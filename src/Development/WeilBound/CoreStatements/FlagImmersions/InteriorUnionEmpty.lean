@@ -13,13 +13,22 @@ namespace RootFieldNumerics.Ref.Comp
 
 open ReciprocityTheory.AnForm.M GlobalTheory.CompanionTheory.Ar.PB Topology Filter
 
-theorem analytic_union {e : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtlas e X} {S T : Set X}
-    (hS : A.IsAnalyticSubset S) (hT : A.IsAnalyticSubset T) : A.IsAnalyticSubset (S ∪ T) := by
+theorem analytic_union
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    {A : FinHolAtlas e X} {S T : Set X} (hS : A.IsAnalyticSubset S) (hT : A.IsAnalyticSubset T)
+    : A.IsAnalyticSubset (S ∪ T) := by
   intro x
   obtain ⟨W, hW, hx, r, f, hf, hSW⟩ := hS x
   obtain ⟨W', hW', hx', r', f', hf', hTW⟩ := hT x
-  refine ⟨W ∩ W', hW.inter hW', ⟨hx, hx'⟩, r * r', fun i y => f (finProdFinEquiv.symm i).1 y *
-    f' (finProdFinEquiv.symm i).2 y, fun i j t ht => ?_, ?_⟩
+  refine ⟨
+    W ∩ W',
+    hW.inter hW',
+    ⟨hx, hx'⟩,
+    r * r',
+    fun i y => f (finProdFinEquiv.symm i).1 y * f' (finProdFinEquiv.symm i).2 y,
+    fun i j t ht => ?_,
+    ?_
+  ⟩
   · exact (hf _ j t ⟨ht.1, ht.2.1⟩).mul (hf' _ j t ⟨ht.1, ht.2.2⟩)
   · ext y
     have h1 := Set.ext_iff.1 hSW y
@@ -47,13 +56,18 @@ theorem analytic_union {e : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtla
       simp only [Equiv.symm_apply_apply] at this
       exact mul_ne_zero hi hi' this
 
-theorem interior_union_empty {X : Type} [TopologicalSpace X] {S T : Set X} (hS : IsClosed S) (h1 : interior S = ∅)
-    (h2 : interior T = ∅) : interior (S ∪ T) = ∅ := by
+theorem interior_union_empty
+    {X : Type} [TopologicalSpace X]
+    {S T : Set X} (hS : IsClosed S) (h1 : interior S = ∅) (h2 : interior T = ∅)
+    : interior (S ∪ T) = ∅ := by
   rw [interior_union_isClosed_of_interior_empty hS h2, h1]
 
-theorem interior_preimage {Y Z : Type} [TopologicalSpace Y] [TopologicalSpace Z] [T2Space Y] [CompactSpace Z]
-    {h : Z → Y} (hh : Continuous h) {N T : Set Y} (hN : IsClosed N) (hNi : interior (h ⁻¹' N) = ∅)
-    (hfib : ∀ x ∉ N, (h ⁻¹' {x}).ncard = 1) (hT : interior T = ∅) : interior (h ⁻¹' T) = ∅ := by
+theorem interior_preimage
+    {Y Z : Type} [TopologicalSpace Y] [TopologicalSpace Z] [T2Space Y] [CompactSpace Z]
+    {h : Z → Y} (hh : Continuous h)
+    {N T : Set Y} (hN : IsClosed N) (hNi : interior (h ⁻¹' N) = ∅)
+    (hfib : ∀ x ∉ N, (h ⁻¹' {x}).ncard = 1) (hT : interior T = ∅)
+    : interior (h ⁻¹' T) = ∅ := by
   by_contra hne
   have hd : Dense (h ⁻¹' N)ᶜ := interior_eq_empty_iff_dense_compl.1 hNi
   obtain ⟨z, hzN, hzO⟩ := hd.exists_mem_open isOpen_interior (Set.nonempty_iff_ne_empty.2 hne)
@@ -84,11 +98,14 @@ theorem interior_preimage {Y Z : Type} [TopologicalSpace Y] [TopologicalSpace Z]
   rw [hT] at this
   exact this
 
-theorem degree_comp {e d : ℕ} {X Y Z : Type} [TopologicalSpace X] [TopologicalSpace Y] [T2Space Y]
-    [TopologicalSpace Z] [CompactSpace Z] {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {C : FinHolAtlas e Z}
-    {π : Y → X} {h : Z → Y} {br S : Set X} {N : Set Y} (hπ : HoloMap B A π) (hh : HoloMap C B h) (hd : 0 < d)
-    (hdπ : IsDegreeOff A B π d br) (hdh : IsDegreeOff B C h 1 N) (hS : A.IsAnalyticSubset S)
-    (hSi : interior (π ⁻¹' S) = ∅) (hNS : N ⊆ π ⁻¹' S) : IsDegreeOff A C (π ∘ h) d (br ∪ S) := by
+theorem degree_comp
+    {e d : ℕ} {X Y Z : Type}
+    [TopologicalSpace X] [TopologicalSpace Y] [T2Space Y] [TopologicalSpace Z] [CompactSpace Z]
+    {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {C : FinHolAtlas e Z} {π : Y → X} {h : Z → Y}
+    {br S : Set X} {N : Set Y} (hπ : HoloMap B A π) (hh : HoloMap C B h)
+    (hd : 0 < d) (hdπ : IsDegreeOff A B π d br) (hdh : IsDegreeOff B C h 1 N)
+    (hS : A.IsAnalyticSubset S) (hSi : interior (π ⁻¹' S) = ∅) (hNS : N ⊆ π ⁻¹' S)
+    : IsDegreeOff A C (π ∘ h) d (br ∪ S) := by
   obtain ⟨a1, a2, a3, a4, a5, a6⟩ := hdπ
   obtain ⟨b1, b2, b3, b4, b5, b6⟩ := hdh
   have hcomp := CovMap.holoMap_comp hh hπ
@@ -100,13 +117,22 @@ theorem degree_comp {e d : ℕ} {X Y Z : Type} [TopologicalSpace X] [Topological
     have hpos : 0 < (π ⁻¹' {x}).ncard := by rw [a5 x hx]; exact hd
     obtain ⟨y, hy⟩ := Set.nonempty_of_ncard_ne_zero hpos.ne'
     have hy' : π y = x := hy
-    have : y ∈ interior (π ⁻¹' S) := preimage_interior_subset_interior_preimage hπ.1 (by
-      show π y ∈ interior S
-      rw [hy']; exact hxO)
+    have : y ∈ interior (π ⁻¹' S) :=
+      preimage_interior_subset_interior_preimage hπ.1 (by
+        show π y ∈ interior S
+        rw [hy']
+        exact hxO)
     rw [hSi] at this
     exact this
   have hU := analytic_union a1 hS
-  refine ⟨hU, interior_union_empty hbrc a2 hSi', CovMap.Deg.isAnalyticSubset_preimage hcomp hU, ?_, ?_, ?_⟩
+  refine ⟨
+    hU,
+    interior_union_empty hbrc a2 hSi',
+    CovMap.Deg.isAnalyticSubset_preimage hcomp hU,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Set.preimage_comp]
     refine interior_preimage hh.1 (isClosed_of_isAnalyticSubset B b1) b4 b5 ?_
     rw [Set.preimage_union]
@@ -128,7 +154,8 @@ theorem degree_comp {e d : ℕ} {X Y Z : Type} [TopologicalSpace X] [Topological
           exact this
         refine ⟨c, ?_, hcx⟩
         show π (h c) = x
-        rw [hcx]; exact hy
+        rw [hcx]
+        exact hy
     rw [← himg]
     refine (Set.InjOn.ncard_image ?_).symm
     intro z hz w _ hzw
@@ -170,8 +197,10 @@ theorem degree_comp {e d : ℕ} {X Y Z : Type} [TopologicalSpace X] [Topological
     have hcomp' : fderiv ℂ (P ∘ Q) y = (fderiv ℂ P (Q y)).comp (fderiv ℂ Q y) :=
       fderiv_comp y hPa.differentiableAt hQa.differentiableAt
     rw [heq.fderiv_eq, hcomp']
-    change LinearMap.det ((fderiv ℂ P (Q y) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ∘ₗ
-      (fderiv ℂ Q y : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))) ≠ 0
+    change LinearMap.det
+        ((fderiv ℂ P (Q y) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+          ∘ₗ (fderiv ℂ Q y : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)))
+      ≠ 0
     rw [LinearMap.det_comp]
     refine mul_ne_zero ?_ ?_
     · rw [hPdef]

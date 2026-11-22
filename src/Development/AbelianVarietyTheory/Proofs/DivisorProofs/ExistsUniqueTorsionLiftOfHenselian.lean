@@ -11,15 +11,26 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Bijectiv
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem existsUnique_torsion_lift_of_henselian : ∀ (W : Type) [CommRing W] [HenselianLocalRing W] (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G → ∀ (p : Sp W ⟶ S) (N : ℕ), IsUnit (N : W) → ∀ x₀ : Over.mk (spMap (residue W) ≫ p) ⟶ G, x₀ ^ N = 1 → ∃! x : Over.mk p ⟶ G, x ^ N = 1 ∧ spMap (residue W) ≫ x.left = x₀.left := by
+theorem existsUnique_torsion_lift_of_henselian
+    : ∀ (W : Type) [CommRing W] [HenselianLocalRing W] (S : Scheme.{0}) (G : Over S) [GrpObj G]
+        [IsCommMonObj G],
+      IsSemiAbelian G
+        → ∀ (p : Sp W ⟶ S) (N : ℕ),
+          IsUnit (N : W)
+            → ∀ x₀ : Over.mk (spMap (residue W) ≫ p) ⟶ G,
+              x₀ ^ N = 1
+                → ∃! x : Over.mk p ⟶ G, x ^ N = 1 ∧ spMap (residue W) ≫ x.left = x₀.left := by
   intro W _ _ S G _ _ hG p N hN x₀ hx₀
   have := hG.smooth
   let G' := (Over.pullback p).obj G
@@ -32,20 +43,23 @@ theorem existsUnique_torsion_lift_of_henselian : ∀ (W : Type) [CommRing W] [He
   let r : T₀ ⟶ T := Over.homMk (spMap (residue W)) (by simp [T, T₀])
   let e := TorsionLift.ptsEquiv p G T p (Category.id_comp p)
   let e₀ := TorsionLift.ptsEquiv p G T₀ (spMap (residue W) ≫ p) rfl
-  have hpow : ∀ {Z : Over (Sp W)} (y : Z ⟶ G'),
-      y ^ N = 1 ↔ y.left ≫ (mulN G' N).left = (1 : Z ⟶ G').left := by
+  have hpow
+      : ∀ {Z : Over (Sp W)} (y : Z ⟶ G'),
+        y ^ N = 1 ↔ y.left ≫ (mulN G' N).left = (1 : Z ⟶ G').left := by
     intro Z y
     rw [← GrpTangent.comp_mulN]
-    exact ⟨fun h => by rw [← Over.comp_left, h],
-      fun h => Over.OverMorphism.ext (by rw [Over.comp_left, h])⟩
+    exact ⟨
+      fun h => by rw [← Over.comp_left, h],
+      fun h => Over.OverMorphism.ext (by rw [Over.comp_left, h])
+    ⟩
   have key : ∀ y₀ : T₀ ⟶ G', y₀ ^ N = 1 → ∃! y : T ⟶ G', y ^ N = 1 ∧ r ≫ y = y₀ := by
     intro y₀ hy₀
     have hone : (1 : T₀ ⟶ G').left = spMap (residue W) ≫ (1 : T ⟶ G').left := by
       rw [← comp_one r, Over.comp_left]
       rfl
-    obtain ⟨l, ⟨hl₁, hl₂⟩, hl₃⟩ := existsUnique_lift_of_etale_of_henselian (mulN G' N).left
-      (residue W) residue_surjective y₀.left (1 : T ⟶ G').left
-      (by rw [(hpow y₀).1 hy₀, hone])
+    obtain ⟨l, ⟨hl₁, hl₂⟩, hl₃⟩ :=
+      existsUnique_lift_of_etale_of_henselian (mulN G' N).left (residue W) residue_surjective
+        y₀.left (1 : T ⟶ G').left (by rw [(hpow y₀).1 hy₀, hone])
     have hlw : l ≫ G'.hom = T.hom := by
       rw [← Over.w (mulN G' N), ← Category.assoc, hl₂]
       exact Over.w _

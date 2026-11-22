@@ -9,7 +9,24 @@ universe u
 
 namespace GlobalTheory
 
-theorem weightSpace_iff_idempotent_fixed : ∀ (k : Type) [Field k] (C : Type) [CommRing C] (M : Type u) [AddCommGroup M] [Module k M] [Module (k ⊗[ℤ] C) M] [IsScalarTower k (k ⊗[ℤ] C) M] [FiniteDimensional k M] (χ : C →+* k) (e : k ⊗[ℤ] C), IsIdempotentElem e → (Algebra.TensorProduct.lift (Algebra.ofId k k) χ.toIntAlgHom (fun _ _ => Commute.all _ _) : k ⊗[ℤ] C →ₐ[k] k) e = 1 → (∀ a, (Algebra.TensorProduct.lift (Algebra.ofId k k) χ.toIntAlgHom (fun _ _ => Commute.all _ _) : k ⊗[ℤ] C →ₐ[k] k) a = 0 → IsNilpotent (e * a)) → ∀ m : M, m ∈ (⨅ c : C, Module.End.maxGenEigenspace (DistribSMul.toLinearMap k M ((1 : k) ⊗ₜ[ℤ] c)) (χ c)) ↔ e • m = m := by
+theorem weightSpace_iff_idempotent_fixed
+    : ∀ (k : Type) [Field k] (C : Type) [CommRing C] (M : Type u) [AddCommGroup M] [Module k M]
+        [Module (k ⊗[ℤ] C) M] [IsScalarTower k (k ⊗[ℤ] C) M] [FiniteDimensional k M] (χ : C →+* k)
+        (e : k ⊗[ℤ] C),
+      IsIdempotentElem e
+        → (Algebra.TensorProduct.lift (Algebra.ofId k k) χ.toIntAlgHom (fun _ _ => Commute.all _ _)
+              : k ⊗[ℤ] C →ₐ[k] k)
+            e
+          = 1
+        → (∀ a,
+          (Algebra.TensorProduct.lift (Algebra.ofId k k) χ.toIntAlgHom (fun _ _ => Commute.all _ _)
+                  : k ⊗[ℤ] C →ₐ[k] k)
+                a
+              = 0
+            → IsNilpotent (e * a))
+        → ∀ m : M,
+          m ∈ (⨅ c : C, Module.End.maxGenEigenspace (DistribSMul.toLinearMap k M ((1 : k) ⊗ₜ[ℤ] c)) (χ c))
+            ↔ e • m = m := by
   intro k _ C _ M _ _ _ _ _ χ e he he1 hnil m
   set φ : k ⊗[ℤ] C →ₐ[k] k := Algebra.TensorProduct.lift (Algebra.ofId k k) χ.toIntAlgHom (fun _ _ => Commute.all _ _) with hφ
   have hφt : ∀ (x : k) (c : C), φ (x ⊗ₜ[ℤ] c) = x * χ c := by
@@ -20,7 +37,9 @@ theorem weightSpace_iff_idempotent_fixed : ∀ (k : Type) [Field k] (C : Type) [
   have hφT : ∀ c, φ (T c) = 0 := by
     intro c
     simp [T, hφt, AlgHom.commutes]
-  have hρT : ∀ c, ρ (T c) = DistribSMul.toLinearMap k M ((1 : k) ⊗ₜ[ℤ] c) - χ c • (1 : Module.End k M) := by
+  have hρT
+      : ∀ c,
+        ρ (T c) = DistribSMul.toLinearMap k M ((1 : k) ⊗ₜ[ℤ] c) - χ c • (1 : Module.End k M) := by
     intro c
     simp only [T]
     rw [map_sub, AlgHom.commutes, Algebra.algebraMap_eq_smul_one]
@@ -34,17 +53,20 @@ theorem weightSpace_iff_idempotent_fixed : ∀ (k : Type) [Field k] (C : Type) [
       intro c
       have hc : Commute (ρ ((1 : k) ⊗ₜ[ℤ] c)) (ρ a) := (Commute.all _ _).map ρ
       exact Module.End.mapsTo_maxGenEigenspace_of_comm hc (χ c) (hx c)
-    let X' : Submodule (k ⊗[ℤ] C) M :=
-      { carrier := X
-        add_mem' := fun ha hb => X.add_mem ha hb
-        zero_mem' := X.zero_mem
-        smul_mem' := fun a x hx => hstab a x hx }
+    let X' : Submodule (k ⊗[ℤ] C) M := {
+      carrier := X
+      add_mem' := fun ha hb => X.add_mem ha hb
+      zero_mem' := X.zero_mem
+      smul_mem' := fun a x hx => hstab a x hx
+    }
     let ρX : k ⊗[ℤ] C →ₐ[k] Module.End k X' := Algebra.lsmul k k X'
     have hT : ∀ c, IsNilpotent (ρX (T c)) := by
       intro c
-      refine ⟨Module.End.maxGenEigenspaceIndex (DistribSMul.toLinearMap k M ((1 : k) ⊗ₜ[ℤ] c)) (χ c), ?_⟩
+      refine
+        ⟨Module.End.maxGenEigenspaceIndex (DistribSMul.toLinearMap k M ((1 : k) ⊗ₜ[ℤ] c)) (χ c), ?_⟩
       ext ⟨x, hx⟩
-      have hx' : x ∈ Module.End.maxGenEigenspace (DistribSMul.toLinearMap k M ((1 : k) ⊗ₜ[ℤ] c)) (χ c) :=
+      have hx'
+          : x ∈ Module.End.maxGenEigenspace (DistribSMul.toLinearMap k M ((1 : k) ⊗ₜ[ℤ] c)) (χ c) :=
         (Submodule.mem_iInf _).1 hx c
       rw [Module.End.maxGenEigenspace_eq, Module.End.mem_genEigenspace_nat] at hx'
       rw [← hρT, ← map_pow] at hx'
@@ -57,15 +79,15 @@ theorem weightSpace_iff_idempotent_fixed : ∀ (k : Type) [Field k] (C : Type) [
       | zero => simp
       | tmul x c =>
         have : x ⊗ₜ[ℤ] c - algebraMap k (k ⊗[ℤ] C) (φ (x ⊗ₜ[ℤ] c)) = x • T c := by
-          simp only [T, hφt, smul_sub, Algebra.smul_def, map_mul, Algebra.TensorProduct.algebraMap_apply,
-            Algebra.TensorProduct.tmul_mul_tmul]
+          simp only [T, hφt, smul_sub, Algebra.smul_def, map_mul,
+            Algebra.TensorProduct.algebraMap_apply, Algebra.TensorProduct.tmul_mul_tmul]
           rw [mul_sub, Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul]
           simp
         rw [this, map_smul]
         exact (hT c).smul x
       | add a b ha hb =>
-        have : a + b - algebraMap k (k ⊗[ℤ] C) (φ (a + b)) =
-            (a - algebraMap k (k ⊗[ℤ] C) (φ a)) + (b - algebraMap k (k ⊗[ℤ] C) (φ b)) := by
+        have : a + b - algebraMap k (k ⊗[ℤ] C) (φ (a + b))
+            = (a - algebraMap k (k ⊗[ℤ] C) (φ a)) + (b - algebraMap k (k ⊗[ℤ] C) (φ b)) := by
           rw [map_add (f := _), map_add (f := _)]; abel
         rw [this, map_add (f := _)]
         exact Commute.isNilpotent_add ((Commute.all _ _).map ρX) ha hb

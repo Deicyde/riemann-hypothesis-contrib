@@ -14,31 +14,37 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL
 
-structure Places (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+structure Places
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     (sig : E →ₐ[F] E) where
   quad : Module.finrank F E = 2
   loc : ∀ p : HeightOneSpectrum (𝓞 F), LocAt F E sig p
   L : ∀ p, LocE (loc p).Fp (loc p).Ep
   L_cj : ∀ p, (L p).cj = (loc p).cj
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
 
 namespace Places
 
 variable (A : Places F E sig) {n : ℕ}
 
-def bc (p : HeightOneSpectrum (𝓞 F)) (x : Fin n → E) : Fin n → (A.loc p).Ep := fun i => (A.loc p).ιE (x i)
+def bc (p : HeightOneSpectrum (𝓞 F)) (x : Fin n → E) : Fin n → (A.loc p).Ep := fun i =>
+  (A.loc p).ιE (x i)
 
-def lat (p : HeightOneSpectrum (𝓞 F)) (Λ : Submodule (𝓞 E) (Fin n → E)) :
-    Submodule (A.L p).O (Fin n → (A.loc p).Ep) :=
+def lat (p : HeightOneSpectrum (𝓞 F)) (Λ : Submodule (𝓞 E) (Fin n → E))
+    : Submodule (A.L p).O (Fin n → (A.loc p).Ep) :=
   Submodule.span (A.L p).O (A.bc p '' (Λ : Set (Fin n → E)))
 
-def Ext (p : HeightOneSpectrum (𝓞 F)) (g : (Fin n → E) ≃ₗ[E] (Fin n → E))
-    (g' : (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep)) : Prop :=
+def Ext
+    (p : HeightOneSpectrum (𝓞 F))
+    (g : (Fin n → E) ≃ₗ[E] (Fin n → E))
+    (g' : (Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep))
+    : Prop :=
   ∀ x, g' (A.bc p x) = A.bc p (g x)
 
-def rat (K : ∀ p, Subgroup ((Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep))) :
-    Subgroup ((Fin n → E) ≃ₗ[E] (Fin n → E)) where
+def rat (K : ∀ p, Subgroup ((Fin n → (A.loc p).Ep) ≃ₗ[(A.loc p).Ep] (Fin n → (A.loc p).Ep)))
+    : Subgroup ((Fin n → E) ≃ₗ[E] (Fin n → E)) where
   carrier := {g | ∀ p, ∃ g' ∈ K p, A.Ext p g g'}
   one_mem' := fun p => ⟨1, (K p).one_mem, fun _ => rfl⟩
   mul_mem' := by
@@ -68,12 +74,24 @@ structure GFrames (A : Places F E sig) (r k : ℕ) where
   c : ∀ p, ((A.loc p).Fp)ˣ
   S : ∀ p, Frames (A.L p) r k
   Hm_eq : ∀ p, (S p).Hm = Hm.map (A.loc p).ιE
-  f_eq : ∀ p (a : Fin (r + 1)), algebraMap (A.loc p).Fp (A.loc p).Ep ((c p : (A.loc p).Fp) ^ (r - (a : ℕ))) • (S p).f a = A.bc p (f a)
-  f'_eq : ∀ p (a : Fin (r + 1)), algebraMap (A.loc p).Fp (A.loc p).Ep ((c p : (A.loc p).Fp) ^ (r - (a : ℕ))) • (S p).f' a = A.bc p (f' a)
-  es_eq : ∀ p (a : Fin r), (S p).es a =
-    algebraMap (A.loc p).Fp (A.loc p).Ep ((c p : (A.loc p).Fp) ^ (r - (a : ℕ))) • A.bc p (es a)
-  es'_eq : ∀ p (a : Fin r), (S p).es' a =
-    algebraMap (A.loc p).Fp (A.loc p).Ep ((c p : (A.loc p).Fp) ^ (r - (a : ℕ))) • A.bc p (es' a)
+  f_eq
+    : ∀ p (a : Fin (r + 1)),
+      algebraMap (A.loc p).Fp (A.loc p).Ep ((c p : (A.loc p).Fp) ^ (r - (a : ℕ))) • (S p).f a
+        = A.bc p (f a)
+  f'_eq
+    : ∀ p (a : Fin (r + 1)),
+      algebraMap (A.loc p).Fp (A.loc p).Ep ((c p : (A.loc p).Fp) ^ (r - (a : ℕ))) • (S p).f' a
+        = A.bc p (f' a)
+  es_eq
+    : ∀ p (a : Fin r),
+      (S p).es a
+        = algebraMap (A.loc p).Fp (A.loc p).Ep ((c p : (A.loc p).Fp) ^ (r - (a : ℕ)))
+          • A.bc p (es a)
+  es'_eq
+    : ∀ p (a : Fin r),
+      (S p).es' a
+        = algebraMap (A.loc p).Fp (A.loc p).Ep ((c p : (A.loc p).Fp) ^ (r - (a : ℕ)))
+          • A.bc p (es' a)
   c_unit : {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ, ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = c p}.Finite
   gg_fin : {p | (S p).gg = true}.Finite
 
@@ -134,11 +152,13 @@ def Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
 
 def D (l : Fin (r + 2)) : E := lead G.Zh l
 
-def TT : E := (∑ i, ∑ j, G.f (Fin.last r) i * G.Hm i j * sig (G.f (Fin.last r) j)) *
-  ∑ i, ∑ j, G.f' (Fin.last r) i * G.Hm i j * sig (G.f' (Fin.last r) j)
+def TT : E :=
+  (∑ i, ∑ j, G.f (Fin.last r) i * G.Hm i j * sig (G.f (Fin.last r) j))
+    * ∑ i, ∑ j, G.f' (Fin.last r) i * G.Hm i j * sig (G.f' (Fin.last r) j)
 
-def Gr : E := G.D (Fin.last (r + 1)) * sig (G.D (Fin.last (r + 1))) -
-  G.TT * (G.D (Fin.last r).castSucc * sig (G.D (Fin.last r).castSucc))
+def Gr : E :=
+  G.D (Fin.last (r + 1)) * sig (G.D (Fin.last (r + 1)))
+    - G.TT * (G.D (Fin.last r).castSucc * sig (G.D (Fin.last r).castSucc))
 
 end GFrames
 

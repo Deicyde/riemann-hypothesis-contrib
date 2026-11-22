@@ -6,24 +6,23 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 open Polynomial in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.absolutely_closed_unit_coefficient_root :
-    ∀ {S : Type} [CommRing S], Aic (S := S) →
-      (∀ a b : S, IsUnit (a + b) → IsUnit a ∨ IsUnit b) →
-      ∀ (Q : Polynomial S) (i : ℕ), Q.coeff 0 = 1 → 0 < i → IsUnit (Q.coeff i) →
-        ∃ y, Q.eval y = 0 := by
+theorem _root_.GlobalTheory.T.absolutely_closed_unit_coefficient_root
+    : ∀ {S : Type} [CommRing S],
+      Aic (S := S) → (∀ a b : S, IsUnit (a + b) → IsUnit a ∨ IsUnit b)
+        → ∀ (Q : Polynomial S) (i : ℕ),
+          Q.coeff 0 = 1 → 0 < i → IsUnit (Q.coeff i) → ∃ y, Q.eval y = 0 := by
   intro S _ hA hL Q i h0 hi hu
   rcases subsingleton_or_nontrivial S with hs | hn
   · exact ⟨0, Subsingleton.elim _ _⟩
   have : IsLocalRing S := IsLocalRing.of_isUnit_or_isUnit_of_isUnit_add hL
   have htd : Q.natTrailingDegree = 0 :=
     Nat.le_zero.mp (natTrailingDegree_le_of_ne_zero (by rw [h0]; exact one_ne_zero))
-  have hmon : Q.reverse.Monic := by
-    rw [Monic, reverse_leadingCoeff, trailingCoeff, htd, h0]
-  have hdeg : Q.reverse.natDegree = Q.natDegree := by
-    rw [reverse_natDegree, htd, Nat.sub_zero]
+  have hmon : Q.reverse.Monic := by rw [Monic, reverse_leadingCoeff, trailingCoeff, htd, h0]
+  have hdeg : Q.reverse.natDegree = Q.natDegree := by rw [reverse_natDegree, htd, Nat.sub_zero]
   have hid : i ≤ Q.natDegree := le_natDegree_of_ne_zero hu.ne_zero
   obtain ⟨s, hs⟩ := GlobalTheory.T.absolutely_closed_polynomial_splits hA _ hmon
   by_cases hex : ∃ b ∈ s, IsUnit b
@@ -42,8 +41,8 @@ theorem _root_.GlobalTheory.T.absolutely_closed_unit_coefficient_root :
     exact key.symm
   · exfalso
     let m := IsLocalRing.maximalIdeal S
-    have coeff_prod_mem (t : Multiset S) (ht : ∀ b ∈ t, b ∈ m) :
-        ∀ k < t.card, ((t.map fun b => (X : S[X]) - C b).prod).coeff k ∈ m := by
+    have coeff_prod_mem (t : Multiset S) (ht : ∀ b ∈ t, b ∈ m)
+        : ∀ k < t.card, ((t.map fun b => (X : S[X]) - C b).prod).coeff k ∈ m := by
       induction t using Multiset.induction_on with
       | empty => intro k hk; simp at hk
       | cons a t ih =>
@@ -61,8 +60,7 @@ theorem _root_.GlobalTheory.T.absolutely_closed_unit_coefficient_root :
           exact m.sub_mem (ih' k (by omega)) (m.mul_mem_right _ ha)
     have hall : ∀ b ∈ s, b ∈ m := fun b hb =>
       (IsLocalRing.mem_maximalIdeal b).mpr fun hbu => hex ⟨b, hb, hbu⟩
-    have hcard : s.card = Q.natDegree := by
-      rw [← hdeg, hs, natDegree_multiset_prod_X_sub_C_eq_card]
+    have hcard : s.card = Q.natDegree := by rw [← hdeg, hs, natDegree_multiset_prod_X_sub_C_eq_card]
     have hcoeff : Q.reverse.coeff (Q.natDegree - i) = Q.coeff i := by
       rw [coeff_reverse, revAt_le (Nat.sub_le _ _)]
       congr 1

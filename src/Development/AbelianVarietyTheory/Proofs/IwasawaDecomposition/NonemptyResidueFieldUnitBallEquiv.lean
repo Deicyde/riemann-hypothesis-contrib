@@ -14,13 +14,16 @@ noncomputable section
 
 namespace GlobalTheory.HeightCounting
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host NumberField IsDedekindDomain
+  Polynomial
 open IsLocalRing
 
-theorem valuation_le_one_iff_of_lt_iff {K F : Type} [Field K] [NumberField K] [NormedField F]
-    (v : HeightOneSpectrum (𝓞 K)) (a : K →+* F)
-    (h : ∀ x : K, v.valuation K x < 1 ↔ ‖a x‖ < 1) (x : K) :
-    v.valuation K x ≤ 1 ↔ ‖a x‖ ≤ 1 := by
+theorem valuation_le_one_iff_of_lt_iff
+    {K F : Type} [Field K] [NumberField K] [NormedField F]
+    (v : HeightOneSpectrum (𝓞 K)) (a : K →+* F) (h : ∀ x : K, v.valuation K x < 1 ↔ ‖a x‖ < 1)
+    (x : K)
+    : v.valuation K x ≤ 1 ↔ ‖a x‖ ≤ 1 := by
   by_cases hx : x = 0
   · simp [hx]
   have h1 := h x⁻¹
@@ -29,9 +32,11 @@ theorem valuation_le_one_iff_of_lt_iff {K F : Type} [Field K] [NumberField K] [N
   rw [map_inv₀, map_inv₀, norm_inv, inv_lt_one₀ hv, inv_lt_one₀ hn] at h1
   rw [← not_lt, ← not_lt, h1]
 
-theorem exists_embedding_inducing_place (K : Type) [Field K] [NumberField K] [IsGalois ℚ K]
-    (l : ℕ) [Fact l.Prime] (v : HeightOneSpectrum (𝓞 K)) (hl : ((l : ℕ) : 𝓞 K) ∈ v.asIdeal) :
-    ∃ a : K →+* PadicAlgCl l, ∀ x : K, v.valuation K x < 1 ↔ ‖a x‖ < 1 := by
+theorem exists_embedding_inducing_place
+    (K : Type) [Field K] [NumberField K] [IsGalois ℚ K]
+    (l : ℕ) [Fact l.Prime]
+    (v : HeightOneSpectrum (𝓞 K)) (hl : ((l : ℕ) : 𝓞 K) ∈ v.asIdeal)
+    : ∃ a : K →+* PadicAlgCl l, ∀ x : K, v.valuation K x < 1 ↔ ‖a x‖ < 1 := by
   classical
   let a₀ : K →+* PadicAlgCl l := (IsAlgClosed.lift (R := ℚ) (S := K) (M := PadicAlgCl l)).toRingHom
   obtain ⟨w₀, hw₀⟩ := GlobalTheory.LadicPlace.exists_place_of_embedding K l a₀
@@ -48,8 +53,8 @@ theorem exists_embedding_inducing_place (K : Type) [Field K] [NumberField K] [Is
   have := w₀.isPrime
   haveI := Formalism.BasicNotions.Examples₂.PlOver.liesOver_of_mem v.asIdeal hl
   haveI := Formalism.BasicNotions.Examples₂.PlOver.liesOver_of_mem w₀.asIdeal hlw
-  obtain ⟨σ, hσ⟩ := Ideal.exists_smul_eq_of_isGaloisGroup (Ideal.span {(l : ℤ)}) v.asIdeal
-    w₀.asIdeal (K ≃ₐ[ℚ] K)
+  obtain ⟨σ, hσ⟩ :=
+    Ideal.exists_smul_eq_of_isGaloisGroup (Ideal.span {(l : ℤ)}) v.asIdeal w₀.asIdeal (K ≃ₐ[ℚ] K)
   let a : K →+* PadicAlgCl l := a₀.comp (σ : K →+* K)
   obtain ⟨v', hv'⟩ := GlobalTheory.LadicPlace.exists_place_of_embedding K l a
   have hvv : v' = v := by
@@ -63,22 +68,30 @@ theorem exists_embedding_inducing_place (K : Type) [Field K] [NumberField K] [Is
   subst hvv
   exact ⟨a, hv'⟩
 
-theorem algebraMap_toZMod_eq {l : ℕ} [Fact l.Prime] {R : Type} [Field R] [Algebra (ZMod l) R]
-    (f : ℤ_[l] →+* R) (hf : f (l : ℤ_[l]) = 0) (x : ℤ_[l]) :
-    algebraMap (ZMod l) R (PadicInt.toZMod x) = f x := by
+theorem algebraMap_toZMod_eq
+    {l : ℕ} [Fact l.Prime]
+    {R : Type} [Field R] [Algebra (ZMod l) R]
+    (f : ℤ_[l] →+* R) (hf : f (l : ℤ_[l]) = 0)
+    (x : ℤ_[l])
+    : algebraMap (ZMod l) R (PadicInt.toZMod x) = f x := by
   first
   | exact @_root_.GlobalTheory.AlgebraMapToZMod.algebraMap_toZMod_eq
   | exact _root_.GlobalTheory.AlgebraMapToZMod.algebraMap_toZMod_eq
   | (apply _root_.GlobalTheory.AlgebraMapToZMod.algebraMap_toZMod_eq <;> assumption)
   | (intros; apply _root_.GlobalTheory.AlgebraMapToZMod.algebraMap_toZMod_eq <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.AlgebraMapToZMod.algebraMap_toZMod_eq <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.AlgebraMapToZMod.algebraMap_toZMod_eq
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.AlgebraMapToZMod.algebraMap_toZMod_eq ..)
 
-theorem isAlgebraic_residueField {l : ℕ} [Fact l.Prime] {B : Type} [CommRing B] [IsLocalRing B]
-    [Algebra (ZMod l) (ResidueField B)] (c : ℤ_[l] →+* B)
-    (hcl : c (l : ℤ_[l]) ∈ maximalIdeal B)
-    (halg : ∀ b : B, ∃ p : ℤ_[l][X], p.IsPrimitive ∧ p.eval₂ c b = 0) :
-    Algebra.IsAlgebraic (ZMod l) (ResidueField B) := by
+theorem isAlgebraic_residueField
+    {l : ℕ} [Fact l.Prime]
+    {B : Type} [CommRing B] [IsLocalRing B] [Algebra (ZMod l) (ResidueField B)]
+    (c : ℤ_[l] →+* B) (hcl : c (l : ℤ_[l]) ∈ maximalIdeal B)
+    (halg : ∀ b : B, ∃ p : ℤ_[l][X], p.IsPrimitive ∧ p.eval₂ c b = 0)
+    : Algebra.IsAlgebraic (ZMod l) (ResidueField B) := by
   have hl : (residue B).comp c (l : ℤ_[l]) = 0 := (residue_eq_zero_iff _).mpr hcl
   have hcomp : (algebraMap (ZMod l) (ResidueField B)).comp PadicInt.toZMod = (residue B).comp c :=
     RingHom.ext fun x => algebraMap_toZMod_eq _ hl x
@@ -99,12 +112,14 @@ theorem isAlgebraic_residueField {l : ℕ} [Fact l.Prime] {B : Type} [CommRing B
     exact PadicInt.prime_p.not_unit hu
   · rw [Polynomial.aeval_def, Polynomial.eval₂_map, hcomp, ← Polynomial.hom_eval₂, hb, map_zero]
 
-theorem exists_isPrimitive_eval₂_eq_zero {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l) :
-    ∃ p : ℤ_[l][X], p.IsPrimitive ∧
-      p.eval₂ ((algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom) x = 0 := by
+theorem exists_isPrimitive_eval₂_eq_zero {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l)
+    : ∃ p : ℤ_[l][X],
+      p.IsPrimitive
+        ∧ p.eval₂ ((algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom) x = 0 := by
   classical
-  have hmap : algebraMap ℤ_[l] (PadicAlgCl l) =
-      (algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom :=
+  have hmap
+      : algebraMap ℤ_[l] (PadicAlgCl l)
+        = (algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom :=
     IsScalarTower.algebraMap_eq ℤ_[l] ℚ_[l] (PadicAlgCl l)
   haveI : FaithfulSMul ℤ_[l] (PadicAlgCl l) :=
     (faithfulSMul_iff_algebraMap_injective _ _).mpr (by
@@ -122,24 +137,25 @@ theorem exists_isPrimitive_eval₂_eq_zero {l : ℕ} [Fact l.Prime] (x : PadicAl
 def unitBall {l : ℕ} [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ) : ValuationSubring ℂ :=
   (PadicAlgCl.valued l).v.valuationSubring.comap (ι.symm : ℂ →+* PadicAlgCl l)
 
-theorem mem_unitBall_iff {l : ℕ} [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ) (z : ℂ) :
-    z ∈ unitBall ι ↔ ‖ι.symm z‖ ≤ 1 := by
-  rw [unitBall, ValuationSubring.mem_comap, Valuation.mem_valuationSubring_iff,
-    ← NNReal.coe_le_coe]
+theorem mem_unitBall_iff {l : ℕ} [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ) (z : ℂ)
+    : z ∈ unitBall ι ↔ ‖ι.symm z‖ ≤ 1 := by
+  rw [unitBall, ValuationSubring.mem_comap, Valuation.mem_valuationSubring_iff, ← NNReal.coe_le_coe]
   rfl
 
-theorem nonempty_residueField_unitBall_equiv {l : ℕ} [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ) :
-    Nonempty (ResidueField (unitBall ι) ≃+* Formalism.CyclotomicNorms.Fbar l) := by
+theorem nonempty_residueField_unitBall_equiv {l : ℕ} [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ)
+    : Nonempty (ResidueField (unitBall ι) ≃+* Formalism.CyclotomicNorms.Fbar l) := by
   classical
   set B := unitBall ι with hB
   let inc : ℤ_[l] →+* PadicAlgCl l := (algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom
   have hinc : ∀ x : ℤ_[l], ‖inc x‖ = ‖x‖ := fun x => by
     change ‖((x : ℚ_[l]) : PadicAlgCl l)‖ = ‖x‖
-    rw [PadicAlgCl.norm_extends]; rfl
-  let c : ℤ_[l] →+* B := (ι.toRingHom.comp inc).codRestrict B.toSubring fun x => by
-    change ι (inc x) ∈ B
-    rw [hB, mem_unitBall_iff, RingEquiv.symm_apply_apply, hinc]
-    exact PadicInt.norm_le_one x
+    rw [PadicAlgCl.norm_extends]
+    rfl
+  let c : ℤ_[l] →+* B :=
+    (ι.toRingHom.comp inc).codRestrict B.toSubring fun x => by
+      change ι (inc x) ∈ B
+      rw [hB, mem_unitBall_iff, RingEquiv.symm_apply_apply, hinc]
+      exact PadicInt.norm_le_one x
   have hcl : c (l : ℤ_[l]) ∈ maximalIdeal B := by
     rw [mem_maximalIdeal, mem_nonunits_iff]
     intro hu
@@ -178,8 +194,8 @@ theorem nonempty_residueField_unitBall_equiv {l : ℕ} [Fact l.Prime] (ι : Padi
   haveI : IsAlgClosure (ZMod l) (ResidueField B) := ⟨inferInstance, inferInstance⟩
   exact ⟨(IsAlgClosure.equiv (ZMod l) (ResidueField B) (AlgebraicClosure (ZMod l))).toRingEquiv⟩
 
-theorem val_nonneg_iff (D : D7) (lam : D.what₂.places.Pl) (x : D.what₂.LL) :
-    0 ≤ D.what₂.places.val lam x ↔ (D.plEq lam).valuation D.what₂.LL x ≤ 1 := by
+theorem val_nonneg_iff (D : D7) (lam : D.what₂.places.Pl) (x : D.what₂.LL)
+    : 0 ≤ D.what₂.places.val lam x ↔ (D.plEq lam).valuation D.what₂.LL x ≤ 1 := by
   haveI := D.nfLL
   by_cases hx : x = 0
   · simp [hx]
@@ -196,20 +212,27 @@ theorem nonempty_plSide : ∀ D : D7, Nonempty (PlSide D) := by
   intro D
   haveI := D.nfLL
   haveI := D.galLL
-  have key : ∀ lam : D.what₂.places.Pl, ∃ ι : Qbar (D.what₂.places.resChar lam) ≃+* ℂ,
-      ∀ x : D.what₂.LL, 0 ≤ D.what₂.places.val lam x ↔ ‖ι.symm (D.what₂.embLL x)‖ ≤ 1 := by
+  have key
+      : ∀ lam : D.what₂.places.Pl, ∃ ι : Qbar (D.what₂.places.resChar lam) ≃+* ℂ, ∀ x : D.what₂.LL,
+        0 ≤ D.what₂.places.val lam x ↔ ‖ι.symm (D.what₂.embLL x)‖ ≤ 1 := by
     intro lam
-    obtain ⟨a, ha⟩ := exists_embedding_inducing_place D.what₂.LL (D.what₂.places.resChar lam)
-      (D.plEq lam) (Formalism.BasicNotions.Examples₂.PlOver.resChar_mem D lam)
-    obtain ⟨ι, hι⟩ := GlobalTheory.exists_padicAlgCl_ringEquiv_complex_comp_eq
-      (D.what₂.places.resChar lam) D.what₂.LL a D.what₂.embLL
+    obtain ⟨a, ha⟩ :=
+      exists_embedding_inducing_place D.what₂.LL (D.what₂.places.resChar lam) (D.plEq lam)
+        (Formalism.BasicNotions.Examples₂.PlOver.resChar_mem D lam)
+    obtain ⟨ι, hι⟩ :=
+      GlobalTheory.exists_padicAlgCl_ringEquiv_complex_comp_eq (D.what₂.places.resChar lam)
+        D.what₂.LL a D.what₂.embLL
     refine ⟨ι, fun x => ?_⟩
-    have h1 : ι.symm (D.what₂.embLL x) = a x := by
-      rw [← hι]; exact ι.symm_apply_apply _
+    have h1 : ι.symm (D.what₂.embLL x) = a x := by rw [← hι]; exact ι.symm_apply_apply _
     rw [h1, val_nonneg_iff, valuation_le_one_iff_of_lt_iff _ a ha]
   choose ι hι using key
-  exact ⟨⟨ι, hι, fun lam => unitBall (ι lam), fun lam z => mem_unitBall_iff (ι lam) z,
-    fun lam => Classical.choice (nonempty_residueField_unitBall_equiv (ι lam))⟩⟩
+  exact ⟨⟨
+    ι,
+    hι,
+    fun lam => unitBall (ι lam),
+    fun lam z => mem_unitBall_iff (ι lam) z,
+    fun lam => Classical.choice (nonempty_residueField_unitBall_equiv (ι lam))
+  ⟩⟩
 
 end GlobalTheory.HeightCounting
 

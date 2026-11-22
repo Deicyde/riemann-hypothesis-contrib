@@ -15,19 +15,23 @@ namespace UpperTheory.GalN.V.Win.N
 
 section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial GlobalTheory.GalOfCusp UpperTheory.V.Af
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+  GlobalTheory.GalOfCusp UpperTheory.V.Af
 
 end
 
 section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
 open GlobalTheory.GalOfCusp UpperTheory.V.CongNum
 
 section
 
-private theorem normV_rat {p : ℕ} (hp : p.Prime) (w : HeightOneSpectrum (𝓞 ℚ)) (hw : (p : 𝓞 ℚ) ∈ w.asIdeal) :
-    normV w = p := by
+private theorem normV_rat
+    {p : ℕ} (hp : p.Prime) (w : HeightOneSpectrum (𝓞 ℚ)) (hw : (p : 𝓞 ℚ) ∈ w.asIdeal)
+    : normV w = p := by
   have h : normV w = Ideal.absNorm w.asIdeal := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]; rfl
   have hN : Ideal.absNorm (Ideal.span {((p : ℕ) : 𝓞 ℚ)}) = p := by
@@ -40,16 +44,22 @@ private theorem normV_rat {p : ℕ} (hp : p.Prime) (w : HeightOneSpectrum (𝓞 
   rw [Ideal.absNorm_eq_one_iff]
   exact w.isPrime.ne_top
 
-private theorem est {p e : ℕ} (hp : 5 ≤ p) (he : 2 ≤ e) {t z₁ z₂ z₃ : ℂ} (h1 : ‖z₁‖ = 1) (h2 : ‖z₂‖ = 1) (h3 : ‖z₃‖ = 1)
-    (ht : ‖t‖ ≤ 3 * (Real.sqrt p * (p : ℝ) ^ ((((e : ℤ) + 1 : ℤ) : ℝ) / 2)) + (p : ℝ) ^ ((((e : ℤ) + 1 : ℤ) : ℝ) / 2)) :
-    t - eis4 p e z₁ z₂ z₃ ≠ 0 ∧ ‖t - eis4 p e z₁ z₂ z₃‖ ≤ (p : ℝ) ^ (2 * (e + 1)) := by
+private theorem est
+    {p e : ℕ} (hp : 5 ≤ p) (he : 2 ≤ e)
+    {t z₁ z₂ z₃ : ℂ} (h1 : ‖z₁‖ = 1) (h2 : ‖z₂‖ = 1) (h3 : ‖z₃‖ = 1)
+    (ht : ‖t‖
+      ≤ 3 * (Real.sqrt p * (p : ℝ) ^ ((((e : ℤ) + 1 : ℤ) : ℝ) / 2))
+        + (p : ℝ) ^ ((((e : ℤ) + 1 : ℤ) : ℝ) / 2))
+    : t - eis4 p e z₁ z₂ z₃ ≠ 0 ∧ ‖t - eis4 p e z₁ z₂ z₃‖ ≤ (p : ℝ) ^ (2 * (e + 1)) := by
   have hp' : (5 : ℝ) ≤ p := by exact_mod_cast hp
   set x : ℝ := (p : ℝ) ^ ((((e : ℤ) + 1 : ℤ) : ℝ) / 2) with hx
   set y : ℝ := (p : ℝ) ^ e with hy
   have hx0 : 0 ≤ x := by positivity
   have hxx : x * x = p * y := by
     rw [hx, ← Real.rpow_add (by linarith), hy, ← pow_succ', ← Real.rpow_natCast]
-    congr 1; push_cast; ring
+    congr 1
+    push_cast
+    ring
   have hy2 : (p : ℝ) ^ 2 ≤ y := pow_le_pow_right₀ (by linarith) he
   have hy0 : 0 ≤ y := by positivity
   have hxy : 2 * x ≤ y := by
@@ -69,7 +79,9 @@ private theorem est {p e : ℕ} (hp : 5 ≤ p) (he : 2 ≤ e) {t z₁ z₂ z₃ 
     rw [norm_one, ← n2, ← n3]
     have := norm_add_le ((p : ℂ) ^ e * z₂) ((p : ℂ) * z₃)
     simpa using this
-  have hE : t - eis4 p e z₁ z₂ z₃ = (t - ((p : ℂ) ^ e * z₂ + (p : ℂ) * z₃ + 1)) - (p : ℂ) ^ (e + 1) * z₁ := by
+  have hE
+      : t - eis4 p e z₁ z₂ z₃
+        = (t - ((p : ℂ) ^ e * z₂ + (p : ℂ) * z₃ + 1)) - (p : ℂ) ^ (e + 1) * z₁ := by
     rw [eis4]; ring
   have hlt : 7 / 2 * y + (y + p + 1) < p * y := by nlinarith
   constructor
@@ -83,17 +95,19 @@ private theorem est {p e : ℕ} (hp : 5 ≤ p) (he : 2 ≤ e) {t z₁ z₂ z₃ 
     have : (2 : ℝ) ≤ p * y := by nlinarith
     nlinarith
 
-private theorem size {c A M e N d p : ℕ} (hN : N ≤ c * (M * (e + 1 + 1)) ^ A) (hM : 1 ≤ M) (hp : 5 ≤ p) :
-    ((N * d : ℕ) : ℝ) * Real.log ((p : ℝ) ^ (2 * (e + 1))) ≤
-      ((c * 2 ^ A * 2 : ℕ) : ℝ) * d * ((M : ℝ) * (e + 1)) ^ (A + 1) * Real.log p := by
+private theorem size
+    {c A M e N d p : ℕ} (hN : N ≤ c * (M * (e + 1 + 1)) ^ A) (hM : 1 ≤ M) (hp : 5 ≤ p)
+    : ((N * d : ℕ) : ℝ) * Real.log ((p : ℝ) ^ (2 * (e + 1)))
+      ≤ ((c * 2 ^ A * 2 : ℕ) : ℝ) * d * ((M : ℝ) * (e + 1)) ^ (A + 1) * Real.log p := by
   have hl : 0 ≤ Real.log p := Real.log_natCast_nonneg p
   have h1 : N * d * (2 * (e + 1)) ≤ c * 2 ^ A * 2 * d * (M * (e + 1)) ^ (A + 1) := by
     have a1 : (M * (e + 1 + 1)) ^ A ≤ 2 ^ A * (M * (e + 1)) ^ A := by
       rw [← mul_pow]; exact Nat.pow_le_pow_left (by nlinarith) _
     have a2 : e + 1 ≤ M * (e + 1) := Nat.le_mul_of_pos_left _ hM
-    calc N * d * (2 * (e + 1)) ≤ c * (2 ^ A * (M * (e + 1)) ^ A) * d * (2 * (M * (e + 1))) := by
-          gcongr
-          exact hN.trans (by gcongr)
+    calc
+      N * d * (2 * (e + 1)) ≤ c * (2 ^ A * (M * (e + 1)) ^ A) * d * (2 * (M * (e + 1))) := by
+        gcongr
+        exact hN.trans (by gcongr)
       _ = _ := by ring
   rw [Real.log_pow, ← mul_assoc]
   refine mul_le_mul_of_nonneg_right ?_ hl

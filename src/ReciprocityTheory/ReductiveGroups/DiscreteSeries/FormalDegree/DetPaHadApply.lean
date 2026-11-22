@@ -17,7 +17,8 @@ variable {n : ℕ}
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-def detPaCj (P Q : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Matrix (Fin n) (Fin n) ℂ where
+def detPaCj (P Q : Matrix (Fin n) (Fin n) ℂ)
+    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Matrix (Fin n) (Fin n) ℂ where
   toFun W := P * W * Q
   map_add' A B := by simp [Matrix.mul_add, Matrix.add_mul]
   map_smul' c A := by simp
@@ -38,10 +39,11 @@ theorem detPaHad_det (s : Fin n → Fin n → ℂ) : LinearMap.det (detPaHad s) 
   rw [LinearMap.det_pi]
   simp [detPaRow_det]
 
-theorem detPa {ε : Fin n → Bool} (y : PCoord ε → ℂ) :
-    LinearMap.det ((fderiv ℝ (shcAd y) 0 : Matrix (Fin n) (Fin n) ℂ →L[ℝ] Matrix (Fin n) (Fin n) ℂ) :
-      Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ) =
-      ∏ i, ∏ j, shc (pev y i - pev y j) ^ 2 := by
+theorem detPa {ε : Fin n → Bool} (y : PCoord ε → ℂ)
+    : LinearMap.det
+        ((fderiv ℝ (shcAd y) 0 : Matrix (Fin n) (Fin n) ℂ →L[ℝ] Matrix (Fin n) (Fin n) ℂ)
+          : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ)
+      = ∏ i, ∏ j, shc (pev y i - pev y j) ^ 2 := by
   set U : Matrix (Fin n) (Fin n) ℂ := ((pmat_isHermitian y).eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hUdef
   have hmem : U ∈ unitary (Matrix (Fin n) (Fin n) ℂ) := ((pmat_isHermitian y).eigenvectorUnitary).2
   have hU2 : U * Uᴴ = 1 := by
@@ -56,13 +58,15 @@ theorem detPa {ε : Fin n → Bool} (y : PCoord ε → ℂ) :
     congr 2
   have hC : shcAd y = ⇑(LinearMap.toContinuousLinearMap (T.restrictScalars ℝ)) := by
     funext W; exact (hT W).symm
-  rw [hC, ContinuousLinearMap.fderiv, LinearMap.coe_toContinuousLinearMap, LinearMap.det_restrictScalars]
+  rw [hC, ContinuousLinearMap.fderiv, LinearMap.coe_toContinuousLinearMap,
+    LinearMap.det_restrictScalars]
   have hAB : LinearMap.det (detPaCj U Uᴴ) * LinearMap.det (detPaCj Uᴴ U) = 1 := by
     rw [← LinearMap.det_comp]
     have : (detPaCj U Uᴴ).comp (detPaCj Uᴴ U) = LinearMap.id := by
       ext W : 1
       simp only [LinearMap.comp_apply, detPaCj, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.id_apply]
-      rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hU2, Matrix.one_mul, Matrix.mul_assoc, hU2, Matrix.mul_one]
+      rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hU2, Matrix.one_mul, Matrix.mul_assoc, hU2,
+        Matrix.mul_one]
     rw [this, LinearMap.det_id]
   have hdet : LinearMap.det T = ∏ i, ∏ j, s i j := by
     simp only [T]

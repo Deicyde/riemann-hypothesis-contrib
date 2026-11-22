@@ -15,15 +15,18 @@ open Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P.G2 Formalism.Fourie
 noncomputable def geoS {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (t : ℂ) : Matrix (Fin n) (Fin n) ℂ :=
   ∑ j ∈ Finset.range n, t ^ (n - 1 - j) • (-X) ^ j
 
-theorem geom {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X) (t : ℂ) :
-    (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) * geoS X t = t ^ n • (1 : Matrix (Fin n) (Fin n) ℂ) := by
+theorem geom {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X) (t : ℂ)
+    : (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) * geoS X t
+      = t ^ n • (1 : Matrix (Fin n) (Fin n) ℂ) := by
   have hnil : ∀ k : ℕ, ∀ i j : Fin n, (j : ℕ) < i + k → (X ^ k) i j = 0 := by
     intro k
     induction k with
     | zero =>
       intro i j hij
       rw [pow_zero, Matrix.one_apply_ne]
-      intro h; rw [h] at hij; omega
+      intro h
+      rw [h] at hij
+      omega
     | succ k ih =>
       intro i j hij
       rw [pow_succ, Matrix.mul_apply]
@@ -38,7 +41,9 @@ theorem geom {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X) (
     simp [hnil n i j (by omega)]
   have hc : Commute (-X) (t • (1 : Matrix (Fin n) (Fin n) ℂ)) := (Commute.one_right _).smul_right t
   have h := hc.mul_geom_sum₂ n
-  have hS : ∑ i ∈ Finset.range n, (-X) ^ i * (t • (1 : Matrix (Fin n) (Fin n) ℂ)) ^ (n - 1 - i) = geoS X t := by
+  have hS
+      : ∑ i ∈ Finset.range n, (-X) ^ i * (t • (1 : Matrix (Fin n) (Fin n) ℂ)) ^ (n - 1 - i)
+        = geoS X t := by
     unfold geoS
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [smul_pow, one_pow, Matrix.mul_smul, mul_one]
@@ -46,19 +51,21 @@ theorem geom {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X) (
   have e : t • (1 : Matrix (Fin n) (Fin n) ℂ) + X = -(-X - t • 1) := by rw [neg_sub, sub_neg_eq_add]
   rw [e, neg_mul, h, neg_neg]
 
-theorem det_shift {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X) (t : ℂ) :
-    (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X).det = t ^ n := by
+theorem det_shift {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X) (t : ℂ)
+    : (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X).det = t ^ n := by
   rw [Matrix.det_of_upperTriangular]
   · simp [hX _ _ le_rfl]
   · intro i j hij
     have hne : i ≠ j := (ne_of_lt hij).symm
     simp [Matrix.one_apply_ne hne, hX i j hij.le]
 
-theorem sum_eq_geoS {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (t : ℂ) :
-    ∑ j ∈ Finset.range n, (ρ ⬝ᵥ ((-X) ^ j *ᵥ B)) * t ^ (n - 1 - j) = ρ ⬝ᵥ (geoS X t *ᵥ B) := by
+theorem sum_eq_geoS {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (t : ℂ)
+    : ∑ j ∈ Finset.range n, (ρ ⬝ᵥ ((-X) ^ j *ᵥ B)) * t ^ (n - 1 - j) = ρ ⬝ᵥ (geoS X t *ᵥ B) := by
   unfold geoS
-  have key : ∀ m : ℕ, ∑ j ∈ Finset.range m, (ρ ⬝ᵥ ((-X) ^ j *ᵥ B)) * t ^ (n - 1 - j) =
-      ρ ⬝ᵥ ((∑ j ∈ Finset.range m, t ^ (n - 1 - j) • (-X) ^ j) *ᵥ B) := by
+  have key
+      : ∀ m : ℕ,
+        ∑ j ∈ Finset.range m, (ρ ⬝ᵥ ((-X) ^ j *ᵥ B)) * t ^ (n - 1 - j)
+          = ρ ⬝ᵥ ((∑ j ∈ Finset.range m, t ^ (n - 1 - j) • (-X) ^ j) *ᵥ B) := by
     intro m
     induction m with
     | zero => simp
@@ -67,8 +74,9 @@ theorem sum_eq_geoS {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n →
         Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul, mul_comm (t ^ (n - 1 - k))]
   exact key n
 
-theorem Mcoord_eq {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) :
-    Mcoord t X B ρ σ = blk (wMat n) 0 0 1 * blk (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) B ρ σ := by
+theorem Mcoord_eq {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ)
+    : Mcoord t X B ρ σ
+      = blk (wMat n) 0 0 1 * blk (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) B ρ σ := by
   unfold Mcoord blk
   simp only [Matrix.reindex_apply]
   rw [Matrix.submatrix_mul_equiv, Matrix.fromBlocks_multiply]
@@ -80,9 +88,13 @@ theorem Mcoord_eq {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : F
   · ext i j; simp [Matrix.mul_apply]
   · ext i j; simp [Matrix.mul_apply]
 
-theorem det_blk_ne {n : ℕ} (t : ℂ) (ht : t ≠ 0) (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X)
-    (B ρ : Fin n → ℂ) (σ : ℂ) :
-    (blk (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) B ρ σ).det = t ^ n * σ - ρ ⬝ᵥ (geoS X t *ᵥ B) := by
+theorem det_blk_ne
+    {n : ℕ}
+    (t : ℂ) (ht : t ≠ 0)
+    (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X)
+    (B ρ : Fin n → ℂ) (σ : ℂ)
+    : (blk (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) B ρ σ).det
+      = t ^ n * σ - ρ ⬝ᵥ (geoS X t *ᵥ B) := by
   unfold blk
   rw [Matrix.det_reindex_self]
   have hdet : (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X).det = t ^ n := det_shift X hX t
@@ -104,18 +116,20 @@ theorem det_blk_ne {n : ℕ} (t : ℂ) (ht : t ≠ 0) (X : Matrix (Fin n) (Fin n
   field_simp
   try ring
 
-theorem continuous_blk_shift {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ) :
-    Continuous fun t : ℂ => blk (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) B ρ σ := by
+theorem continuous_blk_shift {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (B ρ : Fin n → ℂ) (σ : ℂ)
+    : Continuous fun t : ℂ => blk (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) B ρ σ := by
   unfold blk
   fun_prop
 
-theorem continuous_geoS {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) : Continuous fun t : ℂ => geoS X t := by
+theorem continuous_geoS {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ)
+    : Continuous fun t : ℂ => geoS X t := by
   unfold geoS
   fun_prop
 
-theorem det_blk {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X)
-    (B ρ : Fin n → ℂ) (σ : ℂ) :
-    (blk (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) B ρ σ).det = t ^ n * σ - ρ ⬝ᵥ (geoS X t *ᵥ B) := by
+theorem det_blk
+    {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X) (B ρ : Fin n → ℂ) (σ : ℂ)
+    : (blk (t • (1 : Matrix (Fin n) (Fin n) ℂ) + X) B ρ σ).det
+      = t ^ n * σ - ρ ⬝ᵥ (geoS X t *ᵥ B) := by
   by_cases ht : t = 0
   swap
   · exact det_blk_ne t ht X hX B ρ σ
@@ -124,29 +138,37 @@ theorem det_blk {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStr
   have hc2 : Continuous fun s : ℂ => s ^ n * σ - ρ ⬝ᵥ (geoS X s *ᵥ B) :=
     ((continuous_pow n).mul continuous_const).sub
       (continuous_const.dotProduct ((continuous_geoS X).matrix_mulVec continuous_const))
-  have heq := Continuous.ext_on (dense_compl_singleton (0 : ℂ)) hc1 hc2 (fun s hs => det_blk_ne s hs X hX B ρ σ)
+  have heq :=
+    Continuous.ext_on (dense_compl_singleton (0 : ℂ)) hc1 hc2
+      (fun s hs => det_blk_ne s hs X hX B ρ σ)
   exact congrFun heq t
 
-theorem det_Mcoord {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X)
-    (B ρ : Fin n → ℂ) (σ : ℂ) :
-    (Mcoord t X B ρ σ).det = (wMat n).det *
-      (t ^ n * σ - ∑ j ∈ Finset.range n, (ρ ⬝ᵥ ((-X) ^ j *ᵥ B)) * t ^ (n - 1 - j)) := by
+theorem det_Mcoord
+    {n : ℕ} (t : ℂ) (X : Matrix (Fin n) (Fin n) ℂ) (hX : IsStrictUpper X) (B ρ : Fin n → ℂ) (σ : ℂ)
+    : (Mcoord t X B ρ σ).det
+      = (wMat n).det
+        * (t ^ n * σ - ∑ j ∈ Finset.range n, (ρ ⬝ᵥ ((-X) ^ j *ᵥ B)) * t ^ (n - 1 - j)) := by
   have hW : (blk (wMat n) 0 0 1).det = (wMat n).det := by
     unfold blk
     rw [Matrix.det_reindex_self]
     simp only [Pi.zero_apply]
-    rw [show (Matrix.of fun _ _ => (0 : ℂ) : Matrix _ (Fin n) ℂ) = 0 from rfl, Matrix.det_fromBlocks_zero₂₁]
+    rw [show (Matrix.of fun _ _ => (0 : ℂ) : Matrix _ (Fin n) ℂ) = 0 from rfl,
+      Matrix.det_fromBlocks_zero₂₁]
     simp
   rw [Mcoord_eq, Matrix.det_mul, det_blk t X hX, sum_eq_geoS, hW]
 
 theorem detMXY : DetMXY := by
   intro m D t p hC
   have hX := isStrictUpper_strictUpper (redOf m p).2.2.1
-  have h := det_Mcoord t (strictUpper (redOf m p).2.2.1) hX (redOf m p).2.2.2
-    (Fin.cons (rhoXY m D t p) (redOf m p).2.1) (redOf m p).1
+  have h :=
+    det_Mcoord t (strictUpper (redOf m p).2.2.1) hX (redOf m p).2.2.2
+      (Fin.cons (rhoXY m D t p) (redOf m p).2.1) (redOf m p).1
   rw [cornerSplit m _ _ _ _ t] at h
-  have e : detM (MXY m D t p) = (Mcoord t (strictUpper (redOf m p).2.2.1) (redOf m p).2.2.2
-      (Fin.cons (rhoXY m D t p) (redOf m p).2.1) (redOf m p).1).det := rfl
+  have e
+      : detM (MXY m D t p)
+        = (Mcoord t (strictUpper (redOf m p).2.2.1) (redOf m p).2.2.2
+          (Fin.cons (rhoXY m D t p) (redOf m p).2.1) (redOf m p).1).det :=
+    rfl
   rw [e, h]
   congr 1
   have hC' : Cof (strictUpper (redOf m p).2.2.1) (redOf m p).2.2.2 t ≠ 0 := hC
@@ -173,34 +195,44 @@ theorem redIntegrable : RedIntegrable := by
   have hG : Integrable (fun q => Fint β m Φ t c (consMap m q)) (muRed β m) :=
     hmp.integrable_comp_of_integrable hF
   have hcC : Measurable (fun y : (Fin m → ℂ) × (UT (m + 1) → ℂ) × (Fin (m + 1) → ℂ) =>
-      Cof (strictUpper y.2.1) y.2.2 t) := ((continuous_cof m t).comp continuous_snd).measurable
+      Cof (strictUpper y.2.1) y.2.2 t) :=
+    ((continuous_cof m t).comp continuous_snd).measurable
   set α : (Fin m → ℂ) × (UT (m + 1) → ℂ) × (Fin (m + 1) → ℂ) → ℂ :=
     fun y => t ^ (m + 1) / Cof (strictUpper y.2.1) y.2.2 t with hα
   set γ : (Fin m → ℂ) × (UT (m + 1) → ℂ) × (Fin (m + 1) → ℂ) → ℂ :=
     fun y => (-(c * t ^ (m + 1)) - R0 (strictUpper y.2.1) y.2.2 y.1 t) / Cof (strictUpper y.2.1) y.2.2 t with hγ
   have hαm : Measurable α := measurable_const.div hcC
   have hγm : Measurable γ := (measurable_const.sub (continuous_remainder m t).measurable).div hcC
-  have hm := affine_fibre ((muPi β (Fin m)).prod ((muPi β (UT (m + 1))).prod (muPi β (Fin (m + 1))))) β
-    α γ hαm hγm ((ae_cof_ne' β t ht m).mono fun y hy => div_ne_zero (pow_ne_zero _ ht) hy)
-  have hT : Measurable (fun p : RedCoord m => ((α p.2 * p.1 + γ p.2, p.2) : RedCoord m)) := by fun_prop
+  have hm :=
+    affine_fibre ((muPi β (Fin m)).prod ((muPi β (UT (m + 1))).prod (muPi β (Fin (m + 1))))) β α γ
+      hαm hγm ((ae_cof_ne' β t ht m).mono fun y hy => div_ne_zero (pow_ne_zero _ ht) hy)
+  have hT : Measurable (fun p : RedCoord m => ((α p.2 * p.1 + γ p.2, p.2) : RedCoord m)) := by
+    fun_prop
   have hd : Measurable (fun p : RedCoord m => (‖α p.2‖₊ ^ 2 : NNReal)) := by fun_prop
-  have hG' : Integrable (fun q => Fint β m Φ t c (consMap m q))
-      (Measure.map (fun p : RedCoord m => ((α p.2 * p.1 + γ p.2, p.2) : RedCoord m))
+  have hG' : Integrable
+      (fun q => Fint β m Φ t c (consMap m q))
+      (Measure.map
+        (fun p : RedCoord m => ((α p.2 * p.1 + γ p.2, p.2) : RedCoord m))
         ((muRed β m).withDensity (fun p => ((‖α p.2‖₊ ^ 2 : NNReal) : ENNReal)))) := by
-    have : Measure.map (fun p : RedCoord m => ((α p.2 * p.1 + γ p.2, p.2) : RedCoord m))
-        ((muRed β m).withDensity (fun p => ((‖α p.2‖₊ ^ 2 : NNReal) : ENNReal))) = muRed β m := hm
-    rw [this]; exact hG
+    have : Measure.map
+          (fun p : RedCoord m => ((α p.2 * p.1 + γ p.2, p.2) : RedCoord m))
+          ((muRed β m).withDensity (fun p => ((‖α p.2‖₊ ^ 2 : NNReal) : ENNReal)))
+        = muRed β m :=
+      hm
+    rw [this]
+    exact hG
   have h5 := hG'.comp_measurable hT
   have h6 := (integrable_withDensity_iff_integrable_smul hd).1 h5
-  have h7 : Integrable (fun q : RedCoord m => ((‖t‖ ^ (2 * (m + 1)) : ℝ) : ℂ) •
-      redIntegrand β m Φ (c * t ^ (m + 1)) t q) (muRed β m) := by
+  have h7 : Integrable
+      (fun q : RedCoord m =>
+        ((‖t‖ ^ (2 * (m + 1)) : ℝ) : ℂ) • redIntegrand β m Φ (c * t ^ (m + 1)) t q)
+      (muRed β m) := by
     refine h6.congr (Filter.Eventually.of_forall fun q => ?_)
     have := pointwise_red β m Φ t c ht q
     simp only [NNReal.smul_def, NNReal.coe_pow, coe_nnnorm, Function.comp]
     rw [← Complex.coe_smul]
     exact this
-  have hne : ((‖t‖ ^ (2 * (m + 1)) : ℝ) : ℂ) ≠ 0 := by
-    rw [Ne, Complex.ofReal_eq_zero]; positivity
+  have hne : ((‖t‖ ^ (2 * (m + 1)) : ℝ) : ℂ) ≠ 0 := by rw [Ne, Complex.ofReal_eq_zero]; positivity
   exact (integrable_smul_iff hne _).1 h7
 
 theorem innerXYOfReduced : InnerXYOfReduced := by
@@ -211,10 +243,12 @@ theorem innerXYOfReduced : InnerXYOfReduced := by
   have i3 : SecondCountableTopology (RedCoord m) := inferInstance
   have i4 : MeasurableSpace.CountablyGenerated (RedCoord m) := inferInstance
   have i5 : MeasurableSpace.CountablySeparated (RedCoord m) := inferInstance
-  have hemb : MeasurableEmbedding (redOf m) := hmp.measurable.measurableEmbedding (hSplit m β).1.injective
-  have hfun : (fun p : XY m =>
-      psi β (g0 ((-1) ^ (m + 3) * (c * t ^ (m + 1))) p.1 / t) • amp β m Φ (c * t ^ (m + 1)) t p) =
-      redIntegrand β m Φ (c * t ^ (m + 1)) t ∘ redOf m :=
+  have hemb : MeasurableEmbedding (redOf m) :=
+    hmp.measurable.measurableEmbedding (hSplit m β).1.injective
+  have hfun
+      : (fun p : XY m =>
+          psi β (g0 ((-1) ^ (m + 3) * (c * t ^ (m + 1))) p.1 / t) • amp β m Φ (c * t ^ (m + 1)) t p)
+        = redIntegrand β m Φ (c * t ^ (m + 1)) t ∘ redOf m :=
     funext fun p => hAmp m β (c * t ^ (m + 1)) t ht V Φ p
   have h1 := hRI m β t c ht V Φ hint
   have h2 := hOm m β t c ht V Φ hint
@@ -230,8 +264,10 @@ namespace Formalism.FourierDecayAlt.P
 
 theorem det_matrix_xy : Formalism.FourierDecayAlt.G.DetMXY := CuspidalIrreducibleSubrep.detMXY
 
-theorem reduced_integrand_integrable : Formalism.FourierDecayAlt.G.RedIntegrable := CuspidalIrreducibleSubrep.redIntegrable
+theorem reduced_integrand_integrable : Formalism.FourierDecayAlt.G.RedIntegrable :=
+  CuspidalIrreducibleSubrep.redIntegrable
 
-theorem inner_xy_of_reduced : Formalism.FourierDecayAlt.G.InnerXYOfReduced := CuspidalIrreducibleSubrep.innerXYOfReduced
+theorem inner_xy_of_reduced : Formalism.FourierDecayAlt.G.InnerXYOfReduced :=
+  CuspidalIrreducibleSubrep.innerXYOfReduced
 
 end Formalism.FourierDecayAlt.P

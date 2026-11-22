@@ -109,8 +109,12 @@ lemma norm_sum_twist_le (g : ℕ → ℂ) {m : ℝ} (hGs : ∀ k, ‖∑ i ∈ r
 
 theorem pair_cross_bound : PairCross := by
   intro M _ ψ hψ w hw U hU
-  have h := norm_sum_twist_le (fun n => ψ (n : ZMod M)) (m := (M : ℝ))
-    (fun k => norm_character_sum_range_le ψ hψ k) hw hU
+  have h :=
+    norm_sum_twist_le
+      (fun n => ψ (n : ZMod M))
+      (m := (M : ℝ))
+      (fun k => norm_character_sum_range_le ψ hψ k)
+      hw hU
   refine h.trans ?_
   have : (0 : ℝ) ≤ M := by positivity
   nlinarith [norm_nonneg w]
@@ -237,7 +241,8 @@ theorem pair_same_bound : PairSame := by
   have hM0 : (0 : ℝ) < M := by exact_mod_cast NeZero.pos M
   have hU0 : (0 : ℝ) < U := by exact_mod_cast hU
   have h1w : 1 - w ≠ 0 := by
-    intro h; apply ht
+    intro h
+    apply ht
     have := congrArg Complex.im h
     simpa using this
   set c : ℂ := (Fintype.card (ZMod M)ˣ : ℂ) / (M : ℂ) with hc
@@ -258,33 +263,40 @@ theorem pair_same_bound : PairSame := by
     have : (M : ℂ) ≠ 0 := by exact_mod_cast (NeZero.ne M)
     field_simp
     ring
-  have hA := norm_sum_twist_le (fun n => h (n : ZMod M)) (m := 2 * (M : ℝ))
-    (fun k => norm_sum_range_periodic_le h hK hsum0 k) hw hU
+  have hA :=
+    norm_sum_twist_le
+      (fun n => h (n : ZMod M))
+      (m := 2 * (M : ℝ))
+      (fun k => norm_sum_range_periodic_le h hK hsum0 k)
+      hw hU
   have hB := norm_sum_cpow_sub_prim_le hU hw h1w (2 * U) (by omega)
   have hC := norm_prim_dyadic_le hU hw ht
-  have hB' : ((((2 * U : ℕ) : ℝ)) - U) * (‖w‖ / U) = ‖w‖ := by
-    push_cast; field_simp; ring
+  have hB' : ((((2 * U : ℕ) : ℝ)) - U) * (‖w‖ / U) = ‖w‖ := by push_cast; field_simp; ring
   rw [hB'] at hB
   have hS : ‖∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w)‖ ≤ ‖w‖ + 3 * (U : ℝ) ^ (1 - w.re) / |w.im| := by
-    have := norm_add_le (∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w) -
-      (((2 * U : ℕ) : ℂ) ^ (1 - w) - (U : ℂ) ^ (1 - w)) / (1 - w))
-      ((((2 * U : ℕ) : ℂ) ^ (1 - w) - (U : ℂ) ^ (1 - w)) / (1 - w))
+    have :=
+      norm_add_le
+        (∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w)
+          - (((2 * U : ℕ) : ℂ) ^ (1 - w) - (U : ℂ) ^ (1 - w)) / (1 - w))
+        ((((2 * U : ℕ) : ℂ) ^ (1 - w) - (U : ℂ) ^ (1 - w)) / (1 - w))
     rw [sub_add_cancel] at this
     linarith
-  have hsplit : ∑ n ∈ Ioc U (2 * U), (1 : DirichletCharacter ℂ M) (n : ZMod M) * (n : ℂ) ^ (-w) =
-      ∑ n ∈ Ioc U (2 * U), h (n : ZMod M) * (n : ℂ) ^ (-w) +
-        c * ∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w) := by
+  have hsplit
+      : ∑ n ∈ Ioc U (2 * U), (1 : DirichletCharacter ℂ M) (n : ZMod M) * (n : ℂ) ^ (-w)
+        = ∑ n ∈ Ioc U (2 * U), h (n : ZMod M) * (n : ℂ) ^ (-w)
+          + c * ∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w) := by
     rw [Finset.mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl (fun n _ => ?_)
-    simp only [hh]; ring
+    simp only [hh]
+    ring
   rw [hsplit]
   have hQ : 0 ≤ (U : ℝ) ^ (1 - w.re) / |w.im| := by positivity
-  have hcS : ‖c * ∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w)‖ ≤
-      ‖w‖ + 3 * (U : ℝ) ^ (1 - w.re) / |w.im| := by
+  have hcS
+      : ‖c * ∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w)‖ ≤ ‖w‖ + 3 * (U : ℝ) ^ (1 - w.re) / |w.im| := by
     rw [norm_mul]
-    calc ‖c‖ * ‖∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w)‖
-        ≤ 1 * (‖w‖ + 3 * (U : ℝ) ^ (1 - w.re) / |w.im|) :=
-          mul_le_mul hcn hS (norm_nonneg _) zero_le_one
+    calc
+      ‖c‖ * ‖∑ n ∈ Ioc U (2 * U), (n : ℂ) ^ (-w)‖ ≤ 1 * (‖w‖ + 3 * (U : ℝ) ^ (1 - w.re) / |w.im|) :=
+        mul_le_mul hcn hS (norm_nonneg _) zero_le_one
       _ = _ := one_mul _
   refine (norm_add_le _ _).trans ((add_le_add hA hcS).trans ?_)
   have e3 : 3 * (U : ℝ) ^ (1 - w.re) / |w.im| = 3 * ((U : ℝ) ^ (1 - w.re) / |w.im|) := by ring

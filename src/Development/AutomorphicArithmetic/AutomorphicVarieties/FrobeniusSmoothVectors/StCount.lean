@@ -5,14 +5,38 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Twisted
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr
+  UpperTheory.V
 
-private theorem card_bot' {R N : Type} [Ring R] [AddCommGroup N] [Module R N] :
-    Nat.card (⊥ : Submodule R N) = 1 := by
+private theorem card_bot' {R N : Type} [Ring R] [AddCommGroup N] [Module R N]
+    : Nat.card (⊥ : Submodule R N) = 1 := by
   exact Nat.card_unique
 
-theorem UpperTheory.V.Fr.st_count :
-    GlobalFiniteness → GreenbergWiles → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] (S : Finset (HeightOneSpectrum (𝓞 ℚ))) (ρ : Representation (ZMod (l ^ 1)) (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) M), ContainsAbove S l → ContAction ρ → ∀ μ : GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))) →* (ZMod (l ^ 1))ˣ, μ.comp (toGS Ω _) = cycMod ℚ Ω l 1 → ∀ Av : S → ValuationSubring Ω, (∀ v, IsPlaceOver (Av v) v.1) → ∀ σ : G ℚ Ω, IsCC σ → (∀ m, ρ (toGS Ω _ σ) m = m → m = 0) → H0 (twDual μ ρ) = ⊥ → ∀ v₀ : S, (∀ v, v ≠ v₀ → H0 (ρ.comp (locFam S Av v)) = ⊥) → Nat.card (H0 (ρ.comp (locFam S Av v₀))) < Nat.card (H1 (ρ.comp (locFam S Av v₀))) → ∃ z ∈ Z1 ρ, z ∉ B1 ρ ∧ ∀ v, v ≠ v₀ → ∃ m, ∀ g ∈ Dec (F := ℚ) (Av v), z (toGS Ω _ g) = ρ (toGS Ω _ g) m - m := by
+theorem UpperTheory.V.Fr.st_count
+    : GlobalFiniteness → GreenbergWiles
+      → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime],
+        l ≠ 2
+          → ∀ (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M] [TopologicalSpace M]
+              [DiscreteTopology M] (S : Finset (HeightOneSpectrum (𝓞 ℚ)))
+              (ρ : Representation (ZMod (l ^ 1)) (GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ)))) M),
+            ContainsAbove S l → ContAction ρ
+              → ∀ μ : GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))) →* (ZMod (l ^ 1))ˣ,
+                μ.comp (toGS Ω _) = cycMod ℚ Ω l 1
+                  → ∀ Av : S → ValuationSubring Ω,
+                    (∀ v, IsPlaceOver (Av v) v.1)
+                      → ∀ σ : G ℚ Ω,
+                        IsCC σ → (∀ m, ρ (toGS Ω _ σ) m = m → m = 0) → H0 (twDual μ ρ) = ⊥
+                          → ∀ v₀ : S,
+                            (∀ v, v ≠ v₀ → H0 (ρ.comp (locFam S Av v)) = ⊥)
+                              → Nat.card (H0 (ρ.comp (locFam S Av v₀)))
+                                < Nat.card (H1 (ρ.comp (locFam S Av v₀)))
+                              → ∃ z ∈ Z1 ρ,
+                                z ∉ B1 ρ
+                                  ∧ ∀ v,
+                                    v ≠ v₀
+                                      → ∃ m, ∀ g ∈ Dec (F := ℚ) (Av v),
+                                        z (toGS Ω _ g) = ρ (toGS Ω _ g) m - m := by
   intro hGF hGW Ω _ _ _ l _ hl2 M _ _ _ _ _ S ρ hS hρ μ hμ Av hAv σ hσ hfix hdual v₀ hloc hlt
   classical
   have hH0 : H0 ρ = ⊥ := by
@@ -31,13 +55,15 @@ theorem UpperTheory.V.Fr.st_count :
   have e1 : Nat.card (H0 (twDual μ ρ)) = 1 := by
     rw [hdual]
     exact card_bot'
-  have e2 : ∏ v, Nat.card (H0 (ρ.comp (locFam S Av v))) = Nat.card (H0 (ρ.comp (locFam S Av v₀))) := by
+  have e2
+      : ∏ v, Nat.card (H0 (ρ.comp (locFam S Av v))) = Nat.card (H0 (ρ.comp (locFam S Av v₀))) := by
     refine Finset.prod_eq_single v₀ (fun v _ hv => ?_) (fun h => absurd (Finset.mem_univ _) h)
     rw [hloc v hv]
     exact card_bot'
   have e3 : archH0Card S ρ (fun _ => σ) = 1 := by
     unfold archH0Card
-    rw [InfinitePlace.nrComplexPlaces_eq_zero_of_finrank_eq_one (Module.finrank_self ℚ), pow_zero, mul_one]
+    rw [InfinitePlace.nrComplexPlaces_eq_zero_of_finrank_eq_one (Module.finrank_self ℚ), pow_zero,
+      mul_one]
     apply Finset.prod_eq_one
     intro w _
     exact Nat.card_eq_one_iff_unique.2
@@ -46,7 +72,8 @@ theorem UpperTheory.V.Fr.st_count :
     rw [hH0]
     exact card_bot'
   have e5 : ∏ v, Nat.card (L v) = Nat.card (H1 (ρ.comp (locFam S Av v₀))) := by
-    rw [Finset.prod_eq_single v₀ (fun v _ hv => by rw [hL, if_neg hv]; exact card_bot')
+    rw [Finset.prod_eq_single v₀
+      (fun v _ hv => by rw [hL, if_neg hv]; exact card_bot')
       (fun h => absurd (Finset.mem_univ _) h)]
     rw [hL, if_pos rfl]
     exact Nat.card_congr Submodule.topEquiv.toEquiv

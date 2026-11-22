@@ -13,12 +13,13 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.G1
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
-theorem exists_over (𝔭 : Ideal (𝓞 F)) (h𝔭 : 𝔭.IsMaximal) :
-    ∃ P : Ideal (𝓞 K), P.IsMaximal ∧ P.comap (algebraMap (𝓞 F) (𝓞 K)) = 𝔭 := by
+theorem exists_over (𝔭 : Ideal (𝓞 F)) (h𝔭 : 𝔭.IsMaximal)
+    : ∃ P : Ideal (𝓞 K), P.IsMaximal ∧ P.comap (algebraMap (𝓞 F) (𝓞 K)) = 𝔭 := by
   haveI := h𝔭
   refine Ideal.exists_ideal_over_maximal_of_isIntegral 𝔭 ?_
   intro t ht
@@ -32,18 +33,26 @@ theorem exists_over (𝔭 : Ideal (𝓞 F)) (h𝔭 : 𝔭.IsMaximal) :
   rw [h4]
   exact 𝔭.zero_mem
 
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem spanS_le_of {S : Subring K} {n : ℕ} {x : Fin n → V} {X : Submodule K V} (hx : ∀ i, x i ∈ X) :
-    ∀ v ∈ spanS S x, v ∈ X := fun v hv =>
-  spanS_induction (p := fun v => v ∈ X) X.zero_mem (fun a b ha hb => X.add_mem ha hb)
-    (fun c _ a ha => X.smul_mem c ha) hx v hv
+theorem spanS_le_of {S : Subring K} {n : ℕ} {x : Fin n → V} {X : Submodule K V} (hx : ∀ i, x i ∈ X)
+    : ∀ v ∈ spanS S x, v ∈ X := fun v hv =>
+  spanS_induction
+    (p := fun v => v ∈ X)
+    X.zero_mem
+    (fun a b ha hb => X.add_mem ha hb)
+    (fun c _ a ha => X.smul_mem c ha)
+    hx v hv
 
-theorem jordan_exists (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K}
-    (hs : h.IsSymm) (X : Submodule K V) (L : Submodule (𝓞 K) V) (hnd : Cnt.NondegOn h X)
-    (hL : Cnt.IsLatIn X L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (𝔭 : Ideal (𝓞 F))
-    (h𝔭 : 𝔭.IsMaximal) : ∃ b a, Cnt.IsJordanIn h X L 𝔭 b a := by
+theorem jordan_exists
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
+    (X : Submodule K V) (L : Submodule (𝓞 K) V) (hnd : Cnt.NondegOn h X) (hL : Cnt.IsLatIn X L)
+    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    (𝔭 : Ideal (𝓞 F)) (h𝔭 : 𝔭.IsMaximal)
+    : ∃ b a, Cnt.IsJordanIn h X L 𝔭 b a := by
   have inj := IsFractionRing.injective (𝓞 K) K
   have hcomp : ∀ t : 𝓞 F, algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t) = algebraMap F K (t : F) :=
     fun t => rfl
@@ -81,13 +90,13 @@ theorem jordan_exists (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF :
     rw [hdiag, Matrix.det_diagonal] at hdety
     exact fun i => Finset.prod_ne_zero_iff.mp hdety i (Finset.mem_univ i)
 
-  have hgen : ∀ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, ∃ w : 𝓞 K, ∃ t : 𝓞 F,
-      t ∉ P.comap (algebraMap (𝓞 F) (𝓞 K)) ∧ w * s = algebraMap (𝓞 F) (𝓞 K) t := by
+  have hgen
+      : ∀ s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P, ∃ w : 𝓞 K, ∃ t : 𝓞 F,
+        t ∉ P.comap (algebraMap (𝓞 F) (𝓞 K)) ∧ w * s = algebraMap (𝓞 F) (𝓞 K) t := by
     intro s hs
     induction hs using Submonoid.closure_induction with
     | mem s hs =>
-      have hfix : conjO K (conjO K s * s) = conjO K s * s := by
-        rw [map_mul, hconj_conj, mul_comm]
+      have hfix : conjO K (conjO K s * s) = conjO K s * s := by rw [map_mul, hconj_conj, mul_comm]
       obtain ⟨t, ht⟩ := (conjO_eq_iff_mem_range hF _).mp hfix
       refine ⟨conjO K s, t, ?_, ht.symm⟩
       show algebraMap (𝓞 F) (𝓞 K) t ∉ P
@@ -110,8 +119,12 @@ theorem jordan_exists (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF :
         exact fun h0 => (hP.isPrime.mem_or_mem h0).elim htx hty
       · rw [map_mul, ← hx, ← hy]
         ring
-  have hclaim : ∀ c ∈ locRing P, star c = c → ∃ t : 𝓞 F, t ∉ P.comap (algebraMap (𝓞 F) (𝓞 K)) ∧
-      ∃ a : 𝓞 F, algebraMap F K (a : F) = (algebraMap F K (t : F)) ^ 2 * c := by
+  have hclaim
+      : ∀ c ∈ locRing P,
+        star c = c
+          → ∃ t : 𝓞 F,
+            t ∉ P.comap (algebraMap (𝓞 F) (𝓞 K))
+              ∧ ∃ a : 𝓞 F, algebraMap F K (a : F) = (algebraMap F K (t : F)) ^ 2 * c := by
     intro c hc hcs
     obtain ⟨s, hs, hsc⟩ := (Formalism.HermitianLatticesTheory.locDual_mem_locR (K := K) P c).mp hc
     obtain ⟨r, hr⟩ := Submodule.mem_one.mp hsc
@@ -123,8 +136,7 @@ theorem jordan_exists (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF :
       inj (by rw [algebraMap_conjO, ← e1, star_mul', hfixt, hcs])
     obtain ⟨a0, ha0⟩ := (conjO_eq_iff_mem_range hF _).mp hfix
     refine ⟨t, ht, t * a0, ?_⟩
-    have e2 : algebraMap F K (a0 : F) = algebraMap F K (t : F) * c := by
-      rw [← hcomp, ha0, ← e1]
+    have e2 : algebraMap F K (a0 : F) = algebraMap F K (t : F) * c := by rw [← hcomp, ha0, ← e1]
     show algebraMap F K ((t : F) * (a0 : F)) = _
     rw [map_mul, e2]
     ring
@@ -140,8 +152,8 @@ theorem jordan_exists (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF :
     have h2 : t i = 0 := by exact_mod_cast h1
     rw [h2]
     exact Submodule.zero_mem _
-  have hτfix : ∀ i, star (algebraMap F K (t i : F)) = algebraMap F K (t i : F) :=
-    fun i => (hF _).mpr ⟨_, rfl⟩
+  have hτfix : ∀ i, star (algebraMap F K (t i : F)) = algebraMap F K (t i : F) := fun i =>
+    (hF _).mpr ⟨_, rfl⟩
   have hτS : ∀ i, algebraMap F K (t i : F) ∈ locRing P := fun i => by
     rw [← hcomp]
     exact hint _
@@ -149,17 +161,21 @@ theorem jordan_exists (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF :
     intro i
     change _ ∈ Formalism.HermitianLatticesTheory.locR (K := K) P
     rw [Formalism.HermitianLatticesTheory.locDual_mem_locR]
-    refine ⟨algebraMap (𝓞 F) (𝓞 K) (t i), Submonoid.subset_closure ⟨ht i, fun t' ht' => ?_⟩,
-      Submodule.mem_one.mpr ⟨1, ?_⟩⟩
+    refine ⟨
+      algebraMap (𝓞 F) (𝓞 K) (t i),
+      Submonoid.subset_closure ⟨ht i, fun t' ht' => ?_⟩,
+      Submodule.mem_one.mpr ⟨1, ?_⟩
+    ⟩
     · have e : t' = algebraMap (𝓞 F) (𝓞 K) (t i) := inj (by rw [ht', hcomp, hτfix])
       rw [e]
       exact ht i
     · rw [map_one, hcomp, mul_inv_cancel₀ (hτ0 i)]
   obtain ⟨b, hb⟩ : ∃ b : Fin (finrank K X) → V, ∀ i, b i = algebraMap F K (t i : F) • y i :=
     ⟨_, fun _ => rfl⟩
-  have hyX : ∀ i, y i ∈ X := fun i => spanS_le_of (S := locRing P) (x := x)
-    (fun j => by rw [← hsp]; exact Submodule.subset_span ⟨j, rfl⟩) (y i)
-    (by rw [← hys]; exact mem_spanS y i)
+  have hyX : ∀ i, y i ∈ X := fun i =>
+    spanS_le_of (S := locRing P) (x := x)
+      (fun j => by rw [← hsp]; exact Submodule.subset_span ⟨j, rfl⟩)
+      (y i) (by rw [← hys]; exact mem_spanS y i)
   have hbS : spanS (locRing P) b = spanS (locRing P) y := by
     apply le_antisymm
     · refine Submodule.span_le.mpr ?_

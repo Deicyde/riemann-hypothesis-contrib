@@ -12,15 +12,22 @@ namespace Formalism.L2.PairingIndexBounds.Eq.J
 
 open Formalism.L2.Th1.H Formalism.L2.PairingIndexBounds.Eq
 
-variable {ι : Type} [Fintype ι] {V V₁ : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V₁] [Module ℂ V₁]
+variable
+  {ι : Type} [Fintype ι] {V V₁ : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V₁] [Module ℂ V₁]
 
-theorem idx_coord (e : V ≃ₗ[ℂ] (ι → V₁)) (i₀ : ι) {M P : AddSubgroup V} {M₁ P₁ : AddSubgroup V₁}
-    (hM : ∀ x, x ∈ M ↔ ∀ i, e x i ∈ M₁) (hP : ∀ x, x ∈ P ↔ ∀ i, e x i ∈ P₁) (h : relIdx M P ≠ 0) :
-    relIdx M₁ P₁ ≠ 0 := by
-  let f : V₁ →+ V := AddMonoidHom.mk' (fun x => e.symm (Pi.single i₀ x)) (fun x y => by
-    rw [Pi.single_add, map_add (f := _)])
-  have hcomap : ∀ (N : AddSubgroup V) (N₁ : AddSubgroup V₁), (∀ x, x ∈ N ↔ ∀ i, e x i ∈ N₁) →
-      N₁ = N.comap f := by
+theorem idx_coord
+    (e : V ≃ₗ[ℂ] (ι → V₁))
+    (i₀ : ι)
+    {M P : AddSubgroup V} {M₁ P₁ : AddSubgroup V₁}
+    (hM : ∀ x, x ∈ M ↔ ∀ i, e x i ∈ M₁) (hP : ∀ x, x ∈ P ↔ ∀ i, e x i ∈ P₁) (h : relIdx M P ≠ 0)
+    : relIdx M₁ P₁ ≠ 0 := by
+  let f : V₁ →+ V :=
+    AddMonoidHom.mk'
+      (fun x => e.symm (Pi.single i₀ x))
+      (fun x y => by rw [Pi.single_add, map_add (f := _)])
+  have hcomap
+      : ∀ (N : AddSubgroup V) (N₁ : AddSubgroup V₁),
+        (∀ x, x ∈ N ↔ ∀ i, e x i ∈ N₁) → N₁ = N.comap f := by
     intro N N₁ hN
     ext x
     rw [AddSubgroup.mem_comap, hN]
@@ -39,13 +46,15 @@ theorem idx_coord (e : V ≃ₗ[ℂ] (ι → V₁)) (i₀ : ι) {M P : AddSubgro
   rw [hcomap M M₁ hM, hcomap P P₁ hP]
   exact AddSubgroup.relIndex_comap_ne_zero f h
 
-variable {e : V ≃ₗ[ℂ] (ι → V₁)} {H : Sesq V} {H₁ : Sesq V₁} {α : V → ℂ} {α₁ : V₁ → ℂ}
-  {Λ : AddSubgroup V} {Λ₁ : AddSubgroup V₁} {δ Ae : V ≃ₗ[ℂ] V} {δ₁ Ae₁ : V₁ ≃ₗ[ℂ] V₁}
+variable
+  {e : V ≃ₗ[ℂ] (ι → V₁)} {H : Sesq V} {H₁ : Sesq V₁} {α : V → ℂ} {α₁ : V₁ → ℂ} {Λ : AddSubgroup V}
+  {Λ₁ : AddSubgroup V₁} {δ Ae : V ≃ₗ[ℂ] V} {δ₁ Ae₁ : V₁ ≃ₗ[ℂ] V₁}
 
-theorem Copies.mem_img (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (x : V) :
-    x ∈ imgLat (δ : V →ₗ[ℂ] V) Λ ↔ ∀ i, e x i ∈ imgLat (δ₁ : V₁ →ₗ[ℂ] V₁) Λ₁ := by
-  have key : ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (d : W ≃ₗ[ℂ] W) (L : AddSubgroup W) (z : W),
-      z ∈ imgLat (d : W →ₗ[ℂ] W) L ↔ d.symm z ∈ L := by
+theorem Copies.mem_img (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (x : V)
+    : x ∈ imgLat (δ : V →ₗ[ℂ] V) Λ ↔ ∀ i, e x i ∈ imgLat (δ₁ : V₁ →ₗ[ℂ] V₁) Λ₁ := by
+  have key
+      : ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (d : W ≃ₗ[ℂ] W) (L : AddSubgroup W) (z : W),
+        z ∈ imgLat (d : W →ₗ[ℂ] W) L ↔ d.symm z ∈ L := by
     intro W _ _ d L z
     simp only [imgLat, AddSubgroup.mem_map]
     constructor
@@ -61,8 +70,8 @@ theorem Copies.mem_img (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁)
   rw [LinearEquiv.apply_symm_apply] at hmap
   rw [hmap, LinearEquiv.symm_apply_apply]
 
-theorem Copies.form_single (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (i₀ : ι) (x : V₁) (y : V) :
-    H (e.symm (Pi.single i₀ x)) y = H₁ x (e y i₀) := by
+theorem Copies.form_single (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (i₀ : ι) (x : V₁) (y : V)
+    : H (e.symm (Pi.single i₀ x)) y = H₁ x (e y i₀) := by
   rw [c.form, LinearEquiv.apply_symm_apply, Finset.sum_eq_single i₀]
   · simp
   · intro i _ hi
@@ -70,8 +79,8 @@ theorem Copies.form_single (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem Copies.single_mem (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (i₀ : ι) {x : V₁} (hx : x ∈ Λ₁) :
-    e.symm (Pi.single i₀ x) ∈ Λ := by
+theorem Copies.single_mem (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (i₀ : ι) {x : V₁} (hx : x ∈ Λ₁)
+    : e.symm (Pi.single i₀ x) ∈ Λ := by
   rw [c.lat]
   intro i
   rw [LinearEquiv.apply_symm_apply]
@@ -81,8 +90,9 @@ theorem Copies.single_mem (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae�
   · rw [Pi.single_eq_of_ne hi]
     exact Λ₁.zero_mem
 
-theorem Copies.char_single (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (h0 : α₁ 0 = 1) (i₀ : ι) {x : V₁} (hx : x ∈ Λ₁) :
-    α (e.symm (Pi.single i₀ x)) = α₁ x := by
+theorem Copies.char_single
+    (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (h0 : α₁ 0 = 1) (i₀ : ι) {x : V₁} (hx : x ∈ Λ₁)
+    : α (e.symm (Pi.single i₀ x)) = α₁ x := by
   rw [c.char _ (c.single_mem i₀ hx), LinearEquiv.apply_symm_apply, Finset.prod_eq_single i₀]
   · simp
   · intro i _ hi
@@ -90,14 +100,18 @@ theorem Copies.char_single (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem Copies.unitaryData₁ (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (i₀ : ι) (hU : UnitaryData H Λ α δ Ae)
-    (hH₁ : IsHerm H₁) (hP₁ : IsPosDef H₁) (hI₁ : IsIsom H₁ H₁ (δ₁ : V₁ →ₗ[ℂ] V₁)) (hA₁ : ∀ x, Ae₁ x = x - δ₁.symm x)
-    (h0 : α₁ 0 = 1) (hαδ : ∀ x, α₁ (δ₁ x) = α₁ x) : UnitaryData H₁ Λ₁ α₁ δ₁ Ae₁ := by
+theorem Copies.unitaryData₁
+    (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁ Ae₁) (i₀ : ι) (hU : UnitaryData H Λ α δ Ae)
+    (hH₁ : IsHerm H₁) (hP₁ : IsPosDef H₁) (hI₁ : IsIsom H₁ H₁ (δ₁ : V₁ →ₗ[ℂ] V₁))
+    (hA₁ : ∀ x, Ae₁ x = x - δ₁.symm x) (h0 : α₁ 0 = 1) (hαδ : ∀ x, α₁ (δ₁ x) = α₁ x)
+    : UnitaryData H₁ Λ₁ α₁ δ₁ Ae₁ := by
   have hs : ∀ x : V₁, e (e.symm (Pi.single i₀ x)) i₀ = x := fun x => by simp
   have hform : ∀ x y : V₁, H (e.symm (Pi.single i₀ x)) (e.symm (Pi.single i₀ y)) = H₁ x y := by
     intro x y
     rw [c.form_single, hs]
-  have hadd : ∀ x y : V₁, e.symm (Pi.single i₀ (x + y)) = e.symm (Pi.single i₀ x) + e.symm (Pi.single i₀ y) := by
+  have hadd
+      : ∀ x y : V₁,
+        e.symm (Pi.single i₀ (x + y)) = e.symm (Pi.single i₀ x) + e.symm (Pi.single i₀ y) := by
     intro x y
     rw [Pi.single_add, map_add (f := _)]
   have hδs : ∀ y : V₁, δ (e.symm (Pi.single i₀ y)) = e.symm (Pi.single i₀ (δ₁ y)) := by
@@ -109,8 +123,9 @@ theorem Copies.unitaryData₁ (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁
     · subst hi
       simp
     · simp [Pi.single_eq_of_ne hi]
-  have himg_single : ∀ x : V₁, x ∈ imgLat (δ₁ : V₁ →ₗ[ℂ] V₁) Λ₁ →
-      e.symm (Pi.single i₀ x) ∈ imgLat (δ : V →ₗ[ℂ] V) Λ := by
+  have himg_single
+      : ∀ x : V₁,
+        x ∈ imgLat (δ₁ : V₁ →ₗ[ℂ] V₁) Λ₁ → e.symm (Pi.single i₀ x) ∈ imgLat (δ : V →ₗ[ℂ] V) Λ := by
     intro x hx
     rw [c.mem_img]
     intro i
@@ -152,7 +167,8 @@ theorem Copies.unitaryData₁ (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁
     rw [← c.char_single h0 i₀ hx]
     exact hU.semi.1 _ (c.single_mem i₀ hx)
   · intro x hx y hy
-    rw [← c.char_single h0 i₀ hx, ← c.char_single h0 i₀ hy, ← c.char_single h0 i₀ (Λ₁.add_mem hx hy), hadd,
+    rw [← c.char_single h0 i₀ hx, ← c.char_single h0 i₀ hy,
+      ← c.char_single h0 i₀ (Λ₁.add_mem hx hy), hadd,
       hU.semi.2 _ (c.single_mem i₀ hx) _ (c.single_mem i₀ hy)]
     simp only [altE, hform]
   · intro x hx
@@ -165,9 +181,13 @@ theorem Copies.unitaryData₁ (c : Copies e H H₁ α α₁ Λ Λ₁ δ Ae δ₁
   · exact idx_coord e i₀ c.mem_img c.lat hU.idx₁
   · exact idx_coord e i₀ c.lat c.mem_img hU.idx₂
 
-theorem alpha_mult {H : Sesq V} {Λ : AddSubgroup V} {δ : V ≃ₗ[ℂ] V} {ℓ ℓ' σ : V →ₗ[ℂ] V} {n : ℕ}
-    (hM : Multipliers H Λ δ ℓ ℓ' σ n) (c : ℝ) (α : V → ℂ) (hα : ∀ x, α x = (-1 : ℂ) ^ round (c * (H x x).re))
-    (hq : ∀ x ∈ Λ, ∃ m : ℤ, c * (H x x).re = (m : ℝ)) {x : V} (hx : x ∈ Λ) : α (ℓ x) = α x := by
+theorem alpha_mult
+    {H : Sesq V} {Λ : AddSubgroup V} {δ : V ≃ₗ[ℂ] V} {ℓ ℓ' σ : V →ₗ[ℂ] V} {n : ℕ}
+    (hM : Multipliers H Λ δ ℓ ℓ' σ n)
+    (c : ℝ) (α : V → ℂ) (hα : ∀ x, α x = (-1 : ℂ) ^ round (c * (H x x).re))
+    (hq : ∀ x ∈ Λ, ∃ m : ℤ, c * (H x x).re = (m : ℝ))
+    {x : V} (hx : x ∈ Λ)
+    : α (ℓ x) = α x := by
   obtain ⟨m1, hm1⟩ := hq x hx
   obtain ⟨m2, hm2⟩ := hq (σ x) (hM.sΛ x hx)
   obtain ⟨m3, hm3⟩ := hq (x + σ x) (Λ.add_mem hx (hM.sΛ x hx))
@@ -180,12 +200,12 @@ theorem alpha_mult {H : Sesq V} {Λ : AddSubgroup V} {δ : V ≃ₗ[ℂ] V} {ℓ
     simp only [Complex.add_re] at hm3
     push_cast
     linarith
-  have hl : H (ℓ x) (ℓ x) = -H x x + ((4 * n : ℕ) : ℂ) * H x (σ x) := by
+  have hl : H (ℓ x) (ℓ x) = - H x x + ((4 * n : ℕ) : ℂ) * H x (σ x) := by
     rw [hM.adj, hM.rel, map_add (f := _), map_neg, map_nsmul, nsmul_eq_mul]
   have hq' : c * (H (ℓ x) (ℓ x)).re = ((m1 + 2 * (-m1 + (n : ℤ) * (m3 - m1 - m2)) : ℤ) : ℝ) := by
     rw [hl]
-    simp only [Complex.add_re, Complex.neg_re, Complex.mul_re, Complex.natCast_re, Complex.natCast_im,
-      zero_mul, sub_zero]
+    simp only [Complex.add_re, Complex.neg_re, Complex.mul_re, Complex.natCast_re,
+      Complex.natCast_im, zero_mul, sub_zero]
     push_cast
     push_cast at hk
     nlinarith [hm1, hk]

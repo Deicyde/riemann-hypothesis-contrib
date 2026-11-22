@@ -11,7 +11,8 @@ open scoped BigOperators ComplexConjugate
 
 namespace Formalism.HermitianLatticeCounting.P
 
-theorem submodule_automorphism_count : CardSubmodulesAndLinearEquivBounds := ⟨Formalism.SLP.Final.submoduleCountDed, Formalism.SLP.GlobalBoundRefinements.Final.autCount⟩
+theorem submodule_automorphism_count : CardSubmodulesAndLinearEquivBounds :=
+  ⟨Formalism.SLP.Final.submoduleCountDed, Formalism.SLP.GlobalBoundRefinements.Final.autCount⟩
 
 theorem ideal_count_statement : CardSubmodulesOfIndexLePow := by
   intro E _ _ M _ _ _ _ k j hj hk
@@ -20,54 +21,69 @@ theorem ideal_count_statement : CardSubmodulesOfIndexLePow := by
   have hd : 1 ≤ finrank ℚ E := Module.finrank_pos
   have hom := Formalism.SLP.Final.omegaPow (finrank ℚ E) j hd hj
   have hj1 : (1 : ℝ) ≤ j := by exact_mod_cast hj
-  calc ((({N : Submodule (NumberField.RingOfIntegers E) M | N.toAddSubgroup.index = j}.ncard : ℕ)) : ℝ)
-      ≤ ((finrank ℚ E ^ (Nat.primeFactorsList j).length *
-          j ^ finrank (NumberField.RingOfIntegers E) M : ℕ) : ℝ) := by exact_mod_cast hcard
-    _ = (finrank ℚ E : ℝ) ^ (Nat.primeFactorsList j).length *
-          (j : ℝ) ^ finrank (NumberField.RingOfIntegers E) M := by push_cast; ring
+  calc
+    ((({N : Submodule (NumberField.RingOfIntegers E) M | N.toAddSubgroup.index = j}.ncard : ℕ)) : ℝ)
+        ≤ ((finrank ℚ E ^ (Nat.primeFactorsList j).length
+              * j ^ finrank (NumberField.RingOfIntegers E) M
+            : ℕ)
+          : ℝ) := by
+      exact_mod_cast hcard
+    _ = (finrank ℚ E : ℝ) ^ (Nat.primeFactorsList j).length
+        * (j : ℝ) ^ finrank (NumberField.RingOfIntegers E) M := by
+      push_cast; ring
     _ ≤ (j : ℝ) ^ Real.logb 2 (finrank ℚ E) * (j : ℝ) ^ (k : ℝ) := by
-          gcongr
-          rw [← Real.rpow_natCast]
-          exact Real.rpow_le_rpow_of_exponent_le hj1 (by exact_mod_cast hk)
-    _ = (j : ℝ) ^ ((k : ℝ) + Real.logb 2 (finrank ℚ E)) := by
-          rw [Real.rpow_add (by linarith)]; ring
+      gcongr
+      rw [← Real.rpow_natCast]
+      exact Real.rpow_le_rpow_of_exponent_le hj1 (by exact_mod_cast hk)
+    _ = (j : ℝ) ^ ((k : ℝ) + Real.logb 2 (finrank ℚ E)) := by rw [Real.rpow_add (by linarith)]; ring
 
-private theorem fo_step_lemma (N p q s : ℕ) (hp : p.Prime) (hq : q.Prime) (hs : 1 ≤ s)
-    (hps : 2 ≤ (p - 1) * s) (Y : Matrix (Fin N) (Fin N) ℤ)
-    (h : (1 + ((p : ℤ) ^ s) • Y) ^ q = 1) : ∃ W : Matrix (Fin N) (Fin N) ℤ, Y = (p : ℤ) • W := by
+private theorem fo_step_lemma
+    (N p q s : ℕ) (hp : p.Prime) (hq : q.Prime) (hs : 1 ≤ s) (hps : 2 ≤ (p - 1) * s)
+    (Y : Matrix (Fin N) (Fin N) ℤ) (h : (1 + ((p : ℤ) ^ s) • Y) ^ q = 1)
+    : ∃ W : Matrix (Fin N) (Fin N) ℤ, Y = (p : ℤ) • W := by
   set X := ((p : ℤ) ^ s) • Y with hX
   have hp0 : (p : ℤ) ≠ 0 := by exact_mod_cast hp.ne_zero
 
-  have hbin : (X + 1) ^ q = ∑ m ∈ Finset.range (q + 1), X ^ m * (q.choose m : Matrix (Fin N) (Fin N) ℤ) := by
+  have hbin
+      : (X + 1) ^ q
+        = ∑ m ∈ Finset.range (q + 1), X ^ m * (q.choose m : Matrix (Fin N) (Fin N) ℤ) := by
     rw [(Commute.one_right X).add_pow]; simp
   have hq2 := hq.two_le
-  have hsplit : ∑ m ∈ Finset.range (q + 1), X ^ m * (q.choose m : Matrix (Fin N) (Fin N) ℤ) =
-      1 + (q : ℤ) • X + ∑ m ∈ Finset.range (q - 1),
-        (((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2) := by
+  have hsplit
+      : ∑ m ∈ Finset.range (q + 1), X ^ m * (q.choose m : Matrix (Fin N) (Fin N) ℤ)
+        = 1 + (q : ℤ) • X
+          + ∑ m ∈ Finset.range (q - 1),
+            (((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2) := by
     have e : q + 1 = (q - 1) + 1 + 1 := by omega
     rw [e, Finset.sum_range_succ', Finset.sum_range_succ']
     simp only [pow_zero, Nat.choose_zero_right, Nat.cast_one, mul_one, zero_add, pow_one,
       Nat.choose_one_right]
-    have e2 : ∀ m, X ^ (m + 1 + 1) * (q.choose (m + 1 + 1) : Matrix (Fin N) (Fin N) ℤ) =
-        (((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2) := by
+    have e2
+        : ∀ m,
+          X ^ (m + 1 + 1) * (q.choose (m + 1 + 1) : Matrix (Fin N) (Fin N) ℤ)
+            = (((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2) := by
       intro m
       rw [hX, smul_pow, ← nsmul_eq_mul', ← Nat.cast_smul_eq_nsmul ℤ, smul_smul, mul_comm]
     simp only [e2]
     rw [← nsmul_eq_mul', ← Nat.cast_smul_eq_nsmul ℤ]
     abel
-  have hmain : (q : ℤ) • X = -∑ m ∈ Finset.range (q - 1),
-      (((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2) := by
+  have hmain
+      : (q : ℤ) • X
+        = - ∑ m ∈ Finset.range (q - 1),
+          (((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2) := by
     have := h
     rw [add_comm, hbin, hsplit] at this
     rw [eq_neg_iff_add_eq_zero]
     have h2 := congrArg (· - 1) this
     simp only [add_sub_cancel_left, sub_self] at h2
-    rw [← h2]; abel
+    rw [← h2]
+    abel
   by_cases hqp : q = p
   · subst hqp
 
-    have hterm : ∀ m ∈ Finset.range (q - 1),
-        ((q : ℤ) ^ (s + 2)) ∣ ((q : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ) := by
+    have hterm
+        : ∀ m ∈ Finset.range (q - 1),
+          ((q : ℤ) ^ (s + 2)) ∣ ((q : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ) := by
       intro m hm
       rw [Finset.mem_range] at hm
       rw [← pow_mul]
@@ -81,13 +97,14 @@ private theorem fo_step_lemma (N p q s : ℕ) (hp : p.Prime) (hq : q.Prime) (hs 
         rw [hm2]
         apply Dvd.dvd.mul_right
         apply pow_dvd_pow
-        have : (q - 1) * s ≤ s * q - s := by
-          rw [Nat.sub_mul, one_mul, mul_comm]
+        have : (q - 1) * s ≤ s * q - s := by rw [Nat.sub_mul, one_mul, mul_comm]
         omega
     choose c hc using hterm
-    have hsum : ∑ m ∈ Finset.range (q - 1),
-        (((q : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2) =
-        ((q : ℤ) ^ (s + 2)) • ∑ m ∈ (Finset.range (q - 1)).attach, c m.1 m.2 • Y ^ (m.1 + 2) := by
+    have hsum
+        : ∑ m ∈ Finset.range (q - 1),
+            (((q : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2)
+          = ((q : ℤ) ^ (s + 2))
+            • ∑ m ∈ (Finset.range (q - 1)).attach, c m.1 m.2 • Y ^ (m.1 + 2) := by
       rw [Finset.smul_sum, ← Finset.sum_attach]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [hc m.1 m.2, smul_smul]
@@ -96,16 +113,18 @@ private theorem fo_step_lemma (N p q s : ℕ) (hp : p.Prime) (hq : q.Prime) (hs 
     have e2 : (q : ℤ) ^ (s + 2) = (q : ℤ) ^ (s + 1) * q := by ring
     rw [e1, e2, ← smul_smul] at hmain
     refine ⟨_, smul_right_injective _ (pow_ne_zero _ hp0) hmain⟩
-  ·
-    have hterm : ∀ m ∈ Finset.range (q - 1),
-        ((p : ℤ) ^ (2 * s)) ∣ ((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ) := by
+  · have hterm
+        : ∀ m ∈ Finset.range (q - 1),
+          ((p : ℤ) ^ (2 * s)) ∣ ((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ) := by
       intro m _
       rw [← pow_mul]
       exact Dvd.dvd.mul_right (pow_dvd_pow _ (by nlinarith)) _
     choose c hc using hterm
-    have hsum : ∑ m ∈ Finset.range (q - 1),
-        (((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2) =
-        ((p : ℤ) ^ (2 * s)) • ∑ m ∈ (Finset.range (q - 1)).attach, c m.1 m.2 • Y ^ (m.1 + 2) := by
+    have hsum
+        : ∑ m ∈ Finset.range (q - 1),
+            (((p : ℤ) ^ s) ^ (m + 2) * (q.choose (m + 2) : ℤ)) • Y ^ (m + 2)
+          = ((p : ℤ) ^ (2 * s))
+            • ∑ m ∈ (Finset.range (q - 1)).attach, c m.1 m.2 • Y ^ (m.1 + 2) := by
       rw [Finset.smul_sum, ← Finset.sum_attach]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [hc m.1 m.2, smul_smul]
@@ -118,25 +137,29 @@ private theorem fo_step_lemma (N p q s : ℕ) (hp : p.Prime) (hq : q.Prime) (hs 
       exact (Nat.coprime_primes hq hp).2 hqp
     obtain ⟨a, b, hab⟩ := hcop
     refine ⟨(p : ℤ) ^ (s - 1) • (a • W' + b • Y), ?_⟩
-    calc Y = (a * q + (p : ℤ) ^ s * b) • Y := by
-          rw [show a * (q : ℤ) + (p : ℤ) ^ s * b = 1 by linear_combination hab, one_smul]
+    calc
+      Y = (a * q + (p : ℤ) ^ s * b) • Y := by
+        rw [show a * (q : ℤ) + (p : ℤ) ^ s * b = 1 by linear_combination hab, one_smul]
       _ = a • ((q : ℤ) • Y) + ((p : ℤ) ^ s) • (b • Y) := by rw [add_smul, smul_smul, smul_smul]
       _ = a • (((p : ℤ) ^ s) • W') + ((p : ℤ) ^ s) • (b • Y) := by rw [hqY]
       _ = ((p : ℤ) ^ s) • (a • W' + b • Y) := by rw [smul_add, smul_comm a]
       _ = (p : ℤ) • ((p : ℤ) ^ (s - 1) • (a • W' + b • Y)) := by
-          rw [smul_smul, ← pow_succ', Nat.sub_add_cancel hs]
+        rw [smul_smul, ← pow_succ', Nat.sub_add_cancel hs]
 
-private theorem fo_zero_lemma_2 (N p q s0 : ℕ) (hp : p.Prime) (hq : q.Prime) (hs0 : 1 ≤ s0)
-    (hps : 2 ≤ (p - 1) * s0) (A : Matrix (Fin N) (Fin N) ℤ) (hA : A ^ q = 1)
-    (h0 : ∃ Y : Matrix (Fin N) (Fin N) ℤ, A = 1 + ((p : ℤ) ^ s0) • Y) : A = 1 := by
+private theorem fo_zero_lemma_2
+    (N p q s0 : ℕ) (hp : p.Prime) (hq : q.Prime) (hs0 : 1 ≤ s0) (hps : 2 ≤ (p - 1) * s0)
+    (A : Matrix (Fin N) (Fin N) ℤ)
+    (hA : A ^ q = 1) (h0 : ∃ Y : Matrix (Fin N) (Fin N) ℤ, A = 1 + ((p : ℤ) ^ s0) • Y)
+    : A = 1 := by
   have hall : ∀ k : ℕ, ∃ Y : Matrix (Fin N) (Fin N) ℤ, A = 1 + ((p : ℤ) ^ (s0 + k)) • Y := by
     intro k
     induction k with
     | zero => simpa using h0
     | succ k ih =>
       obtain ⟨Y, hY⟩ := ih
-      obtain ⟨W, hW⟩ := fo_step_lemma N p q (s0 + k) hp hq (by omega)
-        (le_trans hps (Nat.mul_le_mul_left _ (by omega))) Y (hY ▸ hA)
+      obtain ⟨W, hW⟩ :=
+        fo_step_lemma N p q (s0 + k) hp hq (by omega)
+          (le_trans hps (Nat.mul_le_mul_left _ (by omega))) Y (hY ▸ hA)
       refine ⟨W, ?_⟩
       rw [hY, hW, smul_smul, ← pow_succ, ← add_assoc]
   ext i j
@@ -175,8 +198,7 @@ theorem finite_order_congruence : FiniteOrderCongruence := by
   obtain ⟨q, hq, hqo⟩ := Nat.exists_prime_and_dvd ho
   have hopos := hfin.orderOf_pos
   set A' := A ^ (orderOf A / q) with hA'
-  have hA'q : A' ^ q = 1 := by
-    rw [hA', ← pow_mul, Nat.div_mul_cancel hqo, pow_orderOf_eq_one]
+  have hA'q : A' ^ q = 1 := by rw [hA', ← pow_mul, Nat.div_mul_cancel hqo, pow_orderOf_eq_one]
   have hA'ne : A' ≠ 1 := by
     apply pow_ne_one_of_lt_orderOf
     · exact (Nat.div_pos (Nat.le_of_dvd hopos hqo) hq.pos).ne'
@@ -199,8 +221,7 @@ theorem finite_order_congruence : FiniteOrderCongruence := by
         · exact ⟨G, dvd_rfl, h2, hG⟩
       have hpH := Nat.minFac_dvd H
       have hp := Nat.minFac_prime (show H ≠ 1 by omega)
-      have hp2 : H.minFac ≠ 2 := by
-        intro h; rw [h] at hpH; exact hHodd hpH
+      have hp2 : H.minFac ≠ 2 := by intro h; rw [h] at hpH; exact hHodd hpH
       have hp3 : 3 ≤ H.minFac := by have := hp.two_le; omega
       exact ⟨H.minFac, 1, hp, le_rfl, by omega, by simpa using hpH.trans hH⟩
   obtain ⟨p, s0, hp, hs0, hps, hdvd⟩ := key
@@ -209,15 +230,15 @@ theorem finite_order_congruence : FiniteOrderCongruence := by
     rw [hC, smul_smul, hG']; push_cast; ring_nf
   exact hA'ne (fo_zero_lemma_2 N p q s0 hp hq hs0 hps A' hA'q ⟨_, hform⟩)
 
-private theorem primeSet_lemma (K : Type) [Field K] [NumberField K]
-    (I : Ideal (NumberField.RingOfIntegers K)) (hI : I ≠ ⊥) :
-    ∃ T : Finset (Ideal (NumberField.RingOfIntegers K)),
-      (↑T : Set _) = {P | P.IsPrime ∧ I ≤ P} ∧ (∀ P ∈ T, P.IsPrime ∧ P ≠ ⊥ ∧ I ≤ P) ∧
-      ∏ P ∈ T, Ideal.absNorm P ∣ Ideal.absNorm I := by
+private theorem primeSet_lemma
+    (K : Type) [Field K] [NumberField K] (I : Ideal (NumberField.RingOfIntegers K)) (hI : I ≠ ⊥)
+    : ∃ T : Finset (Ideal (NumberField.RingOfIntegers K)),
+      (↑T : Set _) = {P | P.IsPrime ∧ I ≤ P} ∧ (∀ P ∈ T, P.IsPrime ∧ P ≠ ⊥ ∧ I ≤ P)
+        ∧ ∏ P ∈ T, Ideal.absNorm P ∣ Ideal.absNorm I := by
   have hn : Ideal.absNorm I ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
   have hfin : {P : Ideal (NumberField.RingOfIntegers K) | P.IsPrime ∧ I ≤ P}.Finite := by
-    apply Set.Finite.subset ((Ideal.absNorm I).divisors.finite_toSet.biUnion
-      fun d hd => Ideal.finite_setOf_absNorm_eq d)
+    apply Set.Finite.subset ((Ideal.absNorm I).divisors.finite_toSet.biUnion fun d hd =>
+      Ideal.finite_setOf_absNorm_eq d)
     intro P hP
     simp only [Set.mem_iUnion, Set.mem_setOf_eq, Finset.mem_coe, Nat.mem_divisors]
     exact ⟨_, ⟨Ideal.absNorm_dvd_absNorm_of_le hP.2, hn⟩, rfl⟩
@@ -239,143 +260,154 @@ private theorem primeSet_lemma (K : Type) [Field K] [NumberField K]
 open Formalism.SLP.P.CountO NumberField
 open scoped nonZeroDivisors
 
-private theorem normCount_lemma (K : Type) [Field K] [NumberField K] : ∀ n : ℕ, 1 ≤ n →
-    {I : Ideal (𝓞 K) | Ideal.absNorm I = n}.ncard ≤
-      finrank ℚ K ^ (Nat.primeFactorsList n).length := by
+private theorem normCount_lemma (K : Type) [Field K] [NumberField K]
+    : ∀ n : ℕ,
+      1 ≤ n
+        → {I : Ideal (𝓞 K) | Ideal.absNorm I = n}.ncard
+          ≤ finrank ℚ K ^ (Nat.primeFactorsList n).length := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
-  intro hn
-  rcases Nat.lt_or_ge n 2 with h | h
-  · have h1 : n = 1 := by omega
-    subst h1
-    have : {I : Ideal (𝓞 K) | Ideal.absNorm I = 1} = {⊤} := by
-      ext I; simp [Ideal.absNorm_eq_one_iff]
-    rw [this]; simp
-  have hd : 0 < finrank ℚ K := Module.finrank_pos
-  have hp : n.minFac.Prime := Nat.minFac_prime (by omega)
-  have hpn : n.minFac ∣ n := Nat.minFac_dvd n
-  set p := n.minFac with hpdef
-  set q : 𝓞 K := (p : 𝓞 K) with hqdef
-  have hq0 : q ≠ 0 := by rw [hqdef]; exact_mod_cast hp.ne_zero
-  have hqbot : Ideal.span {q} ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
-  have hNq : Ideal.absNorm (Ideal.span {q}) = p ^ finrank ℚ K := by
-    rw [Ideal.absNorm_span_singleton]
-    have : q = algebraMap ℤ (𝓞 K) (p : ℤ) := by simp [hqdef]
-    rw [this, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank]
-    simp
-  obtain ⟨T, hT, hT2, hprod⟩ := primeSet_lemma K (Ideal.span {q}) hqbot
-  rw [hNq] at hprod
-  have hNP : ∀ P ∈ T, 2 ≤ Ideal.absNorm P ∧ p ≤ Ideal.absNorm P := by
-    intro P hP
-    obtain ⟨h1, h2, _⟩ := hT2 P hP
-    have a : Ideal.absNorm P ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
-    have b : Ideal.absNorm P ≠ 1 := by rw [Ne, Ideal.absNorm_eq_one_iff]; exact h1.ne_top
-    refine ⟨by omega, ?_⟩
-    obtain ⟨k, _, hk⟩ := (Nat.dvd_prime_pow hp).1 ((Finset.dvd_prod_of_mem _ hP).trans hprod)
-    have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; exact b hk
-    rw [hk]; exact Nat.le_self_pow hk0 p
-  have hTcard : T.card ≤ finrank ℚ K := by
-    have h1 : p ^ T.card ≤ ∏ P ∈ T, Ideal.absNorm P :=
-      Finset.pow_card_le_prod _ _ _ fun P hP => (hNP P hP).2
-    have h2 : ∏ P ∈ T, Ideal.absNorm P ≤ p ^ finrank ℚ K :=
-      Nat.le_of_dvd (pow_pos hp.pos _) hprod
-    exact (Nat.pow_le_pow_iff_right hp.one_lt).1 (h1.trans h2)
+    intro hn
+    rcases Nat.lt_or_ge n 2 with h | h
+    · have h1 : n = 1 := by omega
+      subst h1
+      have : {I : Ideal (𝓞 K) | Ideal.absNorm I = 1} = {⊤} := by
+        ext I; simp [Ideal.absNorm_eq_one_iff]
+      rw [this]
+      simp
+    have hd : 0 < finrank ℚ K := Module.finrank_pos
+    have hp : n.minFac.Prime := Nat.minFac_prime (by omega)
+    have hpn : n.minFac ∣ n := Nat.minFac_dvd n
+    set p := n.minFac with hpdef
+    set q : 𝓞 K := (p : 𝓞 K) with hqdef
+    have hq0 : q ≠ 0 := by rw [hqdef]; exact_mod_cast hp.ne_zero
+    have hqbot : Ideal.span {q} ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
+    have hNq : Ideal.absNorm (Ideal.span {q}) = p ^ finrank ℚ K := by
+      rw [Ideal.absNorm_span_singleton]
+      have : q = algebraMap ℤ (𝓞 K) (p : ℤ) := by simp [hqdef]
+      rw [this, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank]
+      simp
+    obtain ⟨T, hT, hT2, hprod⟩ := primeSet_lemma K (Ideal.span {q}) hqbot
+    rw [hNq] at hprod
+    have hNP : ∀ P ∈ T, 2 ≤ Ideal.absNorm P ∧ p ≤ Ideal.absNorm P := by
+      intro P hP
+      obtain ⟨h1, h2, _⟩ := hT2 P hP
+      have a : Ideal.absNorm P ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
+      have b : Ideal.absNorm P ≠ 1 := by rw [Ne, Ideal.absNorm_eq_one_iff]; exact h1.ne_top
+      refine ⟨by omega, ?_⟩
+      obtain ⟨k, _, hk⟩ := (Nat.dvd_prime_pow hp).1 ((Finset.dvd_prod_of_mem _ hP).trans hprod)
+      have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; exact b hk
+      rw [hk]
+      exact Nat.le_self_pow hk0 p
+    have hTcard : T.card ≤ finrank ℚ K := by
+      have h1 : p ^ T.card ≤ ∏ P ∈ T, Ideal.absNorm P :=
+        Finset.pow_card_le_prod _ _ _ fun P hP => (hNP P hP).2
+      have h2 : ∏ P ∈ T, Ideal.absNorm P ≤ p ^ finrank ℚ K := Nat.le_of_dvd (pow_pos hp.pos _) hprod
+      exact (Nat.pow_le_pow_iff_right hp.one_lt).1 (h1.trans h2)
 
-  have hcover : ∀ I : Ideal (𝓞 K), Ideal.absNorm I = n →
-      ∃ P ∈ T, Ideal.absNorm P ∣ n ∧ ∃ J, Ideal.absNorm J = n / Ideal.absNorm P ∧ I = P * J := by
-    intro I hI
-    have key : I ⊔ Ideal.span {q} ≠ ⊤ := by
-      intro htop
-      have hcard : Nat.card (𝓞 K ⧸ I) = n := by
-        rw [← hI, Ideal.absNorm_apply, Submodule.cardQuot_apply]
-      haveI : Finite (𝓞 K ⧸ I) := Nat.finite_of_card_ne_zero (by omega)
-      haveI : Fact p.Prime := ⟨hp⟩
-      obtain ⟨y, hy⟩ := exists_prime_addOrderOf_dvd_card' (G := 𝓞 K ⧸ I) p (hcard ▸ hpn)
-      have h1 : (1 : 𝓞 K) ∈ I ⊔ Ideal.span {q} := htop ▸ Submodule.mem_top
-      obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 h1
-      obtain ⟨r, rfl⟩ := Ideal.mem_span_singleton'.1 hb
-      have hu : Ideal.Quotient.mk I r * (p : 𝓞 K ⧸ I) = 1 := by
-        have := congrArg (Ideal.Quotient.mk I) hab
-        rw [map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.2 ha, zero_add, map_mul, map_one] at this
-        simpa [hqdef] using this
-      have hpy : (p : 𝓞 K ⧸ I) * y = 0 := by
-        rw [← nsmul_eq_mul, ← hy]; exact addOrderOf_nsmul_eq_zero y
-      have hy0 : y = 0 := by
-        calc y = (Ideal.Quotient.mk I r * (p : 𝓞 K ⧸ I)) * y := by rw [hu, one_mul]
-          _ = Ideal.Quotient.mk I r * ((p : 𝓞 K ⧸ I) * y) := by ring
-          _ = 0 := by rw [hpy, mul_zero]
-      rw [hy0, addOrderOf_zero] at hy
-      exact hp.one_lt.ne hy
-    obtain ⟨P, hPmax, hPle⟩ := Ideal.exists_le_maximal _ key
-    have hPT : P ∈ T := by
-      have : P ∈ (↑T : Set (Ideal (𝓞 K))) := by
-        rw [hT]; exact ⟨hPmax.isPrime, le_trans le_sup_right hPle⟩
-      exact this
-    obtain ⟨J, rfl⟩ := Ideal.dvd_iff_le.2 (le_trans le_sup_left hPle)
-    rw [map_mul] at hI
-    have hP0 : 0 < Ideal.absNorm P := by have := hNP P hPT; omega
-    refine ⟨P, hPT, ⟨_, hI.symm⟩, J, ?_, rfl⟩
-    rw [← hI, Nat.mul_div_cancel_left _ hP0]
+    have hcover
+        : ∀ I : Ideal (𝓞 K),
+          Ideal.absNorm I = n
+            → ∃ P ∈ T,
+              Ideal.absNorm P ∣ n ∧ ∃ J, Ideal.absNorm J = n / Ideal.absNorm P ∧ I = P * J := by
+      intro I hI
+      have key : I ⊔ Ideal.span {q} ≠ ⊤ := by
+        intro htop
+        have hcard : Nat.card (𝓞 K ⧸ I) = n := by
+          rw [← hI, Ideal.absNorm_apply, Submodule.cardQuot_apply]
+        haveI : Finite (𝓞 K ⧸ I) := Nat.finite_of_card_ne_zero (by omega)
+        haveI : Fact p.Prime := ⟨hp⟩
+        obtain ⟨y, hy⟩ := exists_prime_addOrderOf_dvd_card' (G := 𝓞 K ⧸ I) p (hcard ▸ hpn)
+        have h1 : (1 : 𝓞 K) ∈ I ⊔ Ideal.span {q} := htop ▸ Submodule.mem_top
+        obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 h1
+        obtain ⟨r, rfl⟩ := Ideal.mem_span_singleton'.1 hb
+        have hu : Ideal.Quotient.mk I r * (p : 𝓞 K ⧸ I) = 1 := by
+          have := congrArg (Ideal.Quotient.mk I) hab
+          rw [map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.2 ha, zero_add, map_mul, map_one]
+            at this
+          simpa [hqdef] using this
+        have hpy : (p : 𝓞 K ⧸ I) * y = 0 := by
+          rw [← nsmul_eq_mul, ← hy]; exact addOrderOf_nsmul_eq_zero y
+        have hy0 : y = 0 := by
+          calc
+            y = (Ideal.Quotient.mk I r * (p : 𝓞 K ⧸ I)) * y := by rw [hu, one_mul]
+            _ = Ideal.Quotient.mk I r * ((p : 𝓞 K ⧸ I) * y) := by ring
+            _ = 0 := by rw [hpy, mul_zero]
+        rw [hy0, addOrderOf_zero] at hy
+        exact hp.one_lt.ne hy
+      obtain ⟨P, hPmax, hPle⟩ := Ideal.exists_le_maximal _ key
+      have hPT : P ∈ T := by
+        have : P ∈ (↑T : Set (Ideal (𝓞 K))) := by
+          rw [hT]; exact ⟨hPmax.isPrime, le_trans le_sup_right hPle⟩
+        exact this
+      obtain ⟨J, rfl⟩ := Ideal.dvd_iff_le.2 (le_trans le_sup_left hPle)
+      rw [map_mul] at hI
+      have hP0 : 0 < Ideal.absNorm P := by have := hNP P hPT; omega
+      refine ⟨P, hPT, ⟨_, hI.symm⟩, J, ?_, rfl⟩
+      rw [← hI, Nat.mul_div_cancel_left _ hP0]
 
-  classical
-  let T' := T.filter (fun P => Ideal.absNorm P ∣ n)
-  let F := T'.biUnion (fun P =>
-    (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) (n / Ideal.absNorm P)).toFinset.image (P * ·))
-  have hsub : {I : Ideal (𝓞 K) | Ideal.absNorm I = n} ⊆ ↑F := by
-    intro I hI
-    obtain ⟨P, hPT, hdvd, J, hJ, rfl⟩ := hcover I hI
-    simp only [F, T', Finset.coe_biUnion, Finset.coe_filter, Set.mem_iUnion, Finset.coe_image,
-      Set.Finite.coe_toFinset, Set.mem_image, Set.mem_setOf_eq]
-    exact ⟨P, ⟨hPT, hdvd⟩, J, hJ, rfl⟩
-  have hΩ : 1 ≤ (Nat.primeFactorsList n).length := by
-    have : Nat.primeFactorsList n ≠ [] := by
-      rw [Ne, Nat.primeFactorsList_eq_nil]; omega
-    exact List.length_pos_iff.2 this
-  have hterm : ∀ P ∈ T', (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K)
-      (n / Ideal.absNorm P)).toFinset.card ≤
-        finrank ℚ K ^ ((Nat.primeFactorsList n).length - 1) := by
-    intro P hP
-    obtain ⟨hPT, hdvd⟩ := Finset.mem_filter.1 hP
-    obtain ⟨h2, _⟩ := hNP P hPT
-    obtain ⟨m, hm⟩ := hdvd
-    have hm0 : m ≠ 0 := by rintro rfl; omega
-    have hmdiv : n / Ideal.absNorm P = m := by rw [hm, Nat.mul_div_cancel_left _ (by omega)]
-    rw [← Set.ncard_eq_toFinset_card _ (Ideal.finite_setOf_absNorm_eq _), hmdiv]
-    have hmlt : m < n := by
-      rw [hm]; have : 1 * m < Ideal.absNorm P * m := by
-        apply Nat.mul_lt_mul_of_pos_right (by omega) (Nat.pos_of_ne_zero hm0)
-      omega
-    refine (ih m hmlt (Nat.one_le_iff_ne_zero.2 hm0)).trans (Nat.pow_le_pow_right hd ?_)
-    have hlen := (Nat.perm_primeFactorsList_mul (a := Ideal.absNorm P) (b := m)
-      (by omega) hm0).length_eq
-    rw [← hm, List.length_append] at hlen
-    have : 1 ≤ (Nat.primeFactorsList (Ideal.absNorm P)).length := by
-      have : Nat.primeFactorsList (Ideal.absNorm P) ≠ [] := by
-        rw [Ne, Nat.primeFactorsList_eq_nil]; omega
+    classical
+    let T' := T.filter (fun P => Ideal.absNorm P ∣ n)
+    let F :=
+      T'.biUnion (fun P =>
+        (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) (n / Ideal.absNorm P)).toFinset.image (P * ·))
+    have hsub : {I : Ideal (𝓞 K) | Ideal.absNorm I = n} ⊆ ↑F := by
+      intro I hI
+      obtain ⟨P, hPT, hdvd, J, hJ, rfl⟩ := hcover I hI
+      simp only [F, T', Finset.coe_biUnion, Finset.coe_filter, Set.mem_iUnion, Finset.coe_image,
+        Set.Finite.coe_toFinset, Set.mem_image, Set.mem_setOf_eq]
+      exact ⟨P, ⟨hPT, hdvd⟩, J, hJ, rfl⟩
+    have hΩ : 1 ≤ (Nat.primeFactorsList n).length := by
+      have : Nat.primeFactorsList n ≠ [] := by rw [Ne, Nat.primeFactorsList_eq_nil]; omega
       exact List.length_pos_iff.2 this
-    omega
-  calc {I : Ideal (𝓞 K) | Ideal.absNorm I = n}.ncard ≤ (↑F : Set (Ideal (𝓞 K))).ncard :=
-        Set.ncard_le_ncard hsub F.finite_toSet
-    _ = F.card := Set.ncard_coe_finset F
-    _ ≤ ∑ P ∈ T', ((Ideal.finite_setOf_absNorm_eq (S := 𝓞 K)
-          (n / Ideal.absNorm P)).toFinset.image (P * ·)).card := Finset.card_biUnion_le
-    _ ≤ ∑ P ∈ T', (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) (n / Ideal.absNorm P)).toFinset.card :=
+    have hterm
+        : ∀ P ∈ T',
+          (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) (n / Ideal.absNorm P)).toFinset.card
+            ≤ finrank ℚ K ^ ((Nat.primeFactorsList n).length - 1) := by
+      intro P hP
+      obtain ⟨hPT, hdvd⟩ := Finset.mem_filter.1 hP
+      obtain ⟨h2, _⟩ := hNP P hPT
+      obtain ⟨m, hm⟩ := hdvd
+      have hm0 : m ≠ 0 := by rintro rfl; omega
+      have hmdiv : n / Ideal.absNorm P = m := by rw [hm, Nat.mul_div_cancel_left _ (by omega)]
+      rw [← Set.ncard_eq_toFinset_card _ (Ideal.finite_setOf_absNorm_eq _), hmdiv]
+      have hmlt : m < n := by
+        rw [hm]
+        have : 1 * m < Ideal.absNorm P * m := by
+          apply Nat.mul_lt_mul_of_pos_right (by omega) (Nat.pos_of_ne_zero hm0)
+        omega
+      refine (ih m hmlt (Nat.one_le_iff_ne_zero.2 hm0)).trans (Nat.pow_le_pow_right hd ?_)
+      have hlen :=
+        (Nat.perm_primeFactorsList_mul (a := Ideal.absNorm P) (b := m) (by omega) hm0).length_eq
+      rw [← hm, List.length_append] at hlen
+      have : 1 ≤ (Nat.primeFactorsList (Ideal.absNorm P)).length := by
+        have : Nat.primeFactorsList (Ideal.absNorm P) ≠ [] := by
+          rw [Ne, Nat.primeFactorsList_eq_nil]; omega
+        exact List.length_pos_iff.2 this
+      omega
+    calc
+      {I : Ideal (𝓞 K) | Ideal.absNorm I = n}.ncard
+        ≤ (↑F : Set (Ideal (𝓞 K))).ncard := Set.ncard_le_ncard hsub F.finite_toSet
+      _ = F.card := Set.ncard_coe_finset F
+      _ ≤ ∑ P ∈ T', ((Ideal.finite_setOf_absNorm_eq (S := 𝓞 K)
+            (n / Ideal.absNorm P)).toFinset.image (P * ·)).card :=
+        Finset.card_biUnion_le
+      _ ≤ ∑ P ∈ T', (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) (n / Ideal.absNorm P)).toFinset.card :=
         Finset.sum_le_sum fun P _ => Finset.card_image_le
-    _ ≤ ∑ P ∈ T', finrank ℚ K ^ ((Nat.primeFactorsList n).length - 1) := Finset.sum_le_sum hterm
-    _ = T'.card * finrank ℚ K ^ ((Nat.primeFactorsList n).length - 1) := by simp
-    _ ≤ finrank ℚ K * finrank ℚ K ^ ((Nat.primeFactorsList n).length - 1) :=
+      _ ≤ ∑ P ∈ T', finrank ℚ K ^ ((Nat.primeFactorsList n).length - 1) := Finset.sum_le_sum hterm
+      _ = T'.card * finrank ℚ K ^ ((Nat.primeFactorsList n).length - 1) := by simp
+      _ ≤ finrank ℚ K * finrank ℚ K ^ ((Nat.primeFactorsList n).length - 1) :=
         Nat.mul_le_mul_right _ ((Finset.card_filter_le _ _).trans hTcard)
-    _ = finrank ℚ K ^ (Nat.primeFactorsList n).length := by
-        rw [← pow_succ']; congr 1; omega
+      _ = finrank ℚ K ^ (Nat.primeFactorsList n).length := by rw [← pow_succ']; congr 1; omega
 
 theorem ideal_norm_le_count : IdealNormLeCount := by
   intro K _ _ x hx
   classical
   set d := finrank ℚ K
   have hd : 1 ≤ d := Module.finrank_pos
-  let F := (Finset.Icc 1 ⌊x⌋₊).biUnion (fun n =>
-    (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).toFinset)
+  let F :=
+    (Finset.Icc 1 ⌊x⌋₊).biUnion (fun n => (Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).toFinset)
   have hsub : {I : Ideal (𝓞 K) | I ≠ ⊥ ∧ (Ideal.absNorm I : ℝ) ≤ x} ⊆ ↑F := by
     rintro I ⟨hI, hx'⟩
     have h0 : Ideal.absNorm I ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
@@ -384,26 +416,33 @@ theorem ideal_norm_le_count : IdealNormLeCount := by
     exact ⟨Ideal.absNorm I, ⟨by omega, Nat.le_floor hx'⟩, rfl⟩
   refine ⟨F.finite_toSet.subset hsub, ?_⟩
   have hL : 0 ≤ Real.logb 2 d := Real.logb_nonneg (by norm_num) (by exact_mod_cast hd)
-  have hx0 : (0:ℝ) < x := by linarith
-  have h1 : (({I : Ideal (𝓞 K) | I ≠ ⊥ ∧ (Ideal.absNorm I : ℝ) ≤ x}.ncard : ℕ) : ℝ) ≤ (F.card : ℝ) := by
+  have hx0 : (0 : ℝ) < x := by linarith
+  have h1
+      : (({I : Ideal (𝓞 K) | I ≠ ⊥ ∧ (Ideal.absNorm I : ℝ) ≤ x}.ncard : ℕ) : ℝ) ≤ (F.card : ℝ) := by
     exact_mod_cast (Set.ncard_le_ncard hsub F.finite_toSet).trans (Set.ncard_coe_finset F).le
-  have h2 : (F.card : ℝ) ≤ ∑ n ∈ Finset.Icc 1 ⌊x⌋₊,
-      ((Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).toFinset.card : ℝ) := by
+  have h2
+      : (F.card : ℝ)
+        ≤ ∑ n ∈ Finset.Icc 1 ⌊x⌋₊,
+          ((Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).toFinset.card : ℝ) := by
     exact_mod_cast Finset.card_biUnion_le
-  have h3 : ∀ n ∈ Finset.Icc 1 ⌊x⌋₊,
-      ((Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).toFinset.card : ℝ) ≤ x ^ Real.logb 2 d := by
+  have h3
+      : ∀ n ∈ Finset.Icc 1 ⌊x⌋₊,
+        ((Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).toFinset.card : ℝ) ≤ x ^ Real.logb 2 d := by
     intro n hn
     obtain ⟨hn1, hn2⟩ := Finset.mem_Icc.1 hn
     rw [← Set.ncard_eq_toFinset_card _ (Ideal.finite_setOf_absNorm_eq _)]
-    have e1 : (({I : Ideal (𝓞 K) | Ideal.absNorm I = n}.ncard : ℕ) : ℝ) ≤ (d : ℝ) ^ (Nat.primeFactorsList n).length := by
+    have e1
+        : (({I : Ideal (𝓞 K) | Ideal.absNorm I = n}.ncard : ℕ) : ℝ)
+          ≤ (d : ℝ) ^ (Nat.primeFactorsList n).length := by
       exact_mod_cast normCount_lemma K n hn1
     have e2 := Formalism.SLP.Final.omegaPow d n hd hn1
     have e3 : (n : ℝ) ^ Real.logb 2 d ≤ x ^ Real.logb 2 d :=
       Real.rpow_le_rpow (by positivity) ((Nat.cast_le.2 hn2).trans (Nat.floor_le hx0.le)) hL
     linarith
-  have h4 : ∑ n ∈ Finset.Icc 1 ⌊x⌋₊,
-      ((Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).toFinset.card : ℝ) ≤
-      (⌊x⌋₊ : ℝ) * x ^ Real.logb 2 d := by
+  have h4
+      : ∑ n ∈ Finset.Icc 1 ⌊x⌋₊,
+          ((Ideal.finite_setOf_absNorm_eq (S := 𝓞 K) n).toFinset.card : ℝ)
+        ≤ (⌊x⌋₊ : ℝ) * x ^ Real.logb 2 d := by
     refine (Finset.sum_le_sum h3).trans ?_
     simp
   have h5 : (⌊x⌋₊ : ℝ) * x ^ Real.logb 2 d ≤ x * x ^ Real.logb 2 d :=
@@ -442,38 +481,45 @@ theorem class_number_upper_bound : ClassNumberBound := by
   have hD1 : 1 ≤ D := by
     have h0 := NumberField.discr_ne_zero E
     have : (1 : ℤ) ≤ |NumberField.discr E| := Int.one_le_abs h0
-    simp only [D]; exact_mod_cast this
+    simp only [D]
+    exact_mod_cast this
   set x : ℝ := Real.sqrt D
   have hx1 : 1 ≤ x := by simp only [x]; rw [Real.one_le_sqrt]; exact hD1
 
   have hr2 : NumberField.InfinitePlace.nrComplexPlaces E ≤ d - 1 := by
     have := NumberField.InfinitePlace.card_add_two_mul_card_eq_rank E
     omega
-  have hc : (4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E *
-      ((d.factorial : ℝ) / (d : ℝ) ^ d) ≤ 1 := by
-    have hpi : 4 / Real.pi ≤ 2 := by
-      rw [div_le_iff₀ Real.pi_pos]; linarith [Real.pi_gt_three]
-    have h1 : (4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E ≤ (2:ℝ) ^ (d - 1) :=
+  have hc
+      : (4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E
+          * ((d.factorial : ℝ) / (d : ℝ) ^ d)
+        ≤ 1 := by
+    have hpi : 4 / Real.pi ≤ 2 := by rw [div_le_iff₀ Real.pi_pos]; linarith [Real.pi_gt_three]
+    have h1 : (4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E ≤ (2 : ℝ) ^ (d - 1) :=
       (pow_le_pow_left₀ (by positivity) hpi _).trans (pow_le_pow_right₀ (by norm_num) hr2)
     have h2 := factorial_mul_two_pow_le_pow d hd
-    have hdd : (0:ℝ) < (d:ℝ) ^ d := by positivity
-    calc (4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E *
-          ((d.factorial : ℝ) / (d : ℝ) ^ d)
-        ≤ (2:ℝ) ^ (d - 1) * ((d.factorial : ℝ) / (d : ℝ) ^ d) := by gcongr
+    have hdd : (0 : ℝ) < (d : ℝ) ^ d := by positivity
+    calc
+      (4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E
+          * ((d.factorial : ℝ) / (d : ℝ) ^ d)
+        ≤ (2 : ℝ) ^ (d - 1) * ((d.factorial : ℝ) / (d : ℝ) ^ d) := by gcongr
       _ = ((d.factorial : ℝ) * 2 ^ (d - 1)) / (d : ℝ) ^ d := by ring
       _ ≤ 1 := by rw [div_le_one hdd]; exact h2
   obtain ⟨hfin, hcount⟩ := ideal_norm_le_count E x hx1
 
-  have hch : ∀ C : ClassGroup (𝓞 E), ∃ I : (Ideal (𝓞 E))⁰, ClassGroup.mk0 I = C ∧
-      (Ideal.absNorm (I : Ideal (𝓞 E)) : ℝ) ≤ x := by
+  have hch
+      : ∀ C : ClassGroup (𝓞 E), ∃ I : (Ideal (𝓞 E))⁰,
+        ClassGroup.mk0 I = C ∧ (Ideal.absNorm (I : Ideal (𝓞 E)) : ℝ) ≤ x := by
     intro C
     obtain ⟨I, hI, hN⟩ := NumberField.exists_ideal_in_class_of_norm_le C
     refine ⟨I, hI, hN.trans ?_⟩
     have hx0 : 0 ≤ x := by positivity
-    calc (4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E *
-          ((d.factorial : ℝ) / (d : ℝ) ^ d * x)
-        = ((4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E *
-          ((d.factorial : ℝ) / (d : ℝ) ^ d)) * x := by ring
+    calc
+      (4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E
+            * ((d.factorial : ℝ) / (d : ℝ) ^ d * x)
+          = ((4 / Real.pi) ^ NumberField.InfinitePlace.nrComplexPlaces E
+              * ((d.factorial : ℝ) / (d : ℝ) ^ d))
+            * x := by
+        ring
       _ ≤ 1 * x := by gcongr
       _ = x := one_mul x
   choose f hf1 hf2 using hch
@@ -481,8 +527,9 @@ theorem class_number_upper_bound : ClassNumberBound := by
     intro C C' h
     have : f C = f C' := Subtype.ext h
     rw [← hf1 C, ← hf1 C', this]
-  have hcard : NumberField.classNumber E ≤
-      {I : Ideal (𝓞 E) | I ≠ ⊥ ∧ (Ideal.absNorm I : ℝ) ≤ x}.ncard := by
+  have hcard
+      : NumberField.classNumber E
+        ≤ {I : Ideal (𝓞 E) | I ≠ ⊥ ∧ (Ideal.absNorm I : ℝ) ≤ x}.ncard := by
     rw [Set.ncard_eq_toFinset_card _ hfin]
     unfold NumberField.classNumber
     rw [← Finset.card_univ, ← Finset.card_image_of_injective _ hinj]
@@ -495,9 +542,10 @@ theorem class_number_upper_bound : ClassNumberBound := by
     simp only [x]
     rw [Real.sqrt_eq_rpow, ← Real.rpow_mul (by linarith)]
     ring_nf
-  calc (NumberField.classNumber E : ℝ)
-      ≤ (({I : Ideal (𝓞 E) | I ≠ ⊥ ∧ (Ideal.absNorm I : ℝ) ≤ x}.ncard : ℕ) : ℝ) := by
-        exact_mod_cast hcard
+  calc
+    (NumberField.classNumber E : ℝ)
+        ≤ (({I : Ideal (𝓞 E) | I ≠ ⊥ ∧ (Ideal.absNorm I : ℝ) ≤ x}.ncard : ℕ) : ℝ) := by
+      exact_mod_cast hcard
     _ ≤ x ^ (1 + Real.logb 2 d) := hcount
     _ = D ^ ((1 + Real.logb 2 d) / 2) := hxD
 
@@ -700,8 +748,9 @@ theorem projective_quotient_card : ProjQuotCard := by
     rintro ⟨x, q⟩ ⟨x', q'⟩ hxy
     simp only [φ, LinearMap.coprod_apply, Submodule.coe_subtype] at hxy
     have h1 := congrArg f hxy
-    rw [map_add (f := _), map_add (f := _), hfh', hfh', LinearMap.mem_ker.1 q.2, LinearMap.mem_ker.1 q'.2,
-      add_zero, add_zero] at h1
+    rw [map_add (f := _), map_add (f := _), hfh', hfh', LinearMap.mem_ker.1 q.2,
+        LinearMap.mem_ker.1 q'.2, add_zero, add_zero]
+      at h1
     subst h1
     exact Prod.ext rfl (Subtype.ext (add_left_cancel hxy))
   have hφsurj : Function.Surjective φ := by
@@ -710,37 +759,42 @@ theorem projective_quotient_card : ProjQuotCard := by
     · rw [LinearMap.mem_ker, map_sub, hfh', sub_self]
     · simp [φ]
   let e := LinearEquiv.ofBijective φ ⟨hφinj, hφsurj⟩
-  have hhinj : Function.Injective h := fun x y hxy => by
-    rw [← hfh' x, ← hfh' y, hxy]
+  have hhinj : Function.Injective h := fun x y hxy => by rw [← hfh' x, ← hfh' y, hxy]
 
-  have hpi : (I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).toAddSubgroup =
-      AddSubgroup.pi Set.univ (fun _ => (I : Submodule (𝓞 E) (𝓞 E)).toAddSubgroup) := by
+  have hpi
+      : (I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).toAddSubgroup
+        = AddSubgroup.pi Set.univ (fun _ => (I : Submodule (𝓞 E) (𝓞 E)).toAddSubgroup) := by
     ext x
     simp only [Submodule.mem_toAddSubgroup, AddSubgroup.mem_pi, Set.mem_univ, true_implies]
     exact mem_ideal_smul_top_pi_iff I n x
-  have hfree : (I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).toAddSubgroup.index =
-      Ideal.absNorm I ^ n := by
+  have hfree
+      : (I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).toAddSubgroup.index = Ideal.absNorm I ^ n := by
     rw [hpi, AddSubgroup.index_pi]
     simp only [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
     congr 1
     exact (Ideal.absNorm_eq_index I).symm
-  have hcomap : (I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).comap
-      (e : (P × Q) →ₗ[𝓞 E] (Fin n → 𝓞 E)) = I • ⊤ := by
+  have hcomap
+      : (I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).comap (e : (P × Q) →ₗ[𝓞 E] (Fin n → 𝓞 E))
+        = I • ⊤ := by
     rw [Submodule.comap_equiv_eq_map_symm, Submodule.map_smul'', Submodule.map_top,
       LinearEquiv.range]
-  have hprod_idx : (I • (⊤ : Submodule (𝓞 E) (P × Q))).toAddSubgroup.index =
-      Ideal.absNorm I ^ n := by
-    have hc : ((I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).comap
-        (e : (P × Q) →ₗ[𝓞 E] (Fin n → 𝓞 E))).toAddSubgroup =
-        (I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).toAddSubgroup.comap
-          (e : (P × Q) →ₗ[𝓞 E] (Fin n → 𝓞 E)).toAddMonoidHom := by
+  have hprod_idx
+      : (I • (⊤ : Submodule (𝓞 E) (P × Q))).toAddSubgroup.index = Ideal.absNorm I ^ n := by
+    have hc
+        : ((I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).comap
+            (e : (P × Q) →ₗ[𝓞 E] (Fin n → 𝓞 E))).toAddSubgroup
+          = (I • (⊤ : Submodule (𝓞 E) (Fin n → 𝓞 E))).toAddSubgroup.comap
+            (e : (P × Q) →ₗ[𝓞 E] (Fin n → 𝓞 E)).toAddMonoidHom := by
       ext x; rfl
     rw [← hcomap, ← hfree, hc]
     exact AddSubgroup.index_comap_of_surjective _ e.surjective
   rw [ideal_smul_top_prod] at hprod_idx
-  rw [show ((I • (⊤ : Submodule (𝓞 E) P)).prod (I • (⊤ : Submodule (𝓞 E) Q))).toAddSubgroup =
-      (I • (⊤ : Submodule (𝓞 E) P)).toAddSubgroup.prod
-        (I • (⊤ : Submodule (𝓞 E) Q)).toAddSubgroup from rfl, AddSubgroup.index_prod] at hprod_idx
+  rw [show ((I • (⊤ : Submodule (𝓞 E) P)).prod (I • (⊤ : Submodule (𝓞 E) Q))).toAddSubgroup
+          = (I • (⊤ : Submodule (𝓞 E) P)).toAddSubgroup.prod
+            (I • (⊤ : Submodule (𝓞 E) Q)).toAddSubgroup from
+        rfl,
+      AddSubgroup.index_prod]
+    at hprod_idx
 
   set r := finrank (𝓞 E) P
   have hTFP : TF E P := by
@@ -765,8 +819,9 @@ theorem projective_quotient_card : ProjQuotCard := by
   have hLIBQ : LIB E Q (n - r) := by
     intro ι _ v hv
     have hc := linearIndependent_inl_union_inr' ha hv
-    have hc' := (hc.map' (e : (P × Q) →ₗ[𝓞 E] (Fin n → 𝓞 E))
-      (LinearMap.ker_eq_bot.2 e.injective)).fintype_card_le_finrank
+    have hc' :=
+      (hc.map' (e : (P × Q) →ₗ[𝓞 E] (Fin n → 𝓞 E))
+        (LinearMap.ker_eq_bot.2 e.injective)).fintype_card_le_finrank
     rw [Module.finrank_fin_fun, Fintype.card_sum, Fintype.card_fin] at hc'
     omega
   obtain ⟨hP1, hP2⟩ := index_ideal_smul_le_norm_pow (E := E) r _ I hI rfl P hTFP hLIBP
@@ -776,9 +831,9 @@ theorem projective_quotient_card : ProjQuotCard := by
   by_contra hne
   have hlt := lt_of_le_of_ne hP2 hne
   have hpos : 0 < Ideal.absNorm I ^ (n - r) := pow_pos hN _
-  have : (I • (⊤ : Submodule (𝓞 E) P)).toAddSubgroup.index *
-      (I • (⊤ : Submodule (𝓞 E) Q)).toAddSubgroup.index <
-      Ideal.absNorm I ^ r * Ideal.absNorm I ^ (n - r) :=
+  have : (I • (⊤ : Submodule (𝓞 E) P)).toAddSubgroup.index
+        * (I • (⊤ : Submodule (𝓞 E) Q)).toAddSubgroup.index
+      < Ideal.absNorm I ^ r * Ideal.absNorm I ^ (n - r) :=
     lt_of_le_of_lt (Nat.mul_le_mul_left _ hQ2) (Nat.mul_lt_mul_of_pos_right hlt hpos)
   rw [← pow_add, Nat.add_sub_cancel' hrn, hprod_idx] at this
   exact lt_irrefl _ this

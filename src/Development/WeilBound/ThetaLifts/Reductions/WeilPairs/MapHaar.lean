@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DecayZ
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  MeasureTheory
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open Formalism.IndefR.DatumF
 
@@ -21,19 +22,24 @@ namespace PositivityTheory.ThKW.AdelicSchwartzProperties
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem map_haar {nS nT N : ℕ} (α : WOF F E nS nT ≃ₗ[AF F] (Fin N → AF F)) (hαc : Continuous α)
+theorem map_haar
+    {nS nT N : ℕ} (α : WOF F E nS nT ≃ₗ[AF F] (Fin N → AF F)) (hαc : Continuous α)
     (hαs : Continuous α.symm) (ν : Measure (WOF F E nS nT)) (hν : ν.IsAddHaarMeasure)
-    (μN : Measure (Fin N → AF F)) (hμN : μN.IsAddHaarMeasure) :
-    ∃ c : ℝ, 0 < c ∧ (∀ G : (Fin N → AF F) → ℂ, ∫ v, G (α v) ∂ν = (c : ℂ) * ∫ x, G x ∂μN) ∧
-      ∀ G : (Fin N → AF F) → ℂ, Integrable (fun v => G (α v)) ν ↔ Integrable G μN := by
+    (μN : Measure (Fin N → AF F)) (hμN : μN.IsAddHaarMeasure)
+    : ∃ c : ℝ,
+      0 < c ∧ (∀ G : (Fin N → AF F) → ℂ, ∫ v, G (α v) ∂ν = (c : ℂ) * ∫ x, G x ∂μN)
+        ∧ ∀ G : (Fin N → AF F) → ℂ, Integrable (fun v => G (α v)) ν ↔ Integrable G μN := by
   haveI : LocallyCompactSpace (AF F) := GlobalTheory.AdelicUnitaryTop.locallyCompact_adele F
   haveI : SecondCountableTopology (AF F) := GlobalTheory.AdelicUnitaryTop.secondCountable_adele F
   haveI : BorelSpace (AF F) := ⟨rfl⟩
   haveI : BorelSpace (WOF F E nS nT) := ⟨rfl⟩
   haveI := hν
   haveI := hμN
-  let a : WOF F E nS nT ≃ₜ (Fin N → AF F) :=
-    { toEquiv := α.toEquiv, continuous_toFun := hαc, continuous_invFun := hαs }
+  let a : WOF F E nS nT ≃ₜ (Fin N → AF F) := {
+    toEquiv := α.toEquiv
+    continuous_toFun := hαc
+    continuous_invFun := hαs
+  }
   let m : WOF F E nS nT ≃ᵐ (Fin N → AF F) := a.toMeasurableEquiv
   have hm : ∀ v, m v = α v := fun _ => rfl
   haveI : ContinuousAdd (WOF F E nS nT) := ⟨by

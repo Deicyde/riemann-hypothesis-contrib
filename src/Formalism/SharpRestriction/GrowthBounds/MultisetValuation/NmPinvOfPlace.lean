@@ -10,7 +10,9 @@ namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
 open Formalism.MainNotions.G Formalism.BasicNotions Finset
 
-attribute [local instance] Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
+attribute [local instance]
+  Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO
+  Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
   Formalism.MainNotions.G.GAtP.algOK
 
 variable {p : ℕ} [hp : Fact p.Prime] {X : Sys p}
@@ -18,20 +20,18 @@ variable {p : ℕ} [hp : Fact p.Prime] {X : Sys p}
 theorem nm_pinv_of_eO (Y : Pend X) (he : 0 < X.eO) : (p : Y.Kc)⁻¹ ∉ Y.Oc := by
   intro hmem
   have hinj := algebraMap_inj Y he
-  have hpO : (p : X.G.O) ≠ 0 := fun h0 =>
-    pow_ne_zero _ X.unif.ne_zero (X.eO_spec.eq_zero_iff.mp h0)
+  have hpO : (p : X.G.O) ≠ 0 := fun h0 => pow_ne_zero _ X.unif.ne_zero (X.eO_spec.eq_zero_iff.mp h0)
   have hpK : (p : X.G.Kf) ≠ 0 := by
     have := (map_ne_zero_iff _ hinj).mpr hpO
     rwa [map_natCast] at this
-  have h1 : algebraMap X.G.Kf Y.Kc ((p : X.G.Kf)⁻¹) ∈ Y.Oc := by
-    rwa [map_inv₀, map_natCast]
+  have h1 : algebraMap X.G.Kf Y.Kc ((p : X.G.Kf)⁻¹) ∈ Y.Oc := by rwa [map_inv₀, map_natCast]
   obtain ⟨a, ha⟩ := (mem_intK (X := X)).mp ((Y.Oc_K _).mp h1)
 
-  have h1eq : (p : X.G.O) * a = 1 := hinj (by
-    rw [map_mul, ha, map_natCast, mul_inv_cancel₀ hpK, map_one])
+  have h1eq : (p : X.G.O) * a = 1 :=
+    hinj (by rw [map_mul, ha, map_natCast, mul_inv_cancel₀ hpK, map_one])
   have hpu : IsUnit (p : X.G.O) := IsUnit.of_mul_eq_one _ h1eq
-  exact X.unif.not_isUnit
-    ((isUnit_pow_iff (Nat.pos_iff_ne_zero.mp he)).mp (X.eO_spec.isUnit_iff.mp hpu))
+  exact X.unif.not_isUnit ((isUnit_pow_iff (Nat.pos_iff_ne_zero.mp he)).mp
+    (X.eO_spec.isUnit_iff.mp hpu))
 
 theorem nm_pinv_of_place (Y : Pend X) (v : X.Pl) : (p : Y.Kc)⁻¹ ∉ Y.Oc :=
   nm_pinv_of_eO Y (eO_pos X v)
@@ -39,10 +39,11 @@ theorem nm_pinv_of_place (Y : Pend X) (v : X.Pl) : (p : Y.Kc)⁻¹ ∉ Y.Oc :=
 theorem nm_hyp (Y : Pend X) (h : (p : Y.Kc)⁻¹ ∉ Y.Oc) : nm_Hyp Y.Oc p :=
   ⟨hp.out.one_lt, Y.Oc_val, Y.Oc_rank1, h⟩
 
-theorem nm_ext (Y : Pend X) (h : (p : Y.Kc)⁻¹ ∉ Y.Oc) :
-    ∃ (K' : Type) (_ : NormedField K') (_ : Algebra Y.Kc K'), IsUltrametricDist K' ∧ IsAlgClosed K' ∧
-      ‖(p : K')‖ = (p : ℝ)⁻¹ ∧ (∀ x : Y.Kc, ‖algebraMap Y.Kc K' x‖ ≤ 1 ↔ x ∈ Y.Oc) ∧
-      ∃ vp : K', vp ^ (p ^ 2 - 1) = (p : K') := by
+theorem nm_ext (Y : Pend X) (h : (p : Y.Kc)⁻¹ ∉ Y.Oc)
+    : ∃ (K' : Type) (_ : NormedField K') (_ : Algebra Y.Kc K'),
+      IsUltrametricDist K' ∧ IsAlgClosed K' ∧ ‖(p : K')‖ = (p : ℝ)⁻¹
+        ∧ (∀ x : Y.Kc, ‖algebraMap Y.Kc K' x‖ ≤ 1 ↔ x ∈ Y.Oc)
+        ∧ ∃ vp : K', vp ^ (p ^ 2 - 1) = (p : K') := by
   have hH := nm_hyp Y h
   have hc : 1 < nm_abs hH ((p : Y.Kc)⁻¹) := by
     rw [map_inv₀]

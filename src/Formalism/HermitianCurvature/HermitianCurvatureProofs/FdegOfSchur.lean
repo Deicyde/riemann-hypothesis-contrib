@@ -15,20 +15,26 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDe
 
 variable {k r : ℕ}
 
-theorem one_mem_uh : (1 : Mx k r) ∈ UH (Hpk k r) := by
-  simp [UH]
+theorem one_mem_uh : (1 : Mx k r) ∈ UH (Hpk k r) := by simp [UH]
 
-theorem mem_DD {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Mx k r → (H →L[ℂ] H)) (w0 : H)
-    {t : Mx k r} (ht : t ∈ UH (Hpk k r)) : σ t w0 ∈ DDsp σ w0 := Submodule.subset_span ⟨t, ht, rfl⟩
+theorem mem_DD
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Mx k r → (H →L[ℂ] H)) (w0 : H)
+    {t : Mx k r} (ht : t ∈ UH (Hpk k r))
+    : σ t w0 ∈ DDsp σ w0 :=
+  Submodule.subset_span ⟨t, ht, rfl⟩
 
-theorem fdeg_of_schur {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {σ : Mx k r → (H →L[ℂ] H)}
-    {μG : Measure (Mt k r)} {w0 : H} (hw : w0 ≠ 0) {d : ℝ} (hd : 0 < d)
-    (hS : ∫ x, ⟪w0, σ (Matrix.of x) w0⟫_ℂ * star ⟪w0, σ (Matrix.of x) w0⟫_ℂ ∂μG =
-      ⟪w0, w0⟫_ℂ * ⟪w0, w0⟫_ℂ / (d : ℂ)) :
-    PI.BesselPeriodGGP.fdegH μG σ w0 = d := by
-
-  have hpt : ∀ x, ⟪w0, σ (Matrix.of x) w0⟫_ℂ * star ⟪w0, σ (Matrix.of x) w0⟫_ℂ =
-      ((‖⟪w0, σ (Matrix.of x) w0⟫_ℂ‖ ^ 2 : ℝ) : ℂ) := by
+theorem fdeg_of_schur
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : Mx k r → (H →L[ℂ] H)} {μG : Measure (Mt k r)} {w0 : H} (hw : w0 ≠ 0)
+    {d : ℝ} (hd : 0 < d)
+    (hS : ∫ x, ⟪w0, σ (Matrix.of x) w0⟫_ℂ * star ⟪w0, σ (Matrix.of x) w0⟫_ℂ ∂μG
+      = ⟪w0, w0⟫_ℂ * ⟪w0, w0⟫_ℂ / (d : ℂ))
+    : PI.BesselPeriodGGP.fdegH μG σ w0 = d := by
+  have hpt
+      : ∀ x,
+        ⟪w0, σ (Matrix.of x) w0⟫_ℂ * star ⟪w0, σ (Matrix.of x) w0⟫_ℂ
+          = ((‖⟪w0, σ (Matrix.of x) w0⟫_ℂ‖ ^ 2 : ℝ) : ℂ) := by
     intro x
     rw [show star ⟪w0, σ (Matrix.of x) w0⟫_ℂ = (starRingEnd ℂ) ⟪w0, σ (Matrix.of x) w0⟫_ℂ from rfl,
       RCLike.mul_conj]

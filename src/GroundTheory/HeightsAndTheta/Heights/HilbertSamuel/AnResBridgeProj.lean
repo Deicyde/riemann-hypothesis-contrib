@@ -17,43 +17,47 @@ open ReciprocityTheory.ChartRestriction.G.Geo
 
 open MvPolynomial MeasureTheory ReciprocityTheory.AnForm.M
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {P J : Ideal (MRing ι)} {e : ℕ}
+variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {P J : Ideal (MRing ι)} {e : ℕ}
 
-def brQ (R : AnRes P J e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (x : R.X) :
-    Fin e → ℂ :=
-  fun i => Ψ (segre (R.lift x x)) i.succ / Ψ (segre (R.lift x x)) 0
+def brQ (R : AnRes P J e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (x : R.X)
+    : Fin e → ℂ := fun i =>
+  Ψ (segre (R.lift x x)) i.succ / Ψ (segre (R.lift x x)) 0
 
 def brBad (R : AnRes P J e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) : Set R.X :=
-  {x | R.lift x x ∈ mcPts J} ∪ {x | Ψ (segre (R.lift x x)) 0 = 0} ∪
-    {x | ∃ j, x ∈ (R.A.chart j).source ∧
-      ¬ (AnalyticAt ℂ (brQ R Ψ ∘ (R.A.chart j).symm) (R.A.chart j x) ∧
-        LinearMap.det (fderiv ℂ (brQ R Ψ ∘ (R.A.chart j).symm) (R.A.chart j x) :
-          (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ≠ 0)}
+  {x | R.lift x x ∈ mcPts J} ∪ {x | Ψ (segre (R.lift x x)) 0 = 0}
+    ∪ {x | ∃ j, x ∈ (R.A.chart j).source ∧
+        ¬ (AnalyticAt ℂ (brQ R Ψ ∘ (R.A.chart j).symm) (R.A.chart j x) ∧
+          LinearMap.det (fderiv ℂ (brQ R Ψ ∘ (R.A.chart j).symm) (R.A.chart j x) :
+            (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ≠ 0)}
 
-def brW (R : AnRes P J e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (x : R.X) :
-    ((k : K) → ι k) → ℂ :=
+def brW (R : AnRes P J e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (x : R.X)
+    : ((k : K) → ι k) → ℂ :=
   (Ψ (segre (R.lift x x)) 0)⁻¹ • segre (R.lift x x)
 
 variable (R : AnRes P J e) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
 
-theorem brGood : ∀ x ∉ brBad R Ψ, ∀ j, x ∈ (R.A.chart j).source →
-    AnalyticAt ℂ (brQ R Ψ ∘ (R.A.chart j).symm) (R.A.chart j x) ∧
-      LinearMap.det (fderiv ℂ (brQ R Ψ ∘ (R.A.chart j).symm) (R.A.chart j x) :
-        (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ≠ 0 := by
+theorem brGood
+    : ∀ x ∉ brBad R Ψ, ∀ j,
+      x ∈ (R.A.chart j).source
+        → AnalyticAt ℂ (brQ R Ψ ∘ (R.A.chart j).symm) (R.A.chart j x)
+          ∧ LinearMap.det
+              (fderiv ℂ (brQ R Ψ ∘ (R.A.chart j).symm) (R.A.chart j x)
+                : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+            ≠ 0 := by
   intro x hx j hj
   by_contra h
   exact hx (Or.inr ⟨j, hj, h⟩)
 
-theorem notMemB_of_notMem_brBad {x : R.X} (hx : x ∉ brBad R Ψ) : R.lift x x ∉ mcPts J :=
-  fun h => hx (Or.inl (Or.inl h))
+theorem notMemB_of_notMem_brBad {x : R.X} (hx : x ∉ brBad R Ψ) : R.lift x x ∉ mcPts J := fun h =>
+  hx (Or.inl (Or.inl h))
 
-theorem projection_zero_ne_of_notMem_bridgeBadSet {x : R.X} (hx : x ∉ brBad R Ψ) :
-    Ψ (segre (R.lift x x)) 0 ≠ 0 :=
-  fun h => hx (Or.inl (Or.inr h))
+theorem projection_zero_ne_of_notMem_bridgeBadSet {x : R.X} (hx : x ∉ brBad R Ψ)
+    : Ψ (segre (R.lift x x)) 0 ≠ 0 := fun h =>
+  hx (Or.inl (Or.inr h))
 
-theorem brW_mem_fibre (hK : Nonempty K) (hPh : IsMultiHomogIdeal P) {x : R.X}
-    (h0 : Ψ (segre (R.lift x x)) 0 ≠ 0) : brW R Ψ x ∈ fibre P Ψ (brQ R Ψ x) := by
+theorem brW_mem_fibre
+    (hK : Nonempty K) (hPh : IsMultiHomogIdeal P) {x : R.X} (h0 : Ψ (segre (R.lift x x)) 0 ≠ 0)
+    : brW R Ψ x ∈ fibre P Ψ (brQ R Ψ x) := by
   classical
   obtain ⟨k0⟩ := hK
   let c : K → ℂ := Function.update (fun _ => (1 : ℂ)) k0 (Ψ (segre (R.lift x x)) 0)⁻¹
@@ -72,7 +76,8 @@ theorem brW_mem_fibre (hK : Nonempty K) (hPh : IsMultiHomogIdeal P) {x : R.X}
     · simp only [brW, map_smul, Pi.smul_apply, smul_eq_mul, Fin.cons_succ, brQ]
       rw [div_eq_inv_mul]
 
-theorem brW_injOn : Set.InjOn (brW R Ψ) {x | R.lift x x ∉ mcPts J ∧ Ψ (segre (R.lift x x)) 0 ≠ 0} := by
+theorem brW_injOn
+    : Set.InjOn (brW R Ψ) {x | R.lift x x ∉ mcPts J ∧ Ψ (segre (R.lift x x)) 0 ≠ 0} := by
   intro x hx x' hx' hw
   refine R.inj x x' hx.1 ?_
   refine sameOrbit_of_segre (R.mem x' x' (R.mem_U x')).1
@@ -81,18 +86,20 @@ theorem brW_injOn : Set.InjOn (brW R Ψ) {x | R.lift x x ∉ mcPts J ∧ Ψ (seg
   simp only [brW, smul_smul, mul_inv_cancel₀ hx.2, one_smul] at this
   exact this
 
-theorem brFib_finite (hP : IsArithVar P (e + 1)) (hΨ : IsGoodProj P Ψ) (y : Fin e → ℂ) :
-    (brQ R Ψ ⁻¹' {y} \ brBad R Ψ).Finite := by
+theorem brFib_finite (hP : IsArithVar P (e + 1)) (hΨ : IsGoodProj P Ψ) (y : Fin e → ℂ)
+    : (brQ R Ψ ⁻¹' {y} \ brBad R Ψ).Finite := by
   refine Set.Finite.of_finite_image (f := brW R Ψ) ((fibreFinite K ι P e Ψ hP hΨ y).subset ?_)
-    ((brW_injOn R Ψ).mono fun x hx => show _ ∧ _ from
-      ⟨notMemB_of_notMem_brBad R Ψ hx.2, projection_zero_ne_of_notMem_bridgeBadSet R Ψ hx.2⟩)
+    ((brW_injOn R Ψ).mono fun x hx =>
+      show _ ∧ _ from
+        ⟨notMemB_of_notMem_brBad R Ψ hx.2, projection_zero_ne_of_notMem_bridgeBadSet R Ψ hx.2⟩)
   rintro _ ⟨x, hx, rfl⟩
   have := brW_mem_fibre R Ψ hP.1 hP.2.1.2.1 (projection_zero_ne_of_notMem_bridgeBadSet R Ψ hx.2)
   rwa [show brQ R Ψ x = y from hx.1] at this
 
-theorem exists_of_mem_fibre {y : Fin e → ℂ} {w : ((k : K) → ι k) → ℂ} (hw : w ∈ fibre P Ψ y)
-    (hy : ¬ ∃ z ∈ mcPts P, z ∈ mcPts J ∧ Ψ (segre z) = Fin.cons 1 y) :
-    ∃ x, R.lift x x ∉ mcPts J ∧ Ψ (segre (R.lift x x)) 0 ≠ 0 ∧ brQ R Ψ x = y ∧ brW R Ψ x = w := by
+theorem exists_of_mem_fibre
+    {y : Fin e → ℂ} {w : ((k : K) → ι k) → ℂ}
+    (hw : w ∈ fibre P Ψ y) (hy : ¬ ∃ z ∈ mcPts P, z ∈ mcPts J ∧ Ψ (segre z) = Fin.cons 1 y)
+    : ∃ x, R.lift x x ∉ mcPts J ∧ Ψ (segre (R.lift x x)) 0 ≠ 0 ∧ brQ R Ψ x = y ∧ brW R Ψ x = w := by
   obtain ⟨z, hz, rfl, hΨz⟩ := hw
   have hzJ : z ∉ mcPts J := fun h => hy ⟨z, hz, h, hΨz⟩
   obtain ⟨x, c, hc, hxc⟩ := R.surj z hz hzJ

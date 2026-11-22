@@ -22,8 +22,8 @@ namespace TateCharpoly
 
 variable {E E' E'' : WeierstrassCurve F} [E.IsElliptic] [E'.IsElliptic] [E''.IsElliptic]
 
-theorem homPt_homComp (R : isogHom E' E'') (Q : isogHom E E') :
-    homPt (homComp R Q) = (homPt R).comp (homPt Q) := by
+theorem homPt_homComp (R : isogHom E' E'') (Q : isogHom E E')
+    : homPt (homComp R Q) = (homPt R).comp (homPt Q) := by
   by_cases hQ : Q = 0
   · subst hQ
     rw [homComp_zero_right, homPt_zero, homPt_zero, AddMonoidHom.comp_zero]

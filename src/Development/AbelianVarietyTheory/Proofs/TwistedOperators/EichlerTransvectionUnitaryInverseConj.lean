@@ -8,23 +8,29 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem eichlerTransvection_unitary_inverse_conj :
-    ∀ (A : Type) [CommRing A] [StarRing A] [Invertible (2 : A)] (ι : Type) [Fintype ι] [DecidableEq ι] (G : Matrix ι ι A) (_ : Gᴴ = G) (h : (ι → A) → (ι → A) → A) (_ : ∀ x y, h x y = star y ⬝ᵥ G.mulVec x) (E : (ι → A) → (ι → A) → (ι → A) → (ι → A)) (_ : ∀ w v y, E w v y = y + h y v • w - h y w • v - (⅟(2 : A) * h v v * h y w) • w), (∀ w v, h w w = 0 → h w v = 0 → ∀ x y, h (E w v x) (E w v y) = h x y) ∧ (∀ w v, h w w = 0 → h w v = 0 → ∀ y, E w (-v) (E w v y) = y) ∧ ∀ (g : Matrix ι ι A), (∀ x y, h (g.mulVec x) (g.mulVec y) = h x y) → ∀ w v y, g.mulVec (E w v y) = E (g.mulVec w) (g.mulVec v) (g.mulVec y) := by
+theorem eichlerTransvection_unitary_inverse_conj
+    : ∀ (A : Type) [CommRing A] [StarRing A] [Invertible (2 : A)] (ι : Type) [Fintype ι]
+        [DecidableEq ι] (G : Matrix ι ι A) (_ : Gᴴ = G) (h : (ι → A) → (ι → A) → A)
+        (_ : ∀ x y, h x y = star y ⬝ᵥ G.mulVec x) (E : (ι → A) → (ι → A) → (ι → A) → (ι → A))
+        (_ : ∀ w v y, E w v y = y + h y v • w - h y w • v - (⅟(2 : A) * h v v * h y w) • w),
+      (∀ w v, h w w = 0 → h w v = 0 → ∀ x y, h (E w v x) (E w v y) = h x y)
+        ∧ (∀ w v, h w w = 0 → h w v = 0 → ∀ y, E w (-v) (E w v y) = y)
+        ∧ ∀ (g : Matrix ι ι A),
+          (∀ x y, h (g.mulVec x) (g.mulVec y) = h x y)
+            → ∀ w v y, g.mulVec (E w v y) = E (g.mulVec w) (g.mulVec v) (g.mulVec y) := by
   intro A _ _ _ ι _ _ G hG h hh E hE
   have addl : ∀ x x' y, h (x + x') y = h x y + h x' y := by
     intro x x' y; simp only [hh, mulVec_add, dotProduct_add]
   have subl : ∀ x x' y, h (x - x') y = h x y - h x' y := by
     intro x x' y; simp only [hh, mulVec_sub, dotProduct_sub]
-  have negl : ∀ x y, h (-x) y = - h x y := by
-    intro x y; simp only [hh, mulVec_neg, dotProduct_neg]
+  have negl : ∀ x y, h (-x) y = - h x y := by intro x y; simp only [hh, mulVec_neg, dotProduct_neg]
   have smull : ∀ (a : A) x y, h (a • x) y = a * h x y := by
     intro a x y; simp only [hh, mulVec_smul, dotProduct_smul, smul_eq_mul]
   have addr : ∀ x y y', h x (y + y') = h x y + h x y' := by
     intro x y y'; simp only [hh, star_add, add_dotProduct]
   have subr : ∀ x y y', h x (y - y') = h x y - h x y' := by
     intro x y y'; simp only [hh, star_sub, sub_dotProduct]
-  have negr : ∀ x y, h x (-y) = - h x y := by
-    intro x y; simp only [hh, star_neg, neg_dotProduct]
+  have negr : ∀ x y, h x (-y) = - h x y := by intro x y; simp only [hh, star_neg, neg_dotProduct]
   have smulr : ∀ (a : A) x y, h x (a • y) = star a * h x y := by
     intro a x y; simp only [hh, star_smul, smul_dotProduct, smul_eq_mul]
   have symm : ∀ x y, star (h x y) = h y x := by

@@ -8,15 +8,15 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem ncard_primesOver_eq_finrank_of_absNorm_eq_of_not_mem_sq :
-    ∀ (E : Type) [Field E] [NumberField E] (p : ℕ), p.Prime →
-      (∀ P : Ideal (𝓞 E), P.IsMaximal → ((p : 𝓞 E) ∈ P) →
-        Ideal.absNorm P = p ∧ (p : 𝓞 E) ∉ P ^ 2) →
-      (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E := by
+theorem ncard_primesOver_eq_finrank_of_absNorm_eq_of_not_mem_sq
+    : ∀ (E : Type) [Field E] [NumberField E] (p : ℕ),
+      p.Prime
+        → (∀ P : Ideal (𝓞 E),
+          P.IsMaximal → ((p : 𝓞 E) ∈ P) → Ideal.absNorm P = p ∧ (p : 𝓞 E) ∉ P ^ 2)
+        → (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E := by
   intro E _ _ p hp h
   have hpZ : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
-  have hp0 : Ideal.span {(p : ℤ)} ≠ ⊥ := by
-    simpa [Ideal.span_singleton_eq_bot] using hp.ne_zero
+  have hp0 : Ideal.span {(p : ℤ)} ≠ ⊥ := by simpa [Ideal.span_singleton_eq_bot] using hp.ne_zero
   haveI hpr : (Ideal.span {(p : ℤ)}).IsPrime := (Ideal.span_singleton_prime hpZ.ne_zero).mpr hpZ
   haveI hmax : (Ideal.span {(p : ℤ)}).IsMaximal := hpr.isMaximal hp0
   have hsum := Ideal.sum_ramification_inertia (𝓞 E) ℚ E (p := Ideal.span {(p : ℤ)}) hp0

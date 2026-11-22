@@ -35,9 +35,11 @@ noncomputable def ratVal {V : X.Opens} (l : P.obj (op V)) (y : V) : X.functionFi
   haveI := nonempty_inf_of_mem y (Classical.arbitrary U₀)
   X.germToFunctionField (V ⊓ U₀) (coeffOn hs₀ l)
 
-theorem ratVal_eq {V W : X.Opens} (hWV : W ≤ V) (hWU : W ≤ U₀) [Nonempty W]
-    (l : P.obj (op V)) (a : ringOn X W) (ha : a • resM P hWU s₀ = resM P hWV l) (y : V) :
-    ratVal hs₀ l y = X.germToFunctionField W a := by
+theorem ratVal_eq
+    {V W : X.Opens} (hWV : W ≤ V) (hWU : W ≤ U₀) [Nonempty W]
+    (l : P.obj (op V)) (a : ringOn X W) (ha : a • resM P hWU s₀ = resM P hWV l)
+    (y : V)
+    : ratVal hs₀ l y = X.germToFunctionField W a := by
   have hW' : W ≤ V ⊓ U₀ := le_inf hWV hWU
   have h1 := congrArg (resM P hW') (coeffOn_spec hs₀ l)
   rw [resM_smul_res, resM_resM] at h1
@@ -78,7 +80,8 @@ end RatVal
 
 section Invertible
 
-variable [IsIntegral X]
+variable
+  [IsIntegral X]
   {P : PMod X} {U₀ : X.Opens} {s₀ : P.obj (op U₀)} (hs₀ : IsBasisOn P U₀ s₀) [Nonempty U₀]
 
 lemma ratVal_ne_zero_of_isBasisOn {U : X.Opens} {s : P.obj (op U)} (hs : IsBasisOn P U s)
@@ -93,7 +96,6 @@ lemma ratVal_ne_zero_of_isBasisOn {U : X.Opens} {s : P.obj (op U)} (hs : IsBasis
   have hb := (hs (U ⊓ U₀) inf_le_left).1
   have h10 : (1 : ringOn X (U ⊓ U₀)) = 0 := hb (by simp only [hz, smul_zero])
   exact one_ne_zero (α := Γ(X, U ⊓ U₀)) h10
-
 
 variable {L : X.Modules} (hL : IsInvertibleSheaf L)
 
@@ -112,8 +114,8 @@ lemma isBasisOn_basisSec (x : X) :
 
 instance (x : X) : Nonempty (basisOpen hL x) := ⟨⟨x, mem_basisOpen hL x⟩⟩
 
-noncomputable def secVal {V : X.Opens} (l : ((preMod X).obj L).obj (op V)) (y : V) :
-    X.functionField :=
+noncomputable def secVal {V : X.Opens} (l : ((preMod X).obj L).obj (op V)) (y : V)
+    : X.functionField :=
   ratVal (isBasisOn_basisSec hL (Classical.arbitrary X)) l y
 
 lemma secVal_basisSec_ne_zero (x : X) (y : basisOpen hL x) :
@@ -156,21 +158,26 @@ lemma ord_secVal_basisSec (Z : PrimeDivisor X) (x : X) (hZ : Z.point ∈ basisOp
 
 noncomputable def divisorOfInvertible : WeilDivisor X :=
   Finsupp.ofSupportFinite
-    (fun Z => - Z.ord (secVal hL (basisSec hL Z.point) ⟨Z.point, mem_basisOpen hL Z.point⟩)) (by
-    obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (fun x => (basisOpen hL x : Set X))
-      (fun x => (basisOpen hL x).isOpen) (fun x _ => Set.mem_iUnion.2 ⟨x, mem_basisOpen hL x⟩)
-    refine (t.finite_toSet.biUnion fun x _ => PrimeDivisor.finite_ord_ne_zero
-      (secVal_basisSec_ne_zero hL x ⟨x, mem_basisOpen hL x⟩)).subset ?_
-    intro Z hZ
-    obtain ⟨x, hx, hZx⟩ : ∃ x ∈ t, Z.point ∈ basisOpen hL x := by
-      have := ht (Set.mem_univ Z.point)
-      simpa using this
-    refine Set.mem_biUnion hx ?_
-    simp only [Function.mem_support, ne_eq, neg_eq_zero] at hZ
-    change Z.ord (ratVal _ (basisSec hL x) ⟨x, mem_basisOpen hL x⟩) ≠ 0
-    rw [ratVal_const _ (basisSec hL x) ⟨x, mem_basisOpen hL x⟩ ⟨Z.point, hZx⟩]
-    change Z.ord (secVal hL (basisSec hL x) ⟨Z.point, hZx⟩) ≠ 0
-    rwa [ord_secVal_basisSec hL Z x hZx])
+    (fun Z => - Z.ord (secVal hL (basisSec hL Z.point) ⟨Z.point, mem_basisOpen hL Z.point⟩))
+    (by
+      obtain ⟨t, ht⟩ :=
+        isCompact_univ.elim_finite_subcover
+          (fun x => (basisOpen hL x : Set X))
+          (fun x => (basisOpen hL x).isOpen)
+          (fun x _ => Set.mem_iUnion.2 ⟨x, mem_basisOpen hL x⟩)
+      refine (t.finite_toSet.biUnion fun x _ =>
+        PrimeDivisor.finite_ord_ne_zero (secVal_basisSec_ne_zero hL x
+          ⟨x, mem_basisOpen hL x⟩)).subset ?_
+      intro Z hZ
+      obtain ⟨x, hx, hZx⟩ : ∃ x ∈ t, Z.point ∈ basisOpen hL x := by
+        have := ht (Set.mem_univ Z.point)
+        simpa using this
+      refine Set.mem_biUnion hx ?_
+      simp only [Function.mem_support, ne_eq, neg_eq_zero] at hZ
+      change Z.ord (ratVal _ (basisSec hL x) ⟨x, mem_basisOpen hL x⟩) ≠ 0
+      rw [ratVal_const _ (basisSec hL x) ⟨x, mem_basisOpen hL x⟩ ⟨Z.point, hZx⟩]
+      change Z.ord (secVal hL (basisSec hL x) ⟨Z.point, hZx⟩) ≠ 0
+      rwa [ord_secVal_basisSec hL Z x hZx])
 
 end Invertible
 

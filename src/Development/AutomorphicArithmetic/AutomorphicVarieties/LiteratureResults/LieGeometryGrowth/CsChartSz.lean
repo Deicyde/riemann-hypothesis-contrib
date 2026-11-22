@@ -10,8 +10,10 @@ open UpperTheory.V.Lit.Geo.Cs GlobalTheory.CuspRep GlobalTheory.CompanionTheory.
 open GlobalTheory.ThetaPull (invL invL_smooth)
 open scoped ContDiff Topology
 
-private theorem sz_succ {V F : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup F] [NormedSpace ℝ F]
-    {k : ℕ} {f : V → F} {p : V} {b : ℝ} (h0 : ‖f p‖ ≤ b) (h1 : Sz k (fderiv ℝ f) p b) : Sz (k + 1) f p b := by
+private theorem sz_succ
+    {V F : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup F] [NormedSpace ℝ F]
+    {k : ℕ} {f : V → F} {p : V} {b : ℝ} (h0 : ‖f p‖ ≤ b) (h1 : Sz k (fderiv ℝ f) p b)
+    : Sz (k + 1) f p b := by
   intro i hi
   cases i with
   | zero => simpa using h0
@@ -19,12 +21,13 @@ private theorem sz_succ {V F : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] 
     rw [← norm_iteratedFDeriv_fderiv]
     exact h1 i (Nat.le_of_succ_le_succ hi)
 
-theorem UpperTheory.V.Lit.Geo.Cs.chartSz :
-    ChartSz := by
+theorem UpperTheory.V.Lit.Geo.Cs.chartSz : ChartSz := by
   intro E _ _ _ a k ρ hρ
   have h1 : oneL E a ∈ invSet E a := isUnit_one
-  have hval : ∀ (φ : Sm E a), (∀ l : List (Lie E a), ∃ C : ℝ, ∀ g, ‖((l.map (lie E a)).prod φ).1 g‖ ≤ C * ρ g) →
-      ∃ C : ℝ, 0 ≤ C ∧ ∀ g, ‖chart φ.1 g (oneL E a)‖ ≤ C * ρ g := by
+  have hval
+      : ∀ (φ : Sm E a),
+        (∀ l : List (Lie E a), ∃ C : ℝ, ∀ g, ‖((l.map (lie E a)).prod φ).1 g‖ ≤ C * ρ g)
+          → ∃ C : ℝ, 0 ≤ C ∧ ∀ g, ‖chart φ.1 g (oneL E a)‖ ≤ C * ρ g := by
     intro φ hφ
     obtain ⟨C, hC⟩ := hφ []
     refine ⟨max C 0, le_max_right _ _, fun g => ?_⟩
@@ -43,13 +46,17 @@ theorem UpperTheory.V.Lit.Geo.Cs.chartSz :
   | succ k ih =>
     intro φ hφ
     obtain ⟨C₀, hC0, hC⟩ := hval φ hφ
-    have hi : ∀ i : Ix E a, ∃ C : ℝ, 0 ≤ C ∧ ∀ g, Sz k (chart (lie E a (bs E a i) φ).1 g) (oneL E a) (C * ρ g) := by
+    have hi
+        : ∀ i : Ix E a, ∃ C : ℝ,
+          0 ≤ C ∧ ∀ g, Sz k (chart (lie E a (bs E a i) φ).1 g) (oneL E a) (C * ρ g) := by
       intro i
       refine ih _ fun l => ?_
       obtain ⟨C, hC⟩ := hφ (l ++ [bs E a i])
       refine ⟨C, fun g => ?_⟩
       have := hC g
-      rwa [List.map_append, List.prod_append, List.map_singleton, List.prod_singleton, Module.End.mul_apply] at this
+      rwa [List.map_append, List.prod_append, List.map_singleton, List.prod_singleton,
+          Module.End.mul_apply]
+        at this
     choose D hD0 hD using hi
     let Θ : Ix E a → Lie E a → (ℂ →L[ℝ] (Lie E a →L[ℝ] ℂ)) := fun i y =>
       ContinuousLinearMap.smulRightL ℝ (Lie E a) ℂ (coordL i (invL y))
@@ -63,10 +70,14 @@ theorem UpperTheory.V.Lit.Geo.Cs.chartSz :
     · exact (hC g).trans (mul_le_mul_of_nonneg_right (le_add_of_nonneg_right hS0) (hρ g))
     · have hc : ∀ i, ContDiffAt ℝ ∞ (chart (lie E a (bs E a i) φ).1 g) (oneL E a) := fun i =>
         contDiffAt_chart (lie E a (bs E a i) φ).2 g h1
-      have key := (appSz (Lie E a) ℂ (Lie E a →L[ℝ] ℂ) k (oneL E a)).2.2 (Ix E a) Finset.univ
-        (fun i y => Θ i y (chart (lie E a (bs E a i) φ).1 g y)) (fun i => 2 ^ k * B i * (D i * ρ g))
-        (fun i _ => (hΘ i).clm_apply (hc i))
-        (fun i _ => (appSz (Lie E a) ℂ (Lie E a →L[ℝ] ℂ) k (oneL E a)).1 _ _ _ _ (hΘ i) (hc i) (hB i) (hD i g))
+      have key :=
+        (appSz (Lie E a) ℂ (Lie E a →L[ℝ] ℂ) k (oneL E a)).2.2 (Ix E a) Finset.univ
+          (fun i y => Θ i y (chart (lie E a (bs E a i) φ).1 g y))
+          (fun i => 2 ^ k * B i * (D i * ρ g))
+          (fun i _ => (hΘ i).clm_apply (hc i))
+          (fun i _ =>
+            (appSz (Lie E a) ℂ (Lie E a →L[ℝ] ℂ) k (oneL E a)).1 _ _ _ _ (hΘ i) (hc i) (hB i)
+              (hD i g))
       refine (key.congr ?_).mono ?_
       · filter_upwards [isOpen_invSet.mem_nhds h1] with y hy
         exact (fderiv_chart_eq φ g hy).symm

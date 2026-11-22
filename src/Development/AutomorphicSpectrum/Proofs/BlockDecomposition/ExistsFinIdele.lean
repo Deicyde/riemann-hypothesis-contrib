@@ -6,16 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUni
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GroundTheory.Global GroundTheory.Global.AdeleBaseChange GroundTheory.Global.SemiLocal
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GroundTheory.Global GroundTheory.Global.AdeleBaseChange GroundTheory.Global.SemiLocal
 open scoped TensorProduct NumberField.AdeleRing WithZero
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.CMDelta
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem exists_delta (h : IsCMExt F E σ) :
-    ∃ (δ : E) (d : F), δ ≠ 0 ∧ σ δ = -δ ∧ algebraMap F E d = δ ^ 2 := by
+theorem exists_delta (h : IsCMExt F E σ)
+    : ∃ (δ : E) (d : F), δ ≠ 0 ∧ σ δ = -δ ∧ algebraMap F E d = δ ^ 2 := by
   have : Algebra.IsQuadraticExtension F E := { finrank_eq_two' := h.2.2.1 }
   have : IsGalois F E := inferInstance
   have hσ := GlobalTheory.LFun.InertChart.conj_conj h
@@ -33,28 +35,37 @@ theorem exists_delta (h : IsCMExt F E σ) :
     · rw [ht]; rfl
     · rw [(hu t ht).trans (hu s hs1).symm]
       change σ _ = _
-      rw [map_pow, map_sub, hσ]; ring
+      rw [map_pow, map_sub, hσ]
+      ring
   obtain ⟨d, hd⟩ := (IsGalois.mem_range_algebraMap_iff_fixed _).2 hfix
   exact ⟨e - σ e, d, sub_ne_zero.2 (Ne.symm he), by rw [map_sub, hσ]; ring, hd⟩
 
-theorem val_square (hU : Algebra.Unramified (𝓞 F) (𝓞 E)) {δ : E} {d : F} (hd : algebraMap F E d = δ ^ 2)
-    (w : HeightOneSpectrum (𝓞 E)) :
-    w.valuation E δ ^ 2 = (below F w).valuation F d := by
+theorem val_square
+    (hU : Algebra.Unramified (𝓞 F) (𝓞 E))
+    {δ : E} {d : F} (hd : algebraMap F E d = δ ^ 2)
+    (w : HeightOneSpectrum (𝓞 E))
+    : w.valuation E δ ^ 2 = (below F w).valuation F d := by
   have hram : w.asIdeal.ramificationIdx (𝓞 F) = 1 := Ideal.ramificationIdx_eq_one_of_isUnramifiedAt
   have h1 := valued_completionMap (below F w) w (algebraMap F _ d)
-  rw [completionMap_algebraMap, hram, pow_one, IsScalarTower.algebraMap_apply F E (w.adicCompletion E),
-    HeightOneSpectrum.algebraMap_adicCompletion, HeightOneSpectrum.algebraMap_adicCompletion] at h1
-  simp only [Function.comp_apply, HeightOneSpectrum.valuedAdicCompletion_eq_valuation', Algebra.algebraMap_self, RingHom.id_apply] at h1
+  rw [completionMap_algebraMap, hram, pow_one,
+      IsScalarTower.algebraMap_apply F E (w.adicCompletion E),
+      HeightOneSpectrum.algebraMap_adicCompletion, HeightOneSpectrum.algebraMap_adicCompletion]
+    at h1
+  simp only [Function.comp_apply, HeightOneSpectrum.valuedAdicCompletion_eq_valuation',
+      Algebra.algebraMap_self, RingHom.id_apply]
+    at h1
   rw [← h1, hd, map_pow]
 
-theorem valued_alg {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) (x : K) :
-    Valued.v (algebraMap K (v.adicCompletion K) x) = v.valuation K x := by
+theorem valued_alg {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) (x : K)
+    : Valued.v (algebraMap K (v.adicCompletion K) x) = v.valuation K x := by
   rw [HeightOneSpectrum.algebraMap_adicCompletion]
-  simp only [Function.comp_apply, HeightOneSpectrum.valuedAdicCompletion_eq_valuation', Algebra.algebraMap_self, RingHom.id_apply]
+  simp only [Function.comp_apply, HeightOneSpectrum.valuedAdicCompletion_eq_valuation',
+    Algebra.algebraMap_self, RingHom.id_apply]
 
-theorem exists_finIdele {d : F} (hd0 : d ≠ 0) :
-    ∃ (X : (FiniteAdeleRing (𝓞 F) F)ˣ), ∀ (v : HeightOneSpectrum (𝓞 F)) (k : ℤ),
-      v.valuation F d = WithZero.exp (2 * k) → Valued.v ((X : FiniteAdeleRing (𝓞 F) F) v) = WithZero.exp k := by
+theorem exists_finIdele {d : F} (hd0 : d ≠ 0)
+    : ∃ (X : (FiniteAdeleRing (𝓞 F) F)ˣ), ∀ (v : HeightOneSpectrum (𝓞 F)) (k : ℤ),
+      v.valuation F d = WithZero.exp (2 * k)
+        → Valued.v ((X : FiniteAdeleRing (𝓞 F) F) v) = WithZero.exp k := by
   classical
   choose π hπ using fun v : HeightOneSpectrum (𝓞 F) => v.valuation_exists_uniformizer F
   let n : HeightOneSpectrum (𝓞 F) → ℤ := fun v => WithZero.log (v.valuation F d) / 2
@@ -78,7 +89,8 @@ theorem exists_finIdele {d : F} (hd0 : d ≠ 0) :
     filter_upwards [hev] with v hv
     simp [f, hv, one_mem]
   let X (s : ℤ) : FiniteAdeleRing (𝓞 F) F := ⟨f s, hfmem s⟩
-  have hne : ∀ v : HeightOneSpectrum (𝓞 F), algebraMap F (v.adicCompletion F) (π v) ≠ 0 := fun v h => by
+  have hne
+      : ∀ v : HeightOneSpectrum (𝓞 F), algebraMap F (v.adicCompletion F) (π v) ≠ 0 := fun v h => by
     have := valued_alg v (π v)
     rw [h, map_zero, hπ v] at this
     exact WithZero.exp_ne_zero this.symm
@@ -103,12 +115,15 @@ theorem exists_finIdele {d : F} (hd0 : d ≠ 0) :
     rw [← WithZero.exp_zsmul]
     simp
 
-theorem exists_infIdele {d : F} (hd0 : d ≠ 0) (hr : NumberField.IsTotallyReal F) :
-    ∃ T : (InfiniteAdeleRing F)ˣ, ∀ v : InfinitePlace F,
-      (T : InfiniteAdeleRing F) v ^ 2 = algebraMap F (InfiniteAdeleRing F) d v ∨
-      (T : InfiniteAdeleRing F) v ^ 2 = -algebraMap F (InfiniteAdeleRing F) d v := by
-  have key : ∀ v : InfinitePlace F, ∃ t : v.Completion, t ≠ 0 ∧
-      (t ^ 2 = algebraMap F (InfiniteAdeleRing F) d v ∨ t ^ 2 = -algebraMap F (InfiniteAdeleRing F) d v) := by
+theorem exists_infIdele {d : F} (hd0 : d ≠ 0) (hr : NumberField.IsTotallyReal F)
+    : ∃ T : (InfiniteAdeleRing F)ˣ, ∀ v : InfinitePlace F,
+      (T : InfiniteAdeleRing F) v ^ 2 = algebraMap F (InfiniteAdeleRing F) d v
+        ∨ (T : InfiniteAdeleRing F) v ^ 2 = - algebraMap F (InfiniteAdeleRing F) d v := by
+  have key
+      : ∀ v : InfinitePlace F, ∃ t : v.Completion,
+        t ≠ 0
+          ∧ (t ^ 2 = algebraMap F (InfiniteAdeleRing F) d v
+            ∨ t ^ 2 = - algebraMap F (InfiniteAdeleRing F) d v) := by
     intro v
     have hv : v.IsReal := NumberField.IsTotallyReal.isReal v
     let f := InfinitePlace.Completion.ringEquivRealOfIsReal hv
@@ -149,17 +164,17 @@ theorem bDel : PositivityTheory.RgEis.So.BDel := by
     rw [GroundTheory.BlockD.ThmBHecke.adeleEquiv_tmul, map_one, mul_one]
   have hdec : A.i δ = ν α * u := by
     change A.i δ = ν α * (A.i δ * ((Units.map ν.toMonoidHom α)⁻¹ : (_)ˣ).1)
-    have : ν α * ((Units.map ν.toMonoidHom α)⁻¹ : (_)ˣ).1 = 1 := Units.mul_inv (Units.map ν.toMonoidHom α)
+    have : ν α * ((Units.map ν.toMonoidHom α)⁻¹ : (_)ˣ).1 = 1 :=
+      Units.mul_inv (Units.map ν.toMonoidHom α)
     rw [mul_left_comm, this, mul_one]
   set y := PositivityTheory.RgEis.eqv F E u with hy
   set y' := PositivityTheory.RgEis.eqv F E ((u⁻¹ : (_)ˣ) : _) with hy'
-  have h1 : adeleMap F E α * y = algebraMap E 𝔸[E] δ := by
-    rw [← hνe, hy, ← map_mul, ← hdec, hie]
-  have h2 : y * y' = 1 := by
-    rw [hy, hy', ← map_mul, Units.mul_inv, map_one]
+  have h1 : adeleMap F E α * y = algebraMap E 𝔸[E] δ := by rw [← hνe, hy, ← map_mul, ← hdec, hie]
+  have h2 : y * y' = 1 := by rw [hy, hy', ← map_mul, Units.mul_inv, map_one]
   have hfin : ∀ w : HeightOneSpectrum (𝓞 E), Valued.v (y.2 w) = 1 := by
     intro w
-    have hram : w.asIdeal.ramificationIdx (𝓞 F) = 1 := Ideal.ramificationIdx_eq_one_of_isUnramifiedAt
+    have hram : w.asIdeal.ramificationIdx (𝓞 F) = 1 :=
+      Ideal.ramificationIdx_eq_one_of_isUnramifiedAt
     have hw0 : w.valuation E δ ≠ 0 := by simpa using hδ0
     obtain ⟨k, hk⟩ : ∃ k : ℤ, w.valuation E δ = WithZero.exp k :=
       ⟨WithZero.log (w.valuation E δ), (WithZero.exp_log hw0).symm⟩
@@ -174,7 +189,10 @@ theorem bDel : PositivityTheory.RgEis.So.BDel := by
     have hc : (adeleMap F E α).2 w * y.2 w = algebraMap E (w.adicCompletion E) δ :=
       congrArg (fun z : 𝔸[E] => z.2 w) h1
     have hv := congrArg Valued.v hc
-    rw [map_mul, hA, show Valued.v (algebraMap E (w.adicCompletion E) δ) = w.valuation E δ from valued_alg w δ, hk] at hv
+    rw [map_mul, hA,
+        show Valued.v (algebraMap E (w.adicCompletion E) δ) = w.valuation E δ from valued_alg w δ,
+        hk]
+      at hv
     exact mul_left_cancel₀ (WithZero.exp_ne_zero (a := k)) (hv.trans (mul_one _).symm)
   have hfin' : ∀ w : HeightOneSpectrum (𝓞 E), Valued.v (y'.2 w) = 1 := by
     intro w
@@ -187,13 +205,18 @@ theorem bDel : PositivityTheory.RgEis.So.BDel := by
     have hD0 : D ≠ 0 := (map_ne_zero (algebraMap E w.Completion)).2 hδ0
     set v := w.comap (algebraMap F E) with hv
     set Aw : w.Completion := (adeleMap F E α).1 w with hAw
-    have hAsq : Aw ^ 2 = D ^ 2 ∨ Aw ^ 2 = -D ^ 2 := by
-      obtain ⟨g, hg⟩ : ∃ g : v.Completion →+* w.Completion, ∀ x : InfiniteAdeleRing F,
-          GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap (K := F) (L := E) x w = g (x v) :=
+    have hAsq : Aw ^ 2 = D ^ 2 ∨ Aw ^ 2 = - D ^ 2 := by
+      obtain ⟨g, hg⟩
+          : ∃ g : v.Completion →+* w.Completion, ∀ x : InfiniteAdeleRing F,
+            GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap (K := F) (L := E) x w
+              = g (x v) :=
         ⟨_, fun x => GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap_apply x w⟩
       have hAw' : Aw = g ((T : InfiniteAdeleRing F) v) := hg _
       have hm : g (algebraMap F (InfiniteAdeleRing F) d v) = D ^ 2 := by
-        have := congrFun (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap_algebraMap (K := F) (L := E) d) w
+        have :=
+          congrFun
+            (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap_algebraMap (K := F) (L := E) d)
+            w
         rw [hg, hd, map_pow] at this
         exact this
       rcases hT v with h | h
@@ -209,13 +232,19 @@ theorem bDel : PositivityTheory.RgEis.So.BDel := by
     have hn := congrArg norm hc
     rw [norm_mul, hnorm] at hn
     exact mul_left_cancel₀ (norm_ne_zero_iff.2 hD0) (hn.trans (mul_one _).symm)
-  have hint : ∀ z : 𝔸[E], (∀ w : HeightOneSpectrum (𝓞 E), Valued.v (z.2 w) = 1) → z ∈ PositivityTheory.RgEis.intAd E := by
+  have hint
+      : ∀ z : 𝔸[E],
+        (∀ w : HeightOneSpectrum (𝓞 E), Valued.v (z.2 w) = 1)
+          → z ∈ PositivityTheory.RgEis.intAd E := by
     intro z hz
     refine (Subring.mem_iInf).2 fun w => ?_
     exact (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 E) E w).2 (hz w).le
-  have hφ : ∀ w : InfinitePlace E, ‖(InfinitePlace.Completion.extensionEmbedding w) (y.1 w)‖ = 1 := fun w => by
+  have hφ
+      : ∀ w : InfinitePlace E,
+        ‖(InfinitePlace.Completion.extensionEmbedding w) (y.1 w)‖ = 1 := fun w => by
     rw [← hinf w]
-    exact (InfinitePlace.Completion.isometry_extensionEmbedding w).norm_map_of_map_zero (map_zero _) _
+    exact (InfinitePlace.Completion.isometry_extensionEmbedding w).norm_map_of_map_zero (map_zero _)
+      _
   refine ⟨δu, α, u, hσ, hdec, hint y hfin, hint y' hfin', fun w => hφ w⟩
 
 end GlobalTheory.CompanionTheory.CMDelta

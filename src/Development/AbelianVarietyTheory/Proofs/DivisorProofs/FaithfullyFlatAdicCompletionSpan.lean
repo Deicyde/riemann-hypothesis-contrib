@@ -10,30 +10,36 @@ open scoped TensorProduct
 
 namespace GlobalTheory.GoodEtaleSection
 
-theorem faithfullyFlat_adicCompletion_span (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R]
-    (t : R) (ht : t ∈ maximalIdeal R) :
-    Module.FaithfullyFlat R (AdicCompletion (Ideal.span {t}) R) := by
+theorem faithfullyFlat_adicCompletion_span
+    (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] (t : R) (ht : t ∈ maximalIdeal R)
+    : Module.FaithfullyFlat R (AdicCompletion (Ideal.span {t}) R) := by
   haveI : Module.Flat R (AdicCompletion (Ideal.span {t}) R) := AdicCompletion.flat_of_isNoetherian _
   refine ⟨fun m hm => ?_⟩
   rw [IsLocalRing.eq_maximalIdeal hm]
   have hle : Ideal.span {t} ≤ maximalIdeal R := (Ideal.span_singleton_le_iff_mem _).2 ht
-  have hmax := AdicCompletion.isMaximal_map_of_le (Ideal.span {t}) (maximalIdeal R) hle
-    (Submodule.fg_span_singleton t)
+  have hmax :=
+    AdicCompletion.isMaximal_map_of_le (Ideal.span {t}) (maximalIdeal R) hle
+      (Submodule.fg_span_singleton t)
   intro h
   apply hmax.ne_top
   have e := Ideal.smul_top_eq_map (S := AdicCompletion (Ideal.span {t}) R) (maximalIdeal R)
   rw [h] at e
   apply Submodule.restrictScalars_injective R
-  rw [← e]; rfl
+  rw [← e]
+  rfl
 
 end GlobalTheory.GoodEtaleSection
 
 namespace GlobalTheory.GoodEtaleSection
 
-theorem exists_integral_point (A R C : Type) [CommRing A] [IsDomain A] [IsIntegrallyClosed A]
-    [CommRing R] [CommRing C] [Algebra R C] (ρ : R →+* A) (hint : Algebra.IsIntegral R C)
-    (s : C →+* FractionRing A) (hs : s.comp (algebraMap R C) = (algebraMap A (FractionRing A)).comp ρ) :
-    ∃ g : C →+* A, (algebraMap A (FractionRing A)).comp g = s ∧ g.comp (algebraMap R C) = ρ := by
+theorem exists_integral_point
+    (A R C : Type)
+    [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing R] [CommRing C] [Algebra R C]
+    (ρ : R →+* A)
+    (hint : Algebra.IsIntegral R C)
+    (s : C →+* FractionRing A)
+    (hs : s.comp (algebraMap R C) = (algebraMap A (FractionRing A)).comp ρ)
+    : ∃ g : C →+* A, (algebraMap A (FractionRing A)).comp g = s ∧ g.comp (algebraMap R C) = ρ := by
   set K := FractionRing A
   have hmem : ∀ c : C, s c ∈ (algebraMap A K).range := by
     intro c
@@ -43,9 +49,11 @@ theorem exists_integral_point (A R C : Type) [CommRing A] [IsDomain A] [IsIntegr
       rw [Polynomial.eval₂_map, ← hs, ← Polynomial.hom_eval₂, hpc, map_zero]
     obtain ⟨a, ha⟩ := (IsIntegrallyClosed.isIntegral_iff (R := A) (K := K)).1 hi
     exact ⟨a, ha⟩
-  let e := RingEquiv.ofBijective (algebraMap A K).rangeRestrict
-    ⟨fun x y h => IsFractionRing.injective A K (congrArg Subtype.val h),
-     (algebraMap A K).rangeRestrict_surjective⟩
+  let e :=
+    RingEquiv.ofBijective (algebraMap A K).rangeRestrict ⟨
+      fun x y h => IsFractionRing.injective A K (congrArg Subtype.val h),
+      (algebraMap A K).rangeRestrict_surjective
+    ⟩
   let g : C →+* A := e.symm.toRingHom.comp (s.codRestrict _ hmem)
   have hg : (algebraMap A K).comp g = s := by
     ext c
@@ -64,13 +72,13 @@ end GlobalTheory.GoodEtaleSection
 
 namespace GlobalTheory.GoodEtaleSection
 
-theorem mem_pow_of_mul_mem_pow (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R]
+theorem mem_pow_of_mul_mem_pow
+    (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R]
     (ρ : R →+* A) (hρ : ρ.comp (algebraMap A R) = RingHom.id A)
     (t : R) (hker : RingHom.ker ρ = Ideal.span {t}) (ht : t ∈ nonZeroDivisors R)
-    (a : A) (ha : a ≠ 0) : ∀ (n : ℕ) (r : R), algebraMap A R a * r ∈ Ideal.span {t ^ n} →
-      r ∈ Ideal.span {t ^ n} := by
-  have hρa : ρ (algebraMap A R a) = a := by
-    simpa using congrArg (fun f => f a) hρ
+    (a : A) (ha : a ≠ 0)
+    : ∀ (n : ℕ) (r : R), algebraMap A R a * r ∈ Ideal.span {t ^ n} → r ∈ Ideal.span {t ^ n} := by
+  have hρa : ρ (algebraMap A R a) = a := by simpa using congrArg (fun f => f a) hρ
   intro n
   induction n with
   | zero => intro r _; simp
@@ -95,13 +103,17 @@ theorem mem_pow_of_mul_mem_pow (A R : Type) [CommRing A] [IsDomain A] [CommRing 
     obtain ⟨q', rfl⟩ := Ideal.mem_span_singleton.1 this
     exact Ideal.mem_span_singleton.2 ⟨q', by ring⟩
 
-theorem torsionFree_quot : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R]
-    (ρ : R →+* A), ρ.comp (algebraMap A R) = RingHom.id A →
-    ∀ t : R, RingHom.ker ρ = Ideal.span {t} → t ∈ nonZeroDivisors R →
-    ∀ n : ℕ, GlobalTheory.GoodEtale.TorsionFreeOver A R (R ⧸ Ideal.span {t} ^ n) := by
+theorem torsionFree_quot
+    : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R] (ρ : R →+* A),
+      ρ.comp (algebraMap A R) = RingHom.id A
+        → ∀ t : R,
+          RingHom.ker ρ = Ideal.span {t} → t ∈ nonZeroDivisors R
+            → ∀ n : ℕ, GlobalTheory.GoodEtale.TorsionFreeOver A R (R ⧸ Ideal.span {t} ^ n) := by
   intro A R _ _ _ _ ρ hρ t hker ht n a ha m hm
   obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective m
-  rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, Ideal.Quotient.eq_zero_iff_mem, Ideal.span_singleton_pow] at hm
+  rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, Ideal.Quotient.eq_zero_iff_mem,
+      Ideal.span_singleton_pow]
+    at hm
   rw [Ideal.Quotient.eq_zero_iff_mem, Ideal.span_singleton_pow]
   exact mem_pow_of_mul_mem_pow A R ρ hρ t hker ht a ha n r hm
 

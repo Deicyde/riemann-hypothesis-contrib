@@ -15,7 +15,9 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.MinorPolynomials
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryGroupMassFormula.UsCompose
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryGroupMassFormula.UsCompose
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -149,26 +151,57 @@ structure CT (k r nf : ℕ) where
 
 section vals
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 def cvs (D : RealPlaceData k r Wp Wq) {nf : ℕ} (t : CT k r nf) (g : Mat k r) : ℂ :=
   eval (vars g) t.q * C6.monoM D t.a t.b t.c g
 
-def cv (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq) (t : CT k r nf) (g : Mat k r) :
-    C6.EndH Wp Wq :=
+def cv
+    (D : RealPlaceData k r Wp Wq)
+    {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq) (t : CT k r nf)
+    (g : Mat k r)
+    : C6.EndH Wp Wq :=
   cvs D t g • C6.Epart fib t.es g
 
 def dscal (D : RealPlaceData k r Wp Wq) {nf : ℕ} (X : Mat k r) (t : CT k r nf) : List (CT k r nf) :=
-  [{ t with q := dP X t.q }] ++
-  List.ofFn (fun l : Fin (r + 2) => if t.a l = 0 then { t with q := 0 } else
-    { t with q := C (-(t.a l : ℂ)) * t.q * dP X (qDl D.z D.z' l), a := t.a + Pi.single l 1 }) ++
-  List.ofFn (fun l : Fin (r + 2) => if t.b l = 0 then { t with q := 0 } else
-    { t with q := C (-(t.b l : ℂ)) * t.q * dP X (qDbl D.z D.z' l), b := t.b + Pi.single l 1 }) ++
-  [if t.c = 0 then { t with q := 0 } else { t with q := C (-(t.c : ℂ)) * t.q * dP X (qGf D.z D.z'), c := t.c + 1 }]
+  [{ t with q := dP X t.q }]
+    ++ List.ofFn (fun l : Fin (r + 2) =>
+      if t.a l = 0 then {
+        t with
+        q := 0
+      }
+      else {
+        t with
+        q := C (-(t.a l : ℂ)) * t.q * dP X (qDl D.z D.z' l)
+        a := t.a + Pi.single l 1
+      })
+    ++ List.ofFn (fun l : Fin (r + 2) =>
+      if t.b l = 0 then {
+        t with
+        q := 0
+      }
+      else {
+        t with
+        q := C (-(t.b l : ℂ)) * t.q * dP X (qDbl D.z D.z' l)
+        b := t.b + Pi.single l 1
+      })
+    ++ [
+      if t.c = 0 then {
+        t with
+        q := 0
+      }
+      else {
+        t with
+        q := C (-(t.c : ℂ)) * t.q * dP X (qGf D.z D.z')
+        c := t.c + 1
+      }
+    ]
 
 def dfib {nf : ℕ} (X : Mat k r) (t : CT k r nf) : List (CT k r nf) :=
-  List.ofFn (fun i : Fin t.es.length => { t with es := t.es.set i ((t.es.get i).1, X :: (t.es.get i).2) })
+  List.ofFn
+    (fun i : Fin t.es.length => { t with es := t.es.set i ((t.es.get i).1, X :: (t.es.get i).2) })
 
 def dco (D : RealPlaceData k r Wp Wq) {nf : ℕ} (X : Mat k r) (t : CT k r nf) : List (CT k r nf) :=
   dscal D X t ++ dfib X t

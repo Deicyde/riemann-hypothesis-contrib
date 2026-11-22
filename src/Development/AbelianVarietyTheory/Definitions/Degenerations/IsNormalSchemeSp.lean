@@ -7,12 +7,14 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 namespace GlobalTheory.ZJ
 
-abbrev OO (p : ℕ) [Fact p.Prime] : ValuationSubring (PadicAlgCl p) := (Valued.v : Valuation (PadicAlgCl p) NNReal).valuationSubring
+abbrev OO (p : ℕ) [Fact p.Prime] : ValuationSubring (PadicAlgCl p) :=
+  (Valued.v : Valuation (PadicAlgCl p) NNReal).valuationSubring
 
 abbrev cPt (p : ℕ) [Fact p.Prime] : Sp (OO p) := IsLocalRing.closedPoint (OO p)
 
@@ -76,8 +78,9 @@ structure Test {p : ℕ} [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z) where
   smooth : SmoothOfRelativeDimension C.g H.hom
   sep : IsSeparated H.hom
   qc : QuasiCompact H.hom
-  split : ∃ S : SplitExt (Sp (IsLocalRing.ResidueField V)),
-    S.IsGt ((Over.pullback (spMap (IsLocalRing.residue V))).obj H)
+  split
+    : ∃ S : SplitExt (Sp (IsLocalRing.ResidueField V)),
+      S.IsGt ((Over.pullback (spMap (IsLocalRing.residue V))).obj H)
   f : H.left ⟶ C.G.toScheme
   f_over : f ≫ C.GG.hom = H.hom ≫ y₀
   yK : Sp (FractionRing V) ⟶ C.U.toScheme
@@ -85,36 +88,50 @@ structure Test {p : ℕ} [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z) where
   φ : pullback H.hom (Out.jK V) ⟶ C.A.left
   φ_cart : IsGrpPullback ((Over.pullback (Out.jK V)).obj H) C.A yK φ
   φ_f : φ ≫ C.a = pullback.fst H.hom (Out.jK V) ≫ f
-  imm : ∀ h : pullback H.hom (rPt p ≫ spMap j) ⟶ pullback C.GG.hom (rPt p ≫ y),
-    h ≫ pullback.fst _ _ = pullback.fst _ _ ≫ f → h ≫ pullback.snd _ _ = pullback.snd _ _ → IsClosedImmersion h
-  lift : ∀ b : Sp (OO p) ⟶ C.G.toScheme, b ≫ C.GG.hom = y →
-    ∃ c : Sp (OO p) ⟶ H.left, c ≫ H.hom = spMap j ∧ c ≫ f = b
+  imm
+    : ∀ h : pullback H.hom (rPt p ≫ spMap j) ⟶ pullback C.GG.hom (rPt p ≫ y),
+      h ≫ pullback.fst _ _ = pullback.fst _ _ ≫ f → h ≫ pullback.snd _ _ = pullback.snd _ _
+        → IsClosedImmersion h
+  lift
+    : ∀ b : Sp (OO p) ⟶ C.G.toScheme,
+      b ≫ C.GG.hom = y → ∃ c : Sp (OO p) ⟶ H.left, c ≫ H.hom = spMap j ∧ c ≫ f = b
 
 attribute [instance] Test.ring Test.dom Test.dvr Test.grp Test.comm
 
 def HasTests : Prop := ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z), C.Cl y → Nonempty (C.Test y)
 
-def Indep : Prop := ∀ (p : ℕ) [Fact p.Prime] (y y' : Sp (OO p) ⟶ C.Z), C.Cl y → C.Cl y' →
-  rPt p ≫ y = rPt p ≫ y' → ∀ b : Sp (OO p) ⟶ C.G.toScheme, b ≫ C.GG.hom = y →
-  ∃ b' : Sp (OO p) ⟶ C.G.toScheme, b' ≫ C.GG.hom = y' ∧ rPt p ≫ b' = rPt p ≫ b
+def Indep : Prop :=
+  ∀ (p : ℕ) [Fact p.Prime] (y y' : Sp (OO p) ⟶ C.Z),
+    C.Cl y → C.Cl y' → rPt p ≫ y = rPt p ≫ y'
+      → ∀ b : Sp (OO p) ⟶ C.G.toScheme,
+        b ≫ C.GG.hom = y
+          → ∃ b' : Sp (OO p) ⟶ C.G.toScheme, b' ≫ C.GG.hom = y' ∧ rPt p ≫ b' = rPt p ≫ b
 
-def Fib : Prop := ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z) (τ : C.Test y) (x : Sp (kb p) ⟶ C.G.toScheme),
-  x ≫ C.GG.hom = rPt p ≫ y → ∃ c : Sp (kb p) ⟶ τ.H.left, c ≫ τ.H.hom = rPt p ≫ spMap τ.j ∧ c ≫ τ.f = x
+def Fib : Prop :=
+  ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z) (τ : C.Test y) (x : Sp (kb p) ⟶ C.G.toScheme),
+    x ≫ C.GG.hom = rPt p ≫ y
+      → ∃ c : Sp (kb p) ⟶ τ.H.left, c ≫ τ.H.hom = rPt p ≫ spMap τ.j ∧ c ≫ τ.f = x
 
-def Coord (w : C.G.toScheme) (W : C.G.toScheme.Opens) (hw : w ∈ W) (u : Fin C.g → Γ(C.G.toScheme, W)) : Prop :=
-  IsLocalRing.maximalIdeal (C.G.toScheme.presheaf.stalk w) =
-    Ideal.span (Set.range fun i => (C.G.toScheme.presheaf.germ W w hw).hom (u i)) ⊔
-      ((IsLocalRing.maximalIdeal (C.Z.presheaf.stalk (C.GG.hom w))).map (C.GG.hom.stalkMap w).hom).radical
+def Coord
+    (w : C.G.toScheme) (W : C.G.toScheme.Opens) (hw : w ∈ W) (u : Fin C.g → Γ(C.G.toScheme, W))
+    : Prop :=
+  IsLocalRing.maximalIdeal (C.G.toScheme.presheaf.stalk w)
+    = Ideal.span (Set.range fun i => (C.G.toScheme.presheaf.germ W w hw).hom (u i))
+      ⊔ ((IsLocalRing.maximalIdeal (C.Z.presheaf.stalk (C.GG.hom w))).map
+        (C.GG.hom.stalkMap w).hom).radical
 
-def TestCart : Prop := ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z) (τ : C.Test y),
-  IsPullback τ.f τ.H.hom C.GG.hom τ.y₀
+def TestCart : Prop :=
+  ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z) (τ : C.Test y),
+    IsPullback τ.f τ.H.hom C.GG.hom τ.y₀
 
-def FibLaw : Prop := ∀ (p : ℕ) [Fact p.Prime] (y y' : Sp (OO p) ⟶ C.Z) (τ : C.Test y) (τ' : C.Test y')
-  (K : Type) [Field K] [IsAlgClosed K] (r : Sp K ⟶ Sp τ.V) (r' : Sp K ⟶ Sp τ'.V),
-  Set.range r = {IsLocalRing.closedPoint τ.V} → Set.range r' = {IsLocalRing.closedPoint τ'.V} →
-  r ≫ τ.y₀ = r' ≫ τ'.y₀ → ∀ (c d : Over.mk r ⟶ τ.H) (c' d' : Over.mk r' ⟶ τ'.H),
-  c.left ≫ τ.f = c'.left ≫ τ'.f → d.left ≫ τ.f = d'.left ≫ τ'.f →
-  (c * d).left ≫ τ.f = (c' * d').left ≫ τ'.f ∧ (c⁻¹).left ≫ τ.f = (c'⁻¹).left ≫ τ'.f
+def FibLaw : Prop :=
+  ∀ (p : ℕ) [Fact p.Prime] (y y' : Sp (OO p) ⟶ C.Z) (τ : C.Test y) (τ' : C.Test y') (K : Type)
+      [Field K] [IsAlgClosed K] (r : Sp K ⟶ Sp τ.V) (r' : Sp K ⟶ Sp τ'.V),
+    Set.range r = {IsLocalRing.closedPoint τ.V} → Set.range r' = {IsLocalRing.closedPoint τ'.V}
+      → r ≫ τ.y₀ = r' ≫ τ'.y₀
+      → ∀ (c d : Over.mk r ⟶ τ.H) (c' d' : Over.mk r' ⟶ τ'.H),
+        c.left ≫ τ.f = c'.left ≫ τ'.f → d.left ≫ τ.f = d'.left ≫ τ'.f
+          → (c * d).left ≫ τ.f = (c' * d').left ≫ τ'.f ∧ (c⁻¹).left ≫ τ.f = (c'⁻¹).left ≫ τ'.f
 
 structure Law where
   [grp : GrpObj C.GG]
@@ -122,18 +139,19 @@ structure Law where
   smooth : SmoothOfRelativeDimension C.g C.GG.hom
   zero : (eSec C.GG : C.Z ⟶ C.G.toScheme) = C.e
   pull : IsGrpPullback C.A C.GG C.U.ι C.a
-  test : ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z) (τ : C.Test y), IsGrpPullback τ.H C.GG τ.y₀ τ.f
+  test
+    : ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ C.Z) (τ : C.Test y), IsGrpPullback τ.H C.GG τ.y₀ τ.f
 
 end Core
 
-theorem isNormalScheme_sp (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] :
-    ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme (Sp R) := by
+theorem isNormalScheme_sp (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R]
+    : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme (Sp R) := by
   intro x
   refine ⟨inferInstance, ?_⟩
   have : (PrimeSpectrum.asIdeal x).IsPrime := PrimeSpectrum.isPrime x
   have h := StructureSheaf.IsLocalization.to_stalk R x
-  exact @isIntegrallyClosed_of_isLocalization R ((Spec.structureSheaf R).presheaf.stalk x) _ _ (_) _ _
-    (PrimeSpectrum.asIdeal x).primeCompl (Ideal.primeCompl_le_nonZeroDivisors _) h
+  exact @isIntegrallyClosed_of_isLocalization R ((Spec.structureSheaf R).presheaf.stalk x) _ _ (_) _
+    _ (PrimeSpectrum.asIdeal x).primeCompl (Ideal.primeCompl_le_nonZeroDivisors _) h
 
 def Core.zero (U : (Sp ℤ).Opens) (hU : (U : Set (Sp ℤ)).Nonempty) : Core where
   Z := Sp ℤ
@@ -147,13 +165,14 @@ def Core.zero (U : (Sp ℤ).Opens) (hU : (U : Set (Sp ℤ)).Nonempty) : Core whe
   ne := hU
   g := 0
   A := 𝟙_ (Over U.toScheme)
-  ab :=
-    { comm := inferInstance
-      smooth := inferInstanceAs (Smooth (𝟙 U.toScheme))
-      proper := inferInstanceAs (IsProper (𝟙 U.toScheme))
-      geomConnected := by
-        change GeometricallyConnected (𝟙 U.toScheme)
-        infer_instance }
+  ab := {
+    comm := inferInstance
+    smooth := inferInstanceAs (Smooth (𝟙 U.toScheme))
+    proper := inferInstanceAs (IsProper (𝟙 U.toScheme))
+    geomConnected := by
+      change GeometricallyConnected (𝟙 U.toScheme)
+      infer_instance
+  }
   dim := inferInstanceAs (SmoothOfRelativeDimension 0 (𝟙 U.toScheme))
   P := 𝟙_ (Over (Sp ℤ))
   intP := inferInstanceAs (IsIntegral (Sp ℤ))
@@ -161,7 +180,8 @@ def Core.zero (U : (Sp ℤ).Opens) (hU : (U : Set (Sp ℤ)).Nonempty) : Core whe
   G := ⊤
   a := U.ι ≫ (Sp ℤ).topIso.inv
   cart := by
-    change IsPullback ((U.ι ≫ (Sp ℤ).topIso.inv) ≫ (⊤ : (Sp ℤ).Opens).ι) (𝟙 U.toScheme) (𝟙 (Sp ℤ)) U.ι
+    change IsPullback ((U.ι ≫ (Sp ℤ).topIso.inv) ≫ (⊤ : (Sp ℤ).Opens).ι) (𝟙 U.toScheme) (𝟙 (Sp ℤ))
+      U.ι
     rw [Category.assoc, Scheme.toIso_inv_ι, Category.comp_id]
     exact IsPullback.of_vert_isIso ⟨by simp⟩
   e := (Sp ℤ).topIso.inv

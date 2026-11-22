@@ -18,7 +18,8 @@ namespace GlobalTheory.UnitaryBC
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem infGL_mem_UA {n : ℕ} (y : GL (Fin n) (Cinf E)) (hy : y.valᴴ * y.val = 1) : infGL E n y ∈ UA E n := by
+theorem infGL_mem_UA {n : ℕ} (y : GL (Fin n) (Cinf E)) (hy : y.valᴴ * y.val = 1)
+    : infGL E n y ∈ UA E n := by
   change cT (conjAd E) (infGL E n y).val * 1 * (infGL E n y).val = 1
   have h1 : (infGL E n y).val.map (pInf E) = y.val := congrArg Units.val (pInf_infGL y)
   have h2 : (infGL E n y).val.map (pFin E) = 1 := congrArg Units.val (pFin_infGL y)
@@ -37,10 +38,9 @@ theorem infGL_mem_UA {n : ℕ} (y : GL (Fin n) (Cinf E)) (hy : y.valᴴ * y.val 
   simp only [← Matrix.map_mul, hy, mul_one] at h5 h6
   rw [mul_one]
   ext1 i j
-  refine ad_ext ((congrFun₂ h5 i j).trans ?_) ((congrFun₂ h6 i j).trans ?_) <;>
-  · simp only [Matrix.one_apply]
-    split_ifs <;> simp
-
+  refine ad_ext ((congrFun₂ h5 i j).trans ?_) ((congrFun₂ h6 i j).trans ?_)
+    <;> · simp only [Matrix.one_apply]
+          split_ifs <;> simp
 
 end GlobalTheory.UnitaryBC
 

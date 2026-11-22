@@ -40,21 +40,22 @@ private lemma ratio_eq (u : ℂ) (hu : u ≠ 0) (c : ℤ) (i j : ℕ) (hij : i <
     ring
   rw [mul_div_mul_comm, h]
 
-theorem UpperTheory.Gal.Gen.meanVal_pf :
-    UpperTheory.Gal.Gen.MeanVal := by
+theorem UpperTheory.Gal.Gen.meanVal_pf : UpperTheory.Gal.Gen.MeanVal := by
   intro n t ht0 ht1 z hz c m
   set g : ℂ → ℂ := fun u => u ^ m * ∏ p ∈ prs n,
     (1 - u ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ))) /
       (1 - (t : ℂ) * (u ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ)))) with hg
-  have hden : ∀ u ∈ Metric.closedBall (0 : ℂ) 1, ∀ p : Fin n × Fin n,
-      1 - (t : ℂ) * (u ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ))) ≠ 0 := by
+  have hden
+      : ∀ u ∈ Metric.closedBall (0 : ℂ) 1, ∀ p : Fin n × Fin n,
+        1 - (t : ℂ) * (u ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ))) ≠ 0 := by
     intro u hu p h0
     have hu1 : ‖u‖ ≤ 1 := by simpa using hu
     have hx : (t : ℂ) * (u ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ))) = 1 :=
       (sub_eq_zero.mp h0).symm
     have hn := congrArg norm hx
     rw [norm_mul, norm_mul, norm_div, hz, hz, norm_pow, Complex.norm_real, Real.norm_of_nonneg ht0,
-      norm_one, div_one, mul_one] at hn
+        norm_one, div_one, mul_one]
+      at hn
     have : ‖u‖ ^ ((p.2 : ℕ) - (p.1 : ℕ)) ≤ 1 := pow_le_one₀ (norm_nonneg _) hu1
     nlinarith
   have hd : ∀ u ∈ Metric.closedBall (0 : ℂ) 1, DifferentiableAt ℂ g u := by
@@ -62,12 +63,16 @@ theorem UpperTheory.Gal.Gen.meanVal_pf :
     refine (differentiableAt_id.pow m).mul ?_
     refine DifferentiableAt.fun_finsetProd fun p _ => ?_
     refine DifferentiableAt.div ?_ ?_ (hden u hu p)
-    · exact (differentiableAt_const _).sub ((differentiableAt_id.pow _).mul (differentiableAt_const _))
     · exact (differentiableAt_const _).sub
-        ((differentiableAt_const _).mul ((differentiableAt_id.pow _).mul (differentiableAt_const _)))
+        ((differentiableAt_id.pow _).mul (differentiableAt_const _))
+    · exact (differentiableAt_const _).sub
+        ((differentiableAt_const _).mul
+          ((differentiableAt_id.pow _).mul (differentiableAt_const _)))
   have h0 : g 0 = if m = 0 then 1 else 0 := by
-    have hp : ∏ p ∈ prs n, (1 - (0 : ℂ) ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ))) /
-        (1 - (t : ℂ) * ((0 : ℂ) ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ)))) = 1 := by
+    have hp
+        : ∏ p ∈ prs n, (1 - (0 : ℂ) ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ))) /
+            (1 - (t : ℂ) * ((0 : ℂ) ^ ((p.2 : ℕ) - (p.1 : ℕ)) * ((z p.1 : ℂ) / (z p.2 : ℂ))))
+          = 1 := by
       refine Finset.prod_eq_one fun p hp => ?_
       have hlt : (p.1 : ℕ) < (p.2 : ℕ) := (Finset.mem_filter.mp hp).2
       have hk : (p.2 : ℕ) - (p.1 : ℕ) ≠ 0 := by omega
@@ -76,9 +81,11 @@ theorem UpperTheory.Gal.Gen.meanVal_pf :
     split_ifs with hm
     · simp [hm]
     · exact zero_pow hm
-  have hs : ∀ s : UnitAddCircle, ((AddCircle.toCircle s : Circle) : ℂ) ^ m *
-      half (t : ℂ) (fun i => Circle.toUnits (AddCircle.toCircle s) ^ (c - (i : ℕ)) * z i)
-      = g ((AddCircle.toCircle s : Circle) : ℂ) := by
+  have hs
+      : ∀ s : UnitAddCircle,
+        ((AddCircle.toCircle s : Circle) : ℂ) ^ m
+            * half (t : ℂ) (fun i => Circle.toUnits (AddCircle.toCircle s) ^ (c - (i : ℕ)) * z i)
+          = g ((AddCircle.toCircle s : Circle) : ℂ) := by
     intro s
     simp only [hg, half]
     congr 1

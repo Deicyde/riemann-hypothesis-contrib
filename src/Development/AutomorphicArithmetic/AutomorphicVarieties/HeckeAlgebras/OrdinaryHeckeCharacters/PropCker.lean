@@ -8,11 +8,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 open IsLocalRing Matrix UpperTheory.V.Hi
 
-private theorem UpperTheory.V.Hi.propCker_avg {H k M : Type} [Group H] [Field k] [CharZero k] [AddCommGroup M] [Module k M]
-    (ρ : Representation k H M) (hs : ∀ m, ∃ K : Subgroup H, K.FiniteIndex ∧ ∀ x ∈ K, ρ x m = m) {w : M}
-    (hw : w ∈ Submodule.span k {w | ∃ x m, w = ρ x m - m}) (hfix : ∀ x, ρ x w = w) : w = 0 := by
-  have key : ∃ K0 : Subgroup H, K0.FiniteIndex ∧ ∀ (K : Subgroup H) [K.Normal] [Fintype (H ⧸ K)], K ≤ K0 →
-      ∑ q : H ⧸ K, ρ q.out w = 0 := by
+private theorem UpperTheory.V.Hi.propCker_avg
+    {H k M : Type} [Group H] [Field k] [CharZero k] [AddCommGroup M] [Module k M]
+    (ρ : Representation k H M) (hs : ∀ m, ∃ K : Subgroup H, K.FiniteIndex ∧ ∀ x ∈ K, ρ x m = m)
+    {w : M} (hw : w ∈ Submodule.span k {w | ∃ x m, w = ρ x m - m}) (hfix : ∀ x, ρ x w = w)
+    : w = 0 := by
+  have key
+      : ∃ K0 : Subgroup H,
+        K0.FiniteIndex
+          ∧ ∀ (K : Subgroup H) [K.Normal] [Fintype (H ⧸ K)],
+            K ≤ K0 → ∑ q : H ⧸ K, ρ q.out w = 0 := by
     clear hfix
     induction hw using Submodule.span_induction with
     | mem w h =>
@@ -29,13 +34,15 @@ private theorem UpperTheory.V.Hi.propCker_avg {H k M : Type} [Group H] [Field k]
       have h3 := h1 _ (hK h2)
       have h4 : q.out * x = (q * x).out * (((q * x).out)⁻¹ * (q.out * x)) := by group
       rw [Equiv.coe_mulRight, ← mul_apply_eq_comp, ← map_mul, h4, map_mul, mul_apply_eq_comp, h3]
-    | zero => exact ⟨⊤, inferInstance, fun K _ _ _ => by simp⟩
+    | zero =>
+      exact ⟨⊤, inferInstance, fun K _ _ _ => by simp⟩
     | add a b _ _ ha hb =>
       obtain ⟨K1, h1, h1'⟩ := ha
       obtain ⟨K2, h2, h2'⟩ := hb
       refine ⟨K1 ⊓ K2, inferInstance, fun K _ _ hK => ?_⟩
       simp only [map_add (f := _)]
-      rw [Finset.sum_add_distrib, h1' K (hK.trans inf_le_left), h2' K (hK.trans inf_le_right), add_zero]
+      rw [Finset.sum_add_distrib, h1' K (hK.trans inf_le_left), h2' K (hK.trans inf_le_right),
+        add_zero]
     | smul c a _ ha =>
       obtain ⟨K1, h1, h1'⟩ := ha
       refine ⟨K1, h1, fun K _ _ hK => ?_⟩
@@ -48,8 +55,10 @@ private theorem UpperTheory.V.Hi.propCker_avg {H k M : Type} [Group H] [Field k]
   rw [← Nat.cast_smul_eq_nsmul k, smul_eq_zero] at h2
   exact h2.resolve_left (Nat.cast_ne_zero.2 Fintype.card_ne_zero)
 
-theorem UpperTheory.V.Hi.propCker :
-    ∀ (G : Type) [Group G] (I : Iwa G) (k M : Type) [Field k] [CharZero k] [AddCommGroup M] [Module k M] (π : Representation k G M), I.Smooth π → ∀ v ∈ fixd π I.N, v ∈ I.jacKer π ↔ ∃ j : ℕ, (I.uOp π I.z ^ j) v = 0 := by
+theorem UpperTheory.V.Hi.propCker
+    : ∀ (G : Type) [Group G] (I : Iwa G) (k M : Type) [Field k] [CharZero k] [AddCommGroup M]
+        [Module k M] (π : Representation k G M),
+      I.Smooth π → ∀ v ∈ fixd π I.N, v ∈ I.jacKer π ↔ ∃ j : ℕ, (I.uOp π I.z ^ j) v = 0 := by
   intro G _ I k M _ _ _ _ π hsm v hv
   have mul : ∀ (g h : G) (w : M), π g (π h w) = π (g * h) w := fun g h w => by
     rw [map_mul π g h, mul_apply_eq_comp]
@@ -81,7 +90,8 @@ theorem UpperTheory.V.Hi.propCker :
         congr 3
         simp only [Subgroup.subtype_apply]
         group
-      | zero => exact ⟨0, fun j _ => by simp⟩
+      | zero =>
+        exact ⟨0, fun j _ => by simp⟩
       | add a b _ _ ha hb =>
         obtain ⟨j1, h1⟩ := ha
         obtain ⟨j2, h2⟩ := hb
@@ -112,7 +122,8 @@ theorem UpperTheory.V.Hi.propCker :
       exact (uOpMul G I k M π _ 1 (hz j) (one_mem _) v hv).1 x x.2
   · rintro ⟨j, hj⟩
     have h1 := propCp G I k M π _ (hz j) v hv
-    rw [hj, zero_sub, neg_mem_iff, Submodule.smul_mem_iff _ (Nat.cast_ne_zero.2 (I.fin_N _ (hz j)))] at h1
+    rw [hj, zero_sub, neg_mem_iff, Submodule.smul_mem_iff _ (Nat.cast_ne_zero.2 (I.fin_N _ (hz j)))]
+      at h1
     have stab : ∀ t ∈ I.Tf, ∀ w ∈ I.jacKer π, π t w ∈ I.jacKer π := by
       intro t ht w hw
       induction hw using Submodule.span_induction with

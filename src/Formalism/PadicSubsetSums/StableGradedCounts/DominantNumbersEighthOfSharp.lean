@@ -45,7 +45,7 @@ theorem dominant_numbers_sharp_holds : StretchedExponentialDominance := by
       have h6 : 0 ≤ x ^ (ε / 6) / 3 := by positivity
       nlinarith
     linarith
-  have h20 : (1 : ℝ) / 20 = Real.exp (-Real.log 20) := by
+  have h20 : (1 : ℝ) / 20 = Real.exp (- Real.log 20) := by
     rw [Real.exp_neg, Real.exp_log (by norm_num)]
     norm_num
   rw [Real.rpow_def_of_pos hx0, ← Real.exp_add, h20, ← Real.exp_add]

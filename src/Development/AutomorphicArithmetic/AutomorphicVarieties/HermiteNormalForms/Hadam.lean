@@ -7,9 +7,9 @@ public import Mathlib
 open Matrix
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.hadam :
-    ∀ (N : ℕ) (G : Matrix (Fin N) (Fin N) ℂ), G.PosSemidef → (∀ a, (G a a).re ≤ 1) →
-    0 ≤ G.det.re ∧ G.det.re ≤ 1 ∧ ‖G.det‖ = G.det.re := by
+theorem UpperTheory.V.KT.hadam
+    : ∀ (N : ℕ) (G : Matrix (Fin N) (Fin N) ℂ),
+      G.PosSemidef → (∀ a, (G a a).re ≤ 1) → 0 ≤ G.det.re ∧ G.det.re ≤ 1 ∧ ‖G.det‖ = G.det.re := by
   intro N G hG hdiag
   have hH : G.IsHermitian := hG.1
   have hnn : ∀ i, 0 ≤ hH.eigenvalues i := fun i => hG.eigenvalues_nonneg i
@@ -23,14 +23,18 @@ theorem UpperTheory.V.KT.hadam :
       simp
     have h3 : (G.trace).re ≤ N := by
       rw [Matrix.trace, Complex.re_sum]
-      calc ∑ a, (G a a).re ≤ ∑ _a : Fin N, (1 : ℝ) := Finset.sum_le_sum fun a _ => hdiag a
+      calc
+        ∑ a, (G a a).re
+          ≤ ∑ _a : Fin N, (1 : ℝ) := Finset.sum_le_sum fun a _ => hdiag a
         _ = N := by simp
     linarith
   have hp0 : 0 ≤ ∏ i, hH.eigenvalues i := Finset.prod_nonneg fun i _ => hnn i
   have hp1 : ∏ i, hH.eigenvalues i ≤ 1 := by
-    calc ∏ i, hH.eigenvalues i ≤ ∏ i, Real.exp (hH.eigenvalues i - 1) :=
-          Finset.prod_le_prod₀ (fun i _ => hnn i) fun i _ => by
-            linarith [Real.add_one_le_exp (hH.eigenvalues i - 1)]
+    calc
+      ∏ i, hH.eigenvalues i ≤ ∏ i, Real.exp (hH.eigenvalues i - 1) :=
+        Finset.prod_le_prod₀
+          (fun i _ => hnn i)
+          fun i _ => by linarith [Real.add_one_le_exp (hH.eigenvalues i - 1)]
       _ = Real.exp (∑ i, (hH.eigenvalues i - 1)) := (Real.exp_sum _ _).symm
       _ ≤ 1 := by
         rw [Real.exp_le_one_iff, Finset.sum_sub_distrib]

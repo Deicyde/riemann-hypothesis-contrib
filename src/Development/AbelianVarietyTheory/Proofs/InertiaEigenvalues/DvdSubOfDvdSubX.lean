@@ -39,12 +39,14 @@ private lemma order_map_toNat_eq_natDegree_of_isDistinguishedAt {I : Ideal R} {p
   rw [← this]
   simp
 
-
 open PowerSeries in
 variable {R S : Type} [CommRing R] [CommRing S] {l : ℕ} in
-theorem _root_.GlobalTheory.NB.LT.exists_poly_mod [Nontrivial R] {I : Ideal R} [IsAdicComplete I R] {p : Polynomial R}
-    (H : p.IsDistinguishedAt I) (a : R⟦X⟧) :
-    ∃ r : Polynomial R, r.degree < p.degree ∧ (p : R⟦X⟧) ∣ a - r := by
+theorem _root_.GlobalTheory.NB.LT.exists_poly_mod
+    [Nontrivial R]
+    {I : Ideal R} [IsAdicComplete I R]
+    {p : Polynomial R} (H : p.IsDistinguishedAt I)
+    (a : R⟦X⟧)
+    : ∃ r : Polynomial R, r.degree < p.degree ∧ (p : R⟦X⟧) ∣ a - r := by
   have hI : I ≠ ⊤ := by
     intro h
     have := subsingleton_of_isHausdorff_whole_ideal (I := I) h
@@ -56,11 +58,13 @@ theorem _root_.GlobalTheory.NB.LT.exists_poly_mod [Nontrivial R] {I : Ideal R} [
   rw [order_map_toNat_eq_natDegree_of_isDistinguishedAt H hI] at hlt
   rwa [Polynomial.degree_eq_natDegree (Polynomial.Monic.ne_zero H.monic)]
 
-
 open PowerSeries in
 variable {R S : Type} [CommRing R] [CommRing S] {l : ℕ} in
-theorem _root_.GlobalTheory.NB.LT.poly_dvd_of_dvd {I : Ideal R} [IsAdicComplete I R] {p : Polynomial R}
-    (H : p.IsDistinguishedAt I) {r : Polynomial R} (h : (p : R⟦X⟧) ∣ (r : R⟦X⟧)) : p ∣ r := by
+theorem _root_.GlobalTheory.NB.LT.poly_dvd_of_dvd
+    {I : Ideal R} [IsAdicComplete I R]
+    {p : Polynomial R} (H : p.IsDistinguishedAt I)
+    {r : Polynomial R} (h : (p : R⟦X⟧) ∣ (r : R⟦X⟧))
+    : p ∣ r := by
   by_cases hI : I = ⊤
   · have := subsingleton_of_isHausdorff_whole_ideal (I := I) hI
     rw [Subsingleton.elim r 0]
@@ -75,10 +79,12 @@ theorem _root_.GlobalTheory.NB.LT.poly_dvd_of_dvd {I : Ideal R} [IsAdicComplete 
     · rw [not_nontrivial_iff_subsingleton] at hs
       rw [Subsingleton.elim (r %ₘ p) 0]
       simp
-  have hmul : (p : R⟦X⟧) * (h - ((r /ₘ p : Polynomial R) : R⟦X⟧)) = ((r %ₘ p : Polynomial R) : R⟦X⟧) := by
+  have hmul
+      : (p : R⟦X⟧) * (h - ((r /ₘ p : Polynomial R) : R⟦X⟧)) = ((r %ₘ p : Polynomial R) : R⟦X⟧) := by
     have e := Polynomial.modByMonic_add_div r p
-    have e' : ((r %ₘ p : Polynomial R) : R⟦X⟧) + (p : R⟦X⟧) * ((r /ₘ p : Polynomial R) : R⟦X⟧)
-        = (r : R⟦X⟧) := by
+    have e'
+        : ((r %ₘ p : Polynomial R) : R⟦X⟧) + (p : R⟦X⟧) * ((r /ₘ p : Polynomial R) : R⟦X⟧)
+          = (r : R⟦X⟧) := by
       rw [← Polynomial.coe_mul, ← Polynomial.coe_add, e]
     rw [mul_sub, ← hh, ← e']
     ring
@@ -87,8 +93,9 @@ theorem _root_.GlobalTheory.NB.LT.poly_dvd_of_dvd {I : Ideal R} [IsAdicComplete 
 
 open PowerSeries in
 variable {R S : Type} [CommRing R] [CommRing S] {l : ℕ} in
-theorem _root_.GlobalTheory.NB.LT.algHom_coe {B : Type} [CommRing B] [Algebra R B] (σ : R⟦X⟧ →ₐ[R] B) (r : Polynomial R) :
-    σ (r : R⟦X⟧) = Polynomial.aeval (σ X) r := by
+theorem _root_.GlobalTheory.NB.LT.algHom_coe
+    {B : Type} [CommRing B] [Algebra R B] (σ : R⟦X⟧ →ₐ[R] B) (r : Polynomial R)
+    : σ (r : R⟦X⟧) = Polynomial.aeval (σ X) r := by
   have e : σ.comp (Polynomial.coeToPowerSeries.algHom R) = Polynomial.aeval (σ X) :=
     Polynomial.algHom_ext (by simp)
   simpa using DFunLike.congr_fun e r
@@ -106,10 +113,11 @@ private lemma X_pow_dvd_sub_aeval_trunc (ρ : R⟦X⟧ →ₐ[R] R⟦X⟧) (hρ 
   rw [e, map_pow]
   exact (pow_dvd_pow_of_dvd hρ n).mul_right _
 
-
 open PowerSeries in
 variable {R S : Type} [CommRing R] [CommRing S] {l : ℕ} in
-theorem _root_.GlobalTheory.NB.LT.algHom_ext_X (σ τ : R⟦X⟧ →ₐ[R] R⟦X⟧) (h : σ X = τ X) (hX : X ∣ σ X) : σ = τ := by
+theorem _root_.GlobalTheory.NB.LT.algHom_ext_X
+    (σ τ : R⟦X⟧ →ₐ[R] R⟦X⟧) (h : σ X = τ X) (hX : X ∣ σ X)
+    : σ = τ := by
   refine AlgHom.ext fun f => PowerSeries.ext fun m => ?_
   have h1 := X_pow_dvd_sub_aeval_trunc σ hX (m + 1) f
   have h2 := X_pow_dvd_sub_aeval_trunc τ (h ▸ hX) (m + 1) f

@@ -15,13 +15,15 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateTheorem
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.LevR
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.LevR
 
 export Formalism.MainNotions.S.UnitaryLevelOperators (lenI mid3 wnormSq Msq IsKFinCoefT)
 
 export Formalism.MainNotions.S.LocalFrameAxioms (LocMatch FrameAx PsiAx k_le_nS Nlet)
 
-def vmOf (D : D7) {k0 : ℕ} (hk : k0 + 1 = D.R.k) (G : GramWordSpace.GramMap k0 D.R.rS) : ValMap D.R.k D.R.rS :=
+def vmOf (D : D7) {k0 : ℕ} (hk : k0 + 1 = D.R.k) (G : GramWordSpace.GramMap k0 D.R.rS)
+    : ValMap D.R.k D.R.rS :=
   hk ▸ G.toValMap
 
 section Family

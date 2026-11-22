@@ -43,8 +43,8 @@ lemma push_mem_coboundaries (φ : P ⟶ P') {n : ℕ} {σ : Cochain P U n}
     exact ⟨push U φ n τ, (push_d U φ n τ).symm⟩
 
 def cocyclesMap (φ : P ⟶ P') (n : ℕ) : cocycles P U n →+ cocycles P' U n :=
-  AddMonoidHom.codRestrict ((push U φ n).comp (cocycles P U n).subtype) (cocycles P' U n)
-    fun σ => push_mem_cocycles U φ σ.2
+  AddMonoidHom.codRestrict ((push U φ n).comp (cocycles P U n).subtype) (cocycles P' U n) fun σ =>
+    push_mem_cocycles U φ σ.2
 
 def cechHMap (φ : P ⟶ P') (n : ℕ) : cechH P U n →+ cechH P' U n :=
   QuotientAddGroup.map _ _ (cocyclesMap U φ n) fun σ hσ => by
@@ -82,7 +82,6 @@ lemma cechHMap_zero (n : ℕ) (x : cechH P U n) : cechHMap U (0 : P ⟶ P') n x 
   rw [cechHMap_cls]
   exact (cls_congr U (push_zero' U n σ) _ (map_zero _)).trans cls_zero
 
-
 variable (P) in
 def cechH.endRingHom (n : ℕ) : End P →+* AddMonoid.End (cechH P U n) where
   toFun φ := cechHMap U φ.asHom n
@@ -103,10 +102,10 @@ end Map
 
 section Delta
 
-variable {F I Q F' I' Q' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} {f : F ⟶ I} {g : I ⟶ Q}
-  {f' : F' ⟶ I'} {g' : I' ⟶ Q'} {U}
-  (hS : IsCechShortExact U f g) (hS' : IsCechShortExact U f' g')
-  (α₁ : F ⟶ F') (α₂ : I ⟶ I') (α₃ : Q ⟶ Q') (h₁₂ : f ≫ α₂ = α₁ ≫ f') (h₂₃ : g ≫ α₃ = α₂ ≫ g')
+variable
+  {F I Q F' I' Q' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} {f : F ⟶ I} {g : I ⟶ Q} {f' : F' ⟶ I'}
+  {g' : I' ⟶ Q'} {U} (hS : IsCechShortExact U f g) (hS' : IsCechShortExact U f' g') (α₁ : F ⟶ F')
+  (α₂ : I ⟶ I') (α₃ : Q ⟶ Q') (h₁₂ : f ≫ α₂ = α₁ ≫ f') (h₂₃ : g ≫ α₃ = α₂ ≫ g')
 include h₁₂ h₂₃
 
 lemma IsCechShortExact.delta_naturality (n : ℕ) (σ : cocycles Q U n) :
@@ -130,7 +129,8 @@ end Delta
 
 section HDelta
 
-variable [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]
+variable
+  [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]
   {S S' : ShortComplex (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})}
   (hS : S.ShortExact) (hS' : S'.ShortExact) (α : S ⟶ S')
 
@@ -181,19 +181,18 @@ end Zero
 
 section Module
 
-variable {X : Scheme.{u}} {ι : Type w} (U : ι → X.Opens) (A : Type*) [CommRing A]
-  [Algebra A Γ(X, ⊤)]
+variable
+  {X : Scheme.{u}} {ι : Type w} (U : ι → X.Opens) (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
 
-def sheafEndRingHom (G : Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u}) :
-    End G →+* End G.obj where
+def sheafEndRingHom (G : Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})
+    : End G →+* End G.obj where
   toFun φ := End.of φ.asHom.hom
   map_one' := rfl
   map_mul' _ _ := rfl
   map_zero' := rfl
   map_add' _ _ := rfl
 
-def cechH.actRingHom (F : X.Modules) (n : ℕ) :
-    A →+* AddMonoid.End (cechH (modulesAb F).obj U n) :=
+def cechH.actRingHom (F : X.Modules) (n : ℕ) : A →+* AddMonoid.End (cechH (modulesAb F).obj U n) :=
   (((cechH.endRingHom U (modulesAb F).obj n).comp (sheafEndRingHom (modulesAb F))).comp
     (smulAbRingHom F)).comp (algebraMap A Γ(X, ⊤))
 
@@ -203,8 +202,8 @@ instance cechH.instModule (F : X.Modules) (n : ℕ) : Module A (cechH (modulesAb
 lemma cechH.smul_def (F : X.Modules) (n : ℕ) (a : A) (x : cechH (modulesAb F).obj U n) :
     a • x = cechHMap U (smulAbRingHom F (algebraMap A Γ(X, ⊤) a)).asHom.hom n x := rfl
 
-def cechH.linearMap {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) :
-    cechH (modulesAb F).obj U n →ₗ[A] cechH (modulesAb G).obj U n where
+def cechH.linearMap {F G : X.Modules} (φ : F ⟶ G) (n : ℕ)
+    : cechH (modulesAb F).obj U n →ₗ[A] cechH (modulesAb G).obj U n where
   toFun := cechHMap U (modulesAbMap φ).hom n
   map_add' := map_add _
   map_smul' a x := by

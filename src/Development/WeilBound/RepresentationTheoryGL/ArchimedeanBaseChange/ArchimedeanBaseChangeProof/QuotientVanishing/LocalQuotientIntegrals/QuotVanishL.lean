@@ -15,10 +15,13 @@ theorem quotVanishL : GlobalTheory.CompanionTheory.LocVan.QuotVanish := by
   letI : MeasurableSpace (nilrad W₁ W₂) := borel _
   haveI : BorelSpace (nilrad W₁ W₂) := ⟨rfl⟩
   haveI : LocallyCompactSpace (nilrad W₁ W₂) := (nilrad W₁ W₂).closed_of_finiteDimensional.isClosedEmbedding_subtypeVal.locallyCompactSpace
-  refine GlobalTheory.CompanionTheory.QuotVan.quotVanish n μ d μd W₁ W₂ hW Measure.addHaar F hs h1 h2 hF hT hK fun q _ => ?_
+  refine GlobalTheory.CompanionTheory.QuotVan.quotVanish n μ d μd W₁ W₂ hW Measure.addHaar F hs h1
+    h2 hF hT hK fun q _ => ?_
   simp only [GlobalTheory.CompanionTheory.QuotVan.uOf_eq]
   exact h0 _ q
 
-theorem locVanish : LocVanish := GlobalTheory.CompanionTheory.LocVan.locVanish_of GlobalTheory.CompanionTheory.LocVan.nilChange_of_flag quotVanishL
+theorem locVanish : LocVanish :=
+  GlobalTheory.CompanionTheory.LocVan.locVanish_of
+    GlobalTheory.CompanionTheory.LocVan.nilChange_of_flag quotVanishL
 
 end PositivityTheory.Rg.BcB.CV

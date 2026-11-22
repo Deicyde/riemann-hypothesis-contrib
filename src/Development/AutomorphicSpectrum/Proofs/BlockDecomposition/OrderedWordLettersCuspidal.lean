@@ -8,13 +8,15 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.M
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc Zc.M
 
 namespace GlobalTheory.CompanionTheory.ZcWords
 
-theorem wtW_isCusp {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {h : ℕ} (Δ : Fin h → Segment k) :
-    ∀ c ∈ wtW Δ, c.IsCusp := by
+theorem wtW_isCusp
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {h : ℕ} (Δ : Fin h → Segment k)
+    : ∀ c ∈ wtW Δ, c.IsCusp := by
   intro c hc
   obtain ⟨l, hl, hcl⟩ := List.mem_flatten.1 hc
   obtain ⟨i, rfl⟩ := (List.mem_ofFn' _ _).1 hl

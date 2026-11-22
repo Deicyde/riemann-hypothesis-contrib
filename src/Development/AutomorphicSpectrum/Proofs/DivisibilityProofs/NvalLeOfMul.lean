@@ -7,15 +7,22 @@ public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.ExistsPo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
+  GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
 open scoped ENNReal Classical
 
 namespace GlobalTheory.CompanionTheory.SmallFin
 
-theorem le_of_mem_span {K R : Type} [Field K] [NumberField K] [CommRing R] [Algebra K R] [Algebra (𝓞 K) R]
-    [IsScalarTower (𝓞 K) K R] {la : HeightOneSpectrum (𝓞 K)} {v : R → EReal} (hv : IsVal la v) {C : Submodule K R}
-    {n : ℕ} (w : Fin n → C) {d : EReal} (hd : ∀ i, d ≤ v (w i : R)) {x : C}
-    (hx : x ∈ Submodule.span (𝓞 K) (Set.range w)) : d ≤ v (x : R) := by
+theorem le_of_mem_span
+    {K R : Type}
+    [Field K] [NumberField K] [CommRing R] [Algebra K R] [Algebra (𝓞 K) R] [IsScalarTower (𝓞 K) K R]
+    {la : HeightOneSpectrum (𝓞 K)} {v : R → EReal} (hv : IsVal la v)
+    {C : Submodule K R} {n : ℕ} (w : Fin n → C)
+    {d : EReal} (hd : ∀ i, d ≤ v (w i : R))
+    {x : C} (hx : x ∈ Submodule.span (𝓞 K) (Set.range w))
+    : d ≤ v (x : R) := by
   induction hx using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨i, rfl⟩ := hx
@@ -24,7 +31,8 @@ theorem le_of_mem_span {K R : Type} [Field K] [NumberField K] [CommRing R] [Alge
     show d ≤ v 0
     rw [hv.zero]
     exact le_top
-  | add x y _ _ hx hy => exact (le_min hx hy).trans (hv.add _ _)
+  | add x y _ _ hx hy =>
+    exact (le_min hx hy).trans (hv.add _ _)
   | smul a x _ hx =>
     have h1 : ((a • x : C) : R) = (a : K) • (x : R) := (algebraMap_smul K a (x : R)).symm
     rw [h1]
@@ -36,9 +44,12 @@ theorem le_of_mem_span {K R : Type} [Field K] [NumberField K] [CommRing R] [Alge
         exact_mod_cast vAdd_int_nonneg la ha
       exact hx.trans (le_add_of_nonneg_left h2)
 
-theorem adjoin_ratios {K V Ω : Type} [Field K] [AddCommGroup V] [Module K V] [Field Ω] [Algebra K Ω] (ev : V →ₗ[K] Ω)
-    (hB : GlobalTheory.DegVal.ratioField ev = ⊤) {n : ℕ} (w : Fin n → V) (hs : Submodule.span K (Set.range w) = ⊤) (i₀ : Fin n)
-    (h0 : ev (w i₀) ≠ 0) : IntermediateField.adjoin K (Set.range fun i => ev (w i) / ev (w i₀)) = ⊤ := by
+theorem adjoin_ratios
+    {K V Ω : Type} [Field K] [AddCommGroup V] [Module K V] [Field Ω] [Algebra K Ω]
+    (ev : V →ₗ[K] Ω) (hB : GlobalTheory.DegVal.ratioField ev = ⊤)
+    {n : ℕ}
+    (w : Fin n → V) (hs : Submodule.span K (Set.range w) = ⊤) (i₀ : Fin n) (h0 : ev (w i₀) ≠ 0)
+    : IntermediateField.adjoin K (Set.range fun i => ev (w i) / ev (w i₀)) = ⊤ := by
   set F := IntermediateField.adjoin K (Set.range fun i => ev (w i) / ev (w i₀)) with hF
   have key : ∀ v, ev v / ev (w i₀) ∈ F := fun v => by
     have hv : v ∈ Submodule.span K (Set.range w) := hs ▸ Submodule.mem_top
@@ -46,7 +57,8 @@ theorem adjoin_ratios {K V Ω : Type} [Field K] [AddCommGroup V] [Module K V] [F
     | mem x hx =>
       obtain ⟨i, rfl⟩ := hx
       exact IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [map_add (f := _), add_div]
       exact F.add_mem hx hy
@@ -62,8 +74,12 @@ theorem adjoin_ratios {K V Ω : Type} [Field K] [AddCommGroup V] [Module K V] [F
     rw [this]
     exact F.div_mem (key v) (key v')
 
-theorem vV_pow {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
-    [IsFractionRing V K'] {x : K'} (hx : x ≠ 0) (n : ℕ) : vV V (x ^ n) = (n : ℤ) * vV V x := by
+theorem vV_pow
+    {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
+    [IsFractionRing V K']
+    {x : K'} (hx : x ≠ 0)
+    (n : ℕ)
+    : vV V (x ^ n) = (n : ℤ) * vV V x := by
   induction n with
   | zero => simp [vV]
   | succ n ih =>
@@ -71,8 +87,12 @@ theorem vV_pow {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing 
     push_cast
     ring
 
-theorem nval_le_of_mul {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
-    [IsFractionRing V K'] (e : ℕ) {x y : K'} (hx : x ≠ 0) (hy : 0 ≤ vV V y) : nval V e x ≤ nval V e (y * x) := by
+theorem nval_le_of_mul
+    {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K'] [Algebra V K']
+    [IsFractionRing V K']
+    (e : ℕ)
+    {x y : K'} (hx : x ≠ 0) (hy : 0 ≤ vV V y)
+    : nval V e x ≤ nval V e (y * x) := by
   by_cases h : y = 0
   · rw [h, zero_mul, nval_zero]
     exact le_top
@@ -83,8 +103,10 @@ theorem nval_le_of_mul {V K' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuat
 
 section Main
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l}
 
 theorem intAll_all (Xo : Moduli Dw l) (c : Coeff l) : Formalism.L2.PjFree.IntAll Xo c := by
   obtain ⟨⟨-, -, -, -, hA, hBC⟩, -⟩ := GlobalTheory.Exist.frame_laws_of_moduli E H Dw l Xo c
@@ -93,36 +115,43 @@ theorem intAll_all (Xo : Moduli Dw l) (c : Coeff l) : Formalism.L2.PjFree.IntAll
     · exact GlobalTheory.RankZeroFrames.intFrExt_of_rank_zero E H Dw l Xo c h
     · exact GlobalTheory.AnyLevelFrame.intFrExt E H Dw l Xo c h
   have hB : FrBaseChg Xo c := fun S S' _ _ _ _ φ y =>
-    GlobalTheory.Frames.FramedBaseChange.exists_frMap GlobalTheory.lawsFieldsSeparately.2.1 E H Dw l Xo c S S' φ y
+    GlobalTheory.Frames.FramedBaseChange.exists_frMap GlobalTheory.lawsFieldsSeparately.2.1 E H Dw l
+      Xo c S S' φ y
   exact intAll_of_allTest hE hB hA
 
-theorem evR_test {g : Rul Xo c}
-    (hg : IsNatural (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) g) {L : Type} [CommRing L]
-    [Algebra c.F L] (p : TRing c.F) (χ : p.R →ₐ[c.F] L) (u : FrPt Xo c p.R) (z : FrPt Xo c L) (hz : FrMap χ u z) :
-    evR Xo c g z = χ (g p u) := by
+theorem evR_test
+    {g : Rul Xo c}
+    (hg : IsNatural (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) g)
+    {L : Type} [CommRing L] [Algebra c.F L]
+    (p : TRing c.F) (χ : p.R →ₐ[c.F] L) (u : FrPt Xo c p.R)
+    (z : FrPt Xo c L) (hz : FrMap χ u z)
+    : evR Xo c g z = χ (g p u) := by
   obtain ⟨⟨-, hC, -, -, -, -⟩, -⟩ := GlobalTheory.Exist.frame_laws_of_moduli E H Dw l Xo c
   have hWD := evalWD_fr hC
-  have hft : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) z := ⟨p, χ, u, hz⟩
+  have hft : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) z :=
+    ⟨p, χ, u, hz⟩
   unfold evR evalAt
   rw [dite_eq_left hft]
   exact hWD g hg L _ p _ χ _ u z hft.choose_spec.choose_spec.choose_spec hz
 
-theorem evR_bor {e : Ix Dw → ℤ} {g : Rul Xo c} (hg : g ∈ secZ Xo c e) {L : Type} [Field L] [Algebra c.F L]
-    (p : TRing c.F) (χ : p.R →ₐ[c.F] L) (u : FrPt Xo c p.R) (z w : FrPt Xo c L) (hz : FrMap χ u z)
-    (t : Ix Dw → Lˣ) (hb : FrBor t z w) :
-    evR Xo c g w = ((∏ i, t i ^ e i : Lˣ) : L) * χ (g p u) := by
+theorem evR_bor
+    {e : Ix Dw → ℤ} {g : Rul Xo c} (hg : g ∈ secZ Xo c e)
+    {L : Type} [Field L] [Algebra c.F L]
+    (p : TRing c.F) (χ : p.R →ₐ[c.F] L) (u : FrPt Xo c p.R)
+    (z w : FrPt Xo c L) (hz : FrMap χ u z)
+    (t : Ix Dw → Lˣ) (hb : FrBor t z w)
+    : evR Xo c g w = ((∏ i, t i ^ e i : Lˣ) : L) * χ (g p u) := by
   obtain ⟨⟨-, -, hB, -, hA, -⟩, -⟩ := GlobalTheory.Exist.frame_laws_of_moduli E H Dw l Xo c
   rw [← evR_test hg.1 p χ u z hz]
-  exact GlobalTheory.CompanionTheory.Ar.Rec.FinRd.evalAt_bor_zpow hB e hg.1 hg.2 L t z w (hA L z) (hA L w) hb
+  exact GlobalTheory.CompanionTheory.Ar.Rec.FinRd.evalAt_bor_zpow hB e hg.1 hg.2 L t z w (hA L z)
+    (hA L w) hb
 
-theorem prod_exZ_nsmul {M : Type} [CommGroup M] (t : Ix Dw → M) (G : WTZ E) (n : ℕ) :
-    ∏ i, t i ^ exZ Dw (n • G) i = (∏ i, t i ^ exZ Dw G i) ^ n := by
+theorem prod_exZ_nsmul {M : Type} [CommGroup M] (t : Ix Dw → M) (G : WTZ E) (n : ℕ)
+    : ∏ i, t i ^ exZ Dw (n • G) i = (∏ i, t i ^ exZ Dw G i) ^ n := by
   rw [← Finset.prod_pow]
   refine Finset.prod_congr rfl fun i _ => ?_
-  have : exZ Dw (n • G) i = exZ Dw G i * n := by
-    cases i <;> simp [exZ, mul_comm]
+  have : exZ Dw (n • G) i = exZ Dw G i * n := by cases i <;> simp [exZ, mul_comm]
   rw [this, zpow_mul, zpow_natCast]
-
 
 end Main
 

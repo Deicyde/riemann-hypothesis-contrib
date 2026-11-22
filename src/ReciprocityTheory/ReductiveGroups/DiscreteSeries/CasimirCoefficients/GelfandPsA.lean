@@ -192,8 +192,8 @@ lemma opPow_tele {V : Set (Matrix (Fin n) (Fin n) ℂ)} (hV : IsOpen V)
       _ = _ := tele_alg P Q hQP
           (fun c' d' c d => Lhol (M c' d') (opPow (fun a b => Lhol (M a b)) k c d f) z) a b
 
-def conjLE (A B : Matrix (Fin n) (Fin n) ℂ) (hAB : A * B = 1) (hBA : B * A = 1) :
-    Matrix (Fin n) (Fin n) ℂ ≃ₗ[ℂ] Matrix (Fin n) (Fin n) ℂ where
+def conjLE (A B : Matrix (Fin n) (Fin n) ℂ) (hAB : A * B = 1) (hBA : B * A = 1)
+    : Matrix (Fin n) (Fin n) ℂ ≃ₗ[ℂ] Matrix (Fin n) (Fin n) ℂ where
   toFun z := A * z * B
   invFun z := B * z * A
   map_add' x y := by simp [Matrix.mul_add, Matrix.add_mul]
@@ -235,25 +235,29 @@ lemma opPow_conj (M : Fin n → Fin n → Matrix (Fin n) (Fin n) ℂ) (A B : Mat
     rw [ih c b]
     exact lhol_conj A B hAB hBA (M a c) (opPow (fun a b => Lhol (A * M a b * B)) k c b f) y
 
-theorem gelfand_conj {V : Set (Matrix (Fin n) (Fin n) ℂ)} (hV : IsOpen V)
-    (M : Fin n → Fin n → Matrix (Fin n) (Fin n) ℂ) (A B : Matrix (Fin n) (Fin n) ℂ)
-    (hAB : A * B = 1) (hBA : B * A = 1) (P Q : Matrix (Fin n) (Fin n) ℂ)
-    (hN : ∀ a b, A * M a b * B = ∑ c, ∑ d, (P a c * Q d b) • M c d) (hPQ : P * Q = 1) (hQP : Q * P = 1)
-    {f : Matrix (Fin n) (Fin n) ℂ → E} (hf : ContDiffOn ℂ ∞ f V) (m : ℕ) {z : Matrix (Fin n) (Fin n) ℂ}
-    (hz : A * z * B ∈ V) :
-    opGelfand (fun a b => Lhol (M a b)) m (fun y => f (A * y * B)) z =
-      opGelfand (fun a b => Lhol (M a b)) m f (A * z * B) := by
+theorem gelfand_conj
+    {V : Set (Matrix (Fin n) (Fin n) ℂ)} (hV : IsOpen V)
+    (M : Fin n → Fin n → Matrix (Fin n) (Fin n) ℂ)
+    (A B : Matrix (Fin n) (Fin n) ℂ) (hAB : A * B = 1) (hBA : B * A = 1)
+    (P Q : Matrix (Fin n) (Fin n) ℂ) (hN : ∀ a b, A * M a b * B = ∑ c, ∑ d, (P a c * Q d b) • M c d)
+    (hPQ : P * Q = 1) (hQP : Q * P = 1)
+    {f : Matrix (Fin n) (Fin n) ℂ → E} (hf : ContDiffOn ℂ ∞ f V)
+    (m : ℕ)
+    {z : Matrix (Fin n) (Fin n) ℂ} (hz : A * z * B ∈ V)
+    : opGelfand (fun a b => Lhol (M a b)) m (fun y => f (A * y * B)) z
+      = opGelfand (fun a b => Lhol (M a b)) m f (A * z * B) := by
   unfold opGelfand
   simp only [Finset.sum_apply]
-  calc ∑ a, opPow (fun a b => Lhol (M a b)) m a a (fun y => f (A * y * B)) z
-      = ∑ a, opPow (fun a b => Lhol (A * M a b * B)) m a a f (A * z * B) := by
-        refine Finset.sum_congr rfl fun a _ => ?_
-        rw [opPow_conj M A B hAB hBA f m a a]
+  calc
+    ∑ a, opPow (fun a b => Lhol (M a b)) m a a (fun y => f (A * y * B)) z
+        = ∑ a, opPow (fun a b => Lhol (A * M a b * B)) m a a f (A * z * B) := by
+      refine Finset.sum_congr rfl fun a _ => ?_
+      rw [opPow_conj M A B hAB hBA f m a a]
     _ = ∑ a, ∑ c, ∑ d, (P a c * Q d a) • opPow (fun a b => Lhol (M a b)) m c d f (A * z * B) := by
-        refine Finset.sum_congr rfl fun a _ => ?_
-        exact opPow_tele hV M (fun a b => A * M a b * B) P Q hN hPQ hQP hf m a a (A * z * B) hz
+      refine Finset.sum_congr rfl fun a _ => ?_
+      exact opPow_tele hV M (fun a b => A * M a b * B) P Q hN hPQ hQP hf m a a (A * z * B) hz
     _ = ∑ c, opPow (fun a b => Lhol (M a b)) m c c f (A * z * B) :=
-        gel_alg P Q hQP (fun c d => opPow (fun a b => Lhol (M a b)) m c d f (A * z * B))
+      gel_alg P Q hQP (fun c d => opPow (fun a b => Lhol (M a b)) m c d f (A * z * B))
 
 end GPs
 

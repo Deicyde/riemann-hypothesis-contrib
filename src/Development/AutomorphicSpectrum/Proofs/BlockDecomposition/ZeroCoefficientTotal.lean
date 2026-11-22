@@ -7,34 +7,38 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FockTran
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.ThTot
 
 variable {D : D7} {p : ℕ}
 
-theorem mx_zero_subsingleton : Subsingleton (Mx D 0 p) :=
-  ⟨fun _ _ => funext fun i => i.elim0⟩
+theorem mx_zero_subsingleton : Subsingleton (Mx D 0 p) := ⟨fun _ _ => funext fun i => i.elim0⟩
 
 theorem one_mem_schwartzA_zero (θ : InfFam D) : (fun _ => 1 : Mx D 0 p → ℂ) ∈ schwartzA θ 0 p := by
   refine Submodule.subset_span ?_
-  let f : SchwartzMap (D.what₂.Tau → Fin 0 → Fin p → ℂ) ℂ :=
-    { toFun := fun _ => 1
-      smooth' := contDiff_const
-      decay' := by
-        intro k n
-        refine ⟨1, fun x => ?_⟩
-        have hx : x = 0 := Subsingleton.elim _ _
-        subst hx
-        rcases k with _ | k
-        · rcases n with _ | n
-          · simp
-          · simp [iteratedFDeriv_const_of_ne (Nat.succ_ne_zero n)]
-        · simp }
+  let f : SchwartzMap (D.what₂.Tau → Fin 0 → Fin p → ℂ) ℂ := {
+    toFun := fun _ => 1
+    smooth' := contDiff_const
+    decay' := by
+      intro k n
+      refine ⟨1, fun x => ?_⟩
+      have hx : x = 0 := Subsingleton.elim _ _
+      subst hx
+      rcases k with _ | k
+      · rcases n with _ | n
+        · simp
+        · simp [iteratedFDeriv_const_of_ne (Nat.succ_ne_zero n)]
+      · simp
+  }
   refine ⟨f, fun _ => 1, ⟨IsLocallyConstant.const 1, ?_⟩, ?_⟩
   · exact (Set.subsingleton_of_subsingleton).isCompact
   · funext x
@@ -44,8 +48,10 @@ theorem pr_zero (b₀ : HermE D 0) (x y : Mx D 0 p) : pr b₀ x y = 0 := by
   ext i j
   simp [pr, HMul.hMul]
 
-theorem isTh_one {μ : Measure (Mx D 0 p)} (h1 : μ Set.univ = 1) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D)
-    (b₀ : HermE D 0) : IsTh ψ 1 θ b₀ μ (fun _ _ => 1) := by
+theorem isTh_one
+    {μ : Measure (Mx D 0 p)} (h1 : μ Set.univ = 1)
+    (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (b₀ : HermE D 0)
+    : IsTh ψ 1 θ b₀ μ (fun _ _ => 1) := by
   have : IsProbabilityMeasure μ := ⟨h1⟩
   refine ⟨fun _ => one_mem_schwartzA_zero θ, continuous_const, ?_, ?_, ?_, ?_⟩
   · intro C _

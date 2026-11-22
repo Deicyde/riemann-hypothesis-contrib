@@ -8,12 +8,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
 
-theorem UpperTheory.V.Chr.factorGS :
-    ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (N : ℕ) [NeZero N] (e : ℕ) (ψ : G k Ω →* Oˣ), (cls k Ω N).ker ≤ ψ.ker →
-          ∀ S : Set (HeightOneSpectrum (𝓞 k)), S = Above k (l * N) →
-          ∃ θ : GS Ω S →* Oˣ, θ.comp (toGS Ω S) = (Psi l e ψ)⁻¹ ∧ ContAction (twist₂ l θ) := by
+theorem UpperTheory.V.Chr.factorGS
+    : ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (l : ℕ)
+        [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (N : ℕ) [NeZero N] (e : ℕ) (ψ : G k Ω →* Oˣ),
+      (cls k Ω N).ker ≤ ψ.ker
+        → ∀ S : Set (HeightOneSpectrum (𝓞 k)),
+          S = Above k (l * N)
+            → ∃ θ : GS Ω S →* Oˣ, θ.comp (toGS Ω S) = (Psi l e ψ)⁻¹ ∧ ContAction (twist₂ l θ) := by
   intro k Ω _ _ _ _ _ l _ O _ _ _ _ _ N _ e ψ hker S hS
   have hψopen : IsOpen (ψ.ker : Set (G k Ω)) := Subgroup.isOpen_mono hker (clsFacts k Ω N).1
   have hcyc : IsClosed ((cycZ k Ω l).ker : Set (G k Ω)) := by
@@ -21,7 +26,8 @@ theorem UpperTheory.V.Chr.factorGS :
     exact isClosed_singleton.preimage (contTw k Ω l).1
   have hNS : NS Ω S ≤ ψ.ker ⊓ (cycZ k Ω l).ker := by
     unfold NS
-    refine Subgroup.topologicalClosure_minimal _ ?_ ((Subgroup.isClosed_of_isOpen _ hψopen).inter hcyc)
+    refine Subgroup.topologicalClosure_minimal _ ?_
+      ((Subgroup.isClosed_of_isOpen _ hψopen).inter hcyc)
     refine Subgroup.normalClosure_le_normal ?_
     intro σ hσ
     simp only [Set.mem_iUnion, Set.mem_setOf_eq] at hσ
@@ -58,5 +64,6 @@ theorem UpperTheory.V.Chr.factorGS :
   have hG := (contTw k Ω l).2.2 O ψ⁻¹ (-(e : ℤ)) hopen
   rw [← heq] at hG
   unfold ReciprocityTheory.Gal.ContAction at hG ⊢
-  rw [← ((QuotientGroup.isOpenQuotientMap_mk (N := NS Ω S)).prodMap (IsOpenQuotientMap.id (X := QO l O))).continuous_comp_iff]
+  rw [← ((QuotientGroup.isOpenQuotientMap_mk (N := NS Ω S)).prodMap
+    (IsOpenQuotientMap.id (X := QO l O))).continuous_comp_iff]
   exact hG

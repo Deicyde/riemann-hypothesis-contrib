@@ -24,7 +24,8 @@ end
 
 section
 
-variable {R' R : LAlg R₀} {π : LHom R' R} {ξ : (R' : Type u)}
+variable
+  {R' R : LAlg R₀} {π : LHom R' R} {ξ : (R' : Type u)}
   (hsurj : Function.Surjective π.1) (hker : RingHom.ker π.1 = Ideal.span {ξ}) (hsq : ξ * ξ = 0)
 
 include hker in
@@ -82,7 +83,8 @@ end
 
 section
 
-variable {R' R : LAlg R₀} (π : LHom R' R) (Dp : DualPair R) (ξ : (R' : Type u))
+variable
+  {R' R : LAlg R₀} (π : LHom R' R) (Dp : DualPair R) (ξ : (R' : Type u))
   (hsurj : Function.Surjective π.1) (hker : RingHom.ker π.1 = Ideal.span {ξ}) (hsq : ξ * ξ = 0)
 
 def smAlg : (FP π Dp.π : Type u) →ₐ[R₀] (R' : Type u) where
@@ -103,17 +105,23 @@ def smAlg : (FP π Dp.π : Type u) →ₐ[R₀] (R' : Type u) where
   map_add' x y := by
     show (x.1.1 + y.1.1) + ell π ξ hsurj (Dp.κ (x.1.2 + y.1.2)) =
       (x.1.1 + ell π ξ hsurj (Dp.κ x.1.2)) + (y.1.1 + ell π ξ hsurj (Dp.κ y.1.2))
-    rw [Dp.κ_add, ell_add hsurj hker hsq]; ring
+    rw [Dp.κ_add, ell_add hsurj hker hsq]
+    ring
   commutes' c := by
     show algebraMap R₀ (R' : Type u) c + ell π ξ hsurj (Dp.κ (algebraMap R₀ (Dp.D : Type u) c)) =
       algebraMap R₀ (R' : Type u) c
     rw [Dp.κ_algebraMap, ell_zero hsurj hker hsq, add_zero]
 
-def sm : LHom (FP π Dp.π) R' :=
-  ⟨smAlg π Dp ξ hsurj hker hsq, ⟨fun x hx => fp_isUnit π Dp.π x (π.2.map_nonunit _ (by
-    convert hx.map π.1 using 1
-    show _ = π.1 (x.1.1 + ell π ξ hsurj (Dp.κ x.1.2))
-    rw [map_add (f := _), ell_π hsurj hker, add_zero]; rfl))⟩⟩
+def sm : LHom (FP π Dp.π) R' := ⟨
+  smAlg π Dp ξ hsurj hker hsq,
+  ⟨fun x hx =>
+    fp_isUnit π Dp.π x
+      (π.2.map_nonunit _ (by
+        convert hx.map π.1 using 1
+        show _ = π.1 (x.1.1 + ell π ξ hsurj (Dp.κ x.1.2))
+        rw [map_add (f := _), ell_π hsurj hker, add_zero]
+        rfl))⟩
+⟩
 
 lemma π_comp_sm : π.comp (sm π Dp ξ hsurj hker hsq) = π.comp (FP.p₁ π Dp.π) := by
   apply Subtype.ext
@@ -173,8 +181,9 @@ lemma p₂_ker : ∀ a ∈ (FP.p₁ π Dp.π).ker, (FP.p₂ π Dp.π).1.toLinear
   show Dp.π.1 a.1.2 = 0
   rw [← FP.mem π Dp.π a, ha0, map_zero]
 
-variable {ξ : (R' : Type u)} (hsurj : Function.Surjective π.1)
-  (hker : RingHom.ker π.1 = Ideal.span {ξ}) (hsq : ξ * ξ = 0)
+variable
+  {ξ : (R' : Type u)}
+  (hsurj : Function.Surjective π.1) (hker : RingHom.ker π.1 = Ideal.span {ξ}) (hsq : ξ * ξ = 0)
 
 lemma sm_ker : ∀ a ∈ (FP.p₁ π Dp.π).ker, (sm π Dp ξ hsurj hker hsq).1.toLinearMap a ∈ π.ker := by
   intro a ha

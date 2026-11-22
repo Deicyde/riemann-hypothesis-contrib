@@ -8,7 +8,12 @@ public import Formalism.LocalToGlobal.Columns.GenericUnipotentCharacter
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem
+  GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
@@ -26,10 +31,10 @@ variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
 local notation3 "L⁺" => NumberField.maximalRealSubfield L
 
-theorem algHom_eq_or_conj {F : Type} [Field F] [Algebra L⁺ F] (φ ψ : L →ₐ[L⁺] F) :
-    φ = ψ ∨ ∀ x, φ x = ψ (IsCMField.complexConj L x) := by
-  have cc : ∀ x : L, IsCMField.complexConj L (IsCMField.complexConj L x) = x :=
-    fun x => IsCMField.complexConj_apply_apply L x
+theorem algHom_eq_or_conj {F : Type} [Field F] [Algebra L⁺ F] (φ ψ : L →ₐ[L⁺] F)
+    : φ = ψ ∨ ∀ x, φ x = ψ (IsCMField.complexConj L x) := by
+  have cc : ∀ x : L, IsCMField.complexConj L (IsCMField.complexConj L x) = x := fun x =>
+    IsCMField.complexConj_apply_apply L x
   have fix : ∀ z : L, IsCMField.complexConj L z = z → φ z = ψ z := by
     intro z hz
     have hm := (IsCMField.complexConj_eq_self_iff L z).1 hz
@@ -42,32 +47,45 @@ theorem algHom_eq_or_conj {F : Type} [Field F] [Algebra L⁺ F] (φ ψ : L →�
     obtain ⟨a, ha⟩ := DFunLike.ne_iff.mp (IsCMField.complexConj_ne_one L)
     exact ⟨a, ha⟩
   set y := x0 - IsCMField.complexConj L x0 with hy
-  have hyc : IsCMField.complexConj L y = -y := by
-    rw [hy, map_sub, cc]; ring
-  have hy0 : y ≠ 0 := by
-    intro h; apply hx0; rw [hy, sub_eq_zero] at h; exact h.symm
+  have hyc : IsCMField.complexConj L y = -y := by rw [hy, map_sub, cc]; ring
+  have hy0 : y ≠ 0 := by intro h; apply hx0; rw [hy, sub_eq_zero] at h; exact h.symm
   have hyy : φ y * φ y = ψ y * ψ y := by
     rw [← map_mul, ← map_mul]
     exact fix _ (by rw [map_mul, hyc]; ring)
-  have fp : ∀ x : L, IsCMField.complexConj L (x + IsCMField.complexConj L x) = x + IsCMField.complexConj L x := by
+  have fp
+      : ∀ x : L,
+        IsCMField.complexConj L (x + IsCMField.complexConj L x)
+          = x + IsCMField.complexConj L x := by
     intro x; rw [map_add (f := _), cc, add_comm]
-  have fq : ∀ x : L, IsCMField.complexConj L ((x - IsCMField.complexConj L x) * y⁻¹) =
-      (x - IsCMField.complexConj L x) * y⁻¹ := by
+  have fq
+      : ∀ x : L,
+        IsCMField.complexConj L ((x - IsCMField.complexConj L x) * y⁻¹)
+          = (x - IsCMField.complexConj L x) * y⁻¹ := by
     intro x; rw [map_mul, map_inv₀, hyc, map_sub, cc]; ring_nf
   have two : ∀ (χ : L →ₐ[L⁺] F), χ (2 : L) = 2 := fun χ => map_ofNat χ 2
-  have dec : ∀ (χ : L →ₐ[L⁺] F) (x : L), 2 * χ x = χ (x + IsCMField.complexConj L x) +
-      χ ((x - IsCMField.complexConj L x) * y⁻¹) * χ y := by
+  have dec
+      : ∀ (χ : L →ₐ[L⁺] F) (x : L),
+        2 * χ x
+          = χ (x + IsCMField.complexConj L x)
+            + χ ((x - IsCMField.complexConj L x) * y⁻¹) * χ y := by
     intro χ x
-    calc 2 * χ x = χ (2 * x) := by rw [map_mul, two]
+    calc
+      2 * χ x
+        = χ (2 * x) := by rw [map_mul, two]
       _ = χ ((x + IsCMField.complexConj L x) + ((x - IsCMField.complexConj L x) * y⁻¹) * y) := by
-          congr 1; field_simp; ring
+        congr 1; field_simp; ring
       _ = _ := by rw [map_add (f := _), map_mul]
-  have decc : ∀ (χ : L →ₐ[L⁺] F) (x : L), 2 * χ (IsCMField.complexConj L x) = χ (x + IsCMField.complexConj L x) -
-      χ ((x - IsCMField.complexConj L x) * y⁻¹) * χ y := by
+  have decc
+      : ∀ (χ : L →ₐ[L⁺] F) (x : L),
+        2 * χ (IsCMField.complexConj L x)
+          = χ (x + IsCMField.complexConj L x)
+            - χ ((x - IsCMField.complexConj L x) * y⁻¹) * χ y := by
     intro χ x
-    calc 2 * χ (IsCMField.complexConj L x) = χ (2 * IsCMField.complexConj L x) := by rw [map_mul, two]
+    calc
+      2 * χ (IsCMField.complexConj L x)
+        = χ (2 * IsCMField.complexConj L x) := by rw [map_mul, two]
       _ = χ ((x + IsCMField.complexConj L x) - ((x - IsCMField.complexConj L x) * y⁻¹) * y) := by
-          congr 1; field_simp; ring
+        congr 1; field_simp; ring
       _ = _ := by rw [map_sub, map_mul]
   have hfac : (φ y - ψ y) * (φ y + ψ y) = 0 := by linear_combination hyy
   rcases mul_eq_zero.1 hfac with h | h
@@ -79,73 +97,123 @@ theorem algHom_eq_or_conj {F : Type} [Field F] [Algebra L⁺ F] (φ ψ : L →�
   · right
     intro x
     have e1 := dec φ x
-    rw [fix _ (fp x), fix _ (fq x), show φ y = -ψ y from eq_neg_of_add_eq_zero_left h] at e1
+    rw [fix _ (fp x), fix _ (fq x), show φ y = - ψ y from eq_neg_of_add_eq_zero_left h] at e1
     have : 2 * φ x = 2 * ψ (IsCMField.complexConj L x) := by rw [e1, decc ψ x]; ring
     exact mul_left_cancel₀ h2 this
 
-theorem proj_conj {v : HeightOneSpectrum (𝓞 L⁺)} (i j : L →ₐ[L⁺] v.adicCompletion L⁺)
-    (hij : ∀ x, j x = i (IsCMField.complexConj L x)) (x : AL L) :
-    (SplitPlace.mk v j).proj x = (SplitPlace.mk v i).proj (conjAL L x) := by
+theorem proj_conj
+    {v : HeightOneSpectrum (𝓞 L⁺)}
+    (i j : L →ₐ[L⁺] v.adicCompletion L⁺) (hij : ∀ x, j x = i (IsCMField.complexConj L x))
+    (x : AL L)
+    : (SplitPlace.mk v j).proj x = (SplitPlace.mk v i).proj (conjAL L x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
-  | tmul a b =>
-    simp [SplitPlace.proj, conjAL, Algebra.TensorProduct.map_tmul, hij]
+  | tmul a b => simp [SplitPlace.proj, conjAL, Algebra.TensorProduct.map_tmul, hij]
   | add a b ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
 
-theorem loc_conj {v : HeightOneSpectrum (𝓞 L⁺)} (i j : L →ₐ[L⁺] v.adicCompletion L⁺)
-    (hij : ∀ x, j x = i (IsCMField.complexConj L x)) {n : ℕ} (κ : GAf L n) (a b : Fin n) :
-    (((SplitPlace.mk v j).loc n κ : GL (Fin n) (v.adicCompletion L⁺)) : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) a b =
-      (((SplitPlace.mk v i).loc n κ⁻¹ : GL (Fin n) (v.adicCompletion L⁺)) : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) b a := by
-  have e1 : (((SplitPlace.mk v j).loc n κ : GL (Fin n) (v.adicCompletion L⁺)) : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) a b =
-      (SplitPlace.mk v j).proj ((κ.1 : Matrix (Fin n) (Fin n) (AL L)) a b) := rfl
-  have e2 : (((SplitPlace.mk v i).loc n κ⁻¹ : GL (Fin n) (v.adicCompletion L⁺)) : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺)) b a =
-      (SplitPlace.mk v i).proj ((((κ⁻¹ : GAf L n).1 : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) b a) := rfl
+theorem loc_conj
+    {v : HeightOneSpectrum (𝓞 L⁺)}
+    (i j : L →ₐ[L⁺] v.adicCompletion L⁺) (hij : ∀ x, j x = i (IsCMField.complexConj L x))
+    {n : ℕ} (κ : GAf L n) (a b : Fin n)
+    : (((SplitPlace.mk v j).loc n κ : GL (Fin n) (v.adicCompletion L⁺))
+          : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺))
+        a b
+      = (((SplitPlace.mk v i).loc n κ⁻¹ : GL (Fin n) (v.adicCompletion L⁺))
+          : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺))
+        b a := by
+  have e1
+      : (((SplitPlace.mk v j).loc n κ : GL (Fin n) (v.adicCompletion L⁺))
+            : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺))
+          a b
+        = (SplitPlace.mk v j).proj ((κ.1 : Matrix (Fin n) (Fin n) (AL L)) a b) :=
+    rfl
+  have e2
+      : (((SplitPlace.mk v i).loc n κ⁻¹ : GL (Fin n) (v.adicCompletion L⁺))
+            : Matrix (Fin n) (Fin n) (v.adicCompletion L⁺))
+          b a
+        = (SplitPlace.mk v i).proj
+          ((((κ⁻¹ : GAf L n).1 : GL (Fin n) (AL L)) : Matrix (Fin n) (Fin n) (AL L)) b a) :=
+    rfl
   rw [e1, e2, GlobalTheory.FinTypCount.inv_val, proj_conj i j hij]
   rfl
 
-def resO (w : HeightOneSpectrum (𝓞 L⁺)) :
-    (w.adicCompletionIntegers L⁺).toSubring →+* IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺) :=
-  (IsLocalRing.residue (w.adicCompletionIntegers L⁺)).comp
-    { toFun := fun x => ⟨x.1, x.2⟩, map_one' := rfl, map_mul' := fun _ _ => rfl, map_zero' := rfl,
-      map_add' := fun _ _ => rfl }
+def resO (w : HeightOneSpectrum (𝓞 L⁺))
+    : (w.adicCompletionIntegers L⁺).toSubring
+      →+* IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺) :=
+  (IsLocalRing.residue (w.adicCompletionIntegers L⁺)).comp {
+    toFun := fun x => ⟨x.1, x.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
 
-theorem resO_eq_zero_iff {w : HeightOneSpectrum (𝓞 L⁺)} (x : (w.adicCompletionIntegers L⁺).toSubring) :
-    resO w x = 0 ↔ Valued.v (x : w.adicCompletion L⁺) < 1 := by
+theorem resO_eq_zero_iff
+    {w : HeightOneSpectrum (𝓞 L⁺)} (x : (w.adicCompletionIntegers L⁺).toSubring)
+    : resO w x = 0 ↔ Valued.v (x : w.adicCompletion L⁺) < 1 := by
   unfold resO
   rw [RingHom.comp_apply, IsLocalRing.residue_eq_zero_iff]
-  exact Valuation.mem_maximalIdeal_iff (v := (Valued.v : Valuation (w.adicCompletion L⁺) (WithZero (Multiplicative ℤ))))
+  exact Valuation.mem_maximalIdeal_iff
+    (v := (Valued.v : Valuation (w.adicCompletion L⁺) (WithZero (Multiplicative ℤ))))
 
-theorem intMap_injective {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ} : Function.Injective
-    (Formalism.UG.bc (w.adicCompletionIntegers L⁺).toSubring.subtype : GL (Fin n) (w.adicCompletionIntegers L⁺).toSubring →* GL (Fin n) (w.adicCompletion L⁺)) := by
+theorem intMap_injective {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ}
+    : Function.Injective
+      (Formalism.UG.bc (w.adicCompletionIntegers L⁺).toSubring.subtype
+        : GL (Fin n) (w.adicCompletionIntegers L⁺).toSubring
+          →* GL (Fin n) (w.adicCompletion L⁺)) := by
   intro g h e
   apply Units.ext
-  have := congrArg (fun u : GL (Fin n) (w.adicCompletion L⁺) => (u : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺))) e
+  have :=
+    congrArg
+      (fun u : GL (Fin n) (w.adicCompletion L⁺) =>
+        (u : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺)))
+      e
   exact Matrix.map_injective Subtype.val_injective this
 
-def intEquiv (w : HeightOneSpectrum (𝓞 L⁺)) (n : ℕ) :
-    GL (Fin n) (w.adicCompletionIntegers L⁺).toSubring ≃*
-      (Formalism.UG.bc (w.adicCompletionIntegers L⁺).toSubring.subtype : GL (Fin n) (w.adicCompletionIntegers L⁺).toSubring →* GL (Fin n) (w.adicCompletion L⁺)).range :=
+def intEquiv (w : HeightOneSpectrum (𝓞 L⁺)) (n : ℕ)
+    : GL (Fin n) (w.adicCompletionIntegers L⁺).toSubring
+      ≃* (Formalism.UG.bc (w.adicCompletionIntegers L⁺).toSubring.subtype
+        : GL (Fin n) (w.adicCompletionIntegers L⁺).toSubring
+          →* GL (Fin n) (w.adicCompletion L⁺)).range :=
   MonoidHom.ofInjective intMap_injective
 
-def intLoc {w : HeightOneSpectrum (𝓞 L⁺)} (i : L →ₐ[L⁺] w.adicCompletion L⁺) (n : ℕ) :
-    GlobalTheory.HeckeScalarSph.locK n w →* (Formalism.UG.bc (w.adicCompletionIntegers L⁺).toSubring.subtype : GL (Fin n) (w.adicCompletionIntegers L⁺).toSubring →* GL (Fin n) (w.adicCompletion L⁺)).range :=
+def intLoc {w : HeightOneSpectrum (𝓞 L⁺)} (i : L →ₐ[L⁺] w.adicCompletion L⁺) (n : ℕ)
+    : GlobalTheory.HeckeScalarSph.locK n w
+      →* (Formalism.UG.bc (w.adicCompletionIntegers L⁺).toSubring.subtype
+        : GL (Fin n) (w.adicCompletionIntegers L⁺).toSubring
+          →* GL (Fin n) (w.adicCompletion L⁺)).range :=
   (((SplitPlace.mk w i).loc n).comp (GlobalTheory.HeckeScalarSph.locK n w).subtype).codRestrict _
     (fun κ => (GlobalTheory.HeckeScalarSph.loc_mem_GLint_iff (SplitPlace.mk w i) κ.2.2).2 κ.2.1)
 
-def redLoc {w : HeightOneSpectrum (𝓞 L⁺)} (i : L →ₐ[L⁺] w.adicCompletion L⁺) (n : ℕ) :
-    GlobalTheory.HeckeScalarSph.locK n w →* GL (Fin n) (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) :=
+def redLoc {w : HeightOneSpectrum (𝓞 L⁺)} (i : L →ₐ[L⁺] w.adicCompletion L⁺) (n : ℕ)
+    : GlobalTheory.HeckeScalarSph.locK n w
+      →* GL (Fin n) (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) :=
   (Matrix.GeneralLinearGroup.map (resO w)).comp ((intEquiv w n).symm.toMonoidHom.comp (intLoc i n))
 
-theorem redLoc_eq_zero_iff {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ} (i : L →ₐ[L⁺] w.adicCompletion L⁺)
-    (κ : GlobalTheory.HeckeScalarSph.locK n w) (a b : Fin n) :
-    ((redLoc i n κ : GL (Fin n) (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺))) : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺))) a b = 0 ↔
-      Valued.v ((((SplitPlace.mk w i).loc n κ.1 : GL (Fin n) (w.adicCompletion L⁺)) : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺)) a b) < 1 := by
+theorem redLoc_eq_zero_iff
+    {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ}
+    (i : L →ₐ[L⁺] w.adicCompletion L⁺) (κ : GlobalTheory.HeckeScalarSph.locK n w) (a b : Fin n)
+    : ((redLoc i n κ : GL (Fin n) (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)))
+            : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)))
+          a b
+        = 0
+      ↔ Valued.v
+          ((((SplitPlace.mk w i).loc n κ.1 : GL (Fin n) (w.adicCompletion L⁺))
+              : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺))
+            a b)
+        < 1 := by
   set g := (intEquiv w n).symm (intLoc i n κ) with hg
-  have h1 : Formalism.UG.bc (w.adicCompletionIntegers L⁺).toSubring.subtype g = (SplitPlace.mk w i).loc n κ.1 := by
+  have h1
+      : Formalism.UG.bc (w.adicCompletionIntegers L⁺).toSubring.subtype g
+        = (SplitPlace.mk w i).loc n κ.1 := by
     have := congrArg Subtype.val ((intEquiv w n).apply_symm_apply (intLoc i n κ))
     exact this
-  have he : (((g : Matrix (Fin n) (Fin n) _) a b : (w.adicCompletionIntegers L⁺).toSubring) : w.adicCompletion L⁺) =
-      (((SplitPlace.mk w i).loc n κ.1 : GL (Fin n) (w.adicCompletion L⁺)) : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺)) a b := by
+  have he
+      : (((g : Matrix (Fin n) (Fin n) _) a b : (w.adicCompletionIntegers L⁺).toSubring)
+          : w.adicCompletion L⁺)
+        = (((SplitPlace.mk w i).loc n κ.1 : GL (Fin n) (w.adicCompletion L⁺))
+            : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺))
+          a b := by
     rw [← h1]; rfl
   show resO w ((g : Matrix (Fin n) (Fin n) _) a b) = 0 ↔ _
   rw [resO_eq_zero_iff, he]
@@ -154,14 +222,18 @@ def wLow (r : ℕ) : ℕ → ℕ := fun m => if m < r then 0 else 1
 
 def wUp (r : ℕ) : ℕ → ℕ := fun m => if m < r then 1 else 0
 
-theorem mem_low_iff {w : HeightOneSpectrum (𝓞 L⁺)} {n r : ℕ} (i : L →ₐ[L⁺] w.adicCompletion L⁺)
-    (κ : GlobalTheory.HeckeScalarSph.locK n w) :
-    redLoc i n κ ∈ Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wLow r) ↔
-      NG.ParaRT (SplitPlace.mk w i) r ((SplitPlace.mk w i).loc n κ.1) := by
+theorem mem_low_iff
+    {w : HeightOneSpectrum (𝓞 L⁺)} {n r : ℕ}
+    (i : L →ₐ[L⁺] w.adicCompletion L⁺) (κ : GlobalTheory.HeckeScalarSph.locK n w)
+    : redLoc i n κ ∈ Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wLow r)
+      ↔ NG.ParaRT (SplitPlace.mk w i) r ((SplitPlace.mk w i).loc n κ.1) := by
   rw [Col.mem_btG]
   constructor
   · intro h
-    refine ⟨(GlobalTheory.HeckeScalarSph.loc_mem_GLint_iff (SplitPlace.mk w i) κ.2.2).2 κ.2.1, fun a b ha hb => ?_⟩
+    refine ⟨
+      (GlobalTheory.HeckeScalarSph.loc_mem_GLint_iff (SplitPlace.mk w i) κ.2.2).2 κ.2.1,
+      fun a b ha hb => ?_
+    ⟩
     refine (redLoc_eq_zero_iff i κ a b).1 (h a b ?_)
     simp only [wLow]
     rw [if_pos hb, if_neg (Nat.not_lt.2 ha)]
@@ -172,12 +244,16 @@ theorem mem_low_iff {w : HeightOneSpectrum (𝓞 L⁺)} {n r : ℕ} (i : L →�
       split_ifs at hab <;> omega
     exact (redLoc_eq_zero_iff i κ a b).2 (h a b key.1 key.2)
 
-theorem mem_up_of {w : HeightOneSpectrum (𝓞 L⁺)} {n r : ℕ} (i j : L →ₐ[L⁺] w.adicCompletion L⁺)
+theorem mem_up_of
+    {w : HeightOneSpectrum (𝓞 L⁺)} {n r : ℕ} (i j : L →ₐ[L⁺] w.adicCompletion L⁺)
     (hij : ∀ x, j x = i (IsCMField.complexConj L x)) (κ : GlobalTheory.HeckeScalarSph.locK n w)
-    (hP : NG.ParaRT (SplitPlace.mk w j) r ((SplitPlace.mk w j).loc n κ.1)) :
-    redLoc i n κ ∈ Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wUp r) := by
+    (hP : NG.ParaRT (SplitPlace.mk w j) r ((SplitPlace.mk w j).loc n κ.1))
+    : redLoc i n κ
+      ∈ Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wUp r) := by
   obtain ⟨-, h⟩ := hP
-  have hinv : redLoc i n κ⁻¹ ∈ Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wUp r) := by
+  have hinv
+      : redLoc i n κ⁻¹
+        ∈ Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wUp r) := by
     rw [Col.mem_btG]
     intro a b hab
     have key : a.val < r ∧ r ≤ b.val := by
@@ -189,13 +265,14 @@ theorem mem_up_of {w : HeightOneSpectrum (𝓞 L⁺)} {n r : ℕ} (i j : L →�
   have := Subgroup.inv_mem _ hinv
   rwa [← map_inv, inv_inv] at this
 
-def restr {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ} (θ : GAf L n ≃* GAf L n) (hθ : FrameAut θ) :
-    GlobalTheory.HeckeScalarSph.locK n w →* GlobalTheory.HeckeScalarSph.locK n w :=
+def restr {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ} (θ : GAf L n ≃* GAf L n) (hθ : FrameAut θ)
+    : GlobalTheory.HeckeScalarSph.locK n w →* GlobalTheory.HeckeScalarSph.locK n w :=
   (θ.toMonoidHom.comp (GlobalTheory.HeckeScalarSph.locK n w).subtype).codRestrict _ fun κ =>
     show θ κ.1 ∈ Umax L n ∧ TrivOutside {w} (θ κ.1) from ⟨(hθ.1 κ.1).2 κ.2.1, (hθ.2 w κ.1).2 κ.2.2⟩
 
-theorem restr_surjective {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ} (θ : GAf L n ≃* GAf L n) (hθ : FrameAut θ) :
-    Function.Surjective (restr (w := w) θ hθ) := by
+theorem restr_surjective
+    {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ} (θ : GAf L n ≃* GAf L n) (hθ : FrameAut θ)
+    : Function.Surjective (restr (w := w) θ hθ) := by
   intro y
   have hx : θ.symm y.1 ∈ GlobalTheory.HeckeScalarSph.locK n w := by
     have h1 := y.2.1
@@ -204,12 +281,16 @@ theorem restr_surjective {w : HeightOneSpectrum (𝓞 L⁺)} {n : ℕ} (θ : GAf
     exact ⟨(hθ.1 _).1 h1, (hθ.2 w _).1 h2⟩
   exact ⟨⟨_, hx⟩, Subtype.ext (θ.apply_symm_apply y.1)⟩
 
-theorem core {w : HeightOneSpectrum (𝓞 L⁺)} (i j : L →ₐ[L⁺] w.adicCompletion L⁺)
-    (hij : ∀ x, j x = i (IsCMField.complexConj L x)) {n r : ℕ} (hr0 : 0 < r) (hrn : r < n)
+theorem core
+    {w : HeightOneSpectrum (𝓞 L⁺)}
+    (i j : L →ₐ[L⁺] w.adicCompletion L⁺) (hij : ∀ x, j x = i (IsCMField.complexConj L x))
+    {n r : ℕ} (hr0 : 0 < r) (hrn : r < n)
     {θ : GAf L n ≃* GAf L n} (hθ : FrameAut θ)
-    (H : ∀ κ, TrivOutside {w} κ → NG.ParaRT (SplitPlace.mk w i) r ((SplitPlace.mk w i).loc n κ) →
-      NG.ParaRT (SplitPlace.mk w i) r ((SplitPlace.mk w i).loc n (θ κ)) ∧
-        NG.ParaRT (SplitPlace.mk w j) r ((SplitPlace.mk w j).loc n (θ κ))) : False := by
+    (H : ∀ κ,
+      TrivOutside {w} κ → NG.ParaRT (SplitPlace.mk w i) r ((SplitPlace.mk w i).loc n κ)
+        → NG.ParaRT (SplitPlace.mk w i) r ((SplitPlace.mk w i).loc n (θ κ))
+          ∧ NG.ParaRT (SplitPlace.mk w j) r ((SplitPlace.mk w j).loc n (θ κ)))
+    : False := by
   classical
   haveI : Finite (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) := Formalism.UG.P.tjcosets_finite w
   set A := (Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wLow r)).comap (redLoc i n) with hA
@@ -245,17 +326,24 @@ theorem core {w : HeightOneSpectrum (𝓞 L⁺)} (i j : L →ₐ[L⁺] w.adicCom
     have := congrArg Fin.val h
     simp [hi0, hir] at this
     omega
-  let u : GL (Fin n) (w.adicCompletion L⁺) :=
-    ⟨Matrix.transvection i0 ir 1, Matrix.transvection i0 ir (-1),
-      by rw [Matrix.transvection_mul_transvection_same _ _ hne]; simp,
-      by rw [Matrix.transvection_mul_transvection_same _ _ hne]; simp⟩
-  have hent : ∀ (c : w.adicCompletion L⁺) (a b : Fin n), Matrix.transvection i0 ir c a b =
-      (if a = b then 1 else 0) + (if i0 = a ∧ ir = b then c else 0) := by
+  let u : GL (Fin n) (w.adicCompletion L⁺) := ⟨
+    Matrix.transvection i0 ir 1,
+    Matrix.transvection i0 ir (-1),
+    by rw [Matrix.transvection_mul_transvection_same _ _ hne]; simp,
+    by rw [Matrix.transvection_mul_transvection_same _ _ hne]; simp
+  ⟩
+  have hent
+      : ∀ (c : w.adicCompletion L⁺) (a b : Fin n),
+        Matrix.transvection i0 ir c a b
+          = (if a = b then 1 else 0) + (if i0 = a ∧ ir = b then c else 0) := by
     intro c a b
     show (1 + Matrix.single i0 ir c) a b = _
     rw [Matrix.add_apply, Matrix.one_apply, Matrix.single_apply]
-  have hint : ∀ (c : w.adicCompletion L⁺), c ∈ (w.adicCompletionIntegers L⁺).toSubring → ∀ a b : Fin n,
-      Matrix.transvection i0 ir c a b ∈ (w.adicCompletionIntegers L⁺).toSubring := by
+  have hint
+      : ∀ (c : w.adicCompletion L⁺),
+        c ∈ (w.adicCompletionIntegers L⁺).toSubring
+          → ∀ a b : Fin n,
+            Matrix.transvection i0 ir c a b ∈ (w.adicCompletionIntegers L⁺).toSubring := by
     intro c hc a b
     rw [hent]
     refine Subring.add_mem _ ?_ ?_
@@ -266,9 +354,11 @@ theorem core {w : HeightOneSpectrum (𝓞 L⁺)} (i j : L →ₐ[L⁺] w.adicCom
       · exact hc
       · exact Subring.zero_mem _
   have hu : u ∈ Formalism.UG.GLint (Fin n) (w.adicCompletionIntegers L⁺).toSubring :=
-    GlobalTheory.HeckeScalarSph.mem_GLint_iff.2 ⟨hint 1 (Subring.one_mem _), hint (-1) (Subring.neg_mem _ (Subring.one_mem _))⟩
+    GlobalTheory.HeckeScalarSph.mem_GLint_iff.2
+      ⟨hint 1 (Subring.one_mem _), hint (-1) (Subring.neg_mem _ (Subring.one_mem _))⟩
   obtain ⟨x, hx, hxu⟩ := GlobalTheory.SplitLift.exists_trivOutside_loc_eq n (SplitPlace.mk w i) u
-  have hxU : x ∈ Umax L n := (GlobalTheory.HeckeScalarSph.loc_mem_GLint_iff (SplitPlace.mk w i) hx).1 (by rw [hxu]; exact hu)
+  have hxU : x ∈ Umax L n :=
+    (GlobalTheory.HeckeScalarSph.loc_mem_GLint_iff (SplitPlace.mk w i) hx).1 (by rw [hxu]; exact hu)
   let κ0 : GlobalTheory.HeckeScalarSph.locK n w := ⟨x, hxU, hx⟩
   have hκA : κ0 ∈ A := by
     refine (mem_low_iff i κ0).2 ?_
@@ -284,12 +374,18 @@ theorem core {w : HeightOneSpectrum (𝓞 L⁺)} (i j : L →ₐ[L⁺] w.adicCom
       omega
     · rintro rfl
       omega
-  have hκQ : redLoc i n κ0 ∈ Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wUp r) :=
+  have hκQ
+      : redLoc i n κ0
+        ∈ Col.btG n (IsLocalRing.ResidueField (w.adicCompletionIntegers L⁺)) (wUp r) :=
     (Subgroup.mem_inf.1 (Subgroup.mem_comap.1 (hAleQ hκA))).2
   rw [Col.mem_btG] at hκQ
   have h0 := hκQ i0 ir (by simp [wUp, hi0, hir, hr0])
   rw [redLoc_eq_zero_iff] at h0
-  have e : (((SplitPlace.mk w i).loc n κ0.1 : GL (Fin n) (w.adicCompletion L⁺)) : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺)) i0 ir = 1 := by
+  have e
+      : (((SplitPlace.mk w i).loc n κ0.1 : GL (Fin n) (w.adicCompletion L⁺))
+            : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺))
+          i0 ir
+        = 1 := by
     show (((SplitPlace.mk w i).loc n x : GL (Fin n) (w.adicCompletion L⁺)) : Matrix (Fin n) (Fin n) (w.adicCompletion L⁺)) i0 ir = 1
     rw [hxu]
     show Matrix.transvection i0 ir (1 : w.adicCompletion L⁺) i0 ir = 1
@@ -299,7 +395,14 @@ theorem core {w : HeightOneSpectrum (𝓞 L⁺)} (i j : L →ₐ[L⁺] w.adicCom
 
 end GlobalTheory.ParaOpp
 
-theorem GlobalTheory.ParaOpp.splitPlace_eq_of_para : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (r : ℕ) (s s' s₁ : SplitPlace L) (θ : GAf L n ≃* GAf L n), 0 < r → r < n → s'.v = s.v → s₁.v = s.v → FrameAut θ → (∀ κ, TrivOutside {s.v} κ → NG.ParaRT s₁ r (s₁.loc n κ) → NG.ParaRT s r (s.loc n (θ κ)) ∧ NG.ParaRT s' r (s'.loc n (θ κ))) → s' = s := by
+theorem GlobalTheory.ParaOpp.splitPlace_eq_of_para
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (r : ℕ) (s s' s₁ : SplitPlace L)
+        (θ : GAf L n ≃* GAf L n),
+      0 < r → r < n → s'.v = s.v → s₁.v = s.v → FrameAut θ
+        → (∀ κ,
+          TrivOutside {s.v} κ → NG.ParaRT s₁ r (s₁.loc n κ)
+            → NG.ParaRT s r (s.loc n (θ κ)) ∧ NG.ParaRT s' r (s'.loc n (θ κ)))
+        → s' = s := by
   intro L _ _ _ n r s s' s₁ θ hr0 hrn hv' hv1 hθ H
   obtain ⟨v, i⟩ := s
   obtain ⟨v', i'⟩ := s'

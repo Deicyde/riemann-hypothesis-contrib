@@ -14,9 +14,10 @@ open Formalism.InvariantFactorPaths.G7.LogarithmEquivalence (altR)
 
 variable (p : ℕ) [hp : Fact p.Prime] (K' : Type) [Field K'] [Algebra (K0 p) K']
 
-theorem sx_lam_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (n : ℕ) :
-    ∃ z : ℤ, PowerSeries.coeff n (lamF p vp) = (z : K') ∧
-      (p : ℤ) ∣ z - ((if n = 1 then 1 else 0) + (if n = p ^ 2 then 1 else 0)) := by
+theorem sx_lam_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (n : ℕ)
+    : ∃ z : ℤ,
+      PowerSeries.coeff n (lamF p vp) = (z : K')
+        ∧ (p : ℤ) ∣ z - ((if n = 1 then 1 else 0) + (if n = p ^ 2 then 1 else 0)) := by
   haveI := charZero_K' p K'
   have hp2 : 2 ≤ p := hp.out.two_le
   have hq : 4 ≤ p ^ 2 := by nlinarith
@@ -29,8 +30,10 @@ theorem sx_lam_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (n : ℕ) :
     have hjlt : j < (p ^ 2) ^ j + 1 := by
       have := Nat.lt_pow_self (n := j) (show 1 < p ^ 2 by omega)
       omega
-    have hsum : (∑ i ∈ range ((p ^ 2) ^ j + 1),
-        if (p ^ 2) ^ j = (p ^ 2) ^ i then ((p : K') ^ i)⁻¹ else 0) = ((p : K') ^ j)⁻¹ := by
+    have hsum
+        : (∑ i ∈ range ((p ^ 2) ^ j + 1),
+            if (p ^ 2) ^ j = (p ^ 2) ^ i then ((p : K') ^ i)⁻¹ else 0)
+          = ((p : K') ^ j)⁻¹ := by
       rw [Finset.sum_eq_single j]
       · simp
       · intro b _ hb
@@ -40,8 +43,10 @@ theorem sx_lam_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (n : ℕ) :
       · intro hj
         exact absurd (Finset.mem_range.2 hjlt) hj
     rw [hsum]
-    have key : ∀ m : ℕ, ∃ e : ℕ, vp ^ ((p ^ 2) ^ m - 1) = (p : K') ^ e ∧ m ≤ e ∧
-        (m ≤ 1 → e = m) ∧ (2 ≤ m → m + 1 ≤ e) := by
+    have key
+        : ∀ m : ℕ, ∃ e : ℕ,
+          vp ^ ((p ^ 2) ^ m - 1) = (p : K') ^ e ∧ m ≤ e ∧ (m ≤ 1 → e = m)
+            ∧ (2 ≤ m → m + 1 ≤ e) := by
       intro m
       induction m with
       | zero => exact ⟨0, by simp, le_rfl, fun _ => rfl, fun h => by omega⟩
@@ -94,8 +99,8 @@ theorem sx_lam_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (n : ℕ) :
     have hnq : n ≠ p ^ 2 := fun h => hn ⟨1, by simp [h]⟩
     exact ⟨0, by simp, by simp [hn1, hnq]⟩
 
-private theorem sum_sign_if_eq_pow_at_pow (q : ℕ) (hq : 1 < q) (l : ℕ) :
-    (∑ i ∈ range (q ^ l + 1), if q ^ l = q ^ i then ((-1 : ℤ)) ^ i else 0) = (-1) ^ l := by
+private theorem sum_sign_if_eq_pow_at_pow (q : ℕ) (hq : 1 < q) (l : ℕ)
+    : (∑ i ∈ range (q ^ l + 1), if q ^ l = q ^ i then ((-1 : ℤ)) ^ i else 0) = (-1) ^ l := by
   have hinj : Function.Injective (fun j : ℕ => q ^ j) := Nat.pow_right_injective (by omega)
   have hlt : l < q ^ l + 1 := by
     have := Nat.lt_pow_self (n := l) hq
@@ -109,14 +114,17 @@ private theorem sum_sign_if_eq_pow_at_pow (q : ℕ) (hq : 1 < q) (l : ℕ) :
   · intro hl
     exact absurd (Finset.mem_range.2 hlt) hl
 
-private theorem sum_sign_if_eq_pow_eq_zero_of_ne_pow (q m : ℕ) (hm : ∀ l, m ≠ q ^ l) :
-    (∑ i ∈ range (m + 1), if m = q ^ i then ((-1 : ℤ)) ^ i else 0) = 0 :=
+private theorem sum_sign_if_eq_pow_eq_zero_of_ne_pow (q m : ℕ) (hm : ∀ l, m ≠ q ^ l)
+    : (∑ i ∈ range (m + 1), if m = q ^ i then ((-1 : ℤ)) ^ i else 0) = 0 :=
   Finset.sum_eq_zero fun i _ => if_neg (hm i)
 
-private theorem sum_sign_if_eq_pow_add_div_eq_indicator_one (q : ℕ) (hq : 1 < q) (n : ℕ) :
-    (∑ i ∈ range (n + 1), if n = q ^ i then ((-1 : ℤ)) ^ i else 0) +
-      (if q ∣ n then (∑ i ∈ range (n / q + 1), if n / q = q ^ i then ((-1 : ℤ)) ^ i else 0)
-        else 0) = if n = 1 then 1 else 0 := by
+private theorem sum_sign_if_eq_pow_add_div_eq_indicator_one (q : ℕ) (hq : 1 < q) (n : ℕ)
+    : (∑ i ∈ range (n + 1), if n = q ^ i then ((-1 : ℤ)) ^ i else 0)
+        + (if q ∣ n then
+             (∑ i ∈ range (n / q + 1), if n / q = q ^ i then ((-1 : ℤ)) ^ i else 0)
+           else
+             0)
+      = if n = 1 then 1 else 0 := by
   have hinj : Function.Injective (fun j : ℕ => q ^ j) := Nat.pow_right_injective (by omega)
   by_cases hn : ∃ l, n = q ^ l
   · obtain ⟨l, rfl⟩ := hn
@@ -125,8 +133,7 @@ private theorem sum_sign_if_eq_pow_add_div_eq_indicator_one (q : ℕ) (hq : 1 < 
     · have : ¬ q ∣ 1 := fun h => by have := Nat.le_of_dvd one_pos h; omega
       simp [this]
     · have hd : q ∣ q ^ (l + 1) := dvd_pow_self q (by omega)
-      have hdiv : q ^ (l + 1) / q = q ^ l := by
-        rw [pow_succ, Nat.mul_div_cancel _ (by omega)]
+      have hdiv : q ^ (l + 1) / q = q ^ l := by rw [pow_succ, Nat.mul_div_cancel _ (by omega)]
       have hne : q ^ (l + 1) ≠ 1 := fun h => by
         have := hinj (show q ^ (l + 1) = q ^ 0 by rw [h, pow_zero])
         omega
@@ -143,10 +150,12 @@ private theorem sum_sign_if_eq_pow_add_div_eq_indicator_one (q : ℕ) (hq : 1 < 
       rw [pow_succ, ← hl, Nat.div_mul_cancel hd]
     · rfl
 
-private theorem coeff_pow_eq_of_lower_coeff_eq {R : Type} [CommRing R] (a b : PowerSeries R)
-    (ha : PowerSeries.X ∣ a) (hb : PowerSeries.X ∣ b) (n : ℕ)
-    (hab : ∀ m < n, PowerSeries.coeff m a = PowerSeries.coeff m b) (d : ℕ) (hd : d ≠ 1) :
-    PowerSeries.coeff n (a ^ d) = PowerSeries.coeff n (b ^ d) := by
+private theorem coeff_pow_eq_of_lower_coeff_eq
+    {R : Type} [CommRing R]
+    (a b : PowerSeries R) (ha : PowerSeries.X ∣ a) (hb : PowerSeries.X ∣ b)
+    (n : ℕ) (hab : ∀ m < n, PowerSeries.coeff m a = PowerSeries.coeff m b)
+    (d : ℕ) (hd : d ≠ 1)
+    : PowerSeries.coeff n (a ^ d) = PowerSeries.coeff n (b ^ d) := by
   rcases Nat.lt_or_ge d 2 with h | h
   · interval_cases d
     · simp
@@ -173,10 +182,10 @@ private theorem coeff_pow_eq_of_lower_coeff_eq {R : Type} [CommRing R] (a b : Po
     rw [map_sub, sub_eq_zero] at h4
     exact h4
 
-private theorem coeff_subst_eq_sum_coeff_mul_coeff_pow {K : Type} [Field K] (μ f : PowerSeries K)
-    (h0 : PowerSeries.constantCoeff μ = 0) (n : ℕ) :
-    PowerSeries.coeff n (PowerSeries.subst μ f) =
-      ∑ d ∈ range (n + 1), PowerSeries.coeff d f * PowerSeries.coeff n (μ ^ d) := by
+private theorem coeff_subst_eq_sum_coeff_mul_coeff_pow
+    {K : Type} [Field K] (μ f : PowerSeries K) (h0 : PowerSeries.constantCoeff μ = 0) (n : ℕ)
+    : PowerSeries.coeff n (PowerSeries.subst μ f)
+      = ∑ d ∈ range (n + 1), PowerSeries.coeff d f * PowerSeries.coeff n (μ ^ d) := by
   rw [PowerSeries.coeff_subst' (PowerSeries.HasSubst.of_constantCoeff_zero' h0)]
   rw [finsum_eq_sum_of_support_subset _ (s := range (n + 1)) ?_]
   · rfl
@@ -188,10 +197,12 @@ private theorem coeff_subst_eq_sum_coeff_mul_coeff_pow {K : Type} [Field K] (μ 
     obtain ⟨r, hr⟩ := PowerSeries.X_dvd_iff.2 h0
     rw [hr, mul_pow, PowerSeries.coeff_X_pow_mul', if_neg (by omega), smul_zero]
 
-theorem sx_mu_alt_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (μ : PowerSeries K')
-    (h0 : PowerSeries.constantCoeff μ = 0)
-    (h1 : (PowerSeries.subst μ (lamF p vp) : PowerSeries K') = PowerSeries.X) (n : ℕ) :
-    ∃ y : ℤ, PowerSeries.coeff n μ - PowerSeries.coeff n (altF K' p) = (p : K') * (y : K') := by
+theorem sx_mu_alt_int
+    (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K'))
+    (μ : PowerSeries K') (h0 : PowerSeries.constantCoeff μ = 0)
+    (h1 : (PowerSeries.subst μ (lamF p vp) : PowerSeries K') = PowerSeries.X)
+    (n : ℕ)
+    : ∃ y : ℤ, PowerSeries.coeff n μ - PowerSeries.coeff n (altF K' p) = (p : K') * (y : K') := by
   haveI := charZero_K' p K'
   have hp2 : 2 ≤ p := hp.out.two_le
   have hq : 1 < p ^ 2 := by nlinarith
@@ -200,25 +211,36 @@ theorem sx_mu_alt_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (μ : PowerS
   have hX : PowerSeries.X ∣ μ := PowerSeries.X_dvd_iff.2 h0
   have hl1 : PowerSeries.coeff 1 (lamF p vp) = 1 := by
     simp [lamF, lgF, Finset.sum_range_succ, Ne.symm hq1, hp.out.ne_one]
-  have halt : ∀ m, PowerSeries.coeff m (altF K' p) =
-      ((∑ i ∈ range (m + 1), if m = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0 : ℤ) : K') := by
+  have halt
+      : ∀ m,
+        PowerSeries.coeff m (altF K' p)
+          = ((∑ i ∈ range (m + 1), if m = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0 : ℤ) : K') := by
     intro m
     simp only [altF, PowerSeries.coeff_mk]
     push_cast
     rfl
-  have hPk : ∀ (Q : Polynomial ℤ) (m : ℕ), PowerSeries.coeff m
-      ((Q.map (Int.castRingHom K') : Polynomial K') : PowerSeries K') = (Q.coeff m : K') := by
+  have hPk
+      : ∀ (Q : Polynomial ℤ) (m : ℕ),
+        PowerSeries.coeff m ((Q.map (Int.castRingHom K') : Polynomial K') : PowerSeries K')
+          = (Q.coeff m : K') := by
     intro Q m
     rw [Polynomial.coeff_coe, Polynomial.coeff_map, eq_intCast]
-  have hQq : ∀ (R : Polynomial (ZMod p)) (n : ℕ),
-      (R ^ (p ^ 2)).coeff n = if p ^ 2 ∣ n then R.coeff (n / p ^ 2) else 0 := by
+  have hQq
+      : ∀ (R : Polynomial (ZMod p)) (n : ℕ),
+        (R ^ (p ^ 2)).coeff n = if p ^ 2 ∣ n then R.coeff (n / p ^ 2) else 0 := by
     intro R n
     rw [sq, pow_mul, ← ZMod.expand_card, ← ZMod.expand_card, ← Polynomial.expand_mul,
       Polynomial.coeff_expand (by positivity)]
-  have key : ∀ n, 1 ≤ n → ∃ P : Polynomial ℤ, P.coeff 0 = 0 ∧ (∀ m, n ≤ m → P.coeff m = 0) ∧
-      (∀ m < n, PowerSeries.coeff m μ = (P.coeff m : K')) ∧
-      (∀ m < n, (p : ℤ) ∣ P.coeff m -
-        ∑ i ∈ range (m + 1), if m = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0) := by
+  have key
+      : ∀ n,
+        1 ≤ n
+          → ∃ P : Polynomial ℤ,
+            P.coeff 0 = 0 ∧ (∀ m, n ≤ m → P.coeff m = 0)
+              ∧ (∀ m < n, PowerSeries.coeff m μ = (P.coeff m : K'))
+              ∧ (∀ m < n,
+                (p : ℤ)
+                  ∣ P.coeff m
+                    - ∑ i ∈ range (m + 1), if m = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0) := by
     intro n hn
     induction n, hn using Nat.le_induction with
     | base =>
@@ -232,40 +254,55 @@ theorem sx_mu_alt_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (μ : PowerS
         simp
     | succ n hn ih =>
       obtain ⟨P, hP0, hPz, hPμ, hPd⟩ := ih
-      have hXP : PowerSeries.X ∣ ((P.map (Int.castRingHom K') : Polynomial K') : PowerSeries K') := by
+      have hXP
+          : PowerSeries.X ∣ ((P.map (Int.castRingHom K') : Polynomial K') : PowerSeries K') := by
         rw [PowerSeries.X_dvd_iff, ← PowerSeries.coeff_zero_eq_constantCoeff_apply, hPk, hP0,
           Int.cast_zero]
-      have hcμ : PowerSeries.coeff n μ = (((if n = 1 then 1 else 0) -
-          ∑ d ∈ (range (n + 1)).erase 1, z d * (P ^ d).coeff n : ℤ) : K') := by
+      have hcμ
+          : PowerSeries.coeff n μ
+            = (((if n = 1 then 1 else 0) - ∑ d ∈ (range (n + 1)).erase 1, z d * (P ^ d).coeff n : ℤ)
+              : K') := by
         have e1 := congrArg (PowerSeries.coeff n) h1
         rw [coeff_subst_eq_sum_coeff_mul_coeff_pow μ _ h0 n, PowerSeries.coeff_X,
-          ← Finset.add_sum_erase _ _ (Finset.mem_range.2 (by omega : 1 < n + 1)),
-          hl1, pow_one, one_mul] at e1
-        have hS : ∑ d ∈ (range (n + 1)).erase 1,
-            PowerSeries.coeff d (lamF p vp) * PowerSeries.coeff n (μ ^ d) =
-            ∑ d ∈ (range (n + 1)).erase 1, (z d : K') * ((P ^ d).coeff n : K') := by
+            ← Finset.add_sum_erase _ _ (Finset.mem_range.2 (by omega : 1 < n + 1)), hl1, pow_one,
+            one_mul]
+          at e1
+        have hS
+            : ∑ d ∈ (range (n + 1)).erase 1,
+                PowerSeries.coeff d (lamF p vp) * PowerSeries.coeff n (μ ^ d)
+              = ∑ d ∈ (range (n + 1)).erase 1, (z d : K') * ((P ^ d).coeff n : K') := by
           apply Finset.sum_congr rfl
           intro d hd
-          rw [hz1 d, coeff_pow_eq_of_lower_coeff_eq μ _ hX hXP n (fun m hm => by rw [hPμ m hm, hPk]) d
-            (Finset.ne_of_mem_erase hd), ← Polynomial.coe_pow, ← Polynomial.map_pow, hPk]
+          rw [hz1 d,
+            coeff_pow_eq_of_lower_coeff_eq μ _ hX hXP n
+              (fun m hm => by rw [hPμ m hm, hPk])
+              d (Finset.ne_of_mem_erase hd),
+            ← Polynomial.coe_pow, ← Polynomial.map_pow, hPk]
         rw [hS] at e1
         simp only [Int.cast_sub, Int.cast_sum, Int.cast_mul, Int.cast_ite, Int.cast_one,
           Int.cast_zero]
         linear_combination e1
-      have hcd : (p : ℤ) ∣ ((if n = 1 then 1 else 0) -
-          ∑ d ∈ (range (n + 1)).erase 1, z d * (P ^ d).coeff n) -
-          ∑ i ∈ range (n + 1), if n = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0 := by
+      have hcd
+          : (p : ℤ)
+            ∣ ((if n = 1 then 1 else 0) - ∑ d ∈ (range (n + 1)).erase 1, z d * (P ^ d).coeff n)
+              - ∑ i ∈ range (n + 1), if n = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0 := by
         rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
-        have hQ : ∀ m, (P.map (Int.castRingHom (ZMod p))).coeff m = if m < n then
-            (((∑ i ∈ range (m + 1), if m = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0 : ℤ)) : ZMod p)
-            else 0 := by
+        have hQ
+            : ∀ m,
+              (P.map (Int.castRingHom (ZMod p))).coeff m
+                = if m < n then
+                    (((∑ i ∈ range (m + 1), if m = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0 : ℤ))
+                      : ZMod p)
+                  else
+                    0 := by
           intro m
           rw [Polynomial.coeff_map, eq_intCast]
           split_ifs with hm
           · rw [← sub_eq_zero, ← Int.cast_sub, ZMod.intCast_zmod_eq_zero_iff_dvd]
             exact hPd m hm
           · rw [hPz m (by omega), Int.cast_zero]
-        have hzb : ∀ d ∈ (range (n + 1)).erase 1, ((z d : ℤ) : ZMod p) = if d = p ^ 2 then 1 else 0 := by
+        have hzb
+            : ∀ d ∈ (range (n + 1)).erase 1, ((z d : ℤ) : ZMod p) = if d = p ^ 2 then 1 else 0 := by
           intro d hd
           have h := hz2 d
           rw [if_neg (Finset.ne_of_mem_erase hd), zero_add] at h
@@ -275,12 +312,22 @@ theorem sx_mu_alt_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (μ : PowerS
             exact sub_eq_zero.1 h'
           · rw [sub_zero] at h
             exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).2 h
-        have hS : ((∑ d ∈ (range (n + 1)).erase 1, z d * (P ^ d).coeff n : ℤ) : ZMod p) =
-            if p ^ 2 ∣ n then (((∑ i ∈ range (n / p ^ 2 + 1),
-              if n / p ^ 2 = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0 : ℤ)) : ZMod p) else 0 := by
+        have hS
+            : ((∑ d ∈ (range (n + 1)).erase 1, z d * (P ^ d).coeff n : ℤ) : ZMod p)
+              = if p ^ 2 ∣ n then
+                  (((∑ i ∈ range (n / p ^ 2 + 1),
+                        if n / p ^ 2 = (p ^ 2) ^ i then ((-1 : ℤ)) ^ i else 0
+                      : ℤ))
+                    : ZMod p)
+                else
+                  0 := by
           rw [Int.cast_sum]
-          rw [Finset.sum_congr rfl (g := fun d => if d = p ^ 2 then
-            ((P.map (Int.castRingHom (ZMod p))) ^ (p ^ 2)).coeff n else 0)]
+          rw [Finset.sum_congr rfl
+            (g := fun d =>
+              if d = p ^ 2 then
+                ((P.map (Int.castRingHom (ZMod p))) ^ (p ^ 2)).coeff n
+              else
+                0)]
           · rw [Finset.sum_ite_eq', hQq]
             split_ifs with h1 h2 h2
             · rw [hQ, if_pos (Nat.div_lt_self (by omega) hq)]
@@ -297,13 +344,21 @@ theorem sx_mu_alt_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (μ : PowerS
             · subst hdq
               rw [one_mul, ← Polynomial.map_pow, Polynomial.coeff_map, eq_intCast]
             · rw [zero_mul]
-        have hr := congrArg (Int.cast : ℤ → ZMod p) (sum_sign_if_eq_pow_add_div_eq_indicator_one (p ^ 2) hq n)
+        have hr :=
+          congrArg (Int.cast : ℤ → ZMod p)
+            (sum_sign_if_eq_pow_add_div_eq_indicator_one (p ^ 2) hq n)
         rw [Int.cast_add] at hr
         rw [Int.cast_sub, Int.cast_sub, hS]
         split_ifs at hr ⊢ <;> push_cast at hr ⊢ <;> linear_combination (-1 : ZMod p) * hr
-      refine ⟨P + Polynomial.C ((if n = 1 then 1 else 0) -
-          ∑ d ∈ (range (n + 1)).erase 1, z d * (P ^ d).coeff n) * Polynomial.X ^ n,
-        ?_, ?_, ?_, ?_⟩
+      refine ⟨
+        P + Polynomial.C
+            ((if n = 1 then 1 else 0) - ∑ d ∈ (range (n + 1)).erase 1, z d * (P ^ d).coeff n)
+          * Polynomial.X ^ n,
+        ?_,
+        ?_,
+        ?_,
+        ?_
+      ⟩
       · rw [Polynomial.coeff_add, Polynomial.coeff_C_mul_X_pow, if_neg (by omega), hP0, add_zero]
       · intro m hm
         rw [Polynomial.coeff_add, Polynomial.coeff_C_mul_X_pow, if_neg (by omega), hPz m (by omega),
@@ -333,10 +388,12 @@ theorem sx_mu_alt_int (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (μ : PowerS
   push_cast
   ring
 
-theorem sx_mu_alt (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (μ : PowerSeries K')
-    (h0 : PowerSeries.constantCoeff μ = 0)
-    (h1 : (PowerSeries.subst μ (lamF p vp) : PowerSeries K') = PowerSeries.X) (n : ℕ) :
-    ∃ y ∈ Rp p K' vp, PowerSeries.coeff n μ - PowerSeries.coeff n (altF K' p) = (p : K') * y := by
+theorem sx_mu_alt
+    (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K'))
+    (μ : PowerSeries K') (h0 : PowerSeries.constantCoeff μ = 0)
+    (h1 : (PowerSeries.subst μ (lamF p vp) : PowerSeries K') = PowerSeries.X)
+    (n : ℕ)
+    : ∃ y ∈ Rp p K' vp, PowerSeries.coeff n μ - PowerSeries.coeff n (altF K' p) = (p : K') * y := by
   obtain ⟨y, hy⟩ := sx_mu_alt_int p K' vp hvp μ h0 h1 n
   exact ⟨(y : K'), intCast_mem _ y, hy⟩
 

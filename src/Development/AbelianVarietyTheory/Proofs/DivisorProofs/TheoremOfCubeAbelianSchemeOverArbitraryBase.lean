@@ -6,4 +6,5 @@ public import CompanionTheory.AutomorphicTheory.TemperedLocalSpectra.CubicForms.
 
 @[expose] public section
 
-theorem GlobalTheory.CubeTop.cubeTheorem : GlobalTheory.Published.CubeTheorem := GlobalTheory.SpreadingModels.cubeTheorem_holds
+theorem GlobalTheory.CubeTop.cubeTheorem : GlobalTheory.Published.CubeTheorem :=
+  GlobalTheory.SpreadingModels.cubeTheorem_holds

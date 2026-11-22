@@ -17,24 +17,39 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 namespace GlobalTheory.LocalFieldIso
 
 theorem resCard_padic (g : ℕ) [Fact g.Prime] : GlobalTheory.SplitWeil.resCard ℚ_[g] = g := by
-  let e : 𝒪[ℚ_[g]] ≃+* ℤ_[g] :=
-  { toFun := fun x => ⟨x.1, by
-      have h := (Valuation.mem_integer_iff _ _).1 x.2
-      have := (GlobalTheory.SplitWeil.padic_valuation_lt_iff g 1 x.1).not.1 (by rw [map_one]; exact not_lt.2 h)
-      rwa [norm_one, not_lt] at this⟩
-    invFun := fun x => ⟨x.1, (Valuation.mem_integer_iff _ _).2 (by
-      have := (GlobalTheory.SplitWeil.padic_valuation_lt_iff g 1 x.1).not.2 (by rw [norm_one]; exact not_lt.2 x.2)
-      rwa [map_one, not_lt] at this)⟩
+  let e : 𝒪[ℚ_[g]] ≃+* ℤ_[g] := {
+    toFun := fun x => ⟨
+      x.1,
+      by
+        have h := (Valuation.mem_integer_iff _ _).1 x.2
+        have :=
+          (GlobalTheory.SplitWeil.padic_valuation_lt_iff g 1 x.1).not.1 (by
+            rw [map_one]; exact not_lt.2 h)
+        rwa [norm_one, not_lt] at this
+    ⟩
+    invFun := fun x => ⟨
+      x.1,
+      (Valuation.mem_integer_iff _ _).2 (by
+        have :=
+          (GlobalTheory.SplitWeil.padic_valuation_lt_iff g 1 x.1).not.2 (by
+            rw [norm_one]; exact not_lt.2 x.2)
+        rwa [map_one, not_lt] at this)
+    ⟩
     left_inv := fun _ => rfl
     right_inv := fun _ => rfl
     map_mul' := fun _ _ => rfl
-    map_add' := fun _ _ => rfl }
+    map_add' := fun _ _ => rfl
+  }
   unfold GlobalTheory.SplitWeil.resCard
-  rw [Nat.card_congr ((IsLocalRing.ResidueField.mapEquiv e).trans PadicInt.residueField).toEquiv, Nat.card_zmod]
+  rw [Nat.card_congr ((IsLocalRing.ResidueField.mapEquiv e).trans PadicInt.residueField).toEquiv,
+    Nat.card_zmod]
 
-theorem padic_v_map_le_one_iff {E : Type} [Field E] [NumberField E] {g : ℕ} [Fact g.Prime]
-    {w : HeightOneSpectrum (𝓞 E)} (i : ℚ_[g] ≃+* w.adicCompletion E) (hi : Continuous i) (y : ℚ_[g]) :
-    Valued.v (i y) ≤ 1 ↔ ‖y‖ ≤ 1 := by
+theorem padic_v_map_le_one_iff
+    {E : Type} [Field E] [NumberField E]
+    {g : ℕ} [Fact g.Prime]
+    {w : HeightOneSpectrum (𝓞 E)} (i : ℚ_[g] ≃+* w.adicCompletion E) (hi : Continuous i)
+    (y : ℚ_[g])
+    : Valued.v (i y) ≤ 1 ↔ ‖y‖ ≤ 1 := by
   haveI : (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ))).Compatible :=
     Valuation.Compatible.ofValuation _
   rw [← (ValuativeRel.isEquiv (ValuativeRel.valuation _) Valued.v).le_one_iff_le_one,
@@ -44,18 +59,21 @@ theorem padic_v_map_le_one_iff {E : Type} [Field E] [NumberField E] {g : ℕ} [F
 
 end GlobalTheory.LocalFieldIso
 
-
 open GlobalTheory.LocalFieldIso in
-theorem GlobalTheory.LocalFieldIso.padic_iso_place : ∀ (E : Type) [Field E] [NumberField E] (g : ℕ) [Fact g.Prime] (w : HeightOneSpectrum (𝓞 E))
-    (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i →
-    ((g : ℕ) : 𝓞 E) ∈ w.asIdeal ∧ ((g : ℕ) : 𝓞 E) ∉ w.asIdeal ^ 2 ∧ Formalism.ConjugateSelfDual.normV w = g := by
+theorem GlobalTheory.LocalFieldIso.padic_iso_place
+    : ∀ (E : Type) [Field E] [NumberField E] (g : ℕ) [Fact g.Prime] (w : HeightOneSpectrum (𝓞 E))
+        (i : ℚ_[g] ≃+* w.adicCompletion E),
+      Continuous i
+        → ((g : ℕ) : 𝓞 E) ∈ w.asIdeal ∧ ((g : ℕ) : 𝓞 E) ∉ w.asIdeal ^ 2
+          ∧ Formalism.ConjugateSelfDual.normV w = g := by
   intro E _ _ g _ w i hi
   have hv : ∀ y : E, Valued.v (algebraMap E (w.adicCompletion E) y) = w.valuation E y := fun y =>
     HeightOneSpectrum.valuedAdicCompletion_eq_valuation' w y
   have hgc : i (g : ℚ_[g]) = algebraMap E (w.adicCompletion E) (((g : ℕ) : 𝓞 E) : E) := by simp
   have hgp : 1 < (g : ℝ) := by exact_mod_cast (Fact.out : g.Prime).one_lt
   refine ⟨?_, ?_, ?_⟩
-  · have h := GlobalTheory.Published.DepthZeroTypeModel.v_lt_one i hi (k := (g : ℚ_[g])) Padic.norm_p_lt_one
+  · have h :=
+      GlobalTheory.Published.DepthZeroTypeModel.v_lt_one i hi (k := (g : ℚ_[g])) Padic.norm_p_lt_one
     rw [hgc, hv, HeightOneSpectrum.valuation_of_algebraMap] at h
     rwa [HeightOneSpectrum.intValuation_lt_one_iff_mem] at h
   · intro hg2
@@ -76,8 +94,8 @@ theorem GlobalTheory.LocalFieldIso.padic_iso_place : ∀ (E : Type) [Field E] [N
     have hxle : ‖x‖ ≤ (g : ℝ) ^ (-1 : ℤ) :=
       (Padic.norm_le_pow_iff_norm_lt_pow_add_one x (-1)).2 (by simpa using hxlt)
     have hy : Valued.v (i ((g : ℚ_[g]) * x⁻¹ ^ 2)) ≤ 1 := by
-      rw [map_mul, hgc, map_pow, map_inv₀, hix, Valuation.map_mul, hv, HeightOneSpectrum.valuation_of_algebraMap,
-        Valuation.map_pow, map_inv₀, hPv]
+      rw [map_mul, hgc, map_pow, map_inv₀, hix, Valuation.map_mul, hv,
+        HeightOneSpectrum.valuation_of_algebraMap, Valuation.map_pow, map_inv₀, hPv]
       refine le_trans (mul_le_mul_of_nonneg_right h2 zero_le') (le_of_eq ?_)
       rw [← WithZero.exp_neg, ← WithZero.exp_nsmul, ← WithZero.exp_add]
       norm_num

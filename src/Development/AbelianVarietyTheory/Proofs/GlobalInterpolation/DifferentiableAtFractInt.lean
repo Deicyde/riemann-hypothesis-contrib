@@ -94,37 +94,41 @@ lemma zeta_eq_of_one_lt {s : ℂ} (hs : 1 < s.re) :
   | (intros; apply @_root_.GlobalTheory.ZetaFractionalIntegral.zeta_eq_sub_integral_fract <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.ZetaFractionalIntegral.zeta_eq_sub_integral_fract ..)
 
-theorem zeta_eq {s : ℂ} (hs : 0 < s.re) (hs1 : s ≠ 1) :
-    riemannZeta s = s / (s - 1) - s * fractInt s := by
+theorem zeta_eq {s : ℂ} (hs : 0 < s.re) (hs1 : s ≠ 1)
+    : riemannZeta s = s / (s - 1) - s * fractInt s := by
   have hU : IsOpen {z : ℂ | 0 < z.re} := isOpen_lt continuous_const continuous_re
   have hf : AnalyticOnNhd ℂ riemannZeta₀ {z : ℂ | 0 < z.re} :=
     differentiable_riemannZeta₀.differentiableOn.analyticOnNhd hU
   have hg : AnalyticOnNhd ℂ (fun z => 1 - z * fractInt z) {z : ℂ | 0 < z.re} :=
-    DifferentiableOn.analyticOnNhd (fun z hz =>
-      ((differentiableAt_const _).sub
-        (differentiableAt_id.mul (differentiableAt_fractInt hz))).differentiableWithinAt) hU
+    DifferentiableOn.analyticOnNhd
+      (fun z hz =>
+        ((differentiableAt_const _).sub
+          (differentiableAt_id.mul (differentiableAt_fractInt hz))).differentiableWithinAt)
+      hU
   have key : ∀ z : ℂ, z ≠ 1 → z / (z - 1) = (z - 1)⁻¹ + 1 := by
     intro z hz
     have := sub_ne_zero.2 hz
     field_simp
     ring
-  have heq := hf.eqOn_of_preconnected_of_eventuallyEq hg
-    (convex_halfSpace_re_gt 0).isPreconnected (z₀ := 2) (by simp) (by
-      have : {z : ℂ | 1 < z.re} ∈ 𝓝 (2 : ℂ) :=
-        (isOpen_lt continuous_const continuous_re).mem_nhds (by simp)
-      filter_upwards [this] with z hz
-      have hz1 : z ≠ 1 := by
-        rintro rfl
-        simp at hz
-      have h1 := zeta_eq_of_one_lt hz
-      rw [riemannZeta_eq_inv_sub_add hz1, key z hz1] at h1
-      linear_combination h1)
+  have heq :=
+    hf.eqOn_of_preconnected_of_eventuallyEq hg (convex_halfSpace_re_gt 0).isPreconnected (z₀ := 2)
+      (by simp)
+      (by
+        have : {z : ℂ | 1 < z.re} ∈ 𝓝 (2 : ℂ) :=
+          (isOpen_lt continuous_const continuous_re).mem_nhds (by simp)
+        filter_upwards [this] with z hz
+        have hz1 : z ≠ 1 := by
+          rintro rfl
+          simp at hz
+        have h1 := zeta_eq_of_one_lt hz
+        rw [riemannZeta_eq_inv_sub_add hz1, key z hz1] at h1
+        linear_combination h1)
   have h2 : riemannZeta₀ s = 1 - s * fractInt s := heq hs
   rw [riemannZeta_eq_inv_sub_add hs1, key s hs1, h2]
   ring
 
-theorem norm_zeta_sub_le :
-    ∀ s : ℂ, 0 < s.re → s ≠ 1 → ‖riemannZeta s - s / (s - 1)‖ ≤ ‖s‖ / s.re := by
+theorem norm_zeta_sub_le
+    : ∀ s : ℂ, 0 < s.re → s ≠ 1 → ‖riemannZeta s - s / (s - 1)‖ ≤ ‖s‖ / s.re := by
   intro s hs hs1
   rw [zeta_eq hs hs1, sub_sub_cancel_left, norm_neg, norm_mul, div_eq_mul_one_div]
   exact mul_le_mul_of_nonneg_left (norm_fractInt_le hs) (norm_nonneg s)

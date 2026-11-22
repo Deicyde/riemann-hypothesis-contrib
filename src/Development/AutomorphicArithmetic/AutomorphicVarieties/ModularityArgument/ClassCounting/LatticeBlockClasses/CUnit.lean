@@ -6,23 +6,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
-theorem UpperTheory.V.ZK.Cl.cUnit :
-    UpperTheory.V.ZK.Cl.CUnit := by
+theorem UpperTheory.V.ZK.Cl.cUnit : UpperTheory.V.ZK.Cl.CUnit := by
   intro L F _ _ _ _ _ k _ r b hb q v
   obtain ⟨_, hmul, hone, hmem, hinv, hadd, hpow⟩ := cAct L F
   have hres := (cRes L F k r).2.2.2 b hb |>.2
-  have h1 : ∀ P : HeightOneSpectrum (𝓞 F), ordP P 1 = 0 := fun P => by
-    simpa using hpow P 1 0
-  let U : Subgroup Fˣ :=
-    { carrier := {x | IsBU b x}
-      mul_mem' := fun {x y} hx hy P hP => by rw [hadd, hx P hP, hy P hP, add_zero]
-      one_mem' := fun P _ => h1 P
-      inv_mem' := fun {x} hx P hP => by
-        have := hpow P x (-1)
-        rw [zpow_neg_one] at this
-        rw [this, hx P hP, mul_zero] }
+  have h1 : ∀ P : HeightOneSpectrum (𝓞 F), ordP P 1 = 0 := fun P => by simpa using hpow P 1 0
+  let U : Subgroup Fˣ := {
+    carrier := {x | IsBU b x}
+    mul_mem' := fun {x y} hx hy P hP => by rw [hadd, hx P hP, hy P hP, add_zero]
+    one_mem' := fun P _ => h1 P
+    inv_mem' := fun {x} hx P hP => by
+      have := hpow P x (-1)
+      rw [zpow_neg_one] at this
+      rw [this, hx P hP, mul_zero]
+  }
   have uniq : ∀ (x : Fˣ) (u u' : kˣ), Res r x u → Res r x u' → u = u' := by
     rintro x u u' ⟨a, c, hc, hxc, hac⟩ ⟨a', c', hc', hxc', hac'⟩
     have e0 : ((a * c' : 𝓞 F) : F) = ((a' * c : 𝓞 F) : F) := by

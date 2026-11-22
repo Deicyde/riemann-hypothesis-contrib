@@ -40,8 +40,10 @@ def vA (V : VF C) (R : Type) [CommRing R] [Algebra R C] : AddValuation R (WithTo
 
 theorem vA_apply (x : R) : vA V R x = V.v (algebraMap R C x) := rfl
 
-theorem vA_nonneg (hT : ValTie V vm) (hv : vm.Integers R) (h0 : 0 < (vm (V.l : C) : ℝ))
-    (h1 : (vm (V.l : C) : ℝ) < 1) : ∀ x : R, 0 ≤ vA V R x := by
+theorem vA_nonneg
+    (hT : ValTie V vm) (hv : vm.Integers R) (h0 : 0 < (vm (V.l : C) : ℝ))
+    (h1 : (vm (V.l : C) : ℝ) < 1)
+    : ∀ x : R, 0 ≤ vA V R x := by
   intro x
   rw [vA_apply]
   by_cases hx : algebraMap R C x = 0
@@ -56,8 +58,8 @@ theorem vA_nonneg (hT : ValTie V vm) (hv : vm.Integers R) (h0 : 0 < (vm (V.l : C
       linarith
     exact_mod_cast this
 
-theorem lenCoker_vA {m h : ℕ} (α : Matrix (Fin m) (Fin h) R) :
-    S4.lenCoker (vA V R) α = S4.lenCoker V.v (Matrix.of fun i k => algebraMap R C (α i k)) := by
+theorem lenCoker_vA {m h : ℕ} (α : Matrix (Fin m) (Fin h) R)
+    : S4.lenCoker (vA V R) α = S4.lenCoker V.v (Matrix.of fun i k => algebraMap R C (α i k)) := by
   unfold S4.lenCoker
   congr 1
   funext g
@@ -66,8 +68,8 @@ theorem lenCoker_vA {m h : ℕ} (α : Matrix (Fin m) (Fin h) R) :
 
 end Val
 
-theorem rpow_neg_succ {l : ℕ} (hl : 0 < l) (n : ℕ) :
-    (l : ℝ) ^ (-((n : ℝ) + 1)) = ((l : ℝ) ^ (n + 1))⁻¹ := by
+theorem rpow_neg_succ {l : ℕ} (hl : 0 < l) (n : ℕ)
+    : (l : ℝ) ^ (-((n : ℝ) + 1)) = ((l : ℝ) ^ (n + 1))⁻¹ := by
   have h0 : (0 : ℝ) ≤ l := by positivity
   rw [Real.rpow_neg h0, ← Nat.cast_succ, Real.rpow_natCast]
 
@@ -75,11 +77,14 @@ section Val2
 
 variable {V : VF C} {vm : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
 
-theorem lenCoker_eq_logb (hT : ValTie V vm) (hv : vm.Integers R) (h0 : 0 < (vm (V.l : C) : ℝ))
-    (h1 : (vm (V.l : C) : ℝ) < 1) {m h : ℕ} (α : Matrix (Fin m) (Fin h) R) {x : NNReal}
-    (hx : HasLen vm R ((Fin m → R) ⧸ LinearMap.range α.mulVecLin) x) (hpos : 0 < (x : ℝ)) :
-    S4.lenCoker V.v (Matrix.of fun i k => algebraMap R C (α i k)) =
-      ((Real.logb (vm (V.l : C) : ℝ) x : ℝ) : WithTop ℝ) := by
+theorem lenCoker_eq_logb
+    (hT : ValTie V vm) (hv : vm.Integers R) (h0 : 0 < (vm (V.l : C) : ℝ))
+    (h1 : (vm (V.l : C) : ℝ) < 1)
+    {m h : ℕ} (α : Matrix (Fin m) (Fin h) R)
+    {x : NNReal}
+    (hx : HasLen vm R ((Fin m → R) ⧸ LinearMap.range α.mulVecLin) x) (hpos : 0 < (x : ℝ))
+    : S4.lenCoker V.v (Matrix.of fun i k => algebraMap R C (α i k))
+      = ((Real.logb (vm (V.l : C) : ℝ) x : ℝ) : WithTop ℝ) := by
   have hxb : (vm (V.l : C) : ℝ) ^ Real.logb (vm (V.l : C) : ℝ) x = x :=
     Real.rpow_logb h0 (ne_of_lt h1) hpos
   rw [← lenCoker_vA]

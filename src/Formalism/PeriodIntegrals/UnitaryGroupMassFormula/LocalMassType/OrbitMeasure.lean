@@ -9,7 +9,8 @@ noncomputable section
 
 namespace PI.LocMassTypM
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol MeasureTheory NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol MeasureTheory NumberField IsDedekindDomain
 open scoped TensorProduct
 open PI.LocMassTypW
 
@@ -21,8 +22,12 @@ theorem orbit_measure : OmMeas := by
 
   have hK1' : ∀ k : HA (Fv F v) σ J, IsClosed {c | k⁻¹ * c * κ⁻¹ ∈ K1 σ J v Λ g P} := fun k =>
     hK1.preimage ((continuous_const.mul continuous_id).mul continuous_const)
-  exact ⟨measurableSet_omTyp v Λ σ J hSD hg hgv r, LocMassOrdKv.kv_measurableSet σ J v Λ hSD,
-    hK1.measurableSet, measurableSet_image_closed σ J v hKv _,
-    fun k => measurableSet_image_closed σ J v (hK1' k) _⟩
+  exact ⟨
+    measurableSet_omTyp v Λ σ J hSD hg hgv r,
+    LocMassOrdKv.kv_measurableSet σ J v Λ hSD,
+    hK1.measurableSet,
+    measurableSet_image_closed σ J v hKv _,
+    fun k => measurableSet_image_closed σ J v (hK1' k) _
+  ⟩
 
 end PI.LocMassTypM

@@ -16,10 +16,13 @@ section Grp
 
 variable {G : Type*} [AddCommGroup G]
 
-theorem sum_transl {M : Type*} [AddCommMonoid M] (A H : AddSubgroup G) (_hHA : H ≤ A) (T : Finset G)
-    (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
-    (f : G → M) (hf : ∀ x, ∀ h ∈ H, f (x + h) = f x) (a : G) (ha : a ∈ A) :
-    ∑ t ∈ T, f (t + a) = ∑ t ∈ T, f t := by
+theorem sum_transl
+    {M : Type*} [AddCommMonoid M]
+    (A H : AddSubgroup G) (_hHA : H ≤ A)
+    (T : Finset G) (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
+    (f : G → M) (hf : ∀ x, ∀ h ∈ H, f (x + h) = f x)
+    (a : G) (ha : a ∈ A)
+    : ∑ t ∈ T, f (t + a) = ∑ t ∈ T, f t := by
   classical
   have hex : ∀ x ∈ A, ∃ t, t ∈ T ∧ x - t ∈ H := fun x hx => (hu x hx).exists
   let r : G → G := fun x => if hx : x ∈ A then (hex x hx).choose else x
@@ -54,15 +57,17 @@ theorem sum_transl {M : Type*} [AddCommMonoid M] (A H : AddSubgroup G) (_hHA : H
   · intro t ht
     exact hfr _ (A.add_mem (hT t ht) ha)
 
-theorem card_ne_zero (A H : AddSubgroup G) (T : Finset G) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H) :
-    (T.card : ℂ) ≠ 0 := by
+theorem card_ne_zero (A H : AddSubgroup G) (T : Finset G) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
+    : (T.card : ℂ) ≠ 0 := by
   obtain ⟨t, ⟨ht, -⟩, -⟩ := hu 0 A.zero_mem
   exact Nat.cast_ne_zero.2 (Finset.card_ne_zero.2 ⟨t, ht⟩)
 
-theorem sum_char_eq_zero (A H : AddSubgroup G) (hHA : H ≤ A) (T : Finset G)
-    (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
+theorem sum_char_eq_zero
+    (A H : AddSubgroup G) (hHA : H ≤ A)
+    (T : Finset G) (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
     (χ : G → ℂ) (hχ : ∀ x y, χ (x + y) = χ x * χ y) (hH : ∀ h ∈ H, χ h = 1)
-    (a : G) (ha : a ∈ A) (hne : χ a ≠ 1) : ∑ t ∈ T, χ t = 0 := by
+    (a : G) (ha : a ∈ A) (hne : χ a ≠ 1)
+    : ∑ t ∈ T, χ t = 0 := by
   have h := sum_transl A H hHA T hT hu χ (fun x h hh => by rw [hχ, hH h hh, mul_one]) a ha
   simp_rw [hχ] at h
   rw [← Finset.sum_mul] at h
@@ -71,12 +76,13 @@ theorem sum_char_eq_zero (A H : AddSubgroup G) (hHA : H ≤ A) (T : Finset G)
   · exact h1
   · exact absurd (sub_eq_zero.1 h1) hne
 
-theorem avg_indep {M : Type*} [AddCommGroup M] [Module ℂ M] (A H K : AddSubgroup G) (hHA : H ≤ A)
-    (hKA : K ≤ A) (S R : Finset G)
-    (hS : ∀ t ∈ S, t ∈ A) (huS : ∀ a ∈ A, ∃! t, t ∈ S ∧ a - t ∈ H)
+theorem avg_indep
+    {M : Type*} [AddCommGroup M] [Module ℂ M]
+    (A H K : AddSubgroup G) (hHA : H ≤ A) (hKA : K ≤ A)
+    (S R : Finset G) (hS : ∀ t ∈ S, t ∈ A) (huS : ∀ a ∈ A, ∃! t, t ∈ S ∧ a - t ∈ H)
     (hR : ∀ t ∈ R, t ∈ A) (huR : ∀ a ∈ A, ∃! t, t ∈ R ∧ a - t ∈ K)
-    (f : G → M) (hfH : ∀ x, ∀ h ∈ H, f (x + h) = f x) (hfK : ∀ x, ∀ h ∈ K, f (x + h) = f x) :
-    ((S.card : ℂ)⁻¹) • ∑ t ∈ S, f t = ((R.card : ℂ)⁻¹) • ∑ t ∈ R, f t := by
+    (f : G → M) (hfH : ∀ x, ∀ h ∈ H, f (x + h) = f x) (hfK : ∀ x, ∀ h ∈ K, f (x + h) = f x)
+    : ((S.card : ℂ)⁻¹) • ∑ t ∈ S, f t = ((R.card : ℂ)⁻¹) • ∑ t ∈ R, f t := by
   have e1 : ∑ r ∈ R, ∑ t ∈ S, f (t + r) = (R.card : ℂ) • ∑ t ∈ S, f t := by
     rw [Finset.sum_congr rfl (fun r hr => sum_transl A H hHA S hS huS f hfH r (hR r hr))]
     rw [Finset.sum_const, Nat.cast_smul_eq_nsmul]
@@ -93,20 +99,29 @@ theorem avg_indep {M : Type*} [AddCommGroup M] [Module ℂ M] (A H K : AddSubgro
   rw [hX, smul_smul, smul_smul, mul_comm ((S.card : ℂ)⁻¹) ((R.card : ℂ)⁻¹), mul_assoc,
     inv_mul_cancel₀ hSp, mul_one]
 
-theorem sum_circ_eq_zero (A H : AddSubgroup G) (hHA : H ≤ A) (T : Finset G)
-    (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
+theorem sum_circ_eq_zero
+    (A H : AddSubgroup G) (hHA : H ≤ A)
+    (T : Finset G) (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
     (χ : G → Circle) (hχ : ∀ x y, χ (x + y) = χ x * χ y) (hH : ∀ h ∈ H, χ h = 1)
-    (a : G) (ha : a ∈ A) (hne : χ a ≠ 1) : ∑ t ∈ T, ((χ t : Circle) : ℂ) = 0 :=
-  sum_char_eq_zero A H hHA T hT hu (fun x => (χ x : ℂ)) (fun x y => by rw [hχ, Circle.coe_mul])
-    (fun h hh => by rw [hH h hh, Circle.coe_one]) a ha (fun h => hne (Circle.coe_eq_one.1 h))
+    (a : G) (ha : a ∈ A) (hne : χ a ≠ 1)
+    : ∑ t ∈ T, ((χ t : Circle) : ℂ) = 0 :=
+  sum_char_eq_zero A H hHA T hT hu
+    (fun x => (χ x : ℂ))
+    (fun x y => by rw [hχ, Circle.coe_mul])
+    (fun h hh => by rw [hH h hh, Circle.coe_one])
+    a ha
+    (fun h => hne (Circle.coe_eq_one.1 h))
 
-theorem exists_tr [TopologicalSpace G] [IsTopologicalAddGroup G] (A H : AddSubgroup G)
-    (hAc : IsCompact (A : Set G)) (hH : IsOpen (H : Set G)) (hHA : H ≤ A) :
-    ∃ T : Finset G, (∀ t ∈ T, t ∈ A) ∧ ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H := by
+theorem exists_tr
+    [TopologicalSpace G] [IsTopologicalAddGroup G]
+    (A H : AddSubgroup G) (hAc : IsCompact (A : Set G)) (hH : IsOpen (H : Set G)) (hHA : H ≤ A)
+    : ∃ T : Finset G, (∀ t ∈ T, t ∈ A) ∧ ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H := by
   classical
-  obtain ⟨F, hF⟩ := hAc.elim_finite_subcover (fun a : A => (fun x => x - (a : G)) ⁻¹' (H : Set G))
-    (fun a => hH.preimage (continuous_sub_right _))
-    (fun x hx => Set.mem_iUnion.2 ⟨⟨x, hx⟩, by simp [H.zero_mem]⟩)
+  obtain ⟨F, hF⟩ :=
+    hAc.elim_finite_subcover
+      (fun a : A => (fun x => x - (a : G)) ⁻¹' (H : Set G))
+      (fun a => hH.preimage (continuous_sub_right _))
+      (fun x hx => Set.mem_iUnion.2 ⟨⟨x, hx⟩, by simp [H.zero_mem]⟩)
   let r : G → G := fun x => Quotient.out (QuotientAddGroup.mk x : G ⧸ H)
   have hr : ∀ x, r x - x ∈ H := fun x => by
     obtain ⟨h, hh⟩ := QuotientAddGroup.mk_out_eq_add H x
@@ -149,8 +164,10 @@ theorem exists_tr [TopologicalSpace G] [IsTopologicalAddGroup G] (A H : AddSubgr
 
 end Grp
 
-theorem isOpen_ker {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (φ : AddChar k Circle) (hφ : Continuous φ) : IsOpen {x : k | φ x = 1} :=
+theorem isOpen_ker
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (φ : AddChar k Circle) (hφ : Continuous φ)
+    : IsOpen {x : k | φ x = 1} :=
   PositivityTheory.RgUd.Form.U.Lift2.KerOpen.isOpen_ker φ hφ
 
 end PositivityTheory.RgUd.Form.U.Lift2.AvA

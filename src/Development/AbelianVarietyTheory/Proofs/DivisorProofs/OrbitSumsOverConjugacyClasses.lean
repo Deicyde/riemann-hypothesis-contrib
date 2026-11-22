@@ -13,13 +13,12 @@ section Restrict
 
 variable {G Y Y' : Type} [Group G] [MulAction G Y] [MulAction G Y']
 
-theorem out_mk_mem_orbit (x : Y) :
-    Quotient.out (Quotient.mk (orbitRel G Y) x) ∈ orbit G x :=
+theorem out_mk_mem_orbit (x : Y) : Quotient.out (Quotient.mk (orbitRel G Y) x) ∈ orbit G x :=
   orbitRel_apply.mp (Quotient.mk_out (s := orbitRel G Y) x)
 
-theorem injective_mk_comp_out (i : Y' → Y) (hi : Function.Injective i)
-    (heq : ∀ (η : G) (y : Y'), i (η • y) = η • i y) :
-    Function.Injective (fun o : orbitRel.Quotient G Y' =>
+theorem injective_mk_comp_out
+    (i : Y' → Y) (hi : Function.Injective i) (heq : ∀ (η : G) (y : Y'), i (η • y) = η • i y)
+    : Function.Injective (fun o : orbitRel.Quotient G Y' =>
       (Quotient.mk (orbitRel G Y) (i (Quotient.out o)) : orbitRel.Quotient G Y)) := by
   intro o₁ o₂ h
   have h' : i (Quotient.out o₁) ∈ orbit G (i (Quotient.out o₂)) :=
@@ -31,21 +30,22 @@ theorem injective_mk_comp_out (i : Y' → Y) (hi : Function.Injective i)
   rw [← Quotient.out_eq o₁, ← Quotient.out_eq o₂]
   exact Quotient.sound (orbitRel_apply.mpr ⟨η, h2⟩)
 
-theorem finsum_orbits_restrict (i : Y' → Y) (hi : Function.Injective i)
-    (heq : ∀ (η : G) (y : Y'), i (η • y) = η • i y) (g : Y → ℂ) (g' : Y' → ℂ)
-    (hgg : ∀ y, g' y = g (i y)) (hg : ∀ (η : G) (y : Y), g (η • y) = g y)
-    (h0 : ∀ y, g y ≠ 0 → y ∈ Set.range i) :
-    ∑ᶠ o : orbitRel.Quotient G Y, g (Quotient.out o) =
-      ∑ᶠ o : orbitRel.Quotient G Y', g' (Quotient.out o) := by
+theorem finsum_orbits_restrict
+    (i : Y' → Y) (hi : Function.Injective i) (heq : ∀ (η : G) (y : Y'), i (η • y) = η • i y)
+    (g : Y → ℂ) (g' : Y' → ℂ) (hgg : ∀ y, g' y = g (i y))
+    (hg : ∀ (η : G) (y : Y), g (η • y) = g y) (h0 : ∀ y, g y ≠ 0 → y ∈ Set.range i)
+    : ∑ᶠ o : orbitRel.Quotient G Y, g (Quotient.out o)
+      = ∑ᶠ o : orbitRel.Quotient G Y', g' (Quotient.out o) := by
   have hgo : ∀ x : Y, g (Quotient.out (Quotient.mk (orbitRel G Y) x)) = g x := by
     intro x
     obtain ⟨η, hη⟩ := out_mk_mem_orbit (G := G) x
     simp only at hη
     rw [← hη, hg]
   have hφ := injective_mk_comp_out i hi heq
-  have hsupp : Function.support (fun o : orbitRel.Quotient G Y => g (Quotient.out o)) ⊆
-      Set.range (fun o : orbitRel.Quotient G Y' =>
-        (Quotient.mk (orbitRel G Y) (i (Quotient.out o)) : orbitRel.Quotient G Y)) := by
+  have hsupp
+      : Function.support (fun o : orbitRel.Quotient G Y => g (Quotient.out o))
+        ⊆ Set.range (fun o : orbitRel.Quotient G Y' =>
+          (Quotient.mk (orbitRel G Y) (i (Quotient.out o)) : orbitRel.Quotient G Y)) := by
     intro o ho
     obtain ⟨y, hy⟩ := h0 _ ho
     refine ⟨Quotient.mk (orbitRel G Y') y, ?_⟩
@@ -55,8 +55,9 @@ theorem finsum_orbits_restrict (i : Y' → Y) (hi : Function.Injective i)
     rw [← hη, heq, hy]
     conv_rhs => rw [← Quotient.out_eq o]
     exact Quotient.sound (orbitRel_apply.mpr (mem_orbit _ _))
-  rw [← finsum_mem_univ, finsum_mem_inter_support_eq' _ Set.univ _
-    (fun x hx => ⟨fun _ => hsupp hx, fun _ => trivial⟩), finsum_mem_range hφ]
+  rw [← finsum_mem_univ,
+    finsum_mem_inter_support_eq' _ Set.univ _ (fun x hx => ⟨fun _ => hsupp hx, fun _ => trivial⟩),
+    finsum_mem_range hφ]
   exact finsum_congr fun o => by rw [hgo, hgg]
 
 end Restrict
@@ -72,51 +73,58 @@ def finiteStabilizerSubMulAction (Γ Y : Type) [Group Γ] [MulAction Γ Y] : Sub
     rw [stabilizer_smul_eq_stabilizer_map_conj, Subgroup.coe_map]
     exact Set.Finite.image _ hy
 
-theorem mem_stabilizer_conj_iff (η x : Γ) (y : Y) :
-    x ∈ stabilizer Γ y ↔ η * x * η⁻¹ ∈ stabilizer Γ (η • y) := by
+theorem mem_stabilizer_conj_iff (η x : Γ) (y : Y)
+    : x ∈ stabilizer Γ y ↔ η * x * η⁻¹ ∈ stabilizer Γ (η • y) := by
   simp only [mem_stabilizer_iff, mul_smul, inv_smul_smul]
   exact (smul_left_cancel_iff η).symm
 
-theorem natCard_stabilizer_inf_smul (K : Subgroup Γ) (η : Γ) (hK : ∀ x, x ∈ K ↔ η * x * η⁻¹ ∈ K)
-    (y : Y) : Nat.card (stabilizer Γ (η • y) ⊓ K : Subgroup Γ) = Nat.card (stabilizer Γ y ⊓ K : Subgroup Γ) := by
+theorem natCard_stabilizer_inf_smul
+    (K : Subgroup Γ) (η : Γ) (hK : ∀ x, x ∈ K ↔ η * x * η⁻¹ ∈ K) (y : Y)
+    : Nat.card (stabilizer Γ (η • y) ⊓ K : Subgroup Γ)
+      = Nat.card (stabilizer Γ y ⊓ K : Subgroup Γ) := by
   symm
   refine Nat.card_congr ((MulAut.conj η).toEquiv.subtypeEquiv fun x => ?_)
   simp only [Subgroup.mem_inf, MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv, MulAut.conj_apply]
   rw [mem_stabilizer_conj_iff η x y, hK x]
 
-theorem natCard_stabilizer_smul (η : Γ) (y : Y) :
-    Nat.card (stabilizer Γ (η • y)) = Nat.card (stabilizer Γ y) := by
+theorem natCard_stabilizer_smul (η : Γ) (y : Y)
+    : Nat.card (stabilizer Γ (η • y)) = Nat.card (stabilizer Γ y) := by
   symm
   refine Nat.card_congr ((MulAut.conj η).toEquiv.subtypeEquiv fun x => ?_)
   simp only [MulEquiv.toEquiv_eq_coe, MulEquiv.coe_toEquiv, MulAut.conj_apply]
   exact mem_stabilizer_conj_iff η x y
 
-theorem mem_iff_conj_mem (K : Subgroup Γ) {η : Γ} (hη : η ∈ K) (x : Γ) :
-    x ∈ K ↔ η * x * η⁻¹ ∈ K := by
+theorem mem_iff_conj_mem (K : Subgroup Γ) {η : Γ} (hη : η ∈ K) (x : Γ)
+    : x ∈ K ↔ η * x * η⁻¹ ∈ K := by
   constructor
   · intro h; exact K.mul_mem (K.mul_mem hη h) (K.inv_mem hη)
   · intro h
     have := K.mul_mem (K.mul_mem (K.inv_mem hη) h) hη
     simpa [mul_assoc] using this
 
-theorem stabilizer_inf_centralizer_infinite (F : Y → Γ → ℂ)
-    (hF : ∀ (η : Γ) (y : Y) (γ : Γ), F (η • y) (η * γ * η⁻¹) = F y γ) (y : Y)
-    (hs : (Function.support (F y)).Finite) (c : Γ) (hc : F y c ≠ 0)
-    (hinf : (stabilizer Γ y : Set Γ).Infinite) :
-    ((stabilizer Γ y ⊓ Subgroup.centralizer {c} : Subgroup Γ) : Set Γ).Infinite := by
+theorem stabilizer_inf_centralizer_infinite
+    (F : Y → Γ → ℂ) (hF : ∀ (η : Γ) (y : Y) (γ : Γ), F (η • y) (η * γ * η⁻¹) = F y γ)
+    (y : Y) (hs : (Function.support (F y)).Finite)
+    (c : Γ) (hc : F y c ≠ 0)
+    (hinf : (stabilizer Γ y : Set Γ).Infinite)
+    : ((stabilizer Γ y ⊓ Subgroup.centralizer {c} : Subgroup Γ) : Set Γ).Infinite := by
   haveI : Infinite (stabilizer Γ y) := hinf.to_subtype
   haveI : Finite (Function.support (F y)) := hs.to_subtype
-  let f : stabilizer Γ y → Function.support (F y) := fun η =>
-    ⟨(η : Γ) * c * (η : Γ)⁻¹, by
+  let f : stabilizer Γ y → Function.support (F y) := fun η => ⟨
+    (η : Γ) * c * (η : Γ)⁻¹,
+    by
       show F y _ ≠ 0
       have h1 : (η : Γ) • y = y := η.2
       have := hF η y c
       rw [h1] at this
-      rw [this]; exact hc⟩
+      rw [this]
+      exact hc
+  ⟩
   obtain ⟨z, hz⟩ := Finite.exists_infinite_fiber f
   obtain ⟨⟨η₀, hη₀⟩⟩ : Nonempty ↑(f ⁻¹' {z}) := inferInstance
   refine Set.infinite_of_injective_forall_mem (α := ↑(f ⁻¹' {z}))
-    (f := fun η => (η₀ : Γ)⁻¹ * ((η : stabilizer Γ y) : Γ)) ?_ ?_
+    (f := fun η => (η₀ : Γ)⁻¹ * ((η : stabilizer Γ y) : Γ))
+    ?_ ?_
   · intro a b hab
     have : ((a : stabilizer Γ y) : Γ) = ((b : stabilizer Γ y) : Γ) := mul_left_cancel hab
     exact Subtype.ext (Subtype.ext this)
@@ -131,7 +139,9 @@ theorem stabilizer_inf_centralizer_infinite (F : Y → Γ → ℂ)
     intro h hh
     rw [Set.mem_singleton_iff] at hh
     subst hh
-    have h2 : (η₀ : Γ)⁻¹ * ((η : Γ) * h * (η : Γ)⁻¹) * η = (η₀ : Γ)⁻¹ * ((η₀ : Γ) * h * (η₀ : Γ)⁻¹) * η := by
+    have h2
+        : (η₀ : Γ)⁻¹ * ((η : Γ) * h * (η : Γ)⁻¹) * η
+          = (η₀ : Γ)⁻¹ * ((η₀ : Γ) * h * (η₀ : Γ)⁻¹) * η := by
       rw [E]
     simp only [mul_assoc, inv_mul_cancel_left, inv_mul_cancel, mul_one] at h2
     simp only [mul_assoc]

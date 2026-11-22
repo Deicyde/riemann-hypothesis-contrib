@@ -8,21 +8,27 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsDom
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 
 namespace GlobalTheory.ExtendNormal
 
-theorem isDominant_fst {P Y₀ Y : Scheme.{0}} (p : P ⟶ Y) (i : Y₀ ⟶ Y) [IsOpenImmersion p] [IsDominant i] :
-    IsDominant (pullback.fst p i) := by
+theorem isDominant_fst
+    {P Y₀ Y : Scheme.{0}} (p : P ⟶ Y) (i : Y₀ ⟶ Y) [IsOpenImmersion p] [IsDominant i]
+    : IsDominant (pullback.fst p i) := by
   refine ⟨?_⟩
   rw [DenseRange, Scheme.Pullback.range_fst]
   exact i.denseRange.preimage p.isOpenEmbedding.isOpenMap
 
-theorem glue {Y₀ Y X : Scheme.{0}} (i : Y₀ ⟶ Y) (t₀ : Y₀ ⟶ X) [IsDominant i] [IsReduced Y] [X.IsSeparated]
+theorem glue
+    {Y₀ Y X : Scheme.{0}} (i : Y₀ ⟶ Y) (t₀ : Y₀ ⟶ X) [IsDominant i] [IsReduced Y] [X.IsSeparated]
     (h : ∀ y : Y, ∃ (U : Y.Opens) (_ : y ∈ U) (t : U.toScheme ⟶ X),
-      ∀ (T : Scheme.{0}) (a : T ⟶ U.toScheme) (b : T ⟶ Y₀), a ≫ U.ι = b ≫ i → a ≫ t = b ≫ t₀) :
-    ∃ t : Y ⟶ X, i ≫ t = t₀ := by
+      ∀ (T : Scheme.{0}) (a : T ⟶ U.toScheme) (b : T ⟶ Y₀),
+        a ≫ U.ι = b ≫ i → a ≫ t = b ≫ t₀)
+    : ∃ t : Y ⟶ X, i ≫ t = t₀ := by
   choose U hy t ht using h
   have hU : TopologicalSpace.IsOpenCover U := by
     rw [TopologicalSpace.IsOpenCover, eq_top_iff]
@@ -36,7 +42,8 @@ theorem glue {Y₀ Y X : Scheme.{0}} (i : Y₀ ⟶ Y) (t₀ : Y₀ ⟶ X) [IsDom
     have : IsReduced (pullback (U x).ι (U y).ι) := isReduced_of_isOpenImmersion p
     have := isDominant_fst p i
     refine ext_of_isDominant (pullback.fst p i) ?_
-    rw [← Category.assoc, ← Category.assoc, ht x _ _ (pullback.snd p i), ht y _ _ (pullback.snd p i)]
+    rw [← Category.assoc, ← Category.assoc, ht x _ _ (pullback.snd p i),
+      ht y _ _ (pullback.snd p i)]
     · rw [Category.assoc, ← pullback.condition]
       exact pullback.condition
     · rw [Category.assoc]
@@ -48,35 +55,45 @@ theorem glue {Y₀ Y X : Scheme.{0}} (i : Y₀ ⟶ Y) (t₀ : Y₀ ⟶ X) [IsDom
   rw [pullback.condition_assoc, e]
   exact ht y _ _ _ pullback.condition.symm
 
-theorem exists_eq_fromSpec {X : Scheme.{0}} {W : X.Opens} (hW : IsAffineOpen W) (A : CommRingCat.{0})
-    (z : Spec A ⟶ X) (hz : ∀ p, z p ∈ W) : ∃ ψ : Γ(X, W) ⟶ A, Spec.map ψ ≫ hW.fromSpec = z := by
+theorem exists_eq_fromSpec
+    {X : Scheme.{0}} {W : X.Opens} (hW : IsAffineOpen W)
+    (A : CommRingCat.{0}) (z : Spec A ⟶ X) (hz : ∀ p, z p ∈ W)
+    : ∃ ψ : Γ(X, W) ⟶ A, Spec.map ψ ≫ hW.fromSpec = z := by
   have hr : Set.range z ⊆ Set.range hW.fromSpec := by
     rw [hW.range_fromSpec]
     rintro _ ⟨p, rfl⟩
     exact hz p
-  exact ⟨Spec.preimage (IsOpenImmersion.lift hW.fromSpec z hr), by
-    rw [Spec.map_preimage, IsOpenImmersion.lift_fac]⟩
+  exact ⟨
+    Spec.preimage (IsOpenImmersion.lift hW.fromSpec z hr),
+    by rw [Spec.map_preimage, IsOpenImmersion.lift_fac]
+  ⟩
 
-theorem exists_extension_local {X : Scheme.{0}} {W : X.Opens} (hW : IsAffineOpen W) (O K : Type) [CommRing O]
-    [IsDomain O] [IsLocalRing O] [IsNoetherianRing O] [IsIntegrallyClosed O] [Field K] [Algebra O K]
-    [IsFractionRing O K] (x : Sp K ⟶ X)
+theorem exists_extension_local
+    {X : Scheme.{0}} {W : X.Opens} (hW : IsAffineOpen W)
+    (O K : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [IsNoetherianRing O]
+    [IsIntegrallyClosed O] [Field K] [Algebra O K] [IsFractionRing O K]
+    (x : Sp K ⟶ X)
     (h : ∀ (V : ValuationSubring K) [IsDiscreteValuationRing V] (hV : ∀ r, algebraMap O K r ∈ V),
-      IsLocalHom ((algebraMap O K).codRestrict V hV) →
-      ∃ z : Sp V ⟶ X, spMap (algebraMap V K) ≫ z = x ∧ z (IsLocalRing.closedPoint V) ∈ W) :
-    ∃ g : Sp O ⟶ X, spMap (algebraMap O K) ≫ g = x := by
-  have h' : ∀ (V : ValuationSubring K), IsDiscreteValuationRing V →
-      LocalSubring.range (algebraMap O K) ≤ V.toLocalSubring →
-      ∃ ψ : Γ(X, W) ⟶ CommRingCat.of V, Spec.map (ψ ≫ CommRingCat.ofHom (algebraMap V K)) ≫ hW.fromSpec = x := by
+      IsLocalHom ((algebraMap O K).codRestrict V hV)
+        → ∃ z : Sp V ⟶ X, spMap (algebraMap V K) ≫ z = x ∧ z (IsLocalRing.closedPoint V) ∈ W)
+    : ∃ g : Sp O ⟶ X, spMap (algebraMap O K) ≫ g = x := by
+  have h'
+      : ∀ (V : ValuationSubring K),
+        IsDiscreteValuationRing V → LocalSubring.range (algebraMap O K) ≤ V.toLocalSubring
+          → ∃ ψ : Γ(X, W) ⟶ CommRingCat.of V,
+            Spec.map (ψ ≫ CommRingCat.ofHom (algebraMap V K)) ≫ hW.fromSpec = x := by
     intro V hV hle
     obtain ⟨h1, h2⟩ := (localSubring_range_le_valuationSubring_iff_isLocalHom _ _).mp hle
     obtain ⟨z, hz, hzW⟩ := h V h1 h2
-    obtain ⟨ψ, rfl⟩ := exists_eq_fromSpec hW _ z fun p =>
-      ((IsLocalRing.specializes_closedPoint p).map z.continuous).mem_open W.isOpen hzW
+    obtain ⟨ψ, rfl⟩ :=
+      exists_eq_fromSpec hW _ z fun p =>
+        ((IsLocalRing.specializes_closedPoint p).map z.continuous).mem_open W.isOpen hzW
     exact ⟨ψ, by rw [Spec.map_comp, Category.assoc, ← hz]⟩
   by_cases hO : IsField O
   · have hb : Function.Bijective (algebraMap O K) :=
       ⟨IsFractionRing.injective O K, IsFractionRing.surjective_iff_isField.mpr hO⟩
-    have : IsIso (CommRingCat.ofHom (algebraMap O K)) := (ConcreteCategory.isIso_iff_bijective _).mpr hb
+    have : IsIso (CommRingCat.ofHom (algebraMap O K)) :=
+      (ConcreteCategory.isIso_iff_bijective _).mpr hb
     exact ⟨inv (spMap (algebraMap O K)) ≫ x, IsIso.hom_inv_id_assoc _ _⟩
   obtain ⟨V₀, hV₀, hle₀⟩ := exists_discreteValuationSubring_dominating O K K hO
   obtain ⟨ψ₀, hψ₀⟩ := h' V₀ hV₀ hle₀
@@ -90,9 +107,10 @@ theorem exists_extension_local {X : Scheme.{0}} {W : X.Opens} (hW : IsAffineOpen
     rw [← Spec.map_injective hψ]
     exact (ψ.hom b).2
   let e : O ≃+* (algebraMap O K).range :=
-    RingEquiv.ofBijective (algebraMap O K).rangeRestrict
-      ⟨fun a b hab => IsFractionRing.injective O K (congrArg Subtype.val hab),
-        (algebraMap O K).rangeRestrict_surjective⟩
+    RingEquiv.ofBijective (algebraMap O K).rangeRestrict ⟨
+      fun a b hab => IsFractionRing.injective O K (congrArg Subtype.val hab),
+      (algebraMap O K).rangeRestrict_surjective
+    ⟩
   let φ' : Γ(X, W) →+* O := e.symm.toRingHom.comp (φ.hom.codRestrict _ hmem)
   refine ⟨Spec.map (CommRingCat.ofHom φ') ≫ hW.fromSpec, ?_⟩
   rw [← hψ₀, ← Spec.map_comp_assoc]
@@ -100,15 +118,18 @@ theorem exists_extension_local {X : Scheme.{0}} {W : X.Opens} (hW : IsAffineOpen
   ext b
   exact congrArg Subtype.val (e.apply_symm_apply ⟨φ.hom b, hmem b⟩)
 
-theorem isDominant_spMap (O K : Type) [CommRing O] [IsDomain O] [Field K] [Algebra O K] [IsFractionRing O K] :
-    IsDominant (spMap (algebraMap O K)) := by
+theorem isDominant_spMap
+    (O K : Type) [CommRing O] [IsDomain O] [Field K] [Algebra O K] [IsFractionRing O K]
+    : IsDominant (spMap (algebraMap O K)) := by
   refine ⟨(PrimeSpectrum.denseRange_comap_iff_ker_le_nilRadical _).mpr ?_⟩
   exact ((RingHom.injective_iff_ker_eq_bot _).mp (IsFractionRing.injective O K)).le.trans bot_le
 
-theorem exists_nhds_specializes {Y : Scheme.{0}} [IsLocallyNoetherian Y] (y : Y) [IsDomain (Y.presheaf.stalk y)]
-    (V : Y.Opens) (hy : y ∈ V) :
-    ∃ U : Y.Opens, y ∈ U ∧ U ≤ V ∧
-      ∀ u ∈ U, Y.fromSpecStalk y (⊥ : PrimeSpectrum (Y.presheaf.stalk y)) ⤳ u := by
+theorem exists_nhds_specializes
+    {Y : Scheme.{0}} [IsLocallyNoetherian Y]
+    (y : Y) [IsDomain (Y.presheaf.stalk y)]
+    (V : Y.Opens) (hy : y ∈ V)
+    : ∃ U : Y.Opens,
+      y ∈ U ∧ U ≤ V ∧ ∀ u ∈ U, Y.fromSpecStalk y (⊥ : PrimeSpectrum (Y.presheaf.stalk y)) ⤳ u := by
   obtain ⟨U, hyU, hU, hUV, hinj⟩ := Y.exists_le_and_germ_injective y V hy
   have : IsDomain Γ(Y, U) := hinj.isDomain _
   refine ⟨U, hyU, hUV, fun u hu => ?_⟩
@@ -122,24 +143,30 @@ theorem exists_nhds_specializes {Y : Scheme.{0}} [IsLocallyNoetherian Y] (y : Y)
   rw [← hq]
   exact ((PrimeSpectrum.le_iff_specializes ⊥ q).mp bot_le).map (Y.fromSpecStalk y).continuous
 
-theorem spMap_apply_eq_bot (O K : Type) [CommRing O] [IsDomain O] [Field K] [Algebra O K] [IsFractionRing O K]
-    (p : Sp K) : spMap (algebraMap O K) p = (⊥ : PrimeSpectrum O) := by
+theorem spMap_apply_eq_bot
+    (O K : Type) [CommRing O] [IsDomain O] [Field K] [Algebra O K] [IsFractionRing O K] (p : Sp K)
+    : spMap (algebraMap O K) p = (⊥ : PrimeSpectrum O) := by
   refine PrimeSpectrum.ext ?_
   change Ideal.comap (algebraMap O K) p.asIdeal = ⊥
   have hp : Ideal.IsPrime (α := K) p.asIdeal := p.isPrime
   rw [Ideal.eq_bot_of_prime (K := K) p.asIdeal]
   exact Ideal.comap_bot_of_injective _ (IsFractionRing.injective O K)
 
-theorem exists_extension_nhds {R : Type} [CommRing R] {Y₀ Y X : Scheme.{0}} (i : Y₀ ⟶ Y) (σ : Y ⟶ Sp R)
-    (τ : X ⟶ Sp R) (t₀ : Y₀ ⟶ X) [IsOpenImmersion i] [IsDominant i] [IsLocallyNoetherian Y] [IsReduced Y]
-    [X.IsSeparated] [LocallyOfFiniteType τ] (hc : i ≫ σ = t₀ ≫ τ) (y : Y) [IsDomain (Y.presheaf.stalk y)]
-    [IsIntegrallyClosed (Y.presheaf.stalk y)] {W : X.Opens} (hW : IsAffineOpen W)
-    (h : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-      [IsFractionRing V K] (y' : Sp V ⟶ Y) (x : Sp K ⟶ Y₀), spMap (algebraMap V K) ≫ y' = x ≫ i →
-      y' (IsLocalRing.closedPoint V) = y →
-      ∃ z : Sp V ⟶ X, spMap (algebraMap V K) ≫ z = x ≫ t₀ ∧ z (IsLocalRing.closedPoint V) ∈ W) :
-    ∃ (U : Y.Opens) (_ : y ∈ U) (t : U.toScheme ⟶ X),
-      ∀ (T : Scheme.{0}) (a : T ⟶ U.toScheme) (b : T ⟶ Y₀), a ≫ U.ι = b ≫ i → a ≫ t = b ≫ t₀ := by
+theorem exists_extension_nhds
+    {R : Type} [CommRing R]
+    {Y₀ Y X : Scheme.{0}} (i : Y₀ ⟶ Y) (σ : Y ⟶ Sp R) (τ : X ⟶ Sp R) (t₀ : Y₀ ⟶ X)
+    [IsOpenImmersion i] [IsDominant i] [IsLocallyNoetherian Y] [IsReduced Y] [X.IsSeparated]
+    [LocallyOfFiniteType τ]
+    (hc : i ≫ σ = t₀ ≫ τ)
+    (y : Y) [IsDomain (Y.presheaf.stalk y)] [IsIntegrallyClosed (Y.presheaf.stalk y)]
+    {W : X.Opens} (hW : IsAffineOpen W)
+    (h : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K]
+        [Algebra V K] [IsFractionRing V K] (y' : Sp V ⟶ Y) (x : Sp K ⟶ Y₀),
+      spMap (algebraMap V K) ≫ y' = x ≫ i → y' (IsLocalRing.closedPoint V) = y
+        → ∃ z : Sp V ⟶ X, spMap (algebraMap V K) ≫ z = x ≫ t₀ ∧ z (IsLocalRing.closedPoint V) ∈ W)
+    : ∃ (U : Y.Opens) (_ : y ∈ U) (t : U.toScheme ⟶ X),
+      ∀ (T : Scheme.{0}) (a : T ⟶ U.toScheme) (b : T ⟶ Y₀),
+        a ≫ U.ι = b ≫ i → a ≫ t = b ≫ t₀ := by
   let O : Type := Y.presheaf.stalk y
   let K : Type := FractionRing O
   let j : Sp K ⟶ Spec (Y.presheaf.stalk y) := spMap (algebraMap O K)
@@ -151,8 +178,10 @@ theorem exists_extension_nhds {R : Type} [CommRing R] {Y₀ Y X : Scheme.{0}} (i
     obtain ⟨U, hyU, -, hU⟩ := exists_nhds_specializes y ⊤ trivial
     obtain ⟨u, hu⟩ := i.denseRange.exists_mem_open U.isOpen ⟨y, hyU⟩
     exact (hU _ hu).mem_open i.isOpenEmbedding.isOpen_range ⟨u, rfl⟩
-  obtain ⟨x, hx⟩ : ∃ x : Sp K ⟶ Y₀, x ≫ i = j ≫ Y.fromSpecStalk y :=
-    ⟨_, IsOpenImmersion.lift_fac i (j ≫ Y.fromSpecStalk y) (by rintro _ ⟨p, rfl⟩; rw [hgen]; exact hgi)⟩
+  obtain ⟨x, hx⟩ : ∃ x : Sp K ⟶ Y₀, x ≫ i = j ≫ Y.fromSpecStalk y := ⟨
+    _,
+    IsOpenImmersion.lift_fac i (j ≫ Y.fromSpecStalk y) (by rintro _ ⟨p, rfl⟩; rw [hgen]; exact hgi)
+  ⟩
   obtain ⟨g, hg⟩ : ∃ g : Spec (Y.presheaf.stalk y) ⟶ X, j ≫ g = x ≫ t₀ := by
     refine exists_extension_local hW O K (x ≫ t₀) fun V _ hV hloc => ?_
     let k : Sp V ⟶ Spec (Y.presheaf.stalk y) := spMap ((algebraMap O K).codRestrict V hV)

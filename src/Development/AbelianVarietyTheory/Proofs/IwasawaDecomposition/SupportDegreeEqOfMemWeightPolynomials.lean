@@ -12,26 +12,31 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Domin
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix Formalism.MainNotions.G Formalism.MainNotions.TaylorLogMetric
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix Formalism.MainNotions.G
+  Formalism.MainNotions.TaylorLogMetric
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.WtHomog
 
 open MvPolynomial
 
-theorem coeff_aeval_diag {K : Type} [Field K] {σ : Type} (c : σ → K) (Q : MvPolynomial σ K)
-    (e : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (aeval (fun v => C (c v) * X v) Q : MvPolynomial σ K) e
+theorem coeff_aeval_diag
+    {K : Type} [Field K] {σ : Type} (c : σ → K) (Q : MvPolynomial σ K) (e : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (aeval (fun v => C (c v) * X v) Q : MvPolynomial σ K) e
       = (e.prod fun v k => c v ^ k) * AddMonoidAlgebra.coeff Q e := by
   classical
   induction Q using MvPolynomial.induction_on' generalizing e with
   | monomial u a =>
-    have h : (aeval (fun v => C (c v) * X v) (monomial u a) : MvPolynomial σ K)
-        = monomial u ((u.prod fun v k => c v ^ k) * a) := by
+    have h
+        : (aeval (fun v => C (c v) * X v) (monomial u a) : MvPolynomial σ K)
+          = monomial u ((u.prod fun v k => c v ^ k) * a) := by
       rw [aeval_monomial]
       simp only [mul_pow, Finsupp.prod_mul, ← map_pow]
       rw [show (u.prod fun v k => (C (c v ^ k) : MvPolynomial σ K))
-            = C (u.prod fun v k => c v ^ k) from (map_finsuppProd C _ _).symm]
+          = C (u.prod fun v k => c v ^ k) from
+        (map_finsuppProd C _ _).symm]
       rw [show (u.prod fun v k => (X v : MvPolynomial σ K) ^ k) = monomial u 1 from
         (monomial_eq (s := u) (a := (1 : K))).symm ▸ by simp]
       rw [algebraMap_eq, ← mul_assoc, ← C_mul, C_mul_monomial]
@@ -43,14 +48,16 @@ theorem coeff_aeval_diag {K : Type} [Field K] {σ : Type} (c : σ → K) (Q : Mv
   | add p q hp hq =>
     rw [map_add (f := _), MvPolynomial.coeff_add, MvPolynomial.coeff_add, hp, hq, mul_add]
 
-theorem deg_eq_of_mem_wtPol : ∀ {K : Type} [Field K] [CharZero K] {ι : Type} [Fintype ι] {n : ℕ} (ν : ι → Fin n → ℕ)
-    (Q : MvPolynomial (ι × Fin n × Fin n) K) (hQ : Q ∈ WtPol K ν), ∀ e ∈ Q.support, ∀ τ, ∑ α, ∑ s, e (τ, α, s) = ∑ r, ν τ r := by
+theorem deg_eq_of_mem_wtPol
+    : ∀ {K : Type} [Field K] [CharZero K] {ι : Type} [Fintype ι] {n : ℕ} (ν : ι → Fin n → ℕ)
+        (Q : MvPolynomial (ι × Fin n × Fin n) K) (hQ : Q ∈ WtPol K ν),
+      ∀ e ∈ Q.support, ∀ τ,
+        ∑ α, ∑ s, e (τ, α, s) = ∑ r, ν τ r := by
   intro K _ _ ι _ n ν Q hQ e he τ
   classical
   set c : ι → K := fun σ => if σ = τ then 2 else 1 with hc
   set β : ι → Matrix (Fin n) (Fin n) K := fun σ => c σ • (1 : Matrix (Fin n) (Fin n) K) with hβ
-  have hc0 : ∀ σ, c σ ≠ 0 := by
-    intro σ; simp only [hc]; split_ifs <;> norm_num
+  have hc0 : ∀ σ, c σ ≠ 0 := by intro σ; simp only [hc]; split_ifs <;> norm_num
   have hbor : IsBor β := by
     intro σ
     refine ⟨fun r s hsr => ?_, fun r => ?_⟩
@@ -87,8 +94,7 @@ theorem deg_eq_of_mem_wtPol : ∀ {K : Type} [Field K] [CharZero K] {ι : Type} 
     · simp
   rw [hL, hR, smul_eq_mul] at hcoef
   have heq := mul_right_cancel₀ hne hcoef
-  have h2 : ((2 : ℕ) ^ (∑ α, ∑ s, e (τ, α, s))) = (2 : ℕ) ^ (∑ r, ν τ r) := by
-    exact_mod_cast heq
+  have h2 : ((2 : ℕ) ^ (∑ α, ∑ s, e (τ, α, s))) = (2 : ℕ) ^ (∑ r, ν τ r) := by exact_mod_cast heq
   exact Nat.pow_right_injective (le_refl 2) h2
 
 end GlobalTheory.Mem.WtHomog

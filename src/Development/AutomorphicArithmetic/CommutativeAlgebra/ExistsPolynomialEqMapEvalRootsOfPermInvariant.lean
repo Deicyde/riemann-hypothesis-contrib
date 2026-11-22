@@ -8,9 +8,16 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.ExistsEvalRoo
 noncomputable section
 open Polynomial
 
-theorem UpperTheory.exists_polynomial_eq_map_eval_roots_of_perm_invariant :
-    ∀ (A : Type) [CommRing A] (N : ℕ) (g : A[X]) (Φ : (MvPolynomial (Fin N) A)[X]), (∀ σ : Equiv.Perm (Fin N), Φ.map (MvPolynomial.rename σ : MvPolynomial (Fin N) A →ₐ[A] _).toRingHom = Φ) →
-      ∃ p : A[X], p.natDegree ≤ Φ.natDegree ∧ ∀ (S : Type) [CommRing S] [Algebra A S] (x : Fin N → S), g.map (algebraMap A S) = ∏ i, (X - C (x i)) → p.map (algebraMap A S) = Φ.map (MvPolynomial.aeval x : MvPolynomial (Fin N) A →ₐ[A] S).toRingHom := by
+theorem UpperTheory.exists_polynomial_eq_map_eval_roots_of_perm_invariant
+    : ∀ (A : Type) [CommRing A] (N : ℕ) (g : A[X]) (Φ : (MvPolynomial (Fin N) A)[X]),
+      (∀ σ : Equiv.Perm (Fin N),
+          Φ.map (MvPolynomial.rename σ : MvPolynomial (Fin N) A →ₐ[A] _).toRingHom = Φ)
+        → ∃ p : A[X],
+          p.natDegree ≤ Φ.natDegree
+            ∧ ∀ (S : Type) [CommRing S] [Algebra A S] (x : Fin N → S),
+              g.map (algebraMap A S) = ∏ i, (X - C (x i))
+                → p.map (algebraMap A S)
+                  = Φ.map (MvPolynomial.aeval x : MvPolynomial (Fin N) A →ₐ[A] S).toRingHom := by
   intro A _ N g Φ hΦ
   have hsym : ∀ n, (Φ.coeff n).IsSymmetric := by
     intro n σ
@@ -23,7 +30,8 @@ theorem UpperTheory.exists_polynomial_eq_map_eval_roots_of_perm_invariant :
   · intro S _ _ x hx
     ext n
     rw [Polynomial.coeff_map, Polynomial.coeff_map, Polynomial.finsetSum_coeff]
-    simp only [Polynomial.coeff_monomial_apply, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_range]
+    simp only [Polynomial.coeff_monomial_apply, Finset.sum_ite_eq, Finset.sum_ite_eq',
+      Finset.mem_range]
     split_ifs with hn
     · rw [AlgHom.toRingHom_eq_coe, RingHom.coe_coe, ha n S x hx]
     · rw [Polynomial.coeff_eq_zero_of_natDegree_lt (by omega)]

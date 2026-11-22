@@ -34,7 +34,8 @@ def d1 (π : Representation k G M) : (G → M) →ₗ[k] (G × G → M) where
   map_smul' := fun c a => by ext x; simp [smul_sub, smul_add]
 
 def d2 (π : Representation k G M) : (G × G → M) →ₗ[k] (G × G × G → M) where
-  toFun z := fun x => π x.1 (z (x.2.1, x.2.2)) - z (x.1 * x.2.1, x.2.2) + z (x.1, x.2.1 * x.2.2) - z (x.1, x.2.1)
+  toFun z := fun x =>
+    π x.1 (z (x.2.1, x.2.2)) - z (x.1 * x.2.1, x.2.2) + z (x.1, x.2.1 * x.2.2) - z (x.1, x.2.1)
   map_add' := fun a b => by ext x; simp; abel
   map_smul' := fun c a => by ext x; simp [smul_sub, smul_add]
 
@@ -46,10 +47,13 @@ def B1 (π : Representation k G M) (N : Submodule k M) : Submodule k (G → M) :
 def Z2 (π : Representation k G M) (N : Submodule k M) : Submodule k (G × G → M) :=
   C2 G N ⊓ LinearMap.ker (d2 π)
 
-def B2 (π : Representation k G M) (N : Submodule k M) : Submodule k (G × G → M) := (C1 G N).map (d1 π)
+def B2 (π : Representation k G M) (N : Submodule k M) : Submodule k (G × G → M) :=
+  (C1 G N).map (d1 π)
 
-abbrev H1 (π : Representation k G M) (N : Submodule k M) : Type _ := Z1 π N ⧸ (B1 π N).submoduleOf (Z1 π N)
+abbrev H1 (π : Representation k G M) (N : Submodule k M) : Type _ :=
+  Z1 π N ⧸ (B1 π N).submoduleOf (Z1 π N)
 
-abbrev H2 (π : Representation k G M) (N : Submodule k M) : Type _ := Z2 π N ⧸ (B2 π N).submoduleOf (Z2 π N)
+abbrev H2 (π : Representation k G M) (N : Submodule k M) : Type _ :=
+  Z2 π N ⧸ (B2 π N).submoduleOf (Z2 π N)
 
 end ReciprocityTheory.Def

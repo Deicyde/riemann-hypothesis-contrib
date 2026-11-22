@@ -7,7 +7,8 @@ public import GroundTheory.GlobalFields.IdeleGroups.IdeleNorms
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.QSA GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.QSA GlobalTheory.Published
 open Matrix
 open scoped Quaternion Topology TensorProduct
 
@@ -16,17 +17,27 @@ namespace GlobalTheory
 
 open Filter
 
-theorem placesIdem_mem_nhds_one (F : Type) [Field F] [NumberField F] (U : Set (AF F)) (hU : U ∈ 𝓝 (1 : AF F)) :
-    ∃ (S₁ : Finset (InfinitePlace F)) (S₂ : Finset (HeightOneSpectrum (𝓞 F))) (ε : AF F),
+theorem placesIdem_mem_nhds_one
+    (F : Type) [Field F] [NumberField F] (U : Set (AF F)) (hU : U ∈ 𝓝 (1 : AF F))
+    : ∃ (S₁ : Finset (InfinitePlace F)) (S₂ : Finset (HeightOneSpectrum (𝓞 F))) (ε : AF F),
       IsPlacesIdem S₁ S₂ ε ∧ ε ∈ U := by
   classical
-  let x : Finset (HeightOneSpectrum (𝓞 F)) → Π v : HeightOneSpectrum (𝓞 F),
-      ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) :=
-    fun T v => if v ∈ T then ⟨1, (v.adicCompletionIntegers F).one_mem⟩ else ⟨0, (v.adicCompletionIntegers F).zero_mem⟩
-  let one' : Π v : HeightOneSpectrum (𝓞 F), ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) :=
+  let x
+      : Finset (HeightOneSpectrum (𝓞 F))
+        → Π v : HeightOneSpectrum (𝓞 F),
+          ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) := fun T v =>
+    if v ∈ T then
+      ⟨1, (v.adicCompletionIntegers F).one_mem⟩
+    else
+      ⟨0, (v.adicCompletionIntegers F).zero_mem⟩
+  let one'
+      : Π v : HeightOneSpectrum (𝓞 F), ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) :=
     fun v => ⟨1, (v.adicCompletionIntegers F).one_mem⟩
-  let sm := RestrictedProduct.structureMap (fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F)
-    (fun v => (v.adicCompletionIntegers F : Set (v.adicCompletion F))) Filter.cofinite
+  let sm :=
+    RestrictedProduct.structureMap
+      (fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F)
+      (fun v => (v.adicCompletionIntegers F : Set (v.adicCompletion F)))
+      Filter.cofinite
   let e : Finset (HeightOneSpectrum (𝓞 F)) → AF F := fun T => ((1 : Ainf F), (sm (x T) : Af F))
   have hx : Tendsto x atTop (𝓝 one') := by
     rw [tendsto_pi_nhds]
@@ -34,8 +45,7 @@ theorem placesIdem_mem_nhds_one (F : Type) [Field F] [NumberField F] (U : Set (A
     apply tendsto_atTop_of_eventually_const (i₀ := {v})
     intro T hT
     simp [x, one', hT (Finset.mem_singleton_self v)]
-  have h1 : (sm one' : Af F) = 1 := by
-    ext v; rfl
+  have h1 : (sm one' : Af F) = 1 := by ext v; rfl
   have he : Tendsto e atTop (𝓝 (1 : AF F)) := by
     have hc : Continuous sm := RestrictedProduct.isEmbedding_structureMap.continuous
     have h2 : Tendsto (fun T => (sm (x T) : Af F)) atTop (𝓝 (1 : Af F)) := by
@@ -54,9 +64,11 @@ theorem placesIdem_mem_nhds_one (F : Type) [Field F] [NumberField F] (U : Set (A
     show ((x T v : v.adicCompletion F)) = 0
     simp [x, hv]
 
-theorem placesIdem_tendsto_one : ∀ (F : Type) [Field F] [NumberField F], ∀ U : Set (AF F), U ∈ 𝓝 (1 : AF F) →
-    ∃ (S₁ : Finset (InfinitePlace F)) (S₂ : Finset (HeightOneSpectrum (𝓞 F))) (ε : AF F),
-      IsPlacesIdem S₁ S₂ ε ∧ ε ∈ U :=
-  fun F _ _ U hU => placesIdem_mem_nhds_one F U hU
+theorem placesIdem_tendsto_one
+    : ∀ (F : Type) [Field F] [NumberField F], ∀ U : Set (AF F),
+      U ∈ 𝓝 (1 : AF F)
+        → ∃ (S₁ : Finset (InfinitePlace F)) (S₂ : Finset (HeightOneSpectrum (𝓞 F))) (ε : AF F),
+          IsPlacesIdem S₁ S₂ ε ∧ ε ∈ U := fun F _ _ U hU =>
+  placesIdem_mem_nhds_one F U hU
 
 end GlobalTheory

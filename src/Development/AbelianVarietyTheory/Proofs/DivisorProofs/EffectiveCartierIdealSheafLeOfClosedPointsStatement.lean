@@ -7,14 +7,23 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NonUnitAt
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH GlobalTheory.Poinc
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH
+  GlobalTheory.Poinc
 open GlobalTheory.SiegelTor
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.effectiveCartier_idealSheaf_le_of_closedPoints : ∀ (X : Scheme.{0}) [CompactSpace X] (D : EffCartierData X) (K : X.IdealSheafData), (∀ x : X, IsClosed ({x} : Set X) → ∃ (W : X.affineOpens) (i : D.ι) (h : W.1 ≤ D.U i), x ∈ W.1 ∧ resG X h (D.f i) ∈ K.ideal W) → D.idealSheaf ≤ K := by
+theorem _root_.GlobalTheory.T.effectiveCartier_idealSheaf_le_of_closedPoints
+    : ∀ (X : Scheme.{0}) [CompactSpace X] (D : EffCartierData X) (K : X.IdealSheafData),
+      (∀ x : X,
+          IsClosed ({x} : Set X)
+            → ∃ (W : X.affineOpens) (i : D.ι) (h : W.1 ≤ D.U i),
+              x ∈ W.1 ∧ resG X h (D.f i) ∈ K.ideal W)
+        → D.idealSheaf ≤ K := by
   intro X _ D K hK
   have hc : ∀ y : X, ∃ x : X, IsClosed ({x} : Set X) ∧ y ⤳ x := fun y => by
-    obtain ⟨x, hx, hxc⟩ := (isClosed_closure (s := ({y} : Set X))).exists_closed_singleton
-      ⟨y, subset_closure rfl⟩
+    obtain ⟨x, hx, hxc⟩ :=
+      (isClosed_closure (s := ({y} : Set X))).exists_closed_singleton ⟨y, subset_closure rfl⟩
     exact ⟨x, hxc, specializes_iff_mem_closure.2 hx⟩
   choose x hxc hyx using hc
   choose W i h hxW hmem using fun y => hK (x y) (hxc y)

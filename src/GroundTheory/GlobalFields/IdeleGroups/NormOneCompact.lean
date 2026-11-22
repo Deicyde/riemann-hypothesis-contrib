@@ -17,8 +17,8 @@ variable (K : Type*) [Field K] [NumberField K]
 
 namespace IdeleGroup
 
-theorem exists_finset_mul_mem_standardOpenSubgroup :
-    ∃ R : Finset (IdeleGroup K), ∀ x : IdeleGroup K, ∃ k : Kˣ, ∃ r ∈ R,
+theorem exists_finset_mul_mem_standardOpenSubgroup
+    : ∃ R : Finset (IdeleGroup K), ∀ x : IdeleGroup K, ∃ k : Kˣ, ∃ r ∈ R,
       diagonal K k * x * r⁻¹ ∈ standardOpenSubgroup K := by
   classical
   let s : ClassGroup (𝓞 K) → IdeleGroup K := Function.invFun toClassGroup
@@ -32,18 +32,23 @@ theorem exists_finset_mul_mem_standardOpenSubgroup :
   rw [map_inv, mul_assoc, ← hku, inv_mul_cancel_left]
   exact hu
 
-theorem exists_isCompact_of_finset (R : Finset (IdeleGroup K))
-    (hR : ∀ x : IdeleGroup K, ∃ k : Kˣ, ∃ r ∈ R,
-      diagonal K k * x * r⁻¹ ∈ standardOpenSubgroup K) :
-    ∃ D : Set (IdeleGroup K), IsCompact D ∧
-      ∀ x ∈ normOneSubgroup K, ∃ k : Kˣ, diagonal K k * x ∈ D := by
-  obtain ⟨M, hM⟩ := exists_unit_forall_abs_log_le (K := K)
-    (∑ r ∈ R, |Real.log (ideleModule K r : ℝ)|)
-  let S := {x : IdeleGroup K | (∀ w : InfinitePlace K, |Real.log ‖(x : 𝔸[K]).1 w‖| ≤ M) ∧
-    x ∈ standardOpenSubgroup K}
-  refine ⟨⋃ r ∈ R, (fun s ↦ s * r) '' S, R.isCompact_biUnion fun r _ ↦
-    (isCompact_abs_log_le_inter_standardOpenSubgroup K M).image
-      (continuous_id.mul continuous_const), fun x hx ↦ ?_⟩
+theorem exists_isCompact_of_finset
+    (R : Finset (IdeleGroup K))
+    (hR : ∀ x : IdeleGroup K, ∃ k : Kˣ, ∃ r ∈ R, diagonal K k * x * r⁻¹ ∈ standardOpenSubgroup K)
+    : ∃ D : Set (IdeleGroup K),
+      IsCompact D ∧ ∀ x ∈ normOneSubgroup K, ∃ k : Kˣ, diagonal K k * x ∈ D := by
+  obtain ⟨M, hM⟩ :=
+    exists_unit_forall_abs_log_le (K := K) (∑ r ∈ R, |Real.log (ideleModule K r : ℝ)|)
+  let S :=
+    {x : IdeleGroup K | (∀ w : InfinitePlace K, |Real.log ‖(x : 𝔸[K]).1 w‖| ≤ M) ∧
+      x ∈ standardOpenSubgroup K}
+  refine ⟨
+    ⋃ r ∈ R, (fun s ↦ s * r) '' S,
+    R.isCompact_biUnion fun r _ ↦
+      (isCompact_abs_log_le_inter_standardOpenSubgroup K M).image
+        (continuous_id.mul continuous_const),
+    fun x hx ↦ ?_
+  ⟩
   obtain ⟨k, r, hr, hy⟩ := hR x
   set y := diagonal K k * x * r⁻¹ with hydef
   have hmod : ideleModule K y = (ideleModule K r)⁻¹ := by
@@ -55,20 +60,30 @@ theorem exists_isCompact_of_finset (R : Finset (IdeleGroup K))
       rw [ideleModule_apply, finiteModule_eq_one_of_mem hy, mul_one] at this
       exact this
     rw [h1, Real.log_inv, abs_neg]
-    exact Finset.single_le_sum (f := fun r ↦ |Real.log (ideleModule K r : ℝ)|)
-      (fun r _ ↦ abs_nonneg _) hr
+    exact Finset.single_le_sum
+      (f := fun r ↦ |Real.log (ideleModule K r : ℝ)|)
+      (fun r _ ↦ abs_nonneg _)
+      hr
   obtain ⟨u, hu⟩ := hM y hinf
-  refine ⟨unitsToUnits K u * k, Set.mem_biUnion hr
-    ⟨diagonal K (unitsToUnits K u) * y, ⟨hu, mul_mem (diagonal_unitsToUnits_mem K u) hy⟩, ?_⟩⟩
+  refine ⟨
+    unitsToUnits K u * k,
+    Set.mem_biUnion hr
+      ⟨diagonal K (unitsToUnits K u) * y, ⟨hu, mul_mem (diagonal_unitsToUnits_mem K u) hy⟩, ?_⟩
+  ⟩
   simp only [hydef, map_mul, mul_assoc, inv_mul_cancel, mul_one]
 
-theorem exists_isCompact_normOneSubgroup :
-    ∃ D : Set (IdeleGroup K), IsCompact D ∧ D ⊆ normOneSubgroup K ∧
-      ∀ x ∈ normOneSubgroup K, ∃ k : Kˣ, diagonal K k * x ∈ D := by
+theorem exists_isCompact_normOneSubgroup
+    : ∃ D : Set (IdeleGroup K),
+      IsCompact D ∧ D ⊆ normOneSubgroup K
+        ∧ ∀ x ∈ normOneSubgroup K, ∃ k : Kˣ, diagonal K k * x ∈ D := by
   obtain ⟨R, hR⟩ := exists_finset_mul_mem_standardOpenSubgroup K
   obtain ⟨D, hD, hxD⟩ := exists_isCompact_of_finset K R hR
-  refine ⟨D ∩ normOneSubgroup K, hD.inter_right (isClosed_normOneSubgroup K),
-    Set.inter_subset_right, fun x hx ↦ ?_⟩
+  refine ⟨
+    D ∩ normOneSubgroup K,
+    hD.inter_right (isClosed_normOneSubgroup K),
+    Set.inter_subset_right,
+    fun x hx ↦ ?_
+  ⟩
   obtain ⟨k, hk⟩ := hxD x hx
   exact ⟨k, hk, mul_mem (range_diagonal_le_normOneSubgroup K ⟨k, rfl⟩) hx⟩
 
@@ -76,8 +91,7 @@ end IdeleGroup
 
 namespace IdeleClassGroup
 
-theorem isCompact_normOneSubgroup :
-    IsCompact (normOneSubgroup K : Set (IdeleClassGroup K)) := by
+theorem isCompact_normOneSubgroup : IsCompact (normOneSubgroup K : Set (IdeleClassGroup K)) := by
   obtain ⟨D, hD, hDJ, hxD⟩ := IdeleGroup.exists_isCompact_normOneSubgroup K
   have h : (normOneSubgroup K : Set (IdeleClassGroup K)) = mk K '' D := by
     rw [normOneSubgroup_eq_map, Subgroup.coe_map]

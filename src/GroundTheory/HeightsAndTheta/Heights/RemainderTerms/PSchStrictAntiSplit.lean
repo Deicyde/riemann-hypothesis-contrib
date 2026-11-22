@@ -13,12 +13,12 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open Finset
 
-theorem SchStrictAntiSplit.add_gap_le {r : ℕ} {d : Fin r → ℕ} (hd : StrictAnti d) :
-    ∀ (k : ℕ) (i j : Fin r), (j : ℕ) = i + k → d j + k ≤ d i :=
+theorem SchStrictAntiSplit.add_gap_le {r : ℕ} {d : Fin r → ℕ} (hd : StrictAnti d)
+    : ∀ (k : ℕ) (i j : Fin r), (j : ℕ) = i + k → d j + k ≤ d i :=
   _root_.UpperTheory.Reformulated.B.Yoa4.add_gap_le hd
 
-theorem SchStrictAntiSplit.sum_staircase (r : ℕ) :
-    ∑ i : Fin r, (r - 1 - (i : ℕ)) = r * (r - 1) / 2 := by
+theorem SchStrictAntiSplit.sum_staircase (r : ℕ)
+    : ∑ i : Fin r, (r - 1 - (i : ℕ)) = r * (r - 1) / 2 := by
   rw [Fin.sum_univ_eq_sum_range (fun i => r - 1 - i) r, Finset.sum_range_reflect (fun i => i) r,
     Finset.sum_range_id]
 
@@ -27,14 +27,15 @@ theorem SchStrictAntiSplit.proof : SchStrictAntiSplit.Statement := by
   have hlow : ∀ i : Fin r, r - 1 - (i : ℕ) ≤ d i := by
     intro i
     have hr : 0 < r := Fin.pos i
-    have h := SchStrictAntiSplit.add_gap_le hd (r - 1 - (i : ℕ)) i ⟨r - 1, by omega⟩
-      (by simp; omega)
+    have h :=
+      SchStrictAntiSplit.add_gap_le hd (r - 1 - (i : ℕ)) i ⟨r - 1, by omega⟩ (by simp; omega)
     omega
   refine ⟨hlow, ?_⟩
   rw [partitionsOf, Finset.mem_filter, Finset.Nat.mem_antidiagonalTuple]
   refine ⟨?_, ?_⟩
-  · have hadd : ∑ i : Fin r, (d i - (r - 1 - (i : ℕ))) + ∑ i : Fin r, (r - 1 - (i : ℕ)) =
-        ∑ i : Fin r, d i := by
+  · have hadd
+        : ∑ i : Fin r, (d i - (r - 1 - (i : ℕ))) + ∑ i : Fin r, (r - 1 - (i : ℕ))
+          = ∑ i : Fin r, d i := by
       rw [← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun i _ => Nat.sub_add_cancel (hlow i)
     rw [SchStrictAntiSplit.sum_staircase] at hadd

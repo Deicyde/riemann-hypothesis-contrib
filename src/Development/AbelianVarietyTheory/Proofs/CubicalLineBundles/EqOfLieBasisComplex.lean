@@ -11,23 +11,29 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIsL
 
 set_option autoImplicit false
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
 namespace GlobalTheory.DerivZero
 
-theorem exists_lift_isMonHom {S S' : Scheme.{0}} {j : S' ⟶ S} {G H : Over S} {G' H' : Over S'} [GrpObj G] [GrpObj H]
-    [GrpObj G'] [GrpObj H'] {φ : G'.left ⟶ G.left} {ψ : H'.left ⟶ H.left} (hG : IsGrpPullback G' G j φ)
-    (hH : IsGrpPullback H' H j ψ) (f : G ⟶ H) [IsMonHom f] :
-    ∃ f' : G' ⟶ H', IsMonHom f' ∧ f'.left ≫ ψ = φ ≫ f.left := by
+theorem exists_lift_isMonHom
+    {S S' : Scheme.{0}} {j : S' ⟶ S} {G H : Over S} {G' H' : Over S'}
+    [GrpObj G] [GrpObj H] [GrpObj G'] [GrpObj H']
+    {φ : G'.left ⟶ G.left} {ψ : H'.left ⟶ H.left}
+    (hG : IsGrpPullback G' G j φ) (hH : IsGrpPullback H' H j ψ)
+    (f : G ⟶ H) [IsMonHom f]
+    : ∃ f' : G' ⟶ H', IsMonHom f' ∧ f'.left ≫ ψ = φ ≫ f.left := by
   have w : (φ ≫ f.left) ≫ H.hom = G'.hom ≫ j := by
     rw [Category.assoc, Over.w f]
     exact hG.1.w
   obtain ⟨f', hf'⟩ : ∃ f' : G' ⟶ H', f'.left ≫ ψ = φ ≫ f.left :=
     ⟨Over.homMk (hH.1.lift (φ ≫ f.left) G'.hom w) (hH.1.lift_snd _ _ w), hH.1.lift_fst _ _ w⟩
-  have hpt : ∀ {T : Over S'} (x : T ⟶ G'), ∃ x₀ : Over.mk (T.hom ≫ j) ⟶ G, x₀.left = x.left ≫ φ := by
+  have hpt
+      : ∀ {T : Over S'} (x : T ⟶ G'), ∃ x₀ : Over.mk (T.hom ≫ j) ⟶ G, x₀.left = x.left ≫ φ := by
     intro T x
     refine ⟨Over.homMk (x.left ≫ φ) ?_, rfl⟩
     dsimp
@@ -39,11 +45,11 @@ theorem exists_lift_isMonHom {S S' : Scheme.{0}} {j : S' ⟶ S} {G H : Over S} {
     apply Over.OverMorphism.ext
     apply hH.1.hom_ext
     · have e1 := hG.2 T x y x₀ y₀ hx₀ hy₀
-      have e2 := hH.2 T (x ≫ f') (y ≫ f') (x₀ ≫ f) (y₀ ≫ f)
-        (by simp only [Over.comp_left, hx₀, Category.assoc, hf'])
-        (by simp only [Over.comp_left, hy₀, Category.assoc, hf'])
-      have e3 : (x₀ * y₀) ≫ f = (x₀ ≫ f) * (y₀ ≫ f) := by
-        simp [Hom.mul_def]
+      have e2 :=
+        hH.2 T (x ≫ f') (y ≫ f') (x₀ ≫ f) (y₀ ≫ f)
+          (by simp only [Over.comp_left, hx₀, Category.assoc, hf'])
+          (by simp only [Over.comp_left, hy₀, Category.assoc, hf'])
+      have e3 : (x₀ * y₀) ≫ f = (x₀ ≫ f) * (y₀ ≫ f) := by simp [Hom.mul_def]
       rw [← e2, ← e3]
       simp only [Over.comp_left, Category.assoc, hf', e1]
     · simp only [Over.w]

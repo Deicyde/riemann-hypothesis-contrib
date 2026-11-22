@@ -11,13 +11,14 @@ open Polynomial WeierstrassCurve WeierstrassCurve.Affine IntermediateField
 
 variable {F : Type*} [Field F] (E : WeierstrassCurve F) (p : ℕ) [hp : Fact p.Prime] [CharP F p]
 
-noncomputable def powAdjoin (M : IntermediateField F E.toAffine.FunctionField) (a : ℕ) :
-    IntermediateField M E.toAffine.FunctionField :=
+noncomputable def powAdjoin (M : IntermediateField F E.toAffine.FunctionField) (a : ℕ)
+    : IntermediateField M E.toAffine.FunctionField :=
   M⟮genX E ^ p ^ a, genY E ^ p ^ a⟯
 
-theorem powAdjoin_succ_eq_top (M : IntermediateField F E.toAffine.FunctionField)
-    (h1 : powAdjoin E p M 1 = ⊤) {a : ℕ} (ha : powAdjoin E p M a = ⊤) :
-    powAdjoin E p M (a + 1) = ⊤ := by
+theorem powAdjoin_succ_eq_top
+    (M : IntermediateField F E.toAffine.FunctionField) (h1 : powAdjoin E p M 1 = ⊤)
+    {a : ℕ} (ha : powAdjoin E p M a = ⊤)
+    : powAdjoin E p M (a + 1) = ⊤ := by
   set T := powAdjoin E p M (a + 1) with hT
   let Q : IntermediateField M E.toAffine.FunctionField :=
     (T.toSubfield.comap (frobenius E.toAffine.FunctionField p)).toIntermediateField fun m => by
@@ -45,10 +46,11 @@ theorem powAdjoin_succ_eq_top (M : IntermediateField F E.toAffine.FunctionField)
 
 variable [PerfectRing F p]
 
-theorem le_powField_of_finSepDegree_lt (M : IntermediateField F E.toAffine.FunctionField)
+theorem le_powField_of_finSepDegree_lt
+    (M : IntermediateField F E.toAffine.FunctionField)
     [FiniteDimensional M E.toAffine.FunctionField]
-    (h : Field.finSepDegree M E.toAffine.FunctionField <
-      Module.finrank M E.toAffine.FunctionField) : M ≤ powField E p := by
+    (h : Field.finSepDegree M E.toAffine.FunctionField < Module.finrank M E.toAffine.FunctionField)
+    : M ≤ powField E p := by
   by_contra hM
   set N := M ⊔ powField E p
   have t := relfinrank_mul_relfinrank (le_sup_right : powField E p ≤ N) (le_top : N ≤ ⊤)
@@ -74,8 +76,9 @@ theorem le_powField_of_finSepDegree_lt (M : IntermediateField F E.toAffine.Funct
     haveI : ExpChar S p := ExpChar.prime hp.out
     obtain ⟨nx, hnx⟩ := IsPurelyInseparable.pow_mem S p (genX E)
     obtain ⟨ny, hny⟩ := IsPurelyInseparable.pow_mem S p (genY E)
-    have hmem : ∀ (z : E.toAffine.FunctionField) (n a : ℕ),
-        z ^ p ^ n ∈ (algebraMap S E.toAffine.FunctionField).range → n ≤ a → z ^ p ^ a ∈ S := by
+    have hmem
+        : ∀ (z : E.toAffine.FunctionField) (n a : ℕ),
+          z ^ p ^ n ∈ (algebraMap S E.toAffine.FunctionField).range → n ≤ a → z ^ p ^ a ∈ S := by
       intro z n a hz hn
       obtain ⟨s, hs⟩ := hz
       have e : z ^ p ^ a = (z ^ p ^ n) ^ p ^ (a - n) := by

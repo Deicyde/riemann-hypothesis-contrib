@@ -9,15 +9,20 @@ public import ReciprocityTheory.GaloisValuations.GlobalB
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory
 
-theorem eq_of_perturbed_pow_sub_one {R : Type*} [CommRing R] [IsDomain R] [IsLocalRing R]
+theorem eq_of_perturbed_pow_sub_one
+    {R : Type*} [CommRing R] [IsDomain R] [IsLocalRing R]
     (y z u : R) (m : ℕ) (h : Polynomial ℤ)
     (hy : y ^ m - 1 = u * Polynomial.aeval y h) (hz : z ^ m - 1 = u * Polynomial.aeval z h)
     (hu : u ∈ IsLocalRing.maximalIdeal R) (hzy : z - y ∈ IsLocalRing.maximalIdeal R)
-    (hm : (m : R) ∉ IsLocalRing.maximalIdeal R) : z = y := by
+    (hm : (m : R) ∉ IsLocalRing.maximalIdeal R)
+    : z = y := by
   by_contra hne
   have hne' : z - y ≠ 0 := sub_ne_zero.mpr hne
   obtain ⟨k, hk⟩ : z - y ∣ Polynomial.aeval z h - Polynomial.aeval y h := by
@@ -52,13 +57,15 @@ theorem eq_of_perturbed_pow_sub_one {R : Type*} [CommRing R] [IsDomain R] [IsLoc
   rw [geom_sum₂_self] at this
   exact mul_ne_zero hm0 (pow_ne_zero _ hy0) this
 
-theorem exists_roots_fixed_of_mem_Ine (E Ω : Type) [Field E] [NumberField E] [Field Ω]
-    [Algebra E Ω] [IsAlgClosure E Ω] (A' : ValuationSubring Ω) (σ : G E Ω)
-    (hσ : σ ∈ Ine (F := E) A') (b e : Ω) (m : ℕ) (f : Polynomial ℤ) (he : IsIntegral ℤ e)
-    (hσe : σ e = e) (hv : A'.valuation (1 - e) < 1) (hm : A'.valuation (m : Ω) = 1)
-    (hf : f.Monic) (hfm : f.natDegree = m) (hb : Polynomial.aeval b f = 0) :
-    ∃ ys : Multiset Ω, Multiset.card ys = m ∧ (∀ y ∈ ys, IsIntegral ℤ y ∧ σ y = y) ∧
-      e * (b ^ m - 1) = (ys.map (fun y => b - y)).prod := by
+theorem exists_roots_fixed_of_mem_Ine
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (A' : ValuationSubring Ω) (σ : G E Ω) (hσ : σ ∈ Ine (F := E) A')
+    (b e : Ω) (m : ℕ) (f : Polynomial ℤ) (he : IsIntegral ℤ e) (hσe : σ e = e)
+    (hv : A'.valuation (1 - e) < 1) (hm : A'.valuation (m : Ω) = 1) (hf : f.Monic)
+    (hfm : f.natDegree = m) (hb : Polynomial.aeval b f = 0)
+    : ∃ ys : Multiset Ω,
+      Multiset.card ys = m ∧ (∀ y ∈ ys, IsIntegral ℤ y ∧ σ y = y)
+        ∧ e * (b ^ m - 1) = (ys.map (fun y => b - y)).prod := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have hm0 : m ≠ 0 := by
     rintro rfl
@@ -82,8 +89,7 @@ theorem exists_roots_fixed_of_mem_Ine (E Ω : Type) [Field E] [NumberField E] [F
     rw [hf0d, ← Polynomial.smul_eq_C_mul]
     exact lt_of_le_of_lt ((Polynomial.degree_smul_le _ _).trans Polynomial.degree_map_le) hdeg
   have hg0 : g0.Monic := hf0.add_of_left hlt
-  have hg0d : g0.degree = m := by
-    rw [← hf0d]; exact Polynomial.degree_add_eq_left_of_degree_lt hlt
+  have hg0d : g0.degree = m := by rw [← hf0d]; exact Polynomial.degree_add_eq_left_of_degree_lt hlt
   have hev : ∀ y : Ω, Polynomial.aeval y g0 = Polynomial.aeval y f + e * Polynomial.aeval y h := by
     intro y
     simp only [g0, map_add (f := _), map_mul, Polynomial.aeval_map_algebraMap, Polynomial.aeval_C]
@@ -118,22 +124,26 @@ theorem exists_roots_fixed_of_mem_Ine (E Ω : Type) [Field E] [NumberField E] [F
       rw [this]
       congr 1
       exact (Polynomial.aeval_algHom_apply (σ : Ω →+* Ω).toIntAlgHom y h).symm
-    have hae : ∀ x : A', ((Polynomial.aeval x h : A') : Ω) = Polynomial.aeval (x : Ω) h :=
-      fun x => (Polynomial.aeval_algHom_apply A'.subtype.toIntAlgHom x h).symm
-    have := eq_of_perturbed_pow_sub_one (R := A') ⟨y, hyA⟩ ⟨σ y, hzA⟩ ⟨1 - e, huA⟩ m h
-      (Subtype.ext (by simpa [hae] using e1)) (Subtype.ext (by simpa [hae] using e2))
-      ((A'.valuation_lt_one_iff _).mpr hv)
-      ((A'.valuation_lt_one_iff _).mpr (hσ'.2 y ((A'.valuation_le_one_iff _).mpr hyA)))
-      (fun hh' => by
-        have := (A'.valuation_lt_one_iff _).mp hh'
-        rw [show ((m : A') : Ω) = m from by simp, hm] at this
-        exact lt_irrefl _ this)
+    have hae : ∀ x : A', ((Polynomial.aeval x h : A') : Ω) = Polynomial.aeval (x : Ω) h := fun x =>
+      (Polynomial.aeval_algHom_apply A'.subtype.toIntAlgHom x h).symm
+    have :=
+      eq_of_perturbed_pow_sub_one (R := A') ⟨y, hyA⟩ ⟨σ y, hzA⟩ ⟨1 - e, huA⟩ m h
+        (Subtype.ext (by simpa [hae] using e1)) (Subtype.ext (by simpa [hae] using e2))
+        ((A'.valuation_lt_one_iff _).mpr hv)
+        ((A'.valuation_lt_one_iff _).mpr (hσ'.2 y ((A'.valuation_le_one_iff _).mpr hyA)))
+        (fun hh' => by
+          have := (A'.valuation_lt_one_iff _).mp hh'
+          rw [show ((m : A') : Ω) = m from by simp, hm] at this
+          exact lt_irrefl _ this)
     exact congrArg Subtype.val this
-  · have := congrArg (Polynomial.eval b)
-      (Polynomial.prod_multiset_X_sub_C_of_monic_of_roots_card_eq hg hcard)
-    rw [Polynomial.eval_multiset_prod, Multiset.map_map, Polynomial.eval_map_algebraMap, hev,
-      hhev, hb] at this
+  · have :=
+      congrArg (Polynomial.eval b)
+        (Polynomial.prod_multiset_X_sub_C_of_monic_of_roots_card_eq hg hcard)
+    rw [Polynomial.eval_multiset_prod, Multiset.map_map, Polynomial.eval_map_algebraMap, hev, hhev,
+        hb]
+      at this
     simp only [Function.comp_def, eval_sub, eval_X, eval_C] at this
-    rw [this]; ring
+    rw [this]
+    ring
 
 end GlobalTheory

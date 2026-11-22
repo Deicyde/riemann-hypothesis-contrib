@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma card_img {κ : Type} [LinearOrder κ] {d : ℕ} (e : Fin d ↪o κ) : (img e).card = d := by
@@ -91,8 +92,8 @@ private lemma core (hDet : Det) (hK2 : KoszulBoundaryOfComponentMemIdeal) (hKS :
   exact (le_iSup₂_of_le (f := fun (t : S) (_ : t ∈ Set.range fun j => r (ι (e0 j))) => M.map (act t))
     (r (ι (e0 b))) ⟨b, rfl⟩ le_rfl) (Submodule.mem_map_of_mem (hSt _ (hρ l b) x hx))
 
-theorem UpperTheory.Gal.productCup_of_system.koszulThree_of_det :
-    Det → KoszulBoundaryOfComponentMemIdeal → KSub → WdBasic → K3 := by
+theorem UpperTheory.Gal.productCup_of_system.koszulThree_of_det
+    : Det → KoszulBoundaryOfComponentMemIdeal → KSub → WdBasic → K3 := by
   intro hDet hK2 hKS hWB S E _ _ _ _ act κ _ _ R M r d e e' N hSt hr hN hrel hdis hKE c hc
   classical
   have hmemL : ∀ j, e j ∈ img e ∪ img e' := fun j => Finset.mem_union_left _ (by simp [img])
@@ -103,7 +104,12 @@ theorem UpperTheory.Gal.productCup_of_system.koszulThree_of_det :
   let e0' : Fin d ↪o {l // l ∈ img e ∪ img e'} :=
     OrderEmbedding.ofStrictMono (fun j => ⟨e' j, hmemR j⟩) fun a b h => e'.strictMono h
   let ρ : {l // l ∈ img e ∪ img e'} → Fin d → S := fun l =>
-    if h : ∃ j, e j = l.1 then Pi.single h.choose 1 else if h' : ∃ a, e' a = l.1 then N h'.choose else 0
+    if h : ∃ j, e j = l.1 then
+      Pi.single h.choose 1
+    else if h' : ∃ a, e' a = l.1 then
+      N h'.choose
+    else
+      0
   have h1 : ∀ j, ρ (e0 j) = Pi.single j 1 := fun j => by
     have hex : ∃ i, e i = (e0 j).1 := ⟨j, rfl⟩
     have : hex.choose = j := e.injective hex.choose_spec
@@ -138,9 +144,7 @@ theorem UpperTheory.Gal.productCup_of_system.koszulThree_of_det :
       rw [this]
       exact hrel a
   have key := core hDet hK2 hKS hWB act R M r ι e0 e0' N ρ h1 h2 hρ hrel' hSt hr hKE c hc
-  have hi : (img e0).map ι.toEmbedding = img e := by
-    ext x; simp [img, ι, e0]
-  have hi' : (img e0').map ι.toEmbedding = img e' := by
-    ext x; simp [img, ι, e0']
+  have hi : (img e0).map ι.toEmbedding = img e := by ext x; simp [img, ι, e0]
+  have hi' : (img e0').map ι.toEmbedding = img e' := by ext x; simp [img, ι, e0']
   rw [hi, hi'] at key
   exact key

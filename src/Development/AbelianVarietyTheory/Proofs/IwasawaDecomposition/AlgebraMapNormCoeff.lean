@@ -19,19 +19,27 @@ def charK (φ : A →+* B) (hφ : φ.Finite) (K : Type) [Field K] [Algebra A K] 
 
 def normCoeff [IsDomain A] (φ : A →+* B) (hφ : φ.Finite) (b : B) (k : ℕ) : A :=
   letI := Classical.propDecidable
-  if h : ∃ a : A, algebraMap A (FractionRing A) a = (charK φ hφ (FractionRing A) b).reverse.coeff k then
-    h.choose else 0
+  if h
+      : ∃ a : A,
+        algebraMap A (FractionRing A) a = (charK φ hφ (FractionRing A) b).reverse.coeff k then
+    h.choose
+  else
+    0
 
-theorem algebraMap_normCoeff [IsDomain A] (φ : A →+* B) (hφ : φ.Finite) (b : B) (k : ℕ)
-    (h : ∃ a : A, algebraMap A (FractionRing A) a = (charK φ hφ (FractionRing A) b).reverse.coeff k) :
-    algebraMap A (FractionRing A) (normCoeff φ hφ b k) = (charK φ hφ (FractionRing A) b).reverse.coeff k := by
+theorem algebraMap_normCoeff
+    [IsDomain A]
+    (φ : A →+* B) (hφ : φ.Finite)
+    (b : B) (k : ℕ)
+    (h : ∃ a : A, algebraMap A (FractionRing A) a = (charK φ hφ (FractionRing A) b).reverse.coeff k)
+    : algebraMap A (FractionRing A) (normCoeff φ hφ b k)
+      = (charK φ hφ (FractionRing A) b).reverse.coeff k := by
   classical
   unfold normCoeff
   rw [dite_eq_left h]
   exact h.choose_spec
 
-theorem charK_monic (φ : A →+* B) (hφ : φ.Finite) (K : Type) [Field K] [Algebra A K] (b : B) :
-    (charK φ hφ K b).Monic := by
+theorem charK_monic (φ : A →+* B) (hφ : φ.Finite) (K : Type) [Field K] [Algebra A K] (b : B)
+    : (charK φ hφ K b).Monic := by
   letI := φ.toAlgebra
   haveI : Module.Finite A B := hφ
   exact LinearMap.charpoly_monic _

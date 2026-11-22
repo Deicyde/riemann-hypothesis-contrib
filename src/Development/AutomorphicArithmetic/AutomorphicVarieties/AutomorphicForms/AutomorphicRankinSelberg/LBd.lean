@@ -4,8 +4,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-theorem UpperTheory.V.Af.Rs.lBd :
-    UpperTheory.V.Af.Rs.LBd := by
+theorem UpperTheory.V.Af.Rs.lBd : UpperTheory.V.Af.Rs.LBd := by
   intro L _ ψ s hs
   set f : ℕ → ℂ := fun n => ψ n / ((n : ℝ) ^ (2 * s) : ℝ) with hf
   set g : ℕ → ℝ := fun n => 1 / (n : ℝ) ^ 2 with hg
@@ -20,8 +19,9 @@ theorem UpperTheory.V.Af.Rs.lBd :
         Real.rpow_le_rpow_of_exponent_le hn1 (by linarith)
       rw [Real.rpow_two] at hle
       simp only [hf, hg, norm_div, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hpos]
-      calc ‖ψ n‖ / (n : ℝ) ^ (2 * s) ≤ 1 / (n : ℝ) ^ (2 * s) :=
-            div_le_div_of_nonneg_right (DirichletCharacter.norm_le_one ψ _) hpos.le
+      calc
+        ‖ψ n‖ / (n : ℝ) ^ (2 * s) ≤ 1 / (n : ℝ) ^ (2 * s) :=
+          div_le_div_of_nonneg_right (DirichletCharacter.norm_le_one ψ _) hpos.le
         _ ≤ 1 / (n : ℝ) ^ 2 := one_div_le_one_div_of_le (by positivity) hle
   have hgs : HasSum g (Real.pi ^ 2 / 6) := hasSum_zeta_two
   have hsum : Summable f := Summable.of_norm_bounded hgs.summable hbd

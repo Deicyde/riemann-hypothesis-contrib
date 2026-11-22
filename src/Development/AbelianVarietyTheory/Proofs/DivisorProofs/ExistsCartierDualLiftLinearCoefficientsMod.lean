@@ -6,9 +6,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InvDer
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat GlobalTheory.LawDer
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat GlobalTheory.LawDer
 
-theorem GlobalTheory.QLog.Chart.exists_dual_lift_lin : ∀ (p : ℕ) (O : Type) [CommRing O] (G : PDivGroup p O) (d : ℕ) (c : QLog.Chart G d) (m : Ideal O), (p : O) ∈ m → ∃ n : ℕ, ∀ u : Fin d → O, ∃ φ : G.dual.A n, ∀ F, φ (c.ev n F) - ∑ i, u i * lin F i ∈ m := by
+theorem GlobalTheory.QLog.Chart.exists_dual_lift_lin
+    : ∀ (p : ℕ) (O : Type) [CommRing O] (G : PDivGroup p O) (d : ℕ) (c : QLog.Chart G d)
+        (m : Ideal O),
+      (p : O) ∈ m
+        → ∃ n : ℕ, ∀ u : Fin d → O, ∃ φ : G.dual.A n, ∀ F,
+          φ (c.ev n F) - ∑ i, u i * lin F i ∈ m := by
   intro p O _ G d c m hp
   obtain ⟨n, hn⟩ := c.ker 1 2
   refine ⟨n, fun u => ?_⟩
@@ -25,11 +32,12 @@ theorem GlobalTheory.QLog.Chart.exists_dual_lift_lin : ∀ (p : ℕ) (O : Type) 
     have : lin F i = p ^ 1 * a := ha
     rw [this, pow_one]
     exact m.mul_mem_right _ hp
-  let g : G.A n →ₗ[O] O ⧸ m := (LinearMap.ker (c.ev n).toLinearMap).liftQ f hk ∘ₗ
-    ((c.ev n).toLinearMap.quotKerEquivOfSurjective (c.surj n)).symm.toLinearMap
+  let g : G.A n →ₗ[O] O ⧸ m :=
+    (LinearMap.ker (c.ev n).toLinearMap).liftQ f hk
+      ∘ₗ ((c.ev n).toLinearMap.quotKerEquivOfSurjective (c.surj n)).symm.toLinearMap
   have hg : ∀ F, g (c.ev n F) = f F := fun F => by
-    have : ((c.ev n).toLinearMap.quotKerEquivOfSurjective (c.surj n)).symm (c.ev n F) =
-        Submodule.Quotient.mk F := by
+    have : ((c.ev n).toLinearMap.quotKerEquivOfSurjective (c.surj n)).symm (c.ev n F)
+        = Submodule.Quotient.mk F := by
       rw [LinearEquiv.symm_apply_eq]; rfl
     simp only [g, LinearMap.comp_apply, LinearEquiv.coe_coe, this, Submodule.liftQ_apply]
   obtain ⟨φ, hφ⟩ := Module.projective_lifting_property m.mkQ g m.mkQ_surjective

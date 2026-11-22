@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ZmodPrimeS
 
 noncomputable section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory.WFrob
 
@@ -114,9 +115,10 @@ private lemma root_term (wd : WData Tw K) {g : ℕ} (m : Fin g →₀ ℕ) (d : 
     rw [RingEquiv.symm_apply_eq, frobeniusEquiv_apply, frobenius_def, ← pow_mul,
       Nat.div_mul_cancel (hd i)]
 
-theorem wFrob :
-    (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {Tw : ATowerL R₀ p} {K : LAlg R₀}
-      (wd : WData Tw K) (g : ℕ), WFrobStatement wd g) := by
+theorem wFrob
+    : (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {Tw : ATowerL R₀ p} {K : LAlg R₀}
+        (wd : WData Tw K) (g : ℕ),
+      WFrobStatement wd g) := by
   intro R₀ _ p _ Tw K wd g G hG
   classical
   choose d e hde hd using coeff_decomp wd G hG
@@ -126,17 +128,23 @@ theorem wFrob :
     intro f
     rw [← Finset.sum_coe_sort G.support f]
     exact (Equiv.sum_comp G.support.equivFin.symm (fun x => f x)).symm
-  refine ⟨MvPolynomial.eval₂ (Int.castRingHom _)
-      (fun j => MvPolynomial.C (φW wd ((frobeniusEquiv wd.Rb p).symm (d (μ j)))) *
-        ∏ i, MvPolynomial.X i ^ (μ j i / p)) (wS p n) +
-      ∑ j, MvPolynomial.C (wd.πW.1 (e (μ j))) * ∏ i, MvPolynomial.X i ^ (μ j i), ?_⟩
+  refine ⟨
+    MvPolynomial.eval₂ (Int.castRingHom _)
+        (fun j =>
+          MvPolynomial.C (φW wd ((frobeniusEquiv wd.Rb p).symm (d (μ j))))
+            * ∏ i, MvPolynomial.X i ^ (μ j i / p))
+        (wS p n)
+      + ∑ j, MvPolynomial.C (wd.πW.1 (e (μ j))) * ∏ i, MvPolynomial.X i ^ (μ j i),
+    ?_
+  ⟩
   intro y hy a ha
   choose η s hy' using fun i => wd.decomp (y i)
   have hπy : ∀ i, wd.πW.1 (y i) = φW wd (η i) := fun i => by
     rw [hy' i, map_add (f := _), π_pmul, add_zero, φW_apply]
   have hw := wd.witt_add n (fun j => d (μ j) * ∏ i, η i ^ μ j i)
-  have hev : MvPolynomial.eval y G = ∑ j, wd.T (d (μ j) * ∏ i, η i ^ μ j i) +
-      p * ∑ j, e (μ j) * ∏ i, y i ^ μ j i := by
+  have hev
+      : MvPolynomial.eval y G
+        = ∑ j, wd.T (d (μ j) * ∏ i, η i ^ μ j i) + p * ∑ j, e (μ j) * ∏ i, y i ^ μ j i := by
     rw [MvPolynomial.eval_eq', hsum, Finset.mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [hde, add_mul, ← teich_term wd (μ j) (d (μ j)) (hd _) η s, mul_assoc]
@@ -160,6 +168,6 @@ theorem wFrob :
       rw [Function.comp_apply, Function.comp_apply, root_term wd (μ j) (d (μ j)) (hd _) η]
       simp only [map_mul, map_prod, map_pow, MvPolynomial.eval_C, MvPolynomial.eval_X, hπy]
   set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [map_sum, map_mul, map_prod, map_pow, MvPolynomial.eval_C, MvPolynomial.eval_X]
+  · simp only [map_sum, map_mul, map_prod, map_pow, MvPolynomial.eval_C, MvPolynomial.eval_X]
 
 end GlobalTheory.WFrob

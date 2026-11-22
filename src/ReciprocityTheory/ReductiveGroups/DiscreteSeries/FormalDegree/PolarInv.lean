@@ -17,22 +17,25 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 
 variable {n : ℕ}
 
-theorem polarInv_pmat_neg {ε : Fin n → Bool} (z : PCoord ε → ℂ) : pmat (-z) = -pmat z := by
+theorem polarInv_pmat_neg {ε : Fin n → Bool} (z : PCoord ε → ℂ) : pmat (-z) = - pmat z := by
   ext a b
   simp only [pmat, Matrix.neg_apply, Pi.neg_apply]
   split_ifs <;> simp [star_neg]
 
-theorem polarInv_Jm_pmat {ε : Fin n → Bool} (z : PCoord ε → ℂ) : Jm ε * pmat z * Jm ε = -pmat z := by
+theorem polarInv_Jm_pmat {ε : Fin n → Bool} (z : PCoord ε → ℂ)
+    : Jm ε * pmat z * Jm ε = - pmat z := by
   ext a b
   simp only [Jm, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.neg_apply]
   by_cases hab : ε a = ε b
   · have h0 : pmat z a b = 0 := by simp [pmat, hab]
-    rw [h0]; simp
-  · have hs : (if ε a then (1:ℂ) else -1) * (if ε b then 1 else -1) = -1 := by
+    rw [h0]
+    simp
+  · have hs : (if ε a then (1 : ℂ) else -1) * (if ε b then 1 else -1) = -1 := by
       cases ha : ε a <;> cases hb : ε b <;> simp_all
-    calc (if ε a then (1:ℂ) else -1) * pmat z a b * (if ε b then 1 else -1)
-        = ((if ε a then (1:ℂ) else -1) * (if ε b then 1 else -1)) * pmat z a b := by ring
-      _ = -pmat z a b := by rw [hs]; ring
+    calc
+      (if ε a then (1 : ℂ) else -1) * pmat z a b * (if ε b then 1 else -1)
+        = ((if ε a then (1 : ℂ) else -1) * (if ε b then 1 else -1)) * pmat z a b := by ring
+      _ = - pmat z a b := by rw [hs]; ring
 
 theorem polarInv_toMK_inv {ε : Fin n → Bool} (k : KG ε) : toMK k⁻¹ = (toMK k)ᴴ := by
   have hu : toMK k ∈ Matrix.unitaryGroup (Fin n) ℂ := k.2.1
@@ -51,8 +54,8 @@ private theorem conjTranspose_Jm_eq_Jm (ε : Fin n → Bool) : (Jm ε)ᴴ = Jm �
   simp only [Pi.star_apply]
   split_ifs <;> simp
 
-theorem polarInv_key {ε : Fin n → Bool} (k : KG ε) (z : PCoord ε → ℂ) :
-    Jm ε * (polarM (k, z))ᴴ * Jm ε = polarM (k⁻¹, adK k (-z)) := by
+theorem polarInv_key {ε : Fin n → Bool} (k : KG ε) (z : PCoord ε → ℂ)
+    : Jm ε * (polarM (k, z))ᴴ * Jm ε = polarM (k⁻¹, adK k (-z)) := by
   have hK : toMK k ∈ Matrix.unitaryGroup (Fin n) ℂ := k.2.1
   have hKJ : toMK k * Jm ε = Jm ε * toMK k := k.2.2
   have hJJ : Jm ε * Jm ε = 1 := Jm_mul_Jm_eq_oneFormalDegree ε
@@ -69,26 +72,31 @@ theorem polarInv_key {ε : Fin n → Bool} (k : KG ε) (z : PCoord ε → ℂ) :
   have hJinv : (Jm ε)⁻¹ = Jm ε := Matrix.inv_eq_right_inv hJJ
   have hE : (NormedSpace.exp (pmat z))ᴴ = NormedSpace.exp (pmat z) := by
     rw [← Matrix.exp_conjTranspose, (pmat_isHermitian z).eq]
-  have h1 : NormedSpace.exp (Jm ε * pmat z * (Jm ε)⁻¹) =
-      Jm ε * NormedSpace.exp (pmat z) * (Jm ε)⁻¹ := Matrix.exp_conj _ _ hJu
-  have h2 : NormedSpace.exp (toMK k * pmat (-z) * (toMK k)⁻¹) =
-      toMK k * NormedSpace.exp (pmat (-z)) * (toMK k)⁻¹ := Matrix.exp_conj _ _ hKu
+  have h1
+      : NormedSpace.exp (Jm ε * pmat z * (Jm ε)⁻¹) = Jm ε * NormedSpace.exp (pmat z) * (Jm ε)⁻¹ :=
+    Matrix.exp_conj _ _ hJu
+  have h2
+      : NormedSpace.exp (toMK k * pmat (-z) * (toMK k)⁻¹)
+        = toMK k * NormedSpace.exp (pmat (-z)) * (toMK k)⁻¹ :=
+    Matrix.exp_conj _ _ hKu
   rw [hJinv, polarInv_Jm_pmat] at h1
   rw [hKinv] at h2
   rw [show polarM (k, z) = toMK k * NormedSpace.exp (pmat z) from rfl,
     show polarM (k⁻¹, adK k (-z)) = toMK k⁻¹ * NormedSpace.exp (pmat (adK k (-z))) from rfl,
     polarInv_toMK_inv, pmat_adK, h2, Matrix.conjTranspose_mul, hE, polarInv_pmat_neg, h1]
-  calc Jm ε * (NormedSpace.exp (pmat z) * (toMK k)ᴴ) * Jm ε
+  calc
+    Jm ε * (NormedSpace.exp (pmat z) * (toMK k)ᴴ) * Jm ε
       = Jm ε * NormedSpace.exp (pmat z) * ((toMK k)ᴴ * Jm ε) := by simp only [Matrix.mul_assoc]
     _ = Jm ε * NormedSpace.exp (pmat z) * (Jm ε * (toMK k)ᴴ) := by rw [hKhJ]
     _ = ((toMK k)ᴴ * toMK k) * (Jm ε * NormedSpace.exp (pmat z) * Jm ε) * (toMK k)ᴴ := by
-        rw [hKhK, Matrix.one_mul]; simp only [Matrix.mul_assoc]
+      rw [hKhK, Matrix.one_mul]; simp only [Matrix.mul_assoc]
     _ = (toMK k)ᴴ * (toMK k * (Jm ε * NormedSpace.exp (pmat z) * Jm ε) * (toMK k)ᴴ) := by
-        simp only [Matrix.mul_assoc]
+      simp only [Matrix.mul_assoc]
 
-theorem polarInv_apply (ε : Fin n → Bool) (S : Set (UJ ε)) (hS : MeasurableSet S) :
-    muPolar ε S = ∫⁻ k, ∫⁻ z, (intMuCD_eM ε '' S).indicator (1 : (Fin n → Fin n → ℂ) → ENNReal)
-      (intMuCD_pM ε (k, z)) * ENNReal.ofReal (Jac z) ∂volume ∂(dk ε) := by
+theorem polarInv_apply (ε : Fin n → Bool) (S : Set (UJ ε)) (hS : MeasurableSet S)
+    : muPolar ε S
+      = ∫⁻ k, ∫⁻ z, (intMuCD_eM ε '' S).indicator (1 : (Fin n → Fin n → ℂ) → ENNReal)
+        (intMuCD_pM ε (k, z)) * ENNReal.ofReal (Jac z) ∂volume ∂(dk ε) := by
   have he : MeasurableEmbedding (intMuCD_eM ε) := (isClosedEmbedding_toM ε).measurableEmbedding
   have hT : MeasurableSet (intMuCD_eM ε '' S) := he.measurableSet_image.2 hS
   let F := (intMuCD_eM ε '' S).indicator (1 : (Fin n → Fin n → ℂ) → ENNReal)
@@ -102,10 +110,12 @@ theorem polarInv_apply (ε : Fin n → Bool) (S : Set (UJ ε)) (hS : MeasurableS
   rw [lintegral_map hF hpm]
   refine (lintegral_prod (F ∘ intMuCD_pM ε) (hF.comp hpm).aemeasurable).trans ?_
   refine lintegral_congr fun k => ?_
-  exact (lintegral_withDensity_eq_lintegral_mul _ hJ
-    (hF.comp (hpm.comp measurable_prodMk_left))).trans (lintegral_congr fun _ => mul_comm _ _)
+  exact
+    (lintegral_withDensity_eq_lintegral_mul _ hJ (hF.comp (hpm.comp measurable_prodMk_left))).trans
+      (lintegral_congr fun _ => mul_comm _ _)
 
-theorem muPolar_inv (ε : Fin n → Bool) : Measure.map (fun x : UJ ε => x⁻¹) (muPolar ε) = muPolar ε := by
+theorem muPolar_inv (ε : Fin n → Bool)
+    : Measure.map (fun x : UJ ε => x⁻¹) (muPolar ε) = muPolar ε := by
   have hinv : Measurable (fun x : UJ ε => x⁻¹) := continuous_inv.measurable
   have hinvK : Measurable (fun x : KG ε => x⁻¹) := continuous_inv.measurable
   have hce : Topology.IsClosedEmbedding (intMuCD_eM ε) := isClosedEmbedding_toM ε
@@ -113,10 +123,11 @@ theorem muPolar_inv (ε : Fin n → Bool) : Measure.map (fun x : UJ ε => x⁻¹
   ext S hS
   rw [Measure.map_apply hinv hS, polarInv_apply ε _ (hinv hS), polarInv_apply ε S hS]
   have hT : MeasurableSet (intMuCD_eM ε '' S) := he.measurableSet_image.2 hS
-  have hpt : ∀ (k : KG ε) (z : PCoord ε → ℂ),
-      (intMuCD_eM ε '' ((fun x : UJ ε => x⁻¹) ⁻¹' S)).indicator
-          (1 : (Fin n → Fin n → ℂ) → ENNReal) (intMuCD_pM ε (k, z)) =
-        (intMuCD_eM ε '' S).indicator 1 (intMuCD_pM ε (k⁻¹, adK k (-z))) := by
+  have hpt
+      : ∀ (k : KG ε) (z : PCoord ε → ℂ),
+        (intMuCD_eM ε '' ((fun x : UJ ε => x⁻¹) ⁻¹' S)).indicator
+            (1 : (Fin n → Fin n → ℂ) → ENNReal) (intMuCD_pM ε (k, z))
+          = (intMuCD_eM ε '' S).indicator 1 (intMuCD_pM ε (k⁻¹, adK k (-z))) := by
     intro k z
     obtain ⟨g, hg⟩ : polarM (k, z) ∈ Set.range (fun g : UJ ε => toM g) := by
       rw [range_toM]; exact polarM_inUJ (k, z)
@@ -135,8 +146,11 @@ theorem muPolar_inv (ε : Fin n → Bool) : Measure.map (fun x : UJ ε => x⁻¹
     ((measurable_one.indicator hT).comp hpm).mul
       (ENNReal.measurable_ofReal.comp ((jac_continuous ε).measurable.comp measurable_snd))
   have hH : Measurable fun k => ∫⁻ w, G (k, w) := hG.lintegral_prod_right'
-  have step : ∀ k : KG ε, ∫⁻ z, (intMuCD_eM ε '' ((fun x : UJ ε => x⁻¹) ⁻¹' S)).indicator 1
-      (intMuCD_pM ε (k, z)) * ENNReal.ofReal (Jac z) = ∫⁻ w, G (k⁻¹, w) := by
+  have step
+      : ∀ k : KG ε,
+        ∫⁻ z, (intMuCD_eM ε '' ((fun x : UJ ε => x⁻¹) ⁻¹' S)).indicator 1
+            (intMuCD_pM ε (k, z)) * ENNReal.ofReal (Jac z)
+          = ∫⁻ w, G (k⁻¹, w) := by
     intro k
     have hφ : MeasurePreserving (fun z : PCoord ε → ℂ => adK k (-z)) volume volume :=
       (adK_measurePreserving k).comp (Measure.measurePreserving_neg volume)
@@ -145,11 +159,12 @@ theorem muPolar_inv (ε : Fin n → Bool) : Measure.map (fun x : UJ ε => x⁻¹
     refine lintegral_congr fun z => ?_
     show _ = G (k⁻¹, adK k (-z))
     simp only [G, hpt, jac_adK, jac_neg]
-  calc ∫⁻ k, ∫⁻ z, (intMuCD_eM ε '' ((fun x : UJ ε => x⁻¹) ⁻¹' S)).indicator 1
-        (intMuCD_pM ε (k, z)) * ENNReal.ofReal (Jac z) ∂volume ∂(dk ε)
+  calc
+    ∫⁻ k, ∫⁻ z, (intMuCD_eM ε '' ((fun x : UJ ε => x⁻¹) ⁻¹' S)).indicator 1
+     (intMuCD_pM ε (k, z)) * ENNReal.ofReal (Jac z) ∂volume ∂(dk ε)
       = ∫⁻ k, (fun k => ∫⁻ w, G (k, w)) ((fun x : KG ε => x⁻¹) k) ∂(dk ε) := lintegral_congr step
     _ = ∫⁻ k, (∫⁻ w, G (k, w)) ∂(Measure.map (fun x : KG ε => x⁻¹) (dk ε)) := by
-        rw [lintegral_map hH hinvK]
+      rw [lintegral_map hH hinvK]
     _ = _ := by rw [(dk_props ε).2.2.2]
 
 end ReciprocityTheory.ChartRestriction.DS

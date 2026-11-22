@@ -24,40 +24,50 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GradedFo
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 noncomputable section
 namespace GlobalTheory.CompanionTheory.GrCech.Omega
 open GlobalTheory.CompanionTheory.GrForm GlobalTheory.CompanionTheory.GrVB
 
 variable {O : Type} [CommRing O] {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)}
 
-theorem evLift_mul_sub {W : X.Opens} {P : ObjectProperty (Thick (LL q))} (hP : ∀ T, P T → InU W T) (z x : Γ(X, W))
-    (T : P.FullSubcategory) :
-    (show T.obj.B from evLift hP z T) * lft W T.obj x - lft W T.obj (z * x) ∈ T.obj.J := by
+theorem evLift_mul_sub
+    {W : X.Opens} {P : ObjectProperty (Thick (LL q))}
+    (hP : ∀ T, P T → InU W T) (z x : Γ(X, W)) (T : P.FullSubcategory)
+    : (show T.obj.B from evLift hP z T) * lft W T.obj x - lft W T.obj (z * x) ∈ T.obj.J := by
   refine Ideal.Quotient.eq.1 ?_
   rw [map_mul, mk_evLift, lft_spec _ (hP _ T.property), lft_spec _ (hP _ T.property), map_mul]
 
-theorem rp_fAct {W : X.Opens} {P : ObjectProperty (Thick (LL q))} (hF : IsFil (sP P) (sFil P))
-    (hP : ∀ T, P T → InU W T) {d r : ℕ} {t : Fin d → Γ(X, W)} {u : Fin d → ∀ T : Thick (LL q), T.B}
-    (hu : IsLift W t u) (z : Γ(X, W)) (x : Idx r d → Γ(X, W)) (c : HU (GF q r) P r)
-    (hc : Rp (W := W) P u x c) : Rp (W := W) P u (fun I => z * x I) (fAct hF hP r z c) := by
+theorem rp_fAct
+    {W : X.Opens} {P : ObjectProperty (Thick (LL q))}
+    (hF : IsFil (sP P) (sFil P)) (hP : ∀ T, P T → InU W T)
+    {d r : ℕ} {t : Fin d → Γ(X, W)} {u : Fin d → ∀ T : Thick (LL q), T.B} (hu : IsLift W t u)
+    (z : Γ(X, W))
+    (x : Idx r d → Γ(X, W)) (c : HU (GF q r) P r) (hc : Rp (W := W) P u x c)
+    : Rp (W := W) P u (fun I => z * x I) (fAct hF hP r z c) := by
   obtain ⟨f, hf, rfl, hfs⟩ := hc
   refine ⟨(mulMor hF r (evLift hP z) (evLift_nat hP z)).pullC r f, ?_, rfl, ?_⟩
   · rw [CH.Mor.d_pullC, hf, map_zero]
   · intro s
     let uu : Fin d → ∀ T : P.FullSubcategory, (sP P).A.obj T := fun i T => u i T.obj
-    have hl : ∀ i {T T' : P.FullSubcategory} (φ : T ⟶ T'), uu i T' - ((sP P).A.map φ).hom (uu i T) ∈ (sP P).J.S T' :=
-      fun i {T T'} φ => sub_mem_of_lift φ.hom (hP _ T.property) (hP _ T'.property) (t i) _ _
+    have hl
+        : ∀ i {T T' : P.FullSubcategory} (φ : T ⟶ T'),
+          uu i T' - ((sP P).A.map φ).hom (uu i T) ∈ (sP P).J.S T' := fun i {T T'} φ =>
+      sub_mem_of_lift φ.hom (hP _ T.property) (hP _ T'.property) (t i) _ _
         (hu i _ (hP _ T.property)) (hu i _ (hP _ T'.property))
-    change Ideal.Quotient.mk _ (show (sP P).A.obj (s.obj (Fin.last r)) from evLift hP z (s.obj (Fin.last r))) *
-      (show sqM (sFil P r) (sFil P ((r : ℤ) + 1)) _ from f s).1 = _
+    change Ideal.Quotient.mk _
+          (show (sP P).A.obj (s.obj (Fin.last r)) from evLift hP z (s.obj (Fin.last r)))
+        * (show sqM (sFil P r) (sFil P ((r : ℤ) + 1)) _ from f s).1
+      = _
     rw [hfs s, ← map_mul, Ideal.Quotient.eq, Finset.mul_sum, ← Finset.sum_sub_distrib]
     refine Ideal.sum_mem _ fun I _ => ?_
     have hw := wz_mem hF uu hl I.1 s
     have := J_mul_sFil P r _ (evLift_mul_sub hP z (x I) (s.obj (Fin.last r))) hw
-    have e := units_mul_relation_rearrange_commRing (S := (sP P).A.obj (s.obj (Fin.last r)))
-      (evLift hP z (s.obj (Fin.last r))) (wz uu I.1 s) (lft W (s.obj (Fin.last r)).obj (x I))
-      (lft W (s.obj (Fin.last r)).obj (z * x I))
+    have e :=
+      units_mul_relation_rearrange_commRing (S := (sP P).A.obj (s.obj (Fin.last r)))
+        (evLift hP z (s.obj (Fin.last r))) (wz uu I.1 s) (lft W (s.obj (Fin.last r)).obj (x I))
+        (lft W (s.obj (Fin.last r)).obj (z * x I))
     exact Eq.mpr (congrArg (fun v => v ∈ (sFil P ((r : ℤ) + 1)).S (s.obj (Fin.last r))) e) this
 
 theorem basis : KH.LocGr → KH.PolyTf → ∀ {O : Type} [CommRing O] (l s : ℕ) (hb : TFBase (dividedPowersBot O) l s) {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of O)) {W₀ : X.Opens} {d : ℕ}

@@ -10,11 +10,12 @@ namespace GlobalTheory.ProductDegreeCoefficient
 
 open Polynomial
 
-theorem natDegree_le_and_coeff_prod_pow {B : Type u_1} [CommRing B] {T : Type u_2}
-    (s : Finset T) (p : T → Polynomial B) (e : T → ℕ)
-    (h : ∀ t : T, (p t).natDegree ≤ 1) :
-    (∏ t ∈ s, p t ^ e t).natDegree ≤ ∑ t ∈ s, e t ∧
-      (∏ t ∈ s, p t ^ e t).coeff (∑ t ∈ s, e t) = ∏ t ∈ s, (p t).coeff 1 ^ e t := by
+theorem natDegree_le_and_coeff_prod_pow
+    {B : Type u_1} [CommRing B]
+    {T : Type u_2}
+    (s : Finset T) (p : T → Polynomial B) (e : T → ℕ) (h : ∀ t : T, (p t).natDegree ≤ 1)
+    : (∏ t ∈ s, p t ^ e t).natDegree ≤ ∑ t ∈ s, e t
+      ∧ (∏ t ∈ s, p t ^ e t).coeff (∑ t ∈ s, e t) = ∏ t ∈ s, (p t).coeff 1 ^ e t := by
   classical
   induction s using Finset.induction_on with
   | empty => simp

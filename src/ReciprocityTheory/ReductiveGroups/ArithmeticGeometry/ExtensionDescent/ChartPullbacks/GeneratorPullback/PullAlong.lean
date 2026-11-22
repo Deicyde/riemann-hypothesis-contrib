@@ -18,7 +18,8 @@ attribute [local instance] Over.cartesianMonoidalCategory
 namespace ReciprocityTheory.ChartRestriction.G.Out.LBxP
 
 open Semi
-open ReciprocityTheory.ChartRestriction.G.Pdiv.PullbackComparison (gU unit_ext gU_res gU_pullU gU_pullU_congr gU_pullU_res pullU_res')
+open ReciprocityTheory.ChartRestriction.G.Pdiv.PullbackComparison
+  (gU unit_ext gU_res gU_pullU gU_pullU_congr gU_pullU_res pullU_res')
 
 section Germ
 

@@ -10,16 +10,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 open NumberField GlobalTheory.CuspRep UpperTheory.V
 
-private theorem sqId {A : Type} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A) :
-    ∑ i, ∑ j, E i j * E i j = Formalism.REAL.Cas E + (1 / 2 : ℂ) • ∑ i, ∑ j, (E i j - E j i) * (E i j - E j i) := by
+private theorem sqId {A : Type} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A)
+    : ∑ i, ∑ j, E i j * E i j
+      = Formalism.REAL.Cas E + (1 / 2 : ℂ) • ∑ i, ∑ j, (E i j - E j i) * (E i j - E j i) := by
   have h1 : ∑ i, ∑ j, E j i * E j i = ∑ i, ∑ j, E i j * E i j := Finset.sum_comm
   have h2 : ∑ i, ∑ j, E j i * E i j = ∑ i, ∑ j, E i j * E j i := Finset.sum_comm
   simp only [Formalism.REAL.Cas, sub_mul, mul_sub, Finset.sum_sub_distrib, h1, h2]
   module
 
-private theorem aevalShift {M : Type} [AddCommGroup M] [Module ℂ M] (Ω D : Module.End ℂ M) (h : Commute Ω D) (ω : ℂ)
-    (q : Polynomial ℂ) (x : M) (hx : Ω x = ω • x) :
-    Polynomial.aeval (Ω + D) (q.comp (Polynomial.X - Polynomial.C ω)) x = Polynomial.aeval D q x := by
+private theorem aevalShift
+    {M : Type} [AddCommGroup M] [Module ℂ M]
+    (Ω D : Module.End ℂ M) (h : Commute Ω D)
+    (ω : ℂ)
+    (q : Polynomial ℂ)
+    (x : M) (hx : Ω x = ω • x)
+    : Polynomial.aeval (Ω + D) (q.comp (Polynomial.X - Polynomial.C ω)) x
+      = Polynomial.aeval D q x := by
   have hp : ∀ (n : ℕ) (x : M), Ω x = ω • x → ((Ω + D - algebraMap ℂ _ ω) ^ n) x = (D ^ n) x := by
     intro n
     induction n with
@@ -29,8 +35,8 @@ private theorem aevalShift {M : Type} [AddCommGroup M] [Module ℂ M] (Ω D : Mo
       have e : (Ω + D - algebraMap ℂ _ ω) x = D x := by simp [hx]
       rw [pow_succ, pow_succ, Module.End.mul_apply, Module.End.mul_apply, e, ih]
       rw [← Module.End.mul_apply, h.eq, Module.End.mul_apply, hx, map_smul]
-  rw [Polynomial.aeval_comp, map_sub, Polynomial.aeval_X, Polynomial.aeval_C, Polynomial.aeval_eq_sum_range,
-    Polynomial.aeval_eq_sum_range]
+  rw [Polynomial.aeval_comp, map_sub, Polynomial.aeval_X, Polynomial.aeval_C,
+    Polynomial.aeval_eq_sum_range, Polynomial.aeval_eq_sum_range]
   simp only [LinearMap.sum_apply, LinearMap.smul_apply, hp _ x hx]
 
 theorem UpperTheory.V.Af.cuspFormsFiniteReal :

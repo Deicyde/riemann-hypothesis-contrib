@@ -5,10 +5,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleCohomol
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Bc
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Bc
 
-theorem UpperTheory.acy_middle_of_shortExact :
-    ∀ (Q : Scheme.{0} → Prop) (S : ShortComplex (Shv ℤ)), S.ShortExact → Acy Q S.X₁ → Acy Q S.X₃ → Acy Q S.X₂ := by
+theorem UpperTheory.acy_middle_of_shortExact
+    : ∀ (Q : Scheme.{0} → Prop) (S : ShortComplex (Shv ℤ)),
+      S.ShortExact → Acy Q S.X₁ → Acy Q S.X₃ → Acy Q S.X₂ := by
   intro Q S hS h1 h3 P hP n hn
   obtain ⟨z, hz⟩ := GlobalTheory.T.etaleCohomology_coefficient_longExactSequence ℤ S hS
   have e := (hz (sgl ((free ℤ).obj P)) n).1

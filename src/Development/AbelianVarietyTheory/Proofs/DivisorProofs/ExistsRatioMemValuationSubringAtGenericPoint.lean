@@ -15,17 +15,22 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HSCore GlobalTheory.HSChoice
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights GlobalTheory
+  GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HSCore GlobalTheory.HSChoice
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open CategoryTheory AlgebraicGeometry
 
 namespace GlobalTheory.Adelic.LinSys
 
-theorem exists_ratio_mem_of_point {F K : Type} [Field F] [Field K] (S : LinSys F) (hS : S.IsVariety) (r e : ℕ)
-    (u : Fin r → Fin S.N → F) (th : (lbPow S.L e).Sec) (hcov : ∀ y : S.Y, ∃ i, y ∈ nonzeroLocus (S.comb (u i)))
-    (x : Sp K ⟶ S.Y) (V : ValuationSubring K) (hV : ∀ c, S.baseHom x c ∈ V) :
-    ∃ i, S.val x (S.comb (u i)) ≠ 0 ∧ S.powVal x th / S.val x (S.comb (u i)) ^ e ∈ V := by
+theorem exists_ratio_mem_of_point
+    {F K : Type} [Field F] [Field K]
+    (S : LinSys F) (hS : S.IsVariety)
+    (r e : ℕ) (u : Fin r → Fin S.N → F)
+    (th : (lbPow S.L e).Sec) (hcov : ∀ y : S.Y, ∃ i, y ∈ nonzeroLocus (S.comb (u i)))
+    (x : Sp K ⟶ S.Y) (V : ValuationSubring K) (hV : ∀ c, S.baseHom x c ∈ V)
+    : ∃ i, S.val x (S.comb (u i)) ≠ 0 ∧ S.powVal x th / S.val x (S.comb (u i)) ^ e ∈ V := by
   have hpr : IsProper S.str := GlobalTheory.CommonModel.isProper_of_isProjOver hS.proj
   let φ : F →+* V := (S.baseHom x).codRestrict V hV
   have hsq : x ≫ S.str = specAlgebraMap V K ≫ spMap φ := by
@@ -50,8 +55,9 @@ theorem exists_ratio_mem_of_point {F K : Type} [Field F] [Field K] (S : LinSys F
     (map_ne_zero_iff _ (IsFractionRing.injective V K)).2 w.ne_zero
   have hv : S.val x (S.comb (u i)) ≠ 0 := fun h => hw₀ (by rw [← ha, h, mul_zero])
   refine ⟨i, hv, ?_⟩
-  have key : S.powVal x th / S.val x (S.comb (u i)) ^ e =
-      algebraMap V K (valR l _ (Twist.zfun th c) * ((w⁻¹ : Vˣ) : V) ^ e) := by
+  have key
+      : S.powVal x th / S.val x (S.comb (u i)) ^ e
+        = algebraMap V K (valR l _ (Twist.zfun th c) * ((w⁻¹ : Vˣ) : V) ^ e) := by
     have hinv : algebraMap V K ((w⁻¹ : Vˣ) : V) = (algebraMap V K (w : V))⁻¹ :=
       eq_inv_of_mul_eq_one_left (by rw [← map_mul, Units.inv_mul, map_one])
     rw [map_mul, map_pow, ← ht, hinv, ← ha, zpow_natCast]
@@ -60,7 +66,18 @@ theorem exists_ratio_mem_of_point {F K : Type} [Field F] [Field K] (S : LinSys F
   rw [key]
   exact (valR l _ (Twist.zfun th c) * ((w⁻¹ : Vˣ) : V) ^ e).2
 
-theorem exists_ratio_mem_valuationSubring : ∀ (F : Type) [Field F] (S : LinSys F), S.IsVariety → ∀ (r e : ℕ) (u : Fin r → Fin S.N → F) (th : (lbPow S.L e).Sec), (∀ y : S.Y, ∃ i, y ∈ nonzeroLocus (S.comb (u i))) → ∀ η : S.Y, IsGenericPoint η Set.univ → ∀ V : ValuationSubring (S.Y.residueField η), (∀ c, S.baseHom (resPt η) c ∈ V) → ∃ i, S.val (resPt η) (S.comb (u i)) ≠ 0 ∧ S.powVal (resPt η) th / S.val (resPt η) (S.comb (u i)) ^ e ∈ V :=
+theorem exists_ratio_mem_valuationSubring
+    : ∀ (F : Type) [Field F] (S : LinSys F),
+      S.IsVariety
+        → ∀ (r e : ℕ) (u : Fin r → Fin S.N → F) (th : (lbPow S.L e).Sec),
+          (∀ y : S.Y, ∃ i, y ∈ nonzeroLocus (S.comb (u i)))
+            → ∀ η : S.Y,
+              IsGenericPoint η Set.univ
+                → ∀ V : ValuationSubring (S.Y.residueField η),
+                  (∀ c, S.baseHom (resPt η) c ∈ V)
+                    → ∃ i,
+                      S.val (resPt η) (S.comb (u i)) ≠ 0
+                        ∧ S.powVal (resPt η) th / S.val (resPt η) (S.comb (u i)) ^ e ∈ V :=
   fun _ _ S hS r e u th hcov η _ V hV => exists_ratio_mem_of_point S hS r e u th hcov (resPt η) V hV
 
 end GlobalTheory.Adelic.LinSys

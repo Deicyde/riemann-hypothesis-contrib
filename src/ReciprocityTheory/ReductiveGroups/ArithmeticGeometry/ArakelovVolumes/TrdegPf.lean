@@ -7,18 +7,19 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 namespace ReciprocityTheory.ChartRestriction.G.AR
 
 open MvPolynomial in
-theorem kaehlerD_aeval_eq_sum {K : Type*} {Ω : Type*} [Field K] [Field Ω] [Algebra K Ω] {D : ℕ}
-    (x : Fin D → Ω) (P : MvPolynomial (Fin D) K) :
-    KaehlerDifferential.D K Ω (aeval x P) =
-      ∑ i, aeval x (pderiv i P) • KaehlerDifferential.D K Ω (x i) := by
+theorem kaehlerD_aeval_eq_sum
+    {K : Type*} {Ω : Type*} [Field K] [Field Ω] [Algebra K Ω]
+    {D : ℕ} (x : Fin D → Ω) (P : MvPolynomial (Fin D) K)
+    : KaehlerDifferential.D K Ω (aeval x P)
+      = ∑ i, aeval x (pderiv i P) • KaehlerDifferential.D K Ω (x i) := by
   induction P using MvPolynomial.induction_on
-  next a =>
-    simp [Derivation.map_algebraMap]
-  next p q hp hq =>
-    simp only [map_add (f := _), hp, hq, add_smul, Finset.sum_add_distrib]
+  next a => simp [Derivation.map_algebraMap]
+  next p q hp hq => simp only [map_add (f := _), hp, hq, add_smul, Finset.sum_add_distrib]
   next p j hp =>
-    have h1 : ∀ i, aeval x (pderiv i (p * X j)) =
-        x j * aeval x (pderiv i p) + (if j = i then aeval x p else 0) := by
+    have h1
+        : ∀ i,
+          aeval x (pderiv i (p * X j))
+            = x j * aeval x (pderiv i p) + (if j = i then aeval x p else 0) := by
       intro i
       rw [Derivation.leibniz, pderiv_X, Pi.single_apply, smul_eq_mul, smul_eq_mul, map_add (f := _),
         map_mul, map_mul, aeval_X]
@@ -30,13 +31,13 @@ theorem kaehlerD_aeval_eq_sum {K : Type*} {Ω : Type*} [Field K] [Field Ω] [Alg
     exact add_comm _ _
 
 open MvPolynomial in
-theorem exists_pderiv_ne_zero_lt {K : Type*} [Field K] [CharZero K] {D : ℕ}
-    (P : MvPolynomial (Fin D) K) (hP : 0 < P.totalDegree) :
-    ∃ i, pderiv i P ≠ 0 ∧ (pderiv i P).totalDegree < P.totalDegree := by
-  have coeff_pderiv_eq_coeff_add_single_lemma {K : Type _} [Field K] {D : ℕ} (i : Fin D)
-      (n : Fin D →₀ ℕ) (P : MvPolynomial (Fin D) K) :
-      AddMonoidAlgebra.coeff (MvPolynomial.pderiv i P) n =
-        AddMonoidAlgebra.coeff P (n + Finsupp.single i 1) * ((n i : K) + 1) := by
+theorem exists_pderiv_ne_zero_lt
+    {K : Type*} [Field K] [CharZero K] {D : ℕ} (P : MvPolynomial (Fin D) K) (hP : 0 < P.totalDegree)
+    : ∃ i, pderiv i P ≠ 0 ∧ (pderiv i P).totalDegree < P.totalDegree := by
+  have coeff_pderiv_eq_coeff_add_single_lemma
+      {K : Type _} [Field K] {D : ℕ} (i : Fin D) (n : Fin D →₀ ℕ) (P : MvPolynomial (Fin D) K)
+      : AddMonoidAlgebra.coeff (MvPolynomial.pderiv i P) n
+        = AddMonoidAlgebra.coeff P (n + Finsupp.single i 1) * ((n i : K) + 1) := by
     refine MvPolynomial.induction_on' P ?_ ?_
     · intro s a
       rw [MvPolynomial.pderiv_monomial, MvPolynomial.coeff_monomial, MvPolynomial.coeff_monomial]
@@ -48,7 +49,8 @@ theorem exists_pderiv_ne_zero_lt {K : Type*} [Field K] [CharZero K] {D : ℕ}
         · have hs : s i = 0 := by
             by_contra hs
             apply h
-            rw [← h', tsub_add_cancel_of_le (Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr hs))]
+            rw [← h',
+              tsub_add_cancel_of_le (Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr hs))]
           simp [hs]
         · rfl
     · intro p q hp hq
@@ -97,8 +99,10 @@ theorem differentialIndependence.{u, v} : DiffIndepStatement.{u, v} := by
   intro K Ω _ _ _ _ D x hli
   rw [algebraicIndependent_iff]
   have hsum := Fintype.linearIndependent_iff.mp hli
-  suffices h : ∀ N (P : MvPolynomial (Fin D) K), P.totalDegree = N →
-      MvPolynomial.aeval x P = 0 → P = 0 from fun P hP => h _ P rfl hP
+  suffices h
+      : ∀ N (P : MvPolynomial (Fin D) K),
+        P.totalDegree = N → MvPolynomial.aeval x P = 0 → P = 0 from fun P hP =>
+    h _ P rfl hP
   intro N
   induction N using Nat.strong_induction_on with
   | _ N ih =>

@@ -12,7 +12,8 @@ noncomputable section
 namespace SquareStatements
 
 open AlgebraicGeometry CategoryTheory NumberField MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.PB
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.PB
 
 section SlopeTestRemainingChoices
 
@@ -28,19 +29,21 @@ theorem baseInc_injective : Function.Injective (baseInc (ι := ι) blk) := by
   cases h2
   rfl
 
-
 open Classical in
-def extDeg (b : NonPluckerBlocks blk → ℕ) : K → ℕ := fun k => if h : ∀ p, blk p ≠ some k then b ⟨k, h⟩ else 0
+def extDeg (b : NonPluckerBlocks blk → ℕ) : K → ℕ := fun k =>
+  if h : ∀ p, blk p ≠ some k then b ⟨k, h⟩ else 0
 
-theorem isMultiHomog_rename_baseInc {β : MRing (baseIdx ι blk)} {b : NonPluckerBlocks blk → ℕ} (hβ : IsMultiHomog β b) :
-    IsMultiHomog (rename (baseInc (ι := ι) blk) β) (extDeg blk b) := by
+theorem isMultiHomog_rename_baseInc
+    {β : MRing (baseIdx ι blk)} {b : NonPluckerBlocks blk → ℕ} (hβ : IsMultiHomog β b)
+    : IsMultiHomog (rename (baseInc (ι := ι) blk) β) (extDeg blk b) := by
   classical
   intro m hm k
   rw [support_rename_of_injective (baseInc_injective blk)] at hm
   obtain ⟨m₀, hm₀, rfl⟩ := Finset.mem_image.1 hm
   by_cases h : ∀ p, blk p ≠ some k
   · have e : ∀ i : ι k, (Finsupp.mapDomain (baseInc blk) m₀) ⟨k, i⟩ = m₀ ⟨⟨k, h⟩, i⟩ := fun i =>
-      Finsupp.mapDomain_apply_of_injective (baseInc_injective blk) m₀ (⟨⟨k, h⟩, i⟩ : Σ k, baseIdx ι blk k)
+      Finsupp.mapDomain_apply_of_injective (baseInc_injective blk) m₀
+        (⟨⟨k, h⟩, i⟩ : Σ k, baseIdx ι blk k)
     simp only [e, extDeg, dif_pos h]
     exact hβ m₀ hm₀ ⟨k, h⟩
   · have e : ∀ i : ι k, (Finsupp.mapDomain (baseInc blk) m₀) ⟨k, i⟩ = 0 := fun i =>
@@ -51,8 +54,8 @@ theorem isMultiHomog_rename_baseInc {β : MRing (baseIdx ι blk)} {b : NonPlucke
     simp only [e, extDeg, dif_neg h, Finset.sum_const_zero]
 
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem evC_rename_baseInc (z : (Σ k, ι k) → ℂ) (β : MRing (baseIdx ι blk)) :
-    Cmp.evC z (rename (baseInc blk) β) = Cmp.evC (basePart blk z) β := by
+theorem evC_rename_baseInc (z : (Σ k, ι k) → ℂ) (β : MRing (baseIdx ι blk))
+    : Cmp.evC z (rename (baseInc blk) β) = Cmp.evC (basePart blk z) β := by
   simp only [Cmp.evC, map_rename, eval_rename]
   rfl
 
@@ -60,10 +63,11 @@ end SlopeTestRemainingChoices
 
 theorem alg_of : StEmb → StForm → StAlg := by
   intro hE hF E _ _ _ H D l Xo c Y S K _ ι _ Φ _ y M 𝔐 tie n d BM FA hH
-  obtain ⟨β, b, hβ, hβn, hβz⟩ := hF E H D l Xo c Y S M.Ω (NonPluckerBlocks M.blk) (baseIdx ι M.blk) M.x 𝔐
+  obtain ⟨β, b, hβ, hβn, hβz⟩ :=
+    hF E H D l Xo c Y S M.Ω (NonPluckerBlocks M.blk) (baseIdx ι M.blk) M.x 𝔐
   have hβ' := isMultiHomog_rename_baseInc M.blk hβ
-  refine hE K ι (mCoordIdeal y) (d + 1) _ (FA.S.comap some) (FA.Re.comap some) (rename (baseInc M.blk) β)
-    (extDeg M.blk b) FA.J_top FA.deg_one FA.br_empty hβ' ?_ ?_
+  refine hE K ι (mCoordIdeal y) (d + 1) _ (FA.S.comap some) (FA.Re.comap some)
+    (rename (baseInc M.blk) β) (extDeg M.blk b) FA.J_top FA.deg_one FA.br_empty hβ' ?_ ?_
   · rw [form_mem_mCoordIdeal_iff y hβ', aeval_rename]
     have e : y ∘ baseInc M.blk = algebraMap M.Ω Φ ∘ M.x := funext fun q => M.y_base q
     rw [e, aeval_algebraMap_apply]
@@ -78,7 +82,9 @@ theorem alg_of : StEmb → StForm → StAlg := by
       exact this
     set xb := FA.pr (FA.Re.π x)
     have hmem : BM.Rb.lift xb xb ∈ mcPts (mCoordIdeal M.x) := BM.Rb.mem xb xb (BM.Rb.mem_U xb)
-    obtain ⟨z, -, hz⟩ := (GlobalTheory.T.complex_points_iff_centres 𝔐.X M.Ω 𝔐.ξ (NonPluckerBlocks M.blk) (baseIdx ι M.blk) M.x 𝔐.tie _).1 hmem
+    obtain ⟨z, -, hz⟩ :=
+      (GlobalTheory.T.complex_points_iff_centres 𝔐.X M.Ω 𝔐.ξ (NonPluckerBlocks M.blk)
+        (baseIdx ι M.blk) M.x 𝔐.tie _).1 hmem
     have hnot : ¬ 𝔐.Interior z := fun hI => ((hH.interior xb z hz).2 hI) hx'
     have h0 : Cmp.evC (BM.Rb.lift xb xb) β = 0 := hβz z _ hz hnot
     obtain ⟨c₀, -, hc⟩ := FA.pr_eq x

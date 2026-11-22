@@ -4,12 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.StableSubmoduleBotOrTopOfSpanEqTop.irrIff_stable :
-    ∀ {H K : Type} [inst : Group H] [inst_1 : Field K] {n : ℕ}
-    (r : H →* Matrix (Fin n) (Fin n) K),
-    Submodule.span K (Set.range (⇑r : H → Matrix (Fin n) (Fin n) K)) = ⊤ →
-      ∀ (W : Submodule K (Fin n → K)),
-        (∀ (g : H), ∀ v ∈ W, ((r : H → Matrix (Fin n) (Fin n) K) g).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤ := by
+theorem UpperTheory.Reformulated.B.StableSubmoduleBotOrTopOfSpanEqTop.irrIff_stable
+    : ∀ {H K : Type} [inst : Group H] [inst_1 : Field K] {n : ℕ}
+        (r : H →* Matrix (Fin n) (Fin n) K),
+      Submodule.span K (Set.range (⇑r : H → Matrix (Fin n) (Fin n) K)) = ⊤
+        → ∀ (W : Submodule K (Fin n → K)),
+          (∀ (g : H), ∀ v ∈ W, ((r : H → Matrix (Fin n) (Fin n) K) g).mulVec v ∈ W)
+            → W = ⊥ ∨ W = ⊤ := by
   intro H K _ _ n r hspan W hW
   have hall : ∀ (A : Matrix (Fin n) (Fin n) K), ∀ v ∈ W, A.mulVec v ∈ W := by
     intro A v hv
@@ -31,8 +32,9 @@ theorem UpperTheory.Reformulated.B.StableSubmoduleBotOrTopOfSpanEqTop.irrIff_sta
     rw [eq_top_iff]
     intro w _
     have h := hall (Matrix.of fun a b => if b = i then w a / v i else 0) v hv
-    have e : (Matrix.of fun a b => if b = i then w a / v i else 0 :
-        Matrix (Fin n) (Fin n) K).mulVec v = w := by
+    have e
+        : (Matrix.of fun a b => if b = i then w a / v i else 0 : Matrix (Fin n) (Fin n) K).mulVec v
+          = w := by
       funext a
       simp [Matrix.mulVec, dotProduct, hi']
     rwa [e] at h

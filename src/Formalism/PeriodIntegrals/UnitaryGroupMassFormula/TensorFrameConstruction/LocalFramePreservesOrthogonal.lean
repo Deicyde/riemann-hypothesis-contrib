@@ -279,8 +279,8 @@ lemma local_frame_preserves_orthogonal {y : Fin n → ℂ} (hy : ∀ a, hJ ε (L
 
 end Grp
 
-def M (g : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin k) (Fin k) ℂ :=
-  fun a b => hJ ε (L.w a) (g *ᵥ L.w b)
+def M (g : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin k) (Fin k) ℂ := fun a b =>
+  hJ ε (L.w a) (g *ᵥ L.w b)
 
 lemma gw_decomp {g : Matrix (Fin n) (Fin n) ℂ} (hg : Formalism.REAL.inUJ ε g) (hS : InS L.e L.z g) (b : Fin k) :
     g *ᵥ L.w b = ∑ c, L.M g c b • L.w c + ∑ a, hJ ε (L.f a) (g *ᵥ L.w b) • L.e a :=

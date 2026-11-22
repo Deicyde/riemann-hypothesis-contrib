@@ -21,28 +21,28 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
-
 open FlagBundleSectionDivProof GenericProjClosureDivisor in
-theorem SegreFlagCutDivisor.proof (hSpec : SegreFlagCutSpecialize.Statement)
-    (hChart : SegreFlagCutChart.Statement) : SegreFlagCutDivisor.Statement := by
+theorem SegreFlagCutDivisor.proof
+    (hSpec : SegreFlagCutSpecialize.Statement) (hChart : SegreFlagCutChart.Statement)
+    : SegreFlagCutDivisor.Statement := by
   have hModel : SegreFlagClosureModel.Statement :=
     SegreFlagClosureModel.proof (SegreFlagClosureTrdeg.proof SegreFlagConeAlg.proof)
   have hSat : MultAtOfSaturated.Statement.{0} := MultAtOfSaturated.proof
-  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hV N E _ _ B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ hφ'
-    Φ _ _ _ _ e t ht k hk cs ch s h hs hh hdeg hsP hhP hval W hW
+  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hV N E _ _ B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ
+    hφ' Φ _ _ _ _ e t ht k hk cs ch s h hs hh hdeg hsP hhP hval W hW
   classical
   have hPp : (pointIdeal O (flagClosurePt y w e φ φ' t (k + 1))).IsPrime := RingHom.ker_isPrime _
   have hQp : (pointIdeal O (flagClosurePt y w e φ φ' t k)).IsPrime := RingHom.ker_isPrime _
-  obtain ⟨hPQ, hspec⟩ := hSpec O ϖ hϖ Ω K ι y d hV N E B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ hφ'
-    Φ e t ht k hk
+  obtain ⟨hPQ, hspec⟩ :=
+    hSpec O ϖ hϖ Ω K ι y d hV N E B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ hφ' Φ e t ht k hk
   have hτ : flagLineCoord w' w e t (k + 1) ⟨k, hk⟩ ≠ 0 := by
     intro h0
     exact hsP (mem_of_homog hs (by rw [hval, h0, zero_mul]))
   by_cases hWc : W.IsPrime ∧ IsRelevant W ∧ pointIdeal O (flagClosurePt y w e φ φ' t (k + 1)) ≤ W
   · obtain ⟨hWp, hWrel, hPW⟩ := hWc
     obtain ⟨cl, cm, l, μ, u, hl, hμ, hdl, hμW, huW, hlv, hl0, hsat⟩ :=
-      hChart O ϖ hϖ Ω K ι y d hV N E B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ hφ' Φ e t ht k hk W
-        hWp hWrel hPW hW
+      hChart O ϖ hϖ Ω K ι y d hV N E B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ hφ' Φ e t ht k hk
+        W hWp hWrel hPW hW
     have hμP : μ ∉ pointIdeal O (flagClosurePt y w e φ φ' t (k + 1)) := fun h' => hμW (hPW h')
     have hlP : l ∉ pointIdeal O (flagClosurePt y w e φ φ' t (k + 1)) := by
       intro h'
@@ -59,9 +59,11 @@ theorem SegreFlagCutDivisor.proof (hSpec : SegreFlagCutSpecialize.Statement)
     have hdiff : s * μ - l * h ∈ pointIdeal O (flagClosurePt y w e φ φ' t (k + 1)) := by
       have h2 := hl.mul hh
       rw [← hdeg'] at h2
-      refine mem_of_homog (b := cs + cm) ((mem_weightedHomogeneousSubmodule _ _ _ _).mp
-        (Submodule.sub_mem _ ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr (hs.mul hμ))
-          ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr h2))) ?_
+      refine mem_of_homog (b := cs + cm)
+        ((mem_weightedHomogeneousSubmodule _ _ _ _).mp
+          (Submodule.sub_mem _ ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr (hs.mul hμ))
+            ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr h2)))
+        ?_
       rw [map_sub, map_mul, map_mul, hval, hlv]
       ring
     rw [ratDiv_eq_of_sub_mem hsP hhP hlP hμP hdiff]
@@ -71,16 +73,20 @@ theorem SegreFlagCutDivisor.proof (hSpec : SegreFlagCutSpecialize.Statement)
       mem_of_homog hl (hspec l μ hlv)
     split_ifs with hc
     · obtain ⟨hkpos, rfl⟩ := hc
-      obtain ⟨hmin, hmult⟩ := hSat O (Option (Option K)) (bundleIdx (bundleIdx ι M) M') _ _
-        (sup_le hPQ ((Ideal.span_singleton_le_iff_mem _).mpr (hlQ hkpos)))
-        (fun q hq => by
-          obtain ⟨n, hn⟩ := hsat hkpos q hq
-          exact ⟨_, huW' n, hn⟩)
+      obtain ⟨hmin, hmult⟩ :=
+        hSat O (Option (Option K)) (bundleIdx (bundleIdx ι M) M') _ _
+          (sup_le hPQ ((Ideal.span_singleton_le_iff_mem _).mpr (hlQ hkpos)))
+          (fun q hq => by
+            obtain ⟨n, hn⟩ := hsat hkpos q hq
+            exact ⟨_, huW' n, hn⟩)
       unfold divCycle
       rw [dite_eq_left ⟨hmin, hWrel⟩, hmult]
       rfl
     · by_contra hne
-      have hmin : W ∈ (pointIdeal O (flagClosurePt y w e φ φ' t (k + 1)) ⊔ Ideal.span {l}).minimalPrimes := by
+      have hmin
+          : W
+            ∈ (pointIdeal O (flagClosurePt y w e φ φ' t (k + 1))
+              ⊔ Ideal.span {l}).minimalPrimes := by
         unfold divCycle at hne
         split_ifs at hne with h'
         · exact h'.1
@@ -91,19 +97,25 @@ theorem SegreFlagCutDivisor.proof (hSpec : SegreFlagCutSpecialize.Statement)
       · have hQW : pointIdeal O (flagClosurePt y w e φ φ' t k) ≤ W := fun q hq => by
           obtain ⟨n, hn⟩ := hsat hkpos q hq
           exact (hWp.mem_or_mem (hmin.1.2 hn)).resolve_left (huW' n)
-        have hPQ' : pointIdeal O (flagClosurePt y w e φ φ' t (k + 1)) <
-            pointIdeal O (flagClosurePt y w e φ φ' t k) :=
+        have hPQ'
+            : pointIdeal O (flagClosurePt y w e φ φ' t (k + 1))
+              < pointIdeal O (flagClosurePt y w e φ φ' t k) :=
           lt_of_le_of_ne hPQ (fun h' => hlP (by rw [h']; exact hlQ hkpos))
         exact hc ⟨hkpos, (eq_of_lt_of_le_of_mem_minimalPrimes hmin hPQ' hQW).symm⟩
-  · have h0 : ∀ z, divCycle (pointIdeal O (flagClosurePt y w e φ φ' t (k + 1))) z W = 0 := fun z => by
+  · have h0
+        : ∀ z, divCycle (pointIdeal O (flagClosurePt y w e φ φ' t (k + 1))) z W = 0 := fun z => by
       unfold divCycle
       rw [dite_eq_right]
       rintro ⟨h', hr⟩
       exact hWc ⟨h'.1.1, hr, le_sup_left.trans h'.1.2⟩
-    have hWQ : ¬ (0 < k ∧ W = pointIdeal O (flagClosurePt y w e φ φ' t k)) := by
+    have hWQ : ¬(0 < k ∧ W = pointIdeal O (flagClosurePt y w e φ φ' t k)) := by
       rintro ⟨hkpos, rfl⟩
-      exact hWc ⟨hQp, (hModel O ϖ hϖ Ω K ι y d hV N E B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ hφ'
-        Φ e t ht k hkpos hk.le).1.multiProj.relevant, hPQ⟩
+      exact hWc ⟨
+        hQp,
+        (hModel O ϖ hϖ Ω K ι y d hV N E B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ hφ' Φ e t ht k
+          hkpos hk.le).1.multiProj.relevant,
+        hPQ
+      ⟩
     rw [ite_eq_right hWQ]
     simp [ratDiv, h0]
 

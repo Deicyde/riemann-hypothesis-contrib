@@ -10,8 +10,12 @@ public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsC
 
 @[expose] public section
 
-open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top GroundTheory.Heights₂.Heights.ModelLeaves
-open ReciprocityTheory.ChartRestriction.G.Geo (HermLine IsSmoothHerm IsArithVar IsHorizontal mcPts mCoordIdeal IsIntersectionFamily IsIntersectionSystem IntersectionSystem ptsIntegral geoNum charOf recR arInt ChartBundle chartRing)
+open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num
+  GlobalTheory.CompanionTheory.Ar.Top GroundTheory.Heights₂.Heights.ModelLeaves
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (HermLine IsSmoothHerm IsArithVar IsHorizontal mcPts mCoordIdeal IsIntersectionFamily
+    IsIntersectionSystem IntersectionSystem ptsIntegral geoNum charOf recR arInt ChartBundle
+    chartRing)
 open NumberField
 
 namespace GlobalTheory.CompanionTheory.Ar.Num
@@ -24,24 +28,26 @@ variable {K : Type} [DecidableEq K] {ι : K → Type} {Ω : Type} [Field Ω]
 
 def lineVertMono [Fintype K] (c : ∀ k, ι k) (e : K → ℕ) : MRing ι ℤ := ∏ k, X ⟨k, c k⟩ ^ e k
 
-theorem lineVertMono_homog [Fintype K] (c : ∀ k, ι k) (e : K → ℕ) :
-    IsMultiHomog (lineVertMono c e) e := by
-  have h := IsWeightedHomogeneous.prod (R := ℤ) (w := blockWeight ι) Finset.univ
-    (fun k => (X ⟨k, c k⟩ : MRing ι ℤ) ^ e k) (fun k => e k • (Pi.single k 1 : K → ℕ))
-    (fun k _ => (isWeightedHomogeneous_X ℤ (blockWeight ι) ⟨k, c k⟩).pow (e k))
+theorem lineVertMono_homog [Fintype K] (c : ∀ k, ι k) (e : K → ℕ)
+    : IsMultiHomog (lineVertMono c e) e := by
+  have h :=
+    IsWeightedHomogeneous.prod (R := ℤ) (w := blockWeight ι) Finset.univ
+      (fun k => (X ⟨k, c k⟩ : MRing ι ℤ) ^ e k)
+      (fun k => e k • (Pi.single k 1 : K → ℕ))
+      (fun k _ => (isWeightedHomogeneous_X ℤ (blockWeight ι) ⟨k, c k⟩).pow (e k))
   have he : ∑ k, e k • (Pi.single k 1 : K → ℕ) = e := by
     funext j
     simp [Finset.sum_apply, Pi.single_apply]
   rw [he] at h
   exact h
 
-theorem lineVertMono_aeval [Fintype K] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (e : K → ℕ) :
-    aeval y (lineVertMono c e) = ∏ k, y ⟨k, c k⟩ ^ e k := by
+theorem lineVertMono_aeval [Fintype K] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (e : K → ℕ)
+    : aeval y (lineVertMono c e) = ∏ k, y ⟨k, c k⟩ ^ e k := by
   simp [lineVertMono, map_prod]
 
-theorem lineVert_prod_weight [Fintype K] (m : (Σ k, ι k) →₀ ℕ) :
-    (m.prod fun p e => (X p.1 : MvPolynomial K Ω) ^ e) =
-      ∏ k, X k ^ (Finsupp.weight (blockWeight ι) m k) := by
+theorem lineVert_prod_weight [Fintype K] (m : (Σ k, ι k) →₀ ℕ)
+    : (m.prod fun p e => (X p.1 : MvPolynomial K Ω) ^ e)
+      = ∏ k, X k ^ (Finsupp.weight (blockWeight ι) m k) := by
   induction m using Finsupp.induction_linear with
   | zero => simp
   | add f g hf hg =>
@@ -49,46 +55,55 @@ theorem lineVert_prod_weight [Fintype K] (m : (Σ k, ι k) →₀ ℕ) :
       ← Finset.prod_mul_distrib]
     exact Finset.prod_congr rfl fun k _ => by rw [Pi.add_apply, pow_add]
   | single p e =>
-    rw [Finsupp.prod_single_index (by simp), Finsupp.weight_single,
-      Finset.prod_eq_single p.1]
+    rw [Finsupp.prod_single_index (by simp), Finsupp.weight_single, Finset.prod_eq_single p.1]
     · simp [blockWeight]
     · intro k _ hk
       simp [blockWeight, Pi.single_apply, hk]
     · simp
 
-theorem lineVert_cone_homog [Fintype K] (y : (Σ k, ι k) → Ω) {h : MRing ι ℤ} {b : K → ℕ}
-    (hh : IsMultiHomog h b) :
-    pointConeMap ℤ y h = C (aeval y h) * ∏ k, X k ^ b k := by
-  have key : ∀ m ∈ h.support, pointConeMap ℤ y (monomial m (AddMonoidAlgebra.coeff h m)) =
-      C (aeval y (monomial m (AddMonoidAlgebra.coeff h m) : MRing ι ℤ)) * ∏ k, X k ^ b k := by
+theorem lineVert_cone_homog
+    [Fintype K] (y : (Σ k, ι k) → Ω) {h : MRing ι ℤ} {b : K → ℕ} (hh : IsMultiHomog h b)
+    : pointConeMap ℤ y h = C (aeval y h) * ∏ k, X k ^ b k := by
+  have key
+      : ∀ m ∈ h.support,
+        pointConeMap ℤ y (monomial m (AddMonoidAlgebra.coeff h m))
+          = C (aeval y (monomial m (AddMonoidAlgebra.coeff h m) : MRing ι ℤ)) * ∏ k, X k ^ b k := by
     intro m hm
     have hw : Finsupp.weight (blockWeight ι) m = b := hh (mem_support_iff.mp hm)
     rw [pointConeMap, aeval_monomial, aeval_monomial, ← hw, ← lineVert_prod_weight]
-    have e1 : (m.prod fun p e => (C (y p) * X p.1 : MvPolynomial K Ω) ^ e) =
-        C (m.prod fun p e => y p ^ e) * m.prod fun p e => (X p.1 : MvPolynomial K Ω) ^ e := by
+    have e1
+        : (m.prod fun p e => (C (y p) * X p.1 : MvPolynomial K Ω) ^ e)
+          = C (m.prod fun p e => y p ^ e) * m.prod fun p e => (X p.1 : MvPolynomial K Ω) ^ e := by
       simp only [mul_pow, Finsupp.prod, Finset.prod_mul_distrib, map_prod, map_pow]
     rw [e1]
     simp [mul_assoc]
-  calc pointConeMap ℤ y h = ∑ m ∈ h.support, pointConeMap ℤ y (monomial m (AddMonoidAlgebra.coeff h m)) := by
-        conv_lhs => rw [h.as_sum]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+  calc
+    pointConeMap ℤ y h
+        = ∑ m ∈ h.support, pointConeMap ℤ y (monomial m (AddMonoidAlgebra.coeff h m)) := by
+      conv_lhs => rw [h.as_sum]
+      set_option synthInstance.maxHeartbeats 100000 in
+      rw [map_sum]
     _ = ∑ m ∈ h.support, C (aeval y (monomial m (AddMonoidAlgebra.coeff h m) : MRing ι ℤ)) * ∏ k, X k ^ b k :=
-        Finset.sum_congr rfl key
+      Finset.sum_congr rfl key
     _ = C (aeval y h) * ∏ k, X k ^ b k := by
-        conv_rhs => rw [h.as_sum]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, map_sum, Finset.sum_mul]
+      conv_rhs => rw [h.as_sum]
+      set_option synthInstance.maxHeartbeats 100000 in
+      rw [map_sum, map_sum, Finset.sum_mul]
 
-theorem lineVert_mem_of_homog [Fintype K] (y : (Σ k, ι k) → Ω) {h : MRing ι ℤ} {b : K → ℕ}
-    (hh : IsMultiHomog h b) (h0 : aeval y h = 0) : h ∈ pointIdeal ℤ y := by
+theorem lineVert_mem_of_homog
+    [Fintype K]
+    (y : (Σ k, ι k) → Ω)
+    {h : MRing ι ℤ} {b : K → ℕ} (hh : IsMultiHomog h b) (h0 : aeval y h = 0)
+    : h ∈ pointIdeal ℤ y := by
   rw [pointIdeal, RingHom.mem_ker, lineVert_cone_homog y hh, h0]
   simp
 
-theorem lineVert_chart_form [Fintype K] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k)
-    (hc : segreVec y c ≠ 0) {a : Ω} (ha : a ∈ chartRing ℤ (segreVec y) c) :
-    ∃ (r : ℕ) (G : MRing ι ℤ), IsMultiHomog G (fun _ => r) ∧
-      a * segreVec y c ^ r = aeval y G := by
+theorem lineVert_chart_form
+    [Fintype K]
+    (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : segreVec y c ≠ 0)
+    {a : Ω} (ha : a ∈ chartRing ℤ (segreVec y) c)
+    : ∃ (r : ℕ) (G : MRing ι ℤ),
+      IsMultiHomog G (fun _ => r) ∧ a * segreVec y c ^ r = aeval y G := by
   rw [chartRing] at ha
   induction ha using Algebra.adjoin_induction with
   | mem x hx =>
@@ -113,7 +128,8 @@ theorem lineVert_chart_form [Fintype K] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι
       exact a₁.add a₂
     · have hp : ∀ r : ℕ, ∏ k, y ⟨k, c k⟩ ^ r = segreVec y c ^ r := fun r => by
         rw [segreVec, Finset.prod_pow]
-      rw [map_add (f := _), map_mul, map_mul, lineVertMono_aeval, lineVertMono_aeval, hp, hp, ← v₁, ← v₂]
+      rw [map_add (f := _), map_mul, map_mul, lineVertMono_aeval, lineVertMono_aeval, hp, hp, ← v₁,
+        ← v₂]
       ring
   | mul x z _ _ hx hz =>
     obtain ⟨r₁, G₁, h₁, v₁⟩ := hx
@@ -122,14 +138,20 @@ theorem lineVert_chart_form [Fintype K] (y : (Σ k, ι k) → Ω) (c : ∀ k, ι
     rw [map_mul, ← v₁, ← v₂]
     ring
 
-theorem lineVert_chart_pair [Fintype K] (y : (Σ k, ι k) → Ω) (m : ℕ) (b b' : K → ℤ) (s : Ω)
-    (hs : s ≠ 0) (c : ∀ k, ι k) (hc : segreVec y c ≠ 0)
+theorem lineVert_chart_pair
+    [Fintype K]
+    (y : (Σ k, ι k) → Ω) (m : ℕ) (b b' : K → ℤ)
+    (s : Ω) (hs : s ≠ 0)
+    (c : ∀ k, ι k) (hc : segreVec y c ≠ 0)
     (h1 : ∀ t ∈ degLat ℤ y b c, ∃ n : ℕ, ∃ t' ∈ degLat ℤ y b' c, (m : Ω) ^ n * t = s * t')
-    (h2 : ∀ t' ∈ degLat ℤ y b' c, ∃ n : ℕ, ∃ t ∈ degLat ℤ y b c, (m : Ω) ^ n * (s * t') = t) :
-    ∃ (U V : MRing ι ℤ) (dU dV : K → ℕ), IsMultiHomog U dU ∧ IsMultiHomog V dV ∧
-      (∀ k, (dV k : ℤ) - dU k = b k - b' k) ∧ s * aeval y U = aeval y V ∧
-      ∀ W : Ideal (MRing ι ℤ), W.IsPrime → pointIdeal ℤ y ≤ W → (∀ k, (X ⟨k, c k⟩ : MRing ι ℤ) ∉ W) →
-        (C (m : ℤ) : MRing ι ℤ) ∉ W → U ∉ W ∧ V ∉ W := by
+    (h2 : ∀ t' ∈ degLat ℤ y b' c, ∃ n : ℕ, ∃ t ∈ degLat ℤ y b c, (m : Ω) ^ n * (s * t') = t)
+    : ∃ (U V : MRing ι ℤ) (dU dV : K → ℕ),
+      IsMultiHomog U dU ∧ IsMultiHomog V dV ∧ (∀ k, (dV k : ℤ) - dU k = b k - b' k)
+        ∧ s * aeval y U = aeval y V
+        ∧ ∀ W : Ideal (MRing ι ℤ),
+          W.IsPrime → pointIdeal ℤ y ≤ W → (∀ k, (X ⟨k, c k⟩ : MRing ι ℤ) ∉ W)
+            → (C (m : ℤ) : MRing ι ℤ) ∉ W
+            → U ∉ W ∧ V ∉ W := by
   have hy : ∀ k, y ⟨k, c k⟩ ≠ 0 := fun k => Finset.prod_ne_zero_iff.mp hc k (Finset.mem_univ k)
   have hZ : ∀ e : K → ℤ, (∏ k, y ⟨k, c k⟩ ^ e k) ≠ 0 := fun e =>
     Finset.prod_ne_zero_iff.mpr fun k _ => zpow_ne_zero _ (hy k)
@@ -143,12 +165,11 @@ theorem lineVert_chart_pair [Fintype K] (y : (Σ k, ι k) → Ω) (m : ℕ) (b b
   have hYb0 : Yb ≠ 0 := hZ b
   have hYb'0 : Yb' ≠ 0 := hZ b'
   set x := segreVec y c with hx
-  have hxp : ∀ r : ℕ, ∏ k, y ⟨k, c k⟩ ^ r = x ^ r := fun r => by
-    rw [hx, segreVec, Finset.prod_pow]
+  have hxp : ∀ r : ℕ, ∏ k, y ⟨k, c k⟩ ^ r = x ^ r := fun r => by rw [hx, segreVec, Finset.prod_pow]
 
   let e : K → ℤ := fun k => b' k - b k + r'
   let dP : K → ℕ := fun k => (e k).toNat
-  let dN : K → ℕ := fun k => (-e k).toNat
+  let dN : K → ℕ := fun k => (- e k).toNat
   have haa : a * a' = (m : Ω) ^ n * (m : Ω) ^ n' := by
     apply mul_left_cancel₀ (mul_ne_zero (mul_ne_zero hs hYb0) hYb'0)
     linear_combination (-((m : Ω) ^ n' * s * Yb')) * e1 - (s * a * Yb') * e2
@@ -164,9 +185,19 @@ theorem lineVert_chart_pair [Fintype K] (y : (Σ k, ι k) → Ω) (m : ℕ) (b b
     congr 1
     simp only [dP, dN, e]
     omega
-  refine ⟨C ((m : ℤ) ^ n') * lineVertMono c dP, G' * lineVertMono c dN, dP, (fun _ => r') + dN,
-    ?_, IsWeightedHomogeneous.mul hG' (lineVertMono_homog c dN), ?_, ?_, ?_⟩
-  · have a₀ := (isWeightedHomogeneous_C (blockWeight ι) ((m : ℤ) ^ n')).mul (lineVertMono_homog c dP)
+  refine ⟨
+    C ((m : ℤ) ^ n') * lineVertMono c dP,
+    G' * lineVertMono c dN,
+    dP,
+    (fun _ => r') + dN,
+    ?_,
+    IsWeightedHomogeneous.mul hG' (lineVertMono_homog c dN),
+    ?_,
+    ?_,
+    ?_
+  ⟩
+  · have a₀ :=
+      (isWeightedHomogeneous_C (blockWeight ι) ((m : ℤ) ^ n')).mul (lineVertMono_homog c dP)
     rw [zero_add] at a₀
     exact a₀
   · intro k
@@ -193,8 +224,9 @@ theorem lineVert_chart_pair [Fintype K] (y : (Σ k, ι k) → Ω) (m : ℕ) (b b
         apply hPW
         apply lineVert_mem_of_homog y (b := fun _ => r + r')
         · have a₁ := IsWeightedHomogeneous.mul hG hG'
-          have a₂ := (isWeightedHomogeneous_C (blockWeight ι) ((m : ℤ) ^ (n + n'))).mul
-            (lineVertMono_homog (ι := ι) c fun _ => r + r')
+          have a₂ :=
+            (isWeightedHomogeneous_C (blockWeight ι) ((m : ℤ) ^ (n + n'))).mul
+              (lineVertMono_homog (ι := ι) c fun _ => r + r')
           rw [zero_add] at a₂
           exact (weightedHomogeneousSubmodule ℤ (blockWeight ι) _).sub_mem a₁ a₂
         · rw [map_sub, map_mul, map_mul, lineVertMono_aeval, hxp, hGG, aeval_C]
@@ -216,7 +248,23 @@ theorem lineVert_chart_pair [Fintype K] (y : (Σ k, ι k) → Ω) (m : ℕ) (b b
 
 end LineVert
 
-theorem lineVert_of_eq_off : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (y : (Σ k, ι k) → Ω), IsMultiProjPrime (pointIdeal ℤ y) → ∀ (S : Finset Nat.Primes) (b b' : K → ℤ) (s : Ω), s ≠ 0 → (∀ c, segreVec y c ≠ 0 → (∀ t ∈ degLat ℤ y b c, ∃ n : ℕ, ∃ t' ∈ degLat ℤ y b' c, ((∏ p ∈ S, (p : ℕ) : ℕ) : Ω) ^ n * t = s * t') ∧ ∀ t' ∈ degLat ℤ y b' c, ∃ n : ℕ, ∃ t ∈ degLat ℤ y b c, ((∏ p ∈ S, (p : ℕ) : ℕ) : Ω) ^ n * (s * t') = t) → IsHorizontal (pointIdeal ℤ y) → ∃ f g : MRing ι ℤ, (⟨fun _ => b, fun _ => b', fun _ => f, fun _ => g⟩ : LocPair ι ℤ Unit).IsVertOff (pointIdeal ℤ y) S ∧ aeval y f = s * aeval y g := by
+theorem lineVert_of_eq_off
+    : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type)
+        [Field Ω] (y : (Σ k, ι k) → Ω),
+      IsMultiProjPrime (pointIdeal ℤ y)
+        → ∀ (S : Finset Nat.Primes) (b b' : K → ℤ) (s : Ω),
+          s ≠ 0
+            → (∀ c,
+              segreVec y c ≠ 0
+                → (∀ t ∈ degLat ℤ y b c, ∃ n : ℕ, ∃ t' ∈ degLat ℤ y b' c,
+                    ((∏ p ∈ S, (p : ℕ) : ℕ) : Ω) ^ n * t = s * t')
+                  ∧ ∀ t' ∈ degLat ℤ y b' c, ∃ n : ℕ, ∃ t ∈ degLat ℤ y b c,
+                    ((∏ p ∈ S, (p : ℕ) : ℕ) : Ω) ^ n * (s * t') = t)
+            → IsHorizontal (pointIdeal ℤ y)
+            → ∃ f g : MRing ι ℤ,
+              (⟨fun _ => b, fun _ => b', fun _ => f, fun _ => g⟩ : LocPair ι ℤ Unit).IsVertOff
+                  (pointIdeal ℤ y) S
+                ∧ aeval y f = s * aeval y g := by
   intro K _ _ ι _ Ω _ y hP S b b' s hs hch hhor
   set m : ℕ := ∏ p ∈ S, (p : ℕ) with hm
   have hm0 : m ≠ 0 := Finset.prod_ne_zero_iff.mpr fun p _ => p.2.ne_zero
@@ -225,14 +273,16 @@ theorem lineVert_of_eq_off : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K 
     have h' : (m : ℤ) ∈ (pointIdeal ℤ y).comap (C : ℤ →+* MRing ι ℤ) := h
     rw [show (pointIdeal ℤ y).comap (C : ℤ →+* MRing ι ℤ) = ⊥ from hhor, Ideal.mem_bot] at h'
     exact hm0 (by exact_mod_cast h')
-  have hseg : ∀ c : ∀ k, ι k, (∀ k, (X ⟨k, c k⟩ : MRing ι ℤ) ∉ pointIdeal ℤ y) →
-      segreVec y c ≠ 0 := by
+  have hseg
+      : ∀ c : ∀ k, ι k, (∀ k, (X ⟨k, c k⟩ : MRing ι ℤ) ∉ pointIdeal ℤ y) → segreVec y c ≠ 0 := by
     intro c hc
     refine Finset.prod_ne_zero_iff.mpr fun k _ h0 => hc k ?_
-    exact lineVert_mem_of_homog y (isWeightedHomogeneous_X ℤ (blockWeight ι) ⟨k, c k⟩) (by simpa using h0)
+    exact lineVert_mem_of_homog y (isWeightedHomogeneous_X ℤ (blockWeight ι) ⟨k, c k⟩)
+      (by simpa using h0)
   choose c₀ hc₀ using hP.relevant
   obtain ⟨U₀, V₀, dU₀, dV₀, hU₀, hV₀, hd₀, hv₀, hW₀⟩ :=
-    lineVert_chart_pair y m b b' s hs c₀ (hseg c₀ hc₀) (hch c₀ (hseg c₀ hc₀)).1 (hch c₀ (hseg c₀ hc₀)).2
+    lineVert_chart_pair y m b b' s hs c₀ (hseg c₀ hc₀) (hch c₀ (hseg c₀ hc₀)).1
+      (hch c₀ (hseg c₀ hc₀)).2
   have hUV := hW₀ (pointIdeal ℤ y) hP.isPrime le_rfl hc₀ hmP
   refine ⟨V₀, U₀, ?_, hv₀.symm⟩
   intro i

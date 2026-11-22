@@ -10,7 +10,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 noncomputable section
 
@@ -18,9 +19,11 @@ namespace RootFieldNumerics
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem ptsIntegral_const_mul (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
-    (g : ((Σ k, ι k) → ℂ) → ℝ) (c : ℝ) :
-    ptsIntegral P φ (fun z => c * g z) = c * ptsIntegral P φ g := by
+theorem ptsIntegral_const_mul
+    (P : Ideal (MRing ι))
+    {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
+    (g : ((Σ k, ι k) → ℂ) → ℝ) (c : ℝ)
+    : ptsIntegral P φ (fun z => c * g z) = c * ptsIntegral P φ g := by
   unfold ptsIntegral
   split_ifs with hΨ
   · unfold ptsIntegralAt
@@ -34,16 +37,23 @@ theorem ptsIntegral_const_mul (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → (
     split_ifs <;> simp [mul_assoc]
   · simp
 
-theorem ptsIntegral_const (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (c : ℝ) :
-    ptsIntegral P φ (fun _ => c) = c * ptsIntegral P φ (fun _ => 1) := by
+theorem ptsIntegral_const (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (c : ℝ)
+    : ptsIntegral P φ (fun _ => c) = c * ptsIntegral P φ (fun _ => 1) := by
   simpa using ptsIntegral_const_mul P φ (fun _ => (1 : ℝ)) c
 
-theorem smooth_constLine (c : ℝ) :
-    IsSmoothHerm (HermLine.ofWeight (ι := ι) (fun _ => c) (fun _ _ _ => rfl)) := by
+theorem smooth_constLine (c : ℝ)
+    : IsSmoothHerm (HermLine.ofWeight (ι := ι) (fun _ => c) (fun _ _ _ => rfl)) := by
   unfold IsSmoothHerm HermLine.ofWeight
   exact contDiffOn_const
 
-theorem intersection_constant_metric_line : ∀ II : IntersectionSystem, IsIntersectionSystem II → ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ) (L : Fin e → HermLine ι) (c : ℝ), IsArithVar P (e + 1) → (∀ j, IsSmoothHerm (L j)) → II K ι P (e + 1) (Fin.snoc L (HermLine.ofWeight (fun _ => c) (fun _ _ _ => rfl))) = -c * ptsIntegral P (fun j z => Real.log ((L j).h z)) (fun _ => 1) := by
+theorem intersection_constant_metric_line
+    : ∀ II : IntersectionSystem,
+      IsIntersectionSystem II
+        → ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ)
+            (L : Fin e → HermLine ι) (c : ℝ),
+          IsArithVar P (e + 1) → (∀ j, IsSmoothHerm (L j))
+            → II K ι P (e + 1) (Fin.snoc L (HermLine.ofWeight (fun _ => c) (fun _ _ _ => rfl)))
+              = -c * ptsIntegral P (fun j z => Real.log ((L j).h z)) (fun _ => 1) := by
   intro II hII K _ ι _ P e L c hP hL
   have hA : IsSmoothHerm (HermLine.ofWeight (ι := ι) (fun _ => c) (fun _ _ _ => rfl)) :=
     smooth_constLine c
@@ -63,7 +73,9 @@ theorem intersection_constant_metric_line : ∀ II : IntersectionSystem, IsInter
     exact (hW.1.1.ne_top (top_le_iff.1 hW.1.2)).elim
   unfold recR arInt
   simp only [hempty, Set.mem_empty_iff_false, finsum_false, finsum_zero, zero_sub]
-  have hln : logNorm (HermLine.ofWeight (ι := ι) (fun _ => c) (fun _ _ _ => rfl)) (1 : MRing ι) = fun _ => c := by
+  have hln
+      : logNorm (HermLine.ofWeight (ι := ι) (fun _ => c) (fun _ _ _ => rfl)) (1 : MRing ι)
+        = fun _ => c := by
     funext z
     simp [logNorm, HermLine.ofWeight, Real.log_exp]
   rw [hln, ptsIntegral_const]

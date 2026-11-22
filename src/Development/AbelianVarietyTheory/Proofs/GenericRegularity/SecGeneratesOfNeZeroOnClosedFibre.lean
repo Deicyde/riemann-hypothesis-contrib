@@ -7,15 +7,17 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 namespace SecLineGen
 
-theorem constFn_mul' {V : Type} [CommRing V] {X : Scheme.{0}} (π : X ⟶ Sp V) (U : X.Opens)
-    (a b : V) : constFn π U (a * b) = constFn π U a * constFn π U b := by
+theorem constFn_mul' {V : Type} [CommRing V] {X : Scheme.{0}} (π : X ⟶ Sp V) (U : X.Opens) (a b : V)
+    : constFn π U (a * b) = constFn π U a * constFn π U b := by
   first
   | exact map_mul _ a b
   | (unfold constFn; exact map_mul _ a b)
@@ -23,12 +25,14 @@ theorem constFn_mul' {V : Type} [CommRing V] {X : Scheme.{0}} (π : X ⟶ Sp V) 
   | (unfold constFn; simp)
   | (unfold constFn Sp; done)
 
-theorem apply_mem_basicOpen_of_mem {V : Type} [CommRing V] {X : Scheme.{0}} (π : X ⟶ Sp V)
-    (U : X.Opens) (a : V) (g : X) (hg : g ∈ X.basicOpen (constFn π U a)) :
-    π g ∈ PrimeSpectrum.basicOpen a := by
+theorem apply_mem_basicOpen_of_mem
+    {V : Type} [CommRing V]
+    {X : Scheme.{0}} (π : X ⟶ Sp V) (U : X.Opens)
+    (a : V) (g : X) (hg : g ∈ X.basicOpen (constFn π U a))
+    : π g ∈ PrimeSpectrum.basicOpen a := by
   unfold constFn at hg
-  have h0 := Scheme.basicOpen_appLE π U ⊤ (fun _ _ => trivial)
-    ((Scheme.ΓSpecIso (CommRingCat.of V)).inv a)
+  have h0 :=
+    Scheme.basicOpen_appLE π U ⊤ (fun _ _ => trivial) ((Scheme.ΓSpecIso (CommRingCat.of V)).inv a)
   have hg' : g ∈ U ⊓ π ⁻¹ᵁ ((Sp V).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of V)).inv a)) := by
     rw [← h0]
     exact hg
@@ -42,10 +46,14 @@ theorem apply_mem_basicOpen_of_mem {V : Type} [CommRing V] {X : Scheme.{0}} (π 
 
 end SecLineGen
 
-
 open SecLineGen in
-theorem sec_generates_of_ne_zero_on_closed_fibre :
-    ∀ (V : Type) [CommRing V] [IsLocalRing V] (X : Scheme.{0}) (π : X ⟶ Sp V) (L : LB X) (θ θ' : LB.Sec L), (∀ σ : LB.Sec L, ∃! a : V, ∀ i, σ.f i = constFn π _ a * θ.f i) → (∃ (g : X) (i : L.ι), π g = IsLocalRing.closedPoint V ∧ g ∈ X.basicOpen (θ'.f i)) → (∃ u : Vˣ, ∀ i, θ'.f i = constFn π _ (u : V) * θ.f i) ∧ ∀ σ : LB.Sec L, ∃! a : V, ∀ i, σ.f i = constFn π _ a * θ'.f i := by
+theorem sec_generates_of_ne_zero_on_closed_fibre
+    : ∀ (V : Type) [CommRing V] [IsLocalRing V] (X : Scheme.{0}) (π : X ⟶ Sp V) (L : LB X)
+        (θ θ' : LB.Sec L),
+      (∀ σ : LB.Sec L, ∃! a : V, ∀ i, σ.f i = constFn π _ a * θ.f i)
+        → (∃ (g : X) (i : L.ι), π g = IsLocalRing.closedPoint V ∧ g ∈ X.basicOpen (θ'.f i))
+        → (∃ u : Vˣ, ∀ i, θ'.f i = constFn π _ (u : V) * θ.f i)
+          ∧ ∀ σ : LB.Sec L, ∃! a : V, ∀ i, σ.f i = constFn π _ a * θ'.f i := by
   intro V _ _ X π L θ θ' hθ hpt
   obtain ⟨g, i, hgc, hgi⟩ := hpt
   obtain ⟨a, ha, -⟩ := hθ θ'
@@ -68,10 +76,11 @@ theorem sec_generates_of_ne_zero_on_closed_fibre :
   obtain ⟨b, hb, hbu⟩ := hθ σ
   refine ⟨b * ↑u⁻¹, ?_, ?_⟩
   · intro j
-    rw [hb j, ha j, ← _root_.mul_assoc, ← SecLineGen.constFn_mul', _root_.mul_assoc b, Units.inv_mul, _root_.mul_one]
+    rw [hb j, ha j, ← _root_.mul_assoc, ← SecLineGen.constFn_mul', _root_.mul_assoc b,
+      Units.inv_mul, _root_.mul_one]
   · intro c hc
-    have key : c * ↑u = b := hbu (c * ↑u) (fun j => by
-      rw [hc j, ha j, ← _root_.mul_assoc, ← SecLineGen.constFn_mul'])
+    have key : c * ↑u = b :=
+      hbu (c * ↑u) (fun j => by rw [hc j, ha j, ← _root_.mul_assoc, ← SecLineGen.constFn_mul'])
     rw [← key, _root_.mul_assoc, Units.mul_inv, _root_.mul_one]
 
 end GlobalTheory

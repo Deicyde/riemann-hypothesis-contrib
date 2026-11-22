@@ -5,24 +5,31 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
+open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host GlobalTheory.HeckeGal
 
 namespace GlobalTheory.TameEis
 
 open Polynomial
 
-theorem two_le_normV (E : Type) [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E)) :
-    2 ≤ normV v := by
+theorem two_le_normV (E : Type) [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E))
+    : 2 ≤ normV v := by
   have h : normV v = Ideal.absNorm v.asIdeal := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]; rfl
-  have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h' => v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h')
+  have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h' =>
+    v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h')
   have h0 : Ideal.absNorm v.asIdeal ≠ 0 := fun h' => v.ne_bot (Ideal.absNorm_eq_zero_iff.1 h')
   omega
 
-theorem minpoly_and_norm_of_pow_eq_uniformizer : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] (v : HeightOneSpectrum (𝓞 E)) (ϖ : 𝓞 E),
-    ϖ ∈ v.asIdeal → ϖ ∉ v.asIdeal ^ 2 → ∀ π : Ω, π ^ (normV v - 1) = algebraMap E Ω (ϖ : E) →
-      minpoly E π = Polynomial.X ^ (normV v - 1) - Polynomial.C (ϖ : E) ∧
-      Algebra.norm E (IntermediateField.AdjoinSimple.gen E π) = (-1) ^ normV v * (ϖ : E) := by
+theorem minpoly_and_norm_of_pow_eq_uniformizer
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] (v : HeightOneSpectrum (𝓞 E))
+        (ϖ : 𝓞 E),
+      ϖ ∈ v.asIdeal → ϖ ∉ v.asIdeal ^ 2
+        → ∀ π : Ω,
+          π ^ (normV v - 1) = algebraMap E Ω (ϖ : E)
+            → minpoly E π = Polynomial.X ^ (normV v - 1) - Polynomial.C (ϖ : E)
+              ∧ Algebra.norm E (IntermediateField.AdjoinSimple.gen E π)
+                = (-1) ^ normV v * (ϖ : E) := by
   intro E Ω _ _ _ _ v ϖ hmem hnot π hπ
   have hq := two_le_normV E v
   set n := normV v - 1 with hn
@@ -47,17 +54,18 @@ theorem minpoly_and_norm_of_pow_eq_uniformizer : ∀ (E Ω : Type) [Field E] [Nu
   have hirrE : Irreducible (X ^ n - C (ϖ : E)) := by
     rw [← hmap]; exact (hmon.irreducible_iff_irreducible_map_fraction_map (K := E)).1 hirr
   have hmonE : (X ^ n - C (ϖ : E)).Monic := monic_X_pow_sub_C _ hn1.ne'
-  have hroot : aeval π (X ^ n - C (ϖ : E)) = 0 := by
-    simp [hπ]
+  have hroot : aeval π (X ^ n - C (ϖ : E)) = 0 := by simp [hπ]
   have hmin : minpoly E π = X ^ n - C (ϖ : E) :=
     (minpoly.eq_of_irreducible_of_monic hirrE hroot hmonE).symm
   refine ⟨hmin, ?_⟩
   have hx : IsIntegral E π := ⟨_, hmonE, hroot⟩
   rw [← IntermediateField.adjoin.powerBasis_gen hx,
     Algebra.PowerBasis.norm_gen_eq_coeff_zero_minpoly, IntermediateField.adjoin.powerBasis_gen hx,
-    IntermediateField.minpoly_gen, IntermediateField.adjoin.powerBasis_dim, hmin, natDegree_X_pow_sub_C _]
+    IntermediateField.minpoly_gen, IntermediateField.adjoin.powerBasis_dim, hmin,
+    natDegree_X_pow_sub_C _]
   rw [coeff_sub, coeff_X_pow, coeff_C, if_neg hn1.ne, if_pos rfl, zero_sub]
   have : normV v = n + 1 := by omega
-  rw [this, pow_succ]; ring
+  rw [this, pow_succ]
+  ring
 
 end GlobalTheory.TameEis

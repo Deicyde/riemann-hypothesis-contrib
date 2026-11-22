@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.Grp
 
@@ -16,8 +17,8 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 
 namespace P_Jmul
 
-theorem inPow_zero_of_KO {n : ℕ} {g : GL (Fin n) k} (hg : g ∈ KO k (Fin n)) (i j : Fin n) :
-    InPow 0 ((g : Matrix (Fin n) (Fin n) k) i j) := by
+theorem inPow_zero_of_KO {n : ℕ} {g : GL (Fin n) k} (hg : g ∈ KO k (Fin n)) (i j : Fin n)
+    : InPow 0 ((g : Matrix (Fin n) (Fin n) k) i j) := by
   obtain ⟨g', rfl⟩ := hg
   exact ⟨(g' : Matrix (Fin n) (Fin n) 𝒪[k]) i j, by simp, rfl⟩
 
@@ -25,7 +26,8 @@ theorem inPow_mono {a b : ℕ} (hab : a ≤ b) {x : k} (hx : InPow b x) : InPow 
   obtain ⟨y, hy, rfl⟩ := hx
   exact ⟨y, Ideal.pow_le_pow_right hab hy, rfl⟩
 
-theorem inPow_mul {a b : ℕ} {x y : k} (hx : InPow a x) (hy : InPow b y) : InPow (a + b) (x * y) := by
+theorem inPow_mul {a b : ℕ} {x y : k} (hx : InPow a x) (hy : InPow b y)
+    : InPow (a + b) (x * y) := by
   obtain ⟨x', hx', rfl⟩ := hx
   obtain ⟨y', hy', rfl⟩ := hy
   exact ⟨x' * y', by rw [pow_add]; exact Ideal.mul_mem_mul hx' hy', map_mul _ _ _⟩
@@ -37,8 +39,8 @@ theorem inPow_add {a : ℕ} {x y : k} (hx : InPow a x) (hy : InPow a y) : InPow 
 
 theorem inPow_zero (a : ℕ) : InPow a (0 : k) := ⟨0, zero_mem _, map_zero _⟩
 
-theorem inPow_sum {a : ℕ} {ι : Type} (s : Finset ι) (f : ι → k) (h : ∀ i ∈ s, InPow a (f i)) :
-    InPow a (∑ i ∈ s, f i) := by
+theorem inPow_sum {a : ℕ} {ι : Type} (s : Finset ι) (f : ι → k) (h : ∀ i ∈ s, InPow a (f i))
+    : InPow a (∑ i ∈ s, f i) := by
   induction s using Finset.cons_induction with
   | empty => simpa using inPow_zero (k := k) a
   | cons i s hi ih =>

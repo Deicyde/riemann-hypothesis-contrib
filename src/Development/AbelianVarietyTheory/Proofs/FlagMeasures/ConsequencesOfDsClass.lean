@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.Hermi
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -17,17 +18,20 @@ namespace GlobalTheory.ClassificationConsequences
 
 open GlobalTheory.LowestKTypeDetermines
 
-variable {n : ℕ} {ε : Fin n → Bool} {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
+variable
+  {n : ℕ} {ε : Fin n → Bool} {H H' : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H] [NormedAddCommGroup H'] [InnerProductSpace ℂ H']
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {τ : Matrix (Fin n) (Fin n) ℂ → (H' →L[ℂ] H')}
 
-theorem mul_mem_UJset {a b : Matrix (Fin n) (Fin n) ℂ} (ha : a ∈ UJset ε) (hb : b ∈ UJset ε) :
-    a * b ∈ UJset ε := by
+theorem mul_mem_UJset {a b : Matrix (Fin n) (Fin n) ℂ} (ha : a ∈ UJset ε) (hb : b ∈ UJset ε)
+    : a * b ∈ UJset ε := by
   have ha' : aᴴ * Jm ε * a = Jm ε := ha
   have hb' : bᴴ * Jm ε * b = Jm ε := hb
   show (a * b)ᴴ * Jm ε * (a * b) = Jm ε
   rw [Matrix.conjTranspose_mul]
-  calc bᴴ * aᴴ * Jm ε * (a * b) = bᴴ * (aᴴ * Jm ε * a) * b := by simp only [Matrix.mul_assoc]
+  calc
+    bᴴ * aᴴ * Jm ε * (a * b)
+      = bᴴ * (aᴴ * Jm ε * a) * b := by simp only [Matrix.mul_assoc]
     _ = Jm ε := by rw [ha', hb']
 
 theorem isSqIntIrr_of_uEquiv (he : UEquiv ε σ τ) (h : IsSqIntIrr ε τ) : IsSqIntIrr ε σ := by
@@ -58,8 +62,7 @@ theorem isSqIntIrr_of_uEquiv (he : UEquiv ε σ τ) (h : IsSqIntIrr ε τ) : IsS
     have hc' : ContinuousOn (fun g => T.symm (τ g (T v))) (UJset ε) :=
       T.symm.continuous.comp_continuousOn (hcont (T v))
     exact hc'.congr (fun g hg => hσ g hg v)
-  ·
-    intro S hS hst
+  · intro S hS hst
     let S' : Submodule ℂ H' := S.comap (T.symm.toLinearEquiv : H' →ₗ[ℂ] H)
     have mem' : ∀ w, w ∈ S' ↔ T.symm w ∈ S := fun w => Iff.rfl
     have hcl : IsClosed (S' : Set H') := hS.preimage T.symm.continuous
@@ -85,8 +88,7 @@ theorem isSqIntIrr_of_uEquiv (he : UEquiv ε σ τ) (h : IsSqIntIrr ε τ) : IsS
         exact Submodule.mem_top
       rw [mem', LinearIsometryEquiv.symm_apply_apply] at hTv
       exact hTv
-  ·
-    intro v w
+  · intro v w
     have heq : coefOn (ε := ε) σ v w = coefOn (ε := ε) τ (T v) (T w) := by
       funext g
       have hg : umat g ∈ UJset ε := g.2
@@ -104,8 +106,9 @@ theorem isDS_of_uEquiv {lam : Fin n → ℝ} (he : UEquiv ε σ τ) (h : IsDS ε
   · intro μ S hS
     exact h.2.2.2.2.2.2 μ _ (ktype_transfer T hT hS)
 
-theorem isKFin_transfer (T : H ≃ₗᵢ[ℂ] H') (h : ∀ g ∈ UJset ε, ∀ v, T (σ g v) = τ g (T v)) {v : H}
-    (hv : IsKFin ε σ v) : IsKFin ε τ (T v) := by
+theorem isKFin_transfer
+    (T : H ≃ₗᵢ[ℂ] H') (h : ∀ g ∈ UJset ε, ∀ v, T (σ g v) = τ g (T v)) {v : H} (hv : IsKFin ε σ v)
+    : IsKFin ε τ (T v) := by
   obtain ⟨S, hfin, hvS, hst⟩ := hv
   refine ⟨S.map (T.toLinearEquiv : H →ₗ[ℂ] H'), ?_, Submodule.mem_map_of_mem hvS, ?_⟩
   · haveI := hfin
@@ -117,8 +120,10 @@ theorem isKFin_transfer (T : H ≃ₗᵢ[ℂ] H') (h : ∀ g ∈ UJset ε, ∀ v
     rw [← h g (Kset_sub hg) u]
     exact Submodule.mem_map_of_mem (hst g hg u hu)
 
-theorem isZEigen_congr {χ : Fin n → ℂ} {f f' : Matrix (Fin n) (Fin n) ℂ → ℂ}
-    (h : ∀ g, inUJ ε g → f g = f' g) (hf : IsZEigen ε χ f') : IsZEigen ε χ f := by
+theorem isZEigen_congr
+    {χ : Fin n → ℂ} {f f' : Matrix (Fin n) (Fin n) ℂ → ℂ}
+    (h : ∀ g, inUJ ε g → f g = f' g) (hf : IsZEigen ε χ f')
+    : IsZEigen ε χ f := by
   obtain ⟨hsm, heig⟩ := hf
   refine ⟨?_, ?_⟩
   · intro g₀ hg₀
@@ -131,8 +136,8 @@ theorem isZEigen_congr {χ : Fin n → ℂ} {f f' : Matrix (Fin n) (Fin n) ℂ �
       exact Finset.sum_congr rfl (fun a _ => Eword_congr ε h _ g hg)
     rw [hgel, heig m g hg, h g hg]
 
-theorem hasInfChar_of_uEquiv {χ : Fin n → ℂ} (he : UEquiv ε σ τ) (h : HasInfChar ε χ τ) :
-    HasInfChar ε χ σ := by
+theorem hasInfChar_of_uEquiv {χ : Fin n → ℂ} (he : UEquiv ε σ τ) (h : HasInfChar ε χ τ)
+    : HasInfChar ε χ σ := by
   obtain ⟨T, hT⟩ := he
   intro v w hv hw
   have hz := h (T v) (T w) (isKFin_transfer T hT hv) (isKFin_transfer T hT hw)
@@ -155,8 +160,7 @@ theorem strictLow_of_dsClass (h : DSClass) : StrictLow := by
   intro n ε lam hl H _ _ _ σ hσ
   obtain ⟨S0, hS0⟩ := hσ.2.2.2.2.2.1
   refine ⟨?_, ?_⟩
-  ·
-    have hset : {S : Submodule ℂ H | IsKTypeOf ε σ (lowK ε lam) S} = {S0} := by
+  · have hset : {S : Submodule ℂ H | IsKTypeOf ε σ (lowK ε lam) S} = {S0} := by
       ext S
       simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
       constructor
@@ -169,14 +173,14 @@ theorem strictLow_of_dsClass (h : DSClass) : StrictLow := by
       rw [hset, sSup_singleton]
     rw [hsub]
     exact hS0
-  ·
-    intro μ S hS hne
+  · intro μ S hS hne
     obtain ⟨c, hc, hμ⟩ := kTypesAbove_of_dsClass h n ε lam H σ hl hσ μ S hS
     have hQ0 : (∑ a, ∑ b, (c a b : ℝ) • root a b) ≠ 0 := by
       intro h0
       apply hne
       rw [hμ, h0, add_zero]
-    have hx : Antitone (lam + Formalism.QuantumDeterminants.rhoStd n) := (strictAnti_add_rho hl.1).antitone
+    have hx : Antitone (lam + Formalism.QuantumDeterminants.rhoStd n) :=
+      (strictAnti_add_rho hl.1).antitone
     have hcone := nsq_add_cone hx hc
     have hpos : 0 < nsq (∑ a, ∑ b, (c a b : ℝ) • root a b) := by
       rcases (nsq_nonneg (∑ a, ∑ b, (c a b : ℝ) • root a b)).lt_or_eq with hp | hp
@@ -185,16 +189,27 @@ theorem strictLow_of_dsClass (h : DSClass) : StrictLow := by
     have e1 : vNormSq ε (lowK ε lam) = nsq (lam + Formalism.QuantumDeterminants.rhoStd n) := by
       show nsq (lowK ε lam + (2 : ℝ) • rhoC ε) = _
       rw [lowK_add]
-    have e2 : vNormSq ε μ = nsq (lam + Formalism.QuantumDeterminants.rhoStd n + ∑ a, ∑ b, (c a b : ℝ) • root a b) := by
+    have e2
+        : vNormSq ε μ
+          = nsq
+            (lam + Formalism.QuantumDeterminants.rhoStd n + ∑ a, ∑ b, (c a b : ℝ) • root a b) := by
       show nsq (μ + (2 : ℝ) • rhoC ε) = _
       rw [hμ, add_right_comm (lowK ε lam) _ ((2 : ℝ) • rhoC ε), lowK_add]
     rw [e1, e2]
     linarith
 
-theorem consequences_of_dsClass :
-    DSClass → DSExists ∧ DSExhaust ∧ DSUnique ∧ DSInfChar ∧ LowKMultOne ∧ KTypesAbove ∧ StrictLow := by
+theorem consequences_of_dsClass
+    : DSClass
+      → DSExists ∧ DSExhaust ∧ DSUnique ∧ DSInfChar ∧ LowKMultOne ∧ KTypesAbove ∧ StrictLow := by
   intro h
-  exact ⟨dsExists_of_dsClass h, dsExhaust_of_dsClass h, dsUnique_of_dsClass h, dsInfChar_of_dsClass h,
-    lowKMultOne_of_dsClass h, kTypesAbove_of_dsClass h, strictLow_of_dsClass h⟩
+  exact ⟨
+    dsExists_of_dsClass h,
+    dsExhaust_of_dsClass h,
+    dsUnique_of_dsClass h,
+    dsInfChar_of_dsClass h,
+    lowKMultOne_of_dsClass h,
+    kTypesAbove_of_dsClass h,
+    strictLow_of_dsClass h
+  ⟩
 
 end GlobalTheory.ClassificationConsequences

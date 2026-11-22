@@ -7,7 +7,8 @@ public import GroundTheory.GlobalFields.IdeleGroups.GaloisOnAdeles.Places
 @[expose] public section
 
 open NumberField IsDedekindDomain Polynomial
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Global
+  GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange
 open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.Tf.Geo
 open scoped NumberField.AdeleRing
 
@@ -97,39 +98,51 @@ private lemma fin_real (r : ℝ) (h0 : 0 < r) (h1 : r ≤ 1 / 2) (j m : ℕ) (hm
     exact pow_le_one₀ (by positivity) (by linarith)
   exact (mul_le_mul_of_nonneg_right ha (by positivity)).trans hb
 
-theorem UpperTheory.norm_coeff_zero_factor_charpoly_iwahori_diagPow_le :
-    A1 → ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ) (ν : Fin n → ℤ), Function.Injective ν → ∑ i, ν i = 0 →
-        (∀ J : Finset (Fin n), J.Nonempty → J ≠ Finset.univ → ∑ i ∈ J, ν i ≠ 0) → ∀ j : ℕ, 0 < j →
-        ∀ a ∈ GLnLocal.iwahori (w.adicCompletion E) n, ∀ b ∈ GLnLocal.iwahori (w.adicCompletion E) n,
-        ∀ p₁ p₂ : (w.adicCompletion E)[X], p₁.Monic → p₂.Monic → 0 < p₁.natDegree → 0 < p₂.natDegree →
-        p₁ * p₂ = ((a * Cartan.diagPow (w.adicCompletion E) n (fun i => (j : ℤ) * ν i) * b : GL (Fin n) (w.adicCompletion E)) :
-          Matrix (Fin n) (Fin n) (w.adicCompletion E)).charpoly →
-        ‖p₁.coeff 0‖ * 2 ^ j ≤ 1 ∨ ‖p₂.coeff 0‖ * 2 ^ j ≤ 1 := by
+theorem UpperTheory.norm_coeff_zero_factor_charpoly_iwahori_diagPow_le
+    : A1
+      → ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ)
+          (ν : Fin n → ℤ),
+        Function.Injective ν → ∑ i, ν i = 0
+          → (∀ J : Finset (Fin n), J.Nonempty → J ≠ Finset.univ → ∑ i ∈ J, ν i ≠ 0)
+          → ∀ j : ℕ,
+            0 < j
+              → ∀ a ∈ GLnLocal.iwahori (w.adicCompletion E) n,
+                ∀ b ∈ GLnLocal.iwahori (w.adicCompletion E) n, ∀ p₁ p₂ : (w.adicCompletion E)[X],
+                  p₁.Monic → p₂.Monic → 0 < p₁.natDegree → 0 < p₂.natDegree
+                    → p₁ * p₂
+                      = ((a * Cartan.diagPow (w.adicCompletion E) n (fun i => (j : ℤ) * ν i) * b
+                          : GL (Fin n) (w.adicCompletion E))
+                        : Matrix (Fin n) (Fin n) (w.adicCompletion E)).charpoly
+                    → ‖p₁.coeff 0‖ * 2 ^ j ≤ 1 ∨ ‖p₂.coeff 0‖ * 2 ^ j ≤ 1 := by
   intro hA E _ _ w n ν hν hsum hJ j hj a ha b hb p₁ p₂ hm₁ hm₂ hd₁ hd₂ hp
   classical
   have hϖ : ((GLnLocal.uniformizer (w.adicCompletion E) : _) : w.adicCompletion E) ≠ 0 :=
     GLnLocal.uniformizer_ne_zero _
   have hr := nrm_unif w
-  have hdiag : ∀ J : Finset (Fin n), ∏ i ∈ J, ((Cartan.diagPow (w.adicCompletion E) n (fun i => (j : ℤ) * ν i) :
-      GL (Fin n) (w.adicCompletion E)) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) i i =
-      ((GLnLocal.uniformizer (w.adicCompletion E) : _) : w.adicCompletion E) ^ ((j : ℤ) * ∑ i ∈ J, ν i) := by
+  have hdiag
+      : ∀ J : Finset (Fin n),
+        ∏ i ∈ J, ((Cartan.diagPow (w.adicCompletion E) n (fun i => (j : ℤ) * ν i) :
+            GL (Fin n) (w.adicCompletion E)) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) i i
+          = ((GLnLocal.uniformizer (w.adicCompletion E) : _) : w.adicCompletion E)
+            ^ ((j : ℤ) * ∑ i ∈ J, ν i) := by
     intro J
     rw [Finset.mul_sum, ← prod_zp _ hϖ]
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [Cartan.coe_diagPow, Matrix.diagonal_apply_eq]
-  generalize ((GLnLocal.uniformizer (w.adicCompletion E) : _) : w.adicCompletion E) = ϖ at hϖ hr hdiag
+  generalize ((GLnLocal.uniformizer (w.adicCompletion E) : _) : w.adicCompletion E) = ϖ
+    at hϖ hr hdiag
   have hr0 : 0 < ‖ϖ‖ := norm_pos_iff.2 hϖ
   have hinj : Function.Injective (fun i => (j : ℤ) * ν i) := fun x y h =>
     hν (mul_left_cancel₀ (by exact_mod_cast hj.ne') h)
   obtain ⟨J, hJc, hJv⟩ := hA (w.adicCompletion E) n _ hinj a ha b hb p₁ hm₁ ⟨p₂, hp.symm⟩
   have hcp : (p₁ * p₂).natDegree = n := by
     rw [hp, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
-  obtain ⟨J', hJ'c, hJ'v⟩ := hA (w.adicCompletion E) n _ hinj a ha b hb (p₁ * p₂) (hm₁.mul hm₂) (hp ▸ dvd_rfl)
+  obtain ⟨J', hJ'c, hJ'v⟩ :=
+    hA (w.adicCompletion E) n _ hinj a ha b hb (p₁ * p₂) (hm₁.mul hm₂) (hp ▸ dvd_rfl)
   have hJ'u : J' = Finset.univ := by
     apply Finset.eq_univ_of_card
     rw [hJ'c, hcp, Fintype.card_fin]
-  have hdeg : p₁.natDegree + p₂.natDegree = n := by
-    rw [← hm₁.natDegree_mul hm₂]; exact hcp
+  have hdeg : p₁.natDegree + p₂.natDegree = n := by rw [← hm₁.natDegree_mul hm₂]; exact hcp
   have hne : J.Nonempty := Finset.card_pos.1 (by omega)
   have hnu : J ≠ Finset.univ := by
     intro h

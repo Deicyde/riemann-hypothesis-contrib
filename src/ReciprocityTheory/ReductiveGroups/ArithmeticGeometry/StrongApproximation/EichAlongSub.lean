@@ -9,17 +9,16 @@ namespace ReciprocityTheory.ChartRestriction.G.SA
 
 open Matrix
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι] {R : Type*} [CommRing R] {σ : R →+* R}
-  {J : Matrix ι ι R}
-
+variable
+  {ι : Type*} [Fintype ι] [DecidableEq ι] {R : Type*} [CommRing R] {σ : R →+* R} {J : Matrix ι ι R}
 
 variable (σ J) in
 def tor (σ : R →+* R) (J : Matrix ι ι R) (e f : ι → R) (l m : R) : Matrix ι ι R :=
   1 + (l - 1) • vecMulVec e (J *ᵥ (σ ∘ f)) + (m - 1) • vecMulVec f (J *ᵥ (σ ∘ e))
 
 variable (σ J) in
-theorem tor_mulVec (e f : ι → R) (l m : R) (x : ι → R) :
-    tor σ J e f l m *ᵥ x = x + ((l - 1) * hf σ J x f) • e + ((m - 1) * hf σ J x e) • f := by
+theorem tor_mulVec (e f : ι → R) (l m : R) (x : ι → R)
+    : tor σ J e f l m *ᵥ x = x + ((l - 1) * hf σ J x f) • e + ((m - 1) * hf σ J x e) • f := by
   have vmvs : ∀ (s : R) (a w z : ι → R), (s • vecMulVec a w) *ᵥ z = (s * (w ⬝ᵥ z)) • a := by
     intro s a w z
     ext i
@@ -33,8 +32,10 @@ section
 variable (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ)
 include hσ hJ
 
-theorem eich_inv {e u : ι → R} {c : R} (he : hf σ J e e = 0) (hue : hf σ J u e = 0)
-    (hc : c + σ c + hf σ J u u = 0) : eich σ J e (-u) (σ c) * eich σ J e u c = 1 := by
+theorem eich_inv
+    {e u : ι → R} {c : R}
+    (he : hf σ J e e = 0) (hue : hf σ J u e = 0) (hc : c + σ c + hf σ J u u = 0)
+    : eich σ J e (-u) (σ c) * eich σ J e u c = 1 := by
   apply Matrix.ext_of_mulVec_single
   intro j
   rw [Matrix.one_mulVec, ← Matrix.mulVec_mulVec]
@@ -46,7 +47,8 @@ theorem eich_inv {e u : ι → R} {c : R} (he : hf σ J e e = 0) (hue : hf σ J 
   set β := hf σ J x u
   set y := x + α • u - β • e + (c * α) • e with hy
   have h1 : hf σ J y e = α := by
-    rw [hy, hf_add_left, hf_sub_left, hf_add_left, hf_smul_left, hf_smul_left, hf_smul_left, hue, he]
+    rw [hy, hf_add_left, hf_sub_left, hf_add_left, hf_smul_left, hf_smul_left, hf_smul_left, hue,
+      he]
     ring
   have h2 : hf σ J y u = β + α * hf σ J u u := by
     rw [hy, hf_add_left, hf_sub_left, hf_add_left, hf_smul_left, hf_smul_left, hf_smul_left, heu]
@@ -62,8 +64,9 @@ theorem eichAlong_sub {e f : ι → R} (he : hf σ J e e = 0) : eichAlong σ J e
   rw [mem_SU_iff]
   exact ⟨eich_det (hσ := hσ) (hJ := hJ) he hue, eich_preserves (hσ := hσ) (hJ := hJ) he hue hc⟩
 
-theorem eichAlong_inv {e f : ι → R} (he : hf σ J e e = 0) {M : Matrix ι ι R}
-    (hM : M ∈ eichAlong σ J e f) : ∃ M' ∈ eichAlong σ J e f, M' * M = 1 ∧ M * M' = 1 := by
+theorem eichAlong_inv
+    {e f : ι → R} (he : hf σ J e e = 0) {M : Matrix ι ι R} (hM : M ∈ eichAlong σ J e f)
+    : ∃ M' ∈ eichAlong σ J e f, M' * M = 1 ∧ M * M' = 1 := by
   obtain ⟨u, c, hue, huf, hc, rfl⟩ := hM
   have hue' : hf σ J (-u) e = 0 := by rw [hf_neg_left, hue, neg_zero]
   have huf' : hf σ J (-u) f = 0 := by rw [hf_neg_left, huf, neg_zero]
@@ -93,8 +96,8 @@ theorem closure_sub : (Submonoid.closure (eichSet σ J e f) : Set (Matrix ι ι 
     refine ⟨by rw [Matrix.det_mul, hx.1, hy.1, one_mul], fun a b => ?_⟩
     rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hx.2, hy.2]
 
-theorem closure_inv {M : Matrix ι ι R} (hM : M ∈ Submonoid.closure (eichSet σ J e f)) :
-    ∃ M' ∈ Submonoid.closure (eichSet σ J e f), M' * M = 1 ∧ M * M' = 1 := by
+theorem closure_inv {M : Matrix ι ι R} (hM : M ∈ Submonoid.closure (eichSet σ J e f))
+    : ∃ M' ∈ Submonoid.closure (eichSet σ J e f), M' * M = 1 ∧ M * M' = 1 := by
   induction hM using Submonoid.closure_induction with
   | mem x hx =>
     rcases hx with hx | hx
@@ -102,7 +105,8 @@ theorem closure_inv {M : Matrix ι ι R} (hM : M ∈ Submonoid.closure (eichSet 
       exact ⟨M', Submonoid.subset_closure (Or.inl hM'), h1, h2⟩
     · obtain ⟨M', hM', h1, h2⟩ := eichAlong_inv hσ hJ hff hx
       exact ⟨M', Submonoid.subset_closure (Or.inr hM'), h1, h2⟩
-  | one => exact ⟨1, Submonoid.one_mem _, mul_one 1, mul_one 1⟩
+  | one =>
+    exact ⟨1, Submonoid.one_mem _, mul_one 1, mul_one 1⟩
   | mul x y _ _ hx hy =>
     obtain ⟨x', hx'm, hx1, hx2⟩ := hx
     obtain ⟨y', hy'm, hy1, hy2⟩ := hy
@@ -116,10 +120,10 @@ include hef
 theorem hf_fe : hf σ J f e = 1 := by
   rw [← hf_symm (hσ := hσ) (hJ := hJ) (x := e) (y := f), hef, map_one]
 
-theorem tor_preserves {l m : R} (hlm : m * σ l = 1) (x y : ι → R) :
-    hf σ J (tor σ J e f l m *ᵥ x) (tor σ J e f l m *ᵥ y) = hf σ J x y := by
-  rw [tor_mulVec σ J e f l m x, tor_mulVec σ J e f l m y, hf_expand (hσ := hσ) (hJ := hJ), he, hff, hef,
-    hf_fe hσ hJ he hff hef]
+theorem tor_preserves {l m : R} (hlm : m * σ l = 1) (x y : ι → R)
+    : hf σ J (tor σ J e f l m *ᵥ x) (tor σ J e f l m *ᵥ y) = hf σ J x y := by
+  rw [tor_mulVec σ J e f l m x, tor_mulVec σ J e f l m y, hf_expand (hσ := hσ) (hJ := hJ), he, hff,
+    hef, hf_fe hσ hJ he hff hef]
   have h2 : l * σ m = 1 := by
     have h3 := congrArg σ hlm
     rw [map_mul, hσ, map_one] at h3

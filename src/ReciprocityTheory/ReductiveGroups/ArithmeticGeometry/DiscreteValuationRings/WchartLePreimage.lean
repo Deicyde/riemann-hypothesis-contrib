@@ -9,7 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -34,12 +35,23 @@ lemma wchart_le_preimage {X Y Z : Scheme.{0}} (L : LB X) {Ix : Type} [Fintype Ix
   rw [hφ k] at h
   simpa using h
 
-def GenHasVal (ϖ : V) {X : Scheme.{0}} (L : LB X) {Ix : Type} [Fintype Ix]
-    (φ : Ix → (Spec (CommRingCat.of V) ⟶ X)) (φ' : Ix → (Spec (CommRingCat.of (FractionRing V)) ⟶ X))
-    (hφ : ∀ k, φ' k = jK V ≫ φ k) (ε : Ix → ℤ) (t : LB.Gen (LB.LinComb L φ' ε)) (n : ℤ) : Prop :=
-  ∃ e : LB.Gen (LB.LinComb L φ ε), e.IsGen ∧ ∃ c : FractionRing V, HasVal ϖ c n ∧
-    ∀ j, (t.s j).val = resTop _ (scal (𝟙 (Spec (CommRingCat.of (FractionRing V)))) c) *
-      (res (wchart_le_preimage L (jK V) φ φ' hφ j) (pullU (jK V) _ (e.s j))).val
+def GenHasVal
+    (ϖ : V)
+    {X : Scheme.{0}} (L : LB X)
+    {Ix : Type} [Fintype Ix]
+    (φ : Ix → (Spec (CommRingCat.of V) ⟶ X))
+    (φ' : Ix → (Spec (CommRingCat.of (FractionRing V)) ⟶ X)) (hφ : ∀ k, φ' k = jK V ≫ φ k)
+    (ε : Ix → ℤ) (t : LB.Gen (LB.LinComb L φ' ε))
+    (n : ℤ)
+    : Prop :=
+  ∃ e : LB.Gen (LB.LinComb L φ ε),
+    e.IsGen
+      ∧ ∃ c : FractionRing V,
+        HasVal ϖ c n
+          ∧ ∀ j,
+            (t.s j).val
+              = resTop _ (scal (𝟙 (Spec (CommRingCat.of (FractionRing V)))) c)
+                * (res (wchart_le_preimage L (jK V) φ φ' hφ j) (pullU (jK V) _ (e.s j))).val
 
 namespace QForm
 
@@ -50,7 +62,11 @@ lemma ptK_eq (χ : D.X) : ptK (D.c χ) = jK V ≫ (D.c χ).left := by
   congr 1
 
 def QVal (ϖ : V) (χ : D.X) (n : ℤ) : Prop :=
-  GenHasVal ϖ D.P.L (fun _ : PUnit => (D.c χ).left) (fun _ => ptK (D.c χ)) (fun _ => ptK_eq D χ) (fun _ => -1)
+  GenHasVal ϖ D.P.L
+    (fun _ : PUnit => (D.c χ).left)
+    (fun _ => ptK (D.c χ))
+    (fun _ => ptK_eq D χ)
+    (fun _ => -1)
     (D.psi χ) n
 
 def IsQ (ϖ : V) (Q : D.X → ℤ) : Prop := ∀ χ, QVal D ϖ χ (Q χ)

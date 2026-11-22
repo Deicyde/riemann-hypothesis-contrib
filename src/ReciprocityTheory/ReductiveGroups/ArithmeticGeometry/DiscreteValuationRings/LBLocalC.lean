@@ -18,23 +18,27 @@ lemma res_of_le_of_le {X : Scheme.{0}} {U Z : X.Opens} (h : Z ≤ U) (h' : U ≤
   ext
   simp [res]
 
-def gw {X Y : Scheme.{0}} (L : LB X) {K : Type} [Fintype K] (ψ : K → (Y ⟶ X)) (ε : K → ℤ) (j j' : K → L.ι) :
-    Γ(Y, LB.wchart L ψ j ⊓ LB.wchart L ψ j')ˣ :=
+def gw
+    {X Y : Scheme.{0}} (L : LB X)
+    {K : Type} [Fintype K]
+    (ψ : K → (Y ⟶ X)) (ε : K → ℤ) (j j' : K → L.ι)
+    : Γ(Y, LB.wchart L ψ j ⊓ LB.wchart L ψ j')ˣ :=
   ∏ k, (res (le_inf (inf_le_left.trans (LB.wchart_le L ψ j k)) (inf_le_right.trans (LB.wchart_le L ψ j' k)) :
       LB.wchart L ψ j ⊓ LB.wchart L ψ j' ≤ ψ k ⁻¹ᵁ (L.U (j k) ⊓ L.U (j' k)))
     (pullU (ψ k) _ (L.g (j k) (j' k)))) ^ (ε k)
-
 
 lemma eq_top_of_closedPoint_mem {V : Type} [CommRing V] [IsLocalRing V] (U : (Spec (CommRingCat.of V)).Opens)
     (hU : (IsLocalRing.closedPoint V : Spec (CommRingCat.of V)) ∈ U) : U = ⊤ := by
   refine eq_top_iff.2 fun x _ => ?_
   exact (IsLocalRing.specializes_closedPoint (R := V) x).mem_open U.isOpen hU
 
-theorem exists_gen_of_isLB_local {V : Type} [CommRing V] [IsLocalRing V]
-    (M : LB (Spec (CommRingCat.of V))) (hM : M.IsLB) : ∃ e : M.Gen, e.IsGen := by
+theorem exists_gen_of_isLB_local
+    {V : Type} [CommRing V] [IsLocalRing V] (M : LB (Spec (CommRingCat.of V))) (hM : M.IsLB)
+    : ∃ e : M.Gen, e.IsGen := by
   obtain ⟨i₀, hi₀⟩ : ∃ i, (IsLocalRing.closedPoint V : Spec (CommRingCat.of V)) ∈ M.U i := by
-    have : (IsLocalRing.closedPoint V : Spec (CommRingCat.of V)) ∈
-        (⊤ : (Spec (CommRingCat.of V)).Opens) := trivial
+    have : (IsLocalRing.closedPoint V : Spec (CommRingCat.of V))
+        ∈ (⊤ : (Spec (CommRingCat.of V)).Opens) :=
+      trivial
     rw [← hM.cover] at this
     exact TopologicalSpace.Opens.mem_iSup.1 this
   have htop := eq_top_of_closedPoint_mem _ hi₀
@@ -42,16 +46,21 @@ theorem exists_gen_of_isLB_local {V : Type} [CommRing V] [IsLocalRing V]
     rw [htop]
     exact le_top
   refine ⟨⟨fun i => res (le_inf le_rfl (hto _) : M.U i ≤ M.U i ⊓ M.U i₀) (M.g i i₀)⟩, fun i j => ?_⟩
-  have hc := congrArg (res (le_inf le_rfl (hto _) : M.U i ⊓ M.U j ≤ M.U i ⊓ M.U j ⊓ M.U i₀))
-    (hM.cocycle i j i₀)
+  have hc :=
+    congrArg (res (le_inf le_rfl (hto _) : M.U i ⊓ M.U j ≤ M.U i ⊓ M.U j ⊓ M.U i₀))
+      (hM.cocycle i j i₀)
   simp only [map_mul, res_res'] at hc
   simp only [res_res']
   rw [← hc]
   congr 1
 
-theorem exists_gen_of_local {V : Type} [CommRing V] [IsLocalRing V] {X : Scheme.{0}} (L : LB X) (hL : L.IsLB)
-    {K : Type} [Fintype K] (φ : K → (Spec (CommRingCat.of V) ⟶ X)) (ε : K → ℤ) :
-    ∃ e : LB.Gen (LB.LinComb L φ ε), e.IsGen := exists_gen_of_isLB_local _ (linComb_isLB (L := L) (φ := φ) (ε := ε) hL)
+theorem exists_gen_of_local
+    {V : Type} [CommRing V] [IsLocalRing V]
+    {X : Scheme.{0}} (L : LB X) (hL : L.IsLB)
+    {K : Type} [Fintype K]
+    (φ : K → (Spec (CommRingCat.of V) ⟶ X)) (ε : K → ℤ)
+    : ∃ e : LB.Gen (LB.LinComb L φ ε), e.IsGen :=
+  exists_gen_of_isLB_local _ (linComb_isLB (L := L) (φ := φ) (ε := ε) hL)
 
 lemma exists_chart_top {V : Type} [CommRing V] [IsLocalRing V] {X : Scheme.{0}} (L : LB X) (hL : L.IsLB)
     {K : Type} [Fintype K] (φ : K → (Spec (CommRingCat.of V) ⟶ X)) (ε : K → ℤ) :
@@ -150,7 +159,6 @@ lemma genHasVal_units {X : Scheme.{0}} (L : LB X) {Ix : Type} [Fintype Ix]
       | simp
   · exact (inv_mul_cancel_right _ _).symm
 
-
 set_option maxHeartbeats 1000000 in
 lemma genHasVal_top {X : Scheme.{0}} (L : LB X) {Ix : Type} [Fintype Ix]
     (φ : Ix → (Spec (CommRingCat.of V) ⟶ X)) (ε : Ix → ℤ) (t : LB.Gen (LB.LinComb L (fun k => jK V ≫ φ k) ε)) {n : ℤ}
@@ -188,7 +196,6 @@ lemma genHasVal_top {X : Scheme.{0}} (L : LB X) {Ix : Type} [Fintype Ix]
     erw [← hnat]
     rw [CommRingCat.comp_apply]
     congr 1
-
 
 omit [IsDiscreteValuationRing V] in
 theorem isDominant_jK : IsDominant (jK V) := by

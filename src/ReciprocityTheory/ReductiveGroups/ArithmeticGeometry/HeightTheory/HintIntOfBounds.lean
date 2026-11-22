@@ -12,17 +12,18 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open MeasureTheory ReciprocityTheory.MultiplicativeHeights
 
-noncomputable def hintPt {D n : ℕ} (t0 : Fin n → ℂ) (z : BlockSphere D n) :
-    Fin (D + 1) × Fin n → ℂ :=
-  fun v => Fin.cases (t0 v.2) (fun i => spherePoint (z i) v.2) v.1
+noncomputable def hintPt {D n : ℕ} (t0 : Fin n → ℂ) (z : BlockSphere D n)
+    : Fin (D + 1) × Fin n → ℂ := fun v =>
+  Fin.cases (t0 v.2) (fun i => spherePoint (z i) v.2) v.1
 
-theorem hint_mpSplit (D n : ℕ) (hn : 0 < n) :
-    MeasurePreserving (MeasurableEquiv.piFinSuccAbove (fun _ : Fin (D + 1) => UnitSphereC n) 0)
+theorem hint_mpSplit (D n : ℕ) (hn : 0 < n)
+    : MeasurePreserving (MeasurableEquiv.piFinSuccAbove (fun _ : Fin (D + 1) => UnitSphereC n) 0)
       (blockSphereProb (D + 1) n) ((sphereProb n).prod (blockSphereProb D n)) := by
   unfold blockSphereProb
   exact measurePreserving_piFinSuccAbove (fun _ : Fin (D + 1) => sphereProb n) 0
 
-private theorem isProbabilityMeasure_sphereProb' (n : ℕ) (hn : 0 < n) : IsProbabilityMeasure (sphereProb n) := by
+private theorem isProbabilityMeasure_sphereProb' (n : ℕ) (hn : 0 < n)
+    : IsProbabilityMeasure (sphereProb n) := by
   haveI : NeZero n := ⟨hn.ne'⟩
   unfold sphereProb
   have hpos : 0 < Module.finrank ℝ (EuclideanSpace ℂ (Fin n)) := Module.finrank_pos
@@ -34,37 +35,42 @@ private theorem isProbabilityMeasure_sphereProb' (n : ℕ) (hn : 0 < n) : IsProb
     exact ENNReal.mul_ne_top (ENNReal.natCast_ne_top _) measure_ball_lt_top.ne
   exact ProbabilityTheory.cond_isProbabilityMeasure_of_finite h1 h2
 
-theorem hint_mpTail (D n : ℕ) (hn : 0 < n) :
-    MeasurePreserving (fun z : BlockSphere (D + 1) n => fun i : Fin D => z i.succ)
+theorem hint_mpTail (D n : ℕ) (hn : 0 < n)
+    : MeasurePreserving
+      (fun z : BlockSphere (D + 1) n => fun i : Fin D => z i.succ)
       (blockSphereProb (D + 1) n) (blockSphereProb D n) := by
   haveI := isProbabilityMeasure_sphereProb' n hn
   haveI : SFinite (blockSphereProb D n) := by
     unfold blockSphereProb
     infer_instance
-  have h := (measurePreserving_snd (μ := sphereProb n) (ν := blockSphereProb D n)).comp
-    (hint_mpSplit D n hn)
-  have e : (fun z : BlockSphere (D + 1) n => fun i : Fin D => z i.succ) =
-      Prod.snd ∘ ⇑(MeasurableEquiv.piFinSuccAbove (fun _ : Fin (D + 1) => UnitSphereC n) 0) := by
+  have h :=
+    (measurePreserving_snd (μ := sphereProb n) (ν := blockSphereProb D n)).comp
+      (hint_mpSplit D n hn)
+  have e
+      : (fun z : BlockSphere (D + 1) n => fun i : Fin D => z i.succ)
+        = Prod.snd
+          ∘ ⇑(MeasurableEquiv.piFinSuccAbove (fun _ : Fin (D + 1) => UnitSphereC n) 0) := by
     funext z i
     first
-      | rfl
-      | (simp [MeasurableEquiv.piFinSuccAbove_apply, Fin.removeNth]; done)
-      | (simp [MeasurableEquiv.piFinSuccAbove_apply, Fin.removeNth]; rfl)
-      | exact congrArg z (by simp)
+    | rfl
+    | (simp [MeasurableEquiv.piFinSuccAbove_apply, Fin.removeNth]; done)
+    | (simp [MeasurableEquiv.piFinSuccAbove_apply, Fin.removeNth]; rfl)
+    | exact congrArg z (by simp)
   rw [e]
   exact h
 
-theorem hint_blockPoint_eq {D n : ℕ} (z : BlockSphere (D + 1) n) :
-    blockPoint z = hintPt (spherePoint (z 0)) (fun i : Fin D => z i.succ) := by
+theorem hint_blockPoint_eq {D n : ℕ} (z : BlockSphere (D + 1) n)
+    : blockPoint z = hintPt (spherePoint (z 0)) (fun i : Fin D => z i.succ) := by
   funext ⟨i, j⟩
   cases i using Fin.cases with
   | zero => simp [blockPoint, hintPt]
   | succ i => simp [blockPoint, hintPt]
 
-theorem hint_eval_indep {D n : ℕ} {a : Fin (D + 1) → ℕ} {q : MvPolynomial (Fin (D + 1) × Fin n) ℂ}
+theorem hint_eval_indep
+    {D n : ℕ} {a : Fin (D + 1) → ℕ} {q : MvPolynomial (Fin (D + 1) × Fin n) ℂ}
     (hq : IsMultiHomogeneous a q) (ha : a 0 = 0) (x y : Fin (D + 1) × Fin n → ℂ)
-    (hxy : ∀ v : Fin (D + 1) × Fin n, v.1 ≠ 0 → x v = y v) :
-    MvPolynomial.eval x q = MvPolynomial.eval y q := by
+    (hxy : ∀ v : Fin (D + 1) × Fin n, v.1 ≠ 0 → x v = y v)
+    : MvPolynomial.eval x q = MvPolynomial.eval y q := by
   rw [MvPolynomial.eval_eq, MvPolynomial.eval_eq]
   refine Finset.sum_congr rfl fun s hs => ?_
   congr 1
@@ -74,8 +80,7 @@ theorem hint_eval_indep {D n : ℕ} {a : Fin (D + 1) → ℕ} {q : MvPolynomial 
       have hsum := hq s hs 0
       rw [ha] at hsum
       have hle : s (0, v.2) ≤ ∑ j : Fin n, s (0, j) :=
-        Finset.single_le_sum (f := fun j => s (0, j)) (fun _ _ => Nat.zero_le _)
-          (Finset.mem_univ _)
+        Finset.single_le_sum (f := fun j => s (0, j)) (fun _ _ => Nat.zero_le _) (Finset.mem_univ _)
       have hz : s (0, v.2) = 0 := by omega
       have hv' : v = (0, v.2) := Prod.ext hv rfl
       rw [hv']
@@ -83,8 +88,8 @@ theorem hint_eval_indep {D n : ℕ} {a : Fin (D + 1) → ℕ} {q : MvPolynomial 
     rw [h0, pow_zero, pow_zero]
   · rw [hxy v hv]
 
-theorem hint_continuous_pt {D n : ℕ} (t0 : Fin n → ℂ) :
-    Continuous fun z : BlockSphere D n => hintPt t0 z := by
+theorem hint_continuous_pt {D n : ℕ} (t0 : Fin n → ℂ)
+    : Continuous fun z : BlockSphere D n => hintPt t0 z := by
   apply continuous_pi
   rintro ⟨i, j⟩
   cases i using Fin.cases with
@@ -96,10 +101,13 @@ theorem hint_continuous_pt {D n : ℕ} (t0 : Fin n → ℂ) :
     unfold spherePoint
     fun_prop
 
-theorem hint_logInt_tail {D n : ℕ} (hn : 0 < n) {a : Fin (D + 1) → ℕ}
-    {q : MvPolynomial (Fin (D + 1) × Fin n) ℂ} (hq0 : q ≠ 0) (hq : IsMultiHomogeneous a q)
-    (ha : a 0 = 0) (t0 : Fin n → ℂ) :
-    Integrable (fun z : BlockSphere D n => Real.log ‖MvPolynomial.eval (hintPt t0 z) q‖)
+theorem hint_logInt_tail
+    {D n : ℕ} (hn : 0 < n)
+    {a : Fin (D + 1) → ℕ} {q : MvPolynomial (Fin (D + 1) × Fin n) ℂ}
+    (hq0 : q ≠ 0) (hq : IsMultiHomogeneous a q) (ha : a 0 = 0)
+    (t0 : Fin n → ℂ)
+    : Integrable
+      (fun z : BlockSphere D n => Real.log ‖MvPolynomial.eval (hintPt t0 z) q‖)
       (blockSphereProb D n) := by
   have hmeas : AEStronglyMeasurable
       (fun z : BlockSphere D n => Real.log ‖MvPolynomial.eval (hintPt t0 z) q‖)
@@ -107,18 +115,21 @@ theorem hint_logInt_tail {D n : ℕ} (hn : 0 < n) {a : Fin (D + 1) → ℕ}
     ((continuous_norm.comp ((MvPolynomial.continuous_eval q).comp
       (hint_continuous_pt t0))).measurable.log).aestronglyMeasurable
   rw [← (hint_mpTail D n hn).integrable_comp hmeas]
-  refine (ReciprocityTheory.MultiplicativeHeights.Closed.sphereLogIntegrable (D + 1) n a q hq0 hq).congr
-    (Filter.Eventually.of_forall fun z => ?_)
+  refine
+    (ReciprocityTheory.MultiplicativeHeights.Closed.sphereLogIntegrable (D + 1) n a q hq0 hq).congr
+      (Filter.Eventually.of_forall fun z => ?_)
   simp only [Function.comp_apply]
   rw [hint_blockPoint_eq, hint_eval_indep hq ha _ (hintPt t0 (fun i : Fin D => z i.succ))]
   rintro ⟨i, j⟩ hi
   obtain ⟨k, rfl⟩ := Fin.exists_succ_eq.2 hi
   rfl
 
-theorem hint_ae_tail {D n : ℕ} (hn : 0 < n) {a : Fin (D + 1) → ℕ}
-    {q : MvPolynomial (Fin (D + 1) × Fin n) ℂ} (hq0 : q ≠ 0) (hq : IsMultiHomogeneous a q)
-    (ha : a 0 = 0) (t0 : Fin n → ℂ) :
-    ∀ᵐ z ∂(blockSphereProb D n), MvPolynomial.eval (hintPt t0 z) q ≠ 0 := by
+theorem hint_ae_tail
+    {D n : ℕ} (hn : 0 < n)
+    {a : Fin (D + 1) → ℕ} {q : MvPolynomial (Fin (D + 1) × Fin n) ℂ}
+    (hq0 : q ≠ 0) (hq : IsMultiHomogeneous a q) (ha : a 0 = 0)
+    (t0 : Fin n → ℂ)
+    : ∀ᵐ z ∂(blockSphereProb D n), MvPolynomial.eval (hintPt t0 z) q ≠ 0 := by
   have hA : MeasurableSet {z : BlockSphere D n | MvPolynomial.eval (hintPt t0 z) q = 0} :=
     (isClosed_eq ((MvPolynomial.continuous_eval q).comp (hint_continuous_pt t0))
       continuous_const).measurableSet
@@ -136,10 +147,13 @@ theorem hint_ae_tail {D n : ℕ} (hn : 0 < n) {a : Fin (D + 1) → ℕ}
   obtain ⟨k, rfl⟩ := Fin.exists_succ_eq.2 hi
   rfl
 
-theorem hint_fubini {D n : ℕ} (hn : 0 < n) {a : Fin (D + 1) → ℕ}
-    {F : MvPolynomial (Fin (D + 1) × Fin n) ℂ} (hF0 : F ≠ 0) (hF : IsMultiHomogeneous a F) :
-    Integrable (fun z : BlockSphere D n =>
-      ∫ s, Real.log ‖MvPolynomial.eval (hintPt (spherePoint s) z) F‖ ∂(sphereProb n))
+theorem hint_fubini
+    {D n : ℕ} (hn : 0 < n)
+    {a : Fin (D + 1) → ℕ} {F : MvPolynomial (Fin (D + 1) × Fin n) ℂ}
+    (hF0 : F ≠ 0) (hF : IsMultiHomogeneous a F)
+    : Integrable
+      (fun z : BlockSphere D n =>
+        ∫ s, Real.log ‖MvPolynomial.eval (hintPt (spherePoint s) z) F‖ ∂(sphereProb n))
       (blockSphereProb D n) := by
   haveI := sphereMeasure_isProbability hn
   haveI := blockSphereMeasure_isProbability (B := D) hn
@@ -148,15 +162,15 @@ theorem hint_fubini {D n : ℕ} (hn : 0 < n) {a : Fin (D + 1) → ℕ}
   have hint : Integrable G ((sphereProb n).prod (blockSphereProb D n)) := by
     rw [← (hint_mpSplit D n hn).integrable_comp_emb
       (MeasurableEquiv.piFinSuccAbove (fun _ : Fin (D + 1) => UnitSphereC n) 0).measurableEmbedding]
-    refine (ReciprocityTheory.MultiplicativeHeights.Closed.sphereLogIntegrable (D + 1) n a F hF0 hF).congr
-      (Filter.Eventually.of_forall fun z => ?_)
+    refine (ReciprocityTheory.MultiplicativeHeights.Closed.sphereLogIntegrable (D + 1) n a F hF0
+      hF).congr (Filter.Eventually.of_forall fun z => ?_)
     simp only [Function.comp_apply, hG]
     rw [hint_blockPoint_eq]
     rfl
   exact hint.integral_prod_right
 
-theorem hint_lin_ae {n : ℕ} (c : Fin n → ℂ) (hc : c ≠ 0) :
-    ∀ᵐ s ∂(sphereProb n), ∑ j, c j * spherePoint s j ≠ 0 := by
+theorem hint_lin_ae {n : ℕ} (c : Fin n → ℂ) (hc : c ≠ 0)
+    : ∀ᵐ s ∂(sphereProb n), ∑ j, c j * spherePoint s j ≠ 0 := by
   classical
   set Lc : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] ℂ :=
     ∑ j, c j • (EuclideanSpace.proj j : EuclideanSpace ℂ (Fin n) →L[ℂ] ℂ).toLinearMap with hLc

@@ -8,10 +8,13 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem exists_equiv_pi_adjoinRoot_of_aeval_eq_zero (F : Type) [Field F] (Q : Type) [AddCommGroup Q]
-    [Module F Q] [FiniteDimensional F Q] (g : Module.End F Q) (f : F[X]) [Fact (Irreducible f)]
-    (h : aeval g f = 0) :
-    ∃ (t : ℕ) (e : Q ≃ₗ[F] (Fin t → AdjoinRoot f)),
+theorem exists_equiv_pi_adjoinRoot_of_aeval_eq_zero
+    (F : Type) [Field F]
+    (Q : Type) [AddCommGroup Q] [Module F Q] [FiniteDimensional F Q]
+    (g : Module.End F Q)
+    (f : F[X]) [Fact (Irreducible f)]
+    (h : aeval g f = 0)
+    : ∃ (t : ℕ) (e : Q ≃ₗ[F] (Fin t → AdjoinRoot f)),
       (∀ v, e (g v) = AdjoinRoot.root f • e v) ∧ Module.finrank F Q = f.natDegree * t := by
   have hf : f ≠ 0 := (Fact.out : Irreducible f).ne_zero
   let φ : AdjoinRoot f →+* Module.End F Q :=
@@ -27,22 +30,27 @@ theorem exists_equiv_pi_adjoinRoot_of_aeval_eq_zero (F : Type) [Field F] (Q : Ty
     rw [hs, hs, AdjoinRoot.smul_mk, hφ, hφ]
     simp⟩
   haveI : Module.Finite (AdjoinRoot f) Q := Module.Finite.of_restrictScalars_finite F _ _
-  refine ⟨Module.finrank (AdjoinRoot f) Q,
-    (Module.finBasis (AdjoinRoot f) Q).equivFun.restrictScalars F, fun v => ?_, ?_⟩
-  · have : g v = AdjoinRoot.root f • v := by
-      rw [hs, ← AdjoinRoot.mk_X, hφ]; simp
+  refine ⟨
+    Module.finrank (AdjoinRoot f) Q,
+    (Module.finBasis (AdjoinRoot f) Q).equivFun.restrictScalars F,
+    fun v => ?_,
+    ?_
+  ⟩
+  · have : g v = AdjoinRoot.root f • v := by rw [hs, ← AdjoinRoot.mk_X, hφ]; simp
     rw [this]
     exact map_smul (Module.finBasis (AdjoinRoot f) Q).equivFun _ _
   · rw [← Module.finrank_mul_finrank F (AdjoinRoot f) Q, (AdjoinRoot.powerBasis hf).finrank,
       AdjoinRoot.powerBasis_dim]
 
-theorem exists_surjective_pi_adjoinRoot_ker_eq_range (F : Type) [Field F] (V : Type)
-    [AddCommGroup V] [Module F V] [FiniteDimensional F V] (g : Module.End F V) (f : F[X])
-    [Fact (Irreducible f)] :
-    ∃ (t : ℕ) (π : V →ₗ[F] (Fin t → AdjoinRoot f)), Function.Surjective π ∧
-      (∀ v, π (g v) = AdjoinRoot.root f • π v) ∧
-      LinearMap.ker π = LinearMap.range (aeval g f) ∧
-      Module.finrank F (LinearMap.ker (aeval g f)) = f.natDegree * t := by
+theorem exists_surjective_pi_adjoinRoot_ker_eq_range
+    (F : Type) [Field F]
+    (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (g : Module.End F V)
+    (f : F[X]) [Fact (Irreducible f)]
+    : ∃ (t : ℕ) (π : V →ₗ[F] (Fin t → AdjoinRoot f)),
+      Function.Surjective π ∧ (∀ v, π (g v) = AdjoinRoot.root f • π v)
+        ∧ LinearMap.ker π = LinearMap.range (aeval g f)
+        ∧ Module.finrank F (LinearMap.ker (aeval g f)) = f.natDegree * t := by
   set N : Submodule F V := LinearMap.range (aeval g f) with hN
   have hg : N ≤ N.comap g := by
     rintro _ ⟨v, rfl⟩
@@ -60,8 +68,8 @@ theorem exists_surjective_pi_adjoinRoot_ker_eq_range (F : Type) [Field F] (V : T
     | add p q hp hq => intro v; simp only [map_add (f := _), LinearMap.add_apply, hp, hq]
     | monomial n a ih =>
       intro v
-      rw [pow_succ, ← mul_assoc, map_mul, map_mul (aeval g), aeval_X, aeval_X,
-        Module.End.mul_apply, Module.End.mul_apply, hq, ih]
+      rw [pow_succ, ← mul_assoc, map_mul, map_mul (aeval g), aeval_X, aeval_X, Module.End.mul_apply,
+        Module.End.mul_apply, hq, ih]
   have h0 : aeval gq f = 0 := by
     apply LinearMap.ext
     intro x

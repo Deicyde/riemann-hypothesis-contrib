@@ -83,15 +83,19 @@ private lemma exists_isCompact_integral_compl_sq_lt (μ : Measure ℂ) [NullSing
   obtain ⟨n, hn⟩ := (hlim.eventually (gt_mem_nhds hη)).exists
   exact ⟨Kn n, hKc n, h0K n, hn⟩
 
-theorem tendsto_integral_inner_germ_moving {α : Type} {l : Filter α} (μ : Measure ℂ) [IsFiniteMeasureOnCompacts μ]
-    [NullSingletonClass μ] (F G : α → ℂ → H) (g : ℂ → ℝ) (e : α → ℂ → ℝ) (hg : MemLp g 2 μ) (B : ℝ)
-    (hF : ∀ᶠ x in l, MemLp (F x) 2 μ ∧ ∫ D, ‖F x D‖ ^ 2 ∂μ ≤ B)
-    (he : ∀ᶠ x in l, MemLp (e x) 2 μ)
-    (he0 : Tendsto (fun x => ∫ D, e x D ^ 2 ∂μ) l (𝓝 0))
+theorem tendsto_integral_inner_germ_moving
+    {α : Type} {l : Filter α}
+    (μ : Measure ℂ) [IsFiniteMeasureOnCompacts μ] [NullSingletonClass μ]
+    (F G : α → ℂ → H)
+    (g : ℂ → ℝ)
+    (e : α → ℂ → ℝ)
+    (hg : MemLp g 2 μ)
+    (B : ℝ) (hF : ∀ᶠ x in l, MemLp (F x) 2 μ ∧ ∫ D, ‖F x D‖ ^ 2 ∂μ ≤ B)
+    (he : ∀ᶠ x in l, MemLp (e x) 2 μ) (he0 : Tendsto (fun x => ∫ D, e x D ^ 2 ∂μ) l (𝓝 0))
     (hG : ∀ᶠ x in l, ∀ᵐ D ∂μ, ‖G x D‖ ≤ g D + e x D)
-    (hloc : ∀ K : Set ℂ, IsCompact K → (0 : ℂ) ∉ K → ∀ δ : ℝ, 0 < δ →
-      ∀ᶠ x in l, ∀ᵐ D ∂μ, D ∈ K → ‖F x D‖ ≤ δ) :
-    Tendsto (fun x => ∫ D, ⟪F x D, G x D⟫_ℂ ∂μ) l (𝓝 0) := by
+    (hloc : ∀ K : Set ℂ,
+      IsCompact K → (0 : ℂ) ∉ K → ∀ δ : ℝ, 0 < δ → ∀ᶠ x in l, ∀ᵐ D ∂μ, D ∈ K → ‖F x D‖ ≤ δ)
+    : Tendsto (fun x => ∫ D, ⟪F x D, G x D⟫_ℂ ∂μ) l (𝓝 0) := by
   rw [Metric.tendsto_nhds]
   intro ε hε
   set B' : ℝ := max B 0 + 1 with hB'
@@ -99,7 +103,8 @@ theorem tendsto_integral_inner_germ_moving {α : Type} {l : Filter α} (μ : Mea
   set t : ℝ := ε / (4 * B') with ht_def
   have ht : 0 < t := by positivity
   have hg2 : Integrable (fun D => g D ^ 2) μ := hg.integrable_sq
-  obtain ⟨K, hKc, h0K, hKint⟩ := exists_isCompact_integral_compl_sq_lt μ hg2 (η := ε * t / 2) (by positivity)
+  obtain ⟨K, hKc, h0K, hKint⟩ :=
+    exists_isCompact_integral_compl_sq_lt μ hg2 (η := ε * t / 2) (by positivity)
   have hKmeas : MeasurableSet K := hKc.isClosed.measurableSet
   have hKfin : μ K < ⊤ := hKc.measure_lt_top
   have hI1 : Integrable (K.indicator (fun _ => (1 : ℝ))) μ :=
@@ -112,7 +117,8 @@ theorem tendsto_integral_inner_germ_moving {α : Type} {l : Filter α} (μ : Mea
     linarith
   set δ : ℝ := ε / (4 * M) with hδ_def
   have hδ : 0 < δ := by positivity
-  have he' : ∀ᶠ x in l, ∫ D, e x D ^ 2 ∂μ < ε * t / 2 := he0.eventually (gt_mem_nhds (by positivity))
+  have he' : ∀ᶠ x in l, ∫ D, e x D ^ 2 ∂μ < ε * t / 2 :=
+    he0.eventually (gt_mem_nhds (by positivity))
   filter_upwards [hF, he, he', hG, hloc K hKc h0K δ hδ] with x hFx hex he2 hGx hlx
   have hFmem : MemLp (F x) 2 μ := hFx.1
   have hFB := hFx.2
@@ -126,11 +132,14 @@ theorem tendsto_integral_inner_germ_moving {α : Type} {l : Filter α} (μ : Mea
     (hIc.add he2i).div_const _
   have i3 : Integrable (fun D => δ / 2 * (K.indicator (fun _ => (1 : ℝ)) D + g D ^ 2)) μ :=
     (hI1.add hg2).const_mul _
-  have i12 : Integrable (fun D => t * ‖F x D‖ ^ 2 +
-      (Kᶜ.indicator (fun D => g D ^ 2) D + e x D ^ 2) / (2 * t)) μ := i1.add i2
-  have hbnd : ∀ᵐ D ∂μ, ‖⟪F x D, G x D⟫_ℂ‖ ≤
-      t * ‖F x D‖ ^ 2 + (Kᶜ.indicator (fun D => g D ^ 2) D + e x D ^ 2) / (2 * t) +
-        δ / 2 * (K.indicator (fun _ => (1 : ℝ)) D + g D ^ 2) := by
+  have i12 : Integrable
+      (fun D => t * ‖F x D‖ ^ 2 + (Kᶜ.indicator (fun D => g D ^ 2) D + e x D ^ 2) / (2 * t))
+      μ :=
+    i1.add i2
+  have hbnd
+      : ∀ᵐ D ∂μ, ‖⟪F x D, G x D⟫_ℂ‖ ≤
+        t * ‖F x D‖ ^ 2 + (Kᶜ.indicator (fun D => g D ^ 2) D + e x D ^ 2) / (2 * t) +
+          δ / 2 * (K.indicator (fun _ => (1 : ℝ)) D + g D ^ 2) := by
     filter_upwards [hGx, hlx] with D hGD hlD
     have h1 : ‖⟪F x D, G x D⟫_ℂ‖ ≤ ‖F x D‖ * ‖G x D‖ := norm_inner_le_norm _ _
     have hP := mul_le_young_bounds_of_le_add ht hδ.le (norm_nonneg (F x D)) hGD
@@ -143,19 +152,25 @@ theorem tendsto_integral_inner_germ_moving {α : Type} {l : Filter α} (μ : Mea
       have hi2 : Kᶜ.indicator (fun D => g D ^ 2) D = g D ^ 2 := by simp [Set.indicator_apply, hD]
       rw [hi1, hi2]
       exact h1.trans hP.2
-  have hsplit : ∫ D, (t * ‖F x D‖ ^ 2 + (Kᶜ.indicator (fun D => g D ^ 2) D + e x D ^ 2) / (2 * t) +
-        δ / 2 * (K.indicator (fun _ => (1 : ℝ)) D + g D ^ 2)) ∂μ =
-      t * ∫ D, ‖F x D‖ ^ 2 ∂μ + (∫ D, Kᶜ.indicator (fun D => g D ^ 2) D ∂μ + ∫ D, e x D ^ 2 ∂μ) / (2 * t) +
-        δ / 2 * (M - 1) := by
+  have hsplit
+      : ∫ D, (t * ‖F x D‖ ^ 2 + (Kᶜ.indicator (fun D => g D ^ 2) D + e x D ^ 2) / (2 * t) +
+          δ / 2 * (K.indicator (fun _ => (1 : ℝ)) D + g D ^ 2)) ∂μ
+        = t * ∫ D, ‖F x D‖ ^ 2 ∂μ
+          + (∫ D, Kᶜ.indicator (fun D => g D ^ 2) D ∂μ + ∫ D, e x D ^ 2 ∂μ) / (2 * t)
+          + δ / 2 * (M - 1) := by
     rw [integral_add i12 i3, integral_add i1 i2, integral_const_mul, integral_div,
       integral_add hIc he2i, integral_const_mul, integral_add hI1 hg2]
     simp only [hM_def]
     ring
-  have hle : ‖∫ D, ⟪F x D, G x D⟫_ℂ ∂μ‖ ≤ t * ∫ D, ‖F x D‖ ^ 2 ∂μ +
-      (∫ D, Kᶜ.indicator (fun D => g D ^ 2) D ∂μ + ∫ D, e x D ^ 2 ∂μ) / (2 * t) + δ / 2 * (M - 1) := by
+  have hle
+      : ‖∫ D, ⟪F x D, G x D⟫_ℂ ∂μ‖
+        ≤ t * ∫ D, ‖F x D‖ ^ 2 ∂μ
+          + (∫ D, Kᶜ.indicator (fun D => g D ^ 2) D ∂μ + ∫ D, e x D ^ 2 ∂μ) / (2 * t)
+          + δ / 2 * (M - 1) := by
     rw [← hsplit]
     exact (norm_integral_le_integral_norm _).trans
-      (integral_mono_of_nonneg (Filter.Eventually.of_forall fun _ => norm_nonneg _) (i12.add i3) hbnd)
+      (integral_mono_of_nonneg (Filter.Eventually.of_forall fun _ => norm_nonneg _) (i12.add i3)
+        hbnd)
   have hb1 : t * ∫ D, ‖F x D‖ ^ 2 ∂μ ≤ ε / 4 := by
     have hFB' : ∫ D, ‖F x D‖ ^ 2 ∂μ ≤ B' := by linarith [le_max_left B 0]
     have : t * B' = ε / 4 := by rw [ht_def]; field_simp <;> ring

@@ -10,10 +10,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory.TensHead
 
-theorem exists_adjoin_agree {V : Type} [AddCommGroup V] [Module ℂ V] [Nontrivial V]
-    (A : Set (Module.End ℂ V)) (hrank : Module.rank ℂ V ≤ Cardinal.aleph0)
-    (hA : ∀ U : Submodule ℂ V, Stab A U → U = ⊥ ∨ U = ⊤) (p : Module.End ℂ V) (s : Finset V) :
-    ∃ r ∈ Algebra.adjoin ℂ A, ∀ m ∈ s, p m = r m := by
+theorem exists_adjoin_agree
+    {V : Type} [AddCommGroup V] [Module ℂ V] [Nontrivial V]
+    (A : Set (Module.End ℂ V))
+    (hrank : Module.rank ℂ V ≤ Cardinal.aleph0) (hA : ∀ U : Submodule ℂ V, Stab A U → U = ⊥ ∨ U = ⊤)
+    (p : Module.End ℂ V) (s : Finset V)
+    : ∃ r ∈ Algebra.adjoin ℂ A, ∀ m ∈ s, p m = r m := by
   set R := Algebra.adjoin ℂ A with hR
   haveI : IsSimpleModule R V := by
     rw [isSimpleModule_iff]
@@ -25,30 +27,32 @@ theorem exists_adjoin_agree {V : Type} [AddCommGroup V] [Module ℂ V] [Nontrivi
     · right; exact (Submodule.restrictScalars_eq_top_iff ℂ R V).1 h
   have hsc : ∀ φ : Module.End R V, ∃ c : ℂ, ∀ x, φ x = c • x := by
     intro φ
-    obtain ⟨c, hc⟩ := GlobalTheory.dixmier_schur_of_rank_le_aleph0 V A (fun g => g.1)
-      (LinearMap.restrictScalars ℂ φ) inferInstance hrank
-      (fun N hN => hA N (fun g hg x hx => hN ⟨g, hg⟩ x hx))
-      (fun g => LinearMap.ext fun x =>
-        φ.map_smul (⟨g.1, Algebra.subset_adjoin g.2⟩ : R) x)
+    obtain ⟨c, hc⟩ :=
+      GlobalTheory.dixmier_schur_of_rank_le_aleph0 V A
+        (fun g => g.1)
+        (LinearMap.restrictScalars ℂ φ) inferInstance hrank
+        (fun N hN => hA N (fun g hg x hx => hN ⟨g, hg⟩ x hx))
+        (fun g => LinearMap.ext fun x => φ.map_smul (⟨g.1, Algebra.subset_adjoin g.2⟩ : R) x)
     exact ⟨c, fun x => LinearMap.congr_fun hc x⟩
-  let f : Module.End (Module.End R V) V :=
-    { toFun := p
-      map_add' := p.map_add
-      map_smul' := fun φ x => by
-        obtain ⟨c, hc⟩ := hsc φ
-        change p (φ x) = φ (p x)
-        rw [hc, hc, map_smul] }
+  let f : Module.End (Module.End R V) V := {
+    toFun := p
+    map_add' := p.map_add
+    map_smul' := fun φ x => by
+      obtain ⟨c, hc⟩ := hsc φ
+      change p (φ x) = φ (p x)
+      rw [hc, hc, map_smul]
+  }
   obtain ⟨r, hr⟩ := jacobson_density f s
   exact ⟨r.1, r.2, hr⟩
 
-theorem simple_tensor :
-    ∀ {S₀ S₁ : Type} [AddCommGroup S₀] [Module ℂ S₀] [AddCommGroup S₁] [Module ℂ S₁]
-    (A : Set (Module.End ℂ S₀)) (B : Set (Module.End ℂ S₁)),
-    Module.rank ℂ S₀ ≤ Cardinal.aleph0 →
-    (∀ U : Submodule ℂ S₀, GlobalTheory.TensHead.Stab A U → U = ⊥ ∨ U = ⊤) →
-    (∀ U : Submodule ℂ S₁, GlobalTheory.TensHead.Stab B U → U = ⊥ ∨ U = ⊤) →
-    ∀ U : Submodule ℂ (S₀ ⊗[ℂ] S₁), GlobalTheory.TensHead.Stab (GlobalTheory.TensHead.tensOps A B) U →
-      U = ⊥ ∨ U = ⊤ := by
+theorem simple_tensor
+    : ∀ {S₀ S₁ : Type} [AddCommGroup S₀] [Module ℂ S₀] [AddCommGroup S₁] [Module ℂ S₁]
+        (A : Set (Module.End ℂ S₀)) (B : Set (Module.End ℂ S₁)),
+      Module.rank ℂ S₀ ≤ Cardinal.aleph0
+        → (∀ U : Submodule ℂ S₀, GlobalTheory.TensHead.Stab A U → U = ⊥ ∨ U = ⊤)
+        → (∀ U : Submodule ℂ S₁, GlobalTheory.TensHead.Stab B U → U = ⊥ ∨ U = ⊤)
+        → ∀ U : Submodule ℂ (S₀ ⊗[ℂ] S₁),
+          GlobalTheory.TensHead.Stab (GlobalTheory.TensHead.tensOps A B) U → U = ⊥ ∨ U = ⊤ := by
   classical
   intro S₀ S₁ _ _ _ _ A B hrank hA hB U hU
   rcases eq_or_ne U ⊥ with h0 | h0
@@ -70,8 +74,8 @@ theorem simple_tensor :
       exact U.add_mem (hf z hz) (hg z hz)
     | mul f g _ _ hf hg =>
       intro z hz
-      have : TensorProduct.map (f * g) (LinearMap.id : S₁ →ₗ[ℂ] S₁) =
-          (TensorProduct.map f LinearMap.id) ∘ₗ (TensorProduct.map g LinearMap.id) := by
+      have : TensorProduct.map (f * g) (LinearMap.id : S₁ →ₗ[ℂ] S₁)
+          = (TensorProduct.map f LinearMap.id) ∘ₗ (TensorProduct.map g LinearMap.id) := by
         rw [← TensorProduct.map_comp]; rfl
       rw [this]
       exact hf _ (hg z hz)
@@ -86,8 +90,8 @@ theorem simple_tensor :
   obtain ⟨i, hi⟩ := Finsupp.support_nonempty_iff.2 hc0
   have hbi : b i ≠ 0 := b.ne_zero i
   haveI : Nontrivial S₀ := ⟨⟨b i, 0, hbi⟩⟩
-  obtain ⟨r, hr, hrp⟩ := exists_adjoin_agree A hrank hA ((b.coord i).smulRight (b i))
-    (c.support.image b)
+  obtain ⟨r, hr, hrp⟩ :=
+    exists_adjoin_agree A hrank hA ((b.coord i).smulRight (b i)) (c.support.image b)
   have h1 : b i ⊗ₜ[ℂ] c i ∈ U := by
     have h2 := hadj r hr t htU
     have h3 : TensorProduct.map r LinearMap.id t = b i ⊗ₜ[ℂ] c i := by

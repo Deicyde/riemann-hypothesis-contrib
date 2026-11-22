@@ -10,14 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CompactUn
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 open scoped Matrix
 
 namespace GlobalTheory.FockVacStab
 
-theorem mat_mul_mat_inv {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} {n : ℕ} {X : Spc F E n} (k : UA σ X.J) : mat k * mat k⁻¹ = 1 ∧ mat k⁻¹ * mat k = 1 := by
+theorem mat_mul_mat_inv
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} {n : ℕ} {X : Spc F E n} (k : UA σ X.J)
+    : mat k * mat k⁻¹ = 1 ∧ mat k⁻¹ * mat k = 1 := by
   constructor
   · show (k * k⁻¹).1.1 = 1
     simp

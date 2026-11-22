@@ -21,11 +21,12 @@ def HeightsNonneg (II : IntersectionSystem) (P : Ideal (MRing ι)) (A : HermLine
 
 def MoriwakiBigStatement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
-    (y : (Σ k, ι k) → Ω) (D : ℕ) (A : HermLine ι) (P0 : Ideal (MRing ι)) (II : IntersectionSystem),
-    IsIntersectionSystem II → IsArithVar (mCoordIdeal y) (D + 1) → Birational y →
-    P0 ≤ mCoordIdeal y → IsSemipositiveRel P0 (mCoordIdeal y) A → IsConjInvariantH A →
-    NefOnFibres (mCoordIdeal y) A.a → NefOnGeneric (mCoordIdeal y) A →
-    II K ι (mCoordIdeal y) (D + 1) (fun _ => A) ≤
-      arVolP (IsSmallH (mCoordIdeal y) y A) (chartLat y A.a) 1 D
+      (y : (Σ k, ι k) → Ω) (D : ℕ) (A : HermLine ι) (P0 : Ideal (MRing ι))
+      (II : IntersectionSystem),
+    IsIntersectionSystem II → IsArithVar (mCoordIdeal y) (D + 1) → Birational y → P0 ≤ mCoordIdeal y
+      → IsSemipositiveRel P0 (mCoordIdeal y) A → IsConjInvariantH A
+      → NefOnFibres (mCoordIdeal y) A.a → NefOnGeneric (mCoordIdeal y) A
+      → II K ι (mCoordIdeal y) (D + 1) (fun _ => A)
+        ≤ arVolP (IsSmallH (mCoordIdeal y) y A) (chartLat y A.a) 1 D
 
 end ReciprocityTheory.ChartRestriction.G.ArakelovGeometry

@@ -10,9 +10,10 @@ noncomputable section
 
 namespace Formalism.SLP.P
 
-private theorem exists_span_singleton_eq_of_le_span_singleton {R M : Type} [CommRing R] [IsDedekindDomain R]
-    [AddCommGroup M] [Module R M] [Finite M] (v : M) (N : Submodule R M)
-    (hN : N ≤ R ∙ v) : ∃ t : M, (R ∙ t) = N := by
+private theorem exists_span_singleton_eq_of_le_span_singleton
+    {R M : Type} [CommRing R] [IsDedekindDomain R] [AddCommGroup M] [Module R M] [Finite M]
+    (v : M) (N : Submodule R M) (hN : N ≤ R ∙ v)
+    : ∃ t : M, (R ∙ t) = N := by
   let f : R →ₗ[R] M := LinearMap.toSpanSingleton R M v
   let I : Ideal R := N.comap f
   let J : Ideal R := LinearMap.ker f
@@ -22,8 +23,7 @@ private theorem exists_span_singleton_eq_of_le_span_singleton {R M : Type} [Comm
     exact N.zero_mem
   have key : ∃ x, J ⊔ Ideal.span {x} = I := by
     by_cases hJ : J = ⊥
-    ·
-      have hinj : Function.Injective f := LinearMap.ker_eq_bot.1 hJ
+    · have hinj : Function.Injective f := LinearMap.ker_eq_bot.1 hJ
       haveI : Finite R := Finite.of_injective f hinj
       have hF : IsField R := Finite.isField_of_domain R
       by_cases hI : I = ⊥
@@ -51,10 +51,10 @@ private theorem exists_span_singleton_eq_of_le_span_singleton {R M : Type} [Comm
     rw [Submodule.mem_span_singleton]
     exact ⟨s, by rw [add_smul, hjv, zero_add, mul_smul]⟩
 
-theorem exists_family_span_eq_of_le {R M : Type} [CommRing R] [IsDedekindDomain R]
-    [AddCommGroup M] [Module R M] [Finite M] :
-    ∀ (e : ℕ) (v : Fin e → M) (N : Submodule R M), N ≤ Submodule.span R (Set.range v) →
-      ∃ t : Fin e → M, Submodule.span R (Set.range t) = N := by
+theorem exists_family_span_eq_of_le
+    {R M : Type} [CommRing R] [IsDedekindDomain R] [AddCommGroup M] [Module R M] [Finite M]
+    : ∀ (e : ℕ) (v : Fin e → M) (N : Submodule R M),
+      N ≤ Submodule.span R (Set.range v) → ∃ t : Fin e → M, Submodule.span R (Set.range t) = N := by
   intro e
   induction e with
   | zero =>
@@ -81,7 +81,8 @@ theorem exists_family_span_eq_of_le {R M : Type} [CommRing R] [IsDedekindDomain 
       have hb0 : S'.mkQ b = 0 := (Submodule.Quotient.mk_eq_zero S').2 hb
       rw [hb0, add_zero]
       exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self _)
-    obtain ⟨t', ht'⟩ := exists_span_singleton_eq_of_le_span_singleton (S'.mkQ (v 0)) (N.map S'.mkQ) hπ
+    obtain ⟨t', ht'⟩ :=
+      exists_span_singleton_eq_of_le_span_singleton (S'.mkQ (v 0)) (N.map S'.mkQ) hπ
     have ht'm : t' ∈ N.map S'.mkQ := ht' ▸ Submodule.mem_span_singleton_self t'
     obtain ⟨n0, hn0, hn0t⟩ := ht'm
     obtain ⟨u, hu⟩ := ih (Fin.tail v) (N ⊓ S') inf_le_right
@@ -98,19 +99,23 @@ theorem exists_family_span_eq_of_le {R M : Type} [CommRing R] [IsDedekindDomain 
         have h0 : S'.mkQ (n - r • n0) = 0 := by rw [map_sub, map_smul, hr, sub_self]
         exact (Submodule.Quotient.mk_eq_zero S').1 h0
       rw [Submodule.mem_sup]
-      exact ⟨r • n0, Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self _), n - r • n0,
-        ⟨N.sub_mem hn (N.smul_mem _ hn0), hd⟩, by abel⟩
+      exact ⟨
+        r • n0,
+        Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self _),
+        n - r • n0,
+        ⟨N.sub_mem hn (N.smul_mem _ hn0), hd⟩,
+        by abel
+      ⟩
 
 theorem card_submodules_le_of_dedekind : Formalism.SLP.SubmoduleCountDed := by
   intro R M _ _ _ _ _ e v hv
-  have hsurj : Function.Surjective
-      (fun t : Fin e → M => Submodule.span R (Set.range t)) := by
+  have hsurj : Function.Surjective (fun t : Fin e → M => Submodule.span R (Set.range t)) := by
     intro N
     exact exists_family_span_eq_of_le e v N (by rw [hv]; exact le_top)
-  calc Nat.card (Submodule R M) ≤ Nat.card (Fin e → M) :=
-        Nat.card_le_card_of_surjective _ hsurj
-    _ = Nat.card M ^ e := by
-        rw [Nat.card_pi, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+  calc
+    Nat.card (Submodule R M)
+      ≤ Nat.card (Fin e → M) := Nat.card_le_card_of_surjective _ hsurj
+    _ = Nat.card M ^ e := by rw [Nat.card_pi, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
 
 end Formalism.SLP.P
 

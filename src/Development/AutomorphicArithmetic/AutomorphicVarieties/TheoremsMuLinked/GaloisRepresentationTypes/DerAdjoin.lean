@@ -13,22 +13,26 @@ open IsLocalRing Polynomial
 
 variable {O B X : Type} [CommRing O] [CommRing B] [Algebra O B] [AddCommGroup X] [Module O X]
 
-private theorem der_alg {x : B →ₐ[O] O} {δ : B →ₗ[O] X} (h : IsDer x δ) (c : O) : δ (algebraMap O B c) = 0 := by
+private theorem der_alg {x : B →ₐ[O] O} {δ : B →ₗ[O] X} (h : IsDer x δ) (c : O)
+    : δ (algebraMap O B c) = 0 := by
   have h1 : δ 1 = 0 := by
     have := h 1 1
     simpa using this
   rw [Algebra.algebraMap_eq_smul_one, map_smul, h1, smul_zero]
 
-private theorem der_adjoin {x : B →ₐ[O] O} {δ : B →ₗ[O] X} (h : IsDer x δ) {S : Set B} (hS : ∀ s ∈ S, δ s = 0)
-    {a : B} (ha : a ∈ Algebra.adjoin O S) : δ a = 0 := by
+private theorem der_adjoin
+    {x : B →ₐ[O] O} {δ : B →ₗ[O] X} (h : IsDer x δ)
+    {S : Set B} (hS : ∀ s ∈ S, δ s = 0)
+    {a : B} (ha : a ∈ Algebra.adjoin O S)
+    : δ a = 0 := by
   induction ha using Algebra.adjoin_induction with
   | mem s hs => exact hS s hs
   | algebraMap c => exact der_alg h c
   | add a b _ _ ha hb => rw [map_add (f := _), ha, hb, add_zero]
   | mul a b _ _ ha hb => rw [h, ha, hb, smul_zero, smul_zero, add_zero]
 
-private theorem der_fg [IsNoetherianRing B] {x : B →ₐ[O] O} {δ : B →ₗ[O] X} (h : IsDer x δ) :
-    (LinearMap.range δ).FG := by
+private theorem der_fg [IsNoetherianRing B] {x : B →ₐ[O] O} {δ : B →ₗ[O] X} (h : IsDer x δ)
+    : (LinearMap.range δ).FG := by
   obtain ⟨s, hs⟩ := IsNoetherian.noetherian (RingHom.ker x : Ideal B)
   have key : ∀ p ∈ Submodule.span B (s : Set B), δ p ∈ Submodule.span O (δ '' (s : Set B)) := by
     intro p hp
@@ -54,9 +58,13 @@ private theorem der_fg [IsNoetherianRing B] {x : B →ₐ[O] O} {δ : B →ₗ[O
   rw [this]
   exact Submodule.fg_span (s.finite_toSet.image _)
 
-private theorem der_zero [IsNoetherianRing B] [IsLocalRing O] [IsLocalRing B] [IsLocalHom (algebraMap O B)]
-    {x : B →ₐ[O] O} {δ : B →ₗ[O] X} (h : IsDer x δ) {S : Set B} (hS : ∀ s ∈ S, δ s = 0)
-    (hgen : ∀ b : B, ∃ a ∈ Algebra.adjoin O S, b - a ∈ maximalIdeal B ^ 2) (b : B) : δ b = 0 := by
+private theorem der_zero
+    [IsNoetherianRing B] [IsLocalRing O] [IsLocalRing B] [IsLocalHom (algebraMap O B)]
+    {x : B →ₐ[O] O} {δ : B →ₗ[O] X} (h : IsDer x δ)
+    {S : Set B}
+    (hS : ∀ s ∈ S, δ s = 0) (hgen : ∀ b : B, ∃ a ∈ Algebra.adjoin O S, b - a ∈ maximalIdeal B ^ 2)
+    (b : B)
+    : δ b = 0 := by
   have hx : ∀ a ∈ maximalIdeal B, x a ∈ maximalIdeal O := by
     intro a ha hu
     have h1 : a - algebraMap O B (x a) ∈ maximalIdeal B := by
@@ -73,17 +81,23 @@ private theorem der_zero [IsNoetherianRing B] [IsLocalRing O] [IsLocalRing B] [I
     rw [pow_two] at hb
     refine Submodule.mul_induction_on hb (fun m hm k hk => ?_) (fun m k hm hk => ?_)
     · rw [h]
-      exact add_mem (Submodule.smul_mem_smul (hx m hm) ⟨k, rfl⟩) (Submodule.smul_mem_smul (hx k hk) ⟨m, rfl⟩)
+      exact add_mem (Submodule.smul_mem_smul (hx m hm) ⟨k, rfl⟩)
+        (Submodule.smul_mem_smul (hx k hk) ⟨m, rfl⟩)
     · rw [map_add]; exact add_mem hm hk
-  have := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal O) _ (der_fg h) hle
-    (maximalIdeal_le_jacobson _)
+  have :=
+    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal O) _ (der_fg h) hle
+      (maximalIdeal_le_jacobson _)
   have hb : δ b ∈ LinearMap.range δ := ⟨b, rfl⟩
   rw [this] at hb
   simpa using hb
 
-private theorem kill_red [IsDomain O] (x : B →ₐ[O] O) (I : Ideal B) (A : Subalgebra O B)
-    (hred : ∀ t ∈ A, ∀ k : ℕ, t ^ k ∈ I → t ∈ I) {a : B} (ha : a ∈ A) (hx : x a = 0)
-    (q : O[X]) (hq : q ≠ 0) (hI : aeval a q ∈ I) : ∃ s : B, x s ≠ 0 ∧ s * a ∈ I := by
+private theorem kill_red
+    [IsDomain O]
+    (x : B →ₐ[O] O)
+    (I : Ideal B) (A : Subalgebra O B) (hred : ∀ t ∈ A, ∀ k : ℕ, t ^ k ∈ I → t ∈ I)
+    {a : B} (ha : a ∈ A) (hx : x a = 0)
+    (q : O[X]) (hq : q ≠ 0) (hI : aeval a q ∈ I)
+    : ∃ s : B, x s ≠ 0 ∧ s * a ∈ I := by
   obtain ⟨g, hg, hd⟩ := exists_eq_pow_rootMultiplicity_mul_and_not_dvd q hq 0
   refine ⟨aeval a g, ?_, ?_⟩
   · rw [← aeval_algHom_apply, hx]
@@ -92,7 +106,8 @@ private theorem kill_red [IsDomain O] (x : B →ₐ[O] O) (I : Ideal B) (A : Sub
     rw [dvd_iff_isRoot]
     simpa [coe_aeval_eq_eval] using h0
   · set k := rootMultiplicity 0 q
-    have hgA : aeval a g ∈ A := (Algebra.adjoin_le (Set.singleton_subset_iff.2 ha)) (aeval_mem_adjoin_singleton O a)
+    have hgA : aeval a g ∈ A :=
+      (Algebra.adjoin_le (Set.singleton_subset_iff.2 ha)) (aeval_mem_adjoin_singleton O a)
     apply hred _ (A.mul_mem hgA ha) (k + 1)
     have e : (aeval a g * a) ^ (k + 1) = (aeval a g ^ k * a) * aeval a q := by
       conv_rhs => rw [hg]
@@ -101,9 +116,11 @@ private theorem kill_red [IsDomain O] (x : B →ₐ[O] O) (I : Ideal B) (A : Sub
     rw [e]
     exact I.mul_mem_left _ hI
 
-private theorem det_trick [IsDomain O] [IsNoetherianRing B] (x : B →ₐ[O] O) (I : Ideal B)
-    (h : ∀ a, x a = 0 → ∃ c : O, c ≠ 0 ∧ c • a ∈ RingHom.ker x * RingHom.ker x ⊔ I) :
-    ∃ t : B, x t ≠ 0 ∧ ∀ a, x a = 0 → t * a ∈ I := by
+private theorem det_trick
+    [IsDomain O] [IsNoetherianRing B]
+    (x : B →ₐ[O] O) (I : Ideal B)
+    (h : ∀ a, x a = 0 → ∃ c : O, c ≠ 0 ∧ c • a ∈ RingHom.ker x * RingHom.ker x ⊔ I)
+    : ∃ t : B, x t ≠ 0 ∧ ∀ a, x a = 0 → t * a ∈ I := by
   classical
   set P : Ideal B := RingHom.ker x with hP
   obtain ⟨s, hs⟩ := IsNoetherian.noetherian P
@@ -144,7 +161,8 @@ private theorem det_trick [IsDomain O] [IsNoetherianRing B] (x : B →ₐ[O] O) 
     · rw [← smul_eq_mul, map_smul]
       exact Submodule.smul_mem_smul hm ⟨k, hk, rfl⟩
     · rw [map_add]; exact add_mem hm hk
-  obtain ⟨p, hp, -, hco, hev⟩ := LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero B φ P hφ
+  obtain ⟨p, hp, -, hco, hev⟩ :=
+    LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero B φ P hφ
   refine ⟨p.eval (algebraMap O B c), ?_, fun a ha => ?_⟩
   · have e : p.map (x : B →+* O) = Polynomial.X ^ p.natDegree := by
       ext k
@@ -166,29 +184,31 @@ private theorem det_trick [IsDomain O] [IsNoetherianRing B] (x : B →ₐ[O] O) 
     rw [← map_smul] at h2
     exact (Submodule.Quotient.mk_eq_zero I).1 h2
 
-private theorem core [IsDomain O] [IsLocalRing O] [IsNoetherianRing B] [IsLocalRing B] [IsLocalHom (algebraMap O B)]
-    (x : B →ₐ[O] O) (I : Ideal B) (S0 S : Set B)
-    (hint : ∀ a : B, ∃ q : O[X], q ≠ 0 ∧ aeval a q ∈ I)
+private theorem core
+    [IsDomain O] [IsLocalRing O] [IsNoetherianRing B] [IsLocalRing B] [IsLocalHom (algebraMap O B)]
+    (x : B →ₐ[O] O) (I : Ideal B) (S0 S : Set B) (hint : ∀ a : B, ∃ q : O[X], q ≠ 0 ∧ aeval a q ∈ I)
     (hred : ∀ t ∈ Algebra.adjoin O S0, ∀ k : ℕ, t ^ k ∈ I → t ∈ I)
     (hgen : ∀ b : B, ∃ a ∈ Algebra.adjoin O S, b - a ∈ maximalIdeal B ^ 2)
-    (hder : ∀ (Y : Type) [AddCommGroup Y] [Module O Y] (δ : B →ₗ[O] Y), IsDer x δ →
-      (∀ (c : O) (y : Y), c ≠ 0 → c • y = 0 → y = 0) → (∀ s ∈ S0, δ s = 0) → ∀ s ∈ S, δ s = 0) :
-    ∃ t : B, x t ≠ 0 ∧ ∀ a, x a = 0 → t * a ∈ I := by
+    (hder : ∀ (Y : Type) [AddCommGroup Y] [Module O Y] (δ : B →ₗ[O] Y),
+      IsDer x δ → (∀ (c : O) (y : Y), c ≠ 0 → c • y = 0 → y = 0) → (∀ s ∈ S0, δ s = 0)
+        → ∀ s ∈ S, δ s = 0)
+    : ∃ t : B, x t ≠ 0 ∧ ∀ a, x a = 0 → t * a ∈ I := by
   apply det_trick x I
   let K : Ideal B := RingHom.ker x * RingHom.ker x ⊔ I
-  let N : Submodule O B :=
-    { carrier := {a | ∃ c : O, c ≠ 0 ∧ c • a ∈ K}
-      add_mem' := by
-        rintro a b ⟨c, hc, ha⟩ ⟨d, hd, hb⟩
-        refine ⟨c * d, mul_ne_zero hc hd, ?_⟩
-        rw [smul_add]
-        refine add_mem ?_ ?_
-        · rw [mul_comm, mul_smul]; exact Submodule.smul_of_tower_mem _ _ ha
-        · rw [mul_smul]; exact Submodule.smul_of_tower_mem _ _ hb
-      zero_mem' := ⟨1, one_ne_zero, by simp⟩
-      smul_mem' := by
-        rintro r a ⟨c, hc, ha⟩
-        exact ⟨c, hc, by rw [smul_comm]; exact Submodule.smul_of_tower_mem _ _ ha⟩ }
+  let N : Submodule O B := {
+    carrier := {a | ∃ c : O, c ≠ 0 ∧ c • a ∈ K}
+    add_mem' := by
+      rintro a b ⟨c, hc, ha⟩ ⟨d, hd, hb⟩
+      refine ⟨c * d, mul_ne_zero hc hd, ?_⟩
+      rw [smul_add]
+      refine add_mem ?_ ?_
+      · rw [mul_comm, mul_smul]; exact Submodule.smul_of_tower_mem _ _ ha
+      · rw [mul_smul]; exact Submodule.smul_of_tower_mem _ _ hb
+    zero_mem' := ⟨1, one_ne_zero, by simp⟩
+    smul_mem' := by
+      rintro r a ⟨c, hc, ha⟩
+      exact ⟨c, hc, by rw [smul_comm]; exact Submodule.smul_of_tower_mem _ _ ha⟩
+  }
   have hKN : ∀ a ∈ K, a ∈ N := fun a ha => ⟨1, one_ne_zero, by simpa using ha⟩
   let δ : B →ₗ[O] B ⧸ N := N.mkQ ∘ₗ (LinearMap.id - (Algebra.linearMap O B) ∘ₗ x.toLinearMap)
   have hδ : ∀ b, δ b = N.mkQ (b - algebraMap O B (x b)) := fun b => rfl
@@ -202,8 +222,10 @@ private theorem core [IsDomain O] [IsLocalRing O] [IsNoetherianRing B] [IsLocalR
     rw [hδ, hδ, hδ, ← map_smul, ← map_smul, ← map_add (f := _)]
     apply (Submodule.Quotient.eq N).2
     apply hKN
-    have e : a * b - algebraMap O B (x (a * b)) - (x a • (b - algebraMap O B (x b)) + x b • (a - algebraMap O B (x a))) =
-        (a - algebraMap O B (x a)) * (b - algebraMap O B (x b)) := by
+    have e
+        : a * b - algebraMap O B (x (a * b))
+            - (x a • (b - algebraMap O B (x b)) + x b • (a - algebraMap O B (x a)))
+          = (a - algebraMap O B (x a)) * (b - algebraMap O B (x b)) := by
       simp only [Algebra.smul_def, map_mul]; ring
     rw [e]
     exact Ideal.mem_sup_left (Ideal.mul_mem_mul (hk a) (hk b))
@@ -226,31 +248,38 @@ private theorem core [IsDomain O] [IsLocalRing O] [IsNoetherianRing B] [IsLocalR
   intro a ha
   exact (hδ0 a ha).1 (der_zero hD (hder _ δ hD htf h0) hgen a)
 
-private theorem integ {Λ M : Type} [CommRing Λ] [Algebra O Λ] [Nontrivial O] [AddCommGroup M] [Module B M] [Module Λ M]
-    [Module.Finite Λ M] (lam : Λ →ₐ[O] B) (hl : ∀ (a : Λ) (m : M), a • m = lam a • m) (ξ : Λ →ₐ[O] O) (a : B) :
-    ∃ q : O[X], q ≠ 0 ∧ ∀ m : M, aeval a q • m ∈ (RingHom.ker ξ • ⊤ : Submodule Λ M) := by
-  let φ : Module.End Λ M :=
-    { toFun := fun m => a • m
-      map_add' := fun m k => smul_add _ _ _
-      map_smul' := fun r m => by simp only [RingHom.id_apply, hl]; rw [smul_comm] }
+private theorem integ
+    {Λ M : Type} [CommRing Λ] [Algebra O Λ] [Nontrivial O] [AddCommGroup M] [Module B M]
+    [Module Λ M] [Module.Finite Λ M]
+    (lam : Λ →ₐ[O] B) (hl : ∀ (a : Λ) (m : M), a • m = lam a • m)
+    (ξ : Λ →ₐ[O] O) (a : B)
+    : ∃ q : O[X], q ≠ 0 ∧ ∀ m : M, aeval a q • m ∈ (RingHom.ker ξ • ⊤ : Submodule Λ M) := by
+  let φ : Module.End Λ M := {
+    toFun := fun m => a • m
+    map_add' := fun m k => smul_add _ _ _
+    map_smul' := fun r m => by simp only [RingHom.id_apply, hl]; rw [smul_comm]
+  }
   obtain ⟨p, hp, hev⟩ := LinearMap.exists_monic_and_aeval_eq_zero Λ φ
   have hpow : ∀ (k : ℕ) (m : M), (φ ^ k) m = a ^ k • m := by
     intro k
     induction k with
     | zero => simp
     | succ k ih => intro m; rw [pow_succ, pow_succ, Module.End.mul_apply, ih, mul_smul]; rfl
-  have key : ∀ (p : Λ[X]) (m : M), aeval φ p m - aeval a (p.map (ξ : Λ →+* O)) • m ∈
-      (RingHom.ker ξ • ⊤ : Submodule Λ M) := by
+  have key
+      : ∀ (p : Λ[X]) (m : M),
+        aeval φ p m - aeval a (p.map (ξ : Λ →+* O)) • m ∈ (RingHom.ker ξ • ⊤ : Submodule Λ M) := by
     intro p m
     induction p using Polynomial.induction_on' with
     | add p q hp hq =>
-      rw [Polynomial.map_add (f := _), map_add (f := _), map_add (f := _), add_smul, LinearMap.add_apply, add_sub_add_comm]
+      rw [Polynomial.map_add (f := _), map_add (f := _), map_add (f := _), add_smul,
+        LinearMap.add_apply, add_sub_add_comm]
       exact add_mem hp hq
     | monomial k c =>
-      have e : aeval φ (monomial k c) m - aeval a ((monomial k c).map (ξ : Λ →+* O)) • m =
-          (c - algebraMap O Λ (ξ c)) • (a ^ k • m) := by
-        rw [Polynomial.map_monomial, aeval_monomial, aeval_monomial, Module.End.mul_apply, hpow, sub_smul,
-          hl (algebraMap O Λ (ξ c)), AlgHom.commutes, mul_smul]
+      have e
+          : aeval φ (monomial k c) m - aeval a ((monomial k c).map (ξ : Λ →+* O)) • m
+            = (c - algebraMap O Λ (ξ c)) • (a ^ k • m) := by
+        rw [Polynomial.map_monomial, aeval_monomial, aeval_monomial, Module.End.mul_apply, hpow,
+          sub_smul, hl (algebraMap O Λ (ξ c)), AlgHom.commutes, mul_smul]
         rfl
       rw [e]
       exact Submodule.smul_mem_smul (by show ξ _ = 0; simp) trivial
@@ -262,19 +291,21 @@ private theorem integ {Λ M : Type} [CommRing Λ] [Algebra O Λ] [Nontrivial O] 
 end UpperTheory.V.Th.EtaleDerivations
 
 open UpperTheory.V.Th.EtaleDerivations UpperTheory.V.Pa UpperTheory.V.W UpperTheory.V.Alg in
-theorem UpperTheory.V.Th.etOf :
-    EtOf := by
+theorem UpperTheory.V.Th.etOf : EtOf := by
   intro l _ L G0 n O _ _ _ _ _ r B _ _ _ u J D b y x hn hmap hgen hctrl
-  let I : Ideal B :=
-    { carrier := {a | ∀ m : b.M, a • m ∈ wtSub b x}
-      add_mem' := fun ha hb m => by rw [add_smul]; exact add_mem (ha m) (hb m)
-      zero_mem' := fun m => by rw [zero_smul]; exact zero_mem _
-      smul_mem' := fun c a ha m => by rw [smul_eq_mul, mul_comm, mul_smul]; exact ha _ }
+  let I : Ideal B := {
+    carrier := {a | ∀ m : b.M, a • m ∈ wtSub b x}
+    add_mem' := fun ha hb m => by rw [add_smul]; exact add_mem (ha m) (hb m)
+    zero_mem' := fun m => by rw [zero_smul]; exact zero_mem _
+    smul_mem' := fun c a ha m => by rw [smul_eq_mul, mul_comm, mul_smul]; exact ha _
+  }
   obtain ⟨c, hc, hψ⟩ := trPsi l L G0 n O y hn
   haveI := b.fin
   refine core x I {a : B | ∃ i g, a = u.D.lam i (MonoidAlgebra.single g 1)} (pairVals u)
-    (fun a => integ b.lam b.smul_lam (x.comp b.lam) a) hctrl (hgen 2) ?_
+    (fun a => integ b.lam b.smul_lam (x.comp b.lam) a)
+    hctrl (hgen 2) ?_
   intro Y _ _ δ hδ htf h0 s hs
   rcases hs with hs | ⟨v, i, g, rfl⟩
   · exact h0 s hs
-  · exact htf c _ hc (hψ G0 (Glob.Hom.refl G0) r B u x hmap Y δ hδ (fun g => h0 _ ⟨1, g, rfl⟩) v i g)
+  · exact htf c _ hc
+      (hψ G0 (Glob.Hom.refl G0) r B u x hmap Y δ hδ (fun g => h0 _ ⟨1, g, rfl⟩) v i g)

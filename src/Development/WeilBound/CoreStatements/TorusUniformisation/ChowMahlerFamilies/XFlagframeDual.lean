@@ -11,18 +11,23 @@ public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Same
 
 open MvPolynomial GlobalTheory.CompanionTheory.Ar.Num GroundTheory.Heights₂.Heights.NumbersDVR
 open ReciprocityTheory.ChartRestriction.G.Geo (ChartBundle chartRing)
-open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles (mseg mcIdeal chartMon joinCoord bcCoord pullDeg liftVar fnField ck rootNum SameGeneric LatLE IsPull IsPullBC IsSubQuot QuotIso IsFrobPres FlagModel modelDeg)
+open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
+  (mseg mcIdeal chartMon joinCoord bcCoord pullDeg liftVar fnField ck rootNum SameGeneric LatLE
+    IsPull IsPullBC IsSubQuot QuotIso IsFrobPres FlagModel modelDeg)
 
 namespace PositivityTheory.Xgn.A_flagframe_dual
 
-theorem tri_inv {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module Ω V] {N : ℕ}
-    (w u : Module.Basis (Fin N) Ω V) (h : ∀ i j, i < j → w.repr (u i) j = 0) :
-    (∀ i j, i < j → u.repr (w i) j = 0) ∧ ∀ i, u.repr (w i) i = (w.repr (u i) i)⁻¹ := by
+theorem tri_inv
+    {Ω : Type} [Field Ω]
+    {V : Type} [AddCommGroup V] [Module Ω V]
+    {N : ℕ} (w u : Module.Basis (Fin N) Ω V) (h : ∀ i j, i < j → w.repr (u i) j = 0)
+    : (∀ i j, i < j → u.repr (w i) j = 0) ∧ ∀ i, u.repr (w i) i = (w.repr (u i) i)⁻¹ := by
   have hM : (w.toMatrix u).BlockTriangular id := fun i j hij => h j i hij
   have hMN : w.toMatrix u * u.toMatrix w = 1 := Module.Basis.toMatrix_mul_toMatrix_flip w u
   haveI : Invertible (w.toMatrix u) := ⟨u.toMatrix w, Module.Basis.toMatrix_mul_toMatrix_flip u w, hMN⟩
   have hinv : (w.toMatrix u)⁻¹ = u.toMatrix w := Matrix.inv_eq_right_inv hMN
-  have hN : (u.toMatrix w).BlockTriangular id := hinv ▸ Matrix.blockTriangular_inv_of_blockTriangular hM
+  have hN : (u.toMatrix w).BlockTriangular id :=
+    hinv ▸ Matrix.blockTriangular_inv_of_blockTriangular hM
   refine ⟨fun i j hij => hN hij, fun i => ?_⟩
   have hii := congrFun (congrFun hMN i) i
   rw [Matrix.mul_apply, Matrix.one_apply_eq, Finset.sum_eq_single i] at hii
@@ -35,11 +40,14 @@ theorem tri_inv {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module Ω V]
   · intro hi
     exact absurd (Finset.mem_univ i) hi
 
-theorem repr_of_pair {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module Ω V]
-    {V₁ : Type} [AddCommGroup V₁] [Module Ω V₁] {N : ℕ} (β : V →ₗ[Ω] V₁ →ₗ[Ω] Ω)
-    (w : Fin N → V) (w₁ : Module.Basis (Fin N) Ω V₁)
-    (h : ∀ i j, β (w i) (w₁ j) = if i = j.rev then 1 else 0) (y : V₁) (j : Fin N) :
-    w₁.repr y j = β (w j.rev) y := by
+theorem repr_of_pair
+    {Ω : Type} [Field Ω]
+    {V : Type} [AddCommGroup V] [Module Ω V]
+    {V₁ : Type} [AddCommGroup V₁] [Module Ω V₁]
+    {N : ℕ} (β : V →ₗ[Ω] V₁ →ₗ[Ω] Ω) (w : Fin N → V) (w₁ : Module.Basis (Fin N) Ω V₁)
+    (h : ∀ i j, β (w i) (w₁ j) = if i = j.rev then 1 else 0)
+    (y : V₁) (j : Fin N)
+    : w₁.repr y j = β (w j.rev) y := by
   have hy := congrArg (β (w j.rev)) (w₁.sum_repr y)
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum] at hy
@@ -47,19 +55,34 @@ theorem repr_of_pair {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module 
   rw [← hy]
   simp
 
-theorem exists_dual {Ω : Type} [Field Ω] {V : Type} [AddCommGroup V] [Module Ω V]
-    {V₁ : Type} [AddCommGroup V₁] [Module Ω V₁] {N : ℕ} (β : V →ₗ[Ω] V₁ →ₗ[Ω] Ω)
-    (hβ : Function.Bijective β.flip) (u : Module.Basis (Fin N) Ω V) :
-    ∃ u₁ : Module.Basis (Fin N) Ω V₁, ∀ v j, β v (u₁ j) = u.repr v j.rev := by
+theorem exists_dual
+    {Ω : Type} [Field Ω]
+    {V : Type} [AddCommGroup V] [Module Ω V]
+    {V₁ : Type} [AddCommGroup V₁] [Module Ω V₁]
+    {N : ℕ}
+    (β : V →ₗ[Ω] V₁ →ₗ[Ω] Ω) (hβ : Function.Bijective β.flip)
+    (u : Module.Basis (Fin N) Ω V)
+    : ∃ u₁ : Module.Basis (Fin N) Ω V₁, ∀ v j, β v (u₁ j) = u.repr v j.rev := by
   let e := LinearEquiv.ofBijective β.flip hβ
   refine ⟨(u.dualBasis.reindex Fin.revPerm).map e.symm, fun v j => ?_⟩
-  simp only [Module.Basis.map_apply, Module.Basis.reindex_apply, Fin.revPerm_symm, Fin.revPerm_apply]
+  simp only [Module.Basis.map_apply, Module.Basis.reindex_apply, Fin.revPerm_symm,
+    Fin.revPerm_apply]
   change e (e.symm (u.dualBasis j.rev)) v = _
   simp
 
 end PositivityTheory.Xgn.A_flagframe_dual
 
-theorem PositivityTheory.Xgn.t_flagframe_dual : ∀ (O : Type) [CommRing O] (Ω : Type) [Field Ω] [Algebra O Ω] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (x : (Σ k, ι k) → Ω) (N : ℕ) (V : Type) [AddCommGroup V] [Module Ω V] (V₁ : Type) [AddCommGroup V₁] [Module Ω V₁] (E : ChartBundle O (mseg x) N V) (F : ChartBundle O (mseg x) N V₁) (β : V →ₗ[Ω] V₁ →ₗ[Ω] Ω), IsDualLat O x β E.lat F.lat → ∀ (w : Module.Basis (Fin N) Ω V) (b : Fin N → K → ℤ), IsFlagFrame x E w b → ∀ w₁ : Module.Basis (Fin N) Ω V₁, (∀ i j, β (w i) (w₁ j) = if i = j.rev then 1 else 0) → IsFlagFrame x F w₁ (fun j => -b j.rev) := by
+theorem PositivityTheory.Xgn.t_flagframe_dual
+    : ∀ (O : Type) [CommRing O] (Ω : Type) [Field Ω] [Algebra O Ω] (K : Type) [Fintype K]
+        [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (x : (Σ k, ι k) → Ω) (N : ℕ) (V : Type)
+        [AddCommGroup V] [Module Ω V] (V₁ : Type) [AddCommGroup V₁] [Module Ω V₁]
+        (E : ChartBundle O (mseg x) N V) (F : ChartBundle O (mseg x) N V₁) (β : V →ₗ[Ω] V₁ →ₗ[Ω] Ω),
+      IsDualLat O x β E.lat F.lat
+        → ∀ (w : Module.Basis (Fin N) Ω V) (b : Fin N → K → ℤ),
+          IsFlagFrame x E w b
+            → ∀ w₁ : Module.Basis (Fin N) Ω V₁,
+              (∀ i j, β (w i) (w₁ j) = if i = j.rev then 1 else 0)
+                → IsFlagFrame x F w₁ (fun j => - b j.rev) := by
   intro O _ Ω _ _ K _ _ ι _ x N V _ _ V₁ _ _ E F β hD w b hE w₁ hw₁
   refine ⟨fun c hc j => ?_⟩
   have hne : ∀ k, x ⟨k, c k⟩ ≠ 0 := fun k => Finset.prod_ne_zero_iff.mp hc k (Finset.mem_univ k)
@@ -84,14 +107,16 @@ theorem PositivityTheory.Xgn.t_flagframe_dual : ∀ (O : Type) [CommRing O] (Ω 
   have hbasis := (Module.Basis.is_basis_iff_det w).mpr hdet
   let eb : Module.Basis (Fin N) Ω V := Module.Basis.mk hbasis.1 hbasis.2.ge
   have heb : ∀ i, eb i = e i := fun i => Module.Basis.mk_apply _ _ _
-  have htri := A_flagframe_dual.tri_inv w eb (by
-    intro i k hik
-    rw [heb]
-    exact he2 i k hik)
-  have hrep : ∀ y k, w₁.repr y k = β (w k.rev) y :=
-    fun y k => A_flagframe_dual.repr_of_pair β w w₁ hw₁ y k
-  have hstep : ∀ n : ℕ, ∀ v ∈ E.lat c, (∀ k : Fin N, n ≤ k.val → w.repr v k = 0) →
-      ∀ k, eb.repr v k ∈ chartRing O (mseg x) c := by
+  have htri :=
+    A_flagframe_dual.tri_inv w eb (by
+      intro i k hik
+      rw [heb]
+      exact he2 i k hik)
+  have hrep : ∀ y k, w₁.repr y k = β (w k.rev) y := fun y k =>
+    A_flagframe_dual.repr_of_pair β w w₁ hw₁ y k
+  have hstep
+      : ∀ n : ℕ, ∀ v ∈ E.lat c,
+        (∀ k : Fin N, n ≤ k.val → w.repr v k = 0) → ∀ k, eb.repr v k ∈ chartRing O (mseg x) c := by
     intro n
     induction n with
     | zero =>
@@ -128,8 +153,8 @@ theorem PositivityTheory.Xgn.t_flagframe_dual : ∀ (O : Type) [CommRing O] (Ω 
         · exact one_mem _
         · exact zero_mem _
       · exact ih v hv (fun k hk => absurd k.isLt (by omega)) k
-  have hcoef : ∀ v ∈ E.lat c, ∀ k, eb.repr v k ∈ chartRing O (mseg x) c :=
-    fun v hv => hstep N v hv (fun k hk => absurd k.isLt (by omega))
+  have hcoef : ∀ v ∈ E.lat c, ∀ k, eb.repr v k ∈ chartRing O (mseg x) c := fun v hv =>
+    hstep N v hv (fun k hk => absurd k.isLt (by omega))
   ext s
   constructor
   · rintro ⟨w', hw', hz, rfl⟩

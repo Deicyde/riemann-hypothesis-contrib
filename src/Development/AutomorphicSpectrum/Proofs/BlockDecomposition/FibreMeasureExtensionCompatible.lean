@@ -13,7 +13,10 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW GlobalTheory.CompanionTheory.SW.PiLocalization₂ GlobalTheory.CompanionTheory.SW.StageF GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW
+  GlobalTheory.CompanionTheory.SW.PiLocalization₂ GlobalTheory.CompanionTheory.SW.StageF
+  GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
+  NumberField IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
@@ -24,33 +27,38 @@ open GlobalTheory.CompanionTheory.SW.PiLocalization₂.Unfold1
 
 section Main
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E} {t : F} {n : ℕ}
-  {R : Type} [CommRing R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R] [BorelSpace R]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E} {t : F} {n : ℕ} {R : Type}
+  [CommRing R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R] [BorelSpace R]
   {d : ℕ} {b : Module.Basis (Fin d) F E} {lam : Measure R}
   {m₁ : HermR R σ 1 → Measure (Fin 1 → Fin (M + 1) → R ⊗[F] E)}
   {m' : HermR R σ n → Measure (Fin n → Fin M → R ⊗[F] E)}
-  {s : (Fin 1 → Fin (M + 1) → R ⊗[F] E) → HA R σ (blockOne (algebraMap F E t) J)}
-  {B₀ : Set R} {a : R → Rˣ} {κ₁ cm : Rˣ → ℝ≥0}
+  {s : (Fin 1 → Fin (M + 1) → R ⊗[F] E) → HA R σ (blockOne (algebraMap F E t) J)} {B₀ : Set R}
+  {a : R → Rˣ} {κ₁ cm : Rˣ → ℝ≥0}
 
-theorem measurableSet_usetF (D : HermitianMeasureData σ J t n b lam m₁ m' s B₀ a κ₁ cm) :
-    MeasurableSet (UsetF σ J t B₀ : Set (Fin (n + 1) → Fin (M + 1) → R ⊗[F] E)) := by
+theorem measurableSet_usetF (D : HermitianMeasureData σ J t n b lam m₁ m' s B₀ a κ₁ cm)
+    : MeasurableSet (UsetF σ J t B₀ : Set (Fin (n + 1) → Fin (M + 1) → R ⊗[F] E)) := by
   have hTR := D.hR.1
   have hLC := D.hR.2.1
   have hSC := D.hR.2.2.1
   have hT2 := D.hR.2.2.2.1
-  obtain ⟨k1, k2, k3, k4, hsigc, htrc, -, hbw, -, hgramc⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ D.hCM R
+  obtain ⟨k1, k2, k3, k4, hsigc, htrc, -, hbw, -, hgramc⟩ :=
+    GlobalTheory.T.tensor_locally_compact_ring F E σ D.hCM R
   haveI : BorelSpace (R ⊗[F] E) := ⟨rfl⟩
   have hJ' := GlobalTheory.T.block_one_scalar_preserves_nondegenerate F E σ M J D.hJ t D.ht
-  obtain ⟨-, -, -, hbor, hg⟩ := GlobalTheory.T.hermitian_matrices_locally_compact_borel F E σ D.hCM R (n + 1)
+  obtain ⟨-, -, -, hbor, hg⟩ :=
+    GlobalTheory.T.hermitian_matrices_locally_compact_borel F E σ D.hCM R (n + 1)
   obtain ⟨g, hgc, hg⟩ := hg (M + 1) _ hJ'
   have hq : Continuous fun v : Fin (n + 1) → Fin (M + 1) → R ⊗[F] E =>
       s0 R (gramR R σ (blockOne (algebraMap F E t) J) v) := by
     unfold s0
     exact continuous_const.mul (htrc.comp ((hgramc (n + 1) (M + 1) _).matrix_elem 0 0))
-  have hset : gramR R σ (blockOne (algebraMap F E t) J) ⁻¹' (Subtype.val '' BsetF R σ B₀) =
-      (fun v : Fin (n + 1) → Fin (M + 1) → R ⊗[F] E =>
-        s0 R (gramR R σ (blockOne (algebraMap F E t) J) v)) ⁻¹' B₀ := by
+  have hset
+      : gramR R σ (blockOne (algebraMap F E t) J) ⁻¹' (Subtype.val '' BsetF R σ B₀)
+        = (fun v : Fin (n + 1) → Fin (M + 1) → R ⊗[F] E =>
+            s0 R (gramR R σ (blockOne (algebraMap F E t) J) v))
+          ⁻¹' B₀ := by
     ext v
     constructor
     · rintro ⟨S, hS, hSe⟩
@@ -66,11 +74,15 @@ theorem measurableSet_usetF (D : HermitianMeasureData σ J t n b lam m₁ m' s B
 theorem chi_eq_zero_F
     (φ : (Fin (n + 1) → Fin (M + 1) → R ⊗[F] E) → ℝ≥0∞)
     {y : Fin 1 → Fin (M + 1) → R ⊗[F] E}
-    (hy : s0 R (gramR R σ (blockOne (algebraMap F E t) J) y) ∉ B₀) :
-    chi σ J t s a b lam ((UsetF σ J t B₀ : Set (Fin (n + 1) → Fin (M + 1) → R ⊗[F] E)).indicator φ) y = 0 := by
+    (hy : s0 R (gramR R σ (blockOne (algebraMap F E t) J) y) ∉ B₀)
+    : chi σ J t s a b lam
+        ((UsetF σ J t B₀ : Set (Fin (n + 1) → Fin (M + 1) → R ⊗[F] E)).indicator φ) y
+      = 0 := by
   unfold chi
-  have hz : ∀ Z : Fin n → Fin (M + 1) → R ⊗[F] E,
-      (UsetF σ J t B₀ : Set (Fin (n + 1) → Fin (M + 1) → R ⊗[F] E)).indicator φ (Fin.cons (y 0) Z) = 0 := by
+  have hz
+      : ∀ Z : Fin n → Fin (M + 1) → R ⊗[F] E,
+        (UsetF σ J t B₀ : Set (Fin (n + 1) → Fin (M + 1) → R ⊗[F] E)).indicator φ (Fin.cons (y 0) Z)
+          = 0 := by
     intro Z
     refine Set.indicator_of_notMem ?_ _
     rintro ⟨⟨S, hS, hSe⟩, -⟩

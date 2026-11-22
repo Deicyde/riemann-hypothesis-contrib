@@ -13,7 +13,8 @@ open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Is
 
 namespace Formalism.L2.S.Pv.MSOrdP
 
-open Formalism.L2.SG.LocVol Formalism.L2.SG.Pf.Carrier.EnergyConst Formalism.L2.SG.Pf.Carrier.EnergyMS
+open Formalism.L2.SG.LocVol Formalism.L2.SG.Pf.Carrier.EnergyConst
+  Formalism.L2.SG.Pf.Carrier.EnergyMS
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -26,8 +27,8 @@ theorem three_dvd (r : ℕ) : 3 ∣ (r + 1) * (8 * r ^ 2 + 10 * r + 3) := by
   · subst hk
     exact ⟨(k + 1) * (8 * (3 * k + 2) ^ 2 + 10 * (3 * k + 2) + 3), by ring⟩
 
-theorem dimension_exponent_real (D : D7) : ((e1 D : ℕ) : ℝ) =
-    ((D.R.rS : ℝ) + 1) * (8 * (D.R.rS : ℝ) ^ 2 + 10 * D.R.rS + 3) / 3 := by
+theorem dimension_exponent_real (D : D7)
+    : ((e1 D : ℕ) : ℝ) = ((D.R.rS : ℝ) + 1) * (8 * (D.R.rS : ℝ) ^ 2 + 10 * D.R.rS + 3) / 3 := by
   unfold e1
   rw [Nat.cast_div (three_dvd D.R.rS) (by norm_num)]
   push_cast
@@ -42,10 +43,12 @@ theorem msOrd_holds : MSOrd := by
       unfold HeightOneSpectrum.maxPowDividing
       exact pow_ne_zero _ v.ne_bot
     exact_mod_cast (mt Ideal.absNorm_eq_zero_iff.1 hI)
-  have hc : ((Ideal.absNorm (v.maxPowDividing (differentIdeal ℤ (𝓞 X.B.I.F))) : ℕ) : ℝ)⁻¹ ^
-      (-(((D.R.rS : ℝ) + 1) * (8 * (D.R.rS : ℝ) ^ 2 + 10 * D.R.rS + 3) / 3)) = dN X v ^ e1 D := by
-    rw [← dimension_exponent_real D, Real.inv_rpow (Nat.cast_nonneg _), Real.rpow_neg (Nat.cast_nonneg _), inv_inv,
-      Real.rpow_natCast]
+  have hc
+      : ((Ideal.absNorm (v.maxPowDividing (differentIdeal ℤ (𝓞 X.B.I.F))) : ℕ) : ℝ)⁻¹
+          ^ (-(((D.R.rS : ℝ) + 1) * (8 * (D.R.rS : ℝ) ^ 2 + 10 * D.R.rS + 3) / 3))
+        = dN X v ^ e1 D := by
+    rw [← dimension_exponent_real D, Real.inv_rpow (Nat.cast_nonneg _),
+      Real.rpow_neg (Nat.cast_nonneg _), inv_inv, Real.rpow_natCast]
     rfl
   rw [hc] at h
   have hpos : (0 : ℝ) < dN X v := lt_of_le_of_ne (Nat.cast_nonneg _) (Ne.symm hn0)

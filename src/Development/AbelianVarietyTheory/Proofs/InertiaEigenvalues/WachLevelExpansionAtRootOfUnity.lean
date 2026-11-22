@@ -10,21 +10,24 @@ noncomputable section
 
 namespace GlobalTheory.NL
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct
 
 namespace LevPt
 
 open PowerSeries
 
-theorem simple_zero {L : Type} [Field L] (f : PowerSeries L) (h0 : constantCoeff f = 0)
-    (h1 : coeff 1 f ≠ 0) : ∃ w : PowerSeries L, IsUnit w ∧ f = X * w := by
+theorem simple_zero
+    {L : Type} [Field L] (f : PowerSeries L) (h0 : constantCoeff f = 0) (h1 : coeff 1 f ≠ 0)
+    : ∃ w : PowerSeries L, IsUnit w ∧ f = X * w := by
   obtain ⟨w, rfl⟩ := X_dvd_iff.mpr h0
   refine ⟨w, ?_, rfl⟩
   rw [isUnit_iff_constantCoeff, isUnit_iff_ne_zero]
   simpa using h1
 
-theorem coeff_one_pow_of_deriv {L : Type} [Field L] (U : PowerSeries L)
-    (hU : derivative U = U) (m : ℕ) : coeff 1 (U ^ m) = (m : L) * constantCoeff U ^ m := by
+theorem coeff_one_pow_of_deriv
+    {L : Type} [Field L] (U : PowerSeries L) (hU : derivative U = U) (m : ℕ)
+    : coeff 1 (U ^ m) = (m : L) * constantCoeff U ^ m := by
   have h : derivative (U ^ m) = (m : PowerSeries L) * U ^ m := by
     induction m with
     | zero => simp
@@ -37,14 +40,16 @@ theorem coeff_one_pow_of_deriv {L : Type} [Field L] (U : PowerSeries L)
   rw [coeff_derivative] at h2
   simpa using h2
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
 
 theorem φA_one_add : W.φA (1 + letπ) = (1 + letπ) ^ PD.p := by
   rw [map_add (f := _), map_one, W.φA_π]
@@ -56,8 +61,7 @@ theorem φA_one_add : W.φA (1 + letπ) = (1 + letπ) ^ PD.p := by
 theorem φA_pow_one_add (k : ℕ) : (W.φA ^ k) (1 + letπ) = (1 + letπ) ^ (PD.p ^ k) := by
   induction k with
   | zero => simp
-  | succ k ih =>
-    rw [pow_succ, AlgHom.mul_apply, φA_one_add, map_pow, ih, ← pow_mul, ← pow_succ]
+  | succ k ih => rw [pow_succ, AlgHom.mul_apply, φA_one_add, map_pow, ih, ← pow_mul, ← pow_succ]
 
 theorem X_eq : W.X = (1 + letπ) ^ (PD.p ^ (W.s - 1)) - 1 := by
   rw [← φA_pow_one_add W, map_add (f := _), map_one, LocWach.X]
@@ -88,14 +92,15 @@ theorem lev_letE (i : ZMod n) (ζ : LL) : W.lev i ζ (letE i) = 1 := by
   rw [map_sub, map_one] at h
   exact (sub_eq_zero.mp h).symm
 
-theorem lev_values [CharZero LL] (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPrimitiveRoot ζ (PD.p ^ j)) :
-    (∃ w : PowerSeries LL, IsUnit w ∧ W.lev i ζ letπ = C (ζ - 1) + X * w) ∧
-    (ζ ^ (PD.p ^ (W.s - 1)) = 1 → (∃ w : PowerSeries LL, IsUnit w ∧ W.lev i ζ W.X = X * w) ∧
-      IsUnit (W.lev i ζ W.Q)) ∧
-    (IsPrimitiveRoot ζ (PD.p ^ W.s) → (∃ w : PowerSeries LL, IsUnit w ∧ W.lev i ζ W.Q = X * w) ∧
-      IsUnit (W.lev i ζ W.X)) ∧
-    (constantCoeff (W.lev i ζ W.X) = 0 ↔ ζ ^ (PD.p ^ (W.s - 1)) = 1) ∧
-    (constantCoeff (W.lev i ζ W.Q) = 0 ↔ IsPrimitiveRoot ζ (PD.p ^ W.s)) ∧ W.lev i ζ W.Q ≠ 0 := by
+theorem lev_values [CharZero LL] (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPrimitiveRoot ζ (PD.p ^ j))
+    : (∃ w : PowerSeries LL, IsUnit w ∧ W.lev i ζ letπ = C (ζ - 1) + X * w)
+      ∧ (ζ ^ (PD.p ^ (W.s - 1)) = 1
+        → (∃ w : PowerSeries LL, IsUnit w ∧ W.lev i ζ W.X = X * w) ∧ IsUnit (W.lev i ζ W.Q))
+      ∧ (IsPrimitiveRoot ζ (PD.p ^ W.s)
+        → (∃ w : PowerSeries LL, IsUnit w ∧ W.lev i ζ W.Q = X * w) ∧ IsUnit (W.lev i ζ W.X))
+      ∧ (constantCoeff (W.lev i ζ W.X) = 0 ↔ ζ ^ (PD.p ^ (W.s - 1)) = 1)
+      ∧ (constantCoeff (W.lev i ζ W.Q) = 0 ↔ IsPrimitiveRoot ζ (PD.p ^ W.s))
+      ∧ W.lev i ζ W.Q ≠ 0 := by
   have hp : PD.p.Prime := PD.hp
   haveI : Fact PD.p.Prime := ⟨hp⟩
   obtain ⟨E, hE0, hE1, hE⟩ := W.lev_π i ζ hζ
@@ -128,8 +133,8 @@ theorem lev_values [CharZero LL] (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPr
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hQ, map_sum]
     simp [hU0]
-  have hprim : IsPrimitiveRoot ζ (PD.p ^ (r + 1)) ↔
-      ζ ^ (PD.p ^ (r + 1)) = 1 ∧ ¬ ζ ^ (PD.p ^ r) = 1 := by
+  have hprim
+      : IsPrimitiveRoot ζ (PD.p ^ (r + 1)) ↔ ζ ^ (PD.p ^ (r + 1)) = 1 ∧ ¬ ζ ^ (PD.p ^ r) = 1 := by
     constructor
     · intro h
       refine ⟨h.pow_eq_one, h.pow_ne_one_of_pos_of_lt (pow_ne_zero _ hp.ne_zero) ?_⟩
@@ -141,8 +146,7 @@ theorem lev_values [CharZero LL] (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPr
     intro h
     rw [hQ0, h]
     simp [hp.ne_zero]
-  have hX0 : constantCoeff (W.lev i ζ W.X) = 0 ↔ ζ ^ (PD.p ^ r) = 1 := by
-    rw [hX, hc0, sub_eq_zero]
+  have hX0 : constantCoeff (W.lev i ζ W.X) = 0 ↔ ζ ^ (PD.p ^ r) = 1 := by rw [hX, hc0, sub_eq_zero]
   have hQiff : constantCoeff (W.lev i ζ W.Q) = 0 ↔ IsPrimitiveRoot ζ (PD.p ^ (r + 1)) := by
     have hc := congrArg constantCoeff hXQ
     rw [map_mul, hc0] at hc
@@ -156,11 +160,12 @@ theorem lev_values [CharZero LL] (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPr
       exact (mul_eq_zero.mp hc).resolve_right (fun h => h2 (hX0.mp h))
   rw [hr, Nat.add_sub_cancel]
   refine ⟨?_, ?_, ?_, hX0, hQiff, ?_⟩
-  · obtain ⟨w, hw, hw'⟩ := simple_zero (U - C ζ) (by simp [hU0]) (by
-      have := hc1 1 one_ne_zero
-      rw [pow_one, map_sub, coeff_one] at this
-      rw [map_sub, coeff_C]
-      simpa using this)
+  · obtain ⟨w, hw, hw'⟩ :=
+      simple_zero (U - C ζ) (by simp [hU0]) (by
+        have := hc1 1 one_ne_zero
+        rw [pow_one, map_sub, coeff_one] at this
+        rw [map_sub, coeff_C]
+        simpa using this)
     refine ⟨w, hw, ?_⟩
     rw [map_sub, map_one]
     linear_combination hE + hw'
@@ -173,8 +178,9 @@ theorem lev_values [CharZero LL] (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPr
       rw [isUnit_iff_constantCoeff, isUnit_iff_ne_zero]
       exact fun h' => (hprim.mp h).2 (hX0.mp h')
     refine ⟨?_, hXu⟩
-    obtain ⟨w, hw, hw'⟩ := simple_zero (U ^ (PD.p ^ (r + 1)) - 1)
-      (by rw [hc0, h.pow_eq_one, sub_self]) (hc1 _ (pow_ne_zero _ hp.ne_zero))
+    obtain ⟨w, hw, hw'⟩ :=
+      simple_zero (U ^ (PD.p ^ (r + 1)) - 1) (by rw [hc0, h.pow_eq_one, sub_self])
+        (hc1 _ (pow_ne_zero _ hp.ne_zero))
     obtain ⟨u, hu⟩ := hXu
     refine ⟨w * ↑u⁻¹, hw.mul (Units.isUnit _), ?_⟩
     rw [← mul_assoc, ← hw', ← hXQ, ← hu, Units.mul_inv_cancel_right]
@@ -182,9 +188,11 @@ theorem lev_values [CharZero LL] (i : ZMod n) (ζ : LL) (hζ : ∃ j : ℕ, IsPr
     apply hc1 (PD.p ^ (r + 1)) (pow_ne_zero _ hp.ne_zero)
     rw [← hXQ, h, zero_mul, map_zero]
 
-theorem exists_nonunit {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l) (ζ : ↥LL.1)
-    (hζ : ∃ j : ℕ, IsPrimitiveRoot ζ (l ^ j)) :
-    ∃ x : ↥(OL LL), ¬ IsUnit x ∧ (x : ↥LL.1) = ζ - 1 := by
+theorem exists_nonunit
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l)
+    (LL : FinExt l) (ζ : ↥LL.1) (hζ : ∃ j : ℕ, IsPrimitiveRoot ζ (l ^ j))
+    : ∃ x : ↥(OL LL), ¬ IsUnit x ∧ (x : ↥LL.1) = ζ - 1 := by
   have hp : l.Prime := Fact.out
   obtain ⟨j, hj⟩ := hζ
   have hint : IsIntegral ℤ_[l] ζ := (hj.isIntegral (pow_pos hp.pos j)).tower_top
@@ -212,9 +220,27 @@ theorem exists_nonunit {l : ℕ} [Fact l.Prime] (P : LocPrime l) (LL : FinExt l)
 
 end LevPt
 
-
 set_option maxHeartbeats 1000000 in
-theorem lev_at_root_of_unity : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; ∀ (i : Let K) (ζ : ↥LL.1), (∃ j : ℕ, IsPrimitiveRoot ζ (l ^ j)) → (∃ x : ↥(OL LL), ¬ IsUnit x ∧ (x : ↥LL.1) = ζ - 1 ∧ ∃ w : PowerSeries ↥LL.1, IsUnit w ∧ W.lev i ζ letπ = PowerSeries.C (x : ↥LL.1) + PowerSeries.X * w) ∧ W.lev i ζ (letE i) = 1 ∧ (ζ ^ (l ^ (s - 1)) = 1 → (∃ w : PowerSeries ↥LL.1, IsUnit w ∧ W.lev i ζ W.X = PowerSeries.X * w) ∧ IsUnit (W.lev i ζ W.Q)) ∧ (IsPrimitiveRoot ζ (l ^ s) → (∃ w : PowerSeries ↥LL.1, IsUnit w ∧ W.lev i ζ W.Q = PowerSeries.X * w) ∧ IsUnit (W.lev i ζ W.X)) ∧ (PowerSeries.constantCoeff (W.lev i ζ W.X) = 0 ↔ ζ ^ (l ^ (s - 1)) = 1) ∧ (PowerSeries.constantCoeff (W.lev i ζ W.Q) = 0 ↔ IsPrimitiveRoot ζ (l ^ s)) ∧ W.lev i ζ W.Q ≠ 0 := by
+theorem lev_at_root_of_unity
+    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (l : ℕ) [Fact l.Prime] (K : FinExt l)
+        (s : ℕ) (LL : FinExt l) (h : Good K s LL),
+      let W := (HW l).W K s LL h
+      ∀ (i : Let K) (ζ : ↥LL.1),
+        (∃ j : ℕ, IsPrimitiveRoot ζ (l ^ j))
+          → (∃ x : ↥(OL LL),
+              ¬ IsUnit x ∧ (x : ↥LL.1) = ζ - 1
+                ∧ ∃ w : PowerSeries ↥LL.1,
+                  IsUnit w ∧ W.lev i ζ letπ = PowerSeries.C (x : ↥LL.1) + PowerSeries.X * w)
+            ∧ W.lev i ζ (letE i) = 1
+            ∧ (ζ ^ (l ^ (s - 1)) = 1
+              → (∃ w : PowerSeries ↥LL.1, IsUnit w ∧ W.lev i ζ W.X = PowerSeries.X * w)
+                ∧ IsUnit (W.lev i ζ W.Q))
+            ∧ (IsPrimitiveRoot ζ (l ^ s)
+              → (∃ w : PowerSeries ↥LL.1, IsUnit w ∧ W.lev i ζ W.Q = PowerSeries.X * w)
+                ∧ IsUnit (W.lev i ζ W.X))
+            ∧ (PowerSeries.constantCoeff (W.lev i ζ W.X) = 0 ↔ ζ ^ (l ^ (s - 1)) = 1)
+            ∧ (PowerSeries.constantCoeff (W.lev i ζ W.Q) = 0 ↔ IsPrimitiveRoot ζ (l ^ s))
+            ∧ W.lev i ζ W.Q ≠ 0 := by
   intro D HW l _ K s LL h W i ζ hζ
   have hp : ((D.loc l).PD K).p = l := (D.loc l).PD_p K
   have hs : W.s = s := (HW l).W_s K s LL h

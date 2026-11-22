@@ -6,7 +6,8 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.CechNaturality.Li
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 set_option autoImplicit false
 
@@ -43,8 +44,11 @@ lemma smul_mem_twSecs {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A)
   rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app, ← GlobalTheory.Twist.map_comp, hg,
     twist_map_smulHom_app, toFunctions_top_eq]
 
-def twSecsSub {X : Scheme.{0}} (H : ReciprocityTheory.ChartRestriction.G.Semi.LB X) (n : ℤ) {P : X.Modules}
-    (S : Subobject P) : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤) where
+def twSecsSub
+    {X : Scheme.{0}} (H : ReciprocityTheory.ChartRestriction.G.Semi.LB X)
+    (n : ℤ)
+    {P : X.Modules} (S : Subobject P)
+    : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤) where
   carrier := twSecs H n S
   add_mem' := by
     rintro _ _ ⟨x, rfl⟩ ⟨y, rfl⟩
@@ -54,13 +58,17 @@ def twSecsSub {X : Scheme.{0}} (H : ReciprocityTheory.ChartRestriction.G.Semi.LB
     rintro r _ ⟨x, rfl⟩
     exact ⟨r • x, Scheme.Modules.Hom.app_smul _ _ _⟩
 
-theorem twPow_subset_twSecs : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A)
-    {X : Scheme.{0}} [X.Over (Spec (.of A))] (H : ReciprocityTheory.ChartRestriction.G.Semi.LB X), GlobalTheory.IsAmpleLB H →
-    ∀ {P : X.Modules}, IsCoherent P → ∀ (n : ℤ) (m : ℕ),
-      twPow I H n P m ⊆ twSecs H n (powSub I P m) := by
+theorem twPow_subset_twSecs
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
+        [X.Over (Spec (.of A))] (H : ReciprocityTheory.ChartRestriction.G.Semi.LB X),
+      GlobalTheory.IsAmpleLB H
+        → ∀ {P : X.Modules},
+          IsCoherent P → ∀ (n : ℤ) (m : ℕ), twPow I H n P m ⊆ twSecs H n (powSub I P m) := by
   intro A _ _ I X _ H _ P _ n m
-  have key : (Ideal.map (toFunctions (X := X) (A := A) ⊤) (I ^ m) • ⊤ :
-      Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤)) ≤ twSecsSub H n (powSub I P m) := by
+  have key
+      : (Ideal.map (toFunctions (X := X) (A := A) ⊤) (I ^ m) • ⊤
+          : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤))
+        ≤ twSecsSub H n (powSub I P m) := by
     rw [Submodule.smul_le]
     intro r hr c _
     induction hr using Submodule.span_induction with

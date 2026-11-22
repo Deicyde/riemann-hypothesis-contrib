@@ -6,24 +6,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-private theorem stab_smul_comm {T Y : Type} [CommGroup T] [MulAction T Y] (t : T) (y : Y) :
-    MulAction.stabilizer T (t • y) = MulAction.stabilizer T y := by
+private theorem stab_smul_comm {T Y : Type} [CommGroup T] [MulAction T Y] (t : T) (y : Y)
+    : MulAction.stabilizer T (t • y) = MulAction.stabilizer T y := by
   ext s
   simp only [MulAction.mem_stabilizer_iff]
   rw [smul_smul, mul_comm, ← smul_smul, smul_left_cancel_iff]
 
-private theorem out_mk_smul {T Y : Type} [Group T] [MulAction T Y] (y : Y) :
-    ∃ t : T, (Quotient.mk (MulAction.orbitRel T Y) y).out = t • y := by
+private theorem out_mk_smul {T Y : Type} [Group T] [MulAction T Y] (y : Y)
+    : ∃ t : T, (Quotient.mk (MulAction.orbitRel T Y) y).out = t • y := by
   obtain ⟨t, ht⟩ := MulAction.orbitRel_apply.mp (Quotient.mk_out (s := MulAction.orbitRel T Y) y)
   exact ⟨t, ht.symm⟩
 
-private theorem mk_smul_eq {T Y : Type} [Group T] [MulAction T Y] (t : T) (y : Y) :
-    Quotient.mk (MulAction.orbitRel T Y) (t • y) = Quotient.mk (MulAction.orbitRel T Y) y := by
+private theorem mk_smul_eq {T Y : Type} [Group T] [MulAction T Y] (t : T) (y : Y)
+    : Quotient.mk (MulAction.orbitRel T Y) (t • y) = Quotient.mk (MulAction.orbitRel T Y) y := by
   exact Quotient.sound (MulAction.orbitRel_apply.mpr (MulAction.mem_orbit y t))
 
-private theorem wcount_sub {T Y : Type} [Group T] [MulAction T Y] (C : Subgroup T) (k : Y → ℂ) :
-    wcount C k = ∑ᶠ o : {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0},
-      ((MulAction.stabilizer T o.1.out).relIndex C : ℂ) * k o.1.out := by
+private theorem wcount_sub {T Y : Type} [Group T] [MulAction T Y] (C : Subgroup T) (k : Y → ℂ)
+    : wcount C k
+      = ∑ᶠ o : {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0},
+        ((MulAction.stabilizer T o.1.out).relIndex C : ℂ) * k o.1.out := by
   classical
   set g : MulAction.orbitRel.Quotient T Y → ℂ :=
     fun o => ((MulAction.stabilizer T o.out).relIndex C : ℂ) * k o.out with hg
@@ -32,20 +33,24 @@ private theorem wcount_sub {T Y : Type} [Group T] [MulAction T Y] (C : Subgroup 
     simp only [Set.mem_setOf_eq]
     intro h0
     exact (Function.mem_support.mp ho) (by simp [hg, h0])
-  have h1 := finsum_set_coe_eq_finsum_mem (f := g) {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0}
+  have h1 :=
+    finsum_set_coe_eq_finsum_mem (f := g) {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0}
   rw [← finsum_mem_inter_support g, Set.inter_eq_right.mpr hs, finsum_mem_support] at h1
   exact h1.symm
 
-theorem UpperTheory.V.Z.Sym.Loc.wTrans :
-    ∀ (T Y Y' : Type) [CommGroup T] [MulAction T Y] [MulAction T Y'] (C : Subgroup T) (k : Y → ℂ) (k' : Y' → ℂ) (R : Y → Y' → Prop),
-    (∀ (t : T) y, k (t • y) = k y) → (∀ (t : T) y', k' (t • y') = k' y') → (∀ (t : T) y y', R y y' → R (t • y) (t • y')) →
-    (∀ y y', R y y' → k y = k' y') → (∀ y, k y ≠ 0 → ∃! y', R y y') → (∀ y', k' y' ≠ 0 → ∃! y, R y y') →
-    wcount C k = wcount C k' := by
+theorem UpperTheory.V.Z.Sym.Loc.wTrans
+    : ∀ (T Y Y' : Type) [CommGroup T] [MulAction T Y] [MulAction T Y'] (C : Subgroup T) (k : Y → ℂ)
+        (k' : Y' → ℂ) (R : Y → Y' → Prop),
+      (∀ (t : T) y, k (t • y) = k y) → (∀ (t : T) y', k' (t • y') = k' y')
+        → (∀ (t : T) y y', R y y' → R (t • y) (t • y')) → (∀ y y', R y y' → k y = k' y')
+        → (∀ y, k y ≠ 0 → ∃! y', R y y') → (∀ y', k' y' ≠ 0 → ∃! y, R y y')
+        → wcount C k = wcount C k' := by
   classical
   intro T Y Y' _ _ _ C k k' R hk hk' hR hkk hex hex'
   rw [wcount_sub C k, wcount_sub C k']
-  have stab_eq : ∀ y y', R y y' → k y ≠ 0 → k' y' ≠ 0 →
-      MulAction.stabilizer T y = MulAction.stabilizer T y' := by
+  have stab_eq
+      : ∀ y y',
+        R y y' → k y ≠ 0 → k' y' ≠ 0 → MulAction.stabilizer T y = MulAction.stabilizer T y' := by
     intro y y' hyy hy hy'
     ext s
     simp only [MulAction.mem_stabilizer_iff]
@@ -56,22 +61,25 @@ theorem UpperTheory.V.Z.Sym.Loc.wTrans :
     · intro hs
       have h1 : R (s • y) y' := by simpa [hs] using hR s y y' hyy
       exact (hex' y' hy').unique h1 hyy
-  let pick : ∀ o : {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0}, Y' :=
-    fun o => Classical.choose (hex o.1.out o.2).exists
+  let pick : ∀ o : {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0}, Y' := fun o =>
+    Classical.choose (hex o.1.out o.2).exists
   have pick_R : ∀ o, R o.1.out (pick o) := fun o => Classical.choose_spec (hex o.1.out o.2).exists
   have pick_k : ∀ o, k' (pick o) ≠ 0 := fun o => by
     rw [← hkk _ _ (pick_R o)]
     exact o.2
-  have e_mem : ∀ o, Quotient.mk (MulAction.orbitRel T Y') (pick o) ∈
-      {o' : MulAction.orbitRel.Quotient T Y' | k' o'.out ≠ 0} := by
+  have e_mem
+      : ∀ o,
+        Quotient.mk (MulAction.orbitRel T Y') (pick o)
+          ∈ {o' : MulAction.orbitRel.Quotient T Y' | k' o'.out ≠ 0} := by
     intro o
     obtain ⟨t, ht⟩ := out_mk_smul (T := T) (pick o)
     show k' _ ≠ 0
     rw [ht, hk']
     exact pick_k o
-  let e : {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0} →
-      {o' : MulAction.orbitRel.Quotient T Y' | k' o'.out ≠ 0} :=
-    fun o => ⟨Quotient.mk _ (pick o), e_mem o⟩
+  let e
+      : {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0}
+        → {o' : MulAction.orbitRel.Quotient T Y' | k' o'.out ≠ 0} := fun o =>
+    ⟨Quotient.mk _ (pick o), e_mem o⟩
   refine finsum_eq_of_bijective e ⟨?_, ?_⟩ ?_
   · intro o1 o2 h
     have h' : Quotient.mk (MulAction.orbitRel T Y') (pick o1) = Quotient.mk _ (pick o2) :=
@@ -88,8 +96,9 @@ theorem UpperTheory.V.Z.Sym.Loc.wTrans :
     have hkz : k z ≠ 0 := by
       rw [hkk _ _ hz]
       exact ho'
-    have hmem : Quotient.mk (MulAction.orbitRel T Y) z ∈
-        {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0} := by
+    have hmem
+        : Quotient.mk (MulAction.orbitRel T Y) z
+          ∈ {o : MulAction.orbitRel.Quotient T Y | k o.out ≠ 0} := by
       obtain ⟨s, hs⟩ := out_mk_smul (T := T) z
       show k _ ≠ 0
       rw [hs, hk]

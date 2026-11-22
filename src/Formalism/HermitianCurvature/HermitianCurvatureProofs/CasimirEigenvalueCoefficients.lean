@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.B
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.B
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -20,8 +21,10 @@ namespace Qb1
 
 variable {k r : ℕ} {Vs : Type} [NormedAddCommGroup Vs] [NormedSpace ℂ Vs]
 
-theorem ckOn_congr {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {m : ℕ∞} {f f' : Mx k r → E}
-    (he : ∀ g ∈ GV k r, f g = f' g) (h : CkOn m (GV k r) f) : CkOn m (GV k r) f' := by
+theorem ckOn_congr
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {m : ℕ∞} {f f' : Mx k r → E} (he : ∀ g ∈ GV k r, f g = f' g) (h : CkOn m (GV k r) f)
+    : CkOn m (GV k r) f' := by
   intro g₀ hg₀
   obtain ⟨U, F, a, b, c, d⟩ := h g₀ hg₀
   exact ⟨U, F, a, b, c, fun g hg hgG => (he g hgG).symm.trans (d g hg hgG)⟩

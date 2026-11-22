@@ -8,8 +8,7 @@ open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
 theorem UpperTheory.V.Z.Sym.Loc.datSmul : UpperTheory.V.Z.Sym.Loc.DatSmul := by
   intro K _ Δ τ c d m h t
-  have hsig : sigL ((t : K) • m) = (t : K) • sigL m := by
-    ext <;> simp [sigL]
+  have hsig : sigL ((t : K) • m) = (t : K) • sigL m := by ext <;> simp [sigL]
   have hst : ∀ z : EL Δ τ, star ((t : K) • z) = (t : K) • star z := by
     intro z
     ext <;> simp <;> ring

@@ -13,15 +13,19 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.T2SpaceTe
 
 noncomputable section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
-open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free GlobalTheory.CompanionTheory.WeilSiegel.HypStep
+open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
+  GlobalTheory.CompanionTheory.WeilSiegel.HypStep
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.HypStep.ScaleNonUnit
 
-theorem lam_map_mul {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v))
-    [lam.IsAddHaarMeasure] (x : Fv F v) (hx : x ≠ 0) :
-    lam.map (fun y => x * y) = (‖x‖₊)⁻¹ • lam := by
+theorem lam_map_mul
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)) [lam.IsAddHaarMeasure]
+    (x : Fv F v) (hx : x ≠ 0)
+    : lam.map (fun y => x * y) = (‖x‖₊)⁻¹ • lam := by
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
   obtain ⟨i1, i2, i3, i4, -⟩ := GlobalTheory.T.completion_is_local_ring F v
   have hu : IsUnit x := hx.isUnit
@@ -48,8 +52,10 @@ theorem lam_map_mul {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum 
   rw [e, ← distribHaarChar_mul, hc']
   rfl
 
-theorem norm_le_of_val_lt {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v)
-    (hx : x ≠ 0) (h : Valued.v x < 1) : ‖x‖ ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) := by
+theorem norm_le_of_val_lt
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (x : Fv F v) (hx : x ≠ 0) (h : Valued.v x < 1)
+    : ‖x‖ ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) := by
   have h0 : Valued.v x ≠ 0 := (Valuation.ne_zero_iff _).2 hx
   have hv : Valued.v x = WithZero.exp (WithZero.log (Valued.v x)) := (WithZero.exp_log h0).symm
   set n : ℤ := WithZero.log (Valued.v x) with hn
@@ -60,19 +66,24 @@ theorem norm_le_of_val_lt {F : Type} [Field F] [NumberField F] (v : HeightOneSpe
   rw [FinitePlace.norm_def, hv, WithZeroMulInt.toNNReal_neg_apply _ WithZero.exp_ne_zero]
   push_cast
   change ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ n ≤ _
-  have h1 : (1 : ℝ) ≤ ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by exact_mod_cast (by omega : 1 ≤ Ideal.absNorm v.asIdeal)
-  calc ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ n ≤ ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-1 : ℤ) :=
-        zpow_le_zpow_right₀ h1 (by omega)
+  have h1 : (1 : ℝ) ≤ ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) := by
+    exact_mod_cast (by omega : 1 ≤ Ideal.absNorm v.asIdeal)
+  calc
+    ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ n
+      ≤ ((Ideal.absNorm v.asIdeal : ℕ) : ℝ) ^ (-1 : ℤ) := zpow_le_zpow_right₀ h1 (by omega)
     _ = _ := by rw [zpow_neg_one, one_div]
 
-theorem fibre_zero_image_mul (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) (N : ℕ) (hN : 1 ≤ N) (J : Matrix (Fin N) (Fin N) E) (hJ : IsHermND σ J)
-    (d : ℕ) (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v))
-    (hlam : IsStdV v lam) (m : HermR (Fv F v) σ 1 → Measure (Fin 1 → Fin N → Fv F v ⊗[F] E))
+theorem fibre_zero_image_mul
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ)
+    (N : ℕ) (hN : 1 ≤ N) (J : Matrix (Fin N) (Fin N) E) (hJ : IsHermND σ J)
+    (d : ℕ) (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)) (hlam : IsStdV v lam)
+    (m : HermR (Fv F v) σ 1 → Measure (Fin 1 → Fin N → Fv F v ⊗[F] E))
     (hm : IsGramFibFree (Fv F v) σ J 1 (coordW (Fv F v) b lam 1 N) (coordHerm (Fv F v) σ b lam 1) m)
-    (u : (Fv F v ⊗[F] E)ˣ) (B : Set (Fin 1 → Fin N → Fv F v ⊗[F] E)) (hB : MeasurableSet B) :
-    m 0 ((fun (X : Fin 1 → Fin N → Fv F v ⊗[F] E) a i => (u : Fv F v ⊗[F] E) * X a i) '' B) =
-      ((‖Algebra.norm (Fv F v) (u : Fv F v ⊗[F] E)‖₊ ^ (N - 1) : ℝ≥0) : ℝ≥0∞) * m 0 B := by
+    (u : (Fv F v ⊗[F] E)ˣ) (B : Set (Fin 1 → Fin N → Fv F v ⊗[F] E)) (hB : MeasurableSet B)
+    : m 0 ((fun (X : Fin 1 → Fin N → Fv F v ⊗[F] E) a i => (u : Fv F v ⊗[F] E) * X a i) '' B)
+      = ((‖Algebra.norm (Fv F v) (u : Fv F v ⊗[F] E)‖₊ ^ (N - 1) : ℝ≥0) : ℝ≥0∞) * m 0 B := by
   have hloc := GlobalTheory.T.completion_is_local_ring F v
   obtain ⟨i1, i2, i3, i4, -⟩ := id hloc
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
@@ -89,28 +100,30 @@ theorem fibre_zero_image_mul (F E : Type) [Field F] [NumberField F] [Field E] [N
     GlobalTheory.Doubling.algebraMap_norm_eq hσ _
   set q : ℝ≥0 := ‖s‖₊ with hq
   have hq0 : q ≠ 0 := by rw [hq]; exact nnnorm_ne_zero_iff.2 hs0
-  have hsigs : sigR (Fv F v) σ (algebraMap (Fv F v) (Fv F v ⊗[F] E) s) = algebraMap (Fv F v) (Fv F v ⊗[F] E) s := by
+  have hsigs
+      : sigR (Fv F v) σ (algebraMap (Fv F v) (Fv F v ⊗[F] E) s)
+        = algebraMap (Fv F v) (Fv F v ⊗[F] E) s := by
     simp [sigR, Algebra.TensorProduct.algebraMap_apply]
   let g : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E) := Matrix.of fun _ _ => (u : Fv F v ⊗[F] E)
   have hg : IsUnit g.det := by
     rw [Matrix.det_fin_one]
     exact u.isUnit
-  let T : (Fin 1 → Fin N → Fv F v ⊗[F] E) → Fin 1 → Fin N → Fv F v ⊗[F] E :=
-    fun X a i => (u : Fv F v ⊗[F] E) * X a i
-  let Ti : (Fin 1 → Fin N → Fv F v ⊗[F] E) → Fin 1 → Fin N → Fv F v ⊗[F] E :=
-    fun X a i => ((u⁻¹ : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * X a i
+  let T : (Fin 1 → Fin N → Fv F v ⊗[F] E) → Fin 1 → Fin N → Fv F v ⊗[F] E := fun X a i =>
+    (u : Fv F v ⊗[F] E) * X a i
+  let Ti : (Fin 1 → Fin N → Fv F v ⊗[F] E) → Fin 1 → Fin N → Fv F v ⊗[F] E := fun X a i =>
+    ((u⁻¹ : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * X a i
   have hrm : (fun X : Fin 1 → Fin N → Fv F v ⊗[F] E => rmul (Fv F v) X g) = T := by
     funext X p i
     simp only [rmul, Fin.sum_univ_one, g, Matrix.of_apply, T]
     rw [Subsingleton.elim p 0, mul_comm]
-  have hTc : Continuous T := continuous_pi fun a => continuous_pi fun i =>
-    continuous_const.mul ((continuous_apply i).comp (continuous_apply a))
-  have hTic : Continuous Ti := continuous_pi fun a => continuous_pi fun i =>
-    continuous_const.mul ((continuous_apply i).comp (continuous_apply a))
-  have hTT : ∀ X, T (Ti X) = X := by
-    intro X; funext a i; simp [T, Ti]
-  have hTiT : ∀ X, Ti (T X) = X := by
-    intro X; funext a i; simp [T, Ti]
+  have hTc : Continuous T :=
+    continuous_pi fun a =>
+      continuous_pi fun i => continuous_const.mul ((continuous_apply i).comp (continuous_apply a))
+  have hTic : Continuous Ti :=
+    continuous_pi fun a =>
+      continuous_pi fun i => continuous_const.mul ((continuous_apply i).comp (continuous_apply a))
+  have hTT : ∀ X, T (Ti X) = X := by intro X; funext a i; simp [T, Ti]
+  have hTiT : ∀ X, Ti (T X) = X := by intro X; funext a i; simp [T, Ti]
   have hWb : BorelSpace (Fin 1 → Fin N → Fv F v ⊗[F] E) := by infer_instance
   have hTm : Measurable T := hTc.measurable
   have hTim : Measurable Ti := hTic.measurable
@@ -136,22 +149,34 @@ theorem fibre_zero_image_mul (F E : Type) [Field F] [NumberField F] [Field E] [N
     have h2 := congrArg (fun x : Fv F v => ‖x‖₊) h1
     simp only [nnnorm_mul, nnnorm_one] at h2
     exact eq_inv_of_mul_eq_one_left h2
-  have hmu : (coordW (Fv F v) b lam 1 N).map (fun X => rmul (Fv F v) X g) =
-      (q⁻¹ ^ N) • coordW (Fv F v) b lam 1 N := by
+  have hmu
+      : (coordW (Fv F v) b lam 1 N).map (fun X => rmul (Fv F v) X g)
+        = (q⁻¹ ^ N) • coordW (Fv F v) b lam 1 N := by
     rw [hrm]
     ext C hC
     rw [Measure.map_apply hTm hC, himg', Measure.smul_apply]
     have := GlobalTheory.CompanionTheory.SW.coordW_image_unit_mul F E σ hσ N d b v lam hlam u⁻¹ C hC
-    rw [show (Ti '' C) = ((fun (X : Fin 1 → Fin N → Fv F v ⊗[F] E) (p : Fin 1) (k : Fin N) =>
-      ((u⁻¹ : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * X p k) '' C) from rfl, this, hnorm_inv, ENNReal.smul_def, smul_eq_mul, ENNReal.coe_pow]
-  let τ : HermR (Fv F v) σ 1 → HermR (Fv F v) σ 1 := fun S =>
-    ⟨fun i j => algebraMap (Fv F v) (Fv F v ⊗[F] E) s * (S : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E)) i j, by
+    rw [show (Ti '' C)
+          = ((fun (X : Fin 1 → Fin N → Fv F v ⊗[F] E) (p : Fin 1) (k : Fin N) =>
+              ((u⁻¹ : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) * X p k)
+            '' C) from
+        rfl,
+      this, hnorm_inv, ENNReal.smul_def, smul_eq_mul, ENNReal.coe_pow]
+  let τ : HermR (Fv F v) σ 1 → HermR (Fv F v) σ 1 := fun S => ⟨
+    fun i j =>
+      algebraMap (Fv F v) (Fv F v ⊗[F] E) s * (S : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E)) i j,
+    by
       intro a c
       have := S.2 a c
       simp only [map_mul, hsigs]
-      rw [this]⟩
-  have hτe : ∀ S i j, (τ S : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E)) i j =
-      algebraMap (Fv F v) (Fv F v ⊗[F] E) s * (S : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E)) i j := fun _ _ _ => rfl
+      rw [this]
+  ⟩
+  have hτe
+      : ∀ S i j,
+        (τ S : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E)) i j
+          = algebraMap (Fv F v) (Fv F v ⊗[F] E) s
+            * (S : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E)) i j := fun _ _ _ =>
+    rfl
   have hτm : Measurable τ := by
     obtain ⟨-, -, -, hBH, -⟩ := GlobalTheory.CompanionTheory.SW.HermTop.herm_top F E σ hσ (Fv F v) 1
     haveI := hBH
@@ -159,26 +184,32 @@ theorem fibre_zero_image_mul (F E : Type) [Field F] [NumberField F] [Field E] [N
     refine Continuous.subtype_mk ?_ _
     refine continuous_matrix fun i j => ?_
     exact continuous_const.mul ((continuous_apply_apply i j).comp continuous_subtype_val)
-  have hτ : ∀ S, (τ S : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E)) = cT (sigR (Fv F v) σ) g * S * g := by
+  have hτ
+      : ∀ S, (τ S : Matrix (Fin 1) (Fin 1) (Fv F v ⊗[F] E)) = cT (sigR (Fv F v) σ) g * S * g := by
     intro S
     ext i j
     rw [hτe, hN']
-    simp only [Matrix.mul_apply, Fin.sum_univ_one, cT, Matrix.map_apply, Matrix.transpose_apply, g, Matrix.of_apply]
+    simp only [Matrix.mul_apply, Fin.sum_univ_one, cT, Matrix.map_apply, Matrix.transpose_apply, g,
+      Matrix.of_apply]
     rw [Subsingleton.elim i 0, Subsingleton.elim j 0]
     ring
-  have hc := GlobalTheory.CompanionTheory.SW.Dil.coordHerm_map (Fv F v) σ hσ b lam s hs0 q⁻¹ (lam_map_mul v lam s hs0) τ hτm hτe
+  have hc :=
+    GlobalTheory.CompanionTheory.SW.Dil.coordHerm_map (Fv F v) σ hσ b lam s hs0 q⁻¹
+      (lam_map_mul v lam s hs0) τ hτm hτe
   have hfree : IsOpen {X : Fin 1 → Fin N → Fv F v ⊗[F] E | LinearIndependent (Fv F v ⊗[F] E) X} :=
-    GlobalTheory.CompanionTheory.WeilSiegel.Free.Scale.isOpen_free b (Fv F v) hloc (PI.VolStabSW.TensAllW.lip_field _)
-  have key := GlobalTheory.CompanionTheory.WeilSiegel.Free.Scale.free_rmul σ hσ J hJ (Fv F v) hloc 1
-    (coordW (Fv F v) b lam 1 N) (coordHerm (Fv F v) σ b lam 1) m (hW 1 N) (hH 1) hm hfree g hg τ hτ _ _ hmu hc 0
+    GlobalTheory.CompanionTheory.WeilSiegel.Free.Scale.isOpen_free b (Fv F v) hloc
+      (PI.VolStabSW.TensAllW.lip_field _)
+  have key :=
+    GlobalTheory.CompanionTheory.WeilSiegel.Free.Scale.free_rmul σ hσ J hJ (Fv F v) hloc 1
+      (coordW (Fv F v) b lam 1 N) (coordHerm (Fv F v) σ b lam 1) m (hW 1 N) (hH 1) hm hfree g hg τ
+      hτ _ _ hmu hc 0
   have hτ0 : τ 0 = 0 := by
     apply Subtype.ext
     funext i j
     change algebraMap (Fv F v) (Fv F v ⊗[F] E) s * 0 = 0
     rw [mul_zero]
   rw [hτ0, hrm] at key
-  have hTB : MeasurableSet (T '' B) := by
-    rw [himg]; exact hTim hB
+  have hTB : MeasurableSet (T '' B) := by rw [himg]; exact hTim hB
   have key2 := congrArg (fun μ' : Measure (Fin 1 → Fin N → Fv F v ⊗[F] E) => μ' (T '' B)) key
   simp only [Measure.smul_apply, Measure.map_apply hTm hTB] at key2
   have hpre : T ⁻¹' (T '' B) = B := by
@@ -196,32 +227,36 @@ theorem fibre_zero_image_mul (F E : Type) [Field F] [NumberField F] [Field E] [N
     congr 1
     obtain ⟨k, rfl⟩ : ∃ k, N = k + 1 := ⟨N - 1, by omega⟩
     rw [Nat.add_sub_cancel, pow_succ, mul_assoc, mul_inv_cancel₀ hq0, mul_one]
-  calc m 0 (T '' B) = ((q ^ N : ℝ≥0) : ℝ≥0∞) * (((q⁻¹ ^ N : ℝ≥0) : ℝ≥0∞) * m 0 (T '' B)) := by
-        rw [← mul_assoc, e1, one_mul]
+  calc
+    m 0 (T '' B) = ((q ^ N : ℝ≥0) : ℝ≥0∞) * (((q⁻¹ ^ N : ℝ≥0) : ℝ≥0∞) * m 0 (T '' B)) := by
+      rw [← mul_assoc, e1, one_mul]
     _ = _ := by rw [key2, ← mul_assoc, e2]
 
-theorem val_eq_one_eventually {F : Type} [Field F] [NumberField F] (a : F) (ha : a ≠ 0) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, Valued.v (algebraMap F (Fv F v) a) = 1 := by
-  have h1 := HeightOneSpectrum.Support.finite (𝓞 F) a
-  have h2 := HeightOneSpectrum.Support.finite (𝓞 F) a⁻¹
-  refine Filter.eventually_cofinite.2 ((h1.union h2).subset ?_)
-  intro v hv
-  by_contra hc
-  have hc1 : ¬ 1 < v.valuation F a := fun h => hc (Or.inl h)
-  have hc2 : ¬ 1 < v.valuation F a⁻¹ := fun h => hc (Or.inr h)
-  apply hv
-  rw [GlobalTheory.CompanionTheory.SW.Growth.val_alg]
-  have hne : v.valuation F a ≠ 0 := (Valuation.ne_zero_iff _).2 ha
-  rw [not_lt] at hc1 hc2
-  rw [map_inv₀] at hc2
-  exact le_antisymm hc1 ((inv_le_one₀ (zero_lt_iff.2 hne)).1 hc2)
+theorem val_eq_one_eventually {F : Type} [Field F] [NumberField F] (a : F) (ha : a ≠ 0)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, Valued.v (algebraMap F (Fv F v) a) = 1 :=
+  by
+    have h1 := HeightOneSpectrum.Support.finite (𝓞 F) a
+    have h2 := HeightOneSpectrum.Support.finite (𝓞 F) a⁻¹
+    refine Filter.eventually_cofinite.2 ((h1.union h2).subset ?_)
+    intro v hv
+    by_contra hc
+    have hc1 : ¬ 1 < v.valuation F a := fun h => hc (Or.inl h)
+    have hc2 : ¬ 1 < v.valuation F a⁻¹ := fun h => hc (Or.inr h)
+    apply hv
+    rw [GlobalTheory.CompanionTheory.SW.Growth.val_alg]
+    have hne : v.valuation F a ≠ 0 := (Valuation.ne_zero_iff _).2 ha
+    rw [not_lt] at hc1 hc2
+    rw [map_inv₀] at hc2
+    exact le_antisymm hc1 ((inv_le_one₀ (zero_lt_iff.2 hne)).1 hc2)
 
-theorem norm_le_of_nonunit (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) (d : ℕ) (b : Module.Basis (Fin d) F E) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∀ O : Subring (Fv F v ⊗[F] E),
-      (∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F) →
-      ∀ c : O, ¬ IsUnit c → IsUnit (c : Fv F v ⊗[F] E) →
-        ‖Algebra.norm (Fv F v) (c : Fv F v ⊗[F] E)‖ ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) := by
+theorem norm_le_of_nonunit
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ)
+    (d : ℕ) (b : Module.Basis (Fin d) F E)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∀ O : Subring (Fv F v ⊗[F] E),
+        (∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F) →
+        ∀ c : O, ¬ IsUnit c → IsUnit (c : Fv F v ⊗[F] E) →
+          ‖Algebra.norm (Fv F v) (c : Fv F v ⊗[F] E)‖ ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) := by
   haveI : Module.Finite F E := Module.finite_of_finrank_pos (by rw [hσ.2.2.1]; norm_num)
   have hb1 : b.repr 1 ≠ 0 := by
     intro h
@@ -237,25 +272,27 @@ theorem norm_le_of_nonunit (F E : Type) [Field F] [NumberField F] [Field E] [Num
   have hs0 : s ≠ 0 := (hcu.map (Algebra.norm (Fv F v))).ne_zero
   have hN' : algebraMap (Fv F v) (Fv F v ⊗[F] E) s = (c : Fv F v ⊗[F] E) * sigR (Fv F v) σ c :=
     GlobalTheory.Doubling.algebraMap_norm_eq hσ _
-  have hσc : sigR (Fv F v) σ c ∈ O :=
-    (hO _).2 ((hO' _).1 (hσO' _ ((hO' _).2 ((hO _).1 c.2))))
+  have hσc : sigR (Fv F v) σ c ∈ O := (hO _).2 ((hO' _).1 (hσO' _ ((hO' _).2 ((hO _).1 c.2))))
   have hy : algebraMap (Fv F v) (Fv F v ⊗[F] E) s ∈ O := by
     rw [hN']
     exact O.mul_mem c.2 hσc
-  have hrepr : ∀ (r : Fv F v) (y : Fv F v ⊗[F] E) (k : Fin d),
-      (Algebra.TensorProduct.basis (Fv F v) b).repr (algebraMap (Fv F v) (Fv F v ⊗[F] E) r * y) k =
-        r * (Algebra.TensorProduct.basis (Fv F v) b).repr y k := by
+  have hrepr
+      : ∀ (r : Fv F v) (y : Fv F v ⊗[F] E) (k : Fin d),
+        (Algebra.TensorProduct.basis (Fv F v) b).repr (algebraMap (Fv F v) (Fv F v ⊗[F] E) r * y) k
+          = r * (Algebra.TensorProduct.basis (Fv F v) b).repr y k := by
     intro r y k
     rw [← Algebra.smul_def, map_smul]
     rfl
-  have hone : (Algebra.TensorProduct.basis (Fv F v) b).repr (1 : Fv F v ⊗[F] E) k0 =
-      algebraMap F (Fv F v) (b.repr 1 k0) := by
+  have hone
+      : (Algebra.TensorProduct.basis (Fv F v) b).repr (1 : Fv F v ⊗[F] E) k0
+        = algebraMap F (Fv F v) (b.repr 1 k0) := by
     rw [Algebra.TensorProduct.one_def, Algebra.TensorProduct.basis_repr_tmul]
     simp
   have hs1 : Valued.v s ≤ 1 := by
     have h := (hO _).1 hy k0
     rw [← mul_one (algebraMap (Fv F v) (Fv F v ⊗[F] E) s), hrepr, hone,
-      HeightOneSpectrum.mem_adicCompletionIntegers, map_mul, hv, mul_one] at h
+        HeightOneSpectrum.mem_adicCompletionIntegers, map_mul, hv, mul_one]
+      at h
     exact h
   have hlt : Valued.v s < 1 := by
     refine lt_of_le_of_ne hs1 fun h1 => hc ?_

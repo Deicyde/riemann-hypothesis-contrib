@@ -29,7 +29,8 @@ theorem finite_supremum_slopes : FinSup := by
     have : ρ y ∈ zl ρ A := h ((finSup_mem_zl ρ B _).mpr ⟨y, hy, rfl⟩)
     obtain ⟨z, hz, hzy⟩ := (finSup_mem_zl ρ A _).mp this
     have := hL.1 (hAL hz) (hBL hy) hzy
-    rw [← this]; exact hz
+    rw [← this]
+    exact hz
   let g : Set.Iic L → Submodule ℤ (zl ρ L) := fun N => (zl ρ N.1).comap (zl ρ L).subtype
   have hg : StrictMono g := by
     intro A B hAB
@@ -45,8 +46,7 @@ theorem finite_supremum_slopes : FinSup := by
     rw [← heq] at hm
     exact hm
   haveI : WellFoundedGT (Set.Iic L) := hg.wellFoundedGT
-  have hcompact : ∀ s : Set (Set.Iic L), ∃ t : Finset (Set.Iic L),
-      ↑t ⊆ s ∧ sSup s = t.sup id := by
+  have hcompact : ∀ s : Set (Set.Iic L), ∃ t : Finset (Set.Iic L), ↑t ⊆ s ∧ sSup s = t.sup id := by
     intro s
     let T := {x | ∃ t : Finset (Set.Iic L), ↑t ⊆ s ∧ t.sup id = x}
     obtain ⟨m, ⟨t, ⟨ht, rfl⟩⟩, hm⟩ := wellFounded_gt.has_min T ⟨⊥, ∅, by simp⟩

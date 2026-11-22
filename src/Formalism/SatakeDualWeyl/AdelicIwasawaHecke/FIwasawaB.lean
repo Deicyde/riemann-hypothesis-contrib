@@ -15,29 +15,31 @@ variable {L : Type} [Field L] (σ : L →+* L) {n : ℕ}
 def fIwasawaP (π : Equiv.Perm (Fin n)) : Matrix (Fin n) (Fin n) L :=
   Matrix.of fun i j => if π i = j then 1 else 0
 
-theorem permMatrix_mulVec₂ (π : Equiv.Perm (Fin n)) (w : Fin n → L) :
-    fIwasawaP π *ᵥ w = fun i => w (π i) := by
+theorem permMatrix_mulVec₂ (π : Equiv.Perm (Fin n)) (w : Fin n → L)
+    : fIwasawaP π *ᵥ w = fun i => w (π i) := by
   funext i
   simp [fIwasawaP, Matrix.mulVec, dotProduct]
 
-theorem permMatrix_mul_apply₂ (π : Equiv.Perm (Fin n)) (M : Matrix (Fin n) (Fin n) L) (i j : Fin n) :
-    (fIwasawaP π * M : Matrix (Fin n) (Fin n) L) i j = M (π i) j := by
+theorem permMatrix_mul_apply₂ (π : Equiv.Perm (Fin n)) (M : Matrix (Fin n) (Fin n) L) (i j : Fin n)
+    : (fIwasawaP π * M : Matrix (Fin n) (Fin n) L) i j = M (π i) j := by
   simp [fIwasawaP, Matrix.mul_apply]
 
-theorem permMatrix_isUnitary_of_commute_rev (π : Equiv.Perm (Fin n)) (hπ : ∀ i, π (Fin.rev i) = Fin.rev (π i)) :
-    fIwasawaUn σ (fIwasawaP (L := L) π) := by
+theorem permMatrix_isUnitary_of_commute_rev
+    (π : Equiv.Perm (Fin n)) (hπ : ∀ i, π (Fin.rev i) = Fin.rev (π i))
+    : fIwasawaUn σ (fIwasawaP (L := L) π) := by
   apply fIwasawa_un_of_isometry
   intro x y
   simp only [fIwasawaH, permMatrix_mulVec₂, hπ]
   exact Equiv.sum_comp π (fun k => σ (x (Fin.rev k)) * y k)
 
 def fIwasawaE (e z : Fin n → L) (c : L) : Matrix (Fin n) (Fin n) L :=
-  Matrix.of fun i j => (if i = j then 1 else 0) + z i * σ (e (Fin.rev j)) - e i * σ (z (Fin.rev j)) +
-    c * e i * σ (e (Fin.rev j))
+  Matrix.of fun i j =>
+    (if i = j then 1 else 0) + z i * σ (e (Fin.rev j)) - e i * σ (z (Fin.rev j))
+      + c * e i * σ (e (Fin.rev j))
 
-theorem fIwasawa_E_mulVec (e z : Fin n → L) (c : L) (w : Fin n → L) :
-    fIwasawaE σ e z c *ᵥ w = w + fIwasawaH σ e w • z - fIwasawaH σ z w • e +
-      (c * fIwasawaH σ e w) • e := by
+theorem fIwasawa_E_mulVec (e z : Fin n → L) (c : L) (w : Fin n → L)
+    : fIwasawaE σ e z c *ᵥ w
+      = w + fIwasawaH σ e w • z - fIwasawaH σ z w • e + (c * fIwasawaH σ e w) • e := by
   funext i
   simp only [fIwasawaE, fIwasawaH, Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.add_apply,
     Pi.sub_apply, Pi.smul_apply, smul_eq_mul, add_mul, sub_mul, Finset.sum_add_distrib,
@@ -45,9 +47,11 @@ theorem fIwasawa_E_mulVec (e z : Fin n → L) (c : L) (w : Fin n → L) :
     Finset.mul_sum, Finset.sum_mul]
   ring_nf
 
-theorem fIwasawa_E_un (hσ : ∀ x, σ (σ x) = x) (e z : Fin n → L) (c : L)
-    (hee : fIwasawaH σ e e = 0) (hez : fIwasawaH σ e z = 0)
-    (hc : c + σ c + fIwasawaH σ z z = 0) : fIwasawaUn σ (fIwasawaE σ e z c) := by
+theorem fIwasawa_E_un
+    (hσ : ∀ x, σ (σ x) = x)
+    (e z : Fin n → L) (c : L)
+    (hee : fIwasawaH σ e e = 0) (hez : fIwasawaH σ e z = 0) (hc : c + σ c + fIwasawaH σ z z = 0)
+    : fIwasawaUn σ (fIwasawaE σ e z c) := by
   have Hal : ∀ x x' y : Fin n → L, fIwasawaH σ (x + x') y = fIwasawaH σ x y + fIwasawaH σ x' y := by
     intro x x' y
     simp [fIwasawaH, add_mul, Finset.sum_add_distrib]
@@ -87,8 +91,8 @@ variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] (σ : L
 
 def fIwasawaInt (M : Matrix (Fin n) (Fin n) L) : Prop := ∀ i j, Valued.v (M i j) ≤ 1
 
-theorem fIwasawa_int_mul (A B : Matrix (Fin n) (Fin n) L) (hA : fIwasawaInt A) (hB : fIwasawaInt B) :
-    fIwasawaInt (A * B) := by
+theorem fIwasawa_int_mul (A B : Matrix (Fin n) (Fin n) L) (hA : fIwasawaInt A) (hB : fIwasawaInt B)
+    : fIwasawaInt (A * B) := by
   intro i j
   rw [Matrix.mul_apply]
   exact Valuation.map_sum_le _ fun k _ => by rw [map_mul]; exact mul_le_one' (hA i k) (hB k j)
@@ -98,8 +102,9 @@ theorem fIwasawa_int_one : fIwasawaInt (1 : Matrix (Fin n) (Fin n) L) := by
   rw [Matrix.one_apply]
   split_ifs <;> simp
 
-theorem fIwasawa_int_inv (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (M : Matrix (Fin n) (Fin n) L)
-    (hM : fIwasawaInt M) : fIwasawaInt (fIwasawaInv σ M) := by
+theorem fIwasawa_int_inv
+    (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaInt M)
+    : fIwasawaInt (fIwasawaInv σ M) := by
   have hJ : fIwasawaInt (antiJ L n) := by
     intro i j
     simp only [antiJ]
@@ -112,9 +117,11 @@ theorem fIwasawa_int_inv (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (M : Matri
   unfold fIwasawaInv
   exact fIwasawa_int_mul _ _ (fIwasawa_int_mul _ _ hJ hcT) hJ
 
-theorem fIwasawa_int_E (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (e z : Fin n → L) (c : L)
-    (he : ∀ i, Valued.v (e i) ≤ 1) (hz : ∀ i, Valued.v (z i) ≤ 1) (hc : Valued.v c ≤ 1) :
-    fIwasawaInt (fIwasawaE σ e z c) := by
+theorem fIwasawa_int_E
+    (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    (e z : Fin n → L) (c : L)
+    (he : ∀ i, Valued.v (e i) ≤ 1) (hz : ∀ i, Valued.v (z i) ≤ 1) (hc : Valued.v c ≤ 1)
+    : fIwasawaInt (fIwasawaE σ e z c) := by
   intro i j
   simp only [fIwasawaE, Matrix.of_apply]
   have h1 : Valued.v (if i = j then (1 : L) else 0) ≤ 1 := by split_ifs <;> simp
@@ -126,18 +133,20 @@ theorem fIwasawa_int_E (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (e z : Fin n
   · rw [map_mul, map_mul, hσv]
     exact mul_le_one' (mul_le_one' hc (he i)) (he _)
 
-theorem fIwasawa_mk_mem_K (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (M : Matrix (Fin n) (Fin n) L)
-    (hM : fIwasawaUn σ M) (hI : fIwasawaInt M) : fIwasawaMk σ M hM ∈ KU σ n := by
+theorem fIwasawa_mk_mem_K
+    (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (hI : fIwasawaInt M)
+    : fIwasawaMk σ M hM ∈ KU σ n := by
   have hinvI := fIwasawa_int_inv σ hσv M hI
   rw [KU, Subgroup.mem_subgroupOf]
   refine Subgroup.mem_inf.2 ⟨(fIwasawaMk σ M hM).2, ?_⟩
   let A : Matrix (Fin n) (Fin n) (intL L) := Matrix.of fun i j => ⟨M i j, hI i j⟩
   let B : Matrix (Fin n) (Fin n) (intL L) := Matrix.of fun i j => ⟨fIwasawaInv σ M i j, hinvI i j⟩
   have hinj : Function.Injective
-      (RingHom.mapMatrix (intL L).subtype : Matrix (Fin n) (Fin n) (intL L) →+* Matrix (Fin n) (Fin n) L) :=
-    fun X Y h => by
-      ext i j
-      exact congrFun (congrFun h i) j
+      (RingHom.mapMatrix (intL L).subtype
+        : Matrix (Fin n) (Fin n) (intL L) →+* Matrix (Fin n) (Fin n) L) := fun X Y h => by
+    ext i j
+    exact congrFun (congrFun h i) j
   have hA : RingHom.mapMatrix (intL L).subtype A = M := by ext i j; rfl
   have hB : RingHom.mapMatrix (intL L).subtype B = fIwasawaInv σ M := by ext i j; rfl
   have hAB : A * B = 1 := hinj (by rw [map_mul, hA, hB, map_one, fIwasawa_mul_inv σ M hM])

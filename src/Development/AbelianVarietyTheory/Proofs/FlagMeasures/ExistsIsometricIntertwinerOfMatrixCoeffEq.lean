@@ -9,9 +9,12 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem inner_translate_translate_of_norm {G : Type} [Group G] {H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g x, ‖σ g x‖ = ‖x‖) (w : H)
-    (g h : G) : ⟪σ g w, σ h w⟫_ℂ = ⟪w, σ (g⁻¹ * h) w⟫_ℂ := by
+theorem inner_translate_translate_of_norm
+    {G : Type} [Group G]
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g x, ‖σ g x‖ = ‖x‖)
+    (w : H) (g h : G)
+    : ⟪σ g w, σ h w⟫_ℂ = ⟪w, σ (g⁻¹ * h) w⟫_ℂ := by
   have hmul : σ h w = σ g (σ (g⁻¹ * h) w) := by
     show σ h w = (σ g * σ (g⁻¹ * h)) w
     rw [← map_mul, mul_inv_cancel_left]
@@ -19,13 +22,14 @@ theorem inner_translate_translate_of_norm {G : Type} [Group G] {H : Type} [Norme
   rw [hmul]
   exact T.inner_map_map w (σ (g⁻¹ * h) w)
 
-theorem exists_isometric_intertwiner_of_matrixCoeff_eq :
-    ∀ (G : Type) [Group G] (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-      [CompleteSpace H] (σ : G →* (H →L[ℂ] H)) (Hp : Type) [NormedAddCommGroup Hp]
-      [InnerProductSpace ℂ Hp] [CompleteSpace Hp] (π : G →* (Hp →L[ℂ] Hp)),
-      (∀ g x, ‖σ g x‖ = ‖x‖) → (∀ g x, ‖π g x‖ = ‖x‖) → ∀ (w : H) (v : Hp),
-      (∀ y : H, (∀ g, ⟪y, σ g w⟫_ℂ = 0) → y = 0) → (∀ g, ⟪v, π g v⟫_ℂ = ⟪w, σ g w⟫_ℂ) →
-      ∃ io : H →ₗᵢ[ℂ] Hp, io w = v ∧ ∀ (g : G) (u : H), io (σ g u) = π g (io u) := by
+theorem exists_isometric_intertwiner_of_matrixCoeff_eq
+    : ∀ (G : Type) [Group G] (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        [CompleteSpace H] (σ : G →* (H →L[ℂ] H)) (Hp : Type) [NormedAddCommGroup Hp]
+        [InnerProductSpace ℂ Hp] [CompleteSpace Hp] (π : G →* (Hp →L[ℂ] Hp)),
+      (∀ g x, ‖σ g x‖ = ‖x‖) → (∀ g x, ‖π g x‖ = ‖x‖)
+        → ∀ (w : H) (v : Hp),
+          (∀ y : H, (∀ g, ⟪y, σ g w⟫_ℂ = 0) → y = 0) → (∀ g, ⟪v, π g v⟫_ℂ = ⟪w, σ g w⟫_ℂ)
+            → ∃ io : H →ₗᵢ[ℂ] Hp, io w = v ∧ ∀ (g : G) (u : H), io (σ g u) = π g (io u) := by
   intro G _ H _ _ _ σ Hp _ _ _ π hσ hπ w v hcyc hvw
 
   obtain ⟨A, hA⟩ : ∃ A : (G →₀ ℂ) →ₗ[ℂ] H, A = Finsupp.linearCombination ℂ (fun g => σ g w) :=
@@ -39,8 +43,8 @@ theorem exists_isometric_intertwiner_of_matrixCoeff_eq :
   have hinner : ∀ c d, ⟪B c, B d⟫_ℂ = ⟪A c, A d⟫_ℂ := by
     intro c d
     rw [hA, hB]
-    simp only [Finsupp.linearCombination_apply, Finsupp.sum, sum_inner, inner_sum,
-      inner_smul_left, inner_smul_right, hkey]
+    simp only [Finsupp.linearCombination_apply, Finsupp.sum, sum_inner, inner_sum, inner_smul_left,
+      inner_smul_right, hkey]
   have hnorm : ∀ c, ‖B c‖ = ‖A c‖ := by
     intro c
     rw [norm_eq_sqrt_re_inner (𝕜 := ℂ), norm_eq_sqrt_re_inner (𝕜 := ℂ) (A c), hinner]
@@ -49,8 +53,8 @@ theorem exists_isometric_intertwiner_of_matrixCoeff_eq :
     rw [LinearMap.mem_ker] at hc ⊢
     rw [← norm_eq_zero, hnorm, hc, norm_zero]
 
-  obtain ⟨F, hF⟩ : ∃ F : LinearMap.range A →ₗ[ℂ] Hp,
-      ∀ c, F ⟨A c, LinearMap.mem_range_self A c⟩ = B c :=
+  obtain ⟨F, hF⟩
+      : ∃ F : LinearMap.range A →ₗ[ℂ] Hp, ∀ c, F ⟨A c, LinearMap.mem_range_self A c⟩ = B c :=
     ⟨(LinearMap.ker A).liftQ B hker ∘ₗ A.quotKerEquivRange.symm.toLinearMap, fun c => by simp⟩
   have hFn : ∀ y, ‖F y‖ = ‖y‖ := by
     rintro ⟨_, c, rfl⟩
@@ -68,7 +72,8 @@ theorem exists_isometric_intertwiner_of_matrixCoeff_eq :
   have huni : IsUniformInducing (LinearMap.range A).subtypeL :=
     (LinearMap.range A).subtypeₗᵢ.isometry.isUniformInducing
 
-  obtain ⟨X, hXdef⟩ : ∃ X : H →L[ℂ] Hp, X = F'.toContinuousLinearMap.extend (LinearMap.range A).subtypeL :=
+  obtain ⟨X, hXdef⟩
+      : ∃ X : H →L[ℂ] Hp, X = F'.toContinuousLinearMap.extend (LinearMap.range A).subtypeL :=
     ⟨_, rfl⟩
   have hX : ∀ c, X (A c) = B c := fun c => by
     rw [hXdef]
@@ -76,8 +81,9 @@ theorem exists_isometric_intertwiner_of_matrixCoeff_eq :
       ⟨A c, LinearMap.mem_range_self A c⟩).trans (hF c)
   have hXn : ∀ u, ‖X u‖ = ‖u‖ := by
     intro u
-    refine hdense.induction_on (p := fun u => ‖X u‖ = ‖u‖) u
-      (isClosed_eq (continuous_norm.comp X.continuous) continuous_norm) ?_
+    refine hdense.induction_on
+      (p := fun u => ‖X u‖ = ‖u‖)
+      u (isClosed_eq (continuous_norm.comp X.continuous) continuous_norm) ?_
     rintro ⟨_, c, rfl⟩
     show ‖X (A c)‖ = ‖A c‖
     rw [hX, hnorm]
@@ -100,8 +106,9 @@ theorem exists_isometric_intertwiner_of_matrixCoeff_eq :
     simp [map_mul]
   have hXi : ∀ g u, X (σ g u) = π g (X u) := by
     intro g u
-    refine hdense.induction_on (p := fun u => X (σ g u) = π g (X u)) u
-      (isClosed_eq (X.continuous.comp (σ g).continuous) ((π g).continuous.comp X.continuous)) ?_
+    refine hdense.induction_on
+      (p := fun u => X (σ g u) = π g (X u))
+      u (isClosed_eq (X.continuous.comp (σ g).continuous) ((π g).continuous.comp X.continuous)) ?_
     rintro ⟨_, c, rfl⟩
     show X (σ g (A c)) = π g (X (A c))
     rw [hshA, hX, hX, hshB]

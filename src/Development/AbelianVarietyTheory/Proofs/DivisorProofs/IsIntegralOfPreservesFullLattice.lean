@@ -25,14 +25,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulMat
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT
 open scoped Classical
 
 namespace GlobalTheory.UnitLemma
 
-theorem aeval_restrict_coe_of_stable {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
-    (f : Module.End R M) {N : Submodule R M} (h : ∀ x ∈ N, f x ∈ N) (q : R[X]) (x : N) :
-    ((aeval (f.restrict h) q x : N) : M) = aeval f q x := by
+theorem aeval_restrict_coe_of_stable
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    (f : Module.End R M)
+    {N : Submodule R M} (h : ∀ x ∈ N, f x ∈ N)
+    (q : R[X]) (x : N)
+    : ((aeval (f.restrict h) q x : N) : M) = aeval f q x := by
   induction q using Polynomial.induction_on' with
   | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, Submodule.coe_add, ha, hb]
   | monomial n a =>
@@ -42,11 +46,15 @@ theorem aeval_restrict_coe_of_stable {R M : Type} [CommRing R] [AddCommGroup M] 
       | zero => intro y; rfl
       | succ k ih =>
         intro y
-        rw [pow_succ', Module.End.mul_apply, LinearMap.coe_restrict_apply, ih, pow_succ', Module.End.mul_apply]
-    simp only [aeval_monomial, Module.End.mul_apply, Module.algebraMap_end_apply, Submodule.coe_smul, hpow]
+        rw [pow_succ', Module.End.mul_apply, LinearMap.coe_restrict_apply, ih, pow_succ',
+          Module.End.mul_apply]
+    simp only [aeval_monomial, Module.End.mul_apply, Module.algebraMap_end_apply,
+      Submodule.coe_smul, hpow]
 
-theorem isIntegral_of_lat_stable : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.UnitLemma.InvAlg K) (u : B.A)
-    (L : Submodule K.O B.A), GlobalTheory.UnitLemma.IsLat K.O K.E L → (∀ z ∈ L, u * z ∈ L) → IsIntegral K.O u := by
+theorem isIntegral_of_lat_stable
+    : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.UnitLemma.InvAlg K) (u : B.A)
+        (L : Submodule K.O B.A),
+      GlobalTheory.UnitLemma.IsLat K.O K.E L → (∀ z ∈ L, u * z ∈ L) → IsIntegral K.O u := by
   intro K B u L hL hu
   haveI : Module.Finite K.O L := Module.Finite.iff_fg.mpr hL.1
   let f : Module.End K.O B.A := LinearMap.mulLeft K.O u

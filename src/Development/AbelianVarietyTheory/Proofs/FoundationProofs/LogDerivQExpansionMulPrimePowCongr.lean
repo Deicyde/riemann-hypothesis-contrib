@@ -14,11 +14,10 @@ open scoped MatrixGroups
 
 namespace GlobalTheory.Glue.DlPow
 
-
 open scoped MatrixGroups in
-theorem _root_.GlobalTheory.Glue.DlPow.isAlgebraic_of_tower {Ω : Type} [Field Ω] [Algebra ℚ Ω]
-    {ε : Ω →+* ℂ} (X : _root_.GlobalTheory.KZ.Tower Ω ε) :
-    Algebra.IsAlgebraic ℚ Ω := by
+theorem _root_.GlobalTheory.Glue.DlPow.isAlgebraic_of_tower
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X : _root_.GlobalTheory.KZ.Tower Ω ε)
+    : Algebra.IsAlgebraic ℚ Ω := by
   refine ⟨fun c => ?_⟩
   obtain ⟨D, hD, hint⟩ := X.bdd (algebraMap Ω X.K c)
   obtain ⟨k, hk⟩ := hint 0
@@ -90,24 +89,25 @@ private lemma hahnSeries_coeff_pow_mem_valuationSubring {Ω : Type} [Field Ω] (
     rw [pow_succ]
     exact hahnSeries_coeff_mul_mem_valuationSubring A ih hx r
 
-
 open scoped MatrixGroups in
-theorem _root_.GlobalTheory.Glue.DlPow.isDl_mul_lpow_cong : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω]
-    [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ} (X : _root_.GlobalTheory.KZ.Tower Ω ε)
-    (A : ValuationSubring Ω) (l : ℕ) [Fact l.Prime], (l : Ω) ∈ A.nonunits →
-    ∀ (n : ℕ) (f u : X.K), f ≠ 0 → u ≠ 0 →
-      X.sl (_root_.GlobalTheory.KZ.ofSL ModularGroup.T) u = u →
-      ∀ φ φ' : HahnSeries ℚ Ω, _root_.GlobalTheory.Glue.IsDl X A l n 1 f φ →
-        _root_.GlobalTheory.Glue.IsDl X A l n 1 (f * u ^ (l ^ n)) φ' →
-          ∀ r, _root_.GlobalTheory.Glue.CgA A l n (φ.coeff r) (φ'.coeff r) := by
+theorem _root_.GlobalTheory.Glue.DlPow.isDl_mul_lpow_cong
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ}
+        (X : _root_.GlobalTheory.KZ.Tower Ω ε) (A : ValuationSubring Ω) (l : ℕ) [Fact l.Prime],
+      (l : Ω) ∈ A.nonunits
+        → ∀ (n : ℕ) (f u : X.K),
+          f ≠ 0 → u ≠ 0 → X.sl (_root_.GlobalTheory.KZ.ofSL ModularGroup.T) u = u
+            → ∀ φ φ' : HahnSeries ℚ Ω,
+              _root_.GlobalTheory.Glue.IsDl X A l n 1 f φ
+                → _root_.GlobalTheory.Glue.IsDl X A l n 1 (f * u ^ (l ^ n)) φ'
+                → ∀ r, _root_.GlobalTheory.Glue.CgA A l n (φ.coeff r) (φ'.coeff r) := by
   intro Ω _ _ _ ε X A l _ hl n f u hf hu hT φ φ' hφ hφ' r
-  have hj : ∃ g : ℂ → ℂ, DifferentiableOn ℂ g _root_.GlobalTheory.KZ.Hs ∧
-      X.an X.jK = ↑g := by
+  have hj : ∃ g : ℂ → ℂ, DifferentiableOn ℂ g _root_.GlobalTheory.KZ.Hs ∧ X.an X.jK = ↑g := by
     obtain ⟨g, h1, h2⟩ := X.j_hol
     exact ⟨g, h2, h1⟩
-  have hden : ∀ x : X.K,
-      X.sl (_root_.GlobalTheory.KZ.ofSL ModularGroup.T) x = x →
-        ∀ s, (X.exp x).coeff s ≠ 0 → s.den = 1 := by
+  have hden
+      : ∀ x : X.K,
+        X.sl (_root_.GlobalTheory.KZ.ofSL ModularGroup.T) x = x
+          → ∀ s, (X.exp x).coeff s ≠ 0 → s.den = 1 := by
     intro x hx s hs
     have hmem : x ∈ _root_.GlobalTheory.Glue.KT X 1 := by
       rw [_root_.GlobalTheory.Glue.KT.mem_def, pow_one]
@@ -127,8 +127,17 @@ theorem _root_.GlobalTheory.Glue.DlPow.isDl_mul_lpow_cong : ∀ {Ω : Type} [Fie
     have hPaA := hPa.1
     have hPbA := hPb.1
     unfold _root_.GlobalTheory.Glue.IsDl
-    refine ⟨fun s => by simpa using zero_mem A, a ^ (l ^ n), b ^ (l ^ n), κ ^ (l ^ n),
-      pow_ne_zero _ hκ, by rw [map_pow, ← mul_pow, ← mul_pow, hab], ?_, ?_, fun s => ?_⟩
+    refine ⟨
+      fun s => by simpa using zero_mem A,
+      a ^ (l ^ n),
+      b ^ (l ^ n),
+      κ ^ (l ^ n),
+      pow_ne_zero _ hκ,
+      by rw [map_pow, ← mul_pow, ← mul_pow, hab],
+      ?_,
+      ?_,
+      fun s => ?_
+    ⟩
     · rw [map_pow, hk]
       exact prim_pow_succ hPa k
     · rw [map_pow, hk]
@@ -142,24 +151,28 @@ theorem _root_.GlobalTheory.Glue.DlPow.isDl_mul_lpow_cong : ∀ {Ω : Type} [Fie
         have hθP := theta_one_coeff_mem_of_integral_den_one A hPaA (hden a haT)
         have hθQ := theta_one_coeff_mem_of_integral_den_one A hPbA (hden b hbT)
         refine hahnSeries_coeff_mul_mem_valuationSubring A
-          (hahnSeries_coeff_mul_mem_valuationSubring A (hahnSeries_coeff_pow_mem_valuationSubring A hPaA k)
-            (hahnSeries_coeff_pow_mem_valuationSubring A hPbA k)) (fun t => ?_) s
+          (hahnSeries_coeff_mul_mem_valuationSubring A
+            (hahnSeries_coeff_pow_mem_valuationSubring A hPaA k)
+            (hahnSeries_coeff_pow_mem_valuationSubring A hPbA k))
+          (fun t => ?_)
+          s
         rw [HahnSeries.coeff_sub]
         exact sub_mem (hahnSeries_coeff_mul_mem_valuationSubring A hθP hPbA t)
           (hahnSeries_coeff_mul_mem_valuationSubring A hPaA hθQ t)
-      have hexp : HahnSeries.C ((k + 1 : ℕ) : Ω) * P ^ k * _root_.GlobalTheory.Glue.theta 1 P *
-          Q ^ (k + 1) -
-          P ^ (k + 1) * (HahnSeries.C ((k + 1 : ℕ) : Ω) * Q ^ k * _root_.GlobalTheory.Glue.theta 1 Q) =
-          HahnSeries.C ((k + 1 : ℕ) : Ω) * W := by
+      have hexp
+          : HahnSeries.C ((k + 1 : ℕ) : Ω) * P ^ k * _root_.GlobalTheory.Glue.theta 1 P
+                * Q ^ (k + 1)
+              - P ^ (k + 1)
+                * (HahnSeries.C ((k + 1 : ℕ) : Ω) * Q ^ k * _root_.GlobalTheory.Glue.theta 1 Q)
+            = HahnSeries.C ((k + 1 : ℕ) : Ω) * W := by
         simp only [W]
         ring
       unfold _root_.GlobalTheory.Glue.CgA
-      refine ⟨-W.coeff s, neg_mem hW, ?_⟩
+      refine ⟨- W.coeff s, neg_mem hW, ?_⟩
       rw [hexp, HahnSeries.C_mul_eq_smul, HahnSeries.coeff_smul, zero_mul, zero_mul,
         HahnSeries.coeff_zero, hl', smul_eq_mul]
       ring
-  have h := (_root_.GlobalTheory.Glue.isDl_calc ε X hj l A hl n 1 f (u ^ (l ^ n)) φ 0).1
-    hφ hu0
+  have h := (_root_.GlobalTheory.Glue.isDl_calc ε X hj l A hl n 1 f (u ^ (l ^ n)) φ 0).1 hφ hu0
   simpa using _root_.GlobalTheory.Glue.isDl_unique ε X hj l A hl n 1 _ _ _ h hφ' r
 
 end GlobalTheory.Glue.DlPow

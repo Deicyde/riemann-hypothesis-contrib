@@ -6,9 +6,13 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PadicIntermed
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc GlobalTheory.Poinc.Eq8 Formalism.L2.Pj
 open scoped TensorProduct
@@ -17,8 +21,15 @@ open Classical
 
 namespace GlobalTheory
 
-theorem stalk_noetherian_and_finite_image :
-    ∀ (X : Scheme.{0}) (U : X.Opens), IsAffineOpen U → ∀ x ∈ U, Algebra.FiniteType ℤ Γ(X, U) → ∀ (p : ℕ) [Fact p.Prime] (φ : X.presheaf.stalk x →+* OO p), IsNoetherianRing (X.presheaf.stalk x) ∧ ∃ K : IntermediateField ℚ_[p] (PadicAlgCl p), FiniteDimensional ℚ_[p] K ∧ ∀ a, ((φ a : OO p) : PadicAlgCl p) ∈ K := by
+theorem stalk_noetherian_and_finite_image
+    : ∀ (X : Scheme.{0}) (U : X.Opens),
+      IsAffineOpen U
+        → ∀ x ∈ U,
+          Algebra.FiniteType ℤ Γ(X, U)
+            → ∀ (p : ℕ) [Fact p.Prime] (φ : X.presheaf.stalk x →+* OO p),
+              IsNoetherianRing (X.presheaf.stalk x)
+                ∧ ∃ K : IntermediateField ℚ_[p] (PadicAlgCl p),
+                  FiniteDimensional ℚ_[p] K ∧ ∀ a, ((φ a : OO p) : PadicAlgCl p) ∈ K := by
   intro X U hU x hx hft p _ φ
   letI : Algebra Γ(X, U) (X.presheaf.stalk x) := X.presheaf.algebra_section_stalk ⟨x, hx⟩
   have hloc := hU.isLocalization_stalk ⟨x, hx⟩
@@ -41,17 +52,17 @@ theorem stalk_noetherian_and_finite_image :
         exact Set.mem_image_of_mem f hy
       | algebraMap n =>
         have : f (algebraMap ℤ Γ(X, U) n) = (n : PadicAlgCl p) := by simp
-        rw [this]; exact K.intCast_mem n
+        rw [this]
+        exact K.intCast_mem n
       | add a b _ _ ha hb => rw [map_add (f := _)]; exact K.add_mem ha hb
       | mul a b _ _ ha hb => rw [map_mul]; exact K.mul_mem ha hb
     intro a
-    obtain ⟨⟨r, t⟩, rfl⟩ := IsLocalization.mk'_surjective
-      (hU.primeIdealOf ⟨x, hx⟩).asIdeal.primeCompl a
+    obtain ⟨⟨r, t⟩, rfl⟩ :=
+      IsLocalization.mk'_surjective (hU.primeIdealOf ⟨x, hx⟩).asIdeal.primeCompl a
     have hspec := IsLocalization.mk'_spec (X.presheaf.stalk x) r t
     have hunit : IsUnit (algebraMap Γ(X, U) (X.presheaf.stalk x) t) := IsLocalization.map_units _ t
     have hne : f t ≠ 0 := (hunit.map ψ).ne_zero
-    have heq : ψ (IsLocalization.mk' (X.presheaf.stalk x) r t) =
-        f r * (f t)⁻¹ := by
+    have heq : ψ (IsLocalization.mk' (X.presheaf.stalk x) r t) = f r * (f t)⁻¹ := by
       have h2 := congrArg ψ hspec
       rw [map_mul] at h2
       change ψ _ * f t = f r at h2

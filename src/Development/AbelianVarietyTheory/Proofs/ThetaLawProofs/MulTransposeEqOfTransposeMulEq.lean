@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.TransposeMulCommute
 
-theorem mul_transpose_eq_of_transpose_mul_eq :
-    ∀ {al : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) ℤ} {m : ℕ}, (1 : ℕ) ≤ m →
-      Matrix.transpose al * al = (↑m : ℤ) • (1 : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) ℤ) →
-      al * Matrix.transpose al = (↑m : ℤ) • (1 : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) ℤ) := by
+theorem mul_transpose_eq_of_transpose_mul_eq
+    : ∀ {al : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) ℤ} {m : ℕ},
+      (1 : ℕ) ≤ m → Matrix.transpose al * al = (↑m : ℤ) • (1 : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) ℤ)
+        → al * Matrix.transpose al = (↑m : ℤ) • (1 : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) ℤ) := by
   intro al m hm h
   have hm0 : (m : ℤ) ≠ 0 := by
     have : m ≠ 0 := by omega

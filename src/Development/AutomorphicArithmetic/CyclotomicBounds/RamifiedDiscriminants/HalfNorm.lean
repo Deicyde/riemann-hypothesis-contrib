@@ -19,7 +19,8 @@ variable {R : Ranks} (H : Host R)
 
 theorem mem_ramI_iff {p : ℕ} (hp : p.Prime) : p ∈ H.toHostRaw.ramI ↔ p ∣ H.QS * H.q := by
   have h0 : (discr H.E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (discr_ne_zero _)
-  rw [Formalism.HC.HostRaw.ramI, Finset.mem_erase, Formalism.HC.HostRaw.ram, Nat.mem_primeFactors, H.dvd_natAbs_discr_iff hp]
+  rw [Formalism.HC.HostRaw.ramI, Finset.mem_erase, Formalism.HC.HostRaw.ram, Nat.mem_primeFactors,
+    H.dvd_natAbs_discr_iff hp]
   constructor
   · rintro ⟨hd, -, h, -⟩
     exact ((Nat.Prime.dvd_mul hp).1 h).resolve_right fun h' =>
@@ -29,19 +30,29 @@ theorem mem_ramI_iff {p : ℕ} (hp : p.Prime) : p ∈ H.toHostRaw.ramI ↔ p ∣
     rintro rfl
     exact H.toHostRaw.d_not_dvd_QSq h
 
-private theorem liesOver_of_mem {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) (P : Ideal (𝓞 E)) [P.IsPrime]
-    (h : (p : 𝓞 E) ∈ P) : P.LiesOver (span {(p : ℤ)}) :=
+private theorem liesOver_of_mem
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime)
+    (P : Ideal (𝓞 E)) [P.IsPrime]
+    (h : (p : 𝓞 E) ∈ P)
+    : P.LiesOver (span {(p : ℤ)}) :=
   ⟨Ideal.IsMaximal.eq_of_le
     (PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.1 hp).irreducible)
-    (Ideal.IsPrime.ne_top inferInstance) (by
-      rw [Ideal.span_singleton_le_iff_mem, Ideal.mem_comap, map_natCast]; exact h)⟩
+    (Ideal.IsPrime.ne_top inferInstance)
+    (by rw [Ideal.span_singleton_le_iff_mem, Ideal.mem_comap, map_natCast]; exact h)⟩
 
-private theorem dvd_absNorm_of {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) (P J : Ideal (𝓞 E)) [hP : P.IsPrime]
-    (h : (p : 𝓞 E) ∈ P) (hJ : P ∣ J) : p ∣ absNorm J := by
+private theorem dvd_absNorm_of
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime)
+    (P J : Ideal (𝓞 E)) [hP : P.IsPrime]
+    (h : (p : 𝓞 E) ∈ P) (hJ : P ∣ J)
+    : p ∣ absNorm J := by
   by_contra hn
-  obtain ⟨u, v, huv⟩ : IsCoprime (p : 𝓞 E) ((absNorm J : ℕ) : 𝓞 E) := ((Nat.Prime.coprime_iff_not_dvd hp).2 hn).cast
+  obtain ⟨u, v, huv⟩ : IsCoprime (p : 𝓞 E) ((absNorm J : ℕ) : 𝓞 E) :=
+    ((Nat.Prime.coprime_iff_not_dvd hp).2 hn).cast
   exact hP.ne_top ((Ideal.eq_top_iff_one P).2
-    (huv ▸ P.add_mem (P.mul_mem_left u h) (P.mul_mem_left v (Ideal.le_of_dvd hJ (Ideal.absNorm_mem J)))))
+    (huv ▸ P.add_mem (P.mul_mem_left u h)
+      (P.mul_mem_left v (Ideal.le_of_dvd hJ (Ideal.absNorm_mem J)))))
 
 theorem half_ne_bot : H.𝔟 ≠ ⊥ := fun h => by
   have h1 := H.𝔟_spec.1
@@ -73,7 +84,9 @@ theorem prime_dvd_absNorm_half_iff {p : ℕ} (hp : p.Prime) : p ∣ absNorm H.�
     · exact dvd_absNorm_of hp P _ hm h2
     · have hm' : (p : 𝓞 H.E) ∈ H.toHostRaw.conj • P := by
         have := Ideal.smul_mem_pointwise_smul H.toHostRaw.conj _ _ hm
-        rwa [show H.toHostRaw.conj • (p : 𝓞 H.E) = p from map_natCast (MulSemiringAction.toRingHom _ (𝓞 H.E) H.toHostRaw.conj) p] at this
+        rwa [show H.toHostRaw.conj • (p : 𝓞 H.E) = p from
+            map_natCast (MulSemiringAction.toRingHom _ (𝓞 H.E) H.toHostRaw.conj) p]
+          at this
       exact dvd_absNorm_of hp _ _ hm' h2
 
 theorem four_ord_le_condN : 4 * R.toFrame.ord ≤ H.QS * H.q * H.d := by

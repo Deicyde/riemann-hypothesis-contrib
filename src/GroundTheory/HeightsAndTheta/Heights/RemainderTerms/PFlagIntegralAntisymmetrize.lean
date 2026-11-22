@@ -15,10 +15,10 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem flagIntegral_sum_smul_blockPermute (f N : ℕ) (H : RootRing f N)
-    (s : Finset (Fin f → Equiv.Perm (Fin N))) :
-    flagIntegral f N (∑ w ∈ s, blockSign f N w • blockPermute f N w H) =
-      ∑ w ∈ s, blockSign f N w * flagIntegral f N (blockPermute f N w H) := by
+theorem flagIntegral_sum_smul_blockPermute
+    (f N : ℕ) (H : RootRing f N) (s : Finset (Fin f → Equiv.Perm (Fin N)))
+    : flagIntegral f N (∑ w ∈ s, blockSign f N w • blockPermute f N w H)
+      = ∑ w ∈ s, blockSign f N w * flagIntegral f N (blockPermute f N w H) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [Flag.flagIntegral_zero]
@@ -26,8 +26,8 @@ theorem flagIntegral_sum_smul_blockPermute (f N : ℕ) (H : RootRing f N)
     rw [Finset.sum_insert ha, Finset.sum_insert ha, Flag.flagIntegral_add, ih, smul_eq_C_mul,
       Flag.flagIntegral_C_mul]
 
-theorem FlagIntegralAntisymmetrize.proof (h1 : FlagIntegralPermute.Statement) :
-    FlagIntegralAntisymmetrize.Statement := by
+theorem FlagIntegralAntisymmetrize.proof (h1 : FlagIntegralPermute.Statement)
+    : FlagIntegralAntisymmetrize.Statement := by
   intro f N H
   rw [antisymmetrize, flagIntegral_sum_smul_blockPermute]
   rw [Finset.sum_congr rfl fun w _ => by

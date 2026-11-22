@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Bijectiv
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped NumberField CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,8 +20,11 @@ noncomputable section
 
 namespace GlobalTheory.HTTorsRep
 
-theorem absNorm_coprime {K : Type} [Field K] [NumberField K] (p : ℕ) [hp : Fact p.Prime] (𝔟 : Ideal (𝓞 K))
-    (h : 𝔟 ⊔ Ideal.span {(p : 𝓞 K)} = ⊤) : (Ideal.absNorm 𝔟).Coprime p := by
+theorem absNorm_coprime
+    {K : Type} [Field K] [NumberField K]
+    (p : ℕ) [hp : Fact p.Prime]
+    (𝔟 : Ideal (𝓞 K)) (h : 𝔟 ⊔ Ideal.span {(p : 𝓞 K)} = ⊤)
+    : (Ideal.absNorm 𝔟).Coprime p := by
   rw [Nat.coprime_comm, Nat.Prime.coprime_iff_not_dvd hp.out]
   intro hdvd
   have h1 : (1 : 𝓞 K) ∈ 𝔟 ⊔ Ideal.span {(p : 𝓞 K)} := h ▸ Submodule.mem_top
@@ -43,11 +48,11 @@ theorem absNorm_coprime {K : Type} [Field K] [NumberField K] (p : ℕ) [hp : Fac
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply] at hne hdvd
     have : Finite (𝓞 K ⧸ 𝔟) := Nat.finite_of_card_ne_zero hne
     obtain ⟨x, hx⟩ := exists_prime_addOrderOf_dvd_card' p hdvd
-    have hpx : (p : 𝓞 K ⧸ 𝔟) * x = 0 := by
-      rw [← nsmul_eq_mul, ← hx, addOrderOf_nsmul_eq_zero]
+    have hpx : (p : 𝓞 K ⧸ 𝔟) * x = 0 := by rw [← nsmul_eq_mul, ← hx, addOrderOf_nsmul_eq_zero]
     have h1' : (Ideal.Quotient.mk 𝔟 y) * (p : 𝓞 K ⧸ 𝔟) = 1 := by
       have := congrArg (Ideal.Quotient.mk 𝔟) hβz
-      rwa [map_add, Ideal.Quotient.eq_zero_iff_mem.2 hβ, zero_add, map_mul, map_natCast, map_one] at this
+      rwa [map_add, Ideal.Quotient.eq_zero_iff_mem.2 hβ, zero_add, map_mul, map_natCast, map_one] at
+        this
     have hx0 : x = 0 := by
       rw [← _root_.one_mul x, ← h1', _root_.mul_assoc, hpx, MulZeroClass.mul_zero]
     rw [hx0, addOrderOf_zero] at hx
@@ -70,29 +75,45 @@ theorem mono_ι : Mono (torsion.ι A n) := by
   have := mono_of_unit η[A]
   exact pullback.fst_of_mono
 
-def torsAct (f : A ⟶ A) [IsMonHom f] (hf : f ≫ mulN A n = mulN A n ≫ f) : torsion A n ⟶ torsion A n :=
-  pullback.lift (torsion.ι A n ≫ f) (toUnit _) (by
-    rw [Category.assoc, hf, ← Category.assoc, ι_mulN, Category.assoc, IsMonHom.one_hom])
+def torsAct (f : A ⟶ A) [IsMonHom f] (hf : f ≫ mulN A n = mulN A n ≫ f)
+    : torsion A n ⟶ torsion A n :=
+  pullback.lift (torsion.ι A n ≫ f) (toUnit _)
+    (by rw [Category.assoc, hf, ← Category.assoc, ι_mulN, Category.assoc, IsMonHom.one_hom])
 
 @[simp]
-theorem torsAct_ι (f : A ⟶ A) [IsMonHom f] (hf : f ≫ mulN A n = mulN A n ≫ f) :
-    torsAct n f hf ≫ torsion.ι A n = torsion.ι A n ≫ f := pullback.lift_fst _ _ _
+theorem torsAct_ι (f : A ⟶ A) [IsMonHom f] (hf : f ≫ mulN A n = mulN A n ≫ f)
+    : torsAct n f hf ≫ torsion.ι A n = torsion.ι A n ≫ f :=
+  pullback.lift_fst _ _ _
 
-theorem exists_openClosed {Ix : Type} [DecidableEq Ix] (act : Ix → (A ⟶ A)) [∀ a, IsMonHom (act a)]
-    (hc : ∀ a, act a ≫ mulN A n = mulN A n ≫ act a) [Etale (torsion A n).hom] [IsSeparated (torsion A n).hom]
-    (t : Finset Ix) :
-    ∃ (Z : Over S) (j : Z ⟶ torsion A n), Mono j ∧ IsOpenImmersion j.left ∧ IsClosedImmersion j.left ∧
-      ∀ (W : Over S) (y : W ⟶ torsion A n), (∃ z, z ≫ j = y) ↔ ∀ a ∈ t, y ≫ torsion.ι A n ≫ act a = 1 := by
+theorem exists_openClosed
+    {Ix : Type} [DecidableEq Ix]
+    (act : Ix → (A ⟶ A)) [∀ a, IsMonHom (act a)]
+    (hc : ∀ a, act a ≫ mulN A n = mulN A n ≫ act a)
+    [Etale (torsion A n).hom] [IsSeparated (torsion A n).hom]
+    (t : Finset Ix)
+    : ∃ (Z : Over S) (j : Z ⟶ torsion A n),
+      Mono j ∧ IsOpenImmersion j.left ∧ IsClosedImmersion j.left
+        ∧ ∀ (W : Over S) (y : W ⟶ torsion A n),
+          (∃ z, z ≫ j = y) ↔ ∀ a ∈ t, y ≫ torsion.ι A n ≫ act a = 1 := by
   have hEta : torsEta n ≫ torsion.ι A n = η[A] := pullback.lift_fst _ _ _
-  have hsec : IsOpenImmersion (torsEta (A := A) n).left ∧ IsClosedImmersion (torsEta (A := A) n).left :=
-    GlobalTheory.isOpenImmersion_and_isClosedImmersion_of_section_of_etale (torsion A n).hom _ (Over.w (torsEta n))
-  have := hsec.1; have := hsec.2
+  have hsec
+      : IsOpenImmersion (torsEta (A := A) n).left ∧ IsClosedImmersion (torsEta (A := A) n).left :=
+    GlobalTheory.isOpenImmersion_and_isClosedImmersion_of_section_of_etale (torsion A n).hom _
+      (Over.w (torsEta n))
+  have := hsec.1
+  have := hsec.2
   have := mono_of_unit (torsEta (A := A) n)
   have := mono_ι (A := A) n
   induction t using Finset.induction_on with
   | empty =>
-    exact ⟨_, 𝟙 _, inferInstance, by rw [Over.id_left]; infer_instance, by rw [Over.id_left]; infer_instance, fun W y =>
-      ⟨fun _ a ha => absurd ha (Finset.notMem_empty a), fun _ => ⟨y, Category.comp_id y⟩⟩⟩
+    exact ⟨
+      _,
+      𝟙 _,
+      inferInstance,
+      by rw [Over.id_left]; infer_instance,
+      by rw [Over.id_left]; infer_instance,
+      fun W y => ⟨fun _ a ha => absurd ha (Finset.notMem_empty a), fun _ => ⟨y, Category.comp_id y⟩⟩
+    ⟩
   | insert a t hat ih =>
     obtain ⟨Z, j, hj, hjo, hjc, hpts⟩ := ih
     let g := j ≫ torsAct n (act a) (hc a)
@@ -101,7 +122,8 @@ theorem exists_openClosed {Ix : Type} [DecidableEq Ix] (act : Ix → (A ⟶ A)) 
       MorphismProperty.of_isPullback (P := @IsOpenImmersion) hP.flip hsec.1
     have hcl : IsClosedImmersion (pullback.fst g (torsEta n)).left :=
       MorphismProperty.of_isPullback (P := @IsClosedImmersion) hP.flip hsec.2
-    refine ⟨pullback g (torsEta n), pullback.fst g (torsEta n) ≫ j, inferInstance, ?_, ?_, fun W y => ?_⟩
+    refine
+      ⟨pullback g (torsEta n), pullback.fst g (torsEta n) ≫ j, inferInstance, ?_, ?_, fun W y => ?_⟩
     · rw [Over.comp_left]; infer_instance
     · rw [Over.comp_left]; infer_instance
     constructor
@@ -111,21 +133,32 @@ theorem exists_openClosed {Ix : Type} [DecidableEq Ix] (act : Ix → (A ⟶ A)) 
         simp only [Category.assoc]
         rw [e, ← Category.assoc (pullback.fst g _), pullback.condition]
         simp only [Category.assoc, hEta]
-        rw [← Category.assoc, toUnit_unique (z ≫ pullback.snd g (torsEta n)) (toUnit W)]; rfl
+        rw [← Category.assoc, toUnit_unique (z ≫ pullback.snd g (torsEta n)) (toUnit W)]
+        rfl
       · exact (hpts W _).1 ⟨z ≫ pullback.fst _ _, Category.assoc _ _ _⟩ b hb
     · intro h
       obtain ⟨w, hw⟩ := (hpts W y).2 (fun b hb => h b (Finset.mem_insert_of_mem hb))
       have hwg : w ≫ g = toUnit W ≫ torsEta n := by
         rw [← cancel_mono (torsion.ι A n)]
         simp only [g, Category.assoc, torsAct_ι, hEta]
-        rw [← Category.assoc w j, hw, h a (Finset.mem_insert_self a t)]; rfl
+        rw [← Category.assoc w j, hw, h a (Finset.mem_insert_self a t)]
+        rfl
       exact ⟨pullback.lift w (toUnit W) hwg, by rw [← Category.assoc, pullback.lift_fst, hw]⟩
 
 end Tors
 
-
 open GlobalTheory.IwLevel in
-theorem exists_finiteEtale_killedBy : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R] (b : GlobalTheory.UPel.HT.Base D R) (N : ℕ) (S : Scheme.{0}) (s : S ⟶ Sp R) (o : GlobalTheory.UPel.HT.Obj b N s) (𝔟 : Ideal (𝓞 D.F)), 𝔟 ⊔ Ideal.span {(p : 𝓞 D.F)} = ⊤ → ∃ (K : Over S) (i : K ⟶ o.A), Mono i ∧ IsFinite K.hom ∧ Etale K.hom ∧ ∀ (T : Over S) (x : T ⟶ o.A), GlobalTheory.IwLevel.InSub i x ↔ GlobalTheory.IwLevel.KilledBy (GlobalTheory.IwLevel.htAct o) (𝔟.map (algebraMap (𝓞 D.F) D.O)) x := by
+theorem exists_finiteEtale_killedBy
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R]
+        (b : GlobalTheory.UPel.HT.Base D R) (N : ℕ) (S : Scheme.{0}) (s : S ⟶ Sp R)
+        (o : GlobalTheory.UPel.HT.Obj b N s) (𝔟 : Ideal (𝓞 D.F)),
+      𝔟 ⊔ Ideal.span {(p : 𝓞 D.F)} = ⊤
+        → ∃ (K : Over S) (i : K ⟶ o.A),
+          Mono i ∧ IsFinite K.hom ∧ Etale K.hom
+            ∧ ∀ (T : Over S) (x : T ⟶ o.A),
+              GlobalTheory.IwLevel.InSub i x
+                ↔ GlobalTheory.IwLevel.KilledBy (GlobalTheory.IwLevel.htAct o)
+                  (𝔟.map (algebraMap (𝓞 D.F) D.O)) x := by
   intro p _ D R _ b N S s o 𝔟 h𝔟
   classical
   set n := Ideal.absNorm 𝔟 with hn_def

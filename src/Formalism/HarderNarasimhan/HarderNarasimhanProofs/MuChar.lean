@@ -14,16 +14,19 @@ noncomputable section
 
 namespace Formalism.HN
 
-theorem muChar_zl_mono {R V E : Type*} [Ring R] [AddCommGroup V] [Module R V]
-    [NormedAddCommGroup E] [InnerProductSpace ℝ E] (ρ : V →+ E) {A B : Submodule R V}
-    (h : A ≤ B) : zl ρ A ≤ zl ρ B := by
+theorem muChar_zl_mono
+    {R V E : Type*}
+    [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    (ρ : V →+ E)
+    {A B : Submodule R V} (h : A ≤ B)
+    : zl ρ A ≤ zl ρ B := by
   intro y hy
   obtain ⟨x, hx, rfl⟩ : ∃ x ∈ A, ρ x = y := hy
   exact (⟨x, h hx, rfl⟩ : ∃ x' ∈ B, ρ x' = ρ x)
 
 universe u v w in
-theorem muChar_of (h1 : SatR.{u, v, w}) (h2 : SatBasic.{u, v, w}) (h3 : RatioMax.{u, v, w}) :
-    MuChar.{u, v, w} := by
+theorem muChar_of (h1 : SatR.{u, v, w}) (h2 : SatBasic.{u, v, w}) (h3 : RatioMax.{u, v, w})
+    : MuChar.{u, v, w} := by
   intro R V E _ _ _ _ _ _ ρ L hL hL0
   obtain ⟨-, P2, P3, P4, P5, P6, -, P8⟩ := h2 R V E ρ L hL
   have hdisc : DiscreteTopology (zl ρ L) := hL.2
@@ -66,8 +69,7 @@ theorem muChar_of (h1 : SatR.{u, v, w}) (h2 : SatBasic.{u, v, w}) (h3 : RatioMax
     refine ⟨c, ?_⟩
     rintro t ⟨N, hN, hN0, rfl⟩
     exact hsc N hN hN0
-  have part1 : ∀ θ : ℝ, muMax ρ L ≤ θ ↔
-      ∀ N : Submodule R V, N ≤ L → deg ρ N ≤ θ * rk ρ N := by
+  have part1 : ∀ θ : ℝ, muMax ρ L ≤ θ ↔ ∀ N : Submodule R V, N ≤ L → deg ρ N ≤ θ * rk ρ N := by
     intro θ
     rw [hmuMax]
     constructor
@@ -91,15 +93,16 @@ theorem muChar_of (h1 : SatR.{u, v, w}) (h2 : SatBasic.{u, v, w}) (h3 : RatioMax
     rcases lt_or_eq_of_le hle with h | h
     · exact h
     · exact absurd (P3 S L hS hS.1 le_rfl h.symm).symm hSL
-  have hdpos : ∀ S : Submodule R V, IsSat ρ L S → S ≠ L →
-      (1 : ℝ) ≤ (rk ρ L : ℝ) - rk ρ S := by
+  have hdpos : ∀ S : Submodule R V, IsSat ρ L S → S ≠ L → (1 : ℝ) ≤ (rk ρ L : ℝ) - rk ρ S := by
     intro S hS hSL
     have h' : rk ρ S + 1 ≤ rk ρ L := hsatlt S hS hSL
     have : (rk ρ S : ℝ) + 1 ≤ rk ρ L := by exact_mod_cast h'
     linarith
-  have hqslope : ∀ S : Submodule R V, IsSat ρ L S →
-      Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ S)) =
-        (deg ρ L - deg ρ S) / ((rk ρ L : ℝ) - rk ρ S) := by
+  have hqslope
+      : ∀ S : Submodule R V,
+        IsSat ρ L S
+          → Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ S))
+            = (deg ρ L - deg ρ S) / ((rk ρ L : ℝ) - rk ρ S) := by
     intro S hS
     obtain ⟨hr, hle, hd⟩ := P8 S hS
     show Formalism.F.deg _ / (Formalism.F.rk _ : ℝ) = _
@@ -119,8 +122,10 @@ theorem muChar_of (h1 : SatR.{u, v, w}) (h2 : SatBasic.{u, v, w}) (h3 : RatioMax
     have m2 := min_le_right (deg ρ L - max c 0 * rk ρ L) 0
     have m3 := mul_le_mul_of_nonpos_left hd m2
     linarith
-  have part2 : ∀ θ : ℝ, θ ≤ muMin ρ L ↔
-      ∀ N : Submodule R V, N ≤ L → θ * ((rk ρ L : ℝ) - rk ρ N) ≤ deg ρ L - deg ρ N := by
+  have part2
+      : ∀ θ : ℝ,
+        θ ≤ muMin ρ L
+          ↔ ∀ N : Submodule R V, N ≤ L → θ * ((rk ρ L : ℝ) - rk ρ N) ≤ deg ρ L - deg ρ N := by
     intro θ
     rw [hmuMin]
     constructor
@@ -164,16 +169,19 @@ theorem muChar_of (h1 : SatR.{u, v, w}) (h2 : SatBasic.{u, v, w}) (h3 : RatioMax
     simp only [sub_zero, Nat.cast_zero] at hm
     rw [hslope, hslope, div_le_div_iff₀ (hrkpos N' hN' hN'0) (hrkpos N hNsat.1 hN0)]
     linarith
-  have hquotbot : Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ (⊥ : Submodule R V))) = slope ρ L := by
+  have hquotbot
+      : Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ (⊥ : Submodule R V))) = slope ρ L := by
     rw [hqslope ⊥ P6, P5, hrk0, hslope]
     simp
   refine ⟨part1, part2, part3, ?_, ?_⟩
   · rw [hmuMin, ← hquotbot]
     exact csInf_le hUbdd
-      (show Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ (⊥ : Submodule R V))) ∈ U from ⟨⊥, P6, hL0.symm, rfl⟩)
+      (show Formalism.F.slope (Formalism.F.quot (zl ρ L) (zl ρ (⊥ : Submodule R V))) ∈ U from
+        ⟨⊥, P6, hL0.symm, rfl⟩)
   · rw [hmuMax]
     exact le_csSup hTbdd (show slope ρ L ∈ T from ⟨L, le_rfl, hL0, rfl⟩)
 
-theorem slope_characterization : MuChar := muChar_of real_saturation_property saturation_basic_properties maximal_slope_ratio
+theorem slope_characterization : MuChar :=
+  muChar_of real_saturation_property saturation_basic_properties maximal_slope_ratio
 
 end Formalism.HN

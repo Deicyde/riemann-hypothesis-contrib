@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-private theorem pq_iff {l : ℕ} {G : Type} [Group G] (N : Subgroup G) [N.Normal] :
-    IsPGroup l (G ⧸ N) ↔ ∀ g : G, ∃ k : ℕ, g ^ l ^ k ∈ N := by
+private theorem pq_iff {l : ℕ} {G : Type} [Group G] (N : Subgroup G) [N.Normal]
+    : IsPGroup l (G ⧸ N) ↔ ∀ g : G, ∃ k : ℕ, g ^ l ^ k ∈ N := by
   refine ⟨fun h g => ?_, fun h x => ?_⟩
   · obtain ⟨k, hk⟩ := h (g : G ⧸ N)
     exact ⟨k, by rwa [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff] at hk⟩
@@ -17,9 +17,11 @@ private theorem pq_iff {l : ℕ} {G : Type} [Group G] (N : Subgroup G) [N.Normal
     obtain ⟨k, hk⟩ := h g
     exact ⟨k, by rwa [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]⟩
 
-theorem UpperTheory.V.AlgebraTools.proLRes_map :
-    ∀ (l : ℕ) [Fact l.Prime] (G H : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G] [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [CompactSpace H] [TotallyDisconnectedSpace H] (f : G →* H), Continuous f → Function.Surjective f →
-      (proLRes l G).map f = proLRes l H := by
+theorem UpperTheory.V.AlgebraTools.proLRes_map
+    : ∀ (l : ℕ) [Fact l.Prime] (G H : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        [CompactSpace G] [TotallyDisconnectedSpace G] [Group H] [TopologicalSpace H]
+        [IsTopologicalGroup H] [CompactSpace H] [TotallyDisconnectedSpace H] (f : G →* H),
+      Continuous f → Function.Surjective f → (proLRes l G).map f = proLRes l H := by
   intro l _ G H _ _ _ _ _ _ _ _ _ _ f hf hs
   apply le_antisymm
   · rw [Subgroup.map_le_iff_le_comap]
@@ -27,9 +29,10 @@ theorem UpperTheory.V.AlgebraTools.proLRes_map :
     rw [Subgroup.mem_comap, mem_proLRes]
     intro N hN
     rw [pq_iff] at hN
-    let M : OpenNormalSubgroup G :=
-      { toOpenSubgroup := OpenSubgroup.comap f hf N.toOpenSubgroup
-        isNormal' := Subgroup.Normal.comap inferInstance f }
+    let M : OpenNormalSubgroup G := {
+      toOpenSubgroup := OpenSubgroup.comap f hf N.toOpenSubgroup
+      isNormal' := Subgroup.Normal.comap inferInstance f
+    }
     haveI : (M.toOpenSubgroup : Subgroup G).Normal := M.isNormal'
     have hM : IsPGroup l (G ⧸ (M.toOpenSubgroup : Subgroup G)) := by
       rw [pq_iff]
@@ -43,9 +46,13 @@ theorem UpperTheory.V.AlgebraTools.proLRes_map :
     exact (OpenSubgroup.mem_comap (hf := hf)).mp this
   · intro h hh
     rw [mem_proLRes] at hh
-    let t : {N : OpenNormalSubgroup G // IsPGroup l (G ⧸ (N.toOpenSubgroup : Subgroup G))} → Set G :=
+    let t
+        : {N : OpenNormalSubgroup G // IsPGroup l (G ⧸ (N.toOpenSubgroup : Subgroup G))} → Set G :=
       fun N => f ⁻¹' {h} ∩ (N.1.toOpenSubgroup : Set G)
-    let T0 : OpenNormalSubgroup G := { toOpenSubgroup := ⊤, isNormal' := by simpa using Subgroup.normal_top }
+    let T0 : OpenNormalSubgroup G := {
+      toOpenSubgroup := ⊤
+      isNormal' := by simpa using Subgroup.normal_top
+    }
     haveI : (T0.toOpenSubgroup : Subgroup G).Normal := T0.isNormal'
     have htop : IsPGroup l (G ⧸ (T0.toOpenSubgroup : Subgroup G)) := by
       rw [pq_iff]
@@ -79,7 +86,8 @@ theorem UpperTheory.V.AlgebraTools.proLRes_map :
         exact ⟨hx.1, (OpenSubgroup.mem_inf.mp hx2).2⟩
     have hnon : ∀ i, (t i).Nonempty := by
       intro i
-      have hNcl : IsClosed ((i.1.toOpenSubgroup : Subgroup G) : Set G) := i.1.toOpenSubgroup.isClosed
+      have hNcl : IsClosed ((i.1.toOpenSubgroup : Subgroup G) : Set G) :=
+        i.1.toOpenSubgroup.isClosed
       have hMcl : IsClosed (((i.1.toOpenSubgroup : Subgroup G).map f : Subgroup H) : Set H) := by
         rw [Subgroup.coe_map]
         exact hf.isClosedMap _ hNcl
@@ -90,10 +98,13 @@ theorem UpperTheory.V.AlgebraTools.proLRes_map :
         have hd := Subgroup.index_map_dvd (i.1.toOpenSubgroup : Subgroup G) hs
         rw [h0, zero_dvd_iff] at hd
         exact (Subgroup.finiteIndex_iff.mp inferInstance) hd
-      let M : OpenNormalSubgroup H :=
-        { toOpenSubgroup := ⟨(i.1.toOpenSubgroup : Subgroup G).map f,
-            Subgroup.isOpen_of_isClosed_of_finiteIndex _ hMcl⟩
-          isNormal' := Subgroup.Normal.map inferInstance f hs }
+      let M : OpenNormalSubgroup H := {
+        toOpenSubgroup := ⟨
+          (i.1.toOpenSubgroup : Subgroup G).map f,
+          Subgroup.isOpen_of_isClosed_of_finiteIndex _ hMcl
+        ⟩
+        isNormal' := Subgroup.Normal.map inferInstance f hs
+      }
       haveI : (M.toOpenSubgroup : Subgroup H).Normal := M.isNormal'
       have hM : IsPGroup l (H ⧸ (M.toOpenSubgroup : Subgroup H)) := by
         rw [pq_iff]
@@ -105,8 +116,10 @@ theorem UpperTheory.V.AlgebraTools.proLRes_map :
         exact ⟨x ^ l ^ k, hk, map_pow f x _⟩
       obtain ⟨x, hx, hfx⟩ := Subgroup.mem_map.mp (hh M hM)
       exact ⟨x, hfx, hx⟩
-    obtain ⟨g, hg⟩ := IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed t hdir hnon
-      (fun i => (hcl i).isCompact) hcl
+    obtain ⟨g, hg⟩ :=
+      IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed t hdir hnon
+        (fun i => (hcl i).isCompact)
+        hcl
     rw [Set.mem_iInter] at hg
     refine ⟨g, ?_, (hg (Classical.arbitrary _)).1⟩
     rw [SetLike.mem_coe, mem_proLRes]

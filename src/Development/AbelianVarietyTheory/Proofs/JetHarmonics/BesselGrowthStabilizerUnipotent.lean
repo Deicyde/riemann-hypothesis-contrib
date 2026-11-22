@@ -9,26 +9,30 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.UhMeasurable
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory
 
 namespace BesselGrowth
 
-theorem continuous_hsNorm (k r : ℕ) :
-    Continuous (fun x : Formalism.QuantumDeterminants.Mt k r => Formalism.FourierDecayAlt.B.gN (Matrix.of x : Mx k r)) := by
+theorem continuous_hsNorm (k r : ℕ)
+    : Continuous (fun x : Formalism.QuantumDeterminants.Mt k r =>
+      Formalism.FourierDecayAlt.B.gN (Matrix.of x : Mx k r)) := by
   unfold Formalism.FourierDecayAlt.B.gN
   refine Real.continuous_sqrt.comp ?_
   refine continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ => ?_
   refine Complex.continuous_normSq.comp ?_
   exact (continuous_apply j).comp (continuous_apply i)
 
-theorem measurable_hsNorm_rpow (k r : ℕ) (A : ℝ) :
-    Measurable (fun x : Formalism.QuantumDeterminants.Mt k r => Formalism.FourierDecayAlt.B.gN (Matrix.of x : Mx k r) ^ (-A)) :=
+theorem measurable_hsNorm_rpow (k r : ℕ) (A : ℝ)
+    : Measurable (fun x : Formalism.QuantumDeterminants.Mt k r =>
+      Formalism.FourierDecayAlt.B.gN (Matrix.of x : Mx k r) ^ (-A)) :=
   (continuous_hsNorm k r).measurable.pow_const _
 
-theorem hsNorm_nonneg {k r : ℕ} (g : Mx k r) : 0 ≤ Formalism.FourierDecayAlt.B.gN g := Real.sqrt_nonneg _
+theorem hsNorm_nonneg {k r : ℕ} (g : Mx k r) : 0 ≤ Formalism.FourierDecayAlt.B.gN g :=
+  Real.sqrt_nonneg _
 
 theorem growthS_of (hN : NormInv) (hG : GrowthG) : GrowthS := by
   intro k r z μW μN μG νq A _ _ hW hNn hGm hq hA
@@ -51,8 +55,9 @@ theorem growthS_of (hN : NormInv) (hG : GrowthG) : GrowthS := by
   have hSfin : ∫⁻ s, F s ∂(muSof μW μN) < ⊤ := by
     by_contra hc
     have htop : ∫⁻ s, F s ∂(muSof μW μN) = ⊤ := top_le_iff.mp (not_lt.mp hc)
-    have hle : ∫⁻ _x, (⊤ : ℝ≥0∞) ∂νq ≤
-        ∫⁻ x, (∫⁻ s, F (fun i j => (Matrix.of s * Matrix.of x) i j) ∂(muSof μW μN)) ∂νq := by
+    have hle
+        : ∫⁻ _x, (⊤ : ℝ≥0∞) ∂νq
+          ≤ ∫⁻ x, (∫⁻ s, F (fun i j => (Matrix.of s * Matrix.of x) i j) ∂(muSof μW μN)) ∂νq := by
       refine lintegral_mono_ae ?_
       filter_upwards [hae] with x hx
       have hx1 := ((hN k r).2 _ hx).2
@@ -73,22 +78,32 @@ theorem growthS_of (hN : NormInv) (hG : GrowthG) : GrowthS := by
       exact Real.rpow_le_rpow_of_nonpos (lt_of_lt_of_le one_pos hsx) ((hN k r).1 _ _) (by linarith)
     rw [← hq F hFm, lintegral_const, ENNReal.top_mul hν] at hle
     exact absurd hfin (not_lt.mpr hle)
-  have hf : Continuous (fun p : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r =>
+  have hf : Continuous (fun p
+        : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r =>
       (fun i j => (Matrix.of p.1 * Matrix.of p.2) i j : Formalism.QuantumDeterminants.Mt k r)) := by
-    have h1 : Continuous (fun p : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r => (Matrix.of p.1 : Mx k r)) :=
+    have h1 : Continuous (fun p
+          : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r =>
+        (Matrix.of p.1 : Mx k r)) :=
       continuous_fst
-    have h2 : Continuous (fun p : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r => (Matrix.of p.2 : Mx k r)) :=
+    have h2 : Continuous (fun p
+          : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r =>
+        (Matrix.of p.2 : Mx k r)) :=
       continuous_snd
     exact h1.matrix_mul h2
-  have hI : Integrable (fun x : Formalism.QuantumDeterminants.Mt k r => Formalism.FourierDecayAlt.B.gN (Matrix.of x : Mx k r) ^ (-A))
-      (muSof μW μN) :=
-    ⟨hm.aestronglyMeasurable, (hasFiniteIntegral_iff_ofReal
-      (Filter.Eventually.of_forall fun x => Real.rpow_nonneg (hsNorm_nonneg _) _)).mpr hSfin⟩
+  have hI : Integrable
+      (fun x : Formalism.QuantumDeterminants.Mt k r =>
+        Formalism.FourierDecayAlt.B.gN (Matrix.of x : Mx k r) ^ (-A))
+      (muSof μW μN) := ⟨
+    hm.aestronglyMeasurable,
+    (hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall fun x =>
+      Real.rpow_nonneg (hsNorm_nonneg _) _)).mpr hSfin
+  ⟩
   exact (integrable_map_measure hm.aestronglyMeasurable hf.measurable.aemeasurable).mp hI
 
 end BesselGrowth
 
 theorem besselGrowthS : Formalism.FourierDecayAlt.ThreeDimData.GrowthS :=
-  BesselGrowth.growthS_of GlobalTheory.T.hilbertSchmidt_norm_submul_inv_ge_one GlobalTheory.T.growth_unitaryGroup_rpow_neg_integrable
+  BesselGrowth.growthS_of GlobalTheory.T.hilbertSchmidt_norm_submul_inv_ge_one
+    GlobalTheory.T.growth_unitaryGroup_rpow_neg_integrable
 
 end GlobalTheory

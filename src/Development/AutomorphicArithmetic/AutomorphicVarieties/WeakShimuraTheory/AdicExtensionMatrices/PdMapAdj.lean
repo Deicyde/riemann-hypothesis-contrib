@@ -4,22 +4,27 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-private theorem adj_map_ringHom {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (M : M4 R) :
-    adj (M.map f) = (adj M).map f := by
+private theorem adj_map_ringHom {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (M : M4 R)
+    : adj (M.map f) = (adj M).map f := by
   ext i j
   simp [adj, Matrix.map_apply]
 
-private theorem sxPdMap_lemma_2 {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (c : R) (M : M4 R)
-    (h : IsGSp c M) : IsGSp (f c) (M.map f) := by
+private theorem sxPdMap_lemma_2
+    {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (c : R) (M : M4 R) (h : IsGSp c M)
+    : IsGSp (f c) (M.map f) := by
   simp only [IsGSp] at h ⊢
   rw [adj_map_ringHom, ← Matrix.map_mul, h]
   ext i j
   by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
 
-theorem UpperTheory.V.Ws.sxPdMap :
-    ∀ {O Γ : Type} [CommRing O] [Group Γ] {Φ : Fr O Γ} {R R' : Type} [CommRing R] [CommRing R'] (a : O →+* R) (f : R →+* R') (P : PD Φ.ι Γ R), (∀ v i s, (P.map f).ψ v i s = f (P.ψ v i s)) ∧ (Φ.IsPair a P → Φ.IsPair (f.comp a) (P.map f)) ∧ (Φ.Res a P → Φ.Res (f.comp a) (P.map f)) := by
+theorem UpperTheory.V.Ws.sxPdMap
+    : ∀ {O Γ : Type} [CommRing O] [Group Γ] {Φ : Fr O Γ} {R R' : Type} [CommRing R] [CommRing R']
+        (a : O →+* R) (f : R →+* R') (P : PD Φ.ι Γ R),
+      (∀ v i s, (P.map f).ψ v i s = f (P.ψ v i s)) ∧ (Φ.IsPair a P → Φ.IsPair (f.comp a) (P.map f))
+        ∧ (Φ.Res a P → Φ.Res (f.comp a) (P.map f)) := by
   intro O Γ _ _ Φ R R' _ _ a f P
   have hr : ∀ s, mapRep f P.r s = (P.r s).map f := fun s => by
     ext i j
@@ -47,7 +52,8 @@ theorem UpperTheory.V.Ws.sxPdMap :
       simp only [IsUp] at this ⊢
       simp only [PD.map, hr]
       intro i j hij
-      rw [adj_map_ringHom, ← Matrix.map_mul, ← Matrix.map_mul, Matrix.map_apply, this i j hij, map_zero]
+      rw [adj_map_ringHom, ← Matrix.map_mul, ← Matrix.map_mul, Matrix.map_apply, this i j hij,
+        map_zero]
     · rw [hψ, h6 v s hs i, map_one]
   · obtain ⟨h1, h2, h3⟩ := h
     refine ⟨fun g i => ?_, fun v s hs i => ?_, ?_⟩
@@ -58,6 +64,8 @@ theorem UpperTheory.V.Ws.sxPdMap :
       rfl
     · simp only [Supp, SuppM, PD.map] at h3 ⊢
       rcases h3 with ⟨hA, hB⟩ | hC
-      · exact Or.inl ⟨fun g i j h h' => by rw [mapRep_apply, hA g i j h h', map_zero],
-          fun v i j h h' => by rw [Matrix.map_apply, hB v i j h h', map_zero]⟩
+      · exact Or.inl ⟨
+          fun g i j h h' => by rw [mapRep_apply, hA g i j h h', map_zero],
+          fun v i j h h' => by rw [Matrix.map_apply, hB v i j h h', map_zero]
+        ⟩
       · exact Or.inr fun g i j h h' => by rw [mapRep_apply, hC g i j h h', map_zero]

@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 noncomputable section
 
 open scoped Matrix NNReal TensorProduct Classical
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum
 open GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.MixModel GlobalTheory.RegSW
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -29,14 +31,10 @@ end Pure
 
 section Lattice
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) {n r m : ℕ}
-  (J : Matrix (Fin n) (Fin n) E)
-
-
-
-
-
-
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n r m : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
 end Lattice
 

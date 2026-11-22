@@ -22,8 +22,8 @@ theorem measurableSet_cusp_region (C c : ℝ) : MeasurableSet (B1 C c) := by
     (continuous_abs.comp (Complex.continuous_im.comp continuous_subtype_val)).measurable
   exact (measurableSet_le h1 measurable_const).inter (measurableSet_le measurable_const h2)
 
-theorem pt_bound (C c : ℝ) (hc : 0 < c) (t : ℂ) (h1 : |t.re| ≤ C) (h2 : c ≤ |t.im|) :
-    1 / t.im ^ 2 ≤ (1 + C ^ 2) * (1 + 1 / c ^ 2) * ((1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹) := by
+theorem pt_bound (C c : ℝ) (hc : 0 < c) (t : ℂ) (h1 : |t.re| ≤ C) (h2 : c ≤ |t.im|)
+    : 1 / t.im ^ 2 ≤ (1 + C ^ 2) * (1 + 1 / c ^ 2) * ((1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹) := by
   have hc2 : 0 < c ^ 2 := by positivity
   have hb : c ^ 2 ≤ t.im ^ 2 := by
     nlinarith [sq_abs t.im, mul_nonneg (sub_nonneg.2 h2) (add_nonneg (abs_nonneg t.im) hc.le)]
@@ -37,58 +37,70 @@ theorem pt_bound (C c : ℝ) (hc : 0 < c) (t : ℂ) (h1 : |t.re| ≤ C) (h2 : c 
     have h3 : 1 ≤ t.im ^ 2 / c ^ 2 := by
       rw [le_div_iff₀ hc2]
       linarith
-    rw [← div_eq_mul_inv, div_le_div_iff₀ hbpos (by positivity), add_mul, one_mul, one_div, inv_mul_eq_div]
+    rw [← div_eq_mul_inv, div_le_div_iff₀ hbpos (by positivity), add_mul, one_mul, one_div,
+      inv_mul_eq_div]
     linarith
-  calc 1 / t.im ^ 2 = 1 * (1 / t.im ^ 2) := (one_mul _).symm
+  calc
+    1 / t.im ^ 2
+      = 1 * (1 / t.im ^ 2) := (one_mul _).symm
     _ ≤ ((1 + C ^ 2) * (1 + t.re ^ 2)⁻¹) * ((1 + 1 / c ^ 2) * (1 + t.im ^ 2)⁻¹) :=
-        mul_le_mul e1 e2 (by positivity) (by positivity)
+      mul_le_mul e1 e2 (by positivity) (by positivity)
     _ = (1 + C ^ 2) * (1 + 1 / c ^ 2) * ((1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹) := by ring
 
 theorem integ_G : ∫⁻ t : ℂ, ENNReal.ofReal ((1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹) < ⊤ := by
   have h1 : Integrable (fun x : ℝ => (1 + x ^ 2)⁻¹) := integrable_inv_one_add_sq
-  have h2 : Integrable (fun p : ℝ × ℝ => (1 + p.1 ^ 2)⁻¹ * (1 + p.2 ^ 2)⁻¹) :=
-    h1.mul_prod h1
+  have h2 : Integrable (fun p : ℝ × ℝ => (1 + p.1 ^ 2)⁻¹ * (1 + p.2 ^ 2)⁻¹) := h1.mul_prod h1
   have h3 : Integrable (fun t : ℂ => (1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹) :=
     (Complex.volume_preserving_equiv_real_prod.integrable_comp h2.aestronglyMeasurable).2 h2
   exact h3.lintegral_lt_top
 
-private theorem volume_eq_lintegral_inv_im_sq_comap (s : Set {z : ℂ // z.im ≠ 0}) (hs : MeasurableSet s) :
-    (volume : Measure P) (show Set P from s) = ∫⁻ z in s, ENNReal.ofReal (1 / z.1.im ^ 2)
-      ∂(Measure.comap (Subtype.val : {z : ℂ // z.im ≠ 0} → ℂ) volume) :=
+private theorem volume_eq_lintegral_inv_im_sq_comap
+    (s : Set {z : ℂ // z.im ≠ 0}) (hs : MeasurableSet s)
+    : (volume : Measure P) (show Set P from s)
+      = ∫⁻ z in s, ENNReal.ofReal (1 / z.1.im ^ 2)
+        ∂(Measure.comap (Subtype.val : {z : ℂ // z.im ≠ 0} → ℂ) volume) :=
   withDensity_apply _ hs
 
-private theorem lintegral_comap_im_ne_zero_le_lintegral (f : ℂ → ℝ≥0∞) :
-    ∫⁻ z : {z : ℂ // z.im ≠ 0}, f z.1 ∂(Measure.comap Subtype.val volume) ≤ ∫⁻ t, f t := by
+private theorem lintegral_comap_im_ne_zero_le_lintegral (f : ℂ → ℝ≥0∞)
+    : ∫⁻ z : {z : ℂ // z.im ≠ 0}, f z.1 ∂(Measure.comap Subtype.val volume) ≤ ∫⁻ t, f t := by
   have hs : MeasurableSet {z : ℂ | z.im ≠ 0} :=
     (isOpen_ne_fun Complex.continuous_im continuous_const).measurableSet
-  calc ∫⁻ z : {z : ℂ // z.im ≠ 0}, f z.1 ∂(Measure.comap Subtype.val volume)
+  calc
+    ∫⁻ z : {z : ℂ // z.im ≠ 0}, f z.1 ∂(Measure.comap Subtype.val volume)
       = ∫⁻ t in {z : ℂ | z.im ≠ 0}, f t := lintegral_subtype_comap hs f
     _ ≤ ∫⁻ t, f t := setLIntegral_le_lintegral _ _
 
-private theorem lintegral_mul_inv_one_add_sq_lt_top (K : ℝ) (hK : 0 ≤ K) :
-    ∫⁻ t : ℂ, ENNReal.ofReal (K * ((1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹)) < ⊤ := by
+private theorem lintegral_mul_inv_one_add_sq_lt_top (K : ℝ) (hK : 0 ≤ K)
+    : ∫⁻ t : ℂ, ENNReal.ofReal (K * ((1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹)) < ⊤ := by
   simp_rw [ENNReal.ofReal_mul hK]
   rw [lintegral_const_mul _ (by fun_prop)]
   exact ENNReal.mul_lt_top ENNReal.ofReal_lt_top integ_G
 
-private theorem lintegral_B1_inv_im_sq_le_lintegral (C c : ℝ) (hc : 0 < c) :
-    ∫⁻ z in B1 C c, ENNReal.ofReal (1 / z.1.im ^ 2) ∂(Measure.comap Subtype.val volume) ≤
-      ∫⁻ z : {z : ℂ // z.im ≠ 0}, ENNReal.ofReal ((1 + C ^ 2) * (1 + 1 / c ^ 2) *
-          ((1 + z.1.re ^ 2)⁻¹ * (1 + z.1.im ^ 2)⁻¹)) ∂(Measure.comap Subtype.val volume) := by
-  refine le_trans (setLIntegral_mono' (measurableSet_cusp_region C c) fun z hz => ?_) (setLIntegral_le_lintegral _ _)
+private theorem lintegral_B1_inv_im_sq_le_lintegral (C c : ℝ) (hc : 0 < c)
+    : ∫⁻ z in B1 C c, ENNReal.ofReal (1 / z.1.im ^ 2) ∂(Measure.comap Subtype.val volume)
+      ≤ ∫⁻ z : {z : ℂ // z.im ≠ 0}, ENNReal.ofReal ((1 + C ^ 2) * (1 + 1 / c ^ 2) *
+            ((1 + z.1.re ^ 2)⁻¹ * (1 + z.1.im ^ 2)⁻¹)) ∂(Measure.comap Subtype.val volume) := by
+  refine le_trans (setLIntegral_mono' (measurableSet_cusp_region C c) fun z hz => ?_)
+    (setLIntegral_le_lintegral _ _)
   exact ENNReal.ofReal_le_ofReal (pt_bound C c hc z.1 hz.1 hz.2)
 
-theorem volume_cusp_region_lt_top (C c : ℝ) (hc : 0 < c) : (volume : Measure P) (show Set P from B1 C c) < ⊤ := by
+theorem volume_cusp_region_lt_top (C c : ℝ) (hc : 0 < c)
+    : (volume : Measure P) (show Set P from B1 C c) < ⊤ := by
   have hK0 : 0 ≤ (1 + C ^ 2) * (1 + 1 / c ^ 2) := by positivity
   rw [volume_eq_lintegral_inv_im_sq_comap _ (measurableSet_cusp_region C c)]
-  exact lt_of_le_of_lt ((lintegral_B1_inv_im_sq_le_lintegral C c hc).trans (lintegral_comap_im_ne_zero_le_lintegral
-    (fun t : ℂ => ENNReal.ofReal ((1 + C ^ 2) * (1 + 1 / c ^ 2) *
-      ((1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹))))) (lintegral_mul_inv_one_add_sq_lt_top _ hK0)
+  exact lt_of_le_of_lt
+    ((lintegral_B1_inv_im_sq_le_lintegral C c hc).trans
+      (lintegral_comap_im_ne_zero_le_lintegral (fun t : ℂ =>
+        ENNReal.ofReal ((1 + C ^ 2) * (1 + 1 / c ^ 2) * ((1 + t.re ^ 2)⁻¹ * (1 + t.im ^ 2)⁻¹)))))
+    (lintegral_mul_inv_one_add_sq_lt_top _ hK0)
 
 end UpperTheory.Esk.CuspRegionVolume
 
 open UpperTheory.Esk.CuspRegionVolume in
-theorem UpperTheory.Esk.cusp_region_volume_finite_proof : UpperTheory.Esk.B1a → UpperTheory.Esk.UpperHalfPlaneMeasureCoordinates → UpperTheory.Esk.C2 → UpperTheory.Esk.E0a → UpperTheory.Esk.E0d → UpperTheory.Esk.E3 := by
+theorem UpperTheory.Esk.cusp_region_volume_finite_proof
+    : UpperTheory.Esk.B1a → UpperTheory.Esk.UpperHalfPlaneMeasureCoordinates → UpperTheory.Esk.C2
+      → UpperTheory.Esk.E0a → UpperTheory.Esk.E0d
+      → UpperTheory.Esk.E3 := by
   intro hB1a _ hC2 hE0a hE0d
   intro F I Gf _ _ _ D hD b hb
   obtain ⟨hcnt, hsf, -, hPY, -, -, -, -⟩ := hE0a F I Gf D hD
@@ -135,7 +147,9 @@ theorem UpperTheory.Esk.cusp_region_volume_finite_proof : UpperTheory.Esk.B1a �
     unfold Dat.μY
     rw [Measure.prod_prod]
     refine ENNReal.mul_lt_top (Measure.count_apply_lt_top.2 hT) ?_
-    change (Measure.pi fun _ : I => (volume : Measure P)) (Set.univ.pi fun _ : I => (show Set P from B1 C c)) < ⊤
+    change (Measure.pi fun _ : I => (volume : Measure P)) (Set.univ.pi fun _ : I =>
+        (show Set P from B1 C c))
+      < ⊤
     rw [Measure.pi_pi]
     exact ENNReal.prod_lt_top fun _ _ => volume_cusp_region_lt_top C c hc
   exact lt_of_le_of_lt ((hC2 (PG F) D.Y).2 D.μY hPY b hb _ hS hcover) hfin

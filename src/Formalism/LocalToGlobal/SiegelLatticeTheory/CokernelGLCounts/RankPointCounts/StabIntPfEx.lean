@@ -10,8 +10,9 @@ noncomputable section
 
 open scoped Classical
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.PairVal Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.PtCell Formalism.L2.SG.RealObj
-  Formalism.L2.SG.Pf.BlockPermutation
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.PairVal Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.PtCell
+  Formalism.L2.SG.RealObj Formalism.L2.SG.Pf.BlockPermutation
 
 namespace Formalism.L2.SG.Pf.StabIntSh
 
@@ -20,13 +21,15 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7}
 
 def CondX (w : Point D.host.E (D.R.rS + 1)) (X : MatR D) : Prop :=
-  ∀ a c : Fin (D.R.rS + 1), a < c → blkOf w.1 a.val = blkOf w.1 c.val →
-    X (pinv w c) (pinv w a) ∈ ddPow D (c.val - a.val) ∧ bt D X⁻¹ a c ∈ ddPow D (c.val - a.val) ∧
-      X (pinv w c) (pinv w a) - D.conjF (bt D X⁻¹ a c) ∈ qdPow D (c.val - a.val)
+  ∀ a c : Fin (D.R.rS + 1),
+    a < c → blkOf w.1 a.val = blkOf w.1 c.val
+      → X (pinv w c) (pinv w a) ∈ ddPow D (c.val - a.val) ∧ bt D X⁻¹ a c ∈ ddPow D (c.val - a.val)
+        ∧ X (pinv w c) (pinv w a) - D.conjF (bt D X⁻¹ a c) ∈ qdPow D (c.val - a.val)
 
-theorem entryShape_iff (w : Point D.host.E (D.R.rS + 1)) {β b : MatR D} (hβ : IsLoUni β) (hb : IsUpUni b)
-    (hW : β * ptMat w * b = ptMat w) :
-    EntryShape D β b ↔ CondX w ((ptMat w)⁻¹ * β * ptMat w) := by
+theorem entryShape_iff
+    (w : Point D.host.E (D.R.rS + 1))
+    {β b : MatR D} (hβ : IsLoUni β) (hb : IsUpUni b) (hW : β * ptMat w * b = ptMat w)
+    : EntryShape D β b ↔ CondX w ((ptMat w)⁻¹ * β * ptMat w) := by
   obtain ⟨hXb, hX, hXB⟩ := X_of_st w hβ hb hW
   set X := (ptMat w)⁻¹ * β * ptMat w with hXdef
   have hbX : b = X⁻¹ := by
@@ -34,24 +37,28 @@ theorem entryShape_iff (w : Point D.host.E (D.R.rS + 1)) {β b : MatR D} (hβ : 
 
   have hβX : β = ptMat w * X * (ptMat w)⁻¹ := by
     have hu := ptMat_isUnit w
-    rw [hXdef, show ptMat w * ((ptMat w)⁻¹ * β * ptMat w) * (ptMat w)⁻¹ =
-      (ptMat w * (ptMat w)⁻¹) * β * (ptMat w * (ptMat w)⁻¹) by simp only [Matrix.mul_assoc],
+    rw [hXdef,
+      show ptMat w * ((ptMat w)⁻¹ * β * ptMat w) * (ptMat w)⁻¹
+          = (ptMat w * (ptMat w)⁻¹) * β * (ptMat w * (ptMat w)⁻¹) by
+        simp only [Matrix.mul_assoc],
       Matrix.mul_nonsing_inv _ hu, Matrix.one_mul, Matrix.mul_one]
   have hβij : ∀ i j, β i j = cv w i * X (pinv w i) (pinv w j) * (cv w j)⁻¹ := by
     intro i j; rw [hβX, conj'_apply]
 
   have hXiB : IsBlockDiagonalMatrix w X⁻¹ := by
-    have hβi : IsLoUni β⁻¹ := by
-      have := loU_inv (show LoU β from hβ); exact this
+    have hβi : IsLoUni β⁻¹ := by have := loU_inv (show LoU β from hβ); exact this
     have hW' : β⁻¹ * ptMat w * X = ptMat w := by
       have hu := ptMat_isUnit w
       have hβd : IsUnit β.det := by rw [loU_det (show LoU β from hβ)]; exact isUnit_one
-      rw [hXdef, show β⁻¹ * ptMat w * ((ptMat w)⁻¹ * β * ptMat w) = β⁻¹ * (ptMat w * (ptMat w)⁻¹) * β * ptMat w by
-        simp only [Matrix.mul_assoc], Matrix.mul_nonsing_inv _ hu, Matrix.mul_one, Matrix.nonsing_inv_mul _ hβd,
-        Matrix.one_mul]
+      rw [hXdef,
+        show β⁻¹ * ptMat w * ((ptMat w)⁻¹ * β * ptMat w)
+            = β⁻¹ * (ptMat w * (ptMat w)⁻¹) * β * ptMat w by
+          simp only [Matrix.mul_assoc],
+        Matrix.mul_nonsing_inv _ hu, Matrix.mul_one, Matrix.nonsing_inv_mul _ hβd, Matrix.one_mul]
     obtain ⟨h1, -, h3⟩ := X_of_st w hβi hX hW'
     have hXi : (ptMat w)⁻¹ * β⁻¹ * ptMat w = X⁻¹ := h1
-    rw [← hXi]; exact h3
+    rw [← hXi]
+    exact h3
   rw [hbX]
   constructor
   · intro h a c hac hs
@@ -76,11 +83,14 @@ theorem entryShape_iff (w : Point D.host.E (D.R.rS + 1)) {β b : MatR D} (hβ : 
       rw [hβij, hXB _ _ hs', mul_zero, zero_mul, hbt, map_zero, sub_zero]
       exact ⟨FractionalIdeal.zero_mem _, FractionalIdeal.zero_mem _, FractionalIdeal.zero_mem _⟩
 
-theorem mem_stabInt_iff_X (δ : ∀ p : PlF D, (D.s.atP p).Fp)
-    (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (hA : ∀ p, Agree δ M p) (u u' : D.what₂.Word)
-    (w : Point D.host.E (D.R.rS + 1)) (β : GLR D) (hβ : IsLoUni (β : MatR D)) {b : MatR D} (hb : IsUpUni b)
-    (hW : (β : MatR D) * ptMat w * b = ptMat w) :
-    β ∈ stabInt D u u' δ M w ↔ CondX w ((ptMat w)⁻¹ * (β : MatR D) * ptMat w) := by
+theorem mem_stabInt_iff_X
+    (δ : ∀ p : PlF D, (D.s.atP p).Fp) (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep)
+    (hA : ∀ p, Agree δ M p)
+    (u u' : D.what₂.Word)
+    (w : Point D.host.E (D.R.rS + 1))
+    (β : GLR D) (hβ : IsLoUni (β : MatR D))
+    {b : MatR D} (hb : IsUpUni b) (hW : (β : MatR D) * ptMat w * b = ptMat w)
+    : β ∈ stabInt D u u' δ M w ↔ CondX w ((ptMat w)⁻¹ * (β : MatR D) * ptMat w) := by
   rw [stabIntShape D δ M hA u u' w β]
   constructor
   · rintro ⟨-, b', hb', hW', hE⟩

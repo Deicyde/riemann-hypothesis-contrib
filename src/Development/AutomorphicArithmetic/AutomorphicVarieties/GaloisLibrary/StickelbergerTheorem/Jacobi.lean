@@ -11,18 +11,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain UpperTheory.V.Kum UpperTheory.V.Stick
 open scoped nonZeroDivisors
 
-private theorem zmod_pow_mul_eq_pow_mul_mod {p : ℕ} [Fact p.Prime] (M d : ℕ) (hMd : M * d = p - 1) (y : ZMod p)
-    (hy : y ≠ 0) (n : ℕ) : y ^ (d * n) = y ^ (d * (n % M)) := by
+private theorem zmod_pow_mul_eq_pow_mul_mod
+    {p : ℕ} [Fact p.Prime] (M d : ℕ) (hMd : M * d = p - 1) (y : ZMod p) (hy : y ≠ 0) (n : ℕ)
+    : y ^ (d * n) = y ^ (d * (n % M)) := by
   have h1 : (y ^ d) ^ M = 1 := by
     rw [← pow_mul, mul_comm, hMd]
     exact ZMod.pow_card_sub_one_eq_one hy
   conv_lhs => rw [← Nat.mod_add_div n M]
   rw [mul_add, pow_add, pow_mul y d (M * (n / M)), pow_mul (y ^ d) M, h1, one_pow, mul_one]
 
-theorem UpperTheory.V.Stick.jacobi :
-    ∀ (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K] (p : ℕ) [Fact p.Prime] (π : 𝓞 K →+* ZMod p), p.Coprime M →
-    ∀ a b : ZMod M, a ≠ 0 → b ≠ 0 → a + b ≠ 0 →
-    ∃ J : 𝓞 K, J ∣ (p : 𝓞 K) ∧ ∀ t : (ZMod M)ˣ, J ∈ conjI M K (RingHom.ker π) t ↔ carry M (a * t) (b * t) = 0 := by
+theorem UpperTheory.V.Stick.jacobi
+    : ∀ (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K]
+        (p : ℕ) [Fact p.Prime] (π : 𝓞 K →+* ZMod p),
+      p.Coprime M
+        → ∀ a b : ZMod M,
+          a ≠ 0 → b ≠ 0 → a + b ≠ 0
+            → ∃ J : 𝓞 K,
+              J ∣ (p : 𝓞 K)
+                ∧ ∀ t : (ZMod M)ˣ,
+                  J ∈ conjI M K (RingHom.ker π) t ↔ carry M (a * t) (b * t) = 0 := by
   intro M _ K _ _ _ p _ π hp a b ha hb hab
   have hz := (IsCyclotomicExtension.zeta_spec M ℚ K).toInteger_isPrimitiveRoot
   obtain ⟨hπz, hdvd⟩ := redRoot (𝓞 K) p π M _ hp hz
@@ -52,8 +59,9 @@ theorem UpperTheory.V.Stick.jacobi :
     rw [Ne, ZMod.val_eq_zero]
     intro h
     exact hc ((Units.mul_left_eq_zero t).mp h)
-  have hfac : ∀ c : ZMod M, c ≠ 0 → ∀ y : ZMod p,
-      π (sgO M K t ((χ ^ c.val) y)) = y ^ (d * (c * t).val) := by
+  have hfac
+      : ∀ c : ZMod M,
+        c ≠ 0 → ∀ y : ZMod p, π (sgO M K t ((χ ^ c.val) y)) = y ^ (d * (c * t).val) := by
     intro c hc y
     have hcv : c.val ≠ 0 := by rwa [Ne, ZMod.val_eq_zero]
     by_cases hy : y = 0
@@ -61,8 +69,8 @@ theorem UpperTheory.V.Stick.jacobi :
       rw [MulChar.map_zero, map_zero, map_zero, zero_pow (Nat.mul_ne_zero hd0.ne' (hunit c hc))]
     · obtain ⟨h1, h2⟩ := hχ y hy
       rw [MulChar.pow_apply' _ hcv,
-        sgO_apply M K t (by rw [← pow_mul, mul_comm, pow_mul, h1, one_pow]),
-        map_pow, map_pow, h2, ← pow_mul, ← pow_mul, ZMod.val_mul,
+        sgO_apply M K t (by rw [← pow_mul, mul_comm, pow_mul, h1, one_pow]), map_pow, map_pow, h2,
+        ← pow_mul, ← pow_mul, ZMod.val_mul,
         zmod_pow_mul_eq_pow_mul_mod M d hd.symm y hy (c.val * (t : ZMod M).val)]
   have hlt : ∀ c : ZMod M, d * (c * t).val < p - 1 := by
     intro c

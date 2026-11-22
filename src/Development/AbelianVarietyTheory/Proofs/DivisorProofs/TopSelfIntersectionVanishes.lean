@@ -23,9 +23,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.HasBoundedPo
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
 open GlobalTheory.AllWt (Psi wtOf cuspOn latOn normOn petOn GoodOn GoodW bergOn framesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
@@ -38,18 +41,29 @@ noncomputable section
 
 namespace GlobalTheory.ZeroDimSystem
 
-def comb {k : Type} [Field k] {X : Scheme.{0}} [Algebra k Γ(X, ⊤)] {M : LB X} {m : ℕ}
-    (t : Fin m → M.Sec) : (Fin m → k) →ₛₗ[algebraMap k Γ(X, ⊤)] M.Sec :=
-  ⟨⟨fun c => ∑ i, algebraMap k Γ(X, ⊤) (c i) • t i, fun a b => by
-      simp [add_smul, Finset.sum_add_distrib]⟩, fun c a => by
-      simp [mul_smul, Finset.smul_sum]⟩
+def comb
+    {k : Type} [Field k] {X : Scheme.{0}} [Algebra k Γ(X, ⊤)] {M : LB X} {m : ℕ} (t : Fin m → M.Sec)
+    : (Fin m → k) →ₛₗ[algebraMap k Γ(X, ⊤)] M.Sec := ⟨
+  ⟨
+    fun c => ∑ i, algebraMap k Γ(X, ⊤) (c i) • t i,
+    fun a b => by simp [add_smul, Finset.sum_add_distrib]
+  ⟩,
+  fun c a => by simp [mul_smul, Finset.smul_sum]
+⟩
 
-theorem comb_apply {k : Type} [Field k] {X : Scheme.{0}} [Algebra k Γ(X, ⊤)] {M : LB X} {m : ℕ}
-    (t : Fin m → M.Sec) (c : Fin m → k) :
-    comb t c = ∑ i, algebraMap k Γ(X, ⊤) (c i) • t i := rfl
+theorem comb_apply
+    {k : Type} [Field k]
+    {X : Scheme.{0}} [Algebra k Γ(X, ⊤)]
+    {M : LB X} {m : ℕ} (t : Fin m → M.Sec) (c : Fin m → k)
+    : comb t c = ∑ i, algebraMap k Γ(X, ⊤) (c i) • t i :=
+  rfl
 
-def vanishAt {k : Type} [Field k] {X : Scheme.{0}} [Algebra k Γ(X, ⊤)] {M : LB X} {m : ℕ}
-    (t : Fin m → M.Sec) (x : X) : Submodule k (Fin m → k) where
+def vanishAt
+    {k : Type} [Field k]
+    {X : Scheme.{0}} [Algebra k Γ(X, ⊤)]
+    {M : LB X} {m : ℕ} (t : Fin m → M.Sec)
+    (x : X)
+    : Submodule k (Fin m → k) where
   carrier := {c | x ∉ nonzeroLocus (comb t c)}
   add_mem' := fun {a b} ha hb hx => by
     rw [map_add (f := _)] at hx
@@ -61,13 +75,20 @@ def vanishAt {k : Type} [Field k] {X : Scheme.{0}} [Algebra k Γ(X, ⊤)] {M : L
     rw [(comb t).map_smulₛₗ] at hx
     exact ha ((nonzeroLocus_secScale _ _).le hx).2
 
-theorem mem_vanishAt {k : Type} [Field k] {X : Scheme.{0}} [Algebra k Γ(X, ⊤)] {M : LB X}
-    {m : ℕ} (t : Fin m → M.Sec) (x : X) (c : Fin m → k) :
-    c ∈ vanishAt t x ↔ x ∉ nonzeroLocus (comb t c) := Iff.rfl
+theorem mem_vanishAt
+    {k : Type} [Field k]
+    {X : Scheme.{0}} [Algebra k Γ(X, ⊤)]
+    {M : LB X} {m : ℕ} (t : Fin m → M.Sec)
+    (x : X) (c : Fin m → k)
+    : c ∈ vanishAt t x ↔ x ∉ nonzeroLocus (comb t c) :=
+  Iff.rfl
 
-theorem single_notMem_vanishAt {k : Type} [Field k] {X : Scheme.{0}} [Algebra k Γ(X, ⊤)]
-    {M : LB X} {m : ℕ} (t : Fin m → M.Sec) {x : X} {i : Fin m} (hx : x ∈ nonzeroLocus (t i)) :
-    (Pi.single i 1 : Fin m → k) ∉ vanishAt t x := by
+theorem single_notMem_vanishAt
+    {k : Type} [Field k]
+    {X : Scheme.{0}} [Algebra k Γ(X, ⊤)]
+    {M : LB X} {m : ℕ} (t : Fin m → M.Sec)
+    {x : X} {i : Fin m} (hx : x ∈ nonzeroLocus (t i))
+    : (Pi.single i 1 : Fin m → k) ∉ vanishAt t x := by
   classical
   rw [mem_vanishAt, not_not, comb_apply,
     Finset.sum_eq_single i (fun j _ hj => by simp [hj]) (by simp), Pi.single_eq_same, map_one,
@@ -76,9 +97,11 @@ theorem single_notMem_vanishAt {k : Type} [Field k] {X : Scheme.{0}} [Algebra k 
 
 section Main
 
-variable {k : Type} [Field k] [Infinite k] {X : Scheme.{0}} [Algebra k Γ(X, ⊤)]
-  [AlgebraicGeometry.IsNoetherian X] {M : LB X} (hM : M.IsLB) {m : ℕ} (t : Fin m → M.Sec)
-  (ht : ⨆ i, nonzeroLocus (t i) = ⊤)
+variable
+  {k : Type} [Field k] [Infinite k]
+  {X : Scheme.{0}} [Algebra k Γ(X, ⊤)] [AlgebraicGeometry.IsNoetherian X]
+  {M : LB X} (hM : M.IsLB)
+  {m : ℕ} (t : Fin m → M.Sec) (ht : ⨆ i, nonzeroLocus (t i) = ⊤)
   (hf : ∀ r, algebraMap k Γ(X, ⊤) r = (strHom k X).appTop ((Scheme.ΓSpecIso (.of k)).inv r))
   (hp : IsProjOver (strHom k (X := X)))
 include hM ht hf hp

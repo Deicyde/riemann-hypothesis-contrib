@@ -11,15 +11,16 @@ noncomputable section
 
 namespace PI.VolSemiDirect.W.Lc
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory
 open scoped TensorProduct
 
 def AFTop : Prop :=
   ∀ (F : Type) [Field F] [NumberField F],
     LocallyCompactSpace (AF F) ∧ SecondCountableTopology (AF F) ∧ T2Space (AF F)
 
-theorem finite_nf (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] : Module.Finite F E :=
+theorem finite_nf (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    : Module.Finite F E :=
   Module.Finite.of_restrictScalars_finite ℚ F E
 
 theorem tensTop_of (h : AFTop) : TensTop := by
@@ -34,8 +35,11 @@ theorem tensTop_of (h : AFTop) : TensTop := by
   have htr : IsTopologicalRing (R ⊗[F] E) := IsModuleTopology.isTopologicalRing R (R ⊗[F] E)
   have c1 : Continuous e.toLinearMap := IsModuleTopology.continuous_of_linearMap (R := R) _
   have c2 : Continuous e.symm.toLinearMap := IsModuleTopology.continuous_of_linearMap (R := R) _
-  let hm : (R ⊗[F] E) ≃ₜ (Fin (Module.finrank F E) → R) :=
-    { toEquiv := e.toEquiv, continuous_toFun := by simpa using c1, continuous_invFun := by simpa using c2 }
+  let hm : (R ⊗[F] E) ≃ₜ (Fin (Module.finrank F E) → R) := {
+    toEquiv := e.toEquiv
+    continuous_toFun := by simpa using c1
+    continuous_invFun := by simpa using c2
+  }
   refine ⟨htr, ?_, ?_, ?_⟩
   · exact hm.isEmbedding.t2Space
   · exact hm.isClosedEmbedding.locallyCompactSpace

@@ -33,31 +33,35 @@ lemma ite_neg_one_eq_neg (c : Prop) [Decidable c] : (if c then (-1 : ℤ) else 0
 
 section Fam
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {O : Type} [Ring O] [StarRing O]
-  {D : DegData R I} [Module O D.toPre.X] {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (U : UnifPre I D A G)
-  (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O) (χ : D.toPre.X)
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {O : Type} [Ring O] [StarRing O]
+  {D : DegData R I} [Module O D.toPre.X]
+  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
+  (U : UnifPre I D A G) (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O) (χ : D.toPre.X)
 
-abbrev xc : (Over.map (thick R I e)).obj (thickObj R I e G) ⟶ D.toPre.P.A :=
-  toUnit _ ≫ D.toPre.c χ
+abbrev xc : (Over.map (thick R I e)).obj (thickObj R I e G) ⟶ D.toPre.P.A := toUnit _ ≫ D.toPre.c χ
 
-abbrev hOv : (Over.map (thick R I e)).obj (thickObj R I e G) ⟶
-    (Over.map (thick R I e)).obj (thickObj R I e G) :=
+abbrev hOv
+    : (Over.map (thick R I e)).obj (thickObj R I e G)
+      ⟶ (Over.map (thick R I e)).obj (thickObj R I e G) :=
   (Over.map (thick R I e)).map ((Over.pullback (thick R I e)).map (ιG.act a))
 
 abbrev φA : Fin 4 ⊕ Fin 6 → ((thickObj R I e G).left ⟶ D.toPre.P.A.left) :=
-  Sum.elim (D.toPre.Oφ (U.gt e).pG (star a • χ))
-    (fun k => (lift (xc e χ (G := G)) (U.gt e).pG).left ≫
-      rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k)
+  Sum.elim (D.toPre.Oφ (U.gt e).pG (star a • χ)) (fun k =>
+    (lift (xc e χ (G := G)) (U.gt e).pG).left
+      ≫ rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a) k)
 
 abbrev εA : Fin 4 ⊕ Fin 6 → ℤ := Sum.elim Oinvε rosatiε
 
-abbrev φB : Fin 4 → ((thickObj R I e G).left ⟶ D.toPre.P.A.left) :=
-  fun k => ((Over.pullback (thick R I e)).map (ιG.act a)).left ≫ D.toPre.Oφ (U.gt e).pG χ k
+abbrev φB : Fin 4 → ((thickObj R I e G).left ⟶ D.toPre.P.A.left) := fun k =>
+  ((Over.pullback (thick R I e)).map (ιG.act a)).left ≫ D.toPre.Oφ (U.gt e).pG χ k
 
-abbrev lhs (u : LB.Gen (LB.LinComb D.toPre.P.L
-    (rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a)) rosatiε)) :
-    LB.Gen (LB.LinComb D.toPre.P.L (φA U ιD e a χ) εA) :=
+abbrev lhs
+    (u : LB.Gen (LB.LinComb D.toPre.P.L (rosatiφ D.toPre.P.A (ιD.onB.act (star a)) (ιD.onB.act a))
+      rosatiε))
+    : LB.Gen (LB.LinComb D.toPre.P.L (φA U ιD e a χ) εA) :=
   LB.mulGen D.toPre.P.L _ _ _ _ ((U.gt e).t (star a • χ))
     (LB.pullGen D.toPre.P.L _ _ u (lift (toUnit _ ≫ D.toPre.c χ) (U.gt e).pG).left)
 
@@ -84,15 +88,17 @@ end Fam
 
 section Eqs
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {O : Type} [Ring O] [StarRing O]
-  {D : DegData R I} [Module O D.toPre.X] {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (U : UnifPre I D A G)
-  (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O) (χ : D.toPre.X)
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {O : Type} [Ring O] [StarRing O]
+  {D : DegData R I} [Module O D.toPre.X]
+  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
+  (U : UnifPre I D A G) (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O) (χ : D.toPre.X)
 
-abbrev OφX {T : Over (Spec (CommRingCat.of R))} (P x : T ⟶ D.toPre.P.A) :
-    Fin 4 → (T.left ⟶ D.toPre.P.A.left) :=
+abbrev OφX {T : Over (Spec (CommRingCat.of R))} (P x : T ⟶ D.toPre.P.A)
+    : Fin 4 → (T.left ⟶ D.toPre.P.A.left) :=
   ![(padd D.toPre.P.A P x).left, x.left, P.left, (toUnit T ≫ η[D.toPre.P.A]).left]
-
 
 lemma eAk (k : Fin 4) : D.toPre.Oφ (U.gt e).pG (star a • χ) k =
     OφX (D := D) (U.gt e).pG (xc e χ (G := G) ≫ ιD.onB.act (star a)) k := by
@@ -170,12 +176,17 @@ end Eqs
 
 section Sums
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {O : Type} [Ring O] [StarRing O]
-  {D : DegData R I} [Module O D.toPre.X] {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] (U : UnifPre I D A G)
-  (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O) (χ : D.toPre.X)
-  (hO : ∀ a : O, (Over.pullback (thick R I e)).map (ιG.act a) ≫ (U.gt e).q =
-      (U.gt e).q ≫ (Over.pullback (thick R I e)).map (ιD.onB.act a))
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {O : Type} [Ring O] [StarRing O]
+  {D : DegData R I} [Module O D.toPre.X]
+  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
+  (U : UnifPre I D A G) (ιD : D.OAct O) (ιG : RingAct G O) (e : ℕ) (a : O)
+  (χ : D.toPre.X)
+  (hO : ∀ a : O,
+    (Over.pullback (thick R I e)).map (ιG.act a) ≫ (U.gt e).q
+      = (U.gt e).q ≫ (Over.pullback (thick R I e)).map (ιD.onB.act a))
 
 include hO in
 lemma hsub : ∀ k : Fin 4, ∃ k', φA U ιD e a χ k' = φB U ιG e a χ k := by
@@ -188,8 +199,6 @@ lemma hsub : ∀ k : Fin 4, ∃ k', φA U ιD e a χ k' = φB U ιG e a χ k := 
   · exact ⟨Sum.inr 4, h4⟩
   · exact ⟨Sum.inr 5, h5⟩
   · exact ⟨Sum.inl 3, (selfLieBasisVector U e a χ).trans rfl⟩
-
-
 
 private lemma ss_lemma {Y X : Scheme.{0}} (pB x Pa u0 pA xs P : Y ⟶ X) :
     LB.SameSum ![pB, x, Pa, u0] Oinvε (Sum.elim ![pA, xs, P, u0] ![pA, xs, P, pB, x, Pa])
@@ -237,7 +246,6 @@ lemma hA : φA U ιD e a χ = Sum.elim
     · exact h3
     · exact h4
     · exact h5
-
 
 include hO in
 lemma hBv : φB U ιG e a χ =

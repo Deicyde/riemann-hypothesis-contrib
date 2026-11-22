@@ -14,12 +14,13 @@ open ReciprocityTheory.AnForm Filter Topology
 
 noncomputable section
 
-theorem HessCCompPluri.fderiv_fderiv_comp_apply {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+theorem HessCCompPluri.fderiv_fderiv_comp_apply
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     {F : ℝ → ℝ} {L : E → ℝ} {z : E} (hF : ContDiffAt ℝ 2 F (L z)) (hL : ContDiffAt ℝ 2 L z)
-    (v u : E) :
-    fderiv ℝ (fderiv ℝ (fun w => F (L w))) z v u =
-      deriv (deriv F) (L z) * (fderiv ℝ L z v * fderiv ℝ L z u) +
-        deriv F (L z) * fderiv ℝ (fderiv ℝ L) z v u := by
+    (v u : E)
+    : fderiv ℝ (fderiv ℝ (fun w => F (L w))) z v u
+      = deriv (deriv F) (L z) * (fderiv ℝ L z v * fderiv ℝ L z u)
+        + deriv F (L z) * fderiv ℝ (fderiv ℝ L) z v u := by
   have hL2 : ∀ᶠ w in 𝓝 z, ContDiffAt ℝ 2 L w := hL.eventually (by simp)
   have hF2 : ∀ᶠ w in 𝓝 z, ContDiffAt ℝ 2 F (L w) :=
     hL.continuousAt.tendsto.eventually (hF.eventually (by simp))
@@ -34,9 +35,11 @@ theorem HessCCompPluri.fderiv_fderiv_comp_apply {E : Type*} [NormedAddCommGroup 
     (hL.fderiv_right (m := 1) (by norm_num)).differentiableAt (by norm_num)
   have hc : HasFDerivAt (fun w => deriv F (L w)) (deriv (deriv F) (L z) • fderiv ℝ L z) z :=
     hdF.hasDerivAt.comp_hasFDerivAt z (hL.differentiableAt (by norm_num)).hasFDerivAt
-  have hs : HasFDerivAt (fun w => deriv F (L w) • fderiv ℝ L w)
-      (deriv F (L z) • fderiv ℝ (fderiv ℝ L) z +
-        (deriv (deriv F) (L z) • fderiv ℝ L z).smulRight (fderiv ℝ L z)) z :=
+  have hs : HasFDerivAt
+      (fun w => deriv F (L w) • fderiv ℝ L w)
+      (deriv F (L z) • fderiv ℝ (fderiv ℝ L) z
+        + (deriv (deriv F) (L z) • fderiv ℝ L z).smulRight (fderiv ℝ L z))
+      z :=
     hc.smul hdL.hasFDerivAt
   rw [heq.fderiv_eq, hs.fderiv]
   simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply,

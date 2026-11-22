@@ -4,20 +4,24 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCMFra
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open Matrix GlobalTheory GlobalTheory.CM GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Matrix GlobalTheory GlobalTheory.CM GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexOrder
 
 noncomputable section
 
 namespace PositivityTheory.Xgf.OntoKer
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {g : ℕ} {ty : Fin g → (E →+* ℂ)}
-  {P : D.La →+ (Fin g → ℂ)}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {g : ℕ} {ty : Fin g → (E →+* ℂ)} {P : D.La →+ (Fin g → ℂ)}
 
-theorem ty_eq_of_rt {i j : Fin g} (h : ty i (H.rt : E) = ty j (H.rt : E)) (α : OK H) :
-    ty i ((α : 𝓞 E) : E) = ty j ((α : 𝓞 E) : E) := by
+theorem ty_eq_of_rt {i j : Fin g} (h : ty i (H.rt : E) = ty j (H.rt : E)) (α : OK H)
+    : ty i ((α : 𝓞 E) : E) = ty j ((α : 𝓞 E) : E) := by
   have hw : ty i ((H.w0 : 𝓞 E) : E) = ty j ((H.w0 : 𝓞 E) : E) := by
     have e : (2 : E) * ((H.w0 : 𝓞 E) : E) = 1 + ((H.rt : 𝓞 E) : E) := by
       have e0 := congrArg (fun z : 𝓞 E => (z : E)) H.two_weight_eq_one_add_root
@@ -26,8 +30,7 @@ theorem ty_eq_of_rt {i j : Fin g} (h : ty i (H.rt : E) = ty j (H.rt : E)) (α : 
     have hi := congrArg (ty i) e
     have hj := congrArg (ty j) e
     simp only [map_mul, map_add (f := _), map_one, map_ofNat] at hi hj
-    have h2 : (2 : ℂ) * ty i ((H.w0 : 𝓞 E) : E) = 2 * ty j ((H.w0 : 𝓞 E) : E) := by
-      rw [hi, hj, h]
+    have h2 : (2 : ℂ) * ty i ((H.w0 : 𝓞 E) : E) = 2 * ty j ((H.w0 : 𝓞 E) : E) := by rw [hi, hj, h]
     exact mul_left_cancel₀ two_ne_zero h2
   suffices hs : ∀ β ∈ OK H, ty i ((β : 𝓞 E) : E) = ty j ((β : 𝓞 E) : E) from hs _ α.2
   intro β hβ
@@ -35,7 +38,8 @@ theorem ty_eq_of_rt {i j : Fin g} (h : ty i (H.rt : E) = ty j (H.rt : E)) (α : 
   | mem x hx =>
     rw [Set.mem_singleton_iff.1 hx]
     exact hw
-  | algebraMap r => simp
+  | algebraMap r =>
+    simp
   | add x y _ _ hx hy =>
     push_cast
     rw [map_add (f := _), map_add (f := _), hx, hy]
@@ -43,13 +47,12 @@ theorem ty_eq_of_rt {i j : Fin g} (h : ty i (H.rt : E) = ty j (H.rt : E)) (α : 
     push_cast
     rw [map_mul, map_mul, hx, hy]
 
-
 open Classical in
 def kap (ty : Fin g → (E →+* ℂ)) (H : Host E) (b : Bool) (α : OK H) : ℂ :=
   if h : ∃ i, ty i (H.rt : E) = sgnRt H b then ty h.choose ((α : 𝓞 E) : E) else 0
 
-theorem P_smul (hP : IsPeriod D ty P) {b : Bool} (a : PureType.lat hP (sgnRt H b)) (α : OK H) :
-    P ((α : 𝓞 E) • (a : D.La)) = kap ty H b α • P a := by
+theorem P_smul (hP : IsPeriod D ty P) {b : Bool} (a : PureType.lat hP (sgnRt H b)) (α : OK H)
+    : P ((α : 𝓞 E) • (a : D.La)) = kap ty H b α • P a := by
   funext i
   rw [Pi.smul_apply, smul_eq_mul, hP.1]
   by_cases hi : ty i (H.rt : E) = sgnRt H b
@@ -58,9 +61,11 @@ theorem P_smul (hP : IsPeriod D ty P) {b : Bool} (a : PureType.lat hP (sgnRt H b
   · have h0 : P (a : D.La) i = 0 := a.2 i hi
     rw [h0, mul_zero, mul_zero]
 
-theorem span_top (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureType.lat hP (sgnRt H (b k))) (N : ℕ)
-    (hN0 : 0 < N) (hN : ∀ y : D.La, N • y ∈ Submodule.span (OK H) (Set.range fun k => (a k : D.La))) :
-    Submodule.span ℂ (Set.range fun k => P (a k)) = ⊤ := by
+theorem span_top
+    (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureType.lat hP (sgnRt H (b k)))
+    (N : ℕ)
+    (hN0 : 0 < N) (hN : ∀ y : D.La, N • y ∈ Submodule.span (OK H) (Set.range fun k => (a k : D.La)))
+    : Submodule.span ℂ (Set.range fun k => P (a k)) = ⊤ := by
   set W := Submodule.span ℂ (Set.range fun k => P (a k)) with hW
   have hmem : ∀ y, P y ∈ W := by
     intro y
@@ -83,24 +88,32 @@ theorem span_top (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureTyp
     trivial
   exact hR hz
 
-theorem exists_coeffs (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureType.lat hP (sgnRt H (b k))) (N : ℕ)
-    (hN0 : 0 < N) (hN : ∀ y : D.La, N • y ∈ Submodule.span (OK H) (Set.range fun k => (a k : D.La))) (z : Fin g → ℂ) :
-    ∃ c : Fin g → ℂ, z = ∑ k, c k • P (a k) := by
-  have hz : z ∈ Submodule.span ℂ (Set.range fun k => P (a k)) := by rw [span_top hP b a N hN0 hN]; trivial
+theorem exists_coeffs
+    (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureType.lat hP (sgnRt H (b k)))
+    (N : ℕ)
+    (hN0 : 0 < N) (hN : ∀ y : D.La, N • y ∈ Submodule.span (OK H) (Set.range fun k => (a k : D.La)))
+    (z : Fin g → ℂ)
+    : ∃ c : Fin g → ℂ, z = ∑ k, c k • P (a k) := by
+  have hz : z ∈ Submodule.span ℂ (Set.range fun k => P (a k)) := by
+    rw [span_top hP b a N hN0 hN]; trivial
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 hz
   exact ⟨c, hc.symm⟩
 
-theorem linIndep (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureType.lat hP (sgnRt H (b k))) (N : ℕ)
-    (hN0 : 0 < N) (hN : ∀ y : D.La, N • y ∈ Submodule.span (OK H) (Set.range fun k => (a k : D.La))) :
-    LinearIndependent ℂ fun k => P (a k) := by
+theorem linIndep
+    (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureType.lat hP (sgnRt H (b k)))
+    (N : ℕ)
+    (hN0 : 0 < N) (hN : ∀ y : D.La, N • y ∈ Submodule.span (OK H) (Set.range fun k => (a k : D.La)))
+    : LinearIndependent ℂ fun k => P (a k) := by
   apply linearIndependent_of_top_le_span_of_card_eq_finrank
   · rw [span_top hP b a N hN0 hN]
   · simp
 
-theorem coeff_of_period (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureType.lat hP (sgnRt H (b k))) (N : ℕ)
+theorem coeff_of_period
+    (hP : IsPeriod D ty P) (b : Fin g → Bool) (a : ∀ k, PureType.lat hP (sgnRt H (b k)))
+    (N : ℕ)
     (hN0 : 0 < N) (hN : ∀ y : D.La, N • y ∈ Submodule.span (OK H) (Set.range fun k => (a k : D.La)))
-    (s : Fin g → ℂ) (y : D.La) (hs : ∑ k, s k • P (a k) = P y) :
-    ∃ α : Fin g → OK H, ∀ k, (N : ℂ) * s k = kap ty H (b k) (α k) := by
+    (s : Fin g → ℂ) (y : D.La) (hs : ∑ k, s k • P (a k) = P y)
+    : ∃ α : Fin g → OK H, ∀ k, (N : ℂ) * s k = kap ty H (b k) (α k) := by
   have hli := linIndep hP b a N hN0 hN
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun (OK H)).1 (hN y)
   refine ⟨c, fun k => ?_⟩

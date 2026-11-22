@@ -6,13 +6,15 @@ public import Formalism.LocalToGlobal.HermitianForms.IsLocBasis
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.Forms Formalism.UG Matrix NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.Forms Formalism.UG Matrix
+  NumberField IsDedekindDomain
 open scoped InnerProductSpace TensorProduct
 
 namespace GlobalTheory
 
-noncomputable def conjLinearCombination {M : Type} [AddCommGroup M] [Module ℂ M] {I : Type}
-    (b : I → M) : (I →₀ ℂ) →ₗ⋆[ℂ] M where
+noncomputable def conjLinearCombination
+    {M : Type} [AddCommGroup M] [Module ℂ M] {I : Type} (b : I → M)
+    : (I →₀ ℂ) →ₗ⋆[ℂ] M where
   toFun c := c.sum fun i x => star x • b i
   map_add' c d := by
     rw [Finsupp.sum_add_index']
@@ -23,14 +25,20 @@ noncomputable def conjLinearCombination {M : Type} [AddCommGroup M] [Module ℂ 
     refine Finsupp.sum_congr fun i _ => ?_
     rw [smul_smul, smul_eq_mul, star_mul', starRingEnd_apply]
 
-theorem conjLinearCombination_single {M : Type} [AddCommGroup M] [Module ℂ M] {I : Type}
-    (b : I → M) (i : I) (x : ℂ) :
-    conjLinearCombination b (Finsupp.single i x) = star x • b i := by
+theorem conjLinearCombination_single
+    {M : Type} [AddCommGroup M] [Module ℂ M] {I : Type} (b : I → M) (i : I) (x : ℂ)
+    : conjLinearCombination b (Finsupp.single i x) = star x • b i := by
   change (Finsupp.single i x).sum (fun i x => star x • b i) = _
-  rw [Finsupp.sum_single_index]; simp
+  rw [Finsupp.sum_single_index]
+  simp
 
-theorem exists_conjLinear_of_gram_eq :
-    ∀ (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W] (M : Type) [AddCommGroup M] [Module ℂ M] (N : M → M → ℂ) (I : Type) (a : I → W) (b : I → M), (∀ p p' q, N (p + p') q = N p q + N p' q) → (∀ (c : ℂ) p q, N (c • p) q = c * N p q) → (∀ p q, N q p = star (N p q)) → (∀ p, N p p = 0 → p = 0) → Submodule.span ℂ (Set.range a) = ⊤ → (∀ i j, N (b j) (b i) = ⟪a j, a i⟫_ℂ) → ∃ Jm : W →ₗ⋆[ℂ] M, (∀ i, Jm (a i) = b i) ∧ ∀ ξ η, N (Jm η) (Jm ξ) = ⟪η, ξ⟫_ℂ := by
+theorem exists_conjLinear_of_gram_eq
+    : ∀ (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W] (M : Type) [AddCommGroup M]
+        [Module ℂ M] (N : M → M → ℂ) (I : Type) (a : I → W) (b : I → M),
+      (∀ p p' q, N (p + p') q = N p q + N p' q) → (∀ (c : ℂ) p q, N (c • p) q = c * N p q)
+        → (∀ p q, N q p = star (N p q)) → (∀ p, N p p = 0 → p = 0)
+        → Submodule.span ℂ (Set.range a) = ⊤ → (∀ i j, N (b j) (b i) = ⟪a j, a i⟫_ℂ)
+        → ∃ Jm : W →ₗ⋆[ℂ] M, (∀ i, Jm (a i) = b i) ∧ ∀ ξ η, N (Jm η) (Jm ξ) = ⟪η, ξ⟫_ℂ := by
   intro W _ _ M _ _ N I a b hadd hsmul hstar hdef hspan hgram
   have hadd2 : ∀ p q q', N p (q + q') = N p q + N p q' := by
     intro p q q'
@@ -60,8 +68,7 @@ theorem exists_conjLinear_of_gram_eq :
         rw [hA, hB, conjLinearCombination_single, conjLinearCombination_single,
           Finsupp.linearCombination_single, Finsupp.linearCombination_single, hsmul, hsmul2,
           inner_smul_left, inner_smul_right, hgram, star_star, starRingEnd_apply]
-  have hr : LinearMap.range A = ⊤ := by
-    rw [hA, Finsupp.range_linearCombination, hspan]
+  have hr : LinearMap.range A = ⊤ := by rw [hA, Finsupp.range_linearCombination, hspan]
   obtain ⟨s, hs⟩ := LinearMap.exists_rightInverse_of_surjective A hr
   have hs' : ∀ w, A (s w) = w := fun w => LinearMap.congr_fun hs w
   refine ⟨B.comp s, fun i => ?_, fun ξ η => ?_⟩

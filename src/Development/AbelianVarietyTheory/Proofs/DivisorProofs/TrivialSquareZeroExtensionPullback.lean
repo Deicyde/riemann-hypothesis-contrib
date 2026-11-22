@@ -7,18 +7,22 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZM GlobalTheory.SiegLev GlobalTheory.SiegelTor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.SqZeroPb
 
-def liftHom {K : Type} [Field K] {V W₁ W₂ : Type} [AddCommGroup V] [Module K V] [Module Kᵐᵒᵖ V]
-    [IsCentralScalar K V] [AddCommGroup W₁] [Module K W₁] [Module Kᵐᵒᵖ W₁] [IsCentralScalar K W₁]
-    [AddCommGroup W₂] [Module K W₂] [Module Kᵐᵒᵖ W₂] [IsCentralScalar K W₂]
-    (e : V ≃ₗ[K] W₁ × W₂) {T : Type} [CommRing T]
-    (a : T →+* TrivSqZeroExt K W₁) (b : T →+* TrivSqZeroExt K W₂)
-    (h : ∀ t, (a t).fst = (b t).fst) : T →+* TrivSqZeroExt K V where
+def liftHom
+    {K : Type} [Field K]
+    {V W₁ W₂ : Type} [AddCommGroup V] [Module K V] [Module Kᵐᵒᵖ V] [IsCentralScalar K V]
+    [AddCommGroup W₁] [Module K W₁] [Module Kᵐᵒᵖ W₁] [IsCentralScalar K W₁] [AddCommGroup W₂]
+    [Module K W₂] [Module Kᵐᵒᵖ W₂] [IsCentralScalar K W₂]
+    (e : V ≃ₗ[K] W₁ × W₂)
+    {T : Type} [CommRing T]
+    (a : T →+* TrivSqZeroExt K W₁) (b : T →+* TrivSqZeroExt K W₂) (h : ∀ t, (a t).fst = (b t).fst)
+    : T →+* TrivSqZeroExt K V where
   toFun t := TrivSqZeroExt.inl (a t).fst + TrivSqZeroExt.inr (e.symm ((a t).snd, (b t).snd))
   map_one' := by
     refine TrivSqZeroExt.ext ?_ ?_
@@ -40,25 +44,39 @@ def liftHom {K : Type} [Field K] {V W₁ W₂ : Type} [AddCommGroup V] [Module K
   map_add' x y := by
     refine TrivSqZeroExt.ext ?_ ?_
     · simp
-    · simp only [map_add (f := _), TrivSqZeroExt.snd_add, TrivSqZeroExt.fst_add, TrivSqZeroExt.snd_inl,
-        TrivSqZeroExt.snd_inr, zero_add]
+    · simp only [map_add (f := _), TrivSqZeroExt.snd_add, TrivSqZeroExt.fst_add,
+        TrivSqZeroExt.snd_inl, TrivSqZeroExt.snd_inr, zero_add]
       rw [show ((a x).snd + (a y).snd, (b x).snd + (b y).snd)
-          = ((a x).snd, (b x).snd) + ((a y).snd, (b y).snd) from rfl, map_add]
+            = ((a x).snd, (b x).snd) + ((a y).snd, (b y).snd) from
+          rfl,
+        map_add]
 
 end GlobalTheory.SqZeroPb
 
 open GlobalTheory.SqZeroPb in
-theorem GlobalTheory.SqZeroPb.isPullback_trivSqZeroExt : ∀ (K : Type) [Field K] (V W₁ W₂ : Type) [AddCommGroup V] [Module K V] [Module Kᵐᵒᵖ V] [IsCentralScalar K V] [AddCommGroup W₁] [Module K W₁] [Module Kᵐᵒᵖ W₁] [IsCentralScalar K W₁] [AddCommGroup W₂] [Module K W₂] [Module Kᵐᵒᵖ W₂] [IsCentralScalar K W₂] (p : V →ₗ[K] W₁) (q : V →ₗ[K] W₂), Function.Bijective (LinearMap.prod p q) → IsPullback (CommRingCat.ofHom (TrivSqZeroExt.map p).toRingHom) (CommRingCat.ofHom (TrivSqZeroExt.map q).toRingHom) (CommRingCat.ofHom (TrivSqZeroExt.fstHom K K W₁).toRingHom) (CommRingCat.ofHom (TrivSqZeroExt.fstHom K K W₂).toRingHom) := by
+theorem GlobalTheory.SqZeroPb.isPullback_trivSqZeroExt
+    : ∀ (K : Type) [Field K] (V W₁ W₂ : Type) [AddCommGroup V] [Module K V] [Module Kᵐᵒᵖ V]
+        [IsCentralScalar K V] [AddCommGroup W₁] [Module K W₁] [Module Kᵐᵒᵖ W₁]
+        [IsCentralScalar K W₁] [AddCommGroup W₂] [Module K W₂] [Module Kᵐᵒᵖ W₂]
+        [IsCentralScalar K W₂] (p : V →ₗ[K] W₁) (q : V →ₗ[K] W₂),
+      Function.Bijective (LinearMap.prod p q)
+        → IsPullback (CommRingCat.ofHom (TrivSqZeroExt.map p).toRingHom)
+          (CommRingCat.ofHom (TrivSqZeroExt.map q).toRingHom)
+          (CommRingCat.ofHom (TrivSqZeroExt.fstHom K K W₁).toRingHom)
+          (CommRingCat.ofHom (TrivSqZeroExt.fstHom K K W₂).toRingHom) := by
   intro K _ V W₁ W₂ _ _ _ _ _ _ _ _ _ _ _ _ p q hpq
   let e := LinearEquiv.ofBijective (LinearMap.prod p q) hpq
   have he : ∀ v, e v = (p v, q v) := fun v => rfl
-  have hw : CommRingCat.ofHom (TrivSqZeroExt.map p).toRingHom ≫
-      CommRingCat.ofHom (TrivSqZeroExt.fstHom K K W₁).toRingHom =
-      CommRingCat.ofHom (TrivSqZeroExt.map q).toRingHom ≫
-      CommRingCat.ofHom (TrivSqZeroExt.fstHom K K W₂).toRingHom := by
+  have hw
+      : CommRingCat.ofHom (TrivSqZeroExt.map p).toRingHom
+          ≫ CommRingCat.ofHom (TrivSqZeroExt.fstHom K K W₁).toRingHom
+        = CommRingCat.ofHom (TrivSqZeroExt.map q).toRingHom
+          ≫ CommRingCat.ofHom (TrivSqZeroExt.fstHom K K W₂).toRingHom := by
     ext x; simp
-  refine IsPullback.of_isLimit' ⟨hw⟩ (PullbackCone.IsLimit.mk hw
-    (fun s => CommRingCat.ofHom (liftHom e s.fst.hom s.snd.hom ?_)) ?_ ?_ ?_)
+  refine IsPullback.of_isLimit' ⟨hw⟩
+    (PullbackCone.IsLimit.mk hw
+      (fun s => CommRingCat.ofHom (liftHom e s.fst.hom s.snd.hom ?_))
+      ?_ ?_ ?_)
   · intro t
     have := congrArg (fun φ => φ.hom t) s.condition
     simpa using this

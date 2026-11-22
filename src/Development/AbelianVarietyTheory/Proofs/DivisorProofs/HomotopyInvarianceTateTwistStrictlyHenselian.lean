@@ -14,10 +14,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleHomotop
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 open scoped TensorProduct
 
-theorem GlobalTheory.homotopyInvariance_strictlyHenselian : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], SH A → IsUnit (q : A) → ∀ i : ℤ, Eqv _ (spMap (Polynomial.C : A →+* Polynomial A)) (tw q i) := by
+theorem GlobalTheory.homotopyInvariance_strictlyHenselian
+    : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A],
+      SH A → IsUnit (q : A)
+        → ∀ i : ℤ, Eqv _ (spMap (Polynomial.C : A →+* Polynomial A)) (tw q i) := by
   classical
   intro q _ A _ _ hq
-  have hfg : ∀ d : ℕ, ∀ (R : Type) [CommRing R] [Algebra.FiniteType ℤ R], IsUnit (q : R) → ringKrullDim R < d → HInv q R := by
+  have hfg
+      : ∀ d : ℕ, ∀ (R : Type) [CommRing R] [Algebra.FiniteType ℤ R],
+        IsUnit (q : R) → ringKrullDim R < d → HInv q R := by
     intro d
     induction d with
     | zero =>
@@ -28,18 +33,24 @@ theorem GlobalTheory.homotopyInvariance_strictlyHenselian : ∀ (q : ℕ) [NeZer
       exact absurd hd (not_lt.mpr (by exact_mod_cast ringKrullDim_nonneg_of_nontrivial))
     | succ d ih =>
       intro R _ _ hR hd
-      have hdom : ∀ (D : Type) [CommRing D] [IsDomain D] [Algebra.FiniteType ℤ D], IsUnit (q : D) → ringKrullDim D ≤ d → HInv q D := by
+      have hdom
+          : ∀ (D : Type) [CommRing D] [IsDomain D] [Algebra.FiniteType ℤ D],
+            IsUnit (q : D) → ringKrullDim D ≤ d → HInv q D := by
         intro D _ _ _ hD hDd
-        refine GlobalTheory.T.etaleHomotopyInvariance_cechDescent_integral q D (integralClosure D (AlgebraicClosure (FractionRing D))) inferInstance ?_ hD (GlobalTheory.T.etale_homotopy_invariance_tensor_power_integral_closure q d ih D hD hDd)
+        refine GlobalTheory.T.etaleHomotopyInvariance_cechDescent_integral q D
+          (integralClosure D (AlgebraicClosure (FractionRing D))) inferInstance ?_ hD
+          (GlobalTheory.T.etale_homotopy_invariance_tensor_power_integral_closure q d ih D hD hDd)
         intro x hx
         have hinj : Function.Injective (algebraMap D (AlgebraicClosure (FractionRing D))) := by
           rw [IsScalarTower.algebraMap_eq D (FractionRing D) (AlgebraicClosure (FractionRing D))]
-          exact (algebraMap (FractionRing D) _).injective.comp (IsFractionRing.injective D (FractionRing D))
+          exact (algebraMap (FractionRing D) _).injective.comp
+            (IsFractionRing.injective D (FractionRing D))
         have h0 : x = 0 := by
           apply hinj
           have := congrArg Subtype.val (RingHom.mem_ker.mp hx)
           simpa using this
-        rw [h0]; exact zero_mem _
+        rw [h0]
+        exact zero_mem _
       refine GlobalTheory.T.etaleHomotopyInvariantTwists_of_domains_of_dim_lt q d ih hdom R hR ?_
       revert hd
       induction ringKrullDim R with
@@ -48,8 +59,10 @@ theorem GlobalTheory.homotopyInvariance_strictlyHenselian : ∀ (q : ℕ) [NeZer
         intro h
         have h' : n < ((d + 1 : ℕ) : ℕ∞) := WithBot.coe_lt_coe.mp h
         exact WithBot.coe_le_coe.mpr (Order.le_of_lt_add_one (by simpa using h'))
-  let S : Finset A → Subalgebra ℤ A := fun s => Algebra.adjoin ℤ (insert (↑(hq.unit⁻¹) : A) (s : Set A))
-  have hmono : Monotone S := fun s t hst => Algebra.adjoin_mono (Set.insert_subset_insert (by exact_mod_cast hst))
+  let S : Finset A → Subalgebra ℤ A := fun s =>
+    Algebra.adjoin ℤ (insert (↑(hq.unit⁻¹) : A) (s : Set A))
+  have hmono : Monotone S := fun s t hst =>
+    Algebra.adjoin_mono (Set.insert_subset_insert (by exact_mod_cast hst))
   have hcov : ∀ a, ∃ s, a ∈ S s := fun a => ⟨{a}, Algebra.subset_adjoin (by simp)⟩
   have hunit : ∀ s, IsUnit (q : S s) := by
     intro s
@@ -61,7 +74,9 @@ theorem GlobalTheory.homotopyInvariance_strictlyHenselian : ∀ (q : ℕ) [NeZer
     intro s
     have : Algebra.FiniteType ℤ (S s) := by
       have hfg' : (S s).FG := by
-        have : (insert (↑(hq.unit⁻¹) : A) (s : Set A)) = ((insert (↑(hq.unit⁻¹) : A) s : Finset A) : Set A) := by simp
+        have : (insert (↑(hq.unit⁻¹) : A) (s : Set A))
+            = ((insert (↑(hq.unit⁻¹) : A) s : Finset A) : Set A) := by
+          simp
         rw [show S s = Algebra.adjoin ℤ (insert (↑(hq.unit⁻¹) : A) (s : Set A)) from rfl, this]
         exact Subalgebra.fg_adjoin_finset _
       exact Subalgebra.fg_iff_finiteType _ |>.mp hfg'

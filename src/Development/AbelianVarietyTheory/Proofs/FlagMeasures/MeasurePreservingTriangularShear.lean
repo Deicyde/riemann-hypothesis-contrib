@@ -5,14 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IpLEqZeroOfMe
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory
 
-theorem measurePreserving_layer_shear (d : ℕ) (p : Fin d → Prop) [DecidablePred p]
-    (f : (Fin d → ℝ) → (Fin d → ℝ)) (hf : Measurable f)
-    (h : ∀ x y i, ¬ p i → (∀ k, p k → x k = y k) → f x i = f y i) :
-    MeasurePreserving (fun (x : Fin d → ℝ) i => if p i then x i else x i + f x i)
+theorem measurePreserving_layer_shear
+    (d : ℕ) (p : Fin d → Prop) [DecidablePred p]
+    (f : (Fin d → ℝ) → (Fin d → ℝ))
+    (hf : Measurable f) (h : ∀ x y i, ¬ p i → (∀ k, p k → x k = y k) → f x i = f y i)
+    : MeasurePreserving
+      (fun (x : Fin d → ℝ) i => if p i then x i else x i + f x i)
       (volume : Measure (Fin d → ℝ)) volume := by
   set e := MeasurableEquiv.piEquivPiSubtypeProd (fun _ : Fin d => ℝ) p with he
   have he_mp : MeasurePreserving e volume volume :=
@@ -27,11 +30,13 @@ theorem measurePreserving_layer_shear (d : ℕ) (p : Fin d → Prop) [DecidableP
   have hΨ : MeasurePreserving
       (fun q : (Subtype p → ℝ) × ({i // ¬ p i} → ℝ) => (q.1, q.2 + G q.1))
       (volume.prod volume) (volume.prod volume) :=
-    MeasurePreserving.skew_product (f := id) (g := fun a b => b + G a)
+    MeasurePreserving.skew_product (f := id)
+      (g := fun a b => b + G a)
       (MeasurePreserving.id volume) (measurable_snd.add (hG.comp measurable_fst))
       (Filter.Eventually.of_forall fun a => (measurePreserving_add_right volume (G a)).map_eq)
-  have key : (fun (x : Fin d → ℝ) i => if p i then x i else x i + f x i) =
-      e.symm ∘ (fun q : (Subtype p → ℝ) × ({i // ¬ p i} → ℝ) => (q.1, q.2 + G q.1)) ∘ e := by
+  have key
+      : (fun (x : Fin d → ℝ) i => if p i then x i else x i + f x i)
+        = e.symm ∘ (fun q : (Subtype p → ℝ) × ({i // ¬ p i} → ℝ) => (q.1, q.2 + G q.1)) ∘ e := by
     funext x i
     have hx : ∀ k, p k → x k = e.symm ((e x).1, 0) k := fun k hk => by simp [e, hk]
     by_cases hi : p i
@@ -40,18 +45,23 @@ theorem measurePreserving_layer_shear (d : ℕ) (p : Fin d → Prop) [DecidableP
   rw [key]
   exact (MeasurePreserving.symm e he_mp).comp (hΨ.comp he_mp)
 
-theorem measurePreserving_triangular_shear (d : ℕ) (deg : Fin d → ℕ)
-    (f : (Fin d → ℝ) → (Fin d → ℝ)) (hf : Measurable f)
-    (h : ∀ x y i, (∀ k, deg k < deg i → x k = y k) → f x i = f y i) :
-    MeasurePreserving (fun x => x + f x) (volume : Measure (Fin d → ℝ)) volume := by
-
+theorem measurePreserving_triangular_shear
+    (d : ℕ) (deg : Fin d → ℕ) (f : (Fin d → ℝ) → (Fin d → ℝ))
+    (hf : Measurable f) (h : ∀ x y i, (∀ k, deg k < deg i → x k = y k) → f x i = f y i)
+    : MeasurePreserving (fun x => x + f x) (volume : Measure (Fin d → ℝ)) volume := by
   let U : ℕ → (Fin d → ℝ) → (Fin d → ℝ) := fun n x i => if n ≤ deg i then x i + f x i else x i
-  have hS : ∀ n, MeasurePreserving
-      (fun (x : Fin d → ℝ) i => if deg i ≠ n then x i else x i + f x i) volume volume :=
-    fun n => measurePreserving_layer_shear d (fun i => deg i ≠ n) f hf
+  have hS
+      : ∀ n,
+        MeasurePreserving
+          (fun (x : Fin d → ℝ) i => if deg i ≠ n then x i else x i + f x i)
+          volume volume := fun n =>
+    measurePreserving_layer_shear d
+      (fun i => deg i ≠ n)
+      f hf
       (fun x y i hi hxy => h x y i (fun k hk => hxy k (by omega)))
-  have hstep : ∀ n, U n =
-      (fun (x : Fin d → ℝ) i => if deg i ≠ n then x i else x i + f x i) ∘ U (n + 1) := by
+  have hstep
+      : ∀ n,
+        U n = (fun (x : Fin d → ℝ) i => if deg i ≠ n then x i else x i + f x i) ∘ U (n + 1) := by
     intro n
     funext x i
     by_cases hin : deg i = n

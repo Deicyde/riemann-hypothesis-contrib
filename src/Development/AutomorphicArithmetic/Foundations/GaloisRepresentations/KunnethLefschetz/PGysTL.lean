@@ -7,30 +7,46 @@ public import Development.EtaleCohomology.EtaleTrace.LPdCut
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 
-private def castHom {q : ℕ} {E : Spc} {n i n' i' : ℤ} (hn : n = n') (hi : i = i') :
-    Ht q E n i →+ Ht q E n' i' where
+private def castHom {q : ℕ} {E : Spc} {n i n' i' : ℤ} (hn : n = n') (hi : i = i')
+    : Ht q E n i →+ Ht q E n' i' where
   toFun := Ht.cast hn hi
   map_zero' := by subst hn hi; rfl
   map_add' := LRingPf.cast_add hn hi
 
-private def pairSP {k : Type} [Field k] {d e : ℕ} {Z X : Scheme.{0}} {p : X ⟶ S k} {ι : Z ⟶ X}
-    (h : IsPair d e p ι) : LateralTheory.CohomologicalPurity.SP d :=
-  { X := X, Z := Z, S := S k, p := p, ι := ι, e := e
-    U := ⟨(Set.range ι)ᶜ, h.cl.isClosedEmbedding.isClosed_range.isOpen_compl⟩
-    cl := h.cl, smX := h.big, smZ := h.small, hU := rfl }
+private def pairSP
+    {k : Type} [Field k] {d e : ℕ} {Z X : Scheme.{0}} {p : X ⟶ S k} {ι : Z ⟶ X} (h : IsPair d e p ι)
+    : LateralTheory.CohomologicalPurity.SP d := {
+  X := X
+  Z := Z
+  S := S k
+  p := p
+  ι := ι
+  e := e
+  U := ⟨(Set.range ι)ᶜ, h.cl.isClosedEmbedding.isClosed_range.isOpen_compl⟩
+  cl := h.cl
+  smX := h.big
+  smZ := h.small
+  hU := rfl
+}
 
-theorem UpperTheory.Gal.KunnethLefschetz.gysTL_holds :
-    UpperTheory.Gal.KunnethLefschetz.GysTL := by
+theorem UpperTheory.Gal.KunnethLefschetz.gysTL_holds : UpperTheory.Gal.KunnethLefschetz.GysTL := by
   unfold GysTL
   intro hI hO k _
   have hg : ∀ d, LateralTheory.CohomologicalPurity.Gysin d := hI.gys
   unfold LateralTheory.CohomologicalPurity.Gysin at hg
   choose gys rs H using hg
-  refine ⟨⟨fun q d e Z X p ι h n m i j hn hi =>
-    (castHom hn hi).comp (gys d q (pairSP h) n i), ?_, ?_, ?_, ?_, ?_⟩⟩
+  refine ⟨⟨
+    fun q d e Z X p ι h n m i j hn hi => (castHom hn hi).comp (gys d q (pairSP h) n i),
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩⟩
   · intro q _ hq d e Z X p ι h n m i j hn hi U hU
     subst hn hi
     obtain rfl : U = (pairSP h).U := TopologicalSpace.Opens.ext hU

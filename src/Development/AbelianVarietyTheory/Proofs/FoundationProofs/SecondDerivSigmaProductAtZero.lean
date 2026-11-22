@@ -56,8 +56,10 @@ structure IsSigmaLike (L : PeriodPair) (σ : ℂ → ℂ) : Prop where
   diff : Differentiable ℂ σ
   deriv_zero : deriv σ 0 = 1
   zero_iff : ∀ z, σ z = 0 ↔ z ∈ L.lattice
-  add : ∀ u v, u ∉ L.lattice → v ∉ L.lattice →
-    (℘[L] u - ℘[L] v) * (σ u ^ 2 * σ v ^ 2) = -(σ (u + v) * σ (u - v))
+  add
+    : ∀ u v,
+      u ∉ L.lattice → v ∉ L.lattice
+        → (℘[L] u - ℘[L] v) * (σ u ^ 2 * σ v ^ 2) = -(σ (u + v) * σ (u - v))
 
 variable {L : PeriodPair} {σ : ℂ → ℂ}
 
@@ -174,56 +176,72 @@ lemma IsSigmaLike.divQuot_ne (H : IsSigmaLike L σ) {u : ℂ} (hu : u ∉ L.latt
 lemma JetRel.wr {S : Subring (ℂ × ℂ)} {f f' : ℂ → ℂ} (H : JetRel S f f') : JetRel S (wr f) (wr f') :=
   (H.mul H.deriv.deriv).sub (H.deriv.pow 2)
 
-theorem jetRel_divQuot {S : Subring (ℂ × ℂ)} (hS : IsFieldGraph S) {L L' : PeriodPair} {σ σ' : ℂ → ℂ}
-    (H : IsSigmaLike L σ) (H' : IsSigmaLike L' σ') {u u' : ℂ} (hu : u ∉ L.lattice) (hu' : u' ∉ L'.lattice)
-    (hg : (L.g₂, L'.g₂) ∈ S) (hp : (℘[L] u, ℘[L'] u') ∈ S) (hq : (℘'[L] u, ℘'[L'] u') ∈ S) (n : ℕ) :
-    JetRel S (divQuot σ u n) (divQuot σ' u' n) := by
-  have z0 : ∀ {L : PeriodPair} {u : ℂ}, u ∉ L.lattice → 0 + u ∉ L.lattice := fun h => by simpa using h
-  have c0 : ∀ {L : PeriodPair} {σ : ℂ → ℂ} {u : ℂ}, IsSigmaLike L σ →
-      (fun _ => (0 : ℂ)) =ᶠ[𝓝 0] divQuot σ u 0 := fun H =>
+theorem jetRel_divQuot
+    {S : Subring (ℂ × ℂ)} (hS : IsFieldGraph S)
+    {L L' : PeriodPair} {σ σ' : ℂ → ℂ} (H : IsSigmaLike L σ) (H' : IsSigmaLike L' σ')
+    {u u' : ℂ} (hu : u ∉ L.lattice) (hu' : u' ∉ L'.lattice)
+    (hg : (L.g₂, L'.g₂) ∈ S) (hp : (℘[L] u, ℘[L'] u') ∈ S) (hq : (℘'[L] u, ℘'[L'] u') ∈ S) (n : ℕ)
+    : JetRel S (divQuot σ u n) (divQuot σ' u' n) := by
+  have z0 : ∀ {L : PeriodPair} {u : ℂ}, u ∉ L.lattice → 0 + u ∉ L.lattice := fun h => by
+    simpa using h
+  have c0
+      : ∀ {L : PeriodPair} {σ : ℂ → ℂ} {u : ℂ},
+        IsSigmaLike L σ → (fun _ => (0 : ℂ)) =ᶠ[𝓝 0] divQuot σ u 0 := fun H =>
     .of_forall fun z => by simp [divQuot, (H.zero_iff 0).2 (zero_mem _)]
-  have c1 : ∀ {L : PeriodPair} {σ : ℂ → ℂ} {u : ℂ}, IsSigmaLike L σ → u ∉ L.lattice →
-      (fun _ => (1 : ℂ)) =ᶠ[𝓝 0] divQuot σ u 1 := fun H hu => by
+  have c1
+      : ∀ {L : PeriodPair} {σ : ℂ → ℂ} {u : ℂ},
+        IsSigmaLike L σ → u ∉ L.lattice → (fun _ => (1 : ℂ)) =ᶠ[𝓝 0] divQuot σ u 1 := fun H hu => by
     filter_upwards [eventually_add_notMem _ (z0 hu)] with w hw
     simp [divQuot, mt (H.zero_iff _).1 hw]
-  have c2 : ∀ {L : PeriodPair} {σ : ℂ → ℂ} {u : ℂ}, IsSigmaLike L σ → u ∉ L.lattice →
-      (fun z => 0 - ℘'[L] (z + u)) =ᶠ[𝓝 0] divQuot σ u 2 := @fun L σ u H hu => by
-    filter_upwards [eventually_add_notMem _ (z0 hu)] with w hw
-    rw [divQuot, show ((2 : ℕ) : ℂ) * w + (2 : ℕ) * u = (w + u) + (w + u) by push_cast; ring, H.double hw]
-    have := mt (H.zero_iff _).1 hw
-    field_simp
-    ring
-  have c3 : ∀ {L : PeriodPair} {u : ℂ}, u ∉ L.lattice →
-      AnalyticAt ℂ (fun z => ℘'[L] (z + u)) 0 ∧
-      (deriv (fun z => ℘[L] (z + u)) =ᶠ[𝓝 0] fun z => ℘'[L] (z + u)) ∧
-      (deriv (fun z => ℘'[L] (z + u)) =ᶠ[𝓝 0] fun z => 6 * ℘[L] (z + u) * ℘[L] (z + u) - L.g₂ * (2 : ℂ)⁻¹) :=
+  have c2
+      : ∀ {L : PeriodPair} {σ : ℂ → ℂ} {u : ℂ},
+        IsSigmaLike L σ → u ∉ L.lattice → (fun z => 0 - ℘'[L] (z + u)) =ᶠ[𝓝 0] divQuot σ u 2 :=
+    @fun L σ u H hu => by
+      filter_upwards [eventually_add_notMem _ (z0 hu)] with w hw
+      rw [divQuot, show ((2 : ℕ) : ℂ) * w + (2 : ℕ) * u = (w + u) + (w + u) by push_cast; ring,
+        H.double hw]
+      have := mt (H.zero_iff _).1 hw
+      field_simp
+      ring
+  have c3
+      : ∀ {L : PeriodPair} {u : ℂ},
+        u ∉ L.lattice
+          → AnalyticAt ℂ (fun z => ℘'[L] (z + u)) 0
+            ∧ (deriv (fun z => ℘[L] (z + u)) =ᶠ[𝓝 0] fun z => ℘'[L] (z + u))
+            ∧ (deriv (fun z => ℘'[L] (z + u)) =ᶠ[𝓝 0] fun z => 6 * ℘[L] (z + u) * ℘[L] (z + u) - L.g₂ * (2 : ℂ)⁻¹) :=
     @fun L u hu => by
-    refine ⟨(L.analyticOnNhd_derivWeierstrassP _ (z0 hu)).comp (f := (· + u)) (by fun_prop), ?_, ?_⟩
-    · filter_upwards [weierstrass_system_add_const L u (z0 hu)] with w hw using hw.1.deriv
-    · filter_upwards [weierstrass_system_add_const L u (z0 hu)] with w hw
-      rw [hw.2.deriv]; ring
+      refine
+        ⟨(L.analyticOnNhd_derivWeierstrassP _ (z0 hu)).comp (f := (· + u)) (by fun_prop), ?_, ?_⟩
+      · filter_upwards [weierstrass_system_add_const L u (z0 hu)] with w hw using hw.1.deriv
+      · filter_upwards [weierstrass_system_add_const L u (z0 hu)] with w hw
+        rw [hw.2.deriv]
+        ring
   have hq2 : JetRel S (fun z => ℘'[L] (z + u)) (fun z => ℘'[L'] (z + u')) :=
     jetRel_of_weierstrass_system (pair_mul hg (hS.2 _ _ (pair_natCast S 2)))
       (analyticAt_weierstrassP_add L u (z0 hu)) (analyticAt_weierstrassP_add L' u' (z0 hu'))
-      (c3 hu).1 (c3 hu').1 (c3 hu).2.1 (c3 hu').2.1 (c3 hu).2.2 (c3 hu').2.2
-      (by simpa using hp) (by simpa using hq)
+      (c3 hu).1 (c3 hu').1 (c3 hu).2.1 (c3 hu').2.1 (c3 hu).2.2 (c3 hu').2.2 (by simpa using hp)
+      (by simpa using hq)
   induction n using Nat.strong_induction_on with
   | _ n ih =>
-  match n with
-  | 0 => exact (JetRel.const S.zero_mem).congr (c0 H) (c0 H')
-  | 1 => exact (JetRel.const S.one_mem).congr (c1 H hu) (c1 H' hu')
-  | 2 => exact ((JetRel.const S.zero_mem).sub hq2).congr (c2 H hu) (c2 H' hu')
-  | n + 3 =>
-    have c4 : ∀ {L : PeriodPair} {σ : ℂ → ℂ} {u : ℂ}, IsSigmaLike L σ → u ∉ L.lattice →
-        wr (divQuot σ u (n + 2)) =ᶠ[𝓝 0] fun z =>
-          divQuot σ u (n + 3) z * (((n + 2 : ℕ) : ℂ) ^ 2 * divQuot σ u (n + 1) z) := fun H hu => by
-      filter_upwards [eventually_add_notMem _ (z0 hu)] with w hw using (H.divQuot_rec hw (n + 1)).symm
-    refine JetRel.of_mul hS (H.analyticAt_divQuot (z0 hu) _) (H'.analyticAt_divQuot (z0 hu') _)
-      (((JetRel.const (pair_natCast S (n + 2))).pow 2).mul (ih (n + 1) (by omega))) ?_
-      ((ih (n + 2) (by omega)).wr.congr (c4 H hu) (c4 H' hu'))
-    intro e
-    apply H.divQuot_ne hu (n := n + 1) (by omega)
-    have hn : ((n + 2 : ℕ) : ℂ) ^ 2 ≠ 0 := pow_ne_zero _ (by exact_mod_cast (by omega : n + 2 ≠ 0))
-    filter_upwards [e] with w hw using (mul_eq_zero.1 hw).resolve_left hn
+    match n with
+    | 0 => exact (JetRel.const S.zero_mem).congr (c0 H) (c0 H')
+    | 1 => exact (JetRel.const S.one_mem).congr (c1 H hu) (c1 H' hu')
+    | 2 => exact ((JetRel.const S.zero_mem).sub hq2).congr (c2 H hu) (c2 H' hu')
+    | n + 3 =>
+      have c4
+          : ∀ {L : PeriodPair} {σ : ℂ → ℂ} {u : ℂ},
+            IsSigmaLike L σ → u ∉ L.lattice
+              → wr (divQuot σ u (n + 2)) =ᶠ[𝓝 0] fun z =>
+                  divQuot σ u (n + 3) z * (((n + 2 : ℕ) : ℂ) ^ 2 * divQuot σ u (n + 1) z) :=
+        fun H hu => by
+          filter_upwards [eventually_add_notMem _ (z0 hu)] with w hw using (H.divQuot_rec hw (n + 1)).symm
+      refine JetRel.of_mul hS (H.analyticAt_divQuot (z0 hu) _) (H'.analyticAt_divQuot (z0 hu') _)
+        (((JetRel.const (pair_natCast S (n + 2))).pow 2).mul (ih (n + 1) (by omega))) ?_
+        ((ih (n + 2) (by omega)).wr.congr (c4 H hu) (c4 H' hu'))
+      intro e
+      apply H.divQuot_ne hu (n := n + 1) (by omega)
+      have hn : ((n + 2 : ℕ) : ℂ) ^ 2 ≠ 0 :=
+        pow_ne_zero _ (by exact_mod_cast (by omega : n + 2 ≠ 0))
+      filter_upwards [e] with w hw using (mul_eq_zero.1 hw).resolve_left hn
 
 end GlobalTheory.JetConj

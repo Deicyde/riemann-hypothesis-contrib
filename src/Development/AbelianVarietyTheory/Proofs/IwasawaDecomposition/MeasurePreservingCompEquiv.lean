@@ -14,8 +14,8 @@ open MeasureTheory
 
 namespace GlobalTheory.UnifDens
 
-theorem measurePreserving_comp_equiv {κ : Type} [Fintype κ] {n : ℕ} (e : κ ≃ Fin n) :
-    MeasurePreserving (fun x : Fin n → ℂ => fun i : κ => x (e i)) volume volume := by
+theorem measurePreserving_comp_equiv {κ : Type} [Fintype κ] {n : ℕ} (e : κ ≃ Fin n)
+    : MeasurePreserving (fun x : Fin n → ℂ => fun i : κ => x (e i)) volume volume := by
   have := MeasureTheory.volume_measurePreserving_piCongrLeft (fun _ : κ => ℂ) e.symm
   convert this using 1
   funext x i
@@ -25,12 +25,13 @@ theorem measurePreserving_comp_equiv {κ : Type} [Fintype κ] {n : ℕ} (e : κ 
 
 variable {ι : Type} [Fintype ι] {p q n : ℕ}
 
-def flatL (h : Fintype.card (ι × Fin p × Fin q) = n) : ReciprocityTheory.L2DbarEstimates.V n ≃L[ℂ] (ι × Fin p × Fin q → ℂ) :=
+def flatL (h : Fintype.card (ι × Fin p × Fin q) = n)
+    : ReciprocityTheory.L2DbarEstimates.V n ≃L[ℂ] (ι × Fin p × Fin q → ℂ) :=
   (PiLp.continuousLinearEquiv 2 ℂ fun _ : Fin n => ℂ).trans
     (LinearEquiv.funCongrLeft ℂ ℂ (Fintype.equivFinOfCardEq h)).toContinuousLinearEquiv
 
-theorem flatL_mp (h : Fintype.card (ι × Fin p × Fin q) = n) :
-    MeasurePreserving (flatL h) volume volume := by
+theorem flatL_mp (h : Fintype.card (ι × Fin p × Fin q) = n)
+    : MeasurePreserving (flatL h) volume volume := by
   let E' : (Fin n → ℂ) ≃ᵐ ReciprocityTheory.L2DbarEstimates.V n :=
     (PiLp.continuousLinearEquiv 2 ℂ fun _ : Fin n => ℂ).symm.toHomeomorph.toMeasurableEquiv
   have h1 : MeasurePreserving E' volume volume := GlobalTheory.measurePreserving_toLp_complex

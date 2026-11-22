@@ -6,10 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.W
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.HV UpperTheory.V.W
 
-theorem UpperTheory.V.W.b0Ex :
-    PhiAll → ProModularRingExists := by
+theorem UpperTheory.V.W.b0Ex : PhiAll → ProModularRingExists := by
   intro h l hl L Ω _ _ _ _ _ _ s V c n r R _ _ _ hp
   haveI : IsAdicComplete (maximalIdeal c.O) c.O := (UpperTheory.V.Base.dvrFacts l c.O).2.2.2.1
   haveI : IsLocalHom (algebraMap ℤ_[l] c.O) := (UpperTheory.V.Base.dvrFacts l c.O).2.2.1
@@ -21,4 +21,5 @@ theorem UpperTheory.V.W.b0Ex :
   haveI : CharP (ResidueField c.O) l :=
     charP_of_injective_ringHom (algebraMap (ResidueField ℤ_[l]) (ResidueField c.O)).injective l
   obtain ⟨-, h0, hv⟩ := h l L Ω s V
-  exact UpperTheory.V.CA.universalDeformationRing_nonempty_of_nonempty_pair r h0 hv ⟨R, _, _, inferInstance, hp⟩
+  exact UpperTheory.V.CA.universalDeformationRing_nonempty_of_nonempty_pair r h0 hv
+    ⟨R, _, _, inferInstance, hp⟩

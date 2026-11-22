@@ -5,11 +5,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section
-variable {S E κ : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
+variable
+  {S E κ : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
   (act : S →ₐ[ℂ] Module.End ℂ E)
 
 private lemma act_inv_act (v : Sˣ) (m : E) : act ((v⁻¹ : Sˣ) : S) (act (v : S) m) = m := by
@@ -74,13 +76,12 @@ private lemma unsc_wd (u : κ → Sˣ) (z r : κ → S) (hr : ∀ l, r l = z l *
 
 end
 
-theorem UpperTheory.Gal.productCup_of_system.rS_of :
-    RS := by
+theorem UpperTheory.Gal.productCup_of_system.rS_of : RS := by
   intro S E _ _ _ _ act κ _ _ M u r z hr n c
-  have hD : ∀ c, unsc act u ((kosT act M u z).D c) = (kos act M r).D (unsc act u c) :=
-    fun c => unsc_wd act u z r hr c
-  have hC : ∀ n c, c ∈ (kosT act M u z).C n ↔ unsc act u c ∈ (kos act M r).C n :=
-    fun n c => mem_C_iff act M u z r n c
+  have hD : ∀ c, unsc act u ((kosT act M u z).D c) = (kos act M r).D (unsc act u c) := fun c =>
+    unsc_wd act u z r hr c
+  have hC : ∀ n c, c ∈ (kosT act M u z).C n ↔ unsc act u c ∈ (kos act M r).C n := fun n c =>
+    mem_C_iff act M u z r n c
   refine ⟨hC n c, ?_, ?_, unsc_inv_unsc act u c, unsc_unsc_inv act u c⟩
   · simp only [Cx.Z, Submodule.mem_inf, LinearMap.mem_ker]
     refine and_congr (hC n c) ?_

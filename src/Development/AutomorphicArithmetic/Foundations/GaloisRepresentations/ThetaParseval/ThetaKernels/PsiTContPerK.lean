@@ -20,14 +20,22 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix Classical ComplexOrder
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 open GlobalTheory.Doubling (absE)
 namespace PositivityTheory.SiegelWeilFormula.Act.C4
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
-variable {d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ} (L : _root_.PositivityTheory.SiegelWeilFormula.LD_k d)
-instance countableCs_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ) : Countable (_root_.PositivityTheory.SiegelWeilFormula.Act.Cs_k d) := by
-  have : Countable (rat2 σ d.Y) := GlobalTheory.EisBL.DoubledGroupTopology.countable_rational_points_doubled σ d.Y
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ}
+  (L : _root_.PositivityTheory.SiegelWeilFormula.LD_k d)
+instance countableCs_k (d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ)
+    : Countable (_root_.PositivityTheory.SiegelWeilFormula.Act.Cs_k d) := by
+  have : Countable (rat2 σ d.Y) :=
+    GlobalTheory.EisBL.DoubledGroupTopology.countable_rational_points_doubled σ d.Y
   infer_instance
 theorem cont_E_k {s₁ z : ℂ} {f : d.G → ℂ} (hf : IsSec d.K d.χ s₁ f)
     (hmaj : ∀ C : Set d.G, IsCompact C → ∃ u : GlobalTheory.Eis.Cosets (par2 σ d.Y) (rat2 σ d.Y) → ℝ, Summable u ∧ ∀ g ∈ C, ∀ q,
@@ -66,20 +74,22 @@ theorem per_E_k {s₁ z : ℂ} {f : d.G → ℂ} (hf : IsSec d.K d.χ s₁ f) {n
   simp only [GlobalTheory.Eis.cosetSum, GlobalTheory.Eis.term] at h
   rw [kunf.nb_add hnb']
   exact h
-theorem psiT_cont_per_k (T' : nF σ L.Y L.b) :
-    Continuous (fun β' : nA σ L.Y L.b => d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T'.1.1 * β'.1))))) ∧
-    ∀ β₀ ∈ nF σ L.Y L.b, ∀ β' : nA σ L.Y L.b,
-      d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T'.1.1 * (β₀ + β').1)))) =
-        d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T'.1.1 * β'.1)))) := by
+theorem psiT_cont_per_k (T' : nF σ L.Y L.b)
+    : Continuous (fun β' : nA σ L.Y L.b =>
+        d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T'.1.1 * β'.1)))))
+      ∧ ∀ β₀ ∈ nF σ L.Y L.b, ∀ β' : nA σ L.Y L.b,
+        d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T'.1.1 * (β₀ + β').1))))
+          = d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T'.1.1 * β'.1)))) := by
   have hstd := d.ok.good.std
   refine ⟨?_, fun β₀ h₀ β' => ?_⟩
   · have : IsModuleTopology (AF F) (AE F E) := ⟨rfl⟩
     have htr : Continuous (Algebra.trace (AF F) (AE F E)) :=
       IsModuleTopology.continuous_of_linearMap (Algebra.trace (AF F) (AE F E))
-    exact hstd.1.comp (htr.comp ((continuous_const.matrix_mul continuous_subtype_val).matrix_trace)).neg
+    exact hstd.1.comp (htr.comp ((continuous_const.matrix_mul
+      continuous_subtype_val).matrix_trace)).neg
   · have h1 := kunf.psi_rat hstd T' ⟨β₀, h₀⟩
-    rw [AddSubgroup.coe_add, Matrix.mul_add, Matrix.trace_add, map_add (f := _), neg_add, AddChar.map_add_eq_mul,
-      AddChar.map_neg_eq_inv, h1, inv_one, one_mul]
+    rw [AddSubgroup.coe_add, Matrix.mul_add, Matrix.trace_add, map_add (f := _), neg_add,
+      AddChar.map_add_eq_mul, AddChar.map_neg_eq_inv, h1, inv_one, one_mul]
 theorem firstEq_of_k : _root_.PositivityTheory.SiegelWeilFormula.Act.AbsConv_k → _root_.PositivityTheory.SiegelWeilFormula.Act.FirstEq_k := by
   intro hA F E _ _ _ _ _ σ d L s₁ f hf he
   obtain ⟨t₁, ht₁⟩ := hA F E σ d L s₁ f hf he
@@ -150,7 +160,9 @@ theorem firstEq_of_k : _root_.PositivityTheory.SiegelWeilFormula.Act.AbsConv_k �
         rfl
 end PositivityTheory.SiegelWeilFormula.Act.C4
 namespace PositivityTheory.SiegelWeilFormula.Act
-theorem firstEq_k : _root_.PositivityTheory.SiegelWeilFormula.Act.FirstEq_k := _root_.PositivityTheory.SiegelWeilFormula.Act.C4.firstEq_of_k _root_.PositivityTheory.SiegelWeilFormula.Act.absConv_k
+theorem firstEq_k : _root_.PositivityTheory.SiegelWeilFormula.Act.FirstEq_k :=
+  _root_.PositivityTheory.SiegelWeilFormula.Act.C4.firstEq_of_k
+    _root_.PositivityTheory.SiegelWeilFormula.Act.absConv_k
 end PositivityTheory.SiegelWeilFormula.Act
 end
 end

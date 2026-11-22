@@ -10,23 +10,27 @@ public import Development.AbelianVarietyTheory.BlockTheory.PoincareCuspForms.Exh
 
 namespace GlobalTheory.UpCoordCompare
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
-open ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.IndefiniteRowSideFullHecke.ExhaustionFrames
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+open ReciprocityTheory.ChartRestriction.G.AR.Up
+  GlobalTheory.IndefiniteRowSideFullHecke.ExhaustionFrames
 open scoped Matrix ComplexOrder ContDiff
 
 noncomputable section
 
-theorem det_one_add_of_isNilpotent {W : Type} [AddCommGroup W] [Module ℝ W] [Module.Finite ℝ W]
-    {K : W →ₗ[ℝ] W} (hK : IsNilpotent K) : LinearMap.det (1 + K) = 1 := by
+theorem det_one_add_of_isNilpotent
+    {W : Type} [AddCommGroup W] [Module ℝ W] [Module.Finite ℝ W]
+    {K : W →ₗ[ℝ] W} (hK : IsNilpotent K)
+    : LinearMap.det (1 + K) = 1 := by
   have h := (hK.neg).charpoly_eq_X_pow_finrank
   have h2 := LinearMap.eval_charpoly (-K) 1
   rw [h] at h2
   simpa using h2.symm
 
-theorem measurePreserving_of_triangular {n : ℕ} (F : V n → V n) (hF : Differentiable ℝ F)
-    (hb : Function.Bijective F) (ρ : Fin n → ℕ)
-    (htri : ∀ (i : Fin n) (z w : V n), (∀ j, ρ j < ρ i → z j = w j) → F z i - z i = F w i - w i) :
-    MeasurePreserving F volume volume := by
+theorem measurePreserving_of_triangular
+    {n : ℕ} (F : V n → V n) (hF : Differentiable ℝ F) (hb : Function.Bijective F) (ρ : Fin n → ℕ)
+    (htri : ∀ (i : Fin n) (z w : V n), (∀ j, ρ j < ρ i → z j = w j) → F z i - z i = F w i - w i)
+    : MeasurePreserving F volume volume := by
   have hdet : ∀ z, (fderiv ℝ F z).det = 1 := by
     intro z
     set K : V n →ₗ[ℝ] V n := (fderiv ℝ F z : V n →ₗ[ℝ] V n) - 1 with hK
@@ -36,13 +40,15 @@ theorem measurePreserving_of_triangular {n : ℕ} (F : V n → V n) (hF : Differ
         simpa using ((hasDerivAt_id (0 : ℝ)).smul_const h).const_add z
       have h2 : HasDerivAt (fun t : ℝ => F (z + t • h)) (fderiv ℝ F z h) 0 := by
         exact (hF z).hasFDerivAt.comp_hasDerivAt_of_eq (0 : ℝ) h1 (by simp)
-      have h3 := (PiLp.proj 2 (𝕜 := ℝ) (fun _ : Fin n => ℂ) i).hasFDerivAt.comp_hasDerivAt (0 : ℝ)
-        (h2.sub h1)
+      have h3 :=
+        (PiLp.proj 2 (𝕜 := ℝ) (fun _ : Fin n => ℂ) i).hasFDerivAt.comp_hasDerivAt (0 : ℝ)
+          (h2.sub h1)
       have h4 : (fun t : ℝ => F (z + t • h) i - (z + t • h) i) = fun _ => F z i - z i := by
         funext t
         exact htri i _ _ fun j hj => by simp [hh j hj]
-      have h5 : HasDerivAt (fun t : ℝ => F (z + t • h) i - (z + t • h) i)
-          (fderiv ℝ F z h i - h i) 0 := h3
+      have h5
+          : HasDerivAt (fun t : ℝ => F (z + t • h) i - (z + t • h) i) (fderiv ℝ F z h i - h i) 0 :=
+        h3
       rw [h4] at h5
       have := h5.unique (hasDerivAt_const _ _)
       simpa [hK] using this
@@ -63,25 +69,35 @@ theorem measurePreserving_of_triangular {n : ℕ} (F : V n → V n) (hF : Differ
     rw [hK, add_sub_cancel] at this
     exact this
   refine ⟨hF.continuous.measurable, ?_⟩
-  have := map_withDensity_abs_det_fderiv_eq_addHaar (volume : Measure (V n)) (s := Set.univ)
-    (f := F) (f' := fderiv ℝ F) MeasurableSet.univ.nullMeasurableSet
-    (fun x _ => (hF x).hasFDerivAt.hasFDerivWithinAt) hb.1.injOn
+  have :=
+    map_withDensity_abs_det_fderiv_eq_addHaar (volume : Measure (V n)) (s := Set.univ) (f := F)
+      (f' := fderiv ℝ F) MeasurableSet.univ.nullMeasurableSet
+      (fun x _ => (hF x).hasFDerivAt.hasFDerivWithinAt)
+      hb.1.injOn
   simpa [hdet, hb.2.range_eq] using this
 
-theorem opNorm_lt_one_iff {m n : Type} [Fintype m] [Fintype n] [DecidableEq n] (Z : Matrix m n ℂ) :
-    ‖LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin Z)‖ < 1 ↔ (1 - Zᴴ * Z).PosDef := by
-  have key : ∀ v : EuclideanSpace ℂ n, star v.ofLp ⬝ᵥ ((1 - Zᴴ * Z) *ᵥ v.ofLp) =
-      ((‖v‖ ^ 2 - ‖Matrix.toEuclideanLin Z v‖ ^ 2 : ℝ) : ℂ) := by
+theorem opNorm_lt_one_iff {m n : Type} [Fintype m] [Fintype n] [DecidableEq n] (Z : Matrix m n ℂ)
+    : ‖LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin Z)‖ < 1 ↔ (1 - Zᴴ * Z).PosDef := by
+  have key
+      : ∀ v : EuclideanSpace ℂ n,
+        star v.ofLp ⬝ᵥ ((1 - Zᴴ * Z) *ᵥ v.ofLp)
+          = ((‖v‖ ^ 2 - ‖Matrix.toEuclideanLin Z v‖ ^ 2 : ℝ) : ℂ) := by
     intro v
     have e1 : star v.ofLp ⬝ᵥ v.ofLp = ((‖v‖ ^ 2 : ℝ) : ℂ) := by
       have := EuclideanSpace.inner_eq_star_dotProduct v v
       rw [inner_self_eq_norm_sq_to_K] at this
-      rw [dotProduct_comm]; push_cast; exact this.symm
-    have e2 : star (Z *ᵥ v.ofLp) ⬝ᵥ (Z *ᵥ v.ofLp) = ((‖Matrix.toEuclideanLin Z v‖ ^ 2 : ℝ) : ℂ) := by
-      have := EuclideanSpace.inner_eq_star_dotProduct (Matrix.toEuclideanLin Z v)
-        (Matrix.toEuclideanLin Z v)
+      rw [dotProduct_comm]
+      push_cast
+      exact this.symm
+    have e2
+        : star (Z *ᵥ v.ofLp) ⬝ᵥ (Z *ᵥ v.ofLp) = ((‖Matrix.toEuclideanLin Z v‖ ^ 2 : ℝ) : ℂ) := by
+      have :=
+        EuclideanSpace.inner_eq_star_dotProduct (Matrix.toEuclideanLin Z v)
+          (Matrix.toEuclideanLin Z v)
       rw [inner_self_eq_norm_sq_to_K] at this
-      rw [dotProduct_comm]; push_cast; exact this.symm
+      rw [dotProduct_comm]
+      push_cast
+      exact this.symm
     rw [Matrix.sub_mulVec, Matrix.one_mulVec, dotProduct_sub, ← Matrix.mulVec_mulVec,
       Matrix.dotProduct_mulVec, ← Matrix.star_mulVec, e1, e2, ← Complex.ofReal_sub]
   set T := LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin Z) with hT
@@ -92,7 +108,9 @@ theorem opNorm_lt_one_iff {m n : Type} [Fintype m] [Fintype n] [DecidableEq n] (
     intro x hx
     set v : EuclideanSpace ℂ _ := WithLp.toLp 2 x with hv
     have hv0 : 0 < ‖v‖ := by
-      rw [norm_pos_iff]; intro h; apply hx
+      rw [norm_pos_iff]
+      intro h
+      apply hx
       simpa [hv] using congrArg WithLp.ofLp h
     have h1 : ‖Matrix.toEuclideanLin Z v‖ ≤ _ := T.le_opNorm v
     have h2 : ‖Matrix.toEuclideanLin Z v‖ < ‖v‖ := by nlinarith
@@ -102,8 +120,9 @@ theorem opNorm_lt_one_iff {m n : Type} [Fintype m] [Fintype n] [DecidableEq n] (
     rw [this]
     exact Complex.zero_lt_real.2 (by nlinarith)
   · intro hpd
-    obtain ⟨v0, hv0, hmax⟩ := (isCompact_closedBall (0 : EuclideanSpace ℂ n) 1).exists_isMaxOn
-      ⟨0, Metric.mem_closedBall_self zero_le_one⟩ (T.continuous.norm.continuousOn)
+    obtain ⟨v0, hv0, hmax⟩ :=
+      (isCompact_closedBall (0 : EuclideanSpace ℂ n) 1).exists_isMaxOn
+        ⟨0, Metric.mem_closedBall_self zero_le_one⟩ (T.continuous.norm.continuousOn)
     have hv1 : ‖v0‖ ≤ 1 := by simpa using hv0
     have hlt : ‖T v0‖ < 1 := by
       by_cases h0 : v0 = 0
@@ -121,21 +140,23 @@ theorem opNorm_lt_one_iff {m n : Type} [Fintype m] [Fintype n] [DecidableEq n] (
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-def coordOf (x : Frame X.Ψ r) : V (nd X) := WithLp.toLp 2 fun i =>
-  x ((Fintype.equivFin (Ent X)).symm i).1 ((Fintype.equivFin (Ent X)).symm i).2.1.1
-    ((Fintype.equivFin (Ent X)).symm i).2.1.2
+def coordOf (x : Frame X.Ψ r) : V (nd X) :=
+  WithLp.toLp 2 fun i =>
+    x ((Fintype.equivFin (Ent X)).symm i).1 ((Fintype.equivFin (Ent X)).symm i).2.1.1
+      ((Fintype.equivFin (Ent X)).symm i).2.1.2
 
-theorem nmat_coordOf_of_lt (x : Frame X.Ψ r) (τ : X.Ψ) {a b : Fin r} (h : b < a) :
-    nmat X (coordOf X x) τ a b = x τ a b := by
+theorem nmat_coordOf_of_lt (x : Frame X.Ψ r) (τ : X.Ψ) {a b : Fin r} (h : b < a)
+    : nmat X (coordOf X x) τ a b = x τ a b := by
   simp [nmat, h, coordOf]
 
-theorem nmat_of_not_lt (z w : V (nd X)) (τ : X.Ψ) {a b : Fin r} (h : ¬ b < a) :
-    nmat X z τ a b = nmat X w τ a b := by
+theorem nmat_of_not_lt (z w : V (nd X)) (τ : X.Ψ) {a b : Fin r} (h : ¬ b < a)
+    : nmat X z τ a b = nmat X w τ a b := by
   simp [nmat, h]
 
-theorem nmat_apply_idx (z : V (nd X)) (i : Fin (nd X)) :
-    nmat X z ((Fintype.equivFin (Ent X)).symm i).1 ((Fintype.equivFin (Ent X)).symm i).2.1.1
-      ((Fintype.equivFin (Ent X)).symm i).2.1.2 = z i := by
+theorem nmat_apply_idx (z : V (nd X)) (i : Fin (nd X))
+    : nmat X z ((Fintype.equivFin (Ent X)).symm i).1 ((Fintype.equivFin (Ent X)).symm i).2.1.1
+        ((Fintype.equivFin (Ent X)).symm i).2.1.2
+      = z i := by
   have h := ((Fintype.equivFin (Ent X)).symm i).2.2
   simp only [nmat, dif_pos h]
   exact congrArg (fun j => z j) ((Fintype.equivFin (Ent X)).apply_symm_apply i)
@@ -144,10 +165,12 @@ theorem coordOf_nmat (z : V (nd X)) : coordOf X (nmat X z) = z := by
   ext i
   exact nmat_apply_idx X z i
 
-theorem nFrame_apply (z : V (nd X)) (τ : X.Ψ) (a b : Fin r) :
-    nFrame X z τ a b = if X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0 then
-      ∑ c : Fin r, if (c : ℕ) < X.p0 then nmat X z τ a c * nmat X z τ c b else 0
-    else nmat X z τ a b := by
+theorem nFrame_apply (z : V (nd X)) (τ : X.Ψ) (a b : Fin r)
+    : nFrame X z τ a b
+      = if X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0 then
+          ∑ c : Fin r, if (c : ℕ) < X.p0 then nmat X z τ a c * nmat X z τ c b else 0
+        else
+          nmat X z τ a b := by
   show ∑ c, zFrame X z τ a c * leviFrame X z τ c b = _
   simp only [zFrame, leviFrame]
   by_cases ha : X.p0 ≤ (a : ℕ)
@@ -177,41 +200,51 @@ theorem nFrame_apply (z : V (nd X)) (τ : X.Ψ) (a b : Fin r) :
 
 def toEntries (z : V (nd X)) : V (nd X) := coordOf X (nFrame X z)
 
-def ofEntries (w : V (nd X)) : V (nd X) := coordOf X fun τ a b =>
-  if h : X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0 then
-    ExF.Zt X w τ ⟨b, h.2⟩ ⟨a - X.p0, by have := a.isLt; omega⟩
-  else nmat X w τ a b
+def ofEntries (w : V (nd X)) : V (nd X) :=
+  coordOf X fun τ a b =>
+    if h : X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0 then
+      ExF.Zt X w τ ⟨b, h.2⟩ ⟨a - X.p0, by have := a.isLt; omega⟩
+    else
+      nmat X w τ a b
 
 theorem nmat_toEntries (z : V (nd X)) : nmat X (toEntries X z) = nFrame X z := by
   funext τ a b
   by_cases h : b < a
   · exact nmat_coordOf_of_lt X _ τ h
-  · have : ¬ (X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0) := fun h' => h (Fin.lt_def.2 (by omega))
+  · have : ¬(X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0) := fun h' => h (Fin.lt_def.2 (by omega))
     rw [nFrame_apply, if_neg this]
     exact nmat_of_not_lt X _ _ τ h
 
-theorem nmat_toEntries_of_not (z : V (nd X)) (τ : X.Ψ) {a b : Fin r}
-    (h : ¬ (X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0)) : nmat X (toEntries X z) τ a b = nmat X z τ a b := by
+theorem nmat_toEntries_of_not
+    (z : V (nd X)) (τ : X.Ψ) {a b : Fin r} (h : ¬(X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0))
+    : nmat X (toEntries X z) τ a b = nmat X z τ a b := by
   rw [nmat_toEntries, nFrame_apply, if_neg h]
 
-theorem nmat_ofEntries_of_not (w : V (nd X)) (τ : X.Ψ) {a b : Fin r}
-    (h : ¬ (X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0)) : nmat X (ofEntries X w) τ a b = nmat X w τ a b := by
+theorem nmat_ofEntries_of_not
+    (w : V (nd X)) (τ : X.Ψ) {a b : Fin r} (h : ¬(X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0))
+    : nmat X (ofEntries X w) τ a b = nmat X w τ a b := by
   by_cases h' : b < a
   · rw [ofEntries, nmat_coordOf_of_lt X _ τ h', dite_eq_right h]
   · exact nmat_of_not_lt X _ _ τ h'
 
-theorem leadingBlock_blockCoordsToLowerEntries (z : V (nd X)) (τ : X.Ψ) : ExF.n1 X (toEntries X z) τ = ExF.n1 X z τ := by
+theorem leadingBlock_blockCoordsToLowerEntries (z : V (nd X)) (τ : X.Ψ)
+    : ExF.n1 X (toEntries X z) τ = ExF.n1 X z τ := by
   ext a b
   refine nmat_toEntries_of_not X z τ fun h => ?_
-  have := a.isLt; have h1 : X.p0 ≤ (a : ℕ) := h.1; omega
+  have := a.isLt
+  have h1 : X.p0 ≤ (a : ℕ) := h.1
+  omega
 
-theorem leadingBlock_lowerEntriesToBlockCoords (z : V (nd X)) (τ : X.Ψ) : ExF.n1 X (ofEntries X z) τ = ExF.n1 X z τ := by
+theorem leadingBlock_lowerEntriesToBlockCoords (z : V (nd X)) (τ : X.Ψ)
+    : ExF.n1 X (ofEntries X z) τ = ExF.n1 X z τ := by
   ext a b
   refine nmat_ofEntries_of_not X z τ fun h => ?_
-  have := a.isLt; have h1 : X.p0 ≤ (a : ℕ) := h.1; omega
+  have := a.isLt
+  have h1 : X.p0 ≤ (a : ℕ) := h.1
+  omega
 
-theorem Wm_toEntries (z : V (nd X)) (τ : X.Ψ) :
-    ExF.Wm X (toEntries X z) τ = ExF.Wm X z τ * ExF.n1 X z τ := by
+theorem Wm_toEntries (z : V (nd X)) (τ : X.Ψ)
+    : ExF.Wm X (toEntries X z) τ = ExF.Wm X z τ * ExF.n1 X z τ := by
   ext m b
   show nmat X (toEntries X z) τ (ExF.qI X m) (Fin.castLE X.p0_le b) = _
   have h : X.p0 ≤ ((ExF.qI X m : Fin r) : ℕ) ∧ ((Fin.castLE X.p0_le b : Fin r) : ℕ) < X.p0 :=
@@ -224,8 +257,8 @@ theorem Wm_toEntries (z : V (nd X)) (τ : X.Ψ) :
   rw [if_pos (show ((Fin.castLE X.p0_le c : Fin r) : ℕ) < X.p0 from c.isLt)]
   rfl
 
-theorem Wm_ofEntries (w : V (nd X)) (τ : X.Ψ) :
-    ExF.Wm X (ofEntries X w) τ = ExF.Wm X w τ * (ExF.n1 X w τ)⁻¹ := by
+theorem Wm_ofEntries (w : V (nd X)) (τ : X.Ψ)
+    : ExF.Wm X (ofEntries X w) τ = ExF.Wm X w τ * (ExF.n1 X w τ)⁻¹ := by
   ext m b
   show nmat X (ofEntries X w) τ (ExF.qI X m) (Fin.castLE X.p0_le b) = _
   have h : X.p0 ≤ ((ExF.qI X m : Fin r) : ℕ) ∧ ((Fin.castLE X.p0_le b : Fin r) : ℕ) < X.p0 :=
@@ -236,9 +269,11 @@ theorem Wm_ofEntries (w : V (nd X)) (τ : X.Ψ) :
   rw [this]
   rfl
 
-theorem ext_blocks {z w : V (nd X)}
-    (h1 : ∀ τ (a b : Fin r), ¬ (X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0) → nmat X z τ a b = nmat X w τ a b)
-    (h2 : ∀ τ, ExF.Wm X z τ = ExF.Wm X w τ) : z = w := by
+theorem ext_blocks
+    {z w : V (nd X)}
+    (h1 : ∀ τ (a b : Fin r), ¬(X.p0 ≤ (a : ℕ) ∧ (b : ℕ) < X.p0) → nmat X z τ a b = nmat X w τ a b)
+    (h2 : ∀ τ, ExF.Wm X z τ = ExF.Wm X w τ)
+    : z = w := by
   rw [← coordOf_nmat X z, ← coordOf_nmat X w]
   congr 1
   funext τ a b
@@ -249,23 +284,29 @@ theorem ext_blocks {z w : V (nd X)}
     exact this
   · exact h1 τ a b h
 
-theorem isUnit_det_leadingBlock_lowerEntries (z : V (nd X)) (τ : X.Ψ) : IsUnit (ExF.n1 X z τ).det := by
+theorem isUnit_det_leadingBlock_lowerEntries (z : V (nd X)) (τ : X.Ψ)
+    : IsUnit (ExF.n1 X z τ).det := by
   rw [ExF.det_unipotentFrame_eq_one]; exact isUnit_one
 
 def coordEquiv : V (nd X) ≃ V (nd X) where
   toFun := toEntries X
   invFun := ofEntries X
-  left_inv z := ext_blocks X
-    (fun τ a b h => by rw [nmat_ofEntries_of_not X _ τ h, nmat_toEntries_of_not X _ τ h])
-    (fun τ => by
-      rw [Wm_ofEntries, Wm_toEntries, leadingBlock_blockCoordsToLowerEntries, Matrix.mul_nonsing_inv_cancel_right _ _ (isUnit_det_leadingBlock_lowerEntries X z τ)])
-  right_inv z := ext_blocks X
-    (fun τ a b h => by rw [nmat_toEntries_of_not X _ τ h, nmat_ofEntries_of_not X _ τ h])
-    (fun τ => by
-      rw [Wm_toEntries, Wm_ofEntries, leadingBlock_lowerEntriesToBlockCoords, Matrix.nonsing_inv_mul_cancel_right _ _ (isUnit_det_leadingBlock_lowerEntries X z τ)])
+  left_inv z :=
+    ext_blocks X
+      (fun τ a b h => by rw [nmat_ofEntries_of_not X _ τ h, nmat_toEntries_of_not X _ τ h])
+      (fun τ => by
+        rw [Wm_ofEntries, Wm_toEntries, leadingBlock_blockCoordsToLowerEntries,
+          Matrix.mul_nonsing_inv_cancel_right _ _ (isUnit_det_leadingBlock_lowerEntries X z τ)])
+  right_inv z :=
+    ext_blocks X
+      (fun τ a b h => by rw [nmat_toEntries_of_not X _ τ h, nmat_ofEntries_of_not X _ τ h])
+      (fun τ => by
+        rw [Wm_toEntries, Wm_ofEntries, leadingBlock_lowerEntriesToBlockCoords,
+          Matrix.nonsing_inv_mul_cancel_right _ _ (isUnit_det_leadingBlock_lowerEntries X z τ)])
 
-theorem contDiff_coordOf {f : V (nd X) → Frame X.Ψ r}
-    (hf : ∀ τ a b, ContDiff ℂ ∞ fun z => f z τ a b) : ContDiff ℂ ∞ fun z => coordOf X (f z) := by
+theorem contDiff_coordOf
+    {f : V (nd X) → Frame X.Ψ r} (hf : ∀ τ a b, ContDiff ℂ ∞ fun z => f z τ a b)
+    : ContDiff ℂ ∞ fun z => coordOf X (f z) := by
   rw [contDiff_piLp]
   intro i
   exact hf _ _ _
@@ -289,8 +330,10 @@ theorem contDiff_ofEntries : ContDiff ℂ ∞ (ofEntries X) := by
 theorem measurePreserving_toEntries : MeasurePreserving (toEntries X) volume volume := by
   refine measurePreserving_of_triangular _
     (((contDiff_toEntries X).restrict_scalars ℝ).differentiable (by simp)) (coordEquiv X).bijective
-    (fun i => (((Fintype.equivFin (Ent X)).symm i).2.1.1 : ℕ) -
-      (((Fintype.equivFin (Ent X)).symm i).2.1.2 : ℕ)) ?_
+    (fun i =>
+      (((Fintype.equivFin (Ent X)).symm i).2.1.1 : ℕ)
+        - (((Fintype.equivFin (Ent X)).symm i).2.1.2 : ℕ))
+    ?_
   intro i z w h
   rw [← nmat_apply_idx X z i, ← nmat_apply_idx X w i]
   simp only [toEntries, coordOf, nFrame_apply]
@@ -306,9 +349,12 @@ theorem measurePreserving_toEntries : MeasurePreserving (toEntries X) volume vol
     · exact nmat_of_not_lt X _ _ τ hl
   dsimp only
   split_ifs with hW
-  · have hs : ∀ y : V (nd X), (∑ c : Fin r, if (c : ℕ) < X.p0 then nmat X y τ a c * nmat X y τ c b else 0)
-        - nmat X y τ a b = ∑ c ∈ Finset.univ.erase b,
-          if (c : ℕ) < X.p0 then nmat X y τ a c * nmat X y τ c b else 0 := by
+  · have hs
+        : ∀ y : V (nd X),
+          (∑ c : Fin r, if (c : ℕ) < X.p0 then nmat X y τ a c * nmat X y τ c b else 0)
+              - nmat X y τ a b
+            = ∑ c ∈ Finset.univ.erase b,
+              if (c : ℕ) < X.p0 then nmat X y τ a c * nmat X y τ c b else 0 := by
       intro y
       rw [← Finset.add_sum_erase _ _ (Finset.mem_univ b), if_pos hW.2,
         show nmat X y τ b b = 1 from ExF.nM_diag X y τ b]
@@ -324,8 +370,7 @@ theorem measurePreserving_toEntries : MeasurePreserving (toEntries X) volume vol
     · rfl
   · simp
 
-theorem cpt_toEntries (x0 : Base X) (z : V (nd X)) :
-    cpt X x0.1 (toEntries X z) = point X x0 z := by
+theorem cpt_toEntries (x0 : Base X) (z : V (nd X)) : cpt X x0.1 (toEntries X z) = point X x0 z := by
   rw [cpt, nmat_toEntries, point]
 
 def lowEquiv : Fin X.p0 ≃ {b : Fin r // (b : ℕ) < X.p0} where
@@ -340,21 +385,23 @@ def highEquiv : Fin (r - X.p0) ≃ {a : Fin r // X.p0 ≤ (a : ℕ)} where
   left_inv m := Fin.ext (by simp [ExF.qI])
   right_inv a := Subtype.ext (Fin.ext (by have := a.2; simp [ExF.qI]; omega))
 
-theorem Am_toEntries (z : V (nd X)) (τ : X.Ψ) :
-    ExF.Am X (toEntries X z) τ =
-      ((1 - (zBlock X z τ)ᴴ * zBlock X z τ).submatrix (lowEquiv X) (lowEquiv X))ᵀ := by
+theorem Am_toEntries (z : V (nd X)) (τ : X.Ψ)
+    : ExF.Am X (toEntries X z) τ
+      = ((1 - (zBlock X z τ)ᴴ * zBlock X z τ).submatrix (lowEquiv X) (lowEquiv X))ᵀ := by
   have hW : ExF.Wm X z τ = (zBlock X z τ).submatrix (highEquiv X) (lowEquiv X) := rfl
-  have h1 : ((zBlock X z τ)ᴴ * zBlock X z τ).submatrix (lowEquiv X) (lowEquiv X) =
-      (ExF.Wm X z τ)ᴴ * ExF.Wm X z τ := by
+  have h1
+      : ((zBlock X z τ)ᴴ * zBlock X z τ).submatrix (lowEquiv X) (lowEquiv X)
+        = (ExF.Wm X z τ)ᴴ * ExF.Wm X z τ := by
     rw [hW, Matrix.conjTranspose_submatrix, Matrix.submatrix_mul_equiv]
   rw [ExF.Am, ExF.Zt, Wm_toEntries, leadingBlock_blockCoordsToLowerEntries,
-    Matrix.mul_nonsing_inv_cancel_right _ _ (isUnit_det_leadingBlock_lowerEntries X z τ), Matrix.submatrix_sub]
-  simp only [Pi.sub_apply, Matrix.submatrix_one_equiv, h1, Matrix.transpose_sub, Matrix.transpose_one,
-    Matrix.transpose_mul]
+    Matrix.mul_nonsing_inv_cancel_right _ _ (isUnit_det_leadingBlock_lowerEntries X z τ),
+    Matrix.submatrix_sub]
+  simp only [Pi.sub_apply, Matrix.submatrix_one_equiv, h1, Matrix.transpose_sub,
+    Matrix.transpose_one, Matrix.transpose_mul]
   rfl
 
-theorem toEntries_mem_OmF_iff (x0 : Base X) (z : V (nd X)) :
-    toEntries X z ∈ OmF X x0.1 ↔ z ∈ Om X := by
+theorem toEntries_mem_OmF_iff (x0 : Base X) (z : V (nd X))
+    : toEntries X z ∈ OmF X x0.1 ↔ z ∈ Om X := by
   rw [ExF.mem_OmF_iff X x0.1 x0.2]
   refine forall_congr' fun τ => ?_
   rw [Am_toEntries, zNorm, opNorm_lt_one_iff]
@@ -364,23 +411,24 @@ theorem toEntries_mem_OmF_iff (x0 : Base X) (z : V (nd X)) :
   · intro h
     exact (h.submatrix (lowEquiv X).injective).transpose
 
-theorem rhF_toEntries (x0 : Base X) {z : V (nd X)} (hz : z ∈ Om X) :
-    rhF X x0.1 (toEntries X z) = rho X z := by
+theorem rhF_toEntries (x0 : Base X) {z : V (nd X)} (hz : z ∈ Om X)
+    : rhF X x0.1 (toEntries X z) = rho X z := by
   rw [ExF.rhF_eq_sum X x0.1 x0.2, rho, ← Finset.sum_neg_distrib]
   refine Finset.sum_congr rfl fun τ _ => ?_
   have h := (ExF.mem_OmF_iff X x0.1 x0.2 _).1 ((toEntries_mem_OmF_iff X x0 z).2 hz) τ
-  rw [ExF.norm_of_pos h.det_pos, Am_toEntries, Matrix.det_transpose, Matrix.det_submatrix_equiv_self,
-    zDet]
+  rw [ExF.norm_of_pos h.det_pos, Am_toEntries, Matrix.det_transpose,
+    Matrix.det_submatrix_equiv_self, zDet]
 
-theorem densF_toEntries (x0 : Base X) (z : V (nd X)) :
-    densF X x0.1 (toEntries X z) = density X x0 z := by
+theorem densF_toEntries (x0 : Base X) (z : V (nd X))
+    : densF X x0.1 (toEntries X z) = density X x0 z := by
   simp only [densF, density, cpt_toEntries, zpow_neg, zpow_ofNat]
 
 theorem map_mu (x0 : Base X) : Measure.map (toEntries X) (mu X x0) = muF X x0.1 := by
-  let e : V (nd X) ≃ᵐ V (nd X) :=
-    { coordEquiv X with
-      measurable_toFun := (contDiff_toEntries X).continuous.measurable
-      measurable_invFun := (contDiff_ofEntries X).continuous.measurable }
+  let e : V (nd X) ≃ᵐ V (nd X) := {
+    coordEquiv X with
+    measurable_toFun := (contDiff_toEntries X).continuous.measurable
+    measurable_invFun := (contDiff_ofEntries X).continuous.measurable
+  }
   have hpre : Om X = toEntries X ⁻¹' OmF X x0.1 := by
     ext z; exact (toEntries_mem_OmF_iff X x0 z).symm
   have hmp : MeasurePreserving e (volume.restrict (Om X)) (volume.restrict (OmF X x0.1)) := by

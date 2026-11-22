@@ -10,15 +10,15 @@ open Formalism.UG GlobalTheory.SatakeWeyl
 
 namespace GlobalTheory.SatakeWeyl
 
-
 open Classical in
-theorem finsum_partition {X Y : Type} (f : X → ℂ) (Q : X → Prop) (R : Y → X → Prop)
-    (hf : (Function.support f).Finite) (hQ : ∀ x, Q x ↔ ∃ y, R y x)
-    (hu : ∀ x y y', R y x → R y' x → y = y') :
-    (Function.support fun y => ∑ᶠ x, if R y x then f x else 0).Finite ∧
-      (∑ᶠ x, if Q x then f x else 0) = ∑ᶠ y, ∑ᶠ x, if R y x then f x else 0 := by
-  have hS : ∀ (T : X → Prop) [DecidablePred T],
-      (∑ᶠ x, if T x then f x else 0) = ∑ x ∈ hf.toFinset, if T x then f x else 0 := by
+theorem finsum_partition
+    {X Y : Type} (f : X → ℂ) (Q : X → Prop) (R : Y → X → Prop) (hf : (Function.support f).Finite)
+    (hQ : ∀ x, Q x ↔ ∃ y, R y x) (hu : ∀ x y y', R y x → R y' x → y = y')
+    : (Function.support fun y => ∑ᶠ x, if R y x then f x else 0).Finite
+      ∧ (∑ᶠ x, if Q x then f x else 0) = ∑ᶠ y, ∑ᶠ x, if R y x then f x else 0 := by
+  have hS
+      : ∀ (T : X → Prop) [DecidablePred T],
+        (∑ᶠ x, if T x then f x else 0) = ∑ x ∈ hf.toFinset, if T x then f x else 0 := by
     intro T _
     refine finsum_eq_sum_of_support_subset _ fun x hx => ?_
     simp only [Set.Finite.coe_toFinset, Function.mem_support]
@@ -47,9 +47,12 @@ theorem finsum_partition {X Y : Type} (f : X → ℂ) (Q : X → Prop) (R : Y �
 
 theorem descent : GlobalTheory.SatakeWeyl.Descent := by
   intro G A _ _ K N N' ι h g hf hle hN hdec hK hconj
-  have key := finsum_partition (fun x : G ⧸ K => h x.out)
-    (fun x => ∃ u ∈ N, ∃ k ∈ K, x.out = g * u * k)
-    (fun (y : A ⧸ K.comap ι) x => ∃ u ∈ N', ∃ k ∈ K, x.out = g * ι y.out * u * k) hf ?_ ?_
+  have key :=
+    finsum_partition
+      (fun x : G ⧸ K => h x.out)
+      (fun x => ∃ u ∈ N, ∃ k ∈ K, x.out = g * u * k)
+      (fun (y : A ⧸ K.comap ι) x => ∃ u ∈ N', ∃ k ∈ K, x.out = g * ι y.out * u * k)
+      hf ?_ ?_
   · unfold cellSum
     convert key
   · intro x
@@ -57,8 +60,14 @@ theorem descent : GlobalTheory.SatakeWeyl.Descent := by
     · rintro ⟨u, hu, k, hk, e⟩
       obtain ⟨a, u', hu', rfl⟩ := hdec u hu
       obtain ⟨⟨u₀, hu₀⟩, e₀⟩ := QuotientGroup.mk_out_eq_mul (K.comap ι) a
-      refine ⟨QuotientGroup.mk a, ι u₀⁻¹ * u' * (ι u₀⁻¹)⁻¹, hconj _ _ hu', ι u₀⁻¹ * k,
-        K.mul_mem (by rw [map_inv]; exact K.inv_mem hu₀) hk, ?_⟩
+      refine ⟨
+        QuotientGroup.mk a,
+        ι u₀⁻¹ * u' * (ι u₀⁻¹)⁻¹,
+        hconj _ _ hu',
+        ι u₀⁻¹ * k,
+        K.mul_mem (by rw [map_inv]; exact K.inv_mem hu₀) hk,
+        ?_
+      ⟩
       rw [e, e₀]
       simp only [map_mul, map_inv]
       group
@@ -74,8 +83,8 @@ theorem descent : GlobalTheory.SatakeWeyl.Descent := by
       refine hK b (ι b⁻¹ * u₂⁻¹ * (ι b⁻¹)⁻¹ * u₁) (N'.mul_mem (hconj _ _ (N'.inv_mem hu₂)) hu₁) ?_
       have : ι b * (ι b⁻¹ * u₂⁻¹ * (ι b⁻¹)⁻¹ * u₁) = k₂ * k₁⁻¹ := by
         have e' : ι y.out * u₁ = ι y'.out * u₂ * k₂ * k₁⁻¹ := by rw [← e]; group
-        calc _ = u₂⁻¹ * (ι y'.out)⁻¹ * (ι y.out * u₁) := by
-              simp only [hb, map_mul, map_inv]; group
+        calc
+          _ = u₂⁻¹ * (ι y'.out)⁻¹ * (ι y.out * u₁) := by simp only [hb, map_mul, map_inv]; group
           _ = _ := by rw [e']; group
       rw [this]
       exact K.mul_mem hk₂ (K.inv_mem hk₁)

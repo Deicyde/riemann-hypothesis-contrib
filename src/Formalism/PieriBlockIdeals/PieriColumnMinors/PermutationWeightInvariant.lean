@@ -9,32 +9,36 @@ namespace Formalism.CohomologicalDescent.LC
 
 open Formalism.CohomologicalDescent.Symmetrization Formalism.CohomologicalDescent.BinaryFormsExample
 
-theorem lc_c_filter_succ {A : Type*} [AddCommMonoid A] {n : ℕ} (f : Fin n → A) (l : ℕ) (hl : l < n) :
-    ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < l + 1), f i =
-      f ⟨l, hl⟩ + ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < l), f i := by
-  have hfil : (Finset.univ.filter (fun i : Fin n => i.val < l + 1)) =
-      insert (⟨l, hl⟩ : Fin n) (Finset.univ.filter (fun i : Fin n => i.val < l)) := by
+theorem lc_c_filter_succ {A : Type*} [AddCommMonoid A] {n : ℕ} (f : Fin n → A) (l : ℕ) (hl : l < n)
+    : ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < l + 1), f i
+      = f ⟨l, hl⟩ + ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < l), f i := by
+  have hfil
+      : (Finset.univ.filter (fun i : Fin n => i.val < l + 1))
+        = insert (⟨l, hl⟩ : Fin n) (Finset.univ.filter (fun i : Fin n => i.val < l)) := by
     ext a
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.ext_iff]
     omega
   rw [hfil, Finset.sum_insert (by simp)]
 
-theorem lc_c_filter_zero {A : Type*} [AddCommMonoid A] {n : ℕ} (f : Fin n → A) :
-    ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < 0), f i = 0 := by
-  have : (Finset.univ.filter (fun i : Fin n => i.val < 0)) = ∅ := by
-    ext i; simp
+theorem lc_c_filter_zero {A : Type*} [AddCommMonoid A] {n : ℕ} (f : Fin n → A)
+    : ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < 0), f i = 0 := by
+  have : (Finset.univ.filter (fun i : Fin n => i.val < 0)) = ∅ := by ext i; simp
   rw [this, Finset.sum_empty]
 
-theorem lc_c_casVal_step {q : ℕ} (κ : Fin q → ℕ) (r : Fin q) :
-    casVal (κ + Pi.single r 1) - casVal κ - (q : ℤ) = 2 * ((κ r : ℤ) - (r.val : ℤ)) := by
+theorem lc_c_casVal_step {q : ℕ} (κ : Fin q → ℕ) (r : Fin q)
+    : casVal (κ + Pi.single r 1) - casVal κ - (q : ℤ) = 2 * ((κ r : ℤ) - (r.val : ℤ)) := by
   have h2 := casimir_content_holds q (fun b => (κ b : ℤ)) r
   unfold casVal
   simp only [Pi.add_apply, Pi.single_apply, Nat.cast_add, Nat.cast_ite, Nat.cast_one, Nat.cast_zero]
   exact h2
 
-theorem lc_c_casVal_path {q n : ℕ} (lam2 : Fin q → ℕ) (κ : ℕ → Fin q → ℕ) (ρ : Fin n → Fin q) (h0 : κ 0 = lam2)
-    (hs : ∀ j : Fin n, κ (j.val + 1) = κ j.val + Pi.single (ρ j) 1) : ∀ l ≤ n,
-    casVal (κ l) = casVal lam2 + ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < l), (2 * cseq κ ρ i + (q : ℤ)) := by
+theorem lc_c_casVal_path
+    {q n : ℕ} (lam2 : Fin q → ℕ) (κ : ℕ → Fin q → ℕ) (ρ : Fin n → Fin q) (h0 : κ 0 = lam2)
+    (hs : ∀ j : Fin n, κ (j.val + 1) = κ j.val + Pi.single (ρ j) 1)
+    : ∀ l ≤ n,
+      casVal (κ l)
+        = casVal lam2
+          + ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < l), (2 * cseq κ ρ i + (q : ℤ)) := by
   intro l
   induction l with
   | zero => intro _; rw [lc_c_filter_zero, add_zero, h0]
@@ -50,23 +54,32 @@ theorem lc_c_casVal_path {q n : ℕ} (lam2 : Fin q → ℕ) (κ : ℕ → Fin q 
     simp only [cseq] at h3 ⊢
     linarith
 
-theorem lc_c_eig {K V : Type*} [CommRing K] [AddCommGroup V] [Module K V] {A T : Module.End K V} (h : Commute T A)
-    {z : V} {a : K} (hz : A z = a • z) : A (T z) = a • T z := by
+theorem lc_c_eig
+    {K V : Type*} [CommRing K] [AddCommGroup V] [Module K V]
+    {A T : Module.End K V} (h : Commute T A)
+    {z : V} {a : K} (hz : A z = a • z)
+    : A (T z) = a • T z := by
   have := LinearMap.congr_fun h.eq z
   simp only [Module.End.mul_apply] at this
   rw [← this, hz, map_smul]
 
-theorem lc_c_Dpart0 {k R P M : Type*} [CommRing k] [AddCommGroup M] [Module k M] [DecidableEq R] [DecidableEq P]
-    {n : ℕ} (EM : R → R → Module.End k M) (b b' : R) :
-    (Dpart k EM 0 b b' : Module.End k (Tens R P M n)) = onM k (EM b b') := by
+theorem lc_c_Dpart0
+    {k R P M : Type*} [CommRing k] [AddCommGroup M] [Module k M] [DecidableEq R] [DecidableEq P]
+    {n : ℕ}
+    (EM : R → R → Module.End k M) (b b' : R)
+    : (Dpart k EM 0 b b' : Module.End k (Tens R P M n)) = onM k (EM b b') := by
   simp [Dpart]
 
-theorem commute_casimir_zero {k R P M : Type*} [CommRing k] [AddCommGroup M] [Module k M] [DecidableEq R] [DecidableEq P]
-    [Fintype R] {n : ℕ} (EM : R → R → Module.End k M) (T : Module.End k (Tens R P M n))
-    (h0 : ∀ a b, Commute T (onM k (EM a b))) : Commute T (Cas k EM 0) := by
+theorem commute_casimir_zero
+    {k R P M : Type*}
+    [CommRing k] [AddCommGroup M] [Module k M] [DecidableEq R] [DecidableEq P] [Fintype R]
+    {n : ℕ} (EM : R → R → Module.End k M) (T : Module.End k (Tens R P M n))
+    (h0 : ∀ a b, Commute T (onM k (EM a b)))
+    : Commute T (Cas k EM 0) := by
   unfold Cas
   simp only [lc_c_Dpart0]
-  exact Commute.sum_right _ _ _ fun b _ => Commute.sum_right _ _ _ fun b' _ => (h0 _ _).mul_right (h0 _ _)
+  exact Commute.sum_right _ _ _ fun b _ =>
+    Commute.sum_right _ _ _ fun b' _ => (h0 _ _).mul_right (h0 _ _)
 
 theorem casimir_from_x : CasFromX := by
   intro K P M q _ _ _ _ EM n lam2 c z hz l
@@ -78,10 +91,13 @@ theorem casimir_from_x : CasFromX := by
   | succ l ih =>
     intro hl
     have hl' : l < n := hl
-    have h1 := congrArg (fun T : Module.End K (Tens (Fin q) P M n) => T z)
-      (casimir_jucys_murphy_holds K (Fin q) P M EM n ⟨l, hl'⟩)
+    have h1 :=
+      congrArg
+        (fun T : Module.End K (Tens (Fin q) P M n) => T z)
+        (casimir_jucys_murphy_holds K (Fin q) P M EM n ⟨l, hl'⟩)
     simp only [LinearMap.sub_apply, LinearMap.add_apply, LinearMap.smul_apply, Module.End.one_apply,
-      Fintype.card_fin] at h1
+        Fintype.card_fin]
+      at h1
     rw [lc_c_filter_succ _ l hl']
     rw [ih hl'.le, hz.2 ⟨l, hl'⟩, ← Nat.cast_smul_eq_nsmul K, ← Nat.cast_smul_eq_nsmul K] at h1
     rw [sub_eq_iff_eq_add] at h1
@@ -105,8 +121,12 @@ theorem permutation_weight_invariant : PermXWt := by
   intro K P M q _ _ _ _ EM n lam2 c z σ hz
   refine ⟨?_, fun j => ?_⟩
   · exact lc_c_eig (commute_casimir_zero EM _ fun a b => permFirst_commute_onModule K σ _) hz.1
-  · exact lc_c_eig (commute_jucysMurphy_of_commute K EM _ (fun a b => permFirst_commute_onModule K σ _)
-      (fun i a b => permFirst_commute_unitSecond K σ i a b) j) (hz.2 j)
+  · exact lc_c_eig
+      (commute_jucysMurphy_of_commute K EM _
+        (fun a b => permFirst_commute_onModule K σ _)
+        (fun i a b => permFirst_commute_unitSecond K σ i a b)
+        j)
+      (hz.2 j)
 
 theorem to_symmetric_y_x : ToSymYX := by
   intro K R P M _ _ _ _ _ _ _ n σ z
@@ -115,8 +135,8 @@ theorem to_symmetric_y_x : ToSymYX := by
   funext g
   simp [permTensor_apply_comp, permFirst_apply, permSecond_apply]
 
-theorem lc_c_ss {k R P M : Type*} [CommRing k] [AddCommGroup M] [Module k M] {n : ℕ} (a b : Fin n) :
-    (permY k (Equiv.swap a b) * permY k (Equiv.swap a b) : Module.End k (Tens R P M n)) = 1 := by
+theorem lc_c_ss {k R P M : Type*} [CommRing k] [AddCommGroup M] [Module k M] {n : ℕ} (a b : Fin n)
+    : (permY k (Equiv.swap a b) * permY k (Equiv.swap a b) : Module.End k (Tens R P M n)) = 1 := by
   rw [← permOnTensor_mul, Equiv.swap_mul_self, permSecond_one]
 
 theorem exchange' : Exchange := by
@@ -127,7 +147,9 @@ theorem exchange' : Exchange := by
   have h1 : s * xJM K EM j = xJM K EM j' * s - 1 := hH.1
   have hss : s * s = 1 := lc_c_ss j j'
   have h2 : xJM K EM j * s = s * xJM K EM j' - 1 := by
-    calc xJM K EM j * s = (s * s) * xJM K EM j * s := by rw [hss, one_mul]
+    calc
+      xJM K EM j * s
+        = (s * s) * xJM K EM j * s := by rw [hss, one_mul]
       _ = s * (s * xJM K EM j) * s := by simp only [mul_assoc]
       _ = s * (xJM K EM j' * s - 1) * s := by rw [h1]
       _ = s * xJM K EM j' * (s * s) - s * s := by noncomm_ring
@@ -136,7 +158,8 @@ theorem exchange' : Exchange := by
     have := LinearMap.congr_fun h1 z
     simp only [Module.End.mul_apply, LinearMap.sub_apply, Module.End.one_apply] at this
     rw [hz.2 j, map_smul] at this
-    rw [this]; abel
+    rw [this]
+    abel
   have e2 : xJM K EM j (s z) = ((c j' : ℤ) : K) • s z - z := by
     have := LinearMap.congr_fun h2 z
     simp only [Module.End.mul_apply, LinearMap.sub_apply, Module.End.one_apply] at this
@@ -146,24 +169,28 @@ theorem exchange' : Exchange := by
   set b : K := (((c j - c j' : ℤ) : ℤ) : K)⁻¹ with hbdef
   have hb : b * (((c j : ℤ) : K) - ((c j' : ℤ) : K)) = 1 := by
     rw [← Int.cast_sub]; exact inv_mul_cancel₀ hd
-  have hjj' : j ≠ j' := by
-    intro e; have := congrArg Fin.val e; simp [hj'] at this
+  have hjj' : j ≠ j' := by intro e; have := congrArg Fin.val e; simp [hj'] at this
   refine ⟨?_, fun l => ?_⟩
-  · rw [map_add (f := _), map_smul, hz.1, lc_c_eig (commute_casimir_zero EM s fun a b => permSecond_commute_onModule K _ _) hz.1]
+  · rw [map_add (f := _), map_smul, hz.1,
+      lc_c_eig (commute_casimir_zero EM s fun a b => permSecond_commute_onModule K _ _) hz.1]
     module
   · by_cases hl : l = j
     · subst hl
       rw [Function.comp_apply, Equiv.swap_apply_left, map_add (f := _), map_smul, e2, hz.2 l]
       have e : b * ((c l : ℤ) : K) - 1 = ((c j' : ℤ) : K) * b := by linear_combination hb
-      calc _ = ((c j' : ℤ) : K) • s z + (b * ((c l : ℤ) : K) - 1) • z := by module
+      calc
+        _ = ((c j' : ℤ) : K) • s z + (b * ((c l : ℤ) : K) - 1) • z := by module
         _ = _ := by rw [e]; module
     · by_cases hl' : l = j'
-      · rw [hl', Function.comp_apply, Equiv.swap_apply_right, map_add (f := _), map_smul, e1, hz.2 j']
-        have e : 1 + b * ((c j' : ℤ) : K) = ((c j : ℤ) : K) * b := by linear_combination (-1 : K) * hb
-        calc _ = ((c j : ℤ) : K) • s z + (1 + b * ((c j' : ℤ) : K)) • z := by module
+      · rw [hl', Function.comp_apply, Equiv.swap_apply_right, map_add (f := _), map_smul, e1,
+          hz.2 j']
+        have e : 1 + b * ((c j' : ℤ) : K) = ((c j : ℤ) : K) * b := by
+          linear_combination (-1 : K) * hb
+        calc
+          _ = ((c j : ℤ) : K) • s z + (1 + b * ((c j' : ℤ) : K)) • z := by module
           _ = _ := by rw [e]; module
-      · rw [Function.comp_apply, Equiv.swap_apply_of_ne_of_ne hl hl', map_add (f := _), map_smul, hz.2 l,
-          lc_c_eig (hH.2 l hl hl') (hz.2 l)]
+      · rw [Function.comp_apply, Equiv.swap_apply_of_ne_of_ne hl hl', map_add (f := _), map_smul,
+          hz.2 l, lc_c_eig (hH.2 l hl hl') (hz.2 l)]
         module
 
 theorem good_swap_exists : GoodSwap := by
@@ -185,8 +212,7 @@ theorem good_swap_exists : GoodSwap := by
   have e : s z' - b • z' = (1 - b * b) • z := by
     rw [hz'def, map_add (f := _), map_smul, hssz]
     module
-  have t3 : (1 - b * b) • toSym K z = 0 := by
-    rw [← map_smul, ← e, map_sub, map_smul, t1, t2]; simp
+  have t3 : (1 - b * b) • toSym K z = 0 := by rw [← map_smul, ← e, map_sub, map_smul, t1, t2]; simp
   have hD : (((c j - c j' : ℤ) : ℤ) : K) ≠ 0 := Int.cast_ne_zero.2 (sub_ne_zero.2 hne)
   have hb : b * (((c j - c j' : ℤ) : ℤ) : K) = 1 := inv_mul_cancel₀ hD
   have hbb : 1 - b * b ≠ 0 := by
@@ -200,19 +226,27 @@ theorem good_swap_exists : GoodSwap := by
 
 theorem NoWt_of (h : NoTuple) : NoWt := by
   intro K P M q _ _ _ _ _ EM n lam2 hp c z hz hc
-  let TT : Set (Fin (n + 1) → K) := {t | ∃ (tau : Fin q → ℕ) (κ : ℕ → Fin q → ℕ) (ρ : Fin n → Fin q),
-    IsPath n lam2 tau κ ρ ∧ ∀ j : Fin (n + 1), t j = ((casVal (κ j.val) : ℤ) : K)}
-  let E : Set (Tens (Fin q) P M n) := ⋃ tau : Fin q → ℕ, {z | ∃ (κ : ℕ → Fin q → ℕ) (ρ : Fin n → Fin q),
-    IsPath n lam2 tau κ ρ ∧ ∀ j ≤ n, Cas K EM j z = ((casVal (κ j) : ℤ) : K) • z}
-  have hE : Submodule.span K E = ⊤ := by
-    rw [← hp, Submodule.span_iUnion]; rfl
-  let T0 : ℕ → ℤ := fun l => casVal lam2 + ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < l), (2 * c i + (q : ℤ))
-  refine h K (Tens (Fin q) P M n) (Fin (n + 1)) (fun j => Cas K EM j.val) TT E ?_ z (by rw [hE]; trivial)
-    (fun j => ((T0 j.val : ℤ) : K)) ?_ ?_
+  let TT : Set (Fin (n + 1) → K) :=
+    {t | ∃ (tau : Fin q → ℕ) (κ : ℕ → Fin q → ℕ) (ρ : Fin n → Fin q),
+      IsPath n lam2 tau κ ρ ∧ ∀ j : Fin (n + 1), t j = ((casVal (κ j.val) : ℤ) : K)}
+  let E : Set (Tens (Fin q) P M n) :=
+    ⋃ tau : Fin q → ℕ, {z | ∃ (κ : ℕ → Fin q → ℕ) (ρ : Fin n → Fin q),
+      IsPath n lam2 tau κ ρ ∧ ∀ j ≤ n, Cas K EM j z = ((casVal (κ j) : ℤ) : K) • z}
+  have hE : Submodule.span K E = ⊤ := by rw [← hp, Submodule.span_iUnion]; rfl
+  let T0 : ℕ → ℤ := fun l =>
+    casVal lam2 + ∑ i ∈ Finset.univ.filter (fun i : Fin n => i.val < l), (2 * c i + (q : ℤ))
+  refine h K (Tens (Fin q) P M n) (Fin (n + 1))
+    (fun j => Cas K EM j.val)
+    TT E ?_ z (by rw [hE]; trivial)
+    (fun j => ((T0 j.val : ℤ) : K))
+    ?_ ?_
   · intro e he
     obtain ⟨tau, κ, ρ, hpath, hcas⟩ := Set.mem_iUnion.1 he
-    exact ⟨fun j => ((casVal (κ j.val) : ℤ) : K), ⟨tau, κ, ρ, hpath, fun _ => rfl⟩,
-      fun j => hcas j.val (Nat.lt_succ_iff.1 j.2)⟩
+    exact ⟨
+      fun j => ((casVal (κ j.val) : ℤ) : K),
+      ⟨tau, κ, ρ, hpath, fun _ => rfl⟩,
+      fun j => hcas j.val (Nat.lt_succ_iff.1 j.2)
+    ⟩
   · rintro ⟨tau, κ, ρ, hpath, ht⟩
     apply hc
     refine ⟨tau, κ, ρ, hpath, ?_⟩

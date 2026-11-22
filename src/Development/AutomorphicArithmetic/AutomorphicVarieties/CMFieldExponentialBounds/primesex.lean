@@ -8,8 +8,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.StmtFields
 open NumberField Formalism.HC UpperTheory.Top UpperTheory.V
 
 open Polynomial in
-private theorem finrank_quadratic_splitting_field (p : ℕ) (hp : 0 < p) (L : Type) [Field L] [Algebra ℚ L]
-    [h : IsSplittingField ℚ L (X ^ 2 + C (p : ℚ) : ℚ[X])] : Module.finrank ℚ L = 2 := by
+private theorem finrank_quadratic_splitting_field
+    (p : ℕ) (hp : 0 < p)
+    (L : Type) [Field L] [Algebra ℚ L] [h : IsSplittingField ℚ L (X ^ 2 + C (p : ℚ) : ℚ[X])]
+    : Module.finrank ℚ L = 2 := by
   set f : ℚ[X] := X ^ 2 + C (p : ℚ) with hf
   have hdeg : f.natDegree = 2 := by
     rw [hf]
@@ -67,9 +69,12 @@ private theorem finrank_kstar (p : ℕ) (hp : 0 < p) : Module.finrank ℚ (Kstar
   show Module.finrank ℚ (SplittingField (X ^ 2 + C (p : ℚ))) = 2
   exact @finrank_quadratic_splitting_field p hp _ _ _ (Polynomial.IsSplittingField.splittingField _)
 
-theorem UpperTheory.V.pK_pOne_prime_conditions :
-    ∀ ψ : PChar, ((pK ψ).Prime ∧ pK ψ % 4 = 3 ∧ 7 ≤ pK ψ ∧ (pK ψ).Coprime ψ.N) ∧
-      ((pOne ψ).Prime ∧ pOne ψ ≡ 1 [MOD ordCompl[2] (ordC ψ)] ∧ (pOne ψ).Coprime (2 * ψ.N * pK ψ)) ∧ Module.finrank ℚ (Kstar (pK ψ)) = 2 := by
+theorem UpperTheory.V.pK_pOne_prime_conditions
+    : ∀ ψ : PChar,
+      ((pK ψ).Prime ∧ pK ψ % 4 = 3 ∧ 7 ≤ pK ψ ∧ (pK ψ).Coprime ψ.N)
+        ∧ ((pOne ψ).Prime ∧ pOne ψ ≡ 1 [MOD ordCompl[2] (ordC ψ)]
+          ∧ (pOne ψ).Coprime (2 * ψ.N * pK ψ))
+        ∧ Module.finrank ℚ (Kstar (pK ψ)) = 2 := by
   intro ψ
   have hN : ψ.N ≠ 0 := NeZero.ne _
   have hne1 : {p | Nat.Prime p ∧ p % 4 = 3 ∧ 7 ≤ p ∧ p.Coprime ψ.N}.Nonempty := by
@@ -90,8 +95,9 @@ theorem UpperTheory.V.pK_pOne_prime_conditions :
     have := h1.1.pos
     have := Nat.pos_of_ne_zero hN
     positivity
-  have hne2 : {p | Nat.Prime p ∧ p ≡ 1 [MOD ordC ψ / 2 ^ (ordC ψ).factorization 2] ∧
-      p.Coprime (2 * ψ.N * pK ψ)}.Nonempty := by
+  have hne2
+      : {p | Nat.Prime p ∧ p ≡ 1 [MOD ordC ψ / 2 ^ (ordC ψ).factorization 2] ∧
+        p.Coprime (2 * ψ.N * pK ψ)}.Nonempty := by
     obtain ⟨p, hp, hpgt, hpm⟩ := Nat.exists_prime_gt_modEq_one (2 * ψ.N * pK ψ) hk
     refine ⟨p, hp, hpm, ?_⟩
     rw [Nat.Prime.coprime_iff_not_dvd hp]

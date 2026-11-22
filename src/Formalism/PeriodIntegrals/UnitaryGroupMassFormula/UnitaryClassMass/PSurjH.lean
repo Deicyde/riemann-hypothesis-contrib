@@ -13,14 +13,17 @@ namespace PI.UnitaryGroupMassFormula.UJClassMass
 
 section Basic
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {V : Type} [AddCommGroup V] [Module E V]
-  [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
 
-theorem mem_loc_iff (p : Ideal (𝓞 E)) (L : Submodule (𝓞 E) V) (x : V) :
-    x ∈ loc (K := E) p L ↔ ∃ s ∈ hcompl (K := E) p, s • x ∈ L := Iff.rfl
+theorem mem_loc_iff (p : Ideal (𝓞 E)) (L : Submodule (𝓞 E) V) (x : V)
+    : x ∈ loc (K := E) p L ↔ ∃ s ∈ hcompl (K := E) p, s • x ∈ L :=
+  Iff.rfl
 
-theorem mem_gmap_iff (u : V ≃ₗ[E] V) (L : Submodule (𝓞 E) V) (x : V) :
-    x ∈ gmap u L ↔ ∃ y ∈ L, u y = x := Iff.rfl
+theorem mem_gmap_iff (u : V ≃ₗ[E] V) (L : Submodule (𝓞 E) V) (x : V)
+    : x ∈ gmap u L ↔ ∃ y ∈ L, u y = x :=
+  Iff.rfl
 
 theorem equiv_smul_O (u : V ≃ₗ[E] V) (s : 𝓞 E) (v : V) : u (s • v) = s • u v := by
   rw [← algebraMap_smul E s v, LinearEquiv.map_smul, algebraMap_smul]
@@ -31,8 +34,12 @@ theorem hcompl_le_primeCompl (p : Ideal (𝓞 E)) [p.IsPrime] : hcompl (K := E) 
 
 end Basic
 
-theorem linOf_one_apply {E : Type} [Field E] {V : Type} [AddCommGroup V] [Module E V] {M : ℕ}
-    (b : Module.Basis (Fin M) E V) (v : V) : linOf b (1 : GL (Fin M) E) v = v := by
+theorem linOf_one_apply
+    {E : Type} [Field E]
+    {V : Type} [AddCommGroup V] [Module E V]
+    {M : ℕ} (b : Module.Basis (Fin M) E V)
+    (v : V)
+    : linOf b (1 : GL (Fin M) E) v = v := by
   simp [linOf]
 
 theorem locGmapStep : LocGmapStep := by
@@ -58,10 +65,12 @@ theorem locGmapStep : LocGmapStep := by
     rw [mem_gmap_iff]
     exact ⟨s • y, hsy, equiv_smul_O u s y⟩
 
-theorem cofin1 {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Module E V]
-    [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V] (L N : Submodule (𝓞 E) V)
-    (hL : L.FG) (hN : Submodule.span E (N : Set V) = ⊤) :
-    ∃ y : ℤ, y ≠ 0 ∧ ∀ v ∈ L, (y : 𝓞 E) • v ∈ N := by
+theorem cofin1
+    {E : Type} [Field E] [NumberField E]
+    {V : Type}
+    [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V]
+    (L N : Submodule (𝓞 E) V) (hL : L.FG) (hN : Submodule.span E (N : Set V) = ⊤)
+    : ∃ y : ℤ, y ≠ 0 ∧ ∀ v ∈ L, (y : 𝓞 E) • v ∈ N := by
   classical
   let b := Module.finBasis E V
   obtain ⟨y1, hy1, h1⟩ := crd_upper b L hL

@@ -4,4 +4,6 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.HeckeLAdicC
 
 @[expose] public section
 
-theorem UpperTheory.Lit.heckeLAdicCharacterDeRham : GlobalTheory.Published.HeckeLAdicCharacterDeRham := HodgeLocalDeRhamField.HLdR.field_outright
+theorem UpperTheory.Lit.heckeLAdicCharacterDeRham
+    : GlobalTheory.Published.HeckeLAdicCharacterDeRham :=
+  HodgeLocalDeRhamField.HLdR.field_outright

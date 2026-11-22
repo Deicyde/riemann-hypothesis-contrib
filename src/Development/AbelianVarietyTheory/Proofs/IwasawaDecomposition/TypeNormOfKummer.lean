@@ -19,12 +19,15 @@ variable {E : Type} [Field E] [NumberField E] {h : ℕ}
 theorem one_mem_pow : (1 : E) ∈ powIdealElts E h :=
   ⟨one_ne_zero, 1, by rw [one_pow, FractionalIdeal.spanSingleton_one]⟩
 
-theorem mul_mem_pow {x y : E} (hx : x ∈ powIdealElts E h) (hy : y ∈ powIdealElts E h) :
-    x * y ∈ powIdealElts E h := by
+theorem mul_mem_pow {x y : E} (hx : x ∈ powIdealElts E h) (hy : y ∈ powIdealElts E h)
+    : x * y ∈ powIdealElts E h := by
   obtain ⟨hx0, a, ha⟩ := hx
   obtain ⟨hy0, b, hb⟩ := hy
-  exact ⟨mul_ne_zero hx0 hy0, a * b, by
-    rw [← FractionalIdeal.spanSingleton_mul_spanSingleton, ha, hb, mul_pow]⟩
+  exact ⟨
+    mul_ne_zero hx0 hy0,
+    a * b,
+    by rw [← FractionalIdeal.spanSingleton_mul_spanSingleton, ha, hb, mul_pow]
+  ⟩
 
 theorem inv_mem_pow {x : E} (hx : x ∈ powIdealElts E h) : x⁻¹ ∈ powIdealElts E h := by
   obtain ⟨hx0, a, ha⟩ := hx
@@ -40,12 +43,13 @@ theorem zpow_mem_pow {x : E} (hx : x ∈ powIdealElts E h) (n : ℤ) : x ^ n ∈
   | ofNat n => simpa using npow_mem_pow hx n
   | negSucc n => rw [zpow_negSucc]; exact inv_mem_pow (npow_mem_pow hx _)
 
-theorem prod_mem_pow {ι : Type} (s : Finset ι) (f : ι → E) (hf : ∀ i ∈ s, f i ∈ powIdealElts E h) :
-    ∏ i ∈ s, f i ∈ powIdealElts E h :=
+theorem prod_mem_pow {ι : Type} (s : Finset ι) (f : ι → E) (hf : ∀ i ∈ s, f i ∈ powIdealElts E h)
+    : ∏ i ∈ s, f i ∈ powIdealElts E h :=
   Finset.prod_induction f (· ∈ powIdealElts E h) (fun _ _ => mul_mem_pow) one_mem_pow hf
 
-theorem map_mem_pow {E' : Type} [Field E'] [NumberField E'] (σ : E →+* E') {x : E} (hx : x ∈ powIdealElts E h) :
-    σ x ∈ powIdealElts E' h := by
+theorem map_mem_pow
+    {E' : Type} [Field E'] [NumberField E'] (σ : E →+* E') {x : E} (hx : x ∈ powIdealElts E h)
+    : σ x ∈ powIdealElts E' h := by
   obtain ⟨hx0, a, ha⟩ := hx
   have hle : (𝓞 E)⁰ ≤ Submonoid.comap (RingOfIntegers.mapRingHom σ) (𝓞 E')⁰ :=
     nonZeroDivisors_le_comap_nonZeroDivisors_of_injective _ fun a b hab =>
@@ -62,11 +66,10 @@ theorem exists_aut [IsGalois ℚ E] (φ τ : E →+* ℂ) : ∃ σ : E ≃ₐ[�
   let t : E →ₐ[ℚ] ℂ := τ.toRatAlgHom
   exact ⟨t.restrictNormal' E, fun x => (t.restrictNormal_commutes E x).symm⟩
 
-theorem exists_gen (𝔞 : Ideal (𝓞 E)) (h𝔞 : 𝔞 ≠ ⊥) :
-    ∃ γ : 𝓞 E, γ ≠ 0 ∧ 𝔞 ^ classNumber E = Ideal.span {γ} := by
+theorem exists_gen (𝔞 : Ideal (𝓞 E)) (h𝔞 : 𝔞 ≠ ⊥)
+    : ∃ γ : 𝓞 E, γ ≠ 0 ∧ 𝔞 ^ classNumber E = Ideal.span {γ} := by
   let 𝔠 : (Ideal (𝓞 E))⁰ := ⟨𝔞, mem_nonZeroDivisors_of_ne_zero h𝔞⟩
-  have h1 : ClassGroup.mk0 (𝔠 ^ classNumber E) = 1 := by
-    rw [map_pow, classNumber, pow_card_eq_one]
+  have h1 : ClassGroup.mk0 (𝔠 ^ classNumber E) = 1 := by rw [map_pow, classNumber, pow_card_eq_one]
   obtain ⟨γ, hγ⟩ := (ClassGroup.mk0_eq_one_iff (𝔠 ^ classNumber E).2).1 h1
   have hγ' : 𝔞 ^ classNumber E = Ideal.span {γ} := hγ
   refine ⟨γ, ?_, hγ'⟩
@@ -74,9 +77,10 @@ theorem exists_gen (𝔞 : Ideal (𝓞 E)) (h𝔞 : 𝔞 ≠ ⊥) :
   rw [Ideal.span_singleton_zero] at hγ'
   exact pow_ne_zero _ h𝔞 hγ'
 
-theorem span_eq_extend (K : IntermediateField ℚ ℂ) [NumberField K] (τ : E →+* ℂ) (hK : ∀ x, τ x ∈ K)
-    (𝔞 : Ideal (𝓞 E)) : Submodule.span (𝓞 K) {x : K | ∃ a ∈ 𝔞, (x : ℂ) = τ (a : E)} =
-      extendIdealHom (τ.codRestrict K hK) 𝔞 := by
+theorem span_eq_extend
+    (K : IntermediateField ℚ ℂ) [NumberField K] (τ : E →+* ℂ) (hK : ∀ x, τ x ∈ K) (𝔞 : Ideal (𝓞 E))
+    : Submodule.span (𝓞 K) {x : K | ∃ a ∈ 𝔞, (x : ℂ) = τ (a : E)}
+      = extendIdealHom (τ.codRestrict K hK) 𝔞 := by
   refine Eq.trans ?_ (span_image_eq_coeSubmodule_map (τ.codRestrict K hK) 𝔞)
   congr 1
   ext x

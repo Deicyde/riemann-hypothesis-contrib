@@ -6,14 +6,19 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.V.Af.Smo (Eig EigAt)
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
 open scoped Classical
 
-theorem UpperTheory.ConvolutionTheory.R2.H.fixTr :
-    ∀ (K : Type) [Field K] [NumberField K] (v : P K) (f : GL (Fin 2) (A K) → ℂ) (d : GL (Fin 2) (A K)), KAt v d →
-      (Fix v f → Fix v fun g => f (g * d)) ∧ ∀ B, EigAt v B f → EigAt v B fun g => f (g * d) := by
+theorem UpperTheory.ConvolutionTheory.R2.H.fixTr
+    : ∀ (K : Type) [Field K] [NumberField K] (v : P K) (f : GL (Fin 2) (A K) → ℂ)
+        (d : GL (Fin 2) (A K)),
+      KAt v d
+        → (Fix v f → Fix v fun g => f (g * d))
+          ∧ ∀ B, EigAt v B f → EigAt v B fun g => f (g * d) := by
   intro K _ _ v f d hd
   have hl := (lcLaws K v).2.2.2.2.2.2 d
   set x := Matrix.GeneralLinearGroup.map (cp v) d with hx

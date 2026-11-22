@@ -5,11 +5,13 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory.C
 
-theorem UpperTheory.ConvolutionTheory.C.twistUnitary :
-    UpperTheory.ConvolutionTheory.C.TwistUnitary := by
+theorem UpperTheory.ConvolutionTheory.C.twistUnitary
+    : UpperTheory.ConvolutionTheory.C.TwistUnitary := by
   intro K _ _ n μ _ θ
   have hp' : MeasurePreserving θ.e.symm μ μ := θ.pres.symm θ.e.toHomeomorph.toMeasurableEquiv
   have hg' : ∀ g, θ.e.symm g ∈ Gam K n ↔ g ∈ Gam K n := fun g => by
@@ -18,21 +20,28 @@ theorem UpperTheory.ConvolutionTheory.C.twistUnitary :
   obtain ⟨h2, q2⟩ := UpperTheory.ConvolutionTheory.K.qmapPres (Gam K n) μ θ.e.symm hg' hp'
   let Ul : L2 μ →ₗᵢ[ℂ] L2 μ := Lp.compMeasurePreservingₗᵢ ℂ _ q2
   let Ui : L2 μ →ₗᵢ[ℂ] L2 μ := Lp.compMeasurePreservingₗᵢ ℂ _ q1
-  have hUl : ∀ ψ : L2 μ, (Ul ψ : RightCosetSpace (Gam K n) → ℂ) =ᵐ[quotientMeasure (Gam K n) μ]
-      fun y => (ψ : RightCosetSpace (Gam K n) → ℂ) (mk (Gam K n) (θ.e.symm (Quotient.out y))) :=
+  have hUl
+      : ∀ ψ : L2 μ,
+        (Ul ψ : RightCosetSpace (Gam K n) → ℂ) =ᵐ[quotientMeasure (Gam K n) μ]
+          fun y => (ψ : RightCosetSpace (Gam K n) → ℂ) (mk (Gam K n) (θ.e.symm (Quotient.out y))) :=
     fun ψ => Lp.coeFn_compMeasurePreserving ψ q2
-  have hUi : ∀ ψ : L2 μ, (Ui ψ : RightCosetSpace (Gam K n) → ℂ) =ᵐ[quotientMeasure (Gam K n) μ]
-      fun y => (ψ : RightCosetSpace (Gam K n) → ℂ) (mk (Gam K n) (θ.e (Quotient.out y))) :=
+  have hUi
+      : ∀ ψ : L2 μ,
+        (Ui ψ : RightCosetSpace (Gam K n) → ℂ) =ᵐ[quotientMeasure (Gam K n) μ]
+          fun y => (ψ : RightCosetSpace (Gam K n) → ℂ) (mk (Gam K n) (θ.e (Quotient.out y))) :=
     fun ψ => Lp.coeFn_compMeasurePreserving ψ q1
-  have hUθ : ∀ ψ : L2 μ, θ.U ψ = Ul ψ := fun ψ =>
-    Lp.ext ((θ.U_spec ψ).trans (hUl ψ).symm)
-  have hTS : ∀ y : RightCosetSpace (Gam K n),
-      mk (Gam K n) (θ.e.symm (Quotient.out (mk (Gam K n) (θ.e (Quotient.out y))))) = y := fun y => by
+  have hUθ : ∀ ψ : L2 μ, θ.U ψ = Ul ψ := fun ψ => Lp.ext ((θ.U_spec ψ).trans (hUl ψ).symm)
+  have hTS
+      : ∀ y : RightCosetSpace (Gam K n),
+        mk (Gam K n) (θ.e.symm (Quotient.out (mk (Gam K n) (θ.e (Quotient.out y)))))
+          = y := fun y => by
     have := h2 (θ.e (Quotient.out y))
     rw [θ.e.symm_apply_apply] at this
     exact this.trans (Quotient.out_eq y)
-  have hST : ∀ y : RightCosetSpace (Gam K n),
-      mk (Gam K n) (θ.e (Quotient.out (mk (Gam K n) (θ.e.symm (Quotient.out y))))) = y := fun y => by
+  have hST
+      : ∀ y : RightCosetSpace (Gam K n),
+        mk (Gam K n) (θ.e (Quotient.out (mk (Gam K n) (θ.e.symm (Quotient.out y)))))
+          = y := fun y => by
     have := h1 (θ.e.symm (Quotient.out y))
     rw [θ.e.apply_symm_apply] at this
     exact this.trans (Quotient.out_eq y)
@@ -46,10 +55,11 @@ theorem UpperTheory.ConvolutionTheory.C.twistUnitary :
     filter_upwards [hUi (Ul v), q1.quasiMeasurePreserving.ae_eq_comp (hUl v)] with y a b
     simp only [Function.comp_apply] at b
     rw [a, b, hTS]
-  let U : L2 μ ≃ₗᵢ[ℂ] L2 μ :=
-    { toLinearEquiv := LinearEquiv.ofLinearMap Ul.toLinearMap Ui.toLinearMap
-        (LinearMap.ext hlr) (LinearMap.ext hrl)
-      norm_map' := Ul.norm_map }
+  let U : L2 μ ≃ₗᵢ[ℂ] L2 μ := {
+    toLinearEquiv :=
+      LinearEquiv.ofLinearMap Ul.toLinearMap Ui.toLinearMap (LinearMap.ext hlr) (LinearMap.ext hrl)
+    norm_map' := Ul.norm_map
+  }
   have hUU : ∀ v, U v = Ul v := fun _ => rfl
   have hcomm : ∀ v, Ul (Pc μ v) = Pc μ (Ul v) := fun v => by
     have := DFunLike.congr_fun θ.U_comm v

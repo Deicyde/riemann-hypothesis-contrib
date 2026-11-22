@@ -6,11 +6,14 @@ public import Formalism.LocalToGlobal.CharacterGerms.HostTraceIdentity
 @[expose] public section
 
 open scoped BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj Formalism.L2.FormalSeriesBounds NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj Formalism.L2.FormalSeriesBounds
+  NumberField
 
 namespace GlobalTheory.QuadTrace
 
-theorem bar_rt {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) : H.bar H.rt = -H.rt := by
+theorem bar_rt {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
+    : H.bar H.rt = -H.rt := by
   have hd : 0 < H.d := H.d_prime.pos
   have h1 : H.bar H.rt ^ 2 = H.rt ^ 2 := by rw [← map_pow, H.rt_sq]; simp
   rcases sq_eq_sq_iff_eq_or_eq_neg.1 h1 with h | h
@@ -30,8 +33,9 @@ theorem bar_rt {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) :
     nlinarith [sq_nonneg r]
   · exact h
 
-theorem cmHost_idempotent_trace_eq_one :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) [StarRing (𝓞 E)], Formalism.L2.FormalSeriesBounds.HostTraceIdentity H := by
+theorem cmHost_idempotent_trace_eq_one
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) [StarRing (𝓞 E)],
+      Formalism.L2.FormalSeriesBounds.HostTraceIdentity H := by
   intro E _ _ _ H _ hstar
   rw [hstar]
   have hb := congrArg H.bar H.two_weight_eq_one_add_root

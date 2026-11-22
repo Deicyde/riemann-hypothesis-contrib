@@ -36,10 +36,13 @@ theorem interpolation_holds : Interp := by
   simp only [hP, AddMonoidAlgebra.coeff_zero, Pi.zero_apply] at hc
   exact hφ hc.symm
 
-theorem prod_span {ι R A : Type*} [Fintype ι] [DecidableEq ι] [CommRing R] [CommRing A] [Algebra R A] (S : ι → Set A)
-    (T : Submodule R A) (h : ∀ f : ι → A, (∀ i, f i ∈ S i) → ∏ i, f i ∈ T) :
-    ∀ f : ι → A, (∀ i, f i ∈ Submodule.span R (S i)) → ∏ i, f i ∈ T := by
-  have key : ∀ (s : Finset ι) (f : ι → A), (∀ i ∈ s, f i ∈ Submodule.span R (S i)) → (∀ i ∉ s, f i ∈ S i) → ∏ i, f i ∈ T := by
+theorem prod_span
+    {ι R A : Type*} [Fintype ι] [DecidableEq ι] [CommRing R] [CommRing A] [Algebra R A]
+    (S : ι → Set A) (T : Submodule R A) (h : ∀ f : ι → A, (∀ i, f i ∈ S i) → ∏ i, f i ∈ T)
+    : ∀ f : ι → A, (∀ i, f i ∈ Submodule.span R (S i)) → ∏ i, f i ∈ T := by
+  have key
+      : ∀ (s : Finset ι) (f : ι → A),
+        (∀ i ∈ s, f i ∈ Submodule.span R (S i)) → (∀ i ∉ s, f i ∈ S i) → ∏ i, f i ∈ T := by
     intro s
     induction s using Finset.induction_on with
     | empty => intro f _ h2; exact h f fun i => h2 i (Finset.notMem_empty i)

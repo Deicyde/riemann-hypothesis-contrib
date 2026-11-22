@@ -8,10 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.TopFG.subgroup_quot :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G], TopFG G →
-      (∀ H : Subgroup G, IsOpen (H : Set G) → TopFG H) ∧
-      (∀ (Z : Type) [Group Z] [TopologicalSpace Z] (f : G →* Z), Continuous f → Function.Surjective f → TopFG Z) := by
+theorem UpperTheory.V.AlgebraTools.TopFG.subgroup_quot
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G],
+      TopFG G
+        → (∀ H : Subgroup G, IsOpen (H : Set G) → TopFG H)
+          ∧ (∀ (Z : Type) [Group Z] [TopologicalSpace Z] (f : G →* Z),
+            Continuous f → Function.Surjective f → TopFG Z) := by
   intro G _ _ _ _ hG
   obtain ⟨s, hs, hden⟩ := hG
   refine ⟨?_, ?_⟩

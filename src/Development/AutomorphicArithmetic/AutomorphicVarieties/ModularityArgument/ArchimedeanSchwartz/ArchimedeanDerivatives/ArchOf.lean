@@ -7,15 +7,16 @@ public import GroundTheory.AutomorphicForms.GL2.GJStandardLBump
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory Polynomial Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.HenQ UpperTheory.V.Z.Bc
-open GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.GJStandardL GroundTheory.Automorphic.GodementJacquet
+open NumberField IsDedekindDomain MeasureTheory Polynomial Formalism.L2.Host
+  Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.HenQ UpperTheory.V.Z.Bc
+open GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+  GroundTheory.Automorphic.GJStandardL GroundTheory.Automorphic.GodementJacquet
 open GroundTheory.Automorphic.GLnLocal
 open scoped SchwartzMap Classical
 
 attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL
 
-theorem UpperTheory.V.Z.Inf.archOf :
-    UpperTheory.V.Z.Inf.ArchOf := by
+theorem UpperTheory.V.Z.Inf.archOf : UpperTheory.V.Z.Inf.ArchOf := by
   intro hS hF hT hB K _ _ _ n hn ψ m hm fi hfi hne μ _
   obtain ⟨hsurj, hpe, habs, e, c, c', he, hc, hc', hΦ⟩ := hB K n μ
   obtain ⟨k, hk, hS⟩ := hS K n
@@ -34,8 +35,12 @@ theorem UpperTheory.V.Z.Inf.archOf :
   obtain ⟨φ, hφ, hφF⟩ := hΦ Φ hΦt
   obtain ⟨φ', hφ', hφF'⟩ := hΦ _ hDt
   refine ⟨φ, φ', k, κ, hk, hκ, ?_, ?_, ?_, ?_⟩
-  · have h : archZeta μ φ fi = fun s => c * (fun s : ℂ => ∫ x, Φ x * chart ψ.1 1 x * ((UpperTheory.V.Z.Inf.nrm x : ℝ) : ℂ) ^ s)
-        (s + ((n : ℂ) - 1) / 2 - n) := funext fun s => hφ fi _ hcont hval s
+  · have h
+        : archZeta μ φ fi
+          = fun s =>
+            c * (fun s : ℂ => ∫ x, Φ x * chart ψ.1 1 x * ((UpperTheory.V.Z.Inf.nrm x : ℝ) : ℂ) ^ s)
+              (s + ((n : ℂ) - 1) / 2 - n) :=
+      funext fun s => hφ fi _ hcont hval s
     rw [h]
     exact (hdiff.comp ((differentiable_id.add_const _).sub_const _)).const_mul c
   · intro h0

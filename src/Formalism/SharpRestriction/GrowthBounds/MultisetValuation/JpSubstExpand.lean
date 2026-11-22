@@ -47,10 +47,12 @@ def SuppOn (π : σ → Pl) (v : Pl) : Subring (MvPowerSeries σ R) where
     rw [map_neg, neg_ne_zero] at hm
     exact hf m hm x hx
 
-theorem mem_SuppOn {π : σ → Pl} {v : Pl} {f : MvPowerSeries σ R} :
-    f ∈ SuppOn π v ↔ ∀ m, MvPowerSeries.coeff m f ≠ 0 → ∀ x ∈ m.support, π x = v := Iff.rfl
+theorem mem_SuppOn {π : σ → Pl} {v : Pl} {f : MvPowerSeries σ R}
+    : f ∈ SuppOn π v ↔ ∀ m, MvPowerSeries.coeff m f ≠ 0 → ∀ x ∈ m.support, π x = v :=
+  Iff.rfl
 
-theorem X_mem {π : σ → Pl} {v : Pl} {x : σ} (h : π x = v) : (MvPowerSeries.X x : MvPowerSeries σ R) ∈ SuppOn π v := by
+theorem X_mem {π : σ → Pl} {v : Pl} {x : σ} (h : π x = v)
+    : (MvPowerSeries.X x : MvPowerSeries σ R) ∈ SuppOn π v := by
   classical
   intro m hm y hy
   rw [MvPowerSeries.coeff_X] at hm
@@ -61,7 +63,8 @@ theorem X_mem {π : σ → Pl} {v : Pl} {x : σ} (h : π x = v) : (MvPowerSeries
     exact h
   · exact absurd rfl hm
 
-theorem C_mem {π : σ → Pl} {v : Pl} (c : R) : (MvPowerSeries.C c : MvPowerSeries σ R) ∈ SuppOn π v := by
+theorem C_mem {π : σ → Pl} {v : Pl} (c : R)
+    : (MvPowerSeries.C c : MvPowerSeries σ R) ∈ SuppOn π v := by
   classical
   intro m hm y hy
   rw [MvPowerSeries.coeff_C] at hm
@@ -70,9 +73,12 @@ theorem C_mem {π : σ → Pl} {v : Pl} (c : R) : (MvPowerSeries.C c : MvPowerSe
     simp at hy
   · exact absurd rfl hm
 
-theorem subst_mem {τ : Type} {π : σ → Pl} {π' : τ → Pl} {v : Pl} {a : σ → MvPowerSeries τ R}
-    (ha : MvPowerSeries.HasSubst a) {f : MvPowerSeries σ R} (hf : f ∈ SuppOn π v)
-    (h : ∀ s, π s = v → a s ∈ SuppOn π' v) : MvPowerSeries.subst a f ∈ SuppOn π' v := by
+theorem subst_mem
+    {τ : Type} {π : σ → Pl} {π' : τ → Pl} {v : Pl} {a : σ → MvPowerSeries τ R}
+    (ha : MvPowerSeries.HasSubst a)
+    {f : MvPowerSeries σ R} (hf : f ∈ SuppOn π v)
+    (h : ∀ s, π s = v → a s ∈ SuppOn π' v)
+    : MvPowerSeries.subst a f ∈ SuppOn π' v := by
   classical
   intro e he x hx
   rw [MvPowerSeries.coeff_subst ha] at he
@@ -90,27 +96,39 @@ theorem subst_mem {τ : Type} {π : σ → Pl} {π' : τ → Pl} {v : Pl} {a : �
       exact hxv ((mem_SuppOn.mp hprod) e hne x hx)
     rw [h0, smul_zero]
 
-theorem map_mem {R' : Type} [CommRing R'] (φ : R →+* R') {π : σ → Pl} {v : Pl} {f : MvPowerSeries σ R}
-    (hf : f ∈ SuppOn π v) : MvPowerSeries.map φ f ∈ SuppOn π v := by
+theorem map_mem
+    {R' : Type} [CommRing R']
+    (φ : R →+* R')
+    {π : σ → Pl} {v : Pl} {f : MvPowerSeries σ R} (hf : f ∈ SuppOn π v)
+    : MvPowerSeries.map φ f ∈ SuppOn π v := by
   intro m hm x hx
   rw [MvPowerSeries.coeff_map] at hm
   exact (mem_SuppOn.mp hf) m (fun h0 => hm (by rw [h0, map_zero])) x hx
 
 end Supp
 
-def resP {R Pl : Type} [CommRing R] {ι : Pl → Type} (v : Pl) (f : MvPowerSeries (Σ v, ι v) R) : MvPowerSeries (ι v) R :=
-  fun m => MvPowerSeries.coeff (Finsupp.embDomain (Function.Embedding.sigmaMk v) m) f
+def resP {R Pl : Type} [CommRing R] {ι : Pl → Type} (v : Pl) (f : MvPowerSeries (Σ v, ι v) R)
+    : MvPowerSeries (ι v) R := fun m =>
+  MvPowerSeries.coeff (Finsupp.embDomain (Function.Embedding.sigmaMk v) m) f
 
-theorem coeff_resP {R Pl : Type} [CommRing R] {ι : Pl → Type} (v : Pl) (f : MvPowerSeries (Σ v, ι v) R) (m : ι v →₀ ℕ) :
-    MvPowerSeries.coeff m (resP v f) = MvPowerSeries.coeff (Finsupp.embDomain (Function.Embedding.sigmaMk v) m) f := rfl
+theorem coeff_resP
+    {R Pl : Type} [CommRing R]
+    {ι : Pl → Type} (v : Pl) (f : MvPowerSeries (Σ v, ι v) R) (m : ι v →₀ ℕ)
+    : MvPowerSeries.coeff m (resP v f)
+      = MvPowerSeries.coeff (Finsupp.embDomain (Function.Embedding.sigmaMk v) m) f :=
+  rfl
 
-theorem eq_atP {R Pl : Type} [CommRing R] {ι : Pl → Type} [Fintype Pl] [DecidableEq Pl] (v : Pl)
-    (f : MvPowerSeries (Σ v, ι v) R) (hf : f ∈ SuppOn (Sigma.fst : (Σ v, ι v) → Pl) v) :
-    f = atP v (resP v f) := by
+theorem eq_atP
+    {R Pl : Type} [CommRing R]
+    {ι : Pl → Type} [Fintype Pl] [DecidableEq Pl]
+    (v : Pl) (f : MvPowerSeries (Σ v, ι v) R) (hf : f ∈ SuppOn (Sigma.fst : (Σ v, ι v) → Pl) v)
+    : f = atP v (resP v f) := by
   classical
   ext n
-  have h2 : ∀ m : ι v →₀ ℕ, (eqv (ι := ι)).symm (Pi.single v m) =
-      Finsupp.embDomain (Function.Embedding.sigmaMk v) m := by
+  have h2
+      : ∀ m : ι v →₀ ℕ,
+        (eqv (ι := ι)).symm (Pi.single v m)
+          = Finsupp.embDomain (Function.Embedding.sigmaMk v) m := by
     intro m
     rw [AddEquiv.symm_apply_eq, eqv_embDomain]
   by_cases hn : MvPowerSeries.coeff n f = 0
@@ -133,48 +151,68 @@ theorem eq_atP {R Pl : Type} [CommRing R] {ι : Pl → Type} [Fintype Pl] [Decid
           Finsupp.sigmaFinsuppAddEquivPiFinsupp_apply]
         by_contra hne
         exact hw (hsupp ⟨w, i⟩ (Finsupp.mem_support_iff.mpr hne))
-    calc MvPowerSeries.coeff n f
-        = MvPowerSeries.coeff (Finsupp.embDomain (Function.Embedding.sigmaMk v) (eqv n v)) f := by
-          rw [← h2, ← hn']
+    calc
+      MvPowerSeries.coeff n f
+          = MvPowerSeries.coeff (Finsupp.embDomain (Function.Embedding.sigmaMk v) (eqv n v)) f := by
+        rw [← h2, ← hn']
       _ = MvPowerSeries.coeff n (atP v (resP v f)) := by
-          rw [← coeff_resP, ← coeff_atP_single v (resP v f) (eqv n v), ← hn']
+        rw [← coeff_resP, ← coeff_atP_single v (resP v f) (eqv n v), ← hn']
 
-theorem jp_subst_expand {K A σ τ : Type} [CommRing K] [CommRing A] [Algebra K A] (Q : MvPolynomial σ A)
-    (F : MvPowerSeries σ K) (a : τ → MvPowerSeries σ K) (ha : MvPowerSeries.HasSubst a) (U : MvPowerSeries τ K) :
-    ∃ B : Finset (τ →₀ ℕ), jp Q (F * MvPowerSeries.subst a U) =
-      ∑ β ∈ B, MvPowerSeries.coeff β U • jp Q (F * β.prod fun s e => a s ^ e) := by
+theorem jp_subst_expand
+    {K A σ τ : Type} [CommRing K] [CommRing A] [Algebra K A]
+    (Q : MvPolynomial σ A) (F : MvPowerSeries σ K)
+    (a : τ → MvPowerSeries σ K) (ha : MvPowerSeries.HasSubst a)
+    (U : MvPowerSeries τ K)
+    : ∃ B : Finset (τ →₀ ℕ),
+      jp Q (F * MvPowerSeries.subst a U)
+        = ∑ β ∈ B, MvPowerSeries.coeff β U • jp Q (F * β.prod fun s e => a s ^ e) := by
   classical
-  refine ⟨Q.support.biUnion fun κ => (Finset.HasAntidiagonal.antidiagonal κ).biUnion fun pq =>
-    (MvPowerSeries.coeff_subst_finite ha U pq.2).toFinset, ?_⟩
+  refine ⟨
+    Q.support.biUnion fun κ =>
+      (Finset.HasAntidiagonal.antidiagonal κ).biUnion fun pq =>
+        (MvPowerSeries.coeff_subst_finite ha U pq.2).toFinset,
+    ?_
+  ⟩
   set B := Q.support.biUnion fun κ => (Finset.HasAntidiagonal.antidiagonal κ).biUnion fun pq =>
     (MvPowerSeries.coeff_subst_finite ha U pq.2).toFinset with hB
-  have hq : ∀ κ ∈ Q.support, ∀ pq ∈ Finset.HasAntidiagonal.antidiagonal κ,
-      MvPowerSeries.coeff pq.2 (MvPowerSeries.subst a U) =
-        ∑ β ∈ B, MvPowerSeries.coeff β U * MvPowerSeries.coeff pq.2 (β.prod fun s e => a s ^ e) := by
-    intro κ hκ pq hpq
-    rw [MvPowerSeries.coeff_subst ha, finsum_eq_sum_of_support_subset (s := B)]
-    · simp only [smul_eq_mul]
-    · intro β hβ
-      rw [Finset.mem_coe, hB, Finset.mem_biUnion]
-      exact ⟨κ, hκ, Finset.mem_biUnion.mpr ⟨pq, hpq,
-        (MvPowerSeries.coeff_subst_finite ha U pq.2).mem_toFinset.mpr hβ⟩⟩
-  have hκ : ∀ κ ∈ Q.support, MvPowerSeries.coeff κ (F * MvPowerSeries.subst a U) =
-      ∑ β ∈ B, MvPowerSeries.coeff β U * MvPowerSeries.coeff κ (F * β.prod fun s e => a s ^ e) := by
-    intro κ hκ
-    rw [MvPowerSeries.coeff_mul]
-    simp_rw [MvPowerSeries.coeff_mul, Finset.mul_sum]
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl fun pq hpq => ?_
-    rw [hq κ hκ pq hpq, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun β _ => ?_
-    ring
+  have hq
+      : ∀ κ ∈ Q.support, ∀ pq ∈ Finset.HasAntidiagonal.antidiagonal κ,
+        MvPowerSeries.coeff pq.2 (MvPowerSeries.subst a U)
+          = ∑ β ∈ B, MvPowerSeries.coeff β U * MvPowerSeries.coeff pq.2 (β.prod fun s e => a s ^ e) :=
+    by
+      intro κ hκ pq hpq
+      rw [MvPowerSeries.coeff_subst ha, finsum_eq_sum_of_support_subset (s := B)]
+      · simp only [smul_eq_mul]
+      · intro β hβ
+        rw [Finset.mem_coe, hB, Finset.mem_biUnion]
+        exact ⟨
+          κ,
+          hκ,
+          Finset.mem_biUnion.mpr
+            ⟨pq, hpq, (MvPowerSeries.coeff_subst_finite ha U pq.2).mem_toFinset.mpr hβ⟩
+        ⟩
+  have hκ
+      : ∀ κ ∈ Q.support,
+        MvPowerSeries.coeff κ (F * MvPowerSeries.subst a U)
+          = ∑ β ∈ B, MvPowerSeries.coeff β U * MvPowerSeries.coeff κ (F * β.prod fun s e => a s ^ e) :=
+    by
+      intro κ hκ
+      rw [MvPowerSeries.coeff_mul]
+      simp_rw [MvPowerSeries.coeff_mul, Finset.mul_sum]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun pq hpq => ?_
+      rw [hq κ hκ pq hpq, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun β _ => ?_
+      ring
   unfold jp
-  have hL : ∑ κ ∈ Q.support, (((fac κ : ℕ) : K) * MvPowerSeries.coeff κ (F * MvPowerSeries.subst a U)) •
-        AddMonoidAlgebra.coeff Q κ =
-      ∑ κ ∈ Q.support, ∑ β ∈ B, (((fac κ : ℕ) : K) * (MvPowerSeries.coeff β U *
-        MvPowerSeries.coeff κ (F * β.prod fun s e => a s ^ e))) • AddMonoidAlgebra.coeff Q κ := by
-    refine Finset.sum_congr rfl fun κ hκ' => ?_
-    rw [hκ κ hκ', Finset.mul_sum, Finset.sum_smul]
+  have hL
+      : ∑ κ ∈ Q.support, (((fac κ : ℕ) : K) * MvPowerSeries.coeff κ (F * MvPowerSeries.subst a U)) •
+          AddMonoidAlgebra.coeff Q κ
+        = ∑ κ ∈ Q.support, ∑ β ∈ B, (((fac κ : ℕ) : K) * (MvPowerSeries.coeff β U *
+            MvPowerSeries.coeff κ (F * β.prod fun s e => a s ^ e))) • AddMonoidAlgebra.coeff Q κ :=
+    by
+      refine Finset.sum_congr rfl fun κ hκ' => ?_
+      rw [hκ κ hκ', Finset.mul_sum, Finset.sum_smul]
   rw [hL, Finset.sum_comm]
   refine Finset.sum_congr rfl fun β _ => ?_
   rw [Finset.smul_sum]

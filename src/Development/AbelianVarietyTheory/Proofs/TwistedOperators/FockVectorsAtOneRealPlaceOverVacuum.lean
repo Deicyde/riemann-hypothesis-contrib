@@ -12,8 +12,12 @@ namespace GlobalTheory.OnePlaceFock
 
 section Laws
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField Matrix Complex
-open GlobalTheory.Chain GlobalTheory.IndefiniteRowSideFullHecke.VacuumFockVectors GlobalTheory.IndefiniteRowSideFullHecke.HermitianSymplecticScalars GlobalTheory.VacuumFockLaws
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
+  Matrix Complex
+open GlobalTheory.Chain GlobalTheory.IndefiniteRowSideFullHecke.VacuumFockVectors
+  GlobalTheory.IndefiniteRowSideFullHecke.HermitianSymplecticScalars GlobalTheory.VacuumFockLaws
 open GlobalTheory.Ker (ipO)
 open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (fockIp)
 open GlobalTheory.ArchRec (IsFrameOf Mn)
@@ -21,21 +25,23 @@ open scoped Classical ComplexConjugate
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem fockIp_eq {ι : Type} (P Q : MvPolynomial ι ℂ) :
-    fockIp P Q = ∑ k ∈ Q.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) := by
+theorem fockIp_eq {ι : Type} (P Q : MvPolynomial ι ℂ)
+    : fockIp P Q = ∑ k ∈ Q.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) := by
   classical
   have hP : ∀ k ∉ P.support, P.coeff k = 0 := fun k hk => by
     simpa only [MvPolynomial.mem_support_iff, not_not] using hk
   have hQ : ∀ k ∉ Q.support, Q.coeff k = 0 := fun k hk => by
     simpa only [MvPolynomial.mem_support_iff, not_not] using hk
   change ∑ k ∈ P.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) = _
-  have hL : ∑ k ∈ P.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) =
-      ∑ k ∈ P.support ∪ Q.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) := by
+  have hL
+      : ∑ k ∈ P.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ)
+        = ∑ k ∈ P.support ∪ Q.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) := by
     apply Finset.sum_subset Finset.subset_union_left
     intro k _ hk
     rw [hP k hk, zero_mul, zero_mul]
-  have hR : ∑ k ∈ Q.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) =
-      ∑ k ∈ P.support ∪ Q.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) := by
+  have hR
+      : ∑ k ∈ Q.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ)
+        = ∑ k ∈ P.support ∪ Q.support, P.coeff k * conj (Q.coeff k) * (multiFact k : ℂ) := by
     apply Finset.sum_subset Finset.subset_union_right
     intro k _ hk
     rw [hQ k hk, map_zero, mul_zero, zero_mul]
@@ -49,16 +55,17 @@ theorem sgn_cases {n : ℕ} (ε : Fin n → Bool) (a : Fin n) : sgn ε a = 1 ∨
   · left; simp [h]
   · right; simp [h]
 
-theorem Jm_eq_sgn {n : ℕ} (ε : Fin n → Bool) : Formalism.REAL.Jm ε = diagonal fun a => (sgn ε a : ℂ) := by
+theorem Jm_eq_sgn {n : ℕ} (ε : Fin n → Bool)
+    : Formalism.REAL.Jm ε = diagonal fun a => (sgn ε a : ℂ) := by
   unfold Formalism.REAL.Jm
   congr 1
   funext a
   unfold sgn
   by_cases h : ε a <;> simp [h]
 
-theorem frame_inv {n : ℕ} {G s fr : Mn n} {ε : Fin n → Bool} (h : IsFrameOf G s ε fr) :
-    IsUnit (fr⁻¹).det ∧ s * fr⁻¹ = fr⁻¹ * diagonal (fun a => (sgn ε a : ℂ)) ∧
-      (fr⁻¹)ᴴ * G * fr⁻¹ = diagonal fun a => (sgn ε a : ℂ) := by
+theorem frame_inv {n : ℕ} {G s fr : Mn n} {ε : Fin n → Bool} (h : IsFrameOf G s ε fr)
+    : IsUnit (fr⁻¹).det ∧ s * fr⁻¹ = fr⁻¹ * diagonal (fun a => (sgn ε a : ℂ))
+      ∧ (fr⁻¹)ᴴ * G * fr⁻¹ = diagonal fun a => (sgn ε a : ℂ) := by
   obtain ⟨hu, hG, hs⟩ := h
   have hd : IsUnit fr.det := (Matrix.isUnit_iff_isUnit_det fr).mp hu
   refine ⟨Matrix.isUnit_nonsing_inv_det fr hd, ?_, ?_⟩
@@ -66,84 +73,105 @@ theorem frame_inv {n : ℕ} {G s fr : Mn n} {ε : Fin n → Bool} (h : IsFrameOf
   · have e1 : (fr⁻¹)ᴴ * frᴴ = 1 := by
       rw [← Matrix.conjTranspose_mul, Matrix.mul_nonsing_inv _ hd, Matrix.conjTranspose_one]
     rw [← hG]
-    calc (fr⁻¹)ᴴ * (frᴴ * Formalism.REAL.Jm ε * fr) * fr⁻¹
+    calc
+      (fr⁻¹)ᴴ * (frᴴ * Formalism.REAL.Jm ε * fr) * fr⁻¹
         = ((fr⁻¹)ᴴ * frᴴ) * Formalism.REAL.Jm ε * (fr * fr⁻¹) := by simp only [Matrix.mul_assoc]
       _ = diagonal fun a => (sgn ε a : ℂ) := by
         rw [e1, Matrix.mul_nonsing_inv _ hd, Matrix.one_mul, Matrix.mul_one, Jm_eq_sgn]
 
-private theorem cplxO_unitMap_eq_I_mul_sign_smul {m n : ℕ} {s B : Matrix (Fin n) (Fin n) ℂ} {s' B' : Matrix (Fin m) (Fin m) ℂ}
-    {ε : Fin n → ℝ} {ε' : Fin m → ℝ} (hB : IsUnit B.det) (hs : s * B = B * diagonal fun a => (ε a : ℂ))
-    (hs' : s' * B' = B' * diagonal fun a => (ε' a : ℂ)) (i : Fin m) (j : Fin n) :
-    cplxO s s' (unitMap B B' i j) = (Complex.I * ((ε' i * ε j : ℝ) : ℂ)) • unitMap B B' i j := by
+private theorem cplxO_unitMap_eq_I_mul_sign_smul
+    {m n : ℕ} {s B : Matrix (Fin n) (Fin n) ℂ} {s' B' : Matrix (Fin m) (Fin m) ℂ} {ε : Fin n → ℝ}
+    {ε' : Fin m → ℝ} (hB : IsUnit B.det) (hs : s * B = B * diagonal fun a => (ε a : ℂ))
+    (hs' : s' * B' = B' * diagonal fun a => (ε' a : ℂ)) (i : Fin m) (j : Fin n)
+    : cplxO s s' (unitMap B B' i j) = (Complex.I * ((ε' i * ε j : ℝ) : ℂ)) • unitMap B B' i j := by
   have hBi : B⁻¹ * s = (diagonal fun a => (ε a : ℂ)) * B⁻¹ := by
-    calc B⁻¹ * s = B⁻¹ * s * (B * B⁻¹) := by rw [Matrix.mul_nonsing_inv _ hB, Matrix.mul_one]
+    calc
+      B⁻¹ * s
+        = B⁻¹ * s * (B * B⁻¹) := by rw [Matrix.mul_nonsing_inv _ hB, Matrix.mul_one]
       _ = B⁻¹ * (s * B) * B⁻¹ := by simp only [Matrix.mul_assoc]
       _ = (diagonal fun a => (ε a : ℂ)) * B⁻¹ := by
         rw [hs, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hB, Matrix.one_mul]
-  have hd : (diagonal fun a => (ε' a : ℂ)) * single i j (1 : ℂ) * (diagonal fun a => (ε a : ℂ)) =
-      ((ε' i * ε j : ℝ) : ℂ) • single i j (1 : ℂ) := by
+  have hd
+      : (diagonal fun a => (ε' a : ℂ)) * single i j (1 : ℂ) * (diagonal fun a => (ε a : ℂ))
+        = ((ε' i * ε j : ℝ) : ℂ) • single i j (1 : ℂ) := by
     ext a b
-    simp only [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.smul_apply, Matrix.single_apply, smul_eq_mul]
+    simp only [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.smul_apply, Matrix.single_apply,
+      smul_eq_mul]
     by_cases ha : i = a
     · by_cases hb : j = b
       · subst ha hb; simp
       · simp [hb]
     · simp [ha]
-  calc cplxO s s' (unitMap B B' i j)
-      = Complex.I • (B' * ((diagonal fun a => (ε' a : ℂ)) * (single i j (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ) *
-          (diagonal fun a => (ε a : ℂ))) * B⁻¹) := by
-        unfold Formalism.IndefR.Datum.cplxO Formalism.IndefR.Datum.unitMap
-        congr 1
-        simp only [Matrix.mul_assoc]
-        rw [← hBi, ← Matrix.mul_assoc s' B', hs', Matrix.mul_assoc]
+  calc
+    cplxO s s' (unitMap B B' i j)
+        = Complex.I
+          • (B'
+            * ((diagonal fun a => (ε' a : ℂ)) * (single i j (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ)
+              * (diagonal fun a => (ε a : ℂ)))
+            * B⁻¹) := by
+      unfold Formalism.IndefR.Datum.cplxO Formalism.IndefR.Datum.unitMap
+      congr 1
+      simp only [Matrix.mul_assoc]
+      rw [← hBi, ← Matrix.mul_assoc s' B', hs', Matrix.mul_assoc]
     _ = (Complex.I * ((ε' i * ε j : ℝ) : ℂ)) • unitMap B B' i j := by
-        rw [hd, Matrix.mul_smul, Matrix.smul_mul, smul_smul]
-        rfl
+      rw [hd, Matrix.mul_smul, Matrix.smul_mul, smul_smul]
+      rfl
 
-private theorem inv_eq_mul_diagonal_sign_mul_conjTranspose {n : ℕ} {G B : Matrix (Fin n) (Fin n) ℂ} {ε : Fin n → ℝ}
-    (hε : ∀ a, ε a = 1 ∨ ε a = -1) (hB : IsUnit B.det) (hG : Bᴴ * G * B = diagonal fun a => (ε a : ℂ)) :
-    G⁻¹ = B * (diagonal fun a => (ε a : ℂ)) * Bᴴ := by
+private theorem inv_eq_mul_diagonal_sign_mul_conjTranspose
+    {n : ℕ} {G B : Matrix (Fin n) (Fin n) ℂ} {ε : Fin n → ℝ} (hε : ∀ a, ε a = 1 ∨ ε a = -1)
+    (hB : IsUnit B.det) (hG : Bᴴ * G * B = diagonal fun a => (ε a : ℂ))
+    : G⁻¹ = B * (diagonal fun a => (ε a : ℂ)) * Bᴴ := by
   have hdd : (diagonal fun a => (ε a : ℂ)) * (diagonal fun a => (ε a : ℂ)) = 1 := by
     rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
     congr 1
     funext a
     rcases hε a with h | h <;> simp [h]
   have e : Bᴴ * G = (diagonal fun a => (ε a : ℂ)) * B⁻¹ := by
-    calc Bᴴ * G = Bᴴ * G * (B * B⁻¹) := by rw [Matrix.mul_nonsing_inv _ hB, Matrix.mul_one]
+    calc
+      Bᴴ * G
+        = Bᴴ * G * (B * B⁻¹) := by rw [Matrix.mul_nonsing_inv _ hB, Matrix.mul_one]
       _ = Bᴴ * G * B * B⁻¹ := by rw [← Matrix.mul_assoc]
       _ = _ := by rw [hG]
   apply Matrix.inv_eq_left_inv
-  calc B * (diagonal fun a => (ε a : ℂ)) * Bᴴ * G = B * (diagonal fun a => (ε a : ℂ)) * (Bᴴ * G) :=
-        Matrix.mul_assoc _ _ _
+  calc
+    B * (diagonal fun a => (ε a : ℂ)) * Bᴴ * G
+      = B * (diagonal fun a => (ε a : ℂ)) * (Bᴴ * G) := Matrix.mul_assoc _ _ _
     _ = B * ((diagonal fun a => (ε a : ℂ)) * (diagonal fun a => (ε a : ℂ))) * B⁻¹ := by
-        rw [e]; simp only [Matrix.mul_assoc]
+      rw [e]; simp only [Matrix.mul_assoc]
     _ = 1 := by rw [hdd, Matrix.mul_one, Matrix.mul_nonsing_inv _ hB]
 
-private theorem trace_inv_gram_conjTranspose_conj_eq_sign_trace {m n : ℕ} {G B : Matrix (Fin n) (Fin n) ℂ} {G' B' : Matrix (Fin m) (Fin m) ℂ}
-    {ε : Fin n → ℝ} {ε' : Fin m → ℝ} (hε : ∀ a, ε a = 1 ∨ ε a = -1) (hB : IsUnit B.det)
-    (hG : Bᴴ * G * B = diagonal fun a => (ε a : ℂ)) (hG' : B'ᴴ * G' * B' = diagonal fun a => (ε' a : ℂ))
-    (X Y : Matrix (Fin m) (Fin n) ℂ) :
-    (G⁻¹ * (B' * Y * B⁻¹)ᴴ * G' * (B' * X * B⁻¹)).trace =
-      ((diagonal fun a => (ε a : ℂ)) * Yᴴ * (diagonal fun a => (ε' a : ℂ)) * X).trace := by
+private theorem trace_inv_gram_conjTranspose_conj_eq_sign_trace
+    {m n : ℕ} {G B : Matrix (Fin n) (Fin n) ℂ} {G' B' : Matrix (Fin m) (Fin m) ℂ} {ε : Fin n → ℝ}
+    {ε' : Fin m → ℝ} (hε : ∀ a, ε a = 1 ∨ ε a = -1) (hB : IsUnit B.det)
+    (hG : Bᴴ * G * B = diagonal fun a => (ε a : ℂ))
+    (hG' : B'ᴴ * G' * B' = diagonal fun a => (ε' a : ℂ)) (X Y : Matrix (Fin m) (Fin n) ℂ)
+    : (G⁻¹ * (B' * Y * B⁻¹)ᴴ * G' * (B' * X * B⁻¹)).trace
+      = ((diagonal fun a => (ε a : ℂ)) * Yᴴ * (diagonal fun a => (ε' a : ℂ)) * X).trace := by
   have h1 : Bᴴ * (B⁻¹)ᴴ = 1 := by
     rw [← Matrix.conjTranspose_mul, Matrix.nonsing_inv_mul _ hB, Matrix.conjTranspose_one]
-  rw [inv_eq_mul_diagonal_sign_mul_conjTranspose hε hB hG, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
-  have step : B * (diagonal fun a => (ε a : ℂ)) * Bᴴ * ((B⁻¹)ᴴ * (Yᴴ * B'ᴴ)) * G' * (B' * X * B⁻¹) =
-      B * ((diagonal fun a => (ε a : ℂ)) * Yᴴ * (B'ᴴ * G' * B') * X) * B⁻¹ := by
+  rw [inv_eq_mul_diagonal_sign_mul_conjTranspose hε hB hG, Matrix.conjTranspose_mul,
+    Matrix.conjTranspose_mul]
+  have step
+      : B * (diagonal fun a => (ε a : ℂ)) * Bᴴ * ((B⁻¹)ᴴ * (Yᴴ * B'ᴴ)) * G' * (B' * X * B⁻¹)
+        = B * ((diagonal fun a => (ε a : ℂ)) * Yᴴ * (B'ᴴ * G' * B') * X) * B⁻¹ := by
     simp only [← Matrix.mul_assoc]
     rw [Matrix.mul_assoc (B * (diagonal fun a => (ε a : ℂ))) Bᴴ (B⁻¹)ᴴ, h1, Matrix.mul_one]
-  rw [step, Matrix.trace_mul_comm, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hB, Matrix.one_mul, hG']
+  rw [step, Matrix.trace_mul_comm, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hB, Matrix.one_mul,
+    hG']
 
-private theorem trace_diagonal_single_conjTranspose_single {m n : ℕ} (ε : Fin n → ℝ) (ε' : Fin m → ℝ) (i i' : Fin m) (j j' : Fin n) :
-    ((diagonal fun a => (ε a : ℂ)) * (single i' j' (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ)ᴴ *
-      (diagonal fun a => (ε' a : ℂ)) * (single i j (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ)).trace =
-      if (i, j) = (i', j') then ((ε' i * ε j : ℝ) : ℂ) else 0 := by
+private theorem trace_diagonal_single_conjTranspose_single
+    {m n : ℕ} (ε : Fin n → ℝ) (ε' : Fin m → ℝ) (i i' : Fin m) (j j' : Fin n)
+    : ((diagonal fun a => (ε a : ℂ)) * (single i' j' (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ)ᴴ
+        * (diagonal fun a => (ε' a : ℂ)) * (single i j (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ)).trace
+      = if (i, j) = (i', j') then ((ε' i * ε j : ℝ) : ℂ) else 0 := by
   have hY : (single i' j' (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ)ᴴ = single j' i' 1 := by
     ext a b
     simp only [Matrix.conjTranspose_apply, Matrix.single_apply]
     by_cases h1 : j' = a <;> by_cases h2 : i' = b <;> simp [h1, h2]
-  have hD : (diagonal fun a => (ε a : ℂ)) * (single j' i' (1 : ℂ) : Matrix (Fin n) (Fin m) ℂ) *
-      (diagonal fun a => (ε' a : ℂ)) = single j' i' ((ε j' : ℂ) * ε' i') := by
+  have hD
+      : (diagonal fun a => (ε a : ℂ)) * (single j' i' (1 : ℂ) : Matrix (Fin n) (Fin m) ℂ)
+          * (diagonal fun a => (ε' a : ℂ))
+        = single j' i' ((ε j' : ℂ) * ε' i') := by
     ext a b
     simp only [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.single_apply]
     by_cases h1 : j' = a <;> by_cases h2 : i' = b <;> simp [h1, h2]
@@ -154,22 +182,29 @@ private theorem trace_diagonal_single_conjTranspose_single {m n : ℕ} (ε : Fin
   · have h' : ¬ (i, j) = (i', j') := fun e => h ⟨(Prod.mk.inj e).1, (Prod.mk.inj e).2⟩
     simp [h, h']
 
-private theorem trace_inv_gram_single_conj_eq_ite_sign {m n : ℕ} {G B : Matrix (Fin n) (Fin n) ℂ} {G' B' : Matrix (Fin m) (Fin m) ℂ}
-    {ε : Fin n → ℝ} {ε' : Fin m → ℝ} (hε : ∀ a, ε a = 1 ∨ ε a = -1) (hB : IsUnit B.det)
-    (hG : Bᴴ * G * B = diagonal fun a => (ε a : ℂ)) (hG' : B'ᴴ * G' * B' = diagonal fun a => (ε' a : ℂ))
-    (k l : Fin m × Fin n) :
-    (G⁻¹ * (B' * (single l.1 l.2 (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ) * B⁻¹)ᴴ * G' *
-      (B' * (single k.1 k.2 (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ) * B⁻¹)).trace =
-      if k = l then ((ε' k.1 * ε k.2 : ℝ) : ℂ) else 0 := by
-  rw [trace_inv_gram_conjTranspose_conj_eq_sign_trace hε hB hG hG', trace_diagonal_single_conjTranspose_single]
+private theorem trace_inv_gram_single_conj_eq_ite_sign
+    {m n : ℕ} {G B : Matrix (Fin n) (Fin n) ℂ} {G' B' : Matrix (Fin m) (Fin m) ℂ} {ε : Fin n → ℝ}
+    {ε' : Fin m → ℝ} (hε : ∀ a, ε a = 1 ∨ ε a = -1) (hB : IsUnit B.det)
+    (hG : Bᴴ * G * B = diagonal fun a => (ε a : ℂ))
+    (hG' : B'ᴴ * G' * B' = diagonal fun a => (ε' a : ℂ)) (k l : Fin m × Fin n)
+    : (G⁻¹ * (B' * (single l.1 l.2 (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ) * B⁻¹)ᴴ * G'
+        * (B' * (single k.1 k.2 (1 : ℂ) : Matrix (Fin m) (Fin n) ℂ) * B⁻¹)).trace
+      = if k = l then ((ε' k.1 * ε k.2 : ℝ) : ℂ) else 0 := by
+  rw [trace_inv_gram_conjTranspose_conj_eq_sign_trace hε hB hG hG',
+    trace_diagonal_single_conjTranspose_single]
 
-private theorem exists_end_coe_eq_of_linear_on_submodule {X : Type*} (M : Submodule ℂ (X → ℂ)) (T : (X → ℂ) → (X → ℂ))
-    (hmem : ∀ g ∈ M, T g ∈ M) (hadd : ∀ g ∈ M, ∀ h ∈ M, T (g + h) = T g + T h)
-    (hsmul : ∀ (c : ℂ), ∀ g ∈ M, T (c • g) = c • T g) :
-    ∃ a : Module.End ℂ M, ∀ g : M, (a g : X → ℂ) = T g :=
-  ⟨{ toFun := fun g => ⟨T g, hmem g g.2⟩
-     map_add' := fun g h => Subtype.ext (hadd g g.2 h h.2)
-     map_smul' := fun c g => Subtype.ext (hsmul c g g.2) }, fun _ => rfl⟩
+private theorem exists_end_coe_eq_of_linear_on_submodule
+    {X : Type*} (M : Submodule ℂ (X → ℂ)) (T : (X → ℂ) → (X → ℂ)) (hmem : ∀ g ∈ M, T g ∈ M)
+    (hadd : ∀ g ∈ M, ∀ h ∈ M, T (g + h) = T g + T h)
+    (hsmul : ∀ (c : ℂ), ∀ g ∈ M, T (c • g) = c • T g)
+    : ∃ a : Module.End ℂ M, ∀ g : M, (a g : X → ℂ) = T g := ⟨
+  {
+    toFun := fun g => ⟨T g, hmem g g.2⟩
+    map_add' := fun g h => Subtype.ext (hadd g g.2 h h.2)
+    map_smul' := fun c g => Subtype.ext (hsmul c g g.2)
+  },
+  fun _ => rfl
+⟩
 
 set_option maxHeartbeats 4000000 in
 private theorem laws_lemma_7 {D : D7} {V W : HSp D} {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hψ : IsStdChar D ψ (-1)) (hθ : IsInfFam θ)
@@ -478,36 +513,72 @@ private theorem laws_lemma_7 {D : D7} {V W : HSp D} {ψ : AddChar (AF D.host.F) 
 
 variable {D : D7} {V W : HSp D}
 
-theorem laws {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hψ : IsStdChar D ψ (-1)) (hθ : IsInfFam θ)
-    (τ : D.what₂.Tau) {s B : Mn V.rank} {s' B' : Mn W.rank} {ε : Fin V.rank → ℝ} {ε' : Fin W.rank → ℝ}
+theorem laws
+    {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hψ : IsStdChar D ψ (-1)) (hθ : IsInfFam θ)
+    (τ : D.what₂.Tau)
+    {s B : Mn V.rank} {s' B' : Mn W.rank} {ε : Fin V.rank → ℝ} {ε' : Fin W.rank → ℝ}
     (hε : ∀ a, ε a = 1 ∨ ε a = -1) (hε' : ∀ a, ε' a = 1 ∨ ε' a = -1) (hB : IsUnit B.det)
-    (hs : s * B = B * diagonal fun a => (ε a : ℂ)) (hs' : s' * B' = B' * diagonal fun a => (ε' a : ℂ))
+    (hs : s * B = B * diagonal fun a => (ε a : ℂ))
+    (hs' : s' * B' = B' * diagonal fun a => (ε' a : ℂ))
     (hG : Bᴴ * gramAt D V τ * B = diagonal fun a => (ε a : ℂ))
-    (hG' : B'ᴴ * gramAt D W τ * B' = diagonal fun a => (ε' a : ℂ)) {f : WO V W → ℂ} (hf : IsThetaFunO ψ V W f)
-    (hvac : IsFockVacAt (heisO ψ V W) θ τ (cplxO s s') f) :
-    (∀ P, IsThetaFunO ψ V W (GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B' f P)) ∧
-      (f ≠ 0 → Function.Injective (GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B' f)) ∧
-      ∀ (μ : Measure (WO V W)) (𝓕 : Set (WO V W)), μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL W V) 𝓕 μ →
-        ∀ P Q, ipO μ 𝓕 (GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B' f P) (GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B' f Q) =
-          ipO μ 𝓕 f f * fockIp P Q :=
+    (hG' : B'ᴴ * gramAt D W τ * B' = diagonal fun a => (ε' a : ℂ))
+    {f : WO V W → ℂ}
+    (hf : IsThetaFunO ψ V W f) (hvac : IsFockVacAt (heisO ψ V W) θ τ (cplxO s s') f)
+    : (∀ P,
+        IsThetaFunO ψ V W
+          (GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B' f P))
+      ∧ (f ≠ 0
+        → Function.Injective (GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W
+          τ s s' B B' f))
+      ∧ ∀ (μ : Measure (WO V W)) (𝓕 : Set (WO V W)),
+        μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL W V) 𝓕 μ
+          → ∀ P Q,
+            ipO μ 𝓕
+                (GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B'
+                  f P)
+                (GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B'
+                  f Q)
+              = ipO μ 𝓕 f f * fockIp P Q :=
   laws_lemma_7 hψ hθ τ hε hε' hB hs hs' hG hG' hf hvac
 
 end Laws
 
 section Main
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
 open GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction hiding Mat
 open MeasureTheory Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ArchRec
 
-theorem fock_at_one_place : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) (τ : D.what₂.Tau), IsStdChar D ψ (-1) → IsInfFam θ → ∀ (sS frS : Mn S.rank) (εS : Fin S.rank → Bool) (sT frT : Mn T.rank) (εT : Fin T.rank → Bool), IsFrameOf (gramAt D S τ) sS εS frS → IsFrameOf (gramAt D T τ) sT εT frT → ∀ f, IsThetaFunO ψ S T f → IsFockVacAt (heisO ψ S T) θ τ (cplxO sS sT) f → (∀ P, IsThetaFunO ψ S T (ptAt ψ θ S T τ sS sT frS⁻¹ frT⁻¹ f P)) ∧ (f ≠ 0 → Function.Injective (ptAt ψ θ S T τ sS sT frS⁻¹ frT⁻¹ f) ∧ ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL T S) 𝓕 μ → ∃ N, Fischer (ptAt ψ θ S T τ sS sT frS⁻¹ frT⁻¹ f) (ipTh μ 𝓕) (LinearEquiv.refl ℂ _) N) := by
+theorem fock_at_one_place
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) (τ : D.what₂.Tau),
+      IsStdChar D ψ (-1) → IsInfFam θ
+        → ∀ (sS frS : Mn S.rank) (εS : Fin S.rank → Bool) (sT frT : Mn T.rank)
+            (εT : Fin T.rank → Bool),
+          IsFrameOf (gramAt D S τ) sS εS frS → IsFrameOf (gramAt D T τ) sT εT frT
+            → ∀ f,
+              IsThetaFunO ψ S T f → IsFockVacAt (heisO ψ S T) θ τ (cplxO sS sT) f
+                → (∀ P, IsThetaFunO ψ S T (ptAt ψ θ S T τ sS sT frS⁻¹ frT⁻¹ f P))
+                  ∧ (f ≠ 0
+                    → Function.Injective (ptAt ψ θ S T τ sS sT frS⁻¹ frT⁻¹ f)
+                      ∧ ∀ (μ : Measure (WO S T)) (𝓕 : Set (WO S T)),
+                        μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL T S) 𝓕 μ
+                          → ∃ N,
+                            Fischer (ptAt ψ θ S T τ sS sT frS⁻¹ frT⁻¹ f) (ipTh μ 𝓕)
+                              (LinearEquiv.refl ℂ _) N) := by
   intro D ψ θ S T τ hψ hθ sS frS εS sT frT εT hS hT f hf hvac
   obtain ⟨hdS, hsS, hGS⟩ := frame_inv hS
   obtain ⟨hdT, hsT, hGT⟩ := frame_inv hT
-  have L := laws (D := D) (V := S) (W := T) hψ hθ τ (ε := fun a => sgn εS a) (ε' := fun a => sgn εT a)
-    (fun a => sgn_cases εS a) (fun a => sgn_cases εT a) hdS hsS hsT hGS hGT hf hvac
+  have L :=
+    laws (D := D) (V := S) (W := T) hψ hθ τ
+      (ε := fun a => sgn εS a)
+      (ε' := fun a => sgn εT a)
+      (fun a => sgn_cases εS a)
+      (fun a => sgn_cases εT a)
+      hdS hsS hsT hGS hGT hf hvac
   refine ⟨L.1, fun hne => ⟨L.2.1 hne, ?_⟩⟩
   intro μ 𝓕 hμ h𝓕
   have hne0 : GlobalTheory.Ker.ipO μ 𝓕 f f ≠ 0 := fun h0 =>
@@ -524,8 +595,10 @@ theorem fock_at_one_place : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : 
   have hnn : 0 ≤ (GlobalTheory.Ker.ipO μ 𝓕 f f).re := by
     have hI := GlobalTheory.Size.integrableOn_mul_conj hψ hμ h𝓕 hf hf
     unfold GlobalTheory.Ker.ipO
-    have key : (∫ w in 𝓕, f w * (starRingEnd ℂ) (f w) ∂μ).re =
-        ∫ w in 𝓕, (f w * (starRingEnd ℂ) (f w)).re ∂μ := (integral_re hI).symm
+    have key
+        : (∫ w in 𝓕, f w * (starRingEnd ℂ) (f w) ∂μ).re
+          = ∫ w in 𝓕, (f w * (starRingEnd ℂ) (f w)).re ∂μ :=
+      (integral_re hI).symm
     rw [key]
     exact MeasureTheory.integral_nonneg fun w => by
       simp only [Complex.mul_conj, Complex.ofReal_re]

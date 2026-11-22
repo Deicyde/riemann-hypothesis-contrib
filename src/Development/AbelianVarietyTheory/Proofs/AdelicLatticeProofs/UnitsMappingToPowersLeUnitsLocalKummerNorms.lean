@@ -10,11 +10,13 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem norm_map_of_basis {F L A B ι : Type} [CommRing F] [CommRing L] [CommRing A] [CommRing B]
-    [Algebra F A] [Algebra L B] [Fintype ι] [DecidableEq ι] (φ : F →+* L) (ψ : A →+* B)
-    (hψ : ∀ c, ψ (algebraMap F A c) = algebraMap L B (φ c))
-    (b : Module.Basis ι F A) (b' : Module.Basis ι L B) (hb : ∀ i, ψ (b i) = b' i) (y : A) :
-    Algebra.norm L (ψ y) = φ (Algebra.norm F y) := by
+theorem norm_map_of_basis
+    {F L A B ι : Type} [CommRing F] [CommRing L] [CommRing A] [CommRing B] [Algebra F A]
+    [Algebra L B] [Fintype ι] [DecidableEq ι]
+    (φ : F →+* L) (ψ : A →+* B) (hψ : ∀ c, ψ (algebraMap F A c) = algebraMap L B (φ c))
+    (b : Module.Basis ι F A) (b' : Module.Basis ι L B) (hb : ∀ i, ψ (b i) = b' i)
+    (y : A)
+    : Algebra.norm L (ψ y) = φ (Algebra.norm F y) := by
   have hr : ∀ (x : A) (i : ι), b'.repr (ψ x) i = φ (b.repr x i) := by
     intro x i
     have h1 : ψ x = ∑ j, φ (b.repr x j) • b' j := by
@@ -30,9 +32,9 @@ theorem norm_map_of_basis {F L A B ι : Type} [CommRing F] [CommRing L] [CommRin
   rw [RingHom.mapMatrix_apply, Matrix.map_apply, Algebra.leftMulMatrix_eq_repr_mul,
     Algebra.leftMulMatrix_eq_repr_mul, ← hb, ← map_mul, hr]
 
-theorem exists_basis_pow_root {L : Type} [Field L] {p : ℕ} (hp : 0 < p) (a : L) :
-    ∃ b : Module.Basis (Fin p) L (AdjoinRoot (X ^ p - C a : L[X])),
-      ∀ i, b i = AdjoinRoot.root (X ^ p - C a : L[X]) ^ (i : ℕ) := by
+theorem exists_basis_pow_root {L : Type} [Field L] {p : ℕ} (hp : 0 < p) (a : L)
+    : ∃ b : Module.Basis (Fin p) L (AdjoinRoot (X ^ p - C a : L[X])), ∀ i,
+      b i = AdjoinRoot.root (X ^ p - C a : L[X]) ^ (i : ℕ) := by
   have hne : (X ^ p - C a : L[X]) ≠ 0 := X_pow_sub_C_ne_zero hp a
   have hd : (AdjoinRoot.powerBasis hne).dim = p := by
     rw [AdjoinRoot.powerBasis_dim, natDegree_X_pow_sub_C _]
@@ -40,7 +42,12 @@ theorem exists_basis_pow_root {L : Type} [Field L] {p : ℕ} (hp : 0 < p) (a : L
   rw [Module.Basis.reindex_apply, PowerBasis.basis_eq_pow, AdjoinRoot.powerBasis_gen]
   simp
 
-theorem powSub_le_kNorm_and_kNorm_map : ∀ (p : ℕ), 0 < p → (∀ (F L : Type) [Field F] [Field L] (φ : F →+* L) (δ : F), powSub p φ ≤ kNorm p φ δ) ∧ ∀ (F L : Type) [Field F] [Field L] (φ : F →+* L) (δ : F), kNorm p (RingHom.id F) δ ≤ kNorm p φ δ := by
+theorem powSub_le_kNorm_and_kNorm_map
+    : ∀ (p : ℕ),
+      0 < p
+        → (∀ (F L : Type) [Field F] [Field L] (φ : F →+* L) (δ : F), powSub p φ ≤ kNorm p φ δ)
+          ∧ ∀ (F L : Type) [Field F] [Field L] (φ : F →+* L) (δ : F),
+            kNorm p (RingHom.id F) δ ≤ kNorm p φ δ := by
   intro p hp
   constructor
   · intro F L _ _ φ δ x hx
@@ -50,22 +57,21 @@ theorem powSub_le_kNorm_and_kNorm_map : ∀ (p : ℕ), 0 < p → (∀ (F L : Typ
       rw [zero_pow hp.ne'] at hr
       exact (map_ne_zero φ).2 x.ne_zero hr.symm
     obtain ⟨b, -⟩ := exists_basis_pow_root hp (φ δ)
-    refine (mem_kNorm p φ δ x).2
-      ⟨Units.map (algebraMap L (AdjoinRoot (X ^ p - C (φ δ) : L[X]))).toMonoidHom
-        (Units.mk0 r hr0), ?_⟩
+    refine (mem_kNorm p φ δ x).2 ⟨
+      Units.map (algebraMap L (AdjoinRoot (X ^ p - C (φ δ) : L[X]))).toMonoidHom (Units.mk0 r hr0),
+      ?_
+    ⟩
     change Algebra.norm L (algebraMap L _ r) = _
     rw [Algebra.norm_algebraMap_of_basis b, Fintype.card_fin, hr]
   · intro F L _ _ φ δ x hx
     obtain ⟨y, hy⟩ := (mem_kNorm p (RingHom.id F) δ x).1 hx
     obtain ⟨b, hb⟩ := exists_basis_pow_root hp (RingHom.id F δ)
     obtain ⟨b', hb'⟩ := exists_basis_pow_root hp (φ δ)
-    have hdv : (X ^ p - C (φ δ) : L[X]) ∣ (X ^ p - C (RingHom.id F δ) : F[X]).map φ := by
-      simp
+    have hdv : (X ^ p - C (φ δ) : L[X]) ∣ (X ^ p - C (RingHom.id F δ) : F[X]).map φ := by simp
     let ψ := AdjoinRoot.map φ _ _ hdv
     refine (mem_kNorm p φ δ x).2 ⟨Units.map ψ.toMonoidHom y, ?_⟩
     change Algebra.norm L (ψ y) = _
-    rw [norm_map_of_basis φ ψ (fun c => by simp [ψ]) b b'
-      (fun i => by simp [hb, hb', ψ]) y, hy]
+    rw [norm_map_of_basis φ ψ (fun c => by simp [ψ]) b b' (fun i => by simp [hb, hb', ψ]) y, hy]
     rfl
 
 end GlobalTheory.CNorm

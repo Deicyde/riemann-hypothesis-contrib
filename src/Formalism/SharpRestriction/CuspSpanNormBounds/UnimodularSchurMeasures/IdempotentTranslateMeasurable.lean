@@ -14,21 +14,32 @@ open Formalism.MainNotions.S Formalism.MainNotions.CayleySignature
 
 section Grp
 
-variable {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin (2 * r + k + 1) → Bool}
-  {lam : Fin (2 * r + k + 1) → ℝ} {σ : Mat k r → (H →L[ℂ] H)}
+variable
+  {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r + k + 1) → ℝ} {σ : Mat k r → (H →L[ℂ] H)}
 
-theorem discrete_series_isometry (hσ : IsDSHpk k r ε lam σ) {a : Mat k r} (ha : a ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) (v : H) :
-    ‖σ a v‖ = ‖v‖ := by
+theorem discrete_series_isometry
+    (hσ : IsDSHpk k r ε lam σ)
+    {a : Mat k r}
+    (ha : a ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r))
+    (v : H)
+    : ‖σ a v‖ = ‖v‖ := by
   obtain ⟨P, hP, hDS⟩ := hσ
   have := hDS.2.2.1.2.1 _ (cayley_conj_mem_diagonal_model hP ha).1 v
   simpa only [(cayley_conj_mem_diagonal_model hP ha).2] using this
 
-theorem discrete_series_inner (hσ : IsDSHpk k r ε lam σ) {a : Mat k r} (ha : a ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) (x y : H) :
-    ⟪σ a x, σ a y⟫_ℂ = ⟪x, y⟫_ℂ :=
+theorem discrete_series_inner
+    (hσ : IsDSHpk k r ε lam σ)
+    {a : Mat k r}
+    (ha : a ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r))
+    (x y : H)
+    : ⟪σ a x, σ a y⟫_ℂ = ⟪x, y⟫_ℂ :=
   (LinearIsometry.mk (σ a : H →ₗ[ℂ] H) (discrete_series_isometry hσ ha)).inner_map_map x y
 
-theorem discrete_series_continuousOn (hσ : IsDSHpk k r ε lam σ) (v : H) :
-    ContinuousOn (fun g => σ g v) (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) := by
+theorem discrete_series_continuousOn (hσ : IsDSHpk k r ε lam σ) (v : H)
+    : ContinuousOn
+      (fun g => σ g v)
+      (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) := by
   obtain ⟨P, hP, hDS⟩ := hσ
   have h1 := hDS.2.2.1.2.2 v
   have hc : Continuous fun x : Mat k r => P * x * P⁻¹ :=

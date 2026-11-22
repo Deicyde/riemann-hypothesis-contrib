@@ -7,16 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FontaineAinf
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 noncomputable section
 
 namespace GlobalTheory.WinLift
 
-theorem isUnit_of_isUnit_theta {p : ℕ} [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C]
-    [CharZero C] {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
-    [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O)
-    (z : Ainf p O) (hz : IsUnit (WittVector.fontaineTheta O p z)) : IsUnit z := by
+theorem isUnit_of_isUnit_theta
+    {p : ℕ} [Fact p.Prime]
+    {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+    {v : Valuation C NNReal} {O : Type}
+    [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
+    (hv : v.Integers O)
+    (z : Ainf p O) (hz : IsUnit (WittVector.fontaineTheta O p z))
+    : IsUnit z := by
   haveI := GlobalTheory.AinfXi.isLocalRing_ainf (p := p) hv
   haveI := ReciprocityTheory.PGsh.Ainf.O_local O hv
   by_contra hn
@@ -29,7 +35,15 @@ theorem isUnit_of_isUnit_theta {p : ℕ} [Fact p.Prime] {C : Type} [Field C] [Is
   rw [sub_sub_cancel] at h1
   exact (IsLocalRing.maximalIdeal.isMaximal (Ainf p O)).ne_top ((Ideal.eq_top_iff_one _).2 h1)
 
-theorem exists_unit_lift_mod_tau : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ F : BFrame ε, ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (U : Matrix ι ι F.B), IsUnit U → ∃ V : Matrix ι ι (Ainf p O), IsUnit V ∧ ∀ i j, F.τ ∣ U i j - F.a (V i j) := by
+theorem exists_unit_lift_mod_tau
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ F : BFrame ε,
+          ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (U : Matrix ι ι F.B),
+            IsUnit U
+              → ∃ V : Matrix ι ι (Ainf p O), IsUnit V ∧ ∀ i j, F.τ ∣ U i j - F.a (V i j) := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε F ι _ _ U hU
   choose x y hxy using fun i j => F.gen (U i j)
   refine ⟨Matrix.of x, ?_, fun i j => ⟨F.a (y i j), by rw [hxy i j]; simp⟩⟩

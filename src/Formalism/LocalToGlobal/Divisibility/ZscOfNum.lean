@@ -13,12 +13,13 @@ noncomputable section
 
 namespace Formalism.L2.DIV
 
-open Formalism.DivisionValues Formalism.EigenvalueLevelCeiling Formalism.L2.Indef Formalism.BasicNotions
+open Formalism.DivisionValues Formalism.EigenvalueLevelCeiling Formalism.L2.Indef
+  Formalism.BasicNotions
 
 def NumDatum.unitE (Nd : NumDatum) (Nc : ℝ) : ℝ := Nd.sc.x ^ Nd.sc.eps * (Nd.B0 + Nc)
 
-theorem NumDatum.logLog_le (Nd : NumDatum) (h : Real.log Nd.sc.x ≤ Nd.sc.L) :
-    Real.log (Real.log Nd.sc.x) ≤ Nd.sc.x ^ Nd.sc.eps := by
+theorem NumDatum.logLog_le (Nd : NumDatum) (h : Real.log Nd.sc.x ≤ Nd.sc.L)
+    : Real.log (Real.log Nd.sc.x) ≤ Nd.sc.x ^ Nd.sc.eps := by
   have hl : 0 < Real.log Nd.sc.x := Real.log_pos Nd.sc.one_lt_alt
   have h1 := Real.log_le_sub_one_of_pos hl
   have h2 : Nd.sc.L = Nd.sc.x ^ Nd.sc.eps := rfl
@@ -47,7 +48,8 @@ theorem NumDatum.one_le_B0 (Nd : NumDatum) : 1 ≤ Nd.B0 := by
   have h2 := one_le_mul_of_one_le_of_one_le h1 hb
   exact one_le_mul_of_one_le_of_one_le h2 hx
 
-theorem NumDatum.one_le_m_unitE (Nd : NumDatum) {Nc : ℝ} (hNc : 0 ≤ Nc) : 1 ≤ (Nd.R.m : ℝ) * Nd.unitE Nc := by
+theorem NumDatum.one_le_m_unitE (Nd : NumDatum) {Nc : ℝ} (hNc : 0 ≤ Nc)
+    : 1 ≤ (Nd.R.m : ℝ) * Nd.unitE Nc := by
   unfold NumDatum.unitE
   have hm : (1 : ℝ) ≤ Nd.R.m := by
     have := Nd.R.two_le_m
@@ -58,15 +60,23 @@ theorem NumDatum.one_le_m_unitE (Nd : NumDatum) {Nc : ℝ} (hNc : 0 ≤ Nc) : 1 
 
 section Scale
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {m : ℕ}
 
-def ZscOfNum (A : FamIn K G Pl0 T m) (P0 : Subgroup G) (ψ0 : P0 →* Kˣ) (Nd : NumDatum) (eJ : A.fam.base.J ≃ Fin Nd.R.m)
-    (Nc : ℝ) (Zs : DefSub A.fam.amb) : IndefScale A.fam.base where
+def ZscOfNum
+    (A : FamIn K G Pl0 T m)
+    (P0 : Subgroup G) (ψ0 : P0 →* Kˣ)
+    (Nd : NumDatum) (eJ : A.fam.base.J ≃ Fin Nd.R.m)
+    (Nc : ℝ) (Zs : DefSub A.fam.amb)
+    : IndefScale A.fam.base where
   F0 y j := Nd.Fj ((eJ j).1 + 1) y
   J0 t y j := ((A.fam.JJ P0 ψ0 Zs j t y : ℚ) : ℝ)
   E1u := Nd.unitE Nc
-  l3m j := ∑ ρ : RPl Nd.R, (((Nd.R.k : ℝ) + (((eJ j).1 + 1 : ℕ) : ℝ) - 1) - ((Nd.R.m : ℝ) - (((eJ j).1 + 1 : ℕ) : ℝ))) *
-    Nd.w ((eJ j).1 + 1) ρ * Nd.logOm
+  l3m j :=
+    ∑ ρ : RPl Nd.R, (((Nd.R.k : ℝ) + (((eJ j).1 + 1 : ℕ) : ℝ) - 1) - ((Nd.R.m : ℝ) - (((eJ j).1 + 1 : ℕ) : ℝ))) *
+      Nd.w ((eJ j).1 + 1) ρ * Nd.logOm
   l3u := Nd.B0 * Real.log (Real.log Nd.sc.x)
   l6m j := ∑ ρ : RPl Nd.R, Nd.logHook ((eJ j).1 + 1) ρ
   l6u := (Nd.R.f : ℝ) * (Nd.R.nV : ℝ) ^ 2 * Nd.Lp
@@ -75,15 +85,22 @@ def ZscOfNum (A : FamIn K G Pl0 T m) (P0 : Subgroup G) (ψ0 : P0 →* Kˣ) (Nd :
   la := Real.log (Fintype.card G)
   de := 8 * (Nd.R.f : ℝ) * (Nd.R.r : ℝ) / ((min (Nd.g 0) (Nd.g 1) : ℕ) : ℝ)
 
-variable (A : FamIn K G Pl0 T m) (P0 : Subgroup G) (ψ0 : P0 →* Kˣ) (Nd : NumDatum) (eJ : A.fam.base.J ≃ Fin Nd.R.m) (Nc : ℝ)
+variable
+  (A : FamIn K G Pl0 T m)
+  (P0 : Subgroup G) (ψ0 : P0 →* Kˣ)
+  (Nd : NumDatum) (eJ : A.fam.base.J ≃ Fin Nd.R.m)
+  (Nc : ℝ)
 
 def dgOf (hT : Finite T) : ℕ :=
   letI := Fintype.ofFinite T
   Finset.univ.lcm fun p : Fin m × T => (A.fam.L p.1 p.2).DG (A.fam.lvlA P0 ψ0)
 
-theorem dgOf_dvd (hT : Finite T) (j : Fin m) (t : T) : (A.fam.L j t).DG (A.fam.lvlA P0 ψ0) ∣ dgOf A P0 ψ0 hT := by
+theorem dgOf_dvd (hT : Finite T) (j : Fin m) (t : T)
+    : (A.fam.L j t).DG (A.fam.lvlA P0 ψ0) ∣ dgOf A P0 ψ0 hT := by
   letI := Fintype.ofFinite T
-  exact Finset.dvd_lcm (f := fun p : Fin m × T => (A.fam.L p.1 p.2).DG (A.fam.lvlA P0 ψ0)) (Finset.mem_univ (j, t))
+  exact Finset.dvd_lcm
+    (f := fun p : Fin m × T => (A.fam.L p.1 p.2).DG (A.fam.lvlA P0 ψ0))
+    (Finset.mem_univ (j, t))
 
 theorem dgOf_pos (hT : Finite T) : 0 < dgOf A P0 ψ0 hT := by
   letI := Fintype.ofFinite T
@@ -105,8 +122,9 @@ end Scale
 
 section Q
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {Bs : DefBase K} {Df0 Df1 : DefSide Bs} {Dc : DefCols Df1}
-  {Sp : SPer Dc} {N : IndefNum Bs}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {Bs : DefBase K} {Df0 Df1 : DefSide Bs} {Dc : DefCols Df1} {Sp : SPer Dc} {N : IndefNum Bs}
 
 def QOf (P : IndefCore Df0 Df1 Dc Sp N) (LG E3 : ℝ) (E2 : Bs.J → ℝ) : ℝ :=
   max 1 (boundB P LG E3 E2 + N.hh + 28 * N.la)
@@ -115,8 +133,15 @@ end Q
 
 section Sizes
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ}
-variable (A : FamIn K G Pl0 T m) (P0 : Subgroup G) (ψ0 : P0 →* Kˣ) (Nd : NumDatum) (eJ : A.fam.base.J ≃ Fin Nd.R.m) (Nc : ℝ)
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {m : ℕ}
+variable
+  (A : FamIn K G Pl0 T m)
+  (P0 : Subgroup G) (ψ0 : P0 →* Kˣ)
+  (Nd : NumDatum) (eJ : A.fam.base.J ≃ Fin Nd.R.m)
+  (Nc : ℝ)
 
 def LamSizeAt (s : ℕ) (cG : ℝ) : Prop :=
   Real.log (Fintype.card G) + Real.log (s : ℝ) ≤ cG * ((Nd.R.m : ℝ) * Nd.unitE Nc)
@@ -128,7 +153,10 @@ end Sizes
 
 section Assemble
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {m : ℕ}
 
 end Assemble
 

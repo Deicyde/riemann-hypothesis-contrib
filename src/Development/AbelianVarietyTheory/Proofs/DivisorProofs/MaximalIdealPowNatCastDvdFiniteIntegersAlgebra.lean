@@ -8,11 +8,14 @@ namespace GlobalTheory
 
 open IsLocalRing
 
-theorem maxIdeal_pow_dvd_natCast_of_integers :
-    ∀ (p : ℕ), p ≠ 0 → ∀ (C : Type) [Field C] [CharZero C] (v : Valuation C NNReal) (O : Type)
-      [CommRing O] [Algebra O C], v.Integers O → ∀ (A : Type) [CommRing A] [Algebra O A]
-      [Module.Finite O A] [IsLocalRing A] (a : A), a ∈ IsLocalRing.maximalIdeal A →
-      ∃ N : ℕ, (p : A) ∣ a ^ N := by
+theorem maxIdeal_pow_dvd_natCast_of_integers
+    : ∀ (p : ℕ),
+      p ≠ 0
+        → ∀ (C : Type) [Field C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O]
+            [Algebra O C],
+          v.Integers O
+            → ∀ (A : Type) [CommRing A] [Algebra O A] [Module.Finite O A] [IsLocalRing A] (a : A),
+              a ∈ IsLocalRing.maximalIdeal A → ∃ N : ℕ, (p : A) ∣ a ^ N := by
   intro p hp C _ _ v O _ _ hv A _ _ _ _ a ha
 
   set J : Ideal O := (maximalIdeal A).comap (algebraMap O A) with hJdef
@@ -48,7 +51,8 @@ theorem maxIdeal_pow_dvd_natCast_of_integers :
     rintro Q ⟨hQ, hQp⟩
     have hle : J ≤ Q.comap (algebraMap O A) := Ideal.map_le_iff_le_comap.1 hQ
     have hQc : Q.comap (algebraMap O A) = J :=
-      ((inferInstance : J.IsMaximal).eq_of_le (Ideal.IsPrime.comap (algebraMap O A)).ne_top hle).symm
+      ((inferInstance : J.IsMaximal).eq_of_le (Ideal.IsPrime.comap (algebraMap O A)).ne_top
+        hle).symm
     haveI : (Q.comap (algebraMap O A)).IsMaximal := by rw [hQc]; infer_instance
     haveI : Q.IsMaximal := Ideal.isMaximal_of_isIntegral_of_isMaximal_comap
       (algebraMap O A) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) Q this

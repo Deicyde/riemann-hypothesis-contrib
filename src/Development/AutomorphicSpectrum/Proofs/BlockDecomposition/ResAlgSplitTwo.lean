@@ -9,8 +9,8 @@ open PositivityTheory.PfSWUS.Loc
 
 namespace GlobalTheory.CompanionTheory.UnrDens
 
-def barσ {R : Type} [CommRing R] (σ : R →+* R) (ϖ : R) (h : σ ϖ = ϖ) (k : ℕ) :
-    R ⧸ lev ϖ k →+* R ⧸ lev ϖ k :=
+def barσ {R : Type} [CommRing R] (σ : R →+* R) (ϖ : R) (h : σ ϖ = ϖ) (k : ℕ)
+    : R ⧸ lev ϖ k →+* R ⧸ lev ϖ k :=
   Ideal.Quotient.lift (lev ϖ k) ((Ideal.Quotient.mk (lev ϖ k)).comp σ) (by
     intro a ha
     obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
@@ -18,8 +18,10 @@ def barσ {R : Type} [CommRing R] (σ : R →+* R) (ϖ : R) (h : σ ϖ = ϖ) (k 
     apply Ideal.Quotient.eq_zero_iff_mem.2
     exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _))
 
-@[simp] theorem barσ_mk {R : Type} [CommRing R] (σ : R →+* R) (ϖ : R) (h : σ ϖ = ϖ) (k : ℕ) (a : R) :
-    barσ σ ϖ h k (Ideal.Quotient.mk (lev ϖ k) a) = Ideal.Quotient.mk (lev ϖ k) (σ a) := rfl
+@[simp]
+theorem barσ_mk {R : Type} [CommRing R] (σ : R →+* R) (ϖ : R) (h : σ ϖ = ϖ) (k : ℕ) (a : R)
+    : barσ σ ϖ h k (Ideal.Quotient.mk (lev ϖ k) a) = Ideal.Quotient.mk (lev ϖ k) (σ a) :=
+  rfl
 
 structure ResAlg (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ) : Prop where
   inv : ∀ a, τ (τ a) = a
@@ -31,7 +33,8 @@ structure ResAlg (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ) :
 
 variable {E : Type} [CommRing E] {τ : E →+* E}
 
-structure HermSp (E : Type) [CommRing E] (τ : E →+* E) (V : Type) [AddCommGroup V] [Module E V] where
+structure HermSp
+    (E : Type) [CommRing E] (τ : E →+* E) (V : Type) [AddCommGroup V] [Module E V] where
   h : V → V → E
   add_left : ∀ u v w, h (u + v) w = h u w + h v w
   smul_left : ∀ (a : E) v w, h (a • v) w = a * h v w
@@ -99,8 +102,10 @@ noncomputable def perpForm {w : V} (hw : IsUnit (B.h w w)) : HermSp E τ (B.perp
     rw [hz, B.add_right, B.smul_right, h0, mul_zero, add_zero]
     exact h1
 
-@[simp] theorem perpForm_h {w : V} (hw : IsUnit (B.h w w)) (a b : B.perp w) :
-    (B.perpForm hw).h a b = B.h a b := rfl
+@[simp]
+theorem perpForm_h {w : V} (hw : IsUnit (B.h w w)) (a b : B.perp w)
+    : (B.perpForm hw).h a b = B.h a b :=
+  rfl
 
 noncomputable def perpEquiv {w : V} (hw : IsUnit (B.h w w)) : E × B.perp w ≃ V where
   toFun p := p.1 • w + p.2
@@ -122,19 +127,22 @@ noncomputable def perpEquiv {w : V} (hw : IsUnit (B.h w w)) : E × B.perp w ≃ 
     intro z
     simp
 
-theorem perpEquiv_apply {w : V} (hw : IsUnit (B.h w w)) (p : E × B.perp w) :
-    B.perpEquiv hw p = p.1 • w + (p.2 : V) := rfl
+theorem perpEquiv_apply {w : V} (hw : IsUnit (B.h w w)) (p : E × B.perp w)
+    : B.perpEquiv hw p = p.1 • w + (p.2 : V) :=
+  rfl
 
-theorem norm_perp {w v : V} (hv : B.h v w = 0) (a : E) :
-    B.h (a • w + v) (a • w + v) = a * τ a * B.h w w + B.h v v := by
+theorem norm_perp {w v : V} (hv : B.h v w = 0) (a : E)
+    : B.h (a • w + v) (a • w + v) = a * τ a * B.h w w + B.h v v := by
   have hwv : B.h w v = 0 := by rw [B.symm v w, hv, map_zero]
   simp only [B.add_left, B.smul_left, B.add_right, B.smul_right, hv, hwv, mul_zero, add_zero]
   ring
 
 end HermSp
 
-def HermSp.ofMatrix (hτ : ∀ a, τ (τ a) = a) {m : ℕ} (S : Matrix (Fin m) (Fin m) E)
-    (hS : cT τ S = S) (hd : IsUnit S.det) : HermSp E τ (Fin m → E) where
+def HermSp.ofMatrix
+    (hτ : ∀ a, τ (τ a) = a)
+    {m : ℕ} (S : Matrix (Fin m) (Fin m) E) (hS : cT τ S = S) (hd : IsUnit S.det)
+    : HermSp E τ (Fin m → E) where
   h v w := dotProduct (fun i => τ (w i)) (S.mulVec v)
   add_left u v w := by rw [Matrix.mulVec_add, dotProduct_add]
   smul_left a v w := by rw [Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
@@ -157,12 +165,14 @@ def HermSp.ofMatrix (hτ : ∀ a, τ (τ a) = a) {m : ℕ} (S : Matrix (Fin m) (
     have hu : S⁻¹ * S = 1 := Matrix.nonsing_inv_mul _ hd
     simpa [Matrix.mulVec_mulVec, hu] using this
 
-theorem gram_apply (hτ : ∀ a, τ (τ a) = a) {m n : ℕ} (S : Matrix (Fin m) (Fin m) E)
-    (hS : cT τ S = S) (hd : IsUnit S.det) (x : Matrix (Fin m) (Fin n) E) (i j : Fin n) :
-    (cT τ x * S * x) i j = (HermSp.ofMatrix hτ S hS hd).h (fun a => x a j) (fun a => x a i) := by
+theorem gram_apply
+    (hτ : ∀ a, τ (τ a) = a)
+    {m n : ℕ} (S : Matrix (Fin m) (Fin m) E) (hS : cT τ S = S) (hd : IsUnit S.det)
+    (x : Matrix (Fin m) (Fin n) E) (i j : Fin n)
+    : (cT τ x * S * x) i j = (HermSp.ofMatrix hτ S hS hd).h (fun a => x a j) (fun a => x a i) := by
   show (cT τ x * S * x) i j = dotProduct (fun a => τ (x a i)) (S.mulVec (fun a => x a j))
-  simp only [Matrix.mul_apply, cT, Matrix.transpose_apply, Matrix.map_apply, dotProduct, Matrix.mulVec,
-    Finset.sum_mul, Finset.mul_sum]
+  simp only [Matrix.mul_apply, cT, Matrix.transpose_apply, Matrix.map_apply, dotProduct,
+    Matrix.mulVec, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ring

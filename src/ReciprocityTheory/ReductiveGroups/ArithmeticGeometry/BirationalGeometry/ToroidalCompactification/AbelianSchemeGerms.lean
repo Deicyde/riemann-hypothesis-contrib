@@ -9,7 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -19,12 +20,13 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
 
 variable {S : Scheme.{0}}
 
-theorem isAbelianScheme_of_proper (G : Over S) [GrpObj G] (hG : IsSemiAbelian G) [IsProper G.hom] :
-    IsAbelianScheme G :=
+theorem isAbelianScheme_of_proper (G : Over S) [GrpObj G] (hG : IsSemiAbelian G) [IsProper G.hom]
+    : IsAbelianScheme G :=
   ⟨hG.comm, hG.smooth, inferInstance, hG.geomConnected⟩
 
-theorem isAbelianScheme_tensor (G H : Over S) [GrpObj G] [GrpObj H] (hG : IsAbelianScheme G)
-    (hH : IsAbelianScheme H) : IsAbelianScheme (G ⊗ H) := by
+theorem isAbelianScheme_tensor
+    (G H : Over S) [GrpObj G] [GrpObj H] (hG : IsAbelianScheme G) (hH : IsAbelianScheme H)
+    : IsAbelianScheme (G ⊗ H) := by
   have := hG.comm
   have := hH.comm
   have := hG.smooth
@@ -41,8 +43,8 @@ theorem isAbelianScheme_tensor (G H : Over S) [GrpObj G] [GrpObj H] (hG : IsAbel
   · rw [Over.tensorObj_hom, pullback.condition]
     exact GeometricallyConnected.comp _ _
 
-theorem isAbelianScheme_tensor_unit (G : Over S) [GrpObj G] (hG : IsAbelianScheme G) :
-    IsAbelianScheme (G ⊗ 𝟙_ (Over S)) := by
+theorem isAbelianScheme_tensor_unit (G : Over S) [GrpObj G] (hG : IsAbelianScheme G)
+    : IsAbelianScheme (G ⊗ 𝟙_ (Over S)) := by
   have := hG.comm
   have := hG.smooth
   have := hG.proper
@@ -55,13 +57,14 @@ theorem isAbelianScheme_tensor_unit (G : Over S) [GrpObj G] (hG : IsAbelianSchem
   · rw [hc]; infer_instance
   · rw [hc]; infer_instance
 
-theorem isAbelianScheme_powObj (G : Over S) [GrpObj G] (hG : IsAbelianScheme G) :
-    ∀ n : ℕ, IsAbelianScheme (powObj G (n + 1))
+theorem isAbelianScheme_powObj (G : Over S) [GrpObj G] (hG : IsAbelianScheme G)
+    : ∀ n : ℕ, IsAbelianScheme (powObj G (n + 1))
   | 0 => isAbelianScheme_tensor_unit G hG
   | n + 1 => isAbelianScheme_tensor G (powObj G (n + 1)) hG (isAbelianScheme_powObj G hG n)
 
-theorem globalFns_powObj (hGF : GlobalFnsSt) (G : Over S) [GrpObj G] (hG : IsSemiAbelian G)
-    [IsProper G.hom] (n : ℕ) : Function.Bijective (powObj G n).hom.appTop.hom := by
+theorem globalFns_powObj
+    (hGF : GlobalFnsSt) (G : Over S) [GrpObj G] (hG : IsSemiAbelian G) [IsProper G.hom] (n : ℕ)
+    : Function.Bijective (powObj G n).hom.appTop.hom := by
   cases n with
   | zero =>
     show Function.Bijective (𝟙 S : S ⟶ S).appTop.hom

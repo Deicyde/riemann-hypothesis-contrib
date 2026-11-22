@@ -16,22 +16,26 @@ section Core
 
 variable {E : Type} [Field E] [NumberField E] {κ : Type} [Fintype κ]
 
-theorem hom_basis {R' : Type} [Ring R'] (f : 𝓞 E →+* R') (b : Module.Basis κ ℤ (𝓞 E)) (x : 𝓞 E) :
-    f x = ∑ k, ((b.repr x k : ℤ) : R') * f (b k) := by
+theorem hom_basis {R' : Type} [Ring R'] (f : 𝓞 E →+* R') (b : Module.Basis κ ℤ (𝓞 E)) (x : 𝓞 E)
+    : f x = ∑ k, ((b.repr x k : ℤ) : R') * f (b k) := by
   conv_lhs => rw [← b.sum_repr x]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul, zsmul_eq_mul]
 
-variable {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] {ι : Type} [Fintype ι] [DecidableEq ι]
-  [DecidableEq κ]
+variable
+  {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+  {ι : Type} [Fintype ι] [DecidableEq ι] [DecidableEq κ]
 
-theorem decomp_of_inv (ρ : 𝓞 E →+* Module.End R M) (χ : ι → (𝓞 E →+* R)) (b : Module.Basis κ ℤ (𝓞 E))
-    (Cm : κ → ι → R) (hAC : ∀ σ τ, ∑ i, χ σ (b i) * Cm i τ = if σ = τ then 1 else 0)
-    (hCA : ∀ i j, ∑ τ, Cm i τ * χ τ (b j) = if i = j then 1 else 0) :
-    (∀ m : M, ∃ mσ : ι → M, (∀ σ (a : 𝓞 E), ρ a (mσ σ) = χ σ a • mσ σ) ∧ ∑ σ, mσ σ = m) ∧
-    (∀ mσ : ι → M, (∀ σ (a : 𝓞 E), ρ a (mσ σ) = χ σ a • mσ σ) → ∑ σ, mσ σ = 0 → ∀ σ, mσ σ = 0) := by
+theorem decomp_of_inv
+    (ρ : 𝓞 E →+* Module.End R M)
+    (χ : ι → (𝓞 E →+* R)) (b : Module.Basis κ ℤ (𝓞 E)) (Cm : κ → ι → R)
+    (hAC : ∀ σ τ, ∑ i, χ σ (b i) * Cm i τ = if σ = τ then 1 else 0)
+    (hCA : ∀ i j, ∑ τ, Cm i τ * χ τ (b j) = if i = j then 1 else 0)
+    : (∀ m : M, ∃ mσ : ι → M, (∀ σ (a : 𝓞 E), ρ a (mσ σ) = χ σ a • mσ σ) ∧ ∑ σ, mσ σ = m)
+      ∧ (∀ mσ : ι → M,
+        (∀ σ (a : 𝓞 E), ρ a (mσ σ) = χ σ a • mσ σ) → ∑ σ, mσ σ = 0 → ∀ σ, mσ σ = 0) := by
   classical
   set Q : ι → M → M := fun σ m => ∑ i, Cm i σ • ρ (b i) m with hQ
   have hcoef : ∀ (a : 𝓞 E) (i : κ), ∑ τ, χ τ a * Cm i τ = ((b.repr a i : ℤ) : R) := by
@@ -56,7 +60,7 @@ theorem decomp_of_inv (ρ : 𝓞 E →+* Module.End R M) (χ : ι → (𝓞 E �
     intro σ a m
     have h1 : ρ a (Q σ m) = ∑ i, Cm i σ • ρ (a * b i) m := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hQ, map_sum, map_smul, map_mul, Module.End.mul_apply]
+      simp only [hQ, map_sum, map_smul, map_mul, Module.End.mul_apply]
     rw [h1]
     simp_rw [F3 _ m, map_mul, Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
@@ -98,8 +102,11 @@ section NT
 
 variable (E : Type) [Field E] [NumberField E]
 
-theorem isUnit_of_not_dvd {V : Type} [CommRing V] [IsLocalRing V] (g : ℕ) (hg : g.Prime) (hgV : ¬ IsUnit (g : V))
-    (d : ℤ) (hd : ¬ (g : ℤ) ∣ d) : IsUnit (d : V) := by
+theorem isUnit_of_not_dvd
+    {V : Type} [CommRing V] [IsLocalRing V]
+    (g : ℕ) (hg : g.Prime) (hgV : ¬ IsUnit (g : V))
+    (d : ℤ) (hd : ¬ (g : ℤ) ∣ d)
+    : IsUnit (d : V) := by
   have hp : Prime (g : ℤ) := Nat.prime_iff_prime_int.mp hg
   obtain ⟨u, v, huv⟩ := (Irreducible.coprime_iff_not_dvd hp.irreducible).2 hd
   have h1 : (u : V) * (g : V) + (v : V) * (d : V) = 1 := by

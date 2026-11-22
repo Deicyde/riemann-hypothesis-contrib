@@ -22,10 +22,12 @@ def inj (j : ι) : yoneda.obj (X j) ⟶ P0 X where
 
 def isColimitCofanSigmaOfRepresentablePresheaves : IsColimit (Cofan.mk (P0 X) (inj X)) :=
   Cofan.IsColimit.mk _
-    (fun s => { app := fun U => ↾fun (x : Σ j, (unop U ⟶ X j)) => (s.inj x.1).app U x.2
-                naturality := fun U V h => by
-                  ext x
-                  exact NatTrans.naturality_apply (s.inj x.1) h x.2 })
+    (fun s => {
+      app := fun U => ↾fun (x : Σ j, (unop U ⟶ X j)) => (s.inj x.1).app U x.2
+      naturality := fun U V h => by
+        ext x
+        exact NatTrans.naturality_apply (s.inj x.1) h x.2
+    })
     (fun s j => by ext U f; rfl)
     (fun s m hm => by
       ext U ⟨j, f⟩
@@ -67,11 +69,9 @@ variable (R : Type) [CommRing R]
 
 instance : (ModuleCat.free (ULift.{1} R)).IsLeftAdjoint := ⟨_, ⟨ModuleCat.adj _⟩⟩
 
-instance : PreservesColimitsOfShape (Discrete ι) (freeP R) := by
-  unfold freeP; infer_instance
+instance : PreservesColimitsOfShape (Discrete ι) (freeP R) := by unfold freeP; infer_instance
 
-instance : PreservesColimitsOfShape (Discrete ι) (free R) := by
-  unfold free; infer_instance
+instance : PreservesColimitsOfShape (Discrete ι) (free R) := by unfold free; infer_instance
 
 lemma isIso_free_φ : IsIso ((free R).map (φ X)) := by
   have h1 : Scheme.etaleTopology.W (ψ X) := GrothendieckTopology.W_of_isLocallyBijective _ _
@@ -82,7 +82,8 @@ lemma isIso_free_φ : IsIso ((free R).map (φ X)) := by
 theorem FreeCoprod_of : LateralTheory.E.CoprodPf.FreeCoprod := by
   intro R _ ι X
   have := isIso_free_φ X R
-  have h0 := isColimitCofanMkObjOfIsColimit (free R) _ _ (isColimitCofanSigmaOfRepresentablePresheaves X)
+  have h0 :=
+    isColimitCofanMkObjOfIsColimit (free R) _ _ (isColimitCofanSigmaOfRepresentablePresheaves X)
   refine ⟨IsColimit.ofIsoColimit h0 (Cofan.ext (asIso ((free R).map (φ X))) fun j => ?_)⟩
   show (free R).map (inj X j) ≫ (free R).map (φ X) = (free R).map (yoneda.map (Sigma.ι X j))
   rw [← Functor.map_comp, inj_φ]

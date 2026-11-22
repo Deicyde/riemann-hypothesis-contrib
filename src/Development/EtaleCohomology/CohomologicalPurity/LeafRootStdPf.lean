@@ -38,8 +38,7 @@ theorem LeafRootStd_of : LeafRootStd := by
   let P : StandardEtalePair A := ⟨f, hf, f.derivative * q, ⟨q, 0, 1, by ring⟩⟩
   set φ := algebraMap A P.Ring with hφ
   have hX := P.hasMap_X
-  have hroot : (f.map φ).eval P.X = 0 := by
-    rw [← aeval_eq_eval_map]; exact hX.1
+  have hroot : (f.map φ).eval P.X = 0 := by rw [← aeval_eq_eval_map]; exact hX.1
   have hgunit : IsUnit ((f.derivative.map φ).eval P.X * (q.map φ).eval P.X) := by
     have h2 := hX.2
     change IsUnit (aeval P.X (f.derivative * q)) at h2
@@ -48,7 +47,7 @@ theorem LeafRootStd_of : LeafRootStd := by
   have hba : P.X - φ a ∈ I.map φ := by
     have e := std_eval φ f a P.X
     rw [hroot] at e
-    have e2 : (P.X - φ a) * (q.map φ).eval P.X = -φ (f.eval a) := by linear_combination -e
+    have e2 : (P.X - φ a) * (q.map φ).eval P.X = - φ (f.eval a) := by linear_combination -e
     obtain ⟨u, hu'⟩ := hqunit
     rw [← hu'] at e2
     have e3 : P.X - φ a = ((P.X - φ a) * u) * ↑u⁻¹ := by simp [mul_assoc]
@@ -63,15 +62,28 @@ theorem LeafRootStd_of : LeafRootStd := by
   have hm : P.HasMap (Ideal.Quotient.mk I a) := by
     refine ⟨?_, ?_⟩
     · change aeval _ f = 0
-      rw [hmk]; exact Ideal.Quotient.eq_zero_iff_mem.mpr hfa
+      rw [hmk]
+      exact Ideal.Quotient.eq_zero_iff_mem.mpr hfa
     · change IsUnit (aeval _ (f.derivative * q))
-      rw [hmk]; exact hga
-  refine ⟨P.Ring, inferInstance, φ, P.X, (RingHom.etale_algebraMap).mpr inferInstance,
-    ⟨(P.lift _ hm : P.Ring →+* A ⧸ I),
-      (AlgHom.comp_algebraMap (P.lift _ hm)).trans (Ideal.Quotient.algebraMap_eq I)⟩,
-    ?_, hroot, hba, ?_, ?_⟩
-  ·
-    set J := I.map φ with hJ
+      rw [hmk]
+      exact hga
+  refine ⟨
+    P.Ring,
+    inferInstance,
+    φ,
+    P.X,
+    (RingHom.etale_algebraMap).mpr inferInstance,
+    ⟨
+      (P.lift _ hm : P.Ring →+* A ⧸ I),
+      (AlgHom.comp_algebraMap (P.lift _ hm)).trans (Ideal.Quotient.algebraMap_eq I)
+    ⟩,
+    ?_,
+    hroot,
+    hba,
+    ?_,
+    ?_
+  ⟩
+  · set J := I.map φ with hJ
     let π := Ideal.Quotient.mk J
     let R' := (π.comp φ).range
     have hXm : π P.X ∈ R' := ⟨a, (Ideal.Quotient.eq.mpr hba).symm⟩
@@ -89,7 +101,8 @@ theorem LeafRootStd_of : LeafRootStd := by
         rw [eval_map, eval₂_at_apply]
       rw [hev] at hd
       obtain ⟨w, hw⟩ := hd
-      rw [hw]; exact Ideal.mul_mem_right _ _ hba
+      rw [hw]
+      exact Ideal.mul_mem_right _ _ hba
     let mkP : A[X][X] →+* P.Ring := Ideal.Quotient.mk (Ideal.span {C P.f, X * C P.g - 1})
     have hY : π (mkP X) ∈ R' := by
       refine ⟨u, ?_⟩
@@ -105,13 +118,15 @@ theorem LeafRootStd_of : LeafRootStd := by
       refine Polynomial.induction_on c (fun a0 => ⟨a0, rfl⟩) ?_ ?_
       · intro p1 p2 h1 h2; rw [C_add, map_add (f := _), map_add (f := _)]; exact add_mem h1 h2
       · intro n a0 ih
-        rw [pow_succ, ← mul_assoc, C_mul, map_mul, map_mul]; exact mul_mem ih hXm
+        rw [pow_succ, ← mul_assoc, C_mul, map_mul, map_mul]
+        exact mul_mem ih hXm
     have hall : ∀ p : A[X][X], π (mkP p) ∈ R' := by
       intro p
       refine Polynomial.induction_on p hin ?_ ?_
       · intro p1 p2 h1 h2; rw [map_add (f := _), map_add (f := _)]; exact add_mem h1 h2
       · intro n a0 ih
-        rw [pow_succ, ← mul_assoc, map_mul, map_mul]; exact mul_mem ih hY
+        rw [pow_succ, ← mul_assoc, map_mul, map_mul]
+        exact mul_mem ih hY
     intro s
     obtain ⟨p, rfl⟩ : ∃ p, mkP p = s := Ideal.Quotient.mk_surjective s
     obtain ⟨a', ha'⟩ := hall p
@@ -128,9 +143,11 @@ theorem LeafRootStd_of : LeafRootStd := by
     have hm' : P.HasMap c := by
       refine ⟨?_, ?_⟩
       · change aeval c f = 0
-        rw [aeval_eq_eval_map]; exact hc
+        rw [aeval_eq_eval_map]
+        exact hc
       · change IsUnit (aeval c (f.derivative * q))
-        rw [map_mul, aeval_eq_eval_map, aeval_eq_eval_map]; exact h1.mul h2
+        rw [map_mul, aeval_eq_eval_map, aeval_eq_eval_map]
+        exact h1.mul h2
     exact ⟨(P.lift c hm' : P.Ring →+* B), AlgHom.comp_algebraMap (P.lift c hm'), P.lift_X c hm'⟩
 
 end LateralTheory.CohomologicalPurity.Hz

@@ -22,20 +22,20 @@ theorem product_haar_measure_holds : ProdHaarG := by
   have hPF : ProdF K N H ((μN.prod μH).map e) μN μH := by
     intro f hf
     have h1 : Measurable (fun k : K => f (k : X)) := hf.comp measurable_subtype_coe
-    rw [lintegral_map h1 hem, lintegral_prod (fun p => f ((e p : K) : X)) (h1.comp hem).aemeasurable]
+    rw [lintegral_map h1 hem,
+      lintegral_prod (fun p => f ((e p : K) : X)) (h1.comp hem).aemeasurable]
     simp only [he]
   refine ⟨(μN.prod μH).map e, ?_, hPF⟩
   have hLI : (Measure.map e (μN.prod μH)).IsMulLeftInvariant := by
     constructor
     intro k
     set p0 := e.symm k with hp0
-    have hk : (k : X) = (p0.1 : X) * (p0.2 : X) := by
-      rw [← he, hp0, Homeomorph.apply_symm_apply]
+    have hk : (k : X) = (p0.1 : X) * (p0.2 : X) := by rw [← he, hp0, Homeomorph.apply_symm_apply]
     let T : N × H → N × H := fun p => e.symm (k * e p)
     have hTc : Continuous T := e.symm.continuous.comp (continuous_const.mul e.continuous)
     have hTm : Measurable T := hTc.measurable
-    let A : N → N := fun m => ⟨(p0.1 : X) * ((p0.2 : X) * (m : X) * (p0.2 : X)⁻¹),
-      N.mul_mem p0.1.2 (hnorm _ p0.2.2 _ m.2)⟩
+    let A : N → N := fun m =>
+      ⟨(p0.1 : X) * ((p0.2 : X) * (m : X) * (p0.2 : X)⁻¹), N.mul_mem p0.1.2 (hnorm _ p0.2.2 _ m.2)⟩
     let C : N → N := fun m => ⟨(p0.2 : X) * (m : X) * (p0.2 : X)⁻¹, hnorm _ p0.2.2 _ m.2⟩
     have hT : ∀ p : N × H, T p = (A p.1, p0.2 * p.2) := by
       intro p
@@ -50,11 +50,13 @@ theorem product_haar_measure_holds : ProdHaarG := by
       have hA1 : A = fun m => (T (m, 1)).1 := funext fun m => by rw [hT]
       rw [hA1]
       first
-        | exact (continuous_fst.comp (hTc.comp (continuous_id.prodMk continuous_const))).measurable
-        | exact (continuous_fst.comp (hTc.comp (continuous_id.prod_mk continuous_const))).measurable
-    have hCA : C = fun m => p0.1⁻¹ * A m := funext fun m => Subtype.ext (by
-      simp only [A, C, Subgroup.coe_mul, Subgroup.coe_inv]
-      group)
+      | exact (continuous_fst.comp (hTc.comp (continuous_id.prodMk continuous_const))).measurable
+      | exact (continuous_fst.comp (hTc.comp (continuous_id.prod_mk continuous_const))).measurable
+    have hCA : C = fun m => p0.1⁻¹ * A m :=
+      funext fun m =>
+        Subtype.ext (by
+          simp only [A, C, Subgroup.coe_mul, Subgroup.coe_inv]
+          group)
     have hCm : Measurable C := by
       rw [hCA]
       exact (measurable_const_mul _).comp hAm
@@ -63,33 +65,31 @@ theorem product_haar_measure_holds : ProdHaarG := by
       rw [Measure.map_apply hCm hS]
       obtain ⟨B, hB, rfl⟩ := hS
       have key := hC μN hμN (p0.2 : X) p0.2.2 (B.indicator 1) (measurable_one.indicator hB)
-      have e1 : ∫⁻ n, B.indicator 1 ((p0.2 : X) * (n : X) * (p0.2 : X)⁻¹) ∂μN =
-          μN (C ⁻¹' (Subtype.val ⁻¹' B)) := by
+      have e1
+          : ∫⁻ n, B.indicator 1 ((p0.2 : X) * (n : X) * (p0.2 : X)⁻¹) ∂μN
+            = μN (C ⁻¹' (Subtype.val ⁻¹' B)) := by
         rw [← lintegral_indicator_one (hCm (measurable_subtype_coe hB))]
-        first
-          | rfl
-          | (congr 1; funext n; simp [Set.indicator_apply, C])
+        first | rfl | (congr 1; funext n; simp [Set.indicator_apply, C])
       have e2 : ∫⁻ n, B.indicator 1 (n : X) ∂μN = μN (Subtype.val ⁻¹' B) := by
         rw [← lintegral_indicator_one (measurable_subtype_coe hB)]
-        first
-          | rfl
-          | (congr 1; funext n; simp [Set.indicator_apply])
+        first | rfl | (congr 1; funext n; simp [Set.indicator_apply])
       rw [← e1, key, e2]
     have hA : Measure.map A μN = μN := by
       have hAC : A = (fun m => p0.1 * m) ∘ C :=
         funext fun m => Subtype.ext (by simp only [A, C, Function.comp_apply, Subgroup.coe_mul])
       rw [hAC, ← Measure.map_map (measurable_const_mul _) hCm, hCinv, map_mul_left_eq_self]
     have hB : Measure.map (fun h : H => p0.2 * h) μH = μH := map_mul_left_eq_self μH p0.2
-    calc Measure.map (k * ·) (Measure.map e (μN.prod μH))
-        = Measure.map ((k * ·) ∘ e) (μN.prod μH) := by
-          rw [Measure.map_map (measurable_const_mul k) hem]
+    calc
+      Measure.map (k * ·) (Measure.map e (μN.prod μH))
+          = Measure.map ((k * ·) ∘ e) (μN.prod μH) := by
+        rw [Measure.map_map (measurable_const_mul k) hem]
       _ = Measure.map (e ∘ T) (μN.prod μH) := by
-          congr 1
-          funext p
-          simp [T]
+        congr 1
+        funext p
+        simp [T]
       _ = Measure.map e (Measure.map T (μN.prod μH)) := by rw [Measure.map_map hem hTm]
       _ = Measure.map e (μN.prod μH) := by
-          rw [hTAB, ← Measure.map_prod_map _ _ hAm (measurable_const_mul _), hA, hB]
+        rw [hTAB, ← Measure.map_prod_map _ _ hAm (measurable_const_mul _), hA, hB]
   have hFC : IsFiniteMeasureOnCompacts (Measure.map e (μN.prod μH)) := by
     constructor
     intro C hCc

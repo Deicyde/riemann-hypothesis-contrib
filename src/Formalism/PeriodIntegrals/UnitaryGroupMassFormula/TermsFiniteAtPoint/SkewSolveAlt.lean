@@ -24,7 +24,8 @@ theorem skewSolve_holds : SkewSolve := by
     have h0 := congrArg (fun M => Qᴴ * M * Q) hS
     simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_zero, Matrix.zero_mul] at h0
     have e1 : Qᴴ * (βᴴ * x) * Q = x * Q := by
-      rw [← Matrix.mul_assoc, ← Matrix.conjTranspose_mul, hβQ, Matrix.conjTranspose_one, Matrix.one_mul]
+      rw [← Matrix.mul_assoc, ← Matrix.conjTranspose_mul, hβQ, Matrix.conjTranspose_one,
+        Matrix.one_mul]
     have e2 : Qᴴ * (xᴴ * β) * Q = (x * Q)ᴴ := by
       rw [← Matrix.mul_assoc, ← Matrix.conjTranspose_mul, Matrix.mul_assoc, hβQ, Matrix.mul_one]
     rw [e1, e2] at h0
@@ -34,18 +35,22 @@ theorem skewSolve_holds : SkewSolve := by
     exact hβv c
   have hw : βᴴ *ᵥ (x *ᵥ v) = 0 := by
     have h0 := congrArg (fun M => M *ᵥ v) hS
-    simp only [Matrix.add_mulVec, Matrix.zero_mulVec, ← Matrix.mulVec_mulVec, hβv', Matrix.mulVec_zero,
-      add_zero] at h0
+    simp only [Matrix.add_mulVec, Matrix.zero_mulVec, ← Matrix.mulVec_mulVec, hβv',
+        Matrix.mulVec_zero, add_zero]
+      at h0
     exact h0
   have hxv : x *ᵥ v = 0 := by
-    have hu := hind (fun c => star ((x *ᵥ v) c)) (fun b => by
-      have hb := congrFun hw b
-      have h2 : ∑ c, star ((x *ᵥ v) c) * β c b = star ((βᴴ *ᵥ (x *ᵥ v)) b) := by
-        show _ = star (∑ c, βᴴ b c * (x *ᵥ v) c)
-        simp only [Matrix.conjTranspose_apply, star_sum, star_mul', star_star]
-        exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
-      rw [h2, hb]
-      simp)
+    have hu :=
+      hind
+        (fun c => star ((x *ᵥ v) c))
+        (fun b => by
+          have hb := congrFun hw b
+          have h2 : ∑ c, star ((x *ᵥ v) c) * β c b = star ((βᴴ *ᵥ (x *ᵥ v)) b) := by
+            show _ = star (∑ c, βᴴ b c * (x *ᵥ v) c)
+            simp only [Matrix.conjTranspose_apply, star_sum, star_mul', star_star]
+            exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
+          rw [h2, hb]
+          simp)
     funext c
     have hc := congrFun hu c
     simpa using hc

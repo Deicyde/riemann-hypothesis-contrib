@@ -64,8 +64,8 @@ def eqvH : HahnSeries ℚ V ≃+* (incH V).range :=
     ⟨fun x y h => incH_injective V (congrArg Subtype.val h), (incH V).rangeRestrict_surjective⟩
 
 def redA : intA V e →+* HahnSeries ℚ (IsLocalRing.ResidueField V) :=
-  (redH V).comp ((eqvH V).symm.toRingHom.comp
-    (e.toRingHom.restrict (intA V e) (incH V).range (fun _ hx => hx)))
+  (redH V).comp
+    ((eqvH V).symm.toRingHom.comp (e.toRingHom.restrict (intA V e) (incH V).range (fun _ hx => hx)))
 
 lemma redA_coeff (f : intA V e) (r : ℚ) :
     (redA V e f).coeff r = IsLocalRing.residue V ⟨(e f).coeff r, (mem_intA V e f).1 f.2 r⟩ := by
@@ -129,7 +129,10 @@ end GlobalTheory.KZ.GaussDom
 
 namespace GlobalTheory.KZ.GaussDom
 
-variable {Ω : Type} [Field Ω] (V : ValuationSubring Ω) {K : Type} [Field K] [Algebra Ω K]
+variable
+  {Ω : Type} [Field Ω]
+  (V : ValuationSubring Ω)
+  {K : Type} [Field K] [Algebra Ω K]
   (e : K →ₐ[Ω] HahnSeries ℚ Ω)
 
 lemma coeff_const (c : Ω) (r : ℚ) : (e (algebraMap Ω K c)).coeff r = if r = 0 then c else 0 := by
@@ -167,17 +170,22 @@ lemma redA_const (v : V) :
       rw [coeff_const, if_neg hr]
     rw [h0, map_zero]
 
-theorem exists_dom (j : K) (hj1 : (e j).coeff (-1) = 1) (hj2 : ∀ r : ℚ, r < -1 → (e j).coeff r = 0)
-    (hj3 : ∀ r, (e j).coeff r ∈ V) :
-    ∃ W : ValuationSubring K, (∀ a : Ω, algebraMap Ω K a ∈ W ↔ a ∈ V) ∧
-      (∀ P : Polynomial Ω, (∀ i, P.coeff i ∈ V) → (∃ i, P.coeff i ≠ 0 ∧ P.coeff i ∈ V ∧ (P.coeff i)⁻¹ ∈ V) →
-        W.valuation (Polynomial.aeval j P) = 1) ∧
-      ∀ f : K, (∀ r, (e f).coeff r ∈ V) → (∀ r, r ≠ 0 → (e f).coeff r ∈ V.nonunits) →
-        W.valuation (f - algebraMap Ω K ((e f).coeff 0)) < 1 := by
+theorem exists_dom
+    (j : K) (hj1 : (e j).coeff (-1) = 1) (hj2 : ∀ r : ℚ, r < -1 → (e j).coeff r = 0)
+    (hj3 : ∀ r, (e j).coeff r ∈ V)
+    : ∃ W : ValuationSubring K,
+      (∀ a : Ω, algebraMap Ω K a ∈ W ↔ a ∈ V)
+        ∧ (∀ P : Polynomial Ω,
+          (∀ i, P.coeff i ∈ V) → (∃ i, P.coeff i ≠ 0 ∧ P.coeff i ∈ V ∧ (P.coeff i)⁻¹ ∈ V)
+            → W.valuation (Polynomial.aeval j P) = 1)
+        ∧ ∀ f : K,
+          (∀ r, (e f).coeff r ∈ V) → (∀ r, r ≠ 0 → (e f).coeff r ∈ V.nonunits)
+            → W.valuation (f - algebraMap Ω K ((e f).coeff 0)) < 1 := by
   classical
   haveI : (RingHom.ker (redA V e)).IsPrime := RingHom.ker_isPrime _
   obtain ⟨W, hA, hinv, hlt⟩ :=
-    ReciprocityTheory.ChartRestriction.G.AR.Up.NOrd.exists_val_of_prime (intA V e) (RingHom.ker (redA V e))
+    ReciprocityTheory.ChartRestriction.G.AR.Up.NOrd.exists_val_of_prime (intA V e)
+      (RingHom.ker (redA V e))
   have hker : ∀ x : intA V e, x ∈ RingHom.ker (redA V e) ↔ ∀ r, (e x).coeff r ∈ V.nonunits :=
     fun x => (RingHom.mem_ker).trans (redA_eq_zero V e x)
   have hone : ∀ x : intA V e, x ∉ RingHom.ker (redA V e) → W.valuation (x : K) = 1 := by
@@ -220,8 +228,10 @@ theorem exists_dom (j : K) (hj1 : (e j).coeff (-1) = 1) (hj2 : ∀ r : ℚ, r < 
       have h4 := (W.valuation_le_one_iff _).2 ha
       have h5 : W.valuation (algebraMap Ω K a) * W.valuation (algebraMap Ω K a⁻¹) = 1 := by
         rw [← map_mul, ← map_mul, mul_inv_cancel₀ ha0, map_one, map_one]
-      have h6 : W.valuation (algebraMap Ω K a) * W.valuation (algebraMap Ω K a⁻¹) ≤
-          1 * W.valuation (algebraMap Ω K a⁻¹) := by gcongr
+      have h6
+          : W.valuation (algebraMap Ω K a) * W.valuation (algebraMap Ω K a⁻¹)
+            ≤ 1 * W.valuation (algebraMap Ω K a⁻¹) := by
+        gcongr
       rw [h5, one_mul] at h6
       exact absurd (lt_of_le_of_lt h6 h3) (lt_irrefl 1)
     · intro ha
@@ -239,9 +249,10 @@ theorem exists_dom (j : K) (hj1 : (e j).coeff (-1) = 1) (hj2 : ∀ r : ℚ, r < 
     apply hone
     intro hk
     rw [RingHom.mem_ker, Polynomial.hom_eval₂] at hk
-    have hc : (redA V e).comp ι =
-        (algebraMap (IsLocalRing.ResidueField V) (HahnSeries ℚ (IsLocalRing.ResidueField V))).comp
-          (IsLocalRing.residue V) := by
+    have hc
+        : (redA V e).comp ι
+          = (algebraMap (IsLocalRing.ResidueField V)
+            (HahnSeries ℚ (IsLocalRing.ResidueField V))).comp (IsLocalRing.residue V) := by
       apply RingHom.ext
       intro v
       exact redA_const V e v
@@ -295,12 +306,28 @@ end GlobalTheory.KZ.GaussDom
 
 namespace GlobalTheory.KZ
 
-theorem exists_valuationSubring_gauss : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε), Function.Injective ε → (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero)) → ∀ (q : ℕ), q.Prime → ∀ V : ValuationSubring Ω, ((q : ℕ) : Ω) ∈ V.nonunits → ∃ W : ValuationSubring X.K, (∀ a : Ω, algebraMap Ω X.K a ∈ W ↔ a ∈ V) ∧ (∀ P : Polynomial Ω, (∀ i, P.coeff i ∈ V) → (∃ i, P.coeff i ∈ V ∧ P.coeff i ≠ 0 ∧ (P.coeff i)⁻¹ ∈ V) → W.valuation (Polynomial.aeval X.jK P) = 1) ∧ ∀ f : X.K, (∀ r, (X.exp f).coeff r ∈ V) → (∀ r, r ≠ 0 → (X.exp f).coeff r ∈ V.nonunits) → W.valuation (f - algebraMap Ω X.K ((X.exp f).coeff 0)) < 1 := by
+theorem exists_valuationSubring_gauss
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
+      Function.Injective ε → (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero))
+        → ∀ (q : ℕ),
+          q.Prime
+            → ∀ V : ValuationSubring Ω,
+              ((q : ℕ) : Ω) ∈ V.nonunits
+                → ∃ W : ValuationSubring X.K,
+                  (∀ a : Ω, algebraMap Ω X.K a ∈ W ↔ a ∈ V)
+                    ∧ (∀ P : Polynomial Ω,
+                      (∀ i, P.coeff i ∈ V)
+                        → (∃ i, P.coeff i ∈ V ∧ P.coeff i ≠ 0 ∧ (P.coeff i)⁻¹ ∈ V)
+                        → W.valuation (Polynomial.aeval X.jK P) = 1)
+                    ∧ ∀ f : X.K,
+                      (∀ r, (X.exp f).coeff r ∈ V) → (∀ r, r ≠ 0 → (X.exp f).coeff r ∈ V.nonunits)
+                        → W.valuation (f - algebraMap Ω X.K ((X.exp f).coeff 0)) < 1 := by
   intro Ω _ _ _ ε X _ _ q _ V _
-  obtain ⟨W, h1, h2, h3⟩ := GaussDom.exists_dom V X.exp X.jK X.j_exp.1 X.j_exp.2.1 (fun r => by
-    obtain ⟨n, hn⟩ := X.j_exp.2.2 r
-    rw [hn]
-    exact intCast_mem V n)
+  obtain ⟨W, h1, h2, h3⟩ :=
+    GaussDom.exists_dom V X.exp X.jK X.j_exp.1 X.j_exp.2.1 (fun r => by
+      obtain ⟨n, hn⟩ := X.j_exp.2.2 r
+      rw [hn]
+      exact intCast_mem V n)
   exact ⟨W, h1, fun P hP ⟨i, ha, hb, hc⟩ => h2 P hP ⟨i, hb, ha, hc⟩, h3⟩
 
 end GlobalTheory.KZ

@@ -28,11 +28,16 @@ theorem bounded_operators_square_integrable : BoundedOperatorsSquareIntegrable :
     (memLp_two_iff_integrable_sq_norm (jd_evQ_meas P (u π'))).2 (hu π')
   have hs : MemLp (fun q => ∑ π' ∈ Finset.univ, ‖MA.evQ P (u π') q‖) 2 (MA.mu0 P.r P.TT) :=
     memLp_finsetSum _ fun π' _ => (hL2u π').norm
-  have hg : MemLp (fun q => C * ∑ π' ∈ Finset.univ, ‖MA.evQ P (u π') q‖) 2 (MA.mu0 P.r P.TT) := hs.const_mul C
-  refine (memLp_two_iff_integrable_sq_norm hmeas).1 (hg.of_le hmeas (Filter.Eventually.of_forall fun q => ?_))
+  have hg : MemLp (fun q => C * ∑ π' ∈ Finset.univ, ‖MA.evQ P (u π') q‖) 2 (MA.mu0 P.r P.TT) :=
+    hs.const_mul C
+  refine (memLp_two_iff_integrable_sq_norm hmeas).1
+    (hg.of_le hmeas (Filter.Eventually.of_forall fun q => ?_))
   rw [hMe u q π]
-  calc ‖∑ π', Mx q π π' * MA.evQ P (u π') q‖ ≤ ∑ π', ‖Mx q π π' * MA.evQ P (u π') q‖ := norm_sum_le _ _
-    _ ≤ ∑ π', C * ‖MA.evQ P (u π') q‖ := Finset.sum_le_sum fun π' _ => by
+  calc
+    ‖∑ π', Mx q π π' * MA.evQ P (u π') q‖
+      ≤ ∑ π', ‖Mx q π π' * MA.evQ P (u π') q‖ := norm_sum_le _ _
+    _ ≤ ∑ π', C * ‖MA.evQ P (u π') q‖ :=
+      Finset.sum_le_sum fun π' _ => by
         rw [norm_mul]; exact mul_le_mul_of_nonneg_right (hMb q π π') (norm_nonneg _)
     _ = C * ∑ π', ‖MA.evQ P (u π') q‖ := (Finset.mul_sum _ _ _).symm
     _ ≤ ‖C * ∑ π' ∈ Finset.univ, ‖MA.evQ P (u π') q‖‖ := le_abs_self _

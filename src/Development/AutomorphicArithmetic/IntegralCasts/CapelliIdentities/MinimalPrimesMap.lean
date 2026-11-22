@@ -15,24 +15,26 @@ private lemma UpperTheory.Reformulated.B.MinimalPrimesMap.map_lt_map {A : Type} 
     sup_eq_left.mpr (hI.trans h.le)] at e'
   exact e'
 
-theorem UpperTheory.Reformulated.B.MinimalPrimesMap.eq_or_eq_of_mem_minimalPrimes :
-    ∀ {A : Type} [inst : CommRing A] [IsNoetherianRing A]
-    {P Q W : Ideal A} [hP : P.IsPrime] [hQ : Q.IsPrime] {s : A},
-    W ∈ (P ⊔ Ideal.span {s}).minimalPrimes → P ≤ Q → Q ≤ W → Q = P ∨ Q = W := by
+theorem UpperTheory.Reformulated.B.MinimalPrimesMap.eq_or_eq_of_mem_minimalPrimes
+    : ∀ {A : Type} [inst : CommRing A] [IsNoetherianRing A] {P Q W : Ideal A} [hP : P.IsPrime]
+        [hQ : Q.IsPrime] {s : A},
+      W ∈ (P ⊔ Ideal.span {s}).minimalPrimes → P ≤ Q → Q ≤ W → Q = P ∨ Q = W := by
   intro A _ _ P Q W hP hQ s hW hPQ hQW
   by_contra hne
   rw [not_or] at hne
   have hW' : W.IsPrime := hW.1.1
-  have hprime : ∀ I : Ideal A, I.IsPrime → P ≤ I → (I.map (Ideal.Quotient.mk P)).IsPrime :=
-    fun I hI hle => Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective
-      (by rwa [Ideal.mk_ker])
+  have hprime
+      : ∀ I : Ideal A, I.IsPrime → P ≤ I → (I.map (Ideal.Quotient.mk P)).IsPrime := fun I hI hle =>
+    Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])
   have i1 := hprime P hP le_rfl
   have i2 := hprime Q hQ hPQ
   have i3 := hprime W hW' (hPQ.trans hQW)
-  have h1 := Ideal.height_add_one_le_of_lt_of_isPrime
-    (UpperTheory.Reformulated.B.MinimalPrimesMap.map_lt_map le_rfl (lt_of_le_of_ne hPQ (Ne.symm hne.1)))
-  have h2 := Ideal.height_add_one_le_of_lt_of_isPrime
-    (UpperTheory.Reformulated.B.MinimalPrimesMap.map_lt_map hPQ (lt_of_le_of_ne hQW hne.2))
+  have h1 :=
+    Ideal.height_add_one_le_of_lt_of_isPrime (UpperTheory.Reformulated.B.MinimalPrimesMap.map_lt_map
+      le_rfl (lt_of_le_of_ne hPQ (Ne.symm hne.1)))
+  have h2 :=
+    Ideal.height_add_one_le_of_lt_of_isPrime (UpperTheory.Reformulated.B.MinimalPrimesMap.map_lt_map
+      hPQ (lt_of_le_of_ne hQW hne.2))
   have h3 := Ideal.map_height_le_one_of_mem_minimalPrimes hW
   have h4 : (1 : ℕ∞) ≤ (Q.map (Ideal.Quotient.mk P)).height := le_add_self.trans h1
   have h5 : (1 : ℕ∞) + 1 ≤ 1 := (add_le_add h4 le_rfl).trans (h2.trans h3)

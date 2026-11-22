@@ -12,8 +12,9 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.PSer
 
-theorem tm_pow_dvd : ∀ (l : ℕ) [Fact l.Prime] (x : Fl l), ‖sh x‖ ≤ ‖(l : ℂ_[l])‖ →
-    (l : Acris l) ∣ algebraMap (Ainf l) (Acris l) (tm x) ^ l := by
+theorem tm_pow_dvd
+    : ∀ (l : ℕ) [Fact l.Prime] (x : Fl l),
+      ‖sh x‖ ≤ ‖(l : ℂ_[l])‖ → (l : Acris l) ∣ algebraMap (Ainf l) (Acris l) (tm x) ^ l := by
   intro l _ x hx
   have hmem : x.untilt ∈ (Ideal.span {(l : OC l)}) ^ 1 := by
     rw [GlobalTheory.RingBasics.mem_span_pow_OC, pow_one]
@@ -21,9 +22,10 @@ theorem tm_pow_dvd : ∀ (l : ℕ) [Fact l.Prime] (x : Fl l), ‖sh x‖ ≤ ‖
   rw [pow_one] at hmem
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 hmem
   obtain ⟨z, hz⟩ := GlobalTheory.MemLoc.FundOnto.untilt_surjective l c
-  have hk := GlobalTheory.MemLoc.FundOnto.dvd_pow_of_ker l (tm x - (l : Ainf l) * tm z) (by
-    rw [map_sub, map_mul, map_natCast, GlobalTheory.MemLoc.FundOnto.theta_tm,
-      GlobalTheory.MemLoc.FundOnto.theta_tm, hz, ← hc, mul_comm, sub_self])
+  have hk :=
+    GlobalTheory.MemLoc.FundOnto.dvd_pow_of_ker l (tm x - (l : Ainf l) * tm z) (by
+      rw [map_sub, map_mul, map_natCast, GlobalTheory.MemLoc.FundOnto.theta_tm,
+        GlobalTheory.MemLoc.FundOnto.theta_tm, hz, ← hc, mul_comm, sub_self])
   rw [map_sub, map_mul, map_natCast] at hk
   generalize algebraMap (Ainf l) (Acris l) (tm x) = X at hk ⊢
   generalize algebraMap (Ainf l) (Acris l) (tm z) = Z at hk

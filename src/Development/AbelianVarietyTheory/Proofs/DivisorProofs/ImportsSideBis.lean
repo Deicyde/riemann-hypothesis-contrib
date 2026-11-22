@@ -9,13 +9,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DividedPower
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj Filter Topology TopologicalSpace TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.AnPer
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj Filter Topology TopologicalSpace TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.AnPer
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AnPer.Charts
 
-theorem glue : ∀ {I : Type} [Fintype I] {g : ℕ} {Λ : Type} [AddCommGroup Λ] {F : Fam I g Λ} (K : Charts F), K.Rich → ∀ f : ∀ k, Hol (K.W k), (∀ k k' (h : K.le 0 k' k), Charts.sh h (f k) = f k') → ∃ G : Tot I g → ℂ, AnalyticOnNhd ℂ G {p | p.1 ∈ F.V} ∧ (∀ k, ∀ p ∈ K.W k, (f k).fn p = G p) ∧ (∀ (l : Λ) (q : Hol F.V), (∀ k k' (h : K.le l k' k), Charts.sh h (f k) = f k' + K.cst k' q) → ∀ p : Tot I g, p.1 ∈ F.V → G (F.shift l p) = G p + q.fn p.1) ∧ ((∀ k a, dw a (f k) = 0) → ∀ z ∈ F.V, ∀ w, G (z, w) = G (z, 0)) := by
+theorem glue
+    : ∀ {I : Type} [Fintype I] {g : ℕ} {Λ : Type} [AddCommGroup Λ] {F : Fam I g Λ} (K : Charts F),
+      K.Rich
+        → ∀ f : ∀ k, Hol (K.W k),
+          (∀ k k' (h : K.le 0 k' k), Charts.sh h (f k) = f k')
+            → ∃ G : Tot I g → ℂ,
+              AnalyticOnNhd ℂ G {p | p.1 ∈ F.V} ∧ (∀ k, ∀ p ∈ K.W k, (f k).fn p = G p)
+                ∧ (∀ (l : Λ) (q : Hol F.V),
+                  (∀ k k' (h : K.le l k' k), Charts.sh h (f k) = f k' + K.cst k' q)
+                    → ∀ p : Tot I g, p.1 ∈ F.V → G (F.shift l p) = G p + q.fn p.1)
+                ∧ ((∀ k a, dw a (f k) = 0) → ∀ z ∈ F.V, ∀ w, G (z, w) = G (z, 0)) := by
   intro I _ g Λ _ F K hK f hf
   classical
   have indep : ∀ k₁ k₂ p, p ∈ K.W k₁ → p ∈ K.W k₂ → (f k₁).fn p = (f k₂).fn p := by
@@ -49,17 +61,22 @@ theorem glue : ∀ {I : Type} [Fintype I] {g : ℕ} {Λ : Type} [AddCommGroup Λ
     have hder : ∀ w' : Fin g → ℂ, HasFDerivAt (fun u ↦ G (z, u)) (0 : (Fin g → ℂ) →L[ℂ] ℂ) w' := by
       intro w'
       obtain ⟨k, hk⟩ := hK.1 (z, w') hz
-      have hfd : HasFDerivAt (fun u : Fin g → ℂ ↦ ((z, u) : Tot I g))
+      have hfd : HasFDerivAt
+          (fun u : Fin g → ℂ ↦ ((z, u) : Tot I g))
           (ContinuousLinearMap.inr ℂ (I → ℂ) (Fin g → ℂ)) w' :=
         (hasFDerivAt_const z w').prodMk (hasFDerivAt_id w')
       have hGd : HasFDerivAt G (fderiv ℂ (f k).fn (z, w')) (z, w') := by
         rw [← (hGev k _ hk).fderiv_eq]
-        exact (((f k).analytic _ hk).differentiableAt.congr_of_eventuallyEq (hGev k _ hk)).hasFDerivAt
-      have hL : (fderiv ℂ (f k).fn (z, w')).comp (ContinuousLinearMap.inr ℂ (I → ℂ) (Fin g → ℂ)) = 0 := by
+        exact (((f k).analytic _ hk).differentiableAt.congr_of_eventuallyEq
+          (hGev k _ hk)).hasFDerivAt
+      have hL
+          : (fderiv ℂ (f k).fn (z, w')).comp (ContinuousLinearMap.inr ℂ (I → ℂ) (Fin g → ℂ))
+            = 0 := by
         have hs : ∀ a : Fin g, fderiv ℂ (f k).fn (z, w') ((0, Pi.single a 1) : Tot I g) = 0 := by
           intro a
           have := Hol.fn_der ((0, Pi.single a 1) : Tot I g) (f k) hk
-          rw [show Hol.der _ (f k) = dw a (f k) from rfl, h0 k a, ← Hol.ev_apply _ hk, map_zero] at this
+          rw [show Hol.der _ (f k) = dw a (f k) from rfl, h0 k a, ← Hol.ev_apply _ hk, map_zero]
+            at this
           exact this.symm
         refine ContinuousLinearMap.ext fun v ↦ ?_
         set_option synthInstance.maxHeartbeats 100000 in
@@ -67,10 +84,14 @@ theorem glue : ∀ {I : Type} [Fintype I] {g : ℕ} {Λ : Type} [AddCommGroup Λ
         refine Finset.sum_eq_zero fun a _ ↦ ?_
         have e : Pi.single a (v a) = v a • (Pi.single a 1 : Fin g → ℂ) := by
           rw [← Pi.single_smul]; simp
-        rw [e, map_smul, ContinuousLinearMap.comp_apply, ContinuousLinearMap.inr_apply, hs a, smul_zero]
+        rw [e, map_smul, ContinuousLinearMap.comp_apply, ContinuousLinearMap.inr_apply, hs a,
+          smul_zero]
       have := hGd.comp w' hfd
       rw [hL] at this
       exact this
-    exact is_const_of_fderiv_eq_zero (fun w' ↦ (hder w').differentiableAt) (fun w' ↦ (hder w').fderiv) w 0
+    exact is_const_of_fderiv_eq_zero
+      (fun w' ↦ (hder w').differentiableAt)
+      (fun w' ↦ (hder w').fderiv)
+      w 0
 
 end GlobalTheory.AnPer.Charts

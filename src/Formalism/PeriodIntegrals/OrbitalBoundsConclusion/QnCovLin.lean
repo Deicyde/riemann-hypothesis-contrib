@@ -6,5 +6,4 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CovariantLinearP
 
 @[expose] public section
 
-theorem covariant_linear : PI.QnCovLin :=
-  PI.QnCovLinW.qnCovLin
+theorem covariant_linear : PI.QnCovLin := PI.QnCovLinW.qnCovLin

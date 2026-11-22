@@ -22,10 +22,12 @@ theorem spComp : SpComp := by
   rw [hrank, Module.finrank_fin_fun] at hsum
   have hker : Module.finrank E (LinearMap.ker (Matrix.toLin' P)) = m - k := by omega
   refine ⟨by omega, ?_⟩
-  let b : Module.Basis (Fin (m - k)) E (LinearMap.ker (Matrix.toLin' P)) := Module.finBasisOfFinrankEq E _ hker
-  have hU : ∀ y : Fin (m - k) → E,
-      (Matrix.of fun i j => (b j : Fin m → E) i) *ᵥ y =
-        ((b.equivFun.symm y : LinearMap.ker (Matrix.toLin' P)) : Fin m → E) := by
+  let b : Module.Basis (Fin (m - k)) E (LinearMap.ker (Matrix.toLin' P)) :=
+    Module.finBasisOfFinrankEq E _ hker
+  have hU
+      : ∀ y : Fin (m - k) → E,
+        (Matrix.of fun i j => (b j : Fin m → E) i) *ᵥ y
+          = ((b.equivFun.symm y : LinearMap.ker (Matrix.toLin' P)) : Fin m → E) := by
     intro y
     ext i
     rw [Module.Basis.equivFun_symm_apply]

@@ -12,14 +12,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistCoh
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial GlobalTheory.EtC GlobalTheory.EtC.GmStep
+open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial GlobalTheory.EtC
+  GlobalTheory.EtC.GmStep
 
 noncomputable section
 
 namespace GlobalTheory.EtC.SpecMapPullbackFunctoriality
 
 abbrev PC (q : ℕ) (T : Type) [CommRing T] : Prop :=
-  ∀ i : ℤ, Function.Bijective (pull _ (spMap (LaurentPolynomial.C : T →+* LaurentPolynomial T)) (tw q i) 0)
+  ∀ i : ℤ,
+    Function.Bijective (pull _ (spMap (LaurentPolynomial.C : T →+* LaurentPolynomial T)) (tw q i) 0)
 
 open CategoryTheory Limits AlgebraicGeometry Opposite Polynomial in
 private lemma laurentMap_coeff' {A B : Type} [CommRing A] [CommRing B] (f : A →+* B)
@@ -255,12 +257,19 @@ private lemma laurent_isIdempotentElem_eq_zero_or_one_of_isLocalRing (T : Type) 
     exact main (1 - e) he.one_sub (by rw [map_sub, map_one, h, sub_self])
 
 open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial in
-theorem _root_.GlobalTheory.EtC.SpecMapPullbackFunctoriality.laurent_C_pull_bijective : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], _root_.GlobalTheory.EtC.SH A → IsUnit (q : A) →
-    ∀ (T : Type) [CommRing T] [Algebra A T], Module.Finite A T → ∀ i : ℤ,
-    Function.Bijective (_root_.GlobalTheory.EtC.pull _ (_root_.GlobalTheory.EtC.spMap (LaurentPolynomial.C : T →+* LaurentPolynomial T)) (_root_.GlobalTheory.EtC.tw q i) 0) := by
+theorem _root_.GlobalTheory.EtC.SpecMapPullbackFunctoriality.laurent_C_pull_bijective
+    : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A],
+      _root_.GlobalTheory.EtC.SH A → IsUnit (q : A)
+        → ∀ (T : Type) [CommRing T] [Algebra A T],
+          Module.Finite A T
+            → ∀ i : ℤ,
+              Function.Bijective (_root_.GlobalTheory.EtC.pull _
+                (_root_.GlobalTheory.EtC.spMap (LaurentPolynomial.C : T →+* LaurentPolynomial T))
+                (_root_.GlobalTheory.EtC.tw q i) 0) := by
   intro q _ A _ hA hq T _ _ hT
   refine _root_.GlobalTheory.EtC.GmStep.FinSH.induction_principle A hA
-    (fun T _ _ => _root_.GlobalTheory.EtC.SpecMapPullbackFunctoriality.PC q T) ?_ ?_ ?_ ?_ T hT
+    (fun T _ _ => _root_.GlobalTheory.EtC.SpecMapPullbackFunctoriality.PC q T)
+    ?_ ?_ ?_ ?_ T hT
   · intro T T' _ _ _ _ a h
     exact laurentConstant_of_ringEquiv q a.toRingEquiv h
   · intro T _ _ hT0 i
@@ -275,7 +284,9 @@ theorem _root_.GlobalTheory.EtC.SpecMapPullbackFunctoriality.laurent_C_pull_bije
     obtain ⟨hH, -⟩ := id hTs
     exact _root_.GlobalTheory.EtC.h_zero_pull_bijective q T (LaurentPolynomial T)
       LaurentPolynomial.C hqT (exists_cyclotomic_root_of_strictlyHenselian q T hTs hqT)
-      inferInstance (fun e he => isIdempotentElem_eq_zero_or_one_of_isLocalRing e he)
-      (fun e he => laurent_isIdempotentElem_eq_zero_or_one_of_isLocalRing T e he) i
+      inferInstance
+      (fun e he => isIdempotentElem_eq_zero_or_one_of_isLocalRing e he)
+      (fun e he => laurent_isIdempotentElem_eq_zero_or_one_of_isLocalRing T e he)
+      i
 
 end GlobalTheory.EtC.SpecMapPullbackFunctoriality

@@ -11,11 +11,15 @@ noncomputable section
 
 namespace GlobalTheory.OneArcCompare
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.IndefiniteRowSideFullHecke.FractionGeneratorsArcs
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.IndefiniteRowSideFullHecke.FractionGeneratorsArcs
 
-theorem mono_spMap_iff {O F : Type} [CommRing O] [Field F] [CharZero F] [FiniteDimensional ℚ F] (β : O →+* F) :
-    Mono (spMap β) ↔ GeneratesFrac β := by
+theorem mono_spMap_iff
+    {O F : Type} [CommRing O] [Field F] [CharZero F] [FiniteDimensional ℚ F] (β : O →+* F)
+    : Mono (spMap β) ↔ GeneratesFrac β := by
   have e : Mono (spMap β) ↔ Epi (CommRingCat.ofHom β) := by
     constructor
     · intro h
@@ -33,7 +37,8 @@ theorem mono_spMap_iff {O F : Type} [CommRing O] [Field F] [CharZero F] [FiniteD
     have h₂ : Epi (CommRingCat.ofHom K.subtype) := epi_of_epi (CommRingCat.ofHom β₁) _
     have : IsScalarTower ℚ K F := IsScalarTower.of_algebraMap_eq' (Subsingleton.elim _ _)
     have h₃ : Module.Finite K F := Module.Finite.of_restrictScalars_finite ℚ K F
-    obtain ⟨⟨x', hx'⟩, rfl⟩ := RingHom.surjective_of_epi_of_finite (CommRingCat.ofHom K.subtype) h₃ x
+    obtain ⟨⟨x', hx'⟩, rfl⟩ :=
+      RingHom.surjective_of_epi_of_finite (CommRingCat.ofHom K.subtype) h₃ x
     obtain ⟨p, hp, q, hq, rfl⟩ := Subfield.mem_closure_iff.1 hx'
     have hc : Subring.closure (Set.range β) = β.range := Subring.closure_eq β.range
     rw [hc] at hp hq
@@ -51,25 +56,32 @@ theorem mono_spMap_iff {O F : Type} [CommRing O] [Field F] [CharZero F] [FiniteD
     refine hu.mul_right_cancel ?_
     rw [← map_mul, hx, k r, k s, ← map_mul, hx]
 
-theorem mem_abLocus_pullback {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G]
-    (hG : IsSemiAbelian G) {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsPullback φ G'.hom G.hom f) (x : S') :
-    f x ∈ abLocus G ↔ x ∈ abLocus G' := by
-  have key : ∀ {T : Scheme.{0}} (t : T ⟶ S'),
-      IsProper (pullback.snd G'.hom t) ↔ IsProper (pullback.snd G.hom (t ≫ f)) := by
+theorem mem_abLocus_pullback
+    {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G]
+    (hG : IsSemiAbelian G)
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsPullback φ G'.hom G.hom f)
+    (x : S')
+    : f x ∈ abLocus G ↔ x ∈ abLocus G' := by
+  have key
+      : ∀ {T : Scheme.{0}} (t : T ⟶ S'),
+        IsProper (pullback.snd G'.hom t) ↔ IsProper (pullback.snd G.hom (t ≫ f)) := by
     intro T t
     have hp := (IsPullback.of_hasPullback G'.hom t).paste_horiz h
     have e := hp.isoPullback_hom_snd
     constructor
     · intro _
-      rw [← hp.isoPullback_inv_snd]; infer_instance
+      rw [← hp.isoPullback_inv_snd]
+      infer_instance
     · intro _
-      rw [← e]; infer_instance
+      rw [← e]
+      infer_instance
   constructor
   · intro hx K _ _ t ⟨p, hp⟩
     exact (key t).2 (hx K (t ≫ f) ⟨p, by rw [← hp]; simp⟩)
   · intro hx
     let K := AlgebraicClosure (S'.residueField x)
-    let t : Sp K ⟶ S' := Spec.map (CommRingCat.ofHom (algebraMap (S'.residueField x) K)) ≫ S'.fromSpecResidueField x
+    let t : Sp K ⟶ S' :=
+      Spec.map (CommRingCat.ofHom (algebraMap (S'.residueField x) K)) ≫ S'.fromSpecResidueField x
     have p : Sp K := (default : PrimeSpectrum K)
     have ht : t p = x := Scheme.fromSpecResidueField_apply x _
     exact abLocusOne S G hG K (t ≫ f) ((key t).1 (hx K t ⟨p, ht⟩)) ⟨p, congrArg (fun z => f z) ht⟩

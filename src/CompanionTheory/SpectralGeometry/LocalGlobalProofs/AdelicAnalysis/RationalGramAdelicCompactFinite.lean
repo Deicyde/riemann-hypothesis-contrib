@@ -12,7 +12,8 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.FinQ
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 section Field
@@ -38,15 +39,16 @@ theorem exists_moved (σ : E →ₐ[F] E) (h : IsCMExt F E σ) : ∃ x : E, σ x
   rw [hc x] at this
   simpa using this.symm
 
-theorem fixed_mem (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E) (he : σ e = e) :
-    ∃ t : F, e = algebraMap F E t := by
+theorem fixed_mem (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E) (he : σ e = e)
+    : ∃ t : F, e = algebraMap F E t := by
   obtain ⟨x, hx⟩ := exists_moved σ h
   have hd : x - σ x ≠ 0 := fun h0 => hx (sub_eq_zero.mp h0).symm
   have hli : LinearIndependent F ![(1 : E), x] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
     have h2 := congrArg σ hst
-    simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgHom.commutes, map_one, map_zero] at h2
+    simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgHom.commutes, map_one, map_zero]
+      at h2
     have h3 : t • (x - σ x) = 0 := by
       simp only [Algebra.smul_def] at hst ⊢
       linear_combination hst - h2
@@ -73,9 +75,10 @@ theorem fixed_mem (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E) (he : σ e =
   rw [← hab, Algebra.algebraMap_eq_smul_one]
   simp
 
-theorem hE_self_fixed (σ : E →ₐ[F] E) (h : IsCMExt F E σ) {M : ℕ}
-    (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J) (x : Fin M → E) :
-    σ (hE σ J x x) = hE σ J x x := by
+theorem hE_self_fixed
+    (σ : E →ₐ[F] E) (h : IsCMExt F E σ)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J) (x : Fin M → E)
+    : σ (hE σ J x x) = hE σ J x x := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [hE, hform, map_sum, map_mul]
   rw [Finset.sum_comm]
@@ -88,44 +91,50 @@ theorem hE_self_fixed (σ : E →ₐ[F] E) (h : IsCMExt F E σ) {M : ℕ}
 
 end Field
 
-theorem gram_rational_finite : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J →
-    (∀ X : Fin 1 → Fin M → E, ∃ t : F, gramE σ J X = fun _ _ => algebraMap F E t) ∧
-    (∀ (n : ℕ) (X : Fin n → Fin M → E),
-      gramR (AF F) σ J (ratTup (AF F) X) = (gramE σ J X).map (inclR (AF F))) ∧
-    ∀ Ω : Set (Fin 1 → Fin M → AF F ⊗[F] E), IsCompact Ω →
-      {t : F | ∃ Y ∈ Ω, gramR (AF F) σ J Y = fun _ _ => inclR (AF F) (algebraMap F E t)}.Finite := by
-  intro F E _ _ _ _ _ σ hcm M J hJ
-  refine ⟨?_, ?_, ?_⟩
-  · intro X
-    obtain ⟨t, ht⟩ := fixed_mem σ hcm _ (hE_self_fixed σ hcm J hJ (X 0))
-    refine ⟨t, ?_⟩
-    funext a b
-    rw [Subsingleton.elim a 0, Subsingleton.elim b 0]
-    exact ht
-  · intro n X
-    ext a b
-    have hs : ∀ e : E, sigR (AF F) σ (inclR (AF F) e) = inclR (AF F) (σ e) := fun e => by
-      simp [sigR, inclR]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [gramR, hR, hform, ratTup, JR, Matrix.map_apply, gramE, hE, map_sum, map_mul, hs]
-    rfl
-  · intro Ω hΩ
-    obtain ⟨⟨hlc, hsc, ht2⟩, -⟩ := GlobalTheory.CompanionTheory.AdeleTop.adele_top F
-    have hcont : Continuous (gramR (AF F) σ J : (Fin 1 → Fin M → AF F ⊗[F] E) → _) :=
-      (GlobalTheory.T.tensor_locally_compact_ring F E σ hcm (AF F)).2.2.2.2.2.2.2.2.2 1 M J
-    let φ : (Fin 1 → Fin M → AF F ⊗[F] E) → Fin 1 → Fin 1 → AF F ⊗[F] E :=
-      fun Y _ _ => gramR (AF F) σ J Y 0 0
-    have hφ : Continuous φ :=
-      continuous_pi fun _ => continuous_pi fun _ => hcont.matrix_elem 0 0
-    have hfin := (GlobalTheory.T.rational_tuples_discrete_cocompact_adelic F E σ hcm 1 1).2.1 _ (hΩ.image hφ)
-    let ι : F → Fin 1 → Fin 1 → E := fun t _ _ => algebraMap F E t
-    refine Set.Finite.of_injOn (f := ι) ?_ ?_ hfin
-    · rintro t ⟨Y, hY, hYt⟩
-      refine ⟨Y, hY, ?_⟩
+theorem gram_rational_finite
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
+          IsHermND σ J
+            → (∀ X : Fin 1 → Fin M → E, ∃ t : F, gramE σ J X = fun _ _ => algebraMap F E t)
+              ∧ (∀ (n : ℕ) (X : Fin n → Fin M → E),
+                gramR (AF F) σ J (ratTup (AF F) X) = (gramE σ J X).map (inclR (AF F)))
+              ∧ ∀ Ω : Set (Fin 1 → Fin M → AF F ⊗[F] E),
+                IsCompact Ω
+                  → {t : F | ∃ Y ∈ Ω, gramR (AF F) σ J Y = fun _ _ => inclR (AF F) (algebraMap F E t)}.Finite :=
+  by
+    intro F E _ _ _ _ _ σ hcm M J hJ
+    refine ⟨?_, ?_, ?_⟩
+    · intro X
+      obtain ⟨t, ht⟩ := fixed_mem σ hcm _ (hE_self_fixed σ hcm J hJ (X 0))
+      refine ⟨t, ?_⟩
       funext a b
-      exact congrFun (congrFun hYt 0) 0
-    · intro s _ t _ hst
-      exact (algebraMap F E).injective (congrFun (congrFun hst 0) 0)
+      rw [Subsingleton.elim a 0, Subsingleton.elim b 0]
+      exact ht
+    · intro n X
+      ext a b
+      have hs : ∀ e : E, sigR (AF F) σ (inclR (AF F) e) = inclR (AF F) (σ e) := fun e => by
+        simp [sigR, inclR]
+      set_option synthInstance.maxHeartbeats 100000 in
+        simp only [gramR, hR, hform, ratTup, JR, Matrix.map_apply, gramE, hE, map_sum, map_mul, hs]
+      rfl
+    · intro Ω hΩ
+      obtain ⟨⟨hlc, hsc, ht2⟩, -⟩ := GlobalTheory.CompanionTheory.AdeleTop.adele_top F
+      have hcont : Continuous (gramR (AF F) σ J : (Fin 1 → Fin M → AF F ⊗[F] E) → _) :=
+        (GlobalTheory.T.tensor_locally_compact_ring F E σ hcm (AF F)).2.2.2.2.2.2.2.2.2 1 M J
+      let φ : (Fin 1 → Fin M → AF F ⊗[F] E) → Fin 1 → Fin 1 → AF F ⊗[F] E := fun Y _ _ =>
+        gramR (AF F) σ J Y 0 0
+      have hφ : Continuous φ := continuous_pi fun _ => continuous_pi fun _ => hcont.matrix_elem 0 0
+      have hfin :=
+        (GlobalTheory.T.rational_tuples_discrete_cocompact_adelic F E σ hcm 1 1).2.1 _ (hΩ.image hφ)
+      let ι : F → Fin 1 → Fin 1 → E := fun t _ _ => algebraMap F E t
+      refine Set.Finite.of_injOn (f := ι) ?_ ?_ hfin
+      · rintro t ⟨Y, hY, hYt⟩
+        refine ⟨Y, hY, ?_⟩
+        funext a b
+        exact congrFun (congrFun hYt 0) 0
+      · intro s _ t _ hst
+        exact (algebraMap F E).injective (congrFun (congrFun hst 0) 0)
 
 end GlobalTheory.CompanionTheory.SW.FinQ

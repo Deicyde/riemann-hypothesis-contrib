@@ -10,23 +10,32 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames Formalism.GradedWeylDivisibility MvPolynomial Formalism.MainNotions.G.LatticeSystems
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames
+  Formalism.GradedWeylDivisibility MvPolynomial Formalism.MainNotions.G.LatticeSystems
 open scoped TensorProduct
 
 theorem bilinP : BilinP := by
   classical
   intro K _ r B
-  let g : Bool → MvPolynomial (Fin r × Fin r) K →ₗ[K]
-      (MvPolynomial (Fin r × Fin r) K ⊗[K] MvPolynomial (Fin r × Fin r) K) := fun b =>
+  let g
+      : Bool
+        → MvPolynomial (Fin r × Fin r) K →ₗ[K]
+          (MvPolynomial (Fin r × Fin r) K ⊗[K] MvPolynomial (Fin r × Fin r) K) := fun b =>
     match b with
-    | true => (Algebra.TensorProduct.includeLeft :
-        MvPolynomial (Fin r × Fin r) K →ₐ[K] MvPolynomial (Fin r × Fin r) K ⊗[K] MvPolynomial (Fin r × Fin r) K).toLinearMap
-    | false => (Algebra.TensorProduct.includeRight :
-        MvPolynomial (Fin r × Fin r) K →ₐ[K] MvPolynomial (Fin r × Fin r) K ⊗[K] MvPolynomial (Fin r × Fin r) K).toLinearMap
+    | true =>
+      (Algebra.TensorProduct.includeLeft
+        : MvPolynomial (Fin r × Fin r) K →ₐ[K] MvPolynomial (Fin r × Fin r) K ⊗[K] MvPolynomial (Fin r × Fin r) K).toLinearMap
+    | false =>
+      (Algebra.TensorProduct.includeRight
+        : MvPolynomial (Fin r × Fin r) K →ₐ[K] MvPolynomial (Fin r × Fin r) K ⊗[K] MvPolynomial (Fin r × Fin r) K).toLinearMap
   obtain ⟨F, hF⟩ := KP.tensorMap (K := K) (S := Bool) (α := Fin r × Fin r) g
   refine ⟨(TensorProduct.lift B) ∘ₗ F, ?_⟩
   intro f f'
-  have h := hF (fun b => match b with | true => f | false => f')
+  have h :=
+    hF (fun b =>
+      match b with
+      | true => f
+      | false => f')
   rw [Fintype.prod_bool, Fintype.prod_bool] at h
   have h' : F (blockEmb K true f * blockEmb K false f') = f ⊗ₜ[K] f' := by
     refine h.trans ?_
@@ -47,10 +56,14 @@ theorem detFactsP : DetFactsP := by
     rwa [e1] at h2
   · intro l
     unfold detY
-    have hA := AlgHom.map_det (rowAct A (n := r) l) (Matrix.of fun i j : Fin r => (X (i, j) : MvPolynomial (Fin r × Fin r) A))
-    have hM : (rowAct A (n := r) l).mapMatrix (Matrix.of fun i j : Fin r => (X (i, j) : MvPolynomial (Fin r × Fin r) A)) =
-        (C : A →+* MvPolynomial (Fin r × Fin r) A).mapMatrix l *
-          (Matrix.of fun i j : Fin r => (X (i, j) : MvPolynomial (Fin r × Fin r) A)) := by
+    have hA :=
+      AlgHom.map_det (rowAct A (n := r) l)
+        (Matrix.of fun i j : Fin r => (X (i, j) : MvPolynomial (Fin r × Fin r) A))
+    have hM
+        : (rowAct A (n := r) l).mapMatrix
+            (Matrix.of fun i j : Fin r => (X (i, j) : MvPolynomial (Fin r × Fin r) A))
+          = (C : A →+* MvPolynomial (Fin r × Fin r) A).mapMatrix l
+            * (Matrix.of fun i j : Fin r => (X (i, j) : MvPolynomial (Fin r × Fin r) A)) := by
       apply Matrix.ext
       intro i j
       rw [Matrix.mul_apply]
@@ -66,7 +79,9 @@ theorem numP : NumP := by
   have hp1 : (1 : ℝ) < p := by exact_mod_cast hp
   have hN : ((r * (r - 1) / 2 : ℕ) : ℝ) ≤ ((r + 1 : ℕ) : ℝ) ^ 2 := by
     have h0 : r * (r - 1) / 2 ≤ (r + 1) ^ 2 := by
-      calc r * (r - 1) / 2 ≤ r * (r - 1) := Nat.div_le_self _ _
+      calc
+        r * (r - 1) / 2
+          ≤ r * (r - 1) := Nat.div_le_self _ _
         _ ≤ (r + 1) * (r + 1) := Nat.mul_le_mul (by omega) (by omega)
         _ = (r + 1) ^ 2 := by ring
     exact_mod_cast h0
@@ -74,14 +89,18 @@ theorem numP : NumP := by
   have h2 : (Nat.log p (8 * a + (r + 1)) : ℝ) ≤ Real.logb p ((8 * a + (r + 1) : ℕ) : ℝ) := by
     first
     | exact Real.natLog_le_logb _ _
-    | (have hpow := Nat.pow_log_le_self p (x := 8 * a + (r + 1)) (by omega)
-       rw [Real.le_logb_iff_rpow_le hp1 (by positivity)]
-       exact_mod_cast hpow)
+    | (
+        have hpow := Nat.pow_log_le_self p (x := 8 * a + (r + 1)) (by omega)
+        rw [Real.le_logb_iff_rpow_le hp1 (by positivity)]
+        exact_mod_cast hpow
+      )
   have h3 : (Nat.log p (ell + r - 1) : ℝ) ≤ Nat.log p (8 * a + (r + 1)) := by exact_mod_cast h1
-  have hL : (Nat.log p (ell + r - 1) : ℝ) ≤ Real.logb p ((8 * a + (r + 1) : ℕ) : ℝ) + 1 := by linarith
+  have hL : (Nat.log p (ell + r - 1) : ℝ) ≤ Real.logb p ((8 * a + (r + 1) : ℕ) : ℝ) + 1 := by
+    linarith
   push_cast at hL hN
-  have key : ((r * (r - 1) / 2 * Nat.log p (ell + r - 1) : ℕ) : ℝ) ≤
-      ((r : ℝ) + 1) ^ 2 * (Real.logb p (8 * (a : ℝ) + ((r : ℝ) + 1)) + 1) := by
+  have key
+      : ((r * (r - 1) / 2 * Nat.log p (ell + r - 1) : ℕ) : ℝ)
+        ≤ ((r : ℝ) + 1) ^ 2 * (Real.logb p (8 * (a : ℝ) + ((r : ℝ) + 1)) + 1) := by
     push_cast
     exact mul_le_mul hN hL (Nat.cast_nonneg _) (by positivity)
   have key2 := key.trans (Nat.le_ceil _)

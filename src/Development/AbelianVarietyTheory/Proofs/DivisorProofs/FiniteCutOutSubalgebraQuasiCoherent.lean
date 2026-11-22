@@ -11,17 +11,20 @@ open AlgebraicGeometry CategoryTheory Limits Opposite GlobalTheory.QcSub
 
 namespace GlobalTheory.QcSub
 
-theorem subMap_finite (X : Scheme.{0}) (_hX : IsNoetherian X) (F : X.Opensᵒᵖ ⥤ CommRingCat)
-    (α : X.presheaf ⟶ F)
+theorem subMap_finite
+    (X : Scheme.{0}) (_hX : IsNoetherian X) (F : X.Opensᵒᵖ ⥤ CommRingCat) (α : X.presheaf ⟶ F)
     (hα : ((Scheme.AffineZariskiSite.toOpensFunctor X).op.whiskerLeft α).Coequifibered)
     (hint : ∀ U : X.Opens, IsAffineOpen U → (α.app (op U)).hom.IsIntegral)
     {ι : Type} (V : ι → X.Opens) (_hV : ∀ j, IsAffineOpen (V j)) (hcov : ∀ x : X, ∃ j, x ∈ V j)
-    (T : ∀ j, Set (F.obj (op (V j)))) (hT : ∀ j, (T j).Finite) (W : X.Opens)
-    (hW : IsAffineOpen W) : (subMap F α V T W).Finite := by
+    (T : ∀ j, Set (F.obj (op (V j)))) (hT : ∀ j, (T j).Finite)
+    (W : X.Opens) (hW : IsAffineOpen W)
+    : (subMap F α V T W).Finite := by
   haveI : IsNoetherianRing Γ(X, W) := IsLocallyNoetherian.component_noetherian ⟨W, hW⟩
   letI alg : Algebra Γ(X, W) (F.obj (op W)) := (α.app (op W)).hom.toAlgebra
-  let S : Subalgebra Γ(X, W) (F.obj (op W)) :=
-    { sub F α V T W with algebraMap_mem' := algebraMap_mem_sub F α V T W }
+  let S : Subalgebra Γ(X, W) (F.obj (op W)) := {
+    sub F α V T W with
+    algebraMap_mem' := algebraMap_mem_sub F α V T W
+  }
   let s : Set Γ(X, W) := {g | ∃ j, X.basicOpen g ≤ V j}
   have hs : Ideal.span s = ⊤ := by
     rw [← hW.self_le_iSup_basicOpen_iff]
@@ -29,8 +32,9 @@ theorem subMap_finite (X : Scheme.{0}) (_hX : IsNoetherian X) (F : X.Opensᵒᵖ
     obtain ⟨j, hj⟩ := hcov x
     obtain ⟨g, hg, hxg⟩ := hW.exists_basicOpen_le (V := V j) ⟨x, hj⟩ hx
     exact TopologicalSpace.Opens.mem_iSup.mpr ⟨⟨g, j, hg⟩, hxg⟩
-  have hloc : ∀ g ∈ s, ∃ E : Finset (F.obj (op W)), ∀ b ∈ S.toSubmodule, ∃ m : ℕ,
-      algebraMap Γ(X, W) (F.obj (op W)) g ^ m * b ∈ Submodule.span Γ(X, W) (E : Set _) := by
+  have hloc
+      : ∀ g ∈ s, ∃ E : Finset (F.obj (op W)), ∀ b ∈ S.toSubmodule, ∃ m : ℕ,
+        algebraMap Γ(X, W) (F.obj (op W)) g ^ m * b ∈ Submodule.span Γ(X, W) (E : Set _) := by
     rintro g ⟨j, hj⟩
     have hD : IsAffineOpen (X.basicOpen g) := hW.basicOpen g
     letI a1 : Algebra Γ(X, W) Γ(X, X.basicOpen g) :=
@@ -55,22 +59,25 @@ theorem subMap_finite (X : Scheme.{0}) (_hX : IsNoetherian X) (F : X.Opensᵒᵖ
     let N : Submodule Γ(X, X.basicOpen g) (F.obj (op (X.basicOpen g))) :=
       (Algebra.adjoin Γ(X, X.basicOpen g) ((F.map (homOfLE hj).op).hom '' T j)).toSubmodule
     have hN : N.FG := fg_adjoin_of_finite ((hT j).image _) (fun x _ ↦ hint _ hD x)
-    obtain ⟨E, hE⟩ := GlobalTheory.T.exists_finset_pow_mul_mem_span_of_fg_localizationAway (R := Γ(X, W)) (A := F.obj (op W)) (R' := Γ(X, X.basicOpen g))
-      (A' := F.obj (op (X.basicOpen g))) g N hN
+    obtain ⟨E, hE⟩ :=
+      GlobalTheory.T.exists_finset_pow_mul_mem_span_of_fg_localizationAway (R := Γ(X, W))
+        (A := F.obj (op W)) (R' := Γ(X, X.basicOpen g)) (A' := F.obj (op (X.basicOpen g))) g N hN
     refine ⟨E, fun b hb ↦ hE b ?_⟩
     have := (mem_sub F α V T).mp hb j (X.basicOpen g) hD (X.basicOpen_le g) hj
     rw [gen_eq_adjoin] at this
     exact this
-  have hfg : S.toSubmodule.FG := GlobalTheory.T.submodule_fg_of_span_eq_top_of_locally_pow_mul_mem S.toSubmodule s hs hloc
+  have hfg : S.toSubmodule.FG :=
+    GlobalTheory.T.submodule_fg_of_span_eq_top_of_locally_pow_mul_mem S.toSubmodule s hs hloc
   letI := (subMap F α V T W).toAlgebra
   have hfin : Module.Finite Γ(X, W) S.toSubmodule := Module.Finite.iff_fg.mpr hfg
-  let e : S.toSubmodule ≃ₗ[Γ(X, W)] sub F α V T W :=
-    { toFun := fun x ↦ ⟨x.1, x.2⟩
-      invFun := fun x ↦ ⟨x.1, x.2⟩
-      map_add' := fun _ _ ↦ rfl
-      map_smul' := fun _ _ ↦ rfl
-      left_inv := fun _ ↦ rfl
-      right_inv := fun _ ↦ rfl }
+  let e : S.toSubmodule ≃ₗ[Γ(X, W)] sub F α V T W := {
+    toFun := fun x ↦ ⟨x.1, x.2⟩
+    invFun := fun x ↦ ⟨x.1, x.2⟩
+    map_add' := fun _ _ ↦ rfl
+    map_smul' := fun _ _ ↦ rfl
+    left_inv := fun _ ↦ rfl
+    right_inv := fun _ ↦ rfl
+  }
   exact Module.Finite.equiv e
 
 end GlobalTheory.QcSub

@@ -6,7 +6,8 @@ public import Development.EtaleCohomology.TateTwists.EtaleCupAlexanderWhitneyLei
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations
 
@@ -24,12 +25,18 @@ theorem awleib_ext_pf : EtaleSimplicialCochainEqOfEvaluationsAgree := by
     intro x
     exact H N q hpq U.unop x.down
   · have hz : IsZero (((chains R).obj E).X p) :=
-      HomologicalComplex.isZero_extend_X _ _ _ (fun i hi => hp ⟨i, by
-        have e : ComplexShape.embeddingDownNat.f i = -(i : ℤ) := rfl
-        omega⟩)
+      HomologicalComplex.isZero_extend_X _ _ _ (fun i hi =>
+        hp ⟨
+          i,
+          by
+            have e : ComplexShape.embeddingDownNat.f i = -(i : ℤ) := rfl
+            omega
+        ⟩)
     exact hz.eq_of_src _ _
 
-theorem etale_cup_alexanderWhitney_leibniz_of_succ (hs : EtaleAlexanderWhitneyLeibnizPositiveSimplexDegree) : EtaleAlexanderWhitneyCupLeibnizRule :=
+theorem etale_cup_alexanderWhitney_leibniz_of_succ
+    (hs : EtaleAlexanderWhitneyLeibnizPositiveSimplexDegree)
+    : EtaleAlexanderWhitneyCupLeibnizRule :=
   etale_cup_alexanderWhitney_leibniz_of_ext_and_succ awleib_ext_pf hs
 
 end LateralTheory.EtaleFoundations

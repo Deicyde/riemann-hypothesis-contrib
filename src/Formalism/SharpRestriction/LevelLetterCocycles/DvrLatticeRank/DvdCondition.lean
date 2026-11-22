@@ -11,10 +11,12 @@ namespace Formalism.MainNotions.N.Ln34.DvdPf
 
 open Formalism.BasicNotions Formalism.BasicNotions.Loc Module
 
-private theorem finrank_cyclotomicExt_dvd_sub_one {F Ω : Type*} [Field F] [CharZero F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosed Ω] [CharZero Ω] [Algebra.IsIntegral F Ω] (E K : IntermediateField F Ω) (hEK : E ≤ K) (l : ℕ) (hp : l.Prime)
-    (hle : K ≤ E ⊔ IntermediateField.adjoin F {x : Ω | x ^ (l ^ 1) = 1}) :
-    Module.finrank E (IntermediateField.extendScalars hEK) ∣ l - 1 := by
+private theorem finrank_cyclotomicExt_dvd_sub_one
+    {F Ω : Type*} [Field F] [CharZero F] [Field Ω] [Algebra F Ω] [IsAlgClosed Ω] [CharZero Ω]
+    [Algebra.IsIntegral F Ω]
+    (E K : IntermediateField F Ω) (hEK : E ≤ K)
+    (l : ℕ) (hp : l.Prime) (hle : K ≤ E ⊔ IntermediateField.adjoin F {x : Ω | x ^ (l ^ 1) = 1})
+    : Module.finrank E (IntermediateField.extendScalars hEK) ∣ l - 1 := by
   have hl0 : 0 < l := hp.pos
   haveI : NeZero l := ⟨hp.ne_zero⟩
   haveI : NeZero (l : Ω) := ⟨Nat.cast_ne_zero.mpr hp.ne_zero⟩
@@ -23,8 +25,9 @@ private theorem finrank_cyclotomicExt_dvd_sub_one {F Ω : Type*} [Field F] [Char
   haveI : Algebra.IsIntegral E Ω := ⟨fun x => (Algebra.IsIntegral.isIntegral (R := F) x).tower_top⟩
 
   obtain ⟨ζ, hζ⟩ : ∃ ζ : Ω, IsPrimitiveRoot ζ l := by
-    obtain ⟨z, hz⟩ := IsAlgClosed.exists_root (Polynomial.cyclotomic l Ω)
-      (Polynomial.degree_cyclotomic_pos l Ω hl0).ne'
+    obtain ⟨z, hz⟩ :=
+      IsAlgClosed.exists_root (Polynomial.cyclotomic l Ω)
+        (Polynomial.degree_cyclotomic_pos l Ω hl0).ne'
     exact ⟨z, Polynomial.isRoot_cyclotomic_iff.mp hz⟩
   set M : IntermediateField E Ω := IntermediateField.adjoin E {ζ} with hM
   haveI hcyc : IsCyclotomicExtension {l} E M := by
@@ -68,10 +71,14 @@ private theorem finrank_cyclotomicExt_dvd_sub_one {F Ω : Type*} [Field F] [Char
       show y ∈ M.restrictScalars F
       rw [IntermediateField.mem_restrictScalars]
       first
-      | (obtain ⟨i, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hy'
-         exact pow_mem hζM i)
-      | (obtain ⟨i, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hy' hl0
-         exact pow_mem hζM i)
+      | (
+          obtain ⟨i, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hy'
+          exact pow_mem hζM i
+        )
+      | (
+          obtain ⟨i, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hy' hl0
+          exact pow_mem hζM i
+        )
   have hKM : IntermediateField.extendScalars hEK ≤ M := by
     intro x hx
     rw [IntermediateField.mem_extendScalars] at hx
@@ -79,10 +86,13 @@ private theorem finrank_cyclotomicExt_dvd_sub_one {F Ω : Type*} [Field F] [Char
 
   have hdvd : Module.finrank E (IntermediateField.extendScalars hEK) ∣ Module.finrank E M := by
     first
-    | (have h := IntermediateField.relfinrank_mul_relfinrank
-          (bot_le : (⊥ : IntermediateField E Ω) ≤ IntermediateField.extendScalars hEK) hKM
-       rw [IntermediateField.relfinrank_bot_left, IntermediateField.relfinrank_bot_left] at h
-       exact Dvd.intro _ h)
+    | (
+        have h :=
+          IntermediateField.relfinrank_mul_relfinrank
+            (bot_le : (⊥ : IntermediateField E Ω) ≤ IntermediateField.extendScalars hEK) hKM
+        rw [IntermediateField.relfinrank_bot_left, IntermediateField.relfinrank_bot_left] at h
+        exact Dvd.intro _ h
+      )
     | exact IntermediateField.finrank_dvd_of_le_right hKM
   exact hdvd.trans hcard
 
@@ -94,14 +104,17 @@ theorem dvdCondition : Formalism.MainNotions.N.Ln34.DvdStep := by
   have h := finrank_cyclotomicExt_dvd_sub_one (F := ℚ_[l]) (K0 K) K.1 hEK l (Fact.out) hle
   first
   | exact h
-  | (show Module.finrank (K0 K) K.1 ∣ l - 1
-     convert h using 1
-     exact LinearEquiv.finrank_eq
-       { toFun := fun y => ⟨y.1, y.2⟩
-         invFun := fun y => ⟨y.1, y.2⟩
-         map_add' := fun _ _ => rfl
-         map_smul' := fun _ _ => rfl
-         left_inv := fun _ => rfl
-         right_inv := fun _ => rfl })
+  | (
+      show Module.finrank (K0 K) K.1 ∣ l - 1
+      convert h using 1
+      exact LinearEquiv.finrank_eq {
+        toFun := fun y => ⟨y.1, y.2⟩
+        invFun := fun y => ⟨y.1, y.2⟩
+        map_add' := fun _ _ => rfl
+        map_smul' := fun _ _ => rfl
+        left_inv := fun _ => rfl
+        right_inv := fun _ => rfl
+      }
+    )
 
 end Formalism.MainNotions.N.Ln34.DvdPf

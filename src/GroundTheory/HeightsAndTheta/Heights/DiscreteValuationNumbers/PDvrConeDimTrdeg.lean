@@ -29,8 +29,7 @@ theorem proof : Statement := by
   have hdim : ringKrullDim (MRing ι O ⧸ P) = ringKrullDim (MRing ι F ⧸ genFib P) + 1 :=
     le_antisymm (GenericDimGe.proof.{0} O K ι P hPp hPC) (GenericDimBound.full.{0} O K ι P hP hPC)
 
-  have hB : ringKrullDim (MRing ι F ⧸ genFib P) =
-      (Algebra.trdeg F (MRing ι F ⧸ genFib P)).toENat :=
+  have hB : ringKrullDim (MRing ι F ⧸ genFib P) = (Algebra.trdeg F (MRing ι F ⧸ genFib P)).toENat :=
     GroundTheory.Arith.Abelian.Jacobian.ringKrullDim_eq_trdeg F
 
   let M : Submonoid (MRing ι O) := (nonZeroDivisors O).map (C : O →+* MRing ι O)
@@ -55,7 +54,8 @@ theorem proof : Statement := by
   have : FaithfulSMul (MRing ι O ⧸ P) (MRing ι F ⧸ genFib P) :=
     (faithfulSMul_iff_algebraMap_injective _ _).2 hφ
   have : FaithfulSMul O (MRing ι O ⧸ P) := by
-    refine (faithfulSMul_iff_algebraMap_injective _ _).2 ((injective_iff_map_eq_zero (algebraMap O (MRing ι O ⧸ P))).2 fun a ha => ?_)
+    refine (faithfulSMul_iff_algebraMap_injective _ _).2
+      ((injective_iff_map_eq_zero (algebraMap O (MRing ι O ⧸ P))).2 fun a ha => ?_)
     have h : (C a : MRing ι O) ∈ P :=
       Ideal.Quotient.eq_zero_iff_mem.1 (show Ideal.Quotient.mk P (C a) = 0 from ha)
     have : a ∈ P.comap (C : O →+* MRing ι O) := h
@@ -76,8 +76,8 @@ theorem proof : Statement := by
       refine (map_ne_zero_iff _ hφ).2 fun h => ?_
       exact Set.disjoint_left.1 hdisj m.2 (Ideal.Quotient.eq_zero_iff_mem.1 h)
     refine IsAlgebraic.of_mul (mem_nonZeroDivisors_of_ne_zero hy0) (isAlgebraic_algebraMap _) ?_
-    have : y * Ideal.Quotient.mk (genFib P) (IsLocalization.mk' (MRing ι F) s m) =
-        algebraMap (MRing ι O ⧸ P) (MRing ι F ⧸ genFib P) (Ideal.Quotient.mk P s) := by
+    have : y * Ideal.Quotient.mk (genFib P) (IsLocalization.mk' (MRing ι F) s m)
+        = algebraMap (MRing ι O ⧸ P) (MRing ι F ⧸ genFib P) (Ideal.Quotient.mk P s) := by
       change φ _ * _ = φ _
       simp only [φ, Ideal.quotientMap_mk, ← map_mul]
       rw [mul_comm, hspec]

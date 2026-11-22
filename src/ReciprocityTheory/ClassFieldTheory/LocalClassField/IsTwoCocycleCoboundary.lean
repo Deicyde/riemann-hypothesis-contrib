@@ -11,28 +11,33 @@ namespace ReciprocityTheory.DiscreteGroups.LocalClassField.Deg2
 
 section Alg
 
-variable {R : Type*} [CommRing R] {G : Type*} [Group G] {A : Type*} [AddCommGroup A] [Module R A]
+variable
+  {R : Type*} [CommRing R]
+  {G : Type*} [Group G]
+  {A : Type*} [AddCommGroup A] [Module R A]
   (ρ : Representation R G A) (N : Subgroup G)
 
-def IsTwoCocycle (c : G → G → A) : Prop := ∀ g h k, ρ g (c h k) - c (g * h) k + c g (h * k) - c g h = 0
+def IsTwoCocycle (c : G → G → A) : Prop :=
+  ∀ g h k, ρ g (c h k) - c (g * h) k + c g (h * k) - c g h = 0
 
 def D1 (y : G → A) (g h : G) : A := ρ g (y h) - y (g * h) + y g
 
 variable {ρ}
 
-variable {N} {c : G → G → A} (hc : IsTwoCocycle ρ c)
+variable
+  {N} {c : G → G → A} (hc : IsTwoCocycle ρ c)
   {r s : G → G} (hrs : ∀ g, r g * s g = g) (hr : ∀ g, r g ∈ N)
   (hrn : ∀ n ∈ N, ∀ g, r (n * g) = n * r g) (hsn : ∀ n ∈ N, ∀ g, s (n * g) = s g)
 
 include hrs hr in
 theorem s_mem {n : G} (hn : n ∈ N) : s n ∈ N := by
   have h : s n = (r n)⁻¹ * n := by rw [eq_inv_mul_iff_mul_eq, hrs]
-  rw [h]; exact N.mul_mem (N.inv_mem (hr n)) hn
-
+  rw [h]
+  exact N.mul_mem (N.inv_mem (hr n)) hn
 
 include hc hrs hr hrn hsn in
-theorem stepA (h0 : ∀ n ∈ N, ∀ m ∈ N, c n m = 0) (n : G) (hn : n ∈ N) (g : G) :
-    c n g - D1 ρ (fun x => - c (r x) (s x)) n g = 0 := by
+theorem stepA (h0 : ∀ n ∈ N, ∀ m ∈ N, c n m = 0) (n : G) (hn : n ∈ N) (g : G)
+    : c n g - D1 ρ (fun x => - c (r x) (s x)) n g = 0 := by
   have h1 := hc n (r g) (s g)
   rw [hrs, h0 n hn _ (hr g)] at h1
   simp only [D1]
@@ -40,26 +45,30 @@ theorem stepA (h0 : ∀ n ∈ N, ∀ m ∈ N, c n m = 0) (n : G) (hn : n ∈ N) 
   linear_combination (norm := abel) h1
 
 include hc in
-theorem mul_left_of_zero (h0 : ∀ n ∈ N, ∀ g, c n g = 0) (n : G) (hn : n ∈ N) (g h : G) :
-    c (n * g) h = ρ n (c g h) := by
+theorem mul_left_of_zero (h0 : ∀ n ∈ N, ∀ g, c n g = 0) (n : G) (hn : n ∈ N) (g h : G)
+    : c (n * g) h = ρ n (c g h) := by
   have h1 := hc n g h
   rw [h0 n hn, h0 n hn] at h1
   linear_combination (norm := abel) - h1
 
 include hc in
-theorem theta_mul [N.Normal] (h0 : ∀ n ∈ N, ∀ g, c n g = 0) (g m : G) (hm : m ∈ N) (k : G) :
-    c g (m * k) = c g m + ρ (g * m * g⁻¹) (c g k) := by
+theorem theta_mul [N.Normal] (h0 : ∀ n ∈ N, ∀ g, c n g = 0) (g m : G) (hm : m ∈ N) (k : G)
+    : c g (m * k) = c g m + ρ (g * m * g⁻¹) (c g k) := by
   have h1 := hc g m k
   have h2 := mul_left_of_zero hc h0 (g * m * g⁻¹) (‹N.Normal›.conj_mem m hm g) g k
   rw [inv_mul_cancel_right] at h2
   rw [h0 m hm, map_zero, h2] at h1
   linear_combination (norm := abel) h1
 
-
 include hc hrs hr hrn hsn in
-theorem stepB [N.Normal] (h0 : ∀ n ∈ N, ∀ g, c n g = 0) (e : G → A) (he0 : ∀ g ∈ N, e g = 0)
-    (he : ∀ g, ∀ n ∈ N, c g (g⁻¹ * n * g) = e g - ρ n (e g)) (n : G) (hn : n ∈ N) (g : G) :
-    c n g - D1 ρ (fun x => ρ (r x) (e (s x))) n g = 0 ∧ c g n - D1 ρ (fun x => ρ (r x) (e (s x))) g n = 0 := by
+theorem stepB
+    [N.Normal]
+    (h0 : ∀ n ∈ N, ∀ g, c n g = 0)
+    (e : G → A) (he0 : ∀ g ∈ N, e g = 0) (he : ∀ g, ∀ n ∈ N, c g (g⁻¹ * n * g) = e g - ρ n (e g))
+    (n : G) (hn : n ∈ N)
+    (g : G)
+    : c n g - D1 ρ (fun x => ρ (r x) (e (s x))) n g = 0
+      ∧ c g n - D1 ρ (fun x => ρ (r x) (e (s x))) g n = 0 := by
   have ha0 : ρ (r n) (e (s n)) = 0 := by rw [he0 _ (s_mem hrs hr hn), map_zero]
   constructor
   · simp only [D1]
@@ -80,13 +89,17 @@ theorem stepB [N.Normal] (h0 : ∀ n ∈ N, ∀ g, c n g = 0) (e : G → A) (he0
       have key' := key (r g) (s g)
       rw [hrs] at key'
       rw [key']
-    rw [ha0, map_zero, h1, hrn _ hconj, hsn _ hconj, h2, map_mul ρ (g * n * g⁻¹) (r g), Module.End.mul_apply]
+    rw [ha0, map_zero, h1, hrn _ hconj, hsn _ hconj, h2, map_mul ρ (g * n * g⁻¹) (r g),
+      Module.End.mul_apply]
     abel
 
-
 include hc in
-theorem stepC [N.Normal] (h0 : ∀ n ∈ N, ∀ g, c n g = 0) (h0' : ∀ n ∈ N, ∀ g, c g n = 0) (n : G) (hn : n ∈ N)
-    (g h : G) : c g (h * n) = c g h ∧ c (g * n) h = c g h ∧ ρ n (c g h) = c g h := by
+theorem stepC
+    [N.Normal]
+    (h0 : ∀ n ∈ N, ∀ g, c n g = 0) (h0' : ∀ n ∈ N, ∀ g, c g n = 0)
+    (n : G) (hn : n ∈ N)
+    (g h : G)
+    : c g (h * n) = c g h ∧ c (g * n) h = c g h ∧ ρ n (c g h) = c g h := by
   have hR : ∀ g h n, n ∈ N → c g (h * n) = c g h := fun g h n hn => by
     have h1 := hc g h n
     simp only [h0' n hn, map_zero, zero_sub, sub_zero] at h1

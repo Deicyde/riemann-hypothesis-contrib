@@ -20,11 +20,14 @@ section Splitting
 
 variable {K : Type*} [Field K] {n : ℕ} [NeZero n] [HasEnoughRootsOfUnity K n]
 
-theorem algHom_mem_fieldRange_of_pow_eq {L F E : Type*} [Field L] [Field F] [Field E]
-    [Algebra K L] [Algebra K F] [Algebra F E] [Algebra K E] [IsScalarTower K F E]
-    {a : K} {α : L} (hα : α ^ n = algebraMap K L a) (hgen : K⟮α⟯ = ⊤) (ι : L →ₐ[K] E)
-    {x : F} (hx : x ^ n = algebraMap K F a) (m : L) :
-    ι m ∈ (algebraMap F E).fieldRange := by
+theorem algHom_mem_fieldRange_of_pow_eq
+    {L F E : Type*} [Field L] [Field F] [Field E] [Algebra K L] [Algebra K F] [Algebra F E]
+    [Algebra K E] [IsScalarTower K F E]
+    {a : K} {α : L} (hα : α ^ n = algebraMap K L a) (hgen : K⟮α⟯ = ⊤)
+    (ι : L →ₐ[K] E)
+    {x : F} (hx : x ^ n = algebraMap K F a)
+    (m : L)
+    : ι m ∈ (algebraMap F E).fieldRange := by
   have hαr : ι α ∈ (algebraMap F E).fieldRange := by
     by_cases hx0 : x = 0
     · have ha : a = 0 := by
@@ -44,26 +47,29 @@ theorem algHom_mem_fieldRange_of_pow_eq {L F E : Type*} [Field L] [Field F] [Fie
     obtain ⟨k, -, hk⟩ := hζ'.eq_pow_of_pow_eq_one hroot
     refine ⟨algebraMap K F ζ ^ k * x, ?_⟩
     rw [map_mul, map_pow, ← IsScalarTower.algebraMap_apply, hk, div_mul_cancel₀ _ hx0']
-  let J : IntermediateField K E := Subfield.toIntermediateField (algebraMap F E).fieldRange
-    fun c ↦ ⟨algebraMap K F c, (IsScalarTower.algebraMap_apply K F E c).symm⟩
+  let J : IntermediateField K E :=
+    Subfield.toIntermediateField (algebraMap F E).fieldRange fun c ↦
+      ⟨algebraMap K F c, (IsScalarTower.algebraMap_apply K F E c).symm⟩
   have hle : K⟮α⟯ ≤ J.comap ι := adjoin_simple_le_iff.2 hαr
   rw [hgen] at hle
   exact hle (Set.mem_univ m)
 
 variable [NumberField K] {L : Type*} [Field L] [NumberField L] [Algebra K L]
 
-theorem splitsCompletely_of_pow_eq {a : K} {α : L} (hα : α ^ n = algebraMap K L a)
-    (hgen : K⟮α⟯ = ⊤) (v : HeightOneSpectrum (𝓞 K))
-    (h : ∃ x : v.adicCompletion K, x ^ n = algebraMap K (v.adicCompletion K) a) :
-    SplitsCompletely L v := by
+theorem splitsCompletely_of_pow_eq
+    {a : K} {α : L} (hα : α ^ n = algebraMap K L a) (hgen : K⟮α⟯ = ⊤)
+    (v : HeightOneSpectrum (𝓞 K))
+    (h : ∃ x : v.adicCompletion K, x ^ n = algebraMap K (v.adicCompletion K) a)
+    : SplitsCompletely L v := by
   obtain ⟨x, hx⟩ := h
   rw [splitsCompletely_iff_forall_finrank]
   intro w
   let g := (Pi.evalAlgHom (v.adicCompletion K) _ w).comp (tensorEquiv L v).toAlgHom
   exact finrank_eq_one_of_tensor_surjective g
     ((Function.surjective_eval w).comp (tensorEquiv L v).surjective)
-    fun m ↦ algHom_mem_fieldRange_of_pow_eq hα hgen
-      ((g.restrictScalars K).comp Algebra.TensorProduct.includeRight) hx m
+    fun m ↦
+      algHom_mem_fieldRange_of_pow_eq hα hgen
+        ((g.restrictScalars K).comp Algebra.TensorProduct.includeRight) hx m
 
 end Splitting
 
@@ -71,10 +77,17 @@ section LocalNorms
 
 variable {K : Type*} [Field K] [NumberField K] {L : Type*} [Field L] [NumberField L] [Algebra K L]
 
-theorem pow_finrank_mem_range_finiteLocalNorm (v : HeightOneSpectrum (𝓞 K))
-    (y : (v.adicCompletion K)ˣ) : y ^ finrank K L ∈ (finiteLocalNorm L v).range := by
-  refine ⟨fun w ↦ Units.map (algebraMap (v.adicCompletion K) (w.1.adicCompletion L) :
-    v.adicCompletion K →* w.1.adicCompletion L) y, ?_⟩
+theorem pow_finrank_mem_range_finiteLocalNorm
+    (v : HeightOneSpectrum (𝓞 K)) (y : (v.adicCompletion K)ˣ)
+    : y ^ finrank K L ∈ (finiteLocalNorm L v).range := by
+  refine ⟨
+    fun w ↦
+      Units.map
+        (algebraMap (v.adicCompletion K) (w.1.adicCompletion L)
+          : v.adicCompletion K →* w.1.adicCompletion L)
+        y,
+    ?_
+  ⟩
   apply Units.ext
   rw [coe_finiteLocalNorm, Units.val_pow_eq_pow_val, ← sum_finrank_eq L v,
     ← Finset.prod_pow_eq_pow_sum]
@@ -82,13 +95,20 @@ theorem pow_finrank_mem_range_finiteLocalNorm (v : HeightOneSpectrum (𝓞 K))
   rw [Units.coe_map]
   exact Algebra.norm_algebraMap (S := w.1.adicCompletion L) (y : v.adicCompletion K)
 
-theorem pow_finrank_mem_range_infiniteLocalNorm (v : InfinitePlace K) (y : (v.Completion)ˣ) :
-    y ^ finrank K L ∈ (infiniteLocalNorm L v).range := by
+theorem pow_finrank_mem_range_infiniteLocalNorm (v : InfinitePlace K) (y : (v.Completion)ˣ)
+    : y ^ finrank K L ∈ (infiniteLocalNorm L v).range := by
   classical
-  refine ⟨fun w ↦ Units.map (algebraMap v.Completion (w : InfinitePlace L).Completion :
-    v.Completion →* (w : InfinitePlace L).Completion) y, ?_⟩
+  refine ⟨
+    fun w ↦
+      Units.map
+        (algebraMap v.Completion (w : InfinitePlace L).Completion
+          : v.Completion →* (w : InfinitePlace L).Completion)
+        y,
+    ?_
+  ⟩
   apply Units.ext
-  rw [coe_infiniteLocalNorm, Units.val_pow_eq_pow_val, ← GroundTheory.Global.InfinitePlace.sum_finrank_completion (L := L) v,
+  rw [coe_infiniteLocalNorm, Units.val_pow_eq_pow_val,
+    ← GroundTheory.Global.InfinitePlace.sum_finrank_completion (L := L) v,
     ← Finset.prod_pow_eq_pow_sum]
   refine Finset.prod_congr rfl fun w _ ↦ ?_
   rw [Units.coe_map]
@@ -100,8 +120,9 @@ section Main
 
 universe u
 
-theorem not_mem_bot_of_adjoin_eq_top {K L : Type*} [Field K] [Field L] [Algebra K L] {α : L}
-    (hgen : K⟮α⟯ = ⊤) (h1 : finrank K L ≠ 1) : α ∉ (⊥ : IntermediateField K L) := by
+theorem not_mem_bot_of_adjoin_eq_top
+    {K L : Type*} [Field K] [Field L] [Algebra K L] {α : L} (hgen : K⟮α⟯ = ⊤) (h1 : finrank K L ≠ 1)
+    : α ∉ (⊥ : IntermediateField K L) := by
   intro hα
   have hbot : (⊤ : IntermediateField K L) = ⊥ := by
     rw [← hgen]
@@ -110,8 +131,8 @@ theorem not_mem_bot_of_adjoin_eq_top {K L : Type*} [Field K] [Field L] [Algebra 
   rw [IntermediateField.finrank_top'] at this
   exact h1 this
 
-theorem FirstInequality.secondInequalityRoots (hFI : FirstInequality.{u}) :
-    SecondInequalityRoots.{u} := by
+theorem FirstInequality.secondInequalityRoots (hFI : FirstInequality.{u})
+    : SecondInequalityRoots.{u} := by
   intro K L _ _ _ _ _ _ _ p hp hroots hdeg
   classical
   have : Fact p.Prime := ⟨hp⟩
@@ -154,8 +175,7 @@ theorem FirstInequality.secondInequalityRoots (hFI : FirstInequality.{u}) :
   have hfa : {v : HeightOneSpectrum (𝓞 K) | ord v (diagonal K a) ≠ 0}.Finite :=
     eventually_ord_eq_zero (diagonal K a)
   set S : Finset (HeightOneSpectrum (𝓞 K)) := S₀ ∪ hfp.toFinset ∪ hfa.toFinset with hS
-  have hpS : ∀ v, (p : 𝓞 K) ∈ v.asIdeal → v ∈ S := fun v hv ↦ by
-    simp [S, hv]
+  have hpS : ∀ v, (p : 𝓞 K) ∈ v.asIdeal → v ∈ S := fun v hv ↦ by simp [S, hv]
   have hJ : (diagonal K).range ⊔ sIdeles (S : Set (HeightOneSpectrum (𝓞 K))) = ⊤ :=
     sup_sIdeles_eq_top_of_subset (fun v hv ↦ by simp [S, Finset.mem_coe.1 hv]) hS₀
   have haS : a ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K := by
@@ -165,11 +185,13 @@ theorem FirstInequality.secondInequalityRoots (hFI : FirstInequality.{u}) :
 
   obtain ⟨T, hST, -, haT, hidx⟩ := hFI.exists_places_index_map_powerSubgroup S hpS hJ haS hap
 
-  have hnorm : powerSubgroup p (S : Set (HeightOneSpectrum (𝓞 K))) (T : Set (HeightOneSpectrum (𝓞 K))) ≤
-      (ideleNorm K L).range := by
+  have hnorm
+      : powerSubgroup p (S : Set (HeightOneSpectrum (𝓞 K))) (T : Set (HeightOneSpectrum (𝓞 K)))
+        ≤ (ideleNorm K L).range := by
     intro x hx
-    have hxST := powerSubgroup_le_sIdeles (S : Set (HeightOneSpectrum (𝓞 K)))
-      (T : Set (HeightOneSpectrum (𝓞 K))) p hx
+    have hxST :=
+      powerSubgroup_le_sIdeles (S : Set (HeightOneSpectrum (𝓞 K)))
+        (T : Set (HeightOneSpectrum (𝓞 K))) p hx
     obtain ⟨hxS, hxinf, -⟩ := (mem_localSubgroup _ _ _ _).1 hx
     refine mem_range_ideleNorm_of_forall x (fun v ↦ ?_) (fun w ↦ ?_)
     · by_cases hvS : v ∈ S
@@ -177,12 +199,14 @@ theorem FirstInequality.secondInequalityRoots (hFI : FirstInequality.{u}) :
         rw [← hy, powMonoidHom_apply, ← hdeg]
         exact pow_finrank_mem_range_finiteLocalNorm v y
       by_cases hvT : v ∈ T
-      · rw [range_finiteLocalNorm_eq_top_of_isFiniteSplit v ((splitsCompletely_iff_isFiniteSplit v).1
-          (splitsCompletely_of_pow_eq hα hgen v (mem_unitsPowIn.1 (haT v hvT))))]
+      · rw [range_finiteLocalNorm_eq_top_of_isFiniteSplit v
+          ((splitsCompletely_iff_isFiniteSplit v).1
+            (splitsCompletely_of_pow_eq hα hgen v (mem_unitsPowIn.1 (haT v hvT))))]
         exact Subgroup.mem_top _
       · obtain ⟨w⟩ := nonempty_placesOver L v
         have he : w.1.asIdeal.ramificationIdx (𝓞 K) = 1 :=
-          Kummer.ramificationIdx_eq_one_of_pow_eq a hα hgen v (fun h ↦ hvS (hpS v h))
+          Kummer.ramificationIdx_eq_one_of_pow_eq a hα hgen v
+            (fun h ↦ hvS (hpS v h))
             (by rw [haS v hvS, WithZero.log_one]; exact dvd_zero _) w.1.asIdeal
         have hu : finiteProj v x ∈ (Submonoid.ofClass (v.adicCompletionIntegers K)).units := by
           have h := (mem_sIdeles_iff _).1 hxST v (by simp [hvS, hvT])
@@ -195,9 +219,10 @@ theorem FirstInequality.secondInequalityRoots (hFI : FirstInequality.{u}) :
       rw [← hy, powMonoidHom_apply, ← hdeg]
       exact pow_finrank_mem_range_infiniteLocalNorm w y
 
-  have hle : (powerSubgroup p (S : Set (HeightOneSpectrum (𝓞 K)))
-      (T : Set (HeightOneSpectrum (𝓞 K)))).map (IdeleClassGroup.mk K) ≤
-        (ideleClassNorm K L).range := by
+  have hle
+      : (powerSubgroup p (S : Set (HeightOneSpectrum (𝓞 K)))
+          (T : Set (HeightOneSpectrum (𝓞 K)))).map (IdeleClassGroup.mk K)
+        ≤ (ideleClassNorm K L).range := by
     rintro _ ⟨x, hx, rfl⟩
     obtain ⟨y, hy⟩ := hnorm hx
     exact ⟨IdeleClassGroup.mk L y, by rw [ideleClassNorm_mk, hy]⟩

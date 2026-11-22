@@ -10,18 +10,24 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.InverseCompactOpen
 
-theorem inv_exists_compact_open (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (U : Set (Inv r F)) (a₀ : Inv r F)
-    (hU : IsOpen U) (ha : a₀ ∈ U) :
-    ∃ Ω : Set (Inv r F), IsCompact Ω ∧ IsOpen Ω ∧ a₀ ∈ Ω ∧ Ω ⊆ U := by
+theorem inv_exists_compact_open
+    (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+    [StarRing E] [Unram F E]
+    (r : ℕ) (U : Set (Inv r F)) (a₀ : Inv r F) (hU : IsOpen U) (ha : a₀ ∈ U)
+    : ∃ Ω : Set (Inv r F), IsCompact Ω ∧ IsOpen Ω ∧ a₀ ∈ Ω ∧ Ω ⊆ U := by
   have hUn : Unram F E := inferInstance
   haveI : LocallyCompactSpace F := hUn.lcF
   haveI : IsUltrametricDist F := hUn.ultraF
   haveI : ProperSpace F := ProperSpace.of_locallyCompactSpace F
   obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.1 hU a₀ ha
   have hε2 : 0 < ε / 2 := half_pos hε
-  refine ⟨Metric.closedBall a₀ (ε / 2), isCompact_closedBall _ _, ?_,
-    Metric.mem_closedBall_self hε2.le, ?_⟩
+  refine ⟨
+    Metric.closedBall a₀ (ε / 2),
+    isCompact_closedBall _ _,
+    ?_,
+    Metric.mem_closedBall_self hε2.le,
+    ?_
+  ⟩
   · have hpi : ∀ x : Fin r → F, IsOpen (Metric.closedBall x (ε / 2)) := by
       intro x
       rw [closedBall_pi x hε2.le]

@@ -40,44 +40,148 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk Formalism.MainNotions.Lnk Formalism.MainNotions.GlobalTheoryTheory Formalism.L2.GlobalTheoryTheory Formalism.MainNotions.RT GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Fc
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk Formalism.MainNotions.Lnk
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.L2.GlobalTheoryTheory Formalism.MainNotions.RT
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Fc
 namespace GlobalTheory.Fc
-theorem nonempty_hyps_of_allRows_alt : StandardLattice.SiegelMassRatioCM → LitThin → Formalism.L2.SG.Pf.WuDecayOfGap → Formalism.L2.SG.RowsDef.RowsFinDim → Formalism.L2.SG.RowsPos.TypeP → Formalism.L2.SG.RowsPos.RowNGP → Formalism.L2.SG.RowsPos.RowMainEqP → (∀ D, MassRatioUnderVolume D) → (∀ D, Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.GenusMassAt D 2) → ∀ (KP : ∀ B : GlobalTheory.Mem.Base, Fr B.toPre → Prop) (Q Q' : V4.Slot) (Lk : LkT _root_.GlobalTheory.Fc.BundleCondition) (N : FamClass → Prop) (DR : _root_.GlobalTheory.Fc.R1.DefiniteSideType), (DC.MinkDiv → GroupRetwisting.BaseCond KP ∧ GroupRetwisting.FirstG KP Q ∧ GroupRetwisting.ExportF KP Q ∧ GroupRetwisting.SecondG KP Q Q') → ExBL KP Q Q' Lk → _root_.GlobalTheory.Fc.AllRowsAlt KP Q Q' Lk N DR → Nonempty (_root_.GlobalTheory.Fc.HypsAlt N DR) := by
+theorem nonempty_hyps_of_allRows_alt
+    : StandardLattice.SiegelMassRatioCM → LitThin → Formalism.L2.SG.Pf.WuDecayOfGap
+      → Formalism.L2.SG.RowsDef.RowsFinDim → Formalism.L2.SG.RowsPos.TypeP
+      → Formalism.L2.SG.RowsPos.RowNGP → Formalism.L2.SG.RowsPos.RowMainEqP
+      → (∀ D, MassRatioUnderVolume D)
+      → (∀ D, Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.GenusMassAt D 2)
+      → ∀ (KP : ∀ B : GlobalTheory.Mem.Base, Fr B.toPre → Prop) (Q Q' : V4.Slot)
+          (Lk : LkT _root_.GlobalTheory.Fc.BundleCondition) (N : FamClass → Prop)
+          (DR : _root_.GlobalTheory.Fc.R1.DefiniteSideType),
+        (DC.MinkDiv
+            → GroupRetwisting.BaseCond KP ∧ GroupRetwisting.FirstG KP Q
+              ∧ GroupRetwisting.ExportF KP Q ∧ GroupRetwisting.SecondG KP Q Q')
+          → ExBL KP Q Q' Lk → _root_.GlobalTheory.Fc.AllRowsAlt KP Q Q' Lk N DR
+          → Nonempty (_root_.GlobalTheory.Fc.HypsAlt N DR) := by
   intro hP hLit hWu hRF hTy hNG hM hU hG KP Q Q' Lk N DR hc hx hA
   obtain ⟨R30, hR30, c30, cIc, hb30, hpos, r30⟩ := hA.c30
-  have rTu := Row.rowL (KP := KP) (Q := Q) largeBaseProperty_true (_root_.GlobalTheory.T.hTu_cTmin_of_genusMass hU hG Q' Lk)
-  have hall := RowL.and (hA.hn4 : RowL KP Q Q' Lk fun 𝒜 _ => R0.ClassCountBoundAllPoints 𝒜) <|
-    RowL.and (hA.jOn : RowL KP Q Q' Lk fun 𝒜 _ => R0.H_jOn 𝒜) <|
-    RowL.and (hA.hInstR : RowL KP Q Q' Lk fun 𝒜 _ => ClassTwoEntries.H_hInstR 𝒜) <|
-    RowL.and (hA.aC2 : RowL KP Q Q' Lk fun 𝒜 _ => ClassTwoEntries.DivisionSecondComplementAdmissible 𝒜) <|
-    RowL.and (hA.aP10 : RowL KP Q Q' Lk fun 𝒜 _ => AllBundlePointProperties.LevelPrimeColumnValuationsClosed 𝒜) <|
-    RowL.and (hA.aAtG : RowL KP Q Q' Lk fun 𝒜 _ => AllBundlePointProperties.H_aAtG 𝒜) <|
-    RowL.and (hA.aPt0 : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.ReferenceChainEvaluationAdmissible 𝒜) <|
-    RowL.and (hA.aPtTw : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.H_aPtTw 𝒜) <|
-    RowL.and (hA.aPer0 : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.H_aPer0 𝒜) <|
-    RowL.and (hA.aPerTw : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.H_aPerTw 𝒜) <|
-    RowL.and (hA.tie : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.H_tie 𝒜) <|
-    RowL.and (hA.hRB : RowL KP Q Q' Lk (AtAll _root_.GlobalTheory.Fc.R1.P_hRB_alt)) <|
-    RowL.and (hA.hTw : RowL KP Q Q' Lk (AtAll _root_.GlobalTheory.Fc.R1.TwistBundleCondition)) <|
-    RowL.and (hA.hPA : RowL KP Q Q' Lk (AtAll _root_.GlobalTheory.Fc.R1.PrimitivityBundleCondition)) <|
-    RowL.and (hA.hLamP : RowL KP Q Q' Lk (AtAll _root_.GlobalTheory.Fc.R1.LambdaPrimeBundleCondition)) <|
-    RowL.and (hA.hDivG : RowL KP Q Q' Lk (AtAll _root_.GlobalTheory.Fc.R1.DivisorBundleCondition)) <|
-    RowL.and (hA.hDcPtG : RowL KP Q Q' Lk (AtAll _root_.GlobalTheory.Fc.R1.DecompositionPointBundle)) <|
-    RowL.and (hA.selJ : RowL KP Q Q' Lk (AtAll _root_.GlobalTheory.Fc.R1.SelectionJumpBundleCondition)) <|
-    RowL.and (hA.sLp : RowL KP Q Q' Lk _root_.GlobalTheory.Fc.R1.SelectionLpBound) <|
-    RowL.and (hA.sO : RowL KP Q Q' Lk _root_.GlobalTheory.Fc.R1.SelectionOrderBound) <|
-    RowL.and (hA.hServ : RowL KP Q Q' Lk _root_.GlobalTheory.Fc.R1.SelectionServesFamily) <|
-    RowL.and (hA.zL : RowL KP Q Q' Lk _root_.GlobalTheory.Fc.R1.SelectionZeroLocus) <|
-    RowL.and (hA.hTF : RowL KP Q Q' Lk fun 𝒜 _ => R1.H_hTF 𝒜) <|
-    RowL.and (hA.rRows : RowL KP Q Q' Lk (_root_.GlobalTheory.Fc.R1.SelectionDefiniteRows DR)) <|
-    RowL.and (hA.nRest : RowL KP Q Q' Lk fun 𝒜 _ => N (GlobalTheory.Cp.D3 3 𝒜)) <|
-    RowL.and (⟨R30, hR30, r30⟩ : RowL KP Q Q' Lk _) rTu
-  obtain ⟨𝒜, σ, hE, hD, -, hn4, jOn, hInstR, aC2, aP10, aAtG, aPt0, aPtTw, aPer0, aPerTw, tie, hRB, hTw, hPA, hLamP, hDivG,
-    hDcPtG, selJ, sLp, sO, hServ, zL, hTF, rRows, nRest, ⟨h30, irrC⟩, hTu⟩ :=
-    UpperTheory.Top.classSel hP (fun D => hU D) KP Q Q' _root_.GlobalTheory.Fc.BundleCondition Lk _ (fun _ y => Formalism.MainNotions.StandardLattice.HarishChandraReduction.cTmin y) hc hx hall
-  have s3 : ∀ {eps : ℝ} (Fm : FamP eps), GlobalTheory.Cp.D3 3 𝒜 Fm → W3 𝒜 Fm := fun Fm h => ((GlobalTheory.T.workingFamClass_copies_eq_frozen.1 𝒜 _ Fm).1).1 h
-  have s1 : ∀ {eps : ℝ} (Fm : FamP eps), Formalism.MainNotions.WithTw (Formalism.MainNotions.WithSm (GlobalTheory.Cp.WithChN 𝒜)) Fm → W1 𝒜 Fm :=
-    fun Fm h => ((GlobalTheory.T.workingFamClass_copies_eq_frozen.1 𝒜 _ Fm).2).1 h
+  have rTu :=
+    Row.rowL (KP := KP) (Q := Q) largeBaseProperty_true
+      (_root_.GlobalTheory.T.hTu_cTmin_of_genusMass hU hG Q' Lk)
+  have hall :=
+    RowL.and (hA.hn4 : RowL KP Q Q' Lk fun 𝒜 _ => R0.ClassCountBoundAllPoints 𝒜) <|
+      RowL.and (hA.jOn : RowL KP Q Q' Lk fun 𝒜 _ => R0.H_jOn 𝒜) <|
+        RowL.and (hA.hInstR : RowL KP Q Q' Lk fun 𝒜 _ => ClassTwoEntries.H_hInstR 𝒜) <|
+          RowL.and
+              (hA.aC2 : RowL KP Q Q' Lk fun 𝒜 _ =>
+                ClassTwoEntries.DivisionSecondComplementAdmissible 𝒜) <|
+            RowL.and
+                (hA.aP10 : RowL KP Q Q' Lk fun 𝒜 _ =>
+                  AllBundlePointProperties.LevelPrimeColumnValuationsClosed 𝒜) <|
+              RowL.and (hA.aAtG : RowL KP Q Q' Lk fun 𝒜 _ => AllBundlePointProperties.H_aAtG 𝒜) <|
+                RowL.and
+                    (hA.aPt0 : RowL KP Q Q' Lk fun 𝒜 _ =>
+                      PeriodEntriesOverColumns.ReferenceChainEvaluationAdmissible 𝒜) <|
+                  RowL.and
+                      (hA.aPtTw : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.H_aPtTw 𝒜) <|
+                    RowL.and
+                        (hA.aPer0
+                          : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.H_aPer0 𝒜) <|
+                      RowL.and
+                          (hA.aPerTw
+                            : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.H_aPerTw 𝒜) <|
+                        RowL.and
+                            (hA.tie
+                              : RowL KP Q Q' Lk fun 𝒜 _ => PeriodEntriesOverColumns.H_tie 𝒜) <|
+                          RowL.and
+                              (hA.hRB
+                                : RowL KP Q Q' Lk (AtAll _root_.GlobalTheory.Fc.R1.P_hRB_alt)) <|
+                            RowL.and
+                                (hA.hTw : RowL KP Q Q' Lk
+                                  (AtAll _root_.GlobalTheory.Fc.R1.TwistBundleCondition)) <|
+                              RowL.and
+                                  (hA.hPA : RowL KP Q Q' Lk
+                                    (AtAll _root_.GlobalTheory.Fc.R1.PrimitivityBundleCondition)) <|
+                                RowL.and
+                                    (hA.hLamP : RowL KP Q Q' Lk
+                                      (AtAll
+                                        _root_.GlobalTheory.Fc.R1.LambdaPrimeBundleCondition)) <|
+                                  RowL.and
+                                      (hA.hDivG : RowL KP Q Q' Lk
+                                        (AtAll _root_.GlobalTheory.Fc.R1.DivisorBundleCondition)) <|
+                                    RowL.and
+                                        (hA.hDcPtG : RowL KP Q Q' Lk
+                                          (AtAll
+                                            _root_.GlobalTheory.Fc.R1.DecompositionPointBundle)) <|
+                                      RowL.and
+                                          (hA.selJ : RowL KP Q Q' Lk
+                                            (AtAll
+                                              _root_.GlobalTheory.Fc.R1.SelectionJumpBundleCondition)) <|
+                                        RowL.and
+                                            (hA.sLp : RowL KP Q Q' Lk
+                                              _root_.GlobalTheory.Fc.R1.SelectionLpBound) <|
+                                          RowL.and
+                                              (hA.sO : RowL KP Q Q' Lk
+                                                _root_.GlobalTheory.Fc.R1.SelectionOrderBound) <|
+                                            RowL.and
+                                                (hA.hServ : RowL KP Q Q' Lk
+                                                  _root_.GlobalTheory.Fc.R1.SelectionServesFamily) <|
+                                              RowL.and
+                                                  (hA.zL : RowL KP Q Q' Lk
+                                                    _root_.GlobalTheory.Fc.R1.SelectionZeroLocus) <|
+                                                RowL.and
+                                                    (hA.hTF
+                                                      : RowL KP Q Q' Lk fun 𝒜 _ => R1.H_hTF 𝒜) <|
+                                                  RowL.and
+                                                      (hA.rRows : RowL KP Q Q' Lk
+                                                        (_root_.GlobalTheory.Fc.R1.SelectionDefiniteRows
+                                                          DR)) <|
+                                                    RowL.and
+                                                        (hA.nRest : RowL KP Q Q' Lk fun 𝒜 _ =>
+                                                          N (GlobalTheory.Cp.D3 3 𝒜)) <|
+                                                      RowL.and
+                                                        (⟨R30, hR30, r30⟩ : RowL KP Q Q' Lk _) rTu
+  obtain ⟨
+      𝒜,
+      σ,
+      hE,
+      hD,
+      -,
+      hn4,
+      jOn,
+      hInstR,
+      aC2,
+      aP10,
+      aAtG,
+      aPt0,
+      aPtTw,
+      aPer0,
+      aPerTw,
+      tie,
+      hRB,
+      hTw,
+      hPA,
+      hLamP,
+      hDivG,
+      hDcPtG,
+      selJ,
+      sLp,
+      sO,
+      hServ,
+      zL,
+      hTF,
+      rRows,
+      nRest,
+      ⟨h30, irrC⟩,
+      hTu
+    ⟩ :=
+    UpperTheory.Top.classSel hP
+      (fun D => hU D)
+      KP Q Q' _root_.GlobalTheory.Fc.BundleCondition Lk _
+      (fun _ y => Formalism.MainNotions.StandardLattice.HarishChandraReduction.cTmin y)
+      hc hx hall
+  have s3 : ∀ {eps : ℝ} (Fm : FamP eps), GlobalTheory.Cp.D3 3 𝒜 Fm → W3 𝒜 Fm := fun Fm h =>
+    ((GlobalTheory.T.workingFamClass_copies_eq_frozen.1 𝒜 _ Fm).1).1 h
+  have s1
+      : ∀ {eps : ℝ} (Fm : FamP eps),
+        Formalism.MainNotions.WithTw (Formalism.MainNotions.WithSm (GlobalTheory.Cp.WithChN 𝒜)) Fm
+          → W1 𝒜 Fm := fun Fm h =>
+    ((GlobalTheory.T.workingFamClass_copies_eq_frozen.1 𝒜 _ Fm).2).1 h
   exact ⟨{
     𝒜 := 𝒜
     σ := σ
@@ -124,6 +228,7 @@ theorem nonempty_hyps_of_allRows_alt : StandardLattice.SiegelMassRatioCM → Lit
     tie := Formalism.MainNotions.Pk.Closed.sub tie s3
     hU := hU
     hG := hG
-    nRest := nRest }⟩
+    nRest := nRest
+  }⟩
 end GlobalTheory.Fc
 end

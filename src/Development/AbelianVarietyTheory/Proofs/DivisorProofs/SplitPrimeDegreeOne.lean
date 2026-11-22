@@ -5,15 +5,17 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTenso
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun
 
 namespace GlobalTheory.SplitFullyNorm
 
-theorem exists_prime_absNorm_eq_of_splitsFully (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (W : HeightOneSpectrum (𝓞 E)) (h : SplitsFully E (W.under (𝓞 F))) :
-    ∃ p : ℕ, p.Prime ∧ Ideal.absNorm W.asIdeal = p ∧ (p : 𝓞 E) ∉ W.asIdeal ^ 2 := by
+theorem exists_prime_absNorm_eq_of_splitsFully
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (W : HeightOneSpectrum (𝓞 E)) (h : SplitsFully E (W.under (𝓞 F)))
+    : ∃ p : ℕ, p.Prime ∧ Ideal.absNorm W.asIdeal = p ∧ (p : 𝓞 E) ∉ W.asIdeal ^ 2 := by
   classical
-
   set P : Ideal ℤ := W.asIdeal.under ℤ with hPdef
   have hP0 : P ≠ ⊥ := mt Ideal.eq_bot_of_comap_eq_bot W.ne_bot
   haveI hPprime : P.IsPrime := Ideal.IsPrime.under ℤ W.asIdeal
@@ -35,15 +37,17 @@ theorem exists_prime_absNorm_eq_of_splitsFully (F E : Type) [Field F] [NumberFie
     haveI : q.1.IsPrime := q.2.1
     have hpos := Nat.mul_pos (Ideal.ramificationIdx_pos (R := ℤ) q.1) (Ideal.inertiaDeg_pos q.1 ℤ)
     by_contra hne
-    have hlt : ∑ _r : P.primesOver (𝓞 E), (1 : ℕ) <
-        ∑ r : P.primesOver (𝓞 E), r.1.ramificationIdx ℤ * r.1.inertiaDeg ℤ := by
+    have hlt
+        : ∑ _r : P.primesOver (𝓞 E), (1 : ℕ)
+          < ∑ r : P.primesOver (𝓞 E), r.1.ramificationIdx ℤ * r.1.inertiaDeg ℤ := by
       apply Finset.sum_lt_sum
       · intro r _
         haveI : r.1.IsPrime := r.2.1
         exact Nat.mul_pos (Ideal.ramificationIdx_pos (R := ℤ) r.1) (Ideal.inertiaDeg_pos r.1 ℤ)
       · exact ⟨q, Finset.mem_univ _, by omega⟩
     rw [hsum, Finset.sum_const, Finset.card_univ, smul_eq_mul, mul_one, Fintype.card_eq_nat_card,
-      Nat.card_coe_set_eq, hcard] at hlt
+        Nat.card_coe_set_eq, hcard]
+      at hlt
     exact lt_irrefl _ hlt
   have hWmem : W.asIdeal ∈ P.primesOver (𝓞 E) := ⟨W.isPrime, ⟨rfl⟩⟩
   have hw := hone ⟨W.asIdeal, hWmem⟩
@@ -62,10 +66,8 @@ theorem exists_prime_absNorm_eq_of_splitsFully (F E : Type) [Field F] [NumberFie
     exact hPprime
   haveI : W.asIdeal.LiesOver (Ideal.span {((n : ℕ) : ℤ)}) := ⟨by rw [hspan]⟩
   refine ⟨n, hnprime, ?_, ?_⟩
-  ·
-    rw [← Ideal.pow_inertiaDeg n W.asIdeal, hf, pow_one]
-  ·
-    intro hmem
+  · rw [← Ideal.pow_inertiaDeg n W.asIdeal, hf, pow_one]
+  · intro hmem
     have hmap0 : P.map (algebraMap ℤ (𝓞 E)) ≠ ⊥ := Ideal.map_ne_bot_of_ne_bot hP0
     have hle : P.map (algebraMap ℤ (𝓞 E)) ≤ W.asIdeal ^ 2 := by
       rw [← hspan, Ideal.map_span, Set.image_singleton, Ideal.span_le, Set.singleton_subset_iff]

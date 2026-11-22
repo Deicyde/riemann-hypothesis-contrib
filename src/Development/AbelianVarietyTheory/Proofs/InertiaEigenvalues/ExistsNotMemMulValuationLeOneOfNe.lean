@@ -8,9 +8,12 @@ open IsDedekindDomain NumberField
 
 namespace GlobalTheory
 
-theorem exists_notMem_mul_valuation_le_one_of_ne : ∀ {F : Type} [Field F] [NumberField F]
-    (p : HeightOneSpectrum (𝓞 F)) {ι : Type} [Finite ι] (x : ι → F), ∃ s : 𝓞 F, s ∉ p.asIdeal ∧
-      ∀ q : HeightOneSpectrum (𝓞 F), q ≠ p → ∀ i, q.valuation F ((s : F) * x i) ≤ 1 := by
+theorem exists_notMem_mul_valuation_le_one_of_ne
+    : ∀ {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F)) {ι : Type} [Finite ι]
+        (x : ι → F),
+      ∃ s : 𝓞 F,
+        s ∉ p.asIdeal
+          ∧ ∀ q : HeightOneSpectrum (𝓞 F), q ≠ p → ∀ i, q.valuation F ((s : F) * x i) ≤ 1 := by
   intro F _ _ p ι _ x
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (𝓞 F)) x
   have hc : (b : 𝓞 F) ≠ 0 := nonZeroDivisors.ne_zero b.2
@@ -26,8 +29,7 @@ theorem exists_notMem_mul_valuation_le_one_of_ne : ∀ {F : Type} [Field F] [Num
     have h1 : p.asIdeal ≤ q.asIdeal := q.isPrime.le_of_pow_le h
     exact hq (HeightOneSpectrum.ext (p.isMaximal.eq_of_le q.isPrime.ne_top h1).symm)
   obtain ⟨t, ht, htq⟩ := SetLike.not_le_iff_exists.mp hpow
-  have hts : t * s ∈ Ideal.span {(b : 𝓞 F)} := by
-    rw [hJ]; exact Ideal.mul_mem_mul ht hsJ
+  have hts : t * s ∈ Ideal.span {(b : 𝓞 F)} := by rw [hJ]; exact Ideal.mul_mem_mul ht hsJ
   obtain ⟨u, hu⟩ := Ideal.mem_span_singleton.mp hts
   obtain ⟨a, ha⟩ := hb i
   replace ha : algebraMap (𝓞 F) F a = algebraMap (𝓞 F) F (b : 𝓞 F) * x i := by

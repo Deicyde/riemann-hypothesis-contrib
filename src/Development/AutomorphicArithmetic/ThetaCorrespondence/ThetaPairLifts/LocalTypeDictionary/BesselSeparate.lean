@@ -10,8 +10,10 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 section
 namespace UpperTheory.Lit
 open GlobalTheory.SepRows
-theorem bessel_separate_of_step_gap (P : _root_.GlobalTheory.FunPr.ThetaLocalInputs) (hT : RowTower) :
-    SizeGap → GoodRows → RowConv → WeakSep → GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.FunctionalsSeparate :=
-  Bur.separate_of_burGapPos burGapPos GlobalTheory.T.dualCoefSpace_isTensorOverRealPlaces (_root_.GlobalTheory.T.theta_lifts_separate_points P) hT
+theorem bessel_separate_of_step_gap (P : _root_.GlobalTheory.FunPr.ThetaLocalInputs) (hT : RowTower)
+    : SizeGap → GoodRows → RowConv → WeakSep
+      → GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.FunctionalsSeparate :=
+  Bur.separate_of_burGapPos burGapPos GlobalTheory.T.dualCoefSpace_isTensorOverRealPlaces
+    (_root_.GlobalTheory.T.theta_lifts_separate_points P) hT
 end UpperTheory.Lit
 end

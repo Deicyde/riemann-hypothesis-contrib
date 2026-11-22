@@ -15,8 +15,8 @@ section Padic
 
 variable {l : ℕ} [Fact l.Prime]
 
-private theorem pow_dvd_iff_le_valuation_lemma {x : ℤ_[l]} (hx : x ≠ 0) (n : ℕ) :
-    (l : ℤ_[l]) ^ n ∣ x ↔ n ≤ x.valuation := by
+private theorem pow_dvd_iff_le_valuation_lemma {x : ℤ_[l]} (hx : x ≠ 0) (n : ℕ)
+    : (l : ℤ_[l]) ^ n ∣ x ↔ n ≤ x.valuation := by
   simpa [Ideal.mem_span_singleton] using PadicInt.mem_span_pow_iff_le_valuation x hx n
 
 lemma emultiplicity_eq_valuation {x : ℤ_[l]} (hx : x ≠ 0) :

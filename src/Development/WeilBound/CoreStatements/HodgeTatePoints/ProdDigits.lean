@@ -17,7 +17,9 @@ open scoped Matrix
 namespace PositivityTheory.HtPt.Pmono
 
 section
-variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
+variable
+  {C : Type} [Field C]
+  {R : Type} [CommRing R] [Algebra R C]
   {F : Type} [Field F] [Fintype F] [DecidableEq F]
 
 omit [Fintype F] [DecidableEq F] in
@@ -77,26 +79,52 @@ lemma prod_digits {p f : ℕ} (hp : p ≠ 0) (w : ℕ → NNReal) :
   have := (Finset.mem_Icc.1 hm).1
   omega
 
-theorem r_mono : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (AA : HopfOrder (C := C) R F), FStable (F := F) AA.carrier → ∀ σ : MulChar F R, IsFund p σ → ∀ c : ℕ → R, (∀ n, xIdeal AA.carrier (σ ^ p ^ n) = Ideal.span {c n}) → (∀ n, v (p : C) ≤ v (algebraMap R C (c n)) ^ (p - 1)) ∧ ∀ d : Fin f → Fin p, (∃ n, (d n : ℕ) ≠ 0) → xIdeal AA.carrier (σ ^ (∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ))) = Ideal.span {∏ n : Fin f, c n ^ (d n : ℕ)} := by
+theorem r_mono
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (AA : HopfOrder (C := C) R F),
+              FStable (F := F) AA.carrier
+                → ∀ σ : MulChar F R,
+                  IsFund p σ
+                    → ∀ c : ℕ → R,
+                      (∀ n, xIdeal AA.carrier (σ ^ p ^ n) = Ideal.span {c n})
+                        → (∀ n, v (p : C) ≤ v (algebraMap R C (c n)) ^ (p - 1))
+                          ∧ ∀ d : Fin f → Fin p,
+                            (∃ n, (d n : ℕ) ≠ 0)
+                              → xIdeal AA.carrier (σ ^ (∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ)))
+                                = Ideal.span {∏ n : Fin f, c n ^ (d n : ℕ)} := by
   intro p hpp C _ _ _ v R _ _ hv hvp F _ _ _ _ f hf AA hst σ hσ c hc
   have hp0 : p ≠ 0 := hpp.out.ne_zero
   obtain ⟨AD, hstD, hcol, hfund⟩ := rank_one_sum p C v R hv hvp F f hf AA hst
-  obtain ⟨-, -, hpow, -, -⟩ := GlobalTheory.CompanionTheory.Ar.GR.FundGen.main p C v R hv hvp F f hf σ hσ
+  obtain ⟨-, -, hpow, -, -⟩ :=
+    GlobalTheory.CompanionTheory.Ar.GR.FundGen.main p C v R hv hvp F f hf σ hσ
   choose g hg0 hg using fun m : ℕ => (eig_rank_one p C v R hv hvp F f hf AA hst (σ ^ m)).1
   choose gD hgD0 hgD using fun m : ℕ => (eig_rank_one p C v R hv hvp F f hf AD hstD (σ ^ m)).1
-  have hx : ∀ n : ℕ, (v (algebraMap R C (c n)) * v (algebraMap R C (gD (p ^ n)))) ^ (p - 1) =
-      v (p : C) := fun n => hfund (σ ^ p ^ n) (hpow n) _ _ (hc n) (hgD _)
-  have hle : ∀ (BB : HopfOrder (C := C) R F) (γ b : ℕ → R),
-      (∀ m, xIdeal BB.carrier (σ ^ m) = Ideal.span {γ m}) →
-      (∀ n, xIdeal BB.carrier (σ ^ p ^ n) = Ideal.span {b n}) →
-      ∀ d : Fin f → Fin p, ∏ n : Fin f, v (algebraMap R C (b n)) ^ (d n : ℕ) ≤
-        if ∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ) = 0 then 1
-        else v (algebraMap R C (γ (∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ)))) := by
+  have hx
+      : ∀ n : ℕ,
+        (v (algebraMap R C (c n)) * v (algebraMap R C (gD (p ^ n)))) ^ (p - 1) = v (p : C) :=
+    fun n => hfund (σ ^ p ^ n) (hpow n) _ _ (hc n) (hgD _)
+  have hle
+      : ∀ (BB : HopfOrder (C := C) R F) (γ b : ℕ → R),
+        (∀ m, xIdeal BB.carrier (σ ^ m) = Ideal.span {γ m})
+          → (∀ n, xIdeal BB.carrier (σ ^ p ^ n) = Ideal.span {b n})
+          → ∀ d : Fin f → Fin p,
+            ∏ n : Fin f, v (algebraMap R C (b n)) ^ (d n : ℕ)
+              ≤ if ∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ) = 0 then
+                  1
+                else
+                  v (algebraMap R C (γ (∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ)))) := by
     intro BB γ b hγ hb d
     split_ifs with h
     · exact Finset.prod_le_one' fun n _ => pow_le_one' (hv.map_le_one _) _
-    · have hm := mono_mem BB σ hp0 b
-        (fun n => by rw [hb n]; exact Ideal.mem_span_singleton_self _) (fun n => (d n : ℕ)) h
+    · have hm :=
+        mono_mem BB σ hp0 b
+          (fun n => by rw [hb n]; exact Ideal.mem_span_singleton_self _)
+          (fun n => (d n : ℕ))
+          h
       rw [hγ, Ideal.mem_span_singleton, hv.dvd_iff_le] at hm
       simpa only [map_prod, map_pow] using hm
   refine ⟨fun n => ?_, fun d hd => ?_⟩
@@ -107,22 +135,27 @@ theorem r_mono : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
     have hP : v (p : C) ≠ 0 := by
       rw [Ne, map_eq_zero]
       exact_mod_cast hp0
-    have key := (count p f hpp.out.two_le (v (p : C)) hP (fun n => v (algebraMap R C (c n)))
-      (fun n => v (algebraMap R C (gD (p ^ (n : ℕ))))) _ _ (fun n => hx n) (hle AA g c hg hc)
-      (hle AD gD (fun n => gD (p ^ n)) hgD fun n => hgD _)
-      (by
-        rw [Finset.prod_mul_distrib, prod_digits hp0 fun m => v (algebraMap R C (g m)),
-          prod_digits hp0 fun m => v (algebraMap R C (gD m))]
-        exact hcol _ _ hN hD) d).1
+    have key :=
+      (count p f hpp.out.two_le (v (p : C)) hP
+        (fun n => v (algebraMap R C (c n)))
+        (fun n => v (algebraMap R C (gD (p ^ (n : ℕ)))))
+        _ _
+        (fun n => hx n)
+        (hle AA g c hg hc) (hle AD gD (fun n => gD (p ^ n)) hgD fun n => hgD _)
+        (by
+          rw [Finset.prod_mul_distrib, prod_digits hp0 fun m => v (algebraMap R C (g m)),
+            prod_digits hp0 fun m => v (algebraMap R C (gD m))]
+          exact hcol _ _ hN hD)
+        d).1
     have hne : ∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ) ≠ 0 := by
       obtain ⟨n, hn⟩ := hd
       intro h
-      exact mul_ne_zero hn (pow_ne_zero _ hp0)
-        (Finset.sum_eq_zero_iff.1 h n (Finset.mem_univ n))
+      exact mul_ne_zero hn (pow_ne_zero _ hp0) (Finset.sum_eq_zero_iff.1 h n (Finset.mem_univ n))
     rw [if_neg hne] at key
     rw [hg]
-    have hval : v (algebraMap R C (∏ n : Fin f, c n ^ (d n : ℕ))) =
-        v (algebraMap R C (g (∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ)))) := by
+    have hval
+        : v (algebraMap R C (∏ n : Fin f, c n ^ (d n : ℕ)))
+          = v (algebraMap R C (g (∑ n : Fin f, (d n : ℕ) * p ^ (n : ℕ)))) := by
       rw [key]
       simp only [map_prod, map_pow]
     exact le_antisymm (Ideal.span_singleton_le_span_singleton.2 (hv.dvd_of_le hval.ge))

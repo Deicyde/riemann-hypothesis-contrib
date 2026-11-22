@@ -6,16 +6,17 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassOrder.D
 
 noncomputable section
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain
 open scoped TensorProduct
 
 namespace PI.LocMassTypW
 
 def LatOfGlob : Prop :=
   ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (Λ : Set (Fin n → E)),
-    (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsFullLattice E L ∧ (L : Set (Fin n → E)) = Λ) →
-    LocMassOrdW.IsLatLoc v Λ
+      (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (Λ : Set (Fin n → E)),
+    (∃ L : Submodule (𝓞 E) (Fin n → E), Submodule.IsFullLattice E L ∧ (L : Set (Fin n → E)) = Λ)
+      → LocMassOrdW.IsLatLoc v Λ
 
 end PI.LocMassTypW
 
@@ -23,23 +24,24 @@ namespace PI.LocMassTypL
 
 section Rat
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R] {n : ℕ}
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R] {n : ℕ}
 
-theorem ratV_add (x y : Fin n → E) : ratV (F := F) R (x + y) = ratV (F := F) R x + ratV (F := F) R y := by
+theorem ratV_add (x y : Fin n → E)
+    : ratV (F := F) R (x + y) = ratV (F := F) R x + ratV (F := F) R y := by
   funext i; simp [ratV, map_add (f := _)]
 
-theorem ratV_zero : ratV (F := F) R (0 : Fin n → E) = 0 := by
-  funext i; simp [ratV]
+theorem ratV_zero : ratV (F := F) R (0 : Fin n → E) = 0 := by funext i; simp [ratV]
 
-theorem ratV_sum {ι : Type} (s : Finset ι) (x : ι → Fin n → E) :
-    ratV (F := F) R (∑ i ∈ s, x i) = ∑ i ∈ s, ratV (F := F) R (x i) := by
+theorem ratV_sum {ι : Type} (s : Finset ι) (x : ι → Fin n → E)
+    : ratV (F := F) R (∑ i ∈ s, x i) = ∑ i ∈ s, ratV (F := F) R (x i) := by
   funext j; simp [ratV, map_sum, Finset.sum_apply]
 
 theorem ratV_zsmul (m : ℤ) (x : Fin n → E) : ratV (F := F) R (m • x) = m • ratV (F := F) R x := by
   funext i; simp [ratV, map_zsmul]
 
-theorem ratV_smul (a : E) (x : Fin n → E) :
-    ratV (F := F) R (a • x) = inclR (F := F) R a • ratV (F := F) R x := by
+theorem ratV_smul (a : E) (x : Fin n → E)
+    : ratV (F := F) R (a • x) = inclR (F := F) R a • ratV (F := F) R x := by
   funext i; simp [ratV, map_mul]
 
 end Rat
@@ -56,8 +58,10 @@ theorem local_lattice_of_global : PI.LocMassTypW.LatOfGlob := by
   have hTL : T ⊆ (L : Set (Fin n → E)) := by
     rintro _ ⟨⟨j, s⟩, rfl⟩
     exact L.smul_mem _ (hS ▸ Submodule.subset_span (Finset.mem_coe.2 s.2))
-  have key : ∀ x ∈ L, ratV (F := F) (Fv F v) x ∈
-      Submodule.span (v.adicCompletionIntegers F) (ratV (F := F) (Fv F v) '' T) := by
+  have key
+      : ∀ x ∈ L,
+        ratV (F := F) (Fv F v) x
+          ∈ Submodule.span (v.adicCompletionIntegers F) (ratV (F := F) (Fv F v) '' T) := by
     intro x hx
     rw [← hS] at hx
     obtain ⟨f, -, rfl⟩ := (Submodule.mem_span_finset).1 hx
@@ -69,8 +73,9 @@ theorem local_lattice_of_global : PI.LocMassTypW.LatOfGlob := by
     have hmem : ratV (F := F) (Fv F v) ((b j : 𝓞 E) • s) ∈ ratV (F := F) (Fv F v) '' T :=
       ⟨_, ⟨(j, ⟨s, hs⟩), rfl⟩, rfl⟩
     exact zsmul_mem (Submodule.subset_span hmem) _
-  have heq : latLoc (E := E) v Λ =
-      Submodule.span (v.adicCompletionIntegers F) (ratV (F := F) (Fv F v) '' T) := by
+  have heq
+      : latLoc (E := E) v Λ
+        = Submodule.span (v.adicCompletionIntegers F) (ratV (F := F) (Fv F v) '' T) := by
     apply le_antisymm
     · rw [latLoc, Submodule.span_le]
       rintro _ ⟨x, hx, rfl⟩
@@ -80,9 +85,10 @@ theorem local_lattice_of_global : PI.LocMassTypW.LatOfGlob := by
       exact Submodule.span_mono (Set.image_mono (by rw [← hLΛ]; exact hTL))
   refine ⟨?_, ?_⟩
   · rw [heq]; exact Submodule.fg_span (hTfin.image _)
-  · have hspan : ∀ x ∈ Submodule.span E (L : Set (Fin n → E)),
-        ratV (F := F) (Fv F v) x ∈ Submodule.span (Fv F v ⊗[F] E)
-          (latLoc (E := E) v Λ : Set (Fin n → Fv F v ⊗[F] E)) := by
+  · have hspan
+        : ∀ x ∈ Submodule.span E (L : Set (Fin n → E)),
+          ratV (F := F) (Fv F v) x ∈ Submodule.span (Fv F v ⊗[F] E)
+            (latLoc (E := E) v Λ : Set (Fin n → Fv F v ⊗[F] E)) := by
       intro x hx
       induction hx using Submodule.span_induction with
       | mem y hy =>

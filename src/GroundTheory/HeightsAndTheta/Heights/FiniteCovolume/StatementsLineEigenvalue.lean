@@ -16,10 +16,13 @@ variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [De
 variable [NumberField E]
 
 def LineEigenvalue.Statement (h : HermitianForm F E W) (v : Basis ι E W) : Prop :=
-  ∀ x₀ : W, x₀ ≠ 0 → ∃ β : lineStab h v x₀ → (InfinitePlace E → ℂˣ), Continuous β ∧
-    ∀ (p : lineStab h v x₀) (w : InfinitePlace E),
-      (((p : archUnitary h v) : InfinitePlace E → GL ι ℂ) w : Matrix ι ι ℂ) *ᵥ vecAt v x₀ w =
-        (β p w : ℂ) • vecAt v x₀ w
+  ∀ x₀ : W,
+    x₀ ≠ 0
+      → ∃ β : lineStab h v x₀ → (InfinitePlace E → ℂˣ),
+        Continuous β
+          ∧ ∀ (p : lineStab h v x₀) (w : InfinitePlace E),
+            (((p : archUnitary h v) : InfinitePlace E → GL ι ℂ) w : Matrix ι ι ℂ) *ᵥ vecAt v x₀ w
+              = (β p w : ℂ) • vecAt v x₀ w
 
 section Inhabitants
 

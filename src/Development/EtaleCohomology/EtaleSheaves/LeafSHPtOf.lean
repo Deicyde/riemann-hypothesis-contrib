@@ -18,26 +18,28 @@ theorem leafSHTop : LeafSHTop := by
   constructor
   · intro O hxO
     have hU : Etale U.hom := U.prop
-    let U' : B.Etale := MorphismProperty.Over.mk ⊤ (O.ι ≫ U.hom) (by
-      change Etale (O.ι ≫ U.hom); infer_instance)
+    let U' : B.Etale :=
+      MorphismProperty.Over.mk ⊤ (O.ι ≫ U.hom) (by change Etale (O.ι ≫ U.hom); infer_instance)
     let b : U' ⟶ U := MorphismProperty.Over.homMk (A := U') (B := U) O.ι rfl
     obtain ⟨j, g, hg⟩ := hcof U' b ⟨x, hxO⟩ rfl
     rintro _ ⟨z, rfl⟩
     rw [← ht j, ← hg]
     have : Set.range (O.ι) ⊆ (O : Set U.left) := by rw [Scheme.Opens.range_ι]
     apply this
-    exact ⟨(Spec.map (CommRingCat.ofHom (c.ι.app j).hom) ≫ e j ≫ g) z, by
-      rfl⟩
+    exact ⟨(Spec.map (CommRingCat.ofHom (c.ι.app j).hom) ≫ e j ≫ g) z, by rfl⟩
   · intro S hS
     obtain ⟨𝒰, _, h, hU⟩ := (Scheme.mem_smallGrothendieckTopology _ _).1 hS
     obtain ⟨i, ⟨u, hu⟩⟩ := ((Scheme.ofArrows_mem_precoverage_iff _).1 𝒰.mem₀).1 x
     let fi : (𝒰.X i).asOverProp B (h i) ⟶ U := (𝒰.f i).asOverProp B
     refine ⟨_, fi, hU _ _ ⟨i⟩, ?_⟩
     obtain ⟨j, g, hg⟩ := hcof _ fi u hu
-    exact ⟨Spec.map (CommRingCat.ofHom (c.ι.app j).hom) ≫ e j ≫ g, by
-      rw [Category.assoc, Category.assoc, hg, ht j]⟩
+    exact ⟨
+      Spec.map (CommRingCat.ofHom (c.ι.app j).hom) ≫ e j ≫ g,
+      by rw [Category.assoc, Category.assoc, hg, ht j]
+    ⟩
 
-theorem LeafSHPt_of (hN : LateralTheory.E.LeafSHPtPf.LeafSHNb) : LateralTheory.E.LeafInj0VPf.LeafSHPt :=
+theorem LeafSHPt_of (hN : LateralTheory.E.LeafSHPtPf.LeafSHNb)
+    : LateralTheory.E.LeafInj0VPf.LeafSHPt :=
   LateralTheory.E.LeafSHPtPf.LeafSHPt_of hN leafSHTop
 
 end LateralTheory.E.StrictHenselianPoint

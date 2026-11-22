@@ -26,12 +26,12 @@ theorem SchProdOneSubRootsOfUnity.proof : SchProdOneSubRootsOfUnity.Statement :=
       compute_degree
     refine (natDegree_prod_le _ _).trans ((sum_le_sum h1).trans ?_)
     simp
-  have hqdeg : q.natDegree ≤ k := by
-    rw [hq]; compute_degree
+  have hqdeg : q.natDegree ≤ k := by rw [hq]; compute_degree
   have hdeg : (p - q).degree < #(insert (0 : ℂ) (nthRootsFinset k (1 : ℂ))) := by
     rw [card_insert_of_notMem (by simp [mem_nthRootsFinset hk0, zero_pow hk0.ne']),
       hζ.card_nthRootsFinset]
-    refine (degree_le_of_natDegree_le ((natDegree_sub_le _ _).trans (max_le hpdeg hqdeg))).trans_lt ?_
+    refine (degree_le_of_natDegree_le ((natDegree_sub_le _ _).trans (max_le hpdeg hqdeg))).trans_lt
+      ?_
     exact_mod_cast Nat.lt_succ_self k
   refine eq_of_degree_sub_lt_of_eval_finset_eq _ hdeg fun x hx => ?_
   rcases mem_insert.mp hx with rfl | hx
@@ -39,8 +39,7 @@ theorem SchProdOneSubRootsOfUnity.proof : SchProdOneSubRootsOfUnity.Statement :=
   · have hxk : x ^ k = 1 := (mem_nthRootsFinset hk0 _).mp hx
     have hinv : x⁻¹ ^ k = 1 := by rw [inv_pow, hxk, inv_one]
     obtain ⟨i, hi, hi'⟩ := hζ.eq_pow_of_pow_eq_one hinv
-    have hx0 : x ≠ 0 := by
-      rintro rfl; simp [zero_pow hk0.ne'] at hxk
+    have hx0 : x ≠ 0 := by rintro rfl; simp [zero_pow hk0.ne'] at hxk
     have hzero : p.eval x = 0 := by
       rw [hp, eval_prod]
       refine prod_eq_zero (mem_range.mpr hi) ?_

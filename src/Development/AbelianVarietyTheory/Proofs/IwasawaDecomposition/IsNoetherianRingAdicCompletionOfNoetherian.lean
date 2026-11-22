@@ -9,8 +9,9 @@ open IsLocalRing
 
 namespace GlobalTheory.AdicNoeth
 
-theorem isNoetherianRing_adicCompletion : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R),
-    IsNoetherianRing (AdicCompletion I R) := by
+theorem isNoetherianRing_adicCompletion
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R),
+      IsNoetherianRing (AdicCompletion I R) := by
   intro R _ _ I
   have fg : I.FG := I.fg_of_isNoetherianRing
   have hc := AdicCompletion.isAdicComplete_self I fg

@@ -15,10 +15,11 @@ namespace GlobalTheory.Mem.Col2
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV
   Formalism.HermitianLatticesTheory Module Matrix
 
-private theorem fullLattice_of_unimodular {E : Type} [Field E] [NumberField E] [StarRing E]
-    {n : ℕ} {L : Submodule (𝓞 E) (Sp E n)}
-    (hL : Submodule.IsLattice E L) (hu : Formalism.HermitianLatticesTheory.IsUnimodular (hStd E n) L) :
-    Submodule.IsFullLattice E L := by
+private theorem fullLattice_of_unimodular
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {n : ℕ} {L : Submodule (𝓞 E) (Sp E n)} (hL : Submodule.IsLattice E L)
+    (hu : Formalism.HermitianLatticesTheory.IsUnimodular (hStd E n) L)
+    : Submodule.IsFullLattice E L := by
   let := hL
   refine { span_eq_top := ?_ }
   let W := Submodule.span E (L : Set (Sp E n))
@@ -37,53 +38,77 @@ private theorem fullLattice_of_unimodular {E : Type} [Field E] [NumberField E] [
     intro y hy
     apply hStd_mem_one_symm
     have hxy : hStd E n (e x) y = 0 :=
-      congrArg (fun f : Module.Dual E W => f ⟨y, Submodule.subset_span hy⟩) (LinearMap.mem_ker.mp hx)
+      congrArg
+        (fun f : Module.Dual E W => f ⟨y, Submodule.subset_span hy⟩)
+        (LinearMap.mem_ker.mp hx)
     simp [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hxy]
   let i : E →ₗ[𝓞 E] L :=
     ((LinearMap.toSpanSingleton E _ (e x)).restrictScalars (𝓞 E)).codRestrict L hsmul
   let : Module.Finite (𝓞 E) L := Module.Finite.iff_fg.mpr hL.fg
-  let : Module.Finite (𝓞 E) E := Module.Finite.of_injective i fun a b hab =>
-    smul_left_injective E (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero)) (congrArg Subtype.val hab)
+  let : Module.Finite (𝓞 E) E :=
+    Module.Finite.of_injective i fun a b hab =>
+      smul_left_injective E
+        (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero))
+        (congrArg Subtype.val hab)
   exact RingOfIntegers.not_isField E
     (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 E) E) (Field.toIsField E))
 
 section StepOk
 
-variable {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 X.E))}
-  (y : Ys X n) (β : Type) [Fintype β] [DecidableEq β] (Λ : β → LevFam X.E X.K n SG) (Θ : β → LevQFam X.E X.K n Q)
-  (pref : DecoF X.E n ST SG Q → Prop)
+variable
+  {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 X.E))} (y : Ys X n)
+  (β : Type) [Fintype β] [DecidableEq β]
+  (Λ : β → LevFam X.E X.K n SG) (Θ : β → LevQFam X.E X.K n Q) (pref : DecoF X.E n ST SG Q → Prop)
 
-instance ptYInst (Λ : LevFam X.E X.K n SG) (Θ : LevQFam X.E X.K n Q) : MulAction (FrmG Λ Θ) (PtY ST SG Q y) := ptYAct y Λ Θ
+instance ptYInst (Λ : LevFam X.E X.K n SG) (Θ : LevQFam X.E X.K n Q)
+    : MulAction (FrmG Λ Θ) (PtY ST SG Q y) :=
+  ptYAct y Λ Θ
 
-theorem stepY_gam (b : β) (g : FrmG (Λ b) (Θ b)) (x : Sp X.E n) :
-    ((stepY ST y β Λ Θ pref).gam b g : Matrix (Fin n) (Fin n) X.E) *ᵥ x = g.1.1 x := toGLm_mulVec g.1.1 x
+theorem stepY_gam (b : β) (g : FrmG (Λ b) (Θ b)) (x : Sp X.E n)
+    : ((stepY ST y β Λ Θ pref).gam b g : Matrix (Fin n) (Fin n) X.E) *ᵥ x = g.1.1 x :=
+  toGLm_mulVec g.1.1 x
 
-theorem stepY_eq_one (b : β) (g : (stepY ST y β Λ Θ pref).G b) (p : (stepY ST y β Λ Θ pref).D b) (h : g • p = p)
-    (h1 : g.1 = 1) : g = 1 := by
-  have h2 : ((g.1, g.2.1.1) : UF X.E n × GLG (E := X.E) (n := n) (SG := SG)) • p.1.1.deco = p.1.1.deco := congrArg (fun q => q.1.1.deco) h
+theorem stepY_eq_one
+    (b : β) (g : (stepY ST y β Λ Θ pref).G b) (p : (stepY ST y β Λ Θ pref).D b)
+    (h : g • p = p) (h1 : g.1 = 1)
+    : g = 1 := by
+  have h2
+      : ((g.1, g.2.1.1) : UF X.E n × GLG (E := X.E) (n := n) (SG := SG)) • p.1.1.deco
+        = p.1.1.deco :=
+    congrArg (fun q => q.1.1.deco) h
   have h3 := DecoSet.eq_one_of_fst_eq_one _ h2 h1
-  refine Prod.ext h1 (Prod.ext (Subtype.ext (congrArg Prod.snd h3)) (Subtype.ext (funext fun P => ?_)))
+  refine Prod.ext h1
+    (Prod.ext (Subtype.ext (congrArg Prod.snd h3)) (Subtype.ext (funext fun P => ?_)))
   have h4 : g.1.1 * p.1.1.fr P * ((g.2.2.1 P)⁻¹).1 = p.1.1.fr P := congrArg (fun q => q.1.1.fr P) h
   rw [h1, OneMemClass.coe_one, one_mul, mul_eq_left] at h4
   exact inv_eq_one.1 (Subtype.ext h4)
 
-def stabAut (b : β) (p : (stepY ST y β Λ Θ pref).D b) :
-    MulAction.stabilizer ((stepY ST y β Λ Θ pref).G b) p →* autO p.1.1.deco.1.N where
-  toFun g := ⟨g.1.1.1, g.1.1.2, (congrArg (fun q : PtY ST SG Q y => q.1.1.deco.1.N) g.2 : Formalism.HermitianLatticesTheory.gmap g.1.1.1 p.1.1.deco.1.N = p.1.1.deco.1.N)⟩
+def stabAut (b : β) (p : (stepY ST y β Λ Θ pref).D b)
+    : MulAction.stabilizer ((stepY ST y β Λ Θ pref).G b) p →* autO p.1.1.deco.1.N where
+  toFun g := ⟨
+    g.1.1.1,
+    g.1.1.2,
+    (congrArg (fun q : PtY ST SG Q y => q.1.1.deco.1.N) g.2
+      : Formalism.HermitianLatticesTheory.gmap g.1.1.1 p.1.1.deco.1.N = p.1.1.deco.1.N)
+  ⟩
   map_one' := rfl
   map_mul' _ _ := rfl
 
-theorem stabAut_inj (b : β) (p : (stepY ST y β Λ Θ pref).D b) : Function.Injective (stabAut y β Λ Θ pref b p) := by
+theorem stabAut_inj (b : β) (p : (stepY ST y β Λ Θ pref).D b)
+    : Function.Injective (stabAut y β Λ Θ pref b p) := by
   rw [injective_iff_map_eq_one]
   intro g hg
-  exact Subtype.ext (stepY_eq_one y β Λ Θ pref b g.1 p g.2 (Subtype.ext (congrArg (fun a : autO p.1.1.deco.1.N => a.1) hg)))
+  exact Subtype.ext (stepY_eq_one y β Λ Θ pref b g.1 p g.2
+    (Subtype.ext (congrArg (fun a : autO p.1.1.deco.1.N => a.1) hg)))
 
-theorem stepY_dvd (hX : X.Ok) (R : Ranks) (hn : n ∈ gamRanks R) (b : β) (p : (stepY ST y β Λ Θ pref).D b) :
-    Nat.card (MulAction.stabilizer ((stepY ST y β Λ Θ pref).G b) p) ∣ DGam X.E R :=
+theorem stepY_dvd
+    (hX : X.Ok) (R : Ranks) (hn : n ∈ gamRanks R) (b : β) (p : (stepY ST y β Λ Θ pref).D b)
+    : Nat.card (MulAction.stabilizer ((stepY ST y β Λ Θ pref).G b) p) ∣ DGam X.E R :=
   (Subgroup.card_dvd_of_injective _ (stabAut_inj y β Λ Θ pref b p)).trans
     (dvd_DGam (posStar_of_ok hX) R hn p.1.1.deco.2.lat p.1.1.deco.2.uni)
 
-theorem levQ_grp_idx (Θ : LevQFam X.E X.K n Q) (h : ∀ P, (Θ P).H.FiniteIndex) : Θ.grp.FiniteIndex := by
+theorem levQ_grp_idx (Θ : LevQFam X.E X.K n Q) (h : ∀ P, (Θ P).H.FiniteIndex)
+    : Θ.grp.FiniteIndex := by
   have e : Θ.grp = ⨅ P : Q, (Θ P).H.comap (Pi.evalMonoidHom _ P) := by
     ext c
     simp [LevQFam.grp, Subgroup.mem_pi, Subgroup.mem_iInf]
@@ -92,39 +117,61 @@ theorem levQ_grp_idx (Θ : LevQFam X.E X.K n Q) (h : ∀ P, (Θ P).H.FiniteIndex
   rw [Subgroup.index_comap_of_surjective _ (Function.surjective_eval P)]
   exact (h P).index_ne_zero
 
-theorem stepY_fin_orb (hX : X.Ok) (hI : ∀ b P, (Θ b P).H.FiniteIndex)
-    (hy : ∀ N, Submodule.IsLattice X.E N → (y.ys N).Finite) (b : β) :
-    Finite (MulAction.orbitRel.Quotient ((stepY ST y β Λ Θ pref).G b) ((stepY ST y β Λ Θ pref).D b)) := by
+theorem stepY_fin_orb
+    (hX : X.Ok) (hI : ∀ b P, (Θ b P).H.FiniteIndex)
+    (hy : ∀ N, Submodule.IsLattice X.E N → (y.ys N).Finite) (b : β)
+    : Finite (MulAction.orbitRel.Quotient ((stepY ST y β Λ Θ pref).G b)
+      ((stepY ST y β Λ Θ pref).D b)) := by
   obtain ⟨s, hs, hrep⟩ := DecoSet.finite_reps (ST := ST) (SG := SG) (n := n) (posStar_of_ok hX)
   have := levQ_grp_idx (Θ b) (hI b)
-  let cl : (stepY ST y β Λ Θ pref).D b →
-    MulAction.orbitRel.Quotient ((stepY ST y β Λ Θ pref).G b) ((stepY ST y β Λ Θ pref).D b) := Quotient.mk _
-  have hcl : ∀ (g : (stepY ST y β Λ Θ pref).G b) p, cl (g • p) = cl p := fun g p => Quotient.sound ⟨g, rfl⟩
-  have key : ∀ d0 : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG), (cl '' {p | p.1.1.deco = d0}).Finite := by
+  let cl
+      : (stepY ST y β Λ Θ pref).D b
+        → MulAction.orbitRel.Quotient ((stepY ST y β Λ Θ pref).G b) ((stepY ST y β Λ Θ pref).D b) :=
+    Quotient.mk _
+  have hcl : ∀ (g : (stepY ST y β Λ Θ pref).G b) p, cl (g • p) = cl p := fun g p =>
+    Quotient.sound ⟨g, rfl⟩
+  have key
+      : ∀ d0 : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG),
+        (cl '' {p | p.1.1.deco = d0}).Finite := by
     intro d0
-    rcases Set.eq_empty_or_nonempty {p : (stepY ST y β Λ Θ pref).D b | p.1.1.deco = d0} with h | ⟨p0, hp0⟩
+    rcases Set.eq_empty_or_nonempty {p : (stepY ST y β Λ Θ pref).D b | p.1.1.deco = d0} with
+      h | ⟨p0, hp0⟩
     · rw [h, Set.image_empty]
       exact Set.finite_empty
     · have hp0' : p0.1.1.deco = d0 := hp0
       subst hp0'
       have : Finite (y.ys p0.1.1.deco.1.N) := hy _ p0.1.1.deco.2.lat
-      let φ : (GLQ X.E n Q ⧸ (Θ b).grp) × (y.ys p0.1.1.deco.1.N) → (stepY ST y β Λ Θ pref).D b := fun a =>
-        ⟨(⟨(p0.1.1.deco, fun P => p0.1.1.fr P * (a.1.out P).1), fun P x => (p0.1.1.2 P _).trans ((a.1.out P).2 x)⟩, a.2.1), a.2.2⟩
+      let φ : (GLQ X.E n Q ⧸ (Θ b).grp) × (y.ys p0.1.1.deco.1.N) → (stepY ST y β Λ Θ pref).D b :=
+        fun a => ⟨
+          (
+            ⟨
+              (p0.1.1.deco, fun P => p0.1.1.fr P * (a.1.out P).1),
+              fun P x => (p0.1.1.2 P _).trans ((a.1.out P).2 x)
+            ⟩,
+            a.2.1
+          ),
+          a.2.2
+        ⟩
       refine (Set.finite_range (cl ∘ φ)).subset ?_
       rintro _ ⟨p, hp, rfl⟩
       have hp' : p.1.1.deco = p0.1.1.deco := hp
-      let c : GLQ X.E n Q := fun P => ⟨(p0.1.1.fr P)⁻¹ * p.1.1.fr P, fun x => by
-        have h1 := p0.1.1.2 P ((p0.1.1.fr P)⁻¹ (p.1.1.fr P x))
-        have h2 := p.1.1.2 P x
-        have h3 : p0.1.1.1.2 P ((p0.1.1.fr P)⁻¹ (p.1.1.fr P x)) = p.1.1.fr P x := LinearEquiv.apply_symm_apply _ _
-        rw [h3] at h1
-        have h4 : p.1.1.1.1 = p0.1.1.1.1 := hp'
-        rw [h4] at h2
-        exact h1.symm.trans h2⟩
+      let c : GLQ X.E n Q := fun P => ⟨
+        (p0.1.1.fr P)⁻¹ * p.1.1.fr P,
+        fun x => by
+          have h1 := p0.1.1.2 P ((p0.1.1.fr P)⁻¹ (p.1.1.fr P x))
+          have h2 := p.1.1.2 P x
+          have h3 : p0.1.1.1.2 P ((p0.1.1.fr P)⁻¹ (p.1.1.fr P x)) = p.1.1.fr P x :=
+            LinearEquiv.apply_symm_apply _ _
+          rw [h3] at h1
+          have h4 : p.1.1.1.1 = p0.1.1.1.1 := hp'
+          rw [h4] at h2
+          exact h1.symm.trans h2
+      ⟩
       obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul (Θ b).grp c
       refine ⟨(QuotientGroup.mk c, ⟨p.1.2, hp' ▸ p.2⟩), ?_⟩
       refine (hcl ((1, 1, k) : FrmG (Λ b) (Θ b)) _).symm.trans (congrArg cl ?_)
-      refine Subtype.ext (Prod.ext (Subtype.ext (Prod.ext ?_ (funext fun P => ?_))) (Set.image_id _))
+      refine Subtype.ext (Prod.ext (Subtype.ext (Prod.ext ?_ (funext fun P => ?_)))
+        (Set.image_id _))
       · exact (one_smul (UF X.E n × GLG (E := X.E) (n := n) (SG := SG)) p0.1.1.deco).trans hp'.symm
       · show (1 : Sp X.E n ≃ₗ[X.E] Sp X.E n) * (p0.1.1.fr P * ((Quotient.out (QuotientGroup.mk c : GLQ X.E n Q ⧸ (Θ b).grp)) P).1) *
           ((k.1 P)⁻¹).1 = p.1.1.fr P
@@ -138,30 +185,39 @@ theorem stepY_fin_orb (hX : X.Ok) (hI : ∀ b P, (Θ b P).H.FiniteIndex)
   induction q using Quotient.inductionOn with
   | h p =>
     obtain ⟨d0, hd0, g, hg⟩ := hrep p.1.1.deco
-    refine Set.mem_biUnion hd0 ⟨(((g⁻¹, 1, 1) : FrmG (Λ b) (Θ b)) : (stepY ST y β Λ Θ pref).G b) • p, ?_, hcl _ _⟩
+    refine Set.mem_biUnion hd0
+      ⟨(((g⁻¹, 1, 1) : FrmG (Λ b) (Θ b)) : (stepY ST y β Λ Θ pref).G b) • p, ?_, hcl _ _⟩
     show ((g⁻¹, 1) : UF X.E n × GLG (E := X.E) (n := n) (SG := SG)) • p.1.1.deco = d0
     rw [hg, smul_smul, Prod.mk_mul_mk, inv_mul_cancel, one_mul]
     exact one_smul _ d0
 
-theorem stepY_ok (hX : X.Ok) (hI : ∀ b P, (Θ b P).H.FiniteIndex)
+theorem stepY_ok
+    (hX : X.Ok) (hI : ∀ b P, (Θ b P).H.FiniteIndex)
     (hr : ∀ b P g, ∃ m : ℕ, 0 < m ∧ (Θ b P).lam g ^ m = 1)
-    (hy : ∀ N, Submodule.IsLattice X.E N → (y.ys N).Finite) : (stepY ST y β Λ Θ pref).Ok := by
+    (hy : ∀ N, Submodule.IsLattice X.E N → (y.ys N).Finite)
+    : (stepY ST y β Λ Θ pref).Ok := by
   exact {
     fin_orb := stepY_fin_orb y β Λ Θ pref hX hI hy
     fin_stab b p :=
       haveI := autO_finite (posStar_of_ok hX) p.1.1.deco.full_lattice
       Finite.of_injective _ (stabAut_inj y β Λ Θ pref b p)
     unit b g := by
-      have h : Formalism.UG.cT (starRingEnd X.E) (toGLm X.E n g.1.1 : Matrix (Fin n) (Fin n) X.E) * (1 : Matrix (Fin n) (Fin n) X.E) *
-        (toGLm X.E n g.1.1 : Matrix (Fin n) (Fin n) X.E) = 1 := toGLm_mem_UJ g.1
+      have h
+          : Formalism.UG.cT (starRingEnd X.E) (toGLm X.E n g.1.1 : Matrix (Fin n) (Fin n) X.E)
+              * (1 : Matrix (Fin n) (Fin n) X.E) * (toGLm X.E n g.1.1 : Matrix (Fin n) (Fin n) X.E)
+            = 1 :=
+        toGLm_mem_UJ g.1
       rw [Matrix.mul_one] at h
       exact h
     root b g := by
-      have h1 : IsOfFinOrder ((Λ b).chr g.2.1) := MonoidHom.isOfFinOrder _ (isOfFinOrder_of_finite _)
+      have h1 : IsOfFinOrder ((Λ b).chr g.2.1) :=
+        MonoidHom.isOfFinOrder _ (isOfFinOrder_of_finite _)
       have h2 : IsOfFinOrder ((Θ b).chr g.2.2) := by
         rw [show (Θ b).chr g.2.2 = ∏ P, (Θ b P).lam (piProj (fun P => (Θ b P).H) P g.2.2) from
           piChar_apply (fun P => (Θ b P).H) (fun P => (Θ b P).lam) g.2.2]
-        exact Finset.prod_induction _ IsOfFinOrder (fun _ _ => IsOfFinOrder.mul) IsOfFinOrder.one
+        exact Finset.prod_induction _ IsOfFinOrder
+          (fun _ _ => IsOfFinOrder.mul)
+          IsOfFinOrder.one
           fun P _ => isOfFinOrder_iff_pow_eq_one.2 (hr b P _)
       exact isOfFinOrder_iff_pow_eq_one.1 (h1.mul h2)
     lsh_smul b g p x := by
@@ -169,45 +225,63 @@ theorem stepY_ok (hX : X.Ok) (hI : ∀ b P, (Θ b P).H.FiniteIndex)
       show _ ∈ (p.1.1.deco.1.act g.1.1 g.2.1.1).Lsh ↔ _
       rw [Deco.Lsh_act _ g.1.2, mem_gmap, LinearEquiv.symm_apply_apply]
     lsh_full_lat b p := p.1.1.deco.2.Lsh_full_lattice
-    stab_inj b g p h h1 := stepY_eq_one y β Λ Θ pref b g p h
-      (Subtype.ext ((toGLm X.E n).injective (h1.trans (map_one _).symm)))
+    stab_inj b g p h h1 :=
+      stepY_eq_one y β Λ Θ pref b g p h
+        (Subtype.ext ((toGLm X.E n).injective (h1.trans (map_one _).symm)))
   }
 
 end StepOk
 
 section TOk
 
-variable {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 X.E))}
-  (y : Ys X n) (β : Type) [Fintype β] [DecidableEq β] (Λ : β → LevFam X.E X.K n SG) (Θ : β → LevQFam X.E X.K n Q)
-  (pref : DecoF X.E n ST SG Q → Prop) (T : ℕ)
+variable
+  {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 X.E))} (y : Ys X n)
+  (β : Type) [Fintype β] [DecidableEq β]
+  (Λ : β → LevFam X.E X.K n SG) (Θ : β → LevQFam X.E X.K n Q) (pref : DecoF X.E n ST SG Q → Prop)
+  (T : ℕ)
 
-theorem PtY.ext' {y : Ys X n} {p p' : PtY ST SG Q y} (h1 : p.1.1.deco = p'.1.1.deco) (h2 : p.1.1.1.2 = p'.1.1.1.2)
-    (h3 : p.1.2 = p'.1.2) : p = p' := Subtype.ext (Prod.ext (Subtype.ext (Prod.ext h1 h2)) h3)
+theorem PtY.ext'
+    {y : Ys X n} {p p' : PtY ST SG Q y}
+    (h1 : p.1.1.deco = p'.1.1.deco) (h2 : p.1.1.1.2 = p'.1.1.1.2) (h3 : p.1.2 = p'.1.2)
+    : p = p' :=
+  Subtype.ext (Prod.ext (Subtype.ext (Prod.ext h1 h2)) h3)
 
-theorem PtY.mv_spec {y : Ys X n} (p : PtY ST SG Q y) (d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))
-    (h1 : ∀ P : Q, d.1.at P.1 = p.1.1.deco.1.at P.1) (h2 : y.ys d.1.N = y.ys p.1.1.deco.1.N) :
-    (p.mv d).1.1.deco = d ∧ (p.mv d).1.1.1.2 = p.1.1.1.2 ∧ (p.mv d).1.2 = p.1.2 := by
-  have h : (∀ (P : Q) (x : Sp X.E n), p.1.1.1.2 P x ∈ d.1.at P.1 ↔ x ∈ stdAt X.E n P.1) ∧ p.1.2 ∈ y.ys d.1.N :=
+theorem PtY.mv_spec
+    {y : Ys X n} (p : PtY ST SG Q y)
+    (d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))
+    (h1 : ∀ P : Q, d.1.at P.1 = p.1.1.deco.1.at P.1) (h2 : y.ys d.1.N = y.ys p.1.1.deco.1.N)
+    : (p.mv d).1.1.deco = d ∧ (p.mv d).1.1.1.2 = p.1.1.1.2 ∧ (p.mv d).1.2 = p.1.2 := by
+  have h
+      : (∀ (P : Q) (x : Sp X.E n), p.1.1.1.2 P x ∈ d.1.at P.1 ↔ x ∈ stdAt X.E n P.1)
+        ∧ p.1.2 ∈ y.ys d.1.N :=
     ⟨fun P x => by rw [h1 P]; exact p.1.1.2 P x, by rw [h2]; exact p.2⟩
   have e : p.mv d = ⟨(⟨(d, p.1.1.1.2), h.1⟩, p.1.2), h.2⟩ := dite_eq_left h
   rw [e]
   exact ⟨rfl, rfl, rfl⟩
 
-theorem PtY.mv_dia {y : Ys X n} (p : PtY ST SG Q y) (P : ST) (a : (Res P.1)ˣ) :
-    p.mv (DecoSet.dia1 P a p.1.1.deco) = ⟨(⟨(DecoSet.dia1 P a p.1.1.deco, p.1.1.1.2), p.1.1.2⟩, p.1.2), p.2⟩ :=
+theorem PtY.mv_dia {y : Ys X n} (p : PtY ST SG Q y) (P : ST) (a : (Res P.1)ˣ)
+    : p.mv (DecoSet.dia1 P a p.1.1.deco)
+      = ⟨(⟨(DecoSet.dia1 P a p.1.1.deco, p.1.1.1.2), p.1.1.2⟩, p.1.2), p.2⟩ :=
   dite_eq_left ⟨p.1.1.2, p.2⟩
 
-theorem tdatY_ok (hP : ∀ P : ST, conjPrime₂ P.1 ≠ P.1) (hT : ∀ P : ST, (T : 𝓞 X.E) ∈ P.1.asIdeal ∧ (T : 𝓞 X.E) ∉ P.1.asIdeal ^ 2) :
-    (tdatY ST T y β Λ Θ pref).Ok T := by
+theorem tdatY_ok
+    (hP : ∀ P : ST, conjPrime₂ P.1 ≠ P.1)
+    (hT : ∀ P : ST, (T : 𝓞 X.E) ∈ P.1.asIdeal ∧ (T : 𝓞 X.E) ∉ P.1.asIdeal ^ 2)
+    : (tdatY ST T y β Λ Θ pref).Ok T := by
   exact {
     N_lat _ p := fullLattice_of_unimodular p.1.1.deco.2.lat p.1.1.deco.2.uni
-    dnN_lat _ p P := fullLattice_of_unimodular
-      (p.1.1.deco.2.dnN_spec P (hP P)).1 (p.1.1.deco.2.dnN_spec P (hP P)).2.1
+    dnN_lat _ p P :=
+      fullLattice_of_unimodular (p.1.1.deco.2.dnN_spec P (hP P)).1
+        (p.1.1.deco.2.dnN_spec P (hP P)).2.1
     ker_lat _ p P := by
       have hd := p.1.1.deco.2
       obtain ⟨r, hr, hr0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot P.1.ne_bot
-      refine lattice_of_smul hd.lat hd.Lsh_lattice (Submodule.span_le.2 fun x hx => hx.1) hr0 fun x hx => ?_
-      exact Submodule.subset_span ⟨Submodule.smul_mem _ r (hd.N_le_Lsh hx), ((hd.mem_kerAt P _).1 (hd.smul_mem_kerAt P hr hx)).2⟩
+      refine lattice_of_smul hd.lat hd.Lsh_lattice (Submodule.span_le.2 fun x hx => hx.1) hr0
+        fun x hx => ?_
+      exact Submodule.subset_span ⟨
+        Submodule.smul_mem _ r (hd.N_le_Lsh hx),
+        ((hd.mem_kerAt P _).1 (hd.smul_mem_kerAt P hr hx)).2
+      ⟩
     f_add _ p P x hx z hz := p.1.1.deco.2.f_add P x (le_locP _ _ hx) z (le_locP _ _ hz)
     f_smul _ p P a x hx := p.1.1.deco.2.f_smul P a x (le_locP _ _ hx)
     f_ne _ p P := p.1.1.deco.2.f_ne P
@@ -225,13 +299,18 @@ theorem tdatY_ok (hP : ∀ P : ST, conjPrime₂ P.1 ≠ P.1) (hT : ∀ P : ST, (
       have hd := p.1.1.deco.2
       have he' : e ∈ p.1.1.deco.1.N := he
       have h1' : p.1.1.deco.1.f P e = 1 := h1
-      refine ⟨(le_sup_left : p.1.1.deco.1.kerAt P ≤ p.1.1.deco.1.dnN P) (hd.smul_mem_kerAt P (hT P).1 he'), fun hm => ?_⟩
+      refine ⟨
+        (le_sup_left : p.1.1.deco.1.kerAt P ≤ p.1.1.deco.1.dnN P) (hd.smul_mem_kerAt P (hT P).1
+          he'),
+        fun hm => ?_
+      ⟩
       obtain ⟨a, ha, r, hr, har⟩ := exists_inv_unif P.1 (hT P).1 (hT P).2
       obtain ⟨c, hc, hcP⟩ := exists_mem_notMem (hP P)
       have h2 : a • ((T : 𝓞 X.E) • e) ∈ p.1.1.deco.1.dnN P := inv_smul_mem ha hm
       have h3 := ((hd.mem_kerAt P _).1 (hd.conj_smul_dnN_mem P hc h2)).2
       have e1 : c • a • ((T : 𝓞 X.E) • e) = (c * r) • e := by
-        rw [← algebraMap_smul X.E (T : 𝓞 X.E) e, smul_smul a, mul_comm a, har, algebraMap_smul, mul_smul]
+        rw [← algebraMap_smul X.E (T : 𝓞 X.E) e, smul_smul a, mul_comm a, har, algebraMap_smul,
+          mul_smul]
       rw [e1, hd.f_smul P _ e (le_locP _ _ he'), h1', mul_one, Ideal.Quotient.eq_zero_iff_mem] at h3
       exact (P.1.isPrime.mem_or_mem h3).elim hcP hr
     dia_one b P p := by
@@ -275,47 +354,61 @@ theorem tdatY_ok (hP : ∀ P : ST, conjPrime₂ P.1 ≠ P.1) (hT : ∀ P : ST, (
       rfl
   }
 
-theorem tdatY_deco (b : β) (p : PtY ST SG Q y) :
-    (tdatY ST T y β Λ Θ pref).deco b p = p.1.1.deco.1.res (Finset.empty_subset _) :=
+theorem tdatY_deco (b : β) (p : PtY ST SG Q y)
+    : (tdatY ST T y β Λ Θ pref).deco b p = p.1.1.deco.1.res (Finset.empty_subset _) :=
   Deco.ext rfl rfl (funext fun w => absurd w.2 (Finset.notMem_empty _))
 
-theorem dn_ok_of_res {d : Deco X.E n ST SG} (hd : d.Ok) (P : ST) (hP : MoveHyp ST SG P) {g : Sp X.E n → Res P.1}
-    (h : ((d.res (Finset.empty_subset _)).dn P g).Ok) : (d.dn P g).Ok := by
+theorem dn_ok_of_res
+    {d : Deco X.E n ST SG} (hd : d.Ok)
+    (P : ST) (hP : MoveHyp ST SG P)
+    {g : Sp X.E n → Res P.1} (h : ((d.res (Finset.empty_subset _)).dn P g).Ok)
+    : (d.dn P g).Ok := by
   classical
-  have e : ((d.res (Finset.empty_subset _)).dn P g).f P = g := by simp only [Deco.dn, Function.update_self]
+  have e : ((d.res (Finset.empty_subset _)).dn P g).f P = g := by
+    simp only [Deco.dn, Function.update_self]
   exact hd.dn P hP (e ▸ h.f_add P) (e ▸ h.f_smul P) (e ▸ h.f_off P) (e ▸ h.f_ne P)
 
 variable {y} in
-theorem mv_up (p : PtY ST SG Q y) (P : ST) (hP : MoveHyp ST SG P)
-    (hT : (T : 𝓞 X.E) ∈ P.1.asIdeal ∧ (T : 𝓞 X.E) ∉ P.1.asIdeal ^ 2) (hQ : ∀ w : Q, w.1 ≠ P.1 ∧ w.1 ≠ conjPrime₂ P.1)
-    (hy : y.Off P.1) {x : Sp X.E n} (hx : x ∈ p.1.1.deco.1.N) (hf : p.1.1.deco.1.f P x = 1) :
-    (p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x)).1.1.deco.1 = p.1.1.deco.1.up P (T : 𝓞 X.E) x ∧
-      (p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x)).1.1.1.2 = p.1.1.1.2 ∧ (p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x)).1.2 = p.1.2 := by
+theorem mv_up
+    (p : PtY ST SG Q y)
+    (P : ST) (hP : MoveHyp ST SG P) (hT : (T : 𝓞 X.E) ∈ P.1.asIdeal ∧ (T : 𝓞 X.E) ∉ P.1.asIdeal ^ 2)
+    (hQ : ∀ w : Q, w.1 ≠ P.1 ∧ w.1 ≠ conjPrime₂ P.1) (hy : y.Off P.1)
+    {x : Sp X.E n} (hx : x ∈ p.1.1.deco.1.N) (hf : p.1.1.deco.1.f P x = 1)
+    : (p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x)).1.1.deco.1 = p.1.1.deco.1.up P (T : 𝓞 X.E) x
+      ∧ (p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x)).1.1.1.2 = p.1.1.1.2
+      ∧ (p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x)).1.2 = p.1.2 := by
   have e := p.1.1.deco.up_val P hP hT.1 hT.2 hx hf
   have hs := (upN_spec p.1.1.deco.2.lat p.1.1.deco.2.uni P.1 hP.ne hx).2.2.1
-  have h := p.mv_spec (p.1.1.deco.up P (T : 𝓞 X.E) x)
-    (fun w => by rw [e]; exact (hs w.1 (hQ w).1 (hQ w).2).localization_eq)
-    (hy _ _ fun w h1 h2 => by rw [e]; exact (hs w h1 h2).localization_eq)
+  have h :=
+    p.mv_spec (p.1.1.deco.up P (T : 𝓞 X.E) x)
+      (fun w => by rw [e]; exact (hs w.1 (hQ w).1 (hQ w).2).localization_eq)
+      (hy _ _ fun w h1 h2 => by rw [e]; exact (hs w h1 h2).localization_eq)
   exact ⟨by rw [h.1, e], h.2⟩
 
 variable {y} in
-theorem mv_dn (p : PtY ST SG Q y) (P : ST) (hP : MoveHyp ST SG P) (hQ : ∀ w : Q, w.1 ≠ P.1 ∧ w.1 ≠ conjPrime₂ P.1)
-    (hy : y.Off P.1) {g : Sp X.E n → Res P.1} (hg : (p.1.1.deco.1.dn P g).Ok) :
-    (p.mv (p.1.1.deco.dn P g)).1.1.deco.1 = p.1.1.deco.1.dn P g ∧
-      (p.mv (p.1.1.deco.dn P g)).1.1.1.2 = p.1.1.1.2 ∧ (p.mv (p.1.1.deco.dn P g)).1.2 = p.1.2 := by
+theorem mv_dn
+    (p : PtY ST SG Q y)
+    (P : ST)
+    (hP : MoveHyp ST SG P) (hQ : ∀ w : Q, w.1 ≠ P.1 ∧ w.1 ≠ conjPrime₂ P.1) (hy : y.Off P.1)
+    {g : Sp X.E n → Res P.1} (hg : (p.1.1.deco.1.dn P g).Ok)
+    : (p.mv (p.1.1.deco.dn P g)).1.1.deco.1 = p.1.1.deco.1.dn P g
+      ∧ (p.mv (p.1.1.deco.dn P g)).1.1.1.2 = p.1.1.1.2
+      ∧ (p.mv (p.1.1.deco.dn P g)).1.2 = p.1.2 := by
   have e : (p.1.1.deco.dn P g).1 = p.1.1.deco.1.dn P g := by
     unfold DecoSet.dn
     rw [dite_eq_left hg]
   have hs := (p.1.1.deco.2.dnN_spec P hP.ne).2.2.1
-  have h := p.mv_spec (p.1.1.deco.dn P g)
-    (fun w => by rw [e]; exact (hs w.1 (hQ w).1 (hQ w).2).localization_eq)
-    (hy _ _ fun w h1 h2 => by rw [e]; exact (hs w h1 h2).localization_eq)
+  have h :=
+    p.mv_spec (p.1.1.deco.dn P g)
+      (fun w => by rw [e]; exact (hs w.1 (hQ w).1 (hQ w).2).localization_eq)
+      (hy _ _ fun w h1 h2 => by rw [e]; exact (hs w h1 h2).localization_eq)
   exact ⟨by rw [h.1, e], h.2⟩
 
-theorem tdatY_tied (hP : ∀ P : ST, MoveHyp ST SG P)
+theorem tdatY_tied
+    (hP : ∀ P : ST, MoveHyp ST SG P)
     (hT : ∀ P : ST, (T : 𝓞 X.E) ∈ P.1.asIdeal ∧ (T : 𝓞 X.E) ∉ P.1.asIdeal ^ 2)
-    (hQ : ∀ (P : ST) (w : Q), w.1 ≠ P.1 ∧ w.1 ≠ conjPrime₂ P.1) (hy : ∀ P : ST, y.Off P.1) :
-    (tdatY ST T y β Λ Θ pref).Tied T := by
+    (hQ : ∀ (P : ST) (w : Q), w.1 ≠ P.1 ∧ w.1 ≠ conjPrime₂ P.1) (hy : ∀ P : ST, y.Off P.1)
+    : (tdatY ST T y β Λ Θ pref).Tied T := by
   exact {
     ok b p := by
       rw [tdatY_deco]
@@ -329,7 +422,8 @@ theorem tdatY_tied (hP : ∀ P : ST, MoveHyp ST SG P)
     ker_eq _ _ _ := rfl
     up_deco b p P x hx hf := by
       rw [tdatY_deco, tdatY_deco]
-      exact congrArg (Deco.res (Finset.empty_subset _)) (mv_up T p P (hP P) (hT P) (hQ P) (hy P) hx hf).1
+      exact congrArg (Deco.res (Finset.empty_subset _))
+        (mv_up T p P (hP P) (hT P) (hQ P) (hy P) hx hf).1
     dn_deco b p P g hg := by
       rw [tdatY_deco] at hg
       rw [tdatY_deco, tdatY_deco]
@@ -338,25 +432,35 @@ theorem tdatY_tied (hP : ∀ P : ST, MoveHyp ST SG P)
     up_act b γ p P x hx hf := by
       rw [stepY_gam]
       have h1 := mv_up T p P (hP P) (hT P) (hQ P) (hy P) hx hf
-      have h2 := mv_up T (γ • p) P (hP P) (hT P) (hQ P) (hy P) (x := γ.1.1 x)
-        ((mem_gmap γ.1.1 p.1.1.deco.1.N _).2 (by rw [LinearEquiv.symm_apply_apply]; exact hx))
-        (by show p.1.1.deco.1.f P (γ.1.1.symm _) = 1; rw [LinearEquiv.symm_apply_apply]; exact hf)
+      have h2 :=
+        mv_up T (γ • p) P (hP P) (hT P) (hQ P) (hy P) (x := γ.1.1 x)
+          ((mem_gmap γ.1.1 p.1.1.deco.1.N _).2 (by rw [LinearEquiv.symm_apply_apply]; exact hx))
+          (by show p.1.1.deco.1.f P (γ.1.1.symm _) = 1; rw [LinearEquiv.symm_apply_apply]; exact hf)
       refine PtY.ext' (Subtype.ext (h2.1.trans ?_)) (h2.2.1.trans ?_) (h2.2.2.trans ?_)
       · exact (Deco.up_act _ γ.1.2 _ P _ x).trans (congrArg (Deco.act γ.1.1 γ.2.1.1) h1.1.symm)
-      · exact congrArg (fun fr : ∀ _ : Q, Sp X.E n ≃ₗ[X.E] Sp X.E n => fun w => γ.1.1 * fr w * ((γ.2.2.1 w)⁻¹).1) h1.2.1.symm
+      · exact congrArg
+          (fun fr : ∀ _ : Q, Sp X.E n ≃ₗ[X.E] Sp X.E n => fun w => γ.1.1 * fr w * ((γ.2.2.1 w)⁻¹).1)
+          h1.2.1.symm
       · exact congrArg (fun Y : Set (Sp X.E n) => (fun v => γ.1.1 v) '' Y) h1.2.2.symm
     dn_act b γ p P g hg := by
       rw [tdatY_deco] at hg
       have hg' := dn_ok_of_res p.1.1.deco.2 P (hP P) hg
-      have e : (fun z => g (((stepY ST y β Λ Θ pref).gam b γ⁻¹ : Matrix (Fin n) (Fin n) X.E) *ᵥ z)) = fun z => g (γ.1.1.symm z) :=
+      have e
+          : (fun z => g (((stepY ST y β Λ Θ pref).gam b γ⁻¹ : Matrix (Fin n) (Fin n) X.E) *ᵥ z))
+            = fun z => g (γ.1.1.symm z) :=
         funext fun z => congrArg g (stepY_gam y β Λ Θ pref b γ⁻¹ z)
       rw [e]
       have e2 := Deco.dn_act p.1.1.deco.1 γ.1.2 γ.2.1.1 P g
       have h1 := mv_dn p P (hP P) (hQ P) (hy P) hg'
-      have h2 := mv_dn (γ • p) P (hP P) (hQ P) (hy P) (g := fun z => g (γ.1.1.symm z)) (e2 ▸ hg'.act γ.1.2 γ.2.1.1)
+      have h2 :=
+        mv_dn (γ • p) P (hP P) (hQ P) (hy P)
+          (g := fun z => g (γ.1.1.symm z))
+          (e2 ▸ hg'.act γ.1.2 γ.2.1.1)
       refine PtY.ext' (Subtype.ext (h2.1.trans ?_)) (h2.2.1.trans ?_) (h2.2.2.trans ?_)
       · exact e2.trans (congrArg (Deco.act γ.1.1 γ.2.1.1) h1.1.symm)
-      · exact congrArg (fun fr : ∀ _ : Q, Sp X.E n ≃ₗ[X.E] Sp X.E n => fun w => γ.1.1 * fr w * ((γ.2.2.1 w)⁻¹).1) h1.2.1.symm
+      · exact congrArg
+          (fun fr : ∀ _ : Q, Sp X.E n ≃ₗ[X.E] Sp X.E n => fun w => γ.1.1 * fr w * ((γ.2.2.1 w)⁻¹).1)
+          h1.2.1.symm
       · exact congrArg (fun Y : Set (Sp X.E n) => (fun v => γ.1.1 v) '' Y) h1.2.2.symm
     up_congr b p P x x' h := by
       show p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x) = p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x')
@@ -372,31 +476,47 @@ theorem tdatY_tied (hP : ∀ P : ST, MoveHyp ST SG P)
       have e : (p.1.1.deco.1.up P (T : 𝓞 X.E) x).dn P (p.1.1.deco.1.f P) = p.1.1.deco.1 := by
         refine Deco.ext (p.1.1.deco.2.dnN_up P (hP P) (hT P).1 (hT P).2 hx hf) ?_ rfl
         simp only [Deco.dn, Deco.up, Function.update_idem, Function.update_eq_self]
-      have h2 := mv_dn (p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x)) P (hP P) (hQ P) (hy P) (g := p.1.1.deco.1.f P)
-        (by rw [h1.1, e]; exact p.1.1.deco.2)
-      exact PtY.ext' (Subtype.ext (h2.1.trans (by rw [h1.1, e]))) (h2.2.1.trans h1.2.1) (h2.2.2.trans h1.2.2)
+      have h2 :=
+        mv_dn (p.mv (p.1.1.deco.up P (T : 𝓞 X.E) x)) P (hP P) (hQ P) (hy P) (g := p.1.1.deco.1.f P)
+          (by rw [h1.1, e]; exact p.1.1.deco.2)
+      exact PtY.ext' (Subtype.ext (h2.1.trans (by rw [h1.1, e]))) (h2.2.1.trans h1.2.1)
+        (h2.2.2.trans h1.2.2)
   }
 
 end TOk
 
 section AtOk
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks}
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ}
-  (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K)))
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks}
+  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  {S : Set ℕ} (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu))
+  (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K)))
   (Tp : TopLev X Pr R (QE sel (mu : Chr X.F X.E X.K)))
 
-theorem ne_of_T_notMem (hPr : Pr.Ok) (u : Pr.Word) (P : Pr.vT u) {w : HeightOneSpectrum (𝓞 X.E)}
-    (h : (Pr.T u : 𝓞 X.E) ∉ w.asIdeal) : w ≠ P.1 ∧ w ≠ conjPrime₂ P.1 :=
-  ⟨fun e => h (by rw [e]; exact T_mem hPr u P), fun e => h (by rw [e, mem_conjP, map_natCast]; exact T_mem hPr u P)⟩
+theorem ne_of_T_notMem
+    (hPr : Pr.Ok)
+    (u : Pr.Word) (P : Pr.vT u)
+    {w : HeightOneSpectrum (𝓞 X.E)} (h : (Pr.T u : 𝓞 X.E) ∉ w.asIdeal)
+    : w ≠ P.1 ∧ w ≠ conjPrime₂ P.1 := ⟨
+  fun e => h (by rw [e]; exact T_mem hPr u P),
+  fun e => h (by rw [e, mem_conjP, map_natCast]; exact T_mem hPr u P)
+⟩
 
-theorem ysAt_off (hPr : Pr.Ok) (u : Pr.Word) (hQ : ∀ w ∈ QE sel (mu : Chr X.F X.E X.K), (Pr.T u : 𝓞 X.E) ∉ w.asIdeal)
-    (j : ℕ) (P : Pr.vT u) : (ysAt R sel mu cst j).Off P.1 := by
+theorem ysAt_off
+    (hPr : Pr.Ok)
+    (u : Pr.Word) (hQ : ∀ w ∈ QE sel (mu : Chr X.F X.E X.K), (Pr.T u : 𝓞 X.E) ∉ w.asIdeal)
+    (j : ℕ) (P : Pr.vT u)
+    : (ysAt R sel mu cst j).Off P.1 := by
   classical
   intro N N' h
-  have h1 : ∀ w : rowSG Pr sel mu, Formalism.HermitianLatticesTheory.localization₂ w.1.asIdeal N' = Formalism.HermitianLatticesTheory.localization₂ w.1.asIdeal N := by
+  have h1
+      : ∀ w : rowSG Pr sel mu,
+        Formalism.HermitianLatticesTheory.localization₂ w.1.asIdeal N'
+          = Formalism.HermitianLatticesTheory.localization₂ w.1.asIdeal N := by
     intro w
-    have h2 : (Pr.T u : 𝓞 X.E) ∉ w.1.asIdeal := (Finset.mem_union.1 w.2).elim (fun h => T_notMem_vGs hPr u ⟨w.1, h⟩) (hQ w.1)
+    have h2 : (Pr.T u : 𝓞 X.E) ∉ w.1.asIdeal :=
+      (Finset.mem_union.1 w.2).elim (fun h => T_notMem_vGs hPr u ⟨w.1, h⟩) (hQ w.1)
     exact h w.1 (ne_of_T_notMem hPr u P h2).1 (ne_of_T_notMem hPr u P h2).2
   unfold ysAt
   split_ifs
@@ -404,20 +524,26 @@ theorem ysAt_off (hPr : Pr.Ok) (u : Pr.Word) (hQ : ∀ w ∈ QE sel (mu : Chr X.
     simp only [ybSet, locLat, h1]
   · rfl
 
-theorem tdatAt_ok (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word) (j : ℕ) : (tdatAt sel mu cst L Tp u j).Ok (Pr.T u) :=
+theorem tdatAt_ok (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word) (j : ℕ)
+    : (tdatAt sel mu cst L Tp u j).Ok (Pr.T u) :=
   tdatY_ok _ _ _ _ _ _ (fun P => (moveHyp_of_ok hPr u P).ne) (T_unif hX hPr u)
 
-theorem tdatAt_tied (hX : X.Ok) (hPr : Pr.Ok) (u : Pr.Word)
-    (hQ : ∀ w ∈ QE sel (mu : Chr X.F X.E X.K), (Pr.T u : 𝓞 X.E) ∉ w.asIdeal) (j : ℕ) :
-    (tdatAt sel mu cst L Tp u j).Tied (Pr.T u) :=
-  tdatY_tied _ _ _ _ _ _ (moveHyp_of_ok hPr u) (T_unif hX hPr u) (fun P w => ne_of_T_notMem hPr u P (hQ w.1 w.2))
+theorem tdatAt_tied
+    (hX : X.Ok) (hPr : Pr.Ok)
+    (u : Pr.Word) (hQ : ∀ w ∈ QE sel (mu : Chr X.F X.E X.K), (Pr.T u : 𝓞 X.E) ∉ w.asIdeal)
+    (j : ℕ)
+    : (tdatAt sel mu cst L Tp u j).Tied (Pr.T u) :=
+  tdatY_tied _ _ _ _ _ _ (moveHyp_of_ok hPr u) (T_unif hX hPr u)
+    (fun P w => ne_of_T_notMem hPr u P (hQ w.1 w.2))
     (ysAt_off sel mu cst hPr u hQ j)
 
 end AtOk
 
 section Til
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {N n : ℕ} (hN : N = n + 1)
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {N n : ℕ} (hN : N = n + 1)
   {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
 
 theorem iniH_extUH (γ : UF E n) (x : Sp E N) : iniH hN ((extUH hN γ).1 x) = γ.1 (iniH hN x) := by
@@ -437,30 +563,36 @@ theorem Lsh_empty (d : DecoSet (E := E) (n := n) (ST := ∅) (SG := SG)) : d.1.L
   rw [h]
   exact d.2.uni
 
-variable (d : DecoSet (E := E) (n := n) (ST := ∅) (SG := SG)) {pi : 𝓞 E} (hT : ∀ P : ST, cO E pi ∉ P.1.asIdeal) (hG : ∀ w : SG, pi ∉ w.1.asIdeal)
+variable
+  (d : DecoSet (E := E) (n := n) (ST := ∅) (SG := SG))
+  {pi : 𝓞 E} (hT : ∀ P : ST, cO E pi ∉ P.1.asIdeal) (hG : ∀ w : SG, pi ∉ w.1.asIdeal)
 include hT hG
 
-theorem tilH_N (x : Sp E N) : x ∈ (DecoSet.tilH (ST := ST) hN pi d).1.N ↔
-    iniH hN x ∈ d.1.Lsh ∧ x (Br.iL hN) ∈ (1 : Submodule (𝓞 E) E) := by
+theorem tilH_N (x : Sp E N)
+    : x ∈ (DecoSet.tilH (ST := ST) hN pi d).1.N
+      ↔ iniH hN x ∈ d.1.Lsh ∧ x (Br.iL hN) ∈ (1 : Submodule (𝓞 E) E) := by
   subst hN
   show x ∈ (DecoSet.til (ST := ST) pi d).1.N ↔ _
   rw [DecoSet.til_val d hT hG, Lsh_empty, Submodule.mem_one]
   exact mem_tilN _ _
 
-theorem tilH_f (P : ST) (x : Sp E N) (hx : x ∈ (DecoSet.tilH (ST := ST) hN pi d).1.N) :
-    (DecoSet.tilH (ST := ST) hN pi d).1.f P x = redP P.1 (star (pi : E) * x (Br.iL hN)) := by
+theorem tilH_f (P : ST) (x : Sp E N) (hx : x ∈ (DecoSet.tilH (ST := ST) hN pi d).1.N)
+    : (DecoSet.tilH (ST := ST) hN pi d).1.f P x = redP P.1 (star (pi : E) * x (Br.iL hN)) := by
   subst hN
   change x ∈ (DecoSet.til (ST := ST) pi d).1.N at hx
   show (DecoSet.til (ST := ST) pi d).1.f P x = _
   rw [DecoSet.til_val d hT hG] at hx ⊢
-  have : (d.1.til (ST := ST) pi).f P x =
-      redP P.1 (hStd E (n + 1) (z0 E n (algebraMap (𝓞 E) E pi)) x) := ite_eq_left (le_locP _ _ hx)
+  have : (d.1.til (ST := ST) pi).f P x
+      = redP P.1 (hStd E (n + 1) (z0 E n (algebraMap (𝓞 E) E pi)) x) :=
+    ite_eq_left (le_locP _ _ hx)
   rw [this, hermStd_lastVector_apply]
   rfl
 
-theorem tilH_Lsh (hpi : ∀ P : ST, pi ∈ P.1.asIdeal) (hdvd : ∀ r : 𝓞 E, (∀ P : ST, r ∈ P.1.asIdeal) → pi ∣ r) (x : Sp E N) :
-    x ∈ (DecoSet.tilH (ST := ST) hN pi d).1.Lsh ↔
-      iniH hN x ∈ d.1.Lsh ∧ star (pi : E) * x (Br.iL hN) ∈ (1 : Submodule (𝓞 E) E) := by
+theorem tilH_Lsh
+    (hpi : ∀ P : ST, pi ∈ P.1.asIdeal) (hdvd : ∀ r : 𝓞 E, (∀ P : ST, r ∈ P.1.asIdeal) → pi ∣ r)
+    (x : Sp E N)
+    : x ∈ (DecoSet.tilH (ST := ST) hN pi d).1.Lsh
+      ↔ iniH hN x ∈ d.1.Lsh ∧ star (pi : E) * x (Br.iL hN) ∈ (1 : Submodule (𝓞 E) E) := by
   subst hN
   show x ∈ (DecoSet.til (ST := ST) pi d).1.Lsh ↔ _
   rw [DecoSet.til_val d hT hG, Deco.Lsh, d.2.til_L hT hG hpi hdvd, mem_dual_sup, Lsh_empty]
@@ -476,7 +608,8 @@ theorem tilH_Lsh (hpi : ∀ P : ST, pi ∈ P.1.asIdeal) (hdvd : ∀ r : 𝓞 E, 
       exact H _ (Submodule.mem_map_of_mem hz)
     · rintro H _ ⟨z, hz, rfl⟩
       exact (e z).symm ▸ H z hz
-  · have e : hStd E (n + 1) (z0 E n (algebraMap (𝓞 E) E pi)) x = star (pi : E) * x (Br.iL rfl) := hermStd_lastVector_apply pi x
+  · have e : hStd E (n + 1) (z0 E n (algebraMap (𝓞 E) E pi)) x = star (pi : E) * x (Br.iL rfl) :=
+      hermStd_lastVector_apply pi x
     rw [mem_dual, ← e]
     constructor
     · intro H
@@ -494,12 +627,15 @@ open Formalism.L2.Forms
 
 section General
 
-variable {E K ι : Type} [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K] [Fintype ι] {n : ℕ}
-  (S : GStep E K n) (emb : ι → E →+* K) (σ : K →+* ℂ) (lam : ι → DomWeight n)
+variable
+  {E K ι : Type}
+  [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K] [Fintype ι]
+  {n : ℕ} (S : GStep E K n)
+  (emb : ι → E →+* K) (σ : K →+* ℂ) (lam : ι → DomWeight n)
 
-theorem evV_rho (b : S.β) (g : S.G b) (v : VV K lam) :
-    evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ (S.rho emb lam b g v) =
-      S.tr emb σ b g (evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ v) := by
+theorem evV_rho (b : S.β) (g : S.G b) (v : VV K lam)
+    : evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ (S.rho emb lam b g v)
+      = S.tr emb σ b g (evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ v) := by
   funext y
   have h : S.rho emb lam b g v = ((S.chr b g : Kˣ) : K) • rhoVr emb lam (S.gam b g) v := rfl
   rw [h, LinearMap.map_smulₛₗ, GStep.tr, trFr_apply, Pi.smul_apply, smul_eq_mul]
@@ -509,7 +645,8 @@ theorem evV_rho (b : S.β) (g : S.G b) (v : VV K lam) :
   intro τ
   exact (congrFun this τ).symm
 
-theorem embF_mem (h : (S.fam emb lam).Ok) (x : S.FormsK emb lam h) : S.embF emb σ lam h x ∈ S.Fi emb σ lam := by
+theorem embF_mem (h : (S.fam emb lam).Ok) (x : S.FormsK emb lam h)
+    : S.embF emb σ lam h x ∈ S.Fi emb σ lam := by
   intro c
   refine ⟨evV_mem_ValC emb 1 lam σ _, fun g => ?_⟩
   have h1 : S.rho emb lam c.1 g.1 (x.1 c) = x.1 c := x.2 c g
@@ -520,28 +657,36 @@ end General
 
 section Dia
 
-variable {E K ι : Type} [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K] [Fintype ι] {R : Ranks}
-  {I : ChainIn E K ι R} (J : AtIn I) (emb : ι → E →+* K) (σ : K →+* ℂ)
+variable
+  {E K ι : Type}
+  [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K] [Fintype ι]
+  {R : Ranks} {I : ChainIn E K ι R} (J : AtIn I)
+  (emb : ι → E →+* K) (σ : K →+* ℂ)
 
 end Dia
 
 section Laws
 
-variable {E K ι : Type} [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K] [Fintype ι]
+variable
+  {E K ι : Type}
+  [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K] [Fintype ι]
 
-theorem tr_mem {n : ℕ} (S : GStep E K n) (emb : ι → E →+* K) (σ : K →+* ℂ) (lam : ι → DomWeight n) (b : S.β) (g : S.G b)
-    {F : Fr emb σ n → ℂ} (hF : F ∈ ValC (Gr emb σ n) lam) : S.tr emb σ b g F ∈ ValC (Gr emb σ n) lam := by
-
+theorem tr_mem
+    {n : ℕ} (S : GStep E K n)
+    (emb : ι → E →+* K) (σ : K →+* ℂ) (lam : ι → DomWeight n)
+    (b : S.β) (g : S.G b)
+    {F : Fr emb σ n → ℂ} (hF : F ∈ ValC (Gr emb σ n) lam)
+    : S.tr emb σ b g F ∈ ValC (Gr emb σ n) lam := by
   rw [← span_evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ] at hF ⊢
-  have hle : Submodule.span ℂ (Set.range (evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ)) ≤
-      (Submodule.span ℂ (Set.range (evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ))).comap
-        (S.tr emb σ b g).toLinearMap := by
+  have hle
+      : Submodule.span ℂ (Set.range (evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ))
+        ≤ (Submodule.span ℂ (Set.range (evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ))).comap
+          (S.tr emb σ b g).toLinearMap := by
     rw [Submodule.span_le]
     rintro _ ⟨v, rfl⟩
     rw [SetLike.mem_coe, Submodule.mem_comap, LinearEquiv.coe_coe, ← evV_rho S emb σ lam b g v]
     exact Submodule.subset_span ⟨S.rho emb lam b g v, rfl⟩
   exact hle hF
-
 
 variable {R : Ranks} {I : ChainIn E K ι R} (J : AtIn I) (emb : ι → E →+* K) (σ : K →+* ℂ)
 

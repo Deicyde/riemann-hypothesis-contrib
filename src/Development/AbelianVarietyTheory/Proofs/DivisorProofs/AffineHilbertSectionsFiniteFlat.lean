@@ -9,9 +9,12 @@ open AlgebraicGeometry CategoryTheory CategoryTheory.Limits Opposite
 
 namespace GlobalTheory.HilbAff
 
-theorem sec_finite_flat (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (r : ℕ)
-    (Z : Scheme.{0}) (y : (GlobalTheory.HilbAff.functor A B r).obj (op Z)) (W : Z.affineOpens) :
-    Module.Finite Γ(Z, W) (GlobalTheory.HilbAff.Sec A B y W) ∧ Module.Flat Γ(Z, W) (GlobalTheory.HilbAff.Sec A B y W) := by
+theorem sec_finite_flat
+    (A B : Type) [CommRing A] [CommRing B] [Algebra A B]
+    (r : ℕ) (Z : Scheme.{0})
+    (y : (GlobalTheory.HilbAff.functor A B r).obj (op Z)) (W : Z.affineOpens)
+    : Module.Finite Γ(Z, W) (GlobalTheory.HilbAff.Sec A B y W)
+      ∧ Module.Flat Γ(Z, W) (GlobalTheory.HilbAff.Sec A B y W) := by
   obtain ⟨h1, h2, -⟩ := y.2.2
   haveI : IsFinite (subStr A B y) := h1
   haveI : Flat (subStr A B y) := h2

@@ -12,8 +12,8 @@ namespace PositivityTheory.Lit1.GEN.GlobalEulerCharacteristicAlt
 
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
-local instance scalarTowerForFiniteSubfields {F E : FiniteSubfield} [Fact (F ≤ E)] :
-    IsScalarTower F.1 E.1 ℚ̄ :=
+local instance scalarTowerForFiniteSubfields {F E : FiniteSubfield} [Fact (F ≤ E)]
+    : IsScalarTower F.1 E.1 ℚ̄ :=
   IsScalarTower.of_algebraMap_eq fun _ => rfl
 
 set_option maxHeartbeats 1000000 in

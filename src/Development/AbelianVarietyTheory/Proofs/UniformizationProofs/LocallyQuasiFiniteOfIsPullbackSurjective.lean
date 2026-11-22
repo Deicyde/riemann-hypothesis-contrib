@@ -8,10 +8,11 @@ open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
 
 namespace GlobalTheory.Unif
 
-theorem locallyQuasiFinite_of_isPullback_surjective :
-    ∀ (X Z X' Z' : Scheme.{0}) (φ : X ⟶ Z) (φ' : X' ⟶ Z') (a : X' ⟶ X) (p : Z' ⟶ Z),
-      IsPullback a φ' φ p → Surjective p → LocallyOfFiniteType φ → QuasiCompact φ →
-      LocallyQuasiFinite φ' → LocallyQuasiFinite φ := by
+theorem locallyQuasiFinite_of_isPullback_surjective
+    : ∀ (X Z X' Z' : Scheme.{0}) (φ : X ⟶ Z) (φ' : X' ⟶ Z') (a : X' ⟶ X) (p : Z' ⟶ Z),
+      IsPullback a φ' φ p → Surjective p → LocallyOfFiniteType φ → QuasiCompact φ
+        → LocallyQuasiFinite φ'
+        → LocallyQuasiFinite φ := by
   intro X Z X' Z' φ φ' a p h hp _ hqc _
   have : QuasiCompact φ' := MorphismProperty.of_isPullback h hqc
   refine LocallyQuasiFinite.of_finite_preimage_singleton φ fun z => ?_

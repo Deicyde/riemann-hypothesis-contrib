@@ -11,17 +11,21 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField Formalism.BasicNotions Formalism.MainNotions
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 theorem g_mod (D : D7) (k : Fin 2) : D.host.g k % 4 = 1 ∧ D.host.g k % D.host.d = 1 := by
   have hc := D.ntypes.g_cond k
   have hd : D.host.d % 16 = 7 := D.host.hyp.2.2.2.1
   refine ⟨?_, ?_⟩
   · rw [← Nat.mod_mod_of_dvd (D.host.g k)
-      (show 4 ∣ D.host.QS * D.host.q * D.host.d from
-        ((show 4 ∣ 2 ^ (D.R.e + 2) from ⟨2 ^ D.R.e, by ring⟩).trans D.host.tower_dvd).mul_right _ |>.mul_right _), hc]
+        (show 4 ∣ D.host.QS * D.host.q * D.host.d from
+          ((show 4 ∣ 2 ^ (D.R.e + 2) from ⟨2 ^ D.R.e, by ring⟩).trans D.host.tower_dvd).mul_right _
+            |>.mul_right _),
+      hc]
   · rw [← Nat.mod_mod_of_dvd (D.host.g k)
-      (show D.host.d ∣ D.host.QS * D.host.q * D.host.d from Dvd.intro_left _ rfl), hc]
+        (show D.host.d ∣ D.host.QS * D.host.q * D.host.d from Dvd.intro_left _ rfl),
+      hc]
     exact Nat.mod_eq_of_lt (by omega)
 
 theorem g_ne_two (D : D7) (k : Fin 2) : D.host.g k ≠ 2 := by
@@ -50,18 +54,19 @@ theorem splitG (D : D7) : ∀ p ∈ [D.host.g 0, D.host.g 1], SplitOK D p := by
   · exact ⟨D.host.g_prime 1, g_ne_two D 1, g_jacobi D 1⟩
 
 def levelG (D : D7) {hU} : Level (hostOf D hU) :=
-  levelOfPs D [D.host.g 0, D.host.g 1] (fun p hp => ⟨(splitG D p hp).1, (splitG D p hp).2.1⟩) (by simp)
-    (MbProd_of D _ (splitG D)) (MbCop_of D _ (splitG D))
+  levelOfPs D [D.host.g 0, D.host.g 1]
+    (fun p hp => ⟨(splitG D p hp).1, (splitG D p hp).2.1⟩)
+    (by simp) (MbProd_of D _ (splitG D)) (MbCop_of D _ (splitG D))
 
-theorem levelG_M (D : D7) (hU) :
-    (levelG D (hU := hU)).M = D.host.g 0 * D.host.g 1 ∧ (levelG D (hU := hU)).A = 1 := by
+theorem levelG_M (D : D7) (hU)
+    : (levelG D (hU := hU)).M = D.host.g 0 * D.host.g 1 ∧ (levelG D (hU := hU)).A = 1 := by
   constructor <;> simp [levelG, levelOfPs]
 
-theorem tauEmb_sqrt (D : D7) (t : D.what₂.Tau) :
-    DV.tauEmb D t D.host.sqrtMinusD = D.host.φ₀ D.host.sqrtMinusD := by
-  have h1 : D.host.galE
-      (D.host.sigmaOf ((D.eTau t : D.R.Psi) : D.R.GG)) =
-      ((D.eTau t : D.R.Psi) : D.R.GG) :=
+theorem tauEmb_sqrt (D : D7) (t : D.what₂.Tau)
+    : DV.tauEmb D t D.host.sqrtMinusD = D.host.φ₀ D.host.sqrtMinusD := by
+  have h1
+      : D.host.galE (D.host.sigmaOf ((D.eTau t : D.R.Psi) : D.R.GG))
+        = ((D.eTau t : D.R.Psi) : D.R.GG) :=
     MulEquiv.apply_symm_apply _ _
   have hmem := (D.eTau t).2
   rw [← h1] at hmem
@@ -79,7 +84,8 @@ theorem FO_le (D : D7) : FO D ≤ (D.what₂.embLL.toRatAlgHom).fieldRange := by
 
 instance FO_fin (D : D7) : FiniteDimensional ℚ (FO D) := by
   have : FiniteDimensional ℚ (D.what₂.embLL.toRatAlgHom).fieldRange :=
-    LinearEquiv.finiteDimensional (AlgEquiv.ofInjectiveField D.what₂.embLL.toRatAlgHom).toLinearEquiv
+    LinearEquiv.finiteDimensional (AlgEquiv.ofInjectiveField
+      D.what₂.embLL.toRatAlgHom).toLinearEquiv
   exact FiniteDimensional.of_injective (IntermediateField.inclusion (FO_le D)).toLinearMap
     (IntermediateField.inclusion_injective (FO_le D))
 
@@ -103,7 +109,8 @@ theorem conj_mem_FO (D : D7) (τ : D.host.E →+* ℂ) (a : D.host.E) : τ a ∈
   let φ : D.host.E →ₐ[ℚ] ℂ := D.host.φ₀.toRatAlgHom
   let e : D.host.E ≃ₐ[ℚ] φ.fieldRange := AlgEquiv.ofInjectiveField φ
   let f : φ.fieldRange →ₐ[ℚ] ℂ := τ.toRatAlgHom.comp e.symm.toAlgHom
-  have hf : f.fieldRange = φ.fieldRange := key φ.fieldRange (by have := hG; exact Normal.of_algEquiv e) f
+  have hf : f.fieldRange = φ.fieldRange :=
+    key φ.fieldRange (by have := hG; exact Normal.of_algEquiv e) f
   have hmem : τ a ∈ φ.fieldRange := by
     rw [← hf]
     exact ⟨e a, by simp [f]⟩
@@ -150,37 +157,47 @@ def toOF (D : D7) : D.what₂.O →+* 𝓞 (FO D) where
   map_zero' := RingOfIntegers.ext (Subtype.ext (map_zero D.what₂.phiO))
   map_add' x y := RingOfIntegers.ext (Subtype.ext (map_add D.what₂.phiO x y))
 
-theorem toOF_coe (D : D7) (y : D.what₂.O) : (((toOF D y : 𝓞 (FO D)) : FO D) : ℂ) = D.what₂.phiO y := rfl
+theorem toOF_coe (D : D7) (y : D.what₂.O) : (((toOF D y : 𝓞 (FO D)) : FO D) : ℂ) = D.what₂.phiO y :=
+  rfl
 
 theorem toOF_bij (D : D7) (hF : OFull D) : Function.Bijective (toOF D) := by
   refine ⟨fun x y hxy => hF.1 (D.what₂.embLL.injective ?_), fun z => ?_⟩
   · have hc := congrArg (fun w : 𝓞 (FO D) => ((w : FO D) : ℂ)) hxy
     exact hc
-  · obtain ⟨y, hy⟩ := hF.2 ((z : FO D) : ℂ) (z : FO D).2 ((isIntegral_FO D).2 (RingOfIntegers.isIntegral_coe z))
+  · obtain ⟨y, hy⟩ :=
+      hF.2 ((z : FO D) : ℂ) (z : FO D).2 ((isIntegral_FO D).2 (RingOfIntegers.isIntegral_coe z))
     exact ⟨y, RingOfIntegers.ext (Subtype.ext hy)⟩
 
 def eOf (D : D7) (hF : OFull D) : 𝓞 (FO D) ≃+* D.what₂.O :=
   (RingEquiv.ofBijective (toOF D) (toOF_bij D hF)).symm
 
-theorem eOf_spec (D : D7) (hF : OFull D) (x : 𝓞 (FO D)) :
-    D.what₂.embLL (D.what₂.OtoLL (eOf D hF x)) = ((x : FO D) : ℂ) := by
-  have h1 : toOF D (eOf D hF x) = x := (RingEquiv.ofBijective (toOF D) (toOF_bij D hF)).apply_symm_apply x
+theorem eOf_spec (D : D7) (hF : OFull D) (x : 𝓞 (FO D))
+    : D.what₂.embLL (D.what₂.OtoLL (eOf D hF x)) = ((x : FO D) : ℂ) := by
+  have h1 : toOF D (eOf D hF x) = x :=
+    (RingEquiv.ofBijective (toOF D) (toOF_bij D hF)).apply_symm_apply x
   have h2 := toOF_coe D (eOf D hF x)
   rw [h1] at h2
   exact h2.symm
 
-
 open Classical in
-def epsW (D : D7) (j : ℕ) : ℤˣ := if ∃ hI : DatInt D j, DomFor D j (intForm (efQ D j) hI) then 1 else -1
+def epsW (D : D7) (j : ℕ) : ℤˣ :=
+  if ∃ hI : DatInt D j, DomFor D j (intForm (efQ D j) hI) then 1 else -1
 
 theorem epsW_coe (D : D7) (j : ℕ) : ((epsW D j : ℤˣ) : ℤ) = sgnW D j := by
   unfold epsW sgnW
   split_ifs <;> simp
 
-theorem isDatW_datumOf (D : D7) (hU) (j : ℕ) (hI : DatInt D j) (hL : DatLaws D j hI) :
-    IsDatW D j (datumOf D (hU := hU) j hI hL) := by
-  refine ⟨rfl, rfl, (latW D j).subtype, epsW D j, Submodule.injective_subtype _, Submodule.range_subtype _,
-    fun x y => ?_⟩
+theorem isDatW_datumOf (D : D7) (hU) (j : ℕ) (hI : DatInt D j) (hL : DatLaws D j hI)
+    : IsDatW D j (datumOf D (hU := hU) j hI hL) := by
+  refine ⟨
+    rfl,
+    rfl,
+    (latW D j).subtype,
+    epsW D j,
+    Submodule.injective_subtype _,
+    Submodule.range_subtype _,
+    fun x y => ?_
+  ⟩
   show ((sgnW D j * intForm (efQ D j) hI x y : ℤ) : ℚ) = _
   rw [Int.cast_mul, epsW_coe]
   congr 1
@@ -190,15 +207,17 @@ theorem inR_one (D : D7) : InR D 1 := by
   unfold InR
   exact ⟨le_refl 1, le_trans (by norm_num) D.R.two_le_m⟩
 
-
 open Classical in
-def datumAtLift (D : D7) (hU) (hDat : ∀ j, InR D j → ∃ hI : DatInt D j, DatLaws D j hI) (j : ℕ) :
-    Datum (hostOf D hU) :=
-  if h : InR D j then datumOf D j (hDat j h).choose (hDat j h).choose_spec
-  else datumOf D 1 (hDat 1 (inR_one D)).choose (hDat 1 (inR_one D)).choose_spec
+def datumAtLift (D : D7) (hU) (hDat : ∀ j, InR D j → ∃ hI : DatInt D j, DatLaws D j hI) (j : ℕ)
+    : Datum (hostOf D hU) :=
+  if h : InR D j then
+    datumOf D j (hDat j h).choose (hDat j h).choose_spec
+  else
+    datumOf D 1 (hDat 1 (inR_one D)).choose (hDat 1 (inR_one D)).choose_spec
 
-theorem datumAtLift_pq_pos (D : D7) (hU) (hDat : ∀ j, InR D j → ∃ hI : DatInt D j, DatLaws D j hI) (j : ℕ) :
-    1 ≤ (datumAtLift D hU hDat j).p + (datumAtLift D hU hDat j).q := by
+theorem datumAtLift_pq_pos
+    (D : D7) (hU) (hDat : ∀ j, InR D j → ∃ hI : DatInt D j, DatLaws D j hI) (j : ℕ)
+    : 1 ≤ (datumAtLift D hU hDat j).p + (datumAtLift D hU hDat j).q := by
   have := D.R.m_add_three_le_k
   unfold datumAtLift
   split_ifs with h

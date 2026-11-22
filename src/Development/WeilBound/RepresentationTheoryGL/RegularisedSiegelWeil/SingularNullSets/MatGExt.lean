@@ -9,9 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Uni
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open IsDedekindDomain NumberField
@@ -28,9 +32,10 @@ theorem matG_ext {g h : G D n} (e : mat g = mat h) : g = h := by
   apply Subtype.ext; apply Units.ext; exact e
 
 theorem matG_inv {g : G D n} {M : Mx D (n + n) (n + n)} (h : mat g * M = 1) : mat g⁻¹ = M := by
-  have e : mat g⁻¹ * mat g = 1 := by
-    rw [← matG_mul, inv_mul_cancel]; rfl
-  calc mat g⁻¹ = mat g⁻¹ * (mat g * M) := by rw [h, Matrix.mul_one]
+  have e : mat g⁻¹ * mat g = 1 := by rw [← matG_mul, inv_mul_cancel]; rfl
+  calc
+    mat g⁻¹
+      = mat g⁻¹ * (mat g * M) := by rw [h, Matrix.mul_one]
     _ = M := by rw [← Matrix.mul_assoc, e, Matrix.one_mul]
 
 theorem adjM_mul {a b c : ℕ} (x : Mx D a b) (y : Mx D b c) : adj (x * y) = adj y * adj x := by
@@ -43,17 +48,18 @@ end PositivityTheory.Rg.Rsw.L.UnitaryGroupMatrix
 
 namespace PositivityTheory.Rg.Rsw.L
 
-
 open UnitaryGroupMatrix in
 theorem geng : GenG := by
   intro D n A _ h1 hA
-  let S : Subgroup (G D n) :=
-    { carrier := {g | (∀ x ∈ A, g * x ∈ A) ∧ ∀ x ∈ A, g⁻¹ * x ∈ A}
-      mul_mem' := fun {g h} hg hh =>
-        ⟨fun x hx => by rw [mul_assoc]; exact hg.1 _ (hh.1 x hx),
-         fun x hx => by rw [mul_inv_rev, mul_assoc]; exact hh.2 _ (hg.2 x hx)⟩
-      one_mem' := ⟨fun x hx => by rwa [one_mul], fun x hx => by rwa [inv_one, one_mul]⟩
-      inv_mem' := fun {g} hg => ⟨hg.2, fun x hx => by rw [inv_inv]; exact hg.1 x hx⟩ }
+  let S : Subgroup (G D n) := {
+    carrier := {g | (∀ x ∈ A, g * x ∈ A) ∧ ∀ x ∈ A, g⁻¹ * x ∈ A}
+    mul_mem' := fun {g h} hg hh => ⟨
+      fun x hx => by rw [mul_assoc]; exact hg.1 _ (hh.1 x hx),
+      fun x hx => by rw [mul_inv_rev, mul_assoc]; exact hh.2 _ (hg.2 x hx)
+    ⟩
+    one_mem' := ⟨fun x hx => by rwa [one_mul], fun x hx => by rwa [inv_one, one_mul]⟩
+    inv_mem' := fun {g} hg => ⟨hg.2, fun x hx => by rw [inv_inv]; exact hg.1 x hx⟩
+  }
   have hS : S = ⊤ := by
     refine GlobalTheory.T.unitaryUnn_subgroup_eq_top_of_leviUnipotentWeyl D n S ?_ ?_ ?_
     · intro g a hg
@@ -71,7 +77,8 @@ theorem geng : GenG := by
     · intro g hg
       have e : g⁻¹ = g * (g * g) := by
         apply matG_ext
-        rw [matG_inv (M := blk4 0 (-1) 1 0), matG_mul, matG_mul, hg, submatrix_fromBlocks_mul, submatrix_fromBlocks_mul]
+        rw [matG_inv (M := blk4 0 (-1) 1 0), matG_mul, matG_mul, hg, submatrix_fromBlocks_mul,
+          submatrix_fromBlocks_mul]
         · simp
         · rw [hg, submatrix_fromBlocks_mul]; simp [block_matrix_one]
       have hw := hA g (Or.inr (Or.inr hg))

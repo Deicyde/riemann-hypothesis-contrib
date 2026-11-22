@@ -8,11 +8,17 @@ open Matrix
 
 namespace PositivityTheory.SiegelWeilFormula.kunf
 
-theorem exists_beta_pf {K : Type} [Field K] (s : K →+* K) (hs : ∀ x, s (s x) = x) {n : ℕ} (e : K) (he : e * e = 1)
-    (hse : s e = e) (a c d' : Matrix (Fin n) (Fin n) K) (hc : c.det = 0) (hda : e • (c.map s)ᵀ * a + d' * c = 0)
-    (T : Matrix (Fin n) (Fin n) K) (hT : Tᵀ = -(e • T.map s)) (hTd : T.det ≠ 0) :
-    ∃ β₁ : Matrix (Fin n) (Fin n) K, β₁ᵀ = -(e • β₁.map s) ∧ c * β₁ * (e • (c.map s)ᵀ) = 0 ∧
-      (∃ v w : Fin n → K, a * β₁ * (e • (c.map s)ᵀ) = Matrix.vecMulVec v w ∧ w ⬝ᵥ v = 0) ∧ (T * β₁).trace = 2 := by
+theorem exists_beta_pf
+    {K : Type} [Field K]
+    (s : K →+* K) (hs : ∀ x, s (s x) = x)
+    {n : ℕ}
+    (e : K) (he : e * e = 1) (hse : s e = e)
+    (a c d' : Matrix (Fin n) (Fin n) K) (hc : c.det = 0) (hda : e • (c.map s)ᵀ * a + d' * c = 0)
+    (T : Matrix (Fin n) (Fin n) K) (hT : Tᵀ = -(e • T.map s)) (hTd : T.det ≠ 0)
+    : ∃ β₁ : Matrix (Fin n) (Fin n) K,
+      β₁ᵀ = -(e • β₁.map s) ∧ c * β₁ * (e • (c.map s)ᵀ) = 0
+        ∧ (∃ v w : Fin n → K, a * β₁ * (e • (c.map s)ᵀ) = Matrix.vecMulVec v w ∧ w ⬝ᵥ v = 0)
+        ∧ (T * β₁).trace = 2 := by
   classical
   obtain ⟨u, hu0, hcu⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hc
   have hTu : T *ᵥ u ≠ 0 := fun h0 => hTd (Matrix.exists_mulVec_eq_zero_iff.mp ⟨u, hu0, h0⟩)
@@ -42,12 +48,14 @@ theorem exists_beta_pf {K : Type} [Field K] (s : K →+* K) (hs : ∀ x, s (s x)
   · subst hsu hsy
     ext j k
     simp only [Matrix.transpose_apply, Matrix.neg_apply, Matrix.smul_apply, Matrix.map_apply,
-      Matrix.sub_apply, Matrix.vecMulVec_apply, Function.comp_apply, smul_eq_mul, map_sub, map_mul, hs, hse]
+      Matrix.sub_apply, Matrix.vecMulVec_apply, Function.comp_apply, smul_eq_mul, map_sub, map_mul,
+      hs, hse]
     linear_combination (-(y j * u k)) * he
-  · simp [Matrix.mul_sub, Matrix.mul_vecMulVec, Matrix.vecMulVec_mul, Matrix.vecMul_transpose, hcu, hcsu]
+  · simp [Matrix.mul_sub, Matrix.mul_vecMulVec, Matrix.vecMulVec_mul, Matrix.vecMul_transpose, hcu,
+      hcsu]
   · refine ⟨a *ᵥ u, e • (c.map s *ᵥ y), ?_, ?_⟩
-    · simp [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_vecMulVec, Matrix.vecMulVec_mul, Matrix.vecMul_transpose,
-        hcsu]
+    · simp [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_vecMulVec, Matrix.vecMulVec_mul,
+        Matrix.vecMul_transpose, hcsu]
     · rw [smul_dotProduct, key, hM', dotProduct_zero, smul_zero]
   · have h1 : (T *ᵥ u) ⬝ᵥ y = 1 := by rw [dotProduct_comm, hy]
     have hsy1 : sy ⬝ᵥ (T.map s *ᵥ su) = 1 := by
@@ -57,16 +65,17 @@ theorem exists_beta_pf {K : Type} [Field K] (s : K →+* K) (hs : ∀ x, s (s x)
         exact (RingHom.map_mulVec s T u j).symm
       rw [hmv, hsy, ← RingHom.map_dotProduct, hy, map_one]
     have h2 : (T *ᵥ sy) ⬝ᵥ su = -e := by
-      calc (T *ᵥ sy) ⬝ᵥ su = sy ⬝ᵥ (Tᵀ *ᵥ su) := by
-            rw [← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec]
+      calc
+        (T *ᵥ sy) ⬝ᵥ su
+          = sy ⬝ᵥ (Tᵀ *ᵥ su) := by rw [← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec]
         _ = sy ⬝ᵥ ((-(e • T.map s)) *ᵥ su) := by rw [hT]
         _ = -e * (sy ⬝ᵥ (T.map s *ᵥ su)) := by
-            rw [Matrix.neg_mulVec, Matrix.smul_mulVec, dotProduct_neg, dotProduct_smul,
-              smul_eq_mul]
-            ring
+          rw [Matrix.neg_mulVec, Matrix.smul_mulVec, dotProduct_neg, dotProduct_smul, smul_eq_mul]
+          ring
         _ = -e := by rw [hsy1, mul_one]
-    rw [Matrix.mul_sub, Matrix.mul_smul, Matrix.mul_vecMulVec, Matrix.mul_vecMulVec, Matrix.trace_sub,
-      Matrix.trace_smul, Matrix.trace_vecMulVec, Matrix.trace_vecMulVec, h1, h2, smul_eq_mul]
+    rw [Matrix.mul_sub, Matrix.mul_smul, Matrix.mul_vecMulVec, Matrix.mul_vecMulVec,
+      Matrix.trace_sub, Matrix.trace_smul, Matrix.trace_vecMulVec, Matrix.trace_vecMulVec, h1, h2,
+      smul_eq_mul]
     linear_combination he
 
 end PositivityTheory.SiegelWeilFormula.kunf

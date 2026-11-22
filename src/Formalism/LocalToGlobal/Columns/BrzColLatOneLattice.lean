@@ -15,11 +15,14 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.HermitianLattices.TraceIntegrality
+open Formalism.BasicNotions Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps
+  Formalism.HermitianLattices.TraceIntegrality
 
 section Forms
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι]
   (b : Basis ι K V) (P : V →ₗ⋆[K] V →ₗ[K] K)
 
 theorem isSesq_formAt : IsSesq (formAt b P) := by
@@ -27,13 +30,14 @@ theorem isSesq_formAt : IsSesq (formAt b P) := by
   refine ⟨fun x x' y => ?_, fun x y y' => ?_, fun a x y => ?_, fun a x y => ?_⟩
   · simp only [formAt, map_add (f := _), Finsupp.add_apply, add_mul, Finset.sum_add_distrib]
   · simp only [formAt, map_add (f := _), Finsupp.add_apply, mul_add, Finset.sum_add_distrib]
-  · simp only [formAt, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum, mul_assoc]
+  · simp only [formAt, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum,
+      mul_assoc]
   · simp only [formAt, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
 
-theorem gramOf_formAt [DecidableEq ι] (v : InfinitePlace K) :
-    gramOf b (formAt b P v) = Matrix.of fun i j => v.embedding (P (b i) (b j)) := by
+theorem gramOf_formAt [DecidableEq ι] (v : InfinitePlace K)
+    : gramOf b (formAt b P v) = Matrix.of fun i j => v.embedding (P (b i) (b j)) := by
   ext i j
   simp only [gramOf, Matrix.of_apply, formAt, Basis.repr_self, Finsupp.single_apply]
   rw [Finset.sum_eq_single i, Finset.sum_eq_single j]
@@ -45,23 +49,36 @@ theorem gramOf_formAt [DecidableEq ι] (v : InfinitePlace K) :
     simp [Ne.symm hi]
   · intro h; exact absurd (Finset.mem_univ _) h
 
-theorem posAt_formAt [DecidableEq ι] (hpos : ∀ v : InfinitePlace K, (Matrix.of fun i j => v.embedding (P (b i) (b j))).PosDef) :
-    PosAt b (formAt b P) := fun v => by rw [gramOf_formAt]; exact hpos v
+theorem posAt_formAt
+    [DecidableEq ι]
+    (hpos : ∀ v : InfinitePlace K, (Matrix.of fun i j => v.embedding (P (b i) (b j))).PosDef)
+    : PosAt b (formAt b P) := fun v => by
+  rw [gramOf_formAt]; exact hpos v
 
 variable [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [DecidableEq ι]
 
-theorem formH_spec (hpos : ∀ v : InfinitePlace K, (Matrix.of fun i j => v.embedding (P (b i) (b j))).PosDef)
-    (L : Submodule (𝓞 K) V) :
-    FrameOK (ofFormB b L (formAt b P)) ∧
-    (∀ v (x y : V), Formalism.HermitianLatticesTheory.majAt (ofFormB b L (formAt b P)).b (ofFormB b L (formAt b P)).X v x y = formAt b P v x y) ∧
-    (∀ v (x : V), Formalism.HermitianLatticesTheory.normAt (ofFormB b L (formAt b P)).b (ofFormB b L (formAt b P)).X v x =
-      Real.sqrt (formAt b P v x x).re) :=
+theorem formH_spec
+    (hpos : ∀ v : InfinitePlace K, (Matrix.of fun i j => v.embedding (P (b i) (b j))).PosDef)
+    (L : Submodule (𝓞 K) V)
+    : FrameOK (ofFormB b L (formAt b P))
+      ∧ (∀ v (x y : V),
+        Formalism.HermitianLatticesTheory.majAt (ofFormB b L (formAt b P)).b
+            (ofFormB b L (formAt b P)).X v x y
+          = formAt b P v x y)
+      ∧ (∀ v (x : V),
+        Formalism.HermitianLatticesTheory.normAt (ofFormB b L (formAt b P)).b
+            (ofFormB b L (formAt b P)).X v x
+          = Real.sqrt (formAt b P v x x).re) :=
   of_form_spec K V ι b L (formAt b P) (isSesq_formAt b P) (posAt_formAt b P hpos)
 
 end Forms
 
-theorem isLattice_ne_bot {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] [Nontrivial V] {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L) : L ≠ ⊥ := by
+theorem isLattice_ne_bot
+    {K : Type} [Field K] [NumberField K]
+    {V : Type}
+    [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [Nontrivial V]
+    {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L)
+    : L ≠ ⊥ := by
   intro h
   letI := hL
   have h2 := Submodule.IsFullLattice.span_eq_top (A := K) (M := L)

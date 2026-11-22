@@ -6,14 +6,15 @@ public import Formalism.RealPlaceAnalysis.FinalF
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count
 open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem uJ_col_sum {n : ℕ} (ε : Fin n → Bool) (h : Matrix (Fin n) (Fin n) ℂ) (hh : inUJ ε h)
-    (j : Fin n) :
-    ∑ i, (if ε i then (1 : ℝ) else -1) * ‖h i j‖ ^ 2 = if ε j then (1 : ℝ) else -1 := by
+theorem uJ_col_sum
+    {n : ℕ} (ε : Fin n → Bool) (h : Matrix (Fin n) (Fin n) ℂ) (hh : inUJ ε h) (j : Fin n)
+    : ∑ i, (if ε i then (1 : ℝ) else -1) * ‖h i j‖ ^ 2 = if ε j then (1 : ℝ) else -1 := by
   have h1 := congrFun (congrFun hh j) j
   rw [Matrix.mul_apply] at h1
   simp only [Jm, Matrix.mul_diagonal, Matrix.conjTranspose_apply, Matrix.diagonal_apply_eq] at h1
@@ -28,8 +29,8 @@ theorem uJ_col_sum {n : ℕ} (ε : Fin n → Bool) (h : Matrix (Fin n) (Fin n) �
   rw [h2]
   split_ifs <;> simp
 
-theorem uJ_conjTranspose {n : ℕ} (ε : Fin n → Bool) (h : Matrix (Fin n) (Fin n) ℂ)
-    (hh : inUJ ε h) : inUJ ε hᴴ := by
+theorem uJ_conjTranspose {n : ℕ} (ε : Fin n → Bool) (h : Matrix (Fin n) (Fin n) ℂ) (hh : inUJ ε h)
+    : inUJ ε hᴴ := by
   have h1 := (uJInv n ε h hh).1
   have hJ : Jm ε * Jm ε = 1 := by
     simp only [Jm, Matrix.diagonal_mul_diagonal]
@@ -39,29 +40,31 @@ theorem uJ_conjTranspose {n : ℕ} (ε : Fin n → Bool) (h : Matrix (Fin n) (Fi
     split_ifs <;> simp
   unfold inUJ
   rw [Matrix.conjTranspose_conjTranspose]
-  calc h * Jm ε * hᴴ = h * (Jm ε * hᴴ * Jm ε) * Jm ε := by
-        simp only [Matrix.mul_assoc, hJ, Matrix.mul_one]
+  calc
+    h * Jm ε * hᴴ
+      = h * (Jm ε * hᴴ * Jm ε) * Jm ε := by simp only [Matrix.mul_assoc, hJ, Matrix.mul_one]
     _ = Jm ε := by rw [h1, Matrix.one_mul]
 
-theorem hs_le_of_cols (n : ℕ) (ε : Fin n → Bool) (s : Bool) (h : Matrix (Fin n) (Fin n) ℂ)
-    (hh : inUJ ε h) :
-    hs h ≤ n + 4 * ∑ i, ∑ j ∈ univ.filter (fun j => ε j = s), ‖h i j‖ ^ 2 := by
+theorem hs_le_of_cols
+    (n : ℕ) (ε : Fin n → Bool) (s : Bool) (h : Matrix (Fin n) (Fin n) ℂ) (hh : inUJ ε h)
+    : hs h ≤ n + 4 * ∑ i, ∑ j ∈ univ.filter (fun j => ε j = s), ‖h i j‖ ^ 2 := by
   set e : Fin n → ℝ := fun i => if ε i then (1 : ℝ) else -1 with he
   set σ : ℝ := if s then (1 : ℝ) else -1 with hσ
   have hc : ∀ j, ∑ i, e i * ‖h i j‖ ^ 2 = e j := uJ_col_sum ε h hh
   have hr : ∀ i, ∑ j, e j * ‖h i j‖ ^ 2 = e i := fun i => by
     have := uJ_col_sum ε hᴴ (uJ_conjTranspose ε h hh) i
     simpa only [Matrix.conjTranspose_apply, norm_star] using this
-  have hee : ∀ i, e i * e i = 1 := fun i => by
-    simp only [he]; split_ifs <;> simp
+  have hee : ∀ i, e i * e i = 1 := fun i => by simp only [he]; split_ifs <;> simp
   have A : ∑ i, ∑ j, e i * (e j * ‖h i j‖ ^ 2) = n := by
     simp only [← Finset.mul_sum, hr, hee]
     simp
   have B : ∑ i, ∑ j, e j * ‖h i j‖ ^ 2 = ∑ i, ∑ j, e i * ‖h i j‖ ^ 2 := by
     rw [Finset.sum_comm (f := fun i j => e i * ‖h i j‖ ^ 2)]
     simp only [hr, hc]
-  have C : ∑ i, ∑ j, (‖h i j‖ ^ 2 - e i * (e j * ‖h i j‖ ^ 2) + σ * (e j * ‖h i j‖ ^ 2)
-      - σ * (e i * ‖h i j‖ ^ 2)) ≤ ∑ i, ∑ j, 4 * (if ε j = s then ‖h i j‖ ^ 2 else 0) := by
+  have C
+      : ∑ i, ∑ j, (‖h i j‖ ^ 2 - e i * (e j * ‖h i j‖ ^ 2) + σ * (e j * ‖h i j‖ ^ 2)
+          - σ * (e i * ‖h i j‖ ^ 2))
+        ≤ ∑ i, ∑ j, 4 * (if ε j = s then ‖h i j‖ ^ 2 else 0) := by
     refine Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => ?_
     have h0 : 0 ≤ ‖h i j‖ ^ 2 := by positivity
     simp only [he, hσ]

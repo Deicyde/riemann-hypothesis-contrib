@@ -9,18 +9,23 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace UpperTheory.Gal.G3
 
-private theorem ordExStep (hS : OrdStep) {Z Y W : Scheme.{0}} (s : Y ⟶ Z) [IsFinite s] [Etale s] (d : ℕ)
+private theorem ordExStep
+    (hS : OrdStep)
+    {Z Y W : Scheme.{0}} (s : Y ⟶ Z) [IsFinite s] [Etale s]
+    (d : ℕ)
     (c : W ⟶ Z) (σ : Fin d → (W ⟶ Y)) (hcf : IsFinite c) (hce : Etale c) (hσ : ∀ j, σ j ≫ s = c)
     (hinj : ∀ (Ω : Type) [Field Ω] (x : sp Ω ⟶ W), Function.Injective fun j => x ≫ σ j)
-    (huniv : ∀ (U : Scheme.{0}) (z : U ⟶ Z) (y : Fin d → (U ⟶ Y)), (∀ j, y j ≫ s = z) →
-      (∀ (Ω : Type) [Field Ω] (x : sp Ω ⟶ U), Function.Injective fun j => x ≫ y j) →
-      ∃! w : U ⟶ W, w ≫ c = z ∧ ∀ j, w ≫ σ j = y j) :
-    ∃ (W' : Scheme.{0}) (c' : W' ⟶ Z) (σ' : Fin (d + 1) → (W' ⟶ Y)), IsFinite c' ∧ Etale c' ∧
-      (∀ j, σ' j ≫ s = c') ∧
-      (∀ (Ω : Type) [Field Ω] (x : sp Ω ⟶ W'), Function.Injective fun j => x ≫ σ' j) ∧
-      ∀ (U : Scheme.{0}) (z : U ⟶ Z) (y : Fin (d + 1) → (U ⟶ Y)), (∀ j, y j ≫ s = z) →
-        (∀ (Ω : Type) [Field Ω] (x : sp Ω ⟶ U), Function.Injective fun j => x ≫ y j) →
-        ∃! w : U ⟶ W', w ≫ c' = z ∧ ∀ j, w ≫ σ' j = y j := by
+    (huniv : ∀ (U : Scheme.{0}) (z : U ⟶ Z) (y : Fin d → (U ⟶ Y)),
+      (∀ j, y j ≫ s = z)
+        → (∀ (Ω : Type) [Field Ω] (x : sp Ω ⟶ U), Function.Injective fun j => x ≫ y j)
+        → ∃! w : U ⟶ W, w ≫ c = z ∧ ∀ j, w ≫ σ j = y j)
+    : ∃ (W' : Scheme.{0}) (c' : W' ⟶ Z) (σ' : Fin (d + 1) → (W' ⟶ Y)),
+      IsFinite c' ∧ Etale c' ∧ (∀ j, σ' j ≫ s = c')
+        ∧ (∀ (Ω : Type) [Field Ω] (x : sp Ω ⟶ W'), Function.Injective fun j => x ≫ σ' j)
+        ∧ ∀ (U : Scheme.{0}) (z : U ⟶ Z) (y : Fin (d + 1) → (U ⟶ Y)),
+          (∀ j, y j ≫ s = z)
+            → (∀ (Ω : Type) [Field Ω] (x : sp Ω ⟶ U), Function.Injective fun j => x ≫ y j)
+            → ∃! w : U ⟶ W', w ≫ c' = z ∧ ∀ j, w ≫ σ' j = y j := by
   haveI := hcf
   haveI := hce
   let P := pullback s c
@@ -44,14 +49,16 @@ private theorem ordExStep (hS : OrdStep) {Z Y W : Scheme.{0}} (s : Y ⟶ Z) [IsF
       rw [hsec2]; infer_instance
     exact IsClosedImmersion.of_comp (sec j) (pullback.snd s c)
   let S : Set P := ⋃ j, Set.range (sec j).base
-  have hSc : IsClosed S := isClosed_iUnion_of_finite fun j => (hclosed j).isClosedEmbedding.isClosed_range
+  have hSc : IsClosed S :=
+    isClosed_iUnion_of_finite fun j => (hclosed j).isClosedEmbedding.isClosed_range
   have hSo : IsOpen S := isOpen_iUnion fun j => (hopen j).base_open.isOpen_range
   let O : P.Opens := ⟨Sᶜ, hSc.isOpen_compl⟩
   have hOr : Set.range O.ι.base = Sᶜ := O.range_ι
   haveI : IsClosedImmersion O.ι := .of_isPreimmersion _ (by rw [hOr]; exact hSo.isClosed_compl)
-  have hpt : ∀ (j : Fin d) (Ω : Type) [Field Ω] (x : sp Ω ⟶ P),
-      x.base (IsLocalRing.closedPoint Ω) ∈ Set.range (sec j).base →
-      x ≫ pullback.fst s c = x ≫ pullback.snd s c ≫ σ j := by
+  have hpt
+      : ∀ (j : Fin d) (Ω : Type) [Field Ω] (x : sp Ω ⟶ P),
+        x.base (IsLocalRing.closedPoint Ω) ∈ Set.range (sec j).base
+          → x ≫ pullback.fst s c = x ≫ pullback.snd s c ≫ σ j := by
     intro j Ω _ x hx
     have hr : Set.range x.base ⊆ Set.range (sec j).base := by
       rintro _ ⟨p, rfl⟩
@@ -59,15 +66,26 @@ private theorem ordExStep (hS : OrdStep) {Z Y W : Scheme.{0}} (s : Y ⟶ Z) [IsF
     haveI := hopen j
     have hf := IsOpenImmersion.lift_fac (sec j) x hr
     rw [← hf, Category.assoc, Category.assoc, hsec1, reassoc_of% hsec2]
-  have hback : ∀ (j : Fin d) {T : Scheme.{0}} (x : T ⟶ P),
-      x ≫ pullback.fst s c = x ≫ pullback.snd s c ≫ σ j → x = (x ≫ pullback.snd s c) ≫ sec j := by
+  have hback
+      : ∀ (j : Fin d) {T : Scheme.{0}} (x : T ⟶ P),
+        x ≫ pullback.fst s c = x ≫ pullback.snd s c ≫ σ j → x = (x ≫ pullback.snd s c) ≫ sec j := by
     intro j T x hx
     apply pullback.hom_ext
     · rw [Category.assoc, hsec1, hx, Category.assoc]
     · rw [Category.assoc, hsec2, Category.comp_id]
-  refine ⟨O, O.ι ≫ pullback.snd s c ≫ c,
-    Fin.snoc (α := fun _ => ((O : Scheme) ⟶ Y)) (fun j => O.ι ≫ pullback.snd s c ≫ σ j)
-      (O.ι ≫ pullback.fst s c), inferInstance, inferInstance, ?_, ?_, ?_⟩
+  refine ⟨
+    O,
+    O.ι ≫ pullback.snd s c ≫ c,
+    Fin.snoc
+      (α := fun _ => ((O : Scheme) ⟶ Y))
+      (fun j => O.ι ≫ pullback.snd s c ≫ σ j)
+      (O.ι ≫ pullback.fst s c),
+    inferInstance,
+    inferInstance,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro k
     refine Fin.lastCases ?_ (fun j => ?_) k
     · simp only [Fin.snoc_last, Category.assoc, pullback.condition]
@@ -99,10 +117,14 @@ private theorem ordExStep (hS : OrdStep) {Z Y W : Scheme.{0}} (s : Y ⟶ Z) [IsF
         exact absurd hab.symm (key i)
       | cast j =>
         simp only [Fin.snoc_castSucc] at hab
-        exact congrArg Fin.castSucc (hinj Ω (x ≫ O.ι ≫ pullback.snd s c) (by simpa only [Category.assoc] using hab))
+        exact congrArg Fin.castSucc
+          (hinj Ω (x ≫ O.ι ≫ pullback.snd s c) (by simpa only [Category.assoc] using hab))
   · intro U z y hy hinjU
-    obtain ⟨w0, ⟨hw0c, hw0σ⟩, hw0u⟩ := huniv U z (fun j => y j.castSucc) (fun j => hy _)
-      (fun Ω _ x a b h => Fin.castSucc_injective _ (hinjU Ω x h))
+    obtain ⟨w0, ⟨hw0c, hw0σ⟩, hw0u⟩ :=
+      huniv U z
+        (fun j => y j.castSucc)
+        (fun j => hy _)
+        (fun Ω _ x a b h => Fin.castSucc_injective _ (hinjU Ω x h))
     let φ : U ⟶ P := pullback.lift (y (Fin.last d)) w0 (by rw [hy, hw0c])
     have hφ1 : φ ≫ pullback.fst s c = y (Fin.last d) := pullback.lift_fst _ _ _
     have hφ2 : φ ≫ pullback.snd s c = w0 := pullback.lift_snd _ _ _
@@ -114,10 +136,11 @@ private theorem ordExStep (hS : OrdStep) {Z Y W : Scheme.{0}} (s : Y ⟶ Z) [IsF
       let x := U.fromSpecResidueField u
       have hxu : x.base (IsLocalRing.closedPoint (U.residueField u)) = u :=
         U.fromSpecResidueField_apply u _
-      have := hpt j (U.residueField u) (x ≫ φ) (by
-        show φ.base (x.base _) ∈ _
-        rw [hxu]
-        exact hj)
+      have :=
+        hpt j (U.residueField u) (x ≫ φ) (by
+          show φ.base (x.base _) ∈ _
+          rw [hxu]
+          exact hj)
       rw [Category.assoc, Category.assoc, hφ1, reassoc_of% hφ2, hw0σ] at this
       exact (Fin.castSucc_lt_last j).ne (hinjU _ x this).symm
     refine ⟨IsOpenImmersion.lift O.ι φ hrange, ⟨?_, fun k => ?_⟩, ?_⟩

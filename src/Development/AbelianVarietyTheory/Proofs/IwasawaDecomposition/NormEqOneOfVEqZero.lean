@@ -13,16 +13,16 @@ namespace GlobalTheory.LocArith
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem v_nonneg_iff (P : LocPrime l) (LL : FinExt l) (y : ↥LL.1) :
-    0 ≤ P.v LL y ↔ ‖((y : ↥LL.1) : Om l)‖ ≤ 1 := by
+theorem v_nonneg_iff (P : LocPrime l) (LL : FinExt l) (y : ↥LL.1)
+    : 0 ≤ P.v LL y ↔ ‖((y : ↥LL.1) : Om l)‖ ≤ 1 := by
   rw [P.v_O]
   exact GlobalTheory.mem_integralClosure_padicInt_iff LL.1 y
 
 theorem norm_natCast_prime : ‖((l : ℕ) : Om l)‖ = (l : ℝ)⁻¹ := by
   rw [← map_natCast (algebraMap ℚ_[l] (Om l)), PadicAlgCl.norm_extends, Padic.norm_p]
 
-theorem norm_eq_one_of_v_eq_zero (P : LocPrime l) (LL : FinExt l) (y : ↥LL.1) (hy : P.v LL y = 0) :
-    ‖((y : ↥LL.1) : Om l)‖ = 1 := by
+theorem norm_eq_one_of_v_eq_zero (P : LocPrime l) (LL : FinExt l) (y : ↥LL.1) (hy : P.v LL y = 0)
+    : ‖((y : ↥LL.1) : Om l)‖ = 1 := by
   have hy0 : y ≠ 0 := by
     rintro rfl
     rw [AddValuation.map_zero] at hy
@@ -38,9 +38,9 @@ theorem norm_eq_one_of_v_eq_zero (P : LocPrime l) (LL : FinExt l) (y : ↥LL.1) 
   rw [IntermediateField.coe_inv, norm_inv, inv_le_one₀ hpos] at h2
   exact le_antisymm h1 h2
 
-theorem norm_of_v_eq (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) (r : ℚ)
-    (hx : P.v LL x = ((r : ℚ) : WithTop ℚ)) :
-    ‖((x : ↥LL.1) : Om l)‖ = (l : ℝ) ^ (-(r : ℝ)) := by
+theorem norm_of_v_eq
+    (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) (r : ℚ) (hx : P.v LL x = ((r : ℚ) : WithTop ℚ))
+    : ‖((x : ↥LL.1) : Om l)‖ = (l : ℝ) ^ (-(r : ℝ)) := by
   set n := r.den with hn
   set a := r.num.toNat with ha
   set b := (-r.num).toNat with hb
@@ -54,7 +54,8 @@ theorem norm_of_v_eq (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) (r : ℚ)
   have hvy : P.v LL y = 0 := by
     have h := congrArg (P.v LL) hya
     rw [AddValuation.map_mul, AddValuation.map_mul, AddValuation.map_pow, AddValuation.map_pow,
-      AddValuation.map_pow, P.v_l, hx] at h
+        AddValuation.map_pow, P.v_l, hx]
+      at h
     have e1 : (n • ((r : ℚ) : WithTop ℚ)) = (((n : ℚ) * r : ℚ) : WithTop ℚ) := by
       rw [← WithTop.coe_nsmul, nsmul_eq_mul]
     have e2 : ∀ m : ℕ, m • (1 : WithTop ℚ) = (((m : ℚ) : ℚ) : WithTop ℚ) := fun m => by
@@ -69,9 +70,9 @@ theorem norm_of_v_eq (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) (r : ℚ)
       have : s = 0 := by linarith
       rw [this, WithTop.coe_zero]
   have hN := congrArg (fun z : ↥LL.1 => ‖((z : ↥LL.1) : Om l)‖) hya
-  simp only [IntermediateField.coe_mul, IntermediateField.coe_pow,
-    norm_mul, norm_pow] at hN
-  have hc : (((l : ℕ) : ↥LL.1) : Om l) = ((l : ℕ) : Om l) := map_natCast (IntermediateField.val LL.1) l
+  simp only [IntermediateField.coe_mul, IntermediateField.coe_pow, norm_mul, norm_pow] at hN
+  have hc : (((l : ℕ) : ↥LL.1) : Om l) = ((l : ℕ) : Om l) :=
+    map_natCast (IntermediateField.val LL.1) l
   rw [norm_eq_one_of_v_eq_zero P LL y hvy, hc, norm_natCast_prime] at hN
   have hpos : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
   have hn0 : n ≠ 0 := r.den_nz
@@ -91,8 +92,8 @@ theorem norm_of_v_eq (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) (r : ℚ)
   rw [← hrn] at hxn
   exact (pow_left_inj₀ (norm_nonneg _) (Real.rpow_nonneg hpos.le _) hn0).1 hxn
 
-theorem v_eq_iff (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) (q : ℚ) :
-    P.v LL x = ((q : ℚ) : WithTop ℚ) ↔ ‖((x : ↥LL.1) : Om l)‖ = (l : ℝ) ^ (-(q : ℝ)) := by
+theorem v_eq_iff (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) (q : ℚ)
+    : P.v LL x = ((q : ℚ) : WithTop ℚ) ↔ ‖((x : ↥LL.1) : Om l)‖ = (l : ℝ) ^ (-(q : ℝ)) := by
   refine ⟨norm_of_v_eq P LL x q, fun h => ?_⟩
   have hpos : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
@@ -106,11 +107,13 @@ theorem v_eq_iff (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) (q : ℚ) :
   have h2 := norm_of_v_eq P LL x s hs.symm
   rw [h2] at h
   have hqs : (q : ℝ) = (s : ℝ) := by
-    have := le_antisymm ((Real.rpow_le_rpow_left_iff hl1).1 h.le) ((Real.rpow_le_rpow_left_iff hl1).1 h.ge)
+    have :=
+      le_antisymm ((Real.rpow_le_rpow_left_iff hl1).1 h.le)
+        ((Real.rpow_le_rpow_left_iff hl1).1 h.ge)
     linarith
   rw [← hs, show q = s by exact_mod_cast hqs]
 
-theorem arithTied : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l), Formalism.L2.ArithTied P := fun l _ P =>
-  ⟨fun LL x q => v_eq_iff P LL x q⟩
+theorem arithTied : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l), Formalism.L2.ArithTied P :=
+  fun l _ P => ⟨fun LL x q => v_eq_iff P LL x q⟩
 
 end GlobalTheory.LocArith

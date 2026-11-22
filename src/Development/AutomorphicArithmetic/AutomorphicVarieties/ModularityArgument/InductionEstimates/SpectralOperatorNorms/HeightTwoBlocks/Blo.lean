@@ -17,6 +17,7 @@ def On (d : Dat S n) (Λ : (E →+* ℂ) → Multiset ℂ) (t : Pl E → Multise
 
 def blo : {n : ℕ} → (d : Dat S n) → Fin d.len → Σ r, Blo S r
   | _, nil => fun j => j.elim0
-  | _, cons b d => fun j => Fin.cases (motive := fun _ => Σ r, Blo S r) ⟨_, b⟩ d.blo (j : Fin (d.len + 1))
+  | _, cons b d => fun j =>
+    Fin.cases (motive := fun _ => Σ r, Blo S r) ⟨_, b⟩ d.blo (j : Fin (d.len + 1))
 
 end UpperTheory.ConvolutionTheory.BW.Dat

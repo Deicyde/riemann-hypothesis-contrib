@@ -21,8 +21,8 @@ theorem LocalDimDomain.proof : LocalDimDomain.Statement := by
   have hm : m.IsMaximal :=
     Ideal.IsMaximal.map_of_surjective_of_ker_le Ideal.Quotient.mk_surjective
       (by rw [Ideal.mk_ker]; exact hJM)
-  have hsub : Algebra.algebraMapSubmonoid (MvPolynomial (Fin n) ℂ ⧸ J) M.primeCompl =
-      m.primeCompl := by
+  have hsub
+      : Algebra.algebraMapSubmonoid (MvPolynomial (Fin n) ℂ ⧸ J) M.primeCompl = m.primeCompl := by
     ext x
     obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective x
     constructor

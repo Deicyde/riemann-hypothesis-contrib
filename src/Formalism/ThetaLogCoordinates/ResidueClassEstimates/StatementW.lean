@@ -12,6 +12,9 @@ open scoped BigOperators
 namespace Formalism.InvariantFactorPaths.BranchingDimensions
 
 def WeylGT : Prop :=
-  BranchDim → ∀ (n : ℕ) (μ : Fin n → ℤ), Antitone μ → weylDim n (extW μ) = (Formalism.InvariantFactorPaths.GelfandTsetlinBases.dGT n μ : ℝ)
+  BranchDim
+    → ∀ (n : ℕ) (μ : Fin n → ℤ),
+      Antitone μ
+        → weylDim n (extW μ) = (Formalism.InvariantFactorPaths.GelfandTsetlinBases.dGT n μ : ℝ)
 
 end Formalism.InvariantFactorPaths.BranchingDimensions

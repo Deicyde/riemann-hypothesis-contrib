@@ -7,6 +7,7 @@ public import Formalism.SharpRestriction.GrowthBounds.MultisetValuation.NdBNonne
 
 namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
-theorem stmtNumE : Formalism.MainNotions.FormalGroupSystem.NumericalComparisonUniform := numericalComparisonUniform_of_size nd_size
+theorem stmtNumE : Formalism.MainNotions.FormalGroupSystem.NumericalComparisonUniform :=
+  numericalComparisonUniform_of_size nd_size
 
 end Formalism.MainNotions.FormalGroupSystem.Pf

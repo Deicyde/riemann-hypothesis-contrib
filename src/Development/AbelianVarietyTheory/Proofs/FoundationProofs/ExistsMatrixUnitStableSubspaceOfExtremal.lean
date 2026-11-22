@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HighestWe
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
+open Formalism.BasicNotions.TH GlobalTheory.FockAlg
+  GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
 open Formalism.MainNotions.SchurIrreducible (IrrU IrrGK IsHCMod)
 open scoped TensorProduct
 
@@ -84,8 +85,24 @@ lemma eig_of_wt {act : Mat p q →ₗ[ℂ] Module.End ℂ V} (c : Ix p q → ℂ
     simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, hv, Finset.sum_smul,
     mul_smul]
 
-theorem exists_generated :
-    ∀ (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (act : Mat p q →ₗ[ℂ] Module.End ℂ V), IsLieAct act → ∀ (S : Ix p q → Ix p q → Prop), Equivalence S → ∀ (r : Ix p q → ℕ), Function.Injective r → ∀ (μ : Ix p q → ℚ) (v : V), v ∈ wtSub act μ → (∀ a b, S a b → r a < r b → act (Eab a b) v = 0) → ∃ U : Submodule ℂ V, v ∈ U ∧ (∀ a b, S a b → ∀ x ∈ U, act (Eab a b) x ∈ U) ∧ (∀ U' : Submodule ℂ V, v ∈ U' → (∀ a b, S a b → r a < r b → ∀ x ∈ U', act (Eab b a) x ∈ U') → U ≤ U') ∧ (∀ x ∈ U, x ∈ wtSub act μ → ∃ c : ℂ, x = c • v) ∧ ∀ (ν : Ix p q → ℚ), ∀ x ∈ U, x ≠ 0 → x ∈ wtSub act ν → ν = μ ∨ ∑ a, (r a : ℚ) * μ a < ∑ a, (r a : ℚ) * ν a := by
+theorem exists_generated
+    : ∀ (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (act : Mat p q →ₗ[ℂ] Module.End ℂ V),
+      IsLieAct act
+        → ∀ (S : Ix p q → Ix p q → Prop),
+          Equivalence S
+            → ∀ (r : Ix p q → ℕ),
+              Function.Injective r
+                → ∀ (μ : Ix p q → ℚ) (v : V),
+                  v ∈ wtSub act μ → (∀ a b, S a b → r a < r b → act (Eab a b) v = 0)
+                    → ∃ U : Submodule ℂ V,
+                      v ∈ U ∧ (∀ a b, S a b → ∀ x ∈ U, act (Eab a b) x ∈ U)
+                        ∧ (∀ U' : Submodule ℂ V,
+                          v ∈ U' → (∀ a b, S a b → r a < r b → ∀ x ∈ U', act (Eab b a) x ∈ U')
+                            → U ≤ U')
+                        ∧ (∀ x ∈ U, x ∈ wtSub act μ → ∃ c : ℂ, x = c • v)
+                        ∧ ∀ (ν : Ix p q → ℚ), ∀ x ∈ U,
+                          x ≠ 0 → x ∈ wtSub act ν
+                            → ν = μ ∨ ∑ a, (r a : ℚ) * μ a < ∑ a, (r a : ℚ) * ν a := by
   intro p q V _ _ act hL S hS r hr μ v hv hup
   have hv' := mem_wt.1 hv
   set F : Set (Submodule ℂ V) :=
@@ -100,7 +117,8 @@ theorem exists_generated :
       rcases lt_trichotomy (r a) (r b) with h | h | h
       · rw [hup a b hab h]; exact Submodule.zero_mem _
       · obtain rfl := hr h
-        rw [hv']; exact Submodule.smul_mem _ _ hG.1
+        rw [hv']
+        exact Submodule.smul_mem _ _ hG.1
       · exact hG.2 b a (hS.symm hab) h v hG.1
     · intro a b hab hlt y hy
       simp only [Submodule.mem_inf, Submodule.mem_iInf, Submodule.mem_comap] at hy ⊢
@@ -110,25 +128,28 @@ theorem exists_generated :
       exact Submodule.add_mem _ (hG.2 a b hab hlt _ (hy.2 Z hZ)) (hy.2 _ (supp_comm hS hZ hE))
   set c : Ix p q → ℂ := fun a => (r a : ℂ) with hc
   set h : Module.End ℂ V := act (Matrix.diagonal c) with hh
-  have hcast : ∀ ν : Ix p q → ℚ,
-      ∑ a, c a * ((ν a : ℚ) : ℂ) = ((∑ a, (r a : ℚ) * ν a : ℚ) : ℂ) := by
+  have hcast : ∀ ν : Ix p q → ℚ, ∑ a, c a * ((ν a : ℚ) : ℂ) = ((∑ a, (r a : ℚ) * ν a : ℚ) : ℂ) := by
     intro ν; simp [hc]
-  have heig : ∀ (ν : Ix p q → ℚ) (x : V), x ∈ wtSub act ν →
-      x ∈ h.eigenspace ((∑ a, (r a : ℚ) * ν a : ℚ) : ℂ) := by
+  have heig
+      : ∀ (ν : Ix p q → ℚ) (x : V),
+        x ∈ wtSub act ν → x ∈ h.eigenspace ((∑ a, (r a : ℚ) * ν a : ℚ) : ℂ) := by
     intro ν x hx
-    rw [← hcast]; exact eig_of_wt c hx
+    rw [← hcast]
+    exact eig_of_wt c hx
   set m : ℚ := ∑ a, (r a : ℚ) * μ a with hm
   have hvm : v ∈ h.eigenspace (m : ℂ) := heig μ v hv
   set Q : Submodule ℂ V := ⨆ (t : ℚ) (_ : m < t), h.eigenspace (t : ℂ) with hQ
-  have hshift : ∀ a b, r a < r b → ∀ t : ℚ, m ≤ t →
-      ∀ y ∈ h.eigenspace (t : ℂ), act (Eab b a) y ∈ Q := by
+  have hshift
+      : ∀ a b, r a < r b → ∀ t : ℚ, m ≤ t → ∀ y ∈ h.eigenspace (t : ℂ), act (Eab b a) y ∈ Q := by
     intro a b hab t ht y hy
     have h1 := eig_shift hL c b a hy
     have h2 : (t : ℂ) + (c b - c a) = ((t + ((r b : ℚ) - (r a : ℚ)) : ℚ) : ℂ) := by simp [hc]
     rw [h2] at h1
     have h3 : (r a : ℚ) < r b := by exact_mod_cast hab
-    exact (le_iSup₂_of_le (f := fun (t : ℚ) (_ : m < t) => h.eigenspace (t : ℂ)) _
-      (by linarith) le_rfl : _ ≤ Q) h1
+    exact
+      (le_iSup₂_of_le (f := fun (t : ℚ) (_ : m < t) => h.eigenspace (t : ℂ)) _ (by linarith) le_rfl
+          : _ ≤ Q)
+        h1
   have hlow : ∀ a b, r a < r b → ∀ y ∈ (ℂ ∙ v) ⊔ Q, act (Eab b a) y ∈ Q := by
     intro a b hab
     have : (ℂ ∙ v) ⊔ Q ≤ Q.comap (act (Eab b a)) := by
@@ -137,8 +158,10 @@ theorem exists_generated :
       exact hshift a b hab m le_rfl v hvm
     exact this
   have hle : sInf F ≤ (ℂ ∙ v) ⊔ Q :=
-    sInf_le ⟨Submodule.mem_sup_left (Submodule.mem_span_singleton_self v),
-      fun a b _ hab y hy => Submodule.mem_sup_right (hlow a b hab y hy)⟩
+    sInf_le ⟨
+      Submodule.mem_sup_left (Submodule.mem_span_singleton_self v),
+      fun a b _ hab y hy => Submodule.mem_sup_right (hlow a b hab y hy)
+    ⟩
   have hQle : ∀ n : ℚ, n ≤ m → Q ≤ ⨆ (j : ℂ) (_ : j ≠ (n : ℂ)), h.eigenspace j := by
     intro n hn
     refine iSup₂_le fun t ht => le_iSup₂_of_le (t : ℂ) ?_ le_rfl
@@ -153,11 +176,16 @@ theorem exists_generated :
       have := Submodule.sub_mem _ hxm (Submodule.smul_mem _ s hvm)
       simpa using this
     have hz0 : z = 0 :=
-      Submodule.disjoint_def.1 (Module.End.eigenspaces_iSupIndep h (m : ℂ)) z hzm
-        (hQle m le_rfl hz)
+      Submodule.disjoint_def.1 (Module.End.eigenspaces_iSupIndep h (m : ℂ)) z hzm (hQle m le_rfl hz)
     exact ⟨s, by rw [hz0, add_zero]⟩
-  refine ⟨sInf F, hG.1, fun a b hab x hx => ?_, fun U' h1 h2 => sInf_le ⟨h1, h2⟩,
-    fun x hx hxμ => hline x hx (heig μ x hxμ), fun ν x hx hx0 hxν => ?_⟩
+  refine ⟨
+    sInf F,
+    hG.1,
+    fun a b hab x hx => ?_,
+    fun U' h1 h2 => sInf_le ⟨h1, h2⟩,
+    fun x hx hxμ => hline x hx (heig μ x hxμ),
+    fun ν x hx hx0 hxν => ?_
+  ⟩
   · have := sInf_le hG' hx
     simp only [Submodule.mem_inf, Submodule.mem_iInf, Submodule.mem_comap] at this
     exact this.2 _ (supp_Eab hab)
@@ -180,7 +208,9 @@ theorem exists_generated :
       refine (sup_le ?_ (hQle n hgt.le) : (ℂ ∙ v) ⊔ Q ≤ _) (hle hx)
       rw [Submodule.span_singleton_le_iff_mem]
       have hne : (m : ℂ) ≠ (n : ℂ) := by exact_mod_cast hgt.ne'
-      exact (le_iSup₂_of_le (f := fun (j : ℂ) (_ : j ≠ (n : ℂ)) => h.eigenspace j) (m : ℂ) hne
-        le_rfl : _ ≤ _) hvm
+      exact
+        (le_iSup₂_of_le (f := fun (j : ℂ) (_ : j ≠ (n : ℂ)) => h.eigenspace j) (m : ℂ) hne le_rfl
+            : _ ≤ _)
+          hvm
 
 end GlobalTheory.ExtremalGen

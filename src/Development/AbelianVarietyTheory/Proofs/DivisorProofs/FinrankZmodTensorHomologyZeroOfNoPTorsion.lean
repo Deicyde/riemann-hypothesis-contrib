@@ -8,10 +8,12 @@ open CategoryTheory Limits
 
 namespace GlobalTheory
 
-theorem exists_torsion_eq_prime_smul_of_noPTorsion {M : Type*} [AddCommGroup M] (p : ℕ)
-    [hp : Fact p.Prime] (hM : ∀ x : M, (p : ℤ) • x = 0 → x = 0) (t : M)
-    (ht : t ∈ Submodule.torsion ℤ M) :
-    ∃ s ∈ Submodule.torsion ℤ M, t = (p : ℤ) • s := by
+theorem exists_torsion_eq_prime_smul_of_noPTorsion
+    {M : Type*} [AddCommGroup M]
+    (p : ℕ) [hp : Fact p.Prime]
+    (hM : ∀ x : M, (p : ℤ) • x = 0 → x = 0)
+    (t : M) (ht : t ∈ Submodule.torsion ℤ M)
+    : ∃ s ∈ Submodule.torsion ℤ M, t = (p : ℤ) • s := by
   obtain ⟨⟨a, ha⟩, hat⟩ := (Submodule.mem_torsion_iff t).1 ht
   have ha0 : a ≠ 0 := nonZeroDivisors.ne_zero ha
   change a • t = 0 at hat
@@ -21,7 +23,8 @@ theorem exists_torsion_eq_prime_smul_of_noPTorsion {M : Type*} [AddCommGroup M] 
     rcases Int.natAbs_eq a with h | h
     · rw [← h]; exact hat
     · have : a = -(n : ℤ) := h
-      rw [this, neg_smul, neg_eq_zero] at hat; exact hat
+      rw [this, neg_smul, neg_eq_zero] at hat
+      exact hat
   have hpow : ∀ k : ℕ, ∀ y : M, ((p : ℤ) ^ k) • y = 0 → y = 0 := by
     intro k
     induction k with
@@ -45,13 +48,14 @@ theorem exists_torsion_eq_prime_smul_of_noPTorsion {M : Type*} [AddCommGroup M] 
     simpa [Int.gcd_natCast_natCast] using hcop
   obtain ⟨u, v, huv⟩ := hic
   refine ⟨u • t, Submodule.smul_mem _ _ ht, ?_⟩
-  calc t = ((u * p + v * m : ℤ)) • t := by rw [huv, one_smul]
+  calc
+    t = ((u * p + v * m : ℤ)) • t := by rw [huv, one_smul]
     _ = (p : ℤ) • (u • t) := by
       rw [add_smul, mul_smul, mul_smul, hmt, smul_zero, add_zero, smul_comm]
 
-theorem subsingleton_zmod_tensor_torsion {M : Type*} [AddCommGroup M] (p : ℕ) [Fact p.Prime]
-    (hM : ∀ x : M, (p : ℤ) • x = 0 → x = 0) :
-    Subsingleton (TensorProduct ℤ (ZMod p) (Submodule.torsion ℤ M)) := by
+theorem subsingleton_zmod_tensor_torsion
+    {M : Type*} [AddCommGroup M] (p : ℕ) [Fact p.Prime] (hM : ∀ x : M, (p : ℤ) • x = 0 → x = 0)
+    : Subsingleton (TensorProduct ℤ (ZMod p) (Submodule.torsion ℤ M)) := by
   refine subsingleton_of_forall_eq 0 fun z => ?_
   induction z using TensorProduct.induction_on with
   | zero => rfl
@@ -59,14 +63,15 @@ theorem subsingleton_zmod_tensor_torsion {M : Type*} [AddCommGroup M] (p : ℕ) 
     obtain ⟨s, hs, hts⟩ := exists_torsion_eq_prime_smul_of_noPTorsion p hM t.1 t.2
     have : t = (p : ℤ) • (⟨s, hs⟩ : Submodule.torsion ℤ M) := Subtype.ext hts
     rw [this, ← TensorProduct.smul_tmul]
-    have hc : (p : ℤ) • c = 0 := by
-      rw [zsmul_eq_mul, Int.cast_natCast, ZMod.natCast_self, zero_mul]
+    have hc : (p : ℤ) • c = 0 := by rw [zsmul_eq_mul, Int.cast_natCast, ZMod.natCast_self, zero_mul]
     rw [hc, TensorProduct.zero_tmul]
   | add x y hx hy => rw [hx, hy, add_zero]
 
-theorem finrank_zmod_tensor_eq_finrank_of_noPTorsion (M : Type*) [AddCommGroup M] [inst : Module ℤ M]
-    [Module.Finite ℤ M] (p : ℕ) [Fact p.Prime] (hM : ∀ x : M, (p : ℤ) • x = 0 → x = 0) :
-    Module.finrank (ZMod p) (TensorProduct ℤ (ZMod p) M) = Module.finrank ℤ M := by
+theorem finrank_zmod_tensor_eq_finrank_of_noPTorsion
+    (M : Type*) [AddCommGroup M] [inst : Module ℤ M] [Module.Finite ℤ M]
+    (p : ℕ) [Fact p.Prime]
+    (hM : ∀ x : M, (p : ℤ) • x = 0 → x = 0)
+    : Module.finrank (ZMod p) (TensorProduct ℤ (ZMod p) M) = Module.finrank ℤ M := by
   obtain rfl : inst = AddCommGroup.toIntModule M := Subsingleton.elim _ _
   set T := Submodule.torsion ℤ M
   haveI : Module.Free ℤ (M ⧸ T) := Module.free_of_finite_type_torsion_free'
@@ -85,11 +90,11 @@ theorem finrank_zmod_tensor_eq_finrank_of_noPTorsion (M : Type*) [AddCommGroup M
   rw [(LinearEquiv.ofBijective g ⟨hinj, hsurj⟩).finrank_eq, Module.finrank_baseChange,
     finrank_quotient_eq_of_le_torsion le_rfl]
 
-theorem finrank_zmod_tensor_homology_zero :
-    ∀ (C : CochainComplex (ModuleCat.{0} ℤ) ℕ) (p : ℕ) [Fact p.Prime],
-      (∀ (x : C.X 0), (p : ℤ) • x = 0 → x = 0) → Module.Finite ℤ (C.homology 0) →
-      Module.finrank (ZMod p) (TensorProduct ℤ (ZMod p) (C.homology 0)) =
-        Module.finrank ℤ (C.homology 0) := by
+theorem finrank_zmod_tensor_homology_zero
+    : ∀ (C : CochainComplex (ModuleCat.{0} ℤ) ℕ) (p : ℕ) [Fact p.Prime],
+      (∀ (x : C.X 0), (p : ℤ) • x = 0 → x = 0) → Module.Finite ℤ (C.homology 0)
+        → Module.finrank (ZMod p) (TensorProduct ℤ (ZMod p) (C.homology 0))
+          = Module.finrank ℤ (C.homology 0) := by
   intro C p _ hC _
   let f : C.homology 0 ⟶ C.X 0 := C.isoHomologyπ₀.inv ≫ C.iCycles 0
   have hinj : Function.Injective (ConcreteCategory.hom f) :=

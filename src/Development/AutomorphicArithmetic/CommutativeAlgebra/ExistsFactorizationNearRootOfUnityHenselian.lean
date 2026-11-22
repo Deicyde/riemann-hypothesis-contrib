@@ -142,9 +142,16 @@ private lemma mem_mm_top {A D : Type} [CommRing A] [IsLocalRing A] [CommRing D] 
 end UpperTheory.LinearFiltration
 
 open UpperTheory.LinearFiltration in
-theorem UpperTheory.exists_factorization_near_root_of_unity_henselian :
-    ∀ (A D : Type) [CommRing A] [HenselianLocalRing A] [CommRing D] [Algebra A D] (T : TC A D), T.Fin → T.Coord → ∀ (q : ℕ), IsUnit (q : A) → ∀ ω : D, ω ^ q - 1 ∈ mm (⊤ : Subalgebra A D) →
-      ∃ g' ∈ T.B, ∃ g ∈ T.C, ∃ μ : D, g' - 1 ∈ mm T.B ∧ g - 1 ∈ mm T.C ∧ μ - ω ∈ mm (⊤ : Subalgebra A D) ∧ g * g' = μ ^ q := by
+theorem UpperTheory.exists_factorization_near_root_of_unity_henselian
+    : ∀ (A D : Type) [CommRing A] [HenselianLocalRing A] [CommRing D] [Algebra A D] (T : TC A D),
+      T.Fin → T.Coord
+        → ∀ (q : ℕ),
+          IsUnit (q : A)
+            → ∀ ω : D,
+              ω ^ q - 1 ∈ mm (⊤ : Subalgebra A D)
+                → ∃ g' ∈ T.B, ∃ g ∈ T.C, ∃ μ : D,
+                  g' - 1 ∈ mm T.B ∧ g - 1 ∈ mm T.C ∧ μ - ω ∈ mm (⊤ : Subalgebra A D)
+                    ∧ g * g' = μ ^ q := by
   intro A D _ _ _ _ T hF hC q hq ω hω
   classical
   set M := maximalIdeal A with hM
@@ -154,11 +161,14 @@ theorem UpperTheory.exists_factorization_near_root_of_unity_henselian :
     rcases Nat.eq_zero_or_pos q with h | h
     · subst h; simp at hq
     · exact h
-  obtain ⟨T', hT'F, hT't, -, hlift, hproj, -, -⟩ := exists_twoChart_quotient_of_finite_coord A D T hF hC M
+  obtain ⟨T', hT'F, hT't, -, hlift, hproj, -, -⟩ :=
+    exists_twoChart_quotient_of_finite_coord A D T hF hC M
   have hω' : (Ideal.Quotient.mk J ω) ^ q = 1 := by
     rw [← map_pow, ← map_one (Ideal.Quotient.mk J), Ideal.Quotient.eq]
     exact hωJ
-  obtain ⟨m₀, hm₀⟩ := exists_power_decomposition_of_root_of_unity A (D ⧸ J) T' hT'F q hq hq0 (Ideal.Quotient.mk J ω) hω'
+  obtain ⟨m₀, hm₀⟩ :=
+    exists_power_decomposition_of_root_of_unity A (D ⧸ J) T' hT'F q hq hq0 (Ideal.Quotient.mk J ω)
+      hω'
   obtain ⟨k₁, hk₁⟩ := T.locB ω
   obtain ⟨k₂, hk₂⟩ := T.locC ω
   obtain ⟨m, hm⟩ : ∃ m, m = m₀ + k₁ + k₂ := ⟨_, rfl⟩
@@ -170,14 +180,17 @@ theorem UpperTheory.exists_factorization_near_root_of_unity_henselian :
       rw [e]
       exact mul_mem (pow_mem T.tB _) hk₁
     · have e : T.s ^ (2 * m) * (ω * T.t ^ m) = T.s ^ (m₀ + k₁) * (T.s ^ k₂ * ω) := by
-        calc T.s ^ (2 * m) * (ω * T.t ^ m) = T.s ^ m * (T.s ^ m * T.t ^ m) * ω := by ring
+        calc
+          T.s ^ (2 * m) * (ω * T.t ^ m)
+            = T.s ^ m * (T.s ^ m * T.t ^ m) * ω := by ring
           _ = T.s ^ m * ω := by rw [st_pow]; ring
           _ = _ := by rw [hm]; ring
       rw [e]
       exact mul_mem (pow_mem T.sC _) hk₂
   obtain ⟨n, e, L, he, hLe, hLinj⟩ := coord_setup T hC (2 * q * m)
-  have hdec : ∀ k, ∃ a ∈ T.S (q * m), ∃ b ∈ T.S (q * m), ∃ c ∈ T.S (2 * m),
-      a + T.t ^ (q * m) * b - (q : D) * (ω * T.t ^ m) ^ (q - 1) * c - e k ∈ J := by
+  have hdec
+      : ∀ k, ∃ a ∈ T.S (q * m), ∃ b ∈ T.S (q * m), ∃ c ∈ T.S (2 * m),
+        a + T.t ^ (q * m) * b - (q : D) * (ω * T.t ^ m) ^ (q - 1) * c - e k ∈ J := by
     intro k
     obtain ⟨a', ha', b', hb', c', hc', hk⟩ := (hm₀ m hmm).2 _ (hproj _ _ (he k))
     obtain ⟨a, ha, rfl⟩ := hlift _ _ ha'
@@ -205,14 +218,18 @@ theorem UpperTheory.exists_factorization_near_root_of_unity_henselian :
       ring
     rw [e0]
     exact J.mul_mem_left _ hωJ
-  have hd0 : ∀ j, MvPolynomial.eval 0 (MvPolynomial.pderiv j Φ) =
-      a j + T.t ^ (q * m) * b j - (q : D) * (ω * T.t ^ m) ^ (q - 1) * c j := by
+  have hd0
+      : ∀ j,
+        MvPolynomial.eval 0 (MvPolynomial.pderiv j Φ)
+          = a j + T.t ^ (q * m) * b j - (q : D) * (ω * T.t ^ m) ^ (q - 1) * c j := by
     intro j
     rw [hΦ]
     simp only [map_sub, Derivation.leibniz, Derivation.leibniz_pow, pderiv_lin, smul_eq_mul,
       nsmul_eq_mul, map_add, map_mul, map_pow, map_natCast, ev0, MvPolynomial.eval_C]
     ring
-  have hd : ∀ i j, L (MvPolynomial.eval 0 (MvPolynomial.pderiv j Φ)) i - (if i = j then 1 else 0) ∈ M := by
+  have hd
+      : ∀ i j,
+        L (MvPolynomial.eval 0 (MvPolynomial.pderiv j Φ)) i - (if i = j then 1 else 0) ∈ M := by
     intro i j
     have h1 := L_mem M L _ (hkey j) i
     rw [map_sub, Pi.sub_apply, hLe i j] at h1
@@ -230,8 +247,10 @@ theorem UpperTheory.exists_factorization_near_root_of_unity_henselian :
     refine Submodule.sum_mem _ (fun k _ => ?_)
     rw [mul_comm, ← Algebra.smul_def]
     exact Submodule.smul_mem_smul (hxM k) (by simpa using hv k)
-  have hev : MvPolynomial.eval y Φ = (T.t ^ (q * m) + ∑ k, a k * y k) * (1 + ∑ k, b k * y k) -
-      (ω * T.t ^ m + ∑ k, c k * y k) ^ q := by
+  have hev
+      : MvPolynomial.eval y Φ
+        = (T.t ^ (q * m) + ∑ k, a k * y k) * (1 + ∑ k, b k * y k)
+          - (ω * T.t ^ m + ∑ k, c k * y k) ^ q := by
     rw [hΦ]
     simp only [map_sub, map_mul, map_pow, eval_lin]
   have hmem : MvPolynomial.eval y Φ ∈ T.S (2 * q * m) := by
@@ -245,12 +264,22 @@ theorem UpperTheory.exists_factorization_near_root_of_unity_henselian :
       rw [e2]
       exact S_pow T (Submodule.add_mem _ hW (hsum _ _ hc)) q
   have hzero := hLinj _ hmem hΦx
-  have hkey2 : (T.t ^ (q * m) + ∑ k, a k * y k) * (1 + ∑ k, b k * y k) =
-      (ω * T.t ^ m + ∑ k, c k * y k) ^ q := by
+  have hkey2
+      : (T.t ^ (q * m) + ∑ k, a k * y k) * (1 + ∑ k, b k * y k)
+        = (ω * T.t ^ m + ∑ k, c k * y k) ^ q := by
     rw [hev] at hzero
     exact sub_eq_zero.1 hzero
-  refine ⟨1 + ∑ k, b k * y k, ?_, 1 + T.s ^ (q * m) * ∑ k, a k * y k, ?_,
-    ω + T.s ^ m * ∑ k, c k * y k, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    1 + ∑ k, b k * y k,
+    ?_,
+    1 + T.s ^ (q * m) * ∑ k, a k * y k,
+    ?_,
+    ω + T.s ^ m * ∑ k, c k * y k,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact add_mem (one_mem _) ((mem_S T _ _).1 (hsum _ _ hb)).1
   · exact add_mem (one_mem _) ((mem_S T _ _).1 (hsum _ _ ha)).2
   · rw [add_sub_cancel_left]
@@ -261,14 +290,15 @@ theorem UpperTheory.exists_factorization_near_root_of_unity_henselian :
   · rw [add_sub_cancel_left, Finset.mul_sum]
     simp_rw [← mul_assoc]
     exact hsumM ⊤ (fun k => T.s ^ m * c k) (fun _ => Algebra.mem_top)
-  · calc (1 + T.s ^ (q * m) * ∑ k, a k * y k) * (1 + ∑ k, b k * y k)
+  · calc
+      (1 + T.s ^ (q * m) * ∑ k, a k * y k) * (1 + ∑ k, b k * y k)
           = T.s ^ (q * m) * ((T.t ^ (q * m) + ∑ k, a k * y k) * (1 + ∑ k, b k * y k)) := by
-            have h := st_pow T (q * m)
-            linear_combination (-(1 + ∑ k, b k * y k)) * h
+        have h := st_pow T (q * m)
+        linear_combination (-(1 + ∑ k, b k * y k)) * h
       _ = T.s ^ (q * m) * (ω * T.t ^ m + ∑ k, c k * y k) ^ q := by rw [hkey2]
       _ = (ω + T.s ^ m * ∑ k, c k * y k) ^ q := by
-            rw [show T.s ^ (q * m) = (T.s ^ m) ^ q by ring, ← mul_pow]
-            congr 1
-            linear_combination ω * st_pow T m
+        rw [show T.s ^ (q * m) = (T.s ^ m) ^ q by ring, ← mul_pow]
+        congr 1
+        linear_combination ω * st_pow T m
 
 end

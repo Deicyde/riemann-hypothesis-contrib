@@ -14,11 +14,18 @@ open scoped MatrixGroups
 
 namespace GlobalTheory
 
-theorem isThB_coeff_cong : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε)
-    (A : ValuationSubring Ω) (N l : ℕ) [Fact l.Prime], (∃ φ : ℂ → ℂ, X.an X.jK = (φ : Mero) ∧ DifferentiableOn ℂ φ Hs) →
-    l ≠ 2 → ¬ l ∣ N → 1 ≤ N → ((l : Ω) ∈ A.nonunits) → ∀ (n w : ℕ), Odd w → ∀ b : X.Fn l, b ∈ X.B N l w →
-    ∀ φ φ' : HahnSeries ℚ Ω,
-  IsThB X A N l n b φ → IsThB X A N l n b φ' → ∀ r, CgA A l n (φ.coeff r) (φ'.coeff r) := by
+theorem isThB_coeff_cong
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosed Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε)
+        (A : ValuationSubring Ω) (N l : ℕ) [Fact l.Prime],
+      (∃ φ : ℂ → ℂ, X.an X.jK = (φ : Mero) ∧ DifferentiableOn ℂ φ Hs) → l ≠ 2 → ¬ l ∣ N → 1 ≤ N
+        → ((l : Ω) ∈ A.nonunits)
+        → ∀ (n w : ℕ),
+          Odd w
+            → ∀ b : X.Fn l,
+              b ∈ X.B N l w
+                → ∀ φ φ' : HahnSeries ℚ Ω,
+                  IsThB X A N l n b φ → IsThB X A N l n b φ'
+                    → ∀ r, CgA A l n (φ.coeff r) (φ'.coeff r) := by
   intro Ω _ _ _ ε X A N l _ _ hl2 hlN hN hlA n w _ b _ φ φ' h h' r
   obtain ⟨f, hfinv, hfcls, hfδ, hfdl⟩ := h
   obtain ⟨f', hf'inv, hf'cls, hf'δ, hf'dl⟩ := h'
@@ -26,8 +33,7 @@ theorem isThB_coeff_cong : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClo
   have hL : 0 < l ^ n := pow_pos (Fact.out : l.Prime).pos n
   have hfne : (f : X.K) ≠ 0 := f.ne_zero
   have hune : (u : X.K) ≠ 0 := u.ne_zero
-  have hpow : (u : X.K) ^ (l ^ n) = (f' : X.K) * (f : X.K)⁻¹ := by
-    rw [hu]; field_simp
+  have hpow : (u : X.K) ^ (l ^ n) = (f' : X.K) * (f : X.K)⁻¹ := by rw [hu]; field_simp
   have hinv : Inv X (CongruenceSubgroup.Gamma1 (N * l ^ n)) ((u : X.K) ^ (l ^ n)) := by
     intro γ hγ
     rw [hpow, map_mul, map_inv₀, hfinv γ hγ, hf'inv γ hγ]

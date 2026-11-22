@@ -13,17 +13,21 @@ section SlopeTestRemainingChoices
 
 open MvPowerSeries
 
-private theorem mem_span_X {O σ : Type} [CommRing O] [Fintype σ] (f : MvPowerSeries σ O)
-    (hf : constantCoeff f = 0) : f ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) :=
+private theorem mem_span_X
+    {O σ : Type} [CommRing O] [Fintype σ] (f : MvPowerSeries σ O) (hf : constantCoeff f = 0)
+    : f ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) :=
   _root_.UpperTheory.Reformulated.B.MemSpanVariable.mem_span_X f hf
 
-private theorem order_of_mem_pow {O σ : Type} [CommRing O] (n : ℕ) :
-    ∀ g ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) ^ n, (n : ℕ∞) ≤ g.order := by
-  have h1 : ∀ g ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)),
-      ((1 : ℕ) : ℕ∞) ≤ g.order := by
+private theorem order_of_mem_pow {O σ : Type} [CommRing O] (n : ℕ)
+    : ∀ g ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) ^ n,
+      (n : ℕ∞) ≤ g.order := by
+  have h1
+      : ∀ g ∈ Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)),
+        ((1 : ℕ) : ℕ∞) ≤ g.order := by
     intro g hg
-    have hle : Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O)) ≤
-        RingHom.ker (constantCoeff : MvPowerSeries σ O →+* O) := by
+    have hle
+        : Ideal.span (Set.range (MvPowerSeries.X : σ → MvPowerSeries σ O))
+          ≤ RingHom.ker (constantCoeff : MvPowerSeries σ O →+* O) := by
       rw [Ideal.span_le]
       rintro _ ⟨i, rfl⟩
       simp
@@ -44,10 +48,15 @@ private theorem order_of_mem_pow {O σ : Type} [CommRing O] (n : ℕ) :
       exact add_le_add (ih x hx) (h1 y hy)
     · exact le_trans (le_min hx hy) min_order_le_add
 
-private theorem coeff_mem_of_mem_map {O σ : Type} [CommRing O] (I : Ideal O) (g : MvPowerSeries σ O)
-    (hg : g ∈ I.map (MvPowerSeries.C : O →+* MvPowerSeries σ O)) (d : σ →₀ ℕ) : coeff d g ∈ I := by
-  have hle : I.map (MvPowerSeries.C : O →+* MvPowerSeries σ O) ≤
-      RingHom.ker (MvPowerSeries.map (σ := σ) (Ideal.Quotient.mk I)) := by
+private theorem coeff_mem_of_mem_map
+    {O σ : Type} [CommRing O]
+    (I : Ideal O) (g : MvPowerSeries σ O)
+    (hg : g ∈ I.map (MvPowerSeries.C : O →+* MvPowerSeries σ O))
+    (d : σ →₀ ℕ)
+    : coeff d g ∈ I := by
+  have hle
+      : I.map (MvPowerSeries.C : O →+* MvPowerSeries σ O)
+        ≤ RingHom.ker (MvPowerSeries.map (σ := σ) (Ideal.Quotient.mk I)) := by
     rw [Ideal.map_le_iff_le_comap]
     intro a ha
     simp [Ideal.Quotient.eq_zero_iff_mem.2 ha]
@@ -55,14 +64,15 @@ private theorem coeff_mem_of_mem_map {O σ : Type} [CommRing O] (I : Ideal O) (g
   rw [coeff_map, map_zero] at h
   exact Ideal.Quotient.eq_zero_iff_mem.1 h
 
-private theorem monoVal_X_eq {O σ : Type} [CommRing O] (α : σ →₀ ℕ) :
-    GlobalTheory.monoVal (MvPowerSeries.X : σ → MvPowerSeries σ O) α = monomial α 1 := by
+private theorem monoVal_X_eq {O σ : Type} [CommRing O] (α : σ →₀ ℕ)
+    : GlobalTheory.monoVal (MvPowerSeries.X : σ → MvPowerSeries σ O) α = monomial α 1 := by
   simp only [GlobalTheory.monoVal, Finsupp.prod, X_pow_eq, prod_monomial, Finset.prod_const_one]
   congr 2
   exact Finsupp.sum_single α
 
-private theorem eq_of_le_of_degree_eq {σ : Type} {α β : σ →₀ ℕ} (h : β ≤ α)
-    (hd : β.degree = α.degree) : β = α := by
+private theorem eq_of_le_of_degree_eq
+    {σ : Type} {α β : σ →₀ ℕ} (h : β ≤ α) (hd : β.degree = α.degree)
+    : β = α := by
   obtain ⟨γ, rfl⟩ := exists_add_of_le h
   rw [map_add (f := _)] at hd
   have : γ = 0 := by
@@ -72,9 +82,10 @@ private theorem eq_of_le_of_degree_eq {σ : Type} {α β : σ →₀ ℕ} (h : �
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.AlgebraTools.qRegAt_mvPowerSeries :
-    ∀ (Λ σ : Type) [CommRing Λ] [Finite σ] (I : Ideal Λ) (a : ℕ),
-      QRegAt (MvPowerSeries σ Λ) (MvPowerSeries.X : σ → MvPowerSeries σ Λ) (I.map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ)) a := by
+theorem UpperTheory.V.AlgebraTools.qRegAt_mvPowerSeries
+    : ∀ (Λ σ : Type) [CommRing Λ] [Finite σ] (I : Ideal Λ) (a : ℕ),
+      QRegAt (MvPowerSeries σ Λ) (MvPowerSeries.X : σ → MvPowerSeries σ Λ)
+        (I.map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ)) a := by
   intro Λ σ _ _ I a c hc α
   classical
   haveI := Fintype.ofFinite σ
@@ -97,7 +108,10 @@ theorem UpperTheory.V.AlgebraTools.qRegAt_mvPowerSeries :
   have h2 : MvPowerSeries.constantCoeff (c α) ∈ I := by
     rw [← h1, map_add (f := _), h0, zero_add]
     exact coeff_mem_of_mem_map I v hv _
-  have h3 : c α = (c α - MvPowerSeries.C (MvPowerSeries.constantCoeff (c α))) +
-      MvPowerSeries.C (MvPowerSeries.constantCoeff (c α)) := by ring
+  have h3
+      : c α
+        = (c α - MvPowerSeries.C (MvPowerSeries.constantCoeff (c α)))
+          + MvPowerSeries.C (MvPowerSeries.constantCoeff (c α)) := by
+    ring
   rw [h3]
   exact Submodule.add_mem_sup (mem_span_X _ (by simp)) (Ideal.mem_map_of_mem _ h2)

@@ -20,11 +20,13 @@ theorem shiftUp : ShiftUp := by
     ext m
     exact hex.apply_apply_eq_zero m
   let X : ShortComplex (Rep ℂ Γ) := ShortComplex.mk f g hfg
-  have hX : X.ShortExact :=
-    { exact := (forget₂ (Rep ℂ Γ) (ModuleCat ℂ)).reflects_exact_of_faithful _ <|
+  have hX : X.ShortExact := {
+    exact :=
+      (forget₂ (Rep ℂ Γ) (ModuleCat ℂ)).reflects_exact_of_faithful _ <|
         (ShortComplex.moduleCat_exact_iff _).2 fun x hx => (hex x).1 hx
-      mono_f := (Rep.mono_iff_injective _).2 hinj
-      epi_g := (Rep.epi_iff_surjective _).2 hsurj }
+    mono_f := (Rep.mono_iff_injective _).2 hinj
+    epi_g := (Rep.epi_iff_surjective _).2 hsurj
+  }
   have hz : Limits.IsZero (groupCohomology X.X₂ (n + 1)) := by
     haveI := hΩ n
     exact ModuleCat.isZero_of_subsingleton _

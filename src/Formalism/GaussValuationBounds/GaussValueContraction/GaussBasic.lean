@@ -14,9 +14,10 @@ open IsDiscreteValuationRing in
 theorem minLeGaussValAdd : GaussAdd := by
   intro O _ _ _ x f g
   refine le_iInf fun n => ?_
-  have h1 : min (gaussV x f) (gaussV x g) ≤
-      min ((((addVal O (PowerSeries.coeff n f) : ℕ∞)) : ℝ≥0∞) + ENNReal.ofReal (x * n))
-        ((((addVal O (PowerSeries.coeff n g) : ℕ∞)) : ℝ≥0∞) + ENNReal.ofReal (x * n)) :=
+  have h1
+      : min (gaussV x f) (gaussV x g)
+        ≤ min ((((addVal O (PowerSeries.coeff n f) : ℕ∞)) : ℝ≥0∞) + ENNReal.ofReal (x * n))
+          ((((addVal O (PowerSeries.coeff n g) : ℕ∞)) : ℝ≥0∞) + ENNReal.ofReal (x * n)) :=
     min_le_min (iInf_le _ n) (iInf_le _ n)
   refine h1.trans ?_
   rw [min_add_add_right, map_add (f := _)]
@@ -44,6 +45,5 @@ theorem gaussValUnit : GaussUnit := by
   refine le_antisymm ((iInf_le _ 0).trans ?_) (by simp)
   rw [PowerSeries.coeff_zero_eq_constantCoeff_apply, ← hw, addVal_eq_zero_of_unit]
   simp
-
 
 end Formalism.NOK

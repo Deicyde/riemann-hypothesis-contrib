@@ -21,10 +21,11 @@ open Semi
 
 def HomExtDvrSt : Prop :=
   ∀ (T : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T]
-    (G G' : Over (Spec (CommRingCat.of T))) [GrpObj G] [GrpObj G'],
-    IsSemiAbelian G → IsSemiAbelian G' →
-    ∀ φ : genFibre T G ⟶ genFibre T G', IsMonHom φ →
-      ∃! ψ : G ⟶ G', IsMonHom ψ ∧ (Over.pullback (specMap T (FractionRing T))).map ψ = φ
+      (G G' : Over (Spec (CommRingCat.of T))) [GrpObj G] [GrpObj G'],
+    IsSemiAbelian G → IsSemiAbelian G'
+      → ∀ φ : genFibre T G ⟶ genFibre T G',
+        IsMonHom φ
+          → ∃! ψ : G ⟶ G', IsMonHom ψ ∧ (Over.pullback (specMap T (FractionRing T))).map ψ = φ
 
 structure Laws7 : Prop where
   homExtDvr : HomExtDvrSt

@@ -18,17 +18,19 @@ theorem t2Space_isNonarchimedeanLocalField_singleBlock : T2Space K := by
   haveI := isUniformAddGroup_of_addCommGroup (G := K)
   infer_instance
 
-theorem exists_pow_lt_value {a γ : ValueGroupWithZero K} (ha : a < 1) (hγ : γ ≠ 0) :
-    ∃ m : ℕ, a ^ m < γ := by
+theorem exists_pow_lt_value {a γ : ValueGroupWithZero K} (ha : a < 1) (hγ : γ ≠ 0)
+    : ∃ m : ℕ, a ^ m < γ := by
   have e := IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt K
   have : MulArchimedean (ValueGroupWithZero K) := .comap e.toMonoidHom e.strictMono
   exact exists_pow_lt₀ ha (Units.mk0 γ hγ)
 
 variable {K}
 
-theorem exists_value_eq_zpow {π : K} (h0 : valuation K π ≠ 0) (h1 : valuation K π < 1)
-    (hmax : ∀ x : K, valuation K x < 1 → valuation K x ≤ valuation K π) {x : K} (hx : x ≠ 0) :
-    ∃ m : ℤ, valuation K x = valuation K π ^ m := by
+theorem exists_value_eq_zpow
+    {π : K} (h0 : valuation K π ≠ 0) (h1 : valuation K π < 1)
+    (hmax : ∀ x : K, valuation K x < 1 → valuation K x ≤ valuation K π)
+    {x : K} (hx : x ≠ 0)
+    : ∃ m : ℤ, valuation K x = valuation K π ^ m := by
   let e := IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt K
   have hb0 : e (valuation K π) ≠ 0 := by
     intro h
@@ -41,7 +43,8 @@ theorem exists_value_eq_zpow {π : K} (h0 : valuation K π ≠ 0) (h1 : valuatio
   have hle : e (valuation K y) ≤ e (valuation K π) := e.strictMono.monotone (hmax y hy1)
   have hlt : e (valuation K π) < 1 := by simpa using e.strictMono h1
   have hb : e (valuation K π) = WithZero.exp (-1 : ℤ) := by
-    obtain ⟨b, hbe⟩ : ∃ b : ℤ, e (valuation K π) = WithZero.exp b := ⟨_, (WithZero.exp_log hb0).symm⟩
+    obtain ⟨b, hbe⟩ : ∃ b : ℤ, e (valuation K π) = WithZero.exp b :=
+      ⟨_, (WithZero.exp_log hb0).symm⟩
     rw [hbe] at hle hlt ⊢
     rw [hey, WithZero.exp_le_exp] at hle
     rw [← WithZero.exp_zero, WithZero.exp_lt_exp] at hlt
@@ -50,9 +53,8 @@ theorem exists_value_eq_zpow {π : K} (h0 : valuation K π ≠ 0) (h1 : valuatio
   have hx0 : e (valuation K x) ≠ 0 := by
     intro h
     exact (Valuation.ne_zero_iff _).2 hx (e.injective (h.trans (map_zero e).symm))
-  refine ⟨-WithZero.log (e (valuation K x)), e.injective ?_⟩
-  have hz : (WithZero.exp (-1 : ℤ)) ^ (-WithZero.log (e (valuation K x))) =
-      e (valuation K x) := by
+  refine ⟨- WithZero.log (e (valuation K x)), e.injective ?_⟩
+  have hz : (WithZero.exp (-1 : ℤ)) ^ (- WithZero.log (e (valuation K x))) = e (valuation K x) := by
     rw [← WithZero.exp_zsmul]
     simpa using WithZero.exp_log hx0
   show e (valuation K x) = e (valuation K π ^ (-WithZero.log (e (valuation K x))))
@@ -62,10 +64,10 @@ end
 
 section Matrices
 
-theorem mem_unitGL_iff {F : Type*} [Field F] [ValuativeRel F] {n : ℕ} (g : GL (Fin n) F) :
-    g ∈ unitGL (n := Fin n) F ↔
-      (∀ i j, (g : Matrix (Fin n) (Fin n) F) i j ∈ intO F) ∧
-        ∀ i j, ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j ∈ intO F := by
+theorem mem_unitGL_iff {F : Type*} [Field F] [ValuativeRel F] {n : ℕ} (g : GL (Fin n) F)
+    : g ∈ unitGL (n := Fin n) F
+      ↔ (∀ i j, (g : Matrix (Fin n) (Fin n) F) i j ∈ intO F)
+        ∧ ∀ i j, ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j ∈ intO F := by
   constructor
   · rintro ⟨h, rfl⟩
     refine ⟨fun i j => ((h : Matrix (Fin n) (Fin n) (intO F)) i j).2, fun i j => ?_⟩
@@ -78,8 +80,7 @@ theorem mem_unitGL_iff {F : Type*} [Field F] [ValuativeRel F] {n : ℕ} (g : GL 
     have hinj : Function.Injective (f.mapMatrix (m := Fin n)) :=
       Matrix.map_injective Subtype.val_injective
     have hAf : f.mapMatrix A = (g : Matrix (Fin n) (Fin n) F) := by ext i j; rfl
-    have hBf : f.mapMatrix B = ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by
-      ext i j; rfl
+    have hBf : f.mapMatrix B = ((g⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := by ext i j; rfl
     have hAB : A * B = 1 := hinj (by rw [map_mul, hAf, hBf, map_one]; exact Units.mul_inv g)
     have hBA : B * A = 1 := hinj (by rw [map_mul, hAf, hBf, map_one]; exact Units.inv_mul g)
     exact ⟨⟨A, B, hAB, hBA⟩, Units.ext hAf⟩
@@ -88,18 +89,18 @@ end Matrices
 
 section Extension
 
-variable {k E : Type*} [Field k] [ValuativeRel k] [TopologicalSpace k]
-  [IsNonarchimedeanLocalField k] [Field E] [ValuativeRel E] [TopologicalSpace E]
-  [IsNonarchimedeanLocalField E] [Algebra k E]
+variable
+  {k E : Type*} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] [Algebra k E]
 
-theorem value_algebraMap_le_iff [ValuativeExtension k E] (a b : k) :
-    valuation E (algebraMap k E a) ≤ valuation E (algebraMap k E b) ↔
-      valuation k a ≤ valuation k b := by
+theorem value_algebraMap_le_iff [ValuativeExtension k E] (a b : k)
+    : valuation E (algebraMap k E a) ≤ valuation E (algebraMap k E b)
+      ↔ valuation k a ≤ valuation k b := by
   rw [← Valuation.Compatible.vle_iff_le, ← Valuation.Compatible.vle_iff_le,
     ValuativeExtension.vle_iff_vle]
 
-theorem tendsto_pow_zero {x : E} (hx : valuation E x < 1) :
-    Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0) := by
+theorem tendsto_pow_zero {x : E} (hx : valuation E x < 1)
+    : Tendsto (fun n : ℕ => x ^ n) atTop (𝓝 0) := by
   rw [(IsValuativeTopology.hasBasis_nhds_zero' E).tendsto_right_iff]
   intro γ hγ
   obtain ⟨m, hm⟩ := exists_pow_lt_value E hx hγ
@@ -108,9 +109,10 @@ theorem tendsto_pow_zero {x : E} (hx : valuation E x < 1) :
   rw [map_pow]
   exact (pow_le_pow_right_of_le_one' hx.le hn).trans_lt hm
 
-theorem continuous_algebraMap_of_lt_one [ValuativeExtension k E] {π : k}
-    (h0 : valuation E (algebraMap k E π) ≠ 0) (h1 : valuation E (algebraMap k E π) < 1) :
-    Continuous (algebraMap k E) := by
+theorem continuous_algebraMap_of_lt_one
+    [ValuativeExtension k E]
+    {π : k} (h0 : valuation E (algebraMap k E π) ≠ 0) (h1 : valuation E (algebraMap k E π) < 1)
+    : Continuous (algebraMap k E) := by
   refine continuous_of_continuousAt_zero (algebraMap k E) ?_
   rw [ContinuousAt, map_zero, (IsValuativeTopology.hasBasis_nhds_zero' E).tendsto_right_iff]
   intro γ hγ
@@ -129,8 +131,8 @@ theorem continuous_algebraMap_of_lt_one [ValuativeExtension k E] {π : k}
   rw [map_pow, map_pow]
   exact hm.le
 
-theorem continuous_linearMap [FiniteDimensional k E] [ContinuousSMul k E] (f : E →ₗ[k] E) :
-    Continuous f := by
+theorem continuous_linearMap [FiniteDimensional k E] [ContinuousSMul k E] (f : E →ₗ[k] E)
+    : Continuous f := by
   letI := IsTopologicalAddGroup.rightUniformSpace k
   haveI := isUniformAddGroup_of_addCommGroup (G := k)
   letI : (Valued.v (R := k)).RankOne :=
@@ -141,8 +143,9 @@ theorem continuous_linearMap [FiniteDimensional k E] [ContinuousSMul k E] (f : E
   haveI := t2Space_isNonarchimedeanLocalField_singleBlock E
   exact f.continuous_of_finiteDimensional
 
-theorem value_lt_one_of_continuous (τ : E ≃ₐ[k] E) (hτ : Continuous τ) {x : E}
-    (hx : valuation E x < 1) : valuation E (τ x) < 1 := by
+theorem value_lt_one_of_continuous
+    (τ : E ≃ₐ[k] E) (hτ : Continuous τ) {x : E} (hx : valuation E x < 1)
+    : valuation E (τ x) < 1 := by
   have ht : Tendsto (fun n : ℕ => τ (x ^ n)) atTop (𝓝 0) := by
     have h := (hτ.tendsto 0).comp (tendsto_pow_zero hx)
     rw [map_zero] at h
@@ -156,8 +159,9 @@ theorem value_lt_one_of_continuous (τ : E ≃ₐ[k] E) (hτ : Continuous τ) {x
   rw [map_pow, map_pow] at h2
   exact absurd h2 (not_lt.2 h1)
 
-theorem value_le_one_of_continuous (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ) (τ : E ≃ₐ[k] E) {x : E}
-    (hx : valuation E x ≤ 1) : valuation E (τ x) ≤ 1 := by
+theorem value_le_one_of_continuous
+    (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ) (τ : E ≃ₐ[k] E) {x : E} (hx : valuation E x ≤ 1)
+    : valuation E (τ x) ≤ 1 := by
   by_contra h
   have h1 : 1 < valuation E (τ x) := not_le.1 h
   have hy0 : valuation E (τ x) ≠ 0 := (zero_lt_one.trans h1).ne'
@@ -172,8 +176,9 @@ theorem value_le_one_of_continuous (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ) 
     simp [this] at hy0
   exact absurd ((inv_lt_one₀ (zero_lt_iff.2 hx0)).1 h3) (not_lt.2 hx)
 
-theorem value_eq_one_of_continuous (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ) (τ : E ≃ₐ[k] E) {x : E}
-    (hx : valuation E x = 1) : valuation E (τ x) = 1 := by
+theorem value_eq_one_of_continuous
+    (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ) (τ : E ≃ₐ[k] E) {x : E} (hx : valuation E x = 1)
+    : valuation E (τ x) = 1 := by
   refine le_antisymm (value_le_one_of_continuous hc τ hx.le) ?_
   have hx0 : x ≠ 0 := by
     rintro rfl
@@ -184,10 +189,12 @@ theorem value_eq_one_of_continuous (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ) 
   have hy0 : valuation E (τ x) ≠ 0 := by simpa using hx0
   exact (inv_le_one₀ (zero_lt_iff.2 hy0)).1 h2
 
-theorem value_map_eq (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ) {π : k}
-    (h0 : valuation E (algebraMap k E π) ≠ 0) (h1 : valuation E (algebraMap k E π) < 1)
+theorem value_map_eq
+    (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ)
+    {π : k} (h0 : valuation E (algebraMap k E π) ≠ 0) (h1 : valuation E (algebraMap k E π) < 1)
     (hmax : ∀ x : E, valuation E x < 1 → valuation E x ≤ valuation E (algebraMap k E π))
-    (τ : E ≃ₐ[k] E) (x : E) : valuation E (τ x) = valuation E x := by
+    (τ : E ≃ₐ[k] E) (x : E)
+    : valuation E (τ x) = valuation E x := by
   by_cases hx : x = 0
   · simp [hx]
   obtain ⟨m, hm⟩ := exists_value_eq_zpow h0 h1 hmax hx
@@ -197,7 +204,8 @@ theorem value_map_eq (hc : ∀ τ : E ≃ₐ[k] E, Continuous τ) {π : k}
     simp
   have h2 := value_eq_one_of_continuous hc τ hy
   rw [map_mul, map_zpow₀ τ, hp, τ.commutes, ← hp, map_mul, map_zpow₀, zpow_neg,
-    mul_inv_eq_one₀ (zpow_ne_zero _ h0)] at h2
+      mul_inv_eq_one₀ (zpow_ne_zero _ h0)]
+    at h2
   rw [h2, hm]
 
 end Extension

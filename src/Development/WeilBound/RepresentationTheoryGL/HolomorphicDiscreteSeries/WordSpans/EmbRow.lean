@@ -12,7 +12,8 @@ open scoped InnerProductSpace ComplexConjugate
 
 namespace PositivityTheory.RgHe.SM
 
-open Formalism.REAL Formalism.MainNotions.S PositivityTheory.UnitaryDecomposition Formalism.FourierDecayAlt.P.CapelliAbstractCharacter CompanionTheory.D.DSIC
+open Formalism.REAL Formalism.MainNotions.S PositivityTheory.UnitaryDecomposition
+  Formalism.FourierDecayAlt.P.CapelliAbstractCharacter CompanionTheory.D.DSIC
 
 theorem irr : Irr := by
   intro m ε K _ _ σ hU hI u w hu hw
@@ -38,8 +39,9 @@ theorem irr : Irr := by
     have hh' : hᴴ * PI.UpqRep.Jm ε * h = PI.UpqRep.Jm ε := hh
     show (g * h)ᴴ * PI.UpqRep.Jm ε * (g * h) = PI.UpqRep.Jm ε
     rw [Matrix.conjTranspose_mul]
-    calc hᴴ * gᴴ * PI.UpqRep.Jm ε * (g * h) = hᴴ * (gᴴ * PI.UpqRep.Jm ε * g) * h := by
-          simp only [Matrix.mul_assoc]
+    calc
+      hᴴ * gᴴ * PI.UpqRep.Jm ε * (g * h)
+        = hᴴ * (gᴴ * PI.UpqRep.Jm ε * g) * h := by simp only [Matrix.mul_assoc]
       _ = PI.UpqRep.Jm ε := by rw [hg', hh']
   have hone : (1 : Matrix (Fin m) (Fin m) ℂ) ∈ UJset ε := by
     show (1 : Matrix (Fin m) (Fin m) ℂ)ᴴ * PI.UpqRep.Jm ε * 1 = PI.UpqRep.Jm ε
@@ -86,11 +88,13 @@ theorem irr : Irr := by
       rw [htop]
       exact Submodule.mem_top
     have hw0 := hker hwM
-    rw [LinearMap.mem_ker, ContinuousLinearMap.coe_coe, innerSL_apply_apply, inner_self_eq_zero] at hw0
+    rw [LinearMap.mem_ker, ContinuousLinearMap.coe_coe, innerSL_apply_apply, inner_self_eq_zero]
+      at hw0
     exact hw hw0
 
-theorem emb_row {n : ℕ} {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (a : Matrix (Fin n) (Fin n) ℂ) (d : Fin (n + 1)) :
-    emb e a (zi e) d = if d = zi e then 1 else 0 := by
+theorem emb_row
+    {n : ℕ} {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (a : Matrix (Fin n) (Fin n) ℂ) (d : Fin (n + 1))
+    : emb e a (zi e) d = if d = zi e then 1 else 0 := by
   unfold emb zi
   simp only [Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_apply_apply]
   rcases h : e.symm d with i | u
@@ -103,12 +107,13 @@ theorem emb_row {n : ℕ} {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (a : Matrix (Fin 
     have heq : d = e (Sum.inr ()) := by rw [← h, Equiv.apply_symm_apply]
     simp [heq]
 
-theorem emb_ll {n : ℕ} {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (a : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
-    emb e a (e (Sum.inl i)) (e (Sum.inl j)) = a i j := by
+theorem emb_ll {n : ℕ} {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (a : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
+    : emb e a (e (Sum.inl i)) (e (Sum.inl j)) = a i j := by
   simp [emb]
 
-theorem emb_rl {n : ℕ} {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (a : Matrix (Fin n) (Fin n) ℂ) (u : Unit) (j : Fin n) :
-    emb e a (e (Sum.inr u)) (e (Sum.inl j)) = 0 := by
+theorem emb_rl
+    {n : ℕ} {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (a : Matrix (Fin n) (Fin n) ℂ) (u : Unit) (j : Fin n)
+    : emb e a (e (Sum.inr u)) (e (Sum.inl j)) = 0 := by
   simp [emb]
 
 theorem phiEq : PhiEq := by
@@ -125,8 +130,9 @@ theorem phiEq : PhiEq := by
       rw [Matrix.mul_assoc (Jm ε' * gᴴ), Matrix.mul_assoc (Jm ε'), ← Matrix.mul_assoc gᴴ, hg, hJJ]
     have h1 : g * (Jm ε' * gᴴ * Jm ε') = 1 := mul_eq_one_comm.mp h2
     exact ⟨⟨⟨g, _, h1, h2⟩, hg⟩, rfl⟩
-  have hembJ : ∀ g : Matrix (Fin n) (Fin n) ℂ, gᴴ * Jm ε' * g = Jm ε' →
-      (emb e g)ᴴ * Jm ε * emb e g = Jm ε := by
+  have hembJ
+      : ∀ g : Matrix (Fin n) (Fin n) ℂ,
+        gᴴ * Jm ε' * g = Jm ε' → (emb e g)ᴴ * Jm ε * emb e g = Jm ε := by
     intro g hg
     rw [jm_emb hF, emb_ct, ← emb_mul, ← emb_mul, hg]
   have hsm : ∀ x ∈ S, P x ∈ PI.PhMeasCore.smoothVecs (Jm ε') σ := by
@@ -139,19 +145,21 @@ theorem phiEq : PhiEq := by
     letI : NormedSpace ℝ (Matrix (Fin n) (Fin n) ℂ) := Matrix.normedSpace
     letI : NormedAddCommGroup (Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) := Matrix.normedAddCommGroup
     letI : NormedSpace ℝ (Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) := Matrix.normedSpace
-    let L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ :=
-      { toFun := fun g => emb e g - emb e 0
-        map_add' := by
-          intro a b
-          ext i j
-          simp only [emb, Matrix.reindex_apply, Matrix.submatrix_apply, Matrix.sub_apply, Matrix.add_apply]
-          rcases e.symm i with i' | i' <;> rcases e.symm j with j' | j' <;> simp
-        map_smul' := by
-          intro c a
-          ext i j
-          simp only [emb, Matrix.reindex_apply, Matrix.submatrix_apply, Matrix.sub_apply, Matrix.smul_apply,
-            RingHom.id_apply]
-          rcases e.symm i with i' | i' <;> rcases e.symm j with j' | j' <;> simp }
+    let L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ := {
+      toFun := fun g => emb e g - emb e 0
+      map_add' := by
+        intro a b
+        ext i j
+        simp only [emb, Matrix.reindex_apply, Matrix.submatrix_apply, Matrix.sub_apply,
+          Matrix.add_apply]
+        rcases e.symm i with i' | i' <;> rcases e.symm j with j' | j' <;> simp
+      map_smul' := by
+        intro c a
+        ext i j
+        simp only [emb, Matrix.reindex_apply, Matrix.submatrix_apply, Matrix.sub_apply,
+          Matrix.smul_apply, RingHom.id_apply]
+        rcases e.symm i with i' | i' <;> rcases e.symm j with j' | j' <;> simp
+    }
     have hembd : ContDiff ℝ (⊤ : ℕ∞) (emb e) := by
       have hfun : emb e = fun g => L g + emb e 0 := by
         funext g
@@ -160,7 +168,8 @@ theorem phiEq : PhiEq := by
       rw [hfun]
       exact (LinearMap.toContinuousLinearMap L).contDiff.add contDiff_const
     refine ⟨emb e ⁻¹' U, fun g => P (F (emb e g)), hUo.preimage hembd.continuous, hg₀U, ?_, ?_⟩
-    · exact (P.restrictScalars ℝ).contDiff.comp_contDiffOn (hFc.comp hembd.contDiffOn (fun g hg => hg))
+    · exact (P.restrictScalars ℝ).contDiff.comp_contDiffOn
+        (hFc.comp hembd.contDiffOn (fun g hg => hg))
     · intro g hgU hgH
       have hgH' : gᴴ * Jm ε' * g = Jm ε' := hgH
       have h1 := hFeq (emb e g) hgU (hembJ g hgH')
@@ -192,10 +201,12 @@ theorem phiEq : PhiEq := by
     show P (ap (E (e (Sum.inl c0)) (zi e)) (π (emb e (um h)) η)) =
       ∑ d, (um h)⁻¹ d c0 • σ (um h) (P (ap (E (e (Sum.inl d)) (zi e)) η))
     simp only [ap, dif_pos hη, dif_pos hπη]
-    have hc := hS.conj _ hgiU (e (Sum.inl c0)) (zi e) ⟨π (emb e (um h)) η, hπη⟩ ⟨η, hη⟩ (hcomp1 η).symm
+    have hc :=
+      hS.conj _ hgiU (e (Sum.inl c0)) (zi e) ⟨π (emb e (um h)) η, hπη⟩ ⟨η, hη⟩ (hcomp1 η).symm
     rw [hinv] at hc
     simp only [emb_row, mul_ite, mul_one, mul_zero, ite_smul, zero_smul, Finset.sum_ite_eq',
-      Finset.mem_univ, if_true, ite_true] at hc
+        Finset.mem_univ, if_true, ite_true]
+      at hc
     have hc2 := congrArg (fun y => P (π (emb e (um h)) y)) hc
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [hcomp2, map_sum, map_smul] at hc2

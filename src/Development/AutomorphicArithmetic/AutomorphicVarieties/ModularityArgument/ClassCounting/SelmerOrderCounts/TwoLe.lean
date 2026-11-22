@@ -11,15 +11,10 @@ open NumberField IsDedekindDomain
 namespace UpperTheory.V.ZK.Ct
 
 structure Dat (Y I : Type) [AddCommGroup Y] [AddCommGroup I] where
-
   g : Module.End ℤ Y
-
   gI : Module.End ℤ I
-
   d : Y →ₗ[ℤ] I
-
   n : ℕ
-
   a : ℕ
   comm : ∀ y, d (g y) = gI (d y)
   g_pow : g ^ n = 1
@@ -57,14 +52,16 @@ end Dat
 
 variable {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
 
-structure IsDat (γ : F ≃ₐ[L] F) (a : ℕ) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)) : Prop where
+structure IsDat (γ : F ≃ₐ[L] F) (a : ℕ) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ))
+    : Prop where
   n_eq : D.n = orderOf γ
   a_eq : D.a = a
   g_eq : ∀ α : Fˣ, D.g (Additive.ofMul α) = Additive.ofMul (actU γ⁻¹ α)
   gI_eq : ∀ 𝔡 P, D.gI 𝔡 P = 𝔡 (actP γ P)
   d_eq : ∀ (α : Fˣ) P, D.d (Additive.ofMul α) P = ordP P α
 
-def SelL (l : ℕ) (L : Type) [Field L] [NumberField L] : Set (Lˣ ⧸ (powMonoidHom l : Lˣ →* Lˣ).range) :=
+def SelL (l : ℕ) (L : Type) [Field L] [NumberField L]
+    : Set (Lˣ ⧸ (powMonoidHom l : Lˣ →* Lˣ).range) :=
   {x | ∃ y : Lˣ, QuotientGroup.mk y = x ∧
     ∀ p : HeightOneSpectrum (𝓞 L), (l : 𝓞 L) ∉ p.asIdeal → (l : ℤ) ∣ ordP p y}
 

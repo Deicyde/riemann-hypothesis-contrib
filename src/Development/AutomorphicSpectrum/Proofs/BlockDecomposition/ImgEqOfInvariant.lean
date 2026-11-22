@@ -18,10 +18,10 @@ section Comb
 
 variable {A : Type} [Finite A]
 
-theorem exists_signs (ι : A → A) (hι : ∀ a, ι (ι a) = a) :
-    ∃ (m : ℕ) (T : (Fin m → SignType) → Set A), (∀ e, ∀ a ∈ T e, ι a ∉ T e) ∧
-      (∀ I : Set A, (∀ a ∈ I, ι a ∉ I) → ∃! e, T e = I) ∧ T 0 = ∅ ∧
-      (∀ e e', T (sMeet e e') = T e ∩ T e') ∧ (∀ e e', SLe e e' → T e ⊆ T e') := by
+theorem exists_signs (ι : A → A) (hι : ∀ a, ι (ι a) = a)
+    : ∃ (m : ℕ) (T : (Fin m → SignType) → Set A),
+      (∀ e, ∀ a ∈ T e, ι a ∉ T e) ∧ (∀ I : Set A, (∀ a ∈ I, ι a ∉ I) → ∃! e, T e = I) ∧ T 0 = ∅
+        ∧ (∀ e e', T (sMeet e e') = T e ∩ T e') ∧ (∀ e e', SLe e e' → T e ⊆ T e') := by
   classical
   obtain ⟨k, ⟨q⟩⟩ := Finite.exists_equiv_fin A
   letI : Fintype A := Fintype.ofEquiv _ q.symm
@@ -72,7 +72,13 @@ theorem exists_signs (ι : A → A) (hι : ∀ a, ι (ι a) = a) :
       rw [h] at this
       exact absurd this (by decide)
   · intro I hI
-    let e : Fin R.card → SignType := fun j => if r j ∈ I then 1 else if ι (r j) ∈ I then -1 else 0
+    let e : Fin R.card → SignType := fun j =>
+      if r j ∈ I then
+        1
+      else if ι (r j) ∈ I then
+        -1
+      else
+        0
     have he : T e = I := by
       ext a
       constructor
@@ -124,41 +130,42 @@ theorem exists_signs (ι : A → A) (hι : ∀ a, ι (ι a) = a) :
 
 end Comb
 
-theorem exists_invol {A : Type} (c : Set A → Set A) (hanti : Antitone c) (hinv : ∀ I, c (c I) = I) :
-    ∃ ι : A → A, (∀ a, ι (ι a) = a) ∧ ∀ I, c I = (ι '' I)ᶜ := by
+theorem exists_invol {A : Type} (c : Set A → Set A) (hanti : Antitone c) (hinv : ∀ I, c (c I) = I)
+    : ∃ ι : A → A, (∀ a, ι (ι a) = a) ∧ ∀ I, c I = (ι '' I)ᶜ := by
   classical
-
-  let cd : Set A ≃o (Set A)ᵒᵈ :=
-    { toFun := fun I => OrderDual.toDual (c I)
-      invFun := fun I => c (OrderDual.ofDual I)
-      left_inv := hinv
-      right_inv := fun I => by simp [hinv]
-      map_rel_iff' := by
-        intro I J
-        constructor
-        · intro h
-          have := hanti (show c J ≤ c I from h)
-          rwa [hinv, hinv] at this
-        · intro h
-          exact hanti h }
+  let cd : Set A ≃o (Set A)ᵒᵈ := {
+    toFun := fun I => OrderDual.toDual (c I)
+    invFun := fun I => c (OrderDual.ofDual I)
+    left_inv := hinv
+    right_inv := fun I => by simp [hinv]
+    map_rel_iff' := by
+      intro I J
+      constructor
+      · intro h
+        have := hanti (show c J ≤ c I from h)
+        rwa [hinv, hinv] at this
+      · intro h
+        exact hanti h
+  }
   have hcompl : ∀ I, c Iᶜ = (c I)ᶜ := fun I => by
     have h := cd.isCompl (isCompl_compl (x := I))
     have h2 : IsCompl (c I) (c Iᶜ) := h.ofDual
     exact h2.compl_eq.symm
-  let ψ : Set A ≃o Set A :=
-    { toFun := fun I => (c I)ᶜ
-      invFun := fun I => (c I)ᶜ
-      left_inv := fun I => by simp [← hcompl, hinv]
-      right_inv := fun I => by simp [← hcompl, hinv]
-      map_rel_iff' := by
-        intro I J
-        constructor
-        · intro h
-          have h1 : c J ≤ c I := compl_le_compl_iff_le.1 h
-          have := hanti h1
-          rwa [hinv, hinv] at this
-        · intro h
-          exact compl_le_compl (hanti h) }
+  let ψ : Set A ≃o Set A := {
+    toFun := fun I => (c I)ᶜ
+    invFun := fun I => (c I)ᶜ
+    left_inv := fun I => by simp [← hcompl, hinv]
+    right_inv := fun I => by simp [← hcompl, hinv]
+    map_rel_iff' := by
+      intro I J
+      constructor
+      · intro h
+        have h1 : c J ≤ c I := compl_le_compl_iff_le.1 h
+        have := hanti h1
+        rwa [hinv, hinv] at this
+      · intro h
+        exact compl_le_compl (hanti h)
+  }
   have hatom : ∀ a, ∃ b, ψ {a} = {b} := fun a =>
     Set.isAtom_iff.1 ((ψ.isAtom_iff _).2 (Set.isAtom_singleton a))
   choose ι hι using hatom
@@ -188,27 +195,36 @@ section Lin
 
 variable {K V : Type} [Field K] [AddCommGroup V] [Module K V]
 
-theorem aeval_intertwine {M N : Type} [AddCommGroup M] [Module K M] [AddCommGroup N] [Module K N] (φ : M →ₗ[K] N)
-    (f : Module.End K M) (f' : Module.End K N) (h : ∀ x, φ (f x) = f' (φ x)) (p : K[X]) (x : M) :
-    φ (aeval f p x) = aeval f' p (φ x) :=
+theorem aeval_intertwine
+    {M N : Type} [AddCommGroup M] [Module K M] [AddCommGroup N] [Module K N]
+    (φ : M →ₗ[K] N) (f : Module.End K M) (f' : Module.End K N) (h : ∀ x, φ (f x) = f' (φ x))
+    (p : K[X]) (x : M)
+    : φ (aeval f p x) = aeval f' p (φ x) :=
   _root_.UpperTheory.Reformulated.B.AevalIntertwining.aeval_intertwine φ f f' h p x
 
-theorem aeval_restrict_coe (f : Module.End K V) (W : Submodule K V) (hW : ∀ x ∈ W, f x ∈ W) (p : K[X]) (w : W) :
-    ((aeval (f.restrict hW : Module.End K W) p) w : V) = aeval f p (w : V) :=
+theorem aeval_restrict_coe
+    (f : Module.End K V) (W : Submodule K V) (hW : ∀ x ∈ W, f x ∈ W) (p : K[X]) (w : W)
+    : ((aeval (f.restrict hW : Module.End K W) p) w : V) = aeval f p (w : V) :=
   (aeval_intertwine W.subtype (f.restrict hW) f (fun _ => rfl) p w)
 
-theorem aeval_mem (f : Module.End K V) (W : Submodule K V) (hW : ∀ x ∈ W, f x ∈ W) (p : K[X]) {w : V} (hw : w ∈ W) :
-    aeval f p w ∈ W := by
+theorem aeval_mem
+    (f : Module.End K V) (W : Submodule K V) (hW : ∀ x ∈ W, f x ∈ W) (p : K[X]) {w : V} (hw : w ∈ W)
+    : aeval f p w ∈ W := by
   have := aeval_restrict_coe f W hW p ⟨w, hw⟩
   rw [← show _ = aeval f p w from this]
   exact Subtype.property _
 
-theorem aeval_mapQ (f : Module.End K V) (W : Submodule K V) (hW : ∀ x ∈ W, f x ∈ W) (p : K[X]) (v : V) :
-    aeval (W.mapQ W f (fun x hx => hW x hx) : Module.End K (V ⧸ W)) p (W.mkQ v) = W.mkQ (aeval f p v) :=
+theorem aeval_mapQ
+    (f : Module.End K V) (W : Submodule K V) (hW : ∀ x ∈ W, f x ∈ W) (p : K[X]) (v : V)
+    : aeval (W.mapQ W f (fun x hx => hW x hx) : Module.End K (V ⧸ W)) p (W.mkQ v)
+      = W.mkQ (aeval f p v) :=
   (aeval_intertwine W.mkQ f (W.mapQ W f (fun x hx => hW x hx)) (fun _ => rfl) p v).symm
 
-theorem invariant_eq_ker [FiniteDimensional K V] (f : Module.End K V) (hs : Squarefree f.charpoly) (W : Submodule K V)
-    (hW : ∀ x ∈ W, f x ∈ W) : ∃ a b : K[X], a * b = f.charpoly ∧ W = LinearMap.ker (aeval f a) := by
+theorem invariant_eq_ker
+    [FiniteDimensional K V]
+    (f : Module.End K V) (hs : Squarefree f.charpoly)
+    (W : Submodule K V) (hW : ∀ x ∈ W, f x ∈ W)
+    : ∃ a b : K[X], a * b = f.charpoly ∧ W = LinearMap.ker (aeval f a) := by
   have hab := GlobalTheory.CuspGL.charpoly_eq_restrict_mul_mapQ W f hW
   set a := LinearMap.charpoly (f.restrict hW) with ha
   set b := LinearMap.charpoly (W.mapQ W f (fun x hx => hW x hx)) with hb
@@ -228,23 +244,25 @@ theorem invariant_eq_ker [FiniteDimensional K V] (f : Module.End K V) (hs : Squa
       exact (Submodule.Quotient.mk_eq_zero W).1 h1.symm
     have h2 : v = aeval f w (aeval f b v) := by
       have h3 := congrArg (fun p => aeval f p v) huw
-      simp only [map_add (f := _), map_mul, map_one, LinearMap.add_apply, Module.End.mul_apply, Module.End.one_apply] at h3
+      simp only [map_add (f := _), map_mul, map_one, LinearMap.add_apply, Module.End.mul_apply,
+          Module.End.one_apply]
+        at h3
       rw [LinearMap.mem_ker.1 hv, map_zero, zero_add] at h3
       exact h3.symm
     rw [h2]
     exact aeval_mem f W hW w hbv
 
-theorem ker_le_of_dvd (f : Module.End K V) {P p : K[X]} (h : P ∣ p) :
-    LinearMap.ker (aeval f P) ≤ LinearMap.ker (aeval f p) := by
+theorem ker_le_of_dvd (f : Module.End K V) {P p : K[X]} (h : P ∣ p)
+    : LinearMap.ker (aeval f P) ≤ LinearMap.ker (aeval f p) := by
   obtain ⟨c, rfl⟩ := h
   intro x hx
   rw [LinearMap.mem_ker] at hx ⊢
   rw [mul_comm, map_mul, Module.End.mul_apply, hx, map_zero]
 
-theorem exists_atoms [FiniteDimensional K V] (f : Module.End K V) (hs : Squarefree f.charpoly) :
-    ∃ (A : Type) (_ : Finite A) (L : A → Submodule K V), iSupIndep L ∧ (∀ i, L i ≠ ⊥) ∧
-      (∀ i, ∀ x ∈ L i, f x ∈ L i) ∧
-      ∀ W : Submodule K V, (∀ x ∈ W, f x ∈ W) → ∃ I : Set A, W = ⨆ i ∈ I, L i := by
+theorem exists_atoms [FiniteDimensional K V] (f : Module.End K V) (hs : Squarefree f.charpoly)
+    : ∃ (A : Type) (_ : Finite A) (L : A → Submodule K V),
+      iSupIndep L ∧ (∀ i, L i ≠ ⊥) ∧ (∀ i, ∀ x ∈ L i, f x ∈ L i)
+        ∧ ∀ W : Submodule K V, (∀ x ∈ W, f x ∈ W) → ∃ I : Set A, W = ⨆ i ∈ I, L i := by
   classical
   have hm : f.charpoly.Monic := LinearMap.charpoly_monic f
   let F := (UniqueFactorizationMonoid.normalizedFactors f.charpoly).toFinset
@@ -253,15 +271,16 @@ theorem exists_atoms [FiniteDimensional K V] (f : Module.End K V) (hs : Squarefr
   have hprod : ∏ P ∈ F, P = f.charpoly := by
     have h1 : F.val = UniqueFactorizationMonoid.normalizedFactors f.charpoly := by
       simp only [F, Multiset.toFinset_val, hnd.dedup]
-    rw [Finset.prod, h1, Multiset.map_id', UniqueFactorizationMonoid.prod_normalizedFactors_eq hm.ne_zero,
-      hm.normalize_eq_self]
+    rw [Finset.prod, h1, Multiset.map_id',
+      UniqueFactorizationMonoid.prod_normalizedFactors_eq hm.ne_zero, hm.normalize_eq_self]
   have hirr : ∀ P ∈ F, Irreducible P := fun P hP =>
     UniqueFactorizationMonoid.irreducible_of_normalized_factor P (Multiset.mem_toFinset.1 hP)
   have hnorm : ∀ P ∈ F, normalize P = P := fun P hP =>
     UniqueFactorizationMonoid.normalize_normalized_factor P (Multiset.mem_toFinset.1 hP)
   have hcop : ∀ P ∈ F, ∀ Q ∈ F, P ≠ Q → IsCoprime P Q := fun P hP Q hQ hne => by
     refine ((hirr P hP).coprime_iff_not_dvd).2 fun hd => hne ?_
-    exact dvd_antisymm_of_normalize_eq (hnorm P hP) (hnorm Q hQ) hd ((hirr P hP).dvd_symm (hirr Q hQ) hd)
+    exact dvd_antisymm_of_normalize_eq (hnorm P hP) (hnorm Q hQ) hd
+      ((hirr P hP).dvd_symm (hirr Q hQ) hd)
   have hker : ∀ s : Finset K[X], s ⊆ F → LinearMap.ker (aeval f (∏ P ∈ s, P)) = ⨆ P ∈ s, Lk P := by
     intro s
     induction s using Finset.induction_on with
@@ -273,7 +292,8 @@ theorem exists_atoms [FiniteDimensional K V] (f : Module.End K V) (hs : Squarefr
       intro hsF
       have hs' : s ⊆ F := (Finset.subset_insert a s).trans hsF
       have haF : a ∈ F := hsF (Finset.mem_insert_self a s)
-      rw [Finset.prod_insert ha, ← sup_ker_aeval_eq_ker_aeval_mul_of_coprime, ih hs', Finset.iSup_insert]
+      rw [Finset.prod_insert ha, ← sup_ker_aeval_eq_ker_aeval_mul_of_coprime, ih hs',
+        Finset.iSup_insert]
       exact IsCoprime.prod_right fun b hb => hcop a haF b (hs' hb) fun h => ha (h ▸ hb)
   have htop : ⨆ P ∈ F, Lk P = ⊤ := by
     rw [← hker F subset_rfl, hprod, LinearMap.aeval_self_charpoly, LinearMap.ker_zero]
@@ -290,7 +310,8 @@ theorem exists_atoms [FiniteDimensional K V] (f : Module.End K V) (hs : Squarefr
     refine Disjoint.mono_right hle (disjoint_ker_aeval_of_isCoprime f ?_)
     exact IsCoprime.prod_right fun Q hQ =>
       hcop _ a.2.1 _ (Finset.mem_of_mem_erase hQ) (Finset.ne_of_mem_erase hQ).symm
-  · have h1 : aeval f a.1 (f x) = f (aeval f a.1 x) := (aeval_intertwine f f f (fun _ => rfl) a.1 x).symm
+  · have h1 : aeval f a.1 (f x) = f (aeval f a.1 x) :=
+      (aeval_intertwine f f f (fun _ => rfl) a.1 x).symm
     have h2 : aeval f a.1 x = 0 := hx
     show aeval f a.1 (f x) = 0
     rw [h1, h2, map_zero]
@@ -299,7 +320,9 @@ theorem exists_atoms [FiniteDimensional K V] (f : Module.End K V) (hs : Squarefr
     have h1 : ⨆ i ∈ {a : A | a.1 ∣ p}, L i ≤ W := by
       rw [hWe]
       exact iSup₂_le fun i hi => ker_le_of_dvd f hi
-    have h2 : (⊤ : Submodule K V) ≤ (⨆ i ∈ {a : A | a.1 ∣ p}, L i) ⊔ ⨆ P ∈ F.filter (fun P => ¬ P ∣ p), Lk P := by
+    have h2
+        : (⊤ : Submodule K V)
+          ≤ (⨆ i ∈ {a : A | a.1 ∣ p}, L i) ⊔ ⨆ P ∈ F.filter (fun P => ¬ P ∣ p), Lk P := by
       rw [← htop]
       refine iSup₂_le fun P hP => ?_
       by_cases hd : P ∣ p
@@ -334,15 +357,24 @@ section Main
 
 open PositivityTheory.Rg.BcB.D4
 
-theorem perp_anti {K : Type} [Field K] {n : ℕ} (σ : K →+* K) {W W' : Submodule K (Fin n → K)} (h : W ≤ W') :
-    perp σ W' ≤ perp σ W := fun _ hy x hx => hy x (h hx)
+theorem perp_anti
+    {K : Type} [Field K] {n : ℕ} (σ : K →+* K) {W W' : Submodule K (Fin n → K)} (h : W ≤ W')
+    : perp σ W' ≤ perp σ W := fun _ hy x hx =>
+  hy x (h hx)
 
-theorem perpD_anti {K : Type} [Field K] {n : ℕ} (σ : K →+* K) (d : GL (Fin n) K) {W W' : Submodule K (Fin n → K)}
-    (h : W ≤ W') : perpD σ d W' ≤ perpD σ d W :=
+theorem perpD_anti
+    {K : Type} [Field K]
+    {n : ℕ}
+    (σ : K →+* K) (d : GL (Fin n) K)
+    {W W' : Submodule K (Fin n → K)} (h : W ≤ W')
+    : perpD σ d W' ≤ perpD σ d W :=
   Submodule.map_mono (perp_anti σ h)
 
-theorem img_eq_of_invariant {K : Type} [Field K] {n : ℕ} (g : GL (Fin n) K) (W : Submodule K (Fin n → K))
-    (h : ∀ x ∈ W, Matrix.toLin' g.val x ∈ W) : img g W = W := by
+theorem img_eq_of_invariant
+    {K : Type} [Field K]
+    {n : ℕ}
+    (g : GL (Fin n) K) (W : Submodule K (Fin n → K)) (h : ∀ x ∈ W, Matrix.toLin' g.val x ∈ W)
+    : img g W = W := by
   have hinj : Function.Injective (Matrix.toLin' g.val) := by
     intro a b hab
     have h1 := congrArg (fun z => (g⁻¹ : GL (Fin n) K).val *ᵥ z) hab
@@ -355,8 +387,7 @@ theorem img_eq_of_invariant {K : Type} [Field K] {n : ℕ} (g : GL (Fin n) K) (W
 theorem pairParam : PairParam := by
   intro E _ _ _ n d hd
   let f : Module.End E (Fin n → E) := Matrix.toLin' (nrm d).val
-  have hcp : LinearMap.charpoly f = (nrm d).val.charpoly := by
-    simp [f, Matrix.charpoly_toLin']
+  have hcp : LinearMap.charpoly f = (nrm d).val.charpoly := by simp [f, Matrix.charpoly_toLin']
   have hs : Squarefree (LinearMap.charpoly f) := by
     rw [hcp]
     exact Polynomial.Separable.squarefree hd
@@ -375,7 +406,8 @@ theorem pairParam : PairParam := by
       by_contra hc
       have h1 : L a ≤ S I := le_iSup₂_of_le (f := fun i (_ : i ∈ I) => L i) a ha le_rfl
       have h2 : S J ≤ ⨆ j, ⨆ (_ : j ≠ a), L j :=
-        iSup₂_le fun j hj => le_iSup₂_of_le (f := fun j (_ : j ≠ a) => L j) j (fun e => hc (e ▸ hj)) le_rfl
+        iSup₂_le fun j hj =>
+          le_iSup₂_of_le (f := fun j (_ : j ≠ a) => L j) j (fun e => hc (e ▸ hj)) le_rfl
       exact hne a ((hind a).eq_bot_of_le (h1.trans (h.trans h2)))
     · intro h
       exact biSup_mono h
@@ -388,8 +420,11 @@ theorem pairParam : PairParam := by
     rw [← hW]
     exact ⟨x, hx, rfl⟩
   have hφφ : ∀ W, perpD (conjE E) d (perpD (conjE E) d W) = img (nrm d) W := fun W =>
-    GlobalTheory.CompanionTheory.FlagCent.perpD_perpD (conjE E) (fun a => NumberField.IsCMField.complexConj_apply_apply E a) d W
-  have hφstab : ∀ W, img (nrm d) W = W → img (nrm d) (perpD (conjE E) d W) = perpD (conjE E) d W := by
+    GlobalTheory.CompanionTheory.FlagCent.perpD_perpD (conjE E)
+      (fun a => NumberField.IsCMField.complexConj_apply_apply E a)
+      d W
+  have hφstab
+      : ∀ W, img (nrm d) W = W → img (nrm d) (perpD (conjE E) d W) = perpD (conjE E) d W := by
     intro W hW
     rw [← hφφ, hφφ W, hW]
   have hcex : ∀ I, ∃ J, perpD (conjE E) d (S I) = S J := fun I => hexists _ (hφstab _ (hstab I))
@@ -407,15 +442,24 @@ theorem pairParam : PairParam := by
     obtain ⟨Q, hQ⟩ := hall (S I ⊓ S J) fun x hx => ⟨hSinv I x hx.1, hSinv J x hx.2⟩
     have h1 : Q ⊆ I := (hSle _ _).1 (hQ.symm.le.trans inf_le_left)
     have h2 : Q ⊆ J := (hSle _ _).1 (hQ.symm.le.trans inf_le_right)
-    have h3 : I ∩ J ⊆ Q := (hSle _ _).1 (by
-      have : S (I ∩ J) ≤ S I ⊓ S J :=
-        le_inf ((hSle _ _).2 Set.inter_subset_left) ((hSle _ _).2 Set.inter_subset_right)
-      exact this.trans hQ.le)
+    have h3 : I ∩ J ⊆ Q :=
+      (hSle _ _).1 (by
+        have : S (I ∩ J) ≤ S I ⊓ S J :=
+          le_inf ((hSle _ _).2 Set.inter_subset_left) ((hSle _ _).2 Set.inter_subset_right)
+        exact this.trans hQ.le)
     have h4 : I ∩ J = Q := Set.Subset.antisymm h3 (Set.subset_inter h1 h2)
     rw [h4]
     exact hQ.symm
-  refine ⟨m, fun e => S (T e), fun e => ⟨hstab _, ?_⟩, fun W hW => ?_, ?_, fun e e' => ?_, fun e e' h => ?_,
-    fun e => ?_⟩
+  refine ⟨
+    m,
+    fun e => S (T e),
+    fun e => ⟨hstab _, ?_⟩,
+    fun W hW => ?_,
+    ?_,
+    fun e e' => ?_,
+    fun e e' h => ?_,
+    fun e => ?_
+  ⟩
   · rw [hc, hSle, hcι]
     rintro a ha ⟨b, hb, rfl⟩
     exact hT1 _ _ hb ha

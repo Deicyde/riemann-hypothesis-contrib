@@ -11,15 +11,16 @@ open scoped NNReal
 
 namespace UpperTheory.Esk.NormOneUnitsLemmas
 
-theorem pow_sub (ν : Valuation ℂ ℝ≥0) {b : ℂ} (hb : ν b ≤ 1) (m : ℕ) : ν (b ^ m - 1) ≤ ν (b - 1) := by
+theorem pow_sub (ν : Valuation ℂ ℝ≥0) {b : ℂ} (hb : ν b ≤ 1) (m : ℕ)
+    : ν (b ^ m - 1) ≤ ν (b - 1) := by
   rw [← geom_sum_mul, Valuation.map_mul]
   refine mul_le_of_le_one_left zero_le ?_
   refine Valuation.map_sum_le _ fun i _ => ?_
   rw [Valuation.map_pow]
   exact pow_le_one₀ zero_le hb
 
-theorem pow_l (ν : Valuation ℂ ℝ≥0) (l : ℕ) {b : ℂ} (hb : ν b ≤ 1) (hbp : ν (b - 1) ≤ ν (l : ℂ)) :
-    ν (b ^ l - 1) ≤ ν (l : ℂ) * ν (b - 1) := by
+theorem pow_l (ν : Valuation ℂ ℝ≥0) (l : ℕ) {b : ℂ} (hb : ν b ≤ 1) (hbp : ν (b - 1) ≤ ν (l : ℂ))
+    : ν (b ^ l - 1) ≤ ν (l : ℂ) * ν (b - 1) := by
   rw [← geom_sum_mul, Valuation.map_mul]
   refine mul_le_mul_of_nonneg_right ?_ zero_le
   have e : ∑ i ∈ Finset.range l, b ^ i = ∑ i ∈ Finset.range l, (b ^ i - 1) + (l : ℂ) := by
@@ -28,8 +29,8 @@ theorem pow_l (ν : Valuation ℂ ℝ≥0) (l : ℕ) {b : ℂ} (hb : ν b ≤ 1)
   refine (Valuation.map_add _ _ _).trans (max_le ?_ le_rfl)
   exact Valuation.map_sum_le _ fun i _ => (pow_sub ν hb i).trans hbp
 
-theorem pow_lN (ν : Valuation ℂ ℝ≥0) (l : ℕ) {b : ℂ} (hb : ν b ≤ 1) (hbp : ν (b - 1) ≤ ν (l : ℂ)) :
-    ∀ N : ℕ, ν (b ^ (l ^ N) - 1) ≤ ν (l : ℂ) ^ N * ν (b - 1)
+theorem pow_lN (ν : Valuation ℂ ℝ≥0) (l : ℕ) {b : ℂ} (hb : ν b ≤ 1) (hbp : ν (b - 1) ≤ ν (l : ℂ))
+    : ∀ N : ℕ, ν (b ^ (l ^ N) - 1) ≤ ν (l : ℂ) ^ N * ν (b - 1)
   | 0 => by simp
   | N + 1 => by
     have hb' : ν (b ^ (l ^ N)) ≤ 1 := by rw [Valuation.map_pow]; exact pow_le_one₀ zero_le hb
@@ -72,7 +73,8 @@ theorem UpperTheory.Esk.pf_GUnit : UpperTheory.Esk.GUnit := by
   set a := D.em v x ^ (l - 1) with ha
   have hale : nu ι a ≤ 1 := by rw [ha, Valuation.map_pow]; exact pow_le_one₀ zero_le hxle
   have ha1 : nu ι (a - 1) ≤ 1 := by rw [← hemy]; exact ((D.lt v y).2 hylt).le
-  have e : D.em v x ^ ((l - 1) * l ^ N * m) = (a ^ (l ^ N)) ^ m := by rw [ha, ← pow_mul, ← pow_mul, mul_assoc]
+  have e : D.em v x ^ ((l - 1) * l ^ N * m) = (a ^ (l ^ N)) ^ m := by
+    rw [ha, ← pow_mul, ← pow_mul, mul_assoc]
   rw [e]
   have hb : nu ι (a ^ (l ^ N)) ≤ 1 := by rw [Valuation.map_pow]; exact pow_le_one₀ zero_le hale
   refine (pow_sub _ hb m).trans ((pow_lN _ l hale hnuy N).trans ?_)

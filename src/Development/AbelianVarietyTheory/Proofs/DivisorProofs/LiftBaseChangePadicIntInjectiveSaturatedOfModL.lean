@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDimEqO
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.LatticeModL
 
-theorem exists_one_tmul_add_smul (l : ℕ) [Fact l.Prime] (H : Type) [AddCommGroup H]
-    (x : ℤ_[l] ⊗[ℤ] H) :
-    ∃ (h : H) (y : ℤ_[l] ⊗[ℤ] H), x = (1 : ℤ_[l]) ⊗ₜ h + (l : ℤ_[l]) • y := by
+theorem exists_one_tmul_add_smul
+    (l : ℕ) [Fact l.Prime] (H : Type) [AddCommGroup H] (x : ℤ_[l] ⊗[ℤ] H)
+    : ∃ (h : H) (y : ℤ_[l] ⊗[ℤ] H), x = (1 : ℤ_[l]) ⊗ₜ h + (l : ℤ_[l]) • y := by
   induction x using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, by simp⟩
   | tmul a h =>
@@ -24,10 +26,9 @@ theorem exists_one_tmul_add_smul (l : ℕ) [Fact l.Prime] (H : Type) [AddCommGro
       rw [PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton] at this
       exact this
     refine ⟨(a.zmodRepr : ℤ) • h, c ⊗ₜ h, ?_⟩
-    have ha : a = ((a.zmodRepr : ℤ) : ℤ_[l]) + (l : ℤ_[l]) * c := by
-      rw [← hc]; push_cast; ring
-    rw [TensorProduct.tmul_smul, TensorProduct.smul_tmul', TensorProduct.smul_tmul',
-      smul_eq_mul, zsmul_eq_mul, _root_.mul_one, ← TensorProduct.add_tmul, ← ha]
+    have ha : a = ((a.zmodRepr : ℤ) : ℤ_[l]) + (l : ℤ_[l]) * c := by rw [← hc]; push_cast; ring
+    rw [TensorProduct.tmul_smul, TensorProduct.smul_tmul', TensorProduct.smul_tmul', smul_eq_mul,
+      zsmul_eq_mul, _root_.mul_one, ← TensorProduct.add_tmul, ← ha]
   | add x y hx hy =>
     obtain ⟨h₁, y₁, rfl⟩ := hx
     obtain ⟨h₂, y₂, rfl⟩ := hy
@@ -35,21 +36,21 @@ theorem exists_one_tmul_add_smul (l : ℕ) [Fact l.Prime] (H : Type) [AddCommGro
 
 end GlobalTheory.LatticeModL
 
-
 open GlobalTheory.LatticeModL in
-theorem GlobalTheory.latticeMap_liftBaseChange_injective_saturated :
-    ∀ (l : ℕ) [Fact l.Prime] (H T : Type) [AddCommGroup H] [Module.Finite ℤ H] [Module.Free ℤ H]
-      [AddCommGroup T] [Module ℤ_[l] T], (∀ t : T, (l : ℤ_[l]) • t = 0 → t = 0) →
-      ∀ φ : H →+ T, (∀ (h : H) (t : T), φ h = (l : ℤ_[l]) • t → ∃ h' : H, h = l • h') →
-      Function.Injective (φ.toIntLinearMap.liftBaseChange ℤ_[l]) ∧
-      ∀ t : T, (l : ℤ_[l]) • t ∈ LinearMap.range (φ.toIntLinearMap.liftBaseChange ℤ_[l]) →
-        t ∈ LinearMap.range (φ.toIntLinearMap.liftBaseChange ℤ_[l]) := by
+theorem GlobalTheory.latticeMap_liftBaseChange_injective_saturated
+    : ∀ (l : ℕ) [Fact l.Prime] (H T : Type) [AddCommGroup H] [Module.Finite ℤ H] [Module.Free ℤ H]
+        [AddCommGroup T] [Module ℤ_[l] T],
+      (∀ t : T, (l : ℤ_[l]) • t = 0 → t = 0)
+        → ∀ φ : H →+ T,
+          (∀ (h : H) (t : T), φ h = (l : ℤ_[l]) • t → ∃ h' : H, h = l • h')
+            → Function.Injective (φ.toIntLinearMap.liftBaseChange ℤ_[l])
+              ∧ ∀ t : T,
+                (l : ℤ_[l]) • t ∈ LinearMap.range (φ.toIntLinearMap.liftBaseChange ℤ_[l])
+                  → t ∈ LinearMap.range (φ.toIntLinearMap.liftBaseChange ℤ_[l]) := by
   intro l _ H T _ _ _ _ _ htor φ hsat
   set F := φ.toIntLinearMap.liftBaseChange ℤ_[l] with hFdef
-  have hF : ∀ h, F ((1 : ℤ_[l]) ⊗ₜ h) = φ h := by
-    intro h; simp [F]
-  have key : ∀ (x : ℤ_[l] ⊗[ℤ] H) (t : T), F x = (l : ℤ_[l]) • t →
-      ∃ x', x = (l : ℤ_[l]) • x' := by
+  have hF : ∀ h, F ((1 : ℤ_[l]) ⊗ₜ h) = φ h := by intro h; simp [F]
+  have key : ∀ (x : ℤ_[l] ⊗[ℤ] H) (t : T), F x = (l : ℤ_[l]) • t → ∃ x', x = (l : ℤ_[l]) • x' := by
     intro x t hx
     obtain ⟨h, y, rfl⟩ := exists_one_tmul_add_smul l H x
     rw [map_add (f := _), map_smul, hF] at hx

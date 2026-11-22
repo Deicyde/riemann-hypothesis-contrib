@@ -8,13 +8,13 @@ namespace GlobalTheory.RelativeLengthSpanDet
 
 open IsDiscreteValuationRing
 
-variable {R : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+variable
+  {R : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-
 omit [Fintype ι] in
-theorem addVal_prod (s : Finset ι) (c : ι → R) :
-    addVal R (∏ i ∈ s, c i) = ∑ i ∈ s, addVal R (c i) := by
+theorem addVal_prod (s : Finset ι) (c : ι → R)
+    : addVal R (∏ i ∈ s, c i) = ∑ i ∈ s, addVal R (c i) := by
   induction s using Finset.induction_on with
   | empty => simp
   | insert i s hi ih => rw [Finset.prod_insert hi, Finset.sum_insert hi, addVal_mul, ih]
@@ -25,29 +25,31 @@ theorem length_self_eq_top : Module.length R R = ⊤ := by
   have : IsArtinianRing R := h.2
   exact IsDiscreteValuationRing.not_isField R (IsArtinianRing.isField_of_isDomain R)
 
-theorem length_coker_of_det_eq_zero (P : Matrix ι ι R) (h : P.det = 0) :
-    Module.length R ((ι → R) ⧸ LinearMap.range P.mulVecLin) = ⊤ := by
+theorem length_coker_of_det_eq_zero (P : Matrix ι ι R) (h : P.det = 0)
+    : Module.length R ((ι → R) ⧸ LinearMap.range P.mulVecLin) = ⊤ := by
   obtain ⟨w, hw, hwP⟩ := Matrix.exists_vecMul_eq_zero_iff.mpr h
   obtain ⟨k, hk⟩ := Function.ne_iff.mp hw
   have hk' : w k ≠ 0 := hk
   let g : R →ₗ[R] (ι → R) ⧸ LinearMap.range P.mulVecLin :=
     (LinearMap.range P.mulVecLin).mkQ ∘ₗ LinearMap.single R (fun _ : ι => R) k
   have hg : Function.Injective g := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro r hr
     have hr' : (Pi.single k r : ι → R) ∈ LinearMap.range P.mulVecLin :=
       (Submodule.Quotient.mk_eq_zero _).mp hr
     obtain ⟨x, hx⟩ := hr'
-    have h1 : w ⬝ᵥ P.mulVec x = 0 := by
-      rw [Matrix.dotProduct_mulVec, hwP, zero_dotProduct]
+    have h1 : w ⬝ᵥ P.mulVec x = 0 := by rw [Matrix.dotProduct_mulVec, hwP, zero_dotProduct]
     rw [Matrix.mulVecLin_apply] at hx
     rw [hx, dotProduct_single] at h1
     exact (mul_eq_zero.mp h1).resolve_left hk'
   exact top_le_iff.mp (length_self_eq_top (R := R) ▸ Module.length_le_of_injective g hg)
 
-theorem length_coker_of_injective {M : Type*} [AddCommGroup M] [Module R M]
-    (b : Module.Basis ι R M) (f : M →ₗ[R] M) (hf : Function.Injective f) :
-    Module.length R (M ⧸ LinearMap.range f) = addVal R (LinearMap.det f) := by
+theorem length_coker_of_injective
+    {M : Type*} [AddCommGroup M] [Module R M]
+    (b : Module.Basis ι R M)
+    (f : M →ₗ[R] M) (hf : Function.Injective f)
+    : Module.length R (M ⧸ LinearMap.range f) = addVal R (LinearMap.det f) := by
   have hr : Module.finrank R (LinearMap.range f) = Module.finrank R M :=
     LinearMap.finrank_range_of_inj hf
   set c := Submodule.smithNormalFormCoeffs b hr with hc
@@ -57,13 +59,16 @@ theorem length_coker_of_injective {M : Type*} [AddCommGroup M] [Module R M]
   have h1 : Module.length R (M ⧸ LinearMap.range f) = ∑ i, addVal R (c i) := by
     rw [(Submodule.quotientEquivPiSpan _ b hr).length_eq, Module.length_pi_of_fintype]
     exact Finset.sum_congr rfl fun i _ => Ring.ord_eq_addVal (c i)
-  have h2 := LinearMap.associated_det_comp_equiv (LinearMap.range f).subtype
-    (LinearEquiv.ofInjective f hf) (bt.equiv bb (Equiv.refl ι))
+  have h2 :=
+    LinearMap.associated_det_comp_equiv (LinearMap.range f).subtype (LinearEquiv.ofInjective f hf)
+      (bt.equiv bb (Equiv.refl ι))
   have h3 : (LinearMap.range f).subtype ∘ₗ (LinearEquiv.ofInjective f hf : M →ₗ[R] _) = f := by
     ext x
     rfl
-  have h4 : LinearMap.det ((LinearMap.range f).subtype ∘ₗ
-      (bt.equiv bb (Equiv.refl ι) : M →ₗ[R] LinearMap.range f)) = ∏ i, c i := by
+  have h4
+      : LinearMap.det
+          ((LinearMap.range f).subtype ∘ₗ (bt.equiv bb (Equiv.refl ι) : M →ₗ[R] LinearMap.range f))
+        = ∏ i, c i := by
     rw [← LinearMap.det_toMatrix bt, ← Matrix.det_diagonal]
     congr 1
     ext i j
@@ -78,12 +83,13 @@ theorem length_coker_of_injective {M : Type*} [AddCommGroup M] [Module R M]
   rw [h3, h4] at h2
   rw [h1, (addVal_eq_iff_associated _ _).mpr h2, addVal_prod]
 
-theorem length_coker (P : Matrix ι ι R) :
-    Module.length R ((ι → R) ⧸ LinearMap.range P.mulVecLin) = addVal R P.det := by
+theorem length_coker (P : Matrix ι ι R)
+    : Module.length R ((ι → R) ⧸ LinearMap.range P.mulVecLin) = addVal R P.det := by
   by_cases h : P.det = 0
   · rw [length_coker_of_det_eq_zero P h, h, addVal_zero]
   · have hinj : Function.Injective P.mulVecLin := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro x hx
       by_contra hx0
       exact h (Matrix.exists_mulVec_eq_zero_iff.mp ⟨x, hx0, hx⟩)

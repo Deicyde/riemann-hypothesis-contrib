@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.GeoTie
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+  GlobalTheory.GeoTie
 
 set_option autoImplicit false
 
@@ -19,8 +20,9 @@ namespace GlobalTheory.GeoTie.NumPt
 
 section Val
 
-variable {V : Type} {K : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K]
-  [Algebra V K] [IsFractionRing V K]
+variable
+  {V : Type} {K : Type}
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
 
 lemma vV_nonneg_of_mem (b : V) : 0 ≤ vV V (algebraMap V K b) := by
   by_cases hb : b = 0
@@ -63,8 +65,9 @@ end Val
 
 section Cmp
 
-variable {V : Type} {K : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K]
-  [Algebra V K] [IsFractionRing V K]
+variable
+  {V : Type} {K : Type}
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
   {V' : Type} {K' : Type} [CommRing V'] [IsDomain V'] [IsDiscreteValuationRing V'] [Field K']
   [Algebra V' K'] [IsFractionRing V' K']
 
@@ -121,8 +124,10 @@ lemma lt_one_iff_le (g : ℤᵐ⁰) : g < 1 ↔ g ≤ WithZero.exp (-1 : ℤ) :=
 
 section Compl
 
-variable {R : Type} [CommRing R] [IsDedekindDomain R] {L : Type} [Field L] [Algebra R L]
-  [IsFractionRing R L] (w : HeightOneSpectrum R)
+variable
+  {R : Type} [CommRing R] [IsDedekindDomain R]
+  {L : Type} [Field L] [Algebra R L] [IsFractionRing R L]
+  (w : HeightOneSpectrum R)
 
 local notation "Lw" => w.adicCompletion L
 local notation "Ow" => w.adicCompletionIntegers L
@@ -171,8 +176,12 @@ theorem isPrecomplete : IsPrecomplete (IsLocalRing.maximalIdeal Ow) Ow := by
   have hc : Cauchy (map g atTop) := by
     rw [Valued.cauchy_iff]
     refine ⟨map_neBot, fun γ => ?_⟩
-    obtain ⟨n, hn⟩ := exists_pow_lt₀ hπ1 (Units.map (MonoidWithZeroHom.ValueGroup₀.embedding
-      (f := ((Valued.v : Valuation Lw ℤᵐ⁰) : Lw →*₀ ℤᵐ⁰))).toMonoidHom γ)
+    obtain ⟨n, hn⟩ :=
+      exists_pow_lt₀ hπ1
+        (Units.map
+          (MonoidWithZeroHom.ValueGroup₀.embedding
+            (f := ((Valued.v : Valuation Lw ℤᵐ⁰) : Lw →*₀ ℤᵐ⁰))).toMonoidHom
+          γ)
     refine ⟨g '' Set.Ici n, image_mem_map (Ici_mem_atTop n), ?_⟩
     rintro _ ⟨a, ha, rfl⟩ _ ⟨b, hb, rfl⟩
     rw [Valuation.restrict_lt_iff_lt_embedding]
@@ -186,16 +195,22 @@ theorem isPrecomplete : IsPrecomplete (IsLocalRing.maximalIdeal Ow) Ow := by
   obtain ⟨l, hl⟩ := CompleteSpace.complete hc
   have key : ∀ n, Valued.v (g n - l) ≤ Valued.v (π : Lw) ^ n := by
     intro n
-    have hU : {y : Lw | (Valued.v : Valuation Lw ℤᵐ⁰).restrict (y - l) <
-        (Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n)} ∈ 𝓝 l := by
+    have hU
+        : {y : Lw | (Valued.v : Valuation Lw ℤᵐ⁰).restrict (y - l) <
+            (Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n)}
+          ∈ 𝓝 l := by
       rw [Valued.mem_nhds]
-      exact ⟨Units.mk0 ((Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n)) (by simp [hπ0]),
-        subset_rfl⟩
+      exact ⟨
+        Units.mk0 ((Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n)) (by simp [hπ0]),
+        subset_rfl
+      ⟩
     have hm := hl hU
     rw [mem_map, mem_atTop_sets] at hm
     obtain ⟨N, hN⟩ := hm
-    have h1 : (Valued.v : Valuation Lw ℤᵐ⁰).restrict (g (max N n) - l) <
-        (Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n) := hN (max N n) (le_max_left _ _)
+    have h1
+        : (Valued.v : Valuation Lw ℤᵐ⁰).restrict (g (max N n) - l)
+          < (Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n) :=
+      hN (max N n) (le_max_left _ _)
     rw [Valuation.restrict_lt_iff, map_pow] at h1
     have h2 := hf (m := n) (n := max N n) (le_max_right N n)
     have e : g n - l = ((f n - f (max N n) : Ow) : Lw) + (g (max N n) - l) := by
@@ -208,8 +223,10 @@ theorem isPrecomplete : IsPrecomplete (IsLocalRing.maximalIdeal Ow) Ow := by
     exact sub_mem (f 0).2 ((mem_adicCompletionIntegers R L w).2 (by simpa using key 0))
   exact ⟨⟨l, hl1⟩, fun n => key n⟩
 
-theorem isAdicComplete : IsAdicComplete (IsLocalRing.maximalIdeal Ow) Ow :=
-  { toIsHausdorff := inferInstance, toIsPrecomplete := isPrecomplete w }
+theorem isAdicComplete : IsAdicComplete (IsLocalRing.maximalIdeal Ow) Ow := {
+  toIsHausdorff := inferInstance
+  toIsPrecomplete := isPrecomplete w
+}
 
 lemma finite_res [Finite (R ⧸ w.asIdeal)] : Finite (IsLocalRing.ResidueField Ow) := by
   let φ : R →+* IsLocalRing.ResidueField Ow := (IsLocalRing.residue Ow).comp (algebraMap R Ow)
@@ -279,22 +296,25 @@ lemma exists_e : ∃ e : ℕ, 0 < e ∧ ∀ x : L, valV Ow (kMap w x) = w.valuat
 
 end Compl
 
-
 end CompletionHelpers
 
 section Main
 
 open CompletionHelpers HeightOneSpectrum
 
-theorem exists_ptC_of_finExt : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
-    (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (p : ℕ) [Fact p.Prime] (φ : c.F →+* ℂ_[p]), IntAll Xo c →
-    ∀ (L : Type) [Field L] [Algebra c.F L] [FiniteDimensional c.F L] (σ : L →+* ℂ_[p]),
-      (∀ a, σ (algebraMap c.F L a) = φ a) → ∀ (y : FrPt Xo c L) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ),
-      ∃ (z : PtC Xo c φ) (u : ℂ_[p]), u ≠ 0 ∧ ∀ f ∈ sec Xo c a n, valC z.1 f = u * σ (evR Xo c f y) := by
+theorem exists_ptC_of_finExt
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (p : ℕ) [Fact p.Prime] (φ : c.F →+* ℂ_[p]),
+      IntAll Xo c
+        → ∀ (L : Type) [Field L] [Algebra c.F L] [FiniteDimensional c.F L] (σ : L →+* ℂ_[p]),
+          (∀ a, σ (algebraMap c.F L a) = φ a)
+            → ∀ (y : FrPt Xo c L) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), ∃ (z : PtC Xo c φ) (u : ℂ_[p]),
+              u ≠ 0 ∧ ∀ f ∈ sec Xo c a n, valC z.1 f = u * σ (evR Xo c f y) := by
   intro E _ _ _ H Dw l Xo c p _ φ hIA L _ _ _ σ hσ y a n
   haveI : NumberField c.F := { to_charZero := inferInstance, to_finiteDimensional := c.fin }
   haveI : NumberField L := NumberField.of_module_finite c.F L
-  have hL : GlobalTheory.Reg.EvLaws Xo c := (GlobalTheory.Reg.evLaws_genFr_nonempty_comp E H Dw l Xo c).1
+  have hL : GlobalTheory.Reg.EvLaws Xo c :=
+    (GlobalTheory.Reg.evLaws_genFr_nonempty_comp E H Dw l Xo c).1
 
   let w : HeightOneSpectrum (𝓞 L) := placeAt σ
   haveI : Finite (𝓞 L ⧸ w.asIdeal) := w.asIdeal.finiteQuotientOfFreeOfNeBot w.ne_bot
@@ -313,11 +333,12 @@ theorem exists_ptC_of_finExt : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     ring
   have hFin : T.FinRes := finite_res w
 
-  have hlies : w.asIdeal.LiesOver (placeAt φ).asIdeal := ⟨by
-    ext b
-    rw [Ideal.mem_comap, mem_placeAt, mem_placeAt]
-    show _ ↔ ‖σ ((algebraMap (𝓞 c.F) (𝓞 L) b : 𝓞 L) : L)‖ < 1
-    rw [show ((algebraMap (𝓞 c.F) (𝓞 L) b : 𝓞 L) : L) = algebraMap c.F L (b : c.F) from rfl, hσ]⟩
+  have hlies : w.asIdeal.LiesOver (placeAt φ).asIdeal :=
+    ⟨by
+      ext b
+      rw [Ideal.mem_comap, mem_placeAt, mem_placeAt]
+      show _ ↔ ‖σ ((algebraMap (𝓞 c.F) (𝓞 L) b : 𝓞 L) : L)‖ < 1
+      rw [show ((algebraMap (𝓞 c.F) (𝓞 L) b : 𝓞 L) : L) = algebraMap c.F L (b : c.F) from rfl, hσ]⟩
   let io : c.F →+* T.Fr := ι.comp (algebraMap c.F L)
   have he2 : (placeAt φ).asIdeal.ramificationIdx' w.asIdeal ≠ 0 :=
     Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver w.asIdeal (placeAt φ).ne_bot
@@ -334,7 +355,8 @@ theorem exists_ptC_of_finExt : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
   let ιA : L →ₐ[c.F] T.Fr := { ι with commutes' := fun _ => rfl }
   obtain ⟨yT, hyT⟩ := hL.bc L T.Fr ιA y
 
-  obtain ⟨T', io', e', y', hO', hy'alg, φ', zz, t, hint, hmap, hbor⟩ := hIA (placeAt φ) T io _ hO hFin yT
+  obtain ⟨T', io', e', y', hO', hy'alg, φ', zz, t, hint, hmap, hbor⟩ :=
+    hIA (placeAt φ) T io _ hO hFin yT
   letI : Algebra c.F T'.Fr := io'.toAlgebra
 
   let ψ : T.Fr →+* T'.Fr := (φ' : T.Fr →+* T'.Fr)
@@ -349,8 +371,7 @@ theorem exists_ptC_of_finExt : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
       rw [Valuation.ne_zero_iff]
       exact_mod_cast (Fact.out : p.Prime).ne_zero
     intro h0
-    have : WithZero.log ((placeAt φ).valuation c.F (p : c.F)) = 0 := by
-      simp only [vLa] at h0; omega
+    have : WithZero.log ((placeAt φ).valuation c.F (p : c.F)) = 0 := by simp only [vLa] at h0; omega
     have h2 := WithZero.exp_log hne
     rw [this, WithZero.exp_zero] at h2
     exact hlt.ne h2.symm
@@ -365,7 +386,8 @@ theorem exists_ptC_of_finExt : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     · exact h0
   have hOσ' : OverLa (placeAt σ) T'.V (ψ.comp ι) (r * e1) := hOσ.bc ψ hrpos hr
 
-  obtain ⟨k', hk'⟩ := GlobalTheory.T.exists_cdvrReadingInCp_of_finiteResidue p L σ T' (ψ.comp ι) (r * e1) hOσ' hy'alg
+  obtain ⟨k', hk'⟩ :=
+    GlobalTheory.T.exists_cdvrReadingInCp_of_finiteResidue p L σ T' (ψ.comp ι) (r * e1) hOσ' hy'alg
   have hk : IsReading φ T' io' k' := by
     refine ⟨fun b => ?_, hk'.int⟩
     rw [← hψio, ← hσ b]
@@ -377,10 +399,12 @@ theorem exists_ptC_of_finExt : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     simp [wchar, Finset.prod_ne_zero_iff]
   · rw [hz₀ a n f hf]
     obtain ⟨q, χ, y₀, hy₀⟩ := hL.test L y
-    have e1' : evR Xo c f y = χ (f q y₀) := GlobalTheory.Reg.evR_eq_map_of_test_point hL hf q χ y₀ y hy₀
+    have e1' : evR Xo c f y = χ (f q y₀) :=
+      GlobalTheory.Reg.evR_eq_map_of_test_point hL hf q χ y₀ y hy₀
     have e2 : evR Xo c f zz = (φ'.comp (ιA.comp χ)) (f q y₀) :=
       GlobalTheory.Reg.evR_eq_map_of_test_point hL hf q _ y₀ zz
-        (ReciprocityTheory.ChartRestriction.G.PullbackSections.frMap_trans _ φ' (ReciprocityTheory.ChartRestriction.G.PullbackSections.frMap_trans χ ιA hy₀ hyT) hmap)
+        (ReciprocityTheory.ChartRestriction.G.PullbackSections.frMap_trans _ φ'
+          (ReciprocityTheory.ChartRestriction.G.PullbackSections.frMap_trans χ ιA hy₀ hyT) hmap)
     have e3 : evI y' f = wchar (ex Dw a n) t * evR Xo c f zz :=
       hL.wt a n f hf T'.Fr t zz y'.1 (hL.test _ _) (hL.test _ _) hbor
     rw [e3, map_mul, e2, e1']

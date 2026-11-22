@@ -121,18 +121,45 @@ lemma digits_zero {p f : ℕ} (hp : 0 < p) {d : Fin f → Fin p} (hd : num d = 0
 
 end GlobalTheory.CompanionTheory.Ar.GR.RankOneColen
 
-
 open GlobalTheory.CompanionTheory.Ar.GR.RankOneColen in
-theorem _root_.GlobalTheory.CompanionTheory.Relay.fundamental_ideal_frobenius_valuation : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (AA : HopfOrder (C := C) R F), FStable F AA.carrier → ∀ σ : MulChar F R, IsFund p σ → ∀ c : ℕ → R, (∀ n, xIdeal AA.carrier (σ ^ p ^ n) = Ideal.span {c n}) → AA.carrier = Submodule.span R (Set.range fun (d : Fin f → Fin p) (a : F) => ∏ n : Fin f, algebraMap R C (c n * (σ ^ p ^ (n : ℕ)) a) ^ (d n : ℕ)) ∧ ∀ cN, HasColen R v AA.carrier cN → cN ^ 2 = (∏ n : Fin f, v (algebraMap R C (c n))) ^ (p ^ f * (p - 1)) := by
+theorem _root_.GlobalTheory.CompanionTheory.Relay.fundamental_ideal_frobenius_valuation
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (AA : HopfOrder (C := C) R F),
+              FStable F AA.carrier
+                → ∀ σ : MulChar F R,
+                  IsFund p σ
+                    → ∀ c : ℕ → R,
+                      (∀ n, xIdeal AA.carrier (σ ^ p ^ n) = Ideal.span {c n})
+                        → AA.carrier
+                            = Submodule.span R
+                              (Set.range fun (d : Fin f → Fin p) (a : F) =>
+                                ∏ n : Fin f, algebraMap R C (c n * (σ ^ p ^ (n : ℕ)) a) ^ (d n : ℕ))
+                          ∧ ∀ cN,
+                            HasColen R v AA.carrier cN
+                              → cN ^ 2
+                                = (∏ n : Fin f, v (algebraMap R C (c n))) ^ (p ^ f * (p - 1)) := by
   intro p _ C _ _ _ v R _ _ hv hpv F _ _ _ _ f hcard AA hst σ hσ c hc
   classical
   have hp : 0 < p := (Fact.out : p.Prime).pos
-  have hT := GlobalTheory.T.fundamental_ideal_frobenius_powers p C v R hv hpv F f hcard AA hst σ hσ c hc
-  obtain ⟨c', hc', hc'd⟩ : ∃ c' : ℕ → R, (∀ m, xIdeal AA.carrier (σ ^ m) = Ideal.span {c' m}) ∧
-      ∀ d : Fin f → Fin p, num d ≠ 0 → c' (num d) = ∏ n : Fin f, c n ^ (d n : ℕ) := by
-    refine ⟨fun m => if h : m ≠ 0 ∧ m < p ^ f then
-        ∏ n : Fin f, c n ^ ((Classical.choose (num_surj h.2) : Fin f → Fin p) n : ℕ)
-      else Classical.choose (eig_rank_one p C v R hv hpv F f hcard AA hst (σ ^ m)).1, ?_, ?_⟩
+  have hT :=
+    GlobalTheory.T.fundamental_ideal_frobenius_powers p C v R hv hpv F f hcard AA hst σ hσ c hc
+  obtain ⟨c', hc', hc'd⟩
+      : ∃ c' : ℕ → R,
+        (∀ m, xIdeal AA.carrier (σ ^ m) = Ideal.span {c' m})
+          ∧ ∀ d : Fin f → Fin p, num d ≠ 0 → c' (num d) = ∏ n : Fin f, c n ^ (d n : ℕ) := by
+    refine ⟨
+      fun m =>
+        if h : m ≠ 0 ∧ m < p ^ f then
+          ∏ n : Fin f, c n ^ ((Classical.choose (num_surj h.2) : Fin f → Fin p) n : ℕ)
+        else
+          Classical.choose (eig_rank_one p C v R hv hpv F f hcard AA hst (σ ^ m)).1,
+      ?_,
+      ?_
+    ⟩
     · intro m
       dsimp only
       by_cases h : m ≠ 0 ∧ m < p ^ f
@@ -153,9 +180,11 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.fundamental_ideal_frobenius_va
       rw [this]
   obtain ⟨hAug, hCar, hCol⟩ := r_decomp_relay p C v R hv hpv F f hcard AA hst σ hσ c' hc'
   refine ⟨?_, ?_⟩
-  · have hset : Set.range (fun (d : Fin f → Fin p) (a : F) =>
-          ∏ n : Fin f, algebraMap R C (c n * (σ ^ p ^ (n : ℕ)) a) ^ (d n : ℕ)) =
-        insert 1 ((fun m a => algebraMap R C (c' m * (σ ^ m) a)) '' ↑(Finset.Icc 1 (p ^ f - 1))) := by
+  · have hset
+        : Set.range (fun (d : Fin f → Fin p) (a : F) =>
+            ∏ n : Fin f, algebraMap R C (c n * (σ ^ p ^ (n : ℕ)) a) ^ (d n : ℕ))
+          = insert 1
+            ((fun m a => algebraMap R C (c' m * (σ ^ m) a)) '' ↑(Finset.Icc 1 (p ^ f - 1))) := by
       ext g
       simp only [Set.mem_range, Set.mem_insert_iff, Set.mem_image, Finset.coe_Icc, Set.mem_Icc]
       constructor
@@ -187,8 +216,11 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.fundamental_ideal_frobenius_va
       obtain ⟨P, hPu, hP⟩ := AA.lat
       rw [← hBd, ← hB'd, valuation_det_eq_of_span_eq_alt hv hPu (hP.symm.trans hB),
         valuation_det_eq_of_span_eq_alt hv hPu (hP.symm.trans hB')]
-    rw [huniq, prod_Icc_num hp (fun m => v (algebraMap R C (c' m)))
-      (fun d => ∏ n : Fin f, v (algebraMap R C (c n)) ^ (d n : ℕ)) ?_ ?_]
+    rw [huniq,
+      prod_Icc_num hp
+        (fun m => v (algebraMap R C (c' m)))
+        (fun d => ∏ n : Fin f, v (algebraMap R C (c n)) ^ (d n : ℕ))
+        ?_ ?_]
     · exact prod_digit_sq p f (fun n => v (algebraMap R C (c n)))
     · intro d hd
       exact Finset.prod_eq_one (fun n _ => by rw [digits_zero hp hd n, pow_zero])

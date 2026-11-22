@@ -9,11 +9,11 @@ namespace PI.Witt
 
 variable {K V : Type} [Field K] [StarRing K] [CharZero K] [AddCommGroup V] [Module K V]
 
-theorem expand (B : V →ₗ⋆[K] V →ₗ[K] K) (p u u' : V) (c c' : K) :
-    B (u + c • p) (u' + c' • p) =
-      B u u' + c' * B u p + star c * B p u' + star c * c' * B p p := by
-  simp only [map_add (f := _), map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply, map_smul, smul_eq_mul,
-    starRingEnd_apply, RingHom.id_apply]
+theorem expand (B : V →ₗ⋆[K] V →ₗ[K] K) (p u u' : V) (c c' : K)
+    : B (u + c • p) (u' + c' • p)
+      = B u u' + c' * B u p + star c * B p u' + star c * c' * B p p := by
+  simp only [map_add (f := _), map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply, map_smul,
+    smul_eq_mul, starRingEnd_apply, RingHom.id_apply]
   generalize B u u' = A1
   generalize B u p = A2
   generalize B p u' = A3
@@ -21,29 +21,31 @@ theorem expand (B : V →ₗ⋆[K] V →ₗ[K] K) (p u u' : V) (c c' : K) :
   generalize star c = s
   ring
 
-theorem partner (B : V →ₗ⋆[K] V →ₗ[K] K) (hB : ∀ x y, star (B x y) = B y x) (r p0 : V)
-    (hrr : B r r = 0) (h1 : B p0 r = 1) :
-    ∃ p, B p p = 0 ∧ ∀ u, B r u = 0 → B p u = B p0 u := by
+theorem partner
+    (B : V →ₗ⋆[K] V →ₗ[K] K) (hB : ∀ x y, star (B x y) = B y x)
+    (r p0 : V) (hrr : B r r = 0) (h1 : B p0 r = 1)
+    : ∃ p, B p p = 0 ∧ ∀ u, B r u = 0 → B p u = B p0 u := by
   set a := B p0 p0 with ha_def
   have ha : star a = a := hB p0 p0
   have hr1 : B r p0 = 1 := by rw [← hB p0 r, h1, star_one]
-  have hc : star (-(a / 2)) = -(a / 2) := by
-    rw [star_neg, star_div₀, ha, star_ofNat]
+  have hc : star (-(a / 2)) = -(a / 2) := by rw [star_neg, star_div₀, ha, star_ofNat]
   refine ⟨p0 + (-(a / 2)) • r, ?_, ?_⟩
   · rw [expand B r p0 p0 (-(a / 2)) (-(a / 2)), h1, hr1, hrr, hc]
     ring
   · intro u hu
     simp [hu]
 
-theorem enlarge_step [FiniteDimensional K V] (B : V →ₗ⋆[K] V →ₗ[K] K)
+theorem enlarge_step
+    [FiniteDimensional K V]
+    (B : V →ₗ⋆[K] V →ₗ[K] K)
     (hB : ∀ x y, star (B x y) = B y x) (hnd : ∀ x, (∀ y, B x y = 0) → x = 0)
-    (U : Submodule K V) (f : U →ₗ[K] V) (hinj : Function.Injective f)
-    (hf : ∀ x y : U, B (f x) (f y) = B x y)
-    (r : V) (hrU : r ∈ U) (hr0 : r ≠ 0) (hr : ∀ u ∈ U, B r u = 0) :
-    ∃ (U' : Submodule K V) (hlt : U < U') (f' : U' →ₗ[K] V), Function.Injective f' ∧
-      (∀ x y : U', B (f' x) (f' y) = B x y) ∧ ∀ u : U, f' ⟨u, hlt.le u.2⟩ = f u := by
+    (U : Submodule K V) (f : U →ₗ[K] V)
+    (hinj : Function.Injective f) (hf : ∀ x y : U, B (f x) (f y) = B x y)
+    (r : V) (hrU : r ∈ U) (hr0 : r ≠ 0) (hr : ∀ u ∈ U, B r u = 0)
+    : ∃ (U' : Submodule K V) (hlt : U < U') (f' : U' →ₗ[K] V),
+      Function.Injective f' ∧ (∀ x y : U', B (f' x) (f' y) = B x y)
+        ∧ ∀ u : U, f' ⟨u, hlt.le u.2⟩ = f u := by
   classical
-
   obtain ⟨φ0, hφ0⟩ : ∃ φ : Module.Dual K V, φ r ≠ 0 := by
     by_contra h
     push_neg at h
@@ -84,8 +86,7 @@ theorem enlarge_step [FiniteDimensional K V] (B : V →ₗ⋆[K] V →ₗ[K] K)
     have hc : c = 0 := by
       by_contra hc
       apply hpnot
-      have h' : c • p = -(u : V) := by
-        rw [← sub_eq_zero, sub_neg_eq_add, add_comm]; exact h
+      have h' : c • p = -(u : V) := by rw [← sub_eq_zero, sub_neg_eq_add, add_comm]; exact h
       have : p = c⁻¹ • -(u : V) := by rw [← h', smul_smul, inv_mul_cancel₀ hc, one_smul]
       rw [this]
       exact U.smul_mem _ (U.neg_mem u.2)
@@ -122,8 +123,8 @@ theorem enlarge_step [FiniteDimensional K V] (B : V →ₗ⋆[K] V →ₗ[K] K)
     obtain ⟨u', c'⟩ := b
     rw [hΨ, hΨ, hΦ, hΦ]
     dsimp only
-    rw [expand B q (f u) (f u') c c', expand B p (u : V) (u' : V) c c', hf, hqq, hpp,
-      ← hB q (f u), ← hB p (u : V), hqU u, hqU u', hpU _ u.2, hpU _ u'.2]
+    rw [expand B q (f u) (f u') c c', expand B p (u : V) (u' : V) c c', hf, hqq, hpp, ← hB q (f u),
+      ← hB p (u : V), hqU u, hqU u', hpU _ u.2, hpU _ u'.2]
   · intro u
     have h5 : eΦ.symm ⟨u, hlt.le u.2⟩ = (u, 0) := by
       rw [LinearEquiv.symm_apply_eq]

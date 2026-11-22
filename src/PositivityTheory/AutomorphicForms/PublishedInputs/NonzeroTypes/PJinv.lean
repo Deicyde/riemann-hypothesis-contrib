@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.Grp
 
@@ -18,7 +19,8 @@ variable {n : ℕ} (G : Grp k n)
 namespace P_Jinv
 
 def CcUm : Prop :=
-  ∀ a b c : Fin G.s, cc G.μ a a = 0 ∧ cc G.μ a b = cc G.μ b a ∧ cc G.μ a c ≤ max (cc G.μ a b) (cc G.μ b c)
+  ∀ a b c : Fin G.s,
+    cc G.μ a a = 0 ∧ cc G.μ a b = cc G.μ b a ∧ cc G.μ a c ≤ max (cc G.μ a b) (cc G.μ b c)
 
 def fe (i j : Fin n) : ℕ := if G.bl j < G.bl i then cc G.μ (G.bl j) (G.bl i) else 0
 
@@ -76,25 +78,27 @@ def S (hU : CcUm G) : Subalgebra 𝒪[k] (Matrix (Fin n) (Fin n) 𝒪[k]) where
       exact Submodule.mem_top
     · exact zero_mem _
 
-theorem inv_mem (hU : CcUm G) (h : GL (Fin n) 𝒪[k])
-    (hh : (h : Matrix (Fin n) (Fin n) 𝒪[k]) ∈ S G hU) :
-    ((h⁻¹ : GL (Fin n) 𝒪[k]) : Matrix (Fin n) (Fin n) 𝒪[k]) ∈ S G hU := by
+theorem inv_mem
+    (hU : CcUm G) (h : GL (Fin n) 𝒪[k]) (hh : (h : Matrix (Fin n) (Fin n) 𝒪[k]) ∈ S G hU)
+    : ((h⁻¹ : GL (Fin n) 𝒪[k]) : Matrix (Fin n) (Fin n) 𝒪[k]) ∈ S G hU := by
   set A : Matrix (Fin n) (Fin n) 𝒪[k] := (h : Matrix (Fin n) (Fin n) 𝒪[k]) with hAdef
   have hdet : IsUnit A.det := (Matrix.isUnit_iff_isUnit_det A).mp h.isUnit
   rw [Matrix.det_eq_sign_charpoly_coeff] at hdet
   obtain ⟨u, hu⟩ := isUnit_of_mul_isUnit_right hdet
   have h0 := Matrix.aeval_self_charpoly A
   rw [← Polynomial.X_mul_divX_add A.charpoly, map_add (f := _), map_mul, Polynomial.aeval_X,
-    Polynomial.aeval_C] at h0
-  have h1 : A * Polynomial.aeval A A.charpoly.divX = -algebraMap 𝒪[k] _ (A.charpoly.coeff 0) :=
+      Polynomial.aeval_C]
+    at h0
+  have h1 : A * Polynomial.aeval A A.charpoly.divX = - algebraMap 𝒪[k] _ (A.charpoly.coeff 0) :=
     eq_neg_of_add_eq_zero_left h0
   have key : A * (-((u⁻¹ : 𝒪[k]ˣ) : 𝒪[k]) • Polynomial.aeval A A.charpoly.divX) = 1 := by
     rw [mul_smul_comm, h1, neg_smul_neg, ← hu, Algebra.smul_def, ← map_mul, Units.inv_mul, map_one]
   have hinv := Units.eq_inv_of_mul_eq_one_left key
   rw [← hinv]
   refine Subalgebra.smul_mem _ ?_ _
-  have hval : Polynomial.aeval A A.charpoly.divX =
-      (S G hU).val (Polynomial.aeval (⟨A, hh⟩ : S G hU) A.charpoly.divX) :=
+  have hval
+      : Polynomial.aeval A A.charpoly.divX
+        = (S G hU).val (Polynomial.aeval (⟨A, hh⟩ : S G hU) A.charpoly.divX) :=
     (Polynomial.aeval_algHom_apply (S G hU).val (⟨A, hh⟩ : S G hU) A.charpoly.divX)
   rw [hval]
   exact Subtype.prop _

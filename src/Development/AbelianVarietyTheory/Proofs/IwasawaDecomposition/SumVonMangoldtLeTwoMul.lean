@@ -8,13 +8,13 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.RayPrimes
 
 @[expose] public section
 
-open Finset ArithmeticFunction NumberField IsDedekindDomain Filter Topology GlobalTheory.Mem.An Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+open Finset ArithmeticFunction NumberField IsDedekindDomain Filter Topology GlobalTheory.Mem.An
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
 open scoped nonZeroDivisors
 
 namespace GlobalTheory.Mem.An
 
-theorem lcmUpto_le_four_pow_small : ∀ n : ℕ, n ≤ 100 → Nat.lcmUpto n ≤ 4 ^ n := by
-  decide +kernel
+theorem lcmUpto_le_four_pow_small : ∀ n : ℕ, n ≤ 100 → Nat.lcmUpto n ≤ 4 ^ n := by decide +kernel
 
 theorem psi_le_two_mul_small {y : ℝ} (h0 : 0 ≤ y) (h : y ≤ 100) : Chebyshev.psi y ≤ 2 * y := by
   rw [Chebyshev.psi_eq_psi_coe_floor, Chebyshev.psi_eq_log_lcmUpto]
@@ -33,9 +33,9 @@ theorem psi_le_two_mul_small {y : ℝ} (h0 : 0 ≤ y) (h : y ≤ 100) : Chebyshe
   have h6 : (0 : ℝ) ≤ (⌊y⌋₊ : ℝ) := Nat.cast_nonneg _
   nlinarith
 
-theorem psi_le_of_le_sqrt {C x : ℝ} (hC : 0 ≤ C) (hx : 1 ≤ x)
-    (h : ∀ y : ℝ, 0 ≤ y → y ≤ √x → Chebyshev.psi y ≤ C * y) :
-    Chebyshev.psi x ≤ 1.4 * x + 3 * C * √x := by
+theorem psi_le_of_le_sqrt
+    {C x : ℝ} (hC : 0 ≤ C) (hx : 1 ≤ x) (h : ∀ y : ℝ, 0 ≤ y → y ≤ √x → Chebyshev.psi y ≤ C * y)
+    : Chebyshev.psi x ≤ 1.4 * x + 3 * C * √x := by
   have key : ∀ n : ℝ, 2 ≤ n → Chebyshev.psi (x ^ n⁻¹) ≤ C * √x := by
     intro n hn
     have hle : x ^ n⁻¹ ≤ √x := by
@@ -58,17 +58,18 @@ theorem psi_le_two_mul {y : ℝ} (h0 : 0 ≤ y) : Chebyshev.psi y ≤ 2 * y := b
   have hs : √y * √y = y := Real.mul_self_sqrt h0
   have h10 : 10 ≤ √y := Real.le_sqrt_of_sq_le (by linarith)
   rcases le_total (√y) 100 with h' | h'
-  · have := psi_le_of_le_sqrt (C := 2) (by norm_num) (by linarith : 1 ≤ y)
-      (fun z hz hz' => psi_le_two_mul_small hz (hz'.trans h'))
+  · have :=
+      psi_le_of_le_sqrt (C := 2) (by norm_num) (by linarith : 1 ≤ y)
+        (fun z hz hz' => psi_le_two_mul_small hz (hz'.trans h'))
     nlinarith
   · have h4 : Real.log 4 ≤ 2 := by
       have : Real.log 4 = 2 * Real.log 2 := by
         rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.log_pow]; norm_num
       have := Real.log_two_lt_d9
       linarith
-    have := psi_le_of_le_sqrt (C := 6) (by norm_num) (by linarith : 1 ≤ y)
-      (fun z hz _ => (Chebyshev.psi_le_const_mul_self hz).trans
-        (mul_le_mul_of_nonneg_right (by linarith) hz))
+    have :=
+      psi_le_of_le_sqrt (C := 6) (by norm_num) (by linarith : 1 ≤ y) (fun z hz _ =>
+        (Chebyshev.psi_le_const_mul_self hz).trans (mul_le_mul_of_nonneg_right (by linarith) hz))
     nlinarith
 
 theorem sum_vonMangoldt_le_two_mul : ∀ y : ℝ, 0 ≤ y → ∑ n ∈ Icc 1 ⌊y⌋₊, Λ n ≤ 2 * y := by

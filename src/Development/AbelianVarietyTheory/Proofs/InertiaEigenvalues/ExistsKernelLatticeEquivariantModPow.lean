@@ -9,25 +9,28 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.KerLat
 
 variable {l : ℕ} [Fact l.Prime]
 
-def kerMod {d d' : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) (n : ℕ) : Submodule ℤ_[l] (Fin d' → ℤ_[l]) where
+def kerMod {d d' : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) (n : ℕ)
+    : Submodule ℤ_[l] (Fin d' → ℤ_[l]) where
   carrier := {v | ∀ i, (l : ℤ_[l]) ^ n ∣ (P *ᵥ v) i}
-  add_mem' {a b} ha hb i := by
-    rw [Matrix.mulVec_add]; exact dvd_add (ha i) (hb i)
+  add_mem' {a b} ha hb i := by rw [Matrix.mulVec_add]; exact dvd_add (ha i) (hb i)
   zero_mem' i := by simp
-  smul_mem' c v hv i := by
-    rw [Matrix.mulVec_smul]; exact Dvd.dvd.mul_left (hv i) c
+  smul_mem' c v hv i := by rw [Matrix.mulVec_smul]; exact Dvd.dvd.mul_left (hv i) c
 
-theorem mulVec_mem_kerMod {d d' n : ℕ} {P : Matrix (Fin d) (Fin d') ℤ_[l]}
-    {A : Matrix (Fin d') (Fin d') ℤ_[l]} {B : Matrix (Fin d) (Fin d) ℤ_[l]}
-    (h : ∀ i j, (l : ℤ_[l]) ^ n ∣ (P * A - B * P) i j) {v : Fin d' → ℤ_[l]} (hv : v ∈ kerMod P n) :
-    A *ᵥ v ∈ kerMod P n := by
+theorem mulVec_mem_kerMod
+    {d d' n : ℕ} {P : Matrix (Fin d) (Fin d') ℤ_[l]} {A : Matrix (Fin d') (Fin d') ℤ_[l]}
+    {B : Matrix (Fin d) (Fin d) ℤ_[l]} (h : ∀ i j, (l : ℤ_[l]) ^ n ∣ (P * A - B * P) i j)
+    {v : Fin d' → ℤ_[l]} (hv : v ∈ kerMod P n)
+    : A *ᵥ v ∈ kerMod P n := by
   intro i
   have e : P *ᵥ (A *ᵥ v) = (P * A - B * P) *ᵥ v + B *ᵥ (P *ᵥ v) := by
     rw [Matrix.sub_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]; abel
@@ -41,15 +44,19 @@ theorem mulVec_mem_kerMod {d d' n : ℕ} {P : Matrix (Fin d) (Fin d') ℤ_[l]}
 theorem pow_ne_zero' (n : ℕ) : ((l : ℤ_[l]) ^ n) ≠ 0 :=
   pow_ne_zero _ (by exact_mod_cast (Fact.out : l.Prime).ne_zero)
 
-theorem finrank_kerMod {d d' n : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) :
-    Module.finrank ℤ_[l] (kerMod P n) = d' := by
+theorem finrank_kerMod {d d' n : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l])
+    : Module.finrank ℤ_[l] (kerMod P n) = d' := by
   apply le_antisymm
-  · calc Module.finrank ℤ_[l] (kerMod P n) ≤ Module.finrank ℤ_[l] (Fin d' → ℤ_[l]) :=
-          Submodule.finrank_le _
+  · calc
+      Module.finrank ℤ_[l] (kerMod P n)
+        ≤ Module.finrank ℤ_[l] (Fin d' → ℤ_[l]) := Submodule.finrank_le _
       _ = d' := by simp
-  · have hm : ∀ v : Fin d' → ℤ_[l], ((l : ℤ_[l]) ^ n • LinearMap.id : (Fin d' → ℤ_[l]) →ₗ[ℤ_[l]] _) v ∈ kerMod P n := by
+  · have hm
+        : ∀ v : Fin d' → ℤ_[l],
+          ((l : ℤ_[l]) ^ n • LinearMap.id : (Fin d' → ℤ_[l]) →ₗ[ℤ_[l]] _) v ∈ kerMod P n := by
       intro v i
-      simp only [LinearMap.smul_apply, LinearMap.id_apply, Matrix.mulVec_smul, Pi.smul_apply, smul_eq_mul]
+      simp only [LinearMap.smul_apply, LinearMap.id_apply, Matrix.mulVec_smul, Pi.smul_apply,
+        smul_eq_mul]
       exact dvd_mul_right _ _
     let φ : (Fin d' → ℤ_[l]) →ₗ[ℤ_[l]] kerMod P n :=
       LinearMap.codRestrict (kerMod P n) ((l : ℤ_[l]) ^ n • LinearMap.id) hm
@@ -67,27 +74,35 @@ namespace GlobalTheory.KerLat
 
 variable {l : ℕ} [Fact l.Prime]
 
-noncomputable def kerBasis {d d' : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) (n : ℕ) :
-    Module.Basis (Fin d') ℤ_[l] (kerMod P n) :=
+noncomputable def kerBasis {d d' : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) (n : ℕ)
+    : Module.Basis (Fin d') ℤ_[l] (kerMod P n) :=
   Module.finBasisOfFinrankEq ℤ_[l] (kerMod P n) (finrank_kerMod P)
 
-noncomputable def kerMat {d d' : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) (n : ℕ) :
-    Matrix (Fin d') (Fin d') ℤ_[l] :=
+noncomputable def kerMat {d d' : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) (n : ℕ)
+    : Matrix (Fin d') (Fin d') ℤ_[l] :=
   Matrix.of fun i j => ((kerBasis P n j : kerMod P n) : Fin d' → ℤ_[l]) i
 
-theorem kerMat_mulVec {d d' : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) (n : ℕ) (w : Fin d' → ℤ_[l]) :
-    kerMat P n *ᵥ w = ((∑ j, w j • kerBasis P n j : kerMod P n) : Fin d' → ℤ_[l]) := by
+theorem kerMat_mulVec {d d' : ℕ} (P : Matrix (Fin d) (Fin d') ℤ_[l]) (n : ℕ) (w : Fin d' → ℤ_[l])
+    : kerMat P n *ᵥ w = ((∑ j, w j • kerBasis P n j : kerMod P n) : Fin d' → ℤ_[l]) := by
   ext i
   simp [kerMat, Matrix.mulVec, dotProduct, Submodule.coe_sum, Finset.sum_apply, mul_comm]
 
-theorem exists_kernel_lattice : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] (d d' n : ℕ) (ρ : Γ →* GL (Fin d) ℤ_[l]) (ρ' : Γ →* GL (Fin d') ℤ_[l]) (Pi : Matrix (Fin d) (Fin d') (ℤ_[l])), Onto (fun g => (ρ g).val) (fun g => (ρ' g).val) Pi n → ∃ (f : Matrix (Fin d') (Fin d') (ℤ_[l])) (ρ'' : Γ →* GL (Fin d') ℤ_[l]), f.det ≠ 0 ∧ (∀ g, f * (ρ'' g).val = (ρ' g).val * f) ∧ ∀ v : Fin d' → ℤ_[l], (∀ i, (l : ℤ_[l]) ^ n ∣ (Pi *ᵥ v) i) ↔ ∃ w, v = f *ᵥ w := by
+theorem exists_kernel_lattice
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] (d d' n : ℕ) (ρ : Γ →* GL (Fin d) ℤ_[l])
+        (ρ' : Γ →* GL (Fin d') ℤ_[l]) (Pi : Matrix (Fin d) (Fin d') (ℤ_[l])),
+      Onto (fun g => (ρ g).val) (fun g => (ρ' g).val) Pi n
+        → ∃ (f : Matrix (Fin d') (Fin d') (ℤ_[l])) (ρ'' : Γ →* GL (Fin d') ℤ_[l]),
+          f.det ≠ 0 ∧ (∀ g, f * (ρ'' g).val = (ρ' g).val * f)
+            ∧ ∀ v : Fin d' → ℤ_[l], (∀ i, (l : ℤ_[l]) ^ n ∣ (Pi *ᵥ v) i) ↔ ∃ w, v = f *ᵥ w := by
   intro l _ Γ _ d d' n ρ ρ' P hP
   set b := kerBasis P n
   set f := kerMat P n
   have hf : ∀ w, f *ᵥ w = ((∑ j, w j • b j : kerMod P n) : Fin d' → ℤ_[l]) := kerMat_mulVec P n
   have hiff : ∀ v, v ∈ kerMod P n ↔ ∃ w, v = f *ᵥ w := by
-    intro v; constructor
-    · intro hv; refine ⟨b.repr ⟨v, hv⟩, ?_⟩
+    intro v
+    constructor
+    · intro hv
+      refine ⟨b.repr ⟨v, hv⟩, ?_⟩
       rw [hf, b.sum_repr]
     · rintro ⟨w, rfl⟩; rw [hf]; exact Submodule.coe_mem _
   have hinj : ∀ w, f *ᵥ w = 0 → w = 0 := by
@@ -124,9 +139,12 @@ theorem exists_kernel_lattice : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group 
     simp only [Matrix.mulVec, dotProduct] at this
     simp only [Matrix.mul_apply, R, Matrix.of_apply]
     exact this.symm
-  have hR1 : R 1 = 1 := hcancel _ _ (by rw [hR, map_one, Units.val_one, Matrix.one_mul, Matrix.mul_one])
-  have hRm : ∀ g h, R (g * h) = R g * R h := fun g h => hcancel _ _ (by
-    rw [hR, map_mul, Units.val_mul, Matrix.mul_assoc, ← hR h, ← Matrix.mul_assoc, ← hR g, Matrix.mul_assoc])
+  have hR1 : R 1 = 1 :=
+    hcancel _ _ (by rw [hR, map_one, Units.val_one, Matrix.one_mul, Matrix.mul_one])
+  have hRm : ∀ g h, R (g * h) = R g * R h := fun g h =>
+    hcancel _ _ (by
+      rw [hR, map_mul, Units.val_mul, Matrix.mul_assoc, ← hR h, ← Matrix.mul_assoc, ← hR g,
+        Matrix.mul_assoc])
   let Rm : Γ →* Matrix (Fin d') (Fin d') ℤ_[l] := { toFun := R, map_one' := hR1, map_mul' := hRm }
   refine ⟨f, Rm.toHomUnits, hdet, fun g => hR g, fun v => hiff v⟩
 

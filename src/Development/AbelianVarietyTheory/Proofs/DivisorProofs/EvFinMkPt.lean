@@ -9,15 +9,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 noncomputable section
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
 namespace GlobalTheory.VacLine
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem at_latAtV {E : Type} [Field E] [NumberField E] [Algebra F E] {n d : ℕ} {X : Spc F E n}
-    {W : Spc F E d} {v : Pl (F := F)} {γ : Matrix (Fin n) (Fin d) (AE F E)} (hγ : γ ∈ latAtV X W v) :
-    At (evFin F v) γ := by
+theorem at_latAtV
+    {E : Type} [Field E] [NumberField E] [Algebra F E]
+    {n d : ℕ} {X : Spc F E n} {W : Spc F E d} {v : Pl (F := F)}
+    {γ : Matrix (Fin n) (Fin d) (AE F E)} (hγ : γ ∈ latAtV X W v)
+    : At (evFin F v) γ := by
   induction hγ using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨a, ha, -, x, -, y, -, rfl⟩ := hz

@@ -26,7 +26,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsIntegralOfQ
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S.Loc GlobalTheory.HL GlobalTheory.HL.StdPlace NumberField IsDedekindDomain
+open ValuativeRel Formalism.MainNotions.S.Loc GlobalTheory.HL GlobalTheory.HL.StdPlace NumberField
+  IsDedekindDomain
 open scoped Pointwise ENNReal Classical
 
 noncomputable section
@@ -63,22 +64,27 @@ theorem unitIn_alg (L : LocE K R) (u : (𝒪[K])ˣ) : UnitIn L.O (algebraMap K R
   simp only [MulMemClass.coe_mul, OneMemClass.coe_one] at h
   rw [h, map_one]
 
-theorem hf_smul (L : LocE K R) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) R) (s t : R) (x y : Fin n → R) :
-    hf L Hm (s • x) (t • y) = s * L.cj t * hf L Hm x y := by
+theorem hf_smul (L : LocE K R) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) R) (s t : R) (x y : Fin n → R)
+    : hf L Hm (s • x) (t • y) = s * L.cj t * hf L Hm x y := by
   simp only [hf, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
 end Local
 
-theorem lead_scale {R R' : Type} [CommRing R] [CommRing R'] (ι : R' →+* R) {N : ℕ}
-    (Z : Matrix (Fin N) (Fin N) R') (Z' : Matrix (Fin N) (Fin N) R) (β : ℕ → R)
-    (h : ∀ a b, Z' a b = β b * β a * ι (Z a b)) (l : Fin (N + 1)) :
-    lead Z' l = (∏ i ∈ Finset.range l, β i) ^ 2 * ι (lead Z l) := by
+theorem lead_scale
+    {R R' : Type} [CommRing R] [CommRing R']
+    (ι : R' →+* R)
+    {N : ℕ} (Z : Matrix (Fin N) (Fin N) R') (Z' : Matrix (Fin N) (Fin N) R)
+    (β : ℕ → R) (h : ∀ a b, Z' a b = β b * β a * ι (Z a b))
+    (l : Fin (N + 1))
+    : lead Z' l = (∏ i ∈ Finset.range l, β i) ^ 2 * ι (lead Z l) := by
   unfold lead
   set e := Fin.castLE (Nat.lt_succ_iff.mp l.2)
-  have h1 : Z'.submatrix e e = Matrix.of fun i j => β (e j) *
-      (Matrix.of fun i j => β (e i) * ((Z.submatrix e e).map ι) i j) i j := by
+  have h1
+      : Z'.submatrix e e
+        = Matrix.of fun i j =>
+          β (e j) * (Matrix.of fun i j => β (e i) * ((Z.submatrix e e).map ι) i j) i j := by
     ext i j
     simp only [Matrix.submatrix_apply, h, Matrix.of_apply, Matrix.map_apply]
     ring
@@ -89,8 +95,10 @@ theorem lead_scale {R R' : Type} [CommRing R] [CommRing R'] (ι : R' →+* R) {N
   rw [h2]
   ring
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {sig : E →ₐ[F] E} {A : Places F E sig} {r k : ℕ} (G : GFrames A r k) (p : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {sig : E →ₐ[F] E} {A : Places F E sig} {r k : ℕ} (G : GFrames A r k)
+  (p : HeightOneSpectrum (𝓞 F))
 
 def sc (n : ℕ) : (A.loc p).Ep :=
   algebraMap (A.loc p).Fp (A.loc p).Ep (((G.c p : (A.loc p).Fp))⁻¹ ^ (r - n))
@@ -110,22 +118,24 @@ theorem f'_scale (a : Fin (r + 1)) : (G.S p).f' a = sc G p a • A.bc p (G.f' a)
   rw [sc, ← G.f'_eq p a, smul_smul, ← map_mul, ← mul_pow, inv_mul_cancel₀ (G.c p).ne_zero, one_pow,
     map_one, one_smul]
 
-theorem herm_bc (x y : Fin (k + 2 * r + 1) → E) :
-    hf (A.L p) (G.S p).Hm (A.bc p x) (A.bc p y) = (A.loc p).ιE (∑ i, ∑ j, x i * G.Hm i j * sig (y j)) := by
+theorem herm_bc (x y : Fin (k + 2 * r + 1) → E)
+    : hf (A.L p) (G.S p).Hm (A.bc p x) (A.bc p y)
+      = (A.loc p).ιE (∑ i, ∑ j, x i * G.Hm i j * sig (y j)) := by
   rw [G.Hm_eq p]
   exact (RatExt.rational_extend A _ p).2.2.2.2.1 G.Hm x y
 
-theorem Zh_scale (a b : Fin (r + 1)) :
-    (G.S p).Zh a b = sc G p b * sc G p a * (A.loc p).ιE (G.Zh a b) := by
+theorem Zh_scale (a b : Fin (r + 1))
+    : (G.S p).Zh a b = sc G p b * sc G p a * (A.loc p).ιE (G.Zh a b) := by
   simp only [Frames.Zh, Frames.h, Matrix.of_apply, GFrames.Zh]
   rw [f_scale, f'_scale, hf_smul, cj_sc, herm_bc]
 
-theorem D_scale (l : Fin (r + 2)) :
-    (G.S p).D l = (∏ i ∈ Finset.range l, sc G p i) ^ 2 * (A.loc p).ιE (G.D l) :=
+theorem D_scale (l : Fin (r + 2))
+    : (G.S p).D l = (∏ i ∈ Finset.range l, sc G p i) ^ 2 * (A.loc p).ιE (G.D l) :=
   lead_scale (A.loc p).ιE G.Zh (G.S p).Zh (sc G p) (Zh_scale G p) l
 
-theorem TT_eq : algebraMap (A.loc p).Fp (A.loc p).Ep (((G.S p).T : (A.loc p).Fp) * (G.S p).T') =
-    (A.loc p).ιE G.TT := by
+theorem TT_eq
+    : algebraMap (A.loc p).Fp (A.loc p).Ep (((G.S p).T : (A.loc p).Fp) * (G.S p).T')
+      = (A.loc p).ιE G.TT := by
   have h1 := (G.S p).gram (Fin.last r) (Fin.last r)
   have h2 := (G.S p).gram' (Fin.last r) (Fin.last r)
   simp only [and_self, if_true] at h1 h2
@@ -151,37 +161,42 @@ namespace GlobalTheory.HL.GoodAlmostAll
 
 open GlobalTheory.HL.GoodClass
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {sig : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
 
 def Ok (A : Places F E sig) (p : HeightOneSpectrum (𝓞 F)) (x : E) : Prop :=
   (A.loc p).ιE x ∈ (A.L p).O ∧ (A.loc p).ιE x⁻¹ ∈ (A.L p).O
 
 theorem ok_fin (A : Places F E sig) (x : E) : {p | ¬ Ok A p x}.Finite := by
-  refine (((PlacesInt.integers_local A).2.1 x).union ((PlacesInt.integers_local A).2.1 x⁻¹)).subset ?_
+  refine (((PlacesInt.integers_local A).2.1 x).union ((PlacesInt.integers_local A).2.1 x⁻¹)).subset
+    ?_
   intro p hp
   simp only [Ok, not_and_or, Set.mem_setOf_eq] at hp
   exact hp
 
-theorem unitIn_ok {A : Places F E sig} {p : HeightOneSpectrum (𝓞 F)} {x : E} (h : Ok A p x) (hx : x ≠ 0) :
-    UnitIn (A.L p).O ((A.loc p).ιE x) :=
+theorem unitIn_ok
+    {A : Places F E sig} {p : HeightOneSpectrum (𝓞 F)} {x : E} (h : Ok A p x) (hx : x ≠ 0)
+    : UnitIn (A.L p).O ((A.loc p).ιE x) :=
   ⟨h.1, _, h.2, by rw [← map_mul, mul_inv_cancel₀ hx, map_one]⟩
 
 variable {A : Places F E sig} {r k : ℕ} (G : GFrames A r k) (p : HeightOneSpectrum (𝓞 F))
 
-theorem unitIn_sc (u : (𝒪[(A.loc p).Fp])ˣ) (hu : ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = G.c p) (n : ℕ) :
-    UnitIn (A.L p).O (sc G p n) := by
+theorem unitIn_sc
+    (u : (𝒪[(A.loc p).Fp])ˣ) (hu : ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = G.c p) (n : ℕ)
+    : UnitIn (A.L p).O (sc G p n) := by
   rw [sc, map_pow, ← hu, ← coe_inv_unit]
   exact unitIn_pow (unitIn_alg (A.L p) u⁻¹) _
 
-theorem good_of (hgg : (G.S p).gg = false) (u : (𝒪[(A.loc p).Fp])ˣ)
-    (hu : ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = G.c p)
-    (hHm : ∀ i j, Ok A p (G.Hm i j)) (hdet : Ok A p G.Hm.det)
-    (hf : ∀ a i, Ok A p (G.f a i)) (hf' : ∀ a i, Ok A p (G.f' a i))
-    (hes : ∀ a i, Ok A p (G.es a i)) (hes' : ∀ a i, Ok A p (G.es' a i))
-    (hD : ∀ l, Ok A p (G.D l)) (hGr : Ok A p G.Gr) : Good (G.S p) := by
+theorem good_of
+    (hgg : (G.S p).gg = false)
+    (u : (𝒪[(A.loc p).Fp])ˣ) (hu : ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = G.c p)
+    (hHm : ∀ i j, Ok A p (G.Hm i j)) (hdet : Ok A p G.Hm.det) (hf : ∀ a i, Ok A p (G.f a i))
+    (hf' : ∀ a i, Ok A p (G.f' a i)) (hes : ∀ a i, Ok A p (G.es a i))
+    (hes' : ∀ a i, Ok A p (G.es' a i)) (hD : ∀ l, Ok A p (G.D l)) (hGr : Ok A p G.Gr)
+    : Good (G.S p) := by
   haveI := PlacesInt.nontrivial_Ep (A.loc p)
-  have hc : UnitIn (A.L p).O (algebraMap (A.loc p).Fp (A.loc p).Ep (G.c p)) := hu ▸ unitIn_alg (A.L p) u
+  have hc : UnitIn (A.L p).O (algebraMap (A.loc p).Fp (A.loc p).Ep (G.c p)) :=
+    hu ▸ unitIn_alg (A.L p) u
   have hP : ∀ n, UnitIn (A.L p).O (∏ i ∈ Finset.range n, sc G p i) := fun n =>
     unitIn_prod _ _ _ fun i _ => unitIn_sc G p u hu i
   refine ⟨hgg, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -228,25 +243,32 @@ theorem good_of (hgg : (G.S p).gg = false) (u : (𝒪[(A.loc p).Fp])ˣ)
 
 end GlobalTheory.HL.GoodAlmostAll
 
-theorem GlobalTheory.HL.StdPlace.good_almost_all : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E} (A : Places F E sig), ∀ (r k : ℕ) (G : GFrames A r k), {p | ¬ Good (G.S p)}.Finite := by
+theorem GlobalTheory.HL.StdPlace.good_almost_all
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : Places F E sig),
+      ∀ (r k : ℕ) (G : GFrames A r k),
+        {p | ¬ Good (G.S p)}.Finite := by
   intro F E _ _ _ _ _ sig A r k G
   open GlobalTheory.HL.GoodAlmostAll in
-  have H : ({p | (G.S p).gg = true} ∪
-      {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ, ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = G.c p} ∪
-      (⋃ i, ⋃ j, {p | ¬ Ok A p (G.Hm i j)}) ∪ {p | ¬ Ok A p G.Hm.det} ∪
-      (⋃ a, ⋃ i, {p | ¬ Ok A p (G.f a i)}) ∪ (⋃ a, ⋃ i, {p | ¬ Ok A p (G.f' a i)}) ∪
-      (⋃ a, ⋃ i, {p | ¬ Ok A p (G.es a i)}) ∪ (⋃ a, ⋃ i, {p | ¬ Ok A p (G.es' a i)}) ∪
-      (⋃ l, {p | ¬ Ok A p (G.D l)}) ∪ {p | ¬ Ok A p G.Gr}).Finite := by
-    refine (((((((((G.gg_fin.union G.c_unit).union ?_).union (ok_fin A _)).union ?_).union ?_).union ?_).union
-      ?_).union ?_).union (ok_fin A _))
-    all_goals first
+  have H
+      : ({p | (G.S p).gg = true}
+        ∪ {p | ¬ ∃ u : (𝒪[(A.loc p).Fp])ˣ, ((u : 𝒪[(A.loc p).Fp]) : (A.loc p).Fp) = G.c p}
+        ∪ (⋃ i, ⋃ j, {p | ¬ Ok A p (G.Hm i j)}) ∪ {p | ¬ Ok A p G.Hm.det}
+        ∪ (⋃ a, ⋃ i, {p | ¬ Ok A p (G.f a i)}) ∪ (⋃ a, ⋃ i, {p | ¬ Ok A p (G.f' a i)})
+        ∪ (⋃ a, ⋃ i, {p | ¬ Ok A p (G.es a i)}) ∪ (⋃ a, ⋃ i, {p | ¬ Ok A p (G.es' a i)})
+        ∪ (⋃ l, {p | ¬ Ok A p (G.D l)}) ∪ {p | ¬ Ok A p G.Gr}).Finite := by
+    refine (((((((((G.gg_fin.union G.c_unit).union ?_).union (ok_fin A _)).union ?_).union ?_).union
+      ?_).union ?_).union ?_).union (ok_fin A _))
+    all_goals
+      first
       | exact Set.finite_iUnion fun _ => Set.finite_iUnion fun _ => ok_fin A _
       | exact Set.finite_iUnion fun _ => ok_fin A _
   refine H.subset fun p hp => ?_
   by_contra hB
   apply hp
   simp only [Set.mem_union, Set.mem_iUnion, Set.mem_setOf_eq, not_or, not_exists, not_not,
-    Bool.not_eq_true] at hB
+      Bool.not_eq_true]
+    at hB
   obtain ⟨⟨⟨⟨⟨⟨⟨⟨⟨hgg, hu⟩, hHm⟩, hdet⟩, hf⟩, hf'⟩, hes⟩, hes'⟩, hD⟩, hGr⟩ := hB
   obtain ⟨u, hu⟩ := not_forall_not.mp hu
   exact GlobalTheory.HL.GoodAlmostAll.good_of G p hgg u hu hHm hdet hf hf' hes hes' hD hGr

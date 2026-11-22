@@ -79,17 +79,18 @@ lemma eq_zero_of_untilt (x : Per.Fl l) (hx : x.untilt = 0) : x = 0 := by
   have hc : PreTilt.coeff n x = PreTilt.coeff n 0 := by rw [map_zero, ← h3, ← h2]
   simpa only [PreTilt.coeff_def] using hc
 
-theorem untilt_ultrametric_definite (l : ℕ) [Fact l.Prime] (x y : Per.Fl l) :
-    ‖(((x + y).untilt : Per.OC l) : ℂ_[l])‖ ≤
-      max ‖((x.untilt : Per.OC l) : ℂ_[l])‖ ‖((y.untilt : Per.OC l) : ℂ_[l])‖ ∧
-    (x.untilt = 0 → x = 0) := by
+theorem untilt_ultrametric_definite (l : ℕ) [Fact l.Prime] (x y : Per.Fl l)
+    : ‖(((x + y).untilt : Per.OC l) : ℂ_[l])‖
+        ≤ max ‖((x.untilt : Per.OC l) : ℂ_[l])‖ ‖((y.untilt : Per.OC l) : ℂ_[l])‖
+      ∧ (x.untilt = 0 → x = 0) := by
   refine ⟨?_, eq_zero_of_untilt x⟩
   have hl : 1 < l := (Fact.out : l.Prime).one_lt
   have ht : Filter.Tendsto (fun n : ℕ => ‖((l : ℕ) : ℂ_[l])‖ ^ l ^ n) Filter.atTop (nhds 0) :=
     (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) norm_l_lt).comp
       (tendsto_pow_atTop_atTop_of_one_lt hl)
-  have h2 := (tendsto_const_nhds (x := max ‖((x.untilt : Per.OC l) : ℂ_[l])‖
-    ‖((y.untilt : Per.OC l) : ℂ_[l])‖)).max ht
+  have h2 :=
+    (tendsto_const_nhds
+      (x := max ‖((x.untilt : Per.OC l) : ℂ_[l])‖ ‖((y.untilt : Per.OC l) : ℂ_[l])‖)).max ht
   have h3 := ge_of_tendsto' h2 (bound x y)
   rwa [max_eq_left (le_max_of_le_left (norm_nonneg _))] at h3
 

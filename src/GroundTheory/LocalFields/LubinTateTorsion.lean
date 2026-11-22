@@ -18,13 +18,15 @@ section Poly
 
 variable {K : Type*} [Field K] [ValuativeRel K]
 
-theorem psEval_polynomial {M : Type*} [CommRing M] [Algebra K M] [TopologicalSpace M]
-    [T2Space M] (p : 𝒪[K][X]) (x : M) :
-    psEval (p : PowerSeries 𝒪[K]) (fun _ => x) = aeval x (p.map (algebraMap 𝒪[K] K)) := by
+theorem psEval_polynomial
+    {M : Type*} [CommRing M] [Algebra K M] [TopologicalSpace M] [T2Space M] (p : 𝒪[K][X]) (x : M)
+    : psEval (p : PowerSeries 𝒪[K]) (fun _ => x) = aeval x (p.map (algebraMap 𝒪[K] K)) := by
   classical
   let e : (Unit →₀ ℕ) ≃ ℕ := Finsupp.equivFunOnFinite.trans (Equiv.funUnique Unit ℕ)
-  have hterm : ∀ d : Unit →₀ ℕ, psTerm (p : PowerSeries 𝒪[K]) (fun _ => x) d =
-      algebraMap K M (p.coeff (e d)) * x ^ (e d) := by
+  have hterm
+      : ∀ d : Unit →₀ ℕ,
+        psTerm (p : PowerSeries 𝒪[K]) (fun _ => x) d
+          = algebraMap K M (p.coeff (e d)) * x ^ (e d) := by
     intro d
     have hd : d = Finsupp.single () (e d) := by
       ext
@@ -48,7 +50,6 @@ section LTPoly
 
 variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
 
-
 variable (K) in
 theorem one_lt_card_residueField' : 1 < Nat.card 𝓀[K] := Finite.one_lt_card
 
@@ -60,17 +61,18 @@ def ltPolyIter (π : 𝒪[K]) : ℕ → 𝒪[K][X]
 
 theorem ltPolyIter_zero (π : 𝒪[K]) : ltPolyIter π 0 = X := rfl
 
-theorem ltPolyIter_succ (π : 𝒪[K]) (n : ℕ) :
-    ltPolyIter π (n + 1) = (ltPoly π).comp (ltPolyIter π n) := rfl
+theorem ltPolyIter_succ (π : 𝒪[K]) (n : ℕ)
+    : ltPolyIter π (n + 1) = (ltPoly π).comp (ltPolyIter π n) :=
+  rfl
 
-theorem coeff_ltPoly_sub (π : 𝒪[K]) (n : ℕ) :
-    PowerSeries.coeff n ((ltPoly π : PowerSeries 𝒪[K]) - PowerSeries.X ^ Nat.card 𝓀[K]) =
-      (C π * X : 𝒪[K][X]).coeff n := by
+theorem coeff_ltPoly_sub (π : 𝒪[K]) (n : ℕ)
+    : PowerSeries.coeff n ((ltPoly π : PowerSeries 𝒪[K]) - PowerSeries.X ^ Nat.card 𝓀[K])
+      = (C π * X : 𝒪[K][X]).coeff n := by
   rw [ltPoly, Polynomial.coe_add, Polynomial.coe_pow, Polynomial.coe_X, add_sub_cancel_right,
     Polynomial.coeff_coe]
 
-theorem isLubinTateSeries_ltPoly (π : 𝒪[K]) :
-    IsLubinTateSeries π (ltPoly π : PowerSeries 𝒪[K]) := by
+theorem isLubinTateSeries_ltPoly (π : 𝒪[K])
+    : IsLubinTateSeries π (ltPoly π : PowerSeries 𝒪[K]) := by
   have hq := one_lt_card_residueField' K
   refine { constantCoeff_eq_zero := ?_, coeff_one := ?_, dvd_coeff_sub := ?_ }
   · rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, Polynomial.coeff_coe, ltPoly]
@@ -87,18 +89,22 @@ theorem ltPoly_monic (π : 𝒪[K]) : (ltPoly π).Monic := by
   have hq := one_lt_card_residueField' K
   rw [ltPoly, add_comm]
   refine monic_X_pow_add ?_
-  calc degree (C π * X) ≤ 1 := degree_C_mul_X_le π
+  calc
+    degree (C π * X)
+      ≤ 1 := degree_C_mul_X_le π
     _ < Nat.card 𝓀[K] := by exact_mod_cast hq
 
 theorem natDegree_ltPoly (π : 𝒪[K]) : (ltPoly π).natDegree = Nat.card 𝓀[K] := by
   have hq := one_lt_card_residueField' K
   rw [ltPoly, add_comm, natDegree_add_eq_left_of_degree_lt, natDegree_X_pow]
   rw [degree_X_pow]
-  calc degree (C π * X) ≤ 1 := degree_C_mul_X_le π
+  calc
+    degree (C π * X)
+      ≤ 1 := degree_C_mul_X_le π
     _ < Nat.card 𝓀[K] := by exact_mod_cast hq
 
-theorem ltPolyIter_monic (π : 𝒪[K]) (n : ℕ) : (ltPolyIter π n).Monic ∧
-    (ltPolyIter π n).natDegree = Nat.card 𝓀[K] ^ n := by
+theorem ltPolyIter_monic (π : 𝒪[K]) (n : ℕ)
+    : (ltPolyIter π n).Monic ∧ (ltPolyIter π n).natDegree = Nat.card 𝓀[K] ^ n := by
   induction n with
   | zero => exact ⟨monic_X, by simp [ltPolyIter_zero]⟩
   | succ n ih =>
@@ -118,26 +124,25 @@ variable {L : Type*} [Field L] [ValuativeRel L] [Algebra K L] [ValuativeExtensio
 variable {π : 𝒪[K]}
 
 omit [ValuativeRel L] [ValuativeExtension K L] in
-theorem aeval_ltPoly (z : L) :
-    aeval z ((ltPoly π).map (algebraMap 𝒪[K] K)) =
-      algebraMap K L (π : K) * z + z ^ Nat.card 𝓀[K] := by
+theorem aeval_ltPoly (z : L)
+    : aeval z ((ltPoly π).map (algebraMap 𝒪[K] K))
+      = algebraMap K L (π : K) * z + z ^ Nat.card 𝓀[K] := by
   simp only [ltPoly, Polynomial.map_add (f := _), Polynomial.map_mul, map_C, Polynomial.map_X,
     Polynomial.map_pow, map_add, map_mul, aeval_C, aeval_X, map_pow]
   rfl
 
 omit [TopologicalSpace K] [IsNonarchimedeanLocalField K] in
-theorem valuation_algebraMap_integer_le_one (c : 𝒪[K]) :
-    valuation L (algebraMap K L (c : K)) ≤ 1 :=
+theorem valuation_algebraMap_integer_le_one (c : 𝒪[K]) : valuation L (algebraMap K L (c : K)) ≤ 1 :=
   (Valuation.HasExtension.val_map_le_one_iff (valuation K) (valuation L) _).mpr c.2
 
 omit [TopologicalSpace K] [IsNonarchimedeanLocalField K] in
-theorem valuation_algebraMap_lt_one_of_irreducible (hπ : Irreducible π) :
-    valuation L (algebraMap K L (π : K)) < 1 :=
+theorem valuation_algebraMap_lt_one_of_irreducible (hπ : Irreducible π)
+    : valuation L (algebraMap K L (π : K)) < 1 :=
   (Valuation.HasExtension.val_map_lt_one_iff (valuation K) (valuation L) _).mpr
     (Valuation.Integer.not_isUnit_iff_valuation_lt_one.mp hπ.not_isUnit)
 
-theorem valuation_aeval_ltPoly_lt_one {z : L} (hz : valuation L z < 1) :
-    valuation L (aeval z ((ltPoly π).map (algebraMap 𝒪[K] K))) < 1 := by
+theorem valuation_aeval_ltPoly_lt_one {z : L} (hz : valuation L z < 1)
+    : valuation L (aeval z ((ltPoly π).map (algebraMap 𝒪[K] K))) < 1 := by
   have hq := one_lt_card_residueField' K
   rw [aeval_ltPoly]
   refine Valuation.map_add_lt _ ?_ ?_
@@ -146,27 +151,29 @@ theorem valuation_aeval_ltPoly_lt_one {z : L} (hz : valuation L z < 1) :
   · rw [map_pow]
     exact pow_lt_one₀ zero_le hz (by omega)
 
-theorem valuation_aeval_ltPoly_of_one_le (hπ : Irreducible π) {z : L} (hz : 1 ≤ valuation L z) :
-    valuation L (aeval z ((ltPoly π).map (algebraMap 𝒪[K] K))) = valuation L z ^ Nat.card 𝓀[K] := by
+theorem valuation_aeval_ltPoly_of_one_le (hπ : Irreducible π) {z : L} (hz : 1 ≤ valuation L z)
+    : valuation L (aeval z ((ltPoly π).map (algebraMap 𝒪[K] K)))
+      = valuation L z ^ Nat.card 𝓀[K] := by
   have hq := one_lt_card_residueField' K
   rw [aeval_ltPoly, Valuation.map_add_eq_of_lt_right, map_pow]
   rw [map_mul, map_pow]
-  calc valuation L (algebraMap K L (π : K)) * valuation L z < valuation L z :=
-        mul_lt_of_lt_one_left (lt_of_lt_of_le zero_lt_one hz)
-          (valuation_algebraMap_lt_one_of_irreducible hπ)
+  calc
+    valuation L (algebraMap K L (π : K)) * valuation L z < valuation L z :=
+      mul_lt_of_lt_one_left (lt_of_lt_of_le zero_lt_one hz)
+        (valuation_algebraMap_lt_one_of_irreducible hπ)
     _ ≤ valuation L z ^ Nat.card 𝓀[K] := le_self_pow₀ hz (by omega)
 
 omit [ValuativeRel L] [ValuativeExtension K L] in
-theorem aeval_derivative_ltPoly (z : L) :
-    aeval z (derivative ((ltPoly π).map (algebraMap 𝒪[K] K))) =
-      algebraMap K L (π : K) + (Nat.card 𝓀[K] : L) * z ^ (Nat.card 𝓀[K] - 1) := by
+theorem aeval_derivative_ltPoly (z : L)
+    : aeval z (derivative ((ltPoly π).map (algebraMap 𝒪[K] K)))
+      = algebraMap K L (π : K) + (Nat.card 𝓀[K] : L) * z ^ (Nat.card 𝓀[K] - 1) := by
   simp only [ltPoly, Polynomial.map_add (f := _), Polynomial.map_mul, map_C, Polynomial.map_X,
-    Polynomial.map_pow, derivative_C_mul_X, derivative_X_pow, map_add, aeval_C,
-    map_mul, map_pow, aeval_X, map_natCast]
+    Polynomial.map_pow, derivative_C_mul_X, derivative_X_pow, map_add, aeval_C, map_mul, map_pow,
+    aeval_X, map_natCast]
   rfl
 
-theorem exists_card_residueField_eq (hπ : Irreducible π) :
-    ∃ c : 𝒪[K], (Nat.card 𝓀[K] : 𝒪[K]) = π * c := by
+theorem exists_card_residueField_eq (hπ : Irreducible π)
+    : ∃ c : 𝒪[K], (Nat.card 𝓀[K] : 𝒪[K]) = π * c := by
   have h : (Nat.card 𝓀[K] : 𝒪[K]) ∈ IsLocalRing.maximalIdeal 𝒪[K] := by
     rw [← IsLocalRing.residue_eq_zero_iff, map_natCast]
     have := Fintype.ofFinite 𝓀[K]
@@ -175,8 +182,8 @@ theorem exists_card_residueField_eq (hπ : Irreducible π) :
   rw [hπ.maximalIdeal_eq, Ideal.mem_span_singleton] at h
   exact h
 
-theorem aeval_derivative_ltPoly_ne_zero (hπ : Irreducible π) {z : L} (hz : valuation L z < 1) :
-    aeval z (derivative ((ltPoly π).map (algebraMap 𝒪[K] K))) ≠ 0 := by
+theorem aeval_derivative_ltPoly_ne_zero (hπ : Irreducible π) {z : L} (hz : valuation L z < 1)
+    : aeval z (derivative ((ltPoly π).map (algebraMap 𝒪[K] K))) ≠ 0 := by
   have hq := one_lt_card_residueField' K
   obtain ⟨c, hc⟩ := exists_card_residueField_eq hπ
   have hcL : (Nat.card 𝓀[K] : L) = algebraMap K L (π : K) * algebraMap K L (c : K) := by
@@ -193,34 +200,36 @@ theorem aeval_derivative_ltPoly_ne_zero (hπ : Irreducible π) {z : L} (hz : val
       exact lt_of_le_of_lt (mul_le_of_le_one_left' (valuation_algebraMap_integer_le_one c))
         (pow_lt_one₀ zero_le hz (by omega))
 
-theorem valuation_aeval_ltPolyIter_lt_one (n : ℕ) {z : L}
-    (hz : valuation L z < 1) :
-    valuation L (aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K))) < 1 := by
+theorem valuation_aeval_ltPolyIter_lt_one (n : ℕ) {z : L} (hz : valuation L z < 1)
+    : valuation L (aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K))) < 1 := by
   induction n with
   | zero => simpa [ltPolyIter_zero] using hz
   | succ n ih =>
     rw [ltPolyIter_succ, Polynomial.map_comp, aeval_comp]
     exact valuation_aeval_ltPoly_lt_one ih
 
-theorem one_le_valuation_aeval_ltPolyIter (hπ : Irreducible π) (n : ℕ) {z : L}
-    (hz : 1 ≤ valuation L z) :
-    1 ≤ valuation L (aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K))) := by
+theorem one_le_valuation_aeval_ltPolyIter
+    (hπ : Irreducible π) (n : ℕ) {z : L} (hz : 1 ≤ valuation L z)
+    : 1 ≤ valuation L (aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K))) := by
   induction n with
   | zero => simpa [ltPolyIter_zero] using hz
   | succ n ih =>
     rw [ltPolyIter_succ, Polynomial.map_comp, aeval_comp, valuation_aeval_ltPoly_of_one_le hπ ih]
     exact one_le_pow₀ ih
 
-theorem valuation_lt_one_of_aeval_ltPolyIter_eq_zero (hπ : Irreducible π) (n : ℕ) {z : L}
-    (hz : aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K)) = 0) : valuation L z < 1 := by
+theorem valuation_lt_one_of_aeval_ltPolyIter_eq_zero
+    (hπ : Irreducible π)
+    (n : ℕ)
+    {z : L} (hz : aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K)) = 0)
+    : valuation L z < 1 := by
   by_contra h
   have := one_le_valuation_aeval_ltPolyIter hπ n (not_lt.mp h)
   rw [hz, map_zero] at this
   exact not_le.mpr zero_lt_one this
 
-theorem aeval_derivative_ltPolyIter_ne_zero (hπ : Irreducible π) (n : ℕ) {z : L}
-    (hz : valuation L z < 1) :
-    aeval z (derivative ((ltPolyIter π n).map (algebraMap 𝒪[K] K))) ≠ 0 := by
+theorem aeval_derivative_ltPolyIter_ne_zero
+    (hπ : Irreducible π) (n : ℕ) {z : L} (hz : valuation L z < 1)
+    : aeval z (derivative ((ltPolyIter π n).map (algebraMap 𝒪[K] K))) ≠ 0 := by
   induction n with
   | zero => simp [ltPolyIter_zero]
   | succ n ih =>
@@ -232,11 +241,12 @@ end Valuation
 
 section Separable
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   {π : 𝒪[K]}
 
-theorem separable_ltPolyIter (hπ : Irreducible π) (n : ℕ) :
-    ((ltPolyIter π n).map (algebraMap 𝒪[K] K)).Separable := by
+theorem separable_ltPolyIter (hπ : Irreducible π) (n : ℕ)
+    : ((ltPolyIter π n).map (algebraMap 𝒪[K] K)).Separable := by
   rw [separable_def]
   let _ := algebraicValuativeRel K (AlgebraicClosure K)
   have _ := algebraicValuativeRel_valuativeExtension K (AlgebraicClosure K)
@@ -249,24 +259,26 @@ end Separable
 
 section Module
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   {π : 𝒪[K]}
 
-theorem card_quotient_span_pow (hπ : Irreducible π) (n : ℕ) :
-    Nat.card (𝒪[K] ⧸ Ideal.span {π ^ n}) = Nat.card 𝓀[K] ^ n := by
+theorem card_quotient_span_pow (hπ : Irreducible π) (n : ℕ)
+    : Nat.card (𝒪[K] ⧸ Ideal.span {π ^ n}) = Nat.card 𝓀[K] ^ n := by
   have h : Ideal.span {π ^ n} = IsLocalRing.maximalIdeal 𝒪[K] ^ n := by
     rw [hπ.maximalIdeal_eq, Ideal.span_singleton_pow]
-  rw [h, ← Submodule.cardQuot_apply, cardQuot_pow_of_prime
-    (IsDiscreteValuationRing.not_a_field 𝒪[K]), Submodule.cardQuot_apply]
+  rw [h, ← Submodule.cardQuot_apply,
+    cardQuot_pow_of_prime (IsDiscreteValuationRing.not_a_field 𝒪[K]), Submodule.cardQuot_apply]
   rfl
 
 variable {M : Type*} [AddCommGroup M] [Module 𝒪[K] M]
 
-theorem exists_generator_torsionBy (hπ : Irreducible π)
-    (hcard : ∀ k, Nat.card (Submodule.torsionBy 𝒪[K] M (π ^ k)) = Nat.card 𝓀[K] ^ k) (n : ℕ) :
-    ∃ l : M, l ∈ Submodule.torsionBy 𝒪[K] M (π ^ n) ∧
-      (∀ a : 𝒪[K], a • l = 0 ↔ a ∈ Ideal.span {π ^ n}) ∧
-      ∀ m ∈ Submodule.torsionBy 𝒪[K] M (π ^ n), ∃ a : 𝒪[K], a • l = m := by
+theorem exists_generator_torsionBy
+    (hπ : Irreducible π)
+    (hcard : ∀ k, Nat.card (Submodule.torsionBy 𝒪[K] M (π ^ k)) = Nat.card 𝓀[K] ^ k) (n : ℕ)
+    : ∃ l : M,
+      l ∈ Submodule.torsionBy 𝒪[K] M (π ^ n) ∧ (∀ a : 𝒪[K], a • l = 0 ↔ a ∈ Ideal.span {π ^ n})
+        ∧ ∀ m ∈ Submodule.torsionBy 𝒪[K] M (π ^ n), ∃ a : 𝒪[K], a • l = m := by
   cases n with
   | zero =>
     refine ⟨0, Submodule.zero_mem _, fun a => by simp, fun m hm => ⟨0, ?_⟩⟩
@@ -318,10 +330,11 @@ theorem exists_generator_torsionBy (hπ : Irreducible π)
       rw [LinearMap.mem_ker, ← hann a]
       exact ⟨fun h => congrArg Subtype.val h, fun h => Subtype.ext h⟩
     have hcardr : Nat.card (LinearMap.range ψ) = Nat.card T := by
-      rw [← Nat.card_congr (LinearMap.quotKerEquivRange ψ).toEquiv, hker,
-        card_quotient_span_pow hπ, hcard]
-    have hbij := (Subtype.val_injective : Function.Injective
-      (Subtype.val : LinearMap.range ψ → T)).bijective_of_nat_card_le hcardr.ge
+      rw [← Nat.card_congr (LinearMap.quotKerEquivRange ψ).toEquiv, hker, card_quotient_span_pow hπ,
+        hcard]
+    have hbij :=
+      (Subtype.val_injective : Function.Injective
+        (Subtype.val : LinearMap.range ψ → T)).bijective_of_nat_card_le hcardr.ge
     obtain ⟨⟨_, ⟨a, rfl⟩⟩, hr⟩ := hbij.2 ⟨x, hx⟩
     exact ⟨a, congrArg Subtype.val hr⟩
 
@@ -330,32 +343,33 @@ end Module
 section Torsion
 
 variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-variable {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω]
+variable
+  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω]
 variable {π : 𝒪[K]} {hπ : Irreducible π}
 
-theorem ltPoly_pow_smul_val (n : ℕ)
-    (x : IdealPoint Ω (lubinTateFormalGroup hπ (isLubinTateSeries_ltPoly π))) :
-    (π ^ n • x).val = aeval x.val ((ltPolyIter π n).map (algebraMap 𝒪[K] K)) := by
+theorem ltPoly_pow_smul_val
+    (n : ℕ) (x : IdealPoint Ω (lubinTateFormalGroup hπ (isLubinTateSeries_ltPoly π)))
+    : (π ^ n • x).val = aeval x.val ((ltPolyIter π n).map (algebraMap 𝒪[K] K)) := by
   have := t2Space_of_isValuativeTopology Ω
   induction n with
   | zero => simp [ltPolyIter_zero]
   | succ n ih =>
-    rw [pow_succ', mul_smul, lubinTate_uniformizer_smul_val, psEval_polynomial, ih,
-      ltPolyIter_succ, Polynomial.map_comp, aeval_comp]
+    rw [pow_succ', mul_smul, lubinTate_uniformizer_smul_val, psEval_polynomial, ih, ltPolyIter_succ,
+      Polynomial.map_comp, aeval_comp]
 
-theorem mem_lubinTateTorsion_ltPoly_iff (n : ℕ)
-    (x : IdealPoint Ω (lubinTateFormalGroup hπ (isLubinTateSeries_ltPoly π))) :
-    x ∈ lubinTateTorsion Ω (isLubinTateSeries_ltPoly π) n ↔
-      aeval x.val ((ltPolyIter π n).map (algebraMap 𝒪[K] K)) = 0 := by
+theorem mem_lubinTateTorsion_ltPoly_iff
+    (n : ℕ) (x : IdealPoint Ω (lubinTateFormalGroup hπ (isLubinTateSeries_ltPoly π)))
+    : x ∈ lubinTateTorsion Ω (isLubinTateSeries_ltPoly π) n
+      ↔ aeval x.val ((ltPolyIter π n).map (algebraMap 𝒪[K] K)) = 0 := by
   rw [mem_lubinTateTorsion, ← ltPoly_pow_smul_val]
   exact ⟨fun h => by rw [h]; rfl, fun h => IdealPoint.ext h⟩
 
 variable [IsSepClosed Ω]
 
-theorem card_lubinTateTorsion_ltPoly (n : ℕ) :
-    Nat.card (lubinTateTorsion Ω (hπ := hπ) (isLubinTateSeries_ltPoly π) n) =
-      Nat.card 𝓀[K] ^ n := by
+theorem card_lubinTateTorsion_ltPoly (n : ℕ)
+    : Nat.card (lubinTateTorsion Ω (hπ := hπ) (isLubinTateSeries_ltPoly π) n)
+      = Nat.card 𝓀[K] ^ n := by
   classical
   set p := (ltPolyIter π n).map (algebraMap 𝒪[K] K)
   have hp0 : p ≠ 0 := ((ltPolyIter_monic π n).1.map _).ne_zero
@@ -377,35 +391,37 @@ theorem card_lubinTateTorsion_ltPoly (n : ℕ) :
 
 variable {f : PowerSeries 𝒪[K]}
 
-
 omit [IsSepClosed Ω] in
-theorem lubinTatePointEquiv_mem_torsion_iff {g : PowerSeries 𝒪[K]} (hf : IsLubinTateSeries π f)
-    (hg : IsLubinTateSeries π g) (n : ℕ) (x : IdealPoint Ω (lubinTateFormalGroup hπ hg)) :
-    lubinTatePointEquiv hf hg x ∈ lubinTateTorsion Ω hf n ↔ x ∈ lubinTateTorsion Ω hg n := by
-  rw [mem_lubinTateTorsion, mem_lubinTateTorsion, ← map_smul,
-    LinearEquiv.map_eq_zero_iff]
+theorem lubinTatePointEquiv_mem_torsion_iff
+    {g : PowerSeries 𝒪[K]}
+    (hf : IsLubinTateSeries π f)
+    (hg : IsLubinTateSeries π g)
+    (n : ℕ) (x : IdealPoint Ω (lubinTateFormalGroup hπ hg))
+    : lubinTatePointEquiv hf hg x ∈ lubinTateTorsion Ω hf n ↔ x ∈ lubinTateTorsion Ω hg n := by
+  rw [mem_lubinTateTorsion, mem_lubinTateTorsion, ← map_smul, LinearEquiv.map_eq_zero_iff]
 
-theorem card_lubinTateTorsion (hf : IsLubinTateSeries π f) (n : ℕ) :
-    Nat.card (lubinTateTorsion Ω (hπ := hπ) hf n) = Nat.card 𝓀[K] ^ n := by
+theorem card_lubinTateTorsion (hf : IsLubinTateSeries π f) (n : ℕ)
+    : Nat.card (lubinTateTorsion Ω (hπ := hπ) hf n) = Nat.card 𝓀[K] ^ n := by
   rw [← card_lubinTateTorsion_ltPoly (Ω := Ω) (hπ := hπ) n]
   exact Nat.card_congr ((lubinTatePointEquiv hf (isLubinTateSeries_ltPoly π)).toEquiv.subtypeEquiv
     fun x => (lubinTatePointEquiv_mem_torsion_iff hf _ n x).symm).symm
 
-theorem exists_generator_lubinTateTorsion (hf : IsLubinTateSeries π f) (n : ℕ) :
-    ∃ l ∈ lubinTateTorsion Ω (hπ := hπ) hf n,
-      (∀ a : 𝒪[K], a • l = 0 ↔ a ∈ Ideal.span {π ^ n}) ∧
-      ∀ m ∈ lubinTateTorsion Ω (hπ := hπ) hf n, ∃ a : 𝒪[K], a • l = m :=
+theorem exists_generator_lubinTateTorsion (hf : IsLubinTateSeries π f) (n : ℕ)
+    : ∃ l ∈ lubinTateTorsion Ω (hπ := hπ) hf n,
+      (∀ a : 𝒪[K], a • l = 0 ↔ a ∈ Ideal.span {π ^ n})
+        ∧ ∀ m ∈ lubinTateTorsion Ω (hπ := hπ) hf n, ∃ a : 𝒪[K], a • l = m :=
   exists_generator_torsionBy hπ (card_lubinTateTorsion (hπ := hπ) hf) n
 
 end Torsion
 
 section Eisenstein
 
-variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   {π : 𝒪[K]}
 
-theorem map_residue_ltPolyIter (π : 𝒪[K]) (hπ : Irreducible π) (n : ℕ) :
-    (ltPolyIter π n).map (IsLocalRing.residue 𝒪[K]) = X ^ Nat.card 𝓀[K] ^ n := by
+theorem map_residue_ltPolyIter (π : 𝒪[K]) (hπ : Irreducible π) (n : ℕ)
+    : (ltPolyIter π n).map (IsLocalRing.residue 𝒪[K]) = X ^ Nat.card 𝓀[K] ^ n := by
   have hres : IsLocalRing.residue 𝒪[K] π = 0 :=
     (IsLocalRing.residue_eq_zero_iff _).mpr ((IsLocalRing.mem_maximalIdeal _).mpr hπ.not_isUnit)
   induction n with
@@ -423,15 +439,16 @@ theorem coeff_zero_ltPolyIter (π : 𝒪[K]) (n : ℕ) : (ltPolyIter π n).coeff
     simp
     omega
 
-def ltEisenstein (π : 𝒪[K]) (n : ℕ) : 𝒪[K][X] :=
-  C π + ltPolyIter π n ^ (Nat.card 𝓀[K] - 1)
+def ltEisenstein (π : 𝒪[K]) (n : ℕ) : 𝒪[K][X] := C π + ltPolyIter π n ^ (Nat.card 𝓀[K] - 1)
 
-theorem ltEisenstein_monic (π : 𝒪[K]) (n : ℕ) : (ltEisenstein π n).Monic ∧
-    (ltEisenstein π n).natDegree = (Nat.card 𝓀[K] - 1) * Nat.card 𝓀[K] ^ n := by
+theorem ltEisenstein_monic (π : 𝒪[K]) (n : ℕ)
+    : (ltEisenstein π n).Monic
+      ∧ (ltEisenstein π n).natDegree = (Nat.card 𝓀[K] - 1) * Nat.card 𝓀[K] ^ n := by
   have hq := one_lt_card_residueField' K
   have hm := (ltPolyIter_monic π n).1.pow (Nat.card 𝓀[K] - 1)
-  have hd : (ltPolyIter π n ^ (Nat.card 𝓀[K] - 1)).natDegree =
-      (Nat.card 𝓀[K] - 1) * Nat.card 𝓀[K] ^ n := by
+  have hd
+      : (ltPolyIter π n ^ (Nat.card 𝓀[K] - 1)).natDegree
+        = (Nat.card 𝓀[K] - 1) * Nat.card 𝓀[K] ^ n := by
     rw [natDegree_pow, (ltPolyIter_monic π n).2]
   have hpos : 0 < (ltPolyIter π n ^ (Nat.card 𝓀[K] - 1)).natDegree := by
     rw [hd]
@@ -441,20 +458,19 @@ theorem ltEisenstein_monic (π : 𝒪[K]) (n : ℕ) : (ltEisenstein π n).Monic 
   refine ⟨hm.add_of_right hlt, ?_⟩
   rw [ltEisenstein, natDegree_add_eq_right_of_degree_lt hlt, hd]
 
-theorem map_residue_ltEisenstein (hπ : Irreducible π) (n : ℕ) :
-    (ltEisenstein π n).map (IsLocalRing.residue 𝒪[K]) =
-      X ^ ((Nat.card 𝓀[K] - 1) * Nat.card 𝓀[K] ^ n) := by
+theorem map_residue_ltEisenstein (hπ : Irreducible π) (n : ℕ)
+    : (ltEisenstein π n).map (IsLocalRing.residue 𝒪[K])
+      = X ^ ((Nat.card 𝓀[K] - 1) * Nat.card 𝓀[K] ^ n) := by
   have hres : IsLocalRing.residue 𝒪[K] π = 0 :=
     (IsLocalRing.residue_eq_zero_iff _).mpr ((IsLocalRing.mem_maximalIdeal _).mpr hπ.not_isUnit)
   rw [ltEisenstein, Polynomial.map_add (f := _), map_C, hres, C_0, zero_add, Polynomial.map_pow,
     map_residue_ltPolyIter π hπ, ← pow_mul, mul_comm]
 
-theorem isEisensteinAt_ltEisenstein (hπ : Irreducible π) (n : ℕ) :
-    (ltEisenstein π n).IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]) := by
+theorem isEisensteinAt_ltEisenstein (hπ : Irreducible π) (n : ℕ)
+    : (ltEisenstein π n).IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]) := by
   refine { leading := ?_, mem := ?_, notMem := ?_ }
   · rw [(ltEisenstein_monic π n).1.leadingCoeff]
-    exact fun h => (IsLocalRing.maximalIdeal.isMaximal 𝒪[K]).ne_top
-      ((Ideal.eq_top_iff_one _).mpr h)
+    exact fun h => (IsLocalRing.maximalIdeal.isMaximal 𝒪[K]).ne_top ((Ideal.eq_top_iff_one _).mpr h)
   · intro k hk
     rw [← IsLocalRing.residue_eq_zero_iff, ← coeff_map, map_residue_ltEisenstein hπ, coeff_X_pow]
     rw [(ltEisenstein_monic π n).2] at hk
@@ -467,15 +483,18 @@ theorem isEisensteinAt_ltEisenstein (hπ : Irreducible π) (n : ℕ) :
     rintro ⟨c, hc⟩
     have : (1 : 𝒪[K]) = π * c := by
       refine mul_left_cancel₀ hπ.ne_zero ?_
-      calc π * 1 = π := mul_one π
+      calc
+        π * 1
+          = π := mul_one π
         _ = π ^ 2 * c := hc
         _ = π * (π * c) := by ring
     exact hπ.not_isUnit (Units.mkOfMulEqOne π c this.symm).isUnit
 
-theorem aeval_ltEisenstein_eq_zero {L : Type*} [Field L] [Algebra K L] {n : ℕ} {z : L}
-    (h1 : aeval z ((ltPolyIter π (n + 1)).map (algebraMap 𝒪[K] K)) = 0)
-    (h0 : aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K)) ≠ 0) :
-    aeval z ((ltEisenstein π n).map (algebraMap 𝒪[K] K)) = 0 := by
+theorem aeval_ltEisenstein_eq_zero
+    {L : Type*} [Field L] [Algebra K L]
+    {n : ℕ} {z : L} (h1 : aeval z ((ltPolyIter π (n + 1)).map (algebraMap 𝒪[K] K)) = 0)
+    (h0 : aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K)) ≠ 0)
+    : aeval z ((ltEisenstein π n).map (algebraMap 𝒪[K] K)) = 0 := by
   have hq := one_lt_card_residueField' K
   set μ := aeval z ((ltPolyIter π n).map (algebraMap 𝒪[K] K))
   rw [ltPolyIter_succ, Polynomial.map_comp, aeval_comp, aeval_ltPoly] at h1
@@ -483,7 +502,8 @@ theorem aeval_ltEisenstein_eq_zero {L : Type*} [Field L] [Algebra K L] {n : ℕ}
     rw [mul_add, ← pow_succ', Nat.sub_add_cancel hq.le, mul_comm]
     exact h1
   have h3 := (mul_eq_zero.mp h2).resolve_left h0
-  rw [ltEisenstein, Polynomial.map_add (f := _), map_C, Polynomial.map_pow, map_add (f := _), aeval_C, map_pow]
+  rw [ltEisenstein, Polynomial.map_add (f := _), map_C, Polynomial.map_pow, map_add (f := _),
+    aeval_C, map_pow]
   exact h3
 
 end Eisenstein

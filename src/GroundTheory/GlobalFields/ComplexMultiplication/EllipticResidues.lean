@@ -28,10 +28,8 @@ lemma IsPeriodic.residue_eq_of_mk_eq {f : ℂ → ℂ} (hp : IsPeriodic L f) (hf
   have := hp.residue_add hf hzw w
   rwa [add_sub_cancel] at this
 
-
 variable (L) in
-def torusResidue (L : PeriodPair) (f : ℂ → ℂ) (x : Torus L) : ℂ :=
-  residue f x.out
+def torusResidue (L : PeriodPair) (f : ℂ → ℂ) (x : Torus L) : ℂ := residue f x.out
 
 lemma torusResidue_mk {f : ℂ → ℂ} (hf : IsEllipticFunction L f) (z : ℂ) :
     torusResidue L f (Torus.mk L z) = residue f z :=
@@ -56,16 +54,16 @@ lemma im_ω₂_div_ω₁_ne_zero : (L.ω₂ / L.ω₁).im ≠ 0 := by
     ring)
   norm_num at key
 
-theorem finsum_torusResidue_eq_zero {f : ℂ → ℂ} (hf : IsEllipticFunction L f) :
-    ∑ᶠ x : Torus L, torusResidue L f x = 0 := by
+theorem finsum_torusResidue_eq_zero {f : ℂ → ℂ} (hf : IsEllipticFunction L f)
+    : ∑ᶠ x : Torus L, torusResidue L f x = 0 := by
   classical
   obtain ⟨hmer, hper⟩ := hf
   have hω₁ : L.ω₁ ≠ 0 := ω₁_ne_zero L
   set c := L.ω₁ with hc_def
   have hc : c ≠ 0 := ω₁_ne_zero L
   have hcL : c ∈ L.lattice := L.ω₁_mem_lattice
-  obtain ⟨τ, s, hs, hω₂, hτ⟩ : ∃ τ : ℂ, ∃ s : ℤ, (s = 1 ∨ s = -1) ∧
-      L.ω₂ = (s : ℂ) * (c * τ) ∧ 0 < τ.im := by
+  obtain ⟨τ, s, hs, hω₂, hτ⟩
+      : ∃ τ : ℂ, ∃ s : ℤ, (s = 1 ∨ s = -1) ∧ L.ω₂ = (s : ℂ) * (c * τ) ∧ 0 < τ.im := by
     rcases lt_or_gt_of_ne (im_ω₂_div_ω₁_ne_zero L) with h | h
     · refine ⟨-(L.ω₂ / L.ω₁), -1, Or.inr rfl, ?_, by simpa using h⟩
       rw [hc_def]
@@ -109,11 +107,13 @@ theorem finsum_torusResidue_eq_zero {f : ℂ → ℂ} (hf : IsEllipticFunction L
     exact countable_iUnion fun n ↦
       (finite_inter_singularSet hgmer (isCompact_closedBall 0 (n : ℝ))).countable
 
-  obtain ⟨x₀, hx₀⟩ : ∃ x₀ : ℝ, x₀ ∈ ((fun s : ℂ ↦ s.re) '' singularSet g ∪
-      (fun s : ℂ ↦ s.re - 1) '' singularSet g)ᶜ :=
+  obtain ⟨x₀, hx₀⟩
+      : ∃ x₀ : ℝ,
+        x₀ ∈ ((fun s : ℂ ↦ s.re) '' singularSet g ∪ (fun s : ℂ ↦ s.re - 1) '' singularSet g)ᶜ :=
     (((hScount.image _).union (hScount.image _)).dense_compl ℝ).nonempty
-  obtain ⟨y₀, hy₀⟩ : ∃ y₀ : ℝ, y₀ ∈ ((fun s : ℂ ↦ s.im) '' singularSet g ∪
-      (fun s : ℂ ↦ s.im - h) '' singularSet g)ᶜ :=
+  obtain ⟨y₀, hy₀⟩
+      : ∃ y₀ : ℝ,
+        y₀ ∈ ((fun s : ℂ ↦ s.im) '' singularSet g ∪ (fun s : ℂ ↦ s.im - h) '' singularSet g)ᶜ :=
     (((hScount.image _).union (hScount.image _)).dense_compl ℝ).nonempty
   set a : ℂ := x₀ + y₀ * I with ha
   set b : ℂ := a + 1 + h * I with hb
@@ -140,18 +140,23 @@ theorem finsum_torusResidue_eq_zero {f : ℂ → ℂ} (hf : IsEllipticFunction L
     have nr2 : p.re ≠ x₀ + 1 := fun e ↦ hx₀ (Or.inr ⟨p, hpS, by simp [e]⟩)
     have ni1 : p.im ≠ y₀ := fun e ↦ hy₀ (Or.inl ⟨p, hpS, e⟩)
     have ni2 : p.im ≠ y₀ + h := fun e ↦ hy₀ (Or.inr ⟨p, hpS, by simp [e]⟩)
-    exact ⟨lt_of_le_of_ne r1 (Ne.symm nr1), lt_of_le_of_ne r2 nr2,
-      lt_of_le_of_ne i1 (Ne.symm ni1), lt_of_le_of_ne i2 ni2⟩
+    exact ⟨
+      lt_of_le_of_ne r1 (Ne.symm nr1),
+      lt_of_le_of_ne r2 nr2,
+      lt_of_le_of_ne i1 (Ne.symm ni1),
+      lt_of_le_of_ne i2 ni2
+    ⟩
 
   have hsum0 : ∑ p ∈ T, residue g p = 0 := by
-    have hres := rectIntegral_eq_sum_residue (f := g) (z := a) (w := b) T
-      (fun p hp ↦ by
-        obtain ⟨r1, r2, i1, i2⟩ := hTin p hp
-        exact ⟨by rwa [ha_re], by rwa [hb_re], by rwa [ha_im], by rwa [hb_im]⟩)
-      (fun p _ ↦ hgmer p)
-      (fun u hu huT ↦ by
-        by_contra hna
-        exact huT ((hTmem u).2 ⟨hu, hna⟩))
+    have hres :=
+      rectIntegral_eq_sum_residue (f := g) (z := a) (w := b) T
+        (fun p hp ↦ by
+          obtain ⟨r1, r2, i1, i2⟩ := hTin p hp
+          exact ⟨by rwa [ha_re], by rwa [hb_re], by rwa [ha_im], by rwa [hb_im]⟩)
+        (fun p _ ↦ hgmer p)
+        (fun u hu huT ↦ by
+          by_contra hna
+          exact huT ((hTmem u).2 ⟨hu, hna⟩))
     have hper0 : rectIntegral g a b = 0 := rectIntegral_eq_zero_of_periodic hg1 hgτ a
     rw [hper0] at hres
     have h2pi : (2 * π * I : ℂ) ≠ 0 := two_pi_I_ne_zero
@@ -223,8 +228,9 @@ theorem finsum_torusResidue_eq_zero {f : ℂ → ℂ} (hf : IsEllipticFunction L
     set k : ℤ := n * s with hkdef
     have him := congrArg Complex.im hk
     have hre := congrArg Complex.re hk
-    simp only [sub_im, add_im, intCast_im, mul_im, intCast_re, zero_mul, add_zero, zero_add,
-      sub_re, add_re, intCast_re, mul_re, intCast_im, zero_mul, sub_zero] at him hre
+    simp only [sub_im, add_im, intCast_im, mul_im, intCast_re, zero_mul, add_zero, zero_add, sub_re,
+        add_re, intCast_re, mul_re, intCast_im, zero_mul, sub_zero]
+      at him hre
     have hk0 : k = 0 := by
       have h1 : (k : ℝ) * h < h := by rw [hh]; linarith
       have h2 : -h < (k : ℝ) * h := by rw [hh]; linarith

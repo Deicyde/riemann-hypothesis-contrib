@@ -8,23 +8,30 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EtaleLif
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 open TensorProduct
 
 namespace GlobalTheory.CompanionTheory.EtalePerfect
 
-theorem surjective_of_unramified {R S : Type} [CommRing R] [CommRing S] (p : ℕ) (hp : p.Prime)
-    (hS : (p : S) = 0) (f : R →+* S) (hu : f.FormallyUnramified) (hft : f.FiniteType)
-    (hpow : ∀ x : S, ∃ r, f r = x ^ p) : Function.Surjective f := by
+theorem surjective_of_unramified
+    {R S : Type} [CommRing R] [CommRing S]
+    (p : ℕ) (hp : p.Prime) (hS : (p : S) = 0)
+    (f : R →+* S)
+    (hu : f.FormallyUnramified) (hft : f.FiniteType) (hpow : ∀ x : S, ∃ r, f r = x ^ p)
+    : Function.Surjective f := by
   algebraize [f]
-  have hint : Algebra.IsIntegral R S := ⟨fun x => by
-    obtain ⟨r, hr⟩ := hpow x
-    refine IsIntegral.of_pow hp.pos ?_
-    rw [← hr]
-    exact isIntegral_algebraMap⟩
+  have hint : Algebra.IsIntegral R S :=
+    ⟨fun x => by
+      obtain ⟨r, hr⟩ := hpow x
+      refine IsIntegral.of_pow hp.pos ?_
+      rw [← hr]
+      exact isIntegral_algebraMap⟩
   have hfin : Module.Finite R S := Algebra.IsIntegral.finite
-  obtain ⟨t, ht2, ht1⟩ := Algebra.FormallyUnramified.iff_exists_tensorProduct.1
-    (inferInstance : Algebra.FormallyUnramified R S)
+  obtain ⟨t, ht2, ht1⟩ :=
+    Algebra.FormallyUnramified.iff_exists_tensorProduct.1
+      (inferInstance : Algebra.FormallyUnramified R S)
   have hT : (p : S ⊗[R] S) = 0 := by
     rw [← map_natCast (Algebra.TensorProduct.includeLeftRingHom : S →+* S ⊗[R] S), hS, map_zero]
   have hadd : ∀ x y : S ⊗[R] S, (x + y) ^ p = x ^ p + y ^ p := by
@@ -37,21 +44,19 @@ theorem surjective_of_unramified {R S : Type} [CommRing R] [CommRing S] (p : ℕ
     obtain ⟨c, hc⟩ := exists_add_pow_prime_eq hp x y
     rw [hc, hS]
     simp
-  have hfrob : ∀ u : S ⊗[R] S,
-      u ^ p = ((Algebra.TensorProduct.lmul' R (S := S) u) ^ p) ⊗ₜ[R] (1 : S) := by
+  have hfrob
+      : ∀ u : S ⊗[R] S, u ^ p = ((Algebra.TensorProduct.lmul' R (S := S) u) ^ p) ⊗ₜ[R] (1 : S) := by
     intro u
     induction u using TensorProduct.induction_on with
     | zero => simp [zero_pow hp.ne_zero]
     | tmul a b =>
       obtain ⟨s, hs⟩ := hpow b
-      have hs' : b ^ p = s • (1 : S) := by
-        rw [← hs, Algebra.smul_def, mul_one]; rfl
+      have hs' : b ^ p = s • (1 : S) := by rw [← hs, Algebra.smul_def, mul_one]; rfl
       rw [Algebra.TensorProduct.tmul_pow, Algebra.TensorProduct.lmul'_apply_tmul, mul_pow, hs',
         TensorProduct.tmul_smul, mul_smul_comm, mul_one, TensorProduct.smul_tmul']
-    | add x y hx hy =>
-      rw [hadd, hx, hy, map_add (f := _), haddS, TensorProduct.add_tmul]
-  have hmul : ∀ u : S ⊗[R] S,
-      u * t = (Algebra.TensorProduct.lmul' R (S := S) u ⊗ₜ[R] (1 : S)) * t := by
+    | add x y hx hy => rw [hadd, hx, hy, map_add (f := _), haddS, TensorProduct.add_tmul]
+  have hmul
+      : ∀ u : S ⊗[R] S, u * t = (Algebra.TensorProduct.lmul' R (S := S) u ⊗ₜ[R] (1 : S)) * t := by
     intro u
     induction u using TensorProduct.induction_on with
     | zero => simp
@@ -61,8 +66,7 @@ theorem surjective_of_unramified {R S : Type} [CommRing R] [CommRing S] (p : ℕ
       have : a ⊗ₜ[R] b = (a ⊗ₜ[R] (1 : S)) * ((1 : S) ⊗ₜ[R] b) := by simp
       rw [this, mul_assoc, hb, ← mul_assoc]
       simp
-    | add x y hx hy =>
-      rw [add_mul, hx, hy, map_add (f := _), TensorProduct.add_tmul, add_mul]
+    | add x y hx hy => rw [add_mul, hx, hy, map_add (f := _), TensorProduct.add_tmul, add_mul]
   have hidem : t * t = t := by
     rw [hmul t, ht1]
     exact one_mul t
@@ -78,8 +82,11 @@ theorem surjective_of_unramified {R S : Type} [CommRing R] [CommRing S] (p : ℕ
     exact this
   exact Algebra.isEpi_iff_surjective_algebraMap_of_finite.1 hepi
 
-theorem pf_of_etale : ∀ (p : ℕ), p.Prime → ∀ {P E : Type} [CommRing P] [CommRing E] (ψ : P →+* E),
-    ψ.Etale → D.Pf p P → D.Pf p E := by
+theorem pf_of_etale
+    : ∀ (p : ℕ),
+      p.Prime
+        → ∀ {P E : Type} [CommRing P] [CommRing E] (ψ : P →+* E),
+          ψ.Etale → D.Pf p P → D.Pf p E := by
   intro p hp P E _ _ ψ hψ hP
   have hEc : (p : E) = 0 := by rw [← map_natCast ψ, hP.char, map_zero]
   have hadd : ∀ {A : Type} [CommRing A], (p : A) = 0 → ∀ x y : A, (x + y) ^ p = x ^ p + y ^ p := by
@@ -87,18 +94,20 @@ theorem pf_of_etale : ∀ (p : ℕ), p.Prime → ∀ {P E : Type} [CommRing P] [
     obtain ⟨c, hc⟩ := exists_add_pow_prime_eq hp x y
     rw [hc, h]
     simp
-  let φ : E →+* E :=
-    { toFun := fun x => x ^ p
-      map_one' := one_pow p
-      map_mul' := fun x y => mul_pow x y p
-      map_zero' := zero_pow hp.ne_zero
-      map_add' := hadd hEc }
-  let Fp : P →+* P :=
-    { toFun := fun x => x ^ p
-      map_one' := one_pow p
-      map_mul' := fun x y => mul_pow x y p
-      map_zero' := zero_pow hp.ne_zero
-      map_add' := hadd hP.char }
+  let φ : E →+* E := {
+    toFun := fun x => x ^ p
+    map_one' := one_pow p
+    map_mul' := fun x y => mul_pow x y p
+    map_zero' := zero_pow hp.ne_zero
+    map_add' := hadd hEc
+  }
+  let Fp : P →+* P := {
+    toFun := fun x => x ^ p
+    map_one' := one_pow p
+    map_mul' := fun x y => mul_pow x y p
+    map_zero' := zero_pow hp.ne_zero
+    map_add' := hadd hP.char
+  }
   let e : P ≃+* P := RingEquiv.ofBijective Fp hP.bij
   let G : P →+* P := e.symm.toRingHom
   have hFG : ∀ x, (G x) ^ p = x := fun x => e.apply_symm_apply x

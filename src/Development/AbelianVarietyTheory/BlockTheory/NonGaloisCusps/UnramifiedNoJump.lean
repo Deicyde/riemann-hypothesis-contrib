@@ -11,7 +11,8 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedNoJump
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions
 
 section Conj
 
@@ -32,8 +33,9 @@ def conjElt (hc : IsCMConjOm E Ω c) (g : G E Ω) : G E Ω :=
     change c (g (c.symm (algebraMap E Ω x))) = algebraMap E Ω x
     rw [conj_symm hc, hy, AlgEquiv.commutes, ← hy, conj_conj hc])
 
-theorem conjElt_apply (hc : IsCMConjOm E Ω c) (g : G E Ω) (x : Ω) :
-    conjElt hc g x = c (g (c.symm x)) := rfl
+theorem conjElt_apply (hc : IsCMConjOm E Ω c) (g : G E Ω) (x : Ω)
+    : conjElt hc g x = c (g (c.symm x)) :=
+  rfl
 
 def conjHom (hc : IsCMConjOm E Ω c) : G E Ω →* G E Ω where
   toFun := conjElt hc
@@ -79,8 +81,7 @@ def dual (ρ : Γ →* GL (Fin n) A) : Γ →* GL (Fin n) A where
     apply Units.ext
     simp only [transGL, mul_inv_rev, map_mul, Units.val_mul, Matrix.transpose_mul]
 
-def IsoLat (ρ ρ' : Γ →* GL (Fin n) A) : Prop :=
-  ∃ P : GL (Fin n) A, ∀ g, P * ρ g = ρ' g * P
+def IsoLat (ρ ρ' : Γ →* GL (Fin n) A) : Prop := ∃ P : GL (Fin n) A, ∀ g, P * ρ g = ρ' g * P
 
 end Rep
 

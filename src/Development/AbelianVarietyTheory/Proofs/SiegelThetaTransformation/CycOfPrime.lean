@@ -12,9 +12,11 @@ namespace GlobalTheory.SW.Hyper
 
 variable {O M : Type} [CommRing O] [AddCommGroup M] [Module O M]
 
-theorem exists_fun (P : Ideal O) [hP : P.IsMaximal] (N : Submodule O M) (v : M) (hv : v ∉ N)
-    (hPv : ∀ c ∈ P, c • v ∈ N) (hc : ∀ x, ∃ r : O, x - r • v ∈ N) :
-    ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N := by
+theorem exists_fun
+    (P : Ideal O) [hP : P.IsMaximal]
+    (N : Submodule O M) (v : M)
+    (hv : v ∉ N) (hPv : ∀ c ∈ P, c • v ∈ N) (hc : ∀ x, ∃ r : O, x - r • v ∈ N)
+    : ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N := by
   classical
   let g : O →ₗ[O] M ⧸ N := LinearMap.toSpanSingleton O (M ⧸ N) (N.mkQ v)
   have hker : LinearMap.ker g = P := by
@@ -45,11 +47,12 @@ theorem exists_fun (P : Ideal O) [hP : P.IsMaximal] (N : Submodule O M) (v : M) 
     apply hv
     have h1 : (e.symm.toLinearMap ∘ₗ N.mkQ) v = 0 := by rw [h0]; rfl
     simpa only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.map_eq_zero_iff,
-      Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] using h1
+        Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+      using h1
   · rw [LinearEquiv.ker_comp, Submodule.ker_mkQ]
 
-theorem surj_of_ne (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf : f ≠ 0) :
-    ∃ v, f v = 1 := by
+theorem surj_of_ne (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf : f ≠ 0)
+    : ∃ v, f v = 1 := by
   obtain ⟨w, hw⟩ : ∃ w, f w ≠ 0 := by
     by_contra h
     push Not at h
@@ -59,8 +62,8 @@ theorem surj_of_ne (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (h
   refine ⟨c • w, ?_⟩
   rw [map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq, mul_comm, hb]
 
-theorem index_ker (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf : f ≠ 0) :
-    (LinearMap.ker f).toAddSubgroup.index = Nat.card (O ⧸ P) := by
+theorem index_ker (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf : f ≠ 0)
+    : (LinearMap.ker f).toAddSubgroup.index = Nat.card (O ⧸ P) := by
   obtain ⟨v, hv⟩ := surj_of_ne P f hf
   have hs : Function.Surjective f := by
     intro y
@@ -71,12 +74,11 @@ theorem index_ker (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf
   rw [AddMonoidHom.range_eq_top.mpr hs, AddSubgroup.card_top] at h
   exact h
 
-theorem cyc_of_prime (N : Submodule O M) {q : ℕ} (hq : q.Prime)
-    (h : N.toAddSubgroup.index = q) : ∃ v, v ∉ N ∧ ∀ x, ∃ r : O, x - r • v ∈ N := by
+theorem cyc_of_prime (N : Submodule O M) {q : ℕ} (hq : q.Prime) (h : N.toAddSubgroup.index = q)
+    : ∃ v, v ∉ N ∧ ∀ x, ∃ r : O, x - r • v ∈ N := by
   classical
   have : Fact q.Prime := ⟨hq⟩
-  have hcard : Nat.card (M ⧸ N.toAddSubgroup) = q := by
-    rw [← AddSubgroup.index_eq_card]; exact h
+  have hcard : Nat.card (M ⧸ N.toAddSubgroup) = q := by rw [← AddSubgroup.index_eq_card]; exact h
   have hne : N.toAddSubgroup ≠ ⊤ := by
     intro ht
     rw [ht, AddSubgroup.index_top] at h
@@ -88,8 +90,10 @@ theorem cyc_of_prime (N : Submodule O M) {q : ℕ} (hq : q.Prime)
   refine ⟨v, hv, fun x => ?_⟩
   have hv0 : (QuotientAddGroup.mk v : M ⧸ N.toAddSubgroup) ≠ 0 := by
     rw [Ne, QuotientAddGroup.eq_zero_iff]; exact hv
-  have hx : (QuotientAddGroup.mk x : M ⧸ N.toAddSubgroup) ∈
-      AddSubgroup.zmultiples (QuotientAddGroup.mk v) := mem_zmultiples_of_prime_card hcard hv0
+  have hx
+      : (QuotientAddGroup.mk x : M ⧸ N.toAddSubgroup)
+        ∈ AddSubgroup.zmultiples (QuotientAddGroup.mk v) :=
+    mem_zmultiples_of_prime_card hcard hv0
   obtain ⟨n, hn⟩ := AddSubgroup.mem_zmultiples_iff.mp hx
   refine ⟨(n : O), ?_⟩
   rw [Int.cast_smul_eq_zsmul]
@@ -99,9 +103,10 @@ theorem cyc_of_prime (N : Submodule O M) {q : ℕ} (hq : q.Prime)
   rw [sub_eq_neg_add]
   exact h2
 
-theorem finrank_fibre (O M k : Type) [CommRing O] [IsDomain O] [AddCommGroup M] [Module O M]
-    [Module.Finite O M] [Module.Projective O M] [Field k] [Algebra O k] :
-    Module.finrank k (k ⊗[O] M) = Module.finrank O M := by
+theorem finrank_fibre
+    (O M k : Type) [CommRing O] [IsDomain O] [AddCommGroup M] [Module O M] [Module.Finite O M]
+    [Module.Projective O M] [Field k] [Algebra O k]
+    : Module.finrank k (k ⊗[O] M) = Module.finrank O M := by
   have : Module.FinitePresentation O M := Module.finitePresentation_of_projective O M
   have hlc := Module.isLocallyConstant_rankAtStalk (R := O) (M := M)
   let q0 : PrimeSpectrum k := ⟨⊥, Ideal.isPrime_bot⟩
@@ -119,13 +124,14 @@ theorem finrank_fibre (O M k : Type) [CommRing O] [IsDomain O] [AddCommGroup M] 
         (LocalizedModule.mkLinearMap p0.asIdeal.primeCompl M) hp]
   rw [h1, Module.rankAtStalk_baseChange, hlc.apply_eq_of_preconnectedSpace _ p0, h2]
 
-
 attribute [local instance] Ideal.Quotient.field in
-theorem count [IsDomain O] [Module.Finite O M] [Module.Projective O M] (P : Ideal O)
-    [hP : P.IsMaximal] [Finite (O ⧸ P)] :
-    {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}.Finite ∧
-    {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}.ncard *
-      (Nat.card (O ⧸ P) - 1) = Nat.card (O ⧸ P) ^ Module.finrank O M - 1 := by
+theorem count
+    [IsDomain O] [Module.Finite O M] [Module.Projective O M]
+    (P : Ideal O) [hP : P.IsMaximal] [Finite (O ⧸ P)]
+    : {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}.Finite
+      ∧ {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}.ncard
+          * (Nat.card (O ⧸ P) - 1)
+        = Nat.card (O ⧸ P) ^ Module.finrank O M - 1 := by
   classical
   have hcard : Nat.card (M →ₗ[O] O ⧸ P) = Nat.card (O ⧸ P) ^ Module.finrank O M := by
     rw [Nat.card_congr (LinearMap.liftBaseChangeEquiv (M := M) (N := O ⧸ P) (O ⧸ P)).toEquiv,
@@ -136,8 +142,7 @@ theorem count [IsDomain O] [Module.Finite O M] [Module.Projective O M] (P : Idea
   have : Finite (M →ₗ[O] O ⧸ P) :=
     Nat.finite_of_card_ne_zero (by rw [hcard]; exact pow_ne_zero _ Nat.card_pos.ne')
   let φ : ℙ (O ⧸ P) (M →ₗ[O] O ⧸ P) → Submodule O M :=
-    Projectivization.lift (K := O ⧸ P) (V := M →ₗ[O] O ⧸ P)
-      (fun f => LinearMap.ker f.1) (by
+    Projectivization.lift (K := O ⧸ P) (V := M →ₗ[O] O ⧸ P) (fun f => LinearMap.ker f.1) (by
       rintro ⟨a, ha⟩ ⟨b, hb⟩ t (hab : a = t • b)
       have ht : t ≠ 0 := by
         rintro rfl
@@ -145,9 +150,10 @@ theorem count [IsDomain O] [Module.Finite O M] [Module.Projective O M] (P : Idea
         rw [hab, zero_smul]
       ext x
       simp only [LinearMap.mem_ker, hab, LinearMap.smul_apply, smul_eq_zero, ht, false_or])
-  have key : ∀ (f g : M →ₗ[O] O ⧸ P) (hf : f ≠ 0) (hg : g ≠ 0),
-      LinearMap.ker f = LinearMap.ker g →
-      Projectivization.mk (O ⧸ P) g hg = Projectivization.mk (O ⧸ P) f hf := by
+  have key
+      : ∀ (f g : M →ₗ[O] O ⧸ P) (hf : f ≠ 0) (hg : g ≠ 0),
+        LinearMap.ker f = LinearMap.ker g
+          → Projectivization.mk (O ⧸ P) g hg = Projectivization.mk (O ⧸ P) f hf := by
     intro f g hf hg hfg
     obtain ⟨w, hw⟩ := surj_of_ne P f hf
     rw [Projectivization.mk_eq_mk_iff']
@@ -164,8 +170,8 @@ theorem count [IsDomain O] [Module.Finite O M] [Module.Projective O M] (P : Idea
     intro x y hxy
     rw [← Projectivization.mk_rep x, ← Projectivization.mk_rep y] at hxy ⊢
     exact (key _ _ _ _ hxy).symm
-  have hS : {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}
-      = Set.range φ := by
+  have hS
+      : {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N} = Set.range φ := by
     ext N
     constructor
     · rintro ⟨f, hf, rfl⟩

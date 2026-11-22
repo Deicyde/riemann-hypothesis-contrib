@@ -10,32 +10,34 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem echelon_projector_frobenius (l : ℕ) [Fact l.Prime] (C : Type) [Field C] [CharP C l]
-    (d : ℕ) (Y A : Matrix (Fin d) (Fin d) C) (hA : A.det ≠ 0)
-    (hY : Y.map (frobenius C l) = Y * A) :
-    ∃ (I : Finset (Fin d)) (Q Λ : Matrix (Fin d) (Fin d) C), Y * Q = 0 ∧
-      (∀ v, Y.mulVec v = 0 → Q.mulVec v = v) ∧
-      (∀ i ∈ I, ∀ j, Q i j = if i = j then 1 else 0) ∧ (∀ i, ∀ j ∉ I, Q i j = 0) ∧
-      Q = A * Q.map (frobenius C l) * Λ := by
+theorem echelon_projector_frobenius
+    (l : ℕ) [Fact l.Prime]
+    (C : Type) [Field C] [CharP C l]
+    (d : ℕ) (Y A : Matrix (Fin d) (Fin d) C) (hA : A.det ≠ 0) (hY : Y.map (frobenius C l) = Y * A)
+    : ∃ (I : Finset (Fin d)) (Q Λ : Matrix (Fin d) (Fin d) C),
+      Y * Q = 0 ∧ (∀ v, Y.mulVec v = 0 → Q.mulVec v = v)
+        ∧ (∀ i ∈ I, ∀ j, Q i j = if i = j then 1 else 0) ∧ (∀ i, ∀ j ∉ I, Q i j = 0)
+        ∧ Q = A * Q.map (frobenius C l) * Λ := by
   classical
   set N : Submodule C (Fin d → C) := LinearMap.ker (Matrix.toLin' Y) with hN
   let e : Fin d → (Fin d → C) := fun k => Pi.single k 1
 
-  have hsupp : ∀ (S : Set (Fin d)) (v : Fin d → C), (∀ i, i ∉ S → v i = 0) →
-      v ∈ Submodule.span C (e '' S) := by
+  have hsupp
+      : ∀ (S : Set (Fin d)) (v : Fin d → C),
+        (∀ i, i ∉ S → v i = 0) → v ∈ Submodule.span C (e '' S) := by
     intro S v hv
     rw [show v = ∑ k, Pi.single k (v k) from (Finset.univ_sum_single v).symm]
     refine Submodule.sum_mem _ fun k _ => ?_
     by_cases hk : k ∈ S
-    · have : Pi.single k (v k) = v k • e k := by
-        ext i; simp [e, Pi.single_apply]
+    · have : Pi.single k (v k) = v k • e k := by ext i; simp [e, Pi.single_apply]
       rw [this]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, hk, rfl⟩)
     · rw [hv k hk, Pi.single_zero]; exact Submodule.zero_mem _
   have hspan : Submodule.span C (Set.range (N.mkQ ∘ e)) = ⊤ := by
     rw [Set.range_comp, ← Submodule.map_span]
     have : Submodule.span C (Set.range e) = ⊤ := by
-      rw [eq_top_iff]; intro v _
+      rw [eq_top_iff]
+      intro v _
       have := hsupp Set.univ v (fun i hi => absurd (Set.mem_univ i) hi)
       rwa [Set.image_univ] at this
     rw [this, Submodule.map_top, Submodule.range_mkQ]
@@ -74,10 +76,11 @@ theorem echelon_projector_frobenius (l : ℕ) [Fact l.Prime] (C : Type) [Field C
   have hPN : ∀ v, P v ∈ N := fun v => Submodule.projection_apply_mem hc v
   have hmemN : ∀ v, v ∈ N ↔ Y *ᵥ v = 0 := fun v => by
     rw [hN, LinearMap.mem_ker, Matrix.toLin'_apply]
-  have key : ∀ X Z : Matrix (Fin d) (Fin d) C, (∀ v, X *ᵥ v = Z *ᵥ v) → X = Z :=
-    fun X Z h => Matrix.toLin'.injective (LinearMap.ext fun v => by simpa [Matrix.toLin'_apply] using h v)
-  have hYQ : Y * Q = 0 := key _ _ fun v => by
-    rw [← Matrix.mulVec_mulVec, hQv, Matrix.zero_mulVec]; exact (hmemN _).mp (hPN v)
+  have key : ∀ X Z : Matrix (Fin d) (Fin d) C, (∀ v, X *ᵥ v = Z *ᵥ v) → X = Z := fun X Z h =>
+    Matrix.toLin'.injective (LinearMap.ext fun v => by simpa [Matrix.toLin'_apply] using h v)
+  have hYQ : Y * Q = 0 :=
+    key _ _ fun v => by
+      rw [← Matrix.mulVec_mulVec, hQv, Matrix.zero_mulVec]; exact (hmemN _).mp (hPN v)
   set I : Finset (Fin d) := Finset.univ.filter (fun i => i ∉ Set.range a) with hI
   have hmemI : ∀ i, i ∈ I ↔ i ∉ Set.range a := fun i => by simp [hI]
   have hrow : ∀ i ∈ I, ∀ j, Q i j = if i = j then 1 else 0 := by
@@ -92,7 +95,8 @@ theorem echelon_projector_frobenius (l : ℕ) [Fact l.Prime] (C : Type) [Field C
     rw [hmemI, not_not] at hj
     rw [hQ, LinearMap.toMatrix'_apply]
     have : Pi.single j (1 : C) ∈ W := Submodule.subset_span ⟨j, hj, rfl⟩
-    rw [Submodule.projection_apply_of_mem_right hc this]; rfl
+    rw [Submodule.projection_apply_of_mem_right hc this]
+    rfl
 
   set M : Matrix (Fin d) (Fin d) C := A * Q.map (frobenius C l) with hM
   have hYM : Y * M = 0 := by
@@ -108,11 +112,12 @@ theorem echelon_projector_frobenius (l : ℕ) [Fact l.Prime] (C : Type) [Field C
       have := congrArg (fun x => A⁻¹ *ᵥ x) hv
       simp only [Matrix.mulVec_mulVec, Matrix.mulVec_zero] at this
       rwa [← mul_assoc, Matrix.nonsing_inv_mul A hAu, one_mul] at this
-    have := hsupp (Set.range a) v (fun i hi => by
-      have hi' : i ∈ I := (hmemI i).mpr hi
-      have h2 := congrFun h0 i
-      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, hrow i hi', Pi.zero_apply] at h2
-      simpa [apply_ite] using h2)
+    have :=
+      hsupp (Set.range a) v (fun i hi => by
+        have hi' : i ∈ I := (hmemI i).mpr hi
+        have h2 := congrFun h0 i
+        simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, hrow i hi', Pi.zero_apply] at h2
+        simpa [apply_ite] using h2)
     rwa [← hW] at this
   have hrange : LinearMap.range (Matrix.toLin' M) = N := by
     refine Submodule.eq_of_le_of_finrank_le hrangeN ?_

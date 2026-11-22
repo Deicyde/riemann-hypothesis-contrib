@@ -5,18 +5,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.QuadraticEx
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-private theorem UpperTheory.V.Two.invTwo_sign (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
-    (U V : Subgroup Γ) (S : Set Γ) (σ : Γ) (hσ : σ ∈ V) (ho : IsOpen (U.subgroupOf V : Set V)) (hi : U.relIndex V = 2)
-    (hn : σ ∉ U) (hS : ∀ s ∈ S, s ∈ V → s ∈ U) :
-    ∃ ε ∈ CharOff V S 2, ε ⟨σ, hσ⟩ = 1 ∧ ∀ v : V, v.1 ∈ U → ε v = 0 := by
+private theorem UpperTheory.V.Two.invTwo_sign
+    (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+    (U V : Subgroup Γ)
+    (S : Set Γ)
+    (σ : Γ) (hσ : σ ∈ V)
+    (ho : IsOpen (U.subgroupOf V : Set V)) (hi : U.relIndex V = 2) (hn : σ ∉ U)
+    (hS : ∀ s ∈ S, s ∈ V → s ∈ U)
+    : ∃ ε ∈ CharOff V S 2, ε ⟨σ, hσ⟩ = 1 ∧ ∀ v : V, v.1 ∈ U → ε v = 0 := by
   classical
   set H : Subgroup V := U.subgroupOf V with hH
   have hidx : H.index = 2 := hi
-  have hσH : (⟨σ, hσ⟩ : V) ∉ H := by
-    rw [hH, Subgroup.mem_subgroupOf]; exact hn
+  have hσH : (⟨σ, hσ⟩ : V) ∉ H := by rw [hH, Subgroup.mem_subgroupOf]; exact hn
   have hcl : IsClosed (H : Set V) := H.isClosed_of_isOpen ho
   have h10 : (1 : ZMod 2) ≠ 0 := one_ne_zero
   let ε : V → ZMod 2 := fun v => if v ∈ H then 0 else 1
@@ -35,19 +40,20 @@ private theorem UpperTheory.V.Two.invTwo_sign (Γ : Type) [Group Γ] [Topologica
       have hab := Subgroup.mul_mem_iff_of_index_two hidx (a := a) (b := b)
       by_cases ha : a ∈ H <;> by_cases hb : b ∈ H <;> simp [ε, ha, hb, hab] <;> decide
     · intro u hu
-      have : u ∈ H := by
-        rw [hH, Subgroup.mem_subgroupOf]; exact hS _ hu u.2
+      have : u ∈ H := by rw [hH, Subgroup.mem_subgroupOf]; exact hS _ hu u.2
       simp [ε, this]
   refine ⟨ε, hmem, ?_, ?_⟩
   · simp [ε, hσH]
   · intro v hv
-    have : v ∈ H := by
-      rw [hH, Subgroup.mem_subgroupOf]; exact hv
+    have : v ∈ H := by rw [hH, Subgroup.mem_subgroupOf]; exact hv
     simp [ε, this]
 
-theorem UpperTheory.V.Two.invTwo :
-    ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (U V : Subgroup Γ) (S : Set Γ) (σ : Γ) (n : ℕ), U ≤ V → σ ∈ V → IsOpen (U.subgroupOf V : Set V) → U.relIndex V = 2 → σ ∉ U → (∀ s ∈ S, s ∈ V → s ∈ U) →
-      CardLe (CharOff V S 2) n → CardLe {φ : CharOff U S 2 // ∀ u u' : U, u'.1 = σ⁻¹ * u.1 * σ → φ.1 u' = φ.1 u} n := by
+theorem UpperTheory.V.Two.invTwo
+    : ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (U V : Subgroup Γ)
+        (S : Set Γ) (σ : Γ) (n : ℕ),
+      U ≤ V → σ ∈ V → IsOpen (U.subgroupOf V : Set V) → U.relIndex V = 2 → σ ∉ U
+        → (∀ s ∈ S, s ∈ V → s ∈ U) → CardLe (CharOff V S 2) n
+        → CardLe {φ : CharOff U S 2 // ∀ u u' : U, u'.1 = σ⁻¹ * u.1 * σ → φ.1 u' = φ.1 u} n := by
   intro Γ _ _ _ U V S σ n hUV hσ ho hi hn hS hQ
   have two : ∀ x : ZMod 2, x = 0 ∨ x = 1 := by decide
   classical
@@ -89,11 +95,13 @@ theorem UpperTheory.V.Two.invTwo :
       simp only [Pi.add_apply]
       rw [h1, h2]
       rfl
-  have hext : ∀ φ, ∃ ψ ∈ CharOff V S 2, ψ ⟨σ, hσ⟩ = 0 ∧ ∀ u : U, ψ ⟨u, hUV u.2⟩ = χ φ u :=
-    fun φ => UpperTheory.V.Two.extTwo Γ U V S hUV σ hσ hσσ ho hi hn hS (χ φ) (hχmem φ) (hχinv φ) (hχσ φ)
+  have hext : ∀ φ, ∃ ψ ∈ CharOff V S 2, ψ ⟨σ, hσ⟩ = 0 ∧ ∀ u : U, ψ ⟨u, hUV u.2⟩ = χ φ u := fun φ =>
+    UpperTheory.V.Two.extTwo Γ U V S hUV σ hσ hσσ ho hi hn hS (χ φ) (hχmem φ) (hχinv φ) (hχσ φ)
   choose ψ hψmem hψσ hψU using hext
-  let f : P → CharOff V S 2 := fun φ =>
-    ⟨ψ φ + (if val φ = 0 then 0 else ε), add_mem (hψmem φ) (by split_ifs; exact zero_mem _; exact hε)⟩
+  let f : P → CharOff V S 2 := fun φ => ⟨
+    ψ φ + (if val φ = 0 then 0 else ε),
+    add_mem (hψmem φ) (by split_ifs; exact zero_mem _; exact hε)
+  ⟩
   refine UpperTheory.V.Two.CardLe.of_injective hQ f ?_
   intro φ φ' hff
   have hfun : ψ φ + (if val φ = 0 then 0 else ε) = ψ φ' + (if val φ' = 0 then 0 else ε) :=

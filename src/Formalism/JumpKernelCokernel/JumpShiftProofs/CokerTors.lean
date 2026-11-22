@@ -9,15 +9,17 @@ open Polynomial Module
 
 namespace Formalism.KernelCokernelLengths.CokernelTorsionLemmas
 
-theorem charpoly_of_range_le {R : Type} [CommRing R] [IsDomain R] {M : Type} [AddCommGroup M]
-    [Module R M] [Module.Free R M] [Module.Finite R M]
-    (S : Submodule R M) [Module.Free R S] [Module.Finite R S] [Module.Free R (M ⧸ S)]
-    [Module.Finite R (M ⧸ S)] (d : Module.End R M) (hd : ∀ m, d m ∈ S) :
-    d.charpoly = (d.restrict (p := S) (q := S) (fun x _ => hd x)).charpoly *
-      X ^ finrank R (M ⧸ S) := by
+theorem charpoly_of_range_le
+    {R : Type} [CommRing R] [IsDomain R]
+    {M : Type} [AddCommGroup M] [Module R M] [Module.Free R M] [Module.Finite R M]
+    (S : Submodule R M)
+    [Module.Free R S] [Module.Finite R S] [Module.Free R (M ⧸ S)] [Module.Finite R (M ⧸ S)]
+    (d : Module.End R M) (hd : ∀ m, d m ∈ S)
+    : d.charpoly
+      = (d.restrict (p := S) (q := S) (fun x _ => hd x)).charpoly * X ^ finrank R (M ⧸ S) := by
   classical
-  obtain ⟨g, hg⟩ := Module.projective_lifting_property S.mkQ LinearMap.id
-    (Submodule.mkQ_surjective S)
+  obtain ⟨g, hg⟩ :=
+    Module.projective_lifting_property S.mkQ LinearMap.id (Submodule.mkQ_surjective S)
   have hg' : ∀ x, S.mkQ (g x) = x := fun x => LinearMap.congr_fun hg x
   let pr : M →ₗ[R] M := LinearMap.id - g ∘ₗ S.mkQ
   have hmem : ∀ m, pr m ∈ S := by
@@ -28,8 +30,7 @@ theorem charpoly_of_range_le {R : Type} [CommRing R] [IsDomain R] {M : Type} [Ad
     have := hg' (S.mkQ m)
     simp only [Submodule.mkQ_apply] at this ⊢
     rw [this, sub_self]
-  let F : M →ₗ[R] S × (M ⧸ S) :=
-    LinearMap.prod (pr.codRestrict S hmem) S.mkQ
+  let F : M →ₗ[R] S × (M ⧸ S) := LinearMap.prod (pr.codRestrict S hmem) S.mkQ
   let G : S × (M ⧸ S) →ₗ[R] M := S.subtype.coprod g
   have h1 : F ∘ₗ G = LinearMap.id := by
     apply LinearMap.ext
@@ -59,9 +60,10 @@ theorem charpoly_of_range_le {R : Type} [CommRing R] [IsDomain R] {M : Type} [Ad
     · apply Subtype.ext
       simp [e, F, pr, hq]
     · simp [e, F, pr, hq]
-  have hM : LinearMap.toMatrix b b (e.conj d) =
-      Matrix.fromBlocks (LinearMap.toMatrix bS bS dS) (LinearMap.toMatrix b b (e.conj d)).toBlocks₁₂
-        0 0 := by
+  have hM
+      : LinearMap.toMatrix b b (e.conj d)
+        = Matrix.fromBlocks (LinearMap.toMatrix bS bS dS)
+          (LinearMap.toMatrix b b (e.conj d)).toBlocks₁₂ 0 0 := by
     conv_lhs => rw [← Matrix.fromBlocks_toBlocks (LinearMap.toMatrix b b (e.conj d))]
     congr 1
     · ext i j
@@ -82,8 +84,10 @@ end Formalism.KernelCokernelLengths.CokernelTorsionLemmas
 
 namespace Formalism.KernelCokernelLengths.CokernelTorsionLemmas
 
-theorem eq_of_mul_X_pow {R : Type} [CommRing R] [IsDomain R] (P Q : R[X]) (k r : ℕ)
-    (hP : P.coeff 0 ≠ 0) (hQ : Q.coeff 0 ≠ 0) (h : P * X ^ r = X ^ k * Q) : P = Q := by
+theorem eq_of_mul_X_pow
+    {R : Type} [CommRing R] [IsDomain R]
+    (P Q : R[X]) (k r : ℕ) (hP : P.coeff 0 ≠ 0) (hQ : Q.coeff 0 ≠ 0) (h : P * X ^ r = X ^ k * Q)
+    : P = Q := by
   have hP0 : P ≠ 0 := fun h0 => hP (by simp [h0])
   have hQ0 : Q ≠ 0 := fun h0 => hQ (by simp [h0])
   have tP : P.natTrailingDegree = 0 := Polynomial.natTrailingDegree_eq_zero.mpr (Or.inr hP)
@@ -91,7 +95,8 @@ theorem eq_of_mul_X_pow {R : Type} [CommRing R] [IsDomain R] (P Q : R[X]) (k r :
   have hrk : r = k := by
     have h1 := congrArg Polynomial.natTrailingDegree h
     rw [mul_comm (X ^ k) Q, Polynomial.natTrailingDegree_mul_X_pow hP0,
-      Polynomial.natTrailingDegree_mul_X_pow hQ0, tP, tQ] at h1
+        Polynomial.natTrailingDegree_mul_X_pow hQ0, tP, tQ]
+      at h1
     omega
   subst hrk
   rw [mul_comm (X ^ r) Q] at h
@@ -99,7 +104,8 @@ theorem eq_of_mul_X_pow {R : Type} [CommRing R] [IsDomain R] (P Q : R[X]) (k r :
 
 end Formalism.KernelCokernelLengths.CokernelTorsionLemmas
 
-theorem Formalism.KernelCokernelLengths.cokernel_torsion_holds : Formalism.KernelCokernelLengths.CokerTors := by
+theorem Formalism.KernelCokernelLengths.cokernel_torsion_holds
+    : Formalism.KernelCokernelLengths.CokerTors := by
   intro O _ _ _ M _ _ _ _ d k Q hQ0 hchar hann
   classical
   have hQc : Q.coeff 0 ≠ 0 := by rwa [Polynomial.coeff_zero_eq_eval_zero]
@@ -136,8 +142,7 @@ theorem Formalism.KernelCokernelLengths.cokernel_torsion_holds : Formalism.Kerne
       · exact Or.inl ha
       · right
         rw [Submodule.Quotient.mk_eq_zero]
-        have : a • aeval d Q m = 0 := by
-          rw [← map_smul]; exact hx
+        have : a • aeval d Q m = 0 := by rw [← map_smul]; exact hx
         exact (smul_eq_zero.mp this).resolve_left ha
   have : Module.Free O (M ⧸ S) := Module.free_of_finite_type_torsion_free'
   let dS := d.restrict (p := S) (q := S) (fun x _ => hdS x)
@@ -156,7 +161,8 @@ theorem Formalism.KernelCokernelLengths.cokernel_torsion_holds : Formalism.Kerne
   have hPc : dS.charpoly.coeff 0 ≠ 0 := by
     intro h; apply hdet; rw [LinearMap.det_eq_sign_charpoly_coeff, h, mul_zero]
   have hPQ : dS.charpoly = Q :=
-    Formalism.KernelCokernelLengths.CokernelTorsionLemmas.eq_of_mul_X_pow _ _ k _ hPc hQc (hc.symm.trans hchar)
+    Formalism.KernelCokernelLengths.CokernelTorsionLemmas.eq_of_mul_X_pow _ _ k _ hPc hQc
+      (hc.symm.trans hchar)
   have hspan : Ideal.span {LinearMap.det dS} = Ideal.span {Q.eval 0} := by
     rw [LinearMap.det_eq_sign_charpoly_coeff, hPQ, Polynomial.coeff_zero_eq_eval_zero]
     exact Ideal.span_singleton_mul_left_unit ((isUnit_neg_one).pow _) _
@@ -164,8 +170,8 @@ theorem Formalism.KernelCokernelLengths.cokernel_torsion_holds : Formalism.Kerne
   rw [hspan] at hlen
   rw [← hlen]
 
-  have hmemT : ∀ s : S, (LinearMap.range d).mkQ (s : M) ∈
-      Submodule.torsion O (M ⧸ LinearMap.range d) := by
+  have hmemT
+      : ∀ s : S, (LinearMap.range d).mkQ (s : M) ∈ Submodule.torsion O (M ⧸ LinearMap.range d) := by
     intro s
     rw [Submodule.mem_torsion_iff]
     refine ⟨⟨Q.coeff 0, mem_nonZeroDivisors_of_ne_zero hQc⟩, ?_⟩
@@ -195,7 +201,8 @@ theorem Formalism.KernelCokernelLengths.cokernel_torsion_holds : Formalism.Kerne
     have h1 : (a : O) • aeval d Q m = 0 := by
       rw [← map_smul]
       show aeval d Q ((a : O) • m) = 0
-      rw [show (a : O) • m = d m' from hm'.symm]; exact hQd m'
+      rw [show (a : O) • m = d m' from hm'.symm]
+      exact hQd m'
     have hmS : m ∈ S := (smul_eq_zero.mp h1).resolve_left (nonZeroDivisors.coe_ne_zero a)
     refine ⟨Submodule.Quotient.mk ⟨m, hmS⟩, ?_⟩
     rw [Submodule.liftQ_apply]

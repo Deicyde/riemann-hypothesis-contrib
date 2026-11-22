@@ -16,15 +16,16 @@ noncomputable section
 
 namespace GlobalTheory.JR.HeightSquareIntegrable
 
-theorem tsum_pi_prod_le' {ι : Type} [Fintype ι] {α : ι → Type} (f : ∀ i, α i → ℝ≥0∞) :
-    ∑' t : ∀ i, α i, ∏ i, f i (t i) ≤ ∏ i, ∑' x, f i x := by
+theorem tsum_pi_prod_le' {ι : Type} [Fintype ι] {α : ι → Type} (f : ∀ i, α i → ℝ≥0∞)
+    : ∑' t : ∀ i, α i, ∏ i, f i (t i) ≤ ∏ i, ∑' x, f i x := by
   classical
   rw [ENNReal.tsum_eq_iSup_sum]
   refine iSup_le fun s => ?_
-  calc ∑ t ∈ s, ∏ i, f i (t i)
-      ≤ ∑ t ∈ Fintype.piFinset (fun i => s.image (fun t => t i)), ∏ i, f i (t i) := by
-        refine Finset.sum_le_sum_of_subset fun t ht => ?_
-        exact Fintype.mem_piFinset.2 fun i => Finset.mem_image_of_mem _ ht
+  calc
+    ∑ t ∈ s, ∏ i, f i (t i)
+        ≤ ∑ t ∈ Fintype.piFinset (fun i => s.image (fun t => t i)), ∏ i, f i (t i) := by
+      refine Finset.sum_le_sum_of_subset fun t ht => ?_
+      exact Fintype.mem_piFinset.2 fun i => Finset.mem_image_of_mem _ ht
     _ = ∏ i, ∑ x ∈ s.image (fun t => t i), f i x := (Finset.prod_univ_sum _ _).symm
     _ ≤ _ := Finset.prod_le_prod' fun i _ => ENNReal.sum_le_tsum _
 
@@ -34,30 +35,36 @@ variable {K : Type} [CommRing K] {m : ℕ} {f : Fin m → K}
 theorem eq_of_mul_eq (hsum : ∑ i, f i = 1) {x y : K} (h : ∀ j, f j * x = f j * y) : x = y := by
   have hx : x = ∑ j, f j * x := by rw [← Finset.sum_mul, hsum, one_mul]
   have hy : y = ∑ j, f j * y := by rw [← Finset.sum_mul, hsum, one_mul]
-  rw [hx, hy]; exact Finset.sum_congr rfl fun j _ => h j
+  rw [hx, hy]
+  exact Finset.sum_congr rfl fun j _ => h j
 
-theorem mul_sum_eq (hid : ∀ i, f i * f i = f i) (hor : ∀ i j, i ≠ j → f i * f j = 0)
-    (a : Fin m → K) (j : Fin m) : f j * ∑ i, f i * a i = f j * a j := by
+theorem mul_sum_eq
+    (hid : ∀ i, f i * f i = f i) (hor : ∀ i j, i ≠ j → f i * f j = 0) (a : Fin m → K) (j : Fin m)
+    : f j * ∑ i, f i * a i = f j * a j := by
   rw [Finset.mul_sum, Finset.sum_eq_single j]
   · rw [← mul_assoc, hid]
   · intro i _ hij; rw [← mul_assoc, hor j i (Ne.symm hij), zero_mul]
   · intro h; exact absurd (Finset.mem_univ j) h
 
-theorem mul_eq_iff_mk (hid : ∀ i, f i * f i = f i) (j : Fin m) (x y : K) :
-    f j * x = f j * y ↔
-      Ideal.Quotient.mk (Ideal.span {1 - f j}) x = Ideal.Quotient.mk (Ideal.span {1 - f j}) y := by
+theorem mul_eq_iff_mk (hid : ∀ i, f i * f i = f i) (j : Fin m) (x y : K)
+    : f j * x = f j * y
+      ↔ Ideal.Quotient.mk (Ideal.span {1 - f j}) x
+        = Ideal.Quotient.mk (Ideal.span {1 - f j}) y := by
   rw [Ideal.Quotient.eq, Ideal.mem_span_singleton']
   constructor
   · intro h; exact ⟨x - y, by linear_combination (-1 : K) * h⟩
   · rintro ⟨a, ha⟩; linear_combination (-f j) * ha - a * hid j
 
-theorem mul_prod_eq (hid : ∀ i, f i * f i = f i) (hor : ∀ i j, i ≠ j → f i * f j = 0)
-    (g : Fin m → K) (k : Fin m → ℕ) (j : Fin m) :
-    f j * ∏ i, (f i * g i + (1 - f i)) ^ k i = f j * g j ^ k j := by
-  rw [mul_eq_iff_mk hid]; simp only [map_prod, map_pow]
+theorem mul_prod_eq
+    (hid : ∀ i, f i * f i = f i) (hor : ∀ i j, i ≠ j → f i * f j = 0) (g : Fin m → K)
+    (k : Fin m → ℕ) (j : Fin m)
+    : f j * ∏ i, (f i * g i + (1 - f i)) ^ k i = f j * g j ^ k j := by
+  rw [mul_eq_iff_mk hid]
+  simp only [map_prod, map_pow]
   rw [Finset.prod_eq_single j]
   · congr 1
-    rw [← mul_eq_iff_mk hid]; linear_combination (g j - 1) * hid j
+    rw [← mul_eq_iff_mk hid]
+    linear_combination (g j - 1) * hid j
   · intro i _ hij
     have h1 : Ideal.Quotient.mk (Ideal.span {1 - f j}) (f i * g i + (1 - f i)) = 1 := by
       rw [← map_one (Ideal.Quotient.mk (Ideal.span {1 - f j})), ← mul_eq_iff_mk hid]
@@ -67,10 +74,17 @@ theorem mul_prod_eq (hid : ∀ i, f i * f i = f i) (hor : ∀ i j, i ≠ j → f
 
 end Idem
 
-theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (μ : Measure A.K), μ.IsAddHaarMeasure → ∫⁻ z, (⨅ (s : A.Kˣ) (_ : (s : A.K) ∈ A.OK ∧ (s : A.K) * z ∈ A.OK ∧ ∃ α ∈ A.OK, ∃ β ∈ A.OK, α * s + β * (s * z) = 1), ENNReal.ofReal (A.absK s)) ^ 2 ∂μ < ⊤ := by
+theorem height_sq_lintegral_lt_top
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (μ : Measure A.K),
+      μ.IsAddHaarMeasure
+        → ∫⁻ z, (⨅ (s : A.Kˣ) (_ : (s : A.K) ∈ A.OK ∧ (s : A.K) * z ∈ A.OK ∧ ∃ α ∈ A.OK, ∃ β ∈ A.OK, α * s + β * (s * z) = 1), ENNReal.ofReal (A.absK s)) ^ 2 ∂μ
+          < ⊤ := by
   intro F E _ _ _ _ hU A μ hμ
   classical
-  haveI := hU.ultraF; haveI := hU.lcF; haveI := hU.charZero
+  haveI := hU.ultraF
+  haveI := hU.lcF
+  haveI := hU.charZero
   haveI : ProperSpace F := .of_nontriviallyNormedField_of_weaklyLocallyCompactSpace F
   haveI : IsTopologicalAddGroup A.K := IsModuleTopology.topologicalAddGroup F A.K
   haveI : ContinuousSMul F A.K := IsModuleTopology.toContinuousSMul F A.K
@@ -78,13 +92,19 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
   haveI : T2Space A.K := .of_injective_continuous b.equivFun.injective
     (IsModuleTopology.continuous_of_linearMap b.equivFun.toLinearMap)
   haveI : SecondCountableTopology A.K := b.equivFunL.toHomeomorph.secondCountableTopology
-  obtain ⟨-, -, -, -, -, -, -, -, -, hOo, hOc, R, hR⟩ := GlobalTheory.T.etaleHermitianPair_structure_facts F E A
+  obtain ⟨-, -, -, -, -, -, -, -, -, hOo, hOc, R, hR⟩ :=
+    GlobalTheory.T.etaleHermitianPair_structure_facts F E A
   obtain ⟨m, f, hid, hor, hsum, hsc, hvp⟩ :=
-    GlobalTheory.T.idempotent_decomposition_of_integrality F E A (fun k _ _ _ y hy => GlobalTheory.T.isIntegral_or_inv_isIntegral_finite_ext_ultrametric F k y hy)
+    GlobalTheory.T.idempotent_decomposition_of_integrality F E A (fun k _ _ _ y hy =>
+      GlobalTheory.T.isIntegral_or_inv_isIntegral_finite_ext_ultrametric F k y hy)
   have hOR : ∀ x, x ∈ A.OK ↔ x ∈ R := fun x => by rw [← hR, SetLike.mem_coe]
   have hfR : ∀ i, f i ∈ R := fun i => by
     rw [← hOR, Et.mem_OK_iff_isIntegral]
-    refine ⟨Polynomial.X ^ 2 - Polynomial.X, Polynomial.monic_X_pow_sub (by rw [Polynomial.degree_X]; norm_num), ?_⟩
+    refine ⟨
+      Polynomial.X ^ 2 - Polynomial.X,
+      Polynomial.monic_X_pow_sub (by rw [Polynomial.degree_X]; norm_num),
+      ?_
+    ⟩
     simp [sq, hid i]
   obtain ⟨π, hπ0, hπ1⟩ := NormedField.exists_norm_lt_one F
   have hπ : π ≠ 0 := norm_pos_iff.1 hπ0
@@ -94,12 +114,17 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
     rw [← hOR, Et.mem_OK_iff_isIntegral]
     have hmem : π ∈ (NormedField.valuation (K := F)).integer := by
       rw [Valuation.mem_integer_iff, NormedField.valuation_apply]; exact_mod_cast hπ1.le
-    exact (isIntegral_algebraMap (R := (NormedField.valuation (K := F)).integer) (A := A.K) (x := ⟨π, hmem⟩) : _)
+    exact (isIntegral_algebraMap (R := (NormedField.valuation (K := F)).integer) (A := A.K)
+        (x := ⟨π, hmem⟩)
+      : _)
   set p := algebraMap F A.K π with hp
   set p' := algebraMap F A.K π⁻¹ with hp'
-  let u : Fin m → A.Kˣ := fun i => ⟨f i * p + (1 - f i), f i * p' + (1 - f i),
+  let u : Fin m → A.Kˣ := fun i => ⟨
+    f i * p + (1 - f i),
+    f i * p' + (1 - f i),
     by linear_combination (f i * f i) * hpp + (2 - p - p') * hid i,
-    by linear_combination (f i * f i) * hpp + (2 - p - p') * hid i⟩
+    by linear_combination (f i * f i) * hpp + (2 - p - p') * hid i
+  ⟩
   have hu : ∀ i, ((u i : A.Kˣ) : A.K) = f i * p + (1 - f i) := fun i => rfl
   have huR : ∀ i, ((u i : A.Kˣ) : A.K) ∈ R := fun i => by
     rw [hu]; exact R.add_mem (R.mul_mem (hfR i) hpR) (R.sub_mem R.one_mem (hfR i))
@@ -142,7 +167,8 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
       by_contra hc
       have hc' : 1 ≤ (distribHaarChar A.K (u i) : ℝ≥0∞) := not_lt.1 hc
       have h5 : 1 * μ A.OK ≤ (distribHaarChar A.K (u i) : ℝ≥0∞) * μ A.OK := by gcongr
-      rw [one_mul] at h5; exact absurd hlt (not_lt.2 h5)
+      rw [one_mul] at h5
+      exact absurd hlt (not_lt.2 h5)
     exact_mod_cast h4
   have hex : ∀ z : A.K, ∀ i, ∃ n : ℕ, π ^ n • (f i * z) ∈ A.OK := by
     intro z i
@@ -158,9 +184,10 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
   have hsmul : ∀ (k : ℕ) (x : A.K), π ^ k • x = p ^ k * x := fun k x => by
     rw [Algebra.smul_def, map_pow]
   have hrep : ∀ x : A.K, x = ∑ j, f j * x := fun x => by rw [← Finset.sum_mul, hsum, one_mul]
-  have hkey : ∀ z : A.K, ∃ s : A.Kˣ, ((s : A.K) ∈ A.OK ∧ (s : A.K) * z ∈ A.OK ∧
-      ∃ α ∈ A.OK, ∃ β ∈ A.OK, α * s + β * (s * z) = 1) ∧
-      distribHaarChar A.K s ≤ ∏ i, distribHaarChar A.K (u i) ^ (N z i - 1) := by
+  have hkey
+      : ∀ z : A.K, ∃ s : A.Kˣ,
+        ((s : A.K) ∈ A.OK ∧ (s : A.K) * z ∈ A.OK ∧ ∃ α ∈ A.OK, ∃ β ∈ A.OK, α * s + β * (s * z) = 1)
+          ∧ distribHaarChar A.K s ≤ ∏ i, distribHaarChar A.K (u i) ^ (N z i - 1) := by
     intro z
     set n := N z with hn
     have hn0 : ∀ i, π ^ n i • (f i * z) ∈ A.OK := fun i => hNspec z i
@@ -177,11 +204,13 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
     obtain ⟨c, hc⟩ : ∃ c : Fin m → A.K, ∀ i, c i = if n i = 0 then 1 else π ^ (n i - 1) • z :=
       ⟨_, fun i => rfl⟩
     have haR : ∀ i, a i ∈ R := fun i => by
-      rw [ha]; split_ifs
+      rw [ha]
+      split_ifs
       · exact R.one_mem
       · exact hwR i
     have hac : ∀ i, f i * (a i * c i) = f i := fun i => by
-      rw [ha, hc]; split_ifs with hi
+      rw [ha, hc]
+      split_ifs with hi
       · ring
       · linear_combination hwf i hi
     obtain ⟨σ, hσ⟩ : ∃ σ : A.K, σ = ∑ i, f i * a i := ⟨_, rfl⟩
@@ -190,7 +219,9 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
     have hfσ' : ∀ j, f j * σ' = f j * c j := fun j => by rw [hσ']; exact mul_sum_eq hid hor c j
     have hσσ : σ * σ' = 1 := by
       refine eq_of_mul_eq hsum fun j => ?_
-      calc f j * (σ * σ') = (f j * σ) * σ' := by ring
+      calc
+        f j * (σ * σ')
+          = (f j * σ) * σ' := by ring
         _ = a j * (f j * σ') := by rw [hfσ]; ring
         _ = f j * (a j * c j) := by rw [hfσ']; ring
         _ = f j * 1 := by rw [hac, mul_one]
@@ -198,7 +229,8 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
     have hσR : σ ∈ R := by rw [hσ]; exact R.sum_mem fun i _ => R.mul_mem (hfR i) (haR i)
     let q : A.Kˣ := ∏ i, u i ^ (n i - 1)
     have hfq : ∀ j, f j * (q : A.K) = f j * p ^ (n j - 1) := fun j => by
-      rw [Units.coe_prod]; simp only [Units.val_pow_eq_pow_val]
+      rw [Units.coe_prod]
+      simp only [Units.val_pow_eq_pow_val]
       exact mul_prod_eq hid hor (fun _ => p) (fun i => n i - 1) j
     have hqR : (q : A.K) ∈ R := by
       rw [Units.coe_prod]
@@ -206,7 +238,9 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
     have hsval : ((σU * q : A.Kˣ) : A.K) = σ * q := rfl
     have hfs : ∀ j, f j * ((σU * q : A.Kˣ) : A.K) = a j * (f j * p ^ (n j - 1)) := fun j => by
       rw [hsval, ← hfq]
-      calc f j * (σ * q) = (f j * σ) * q := by ring
+      calc
+        f j * (σ * q)
+          = (f j * σ) * q := by ring
         _ = _ := by rw [hfσ]; ring
     have hfs0 : ∀ j, n j = 0 → f j * ((σU * q : A.Kˣ) : A.K) = f j := fun j hj => by
       rw [hfs, ha, if_pos hj, hj]; simp
@@ -217,31 +251,43 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
       · rw [ha, if_pos hj, hj]; simp
       · have h1 := hwf j hj
         rw [hsmul] at h1
-        rw [ha, if_neg hj]; linear_combination h1
+        rw [ha, if_neg hj]
+        linear_combination h1
     refine ⟨σU * q, ⟨?_, ?_, ?_⟩, ?_⟩
     · rw [hOR, hsval]; exact R.mul_mem hσR hqR
     · rw [hOR, hrep (((σU * q : A.Kˣ) : A.K) * z)]
       refine R.sum_mem fun j _ => ?_
-      rw [hfsz]; split_ifs with hj
+      rw [hfsz]
+      split_ifs with hj
       · have h1 := hn0 j; rw [hj, pow_zero, one_smul, hOR] at h1; exact h1
       · exact hfR j
-    · refine ⟨∑ i, f i * (if n i = 0 then 1 else 0), ?_, ∑ i, f i * (if n i = 0 then 0 else 1), ?_,
-        eq_of_mul_eq hsum fun j => ?_⟩
-      · rw [hOR]; refine R.sum_mem fun i _ => R.mul_mem (hfR i) ?_
+    · refine ⟨
+        ∑ i, f i * (if n i = 0 then 1 else 0),
+        ?_,
+        ∑ i, f i * (if n i = 0 then 0 else 1),
+        ?_,
+        eq_of_mul_eq hsum fun j => ?_
+      ⟩
+      · rw [hOR]
+        refine R.sum_mem fun i _ => R.mul_mem (hfR i) ?_
         split_ifs
         · exact R.one_mem
         · exact R.zero_mem
-      · rw [hOR]; refine R.sum_mem fun i _ => R.mul_mem (hfR i) ?_
+      · rw [hOR]
+        refine R.sum_mem fun i _ => R.mul_mem (hfR i) ?_
         split_ifs
         · exact R.zero_mem
         · exact R.one_mem
-      · have e1 : ∀ (x y X Y : A.K), f j * (x * X + y * Y) = (f j * x) * X + (f j * y) * Y :=
-          fun x y X Y => by ring
+      · have e1
+            : ∀ (x y X Y : A.K),
+              f j * (x * X + y * Y) = (f j * x) * X + (f j * y) * Y := fun x y X Y => by
+          ring
         rw [e1, mul_sum_eq hid hor, mul_sum_eq hid hor]
         split_ifs with hj
         · rw [mul_one, mul_zero, zero_mul, add_zero, hfs0 j hj]
         · rw [mul_zero, zero_mul, zero_add, mul_one, hfsz, if_neg hj]
-    · rw [map_mul, map_prod]; simp only [map_pow]
+    · rw [map_mul, map_prod]
+      simp only [map_pow]
       exact mul_le_of_le_one_left zero_le (hle1 σU hσR)
 
   set C : Fin m → ℝ≥0∞ := fun i => (distribHaarChar A.K (u i) : ℝ≥0∞) with hCdef
@@ -251,7 +297,9 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
     rw [← ENNReal.coe_mul, ← map_mul, mul_inv_cancel, map_one, ENNReal.coe_one]
   have hC1 : ∀ i, C i < 1 := fun i => ENNReal.coe_lt_one_iff.2 (hlt1 i)
   have hD1 : ∀ i, 1 ≤ D i := fun i => by
-    calc (1 : ℝ≥0∞) = C i * D i := (hCD i).symm
+    calc
+      (1 : ℝ≥0∞)
+        = C i * D i := (hCD i).symm
       _ ≤ 1 * D i := by gcongr; exact (hC1 i).le
       _ = D i := one_mul _
   have hpow : ∀ i (k : ℕ), C i ^ (k - 1) ≤ D i * C i ^ k := fun i k => by
@@ -262,7 +310,9 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
         hCD, mul_one]
   let Q : (Fin m → ℕ) → A.Kˣ := fun k => ∏ i, u i ^ k i
   have hfQ : ∀ k j, f j * (Q k : A.K) = f j * p ^ k j := fun k j => by
-    simp only [Q]; rw [Units.coe_prod]; simp only [Units.val_pow_eq_pow_val]
+    simp only [Q]
+    rw [Units.coe_prod]
+    simp only [Units.val_pow_eq_pow_val]
     exact mul_prod_eq hid hor (fun _ => p) k j
   let S : (Fin m → ℕ) → Set A.K := fun k => {z | (Q k : A.K) * z ∈ A.OK}
   have hzS : ∀ z, z ∈ S (N z) := fun z => by
@@ -271,23 +321,29 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
     refine R.sum_mem fun j _ => ?_
     have h1 := hNspec z j
     rw [hsmul, hOR] at h1
-    have e : f j * ((Q (N z) : A.K) * z) = p ^ N z j * (f j * z) := by
-      rw [← mul_assoc, hfQ]; ring
-    rw [e]; exact h1
+    have e : f j * ((Q (N z) : A.K) * z) = p ^ N z j * (f j * z) := by rw [← mul_assoc, hfQ]; ring
+    rw [e]
+    exact h1
   have hSm : ∀ k, MeasurableSet (S k) := fun k =>
     (hOo.preimage (continuous_const_mul _)).measurableSet
   have hμS : ∀ k, μ (S k) = (∏ i, D i ^ k i) * μ A.OK := fun k => by
     have hset : S k = (Q k)⁻¹ • A.OK := by
       ext z; rw [Set.mem_smul_set_iff_inv_smul_mem, inv_inv, Units.smul_def]; rfl
-    have hinv : (Q k)⁻¹ = ∏ i, (u i)⁻¹ ^ k i := by
-      simp only [Q, ← Finset.prod_inv_distrib, inv_pow]
+    have hinv : (Q k)⁻¹ = ∏ i, (u i)⁻¹ ^ k i := by simp only [Q, ← Finset.prod_inv_distrib, inv_pow]
     rw [hset, ← distribHaarChar_mul μ, hinv]
     simp only [hDdef, map_prod, map_pow, ENNReal.ofNNReal_finsetProd, ENNReal.coe_pow]
-  refine lt_of_le_of_lt (lintegral_mono (g := fun z => ∑' k : Fin m → ℕ,
-    (S k).indicator (fun _ => (∏ i, D i) ^ 2 * ∏ i, (C i ^ k i) ^ 2) z) fun z => ?_) ?_
+  refine lt_of_le_of_lt
+    (lintegral_mono
+      (g := fun z =>
+        ∑' k : Fin m → ℕ,
+          (S k).indicator (fun _ => (∏ i, D i) ^ 2 * ∏ i, (C i ^ k i) ^ 2) z)
+      fun z => ?_)
+    ?_
   · obtain ⟨s, hs, hsle⟩ := hkey z
-    have h1 : (⨅ (s : A.Kˣ) (_ : (s : A.K) ∈ A.OK ∧ (s : A.K) * z ∈ A.OK ∧ ∃ α ∈ A.OK, ∃ β ∈ A.OK,
-        α * s + β * (s * z) = 1), ENNReal.ofReal (A.absK s)) ≤ ∏ i, C i ^ (N z i - 1) := by
+    have h1
+        : (⨅ (s : A.Kˣ) (_ : (s : A.K) ∈ A.OK ∧ (s : A.K) * z ∈ A.OK ∧ ∃ α ∈ A.OK, ∃ β ∈ A.OK,
+            α * s + β * (s * z) = 1), ENNReal.ofReal (A.absK s))
+          ≤ ∏ i, C i ^ (N z i - 1) := by
       refine (iInf₂_le s hs).trans ?_
       have e : A.absK (s : A.K) = distribHaarChar A.K s := by simp [Et.absK]
       rw [e, ENNReal.ofReal_coe_nnreal]
@@ -299,18 +355,24 @@ theorem height_sq_lintegral_lt_top : ∀ (F E : Type) [NontriviallyNormedField F
     rw [Set.indicator_of_mem (hzS z), Finset.prod_pow, ← mul_pow]
     exact pow_le_pow_left₀ zero_le (h1.trans h2) 2
   · rw [lintegral_tsum (fun k => (measurable_const.indicator (hSm k)).aemeasurable)]
-    have hterm : ∀ k : Fin m → ℕ, ∫⁻ z, (S k).indicator (fun _ => (∏ i, D i) ^ 2 * ∏ i, (C i ^ k i) ^ 2) z ∂μ
-        = ((∏ i, D i) ^ 2 * μ A.OK) * ∏ i, C i ^ k i := by
+    have hterm
+        : ∀ k : Fin m → ℕ,
+          ∫⁻ z, (S k).indicator (fun _ => (∏ i, D i) ^ 2 * ∏ i, (C i ^ k i) ^ 2) z ∂μ
+            = ((∏ i, D i) ^ 2 * μ A.OK) * ∏ i, C i ^ k i := by
       intro k
       rw [lintegral_indicator_const (hSm k), hμS]
       have e : (∏ i, (C i ^ k i) ^ 2) * ∏ i, D i ^ k i = ∏ i, C i ^ k i := by
-        rw [← Finset.prod_mul_distrib]; refine Finset.prod_congr rfl fun i _ => ?_
+        rw [← Finset.prod_mul_distrib]
+        refine Finset.prod_congr rfl fun i _ => ?_
         rw [sq, mul_assoc, ← mul_pow, hCD, one_pow, mul_one]
-      calc _ = (∏ i, D i) ^ 2 * μ A.OK * ((∏ i, (C i ^ k i) ^ 2) * ∏ i, D i ^ k i) := by ring
+      calc
+        _ = (∏ i, D i) ^ 2 * μ A.OK * ((∏ i, (C i ^ k i) ^ 2) * ∏ i, D i ^ k i) := by ring
         _ = _ := by rw [e]
     rw [tsum_congr hterm, ENNReal.tsum_mul_left]
-    refine ENNReal.mul_lt_top (ENNReal.mul_lt_top (ENNReal.pow_lt_top
-      (ENNReal.prod_lt_top fun i _ => ENNReal.coe_lt_top)) hμOt.lt_top) ?_
+    refine ENNReal.mul_lt_top
+      (ENNReal.mul_lt_top (ENNReal.pow_lt_top (ENNReal.prod_lt_top fun i _ => ENNReal.coe_lt_top))
+        hμOt.lt_top)
+      ?_
     refine lt_of_le_of_lt (tsum_pi_prod_le' (fun i (x : ℕ) => C i ^ x)) ?_
     refine ENNReal.prod_lt_top fun i _ => ?_
     rw [ENNReal.tsum_geometric]

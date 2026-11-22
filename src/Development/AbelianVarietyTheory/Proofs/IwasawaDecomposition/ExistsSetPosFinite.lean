@@ -7,15 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.Mem.Vol
+open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain
+  NumberField Matrix GlobalTheory.Mem.Vol
 open scoped TensorProduct
 
 namespace GlobalTheory.Mem.VolUnique
 
-theorem haar_eq_of_eq_on_set {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    (μ μ' : Measure G) [μ.IsHaarMeasure] [μ'.IsHaarMeasure] (S : Set G) (h : μ S = μ' S)
-    (h0 : μ' S ≠ 0) (ht : μ' S ≠ ⊤) : μ = μ' := by
+theorem haar_eq_of_eq_on_set
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (μ μ' : Measure G) [μ.IsHaarMeasure] [μ'.IsHaarMeasure]
+    (S : Set G) (h : μ S = μ' S) (h0 : μ' S ≠ 0) (ht : μ' S ≠ ⊤)
+    : μ = μ' := by
   have hμ := Measure.isMulLeftInvariant_eq_smul μ μ'
   have hc : ((Measure.haarScalarFactor μ μ' : NNReal) : ENNReal) = 1 := by
     have h1 : μ S = (Measure.haarScalarFactor μ μ' : ENNReal) * μ' S := by
@@ -26,14 +30,21 @@ theorem haar_eq_of_eq_on_set {G : Type} [Group G] [TopologicalSpace G] [IsTopolo
   have hc' : Measure.haarScalarFactor μ μ' = 1 := by exact_mod_cast hc
   rw [hμ, hc', one_smul]
 
-theorem exists_set_pos_finite (cd : CDHaar) (P Q : ℕ) :
-    ∃ B : Set (UpqT P Q), MeasurableSet B ∧ cd.cd P Q B ≠ 0 ∧ cd.cd P Q B ≠ ⊤ := by
+theorem exists_set_pos_finite (cd : CDHaar) (P Q : ℕ)
+    : ∃ B : Set (UpqT P Q), MeasurableSet B ∧ cd.cd P Q B ≠ 0 ∧ cd.cd P Q B ≠ ⊤ := by
   obtain ⟨_, _, _, _, _, _⟩ := GlobalTheory.UpqTopology.upq_lcsc P Q
   haveI := cd.haar P Q
   obtain ⟨K, hK, hK1⟩ := exists_compact_mem_nhds (1 : UpqT P Q)
   exact ⟨K, hK.measurableSet, (Measure.measure_pos_of_mem_nhds _ hK1).ne', hK.measure_lt_top.ne⟩
 
-theorem volMeas_unique : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (cm : CMData F E) (I : Type) [Fintype I] (τ : I → (E →+* ℂ)) (cd : CDHaar) (W : HSpace E), IsCMFam τ → W.SigOK → ∀ μ μ', IsVolMeasF cm τ cd W (fun ρ => (W.sig (τ ρ)).1) (fun ρ => (W.sig (τ ρ)).2) μ → IsVolMeasF cm τ cd W (fun ρ => (W.sig (τ ρ)).1) (fun ρ => (W.sig (τ ρ)).2) μ' → μ = μ' := by
+theorem volMeas_unique
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+        (cm : CMData F E) (I : Type) [Fintype I] (τ : I → (E →+* ℂ)) (cd : CDHaar) (W : HSpace E),
+      IsCMFam τ → W.SigOK
+        → ∀ μ μ',
+          IsVolMeasF cm τ cd W (fun ρ => (W.sig (τ ρ)).1) (fun ρ => (W.sig (τ ρ)).2) μ
+            → IsVolMeasF cm τ cd W (fun ρ => (W.sig (τ ρ)).1) (fun ρ => (W.sig (τ ρ)).2) μ'
+            → μ = μ' := by
   intro F E _ _ _ _ _ _ cm I _ τ cd W _ _ μ μ' hμ hμ'
   obtain ⟨hH, ⟨θ, hθ⟩, hall⟩ := hμ
   obtain ⟨hH', -, hall'⟩ := hμ'

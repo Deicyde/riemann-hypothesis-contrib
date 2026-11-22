@@ -8,8 +8,8 @@ namespace PI.TailWork
 
 open Finset
 
-theorem sum_log_block (n : ℕ) :
-    ∑ p ∈ (Ioc n (2 * n)).filter Nat.Prime, Real.log (p : ℝ) ≤ (n : ℝ) * Real.log 4 := by
+theorem sum_log_block (n : ℕ)
+    : ∑ p ∈ (Ioc n (2 * n)).filter Nat.Prime, Real.log (p : ℝ) ≤ (n : ℝ) * Real.log 4 := by
   classical
   have hdvd : (∏ p ∈ (Ioc n (2 * n)).filter Nat.Prime, p) ∣ Nat.centralBinom n := by
     apply Finset.prod_primes_dvd
@@ -39,8 +39,8 @@ noncomputable def g (n : ℕ) : ℝ := 1 / ((n : ℝ) * ((n : ℝ) - 1))
 
 noncomputable def h (n : ℕ) : ℝ := 1 / ((n : ℝ) - 1) + 1 / (n : ℝ)
 
-theorem sum_Ico_tele (f : ℕ → ℝ) (a b : ℕ) (hab : a ≤ b) :
-    ∑ n ∈ Ico a b, (f n - f (n + 1)) = f a - f b := by
+theorem sum_Ico_tele (f : ℕ → ℝ) (a b : ℕ) (hab : a ≤ b)
+    : ∑ n ∈ Ico a b, (f n - f (n + 1)) = f a - f b := by
   induction b, hab using Nat.le_induction with
   | base => simp
   | succ b hab ih =>
@@ -67,9 +67,8 @@ theorem w_mul (n : ℕ) (hn : 2 ≤ n) : (g n - g (n + 1)) * (n : ℝ) = h n - h
   field_simp
   ring
 
-theorem weighted (k : ℕ) (hk : 1 ≤ k) (Q : Finset ℕ)
-    (hQ : ∀ p ∈ Q, p.Prime ∧ 2 * k + 1 ≤ p) :
-    ∑ p ∈ Q, Real.log (p : ℝ) * (g ((p + 1) / 2) - g p)
+theorem weighted (k : ℕ) (hk : 1 ≤ k) (Q : Finset ℕ) (hQ : ∀ p ∈ Q, p.Prime ∧ 2 * k + 1 ≤ p)
+    : ∑ p ∈ Q, Real.log (p : ℝ) * (g ((p + 1) / 2) - g p)
       ≤ Real.log 4 * (1 / (k : ℝ) + 1 / ((k : ℝ) + 1)) := by
   classical
   set N := k + 1 + Q.sup id + 1 with hN
@@ -77,9 +76,10 @@ theorem weighted (k : ℕ) (hk : 1 ≤ k) (Q : Finset ℕ)
     intro p hp
     have := (hQ p hp).2
     rw [sum_Ico_tele g _ _ (by omega)]
-  have hL : ∑ p ∈ Q, Real.log (p : ℝ) * (g ((p + 1) / 2) - g p)
-      = ∑ m ∈ Ico (k + 1) N, (g m - g (m + 1)) *
-          ∑ p ∈ Q.filter (fun p => (p + 1) / 2 ≤ m ∧ m < p), Real.log (p : ℝ) := by
+  have hL
+      : ∑ p ∈ Q, Real.log (p : ℝ) * (g ((p + 1) / 2) - g p)
+        = ∑ m ∈ Ico (k + 1) N, (g m - g (m + 1)) *
+            ∑ p ∈ Q.filter (fun p => (p + 1) / 2 ≤ m ∧ m < p), Real.log (p : ℝ) := by
     rw [Finset.sum_congr rfl (fun p hp => by rw [hw p hp, Finset.mul_sum])]
     rw [Finset.sum_comm' (t' := Ico (k + 1) N)
       (s' := fun m => Q.filter (fun p => (p + 1) / 2 ≤ m ∧ m < p))]
@@ -96,13 +96,15 @@ theorem weighted (k : ℕ) (hk : 1 ≤ k) (Q : Finset ℕ)
       · rintro ⟨⟨hp, h1, h2⟩, _, _⟩
         exact ⟨hp, h1, h2⟩
   rw [hL]
-  have hb : ∀ m ∈ Ico (k + 1) N, (g m - g (m + 1)) *
-      ∑ p ∈ Q.filter (fun p => (p + 1) / 2 ≤ m ∧ m < p), Real.log (p : ℝ)
-        ≤ Real.log 4 * (h m - h (m + 1)) := by
+  have hb
+      : ∀ m ∈ Ico (k + 1) N,
+        (g m - g (m + 1)) * ∑ p ∈ Q.filter (fun p => (p + 1) / 2 ≤ m ∧ m < p), Real.log (p : ℝ)
+          ≤ Real.log 4 * (h m - h (m + 1)) := by
     intro m hm
     have hm2 : 2 ≤ m := by simp only [Finset.mem_Ico] at hm; omega
-    have hin : ∑ p ∈ Q.filter (fun p => (p + 1) / 2 ≤ m ∧ m < p), Real.log (p : ℝ)
-        ≤ (m : ℝ) * Real.log 4 := by
+    have hin
+        : ∑ p ∈ Q.filter (fun p => (p + 1) / 2 ≤ m ∧ m < p), Real.log (p : ℝ)
+          ≤ (m : ℝ) * Real.log 4 := by
       refine le_trans ?_ (sum_log_block m)
       apply Finset.sum_le_sum_of_subset_of_nonneg
       · intro p hp
@@ -110,8 +112,9 @@ theorem weighted (k : ℕ) (hk : 1 ≤ k) (Q : Finset ℕ)
         exact ⟨⟨hp.2.2, by omega⟩, (hQ p hp.1).1⟩
       · intro p _ _
         exact Real.log_natCast_nonneg p
-    calc _ ≤ (g m - g (m + 1)) * ((m : ℝ) * Real.log 4) :=
-          mul_le_mul_of_nonneg_left hin (w_nonneg m hm2)
+    calc
+      _ ≤ (g m - g (m + 1)) * ((m : ℝ) * Real.log 4) :=
+        mul_le_mul_of_nonneg_left hin (w_nonneg m hm2)
       _ = Real.log 4 * ((g m - g (m + 1)) * m) := by ring
       _ = _ := by rw [w_mul m hm2]
   refine (Finset.sum_le_sum hb).trans ?_
@@ -137,8 +140,8 @@ theorem log_four_lt : Real.log 4 < 1.3863 := by
   norm_num at h2 ⊢
   linarith
 
-theorem weight_ge (k p : ℕ) (hk : 1 ≤ k) (hp : 2 * k + 1 ≤ p) (hodd : p % 2 = 1) :
-    (3 - 1 / (2 * (k : ℝ) + 1)) / (p : ℝ) ^ 2 ≤ g ((p + 1) / 2) - g p := by
+theorem weight_ge (k p : ℕ) (hk : 1 ≤ k) (hp : 2 * k + 1 ≤ p) (hodd : p % 2 = 1)
+    : (3 - 1 / (2 * (k : ℝ) + 1)) / (p : ℝ) ^ 2 ≤ g ((p + 1) / 2) - g p := by
   obtain ⟨j, rfl⟩ : ∃ j, p = 2 * j + 1 := ⟨p / 2, by omega⟩
   have hq : (2 * j + 1 + 1) / 2 = j + 1 := by omega
   rw [hq]
@@ -153,23 +156,24 @@ theorem weight_ge (k p : ℕ) (hk : 1 ≤ k) (hp : 2 * k + 1 ≤ p) (hodd : p % 
     have : 1 / (2 * (j : ℝ) + 1) ≤ 1 / (2 * (k : ℝ) + 1) :=
       one_div_le_one_div_of_le (by positivity) (by linarith)
     linarith
-  have key : 1 / (((j : ℝ) + 1) * j) - 1 / ((2 * (j : ℝ) + 1) * (2 * j))
-      - (3 - 1 / (2 * (j : ℝ) + 1)) / (2 * (j : ℝ) + 1) ^ 2
-      = (6 * (j : ℝ) + 2) / ((2 * (j : ℝ) + 1) ^ 3 * (4 * j * (j + 1))) := by
+  have key
+      : 1 / (((j : ℝ) + 1) * j) - 1 / ((2 * (j : ℝ) + 1) * (2 * j))
+          - (3 - 1 / (2 * (j : ℝ) + 1)) / (2 * (j : ℝ) + 1) ^ 2
+        = (6 * (j : ℝ) + 2) / ((2 * (j : ℝ) + 1) ^ 3 * (4 * j * (j + 1))) := by
     have : (j : ℝ) ≠ 0 := by linarith
     have : (j : ℝ) + 1 ≠ 0 := by linarith
     have : 2 * (j : ℝ) + 1 ≠ 0 := by linarith
     field_simp
     ring
   have hpos : 0 ≤ (6 * (j : ℝ) + 2) / ((2 * (j : ℝ) + 1) ^ 3 * (4 * j * (j + 1))) := by positivity
-  have hstep : (3 - 1 / (2 * (k : ℝ) + 1)) / (2 * (j : ℝ) + 1) ^ 2
-      ≤ (3 - 1 / (2 * (j : ℝ) + 1)) / (2 * (j : ℝ) + 1) ^ 2 :=
+  have hstep
+      : (3 - 1 / (2 * (k : ℝ) + 1)) / (2 * (j : ℝ) + 1) ^ 2
+        ≤ (3 - 1 / (2 * (j : ℝ) + 1)) / (2 * (j : ℝ) + 1) ^ 2 :=
     div_le_div_of_nonneg_right hmid (by positivity)
   linarith
 
-theorem tail_odd (k : ℕ) (hk : 3 ≤ k) (Q : Finset ℕ)
-    (hQ : ∀ p ∈ Q, p.Prime ∧ 2 * k + 1 ≤ p) :
-    ∑ p ∈ Q, Real.log (p : ℝ) / (p : ℝ) ^ 2 ≤ 2.04 / (2 * (k : ℝ) + 1) := by
+theorem tail_odd (k : ℕ) (hk : 3 ≤ k) (Q : Finset ℕ) (hQ : ∀ p ∈ Q, p.Prime ∧ 2 * k + 1 ≤ p)
+    : ∑ p ∈ Q, Real.log (p : ℝ) / (p : ℝ) ^ 2 ≤ 2.04 / (2 * (k : ℝ) + 1) := by
   have hk1 : 1 ≤ k := by omega
   have hW := weighted k hk1 Q hQ
   have hkR : (3 : ℝ) ≤ k := by exact_mod_cast hk
@@ -178,8 +182,10 @@ theorem tail_odd (k : ℕ) (hk : 3 ≤ k) (Q : Finset ℕ)
       rw [div_le_one (by positivity)]
       linarith
     linarith
-  have hterm : ∀ p ∈ Q, Real.log (p : ℝ) / (p : ℝ) ^ 2
-      ≤ Real.log (p : ℝ) * (g ((p + 1) / 2) - g p) / (3 - 1 / (2 * (k : ℝ) + 1)) := by
+  have hterm
+      : ∀ p ∈ Q,
+        Real.log (p : ℝ) / (p : ℝ) ^ 2
+          ≤ Real.log (p : ℝ) * (g ((p + 1) / 2) - g p) / (3 - 1 / (2 * (k : ℝ) + 1)) := by
     intro p hp
     obtain ⟨hpr, hpk⟩ := hQ p hp
     have hodd : p % 2 = 1 := by
@@ -189,13 +195,15 @@ theorem tail_odd (k : ℕ) (hk : 3 ≤ k) (Q : Finset ℕ)
     have hwg := weight_ge k p hk1 hpk hodd
     have hlog : 0 ≤ Real.log (p : ℝ) := Real.log_natCast_nonneg p
     rw [le_div_iff₀ hcpos]
-    calc Real.log (p : ℝ) / (p : ℝ) ^ 2 * (3 - 1 / (2 * (k : ℝ) + 1))
+    calc
+      Real.log (p : ℝ) / (p : ℝ) ^ 2 * (3 - 1 / (2 * (k : ℝ) + 1))
         = Real.log (p : ℝ) * ((3 - 1 / (2 * (k : ℝ) + 1)) / (p : ℝ) ^ 2) := by ring
       _ ≤ _ := mul_le_mul_of_nonneg_left hwg hlog
   have hl := log_four_lt
   have hl0 : 0 ≤ Real.log 4 := Real.log_nonneg (by norm_num)
-  have e : Real.log 4 * (1 / (k : ℝ) + 1 / ((k : ℝ) + 1)) / (3 - 1 / (2 * (k : ℝ) + 1))
-      = Real.log 4 * (2 * (k : ℝ) + 1) ^ 2 / ((k : ℝ) * ((k : ℝ) + 1) * (6 * (k : ℝ) + 2)) := by
+  have e
+      : Real.log 4 * (1 / (k : ℝ) + 1 / ((k : ℝ) + 1)) / (3 - 1 / (2 * (k : ℝ) + 1))
+        = Real.log 4 * (2 * (k : ℝ) + 1) ^ 2 / ((k : ℝ) * ((k : ℝ) + 1) * (6 * (k : ℝ) + 2)) := by
     have : (k : ℝ) ≠ 0 := by linarith
     have : (k : ℝ) + 1 ≠ 0 := by linarith
     have : 2 * (k : ℝ) + 1 ≠ 0 := by linarith
@@ -209,17 +217,19 @@ theorem tail_odd (k : ℕ) (hk : 3 ≤ k) (Q : Finset ℕ)
   have A : Real.log 4 * (2 * (k : ℝ) + 1) ^ 3 ≤ 1.3863 * (2 * (k : ℝ) + 1) ^ 3 :=
     mul_le_mul_of_nonneg_right hl.le (by positivity)
   have hk3 : 0 ≤ (k : ℝ) - 3 := by linarith
-  have B : 1.3863 * (2 * (k : ℝ) + 1) ^ 3 ≤ 2.04 * ((k : ℝ) * ((k : ℝ) + 1) * (6 * (k : ℝ) + 2)) := by
+  have B
+      : 1.3863 * (2 * (k : ℝ) + 1) ^ 3 ≤ 2.04 * ((k : ℝ) * ((k : ℝ) + 1) * (6 * (k : ℝ) + 2)) := by
     nlinarith [mul_nonneg (mul_nonneg hk3 hk3) hk3, mul_nonneg hk3 hk3, hk3]
-  calc ∑ p ∈ Q, Real.log (p : ℝ) / (p : ℝ) ^ 2
-      ≤ ∑ p ∈ Q, Real.log (p : ℝ) * (g ((p + 1) / 2) - g p) / (3 - 1 / (2 * (k : ℝ) + 1)) :=
-        Finset.sum_le_sum hterm
+  calc
+    ∑ p ∈ Q, Real.log (p : ℝ) / (p : ℝ) ^ 2
+        ≤ ∑ p ∈ Q, Real.log (p : ℝ) * (g ((p + 1) / 2) - g p) / (3 - 1 / (2 * (k : ℝ) + 1)) :=
+      Finset.sum_le_sum hterm
     _ = (∑ p ∈ Q, Real.log (p : ℝ) * (g ((p + 1) / 2) - g p)) / (3 - 1 / (2 * (k : ℝ) + 1)) := by
-        rw [Finset.sum_div]
+      rw [Finset.sum_div]
     _ ≤ Real.log 4 * (1 / (k : ℝ) + 1 / ((k : ℝ) + 1)) / (3 - 1 / (2 * (k : ℝ) + 1)) :=
-        div_le_div_of_nonneg_right hW hcpos.le
+      div_le_div_of_nonneg_right hW hcpos.le
     _ ≤ 2.04 / (2 * (k : ℝ) + 1) := by
-        rw [e, div_le_div_iff₀ (by positivity) (by positivity)]
-        nlinarith [A, B]
+      rw [e, div_le_div_iff₀ (by positivity) (by positivity)]
+      nlinarith [A, B]
 
 end PI.TailWork

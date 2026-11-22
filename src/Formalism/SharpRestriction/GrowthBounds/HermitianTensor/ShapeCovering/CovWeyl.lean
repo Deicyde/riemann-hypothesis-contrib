@@ -108,9 +108,13 @@ private lemma cw_minor1 {K : Type} [Field K] {r n : ℕ} (s : ℕ) (hs : s ≤ n
 
 theorem first_column_polynomials_characterize : FirstColumnPolynomialsSpan := by
   intro K _ m P F hm
-  have hren : ∀ f : MvPolynomial (Fin (m + 1)) K, rename (fun i => (i, (0 : Fin (m + 1)))) f =
-      aeval (fun i => (X (i, (0 : Fin (m + 1))) : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K)) f :=
-    fun f => DFunLike.congr_fun (algHom_ext fun i => by simp) f
+  have hren
+      : ∀ f : MvPolynomial (Fin (m + 1)) K,
+        rename (fun i => (i, (0 : Fin (m + 1)))) f
+          = aeval
+            (fun i => (X (i, (0 : Fin (m + 1))) : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K))
+            f := fun f =>
+    DFunLike.congr_fun (algHom_ext fun i => by simp) f
   simp only [hren]
   constructor
   · refine cw_span_le _ P _ ?_ F
@@ -118,21 +122,30 @@ theorem first_column_polynomials_characterize : FirstColumnPolynomialsSpan := by
     have h0 : shapeDeg sz (0 : Fin (m + 1)) = P := by rw [hs]; simp
     have h1 : shapeDeg sz (⟨1, by omega⟩ : Fin (m + 1)) = 0 := by rw [hs]; simp [Fin.ext_iff]
     have hle : ∀ j, sz j ≤ 1 := cw_le_of_shape sz _ h1
-    have := cw_prod_aeval
-      (fun i => (X (i, (0 : Fin (m + 1))) : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K)) Finset.univ
-      (fun j => initMinor K (I j) (hsz j)) (fun j => if 0 < sz j then 1 else 0) ?_
+    have :=
+      cw_prod_aeval
+        (fun i => (X (i, (0 : Fin (m + 1))) : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K))
+        Finset.univ
+        (fun j => initMinor K (I j) (hsz j))
+        (fun j => if 0 < sz j then 1 else 0)
+        ?_
     · rw [cw_card, h0] at this
       exact this
     · intro j
       by_cases hj : 0 < sz j
       · refine ⟨X (I j ⟨0, hj⟩), by simpa [hj] using isHomogeneous_X K (I j ⟨0, hj⟩), ?_⟩
         rw [aeval_X, cw_minor1 _ _ hj (hle j)]
-      · exact ⟨1, by simpa [hj] using isHomogeneous_one (Fin (m + 1)) K,
-          by rw [map_one, cw_minor0 _ _ (by omega)]⟩
+      · exact ⟨
+          1,
+          by simpa [hj] using isHomogeneous_one (Fin (m + 1)) K,
+          by rw [map_one, cw_minor0 _ _ (by omega)]
+        ⟩
   · rintro ⟨f, hf, rfl⟩
-    have := cw_aeval_mem
-      (fun i => (X (i, (0 : Fin (m + 1))) : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K))
-      (ν := fun t => if t.val < 1 then 1 else 0) ?_ P f hf
+    have :=
+      cw_aeval_mem
+        (fun i => (X (i, (0 : Fin (m + 1))) : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K))
+        (ν := fun t => if t.val < 1 then 1 else 0)
+        ?_ P f hf
     · convert this using 2
       funext t
       by_cases ht : t = 0
@@ -215,23 +228,27 @@ theorem signed_minor_polynomials_characterize : SignedMinorPolynomialsSpan := by
       simp [this]
     have h2 : shapeDeg sz (Fin.last m) = 0 := by rw [hs]; simp
     have hle : ∀ j, sz j ≤ m := cw_le_of_shape sz _ h2
-    have hsub : Finset.univ.filter (fun j => m - 1 < sz j) ⊆ Finset.univ.filter (fun j => 0 < sz j) := by
+    have hsub
+        : Finset.univ.filter (fun j => m - 1 < sz j) ⊆ Finset.univ.filter (fun j => 0 < sz j) := by
       intro j hj
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hj ⊢
       omega
-    have heq := Finset.eq_of_subset_of_card_le hsub (by
-      have a0 : (Finset.univ.filter (fun j => 0 < sz j)).card = Q := h0
-      have a1 : (Finset.univ.filter (fun j => m - 1 < sz j)).card = Q := h1
-      rw [a0, a1])
+    have heq :=
+      Finset.eq_of_subset_of_card_le hsub (by
+        have a0 : (Finset.univ.filter (fun j => 0 < sz j)).card = Q := h0
+        have a1 : (Finset.univ.filter (fun j => m - 1 < sz j)).card = Q := h1
+        rw [a0, a1])
     have hm' : ∀ j, 0 < sz j → sz j = m := by
       intro j hj
-      have : j ∈ Finset.univ.filter (fun j => m - 1 < sz j) := by
-        rw [heq]; simpa using hj
+      have : j ∈ Finset.univ.filter (fun j => m - 1 < sz j) := by rw [heq]; simpa using hj
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at this
       have := hle j
       omega
-    have := cw_prod_aeval (covY K m) Finset.univ
-      (fun j => initMinor K (I j) (hsz j)) (fun j => if 0 < sz j then 1 else 0) ?_
+    have :=
+      cw_prod_aeval (covY K m) Finset.univ
+        (fun j => initMinor K (I j) (hsz j))
+        (fun j => if 0 < sz j then 1 else 0)
+        ?_
     · rw [cw_card, h0] at this
       exact this
     · intro j
@@ -240,8 +257,11 @@ theorem signed_minor_polynomials_characterize : SignedMinorPolynomialsSpan := by
         refine ⟨C ε * X i, by simpa [hj] using (isHomogeneous_X K i).C_mul ε, ?_⟩
         rw [map_mul, aeval_X, aeval_C, hi]
         rfl
-      · exact ⟨1, by simpa [hj] using isHomogeneous_one (Fin (m + 1)) K,
-          by rw [map_one, cw_minor0 _ _ (by omega)]⟩
+      · exact ⟨
+          1,
+          by simpa [hj] using isHomogeneous_one (Fin (m + 1)) K,
+          by rw [map_one, cw_minor0 _ _ (by omega)]
+        ⟩
   · rintro ⟨f, hf, rfl⟩
     have := cw_aeval_mem (covY K m) (cw_covY_mem m) Q f hf
     convert this using 2

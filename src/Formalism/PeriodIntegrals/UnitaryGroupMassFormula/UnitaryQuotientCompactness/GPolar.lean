@@ -59,16 +59,19 @@ theorem unitary_group_polar_decomposition : PolarUH := by
   have hSinv0 : 0 ≤ S⁻¹ := by
     have h := star_left_conjugate_nonneg hS0 S⁻¹
     rwa [Matrix.star_eq_conjTranspose, hSinvt, Matrix.mul_assoc, Matrix.mul_nonsing_inv S hSdet,
-      Matrix.mul_one] at h
+        Matrix.mul_one]
+      at h
   have hsq : (Hpk k r * S * Hpk k r) * (Hpk k r * S * Hpk k r) = S⁻¹ * S⁻¹ := by
     have h1 : Hpk k r * S * Hpk k r * (Hpk k r * S * Hpk k r) = Hpk k r * (gᴴ * g) * Hpk k r := by
-      calc Hpk k r * S * Hpk k r * (Hpk k r * S * Hpk k r)
+      calc
+        Hpk k r * S * Hpk k r * (Hpk k r * S * Hpk k r)
           = Hpk k r * S * (Hpk k r * Hpk k r) * S * Hpk k r := by simp only [Matrix.mul_assoc]
         _ = Hpk k r * (S * S) * Hpk k r := by rw [hHH, Matrix.mul_one]; simp only [Matrix.mul_assoc]
         _ = Hpk k r * (gᴴ * g) * Hpk k r := by rw [hSS]
     have h2 : S⁻¹ * S⁻¹ = (gᴴ * g)⁻¹ := by rw [← Matrix.mul_inv_rev, hSS]
     have h3 : Hpk k r * (gᴴ * g) * Hpk k r * (gᴴ * g) = 1 := by
-      calc Hpk k r * (gᴴ * g) * Hpk k r * (gᴴ * g)
+      calc
+        Hpk k r * (gᴴ * g) * Hpk k r * (gᴴ * g)
           = Hpk k r * ((gᴴ * g) * Hpk k r * (gᴴ * g)) := by simp only [Matrix.mul_assoc]
         _ = 1 := by rw [hAHA, hHH]
     rw [h1, h2, (Matrix.inv_eq_left_inv h3).symm]
@@ -77,14 +80,19 @@ theorem unitary_group_polar_decomposition : PolarUH := by
     show Sᴴ * Hpk k r * S = Hpk k r
     rw [hSt]
     have h5 : S * (Hpk k r * S * Hpk k r) = 1 := by rw [hTS, Matrix.mul_nonsing_inv S hSdet]
-    calc S * Hpk k r * S = S * Hpk k r * S * (Hpk k r * Hpk k r) := by rw [hHH, Matrix.mul_one]
+    calc
+      S * Hpk k r * S
+        = S * Hpk k r * S * (Hpk k r * Hpk k r) := by rw [hHH, Matrix.mul_one]
       _ = S * (Hpk k r * S * Hpk k r) * Hpk k r := by simp only [Matrix.mul_assoc]
       _ = Hpk k r := by rw [h5, Matrix.one_mul]
   refine ⟨g * S⁻¹, S, uh_mul hg (uh_inv hSU), ?_, hSU, hSt, ?_⟩
   · rw [Matrix.conjTranspose_mul, hSinvt]
-    calc S⁻¹ * gᴴ * (g * S⁻¹) = S⁻¹ * (gᴴ * g) * S⁻¹ := by simp only [Matrix.mul_assoc]
+    calc
+      S⁻¹ * gᴴ * (g * S⁻¹)
+        = S⁻¹ * (gᴴ * g) * S⁻¹ := by simp only [Matrix.mul_assoc]
       _ = S⁻¹ * S * (S * S⁻¹) := by rw [← hSS]; simp only [Matrix.mul_assoc]
-      _ = 1 := by rw [Matrix.nonsing_inv_mul S hSdet, Matrix.mul_nonsing_inv S hSdet, Matrix.one_mul]
+      _ = 1 := by
+        rw [Matrix.nonsing_inv_mul S hSdet, Matrix.mul_nonsing_inv S hSdet, Matrix.one_mul]
   · rw [Matrix.mul_assoc, Matrix.nonsing_inv_mul S hSdet, Matrix.mul_one]
 
 theorem unitary_group_modular_function_trivial : TrivG := by

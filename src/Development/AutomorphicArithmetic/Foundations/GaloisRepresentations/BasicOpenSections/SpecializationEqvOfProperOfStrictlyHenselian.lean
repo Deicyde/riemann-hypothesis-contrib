@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
-private theorem eqv_of_isIso_comp {R : Type} [CommRing R] {E E' E'' : Spc} (a : E ⟶ E') [IsIso a]
-    (b : E' ⟶ E'') (F : Shv R) (h : Eqv R b F) : Eqv R (a ≫ b) F := by
+private theorem eqv_of_isIso_comp
+    {R : Type} [CommRing R]
+    {E E' E'' : Spc} (a : E ⟶ E') [IsIso a]
+    (b : E' ⟶ E'') (F : Shv R) (h : Eqv R b F)
+    : Eqv R (a ≫ b) F := by
   intro n
   have hl : Function.LeftInverse (pull R (inv a) F n) (pull R a F n) := fun x => by
     rw [← pull_comp, IsIso.inv_hom_id, pull_id]
@@ -20,21 +23,28 @@ private theorem eqv_of_isIso_comp {R : Type} [CommRing R] {E E' E'' : Spc} (a : 
   rw [he]
   exact ha.comp (h n)
 
-theorem UpperTheory.Gal.Mod.specialization_eqv_of_proper_of_strictly_henselian :
-    GlobalTheory.EtC.E2 → ∀ (q : ℕ) (A : Type) [CommRing A] [IsLocalRing A], SH A → IsUnit (q : A) → ∀ (k : Type) [Field k] (r : A →+* k), Function.Surjective r → ∀ {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of A)) [IsProper p] (i : ℤ), Eqv _ (sch.map (pullback.fst p (Spec.map (CommRingCat.ofHom r)))) (tw q i) := by
+theorem UpperTheory.Gal.Mod.specialization_eqv_of_proper_of_strictly_henselian
+    : GlobalTheory.EtC.E2
+      → ∀ (q : ℕ) (A : Type) [CommRing A] [IsLocalRing A],
+        SH A → IsUnit (q : A)
+          → ∀ (k : Type) [Field k] (r : A →+* k),
+            Function.Surjective r
+              → ∀ {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of A)) [IsProper p] (i : ℤ),
+                Eqv _ (sch.map (pullback.fst p (Spec.map (CommRingCat.ofHom r)))) (tw q i) := by
   intro hE2 q A _ _ hSH hq k _ r hr X p _ i
   have hker : RingHom.ker r = IsLocalRing.maximalIdeal A :=
     IsLocalRing.eq_maximalIdeal (RingHom.ker_isMaximal_of_surjective r hr)
 
   let e0 : (A ⧸ RingHom.ker r) ≃+* k := RingHom.quotientKerEquivOfSurjective hr
-  let e1 : IsLocalRing.ResidueField A ≃+* (A ⧸ RingHom.ker r) :=
-    Ideal.quotEquivOfEq hker.symm
+  let e1 : IsLocalRing.ResidueField A ≃+* (A ⧸ RingHom.ker r) := Ideal.quotEquivOfEq hker.symm
   let e : IsLocalRing.ResidueField A ≃+* k := e1.trans e0
   have hfac : (e : IsLocalRing.ResidueField A →+* k).comp (IsLocalRing.residue A) = r := by
     ext x
     rfl
-  have hcomp : CommRingCat.ofHom r =
-      CommRingCat.ofHom (IsLocalRing.residue A) ≫ CommRingCat.ofHom (e : IsLocalRing.ResidueField A →+* k) := by
+  have hcomp
+      : CommRingCat.ofHom r
+        = CommRingCat.ofHom (IsLocalRing.residue A)
+          ≫ CommRingCat.ofHom (e : IsLocalRing.ResidueField A →+* k) := by
     rw [← CommRingCat.ofHom_comp, hfac]
   let s : Spec (CommRingCat.of k) ⟶ Spec (CommRingCat.of (IsLocalRing.ResidueField A)) :=
     Spec.map (CommRingCat.ofHom (e : IsLocalRing.ResidueField A →+* k))

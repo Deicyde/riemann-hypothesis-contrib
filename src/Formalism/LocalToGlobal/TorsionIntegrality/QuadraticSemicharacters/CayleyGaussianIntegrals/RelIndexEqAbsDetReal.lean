@@ -12,15 +12,16 @@ namespace Formalism.L2.Th1.H
 
 section Real
 
-theorem relIndex_eq_abs_det_real {E : Type*} [AddCommGroup E] [Module ℝ E]
-    (L₁ L₂ : AddSubgroup E) (h : L₁ ≤ L₂) {ι : Type*} [DecidableEq ι] [Fintype ι]
-    (b₁ b₂ : Basis ι ℝ E) (h₁ : L₁ = .closure (Set.range b₁)) (h₂ : L₂ = .closure (Set.range b₂)) :
-    (L₁.relIndex L₂ : ℝ) = |b₂.det b₁| := by
+theorem relIndex_eq_abs_det_real
+    {E : Type*} [AddCommGroup E] [Module ℝ E]
+    (L₁ L₂ : AddSubgroup E) (h : L₁ ≤ L₂)
+    {ι : Type*} [DecidableEq ι] [Fintype ι]
+    (b₁ b₂ : Basis ι ℝ E) (h₁ : L₁ = .closure (Set.range b₁)) (h₂ : L₂ = .closure (Set.range b₂))
+    : (L₁.relIndex L₂ : ℝ) = |b₂.det b₁| := by
   classical
   subst h₁ h₂
   rw [← Submodule.span_int_eq_addSubgroupClosure, ← Submodule.span_int_eq_addSubgroupClosure] at h ⊢
-  have hle : Submodule.span ℤ (Set.range b₁) ≤ Submodule.span ℤ (Set.range b₂) :=
-    fun x hx => h hx
+  have hle : Submodule.span ℤ (Set.range b₁) ≤ Submodule.span ℤ (Set.range b₂) := fun x hx => h hx
   set S₁ := Submodule.span ℤ (Set.range b₁) with hS₁
   set S₂ := Submodule.span ℤ (Set.range b₂) with hS₂
   let B₂ : Basis ι ℤ S₂ := b₂.restrictScalars ℤ
@@ -39,7 +40,8 @@ theorem relIndex_eq_abs_det_real {E : Type*} [AddCommGroup E] [Module ℝ E]
   have hdet : ((B₂.det (Subtype.val ∘ BN) : ℤ) : ℝ) = b₂.det b₁ := by
     rw [Basis.det_apply, Basis.det_apply]
     rw [show ((Matrix.det (B₂.toMatrix (Subtype.val ∘ BN)) : ℤ) : ℝ)
-        = (Int.castRingHom ℝ) (Matrix.det (B₂.toMatrix (Subtype.val ∘ BN))) from rfl,
+          = (Int.castRingHom ℝ) (Matrix.det (B₂.toMatrix (Subtype.val ∘ BN))) from
+        rfl,
       RingHom.map_det]
     congr 1
     ext i j
@@ -48,11 +50,13 @@ theorem relIndex_eq_abs_det_real {E : Type*} [AddCommGroup E] [Module ℝ E]
     rw [hrepr, hv]
   rw [← hcard, ← key, ← hdet, Nat.cast_natAbs, Int.cast_abs]
 
-theorem relIndex_map_real {E : Type*} [AddCommGroup E] [Module ℝ E]
-    (L₁ L₂ : AddSubgroup E) (h : L₁ ≤ L₂) {ι : Type*} [DecidableEq ι] [Fintype ι]
+theorem relIndex_map_real
+    {E : Type*} [AddCommGroup E] [Module ℝ E]
+    (L₁ L₂ : AddSubgroup E) (h : L₁ ≤ L₂)
+    {ι : Type*} [DecidableEq ι] [Fintype ι]
     (b₁ b₂ : Basis ι ℝ E) (h₁ : L₁ = .closure (Set.range b₁)) (h₂ : L₂ = .closure (Set.range b₂))
-    (f : E ≃ₗ[ℝ] E) (hf : L₁.map (f : E →ₗ[ℝ] E).toAddMonoidHom ≤ L₂) :
-    ((L₁.map (f : E →ₗ[ℝ] E).toAddMonoidHom).relIndex L₂ : ℝ)
+    (f : E ≃ₗ[ℝ] E) (hf : L₁.map (f : E →ₗ[ℝ] E).toAddMonoidHom ≤ L₂)
+    : ((L₁.map (f : E →ₗ[ℝ] E).toAddMonoidHom).relIndex L₂ : ℝ)
       = (L₁.relIndex L₂ : ℝ) * |LinearMap.det (f : E →ₗ[ℝ] E)| := by
   classical
   have hb : L₁.map (f : E →ₗ[ℝ] E).toAddMonoidHom = .closure (Set.range (b₁.map f)) := by
@@ -63,9 +67,10 @@ theorem relIndex_map_real {E : Type*} [AddCommGroup E] [Module ℝ E]
   have e : ⇑(b₁.map f) = (f : E →ₗ[ℝ] E) ∘ b₁ := by ext i; simp
   rw [e, Basis.det_comp, abs_mul, mul_comm]
 
-theorem exists_basis_of_lattice {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    (Λ : AddSubgroup E) (hd : DiscreteTopology Λ) (hs : Submodule.span ℝ (Λ : Set E) = ⊤) :
-    ∃ b : Basis (Fin (finrank ℝ E)) ℝ E, Λ = .closure (Set.range b) := by
+theorem exists_basis_of_lattice
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+    (Λ : AddSubgroup E) (hd : DiscreteTopology Λ) (hs : Submodule.span ℝ (Λ : Set E) = ⊤)
+    : ∃ b : Basis (Fin (finrank ℝ E)) ℝ E, Λ = .closure (Set.range b) := by
   classical
   let L : Submodule ℤ E := AddSubgroup.toIntSubmodule Λ
   haveI : DiscreteTopology L := hd
@@ -82,8 +87,10 @@ theorem exists_basis_of_lattice {E : Type*} [NormedAddCommGroup E] [NormedSpace 
 
 end Real
 
-theorem isLat_inf {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] {Λ Λ₁ : AddSubgroup V}
-    (hL : IsLat Λ) (hi : Λ₁.relIndex Λ ≠ 0) : IsLat (Λ ⊓ Λ₁) := by
+theorem isLat_inf
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {Λ Λ₁ : AddSubgroup V} (hL : IsLat Λ) (hi : Λ₁.relIndex Λ ≠ 0)
+    : IsLat (Λ ⊓ Λ₁) := by
   obtain ⟨hd, hs⟩ := hL
   refine ⟨DiscreteTopology.of_subset (s := (Λ : Set V)) hd (fun x hx => hx.1), ?_⟩
   rw [eq_top_iff, ← hs, Submodule.span_le]
@@ -111,15 +118,15 @@ theorem unitary_index : UnitaryIndex := by
   have hL1 := isLat_inf hL hU.idx₁
   obtain ⟨b₁, hb₁⟩ := exists_basis_of_lattice (Λ ⊓ imgLat (δ : V →ₗ[ℂ] V) Λ) hL1.1 hL1.2
   let f : V ≃ₗ[ℝ] V := Ae.restrictScalars ℝ
-  have hmap : latA Λ δ Ae
-      = (Λ ⊓ imgLat (δ : V →ₗ[ℂ] V) Λ).map (f : V →ₗ[ℝ] V).toAddMonoidHom := rfl
-  have key := relIndex_map_real (Λ ⊓ imgLat (δ : V →ₗ[ℂ] V) Λ) Λ inf_le_left b₁ b₂ hb₁ hb₂ f
-    (by rw [← hmap]; exact hle)
+  have hmap : latA Λ δ Ae = (Λ ⊓ imgLat (δ : V →ₗ[ℂ] V) Λ).map (f : V →ₗ[ℝ] V).toAddMonoidHom := rfl
+  have key :=
+    relIndex_map_real (Λ ⊓ imgLat (δ : V →ₗ[ℂ] V) Λ) Λ inf_le_left b₁ b₂ hb₁ hb₂ f
+      (by rw [← hmap]; exact hle)
   unfold relIdx
   rw [hmap, key, AddSubgroup.inf_relIndex_left]
   congr 1
-  have hd : LinearMap.det (f : V →ₗ[ℝ] V)
-      = Algebra.norm ℝ (LinearMap.det (Ae : V →ₗ[ℂ] V)) := LinearMap.det_restrictScalars
+  have hd : LinearMap.det (f : V →ₗ[ℝ] V) = Algebra.norm ℝ (LinearMap.det (Ae : V →ₗ[ℂ] V)) :=
+    LinearMap.det_restrictScalars
   rw [hd, Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq]
   exact abs_of_nonneg (by positivity)
 

@@ -8,7 +8,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.StandardLattice Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2 Formalism.L2.Host Formalism.L2.DIV Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.TwInputs GlobalTheory.SeriesTie GlobalTheory.ExportSeries NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.StandardLattice Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2 Formalism.L2.Host Formalism.L2.DIV Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.TwInputs
+  GlobalTheory.SeriesTie GlobalTheory.ExportSeries NumberField IsDedekindDomain
 open Formalism.MainNotions.IntegralHeckeForms (TwOK)
 open Formalism.AUTREP (GAf)
 open GlobalTheory.FormInner (frameEquiv)
@@ -23,47 +27,66 @@ open MvPolynomial
 
 variable {L : Type} [Field L] {n : ℕ} {K : Type} [Field K]
 
-
 open Classical in
-noncomputable def evS {S : Type} [CommRing S] (c : L →+* L) (τ : L →+* K) (X Y : Matrix (Fin n) (Fin n) S) :
-    (L →+* K) × Fin n × Fin n → S := fun p =>
-  if p.1 = τ then X p.2.1 p.2.2
-  else if p.1 = τ.comp c then Y p.2.2 p.2.1
-  else if p.2.1 = p.2.2 then 1 else 0
+noncomputable def evS
+    {S : Type} [CommRing S] (c : L →+* L) (τ : L →+* K) (X Y : Matrix (Fin n) (Fin n) S)
+    : (L →+* K) × Fin n × Fin n → S := fun p =>
+  if p.1 = τ then
+    X p.2.1 p.2.2
+  else if p.1 = τ.comp c then
+    Y p.2.2 p.2.1
+  else if p.2.1 = p.2.2 then
+    1
+  else
+    0
 
-theorem evS_map {S S' : Type} [CommRing S] [CommRing S'] (ψ : S →+* S') (c : L →+* L) (τ : L →+* K)
-    (X Y : Matrix (Fin n) (Fin n) S) : ψ ∘ evS c τ X Y = evS c τ (X.map ψ) (Y.map ψ) := by
+theorem evS_map
+    {S S' : Type} [CommRing S] [CommRing S']
+    (ψ : S →+* S') (c : L →+* L) (τ : L →+* K) (X Y : Matrix (Fin n) (Fin n) S)
+    : ψ ∘ evS c τ X Y = evS c τ (X.map ψ) (Y.map ψ) := by
   funext p
   simp only [evS, Function.comp_apply, Matrix.map_apply]
   split_ifs <;> simp
 
-noncomputable def defect {S : Type} [CommRing S] (φ : K →+* S) (c : L →+* L) (τ : L →+* K) {ι : Type} [Fintype ι]
+noncomputable def defect
+    {S : Type} [CommRing S]
+    (φ : K →+* S) (c : L →+* L) (τ : L →+* K)
+    {ι : Type} [Fintype ι]
     (P : ι → ι → MvPolynomial ((L →+* K) × Fin n × Fin n) K) (v : ι → K) (lam : Fin n → ℤ)
-    (X Y : Matrix (Fin n) (Fin n) S) (i : ι) : S :=
-  (∏ a, X a a ^ (-lam a).toNat) * ∑ j, eval₂ φ (evS c τ X Y) (P i j) * φ (v j) -
-    (∏ a, X a a ^ (lam a).toNat) * φ (v i)
+    (X Y : Matrix (Fin n) (Fin n) S) (i : ι)
+    : S :=
+  (∏ a, X a a ^ (-lam a).toNat) * ∑ j, eval₂ φ (evS c τ X Y) (P i j) * φ (v j)
+    - (∏ a, X a a ^ (lam a).toNat) * φ (v i)
 
-theorem defect_map {S S' : Type} [CommRing S] [CommRing S'] (ψ : S →+* S') (φ : K →+* S) (c : L →+* L)
-    (τ : L →+* K) {ι : Type} [Fintype ι] (P : ι → ι → MvPolynomial ((L →+* K) × Fin n × Fin n) K) (v : ι → K)
-    (lam : Fin n → ℤ) (X Y : Matrix (Fin n) (Fin n) S) (i : ι) :
-    ψ (defect φ c τ P v lam X Y i) = defect (ψ.comp φ) c τ P v lam (X.map ψ) (Y.map ψ) i := by
+theorem defect_map
+    {S S' : Type} [CommRing S] [CommRing S']
+    (ψ : S →+* S') (φ : K →+* S) (c : L →+* L) (τ : L →+* K)
+    {ι : Type} [Fintype ι]
+    (P : ι → ι → MvPolynomial ((L →+* K) × Fin n × Fin n) K) (v : ι → K) (lam : Fin n → ℤ)
+    (X Y : Matrix (Fin n) (Fin n) S) (i : ι)
+    : ψ (defect φ c τ P v lam X Y i) = defect (ψ.comp φ) c τ P v lam (X.map ψ) (Y.map ψ) i := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [defect, map_sub, map_mul, map_prod, map_pow, map_sum, hom_eval₂, Matrix.map_apply,
-    RingHom.comp_apply]
+      RingHom.comp_apply]
   rw [← evS_map]
   rfl
 
-theorem defect_eq_zero_iff {F : Type} [Field F] (φ : K →+* F) (c : L →+* L) (τ : L →+* K) {ι : Type}
-    [Fintype ι] (P : ι → ι → MvPolynomial ((L →+* K) × Fin n × Fin n) K) (v : ι → K) (lam : Fin n → ℤ)
-    (X Y : Matrix (Fin n) (Fin n) F) (hX : ∀ a, X a a ≠ 0) (i : ι) :
-    defect φ c τ P v lam X Y i = 0 ↔
-      ∑ j, eval₂ φ (evS c τ X Y) (P i j) * φ (v j) = (∏ a, X a a ^ lam a) * φ (v i) := by
-  have key : ∀ a, X a a ^ (lam a).toNat = X a a ^ (-lam a).toNat * X a a ^ lam a := by
+theorem defect_eq_zero_iff
+    {F : Type} [Field F]
+    (φ : K →+* F) (c : L →+* L) (τ : L →+* K)
+    {ι : Type} [Fintype ι]
+    (P : ι → ι → MvPolynomial ((L →+* K) × Fin n × Fin n) K) (v : ι → K) (lam : Fin n → ℤ)
+    (X Y : Matrix (Fin n) (Fin n) F) (hX : ∀ a, X a a ≠ 0)
+    (i : ι)
+    : defect φ c τ P v lam X Y i = 0
+      ↔ ∑ j, eval₂ φ (evS c τ X Y) (P i j) * φ (v j) = (∏ a, X a a ^ lam a) * φ (v i) := by
+  have key : ∀ a, X a a ^ (lam a).toNat = X a a ^ (- lam a).toNat * X a a ^ lam a := by
     intro a
     rw [← zpow_natCast, ← zpow_natCast, ← zpow_add₀ (hX a)]
     congr 1
     omega
-  have hu : (∏ a, X a a ^ (-lam a).toNat) ≠ 0 := Finset.prod_ne_zero_iff.2 fun a _ => pow_ne_zero _ (hX a)
+  have hu : (∏ a, X a a ^ (-lam a).toNat) ≠ 0 :=
+    Finset.prod_ne_zero_iff.2 fun a _ => pow_ne_zero _ (hX a)
   simp only [defect, sub_eq_zero, key, Finset.prod_mul_distrib, mul_assoc]
   exact ⟨fun h => mul_left_cancel₀ hu h, fun h => by rw [h]⟩
 
@@ -75,28 +98,38 @@ open MvPolynomial
 
 variable {L : Type} [Field L] {n : ℕ} {K : Type} [Field K]
 
-theorem inv_map_of_mul {A F : Type} [CommRing A] [Field F] (ψ : A →+* F) (G : Matrix (Fin n) (Fin n) A)
-    (h : G⁻¹ * G = 1) : (G.map ψ)⁻¹ = G⁻¹.map ψ := by
+theorem inv_map_of_mul
+    {A F : Type} [CommRing A] [Field F]
+    (ψ : A →+* F)
+    (G : Matrix (Fin n) (Fin n) A) (h : G⁻¹ * G = 1)
+    : (G.map ψ)⁻¹ = G⁻¹.map ψ := by
   apply Matrix.inv_eq_left_inv
   rw [← Matrix.map_mul, h, Matrix.map_one _ (map_zero ψ) (map_one ψ)]
 
-theorem defect_transfer (e : K →+* ℂ) (c : L →+* L) (τ : L →+* K) {ι : Type} [Fintype ι]
+theorem defect_transfer
+    (e : K →+* ℂ)
+    (c : L →+* L) (τ : L →+* K)
+    {ι : Type} [Fintype ι]
     (P : ι → ι → MvPolynomial ((L →+* K) × Fin n × Fin n) K) (v : ι → K) (lam : Fin n → ℤ)
-    (hK : ∀ B : GL (Fin n) K, B.val.BlockTriangular id → ∀ i, defect (RingHom.id K) c τ P v lam B.val (B⁻¹).val i = 0)
-    (B : GL (Fin n) ℂ) (hB : B.val.BlockTriangular id) (i : ι) :
-    defect e c τ P v lam B.val (B⁻¹).val i = 0 := by
+    (hK : ∀ B : GL (Fin n) K,
+      B.val.BlockTriangular id → ∀ i, defect (RingHom.id K) c τ P v lam B.val (B⁻¹).val i = 0)
+    (B : GL (Fin n) ℂ) (hB : B.val.BlockTriangular id)
+    (i : ι)
+    : defect e c τ P v lam B.val (B⁻¹).val i = 0 := by
   haveI : CharZero K := RingHom.charZero e
   haveI : Infinite K := inferInstance
   classical
   obtain ⟨D, hD⟩ : ∃ D : MvPolynomial (Fin n × Fin n) K, D = ∏ a, X (a, a) := ⟨_, rfl⟩
   let A := Localization.Away D
   let φA : K →+* A := (algebraMap (MvPolynomial (Fin n × Fin n) K) A).comp C
-  let G : Matrix (Fin n) (Fin n) A := fun a b => if b < a then 0 else algebraMap (MvPolynomial (Fin n × Fin n) K) A (X (a, b))
+  let G : Matrix (Fin n) (Fin n) A := fun a b =>
+    if b < a then 0 else algebraMap (MvPolynomial (Fin n × Fin n) K) A (X (a, b))
   have hGtri : G.BlockTriangular id := fun a b h => by
     simp only [G]
     rw [if_pos (show b < a from h)]
-  have hDA : algebraMap (MvPolynomial (Fin n × Fin n) K) A D =
-      ∏ a, algebraMap (MvPolynomial (Fin n × Fin n) K) A (X (a, a)) := by
+  have hDA
+      : algebraMap (MvPolynomial (Fin n × Fin n) K) A D
+        = ∏ a, algebraMap (MvPolynomial (Fin n × Fin n) K) A (X (a, a)) := by
     rw [← map_prod]
     exact congrArg _ hD
   have hdet : G.det = algebraMap (MvPolynomial (Fin n × Fin n) K) A D := by
@@ -110,7 +143,8 @@ theorem defect_transfer (e : K →+* ℂ) (c : L →+* L) (τ : L →+* K) {ι :
     have hf : ∀ x : Fin n × Fin n → K, eval x D ≠ 0 → eval x f = 0 := by
       intro x hx
       let ψ : A →+* K := IsLocalization.Away.lift D (g := eval x) (Ne.isUnit hx)
-      have hψ : ∀ r, ψ (algebraMap (MvPolynomial (Fin n × Fin n) K) A r) = eval x r := IsLocalization.Away.lift_eq D _
+      have hψ : ∀ r, ψ (algebraMap (MvPolynomial (Fin n × Fin n) K) A r) = eval x r :=
+        IsLocalization.Away.lift_eq D _
       set M : Matrix (Fin n) (Fin n) K := G.map ψ with hM
       have hMtri : M.BlockTriangular id := fun a b h => by
         show ψ (G a b) = 0
@@ -149,8 +183,12 @@ theorem defect_transfer (e : K →+* ℂ) (c : L →+* L) (τ : L →+* K) {ι :
     have : B.val.det ≠ 0 := (Matrix.isUnit_iff_isUnit_det _).1 B.isUnit |>.ne_zero
     rw [Matrix.det_of_upperTriangular hB] at this
     simpa [hD] using this
-  let ψ : A →+* ℂ := IsLocalization.Away.lift D (g := eval₂Hom e (fun p => B.val p.1 p.2)) (Ne.isUnit hBdiag)
-  have hψ : ∀ r, ψ (algebraMap (MvPolynomial (Fin n × Fin n) K) A r) = eval₂ e (fun p => B.val p.1 p.2) r := IsLocalization.Away.lift_eq D _
+  let ψ : A →+* ℂ :=
+    IsLocalization.Away.lift D (g := eval₂Hom e (fun p => B.val p.1 p.2)) (Ne.isUnit hBdiag)
+  have hψ
+      : ∀ r,
+        ψ (algebraMap (MvPolynomial (Fin n × Fin n) K) A r) = eval₂ e (fun p => B.val p.1 p.2) r :=
+    IsLocalization.Away.lift_eq D _
   have hGB : G.map ψ = B.val := by
     ext a b
     by_cases h : b < a
@@ -169,22 +207,26 @@ namespace GlobalTheory.HwTransfer
 
 open MvPolynomial
 
-theorem diag_ne_zero {n : ℕ} {F : Type} [Field F] (B : GL (Fin n) F) (hB : B.val.BlockTriangular id) (a : Fin n) :
-    B.val a a ≠ 0 := by
+theorem diag_ne_zero
+    {n : ℕ} {F : Type} [Field F] (B : GL (Fin n) F) (hB : B.val.BlockTriangular id) (a : Fin n)
+    : B.val a a ≠ 0 := by
   have h : B.val.det ≠ 0 := ((Matrix.isUnit_iff_isUnit_det _).1 B.isUnit).ne_zero
   rw [Matrix.det_of_upperTriangular hB] at h
   exact Finset.prod_ne_zero_iff.1 h a (Finset.mem_univ a)
 
 end GlobalTheory.HwTransfer
 
-
 open MvPolynomial GlobalTheory.HwTransfer in
-theorem GlobalTheory.hwAt_of_hwAtF : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (K : Type) [Field K] (e : K →+* ℂ)
-    (c : L →+* L), (∀ x, c x = IsCMField.complexConj L x) → ∀ (W : Type) [AddCommGroup W] [Module K W]
-    (ρ : Representation K (ReciprocityTheory.Aut.GQ L n) W) (a : NG.AlgWt L n) (ω : W →ₛₗ[e] a.W),
-    (∀ (κ : Type) (v : κ → W), LinearIndependent K v → LinearIndependent ℂ fun x => ω (v x)) →
-    Submodule.span ℂ (Set.range ω) = ⊤ → (∀ γ w, ω (ρ γ w) = a.ρ γ (ω w)) →
-    ∀ (τ : L →+* K) (lam : Fin n → ℤ), NX.HWAtF c ρ τ lam → a.HWAt (e.comp τ) lam := by
+theorem GlobalTheory.hwAt_of_hwAtF
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (K : Type) [Field K]
+        (e : K →+* ℂ) (c : L →+* L),
+      (∀ x, c x = IsCMField.complexConj L x)
+        → ∀ (W : Type) [AddCommGroup W] [Module K W]
+            (ρ : Representation K (ReciprocityTheory.Aut.GQ L n) W) (a : NG.AlgWt L n)
+            (ω : W →ₛₗ[e] a.W),
+          (∀ (κ : Type) (v : κ → W), LinearIndependent K v → LinearIndependent ℂ fun x => ω (v x))
+            → Submodule.span ℂ (Set.range ω) = ⊤ → (∀ γ w, ω (ρ γ w) = a.ρ γ (ω w))
+            → ∀ (τ : L →+* K) (lam : Fin n → ℤ), NX.HWAtF c ρ τ lam → a.HWAt (e.comp τ) lam := by
   intro L _ _ _ n K _ e c hc W _ _ ρ a ω hind hspan hint τ lam h
   classical
   obtain ⟨ι, hι, hdec, b, P, hP, v, hv0, hv⟩ := h
@@ -208,14 +250,17 @@ theorem GlobalTheory.hwAt_of_hwAtF : ∀ (L : Type) [Field L] [NumberField L] [I
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
   let b' : Module.Basis ι ℂ a.W := Module.Basis.mk hli hsp
   let f : (L →+* K) × Fin n × Fin n → (L →+* ℂ) × Fin n × Fin n := fun p => (e.comp p.1, p.2)
-  have hev : ∀ (g : (L →+* ℂ) × Fin n × Fin n → ℂ) (Q : MvPolynomial ((L →+* K) × Fin n × Fin n) K),
-      eval g (rename f (map e Q)) = eval₂ e (g ∘ f) Q := fun g Q => by rw [eval_rename, eval_map]
+  have hev
+      : ∀ (g : (L →+* ℂ) × Fin n × Fin n → ℂ) (Q : MvPolynomial ((L →+* K) × Fin n × Fin n) K),
+        eval g (rename f (map e Q)) = eval₂ e (g ∘ f) Q := fun g Q => by
+    rw [eval_rename, eval_map]
   refine ⟨ι, hι, hdec, b', fun i j => rename f (map e (P i j)), ?_, fun i => e (v i), ?_, ?_⟩
   · intro γ γ₀ hγ
     have h1 := hP γ γ₀ hγ
     ext i j
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [LinearMap.toMatrix_apply, Module.Basis.mk_apply, ← hint, ← b.sum_repr (ρ γ (b j)), map_sum]
+      rw [LinearMap.toMatrix_apply, Module.Basis.mk_apply, ← hint, ← b.sum_repr (ρ γ (b j)),
+        map_sum]
     simp only [LinearMap.map_smulₛₗ]
     have hb' : ∀ k, ω (b k) = b' k := fun k => (Module.Basis.mk_apply hli hsp k).symm
     set_option synthInstance.maxHeartbeats 100000 in
@@ -235,8 +280,10 @@ theorem GlobalTheory.hwAt_of_hwAtF : ∀ (L : Type) [Field L] [NumberField L] [I
     funext i
     exact e.injective (by simpa using congrFun h0 i)
   · intro B hB
-    have hK : ∀ B : GL (Fin n) K, B.val.BlockTriangular id → ∀ i,
-        defect (RingHom.id K) c τ P v lam B.val (B⁻¹).val i = 0 := by
+    have hK
+        : ∀ B : GL (Fin n) K,
+          B.val.BlockTriangular id
+            → ∀ i, defect (RingHom.id K) c τ P v lam B.val (B⁻¹).val i = 0 := by
       intro B hB i
       rw [defect_eq_zero_iff _ c τ P v lam _ _ (diag_ne_zero B hB)]
       have h3 := congrFun (hv B hB) i

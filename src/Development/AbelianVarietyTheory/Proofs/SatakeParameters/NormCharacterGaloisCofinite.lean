@@ -16,15 +16,25 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AbsNormPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL
 open Pointwise
 
 namespace GlobalTheory
 
-theorem trivial_on_ext_of_frob_eq_normChar : ∀ (Ω : Type) [Field Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω] (M : Type) [Field M] [NumberField M] [Algebra M Ω] [IsAlgClosure M Ω] [Algebra K M] [IsScalarTower K M Ω] (η : HChar K), UpperTheory.V.Published.IsNormChar M η → ∀ χ : G K Ω →* ℂˣ, IsOpen (χ.ker : Set (G K Ω)) → (∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite, ∀ (A : ValuationSubring Ω) (σ : G K Ω), IsPlaceOver A v → IsFrob A (normV v) σ → χ σ = η.val v) → ∀ g : G K Ω, (∀ x : M, g (algebraMap M Ω x) = algebraMap M Ω x) → χ g = 1 := by
+theorem trivial_on_ext_of_frob_eq_normChar
+    : ∀ (Ω : Type) [Field Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
+        (M : Type) [Field M] [NumberField M] [Algebra M Ω] [IsAlgClosure M Ω] [Algebra K M]
+        [IsScalarTower K M Ω] (η : HChar K),
+      UpperTheory.V.Published.IsNormChar M η
+        → ∀ χ : G K Ω →* ℂˣ,
+          IsOpen (χ.ker : Set (G K Ω))
+            → (∀ᶠ v : HeightOneSpectrum (𝓞 K) in Filter.cofinite, ∀ (A : ValuationSubring Ω) (σ : G K Ω), IsPlaceOver A v → IsFrob A (normV v) σ → χ σ = η.val v)
+            → ∀ g : G K Ω, (∀ x : M, g (algebraMap M Ω x) = algebraMap M Ω x) → χ g = 1 := by
   intro Ω _ K _ _ _ _ M _ _ _ _ _ _ η hη χ hχo hχ g hg
   classical
   let r : G M Ω →* G K Ω := AlgEquiv.restrictScalarsHom K
@@ -34,24 +44,30 @@ theorem trivial_on_ext_of_frob_eq_normChar : ∀ (Ω : Type) [Field Ω] (K : Typ
   have hS := Filter.eventually_cofinite.1 hχ
   have hT₁ := Filter.eventually_cofinite.1 hη.2.2
   let T : Set (HeightOneSpectrum (𝓞 M)) :=
-    {w | ¬ ∀ f : ℕ, normV w = normV (w.under (𝓞 K)) ^ f → η.val (w.under (𝓞 K)) ^ f = 1} ∪
-      u ⁻¹' {v | ¬ ∀ (A : ValuationSubring Ω) (σ : G K Ω), IsPlaceOver A v → IsFrob A (normV v) σ → χ σ = η.val v}
-  have hT : T.Finite := hT₁.union (hS.preimage' (f := u) fun v _ => by
-    have := v.isMaximal
-    refine ((IsDedekindDomain.primesOver_finite v.asIdeal (𝓞 M)).preimage
-      (f := fun w : HeightOneSpectrum (𝓞 M) => w.asIdeal) (fun a _ b _ h => HeightOneSpectrum.ext h)).subset ?_
-    rintro w rfl
-    exact ⟨w.isPrime, hu w⟩)
+    {w | ¬ ∀ f : ℕ, normV w = normV (w.under (𝓞 K)) ^ f → η.val (w.under (𝓞 K)) ^ f = 1}
+      ∪ u
+        ⁻¹' {v | ¬ ∀ (A : ValuationSubring Ω) (σ : G K Ω), IsPlaceOver A v → IsFrob A (normV v) σ → χ σ = η.val v}
+  have hT : T.Finite :=
+    hT₁.union (hS.preimage' (f := u) fun v _ => by
+      have := v.isMaximal
+      refine ((IsDedekindDomain.primesOver_finite v.asIdeal (𝓞 M)).preimage
+        (f := fun w : HeightOneSpectrum (𝓞 M) => w.asIdeal)
+        (fun a _ b _ h => HeightOneSpectrum.ext h)).subset ?_
+      rintro w rfl
+      exact ⟨w.isPrime, hu w⟩)
   have hdense := GlobalTheory.Published.chebotarevDegreeOne'.dense (F := M) (Ω := Ω) hT
   let H : Subgroup (G M Ω) := (χ.comp r).ker
   have hHc : IsClosed (H : Set (G M Ω)) := H.isClosed_of_isOpen (by exact hχo.preimage hr)
-  have hsub : {σ : G M Ω | ∃ w : HeightOneSpectrum (𝓞 M), w ∉ T ∧ w.asIdeal.inertiaDeg ℤ = 1 ∧
-      ∃ B : ValuationSubring Ω, IsPlaceOver B w ∧ IsFrob B (normV w) σ} ⊆ H := by
+  have hsub
+      : {σ : G M Ω | ∃ w : HeightOneSpectrum (𝓞 M), w ∉ T ∧ w.asIdeal.inertiaDeg ℤ = 1 ∧
+          ∃ B : ValuationSubring Ω, IsPlaceOver B w ∧ IsFrob B (normV w) σ}
+        ⊆ H := by
     rintro σ ⟨w, hw, hd, B, hB, hσ⟩
     have hw1 : ∀ f : ℕ, normV w = normV (u w) ^ f → η.val (u w) ^ f = 1 := by
       by_contra h; exact hw (Or.inl h)
-    have hw2 : ∀ (A : ValuationSubring Ω) (σ : G K Ω), IsPlaceOver A (u w) → IsFrob A (normV (u w)) σ →
-        χ σ = η.val (u w) := by
+    have hw2
+        : ∀ (A : ValuationSubring Ω) (σ : G K Ω),
+          IsPlaceOver A (u w) → IsFrob A (normV (u w)) σ → χ σ = η.val (u w) := by
       by_contra h; exact hw (Or.inr h)
     have hp : (Ideal.absNorm w.asIdeal).Prime :=
       ((GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramified M).1 w).2 hd

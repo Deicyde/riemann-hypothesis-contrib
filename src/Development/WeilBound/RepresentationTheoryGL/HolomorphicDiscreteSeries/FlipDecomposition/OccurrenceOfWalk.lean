@@ -14,12 +14,14 @@ open Formalism.REAL Formalism.MainNotions.S PositivityTheory.UnitaryDecompositio
 
 variable {n : ℕ}
 
-def shL (lam : Fin (n + 1) → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) : Fin (n + 1) → ℝ := lam + fun i => (b (Sum.inl i) : ℝ)
+def shL (lam : Fin (n + 1) → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) : Fin (n + 1) → ℝ :=
+  lam + fun i => (b (Sum.inl i) : ℝ)
 
-def shM (mu : Fin n → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) : Fin n → ℝ := mu + fun j => (b (Sum.inr j) : ℝ)
+def shM (mu : Fin n → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) : Fin n → ℝ :=
+  mu + fun j => (b (Sum.inr j) : ℝ)
 
-theorem abs_le_shift {x y : ℝ} {p q : ℕ} (h1 : x ≤ y → p ≤ q) (h2 : y ≤ x → q ≤ p) :
-    |x - y| ≤ |(x + p) - (y + q)| := by
+theorem abs_le_shift {x y : ℝ} {p q : ℕ} (h1 : x ≤ y → p ≤ q) (h2 : y ≤ x → q ≤ p)
+    : |x - y| ≤ |(x + p) - (y + q)| := by
   rcases le_total x y with h | h
   · have := h1 h
     have h' : (p : ℝ) ≤ q := by exact_mod_cast this
@@ -30,8 +32,10 @@ theorem abs_le_shift {x y : ℝ} {p q : ℕ} (h1 : x ≤ y → p ≤ q) (h2 : y 
     rw [abs_of_nonneg (by linarith), abs_of_nonneg (by linarith)]
     linarith
 
-theorem hc_shift {m : ℕ} {lam : Fin m → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam) (c : Fin m → ℕ)
-    (hc : ∀ i j, lam i ≤ lam j → c i ≤ c j) : Formalism.QuantumDeterminants.IsHCParam (lam + fun i => (c i : ℝ)) := by
+theorem hc_shift
+    {m : ℕ} {lam : Fin m → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam) (c : Fin m → ℕ)
+    (hc : ∀ i j, lam i ≤ lam j → c i ≤ c j)
+    : Formalism.QuantumDeterminants.IsHCParam (lam + fun i => (c i : ℝ)) := by
   refine ⟨fun i j hij => ?_, fun a => ?_⟩
   · have h1 := hl.1 hij
     have h2 : (c j : ℝ) ≤ c i := by exact_mod_cast hc j i h1.le
@@ -40,8 +44,11 @@ theorem hc_shift {m : ℕ} {lam : Fin m → ℝ} (hl : Formalism.QuantumDetermin
   · obtain ⟨z, hz⟩ := hl.2 a
     exact ⟨z + c a, by simp only [Pi.add_apply]; push_cast; linarith⟩
 
-theorem gap_shift {m : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {h : ℝ} (hg : Formalism.QuantumDeterminants.GapAtLeast ε lam h) (c : Fin m → ℕ)
-    (hc : ∀ i j, lam i ≤ lam j → c i ≤ c j) : Formalism.QuantumDeterminants.GapAtLeast ε (lam + fun i => (c i : ℝ)) h := by
+theorem gap_shift
+    {m : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {h : ℝ}
+    (hg : Formalism.QuantumDeterminants.GapAtLeast ε lam h) (c : Fin m → ℕ)
+    (hc : ∀ i j, lam i ≤ lam j → c i ≤ c j)
+    : Formalism.QuantumDeterminants.GapAtLeast ε (lam + fun i => (c i : ℝ)) h := by
   intro a b hab
   refine (hg a b hab).trans ?_
   simp only [Pi.add_apply]
@@ -50,16 +57,26 @@ theorem gap_shift {m : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {h : ℝ
 def Mono (lam : Fin (n + 1) → ℝ) (mu : Fin n → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) : Prop :=
   ∀ x y, Sum.elim lam mu x ≤ Sum.elim lam mu y → b x ≤ b y
 
-theorem gp_shift {ε : Fin (n + 1) → Bool} {lam : Fin (n + 1) → ℝ} {ε' : Fin n → Bool} {mu : Fin n → ℝ}
-    {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (hG : Gp ε lam ε' mu e) {b : Fin (n + 1) ⊕ Fin n → ℕ} (hb : Mono lam mu b) :
-    Gp ε (shL lam b) ε' (shM mu b) e :=
-  ⟨hG.fits, hG.two, hG.neg, hG.le, hc_shift hG.hc _ fun i j h => hb (Sum.inl i) (Sum.inl j) h,
-    hc_shift hG.hc' _ fun i j h => hb (Sum.inr i) (Sum.inr j) h,
-    gap_shift hG.gap _ fun i j h => hb (Sum.inl i) (Sum.inl j) h,
-    gap_shift hG.gap' _ fun i j h => hb (Sum.inr i) (Sum.inr j) h⟩
+theorem gp_shift
+    {ε : Fin (n + 1) → Bool} {lam : Fin (n + 1) → ℝ} {ε' : Fin n → Bool} {mu : Fin n → ℝ}
+    {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (hG : Gp ε lam ε' mu e)
+    {b : Fin (n + 1) ⊕ Fin n → ℕ} (hb : Mono lam mu b)
+    : Gp ε (shL lam b) ε' (shM mu b) e := ⟨
+  hG.fits,
+  hG.two,
+  hG.neg,
+  hG.le,
+  hc_shift hG.hc _ fun i j h => hb (Sum.inl i) (Sum.inl j) h,
+  hc_shift hG.hc' _ fun i j h => hb (Sum.inr i) (Sum.inr j) h,
+  gap_shift hG.gap _ fun i j h => hb (Sum.inl i) (Sum.inl j) h,
+  gap_shift hG.gap' _ fun i j h => hb (Sum.inr i) (Sum.inr j) h
+⟩
 
-theorem half {lam : Fin (n + 1) → ℝ} {mu : Fin n → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam) (hm : Formalism.QuantumDeterminants.IsHCParam mu)
-    (i : Fin (n + 1)) (j : Fin n) : ∃ z : ℤ, lam i - mu j = z + 1 / 2 := by
+theorem half
+    {lam : Fin (n + 1) → ℝ} {mu : Fin n → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam)
+    (hm : Formalism.QuantumDeterminants.IsHCParam mu)
+    (i : Fin (n + 1)) (j : Fin n)
+    : ∃ z : ℤ, lam i - mu j = z + 1 / 2 := by
   obtain ⟨a, ha⟩ := hl.2 i
   obtain ⟨b, hb⟩ := hm.2 j
   refine ⟨a - b, ?_⟩
@@ -85,8 +102,10 @@ theorem half_ge {x : ℝ} (h : ∃ z : ℤ, x = z + 1 / 2) (hx : 0 < x) : 1 / 2 
   have h2 : (0 : ℝ) ≤ z := by exact_mod_cast hz0
   linarith
 
-theorem inj_merge {lam : Fin (n + 1) → ℝ} {mu : Fin n → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam) (hm : Formalism.QuantumDeterminants.IsHCParam mu) :
-    Function.Injective (Sum.elim lam mu) := by
+theorem inj_merge
+    {lam : Fin (n + 1) → ℝ} {mu : Fin n → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam)
+    (hm : Formalism.QuantumDeterminants.IsHCParam mu)
+    : Function.Injective (Sum.elim lam mu) := by
   intro x y hxy
   rcases x with i | j <;> rcases y with i' | j'
   · simp only [Sum.elim_inl] at hxy
@@ -100,9 +119,12 @@ theorem inj_merge {lam : Fin (n + 1) → ℝ} {mu : Fin n → ℝ} (hl : Formali
 
 section Step
 
-variable {lam : Fin (n + 1) → ℝ} {mu : Fin n → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam) (hm : Formalism.QuantumDeterminants.IsHCParam mu)
-  {b : Fin (n + 1) ⊕ Fin n → ℕ} (hb : Mono lam mu b) {x : Fin (n + 1) ⊕ Fin n} (hx : 0 < b x)
-  (hmin : ∀ y, 0 < b y → Sum.elim lam mu x ≤ Sum.elim lam mu y)
+variable
+  {lam : Fin (n + 1) → ℝ} {mu : Fin n → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam)
+  (hm : Formalism.QuantumDeterminants.IsHCParam mu)
+  {b : Fin (n + 1) ⊕ Fin n → ℕ} (hb : Mono lam mu b)
+  {x : Fin (n + 1) ⊕ Fin n}
+  (hx : 0 < b x) (hmin : ∀ y, 0 < b y → Sum.elim lam mu x ≤ Sum.elim lam mu y)
 include hl hm hb hx hmin
 
 theorem mono_down : Mono lam mu (Function.update b x (b x - 1)) := by
@@ -124,7 +146,8 @@ theorem mono_down : Mono lam mu (Function.update b x (b x - 1)) := by
   · rw [Function.update_of_ne hy, Function.update_of_ne hz]
     exact hb y z hyz
 
-theorem cond_down_l (s : Fin (n + 1)) (hs : x = Sum.inl s) (j : Fin n) : shL lam b s - 1 / 2 ≠ shM mu b j := by
+theorem cond_down_l (s : Fin (n + 1)) (hs : x = Sum.inl s) (j : Fin n)
+    : shL lam b s - 1 / 2 ≠ shM mu b j := by
   subst hs
   intro heq
   simp only [shL, shM, Pi.add_apply] at heq
@@ -147,7 +170,8 @@ theorem cond_down_l (s : Fin (n + 1)) (hs : x = Sum.inl s) (j : Fin n) : shL lam
     have hc1 : (b (Sum.inl s) : ℝ) ≤ b (Sum.inr j) := by exact_mod_cast h1
     linarith
 
-theorem cond_down_m (j : Fin n) (hs : x = Sum.inr j) (s : Fin (n + 1)) : shM mu b j - 1 / 2 ≠ shL lam b s := by
+theorem cond_down_m (j : Fin n) (hs : x = Sum.inr j) (s : Fin (n + 1))
+    : shM mu b j - 1 / 2 ≠ shL lam b s := by
   subst hs
   intro heq
   simp only [shL, shM, Pi.add_apply] at heq
@@ -174,8 +198,9 @@ theorem cond_down_m (j : Fin n) (hs : x = Sum.inr j) (s : Fin (n + 1)) : shM mu 
 
 end Step
 
-theorem shL_down (lam : Fin (n + 1) → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (s : Fin (n + 1)) (hx : 0 < b (Sum.inl s)) :
-    shL lam (Function.update b (Sum.inl s) (b (Sum.inl s) - 1)) = shL lam b - Pi.single s 1 := by
+theorem shL_down
+    (lam : Fin (n + 1) → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (s : Fin (n + 1)) (hx : 0 < b (Sum.inl s))
+    : shL lam (Function.update b (Sum.inl s) (b (Sum.inl s) - 1)) = shL lam b - Pi.single s 1 := by
   funext i
   simp only [shL, Pi.add_apply, Pi.sub_apply]
   by_cases h : i = s
@@ -186,14 +211,14 @@ theorem shL_down (lam : Fin (n + 1) → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ)
   · rw [Function.update_of_ne (fun h' => h (Sum.inl_injective h')), Pi.single_eq_of_ne h]
     ring
 
-theorem shM_down_l (mu : Fin n → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (s : Fin (n + 1)) :
-    shM mu (Function.update b (Sum.inl s) (b (Sum.inl s) - 1)) = shM mu b := by
+theorem shM_down_l (mu : Fin n → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (s : Fin (n + 1))
+    : shM mu (Function.update b (Sum.inl s) (b (Sum.inl s) - 1)) = shM mu b := by
   funext j
   simp only [shM, Pi.add_apply]
   rw [Function.update_of_ne Sum.inr_ne_inl]
 
-theorem shM_down (mu : Fin n → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (j : Fin n) (hx : 0 < b (Sum.inr j)) :
-    shM mu (Function.update b (Sum.inr j) (b (Sum.inr j) - 1)) = shM mu b - Pi.single j 1 := by
+theorem shM_down (mu : Fin n → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (j : Fin n) (hx : 0 < b (Sum.inr j))
+    : shM mu (Function.update b (Sum.inr j) (b (Sum.inr j) - 1)) = shM mu b - Pi.single j 1 := by
   funext i
   simp only [shM, Pi.add_apply, Pi.sub_apply]
   by_cases h : i = j
@@ -204,22 +229,24 @@ theorem shM_down (mu : Fin n → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (j : F
   · rw [Function.update_of_ne (fun h' => h (Sum.inr_injective h')), Pi.single_eq_of_ne h]
     ring
 
-theorem shL_down_m (lam : Fin (n + 1) → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (j : Fin n) :
-    shL lam (Function.update b (Sum.inr j) (b (Sum.inr j) - 1)) = shL lam b := by
+theorem shL_down_m (lam : Fin (n + 1) → ℝ) (b : Fin (n + 1) ⊕ Fin n → ℕ) (j : Fin n)
+    : shL lam (Function.update b (Sum.inr j) (b (Sum.inr j) - 1)) = shL lam b := by
   funext i
   simp only [shL, Pi.add_apply]
   rw [Function.update_of_ne Sum.inl_ne_inr]
 
-theorem sum_down (b : Fin (n + 1) ⊕ Fin n → ℕ) (x : Fin (n + 1) ⊕ Fin n) (hx : 0 < b x) :
-    ∑ y, Function.update b x (b x - 1) y + 1 = ∑ y, b y := by
+theorem sum_down (b : Fin (n + 1) ⊕ Fin n → ℕ) (x : Fin (n + 1) ⊕ Fin n) (hx : 0 < b x)
+    : ∑ y, Function.update b x (b x - 1) y + 1 = ∑ y, b y := by
   rw [Finset.sum_update_of_mem (mem_univ x), ← Finset.add_sum_erase _ _ (mem_univ x)]
   rw [show (univ \ {x} : Finset _) = univ.erase x from (Finset.erase_eq _ _).symm]
   omega
 
-theorem down (hL : StepL) (hM : StepM) {ε : Fin (n + 1) → Bool} {lam : Fin (n + 1) → ℝ} {ε' : Fin n → Bool}
-    {mu : Fin n → ℝ} {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (hG : Gp ε lam ε' mu e) :
-    ∀ (k : ℕ) (b : Fin (n + 1) ⊕ Fin n → ℕ), ∑ y, b y = k → Mono lam mu b →
-      OccAt ε (shL lam b) ε' (shM mu b) e → OccAt ε lam ε' mu e := by
+theorem down
+    (hL : StepL) (hM : StepM)
+    {ε : Fin (n + 1) → Bool} {lam : Fin (n + 1) → ℝ} {ε' : Fin n → Bool} {mu : Fin n → ℝ}
+    {e : Fin n ⊕ Unit ≃ Fin (n + 1)} (hG : Gp ε lam ε' mu e)
+    : ∀ (k : ℕ) (b : Fin (n + 1) ⊕ Fin n → ℕ),
+      ∑ y, b y = k → Mono lam mu b → OccAt ε (shL lam b) ε' (shM mu b) e → OccAt ε lam ε' mu e := by
   intro k
   induction k with
   | zero =>
@@ -237,7 +264,8 @@ theorem down (hL : StepL) (hM : StepM) {ε : Fin (n + 1) → Bool} {lam : Fin (n
       omega
     obtain ⟨x, hx, hmin⟩ := Finset.exists_min_image _ (Sum.elim lam mu) hne
     have hx' : 0 < b x := (mem_filter.1 hx).2
-    have hmin' : ∀ y, 0 < b y → Sum.elim lam mu x ≤ Sum.elim lam mu y := fun y hy => hmin y (mem_filter.2 ⟨mem_univ y, hy⟩)
+    have hmin' : ∀ y, 0 < b y → Sum.elim lam mu x ≤ Sum.elim lam mu y := fun y hy =>
+      hmin y (mem_filter.2 ⟨mem_univ y, hy⟩)
     have hb' := mono_down hG.hc hG.hc' hb hx' hmin'
     have hs' : ∑ y, Function.update b x (b x - 1) y = k := by have := sum_down b x hx'; omega
     refine ih _ hs' hb' ?_

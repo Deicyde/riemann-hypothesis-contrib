@@ -13,5 +13,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Th in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Th.stUnit : UpperTheory.V.Z.Tf.GlobalTraceComparison.StUnit :=
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Th.stUnit
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.StUnit :=
   stUnit_of (twSwap orbFub) twLin cvRing (cvComm2 cvGelfand) theta_involution_facts genTw

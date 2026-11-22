@@ -11,13 +11,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison UpperTheory.Ru.crystallineComparison UpperTheory.Gal.crystallineComparison
+open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison
+  UpperTheory.Ru.crystallineComparison UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.exists_finite_sections_determining_ringHom_of_smooth :
-    ∀ {O : Type} [CommRing O] {Y : Scheme.{0}} (q : Y ⟶ Spec (CommRingCat.of O)), Smooth q →
-        ∀ {V : Y.Opens} (hV : IsAffineOpen V),
-        ∃ (k : ℕ) (x : Fin k → Γ(Y, V)), ∀ (R : Type) [CommRing R] (f₁ f₂ : Γ(Y, V) →+* R),
-          ptOf hV R f₁ ≫ q = ptOf hV R f₂ ≫ q → (∀ i, f₁ (x i) = f₂ (x i)) → f₁ = f₂ := by
+theorem UpperTheory.exists_finite_sections_determining_ringHom_of_smooth
+    : ∀ {O : Type} [CommRing O] {Y : Scheme.{0}} (q : Y ⟶ Spec (CommRingCat.of O)),
+      Smooth q
+        → ∀ {V : Y.Opens} (hV : IsAffineOpen V), ∃ (k : ℕ) (x : Fin k → Γ(Y, V)),
+          ∀ (R : Type) [CommRing R] (f₁ f₂ : Γ(Y, V) →+* R),
+            ptOf hV R f₁ ≫ q = ptOf hV R f₂ ≫ q → (∀ i, f₁ (x i) = f₂ (x i)) → f₁ = f₂ := by
   intro O _ Y q hq V hV
   have hlft : LocallyOfFiniteType q := inferInstance
   have htop : IsAffineOpen (⊤ : (Spec (CommRingCat.of O)).Opens) := isAffineOpen_top _
@@ -35,8 +37,10 @@ theorem UpperTheory.exists_finite_sections_determining_ringHom_of_smooth :
   refine ⟨s.card, fun i => (s.equivFin.symm i : Γ(Y, V)), ?_⟩
   intro R _ f₁ f₂ hpt hgen
   have hcomp : f₁.comp (q.appLE ⊤ V hle).hom = f₂.comp (q.appLE ⊤ V hle).hom := by
-    have e : ∀ f : Γ(Y, V) →+* R, ptOf hV R f ≫ q =
-        Spec.map (CommRingCat.ofHom (f.comp (q.appLE ⊤ V hle).hom)) ≫ htop.fromSpec := by
+    have e
+        : ∀ f : Γ(Y, V) →+* R,
+          ptOf hV R f ≫ q
+            = Spec.map (CommRingCat.ofHom (f.comp (q.appLE ⊤ V hle).hom)) ≫ htop.fromSpec := by
       intro f
       unfold ptOf
       rw [Category.assoc, ← IsAffineOpen.SpecMap_appLE_fromSpec q htop hV hle, ← Category.assoc,

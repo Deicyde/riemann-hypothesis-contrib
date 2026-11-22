@@ -10,9 +10,11 @@ namespace PositivityTheory.RgUd.TP.Desc.Piece.PSect
 
 open Module Polynomial
 
-theorem idem {k S : Type*} [Field k] [CommRing S] [Algebra k S] [FiniteDimensional k S] [IsReduced S] :
-    ∃ (m : ℕ) (e : Fin m → S), (∀ t, IsIdempotentElem (e t)) ∧ ∑ t, e t = 1 ∧
-      (∀ t t', t ≠ t' → e t * e t' = 0) ∧ ∀ t s, s * e t = 0 ∨ ∃ w, s * e t * w = e t := by
+theorem idem
+    {k S : Type*} [Field k] [CommRing S] [Algebra k S] [FiniteDimensional k S] [IsReduced S]
+    : ∃ (m : ℕ) (e : Fin m → S),
+      (∀ t, IsIdempotentElem (e t)) ∧ ∑ t, e t = 1 ∧ (∀ t t', t ≠ t' → e t * e t' = 0)
+        ∧ ∀ t s, s * e t = 0 ∨ ∃ w, s * e t * w = e t := by
   classical
   have : IsArtinianRing S := IsArtinianRing.of_finite k S
   haveI : Fintype (MaximalSpectrum S) := Fintype.ofFinite _
@@ -36,7 +38,8 @@ theorem idem {k S : Type*} [Field k] [CommRing S] [Algebra k S] [FiniteDimension
   · intro t t' htt
     rw [← map_mul]
     have hne : σ t ≠ σ t' := fun h => htt (σ.injective h)
-    have : (Pi.single (σ t) 1 * Pi.single (σ t') 1 : ∀ M : MaximalSpectrum S, S ⧸ M.asIdeal) = 0 := by
+    have : (Pi.single (σ t) 1 * Pi.single (σ t') 1 : ∀ M : MaximalSpectrum S, S ⧸ M.asIdeal)
+        = 0 := by
       ext M
       by_cases h1 : M = σ t
       · subst h1; simp [hne.symm]
@@ -62,16 +65,20 @@ theorem idem {k S : Type*} [Field k] [CommRing S] [Algebra k S] [FiniteDimension
       · subst h1; simp only [Pi.mul_apply, Pi.single_eq_same, mul_one]; exact hb
       · simp [h1]
 
-theorem sEps {k R : Type*} [Field k] [CommRing R] [Algebra k R] [IsPrincipalIdealRing R] (S : Subalgebra k R)
-    (hS : ∀ r : R, ∃ s ∈ S, IsNilpotent (r - s)) (q : ℕ) (hnil : ∀ r : R, IsNilpotent r → r ^ q = 0) :
-    ∃ ε : R, IsNilpotent ε ∧ ∀ r : R, ∃ σ : Fin q → R, (∀ l, σ l ∈ S) ∧ r = ∑ l, σ l * ε ^ (l : ℕ) := by
+theorem sEps
+    {k R : Type*} [Field k] [CommRing R] [Algebra k R] [IsPrincipalIdealRing R]
+    (S : Subalgebra k R) (hS : ∀ r : R, ∃ s ∈ S, IsNilpotent (r - s))
+    (q : ℕ) (hnil : ∀ r : R, IsNilpotent r → r ^ q = 0)
+    : ∃ ε : R,
+      IsNilpotent ε ∧ ∀ r : R, ∃ σ : Fin q → R, (∀ l, σ l ∈ S) ∧ r = ∑ l, σ l * ε ^ (l : ℕ) := by
   classical
   set ε := Submodule.IsPrincipal.generator (nilradical R) with hε
   have hspan : Ideal.span {ε} = nilradical R := Ideal.span_singleton_generator _
   have hεn : IsNilpotent ε := mem_nilradical.mp (Submodule.IsPrincipal.generator_mem _)
   refine ⟨ε, hεn, fun r => ?_⟩
-  have key : ∀ n : ℕ, ∃ σ : Fin n → R, (∀ l, σ l ∈ S) ∧
-      ∃ u : R, r = ∑ l, σ l * ε ^ (l : ℕ) + ε ^ n * u := by
+  have key
+      : ∀ n : ℕ, ∃ σ : Fin n → R,
+        (∀ l, σ l ∈ S) ∧ ∃ u : R, r = ∑ l, σ l * ε ^ (l : ℕ) + ε ^ n * u := by
     intro n
     induction n with
     | zero => exact ⟨Fin.elim0, fun l => l.elim0, r, by simp⟩

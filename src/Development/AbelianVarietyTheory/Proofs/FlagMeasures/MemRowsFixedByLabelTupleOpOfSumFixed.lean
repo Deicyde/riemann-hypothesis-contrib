@@ -13,20 +13,37 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsWeakInt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.ArithmeticCylinders Formalism.L2.Theta Formalism.IndefR.Mult Formalism.IndefR.Links Formalism.IndefR.AutomorphicEvaluation Formalism.IndefR.principalLevelFrame Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField ReciprocityTheory.Aut Formalism.AUTREP GlobalTheory.Mem.SRe GlobalTheory.LabPin
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.ArithmeticCylinders Formalism.L2.Theta Formalism.IndefR.Mult
+  Formalism.IndefR.Links Formalism.IndefR.AutomorphicEvaluation Formalism.IndefR.principalLevelFrame
+  Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField ReciprocityTheory.Aut
+  Formalism.AUTREP GlobalTheory.Mem.SRe GlobalTheory.LabPin
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LabPin.instCM
 
 namespace GlobalTheory.LabFix
 
-theorem mem_VT_of_sum_fixed : ∀ (D : D7) (X : HidaSetting D) (red : X.B.I.Gf → G0g D.nd) (sec : G0g D.nd → X.B.I.Gf), IsRedHom X red → IsSec X red sec → ∀ (t : Tup2 D), (∀ k v, IsLabel D k (t k v)) → ∀ f ∈ HHX X, ∑ᶠ γ, serCoef t γ • X.B.R ((1, sec γ) : X.B.I.GA) f = f → f ∈ VT X t := by
+theorem mem_VT_of_sum_fixed
+    : ∀ (D : D7) (X : HidaSetting D) (red : X.B.I.Gf → G0g D.nd) (sec : G0g D.nd → X.B.I.Gf),
+      IsRedHom X red → IsSec X red sec
+        → ∀ (t : Tup2 D),
+          (∀ k v, IsLabel D k (t k v))
+            → ∀ f ∈ HHX X,
+              ∑ᶠ γ, serCoef t γ • X.B.R ((1, sec γ) : X.B.I.GA) f = f → f ∈ VT X t := by
   intro D X red sec hred hsec t ht f hf hsum
   classical
   have hg : 1 ≤ X.B.g := by
     rw [X.g_eq]
-    exact Nat.one_le_iff_ne_zero.2 (mul_ne_zero (D.host.g_prime 0).ne_zero (D.host.g_prime 1).ne_zero)
-  let ρ : GlobalTheory.RowLev.Red X.B.I X.B.g (G0g D.nd) :=
-    { toFun := red, map_mul := hred.2.1, ker := hred.2.2.2, surj := hred.2.2.1 }
+    exact Nat.one_le_iff_ne_zero.2 (mul_ne_zero (D.host.g_prime 0).ne_zero
+      (D.host.g_prime 1).ne_zero)
+  let ρ : GlobalTheory.RowLev.Red X.B.I X.B.g (G0g D.nd) := {
+    toFun := red
+    map_mul := hred.2.1
+    ker := hred.2.2.2
+    surj := hred.2.2.1
+  }
   obtain ⟨hcoef, hcent⟩ := GlobalTheory.LabIdem.ES_single_coeff_central D t ht
   have hegA : egA X (ES {t}) = ρ.lift X.B.μf (ES {t}) := by
     funext x
@@ -34,15 +51,19 @@ theorem mem_VT_of_sum_fixed : ∀ (D : D7) (X : HidaSetting D) (red : X.B.I.Gf �
     by_cases hx : x ∈ X.B.I.Kset
     · rw [if_pos hx, GlobalTheory.RowLev.Red.lift_of_mem ρ _ _ hx]
     · rw [if_neg hx, GlobalTheory.RowLev.Red.lift_of_notMem ρ _ _ hx]
-  obtain ⟨h1R, hm, hn, -⟩ := GlobalTheory.RightRegProps.rightReg_unitary_mul_continuous X.B.I X.B.μf X.B.fund
-    X.B.fund_spec X.B.R X.B.R_spec
-  obtain ⟨huniq, -, -, hprod, -⟩ := GlobalTheory.WeakConv.rightConv_unique_add_smul_mul_comm X.B.I X.B.μf X.B.fund X.B.R
-    X.B.fund_spec X.B.R_spec
-  obtain ⟨hQ, -, -, -, -, hinfl, -, -, -⟩ := GlobalTheory.InflBasic.inflation_basic X.B.I X.B.g (G0g D.nd) ρ X.B.μf hg
+  obtain ⟨h1R, hm, hn, -⟩ :=
+    GlobalTheory.RightRegProps.rightReg_unitary_mul_continuous X.B.I X.B.μf X.B.fund X.B.fund_spec
+      X.B.R X.B.R_spec
+  obtain ⟨huniq, -, -, hprod, -⟩ :=
+    GlobalTheory.WeakConv.rightConv_unique_add_smul_mul_comm X.B.I X.B.μf X.B.fund X.B.R
+      X.B.fund_spec X.B.R_spec
+  obtain ⟨hQ, -, -, -, -, hinfl, -, -, -⟩ :=
+    GlobalTheory.InflBasic.inflation_basic X.B.I X.B.g (G0g D.nd) ρ X.B.μf hg
   letI : Fintype (G0g D.nd) := Fintype.ofFinite _
   obtain ⟨hlint, hlloc, -⟩ := hinfl (ES {t})
-  obtain ⟨Ta, hTa⟩ := (GlobalTheory.AutInst_exists_isRConvF_and_isRConv X.B.I X.B.μf X.B.fund X.B.fund_spec X.B.R
-    X.B.R_spec).1 _ hlint
+  obtain ⟨Ta, hTa⟩ :=
+    (GlobalTheory.AutInst_exists_isRConvF_and_isRConv X.B.I X.B.μf X.B.fund X.B.fund_spec X.B.R
+      X.B.R_spec).1 _ hlint
   have he := X.B.e_adm
   have hecont : Continuous X.B.e := he.1.continuous
   have hReRe : X.B.Re.comp X.B.Re = X.B.Re := by
@@ -76,14 +97,20 @@ theorem mem_VT_of_sum_fixed : ∀ (D : D7) (X : HidaSetting D) (red : X.B.I.Gf �
   haveI : SecondCountableTopology X.B.I.Gf := GlobalTheory.CongTop.secondCountable_finiteAdelicPoints X.B.I
   have hfix : ∀ k ∈ X.B.I.Kg X.B.g, X.B.R (1, k) f = f := by
     intro k hk
-    have h := GlobalTheory.IdemProj.op_fixed X.B.μf (fun g => X.B.R (1, g)) p1 pm pn X.B.e X.B.Re X.B.Re_spec.2 k
-      (fun x => by simpa using he.2.2.2.2.2.1 x k hk 1 hone)
+    have h :=
+      GlobalTheory.IdemProj.op_fixed X.B.μf
+        (fun g => X.B.R (1, g))
+        p1 pm pn X.B.e X.B.Re X.B.Re_spec.2 k
+        (fun x => by simpa using he.2.2.2.2.2.1 x k hk 1 hone)
     rw [← hRef, ← ContinuousLinearMap.comp_apply]
     exact DFunLike.congr_fun h f
   have hTaf : Ta f = f := by
     apply ext_inner_left ℂ
     intro v
-    rw [hTa.2, GlobalTheory.LevelIdem.integral_lift ρ X.B.μf hg (ES {t}) sec hsec (fun x => ⟪v, X.B.R (1, x) f⟫_ℂ) ?_]
+    rw [hTa.2,
+      GlobalTheory.LevelIdem.integral_lift ρ X.B.μf hg (ES {t}) sec hsec
+        (fun x => ⟪v, X.B.R (1, x) f⟫_ℂ)
+        ?_]
     · conv_rhs => rw [← hsum]
       rw [finsum_eq_sum_of_fintype, inner_sum]
       simp only [inner_smul_right, hcoef]

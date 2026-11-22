@@ -9,18 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FramesCharact
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver GlobalTheory.HL
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver GlobalTheory.HL
 open scoped Classical
 
 namespace GlobalTheory.RelGPoint
 
 open GlobalTheory.HL.CoordExist
 
-theorem exists_coord_of_point {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-    [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E) (hM : M.OK) {V : Type}
-    [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r)
-    (hrk : Module.finrank E V = k + 2 * r + 1) (hpt : P.IsPoint) (hN : P.NormsOK) (hG : P.Gv ≠ 0) :
-    ∃ S : Frames M.L r k, Nonempty (Coord P S) := by
+theorem exists_coord_of_point
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+    (M : Model F E) (hM : M.OK)
+    {V : Type} [AddCommGroup V] [Module E V]
+    (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r)
+    (hrk : Module.finrank E V = k + 2 * r + 1) (hpt : P.IsPoint) (hN : P.NormsOK) (hG : P.Gv ≠ 0)
+    : ∃ S : Frames M.L r k, Nonempty (Coord P S) := by
   obtain ⟨w, hw⟩ := hpt
   obtain ⟨hTo, hT, hTo', hT', hgg⟩ := hN
   have := hM.loc
@@ -34,7 +38,8 @@ theorem exists_coord_of_point {F : Type} [Field F] [ValuativeRel F] [Topological
       exact ⟨ϖ, hϖ, fun g hg => by cases hg⟩
     · exact ⟨g.q, g.q_irr, fun g' hg => by cases hg; rfl⟩
   refine ⟨
-    { ϖ := ϖ
+    {
+      ϖ := ϖ
       ϖ_irr := hϖ
       Hm := Matrix.of fun i j => H.h (b i) (b j)
       herm := hermND H b
@@ -54,8 +59,10 @@ theorem exists_coord_of_point {F : Type} [Field F] [ValuativeRel F] [Topological
       relevant := fun a c => ?_
       G_ne := ?_
       gg := M.split.isSome
-      gg_ok := fun h => ?_ }, ⟨
-    { e := b.equivFun
+      gg_ok := fun h => ?_
+    },
+    ⟨{
+      e := b.equivFun
       h_eq := fun x y => hf_basis H b x y
       f_eq := fun _ => rfl
       f'_eq := fun _ => rfl
@@ -64,15 +71,19 @@ theorem exists_coord_of_point {F : Type} [Field F] [ValuativeRel F] [Topological
       T_eq := rfl
       T'_eq := rfl
       gg_none := fun h => by simp only [h, Option.isSome_none]
-      gg_some := fun g h => ⟨by simp only [h, Option.isSome_some], hϖg g h⟩ }⟩⟩
+      gg_some := fun g h => ⟨by simp only [h, Option.isSome_some], hϖg g h⟩
+    }⟩
+  ⟩
   · rw [hf_basis, ← hw, mul_right_comm, ← mul_pow]
     simp [HermSp.Zhat]
   · simp only [hf_basis]
-    have h1 : H.Dl P.A.f P.B.f (r + 1) =
-        lead (Matrix.of fun a c => H.h (P.B.f c) (P.A.f a)) (Fin.last (r + 1)) := by
+    have h1
+        : H.Dl P.A.f P.B.f (r + 1)
+          = lead (Matrix.of fun a c => H.h (P.B.f c) (P.A.f a)) (Fin.last (r + 1)) := by
       unfold HermSp.Dl; rw [dite_eq_left le_rfl]; rfl
-    have h2 : H.Dl P.A.f P.B.f r =
-        lead (Matrix.of fun a c => H.h (P.B.f c) (P.A.f a)) (Fin.last r).castSucc := by
+    have h2
+        : H.Dl P.A.f P.B.f r
+          = lead (Matrix.of fun a c => H.h (P.B.f c) (P.A.f a)) (Fin.last r).castSucc := by
       unfold HermSp.Dl; rw [dite_eq_left (Nat.le_succ r)]; rfl
     rw [← h1, ← h2]
     exact hG
@@ -80,7 +91,14 @@ theorem exists_coord_of_point {F : Type} [Field F] [ValuativeRel F] [Topological
     obtain ⟨⟨u, v, hu, hv⟩, -⟩ := hgg g hg
     exact ⟨not_field M.L g, unit_of hTo u hu, unit_of hTo' v hv⟩
 
-theorem relG_of_point : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ), ∀ (k : ℕ) (P : FPair H r), Module.finrank E V = k + 2 * r + 1 → P.IsPoint → P.NormsOK → P.Gv ≠ 0 → P.RelG (theta M) := by
+theorem relG_of_point
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ),
+          ∀ (k : ℕ) (P : FPair H r),
+            Module.finrank E V = k + 2 * r + 1 → P.IsPoint → P.NormsOK → P.Gv ≠ 0
+              → P.RelG (theta M) := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P hrk hpt hN hG
   obtain ⟨S, ⟨c⟩⟩ := exists_coord_of_point M hM H r k P hrk hpt hN hG
   haveI := hM.loc
@@ -97,8 +115,9 @@ theorem relG_of_point : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSp
     rw [dite_eq_left hl]
     unfold Frames.D lead
     rw [hZm]
-  have hmap : ∀ (f : Fin (r + 1) → V) (g : Fin (r + 1) → S.V), (∀ a, g a = c.e (f a)) →
-      ∀ x ∈ H.Xp f, c.e x ∈ Submodule.span E (Set.range g) := by
+  have hmap
+      : ∀ (f : Fin (r + 1) → V) (g : Fin (r + 1) → S.V),
+        (∀ a, g a = c.e (f a)) → ∀ x ∈ H.Xp f, c.e x ∈ Submodule.span E (Set.range g) := by
     intro f g hg x hx
     have hgf : g = (c.e : V →ₗ[E] S.V) ∘ f := funext hg
     rw [hgf, Set.range_comp, ← Submodule.map_span]

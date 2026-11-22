@@ -16,13 +16,15 @@ theorem LocalQuotPrimes.proof : LocalQuotPrimes.Statement.{u} := by
   let S := Localization.AtPrime U
   let PS : Ideal S := P.map (algebraMap R S)
   have hsurj : Function.Surjective (Ideal.Quotient.mk PS) := Ideal.Quotient.mk_surjective
-  have hmap : ∀ I : Ideal R,
-      I.map (localQuotMap P U) = (I.map (algebraMap R S)).map (Ideal.Quotient.mk PS) := by
+  have hmap
+      : ∀ I : Ideal R,
+        I.map (localQuotMap P U) = (I.map (algebraMap R S)).map (Ideal.Quotient.mk PS) := by
     intro I
     rw [Ideal.map_map]
     rfl
-  have hcomap : ∀ J : Ideal (localQuot P U),
-      J.comap (localQuotMap P U) = (J.comap (Ideal.Quotient.mk PS)).comap (algebraMap R S) := by
+  have hcomap
+      : ∀ J : Ideal (localQuot P U),
+        J.comap (localQuotMap P U) = (J.comap (Ideal.Quotient.mk PS)).comap (algebraMap R S) := by
     intro J
     rw [Ideal.comap_comap]
     rfl

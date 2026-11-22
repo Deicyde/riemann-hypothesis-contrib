@@ -20,7 +20,8 @@ section CyclicChar
 
 variable (Q : Type) [Group Q] [Finite Q] [IsCyclic Q]
 
-theorem exists_injective_addCircle_char : ∃ ψ : Additive Q →+ AddCircle (1 : ℚ), Function.Injective ψ := by
+theorem exists_injective_addCircle_char
+    : ∃ ψ : Additive Q →+ AddCircle (1 : ℚ), Function.Injective ψ := by
   have := Fintype.ofFinite Q
   obtain ⟨σ, hσ⟩ := IsCyclic.exists_generator (α := Q)
   refine ⟨GroundTheory.GroupCoh.cyclicChar σ hσ, (injective_iff_map_eq_zero _).2 fun x hx => ?_⟩
@@ -38,21 +39,26 @@ theorem exists_injective_addCircle_char : ∃ ψ : Additive Q →+ AddCircle (1 
       field_simp at hm
       linarith
     exact_mod_cast this
-  rw [hxk, hkm, mul_comm, ← ofMul_zpow, zpow_mul, zpow_natCast, pow_card_eq_one', one_zpow, ofMul_one]
+  rw [hxk, hkm, mul_comm, ← ofMul_zpow, zpow_mul, zpow_natCast, pow_card_eq_one', one_zpow,
+    ofMul_one]
 
 end CyclicChar
 
 section Main
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
   [TotallyDisconnectedSpace G]
 
-theorem exists_cupCharClassProf_eq_of_cohomologyRes_eq_zero (A : Rep ℤ G) [IsDiscreteRep A]
-    (N : Subgroup G) [N.Normal] (hN : IsOpen (N : Set G)) [IsCyclic (G ⧸ N)]
-    (h1 : IsZero (cohomology (Rep.res N.subtype A) 1)) (x : cohomology A 2)
-    (hx : (cohomologyRes A N 2).hom x = 0) :
-    ∃ (χ : Additive G →ₜ+ QZ) (a : A.ρ.invariants), (∀ n ∈ N, χ (Additive.ofMul n) = 0) ∧
-      (cupCharClassProf A χ).hom a = x := by
+theorem exists_cupCharClassProf_eq_of_cohomologyRes_eq_zero
+    (A : Rep ℤ G) [IsDiscreteRep A]
+    (N : Subgroup G) [N.Normal]
+    (hN : IsOpen (N : Set G))
+    [IsCyclic (G ⧸ N)]
+    (h1 : IsZero (cohomology (Rep.res N.subtype A) 1))
+    (x : cohomology A 2) (hx : (cohomologyRes A N 2).hom x = 0)
+    : ∃ (χ : Additive G →ₜ+ QZ) (a : A.ρ.invariants),
+      (∀ n ∈ N, χ (Additive.ofMul n) = 0) ∧ (cupCharClassProf A χ).hom a = x := by
   have hNc : IsClosed (N : Set G) := Subgroup.isClosed_of_isOpen N hN
   have hmem : x ∈ LinearMap.range (cohomologyInfl A N 2).hom := by
     rw [range_cohomologyInfl_eq_ker_cohomologyRes hNc two_ne_zero]
@@ -65,23 +71,29 @@ theorem exists_cupCharClassProf_eq_of_cohomologyRes_eq_zero (A : Rep ℤ G) [IsD
   have : Finite (G ⧸ N) := Subgroup.quotient_finite_of_isOpen N hN
   have := Fintype.ofFinite (G ⧸ N)
   obtain ⟨ψ, hψ⟩ := exists_injective_addCircle_char (G ⧸ N)
-  let χ₀ : Additive (G ⧸ N) →ₜ+ QZ :=
-    { toAddMonoidHom := QZ.toAddCircle.symm.toAddMonoidHom.comp ψ
-      continuous_toFun := continuous_of_discreteTopology }
+  let χ₀ : Additive (G ⧸ N) →ₜ+ QZ := {
+    toAddMonoidHom := QZ.toAddCircle.symm.toAddMonoidHom.comp ψ
+    continuous_toFun := continuous_of_discreteTopology
+  }
   have hχ₀ : Function.Injective χ₀ := QZ.toAddCircle.symm.injective.comp hψ
   obtain ⟨a, rfl⟩ := cupCharClassProf_surjective (A.quotientToInvariants N) χ₀ hχ₀ y
   let f : Rep.res (QuotientGroup.mk' N) (A.quotientToInvariants N) ⟶ A :=
     Rep.ofHom (A.ρ.quotientToInvariants_lift N)
-  let b : A.ρ.invariants := ⟨f.hom (a : A.quotientToInvariants N), fun g => by
-    have hc := Rep.hom_comm_apply f g (a : A.quotientToInvariants N)
-    rw [← hc]
-    congr 1
-    exact a.2 (QuotientGroup.mk' N g)⟩
-  refine ⟨contCharComp χ₀ (QuotientGroup.mk' N) (continuous_quotientGroup_mk' N), b, fun n hn => ?_, ?_⟩
-  · rw [contCharComp_apply, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff n).2 hn, ofMul_one, map_zero]
+  let b : A.ρ.invariants := ⟨
+    f.hom (a : A.quotientToInvariants N),
+    fun g => by
+      have hc := Rep.hom_comm_apply f g (a : A.quotientToInvariants N)
+      rw [← hc]
+      congr 1
+      exact a.2 (QuotientGroup.mk' N g)
+  ⟩
+  refine
+    ⟨contCharComp χ₀ (QuotientGroup.mk' N) (continuous_quotientGroup_mk' N), b, fun n hn => ?_, ?_⟩
+  · rw [contCharComp_apply, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff n).2 hn, ofMul_one,
+      map_zero]
   · rw [cohomologyInfl_eq]
-    exact (cohomologyMapAlong_cupCharClassProf (QuotientGroup.mk' N) (continuous_quotientGroup_mk' N) f χ₀
-      a b rfl).symm
+    exact (cohomologyMapAlong_cupCharClassProf (QuotientGroup.mk' N)
+      (continuous_quotientGroup_mk' N) f χ₀ a b rfl).symm
 
 end Main
 

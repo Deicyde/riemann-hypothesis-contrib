@@ -9,11 +9,13 @@ open GlobalTheory.CuspGeneric MeasureTheory
 
 namespace GlobalTheory.CompanionTheory.AvgSwap
 
-private theorem integral_intervalIntegral_comm_of_continuous_norm_le {G : Type} [TopologicalSpace G]
-    {mG : MeasurableSpace G} [OpensMeasurableSpace G] (μ : Measure G) [IsFiniteMeasure μ]
-    (F : G × ℝ → ℂ) (hF : Continuous F) (t C : ℝ)
-    (hC : ∀ x, ∀ s ∈ Set.uIcc (0 : ℝ) t, ‖F (x, s)‖ ≤ C) :
-    ∫ x, (∫ s in (0 : ℝ)..t, F (x, s)) ∂μ = ∫ s in (0 : ℝ)..t, ∫ x, F (x, s) ∂μ := by
+private theorem integral_intervalIntegral_comm_of_continuous_norm_le
+    {G : Type} [TopologicalSpace G]
+    {mG : MeasurableSpace G} [OpensMeasurableSpace G]
+    (μ : Measure G) [IsFiniteMeasure μ]
+    (F : G × ℝ → ℂ) (hF : Continuous F)
+    (t C : ℝ) (hC : ∀ x, ∀ s ∈ Set.uIcc (0 : ℝ) t, ‖F (x, s)‖ ≤ C)
+    : ∫ x, (∫ s in (0 : ℝ)..t, F (x, s)) ∂μ = ∫ s in (0 : ℝ)..t, ∫ x, F (x, s) ∂μ := by
   haveI : IsFiniteMeasure (volume.restrict (Set.uIoc (0 : ℝ) t)) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact measure_Ioc_lt_top⟩
   have hint : Integrable (Function.uncurry fun x s => F (x, s))
@@ -28,14 +30,18 @@ private theorem integral_intervalIntegral_comm_of_continuous_norm_le {G : Type} 
   congr 1
   exact integral_integral_swap hint
 
-theorem avg_intervalIntegral_swap {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] (Γ : AddSubgroup G) (hΓ : IsCoLat Γ)
-    (F : G × ℝ → ℂ) (hF : Continuous F) (hper : ∀ γ ∈ Γ, ∀ x s, F (γ + x, s) = F (x, s)) (t : ℝ) :
-    avg Γ (fun x => ∫ s in (0 : ℝ)..t, F (x, s)) = ∫ s in (0 : ℝ)..t, avg Γ (fun x => F (x, s)) := by
+theorem avg_intervalIntegral_swap
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+    [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G]
+    (Γ : AddSubgroup G) (hΓ : IsCoLat Γ)
+    (F : G × ℝ → ℂ) (hF : Continuous F) (hper : ∀ γ ∈ Γ, ∀ x s, F (γ + x, s) = F (x, s))
+    (t : ℝ)
+    : avg Γ (fun x => ∫ s in (0 : ℝ)..t, F (x, s))
+      = ∫ s in (0 : ℝ)..t, avg Γ (fun x => F (x, s)) := by
   unfold GlobalTheory.CuspGeneric.IsCoLat at hΓ
   obtain ⟨-, K, hK, hKcov⟩ := hΓ
-  obtain ⟨C, hC⟩ := (hK.prod (isCompact_uIcc (a := (0 : ℝ)) (b := t))).exists_bound_of_continuousOn
-    hF.continuousOn
+  obtain ⟨C, hC⟩ :=
+    (hK.prod (isCompact_uIcc (a := (0 : ℝ)) (b := t))).exists_bound_of_continuousOn hF.continuousOn
   have hbound : ∀ x, ∀ s ∈ Set.uIcc (0 : ℝ) t, ‖F (x, s)‖ ≤ C := by
     intro x s hs
     obtain ⟨γ, hγ, hγK⟩ := hKcov x

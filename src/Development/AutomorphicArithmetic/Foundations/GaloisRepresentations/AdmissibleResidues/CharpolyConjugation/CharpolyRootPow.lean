@@ -28,25 +28,28 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial GlobalTheory GlobalTheory.WeilDeligne GlobalTheory.CuspRep UpperTheory.V.Af UpperTheory.GalN.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial GlobalTheory GlobalTheory.WeilDeligne
+  GlobalTheory.CuspRep UpperTheory.V.Af UpperTheory.GalN.V
 
 section
 
-variable {F Ω K : Type} [Field F] [Field Ω] [Algebra F Ω] [Field K] [Algebra F K] [Algebra K Ω]
-  [IsScalarTower F K Ω]
+variable
+  {F Ω K : Type}
+  [Field F] [Field Ω] [Algebra F Ω] [Field K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω]
 
-private def resK (K : Type) [Field K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω]
-    (σ : G F Ω) : K →ₐ[F] Ω :=
+private def resK (K : Type) [Field K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω] (σ : G F Ω)
+    : K →ₐ[F] Ω :=
   (σ : Ω →ₐ[F] Ω).comp (IsScalarTower.toAlgHom F K Ω)
 
 private theorem resK_apply (σ : G F Ω) (x : K) : resK K σ x = σ (algebraMap K Ω x) := rfl
 
-private theorem lift_of_fix (σ : G F Ω) (h : ∀ x : K, σ (algebraMap K Ω x) = algebraMap K Ω x) :
-    ∃ τ : G K Ω, (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) τ = σ := by
+private theorem lift_of_fix (σ : G F Ω) (h : ∀ x : K, σ (algebraMap K Ω x) = algebraMap K Ω x)
+    : ∃ τ : G K Ω, (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) τ = σ := by
   exact ⟨AlgEquiv.ofRingEquiv (f := (σ : Ω ≃+* Ω)) h, by ext x; rfl⟩
 
-private theorem lift_of_res {σ τ : G F Ω} (h : resK K σ = resK K τ) :
-    ∃ u : G K Ω, (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) u = σ⁻¹ * τ := by
+private theorem lift_of_res {σ τ : G F Ω} (h : resK K σ = resK K τ)
+    : ∃ u : G K Ω, (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) u = σ⁻¹ * τ := by
   apply lift_of_fix
   intro x
   have e := congrArg (fun f => f x) h
@@ -54,9 +57,8 @@ private theorem lift_of_res {σ τ : G F Ω} (h : resK K σ = resK K τ) :
   rw [AlgEquiv.mul_apply, ← e]
   simp
 
-private theorem exists_pow_lift [Finite (K →ₐ[F] Ω)] (s : G F Ω) :
-    ∃ m : ℕ, 1 ≤ m ∧ ∃ u : G K Ω,
-      (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) u = s ^ m := by
+private theorem exists_pow_lift [Finite (K →ₐ[F] Ω)] (s : G F Ω)
+    : ∃ m : ℕ, 1 ≤ m ∧ ∃ u : G K Ω, (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) u = s ^ m := by
   obtain ⟨a, b, hne, hab⟩ := Finite.exists_ne_map_eq_of_infinite (fun m : ℕ => resK K (s ^ m))
   rcases lt_or_gt_of_ne hne with hlt | hlt
   · obtain ⟨u, hu⟩ := lift_of_res (K := K) hab
@@ -70,23 +72,29 @@ end
 
 section
 
-variable {F Ω K : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [Field K] [NumberField K]
+variable
+  {F Ω K : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [Field K] [NumberField K]
   [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω]
 
-private theorem isFrob_descend {A : ValuationSubring Ω} {q : ℕ} {u : G K Ω}
-    (h : IsFrob A q ((AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) u)) : IsFrob A q u :=
+private theorem isFrob_descend
+    {A : ValuationSubring Ω} {q : ℕ} {u : G K Ω}
+    (h : IsFrob A q ((AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) u))
+    : IsFrob A q u :=
   ⟨h.1, h.2⟩
 
-private theorem ine_descend {A : ValuationSubring Ω} {u : G K Ω}
-    (h : (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) u ∈ Ine (F := F) A) :
-    u ∈ Ine (F := K) A :=
+private theorem ine_descend
+    {A : ValuationSubring Ω} {u : G K Ω}
+    (h : (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω) u ∈ Ine (F := F) A)
+    : u ∈ Ine (F := K) A :=
   ⟨h.1, h.2⟩
 
-private theorem isFrob_pow {A : ValuationSubring Ω} {q : ℕ} {σ : G F Ω} (h : IsFrob A q σ) (k : ℕ) :
-    IsFrob A (q ^ k) (σ ^ k) := by
+private theorem isFrob_pow {A : ValuationSubring Ω} {q : ℕ} {σ : G F Ω} (h : IsFrob A q σ) (k : ℕ)
+    : IsFrob A (q ^ k) (σ ^ k) := by
   obtain ⟨hd, hf⟩ := h
-  have hint : ∀ τ : G F Ω, τ ∈ ValuationSubring.decompositionSubgroup F A →
-      ∀ y : Ω, A.valuation y ≤ 1 → A.valuation (τ y) ≤ 1 := by
+  have hint
+      : ∀ τ : G F Ω,
+        τ ∈ ValuationSubring.decompositionSubgroup F A
+          → ∀ y : Ω, A.valuation y ≤ 1 → A.valuation (τ y) ≤ 1 := by
     intro τ hτ y hy
     by_contra hc
     push_neg at hc
@@ -117,8 +125,8 @@ private theorem isFrob_pow {A : ValuationSubring Ω} {q : ℕ} {σ : G F Ω} (h 
       rw [map_pow]
       exact pow_le_one' hx _
     have e : (σ ^ (k + 1)) x - x ^ q ^ (k + 1) = (σ y - y ^ q) + (y ^ q - (x ^ q ^ k) ^ q) := by
-      rw [show σ ^ (k + 1) = σ * σ ^ k from pow_succ' σ k, show q ^ (k + 1) = q ^ k * q from pow_succ q k,
-        pow_mul, AlgEquiv.mul_apply]
+      rw [show σ ^ (k + 1) = σ * σ ^ k from pow_succ' σ k,
+        show q ^ (k + 1) = q ^ k * q from pow_succ q k, pow_mul, AlgEquiv.mul_apply]
       ring
     rw [e]
     refine lt_of_le_of_lt (Valuation.map_add _ _ _) (max_lt (hf y hy) ?_)
@@ -130,15 +138,19 @@ private theorem isFrob_pow {A : ValuationSubring Ω} {q : ℕ} {σ : G F Ω} (h 
       exact mul_le_one' (pow_le_one' hy _) (pow_le_one' hz _)
     exact lt_of_le_of_lt (mul_le_of_le_one_left' hs) (ih x hx)
 
-private theorem ine_finite [Finite (K →ₐ[F] Ω)] {l : ℕ} [Fact l.Prime] {n : ℕ}
-    (r : G F Ω →* GL (Fin n) (Qbar l)) (A : ValuationSubring Ω)
-    (h : ((r.comp (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω)) ''
-      (Ine (F := K) A : Set (G K Ω))).Finite) :
-    (r '' (Ine (F := F) A : Set (G F Ω))).Finite := by
+private theorem ine_finite
+    [Finite (K →ₐ[F] Ω)]
+    {l : ℕ} [Fact l.Prime]
+    {n : ℕ} (r : G F Ω →* GL (Fin n) (Qbar l))
+    (A : ValuationSubring Ω)
+    (h : ((r.comp (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω))
+      '' (Ine (F := K) A : Set (G K Ω))).Finite)
+    : (r '' (Ine (F := F) A : Set (G F Ω))).Finite := by
   classical
   let c : (K →ₐ[F] Ω) → GL (Fin n) (Qbar l) := fun φ =>
     if hφ : ∃ g ∈ Ine (F := F) A, resK K g = φ then r (Classical.choose hφ) else 1
-  refine ((Set.finite_univ.prod h).image (fun p : (K →ₐ[F] Ω) × GL (Fin n) (Qbar l) => c p.1 * p.2)).subset ?_
+  refine ((Set.finite_univ.prod h).image
+    (fun p : (K →ₐ[F] Ω) × GL (Fin n) (Qbar l) => c p.1 * p.2)).subset ?_
   rintro _ ⟨σ, hσ, rfl⟩
   have hex : ∃ g ∈ Ine (F := F) A, resK K g = resK K σ := ⟨σ, hσ, rfl⟩
   obtain ⟨hg, hgres⟩ := Classical.choose_spec hex
@@ -151,15 +163,21 @@ private theorem ine_finite [Finite (K →ₐ[F] Ω)] {l : ℕ} [Fact l.Prime] {n
 
 end
 
-private theorem charpoly_root_pow {k : Type} [Field k] [IsAlgClosed k] {n : ℕ}
-    (M : Matrix (Fin n) (Fin n) k) {N : ℕ} (hN : 0 < N) {α : k}
-    (h : (M ^ N).charpoly.IsRoot α) : ∃ a, M.charpoly.IsRoot a ∧ a ^ N = α := by
+private theorem charpoly_root_pow
+    {k : Type} [Field k] [IsAlgClosed k]
+    {n : ℕ} (M : Matrix (Fin n) (Fin n) k)
+    {N : ℕ} (hN : 0 < N)
+    {α : k} (h : (M ^ N).charpoly.IsRoot α)
+    : ∃ a, M.charpoly.IsRoot a ∧ a ^ N = α := by
   rw [← Matrix.mem_spectrum_iff_isRoot_charpoly, spectrum.map_pow_of_pos M hN] at h
   obtain ⟨a, ha, rfl⟩ := h
   exact ⟨a, Matrix.mem_spectrum_iff_isRoot_charpoly.1 ha, rfl⟩
 
-private theorem noLink_pow {l : ℕ} [Fact l.Prime] {n : ℕ} {x : GL (Fin n) (Qbar l)} {Q : ℕ}
-    (h : NoLink x Q) {N : ℕ} (hN : 0 < N) : NoLink (x ^ N) (Q ^ N) := by
+private theorem noLink_pow
+    {l : ℕ} [Fact l.Prime]
+    {n : ℕ} {x : GL (Fin n) (Qbar l)} {Q : ℕ} (h : NoLink x Q)
+    {N : ℕ} (hN : 0 < N)
+    : NoLink (x ^ N) (Q ^ N) := by
   intro α β hα hβ k hk heq
   rw [Units.val_pow_eq_pow_val] at hα hβ
   obtain ⟨a, ha, rfl⟩ := charpoly_root_pow _ hN hα
@@ -169,8 +187,11 @@ private theorem noLink_pow {l : ℕ} [Fact l.Prime] {n : ℕ} {x : GL (Fin n) (Q
   push_cast at heq
   exact heq
 
-theorem UpperTheory.GalN.V.L.wup :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (n : ℕ) (r : G F Ω →* GL (Fin n) (Qbar l)) (K : Type) [Field K] [NumberField K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω], Unlinked r → Unlinked (r.comp (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω)) := by
+theorem UpperTheory.GalN.V.L.wup
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (n : ℕ) (r : G F Ω →* GL (Fin n) (Qbar l)) (K : Type) [Field K]
+        [NumberField K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω],
+      Unlinked r → Unlinked (r.comp (AlgEquiv.restrictScalarsHom F : G K Ω →* G F Ω)) := by
   intro F Ω _ _ _ _ _ l _ n r K _ _ _ _ _ hU
   intro w hl A hA hfin
   haveI : Finite (K →ₐ[F] Ω) := inferInstance

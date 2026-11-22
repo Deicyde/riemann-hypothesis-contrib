@@ -12,24 +12,26 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open MvPolynomial Finset
 
-theorem prod_one_sub_rootOfUnityPoint (h1 : SchProdOneSubRootsOfUnity.Statement) {N k : ℕ}
-    (hk : 1 ≤ k) (hkN : k ≤ N) :
-    ∏ i : Fin N, (1 - Polynomial.C (rootOfUnityPoint N k i) * Polynomial.X) =
-      (1 - Polynomial.X ^ k : Polynomial ℂ) := by
+theorem prod_one_sub_rootOfUnityPoint
+    (h1 : SchProdOneSubRootsOfUnity.Statement) {N k : ℕ} (hk : 1 ≤ k) (hkN : k ≤ N)
+    : ∏ i : Fin N, (1 - Polynomial.C (rootOfUnityPoint N k i) * Polynomial.X)
+      = (1 - Polynomial.X ^ k : Polynomial ℂ) := by
   let f : ℕ → Polynomial ℂ := fun i =>
     1 - Polynomial.C (if i < k then rootOfUnity k ^ i else 0) * Polynomial.X
-  calc ∏ i : Fin N, (1 - Polynomial.C (rootOfUnityPoint N k i) * Polynomial.X)
+  calc
+    ∏ i : Fin N, (1 - Polynomial.C (rootOfUnityPoint N k i) * Polynomial.X)
       = ∏ i ∈ range N, f i := Fin.prod_univ_eq_prod_range f N
     _ = ∏ i ∈ range k, f i := by
-        refine (prod_subset (range_subset_range.2 hkN) fun i _ hik => ?_).symm
-        have : ¬ i < k := fun h => hik (mem_range.2 h)
-        simp [f, this]
+      refine (prod_subset (range_subset_range.2 hkN) fun i _ hik => ?_).symm
+      have : ¬ i < k := fun h => hik (mem_range.2 h)
+      simp [f, this]
     _ = ∏ i ∈ range k, (1 - Polynomial.C (rootOfUnity k ^ i) * Polynomial.X) :=
-        prod_congr rfl fun i hi => by simp [f, mem_range.1 hi]
+      prod_congr rfl fun i hi => by simp [f, mem_range.1 hi]
     _ = 1 - Polynomial.X ^ k := h1 k hk
 
-theorem SchCompleteAtRootsOfUnity.proof (h1 : SchProdOneSubRootsOfUnity.Statement)
-    (h2 : SchCompleteGenerating.Statement) : SchCompleteAtRootsOfUnity.Statement := by
+theorem SchCompleteAtRootsOfUnity.proof
+    (h1 : SchProdOneSubRootsOfUnity.Statement) (h2 : SchCompleteGenerating.Statement)
+    : SchCompleteAtRootsOfUnity.Statement := by
   intro N k d hk hkN
   let H : ℕ → ℂ := fun n => aeval (rootOfUnityPoint N k) (hsymm (Fin N) ℚ n)
   have hrec : ∀ n, H n - (if k ≤ n then H (n - k) else 0) = if n = 0 then 1 else 0 := by

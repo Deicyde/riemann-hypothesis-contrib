@@ -13,34 +13,38 @@ namespace GlobalTheory.PD.Loc
 
 variable {k : Type} [Field k] {F : Type} [Field F] [Algebra k F] {d : ℕ} {x : Fin (d + 1) → F}
 
-theorem gen_mem (I : Finset (Fin (d + 1))) {i : Fin (d + 1)} (hi : i ∈ I) (j : Fin (d + 1)) :
-    x j / x i ∈ rA k x I :=
+theorem gen_mem (I : Finset (Fin (d + 1))) {i : Fin (d + 1)} (hi : i ∈ I) (j : Fin (d + 1))
+    : x j / x i ∈ rA k x I :=
   Algebra.subset_adjoin ⟨i, hi, j, rfl⟩
 
 theorem rA_mono {I J : Finset (Fin (d + 1))} (h : I ⊆ J) : rA k x I ≤ rA k x J :=
   Algebra.adjoin_mono fun _ ⟨i, hi, j, e⟩ => ⟨i, h hi, j, e⟩
 
-theorem prod_mem_single (I : Finset (Fin (d + 1))) (i : Fin (d + 1)) :
-    ∏ j ∈ I, x j / x i ∈ rA k x {i} :=
+theorem prod_mem_single (I : Finset (Fin (d + 1))) (i : Fin (d + 1))
+    : ∏ j ∈ I, x j / x i ∈ rA k x {i} :=
   Subalgebra.prod_mem _ fun j _ => gen_mem {i} (Finset.mem_singleton_self i) j
 
-theorem gen_mul_prod_mem (hne : ∀ l, x l ≠ 0) (I : Finset (Fin (d + 1))) (i : Fin (d + 1))
-    {i' : Fin (d + 1)} (hi' : i' ∈ I) (j : Fin (d + 1)) :
-    x j / x i' * ∏ l ∈ I, x l / x i ∈ rA k x {i} := by
+theorem gen_mul_prod_mem
+    (hne : ∀ l, x l ≠ 0)
+    (I : Finset (Fin (d + 1)))
+    (i : Fin (d + 1))
+    {i' : Fin (d + 1)} (hi' : i' ∈ I)
+    (j : Fin (d + 1))
+    : x j / x i' * ∏ l ∈ I, x l / x i ∈ rA k x {i} := by
   rw [← Finset.mul_prod_erase I (fun l => x l / x i) hi', ← mul_assoc]
-  have e : x j / x i' * (x i' / x i) = x j / x i := by
-    field_simp [hne i', hne i]
+  have e : x j / x i' * (x i' / x i) = x j / x i := by field_simp [hne i', hne i]
   rw [e]
   exact Subalgebra.mul_mem _ (gen_mem {i} (Finset.mem_singleton_self i) j)
     (Subalgebra.prod_mem _ fun l _ => gen_mem {i} (Finset.mem_singleton_self i) l)
 
 end GlobalTheory.PD.Loc
 
-
 open GlobalTheory.PD.Loc in
-theorem GlobalTheory.PD.rA_eq_loc : ∀ (k : Type) [Field k] (F : Type) [Field F] [Algebra k F] (d : ℕ) (x : Fin (d + 1) → F),
-    IsPd k x → ∀ (I : Finset (Fin (d + 1))) (i : Fin (d + 1)), i ∈ I → ∀ y : F,
-      y ∈ rA k x I ↔ ∃ N : ℕ, y * (∏ j ∈ I, x j / x i) ^ N ∈ rA k x {i} := by
+theorem GlobalTheory.PD.rA_eq_loc
+    : ∀ (k : Type) [Field k] (F : Type) [Field F] [Algebra k F] (d : ℕ) (x : Fin (d + 1) → F),
+      IsPd k x
+        → ∀ (I : Finset (Fin (d + 1))) (i : Fin (d + 1)),
+          i ∈ I → ∀ y : F, y ∈ rA k x I ↔ ∃ N : ℕ, y * (∏ j ∈ I, x j / x i) ^ N ∈ rA k x {i} := by
   intro k _ F _ _ d x hx I i hi y
   set P := ∏ j ∈ I, x j / x i with hP
   have hPm : P ∈ rA k x {i} := prod_mem_single I i
@@ -50,7 +54,8 @@ theorem GlobalTheory.PD.rA_eq_loc : ∀ (k : Type) [Field k] (F : Type) [Field F
     | mem z hz =>
       obtain ⟨i', hi', j, rfl⟩ := hz
       exact ⟨1, by rw [pow_one]; exact gen_mul_prod_mem hx.ne I i hi' j⟩
-    | algebraMap r => exact ⟨0, by rw [pow_zero, mul_one]; exact Subalgebra.algebraMap_mem _ r⟩
+    | algebraMap r =>
+      exact ⟨0, by rw [pow_zero, mul_one]; exact Subalgebra.algebraMap_mem _ r⟩
     | add a b _ _ ha hb =>
       obtain ⟨N₁, h₁⟩ := ha
       obtain ⟨N₂, h₂⟩ := hb
@@ -74,4 +79,5 @@ theorem GlobalTheory.PD.rA_eq_loc : ∀ (k : Type) [Field k] (F : Type) [Field F
     have e : y = (y * P ^ N) * P⁻¹ ^ N := by
       rw [mul_assoc, ← mul_pow, mul_inv_cancel₀ hP0, one_pow, mul_one]
     rw [e]
-    exact Subalgebra.mul_mem _ (rA_mono (Finset.singleton_subset_iff.2 hi) hN) (Subalgebra.pow_mem _ hPinv _)
+    exact Subalgebra.mul_mem _ (rA_mono (Finset.singleton_subset_iff.2 hi) hN)
+      (Subalgebra.pow_mem _ hPinv _)

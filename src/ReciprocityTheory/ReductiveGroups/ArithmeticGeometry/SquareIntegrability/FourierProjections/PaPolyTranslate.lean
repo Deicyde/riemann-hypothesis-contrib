@@ -21,12 +21,12 @@ def jRot (j : ι) (u : Circle) : EuclideanSpace ℂ ι ≃ₗᵢ[ℝ] EuclideanS
   LinearIsometryEquiv.piLpCongrRight 2
     (fun i => if i = j then rotation u else LinearIsometryEquiv.refl ℝ ℂ)
 
-theorem jRot_apply (j : ι) (u : Circle) (z : EuclideanSpace ℂ ι) (i : ι) :
-    jRot j u z i = (if i = j then (u : ℂ) else 1) * z i := by
+theorem jRot_apply (j : ι) (u : Circle) (z : EuclideanSpace ℂ ι) (i : ι)
+    : jRot j u z i = (if i = j then (u : ℂ) else 1) * z i := by
   by_cases h : i = j <;> simp [jRot, h, rotation_apply]
 
-theorem paMono_rot (α : ι →₀ ℕ) (j : ι) (u : Circle) (z : EuclideanSpace ℂ ι) :
-    paMono α (jRot j u z) = (u : ℂ) ^ (α j) * paMono α z := by
+theorem paMono_rot (α : ι →₀ ℕ) (j : ι) (u : Circle) (z : EuclideanSpace ℂ ι)
+    : paMono α (jRot j u z) = (u : ℂ) ^ (α j) * paMono α z := by
   rw [paMono_eq, paMono_eq]
   simp only [jRot_apply, mul_pow, Finset.prod_mul_distrib]
   congr 1
@@ -37,7 +37,8 @@ theorem paMono_rot (α : ι →₀ ℕ) (j : ι) (u : Circle) (z : EuclideanSpac
   · intro hj
     exact absurd (Finset.mem_univ j) hj
 
-theorem gaussianInner_monomial_orthogonal (q : ℕ) {α β : ι →₀ ℕ} (h : α ≠ β) : paIP q (paMono α) (paMono β) = 0 := by
+theorem gaussianInner_monomial_orthogonal (q : ℕ) {α β : ι →₀ ℕ} (h : α ≠ β)
+    : paIP q (paMono α) (paMono β) = 0 := by
   obtain ⟨j, hj⟩ : ∃ j, α j ≠ β j := by
     by_contra hc
     push_neg at hc
@@ -46,8 +47,10 @@ theorem gaussianInner_monomial_orthogonal (q : ℕ) {α β : ι →₀ ℕ} (h :
   obtain ⟨θ, hθ⟩ : ∃ θ : ℝ, ((α j : ℝ) - β j) * θ = Real.pi :=
     ⟨Real.pi / ((α j : ℝ) - β j), by field_simp⟩
   have hc : ((α j : ℂ) - β j) * θ = Real.pi := by exact_mod_cast hθ
-  have hfac : ((Circle.exp θ : Circle) : ℂ) ^ (α j) *
-      (starRingEnd ℂ) (((Circle.exp θ : Circle) : ℂ) ^ (β j)) = -1 := by
+  have hfac
+      : ((Circle.exp θ : Circle) : ℂ) ^ (α j)
+          * (starRingEnd ℂ) (((Circle.exp θ : Circle) : ℂ) ^ (β j))
+        = -1 := by
     rw [Circle.coe_exp, map_pow, ← Complex.exp_conj, ← Complex.exp_nat_mul, ← Complex.exp_nat_mul,
       ← Complex.exp_add, ← Complex.exp_pi_mul_I]
     congr 1
@@ -56,12 +59,15 @@ theorem gaussianInner_monomial_orthogonal (q : ℕ) {α β : ι →₀ ℕ} (h :
   have hw : ∀ v, paW q (jRot j (Circle.exp θ) v) = paW q v := by
     intro v
     simp only [paW, LinearIsometryEquiv.norm_map]
-  have key : ∀ v, paMono α (jRot j (Circle.exp θ) v) * (starRingEnd ℂ) (paMono β (jRot j (Circle.exp θ) v)) *
-      (paW q (jRot j (Circle.exp θ) v) : ℂ) = -(paMono α v * (starRingEnd ℂ) (paMono β v) * (paW q v : ℂ)) := by
+  have key
+      : ∀ v,
+        paMono α (jRot j (Circle.exp θ) v) * (starRingEnd ℂ) (paMono β (jRot j (Circle.exp θ) v))
+            * (paW q (jRot j (Circle.exp θ) v) : ℂ)
+          = -(paMono α v * (starRingEnd ℂ) (paMono β v) * (paW q v : ℂ)) := by
     intro v
     rw [paMono_rot, paMono_rot, hw, map_mul]
     linear_combination (paMono α v * (starRingEnd ℂ) (paMono β v) * (paW q v : ℂ)) * hfac
-  have hI : paIP q (paMono α) (paMono β) = -paIP q (paMono α) (paMono β) := by
+  have hI : paIP q (paMono α) (paMono β) = - paIP q (paMono α) (paMono β) := by
     unfold paIP
     rw [← integral_neg]
     conv_lhs =>
@@ -108,8 +114,8 @@ theorem paPoly_mono {c d : ℕ} (h : c ≤ d) : paPoly (ι := ι) c ≤ paPoly d
   intro γ hγ
   exact mem_paS'.mpr (le_trans (mem_paS'.mp hγ) (by exact_mod_cast h))
 
-theorem paPoly_contDiff {c : ℕ} {F : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) :
-    ContDiff ℂ (⊤ : ℕ∞) F := by
+theorem paPoly_contDiff {c : ℕ} {F : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c)
+    : ContDiff ℂ (⊤ : ℕ∞) F := by
   unfold paPoly at hF
   induction hF using Submodule.span_induction with
   | mem x hx =>
@@ -127,8 +133,8 @@ private lemma paMono_mul (α β : ι →₀ ℕ) :
   funext v
   simp only [Pi.mul_apply, paMono_eq, Finsupp.add_apply, pow_add, Finset.prod_mul_distrib]
 
-theorem paPoly_mul {c d : ℕ} {F G : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) (hG : G ∈ paPoly d) :
-    F * G ∈ paPoly (c + d) := by
+theorem paPoly_mul {c d : ℕ} {F G : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) (hG : G ∈ paPoly d)
+    : F * G ∈ paPoly (c + d) := by
   unfold paPoly at hF hG ⊢
   have hm := Submodule.mul_mem_mul hF hG
   rw [Submodule.span_mul_span] at hm
@@ -160,10 +166,11 @@ theorem paPoly_coord (i : ι) : (fun v : EuclideanSpace ℂ ι => v i) ∈ paPol
     · intro hi
       exact absurd (Finset.mem_univ i) hi
   rw [h1]
-  exact paMono_mem_paPoly_of_degree_le (le_of_eq (by rw [finsupp_degree_eq_sum]; simp [Finsupp.single_apply]))
+  exact paMono_mem_paPoly_of_degree_le (le_of_eq (by
+    rw [finsupp_degree_eq_sum]; simp [Finsupp.single_apply]))
 
-theorem paPoly_pow {c : ℕ} {F : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) (n : ℕ) :
-    F ^ n ∈ paPoly (n * c) := by
+theorem paPoly_pow {c : ℕ} {F : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) (n : ℕ)
+    : F ^ n ∈ paPoly (n * c) := by
   induction n with
   | zero =>
     rw [pow_zero, zero_mul]
@@ -183,32 +190,36 @@ private lemma prod_mem_paPoly (s : Finset ι) (f : ι → EuclideanSpace ℂ ι 
     exact paPoly_mul (h j (Finset.mem_insert_self j s))
       (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem paPoly_translate {c : ℕ} {F : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c)
-    (a : EuclideanSpace ℂ ι) : (fun v => F (v - a)) ∈ paPoly c := by
+theorem paPoly_translate
+    {c : ℕ} {F : EuclideanSpace ℂ ι → ℂ} (hF : F ∈ paPoly c) (a : EuclideanSpace ℂ ι)
+    : (fun v => F (v - a)) ∈ paPoly c := by
   unfold paPoly at hF
   induction hF using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨α, hα, rfl⟩ := hx
     have hdeg := mem_paS'.mp hα
-    have he : (fun v => paMono α (v - a)) =
-        ∏ i, ((fun v : EuclideanSpace ℂ ι => v i) - fun _ => a i) ^ (α i) := by
+    have he
+        : (fun v => paMono α (v - a))
+          = ∏ i, ((fun v : EuclideanSpace ℂ ι => v i) - fun _ => a i) ^ (α i) := by
       funext v
       simp [paMono_eq, Finset.prod_apply]
     rw [he]
-    have hi : ∀ i, ((fun v : EuclideanSpace ℂ ι => v i) - fun _ => a i) ∈ paPoly (ι := ι) 1 :=
-      fun i => Submodule.sub_mem _ (paPoly_coord i) (paPoly_mono (Nat.zero_le 1) (paPoly_const (a i)))
+    have hi
+        : ∀ i, ((fun v : EuclideanSpace ℂ ι => v i) - fun _ => a i) ∈ paPoly (ι := ι) 1 := fun i =>
+      Submodule.sub_mem _ (paPoly_coord i) (paPoly_mono (Nat.zero_le 1) (paPoly_const (a i)))
     have hle : ∑ i, α i * 1 ≤ c := by
       rw [finsupp_degree_eq_sum] at hdeg
       simpa using hdeg
-    exact paPoly_mono hle (prod_mem_paPoly Finset.univ _ (fun i => α i * 1)
-      fun i _ => paPoly_pow (hi i) (α i))
+    exact paPoly_mono hle
+      (prod_mem_paPoly Finset.univ _ (fun i => α i * 1) fun i _ => paPoly_pow (hi i) (α i))
   | zero => exact Submodule.zero_mem _
   | add x y _ _ hx hy => exact Submodule.add_mem _ hx hy
   | smul b x _ hx => exact Submodule.smul_mem _ b hx
 
 theorem paPoly_Hf (a : EuclideanSpace ℂ ι) : (fun v : EuclideanSpace ℂ ι => Hf v a) ∈ paPoly 1 := by
-  have h1 : (fun v : EuclideanSpace ℂ ι => Hf v a) =
-      ∑ i, (starRingEnd ℂ) (a i) • (fun v : EuclideanSpace ℂ ι => v i) := by
+  have h1
+      : (fun v : EuclideanSpace ℂ ι => Hf v a)
+        = ∑ i, (starRingEnd ℂ) (a i) • (fun v : EuclideanSpace ℂ ι => v i) := by
     funext v
     rw [Finset.sum_apply]
     simp only [Hf, Pi.smul_apply, smul_eq_mul]

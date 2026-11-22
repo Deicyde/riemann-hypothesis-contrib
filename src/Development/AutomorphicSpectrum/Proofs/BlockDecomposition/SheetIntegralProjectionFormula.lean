@@ -9,20 +9,26 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 set_option autoImplicit false
 open CategoryTheory AlgebraicGeometry Limits TopologicalSpace MvPolynomial MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts
+  GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ
-open ReciprocityTheory.ChartRestriction.G.Geo (mcPts IsMultiHomog SameOrbit segre fibre IsGoodProj IsSheet HermLine IsSmoothHerm sheetDensity maDensity ptsIntegral ptsIntegralAt pot)
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (mcPts IsMultiHomog SameOrbit segre fibre IsGoodProj IsSheet HermLine IsSmoothHerm sheetDensity
+    maDensity ptsIntegral ptsIntegralAt pot)
 open ReciprocityTheory.ChartRestriction.G.AI.I2 (IsRatSectionOn logNormRat)
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.MixZ.ArchEq
 
-theorem sameOrbit_of_segre_eq {K : Type*} [Fintype K] {κ : K → Type*} [∀ k, Fintype (κ k)]
-    {z z' : (Σ k, κ k) → ℂ} (hz : ∀ k, ∃ a, z ⟨k, a⟩ ≠ 0) (h : segre z = segre z') :
-    SameOrbit z z' := by
+theorem sameOrbit_of_segre_eq
+    {K : Type*} [Fintype K]
+    {κ : K → Type*} [∀ k, Fintype (κ k)]
+    {z z' : (Σ k, κ k) → ℂ} (hz : ∀ k, ∃ a, z ⟨k, a⟩ ≠ 0) (h : segre z = segre z')
+    : SameOrbit z z' := by
   classical
   choose a ha using hz
   have hs : ∀ b : ∀ k, κ k, ∏ k, z ⟨k, b k⟩ = ∏ k, z' ⟨k, b k⟩ := fun b => congrFun h b
@@ -34,15 +40,18 @@ theorem sameOrbit_of_segre_eq {K : Type*} [Fintype K] {κ : K → Type*} [∀ k,
   funext p
   rcases p with ⟨k, j⟩
   show z ⟨k, j⟩ = z ⟨k, a k⟩ / z' ⟨k, a k⟩ * z' ⟨k, j⟩
-  have split : ∀ w : (Σ k, κ k) → ℂ, ∏ l, w ⟨l, Function.update a k j l⟩ =
-      w ⟨k, j⟩ * ∏ l ∈ Finset.univ.erase k, w ⟨l, a l⟩ := by
+  have split
+      : ∀ w : (Σ k, κ k) → ℂ,
+        ∏ l, w ⟨l, Function.update a k j l⟩ = w ⟨k, j⟩ * ∏ l ∈ Finset.univ.erase k, w ⟨l, a l⟩ := by
     intro w
     rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ k)]
     congr 1
     · simp
-    · exact Finset.prod_congr rfl fun l hl => by rw [Function.update_of_ne (Finset.ne_of_mem_erase hl)]
-  have split0 : ∀ w : (Σ k, κ k) → ℂ, ∏ l, w ⟨l, a l⟩ =
-      w ⟨k, a k⟩ * ∏ l ∈ Finset.univ.erase k, w ⟨l, a l⟩ := fun w =>
+    · exact Finset.prod_congr rfl fun l hl => by
+        rw [Function.update_of_ne (Finset.ne_of_mem_erase hl)]
+  have split0
+      : ∀ w : (Σ k, κ k) → ℂ,
+        ∏ l, w ⟨l, a l⟩ = w ⟨k, a k⟩ * ∏ l ∈ Finset.univ.erase k, w ⟨l, a l⟩ := fun w =>
     (Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ k)).symm
   have e1 := hs (Function.update a k j)
   rw [split z, split z'] at e1
@@ -55,20 +64,26 @@ theorem sameOrbit_of_segre_eq {K : Type*} [Fintype K] {κ : K → Type*} [∀ k,
   apply mul_right_cancel₀ hP
   linear_combination z' ⟨k, a k⟩ * e1 - z' ⟨k, j⟩ * e2
 
-theorem finsum_fibre_eq (m : ℕ) (n : Fin (m + 1) → ℕ) (X : Scheme.{0}) [IsIntegral X] (i : X ⟶ MP ℤ m n)
-    [IsClosedImmersion i] (D : ℕ) (Ψ : LinProj n D) (N : Pol n)
-    (hP : ReciprocityTheory.ChartRestriction.G.Geo.IsArithVar (ptIdeal (i (genericPoint X))) (D + 1))
-    (hΨ : IsGoodProj (ptIdeal (i (genericPoint X))) Ψ) {ι : Type}
-    (e : ι → OpenPartialHomeomorph (GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀) (Fin D → ℂ))
-    (Γ : ι → (Fin D → ℂ) → (Σ k, Bk n k) → ℂ) (S : ι → Set (GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀))
-    (hpc : ∀ l, IsPiece i Ψ N (e l) (Γ l)) (hS : ∀ l, S l ⊆ (e l).source)
-    (hd : Pairwise (Function.onFun Disjoint S)) (v : Fin D → ℂ)
-    (hcov : ∀ z ∈ mcPts (ptIdeal (i (genericPoint X))), Ψ (segre z) = Fin.cons 1 v →
-        ∃ y, Over i y z ∧ y ∈ ⋃ l, S l)
+theorem finsum_fibre_eq
+    (m : ℕ) (n : Fin (m + 1) → ℕ)
+    (X : Scheme.{0}) [IsIntegral X]
+    (i : X ⟶ MP ℤ m n) [IsClosedImmersion i]
+    (D : ℕ) (Ψ : LinProj n D)
+    (N : Pol n)
+    (hP
+      : ReciprocityTheory.ChartRestriction.G.Geo.IsArithVar (ptIdeal (i (genericPoint X))) (D + 1))
+    (hΨ : IsGoodProj (ptIdeal (i (genericPoint X))) Ψ)
+    {ι : Type} (e : ι → OpenPartialHomeomorph (GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀) (Fin D → ℂ))
+    (Γ : ι → (Fin D → ℂ) → (Σ k, Bk n k) → ℂ)
+    (S : ι → Set (GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀)) (hpc : ∀ l, IsPiece i Ψ N (e l) (Γ l))
+    (hS : ∀ l, S l ⊆ (e l).source) (hd : Pairwise (Function.onFun Disjoint S))
+    (v : Fin D → ℂ)
+    (hcov : ∀ z ∈ mcPts (ptIdeal (i (genericPoint X))),
+      Ψ (segre z) = Fin.cons 1 v → ∃ y, Over i y z ∧ y ∈ ⋃ l, S l)
     (h : (((k : Fin (m + 1)) → Bk n k) → ℂ) → ℝ) (T : ι → ℝ)
-    (hT : ∀ l, v ∈ (e l) '' S l → h (segre (Γ l v)) = T l) :
-    ∑ᶠ w ∈ fibre (ptIdeal (i (genericPoint X))) Ψ v, h w =
-      ∑' l, ((e l) '' S l).indicator (fun _ => T l) v := by
+    (hT : ∀ l, v ∈ (e l) '' S l → h (segre (Γ l v)) = T l)
+    : ∑ᶠ w ∈ fibre (ptIdeal (i (genericPoint X))) Ψ v, h w
+      = ∑' l, ((e l) '' S l).indicator (fun _ => T l) v := by
   classical
   set P := ptIdeal (i (genericPoint X)) with hPdef
   let Lv : Set ι := {l | v ∈ (e l) '' S l}
@@ -76,8 +91,9 @@ theorem finsum_fibre_eq (m : ℕ) (n : Fin (m + 1) → ℕ) (X : Scheme.{0}) [Is
   have hy : ∀ l ∈ Lv, (e l).symm v ∈ S l ∧ v ∈ (e l).target := by
     rintro l ⟨y, hyS, rfl⟩
     exact ⟨by rw [(e l).left_inv (hS l hyS)]; exact hyS, (e l).map_source (hS l hyS)⟩
-  have hpc' : ∀ l ∈ Lv, Over i ((e l).symm v) (Γ l v) ∧ Γ l v ∈ mcPts P ∧
-      Ψ (segre (Γ l v)) = Fin.cons 1 v := by
+  have hpc'
+      : ∀ l ∈ Lv,
+        Over i ((e l).symm v) (Γ l v) ∧ Γ l v ∈ mcPts P ∧ Ψ (segre (Γ l v)) = Fin.cons 1 v := by
     intro l hl
     obtain ⟨_, _, hp⟩ := hpc l
     obtain ⟨h1, h2, h3, -⟩ := hp v (hy l hl).2
@@ -118,10 +134,12 @@ theorem finsum_fibre_eq (m : ℕ) (n : Fin (m + 1) → ℕ) (X : Scheme.{0}) [Is
     obtain ⟨o1, o2, -⟩ := hpc' l hl
     obtain ⟨o1', -, -⟩ := hpc' l' hl'
     have hso := sameOrbit_of_segre_eq o2.1 hll
-    have hyy := (GlobalTheory.CompanionTheory.MixZ.Orbit.eq_iff_sameOrbit m n X i _ _ _ _ o1 o1').2 hso
+    have hyy :=
+      (GlobalTheory.CompanionTheory.MixZ.Orbit.eq_iff_sameOrbit m n X i _ _ _ _ o1 o1').2 hso
     by_contra hne
     exact Set.disjoint_left.1 (hd hne) (hy l hl).1 (by rw [hyy]; exact (hy l' hl').1)
-  have hfin : (fibre P Ψ v).Finite := ReciprocityTheory.ChartRestriction.G.Geo.fibreFinite _ _ _ _ Ψ hP hΨ v
+  have hfin : (fibre P Ψ v).Finite :=
+    ReciprocityTheory.ChartRestriction.G.Geo.fibreFinite _ _ _ _ Ψ hP hΨ v
   have hLfin : Lv.Finite := Set.Finite.of_finite_image (himg ▸ hfin) hinj
   rw [himg, finsum_mem_image hinj]
   have hind : ∀ l, ((e l) '' S l).indicator (fun _ => T l) v = Lv.indicator T l := by

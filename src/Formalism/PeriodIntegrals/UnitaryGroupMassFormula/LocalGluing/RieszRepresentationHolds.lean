@@ -19,15 +19,17 @@ theorem rieszRepresentation_holds : Riesz := by
   have : Module.Free E V := H.free
   have : Module.Finite E V := H.fin
   let b := Module.Free.chooseBasis E V
-  let ℓ : V → V →ₗ[E] E := fun y =>
-    { toFun := fun v => H.h v y
-      map_add' := fun v w => H.h_add_left v w y
-      map_smul' := fun c v => by
-        simp only [RingHom.id_apply, smul_eq_mul]
-        exact H.h_smul_left c v y }
+  let ℓ : V → V →ₗ[E] E := fun y => {
+    toFun := fun v => H.h v y
+    map_add' := fun v w => H.h_add_left v w y
+    map_smul' := fun c v => by
+      simp only [RingHom.id_apply, smul_eq_mul]
+      exact H.h_smul_left c v y
+  }
   have hℓ : ∀ v y, ℓ y v = H.h v y := fun _ _ => rfl
-  have key : ∀ (v : V) (a : Module.Free.ChooseBasisIndex E V → E),
-      H.h v (∑ j, a j • b j) = ∑ j, M.L.cj (a j) * H.h v (b j) := by
+  have key
+      : ∀ (v : V) (a : Module.Free.ChooseBasisIndex E V → E),
+        H.h v (∑ j, a j • b j) = ∑ j, M.L.cj (a j) * H.h v (b j) := by
     intro v a
     rw [H.h_herm (∑ j, a j • b j) v]
     have hs : H.h (∑ j, a j • b j) v = ∑ j, a j * H.h (b j) v := by
@@ -70,8 +72,8 @@ theorem rieszRepresentation_holds : Riesz := by
     have h2 := congrArg M.L.cj this
     rw [M.L.cj_cj, map_zero] at h2
     exact h2
-  obtain ⟨u, hu⟩ := IsArtinian.surjective_of_injective_endomorphism A.mulVecLin hinj
-    (fun i => f (b i))
+  obtain ⟨u, hu⟩ :=
+    IsArtinian.surjective_of_injective_endomorphism A.mulVecLin hinj (fun i => f (b i))
   refine ⟨∑ j, M.L.cj (u j) • b j, hext _ f fun i => ?_⟩
   rw [hA, hu]
 

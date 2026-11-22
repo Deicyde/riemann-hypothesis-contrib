@@ -6,25 +6,36 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Nonne
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.CarDim
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.CarDim
 
 noncomputable section
 
 namespace GlobalTheory.PolFan.CarDim
 
-theorem projective_quot_orad (E : Type) [Field E] [NumberField E] (X : Type) [AddCommGroup X] [Module (𝓞 E) X]
-    [Module.Finite (𝓞 E) X] (β : LinearMap.BilinForm ℤ X) :
-    Module.Projective (𝓞 E) (X ⧸ (orad β : Submodule (𝓞 E) X)) := by
+theorem projective_quot_orad
+    (E : Type) [Field E] [NumberField E]
+    (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+    (β : LinearMap.BilinForm ℤ X)
+    : Module.Projective (𝓞 E) (X ⧸ (orad β : Submodule (𝓞 E) X)) := by
   classical
-  have hZ : ∀ n : ℤ, n ≠ 0 → ∀ y : X, n • y ∈ (orad β : Submodule (𝓞 E) X) → y ∈ (orad β : Submodule (𝓞 E) X) :=
-    fun n hn y hy a z => by
-      have h := hy a z
-      rw [smul_comm, map_zsmul, LinearMap.smul_apply, smul_eq_mul] at h
-      exact (mul_eq_zero.1 h).resolve_left hn
-  have hO : ∀ a : 𝓞 E, a ≠ 0 → ∀ y : X, a • y ∈ (orad β : Submodule (𝓞 E) X) → y ∈ (orad β : Submodule (𝓞 E) X) := by
+  have hZ
+      : ∀ n : ℤ,
+        n ≠ 0
+          → ∀ y : X,
+            n • y ∈ (orad β : Submodule (𝓞 E) X)
+              → y ∈ (orad β : Submodule (𝓞 E) X) := fun n hn y hy a z => by
+    have h := hy a z
+    rw [smul_comm, map_zsmul, LinearMap.smul_apply, smul_eq_mul] at h
+    exact (mul_eq_zero.1 h).resolve_left hn
+  have hO
+      : ∀ a : 𝓞 E,
+        a ≠ 0
+          → ∀ y : X, a • y ∈ (orad β : Submodule (𝓞 E) X) → y ∈ (orad β : Submodule (𝓞 E) X) := by
     intro a ha y hy
     have hne : (Ideal.span {a}).comap (algebraMap ℤ (𝓞 E)) ≠ ⊥ :=
-      Ideal.comap_ne_bot_of_integral_mem ha (Ideal.mem_span_singleton_self a) (Algebra.IsIntegral.isIntegral a)
+      Ideal.comap_ne_bot_of_integral_mem ha (Ideal.mem_span_singleton_self a)
+        (Algebra.IsIntegral.isIntegral a)
     obtain ⟨n, hn, hn0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
     obtain ⟨a', ha'⟩ := Ideal.mem_span_singleton'.1 (Ideal.mem_comap.1 hn)
     refine hZ n hn0 y fun b z => ?_
@@ -38,24 +49,30 @@ theorem projective_quot_orad (E : Type) [Field E] [NumberField E] (X : Type) [Ad
     rw [Submonoid.mk_smul, ← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at hau
     rw [Submodule.Quotient.mk_eq_zero]
     exact hO a (nonZeroDivisors.ne_zero ha) y hau
-  have : Module.Flat (𝓞 E) (X ⧸ (orad β : Submodule (𝓞 E) X)) := IsDedekindDomain.flat_iff_torsion_eq_bot.2 htor
-  have : Module.FinitePresentation (𝓞 E) (X ⧸ (orad β : Submodule (𝓞 E) X)) := Module.finitePresentation_of_finite _ _
+  have : Module.Flat (𝓞 E) (X ⧸ (orad β : Submodule (𝓞 E) X)) :=
+    IsDedekindDomain.flat_iff_torsion_eq_bot.2 htor
+  have : Module.FinitePresentation (𝓞 E) (X ⧸ (orad β : Submodule (𝓞 E) X)) :=
+    Module.finitePresentation_of_finite _ _
   exact Module.Flat.projective_of_finitePresentation
 
-theorem genRank_le_of_smul_mem_span {X : Type} [AddCommGroup X] {m m' : ℕ} (A : Fin m' → LinearMap.BilinForm ℤ X)
-    (B : Fin m → LinearMap.BilinForm ℤ X)
-    (h : ∀ j, ∃ k : ℕ, 0 < k ∧ k • A j ∈ Submodule.span ℤ (Set.range B)) : genRank A ≤ genRank B := by
+theorem genRank_le_of_smul_mem_span
+    {X : Type} [AddCommGroup X]
+    {m m' : ℕ} (A : Fin m' → LinearMap.BilinForm ℤ X) (B : Fin m → LinearMap.BilinForm ℤ X)
+    (h : ∀ j, ∃ k : ℕ, 0 < k ∧ k • A j ∈ Submodule.span ℤ (Set.range B))
+    : genRank A ≤ genRank B := by
   classical
   unfold genRank
   choose k hk hkm using h
   set P : ℕ := ∏ j, k j with hPdef
   have hP : 0 < P := Finset.prod_pos fun j _ => hk j
-  have hmem : ∀ x ∈ Submodule.span ℤ (Set.range A), (P : ℤ) • x ∈ Submodule.span ℤ (Set.range B) := by
+  have hmem
+      : ∀ x ∈ Submodule.span ℤ (Set.range A), (P : ℤ) • x ∈ Submodule.span ℤ (Set.range B) := by
     intro x hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨j, rfl⟩ := hx
-      have e : P = (∏ i ∈ Finset.univ.erase j, k i) * k j := (Finset.prod_erase_mul _ _ (Finset.mem_univ j)).symm
+      have e : P = (∏ i ∈ Finset.univ.erase j, k i) * k j :=
+        (Finset.prod_erase_mul _ _ (Finset.mem_univ j)).symm
       rw [natCast_zsmul, e, mul_smul]
       exact nsmul_mem (hkm j) _
     | zero => simp
@@ -76,10 +93,15 @@ theorem genRank_le_of_smul_mem_span {X : Type} [AddCommGroup X] {m m' : ℕ} (A 
     simpa using (mul_eq_zero.1 this).resolve_left hP'
   exact LinearMap.finrank_le_finrank_of_injective hf
 
-theorem intLin_eq_sum_of_toReal {X : Type} [AddCommGroup X] {m : ℕ} (γ : Fin m → LinearMap.BilinForm ℤ X) (c : Fin m → ℝ)
-    (β : LinearMap.BilinForm ℤ X) (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ) (h : toReal β = ∑ i, c i • toReal (γ i)) :
-    (ℓ β : ℝ) = ∑ i, c i * (ℓ (γ i) : ℝ) := by
-  have h0 : ∑ o : Option (Fin m), (o.elim (-1) c) • toReal (LinearMap.id (R := ℤ) (o.elim β γ)) = 0 := by
+theorem intLin_eq_sum_of_toReal
+    {X : Type} [AddCommGroup X]
+    {m : ℕ} (γ : Fin m → LinearMap.BilinForm ℤ X) (c : Fin m → ℝ)
+    (β : LinearMap.BilinForm ℤ X)
+    (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ) (h : toReal β = ∑ i, c i • toReal (γ i))
+    : (ℓ β : ℝ) = ∑ i, c i * (ℓ (γ i) : ℝ) := by
+  have h0
+      : ∑ o : Option (Fin m), (o.elim (-1) c) • toReal (LinearMap.id (R := ℤ) (o.elim β γ))
+        = 0 := by
     rw [Fintype.sum_option]
     simp only [Option.elim, LinearMap.id_apply, h, neg_one_smul, neg_add_cancel]
   have := sum_mul_eq_zero_of_sum_toReal (j := LinearMap.id) (fun _ _ h => h) ℓ h0
@@ -87,17 +109,26 @@ theorem intLin_eq_sum_of_toReal {X : Type} [AddCommGroup X] {m : ℕ} (γ : Fin 
   simp only [Option.elim] at this
   linarith
 
-theorem exists_radical_test {O : Type} [CommRing O] [IsNoetherianRing O] (bar : O → O) {X : Type} [AddCommGroup X]
-    [Module O X] [Module.Finite O X] (K : Submodule O X) :
-    ∃ hK : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ, ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) →
-      0 ≤ hK β ∧ (hK β = 0 ↔ ∀ k ∈ K, ∀ y, β k y = 0) := by
+theorem exists_radical_test
+    {O : Type} [CommRing O] [IsNoetherianRing O]
+    (bar : O → O)
+    {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+    (K : Submodule O X)
+    : ∃ hK : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ, ∀ β ∈ balForms bar X,
+      (∀ y, 0 ≤ β y y) → 0 ≤ hK β ∧ (hK β = 0 ↔ ∀ k ∈ K, ∀ y, β k y = 0) := by
   classical
   obtain ⟨G, hG⟩ := IsNoetherian.noetherian K
   refine ⟨∑ k ∈ G, LinearMap.applyₗ k ∘ₗ LinearMap.applyₗ k, fun β hβ hp => ?_⟩
-  have hv : (∑ k ∈ G, (LinearMap.applyₗ k ∘ₗ LinearMap.applyₗ k : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ)) β = ∑ k ∈ G, β k k := by
+  have hv
+      : (∑ k ∈ G, (LinearMap.applyₗ k ∘ₗ LinearMap.applyₗ k : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ)) β
+        = ∑ k ∈ G, β k k := by
     simp
   rw [hv]
-  refine ⟨Finset.sum_nonneg fun k _ => hp k, fun h0 => ?_, fun h0 => Finset.sum_eq_zero fun k hk => h0 k ?_ k⟩
+  refine ⟨
+    Finset.sum_nonneg fun k _ => hp k,
+    fun h0 => ?_,
+    fun h0 => Finset.sum_eq_zero fun k hk => h0 k ?_ k
+  ⟩
   · have hk0 : ∀ k ∈ G, β k k = 0 := (Finset.sum_eq_zero_iff_of_nonneg fun k _ => hp k).1 h0
     rw [← hG]
     intro x hx
@@ -113,11 +144,15 @@ end GlobalTheory.PolFan.CarDim
 
 namespace GlobalTheory.PolFan.CarDim
 
-theorem intLin_eq_of_inCone {O : Type} [CommRing O] (φ : InvFun O) {Y : Type} [AddCommGroup Y] [Module O Y]
-    [Module.Finite O Y] {n : ℕ} {γ : Fin n → LinearMap.BilinForm ℤ Y} (hl : φ.LinearOn γ) {N : ℕ}
-    {ℓ : LinearMap.BilinForm ℤ Y →ₗ[ℤ] ℤ} (h1 : ∀ i, (ℓ (γ i) : ℝ) = N * φ.evalZ (γ i)) {c : Fin n → ℝ}
-    (hc : ∀ i, 0 ≤ c i) {b : LinearMap.BilinForm ℤ Y} (hb : toReal b = ∑ i, c i • toReal (γ i)) :
-    (ℓ b : ℝ) = N * φ.evalZ b := by
+theorem intLin_eq_of_inCone
+    {O : Type} [CommRing O]
+    (φ : InvFun O)
+    {Y : Type} [AddCommGroup Y] [Module O Y] [Module.Finite O Y]
+    {n : ℕ} {γ : Fin n → LinearMap.BilinForm ℤ Y} (hl : φ.LinearOn γ)
+    {N : ℕ} {ℓ : LinearMap.BilinForm ℤ Y →ₗ[ℤ] ℤ} (h1 : ∀ i, (ℓ (γ i) : ℝ) = N * φ.evalZ (γ i))
+    {c : Fin n → ℝ} (hc : ∀ i, 0 ≤ c i)
+    {b : LinearMap.BilinForm ℤ Y} (hb : toReal b = ∑ i, c i • toReal (γ i))
+    : (ℓ b : ℝ) = N * φ.evalZ b := by
   have e1 : φ.evalZ b = ∑ i, c i * φ.evalZ (γ i) := by
     rw [← hl c hc]
     unfold InvFun.evalZ
@@ -128,40 +163,65 @@ theorem intLin_eq_of_inCone {O : Type} [CommRing O] (φ : InvFun O) {Y : Type} [
   rw [intLin_eq_sum_of_toReal γ c b ℓ hb, e1, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by rw [h1 i]; ring
 
-theorem cell_of_quot_cell : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (ψ : InvFun (𝓞 E)) (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X] [Module.Projective (𝓞 E) X], IsPolyFanOn H.bar ψ X → (∀ (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (s : Fin m' ↪ Fin m) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ), IsCell H.bar ψ γ → IsFaceCut γ s h → IsCell H.bar ψ (fun i => γ (s i))) → ∀ β ∈ balForms H.bar X, (∀ y, 0 ≤ β y y) → ∀ (m' : ℕ) (δ : Fin m' → LinearMap.BilinForm ℤ (X ⧸ (orad β : Submodule (𝓞 E) X))), IsCell H.bar ψ δ → InRCone (fun i => pull (orad β : Submodule (𝓞 E) X).mkQ (δ i)) β → ∃ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X), IsCell H.bar ψ γ ∧ InRCone γ β ∧ genRank γ ≤ genRank δ := by
+theorem cell_of_quot_cell
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (ψ : InvFun (𝓞 E))
+        (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+        [Module.Projective (𝓞 E) X],
+      IsPolyFanOn H.bar ψ X
+        → (∀ (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (s : Fin m' ↪ Fin m)
+            (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
+          IsCell H.bar ψ γ → IsFaceCut γ s h → IsCell H.bar ψ (fun i => γ (s i)))
+        → ∀ β ∈ balForms H.bar X,
+          (∀ y, 0 ≤ β y y)
+            → ∀ (m' : ℕ) (δ : Fin m' → LinearMap.BilinForm ℤ (X ⧸ (orad β : Submodule (𝓞 E) X))),
+              IsCell H.bar ψ δ → InRCone (fun i => pull (orad β : Submodule (𝓞 E) X).mkQ (δ i)) β
+                → ∃ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X),
+                  IsCell H.bar ψ γ ∧ InRCone γ β ∧ genRank γ ≤ genRank δ := by
   intro E _ _ _ H ψ X _ _ _ _ hfan hface β hβ hp m' δ hδ hin
   classical
   have : Module.Projective (𝓞 E) (X ⧸ (orad (O := 𝓞 E) β)) := projective_quot_orad E X β
-  obtain ⟨t, ht⟩ := Module.projective_lifting_property (orad (O := 𝓞 E) β).mkQ LinearMap.id (orad (O := 𝓞 E) β).mkQ_surjective
+  obtain ⟨t, ht⟩ :=
+    Module.projective_lifting_property (orad (O := 𝓞 E) β).mkQ LinearMap.id
+      (orad (O := 𝓞 E) β).mkQ_surjective
   have htt : ∀ u, (orad (O := 𝓞 E) β).mkQ (t u) = u := fun u => LinearMap.congr_fun ht u
   have htt' : ∀ u, (Submodule.Quotient.mk (t u) : X ⧸ (orad (O := 𝓞 E) β)) = u := htt
   have hπ : Function.Surjective (orad (O := 𝓞 E) β).mkQ := (orad (O := 𝓞 E) β).mkQ_surjective
 
-  have desc : ∀ β' : LinearMap.BilinForm ℤ X, β' ∈ balForms H.bar X → (∀ k ∈ (orad (O := 𝓞 E) β), ∀ y, β' k y = 0) →
-      pull (orad (O := 𝓞 E) β).mkQ (pull t β') = β' := by
+  have desc
+      : ∀ β' : LinearMap.BilinForm ℤ X,
+        β' ∈ balForms H.bar X → (∀ k ∈ (orad (O := 𝓞 E) β), ∀ y, β' k y = 0)
+          → pull (orad (O := 𝓞 E) β).mkQ (pull t β') = β' := by
     intro β' hb hv
     refine LinearMap.ext₂ fun a b => ?_
     have ha : a - t ((orad (O := 𝓞 E) β).mkQ a) ∈ (orad (O := 𝓞 E) β) := by
-      rw [← Submodule.Quotient.mk_eq_zero (orad (O := 𝓞 E) β), ← Submodule.mkQ_apply, map_sub, htt, sub_self]
+      rw [← Submodule.Quotient.mk_eq_zero (orad (O := 𝓞 E) β), ← Submodule.mkQ_apply, map_sub, htt,
+        sub_self]
     have hb' : b - t ((orad (O := 𝓞 E) β).mkQ b) ∈ (orad (O := 𝓞 E) β) := by
-      rw [← Submodule.Quotient.mk_eq_zero (orad (O := 𝓞 E) β), ← Submodule.mkQ_apply, map_sub, htt, sub_self]
+      rw [← Submodule.Quotient.mk_eq_zero (orad (O := 𝓞 E) β), ← Submodule.mkQ_apply, map_sub, htt,
+        sub_self]
     have e1 := hv _ ha b
     have e2 := hv _ hb' (t ((orad (O := 𝓞 E) β).mkQ a))
     rw [map_sub, LinearMap.sub_apply, sub_eq_zero] at e1 e2
-    rw [pull_apply, pull_apply, hb.1 (t _) (t _), ← e2, hb.1 b (t ((orad (O := 𝓞 E) β).mkQ a)), ← e1]
-  have hbK : ∀ k ∈ (orad (O := 𝓞 E) β), ∀ y, β k y = 0 := fun k hk y => by simpa using (mem_orad.1 hk) 1 y
+    rw [pull_apply, pull_apply, hb.1 (t _) (t _), ← e2, hb.1 b (t ((orad (O := 𝓞 E) β).mkQ a)),
+      ← e1]
+  have hbK : ∀ k ∈ (orad (O := 𝓞 E) β), ∀ y, β k y = 0 := fun k hk y => by
+    simpa using (mem_orad.1 hk) 1 y
 
   have hmem : toReal β ∈ psdCone (bar := H.bar) (X := X) := by
-    have := ConeSub.sum_smul_toReal_mem_psdCone (𝓞 E) H.bar X 1 ![β] ![1] (fun i => by fin_cases i; exact hβ)
-      (fun i y => by fin_cases i; exact hp y) (fun i => by fin_cases i; norm_num)
+    have :=
+      ConeSub.sum_smul_toReal_mem_psdCone (𝓞 E) H.bar X 1 ![β] ![1]
+        (fun i => by fin_cases i; exact hβ)
+        (fun i y => by fin_cases i; exact hp y)
+        (fun i => by fin_cases i; norm_num)
     simpa using this
   obtain ⟨S, -, hS⟩ := hfan.finite
   obtain ⟨e, m, γ, d, hγ, -, hd, he⟩ := hS _ hmem
   set σ : Fin m → LinearMap.BilinForm ℤ X := fun i => pull e.symm.toLinearMap (γ i) with hσdef
   have hσ : IsCell H.bar ψ σ := isCell_pull_equiv hγ e.symm
-  have hβσ : toReal β = ∑ i, d i • toReal (σ i) := LinearMap.ext₂ fun a b => by
-    have := LinearMap.congr_fun₂ he (e.symm a) (e.symm b)
-    simpa [LinearMap.sum_apply, hσdef] using this
+  have hβσ : toReal β = ∑ i, d i • toReal (σ i) :=
+    LinearMap.ext₂ fun a b => by
+      have := LinearMap.congr_fun₂ he (e.symm a) (e.symm b)
+      simpa [LinearMap.sum_apply, hσdef] using this
 
   obtain ⟨Nδ, ℓδ, hNδ, hℓδ1, hℓδ2, hℓδ3⟩ := hδ.strict
   obtain ⟨Nσ, ℓσ, hNσ, hℓσ1, hℓσ2, hℓσ3⟩ := hσ.strict
@@ -170,12 +230,15 @@ theorem cell_of_quot_cell : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   have hg : ∀ β', g β' = Nσ * ℓδ (pull t β') - Nδ * ℓσ β' := fun β' => by simp [g]
   set M : ℤ := ∑ j, |g (σ j)| + 1 with hM
   have hMj : ∀ j, |g (σ j)| < M := fun j => by
-    have := Finset.single_le_sum (f := fun j => |g (σ j)|) (fun j _ => abs_nonneg _) (Finset.mem_univ j)
+    have :=
+      Finset.single_le_sum (f := fun j => |g (σ j)|) (fun j _ => abs_nonneg _) (Finset.mem_univ j)
     linarith
   let hh : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ := g + M • hK
   have hhv : ∀ β', hh β' = g β' + M * hK β' := fun β' => by simp [hh]
-  have factA : ∀ j, hK (σ j) = 0 →
-      (g (σ j) : ℝ) = Nσ * ((ℓδ (pull t (σ j)) : ℝ) - Nδ * ψ.evalZ (pull t (σ j))) := by
+  have factA
+      : ∀ j,
+        hK (σ j) = 0
+          → (g (σ j) : ℝ) = Nσ * ((ℓδ (pull t (σ j)) : ℝ) - Nδ * ψ.evalZ (pull t (σ j))) := by
     intro j hj
     have hv := (hKt _ (hσ.mem j) (hσ.nonneg j)).2.1 hj
     have e1 : ψ.evalZ (σ j) = ψ.evalZ (pull t (σ j)) := by
@@ -216,12 +279,12 @@ theorem cell_of_quot_cell : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   have hσs : IsCell H.bar ψ (fun i => σ (s i)) := hface m F.card σ s hh hσ hcut
 
   have hKb : hK β = 0 := (hKt β hβ hp).2.2 hbK
-  have hψβ : ψ.evalZ β = ψ.evalZ (pull t β) := by
-    rw [← evalZ_pull ψ hπ (pull t β), desc β hβ hbK]
+  have hψβ : ψ.evalZ β = ψ.evalZ (pull t β) := by rw [← evalZ_pull ψ hπ (pull t β), desc β hβ hbK]
   obtain ⟨c, hc, hcβ⟩ := hin
-  have hcβ1 : toReal (pull t β) = ∑ i, c i • toReal (δ i) := LinearMap.ext₂ fun a b => by
-    have := LinearMap.congr_fun₂ hcβ (t a) (t b)
-    simpa [LinearMap.sum_apply, htt, htt'] using this
+  have hcβ1 : toReal (pull t β) = ∑ i, c i • toReal (δ i) :=
+    LinearMap.ext₂ fun a b => by
+      have := LinearMap.congr_fun₂ hcβ (t a) (t b)
+      simpa [LinearMap.sum_apply, htt, htt'] using this
   have hgβ : g β = 0 := by
     have e1 := intLin_eq_of_inCone ψ hσ.linear hℓσ1 hd hβσ
     have e2 := intLin_eq_of_inCone ψ hδ.linear hℓδ1 hc hcβ1
@@ -235,7 +298,9 @@ theorem cell_of_quot_cell : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   have hsum := intLin_eq_sum_of_toReal σ d β hh hβσ
   rw [hhβ, Int.cast_zero] at hsum
   have hzero : ∀ j, d j * (hh (σ j) : ℝ) = 0 := by
-    have := (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => mul_nonneg (hd j) (by exact_mod_cast hnn j))).1 hsum.symm
+    have :=
+      (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => mul_nonneg (hd j) (by exact_mod_cast hnn j))).1
+        hsum.symm
     exact fun j => this j (Finset.mem_univ j)
   have hdz : ∀ j, j ∉ Set.range s → d j = 0 := fun j hj => by
     have h0 : (hh (σ j) : ℝ) ≠ 0 := by exact_mod_cast fun h => hj ((hs j).2 h)
@@ -243,9 +308,15 @@ theorem cell_of_quot_cell : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   have hcone : InRCone (fun i => σ (s i)) β := by
     refine ⟨fun i => d (s i), fun i => hd _, ?_⟩
     rw [hβσ]
-    exact (Fintype.sum_of_injective s s.injective _ _ (fun j hj => by rw [hdz j hj, zero_smul]) fun i => rfl).symm
+    exact (Fintype.sum_of_injective s s.injective _ _
+      (fun j hj => by rw [hdz j hj, zero_smul])
+      fun i => rfl).symm
 
-  have hspan : ∀ i, ∃ k : ℕ, 0 < k ∧ k • σ (s i) ∈ Submodule.span ℤ (Set.range fun i => pull (orad (O := 𝓞 E) β).mkQ (δ i)) := by
+  have hspan
+      : ∀ i, ∃ k : ℕ,
+        0 < k
+          ∧ k • σ (s i)
+            ∈ Submodule.span ℤ (Set.range fun i => pull (orad (O := 𝓞 E) β).mkQ (δ i)) := by
     intro i
     have hj0 : hh (σ (s i)) = 0 := (hs (s i)).1 ⟨i, rfl⟩
     have hKj : hK (σ (s i)) = 0 := by
@@ -272,8 +343,9 @@ theorem cell_of_quot_cell : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     rw [e3]
     exact Submodule.sum_mem _ fun l _ => nsmul_mem (Submodule.subset_span (Set.mem_range_self l)) _
   refine ⟨F.card, fun i => σ (s i), hσs, hcone, ?_⟩
-  calc genRank (fun i => σ (s i)) ≤ genRank (fun i => pull (orad (O := 𝓞 E) β).mkQ (δ i)) :=
-        genRank_le_of_smul_mem_span _ _ hspan
+  calc
+    genRank (fun i => σ (s i)) ≤ genRank (fun i => pull (orad (O := 𝓞 E) β).mkQ (δ i)) :=
+      genRank_le_of_smul_mem_span _ _ hspan
     _ = genRank δ := genRank_pull hπ δ
 
 end GlobalTheory.PolFan.CarDim

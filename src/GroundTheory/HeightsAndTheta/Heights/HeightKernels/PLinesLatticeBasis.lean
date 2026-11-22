@@ -9,11 +9,12 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-theorem LinesLatticeBasis.proof (V : Type) [AddCommGroup V] [Module ℚ V]
-    [FiniteDimensional ℚ V] (ι : Type) [Fintype ι]
-    (hcard : Fintype.card ι = Module.finrank ℚ V) (M : Submodule ℤ V)
-    (hM : Submodule.IsFullLattice ℚ M) :
-    ∃ b : Module.Basis ι ℚ V, M = Submodule.span ℤ (Set.range b) := by
+theorem LinesLatticeBasis.proof
+    (V : Type) [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V]
+    (ι : Type) [Fintype ι]
+    (hcard : Fintype.card ι = Module.finrank ℚ V)
+    (M : Submodule ℤ V) (hM : Submodule.IsFullLattice ℚ M)
+    : ∃ b : Module.Basis ι ℚ V, M = Submodule.span ℤ (Set.range b) := by
   have : Module.Free ℤ M := Submodule.IsLattice.free ℚ M
   have : Module.Finite ℤ M := Submodule.IsLattice.finite ℚ M
   let b0 := Module.finBasis ℤ M

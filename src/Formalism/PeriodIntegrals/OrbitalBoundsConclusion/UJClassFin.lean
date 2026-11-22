@@ -9,5 +9,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnitaryClassFini
 @[expose] public section
 
 theorem unitary_class_set_finite : PI.UJClassFin.UJClassFin :=
-  PI.UnitaryGroupMassFormula.UJClassFin.uJClassFin_of_latFin PI.UnitaryGroupMassFormula.UJClassFin.posDefOfDefiniteSignature_holds
-    PI.UnitaryGroupMassFormula.UJClassFin.adelic_bounds PI.UnitaryGroupMassFormula.UJClassFin.lattice_classes_finite_refinement
+  PI.UnitaryGroupMassFormula.UJClassFin.uJClassFin_of_latFin
+    PI.UnitaryGroupMassFormula.UJClassFin.posDefOfDefiniteSignature_holds
+    PI.UnitaryGroupMassFormula.UJClassFin.adelic_bounds
+    PI.UnitaryGroupMassFormula.UJClassFin.lattice_classes_finite_refinement

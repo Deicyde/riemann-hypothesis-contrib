@@ -8,9 +8,12 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 namespace KStar.Tree
 
 open Polynomial IntermediateField in
-private theorem totient_le_of_cyc_pow_eq_one (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] [NumberField E] [Field Ω]
-    [Algebra E Ω] [IsAlgClosure E Ω] (n : ℕ) (hn : n ≠ 0) (h : ∀ g : Ω ≃ₐ[E] Ω, cyc l E Ω g ^ n = 1) (k : ℕ) :
-    Nat.totient (l ^ k) ≤ Module.finrank ℚ E * n := by
+private theorem totient_le_of_cyc_pow_eq_one
+    (l : ℕ) [Fact l.Prime]
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (n : ℕ) (hn : n ≠ 0) (h : ∀ g : Ω ≃ₐ[E] Ω, cyc l E Ω g ^ n = 1)
+    (k : ℕ)
+    : Nat.totient (l ^ k) ≤ Module.finrank ℚ E * n := by
   classical
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
@@ -20,13 +23,15 @@ private theorem totient_le_of_cyc_pow_eq_one (l : ℕ) [Fact l.Prime] (E Ω : Ty
   have hint : IsIntegral E ζ := (hζ.isIntegral (pow_pos hl.pos k)).tower_top
   set S : Finset ℤ_[l] := (Polynomial.nthRoots n (1 : ℤ_[l])).toFinset with hSdef
   have hS : S.card ≤ n := (Multiset.toFinset_card_le _).trans (Polynomial.card_nthRoots n 1)
-  have hsub : ∀ r ∈ (minpoly E ζ).rootSet Ω, r ∈ S.image fun x => ζ ^ (PadicInt.toZModPow k x).val := by
+  have hsub
+      : ∀ r ∈ (minpoly E ζ).rootSet Ω, r ∈ S.image fun x => ζ ^ (PadicInt.toZModPow k x).val := by
     intro r hr
     rw [Polynomial.mem_rootSet] at hr
     have hmin : minpoly E r = minpoly E ζ :=
       (minpoly.eq_of_irreducible_of_monic (minpoly.irreducible hint) hr.2 (minpoly.monic hint)).symm
     obtain ⟨g, hg⟩ := (Normal.minpoly_eq_iff_mem_orbit Ω).1 hmin
-    have hspec := cyclotomicCharacter.spec l (MulSemiringAction.toRingAut Gal(Ω/E) Ω g) ζ hζ.pow_eq_one
+    have hspec :=
+      cyclotomicCharacter.spec l (MulSemiringAction.toRingAut Gal(Ω/E) Ω g) ζ hζ.pow_eq_one
     rw [Finset.mem_image]
     refine ⟨((cyc l E Ω g : ℤ_[l]ˣ) : ℤ_[l]), ?_, ?_⟩
     · rw [hSdef, Multiset.mem_toFinset, Polynomial.mem_nthRoots (Nat.pos_of_ne_zero hn),
@@ -36,10 +41,11 @@ private theorem totient_le_of_cyc_pow_eq_one (l : ℕ) [Fact l.Prime] (E Ω : Ty
   have hdeg : (minpoly E ζ).natDegree ≤ n := by
     rw [← Polynomial.card_rootSet_eq_natDegree (K := Ω) (minpoly.irreducible hint).separable
       (IsAlgClosed.splits ((minpoly E ζ).map (algebraMap E Ω)))]
-    calc Fintype.card ((minpoly E ζ).rootSet Ω) = ((minpoly E ζ).rootSet Ω).toFinset.card :=
-          (Set.toFinset_card _).symm
+    calc
+      Fintype.card ((minpoly E ζ).rootSet Ω)
+        = ((minpoly E ζ).rootSet Ω).toFinset.card := (Set.toFinset_card _).symm
       _ ≤ (S.image fun x => ζ ^ (PadicInt.toZModPow k x).val).card :=
-          Finset.card_le_card fun x hx => hsub x (Set.mem_toFinset.1 hx)
+        Finset.card_le_card fun x hx => hsub x (Set.mem_toFinset.1 hx)
       _ ≤ S.card := Finset.card_image_le
       _ ≤ n := hS
   haveI : FiniteDimensional E E⟮ζ⟯ := IntermediateField.adjoin.finiteDimensional hint
@@ -50,15 +56,20 @@ private theorem totient_le_of_cyc_pow_eq_one (l : ℕ) [Fact l.Prime] (E Ω : Ty
     rw [← Polynomial.natDegree_cyclotomic (l ^ k) ℚ,
       Polynomial.cyclotomic_eq_minpoly_rat hζF (pow_pos hl.pos k)]
     exact minpoly.natDegree_le _
-  calc (l ^ k).totient ≤ Module.finrank ℚ E⟮ζ⟯ := hq
+  calc
+    (l ^ k).totient
+      ≤ Module.finrank ℚ E⟮ζ⟯ := hq
     _ = Module.finrank ℚ E * Module.finrank E E⟮ζ⟯ := (Module.finrank_mul_finrank ℚ E E⟮ζ⟯).symm
     _ ≤ Module.finrank ℚ E * n := by
-        apply Nat.mul_le_mul_left
-        rw [IntermediateField.adjoin.finrank hint]
-        exact hdeg
+      apply Nat.mul_le_mul_left
+      rw [IntermediateField.adjoin.finrank hint]
+      exact hdeg
 
-theorem exists_cyc_pow_ne_one (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (n : ℕ) (hn : n ≠ 0) : ∃ g : Ω ≃ₐ[E] Ω, cyc l E Ω g ^ n ≠ 1 := by
+theorem exists_cyc_pow_ne_one
+    (l : ℕ) [Fact l.Prime]
+    (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (n : ℕ) (hn : n ≠ 0)
+    : ∃ g : Ω ≃ₐ[E] Ω, cyc l E Ω g ^ n ≠ 1 := by
   have hl := (Fact.out : l.Prime)
   by_contra hne
   push_neg at hne

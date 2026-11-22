@@ -8,8 +8,8 @@ namespace KStar.Ram
 
 open DirichletCharacter
 
-private theorem prime_dvd_finset_lcm {ι : Type*} {p : ℕ} (hp : p.Prime) (s : Finset ι)
-    (c : ι → ℕ) : p ∣ s.lcm c ↔ ∃ i ∈ s, p ∣ c i := by
+private theorem prime_dvd_finset_lcm {ι : Type*} {p : ℕ} (hp : p.Prime) (s : Finset ι) (c : ι → ℕ)
+    : p ∣ s.lcm c ↔ ∃ i ∈ s, p ∣ c i := by
   classical
   refine Finset.induction_on s ?_ ?_
   · simp [hp.ne_one]
@@ -21,9 +21,9 @@ private theorem prime_dvd_finset_lcm {ι : Type*} {p : ℕ} (hp : p.Prime) (s : 
 
 variable {N : ℕ} [NeZero N] (l : ℕ) [Fact l.Prime]
 
-theorem ramIdx_eq_one_iff (X : Subgroup (DirichletCharacter ℂ N)) :
-    (ramIdx l X = 1 ↔ ∀ ψ ∈ X, ¬ l ∣ ψ.conductor) ∧ (ramIdx l X = 1 ↔ ¬ l ∣ fieldCond X) ∧
-      1 ≤ ramIdx l X := by
+theorem ramIdx_eq_one_iff (X : Subgroup (DirichletCharacter ℂ N))
+    : (ramIdx l X = 1 ↔ ∀ ψ ∈ X, ¬ l ∣ ψ.conductor) ∧ (ramIdx l X = 1 ↔ ¬ l ∣ fieldCond X)
+      ∧ 1 ≤ ramIdx l X := by
   have key : ramIdx l X = 1 ↔ ∀ ψ ∈ X, localPart N l ψ = 1 := by
     unfold ramIdx
     rw [Subgroup.card_eq_one, Subgroup.map_eq_bot_iff]

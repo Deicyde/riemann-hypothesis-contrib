@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsIsArchi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -16,11 +18,11 @@ noncomputable section
 
 namespace GlobalTheory.RealLineAt
 
-theorem exists_inverse_chart {D : D7} {θ : InfFam D} (hθ : IsInfFam θ) :
-    ∃ σ : (D.what₂.Tau → ℂ) →+ AE D, GlobalTheory.FockCompare.Chart θ σ := by
-  obtain ⟨ρ, h1, h2, h3⟩ := GlobalTheory.FockCompare.exists_real_chart D θ hθ (GlobalTheory.CMTypePlaces.places_bijective D)
+theorem exists_inverse_chart {D : D7} {θ : InfFam D} (hθ : IsInfFam θ)
+    : ∃ σ : (D.what₂.Tau → ℂ) →+ AE D, GlobalTheory.FockCompare.Chart θ σ := by
+  obtain ⟨ρ, h1, h2, h3⟩ :=
+    GlobalTheory.FockCompare.exists_real_chart D θ hθ (GlobalTheory.CMTypePlaces.places_bijective D)
   exact GlobalTheory.FockCompare.RealChart.exists_chart D θ hθ ρ h1 h2 h3
-
 
 open Classical in
 def ray {ι : Type} (τ : ι) (c : ℂ) : ℝ →+ (ι → ℂ) where
@@ -44,16 +46,17 @@ theorem continuous_ray {ι : Type} (τ : ι) (c : ℂ) : Continuous (ray τ c) :
 theorem lineAt_exists (D : D7) : LineAtExists D := by
   intro θ hθ m n τ z
   obtain ⟨σ, hσ⟩ := exists_inverse_chart hθ
-  let L : ℝ →+ Mx D m n :=
-    { toFun := fun t => Matrix.of fun i j => σ (ray τ (z i j) t)
-      map_zero' := by
-        funext i j
-        show σ (ray τ (z i j) 0) = 0
-        rw [(ray τ (z i j)).map_zero, σ.map_zero]
-      map_add' := fun s t => by
-        funext i j
-        show σ (ray τ (z i j) (s + t)) = σ (ray τ (z i j) s) + σ (ray τ (z i j) t)
-        rw [map_add, map_add] }
+  let L : ℝ →+ Mx D m n := {
+    toFun := fun t => Matrix.of fun i j => σ (ray τ (z i j) t)
+    map_zero' := by
+      funext i j
+      show σ (ray τ (z i j) 0) = 0
+      rw [(ray τ (z i j)).map_zero, σ.map_zero]
+    map_add' := fun s t => by
+      funext i j
+      show σ (ray τ (z i j) (s + t)) = σ (ray τ (z i j) s) + σ (ray τ (z i j) t)
+      rw [map_add, map_add]
+  }
   refine ⟨L, ?_, fun t => ?_, fun t τ' => ?_⟩
   · exact continuous_pi fun i => continuous_pi fun j => hσ.cont.comp (continuous_ray τ (z i j))
   · funext i j
@@ -79,8 +82,8 @@ theorem lineAt_unique (D : D7) : LineAtUnique D := by
       congrFun (congrFun ((hL.2.2 t τ').trans (hL'.2.2 t τ').symm) i) j
     rw [RingHom.map_sub, RingHom.map_sub, e, sub_self]
 
-theorem lineAt_exists_unique : ∀ D : D7, LineAtExists D ∧ LineAtUnique D :=
-  fun D => ⟨lineAt_exists D, lineAt_unique D⟩
+theorem lineAt_exists_unique : ∀ D : D7, LineAtExists D ∧ LineAtUnique D := fun D =>
+  ⟨lineAt_exists D, lineAt_unique D⟩
 
 end GlobalTheory.RealLineAt
 

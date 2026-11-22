@@ -28,12 +28,14 @@ theorem dR_nonneg (x : E r) : 0 ≤ dR x := by
 theorem dR_continuousAt {x : E r} (hx : x ∈ Qset r TT) : ContinuousAt (dR (r := r)) x := by
   unfold dR
   refine tendsto_finsetProd _ fun l _ => ?_
-  exact ((Complex.continuous_normSq.comp ((continuous_apply l).comp continuous_fst)).continuousAt).inv₀
-    (Complex.normSq_pos.2 (hx.1 l)).ne'
+  exact
+    ((Complex.continuous_normSq.comp ((continuous_apply l).comp continuous_fst)).continuousAt).inv₀
+      (Complex.normSq_pos.2 (hx.1 l)).ne'
 
-def ofAmb (χ : E r → ℝ) (hχ : ContDiff ℝ sm χ) : SmQ r TT :=
-  ⟨fun q => ((χ q.1 : ℝ) : ℂ),
-    ((Complex.ofRealCLM.contDiff.comp hχ).contDiffOn).congr fun x hx => by simp [MA.ext, hx]⟩
+def ofAmb (χ : E r → ℝ) (hχ : ContDiff ℝ sm χ) : SmQ r TT := ⟨
+  fun q => ((χ q.1 : ℝ) : ℂ),
+  ((Complex.ofRealCLM.contDiff.comp hχ).contDiffOn).congr fun x hx => by simp [MA.ext, hx]
+⟩
 
 theorem fund0 (h : SmQ r TT) (hh : ∀ V ∈ Test r TT, ip0 h V = 0) : h = 0 := by
   apply S_ext
@@ -104,12 +106,15 @@ theorem fund0 (h : SmQ r TT) (hh : ∀ V ∈ Test r TT, ip0 h V = 0) : h = 0 := 
     have he : MA.ext (h : Qp r TT → ℂ) q0.1 = (h : Qp r TT → ℂ) q0 := by simp [MA.ext, q0.2]
     simp only [hG, hb1, one_mul, he]
     exact (mul_pos (dR_pos q0.2) (pow_pos (norm_pos_iff.2 hne) 2)).ne'
-  have := hcont.integral_pos_of_hasCompactSupport_nonneg_nonzero (μ := (volume : Measure (E r))) hcs hnn hpos0
+  have :=
+    hcont.integral_pos_of_hasCompactSupport_nonneg_nonzero (μ := (volume : Measure (E r))) hcs hnn
+      hpos0
   linarith
 
-theorem inner_product_sub_left {f g V : SmQ r TT} (hV : V ∈ Test r TT) : ip0 (f - g) V = ip0 f V - ip0 g V := by
-  rw [inner_conj_symm_alt, sub_eq_add_neg, inner_add_right_alt hV, inner_neg_right_alt, map_add (f := _), map_neg, ← inner_conj_symm_alt, ← inner_conj_symm_alt,
-    ← sub_eq_add_neg]
+theorem inner_product_sub_left {f g V : SmQ r TT} (hV : V ∈ Test r TT)
+    : ip0 (f - g) V = ip0 f V - ip0 g V := by
+  rw [inner_conj_symm_alt, sub_eq_add_neg, inner_add_right_alt hV, inner_neg_right_alt,
+    map_add (f := _), map_neg, ← inner_conj_symm_alt, ← inner_conj_symm_alt, ← sub_eq_add_neg]
 
 end fund
 
@@ -125,8 +130,9 @@ theorem fundamental_quadratic_identity : SAFundQ := by
       · simp [hπ, hV]
       · simp [hπ, test_zero]
     have h1 := h _ hU
-    have hs : ∀ x : M.Ty P → MA.SmQ P.r P.TT,
-        MA.ipA P x (fun π'' => if π'' = π then V else 0) = MA.ip0 (x π) V := by
+    have hs
+        : ∀ x : M.Ty P → MA.SmQ P.r P.TT,
+          MA.ipA P x (fun π'' => if π'' = π then V else 0) = MA.ip0 (x π) V := by
       intro x
       unfold MA.ipA
       rw [Finset.sum_eq_single π (fun b _ hb => by simp [hb, inner_zero_right_alt]) (by simp)]

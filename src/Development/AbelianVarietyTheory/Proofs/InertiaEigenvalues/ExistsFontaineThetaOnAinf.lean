@@ -17,7 +17,8 @@ noncomputable section
 
 namespace GlobalTheory.Cyc
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation
 open scoped Formalism.Per
 
 variable {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI : LocAinf l P)
@@ -33,8 +34,9 @@ theorem actT_eq_σF (g : GQ l) (x : OCb l) : AI.actT g x = Formalism.Per.σF g x
   refine Perfection.ext fun n => ?_
   obtain ⟨y, hy⟩ := Ideal.Quotient.mk_surjective (PreTilt.coeff n x)
   obtain ⟨y', h1, h2⟩ := AI.actT_coeff g x n y hy.symm
-  have h3 : y' = Formalism.Per.σO g y := Subtype.ext ((h1.trans (actC_eq_σC AI g y)).trans
-    (by symm; apply GlobalTheory.RingIface.sigO_coe))
+  have h3 : y' = Formalism.Per.σO g y :=
+    Subtype.ext ((h1.trans (actC_eq_σC AI g y)).trans
+      (by symm; apply GlobalTheory.RingIface.sigO_coe))
   refine h2.trans ?_
   rw [h3]
   exact (GlobalTheory.AdicMaps.coeff_galois l g x n y hy.symm).symm
@@ -44,8 +46,9 @@ theorem ζ_add_pow (j n : ℕ) : AI.ζ (j + n) ^ l ^ n = AI.ζ j := by
   | zero => simp
   | succ n ih => rw [pow_succ', pow_mul, ← add_assoc, AI.ζ_succ, ih]
 
-theorem coeff_εroot (j n : ℕ) : PreTilt.coeff n (AI.εroot j) =
-    Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) (AI.ζ (j + n)) := by
+theorem coeff_εroot (j n : ℕ)
+    : PreTilt.coeff n (AI.εroot j)
+      = Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) (AI.ζ (j + n)) := by
   rw [← AI.ε_coeff, LocAinf.εroot, PreTilt.coeff_iterate_frobeniusEquiv_symm, add_comm]
 
 theorem untilt_εroot (j : ℕ) : (AI.εroot j).untilt = AI.ζ j := by
@@ -64,18 +67,21 @@ theorem isTheta_fontaineTheta : IsTheta AI (WittVector.fontaineTheta (OC l) l) :
   · rw [← Ideal.Quotient.eq, WittVector.fontaineTheta_teichmuller, ← h]
     exact PreTilt.mk_untilt_eq_coeff_zero x
   · exact ReciprocityTheory.PGsh.Ainf.theta_surj l (OC l) (PadicComplexInt.integers l)
-  · have e : AI.actW g a = Formalism.Per.σA g a := WittVector.ext fun n =>
-      (actT_eq_σF AI g (a.coeff n)).trans (by symm; apply GlobalTheory.RingIface.sigA_coeff)
+  · have e : AI.actW g a = Formalism.Per.σA g a :=
+      WittVector.ext fun n =>
+        (actT_eq_σF AI g (a.coeff n)).trans (by symm; apply GlobalTheory.RingIface.sigA_coeff)
     rw [e, actC_eq_σC]
-    exact (congrArg Subtype.val (GlobalTheory.RingBasics.θ_σA g a)).trans (by apply GlobalTheory.RingIface.sigO_coe)
+    exact (congrArg Subtype.val (GlobalTheory.RingBasics.θ_σA g a)).trans
+      (by apply GlobalTheory.RingIface.sigO_coe)
   · rw [← RingHom.mem_ker,
       ReciprocityTheory.PGsh.Ainf.ker_theta l (OC l) (PadicComplexInt.integers l) AI.ε hprim,
       Ideal.mem_span_singleton]
     rfl
   · rw [WittVector.fontaineTheta_teichmuller, untilt_εroot]
 
-theorem exists_isTheta : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
-    ∃ θ : Ainf l →+* OC l, IsTheta AI θ :=
-  fun _ _ _ AI => ⟨_, isTheta_fontaineTheta AI⟩
+theorem exists_isTheta
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), ∃ θ : Ainf l →+* OC l,
+      IsTheta AI θ := fun _ _ _ AI =>
+  ⟨_, isTheta_fontaineTheta AI⟩
 
 end GlobalTheory.Cyc

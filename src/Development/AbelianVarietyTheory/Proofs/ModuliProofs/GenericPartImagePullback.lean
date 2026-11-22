@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Counterexamples.JetSurvey.ExistsU
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 open GlobalTheory.FlatTors GlobalTheory.IndefiniteRowSideFullHecke.FlatIsoUnitGenerator
 open scoped TensorProduct
@@ -20,22 +22,24 @@ noncomputable section
 
 namespace GlobalTheory.GenTorsMap
 
-theorem exists_factor {K : Type} [Field K] (X : Over (Sp K)) (hX : IsFinite X.hom) (F : Type) [Field F]
-    [IsAlgClosed F] [Algebra K F] (x : Sp F ⟶ X.left) (hx : x ≫ X.hom = spMap (algebraMap K F)) :
-    ∃ (σ : AlgebraicClosure K →ₐ[K] F) (x' : Over.mk (spMap (algebraMap K (AlgebraicClosure K))) ⟶ X),
+theorem exists_factor
+    {K : Type} [Field K]
+    (X : Over (Sp K)) (hX : IsFinite X.hom)
+    (F : Type) [Field F] [IsAlgClosed F] [Algebra K F]
+    (x : Sp F ⟶ X.left) (hx : x ≫ X.hom = spMap (algebraMap K F))
+    : ∃ (σ : AlgebraicClosure K →ₐ[K] F)
+        (x' : Over.mk (spMap (algebraMap K (AlgebraicClosure K))) ⟶ X),
       x = spMap σ.toRingHom ≫ x'.left := by
   haveI : IsAffine X.left := isAffine_of_isAffineHom X.hom
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (x ≫ X.left.isoSpec.hom)
   obtain ⟨c, hc⟩ := Spec.map_surjective (X.left.isoSpec.inv ≫ X.hom)
-  have hfin : c.hom.Finite := by
-    rw [← IsFinite.SpecMap_iff, hc]; infer_instance
+  have hfin : c.hom.Finite := by rw [← IsFinite.SpecMap_iff, hc]; infer_instance
   have e : c ≫ φ = CommRingCat.ofHom (algebraMap K F) := by
     apply Spec.map_injective
     rw [Spec.map_comp, hφ, hc, Category.assoc, Iso.hom_inv_id_assoc, hx]
   let σ : AlgebraicClosure K →ₐ[K] F := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hr : ∀ b, φ.hom b ∈ σ.range := fun b => by
     have hi : IsIntegral K (φ.hom b) := by
@@ -66,9 +70,11 @@ theorem exists_factor {K : Type} [Field K] (X : Over (Sp K)) (hX : IsFinite X.ho
     ext b
     exact (h1 b).symm
 
-theorem hom_ext_points {K : Type} [Field K] {X Y : Over (Sp K)} (hX : IsFinite X.hom) (hE : Etale X.hom)
-    (hY : IsSeparated Y.hom) (u v : X ⟶ Y)
-    (h : ∀ x : Over.mk (spMap (algebraMap K (AlgebraicClosure K))) ⟶ X, x ≫ u = x ≫ v) : u = v := by
+theorem hom_ext_points
+    {K : Type} [Field K]
+    {X Y : Over (Sp K)} (hX : IsFinite X.hom) (hE : Etale X.hom) (hY : IsSeparated Y.hom)
+    (u v : X ⟶ Y) (h : ∀ x : Over.mk (spMap (algebraMap K (AlgebraicClosure K))) ⟶ X, x ≫ u = x ≫ v)
+    : u = v := by
   haveI : IsAffine X.left := isAffine_of_isAffineHom X.hom
   haveI : IsReduced X.left := by
     obtain ⟨c, hc⟩ := Spec.map_surjective (X.left.isoSpec.inv ≫ X.hom)
@@ -88,7 +94,10 @@ theorem hom_ext_points {K : Type} [Field K] {X Y : Over (Sp K)} (hX : IsFinite X
   have : Epi i := by
     have : Flat i := inferInstance
     have : Surjective i :=
-      ⟨fun _ => ⟨(default : PrimeSpectrum F), Subsingleton.elim (α := PrimeSpectrum (X.left.residueField z)) _ _⟩⟩
+      ⟨fun _ => ⟨
+        (default : PrimeSpectrum F),
+        Subsingleton.elim (α := PrimeSpectrum (X.left.residueField z)) _ _
+      ⟩⟩
     exact Flat.epi_of_flat_of_surjective _
   rw [← cancel_epi i, ← Category.assoc, ← Category.assoc]
   erw [e]

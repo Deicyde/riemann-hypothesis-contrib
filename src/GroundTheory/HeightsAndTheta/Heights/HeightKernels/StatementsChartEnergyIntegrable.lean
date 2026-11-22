@@ -15,9 +15,12 @@ open scoped ComplexOrder
 noncomputable section
 
 def ChartEnergyIntegrable.Statement : Prop :=
-  ∀ (e : ℕ) (M N : Matrix (Fin (e + 1)) (Fin (e + 1)) ℂ), M.PosDef → N.PosDef → ∀ k : ℕ,
-    Integrable (fun y : Fin e → ℂ => (hermChartPot M y - hermChartPot N y) *
-      maDensity (fun j : Fin e => if (j : ℕ) < k then hermChartPot M else hermChartPot N) y)
+  ∀ (e : ℕ) (M N : Matrix (Fin (e + 1)) (Fin (e + 1)) ℂ),
+    M.PosDef → N.PosDef
+      → ∀ k : ℕ,
+        Integrable (fun y : Fin e → ℂ =>
+          (hermChartPot M y - hermChartPot N y)
+            * maDensity (fun j : Fin e => if (j : ℕ) < k then hermChartPot M else hermChartPot N) y)
 
 end
 

@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem ul_cop (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] [CharP k l] (n : ℕ) :
-    (Nat.card (Fin n → kˣ)).Coprime l := by
+private theorem ul_cop (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] [CharP k l] (n : ℕ)
+    : (Nat.card (Fin n → kˣ)).Coprime l := by
   classical
   haveI := Fintype.ofFinite k
   have hl : l.Prime := Fact.out
@@ -23,21 +24,29 @@ private theorem ul_cop (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Finite k] 
   rw [Nat.sub_sub_self h2] at h3
   exact hl.one_lt.ne' (Nat.dvd_one.mp h3)
 
-private theorem ul_ker {G C : Type} [Group G] [Group C] {n : ℕ} (f : Fin n → G →* C) :
-    (MonoidHom.pi f).ker = ⨅ i, (f i).ker := by
+private theorem ul_ker {G C : Type} [Group G] [Group C] {n : ℕ} (f : Fin n → G →* C)
+    : (MonoidHom.pi f).ker = ⨅ i, (f i).ker := by
   ext g
   simp [MonoidHom.mem_ker, Subgroup.mem_iInf, funext_iff]
 
-theorem UpperTheory.V.Pa.unrLoc :
-    ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (V0 : s.Lev) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (n : ℕ) (r : Resid V0.frame O n), ∀ u, UnrCount l ((locOf r).Gu u) ((locOf r).Ju u) := by
+theorem UpperTheory.V.Pa.unrLoc
+    : ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω]
+        [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (V0 : s.Lev) (O : Type)
+        [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (n : ℕ)
+        (r : Resid V0.frame O n),
+      ∀ u,
+        UnrCount l ((locOf r).Gu u) ((locOf r).Ju u) := by
   intro l _ L Ω _ _ _ _ _ _ s V0 O _ _ _ _ _ n r u
   haveI : CharP (IsLocalRing.ResidueField O) l := IsCoef.char
   haveI : Finite (IsLocalRing.ResidueField O) := IsCoef.finite
   unfold locOf
   dsimp only
-  have key : ∀ (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 L)), IsPlaceOver A v →
-      UnrCount l (Dec (F := L) A) ((Ine A).subgroupOf (Dec (F := L) A) ⊓
-        ⨅ i, ((r.chib i).comp (V0.pr.comp (Dec (F := L) A).subtype)).ker) := by
+  have key
+      : ∀ (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 L)),
+        IsPlaceOver A v
+          → UnrCount l (Dec (F := L) A)
+            ((Ine A).subgroupOf (Dec (F := L) A)
+              ⊓ ⨅ i, ((r.chib i).comp (V0.pr.comp (Dec (F := L) A).subtype)).ker) := by
     intro A v hv
     let χ := MonoidHom.pi (fun i => (r.chib i).comp (V0.pr.comp (Dec (F := L) A).subtype))
     have hker : χ.ker = ⨅ i, ((r.chib i).comp (V0.pr.comp (Dec (F := L) A).subtype)).ker := ul_ker _

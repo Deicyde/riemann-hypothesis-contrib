@@ -18,8 +18,10 @@ noncomputable section
 
 namespace GlobalTheory.ArchJointCont
 
-theorem continuous_of_weak {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
-    (A : 𝓢(V, ℂ) →ₗ[ℂ] 𝓢(V, ℂ)) (h : ∀ T : 𝓢(V, ℂ) →L[ℂ] ℂ, Continuous fun f => T (A f)) : Continuous A := by
+theorem continuous_of_weak
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    (A : 𝓢(V, ℂ) →ₗ[ℂ] 𝓢(V, ℂ)) (h : ∀ T : 𝓢(V, ℂ) →L[ℂ] ℂ, Continuous fun f => T (A f))
+    : Continuous A := by
   haveI : BarrelledSpace ℂ 𝓢(V, ℂ) := GlobalTheory.schwartzMap_barrelledSpace V
   refine (schwartz_withSeminorms ℂ V ℂ).continuous_of_continuous_comp A fun i => ?_
   set p : Seminorm ℂ 𝓢(V, ℂ) := schwartzSeminormFamily ℂ V ℂ i
@@ -40,11 +42,15 @@ theorem continuous_of_weak {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
   have hex : ∃ L : StrongDual ℂ (GlobalTheory.DiffDecay.WithSemi p), y * ‖L‖ < ‖L (j (A f₀))‖ := by
     by_contra hne
     push_neg at hne
-    have h1 : ‖NormedSpace.inclusionInDoubleDual ℂ (GlobalTheory.DiffDecay.WithSemi p) (j (A f₀))‖ ≤ y :=
-      ContinuousLinearMap.opNorm_le_bound _ hy0 fun L => by
-        rw [NormedSpace.dual_def]; exact hne L
-    rw [show NormedSpace.inclusionInDoubleDual ℂ (GlobalTheory.DiffDecay.WithSemi p) (j (A f₀)) =
-      NormedSpace.inclusionInDoubleDualLi ℂ (j (A f₀)) from rfl, LinearIsometry.norm_map, hnorm] at h1
+    have h1
+        : ‖NormedSpace.inclusionInDoubleDual ℂ (GlobalTheory.DiffDecay.WithSemi p) (j (A f₀))‖
+          ≤ y :=
+      ContinuousLinearMap.opNorm_le_bound _ hy0 fun L => by rw [NormedSpace.dual_def]; exact hne L
+    rw [show NormedSpace.inclusionInDoubleDual ℂ (GlobalTheory.DiffDecay.WithSemi p) (j (A f₀))
+            = NormedSpace.inclusionInDoubleDualLi ℂ (j (A f₀)) from
+          rfl,
+        LinearIsometry.norm_map, hnorm]
+      at h1
     exact absurd hy (not_lt.2 h1)
   obtain ⟨L, hL⟩ := hex
   have hc : Continuous fun f => ‖L (j (A f))‖ := (h (L.comp j)).norm
@@ -56,21 +62,28 @@ theorem continuous_of_weak {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
   push_neg at hcon
   nlinarith [norm_nonneg L]
 
-theorem exists_adm (F : Type) [Field F] [NumberField F] {κ : Type} [Fintype κ] (T : SInf F κ →L[ℂ] ℂ) :
-    ∃ l ∈ (adeleClass F).adm κ, ∀ (f : SInf F κ) (g : (κ → IsDedekindDomain.FiniteAdeleRing (𝓞 F) F) → ℂ),
-      l (pureA F ⇑f g) = g 0 * T f := by
+theorem exists_adm
+    (F : Type) [Field F] [NumberField F] {κ : Type} [Fintype κ] (T : SInf F κ →L[ℂ] ℂ)
+    : ∃ l ∈ (adeleClass F).adm κ,
+      ∀ (f : SInf F κ) (g : (κ → IsDedekindDomain.FiniteAdeleRing (𝓞 F) F) → ℂ),
+        l (pureA F ⇑f g) = g 0 * T f := by
   let lift : (κ → mixedEmbedding.mixedSpace F) → (κ → AF F) := fun y i =>
     ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (y i), 0)
-  let sl : ((κ → AF F) → ℂ) →ₗ[ℂ] ((κ → mixedEmbedding.mixedSpace F) → ℂ) := LinearMap.funLeft ℂ ℂ lift
-  let co : SInf F κ →ₗ[ℂ] ((κ → mixedEmbedding.mixedSpace F) → ℂ) :=
-    { toFun := fun f => ⇑f, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
+  let sl : ((κ → AF F) → ℂ) →ₗ[ℂ] ((κ → mixedEmbedding.mixedSpace F) → ℂ) :=
+    LinearMap.funLeft ℂ ℂ lift
+  let co : SInf F κ →ₗ[ℂ] ((κ → mixedEmbedding.mixedSpace F) → ℂ) := {
+    toFun := fun f => ⇑f
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hco : Function.Injective co := DFunLike.coe_injective
   let e := LinearEquiv.ofInjective co hco
   obtain ⟨T₂, hT₂⟩ := LinearMap.exists_extend (T.toLinearMap ∘ₗ e.symm.toLinearMap)
   have hT₂f : ∀ f : SInf F κ, T₂ ⇑f = T f := fun f => by
     have := congrArg (fun m => m (e f)) hT₂
-    simp only [LinearMap.comp_apply, Submodule.subtype_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply,
-      ContinuousLinearMap.coe_coe] at this
+    simp only [LinearMap.comp_apply, Submodule.subtype_apply, LinearEquiv.coe_coe,
+        LinearEquiv.symm_apply_apply, ContinuousLinearMap.coe_coe]
+      at this
     rw [LinearEquiv.ofInjective_apply] at this
     exact this
   have hsl : ∀ (f : SInf F κ) g, sl (pureA F ⇑f g) = g 0 • ⇑f := fun f g => by

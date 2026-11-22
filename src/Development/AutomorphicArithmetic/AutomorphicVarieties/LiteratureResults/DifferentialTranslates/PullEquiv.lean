@@ -26,19 +26,25 @@ theorem pullEquiv : PullEquiv := by
     have h := hl.2 γ ((G.σ γ⁻¹) s) ((G.ρ γ⁻¹) x) (G.maps γ⁻¹ x hx)
     rw [hss, hBA] at h
     exact h
-  have hηinv : ∀ x, (η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s x = G.tr q γ ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) ((G.σ γ⁻¹) s) ((G.ρ γ⁻¹) x)) := fun x => by
+  have hηinv
+      : ∀ x,
+        (η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s x
+          = G.tr q γ
+            ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) ((G.σ γ⁻¹) s) ((G.ρ γ⁻¹) x)) := fun x => by
     have h := congrArg (fun w : G.Om q => (w : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s x) (hη γ)
     exact h.symm
-  have hloc : (fun x => l s x • x) =ᶠ[nhds p]
-      fun x => (G.ρ γ) (l ((G.σ γ⁻¹) s) ((G.ρ γ⁻¹) x) • (G.ρ γ⁻¹) x) :=
-    Filter.eventuallyEq_of_mem (G.isOpen.mem_nhds hp) fun x hx => by
-      rw [map_smul, hBA, hlinv x hx]
+  have hloc
+      : (fun x => l s x • x) =ᶠ[nhds p]
+        fun x => (G.ρ γ) (l ((G.σ γ⁻¹) s) ((G.ρ γ⁻¹) x) • (G.ρ γ⁻¹) x) :=
+    Filter.eventuallyEq_of_mem (G.isOpen.mem_nhds hp) fun x hx => by rw [map_smul, hBA, hlinv x hx]
   have hdl : DifferentiableAt ℝ (l ((G.σ γ⁻¹) s)) ((G.ρ γ⁻¹) p) :=
     (((hl.1 ((G.σ γ⁻¹) s)).1).contDiffAt (G.isOpen.mem_nhds hAp)).differentiableAt (by simp)
-  have hD : fderiv ℝ (fun x => l s x • x) p = (G.ρ γ) ∘L
-      (fderiv ℝ (fun y => l ((G.σ γ⁻¹) s) y • y) ((G.ρ γ⁻¹) p)) ∘L (G.ρ γ⁻¹) := by
+  have hD
+      : fderiv ℝ (fun x => l s x • x) p
+        = (G.ρ γ) ∘L (fderiv ℝ (fun y => l ((G.σ γ⁻¹) s) y • y) ((G.ρ γ⁻¹) p)) ∘L (G.ρ γ⁻¹) := by
     rw [hloc.fderiv_eq]
-    have h1 : HasFDerivAt (fun y => l ((G.σ γ⁻¹) s) y • y)
+    have h1 : HasFDerivAt
+        (fun y => l ((G.σ γ⁻¹) s) y • y)
         (fderiv ℝ (fun y => l ((G.σ γ⁻¹) s) y • y) ((G.ρ γ⁻¹) p)) ((G.ρ γ⁻¹) p) :=
       (hdl.smul differentiableAt_id).hasFDerivAt
     exact ((G.ρ γ).hasFDerivAt.comp p (h1.comp p (G.ρ γ⁻¹).hasFDerivAt)).fderiv

@@ -10,9 +10,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 open UpperTheory.V UpperTheory.V.PropA
 
-theorem UpperTheory.V.PropA.detBound :
-    ∀ (l : ℕ) [Fact l.Prime] (u : ℤ_[l]) (c : ℕ), IsLevel l u c → ∀ (j R : ℕ) (S : Matrix (Fin R) (Fin R) ℤ_[l]),
-      ∃ s : Fin R → ℤ_[l], ∀ e : ℕ, vl l ((u ^ l ^ j) ^ e • S - 1).det ≤ ∑ i, (((j + c : ℕ) : ℕ∞) + vl l (s i - e)) := by
+theorem UpperTheory.V.PropA.detBound
+    : ∀ (l : ℕ) [Fact l.Prime] (u : ℤ_[l]) (c : ℕ),
+      IsLevel l u c
+        → ∀ (j R : ℕ) (S : Matrix (Fin R) (Fin R) ℤ_[l]), ∃ s : Fin R → ℤ_[l], ∀ e : ℕ,
+          vl l ((u ^ l ^ j) ^ e • S - 1).det ≤ ∑ i, (((j + c : ℕ) : ℕ∞) + vl l (s i - e)) := by
   intro l _ u c hc j R S
   let φ : ℤ_[l] →+* PadicAlgCl l := (algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom
   have hφ : ∀ x, ‖φ x‖ = ‖x‖ := by

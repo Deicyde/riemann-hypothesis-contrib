@@ -4,24 +4,28 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.BorelPara
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling
-  GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition GlobalTheory.SatakeBound
+open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.Doubling GlobalTheory.GLDoubling
+  GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition
+  GlobalTheory.SatakeBound
 
 namespace GlobalTheory.ParahoricLowerBlock
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem residue_eq_zero_iff_val (x : 𝒪[k]) :
-    IsLocalRing.residue 𝒪[k] x = 0 ↔ valuation k (algebraMap 𝒪[k] k x) < 1 := by
+theorem residue_eq_zero_iff_val (x : 𝒪[k])
+    : IsLocalRing.residue 𝒪[k] x = 0 ↔ valuation k (algebraMap 𝒪[k] k x) < 1 := by
   rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
     (Valuation.integer.integers (valuation k)).isUnit_iff_valuation_eq_one]
   exact ⟨fun h => lt_of_le_of_ne x.2 h, fun h => h.ne⟩
 
-theorem lower_block_det (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D]
-    (j : GL (A ⊕ D) k) (hj : j ∈ parahoric k A D) :
-    ∃ a b : 𝒪[k], (j : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det = algebraMap 𝒪[k] k a ∧
-      ((j⁻¹ : GL (A ⊕ D) k) : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det = algebraMap 𝒪[k] k b ∧
-      IsLocalRing.residue 𝒪[k] (a * b) = 1 := by
+theorem lower_block_det
+    (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D]
+    (j : GL (A ⊕ D) k) (hj : j ∈ parahoric k A D)
+    : ∃ a b : 𝒪[k],
+      (j : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det = algebraMap 𝒪[k] k a
+        ∧ ((j⁻¹ : GL (A ⊕ D) k) : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det = algebraMap 𝒪[k] k b
+        ∧ IsLocalRing.residue 𝒪[k] (a * b) = 1 := by
   obtain ⟨⟨h, rfl⟩, hlow⟩ := mem_parahoric.1 hj
   set f := IsLocalRing.residue 𝒪[k]
   set Hb := f.mapMatrix h.val
@@ -29,8 +33,7 @@ theorem lower_block_det (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [De
   have hz : Hb.toBlocks₂₁ = 0 := by
     ext i j'
     exact (residue_eq_zero_iff_val _).2 (hlow i j')
-  have hHG : Hb * Gb = 1 := by
-    simp only [Hb, Gb, ← map_mul, Units.mul_inv, map_one]
+  have hHG : Hb * Gb = 1 := by simp only [Hb, Gb, ← map_mul, Units.mul_inv, map_one]
   have h22 : Hb.toBlocks₂₂ * Gb.toBlocks₂₂ = 1 := by
     have := congrArg Matrix.toBlocks₂₂ hHG
     rw [← fromBlocks_toBlocks Hb, ← fromBlocks_toBlocks Gb, fromBlocks_multiply, hz] at this
@@ -47,10 +50,16 @@ end GlobalTheory.ParahoricLowerBlock
 
 namespace GlobalTheory.ParahoricLowerBlock
 
-theorem lower_block_tame : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] (ξ : kˣ →* ℂˣ), IsTame ξ →
-  ∀ j ∈ parahoric k A D, (j : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det ≠ 0 ∧
-    ∀ d d' : kˣ, (d : k) = (j : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det →
-      (d' : k) = ((j⁻¹ : GL (A ⊕ D) k) : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det → (ξ d : ℂ) * ξ d' = 1 := by
+theorem lower_block_tame
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] (ξ : kˣ →* ℂˣ),
+      IsTame ξ
+        → ∀ j ∈ parahoric k A D,
+          (j : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det ≠ 0
+            ∧ ∀ d d' : kˣ,
+              (d : k) = (j : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det
+                → (d' : k) = ((j⁻¹ : GL (A ⊕ D) k) : Matrix (A ⊕ D) (A ⊕ D) k).toBlocks₂₂.det
+                → (ξ d : ℂ) * ξ d' = 1 := by
   intro k _ _ _ _ A D _ _ _ _ ξ hξ j hj
   obtain ⟨a, b, ha, hb, hab⟩ := lower_block_det A D j hj
   have ha0 : a ≠ 0 := by

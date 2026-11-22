@@ -16,12 +16,15 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4 IndefiniteRowSideFullHecke.Inter
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+  IndefiniteRowSideFullHecke.Inter
 
-theorem SemilocLengthSum.proof (h₁ : SemilocFinite.Statement) (h₂ : SemilocMaxIdeals.Statement)
+theorem SemilocLengthSum.proof
+    (h₁ : SemilocFinite.Statement) (h₂ : SemilocMaxIdeals.Statement)
     (h₃ : SemilocResidueDeg.Statement) (h₄ : FibreDivSupp.Statement) (h₅ : LocRingDimOne.Statement)
-    (h₆ : FibreOverFinite.Statement) :
-    SemilocLengthSum.Statement := by
+    (h₆ : FibreOverFinite.Statement)
+    : SemilocLengthSum.Statement := by
   classical
   intro K _ ι _ K' _ ι' _ κ v P' n s t α W E hv hP' y hPn hs ht hsP hW htW hy hE
   have := hP'.2.1.1
@@ -37,39 +40,58 @@ theorem SemilocLengthSum.proof (h₁ : SemilocFinite.Statement) (h₂ : SemilocM
     haveI := W'.2.1.1; regularityLocalFlat_holds.isLocalRing W'.2.2.1
   let _ : ∀ W' : fibreOver v P' W, Algebra (semiLocRing P' (fibreOver v P' W)) (locRing P' W'.1) :=
     fun W' => (semiToLoc P' _ W'.1 W'.2).toAlgebra
-  have key := FieldNumbers.FiniteAlgebraLengthSum.proof.{0} (locRing (imageZ v P') W) (semiLocRing P' (fibreOver v P' W))
-    (fibreOver v P' W) (fun W' => semiMaxIdeal P' _ W'.1 W'.2) (fun W' => (hmax W'.1 W'.2).1)
-    (fun W₁ W₂ h => Subtype.ext (hinj W₁.1 W₂.1 W₁.2 W₂.2 h))
-    (fun M hM => by obtain ⟨W', hW', h⟩ := hcov M hM; exact ⟨⟨W', hW'⟩, @h (hloc ⟨W', hW'⟩)⟩)
-    (fun W' => locRing P' W'.1) (fun W' => (hmax W'.1 W'.2).2) y
+  have key :=
+    FieldNumbers.FiniteAlgebraLengthSum.proof.{0} (locRing (imageZ v P') W)
+      (semiLocRing P' (fibreOver v P' W)) (fibreOver v P' W)
+      (fun W' => semiMaxIdeal P' _ W'.1 W'.2)
+      (fun W' => (hmax W'.1 W'.2).1)
+      (fun W₁ W₂ h => Subtype.ext (hinj W₁.1 W₂.1 W₁.2 W₂.2 h))
+      (fun M hM => by obtain ⟨W', hW', h⟩ := hcov M hM; exact ⟨⟨W', hW'⟩, @h (hloc ⟨W', hW'⟩)⟩)
+      (fun W' => locRing P' W'.1)
+      (fun W' => (hmax W'.1 W'.2).2)
+      y
 
   refine ⟨hfin, ?_⟩
   have hyne : (y : FractionRing (MRing ι ⧸ imageZ v P')) ≠ 0 := by
     intro h0
-    rw [h0, zero_mul, eq_comm, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem] at hy
+    rw [h0, zero_mul, eq_comm, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem]
+      at hy
     exact hsP hy
   have hs' : rename v s ∉ P' := hsP
-  have hterm : ∀ W' : fibreOver v P' W,
-      Ring.ord (locRing P' W'.1) (algebraMap (semiLocRing P' (fibreOver v P' W)) (locRing P' W'.1)
-          (algebraMap (locRing (imageZ v P') W) _ y)) *
-        Module.length (locRing (imageZ v P') W)
-          (semiLocRing P' (fibreOver v P' W) ⧸ semiMaxIdeal P' _ W'.1 W'.2) ≠ ⊤ ∧
-      (((Ring.ord (locRing P' W'.1) (algebraMap (semiLocRing P' (fibreOver v P' W)) (locRing P' W'.1)
-          (algebraMap (locRing (imageZ v P') W) _ y)) *
-        Module.length (locRing (imageZ v P') W)
-          (semiLocRing P' (fibreOver v P' W) ⧸ semiMaxIdeal P' _ W'.1 W'.2)).toNat : ℕ) : ℤ) =
-        if rename v s ∈ W'.1 then
-          ((Module.length (locRing P' W'.1) (locRing P' W'.1 ⧸ locIdeal P' W'.1 (fracMapZ v P' y))).toNat : ℤ) *
-            E W'.1 else 0 := by
+  have hterm
+      : ∀ W' : fibreOver v P' W,
+        Ring.ord (locRing P' W'.1)
+                (algebraMap (semiLocRing P' (fibreOver v P' W)) (locRing P' W'.1)
+                  (algebraMap (locRing (imageZ v P') W) _ y))
+              * Module.length (locRing (imageZ v P') W)
+                (semiLocRing P' (fibreOver v P' W) ⧸ semiMaxIdeal P' _ W'.1 W'.2)
+            ≠ ⊤
+          ∧ (((Ring.ord (locRing P' W'.1)
+                    (algebraMap (semiLocRing P' (fibreOver v P' W)) (locRing P' W'.1)
+                      (algebraMap (locRing (imageZ v P') W) _ y))
+                  * Module.length (locRing (imageZ v P') W)
+                    (semiLocRing P' (fibreOver v P' W) ⧸ semiMaxIdeal P' _ W'.1 W'.2)).toNat
+                : ℕ)
+              : ℤ)
+            = if rename v s ∈ W'.1 then
+                ((Module.length (locRing P' W'.1)
+                      (locRing P' W'.1 ⧸ locIdeal P' W'.1 (fracMapZ v P' y))).toNat
+                    : ℤ)
+                  * E W'.1
+              else
+                0 := by
     intro W'
     obtain ⟨hW'p, hPW', hW'i⟩ := W'.2
     have := hW'p.1
     set x := algebraMap (semiLocRing P' (fibreOver v P' W)) (locRing P' W'.1)
       (algebraMap (locRing (imageZ v P') W) _ y) with hxdef
     have hx : (x : FractionRing (MRing ι' ⧸ P')) = fracMapZ v P' y := by
-      rw [hxdef, RingHom.algebraMap_toAlgebra, RingHom.algebraMap_toAlgebra, semiToLoc_coe, locToSemiloc_coe]
-    have hord : Ring.ord (locRing P' W'.1) x =
-        Module.length (locRing P' W'.1) (locRing P' W'.1 ⧸ locIdeal P' W'.1 (fracMapZ v P' y)) := by
+      rw [hxdef, RingHom.algebraMap_toAlgebra, RingHom.algebraMap_toAlgebra, semiToLoc_coe,
+        locToSemiloc_coe]
+    have hord
+        : Ring.ord (locRing P' W'.1) x
+          = Module.length (locRing P' W'.1)
+            (locRing P' W'.1 ⧸ locIdeal P' W'.1 (fracMapZ v P' y)) := by
       have hI : locIdeal P' W'.1 (fracMapZ v P' y) = Ideal.span {x} := by
         rw [locIdeal, ← hx]
         congr 1
@@ -82,8 +104,9 @@ theorem SemilocLengthSum.proof (h₁ : SemilocFinite.Statement) (h₂ : SemilocM
       obtain ⟨d, hd, hdE⟩ := h₃ K ι K' ι' κ v P' n s α W hv hP' hPn hs hsP hW W'.1 W'.2 G' J' hJ'
       have hdiv : W'.1 ∈ divSupp P' (rename v s) :=
         ((h₄ K ι K' ι' κ v P' n s α W hv hP' hPn hs hsP hW W'.1).1 ⟨W'.2, hsW'⟩).1
-      obtain ⟨hN, -, hdim⟩ := h₅ K' ι' P' (rename v s) (Function.extend κ α 0) W'.1 hP'.2.1
-        (rename_isMultiHomog hv hs) hs' hdiv
+      obtain ⟨hN, -, hdim⟩ :=
+        h₅ K' ι' P' (rename v s) (Function.extend κ α 0) W'.1 hP'.2.1 (rename_isMultiHomog hv hs)
+          hs' hdiv
       have : Ring.KrullDimLE 1 (locRing P' W'.1) := by
         rw [Ring.krullDimLE_iff, hdim]
         rfl
@@ -94,22 +117,26 @@ theorem SemilocLengthSum.proof (h₁ : SemilocFinite.Statement) (h₂ : SemilocM
       refine ⟨WithTop.mul_ne_top hfinord (ENat.natCast_ne_top d), ?_⟩
       rw [ENat.toNat_mul, ENat.toNat_natCast, Nat.cast_mul, hdE, hEW']
     · have ht' : rename v t ∉ W'.1 := fun h => htW (hW'i ▸ h)
-      have hxe : (x : FractionRing (MRing ι' ⧸ P')) * regularityLocalFlat_holds.fracHom P' (rename v t) =
-          regularityLocalFlat_holds.fracHom P' (rename v s) := by
-        rw [hx, regularityLocalFlat_holds.fracHom_apply, regularityLocalFlat_holds.fracHom_apply, ← fracMapZ_algebraMap, ← fracMapZ_algebraMap,
-          ← map_mul, hy]
-      have hu : IsUnit x := (regularityLocalFlat_holds.isUnit_iff hPW' x (rename_isMultiHomog hv hs) (rename_isMultiHomog hv ht) ht'
-        hxe).mpr hsW'
+      have hxe
+          : (x : FractionRing (MRing ι' ⧸ P')) * regularityLocalFlat_holds.fracHom P' (rename v t)
+            = regularityLocalFlat_holds.fracHom P' (rename v s) := by
+        rw [hx, regularityLocalFlat_holds.fracHom_apply, regularityLocalFlat_holds.fracHom_apply,
+          ← fracMapZ_algebraMap, ← fracMapZ_algebraMap, ← map_mul, hy]
+      have hu : IsUnit x :=
+        (regularityLocalFlat_holds.isUnit_iff hPW' x (rename_isMultiHomog hv hs)
+          (rename_isMultiHomog hv ht) ht' hxe).mpr hsW'
       rw [Ring.ord_of_isUnit hu, zero_mul]
       simp
-  have hset : {W' | W' ∈ fibreOver v P' W ∧ rename v s ∈ W'} =
-      ↑(hfin.toFinset.filter (fun W' => rename v s ∈ W')) := by
+  have hset
+      : {W' | W' ∈ fibreOver v P' W ∧ rename v s ∈ W'}
+        = ↑(hfin.toFinset.filter (fun W' => rename v s ∈ W')) := by
     ext
     simp
   have hsum := ENat.sum_ne_top.mpr fun W' (_ : W' ∈ Finset.univ) => (hterm W').1
   rw [key]
   refine ⟨_, (ENat.natCast_toNat hsum).symm, ?_⟩
-  rw [ENat.toNat_sum fun W' _ => (hterm W').1, Nat.cast_sum, hset, finsum_mem_coe_finset, Finset.sum_filter,
+  rw [ENat.toNat_sum fun W' _ => (hterm W').1, Nat.cast_sum, hset, finsum_mem_coe_finset,
+    Finset.sum_filter,
     Finset.sum_subtype (F := hfin.fintype) hfin.toFinset (fun _ => Set.Finite.mem_toFinset hfin)]
   exact Finset.sum_congr rfl fun W' _ => (hterm W').2
 

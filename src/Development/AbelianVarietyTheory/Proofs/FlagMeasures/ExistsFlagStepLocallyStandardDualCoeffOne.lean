@@ -11,7 +11,16 @@ open Formalism.MainNotions.S
 
 namespace GlobalTheory
 
-theorem locStd_exists_flag_coef_one : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] {M : Formalism.MainNotions.S.Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : Formalism.MainNotions.S.Loc.HermSp M V} {r : ℕ} (Fr : Formalism.MainNotions.S.LocNG.FrameD H r) (n : V ≃ₗ[E] V), n ∈ Fr.N → ∀ (L : Submodule M.L.O (H.Wb Fr.f)) (a : Fin r), ∃ v ∈ Formalism.MainNotions.S.LocNG.img n (Fr.LamStd L), v ∈ Fr.Fj (a.val + 1) ∧ H.h v (Fr.es a) = 1 := by
+theorem locStd_exists_flag_coef_one
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+        {M : Formalism.MainNotions.S.Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
+        {H : Formalism.MainNotions.S.Loc.HermSp M V} {r : ℕ}
+        (Fr : Formalism.MainNotions.S.LocNG.FrameD H r) (n : V ≃ₗ[E] V),
+      n ∈ Fr.N
+        → ∀ (L : Submodule M.L.O (H.Wb Fr.f)) (a : Fin r),
+          ∃ v ∈ Formalism.MainNotions.S.LocNG.img n (Fr.LamStd L),
+            v ∈ Fr.Fj (a.val + 1) ∧ H.h v (Fr.es a) = 1 := by
   intro F _ _ _ E _ _ _ _ M V _ _ H r Fr n hn L a
 
   have hiso : ∀ b c : Fin r, H.h (Fr.e b) (Fr.e c) = 0 := fun b c =>
@@ -43,11 +52,12 @@ theorem locStd_exists_flag_coef_one : ∀ {F : Type} [Field F] [ValuativeRel F] 
     | add x y _ _ hx hy => rw [H.h_add_left, hx, hy, add_zero]
     | smul c x _ hx => rw [H.h_smul_left, hx, mul_zero]
 
-  have hmem : Fr.e a ∈ Fr.Fj (a.val + 1) :=
-    Submodule.subset_span ⟨a, Nat.lt_succ_self _, rfl⟩
+  have hmem : Fr.e a ∈ Fr.Fj (a.val + 1) := Submodule.subset_span ⟨a, Nat.lt_succ_self _, rfl⟩
   have hle : a.val + 1 ≤ r := a.isLt
   have hdiff : n (Fr.e a) - Fr.e a ∈ Fr.Fj a.val := by
-    have := (T.unipotentRadical_isotropicFlag_moves_step_into_prev Fr n hn (a.val + 1) hle (Fr.e a) hmem).1
+    have :=
+      (T.unipotentRadical_isotropicFlag_moves_step_into_prev Fr n hn (a.val + 1) hle (Fr.e a)
+        hmem).1
     simpa using this
   have hmono : Fr.Fj a.val ≤ Fr.Fj (a.val + 1) :=
     Submodule.span_mono (Set.image_mono fun b (hb : b.val < a.val) => Nat.lt_succ_of_lt hb)

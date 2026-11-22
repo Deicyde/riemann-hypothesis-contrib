@@ -9,7 +9,8 @@ open GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.BZMir.Fun
 
 namespace GlobalTheory.CompanionTheory.BZFun
 
-variable {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
+variable
+  {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
 
 theorem isSmooth_smInd (H : Subgroup G) (σ : Representation ℂ H W) : IsSmooth (smInd H σ) := by
   intro f

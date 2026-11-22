@@ -6,9 +6,10 @@ public import Development.EtaleCohomology.EtaleSheaves.GlueRelPfNat
 
 @[expose] public section
 
-open CategoryTheory GlobalTheory.EtC CochainComplex.HomComplex LateralTheory.E.E4 LateralTheory.E.LeafGhostCut in
-theorem UpperTheory.relativeCohomology_connecting_naturality :
-    LateralTheory.E.NeighbourhoodKilling.ObsNat := by
+open CategoryTheory GlobalTheory.EtC CochainComplex.HomComplex LateralTheory.E.E4
+  LateralTheory.E.LeafGhostCut in
+theorem UpperTheory.relativeCohomology_connecting_naturality
+    : LateralTheory.E.NeighbourhoodKilling.ObsNat := by
   intro q _ U E U' E' f f' u e comm i m w
   obtain ⟨w, rfl⟩ := w.mk_surjective
   refine congrArg CohomologyClass.mk (Cocycle.ext ?_)

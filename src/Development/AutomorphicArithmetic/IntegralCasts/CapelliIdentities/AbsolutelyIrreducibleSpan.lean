@@ -4,32 +4,35 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.AbsIrr.{u_1, u_2, u_3} :
-    {k : Type u_1} → [Field k] → {n : Type u_2} → [Fintype n] → [DecidableEq n] → {G : Type u_3} → (G → Matrix n n k) → Prop :=
-    fun {k : Type u_1} [Field k] {n : Type u_2} [Fintype n] [DecidableEq n] {G : Type u_3} (ρ : G → Matrix n n k) ↦
-      (∀ (W : Submodule k (n → k)), (∀ (g : G), ∀ v ∈ W, (ρ g).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤) ∧
-        ∀ (M : Matrix n n k), (∀ (g : G), M * ρ g = ρ g * M) → ∃ (c : k), M = c • (1 : Matrix n n k)
+noncomputable def UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.AbsIrr.{u_1, u_2, u_3}
+    : {k : Type u_1} → [Field k] → {n : Type u_2} → [Fintype n] → [DecidableEq n] → {G : Type u_3}
+      → (G → Matrix n n k)
+      → Prop :=
+  fun {k : Type u_1} [Field k] {n : Type u_2} [Fintype n] [DecidableEq n] {G : Type u_3}
+      (ρ : G → Matrix n n k) ↦
+    (∀ (W : Submodule k (n → k)), (∀ (g : G), ∀ v ∈ W, (ρ g).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤)
+      ∧ ∀ (M : Matrix n n k), (∀ (g : G), M * ρ g = ρ g * M) → ∃ (c : k), M = c • (1 : Matrix n n k)
 
-noncomputable def UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.StatOntoSpan :
-    Prop :=
-    ∀ (O : Type) [inst : CommRing O] [inst_1 : IsLocalRing O] (n : Type) [inst_2 : Fintype n] [inst_3 : DecidableEq n]
-      (G : Type) [inst_4 : Monoid G] (ρ : G →* Matrix n n O),
-      (UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.AbsIrr fun (g : G) ↦
-          ((ρ : G → Matrix n n O) g).map (⇑(IsLocalRing.residue O) : O → IsLocalRing.ResidueField O)) →
-        Submodule.span O (Set.range (⇑ρ : G → Matrix n n O)) = ⊤
+noncomputable def UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.StatOntoSpan : Prop :=
+  ∀ (O : Type) [inst : CommRing O] [inst_1 : IsLocalRing O] (n : Type) [inst_2 : Fintype n]
+      [inst_3 : DecidableEq n] (G : Type) [inst_4 : Monoid G] (ρ : G →* Matrix n n O),
+    (UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.AbsIrr fun (g : G) ↦
+        ((ρ : G → Matrix n n O) g).map (⇑(IsLocalRing.residue O) : O → IsLocalRing.ResidueField O))
+      → Submodule.span O (Set.range (⇑ρ : G → Matrix n n O)) = ⊤
 
-private theorem UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.adjoin_top {k : Type} [Field k] {n : Type} [Fintype n] [DecidableEq n]
-    {G : Type} (ρ : G → Matrix n n k) (h : UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.AbsIrr ρ) :
-    Algebra.adjoin k (Set.range ρ) = ⊤ := by
+private theorem UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.adjoin_top
+    {k : Type} [Field k]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {G : Type}
+    (ρ : G → Matrix n n k) (h : UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.AbsIrr ρ)
+    : Algebra.adjoin k (Set.range ρ) = ⊤ := by
   classical
   obtain ⟨h1, h2⟩ := h
   set A : Subalgebra k (Module.End k (n → k)) :=
     (Algebra.adjoin k (Set.range ρ)).map (Matrix.toLinAlgEquiv' (R := k) (n := n)).toAlgHom with hA
-  have hmem : ∀ g, Matrix.toLin' (ρ g) ∈ A := fun g =>
-    ⟨ρ g, Algebra.subset_adjoin ⟨g, rfl⟩, rfl⟩
+  have hmem : ∀ g, Matrix.toLin' (ρ g) ∈ A := fun g => ⟨ρ g, Algebra.subset_adjoin ⟨g, rfl⟩, rfl⟩
   have hsm : ∀ (a : A) (v : n → k), a • v = (a : Module.End k (n → k)) v := fun _ _ => rfl
-  have hk : ∀ (c : k) (v : n → k), (algebraMap k A c) • v = c • v := fun c v => by
-    rw [hsm]; simp
+  have hk : ∀ (c : k) (v : n → k), (algebraMap k A c) • v = c • v := fun c v => by rw [hsm]; simp
   haveI : IsSemisimpleModule A (n → k) := by
     rw [isSemisimpleModule_iff]
     constructor
@@ -57,33 +60,33 @@ private theorem UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.adjoin_top 
       exact ⟨⊥, this ▸ isCompl_top_bot⟩
   have hsc : ∀ φ : Module.End A (n → k), ∃ c : k, ∀ v, φ v = c • v := by
     intro φ
-    let ψ : Module.End k (n → k) :=
-      { toFun := φ
-        map_add' := φ.map_add
-        map_smul' := fun c v => by
-          rw [← hk, φ.map_smul, hk]; rfl }
-    obtain ⟨c, hc⟩ := h2 (LinearMap.toMatrix' ψ) (fun g => by
-      apply Matrix.toLin'.injective
-      rw [Matrix.toLin'_mul, Matrix.toLin'_mul, Matrix.toLin'_toMatrix']
-      refine LinearMap.ext fun v => ?_
-      exact φ.map_smul (⟨_, hmem g⟩ : A) v)
+    let ψ : Module.End k (n → k) := {
+      toFun := φ
+      map_add' := φ.map_add
+      map_smul' := fun c v => by rw [← hk, φ.map_smul, hk]; rfl
+    }
+    obtain ⟨c, hc⟩ :=
+      h2 (LinearMap.toMatrix' ψ) (fun g => by
+        apply Matrix.toLin'.injective
+        rw [Matrix.toLin'_mul, Matrix.toLin'_mul, Matrix.toLin'_toMatrix']
+        refine LinearMap.ext fun v => ?_
+        exact φ.map_smul (⟨_, hmem g⟩ : A) v)
     refine ⟨c, fun v => ?_⟩
-    have h3 : ψ = Matrix.toLin' (c • (1 : Matrix n n k)) := by
-      rw [← hc, Matrix.toLin'_toMatrix']
+    have h3 : ψ = Matrix.toLin' (c • (1 : Matrix n n k)) := by rw [← hc, Matrix.toLin'_toMatrix']
     have h4 : φ v = ψ v := rfl
     rw [h4, h3]
     simp
   rw [eq_top_iff]
   intro M _
-  let f : Module.End (Module.End A (n → k)) (n → k) :=
-    { toFun := Matrix.toLin' M
-      map_add' := (Matrix.toLin' M).map_add
-      map_smul' := fun φ v => by
-        obtain ⟨c, hc⟩ := hsc φ
-        change Matrix.toLin' M (φ v) = φ (Matrix.toLin' M v)
-        rw [hc, hc, map_smul] }
-  obtain ⟨r, hr⟩ := jacobson_density f
-    (Finset.univ.image fun i : n => (Pi.single i 1 : n → k))
+  let f : Module.End (Module.End A (n → k)) (n → k) := {
+    toFun := Matrix.toLin' M
+    map_add' := (Matrix.toLin' M).map_add
+    map_smul' := fun φ v => by
+      obtain ⟨c, hc⟩ := hsc φ
+      change Matrix.toLin' M (φ v) = φ (Matrix.toLin' M v)
+      rw [hc, hc, map_smul]
+  }
+  obtain ⟨r, hr⟩ := jacobson_density f (Finset.univ.image fun i : n => (Pi.single i 1 : n → k))
   obtain ⟨r, N, hN, rfl⟩ := r
   have : M = N := by
     apply Matrix.toLin'.injective
@@ -93,14 +96,13 @@ private theorem UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.adjoin_top 
     exact hr _ (Finset.mem_image_of_mem _ (Finset.mem_univ i))
   exact this ▸ hN
 
-theorem UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan :
-    UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.StatOntoSpan := by
+theorem UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan
+    : UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.StatOntoSpan := by
   intro O _ _ n _ _ G _ ρ h
   have h1 := UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.adjoin_top _ h
   let π : Matrix n n O →+* Matrix n n (IsLocalRing.ResidueField O) :=
     (IsLocalRing.residue O).mapMatrix
-  have h2 : Submodule.span (IsLocalRing.ResidueField O)
-      (Set.range fun g => π (ρ g)) = ⊤ := by
+  have h2 : Submodule.span (IsLocalRing.ResidueField O) (Set.range fun g => π (ρ g)) = ⊤ := by
     rw [← Algebra.adjoin_eq_span_of_subset]
     · exact (congrArg Subalgebra.toSubmodule h1).trans rfl
     · intro x hx
@@ -109,16 +111,19 @@ theorem UpperTheory.Reformulated.B.AbsolutelyIrreducibleSpan.ontoSpan :
         (Submonoid.closure_le (S := MonoidHom.mrange (π.toMonoidHom.comp ρ))).mpr
           (by rintro _ ⟨g, rfl⟩; exact ⟨g, rfl⟩) hx
       exact this
-  have h3 : ∀ X : Matrix n n (IsLocalRing.ResidueField O),
-      ∃ Y ∈ Submodule.span O (Set.range (ρ : G → Matrix n n O)), π Y = X := by
+  have h3
+      : ∀ X : Matrix n n (IsLocalRing.ResidueField O),
+        ∃ Y ∈ Submodule.span O (Set.range (ρ : G → Matrix n n O)),
+          π Y = X := by
     intro X
-    have hX : X ∈ Submodule.span (IsLocalRing.ResidueField O)
-      (Set.range fun g => π (ρ g)) := h2 ▸ Submodule.mem_top
+    have hX : X ∈ Submodule.span (IsLocalRing.ResidueField O) (Set.range fun g => π (ρ g)) :=
+      h2 ▸ Submodule.mem_top
     induction hX using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨g, rfl⟩ := hx
       exact ⟨ρ g, Submodule.subset_span ⟨g, rfl⟩, rfl⟩
-    | zero => exact ⟨0, Submodule.zero_mem _, map_zero _⟩
+    | zero =>
+      exact ⟨0, Submodule.zero_mem _, map_zero _⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, ha, rfl⟩ := hx
       obtain ⟨b, hb, rfl⟩ := hy

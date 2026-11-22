@@ -13,24 +13,31 @@ open NumberField
 
 namespace Formalism.FourierDecayAlt.P.CutMP.En
 
-theorem om_sub' {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {g : B.Mat k r} (hg : g ∈ JF.Om k r z z') :
-    g ∈ Q.Glev k r 0 ∩ {g | 0 < Formalism.QuantumDeterminants.Gf k r z z' g ∧
-      ∀ a : Fin r, Formalism.QuantumDeterminants.Dmin k r z z' g ⟨(a : ℕ) + 1, by omega⟩ ≠ 0} := by
-  obtain ⟨hG, hD, hGf⟩ := hg
-  refine ⟨⟨hG, fun a ha => by simp at ha⟩, hGf, fun a => hD _ (by show (a : ℕ) + 1 ≤ r; omega)⟩
+theorem om_sub' {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {g : B.Mat k r} (hg : g ∈ JF.Om k r z z')
+    : g
+      ∈ Q.Glev k r 0
+        ∩ {g | 0 < Formalism.QuantumDeterminants.Gf k r z z' g ∧
+          ∀ a : Fin r, Formalism.QuantumDeterminants.Dmin k r z z' g ⟨(a : ℕ) + 1, by omega⟩ ≠ 0} :=
+  by
+    obtain ⟨hG, hD, hGf⟩ := hg
+    refine ⟨⟨hG, fun a ha => by simp at ha⟩, hGf, fun a => hD _ (by show (a : ℕ) + 1 ≤ r; omega)⟩
 
-theorem stab_fix_gq {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} (μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (q : (Fin r → ℂ) × ℂ) {p : Q.Mx k r × Q.Mx k r} (hp : p ∈ NF.Stab k r z z' μsec q.2) :
-    p.1 * bigCell k r q.1 (μsec q.2) * p.2 = bigCell k r q.1 (μsec q.2) := by
+theorem stab_fix_gq
+    {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ}
+    (μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (q : (Fin r → ℂ) × ℂ)
+    {p : Q.Mx k r × Q.Mx k r} (hp : p ∈ NF.Stab k r z z' μsec q.2)
+    : p.1 * bigCell k r q.1 (μsec q.2) * p.2 = bigCell k r q.1 (μsec q.2) := by
   obtain ⟨h1, -, h3⟩ := hp
   obtain ⟨-, hsub, hcomm⟩ := Formalism.FourierDecayAlt.P.TwoByOneBlock.uWbFacts k r
   have hc := hcomm q.1 p.1 (hsub z h1)
   have hf := (Formalism.FourierDecayAlt.P.TwoByOneBlock.bigCellFactor k r q.1 (μsec q.2)).1
   have h3' : p.1 * B2.embWb k r (μsec q.2) * p.2 = B2.embWb k r (μsec q.2) := h3
   rw [hf]
-  calc p.1 * (bigCell k r q.1 1 * B2.embWb k r (μsec q.2)) * p.2
+  calc
+    p.1 * (bigCell k r q.1 1 * B2.embWb k r (μsec q.2)) * p.2
       = (p.1 * bigCell k r q.1 1) * B2.embWb k r (μsec q.2) * p.2 := by simp only [Matrix.mul_assoc]
-    _ = bigCell k r q.1 1 * (p.1 * B2.embWb k r (μsec q.2) * p.2) := by rw [hc]; simp only [Matrix.mul_assoc]
+    _ = bigCell k r q.1 1 * (p.1 * B2.embWb k r (μsec q.2) * p.2) := by
+      rw [hc]; simp only [Matrix.mul_assoc]
     _ = bigCell k r q.1 1 * B2.embWb k r (μsec q.2) := by rw [h3']
 
 theorem fibre_membership_holds : FibMem := by

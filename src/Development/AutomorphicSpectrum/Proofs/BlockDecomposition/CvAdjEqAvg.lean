@@ -12,10 +12,11 @@ open PositivityTheory.Rg.BcB.E1
 
 namespace GlobalTheory.CompanionTheory.ApproxUnit
 
-theorem avg_le {α : Type*} [MeasurableSpace α] (μ : Measure α) (b : α → ℝ) (u : α → ℂ) (c : ℂ)
-    (ε : ℝ) (hb0 : ∀ w, 0 ≤ b w) (hb1 : ∫ w, b w ∂μ = 1) (hum : AEStronglyMeasurable u μ)
-    (h : ∀ w, b w ≠ 0 → ‖u w - c‖ ≤ ε) :
-    ‖∫ w, u w * (b w : ℂ) ∂μ - c‖ ≤ ε := by
+theorem avg_le
+    {α : Type*} [MeasurableSpace α]
+    (μ : Measure α) (b : α → ℝ) (u : α → ℂ) (c : ℂ) (ε : ℝ) (hb0 : ∀ w, 0 ≤ b w)
+    (hb1 : ∫ w, b w ∂μ = 1) (hum : AEStronglyMeasurable u μ) (h : ∀ w, b w ≠ 0 → ‖u w - c‖ ≤ ε)
+    : ‖∫ w, u w * (b w : ℂ) ∂μ - c‖ ≤ ε := by
   have hbi : Integrable b μ := by
     by_contra hn
     rw [integral_undef hn] at hb1
@@ -45,20 +46,21 @@ theorem avg_le {α : Type*} [MeasurableSpace α] (μ : Measure α) (b : α → �
       ring
     rw [h1, integral_sub hu (hbc.const_mul c), integral_const_mul, hc, mul_one]
   rw [e]
-  calc ‖∫ w, (u w - c) * (b w : ℂ) ∂μ‖ ≤ ∫ w, ε * b w ∂μ :=
-        norm_integral_le_of_norm_le (hbi.const_mul ε) (Filter.Eventually.of_forall hpt)
+  calc
+    ‖∫ w, (u w - c) * (b w : ℂ) ∂μ‖ ≤ ∫ w, ε * b w ∂μ :=
+      norm_integral_le_of_norm_le (hbi.const_mul ε) (Filter.Eventually.of_forall hpt)
     _ = ε := by rw [integral_const_mul, hb1, mul_one]
 
-theorem cv_eq_avg (X : Ctx) (φ ψ : X.G → ℂ) (hψ : IsBump X ψ) (g : X.G) :
-    cv X.μ φ ψ g = ∫ w, φ (g * w) * ((‖ψ w⁻¹‖ : ℝ) : ℂ) ∂X.μ := by
+theorem cv_eq_avg (X : Ctx) (φ ψ : X.G → ℂ) (hψ : IsBump X ψ) (g : X.G)
+    : cv X.μ φ ψ g = ∫ w, φ (g * w) * ((‖ψ w⁻¹‖ : ℝ) : ℂ) ∂X.μ := by
   unfold cv
   rw [← integral_mul_left_eq_self _ g]
   refine integral_congr_ae (Filter.Eventually.of_forall fun w => ?_)
   simp only [mul_inv_rev, inv_mul_cancel_right]
   rw [← hψ.2.1]
 
-theorem cv_adj_eq_avg (X : Ctx) (f ψ : X.G → ℂ) (hψ : IsBump X ψ) (y : X.G) :
-    cv X.μ (adj ψ) f y = ∫ z, f (z⁻¹ * y) * ((‖ψ z⁻¹‖ : ℝ) : ℂ) ∂X.μ := by
+theorem cv_adj_eq_avg (X : Ctx) (f ψ : X.G → ℂ) (hψ : IsBump X ψ) (y : X.G)
+    : cv X.μ (adj ψ) f y = ∫ z, f (z⁻¹ * y) * ((‖ψ z⁻¹‖ : ℝ) : ℂ) ∂X.μ := by
   unfold cv
   refine integral_congr_ae (Filter.Eventually.of_forall fun z => ?_)
   have h : adj ψ z = ((‖ψ z⁻¹‖ : ℝ) : ℂ) := by
@@ -83,16 +85,20 @@ theorem approxU : CvTest → TwoUnif → ApproxU := by
   have key : ∀ z ∈ W₀, ‖cv X.μ φ ψ (z * y) - φ y‖ ≤ ε := by
     intro z hz
     rw [cv_eq_avg X φ ψ hb]
-    refine avg_le X.μ (fun w => ‖ψ w⁻¹‖) (fun w => φ (z * y * w)) (φ y) ε hb0 hb.2.2
-      (Continuous.aestronglyMeasurable (hφ.1.comp (by fun_prop))) ?_
+    refine avg_le X.μ
+      (fun w => ‖ψ w⁻¹‖)
+      (fun w => φ (z * y * w))
+      (φ y) ε hb0 hb.2.2 (Continuous.aestronglyMeasurable (hφ.1.comp (by fun_prop))) ?_
     intro w hw
     exact hW z hz w (hsupp w hw).1 y
   refine ⟨?_, ?_⟩
   · simpa using key 1 (mem_of_mem_nhds hW₀)
   · rw [cv_adj_eq_avg X _ ψ hb]
     have hc : Continuous (cv X.μ φ ψ) := (hcv X φ ψ hφ hb.1).1.1
-    refine avg_le X.μ (fun w => ‖ψ w⁻¹‖) (fun z => cv X.μ φ ψ (z⁻¹ * y)) (φ y) ε hb0 hb.2.2
-      (Continuous.aestronglyMeasurable (hc.comp (by fun_prop))) ?_
+    refine avg_le X.μ
+      (fun w => ‖ψ w⁻¹‖)
+      (fun z => cv X.μ φ ψ (z⁻¹ * y))
+      (φ y) ε hb0 hb.2.2 (Continuous.aestronglyMeasurable (hc.comp (by fun_prop))) ?_
     intro z hz
     exact key z⁻¹ (hsupp z hz).2
 

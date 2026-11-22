@@ -8,8 +8,8 @@ namespace ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
 
 open Finset
 
-theorem exists_int_avoid {f : ℕ} (Z : Finset (Fin f → ℝ)) (hZ : ∀ z ∈ Z, z ≠ 0) :
-    ∃ t : Fin f → ℤ, ∀ z ∈ Z, ∑ j, z j * (t j : ℝ) ≠ 0 := by
+theorem exists_int_avoid {f : ℕ} (Z : Finset (Fin f → ℝ)) (hZ : ∀ z ∈ Z, z ≠ 0)
+    : ∃ t : Fin f → ℤ, ∀ z ∈ Z, ∑ j, z j * (t j : ℝ) ≠ 0 := by
   classical
   let P : (Fin f → ℝ) → Polynomial ℝ := fun z => ∑ j, Polynomial.C (z j) * Polynomial.X ^ (j : ℕ)
   have hP : ∀ z ∈ Z, P z ≠ 0 := by
@@ -18,9 +18,12 @@ theorem exists_int_avoid {f : ℕ} (Z : Finset (Fin f → ℝ)) (hZ : ∀ z ∈ 
     funext j
     have h1 := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p (j : ℕ)) h0
     simp only [P, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow,
-      Polynomial.coeff_zero] at h1
-    rw [Finset.sum_eq_single j (fun i _ hij => by
-      rw [if_neg (fun h => hij (Fin.ext h.symm)), mul_zero]) (by simp)] at h1
+        Polynomial.coeff_zero]
+      at h1
+    rw [Finset.sum_eq_single j
+        (fun i _ hij => by rw [if_neg (fun h => hij (Fin.ext h.symm)), mul_zero])
+        (by simp)]
+      at h1
     simpa using h1
   obtain ⟨T, hT⟩ : ∃ T : ℕ, (T : ℝ) ∉ Z.biUnion (fun z => (P z).roots.toFinset) := by
     by_contra h
@@ -34,8 +37,8 @@ theorem exists_int_avoid {f : ℕ} (Z : Finset (Fin f → ℝ)) (hZ : ∀ z ∈ 
   rw [Finset.mem_biUnion]
   refine ⟨z, hz, ?_⟩
   rw [Multiset.mem_toFinset, Polynomial.mem_roots (hP z hz), Polynomial.IsRoot]
-  simp only [P, Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow,
-    Polynomial.eval_X]
+  simp only [P, Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_C,
+    Polynomial.eval_pow, Polynomial.eval_X]
   push_cast at h0
   exact h0
 

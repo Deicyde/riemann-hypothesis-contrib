@@ -16,8 +16,9 @@ open PowerSeries GlobalTheory.Honda Formalism.L2.Th1.CM
 
 namespace GlobalTheory.Honda
 
-theorem norm_eq_one_of_quad_root {l : ℕ} [Fact l.Prime] (x : ℂ_[l]) (N : ℕ) (hN : ¬ l ∣ N)
-    (hx : x ^ 2 - x + (N : ℂ_[l]) = 0) : ‖x‖ = 1 := by
+theorem norm_eq_one_of_quad_root
+    {l : ℕ} [Fact l.Prime] (x : ℂ_[l]) (N : ℕ) (hN : ¬ l ∣ N) (hx : x ^ 2 - x + (N : ℂ_[l]) = 0)
+    : ‖x‖ = 1 := by
   have hNn : ‖(N : ℂ_[l])‖ = 1 := by
     rw [← map_natCast (algebraMap ℚ_[l] ℂ_[l]), norm_algebraMap', Padic.norm_natCast_eq_one_iff]
     exact (Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hN
@@ -37,7 +38,9 @@ theorem norm_eq_one_of_quad_root {l : ℕ} [Fact l.Prime] (x : ℂ_[l]) (N : ℕ
   have hprod : x * (1 - x) = N := by linear_combination -hx
   have h4 : ‖x‖ * ‖1 - x‖ = 1 := by rw [← norm_mul, hprod, hNn]
   refine le_antisymm h1 ?_
-  calc (1 : ℝ) = ‖x‖ * ‖1 - x‖ := h4.symm
+  calc
+    (1 : ℝ)
+      = ‖x‖ * ‖1 - x‖ := h4.symm
     _ ≤ ‖x‖ * 1 := mul_le_mul_of_nonneg_left h2 (norm_nonneg x)
     _ = ‖x‖ := mul_one _
 
@@ -45,7 +48,8 @@ theorem endOmega_holds : EndOmega := by
   intro d L hd hL l _ hl5 hld hsq ι g2 g3 hG n
   obtain ⟨-, -, h2, h3, hΔ, lam, hlam, rfl, rfl⟩ := hG
   have hc0 : ι.symm lam ≠ 0 := by simpa using hlam
-  obtain ⟨L', -, hg2, hg3, -, hCM⟩ := GlobalTheory.T.exists_homothetic_periodPair_lattice L (ι.symm lam) hc0
+  obtain ⟨L', -, hg2, hg3, -, hCM⟩ :=
+    GlobalTheory.T.exists_homothetic_periodPair_lattice L (ι.symm lam) hc0
   have hιc : ι (ι.symm lam) = lam := ι.apply_symm_apply lam
   have e2 : ι L'.g₂ = lam ^ 4 * ι L.g₂ := by rw [hg2, map_mul, map_pow, hιc]
   have e3 : ι L'.g₃ = lam ^ 6 * ι L.g₃ := by rw [hg3, map_mul, map_pow, hιc]
@@ -73,8 +77,9 @@ theorem endOmega_holds : EndOmega := by
     have e : (N : ℂ) * z = omegaK d * z - omegaK d * (omegaK d * z) := by linear_combination z * hq
     rw [e]
     exact sub_mem hz hz2
-  have key := GlobalTheory.T.formalGroup_mulBy_integral_of_kernel_prime_to_l L' l hl5 ι (by rw [e2]; exact h2) (by rw [e3]; exact h3)
-    (by rw [e2, e3]; exact hΔ) (omegaK d) N hL' hιβ hN0 hlN hNz
+  have key :=
+    GlobalTheory.T.formalGroup_mulBy_integral_of_kernel_prime_to_l L' l hl5 ι (by rw [e2]; exact h2)
+      (by rw [e3]; exact h3) (by rw [e2, e3]; exact hΔ) (omegaK d) N hL' hιβ hN0 hlN hNz
   rw [e2, e3] at key
   rw [Formalism.L2.Th1.A.uSerEq ℂ_[l]]
   exact key n

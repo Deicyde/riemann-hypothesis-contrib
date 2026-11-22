@@ -14,8 +14,7 @@ namespace Formalism.MainNotions.DIV.Cons
 
 open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions
 
-def ofGaps {p : ℕ} (g : Fin p → ℕ) (i : Fin p) : ℕ :=
-  ∑ k ∈ Finset.univ.filter (fun k => i ≤ k), g k
+def ofGaps {p : ℕ} (g : Fin p → ℕ) (i : Fin p) : ℕ := ∑ k ∈ Finset.univ.filter (fun k => i ≤ k), g k
 
 theorem ofGaps_anti {p : ℕ} (g : Fin p → ℕ) : Antitone (ofGaps g) := by
   intro a b hab
@@ -24,11 +23,12 @@ theorem ofGaps_anti {p : ℕ} (g : Fin p → ℕ) : Antitone (ofGaps g) := by
   simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hk ⊢
   exact le_trans hab hk
 
-theorem ofGaps_succ {p : ℕ} (g : Fin p → ℕ) (i : Fin p) (h : i.1 + 1 < p) :
-    ofGaps g i = g i + ofGaps g ⟨i.1 + 1, h⟩ := by
+theorem ofGaps_succ {p : ℕ} (g : Fin p → ℕ) (i : Fin p) (h : i.1 + 1 < p)
+    : ofGaps g i = g i + ofGaps g ⟨i.1 + 1, h⟩ := by
   unfold ofGaps
-  have hs : Finset.univ.filter (fun k : Fin p => i ≤ k) =
-      insert i (Finset.univ.filter (fun k : Fin p => (⟨i.1 + 1, h⟩ : Fin p) ≤ k)) := by
+  have hs
+      : Finset.univ.filter (fun k : Fin p => i ≤ k)
+        = insert i (Finset.univ.filter (fun k : Fin p => (⟨i.1 + 1, h⟩ : Fin p) ≤ k)) := by
     ext k
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.le_def,
       Fin.ext_iff]
@@ -46,7 +46,8 @@ theorem ofGaps_last {p : ℕ} (g : Fin p → ℕ) (i : Fin p) (h : ¬ i.1 + 1 < 
     omega
   rw [hs, Finset.sum_singleton]
 
-theorem gapZ_ofGaps {p : ℕ} (g : Fin p → ℕ) (i : Fin p) : WeightAlgebra.gapZ (ofGaps g) i = g i := by
+theorem gapZ_ofGaps {p : ℕ} (g : Fin p → ℕ) (i : Fin p)
+    : WeightAlgebra.gapZ (ofGaps g) i = g i := by
   unfold WeightAlgebra.gapZ
   split_ifs with h
   · rw [ofGaps_succ g i h]
@@ -115,12 +116,13 @@ private lemma aPlusQ_succ_le_aPlusQ (D : D7) (j : ℕ) (τ : D.what₂.Tau) (i :
   push_cast
   linarith
 
-theorem kaBig_anti (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau) :
-    Antitone (D.what₂.kaBig j τ) := by
+theorem kaBig_anti
+    (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau)
+    : Antitone (D.what₂.kaBig j τ) := by
   have hk : D.R.m + 3 ≤ D.R.k := D.R.m_add_three_le_k
   have hs : (D.R.sigW j).1 = D.R.k + j - 1 := rfl
-  have hq : ∀ i : Fin (D.R.sigW j).1, (D.what₂.kaBig j τ i : ℚ) = DV.aPlusQ D j τ i :=
-    fun i => (hK j h1 h2 τ).1 i
+  have hq : ∀ i : Fin (D.R.sigW j).1, (D.what₂.kaBig j τ i : ℚ) = DV.aPlusQ D j τ i := fun i =>
+    (hK j h1 h2 τ).1 i
   have step : ∀ d a : ℕ, a + d < (D.R.sigW j).1 → DV.aPlusQ D j τ (a + d) ≤ DV.aPlusQ D j τ a := by
     intro d
     induction d with
@@ -141,15 +143,19 @@ theorem kaBig_anti (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : j 
     exact h5
   exact_mod_cast hq'
 
-theorem kaBig_nonneg (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau)
-    (i : Fin (D.R.sigW j).1) : 0 ≤ D.what₂.kaBig j τ i := by
+theorem kaBig_nonneg
+    (D : D7) (hK : DV.KapDef D)
+    {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
+    (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).1)
+    : 0 ≤ D.what₂.kaBig j τ i := by
   have hk : D.R.m + 3 ≤ D.R.k := D.R.m_add_three_le_k
   have hs : (D.R.sigW j).1 = D.R.k + j - 1 := rfl
   have hi := i.2
   have hlt : D.R.k + j - 2 < (D.R.sigW j).1 := by omega
-  have h3 := kaBig_anti D hK h1 h2 τ
-    (show i ≤ (⟨D.R.k + j - 2, hlt⟩ : Fin (D.R.sigW j).1) from
-      Fin.le_def.2 (by show i.1 ≤ D.R.k + j - 2; omega))
+  have h3 :=
+    kaBig_anti D hK h1 h2 τ
+      (show i ≤ (⟨D.R.k + j - 2, hlt⟩ : Fin (D.R.sigW j).1) from
+        Fin.le_def.2 (by show i.1 ≤ D.R.k + j - 2; omega))
   have hq := (hK j h1 h2 τ).1 ⟨D.R.k + j - 2, hlt⟩
   suffices hsuf : (0 : ℚ) ≤ D.what₂.kaBig j τ ⟨D.R.k + j - 2, hlt⟩ by
     have h4 : (0 : ℤ) ≤ D.what₂.kaBig j τ ⟨D.R.k + j - 2, hlt⟩ := by exact_mod_cast hsuf
@@ -158,9 +164,9 @@ theorem kaBig_nonneg (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : 
   show (0 : ℚ) ≤ DV.aPlusQ D j τ (D.R.k + j - 2)
   have hm1 : j - 1 < D.R.m := by omega
   have g := (D.hc τ).gap_be ⟨j - 1, hm1⟩
-  have hsig : DV.sigPar D τ (D.R.k + j - 2) = -(D.hc τ).b ⟨j - 1, hm1⟩ := by
+  have hsig : DV.sigPar D τ (D.R.k + j - 2) = - (D.hc τ).b ⟨j - 1, hm1⟩ := by
     unfold DV.sigPar
-    have c1 : ¬ (D.R.k + j - 2 < D.R.k - 1) := by omega
+    have c1 : ¬(D.R.k + j - 2 < D.R.k - 1) := by omega
     have c2 : D.R.k + j - 2 - (D.R.k - 1) < D.R.m := by omega
     rw [dite_eq_right c1, dite_eq_left c2]
     have e : (⟨D.R.k + j - 2 - (D.R.k - 1), c2⟩ : Fin D.R.m) = ⟨j - 1, hm1⟩ :=
@@ -199,12 +205,14 @@ private lemma aMinusQ_le_aMinusQ_succ (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c
   push_cast
   linarith
 
-theorem kaSmall_anti (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau) :
-    Antitone (D.what₂.kaSmall j τ) := by
+theorem kaSmall_anti
+    (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau)
+    : Antitone (D.what₂.kaSmall j τ) := by
   have hs : (D.R.sigW j).2 = D.R.m - j := rfl
-  have hq : ∀ c : Fin (D.R.sigW j).2, (D.what₂.kaSmall j τ c : ℚ) = -DV.aMinusQ D j τ c :=
-    fun c => (hK j h1 h2 τ).2 c
-  have step : ∀ d a : ℕ, a + d < (D.R.sigW j).2 → DV.aMinusQ D j τ a ≤ DV.aMinusQ D j τ (a + d) := by
+  have hq : ∀ c : Fin (D.R.sigW j).2, (D.what₂.kaSmall j τ c : ℚ) = - DV.aMinusQ D j τ c := fun c =>
+    (hK j h1 h2 τ).2 c
+  have step
+      : ∀ d a : ℕ, a + d < (D.R.sigW j).2 → DV.aMinusQ D j τ a ≤ DV.aMinusQ D j τ (a + d) := by
     intro d
     induction d with
     | zero => intro a _; simp
@@ -224,13 +232,17 @@ theorem kaSmall_anti (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : 
     linarith
   exact_mod_cast hq'
 
-theorem kaSmall_nonpos (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau)
-    (c : Fin (D.R.sigW j).2) : D.what₂.kaSmall j τ c ≤ 0 := by
+theorem kaSmall_nonpos
+    (D : D7) (hK : DV.KapDef D)
+    {j : ℕ} (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
+    (τ : D.what₂.Tau) (c : Fin (D.R.sigW j).2)
+    : D.what₂.kaSmall j τ c ≤ 0 := by
   have hs : (D.R.sigW j).2 = D.R.m - j := rfl
   have hc := c.2
   have h0 : 0 < (D.R.sigW j).2 := by omega
-  have h3 := kaSmall_anti D hK h1 h2 τ
-    (show (⟨0, h0⟩ : Fin (D.R.sigW j).2) ≤ c from Fin.le_def.2 (Nat.zero_le _))
+  have h3 :=
+    kaSmall_anti D hK h1 h2 τ
+      (show (⟨0, h0⟩ : Fin (D.R.sigW j).2) ≤ c from Fin.le_def.2 (Nat.zero_le _))
   have hq := (hK j h1 h2 τ).2 ⟨0, h0⟩
   suffices hsuf : (D.what₂.kaSmall j τ ⟨0, h0⟩ : ℚ) ≤ 0 by
     have h4 : D.what₂.kaSmall j τ ⟨0, h0⟩ ≤ 0 := by exact_mod_cast hsuf
@@ -248,8 +260,9 @@ theorem kaSmall_nonpos (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 
   have he : DV.eQ D j τ = (D.hc τ).e ⟨j - 1, hj1⟩ := by
     unfold DV.eQ
     rw [dite_eq_left ⟨h1, h2⟩]
-  have hpos : DV.aMinusQ D j τ 0 =
-      (D.hc τ).b ⟨j + 0, by omega⟩ - (D.hc τ).e ⟨j - 1, hj1⟩ - ((D.R.t : ℚ) + 1) / 2 := by
+  have hpos
+      : DV.aMinusQ D j τ 0
+        = (D.hc τ).b ⟨j + 0, by omega⟩ - (D.hc τ).e ⟨j - 1, hj1⟩ - ((D.R.t : ℚ) + 1) / 2 := by
     unfold DV.aMinusQ
     rw [dite_eq_left (show j + 0 < D.R.m by omega), he]
     push_cast
@@ -257,7 +270,8 @@ theorem kaSmall_nonpos (D : D7) (hK : DV.KapDef D) {j : ℕ} (h1 : 1 ≤ j) (h2 
   rw [hpos]
   linarith
 
-theorem even_nV {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (T : ParamsT D L P) : Even D.R.nV := by
+theorem even_nV {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (T : ParamsT D L P)
+    : Even D.R.nV := by
   obtain ⟨c, hc⟩ := T.nW_dvd
   have h1 := T.split
   have h2 := T.nP_eq
@@ -266,39 +280,49 @@ theorem even_nV {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (T : Par
   rw [h1, h2, hc]
   ring
 
-theorem even_nW {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (T : ParamsT D L P) : Even T.nWn := by
+theorem even_nW {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (T : ParamsT D L P)
+    : Even T.nWn := by
   obtain ⟨c, hc⟩ := T.nW_dvd
   exact ⟨4 * c, by omega⟩
 
-theorem even_nP {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (T : ParamsT D L P) : Even T.nP := by
+theorem even_nP {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L} (T : ParamsT D L P)
+    : Even T.nP := by
   rw [T.nP_eq]
   exact ⟨4 * D.R.f * D.R.r + 2, by ring⟩
 
 def kaWt (D : D7) (hK : DV.KapDef D) (hn : Even D.R.nV) (j : ℕ) : WeightFamilies.Wt D j :=
-  if h : 1 ≤ j ∧ j ≤ D.R.m then
-    { aP := fun τ i => (D.what₂.kaBig j τ i).toNat
-      aM := fun τ c => (-D.what₂.kaSmall j τ (Fin.rev c)).toNat
-      aPlus_antitone := fun τ _ _ hab => Int.toNat_le_toNat (kaBig_anti D hK h.1 h.2 τ hab)
-      aM_anti := fun τ _ _ hab =>
-        Int.toNat_le_toNat (neg_le_neg (kaSmall_anti D hK h.1 h.2 τ (Fin.rev_le_rev.2 hab)))
-      n := D.R.nV
-      n_even := hn }
-  else WeightAlgebra.wscalar D j D.R.nV hn
+  if h : 1 ≤ j ∧ j ≤ D.R.m then {
+    aP := fun τ i => (D.what₂.kaBig j τ i).toNat
+    aM := fun τ c => (- D.what₂.kaSmall j τ (Fin.rev c)).toNat
+    aPlus_antitone := fun τ _ _ hab => Int.toNat_le_toNat (kaBig_anti D hK h.1 h.2 τ hab)
+    aM_anti := fun τ _ _ hab =>
+      Int.toNat_le_toNat (neg_le_neg (kaSmall_anti D hK h.1 h.2 τ (Fin.rev_le_rev.2 hab)))
+    n := D.R.nV
+    n_even := hn
+  }
+  else
+    WeightAlgebra.wscalar D j D.R.nV hn
 
-theorem kaWt_big (D : D7) (hK : DV.KapDef D) (hn : Even D.R.nV) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
-    (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).1) : ((kaWt D hK hn j).aP τ i : ℤ) = D.what₂.kaBig j τ i := by
+theorem kaWt_big
+    (D : D7) (hK : DV.KapDef D) (hn : Even D.R.nV)
+    (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
+    (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).1)
+    : ((kaWt D hK hn j).aP τ i : ℤ) = D.what₂.kaBig j τ i := by
   unfold kaWt
   rw [dite_eq_left ⟨h1, h2⟩]
   exact Int.toNat_of_nonneg (kaBig_nonneg D hK h1 h2 τ i)
 
-theorem kaWt_small (D : D7) (hK : DV.KapDef D) (hn : Even D.R.nV) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
-    (τ : D.what₂.Tau) (c : Fin (D.R.sigW j).2) :
-    ((kaWt D hK hn j).aM τ c : ℤ) = -D.what₂.kaSmall j τ (Fin.rev c) := by
+theorem kaWt_small
+    (D : D7) (hK : DV.KapDef D) (hn : Even D.R.nV)
+    (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m)
+    (τ : D.what₂.Tau) (c : Fin (D.R.sigW j).2)
+    : ((kaWt D hK hn j).aM τ c : ℤ) = - D.what₂.kaSmall j τ (Fin.rev c) := by
   unfold kaWt
   rw [dite_eq_left ⟨h1, h2⟩]
   exact Int.toNat_of_nonneg (neg_nonneg.2 (kaSmall_nonpos D hK h1 h2 τ (Fin.rev c)))
 
-theorem kaWt_n (D : D7) (hK : DV.KapDef D) (hn : Even D.R.nV) (j : ℕ) : (kaWt D hK hn j).n = D.R.nV := by
+theorem kaWt_n (D : D7) (hK : DV.KapDef D) (hn : Even D.R.nV) (j : ℕ)
+    : (kaWt D hK hn j).n = D.R.nV := by
   unfold kaWt
   split_ifs <;> rfl
 
@@ -307,12 +331,17 @@ section Run
 variable (D : D7) {j : ℕ}
 
 def lGapP (ka : WeightFamilies.Wt D j) (T nW : ℕ) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).1) : ℕ :=
-  if i.1 + 1 < (D.R.sigW j).1 then (Int.fdiv (WeightAlgebra.gapZ (ka.aP τ) i + 2) (WeightAlgebra.Tp D j T)).toNat
-  else (Int.fdiv ((ka.aP τ i : ℤ) - ((WeightFamilies.dimY D j : ℤ) + 2) * nW - 2 * D.R.r) (WeightAlgebra.Tp D j T)).toNat
+  if i.1 + 1 < (D.R.sigW j).1 then
+    (Int.fdiv (WeightAlgebra.gapZ (ka.aP τ) i + 2) (WeightAlgebra.Tp D j T)).toNat
+  else
+    (Int.fdiv ((ka.aP τ i : ℤ) - ((WeightFamilies.dimY D j : ℤ) + 2) * nW - 2 * D.R.r)
+      (WeightAlgebra.Tp D j T)).toNat
 
 def lGapM (ka : WeightFamilies.Wt D j) (T : ℕ) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).2) : ℕ :=
-  if i.1 + 1 < (D.R.sigW j).2 then (Int.fdiv (WeightAlgebra.gapZ (ka.aM τ) i + 2) (WeightAlgebra.Tp D j T)).toNat
-  else (Int.fdiv (ka.aM τ i : ℤ) (WeightAlgebra.Tp D j T)).toNat
+  if i.1 + 1 < (D.R.sigW j).2 then
+    (Int.fdiv (WeightAlgebra.gapZ (ka.aM τ) i + 2) (WeightAlgebra.Tp D j T)).toNat
+  else
+    (Int.fdiv (ka.aM τ i : ℤ) (WeightAlgebra.Tp D j T)).toNat
 
 def lWt (ka : WeightFamilies.Wt D j) (T nW : ℕ) (hW : Even nW) : WeightFamilies.Wt D j where
   aP τ := ofGaps (lGapP D ka T nW τ)
@@ -323,12 +352,16 @@ def lWt (ka : WeightFamilies.Wt D j) (T nW : ℕ) (hW : Even nW) : WeightFamilie
   n_even := hW
 
 def fGapP (ka wL : WeightFamilies.Wt D j) (T : ℕ) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).1) : ℕ :=
-  if i.1 + 1 < (D.R.sigW j).1 then (WeightAlgebra.gapZ (ka.aP τ) i - T * WeightAlgebra.gapZ (wL.aP τ) i).toNat
-  else ((ka.aP τ i : ℤ) - T * wL.aP τ i).toNat
+  if i.1 + 1 < (D.R.sigW j).1 then
+    (WeightAlgebra.gapZ (ka.aP τ) i - T * WeightAlgebra.gapZ (wL.aP τ) i).toNat
+  else
+    ((ka.aP τ i : ℤ) - T * wL.aP τ i).toNat
 
 def fGapM (ka wL : WeightFamilies.Wt D j) (T : ℕ) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).2) : ℕ :=
-  if i.1 + 1 < (D.R.sigW j).2 then (WeightAlgebra.gapZ (ka.aM τ) i - T * WeightAlgebra.gapZ (wL.aM τ) i).toNat
-  else ((ka.aM τ i : ℤ) - T * wL.aM τ i).toNat
+  if i.1 + 1 < (D.R.sigW j).2 then
+    (WeightAlgebra.gapZ (ka.aM τ) i - T * WeightAlgebra.gapZ (wL.aM τ) i).toNat
+  else
+    ((ka.aM τ i : ℤ) - T * wL.aM τ i).toNat
 
 def fWt (ka wL : WeightFamilies.Wt D j) (T nP : ℕ) (hP : Even nP) : WeightFamilies.Wt D j where
   aP τ := ofGaps (fGapP D ka wL T τ)

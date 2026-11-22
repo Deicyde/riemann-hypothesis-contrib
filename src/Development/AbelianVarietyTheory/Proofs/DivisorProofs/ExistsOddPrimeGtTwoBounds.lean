@@ -16,19 +16,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CmAlgCharEqA
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.ExpFrame Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.LD Formalism.RankGapBounds.FormsTensorLocalization Formalism.L2.Host GlobalTheory.HeckeGal
+open NumberField IsDedekindDomain GlobalTheory.ExpFrame
+  Formalism.CohomologicalDescent.DepthNonnegative Formalism.CohomologicalDescent.LD
+  Formalism.RankGapBounds.FormsTensorLocalization Formalism.L2.Host GlobalTheory.HeckeGal
 
 namespace GlobalTheory.AlgCharUnr
 
-theorem phase_prod_eq_one {E : Type} [Field E] [NumberField E] [IsCMField E] {q : ℕ} (hq : q.Prime) (hq2 : 2 < q)
-    (ht : ¬ q ∣ Nat.card (Units.torsion E)) (u : (𝓞 E)ˣ) (hu : (u : 𝓞 E) - 1 ∈ Ideal.span {((q : ℕ) : 𝓞 E)})
-    (m : InfinitePlace E → ℤ) (w0 : ℤ) (hm : ∀ w, ∃ a, m w = 2 * a - w0) :
-    ∏ w : InfinitePlace E, (w.embedding ((u : 𝓞 E) : E) / ((‖w.embedding ((u : 𝓞 E) : E)‖ : ℝ) : ℂ)) ^ m w = 1 := by
+theorem phase_prod_eq_one
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {q : ℕ} (hq : q.Prime) (hq2 : 2 < q) (ht : ¬ q ∣ Nat.card (Units.torsion E))
+    (u : (𝓞 E)ˣ) (hu : (u : 𝓞 E) - 1 ∈ Ideal.span {((q : ℕ) : 𝓞 E)})
+    (m : InfinitePlace E → ℤ) (w0 : ℤ) (hm : ∀ w, ∃ a, m w = 2 * a - w0)
+    : ∏ w : InfinitePlace E, (w.embedding ((u : 𝓞 E) : E) / ((‖w.embedding ((u : 𝓞 E) : E)‖ : ℝ) : ℂ)) ^ m w
+      = 1 := by
   have hr := GlobalTheory.T.unit_real_of_sub_one_mem_span_prime E q hq ht u hu
   have hs := GlobalTheory.T.prod_arg_real_unit_eq_one' E q hq hq2 u hu hr
-  have hsq : ∀ w : InfinitePlace E,
-      (w.embedding ((u : 𝓞 E) : E) / ((‖w.embedding ((u : 𝓞 E) : E)‖ : ℝ) : ℂ)) ^ m w =
-      ((w.embedding ((u : 𝓞 E) : E) / ((‖w.embedding ((u : 𝓞 E) : E)‖ : ℝ) : ℂ)) ^ w0)⁻¹ := fun w => by
+  have hsq
+      : ∀ w : InfinitePlace E,
+        (w.embedding ((u : 𝓞 E) : E) / ((‖w.embedding ((u : 𝓞 E) : E)‖ : ℝ) : ℂ)) ^ m w
+          = ((w.embedding ((u : 𝓞 E) : E) / ((‖w.embedding ((u : 𝓞 E) : E)‖ : ℝ) : ℂ))
+            ^ w0)⁻¹ := fun w => by
     set z := w.embedding ((u : 𝓞 E) : E) with hz
     have h0 : z ≠ 0 := by rw [hz, map_ne_zero]; exact Units.coe_ne_zero u
     have hn : ((‖z‖ : ℝ) : ℂ) ≠ 0 := by exact_mod_cast norm_ne_zero_iff.2 h0
@@ -41,13 +48,21 @@ theorem phase_prod_eq_one {E : Type} [Field E] [NumberField E] [IsCMField E] {q 
     obtain ⟨a, ha⟩ := hm w
     have hne : z / ((‖z‖ : ℝ) : ℂ) ≠ 0 := div_ne_zero h0 hn
     rw [ha, sub_eq_add_neg, zpow_add₀ hne, zpow_mul, h2, one_zpow, one_mul, zpow_neg]
-  rw [Finset.prod_congr rfl fun w _ => hsq w, Finset.prod_inv_distrib, Finset.prod_zpow, hs, one_zpow, inv_one]
+  rw [Finset.prod_congr rfl fun w _ => hsq w, Finset.prod_inv_distrib, Finset.prod_zpow, hs,
+    one_zpow, inv_one]
 
 theorem exists_odd_prime_gt_two_bounds (l t : ℕ) : ∃ q : ℕ, q.Prime ∧ 2 < q ∧ l < q ∧ t < q := by
   obtain ⟨q, hq, hp⟩ := Nat.exists_infinite_primes (max (max 3 (l + 1)) (t + 1))
   exact ⟨q, hp, by omega, by omega, by omega⟩
 
-theorem exists_algChar_unr : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (l : ℕ), l.Prime → ∀ (n : (E →+* ℂ) → ℤ) (w0 : ℤ), (∀ φ, n φ + n (NumberField.ComplexEmbedding.conjugate φ) = w0) → ∃ χ : HChar E, IsAlgPos χ n ∧ ∀ w : HeightOneSpectrum (𝓞 E), ((l : ℕ) : 𝓞 E) ∈ w.asIdeal → χ.UnrAt w := by
+theorem exists_algChar_unr
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (l : ℕ),
+      l.Prime
+        → ∀ (n : (E →+* ℂ) → ℤ) (w0 : ℤ),
+          (∀ φ, n φ + n (NumberField.ComplexEmbedding.conjugate φ) = w0)
+            → ∃ χ : HChar E,
+              IsAlgPos χ n
+                ∧ ∀ w : HeightOneSpectrum (𝓞 E), ((l : ℕ) : 𝓞 E) ∈ w.asIdeal → χ.UnrAt w := by
   intro E _ _ _ l hl n w0 hn
   classical
   obtain ⟨q, hq, hq2, hlq, htq⟩ := exists_odd_prime_gt_two_bounds l (Nat.card (Units.torsion E))
@@ -60,10 +75,18 @@ theorem exists_algChar_unr : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
   have hbij : Function.Bijective fun w : InfinitePlace E => InfinitePlace.mk w.embedding := by
     simp only [InfinitePlace.mk_embedding]
     exact Function.bijective_id
-  obtain ⟨ψ, hψ, hψu, hψi, -, hψS, hψd⟩ := GlobalTheory.ModelChar.exists_modelChar E (InfinitePlace E) (fun w => w.embedding)
-    hbij m ∅ (fun _ => 1) (by simp)
-  have hinf := (GlobalTheory.InfTypeLocal.infType_iff_local E (InfinitePlace E) (fun w => w.embedding) hbij ψ hψ _).2 hψi
-  let U : Subgroup (Neutral.B1.Ideles E) := GlobalTheory.Mem.Chr.unitIdl E ⊓ GlobalTheory.RayChar.congrIdl 𝔪
+  obtain ⟨ψ, hψ, hψu, hψi, -, hψS, hψd⟩ :=
+    GlobalTheory.ModelChar.exists_modelChar E (InfinitePlace E)
+      (fun w => w.embedding)
+      hbij m ∅
+      (fun _ => 1)
+      (by simp)
+  have hinf :=
+    (GlobalTheory.InfTypeLocal.infType_iff_local E (InfinitePlace E)
+      (fun w => w.embedding)
+      hbij ψ hψ _).2 hψi
+  let U : Subgroup (Neutral.B1.Ideles E) :=
+    GlobalTheory.Mem.Chr.unitIdl E ⊓ GlobalTheory.RayChar.congrIdl 𝔪
   have hU : IsOpen (U : Set (Neutral.B1.Ideles E)) :=
     GlobalTheory.Mem.UnitOpen.isOpen_unitIdl.inter (GlobalTheory.RayChar.isOpen_congrIdl hm)
   have hmem : ∀ k : Eˣ, infDiag k ∈ U := fun k => by
@@ -75,28 +98,35 @@ theorem exists_algChar_unr : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
         congrArg Units.val (GlobalTheory.ModelChar.finEv_infDiag v k)
       rw [h1, sub_self, map_zero]
       exact zero_le
-  obtain ⟨χ1, hχc, -, hχU, hχd⟩ := GlobalTheory.exists_unitary_char_of_open_subgroup_and_hom (Neutral.B1.Ideles E) Eˣ U hU
-    (Neutral.B1.diagUnits E) 1 ψ hψ hψu (fun _ => by simp) (fun k hk => by
-      obtain ⟨u, hu⟩ := GlobalTheory.DefU.NonTriv.exists_unit k hk.1
-      have hu1 : (u : 𝓞 E) - 1 ∈ 𝔪 := (GlobalTheory.RayChar.mem_iff_at hm _).2 fun v hv => by
-        rw [GlobalTheory.RayChar.at'_sub_one]
-        have h2 := (GlobalTheory.RayChar.mem_congrIdl hm).1 hk.2 v hv
-        rw [GlobalTheory.RayChar.cmp_diag, ← hu] at h2
-        exact h2
-      show (1 : ℂˣ) = ψ (Neutral.B1.diagUnits E k)
-      rw [hψd, Finset.prod_empty, mul_one]
-      refine (Units.ext ?_).symm
-      rw [hinf k, Units.val_one, ← hu]
-      exact phase_prod_eq_one hq hq2 ht u hu1 m w0 fun w => ⟨n w.embedding, rfl⟩)
+  obtain ⟨χ1, hχc, -, hχU, hχd⟩ :=
+    GlobalTheory.exists_unitary_char_of_open_subgroup_and_hom (Neutral.B1.Ideles E) Eˣ U hU
+      (Neutral.B1.diagUnits E) 1 ψ hψ hψu
+      (fun _ => by simp)
+      (fun k hk => by
+        obtain ⟨u, hu⟩ := GlobalTheory.DefU.NonTriv.exists_unit k hk.1
+        have hu1 : (u : 𝓞 E) - 1 ∈ 𝔪 :=
+          (GlobalTheory.RayChar.mem_iff_at hm _).2 fun v hv => by
+            rw [GlobalTheory.RayChar.at'_sub_one]
+            have h2 := (GlobalTheory.RayChar.mem_congrIdl hm).1 hk.2 v hv
+            rw [GlobalTheory.RayChar.cmp_diag, ← hu] at h2
+            exact h2
+        show (1 : ℂˣ) = ψ (Neutral.B1.diagUnits E k)
+        rw [hψd, Finset.prod_empty, mul_one]
+        refine (Units.ext ?_).symm
+        rw [hinf k, Units.val_one, ← hu]
+        exact phase_prod_eq_one hq hq2 ht u hu1 m w0 fun w => ⟨n w.embedding, rfl⟩)
   let χ0 : HChar E := ⟨χ1, hχc, fun k => by rw [hχd]; rfl⟩
   let s : ℝ := (w0 : ℝ) / 2
   let ν : HChar E := GlobalTheory.Mem.Chr.CharModel.absChar E (s : ℂ)
   have hν : ν.IsAbsPow s := GlobalTheory.Mem.Chr.CharModel.absChar_isAbsPow s
   refine ⟨χ0 * ν, fun k _ => ?_, fun w hw x hx => ?_⟩
-  · have h1 : ((χ0.inf k : ℂˣ) : ℂ) = ∏ w : InfinitePlace E, (w.embedding (k : E) / ((‖w.embedding (k : E)‖ : ℝ) : ℂ)) ^ m w := by
-      show ((χ1 (infDiag k) : ℂˣ) : ℂ) = _
-      rw [hχU _ (hmem k)]
-      exact hinf k
+  · have h1
+        : ((χ0.inf k : ℂˣ) : ℂ)
+          = ∏ w : InfinitePlace E, (w.embedding (k : E) / ((‖w.embedding (k : E)‖ : ℝ) : ℂ)) ^ m w :=
+      by
+        show ((χ1 (infDiag k) : ℂˣ) : ℂ) = _
+        rw [hχU _ (hmem k)]
+        exact hinf k
     rw [HChar.inf_mul, Units.val_mul, h1, hν.2.2 k]
     exact GlobalTheory.T.cm_algChar_eq_arg_mul_abs E n w0 hn (k : E) k.ne_zero
   · have hwq : ¬ w.asIdeal ∣ 𝔪 := by
@@ -111,7 +141,8 @@ theorem exists_algChar_unr : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
     change χ0.loc w x * ν.loc w x = 1
     rw [hν.1 w x hx, mul_one]
     show χ1 (Neutral.B1.localIdele E w x) = 1
-    rw [hχU _ ⟨GlobalTheory.RayChar.local_mem_unitIdl hx, GlobalTheory.RayChar.local_mem_congrIdl hwq x⟩]
+    rw [hχU _
+      ⟨GlobalTheory.RayChar.local_mem_unitIdl hx, GlobalTheory.RayChar.local_mem_congrIdl hwq x⟩]
     exact hψS w (Finset.notMem_empty w) x
 
 end GlobalTheory.AlgCharUnr

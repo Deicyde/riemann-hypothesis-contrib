@@ -18,19 +18,15 @@ namespace Formalism.L2
 
 section
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L} {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D}
-  {cX : ExtraC}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L}
+  {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
 
 structure RecT (ex : Extra D L hT Gi Gl K Y cX) where
-
   T : TiedDataSK ex
-
   pin : Rows.RowPinMin T
-
   joints : JointsS T.toTiedDataS
-
   host : HostDatumS T.toTiedDataS
-
   weq : Theta.WeilCompatibleEquivariance T.toTiedDataS.theta.W
 
 end

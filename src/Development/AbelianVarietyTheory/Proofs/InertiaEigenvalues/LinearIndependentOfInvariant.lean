@@ -9,17 +9,18 @@ open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibl
 
 namespace GlobalTheory.Per
 
-theorem linearIndependent_of_invariant (G E M ι : Type) [Field E] [AddCommGroup M] [Module E M]
-    [Fintype ι] (σ : G → (E →+* E)) (ρ : G → (M →+ M))
-    (hρ : ∀ g (e : E) (m : M), ρ g (e • m) = σ g e • ρ g m) (v : ι → M)
-    (hv : ∀ g i, ρ g (v i) = v i)
-    (hind : ∀ c : ι → E, (∀ g i, σ g (c i) = c i) → ∑ i, c i • v i = 0 → ∀ i, c i = 0) :
-    LinearIndependent E v := by
+theorem linearIndependent_of_invariant
+    (G E M ι : Type) [Field E] [AddCommGroup M] [Module E M] [Fintype ι]
+    (σ : G → (E →+* E)) (ρ : G → (M →+ M)) (hρ : ∀ g (e : E) (m : M), ρ g (e • m) = σ g e • ρ g m)
+    (v : ι → M) (hv : ∀ g i, ρ g (v i) = v i)
+    (hind : ∀ c : ι → E, (∀ g i, σ g (c i) = c i) → ∑ i, c i • v i = 0 → ∀ i, c i = 0)
+    : LinearIndependent E v := by
   classical
   rw [Fintype.linearIndependent_iff]
 
-  suffices H : ∀ n : ℕ, ∀ c : ι → E,
-      (Finset.univ.filter (fun i => c i ≠ 0)).card ≤ n → ∑ i, c i • v i = 0 → ∀ i, c i = 0 by
+  suffices H
+      : ∀ n : ℕ, ∀ c : ι → E,
+        (Finset.univ.filter (fun i => c i ≠ 0)).card ≤ n → ∑ i, c i • v i = 0 → ∀ i, c i = 0 by
     exact fun c hc => H _ c le_rfl hc
   intro n
   induction n with
@@ -40,7 +41,8 @@ theorem linearIndependent_of_invariant (G E M ι : Type) [Field E] [AddCommGroup
     have hc'i0 : c' i0 = 1 := by
       rw [hc']
       exact inv_mul_cancel₀ hi0
-    have hsupp : Finset.univ.filter (fun i => c' i ≠ 0) = Finset.univ.filter (fun i => c i ≠ 0) := by
+    have hsupp
+        : Finset.univ.filter (fun i => c' i ≠ 0) = Finset.univ.filter (fun i => c i ≠ 0) := by
       ext i
       simp [hc', hi0]
 
@@ -54,8 +56,9 @@ theorem linearIndependent_of_invariant (G E M ι : Type) [Field E] [AddCommGroup
         simpa [hρ, hv] using h2
       have hdsum : ∑ i, d i • v i = 0 := by
         simp only [hd, sub_smul, Finset.sum_sub_distrib, h1, hc'sum, sub_zero]
-      have hsub : Finset.univ.filter (fun i => d i ≠ 0) ⊆
-          (Finset.univ.filter (fun i => c' i ≠ 0)).erase i0 := by
+      have hsub
+          : Finset.univ.filter (fun i => d i ≠ 0)
+            ⊆ (Finset.univ.filter (fun i => c' i ≠ 0)).erase i0 := by
         intro i hi
         simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase] at hi ⊢
         refine ⟨?_, ?_⟩

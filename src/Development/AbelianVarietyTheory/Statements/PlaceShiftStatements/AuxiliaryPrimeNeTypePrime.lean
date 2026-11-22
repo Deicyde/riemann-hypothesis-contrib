@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NonemptyGrid
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.IndefR Formalism.IndefR.Links IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.IndefR Formalism.IndefR.Links
+  IsDedekindDomain NumberField
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
 
 namespace GlobalTheory.SqTop.Model
@@ -18,24 +19,32 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem rec_iff (large₂ : SizeData₂ D) : Rec large₂ ↔ GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows large₂ ∧ HostHyp D :=
+theorem rec_iff (large₂ : SizeData₂ D)
+    : Rec large₂
+      ↔ GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows large₂ ∧ HostHyp D :=
   ⟨fun h => ⟨h.size, h.host⟩, fun h => ⟨h.1, h.2, rfl, h.1.2.1.2.2.2.2.2.2.1.2.2.2.2.2.1⟩⟩
 
-theorem gBig_and {Q Q' : GP} (h : GBig @Q) (h' : GBig @Q') :
-    GBig fun G μ C x b => Q G μ C x b ∧ Q' G μ C x b := by
+theorem gBig_and {Q Q' : GP} (h : GBig @Q) (h' : GBig @Q')
+    : GBig fun G μ C x b => Q G μ C x b ∧ Q' G μ C x b := by
   obtain ⟨c, h⟩ := h
   obtain ⟨c', h'⟩ := h'
   refine ⟨max c c', fun ε CF hCF => ?_⟩
   obtain ⟨C0, x0, h⟩ := h ε CF (le_of_max_le_left hCF)
   obtain ⟨C1, x1, h'⟩ := h' ε CF (le_of_max_le_right hCF)
-  exact ⟨max C0 C1, max x0 x1, fun C hC D large₂ a b r T Lc μ hL G =>
-    ⟨h C (le_of_max_le_left hC) D large₂ a (le_of_max_le_left b) r T Lc μ hL G,
-      h' C (le_of_max_le_right hC) D large₂ a (le_of_max_le_right b) r T Lc μ hL G⟩⟩
+  exact ⟨
+    max C0 C1,
+    max x0 x1,
+    fun C hC D large₂ a b r T Lc μ hL G => ⟨
+      h C (le_of_max_le_left hC) D large₂ a (le_of_max_le_left b) r T Lc μ hL G,
+      h' C (le_of_max_le_right hC) D large₂ a (le_of_max_le_right b) r T Lc μ hL G
+    ⟩
+  ⟩
 
-theorem tower_numbers (i j : Fin D.R.m) : e0 D i j + pp D j = eTop D i j + qq D j ∧
-    halfRank D i j = h0 D i j + pp D j + qq D j ∧ pp D j + qq D j = D.R.m - 1 - j ∧ 1 ≤ e0 D i j ∧ e0 D i j < h0 D i j ∧
-    botBig D i j = e0 D i j + h0 D i j ∧ botSmall D i j + e0 D i j = h0 D i j ∧ eTop D i j + qq D j ≤ halfRank D i j ∧
-    halfRank D i j ≤ bigN D := by
+theorem tower_numbers (i j : Fin D.R.m)
+    : e0 D i j + pp D j = eTop D i j + qq D j ∧ halfRank D i j = h0 D i j + pp D j + qq D j
+      ∧ pp D j + qq D j = D.R.m - 1 - j ∧ 1 ≤ e0 D i j ∧ e0 D i j < h0 D i j
+      ∧ botBig D i j = e0 D i j + h0 D i j ∧ botSmall D i j + e0 D i j = h0 D i j
+      ∧ eTop D i j + qq D j ≤ halfRank D i j ∧ halfRank D i j ≤ bigN D := by
   obtain ⟨h1, h2, h3⟩ := ranks_exact D i j
   obtain ⟨u, hu⟩ := D.R.t_odd
   obtain ⟨v, hv⟩ := odd_sLen D
@@ -53,9 +62,11 @@ theorem tower_numbers (i j : Fin D.R.m) : e0 D i j + pp D j = eTop D i j + qq D 
   simp only [e0, h0, pp, qq, eTop]
   omega
 
-variable {T : Type} {Lc : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} (G : GridData Lc sc) {μ₀ : T}
+variable
+  {T : Type} {Lc : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} (G : GridData Lc sc) {μ₀ : T}
 
-theorem base_tuple (hL : Lc.Is μ₀) : twPl G μ₀ = ∅ ∧ Qn G μ₀ = 1 ∧ modT G μ₀ = SqNum.condE G.pl := by
+theorem base_tuple (hL : Lc.Is μ₀)
+    : twPl G μ₀ = ∅ ∧ Qn G μ₀ = 1 ∧ modT G μ₀ = SqNum.condE G.pl := by
   have h : twPl G μ₀ = ∅ := by
     refine Finset.eq_empty_of_forall_notMem fun w hw => ?_
     simp only [twPl, locPl, Finset.mem_filter, Finset.mem_union] at hw

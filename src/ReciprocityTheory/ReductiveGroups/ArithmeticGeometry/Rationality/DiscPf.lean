@@ -7,23 +7,32 @@ public import ReciprocityTheory.SemistableReduction.CauchyInequalityOnTorus
 
 namespace ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
 
-theorem disc_bound {K : Type} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    (K₀ : Subfield K) (hres : ReciprocityTheory.MultiplicativeHeights.ResidueFieldInfiniteOn (K₀ : Set K)) (c : ℤ → K)
-    (S : Set K)
+theorem disc_bound
+    {K : Type} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+    (K₀ : Subfield K)
+    (hres : ReciprocityTheory.MultiplicativeHeights.ResidueFieldInfiniteOn (K₀ : Set K))
+    (c : ℤ → K) (S : Set K)
     (hc : ∀ t ∈ S,
-        Filter.Tendsto (fun n => ‖c n * t ^ n‖) Filter.cofinite (nhds 0) ∧
-        ∀ τ ∈ K₀, ‖τ‖ = 1 → ‖∑' n, c n * (t * τ) ^ n‖ ≤ 1)
-    (t : K) (htS : t ∈ S) (n : ℤ) : ‖c n‖ * ‖t‖ ^ n ≤ 1 := by
+      Filter.Tendsto (fun n => ‖c n * t ^ n‖) Filter.cofinite (nhds 0)
+        ∧ ∀ τ ∈ K₀, ‖τ‖ = 1 → ‖∑' n, c n * (t * τ) ^ n‖ ≤ 1)
+    (t : K) (htS : t ∈ S)
+    (n : ℤ)
+    : ‖c n‖ * ‖t‖ ^ n ≤ 1 := by
   obtain ⟨hlim, hbd⟩ := hc t htS
   let e := Equiv.funUnique (Fin 1) ℤ
-  have key := ReciprocityTheory.MultiplicativeHeights.cauchy_inequality_on_torus K K₀ hres 1 (fun χ => c (χ 0) * t ^ (χ 0)) ?_ ?_ (fun _ => n)
+  have key :=
+    ReciprocityTheory.MultiplicativeHeights.cauchy_inequality_on_torus K K₀ hres 1
+      (fun χ => c (χ 0) * t ^ (χ 0))
+      ?_ ?_
+      (fun _ => n)
   · simpa [norm_mul, norm_zpow] using key
   · exact (hlim.comp e.injective.tendsto_cofinite :)
   · intro τ hτ
     have h := hbd (τ 0) (hτ 0).1 (hτ 0).2
     unfold ReciprocityTheory.MultiplicativeHeights.torusSum
-    have h2 : (fun χ : Fin 1 → ℤ => c (χ 0) * t ^ (χ 0) * ∏ i, τ i ^ χ i) =
-        fun χ => (fun m : ℤ => c m * (t * τ 0) ^ m) (e χ) := by
+    have h2
+        : (fun χ : Fin 1 → ℤ => c (χ 0) * t ^ (χ 0) * ∏ i, τ i ^ χ i)
+          = fun χ => (fun m : ℤ => c m * (t * τ 0) ^ m) (e χ) := by
       funext χ
       simp [e, Fin.prod_univ_one, mul_zpow, mul_assoc]
     rw [h2]
@@ -77,8 +86,7 @@ theorem disc_holds : DiscStatement := by
       linarith
     have h6 := hball hdist
     have h1 := hbd t htS
-    have h7 : ‖t‖ ^ n * ‖t‖ ^ (-n) = 1 := by
-      rw [← zpow_add₀ htpos.ne', add_neg_cancel, zpow_zero]
+    have h7 : ‖t‖ ^ n * ‖t‖ ^ (-n) = 1 := by rw [← zpow_add₀ htpos.ne', add_neg_cancel, zpow_zero]
     have h9 : ‖c n‖ ≤ ‖t‖ ^ (-n) := by
       have h10 := mul_le_mul_of_nonneg_right h1 (zpow_pos htpos (-n)).le
       rw [mul_assoc, h7, mul_one, one_mul] at h10

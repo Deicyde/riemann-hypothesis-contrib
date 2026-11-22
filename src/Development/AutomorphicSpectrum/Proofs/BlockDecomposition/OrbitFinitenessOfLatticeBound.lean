@@ -8,10 +8,14 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IsS
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 open IsDedekindDomain NumberField
 open GlobalTheory.RegSch (ikS projS Lvl)
 open PositivityTheory.Rg.Rsw PositivityTheory.Rg.Rsw.L
@@ -27,7 +31,8 @@ theorem orbFin_of_latBound : LatBound → OrbFin := by
   obtain ⟨-, g2, g3, -, h5, -⟩ := GlobalTheory.Mem.AdelicGroupTop.adelic_unitary_topology D W
   have hfd : IsFundamentalDomain (GQ W) (stdDom (GQ W)) m := isFundamentalDomain_stdDom _ m
   have hfin := GlobalTheory.CuspDecay.measure_lt_top GlobalTheory.Mem.VolFin.finVol W m _ hm hfd
-  have hcnt : Countable (GQ W) := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.countableGamma D.sp.cm.sig W.gram
+  have hcnt : Countable (GQ W) :=
+    Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.countableGamma D.sp.cm.sig W.gram
   have hNc : Continuous N :=
     (GlobalTheory.SchwartzMaj.continuous_and_le_maj D θ hθ W.rank W.rank N
       (GlobalTheory.SchwartzPure.isSchwartzBruhat_of_mem_schwartzA D θ hθ W.rank W.rank N hN)).1
@@ -46,17 +51,21 @@ theorem orbFin_of_latBound : LatBound → OrbFin := by
       rw [Matrix.det_mul]
       exact ((Matrix.isUnit_iff_isUnit_det _).1 (u γ).isUnit).mul hxu
     simpa using Matrix.rank_of_isUnit _ h1
-  let e : GQ W → {x : Matrix (Fin W.rank) (Fin W.rank) D.host.E // x.rank = W.rank} :=
-    fun γ => ⟨(u γ).1 * x₀, hrk γ⟩
+  let e : GQ W → {x : Matrix (Fin W.rank) (Fin W.rank) D.host.E // x.rank = W.rank} := fun γ =>
+    ⟨(u γ).1 * x₀, hrk γ⟩
   have he : Function.Injective e := fun γ γ' h => by
     have h1 : (u γ).1 * x₀ = (u γ').1 * x₀ := congrArg Subtype.val h
     have h2 : (u γ).1 = (u γ').1 := by
       have hxi : x₀ * x₀⁻¹ = 1 := Matrix.mul_nonsing_inv _ hxu
-      calc (u γ).1 = (u γ).1 * x₀ * x₀⁻¹ := by rw [Matrix.mul_assoc, hxi, Matrix.mul_one]
+      calc
+        (u γ).1
+          = (u γ).1 * x₀ * x₀⁻¹ := by rw [Matrix.mul_assoc, hxi, Matrix.mul_one]
         _ = (u γ').1 * x₀ * x₀⁻¹ := by rw [h1]
         _ = (u γ').1 := by rw [Matrix.mul_assoc, hxi, Matrix.mul_one]
     exact Subtype.ext (GlobalTheory.MixModel.mt_injective W (by rw [hu, hu, h2]))
-  have hterm : ∀ (γ : GQ W) (h : GA D W), ‖N (ww W x₀ (γ⁻¹ • h))‖ₑ = ‖N (mm (mt W h⁻¹) (rat (e γ).1))‖ₑ := fun γ h => by
+  have hterm
+      : ∀ (γ : GQ W) (h : GA D W),
+        ‖N (ww W x₀ (γ⁻¹ • h))‖ₑ = ‖N (mm (mt W h⁻¹) (rat (e γ).1))‖ₑ := fun γ h => by
     have h1 : (γ⁻¹ • h)⁻¹ = h⁻¹ * γ.1 := by
       change ((γ.1)⁻¹ * h)⁻¹ = _
       rw [mul_inv_rev, inv_inv]
@@ -68,8 +77,10 @@ theorem orbFin_of_latBound : LatBound → OrbFin := by
     rw [h3]
   rw [hfd.lintegral_eq_tsum']
   rw [← lintegral_tsum fun γ => ?_]
-  · calc ∫⁻ h in stdDom (GQ W), ∑' γ : GQ W, ‖N (ww W x₀ (γ⁻¹ • h))‖ₑ ∂m
-        ≤ ∫⁻ _ in stdDom (GQ W), (C : ℝ≥0∞) ∂m := lintegral_mono fun h => by
+  · calc
+      ∫⁻ h in stdDom (GQ W), ∑' γ : GQ W, ‖N (ww W x₀ (γ⁻¹ • h))‖ₑ ∂m
+          ≤ ∫⁻ _ in stdDom (GQ W), (C : ℝ≥0∞) ∂m :=
+        lintegral_mono fun h => by
           simp only [hterm]
           exact (ENNReal.tsum_comp_le_tsum_of_injective he
             (fun x => ‖N (mm (mt W h⁻¹) (rat x.1))‖ₑ)).trans (hC h)

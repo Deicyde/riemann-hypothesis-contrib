@@ -5,14 +5,19 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.ToEBij
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
-private theorem chr_val (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ) (g : φ.GG) :
-    ((chr φ ψ g : ℂˣ) : ℂ) = ψ (Multiplicative.toAdd (toE φ g)) := rfl
+private theorem chr_val (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ) (g : φ.GG)
+    : ((chr φ ψ g : ℂˣ) : ℂ) = ψ (Multiplicative.toAdd (toE φ g)) :=
+  rfl
 
-private theorem sgn_val (s : ℤˣ) :
-    (if Multiplicative.toAdd (LFunctionChainParameters.LHost.sgn2 s) = 0 then (1 : ℂ) else -1) = ((s : ℤ) : ℂ) := by
+private theorem sgn_val (s : ℤˣ)
+    : (if Multiplicative.toAdd (LFunctionChainParameters.LHost.sgn2 s) = 0 then (1 : ℂ) else -1)
+      = ((s : ℤ) : ℂ) := by
   rcases Int.units_eq_one_or s with rfl | rfl
   · have h0 : Multiplicative.toAdd (LFunctionChainParameters.LHost.sgn2 1) = 0 := by
       rw [map_one, toAdd_one]
@@ -22,10 +27,12 @@ private theorem sgn_val (s : ℤˣ) :
     rw [h1, if_neg (by decide)]
     simp
 
-theorem UpperTheory.Comparison₂.chr_bij :
-    ∀ φ : Frame, Function.Bijective (chr φ) ∧ chr φ 0 = 1 ∧ chr φ chC = φ.chC ∧ chr φ psC = φ.psC ∧
-      (∀ ψ g, ((chr φ ψ g : ℂˣ) : ℂ) = ψ (Multiplicative.toAdd (toE φ g))) ∧
-      (∀ ψ, ψ ∈ PsiA φ.A0 ↔ Frame.TrivialOnFirstFactor (chr φ ψ)) ∧ ∀ ψ, chr φ ψ ∈ φ.Xp ↔ (ψ ∈ PsiA φ.A0 ∧ ψ sgc0 = 1) := by
+theorem UpperTheory.Comparison₂.chr_bij
+    : ∀ φ : Frame,
+      Function.Bijective (chr φ) ∧ chr φ 0 = 1 ∧ chr φ chC = φ.chC ∧ chr φ psC = φ.psC
+        ∧ (∀ ψ g, ((chr φ ψ g : ℂˣ) : ℂ) = ψ (Multiplicative.toAdd (toE φ g)))
+        ∧ (∀ ψ, ψ ∈ PsiA φ.A0 ↔ Frame.TrivialOnFirstFactor (chr φ ψ))
+        ∧ ∀ ψ, chr φ ψ ∈ φ.Xp ↔ (ψ ∈ PsiA φ.A0 ∧ ψ sgc0 = 1) := by
   intro φ
   obtain ⟨hbij, hiod, -, htau, -⟩ := toE_bij φ
   have trivA : ∀ ψ, ψ ∈ PsiA φ.A0 ↔ Frame.TrivialOnFirstFactor (chr φ ψ) := by
@@ -55,13 +62,13 @@ theorem UpperTheory.Comparison₂.chr_bij :
     simp only [chr_val, hg, toAdd_ofAdd] at h2
     exact h2
   · intro θ
-    let ψ : AddChar (E0 × φ.A) ℂ :=
-      { toFun := fun a => ((θ (e.symm (Multiplicative.ofAdd a)) : ℂˣ) : ℂ)
-        map_zero_eq_one' := by
-          simp only [ofAdd_zero, map_one, Units.val_one]
-        map_add_eq_mul' := by
-          intro a b
-          simp only [ofAdd_add, map_mul, Units.val_mul] }
+    let ψ : AddChar (E0 × φ.A) ℂ := {
+      toFun := fun a => ((θ (e.symm (Multiplicative.ofAdd a)) : ℂˣ) : ℂ)
+      map_zero_eq_one' := by simp only [ofAdd_zero, map_one, Units.val_one]
+      map_add_eq_mul' := by
+        intro a b
+        simp only [ofAdd_add, map_mul, Units.val_mul]
+    }
     refine ⟨ψ, ?_⟩
     refine MonoidHom.ext fun g => Units.ext ?_
     rw [chr_val]

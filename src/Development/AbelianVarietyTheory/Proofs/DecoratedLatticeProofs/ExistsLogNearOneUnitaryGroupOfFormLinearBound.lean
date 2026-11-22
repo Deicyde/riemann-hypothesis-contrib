@@ -40,28 +40,30 @@ private lemma norm_entry_le_linftyOp_norm {n : ℕ} (A : Matrix (Fin n) (Fin n) 
     _ ≤ _ := by
       exact_mod_cast Finset.le_sup (f := fun i => ∑ k, ‖A i k‖₊) (Finset.mem_univ i)
 
-
 open Matrix Filter Topology in
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra in
-theorem _root_.GlobalTheory.UnitaryLog.exists_log_unitary (n : ℕ)
-    (G : Matrix (Fin n) (Fin n) ℂ) (hG : IsUnit G.det) :
-    ∃ δ₁ C : ℝ, 0 < δ₁ ∧ ∀ (u : Matrix (Fin n) (Fin n) ℂ) (δ : ℝ), uᴴ * G * u = G → δ ≤ δ₁ →
-      (∀ i j, ‖(u - 1) i j‖ ≤ δ) → ∃ X : Matrix (Fin n) (Fin n) ℂ, Xᴴ * G + G * X = 0 ∧
-        NormedSpace.exp X = u ∧ ∀ i j, ‖X i j‖ ≤ C * δ := by
+theorem _root_.GlobalTheory.UnitaryLog.exists_log_unitary
+    (n : ℕ) (G : Matrix (Fin n) (Fin n) ℂ) (hG : IsUnit G.det)
+    : ∃ δ₁ C : ℝ,
+      0 < δ₁
+        ∧ ∀ (u : Matrix (Fin n) (Fin n) ℂ) (δ : ℝ),
+          uᴴ * G * u = G → δ ≤ δ₁ → (∀ i j, ‖(u - 1) i j‖ ≤ δ)
+            → ∃ X : Matrix (Fin n) (Fin n) ℂ,
+              Xᴴ * G + G * X = 0 ∧ NormedSpace.exp X = u ∧ ∀ i j, ‖X i j‖ ≤ C * δ := by
   have hf : HasStrictFDerivAt (NormedSpace.exp : Matrix (Fin n) (Fin n) ℂ → _)
-      ((ContinuousLinearEquiv.refl ℂ (Matrix (Fin n) (Fin n) ℂ) :
-        Matrix (Fin n) (Fin n) ℂ →L[ℂ] _)) 0 :=
+      ((ContinuousLinearEquiv.refl ℂ (Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ →L[ℂ] _))
+      0 :=
     hasStrictFDerivAt_exp_zero
   set L := hf.localInverse _ _ _ with hL
   set φ : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ := fun X => G⁻¹ * Xᴴ * G with hφ
   have hφc : Continuous φ :=
     (continuous_const.mul continuous_id.matrix_conjTranspose).mul continuous_const
-  have hφ0 : Tendsto φ (𝓝 0) (𝓝 0) := by
-    simpa [φ] using hφc.tendsto 0
+  have hφ0 : Tendsto φ (𝓝 0) (𝓝 0) := by simpa [φ] using hφc.tendsto 0
   have hleft : ∀ᶠ X in 𝓝 (0 : Matrix (Fin n) (Fin n) ℂ), L (NormedSpace.exp X) = X :=
     hf.eventually_left_inverse
-  have hP : ∀ᶠ X in 𝓝 (0 : Matrix (Fin n) (Fin n) ℂ), L (NormedSpace.exp X) = X ∧
-      L (NormedSpace.exp (φ X)) = φ X ∧ L (NormedSpace.exp (-X)) = -X :=
+  have hP
+      : ∀ᶠ X in 𝓝 (0 : Matrix (Fin n) (Fin n) ℂ), L (NormedSpace.exp X) = X ∧
+        L (NormedSpace.exp (φ X)) = φ X ∧ L (NormedSpace.exp (-X)) = -X :=
     hleft.and ((hφ0.eventually hleft).and
       ((continuous_neg.tendsto' (0 : Matrix (Fin n) (Fin n) ℂ) 0 neg_zero).eventually hleft))
   obtain ⟨K, s, hs, hK⟩ := hf.to_localInverse.exists_lipschitzOnWith
@@ -79,7 +81,9 @@ theorem _root_.GlobalTheory.UnitaryLog.exists_log_unitary (n : ℕ)
     nlinarith
   have hdist : dist u 1 < ε := by
     rw [dist_eq_norm]
-    calc ‖u - 1‖ ≤ n * δ := hnorm
+    calc
+      ‖u - 1‖
+        ≤ n * δ := hnorm
       _ ≤ n * (ε / (2 * ((n : ℝ) + 1))) := mul_le_mul_of_nonneg_left hδ (Nat.cast_nonneg n)
       _ < ε := hsmall
   obtain ⟨hexp, ⟨hX, hXφ, hXneg⟩, hus⟩ := hball hdist
@@ -90,19 +94,20 @@ theorem _root_.GlobalTheory.UnitaryLog.exists_log_unitary (n : ℕ)
       have hu' := hu
       simp only [Matrix.mul_assoc] at hu' ⊢
       rw [hu', Matrix.nonsing_inv_mul G hG]
-    have hexpφ : NormedSpace.exp (φ (L u)) = NormedSpace.exp (-L u) := by
+    have hexpφ : NormedSpace.exp (φ (L u)) = NormedSpace.exp (- L u) := by
       rw [Matrix.exp_neg, hexp, hinv]
       simp only [φ]
       rw [Matrix.exp_conj' G _ hGu, Matrix.exp_conjTranspose, hexp]
-    have heq : φ (L u) = -L u := by
-      rw [← hXφ, ← hXneg, hexpφ]
-    calc (L u)ᴴ * G + G * L u = G * φ (L u) + G * L u := by
-          simp only [φ]
-          rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv G hG,
-            Matrix.one_mul]
+    have heq : φ (L u) = - L u := by rw [← hXφ, ← hXneg, hexpφ]
+    calc
+      (L u)ᴴ * G + G * L u = G * φ (L u) + G * L u := by
+        simp only [φ]
+        rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv G hG, Matrix.one_mul]
       _ = 0 := by rw [heq, Matrix.mul_neg, neg_add_cancel]
   · intro i j
-    calc ‖L u i j‖ ≤ ‖L u‖ := norm_entry_le_linftyOp_norm _ i j
+    calc
+      ‖L u i j‖
+        ≤ ‖L u‖ := norm_entry_le_linftyOp_norm _ i j
       _ = dist (L u) (L 1) := by rw [hL1, dist_zero_right]
       _ ≤ K * dist u 1 := hK.dist_le_mul u hus 1 hs1
       _ ≤ K * (n * δ) := by

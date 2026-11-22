@@ -4,12 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.SingleMemSubmodule.single_mem :
-    ∀ {K : Type} [inst : Field K] (d : Fin (3 : ℕ) → K),
-    Function.Injective d →
-      ∀ (W : Submodule K (Fin (3 : ℕ) → K)),
-        (∀ v ∈ W, (Matrix.diagonal d).mulVec v ∈ W) →
-          ∀ {v : Fin (3 : ℕ) → K}, v ∈ W → ∀ {i : Fin (3 : ℕ)}, v i ≠ (0 : K) → Pi.single i (1 : K) ∈ W := by
+theorem UpperTheory.Reformulated.B.SingleMemSubmodule.single_mem
+    : ∀ {K : Type} [inst : Field K] (d : Fin (3 : ℕ) → K),
+      Function.Injective d
+        → ∀ (W : Submodule K (Fin (3 : ℕ) → K)),
+          (∀ v ∈ W, (Matrix.diagonal d).mulVec v ∈ W)
+            → ∀ {v : Fin (3 : ℕ) → K},
+              v ∈ W → ∀ {i : Fin (3 : ℕ)}, v i ≠ (0 : K) → Pi.single i (1 : K) ∈ W := by
   intro K _ d hd W hW v hv i hi
   have step : ∀ (c : K), ∀ w ∈ W, (fun l => (d l - c) * w l) ∈ W := by
     intro c w hw
@@ -31,8 +32,9 @@ theorem UpperTheory.Reformulated.B.SingleMemSubmodule.single_mem :
       exact hv
     | insert a s ha ih =>
       have h := step (d a) _ ih
-      have e : (fun l => (∏ j ∈ insert a s, (d l - d j)) * v l)
-          = fun l => (d l - d a) * ((∏ j ∈ s, (d l - d j)) * v l) := by
+      have e
+          : (fun l => (∏ j ∈ insert a s, (d l - d j)) * v l)
+            = fun l => (d l - d a) * ((∏ j ∈ s, (d l - d j)) * v l) := by
         funext l
         rw [Finset.prod_insert ha, mul_assoc]
       rw [e]
@@ -41,11 +43,12 @@ theorem UpperTheory.Reformulated.B.SingleMemSubmodule.single_mem :
     refine mul_ne_zero (Finset.prod_ne_zero_iff.mpr ?_) hi
     intro j hj
     exact sub_ne_zero.mpr fun h => (Finset.ne_of_mem_erase hj) (hd h).symm
-  have h := W.smul_mem ((∏ j ∈ Finset.univ.erase i, (d i - d j)) * v i)⁻¹
-    (iter (Finset.univ.erase i))
-  have e : (Pi.single i (1 : K) : Fin 3 → K)
-      = ((∏ j ∈ Finset.univ.erase i, (d i - d j)) * v i)⁻¹ •
-        (fun l => (∏ j ∈ Finset.univ.erase i, (d l - d j)) * v l) := by
+  have h :=
+    W.smul_mem ((∏ j ∈ Finset.univ.erase i, (d i - d j)) * v i)⁻¹ (iter (Finset.univ.erase i))
+  have e
+      : (Pi.single i (1 : K) : Fin 3 → K)
+        = ((∏ j ∈ Finset.univ.erase i, (d i - d j)) * v i)⁻¹
+          • (fun l => (∏ j ∈ Finset.univ.erase i, (d l - d j)) * v l) := by
     funext l
     rw [Pi.smul_apply, smul_eq_mul]
     by_cases hl : l = i

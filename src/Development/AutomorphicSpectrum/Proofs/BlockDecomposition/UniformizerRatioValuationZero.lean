@@ -12,9 +12,10 @@ open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.Uniformiser
 
-theorem valued_eq_exp_neg_one {F : Type} [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) (a : 𝓞 F) (h1 : a ∈ v.asIdeal) (h2 : a ∉ v.asIdeal ^ 2) :
-    Valued.v (algebraMap F (v.adicCompletion F) (a : F)) = WithZero.exp (-1 : ℤ) := by
+theorem valued_eq_exp_neg_one
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (a : 𝓞 F) (h1 : a ∈ v.asIdeal) (h2 : a ∉ v.asIdeal ^ 2)
+    : Valued.v (algebraMap F (v.adicCompletion F) (a : F)) = WithZero.exp (-1 : ℤ) := by
   have ha0 : a ≠ 0 := by
     rintro rfl
     exact h2 (Submodule.zero_mem _)
@@ -30,20 +31,26 @@ theorem valued_eq_exp_neg_one {F : Type} [Field F] [NumberField F]
   congr 1
   omega
 
-theorem ord_eq_zero_of_valued_eq_one {F : Type} [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)) {x : v.adicCompletion F} (hx : Valued.v x = 1) :
-    GroundTheory.LocalField.ord x = 0 := by
-  have heq : (Valued.v : Valuation (v.adicCompletion F) (WithZero (Multiplicative ℤ))).IsEquiv
-      (ValuativeRel.valuation (v.adicCompletion F)) := ValuativeRel.isEquiv _ _
+theorem ord_eq_zero_of_valued_eq_one
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F))
+    {x : v.adicCompletion F} (hx : Valued.v x = 1)
+    : GroundTheory.LocalField.ord x = 0 := by
+  have heq
+      : (Valued.v : Valuation (v.adicCompletion F) (WithZero (Multiplicative ℤ))).IsEquiv
+        (ValuativeRel.valuation (v.adicCompletion F)) :=
+    ValuativeRel.isEquiv _ _
   have h1 : ValuativeRel.valuation (v.adicCompletion F) x = 1 := heq.eq_one_iff_eq_one.1 hx
   unfold GroundTheory.LocalField.ord
   rw [GroundTheory.LocalField.normalizedValuation_apply, h1, map_one, WithZero.log_one, neg_zero]
 
-theorem ord_ratio_eq_zero : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
-    (ϖ ϖ' : 𝓞 F), ϖ ∈ v.asIdeal → ϖ ∉ v.asIdeal ^ 2 → ϖ' ∈ v.asIdeal → ϖ' ∉ v.asIdeal ^ 2 →
-    ∀ U : (v.adicCompletion F)ˣ, (U : v.adicCompletion F) *
-      algebraMap F (v.adicCompletion F) (ϖ : F) = algebraMap F (v.adicCompletion F) (ϖ' : F) →
-    GroundTheory.LocalField.ord (U : v.adicCompletion F) = 0 := by
+theorem ord_ratio_eq_zero
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (ϖ ϖ' : 𝓞 F),
+      ϖ ∈ v.asIdeal → ϖ ∉ v.asIdeal ^ 2 → ϖ' ∈ v.asIdeal → ϖ' ∉ v.asIdeal ^ 2
+        → ∀ U : (v.adicCompletion F)ˣ,
+          (U : v.adicCompletion F) * algebraMap F (v.adicCompletion F) (ϖ : F)
+              = algebraMap F (v.adicCompletion F) (ϖ' : F)
+            → GroundTheory.LocalField.ord (U : v.adicCompletion F) = 0 := by
   intro F _ _ v ϖ ϖ' h1 h2 h1' h2' U hU
   apply ord_eq_zero_of_valued_eq_one v
   have e1 := valued_eq_exp_neg_one v ϖ h1 h2

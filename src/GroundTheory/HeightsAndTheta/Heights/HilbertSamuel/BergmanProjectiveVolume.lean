@@ -9,8 +9,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MeasureTheory Set Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.A
-  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.CP
+open MeasureTheory Set Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.A GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.CP
 open scoped ComplexConjugate ENNReal ContDiff
 
 noncomputable section
@@ -60,9 +60,9 @@ lemma ae_chartVec_ne (j : Fin (N + 1)) : ∀ᵐ y : Fin N → ℂ, chartVec j y 
     rw [hset, volume_pi]
     exact Measure.pi_eval_preimage_null _ (measure_singleton 0)
 
-theorem setLIntegral_fsMeasure_chartDomain (j : Fin (N + 1)) (g : CP N → ℝ≥0∞) (hg : Measurable g) :
-    ∫⁻ x in chartDomain j, g x ∂fsMeasure N =
-      ∫⁻ y, g (chartInv j y) * ENNReal.ofReal (fsVolumeDensity j y) := by
+theorem setLIntegral_fsMeasure_chartDomain (j : Fin (N + 1)) (g : CP N → ℝ≥0∞) (hg : Measurable g)
+    : ∫⁻ x in chartDomain j, g x ∂fsMeasure N
+      = ∫⁻ y, g (chartInv j y) * ENNReal.ofReal (fsVolumeDensity j y) := by
   have hD : MeasurableSet (chartDomain (N := N) j) := (isOpen_chartDomain j).measurableSet
   rw [fsMeasure, setLIntegral_map hD hg (measurable_chartInv 0), fsChartMeasure,
     setLIntegral_withDensity_eq_setLIntegral_mul _ (measurable_fsVolumeDensity 0).ennreal_ofReal
@@ -70,20 +70,23 @@ theorem setLIntegral_fsMeasure_chartDomain (j : Fin (N + 1)) (g : CP N → ℝ�
       (hD.preimage (measurable_chartInv 0))]
   have hW : chartInv 0 ⁻¹' chartDomain j = {z : Fin N → ℂ | chartVec 0 z j ≠ 0} := rfl
   rw [hW]
-  have hae : (Set.univ : Set (Fin N → ℂ)) =ᵐ[volume]
-      transition 0 j '' {z : Fin N → ℂ | chartVec 0 z j ≠ 0} := by
+  have hae
+      : (Set.univ : Set (Fin N → ℂ)) =ᵐ[volume]
+        transition 0 j '' {z : Fin N → ℂ | chartVec 0 z j ≠ 0} := by
     rw [image_transition]
     filter_upwards [ae_chartVec_ne j] with y hy
     exact ⟨fun _ => hy, fun _ => trivial⟩
   conv_rhs => rw [← setLIntegral_univ]
   rw [setLIntegral_congr hae,
     lintegral_image_eq_lintegral_normSq_det_mul (transition 0 j) _ (isOpen_chartVec_ne 0 j)
-      (fun z hz => analyticAt_transition 0 j hz) (injOn_transition 0 j)]
+      (fun z hz => analyticAt_transition 0 j hz)
+      (injOn_transition 0 j)]
   refine setLIntegral_congr_fun (isOpen_chartVec_ne 0 j).measurableSet fun z hz => ?_
   have h1 : chartInv j (transition 0 j z) = chartInv 0 z :=
     chartInv_chartCoord j (show chartInv 0 z ∈ chartDomain j from hz)
-  have h2 : fsVolumeDensity 0 z =
-      Complex.normSq (jacC (transition 0 j) z).det * fsVolumeDensity j (transition 0 j z) := by
+  have h2
+      : fsVolumeDensity 0 z
+        = Complex.normSq (jacC (transition 0 j) z).det * fsVolumeDensity j (transition 0 j z) := by
     rw [fsVolumeDensity_transition 0 j hz,
       det_fderiv_real_eq_normSq _ z (differentiableAt_transition 0 j hz),
       abs_of_nonneg (Complex.normSq_nonneg _)]
@@ -98,21 +101,21 @@ def fsVolume (N : ℕ) : SmoothVolume (projAtlas N) where
   isProb := inferInstance
   dens := fsVolumeDensity
   smooth (j : Fin (N + 1)) := by
-    have h : fsVolumeDensity (N := N) j =
-        fun z => (N.factorial : ℝ) / (Real.pi ^ N * (1 + normSqSum z) ^ (N + 1)) :=
+    have h
+        : fsVolumeDensity (N := N) j
+          = fun z => (N.factorial : ℝ) / (Real.pi ^ N * (1 + normSqSum z) ^ (N + 1)) :=
       funext fun z => fsVolumeDensity_eq j z
     rw [h]
-    have hs : ContDiff ℝ ∞ (normSqSum (N := N)) := by
-      unfold normSqSum; exact contDiff_normSqSum
-    refine (contDiff_const.div (contDiff_const.mul ((contDiff_const.add hs).pow _))
-      fun z => ?_).contDiffOn
+    have hs : ContDiff ℝ ∞ (normSqSum (N := N)) := by unfold normSqSum; exact contDiff_normSqSum
+    refine (contDiff_const.div (contDiff_const.mul ((contDiff_const.add hs).pow _)) fun z =>
+      ?_).contDiffOn
     have := one_add_normSqSum_pos z
     have := Real.pi_pos
     positivity
   pos (j : Fin (N + 1)) y _ := fsVolumeDensity_pos j y
   chart_lintegral (j : Fin (N + 1)) g hg := by
-    change ∫⁻ x in chartDomain j, g x ∂fsMeasure N =
-      ∫⁻ y in univ, g (chartInv j y) * ENNReal.ofReal (fsVolumeDensity j y)
+    change ∫⁻ x in chartDomain j, g x ∂fsMeasure N
+      = ∫⁻ y in univ, g (chartInv j y) * ENNReal.ofReal (fsVolumeDensity j y)
     rw [setLIntegral_univ]
     exact ProjFS.setLIntegral_fsMeasure_chartDomain j g hg
 

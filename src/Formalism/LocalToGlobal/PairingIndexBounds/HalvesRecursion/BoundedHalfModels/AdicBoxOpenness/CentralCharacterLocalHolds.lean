@@ -11,13 +11,17 @@ open scoped BigOperators nonZeroDivisors
 
 namespace Formalism.L2.PairingIndexBounds.Rec
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta Formalism.L2.PairingIndexBounds.Mv Formalism.L2.Th1.H Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.GL3Theta Formalism.L2.PairingIndexBounds.Mv Formalism.L2.Th1.H
+  Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
 
 theorem phi_injective_holds : PhiInj := by
   intro D cc δ N N' hδ y z h
   have : Nonempty D.what₂.Tau := by
     apply Fintype.card_pos_iff.1
-    rw [FL.card_tau D]; have := D.R.ord_pos; positivity
+    rw [FL.card_tau D]
+    have := D.R.ord_pos
+    positivity
   obtain ⟨τ⟩ := (inferInstance : Nonempty D.what₂.Tau)
   funext i j
   have h1 := congrFun (congrFun (congrFun h τ) i) j
@@ -26,7 +30,7 @@ theorem phi_injective_holds : PhiInj := by
 
 theorem good_duality_holds : GoodDual := by
   intro V _ _ H A B Λ hH hA hB hsum hsd
-  have hanti : ∀ x y : V, altE H y x = -altE H x y := by
+  have hanti : ∀ x y : V, altE H y x = - altE H x y := by
     intro x y
     simp only [altE]
     rw [hH x y]
@@ -57,14 +61,15 @@ theorem equality_off_boundary_holds : EqOffBound := by
   have h1 := hm (π ^ m) (cO D π ^ m) (by rw [← map_pow]; rfl) (Ideal.pow_mem_pow hπ m)
   simpa only [mul_pow] using h1
 
-theorem oSmul (D : D7) {m n : Type} (x : 𝓞 D.host.E) (A : Matrix m n D.host.E) :
-    x • A = (x : D.host.E) • A := by
+theorem oSmul (D : D7) {m n : Type} (x : 𝓞 D.host.E) (A : Matrix m n D.host.E)
+    : x • A = (x : D.host.E) • A := by
   ext i j
   rw [Matrix.smul_apply, Matrix.smul_apply, Algebra.smul_def, smul_eq_mul]
 
 def kE (D : D7) (c : 𝓞 D.host.K) : 𝓞 D.host.E := ⟨((c : D.host.K) : D.host.E), FL.intK D c⟩
 
-theorem kE_mem (D : D7) (cc : Ideal (𝓞 D.host.K)) (c : 𝓞 D.host.K) (hc : c ∈ cc) : kE D c ∈ ccE D cc :=
+theorem kE_mem (D : D7) (cc : Ideal (𝓞 D.host.K)) (c : 𝓞 D.host.K) (hc : c ∈ cc)
+    : kE D c ∈ ccE D cc :=
   Ideal.subset_span ⟨c, hc, rfl⟩
 
 theorem multiplicity_equality_holds : MMeq := by
@@ -72,8 +77,7 @@ theorem multiplicity_equality_holds : MMeq := by
   apply le_antisymm
   · rw [MM, AddSubgroup.closure_le]
     rintro y ⟨c, hc, A, hA, rfl⟩
-    have : ((c : D.host.K) : D.host.E) • A = kE D c • A := by
-      rw [oSmul]; rfl
+    have : ((c : D.host.K) : D.host.E) • A = kE D c • A := by rw [oSmul]; rfl
     rw [this]
     exact Submodule.smul_mem_smul (kE_mem D cc c hc) hA
   · intro y hy
@@ -86,8 +90,10 @@ theorem multiplicity_equality_holds : MMeq := by
         apply AddSubgroup.subset_closure
         refine ⟨c, hc, A, hA, ?_⟩
         rw [oSmul, hxc]
-      | zero => rw [zero_smul]; exact AddSubgroup.zero_mem _
-      | add x₁ x₂ _ _ h1 h2 => rw [add_smul]; exact AddSubgroup.add_mem _ (h1 A hA) (h2 A hA)
+      | zero =>
+        rw [zero_smul]; exact AddSubgroup.zero_mem _
+      | add x₁ x₂ _ _ h1 h2 =>
+        rw [add_smul]; exact AddSubgroup.add_mem _ (h1 A hA) (h2 A hA)
       | smul r x _ h1 =>
         rw [smul_eq_mul, mul_comm, mul_smul]
         exact h1 _ (Submodule.smul_mem _ r hA)
@@ -110,7 +116,13 @@ theorem lattice_equality_map_holds : LaEqMap := by
   · rw [AddSubgroup.closure_le]
     rintro z ⟨y, ⟨c, hc, A, hA, rfl⟩, rfl⟩
     apply AddSubgroup.subset_closure
-    refine ⟨δ * D.host.φ₀ (((c : D.host.K) : D.host.E)), AddSubgroup.subset_closure ⟨c, hc, rfl⟩, A, hA, ?_⟩
+    refine ⟨
+      δ * D.host.φ₀ (((c : D.host.K) : D.host.E)),
+      AddSubgroup.subset_closure ⟨c, hc, rfl⟩,
+      A,
+      hA,
+      ?_
+    ⟩
     funext τ i j
     simp only [Phi, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Pi.smul_apply, smul_eq_mul, embV, tor0,
       Matrix.smul_apply]
@@ -126,8 +138,8 @@ theorem uniformizer_element_holds : UnifElt := by
   have hm : P.asIdeal ^ h ∈ (Ideal (𝓞 D.host.E))⁰ := pow_mem (mem_nonZeroDivisors_of_ne_zero hP0) h
   have hprin : (P.asIdeal ^ h).IsPrincipal := by
     rw [← ClassGroup.mk0_eq_one_iff hm]
-    have : ClassGroup.mk0 (⟨P.asIdeal ^ h, hm⟩ : (Ideal (𝓞 D.host.E))⁰) =
-        ClassGroup.mk0 ⟨P.asIdeal, mem_nonZeroDivisors_of_ne_zero hP0⟩ ^ h := by
+    have : ClassGroup.mk0 (⟨P.asIdeal ^ h, hm⟩ : (Ideal (𝓞 D.host.E))⁰)
+        = ClassGroup.mk0 ⟨P.asIdeal, mem_nonZeroDivisors_of_ne_zero hP0⟩ ^ h := by
       rw [← map_pow, SubmonoidClass.mk_pow]
     rw [this, pow_card_eq_one]
   obtain ⟨π, hπ⟩ := hprin
@@ -159,7 +171,8 @@ theorem uniformizer_element_holds : UnifElt := by
     rw [Ideal.mem_comap] at ha'
     apply hbP
     have hb : b = cO D a := Subtype.ext (hab.trans rfl)
-    rw [hb]; exact ha'
+    rw [hb]
+    exact ha'
 
 theorem ccE_ne_bot (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : IsCurveIdeal D cc) : ccE D cc ≠ ⊥ := by
   obtain ⟨c, hc, hc0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hcc.1
@@ -169,8 +182,8 @@ theorem ccE_ne_bot (D : D7) (cc : Ideal (𝓞 D.host.K)) (hcc : IsCurveIdeal D c
   apply hc0
   have h2 : ((c : D.host.K) : D.host.E) = 0 := congrArg Subtype.val this
   set_option synthInstance.maxHeartbeats 200000 in
-    have h3 : (c : D.host.K) = 0 := by exact_mod_cast h2
-    exact_mod_cast h3
+  have h3 : (c : D.host.K) = 0 := by exact_mod_cast h2
+  exact_mod_cast h3
 
 theorem central_character_local_holds : CcLoc := by
   intro D cc hcc P
@@ -195,9 +208,11 @@ theorem central_character_local_holds : CcLoc := by
   obtain ⟨o, ho⟩ := Ideal.mem_span_singleton'.1 this
   exact ⟨o, by rw [← ho, mul_comm]⟩
 
-theorem mem_homL (D : D7) {N N' : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
-    (L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)) (A : Matrix (Fin N') (Fin N) D.host.E) :
-    A ∈ homL D L L' ↔ ∀ x ∈ L, A.mulVec x ∈ L' := by
+theorem mem_homL
+    (D : D7)
+    {N N' : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
+    (L' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)) (A : Matrix (Fin N') (Fin N) D.host.E)
+    : A ∈ homL D L L' ↔ ∀ x ∈ L, A.mulVec x ∈ L' := by
   constructor
   · intro hA
     induction hA using Submodule.span_induction with
@@ -215,7 +230,8 @@ theorem pairing_bound_holds : YYBound := by
     intro x hx
     have : ((w * w) • A).mulVec x = w • (A.mulVec (w • x)) := by
       rw [Matrix.smul_mulVec, Matrix.mulVec_smul, mul_smul]
-    rw [this]; exact hL' _ (hA _ (hL x hx))
+    rw [this]
+    exact hL' _ (hA _ (hL x hx))
   induction hy using Submodule.span_induction with
   | mem B hB =>
     obtain ⟨a, ha, A, hA, rfl⟩ := hB
@@ -225,8 +241,12 @@ theorem pairing_bound_holds : YYBound := by
   | add _ _ _ _ h1 h2 => rw [smul_add]; exact Submodule.add_mem _ h1 h2
   | smul c B _ h1 => rw [smul_comm]; exact Submodule.smul_mem _ c h1
 
-theorem mem_sLat (D : D7) {N : ℕ} (u : D.host.E) (hu : u ≠ 0) (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
-    (x : Fin N → D.host.E) : x ∈ sLat D u L ↔ u⁻¹ • x ∈ L := by
+theorem mem_sLat
+    (D : D7)
+    {N : ℕ}
+    (u : D.host.E) (hu : u ≠ 0)
+    (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)) (x : Fin N → D.host.E)
+    : x ∈ sLat D u L ↔ u⁻¹ • x ∈ L := by
   constructor
   · rintro ⟨y, hy, rfl⟩
     simp only [LinearMap.coe_restrictScalars, LinearMap.lsmul_apply]
@@ -252,18 +272,18 @@ theorem unipotent_pairing_holds : UYY := by
     refine ⟨a • (u⁻¹ • A), ⟨a, ha, u⁻¹ • A, (hhom A).1 hA, rfl⟩, ?_⟩
     rw [smul_comm u a, smul_smul u u⁻¹, mul_inv_cancel₀ hu, one_smul]
   · rintro ⟨_, ⟨a, ha, A, hA, rfl⟩, rfl⟩
-    refine ⟨a, ha, u • A, (hhom _).2 (by rwa [smul_smul, inv_mul_cancel₀ hu, one_smul]), smul_comm _ _ _⟩
+    refine
+      ⟨a, ha, u • A, (hhom _).2 (by rwa [smul_smul, inv_mul_cancel₀ hu, one_smul]), smul_comm _ _ _⟩
 
 theorem admissible_unipotent_holds : UAdm := by
   intro D N N' L₀ L₀' u hu h
   let _ := D.host.cmStar
   have hu0 : u ≠ 0 := by rintro rfl; simp at hu
-  have hstar : star u = u⁻¹ := by
-    rw [CU.star_conj D u]; exact eq_inv_of_mul_eq_one_right hu
+  have hstar : star u = u⁻¹ := by rw [CU.star_conj D u]; exact eq_inv_of_mul_eq_one_right hu
   obtain ⟨h1, h2, h3, ⟨hfg, hspan, hsd⟩⟩ := h
   refine ⟨h1, h2, h3, hfg.map _, ?_, ?_⟩
-  · have : ((sLat D u L₀' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)) : Set (Fin N' → D.host.E)) =
-        (LinearMap.lsmul D.host.E (Fin N' → D.host.E) u) '' (L₀' : Set (Fin N' → D.host.E)) := by
+  · have : ((sLat D u L₀' : Submodule (𝓞 D.host.E) (Fin N' → D.host.E)) : Set (Fin N' → D.host.E))
+        = (LinearMap.lsmul D.host.E (Fin N' → D.host.E) u) '' (L₀' : Set (Fin N' → D.host.E)) := by
       simp [sLat]
     rw [this, Submodule.span_image, hspan, Submodule.map_top, LinearMap.range_eq_top]
     intro z
@@ -275,11 +295,13 @@ theorem admissible_unipotent_holds : UAdm := by
       rw [mem_sLat D u hu0] at hx'
       have := hy _ hx'
       convert this using 1
-      simp only [Formalism.BasicNotions.stdH, Pi.smul_apply, smul_eq_mul, star_mul', star_inv₀, hstar, inv_inv]
+      simp only [Formalism.BasicNotions.stdH, Pi.smul_apply, smul_eq_mul, star_mul', star_inv₀,
+        hstar, inv_inv]
       refine Finset.sum_congr rfl fun i _ => ?_
       field_simp
     · intro hy x hx
-      have := hy (u • x) ((mem_sLat D u hu0 L₀' _).2 (by rwa [smul_smul, inv_mul_cancel₀ hu0, one_smul]))
+      have :=
+        hy (u • x) ((mem_sLat D u hu0 L₀' _).2 (by rwa [smul_smul, inv_mul_cancel₀ hu0, one_smul]))
       convert this using 1
       simp only [Formalism.BasicNotions.stdH, Pi.smul_apply, smul_eq_mul, star_mul', hstar]
       refine Finset.sum_congr rfl fun i _ => ?_

@@ -10,13 +10,12 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem herb_relIndex_map_range {A : Type} [CommGroup A] (f : A →* A) (H : Subgroup A) :
-    (H.map f).relIndex f.range = (H ⊔ f.ker).index := by
+theorem herb_relIndex_map_range {A : Type} [CommGroup A] (f : A →* A) (H : Subgroup A)
+    : (H.map f).relIndex f.range = (H ⊔ f.ker).index := by
   rw [← Subgroup.comap_map_eq, Subgroup.index_comap]
 
-theorem herb_lattice {A : Type} [CommGroup A] (B C K : Subgroup A) (hCK : C ≤ K) :
-    (C ⊔ B).index * Nat.card ↥(B ⊓ K) =
-      (B ⊔ K).index * C.relIndex K * Nat.card ↥(C ⊓ B) := by
+theorem herb_lattice {A : Type} [CommGroup A] (B C K : Subgroup A) (hCK : C ≤ K)
+    : (C ⊔ B).index * Nat.card ↥(B ⊓ K) = (B ⊔ K).index * C.relIndex K * Nat.card ↥(C ⊓ B) := by
   have h1 : (C ⊔ B).relIndex (B ⊔ K) * (B ⊔ K).index = (C ⊔ B).index :=
     Subgroup.relIndex_mul_index (sup_le (hCK.trans le_sup_right) le_sup_left)
   have h2 : (C ⊔ B).relIndex (B ⊔ K) = (C ⊔ B ⊓ K).relIndex K := by
@@ -29,16 +28,16 @@ theorem herb_lattice {A : Type} [CommGroup A] (B C K : Subgroup A) (hCK : C ≤ 
     Subgroup.relIndex_mul_relIndex _ _ _ le_sup_left (sup_le hCK inf_le_right)
   have h4 : C.relIndex (C ⊔ B ⊓ K) = C.relIndex (B ⊓ K) := Subgroup.relIndex_sup_left _ _
   have h5 : Nat.card ↥(C ⊓ B) * C.relIndex (B ⊓ K) = Nat.card ↥(B ⊓ K) := by
-    have e : C ⊓ (B ⊓ K) = C ⊓ B := by
-      rw [inf_comm B K, ← inf_assoc, inf_eq_left.2 hCK]
+    have e : C ⊓ (B ⊓ K) = C ⊓ B := by rw [inf_comm B K, ← inf_assoc, inf_eq_left.2 hCK]
     rw [← Subgroup.inf_relIndex_right C, e, ← Subgroup.relIndex_bot_left,
       ← Subgroup.relIndex_bot_left]
     exact Subgroup.relIndex_mul_relIndex _ _ _ bot_le (e ▸ inf_le_right)
   rw [← h1, h2, ← h3, h4, ← h5]
   ring
 
-theorem herb_nrm_apply_sigma {A : Type} [CommGroup A] (σ : A →* A) (p : ℕ)
-    (h : ∀ a, σ^[p] a = a) (a : A) : nrm σ p (σ a) = nrm σ p a := by
+theorem herb_nrm_apply_sigma
+    {A : Type} [CommGroup A] (σ : A →* A) (p : ℕ) (h : ∀ a, σ^[p] a = a) (a : A)
+    : nrm σ p (σ a) = nrm σ p a := by
   have e1 := Finset.prod_range_succ (fun i => σ^[i] a) p
   have e2 := Finset.prod_range_succ' (fun i => σ^[i] a) p
   rw [e1] at e2
@@ -46,12 +45,18 @@ theorem herb_nrm_apply_sigma {A : Type} [CommGroup A] (σ : A →* A) (p : ℕ)
   rw [nrm_apply, nrm_apply]
   exact (mul_right_cancel e2).symm
 
-theorem herb_nrm_of_fix {A : Type} [CommGroup A] (σ : A →* A) (p : ℕ) (b : A)
-    (hb : b ∈ fix σ) : nrm σ p b = b ^ p := by
+theorem herb_nrm_of_fix {A : Type} [CommGroup A] (σ : A →* A) (p : ℕ) (b : A) (hb : b ∈ fix σ)
+    : nrm σ p b = b ^ p := by
   rw [nrm_apply, Finset.prod_congr rfl (fun i _ => Function.iterate_fixed ((mem_fix σ b).1 hb) i)]
   simp
 
-theorem herb_index_identity : ∀ (p : ℕ) (A : Type) [CommGroup A] (σ : A →* A), (∀ a, σ^[p] a = a) → (nrm σ p).range.relIndex (fix σ) * ((dif σ).range.map (dif σ)).relIndex (dif σ).range * pTor p (fix σ) = pIdx p (fix σ) * (dif σ).range.relIndex (nrm σ p).ker * Nat.card ↥((dif σ).range ⊓ fix σ) := by
+theorem herb_index_identity
+    : ∀ (p : ℕ) (A : Type) [CommGroup A] (σ : A →* A),
+      (∀ a, σ^[p] a = a)
+        → (nrm σ p).range.relIndex (fix σ) * ((dif σ).range.map (dif σ)).relIndex (dif σ).range
+            * pTor p (fix σ)
+          = pIdx p (fix σ) * (dif σ).range.relIndex (nrm σ p).ker
+            * Nat.card ↥((dif σ).range ⊓ fix σ) := by
   intro p A _ σ h
   have hker : (dif σ).ker = fix σ := by
     ext a
@@ -80,8 +85,8 @@ theorem herb_index_identity : ∀ (p : ℕ) (A : Type) [CommGroup A] (σ : A →
     rw [Subgroup.mem_inf, MonoidHom.mem_ker]
     refine and_congr_right fun hx => ?_
     rw [herb_nrm_of_fix σ p x hx]
-  have hidx : pIdx p (fix σ) =
-      (fix σ ⊔ (nrm σ p).ker).index * (nrm σ p).range.relIndex (fix σ) := by
+  have hidx
+      : pIdx p (fix σ) = (fix σ ⊔ (nrm σ p).ker).index * (nrm σ p).range.relIndex (fix σ) := by
     unfold pIdx
     rw [hpow, ← herb_relIndex_map_range]
     exact (Subgroup.relIndex_mul_relIndex _ _ _ (Subgroup.map_le_range _ _) hNB).symm

@@ -11,14 +11,15 @@ public import GroundTheory.AutomorphicForms.Satake
 
 open MeasureTheory GroundTheory.Automorphic UpperTheory.ConvolutionTheory.C
 
-theorem UpperTheory.ConvolutionTheory.L1.sphRank :
-    UpperTheory.ConvolutionTheory.L1.SphRank := by
+theorem UpperTheory.ConvolutionTheory.L1.sphRank : UpperTheory.ConvolutionTheory.L1.SphRank := by
   intro K _ _ n μ _ V hV w
   letI : MeasurableSpace (Gw n w) := borel _
   haveI : BorelSpace (Gw n w) := ⟨rfl⟩
   obtain ⟨⟨σ, hσ⟩, -, -⟩ := UpperTheory.ConvolutionTheory.C.occursBasics K n μ V w Measure.haar hV
-  have hmem : ∀ x : σ.V, (∀ g ∈ GLnLocal.integralGL (w.adicCompletion K) n,
-      σ.ρ g x = (1 : Gw n w → ℂ) g • x) → x ∈ fixedVectors σ.ρ (GLnLocal.integralGL (w.adicCompletion K) n) := by
+  have hmem
+      : ∀ x : σ.V,
+        (∀ g ∈ GLnLocal.integralGL (w.adicCompletion K) n, σ.ρ g x = (1 : Gw n w → ℂ) g • x)
+          → x ∈ fixedVectors σ.ρ (GLnLocal.integralGL (w.adicCompletion K) n) := by
     intro x hx
     exact fun g hg => by simpa using hx g hg
   refine UpperTheory.ConvolutionTheory.L1.lineRank K n μ V hV w σ hσ _ 1

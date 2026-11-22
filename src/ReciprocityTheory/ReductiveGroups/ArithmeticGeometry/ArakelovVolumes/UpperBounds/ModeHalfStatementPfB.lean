@@ -8,18 +8,19 @@ namespace ReciprocityTheory.ChartRestriction.G.AR.Up
 
 namespace ModeHalfB
 
-open Matrix NumberField Complex ReciprocityTheory.ChartRestriction.G.FD Topology Filter ModeHalfA ReciprocityTheory.ChartRestriction.G.AR.Inst
-  ReciprocityTheory.L2DbarEstimates
+open Matrix NumberField Complex ReciprocityTheory.ChartRestriction.G.FD Topology Filter ModeHalfA
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates
 open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
 def Nid (r : ℕ) : Fin r → Fin r → ℂ := fun a b => if a = b then 1 else 0
 
-theorem chosenFrame_isOrthogonal (X : Data E r) : IsOrth X (x0F X) := fun τ => (X.signature τ).choose_spec.2
+theorem chosenFrame_isOrthogonal (X : Data E r) : IsOrth X (x0F X) := fun τ =>
+  (X.signature τ).choose_spec.2
 
-private theorem sum_castLE_lemma {p0 : ℕ} (hp : p0 ≤ r) (f : Fin r → ℝ) :
-    ∑ a : Fin p0, f (Fin.castLE hp a) = ∑ k : Fin r, if (k : ℕ) < p0 then f k else 0 := by
+private theorem sum_castLE_lemma {p0 : ℕ} (hp : p0 ≤ r) (f : Fin r → ℝ)
+    : ∑ a : Fin p0, f (Fin.castLE hp a) = ∑ k : Fin r, if (k : ℕ) < p0 then f k else 0 := by
   rw [← Finset.sum_filter]
   refine Finset.sum_bij (fun a _ => Fin.castLE hp a) ?_ ?_ ?_ ?_
   · intro a _
@@ -32,8 +33,8 @@ private theorem sum_castLE_lemma {p0 : ℕ} (hp : p0 ≤ r) (f : Fin r → ℝ) 
   · intro a _
     rfl
 
-theorem Ms_id (X : Data E r) (τ : X.Ψ) (v : Fin r → ℂ) :
-    Ms X.p0 X.p0_le (Nid r) v = ∑ k, ‖v k‖ ^ 2 := by
+theorem Ms_id (X : Data E r) (τ : X.Ψ) (v : Fin r → ℂ)
+    : Ms X.p0 X.p0_le (Nid r) v = ∑ k, ‖v k‖ ^ 2 := by
   have hA : Ag X.p0 X.p0_le (Nid r) = 1 := by
     ext a b
     simp only [Ag, Matrix.of_apply, sf, cl, Nid, Matrix.one_apply]
@@ -41,7 +42,8 @@ theorem Ms_id (X : Data E r) (τ : X.Ψ) (v : Fin r → ℂ) :
     · have hs : sgn X.p0 ((Fin.castLE X.p0_le a : Fin r) : ℕ) = 1 := by simp [sgn, a.2]
       by_cases hab : a = b
       · subst hab; simp [hs, sgn, a.2]
-      · have : Fin.castLE X.p0_le a ≠ Fin.castLE X.p0_le b := fun h => hab (Fin.castLE_injective X.p0_le h)
+      · have : Fin.castLE X.p0_le a ≠ Fin.castLE X.p0_le b := fun h =>
+          hab (Fin.castLE_injective X.p0_le h)
         simp [hab, this]
     · intro k _ hk; simp [hk]
     · simp
@@ -53,9 +55,10 @@ theorem Ms_id (X : Data E r) (τ : X.Ψ) (v : Fin r → ℂ) :
     · intro k _ hk
       simp [hk]
     · simp
-  have hin : (∑ a : Fin X.p0, ∑ b : Fin X.p0, sf X.p0 v (cl (Nid r) (Fin.castLE X.p0_le a)) *
-      (1 : Matrix (Fin X.p0) (Fin X.p0) ℂ) a b * conj (sf X.p0 v (cl (Nid r) (Fin.castLE X.p0_le b)))) =
-      ∑ a : Fin X.p0, ((Complex.normSq (v (Fin.castLE X.p0_le a)) : ℝ) : ℂ) := by
+  have hin
+      : (∑ a : Fin X.p0, ∑ b : Fin X.p0, sf X.p0 v (cl (Nid r) (Fin.castLE X.p0_le a)) *
+          (1 : Matrix (Fin X.p0) (Fin X.p0) ℂ) a b * conj (sf X.p0 v (cl (Nid r) (Fin.castLE X.p0_le b))))
+        = ∑ a : Fin X.p0, ((Complex.normSq (v (Fin.castLE X.p0_le a)) : ℝ) : ℂ) := by
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [Finset.sum_eq_single a]
     · rw [Matrix.one_apply_eq, mul_one, hsf, map_mul, Complex.conj_ofReal]
@@ -73,28 +76,31 @@ theorem Ms_id (X : Data E r) (τ : X.Ψ) (v : Fin r → ℂ) :
   simp only [Ms, hA, inv_one]
   rw [hin, hvv, Complex.re_sum]
   simp only [Complex.ofReal_re]
-  rw [sum_castLE_lemma X.p0_le (fun k => Complex.normSq (v k)), Finset.mul_sum, ← Finset.sum_sub_distrib]
+  rw [sum_castLE_lemma X.p0_le (fun k => Complex.normSq (v k)), Finset.mul_sum,
+    ← Finset.sum_sub_distrib]
   simp only [Complex.sq_norm]
   refine Finset.sum_congr rfl fun k _ => ?_
   simp only [sgn]
   split_ifs <;> ring
 
-theorem sf_smul_left (p0 : ℕ) (c : ℝ) (α β : Fin r → ℂ) :
-    sf p0 ((c : ℂ) • α) β = c * sf p0 α β := by
+theorem sf_smul_left (p0 : ℕ) (c : ℝ) (α β : Fin r → ℂ)
+    : sf p0 ((c : ℂ) • α) β = c * sf p0 α β := by
   simp only [sf, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem sf_smul_right (p0 : ℕ) (c : ℝ) (α β : Fin r → ℂ) :
-    sf p0 α ((c : ℂ) • β) = c * sf p0 α β := by
+theorem sf_smul_right (p0 : ℕ) (c : ℝ) (α β : Fin r → ℂ)
+    : sf p0 α ((c : ℂ) • β) = c * sf p0 α β := by
   simp only [sf, Pi.smul_apply, smul_eq_mul, map_mul, Complex.conj_ofReal, Finset.mul_sum]
   exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem Ms_smul (p0 : ℕ) (hp : p0 ≤ r) (N : Fin r → Fin r → ℂ) (c : ℝ) (v : Fin r → ℂ) :
-    Ms p0 hp N ((c : ℂ) • v) = c ^ 2 * Ms p0 hp N v := by
-  have h1 : (∑ a : Fin p0, ∑ b : Fin p0, sf p0 ((c : ℂ) • v) (cl N (Fin.castLE hp a)) *
-      (Ag p0 hp N)⁻¹ a b * conj (sf p0 ((c : ℂ) • v) (cl N (Fin.castLE hp b)))) =
-      ((c ^ 2 : ℝ) : ℂ) * ∑ a : Fin p0, ∑ b : Fin p0, sf p0 v (cl N (Fin.castLE hp a)) *
-        (Ag p0 hp N)⁻¹ a b * conj (sf p0 v (cl N (Fin.castLE hp b))) := by
+theorem Ms_smul (p0 : ℕ) (hp : p0 ≤ r) (N : Fin r → Fin r → ℂ) (c : ℝ) (v : Fin r → ℂ)
+    : Ms p0 hp N ((c : ℂ) • v) = c ^ 2 * Ms p0 hp N v := by
+  have h1
+      : (∑ a : Fin p0, ∑ b : Fin p0, sf p0 ((c : ℂ) • v) (cl N (Fin.castLE hp a)) *
+          (Ag p0 hp N)⁻¹ a b * conj (sf p0 ((c : ℂ) • v) (cl N (Fin.castLE hp b))))
+        = ((c ^ 2 : ℝ) : ℂ)
+          * ∑ a : Fin p0, ∑ b : Fin p0, sf p0 v (cl N (Fin.castLE hp a)) *
+            (Ag p0 hp N)⁻¹ a b * conj (sf p0 v (cl N (Fin.castLE hp b))) := by
     simp only [sf_smul_left, map_mul, Complex.conj_ofReal, Finset.mul_sum]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
     push_cast
@@ -107,27 +113,36 @@ theorem Ms_smul (p0 : ℕ) (hp : p0 ≤ r) (N : Fin r → Fin r → ℂ) (c : �
   rw [h1, h2, Complex.re_ofReal_mul, Complex.re_ofReal_mul]
   ring
 
-noncomputable def Mt (p0 : ℕ) (hp : p0 ≤ r) (q : (Fin r → ℂ) × (Fin r → Fin r → ℂ) × Matrix (Fin p0) (Fin p0) ℂ) : ℝ :=
+noncomputable def Mt
+    (p0 : ℕ) (hp : p0 ≤ r) (q : (Fin r → ℂ) × (Fin r → Fin r → ℂ) × Matrix (Fin p0) (Fin p0) ℂ)
+    : ℝ :=
   2 * (∑ a : Fin p0, ∑ b : Fin p0, sf p0 q.1 (cl q.2.1 (Fin.castLE hp a)) * q.2.2 a b *
-    conj (sf p0 q.1 (cl q.2.1 (Fin.castLE hp b)))).re - (sf p0 q.1 q.1).re
+        conj (sf p0 q.1 (cl q.2.1 (Fin.castLE hp b)))).re
+    - (sf p0 q.1 q.1).re
 
-private theorem continuous_sf {T : Type*} [TopologicalSpace T] (p0 : ℕ) {f g : T → Fin r → ℂ}
-    (hf : Continuous f) (hg : Continuous g) : Continuous fun x => sf p0 (f x) (g x) := by
+private theorem continuous_sf
+    {T : Type*} [TopologicalSpace T]
+    (p0 : ℕ)
+    {f g : T → Fin r → ℂ} (hf : Continuous f) (hg : Continuous g)
+    : Continuous fun x => sf p0 (f x) (g x) := by
   simp only [sf]
   exact continuous_finsetSum _ fun k _ =>
     (continuous_const.mul ((continuous_apply k).comp hf)).mul
       (Complex.continuous_conj.comp ((continuous_apply k).comp hg))
 
 theorem Mt_cont (p0 : ℕ) (hp : p0 ≤ r) : Continuous (Mt p0 hp) := by
-  have hc : ∀ c : Fin r, Continuous fun q : (Fin r → ℂ) × (Fin r → Fin r → ℂ) ×
-      Matrix (Fin p0) (Fin p0) ℂ => sf p0 q.1 (cl q.2.1 c) := fun c =>
+  have hc
+      : ∀ c : Fin r,
+        Continuous fun q : (Fin r → ℂ) × (Fin r → Fin r → ℂ) × Matrix (Fin p0) (Fin p0) ℂ =>
+          sf p0 q.1 (cl q.2.1 c) := fun c =>
     continuous_sf p0 continuous_fst
-      (continuous_pi fun k => (continuous_apply c).comp ((continuous_apply k).comp continuous_snd.fst))
+      (continuous_pi fun k =>
+        (continuous_apply c).comp ((continuous_apply k).comp continuous_snd.fst))
   unfold Mt
   exact (continuous_const.mul (Complex.continuous_re.comp (continuous_finsetSum _ fun a _ =>
-    continuous_finsetSum _ fun b _ =>
-      ((hc _).mul ((continuous_apply b).comp ((continuous_apply a).comp continuous_snd.snd))).mul
-        (Complex.continuous_conj.comp (hc _))))).sub
+      continuous_finsetSum _ fun b _ =>
+        ((hc _).mul ((continuous_apply b).comp ((continuous_apply a).comp continuous_snd.snd))).mul
+          (Complex.continuous_conj.comp (hc _))))).sub
     (Complex.continuous_re.comp (continuous_sf p0 continuous_fst continuous_fst))
 
 theorem Ag_cont (p0 : ℕ) (hp : p0 ≤ r) : Continuous (Ag p0 hp) := by
@@ -148,8 +163,8 @@ theorem Ag_Nid (p0 : ℕ) (hp : p0 ≤ r) : Ag p0 hp (Nid r) = 1 := by
   · intro k _ hk; simp [hk]
   · simp
 
-theorem Ms_contAt (p0 : ℕ) (hp : p0 ≤ r) (v0 : Fin r → ℂ) :
-    ContinuousAt (fun p : (Fin r → Fin r → ℂ) × (Fin r → ℂ) => Ms p0 hp p.1 p.2) (Nid r, v0) := by
+theorem Ms_contAt (p0 : ℕ) (hp : p0 ≤ r) (v0 : Fin r → ℂ)
+    : ContinuousAt (fun p : (Fin r → Fin r → ℂ) × (Fin r → ℂ) => Ms p0 hp p.1 p.2) (Nid r, v0) := by
   have hinv : ContinuousAt (fun M : Matrix (Fin p0) (Fin p0) ℂ => M⁻¹) (Ag p0 hp (Nid r)) := by
     rw [Ag_Nid]
     apply continuousAt_matrix_inv
@@ -158,13 +173,16 @@ theorem Ms_contAt (p0 : ℕ) (hp : p0 ≤ r) (v0 : Fin r → ℂ) :
     rwa [Units.val_one] at this
   have hAg : ContinuousAt (fun p : (Fin r → Fin r → ℂ) × (Fin r → ℂ) => Ag p0 hp p.1) (Nid r, v0) :=
     ((Ag_cont p0 hp).comp continuous_fst).continuousAt
-  have h1 : ContinuousAt (fun p : (Fin r → Fin r → ℂ) × (Fin r → ℂ) =>
-      ((p.2, p.1, (Ag p0 hp p.1)⁻¹) : (Fin r → ℂ) × (Fin r → Fin r → ℂ) × Matrix (Fin p0) (Fin p0) ℂ))
+  have h1 : ContinuousAt
+      (fun p : (Fin r → Fin r → ℂ) × (Fin r → ℂ) =>
+        ((p.2, p.1, (Ag p0 hp p.1)⁻¹)
+          : (Fin r → ℂ) × (Fin r → Fin r → ℂ) × Matrix (Fin p0) (Fin p0) ℂ))
       (Nid r, v0) :=
-    continuous_snd.continuousAt.prodMk
-      (continuous_fst.continuousAt.prodMk (ContinuousAt.comp_of_eq hinv hAg rfl))
-  have heq : (fun p : (Fin r → Fin r → ℂ) × (Fin r → ℂ) => Ms p0 hp p.1 p.2) =
-      fun p => Mt p0 hp (p.2, p.1, (Ag p0 hp p.1)⁻¹) := by
+    continuous_snd.continuousAt.prodMk (continuous_fst.continuousAt.prodMk (ContinuousAt.comp_of_eq
+      hinv hAg rfl))
+  have heq
+      : (fun p : (Fin r → Fin r → ℂ) × (Fin r → ℂ) => Ms p0 hp p.1 p.2)
+        = fun p => Mt p0 hp (p.2, p.1, (Ag p0 hp p.1)⁻¹) := by
     funext p
     simp only [Ms, Mt]
   rw [heq]
@@ -173,9 +191,9 @@ theorem Ms_contAt (p0 : ℕ) (hp : p0 ≤ r) (v0 : Fin r → ℂ) :
 theorem Ms_zero (p0 : ℕ) (hp : p0 ≤ r) (N : Fin r → Fin r → ℂ) : Ms p0 hp N 0 = 0 := by
   simp [Ms, sf]
 
-theorem Ms_unif (X : Data E r) (τ : X.Ψ) {κ : ℝ} (hκ : 1 < κ) :
-    ∀ᶠ N in 𝓝 (Nid r), ∀ v : Fin r → ℂ, κ⁻¹ * ∑ k, ‖v k‖ ^ 2 ≤ Ms X.p0 X.p0_le N v ∧
-      Ms X.p0 X.p0_le N v ≤ κ * ∑ k, ‖v k‖ ^ 2 := by
+theorem Ms_unif (X : Data E r) (τ : X.Ψ) {κ : ℝ} (hκ : 1 < κ)
+    : ∀ᶠ N in 𝓝 (Nid r), ∀ v : Fin r → ℂ, κ⁻¹ * ∑ k, ‖v k‖ ^ 2 ≤ Ms X.p0 X.p0_le N v ∧
+        Ms X.p0 X.p0_le N v ≤ κ * ∑ k, ‖v k‖ ^ 2 := by
   set S : Set (Fin r → ℂ) := {v | ∑ k, ‖v k‖ ^ 2 = 1} with hS
   have hScont : Continuous fun v : Fin r → ℂ => ∑ k, ‖v k‖ ^ 2 :=
     continuous_finsetSum _ fun k _ => ((continuous_apply k).norm).pow 2
@@ -188,11 +206,12 @@ theorem Ms_unif (X : Data E r) (τ : X.Ψ) {κ : ℝ} (hκ : 1 < κ) :
     have h1 : ‖v k‖ ^ 2 ≤ 1 := by
       have hv' : ∑ k, ‖v k‖ ^ 2 = 1 := hv
       rw [← hv']
-      exact Finset.single_le_sum (f := fun k => ‖v k‖ ^ 2) (fun i _ => sq_nonneg _)
-        (Finset.mem_univ k)
+      exact
+        Finset.single_le_sum (f := fun k => ‖v k‖ ^ 2) (fun i _ => sq_nonneg _) (Finset.mem_univ k)
     nlinarith [norm_nonneg (v k)]
-  have hev : ∀ᶠ N in 𝓝 (Nid r), ∀ v ∈ S,
-      κ⁻¹ < Ms X.p0 X.p0_le N v ∧ Ms X.p0 X.p0_le N v < κ := by
+  have hev
+      : ∀ᶠ N in 𝓝 (Nid r), ∀ v ∈ S,
+        κ⁻¹ < Ms X.p0 X.p0_le N v ∧ Ms X.p0 X.p0_le N v < κ := by
     apply hSc.eventually_forall_of_forall_eventually
     intro v0 hv0
     have hc := Ms_contAt X.p0 X.p0_le v0
@@ -209,8 +228,8 @@ theorem Ms_unif (X : Data E r) (τ : X.Ψ) {κ : ℝ} (hκ : 1 < κ) :
   by_cases hv : ∑ k, ‖v k‖ ^ 2 = 0
   · have hv0 : v = 0 := by
       funext k
-      have h := (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => sq_nonneg ‖v i‖)).mp hv k
-        (Finset.mem_univ k)
+      have h :=
+        (Finset.sum_eq_zero_iff_of_nonneg (fun i _ => sq_nonneg ‖v i‖)).mp hv k (Finset.mem_univ k)
       simpa using h
     subst hv0
     simp [Ms_zero]
@@ -229,9 +248,9 @@ theorem Ms_unif (X : Data E r) (τ : X.Ψ) {κ : ℝ} (hκ : 1 < κ) :
       simp only [hk, ← Finset.mul_sum, ← hss]
       field_simp
     have hvu : v = ((s : ℝ) : ℂ) • u := by
-      rw [hu, smul_smul, ← Complex.ofReal_mul, mul_inv_cancel₀ hs0.ne', Complex.ofReal_one, one_smul]
-    have hMs : Ms X.p0 X.p0_le N v = s ^ 2 * Ms X.p0 X.p0_le N u := by
-      rw [hvu, Ms_smul]
+      rw [hu, smul_smul, ← Complex.ofReal_mul, mul_inv_cancel₀ hs0.ne', Complex.ofReal_one,
+        one_smul]
+    have hMs : Ms X.p0 X.p0_le N v = s ^ 2 * Ms X.p0 X.p0_le N u := by rw [hvu, Ms_smul]
     obtain ⟨h1, h2⟩ := hN u huS
     rw [hMs, ← hss]
     have hs2 : 0 < s ^ 2 := pow_pos hs0 2

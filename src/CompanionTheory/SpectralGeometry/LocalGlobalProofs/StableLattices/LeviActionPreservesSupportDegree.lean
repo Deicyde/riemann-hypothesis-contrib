@@ -15,11 +15,21 @@ open CompanionTheory.RgExh.U
 
 variable {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem cre_ann_ne (i k : Pos n) (x : Cn n V) (A : Finset (Pos n))
-    (h : (cre k * ann i : Module.End ℂ (Cn n V)) x A ≠ 0) :
-    k ∈ A ∧ i ∉ A.erase k ∧ x (insert i (A.erase k)) ≠ 0 := by
-  change (if k ∈ A then sg k A • (if i ∈ A.erase k then 0 else
-    sg i (A.erase k) • x (insert i (A.erase k))) else 0) ≠ 0 at h
+theorem cre_ann_ne
+    (i k : Pos n) (x : Cn n V) (A : Finset (Pos n))
+    (h : (cre k * ann i : Module.End ℂ (Cn n V)) x A ≠ 0)
+    : k ∈ A ∧ i ∉ A.erase k ∧ x (insert i (A.erase k)) ≠ 0 := by
+  change
+      (if k ∈ A then
+         sg k A
+           • (if i ∈ A.erase k then
+                0
+              else
+                sg i (A.erase k) • x (insert i (A.erase k)))
+       else
+         0)
+        ≠ 0
+    at h
   by_cases hk : k ∈ A
   · by_cases hi : i ∈ A.erase k
     · rw [if_pos hk, if_pos hi, smul_zero] at h
@@ -30,9 +40,11 @@ theorem cre_ann_ne (i k : Pos n) (x : Cn n V) (A : Finset (Pos n))
   · rw [if_neg hk] at h
     exact absurd rfl h
 
-theorem lF_ne (E : Fin n → Fin n → Module.End ℂ V) (p q : Fin n) (x : Cn n V) (A : Finset (Pos n))
-    (h : lF E p q x A ≠ 0) :
-    x A ≠ 0 ∨ ∃ i k : Pos n, adC p q i k ≠ 0 ∧ (cre k * ann i : Module.End ℂ (Cn n V)) x A ≠ 0 := by
+theorem lF_ne
+    (E : Fin n → Fin n → Module.End ℂ V) (p q : Fin n) (x : Cn n V) (A : Finset (Pos n))
+    (h : lF E p q x A ≠ 0)
+    : x A ≠ 0
+      ∨ ∃ i k : Pos n, adC p q i k ≠ 0 ∧ (cre k * ann i : Module.End ℂ (Cn n V)) x A ≠ 0 := by
   by_contra hcon
   push Not at hcon
   obtain ⟨h0, hall⟩ := hcon
@@ -49,8 +61,10 @@ theorem lF_ne (E : Fin n → Fin n → Module.End ℂ V) (p q : Fin n) (x : Cn n
   · rw [hc, zero_smul]
   · rw [hall i k hc, smul_zero]
 
-theorem inU_of_adC {lev : Fin n → ℕ} {p q : Fin n} (hpq : lev p = lev q) {i k : Pos n}
-    (h : adC p q i k ≠ 0) (hi : inU lev i) : inU lev k := by
+theorem inU_of_adC
+    {lev : Fin n → ℕ} {p q : Fin n} (hpq : lev p = lev q)
+    {i k : Pos n} (h : adC p q i k ≠ 0) (hi : inU lev i)
+    : inU lev k := by
   unfold adC at h
   unfold inU at hi ⊢
   by_cases h1 : q = (i : Fin n × Fin n).1 ∧ (k : Fin n × Fin n) = (p, (i : Fin n × Fin n).2)
@@ -66,10 +80,13 @@ theorem inU_of_adC {lev : Fin n → ℕ} {p q : Fin n} (hpq : lev p = lev q) {i 
     · rw [if_neg h1, if_neg h2, sub_zero] at h
       exact absurd rfl h
 
-theorem lF_suppIn_deg (n : ℕ) (lev : Fin n → ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (E : Fin n → Fin n → Module.End ℂ V) (_hlev : Monotone lev) (x : Cn n V)
-    (hx : SuppIn (inU lev) x) (p q : Fin n) (hpq : lev p = lev q) :
-    SuppIn (inU lev) (lF E p q x) ∧ ∀ j, Deg j x → Deg j (lF E p q x) := by
+theorem lF_suppIn_deg
+    (n : ℕ) (lev : Fin n → ℕ)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (E : Fin n → Fin n → Module.End ℂ V) (_hlev : Monotone lev)
+    (x : Cn n V) (hx : SuppIn (inU lev) x)
+    (p q : Fin n) (hpq : lev p = lev q)
+    : SuppIn (inU lev) (lF E p q x) ∧ ∀ j, Deg j x → Deg j (lF E p q x) := by
   unfold SuppIn at hx ⊢
   unfold Deg
   constructor

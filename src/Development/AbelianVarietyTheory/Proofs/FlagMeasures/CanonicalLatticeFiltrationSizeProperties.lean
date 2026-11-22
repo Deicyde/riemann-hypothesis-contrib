@@ -8,21 +8,25 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AutPointMajor
 
 @[expose] public section
 
-open GlobalTheory.Count Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField MeasureTheory Finset
+open GlobalTheory.Count Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField
+  MeasureTheory Finset
 
 namespace GlobalTheory.CountSteps
 
 section Abstract
 
-variable {R V E : Type} [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E]
-  [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] {ρ : V →+ E} {L : Submodule R V}
+variable
+  {R V E : Type} [Ring R] [AddCommGroup V] [Module R V] [NormedAddCommGroup E]
+  [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+  {ρ : V →+ E} {L : Submodule R V}
 
-theorem strict_eq (hL : IsLat ρ L) (θ : ℝ) :
-    ∃ θ₀, θ < θ₀ ∧ ∀ θ', θ < θ' → θ' ≤ θ₀ →
-      sSup {N : Submodule R V | N ≤ L ∧ N ≠ ⊥ ∧ θ < muMin ρ N} = hnStep ρ L θ' := by
-
-  obtain ⟨t, ht, hsup⟩ :=
-    finSup R V E ρ L {N | N ≤ L ∧ N ≠ ⊥ ∧ θ < muMin ρ N} hL (fun N hN => hN.1)
+theorem strict_eq (hL : IsLat ρ L) (θ : ℝ)
+    : ∃ θ₀,
+      θ < θ₀
+        ∧ ∀ θ',
+          θ < θ' → θ' ≤ θ₀
+            → sSup {N : Submodule R V | N ≤ L ∧ N ≠ ⊥ ∧ θ < muMin ρ N} = hnStep ρ L θ' := by
+  obtain ⟨t, ht, hsup⟩ := finSup R V E ρ L {N | N ≤ L ∧ N ≠ ⊥ ∧ θ < muMin ρ N} hL (fun N hN => hN.1)
   obtain ⟨θ₀, hθ₀, hle⟩ : ∃ θ₀, θ < θ₀ ∧ ∀ N ∈ t, θ₀ ≤ muMin ρ N := by
     rcases t.eq_empty_or_nonempty with h | h
     · exact ⟨θ + 1, by linarith, by simp [h]⟩
@@ -41,13 +45,14 @@ private lemma zl_mono' {A B : Submodule R V} (h : A ≤ B) : zl ρ A ≤ zl ρ B
   obtain ⟨a, ha, rfl⟩ := hy
   exact ⟨a, h ha, rfl⟩
 
-theorem isSat_of_le {S N : Submodule R V} (hS : IsSat ρ L S) (h1 : S ≤ N) (h2 : N ≤ L) :
-    IsSat ρ N S := by
+theorem isSat_of_le {S N : Submodule R V} (hS : IsSat ρ L S) (h1 : S ≤ N) (h2 : N ≤ L)
+    : IsSat ρ N S := by
   unfold IsSat Formalism.F.IsSaturated at *
   exact ⟨h1, zl_mono' h1, fun y hy hspan => hS.2.2 y (zl_mono' h2 hy) hspan⟩
 
-theorem quot_slope_lt (hL : IsLat ρ L) (θ : ℝ) {N : Submodule R V} (h1 : hnStep ρ L θ < N) (h2 : N ≤ L) :
-    Formalism.F.slope (Formalism.F.quot (zl ρ N) (zl ρ (hnStep ρ L θ))) < θ := by
+theorem quot_slope_lt
+    (hL : IsLat ρ L) (θ : ℝ) {N : Submodule R V} (h1 : hnStep ρ L θ < N) (h2 : N ≤ L)
+    : Formalism.F.slope (Formalism.F.quot (zl ρ N) (zl ρ (hnStep ρ L θ))) < θ := by
   obtain ⟨hsat, -, -, hmax⟩ := hnStep_spec R V E ρ L hL θ
   obtain ⟨hsub, -, hsatEq, -, -, -, -, -⟩ := satBasic R V E ρ L hL
   obtain ⟨-, -, -, -, -, -, -, hq⟩ := satBasic R V E ρ N (hsub N h2)
@@ -79,10 +84,11 @@ theorem step_eq_bot (hL : IsLat ρ L) (h0 : L ≠ ⊥) (θ : ℝ) : hnStep ρ L 
       have e : slope ρ N = deg ρ N / rk ρ N := rfl
       rw [e, div_eq_iff hrkpos.ne'] at hNslope
       exact hNslope
-    have hmm : muMax ρ L ≤ muMin ρ N := (hminN _).2 fun S hS => by
-      have := hdegL S (hS.trans hNL)
-      rw [mul_sub, ← hdegN]
-      linarith
+    have hmm : muMax ρ L ≤ muMin ρ N :=
+      (hminN _).2 fun S hS => by
+        have := hdegL S (hS.trans hNL)
+        rw [mul_sub, ← hdegN]
+        linarith
     have hle := hcont N hNL hN0 (hcon.trans hmm)
     rw [hbot] at hle
     exact hN0 (le_bot_iff.mp hle)
@@ -91,8 +97,7 @@ theorem step_eq_bot (hL : IsLat ρ L) (h0 : L ≠ ⊥) (θ : ℝ) : hnStep ρ L 
     have hH := hmin hne
     have hHL : hnStep ρ L θ ≤ L := hsat.1
     obtain ⟨hmaxH, -, -, hm1, hm2⟩ := muChar R V E ρ _ (hsub _ hHL) hne
-    have : muMax ρ (hnStep ρ L θ) ≤ muMax ρ L :=
-      (hmaxH _).2 fun S hS => hdegL S (hS.trans hHL)
+    have : muMax ρ (hnStep ρ L θ) ≤ muMax ρ L := (hmaxH _).2 fun S hS => hdegL S (hS.trans hHL)
     linarith
 
 end Abstract
@@ -105,7 +110,21 @@ theorem exp_lt_iff {c m t : ℝ} (ht : 0 < t) : Real.exp (c - m) < t ↔ c - Rea
   rw [← Real.lt_log_iff_exp_lt ht]
   constructor <;> intro h <;> linarith
 
-theorem steps : ∀ (I : AutInst) (x : I.GA) (t : ℝ), 0 < t → IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) (stepLe I x t) ∧ IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) (stepLt I x t) ∧ stepLt I x t ≤ stepLe I x t ∧ (∀ t', t < t' → stepLe I x t ≤ stepLt I x t') ∧ (stepLe I x t ≠ ⊥ → largestSize (bas I) (frm I x) (stepLe I x t) ≤ t) ∧ (stepLt I x t ≠ ⊥ → largestSize (bas I) (frm I x) (stepLt I x t) < t) ∧ (∀ N, stepLe I x t < N → N ≤ lamX I x → t < sizeQ (bas I) (frm I x) N (stepLe I x t)) ∧ (∀ N, stepLt I x t < N → N ≤ lamX I x → t ≤ sizeQ (bas I) (frm I x) N (stepLt I x t)) ∧ (1 ≤ I.n → 0 < least I x ∧ (stepLe I x t = ⊥ ↔ t < least I x) ∧ (stepLt I x t = ⊥ ↔ t ≤ least I x)) := by
+theorem steps
+    : ∀ (I : AutInst) (x : I.GA) (t : ℝ),
+      0 < t
+        → IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x)
+            (stepLe I x t)
+          ∧ IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x)
+            (stepLt I x t)
+          ∧ stepLt I x t ≤ stepLe I x t ∧ (∀ t', t < t' → stepLe I x t ≤ stepLt I x t')
+          ∧ (stepLe I x t ≠ ⊥ → largestSize (bas I) (frm I x) (stepLe I x t) ≤ t)
+          ∧ (stepLt I x t ≠ ⊥ → largestSize (bas I) (frm I x) (stepLt I x t) < t)
+          ∧ (∀ N, stepLe I x t < N → N ≤ lamX I x → t < sizeQ (bas I) (frm I x) N (stepLe I x t))
+          ∧ (∀ N, stepLt I x t < N → N ≤ lamX I x → t ≤ sizeQ (bas I) (frm I x) N (stepLt I x t))
+          ∧ (1 ≤ I.n
+            → 0 < least I x ∧ (stepLe I x t = ⊥ ↔ t < least I x)
+              ∧ (stepLt I x t = ⊥ ↔ t ≤ least I x)) := by
   intro I x t ht
   obtain ⟨-, hfg, hspan, -, -⟩ := GlobalTheory.T.autPointLatticeIntersection_selfDual_properties I x
   obtain ⟨hTC, -, -, -, hw⟩ := GlobalTheory.T.autPointMajorantFrames_give_majorants I x
@@ -118,11 +137,13 @@ theorem steps : ∀ (I : AutInst) (x : I.GA) (t : ℝ), 0 < t → IsSat (Formali
   have hNfg : ∀ N, N ≤ L → N.FG := fun N hN => Submodule.FG.of_le_of_isNoetherian hN
   set c : ℝ := Real.log 2 / 2 - logDisc I.E / (2 * (Module.finrank ℚ I.E : ℝ)) with hc
 
-  have hlarge : ∀ N, N ≤ L → N ≠ ⊥ →
-      largestSize (bas I) (frm I x) N = Real.exp (c - muMin ρ N) := fun N hN h0 =>
-    (sizeMu _ _ _ (bas I) (frm I x) hdet N (hNfg N hN) h0).2.2.2.2.1
-  have hsq : ∀ N S, N ≤ L → N ≠ ⊥ → IsSat ρ N S → S ≠ N →
-      sizeQ (bas I) (frm I x) N S = Real.exp (c - Formalism.F.slope (Formalism.F.quot (zl ρ N) (zl ρ S))) :=
+  have hlarge : ∀ N, N ≤ L → N ≠ ⊥ → largestSize (bas I) (frm I x) N = Real.exp (c - muMin ρ N) :=
+    fun N hN h0 => (sizeMu _ _ _ (bas I) (frm I x) hdet N (hNfg N hN) h0).2.2.2.2.1
+  have hsq
+      : ∀ N S,
+        N ≤ L → N ≠ ⊥ → IsSat ρ N S → S ≠ N
+          → sizeQ (bas I) (frm I x) N S
+            = Real.exp (c - Formalism.F.slope (Formalism.F.quot (zl ρ N) (zl ρ S))) :=
     fun N S hN h0 hS hne => (sizeMu _ _ _ (bas I) (frm I x) hdet N (hNfg N hN) h0).2.2.1 S hS hne
   set θ := c - Real.log t with hθ
 
@@ -138,8 +159,11 @@ theorem steps : ∀ (I : AutInst) (x : I.GA) (t : ℝ), 0 < t → IsSat (Formali
       refine ⟨hN, h0, ?_⟩
       rw [hlarge N hN h0]
       exact (exp_le_iff ht).2 hs
-  have hLt : stepLt I x t = sSup {N : Submodule (𝓞 I.E) (Fin I.n → I.E) |
-      N ≤ L ∧ N ≠ ⊥ ∧ θ < muMin ρ N} := by
+  have hLt
+      : stepLt I x t
+        = sSup
+          {N : Submodule (𝓞 I.E) (Fin I.n → I.E) |
+            N ≤ L ∧ N ≠ ⊥ ∧ θ < muMin ρ N} := by
     unfold stepLt
     refine congrArg sSup (Set.ext fun N => ?_)
     simp only [Set.mem_ofPred_eq]
@@ -182,8 +206,11 @@ theorem steps : ∀ (I : AutInst) (x : I.GA) (t : ℝ), 0 < t → IsSat (Formali
     rw [hLt'] at h1 ⊢
     rw [hsq N _ h2 (ne_bot_of_gt h1) (isSat_of_le hspec₀.1 h1.le h2) h1.ne]
 
-    have key : ∀ θ', θ < θ' → θ' ≤ θ₀ →
-        Formalism.F.slope (Formalism.F.quot (zl ρ N) (zl ρ (hnStep ρ L θ₀))) < θ' := fun θ' h1' h2' => by
+    have key
+        : ∀ θ',
+          θ < θ' → θ' ≤ θ₀
+            → Formalism.F.slope (Formalism.F.quot (zl ρ N) (zl ρ (hnStep ρ L θ₀)))
+              < θ' := fun θ' h1' h2' => by
       have e := hsame θ' h1' h2'
       have := quot_slope_lt hLlat θ' (by rw [e]; exact h1) h2
       rwa [e] at this

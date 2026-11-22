@@ -10,8 +10,9 @@ namespace GlobalTheory.CompactUniformHeightBound
 
 open Filter Topology
 
-theorem height_one_le {E : Type} [Field E] [NumberField E] {a : ℕ}
-    (y : GL (Fin a) (GlobalTheory.CuspRep.Cinf E)) : 1 ≤ GlobalTheory.CuspRep.height y := by
+theorem height_one_le
+    {E : Type} [Field E] [NumberField E] {a : ℕ} (y : GL (Fin a) (GlobalTheory.CuspRep.Cinf E))
+    : 1 ≤ GlobalTheory.CuspRep.height y := by
   unfold GlobalTheory.CuspRep.height
   exact le_add_of_le_of_nonneg (le_add_of_nonneg_right (norm_nonneg _)) (norm_nonneg _)
 

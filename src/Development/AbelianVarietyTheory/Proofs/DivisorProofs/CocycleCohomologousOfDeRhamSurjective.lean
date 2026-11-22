@@ -4,10 +4,13 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDatNeZ
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -19,13 +22,16 @@ namespace GlobalTheory.PtExt.Lift
 variable {R : Type} [CommRing R] {X : Over (Sp R)}
 
 def trivEquiv (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (hT : T.J = ⊥) : T.B ≃+* T.B₀ :=
-  RingEquiv.ofBijective T.π ⟨(injective_iff_map_eq_zero T.π).2 fun b hb ↦ by
+  RingEquiv.ofBijective T.π ⟨
+    (injective_iff_map_eq_zero T.π).2 fun b hb ↦ by
       have h := (T.ker b).1 hb
       rw [hT] at h
-      exact Ideal.mem_bot.1 h, T.surj⟩
+      exact Ideal.mem_bot.1 h,
+    T.surj
+  ⟩
 
-theorem trivEquiv_symm_π (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (hT : T.J = ⊥) (b : T.B) :
-    (trivEquiv T hT).symm (T.π b) = b :=
+theorem trivEquiv_symm_π (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (hT : T.J = ⊥) (b : T.B)
+    : (trivEquiv T hT).symm (T.π b) = b :=
   (trivEquiv T hT).symm_apply_apply b
 
 def trivPt (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (hT : T.J = ⊥) : Pt X T.B :=
@@ -38,11 +44,12 @@ def trivPt (T : Thick (dp0 R) (X.hom ≫ 𝟙 _)) (hT : T.J = ⊥) : Pt X T.B :=
     ext r
     exact trivEquiv_symm_π T hT _)
 
-theorem spOver_trivPt {T T' : Thick (dp0 R) (X.hom ≫ 𝟙 _)} (hT : T.J = ⊥) (hT' : T'.J = ⊥) (φ : T ⟶ T') :
-    spOver φ.φ ≫ trivPt T hT = trivPt T' hT' := by
+theorem spOver_trivPt
+    {T T' : Thick (dp0 R) (X.hom ≫ 𝟙 _)} (hT : T.J = ⊥) (hT' : T'.J = ⊥) (φ : T ⟶ T')
+    : spOver φ.φ ≫ trivPt T hT = trivPt T' hT' := by
   apply Over.OverMorphism.ext
-  change spMap (φ.φ : T.B →+* T'.B) ≫ spMap ((trivEquiv T hT).symm.toRingHom) ≫ T.x =
-    spMap ((trivEquiv T' hT').symm.toRingHom) ≫ T'.x
+  change spMap (φ.φ : T.B →+* T'.B) ≫ spMap ((trivEquiv T hT).symm.toRingHom) ≫ T.x
+    = spMap ((trivEquiv T' hT').symm.toRingHom) ≫ T'.x
   rw [← φ.pt, ← Category.assoc, ← Category.assoc, ← Cris.spMap_comp, ← Cris.spMap_comp]
   congr 2
   ext b
@@ -50,33 +57,41 @@ theorem spOver_trivPt {T T' : Thick (dp0 R) (X.hom ≫ 𝟙 _)} (hT : T.J = ⊥)
   change φ.φ ((trivEquiv T hT).symm (T.π b)) = (trivEquiv T' hT').symm (φ.φ₀ (T.π b))
   rw [φ.comm, trivEquiv_symm_π, trivEquiv_symm_π]
 
-theorem trivPt_trivAt {D : Type} [CommRing D] [Algebra R D] (x : Pt X D) : trivPt (trivAt x) rfl = x := by
+theorem trivPt_trivAt {D : Type} [CommRing D] [Algebra R D] (x : Pt X D)
+    : trivPt (trivAt x) rfl = x := by
   apply Over.OverMorphism.ext
   change spMap ((trivEquiv (trivAt x) rfl).symm.toRingHom) ≫ x.left = x.left
   have : (trivEquiv (trivAt x) rfl).symm.toRingHom = RingHom.id D :=
     RingHom.ext fun b ↦ trivEquiv_symm_π (trivAt x) rfl b
   rw [this, Cris.spMap_id, Category.id_comp]
 
-def trivCoc (u : Fn1 X) (hu : IsCoc (whole X) u) :
-    Z1 ((IsTriv (X.hom ≫ 𝟙 _)).ι ⋙ O (dp0 R) (X.hom ≫ 𝟙 _)) :=
-  ⟨fun T T' φ ↦ u T.obj.B T'.obj.B φ.hom.φ (trivPt T.obj T.property), fun T T' T'' φ ψ ↦ by
+def trivCoc (u : Fn1 X) (hu : IsCoc (whole X) u)
+    : Z1 ((IsTriv (X.hom ≫ 𝟙 _)).ι ⋙ O (dp0 R) (X.hom ≫ 𝟙 _)) := ⟨
+  fun T T' φ ↦ u T.obj.B T'.obj.B φ.hom.φ (trivPt T.obj T.property),
+  fun T T' T'' φ ψ ↦ by
     change u _ _ (ψ.hom.φ.comp φ.hom.φ) _ = ψ.hom.φ (u _ _ φ.hom.φ _) + u _ _ ψ.hom.φ _
-    rw [hu _ _ _ φ.hom.φ ψ.hom.φ _ (sm_whole _), spOver_trivPt T.property T'.property φ.hom]⟩
+    rw [hu _ _ _ φ.hom.φ ψ.hom.φ _ (sm_whole _), spOver_trivPt T.property T'.property φ.hom]
+⟩
 
 end GlobalTheory.PtExt.Lift
 
-
 open GlobalTheory.PtExt.Lift in
-theorem GlobalTheory.PtExt.cohom_fv_of_toH1O_surjective : ∀ (R : Type) [CommRing R] (X : Over (Sp R)),
-    Function.Surjective (toH1O (X.hom ≫ 𝟙 _)) → ∀ u : Fn1 X, IsCoc (whole X) u →
-      ∃ f : Z1 (O (dp0 R) (X.hom ≫ 𝟙 _)), Cohom (whole X) u (fv f) := by
+theorem GlobalTheory.PtExt.cohom_fv_of_toH1O_surjective
+    : ∀ (R : Type) [CommRing R] (X : Over (Sp R)),
+      Function.Surjective (toH1O (X.hom ≫ 𝟙 _))
+        → ∀ u : Fn1 X,
+          IsCoc (whole X) u → ∃ f : Z1 (O (dp0 R) (X.hom ≫ 𝟙 _)), Cohom (whole X) u (fv f) := by
   intro R _ X hs u hu
   obtain ⟨c, hc⟩ := hs (H1.mk _ (trivCoc u hu))
   obtain ⟨f, rfl⟩ := H1.mk_surjective _ c
-  have hc' : H1.mk _ ((CoefMap.restrict (O (dp0 R) (X.hom ≫ 𝟙 _)) (IsTriv (X.hom ≫ 𝟙 _)).ι).pullbackOneCocycle f) =
-      H1.mk _ (trivCoc u hu) := hc
+  have hc'
+      : H1.mk _
+          ((CoefMap.restrict (O (dp0 R) (X.hom ≫ 𝟙 _)) (IsTriv (X.hom ≫ 𝟙 _)).ι).pullbackOneCocycle
+            f)
+        = H1.mk _ (trivCoc u hu) :=
+    hc
   obtain ⟨g, hg⟩ := H1.mk_eq_mk.1 hc'
-  refine ⟨f, fun D _ _ x ↦ -g ⟨trivAt x, rfl⟩, ?_⟩
+  refine ⟨f, fun D _ _ x ↦ - g ⟨trivAt x, rfl⟩, ?_⟩
   intro D _ _ D' _ _ φ x _
   let T : (IsTriv (X.hom ≫ 𝟙 _)).FullSubcategory := ⟨trivAt x, rfl⟩
   let T' : (IsTriv (X.hom ≫ 𝟙 _)).FullSubcategory := ⟨trivAt (spOver φ ≫ x), rfl⟩
@@ -86,6 +101,6 @@ theorem GlobalTheory.PtExt.cohom_fv_of_toH1O_surjective : ∀ (R : Type) [CommRi
   have h := congrFun (congrFun (congrFun hg T) T') a
   change b' - φ b = ev f (trivMap φ x) - u D D' φ (trivPt (trivAt x) rfl) at h
   rw [trivPt_trivAt] at h
-  change u D D' φ x + -ev f (trivMap φ x) = -b' - φ (-b)
+  change u D D' φ x + - ev f (trivMap φ x) = -b' - φ (-b)
   rw [map_neg]
   linear_combination h

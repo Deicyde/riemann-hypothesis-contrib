@@ -7,17 +7,31 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Regul
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
 namespace GlobalTheory.LocExt
 
-theorem exists_finite_normal_cover_of_finiteDimensional : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R] [IsDomain R] [CharZero R], IsAdicComplete (maximalIdeal R) R → ∀ (K' : Type) [Field K'] [Algebra (FractionRing R) K'] [FiniteDimensional (FractionRing R) K'], ∃ (R' : Type) (_ : CommRing R') (_ : IsDomain R') (_ : IsNoetherianRing R') (_ : IsIntegrallyClosed R') (_ : IsLocalRing R') (ρ : R →+* R') (τ : K' →+* FractionRing R'), Function.Injective ρ ∧ ρ.Finite ∧ ((τ.comp (algebraMap (FractionRing R) K')).comp (algebraMap R (FractionRing R))) = (algebraMap R' (FractionRing R')).comp ρ := by
+theorem exists_finite_normal_cover_of_finiteDimensional
+    : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R] [IsDomain R] [CharZero R],
+      IsAdicComplete (maximalIdeal R) R
+        → ∀ (K' : Type) [Field K'] [Algebra (FractionRing R) K']
+            [FiniteDimensional (FractionRing R) K'],
+          ∃ (R' : Type) (_ : CommRing R') (_ : IsDomain R') (_ : IsNoetherianRing R')
+              (_ : IsIntegrallyClosed R') (_ : IsLocalRing R') (ρ : R →+* R')
+              (τ : K' →+* FractionRing R'),
+            Function.Injective ρ ∧ ρ.Finite
+              ∧ ((τ.comp (algebraMap (FractionRing R) K')).comp (algebraMap R (FractionRing R)))
+                = (algebraMap R' (FractionRing R')).comp ρ := by
   intro R _ _ _ _ hcomp K' _ _ _
-  have hnorm : IsIntegrallyClosed R := (GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing R).2
+  have hnorm : IsIntegrallyClosed R :=
+    (GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing R).2
   have hCN : IsCN R := ⟨inferInstance, hnorm, hcomp, inferInstance⟩
   let K := FractionRing R
   letI : Algebra R K' := ((algebraMap K K').comp (algebraMap R K)).toAlgebra
@@ -40,7 +54,8 @@ theorem exists_finite_normal_cover_of_finiteDimensional : ∀ (R : Type) [CommRi
   haveI : IsScalarTower R C R' := IsScalarTower.of_algebraMap_eq (fun r => (RingHom.congr_fun hσρ r).symm)
   haveI : Algebra.IsIntegral R C := Algebra.IsIntegral.of_finite R C
   have hσ : Function.Injective σ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro c hc
     have hker : RingHom.ker σ = ⊥ := by
       apply Ideal.eq_bot_of_comap_eq_bot (R := R)

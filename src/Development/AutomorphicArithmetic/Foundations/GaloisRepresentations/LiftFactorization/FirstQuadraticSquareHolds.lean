@@ -22,7 +22,8 @@ namespace UpperTheory.Gal.AbelianGaloisNormality
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion UpperTheory.ConvolutionTheory.Sph
 
 theorem gk_holds : GlobalTheory.Published.GelfandKazhdanDual :=
-  GlobalTheory.GelfandKazhdanTop.gelfandKazhdanDual_of_rapidDecay PositivityTheory.AdelicQuotientData.jacquetShalika GlobalTheory.automorphicFormsFiniteGL
+  GlobalTheory.GelfandKazhdanTop.gelfandKazhdanDual_of_rapidDecay
+    PositivityTheory.AdelicQuotientData.jacquetShalika GlobalTheory.automorphicFormsFiniteGL
     GlobalTheory.CompanionTheory.CuspFinGL.cuspRapidDecaySiegelGL
 theorem strongTC_holds : GlobalTheory.Published.ArthurClozelStrongTC := strongOf liftUnr ramSph
 

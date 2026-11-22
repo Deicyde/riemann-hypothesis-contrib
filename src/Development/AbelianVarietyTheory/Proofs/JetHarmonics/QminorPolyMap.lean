@@ -9,18 +9,18 @@ open Formalism.REAL Finset
 
 namespace GlobalTheory
 
-
 open Finset in
-theorem _root_.GlobalTheory.qminor_polyMap (A : Type) [Ring A] [Algebra ℂ A] (n t : ℕ) (E : Fin n → Fin n → A)
-    (a b : Fin t → Fin n) (s : ℂ) :
-    ∃ c : ℕ → A, ∀ u : ℂ, _root_.Formalism.REAL.qminor E a b (u - s) = ∑ i ∈ Finset.range (t + 1), u ^ i • c i := by
+theorem _root_.GlobalTheory.qminor_polyMap
+    (A : Type) [Ring A] [Algebra ℂ A]
+    (n t : ℕ) (E : Fin n → Fin n → A) (a b : Fin t → Fin n)
+    (s : ℂ)
+    : ∃ c : ℕ → A, ∀ u : ℂ,
+      _root_.Formalism.REAL.qminor E a b (u - s) = ∑ i ∈ Finset.range (t + 1), u ^ i • c i := by
   classical
   let F : Equiv.Perm (Fin t) → Fin t → Polynomial A := fun σ k =>
-    Polynomial.C (if a (σ k) = b k then (1 : A) else 0) * Polynomial.X +
-      Polynomial.C ((if a (σ k) = b k then algebraMap ℂ A (-s - ((k : ℕ) : ℂ)) else 0) +
-        E (a (σ k)) (b k))
-  let P : Polynomial A :=
-    ∑ σ, Polynomial.C (((Equiv.Perm.sign σ : ℤ) : A)) * (List.ofFn (F σ)).prod
+    Polynomial.C (if a (σ k) = b k then (1 : A) else 0) * Polynomial.X + Polynomial.C
+      ((if a (σ k) = b k then algebraMap ℂ A (-s - ((k : ℕ) : ℂ)) else 0) + E (a (σ k)) (b k))
+  let P : Polynomial A := ∑ σ, Polynomial.C (((Equiv.Perm.sign σ : ℤ) : A)) * (List.ofFn (F σ)).prod
   have hdeg : P.natDegree < t + 1 := by
     refine Nat.lt_succ_of_le (Polynomial.natDegree_sum_le_of_forall_le _ _ fun σ _ => ?_)
     refine (Polynomial.natDegree_C_mul_le _ _).trans ?_
@@ -29,14 +29,18 @@ theorem _root_.GlobalTheory.qminor_polyMap (A : Type) [Ring A] [Algebra ℂ A] (
       (Polynomial.natDegree_add_le _ _).trans
         (max_le ((Polynomial.natDegree_C_mul_le _ _).trans Polynomial.natDegree_X_le) (by simp))
     rw [List.map_ofFn, List.sum_ofFn]
-    calc ∑ k, (Polynomial.natDegree ∘ F σ) k ≤ ∑ _k : Fin t, 1 := Finset.sum_le_sum fun k _ => h1 k
+    calc
+      ∑ k, (Polynomial.natDegree ∘ F σ) k
+        ≤ ∑ _k : Fin t, 1 := Finset.sum_le_sum fun k _ => h1 k
       _ = t := by simp
   refine ⟨fun i => P.coeff i, fun u => ?_⟩
-  have hcomm : ∀ (p : Polynomial A) (k : ℕ),
-      Commute ((RingHom.id A) (p.coeff k)) (algebraMap ℂ A u) := fun p k =>
-    Algebra.commute_algebraMap_right u _
-  have hF : ∀ σ k, Polynomial.eval₂ (RingHom.id A) (algebraMap ℂ A u) (F σ k) =
-      _root_.Formalism.REAL.Tm E (u - s - ((k : ℕ) : ℂ)) (a (σ k)) (b k) := by
+  have hcomm
+      : ∀ (p : Polynomial A) (k : ℕ), Commute ((RingHom.id A) (p.coeff k)) (algebraMap ℂ A u) :=
+    fun p k => Algebra.commute_algebraMap_right u _
+  have hF
+      : ∀ σ k,
+        Polynomial.eval₂ (RingHom.id A) (algebraMap ℂ A u) (F σ k)
+          = _root_.Formalism.REAL.Tm E (u - s - ((k : ℕ) : ℂ)) (a (σ k)) (b k) := by
     intro σ k
     unfold _root_.Formalism.REAL.Tm
     simp only [F, Polynomial.eval₂_add, Polynomial.eval₂_mul_X, Polynomial.eval₂_C,
@@ -46,7 +50,9 @@ theorem _root_.GlobalTheory.qminor_polyMap (A : Type) [Ring A] [Algebra ℂ A] (
       congr 2
       ring
     · simp
-  have hP : Polynomial.eval₂ (RingHom.id A) (algebraMap ℂ A u) P = _root_.Formalism.REAL.qminor E a b (u - s) := by
+  have hP
+      : Polynomial.eval₂ (RingHom.id A) (algebraMap ℂ A u) P
+        = _root_.Formalism.REAL.qminor E a b (u - s) := by
     unfold _root_.Formalism.REAL.qminor
     simp only [P, Polynomial.eval₂_finsetSum]
     refine Finset.sum_congr rfl fun σ _ => ?_

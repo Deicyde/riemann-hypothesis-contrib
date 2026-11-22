@@ -16,7 +16,8 @@ namespace GlobalTheory.InflBasic
 
 open GlobalTheory.RowLev.Inhab GlobalTheory.Mem.RowsBundle
 
-theorem finite_of_red {I : AutInst} {g : ℕ} {Q : Type} [Group Q] (ρ : Red I g Q) (hg : 1 ≤ g) : Finite Q := by
+theorem finite_of_red {I : AutInst} {g : ℕ} {Q : Type} [Group Q] (ρ : Red I g Q) (hg : 1 ≤ g)
+    : Finite Q := by
   obtain ⟨-, hK⟩ := GlobalTheory.CongTop.congruence_normal_finite_index I
   obtain ⟨-, -, -, s, hs⟩ := hK g hg
   refine Finite.of_surjective (fun t : s => ρ.toFun t) ?_
@@ -30,11 +31,27 @@ theorem finite_of_red {I : AutInst} {g : ℕ} {Q : Type} [Group Q] (ρ : Red I g
     exact (mem_Ksub I t).1 hmem
   refine ⟨⟨t, ht⟩, ?_⟩
   show ρ.toFun t = ρ.toFun x
-  calc ρ.toFun t = ρ.toFun t * ρ.toFun (t⁻¹ * x) := by rw [(ρ.ker _ hk).2 htx, mul_one]
+  calc
+    ρ.toFun t
+      = ρ.toFun t * ρ.toFun (t⁻¹ * x) := by rw [(ρ.ker _ hk).2 htx, mul_one]
     _ = ρ.toFun (t * (t⁻¹ * x)) := (ρ.map_mul t htK _ hk).symm
     _ = ρ.toFun x := by rw [mul_inv_cancel_left]
 
-theorem inflation_basic : ∀ (I : AutInst) (g : ℕ) (Q : Type) [Group Q] (ρ : Red I g Q) (μf : Measure I.Gf) [μf.IsHaarMeasure], 1 ≤ g → Finite Q ∧ 0 < (μf (I.Kg g)).toReal ∧ ρ.toFun 1 = 1 ∧ (∀ x ∈ I.Kset, ρ.toFun x⁻¹ = (ρ.toFun x)⁻¹) ∧ (∀ q : Q, μf {x | x ∈ I.Kset ∧ ρ.toFun x = q} = μf (I.Kg g) ∧ IsOpen {x | x ∈ I.Kset ∧ ρ.toFun x = q}) ∧ (∀ a, Integrable (ρ.lift μf a) μf ∧ IsLocallyConstant (ρ.lift μf a) ∧ ∀ x, ∀ k ∈ I.Kg g, ∀ k' ∈ I.Kg g, ρ.lift μf a (k * x * k') = ρ.lift μf a x) ∧ (∀ a b, ρ.lift μf (a + b) = ρ.lift μf a + ρ.lift μf b) ∧ (∀ (c : ℂ) a, ρ.lift μf (c • a) = c • ρ.lift μf a) ∧ ∀ a, ρ.lift μf a 1 = a.coeff 1 / ((μf (I.Kg g)).toReal : ℂ) := by
+theorem inflation_basic
+    : ∀ (I : AutInst) (g : ℕ) (Q : Type) [Group Q] (ρ : Red I g Q) (μf : Measure I.Gf)
+        [μf.IsHaarMeasure],
+      1 ≤ g
+        → Finite Q ∧ 0 < (μf (I.Kg g)).toReal ∧ ρ.toFun 1 = 1
+          ∧ (∀ x ∈ I.Kset, ρ.toFun x⁻¹ = (ρ.toFun x)⁻¹)
+          ∧ (∀ q : Q,
+            μf {x | x ∈ I.Kset ∧ ρ.toFun x = q} = μf (I.Kg g)
+              ∧ IsOpen {x | x ∈ I.Kset ∧ ρ.toFun x = q})
+          ∧ (∀ a,
+            Integrable (ρ.lift μf a) μf ∧ IsLocallyConstant (ρ.lift μf a)
+              ∧ ∀ x, ∀ k ∈ I.Kg g, ∀ k' ∈ I.Kg g, ρ.lift μf a (k * x * k') = ρ.lift μf a x)
+          ∧ (∀ a b, ρ.lift μf (a + b) = ρ.lift μf a + ρ.lift μf b)
+          ∧ (∀ (c : ℂ) a, ρ.lift μf (c • a) = c • ρ.lift μf a)
+          ∧ ∀ a, ρ.lift μf a 1 = a.coeff 1 / ((μf (I.Kg g)).toReal : ℂ) := by
   intro I g Q _ ρ μf _ hg
   have hQ : Finite Q := finite_of_red ρ hg
   obtain ⟨-, hK⟩ := GlobalTheory.CongTop.congruence_normal_finite_index I
@@ -68,8 +85,8 @@ theorem inflation_basic : ∀ (I : AutInst) (g : ℕ) (Q : Type) [Group Q] (ρ :
     by_cases hx : x ∈ I.Kset
     · rw [Pi.add_apply, ρ.lift_of_mem μf _ hx, ρ.lift_of_mem μf _ hx, ρ.lift_of_mem μf _ hx,
         MonoidAlgebra.coeff_add, Finsupp.add_apply, add_div]
-    · rw [Pi.add_apply, ρ.lift_of_notMem μf _ hx, ρ.lift_of_notMem μf _ hx, ρ.lift_of_notMem μf _ hx,
-        add_zero]
+    · rw [Pi.add_apply, ρ.lift_of_notMem μf _ hx, ρ.lift_of_notMem μf _ hx,
+        ρ.lift_of_notMem μf _ hx, add_zero]
   · intro c a
     funext x
     by_cases hx : x ∈ I.Kset

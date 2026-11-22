@@ -26,8 +26,8 @@ theorem gl_one_comm {k : Type} [Field k] (a b : GL (Fin 1) k) : a * b = b * a :=
   simp only [Units.val_mul, Matrix.mul_apply, Fin.sum_univ_one]
   exact mul_comm _ _
 
-noncomputable def torusCharHom {k : Type} [Field k] {n : ℕ} (ξ : Fin n → (kˣ →* ℂˣ)) :
-    (∀ _ : Fin n, GL (Fin 1) k) →* ℂ where
+noncomputable def torusCharHom {k : Type} [Field k] {n : ℕ} (ξ : Fin n → (kˣ →* ℂˣ))
+    : (∀ _ : Fin n, GL (Fin 1) k) →* ℂ where
   toFun := PositivityTheory.Lbc.torusChar ξ
   map_one' := by simp [PositivityTheory.Lbc.torusChar]
   map_mul' a b := by simp [PositivityTheory.Lbc.torusChar, Finset.prod_mul_distrib]

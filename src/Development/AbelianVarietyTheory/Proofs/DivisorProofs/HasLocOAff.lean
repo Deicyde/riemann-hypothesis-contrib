@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VanishingH1I
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.CechDR
+open CategoryTheory AlgebraicGeometry KaehlerDifferential
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.CechDR
 
 set_option autoImplicit false
 
@@ -14,8 +16,8 @@ noncomputable section
 
 namespace GlobalTheory.CechDR
 
-theorem hasLoc_OAff : ∀ {R' : Type} [CommRing R'] {X' : Scheme.{0}} (s' : X' ⟶ Sp R'),
-    Desc.HasLoc (OAff s') := by
+theorem hasLoc_OAff
+    : ∀ {R' : Type} [CommRing R'] {X' : Scheme.{0}} (s' : X' ⟶ Sp R'), Desc.HasLoc (OAff s') := by
   intro R' _ X' s' T b
   let U := T.unop
   let b' : Γ(X', U.1) := b
@@ -45,7 +47,8 @@ theorem hasLoc_OAff : ∀ {R' : Type} [CommRing R'] {X' : Scheme.{0}} (s' : X' �
     rw [Scheme.basicOpen_of_isUnit _ hu'] at h1
     have hSV : S.unop ≤ V := by
       change S.unop.1 ≤ X'.basicOpen b'
-      rw [h1]; exact inf_le_right
+      rw [h1]
+      exact inf_le_right
     refine ⟨(homOfLE hSV).op, Subsingleton.elim _ _, fun _ _ ↦ Subsingleton.elim _ _⟩
 
 end GlobalTheory.CechDR

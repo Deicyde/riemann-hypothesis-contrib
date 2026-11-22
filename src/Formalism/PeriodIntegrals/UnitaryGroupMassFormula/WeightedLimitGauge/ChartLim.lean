@@ -24,42 +24,52 @@ theorem chartLim : ChartLim := by
   obtain ⟨η1, hη1, hball⟩ := Metric.mem_nhds_iff.mp (hδ hnhds)
   refine ⟨min η1 ε0, lt_min hη1 hε0, fun {ρ} hρ hdist => ?_⟩
   have hρ0 : 0 < ρ := Set.mem_Ioi.mp hρ
-  have hρ' : ρ < min η1 ε0 := by
-    rwa [Real.dist_eq, sub_zero, abs_of_pos hρ0] at hdist
+  have hρ' : ρ < min η1 ε0 := by rwa [Real.dist_eq, sub_zero, abs_of_pos hρ0] at hdist
   have hρη : ρ < η1 := lt_of_lt_of_le hρ' (min_le_left _ _)
   have hρε : ρ < ε0 := lt_of_lt_of_le hρ' (min_le_right _ _)
   have hV0 : volume (Metric.ball (0 : E) ρ) ≠ 0 := (Metric.measure_ball_pos volume (0 : E) hρ0).ne'
   have hVt : volume (Metric.ball (0 : E) ρ) ≠ ⊤ := measure_ball_lt_top.ne
-  have hbd : ∀ x ∈ Metric.ball (0 : E) ρ,
-      δ x ∈ Set.Icc (δ 0 - ENNReal.ofReal (ε / 2)) (δ 0 + ENNReal.ofReal (ε / 2)) :=
-    fun x hx => hball (Metric.ball_subset_ball hρη.le hx)
-  have hup : ∫⁻ x in Metric.ball (0 : E) ρ, δ x ≤
-      (δ 0 + ENNReal.ofReal (ε / 2)) * volume (Metric.ball (0 : E) ρ) := by
-    calc ∫⁻ x in Metric.ball (0 : E) ρ, δ x
-        ≤ ∫⁻ _ in Metric.ball (0 : E) ρ, (δ 0 + ENNReal.ofReal (ε / 2)) :=
-          setLIntegral_mono' measurableSet_ball fun x hx => (hbd x hx).2
+  have hbd
+      : ∀ x ∈ Metric.ball (0 : E) ρ,
+        δ x ∈ Set.Icc (δ 0 - ENNReal.ofReal (ε / 2)) (δ 0 + ENNReal.ofReal (ε / 2)) := fun x hx =>
+    hball (Metric.ball_subset_ball hρη.le hx)
+  have hup
+      : ∫⁻ x in Metric.ball (0 : E) ρ, δ x
+        ≤ (δ 0 + ENNReal.ofReal (ε / 2)) * volume (Metric.ball (0 : E) ρ) := by
+    calc
+      ∫⁻ x in Metric.ball (0 : E) ρ, δ x
+          ≤ ∫⁻ _ in Metric.ball (0 : E) ρ, (δ 0 + ENNReal.ofReal (ε / 2)) :=
+        setLIntegral_mono' measurableSet_ball fun x hx => (hbd x hx).2
       _ = (δ 0 + ENNReal.ofReal (ε / 2)) * volume (Metric.ball (0 : E) ρ) := setLIntegral_const _ _
-  have hlo : (δ 0 - ENNReal.ofReal (ε / 2)) * volume (Metric.ball (0 : E) ρ) ≤
-      ∫⁻ x in Metric.ball (0 : E) ρ, δ x := by
-    calc (δ 0 - ENNReal.ofReal (ε / 2)) * volume (Metric.ball (0 : E) ρ)
-        = ∫⁻ _ in Metric.ball (0 : E) ρ, (δ 0 - ENNReal.ofReal (ε / 2)) := (setLIntegral_const _ _).symm
+  have hlo
+      : (δ 0 - ENNReal.ofReal (ε / 2)) * volume (Metric.ball (0 : E) ρ)
+        ≤ ∫⁻ x in Metric.ball (0 : E) ρ, δ x := by
+    calc
+      (δ 0 - ENNReal.ofReal (ε / 2)) * volume (Metric.ball (0 : E) ρ)
+          = ∫⁻ _ in Metric.ball (0 : E) ρ, (δ 0 - ENNReal.ofReal (ε / 2)) :=
+        (setLIntegral_const _ _).symm
       _ ≤ ∫⁻ x in Metric.ball (0 : E) ρ, δ x :=
-          setLIntegral_mono' measurableSet_ball fun x hx => (hbd x hx).1
-  have htop1 : δ 0 + ENNReal.ofReal (ε / 2) ≠ ⊤ := ENNReal.add_ne_top.mpr ⟨hδ0, ENNReal.ofReal_ne_top⟩
+        setLIntegral_mono' measurableSet_ball fun x hx => (hbd x hx).1
+  have htop1 : δ 0 + ENNReal.ofReal (ε / 2) ≠ ⊤ :=
+    ENNReal.add_ne_top.mpr ⟨hδ0, ENNReal.ofReal_ne_top⟩
   have hAt : ∫⁻ x in Metric.ball (0 : E) ρ, δ x ≠ ⊤ :=
     ne_top_of_le_ne_top (ENNReal.mul_ne_top htop1 hVt) hup
   have hVr : 0 < (volume (Metric.ball (0 : E) ρ)).toReal := ENNReal.toReal_pos hV0 hVt
-  have hupR : (∫⁻ x in Metric.ball (0 : E) ρ, δ x).toReal ≤
-      ((δ 0).toReal + ε / 2) * (volume (Metric.ball (0 : E) ρ)).toReal := by
+  have hupR
+      : (∫⁻ x in Metric.ball (0 : E) ρ, δ x).toReal
+        ≤ ((δ 0).toReal + ε / 2) * (volume (Metric.ball (0 : E) ρ)).toReal := by
     have h1 := ENNReal.toReal_mono (ENNReal.mul_ne_top htop1 hVt) hup
     rwa [ENNReal.toReal_mul, ENNReal.toReal_add hδ0 ENNReal.ofReal_ne_top,
-      ENNReal.toReal_ofReal (by linarith)] at h1
-  have hloR : ((δ 0).toReal - ε / 2) * (volume (Metric.ball (0 : E) ρ)).toReal ≤
-      (∫⁻ x in Metric.ball (0 : E) ρ, δ x).toReal := by
+        ENNReal.toReal_ofReal (by linarith)]
+      at h1
+  have hloR
+      : ((δ 0).toReal - ε / 2) * (volume (Metric.ball (0 : E) ρ)).toReal
+        ≤ (∫⁻ x in Metric.ball (0 : E) ρ, δ x).toReal := by
     have h1 := ENNReal.toReal_mono hAt hlo
     rw [ENNReal.toReal_mul] at h1
     have h2 : (δ 0).toReal - ε / 2 ≤ (δ 0 - ENNReal.ofReal (ε / 2)).toReal := by
-      have h3 := ENNReal.le_toReal_sub (a := δ 0) (b := ENNReal.ofReal (ε / 2)) ENNReal.ofReal_ne_top
+      have h3 :=
+        ENNReal.le_toReal_sub (a := δ 0) (b := ENNReal.ofReal (ε / 2)) ENNReal.ofReal_ne_top
       rwa [ENNReal.toReal_ofReal (by linarith)] at h3
     exact le_trans (mul_le_mul_of_nonneg_right h2 hVr.le) h1
   have h4 := (div_le_iff₀ hVr).mpr hupR

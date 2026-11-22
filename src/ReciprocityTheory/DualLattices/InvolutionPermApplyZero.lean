@@ -48,8 +48,8 @@ section Inv
 
 variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Algebra ℤ_[p] O] {σ : O ≃ₐ[ℤ_[p]] O}
 
-def pi2 {m : ℕ} (e : Fin m → O) (π : Equiv.Perm (Fin m)) (hσ : ∀ i, σ (e i) = e (π i)) :
-    Equiv.Perm (Fin m) := by
+def pi2 {m : ℕ} (e : Fin m → O) (π : Equiv.Perm (Fin m)) (hσ : ∀ i, σ (e i) = e (π i))
+    : Equiv.Perm (Fin m) := by
   classical
   exact Equiv.ofBijective (fun k => if e k = 0 then k else π k) (by
     apply Finite.injective_iff_bijective.1
@@ -58,12 +58,14 @@ def pi2 {m : ℕ} (e : Fin m → O) (π : Equiv.Perm (Fin m)) (hσ : ∀ i, σ (
     by_cases ha : e a = 0 <;> by_cases hb : e b = 0
     · simpa [ha, hb] using hab
     · rw [if_pos ha, if_neg hb] at hab
-      exfalso; apply hb
+      exfalso
+      apply hb
       have h := hσ b
       rw [← hab, ha] at h
       exact σ.injective (h.trans (map_zero σ).symm)
     · rw [if_neg ha, if_pos hb] at hab
-      exfalso; apply ha
+      exfalso
+      apply ha
       have h := hσ a
       rw [hab, hb] at h
       exact σ.injective (h.trans (map_zero σ).symm)
@@ -113,23 +115,28 @@ theorem wdetLen : WdetLenStatement := by
   haveI := htd_domain hS
   haveI := isLocal_of_integers hS.integers
   by_cases hw0 : e w = 0
-  · have he' : e (π w) = 0 := by
-      have h := hσ w; rw [hw0, map_zero] at h; exact h.symm
+  · have he' : e (π w) = 0 := by have h := hσ w; rw [hw0, map_zero] at h; exact h.symm
     have hsubL : ∀ a : O, a = 0 → Subsingleton (LinearMap.range (Matrix.mulVecLin (H.ρL a))) := by
       rintro a rfl
       refine ⟨fun x y => Subtype.ext ?_⟩
-      obtain ⟨x', hx⟩ := x.2; obtain ⟨y', hy⟩ := y.2
-      rw [← hx, ← hy]; simp
+      obtain ⟨x', hx⟩ := x.2
+      obtain ⟨y', hy⟩ := y.2
+      rw [← hx, ← hy]
+      simp
     have hsubD : ∀ a : O, a = 0 → Subsingleton (lieDPart H a) := by
       rintro a rfl
       refine ⟨fun x y => Subtype.ext ?_⟩
-      obtain ⟨x', hx⟩ := x.2; obtain ⟨y', hy⟩ := y.2
-      rw [← hx, ← hy]; simp
-    have hquot : ∀ {M : Type} [AddCommGroup M] [Module R M] [Subsingleton M] (N : Submodule R M),
-        Subsingleton (M ⧸ N) := fun N => ⟨fun a b => by
-      obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ a
-      obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ b
-      rw [Subsingleton.elim x y]⟩
+      obtain ⟨x', hx⟩ := x.2
+      obtain ⟨y', hy⟩ := y.2
+      rw [← hx, ← hy]
+      simp
+    have hquot
+        : ∀ {M : Type} [AddCommGroup M] [Module R M] [Subsingleton M] (N : Submodule R M),
+          Subsingleton (M ⧸ N) := fun N =>
+      ⟨fun a b => by
+        obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ a
+        obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ b
+        rw [Subsingleton.elim x y]⟩
     haveI := hsubL _ hw0
     haveI := hsubD _ hw0
     haveI := hsubD _ he'
@@ -184,8 +191,8 @@ theorem wdetLen : WdetLenStatement := by
     · simp only [hεT, Fin.cons_zero, if_true, ← map_mul, H.projectors.1]
     · simp only [hεT, Fin.cons_zero, Fin.cons_succ, ← map_mul, hPcomm, map_zero,
         (Fin.succ_ne_zero j).symm, if_false]
-    · simp only [hεT, Fin.cons_zero, Fin.cons_succ, ← map_mul, hPT, map_zero,
-        Fin.succ_ne_zero i, if_false]
+    · simp only [hεT, Fin.cons_zero, Fin.cons_succ, ← map_mul, hPT, map_zero, Fin.succ_ne_zero i,
+        if_false]
     · simp only [hεT, Fin.cons_succ, ← map_mul, ← map_mul H.ρ, horth, Fin.succ_inj]
       split_ifs <;> simp
   have hLo : ∀ a b, εL a * εL b = if a = b then εL a else 0 := by
@@ -200,7 +207,7 @@ theorem wdetLen : WdetLenStatement := by
     rw [Fin.sum_univ_succ]
     simp only [hεT, Fin.cons_zero, Fin.cons_succ]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum ι (fun i => H.ρ (e i)) Finset.univ, ← map_add (f := _), add_comm, hsT, map_one]
+    rw [← map_sum ι (fun i => H.ρ (e i)) Finset.univ, ← map_add (f := _), add_comm, hsT, map_one]
   have hLs : ∑ a, εL a = 1 := by
     rw [Fin.sum_univ_succ]
     simp only [hεL, Fin.cons_zero, Fin.cons_succ]
@@ -209,19 +216,24 @@ theorem wdetLen : WdetLenStatement := by
     intro a
     refine Fin.cases ?_ (fun i => ?_) a
     · rw [hπ'0]; simp only [hεT, hεL, Fin.cons_zero]; exact H.Ht_equivariant.2
-    · rw [hπ's]; simp only [hεT, hεL, Fin.cons_succ]
-      rw [← involutionPerm_sigma e π hσ i]; exact H.Ht_equivariant.1 (e i)
-  have hadj : ∀ a, (εT a)ᵀ * H.E.map (algebraMap ℤ_[p] R) =
-      H.E.map (algebraMap ℤ_[p] R) * εT (π' a) := by
+    · rw [hπ's]
+      simp only [hεT, hεL, Fin.cons_succ]
+      rw [← involutionPerm_sigma e π hσ i]
+      exact H.Ht_equivariant.1 (e i)
+  have hadj
+      : ∀ a, (εT a)ᵀ * H.E.map (algebraMap ℤ_[p] R) = H.E.map (algebraMap ℤ_[p] R) * εT (π' a) := by
     intro a
     refine Fin.cases ?_ (fun i => ?_) a
-    · rw [hπ'0]; simp only [hεT, Fin.cons_zero, hι, RingHom.mapMatrix_apply]
+    · rw [hπ'0]
+      simp only [hεT, Fin.cons_zero, hι, RingHom.mapMatrix_apply]
       rw [← Matrix.transpose_map, ← Matrix.map_mul, ← Matrix.map_mul, H.projectors.2.2.1]
-    · rw [hπ's]; simp only [hεT, Fin.cons_succ, hι, RingHom.mapMatrix_apply]
+    · rw [hπ's]
+      simp only [hεT, Fin.cons_succ, hι, RingHom.mapMatrix_apply]
       rw [← Matrix.transpose_map, ← Matrix.map_mul, ← Matrix.map_mul, H.E_equivariant (e i),
         involutionPerm_sigma e π hσ i]
-  obtain ⟨hua, hub, -⟩ := u1 R g (m + 1) H.Ht H.Bt (H.E.map (algebraMap ℤ_[p] R)) cp εT εL π'
-    hπinv hTo hTs hLo hLs hHt hadj H.form_eq_alt
+  obtain ⟨hua, hub, -⟩ :=
+    u1 R g (m + 1) H.Ht H.Bt (H.E.map (algebraMap ℤ_[p] R)) cp εT εL π' hπinv hTo hTs hLo hLs hHt
+      hadj H.form_eq_alt
   have hbt : ∑ a, εL a * H.Bt * εT a = btP H e := by
     rw [Fin.sum_univ_succ]
     simp only [hεT, hεL, Fin.cons_zero, Fin.cons_succ, btP, hι, RingHom.mapMatrix_apply]
@@ -230,17 +242,19 @@ theorem wdetLen : WdetLenStatement := by
   have hidem : H.ρL (e w) * H.ρL (e w) = H.ρL (e w) := by rw [← map_mul, horth, if_pos rfl]
   obtain ⟨d, ⟨φ⟩⟩ := idem_free (H.ρL (e w)) hidem
   obtain ⟨hEt, -, hEdet⟩ := htd_E H
-  have hcw' : HasLen v R (cokE H.Ht εT εL w.succ (π' w.succ)) cw := by
-    rw [hπ's, hpw]; exact hcw
-  have hcwb' : HasLen v R (cokE H.Ht εT εL (π' w.succ) w.succ) cwb := by
-    rw [hπ's, hpw]; exact hcwb
-  obtain ⟨X, hX, hXe⟩ := lenId C v R hS.integers g (m + 1) H.Ht (btP H e)
-    (H.E.map (algebraMap ℤ_[p] R)) cp (htd_cp_ne hS) hEdet hua εT εL π' hπinv hTo hTs hLo hLs
-    hHt hub hadj w.succ d ⟨φ⟩ cw cwb hcw' hcwb'
+  have hcw' : HasLen v R (cokE H.Ht εT εL w.succ (π' w.succ)) cw := by rw [hπ's, hpw]; exact hcw
+  have hcwb' : HasLen v R (cokE H.Ht εT εL (π' w.succ) w.succ) cwb := by rw [hπ's, hpw]; exact hcwb
+  obtain ⟨X, hX, hXe⟩ :=
+    lenId C v R hS.integers g (m + 1) H.Ht (btP H e) (H.E.map (algebraMap ℤ_[p] R)) cp
+      (htd_cp_ne hS) hEdet hua εT εL π' hπinv hTo hTs hLo hLs hHt hub hadj w.succ d ⟨φ⟩ cw cwb hcw'
+      hcwb'
   refine ⟨d, X, ⟨φ⟩, ?_, hXe⟩
-  have hX' : HasLen v R (qE εL w.succ (π' w.succ) ⧸
-      ((LinearMap.range (Matrix.mulVecLin (εT w.succ))).map
-        (Matrix.mulVecLin (fromRows H.Ht (btP H e)))).comap (qE εL w.succ (π' w.succ)).subtype) X := hX
+  have hX' : HasLen v R
+      (qE εL w.succ (π' w.succ) ⧸
+        ((LinearMap.range (Matrix.mulVecLin (εT w.succ))).map
+          (Matrix.mulVecLin (fromRows H.Ht (btP H e)))).comap (qE εL w.succ (π' w.succ)).subtype)
+      X :=
+    hX
   generalize hq : π' w.succ = q at hX'
   rw [hπ's, hpw] at hq
   subst hq

@@ -11,15 +11,15 @@ universe u
 
 namespace GlobalTheory.CompanionTheory.Comb
 
-theorem interleave_perm_append {T : Type u} {u v w : List T} (h : Interleave u v w) :
-    w.Perm (u ++ v) := by
+theorem interleave_perm_append {T : Type u} {u v w : List T} (h : Interleave u v w)
+    : w.Perm (u ++ v) := by
   induction h with
   | nil => exact List.Perm.refl _
   | left _ ih => exact ih.cons _
   | right _ ih => exact (ih.cons _).trans List.perm_middle.symm
 
-theorem shuffle_perm_flatten {T : Type u} (us : List (List T)) (w : List T)
-    (h : Shuffle us w) : w.Perm us.flatten := by
+theorem shuffle_perm_flatten {T : Type u} (us : List (List T)) (w : List T) (h : Shuffle us w)
+    : w.Perm us.flatten := by
   induction h with
   | nil => exact List.Perm.refl _
   | cons _ hi ih =>

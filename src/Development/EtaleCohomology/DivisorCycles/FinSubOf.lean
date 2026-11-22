@@ -10,20 +10,27 @@ namespace LateralTheory.DivDb.FiniteSubrepresentation
 
 variable {K : Type} [Field K] {N n : ℕ}
 
-theorem pow_tw (X : Matrix (Fin N) (Fin N) K) (Y : Matrix (Fin n) (Fin n) K) (T : Matrix (Fin N) (Fin n) K)
-    (h : X * T = T * Y) (k : ℕ) : X ^ k * T = T * Y ^ k := by
+theorem pow_tw
+    (X : Matrix (Fin N) (Fin N) K) (Y : Matrix (Fin n) (Fin n) K) (T : Matrix (Fin N) (Fin n) K)
+    (h : X * T = T * Y)
+    (k : ℕ)
+    : X ^ k * T = T * Y ^ k := by
   induction k with
   | zero => simp
-  | succ k ih => rw [pow_succ, pow_succ, Matrix.mul_assoc, h, ← Matrix.mul_assoc, ih, Matrix.mul_assoc]
+  | succ k ih =>
+    rw [pow_succ, pow_succ, Matrix.mul_assoc, h, ← Matrix.mul_assoc, ih, Matrix.mul_assoc]
 
-theorem aeval_tw (X : Matrix (Fin N) (Fin N) K) (Y : Matrix (Fin n) (Fin n) K) (T : Matrix (Fin N) (Fin n) K)
-    (h : X * T = T * Y) (q : Polynomial K) : Polynomial.aeval X q * T = T * Polynomial.aeval Y q := by
+theorem aeval_tw
+    (X : Matrix (Fin N) (Fin N) K) (Y : Matrix (Fin n) (Fin n) K) (T : Matrix (Fin N) (Fin n) K)
+    (h : X * T = T * Y)
+    (q : Polynomial K)
+    : Polynomial.aeval X q * T = T * Polynomial.aeval Y q := by
   induction q using Polynomial.induction_on' with
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), Matrix.add_mul, Matrix.mul_add, hp, hq]
   | monomial k c =>
     rw [Polynomial.aeval_monomial, Polynomial.aeval_monomial, Algebra.algebraMap_eq_smul_one,
-      Algebra.algebraMap_eq_smul_one, smul_mul_assoc, smul_mul_assoc, one_mul, one_mul, Matrix.smul_mul,
-      Matrix.mul_smul, pow_tw X Y T h]
+      Algebra.algebraMap_eq_smul_one, smul_mul_assoc, smul_mul_assoc, one_mul, one_mul,
+      Matrix.smul_mul, Matrix.mul_smul, pow_tw X Y T h]
 
 end LateralTheory.DivDb.FiniteSubrepresentation
 
@@ -36,10 +43,11 @@ theorem LateralTheory.DivDb.FiniteSubrepresentation.FinSub_of : LateralTheory.Di
     simpa [Matrix.mulVec_mulVec, hBA] using this
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro W hW
-    obtain ⟨W'', hc, hs⟩ := hρ (W.map (Matrix.mulVecLin A)) (by
-      rintro g _ ⟨w, hw, rfl⟩
-      refine ⟨(r g : Matrix (Fin n) (Fin n) K) *ᵥ w, hW g w hw, ?_⟩
-      simp only [Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, hAr g])
+    obtain ⟨W'', hc, hs⟩ :=
+      hρ (W.map (Matrix.mulVecLin A)) (by
+        rintro g _ ⟨w, hw, rfl⟩
+        refine ⟨(r g : Matrix (Fin n) (Fin n) K) *ᵥ w, hW g w hw, ?_⟩
+        simp only [Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, hAr g])
     refine ⟨W''.comap (Matrix.mulVecLin A), ?_, ?_⟩
     · constructor
       · rw [Submodule.disjoint_def]

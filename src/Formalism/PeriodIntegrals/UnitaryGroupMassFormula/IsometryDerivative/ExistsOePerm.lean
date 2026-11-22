@@ -16,8 +16,8 @@ instance finiteOE (h n : ℕ) : Finite (Fin h ↪o Fin n) :=
 
 instance fintypeOE (h n : ℕ) : Fintype (Fin h ↪o Fin n) := Fintype.ofFinite _
 
-theorem exists_oe_perm {h n : ℕ} (f : Fin h → Fin n) (hf : Function.Injective f) :
-    ∃ (I : Fin h ↪o Fin n) (σ : Equiv.Perm (Fin h)), ∀ i, I (σ i) = f i := by
+theorem exists_oe_perm {h n : ℕ} (f : Fin h → Fin n) (hf : Function.Injective f)
+    : ∃ (I : Fin h ↪o Fin n) (σ : Equiv.Perm (Fin h)), ∀ i, I (σ i) = f i := by
   classical
   set s : Finset (Fin n) := Finset.univ.image f with hs
   have hcard : s.card = h := by
@@ -34,24 +34,30 @@ theorem exists_oe_perm {h n : ℕ} (f : Fin h → Fin n) (hf : Function.Injectiv
     rw [← hg i, ← hg j, e]
   exact ⟨s.orderEmbOfFin hcard, Equiv.ofBijective g (Finite.injective_iff_bijective.mp ginj), hg⟩
 
-theorem cauchyBinet {R : Type*} [CommRing R] {h n : ℕ}
-    (A : Matrix (Fin h) (Fin n) R) (B : Matrix (Fin n) (Fin h) R) :
-    (A * B).det = ∑ I : Fin h ↪o Fin n, (A.submatrix id I).det * (B.submatrix I id).det := by
+theorem cauchyBinet
+    {R : Type*} [CommRing R] {h n : ℕ} (A : Matrix (Fin h) (Fin n) R) (B : Matrix (Fin n) (Fin h) R)
+    : (A * B).det = ∑ I : Fin h ↪o Fin n, (A.submatrix id I).det * (B.submatrix I id).det := by
   classical
   rw [GenFrameSpan.det_mul_rect]
-  have hR : ∀ I : Fin h ↪o Fin n, (A.submatrix id I).det * (B.submatrix I id).det
-      = ∑ σ : Equiv.Perm (Fin h), (∏ i, B (I (σ i)) i) * (A.submatrix id (fun i => I (σ i))).det := by
-    intro I
-    rw [det_apply (B.submatrix I id), Finset.mul_sum]
-    refine Finset.sum_congr rfl fun σ _ => ?_
-    have e : A.submatrix id (fun i => I (σ i)) = (A.submatrix id I).submatrix id σ := rfl
-    rw [e, det_permute']
-    simp only [submatrix_apply, id, Units.smul_def, zsmul_eq_mul]
-    ring
+  have hR
+      : ∀ I : Fin h ↪o Fin n,
+        (A.submatrix id I).det * (B.submatrix I id).det
+          = ∑ σ : Equiv.Perm (Fin h), (∏ i, B (I (σ i)) i) * (A.submatrix id (fun i => I (σ i))).det :=
+    by
+      intro I
+      rw [det_apply (B.submatrix I id), Finset.mul_sum]
+      refine Finset.sum_congr rfl fun σ _ => ?_
+      have e : A.submatrix id (fun i => I (σ i)) = (A.submatrix id I).submatrix id σ := rfl
+      rw [e, det_permute']
+      simp only [submatrix_apply, id, Units.smul_def, zsmul_eq_mul]
+      ring
   rw [Finset.sum_congr rfl fun I _ => hR I, ← Finset.sum_product']
   symm
-  refine Finset.sum_bij_ne_zero (fun p _ _ => fun i => p.1 (p.2 i)) (fun _ _ _ => Finset.mem_univ _)
-    ?_ ?_ (fun _ _ _ => rfl)
+  refine Finset.sum_bij_ne_zero
+    (fun p _ _ => fun i => p.1 (p.2 i))
+    (fun _ _ _ => Finset.mem_univ _)
+    ?_ ?_
+    (fun _ _ _ => rfl)
   · rintro ⟨I, σ⟩ _ _ ⟨I', σ'⟩ _ _ e
     have e' : (fun i => I (σ i)) = fun i => I' (σ' i) := e
     have hr : Set.range I = Set.range I' := by

@@ -10,9 +10,11 @@ open UpperTheory.V.Sd.S2 ReciprocityTheory.Gal
 
 namespace UpperTheory
 
-private theorem mix_cont {k X : Type} [Field k] [TopologicalSpace k] [IsTopologicalRing k] [TopologicalSpace X] (γ : kˣ)
-    {A B : X → Matrix (Fin 2) (Fin 2) k} (hA : Continuous A) (hB : Continuous B) :
-    Continuous fun x => mix γ (A x) (B x) := by
+private theorem mix_cont
+    {k X : Type} [Field k] [TopologicalSpace k] [IsTopologicalRing k] [TopologicalSpace X]
+    (γ : kˣ)
+    {A B : X → Matrix (Fin 2) (Fin 2) k} (hA : Continuous A) (hB : Continuous B)
+    : Continuous fun x => mix γ (A x) (B x) := by
   have a : ∀ i j, Continuous fun x => A x i j := fun i j => hA.matrix_elem i j
   have b : ∀ i j, Continuous fun x => B x i j := fun i j => hB.matrix_elem i j
   refine continuous_matrix fun i j => ?_

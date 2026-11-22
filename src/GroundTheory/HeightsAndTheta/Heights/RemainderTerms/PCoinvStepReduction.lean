@@ -60,10 +60,11 @@ theorem CoinvStepReduction.proof : CoinvStepReduction.Statement := by
     · have hne : u ≠ (b, k) := by
         rintro rfl
         rcases hu with h | ⟨-, h⟩ <;> exact lt_irrefl _ h
-      have h0 := hoff u (by
-        rcases hu with h | ⟨-, h⟩
-        · exact Or.inl (ne_of_lt h)
-        · exact Or.inr (le_of_lt h))
+      have h0 :=
+        hoff u (by
+          rcases hu with h | ⟨-, h⟩
+          · exact Or.inl (ne_of_lt h)
+          · exact Or.inr (le_of_lt h))
       simp [h0, Ne.symm hne]
     · have h0 := hoff (b, k) (Or.inr le_rfl)
       simp only [Finsupp.add_apply, h0, Finsupp.single_eq_same]
@@ -73,12 +74,15 @@ theorem CoinvStepReduction.proof : CoinvStepReduction.Statement := by
       refine Finset.sum_congr rfl fun e' _ => ?_
       rw [smul_monomial, smul_eq_mul, mul_one]
     rw [hsum]
-    have hm : monomial (e₀ + Finsupp.single (b, k) ((k : ℕ) + 1)) (1 : K) =
-        monomial e₀ 1 * X (b, k) ^ ((k : ℕ) + 1) := by
+    have hm
+        : monomial (e₀ + Finsupp.single (b, k) ((k : ℕ) + 1)) (1 : K)
+          = monomial e₀ 1 * X (b, k) ^ ((k : ℕ) + 1) := by
       rw [X_pow_eq_monomial, monomial_mul, one_mul]
-    have hdiff : monomial (e₀ + Finsupp.single (b, k) ((k : ℕ) + 1)) (1 : K) - P =
-        monomial e₀ 1 * (X (b, k) ^ ((k : ℕ) + 1) +
-          ∑ j ∈ range ((k : ℕ) + 1), rename φ (c j) * X (b, k) ^ j) := by
+    have hdiff
+        : monomial (e₀ + Finsupp.single (b, k) ((k : ℕ) + 1)) (1 : K) - P
+          = monomial e₀ 1
+            * (X (b, k) ^ ((k : ℕ) + 1)
+              + ∑ j ∈ range ((k : ℕ) + 1), rename φ (c j) * X (b, k) ^ j) := by
       rw [hm, hP, mul_add, Finset.mul_sum]
       simp only [map_neg, neg_mul, mul_neg, Finset.sum_neg_distrib, sub_neg_eq_add]
     rw [hdiff]

@@ -18,38 +18,46 @@ universe u w
 
 namespace SectionCount.Drop.Filt.Kernel
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω}
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
 theorem mem_secs_iff' {F : SubSystem S x Ω} {y : Ω} : y ∈ F.secs ↔ ∀ I, y ∈ F.sub I := by
   simp [SubSystem.secs, Submodule.mem_iInf]
 
-def ratioPow (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1) (j : Fin (N + 1)) (b : ℕ) :
-    chartRing S x I :=
-  ⟨x j ^ b / x i ^ b, X j ^ b, X i ^ b, b, pow_mem (X_mem_monos hi) b, isHomogeneous_X_pow _ _,
-    isHomogeneous_X_pow _ _, by simp⟩
+def ratioPow (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1) (j : Fin (N + 1)) (b : ℕ)
+    : chartRing S x I := ⟨
+  x j ^ b / x i ^ b,
+  X j ^ b,
+  X i ^ b,
+  b,
+  pow_mem (X_mem_monos hi) b,
+  isHomogeneous_X_pow _ _,
+  isHomogeneous_X_pow _ _,
+  by simp
+⟩
 
-theorem aeval_div_mem_chartRing (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1) (f : Poly S N) :
-    aeval (fun l => x l / x i) f ∈ chartRing S x I := by
+theorem aeval_div_mem_chartRing (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1) (f : Poly S N)
+    : aeval (fun l => x l / x i) f ∈ chartRing S x I := by
   have h : (aeval (fun l => x l / x i) : Poly S N →ₐ[S] Ω).range ≤ chartRing S x I := by
     rw [← Algebra.adjoin_range_eq_range_aeval, Algebra.adjoin_le_iff]
     rintro _ ⟨l, rfl⟩
     exact ⟨X l, X i, 1, X_mem_monos hi, isHomogeneous_X _ _, isHomogeneous_X _ _, by simp⟩
   exact h ⟨f, rfl⟩
 
-theorem idealMod_le (j : Fin (N + 1)) (b : ℕ) (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1) :
-    idealMod (primeOf (S := S) x ⊔ zeroIdeal (twistSys S x (b : ℤ)) (x j ^ b)) I ≤
-      Submodule.span (chartRing S x I) {x j ^ b / x i ^ b} := by
+theorem idealMod_le (j : Fin (N + 1)) (b : ℕ) (I : Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1)
+    : idealMod (primeOf (S := S) x ⊔ zeroIdeal (twistSys S x (b : ℤ)) (x j ^ b)) I
+      ≤ Submodule.span (chartRing S x I) {x j ^ b / x i ^ b} := by
   have hxi : x i ≠ 0 := (mem_support x).mp (I.2.2 hi)
   set M := Submodule.span (chartRing S x I) {x j ^ b / x i ^ b}
-  let K : Ideal (Poly S N) :=
-    { carrier := {f | aeval (fun l => x l / x i) f ∈ M}
-      add_mem' := fun {f g} hf hg => by
-        simp only [Set.mem_ofPred_eq, map_add (f := _)] at *; exact M.add_mem hf hg
-      zero_mem' := by simp only [Set.mem_ofPred_eq, map_zero]; exact M.zero_mem
-      smul_mem' := fun r f hf => by
-        simp only [Set.mem_ofPred_eq, smul_eq_mul, map_mul] at *
-        exact M.smul_mem ⟨_, aeval_div_mem_chartRing I hi r⟩ hf }
+  let K : Ideal (Poly S N) := {
+    carrier := {f | aeval (fun l => x l / x i) f ∈ M}
+    add_mem' := fun {f g} hf hg => by
+      simp only [Set.mem_ofPred_eq, map_add (f := _)] at *; exact M.add_mem hf hg
+    zero_mem' := by simp only [Set.mem_ofPred_eq, map_zero]; exact M.zero_mem
+    smul_mem' := fun r f hf => by
+      simp only [Set.mem_ofPred_eq, smul_eq_mul, map_mul] at *
+      exact M.smul_mem ⟨_, aeval_div_mem_chartRing I hi r⟩ hf
+  }
   have hK : primeOf (S := S) x ⊔ zeroIdeal (twistSys S x (b : ℤ)) (x j ^ b) ≤ K := by
     refine sup_le (fun f hf => ?_) (Ideal.span_le.mpr ?_)
     · change aeval (fun l => x l / x i) f ∈ M
@@ -59,7 +67,8 @@ theorem idealMod_le (j : Fin (N + 1)) (b : ℕ) (I : Chart x) {i : Fin (N + 1)} 
       refine Finset.sum_eq_zero fun d _ => ?_
       rw [aeval_div_of_isHomogeneous (homogeneousComponent_isHomogeneous d f) i,
         (mem_primeOf_of_isHomogeneous x (homogeneousComponent_isHomogeneous d f)).mp
-          (homogeneousComponent_mem_primeOf x hf d), zero_div]
+          (homogeneousComponent_mem_primeOf x hf d),
+        zero_div]
     · rintro g ⟨c, hg, hz⟩
       have hδ : x i ^ b ∈ (twistSys S x (b : ℤ)).sub I := by
         change x i ^ b ∈ twistMod S x (b : ℤ) I
@@ -79,8 +88,11 @@ theorem idealMod_le (j : Fin (N + 1)) (b : ℕ) (I : Chart x) {i : Fin (N + 1)} 
   have hs0 := eval_ne_zero_of_mem_monos I hs
   have hm : aeval (fun l => x l / x i) f ∈ M := hK hf
   rw [aeval_div_of_isHomogeneous hfe i] at hm
-  have h := M.smul_mem (⟨x i ^ e / aeval x s, X i ^ e, s, e, hs, isHomogeneous_X_pow _ _, hse,
-    by simp⟩ : chartRing S x I) hm
+  have h :=
+    M.smul_mem
+      (⟨x i ^ e / aeval x s, X i ^ e, s, e, hs, isHomogeneous_X_pow _ _, hse, by simp⟩
+        : chartRing S x I)
+      hm
   rw [chartRing_smul_def] at h
   rw [SetLike.mem_coe]
   convert h using 1

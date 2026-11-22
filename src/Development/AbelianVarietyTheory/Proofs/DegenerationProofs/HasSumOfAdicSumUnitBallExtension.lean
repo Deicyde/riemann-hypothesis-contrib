@@ -97,12 +97,12 @@ private lemma norm_le_pow_of_mem_ideal_pow {R C : Type} [CommRing R] [NormedFiel
       rw [map_add (f := _)]
       exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ha hb)
 
-
 open Filter Topology in
-theorem _root_.GlobalTheory.Ex.AdicNormSum.main : ∀ (R : Type) [CommRing R] [IsDomain R]
-    [IsNoetherianRing R] (I : Ideal R) (C : Type) [NormedField C] [IsUltrametricDist C]
-    [Algebra (FractionRing R) C], _root_.GlobalTheory.Ex.CExt R I C → ∀ (Ix : Type) (x : Ix → C)
-    (s : C), _root_.GlobalTheory.UT.SumF I C x s → HasSum x s := by
+theorem _root_.GlobalTheory.Ex.AdicNormSum.main
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] (I : Ideal R) (C : Type)
+        [NormedField C] [IsUltrametricDist C] [Algebra (FractionRing R) C],
+      _root_.GlobalTheory.Ex.CExt R I C
+        → ∀ (Ix : Type) (x : Ix → C) (s : C), _root_.GlobalTheory.UT.SumF I C x s → HasSum x s := by
   intro R _ _ _ I C _ _ _ hC Ix x s hs
   obtain ⟨hle, hlt⟩ := hC
   letI : Module R C := Module.compHom C (algebraMap R (FractionRing R))
@@ -111,10 +111,15 @@ theorem _root_.GlobalTheory.Ex.AdicNormSum.main : ∀ (R : Type) [CommRing R] [I
   obtain ⟨N, hNfg, -, -, hconv⟩ := hs'
   let φ : R →+* C := (algebraMap (FractionRing R) C).comp (algebraMap R (FractionRing R))
   have hφ : ∀ r, ‖φ r‖ ≤ 1 := hle
-  obtain ⟨M, -, hM⟩ := exists_norm_le_mul_of_mem_ideal_smul_fg (N := N) φ hφ
-    (fun r y => Algebra.smul_def (algebraMap R (FractionRing R) r) y) hNfg
-  obtain ⟨c, hc0, hc1, hcI⟩ := exists_uniform_norm_bound_lt_one_of_fg φ hφ (IsNoetherian.noetherian I) hlt
-  exact hasSum_of_norm_sub_le_geometric hc0 hc1 fun n => (hconv n).imp fun S hS T hT =>
-    hM (I ^ n) (c ^ n) (pow_nonneg hc0 n) (norm_le_pow_of_mem_ideal_pow φ hφ hc0 hcI n) _ (hS T hT)
+  obtain ⟨M, -, hM⟩ :=
+    exists_norm_le_mul_of_mem_ideal_smul_fg (N := N) φ hφ
+      (fun r y => Algebra.smul_def (algebraMap R (FractionRing R) r) y)
+      hNfg
+  obtain ⟨c, hc0, hc1, hcI⟩ :=
+    exists_uniform_norm_bound_lt_one_of_fg φ hφ (IsNoetherian.noetherian I) hlt
+  exact hasSum_of_norm_sub_le_geometric hc0 hc1 fun n =>
+    (hconv n).imp fun S hS T hT =>
+      hM (I ^ n) (c ^ n) (pow_nonneg hc0 n) (norm_le_pow_of_mem_ideal_pow φ hφ hc0 hcI n) _
+        (hS T hT)
 
 end GlobalTheory.Ex.AdicNormSum

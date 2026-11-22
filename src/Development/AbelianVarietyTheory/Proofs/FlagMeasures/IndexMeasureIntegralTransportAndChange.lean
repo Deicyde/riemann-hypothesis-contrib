@@ -149,18 +149,31 @@ private lemma Fine_inf_of_relIndex_ne_zero {A A' B : AddSubgroup W} {φ : W → 
     AddSubgroup.inf_relIndex_right]
   exact mul_ne_zero hD h₁
 
-
 open scoped Pointwise Classical in
 variable {W : Type} [AddCommGroup W] {W' : Type} [AddCommGroup W'] in
-theorem _root_.GlobalTheory.IdxInt.Transport.cint_map_and_change : ∀ {W : Type} [AddCommGroup W] {W' : Type} [AddCommGroup W'], (∀ (e : W ≃+ W') (A : AddSubgroup W) (φ : W' → ℂ), (_root_.GlobalTheory.IdxInt.Nice (A.map e.toAddMonoidHom) φ ↔ _root_.GlobalTheory.IdxInt.Nice A (fun w => φ (e w))) ∧ _root_.GlobalTheory.IdxInt.cint (A.map e.toAddMonoidHom) φ = _root_.GlobalTheory.IdxInt.cint A (fun w => φ (e w))) ∧ ∀ (A A' : AddSubgroup W) (φ : W → ℂ), A.relIndex A' ≠ 0 → A'.relIndex A ≠ 0 → (_root_.GlobalTheory.IdxInt.Nice A φ ↔ _root_.GlobalTheory.IdxInt.Nice A' φ) ∧ _root_.GlobalTheory.IdxInt.cint A' φ * (A.relIndex A' : ℂ) = _root_.GlobalTheory.IdxInt.cint A φ * (A'.relIndex A : ℂ) := by
+theorem _root_.GlobalTheory.IdxInt.Transport.cint_map_and_change
+    : ∀ {W : Type} [AddCommGroup W] {W' : Type} [AddCommGroup W'],
+      (∀ (e : W ≃+ W') (A : AddSubgroup W) (φ : W' → ℂ),
+          (_root_.GlobalTheory.IdxInt.Nice (A.map e.toAddMonoidHom) φ
+              ↔ _root_.GlobalTheory.IdxInt.Nice A (fun w => φ (e w)))
+            ∧ _root_.GlobalTheory.IdxInt.cint (A.map e.toAddMonoidHom) φ
+              = _root_.GlobalTheory.IdxInt.cint A (fun w => φ (e w)))
+        ∧ ∀ (A A' : AddSubgroup W) (φ : W → ℂ),
+          A.relIndex A' ≠ 0 → A'.relIndex A ≠ 0
+            → (_root_.GlobalTheory.IdxInt.Nice A φ ↔ _root_.GlobalTheory.IdxInt.Nice A' φ)
+              ∧ _root_.GlobalTheory.IdxInt.cint A' φ * (A.relIndex A' : ℂ)
+                = _root_.GlobalTheory.IdxInt.cint A φ * (A'.relIndex A : ℂ) := by
   intro W _ W' _
   refine ⟨fun e A φ => ?_, fun A A' φ h₁ h₂ => ?_⟩
-  · have hiff : _root_.GlobalTheory.IdxInt.Nice (A.map e.toAddMonoidHom) φ ↔
-        _root_.GlobalTheory.IdxInt.Nice A (fun w => φ (e w)) := by
+  · have hiff
+        : _root_.GlobalTheory.IdxInt.Nice (A.map e.toAddMonoidHom) φ
+          ↔ _root_.GlobalTheory.IdxInt.Nice A (fun w => φ (e w)) := by
       constructor
       · rintro ⟨B', hB'⟩
         have hB'' : _root_.GlobalTheory.IdxInt.Fine (A.map e.toAddMonoidHom)
-            (fun w => (fun w => φ (e w)) (e.symm w)) B' := by simpa using hB'
+            (fun w => (fun w => φ (e w)) (e.symm w))
+            B' := by
+          simpa using hB'
         have h := (Fine_map_addEquiv_and_finsum_eq e.symm (φ := fun w => φ (e w)) hB'').1
         rw [map_symm_map_addEquiv] at h
         exact ⟨_, h⟩
@@ -169,8 +182,10 @@ theorem _root_.GlobalTheory.IdxInt.Transport.cint_map_and_change : ∀ {W : Type
     refine ⟨hiff, ?_⟩
     by_cases hN : _root_.GlobalTheory.IdxInt.Nice A (fun w => φ (e w))
     · obtain ⟨B, hB⟩ := hN
-      rw [cint_eq_finsum_div_relIndex_of_fine hB, cint_eq_finsum_div_relIndex_of_fine (Fine_map_addEquiv_and_finsum_eq e hB).1,
-        (Fine_map_addEquiv_and_finsum_eq e hB).2, AddSubgroup.relIndex_map_map_of_injective _ _ e.injective]
+      rw [cint_eq_finsum_div_relIndex_of_fine hB,
+        cint_eq_finsum_div_relIndex_of_fine (Fine_map_addEquiv_and_finsum_eq e hB).1,
+        (Fine_map_addEquiv_and_finsum_eq e hB).2,
+        AddSubgroup.relIndex_map_map_of_injective _ _ e.injective]
     · unfold _root_.GlobalTheory.IdxInt.cint
       rw [dite_eq_right hN, dite_eq_right (hiff.not.mpr hN)]
   · have hiff : _root_.GlobalTheory.IdxInt.Nice A φ ↔ _root_.GlobalTheory.IdxInt.Nice A' φ := by

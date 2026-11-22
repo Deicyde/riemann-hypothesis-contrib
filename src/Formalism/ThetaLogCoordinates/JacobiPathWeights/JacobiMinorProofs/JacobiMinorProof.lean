@@ -136,8 +136,8 @@ lemma minorF_genMat (A B : Finset (Fin n)) :
       algebraMap (MvPolynomial (Fin n × Fin n) k) (GenField k n) (minorF (genX k n) A B) :=
   (minorMap _ _ (algebraMap (MvPolynomial (Fin n × Fin n) k) (GenField k n)) n (genX k n) A B).symm
 
-def colT (lo : ℤ) (C : ℕ) (I : ℤ → Finset (Fin n)) : Fin C → Finset (Fin n) :=
-  fun t => hatIdx I (lo + 1 + (t.val : ℤ))
+def colT (lo : ℤ) (C : ℕ) (I : ℤ → Finset (Fin n)) : Fin C → Finset (Fin n) := fun t =>
+  hatIdx I (lo + 1 + (t.val : ℤ))
 
 lemma exists_bounds (μ : Fin n → ℤ) : ∃ lo hi : ℤ, lo ≤ 0 ∧ 0 ≤ hi ∧ ∀ m, lo ≤ μ m ∧ μ m ≤ hi := by
   have h : ∀ m, |μ m| ≤ ∑ m, |μ m| := fun m =>
@@ -278,18 +278,20 @@ theorem fact_break : FactBrk := by
   intro k _ n μ _
   obtain ⟨lo, hi, hlo, hhi, hb⟩ := exists_bounds μ
   have hA := path_basis_lemma k n (hi - lo).toNat
-  let e : {I : ℤ → Finset (Fin n) // IsStd μ I} →
-      {T : Fin (hi - lo).toNat → Finset (Fin n) // SemiStd T} :=
-    fun I => ⟨colT lo (hi - lo).toNat I.1, semi_colT I.2 lo _⟩
+  let e
+      : {I : ℤ → Finset (Fin n) // IsStd μ I}
+        → {T : Fin (hi - lo).toNat → Finset (Fin n) // SemiStd T} := fun I =>
+    ⟨colT lo (hi - lo).toNat I.1, semi_colT I.2 lo _⟩
   have he : Function.Injective e := by
     intro I I' h
     exact Subtype.ext (colT_inj hlo hhi hb I.2.1 I'.2.1 (congrArg Subtype.val h))
   have h1 := hA.comp e he
   let φ : MvPolynomial (Fin n × Fin n) k →ₗ[k] GenField k n :=
     (IsScalarTower.toAlgHom k (MvPolynomial (Fin n × Fin n) k) (GenField k n)).toLinearMap
-  have hφ : LinearMap.ker φ = ⊥ := LinearMap.ker_eq_bot.2 (by
-    intro a b h
-    exact IsFractionRing.injective (MvPolynomial (Fin n × Fin n) k) (GenField k n) h)
+  have hφ : LinearMap.ker φ = ⊥ :=
+    LinearMap.ker_eq_bot.2 (by
+      intro a b h
+      exact IsFractionRing.injective (MvPolynomial (Fin n × Fin n) k) (GenField k n) h)
   have h2 := h1.map' φ hφ
   set D : GenField k n :=
     ∏ c ∈ Finset.Ioc lo hi, if 1 ≤ c then (1 : GenField k n) else ((genMat k n).det)⁻¹ with hD
@@ -299,12 +301,15 @@ theorem fact_break : FactBrk := by
     split_ifs
     · exact one_ne_zero
     · exact inv_ne_zero (genMat_det_ne k n)
-  have h3 := h2.map' (LinearMap.mulLeft k D) (LinearMap.ker_eq_bot.2 (fun a b h => mul_left_cancel₀ hD0 h))
+  have h3 :=
+    h2.map' (LinearMap.mulLeft k D) (LinearMap.ker_eq_bot.2 (fun a b h => mul_left_cancel₀ hD0 h))
   have h4 := h3.units_smul (fun I => ∏ c ∈ Finset.Ioc lo hi, sgnU k μ I.1 c)
-  have h5 : (fun I : {I : ℤ → Finset (Fin n) // IsStd μ I} => brk (genMat k n) (genMat k n)⁻¹ μ I.1) =
-      (fun I : {I : ℤ → Finset (Fin n) // IsStd μ I} => ∏ c ∈ Finset.Ioc lo hi, sgnU k μ I.1 c) •
-        (⇑(LinearMap.mulLeft k D) ∘ ⇑φ ∘ (fun T : {T : Fin (hi - lo).toNat → Finset (Fin n) // SemiStd T} =>
-          tabMinors k T.1) ∘ e) := by
+  have h5
+      : (fun I : {I : ℤ → Finset (Fin n) // IsStd μ I} => brk (genMat k n) (genMat k n)⁻¹ μ I.1)
+        = (fun I : {I : ℤ → Finset (Fin n) // IsStd μ I} => ∏ c ∈ Finset.Ioc lo hi, sgnU k μ I.1 c)
+          • (⇑(LinearMap.mulLeft k D) ∘ ⇑φ
+            ∘ (fun T : {T : Fin (hi - lo).toNat → Finset (Fin n) // SemiStd T} => tabMinors k T.1)
+            ∘ e) := by
     funext I
     exact brk_eq hlo hhi hb I.2.1
   rw [h5]

@@ -11,9 +11,9 @@ open NumberField IsDedekindDomain
 
 namespace PI.TameSurjW
 
-theorem liesOver_span_iff {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
-    (P : Ideal (𝓞 E)) [hP : P.IsPrime] :
-    P.LiesOver (Ideal.span {(p : ℤ)}) ↔ ((p : ℕ) : 𝓞 E) ∈ P := by
+theorem liesOver_span_iff
+    {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) (P : Ideal (𝓞 E)) [hP : P.IsPrime]
+    : P.LiesOver (Ideal.span {(p : ℤ)}) ↔ ((p : ℕ) : 𝓞 E) ∈ P := by
   have : Fact p.Prime := ⟨hp⟩
   have hmax : (Ideal.span {(p : ℤ)}).IsMaximal := Int.ideal_span_isMaximal_of_prime p
   constructor
@@ -26,16 +26,18 @@ theorem liesOver_span_iff {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p
     rw [Ideal.span_le, Set.singleton_subset_iff, SetLike.mem_coe, Ideal.under, Ideal.mem_comap]
     simpa using h
 
-theorem notMem_sq_of_split {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
-    (h : (Formalism.BasicNotions.placesOver E p).ncard = Module.finrank ℚ E)
-    (v : HeightOneSpectrum (𝓞 E)) (hv : v ∈ Formalism.BasicNotions.placesOver E p) :
-    ((p : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2 := by
+theorem notMem_sq_of_split
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime) (h : (Formalism.BasicNotions.placesOver E p).ncard = Module.finrank ℚ E)
+    (v : HeightOneSpectrum (𝓞 E)) (hv : v ∈ Formalism.BasicNotions.placesOver E p)
+    : ((p : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2 := by
   set P0 : Ideal ℤ := Ideal.span {(p : ℤ)} with hP0def
   have : Fact p.Prime := ⟨hp⟩
   have hmax : P0.IsMaximal := Int.ideal_span_isMaximal_of_prime p
-  have hP0 : P0 ≠ ⊥ := by
-    simp [P0, hp.ne_zero]
-  have himg : HeightOneSpectrum.asIdeal '' (Formalism.BasicNotions.placesOver E p) = P0.primesOver (𝓞 E) := by
+  have hP0 : P0 ≠ ⊥ := by simp [P0, hp.ne_zero]
+  have himg
+      : HeightOneSpectrum.asIdeal '' (Formalism.BasicNotions.placesOver E p)
+        = P0.primesOver (𝓞 E) := by
     ext P
     constructor
     · rintro ⟨w, hw, rfl⟩
@@ -61,8 +63,9 @@ theorem notMem_sq_of_split {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : 
   have he : 2 ≤ v.asIdeal.ramificationIdx ℤ := by
     rw [Ideal.IsDedekindDomain.ramificationIdx_eq_multiplicity P0 v.asIdeal hmap]
     exact hfin.le_multiplicity_of_pow_dvd hdvd
-  have hlt : Fintype.card (P0.primesOver (𝓞 E)) <
-      ∑ r : P0.primesOver (𝓞 E), r.1.ramificationIdx ℤ * r.1.inertiaDeg ℤ := by
+  have hlt
+      : Fintype.card (P0.primesOver (𝓞 E))
+        < ∑ r : P0.primesOver (𝓞 E), r.1.ramificationIdx ℤ * r.1.inertiaDeg ℤ := by
     rw [Fintype.card_eq_sum_ones]
     apply Finset.sum_lt_sum
     · intro r _

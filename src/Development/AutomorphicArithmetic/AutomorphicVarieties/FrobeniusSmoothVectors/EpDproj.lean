@@ -18,23 +18,28 @@ private theorem sg_sq (K : Type) [CommRing K] (i : ZMod 2) : sg K i * sg K i = 1
   rw [← sg_add, h]
   simp [sg]
 
-private theorem sg_ne (K : Type) [CommRing K] (i j : ZMod 2) (e : i ≠ j) : sg K i * sg K j = -1 := by
+private theorem sg_ne (K : Type) [CommRing K] (i j : ZMod 2) (e : i ≠ j)
+    : sg K i * sg K j = -1 := by
   have h : i + j = 1 := by revert i j; decide
   rw [← sg_add, h]
   show (-1 : K) ^ (1 : ZMod 2).val = -1
   rw [show (1 : ZMod 2).val = 1 from rfl, pow_one]
 
-private theorem lin_sg {O R K : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup K] [Module O K]
-    (D : R →ₗ[O] K) (i : ZMod 2) (x : R) : D (sg R i * x) = sg ℤ i • D x := by
+private theorem lin_sg
+    {O R K : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup K] [Module O K]
+    (D : R →ₗ[O] K) (i : ZMod 2) (x : R)
+    : D (sg R i * x) = sg ℤ i • D x := by
   have h : i = 0 ∨ i = 1 := by revert i; decide
   rcases h with rfl | rfl
   · simp [sg]
   · show D ((-1 : R) ^ (1 : ZMod 2).val * x) = (-1 : ℤ) ^ (1 : ZMod 2).val • D x
     rw [show (1 : ZMod 2).val = 1 from rfl, pow_one, pow_one, neg_one_mul, map_neg, neg_one_zsmul]
 
-private theorem gl_inv_apply_eq_zero_of_forall_pw_ne_zero {K : Type} [Field K] (h2 : (2 : K) ≠ 0) (G : GL (Fin 3) K)
-    (hG : ∀ a b, pw a b ≠ 0 → (G : Matrix (Fin 3) (Fin 3) K) a b = 0) :
-    ∀ a b, pw a b ≠ 0 → ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) a b = 0 := by
+private theorem gl_inv_apply_eq_zero_of_forall_pw_ne_zero
+    {K : Type} [Field K]
+    (h2 : (2 : K) ≠ 0)
+    (G : GL (Fin 3) K) (hG : ∀ a b, pw a b ≠ 0 → (G : Matrix (Fin 3) (Fin 3) K) a b = 0)
+    : ∀ a b, pw a b ≠ 0 → ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) a b = 0 := by
   set E : Matrix (Fin 3) (Fin 3) K := Matrix.diagonal (fun a => sg K (pq a)) with hE
   have hEE : E * E = 1 := by
     rw [hE, Matrix.diagonal_mul_diagonal]
@@ -51,24 +56,40 @@ private theorem gl_inv_apply_eq_zero_of_forall_pw_ne_zero {K : Type} [Field K] (
     · rw [h]
       simp [sg]
     · rw [hG a b h, mul_zero]
-  have hinv1 : (G : Matrix (Fin 3) (Fin 3) K) * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) = 1 := by
+  have hinv1
+      : (G : Matrix (Fin 3) (Fin 3) K) * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) = 1 := by
     rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
-  have hinv2 : ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * (G : Matrix (Fin 3) (Fin 3) K) = 1 := by
+  have hinv2
+      : ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * (G : Matrix (Fin 3) (Fin 3) K) = 1 := by
     rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
-  have key : E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E = ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) := by
-    have h1 : (G : Matrix (Fin 3) (Fin 3) K) * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E) = 1 := by
-      calc (G : Matrix (Fin 3) (Fin 3) K) * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E)
-          = (E * (G : Matrix (Fin 3) (Fin 3) K) * E) * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E) := by
-            rw [hEG]
-        _ = E * ((G : Matrix (Fin 3) (Fin 3) K) * ((E * E) * (((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E))) := by
-            simp only [Matrix.mul_assoc]
+  have key
+      : E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E
+        = ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) := by
+    have h1
+        : (G : Matrix (Fin 3) (Fin 3) K)
+            * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E)
+          = 1 := by
+      calc
+        (G : Matrix (Fin 3) (Fin 3) K) * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E)
+            = (E * (G : Matrix (Fin 3) (Fin 3) K) * E)
+              * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E) := by
+          rw [hEG]
+        _ = E
+            * ((G : Matrix (Fin 3) (Fin 3) K)
+              * ((E * E) * (((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E))) := by
+          simp only [Matrix.mul_assoc]
         _ = 1 := by
-            rw [hEE, Matrix.one_mul, ← Matrix.mul_assoc (G : Matrix (Fin 3) (Fin 3) K), hinv1, Matrix.one_mul, hEE]
-    calc E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E
-        = (((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * G) * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E) := by
-          rw [hinv2, Matrix.one_mul]
-      _ = ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * ((G : Matrix (Fin 3) (Fin 3) K) * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E)) := by
-          rw [Matrix.mul_assoc]
+          rw [hEE, Matrix.one_mul, ← Matrix.mul_assoc (G : Matrix (Fin 3) (Fin 3) K), hinv1,
+            Matrix.one_mul, hEE]
+    calc
+      E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E
+          = (((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * G)
+            * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E) := by
+        rw [hinv2, Matrix.one_mul]
+      _ = ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K)
+          * ((G : Matrix (Fin 3) (Fin 3) K)
+            * (E * ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * E)) := by
+        rw [Matrix.mul_assoc]
       _ = ((G⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) := by rw [h1, Matrix.mul_one]
   intro a b hab
   have e := congrFun (congrFun key a) b
@@ -86,8 +107,16 @@ private theorem gl_inv_apply_eq_zero_of_forall_pw_ne_zero {K : Type} [Field K] (
     linear_combination -e
   exact (mul_eq_zero.mp e').resolve_left h2
 
-theorem UpperTheory.V.Fr.ep_dproj :
-    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} (O : Type) [CommRing O] [IsLocalRing O], IsUnit (2 : O) → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R), (∀ y, σ (σ y) = y) → ∀ (B : Box F 3 R) (π : F.V → Fin 3 → ZMod 2), B.Gr σ π → ∀ j, ∀ D ∈ Tan O R, ∃ D' ∈ derp O σ j, ∀ s, B.tanCo O D' s = prp (ResidueField O) j (B.tanCo O D s) := by
+theorem UpperTheory.V.Fr.ep_dproj
+    : ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} (O : Type) [CommRing O]
+        [IsLocalRing O],
+      IsUnit (2 : O)
+        → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : R →ₐ[O] R),
+          (∀ y, σ (σ y) = y)
+            → ∀ (B : Box F 3 R) (π : F.V → Fin 3 → ZMod 2),
+              B.Gr σ π
+                → ∀ j, ∀ D ∈ Tan O R, ∃ D' ∈ derp O σ j, ∀ s,
+                  B.tanCo O D' s = prp (ResidueField O) j (B.tanCo O D s) := by
   intro l _ k _ F O _ _ h2 R _ _ _ σ hσ B π hB j D hD
   have h2k : (2 : ResidueField O) ≠ 0 := by
     have := h2.map (residue O)
@@ -128,8 +157,10 @@ theorem UpperTheory.V.Fr.ep_dproj :
         linear_combination D ((B.r s).mat a c) * sg_sq (ResidueField O) j
       · rw [← mul_assoc, sg_ne _ _ _ (Ne.symm hp)]
         ring
-    have hbar : ∀ a c, pw a c ≠ 0 →
-        (((Box.bar O B).r s).left : Matrix (Fin 3) (Fin 3) (ResidueField O)) a c = 0 := by
+    have hbar
+        : ∀ a c,
+          pw a c ≠ 0
+            → (((Box.bar O B).r s).left : Matrix (Fin 3) (Fin 3) (ResidueField O)) a c = 0 := by
       intro a c hac
       show res O R ((B.r s).mat a c) = 0
       have hp : pw a c = 1 := by
@@ -143,8 +174,7 @@ theorem UpperTheory.V.Fr.ep_dproj :
         show (-1 : R) ^ (1 : ZMod 2).val = -1
         rw [show (1 : ZMod 2).val = 1 from rfl, pow_one]
       rw [s1R, map_neg, map_one] at e
-      have e' : (2 : ResidueField O) * res O R ((B.r s).mat a c) = 0 := by
-        linear_combination e
+      have e' : (2 : ResidueField O) * res O R ((B.r s).mat a c) = 0 := by linear_combination e
       exact (mul_eq_zero.mp e').resolve_left h2k
     have hN := gl_inv_apply_eq_zero_of_forall_pw_ne_zero h2k ((Box.bar O B).r s).left hbar
     ext a b

@@ -20,8 +20,8 @@ open Formalism.L2.DIV GlobalTheory.BI
 
 variable {K : Type} [Field K] [Fintype K] [DecidableEq K] {r s : ℕ}
 
-theorem parab_eq_blockTri (b : Fin r → Fin s) :
-    parab K b = blockTri (κ := K) (fun i => (b i : ℕ)) := by
+theorem parab_eq_blockTri (b : Fin r → Fin s)
+    : parab K b = blockTri (κ := K) (fun i => (b i : ℕ)) := by
   ext g
   constructor
   · intro hg
@@ -29,21 +29,24 @@ theorem parab_eq_blockTri (b : Fin r → Fin s) :
   · intro hg
     exact ⟨hg, (blockTri (κ := K) (fun i => (b i : ℕ))).inv_mem hg⟩
 
-
 omit [Fintype K] [DecidableEq K] in
-def blockGL (b : Fin r → Fin s) (c : Fin s) :
-    GL (Fin (Fintype.card {i // b i = c})) K ≃* GL {i // b i = c} K :=
+def blockGL (b : Fin r → Fin s) (c : Fin s)
+    : GL (Fin (Fintype.card {i // b i = c})) K ≃* GL {i // b i = c} K :=
   glEquiv K (Fintype.equivFin {i // b i = c}).symm
 
 omit [Fintype K] [DecidableEq K] in
-theorem blockGL_apply (b : Fin r → Fin s) (c : Fin s) (g : GL (Fin (Fintype.card {i // b i = c})) K)
-    (x y : {i // b i = c}) :
-    ((blockGL b c g : GL {i // b i = c} K) : Matrix _ _ K) x y =
-      (g : Matrix _ _ K) (Fintype.equivFin _ x) (Fintype.equivFin _ y) := rfl
+theorem blockGL_apply
+    (b : Fin r → Fin s) (c : Fin s)
+    (g : GL (Fin (Fintype.card {i // b i = c})) K) (x y : {i // b i = c})
+    : ((blockGL b c g : GL {i // b i = c} K) : Matrix _ _ K) x y
+      = (g : Matrix _ _ K) (Fintype.equivFin _ x) (Fintype.equivFin _ y) :=
+  rfl
 
-theorem sum_unipRadical_eq_zero (b : Fin r → Fin s) (c : Fin s) (τ : FDRep ℂ (GL {i // b i = c} K))
-    (hτ : IsCuspidal K τ) (c' : Fin (Fintype.card {i // b i = c}) → ℕ) (hc' : ∃ i j, c' i ≠ c' j) :
-    ∑ᶠ u : GlobalTheory.FiniteGL.unipRadical K c', LinearMap.trace ℂ τ (τ.ρ (blockGL b c u)) = 0 := by
+theorem sum_unipRadical_eq_zero
+    (b : Fin r → Fin s) (c : Fin s) (τ : FDRep ℂ (GL {i // b i = c} K)) (hτ : IsCuspidal K τ)
+    (c' : Fin (Fintype.card {i // b i = c}) → ℕ) (hc' : ∃ i j, c' i ≠ c' j)
+    : ∑ᶠ u : GlobalTheory.FiniteGL.unipRadical K c', LinearMap.trace ℂ τ (τ.ρ (blockGL b c u))
+      = 0 := by
   classical
   let _ : Fintype (GlobalTheory.FiniteGL.unipRadical K c') := Fintype.ofFinite _
   rw [finsum_eq_sum_of_fintype]
@@ -84,52 +87,67 @@ theorem sum_unipRadical_eq_zero (b : Fin r → Fin s) (c : Fin s) (τ : FDRep �
       have hl : c' l ≤ c' i0 := by
         by_contra hl
         exact hkl (by rw [hb, hb, if_neg hk, if_neg hl])
-      have hlt : bb (F.symm l) < bb (F.symm k) := by
-        rw [hb, hb, if_neg hk, if_pos hl]; decide
+      have hlt : bb (F.symm l) < bb (F.symm k) := by rw [hb, hb, if_neg hk, if_pos hl]; decide
       have ekl : k ≠ l := fun e => hkl (by rw [e])
       rw [hu.1.1 _ _ hlt, Matrix.one_apply_ne ekl, sub_zero]
   have := hv ⟨u', hmem⟩
   simpa [ρu, hu'u] using this
 
-theorem isIrrChar_block (b : Fin r → Fin s) (c : Fin s) (τ : FDRep ℂ (GL {i // b i = c} K)) (hτ : Simple τ) :
-    IsIrrChar ℂ ℂ (fun g : GL (Fin (Fintype.card {i // b i = c})) K => LinearMap.trace ℂ τ (τ.ρ (blockGL b c g))) := by
-  have hi := GlobalTheory.FinGL.Transport.isIrreducible_comp τ.ρ (blockGL b c).toMonoidHom (blockGL b c).surjective
-    (GlobalTheory.SerOSys.ZSum.isIrreducible_of_simple τ hτ)
+theorem isIrrChar_block
+    (b : Fin r → Fin s) (c : Fin s) (τ : FDRep ℂ (GL {i // b i = c} K)) (hτ : Simple τ)
+    : IsIrrChar ℂ ℂ (fun g : GL (Fin (Fintype.card {i // b i = c})) K =>
+      LinearMap.trace ℂ τ (τ.ρ (blockGL b c g))) := by
+  have hi :=
+    GlobalTheory.FinGL.Transport.isIrreducible_comp τ.ρ (blockGL b c).toMonoidHom
+      (blockGL b c).surjective (GlobalTheory.SerOSys.ZSum.isIrreducible_of_simple τ hτ)
   have h := (isChar_and_isIrrChar_of_rep ℂ ℂ _ τ (τ.ρ.comp (blockGL b c).toMonoidHom)).2 hi
   simpa [Representation.character] using h
 
-theorem isCuspProdChar_trace_hcRep : ∀ (K : Type) [Field K] [Fintype K] [DecidableEq K] (r s : ℕ) (b : Fin r → Fin s)
-    (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)), Function.Surjective b →
-    (∀ c, Simple (lam c) ∧ IsCuspidal K (lam c)) → Monotone b →
-    GlobalTheory.IndefiniteRowSideFullHecke.CuspidalProductMultiplicity.IsCuspProdChar (fun x : GL (Fin r) K => LinearMap.trace ℂ (hcSpace K b lam) (hcRep K b lam x)) := by
+theorem isCuspProdChar_trace_hcRep
+    : ∀ (K : Type) [Field K] [Fintype K] [DecidableEq K] (r s : ℕ) (b : Fin r → Fin s)
+        (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)),
+      Function.Surjective b → (∀ c, Simple (lam c) ∧ IsCuspidal K (lam c)) → Monotone b
+        → GlobalTheory.IndefiniteRowSideFullHecke.CuspidalProductMultiplicity.IsCuspProdChar
+          (fun x : GL (Fin r) K => LinearMap.trace ℂ (hcSpace K b lam) (hcRep K b lam x)) := by
   intro K _ _ _ r s b lam _ hlam hmono
   classical
   let b₀ : Fin r → ℕ := fun i => (b i : ℕ)
   have hb₀ : Monotone b₀ := fun i j h => hmono h
   let d : Fin s → ℕ := fun c => Fintype.card {i // b i = c}
   let e : (Σ c, Fin (d c)) ≃ Fin r :=
-    (Equiv.sigmaCongrRight fun c => (Fintype.equivFin {i // b i = c}).symm).trans (Equiv.sigmaFiberEquiv b)
+    (Equiv.sigmaCongrRight fun c => (Fintype.equivFin {i // b i = c}).symm).trans
+      (Equiv.sigmaFiberEquiv b)
   have hbe : ∀ x, b (e x) = x.1 := fun x => ((Fintype.equivFin {i // b i = x.1}).symm x.2).2
   have he : ∀ x y, b₀ (e x) = b₀ (e y) ↔ x.1 = y.1 := by
     intro x y
     simp only [b₀, hbe, Fin.val_inj]
-  let χ : ∀ c, GL (Fin (d c)) K → ℂ := fun c g => LinearMap.trace ℂ (lam c) ((lam c).ρ (blockGL b c g))
-  obtain ⟨n, σ, hσ, hch⟩ := GlobalTheory.GoodTypeGeneric.exists_isCuspDatum (F := K) hb₀ e he χ
-    (fun c => isIrrChar_block b c (lam c) (hlam c).1)
-    (fun c c' hc' => sum_unipRadical_eq_zero b c (lam c) (hlam c).2 c' hc')
+  let χ : ∀ c, GL (Fin (d c)) K → ℂ := fun c g =>
+    LinearMap.trace ℂ (lam c) ((lam c).ρ (blockGL b c g))
+  obtain ⟨n, σ, hσ, hch⟩ :=
+    GlobalTheory.GoodTypeGeneric.exists_isCuspDatum (F := K) hb₀ e he χ
+      (fun c => isIrrChar_block b c (lam c) (hlam c).1)
+      (fun c c' hc' => sum_unipRadical_eq_zero b c (lam c) (hlam c).2 c' hc')
   refine ⟨n, b₀, σ, hσ, fun x => ?_⟩
   have hPB := parab_eq_blockTri (K := K) b
   let f : blockTri (κ := K) b₀ →* parab K b :=
-    MonoidHom.codRestrict (blockTri (κ := K) b₀).subtype (parab K b) (fun p => by rw [hPB]; exact p.2)
+    MonoidHom.codRestrict (blockTri (κ := K) b₀).subtype (parab K b)
+      (fun p => by rw [hPB]; exact p.2)
   have hf : Function.Surjective f := fun p => ⟨⟨p.1, by rw [← hPB]; exact p.2⟩, rfl⟩
-  have h1 : LinearMap.trace ℂ (hcSpace K b lam) (hcRep K b lam x) =
-      (Representation.coind (parab K b).subtype (PI.SerBridgeGLW.inflRep K b lam)).character x := rfl
+  have h1
+      : LinearMap.trace ℂ (hcSpace K b lam) (hcRep K b lam x)
+        = (Representation.coind (parab K b).subtype (PI.SerBridgeGLW.inflRep K b lam)).character
+          x :=
+    rfl
   show LinearMap.trace ℂ (hcSpace K b lam) (hcRep K b lam x) = _
-  have h2 := GlobalTheory.FinGL.Transport.character_coind (parab K b).subtype (blockTri (κ := K) b₀).subtype
-    (PI.SerBridgeGLW.inflRep K b lam) (MulEquiv.refl _) f hf (fun _ => rfl) x
+  have h2 :=
+    GlobalTheory.FinGL.Transport.character_coind (parab K b).subtype (blockTri (κ := K) b₀).subtype
+      (PI.SerBridgeGLW.inflRep K b lam) (MulEquiv.refl _) f hf
+      (fun _ => rfl)
+      x
   rw [MulEquiv.refl_apply] at h2
   rw [h1, ← h2]
-  rw [GlobalTheory.GoodTypeGeneric.character_coind_eq_ind, GlobalTheory.GoodTypeGeneric.character_coind_eq_ind]
+  rw [GlobalTheory.GoodTypeGeneric.character_coind_eq_ind,
+    GlobalTheory.GoodTypeGeneric.character_coind_eq_ind]
   congr 1
   funext p
   rw [hch p]

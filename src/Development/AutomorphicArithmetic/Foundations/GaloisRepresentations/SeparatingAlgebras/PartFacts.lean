@@ -5,24 +5,27 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.EigenForm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
 open MeasureTheory GroundTheory.Automorphic.Spherical UpperTheory.Gal.Gen
 
-theorem UpperTheory.Gal.Gen.partFacts_pf :
-    UpperTheory.Gal.Gen.PartFacts := by
+theorem UpperTheory.Gal.Gen.partFacts_pf : UpperTheory.Gal.Gen.PartFacts := by
   intro E _ _ _ a W C P
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro f hf
-    obtain ⟨I, F, h1, h2, rfl⟩ := GlobalTheory.T.eigenForm_eq_finite_sum_autRep_eigenForms E a W C 1 f (fun c v g => by simpa using hf c.1 c.2 v g)
+    obtain ⟨I, F, h1, h2, rfl⟩ :=
+      GlobalTheory.T.eigenForm_eq_finite_sum_autRep_eigenForms E a W C 1 f
+        (fun c v g => by simpa using hf c.1 c.2 v g)
     refine Submodule.sum_mem _ fun π hπ => ?_
     have hfix : F π ∈ fixedBy W C := fun k hk v g => by simpa using h2 π hπ ⟨k, hk⟩ v g
     by_cases hP : P π.V
-    · exact Submodule.mem_sup_left
-        (Submodule.mem_iSup_of_mem π (Submodule.mem_iSup_of_mem hP ⟨h1 π hπ, hfix⟩))
-    · exact Submodule.mem_sup_right
-        (Submodule.mem_iSup_of_mem π (Submodule.mem_iSup_of_mem hP ⟨h1 π hπ, hfix⟩))
+    · exact Submodule.mem_sup_left (Submodule.mem_iSup_of_mem π
+        (Submodule.mem_iSup_of_mem hP ⟨h1 π hπ, hfix⟩))
+    · exact Submodule.mem_sup_right (Submodule.mem_iSup_of_mem π
+        (Submodule.mem_iSup_of_mem hP ⟨h1 π hπ, hfix⟩))
   · exact iSup₂_le fun π _ => inf_le_right
   · intro K hK
     refine iSup₂_mono fun π _ => inf_le_inf_left _ ?_
@@ -40,8 +43,10 @@ theorem UpperTheory.Gal.Gen.partFacts_pf :
         exact hf.2 _ (hx c hc) v _
     exact hle hf
   · intro G hG
-    obtain ⟨F, hF, rfl⟩ := (Submodule.mem_iSup_iff_exists_finsupp
-      (fun π : AutSub E a => ⨆ (_ : P π.V), π.finPart W ⊓ fixedBy W C) G).1 hG
+    obtain ⟨F, hF, rfl⟩ :=
+      (Submodule.mem_iSup_iff_exists_finsupp
+        (fun π : AutSub E a => ⨆ (_ : P π.V), π.finPart W ⊓ fixedBy W C)
+        G).1 hG
     refine ⟨F.support, F, fun π hπ => ?_, rfl⟩
     have h0 : F π ≠ 0 := Finsupp.mem_support_iff.1 hπ
     have hm : F π ∈ ⨆ (_ : P π.V), π.finPart W ⊓ fixedBy W C := hF π

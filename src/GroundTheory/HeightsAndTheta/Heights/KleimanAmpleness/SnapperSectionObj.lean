@@ -15,8 +15,8 @@ noncomputable section
 
 universe u v w
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
-
+variable
+  {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
 variable (S x) in
 def spanBundle (s : Ω) (hs : s ≠ 0) : LineBundle S x where
@@ -42,8 +42,12 @@ def spanBundle (s : Ω) (hs : s ≠ 0) : LineBundle S x where
       change (↑u⁻¹ : chartRing S x J).1 * ((c : Ω) * s) = y
       rw [← chartRing_smul_def c s, hc, smul_eq_mul, ← mul_assoc, hinv, one_mul]
   fg _ := Submodule.fg_span_singleton s
-  invertible I := ⟨Submodule.span (chartRing S x I) {s⁻¹}, by
-    rw [Submodule.span_mul_span, Set.singleton_mul_singleton, mul_inv_cancel₀ hs, ← Submodule.one_eq_span]⟩
+  invertible I := ⟨
+    Submodule.span (chartRing S x I) {s⁻¹},
+    by
+      rw [Submodule.span_mul_span, Set.singleton_mul_singleton, mul_inv_cancel₀ hs,
+        ← Submodule.one_eq_span]
+  ⟩
 
 variable {E : Type v} [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
 
@@ -60,8 +64,8 @@ def SubFamily.sup (F G : SubFamily S x E) : SubFamily S x E where
       obtain ⟨v, hv, hvb⟩ := (G.mem_iff I J h b).mp hb
       refine ⟨u * v, by rw [map_mul]; exact hu.mul hv, ?_⟩
       have : ((u * v : chartRing S x I) : Ω) • (a + b) = v • ((u : Ω) • a) + u • ((v : Ω) • b) := by
-        rw [Subalgebra.smul_def, Subalgebra.smul_def, smul_smul, smul_smul, Subalgebra.coe_mul, smul_add,
-          mul_comm (v : Ω) (u : Ω)]
+        rw [Subalgebra.smul_def, Subalgebra.smul_def, smul_smul, smul_smul, Subalgebra.coe_mul,
+          smul_add, mul_comm (v : Ω) (u : Ω)]
       rw [this]
       exact Submodule.add_mem _ (Submodule.mem_sup_left (Submodule.smul_mem _ v hua))
         (Submodule.mem_sup_right (Submodule.smul_mem _ u hvb))

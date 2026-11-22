@@ -7,9 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Filter Formalism.MainNotions.V.Pf.V2.Calc UpperTheory.V.Alg UpperTheory.V.Alg.M
 
-private theorem UpperTheory.V.Alg.M.kill_pow {O B A κ : Type} [CommRing O] [CommRing B] [CommRing A] [Algebra O A]
-    [Algebra B A] [Field κ] [Algebra O κ] (ξ : A →ₐ[O] κ) (N : Submodule B A) (hN : ∀ f ∈ N, ξ f = 0)
-    (n : ℕ) (hn : n ≠ 0) : ∀ f ∈ N ^ n, ξ f = 0 := by
+private theorem UpperTheory.V.Alg.M.kill_pow
+    {O B A κ : Type}
+    [CommRing O] [CommRing B] [CommRing A] [Algebra O A] [Algebra B A] [Field κ] [Algebra O κ]
+    (ξ : A →ₐ[O] κ) (N : Submodule B A) (hN : ∀ f ∈ N, ξ f = 0)
+    (n : ℕ) (hn : n ≠ 0)
+    : ∀ f ∈ N ^ n, ξ f = 0 := by
   obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hn
   intro f hf
   rw [pow_succ] at hf
@@ -17,11 +20,13 @@ private theorem UpperTheory.V.Alg.M.kill_pow {O B A κ : Type} [CommRing O] [Com
   · rw [map_mul, hN b hb, mul_zero]
   · rw [map_add (f := _), ha, hb, add_zero]
 
-theorem UpperTheory.V.Alg.M.sign_holds :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (A : Type) [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O), IsWRing 𝒜 x →
-    ∀ (κ : Type) [Field κ] [Algebra O κ] (ξ : A →ₐ[O] κ),
-      (¬ NegZero 𝒜 ξ ↔ ∃ f ∈ 𝒜 (-2), ξ f ≠ 0) ∧ (¬ PosZero 𝒜 ξ ↔ ∃ g ∈ 𝒜 2, ξ g ≠ 0) := by
+theorem UpperTheory.V.Alg.M.sign_holds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (A : Type) [CommRing A] [Algebra O A]
+        (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O),
+      IsWRing 𝒜 x
+        → ∀ (κ : Type) [Field κ] [Algebra O κ] (ξ : A →ₐ[O] κ),
+          (¬ NegZero 𝒜 ξ ↔ ∃ f ∈ 𝒜 (-2), ξ f ≠ 0) ∧ (¬ PosZero 𝒜 ξ ↔ ∃ g ∈ 𝒜 2, ξ g ≠ 0) := by
   intro O _ _ _ _ _ A _ _ 𝒜 _ _ x hx κ _ _ ξ
   have hp := UpperTheory.V.Alg.M.oz_two_mul_eq_pow O A 𝒜 x hx
   refine ⟨⟨fun h => ?_, ?_⟩, ⟨fun h => ?_, ?_⟩⟩

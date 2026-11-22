@@ -26,16 +26,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TraceMulEqZe
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT
 open scoped Classical
 
 noncomputable section
 
 namespace GlobalTheory.TwLat.GramUnit
 
-theorem isReduced_of_adjoin {F A : Type} [Field F] [CommRing A] [Algebra F A] [Module.Finite F A]
-    (u : A) (P : F[X]) (hP : P.Separable) (hu : aeval u P = 0) (hadj : Algebra.adjoin F {u} = ⊤) :
-    IsReduced A := by
+theorem isReduced_of_adjoin
+    {F A : Type} [Field F] [CommRing A] [Algebra F A] [Module.Finite F A]
+    (u : A) (P : F[X]) (hP : P.Separable) (hu : aeval u P = 0)
+    (hadj : Algebra.adjoin F {u} = ⊤)
+    : IsReduced A := by
   refine ⟨fun x hx => ?_⟩
   obtain ⟨N, hN⟩ := hx
   have hxmem : x ∈ Algebra.adjoin F {u} := hadj ▸ Algebra.mem_top
@@ -49,20 +52,32 @@ theorem isReduced_of_adjoin {F A : Type} [Field F] [CommRing A] [Algebra F A] [M
   change aeval u (minpoly F u * g) = 0
   rw [map_mul, minpoly.aeval, zero_mul]
 
-theorem eq_zero_of_trace_mul {F A : Type} [Field F] [CharZero F] [CommRing A] [Algebra F A] [Module.Finite F A]
-    [IsReduced A] (x : A) (h : ∀ z, Algebra.trace F A (x * z) = 0) : x = 0 := by
+theorem eq_zero_of_trace_mul
+    {F A : Type} [Field F] [CharZero F] [CommRing A] [Algebra F A] [Module.Finite F A] [IsReduced A]
+    (x : A) (h : ∀ z, Algebra.trace F A (x * z) = 0)
+    : x = 0 := by
   first
-  | (rename_i h_2 h_3 h_4 h_5 h_6 h_7; revert F A h_2 h_3 h_4 h_5 h_6 h_7 x h; exact @_root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp)
+  | (
+      rename_i h_2 h_3 h_4 h_5 h_6 h_7
+      revert F A h_2 h_3 h_4 h_5 h_6 h_7 x h
+      exact @_root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp
+    )
   | exact @_root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp
   | exact _root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp
   | (apply _root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp <;> assumption)
   | (intros; apply _root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.TraceMulVanishing.trace_mul_eq_zero_imp ..)
 
-theorem det_gram_ne_zero {K : GlobalTheory.UnitLemma.UQ} (B : GlobalTheory.UnitLemma.InvAlg K) [IsReduced B.A] {m : ℕ}
-    (b : Module.Basis (Fin m) K.E B.A) (β : B.A) (hβ : IsUnit β) :
-    (Matrix.of fun i j => B.herm β (b i) (b j)).det ≠ 0 := by
+theorem det_gram_ne_zero
+    {K : GlobalTheory.UnitLemma.UQ} (B : GlobalTheory.UnitLemma.InvAlg K) [IsReduced B.A]
+    {m : ℕ} (b : Module.Basis (Fin m) K.E B.A)
+    (β : B.A) (hβ : IsUnit β)
+    : (Matrix.of fun i j => B.herm β (b i) (b j)).det ≠ 0 := by
   intro hdet
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_vecMul_eq_zero_iff.mpr hdet
   set y := ∑ i, v i • b i with hy
@@ -103,16 +118,33 @@ theorem det_gram_ne_zero {K : GlobalTheory.UnitLemma.UQ} (B : GlobalTheory.UnitL
 
 end GlobalTheory.TwLat.GramUnit
 
-
 open GlobalTheory.TwLat.GramUnit in
-theorem GlobalTheory.TwLat.isUnit_gram_of_separable : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ (w : Pl E), ¬ IsSplitAt w → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E), (∀ x, e (K.c x) = cj w (e x)) → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1) → (∀ x, GlobalTheory.UnitLemma.val K.O x = ordL (e x)) → ∀ (B : GlobalTheory.UnitLemma.InvAlg K) (m : ℕ) (b : Module.Basis (Fin m) K.E B.A), ∀ (u : B.A) (P : K.E[X]), P.Separable → aeval u P = 0 → Algebra.adjoin K.E {u} = ⊤ → ∀ β : B.A, IsUnit β → IsUnit (GlobalTheory.TwLat.gram e b β) := by
+theorem GlobalTheory.TwLat.isUnit_gram_of_separable
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ (w : Pl E),
+          ¬ IsSplitAt w
+            → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E),
+              (∀ x, e (K.c x) = cj w (e x))
+                → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1)
+                → (∀ x, GlobalTheory.UnitLemma.val K.O x = ordL (e x))
+                → ∀ (B : GlobalTheory.UnitLemma.InvAlg K) (m : ℕ)
+                    (b : Module.Basis (Fin m) K.E B.A),
+                  ∀ (u : B.A) (P : K.E[X]),
+                    P.Separable → aeval u P = 0 → Algebra.adjoin K.E {u} = ⊤
+                      → ∀ β : B.A, IsUnit β → IsUnit (GlobalTheory.TwLat.gram e b β) := by
   intro E _ _ _ _ w _ K e _ _ _ B m b u P hP hu hadj β hβ
   haveI : IsReduced B.A := isReduced_of_adjoin u P hP hu hadj
   have hd := det_gram_ne_zero B b β hβ
-  have hmap : GlobalTheory.TwLat.gram e b β = (Matrix.of fun i j => B.herm β (b i) (b j)).map e := by
+  have hmap
+      : GlobalTheory.TwLat.gram e b β = (Matrix.of fun i j => B.herm β (b i) (b j)).map e := by
     ext i j; rfl
   rw [hmap, Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero]
-  have := RingHom.map_det (e : K.E →+* w.adicCompletion E) (Matrix.of fun i j => B.herm β (b i) (b j))
-  rw [show ((Matrix.of fun i j => B.herm β (b i) (b j)).map e) =
-    (e : K.E →+* w.adicCompletion E).mapMatrix (Matrix.of fun i j => B.herm β (b i) (b j)) from rfl, ← this]
+  have :=
+    RingHom.map_det (e : K.E →+* w.adicCompletion E) (Matrix.of fun i j => B.herm β (b i) (b j))
+  rw [show ((Matrix.of fun i j => B.herm β (b i) (b j)).map e)
+        = (e : K.E →+* w.adicCompletion E).mapMatrix
+          (Matrix.of fun i j => B.herm β (b i) (b j)) from
+      rfl,
+    ← this]
   exact (map_ne_zero_iff _ e.injective).mpr hd

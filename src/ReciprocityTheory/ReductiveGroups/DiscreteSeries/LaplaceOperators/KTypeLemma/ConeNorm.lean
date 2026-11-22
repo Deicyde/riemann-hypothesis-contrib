@@ -11,18 +11,19 @@ open Finset
 
 namespace ReciprocityTheory.ChartRestriction.DS.Lap.LemK
 
-theorem cone_norm_dot_root {n : ℕ} (l : Fin n → ℝ) (a b : Fin n) (c : ℝ) :
-    ∑ i, l i * (c • root a b) i = c * (l a - l b) := by
+theorem cone_norm_dot_root {n : ℕ} (l : Fin n → ℝ) (a b : Fin n) (c : ℝ)
+    : ∑ i, l i * (c • root a b) i = c * (l a - l b) := by
   unfold root
   simp [Pi.single_apply, mul_sub, Finset.sum_sub_distrib]
   try ring
 
-theorem cone_norm_dot_nonneg {n : ℕ} (l β : Fin n → ℝ) (hl : Antitone l) (hβ : InRootCone β) :
-    0 ≤ dot l β := by
+theorem cone_norm_dot_nonneg {n : ℕ} (l β : Fin n → ℝ) (hl : Antitone l) (hβ : InRootCone β)
+    : 0 ≤ dot l β := by
   unfold dot
   obtain ⟨m, rfl⟩ := hβ
-  have hsw : ∑ i, l i * (∑ a, ∑ b, if a < b then (m a b : ℝ) • root a b else 0) i
-      = ∑ a, ∑ b, ∑ i, l i * ((if a < b then (m a b : ℝ) • root a b else 0) i) := by
+  have hsw
+      : ∑ i, l i * (∑ a, ∑ b, if a < b then (m a b : ℝ) • root a b else 0) i
+        = ∑ a, ∑ b, ∑ i, l i * ((if a < b then (m a b : ℝ) • root a b else 0) i) := by
     simp only [Finset.sum_apply, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun a _ => ?_

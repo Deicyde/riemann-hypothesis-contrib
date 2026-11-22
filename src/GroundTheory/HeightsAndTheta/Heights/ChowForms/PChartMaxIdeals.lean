@@ -19,8 +19,8 @@ namespace ChartMaxIdeals
 
 variable {F : Type} [Field F] {n e : ℕ}
 
-theorem chartIncIdeal_eq_sup {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) :
-    chartIncIdeal W t e = chartIncIdeal I t e ⊔ W.map (rename Sum.inl) := by
+theorem chartIncIdeal_eq_sup {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F)
+    : chartIncIdeal W t e = chartIncIdeal I t e ⊔ W.map (rename Sum.inl) := by
   unfold chartIncIdeal
   apply le_antisymm
   · refine sup_le ?_ (le_sup_right.trans le_sup_left)
@@ -30,16 +30,16 @@ theorem chartIncIdeal_eq_sup {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W
     · exact (Ideal.map_mono (sup_le_sup_right h _)).trans le_sup_left
     · exact (Ideal.map_mono le_sup_left).trans le_sup_left
 
-theorem chartIncIdeal_le {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) :
-    chartIncIdeal I t e ≤ chartIncIdeal W t e :=
+theorem chartIncIdeal_le {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F)
+    : chartIncIdeal I t e ≤ chartIncIdeal W t e :=
   le_sup_left.trans_eq (chartIncIdeal_eq_sup h t).symm
 
-def toSub {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) (e : ℕ) :
-    ChartInc I t e →+* ChartInc W t e :=
+def toSub {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) (e : ℕ)
+    : ChartInc I t e →+* ChartInc W t e :=
   Ideal.Quotient.factor (chartIncIdeal_le h t)
 
-theorem ker_toSub {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) :
-    RingHom.ker (toSub h t e) = W.map (chartX I t e) := by
+theorem ker_toSub {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F)
+    : RingHom.ker (toSub h t e) = W.map (chartX I t e) := by
   apply le_antisymm
   · intro x hx
     obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective (I := chartIncIdeal I t e) x
@@ -47,12 +47,15 @@ theorem ker_toSub {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin 
     rw [chartIncIdeal_eq_sup h t, Submodule.mem_sup] at hy
     obtain ⟨a, ha, b, hb, rfl⟩ := hy
     have hb' : Ideal.Quotient.mk (chartIncIdeal I t e) b ∈ W.map (chartX I t e) := by
-      have hle : W.map (rename Sum.inl) ≤ (W.map (chartX I t e)).comap (Ideal.Quotient.mk (chartIncIdeal I t e)) := by
+      have hle
+          : W.map (rename Sum.inl)
+            ≤ (W.map (chartX I t e)).comap (Ideal.Quotient.mk (chartIncIdeal I t e)) := by
         rw [Ideal.map_le_iff_le_comap]
         intro w hw
         exact Ideal.mem_map_of_mem (chartX I t e) hw
       exact hle hb
-    have ha' : Ideal.Quotient.mk (chartIncIdeal I t e) a = 0 := Ideal.Quotient.eq_zero_iff_mem.mpr ha
+    have ha' : Ideal.Quotient.mk (chartIncIdeal I t e) a = 0 :=
+      Ideal.Quotient.eq_zero_iff_mem.mpr ha
     rw [map_add (f := _), ha', zero_add]
     exact hb'
   · rw [Ideal.map_le_iff_le_comap]
@@ -62,28 +65,31 @@ theorem ker_toSub {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin 
     rw [Ideal.Quotient.eq_zero_iff_mem, chartIncIdeal_eq_sup h t]
     exact Ideal.mem_sup_right (Ideal.mem_map_of_mem _ hw)
 
-theorem toSub_comp_chartX {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) :
-    (toSub h t e).comp (chartX I t e) = chartX W t e :=
+theorem toSub_comp_chartX {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F)
+    : (toSub h t e).comp (chartX I t e) = chartX W t e :=
   RingHom.ext fun _ => rfl
 
-theorem toSub_comp_algebraMap {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) :
-    (toSub h t e).comp (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) =
-      algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc W t e) :=
+theorem toSub_comp_algebraMap {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F)
+    : (toSub h t e).comp (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e))
+      = algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc W t e) :=
   RingHom.ext fun _ => rfl
 
-theorem comap_chartX_map {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) :
-    (W.map (chartX I t e)).comap (chartX I t e) = RingHom.ker (chartX W t e) := by
+theorem comap_chartX_map {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F)
+    : (W.map (chartX I t e)).comap (chartX I t e) = RingHom.ker (chartX W t e) := by
   rw [← ker_toSub h t, RingHom.comap_ker, toSub_comp_chartX]
 
-theorem comap_algebraMap_map {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F) :
-    (W.map (chartX I t e)).comap (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) =
-      RingHom.ker (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc W t e)) := by
+theorem comap_algebraMap_map {I W : Ideal (MvPolynomial (Fin n) F)} (h : I ≤ W) (t : Fin n → F)
+    : (W.map (chartX I t e)).comap (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e))
+      = RingHom.ker (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc W t e)) := by
   rw [← ker_toSub h t, RingHom.comap_ker, toSub_comp_algebraMap]
 
-theorem disjoint_iff {I : Ideal (MvPolynomial (Fin n) F)} {t : Fin n → F}
-    {p : Ideal (MvPolynomial (Fin e × Fin n) F)} [p.IsPrime] (P : Ideal (ChartInc I t e)) :
-    Disjoint (Algebra.algebraMapSubmonoid (ChartInc I t e) p.primeCompl : Set (ChartInc I t e)) (P : Set _) ↔
-      P.comap (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) ≤ p := by
+theorem disjoint_iff
+    {I : Ideal (MvPolynomial (Fin n) F)} {t : Fin n → F}
+    {p : Ideal (MvPolynomial (Fin e × Fin n) F)} [p.IsPrime]
+    (P : Ideal (ChartInc I t e))
+    : Disjoint (Algebra.algebraMapSubmonoid (ChartInc I t e) p.primeCompl : Set (ChartInc I t e))
+        (P : Set _)
+      ↔ P.comap (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) ≤ p := by
   constructor
   · intro hd s hs
     by_contra hsp
@@ -93,9 +99,12 @@ theorem disjoint_iff {I : Ideal (MvPolynomial (Fin n) F)} {t : Fin n → F}
     rintro _ ⟨s, hs, rfl⟩ hmem
     exact hs (hle hmem)
 
-theorem le_of_sup_le (hD : ChartDehomog.Statement) {W₁ W₂ : Ideal (MvPolynomial (Fin n) F)} {t : Fin n → F}
+theorem le_of_sup_le
+    (hD : ChartDehomog.Statement)
+    {W₁ W₂ : Ideal (MvPolynomial (Fin n) F)} {t : Fin n → F}
     (hh₁ : IsHomogIdeal W₁) (h₂ : W₂.IsPrime) (hh₂ : IsHomogIdeal W₂) (ht₂ : linForm t ∉ W₂)
-    (h : W₁ ⊔ Ideal.span {linForm t - 1} ≤ W₂ ⊔ Ideal.span {linForm t - 1}) : W₁ ≤ W₂ := by
+    (h : W₁ ⊔ Ideal.span {linForm t - 1} ≤ W₂ ⊔ Ideal.span {linForm t - 1})
+    : W₁ ≤ W₂ := by
   intro g hg
   rw [← sum_homogeneousComponent g]
   refine Ideal.sum_mem _ fun d _ => ?_
@@ -104,65 +113,90 @@ theorem le_of_sup_le (hD : ChartDehomog.Statement) {W₁ W₂ : Ideal (MvPolynom
 
 end ChartMaxIdeals
 
-
 open ChartMaxIdeals in
-theorem ChartMaxIdeals.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : ConeDimComponent.Statement)
-    (h₆ : SpecFirstMemIncIdeal.Statement) (h₇ : ChartFinite.Statement) (h₈ : ChartIncDomain.Statement)
-    (h₉ : ChartKernel.Statement) (hH : ChartHomogenise.Statement) (hD : ChartDehomog.Statement)
-    (hC : ComponentOfIncIdeal.Statement) : ChartMaxIdeals.Statement := by
+theorem ChartMaxIdeals.proof
+    (h₁ : ConeDimOfChowForm.Statement) (h₂ : ConeDimComponent.Statement)
+    (h₆ : SpecFirstMemIncIdeal.Statement) (h₇ : ChartFinite.Statement)
+    (h₈ : ChartIncDomain.Statement) (h₉ : ChartKernel.Statement) (hH : ChartHomogenise.Statement)
+    (hD : ChartDehomog.Statement) (hC : ComponentOfIncIdeal.Statement)
+    : ChartMaxIdeals.Statement := by
   intro F _ n e I f t u q p _ hI hf hu hq hp hqt
   classical
   have hdim := h₁ F n (e + 1) I f hI hf
   have hpt : specFirst f t ∉ p := by rw [hp, Ideal.mem_span_singleton]; exact hqt
   have : Module.Finite (Localization.AtPrime p) (ChartLoc I t e p) := h₇ F n e I f t p hI hf hpt
-  have : Algebra.IsIntegral (Localization.AtPrime p) (ChartLoc I t e p) := Algebra.IsIntegral.of_finite _ _
-  have hsupp : ∀ W, W ∈ (divCycle I u).support ↔
-      W ∈ relComps (I ⊔ Ideal.span {linForm u}) ∧ localMult (I ⊔ Ideal.span {linForm u}) W ≠ 0 := by
+  have : Algebra.IsIntegral (Localization.AtPrime p) (ChartLoc I t e p) :=
+    Algebra.IsIntegral.of_finite _ _
+  have hsupp
+      : ∀ W,
+        W ∈ (divCycle I u).support
+          ↔ W ∈ relComps (I ⊔ Ideal.span {linForm u})
+            ∧ localMult (I ⊔ Ideal.span {linForm u}) W ≠ 0 := by
     intro W
     rw [Finsupp.mem_support_iff, divCycle, fundCycle, Finsupp.onFinset_apply]
     split_ifs with h <;> simp [h]
-  have htower : (algebraMap (Localization.AtPrime p) (ChartLoc I t e p)).comp
-        (algebraMap (MvPolynomial (Fin e × Fin n) F) (Localization.AtPrime p)) =
-      (algebraMap (ChartInc I t e) (ChartLoc I t e p)).comp
-        (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) := by
+  have htower
+      : (algebraMap (Localization.AtPrime p) (ChartLoc I t e p)).comp
+          (algebraMap (MvPolynomial (Fin e × Fin n) F) (Localization.AtPrime p))
+        = (algebraMap (ChartInc I t e) (ChartLoc I t e p)).comp
+          (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) := by
     rw [← IsScalarTower.algebraMap_eq, ← IsScalarTower.algebraMap_eq]
 
-  have key : ∀ W : Ideal (MvPolynomial (Fin n) F), IsProjPrime W → linForm t ∉ W → I ≤ W → incIdeal W e = p →
-      (chartIdeal I t e p W).IsMaximal ∧
-        (chartIdeal I t e p W).comap (algebraMap (ChartInc I t e) (ChartLoc I t e p)) = W.map (chartX I t e) ∧
-        (W.map (chartX I t e)).comap (chartX I t e) = W ⊔ Ideal.span {linForm t - 1} := by
+  have key
+      : ∀ W : Ideal (MvPolynomial (Fin n) F),
+        IsProjPrime W → linForm t ∉ W → I ≤ W → incIdeal W e = p
+          → (chartIdeal I t e p W).IsMaximal
+            ∧ (chartIdeal I t e p W).comap (algebraMap (ChartInc I t e) (ChartLoc I t e p))
+              = W.map (chartX I t e)
+            ∧ (W.map (chartX I t e)).comap (chartX I t e) = W ⊔ Ideal.span {linForm t - 1} := by
     intro W hW ht hIW hWp
     obtain ⟨hdom, hker⟩ := h₈ F n e W t hW ht
     have hk := h₉ F n e W t hW ht
     have hprime : (W.map (chartX I t e)).IsPrime := by
       rw [← ker_toSub hIW t]; exact RingHom.ker_isPrime _
-    have hcS : (W.map (chartX I t e)).comap (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) = p := by
+    have hcS
+        : (W.map (chartX I t e)).comap
+            (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e))
+          = p := by
       rw [comap_algebraMap_map hIW t, hk, hWp]
     have hdisj := (disjoint_iff (p := p) (W.map (chartX I t e))).mpr hcS.le
     have h𝔓 : (chartIdeal I t e p W).IsPrime :=
       IsLocalization.isPrime_of_isPrime_disjoint _ _ _ hprime hdisj
-    have hc𝔓 : (chartIdeal I t e p W).comap (algebraMap (ChartInc I t e) (ChartLoc I t e p)) =
-        W.map (chartX I t e) :=
+    have hc𝔓
+        : (chartIdeal I t e p W).comap (algebraMap (ChartInc I t e) (ChartLoc I t e p))
+          = W.map (chartX I t e) :=
       IsLocalization.under_map_of_isPrime_disjoint _ _ hprime hdisj
-    have hO : ((chartIdeal I t e p W).comap (algebraMap (Localization.AtPrime p) (ChartLoc I t e p))).comap
-        (algebraMap (MvPolynomial (Fin e × Fin n) F) (Localization.AtPrime p)) = p := by
+    have hO
+        : ((chartIdeal I t e p W).comap
+              (algebraMap (Localization.AtPrime p) (ChartLoc I t e p))).comap
+            (algebraMap (MvPolynomial (Fin e × Fin n) F) (Localization.AtPrime p))
+          = p := by
       rw [Ideal.comap_comap, htower, ← Ideal.comap_comap, hc𝔓, hcS]
-    have hmaxO : (chartIdeal I t e p W).comap (algebraMap (Localization.AtPrime p) (ChartLoc I t e p)) =
-        IsLocalRing.maximalIdeal (Localization.AtPrime p) := by
+    have hmaxO
+        : (chartIdeal I t e p W).comap (algebraMap (Localization.AtPrime p) (ChartLoc I t e p))
+          = IsLocalRing.maximalIdeal (Localization.AtPrime p) := by
       rw [← IsLocalization.map_under p.primeCompl (Localization.AtPrime p)
         ((chartIdeal I t e p W).comap (algebraMap (Localization.AtPrime p) (ChartLoc I t e p)))]
-      change Ideal.map _ (Ideal.comap (algebraMap (MvPolynomial (Fin e × Fin n) F) (Localization.AtPrime p)) _) = _
+      change Ideal.map _
+          (Ideal.comap (algebraMap (MvPolynomial (Fin e × Fin n) F) (Localization.AtPrime p)) _)
+        = _
       rw [hO, Localization.AtPrime.map_eq_maximalIdeal]
     haveI := h𝔓
-    refine ⟨Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := Localization.AtPrime p)
-      (chartIdeal I t e p W) ?_, hc𝔓, ?_⟩
+    refine ⟨
+      Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := Localization.AtPrime p)
+        (chartIdeal I t e p W) ?_,
+      hc𝔓,
+      ?_
+    ⟩
     · change (Ideal.comap (algebraMap (Localization.AtPrime p) (ChartLoc I t e p))
         (chartIdeal I t e p W)).IsMaximal
-      rw [hmaxO]; exact IsLocalRing.maximalIdeal.isMaximal _
+      rw [hmaxO]
+      exact IsLocalRing.maximalIdeal.isMaximal _
     · rw [comap_chartX_map hIW t, hker]
 
-  have hmem : ∀ W ∈ {W | W ∈ (divCycle I u).support ∧ Ideal.span {q} = incIdeal W e},
-      IsProjPrime W ∧ linForm t ∉ W ∧ I ≤ W ∧ linForm u ∈ W ∧ incIdeal W e = p := by
+  have hmem
+      : ∀ W ∈ {W | W ∈ (divCycle I u).support ∧ Ideal.span {q} = incIdeal W e},
+        IsProjPrime W ∧ linForm t ∉ W ∧ I ≤ W ∧ linForm u ∈ W ∧ incIdeal W e = p := by
     rintro W ⟨hWs, hWq⟩
     obtain ⟨hrel, -⟩ := (hsupp W).mp hWs
     obtain ⟨hWproj, -⟩ := h₂ F n e I W u hI hdim hu hrel
@@ -173,7 +207,13 @@ theorem ChartMaxIdeals.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : ConeDi
       have := h₆ F n e I W f t hf hIW htW
       rw [← hWq, Ideal.mem_span_singleton] at this
       exact hqt this
-    exact ⟨hWproj, ht, hIW, hJW (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)), hWq.symm.trans hp.symm⟩
+    exact ⟨
+      hWproj,
+      ht,
+      hIW,
+      hJW (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)),
+      hWq.symm.trans hp.symm
+    ⟩
   refine ⟨?_, ?_, ?_⟩
   · intro W hW
     obtain ⟨hWp, ht, hIW, huW, hinc⟩ := hmem W hW
@@ -215,8 +255,8 @@ theorem ChartMaxIdeals.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : ConeDi
       by_contra hsp
       have hunit : IsUnit (algebraMap (ChartInc I t e) (ChartLoc I t e p)
           (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e) s)) :=
-        IsLocalization.map_units (ChartLoc I t e p) (⟨_, s, hsp, rfl⟩ :
-          Algebra.algebraMapSubmonoid (ChartInc I t e) p.primeCompl)
+        IsLocalization.map_units (ChartLoc I t e p)
+          (⟨_, s, hsp, rfl⟩ : Algebra.algebraMapSubmonoid (ChartInc I t e) p.primeCompl)
       exact hmax.ne_top (Ideal.eq_top_of_isUnit_mem _ hs hunit)
     have hincle : incIdeal W e ≤ Ideal.span {q} := by
       rw [← hp, ← h₉ F n e W t hWp ht, ← comap_algebraMap_map hIW t]

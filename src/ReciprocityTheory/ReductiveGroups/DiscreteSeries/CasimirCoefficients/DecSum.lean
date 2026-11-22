@@ -92,42 +92,49 @@ lemma nuNext_tele (ν : Fin n → ℝ) {a b : Fin n} (hba : b < a) :
   rw [hfil, sum_Ico_tele f (b := (b : ℕ)) (a : ℕ) (Fin.lt_iff_val_lt_val.mp hba).le]
   simp [f, b.isLt, a.isLt]
 
-theorem dec_weighted {ε : Fin n → Bool} (ν : Fin n → ℝ) (hν : Antitone ν) {g : ℝ}
-    (hg : ∀ a b : Fin n, ε a ≠ ε b → b < a → g ≤ ν b - ν a) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inP ε Y) :
-    g * hs Y / 2 ≤
-      ∑ i : Fin n, (ν i - nuNext ν i) *
-        (∑ a : Fin n, ∑ b : Fin n, if (b : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (a : ℕ) then ‖Y a b‖ ^ 2 else 0) := by
-  rw [hs_eq_two_lower hY]
-  have hR : ∑ i : Fin n, (ν i - nuNext ν i) *
-      (∑ a : Fin n, ∑ b : Fin n, if (b : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (a : ℕ) then ‖Y a b‖ ^ 2 else 0) =
-      ∑ a : Fin n, ∑ b : Fin n, if b < a then (ν b - ν a) * ‖Y a b‖ ^ 2 else 0 := by
-    simp_rw [Finset.mul_sum]
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl fun a _ => ?_
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl fun b _ => ?_
+theorem dec_weighted
+    {ε : Fin n → Bool}
+    (ν : Fin n → ℝ) (hν : Antitone ν)
+    {g : ℝ} (hg : ∀ a b : Fin n, ε a ≠ ε b → b < a → g ≤ ν b - ν a)
+    {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inP ε Y)
+    : g * hs Y / 2
+      ≤ ∑ i : Fin n, (ν i - nuNext ν i) *
+          (∑ a : Fin n, ∑ b : Fin n, if (b : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (a : ℕ) then ‖Y a b‖ ^ 2 else 0) :=
+  by
+    rw [hs_eq_two_lower hY]
+    have hR
+        : ∑ i : Fin n, (ν i - nuNext ν i) *
+            (∑ a : Fin n, ∑ b : Fin n, if (b : ℕ) ≤ (i : ℕ) ∧ (i : ℕ) < (a : ℕ) then ‖Y a b‖ ^ 2 else 0)
+          = ∑ a : Fin n, ∑ b : Fin n, if b < a then (ν b - ν a) * ‖Y a b‖ ^ 2 else 0 := by
+      simp_rw [Finset.mul_sum]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun a _ => ?_
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun b _ => ?_
+      split_ifs with hba
+      · rw [← nuNext_tele ν hba, Finset.sum_mul]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        split_ifs <;> ring
+      · refine Finset.sum_eq_zero fun i _ => ?_
+        rw [if_neg, mul_zero]
+        intro h
+        exact hba (Fin.lt_iff_val_lt_val.mpr (lt_of_le_of_lt h.1 h.2))
+    rw [hR]
+    have hL
+        : g * (2 * ∑ a : Fin n, ∑ b : Fin n, if b < a then ‖Y a b‖ ^ 2 else 0) / 2
+          = ∑ a : Fin n, ∑ b : Fin n, if b < a then g * ‖Y a b‖ ^ 2 else 0 := by
+      have hg'
+          : ∀ a b : Fin n,
+            (if b < a then g * ‖Y a b‖ ^ 2 else 0) = g * (if b < a then ‖Y a b‖ ^ 2 else 0) := by
+        intro a b; split_ifs <;> simp
+      simp_rw [hg', ← Finset.mul_sum]
+      ring
+    rw [hL]
+    refine Finset.sum_le_sum fun a _ => Finset.sum_le_sum fun b _ => ?_
     split_ifs with hba
-    · rw [← nuNext_tele ν hba, Finset.sum_mul]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      split_ifs <;> ring
-    · refine Finset.sum_eq_zero fun i _ => ?_
-      rw [if_neg, mul_zero]
-      intro h
-      exact hba (Fin.lt_iff_val_lt_val.mpr (lt_of_le_of_lt h.1 h.2))
-  rw [hR]
-  have hL : g * (2 * ∑ a : Fin n, ∑ b : Fin n, if b < a then ‖Y a b‖ ^ 2 else 0) / 2 =
-      ∑ a : Fin n, ∑ b : Fin n, if b < a then g * ‖Y a b‖ ^ 2 else 0 := by
-    have hg' : ∀ a b : Fin n, (if b < a then g * ‖Y a b‖ ^ 2 else 0) =
-        g * (if b < a then ‖Y a b‖ ^ 2 else 0) := by
-      intro a b; split_ifs <;> simp
-    simp_rw [hg', ← Finset.mul_sum]
-    ring
-  rw [hL]
-  refine Finset.sum_le_sum fun a _ => Finset.sum_le_sum fun b _ => ?_
-  split_ifs with hba
-  · by_cases hε : ε a = ε b
-    · rw [inP_entry_zero hY hε]; simp
-    · exact mul_le_mul_of_nonneg_right (hg a b hε hba) (by positivity)
-  · exact le_rfl
+    · by_cases hε : ε a = ε b
+      · rw [inP_entry_zero hY hε]; simp
+      · exact mul_le_mul_of_nonneg_right (hg a b hε hba) (by positivity)
+    · exact le_rfl
 
 end ReciprocityTheory.ChartRestriction.DS.S7

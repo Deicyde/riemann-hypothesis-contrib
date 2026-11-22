@@ -6,16 +6,15 @@ public import Mathlib
 
 namespace Bl.general_b_fact_form
 
-theorem goal1 :
-  ∀ {n : Nat} {N N' U U' : Matrix.{0, 0, 0} (Fin n) (Fin n) Complex},
-  Matrix.BlockTriangular.{0, 0, 0} N (DFunLike.coe.{1, 1, 1} OrderDual.toDual.{0}) →
-    (∀ (a : Fin n), Eq.{1} (N a a) 1) →
-      Matrix.BlockTriangular.{0, 0, 0} N' (DFunLike.coe.{1, 1, 1} OrderDual.toDual.{0}) →
-        (∀ (a : Fin n), Eq.{1} (N' a a) 1) →
-          Matrix.BlockTriangular.{0, 0, 0} U id.{1} →
-            Matrix.BlockTriangular.{0, 0, 0} U' id.{1} →
-              Ne.{1} (Matrix.det.{0, 0} U') 0 →
-                Eq.{1} (HMul.hMul.{0, 0, 0} N U) (HMul.hMul.{0, 0, 0} N' U') → And (Eq.{1} N N') (Eq.{1} U U') := by
+theorem goal1
+    : ∀ {n : Nat} {N N' U U' : Matrix.{0, 0, 0} (Fin n) (Fin n) Complex},
+      Matrix.BlockTriangular.{0, 0, 0} N (DFunLike.coe.{1, 1, 1} OrderDual.toDual.{0})
+        → (∀ (a : Fin n), Eq.{1} (N a a) 1)
+        → Matrix.BlockTriangular.{0, 0, 0} N' (DFunLike.coe.{1, 1, 1} OrderDual.toDual.{0})
+        → (∀ (a : Fin n), Eq.{1} (N' a a) 1) → Matrix.BlockTriangular.{0, 0, 0} U id.{1}
+        → Matrix.BlockTriangular.{0, 0, 0} U' id.{1} → Ne.{1} (Matrix.det.{0, 0} U') 0
+        → Eq.{1} (HMul.hMul.{0, 0, 0} N U) (HMul.hMul.{0, 0, 0} N' U')
+        → And (Eq.{1} N N') (Eq.{1} U U') := by
   intro n N N' U U' hN hNd hN' hN'd hU hU' hdet hEq
   have hdN : N.det = 1 := by
     rw [Matrix.det_of_isLowerTriangular N hN]
@@ -34,12 +33,12 @@ theorem goal1 :
   let _ : Invertible N' := Matrix.invertibleOfIsUnitDet N' uN'
   let _ : Invertible U := Matrix.invertibleOfIsUnitDet U uU
   have hAeq : N'⁻¹ * N = U' * U⁻¹ := by
-    calc N'⁻¹ * N = N'⁻¹ * N * (U * U⁻¹) := by
-          rw [Matrix.mul_nonsing_inv U uU, Matrix.mul_one]
+    calc
+      N'⁻¹ * N
+        = N'⁻¹ * N * (U * U⁻¹) := by rw [Matrix.mul_nonsing_inv U uU, Matrix.mul_one]
       _ = N'⁻¹ * (N * U) * U⁻¹ := by simp only [Matrix.mul_assoc]
       _ = N'⁻¹ * (N' * U') * U⁻¹ := by rw [hEq]
-      _ = U' * U⁻¹ := by
-          rw [← Matrix.mul_assoc N'⁻¹, Matrix.nonsing_inv_mul N' uN', Matrix.one_mul]
+      _ = U' * U⁻¹ := by rw [← Matrix.mul_assoc N'⁻¹, Matrix.nonsing_inv_mul N' uN', Matrix.one_mul]
   have hAl : (N'⁻¹ * N).BlockTriangular (DFunLike.coe OrderDual.toDual) :=
     (Matrix.blockTriangular_inv_of_blockTriangular hN').mul hN
   have hAu : (N'⁻¹ * N).BlockTriangular id := by
@@ -70,8 +69,8 @@ theorem goal1 :
     · rw [hoff i j h, Matrix.one_apply_ne h]
   have hNN : N = N' := by rw [hNA, hA1, Matrix.mul_one]
   refine ⟨hNN, ?_⟩
-  calc U = N⁻¹ * (N * U) := by
-        rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul N uN, Matrix.one_mul]
+  calc
+    U = N⁻¹ * (N * U) := by rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul N uN, Matrix.one_mul]
     _ = N⁻¹ * (N * U') := by rw [hEq, hNN]
     _ = U' := by rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul N uN, Matrix.one_mul]
 

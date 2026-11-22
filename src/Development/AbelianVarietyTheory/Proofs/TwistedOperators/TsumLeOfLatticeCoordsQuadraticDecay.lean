@@ -4,7 +4,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DerAlong
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
+  Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition GlobalTheory.MixedTerm
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -78,16 +81,19 @@ lemma pi_sum_le (n : ℕ) (f : ℤ → ℝ≥0∞) :
     _ ≤ ∏ _j : Fin n, ∑' z, f z := Finset.prod_le_prod' fun j _ => ENNReal.sum_le_tsum _
     _ = (∑' z, f z) ^ n := by simp
 
-theorem tsum_le {Y : Type} (n N : ℕ) (hN : 0 < N) (a : Y → ENNReal) (T : Fin n → Y → ℝ)
+theorem tsum_le
+    {Y : Type}
+    (n N : ℕ) (hN : 0 < N)
+    (a : Y → ENNReal) (T : Fin n → Y → ℝ)
     (hinj : ∀ y y', a y ≠ 0 → a y' ≠ 0 → (∀ j, T j y = T j y') → y = y')
-    (hint : ∀ y, a y ≠ 0 → ∀ j, ∃ c : ℤ, (N : ℝ) * T j y = c) (S : ENNReal)
-    (hS : ∀ y, a y * ∏ j, ENNReal.ofReal (1 + T j y ^ 2) ≤ S) :
-    ∑' y, a y ≤ S * ENNReal.ofReal ((5 * (N : ℝ) ^ 2) ^ n) := by
+    (hint : ∀ y, a y ≠ 0 → ∀ j, ∃ c : ℤ, (N : ℝ) * T j y = c)
+    (S : ENNReal) (hS : ∀ y, a y * ∏ j, ENNReal.ofReal (1 + T j y ^ 2) ≤ S)
+    : ∑' y, a y ≤ S * ENNReal.ofReal ((5 * (N : ℝ) ^ 2) ^ n) := by
   classical
-  have hN' : (N:ℝ) ≠ 0 := by exact_mod_cast hN.ne'
+  have hN' : (N : ℝ) ≠ 0 := by exact_mod_cast hN.ne'
   let cf : Function.support a → Fin n → ℤ := fun y j => Classical.choose (hint y.1 y.2 j)
-  have hcf : ∀ (y : Function.support a) j, (N : ℝ) * T j y.1 = cf y j :=
-    fun y j => Classical.choose_spec (hint y.1 y.2 j)
+  have hcf : ∀ (y : Function.support a) j, (N : ℝ) * T j y.1 = cf y j := fun y j =>
+    Classical.choose_spec (hint y.1 y.2 j)
   have hT : ∀ (y : Function.support a) j, T j y.1 = (cf y j : ℝ) / N := fun y j => by
     rw [eq_div_iff hN', mul_comm]; exact hcf y j
   have hcinj : Function.Injective cf := by
@@ -101,23 +107,24 @@ theorem tsum_le {Y : Type} (n N : ℕ) (hN : 0 < N) (a : Y → ENNReal) (T : Fin
     have hP : (∏ j, ENNReal.ofReal (1 + T j y.1 ^ 2)) * ∏ j, wt N (cf y j) = 1 := by
       rw [← Finset.prod_mul_distrib]
       refine Finset.prod_eq_one fun j _ => ?_
-      have hpos : (0:ℝ) < 1 + T j y.1 ^ 2 := by positivity
-      rw [wt, ← hT y j, ← ENNReal.ofReal_mul hpos.le, mul_one_div_cancel hpos.ne', ENNReal.ofReal_one]
-    calc a y.1 = a y.1 * ((∏ j, ENNReal.ofReal (1 + T j y.1 ^ 2)) * ∏ j, wt N (cf y j)) := by
-          rw [hP, mul_one]
-      _ = (a y.1 * ∏ j, ENNReal.ofReal (1 + T j y.1 ^ 2)) * ∏ j, wt N (cf y j) := by
-          rw [mul_assoc]
+      have hpos : (0 : ℝ) < 1 + T j y.1 ^ 2 := by positivity
+      rw [wt, ← hT y j, ← ENNReal.ofReal_mul hpos.le, mul_one_div_cancel hpos.ne',
+        ENNReal.ofReal_one]
+    calc
+      a y.1 = a y.1 * ((∏ j, ENNReal.ofReal (1 + T j y.1 ^ 2)) * ∏ j, wt N (cf y j)) := by
+        rw [hP, mul_one]
+      _ = (a y.1 * ∏ j, ENNReal.ofReal (1 + T j y.1 ^ 2)) * ∏ j, wt N (cf y j) := by rw [mul_assoc]
       _ ≤ S * ∏ j, wt N (cf y j) := by gcongr; exact hS y.1
   rw [← tsum_subtype_support]
-  calc ∑' y : Function.support a, a y.1 ≤ ∑' y : Function.support a, S * ∏ j, wt N (cf y j) :=
-        ENNReal.tsum_le_tsum hbound
+  calc
+    ∑' y : Function.support a, a y.1
+      ≤ ∑' y : Function.support a, S * ∏ j, wt N (cf y j) := ENNReal.tsum_le_tsum hbound
     _ = S * ∑' y : Function.support a, ∏ j, wt N (cf y j) := ENNReal.tsum_mul_left
     _ ≤ S * ∑' c : Fin n → ℤ, ∏ j, wt N (c j) := by
-        gcongr
-        exact ENNReal.tsum_comp_le_tsum_of_injective hcinj (fun c => ∏ j, wt N (c j))
+      gcongr
+      exact ENNReal.tsum_comp_le_tsum_of_injective hcinj (fun c => ∏ j, wt N (c j))
     _ ≤ S * (∑' z, wt N z) ^ n := by gcongr; exact pi_sum_le n (wt N)
-    _ ≤ S * ENNReal.ofReal (5 * (N:ℝ)^2) ^ n := by gcongr; exact int_sum_le N hN
-    _ = S * ENNReal.ofReal ((5 * (N : ℝ) ^ 2) ^ n) := by
-        rw [ENNReal.ofReal_pow (by positivity)]
+    _ ≤ S * ENNReal.ofReal (5 * (N : ℝ) ^ 2) ^ n := by gcongr; exact int_sum_le N hN
+    _ = S * ENNReal.ofReal ((5 * (N : ℝ) ^ 2) ^ n) := by rw [ENNReal.ofReal_pow (by positivity)]
 
 end GlobalTheory.TwBoundFour

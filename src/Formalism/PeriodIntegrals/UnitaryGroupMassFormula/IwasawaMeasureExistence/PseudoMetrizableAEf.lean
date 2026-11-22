@@ -36,11 +36,13 @@ open Formalism.MainNotions.S Formalism.L2.S.S7.GLOne
 
 section Gen
 
-variable {A : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [LocallyCompactSpace A]
+variable
+  {A : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [LocallyCompactSpace A]
   [T2Space A] [SecondCountableTopology A] [MeasurableSpace A] [BorelSpace A]
 
-theorem char_eq_of_map' (μ : Measure A) [μ.IsAddHaarMeasure] (φ : A ≃ₜ+ A) {c : ℝ≥0} (hc : c ≠ 0)
-    (h : μ.map φ = c • μ) : addEquivAddHaarChar φ = c⁻¹ := by
+theorem char_eq_of_map'
+    (μ : Measure A) [μ.IsAddHaarMeasure] (φ : A ≃ₜ+ A) {c : ℝ≥0} (hc : c ≠ 0) (h : μ.map φ = c • μ)
+    : addEquivAddHaarChar φ = c⁻¹ := by
   have hreg : μ.Regular := inferInstance
   have h1 := MeasureTheory.addEquivAddHaarChar_smul_map μ φ
   rw [h, smul_smul] at h1
@@ -52,7 +54,8 @@ theorem char_eq_of_map' (μ : Measure A) [μ.IsAddHaarMeasure] (φ : A ≃ₜ+ A
   have h3 : μ K * ((addEquivAddHaarChar φ * c : ℝ≥0) : ℝ≥0∞) = μ K * 1 := by
     rw [mul_one, mul_comm]
     exact_mod_cast h2
-  have h4 : ((addEquivAddHaarChar φ * c : ℝ≥0) : ℝ≥0∞) = 1 := (ENNReal.mul_right_inj hpos.ne' hfin).1 h3
+  have h4 : ((addEquivAddHaarChar φ * c : ℝ≥0) : ℝ≥0∞) = 1 :=
+    (ENNReal.mul_right_inj hpos.ne' hfin).1 h3
   have h5 : addEquivAddHaarChar φ * c = 1 := by exact_mod_cast h4
   exact eq_inv_of_mul_eq_one_left h5
 
@@ -65,8 +68,8 @@ def piE {ι : Type*} [Fintype ι] (φ : ι → A ≃ₜ+ A) : (ι → A) ≃ₜ+
   continuous_toFun := continuous_pi fun i => (φ i).continuous.comp (continuous_apply i)
   continuous_invFun := continuous_pi fun i => (φ i).symm.continuous.comp (continuous_apply i)
 
-theorem char_pi {ι : Type} [Fintype ι] [DecidableEq ι] (φ : ι → A ≃ₜ+ A) :
-    addEquivAddHaarChar (piE φ) = ∏ i, addEquivAddHaarChar (φ i) := by
+theorem char_pi {ι : Type} [Fintype ι] [DecidableEq ι] (φ : ι → A ≃ₜ+ A)
+    : addEquivAddHaarChar (piE φ) = ∏ i, addEquivAddHaarChar (φ i) := by
   classical
   set μ : Measure A := Measure.addHaar with hμ
   set c : ι → ℝ≥0 := fun i => addEquivAddHaarChar (φ i) with hcdef
@@ -74,25 +77,37 @@ theorem char_pi {ι : Type} [Fintype ι] [DecidableEq ι] (φ : ι → A ≃ₜ+
   have hmap : ∀ i, μ.map (φ i) = (c i)⁻¹ • μ := by
     intro i
     have h1 := addEquivAddHaarChar_smul_map μ (φ i)
-    calc μ.map (φ i) = (c i)⁻¹ • (c i • μ.map (φ i)) := by
-          rw [smul_smul, inv_mul_cancel₀ (hc0 i), one_smul]
+    calc
+      μ.map (φ i)
+        = (c i)⁻¹ • (c i • μ.map (φ i)) := by rw [smul_smul, inv_mul_cancel₀ (hc0 i), one_smul]
       _ = (c i)⁻¹ • μ := by rw [h1]
   haveI : ∀ i, SigmaFinite (μ.map (φ i)) := fun i => by rw [hmap i]; infer_instance
-  have hbox : ∀ d : ι → ℝ≥0, Measure.pi (fun i => d i • μ) = (∏ i, d i) • Measure.pi (fun _ : ι => μ) := by
+  have hbox
+      : ∀ d : ι → ℝ≥0,
+        Measure.pi (fun i => d i • μ) = (∏ i, d i) • Measure.pi (fun _ : ι => μ) := by
     intro d
-    refine (Measure.pi_eq (μ := fun i => d i • μ) (μ' := (∏ i, d i) • Measure.pi (fun _ : ι => μ)) fun s hs => ?_)
+    refine (Measure.pi_eq
+      (μ := fun i => d i • μ)
+      (μ' := (∏ i, d i) • Measure.pi (fun _ : ι => μ))
+      fun s hs => ?_)
     rw [Measure.smul_apply, Measure.pi_pi]
     simp only [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
     rw [Finset.prod_mul_distrib]
     push_cast
     rfl
-  have hpm : (Measure.pi (fun _ : ι => μ)).map (piE φ) = (∏ i, (c i)⁻¹) • Measure.pi (fun _ : ι => μ) := by
+  have hpm
+      : (Measure.pi (fun _ : ι => μ)).map (piE φ)
+        = (∏ i, (c i)⁻¹) • Measure.pi (fun _ : ι => μ) := by
     have h2 : ⇑(piE φ) = fun x i => φ i (x i) := rfl
-    rw [h2, Measure.pi_map_pi (f := fun i => (φ i : A → A)) (fun i => (φ i).continuous.measurable.aemeasurable)]
+    rw [h2,
+      Measure.pi_map_pi
+        (f := fun i => (φ i : A → A))
+        (fun i => (φ i).continuous.measurable.aemeasurable)]
     simp only [hmap]
     exact hbox _
-  have h3 := char_eq_of_map' (Measure.pi fun _ : ι => μ) (piE φ)
-    (Finset.prod_ne_zero_iff.2 fun i _ => inv_ne_zero (hc0 i)) hpm
+  have h3 :=
+    char_eq_of_map' (Measure.pi fun _ : ι => μ) (piE φ)
+      (Finset.prod_ne_zero_iff.2 fun i _ => inv_ne_zero (hc0 i)) hpm
   rw [h3, Finset.prod_inv_distrib, inv_inv]
 
 end Gen

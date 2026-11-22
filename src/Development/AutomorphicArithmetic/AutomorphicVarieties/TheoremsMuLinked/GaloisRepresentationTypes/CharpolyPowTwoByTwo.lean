@@ -16,14 +16,20 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.HV GlobalTheory.GalOfCusp UpperTheory.V.Th
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial UpperTheory.V UpperTheory.V.HV GlobalTheory.GalOfCusp UpperTheory.V.Th
 
-private theorem irr2 {G κ k A : Type} [Group G] [Field κ] [IsAlgClosed κ] [Field k] [CommRing A]
-    (r : G →* GL (Fin 2) κ) (hr : U3.MatIrr ⊤ (Pr.gm r)) (j : A →+* κ) (hj : Function.Injective j) (φ : A →+* k)
-    (χ : G →* kˣ) (t : G → A) (ht : ∀ g, j (t g) = (Pr.gm r g).trace)
-    (hχ : ∀ g, φ (t g) = (χ g : kˣ) + ((χ g)⁻¹ : kˣ)) (U : Subgroup G) [U.Normal] {u : G} (hu : u ∈ U)
-    (hd : (Pr.gm r u).det = 1) (hne : χ u ^ 2 ≠ 1) : U3.MatIrr U (Pr.gm r) := by
-  have hy : ((χ u : kˣ) : k) ^ 2 - 1 ≠ 0 := fun h => hne (Units.ext (by simpa [sub_eq_zero] using h))
+private theorem irr2
+    {G κ k A : Type} [Group G] [Field κ] [IsAlgClosed κ] [Field k] [CommRing A]
+    (r : G →* GL (Fin 2) κ) (hr : U3.MatIrr ⊤ (Pr.gm r))
+    (j : A →+* κ) (hj : Function.Injective j)
+    (φ : A →+* k) (χ : G →* kˣ) (t : G → A)
+    (ht : ∀ g, j (t g) = (Pr.gm r g).trace) (hχ : ∀ g, φ (t g) = (χ g : kˣ) + ((χ g)⁻¹ : kˣ))
+    (U : Subgroup G) [U.Normal]
+    {u : G} (hu : u ∈ U) (hd : (Pr.gm r u).det = 1) (hne : χ u ^ 2 ≠ 1)
+    : U3.MatIrr U (Pr.gm r) := by
+  have hy : ((χ u : kˣ) : k) ^ 2 - 1 ≠ 0 := fun h =>
+    hne (Units.ext (by simpa [sub_eq_zero] using h))
   rcases Pr.cliffPrime G κ 2 Nat.prime_two r hr U with h | h | ⟨b, la, π, -, hla, hπ, htr⟩
   · exact h
   · exfalso
@@ -32,7 +38,9 @@ private theorem irr2 {G κ k A : Type} [Group G] [Field κ] [IsAlgClosed κ] [Fi
       apply hj
       rw [map_pow, ht, map_ofNat]
       rw [ha] at hd ⊢
-      simp only [Matrix.det_smul, Matrix.det_one, Fintype.card_fin, Matrix.trace_smul, Matrix.trace_one, smul_eq_mul] at hd ⊢
+      simp only [Matrix.det_smul, Matrix.det_one, Fintype.card_fin, Matrix.trace_smul,
+          Matrix.trace_one, smul_eq_mul]
+        at hd ⊢
       push_cast
       linear_combination 4 * hd
     have e2 := congrArg φ e
@@ -70,13 +78,21 @@ private theorem irr2 {G κ k A : Type} [Group G] [Field κ] [IsAlgClosed κ] [Fi
     apply hy
     linear_combination ((χ u : kˣ) : k) ^ 2 * z1 - z2
 
-private theorem pair2 {κ : Type} [Field κ] :
-    ∃ J : GL (Fin 2) κ, ∀ M : Matrix (Fin 2) (Fin 2) κ, M.transpose * J.val * M = M.det • J.val := by
-  refine ⟨⟨!![0, 1; -1, 0], !![0, -1; 1, 0], by simp [Matrix.one_fin_two], by simp [Matrix.one_fin_two]⟩, fun M => ?_⟩
+private theorem pair2 {κ : Type} [Field κ]
+    : ∃ J : GL (Fin 2) κ, ∀ M : Matrix (Fin 2) (Fin 2) κ,
+      M.transpose * J.val * M = M.det • J.val := by
+  refine ⟨
+    ⟨!![0, 1; -1, 0], !![0, -1; 1, 0], by simp [Matrix.one_fin_two], by simp [Matrix.one_fin_two]⟩,
+    fun M => ?_
+  ⟩
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.det_fin_two] <;> ring
+  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.det_fin_two]
+    <;> ring
 
-private theorem freeRes {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (L : Type) [Field L]
-    [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω] (W : G ℚ Ω →* GL (Fin 2) (Qbar l)) (h : FreeAt l W) :
-    FreeAt l (W.comp (Base.galEmb ℚ L Ω)) :=
+private theorem freeRes
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    (L : Type) [Field L] [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω]
+    (W : G ℚ Ω →* GL (Fin 2) (Qbar l)) (h : FreeAt l W)
+    : FreeAt l (W.comp (Base.galEmb ℚ L Ω)) :=
   _root_.UpperTheory.Reformulated.B.FreeAtCompGaloisEmbedding.freeRes L W h

@@ -21,8 +21,12 @@ theorem FontaineBcris.fund_holds (l : ℕ) [Fact l.Prime] (C : Core l) : C.Fund 
   exact GlobalTheory.MemLoc.fundamental_exact l C b h1 h2
 
 theorem FontaineBcris_holds : FontaineBcris :=
-  FontaineBcris.of_rest fun l _ C =>
-    ⟨GlobalTheory.T.algClosure_tensor_bcris_to_bdR_injective l C, FontaineBcris.fund_holds l C, GlobalTheory.MemLoc.FundOnto.fundOnto l C,
-      GlobalTheory.T.bcris_regular_of_tensorInj l C (GlobalTheory.T.algClosure_tensor_bcris_to_bdR_injective l C)⟩
+  FontaineBcris.of_rest fun l _ C => ⟨
+    GlobalTheory.T.algClosure_tensor_bcris_to_bdR_injective l C,
+    FontaineBcris.fund_holds l C,
+    GlobalTheory.MemLoc.FundOnto.fundOnto l C,
+    GlobalTheory.T.bcris_regular_of_tensorInj l C
+      (GlobalTheory.T.algClosure_tensor_bcris_to_bdR_injective l C)
+  ⟩
 
 end GlobalTheory.Published

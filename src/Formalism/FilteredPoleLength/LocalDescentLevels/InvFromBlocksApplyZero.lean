@@ -18,11 +18,10 @@ theorem complexHadamard : ComplexHadamard := by
   simp only [Matrix.transpose_apply] at h1
   have hprod : (∏ j, Real.sqrt (∑ i, ‖M i j‖ ^ 2)) ^ 2 = ∏ j, ∑ i, ‖M i j‖ ^ 2 := by
     rw [← Finset.prod_pow]
-    exact Finset.prod_congr rfl fun j _ =>
-      Real.sq_sqrt (Finset.sum_nonneg fun i _ => by positivity)
+    exact Finset.prod_congr rfl fun j _ => Real.sq_sqrt (Finset.sum_nonneg fun i _ => by positivity)
   refine ⟨?_, ?_⟩
-  · refine (pow_le_pow_iff_left₀ (norm_nonneg _)
-      (Finset.prod_nonneg fun j _ => Real.sqrt_nonneg _) two_ne_zero).1 ?_
+  · refine (pow_le_pow_iff_left₀ (norm_nonneg _) (Finset.prod_nonneg fun j _ => Real.sqrt_nonneg _)
+      two_ne_zero).1 ?_
     rw [hprod]
     exact h1
   · have h2 := Formalism.HadamardInequality.P.hadamard_maximum_holds n M A hA

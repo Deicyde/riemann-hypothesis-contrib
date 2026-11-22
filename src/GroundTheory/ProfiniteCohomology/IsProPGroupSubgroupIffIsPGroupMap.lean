@@ -15,8 +15,8 @@ variable {G : Type*} [Group G] [TopologicalSpace G]
 def IsProPGroup (p : ℕ) (G : Type*) [Group G] [TopologicalSpace G] : Prop :=
   ∀ U : OpenNormalSubgroup G, IsPGroup p (G ⧸ (U : Subgroup G))
 
-theorem isProPGroup_iff {p : ℕ} :
-    IsProPGroup p G ↔ ∀ U : OpenNormalSubgroup G, ∀ g : G, ∃ k : ℕ, g ^ p ^ k ∈ U := by
+theorem isProPGroup_iff {p : ℕ}
+    : IsProPGroup p G ↔ ∀ U : OpenNormalSubgroup G, ∀ g : G, ∃ k : ℕ, g ^ p ^ k ∈ U := by
   refine forall_congr' fun U => ⟨fun h g => ?_, fun h x => ?_⟩
   · obtain ⟨k, hk⟩ := h (g : G ⧸ (U : Subgroup G))
     refine ⟨k, ?_⟩
@@ -27,10 +27,9 @@ theorem isProPGroup_iff {p : ℕ} :
       obtain ⟨k, hk⟩ := h g
       exact ⟨k, by rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]; exact hk⟩
 
-
 omit [TopologicalSpace G] in
-theorem isPGroup_map_mk_iff {p : ℕ} (H U : Subgroup G) [U.Normal] :
-    IsPGroup p (H.map (QuotientGroup.mk' U)) ↔ ∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ U := by
+theorem isPGroup_map_mk_iff {p : ℕ} (H U : Subgroup G) [U.Normal]
+    : IsPGroup p (H.map (QuotientGroup.mk' U)) ↔ ∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ U := by
   constructor
   · intro hp h hh
     obtain ⟨k, hk⟩ := hp ⟨QuotientGroup.mk' U h, Subgroup.mem_map_of_mem _ hh⟩
@@ -48,8 +47,8 @@ theorem isPGroup_map_mk_iff {p : ℕ} (H U : Subgroup G) [U.Normal] :
 
 variable [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G]
 
-theorem exists_subgroupOf_le {H : Subgroup G} (V : OpenNormalSubgroup H) :
-    ∃ U : OpenNormalSubgroup G, (U : Subgroup G).subgroupOf H ≤ (V : Subgroup H) := by
+theorem exists_subgroupOf_le {H : Subgroup G} (V : OpenNormalSubgroup H)
+    : ∃ U : OpenNormalSubgroup G, (U : Subgroup G).subgroupOf H ≤ (V : Subgroup H) := by
   obtain ⟨W, hWo, hWV⟩ := isOpen_induced_iff.mp V.toOpenSubgroup.isOpen
   have h1W : (1 : G) ∈ W := by
     have : (1 : H) ∈ Subtype.val ⁻¹' W := hWV ▸ V.one_mem
@@ -61,15 +60,16 @@ theorem exists_subgroupOf_le {H : Subgroup G} (V : OpenNormalSubgroup H) :
   rw [hWV] at this
   exact this
 
-theorem isProPGroup_subgroup_iff {p : ℕ} {H : Subgroup G} :
-    IsProPGroup p H ↔ ∀ U : OpenNormalSubgroup G, ∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ U := by
+theorem isProPGroup_subgroup_iff {p : ℕ} {H : Subgroup G}
+    : IsProPGroup p H ↔ ∀ U : OpenNormalSubgroup G, ∀ h ∈ H, ∃ k : ℕ, h ^ p ^ k ∈ U := by
   rw [isProPGroup_iff]
   constructor
   · intro hH U h hh
-    let U' : OpenNormalSubgroup H :=
-      { toSubgroup := (U : Subgroup G).subgroupOf H
-        isOpen' := Subgroup.subgroupOf_isOpen H (U : Subgroup G) U.toOpenSubgroup.isOpen
-        isNormal' := inferInstance }
+    let U' : OpenNormalSubgroup H := {
+      toSubgroup := (U : Subgroup G).subgroupOf H
+      isOpen' := Subgroup.subgroupOf_isOpen H (U : Subgroup G) U.toOpenSubgroup.isOpen
+      isNormal' := inferInstance
+    }
     obtain ⟨k, hk⟩ := hH U' ⟨h, hh⟩
     exact ⟨k, hk⟩
   · intro hH V g
@@ -77,9 +77,9 @@ theorem isProPGroup_subgroup_iff {p : ℕ} {H : Subgroup G} :
     obtain ⟨k, hk⟩ := hH U g g.2
     exact ⟨k, hU (show (g ^ p ^ k : H) ∈ (U : Subgroup G).subgroupOf H from hk)⟩
 
-theorem isProPGroup_subgroup_iff_isPGroup_map {p : ℕ} {H : Subgroup G} :
-    IsProPGroup p H ↔
-      ∀ U : OpenNormalSubgroup G, IsPGroup p (H.map (QuotientGroup.mk' (U : Subgroup G))) := by
+theorem isProPGroup_subgroup_iff_isPGroup_map {p : ℕ} {H : Subgroup G}
+    : IsProPGroup p H
+      ↔ ∀ U : OpenNormalSubgroup G, IsPGroup p (H.map (QuotientGroup.mk' (U : Subgroup G))) := by
   rw [isProPGroup_subgroup_iff]
   exact forall_congr' fun U => (isPGroup_map_mk_iff H (U : Subgroup G)).symm
 

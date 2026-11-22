@@ -7,12 +7,16 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM
 
 namespace GlobalTheory.PolFan
 
-theorem eq_zero_of_linearIndependent_int_rat {Y ι : Type} [Fintype ι] {f : ι → Y → ℤ}
-    (hf : LinearIndependent ℤ f) (q : ι → ℚ) (hq : ∀ y, ∑ i, q i * (f i y : ℚ) = 0) : q = 0 := by
+theorem eq_zero_of_linearIndependent_int_rat
+    {Y ι : Type} [Fintype ι]
+    {f : ι → Y → ℤ} (hf : LinearIndependent ℤ f)
+    (q : ι → ℚ) (hq : ∀ y, ∑ i, q i * (f i y : ℚ) = 0)
+    : q = 0 := by
   classical
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors ℤ) q
   have hb' : ∀ i, ∃ r : ℤ, (r : ℚ) = ((b : ℤ) : ℚ) * q i := fun i => by
@@ -29,7 +33,8 @@ theorem eq_zero_of_linearIndependent_int_rat {Y ι : Type} [Fintype ι] {f : ι 
       push_cast
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
-      rw [hn i]; ring
+      rw [hn i]
+      ring
     rw [hq y, mul_zero] at this
     exact_mod_cast this
   funext i
@@ -39,9 +44,12 @@ theorem eq_zero_of_linearIndependent_int_rat {Y ι : Type} [Fintype ι] {f : ι 
   simp only [Pi.zero_apply, Int.cast_zero] at h
   exact (mul_eq_zero.mp h.symm).resolve_left hbne
 
-theorem eq_zero_of_linearIndependent_int {Y ι : Type} [Fintype ι] {f : ι → Y → ℤ}
-    (hf : LinearIndependent ℤ f) (k : Type) [Field k] [CharZero k] (a : ι → k)
-    (ha : ∀ y, ∑ i, a i * (f i y : k) = 0) : a = 0 := by
+theorem eq_zero_of_linearIndependent_int
+    {Y ι : Type} [Fintype ι]
+    {f : ι → Y → ℤ} (hf : LinearIndependent ℤ f)
+    (k : Type) [Field k] [CharZero k]
+    (a : ι → k) (ha : ∀ y, ∑ i, a i * (f i y : k) = 0)
+    : a = 0 := by
   classical
   let B := Module.Basis.ofVectorSpace ℚ k
   have key : ∀ j, (fun i => B.coord j (a i)) = 0 := fun j =>

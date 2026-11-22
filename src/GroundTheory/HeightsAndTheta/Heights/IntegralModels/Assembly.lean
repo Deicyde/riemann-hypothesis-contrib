@@ -34,7 +34,8 @@ theorem FiniteIntegralClosure.full : FiniteIntegralClosure.Statement := FiniteIn
 
 theorem MertensUpper.full : MertensUpper.Statement := MertensUpper.proof
 
-theorem TorsionFreeQuotientLength.full : TorsionFreeQuotientLength.Statement := TorsionFreeQuotientLength.proof
+theorem TorsionFreeQuotientLength.full : TorsionFreeQuotientLength.Statement :=
+  TorsionFreeQuotientLength.proof
 
 theorem KrullAkizukiQuotientLength.full : KrullAkizukiQuotientLength.Statement :=
   KrullAkizukiQuotientLength.proof TorsionFreeQuotientLength.full
@@ -45,13 +46,13 @@ theorem KrullAkizuki.full : KrullAkizuki.Statement :=
 theorem DominatingDVR.full : DominatingDVR.Statement :=
   DominatingDVR.proof KrullAkizuki.full BlowUpChart.full
 
-theorem SumCp.full : SumCp.Statement :=
-  SumCp.proof MertensUpper.full
+theorem SumCp.full : SumCp.Statement := SumCp.proof MertensUpper.full
 
 theorem FiniteNormalization.full : FiniteNormalization.Statement :=
   GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.FiniteIntegralClosure.normalization_of_scheme
     (GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.FiniteIntegralClosure.scheme_of_alg
-      (GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.FiniteIntegralClosure.alg_iff.mp FiniteIntegralClosure.full))
+      (GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.FiniteIntegralClosure.alg_iff.mp
+        FiniteIntegralClosure.full))
 
 end GroundTheory.Heights₂.Heights.Model
 
@@ -70,7 +71,9 @@ theorem SumCp.full : SumCp.Statement :=
   SumCp.equiv.mp GroundTheory.Heights₂.Heights.Model.SumCp.full
 
 theorem FiniteIntegralClosure.full : FiniteIntegralClosure.Statement :=
-  FiniteIntegralClosure.equiv.mp ⟨GroundTheory.Heights₂.Heights.Model.FiniteIntegralClosure.full,
-    GroundTheory.Heights₂.Heights.Model.FiniteNormalization.full⟩
+  FiniteIntegralClosure.equiv.mp ⟨
+    GroundTheory.Heights₂.Heights.Model.FiniteIntegralClosure.full,
+    GroundTheory.Heights₂.Heights.Model.FiniteNormalization.full
+  ⟩
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model

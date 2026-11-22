@@ -6,17 +6,22 @@ public import Formalism.LocalToGlobal.Columns.PolyFnLemmas
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Forms GlobalTheory.Mem.Col2
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV
+  Formalism.L2.Forms GlobalTheory.Mem.Col2
 
 namespace GlobalTheory.Mem.Col2
 
-theorem valC_finiteDimensional {E K ι : Type} [Field E] [Field K] [CharZero K] [Fintype ι] {n : ℕ}
-    (emb : ι → E →+* K) (σ : K →+* ℂ) (lam : ι → DomWeight n) :
-    FiniteDimensional ℂ (ValC (Gr emb σ n) lam) := by
+theorem valC_finiteDimensional
+    {E K ι : Type} [Field E] [Field K] [CharZero K] [Fintype ι]
+    {n : ℕ}
+    (emb : ι → E →+* K) (σ : K →+* ℂ) (lam : ι → DomWeight n)
+    : FiniteDimensional ℂ (ValC (Gr emb σ n) lam) := by
   classical
   have h := span_evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ
-  have h2 : ValC (Gr emb σ n) lam ≤
-      Submodule.span ℂ (Set.range fun i => evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ (bVV K lam i)) := by
+  have h2
+      : ValC (Gr emb σ n) lam
+        ≤ Submodule.span ℂ
+          (Set.range fun i => evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ (bVV K lam i)) := by
     rw [← h, Submodule.span_le]
     rintro _ ⟨F, rfl⟩
     set_option synthInstance.maxHeartbeats 100000 in
@@ -28,15 +33,20 @@ theorem valC_finiteDimensional {E K ι : Type} [Field E] [Field K] [CharZero K] 
     (Set.finite_range fun i => evV emb (1 : Matrix (Fin n) (Fin n) E) lam σ (bVV K lam i))
   exact Submodule.finiteDimensional_of_le h2
 
-theorem GStep.fi_finiteDimensional {E K ι : Type} [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K]
-    [StarRing K] [Fintype ι] {n : ℕ} (S : GStep E K n) (emb : ι → E →+* K) (σ : K →+* ℂ) (lam : ι → DomWeight n)
-    (_hF : FOk emb σ) (hS : S.Ok) : FiniteDimensional ℂ (S.Fi emb σ lam) := by
+theorem GStep.fi_finiteDimensional
+    {E K ι : Type}
+    [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K] [Fintype ι]
+    {n : ℕ} (S : GStep E K n)
+    (emb : ι → E →+* K) (σ : K →+* ℂ)
+    (lam : ι → DomWeight n) (_hF : FOk emb σ) (hS : S.Ok)
+    : FiniteDimensional ℂ (S.Fi emb σ lam) := by
   haveI := hS.fin_orb
   haveI := valC_finiteDimensional emb σ lam
-  let f : S.Fi emb σ lam →ₗ[ℂ] (S.Cl → ValC (Gr emb σ n) lam) :=
-    { toFun := fun φ c => ⟨φ.1 c, (φ.2 c).1⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let f : S.Fi emb σ lam →ₗ[ℂ] (S.Cl → ValC (Gr emb σ n) lam) := {
+    toFun := fun φ c => ⟨φ.1 c, (φ.2 c).1⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   refine Module.Finite.of_injective f fun a b hab => ?_
   apply Subtype.ext
   funext c

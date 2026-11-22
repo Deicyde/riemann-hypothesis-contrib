@@ -12,8 +12,11 @@ public import Development.WeilBound.RepresentationTheoryGL.HolomorphicDiscreteSe
 namespace PositivityTheory.RgHe
 
 theorem occ : Occ :=
-  Dec.walk (Sl.stepL LowestKTypeModel.models LowestKTypeModel.ofInt LowestKTypeModel.seed Dec.decomposition_existence_holds)
-    (SM.stepM LowestKTypeModel.models LowestKTypeModel.ofInt LowestKTypeModel.seed Dec.decomposition_existence_holds)
+  Dec.walk
+    (Sl.stepL LowestKTypeModel.models LowestKTypeModel.ofInt LowestKTypeModel.seed
+      Dec.decomposition_existence_holds)
+    (SM.stepM LowestKTypeModel.models LowestKTypeModel.ofInt LowestKTypeModel.seed
+      Dec.decomposition_existence_holds)
     (PositivityTheory.RgHe3.base LowestKTypeModel.models FrameF.frame)
 
 end PositivityTheory.RgHe

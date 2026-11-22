@@ -9,11 +9,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem finite_card_trace_algHom_of_isReduced_baseChange :
-    ∀ (O H K : Type) [CommRing O] [Nontrivial O] [CommRing H] [Algebra O H] [Module.Free O H]
-      [Module.Finite O H] [Field K] [IsAlgClosed K] [Algebra O K], IsReduced (K ⊗[O] H) →
-      Finite (H →ₐ[O] K) ∧ Nat.card (H →ₐ[O] K) = Module.finrank O H ∧
-        ∀ h : H, algebraMap O K (Algebra.trace O H h) = ∑ᶠ ga : H →ₐ[O] K, ga h := by
+theorem finite_card_trace_algHom_of_isReduced_baseChange
+    : ∀ (O H K : Type) [CommRing O] [Nontrivial O] [CommRing H] [Algebra O H] [Module.Free O H]
+        [Module.Finite O H] [Field K] [IsAlgClosed K] [Algebra O K],
+      IsReduced (K ⊗[O] H)
+        → Finite (H →ₐ[O] K) ∧ Nat.card (H →ₐ[O] K) = Module.finrank O H
+          ∧ ∀ h : H, algebraMap O K (Algebra.trace O H h) = ∑ᶠ ga : H →ₐ[O] K, ga h := by
   classical
   intro O H K _ _ _ _ _ _ _ _ _ hred
   have : IsReduced (K ⊗[O] H) := hred
@@ -37,6 +38,9 @@ theorem finite_card_trace_algHom_of_isReduced_baseChange :
   let _ := Fintype.ofFinite (H →ₐ[O] K)
   rw [finsum_eq_sum_of_fintype]
   exact algebraMap_trace_eq_sum_algHom_of_card (R := O) (S := H) (L := K)
-    (by rw [← Nat.card_eq_fintype_card, hcard]) (P := fun g => g) (fun _ _ e => e) h
+    (by rw [← Nat.card_eq_fintype_card, hcard])
+    (P := fun g => g)
+    (fun _ _ e => e)
+    h
 
 end GlobalTheory

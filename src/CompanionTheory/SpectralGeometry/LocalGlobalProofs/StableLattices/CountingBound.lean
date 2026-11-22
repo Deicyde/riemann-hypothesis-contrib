@@ -10,11 +10,14 @@ open scoped InnerProductSpace Kronecker
 
 namespace GlobalTheory.CompanionTheory.ZuckCount
 
-theorem casG_polar {n : ℕ} (μ : Fin n → ℝ) (J : Finset (Fin n)) (s : Fin n) :
-    casG (addSet μ J) + casG (μ + Pi.single s 1) + (2 - casG μ) - casG (addSet μ J + Pi.single s 1)
+theorem casG_polar {n : ℕ} (μ : Fin n → ℝ) (J : Finset (Fin n)) (s : Fin n)
+    : casG (addSet μ J) + casG (μ + Pi.single s 1) + (2 - casG μ)
+        - casG (addSet μ J + Pi.single s 1)
       = if s ∈ J then 0 else 2 := by
-  have h : ∑ a, ((addSet μ J a) ^ 2 + ((μ + Pi.single s 1 : Fin n → ℝ) a) ^ 2 - μ a ^ 2
-      - ((addSet μ J + Pi.single s 1 : Fin n → ℝ) a) ^ 2) = if s ∈ J then -2 else 0 := by
+  have h
+      : ∑ a, ((addSet μ J a) ^ 2 + ((μ + Pi.single s 1 : Fin n → ℝ) a) ^ 2 - μ a ^ 2
+          - ((addSet μ J + Pi.single s 1 : Fin n → ℝ) a) ^ 2)
+        = if s ∈ J then -2 else 0 := by
     rw [Finset.sum_eq_single s]
     · simp only [addSet, Pi.add_apply, Pi.single_eq_same]
       split_ifs <;> ring
@@ -26,16 +29,16 @@ theorem casG_polar {n : ℕ} (μ : Fin n → ℝ) (J : Finset (Fin n)) (s : Fin 
   unfold casG
   split_ifs at h ⊢ <;> linarith
 
-theorem addSet_insert {n : ℕ} (μ : Fin n → ℝ) (J : Finset (Fin n)) (s : Fin n) (hs : s ∉ J) :
-    addSet μ J + Pi.single s 1 = addSet μ (insert s J) := by
+theorem addSet_insert {n : ℕ} (μ : Fin n → ℝ) (J : Finset (Fin n)) (s : Fin n) (hs : s ∉ J)
+    : addSet μ J + Pi.single s 1 = addSet μ (insert s J) := by
   funext a
   by_cases ha : a = s
   · subst ha
     simp [addSet, hs]
   · simp [addSet, ha]
 
-theorem addSet_eq_iff {n : ℕ} (μ : Fin n → ℝ) (J I : Finset (Fin n)) (s : Fin n) :
-    addSet μ J + Pi.single s 1 = addSet μ I ↔ s ∉ J ∧ I = insert s J := by
+theorem addSet_eq_iff {n : ℕ} (μ : Fin n → ℝ) (J I : Finset (Fin n)) (s : Fin n)
+    : addSet μ J + Pi.single s 1 = addSet μ I ↔ s ∉ J ∧ I = insert s J := by
   constructor
   · intro h
     have hs : s ∉ J := by
@@ -52,15 +55,17 @@ theorem addSet_eq_iff {n : ℕ} (μ : Fin n → ℝ) (J I : Finset (Fin n)) (s :
   · rintro ⟨hs, rfl⟩
     exact addSet_insert μ J s hs
 
-theorem casG_polar_complex {n : ℕ} (μ : Fin n → ℝ) (J : Finset (Fin n)) (s : Fin n) :
-    (casG (addSet μ J) : ℂ) + (casG (μ + Pi.single s 1) : ℂ) + (2 - (casG μ : ℂ))
-      - (casG (addSet μ J + Pi.single s 1) : ℂ) = if s ∈ J then 0 else 2 := by
+theorem casG_polar_complex {n : ℕ} (μ : Fin n → ℝ) (J : Finset (Fin n)) (s : Fin n)
+    : (casG (addSet μ J) : ℂ) + (casG (μ + Pi.single s 1) : ℂ) + (2 - (casG μ : ℂ))
+        - (casG (addSet μ J + Pi.single s 1) : ℂ)
+      = if s ∈ J then 0 else 2 := by
   have h := congrArg (fun x : ℝ => (x : ℂ)) (casG_polar μ J s)
   split_ifs at h ⊢ <;> (push_cast at h; exact h)
 
 theorem count : Count := by
   intro n m μ _ par w
-  have hw : ∀ p, w p (par p) = if p.2 ∈ p.1.1 then 0 else 2 := fun p => casG_polar_complex μ p.1.1 p.2
+  have hw : ∀ p, w p (par p) = if p.2 ∈ p.1.1 then 0 else 2 := fun p =>
+    casG_polar_complex μ p.1.1 p.2
   refine ⟨fun I => ?_, fun ν hν => ?_⟩
   · have h1 : ∀ p ∈ univ.filter (fun p => par p = addSet μ I.1), w p (addSet μ I.1) = 2 := by
       intro p hp
@@ -71,7 +76,8 @@ theorem count : Count := by
       refine Finset.card_bij (fun p _ => p.2) ?_ ?_ ?_
       · intro p hp
         have := (addSet_eq_iff μ p.1.1 I.1 p.2).1 (Finset.mem_filter.1 hp).2
-        rw [this.2]; exact Finset.mem_insert_self _ _
+        rw [this.2]
+        exact Finset.mem_insert_self _ _
       · intro p hp q hq hpq
         have h1 := (addSet_eq_iff μ p.1.1 I.1 p.2).1 (Finset.mem_filter.1 hp).2
         have h2 := (addSet_eq_iff μ q.1.1 I.1 q.2).1 (Finset.mem_filter.1 hq).2

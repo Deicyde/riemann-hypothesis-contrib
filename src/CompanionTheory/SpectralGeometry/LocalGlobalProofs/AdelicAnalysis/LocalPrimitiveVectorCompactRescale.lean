@@ -11,16 +11,23 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.PrimV
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 def UniP (K : Type*) [CommRing K] [TopologicalSpace K] (M : ℕ) : Prop :=
-  ∃ Ω : Set (Fin M → K), IsCompact Ω ∧ ∀ y : Fin M → K, (∃ z : Fin M → K, z ⬝ᵥ y = 1) →
-    ∃ (a : Kˣ) (z : Fin M → K), (a : K) • y ∈ Ω ∧ z ∈ Ω ∧ z ⬝ᵥ ((a : K) • y) = 1
+  ∃ Ω : Set (Fin M → K),
+    IsCompact Ω
+      ∧ ∀ y : Fin M → K,
+        (∃ z : Fin M → K, z ⬝ᵥ y = 1)
+          → ∃ (a : Kˣ) (z : Fin M → K), (a : K) • y ∈ Ω ∧ z ∈ Ω ∧ z ⬝ᵥ ((a : K) • y) = 1
 
-theorem primitiveCompact_of_multiplicative {K : Type*} [CommRing K] [Nontrivial K] [TopologicalSpace K] (M : ℕ) (ν : K → ℝ)
-    (h0 : ν 0 = 0) (h1 : ν 1 = 1) (hm : ∀ x y, ν (x * y) = ν x * ν y) (hn : ∀ x, 0 ≤ ν x)
-    (hu : ∀ x, x ≠ 0 → IsUnit x ∧ 0 < ν x) (hc : IsCompact {x | ν x ≤ 1}) : UniP K M := by
+theorem primitiveCompact_of_multiplicative
+    {K : Type*} [CommRing K] [Nontrivial K] [TopologicalSpace K]
+    (M : ℕ)
+    (ν : K → ℝ) (h0 : ν 0 = 0) (h1 : ν 1 = 1) (hm : ∀ x y, ν (x * y) = ν x * ν y)
+    (hn : ∀ x, 0 ≤ ν x) (hu : ∀ x, x ≠ 0 → IsUnit x ∧ 0 < ν x) (hc : IsCompact {x | ν x ≤ 1})
+    : UniP K M := by
   refine ⟨Set.pi Set.univ fun _ => {x | ν x ≤ 1}, isCompact_univ_pi fun _ => hc, ?_⟩
   rintro y ⟨z, hz⟩
   have hex : ∃ j, y j ≠ 0 := by
@@ -52,13 +59,16 @@ theorem primitiveCompact_of_multiplicative {K : Type*} [CommRing K] [Nontrivial 
     · simp [Pi.single_eq_of_ne hk, h0]
   · simp [hwi]
 
-theorem primitiveCompact_prod {A B : Type*} [CommRing A] [CommRing B] [TopologicalSpace A] [TopologicalSpace B] {M : ℕ}
-    (hA : UniP A M) (hB : UniP B M) : UniP (A × B) M := by
+theorem primitiveCompact_prod
+    {A B : Type*} [CommRing A] [CommRing B] [TopologicalSpace A] [TopologicalSpace B]
+    {M : ℕ} (hA : UniP A M) (hB : UniP B M)
+    : UniP (A × B) M := by
   obtain ⟨ΩA, cA, pA⟩ := hA
   obtain ⟨ΩB, cB, pB⟩ := hB
   let f : (Fin M → A) × (Fin M → B) → (Fin M → A × B) := fun p i => (p.1 i, p.2 i)
-  have hf : Continuous f := continuous_pi fun i =>
-    ((continuous_apply i).comp continuous_fst).prodMk ((continuous_apply i).comp continuous_snd)
+  have hf : Continuous f :=
+    continuous_pi fun i =>
+      ((continuous_apply i).comp continuous_fst).prodMk ((continuous_apply i).comp continuous_snd)
   refine ⟨f '' (ΩA ×ˢ ΩB), (cA.prod cB).image hf, ?_⟩
   rintro y ⟨z, hz⟩
   have h1 : (fun i => (z i).1) ⬝ᵥ (fun i => (y i).1) = 1 := by
@@ -70,29 +80,41 @@ theorem primitiveCompact_prod {A B : Type*} [CommRing A] [CommRing B] [Topologic
   obtain ⟨a, za, m1, m2, m3⟩ := pA _ ⟨_, h1⟩
   obtain ⟨b, zb, n1, n2, n3⟩ := pB _ ⟨_, h2⟩
   have hab : ((MulEquiv.prodUnits.symm (a, b) : (A × B)ˣ) : A × B) = ((a : A), (b : B)) := rfl
-  refine ⟨MulEquiv.prodUnits.symm (a, b), fun i => (za i, zb i),
-    ⟨(_, _), ⟨m1, n1⟩, ?_⟩, ⟨(za, zb), ⟨m2, n2⟩, rfl⟩, ?_⟩
+  refine ⟨
+    MulEquiv.prodUnits.symm (a, b),
+    fun i => (za i, zb i),
+    ⟨(_, _), ⟨m1, n1⟩, ?_⟩,
+    ⟨(za, zb), ⟨m2, n2⟩, rfl⟩,
+    ?_
+  ⟩
   · ext i <;> simp [f, hab]
   · refine Prod.ext ?_ ?_
     · simpa [dotProduct, Prod.fst_sum, hab] using m3
     · simpa [dotProduct, Prod.snd_sum, hab] using n3
 
-theorem primitiveCompact_of_ringEquiv {A B : Type*} [CommRing A] [CommRing B] [TopologicalSpace A] [TopologicalSpace B] {M : ℕ}
-    (e : A ≃+* B) (hc : Continuous e.symm) (h : UniP B M) : UniP A M := by
+theorem primitiveCompact_of_ringEquiv
+    {A B : Type*} [CommRing A] [CommRing B] [TopologicalSpace A] [TopologicalSpace B]
+    {M : ℕ}
+    (e : A ≃+* B) (hc : Continuous e.symm)
+    (h : UniP B M)
+    : UniP A M := by
   obtain ⟨Ω, c, p⟩ := h
-  refine ⟨(fun w i => e.symm (w i)) '' Ω,
-    c.image (continuous_pi fun i => hc.comp (continuous_apply i)), ?_⟩
+  refine ⟨
+    (fun w i => e.symm (w i)) '' Ω,
+    c.image (continuous_pi fun i => hc.comp (continuous_apply i)),
+    ?_
+  ⟩
   rintro y ⟨z, hz⟩
   have h1 : (fun i => e (z i)) ⬝ᵥ (fun i => e (y i)) = 1 := by
     have := congrArg e hz
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [dotProduct, map_sum, map_mul] using this
+    simpa [dotProduct, map_sum, map_mul] using this
   obtain ⟨a, w, m1, m2, m3⟩ := p _ ⟨_, h1⟩
   refine ⟨Units.map (e.symm : B →* A) a, fun i => e.symm (w i), ⟨_, m1, ?_⟩, ⟨w, m2, rfl⟩, ?_⟩
   · ext i; simp
   · apply e.injective
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [dotProduct, map_sum, map_mul] using m3
+    simpa [dotProduct, map_sum, map_mul] using m3
 
 section Quad
 
@@ -100,8 +122,8 @@ variable {L K : Type*} [Field L] [CommRing K] [Algebra L K]
 
 def gg (d : K) (p : L × L) : K := p.1 • (1 : K) + p.2 • d
 
-theorem gg_mul {d : K} {D : L} (hd : d * d = algebraMap L K D) (p q : L × L) :
-    gg d p * gg d q = gg d (p.1 * q.1 + D * (p.2 * q.2), p.1 * q.2 + p.2 * q.1) := by
+theorem gg_mul {d : K} {D : L} (hd : d * d = algebraMap L K D) (p q : L × L)
+    : gg d p * gg d q = gg d (p.1 * q.1 + D * (p.2 * q.2), p.1 * q.2 + p.2 * q.1) := by
   simp only [gg, Algebra.smul_def, map_add (f := _), map_mul, mul_one]
   linear_combination (algebraMap L K p.2 * algebraMap L K q.2) * hd
 
@@ -117,15 +139,17 @@ theorem gg_rr (h0 : bs 0 = 1) (x : K) : gg (bs 1) (rr bs x) = x := by
 theorem rr_gg (h0 : bs 0 = 1) (p : L × L) : rr bs (gg (bs 1) p) = p := by
   refine Prod.ext ?_ ?_ <;> simp [rr, gg, ← h0]
 
-theorem rr_mul (h0 : bs 0 = 1) {D : L} (hd : bs 1 * bs 1 = algebraMap L K D) (x y : K) :
-    rr bs (x * y) = ((rr bs x).1 * (rr bs y).1 + D * ((rr bs x).2 * (rr bs y).2),
-      (rr bs x).1 * (rr bs y).2 + (rr bs x).2 * (rr bs y).1) := by
+theorem rr_mul (h0 : bs 0 = 1) {D : L} (hd : bs 1 * bs 1 = algebraMap L K D) (x y : K)
+    : rr bs (x * y)
+      = (
+        (rr bs x).1 * (rr bs y).1 + D * ((rr bs x).2 * (rr bs y).2),
+        (rr bs x).1 * (rr bs y).2 + (rr bs x).2 * (rr bs y).1
+      ) := by
   conv_lhs => rw [← gg_rr bs h0 x, ← gg_rr bs h0 y, gg_mul hd, rr_gg bs h0]
 
 theorem rr_zero : rr bs (0 : K) = 0 := by simp [rr]
 
-theorem rr_one (h0 : bs 0 = 1) : rr bs (1 : K) = (1, 0) := by
-  rw [← h0]; simp [rr]
+theorem rr_one (h0 : bs 0 = 1) : rr bs (1 : K) = (1, 0) := by rw [← h0]; simp [rr]
 
 theorem rr_add (x y : K) : rr bs (x + y) = rr bs x + rr bs y := by simp [rr]
 
@@ -143,8 +167,8 @@ variable {L K : Type*} [NormedField L] [ProperSpace L]
 
 def Nf (D : L) (p : L × L) : L := p.1 ^ 2 - D * p.2 ^ 2
 
-theorem Nf_mul (D : L) (p q : L × L) :
-    Nf D (p.1 * q.1 + D * (p.2 * q.2), p.1 * q.2 + p.2 * q.1) = Nf D p * Nf D q := by
+theorem Nf_mul (D : L) (p q : L × L)
+    : Nf D (p.1 * q.1 + D * (p.2 * q.2), p.1 * q.2 + p.2 * q.1) = Nf D p * Nf D q := by
   simp only [Nf]; ring
 
 theorem Nf_ne {D : L} (hD : ∀ s, s * s ≠ D) {p : L × L} (hp : p ≠ 0) : Nf D p ≠ 0 := by
@@ -160,8 +184,7 @@ theorem Nf_ne {D : L} (hD : ∀ s, s * s ≠ D) {p : L × L} (hp : p ≠ 0) : Nf
     linear_combination h
 
 theorem compact_Nf {D : L} (hD : ∀ s, s * s ≠ D) : IsCompact {p : L × L | ‖Nf D p‖ ≤ 1} := by
-  have hcont : Continuous fun p : L × L => ‖Nf D p‖ := by
-    unfold Nf; fun_prop
+  have hcont : Continuous fun p : L × L => ‖Nf D p‖ := by unfold Nf; fun_prop
   have hs : IsCompact (Metric.sphere (0 : L × L) 1) := isCompact_sphere _ _
   have hne : (Metric.sphere (0 : L × L) 1).Nonempty := ⟨(1, 0), by simp [Prod.norm_def]⟩
   obtain ⟨q0, hq0, hmin⟩ := hs.exists_isMinOn hne hcont.continuousOn
@@ -198,8 +221,7 @@ theorem compact_Nf {D : L} (hD : ∀ s, s * s ≠ D) : IsCompact {p : L × L | �
     have h4 : ‖Nf D p‖ ≤ 1 := hp
     rw [h2, norm_mul, norm_pow, hw] at h4
     exact (mul_le_mul_of_nonneg_left h1 (by positivity)).trans h4
-  have h5 : ‖p‖ ^ 2 ≤ 1 / ‖Nf D q0‖ := by
-    rw [le_div_iff₀ hm]; exact h3
+  have h5 : ‖p‖ ^ 2 ≤ 1 / ‖Nf D q0‖ := by rw [le_div_iff₀ hm]; exact h3
   have h6 : 0 < 1 / ‖Nf D q0‖ := by positivity
   by_cases h7 : ‖p‖ ≤ 1
   · linarith
@@ -208,10 +230,17 @@ theorem compact_Nf {D : L} (hD : ∀ s, s * s ≠ D) : IsCompact {p : L × L | �
 
 variable [CommRing K] [Algebra L K] [TopologicalSpace K] (bs : Module.Basis (Fin 2) L K)
 
-theorem primitiveCompact_nonsplit (h0 : bs 0 = 1) {D : L} (hd : bs 1 * bs 1 = algebraMap L K D)
-    (hD : ∀ s, s * s ≠ D) (hg : Continuous (gg (bs 1) : L × L → K)) (M : ℕ) : UniP K M := by
+theorem primitiveCompact_nonsplit
+    (h0 : bs 0 = 1)
+    {D : L} (hd : bs 1 * bs 1 = algebraMap L K D) (hD : ∀ s, s * s ≠ D)
+    (hg : Continuous (gg (bs 1) : L × L → K)) (M : ℕ)
+    : UniP K M := by
   haveI := nontrivial_of_basis bs h0
-  refine primitiveCompact_of_multiplicative M (fun x => ‖Nf D (rr bs x)‖) ?_ ?_ ?_ (fun _ => norm_nonneg _) ?_ ?_
+  refine primitiveCompact_of_multiplicative M
+    (fun x => ‖Nf D (rr bs x)‖)
+    ?_ ?_ ?_
+    (fun _ => norm_nonneg _)
+    ?_ ?_
   · simp [rr_zero, Nf]
   · simp [rr_one bs h0, Nf]
   · intro x y
@@ -226,7 +255,8 @@ theorem primitiveCompact_nonsplit (h0 : bs 0 = 1) {D : L} (hd : bs 1 * bs 1 = al
       simp [gg]
     have hn := Nf_ne hD hp
     generalize rr bs x = p at hxg hp hn ⊢
-    refine ⟨isUnit_iff_exists_inv.2 ⟨gg (bs 1) (p.1 / Nf D p, -p.2 / Nf D p), ?_⟩, norm_pos_iff.2 hn⟩
+    refine
+      ⟨isUnit_iff_exists_inv.2 ⟨gg (bs 1) (p.1 / Nf D p, -p.2 / Nf D p), ?_⟩, norm_pos_iff.2 hn⟩
     rw [← hxg, gg_mul hd]
     have e1 : p.1 * (p.1 / Nf D p) + D * (p.2 * (-p.2 / Nf D p)) = 1 := by
       field_simp
@@ -250,51 +280,64 @@ theorem primitiveCompact_nonsplit (h0 : bs 0 = 1) {D : L} (hd : bs 1 * bs 1 = al
     exact (compact_Nf hD).image hg
 
 theorem primitiveCompact_normedField (M : ℕ) : UniP L M := by
-  refine primitiveCompact_of_multiplicative M (fun x => ‖x‖) norm_zero norm_one norm_mul (fun _ => norm_nonneg _)
-    (fun x hx => ⟨isUnit_iff_ne_zero.2 hx, norm_pos_iff.2 hx⟩) ?_
-  have : {x : L | ‖x‖ ≤ 1} = Metric.closedBall 0 1 := by
-    ext x; simp
+  refine primitiveCompact_of_multiplicative M
+    (fun x => ‖x‖)
+    norm_zero norm_one norm_mul
+    (fun _ => norm_nonneg _)
+    (fun x hx => ⟨isUnit_iff_ne_zero.2 hx, norm_pos_iff.2 hx⟩)
+    ?_
+  have : {x : L | ‖x‖ ≤ 1} = Metric.closedBall 0 1 := by ext x; simp
   rw [this]
   exact isCompact_closedBall _ _
 
-theorem primitiveCompact_split (h0 : bs 0 = 1) {D : L} (hd : bs 1 * bs 1 = algebraMap L K D) {s : L} (hs : s ≠ 0)
-    (hD : s * s = D) (h2 : (2 : L) ≠ 0) (hg : Continuous (gg (bs 1) : L × L → K)) (M : ℕ) : UniP K M := by
-  let e : K ≃+* L × L :=
-    { toFun := fun x => ((rr bs x).1 + s * (rr bs x).2, (rr bs x).1 - s * (rr bs x).2)
-      invFun := fun w => gg (bs 1) ((w.1 + w.2) / 2, (w.1 - w.2) / (2 * s))
-      left_inv := fun x => by
-        have e1 : ((rr bs x).1 + s * (rr bs x).2 + ((rr bs x).1 - s * (rr bs x).2)) / 2 = (rr bs x).1 := by
-          field_simp
-          ring
-        have e2 : ((rr bs x).1 + s * (rr bs x).2 - ((rr bs x).1 - s * (rr bs x).2)) / (2 * s) = (rr bs x).2 := by
-          field_simp
-          ring
-        simp only [e1, e2]
-        exact gg_rr bs h0 x
-      right_inv := fun w => by
-        simp only [rr_gg bs h0]
-        refine Prod.ext ?_ ?_
-        · simp only
-          field_simp
-          ring
-        · simp only
-          field_simp
-          ring
-      map_mul' := fun x y => by
-        simp only [rr_mul bs h0 hd, ← hD]
-        refine Prod.ext ?_ ?_
-        · simp only [Prod.fst_mul]
-          ring
-        · simp only [Prod.snd_mul]
-          ring
-      map_add' := fun x y => by
-        simp only [rr_add]
-        refine Prod.ext ?_ ?_
-        · simp only [Prod.fst_add, Prod.snd_add]
-          ring
-        · simp only [Prod.fst_add, Prod.snd_add]
-          ring }
-  refine primitiveCompact_of_ringEquiv e ?_ (primitiveCompact_prod (primitiveCompact_normedField M) (primitiveCompact_normedField M))
+theorem primitiveCompact_split
+    (h0 : bs 0 = 1)
+    {D : L} (hd : bs 1 * bs 1 = algebraMap L K D)
+    {s : L} (hs : s ≠ 0) (hD : s * s = D)
+    (h2 : (2 : L) ≠ 0) (hg : Continuous (gg (bs 1) : L × L → K)) (M : ℕ)
+    : UniP K M := by
+  let e : K ≃+* L × L := {
+    toFun := fun x => ((rr bs x).1 + s * (rr bs x).2, (rr bs x).1 - s * (rr bs x).2)
+    invFun := fun w => gg (bs 1) ((w.1 + w.2) / 2, (w.1 - w.2) / (2 * s))
+    left_inv := fun x => by
+      have e1
+          : ((rr bs x).1 + s * (rr bs x).2 + ((rr bs x).1 - s * (rr bs x).2)) / 2
+            = (rr bs x).1 := by
+        field_simp
+        ring
+      have e2
+          : ((rr bs x).1 + s * (rr bs x).2 - ((rr bs x).1 - s * (rr bs x).2)) / (2 * s)
+            = (rr bs x).2 := by
+        field_simp
+        ring
+      simp only [e1, e2]
+      exact gg_rr bs h0 x
+    right_inv := fun w => by
+      simp only [rr_gg bs h0]
+      refine Prod.ext ?_ ?_
+      · simp only
+        field_simp
+        ring
+      · simp only
+        field_simp
+        ring
+    map_mul' := fun x y => by
+      simp only [rr_mul bs h0 hd, ← hD]
+      refine Prod.ext ?_ ?_
+      · simp only [Prod.fst_mul]
+        ring
+      · simp only [Prod.snd_mul]
+        ring
+    map_add' := fun x y => by
+      simp only [rr_add]
+      refine Prod.ext ?_ ?_
+      · simp only [Prod.fst_add, Prod.snd_add]
+        ring
+      · simp only [Prod.fst_add, Prod.snd_add]
+        ring
+  }
+  refine primitiveCompact_of_ringEquiv e ?_
+    (primitiveCompact_prod (primitiveCompact_normedField M) (primitiveCompact_normedField M))
   show Continuous fun w : L × L => gg (bs 1) ((w.1 + w.2) / 2, (w.1 - w.2) / (2 * s))
   exact hg.comp (by fun_prop)
 
@@ -304,8 +347,8 @@ section Delta
 
 variable {F E : Type*} [Field F] [Field E] [Algebra F E]
 
-theorem basis_of_not_mem (h2 : Module.finrank F E = 2) {d : E} (hd : d ∉ (algebraMap F E).range) :
-    ∃ b : Module.Basis (Fin 2) F E, b 0 = 1 ∧ b 1 = d := by
+theorem basis_of_not_mem (h2 : Module.finrank F E = 2) {d : E} (hd : d ∉ (algebraMap F E).range)
+    : ∃ b : Module.Basis (Fin 2) F E, b 0 = 1 ∧ b 1 = d := by
   have hli : LinearIndependent F ![(1 : E), d] := by
     rw [LinearIndependent.pair_iff]
     intro s t hst
@@ -324,8 +367,8 @@ theorem basis_of_not_mem (h2 : Module.finrank F E = 2) {d : E} (hd : d ∉ (alge
     simpa using hst
   refine ⟨basisOfLinearIndependentOfCardEqFinrank hli (by simp [h2]), ?_, ?_⟩ <;> simp
 
-theorem exists_delta [CharZero F] (h2 : Module.finrank F E = 2) :
-    ∃ (b : Module.Basis (Fin 2) F E) (Δ : F), b 0 = 1 ∧ b 1 * b 1 = algebraMap F E Δ ∧ Δ ≠ 0 := by
+theorem exists_delta [CharZero F] (h2 : Module.finrank F E = 2)
+    : ∃ (b : Module.Basis (Fin 2) F E) (Δ : F), b 0 = 1 ∧ b 1 * b 1 = algebraMap F E Δ ∧ Δ ≠ 0 := by
   haveI : FiniteDimensional F E := Module.finite_of_finrank_pos (by omega)
   obtain ⟨x, hx⟩ : ∃ x : E, x ∉ (algebraMap F E).range := by
     by_contra hcon
@@ -336,7 +379,8 @@ theorem exists_delta [CharZero F] (h2 : Module.finrank F E = 2) :
     have h1 := Subalgebra.bot_eq_top_iff_finrank_eq_one.1 this
     omega
   obtain ⟨b0, h00, h01⟩ := basis_of_not_mem h2 hx
-  have hxx : x * x = algebraMap F E (b0.repr (x * x) 0) + algebraMap F E (b0.repr (x * x) 1) * x := by
+  have hxx
+      : x * x = algebraMap F E (b0.repr (x * x) 0) + algebraMap F E (b0.repr (x * x) 1) * x := by
     have := b0.sum_repr (x * x)
     rw [Fin.sum_univ_two, h00, h01] at this
     simp only [Algebra.smul_def, mul_one] at this
@@ -365,7 +409,16 @@ theorem exists_delta [CharZero F] (h2 : Module.finrank F E = 2) :
 
 end Delta
 
-theorem exists_compact_unimodular_vectors_mod_units : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (v : HeightOneSpectrum (𝓞 F)), ∃ Ω : Set (Fin 1 → Fin M → Fv F v ⊗[F] E), IsCompact Ω ∧ ∀ y : Fin 1 → Fin M → Fv F v ⊗[F] E, (∃ z : Fin M → Fv F v ⊗[F] E, z ⬝ᵥ y 0 = 1) → ∃ (a : (Fv F v ⊗[F] E)ˣ) (z : Fin 1 → Fin M → Fv F v ⊗[F] E), (a : Fv F v ⊗[F] E) • y ∈ Ω ∧ z ∈ Ω ∧ z 0 ⬝ᵥ ((a : Fv F v ⊗[F] E) • y) 0 = 1 := by
+theorem exists_compact_unimodular_vectors_mod_units
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M : ℕ) (v : HeightOneSpectrum (𝓞 F)), ∃ Ω : Set (Fin 1 → Fin M → Fv F v ⊗[F] E),
+          IsCompact Ω
+            ∧ ∀ y : Fin 1 → Fin M → Fv F v ⊗[F] E,
+              (∃ z : Fin M → Fv F v ⊗[F] E, z ⬝ᵥ y 0 = 1)
+                → ∃ (a : (Fv F v ⊗[F] E)ˣ) (z : Fin 1 → Fin M → Fv F v ⊗[F] E),
+                  (a : Fv F v ⊗[F] E) • y ∈ Ω ∧ z ∈ Ω ∧ z 0 ⬝ᵥ ((a : Fv F v ⊗[F] E) • y) 0 = 1 := by
   intro F E _ _ _ _ _ σ hσ M v
   obtain ⟨b, Δ, hb0, hb1, hΔ⟩ := exists_delta (F := F) (E := E) hσ.2.2.1
   haveI hprop : ProperSpace (Fv F v) := Formalism.BasicNotions.Examples₂.LocF.proper v
@@ -376,15 +429,13 @@ theorem exists_compact_unimodular_vectors_mod_units : ∀ (F E : Type) [Field F]
   have h0 : bs 0 = 1 := by
     simp [bs, Algebra.TensorProduct.basis_apply, hb0, Algebra.TensorProduct.one_def]
   have hd : bs 1 * bs 1 = algebraMap (Fv F v) (Fv F v ⊗[F] E) (algebraMap F (Fv F v) Δ) := by
-    simp only [bs, Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.tmul_mul_tmul, hb1, mul_one,
-      Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_eq_smul_one Δ, TensorProduct.smul_tmul,
-      Algebra.algebraMap_self, RingHom.id_apply]
+    simp only [bs, Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.tmul_mul_tmul, hb1,
+      mul_one, Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_eq_smul_one Δ,
+      TensorProduct.smul_tmul, Algebra.algebraMap_self, RingHom.id_apply]
   have hg : Continuous (gg (bs 1) : Fv F v × Fv F v → Fv F v ⊗[F] E) := by
     unfold gg
-    have c1 : Continuous fun p : Fv F v × Fv F v => p.1 • (1 : Fv F v ⊗[F] E) := by
-      fun_prop
-    have c2 : Continuous fun p : Fv F v × Fv F v => p.2 • bs 1 := by
-      fun_prop
+    have c1 : Continuous fun p : Fv F v × Fv F v => p.1 • (1 : Fv F v ⊗[F] E) := by fun_prop
+    have c2 : Continuous fun p : Fv F v × Fv F v => p.2 • bs 1 := by fun_prop
     exact c1.add c2
   have hU : UniP (Fv F v ⊗[F] E) M := by
     by_cases hsq : ∃ s, s * s = algebraMap F (Fv F v) Δ

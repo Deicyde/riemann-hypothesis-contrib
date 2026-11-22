@@ -24,33 +24,41 @@ theorem ncard_carrier (Δ : Segment k) : Δ.carrier.ncard = Δ.len := by
   rw [Segment.carrier, ← Set.image_univ, Set.ncard_image_of_injective _ (term_injective Δ)]
   simp
 
-theorem ms_le {Δ : Segment k} {s : Multiset (IrrGL (k := k))} (h : ∀ x ∈ Δ.carrier, x ∈ s) : Δ.ms ≤ s :=
+theorem ms_le {Δ : Segment k} {s : Multiset (IrrGL (k := k))} (h : ∀ x ∈ Δ.carrier, x ∈ s)
+    : Δ.ms ≤ s :=
   (Multiset.le_iff_subset (ms_nodup Δ)).2 fun _ hx => h _ (Segment.mem_ms.1 hx)
 
-theorem exists_longest {s : Multiset (IrrGL (k := k))} {y : IrrGL (k := k)} (hy : y ∈ s) (hc : y.IsCusp) :
-    ∃ Γ : Segment k, (∀ x ∈ Γ.carrier, x ∈ s) ∧
-      ∀ D : Segment k, (∀ x ∈ D.carrier, x ∈ s) → D.len ≤ Γ.len := by
+theorem exists_longest
+    {s : Multiset (IrrGL (k := k))} {y : IrrGL (k := k)} (hy : y ∈ s) (hc : y.IsCusp)
+    : ∃ Γ : Segment k,
+      (∀ x ∈ Γ.carrier, x ∈ s) ∧ ∀ D : Segment k, (∀ x ∈ D.carrier, x ∈ s) → D.len ≤ Γ.len := by
   classical
   let P : ℕ → Prop := fun l => ∃ D : Segment k, (∀ x ∈ D.carrier, x ∈ s) ∧ D.len = l
   have hb : ∀ D : Segment k, (∀ x ∈ D.carrier, x ∈ s) → D.len ≤ Multiset.card s := fun D hD => by
     rw [← Segment.card_ms]
     exact Multiset.card_le_card (ms_le hD)
-  have h1 : P 1 := ⟨Segment.single y hc, fun x hx => by
-    rw [Segment.carrier_single] at hx
-    exact hx ▸ hy, rfl⟩
+  have h1 : P 1 := ⟨
+    Segment.single y hc,
+    fun x hx => by
+      rw [Segment.carrier_single] at hx
+      exact hx ▸ hy,
+    rfl
+  ⟩
   have h1' : 1 ≤ Multiset.card s := by
     obtain ⟨D, hD, e⟩ := h1
     exact e ▸ hb D hD
   obtain ⟨Γ, hΓ, e⟩ := Nat.findGreatest_spec h1' h1
   exact ⟨Γ, hΓ, fun D hD => e ▸ Nat.le_findGreatest (hb D hD) ⟨D, hD, rfl⟩⟩
 
-theorem not_linked_of_longest {s : Multiset (IrrGL (k := k))} {Γ D : Segment k} (hΓ : ∀ x ∈ Γ.carrier, x ∈ s)
-    (hm : ∀ D : Segment k, (∀ x ∈ D.carrier, x ∈ s) → D.len ≤ Γ.len) (hD : ∀ x ∈ D.carrier, x ∈ s) :
-    ¬ Γ.Linked D := by
+theorem not_linked_of_longest
+    {s : Multiset (IrrGL (k := k))} {Γ D : Segment k} (hΓ : ∀ x ∈ Γ.carrier, x ∈ s)
+    (hm : ∀ D : Segment k, (∀ x ∈ D.carrier, x ∈ s) → D.len ≤ Γ.len) (hD : ∀ x ∈ D.carrier, x ∈ s)
+    : ¬ Γ.Linked D := by
   rintro ⟨⟨U, hU⟩, -, h2⟩
-  have h3 : U.len ≤ Γ.len := hm U fun x hx => by
-    rw [hU] at hx
-    exact hx.elim (hΓ x) (hD x)
+  have h3 : U.len ≤ Γ.len :=
+    hm U fun x hx => by
+      rw [hU] at hx
+      exact hx.elim (hΓ x) (hD x)
   have h4 : Γ.carrier ⊂ U.carrier := by
     rw [hU]
     exact ⟨Set.subset_union_left, fun h => h2 (Set.subset_union_right.trans h)⟩
@@ -58,8 +66,11 @@ theorem not_linked_of_longest {s : Multiset (IrrGL (k := k))} {Γ D : Segment k}
   rw [ncard_carrier, ncard_carrier] at h5
   omega
 
-theorem exists_unlinked (n : ℕ) : ∀ s : Multiset (IrrGL (k := k)), Multiset.card s = n → (∀ y ∈ s, y.IsCusp) →
-    ∃ m : Multiset (Segment k), (∀ D ∈ m, ∀ D' ∈ m, ¬ D.Linked D') ∧ m.bind Segment.ms = s := by
+theorem exists_unlinked (n : ℕ)
+    : ∀ s : Multiset (IrrGL (k := k)),
+      Multiset.card s = n → (∀ y ∈ s, y.IsCusp)
+        → ∃ m : Multiset (Segment k),
+          (∀ D ∈ m, ∀ D' ∈ m, ¬ D.Linked D') ∧ m.bind Segment.ms = s := by
   classical
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -68,7 +79,8 @@ theorem exists_unlinked (n : ℕ) : ∀ s : Multiset (IrrGL (k := k)), Multiset.
     · exact ⟨0, by simp, by simp⟩
     obtain ⟨Γ, hΓ, hm⟩ := exists_longest hy (hs y hy)
     have hle := ms_le hΓ
-    have hsub : ∀ x ∈ s - Γ.ms, x ∈ s := fun x hx => Multiset.mem_of_le (Multiset.sub_le_self _ _) hx
+    have hsub : ∀ x ∈ s - Γ.ms, x ∈ s := fun x hx =>
+      Multiset.mem_of_le (Multiset.sub_le_self _ _) hx
     have hcard : Multiset.card (s - Γ.ms) < n := by
       have h1 := Multiset.card_sub hle
       have h2 := Multiset.card_le_card hle
@@ -91,8 +103,9 @@ theorem exists_unlinked (n : ℕ) : ∀ s : Multiset (IrrGL (k := k)), Multiset.
     · rw [Multiset.cons_bind, hb]
       exact add_tsub_cancel_of_le hle
 
-theorem unlinkedLayers (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    UnlinkedLayers k := by
+theorem unlinkedLayers
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : UnlinkedLayers k := by
   intro s hs
   obtain ⟨m, hu, hb⟩ := exists_unlinked _ s rfl hs
   have hmem : ∀ i : Fin m.toList.length, m.toList.get i ∈ m := fun i =>

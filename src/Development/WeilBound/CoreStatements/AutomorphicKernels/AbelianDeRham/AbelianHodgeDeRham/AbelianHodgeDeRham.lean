@@ -80,8 +80,10 @@ theorem abelianHodgeDeRham' : Chapters := by
     van := GlobalTheory.CompanionTheory.Hodge.vanSt
     perfnoeth := GlobalTheory.CompanionTheory.PerfN.perfNoeth
     perfbase := GlobalTheory.CompanionTheory.PerfExt.main
-    perfh1 := GlobalTheory.CompanionTheory.PerfectFirstCohomology.perfect_first_cohomology_base_change
-    perfh2 := GlobalTheory.CompanionTheory.PerfectSecondCohomology.perfect_second_cohomology_from_fibres
+    perfh1 :=
+      GlobalTheory.CompanionTheory.PerfectFirstCohomology.perfect_first_cohomology_base_change
+    perfh2 :=
+      GlobalTheory.CompanionTheory.PerfectSecondCohomology.perfect_second_cohomology_from_fibres
     wedgeof := GlobalTheory.CompanionTheory.WedgeOf.wedgeOf_of_low
     hopffield := GlobalTheory.CompanionTheory.HopfC.hopfFieldSt
     oneform := GlobalTheory.CompanionTheory.OneFormCoh.oneFormCohSt
@@ -102,16 +104,21 @@ theorem abelianHodgeDeRham' : Chapters := by
     noprim := MainStatements.Hodge.Pf.noprim
     smalllift := GlobalTheory.CompanionTheory.SmallLift.main
     perfvb := GlobalTheory.CompanionTheory.PerfVB.perfVB
-    h1all := GlobalTheory.CompanionTheory.Hodge.FirstCohomologyVectorBundle.first_cohomology_vector_bundle_rank
+    h1all :=
+      GlobalTheory.CompanionTheory.Hodge.FirstCohomologyVectorBundle.first_cohomology_vector_bundle_rank
     flatbc := GlobalTheory.CompanionTheory.Hodge.FlatBase.flatBC
     feweqn := GlobalTheory.CompanionTheory.FewEq.fewEq
     stalkdim := MainStatements.Hodge.Pf.stalkdim
-    h1ge := GlobalTheory.CompanionTheory.FirstCohomologyLowerBound.first_cohomology_dimension_lower_bound
-    h1field := GlobalTheory.CompanionTheory.AbelianFirstCohomologyOverField.first_cohomology_rank_over_field
+    h1ge :=
+      GlobalTheory.CompanionTheory.FirstCohomologyLowerBound.first_cohomology_dimension_lower_bound
+    h1field :=
+      GlobalTheory.CompanionTheory.AbelianFirstCohomologyOverField.first_cohomology_rank_over_field
   }
 
 theorem abelianHodgeDeRham : GlobalTheory.Published.AbelianHodgeDeRham :=
-  abelianHodgeDeRham'.print GlobalTheory.CompanionTheory.NoethApprox.schemeModels GlobalTheory.CompanionTheory.SmoothSpread.smooth_spreads GlobalTheory.CompanionTheory.SpreadingModels.properSpreads
+  abelianHodgeDeRham'.print GlobalTheory.CompanionTheory.NoethApprox.schemeModels
+    GlobalTheory.CompanionTheory.SmoothSpread.smooth_spreads
+    GlobalTheory.CompanionTheory.SpreadingModels.properSpreads
     GlobalTheory.CompanionTheory.TrivLoc.trivLocus GlobalTheory.CompanionTheory.KLFinite.kFinite
 
 end MainStatements.Hodge.Free

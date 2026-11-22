@@ -9,6 +9,9 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InfiniteMeasureT
 @[expose] public section
 
 theorem infinite_measure_transfer : Formalism.L2.SG.Pf.MeasInf.InfTransfer :=
-  Formalism.L2.SG.Pf.MeasInfW.measInfXfer_of Formalism.L2.SG.Pf.MeasInfW.measure_isomorphism_at_infinity
-    Formalism.L2.SG.Pf.MeasInfW.nilpotent_measure_recursion Formalism.L2.SG.Pf.MeasInfW.hermitian_measure_recursion
-    Formalism.L2.SG.Pf.MeasInfW.nilpotent_measure_closed_form Formalism.L2.SG.Pf.MeasInfW.hermitian_measure_closed_form
+  Formalism.L2.SG.Pf.MeasInfW.measInfXfer_of
+    Formalism.L2.SG.Pf.MeasInfW.measure_isomorphism_at_infinity
+    Formalism.L2.SG.Pf.MeasInfW.nilpotent_measure_recursion
+    Formalism.L2.SG.Pf.MeasInfW.hermitian_measure_recursion
+    Formalism.L2.SG.Pf.MeasInfW.nilpotent_measure_closed_form
+    Formalism.L2.SG.Pf.MeasInfW.hermitian_measure_closed_form

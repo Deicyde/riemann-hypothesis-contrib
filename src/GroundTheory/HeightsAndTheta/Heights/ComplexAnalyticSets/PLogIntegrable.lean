@@ -21,11 +21,15 @@ namespace LogIntegrableProof
 
 variable {n : ℕ}
 
-theorem lintegral_lt_top (hS : VarSlabMeasure.Statement) (hF : MassFinite.Statement) {d : ℕ}
-    {J : Ideal (MvPolynomial (Fin n) ℂ)} (u : Fin n → ℂ) (R : ℝ) (hJ : J.IsPrime)
-    (hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d) (hu : linForm u ∉ J) :
-    ∫⁻ z in zeroSetEuc J ∩ {z | ‖z‖ ≤ R}, ‖Real.log ‖∑ j, u j * z j‖‖ₑ
-      ∂(μH[((2 * d : ℕ) : ℝ)]) < ⊤ := by
+theorem lintegral_lt_top
+    (hS : VarSlabMeasure.Statement) (hF : MassFinite.Statement)
+    {d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
+    (u : Fin n → ℂ)
+    (R : ℝ) (hJ : J.IsPrime) (hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d)
+    (hu : linForm u ∉ J)
+    : ∫⁻ z in zeroSetEuc J ∩ {z | ‖z‖ ≤ R}, ‖Real.log ‖∑ j, u j * z j‖‖ₑ
+        ∂(μH[((2 * d : ℕ) : ℝ)])
+      < ⊤ := by
   obtain ⟨C, α, hα, hC⟩ := hS n d J u R hJ hdim hu
   set S := zeroSetEuc J ∩ {z : EuclideanSpace ℂ (Fin n) | ‖z‖ ≤ R} with hSdef
   set μ := (μH[((2 * d : ℕ) : ℝ)]).restrict S
@@ -59,8 +63,8 @@ theorem lintegral_lt_top (hS : VarSlabMeasure.Statement) (hF : MassFinite.Statem
     refine lt_of_le_of_lt (lintegral_mono_ae ?_) hint.lintegral_lt_top
     refine (ae_restrict_iff' measurableSet_Ioi).mpr (Eventually.of_forall fun t (ht : 0 < t) => ?_)
     rw [Measure.restrict_apply (measurableSet_le measurable_const hGm)]
-    refine (measure_mono ?_).trans ((hC (Real.exp (-t)) (Real.exp_pos _)
-      (Real.exp_le_one_iff.mpr (by linarith))).trans_eq ?_)
+    refine (measure_mono ?_).trans
+      ((hC (Real.exp (-t)) (Real.exp_pos _) (Real.exp_le_one_iff.mpr (by linarith))).trans_eq ?_)
     · rintro z ⟨hz, hzS⟩
       refine ⟨hzS, ?_⟩
       have htF : F z ≤ -t := by
@@ -78,33 +82,44 @@ theorem lintegral_lt_top (hS : VarSlabMeasure.Statement) (hF : MassFinite.Statem
     refine ENNReal.ofReal_le_ofReal ?_
     have h1 := hFle z hz
     rcases le_or_gt 0 (F z) with h2 | h2
-    · rw [abs_of_nonneg h2]; have := le_max_right (-F z) 0; linarith
-    · rw [abs_of_neg h2]; have := le_max_left (-F z) 0; have := le_max_right (∑ j, ‖u j‖ * R) 0
+    · rw [abs_of_nonneg h2]; have := le_max_right (- F z) 0; linarith
+    · rw [abs_of_neg h2]
+      have := le_max_left (- F z) 0
+      have := le_max_right (∑ j, ‖u j‖ * R) 0
       linarith
-  refine lt_of_le_of_lt (setLIntegral_mono (g := fun z => ENNReal.ofReal M + ENNReal.ofReal (G z))
-    (measurable_const.add hGm.ennreal_ofReal) hle) ?_
+  refine lt_of_le_of_lt
+    (setLIntegral_mono
+      (g := fun z => ENNReal.ofReal M + ENNReal.ofReal (G z))
+      (measurable_const.add hGm.ennreal_ofReal) hle)
+    ?_
   rw [lintegral_add_left measurable_const, lintegral_const, Measure.restrict_apply_univ]
   exact ENNReal.add_lt_top.mpr ⟨ENNReal.mul_lt_top ENNReal.ofReal_lt_top hSfin, hG⟩
 
 end LogIntegrableProof
 
-
 open LogIntegrableProof in
-theorem LogIntegrable.proof (hM : SheetSumMeasurable.Statement) (hD : ChartMassCompare.Statement)
-    (hS : VarSlabMeasure.Statement) (hF : MassFinite.Statement) : LogIntegrable.Statement := by
+theorem LogIntegrable.proof
+    (hM : SheetSumMeasurable.Statement) (hD : ChartMassCompare.Statement)
+    (hS : VarSlabMeasure.Statement) (hF : MassFinite.Statement)
+    : LogIntegrable.Statement := by
   intro n d J A u φ R hJ hdim hA hu hφ
   have hcont : Continuous fun x : Fin n → ℂ => linEval u x := by unfold linEval; fun_prop
   have hwm : Measurable fun x : Fin n → ℂ => Real.log ‖linEval u x‖ :=
     Real.measurable_log.comp (continuous_norm.comp hcont).measurable
-  refine ⟨(hM n d J A _ φ hJ hdim hA (hwm.indicator measurableSet_closedBall) hφ).2.aestronglyMeasurable,
-    ?_⟩
+  refine ⟨
+    (hM n d J A _ φ hJ hdim hA (hwm.indicator measurableSet_closedBall) hφ).2.aestronglyMeasurable,
+    ?_
+  ⟩
   obtain ⟨K, hK, hDK⟩ := hD n d J A φ R hJ hdim hA hφ
 
-  obtain ⟨L, hL0, hL⟩ : ∃ L : ℝ, 0 ≤ L ∧
-      ∀ z : EuclideanSpace ℂ (Fin n), ‖z‖ ≤ L * ‖WithLp.ofLp z‖ :=
-    ⟨(n : ℝ) ^ (2⁻¹ : ℝ), by positivity, fun z => by
+  obtain ⟨L, hL0, hL⟩
+      : ∃ L : ℝ, 0 ≤ L ∧ ∀ z : EuclideanSpace ℂ (Fin n), ‖z‖ ≤ L * ‖WithLp.ofLp z‖ := ⟨
+    (n : ℝ) ^ (2⁻¹ : ℝ),
+    by positivity,
+    fun z => by
       simpa [dist_zero_right] using
-        (PiLp.lipschitzWith_toLp 2 (fun _ : Fin n => ℂ)).dist_le_mul (WithLp.ofLp z) 0⟩
+        (PiLp.lipschitzWith_toLp 2 (fun _ : Fin n => ℂ)).dist_le_mul (WithLp.ofLp z) 0
+  ⟩
   unfold HasFiniteIntegral
   refine (hDK _ hwm).trans_lt (ENNReal.mul_lt_top hK ?_)
   refine lt_of_le_of_lt (lintegral_mono_set ?_) (lintegral_lt_top hS hF u (L * R) hJ hdim hu)

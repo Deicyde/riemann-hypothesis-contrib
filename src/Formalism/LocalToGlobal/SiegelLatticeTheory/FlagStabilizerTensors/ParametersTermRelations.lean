@@ -14,8 +14,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.MassD
 noncomputable section
 
 open scoped Classical InnerProductSpace
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting
-  Formalism.L2.SG.TermOp
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp
 
 namespace Formalism.L2.SG.PackageTie2
 
@@ -23,19 +23,20 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Cols
 
-variable {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter)
+variable
+  {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter)
   {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)} (cs : ColSys X u what₂)
 
 theorem sharp_add (T T' : Cu X u hK) : sharp hK cs (T + T') = sharp hK cs T + sharp hK cs T' := by
   ext ρ
   simp [sharp, LinearMap.comp_add, map_add (f := _)]
 
-theorem sharp_smul (c : ℂ) (T : Cu X u hK) : sharp hK cs (c • T) = (starRingEnd ℂ c) • sharp hK cs T := by
+theorem sharp_smul (c : ℂ) (T : Cu X u hK)
+    : sharp hK cs (c • T) = (starRingEnd ℂ c) • sharp hK cs T := by
   ext ρ
   simp [sharp, LinearMap.comp_smul, map_smul, map_smulₛₗ]
 
-theorem sharp_zero : sharp hK cs 0 = 0 := by
-  simpa using sharp_add X u hK cs 0 0
+theorem sharp_zero : sharp hK cs 0 = 0 := by simpa using sharp_add X u hK cs 0 0
 
 variable {X u hK cs}
 
@@ -82,7 +83,8 @@ end Cols
 
 section Inv
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {hK : X.LevelSubgroupCharacter}
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {hK : X.LevelSubgroupCharacter}
   {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)} {cs : ColSys X u what₂}
   {hinj : Function.Injective (sharp hK cs)} (hb : Function.Bijective (shT hinj))
 
@@ -103,7 +105,6 @@ theorem shInv_smul (c : ℂ) (x : CM cs) : shInv hb (c • x) = (starRingEnd ℂ
   rw [shT_shInv, shT_smul, shT_shInv, starRingEnd_self_apply]
 
 def shInvAdd : CM cs →+ ColT hinj := AddMonoidHom.mk' (shInv hb) (shInv_add hb)
-
 
 include hb in
 theorem finiteDimensional_colT : FiniteDimensional ℂ (ColT hinj) := by
@@ -126,9 +127,11 @@ end Inv
 
 section Transport
 
-variable {D : D7} {X : HidaSetting D} {u u' : D.what₂.Word} {hK : X.LevelSubgroupCharacter}
-  {what₂ rows' : Finset (Submodule (𝓞 D.host.E) (VS D).V)} {cs : ColSys X u what₂} {cs' : ColSys X u' rows'}
-  {hinj : Function.Injective (sharp hK cs)} {hinj' : Function.Injective (sharp hK cs')}
+variable
+  {D : D7} {X : HidaSetting D} {u u' : D.what₂.Word} {hK : X.LevelSubgroupCharacter}
+  {what₂ rows' : Finset (Submodule (𝓞 D.host.E) (VS D).V)} {cs : ColSys X u what₂}
+  {cs' : ColSys X u' rows'} {hinj : Function.Injective (sharp hK cs)}
+  {hinj' : Function.Injective (sharp hK cs')}
   (hb : Function.Bijective (shT hinj)) (hb' : Function.Bijective (shT hinj'))
 
 def trL (A : CM cs' →L[ℂ] CM cs) : ColT hinj' →ₗ[ℂ] ColT hinj where
@@ -138,19 +141,19 @@ def trL (A : CM cs' →L[ℂ] CM cs) : ColT hinj' →ₗ[ℂ] ColT hinj where
     rw [shT_smul, map_smul, shInv_smul, starRingEnd_self_apply]
     rfl
 
-
 include hb' in
 def tr (A : CM cs' →L[ℂ] CM cs) : ColT hinj' →L[ℂ] ColT hinj :=
   haveI := finiteDimensional_colT hb'
   LinearMap.toContinuousLinearMap (trL hb A)
 
 include hb' in
-theorem tr_apply (A : CM cs' →L[ℂ] CM cs) (T' : ColT hinj') :
-    tr hb hb' A T' = shInv hb (A (shT hinj' T')) := rfl
+theorem tr_apply (A : CM cs' →L[ℂ] CM cs) (T' : ColT hinj')
+    : tr hb hb' A T' = shInv hb (A (shT hinj' T')) :=
+  rfl
 
 include hb' in
-theorem shT_tr (A : CM cs' →L[ℂ] CM cs) (T' : ColT hinj') :
-    shT hinj (tr hb hb' A T') = A (shT hinj' T') := by
+theorem shT_tr (A : CM cs' →L[ℂ] CM cs) (T' : ColT hinj')
+    : shT hinj (tr hb hb' A T') = A (shT hinj' T') := by
   rw [tr_apply, shT_shInv]
 
 end Transport
@@ -164,8 +167,7 @@ variable {D : D7} {X : HidaSetting D}
 abbrev TT (Y : Full X) (u u' : D.what₂.Word) : Type :=
   GTerm X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u')
 
-abbrev RT (Y : Full X) (u u' : D.what₂.Word) : Type :=
-  TermDef.Term D u u' (X.Fu u) (Y.what₂ u)
+abbrev RT (Y : Full X) (u u' : D.what₂.Word) : Type := TermDef.Term D u u' (X.Fu u) (Y.what₂ u)
 
 def fib (Y : Full X) {u u' : D.what₂.Word} (t : RT Y u u') : Type := {s : TT Y u u' // s.toTerm = t}
 
@@ -179,11 +181,12 @@ structure FinX (Y : Full X) : Prop where
   puLin : ∀ u, PuLinear X u Y.hK (Y.Dt u)
   finHH : FiniteDimensional ℂ (HHX X)
   fibFin : ∀ u u' (t : RT Y u u'), Finite (fib Y t)
-
-  pairIndep : ∀ u u' (s₁ s₂ s₁' s₂' : TT Y u u'), s₁.toTerm = s₁'.toTerm → s₂.toTerm = s₂'.toTerm →
-    rowOf Y.TR (Y.cs u) (Y.cs u') s₁ = rowOf Y.TR (Y.cs u) (Y.cs u') s₂ →
-    rowOf Y.TR (Y.cs u) (Y.cs u') s₁' = rowOf Y.TR (Y.cs u) (Y.cs u') s₂' →
-    s0T s₁ s₂ = s0T s₁' s₂' ∧ (liftScalar s₁ s₂ ↔ liftScalar s₁' s₂')
+  pairIndep
+    : ∀ u u' (s₁ s₂ s₁' s₂' : TT Y u u'),
+      s₁.toTerm = s₁'.toTerm → s₂.toTerm = s₂'.toTerm
+        → rowOf Y.TR (Y.cs u) (Y.cs u') s₁ = rowOf Y.TR (Y.cs u) (Y.cs u') s₂
+        → rowOf Y.TR (Y.cs u) (Y.cs u') s₁' = rowOf Y.TR (Y.cs u) (Y.cs u') s₂'
+        → s0T s₁ s₂ = s0T s₁' s₂' ∧ (liftScalar s₁ s₂ ↔ liftScalar s₁' s₂')
   Greal : ∀ u u' (t : RT Y u u'), t.G ∈ D.host.F
   cdEx : Formalism.L2.SG.PairVal.CdScaleExists D
   volPos : ∀ u, 0 < Y.volN u ∧ 0 < Y.volH u
@@ -192,7 +195,6 @@ variable {Y : Full X}
 
 theorem FinX.shBij (hF : FinX Y) (u : D.what₂.Word) : Function.Bijective (shT (hF.shInj u)) :=
   ⟨hF.shInj u, hF.shSurj u⟩
-
 
 variable (Y) in
 def RP (u u' : D.what₂.Word) : Type :=
@@ -229,7 +231,6 @@ def aR (u u' : D.what₂.Word) (t : RT Y u u') : ColT (hF.shInj u') →L[ℂ] Co
   haveI := hF.fibFT t
   ∑ s : fib Y t, aT hF u u' s.1
 
-
 variable (Y) in
 def vT (u u' : D.what₂.Word) (s : TT Y u u') : H1 X u u' (Y.what₂ u) (Y.what₂ u') :=
   vec (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') s
@@ -240,7 +241,9 @@ def pvR (u u' : D.what₂.Word) (q : RP Y u u') : ℂ :=
   ∑ r : fib Y q.1.1 × fib Y q.1.2,
     if rowOf Y.TR (Y.cs u) (Y.cs u') r.1.1 = rowOf Y.TR (Y.cs u) (Y.cs u') r.2.1 then inner ℂ (vT Y u u' r.2.1) (vT Y u u' r.1.1) else 0
 
-def sOf : Formalism.MainNotions.S.Draft.SData D.R D.host.F D.host.E D.conjF D.what₂.Word D.what₂.Tau D.hcW where
+def sOf
+    : Formalism.MainNotions.S.Draft.SData D.R D.host.F D.host.E D.conjF D.what₂.Word D.what₂.Tau
+      D.hcW where
   cdScale := Formalism.L2.SG.PairVal.cdScaleOf D
   cdScale_pos n ε := (Formalism.L2.SG.PairVal.cdScaleOf_tie D hF.cdEx n ε).1
   Del := D.s.Del
@@ -277,7 +280,8 @@ def sOf : Formalism.MainNotions.S.Draft.SData D.R D.host.F D.host.E D.conjF D.wh
   pval {u u'} q := pvR hF u u' q
   ptOf t := Formalism.L2.SG.PairVal.ptOf t
   cTerm {u u'} t :=
-    Formalism.L2.SG.PairVal.cTerm (Formalism.L2.SG.PairVal.vRdef D u u' (X.Fu u) (Y.what₂ u) Y.δ Y.M) t
+    Formalism.L2.SG.PairVal.cTerm
+      (Formalism.L2.SG.PairVal.vRdef D u u' (X.Fu u) (Y.what₂ u) Y.δ Y.M) t
   massPair q := Formalism.L2.SG.PairVal.massTerm q.1.1
   meanCount u u' w := Formalism.L2.SG.PairVal.meanCount D u u' (X.Fu u) (Y.what₂ u) w
 
@@ -285,7 +289,8 @@ end SOf
 
 section Iso
 
-variable {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {Word Tau : Type} {hc : Word → Tau → HCParam R}
 
 structure SIso (s s' : Formalism.MainNotions.S.Draft.SData R F E sig Word Tau hc) : Type 1 where
@@ -298,7 +303,9 @@ structure SIso (s s' : Formalism.MainNotions.S.Draft.SData R F E sig Word Tau hc
   volN : s.volN = s'.volN
   volH : s.volH = s'.volH
   eT : ∀ u u', s.Term u u' ≃ s'.Term u u'
-  aTerm_eq : ∀ u u' (t : s.Term u u') (x : s.Cu u'), eCu u (s.aTerm u u' t x) = s'.aTerm u u' (eT u u' t) (eCu u' x)
+  aTerm_eq
+    : ∀ u u' (t : s.Term u u') (x : s.Cu u'),
+      eCu u (s.aTerm u u' t x) = s'.aTerm u u' (eT u u' t) (eCu u' x)
   isId : ∀ {u u'} (t : s.Term u u'), s.isId t ↔ s'.isId (eT u u' t)
   inS : ∀ {u u'} (t : s.Term u u'), s.inS t ↔ s'.inS (eT u u' t)
   relevant : ∀ {u u'} (t : s.Term u u'), s.relevant t ↔ s'.relevant (eT u u' t)
@@ -327,25 +334,30 @@ open Formalism.L2.SG.Full
 
 variable {D : D7} {X : HidaSetting D} {Y : Full X} (hF : FinX Y)
 
-theorem finrank_cols (hI : SIso D.s (sOf hF)) (u : D.what₂.Word) :
-    Module.finrank ℂ (ColT (hF.shInj u)) = D.duS u := by
+theorem finrank_cols (hI : SIso D.s (sOf hF)) (u : D.what₂.Word)
+    : Module.finrank ℂ (ColT (hF.shInj u)) = D.duS u := by
   exact (hI.eCu u).toLinearEquiv.finrank_eq.symm.trans (D.s_Cu u).finrank_eq
 
 def DimTie (u : D.what₂.Word) : Prop :=
   (Module.finrank ℂ (X.Vpi u) : ℝ) = Formalism.MainNotions.S.dimPi (hc := D.hcW) u
 
 def NormTie (u u' : D.what₂.Word) : Prop :=
-  DimTie (X := X) u → DimTie (X := X) u' →
-  Formalism.L2.SG.TermOp.KExpansion (X.Fu u) (X.Fu u') (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') Y.hK (Y.Dt u) (Y.Dt u') →
-  Formalism.L2.SG.TermOp.AbsConvT (X.Fu u) (X.Fu u') Y.TR (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') →
-  (Y.tO u u').IdDegenerate → (Y.tO u u').part (Y.tO u u').degSet = 0 →
-    ‖(Y.tO u u').K0‖ ^ 2 = Formalism.MainNotions.S.hsNormSq (Formalism.MainNotions.S.Kmat (sOf hF) u u')
+  DimTie (X := X) u → DimTie (X := X) u'
+    → Formalism.L2.SG.TermOp.KExpansion (X.Fu u) (X.Fu u') (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u')
+      Y.hK (Y.Dt u) (Y.Dt u')
+    → Formalism.L2.SG.TermOp.AbsConvT (X.Fu u) (X.Fu u') Y.TR (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u')
+    → (Y.tO u u').IdDegenerate → (Y.tO u u').part (Y.tO u u').degSet = 0
+    → ‖(Y.tO u u').K0‖ ^ 2
+      = Formalism.MainNotions.S.hsNormSq (Formalism.MainNotions.S.Kmat (sOf hF) u u')
 
 def IsoNorm : Prop :=
   ∀ {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {sig : E →ₐ[F] E} {Word Tau : Type} [Fintype Tau] {hc : Word → Tau → HCParam R}
-    (s s' : Formalism.MainNotions.S.Draft.SData R F E sig Word Tau hc), SIso s s' →
-      ∀ u u', Formalism.MainNotions.S.hsNormSq (Formalism.MainNotions.S.Kmat s u u') = Formalism.MainNotions.S.hsNormSq (Formalism.MainNotions.S.Kmat s' u u')
+      {sig : E →ₐ[F] E} {Word Tau : Type} [Fintype Tau] {hc : Word → Tau → HCParam R}
+      (s s' : Formalism.MainNotions.S.Draft.SData R F E sig Word Tau hc),
+    SIso s s'
+      → ∀ u u',
+        Formalism.MainNotions.S.hsNormSq (Formalism.MainNotions.S.Kmat s u u')
+          = Formalism.MainNotions.S.hsNormSq (Formalism.MainNotions.S.Kmat s' u u')
 
 end Ties
 
@@ -354,18 +366,22 @@ section Link
 open Formalism.L2.SG.Full
 
 def ParametersTermRelations (D : D7) (L : SizeData₂ D) : Prop :=
-  0 ≤ L.sc.b → IsoNorm →
-  ∀ (X : HidaSetting D) (Y : Full X) (hF : FinX Y), Nonempty (SIso D.s (sOf hF)) →
-  ∀ u u', u ≠ u' →
-    DimTie (X := X) u → DimTie (X := X) u' →
-    Formalism.L2.SG.TermOp.KExpansion (X.Fu u) (X.Fu u') (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') Y.hK (Y.Dt u) (Y.Dt u') →
-    Formalism.L2.SG.TermOp.AbsConvT (X.Fu u) (X.Fu u') Y.TR (Y.cs u) (Y.cs u') (Y.FN u) (Y.FN u') →
-    (Y.tO u u').IdDegenerate → (Y.tO u u').part (Y.tO u u').degSet = 0 →
-    NormTie hF u u' →
-    (∃ (ι : Type) (_ : Fintype ι) (G : Formalism.FourierDecayAlt.Sz.Glob ι) (de : ℕ → ℝ) (T : ℕ) (du du' : ℝ),
-      Formalism.L2.SG.PackageTie.SizeTie D L u u' G de T L.sc.b du du' ∧
-      ‖(Y.tO u u').K0‖ ^ 2 ≤ (1 + (L.sc.b ^ 6)⁻¹) * (du * du' / (G.size de T du).Dstar)) →
-    L.hsSq u u' ≤ (1 + L.sc.b ^ (-(6 : ℝ))) * (D.duS u : ℝ) * (D.duS u' : ℝ) / D.what₂.Dstar
+  0 ≤ L.sc.b → IsoNorm
+    → ∀ (X : HidaSetting D) (Y : Full X) (hF : FinX Y),
+      Nonempty (SIso D.s (sOf hF))
+        → ∀ u u',
+          u ≠ u' → DimTie (X := X) u → DimTie (X := X) u'
+            → Formalism.L2.SG.TermOp.KExpansion (X.Fu u) (X.Fu u') (Y.cs u) (Y.cs u') (Y.FN u)
+              (Y.FN u') Y.hK (Y.Dt u) (Y.Dt u')
+            → Formalism.L2.SG.TermOp.AbsConvT (X.Fu u) (X.Fu u') Y.TR (Y.cs u) (Y.cs u') (Y.FN u)
+              (Y.FN u')
+            → (Y.tO u u').IdDegenerate → (Y.tO u u').part (Y.tO u u').degSet = 0 → NormTie hF u u'
+            → (∃ (ι : Type) (_ : Fintype ι) (G : Formalism.FourierDecayAlt.Sz.Glob ι) (de : ℕ → ℝ)
+                (T : ℕ) (du du' : ℝ),
+              Formalism.L2.SG.PackageTie.SizeTie D L u u' G de T L.sc.b du du'
+                ∧ ‖(Y.tO u u').K0‖ ^ 2 ≤ (1 + (L.sc.b ^ 6)⁻¹) * (du * du' / (G.size de T du).Dstar))
+            → L.hsSq u u'
+              ≤ (1 + L.sc.b ^ (-(6 : ℝ))) * (D.duS u : ℝ) * (D.duS u' : ℝ) / D.what₂.Dstar
 
 theorem packageTieConc (D : D7) (L : SizeData₂ D) : ParametersTermRelations D L := by
   intro hb hIso X Y hF hI u u' _ hDu hDu' hKE hAC hId hdeg hNT hSz

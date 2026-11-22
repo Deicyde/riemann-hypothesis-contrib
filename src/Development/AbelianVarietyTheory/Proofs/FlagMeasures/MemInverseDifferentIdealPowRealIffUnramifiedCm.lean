@@ -6,7 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FormallyUnram
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN GlobalTheory.SnMass.SkewVol
+open NumberField IsDedekindDomain MeasureTheory Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
+  GlobalTheory.SnMass.VolN GlobalTheory.SnMass.SkewVol
 open scoped TensorProduct ENNReal nonZeroDivisors Classical
 
 noncomputable section
@@ -17,29 +20,33 @@ section Fixed
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem differentIdeal_eq_map_of_unramified (hu : Algebra.FormallyUnramified (𝓞 F) (𝓞 E)) :
-    differentIdeal ℤ (𝓞 E) = (differentIdeal ℤ (𝓞 F)).map (algebraMap (𝓞 F) (𝓞 E)) := by
+theorem differentIdeal_eq_map_of_unramified (hu : Algebra.FormallyUnramified (𝓞 F) (𝓞 E))
+    : differentIdeal ℤ (𝓞 E) = (differentIdeal ℤ (𝓞 F)).map (algebraMap (𝓞 F) (𝓞 E)) := by
   rw [differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 F) (𝓞 E),
-    (GlobalTheory.formallyUnramified_ringOfIntegers_iff_differentIdeal_eq_top F E).1 hu, Ideal.top_mul]
+    (GlobalTheory.formallyUnramified_ringOfIntegers_iff_differentIdeal_eq_top F E).1 hu,
+    Ideal.top_mul]
 
-theorem dInv_eq_inv_coe (K : Type) [Field K] [NumberField K] (j : ℕ) :
-    dInv K j = ((↑(differentIdeal ℤ (𝓞 K) ^ j) : FractionalIdeal (𝓞 K)⁰ K))⁻¹ := by
+theorem dInv_eq_inv_coe (K : Type) [Field K] [NumberField K] (j : ℕ)
+    : dInv K j = ((↑(differentIdeal ℤ (𝓞 K) ^ j) : FractionalIdeal (𝓞 K)⁰ K))⁻¹ := by
   rw [dInv, FractionalIdeal.coeIdeal_pow, inv_pow]
 
-theorem algebraMap_mem_inv_map_iff (I : Ideal (𝓞 F)) (hI : I ≠ ⊥) (y : F) :
-    algebraMap F E y ∈ ((↑(I.map (algebraMap (𝓞 F) (𝓞 E))) : FractionalIdeal (𝓞 E)⁰ E))⁻¹ ↔
-      y ∈ ((↑I : FractionalIdeal (𝓞 F)⁰ F))⁻¹ := by
+theorem algebraMap_mem_inv_map_iff (I : Ideal (𝓞 F)) (hI : I ≠ ⊥) (y : F)
+    : algebraMap F E y ∈ ((↑(I.map (algebraMap (𝓞 F) (𝓞 E))) : FractionalIdeal (𝓞 E)⁰ E))⁻¹
+      ↔ y ∈ ((↑I : FractionalIdeal (𝓞 F)⁰ F))⁻¹ := by
   have hIE : I.map (algebraMap (𝓞 F) (𝓞 E)) ≠ ⊥ := Ideal.map_ne_bot_of_ne_bot hI
   rw [FractionalIdeal.mem_inv_iff (FractionalIdeal.coeIdeal_ne_zero.2 hIE),
     FractionalIdeal.mem_inv_iff (FractionalIdeal.coeIdeal_ne_zero.2 hI)]
-  have key : ∀ a : 𝓞 F, algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) a) =
-      algebraMap F E (algebraMap (𝓞 F) F a) := fun a => by
+  have key
+      : ∀ a : 𝓞 F,
+        algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) a)
+          = algebraMap F E (algebraMap (𝓞 F) F a) := fun a => by
     rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
   constructor
   · intro h z hz
     obtain ⟨a, ha, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hz
-    have h1 := h (algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) a))
-      ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, Ideal.mem_map_of_mem _ ha, rfl⟩)
+    have h1 :=
+      h (algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) a))
+        ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, Ideal.mem_map_of_mem _ ha, rfl⟩)
     obtain ⟨c, hc⟩ := (FractionalIdeal.mem_one_iff _).1 h1
     rw [key, ← map_mul] at hc
     have hint : IsIntegral ℤ (y * algebraMap (𝓞 F) F a) := by
@@ -50,14 +57,14 @@ theorem algebraMap_mem_inv_map_iff (I : Ideal (𝓞 F)) (hI : I ≠ ⊥) (y : F)
     exact (FractionalIdeal.mem_one_iff _).2 ⟨⟨_, hint⟩, rfl⟩
   · intro h z hz
     obtain ⟨b, hb, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hz
-    let T : Ideal (𝓞 E) := Submodule.comap
-      ((LinearMap.mulLeft (𝓞 E) (algebraMap F E y)) ∘ₗ Algebra.linearMap (𝓞 E) E)
-      ((1 : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E)
+    let T : Ideal (𝓞 E) :=
+      Submodule.comap ((LinearMap.mulLeft (𝓞 E) (algebraMap F E y)) ∘ₗ Algebra.linearMap (𝓞 E) E)
+        ((1 : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E)
     have hle : I.map (algebraMap (𝓞 F) (𝓞 E)) ≤ T := by
       rw [Ideal.map_le_iff_le_comap]
       intro a ha
-      obtain ⟨c, hc⟩ := (FractionalIdeal.mem_one_iff _).1
-        (h _ ((FractionalIdeal.mem_coeIdeal _).2 ⟨a, ha, rfl⟩))
+      obtain ⟨c, hc⟩ :=
+        (FractionalIdeal.mem_one_iff _).1 (h _ ((FractionalIdeal.mem_coeIdeal _).2 ⟨a, ha, rfl⟩))
       show algebraMap F E y * algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) a) ∈
         (1 : FractionalIdeal (𝓞 E)⁰ E)
       rw [key, ← map_mul, ← hc]
@@ -75,8 +82,8 @@ theorem cm_sigma_ne_id {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : σ ≠ AlgHom
   rw [hσ] at this
   simpa [ComplexEmbedding.conjugate_coe_eq] using this.symm
 
-theorem mem_range_of_cm_fixed {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {x : E} (hx : σ x = x) :
-    x ∈ Set.range (algebraMap F E) := by
+theorem mem_range_of_cm_fixed {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {x : E} (hx : σ x = x)
+    : x ∈ Set.range (algebraMap F E) := by
   have hne := cm_sigma_ne_id h
   have hxS : x ∈ AlgHom.equalizer σ (AlgHom.id F E) := hx
   have hle : Module.finrank F (AlgHom.equalizer σ (AlgHom.id F E)) ≤ 2 := by
@@ -84,8 +91,10 @@ theorem mem_range_of_cm_fixed {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {x : E} 
     exact Submodule.finrank_le _
   have hpos : 0 < Module.finrank F (AlgHom.equalizer σ (AlgHom.id F E)) := Module.finrank_pos
   have hS : AlgHom.equalizer σ (AlgHom.id F E) = ⊥ := by
-    rcases (by omega : Module.finrank F (AlgHom.equalizer σ (AlgHom.id F E)) = 1 ∨
-        Module.finrank F (AlgHom.equalizer σ (AlgHom.id F E)) = 2) with h1 | h2
+    rcases (by omega
+        : Module.finrank F (AlgHom.equalizer σ (AlgHom.id F E)) = 1
+          ∨ Module.finrank F (AlgHom.equalizer σ (AlgHom.id F E)) = 2)
+      with h1 | h2
     · exact Subalgebra.finrank_eq_one_iff.1 h1
     · exfalso
       apply hne
@@ -116,13 +125,17 @@ theorem imV_eq_zero_iff {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (x : E) : imV 
 
 end Fixed
 
-theorem mem_dInv_imV_iff : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → Algebra.FormallyUnramified (𝓞 F) (𝓞 E) →
-    ∀ (j : ℕ) (x : E), (x ∈ dInv E j ∧ imV x = 0) ↔ ∃ y ∈ dInv F j, algebraMap F E y = x := by
+theorem mem_dInv_imV_iff
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ → Algebra.FormallyUnramified (𝓞 F) (𝓞 E)
+        → ∀ (j : ℕ) (x : E), (x ∈ dInv E j ∧ imV x = 0) ↔ ∃ y ∈ dInv F j, algebraMap F E y = x := by
   intro F E _ _ _ _ _ σ h hu j x
   have hIne : differentIdeal ℤ (𝓞 F) ^ j ≠ ⊥ := pow_ne_zero _ differentIdeal_ne_bot
-  have hE : dInv E j = ((↑((differentIdeal ℤ (𝓞 F) ^ j).map (algebraMap (𝓞 F) (𝓞 E))) :
-      FractionalIdeal (𝓞 E)⁰ E))⁻¹ := by
+  have hE
+      : dInv E j
+        = ((↑((differentIdeal ℤ (𝓞 F) ^ j).map (algebraMap (𝓞 F) (𝓞 E)))
+          : FractionalIdeal (𝓞 E)⁰ E))⁻¹ := by
     rw [dInv_eq_inv_coe, differentIdeal_eq_map_of_unramified hu, Ideal.map_pow]
   constructor
   · rintro ⟨hx, him⟩

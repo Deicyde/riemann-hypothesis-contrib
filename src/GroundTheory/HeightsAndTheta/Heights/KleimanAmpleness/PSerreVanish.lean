@@ -16,15 +16,18 @@ noncomputable section
 
 universe u v
 
-theorem SerreVanish.proof (hExact : CechExact.Statement.{u, max u v})
-    (hTop : CechTop.Statement.{u, max u v}) (hFree : SerreFree.Statement.{u, max u v})
-    (hPres : GradedPres.Statement.{u, v}) (hLift : GradedULift.Statement.{u, v})
-    (hRet : CohomRetract.Statement.{u, v, max u v}) : SerreVanish.Statement.{u, v} := by
+theorem SerreVanish.proof
+    (hExact : CechExact.Statement.{u, max u v}) (hTop : CechTop.Statement.{u, max u v})
+    (hFree : SerreFree.Statement.{u, max u v}) (hPres : GradedPres.Statement.{u, v})
+    (hLift : GradedULift.Statement.{u, v}) (hRet : CohomRetract.Statement.{u, v, max u v})
+    : SerreVanish.Statement.{u, v} := by
   intro S _ _ N
 
-  have key : ∀ (k : ℕ) (M : Type (max u v)) [AddCommGroup M] [Module (Poly S N) M] [Module S M]
-      [IsScalarTower S (Poly S N) M] (𝓜 : GradedPMod S N M), Module.Finite (Poly S N) M →
-      ∃ c₀ : ℤ, ∀ i, N + 1 ≤ i + k → 1 ≤ i → ∀ c ≥ c₀, Subsingleton (cohom 𝓜 i c) := by
+  have key
+      : ∀ (k : ℕ) (M : Type (max u v)) [AddCommGroup M] [Module (Poly S N) M] [Module S M]
+          [IsScalarTower S (Poly S N) M] (𝓜 : GradedPMod S N M),
+        Module.Finite (Poly S N) M
+          → ∃ c₀ : ℤ, ∀ i, N + 1 ≤ i + k → 1 ≤ i → ∀ c ≥ c₀, Subsingleton (cohom 𝓜 i c) := by
     intro k
     induction k with
     | zero =>
@@ -37,8 +40,9 @@ theorem SerreVanish.proof (hExact : CechExact.Statement.{u, max u v})
       obtain ⟨c₁, hc₁⟩ := ih K 𝓚 hK
       refine ⟨max c₁ (∑ j, |d j|), fun i hi hi1 c hc => ?_⟩
       have hdc : ∀ j, d j ≤ c := fun j =>
-        ((le_abs_self (d j)).trans (Finset.single_le_sum (fun j _ => abs_nonneg (d j))
-          (Finset.mem_univ j))).trans ((le_max_right _ _).trans hc)
+        ((le_abs_self (d j)).trans
+            (Finset.single_le_sum (fun j _ => abs_nonneg (d j)) (Finset.mem_univ j))).trans
+          ((le_max_right _ _).trans hc)
       have hF := ((hFree S N F 𝓕 r b d hb).2 c hdc).1 i hi1
       have hKv := hc₁ (i + 1) (by omega) (by omega) c ((le_max_left _ _).trans hc)
       obtain ⟨δ, hδ, -⟩ := ((hExact S N K F M 𝓚 𝓕 𝓜 f g hf hg hfg c).2 i).2

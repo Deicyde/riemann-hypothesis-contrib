@@ -17,12 +17,13 @@ open MvPolynomial
 
 noncomputable section
 
-theorem SectionOrderAlgClosed.proof (h₁ : IncIdealBelow.Statement) (h₂ : SpecFirstMemIncIdeal.Statement)
+theorem SectionOrderAlgClosed.proof
+    (h₁ : IncIdealBelow.Statement) (h₂ : SpecFirstMemIncIdeal.Statement)
     (h₃ : ChartChoiceAlgClosed.Statement) (h₄ : Vertical.SpecFirstNeField.Statement)
-    (h₅ : LocalizationPrimeDVR.Statement) (h₆ : EmultiplicityOrd.Statement) (h₇ : ChartFinite.Statement)
-    (h₈ : ChartLocDomain.Statement) (h₉ : ChartNormAlgClosed.Statement)
-    (h₁₀ : ChartLengthAlgClosed.Statement) (h₁₁ : LengthQuotientDet.Statement) :
-    SectionOrderAlgClosed.Statement := by
+    (h₅ : LocalizationPrimeDVR.Statement) (h₆ : EmultiplicityOrd.Statement)
+    (h₇ : ChartFinite.Statement) (h₈ : ChartLocDomain.Statement) (h₉ : ChartNormAlgClosed.Statement)
+    (h₁₀ : ChartLengthAlgClosed.Statement) (h₁₁ : LengthQuotientDet.Statement)
+    : SectionOrderAlgClosed.Statement := by
   intro F _ _ n e I f u hI hf hu
   have hne : specFirst f u ≠ 0 := h₄ F n e I f u hI hf hu
   refine ⟨hne, fun q hq => ?_⟩
@@ -51,11 +52,13 @@ theorem SectionOrderAlgClosed.proof (h₁ : IncIdealBelow.Statement) (h₂ : Spe
   have hnorm := h₉ F n e I f t p hI hf (Or.inr ⟨q, hqp, rfl⟩) htp u
   have hunit : IsUnit (algebraMap _ (Localization.AtPrime p) (specFirst f t)) :=
     IsLocalization.map_units (Localization.AtPrime p) (⟨specFirst f t, htp⟩ : p.primeCompl)
-  have hinjO : Function.Injective
-      (algebraMap (MvPolynomial (Fin e × Fin n) F) (Localization.AtPrime p)) :=
+  have hinjO
+      : Function.Injective (algebraMap (MvPolynomial (Fin e × Fin n) F) (Localization.AtPrime p)) :=
     IsLocalization.injective _ p.primeCompl_le_nonZeroDivisors
-  have hdet : LinearMap.det (LinearMap.mulLeft (Localization.AtPrime p)
-      (algebraMap (ChartInc I t e) (ChartLoc I t e p) (chartLin I t e u))) ≠ 0 := by
+  have hdet
+      : LinearMap.det (LinearMap.mulLeft (Localization.AtPrime p)
+          (algebraMap (ChartInc I t e) (ChartLoc I t e p) (chartLin I t e u)))
+        ≠ 0 := by
     intro h0
     apply hne
     apply hinjO

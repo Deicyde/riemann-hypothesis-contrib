@@ -75,7 +75,8 @@ theorem content_prime_condition_holds : FjPCore := by
       intro hmem
       have hdv : p ∣ Nd.H.QS := Nat.dvd_of_mem_primeFactors hmem
       have hpr : p.Prime := Nat.prime_of_mem_primeFactors hmem
-      have hQd : Nat.Coprime Nd.H.QS Nd.H.d := Nat.Coprime.coprime_dvd_right (dvd_mul_left _ _) Nd.H.QS_coprime
+      have hQd : Nat.Coprime Nd.H.QS Nd.H.d :=
+        Nat.Coprime.coprime_dvd_right (dvd_mul_left _ _) Nd.H.QS_coprime
       rw [hd] at hdv hpr
       exact Nat.not_prime_one (Nat.Coprime.eq_one_of_dvd hQd.symm hdv ▸ hpr)
     have hc : Nd.cls p = PrimeClass.ramD := by
@@ -97,10 +98,7 @@ theorem ramified_discriminant_condition_holds : FRamDCore := by
     rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
     congr 2
     simp only [Formalism.BasicNotions.Ranks.n, Formalism.HC.Frame.A]
-    first
-    | exact Fintype.card_fin _
-    | simp [Formalism.HC.Idx]
-    | exact ZMod.card _
+    first | exact Fintype.card_fin _ | simp [Formalism.HC.Idx] | exact ZMod.card _
   have h1 := mul_le_mul_of_nonneg_left (hsumle.trans hcard.le) hk1
   have h2 := mul_nonneg hk1 hsum0
   unfold NumDatum.FRamD
@@ -109,9 +107,12 @@ theorem ramified_discriminant_condition_holds : FRamDCore := by
 section Record
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
-variable {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P : Type} [Group P] [Finite P] {c : OnConst}
+variable
+  {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P : Type} [Group P] [Finite P]
+  {c : OnConst}
 
-open Formalism.DivisionValues Formalism.EigenvalueLevelCeiling Formalism.L2.Indef Formalism.L2.Indef.Tree
+open Formalism.DivisionValues Formalism.EigenvalueLevelCeiling Formalism.L2.Indef
+  Formalism.L2.Indef.Tree
 
 end Record
 

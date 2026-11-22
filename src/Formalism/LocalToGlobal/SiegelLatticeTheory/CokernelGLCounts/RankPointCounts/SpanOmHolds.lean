@@ -8,12 +8,12 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.Pf.ScalarFramePf
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.Pf.ScalarFramePf
 
 namespace Formalism.L2.SG.Pf.FrameGlobalPatching.FStar
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-
 
 open SpanOmPf in
 theorem spanOm_holds (D : Formalism.BasicNotions.D7) : SpanOm D := by
@@ -45,19 +45,23 @@ theorem spanOm_holds (D : Formalism.BasicNotions.D7) : SpanOm D := by
     have hxX : ∀ y0 ∈ F'.X, (VS D).hT y0 x = 0 := by
       intro y0 hy0
       have := h1 y0 hy0
-      rw [map_add (f := _), map_add (f := _), SpanOmPf.iso_X F' hy0 hy', map_smul, SpanOmPf.isotropicSpan_orthogonal_anisotropicVector F' hy0, smul_zero, add_zero, add_zero] at this
+      rw [map_add (f := _), map_add (f := _), SpanOmPf.iso_X F' hy0 hy', map_smul,
+          SpanOmPf.isotropicSpan_orthogonal_anisotropicVector F' hy0, smul_zero, add_zero, add_zero]
+        at this
       exact this
     obtain ⟨c, rfl⟩ := SpanOmPf.om_uniq F F' hD (by rw [← SpanOmPf.Xplus_eq]; exact hx) hxX
     have hzo : (VS D).hT F'.z ω = star Dd := by rw [SpanOmPf.hsw', SpanOmPf.omega_hermitian_z]
     have e3 : c * star Dd + β * -T' = 0 := by
       have := h3
-      rw [map_add (f := _), map_add (f := _), map_smul, map_smul, hzo, SpanOmPf.z_orth_X F' hy', F'.z_norm, smul_eq_mul, smul_eq_mul,
-        zero_add] at this
+      rw [map_add (f := _), map_add (f := _), map_smul, map_smul, hzo, SpanOmPf.z_orth_X F' hy',
+          F'.z_norm, smul_eq_mul, smul_eq_mul, zero_add]
+        at this
       exact this
     have e4 : c * (-T * (Dr * star Dr)) + β * Dd = 0 := by
       have := h4
-      rw [map_add (f := _), map_add (f := _), map_smul, map_smul, SpanOmPf.om_om, SpanOmPf.om_X' F F' hy', SpanOmPf.omega_hermitian_z, smul_eq_mul, smul_eq_mul,
-        zero_add] at this
+      rw [map_add (f := _), map_add (f := _), map_smul, map_smul, SpanOmPf.om_om,
+          SpanOmPf.om_X' F F' hy', SpanOmPf.omega_hermitian_z, smul_eq_mul, smul_eq_mul, zero_add]
+        at this
       exact this
     have hc : c = 0 := by
       have hcG : c * (Dd * star Dd - T * T' * (Dr * star Dr)) = 0 := by
@@ -69,8 +73,10 @@ theorem spanOm_holds (D : Formalism.BasicNotions.D7) : SpanOm D := by
       exact (mul_eq_zero.1 this).resolve_right hD
     rw [hc, hβ, zero_smul, zero_smul, add_zero, zero_add]
     exact hy'
-  have hmU : m ∈ U := BwdNA.mem_of_orth_orth (VS D) U (fun u hu => by
-    rw [SpanOmPf.hsw', (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth (VS D)).1 hm u (key u hu), star_zero])
+  have hmU : m ∈ U :=
+    BwdNA.mem_of_orth_orth (VS D) U (fun u hu => by
+      rw [SpanOmPf.hsw', (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth (VS D)).1 hm u (key u hu),
+        star_zero])
   obtain ⟨y, hy, s, hs, rfl⟩ := Submodule.mem_sup.1 hmU
   obtain ⟨x', hx', w, hw, rfl⟩ := Submodule.mem_sup.1 hy
   obtain ⟨a, b, rfl⟩ := Submodule.mem_span_pair.1 hs

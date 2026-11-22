@@ -17,7 +17,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.ModuliIntegralCharts.H1
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.Pj
 
 namespace H1algLink
 
@@ -54,13 +55,15 @@ theorem eWL_eq : eWL K la = ramOverZ la := by
 
 theorem ramOverZ_ne_zero : ramOverZ la ≠ 0 := by
   have := liesOver_resChar la
-  exact Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver la.asIdeal (span_resChar_ne_bot la)
+  exact Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver la.asIdeal
+    (span_resChar_ne_bot la)
 
 theorem prime_mem_iff {p : ℕ} (hp : p.Prime) : ((p : ℕ) : 𝓞 K) ∈ la.asIdeal ↔ resCharOf la = p := by
   constructor
   · intro hm
     by_contra hne
-    have hnd : ¬ resCharOf la ∣ p := fun hd => hne ((Nat.prime_dvd_prime_iff_eq (resCharOf_prime la) hp).1 hd)
+    have hnd : ¬ resCharOf la ∣ p := fun hd =>
+      hne ((Nat.prime_dvd_prime_iff_eq (resCharOf_prime la) hp).1 hd)
     exact crv_not_mem la hnd hm
   · intro h
     rw [← h]
@@ -69,6 +72,5 @@ theorem prime_mem_iff {p : ℕ} (hp : p.Prime) : ((p : ℕ) : 𝓞 K) ∈ la.asI
 variable {D : D7}
 
 end H1algLink
-
 
 end Formalism.MainNotions.ModuliIntegralCharts.H1

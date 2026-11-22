@@ -5,25 +5,29 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LowersMulZero
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.RadCov.LowDim
 
-variable {n m : ℕ} {W : ℕ → Submodule ℂ (Fin n → ℂ)} {r : ℕ → ℕ}
-  {U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ}
+variable
+  {n m : ℕ} {W : ℕ → Submodule ℂ (Fin n → ℂ)} {r : ℕ → ℕ} {U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ}
 
 theorem block_eq_zero (hB : Biorth r m U (fun b => (U b)ᴴ)) {s : ℕ} (hs : m ≤ s) : U s = 0 := by
   obtain ⟨-, h2, h3⟩ := hB
-  calc U s = (∑ b ∈ range m, U b * (U b)ᴴ) * U s := by rw [h3, Matrix.one_mul]
+  calc
+    U s
+      = (∑ b ∈ range m, U b * (U b)ᴴ) * U s := by rw [h3, Matrix.one_mul]
     _ = 0 := by
       rw [Matrix.sum_mul]
       refine Finset.sum_eq_zero fun b hb => ?_
       have hb' : b ≠ s := by have := Finset.mem_range.1 hb; omega
       rw [Matrix.mul_assoc, h2 b s hb', Matrix.mul_zero]
 
-theorem mem_lowers_iff_blocks (hB : Biorth r m U (fun b => (U b)ᴴ))
-    (hW : ∀ k y, y ∈ W k ↔ ∀ b, k ≤ b → (U b)ᴴ *ᵥ y = 0) (c : ℕ) (Y : Matrix (Fin n) (Fin n) ℂ) :
-    Y ∈ lowers W c ↔ ∀ s t, t ≤ s + c → (U s)ᴴ * Y * U t = 0 := by
+theorem mem_lowers_iff_blocks
+    (hB : Biorth r m U (fun b => (U b)ᴴ)) (hW : ∀ k y, y ∈ W k ↔ ∀ b, k ≤ b → (U b)ᴴ *ᵥ y = 0)
+    (c : ℕ) (Y : Matrix (Fin n) (Fin n) ℂ)
+    : Y ∈ lowers W c ↔ ∀ s t, t ≤ s + c → (U s)ᴴ * Y * U t = 0 := by
   obtain ⟨-, h2, h3⟩ := hB
   rw [mem_lowers]
   constructor
@@ -48,8 +52,8 @@ theorem mem_lowers_iff_blocks (hB : Biorth r m U (fun b => (U b)ᴴ))
     · rw [h s t hst, Matrix.zero_mulVec]
     · rw [(hW _ _).1 hy t (by omega), Matrix.mulVec_zero]
 
-noncomputable def layer (m : ℕ) (U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ) (c : ℕ) :
-    Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ∀ b : Fin m, Matrix (Fin (r b)) (Fin (r (b + c + 1))) ℂ where
+noncomputable def layer (m : ℕ) (U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ) (c : ℕ)
+    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ∀ b : Fin m, Matrix (Fin (r b)) (Fin (r (b + c + 1))) ℂ where
   toFun Y b := (U b)ᴴ * Y * U (b + c + 1)
   map_add' Y Z := by
     funext b
@@ -62,13 +66,14 @@ end GlobalTheory.RadCov.LowDim
 
 namespace GlobalTheory.RadCov
 
-
 open LowDim in
-theorem finrank_lowers_eq_succ_add (n m : ℕ) (W : ℕ → Submodule ℂ (Fin n → ℂ)) (r : ℕ → ℕ)
-    (U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ) (hB : Biorth r m U (fun b => (U b)ᴴ))
-    (hW : ∀ k y, y ∈ W k ↔ ∀ b, k ≤ b → (U b)ᴴ *ᵥ y = 0) (c : ℕ) :
-    Module.finrank ℂ (lowers W c) = Module.finrank ℂ (lowers W (c + 1)) +
-      ∑ b ∈ Finset.range m, r b * r (b + c + 1) := by
+theorem finrank_lowers_eq_succ_add
+    (n m : ℕ) (W : ℕ → Submodule ℂ (Fin n → ℂ))
+    (r : ℕ → ℕ) (U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ)
+    (hB : Biorth r m U (fun b => (U b)ᴴ)) (hW : ∀ k y, y ∈ W k ↔ ∀ b, k ≤ b → (U b)ᴴ *ᵥ y = 0)
+    (c : ℕ)
+    : Module.finrank ℂ (lowers W c)
+      = Module.finrank ℂ (lowers W (c + 1)) + ∑ b ∈ Finset.range m, r b * r (b + c + 1) := by
   have hle : lowers W (c + 1) ≤ lowers W c := by
     intro Y hY
     rw [mem_lowers_iff_blocks hB hW] at hY ⊢
@@ -95,8 +100,10 @@ theorem finrank_lowers_eq_succ_add (n m : ℕ) (W : ℕ → Submodule ℂ (Fin n
     rw [LinearMap.range_eq_top]
     intro Z
     obtain ⟨h1, h2, -⟩ := id hB
-    have key : ∀ s t, (U s)ᴴ * (∑ b : Fin m, U b * Z b * (U (b + c + 1))ᴴ) * U t
-        = ∑ b : Fin m, ((U s)ᴴ * U b) * Z b * ((U (b + c + 1))ᴴ * U t) := by
+    have key
+        : ∀ s t,
+          (U s)ᴴ * (∑ b : Fin m, U b * Z b * (U (b + c + 1))ᴴ) * U t
+            = ∑ b : Fin m, ((U s)ᴴ * U b) * Z b * ((U (b + c + 1))ᴴ * U t) := by
       intro s t
       rw [Matrix.mul_sum, Matrix.sum_mul]
       exact Finset.sum_congr rfl fun b _ => by simp only [Matrix.mul_assoc]
@@ -117,7 +124,8 @@ theorem finrank_lowers_eq_succ_add (n m : ℕ) (W : ℕ → Submodule ℂ (Fin n
       · simp
   have h := LinearMap.finrank_range_add_finrank_ker φ
   rw [hker, hrange, finrank_top, (Submodule.comapSubtypeEquivOfLe hle).finrank_eq,
-    Module.finrank_pi_fintype] at h
+      Module.finrank_pi_fintype]
+    at h
   rw [← h, add_comm, ← Fin.sum_univ_eq_sum_range (fun b => r b * r (b + c + 1)) m]
   simp [Module.finrank_matrix]
 

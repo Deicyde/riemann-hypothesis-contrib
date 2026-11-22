@@ -5,16 +5,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
-open UpperTheory.V.Af.Smo hiding psiR conv Cen SameSat ArchStep LinChange ArchKir PsiInf EmbY FinKir ChartCont ConvCont ConvFub ConvNice SeedConv EigMap KillP SphAll Vanish OrthStep OrthConv EigOfSat Seed SetUp Pair CenSame
+open UpperTheory.V.Af.Smo hiding
+  psiR conv Cen SameSat ArchStep LinChange ArchKir PsiInf EmbY FinKir ChartCont ConvCont ConvFub
+  ConvNice SeedConv EigMap KillP SphAll Vanish OrthStep OrthConv EigOfSat Seed SetUp Pair CenSame
 open GlobalTheory.CuspRep (Cinf Lie chart infGL pInf sInf toL lmul invSet)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 open UpperTheory.V UpperTheory.V.Af.StrongMultiplicityOne
 
-theorem UpperTheory.V.Af.StrongMultiplicityOne.convCont :
-    UpperTheory.V.Af.StrongMultiplicityOne.ChartCont → UpperTheory.V.Af.StrongMultiplicityOne.ConvCont := by
+theorem UpperTheory.V.Af.StrongMultiplicityOne.convCont
+    : UpperTheory.V.Af.StrongMultiplicityOne.ChartCont
+      → UpperTheory.V.Af.StrongMultiplicityOne.ConvCont := by
   intro hc E _ _ _ n f hf hb α
   obtain ⟨C, hC⟩ := hb
   obtain ⟨h1, h2⟩ := hc E n f hf
@@ -43,7 +47,10 @@ theorem UpperTheory.V.Af.StrongMultiplicityOne.convCont :
     · refine Filter.Eventually.of_forall fun x => ?_
       refine Continuous.mul ?_ continuous_const
       by_cases hx : x ∈ invSet E n
-      · exact h1.comp_continuous (f := fun g : GA E n => (g, x)) (by fun_prop) fun g => ⟨Set.mem_univ _, hx⟩
+      · exact h1.comp_continuous
+          (f := fun g : GA E n => (g, x))
+          (by fun_prop)
+          fun g => ⟨Set.mem_univ _, hx⟩
       · have : (fun g => chart f g x) = fun _ => 0 := by
           funext g
           unfold GlobalTheory.CuspRep.chart

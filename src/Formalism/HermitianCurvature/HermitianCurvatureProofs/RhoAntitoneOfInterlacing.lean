@@ -29,8 +29,8 @@ theorem lambda_side_inequality : C7.LamSide := by
     rw [show (j : ℕ) + 2 = l by omega] at h1 h2
     exact max_lt (lt_of_lt_of_le h1 hi1) (lt_of_lt_of_le h2 hi1)
 
-theorem rho_antitone_of_interlacing {k : ℕ} {u u' ρ : ℕ → ℝ} (h : I.Interlaces k u u' ρ) :
-    ∀ i j, 1 ≤ i → i ≤ j → j ≤ k - 1 → ρ j ≤ ρ i := by
+theorem rho_antitone_of_interlacing {k : ℕ} {u u' ρ : ℕ → ℝ} (h : I.Interlaces k u u' ρ)
+    : ∀ i j, 1 ≤ i → i ≤ j → j ≤ k - 1 → ρ j ≤ ρ i := by
   intro i j hi hij hj
   induction j, hij using Nat.le_induction with
   | base => exact le_rfl
@@ -61,16 +61,21 @@ theorem rho_side_inequality : C7.RhoSide := by
       · rw [max_eq_left h]; exact h1.2.2.1
     linarith
 
-theorem sign_prod_of_split_at_index (s : Finset ℕ) (g : ℕ → ℝ) (m : ℕ) (hpos : ∀ j ∈ s, j < m → 0 < g j)
-    (hneg : ∀ j ∈ s, m ≤ j → g j < 0) : 0 < (-1 : ℝ) ^ (s.filter (m ≤ ·)).card * ∏ j ∈ s, g j := by
+theorem sign_prod_of_split_at_index
+    (s : Finset ℕ) (g : ℕ → ℝ) (m : ℕ)
+    (hpos : ∀ j ∈ s, j < m → 0 < g j) (hneg : ∀ j ∈ s, m ≤ j → g j < 0)
+    : 0 < (-1 : ℝ) ^ (s.filter (m ≤ ·)).card * ∏ j ∈ s, g j := by
   induction s using Finset.induction_on with
   | empty => simp
   | @insert a s ha ih =>
-    have ih' := ih (fun j hj => hpos j (Finset.mem_insert_of_mem hj))
-      (fun j hj => hneg j (Finset.mem_insert_of_mem hj))
+    have ih' :=
+      ih
+        (fun j hj => hpos j (Finset.mem_insert_of_mem hj))
+        (fun j hj => hneg j (Finset.mem_insert_of_mem hj))
     rw [Finset.prod_insert ha, Finset.filter_insert]
     by_cases hma : m ≤ a
-    · rw [if_pos hma, Finset.card_insert_of_notMem (fun h => ha (Finset.mem_filter.1 h).1), pow_succ]
+    · rw [if_pos hma, Finset.card_insert_of_notMem (fun h => ha (Finset.mem_filter.1 h).1),
+        pow_succ]
       have := hneg a (Finset.mem_insert_self a s) hma
       nlinarith
     · rw [if_neg hma]
@@ -85,38 +90,49 @@ theorem polynomial_sign : C7.PSign := by
   have hB' := hB
   unfold C7.Between at hB'
   have hA : 0 < (-1 : ℝ) ^ (k - l) * ∏ s, (Y + lam s) := by
-    have hprod : ∏ s, (Y + lam s) = ∏ j ∈ Finset.range (k + 2 * r + 1),
-        (fun j => if h : j < k + 2 * r + 1 then Y + lam ⟨j, h⟩ else 1) j := by
+    have hprod
+        : ∏ s, (Y + lam s)
+          = ∏ j ∈ Finset.range (k + 2 * r + 1),
+            (fun j => if h : j < k + 2 * r + 1 then Y + lam ⟨j, h⟩ else 1) j := by
       rw [← Fin.prod_univ_eq_prod_range]
       refine Finset.prod_congr rfl fun s _ => ?_
       simp only [dif_pos s.isLt, Fin.eta]
-    have key := sign_prod_of_split_at_index (Finset.range (k + 2 * r + 1))
-      (fun j => if h : j < k + 2 * r + 1 then Y + lam ⟨j, h⟩ else 1) (l - 1)
-      (fun j hj hjm => by
-        have hj' : j < k + 2 * r + 1 := Finset.mem_range.1 hj
-        simp only [dif_pos hj']
-        have := (hside ⟨j, hj'⟩).2 (show j + 1 < l by omega)
-        linarith [hB'.2])
-      (fun j hj hjm => by
-        have hj' : j < k + 2 * r + 1 := Finset.mem_range.1 hj
-        simp only [dif_pos hj']
-        have := (hside ⟨j, hj'⟩).1 (show l ≤ j + 1 by omega)
-        linarith [hB'.1])
-    have hcard : ((Finset.range (k + 2 * r + 1)).filter (l - 1 ≤ ·)).card = (k - l) + 2 * (r + 1) := by
-      rw [(show (Finset.range (k + 2 * r + 1)).filter (l - 1 ≤ ·) = Finset.Ico (l - 1) (k + 2 * r + 1) by
-        ext j; simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_Ico]; omega), Nat.card_Ico]
+    have key :=
+      sign_prod_of_split_at_index (Finset.range (k + 2 * r + 1))
+        (fun j => if h : j < k + 2 * r + 1 then Y + lam ⟨j, h⟩ else 1)
+        (l - 1)
+        (fun j hj hjm => by
+          have hj' : j < k + 2 * r + 1 := Finset.mem_range.1 hj
+          simp only [dif_pos hj']
+          have := (hside ⟨j, hj'⟩).2 (show j + 1 < l by omega)
+          linarith [hB'.2])
+        (fun j hj hjm => by
+          have hj' : j < k + 2 * r + 1 := Finset.mem_range.1 hj
+          simp only [dif_pos hj']
+          have := (hside ⟨j, hj'⟩).1 (show l ≤ j + 1 by omega)
+          linarith [hB'.1])
+    have hcard
+        : ((Finset.range (k + 2 * r + 1)).filter (l - 1 ≤ ·)).card = (k - l) + 2 * (r + 1) := by
+      rw [(show (Finset.range (k + 2 * r + 1)).filter (l - 1 ≤ ·)
+            = Finset.Ico (l - 1) (k + 2 * r + 1) by
+          ext j; simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_Ico]; omega),
+        Nat.card_Ico]
       omega
     rw [hcard, pow_add, pow_mul, neg_one_sq, one_pow, mul_one] at key
     rw [hprod]
     exact key
   have hB2 : 0 < (-1 : ℝ) ^ (k - l) * I.xpoly k ρ Y := by
     unfold I.xpoly
-    have key := sign_prod_of_split_at_index (Finset.Icc 1 (k - 1)) (fun i => Y + ρ i) l
-      (fun i hi hil => show 0 < Y + ρ i by linarith [(hrho i hi).2 hil])
-      (fun i hi hli => show Y + ρ i < 0 by linarith [(hrho i hi).1 hli])
+    have key :=
+      sign_prod_of_split_at_index (Finset.Icc 1 (k - 1))
+        (fun i => Y + ρ i)
+        l
+        (fun i hi hil => show 0 < Y + ρ i by linarith [(hrho i hi).2 hil])
+        (fun i hi hli => show Y + ρ i < 0 by linarith [(hrho i hi).1 hli])
     have hcard : ((Finset.Icc 1 (k - 1)).filter (l ≤ ·)).card = k - l := by
       rw [(show (Finset.Icc 1 (k - 1)).filter (l ≤ ·) = Finset.Icc l (k - 1) by
-        ext j; simp only [Finset.mem_filter, Finset.mem_Icc]; omega), Nat.card_Icc]
+          ext j; simp only [Finset.mem_filter, Finset.mem_Icc]; omega),
+        Nat.card_Icc]
       omega
     rw [hcard] at key
     exact key
@@ -129,7 +145,7 @@ theorem roots_outside_jointly : C7.RootsOutJoint := by
   unfold C7.RootsOutJoint LE.Sys.RootsOut
   intro S u u' l hl hlk hI hI' hB s hs
   have hb := hB _ hs
-  have key := lambda_side_inequality S.k S.r u u' S.lam l (-S.lam s) hl hlk hI hI' hb s
+  have key := lambda_side_inequality S.k S.r u u' S.lam l (- S.lam s) hl hlk hI hI' hb s
   unfold C7.Between at hb
   rw [neg_neg] at hb
   by_cases h : l ≤ s.val + 1

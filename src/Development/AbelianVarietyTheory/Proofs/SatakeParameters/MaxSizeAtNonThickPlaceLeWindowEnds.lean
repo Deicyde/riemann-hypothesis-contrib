@@ -7,7 +7,9 @@ public import Formalism.SharpRestriction.ParConsts
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 noncomputable section
 
@@ -23,8 +25,9 @@ theorem wB_nonneg {D : D7} (L : SizeData₂ D) : 0 ≤ wB L := by
   have h1 := L.etaSz_pos
   exact le_trans (by linarith) (le_max_left _ _)
 
-theorem floor_size_le_wB {D : D7} (L : SizeData₂ D) (g : D.R.GG) (j : Fin D.R.m) (hg : ¬ Thick D.host g) :
-    ((⌊(hcAt D g).e j⌋.toNat : ℕ) : ℝ) ≤ wB L := by
+theorem floor_size_le_wB
+    {D : D7} (L : SizeData₂ D) (g : D.R.GG) (j : Fin D.R.m) (hg : ¬ Thick D.host g)
+    : ((⌊(hcAt D g).e j⌋.toNat : ℕ) : ℝ) ≤ wB L := by
   set ρ := D.eTau.symm ⟨plc g, plc_mem g⟩ with hρ
   have hρ' : (D.eTau ρ : D.R.GG) = plc g := by rw [hρ, Equiv.apply_symm_apply]
   have hj : j.1 + 1 ≤ D.R.m := j.2
@@ -63,8 +66,7 @@ theorem wMax_le_wB : ∀ {D : D7} (L : SizeData₂ D), (wMax D : ℝ) ≤ wB L �
     apply csSup_le'
     rintro s ⟨g, j, hg, rfl⟩
     exact Nat.le_floor (floor_size_le_wB L g j hg)
-  have h2 : (wMax D : ℝ) ≤ wB L :=
-    le_trans (by exact_mod_cast h1) (Nat.floor_le hB)
+  have h2 : (wMax D : ℝ) ≤ wB L := le_trans (by exact_mod_cast h1) (Nat.floor_le hB)
   refine ⟨h2, ?_⟩
   have h3 : (((D.R.t + 1) / 2 : ℕ) : ℝ) ≤ ((D.R.t : ℝ) + 1) / 2 := by
     have := Nat.cast_div_le (α := ℝ) (m := D.R.t + 1) (n := 2)

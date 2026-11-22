@@ -10,12 +10,17 @@ namespace Formalism.IndefR.Rat
 
 open Matrix
 
-theorem coord_rat {K : Type} [Field K] (σ : K →+* ℂ) {E : Type} [AddCommGroup E] [Module ℂ E] {κ : Type} [Fintype κ]
-    [DecidableEq κ] {ι : Type} [Fintype ι] [DecidableEq ι]
+theorem coord_rat
+    {K : Type} [Field K]
+    (σ : K →+* ℂ)
+    {E : Type} [AddCommGroup E] [Module ℂ E]
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
     (ψ : κ → Module.Dual ℂ E) (hψ : ∀ e, (∀ i, ψ i e = 0) → e = 0)
-    (f : (ι → ℂ) →ₗ[ℂ] E) (hf : Function.Injective f)
-    (hfr : ∀ i l, ψ i (f (Pi.single l 1)) ∈ Set.range σ)
-    (c : ι → ℂ) (hc : ∀ i, ψ i (f c) ∈ Set.range σ) : ∀ l, c l ∈ Set.range σ := by
+    (f : (ι → ℂ) →ₗ[ℂ] E)
+    (hf : Function.Injective f) (hfr : ∀ i l, ψ i (f (Pi.single l 1)) ∈ Set.range σ)
+    (c : ι → ℂ) (hc : ∀ i, ψ i (f c) ∈ Set.range σ)
+    : ∀ l, c l ∈ Set.range σ := by
   classical
   intro l
 
@@ -27,10 +32,10 @@ theorem coord_rat {K : Type} [Field K] (σ : K →+* ℂ) {E : Type} [AddCommGro
     conv_lhs => rw [← Finset.univ_sum_single y]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
-    exact Finset.sum_congr rfl fun m _ => by
-      rw [← map_smul, ← Pi.single_smul, smul_eq_mul, mul_one]
+    exact Finset.sum_congr rfl fun m _ => by rw [← map_smul, ← Pi.single_smul, smul_eq_mul, mul_one]
   have hmul : ∀ y : ι → ℂ, ((A'.map σ) *ᵥ y) = fun i => ψ i (f y) := by
-    intro y; funext i
+    intro y
+    funext i
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hfc y, map_sum]
     simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, A', Matrix.of_apply, hA', map_smul,
@@ -42,8 +47,7 @@ theorem coord_rat {K : Type} [Field K] (σ : K →+* ℂ) {E : Type} [AddCommGro
     have h1 : (A'.map σ) *ᵥ (σ ∘ x) = 0 := by
       funext i
       rw [← RingHom.map_mulVec σ A' x i]
-      have hx' : (A' *ᵥ x) i = 0 := by
-        have := congrFun hx i; simpa using this
+      have hx' : (A' *ᵥ x) i = 0 := by have := congrFun hx i; simpa using this
       simp [hx']
     rw [hmul] at h1
     have h2 : f (σ ∘ x) = 0 := hψ _ (fun i => congrFun h1 i)
@@ -51,8 +55,8 @@ theorem coord_rat {K : Type} [Field K] (σ : K →+* ℂ) {E : Type} [AddCommGro
     funext m
     have := congrFun h3 m
     simpa using this
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Matrix.toLin' A')
-    (LinearMap.ker_eq_bot.mpr hinj)
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Matrix.toLin' A') (LinearMap.ker_eq_bot.mpr hinj)
   set L' : Matrix ι κ K := LinearMap.toMatrix' g
   have hLA : L' * A' = 1 := by
     have : LinearMap.toMatrix' (g.comp (Matrix.toLin' A')) = L' * A' := by
@@ -60,8 +64,7 @@ theorem coord_rat {K : Type} [Field K] (σ : K →+* ℂ) {E : Type} [AddCommGro
     rw [← this, hg, LinearMap.toMatrix'_id]
   have hLA' : (L'.map σ) * (A'.map σ) = 1 := by
     rw [← Matrix.map_mul, hLA, Matrix.map_one _ (map_zero σ) (map_one σ)]
-  have hb : (A'.map σ) *ᵥ c = σ ∘ b' := by
-    rw [hmul]; funext i; simp [hb']
+  have hb : (A'.map σ) *ᵥ c = σ ∘ b' := by rw [hmul]; funext i; simp [hb']
   have hcL : c = (L'.map σ) *ᵥ (σ ∘ b') := by
     rw [← hb, Matrix.mulVec_mulVec, hLA', Matrix.one_mulVec]
   rw [hcL]

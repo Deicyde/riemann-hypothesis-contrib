@@ -9,15 +9,20 @@ open scoped Uniformity
 
 namespace GlobalTheory
 
-theorem bilinear_bound_of_dense_right : ∀ {E : Type} [AddCommGroup E] [Module ℂ E] [UniformSpace E] [IsUniformAddGroup E] [CompleteSpace E] [T2Space E]
-    {p : ℕ → Seminorm ℂ E}, WithSeminorms p →
-    ∀ {X₁ X₂ : Type} [AddCommGroup X₁] [Module ℂ X₁] [AddCommGroup X₂] [Module ℂ X₂]
-    (j₁ : X₁ →ₗ[ℂ] E) (j₂ : X₂ →ₗ[ℂ] E), Function.Injective j₁ → IsClosed (Set.range j₁) →
-    ∀ (D₂ : Submodule ℂ X₂), (∀ x, j₂ x ∈ closure (j₂ '' (D₂ : Set X₂))) →
-    ∀ (F : X₁ →ₗ[ℂ] X₂ →ₗ[ℂ] E),
-    (∀ w i, ∃ q : Seminorm ℂ E, Continuous q ∧ ∀ b, p i (F w b) ≤ q (j₂ b)) →
-    (∀ a ∈ D₂, ∀ i, ∃ q : Seminorm ℂ E, Continuous q ∧ ∀ w, p i (F w a) ≤ q (j₁ w)) →
-    ∀ b i, ∃ q : Seminorm ℂ E, Continuous q ∧ ∀ w, p i (F w b) ≤ q (j₁ w) := by
+theorem bilinear_bound_of_dense_right
+    : ∀ {E : Type} [AddCommGroup E] [Module ℂ E] [UniformSpace E] [IsUniformAddGroup E]
+        [CompleteSpace E] [T2Space E] {p : ℕ → Seminorm ℂ E},
+      WithSeminorms p
+        → ∀ {X₁ X₂ : Type} [AddCommGroup X₁] [Module ℂ X₁] [AddCommGroup X₂] [Module ℂ X₂]
+            (j₁ : X₁ →ₗ[ℂ] E) (j₂ : X₂ →ₗ[ℂ] E),
+          Function.Injective j₁ → IsClosed (Set.range j₁)
+            → ∀ (D₂ : Submodule ℂ X₂),
+              (∀ x, j₂ x ∈ closure (j₂ '' (D₂ : Set X₂)))
+                → ∀ (F : X₁ →ₗ[ℂ] X₂ →ₗ[ℂ] E),
+                  (∀ w i, ∃ q : Seminorm ℂ E, Continuous q ∧ ∀ b, p i (F w b) ≤ q (j₂ b))
+                    → (∀ a ∈ D₂, ∀ i, ∃ q : Seminorm ℂ E,
+                      Continuous q ∧ ∀ w, p i (F w a) ≤ q (j₁ w))
+                    → ∀ b i, ∃ q : Seminorm ℂ E, Continuous q ∧ ∀ w, p i (F w b) ≤ q (j₁ w) := by
   intro E _ _ _ _ _ _ p hp X₁ X₂ _ _ _ _ j₁ j₂ hinj hcl D₂ hdense F h₁ h₂ b i
   haveI : ContinuousSMul ℂ E := hp.continuousSMul
   haveI : FirstCountableTopology E := hp.firstCountableTopology
@@ -63,8 +68,9 @@ theorem bilinear_bound_of_dense_right : ∀ {E : Type} [AddCommGroup E] [Module 
       have := (hq.tendsto _).comp h0
       simpa [Function.comp_def] using this
     filter_upwards [ht.eventually (gt_mem_nhds hε)] with a ha
-    calc p k (g a y - F (e.symm y) b) = p k (F (e.symm y) ((a : X₂) - b)) := by
-          simp [g, hgl, map_sub]
+    calc
+      p k (g a y - F (e.symm y) b)
+        = p k (F (e.symm y) ((a : X₂) - b)) := by simp [g, hgl, map_sub]
       _ ≤ q (j₂ ((a : X₂) - b)) := hle _
       _ < ε := by simpa [map_sub] using ha
   let G : Y →L[ℂ] E := continuousLinearMapOfTendsto g hT

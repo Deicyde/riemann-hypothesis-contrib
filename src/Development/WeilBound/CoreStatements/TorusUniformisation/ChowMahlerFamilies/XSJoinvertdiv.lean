@@ -6,5 +6,6 @@ public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.PTwi
 
 @[expose] public section
 
-theorem PositivityTheory.Xgn.t_s_joinvertdiv : GroundTheory.Heights₂.Heights.NumbersDVR.JoinVerticalDivisor.Statement :=
+theorem PositivityTheory.Xgn.t_s_joinvertdiv
+    : GroundTheory.Heights₂.Heights.NumbersDVR.JoinVerticalDivisor.Statement :=
   GroundTheory.Heights₂.Heights.NumbersDVR.JoinVerticalDivisor.proof

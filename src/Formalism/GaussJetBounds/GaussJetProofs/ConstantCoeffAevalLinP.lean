@@ -178,10 +178,10 @@ lemma constantCoeff_aeval_linP (A : ι → ι' → K) (G : MvPolynomial ι' K) :
     simp only [map_mul, MvPolynomial.aeval_X, hp, MvPolynomial.constantCoeff_X, mul_zero]
     simp [linP]
 
-private theorem mvPowerSeries_pderiv_coe_eq_coe_pderiv {L : Type u} [Field L] {σ : Type} (i : σ)
-    (G : MvPolynomial σ L) :
-    MvPowerSeries.pderiv (R := L) i (G : MvPowerSeries σ L) =
-      ((MvPolynomial.pderiv i G : MvPolynomial σ L) : MvPowerSeries σ L) := by
+private theorem mvPowerSeries_pderiv_coe_eq_coe_pderiv
+    {L : Type u} [Field L] {σ : Type} (i : σ) (G : MvPolynomial σ L)
+    : MvPowerSeries.pderiv (R := L) i (G : MvPowerSeries σ L)
+      = ((MvPolynomial.pderiv i G : MvPolynomial σ L) : MvPowerSeries σ L) := by
   ext n
   rw [MvPowerSeries.coeff_pderiv, MvPolynomial.coeff_coe, MvPolynomial.coeff_coe,
     MvPolynomial.coeff_pderiv]
@@ -246,9 +246,11 @@ theorem jet_pair_linearity : JetPairLin.{u} := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [ha, linP, ← MvPolynomial.coeToMvPowerSeries.ringHom_apply, map_sum]
     simp
-  have hmon : ∀ μ : ι' →₀ ℕ, (μ.prod fun s e => a s ^ e) =
-      ((MvPolynomial.aeval (linP A) (MvPolynomial.monomial μ (1 : K)) : MvPolynomial ι K) :
-        MvPowerSeries ι K) := fun μ => by
+  have hmon
+      : ∀ μ : ι' →₀ ℕ,
+        (μ.prod fun s e => a s ^ e)
+          = ((MvPolynomial.aeval (linP A) (MvPolynomial.monomial μ (1 : K)) : MvPolynomial ι K)
+            : MvPowerSeries ι K) := fun μ => by
     rw [MvPolynomial.aeval_monomial, ← MvPolynomial.coeToMvPowerSeries.ringHom_apply, map_mul,
       Finsupp.prod, Finsupp.prod, map_prod]
     simp [hcoe]
@@ -257,16 +259,19 @@ theorem jet_pair_linearity : JetPairLin.{u} := by
   have hfin := fun κ => MvPowerSeries.coeff_subst_finite hs F κ
   set T : Finset (ι' →₀ ℕ) := (P.support.biUnion fun κ => (hfin κ).toFinset) ∪ P'.support with hT
   rw [jetPair_eq_sum P' F T Finset.subset_union_right]
-  have h1 : ∀ κ ∈ P.support, MvPowerSeries.coeff κ (MvPowerSeries.subst a F) =
-      ∑ μ ∈ T, MvPowerSeries.coeff μ F * MvPowerSeries.coeff κ (μ.prod fun s e => a s ^ e) := by
-    intro κ hκ
-    rw [MvPowerSeries.coeff_subst hs, finsum_eq_sum_of_support_subset]
-    · rfl
-    · intro μ hμ
-      rw [hT, Finset.coe_union]
-      left
-      rw [Finset.coe_biUnion]
-      exact Set.mem_biUnion hκ (by simpa using hμ)
+  have h1
+      : ∀ κ ∈ P.support,
+        MvPowerSeries.coeff κ (MvPowerSeries.subst a F)
+          = ∑ μ ∈ T, MvPowerSeries.coeff μ F * MvPowerSeries.coeff κ (μ.prod fun s e => a s ^ e) :=
+    by
+      intro κ hκ
+      rw [MvPowerSeries.coeff_subst hs, finsum_eq_sum_of_support_subset]
+      · rfl
+      · intro μ hμ
+        rw [hT, Finset.coe_union]
+        left
+        rw [Finset.coe_biUnion]
+        exact Set.mem_biUnion hκ (by simpa using hμ)
   unfold jetPair
   rw [Finset.sum_congr rfl fun κ hκ => by rw [h1 κ hκ, Finset.mul_sum]]
   rw [Finset.sum_comm]
@@ -336,9 +341,10 @@ lemma sum_ZV_slice {d N0 N1 : ℕ} [NeZero d] {M : Type*} [AddCommMonoid M] (s :
     rintro ⟨h1, h2⟩
     exact hy (Finset.mem_image.mpr ⟨y.2.1, Finset.mem_univ _, Prod.ext h1.symm (Prod.ext rfl h2.symm)⟩)
 
-def genA {K : Type u} [Field K] {d N0 N1 : ℕ} (TT : Finset (ZMod d))
-    (T : ZMod d → Fin N0 → Fin N0 → K) : ZV d N0 N1 → ZV d N0 N1 → K :=
-  fun y y' => if y'.1 = y.1 ∧ y'.2.2 = y.2.2 then effMat TT T y.1 y.2.1 y'.2.1 else 0
+def genA
+    {K : Type u} [Field K] {d N0 N1 : ℕ} (TT : Finset (ZMod d)) (T : ZMod d → Fin N0 → Fin N0 → K)
+    : ZV d N0 N1 → ZV d N0 N1 → K := fun y y' =>
+  if y'.1 = y.1 ∧ y'.2.2 = y.2.2 then effMat TT T y.1 y.2.1 y'.2.1 else 0
 
 lemma frameM_genA {K : Type u} [Field K] {d N0 N1 : ℕ} [NeZero d] (TT : Finset (ZMod d))
     (T : ZMod d → Fin N0 → Fin N0 → K) (x xg : ZMod d × Fin N0 × Fin N0 → K)
@@ -396,10 +402,12 @@ lemma map_minorProd {R : Type u} [CommRing R] {σ σ' : Type} {N0 N1 C : ℕ}
 
 end Frames
 
-private theorem cc_subst_lemma {K : Type u} [Field K] {σ τ : Type} [Finite σ]
+private theorem cc_subst_lemma
+    {K : Type u} [Field K]
+    {σ τ : Type} [Finite σ]
     (a : σ → MvPowerSeries τ K) (ha0 : ∀ s, MvPowerSeries.constantCoeff (a s) = 0)
-    (f : MvPowerSeries σ K) :
-    MvPowerSeries.constantCoeff (MvPowerSeries.subst a f) = MvPowerSeries.constantCoeff f := by
+    (f : MvPowerSeries σ K)
+    : MvPowerSeries.constantCoeff (MvPowerSeries.subst a f) = MvPowerSeries.constantCoeff f := by
   classical
   have ha : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha0
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_subst ha,
@@ -408,31 +416,38 @@ private theorem cc_subst_lemma {K : Type u} [Field K] {σ τ : Type} [Finite σ]
   · intro e he
     rw [MvPowerSeries.coeff_zero_eq_constantCoeff_apply, Finsupp.prod, map_prod]
     obtain ⟨s, hs⟩ := Finsupp.support_nonempty_iff.mpr he
-    rw [Finset.prod_eq_zero hs
-      (by rw [map_pow, ha0, zero_pow (Finsupp.mem_support_iff.mp hs)]), smul_zero]
+    rw [Finset.prod_eq_zero hs (by rw [map_pow, ha0, zero_pow (Finsupp.mem_support_iff.mp hs)]),
+      smul_zero]
 
 theorem thmAGen : ThmAGen.{u} := by
   unfold ThmAGen
-  intro K _ _ _ l d N0 N1 _ hl hl3 hd hde hlt h0 K0 hK0 ζ hζ be hbe x hx g hg0 hg U hU ε hε
-    TT colN p hp hp1 I T hT xg hxg nu1 nu2 size hnu1 hnu2 hsize a ha hsa spec hs1 hs2 hs3
+  intro K _ _ _ l d N0 N1 _ hl hl3 hd hde hlt h0 K0 hK0 ζ hζ be hbe x hx g hg0 hg U hU ε hε TT colN
+    p hp hp1 I T hT xg hxg nu1 nu2 size hnu1 hnu2 hsize a ha hsa spec hs1 hs2 hs3
   have hOp := thmAOp.{u}
   unfold ThmAOp at hOp
-  have key := hOp K l d N0 N1 hl hl3 hd hde hlt h0 K0 hK0 ζ hζ be hbe x hx g hg0 hg U hU ε hε
-    TT colN p hp hp1 I T hT nu1 nu2 size hnu1 hnu2 hsize a ha hsa spec hs1 hs2 hs3
+  have key :=
+    hOp K l d N0 N1 hl hl3 hd hde hlt h0 K0 hK0 ζ hζ be hbe x hx g hg0 hg U hU ε hε TT colN p hp hp1
+      I T hT nu1 nu2 size hnu1 hnu2 hsize a ha hsa spec hs1 hs2 hs3
   have hJ := jet_pair_linearity.{u}
   unfold JetPairLin at hJ
   have hsub : MvPowerSeries.HasSubst (fun j : ZV d N0 N1 =>
-      (∑ i : ZV d N0 N1, MvPowerSeries.C (genA TT T i j) * MvPowerSeries.X i :
-        MvPowerSeries (ZV d N0 N1) K)) :=
+      (∑ i : ZV d N0 N1, MvPowerSeries.C (genA TT T i j) * MvPowerSeries.X i
+        : MvPowerSeries (ZV d N0 N1) K)) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun j => by simp)
-  have hlin : ∀ z, MvPowerSeries.subst (fun j : ZV d N0 N1 =>
-      (∑ i : ZV d N0 N1, MvPowerSeries.C (genA TT T i j) * MvPowerSeries.X i :
-        MvPowerSeries (ZV d N0 N1) K))
-      (linSub (frameM (N1 := N1) x) z) = linSub (frameM (N1 := N1) xg) z :=
-    fun z => subst_linSub (frameM (N1 := N1) x) (genA TT T) (frameM (N1 := N1) xg)
-      (fun z i => frameM_genA TT T x xg hxg z i) z
-  have hL : ∀ (a0 : Fin N0) (b0 : Fin N1),
-      MvPowerSeries.HasSubst (fun s : ZMod d => linSub (frameM (N1 := N1) x) (s, a0, b0)) :=
+  have hlin
+      : ∀ z,
+        MvPowerSeries.subst
+            (fun j : ZV d N0 N1 =>
+              (∑ i : ZV d N0 N1, MvPowerSeries.C (genA TT T i j) * MvPowerSeries.X i
+                : MvPowerSeries (ZV d N0 N1) K))
+            (linSub (frameM (N1 := N1) x) z)
+          = linSub (frameM (N1 := N1) xg) z := fun z =>
+    subst_linSub (frameM (N1 := N1) x) (genA TT T) (frameM (N1 := N1) xg)
+      (fun z i => frameM_genA TT T x xg hxg z i)
+      z
+  have hL
+      : ∀ (a0 : Fin N0) (b0 : Fin N1),
+        MvPowerSeries.HasSubst (fun s : ZMod d => linSub (frameM (N1 := N1) x) (s, a0, b0)) :=
     fun a0 b0 => MvPowerSeries.hasSubst_of_constantCoeff_zero (fun s => by simp [linSub])
   have hLx : MvPowerSeries.HasSubst (linSub (frameM (N1 := N1) x)) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun s => by simp [linSub])
@@ -450,15 +465,20 @@ theorem thmAGen : ThmAGen.{u} := by
   have hf0 : MvPowerSeries.constantCoeff (ε • bSum (frameM (N1 := N1) x) be) = 0 := by
     first
     | (rw [MvPowerSeries.smul_eq_C_mul, map_mul, hB, mul_zero])
-    | (rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_smul,
-        MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hB]; simp)
-  have hF : MvPowerSeries.subst (fun j : ZV d N0 N1 =>
-      (∑ i : ZV d N0 N1, MvPowerSeries.C (genA TT T i j) * MvPowerSeries.X i :
-        MvPowerSeries (ZV d N0 N1) K))
-      (MvPowerSeries.subst (linSub (frameM (N1 := N1) x)) (MvPowerSeries.subst g U) *
-        mvExp (ε • bSum (frameM (N1 := N1) x) be)) =
-      MvPowerSeries.subst (linSub (frameM (N1 := N1) xg)) (MvPowerSeries.subst g U) *
-        mvExp (ε • bSum (frameM (N1 := N1) xg) be) := by
+    | (
+        rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_smul,
+          MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hB]
+        simp
+      )
+  have hF
+      : MvPowerSeries.subst
+          (fun j : ZV d N0 N1 =>
+            (∑ i : ZV d N0 N1, MvPowerSeries.C (genA TT T i j) * MvPowerSeries.X i
+              : MvPowerSeries (ZV d N0 N1) K))
+          (MvPowerSeries.subst (linSub (frameM (N1 := N1) x)) (MvPowerSeries.subst g U)
+            * mvExp (ε • bSum (frameM (N1 := N1) x) be))
+        = MvPowerSeries.subst (linSub (frameM (N1 := N1) xg)) (MvPowerSeries.subst g U)
+          * mvExp (ε • bSum (frameM (N1 := N1) xg) be) := by
     rw [MvPowerSeries.subst_mul hsub, MvPowerSeries.subst_comp_subst_apply hLx hsub,
       subst_mvExp hsub _ hf0]
     congr 2
@@ -473,12 +493,14 @@ theorem thmAGen : ThmAGen.{u} := by
       congr 1
       funext s
       exact hlin _
-  have hP : MvPolynomial.aeval (fun i : ZV d N0 N1 =>
-      (∑ j : ZV d N0 N1, MvPolynomial.C (genA TT T i j) * MvPolynomial.X j :
-        MvPolynomial (ZV d N0 N1) K))
-      (∏ s : ZMod d, minorProd (fun (i : Fin N0) (b : Fin N1) =>
-        (MvPolynomial.X (s, i, b) : MvPolynomial (ZV d N0 N1) K)) (p s) (hp s) (I s)) =
-      ∏ s : ZMod d, minorProd (rowOp (N1 := N1) TT T s) (p s) (hp s) (I s) := by
+  have hP
+      : MvPolynomial.aeval
+          (fun i : ZV d N0 N1 =>
+            (∑ j : ZV d N0 N1, MvPolynomial.C (genA TT T i j) * MvPolynomial.X j
+              : MvPolynomial (ZV d N0 N1) K))
+          (∏ s : ZMod d, minorProd (fun (i : Fin N0) (b : Fin N1) =>
+            (MvPolynomial.X (s, i, b) : MvPolynomial (ZV d N0 N1) K)) (p s) (hp s) (I s))
+        = ∏ s : ZMod d, minorProd (rowOp (N1 := N1) TT T s) (p s) (hp s) (I s) := by
     rw [map_prod]
     refine Finset.prod_congr rfl (fun s _ => ?_)
     rw [map_minorProd]
@@ -486,11 +508,12 @@ theorem thmAGen : ThmAGen.{u} := by
     funext i b
     rw [MvPolynomial.aeval_X]
     exact sum_genA_eq_rowOp TT T s i b
-  have e1 := hJ K (ZV d N0 N1) (ZV d N0 N1) (genA TT T)
-    (∏ s : ZMod d, minorProd (fun (i : Fin N0) (b : Fin N1) =>
-      (MvPolynomial.X (s, i, b) : MvPolynomial (ZV d N0 N1) K)) (p s) (hp s) (I s))
-    (MvPowerSeries.subst (linSub (frameM (N1 := N1) x)) (MvPowerSeries.subst g U) *
-      mvExp (ε • bSum (frameM (N1 := N1) x) be))
+  have e1 :=
+    hJ K (ZV d N0 N1) (ZV d N0 N1) (genA TT T)
+      (∏ s : ZMod d, minorProd (fun (i : Fin N0) (b : Fin N1) =>
+        (MvPolynomial.X (s, i, b) : MvPolynomial (ZV d N0 N1) K)) (p s) (hp s) (I s))
+      (MvPowerSeries.subst (linSub (frameM (N1 := N1) x)) (MvPowerSeries.subst g U)
+        * mvExp (ε • bSum (frameM (N1 := N1) x) be))
   rw [hF, hP] at e1
   rw [e1]
   exact key

@@ -22,8 +22,8 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
 namespace CxData
 
-theorem rinv_spec {d n : ℕ} (P : Matrix (Fin d) (Fin n) K) (h : Function.Surjective P.mulVec) :
-    P * rinv P = 1 := by
+theorem rinv_spec {d n : ℕ} (P : Matrix (Fin d) (Fin n) K) (h : Function.Surjective P.mulVec)
+    : P * rinv P = 1 := by
   have hex : ∃ R : Matrix (Fin n) (Fin d) K, P * R = 1 := by
     choose f hf using h
     refine ⟨Matrix.of fun i k => f (Pi.single k 1) i, ?_⟩
@@ -36,12 +36,17 @@ theorem rinv_spec {d n : ℕ} (P : Matrix (Fin d) (Fin n) K) (h : Function.Surje
   rw [dite_eq_left hex]
   exact hex.choose_spec
 
-variable {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A) {fc : DefSub A → DefFace Bs} (cr : Crd A fc)
+variable
+  {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A) {fc : DefSub A → DefFace Bs} (cr : Crd A fc)
 
 theorem cutPairing : X.CutPairing cr := by
   intro ζ sEE hW h2 hBt hMI hZ
-  refine ⟨?_, fun u => by simp [colDef, colOf, hZ.1 u], fun u t => inv_ne_zero (hZ.2.1 u t),
-    fun u w => ?_⟩
+  refine ⟨
+    ?_,
+    fun u => by simp [colDef, colOf, hZ.1 u],
+    fun u t => inv_ne_zero (hZ.2.1 u t),
+    fun u w => ?_
+  ⟩
   swap
   · show vw w (ζ u (X.μ w))⁻¹ = 0
     rw [ValuationRepresentative.vw_inv, hZ.2.2 u w, neg_zero]
@@ -54,10 +59,11 @@ theorem cutPairing : X.CutPairing cr := by
     show (fc X.zs).Dc.Pt u Bs.μ0 φ F = (fc X.zs).Dc.Pt u Bs.μ0 φ
       ((rinv ((fc X.zs).Df1.Pq Bs.μ0)).mulVec (((fc X.zs).Df1.Pq Bs.μ0).mulVec F))
     have hR := rinv_spec _ (hW.Pq_surj Bs.μ0)
-    have hk : F - (rinv ((fc X.zs).Df1.Pq Bs.μ0)).mulVec (((fc X.zs).Df1.Pq Bs.μ0).mulVec F) ∈
-        (fc X.zs).Df1.U Bs.μ0 := by
-      rw [DefSide.U, LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVec_sub, Matrix.mulVec_mulVec, hR,
-        Matrix.one_mulVec, sub_self]
+    have hk
+        : F - (rinv ((fc X.zs).Df1.Pq Bs.μ0)).mulVec (((fc X.zs).Df1.Pq Bs.μ0).mulVec F)
+          ∈ (fc X.zs).Df1.U Bs.μ0 := by
+      rw [DefSide.U, LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVec_sub,
+        Matrix.mulVec_mulVec, hR, Matrix.one_mulVec, sub_self]
     have h0 := hBt u φ _ hk
     rw [map_sub, sub_eq_zero] at h0
     exact h0

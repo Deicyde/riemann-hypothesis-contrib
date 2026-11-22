@@ -7,28 +7,35 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocCl
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.NRatInv
 
 variable {D : D7}
 
-theorem xflag_mono {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) {j k : ℕ} (h : j ≤ k) :
-    Xflag F j ≤ Xflag F k :=
+theorem xflag_mono {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) {j k : ℕ} (h : j ≤ k)
+    : Xflag F j ≤ Xflag F k :=
   Submodule.span_mono (Set.image_mono fun i (hi : i.1 < j) => lt_of_lt_of_le hi h)
 
 theorem xsp_eq {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) : Xsp F = Xflag F D.R.rS := by
   show Submodule.span _ _ = Submodule.span _ _
   congr 1
-  ext x; simp
+  ext x
+  simp
 
-theorem mem_orth_iff {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (y : (VS D).V) :
-    y ∈ orth (VS D) (Xsp F) ↔ ∀ x ∈ Xsp F, (VS D).hT x y = 0 := by
+theorem mem_orth_iff {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (y : (VS D).V)
+    : y ∈ orth (VS D) (Xsp F) ↔ ∀ x ∈ Xsp F, (VS D).hT x y = 0 := by
   simp [orth, Submodule.mem_iInf, LinearMap.mem_ker]
 
-theorem inv_mem_of_map_le (n : GV D) (W : Submodule D.host.E (VS D).V) [FiniteDimensional D.host.E W]
-    (h : ∀ x ∈ W, n x ∈ W) : ∀ x ∈ W, n⁻¹ x ∈ W := by
+theorem inv_mem_of_map_le
+    (n : GV D)
+    (W : Submodule D.host.E (VS D).V) [FiniteDimensional D.host.E W]
+    (h : ∀ x ∈ W, n x ∈ W)
+    : ∀ x ∈ W, n⁻¹ x ∈ W := by
   have hle : W.map (n : (VS D).V →ₗ[D.host.E] (VS D).V) ≤ W := by
     rintro _ ⟨y, hy, rfl⟩; exact h y hy
   have heq : W.map (n : (VS D).V →ₗ[D.host.E] (VS D).V) = W :=
@@ -45,12 +52,13 @@ namespace GlobalTheory.NRatInv
 
 variable {D : D7}
 
-theorem xflag_fd {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (j : ℕ) :
-    FiniteDimensional D.host.E (Xflag F j) :=
+theorem xflag_fd {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (j : ℕ)
+    : FiniteDimensional D.host.E (Xflag F j) :=
   FiniteDimensional.span_of_finite _ (Set.toFinite _)
 
-theorem map_xflag {T : D.host.E} {F : LFlag (D.sp.Y 0) D.R.rS T} {n : GV D} (hn : n ∈ NRat F) (k : ℕ) :
-    ∀ x ∈ Xflag F k, n x ∈ Xflag F k := by
+theorem map_xflag
+    {T : D.host.E} {F : LFlag (D.sp.Y 0) D.R.rS T} {n : GV D} (hn : n ∈ NRat F) (k : ℕ)
+    : ∀ x ∈ Xflag F k, n x ∈ Xflag F k := by
   intro x hx
   cases k with
   | zero =>
@@ -58,14 +66,16 @@ theorem map_xflag {T : D.host.E} {F : LFlag (D.sp.Y 0) D.R.rS T} {n : GV D} (hn 
       show Submodule.span _ _ = ⊥
       simp
     rw [this, Submodule.mem_bot] at hx
-    subst hx; simp
+    subst hx
+    simp
   | succ j =>
     have h1 := hn.2.1 j x hx
     have h2 := xflag_mono F (Nat.le_succ j) h1
     simpa using add_mem h2 hx
 
-theorem adapt_and_inv_mem : ∀ (D : D7) (T : D.host.E) (F : LFlag (D.sp.Y 0) D.R.rS T) (n : GV D),
-    n ∈ NRat F → Adapt n F F ∧ n⁻¹ ∈ NRat F := by
+theorem adapt_and_inv_mem
+    : ∀ (D : D7) (T : D.host.E) (F : LFlag (D.sp.Y 0) D.R.rS T) (n : GV D),
+      n ∈ NRat F → Adapt n F F ∧ n⁻¹ ∈ NRat F := by
   intro D T F n hn
   obtain ⟨hiso, hfl, hor⟩ := hn
   have hn' : n ∈ NRat F := ⟨hiso, hfl, hor⟩
@@ -108,15 +118,15 @@ theorem adapt_and_inv_mem : ∀ (D : D7) (T : D.host.E) (F : LFlag (D.sp.Y 0) D.
       haveI := xflag_fd F D.R.rS
       have hsp : ∀ y ∈ Xsp F, n⁻¹ y ∈ Xsp F := by
         rw [xsp_eq]; exact inv_mem_of_map_le n _ (map_xflag hn' D.R.rS)
-      have hspn : ∀ y ∈ Xsp F, n y ∈ Xsp F := by
-        rw [xsp_eq]; exact map_xflag hn' D.R.rS
+      have hspn : ∀ y ∈ Xsp F, n y ∈ Xsp F := by rw [xsp_eq]; exact map_xflag hn' D.R.rS
       have hy : n⁻¹ x ∈ orth (VS D) (Xsp F) := by
         rw [mem_orth_iff] at hx ⊢
         intro e he
         have h1 : n⁻¹ (n e) = e := n.symm_apply_apply e
         have h2 := (inv_mem hiso) (n e) x
         rw [h1] at h2
-        rw [h2]; exact hx _ (hspn e he)
+        rw [h2]
+        exact hx _ (hspn e he)
       have key := hor _ hy
       have : n (n⁻¹ x) = x := n.apply_symm_apply x
       rw [this] at key

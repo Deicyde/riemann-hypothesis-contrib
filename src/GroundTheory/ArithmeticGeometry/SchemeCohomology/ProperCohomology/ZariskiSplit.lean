@@ -15,11 +15,13 @@ open AlgebraicGeometry CategoryTheory TopologicalSpace
 
 universe c236Ext c236Scheme
 
-private noncomputable abbrev H.linearMapV436 {X : Scheme.{c236Scheme}}
+private noncomputable abbrev H.linearMapV436
+    {X : Scheme.{c236Scheme}}
     [HasExt.{c236Ext} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{c236Scheme})]
     (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
-    {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) :
-    Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n :=
+    {F G : X.Modules} (φ : F ⟶ G)
+    (n : ℕ)
+    : Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n :=
   H.linearMap A φ n
 
 end
@@ -32,8 +34,9 @@ noncomputable section
 
 attribute [local instance] algebraOfOver
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] [IsLocalRing A] {X : Scheme.{u}}
-  [X.Over (Spec (.of A))]
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
 
 lemma existsUnique_glue_of_supportedIn {F : X.Modules} {T : Set X}
     (hF : Scheme.Modules.SupportedIn F T) {W₁ W₂ : X.Opens} (hcov : W₁ ⊔ W₂ = ⊤)
@@ -70,9 +73,9 @@ lemma existsUnique_glue_of_supportedIn {F : X.Modules} {T : Set X}
   · exact ⟨W₁, le_top, h, ht.1.trans (hs ⟨true⟩).symm⟩
   · exact ⟨W₂, le_top, h, ht.2.trans (hs ⟨false⟩).symm⟩
 
-variable {W₁ W₂ : X.Opens} (hcov : W₁ ⊔ W₂ = ⊤)
-  (hdisj : Disjoint ((W₁ ⊓ W₂ : X.Opens) : Set X) (closedFibre (A := A) X))
-
+variable
+  {W₁ W₂ : X.Opens}
+  (hcov : W₁ ⊔ W₂ = ⊤) (hdisj : Disjoint ((W₁ ⊓ W₂ : X.Opens) : Set X) (closedFibre (A := A) X))
 
 variable (A) in
 def splitSection (n : ℕ) : Γ(fibreQuot A X n, ⊤) :=
@@ -103,11 +106,12 @@ lemma quotPowMap_splitSection (n : ℕ) :
   · rw [resF_app, h₁, ← resF_app, quotPowMap_fibreOne]
   · rw [resF_app, h₂, map_zero]
 
-
 variable (A X) in
-abbrev fibreTower : ∀ n, Sheaf.H.{u} (modulesAb (fibreQuot A X (n + 1))) 0 →ₗ[A]
-    Sheaf.H.{u} (modulesAb (fibreQuot A X n)) 0 :=
-  fun n => H.linearMap A (quotPowMap (maximalIdeal A) (𝟙_ X.Modules) n) 0
+abbrev fibreTower
+    : ∀ n,
+      Sheaf.H.{u} (modulesAb (fibreQuot A X (n + 1))) 0 →ₗ[A]
+        Sheaf.H.{u} (modulesAb (fibreQuot A X n)) 0 := fun n =>
+  H.linearMap A (quotPowMap (maximalIdeal A) (𝟙_ X.Modules) n) 0
 
 lemma mem_towerLimit_splitSection :
     (fun n => (Sheaf.H.equiv₀ (modulesAb (fibreQuot A X n)) isTerminalTop).symm
@@ -118,30 +122,34 @@ lemma mem_towerLimit_splitSection :
   exact (Sheaf.H.equiv₀_symm_naturality isTerminalTop _ _).trans
     (congrArg _ (quotPowMap_splitSection hcov hdisj n))
 
-
 include hcov hdisj in
-theorem false_of_split (hΓ : Function.Surjective (algebraMap A Γ(X, ⊤)))
+theorem false_of_split
+    (hΓ : Function.Surjective (algebraMap A Γ(X, ⊤)))
     (hsurj : ∀ x : (∀ n, Sheaf.H.{u} (modulesAb (fibreQuot A X n)) 0),
-      x ∈ towerLimit (fibreTower A X) → x 0 ∈ LinearMap.range
-      (H.linearMap.{u} A (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0) 0))
+      x ∈ towerLimit (fibreTower A X)
+        → x 0 ∈ LinearMap.range (H.linearMap.{u} A (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0) 0))
     {x₁ x₂ : X} (hx₁ : x₁ ∈ closedFibre (A := A) X) (hx₁W : x₁ ∈ W₁)
-    (hx₂ : x₂ ∈ closedFibre (A := A) X) (hx₂W : x₂ ∈ W₂) : False := by
+    (hx₂ : x₂ ∈ closedFibre (A := A) X) (hx₂W : x₂ ∈ W₂)
+    : False := by
   obtain ⟨h, hh⟩ := hsurj _ (mem_towerLimit_splitSection hcov hdisj)
   set g : Γ(X, ⊤) := Sheaf.H.equiv₀ (modulesAb (𝟙_ X.Modules)) isTerminalTop h
   obtain ⟨a, ha⟩ := hΓ g
   have hs : splitSection A hcov hdisj 0 = (algebraMap A Γ(X, ⊤) a) • fibreOne A X 0 := by
-    have e1 : Sheaf.H.equiv₀ (modulesAb (fibreQuot A X 0)) isTerminalTop
-        (H.linearMapV436 A (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0) 0 h) =
-          splitSection A hcov hdisj 0 := by
+    have e1
+        : Sheaf.H.equiv₀ (modulesAb (fibreQuot A X 0)) isTerminalTop
+            (H.linearMapV436 A (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0) 0 h)
+          = splitSection A hcov hdisj 0 := by
       rw [hh]
       exact AddEquiv.apply_symm_apply _ _
     rw [← e1]
-    change Sheaf.H.equiv₀ _ isTerminalTop (Sheaf.H.map.{u}
-      (modulesAbMap (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0)) 0 h) = _
+    change Sheaf.H.equiv₀ _ isTerminalTop
+        (Sheaf.H.map.{u} (modulesAbMap (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0)) 0 h)
+      = _
     rw [← Sheaf.H.equiv₀_naturality]
     change (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0).app ⊤ g = _
-    have e2 : (show Γ(𝟙_ X.Modules, ⊤) from g) =
-        algebraMap A Γ(X, ⊤) a • (show Γ(𝟙_ X.Modules, ⊤) from (1 : Γ(X, ⊤))) := by
+    have e2
+        : (show Γ(𝟙_ X.Modules, ⊤) from g)
+          = algebraMap A Γ(X, ⊤) a • (show Γ(𝟙_ X.Modules, ⊤) from (1 : Γ(X, ⊤))) := by
       rw [← ha]
       exact (mul_one (algebraMap A Γ(X, ⊤) a)).symm
     rw [e2]
@@ -157,8 +165,10 @@ theorem false_of_split (hΓ : Function.Surjective (algebraMap A Γ(X, ⊤)))
     simpa [smul_smul] using this
   · apply resF_fibreOne_ne_zero hx₁ hx₁W 0
     have hu' : IsUnit (resO (le_top : W₁ ≤ ⊤) (algebraMap A Γ(X, ⊤) (1 - a))) := (hu.map _).map _
-    have e : resO (le_top : W₁ ≤ ⊤) (algebraMap A Γ(X, ⊤) (1 - a)) •
-        resF (fibreQuot A X 0) (le_top : W₁ ≤ ⊤) (fibreOne A X 0) = 0 := by
+    have e
+        : resO (le_top : W₁ ≤ ⊤) (algebraMap A Γ(X, ⊤) (1 - a))
+            • resF (fibreQuot A X 0) (le_top : W₁ ≤ ⊤) (fibreOne A X 0)
+          = 0 := by
       rw [map_sub, map_one, map_sub, map_one, sub_smul, one_smul, hs₁, sub_self]
     obtain ⟨v, hv⟩ := hu'
     rw [← hv] at e
@@ -167,23 +177,23 @@ theorem false_of_split (hΓ : Function.Surjective (algebraMap A Γ(X, ⊤)))
 
 section Connected
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] [IsLocalRing A] {X : Scheme.{u}}
-  [X.Over (Spec (.of A))]
-
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
 
 omit [IsNoetherianRing A] in
 lemma isClosed_closedFibre : IsClosed (closedFibre (A := A) X) :=
   (isClosed_singleton_closedPoint A).preimage (X ↘ Spec (.of A)).base.hom.continuous
 
-theorem isConnected_closedFibre_of_surj [IsProper (X ↘ Spec (.of A))]
+theorem isConnected_closedFibre_of_surj
+    [IsProper (X ↘ Spec (.of A))]
     (hΓ : Function.Bijective (algebraMap A Γ(X, ⊤)))
     (hsurj : ∀ x : (∀ n, Sheaf.H.{u} (modulesAb (fibreQuot A X n)) 0),
-      x ∈ towerLimit (fibreTower A X) → x 0 ∈ LinearMap.range
-      (H.linearMap.{u} A (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0) 0)) :
-    _root_.IsConnected (closedFibre (A := A) X) := by
+      x ∈ towerLimit (fibreTower A X)
+        → x 0 ∈ LinearMap.range (H.linearMap.{u} A (quotPowπ (maximalIdeal A) (𝟙_ X.Modules) 0) 0))
+    : _root_.IsConnected (closedFibre (A := A) X) := by
   refine ⟨?_, ?_⟩
-  ·
-    have : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace (X ↘ Spec (.of A))
+  · have : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace (X ↘ Spec (.of A))
     have hinj : Function.Injective (X ↘ Spec (.of A)).appTop := by
       intro r s hrs
       obtain ⟨r', rfl⟩ := (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (.of A)).inv).2 r

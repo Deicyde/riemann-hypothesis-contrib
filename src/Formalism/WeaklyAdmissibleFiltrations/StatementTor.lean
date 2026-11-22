@@ -12,30 +12,32 @@ open Module TensorProduct
 
 section Tor
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [Module O V] [IsScalarTower O LL V]
-    {ρ : Representation LL G V}
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [Module O V]
+  [IsScalarTower O LL V]
+  {ρ : Representation LL G V}
 
 def actT (L : Lattice (O := O) ρ) (g : G) : ↥L.T →ₗ[O] ↥L.T :=
   ((ρ g).restrictScalars O).restrict (L.stable g)
 
-def StableSub (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) : Prop :=
-  ∀ g, ∀ x ∈ I, actT L g x ∈ I
+def StableSub (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) : Prop := ∀ g, ∀ x ∈ I, actT L g x ∈ I
 
-def actQ (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I) (g : G) :
-    (↥L.T ⧸ I) →ₗ[O] (↥L.T ⧸ I) :=
+def actQ (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I) (g : G)
+    : (↥L.T ⧸ I) →ₗ[O] (↥L.T ⧸ I) :=
   I.mapQ I (actT L g) (fun x hx => hI g x hx)
 
-def quotientCocycles [TopologicalSpace G] (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I) :
-    Submodule O (G → ↥L.T ⧸ I) where
+def quotientCocycles
+    [TopologicalSpace G] (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I)
+    : Submodule O (G → ↥L.T ⧸ I) where
   carrier := {c | IsLocallyConstant c ∧ ∀ g h, c (g * h) = c g + actQ L I hI g (c h)}
   zero_mem' := ⟨IsLocallyConstant.const 0, fun g h => by simp⟩
   add_mem' := by
@@ -48,12 +50,13 @@ def quotientCocycles [TopologicalSpace G] (L : Lattice (O := O) ρ) (I : Submodu
     refine ⟨ha.comp (c • ·), fun g h => ?_⟩
     simp only [Pi.smul_apply, ha', map_smul, smul_add]
 
-def BQ (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I) :
-    Submodule O (G → ↥L.T ⧸ I) :=
+def BQ (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I)
+    : Submodule O (G → ↥L.T ⧸ I) :=
   LinearMap.range (LinearMap.pi fun g => actQ L I hI g - LinearMap.id)
 
-abbrev QuotientCohomology [TopologicalSpace G] (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T)
-    (hI : StableSub L I) : Type :=
+abbrev QuotientCohomology
+    [TopologicalSpace G] (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I)
+    : Type :=
   ↥(quotientCocycles L I hI) ⧸ (BQ L I hI).comap (quotientCocycles L I hI).subtype
 
 variable [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
@@ -63,32 +66,35 @@ def evT (L : Lattice (O := O) ρ) (g : G) : ↥(latticeCocycles L) →ₗ[O] ↥
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-def redT (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) : ↥(latticeCocycles L) →ₗ[O] (G → ↥L.T ⧸ I) :=
+def redT (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T)
+    : ↥(latticeCocycles L) →ₗ[O] (G → ↥L.T ⧸ I) :=
   LinearMap.pi fun g => I.mkQ ∘ₗ evT L g
 
-def HfQ (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I) :
-    Submodule O (G → ↥L.T ⧸ I) :=
+def HfQ (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I)
+    : Submodule O (G → ↥L.T ⧸ I) :=
   ((latticeFiniteCocycles PD L).comap (latticeCocycles L).subtype).map (redT L I) ⊔ BQ L I hI
 
-def quotientFiniteCohomology (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I) :
-    Submodule O (QuotientCohomology L I hI) :=
+def quotientFiniteCohomology (L : Lattice (O := O) ρ) (I : Submodule O ↥L.T) (hI : StableSub L I)
+    : Submodule O (QuotientCohomology L I hI) :=
   ((HfQ PD L I hI).comap (quotientCocycles L I hI).subtype).map (Submodule.mkQ _)
 
 end Tor
 
 section TorMore
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [Module O V] [IsScalarTower O LL V]
-    {ρ : Representation LL G V} [TopologicalSpace G]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [Module O V]
+  [IsScalarTower O LL V]
+  {ρ : Representation LL G V} [TopologicalSpace G]
 
 def actD (L : Lattice (O := O) ρ) (g : G) : (V ⧸ L.T) →ₗ[O] (V ⧸ L.T) :=
   L.T.mapQ L.T ((ρ g).restrictScalars O) (fun x hx => L.stable g x hx)
@@ -109,7 +115,8 @@ def divisibleCocycles (L : Lattice (O := O) ρ) : Submodule O (G → V ⧸ L.T) 
 def BD (L : Lattice (O := O) ρ) : Submodule O (G → V ⧸ L.T) :=
   LinearMap.range (LinearMap.pi fun g => actD L g - LinearMap.id)
 
-abbrev DivisibleCohomology (L : Lattice (O := O) ρ) : Type := ↥(divisibleCocycles L) ⧸ (BD L).comap (divisibleCocycles L).subtype
+abbrev DivisibleCohomology (L : Lattice (O := O) ρ) : Type :=
+  ↥(divisibleCocycles L) ⧸ (BD L).comap (divisibleCocycles L).subtype
 
 variable [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
 

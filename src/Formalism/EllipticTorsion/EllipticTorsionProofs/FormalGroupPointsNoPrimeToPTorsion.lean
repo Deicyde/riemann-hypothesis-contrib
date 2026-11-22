@@ -443,13 +443,11 @@ namespace Formalism.ELL
 
 open WeierstrassCurve
 
-
 open Classical in
 theorem formal_group_points_no_prime_to_p_torsion : FormalGroupPointsTorsionFree.{u} := by
   intro K _ _ W hW _ n hn P hP hnP
   by_contra hP0
-  obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 :=
-    Nat.exists_eq_succ_of_ne_zero (by rintro rfl; simp at hn)
+  obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := Nat.exists_eq_succ_of_ne_zero (by rintro rfl; simp at hn)
   have h := (FormalGroupPointsTorsion.mulz hW P hP hP0 m).2
   rw [hnP, Affine.Point.zero_def] at h
   simp only [FormalGroupPointsTorsion.zf, zero_sub, norm_neg, norm_mul, hn, one_mul] at h

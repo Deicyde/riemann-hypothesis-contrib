@@ -18,11 +18,10 @@ section Lex
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {n : ℕ}
 
-def lexW (e : K ≃ Fin n) : (Σ k, ι k) → Lex (Fin n → ℕ) :=
-  fun p => toLex (Pi.single (e p.1) 1)
+def lexW (e : K ≃ Fin n) : (Σ k, ι k) → Lex (Fin n → ℕ) := fun p => toLex (Pi.single (e p.1) 1)
 
-theorem weight_lexW (e : K ≃ Fin n) (m : (Σ k, ι k) →₀ ℕ) :
-    Finsupp.weight (lexW (ι := ι) e) m = toLex (fun j => ∑ i, m ⟨e.symm j, i⟩) := by
+theorem weight_lexW (e : K ≃ Fin n) (m : (Σ k, ι k) →₀ ℕ)
+    : Finsupp.weight (lexW (ι := ι) e) m = toLex (fun j => ∑ i, m ⟨e.symm j, i⟩) := by
   rw [Finsupp.weight_apply,
     Finsupp.sum_fintype m (fun i c => c • lexW (ι := ι) e i) (fun i => zero_nsmul _)]
   show (∑ p, m p • (Pi.single (e p.1) 1 : Fin n → ℕ)) = fun j => ∑ i, m ⟨e.symm j, i⟩
@@ -35,8 +34,8 @@ theorem weight_lexW (e : K ≃ Fin n) (m : (Σ k, ι k) →₀ ℕ) :
     simp [Pi.single_apply, hjk]
   · simp
 
-theorem isMultiHomog_iff_lex (e : K ≃ Fin n) (f : MRing ι) (a : K → ℕ) :
-    IsMultiHomog f a ↔ IsWeightedHomogeneous (lexW e) f (toLex (a ∘ e.symm)) := by
+theorem isMultiHomog_iff_lex (e : K ≃ Fin n) (f : MRing ι) (a : K → ℕ)
+    : IsMultiHomog f a ↔ IsWeightedHomogeneous (lexW e) f (toLex (a ∘ e.symm)) := by
   constructor
   · intro h d hd
     rw [weight_lexW]
@@ -51,9 +50,10 @@ theorem isMultiHomog_iff_lex (e : K ≃ Fin n) (f : MRing ι) (a : K → ℕ) :
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem isMultiHomog_of_mem_lex (e : K ≃ Fin n) {f : MRing ι} {m : Lex (Fin n → ℕ)}
-    (h : f ∈ weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e) m) :
-    IsMultiHomog f (fun k => ofLex m (e k)) := by
+theorem isMultiHomog_of_mem_lex
+    (e : K ≃ Fin n)
+    {f : MRing ι} {m : Lex (Fin n → ℕ)} (h : f ∈ weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e) m)
+    : IsMultiHomog f (fun k => ofLex m (e k)) := by
   rw [mem_weightedHomogeneousSubmodule] at h
   rw [isMultiHomog_iff_lex e]
   have hm : (fun k => ofLex m (e k)) ∘ e.symm = ofLex m := by
@@ -62,13 +62,13 @@ theorem isMultiHomog_of_mem_lex (e : K ≃ Fin n) {f : MRing ι} {m : Lex (Fin n
   rw [hm, toLex_ofLex]
   exact h
 
-theorem mem_lex_of_isMultiHomog (e : K ≃ Fin n) {f : MRing ι} {a : K → ℕ} (h : IsMultiHomog f a) :
-    f ∈ weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e) (toLex (a ∘ e.symm)) := by
+theorem mem_lex_of_isMultiHomog (e : K ≃ Fin n) {f : MRing ι} {a : K → ℕ} (h : IsMultiHomog f a)
+    : f ∈ weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e) (toLex (a ∘ e.symm)) := by
   rw [mem_weightedHomogeneousSubmodule]
   exact (isMultiHomog_iff_lex e f a).1 h
 
-theorem isHomogeneous_lex_iff (e : K ≃ Fin n) (J : Ideal (MRing ι)) :
-    J.IsHomogeneous (weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e)) ↔ IsMultiHomogIdeal J := by
+theorem isHomogeneous_lex_iff (e : K ≃ Fin n) (J : Ideal (MRing ι))
+    : J.IsHomogeneous (weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e)) ↔ IsMultiHomogIdeal J := by
   constructor
   · intro h
     obtain ⟨S, hS⟩ := (Ideal.IsHomogeneous.iff_exists _ J).1 h
@@ -99,22 +99,24 @@ theorem isMultiHomog_one : IsMultiHomog (1 : MRing ι) 0 := by
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem exists_colon_prime (J : Ideal (MRing ι)) (hJ : IsMultiHomogIdeal J) (hJt : J ≠ ⊤) :
-    ∃ (f : MRing ι) (c : K → ℕ), IsMultiHomog f c ∧ f ∉ J ∧
-      (J.colon {f}).IsPrime ∧ IsMultiHomogIdeal (J.colon {f}) := by
+theorem exists_colon_prime (J : Ideal (MRing ι)) (hJ : IsMultiHomogIdeal J) (hJt : J ≠ ⊤)
+    : ∃ (f : MRing ι) (c : K → ℕ),
+      IsMultiHomog f c ∧ f ∉ J ∧ (J.colon {f}).IsPrime ∧ IsMultiHomogIdeal (J.colon {f}) := by
   let e := Fintype.equivFin K
   have hJh : J.IsHomogeneous (weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e)) :=
     (isHomogeneous_lex_iff e J).2 hJ
 
-  have hcolh : ∀ (f : MRing ι) (d : Lex (Fin (Fintype.card K) → ℕ)),
-      f ∈ weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e) d →
-      (J.colon {f}).IsHomogeneous (weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e)) := by
+  have hcolh
+      : ∀ (f : MRing ι) (d : Lex (Fin (Fintype.card K) → ℕ)),
+        f ∈ weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e) d
+          → (J.colon {f}).IsHomogeneous (weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e)) := by
     intro f d hf i g hg
     rw [Submodule.mem_colon_singleton, smul_eq_mul] at hg ⊢
     rw [← DirectSum.coe_decompose_mul_add_of_right_mem _ hf]
     exact hJh (i + d) hg
 
-  let S : Set (Ideal (MRing ι)) := {P | ∃ (f : MRing ι) (c : K → ℕ), IsMultiHomog f c ∧ f ∉ J ∧ P = J.colon {f}}
+  let S : Set (Ideal (MRing ι)) :=
+    {P | ∃ (f : MRing ι) (c : K → ℕ), IsMultiHomog f c ∧ f ∉ J ∧ P = J.colon {f}}
   have hne : S.Nonempty := by
     refine ⟨J.colon {1}, ?_⟩
     simp only [S, Set.mem_setOf_eq]
@@ -152,8 +154,10 @@ theorem exists_colon_prime (J : Ideal (MRing ι)) (hJ : IsMultiHomogIdeal J) (hJ
     rw [← mul_assoc, mul_comm y x]
     exact hxy
 
-theorem isMultiHomogIdeal_sup_span {J : Ideal (MRing ι)} (hJ : IsMultiHomogIdeal J) {f : MRing ι}
-    {c : K → ℕ} (hf : IsMultiHomog f c) : IsMultiHomogIdeal (J ⊔ Ideal.span {f}) := by
+theorem isMultiHomogIdeal_sup_span
+    {J : Ideal (MRing ι)} (hJ : IsMultiHomogIdeal J)
+    {f : MRing ι} {c : K → ℕ} (hf : IsMultiHomog f c)
+    : IsMultiHomogIdeal (J ⊔ Ideal.span {f}) := by
   obtain ⟨S, hS, rfl⟩ := hJ
   refine ⟨S ∪ {f}, ?_, (Ideal.span_union _ _).symm⟩
   rintro g (hg | hg)
@@ -161,20 +165,21 @@ theorem isMultiHomogIdeal_sup_span {J : Ideal (MRing ι)} (hJ : IsMultiHomogIdea
   · rw [Set.mem_singleton_iff.mp hg]
     exact ⟨c, hf⟩
 
-theorem exists_primeFiltration_of_isMultiHomogIdeal (J : Ideal (MRing ι)) (hJ : IsMultiHomogIdeal J) :
-    ∃ (N : ℕ) (F : Fin (N + 1) → Ideal (MRing ι)) (f : Fin N → MRing ι) (c : Fin N → K → ℕ)
-      (q : Fin N → Ideal (MRing ι)),
-      F 0 = J ∧ F (Fin.last N) = ⊤ ∧ ∀ j : Fin N,
-        IsMultiHomog (f j) (c j) ∧ F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧
-        (q j).IsPrime ∧ IsMultiHomogIdeal (q j) ∧
-        ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc := by
+theorem exists_primeFiltration_of_isMultiHomogIdeal (J : Ideal (MRing ι)) (hJ : IsMultiHomogIdeal J)
+    : ∃ (N : ℕ) (F : Fin (N + 1) → Ideal (MRing ι)) (f : Fin N → MRing ι) (c : Fin N → K → ℕ)
+        (q : Fin N → Ideal (MRing ι)),
+      F 0 = J ∧ F (Fin.last N) = ⊤
+        ∧ ∀ j : Fin N,
+          IsMultiHomog (f j) (c j) ∧ F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧ (q j).IsPrime
+            ∧ IsMultiHomogIdeal (q j) ∧ ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc := by
   induction J using WellFoundedGT.induction
   rename_i J ih
   by_cases hJt : J = ⊤
   · exact ⟨0, fun _ => J, Fin.elim0, Fin.elim0, Fin.elim0, rfl, hJt, fun j => Fin.elim0 j⟩
   obtain ⟨f, c, hf, hfJ, hprime, hqh⟩ := exists_colon_prime J hJ hJt
-  have hlt : J < J ⊔ Ideal.span {f} := lt_of_le_of_ne le_sup_left fun h =>
-    hfJ (h ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
+  have hlt : J < J ⊔ Ideal.span {f} :=
+    lt_of_le_of_ne le_sup_left fun h =>
+      hfJ (h ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
   obtain ⟨N, F, g, cc, q, hF0, hFl, hstep⟩ := ih _ hlt (isMultiHomogIdeal_sup_span hJ hf)
   refine ⟨N + 1, Fin.cons J F, Fin.cons f g, Fin.cons c cc, Fin.cons (J.colon {f}) q, rfl, ?_, ?_⟩
   · rw [← Fin.succ_last, Fin.cons_succ]

@@ -9,8 +9,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.IdemSum
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.InjectiveDecompositionAction
-  IsDedekindDomain NumberField Formalism.IndefR.DeterminantProjection Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.InjectiveDecompositionAction IsDedekindDomain NumberField
+  Formalism.IndefR.DeterminantProjection Matrix
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -18,19 +20,21 @@ namespace Formalism.IndefR.Fin
 
 namespace SplitChar
 
-theorem exists_place_two (F : Type) [Field F] [NumberField F] :
-    ∃ v : HeightOneSpectrum (𝓞 F), (2 : 𝓞 F) ∈ v.asIdeal := by
+theorem exists_place_two (F : Type) [Field F] [NumberField F]
+    : ∃ v : HeightOneSpectrum (𝓞 F), (2 : 𝓞 F) ∈ v.asIdeal := by
   have h2 : ¬ IsUnit (2 : 𝓞 F) := by
     intro hu
     have hn := hu.map (Algebra.norm ℤ (S := 𝓞 F))
     rw [show (2 : 𝓞 F) = algebraMap ℤ (𝓞 F) 2 by simp, Algebra.norm_algebraMap] at hn
     have hr : 0 < Module.finrank ℤ (𝓞 F) := Module.finrank_pos
     have hge : (2 : ℤ) ≤ 2 ^ Module.finrank ℤ (𝓞 F) := by
-      calc (2 : ℤ) = 2 ^ 1 := by norm_num
+      calc
+        (2 : ℤ)
+          = 2 ^ 1 := by norm_num
         _ ≤ 2 ^ Module.finrank ℤ (𝓞 F) := pow_le_pow_right₀ (by norm_num) hr
     rcases Int.isUnit_iff.mp hn with h | h <;> omega
-  obtain ⟨M, hM, h2M⟩ := Ideal.exists_le_maximal (Ideal.span {(2 : 𝓞 F)})
-    (by rwa [Ne, Ideal.span_singleton_eq_top])
+  obtain ⟨M, hM, h2M⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {(2 : 𝓞 F)}) (by rwa [Ne, Ideal.span_singleton_eq_top])
   have h2mem : (2 : 𝓞 F) ∈ M := h2M (Ideal.mem_span_singleton_self 2)
   have hM0 : M ≠ ⊥ := by
     rintro rfl

@@ -16,39 +16,60 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix SchwartzMap Classical InnerProductSpace
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.Rg.Sw
 namespace PositivityTheory.SiegelWeilFormula.KFPB
 open PositivityTheory.SiegelWeilFormula.KFP
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 variable {d : _root_.PositivityTheory.SiegelWeilFormula.SD_k σ}
-theorem continuous_loc_k (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d) (w : InfinitePlace F) : Continuous (fun X : Mx F E d.m d.n => R.loc w X) := by
-  have h := _root_.PositivityTheory.SiegelWeilFormula.Place.continuous_cw_k d w (p := Fin d.m) (q := Fin d.n)
+theorem continuous_loc_k
+    (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d) (w : InfinitePlace F)
+    : Continuous (fun X : Mx F E d.m d.n => R.loc w X) := by
+  have h :=
+    _root_.PositivityTheory.SiegelWeilFormula.Place.continuous_cw_k d w (p := Fin d.m)
+      (q := Fin d.n)
   unfold _root_.PositivityTheory.SiegelWeilFormula.RD_k.loc
   refine continuous_pi fun a => continuous_pi fun j => ?_
   simp only [Matrix.map_apply, Matrix.mul_apply]
   exact continuous_star.comp (continuous_finsetSum _ fun i _ =>
     continuous_const.mul ((continuous_apply j).comp ((continuous_apply i).comp h)))
-theorem continuous_arc_k (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d) : Continuous (_root_.PositivityTheory.SiegelWeilFormula.KFP.arc_k R) := by
+theorem continuous_arc_k (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d)
+    : Continuous (_root_.PositivityTheory.SiegelWeilFormula.KFP.arc_k R) := by
   unfold _root_.PositivityTheory.SiegelWeilFormula.KFP.arc_k
-  refine (EuclideanSpace.equiv (_root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d) ℝ).symm.continuous.comp (continuous_pi fun i => ?_)
+  refine (EuclideanSpace.equiv (_root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d)
+    ℝ).symm.continuous.comp (continuous_pi fun i => ?_)
   have h : Continuous fun X : Mx F E d.m d.n => R.loc i.1 X i.2.1 i.2.2.1 :=
-    (continuous_apply _).comp ((continuous_apply _).comp (_root_.PositivityTheory.SiegelWeilFormula.KFPB.continuous_loc_k R i.1))
+    (continuous_apply _).comp
+      ((continuous_apply _).comp
+        (_root_.PositivityTheory.SiegelWeilFormula.KFPB.continuous_loc_k R i.1))
   split_ifs
   · exact Complex.continuous_re.comp h
   · exact Complex.continuous_im.comp h
 theorem continuous_fin_k : Continuous (_root_.PositivityTheory.SiegelWeilFormula.KFP.fin_k d) := by
   unfold _root_.PositivityTheory.SiegelWeilFormula.KFP.fin_k
-  exact continuous_pi fun k => continuous_snd.comp ((continuous_apply k).comp (_root_.PositivityTheory.SiegelWeilFormula.KFock.continuous_crd_k d))
-theorem continuous_zOf_k : Continuous (fun u : _root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d → ℝ => _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k u) := by
+  exact continuous_pi fun k =>
+    continuous_snd.comp ((continuous_apply k).comp
+      (_root_.PositivityTheory.SiegelWeilFormula.KFock.continuous_crd_k d))
+theorem continuous_zOf_k
+    : Continuous (fun u : _root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d → ℝ =>
+      _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k u) := by
   refine continuous_pi fun w => continuous_pi fun a => continuous_pi fun j => ?_
-  have : (fun u : _root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d → ℝ => _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k u w a j) =
-      fun u => Complex.equivRealProdCLM.symm (u (w, a, j, true), u (w, a, j, false)) := by
+  have : (fun u : _root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d → ℝ =>
+        _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k u w a j)
+      = fun u => Complex.equivRealProdCLM.symm (u (w, a, j, true), u (w, a, j, false)) := by
     funext u
     rfl
   rw [this]
-  exact Complex.equivRealProdCLM.symm.continuous.comp ((continuous_apply _).prodMk (continuous_apply _))
-theorem zOf_add_k (u v : _root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d → ℝ) : _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k (u + v) = _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k u + _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k v := by
+  exact Complex.equivRealProdCLM.symm.continuous.comp ((continuous_apply _).prodMk
+    (continuous_apply _))
+theorem zOf_add_k (u v : _root_.PositivityTheory.SiegelWeilFormula.KFP.Iw_k d → ℝ)
+    : _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k (u + v)
+      = _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k u
+        + _root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k v := by
   funext w a j
   apply Complex.ext <;> simp [_root_.PositivityTheory.SiegelWeilFormula.KFP.zOf_k]
 theorem jn_eq_cmb_k (R : _root_.PositivityTheory.SiegelWeilFormula.RD_k d) :

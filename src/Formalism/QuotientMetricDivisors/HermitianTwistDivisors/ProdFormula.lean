@@ -11,14 +11,15 @@ noncomputable section
 
 namespace Formalism.DivisionValues
 
-theorem log_abs_norm_eq_two_sum (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
-    (a : K) (ha : a ≠ 0) :
-    Real.log |((Algebra.norm ℚ a : ℚ) : ℝ)| =
-      2 * ∑ v : InfinitePlace K, Real.log ‖v.embedding a‖ := by
+theorem log_abs_norm_eq_two_sum
+    (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    (a : K) (ha : a ≠ 0)
+    : Real.log |((Algebra.norm ℚ a : ℚ) : ℝ)|
+      = 2 * ∑ v : InfinitePlace K, Real.log ‖v.embedding a‖ := by
   have h := NumberField.InfinitePlace.prod_eq_abs_norm a
   have hm : ∀ w : InfinitePlace K, w.mult = 2 := fun w => by
-    rw [InfinitePlace.mult, if_neg (InfinitePlace.not_isReal_iff_isComplex.mpr
-      (IsTotallyComplex.isComplex w))]
+    rw [InfinitePlace.mult,
+      if_neg (InfinitePlace.not_isReal_iff_isComplex.mpr (IsTotallyComplex.isComplex w))]
   have hpos : ∀ w : InfinitePlace K, w a ≠ 0 := fun w => by
     rw [← InfinitePlace.norm_embedding_eq]
     simpa using ha
@@ -37,8 +38,9 @@ theorem prod_formula' : ProdFormula := by
   have hfin : {w : HeightOneSpectrum (𝓞 K) | FractionalIdeal.count K w I ≠ 0}.Finite :=
     Filter.eventually_cofinite.mp (FractionalIdeal.finite_factors I)
   have hvw : ∀ w : HeightOneSpectrum (𝓞 K), vw w a = FractionalIdeal.count K w I := fun w => rfl
-  have hsupp : (Function.support fun w : HeightOneSpectrum (𝓞 K) => lw w * (vw w a : ℝ)) ⊆
-      (hfin.toFinset : Set (HeightOneSpectrum (𝓞 K))) := by
+  have hsupp
+      : (Function.support fun w : HeightOneSpectrum (𝓞 K) => lw w * (vw w a : ℝ))
+        ⊆ (hfin.toFinset : Set (HeightOneSpectrum (𝓞 K))) := by
     intro w hw
     simp only [Function.mem_support, Set.Finite.coe_toFinset, Set.mem_setOf_eq] at hw ⊢
     intro h0
@@ -49,8 +51,10 @@ theorem prod_formula' : ProdFormula := by
   have hpos : ∀ w : HeightOneSpectrum (𝓞 K), (Ideal.absNorm w.asIdeal : ℝ) ≠ 0 := fun w => by
     rw [Nat.cast_ne_zero, Ne, Ideal.absNorm_eq_zero_iff]
     exact w.ne_bot
-  have hN : (|Algebra.norm ℚ a| : ℚ) = ∏ w ∈ hfin.toFinset,
-      ((Ideal.absNorm w.asIdeal : ℚ)) ^ FractionalIdeal.count K w I := by
+  have hN
+      : (|Algebra.norm ℚ a| : ℚ)
+        = ∏ w ∈ hfin.toFinset,
+          ((Ideal.absNorm w.asIdeal : ℚ)) ^ FractionalIdeal.count K w I := by
     rw [← FractionalIdeal.absNorm_span_singleton (𝓞 K), ← hIdef]
     conv_lhs => rw [← FractionalIdeal.finprod_heightOneSpectrum_factorization' K hI]
     rw [finprod_eq_prod_of_mulSupport_subset _ (s := hfin.toFinset) ?_, map_prod]
@@ -61,10 +65,14 @@ theorem prod_formula' : ProdFormula := by
       intro h0
       apply hw
       rw [h0, zpow_zero]
-  have hlog : Real.log |((Algebra.norm ℚ a : ℚ) : ℝ)| = ∑ w ∈ hfin.toFinset,
-      (FractionalIdeal.count K w I : ℝ) * Real.log (Ideal.absNorm w.asIdeal : ℝ) := by
-    have h1 : |((Algebra.norm ℚ a : ℚ) : ℝ)| = ∏ w ∈ hfin.toFinset,
-        ((Ideal.absNorm w.asIdeal : ℝ)) ^ FractionalIdeal.count K w I := by
+  have hlog
+      : Real.log |((Algebra.norm ℚ a : ℚ) : ℝ)|
+        = ∑ w ∈ hfin.toFinset,
+          (FractionalIdeal.count K w I : ℝ) * Real.log (Ideal.absNorm w.asIdeal : ℝ) := by
+    have h1
+        : |((Algebra.norm ℚ a : ℚ) : ℝ)|
+          = ∏ w ∈ hfin.toFinset,
+            ((Ideal.absNorm w.asIdeal : ℝ)) ^ FractionalIdeal.count K w I := by
       rw [← Rat.cast_abs, hN]
       push_cast
       rfl
@@ -74,14 +82,15 @@ theorem prod_formula' : ProdFormula := by
   have hn : (finrank ℚ K : ℝ) ≠ 0 := by
     have := Module.finrank_pos (R := ℚ) (M := K)
     positivity
-  calc (2 / (finrank ℚ K : ℝ)) * ∑ v : InfinitePlace K, Real.log ‖v.embedding a‖
-      = Real.log |((Algebra.norm ℚ a : ℚ) : ℝ)| / finrank ℚ K := by
-        rw [hB]
-        field_simp
+  calc
+    (2 / (finrank ℚ K : ℝ)) * ∑ v : InfinitePlace K, Real.log ‖v.embedding a‖
+        = Real.log |((Algebra.norm ℚ a : ℚ) : ℝ)| / finrank ℚ K := by
+      rw [hB]
+      field_simp
     _ = ∑ w ∈ hfin.toFinset, lw w * (vw w a : ℝ) := by
-        rw [hlog, Finset.sum_div]
-        refine Finset.sum_congr rfl fun w _ => ?_
-        rw [hvw, lw]
-        ring
+      rw [hlog, Finset.sum_div]
+      refine Finset.sum_congr rfl fun w _ => ?_
+      rw [hvw, lw]
+      ring
 
 end Formalism.DivisionValues

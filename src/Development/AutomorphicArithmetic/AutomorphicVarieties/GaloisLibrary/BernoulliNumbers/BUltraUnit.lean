@@ -7,16 +7,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-private theorem b_ultra_int {Ω : Type} [NormedField Ω] [IsUltrametricDist Ω] {y : Ω}
-    (h : IsIntegral ℤ y) : ‖y‖ ≤ 1 := by
+private theorem b_ultra_int
+    {Ω : Type} [NormedField Ω] [IsUltrametricDist Ω] {y : Ω} (h : IsIntegral ℤ y)
+    : ‖y‖ ≤ 1 := by
   have h1 : IsIntegral (NormedField.valuation (K := Ω)).integer y := h.tower_top
   have h2 := (Valuation.integer.integers (NormedField.valuation (K := Ω))).mem_of_integral h1
   have h3 : ‖y‖₊ ≤ 1 := h2
   exact_mod_cast h3
 
-private theorem b_ultra_unit {Ω : Type} [NormedField Ω] [IsUltrametricDist Ω] (l : ℕ)
-    [hl : Fact l.Prime] (hn : ‖(l : Ω)‖ = (l : ℝ)⁻¹) (m : ℤ) (hm : ¬ (l : ℤ) ∣ m) :
-    ‖(m : Ω)‖ = 1 := by
+private theorem b_ultra_unit
+    {Ω : Type} [NormedField Ω] [IsUltrametricDist Ω]
+    (l : ℕ) [hl : Fact l.Prime]
+    (hn : ‖(l : Ω)‖ = (l : ℝ)⁻¹)
+    (m : ℤ) (hm : ¬ (l : ℤ) ∣ m)
+    : ‖(m : Ω)‖ = 1 := by
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl.out
   obtain ⟨a, b, hab⟩ := (hp.irreducible.coprime_iff_not_dvd).mpr hm
   have h1 : (a : Ω) * l + b * m = 1 := by exact_mod_cast congrArg (Int.cast : ℤ → Ω) hab
@@ -33,15 +37,21 @@ private theorem b_ultra_unit {Ω : Type} [NormedField Ω] [IsUltrametricDist Ω]
   have h4 : ‖(b : Ω)‖ * ‖(m : Ω)‖ < 1 := mul_lt_one_of_nonneg_of_lt_one_right hb (norm_nonneg _) hc
   exact absurd h2 (not_le.mpr (max_lt h3 h4))
 
-private theorem b_ultra_log {Ω : Type} [NormedField Ω] [IsUltrametricDist Ω] (l : ℕ)
-    [hl : Fact l.Prime] (hn : ‖(l : Ω)‖ = (l : ℝ)⁻¹) (M : ℤ) (hM : M ≠ 0) :
-    -Real.log ‖(M : Ω)‖ = (padicValInt l M : ℝ) * Real.log l := by
+private theorem b_ultra_log
+    {Ω : Type} [NormedField Ω] [IsUltrametricDist Ω]
+    (l : ℕ) [hl : Fact l.Prime]
+    (hn : ‖(l : Ω)‖ = (l : ℝ)⁻¹)
+    (M : ℤ) (hM : M ≠ 0)
+    : - Real.log ‖(M : Ω)‖ = (padicValInt l M : ℝ) * Real.log l := by
   obtain ⟨m, hm⟩ := padicValInt_dvd (p := l) M
   have hnd : ¬ (l : ℤ) ∣ m := by
     rintro ⟨c, hc⟩
-    have : (l : ℤ) ^ (padicValInt l M + 1) ∣ M := ⟨c, by
-      conv_lhs => rw [hm, hc]
-      ring⟩
+    have : (l : ℤ) ^ (padicValInt l M + 1) ∣ M := ⟨
+      c,
+      by
+        conv_lhs => rw [hm, hc]
+        ring
+    ⟩
     rcases (padicValInt_dvd_iff _ _).mp this with h | h
     · exact hM h
     · omega
@@ -50,8 +60,13 @@ private theorem b_ultra_log {Ω : Type} [NormedField Ω] [IsUltrametricDist Ω] 
   rw [h1, norm_mul, b_ultra_unit l hn m hnd, mul_one, norm_pow, hn, Real.log_pow, Real.log_inv]
   ring
 
-theorem UpperTheory.V.Bern.b_ultra :
-    ∀ {Ω ι : Type} [NormedField Ω] [IsUltrametricDist Ω] [CharZero Ω] (l : ℕ) [Fact l.Prime], ‖(l : Ω)‖ = (l : ℝ)⁻¹ → ∀ (S : Set ι) (x : ι → Ω) (D : ℕ) (M : ℤ), S.Finite → M ≠ 0 → (∀ i ∈ S, IsIntegral ℤ ((D : Ω) * x i)) → ∏ᶠ i ∈ S, (D : Ω) * x i = (M : Ω) → ∑ᶠ i ∈ S, max 0 (-Real.log ‖x i‖) ≤ (padicValInt l M : ℝ) * Real.log l := by
+theorem UpperTheory.V.Bern.b_ultra
+    : ∀ {Ω ι : Type} [NormedField Ω] [IsUltrametricDist Ω] [CharZero Ω] (l : ℕ) [Fact l.Prime],
+      ‖(l : Ω)‖ = (l : ℝ)⁻¹
+        → ∀ (S : Set ι) (x : ι → Ω) (D : ℕ) (M : ℤ),
+          S.Finite → M ≠ 0 → (∀ i ∈ S, IsIntegral ℤ ((D : Ω) * x i))
+            → ∏ᶠ i ∈ S, (D : Ω) * x i = (M : Ω)
+            → ∑ᶠ i ∈ S, max 0 (-Real.log ‖x i‖) ≤ (padicValInt l M : ℝ) * Real.log l := by
   intro Ω ι _ _ _ l _ hn S x D M hS hM hint hprod
   rw [finprod_mem_eq_finite_toFinset_prod _ hS] at hprod
   rw [finsum_mem_eq_finite_toFinset_sum _ hS, ← b_ultra_log l hn M hM, ← hprod, norm_prod]

@@ -9,12 +9,22 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
 
 namespace UpperTheory.V.GradeZeroInterpolatingElement
 
 def tDims (r r' m : ℕ) (j : ℤ × ℤ) : ℕ :=
-  if j = wAl ∨ j = wBe ∨ j = wTh then 1 else if j = wPs then r' else if j = -wPs then r else if j = 0 then m else 0
+  if j = wAl ∨ j = wBe ∨ j = wTh then
+    1
+  else if j = wPs then
+    r'
+  else if j = -wPs then
+    r
+  else if j = 0 then
+    m
+  else
+    0
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
 
@@ -63,10 +73,16 @@ structure Model (D : Raw Ω c) where
   gen : ru.Generates
   hom : ∀ g i j, ∃ f ∈ W.part (wt i j), π f = ru.hom g i j
   at0 : ∀ g i j f, π f = ru.hom g i j → W.origin org f = D.r0 g i j
-  der : ∀ (a : c.O) (z : G ℚ Ω → c.O ⧸ Ideal.span {a}), a ≠ 0 → D.ShaCoc a z →
-    ∃ δ ∈ PtDer (W.origin org) c.O, HasWt W.part (-wPs) δ ∧ (∀ f, π f = 0 → δ f ∈ Ideal.span {a}) ∧
-      ∀ g f, (π f = ru.hom g 2 0 → Ideal.Quotient.mk _ (δ f) = Ideal.Quotient.mk _ (D.th g : c.O) * z g) ∧
-        (π f = ru.hom g 3 1 → Ideal.Quotient.mk _ (δ f) = Ideal.Quotient.mk _ (D.Psi g : c.O) * z g)
+  der
+    : ∀ (a : c.O) (z : G ℚ Ω → c.O ⧸ Ideal.span {a}),
+      a ≠ 0 → D.ShaCoc a z
+        → ∃ δ ∈ PtDer (W.origin org) c.O,
+          HasWt W.part (-wPs) δ ∧ (∀ f, π f = 0 → δ f ∈ Ideal.span {a})
+            ∧ ∀ g f,
+              (π f = ru.hom g 2 0
+                  → Ideal.Quotient.mk _ (δ f) = Ideal.Quotient.mk _ (D.th g : c.O) * z g)
+                ∧ (π f = ru.hom g 3 1
+                  → Ideal.Quotient.mk _ (δ f) = Ideal.Quotient.mk _ (D.Psi g : c.O) * z g)
 
 attribute [instance] Model.cR Model.aR Model.coR Model.dR Model.cS Model.aS Model.coS
 
@@ -103,7 +119,8 @@ def rS : G ℚ Ω →* M4 M.SS where
     rw [map_mul]
     simp [Matrix.mul_apply, ent]
 
-def rep {K : Type} [CommRing K] [Algebra c.O K] (ξ : M.SS →ₐ[c.O] K) : G ℚ Ω →* M4 K := mapRep (ξ : M.SS →+* K) M.rS
+def rep {K : Type} [CommRing K] [Algebra c.O K] (ξ : M.SS →ₐ[c.O] K) : G ℚ Ω →* M4 K :=
+  mapRep (ξ : M.SS →+* K) M.rS
 
 def aPart (n : ℤ) : Submodule c.O M.R := M.W.part (0, n)
 
@@ -139,7 +156,11 @@ def eqns : Eqns M.gr M.x0 M.r 0 M.r' 0 M.m where
 
 theorem π_mem (f : M.A) : M.π f ∈ M.SS := by
   obtain ⟨f, hf⟩ := f
-  refine Submodule.iSup_induction M.aPart (motive := fun f => M.π f ∈ M.SS) hf (fun n a ha => ?_) (by simp)
+  refine Submodule.iSup_induction M.aPart
+    (motive := fun f => M.π f ∈ M.SS)
+    hf
+    (fun n a ha => ?_)
+    (by simp)
     (fun a b ha hb => by simpa only [map_add] using M.SS.add_mem ha hb)
   exact M.sPart_le (j := (0, n)) ⟨a, ha, rfl⟩
 
@@ -147,20 +168,28 @@ def toSS : M.A →ₐ[c.O] M.SS := (M.π.comp M.A.val).codRestrict M.SS M.π_mem
 
 end Model
 
-
 variable (Ω l) in
 def SoV : Prop :=
-  ∀ ψ : G ℚ Ω →* (PadicAlgCl l)ˣ, IsOpen (ψ.ker : Set (G ℚ Ω)) → ∀ e : ℕ, 1 ≤ e → ∀ θ : G ℚ Ω → PadicAlgCl l,
-    (∀ g, θ g * (ψ g : PadicAlgCl l) * algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) ^ e = 1) →
-    ∀ z : G ℚ Ω → PadicAlgCl l, Continuous z → (∀ g h, z (g * h) = z g + θ g * z h) →
-    (∀ A : ValuationSubring Ω, ∃ m, ∀ g ∈ Ine (F := ℚ) A, z g = θ g * m - m) →
-    (∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∃ m, ∀ g ∈ Dec (F := ℚ) A, z g = θ g * m - m) →
-    ∃ m, ∀ g, z g = θ g * m - m
-
+  ∀ ψ : G ℚ Ω →* (PadicAlgCl l)ˣ,
+    IsOpen (ψ.ker : Set (G ℚ Ω))
+      → ∀ e : ℕ,
+        1 ≤ e
+          → ∀ θ : G ℚ Ω → PadicAlgCl l,
+            (∀ g,
+                θ g * (ψ g : PadicAlgCl l)
+                    * algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) ^ e
+                  = 1)
+              → ∀ z : G ℚ Ω → PadicAlgCl l,
+                Continuous z → (∀ g h, z (g * h) = z g + θ g * z h)
+                  → (∀ A : ValuationSubring Ω, ∃ m, ∀ g ∈ Ine (F := ℚ) A, z g = θ g * m - m)
+                  → (∀ A : ValuationSubring Ω,
+                    A.valuation (l : Ω) < 1 → ∃ m, ∀ g ∈ Dec (F := ℚ) A, z g = θ g * m - m)
+                  → ∃ m, ∀ g, z g = θ g * m - m
 
 variable (Ω l) in
 def SoFin : Prop :=
-  ∀ (c : Coef l) (ψ : G ℚ Ω →* c.Oˣ), IsOpen (ψ.ker : Set (G ℚ Ω)) → ∀ e : ℕ, 1 ≤ e → Chr.V l e ψ ≠ ⊤
+  ∀ (c : Coef l) (ψ : G ℚ Ω →* c.Oˣ),
+    IsOpen (ψ.ker : Set (G ℚ Ω)) → ∀ e : ℕ, 1 ≤ e → Chr.V l e ψ ≠ ⊤
 
 structure CohomologyHyp : Prop where
   loc : Loc.LocalPublishedTheorems

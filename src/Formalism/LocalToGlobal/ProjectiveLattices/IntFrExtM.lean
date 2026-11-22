@@ -21,10 +21,13 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 section ValCrit
 
-theorem valCrit_proj {R : Type} [CommRing R] {X : Scheme.{0}} (f : X ⟶ Sp R) (hf : IsProjOver f)
+theorem valCrit_proj
+    {R : Type} [CommRing R]
+    {X : Scheme.{0}} (f : X ⟶ Sp R) (hf : IsProjOver f)
     (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-    [IsFractionRing V K] (b : R →+* V) (y : Sp K ⟶ X) (hy : y ≫ f = spMap (algebraMap V K) ≫ spMap b) :
-    ∃ y' : Sp V ⟶ X, y' ≫ f = spMap b ∧ spMap (algebraMap V K) ≫ y' = y := by
+    [IsFractionRing V K]
+    (b : R →+* V) (y : Sp K ⟶ X) (hy : y ≫ f = spMap (algebraMap V K) ≫ spMap b)
+    : ∃ y' : Sp V ⟶ X, y' ≫ f = spMap b ∧ spMap (algebraMap V K) ≫ y' = y := by
   obtain ⟨N, i, hi, hif⟩ := hf
   haveI : IsClosedImmersion i := hi
   haveI : IsProper (PSpace.str R N) := isProper_str R N
@@ -56,15 +59,18 @@ section Proofs
 
 variable {D : Datum H} {l : Level H}
 
-theorem exists_family {D : Datum H} {l : Level H} (X0 : Moduli D l) (hN : ∀ l' : Level H, Nonempty (Moduli D l')) :
-    ∃ XoF : ∀ l' : Level H, Moduli D l', XoF l = X0 := by
+theorem exists_family
+    {D : Datum H} {l : Level H} (X0 : Moduli D l) (hN : ∀ l' : Level H, Nonempty (Moduli D l'))
+    : ∃ XoF : ∀ l' : Level H, Moduli D l', XoF l = X0 := by
   classical
   refine ⟨fun l' => if h : l' = l then cast (congrArg (Moduli D) h.symm) X0 else (hN l').some, ?_⟩
   first
-    | (beta_reduce
-       rw [dite_eq_left rfl]
-       rfl)
-    | simp
+  | (
+      beta_reduce
+      rw [dite_eq_left rfl]
+      rfl
+    )
+  | simp
 
 end Proofs
 

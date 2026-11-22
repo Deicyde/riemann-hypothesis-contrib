@@ -27,16 +27,21 @@ theorem continuous_group_lower_right_block : Continuous (fun g : GR n => (mR g).
 
 theorem continuous_first_cayley_block_map : Continuous (fun g : GR n => u1 (mR g)) := by
   unfold u1
-  exact ((continuous_group_lower_left_block (n := n)).const_smul Complex.I).add continuous_group_lower_right_block
+  exact ((continuous_group_lower_left_block (n := n)).const_smul Complex.I).add
+    continuous_group_lower_right_block
 
 theorem continuous_second_cayley_block_map : Continuous (fun g : GR n => u2 (mR g)) := by
   unfold u2
-  exact ((continuous_group_lower_left_block (n := n)).const_smul Complex.I).neg.add continuous_group_lower_right_block
+  exact ((continuous_group_lower_left_block (n := n)).const_smul Complex.I).neg.add
+    continuous_group_lower_right_block
 
-theorem continuous_weight_factor (hD : CayleyBlocksInvertible) (p q : ℕ) (e : ℤ) : Continuous (F0 (n := n) p q e) := by
+theorem continuous_weight_factor (hD : CayleyBlocksInvertible) (p q : ℕ) (e : ℤ)
+    : Continuous (F0 (n := n) p q e) := by
   have hdet : Continuous (fun g : GR n => (mR g).det) := continuous_mR.matrix_det
-  have h1 : Continuous (fun g : GR n => (u1 (mR g)).det) := continuous_first_cayley_block_map.matrix_det
-  have h2 : Continuous (fun g : GR n => (u2 (mR g)).det) := continuous_second_cayley_block_map.matrix_det
+  have h1 : Continuous (fun g : GR n => (u1 (mR g)).det) :=
+    continuous_first_cayley_block_map.matrix_det
+  have h2 : Continuous (fun g : GR n => (u2 (mR g)).det) :=
+    continuous_second_cayley_block_map.matrix_det
   have hne : ∀ g : GR n, (mR g).det ≠ 0 := fun g =>
     ((Matrix.isUnit_iff_isUnit_det _).mp (Units.isUnit (g : GL (Fin n ⊕ Fin n) ℂ))).ne_zero
   show Continuous (fun g : GR n =>
@@ -46,7 +51,8 @@ theorem continuous_weight_factor (hD : CayleyBlocksInvertible) (p q : ℕ) (e : 
 
 theorem continuous_hLoc (hD : CayleyBlocksInvertible) : Continuous (hLoc (n := n)) := by
   unfold hLoc
-  exact ((continuous_first_cayley_block_map.matrix_det).norm.pow 2).inv₀ fun g => pow_ne_zero 2 (norm_ne_zero_iff.mpr (hD n g).1)
+  exact ((continuous_first_cayley_block_map.matrix_det).norm.pow 2).inv₀ fun g =>
+    pow_ne_zero 2 (norm_ne_zero_iff.mpr (hD n g).1)
 
 theorem hLoc_nonneg (g : GR n) : 0 ≤ hLoc g := by
   unfold hLoc

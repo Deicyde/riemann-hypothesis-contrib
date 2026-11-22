@@ -16,8 +16,8 @@ universe w u
 
 variable {R : CommRingCat.{u}} (M : ModuleCat.{u} R)
 
-noncomputable abbrev tildeAb :
-    Sheaf (Opens.grothendieckTopology (Spec R).toTopCat) AddCommGrpCat.{u} :=
+noncomputable abbrev tildeAb
+    : Sheaf (Opens.grothendieckTopology (Spec R).toTopCat) AddCommGrpCat.{u} :=
   (SheafOfModules.toSheaf (Spec R).ringCatSheaf).obj (tilde M)
 
 noncomputable instance (W : Opens (Spec R).toTopCat) : Module R ((tildeAb M).obj.obj (op W)) :=
@@ -56,8 +56,8 @@ lemma exists_cover_eq (g : R) {ι : Type*} [Fintype ι] (h : ι → R) (N : ℕ)
   obtain ⟨c, hc⟩ := Ideal.mem_span_range_iff_exists_fun.1 hL
   exact ⟨L, c, hc.symm⟩
 
-noncomputable def tildeAction :
-    LocalizingAction (X := (Spec R).toTopCat) (P := (tildeAb M).obj)
+noncomputable def tildeAction
+    : LocalizingAction (X := (Spec R).toTopCat) (P := (tildeAb M).obj)
       (fun r : R => basicOpen r) where
   act r W := DistribSMul.toAddMonoidHom ((tildeAb M).obj.obj (op W)) r
   res_act r V W h x := res_smul M h r x
@@ -77,14 +77,14 @@ noncomputable def tildeAction :
     obtain ⟨⟨m, c⟩, hmc⟩ := IsLocalizedModule.surj (Submonoid.powers s) (tilde.toOpen M W).hom x
     obtain ⟨k, hk⟩ := c.2
     have hk' : s ^ k = (c : R) := hk
-    have hmc' : s ^ k • x = (tilde.toOpen M W).hom m := by
-      rw [hk']; exact hmc
+    have hmc' : s ^ k • x = (tilde.toOpen M W).hom m := by rw [hk']; exact hmc
     have h1 : (tilde.toOpen M W').hom m = 0 := by
       rw [← res_toOpen M hle, ← hmc', res_smul M hle]
       change s ^ k • res (X := (Spec R).toTopCat) (tildeAb M).obj hle x = 0
       rw [hx, smul_zero]
-    obtain ⟨c', hc'⟩ := IsLocalizedModule.exists_of_eq (S := Submonoid.powers (s * t))
-      (f := (tilde.toOpen M W').hom) (h1.trans (map_zero _).symm)
+    obtain ⟨c', hc'⟩ :=
+      IsLocalizedModule.exists_of_eq (S := Submonoid.powers (s * t)) (f := (tilde.toOpen M W').hom)
+        (h1.trans (map_zero _).symm)
     obtain ⟨N, hN⟩ := c'.2
     have hN' : (s * t) ^ N = (c' : R) := hN
     rw [smul_zero] at hc'
@@ -92,7 +92,8 @@ noncomputable def tildeAction :
     refine ⟨N, ?_⟩
     have h2 : ((s * t) ^ N * s ^ k) • x = 0 := by
       rw [mul_smul, hmc']
-      exact (map_smul (tilde.toOpen M W).hom ((s * t) ^ N) m).symm.trans (by rw [hc'']; exact map_zero _)
+      exact (map_smul (tilde.toOpen M W).hom ((s * t) ^ N) m).symm.trans
+        (by rw [hc'']; exact map_zero _)
     have h3 : (s ^ (N + k)) • ((t ^ N) • x) = (s ^ (N + k)) • (0 : (tildeAb M).obj.obj (op W)) := by
       rw [← mul_smul, smul_zero, ← h2]
       congr 1
@@ -105,12 +106,11 @@ noncomputable def tildeAction :
       rw [hW']; infer_instance
     have hWs : W ≤ basicOpen s := hW.le
     have hW's : W' ≤ basicOpen s := hW'.le.trans (basicOpen_mul_le_left s t)
-    obtain ⟨⟨m, c⟩, hmc⟩ := IsLocalizedModule.surj (Submonoid.powers (s * t))
-      (tilde.toOpen M W').hom y
+    obtain ⟨⟨m, c⟩, hmc⟩ :=
+      IsLocalizedModule.surj (Submonoid.powers (s * t)) (tilde.toOpen M W').hom y
     obtain ⟨k, hk⟩ := c.2
     have hk' : (s * t) ^ k = (c : R) := hk
-    have hmc' : (s * t) ^ k • y = (tilde.toOpen M W').hom m := by
-      rw [hk']; exact hmc
+    have hmc' : (s * t) ^ k • y = (tilde.toOpen M W').hom m := by rw [hk']; exact hmc
     obtain ⟨x, hx⟩ := (bijective_smul_tilde M s W hWs k).2 ((tilde.toOpen M W).hom m)
     have hx' : s ^ k • x = (tilde.toOpen M W).hom m := hx
     refine ⟨k, x, ?_⟩

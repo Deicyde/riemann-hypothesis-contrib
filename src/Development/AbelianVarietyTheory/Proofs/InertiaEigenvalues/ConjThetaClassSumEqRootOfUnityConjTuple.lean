@@ -15,7 +15,11 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Coeffic
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT
+  Formalism.L2.Pj
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
@@ -29,20 +33,27 @@ noncomputable section
 
 namespace GlobalTheory.GalEqCls
 
-theorem isThClsD_transfer {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
-    {Dw : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H} {l : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H}
-    {Xo : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Moduli Dw l} {c : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l} {n : ℕ}
+theorem isThClsD_transfer
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+    {Dw : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
+    {l : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H}
+    {Xo : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Moduli Dw l}
+    {c : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l} {n : ℕ}
     {d d' : Formalism.L2.Pj.DeltaDat Xo c n} (hd : d' = d)
-    {Cl Cl' : Type} [Fintype Cl] [Fintype Cl'] (e : Cl ≃ Cl')
-    (w : Cl → (Fin n → LevQ Dw d.l₂) → c.F) (w' : Cl' → (Fin n → LevQ Dw d'.l₂) → c.F)
-    (hw : ∀ k, HEq (w k) (w' (e k)))
+    {Cl Cl' : Type} [Fintype Cl] [Fintype Cl']
+    (e : Cl ≃ Cl') (w : Cl → (Fin n → LevQ Dw d.l₂) → c.F)
+    (w' : Cl' → (Fin n → LevQ Dw d'.l₂) → c.F) (hw : ∀ k, HEq (w k) (w' (e k)))
     (La : Cl → GenLat E n) (La' : Cl' → GenLat E n) (hLa : ∀ k, La' (e k) = La k)
     (Nc : Cl → ℕ) (Nc' : Cl' → ℕ) (hNc : ∀ k, Nc' (e k) = Nc k)
     (gam : Cl → ℕ) (gam' : Cl' → ℕ) (hgam : ∀ k, gam' (e k) = gam k)
-    (vol : c.F) (ep : Cl → c.F) (ep' : Cl' → c.F) (hep : ∀ k, ep' (e k) = ep k)
-    {Vs : Type} [AddCommGroup Vs] [Module c.F Vs] (io : Vs →ₗ[c.F] MvPolynomial (LtN Dw n) c.F)
-    (x : Cl → Vs) (x' : Cl' → Vs) (hx : ∀ k, x' (e k) = x k) (f : Rul Xo c)
-    (h : IsThClsD Xo c d w La Nc gam vol ep io x f) : IsThClsD Xo c d' w' La' Nc' gam' vol ep' io x' f := by
+    (vol : c.F)
+    (ep : Cl → c.F) (ep' : Cl' → c.F) (hep : ∀ k, ep' (e k) = ep k)
+    {Vs : Type} [AddCommGroup Vs] [Module c.F Vs]
+    (io : Vs →ₗ[c.F] MvPolynomial (LtN Dw n) c.F)
+    (x : Cl → Vs) (x' : Cl' → Vs) (hx : ∀ k, x' (e k) = x k)
+    (f : Rul Xo c) (h : IsThClsD Xo c d w La Nc gam vol ep io x f)
+    : IsThClsD Xo c d' w' La' Nc' gam' vol ep' io x' f := by
   subst hd
   intro k _ _ A A₂ hk y y₂ hy
   obtain ⟨vc, hvc, he⟩ := @h k _ _ A A₂ hk y y₂ hy
@@ -58,11 +69,45 @@ theorem isThClsD_transfer {E : Type} [Field E] [NumberField E] [IsCMField E] {H 
     dsimp only
     rw [e.symm_apply_apply, hgam, hep]
 
-theorem galRul_isSum : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2 → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type) (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL] (R : RealDat D A T.Q.c.F) (F : Face D A) (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)) (v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec), GlobalTheory.Hk3.Core R F → Nonempty (FWTie T R κ v₀) → ∀ (i : Fin D.R.m) (Tp : Type) (tup : Tp → T0) (M : OMDat T.toCore R i Tp tup), M.Pins (κ i) (v₀ i (sg0 D A)) (iotaW T i) (T.x₀ ((i : ℕ) + 1) M.s0) → ∀ (τ : ℂ ≃+* ℂ) (ta : M.c'.F ≃+* M.c'.F), (∀ a : M.c'.F, ((ta a : M.c'.F) : ℂ) = τ (a : ℂ)) → FixBase T R i τ → GlobalTheory.CompRat.CurveOver T.Q.H M.c'.F 1 → (∀ t x, ((R.xi (tup t) x : Circle) : ℂ) ∈ M.c'.F) → ∃ (hf : Fixes M.c' ta) (k0 : ℂ), IsRoot1 k0 ∧ ∀ (a b : Tp) (e : M.Cl' a ≃ M.Cl' b), SameCover M a b e → ConjTup R τ (tup a) (tup b) → ∃ (u : M.c'.F) (s : (AE D)ˣ), (u : ℂ) = k0 * ((R.xi (tup b) s : Circle) : ℂ) ∧ ∀ (xs : M.Cl' a → VsV D i M.c'.F) (xs' : M.Cl' b → VsV D i M.c'.F), (∀ k, (xs' (e k) : Pol M.c'.F D.what₂.Tau (Vc D i).rank) = MvPolynomial.map (ta : M.c'.F →+* M.c'.F) (xs k : Pol M.c'.F D.what₂.Tau (Vc D i).rank)) → ∀ f ∈ sec (T.Q.Xo ((i : ℕ) + 1)) M.c' (wtA (κ i)) (Vc D i).rank, GlobalTheory.OneMapAll.IsSum M a xs f → u • galRul hf f ∈ sec (T.Q.Xo ((i : ℕ) + 1)) M.c' (wtA (κ i)) (Vc D i).rank ∧ GlobalTheory.OneMapAll.IsSum M b xs' (u • galRul hf f) := by
+theorem galRul_isSum
+    : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
+      → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
+          (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
+          (R : RealDat D A T.Q.c.F) (F : Face D A)
+          (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1))
+          (v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec),
+        GlobalTheory.Hk3.Core R F → Nonempty (FWTie T R κ v₀)
+          → ∀ (i : Fin D.R.m) (Tp : Type) (tup : Tp → T0) (M : OMDat T.toCore R i Tp tup),
+            M.Pins (κ i) (v₀ i (sg0 D A)) (iotaW T i) (T.x₀ ((i : ℕ) + 1) M.s0)
+              → ∀ (τ : ℂ ≃+* ℂ) (ta : M.c'.F ≃+* M.c'.F),
+                (∀ a : M.c'.F, ((ta a : M.c'.F) : ℂ) = τ (a : ℂ)) → FixBase T R i τ
+                  → GlobalTheory.CompRat.CurveOver T.Q.H M.c'.F 1
+                  → (∀ t x, ((R.xi (tup t) x : Circle) : ℂ) ∈ M.c'.F)
+                  → ∃ (hf : Fixes M.c' ta) (k0 : ℂ),
+                    IsRoot1 k0
+                      ∧ ∀ (a b : Tp) (e : M.Cl' a ≃ M.Cl' b),
+                        SameCover M a b e → ConjTup R τ (tup a) (tup b)
+                          → ∃ (u : M.c'.F) (s : (AE D)ˣ),
+                            (u : ℂ) = k0 * ((R.xi (tup b) s : Circle) : ℂ)
+                              ∧ ∀ (xs : M.Cl' a → VsV D i M.c'.F) (xs' : M.Cl' b → VsV D i M.c'.F),
+                                (∀ k,
+                                    (xs' (e k) : Pol M.c'.F D.what₂.Tau (Vc D i).rank)
+                                      = MvPolynomial.map (ta : M.c'.F →+* M.c'.F)
+                                        (xs k : Pol M.c'.F D.what₂.Tau (Vc D i).rank))
+                                  → ∀ f ∈ sec (T.Q.Xo ((i : ℕ) + 1)) M.c' (wtA (κ i)) (Vc D i).rank,
+                                    GlobalTheory.OneMapAll.IsSum M a xs f
+                                      → u • galRul hf f ∈ sec (T.Q.Xo ((i : ℕ) + 1)) M.c'
+                                          (wtA (κ i)) (Vc D i).rank
+                                        ∧ GlobalTheory.OneMapAll.IsSum M b xs'
+                                          (u • galRul hf f) := by
   intro hC D G _ _ Pl0 T0 A T _ R F κ v₀ hcore hFW i Tp tup M hP τ ta hta hfix hcurve hxi
-  have hf : Fixes M.c' ta := ⟨fun φ x => Subtype.ext (by rw [hta]; exact hfix.host φ x),
-    fun a => Subtype.ext (by rw [hta]; exact hfix.core ⟨a, T.Q.c.le a.2⟩)⟩
-  obtain ⟨k0, hk0, hcxi⟩ := GlobalTheory.T.galoisConj_coverFunction_eq_const_mul_conjTuple D G Pl0 T0 A T R F κ v₀ hcore hFW i Tp tup M hP τ ta hta hfix hcurve hxi
+  have hf : Fixes M.c' ta := ⟨
+    fun φ x => Subtype.ext (by rw [hta]; exact hfix.host φ x),
+    fun a => Subtype.ext (by rw [hta]; exact hfix.core ⟨a, T.Q.c.le a.2⟩)
+  ⟩
+  obtain ⟨k0, hk0, hcxi⟩ :=
+    GlobalTheory.T.galoisConj_coverFunction_eq_const_mul_conjTuple D G Pl0 T0 A T R F κ v₀ hcore hFW
+      i Tp tup M hP τ ta hta hfix hcurve hxi
   have hk0ne : k0 ≠ 0 := by
     rintro rfl
     obtain ⟨n, hn, hkn⟩ := hk0
@@ -75,8 +120,11 @@ theorem galRul_isSum : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepS
   obtain ⟨⟨cx, hcx⟩, hU, hdict, -, -, hcl⟩ := id hsame
   obtain ⟨h₂, ka, s1, hka, hev⟩ := hcxi a b cx hcx hU hdict hconj
   obtain ⟨u, s2, w', hu, hw'eq, hw⟩ :=
-    GlobalTheory.T.conj_fourierCoefficients_conjugate_tuples D G Pl0 T0 A T R F κ v₀ hcore hFW i Tp tup M hP τ ta hta hfix a b e hsame hconj
-  obtain ⟨hvol, hep⟩ := GlobalTheory.T.galoisConj_classScalars_and_volume D G Pl0 T0 A T R F κ v₀ hcore hFW i Tp tup M hP τ ta hta hfix a b e hsame hconj
+    GlobalTheory.T.conj_fourierCoefficients_conjugate_tuples D G Pl0 T0 A T R F κ v₀ hcore hFW i Tp
+      tup M hP τ ta hta hfix a b e hsame hconj
+  obtain ⟨hvol, hep⟩ :=
+    GlobalTheory.T.galoisConj_classScalars_and_volume D G Pl0 T0 A T R F κ v₀ hcore hFW i Tp tup M
+      hP τ ta hta hfix a b e hsame hconj
   have hkane : ka ≠ 0 := fun h0 => by
     have h1 : ((ka : ℂ)) = 0 := by rw [h0]; rfl
     rw [hka] at h1
@@ -91,19 +139,37 @@ theorem galRul_isSum : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepS
     ring
   intro xs xs' hxs f hfs hsum
   obtain ⟨-, cga, hio⟩ := hP.io
-  have hio' := fun v => GlobalTheory.HarmBasis.mem_HHa_of_mem_span subset_rfl (hio.2.2.1 ▸ LinearMap.mem_range_self M.io v)
+  have hio' := fun v =>
+    GlobalTheory.HarmBasis.mem_HHa_of_mem_span subset_rfl
+      (hio.2.2.1 ▸ LinearMap.mem_range_self M.io v)
   obtain ⟨hLev, -, hN⟩ := hP.cov a
   have hδ := hLev.2.2.2.2.2.2.2.1
-  have key := GlobalTheory.GalTw.isThClsD_galRul hC _ _ _ _ (T.Q.Xo ((i : ℕ) + 1)) M.c' ta hf (Vc D i).rank (M.dδ a) h₂ hN hδ cx
-    ka u hkane hune hev (M.Cl' a) (M.w a) w' (M.La a) (M.Nc a) (M.gam a) (M.vol a) (M.ep a) (VsV D i M.c'.F) M.io
-    (wtA (κ i)) hio' hw xs (fun k => xs' (e k))
-    (fun k => GlobalTheory.T.coefficientMap_commutes_fieldAutomorphism D G Pl0 T0 A T R F κ v₀ hcore hFW i Tp tup M hP τ ta hta hfix (xs k) (xs' (e k)) (hxs k))
-    (Vc D i).rank f hfs hsum
+  have key :=
+    GlobalTheory.GalTw.isThClsD_galRul hC _ _ _ _ (T.Q.Xo ((i : ℕ) + 1)) M.c' ta hf (Vc D i).rank
+      (M.dδ a) h₂ hN hδ cx ka u hkane hune hev (M.Cl' a) (M.w a) w' (M.La a) (M.Nc a) (M.gam a)
+      (M.vol a) (M.ep a) (VsV D i M.c'.F) M.io (wtA (κ i)) hio' hw xs
+      (fun k => xs' (e k))
+      (fun k =>
+        GlobalTheory.T.coefficientMap_commutes_fieldAutomorphism D G Pl0 T0 A T R F κ v₀ hcore hFW i
+          Tp tup M hP τ ta hta hfix (xs k) (xs' (e k)) (hxs k))
+      (Vc D i).rank f hfs hsum
   refine ⟨key.1, ?_⟩
   have key2 := key.2
   rw [hvol] at key2
-  exact isThClsD_transfer hcx e w' (M.w b) hw'eq (M.La a) (M.La b) (fun k => (hcl k).2.1) (M.Nc a) (M.Nc b)
-    (fun k => (hcl k).2.2.1) (M.gam a) (M.gam b) (fun k => (hcl k).2.2.2) (M.vol b) (fun k => ta (M.ep a k)) (M.ep b)
-    (fun k => (hep k).symm) M.io (fun k => xs' (e k)) xs' (fun _ => rfl) _ key2
+  exact isThClsD_transfer hcx e w' (M.w b) hw'eq (M.La a) (M.La b)
+    (fun k => (hcl k).2.1)
+    (M.Nc a) (M.Nc b)
+    (fun k => (hcl k).2.2.1)
+    (M.gam a) (M.gam b)
+    (fun k => (hcl k).2.2.2)
+    (M.vol b)
+    (fun k => ta (M.ep a k))
+    (M.ep b)
+    (fun k => (hep k).symm)
+    M.io
+    (fun k => xs' (e k))
+    xs'
+    (fun _ => rfl)
+    _ key2
 
 end GlobalTheory.GalEqCls

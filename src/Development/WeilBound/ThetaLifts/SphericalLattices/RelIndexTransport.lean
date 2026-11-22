@@ -11,19 +11,27 @@ noncomputable section
 namespace PositivityTheory.Sph.M2
 
 open scoped Matrix TensorProduct
-open NumberField IsDedekindDomain GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.LFun.InertChart GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  PositivityTheory.ThK PositivityTheory.ThKH.Iwas MeasureTheory GlobalTheory.Doubling
+open NumberField IsDedekindDomain GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.LFun.InertChart GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PositivityTheory.ThK
+  PositivityTheory.ThKH.Iwas MeasureTheory GlobalTheory.Doubling
 
-theorem relIndex_transport {G H : Type} [Group G] [Group H] (U : Subgroup G) (Φ : G →* H)
-    (hinj : ∀ g ∈ U, ∀ g' ∈ U, Φ g = Φ g' → g = g') {A B : Subgroup G} (hA : A ≤ U) (hB : B ≤ U) :
-    (A.map Φ).relIndex (B.map Φ) = A.relIndex B := by
+theorem relIndex_transport
+    {G H : Type} [Group G] [Group H]
+    (U : Subgroup G) (Φ : G →* H) (hinj : ∀ g ∈ U, ∀ g' ∈ U, Φ g = Φ g' → g = g')
+    {A B : Subgroup G} (hA : A ≤ U) (hB : B ≤ U)
+    : (A.map Φ).relIndex (B.map Φ) = A.relIndex B := by
   have hφ : Function.Injective (Φ.comp U.subtype) := fun x y e => Subtype.ext (hinj _ x.2 _ y.2 e)
-  have e : ∀ C : Subgroup G, C ≤ U → (C.subgroupOf U).map (Φ.comp U.subtype) = C.map Φ := fun C hC => by
+  have e
+      : ∀ C : Subgroup G,
+        C ≤ U → (C.subgroupOf U).map (Φ.comp U.subtype) = C.map Φ := fun C hC => by
     rw [← Subgroup.map_map, Subgroup.subgroupOf_map_subtype, inf_of_le_left hC]
-  rw [← e A hA, ← e B hB, Subgroup.relIndex_map_map_of_injective _ _ hφ, Subgroup.relIndex_subgroupOf hB]
+  rw [← e A hA, ← e B hB, Subgroup.relIndex_map_map_of_injective _ _ hφ,
+    Subgroup.relIndex_subgroupOf hB]
 
-theorem map_conj_map {G H : Type} [Group G] [Group H] (Φ : G →* H) (g : G) (A : Subgroup G) :
-    (A.map (MulAut.conj g).toMonoidHom).map Φ = (A.map Φ).map (MulAut.conj (Φ g)).toMonoidHom := by
+theorem map_conj_map {G H : Type} [Group G] [Group H] (Φ : G →* H) (g : G) (A : Subgroup G)
+    : (A.map (MulAut.conj g).toMonoidHom).map Φ
+      = (A.map Φ).map (MulAut.conj (Φ g)).toMonoidHom := by
   rw [Subgroup.map_map, Subgroup.map_map]
   congr 1
   ext x
@@ -52,10 +60,12 @@ theorem modSt_of (hC : ChartSt) (hL : LocModSt) : PositivityTheory.Sph.ModSt := 
   have hconj : ∀ g ∈ USub σ W v, KP.map (MulAut.conj g).toMonoidHom ≤ USub σ W v := fun g hg => by
     rintro _ ⟨k, hk, rfl⟩
     exact (USub σ W v).mul_mem ((USub σ W v).mul_mem hg (hKPU hk)) ((USub σ W v).inv_mem hg)
-  have tr : ∀ g ∈ USub σ W v, (KP.map (MulAut.conj g).toMonoidHom).relIndex KP =
-      ((KPW (w.adicCompletion E) c m).map (MulAut.conj (Φ g)).toMonoidHom).relIndex (KPW (w.adicCompletion E) c m) :=
-    fun g hg => by
-      rw [← relIndex_transport (USub σ W v) Φ hinj (hconj g hg) hKPU, map_conj_map, himg]
+  have tr
+      : ∀ g ∈ USub σ W v,
+        (KP.map (MulAut.conj g).toMonoidHom).relIndex KP
+          = ((KPW (w.adicCompletion E) c m).map (MulAut.conj (Φ g)).toMonoidHom).relIndex
+            (KPW (w.adicCompletion E) c m) := fun g hg => by
+    rw [← relIndex_transport (USub σ W v) Φ hinj (hconj g hg) hKPU, map_conj_map, himg]
   have hPW : Φ p ∈ PW (w.adicCompletion E) c m := (hP p hpU).1 hp
   have key := hL (w.adicCompletion E) ϖ c (Formalism.UG.qV F v) hU m (Φ p) hPW
   rw [← map_inv, ← tr p⁻¹ ((USub σ W v).inv_mem hpU), ← tr p hpU, hdet p hp t ht] at key
@@ -63,9 +73,10 @@ theorem modSt_of (hC : ChartSt) (hL : LocModSt) : PositivityTheory.Sph.ModSt := 
   congr 1
   have h21 : (Φ p : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) (w.adicCompletion E)).toBlocks₂₁ = 0 :=
     GlobalTheory.LGrp.mem_blockQ_two.1 hPW.2
-  have hdetΦ : (Φ p : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) (w.adicCompletion E)).det =
-      (Φ p : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) (w.adicCompletion E)).toBlocks₁₁.det *
-        (Φ p : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) (w.adicCompletion E)).toBlocks₂₂.det := by
+  have hdetΦ
+      : (Φ p : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) (w.adicCompletion E)).det
+        = (Φ p : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) (w.adicCompletion E)).toBlocks₁₁.det
+          * (Φ p : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) (w.adicCompletion E)).toBlocks₂₂.det := by
     conv_lhs => rw [← Matrix.fromBlocks_toBlocks (Φ p : Matrix (Fin m ⊕ Fin m) (Fin m ⊕ Fin m) (w.adicCompletion E)), h21]
     exact Matrix.det_fromBlocks_zero₂₁ _ _ _
   have hne : piE h t.det ≠ 0 := by
@@ -81,7 +92,8 @@ theorem modSt_of (hC : ChartSt) (hL : LocModSt) : PositivityTheory.Sph.ModSt := 
     exact RingHom.map_det _ _
   have habs := GlobalTheory.AbsInert.absEv_inert F E σ hσ v w h hw x
   have hm : (((sbClass (Fv F v)).modu u : NNReal) : ℝ) = (absEv F E v x : ℝ) := by
-    have e1 := GlobalTheory.CompanionTheory.SW.ProdFormula.distribHaarChar_eq_nnnorm v (u : Fv F v) u.ne_zero
+    have e1 :=
+      GlobalTheory.CompanionTheory.SW.ProdFormula.distribHaarChar_eq_nnnorm v (u : Fv F v) u.ne_zero
     rw [Units.mk0_val] at e1
     change ((distribHaarChar (Fv F v) u : NNReal) : ℝ) = _
     rw [e1, absEv_apply, hx1, ← hu]

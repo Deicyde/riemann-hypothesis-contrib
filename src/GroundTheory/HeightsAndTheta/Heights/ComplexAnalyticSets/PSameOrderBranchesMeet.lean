@@ -15,9 +15,11 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets Filter Topology
 
-noncomputable def VarBranch.restrictInto {n k : ℕ} {I : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
-    (J : Ideal (MvPolynomial (Fin n) ℂ)) (c : VarBranch I k q) (ε : ℝ) (hε : 0 < ε)
-    (h : ∀ t ∈ Metric.ball (0 : Fin k → ℂ) ε, c.toFun t ∈ zeroSet J) : VarBranch J k q where
+noncomputable def VarBranch.restrictInto
+    {n k : ℕ} {I : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
+    (J : Ideal (MvPolynomial (Fin n) ℂ)) (c : VarBranch I k q)
+    (ε : ℝ) (hε : 0 < ε) (h : ∀ t ∈ Metric.ball (0 : Fin k → ℂ) ε, c.toFun t ∈ zeroSet J)
+    : VarBranch J k q where
   radius := min ε c.radius
   radius_pos := lt_min hε c.radius_pos
   toFun := c.toFun
@@ -26,9 +28,10 @@ noncomputable def VarBranch.restrictInto {n k : ℕ} {I : Ideal (MvPolynomial (F
   map_zero := c.map_zero
   mapsTo := fun t ht ↦ h t (Metric.ball_subset_ball (min_le_left _ _) ht)
 
-theorem VarBranch.eventually_mem_zeroSet {n : ℕ} {I : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
-    (J : Ideal (MvPolynomial (Fin n) ℂ)) (c : VarBranch I 1 q) (h : ∀ f ∈ J, branchOrder c f = ⊤) :
-    ∀ᶠ t in 𝓝 (0 : Fin 1 → ℂ), c.toFun t ∈ zeroSet J := by
+theorem VarBranch.eventually_mem_zeroSet
+    {n : ℕ} {I : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
+    (J : Ideal (MvPolynomial (Fin n) ℂ)) (c : VarBranch I 1 q) (h : ∀ f ∈ J, branchOrder c f = ⊤)
+    : ∀ᶠ t in 𝓝 (0 : Fin 1 → ℂ), c.toFun t ∈ zeroSet J := by
   have key : ∀ f ∈ J, ∀ᶠ t in 𝓝 (0 : Fin 1 → ℂ), eval (c.toFun t) f = 0 := by
     intro f hf
     have h0 := analyticOrderAt_eq_top.1 (h f hf)

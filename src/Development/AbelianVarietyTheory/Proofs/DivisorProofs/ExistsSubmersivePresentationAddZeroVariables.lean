@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitsPatch
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -15,8 +18,8 @@ namespace GlobalTheory.PinchEnl
 
 open MvPolynomial
 
-theorem ker_aeval_zero_eq_span (D κ : Type) [CommRing D] :
-    RingHom.ker (aeval (R := D) (fun _ : κ ↦ (0 : D))) = Ideal.span (Set.range X) := by
+theorem ker_aeval_zero_eq_span (D κ : Type) [CommRing D]
+    : RingHom.ker (aeval (R := D) (fun _ : κ ↦ (0 : D))) = Ideal.span (Set.range X) := by
   apply le_antisymm
   · intro p hp
     rw [← Set.image_univ, MvPolynomial.mem_ideal_span_X_image]
@@ -28,16 +31,21 @@ theorem ker_aeval_zero_eq_span (D κ : Type) [CommRing D] :
     rw [RingHom.mem_ker] at hp
     have : aeval (R := D) (fun _ : κ ↦ (0 : D)) p = AddMonoidAlgebra.coeff p 0 := by
       first
-        | (show MvPolynomial.eval (0 : κ → D) p = _
-           exact congrFun (congrArg DFunLike.coe (MvPolynomial.eval_zero (R := D) (σ := κ))) p)
-        | (rw [MvPolynomial.aeval_def]; simp [MvPolynomial.eval₂_eq, MvPolynomial.coeff_zero_eq_constantCoeff])
+      | (
+          show MvPolynomial.eval (0 : κ → D) p = _
+          exact congrFun (congrArg DFunLike.coe (MvPolynomial.eval_zero (R := D) (σ := κ))) p
+        )
+      | (
+          rw [MvPolynomial.aeval_def]
+          simp [MvPolynomial.eval₂_eq, MvPolynomial.coeff_zero_eq_constantCoeff]
+        )
     exact (mem_support_iff.mp hm) (this ▸ hp)
   · rw [Ideal.span_le]
     rintro _ ⟨k, rfl⟩
     simp
 
-noncomputable def zeroPre (D κ : Type) [CommRing D] :
-    Algebra.PreSubmersivePresentation D D κ κ where
+noncomputable def zeroPre (D κ : Type) [CommRing D]
+    : Algebra.PreSubmersivePresentation D D κ κ where
   val _ := 0
   σ' x := C x
   aeval_val_σ' x := by simp
@@ -61,11 +69,16 @@ theorem zeroPre_jacobian (D κ : Type) [CommRing D] [Finite κ] : (zeroPre D κ)
 
 end GlobalTheory.PinchEnl
 
-theorem GlobalTheory.PinchEnl.exists_submersivePresentation_sum_zero : ∀ (R D ν σ κ : Type) [CommRing R] [CommRing D] [Algebra R D] [Finite ν] [Finite σ] [Finite κ] (P : Algebra.SubmersivePresentation R D ν σ), ∃ P' : Algebra.SubmersivePresentation R D (κ ⊕ ν) (κ ⊕ σ), P'.val = Sum.elim (fun _ ↦ 0) P.val := by
+theorem GlobalTheory.PinchEnl.exists_submersivePresentation_sum_zero
+    : ∀ (R D ν σ κ : Type) [CommRing R] [CommRing D] [Algebra R D] [Finite ν] [Finite σ] [Finite κ]
+        (P : Algebra.SubmersivePresentation R D ν σ),
+      ∃ P' : Algebra.SubmersivePresentation R D (κ ⊕ ν) (κ ⊕ σ),
+        P'.val = Sum.elim (fun _ ↦ 0) P.val := by
   intro R D ν σ κ _ _ _ _ _ _ P
-  let Q : Algebra.SubmersivePresentation D D κ κ :=
-    { __ := GlobalTheory.PinchEnl.zeroPre D κ
-      jacobian_isUnit := by rw [GlobalTheory.PinchEnl.zeroPre_jacobian]; exact isUnit_one }
+  let Q : Algebra.SubmersivePresentation D D κ κ := {
+    __ := GlobalTheory.PinchEnl.zeroPre D κ
+    jacobian_isUnit := by rw [GlobalTheory.PinchEnl.zeroPre_jacobian]; exact isUnit_one
+  }
   refine ⟨Q.comp P, ?_⟩
   ext i
   rcases i with k | j

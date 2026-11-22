@@ -42,7 +42,11 @@ private lemma Incl_mono {ι : Type} [DecidableEq ι] {N : ℕ} {lam : ι → ℕ
 
 theorem inclusion_w_seven_real_holds : HidaLatticeInclusionAtCoarseWeightBound := by
   intro P hP hL ι _ _ W hW l X hl hu hlJ hin
-  obtain ⟨h1, h2⟩ := Formalism.CohomologicalDescent.Down.inclusion_w_real_holds P hP hL ι W hW l X hl hu hlJ hin
-  exact ⟨Incl_mono X l _ _ h1 (JW_le_coarseWeightBound W P l), le_trans h2 (JW_le_coarseWeightBound W P l)⟩
+  obtain ⟨h1, h2⟩ :=
+    Formalism.CohomologicalDescent.Down.inclusion_w_real_holds P hP hL ι W hW l X hl hu hlJ hin
+  exact ⟨
+    Incl_mono X l _ _ h1 (JW_le_coarseWeightBound W P l),
+    le_trans h2 (JW_le_coarseWeightBound W P l)
+  ⟩
 
 end Formalism.CohomologicalDescent.Down7

@@ -33,12 +33,15 @@ theorem isInducing_toL1 (P Q : ℕ) : IsInducing (toL1 P Q) := by
   exact (PiLp.homeomorph 1 (fun _ : (Fin P ⊕ Fin Q) × (Fin P ⊕ Fin Q) => ℂ)).symm.isInducing.comp
     (h1.comp IsInducing.subtypeVal)
 
-@[reducible] def sumNorm (P Q : ℕ) : NormedAddCommGroup (lieU P Q) :=
+@[reducible]
+def sumNorm (P Q : ℕ) : NormedAddCommGroup (lieU P Q) :=
   let N := NormedAddCommGroup.induced (lieU P Q) _ (toL1 P Q) (toL1_injective P Q)
-  { toNorm := N.toNorm
+  {
+    toNorm := N.toNorm
     toAddCommGroup := inferInstance
     toMetricSpace := N.toMetricSpace.replaceTopology (isInducing_toL1 P Q).eq_induced
-    dist_eq := N.dist_eq }
+    dist_eq := N.dist_eq
+  }
 
 theorem mat_mul {P Q : ℕ} (g h : UpqT P Q) : (g * h).mat = g.mat * h.mat := rfl
 

@@ -14,12 +14,18 @@ namespace GlobalTheory.SgInfOrb
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem smooth_rdWord_functional : ∀ (k r : ℕ) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] {B : Type} [NormedAddCommGroup B] [NormedSpace ℂ B] (σ : Mat k r → (H →L[ℂ] H))
-    (Λ : H →L[ℂ] B), IsURepOn (GG k r) σ → ∀ v : H, IsSmoothVec (k := k) (r := r) σ v →
-    SmoothOnH (Hpk k r) (fun g : Mat k r => Λ (σ g v)) ∧
-    ∀ ws : List (Mat k r), (∀ X ∈ ws, InLieHpk k r X) → ∀ x ∈ GG k r,
-      rdWord ws (fun g : Mat k r => Λ (σ g v)) x = Λ (σ x (dsigW σ ws v)) := by
+theorem smooth_rdWord_functional
+    : ∀ (k r : ℕ) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        {B : Type} [NormedAddCommGroup B] [NormedSpace ℂ B] (σ : Mat k r → (H →L[ℂ] H))
+        (Λ : H →L[ℂ] B),
+      IsURepOn (GG k r) σ
+        → ∀ v : H,
+          IsSmoothVec (k := k) (r := r) σ v
+            → SmoothOnH (Hpk k r) (fun g : Mat k r => Λ (σ g v))
+              ∧ ∀ ws : List (Mat k r),
+                (∀ X ∈ ws, InLieHpk k r X)
+                  → ∀ x ∈ GG k r,
+                    rdWord ws (fun g : Mat k r => Λ (σ g v)) x = Λ (σ x (dsigW σ ws v)) := by
   intro k r H _ _ _ B _ _ σ Λ hσ v hv
   refine ⟨?_, ?_⟩
   · intro g₀ hg₀
@@ -36,12 +42,16 @@ theorem smooth_rdWord_functional : ∀ (k r : ℕ) {H : Type} [NormedAddCommGrou
       have hw : ∀ Y ∈ w, InLieHpk k r Y := fun Y hY => hws Y (List.mem_cons_of_mem _ hY)
       have hd := Formalism.MainNotions.LowestKTypeMultiplicity.dsigW_hasDeriv hσ hv w hw hX
       have h2 := ((Λ.comp (σ x)).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ) hd
-      have e : (fun t : ℝ => rdWord w (fun g : Mat k r => Λ (σ g v)) (x * NormedSpace.exp ((t : ℂ) • X))) =
-          (⇑((Λ.comp (σ x)).restrictScalars ℝ) ∘ fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • X)) (dsigW σ w v)) := by
+      have e
+          : (fun t : ℝ =>
+              rdWord w (fun g : Mat k r => Λ (σ g v)) (x * NormedSpace.exp ((t : ℂ) • X)))
+            = (⇑((Λ.comp (σ x)).restrictScalars ℝ)
+              ∘ fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • X)) (dsigW σ w v)) := by
         funext t
         have ht := Formalism.MainNotions.LowestKTypeMultiplicity.exp_mem_UH hX t
         rw [ih hw _ (GlobalTheory.SgInfDD.gg_mul hx ht)]
-        simp only [Function.comp, ContinuousLinearMap.coe_restrictScalars', ContinuousLinearMap.comp_apply]
+        simp only [Function.comp, ContinuousLinearMap.coe_restrictScalars',
+          ContinuousLinearMap.comp_apply]
         rw [hσ.1.2 x hx _ ht]
         rfl
       show deriv _ 0 = _

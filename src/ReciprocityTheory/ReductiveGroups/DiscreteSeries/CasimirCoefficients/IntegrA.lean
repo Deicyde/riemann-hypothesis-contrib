@@ -86,66 +86,87 @@ lemma lintegral_exp_neg_norm_lt_top {E : Type*} [NormedAddCommGroup E] [NormedSp
     _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top
         (finite_integral_one_add_norm (μ := μ) (by push_cast; linarith))
 
-theorem lintegral_lt_top_of_polar (hq : 1 ≤ q0 ε) (ν : Measure (UJ ε)) [ν.IsHaarMeasure]
-    (F : UJ ε → ℝ≥0∞) (hF : Measurable F) {M δ : ℝ} (hM : 0 ≤ M) (hδ : 0 < δ)
-    (hb : ∀ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ), inP ε X →
-      F (toUJ ε (toMK k * NormedSpace.exp X)) ≤
-        ENNReal.ofReal (M * Real.exp (-(δ + n * Real.sqrt (2 * q0 ε)) * Real.sqrt (hs X)))) :
-    ∫⁻ g, F g ∂ν < ⊤ := by
+theorem lintegral_lt_top_of_polar
+    (hq : 1 ≤ q0 ε)
+    (ν : Measure (UJ ε)) [ν.IsHaarMeasure]
+    (F : UJ ε → ℝ≥0∞) (hF : Measurable F)
+    {M δ : ℝ} (hM : 0 ≤ M) (hδ : 0 < δ)
+    (hb : ∀ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ),
+      inP ε X
+        → F (toUJ ε (toMK k * NormedSpace.exp X))
+          ≤ ENNReal.ofReal (M * Real.exp (-(δ + n * Real.sqrt (2 * q0 ε)) * Real.sqrt (hs X))))
+    : ∫⁻ g, F g ∂ν < ⊤ := by
   obtain ⟨C, hC, hpol⟩ := haar_polar_le ε hq ν
   have := compactSpace_KG ε
   have hK : muK ε Set.univ ≠ ⊤ := (isCompact_univ.measure_lt_top).ne
   set c := Real.sqrt (2 * q0 ε) with hcdef
   have hc0 : 0 ≤ c := Real.sqrt_nonneg _
-  have hpt : ∀ B : Pt ε → Qt ε → ℂ,
-      (∫⁻ k, F (toUJ ε (toMK k * NormedSpace.exp (pOfB ε B))) ∂(muK ε)) *
-        ENNReal.ofReal (Real.exp (n * c * Real.sqrt (hs (pOfB ε B)))) ≤
-      muK ε Set.univ * ENNReal.ofReal (M * Real.exp (-δ * ‖B‖)) := by
+  have hpt
+      : ∀ B : Pt ε → Qt ε → ℂ,
+        (∫⁻ k, F (toUJ ε (toMK k * NormedSpace.exp (pOfB ε B))) ∂(muK ε))
+            * ENNReal.ofReal (Real.exp (n * c * Real.sqrt (hs (pOfB ε B))))
+          ≤ muK ε Set.univ * ENNReal.ofReal (M * Real.exp (-δ * ‖B‖)) := by
     intro B
     set r := Real.sqrt (hs (pOfB ε B)) with hrdef
     have hr : ‖B‖ ≤ r := norm_le_sqrt_hs_pOfB B
     have h0 : 0 ≤ M * Real.exp (-(δ + n * c) * r) := by positivity
-    calc (∫⁻ k, F (toUJ ε (toMK k * NormedSpace.exp (pOfB ε B))) ∂(muK ε)) *
-          ENNReal.ofReal (Real.exp (n * c * r))
-        ≤ (∫⁻ _k, ENNReal.ofReal (M * Real.exp (-(δ + n * c) * r)) ∂(muK ε)) *
-          ENNReal.ofReal (Real.exp (n * c * r)) := by
-          gcongr with k
-          exact hb k _ (pOfB_inP ε B)
-      _ = muK ε Set.univ * ENNReal.ofReal (M * Real.exp (-(δ + n * c) * r) * Real.exp (n * c * r)) := by
-          rw [lintegral_const, ENNReal.ofReal_mul h0, mul_comm (ENNReal.ofReal _) (muK ε _), mul_assoc]
+    calc
+      (∫⁻ k, F (toUJ ε (toMK k * NormedSpace.exp (pOfB ε B))) ∂(muK ε))
+            * ENNReal.ofReal (Real.exp (n * c * r))
+          ≤ (∫⁻ _k, ENNReal.ofReal (M * Real.exp (-(δ + n * c) * r)) ∂(muK ε))
+            * ENNReal.ofReal (Real.exp (n * c * r)) := by
+        gcongr with k
+        exact hb k _ (pOfB_inP ε B)
+      _ = muK ε Set.univ
+          * ENNReal.ofReal (M * Real.exp (-(δ + n * c) * r) * Real.exp (n * c * r)) := by
+        rw [lintegral_const, ENNReal.ofReal_mul h0, mul_comm (ENNReal.ofReal _) (muK ε _),
+          mul_assoc]
       _ ≤ muK ε Set.univ * ENNReal.ofReal (M * Real.exp (-δ * ‖B‖)) := by
-          refine mul_le_mul_right (ENNReal.ofReal_le_ofReal ?_) _
-          rw [mul_assoc, ← Real.exp_add]
-          refine mul_le_mul_of_nonneg_left (Real.exp_le_exp.2 ?_) hM
-          nlinarith
+        refine mul_le_mul_right (ENNReal.ofReal_le_ofReal ?_) _
+        rw [mul_assoc, ← Real.exp_add]
+        refine mul_le_mul_of_nonneg_left (Real.exp_le_exp.2 ?_) hM
+        nlinarith
   have h1 : ∀ _ : Pt ε, (volume : Measure (Qt ε → ℂ)).IsAddHaarMeasure := fun _ => inferInstance
   have h2 : ∀ _ : Pt ε, SigmaFinite (volume : Measure (Qt ε → ℂ)) := fun _ => inferInstance
   have h3 : (volume : Measure (Pt ε → Qt ε → ℂ)).IsAddHaarMeasure := inferInstance
-  calc ∫⁻ g, F g ∂ν
-      ≤ C * ∫⁻ B : Pt ε → Qt ε → ℂ,
-          (∫⁻ k, F (toUJ ε (toMK k * NormedSpace.exp (pOfB ε B))) ∂(muK ε)) *
-            ENNReal.ofReal (Real.exp (n * c * Real.sqrt (hs (pOfB ε B)))) := hpol F hF
+  calc
+    ∫⁻ g, F g ∂ν
+        ≤ C
+          * ∫⁻ B : Pt ε → Qt ε → ℂ,
+            (∫⁻ k, F (toUJ ε (toMK k * NormedSpace.exp (pOfB ε B))) ∂(muK ε)) *
+              ENNReal.ofReal (Real.exp (n * c * Real.sqrt (hs (pOfB ε B)))) :=
+      hpol F hF
     _ ≤ C * ∫⁻ B : Pt ε → Qt ε → ℂ, muK ε Set.univ * ENNReal.ofReal (M * Real.exp (-δ * ‖B‖)) := by
-        exact mul_le_mul_right (lintegral_mono fun B => hpt B) _
-    _ = C * (muK ε Set.univ * (ENNReal.ofReal M *
-          ∫⁻ B : Pt ε → Qt ε → ℂ, ENNReal.ofReal (Real.exp (-δ * ‖B‖)))) := by
-        rw [lintegral_const_mul' _ _ hK]
-        simp_rw [ENNReal.ofReal_mul hM]
-        rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
-    _ < ⊤ := ENNReal.mul_lt_top hC.lt_top (ENNReal.mul_lt_top hK.lt_top
-        (ENNReal.mul_lt_top ENNReal.ofReal_lt_top (lintegral_exp_neg_norm_lt_top _ hδ)))
+      exact mul_le_mul_right (lintegral_mono fun B => hpt B) _
+    _ = C
+        * (muK ε Set.univ
+          * (ENNReal.ofReal M * ∫⁻ B : Pt ε → Qt ε → ℂ, ENNReal.ofReal (Real.exp (-δ * ‖B‖)))) := by
+      rw [lintegral_const_mul' _ _ hK]
+      simp_rw [ENNReal.ofReal_mul hM]
+      rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
+    _ < ⊤ :=
+      ENNReal.mul_lt_top hC.lt_top
+        (ENNReal.mul_lt_top hK.lt_top
+          (ENNReal.mul_lt_top ENNReal.ofReal_lt_top (lintegral_exp_neg_norm_lt_top _ hδ)))
 
-theorem integrable_of_polar {E : Type*} [NormedAddCommGroup E] (hq : 1 ≤ q0 ε)
-    (ν : Measure (UJ ε)) [ν.IsHaarMeasure] (φ : UJ ε → E) (hφ : Continuous φ) {M δ : ℝ}
-    (hM : 0 ≤ M) (hδ : 0 < δ)
-    (hb : ∀ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ), inP ε X →
-      ‖φ (toUJ ε (toMK k * NormedSpace.exp X))‖ ≤
-        M * Real.exp (-(δ + n * Real.sqrt (2 * q0 ε)) * Real.sqrt (hs X))) :
-    Integrable φ ν := by
+theorem integrable_of_polar
+    {E : Type*} [NormedAddCommGroup E]
+    (hq : 1 ≤ q0 ε)
+    (ν : Measure (UJ ε)) [ν.IsHaarMeasure]
+    (φ : UJ ε → E) (hφ : Continuous φ)
+    {M δ : ℝ} (hM : 0 ≤ M) (hδ : 0 < δ)
+    (hb : ∀ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ),
+      inP ε X
+        → ‖φ (toUJ ε (toMK k * NormedSpace.exp X))‖
+          ≤ M * Real.exp (-(δ + n * Real.sqrt (2 * q0 ε)) * Real.sqrt (hs X)))
+    : Integrable φ ν := by
   refine ⟨hφ.aestronglyMeasurable, ?_⟩
-  exact lintegral_lt_top_of_polar hq ν (fun g => ‖φ g‖ₑ) hφ.enorm.measurable hM hδ fun k X hX => by
-    rw [← ofReal_norm]
-    exact ENNReal.ofReal_le_ofReal (hb k X hX)
+  exact lintegral_lt_top_of_polar hq ν
+    (fun g => ‖φ g‖ₑ)
+    hφ.enorm.measurable hM hδ
+    fun k X hX => by
+      rw [← ofReal_norm]
+      exact ENNReal.ofReal_le_ofReal (hb k X hX)
 
 lemma min_bound {h c x : ℝ} (hh : 0 ≤ h) (hc : 0 < c) (hx : 0 ≤ x) :
     -(h / 8) * min x (Real.sqrt x / c) ≤ h / (32 * c ^ 2) + -(h / (8 * c)) * Real.sqrt x := by

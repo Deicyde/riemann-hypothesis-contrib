@@ -13,8 +13,8 @@ namespace PI.OddDualWeyl
 
 namespace MiscB
 
-theorem abel (f : ℕ → ℕ) (hf : ∀ s, f (s + 1) ≤ f s) :
-    ∀ n, ∑ s ∈ Finset.range n, (s + 1) * (f s - f (s + 1)) + n * f n = ∑ s ∈ Finset.range n, f s
+theorem abel (f : ℕ → ℕ) (hf : ∀ s, f (s + 1) ≤ f s)
+    : ∀ n, ∑ s ∈ Finset.range n, (s + 1) * (f s - f (s + 1)) + n * f n = ∑ s ∈ Finset.range n, f s
   | 0 => by simp
   | n + 1 => by
     rw [Finset.sum_range_succ, Finset.sum_range_succ, ← abel f hf n, add_assoc, ← Nat.mul_add,
@@ -37,8 +37,9 @@ theorem degW_eq {k : ℕ} (ν : Fin k → ℕ) (hν : Antitone ν) : degW ν = �
     unfold ext0
     simp
   rw [hk, mul_zero, add_zero] at h
-  have e1 : ∑ s : Fin k, (s.val + 1) * (ν s - nuNext ν s) =
-      ∑ s ∈ Finset.range k, (s + 1) * (ext0 ν s - ext0 ν (s + 1)) := by
+  have e1
+      : ∑ s : Fin k, (s.val + 1) * (ν s - nuNext ν s)
+        = ∑ s ∈ Finset.range k, (s + 1) * (ext0 ν s - ext0 ν (s + 1)) := by
     rw [← Fin.sum_univ_eq_sum_range (fun s => (s + 1) * (ext0 ν s - ext0 ν (s + 1))) k]
     refine Finset.sum_congr rfl fun s _ => ?_
     simp only [ext0, dif_pos s.2]
@@ -52,7 +53,8 @@ theorem degW_eq {k : ℕ} (ν : Fin k → ℕ) (hν : Antitone ν) : degW ν = �
 
 variable {m : ℕ} {lam : Fin (m + 1) → ℤ}
 
-theorem nu_cast (hl : Antitone lam) (t : Fin (m + 1)) : (nuOf lam t : ℤ) = lam t - lam (Fin.last m) := by
+theorem nu_cast (hl : Antitone lam) (t : Fin (m + 1))
+    : (nuOf lam t : ℤ) = lam t - lam (Fin.last m) := by
   unfold nuOf
   exact Int.toNat_of_nonneg (sub_nonneg.2 (hl (Fin.le_last t)))
 
@@ -69,8 +71,9 @@ theorem sum_nu_le (hl : Antitone lam) : ∑ t, nuOf lam t ≤ m * nuOf lam 0 := 
     unfold nuOf
     simp
   rw [hl0, add_zero]
-  calc ∑ t : Fin m, nuOf lam t.castSucc ≤ ∑ _t : Fin m, nuOf lam 0 :=
-        Finset.sum_le_sum fun t _ => nu_anti hl (Fin.zero_le _)
+  calc
+    ∑ t : Fin m, nuOf lam t.castSucc
+      ≤ ∑ _t : Fin m, nuOf lam 0 := Finset.sum_le_sum fun t _ => nu_anti hl (Fin.zero_le _)
     _ = m * nuOf lam 0 := by simp
 
 end MiscB
@@ -84,8 +87,9 @@ theorem degreeBalance : Bk := by
   rw [MiscB.degW_eq _ (MiscB.nu_anti hs), Nat.cast_sub (MiscB.sum_nu_le hl)]
   push_cast
   simp only [MiscB.nu_cast hs, MiscB.nu_cast hl]
-  have hr : ∑ t : Fin (m + 1), (lamStar lam t - lamStar lam (Fin.last m)) =
-      ∑ t : Fin (m + 1), (lam 0 - lam t) := by
+  have hr
+      : ∑ t : Fin (m + 1), (lamStar lam t - lamStar lam (Fin.last m))
+        = ∑ t : Fin (m + 1), (lam 0 - lam t) := by
     unfold lamStar
     rw [Fin.rev_last, ← Equiv.sum_comp Fin.revPerm (fun t => lam 0 - lam t)]
     refine Finset.sum_congr rfl fun t _ => ?_
@@ -94,7 +98,8 @@ theorem degreeBalance : Bk := by
   rw [hr]
   unfold lamStar
   rw [Fin.rev_last]
-  simp only [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  simp only [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+    nsmul_eq_mul]
   push_cast
   ring
 

@@ -6,12 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory.FockAlg
 
-
 open MvPolynomial in
-theorem injective_of_pderiv {V : Type} [AddCommGroup V] [Module ℂ V] {ι : Type}
-    (Φ₀ : MvPolynomial ι ℂ →ₗ[ℂ] V) (d : ι → Module.End ℂ V)
+theorem injective_of_pderiv
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {ι : Type} (Φ₀ : MvPolynomial ι ℂ →ₗ[ℂ] V) (d : ι → Module.End ℂ V)
     (hd : ∀ (i : ι) (p : MvPolynomial ι ℂ), Φ₀ (MvPolynomial.pderiv i p) = d i (Φ₀ p))
-    (h1 : Φ₀ 1 ≠ 0) : Function.Injective Φ₀ := by
+    (h1 : Φ₀ 1 ≠ 0)
+    : Function.Injective Φ₀ := by
   classical
   have hC : ∀ p : MvPolynomial ι ℂ, Φ₀ p = 0 → (∀ m ∈ p.support, m = 0) → p = 0 := by
     intro p hp hs
@@ -27,8 +28,8 @@ theorem injective_of_pderiv {V : Type} [AddCommGroup V] [Module ℂ V] {ι : Typ
     rcases hp with hp | hp
     · rw [e, hp, zero_smul]
     · exact absurd hp h1
-  have key : ∀ n : ℕ, ∀ p : MvPolynomial ι ℂ, (∀ m ∈ p.support, m.degree ≤ n) →
-      Φ₀ p = 0 → p = 0 := by
+  have key
+      : ∀ n : ℕ, ∀ p : MvPolynomial ι ℂ, (∀ m ∈ p.support, m.degree ≤ n) → Φ₀ p = 0 → p = 0 := by
     intro n
     induction n with
     | zero =>
@@ -52,16 +53,19 @@ theorem injective_of_pderiv {V : Type} [AddCommGroup V] [Module ℂ V] {ι : Typ
         by_contra h
         push Not at h
         exact hm0 (Finsupp.ext h)
-      have hle : Finsupp.single i 1 ≤ m := by
-        rw [Finsupp.single_le_iff]; omega
+      have hle : Finsupp.single i 1 ≤ m := by rw [Finsupp.single_le_iff]; omega
       have hc := congrArg (fun q : MvPolynomial ι ℂ => q.coeff (m - Finsupp.single i 1)) (hz i)
-      rw [coeff_pderiv, tsub_add_cancel_of_le hle, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply, mul_eq_zero] at hc
+      rw [coeff_pderiv, tsub_add_cancel_of_le hle, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply,
+          mul_eq_zero]
+        at hc
       rcases hc with hc | hc
       · exact (mem_support_iff.1 hm) hc
       · exact (Nat.cast_add_one_ne_zero _) hc
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro p hp
   exact key (p.support.sup fun m => m.degree) p
-    (fun m hm => Finset.le_sup (f := fun m : ι →₀ ℕ => m.degree) hm) hp
+    (fun m hm => Finset.le_sup (f := fun m : ι →₀ ℕ => m.degree) hm)
+    hp
 
 end GlobalTheory.FockAlg

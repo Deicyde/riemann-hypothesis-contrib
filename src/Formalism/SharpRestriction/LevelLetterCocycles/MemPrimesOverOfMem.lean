@@ -23,7 +23,8 @@ theorem finrank_E_host (D : D7) : Module.finrank ℚ D.host.E = 2 * D.R.f := by
   ring
 
 theorem two_mem_small (D : D7) : 2 ∈ D.host.small :=
-  Nat.mem_primeFactors.2 ⟨Nat.prime_two, (dvd_pow_self 2 (by omega)).trans D.host.tower_dvd, D.host.QS_pos.ne'⟩
+  Nat.mem_primeFactors.2
+    ⟨Nat.prime_two, (dvd_pow_self 2 (by omega)).trans D.host.tower_dvd, D.host.QS_pos.ne'⟩
 
 end
 
@@ -44,25 +45,34 @@ theorem logWeight_nonneg (w : D.what₂.places.Pl) : 0 ≤ SizeData₂.lwP w := 
   apply div_nonneg (Real.log_natCast_nonneg _)
   positivity
 
-
 open Classical in
-theorem etaSum_eq_sum (L : SizeData₂ D) (j : ℕ) :
-    etaSum L j = ∑ l ∈ (L.supp.filter (fun w => D.what₂.muAt w ≠ D.what₂.mu0)).image
-      (fun w => D.what₂.places.resChar w), etaAt L j l := by
+theorem etaSum_eq_sum (L : SizeData₂ D) (j : ℕ)
+    : etaSum L j
+      = ∑ l ∈ (L.supp.filter (fun w => D.what₂.muAt w ≠ D.what₂.mu0)).image
+        (fun w => D.what₂.places.resChar w), etaAt L j l := by
   unfold etaSum etaAt
-  rw [← Finset.sum_fiberwise_of_maps_to (g := fun w => D.what₂.places.resChar w)
-      (t := (L.supp.filter (fun w => D.what₂.muAt w ≠ D.what₂.mu0)).image
-        (fun w => D.what₂.places.resChar w)) (fun w hw => Finset.mem_image_of_mem _ hw)]
+  rw [← Finset.sum_fiberwise_of_maps_to
+    (g := fun w => D.what₂.places.resChar w)
+    (t :=
+      (L.supp.filter (fun w => D.what₂.muAt w ≠ D.what₂.mu0)).image
+        (fun w => D.what₂.places.resChar w))
+    (fun w hw => Finset.mem_image_of_mem _ hw)]
   refine Finset.sum_congr rfl (fun l _ => ?_)
   apply Finset.sum_congr _ (fun _ _ => rfl)
   ext w
   simp [twAt, Finset.mem_filter, and_assoc]
 
-theorem etaAt_le (L : SizeData₂ D) {j : ℕ} (hj : j ∈ SizeData₂.lifts D) {l : ℕ} (hl : l ∉ gset D) {U : ℝ}
-    (hU : 0 ≤ U) (h1 : adm1 D) (h2 : adm2 L) (h3 : adm3 L)
-    (hloc : ∀ i : D.nd.Loc, TwLoc D i → D.nd.l i = l → ∀ π ∈ D.nd.Zgood i,
-      (D.nd.vcc i π : ℝ) + (padicValNat l D.what₂.restRowsFiniteGroupCard : ℝ) ≤ U) :
-    etaAt L j l ≤ Real.log l * ((L.dZ0 j : ℝ) * U) := by
+theorem etaAt_le
+    (L : SizeData₂ D)
+    {j : ℕ} (hj : j ∈ SizeData₂.lifts D)
+    {l : ℕ} (hl : l ∉ gset D)
+    {U : ℝ} (hU : 0 ≤ U)
+    (h1 : adm1 D) (h2 : adm2 L) (h3 : adm3 L)
+    (hloc : ∀ i : D.nd.Loc,
+      TwLoc D i → D.nd.l i = l
+        → ∀ π ∈ D.nd.Zgood i,
+          (D.nd.vcc i π : ℝ) + (padicValNat l D.what₂.restRowsFiniteGroupCard : ℝ) ≤ U)
+    : etaAt L j l ≤ Real.log l * ((L.dZ0 j : ℝ) * U) := by
   classical
   have hjm : 1 ≤ j ∧ j ≤ D.R.m := Finset.mem_Icc.1 hj
   have hw : ∀ w ∈ twAt L l, (D.what₂.etaJ j w : ℝ) ≤ (L.dZ0 j : ℝ) * U := by
@@ -70,31 +80,35 @@ theorem etaAt_le (L : SizeData₂ D) {j : ℕ} (hj : j ∈ SizeData₂.lifts D) 
     obtain ⟨_, htw, hwl⟩ := mem_twAt.1 hw
     rw [D.etaJ_tie j w hjm.1 hjm.2]
     push_cast
-    calc ∑ i ∈ D.nd.locs j w, (D.nd.etaLoc i : ℝ)
-        ≤ ∑ i ∈ D.nd.locs j w, ∑ π ∈ D.nd.Zgood i, (D.nd.mult i π : ℝ) * U := by
-          apply Finset.sum_le_sum
-          intro i hi
-          have hiw := (D.nd.locs_mem j w i).1 hi
-          have hti : TwLoc D i := TwPl.twLoc htw hi
-          have hli : D.nd.l i = l := by rw [← D.nd.w_l i, hiw.2, hwl]
-          refine (h1 i hti (hli ▸ hl)).trans ?_
-          apply Finset.sum_le_sum
-          intro π hπ
-          apply mul_le_mul_of_nonneg_left _ (by positivity)
-          have := hloc i hti hli π hπ
-          rw [hli]
-          exact this
+    calc
+      ∑ i ∈ D.nd.locs j w, (D.nd.etaLoc i : ℝ)
+          ≤ ∑ i ∈ D.nd.locs j w, ∑ π ∈ D.nd.Zgood i, (D.nd.mult i π : ℝ) * U := by
+        apply Finset.sum_le_sum
+        intro i hi
+        have hiw := (D.nd.locs_mem j w i).1 hi
+        have hti : TwLoc D i := TwPl.twLoc htw hi
+        have hli : D.nd.l i = l := by rw [← D.nd.w_l i, hiw.2, hwl]
+        refine (h1 i hti (hli ▸ hl)).trans ?_
+        apply Finset.sum_le_sum
+        intro π hπ
+        apply mul_le_mul_of_nonneg_left _ (by positivity)
+        have := hloc i hti hli π hπ
+        rw [hli]
+        exact this
       _ = U * ∑ i ∈ D.nd.locs j w, ∑ π ∈ D.nd.Zgood i, (D.nd.mult i π : ℝ) := by
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl (fun i _ => ?_)
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl (fun π _ => ?_)
-          ring
-      _ ≤ U * (L.zeroSpaceRankAtPlace j w : ℝ) := mul_le_mul_of_nonneg_left (h2 j hj w htw (hwl ▸ hl)) hU
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun i _ => ?_)
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun π _ => ?_)
+        ring
+      _ ≤ U * (L.zeroSpaceRankAtPlace j w : ℝ) :=
+        mul_le_mul_of_nonneg_left (h2 j hj w htw (hwl ▸ hl)) hU
       _ = (L.dZ0 j : ℝ) * U := by rw [h3 j hj w htw]; ring
   have hdU : 0 ≤ (L.dZ0 j : ℝ) * U := mul_nonneg (by positivity) hU
-  have hsum : etaAt L j l ≤ (∑ w ∈ twAt L l, SizeData₂.lwP w * (D.what₂.places.ramIdx w : ℝ)) *
-      ((L.dZ0 j : ℝ) * U) := by
+  have hsum
+      : etaAt L j l
+        ≤ (∑ w ∈ twAt L l, SizeData₂.lwP w * (D.what₂.places.ramIdx w : ℝ))
+          * ((L.dZ0 j : ℝ) * U) := by
     unfold etaAt
     rw [Finset.sum_mul]
     apply Finset.sum_le_sum
@@ -109,10 +123,15 @@ theorem etaAt_le (L : SizeData₂ D) {j : ℕ} (hj : j ∈ SizeData₂.lifts D) 
     have hlp : l.Prime := (mem_twAt.1 hwm).2.2 ▸ D.what₂.places.resChar_prime w
     exact hsum.trans (mul_le_mul_of_nonneg_right (admissibleMeanCondition_holds L l hlp) hdU)
 
-theorem etaAt_le_g (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (hH : GeneratorPrimeEtaBound L tb C) (h6 : adm6 L tb)
-    {j : ℕ} (hj : j ∈ SizeData₂.lifts D) {l : ℕ} (hl : l ∈ gset D) :
-    etaAt L j l ≤ Real.log l * ((L.dZ0 j : ℝ) *
-      (C * L.sc.x ^ C * L.etaSz + 2 / (l : ℝ) ^ 2 + VVr D l + vhE D l)) := by
+theorem etaAt_le_g
+    (L : SizeData₂ D) (tb : Tab L)
+    (C : ℝ) (hH : GeneratorPrimeEtaBound L tb C)
+    (h6 : adm6 L tb)
+    {j : ℕ} (hj : j ∈ SizeData₂.lifts D)
+    {l : ℕ} (hl : l ∈ gset D)
+    : etaAt L j l
+      ≤ Real.log l
+        * ((L.dZ0 j : ℝ) * (C * L.sc.x ^ C * L.etaSz + 2 / (l : ℝ) ^ 2 + VVr D l + vhE D l)) := by
   obtain ⟨hH1, hH2⟩ := hH j hj l hl
   have hs := h6.2 j hj l hl
   refine hH1.trans ?_
@@ -133,9 +152,11 @@ open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
 
 variable {D : D7}
 
-theorem mem_primesOver_of_mem {E : Type} [Field E] [NumberField E] {l : ℕ} (hl : l.Prime)
-    {v : HeightOneSpectrum (𝓞 E)} (hv : v ∈ placesOver E l) :
-    v.asIdeal ∈ (Ideal.span {(l : ℤ)}).primesOver (𝓞 E) := by
+theorem mem_primesOver_of_mem
+    {E : Type} [Field E] [NumberField E]
+    {l : ℕ} (hl : l.Prime)
+    {v : HeightOneSpectrum (𝓞 E)} (hv : v ∈ placesOver E l)
+    : v.asIdeal ∈ (Ideal.span {(l : ℤ)}).primesOver (𝓞 E) := by
   have : Fact l.Prime := ⟨hl⟩
   have hmax := Int.ideal_span_isMaximal_of_prime l
   have := v.isPrime
@@ -145,15 +166,16 @@ theorem mem_primesOver_of_mem {E : Type} [Field E] [NumberField E] {l : ℕ} (hl
   have hv' : ((l : ℕ) : 𝓞 E) ∈ v.asIdeal := hv
   simpa using hv'
 
-theorem placesOver_finite (E : Type) [Field E] [NumberField E] {l : ℕ} (hl : l.Prime) :
-    (placesOver E l).Finite := by
+theorem placesOver_finite (E : Type) [Field E] [NumberField E] {l : ℕ} (hl : l.Prime)
+    : (placesOver E l).Finite := by
   classical
   have : Fact l.Prime := ⟨hl⟩
   haveI := Int.ideal_span_isMaximal_of_prime l
-  have hfin : ((Ideal.span {(l : ℤ)}).primesOver (𝓞 E)).Finite :=
-    Set.toFinite _
-  have hinj : Set.InjOn (fun v : HeightOneSpectrum (𝓞 E) => v.asIdeal)
-      ((fun v : HeightOneSpectrum (𝓞 E) => v.asIdeal) ⁻¹' ((Ideal.span {(l : ℤ)}).primesOver (𝓞 E))) := by
+  have hfin : ((Ideal.span {(l : ℤ)}).primesOver (𝓞 E)).Finite := Set.toFinite _
+  have hinj : Set.InjOn
+      (fun v : HeightOneSpectrum (𝓞 E) => v.asIdeal)
+      ((fun v : HeightOneSpectrum (𝓞 E) => v.asIdeal)
+        ⁻¹' ((Ideal.span {(l : ℤ)}).primesOver (𝓞 E))) := by
     intro a _ b _ hab
     exact HeightOneSpectrum.ext hab
   exact (hfin.preimage hinj).subset (fun v hv => mem_primesOver_of_mem hl hv)
@@ -165,45 +187,51 @@ theorem nLam_pos (D : D7) (lam : HeightOneSpectrum (𝓞 D.host.E)) : 1 ≤ nLam
   have h2 := Ideal.inertiaDeg_pos lam.asIdeal ℤ
   exact Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero h1.ne' h2.ne')
 
-theorem sum_nLam_le (D : D7) {l : ℕ} (hl : l.Prime) :
-    ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, (nLam D lam : ℝ) ≤ 2 * D.R.f := by
+theorem sum_nLam_le (D : D7) {l : ℕ} (hl : l.Prime)
+    : ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, (nLam D lam : ℝ) ≤ 2 * D.R.f := by
   classical
   have : Fact l.Prime := ⟨hl⟩
   have hsum := Ideal.sum_ramification_inertia_eq_finrank (Ideal.span {(l : ℤ)}) (𝓞 D.host.E)
   rw [RingOfIntegers.rank, finrank_E_host] at hsum
-  have hsum' : ∑ q ∈ ((Ideal.span {(l : ℤ)}).primesOver (𝓞 D.host.E)).toFinset,
-      q.ramificationIdx ℤ * q.inertiaDeg ℤ = 2 * D.R.f := by
+  have hsum'
+      : ∑ q ∈ ((Ideal.span {(l : ℤ)}).primesOver (𝓞 D.host.E)).toFinset,
+          q.ramificationIdx ℤ * q.inertiaDeg ℤ
+        = 2 * D.R.f := by
     rw [← hsum]
-    exact (Finset.sum_set_coe (f := fun q : Ideal (𝓞 D.host.E) => q.ramificationIdx ℤ * q.inertiaDeg ℤ) _).symm
+    exact (Finset.sum_set_coe
+      (f := fun q : Ideal (𝓞 D.host.E) => q.ramificationIdx ℤ * q.inertiaDeg ℤ)
+      _).symm
   set G : Ideal (𝓞 D.host.E) → ℝ := fun q => ((q.ramificationIdx ℤ * q.inertiaDeg ℤ : ℕ) : ℝ) with hG
   set S := (placesOver_finite D.host.E hl).toFinset with hS
   have hinj : Set.InjOn (fun v : HeightOneSpectrum (𝓞 D.host.E) => v.asIdeal) (S : Set _) := by
     intro a _ b _ hab
     exact HeightOneSpectrum.ext hab
-  calc ∑ lam ∈ S, (nLam D lam : ℝ) = ∑ lam ∈ S, G lam.asIdeal := by
-        refine Finset.sum_congr rfl (fun lam _ => ?_)
-        simp [hG, nLam, Formalism.MainNotions.N.locDeg]
+  calc
+    ∑ lam ∈ S, (nLam D lam : ℝ) = ∑ lam ∈ S, G lam.asIdeal := by
+      refine Finset.sum_congr rfl (fun lam _ => ?_)
+      simp [hG, nLam, Formalism.MainNotions.N.locDeg]
     _ = ∑ q ∈ S.image (fun v => v.asIdeal), G q := (Finset.sum_image hinj).symm
     _ ≤ ∑ q ∈ ((Ideal.span {(l : ℤ)}).primesOver (𝓞 D.host.E)).toFinset, G q := by
-        apply Finset.sum_le_sum_of_subset_of_nonneg
-        · intro q hq
-          obtain ⟨v, hv, rfl⟩ := Finset.mem_image.1 hq
-          rw [Set.mem_toFinset]
-          exact mem_primesOver_of_mem hl ((Set.Finite.mem_toFinset _).1 hv)
-        · intro q _ _
-          simp only [hG]
-          positivity
-    _ = 2 * D.R.f := by
+      apply Finset.sum_le_sum_of_subset_of_nonneg
+      · intro q hq
+        obtain ⟨v, hv, rfl⟩ := Finset.mem_image.1 hq
+        rw [Set.mem_toFinset]
+        exact mem_primesOver_of_mem hl ((Set.Finite.mem_toFinset _).1 hv)
+      · intro q _ _
         simp only [hG]
-        rw [← Nat.cast_sum, hsum']
-        push_cast
-        ring
+        positivity
+    _ = 2 * D.R.f := by
+      simp only [hG]
+      rw [← Nat.cast_sum, hsum']
+      push_cast
+      ring
 
-theorem sum_nLam_succ_le (D : D7) {l : ℕ} (hl : l.Prime) :
-    ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, ((nLam D lam : ℝ) + 1) ≤ 4 * D.R.f := by
+theorem sum_nLam_succ_le (D : D7) {l : ℕ} (hl : l.Prime)
+    : ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, ((nLam D lam : ℝ) + 1) ≤ 4 * D.R.f := by
   have h := sum_nLam_le D hl
-  have h2 : ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, ((nLam D lam : ℝ) + 1) ≤
-      ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, (2 * (nLam D lam : ℝ)) := by
+  have h2
+      : ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, ((nLam D lam : ℝ) + 1)
+        ≤ ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, (2 * (nLam D lam : ℝ)) := by
     apply Finset.sum_le_sum
     intro lam _
     have : (1 : ℝ) ≤ nLam D lam := by exact_mod_cast nLam_pos D lam
@@ -211,12 +239,13 @@ theorem sum_nLam_succ_le (D : D7) {l : ℕ} (hl : l.Prime) :
   rw [← Finset.mul_sum] at h2
   linarith
 
-theorem sumOver_eq (D : D7) {l : ℕ} (hl : l.Prime) (f : HeightOneSpectrum (𝓞 D.host.E) → ℝ) :
-    sumOver D l f = ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, f lam :=
+theorem sumOver_eq (D : D7) {l : ℕ} (hl : l.Prime) (f : HeightOneSpectrum (𝓞 D.host.E) → ℝ)
+    : sumOver D l f = ∑ lam ∈ (placesOver_finite D.host.E hl).toFinset, f lam :=
   finsum_mem_eq_finite_toFinset_sum f _
 
-theorem split_or_inert (D : D7) {l : ℕ} (h2 : l ∉ D.host.small) (hq : l ≠ D.host.q) (hd : l ≠ D.host.d) :
-    SplitK D l ∨ InertK D l := by
+theorem split_or_inert
+    (D : D7) {l : ℕ} (h2 : l ∉ D.host.small) (hq : l ≠ D.host.q) (hd : l ≠ D.host.d)
+    : SplitK D l ∨ InertK D l := by
   unfold SplitK InertK Host.cls primeClass
   simp only [h2, hq, hd, if_false]
   split_ifs <;> simp
@@ -237,34 +266,42 @@ section Bound
 
 variable (L : SizeData₂ D) (tb : Tab L) (C : ℝ)
 
-
 open Classical in
 def bandI (l : ℕ) : ℝ :=
-  if ∃ s : ℝ, L.sc.w'' D.R.n ≤ s ∧ s ≤ wB L ∧
-      |(l : ℝ) * s - L.sc.b| ≤ C * (l * eta₃ L + l * L.Sc + L.sc.b / l + s + l * large₂ L) then 1 else 0
+  if ∃ s : ℝ,
+      L.sc.w'' D.R.n ≤ s ∧ s ≤ wB L
+        ∧ |(l : ℝ) * s - L.sc.b| ≤ C * (l * eta₃ L + l * L.Sc + L.sc.b / l + s + l * large₂ L) then
+    1
+  else
+    0
 
 def flatB (l : ℕ) : ℝ := (wP L + eta₃ L) / l + L.Sc + large₂ L + eta₃ L * bandI L C l
 
 def rowBr (l : ℕ) : ℝ :=
   hB L / ((l : ℝ) - 1) ^ (jA L l + 1) + (GP L + 1) * ((jA L l : ℝ) + 1) + large₂ L
 
-
 open Classical in
 def lenB (l : ℕ) : ℝ :=
-  if SplitK D l then (2 * (D.R.f : ℝ) * D.R.m + D.R.f) * eP L C l
-  else if (l : ℝ) < lA L ∧ 4 * D.host.Lw < ordH D l then 4 * (D.R.f : ℝ) * (C * D.R.r * rowBr L l)
-  else 4 * (D.R.f : ℝ) * (C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) +
-    2 * (D.R.f : ℝ) * (C * D.R.m * eP L C l)
+  if SplitK D l then
+    (2 * (D.R.f : ℝ) * D.R.m + D.R.f) * eP L C l
+  else if (l : ℝ) < lA L ∧ 4 * D.host.Lw < ordH D l then
+    4 * (D.R.f : ℝ) * (C * D.R.r * rowBr L l)
+  else
+    4 * (D.R.f : ℝ) * (C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l))
+      + 2 * (D.R.f : ℝ) * (C * D.R.m * eP L C l)
 
 def bbB : ℝ := C * D.R.f * D.R.n * (D.R.t : ℝ) ^ 2 * D.R.nV * (large₂ L) ^ 2
 
-
 open Classical in
 def lamB (l : ℕ) : ℝ :=
-  if l ∈ D.host.small ∨ l = 3 then C * D.R.f * D.R.m * L.sc.b * Real.log L.sc.x + C * L.sc.x ^ C * (large₂ L) ^ 2
-  else if l = D.host.q ∨ l = D.host.d then 2 * C * D.R.f * D.R.m * L.sc.b
-  else if lStar L < l ∧ l ∉ tb.exc then 0
-  else bbB L C + lenB L C l
+  if l ∈ D.host.small ∨ l = 3 then
+    C * D.R.f * D.R.m * L.sc.b * Real.log L.sc.x + C * L.sc.x ^ C * (large₂ L) ^ 2
+  else if l = D.host.q ∨ l = D.host.d then
+    2 * C * D.R.f * D.R.m * L.sc.b
+  else if lStar L < l ∧ l ∉ tb.exc then
+    0
+  else
+    bbB L C + lenB L C l
 
 end Bound
 
@@ -336,8 +373,7 @@ theorem eP_nonneg {C : ℝ} (hC : 0 ≤ C) (l : ℕ) : 0 ≤ eP L C l := by
     exact div_nonneg (Real.log_nonneg (one_le_hB L)) (Real.log_natCast_nonneg l)
   linarith
 
-theorem bandI_nonneg (C : ℝ) (l : ℕ) : 0 ≤ bandI L C l := by
-  unfold bandI; split_ifs <;> norm_num
+theorem bandI_nonneg (C : ℝ) (l : ℕ) : 0 ≤ bandI L C l := by unfold bandI; split_ifs <;> norm_num
 
 theorem flatB_nonneg (C : ℝ) (l : ℕ) : 0 ≤ flatB L C l := by
   unfold flatB
@@ -367,11 +403,15 @@ end Signs
 theorem ge_five {l : ℕ} (hp : l.Prime) (h2 : l ≠ 2) (h3 : l ≠ 3) : 5 ≤ l := by
   by_contra h
   push_neg at h
-  interval_cases l <;> simp_all (config := {decide := true})
+  interval_cases l <;> simp_all (config := { decide := true })
 
-theorem flatCD_le (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (hBand : BandPlaceWeightApproximation L tb C) {i : D.nd.Loc}
-    (hti : TwLoc D i) {lam : HeightOneSpectrum (𝓞 D.host.E)} {l : ℕ} (hlam : lam ∈ placesOver D.host.E l)
-    (hl : l.Prime) : flatCD L tb i lam l ≤ flatB L C l := by
+theorem flatCD_le
+    (L : SizeData₂ D) (tb : Tab L)
+    (C : ℝ) (hBand : BandPlaceWeightApproximation L tb C)
+    {i : D.nd.Loc} (hti : TwLoc D i)
+    {lam : HeightOneSpectrum (𝓞 D.host.E)} {l : ℕ}
+    (hlam : lam ∈ placesOver D.host.E l) (hl : l.Prime)
+    : flatCD L tb i lam l ≤ flatB L C l := by
   classical
   unfold flatCD flatB
   have he := etaP_nonneg L
@@ -385,18 +425,22 @@ theorem flatCD_le (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (hBand : BandPlaceW
     have : 0 ≤ eta₃ L * bandI L C l := mul_nonneg he this
     linarith
 
-theorem loc_le_lamB (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (hC : 0 < C)
-    (h5 : adm5 L tb C) (hA : admA L tb C) (hRowB : admB L tb C) (hCc : MediumInertPrimeLengthBound L tb C) (hD : SmallInertPrimeSmallOrderLengthBound L tb C)
-    (hBand : BandPlaceWeightApproximation L tb C) (hE : LargePrimeLengthVanishing L tb) (hF : SmallPrimeLengthBound L tb C) (hG : RamifiedPrimeLengthBound L tb C)
-    (i : D.nd.Loc) (hti : TwLoc D i) (hlg : D.nd.l i ∉ gset D) :
-    sumOver D (D.nd.l i) (tb.len i) + tb.BB i ≤
-      lamB L tb C (D.nd.l i) := by
+theorem loc_le_lamB
+    (L : SizeData₂ D) (tb : Tab L)
+    (C : ℝ) (hC : 0 < C) (h5 : adm5 L tb C) (hA : admA L tb C) (hRowB : admB L tb C)
+    (hCc : MediumInertPrimeLengthBound L tb C) (hD : SmallInertPrimeSmallOrderLengthBound L tb C)
+    (hBand : BandPlaceWeightApproximation L tb C)
+    (hE : LargePrimeLengthVanishing L tb) (hF : SmallPrimeLengthBound L tb C)
+    (hG : RamifiedPrimeLengthBound L tb C)
+    (i : D.nd.Loc) (hti : TwLoc D i) (hlg : D.nd.l i ∉ gset D)
+    : sumOver D (D.nd.l i) (tb.len i) + tb.BB i ≤ lamB L tb C (D.nd.l i) := by
   classical
   have hp : (D.nd.l i).Prime := (D.nd.lPrime i).out
   set l := D.nd.l i with hl
   have hS := sumOver_eq D hp (tb.len i)
   set T := (placesOver_finite D.host.E hp).toFinset with hT
-  have hmemT : ∀ lam ∈ T, lam ∈ placesOver D.host.E l := fun lam h => (Set.Finite.mem_toFinset _).1 h
+  have hmemT : ∀ lam ∈ T, lam ∈ placesOver D.host.E l := fun lam h =>
+    (Set.Finite.mem_toFinset _).1 h
   have hn := sum_nLam_le D hp
   have hn1 := sum_nLam_succ_le D hp
   have hf0 : (0 : ℝ) ≤ D.R.f := by positivity
@@ -435,19 +479,21 @@ theorem loc_le_lamB (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (hC : 0 < C)
     unfold lenB
     by_cases hsp : SplitK D l
     · rw [if_pos hsp]
-      have ha : 2 * sumOver D l (tb.len i) ≤
-          sumOver D l (fun lam => (2 * (nLam D lam : ℝ) * D.R.m + 1) * eP L C l) :=
+      have ha
+          : 2 * sumOver D l (tb.len i)
+            ≤ sumOver D l (fun lam => (2 * (nLam D lam : ℝ) * D.R.m + 1) * eP L C l) :=
         hA i hti ⟨h5l, hsp, hle, hlg⟩
       rw [hS, sumOver_eq D hp] at ha
-      have : ∑ lam ∈ T, (2 * (nLam D lam : ℝ) * D.R.m + 1) * eP L C l ≤
-          ∑ lam ∈ T, ((2 * D.R.m + 1) * eP L C l) * (nLam D lam : ℝ) := by
+      have : ∑ lam ∈ T, (2 * (nLam D lam : ℝ) * D.R.m + 1) * eP L C l
+          ≤ ∑ lam ∈ T, ((2 * D.R.m + 1) * eP L C l) * (nLam D lam : ℝ) := by
         apply Finset.sum_le_sum
         intro lam _
         have : (1 : ℝ) ≤ nLam D lam := by exact_mod_cast nLam_pos D lam
         nlinarith
       rw [← Finset.mul_sum] at this
-      have h2f : (2 * (D.R.m : ℝ) + 1) * eP L C l * ∑ lam ∈ T, (nLam D lam : ℝ) ≤
-          (2 * (D.R.m : ℝ) + 1) * eP L C l * (2 * D.R.f) :=
+      have h2f
+          : (2 * (D.R.m : ℝ) + 1) * eP L C l * ∑ lam ∈ T, (nLam D lam : ℝ)
+            ≤ (2 * (D.R.m : ℝ) + 1) * eP L C l * (2 * D.R.f) :=
         mul_le_mul_of_nonneg_left hn (by positivity)
       nlinarith
     rw [if_neg hsp]
@@ -456,27 +502,29 @@ theorem loc_le_lamB (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (hC : 0 < C)
     · rw [if_pos hb]
       have hb' := hRowB i hti ⟨hin, hb.1, hb.2, hlg⟩
       have hbr := rowBr_nonneg L (show 2 ≤ l by omega)
-      calc ∑ lam ∈ T, tb.len i lam
-          ≤ ∑ lam ∈ T, (C * D.R.r * rowBr L l) * ((nLam D lam : ℝ) + 1) := by
-            apply Finset.sum_le_sum
-            intro lam hlam
-            have := hb' lam (hmemT lam hlam)
-            unfold rowBr
-            nlinarith
+      calc
+        ∑ lam ∈ T, tb.len i lam ≤ ∑ lam ∈ T, (C * D.R.r * rowBr L l) * ((nLam D lam : ℝ) + 1) := by
+          apply Finset.sum_le_sum
+          intro lam hlam
+          have := hb' lam (hmemT lam hlam)
+          unfold rowBr
+          nlinarith
         _ = (C * D.R.r * rowBr L l) * ∑ lam ∈ T, ((nLam D lam : ℝ) + 1) := by rw [Finset.mul_sum]
         _ ≤ (C * D.R.r * rowBr L l) * (4 * D.R.f) := mul_le_mul_of_nonneg_left hn1 (by positivity)
         _ = 4 * (D.R.f : ℝ) * (C * D.R.r * rowBr L l) := by ring
     · rw [if_neg hb]
-      have hX : ∀ lam ∈ T, tb.len i lam ≤
-          (C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) * ((nLam D lam : ℝ) + 1) +
-            (C * D.R.m * eP L C l) * (nLam D lam : ℝ) := by
+      have hX
+          : ∀ lam ∈ T,
+            tb.len i lam
+              ≤ (C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) * ((nLam D lam : ℝ) + 1)
+                + (C * D.R.m * eP L C l) * (nLam D lam : ℝ) := by
         intro lam hlam
         have hfl := flatCD_le L tb C hBand hti (hmemT lam hlam) hp
         have hCr : 0 ≤ C * ((nLam D lam : ℝ) + 1) * D.R.r := by positivity
         by_cases hc : lA L ≤ l
         · have := hCc i hti ⟨hin, hc, hle, hlg⟩ lam (hmemT lam hlam)
-          have : C * ((nLam D lam : ℝ) + 1) * D.R.r * (hB L / (l : ℝ) ^ 2 + flatCD L tb i lam l) ≤
-              C * ((nLam D lam : ℝ) + 1) * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l) :=
+          have : C * ((nLam D lam : ℝ) + 1) * D.R.r * (hB L / (l : ℝ) ^ 2 + flatCD L tb i lam l)
+              ≤ C * ((nLam D lam : ℝ) + 1) * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l) :=
             mul_le_mul_of_nonneg_left (by linarith) hCr
           nlinarith
         · push_neg at hc
@@ -485,21 +533,23 @@ theorem loc_le_lamB (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (hC : 0 < C)
             push_neg at ho
             exact hb ⟨hc, ho⟩
           have := hD i hti ⟨hin, hc, hord, hlg⟩ lam (hmemT lam hlam)
-          have : C * ((nLam D lam : ℝ) + 1) * D.R.r * flatCD L tb i lam l ≤
-              C * ((nLam D lam : ℝ) + 1) * D.R.r * flatB L C l :=
+          have : C * ((nLam D lam : ℝ) + 1) * D.R.r * flatCD L tb i lam l
+              ≤ C * ((nLam D lam : ℝ) + 1) * D.R.r * flatB L C l :=
             mul_le_mul_of_nonneg_left hfl hCr
           nlinarith
       have hfb := flatB_nonneg L C l
       have hh : 0 ≤ hB L / (l : ℝ) ^ 2 := div_nonneg (by linarith [one_le_hB L]) (by positivity)
-      calc ∑ lam ∈ T, tb.len i lam
-          ≤ ∑ lam ∈ T, ((C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) * ((nLam D lam : ℝ) + 1) +
-            (C * D.R.m * eP L C l) * (nLam D lam : ℝ)) := Finset.sum_le_sum hX
-        _ = (C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) * ∑ lam ∈ T, ((nLam D lam : ℝ) + 1) +
-            (C * D.R.m * eP L C l) * ∑ lam ∈ T, (nLam D lam : ℝ) := by
-            rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum]
-        _ ≤ (C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) * (4 * D.R.f) +
-            (C * D.R.m * eP L C l) * (2 * D.R.f) := by
-            gcongr
+      calc
+        ∑ lam ∈ T, tb.len i lam
+            ≤ ∑ lam ∈ T, ((C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) * ((nLam D lam : ℝ) + 1) +
+              (C * D.R.m * eP L C l) * (nLam D lam : ℝ)) :=
+          Finset.sum_le_sum hX
+        _ = (C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) * ∑ lam ∈ T, ((nLam D lam : ℝ) + 1)
+            + (C * D.R.m * eP L C l) * ∑ lam ∈ T, (nLam D lam : ℝ) := by
+          rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum]
+        _ ≤ (C * D.R.r * (hB L / (l : ℝ) ^ 2 + flatB L C l)) * (4 * D.R.f)
+            + (C * D.R.m * eP L C l) * (2 * D.R.f) := by
+          gcongr
         _ = _ := by ring
 
 end Formalism.MainNotions.TwistedPlaces
@@ -527,13 +577,12 @@ theorem vvTerm_nonneg (D : D7) (l : ℕ) : 0 ≤ vvTerm D l := by
 
 theorem vhE_nonneg (D : D7) (l : ℕ) : 0 ≤ vhE D l := by unfold vhE; positivity
 
-
 open Classical in
 def lamG (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (l : ℕ) : ℝ :=
   if l ∈ gset D then C * L.sc.x ^ C * L.etaSz else lamB L tb C l
 
-theorem lamB_nonneg (L : SizeData₂ D) (tb : Tab L) {C : ℝ} (hC : 0 < C) {l : ℕ} (hl : 2 ≤ l) :
-    0 ≤ lamB L tb C l := by
+theorem lamB_nonneg (L : SizeData₂ D) (tb : Tab L) {C : ℝ} (hC : 0 < C) {l : ℕ} (hl : 2 ≤ l)
+    : 0 ≤ lamB L tb C l := by
   classical
   have hf0 : (0 : ℝ) ≤ D.R.f := by positivity
   have hm0 : (0 : ℝ) ≤ D.R.m := by positivity
@@ -557,13 +606,19 @@ theorem lamB_nonneg (L : SizeData₂ D) (tb : Tab L) {C : ℝ} (hC : 0 < C) {l :
       split_ifs <;> positivity
     linarith
 
-
 open Classical in
-theorem etaSum_le (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (P : ParameterChoice' D L) (hA : AdmT L tb C P)
-    (_hg2 : ∀ l ∈ gset D, l ≠ 2) (hsumm : Summable (vvTerm D)) {j : ℕ} (hj : j ∈ SizeData₂.lifts D) :
-    etaSum L j ≤ (L.dZ0 j : ℝ) * (6 + UpperTheory.KStar.nuBudget D + Real.log (Formalism.MainNotions.N.hE D.host : ℝ) + Real.log (D.what₂.restRowsFiniteGroupCard : ℝ) +
-      ∑ l ∈ (L.supp.filter (fun w => D.what₂.muAt w ≠ D.what₂.mu0)).image
-        (fun w => D.what₂.places.resChar w), Real.log l * lamG L tb C l) + (L.dZ0 j : ℝ) * ∑' l, vvTerm D l := by
+theorem etaSum_le
+    (L : SizeData₂ D) (tb : Tab L)
+    (C : ℝ) (P : ParameterChoice' D L) (hA : AdmT L tb C P)
+    (_hg2 : ∀ l ∈ gset D, l ≠ 2) (hsumm : Summable (vvTerm D))
+    {j : ℕ} (hj : j ∈ SizeData₂.lifts D)
+    : etaSum L j
+      ≤ (L.dZ0 j : ℝ)
+          * (6 + UpperTheory.KStar.nuBudget D + Real.log (Formalism.MainNotions.N.hE D.host : ℝ)
+            + Real.log (D.what₂.restRowsFiniteGroupCard : ℝ)
+            + ∑ l ∈ (L.supp.filter (fun w => D.what₂.muAt w ≠ D.what₂.mu0)).image
+                (fun w => D.what₂.places.resChar w), Real.log l * lamG L tb C l)
+        + (L.dZ0 j : ℝ) * ∑' l, vvTerm D l := by
   classical
   obtain ⟨h1, h2, h3, h4, h5, h6, hRa, hRb, hRc, hRd, hBand, hRe, hExc, hRf, hRg, hRh, hPar⟩ := hA
   have hC : 0 < C := lt_of_lt_of_le P.CLw_pos hPar.1
@@ -616,11 +671,14 @@ theorem etaSum_le (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (P : ParameterChoic
   have hsig : ∑ l ∈ S, Real.log l * sig l ≤ 6 + UpperTheory.KStar.nuBudget D := by
     have hA2 : ∑ l ∈ S, Real.log l / (l : ℝ) ^ 2 ≤ 2 := by
       have := Sums.sum_log_div_sq_le S
-      have heq : S.filter (fun l : ℕ => 2 ≤ l) = S := Finset.filter_true_of_mem (fun l hl => (hSp l hl).two_le)
+      have heq : S.filter (fun l : ℕ => 2 ≤ l) = S :=
+        Finset.filter_true_of_mem (fun l hl => (hSp l hl).two_le)
       rw [heq] at this
       exact this
     have hν := UpperTheory.KStar.sum_nuL_le D S hSp
-    have e : ∑ l ∈ S, Real.log l * sig l = ∑ l ∈ S, nuL D l * Real.log l + 2 * ∑ l ∈ S, Real.log l / (l : ℝ) ^ 2 := by
+    have e
+        : ∑ l ∈ S, Real.log l * sig l
+          = ∑ l ∈ S, nuL D l * Real.log l + 2 * ∑ l ∈ S, Real.log l / (l : ℝ) ^ 2 := by
       rw [Finset.mul_sum, ← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun l _ => by simp only [sig]; ring
     linarith
@@ -635,16 +693,24 @@ theorem etaSum_le (L : SizeData₂ D) (tb : Tab L) (C : ℝ) (P : ParameterChoic
     rw [heq]
     exact Summable.sum_le_tsum S (fun l _ => vvTerm_nonneg D l) hsumm
   have hvh : ∑ l ∈ S, Real.log l * vhE D l ≤ Real.log (Formalism.MainNotions.N.hE D.host : ℝ) := by
-    have := Sums.sum_padicVal_log_le S hSp (Formalism.MainNotions.N.hE D.host) (by
-      unfold Formalism.MainNotions.N.hE NumberField.classNumber; exact Fintype.card_ne_zero)
+    have :=
+      Sums.sum_padicVal_log_le S hSp (Formalism.MainNotions.N.hE D.host)
+        (by unfold Formalism.MainNotions.N.hE NumberField.classNumber; exact Fintype.card_ne_zero)
     refine le_of_eq_of_le (Finset.sum_congr rfl (fun l _ => ?_)) this
-    unfold vhE; ring
+    unfold vhE
+    ring
   have hvG : ∑ l ∈ S, Real.log l * vG l ≤ Real.log (D.what₂.restRowsFiniteGroupCard : ℝ) := by
-    have := Sums.sum_padicVal_log_le S hSp D.what₂.restRowsFiniteGroupCard D.what₂.restRowsFiniteGroupCard_pos.ne'
+    have :=
+      Sums.sum_padicVal_log_le S hSp D.what₂.restRowsFiniteGroupCard
+        D.what₂.restRowsFiniteGroupCard_pos.ne'
     refine le_of_eq_of_le (Finset.sum_congr rfl (fun l _ => ?_)) this
-    simp only [vG]; ring
-  have hsplit : ∑ l ∈ S, Real.log l * U l = ∑ l ∈ S, Real.log l * sig l + ∑ l ∈ S, Real.log l * lamG L tb C l +
-      ∑ l ∈ S, Real.log l * VVo l + ∑ l ∈ S, Real.log l * vhE D l + ∑ l ∈ S, Real.log l * vG l := by
+    simp only [vG]
+    ring
+  have hsplit
+      : ∑ l ∈ S, Real.log l * U l
+        = ∑ l ∈ S, Real.log l * sig l + ∑ l ∈ S, Real.log l * lamG L tb C l
+          + ∑ l ∈ S, Real.log l * VVo l + ∑ l ∈ S, Real.log l * vhE D l
+          + ∑ l ∈ S, Real.log l * vG l := by
     simp only [U, mul_add, Finset.sum_add_distrib]
   rw [hsplit, ← mul_add]
   apply mul_le_mul_of_nonneg_left _ hd0
@@ -685,11 +751,14 @@ lemma pm_mod_of_dvd (l M N : ℕ) (hM : 0 < M) (hMN : M ∣ N) (hN : 0 < N)
     rw [Nat.mod_eq_of_lt hlt] at h3
     omega
 
-theorem rowd_cong (D : D7) (l : ℕ) (hl : Odd l) (hord : ordH D l ≤ 4 * D.host.Lw) :
-    l % Mst D = 1 ∨ l % Mst D = Mst D - 1 := by
+theorem rowd_cong (D : D7) (l : ℕ) (hl : Odd l) (hord : ordH D l ≤ 4 * D.host.Lw)
+    : l % Mst D = 1 ∨ l % Mst D = Mst D - 1 := by
   have hne := Cong.ordPM_nonempty (D.R.e + 2) l hl
-  have hmem : ordH D l ∈ {o : ℕ | 0 < o ∧ ((l : ZMod (2 ^ (D.R.e + 2))) ^ o = 1 ∨
-      (l : ZMod (2 ^ (D.R.e + 2))) ^ o = -1)} := Nat.sInf_mem hne
+  have hmem
+      : ordH D l
+        ∈ {o : ℕ | 0 < o ∧ ((l : ZMod (2 ^ (D.R.e + 2))) ^ o = 1 ∨
+          (l : ZMod (2 ^ (D.R.e + 2))) ^ o = -1)} :=
+    Nat.sInf_mem hne
   obtain ⟨ho, hpm⟩ := hmem
   have key := Cong.pm_one_of_pow (D.R.e + 2) l (ordH D l) hl ho hpm
   have hv : padicValNat 2 (ordH D l) ≤ Nat.log 2 (4 * D.host.Lw) :=
@@ -698,8 +767,8 @@ theorem rowd_cong (D : D7) (l : ℕ) (hl : Odd l) (hord : ordH D l ≤ 4 * D.hos
     unfold Mst; exact Nat.pow_dvd_pow 2 (by omega)
   exact pm_mod_of_dvd l (Mst D) _ (by unfold Mst; positivity) hdvd (by positivity) key
 
-theorem Mst_ge (D : D7) (hV : Nat.log 2 (4 * D.host.Lw) ≤ D.R.e + 2) (hLw : 0 < D.host.Lw) :
-    ((2 ^ D.R.e : ℕ) : ℝ) / D.host.Lw ≤ Mst D := by
+theorem Mst_ge (D : D7) (hV : Nat.log 2 (4 * D.host.Lw) ≤ D.R.e + 2) (hLw : 0 < D.host.Lw)
+    : ((2 ^ D.R.e : ℕ) : ℝ) / D.host.Lw ≤ Mst D := by
   have hpow : 2 ^ Nat.log 2 (4 * D.host.Lw) ≤ 4 * D.host.Lw := Nat.pow_log_le_self 2 (by omega)
   have h1 : Mst D * 2 ^ Nat.log 2 (4 * D.host.Lw) = 4 * 2 ^ D.R.e := by
     unfold Mst; rw [← pow_add, Nat.sub_add_cancel hV, pow_add]; ring

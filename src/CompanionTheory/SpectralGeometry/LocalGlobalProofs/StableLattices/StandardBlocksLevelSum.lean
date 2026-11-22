@@ -14,9 +14,9 @@ open GlobalTheory.CompanionTheory.RgCOBlock
 
 namespace GlobalTheory.CompanionTheory.RgCOBlock
 
-theorem card_lev_lt_succ {n : ℕ} (lev : Fin n → ℕ) (k : ℕ) :
-    (univ.filter fun a => lev a < k + 1).card =
-      (univ.filter fun a => lev a < k).card + (univ.filter fun a => lev a = k).card := by
+theorem card_lev_lt_succ {n : ℕ} (lev : Fin n → ℕ) (k : ℕ)
+    : (univ.filter fun a => lev a < k + 1).card
+      = (univ.filter fun a => lev a < k).card + (univ.filter fun a => lev a = k).card := by
   have hd : Disjoint (univ.filter fun a => lev a < k) (univ.filter fun a => lev a = k) := by
     refine Finset.disjoint_left.2 fun a ha hb => ?_
     simp only [mem_filter, mem_univ, true_and] at ha hb
@@ -27,8 +27,9 @@ theorem card_lev_lt_succ {n : ℕ} (lev : Fin n → ℕ) (k : ℕ) :
   simp only [mem_filter, mem_univ, true_and, mem_union]
   omega
 
-theorem sum_sz_castLE {n M : ℕ} (lev : Fin n → ℕ) : ∀ (k : ℕ) (hk : k ≤ M),
-    ∑ b : Fin k, sz lev M (Fin.castLE hk b) = (univ.filter fun a => lev a < k).card := by
+theorem sum_sz_castLE {n M : ℕ} (lev : Fin n → ℕ)
+    : ∀ (k : ℕ) (hk : k ≤ M),
+      ∑ b : Fin k, sz lev M (Fin.castLE hk b) = (univ.filter fun a => lev a < k).card := by
   intro k
   induction k with
   | zero => intro hk; simp
@@ -37,8 +38,8 @@ theorem sum_sz_castLE {n M : ℕ} (lev : Fin n → ℕ) : ∀ (k : ℕ) (hk : k 
     rw [Fin.sum_univ_castSucc, card_lev_lt_succ, ← ih (by omega)]
     rfl
 
-theorem lt_card_iff {n : ℕ} {lev : Fin n → ℕ} (hm : Monotone lev) (k : ℕ) (a : Fin n) :
-    (a : ℕ) < (univ.filter fun b => lev b < k).card ↔ lev a < k := by
+theorem lt_card_iff {n : ℕ} {lev : Fin n → ℕ} (hm : Monotone lev) (k : ℕ) (a : Fin n)
+    : (a : ℕ) < (univ.filter fun b => lev b < k).card ↔ lev a < k := by
   constructor
   · intro h
     by_contra hn
@@ -58,8 +59,10 @@ theorem lt_card_iff {n : ℕ} {lev : Fin n → ℕ} (hm : Monotone lev) (k : ℕ
     rw [Fin.card_Iic] at this
     omega
 
-theorem lev_stdBlocks {n M : ℕ} (lev : Fin n → ℕ) (h : ∑ i, sz lev M i = n) (hm : Monotone lev)
-    (i : Fin M) (p : Fin (sz lev M i)) : lev (stdBlocks (sz lev M) h ⟨i, p⟩) = (i : ℕ) := by
+theorem lev_stdBlocks
+    {n M : ℕ} (lev : Fin n → ℕ) (h : ∑ i, sz lev M i = n) (hm : Monotone lev) (i : Fin M)
+    (p : Fin (sz lev M i))
+    : lev (stdBlocks (sz lev M) h ⟨i, p⟩) = (i : ℕ) := by
   have hv := stdBlocks_val (sz lev M) h i p
   rw [sum_sz_castLE lev (i : ℕ) i.2.le] at hv
   have hp : (p : ℕ) < (univ.filter fun a => lev a = (i : ℕ)).card := p.2
@@ -72,10 +75,13 @@ theorem lev_stdBlocks {n M : ℕ} (lev : Fin n → ℕ) (h : ∑ i, sz lev M i =
     omega
   omega
 
-theorem stdBlocks_clusters : ∀ (n M : ℕ) (lev : Fin n → ℕ) (h : ∑ i, sz lev M i = n), Monotone lev → (∀ a, lev a < M) →
-    (∀ (i : Fin M) (p : Fin (sz lev M i)), lev (stdBlocks (sz lev M) h ⟨i, p⟩) = (i : ℕ)) ∧
-    ∀ (f : Fin n → ℂ) (i : Fin M), ∑ p : Fin (sz lev M i), f (stdBlocks (sz lev M) h ⟨i, p⟩) =
-      ∑ a ∈ univ.filter (fun a => lev a = (i : ℕ)), f a := by
+theorem stdBlocks_clusters
+    : ∀ (n M : ℕ) (lev : Fin n → ℕ) (h : ∑ i, sz lev M i = n),
+      Monotone lev → (∀ a, lev a < M)
+        → (∀ (i : Fin M) (p : Fin (sz lev M i)), lev (stdBlocks (sz lev M) h ⟨i, p⟩) = (i : ℕ))
+          ∧ ∀ (f : Fin n → ℂ) (i : Fin M),
+            ∑ p : Fin (sz lev M i), f (stdBlocks (sz lev M) h ⟨i, p⟩)
+              = ∑ a ∈ univ.filter (fun a => lev a = (i : ℕ)), f a := by
   intro n M lev h hm _
   refine ⟨lev_stdBlocks lev h hm, fun f i => ?_⟩
   refine Finset.sum_bij (fun p _ => stdBlocks (sz lev M) h ⟨i, p⟩) ?_ ?_ ?_ ?_

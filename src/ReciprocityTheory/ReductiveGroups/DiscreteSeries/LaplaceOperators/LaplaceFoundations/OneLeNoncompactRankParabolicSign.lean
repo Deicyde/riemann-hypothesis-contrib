@@ -12,8 +12,8 @@ namespace ReciprocityTheory.ChartRestriction.DS.Lap.Base
 
 open ReciprocityTheory.ChartRestriction.DS
 
-theorem parEps_eq_false_iff (k r : ℕ) (hk : 1 ≤ k) (b : Fin (2 * r + k + 1)) :
-    parEps k r b = false ↔ k ≤ b.val ∧ (b.val - k) % 2 = 0 := by
+theorem parEps_eq_false_iff (k r : ℕ) (hk : 1 ≤ k) (b : Fin (2 * r + k + 1))
+    : parEps k r b = false ↔ k ≤ b.val ∧ (b.val - k) % 2 = 0 := by
   unfold parEps
   split_ifs with h
   · constructor
@@ -24,17 +24,18 @@ theorem parEps_eq_false_iff (k r : ℕ) (hk : 1 ≤ k) (b : Fin (2 * r + k + 1))
   · simp only [decide_eq_false_iff_not]
     omega
 
-theorem parEps_true_of_lt (k r : ℕ) (hk : 1 ≤ k) (b : Fin (2 * r + k + 1)) (hb : b.val < k) :
-    parEps k r b = true := by
+theorem parEps_true_of_lt (k r : ℕ) (hk : 1 ≤ k) (b : Fin (2 * r + k + 1)) (hb : b.val < k)
+    : parEps k r b = true := by
   cases h : parEps k r b
   · exact absurd ((parEps_eq_false_iff k r hk b).1 h).1 (by omega)
   · rfl
 
-theorem card_parEps_false (k r : ℕ) (hk : 1 ≤ k) :
-    (univ.filter fun b : Fin (2 * r + k + 1) => parEps k r b = false).card = r + 1 := by
-  have e : (univ.filter fun b : Fin (2 * r + k + 1) => parEps k r b = false) =
-      (univ : Finset (Fin (r + 1))).image
-        (fun i => (⟨k + 2 * i.val, by have := i.isLt; omega⟩ : Fin (2 * r + k + 1))) := by
+theorem card_parEps_false (k r : ℕ) (hk : 1 ≤ k)
+    : (univ.filter fun b : Fin (2 * r + k + 1) => parEps k r b = false).card = r + 1 := by
+  have e
+      : (univ.filter fun b : Fin (2 * r + k + 1) => parEps k r b = false)
+        = (univ : Finset (Fin (r + 1))).image
+          (fun i => (⟨k + 2 * i.val, by have := i.isLt; omega⟩ : Fin (2 * r + k + 1))) := by
     ext b
     simp only [mem_filter, mem_univ, true_and, mem_image, parEps_eq_false_iff k r hk]
     constructor
@@ -63,11 +64,12 @@ theorem one_le_noncompactRank_parabolicSign (k r : ℕ) (hk : 1 ≤ k) : 1 ≤ S
     rw [card_parEps_false k r hk]
     omega
 
-theorem rhoN_parEps (k r : ℕ) (hk : 1 ≤ k) (a : Fin (2 * r + k + 1)) (ha : a.val < k) :
-    rhoN (parEps k r) a = ((r : ℝ) + 1) / 2 := by
+theorem rhoN_parEps (k r : ℕ) (hk : 1 ≤ k) (a : Fin (2 * r + k + 1)) (ha : a.val < k)
+    : rhoN (parEps k r) a = ((r : ℝ) + 1) / 2 := by
   have hea := parEps_true_of_lt k r hk a ha
-  have e1 : (univ.filter fun b => a < b ∧ parEps k r b ≠ parEps k r a) =
-      univ.filter fun b : Fin (2 * r + k + 1) => parEps k r b = false := by
+  have e1
+      : (univ.filter fun b => a < b ∧ parEps k r b ≠ parEps k r a)
+        = univ.filter fun b : Fin (2 * r + k + 1) => parEps k r b = false := by
     ext b
     simp only [mem_filter, mem_univ, true_and, hea, ne_eq, Bool.not_eq_true]
     constructor
@@ -85,15 +87,17 @@ theorem rhoN_parEps (k r : ℕ) (hk : 1 ≤ k) (a : Fin (2 * r + k + 1)) (ha : a
   push_cast
   ring
 
-theorem rhoC_parEps (k r : ℕ) (hk : 1 ≤ k) (a : Fin (2 * r + k + 1)) (ha : a.val < k) :
-    rhoC (parEps k r) a = ((r : ℝ) + k - 1 - 2 * (a.val : ℝ)) / 2 := by
+theorem rhoC_parEps (k r : ℕ) (hk : 1 ≤ k) (a : Fin (2 * r + k + 1)) (ha : a.val < k)
+    : rhoC (parEps k r) a = ((r : ℝ) + k - 1 - 2 * (a.val : ℝ)) / 2 := by
   have hea := parEps_true_of_lt k r hk a ha
-  have e1 : (univ.filter fun b => a < b ∧ parEps k r b = parEps k r a) =
-      (Ioi a).filter fun b => parEps k r b = true := by
+  have e1
+      : (univ.filter fun b => a < b ∧ parEps k r b = parEps k r a)
+        = (Ioi a).filter fun b => parEps k r b = true := by
     ext b
     simp only [mem_filter, mem_univ, true_and, mem_Ioi, hea]
-  have e3 : ((Ioi a).filter fun b => ¬ parEps k r b = true) =
-      univ.filter fun b : Fin (2 * r + k + 1) => parEps k r b = false := by
+  have e3
+      : ((Ioi a).filter fun b => ¬ parEps k r b = true)
+        = univ.filter fun b : Fin (2 * r + k + 1) => parEps k r b = false := by
     ext b
     simp only [mem_filter, mem_univ, true_and, mem_Ioi, Bool.not_eq_true]
     constructor
@@ -111,8 +115,9 @@ theorem rhoC_parEps (k r : ℕ) (hk : 1 ≤ k) (a : Fin (2 * r + k + 1)) (ha : a
       exact ⟨hb, parEps_true_of_lt k r hk b (by omega)⟩
   have hsum := card_filter_add_card_filter_not (s := Ioi a) (p := fun b => parEps k r b = true)
   rw [e3, card_parEps_false k r hk, Fin.card_Ioi] at hsum
-  have hC : ((univ.filter fun b => a < b ∧ parEps k r b = parEps k r a).card : ℝ) =
-      (r : ℝ) + k - 1 - (a.val : ℝ) := by
+  have hC
+      : ((univ.filter fun b => a < b ∧ parEps k r b = parEps k r a).card : ℝ)
+        = (r : ℝ) + k - 1 - (a.val : ℝ) := by
     rw [e1]
     have := a.isLt
     have h2 : ((Ioi a).filter fun b => parEps k r b = true).card + a.val + 1 = r + k := by omega
@@ -123,8 +128,10 @@ theorem rhoC_parEps (k r : ℕ) (hk : 1 ≤ k) (a : Fin (2 * r + k + 1)) (ha : a
   rw [hC, e2, Fin.card_Iio]
   ring
 
-theorem u_strictAnti (k r : ℕ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ)
-    (hI : Interlaces k r u v b) : StrictAnti u := by
+theorem u_strictAnti
+    (k r : ℕ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ)
+    (hI : Interlaces k r u v b)
+    : StrictAnti u := by
   have step : ∀ (i j : Fin k), j.val = i.val + 1 → u j < u i := by
     intro i j hij
     have hi : i.val < k - 1 := by have := j.isLt; omega
@@ -145,9 +152,10 @@ theorem u_strictAnti (k r : ℕ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ) (
   have : i.val < j.val := hij
   exact gen (j.val - i.val - 1) i j (by omega)
 
-theorem u_isHCParam (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
-    (b : Fin (2 * r + 2) → ℝ) (hP : IsHCPar (parLam k r v b)) (hI : Interlaces k r u v b)
-    (hH : HalfInts k r u v b) : Formalism.QuantumDeterminants.IsHCParam u := by
+theorem u_isHCParam
+    (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ)
+    (hP : IsHCPar (parLam k r v b)) (hI : Interlaces k r u v b) (hH : HalfInts k r u v b)
+    : Formalism.QuantumDeterminants.IsHCParam u := by
   refine ⟨u_strictAnti k r u v b hI, fun i => ?_⟩
   let s : Fin (2 * r + k + 1) := ⟨0, by omega⟩
   obtain ⟨m1, hm1⟩ := hH i s
@@ -156,9 +164,10 @@ theorem u_isHCParam (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (v : Fin (k -
   push_cast at hm2 ⊢
   linarith
 
-theorem lamT_eq_sub (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t : ℕ)
-    (a : Fin (2 * r + k + 1)) :
-    lamT k r u b t a = lamT k r u b 0 a - ((a.val + 1 - k : ℕ) : ℝ) * (t : ℝ) := by
+theorem lamT_eq_sub
+    (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ)
+    (t : ℕ) (a : Fin (2 * r + k + 1))
+    : lamT k r u b t a = lamT k r u b 0 a - ((a.val + 1 - k : ℕ) : ℝ) * (t : ℝ) := by
   unfold lamT
   split_ifs with h
   · have : a.val + 1 - k = 0 := by omega
@@ -168,17 +177,20 @@ theorem lamT_eq_sub (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (b : Fin (2 *
     rw [e]
     simp
 
-theorem lamT_eq_parLam (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
-    (b : Fin (2 * r + 2) → ℝ) (t : ℕ) (a : Fin (2 * r + k + 1)) (ha : k ≤ a.val) :
-    lamT k r u b t a = parLam k r v b a - ((a.val + 1 - k : ℕ) : ℝ) * (t : ℝ) := by
+theorem lamT_eq_parLam
+    (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ)
+    (t : ℕ)
+    (a : Fin (2 * r + k + 1)) (ha : k ≤ a.val)
+    : lamT k r u b t a = parLam k r v b a - ((a.val + 1 - k : ℕ) : ℝ) * (t : ℝ) := by
   unfold lamT parLam
   rw [dite_eq_right (by omega), dite_eq_right (by omega)]
   have : a.val - (k - 1) = a.val + 1 - k := by omega
   have e : ((a.val - (k - 1) : ℕ) : ℝ) = ((a.val + 1 - k : ℕ) : ℝ) := by rw [this]
   rw [e]
 
-theorem lowK_lamT_affine (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t : ℕ) :
-    lowK (parEps k r) (lamT k r u b t) = (t : ℝ) • dNode k r + lowK (parEps k r) (lamT k r u b 0) := by
+theorem lowK_lamT_affine (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t : ℕ)
+    : lowK (parEps k r) (lamT k r u b t)
+      = (t : ℝ) • dNode k r + lowK (parEps k r) (lamT k r u b 0) := by
   funext a
   simp only [lowK, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
   rw [lamT_eq_sub k r hk u b t a]
@@ -192,34 +204,47 @@ theorem lowK_lamT_affine (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (b : Fin
   rw [hd]
   ring
 
-theorem lowK_lamT_first (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t : ℕ)
-    (a : Fin k) :
-    lowK (parEps k r) (lamT k r u b t) ⟨a.val, by omega⟩ = Formalism.QuantumDeterminants.lowK (Formalism.MainNotions.S.allPos k) u a := by
+theorem lowK_lamT_first
+    (k r : ℕ) (hk : 1 ≤ k) (u : Fin k → ℝ) (b : Fin (2 * r + 2) → ℝ) (t : ℕ) (a : Fin k)
+    : lowK (parEps k r) (lamT k r u b t) ⟨a.val, by omega⟩
+      = Formalism.QuantumDeterminants.lowK (Formalism.MainNotions.S.allPos k) u a := by
   have ha : (⟨a.val, by omega⟩ : Fin (2 * r + k + 1)).val < k := a.isLt
   have hN0 : Formalism.REAL.rhoN (Formalism.MainNotions.S.allPos k) a = 0 := by
     simp [Formalism.REAL.rhoN, Formalism.MainNotions.S.allPos]
-  have e1 : (univ.filter fun b : Fin k => a < b ∧ Formalism.MainNotions.S.allPos k b = Formalism.MainNotions.S.allPos k a) =
-      Ioi a := by
+  have e1
+      : (univ.filter fun b : Fin k =>
+          a < b ∧ Formalism.MainNotions.S.allPos k b = Formalism.MainNotions.S.allPos k a)
+        = Ioi a := by
     ext b; simp [Formalism.MainNotions.S.allPos]
-  have e2 : (univ.filter fun b : Fin k => b < a ∧ Formalism.MainNotions.S.allPos k b = Formalism.MainNotions.S.allPos k a) =
-      Iio a := by
+  have e2
+      : (univ.filter fun b : Fin k =>
+          b < a ∧ Formalism.MainNotions.S.allPos k b = Formalism.MainNotions.S.allPos k a)
+        = Iio a := by
     ext b; simp [Formalism.MainNotions.S.allPos]
-  have hC0 : Formalism.REAL.rhoC (Formalism.MainNotions.S.allPos k) a = (((k : ℝ) - 1) - 2 * (a.val : ℝ)) / 2 := by
+  have hC0
+      : Formalism.REAL.rhoC (Formalism.MainNotions.S.allPos k) a
+        = (((k : ℝ) - 1) - 2 * (a.val : ℝ)) / 2 := by
     have hc : ((k - 1 - (a : ℕ) : ℕ) : ℝ) = (k : ℝ) - 1 - (a : ℕ) := by
       have := a.2
-      rw [Nat.cast_sub (by omega), Nat.cast_sub hk]; simp
+      rw [Nat.cast_sub (by omega), Nat.cast_sub hk]
+      simp
     unfold Formalism.REAL.rhoC
     rw [e1, e2, Fin.card_Ioi, Fin.card_Iio, hc]
     ring
   simp only [lowK, Formalism.QuantumDeterminants.lowK, Pi.add_apply, Pi.sub_apply]
   rw [rhoN_parEps k r hk _ ha, rhoC_parEps k r hk _ ha, hN0, hC0]
-  simp only [lamT, a.isLt, ↓reduceDIte]
+  simp only [lamT, a.isLt, ↓ reduceDIte]
   ring
 
 theorem lamT_facts : LamTStatement := by
   intro k r u v b hk hP hI hH
-  refine ⟨u_isHCParam k r hk u v b hP hI hH, one_le_noncompactRank_parabolicSign k r hk,
-    fun t => lowK_lamT_affine k r hk u b t, fun t a => lowK_lamT_first k r hk u b t a, ?_⟩
+  refine ⟨
+    u_isHCParam k r hk u v b hP hI hH,
+    one_le_noncompactRank_parabolicSign k r hk,
+    fun t => lowK_lamT_affine k r hk u b t,
+    fun t a => lowK_lamT_first k r hk u b t a,
+    ?_
+  ⟩
   set B : ℝ := ∑ a, |lamT k r u b 0 a| with hB
   have hBa : ∀ a, |lamT k r u b 0 a| ≤ B := fun a =>
     single_le_sum (f := fun a => |lamT k r u b 0 a|) (fun i _ => abs_nonneg _) (mem_univ a)
@@ -230,8 +255,9 @@ theorem lamT_facts : LamTStatement := by
     lt_of_lt_of_le ht₀ (by exact_mod_cast ht)
   have hNa := le_abs_self (hNeed (parEps k r))
   have hNb := abs_nonneg (hNeed (parEps k r))
-  have key : ∀ a c : Fin (2 * r + k + 1), a.val + 1 - k < c.val + 1 - k →
-      (t : ℝ) / 2 ≤ lamT k r u b t a - lamT k r u b t c := by
+  have key
+      : ∀ a c : Fin (2 * r + k + 1),
+        a.val + 1 - k < c.val + 1 - k → (t : ℝ) / 2 ≤ lamT k r u b t a - lamT k r u b t c := by
     intro a c hac
     rw [lamT_eq_sub k r hk u b t a, lamT_eq_sub k r hk u b t c]
     have h1 : ((a.val + 1 - k : ℕ) : ℝ) + 1 ≤ ((c.val + 1 - k : ℕ) : ℝ) := by exact_mod_cast hac
@@ -245,7 +271,7 @@ theorem lamT_facts : LamTStatement := by
     by_cases hc : c.val < k
     · have ha : a.val < k := by omega
       have hu := u_strictAnti k r u v b hI (show (⟨a.val, ha⟩ : Fin k) < ⟨c.val, hc⟩ from hac')
-      simp only [lamT, ha, hc, ↓reduceDIte]
+      simp only [lamT, ha, hc, ↓ reduceDIte]
       linarith
     · have := key a c (by omega)
       linarith
@@ -254,7 +280,7 @@ theorem lamT_facts : LamTStatement := by
     · obtain ⟨m1, hm1⟩ := hH ⟨a.val, ha⟩ a
       obtain ⟨m2, hm2⟩ := hP.2 a
       refine ⟨m1 + m2, ?_⟩
-      simp only [lamT, ha, ↓reduceDIte]
+      simp only [lamT, ha, ↓ reduceDIte]
       push_cast at hm2 ⊢
       linarith
     · obtain ⟨m2, hm2⟩ := hP.2 a

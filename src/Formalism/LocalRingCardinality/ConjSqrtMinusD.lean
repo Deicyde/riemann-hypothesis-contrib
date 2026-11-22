@@ -11,12 +11,12 @@ open NumberField
 
 variable {R : Ranks}
 
-theorem Host.sqrtMinusD_sq (H : Host R) : H.sqrtMinusD ^ 2 = -(H.d : H.E) := by
-  exact H.sqd_sq
+theorem Host.sqrtMinusD_sq (H : Host R) : H.sqrtMinusD ^ 2 = -(H.d : H.E) := by exact H.sqd_sq
 
 theorem Host.conj_sqrtMinusD (H : Host R) : H.conj H.sqrtMinusD = -H.sqrtMinusD := by
   apply H.φ₀.injective
-  have h1 : H.φ₀ (H.conj H.sqrtMinusD) = starRingEnd ℂ (H.φ₀ H.sqrtMinusD) := H.conjE_apply H.φ₀ H.sqrtMinusD
+  have h1 : H.φ₀ (H.conj H.sqrtMinusD) = starRingEnd ℂ (H.φ₀ H.sqrtMinusD) :=
+    H.conjE_apply H.φ₀ H.sqrtMinusD
   rw [h1, map_neg]
   set z := H.φ₀ H.sqrtMinusD
   have hz : z ^ 2 = -(H.d : ℂ) := by rw [← map_pow, H.sqrtMinusD_sq]; simp
@@ -40,8 +40,11 @@ theorem Host.exists_trace_one (H : Host R) : ∃ c : 𝓞 H.E, (c : H.E) + H.con
     have hs := H.sqrtMinusD_sq
     simp only [c]
     linear_combination (1 / 4 : H.E) * hs - (1 / 4 : H.E) * e
-  have hint : IsIntegral ℤ c := ⟨Polynomial.X ^ 2 - Polynomial.X + Polynomial.C (m : ℤ), by monicity!, by
-    simp [Polynomial.eval₂_sub, Polynomial.eval₂_add, hc]⟩
+  have hint : IsIntegral ℤ c := ⟨
+    Polynomial.X ^ 2 - Polynomial.X + Polynomial.C (m : ℤ),
+    by monicity!,
+    by simp [Polynomial.eval₂_sub, Polynomial.eval₂_add, hc]
+  ⟩
   refine ⟨⟨c, hint⟩, ?_⟩
   show c + H.conj c = 1
   simp only [c, map_div₀, map_add (f := _), map_one, H.conj_sqrtMinusD, map_ofNat]

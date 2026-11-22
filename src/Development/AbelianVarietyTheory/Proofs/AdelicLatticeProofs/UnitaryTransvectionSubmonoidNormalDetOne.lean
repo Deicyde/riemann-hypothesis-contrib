@@ -12,41 +12,56 @@ open scoped TensorProduct
 
 namespace GlobalTheory.UTrans
 
-theorem IsU.transpose_mul_mul_map {R : Type} [CommRing R] {n : ℕ} {σ : R →+* R}
-    {G γ : Matrix (Fin n) (Fin n) R} (h : IsU σ G γ) : γᵀ * G * γ.map σ = G := by
+theorem IsU.transpose_mul_mul_map
+    {R : Type} [CommRing R] {n : ℕ} {σ : R →+* R} {G γ : Matrix (Fin n) (Fin n) R} (h : IsU σ G γ)
+    : γᵀ * G * γ.map σ = G := by
   ext a b
   have h1 := h (Pi.single a 1) (Pi.single b 1)
   have h2 : hf σ G (Pi.single a 1) (Pi.single b 1) = G a b := by
     simp [hf, Pi.single_apply, apply_ite σ]
   rw [h2] at h1
   rw [← h1]
-  simp only [hf, Matrix.mulVec_single_one, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply,
-    Matrix.col_apply, Finset.sum_mul]
+  simp only [hf, Matrix.mulVec_single_one, Matrix.mul_apply, Matrix.transpose_apply,
+    Matrix.map_apply, Matrix.col_apply, Finset.sum_mul]
   exact Finset.sum_comm
 
-theorem IsU.det_mul_conj_det {E : Type} [Field E] {n : ℕ} {σ : E →+* E}
-    {G γ : Matrix (Fin n) (Fin n) E} (hG : G.det ≠ 0) (h : IsU σ G γ) : γ.det * σ γ.det = 1 := by
+theorem IsU.det_mul_conj_det
+    {E : Type} [Field E]
+    {n : ℕ} {σ : E →+* E} {G γ : Matrix (Fin n) (Fin n) E} (hG : G.det ≠ 0) (h : IsU σ G γ)
+    : γ.det * σ γ.det = 1 := by
   have h1 := congrArg Matrix.det h.transpose_mul_mul_map
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose] at h1
-  have h2 : (γ.map σ).det = σ γ.det := by
-    rw [RingHom.map_det]; rfl
+  have h2 : (γ.map σ).det = σ γ.det := by rw [RingHom.map_det]; rfl
   rw [h2] at h1
   apply mul_left_cancel₀ hG
   linear_combination h1
 
-theorem IsU.nonsing_inv {E : Type} [Field E] {n : ℕ} {σ : E →+* E}
-    {G γ : Matrix (Fin n) (Fin n) E} (hG : G.det ≠ 0) (h : IsU σ G γ) : IsU σ G γ⁻¹ := by
+theorem IsU.nonsing_inv
+    {E : Type} [Field E]
+    {n : ℕ} {σ : E →+* E} {G γ : Matrix (Fin n) (Fin n) E} (hG : G.det ≠ 0) (h : IsU σ G γ)
+    : IsU σ G γ⁻¹ := by
   have hu : IsUnit γ.det := IsUnit.of_mul_eq_one _ (h.det_mul_conj_det hG)
   intro x y
   rw [← h, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hu,
     Matrix.one_mulVec, Matrix.one_mulVec]
 
-theorem tvGen_normal : ∀ (E : Type) [Field E] [CharZero E] (n : ℕ) (σ : E →+* E) (G : Matrix (Fin n) (Fin n) E), IsHerm σ G → (∀ γ, IsU σ G γ → γ.det * σ γ.det = 1 ∧ IsU σ G γ⁻¹) ∧ (∀ m ∈ TvGen σ G, IsU σ G m ∧ m.det = 1 ∧ m⁻¹ ∈ TvGen σ G ∧ ∀ γ, IsU σ G γ → ∃ m' ∈ TvGen σ G, γ * m = m' * γ ∧ ∃ m'' ∈ TvGen σ G, m * γ = γ * m'') := by
+theorem tvGen_normal
+    : ∀ (E : Type) [Field E] [CharZero E] (n : ℕ) (σ : E →+* E) (G : Matrix (Fin n) (Fin n) E),
+      IsHerm σ G
+        → (∀ γ, IsU σ G γ → γ.det * σ γ.det = 1 ∧ IsU σ G γ⁻¹)
+          ∧ (∀ m ∈ TvGen σ G,
+            IsU σ G m ∧ m.det = 1 ∧ m⁻¹ ∈ TvGen σ G
+              ∧ ∀ γ,
+                IsU σ G γ
+                  → ∃ m' ∈ TvGen σ G, γ * m = m' * γ ∧ ∃ m'' ∈ TvGen σ G, m * γ = γ * m'') := by
   intro E _ _ n σ G hG
-  obtain ⟨-, -, hmul, hdet, hU, hconj, -, hUmul⟩ := GlobalTheory.T.transvection_identities_unitary E n σ G hG.invol hG.herm
+  obtain ⟨-, -, hmul, hdet, hU, hconj, -, hUmul⟩ :=
+    GlobalTheory.T.transvection_identities_unitary E n σ G hG.invol hG.herm
   refine ⟨fun γ h => ⟨h.det_mul_conj_det hG.det_ne, h.nonsing_inv hG.det_ne⟩, ?_⟩
-  have key : ∀ m ∈ TvGen σ G, IsU σ G m ∧ m.det = 1 ∧ m⁻¹ ∈ TvGen σ G ∧
-      ∀ γ, IsU σ G γ → ∃ m' ∈ TvGen σ G, γ * m = m' * γ := by
+  have key
+      : ∀ m ∈ TvGen σ G,
+        IsU σ G m ∧ m.det = 1 ∧ m⁻¹ ∈ TvGen σ G
+          ∧ ∀ γ, IsU σ G γ → ∃ m' ∈ TvGen σ G, γ * m = m' * γ := by
     intro m hm
     induction hm using Submonoid.closure_induction with
     | mem m hm =>
@@ -59,10 +74,18 @@ theorem tvGen_normal : ∀ (E : Type) [Field E] [CharZero E] (n : ℕ) (σ : E �
         rw [Matrix.inv_eq_right_inv h1]
         exact Submonoid.subset_closure ⟨x, -t, hx, by rw [map_neg]; linear_combination -ht, rfl⟩
       · intro γ hγ
-        exact ⟨tv σ G (γ *ᵥ x) t, Submonoid.subset_closure ⟨_, t, by rw [hγ, hx], ht, rfl⟩,
-          hconj γ x t hγ⟩
+        exact ⟨
+          tv σ G (γ *ᵥ x) t,
+          Submonoid.subset_closure ⟨_, t, by rw [hγ, hx], ht, rfl⟩,
+          hconj γ x t hγ
+        ⟩
     | one =>
-      refine ⟨fun x y => by simp, by simp, by rw [inv_one]; exact one_mem _, fun γ _ => ⟨1, one_mem _, by simp⟩⟩
+      refine ⟨
+        fun x y => by simp,
+        by simp,
+        by rw [inv_one]; exact one_mem _,
+        fun γ _ => ⟨1, one_mem _, by simp⟩
+      ⟩
     | mul a b _ _ ha hb =>
       obtain ⟨ha1, ha2, ha3, ha4⟩ := ha
       obtain ⟨hb1, hb2, hb3, hb4⟩ := hb
@@ -79,9 +102,9 @@ theorem tvGen_normal : ∀ (E : Type) [Field E] [CharZero E] (n : ℕ) (σ : E �
   obtain ⟨m'', hm'', e'⟩ := h4 γ⁻¹ (hγ.nonsing_inv hG.det_ne)
   have hu : IsUnit γ.det := IsUnit.of_mul_eq_one _ (hγ.det_mul_conj_det hG.det_ne)
   refine ⟨m', hm', e, m'', hm'', ?_⟩
-  calc m * γ = γ * (γ⁻¹ * m) * γ := by
-        rw [← mul_assoc, Matrix.mul_nonsing_inv _ hu, one_mul]
-    _ = γ * m'' := by
-        rw [e', mul_assoc, mul_assoc, Matrix.nonsing_inv_mul _ hu, mul_one]
+  calc
+    m * γ
+      = γ * (γ⁻¹ * m) * γ := by rw [← mul_assoc, Matrix.mul_nonsing_inv _ hu, one_mul]
+    _ = γ * m'' := by rw [e', mul_assoc, mul_assoc, Matrix.nonsing_inv_mul _ hu, mul_one]
 
 end GlobalTheory.UTrans

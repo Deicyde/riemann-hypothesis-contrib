@@ -16,9 +16,10 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.ModelS
 
-theorem DR_one_of_eqv (n : ℕ) (lev : Fin n → ℕ) (f h : SmF n) (_hf : f ∈ Eqv lev f.1) (_hf1 : f.1 1 = 1)
-    (hh : h ∈ Eqv lev f.1) (X : Mat n) (hX : ∀ a b, lev a < lev b → X a b = 0) :
-    (DR X h).1 1 = (DR X f).1 1 * h.1 1 := by
+theorem DR_one_of_eqv
+    (n : ℕ) (lev : Fin n → ℕ) (f h : SmF n) (_hf : f ∈ Eqv lev f.1) (_hf1 : f.1 1 = 1)
+    (hh : h ∈ Eqv lev f.1) (X : Mat n) (hX : ∀ a b, lev a < lev b → X a b = 0)
+    : (DR X h).1 1 = (DR X f).1 1 * h.1 1 := by
   have h1 : (1 : Mat n) ∈ GLs n := by simp [GLs]
   have dh := (GlobalTheory.CompanionTheory.RCalc.differentiableAt_of_smooth h.2.1 h1).hasFDerivAt
   have df := (GlobalTheory.CompanionTheory.RCalc.differentiableAt_of_smooth f.2.1 h1).hasFDerivAt
@@ -34,8 +35,9 @@ theorem DR_one_of_eqv (n : ℕ) (lev : Fin n → ℕ) (f h : SmF n) (_hf : f ∈
       have hm : (1 : Mat n) + (0 : ℝ) • X = 1 := by simp
       rw [hm]
       exact GlobalTheory.CompanionTheory.RCalc.isOpen_GLs.mem_nhds h1)
-  have heq : (h.1 ∘ fun t : ℝ => (1 : Mat n) + t • X) =ᶠ[nhds 0]
-      fun t => (f.1 ∘ fun t : ℝ => (1 : Mat n) + t • X) t * h.1 1 := by
+  have heq
+      : (h.1 ∘ fun t : ℝ => (1 : Mat n) + t • X) =ᶠ[nhds 0]
+        fun t => (f.1 ∘ fun t : ℝ => (1 : Mat n) + t • X) t * h.1 1 := by
     filter_upwards [hev] with t ht
     have hp : (1 : Mat n) + t • X ∈ Pb lev := by
       refine ⟨ht, fun a b hab => ?_⟩

@@ -108,23 +108,28 @@ private lemma isTauOf_tauPair_denom_smul (γ : SL(2, ℤ)) (τ : ℍ) :
   · rintro ⟨u, v, rfl⟩
     exact ⟨_, _, (key u v).symm⟩
 
-
 open scoped UpperHalfPlane MatrixGroups Matrix ModularForm ComplexConjugate in
-theorem _root_.GlobalTheory.WpFam.isFam_wp_wpd : ∀ (N : ℕ) [NeZero N],
-    _root_.GlobalTheory.QFam.IsFam (_root_.GlobalTheory.WpFam.vact N) 2
-        (_root_.GlobalTheory.WpFam.wp N) ∧
-      _root_.GlobalTheory.QFam.IsFam (_root_.GlobalTheory.WpFam.vact N) 3
-        (_root_.GlobalTheory.WpFam.wpd N) := by
+theorem _root_.GlobalTheory.WpFam.isFam_wp_wpd
+    : ∀ (N : ℕ) [NeZero N],
+      _root_.GlobalTheory.QFam.IsFam (_root_.GlobalTheory.WpFam.vact N) 2
+          (_root_.GlobalTheory.WpFam.wp N)
+        ∧ _root_.GlobalTheory.QFam.IsFam (_root_.GlobalTheory.WpFam.vact N) 3
+          (_root_.GlobalTheory.WpFam.wpd N) := by
   intro N _
   constructor
   · intro x γ
     funext τ
     obtain ⟨l, hl, hP⟩ := exists_tors_vact_eq_denom_mul_tors_smul_add N x γ τ
-    have hom := _root_.GlobalTheory.WpFam.homogeneity_of_isTauOf _ _ _ (isTauOf_tauPair_denom_smul γ τ)
-    have hper : (_root_.GlobalTheory.QFam.tauPair τ).weierstrassP
-        ((((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ)) * _root_.GlobalTheory.WpFam.tors N (γ • τ) x + l) =
-        (_root_.GlobalTheory.QFam.tauPair τ).weierstrassP
-        ((((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ)) * _root_.GlobalTheory.WpFam.tors N (γ • τ) x) :=
+    have hom :=
+      _root_.GlobalTheory.WpFam.homogeneity_of_isTauOf _ _ _ (isTauOf_tauPair_denom_smul γ τ)
+    have hper
+        : (_root_.GlobalTheory.QFam.tauPair τ).weierstrassP
+            ((((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ))
+                * _root_.GlobalTheory.WpFam.tors N (γ • τ) x
+              + l)
+          = (_root_.GlobalTheory.QFam.tauPair τ).weierstrassP
+            ((((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ))
+              * _root_.GlobalTheory.WpFam.tors N (γ • τ) x) :=
       (_root_.GlobalTheory.QFam.tauPair τ).weierstrassP_add_coe _ ⟨l, hl⟩
     rw [ModularForm.SL_slash_apply, modularGroup_denom_eq]
     unfold _root_.GlobalTheory.WpFam.wp
@@ -133,11 +138,16 @@ theorem _root_.GlobalTheory.WpFam.isFam_wp_wpd : ∀ (N : ℕ) [NeZero N],
   · intro x γ
     funext τ
     obtain ⟨l, hl, hP⟩ := exists_tors_vact_eq_denom_mul_tors_smul_add N x γ τ
-    have hom := _root_.GlobalTheory.WpFam.homogeneity_of_isTauOf _ _ _ (isTauOf_tauPair_denom_smul γ τ)
-    have hper : (_root_.GlobalTheory.QFam.tauPair τ).derivWeierstrassP
-        ((((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ)) * _root_.GlobalTheory.WpFam.tors N (γ • τ) x + l) =
-        (_root_.GlobalTheory.QFam.tauPair τ).derivWeierstrassP
-        ((((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ)) * _root_.GlobalTheory.WpFam.tors N (γ • τ) x) :=
+    have hom :=
+      _root_.GlobalTheory.WpFam.homogeneity_of_isTauOf _ _ _ (isTauOf_tauPair_denom_smul γ τ)
+    have hper
+        : (_root_.GlobalTheory.QFam.tauPair τ).derivWeierstrassP
+            ((((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ))
+                * _root_.GlobalTheory.WpFam.tors N (γ • τ) x
+              + l)
+          = (_root_.GlobalTheory.QFam.tauPair τ).derivWeierstrassP
+            ((((γ 1 0 : ℤ) : ℂ) * τ + ((γ 1 1 : ℤ) : ℂ))
+              * _root_.GlobalTheory.WpFam.tors N (γ • τ) x) :=
       (_root_.GlobalTheory.QFam.tauPair τ).derivWeierstrassP_add_coe _ ⟨l, hl⟩
     rw [ModularForm.SL_slash_apply, modularGroup_denom_eq]
     unfold _root_.GlobalTheory.WpFam.wpd

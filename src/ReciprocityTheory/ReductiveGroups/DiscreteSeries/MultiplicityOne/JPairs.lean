@@ -11,11 +11,14 @@ open scoped ENNReal ComplexConjugate InnerProductSpace
 
 namespace ReciprocityTheory.ChartRestriction.DS.Mult1
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 ConjugateNormInequalities
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  ConjugateNormInequalities
 
 theorem stPairs (h : UnitaryGroupStructuralFacts) : StPairs := by
   have h' := h
-  unfold UnitaryGroupStructuralFacts ReciprocityTheory.ChartRestriction.DS.Xi.InductiveHeisenbergInputs at h'
+  unfold UnitaryGroupStructuralFacts
+      ReciprocityTheory.ChartRestriction.DS.Xi.InductiveHeisenbergInputs
+    at h'
   obtain ⟨⟨-, -, -, -, -, -, -, -, -, -, -, -, -, -, hInt, hLow, -⟩, -⟩ := h'
   intro k r Wp _ _ _ D X _ _ d hd a₁ a₂ u hu v hv
   set a := min a₁ a₂ with ha_def
@@ -31,14 +34,18 @@ theorem stPairs (h : UnitaryGroupStructuralFacts) : StPairs := by
   swap
   · refine ⟨‖u‖ * ‖v‖, fun x hx => ?_⟩
     have h1 : ‖mc X u v x‖ ≤ ‖u‖ * ‖v‖ := by
-      calc ‖mc X u v x‖ = ‖⟪v, X.σ x u⟫_ℂ‖ := rfl
+      calc
+        ‖mc X u v x‖
+          = ‖⟪v, X.σ x u⟫_ℂ‖ := rfl
         _ ≤ ‖v‖ * ‖X.σ x u‖ := norm_inner_le_norm _ _
         _ = ‖u‖ * ‖v‖ := by rw [X.rep.2.1 x hx u]; ring
     have h2 : 1 ≤ gN x ^ (-(min a₁ a₂ - AG k r - 1)) := by
       apply Real.one_le_rpow (hlow x hx)
       rw [← ha_def]
       linarith
-    calc ‖mc X u v x‖ ≤ ‖u‖ * ‖v‖ := h1
+    calc
+      ‖mc X u v x‖
+        ≤ ‖u‖ * ‖v‖ := h1
       _ = ‖u‖ * ‖v‖ * 1 := by ring
       _ ≤ ‖u‖ * ‖v‖ * gN x ^ (-(min a₁ a₂ - AG k r - 1)) := by gcongr
   obtain ⟨C₁, hC₁⟩ := hu
@@ -117,12 +124,12 @@ theorem stPairs (h : UnitaryGroupStructuralFacts) : StPairs := by
       exact min_le_right a₁ a₂
     have key := real_key hA1 hB1 (hpos x hx) hc hb0 hab (gN_le_mul hg x)
     rw [hFg, hG_def]
-    calc ‖mc X u X.w (Matrix.of g * x)‖ * ‖mc X v X.w (Matrix.of g)‖
-        ≤ (C₁ * gN (Matrix.of g * x) ^ (-a)) * (C₂ * gN (Matrix.of g) ^ (-a)) :=
-          mul_le_mul e1 e2 (norm_nonneg _) (mul_nonneg hC₁0 (Real.rpow_nonneg (hpos _ hgx).le _))
+    calc
+      ‖mc X u X.w (Matrix.of g * x)‖ * ‖mc X v X.w (Matrix.of g)‖
+          ≤ (C₁ * gN (Matrix.of g * x) ^ (-a)) * (C₂ * gN (Matrix.of g) ^ (-a)) :=
+        mul_le_mul e1 e2 (norm_nonneg _) (mul_nonneg hC₁0 (Real.rpow_nonneg (hpos _ hgx).le _))
       _ = C₁ * C₂ * (gN (Matrix.of g * x) ^ (-a) * gN (Matrix.of g) ^ (-a)) := by ring
-      _ ≤ C₁ * C₂ * ((gN x * c⁻¹) ^ (-(a - b)) * gN (Matrix.of g) ^ (-b)) := by
-          gcongr
+      _ ≤ C₁ * C₂ * ((gN x * c⁻¹) ^ (-(a - b)) * gN (Matrix.of g) ^ (-b)) := by gcongr
       _ = C₁ * C₂ * (gN x * c⁻¹) ^ (-(a - b)) * gN (Matrix.of g) ^ (-b) := by ring
   have hbound : ‖∫ g, F g ∂D.μG‖ ≤ ∫ g, G g ∂D.μG :=
     (norm_integral_le_integral_norm _).trans
@@ -131,15 +138,13 @@ theorem stPairs (h : UnitaryGroupStructuralFacts) : StPairs := by
     rw [hG_def, integral_const_mul]
   have hsplit : (gN x * c⁻¹) ^ (-(a - b)) = gN x ^ (-(a - b)) * (c⁻¹) ^ (-(a - b)) :=
     Real.mul_rpow (hpos x hx).le (inv_nonneg.mpr hc.le)
-  have hexp : -(min a₁ a₂ - AG k r - 1) = -(a - b) := by
-    rw [ha_def, hb_def]; ring
+  have hexp : -(min a₁ a₂ - AG k r - 1) = -(a - b) := by rw [ha_def, hb_def]; ring
   rw [hmc, norm_mul, hexp]
-  have hdn : ‖(d : ℂ)‖ = d := by
-    rw [Complex.norm_real, Real.norm_eq_abs, abs_of_pos hd0]
+  have hdn : ‖(d : ℂ)‖ = d := by rw [Complex.norm_real, Real.norm_eq_abs, abs_of_pos hd0]
   rw [hdn]
-  calc d * ‖∫ g, F g ∂D.μG‖ ≤ d * (C₁ * C₂ * (gN x * c⁻¹) ^ (-(a - b)) * I) := by
-        rw [← hGint]; exact mul_le_mul_of_nonneg_left hbound hd0.le
-    _ = d * (C₁ * C₂ * I * (c⁻¹) ^ (-(a - b))) * gN x ^ (-(a - b)) := by
-        rw [hsplit]; ring
+  calc
+    d * ‖∫ g, F g ∂D.μG‖ ≤ d * (C₁ * C₂ * (gN x * c⁻¹) ^ (-(a - b)) * I) := by
+      rw [← hGint]; exact mul_le_mul_of_nonneg_left hbound hd0.le
+    _ = d * (C₁ * C₂ * I * (c⁻¹) ^ (-(a - b))) * gN x ^ (-(a - b)) := by rw [hsplit]; ring
 
 end ReciprocityTheory.ChartRestriction.DS.Mult1

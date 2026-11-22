@@ -9,15 +9,17 @@ open IsLocalRing Polynomial
 
 namespace GlobalTheory
 
-theorem exists_maximal_over_closedPt : ∀ (T E : Type) [CommRing T] [IsLocalRing T] [CommRing E] [Algebra (Polynomial T) E]
-    [Algebra.FiniteType (Polynomial T) E] (Q : Ideal E) [Q.IsPrime],
-    Q.comap (algebraMap (Polynomial T) E) =
-      (IsLocalRing.maximalIdeal T).map (Polynomial.C : T →+* Polynomial T) →
-    ∃ y : Ideal E, y.IsMaximal ∧ Q ≤ y ∧
-      y.comap (algebraMap (Polynomial T) E) ≠
-        (IsLocalRing.maximalIdeal T).map (Polynomial.C : T →+* Polynomial T) ∧
-      (y.comap (algebraMap (Polynomial T) E)).comap (Polynomial.C : T →+* Polynomial T) =
-        IsLocalRing.maximalIdeal T := by
+theorem exists_maximal_over_closedPt
+    : ∀ (T E : Type) [CommRing T] [IsLocalRing T] [CommRing E] [Algebra (Polynomial T) E]
+        [Algebra.FiniteType (Polynomial T) E] (Q : Ideal E) [Q.IsPrime],
+      Q.comap (algebraMap (Polynomial T) E)
+          = (IsLocalRing.maximalIdeal T).map (Polynomial.C : T →+* Polynomial T)
+        → ∃ y : Ideal E,
+          y.IsMaximal ∧ Q ≤ y
+            ∧ y.comap (algebraMap (Polynomial T) E)
+              ≠ (IsLocalRing.maximalIdeal T).map (Polynomial.C : T →+* Polynomial T)
+            ∧ (y.comap (algebraMap (Polynomial T) E)).comap (Polynomial.C : T →+* Polynomial T)
+              = IsLocalRing.maximalIdeal T := by
   intro T E _ _ _ _ _ Q hQp hQ
   set P : Ideal T[X] := (maximalIdeal T).map (C : T →+* T[X]) with hPdef
   set f := algebraMap T[X] E with hfdef
@@ -27,13 +29,14 @@ theorem exists_maximal_over_closedPt : ∀ (T E : Type) [CommRing T] [IsLocalRin
   letI : Field (T ⧸ maximalIdeal T) := Ideal.Quotient.field _
   have eP := Ideal.polynomialQuotientEquivQuotientPolynomial (maximalIdeal T)
   haveI : IsJacobsonRing (T[X] ⧸ P) := isJacobsonRing_of_surjective ⟨eP.toRingHom, eP.surjective⟩
-  have hPnf : ¬ P.IsMaximal := by
+  have hPnf : ¬P.IsMaximal := by
     intro hm
     have hf : IsField (T[X] ⧸ P) := (Ideal.Quotient.maximal_ideal_iff_isField_quotient P).1 hm
     exact Polynomial.not_isField (T ⧸ maximalIdeal T) (MulEquiv.isField hf eP.toMulEquiv)
 
   let φ : T[X] ⧸ P →+* E ⧸ y := Ideal.quotientMap y f hPy
-  have hcomp : φ.comp (Ideal.Quotient.mk P) = (Ideal.Quotient.mk y).comp f := Ideal.quotientMap_comp_mk hPy
+  have hcomp : φ.comp (Ideal.Quotient.mk P) = (Ideal.Quotient.mk y).comp f :=
+    Ideal.quotientMap_comp_mk hPy
   have hft : φ.FiniteType := by
     apply RingHom.FiniteType.of_comp_finiteType (f := Ideal.Quotient.mk P)
     rw [hcomp]
@@ -49,8 +52,8 @@ theorem exists_maximal_over_closedPt : ∀ (T E : Type) [CommRing T] [IsLocalRin
     rwa [← RingHom.ker_eq_comap_bot] at this
   have hyc : y.comap f = (RingHom.ker φ).comap (Ideal.Quotient.mk P) := by
     ext x
-    rw [Ideal.mem_comap, Ideal.mem_comap, RingHom.mem_ker, ← RingHom.comp_apply, hcomp, RingHom.comp_apply,
-      Ideal.Quotient.eq_zero_iff_mem]
+    rw [Ideal.mem_comap, Ideal.mem_comap, RingHom.mem_ker, ← RingHom.comp_apply, hcomp,
+      RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem]
   have hymax : (y.comap f).IsMaximal := by
     rw [hyc]; exact Ideal.comap_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective
   refine ⟨y, hy, hQy, fun h => hPnf (h ▸ hymax), ?_⟩

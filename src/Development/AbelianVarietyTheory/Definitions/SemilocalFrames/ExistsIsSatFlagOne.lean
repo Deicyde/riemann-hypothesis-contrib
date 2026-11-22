@@ -22,6 +22,7 @@ theorem cIw_pos (p q : ℕ) {a : ℕ} (j : Fin a → ℕ) : 0 < cIw p q j := by
   unfold cIw
   have := volU_pos
   refine div_pos (mul_pos (by positivity) (mul_pos (this _) (this _)))
-    (mul_pos (mul_pos (Finset.prod_pos fun i _ => mul_pos (this _) (by positivity)) (this _)) (this _))
+    (mul_pos (mul_pos (Finset.prod_pos fun i _ => mul_pos (this _) (by positivity)) (this _))
+      (this _))
 
 end GlobalTheory.FlagMeas.SatModel

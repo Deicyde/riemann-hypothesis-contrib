@@ -12,12 +12,23 @@ public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.Semi
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory.SS
 
-theorem card_torsion_le : ∀ (k : Type) [Field k] [IsAlgClosed k] (B : Over (Sp k)) [GrpObj B], IsAbelianScheme B → ∀ (L : LB B.left), AmpleCub B L → ∀ a, SmoothOfRelativeDimension a B.hom → ∃ C : ℕ, ∀ n : ℕ, (n : k) ≠ 0 → Finite {x : (𝟙_ (Over (Sp k)) ⟶ B) // x ^ n = 1} ∧ Nat.card {x : (𝟙_ (Over (Sp k)) ⟶ B) // x ^ n = 1} ≤ C * n ^ (2 * a) := by
+theorem card_torsion_le
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (B : Over (Sp k)) [GrpObj B],
+      IsAbelianScheme B
+        → ∀ (L : LB B.left),
+          AmpleCub B L
+            → ∀ a,
+              SmoothOfRelativeDimension a B.hom
+                → ∃ C : ℕ, ∀ n : ℕ,
+                  (n : k) ≠ 0
+                    → Finite {x : (𝟙_ (Over (Sp k)) ⟶ B) // x ^ n = 1}
+                      ∧ Nat.card {x : (𝟙_ (Over (Sp k)) ⟶ B) // x ^ n = 1} ≤ C * n ^ (2 * a) := by
   intro k _ _ B _ hB L _ a ha
   refine ⟨1, fun n hn => ?_⟩
   have h := GlobalTheory.T.abelianVarietyTorsionCardEqPow k B a n hB ha hn

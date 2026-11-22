@@ -30,24 +30,25 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.For
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AbLaw.FromCube
 
 abbrev CubeGen : Prop :=
-  ∀ (S : Scheme.{0}) (P : PolAV S) (M : LB P.A.left), M.IsLB →
-    ∃ t : LB.Gen (Theta P.A M), t.IsGen
+  ∀ (S : Scheme.{0}) (P : PolAV S) (M : LB P.A.left), M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen
 
 theorem cube (h : CubeGen) : CubeSt :=
   GlobalTheory.AbLaw.Cube.cube_of_gen GlobalTheory.T.abelianScheme_laws_without_cohomology.1 h
 
-theorem square (h : CubeGen) : SquareSt :=
-  (GlobalTheory.AbSquare.square_of_cube h).2
+theorem square (h : CubeGen) : SquareSt := (GlobalTheory.AbSquare.square_of_cube h).2
 
 theorem mulPull (h : CubeGen) : MulPullSt :=
-  (GlobalTheory.MulPull.mulPull_of_cube_of_symm h (GlobalTheory.exists_gen_negLB GlobalTheory.T.abelianScheme_laws_without_cohomology.1)).2
+  (GlobalTheory.MulPull.mulPull_of_cube_of_symm h
+    (GlobalTheory.exists_gen_negLB GlobalTheory.T.abelianScheme_laws_without_cohomology.1)).2
 
 theorem kerPow (h : CubeGen) : KerPowSt :=
   (GlobalTheory.kerPow_of_square (GlobalTheory.AbSquare.square_of_cube h).1).2.1
@@ -57,21 +58,29 @@ theorem weil (h : CubeGen) : WeilSt :=
   have lift := (GlobalTheory.kerPow_of_square (GlobalTheory.AbSquare.square_of_cube h).1).2.2
   have w₁ := GlobalTheory.CommutatorPairing.existsUnique_weilIs g lift
   GlobalTheory.weilSt_of_parts w₁ (GlobalTheory.weilIs_mul_left g)
-    (GlobalTheory.weilIs_alternating_skew_natural g lift) (GlobalTheory.PairingLevels.weilIs_mul_iff g h lift w₁)
+    (GlobalTheory.weilIs_alternating_skew_natural g lift)
+    (GlobalTheory.PairingLevels.weilIs_mul_iff g h lift w₁)
 
 theorem symLift (h : CubeGen) : SymLiftSt :=
-  (GlobalTheory.T.symmetric_lift_odd_order_exists_unique GlobalTheory.T.abelianScheme_laws_without_cohomology.1 (GlobalTheory.kerPow_of_square (GlobalTheory.AbSquare.square_of_cube h).1).2.2
+  (GlobalTheory.T.symmetric_lift_odd_order_exists_unique
+    GlobalTheory.T.abelianScheme_laws_without_cohomology.1
+    (GlobalTheory.kerPow_of_square (GlobalTheory.AbSquare.square_of_cube h).1).2.2
     (GlobalTheory.exists_gen_negLB GlobalTheory.T.abelianScheme_laws_without_cohomology.1)).2
 
-theorem mulA_props (h : CubeGen) :
-    ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (P : PolAV S) (n : ℕ), 1 ≤ n → IsFinite (mulA P.A n).left ∧ Flat (mulA P.A n).left ∧ Surjective (mulA P.A n).left ∧ (IsUnit (n : Γ(S, ⊤)) → Etale (mulA P.A n).left) :=
+theorem mulA_props (h : CubeGen)
+    : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (P : PolAV S) (n : ℕ),
+      1 ≤ n
+        → IsFinite (mulA P.A n).left ∧ Flat (mulA P.A n).left ∧ Surjective (mulA P.A n).left
+          ∧ (IsUnit (n : Γ(S, ⊤)) → Etale (mulA P.A n).left) :=
   have gi := GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected
   GlobalTheory.AbLaw.MulN.mulA_finite_flat_surjective_etale
     (GlobalTheory.MulFinite.isFinite_mulA
-      (GlobalTheory.MulPull.mulPull_of_cube_of_symm h (GlobalTheory.exists_gen_negLB GlobalTheory.T.abelianScheme_laws_without_cohomology.1)).1
+      (GlobalTheory.MulPull.mulPull_of_cube_of_symm h
+        (GlobalTheory.exists_gen_negLB GlobalTheory.T.abelianScheme_laws_without_cohomology.1)).1
       GlobalTheory.T.abelianScheme_laws_without_cohomology.2.2.1 gi)
     (GlobalTheory.flat_and_surjective_of_isFinite_abelianEnd gi)
-    GlobalTheory.flat_of_isFinite_of_flat_geometric_fibres GlobalTheory.T.formallyUnramified_mul_invertible_integer
+    GlobalTheory.flat_of_isFinite_of_flat_geometric_fibres
+    GlobalTheory.T.formallyUnramified_mul_invertible_integer
 
 theorem weilNondeg (h : CubeGen) : WeilNondegSt :=
   have g := GlobalTheory.T.abelianScheme_laws_without_cohomology.1
@@ -79,11 +88,14 @@ theorem weilNondeg (h : CubeGen) : WeilNondegSt :=
   GlobalTheory.weilNondeg_of_descent (GlobalTheory.torsion_invariant_descends (mulA_props h))
     (GlobalTheory.DescentPairing.exists_gen_transl_eq_pairing g (cube h)
       (GlobalTheory.weilIs_iff_commIsOf_and_lift_subsingleton g lift
-        (GlobalTheory.T.symmetric_lift_odd_order_exists_unique g lift (GlobalTheory.exists_gen_negLB g)).1) (weil h))
+        (GlobalTheory.T.symmetric_lift_odd_order_exists_unique g lift
+          (GlobalTheory.exists_gen_negLB g)).1)
+      (weil h))
 
 theorem charPair (h : CubeGen) : CharPairSt :=
   GlobalTheory.charPair_of_weil (weil h)
-    (GlobalTheory.weilIs_alternating_skew_natural GlobalTheory.T.abelianScheme_laws_without_cohomology.1
+    (GlobalTheory.weilIs_alternating_skew_natural
+      GlobalTheory.T.abelianScheme_laws_without_cohomology.1
       (GlobalTheory.kerPow_of_square (GlobalTheory.AbSquare.square_of_cube h).1).2.2)
     (weilNondeg h) (mulA_props h)
 

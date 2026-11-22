@@ -9,8 +9,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibl
 
 namespace GlobalTheory.Cyc
 
-theorem geom_sum_one_add_expand {R : Type*} [CommRing R] (y : R) (n : ℕ) :
-    ∃ z : R, (1 + y) ^ n - 1 = y * ((n : R) + (n.choose 2 : ℕ) * y + y ^ 2 * z) := by
+theorem geom_sum_one_add_expand {R : Type*} [CommRing R] (y : R) (n : ℕ)
+    : ∃ z : R, (1 + y) ^ n - 1 = y * ((n : R) + (n.choose 2 : ℕ) * y + y ^ 2 * z) := by
   induction n with
   | zero => exact ⟨0, by simp⟩
   | succ n ih =>
@@ -29,8 +29,8 @@ variable {l : ℕ} [hl : Fact l.Prime]
 theorem padicInt_norm_add_eq_of_lt {a b : ℤ_[l]} (h : ‖b‖ < ‖a‖) : ‖a + b‖ = ‖a‖ := by
   rw [PadicInt.norm_add_eq_max_of_ne h.ne', max_eq_left h.le]
 
-theorem norm_pow_sub_one_of_not_dvd (x : ℤ_[l]) (hx : ‖x - 1‖ < 1) (n : ℕ) (hn : ¬ l ∣ n) :
-    ‖x ^ n - 1‖ = ‖x - 1‖ := by
+theorem norm_pow_sub_one_of_not_dvd (x : ℤ_[l]) (hx : ‖x - 1‖ < 1) (n : ℕ) (hn : ¬ l ∣ n)
+    : ‖x ^ n - 1‖ = ‖x - 1‖ := by
   obtain ⟨z, hz⟩ := geom_sum_one_add_expand (x - 1) n
   rw [add_sub_cancel] at hz
   have hn1 : ‖(n : ℤ_[l])‖ = 1 := by
@@ -40,15 +40,17 @@ theorem norm_pow_sub_one_of_not_dvd (x : ℤ_[l]) (hx : ‖x - 1‖ < 1) (n : �
     have h' : ‖((n : ℤ) : ℤ_[l])‖ < 1 := by simpa using h
     rw [PadicInt.norm_int_lt_one_iff_dvd] at h'
     exact hn (Int.natCast_dvd_natCast.mp h')
-  have e : (n : ℤ_[l]) + (n.choose 2 : ℕ) * (x - 1) + (x - 1) ^ 2 * z
-      = n + (x - 1) * ((n.choose 2 : ℕ) + (x - 1) * z) := by ring
+  have e
+      : (n : ℤ_[l]) + (n.choose 2 : ℕ) * (x - 1) + (x - 1) ^ 2 * z
+        = n + (x - 1) * ((n.choose 2 : ℕ) + (x - 1) * z) := by
+    ring
   rw [hz, norm_mul, e, padicInt_norm_add_eq_of_lt, hn1, mul_one]
   rw [hn1, norm_mul]
   exact lt_of_le_of_lt (mul_le_of_le_one_right (norm_nonneg _) (PadicInt.norm_le_one _)) hx
 
-theorem norm_pow_prime_sub_one (x : ℤ_[l]) (hx : ‖x - 1‖ ≤ (l : ℝ)⁻¹)
-    (h2 : l = 2 → ‖x - 1‖ < (l : ℝ)⁻¹) :
-    ‖x ^ l - 1‖ = ‖x - 1‖ * ‖(l : ℤ_[l])‖ := by
+theorem norm_pow_prime_sub_one
+    (x : ℤ_[l]) (hx : ‖x - 1‖ ≤ (l : ℝ)⁻¹) (h2 : l = 2 → ‖x - 1‖ < (l : ℝ)⁻¹)
+    : ‖x ^ l - 1‖ = ‖x - 1‖ * ‖(l : ℤ_[l])‖ := by
   obtain ⟨z, hz⟩ := geom_sum_one_add_expand (x - 1) l
   rw [add_sub_cancel] at hz
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl.out.one_lt
@@ -73,8 +75,10 @@ theorem norm_pow_prime_sub_one (x : ℤ_[l]) (hx : ‖x - 1‖ ≤ (l : ℝ)⁻�
   rw [PadicInt.norm_p]
   exact lt_of_le_of_lt (PadicInt.nonarchimedean _ _) (max_lt hA hB)
 
-theorem norm_pow_nat_sub_one (n : ℕ) (hn : n ≠ 0) : ∀ (x : ℤ_[l]), ‖x - 1‖ ≤ (l : ℝ)⁻¹ →
-    (l = 2 → ‖x - 1‖ < (l : ℝ)⁻¹) → ‖x ^ n - 1‖ = ‖x - 1‖ * ‖(n : ℤ_[l])‖ := by
+theorem norm_pow_nat_sub_one (n : ℕ) (hn : n ≠ 0)
+    : ∀ (x : ℤ_[l]),
+      ‖x - 1‖ ≤ (l : ℝ)⁻¹ → (l = 2 → ‖x - 1‖ < (l : ℝ)⁻¹)
+        → ‖x ^ n - 1‖ = ‖x - 1‖ * ‖(n : ℤ_[l])‖ := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl.out.one_lt
   have hi1 : (l : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ hl1
   induction n using Nat.strong_induction_on with
@@ -98,10 +102,11 @@ theorem norm_pow_nat_sub_one (n : ℕ) (hn : n ≠ 0) : ∀ (x : ℤ_[l]), ‖x 
         exact hd (Int.natCast_dvd_natCast.mp h')
       rw [norm_pow_sub_one_of_not_dvd x (hx.trans_lt hi1) n hd, hn1, mul_one]
 
-theorem norm_unit_zpow_sub_one :
-    ∀ (l : ℕ) [Fact l.Prime], ∀ (s : ℕ) (u : ℤ_[l]ˣ), 1 ≤ s → (l = 2 → 2 ≤ s) →
-      ‖(u : ℤ_[l]) - 1‖ = (l : ℝ) ^ (-(s : ℤ)) → ∀ n : ℤ, n ≠ 0 →
-      ‖((u ^ n : ℤ_[l]ˣ) : ℤ_[l]) - 1‖ = (l : ℝ) ^ (-(s : ℤ)) * ‖(n : ℤ_[l])‖ := by
+theorem norm_unit_zpow_sub_one
+    : ∀ (l : ℕ) [Fact l.Prime], ∀ (s : ℕ) (u : ℤ_[l]ˣ),
+      1 ≤ s → (l = 2 → 2 ≤ s) → ‖(u : ℤ_[l]) - 1‖ = (l : ℝ) ^ (-(s : ℤ))
+        → ∀ n : ℤ,
+          n ≠ 0 → ‖((u ^ n : ℤ_[l]ˣ) : ℤ_[l]) - 1‖ = (l : ℝ) ^ (-(s : ℤ)) * ‖(n : ℤ_[l])‖ := by
   intro l hl s u hs h2 hu n hn
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl.out.one_lt
   have hx : ‖(u : ℤ_[l]) - 1‖ ≤ (l : ℝ)⁻¹ := by
@@ -116,8 +121,9 @@ theorem norm_unit_zpow_sub_one :
     rw [zpow_natCast, Units.val_pow_eq_pow_val, norm_pow_nat_sub_one m hm _ hx hx2, hu,
       Int.cast_natCast]
   · have hm : m ≠ 0 := by rintro rfl; simp at hn
-    have e : (((u ^ m)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) - 1
-        = -((((u ^ m)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) * (((u ^ m : ℤ_[l]ˣ) : ℤ_[l]) - 1)) := by
+    have e
+        : (((u ^ m)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) - 1
+          = -((((u ^ m)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) * (((u ^ m : ℤ_[l]ˣ) : ℤ_[l]) - 1)) := by
       rw [mul_sub, Units.inv_mul]; ring
     rw [zpow_neg, zpow_natCast, e, norm_neg, norm_mul, PadicInt.norm_units, one_mul,
       Units.val_pow_eq_pow_val, norm_pow_nat_sub_one m hm _ hx hx2, hu, Int.cast_neg, norm_neg,

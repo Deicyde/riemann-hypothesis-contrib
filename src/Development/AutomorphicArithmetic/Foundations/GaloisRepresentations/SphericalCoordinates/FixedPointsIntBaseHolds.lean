@@ -121,7 +121,8 @@ theorem FForm_holds : FForm := fForm_of
 
 theorem SN_holds : SN := sN_of
 
-theorem PFrameEx_holds : PFrameEx := pFrameEx_of FMat_holds FForm_holds SN_holds FTrace_holds FInt_holds FApprox_holds
+theorem PFrameEx_holds : PFrameEx :=
+  pFrameEx_of FMat_holds FForm_holds SN_holds FTrace_holds FInt_holds FApprox_holds
 
 theorem PLatOf_holds : PLatOf := pLatOf_of
 
@@ -133,7 +134,8 @@ theorem PkPerf_holds : PkPerf := pkPerf_of MemDual_holds
 
 theorem PkInj_holds : PkInj := pkInj_of MemDual_holds EmbAll_holds
 
-theorem PkOnto_holds : PkOnto := pkOnto_of LocLat_holds FApprox_holds FInt_holds PkLat_holds PkPerf_holds OOnto_holds
+theorem PkOnto_holds : PkOnto :=
+  pkOnto_of LocLat_holds FApprox_holds FInt_holds PkLat_holds PkPerf_holds OOnto_holds
 
 theorem ArchSpan_holds : ArchSpan := archSpan_of
 
@@ -153,11 +155,14 @@ theorem LineBasis_holds : LineBasis := lineBasis_of
 
 theorem PlaceT_holds : PlaceT := placeT_of
 
-theorem TypeIso_holds : TypeIso := typeIso_of SimDiag_holds ExtendEmb_holds TypeCount_holds PlaceT_holds
+theorem TypeIso_holds : TypeIso :=
+  typeIso_of SimDiag_holds ExtendEmb_holds TypeCount_holds PlaceT_holds
 
-theorem RPer_holds : RPer := rPer_of SigB_holds LineBasis_holds TypeIso_holds HermOfJ_holds PlaceT_holds
+theorem RPer_holds : RPer :=
+  rPer_of SigB_holds LineBasis_holds TypeIso_holds HermOfJ_holds PlaceT_holds
 
-theorem RDicEx_holds : RDicEx := rDicEx_of ArchEx_holds SigB_holds PerExt_holds JStruct_holds JLine_holds RPer_holds PlaceT_holds
+theorem RDicEx_holds : RDicEx :=
+  rDicEx_of ArchEx_holds SigB_holds PerExt_holds JStruct_holds JLine_holds RPer_holds PlaceT_holds
 
 theorem RhoSig_holds : RhoSig := rhoSig_of
 
@@ -165,7 +170,8 @@ theorem BaseC_holds : BaseC := baseC_of
 
 theorem GFine_holds : GFine := gFine_of
 
-theorem GUnif_holds : GUnif := gUnif_of ModelEx_holds GenCmp_holds GenPts_holds BaseC_holds GFine_holds
+theorem GUnif_holds : GUnif :=
+  gUnif_of ModelEx_holds GenCmp_holds GenPts_holds BaseC_holds GFine_holds
 
 theorem SheetOf_holds : SheetOf := sheetOf_of
 
@@ -201,7 +207,8 @@ theorem CoordMove_holds : CoordMove := coordMove_of
 
 theorem PlaceEx_holds : PlaceEx := placeEx_of AdCore_holds LatForm_holds
 
-theorem CoordEx_holds : CoordEx := coordEx_of PlaceEx_holds AdOfWit_holds PlaceLoc_holds PlacePer_holds
+theorem CoordEx_holds : CoordEx :=
+  coordEx_of PlaceEx_holds AdOfWit_holds PlaceLoc_holds PlacePer_holds
 
 theorem CoordOcc_holds : CoordOcc := coordOcc_of WitOfAd_holds PlacePer_holds
 
@@ -213,11 +220,13 @@ theorem Rigid_holds : Rigid := rigid_of
 
 theorem FixLine_holds : FixLine := fixLine_of ActY_holds
 
-theorem StabTriv_holds : StabTriv := stabTriv_of CoordOcc_holds LatIso_holds FixLine_holds Rigid_holds
+theorem StabTriv_holds : StabTriv :=
+  stabTriv_of CoordOcc_holds LatIso_holds FixLine_holds Rigid_holds
 
 theorem IsogForm_holds : IsogForm := isogForm_of RdForm_holds
 
-theorem IsogCoord_holds : IsogCoord := isogCoord_of AdOfWit_holds CoordKN_holds IsogForm_holds RdDense_holds
+theorem IsogCoord_holds : IsogCoord :=
+  isogCoord_of AdOfWit_holds CoordKN_holds IsogForm_holds RdDense_holds
 
 theorem IntMult_holds : IntMult := intMult_of
 
@@ -241,9 +250,11 @@ theorem HeckeCoord_holds : HeckeCoord := heckeCoord_of IsogAt_holds IsogCoord_ho
 
 theorem OneAt_holds : OneAt := oneAt_of HeckeCoord_holds LatIso_holds
 
-theorem FixFwd_holds : FixFwd := fixFwd_of HeckeCoord_holds OneAt_holds LatForm_holds LatIso_holds FixLine_holds ActY_holds
+theorem FixFwd_holds : FixFwd :=
+  fixFwd_of HeckeCoord_holds OneAt_holds LatForm_holds LatIso_holds FixLine_holds ActY_holds
 
-theorem FixGa_holds : FixGa := fixGa_of HeckeCoord_holds LatIso_holds FixLine_holds ActY_holds IntMult_holds
+theorem FixGa_holds : FixGa :=
+  fixGa_of HeckeCoord_holds LatIso_holds FixLine_holds ActY_holds IntMult_holds
 
 theorem FixEq_holds : FixEq := fixEq_of HeckeCoord_holds OneAt_holds LatIso_holds
 
@@ -253,11 +264,19 @@ theorem PowCorr_holds : PowCorr := powCorr_of PwOver_holds PtFibre_holds
 
 theorem PowSm_holds : PowSm := powSm_of
 
-theorem FixLoc_holds : FixLoc := fixLoc_of SheetOf_holds FixGa_holds FixEq_holds OneAt_holds PowCorr_holds CspDim_holds AdExists_holds EigTop_holds LocSum_holds RegSep_holds InvMin_holds MinBridge_holds CorrChart_holds PtFibre_holds
+theorem FixLoc_holds : FixLoc :=
+  fixLoc_of SheetOf_holds FixGa_holds FixEq_holds OneAt_holds PowCorr_holds CspDim_holds
+    AdExists_holds EigTop_holds LocSum_holds RegSep_holds InvMin_holds MinBridge_holds
+    CorrChart_holds PtFibre_holds
 
-theorem PDicEx_holds : PDicEx := pkTop_of PFrameEx_holds PkLat_holds PkEquiv_holds PkPerf_holds PkInj_holds PkOnto_holds KpMem_holds
+theorem PDicEx_holds : PDicEx :=
+  pkTop_of PFrameEx_holds PkLat_holds PkEquiv_holds PkPerf_holds PkInj_holds PkOnto_holds
+    KpMem_holds
 
-theorem fixedPoints_int_base_holds : HeckeFixedPointCMCycleClass := fixedPoints_integral_base_of_uniformisation RhoSig_holds GUnif_holds PDicEx_holds RDicEx_holds UnifG_holds StabTriv_holds FixFwd_holds FixEq_holds FixGa_holds FixLoc_holds TanExists_holds FixFinite_holds PowSm_holds PwOver_holds SumPts_holds EigSame_holds
+theorem fixedPoints_int_base_holds : HeckeFixedPointCMCycleClass :=
+  fixedPoints_integral_base_of_uniformisation RhoSig_holds GUnif_holds PDicEx_holds RDicEx_holds
+    UnifG_holds StabTriv_holds FixFwd_holds FixEq_holds FixGa_holds FixLoc_holds TanExists_holds
+    FixFinite_holds PowSm_holds PwOver_holds SumPts_holds EigSame_holds
 
 theorem FixZ_holds : FixZ := fixZ_of fixedPoints_int_base_holds LevelChange_holds
 

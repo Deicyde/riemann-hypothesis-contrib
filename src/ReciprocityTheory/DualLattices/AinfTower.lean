@@ -13,9 +13,11 @@ namespace ReciprocityTheory.PGsh
 
 namespace Ainf
 
-variable (p : ℕ) [hp : Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-  {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C]
-  [Fact ¬IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+variable
+  (p : ℕ) [hp : Fact p.Prime]
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal}
+  (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 abbrev R0 (ε : PreTilt O p) := A p O ⧸ span {xi p O ε ^ 2}
 
@@ -48,8 +50,9 @@ lemma Rn_local (hv : v.Integers O) (n : ℕ) : IsLocalRing (Rn p O n) := by
 lemma one_add_unit {S : Type} [CommRing S] (a b : S) (hb : b * b = 0) : IsUnit (1 + a * b) := by
   exact IsUnit.of_mul_eq_one (1 - a * b) (by linear_combination (-a ^ 2) * hb)
 
-variable (hv : v.Integers O) (ε : PreTilt O p)
-  (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
+variable
+  (hv : v.Integers O)
+  (ε : PreTilt O p) (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
 include hv hε
 
 def thetaBar : R0 p O ε →+* O :=
@@ -63,10 +66,10 @@ def algRn (n : ℕ) : Algebra (R0 p O ε) (Rn p O n) :=
   ((Ideal.Quotient.mk (span {(p : O) ^ (n + 1)})).comp (thetaBar p O hv ε hε)).toAlgebra
 
 def piRing (n : ℕ) : R'n p O ε n →+* Rn p O n :=
-  Ideal.Quotient.lift _ ((Ideal.Quotient.mk (span {(p : O) ^ (n + 1)})).comp
-    (thetaBar p O hv ε hε)) (fun a ha => by
-    obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
-    simp only [RingHom.comp_apply, map_mul, map_pow, map_natCast, hpRn, mul_zero])
+  Ideal.Quotient.lift _ ((Ideal.Quotient.mk (span {(p : O) ^ (n + 1)})).comp (thetaBar p O hv ε hε))
+    (fun a ha => by
+      obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
+      simp only [RingHom.comp_apply, map_mul, map_pow, map_natCast, hpRn, mul_zero])
 
 lemma piRing_mk (n : ℕ) (a : A p O) :
     piRing p O hv ε hε n (Ideal.Quotient.mk _ (Ideal.Quotient.mk _ a)) =
@@ -79,7 +82,8 @@ lemma piRing_surj (n : ℕ) : Function.Surjective (piRing p O hv ε hε n) := by
   exact ⟨_, piRing_mk p O hv ε hε n a⟩
 
 def xiR (n : ℕ) : R'n p O ε n :=
-  Ideal.Quotient.mk (span {(p : R0 p O ε) ^ (n + 1)}) (Ideal.Quotient.mk (span {xi p O ε ^ 2}) (xi p O ε))
+  Ideal.Quotient.mk (span {(p : R0 p O ε) ^ (n + 1)})
+    (Ideal.Quotient.mk (span {xi p O ε ^ 2}) (xi p O ε))
 
 lemma ker_pi (n : ℕ) : RingHom.ker (piRing p O hv ε hε n) = span {xiR p O ε n} := by
   apply le_antisymm
@@ -195,8 +199,11 @@ lemma zeta_unit (n : ℕ) : IsUnit (zetaV p O ε n) := by
 
 def LO : LAlg (R0 p O ε) := { carrier := O, alg := algO p O hv ε hε, loc := O_local O hv }
 
-def LR (n : ℕ) : LAlg (R0 p O ε) :=
-  { carrier := Rn p O n, alg := algRn p O hv ε hε n, loc := Rn_local p O hv n }
+def LR (n : ℕ) : LAlg (R0 p O ε) := {
+  carrier := Rn p O n
+  alg := algRn p O hv ε hε n
+  loc := Rn_local p O hv n
+}
 
 def LR' (n : ℕ) : LAlg (R0 p O ε) := { carrier := R'n p O ε n, loc := R'n_local p O hv ε hε n }
 
@@ -207,18 +214,22 @@ def ainfTower : ATower (R0 p O ε) p where
   O := LO p O hv ε hε
   R' n := LR' p O hv ε hε n
   R n := LR p O hv ε hε n
-  π n := ⟨{ toRingHom := piRing p O hv ε hε n, commutes' := fun _ => rfl },
-    TowerExample.isLocalHom_of_surj _ (piRing_surj p O hv ε hε n)⟩
-  q n := ⟨{ toRingHom := Ideal.Quotient.mk (span {(p : O) ^ (n + 1)}), commutes' := fun _ => rfl },
-    TowerExample.isLocalHom_of_surj _ (q_surj p O hv ε hε n)⟩
+  π n := ⟨
+    { toRingHom := piRing p O hv ε hε n, commutes' := fun _ => rfl },
+    TowerExample.isLocalHom_of_surj _ (piRing_surj p O hv ε hε n)
+  ⟩
+  q n := ⟨
+    { toRingHom := Ideal.Quotient.mk (span {(p : O) ^ (n + 1)}), commutes' := fun _ => rfl },
+    TowerExample.isLocalHom_of_surj _ (q_surj p O hv ε hε n)
+  ⟩
   ξ n := xiR p O ε n
   surj n := piRing_surj p O hv ε hε n
   ker_eq n := ker_pi p O hv ε hε n
   ξ_sq n := xi_sq' p O hv ε hε n
   ann n a ha := ann' p O hv ε hε n a ha
   char n := by rw [Nat.cast_pow]; exact hpR' p O ε n
-  sep a ha := sepO p O a fun n =>
-    (Ideal.Quotient.eq_zero_iff_mem (I := span {(p : O) ^ (n + 1)})).1 (ha n)
+  sep a ha :=
+    sepO p O a fun n => (Ideal.Quotient.eq_zero_iff_mem (I := span {(p : O) ^ (n + 1)})).1 (ha n)
   c := fontaineTheta O p (nu p O ε)
   cp n := nuR p O ε n
   cp_spec n := rfl

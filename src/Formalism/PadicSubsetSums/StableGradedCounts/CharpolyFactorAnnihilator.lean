@@ -25,8 +25,9 @@ theorem charpolyFactorAnnihilator : CharpolyFactorAnnihilator := by
 
   have hcB : gB.charpoly = (X - C c) ^ t := by
     rw [← LinearMap.charpoly_toMatrix gB (Module.finBasis K B)]
-    have hm : LinearMap.toMatrix (Module.finBasis K B) (Module.finBasis K B) gB =
-        Matrix.diagonal (fun _ => c) := by
+    have hm
+        : LinearMap.toMatrix (Module.finBasis K B) (Module.finBasis K B) gB
+          = Matrix.diagonal (fun _ => c) := by
       simp only [gB, map_smul, LinearMap.toMatrix_id]
       ext i j
       by_cases h : i = j <;> simp [h, Matrix.one_apply]
@@ -59,8 +60,7 @@ theorem charpolyFactorAnnihilator : CharpolyFactorAnnihilator := by
   intro v
   have hv : v ∈ A ⊔ B := by rw [hAB.sup_eq_top]; trivial
   obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hv
-  rw [Module.End.mul_apply, LinearMap.zero_apply, LinearMap.sub_apply,
-    Module.algebraMap_end_apply]
+  rw [Module.End.mul_apply, LinearMap.zero_apply, LinearMap.sub_apply, Module.algebraMap_end_apply]
   have h3 : γ (a + b) - cγ • (a + b) = γ a - cγ • a := by
     rw [map_add (f := _), hB b hb, smul_add]
     abel

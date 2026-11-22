@@ -13,7 +13,11 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RightRegularR
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory
+  NumberField IsDedekindDomain
 open scoped InnerProductSpace TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -59,29 +63,39 @@ private lemma ext_ae_eq_of_leftInvariant (B : RowsAut) (f : B.I.GA → ℂ) (hf 
   show (F : B.I.GA → ℂ) (B.I.rep B.fund y) = f y
   rw [hrep, hy γ hγ hmem, hf γ hγ y]
 
-theorem rightReg_ae (B : RowsAut) (f : B.I.GA → ℂ) (hf : ∀ γ ∈ B.I.GFset, ∀ y, f (γ * y) = f y)
-    (F : B.I.L2 B.μf B.fund) (hF : (F : B.I.GA → ℂ) =ᵐ[(B.I.muA B.μf).restrict B.fund] f) (g : B.I.GA) :
-    (B.R g F : B.I.GA → ℂ) =ᵐ[(B.I.muA B.μf).restrict B.fund] fun x => f (x * g) := by
+theorem rightReg_ae
+    (B : RowsAut) (f : B.I.GA → ℂ) (hf : ∀ γ ∈ B.I.GFset, ∀ y, f (γ * y) = f y)
+    (F : B.I.L2 B.μf B.fund)
+    (hF : (F : B.I.GA → ℂ) =ᵐ[(B.I.muA B.μf).restrict B.fund] f) (g : B.I.GA)
+    : (B.R g F : B.I.GA → ℂ) =ᵐ[(B.I.muA B.μf).restrict B.fund] fun x => f (x * g) := by
   have hE := ext_ae_eq_of_leftInvariant B f hf F hF
   have hr : ∀ᵐ x ∂(B.I.muA B.μf), B.I.ext F (x * g) = f (x * g) :=
-    ae_comp_of_map_eq B (fun x => x * g) ((GlobalTheory.T.adelicUnitaryHaar_bi_invariant B.I B.μf).2.1 g) (p := fun z => B.I.ext F z = f z) hE
+    ae_comp_of_map_eq B
+      (fun x => x * g)
+      ((GlobalTheory.T.adelicUnitaryHaar_bi_invariant B.I B.μf).2.1 g)
+      (p := fun z => B.I.ext F z = f z)
+      hE
   filter_upwards [B.R_spec g F, ae_restrict_of_ae hr] with x h1 h2
   rw [h1, h2]
 
-theorem memLp_mul_right (B : RowsAut) (f : B.I.GA → ℂ) (hf : ∀ γ ∈ B.I.GFset, ∀ y, f (γ * y) = f y)
-    (hm : MemLp f 2 ((B.I.muA B.μf).restrict B.fund)) (g : B.I.GA) :
-    MemLp (fun x => f (x * g)) 2 ((B.I.muA B.μf).restrict B.fund) := by
+theorem memLp_mul_right
+    (B : RowsAut) (f : B.I.GA → ℂ) (hf : ∀ γ ∈ B.I.GFset, ∀ y, f (γ * y) = f y)
+    (hm : MemLp f 2 ((B.I.muA B.μf).restrict B.fund)) (g : B.I.GA)
+    : MemLp (fun x => f (x * g)) 2 ((B.I.muA B.μf).restrict B.fund) := by
   have h := rightReg_ae B f hf (hm.toLp f) hm.coeFn_toLp g
   exact (Lp.memLp (B.R g (hm.toLp f))).ae_eq h
 
-
 open Classical in
-theorem mult_props {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar}
-    (θ : D.what₂.Tau → (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ))
-    (M : DSModel V S) (J : Set (GA D V)) (χ : GA D V → ℂ) (T : MMap M) (hT : T ∈ Mult θ M J χ) :
-    (∀ v, ∀ γ ∈ GQ V, ∀ z, T v (γ * z) = T v z) ∧
-    (∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ), ∀ (v : M.Vec) (w : M.sm τ),
-      (w : M.H τ) = M.rep τ g (v τ) → ∀ z, T (Function.update v τ w) z = T v (z * atTau θ V τ g)) := by
+theorem mult_props
+    {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar}
+    (θ : D.what₂.Tau
+      → (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf D.host.F ⊗[D.host.F] D.host.E
+        →+* ℂ))
+    (M : DSModel V S) (J : Set (GA D V)) (χ : GA D V → ℂ) (T : MMap M) (hT : T ∈ Mult θ M J χ)
+    : (∀ v, ∀ γ ∈ GQ V, ∀ z, T v (γ * z) = T v z)
+      ∧ (∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ), ∀ (v : M.Vec) (w : M.sm τ),
+        (w : M.H τ) = M.rep τ g (v τ)
+          → ∀ z, T (Function.update v τ w) z = T v (z * atTau θ V τ g)) := by
   unfold Formalism.IndefR.Mult.Mult at hT
   induction hT using Submodule.span_induction with
   | mem T hT =>
@@ -90,8 +104,8 @@ theorem mult_props {D : D7} {V : HSp D} {S : D.what₂.Tau → SPar}
     rw [hT'.equiv τ g hg v w hw]
     rfl
   | zero =>
-    refine ⟨fun v γ _ z => ?_, fun τ g _ v w _ z => ?_⟩ <;>
-      simp only [MultilinearMap.zero_apply, Pi.zero_apply]
+    refine ⟨fun v γ _ z => ?_, fun τ g _ v w _ z => ?_⟩
+      <;> simp only [MultilinearMap.zero_apply, Pi.zero_apply]
   | add T₁ T₂ _ _ h₁ h₂ =>
     refine ⟨fun v γ hγ z => ?_, fun τ g hg v w hw z => ?_⟩
     · simp only [MultilinearMap.add_apply, Pi.add_apply, h₁.1 v γ hγ z, h₂.1 v γ hγ z]
@@ -112,12 +126,14 @@ end GlobalTheory.RowEvalHH
 
 namespace GlobalTheory.RowEvalHH
 
-
 open Classical in
-theorem star_dite_mul_right (B : RowsAut) (f f' : B.I.GA → ℂ) (G : B.I.GA)
-    (hf : ∀ γ ∈ B.I.GFset, ∀ y, f (γ * y) = f y) (key : ∀ x, f' x = f (x * G)) :
-    (star (if hm : MemLp f' 2 ((B.I.muA B.μf).restrict B.fund) then hm.toLp f' else 0) : B.I.L2 B.μf B.fund) =
-      B.R G (star (if hm : MemLp f 2 ((B.I.muA B.μf).restrict B.fund) then hm.toLp f else 0)) := by
+theorem star_dite_mul_right
+    (B : RowsAut) (f f' : B.I.GA → ℂ) (G : B.I.GA)
+    (hf : ∀ γ ∈ B.I.GFset, ∀ y, f (γ * y) = f y) (key : ∀ x, f' x = f (x * G))
+    : (star (if hm : MemLp f' 2 ((B.I.muA B.μf).restrict B.fund) then hm.toLp f' else 0)
+        : B.I.L2 B.μf B.fund)
+      = B.R G
+        (star (if hm : MemLp f 2 ((B.I.muA B.μf).restrict B.fund) then hm.toLp f else 0)) := by
   have hf' : f' = fun x => f (x * G) := funext key
   subst hf'
   by_cases hm : MemLp f 2 ((B.I.muA B.μf).restrict B.fund)
@@ -125,8 +141,9 @@ theorem star_dite_mul_right (B : RowsAut) (f f' : B.I.GA → ℂ) (G : B.I.GA)
     rw [dite_eq_left hm', dite_eq_left hm]
     have hsf : ∀ γ ∈ B.I.GFset, ∀ y, (star f) (γ * y) = (star f) y := fun γ hγ y => by
       simp only [Pi.star_apply, hf γ hγ y]
-    have hS : ((star (hm.toLp f) : B.I.L2 B.μf B.fund) : B.I.GA → ℂ)
-        =ᵐ[(B.I.muA B.μf).restrict B.fund] star f := by
+    have hS
+        : ((star (hm.toLp f) : B.I.L2 B.μf B.fund) : B.I.GA → ℂ)
+          =ᵐ[(B.I.muA B.μf).restrict B.fund] star f := by
       filter_upwards [Lp.coeFn_star (hm.toLp f), hm.coeFn_toLp] with x h1 h2
       rw [h1, Pi.star_apply, h2, Pi.star_apply]
     apply Lp.ext
@@ -163,7 +180,26 @@ private lemma rep_mem_sm_of_mem_UH {D : D7} {V : HSp D} {S : D.what₂.Tau → S
   have h := Formalism.IndefR.SchurOrthogonalityAlt.sm_stable M τ ⟨hu.unit, hmem⟩ hw
   simpa [Formalism.IndefR.SchurOrthogonalityAlt.gm, IsUnit.unit_spec] using h
 
-theorem evF_equiv : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D), R.toLevCh.Is A.μ0 → R.IsGrp F → R.IsModels → HostHyp D → (∀ x : X.B.I.E, HEq (X.ιE x) x) → ∀ (t : GA D (Yc D 0)) (c : ∀ τ, (MP R).H τ ≃ₗᵢ⋆[ℂ] X.B.H (X.pl.symm τ)), t ∈ GfC (Yc D 0) → (∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D (D.sp.Y 0) τ), ∀ w, c τ ((MP R).rep τ g w) = X.B.σ (X.pl.symm τ) (uMat ((iotaX X h (atTau R.θ (D.sp.Y 0) τ g)).1 (X.pl.symm τ))) (c τ w)) → ∀ S ∈ EP R F, ∀ (g : X.B.I.Ginf) (y : ∀ τ, ↥(GlobalTheory.RowEvalHH.Wsub R X c τ)), ∃ y' : ∀ τ, ↥(GlobalTheory.RowEvalHH.Wsub R X c τ), GlobalTheory.RowEvalHH.tensT X (fun τ => (y' τ : X.B.H (X.pl.symm τ))) = X.B.σs g (GlobalTheory.RowEvalHH.tensT X (fun τ => (y τ : X.B.H (X.pl.symm τ)))) ∧ GlobalTheory.RowEvalHH.evF R X h t c S y' = X.B.R (g, 1) (GlobalTheory.RowEvalHH.evF R X h t c S y) := by
+theorem evF_equiv
+    : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A)
+        (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+        (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D),
+      R.toLevCh.Is A.μ0 → R.IsGrp F → R.IsModels → HostHyp D → (∀ x : X.B.I.E, HEq (X.ιE x) x)
+        → ∀ (t : GA D (Yc D 0)) (c : ∀ τ, (MP R).H τ ≃ₗᵢ⋆[ℂ] X.B.H (X.pl.symm τ)),
+          t ∈ GfC (Yc D 0)
+            → (∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D (D.sp.Y 0) τ), ∀ w,
+              c τ ((MP R).rep τ g w)
+                = X.B.σ (X.pl.symm τ)
+                  (uMat ((iotaX X h (atTau R.θ (D.sp.Y 0) τ g)).1 (X.pl.symm τ))) (c τ w))
+            → ∀ S ∈ EP R F, ∀ (g : X.B.I.Ginf) (y : ∀ τ, ↥(GlobalTheory.RowEvalHH.Wsub R X c τ)),
+              ∃ y' : ∀ τ, ↥(GlobalTheory.RowEvalHH.Wsub R X c τ),
+                GlobalTheory.RowEvalHH.tensT X (fun τ => (y' τ : X.B.H (X.pl.symm τ)))
+                    = X.B.σs g
+                      (GlobalTheory.RowEvalHH.tensT X (fun τ => (y τ : X.B.H (X.pl.symm τ))))
+                  ∧ GlobalTheory.RowEvalHH.evF R X h t c S y'
+                    = X.B.R (g, 1) (GlobalTheory.RowEvalHH.evF R X h t c S y) := by
   classical
   intro D G _ _ Pl0 T A Ks _ _ _ R F X h hLev hGrp hMod _hHost hι t c ht hc S hS g y
   obtain ⟨hfin, hat, hsurj⟩ := GlobalTheory.IotaReal.iotaX_real_finite R F X h hLev hGrp hMod hι
@@ -171,24 +207,32 @@ theorem evF_equiv : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
   have hS0 := hS
   unfold EP RealDat.EEat goodPart at hS0
   have hS' := mult_props R.θ (MP R) _ _ S hS0.1
-  obtain ⟨w', hw'⟩ : ∃ w' : (MP R).Vec, ∀ τ, ((w' τ : (MP R).sm τ) : (MP R).H τ) =
-      (MP R).rep τ (g' τ) ((vecOf R X c y τ : (MP R).sm τ) : (MP R).H τ) :=
+  obtain ⟨w', hw'⟩
+      : ∃ w' : (MP R).Vec, ∀ τ,
+        ((w' τ : (MP R).sm τ) : (MP R).H τ)
+          = (MP R).rep τ (g' τ) ((vecOf R X c y τ : (MP R).sm τ) : (MP R).H τ) :=
     ⟨fun τ => ⟨_, rep_mem_sm_of_mem_UH (MP R) τ (hg' τ) (vecOf R X c y τ).2⟩, fun τ => rfl⟩
-  obtain ⟨y', hy'⟩ : ∃ y' : ∀ τ, ↥(Wsub R X c τ), ∀ τ,
-      ((y' τ : ↥(Wsub R X c τ)) : X.B.H (X.pl.symm τ)) = c τ (w' τ : (MP R).H τ) :=
-    ⟨fun τ => ⟨c τ (w' τ : (MP R).H τ), by unfold Wsub; exact Submodule.mem_map_of_mem (w' τ).2⟩,
-      fun τ => rfl⟩
-  have hyσ : ∀ τ, ((y' τ : ↥(Wsub R X c τ)) : X.B.H (X.pl.symm τ)) =
-      X.B.σ (X.pl.symm τ) (uMat (g (X.pl.symm τ))) (y τ : X.B.H (X.pl.symm τ)) := by
+  obtain ⟨y', hy'⟩
+      : ∃ y' : ∀ τ, ↥(Wsub R X c τ), ∀ τ,
+        ((y' τ : ↥(Wsub R X c τ)) : X.B.H (X.pl.symm τ)) = c τ (w' τ : (MP R).H τ) := ⟨
+    fun τ => ⟨c τ (w' τ : (MP R).H τ), by unfold Wsub; exact Submodule.mem_map_of_mem (w' τ).2⟩,
+    fun τ => rfl
+  ⟩
+  have hyσ
+      : ∀ τ,
+        ((y' τ : ↥(Wsub R X c τ)) : X.B.H (X.pl.symm τ))
+          = X.B.σ (X.pl.symm τ) (uMat (g (X.pl.symm τ))) (y τ : X.B.H (X.pl.symm τ)) := by
     intro τ
     rw [hy', hw', hc τ (g' τ) (hg' τ), hg'eq τ]
     congr 1
     exact (c τ).apply_symm_apply _
-  obtain ⟨a, ha⟩ : ∃ a : Finset D.what₂.Tau → GA D (D.sp.Y 0), ∀ s,
-      iotaX X h (a s) = ((fun v => if X.pl v ∈ s then g v else 1 : X.B.I.Ginf), (1 : X.B.I.Gf)) :=
+  obtain ⟨a, ha⟩
+      : ∃ a : Finset D.what₂.Tau → GA D (D.sp.Y 0), ∀ s,
+        iotaX X h (a s) = ((fun v => if X.pl v ∈ s then g v else 1 : X.B.I.Ginf), (1 : X.B.I.Gf)) :=
     ⟨fun s => (iotaX X h).symm _, fun s => (iotaX X h).apply_symm_apply _⟩
-  have hstep : ∀ τ (s : Finset D.what₂.Tau), τ ∉ s →
-      atTau R.θ (D.sp.Y 0) τ (g' τ) * a s = a (insert τ s) := by
+  have hstep
+      : ∀ τ (s : Finset D.what₂.Tau),
+        τ ∉ s → atTau R.θ (D.sp.Y 0) τ (g' τ) * a s = a (insert τ s) := by
     intro τ s hτ
     apply (iotaX X h).injective
     obtain ⟨h2, h1, -⟩ := hat τ (g' τ) (hg' τ)
@@ -204,8 +248,9 @@ theorem evF_equiv : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
         have hne : X.pl v ≠ τ := fun e => hv (by rw [← e, Equiv.symm_apply_apply])
         simp [hne]
     · simp only [Prod.snd_mul, h2, one_mul]
-  have hclaim : ∀ s : Finset D.what₂.Tau, ∀ z,
-      S (fun τ => if τ ∈ s then w' τ else vecOf R X c y τ) z = S (vecOf R X c y) (z * a s) := by
+  have hclaim
+      : ∀ s : Finset D.what₂.Tau, ∀ z,
+        S (fun τ => if τ ∈ s then w' τ else vecOf R X c y τ) z = S (vecOf R X c y) (z * a s) := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -219,11 +264,15 @@ theorem evF_equiv : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
       simp [h1]
     | @insert τ s hτ ih =>
       intro z
-      have hw : ((w' τ : (MP R).sm τ) : (MP R).H τ) = (MP R).rep τ (g' τ)
-          (((fun τ' => if τ' ∈ s then w' τ' else vecOf R X c y τ') τ : (MP R).sm τ) : (MP R).H τ) := by
+      have hw
+          : ((w' τ : (MP R).sm τ) : (MP R).H τ)
+            = (MP R).rep τ (g' τ)
+              (((fun τ' => if τ' ∈ s then w' τ' else vecOf R X c y τ') τ : (MP R).sm τ)
+                : (MP R).H τ) := by
         simp only [if_neg hτ]
         exact hw' τ
-      have e := hS'.2 τ (g' τ) (hg' τ) (fun τ' => if τ' ∈ s then w' τ' else vecOf R X c y τ') (w' τ) hw z
+      have e :=
+        hS'.2 τ (g' τ) (hg' τ) (fun τ' => if τ' ∈ s then w' τ' else vecOf R X c y τ') (w' τ) hw z
       refine Eq.trans (congrArg (fun v => S v z) ?_) (e.trans ?_)
       · funext τ'
         by_cases hτ' : τ' = τ

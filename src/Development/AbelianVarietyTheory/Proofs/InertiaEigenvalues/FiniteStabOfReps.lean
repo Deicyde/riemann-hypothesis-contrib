@@ -12,18 +12,18 @@ open Formalism.IndefR.Bridge
 
 namespace GlobalTheory.ClassTrace
 
-variable {O Γ Hf P : Type} [CommRing O] [Group Γ] [Group Hf] [AddCommGroup P] [Module O P]
-  (ι : Γ →* Hf) (J : Subgroup Hf) (lam : J →* Oˣ) (ρ : Representation O Γ P)
-
+variable
+  {O Γ Hf P : Type} [CommRing O] [Group Γ] [Group Hf] [AddCommGroup P] [Module O P]
+  (ι : Γ →* Hf)
+  (J : Subgroup Hf) (lam : J →* Oˣ)
+  (ρ : Representation O Γ P)
 
 open Classical in
 def lamExt (x : Hf) : O := if hx : x ∈ J then (lam ⟨x, hx⟩ : O) else 0
 
-theorem lamExt_coe (k : J) : lamExt J lam (k : Hf) = (lam k : O) := by
-  simp [lamExt]
+theorem lamExt_coe (k : J) : lamExt J lam (k : Hf) = (lam k : O) := by simp [lamExt]
 
-theorem lamExt_of_not_mem {x : Hf} (hx : x ∉ J) : lamExt J lam x = 0 := by
-  simp [lamExt, hx]
+theorem lamExt_of_not_mem {x : Hf} (hx : x ∉ J) : lamExt J lam x = 0 := by simp [lamExt, hx]
 
 theorem lamExt_mul (x : Hf) (k : J) : lamExt J lam (x * k) = lamExt J lam x * (lam k : O) := by
   by_cases hx : x ∈ J
@@ -50,13 +50,19 @@ theorem mem_link_iff {h x : Hf} {γ : Γ} : γ ∈ link ι J h x ↔ ∃ k : J, 
     exact k.2
 
 def linkEquiv {h x : Hf} {γ₀ : Γ} (h0 : γ₀ ∈ link ι J h x) : stab ι J x ≃ link ι J h x where
-  toFun δ := ⟨δ * γ₀, by
-    have h1 := J.mul_mem h0 (J.inv_mem ((mem_stab ι).1 δ.2))
-    simpa [link, mul_assoc] using h1⟩
-  invFun γ := ⟨γ * γ₀⁻¹, by
-    have h1 := J.mul_mem (J.inv_mem γ.2) h0
-    rw [mem_stab]
-    simpa [link, mul_assoc] using h1⟩
+  toFun δ := ⟨
+    δ * γ₀,
+    by
+      have h1 := J.mul_mem h0 (J.inv_mem ((mem_stab ι).1 δ.2))
+      simpa [link, mul_assoc] using h1
+  ⟩
+  invFun γ := ⟨
+    γ * γ₀⁻¹,
+    by
+      have h1 := J.mul_mem (J.inv_mem γ.2) h0
+      rw [mem_stab]
+      simpa [link, mul_assoc] using h1
+  ⟩
   left_inv δ := by simp
   right_inv γ := by simp
 
@@ -67,16 +73,16 @@ theorem link_finite (hfin : ∀ x, Finite (stab ι J x)) (h x : Hf) : (link ι J
   · have := hfin x
     exact Set.finite_coe_iff.mp (Finite.of_equiv _ (linkEquiv ι J h0))
 
-theorem support_subset (h : Hf) (p : P) (x : Hf) :
-    (Function.support fun γ : Γ => lamExt J lam (h⁻¹ * (ι γ)⁻¹ * x) • ρ γ p) ⊆ link ι J h x := by
+theorem support_subset (h : Hf) (p : P) (x : Hf)
+    : (Function.support fun γ : Γ => lamExt J lam (h⁻¹ * (ι γ)⁻¹ * x) • ρ γ p) ⊆ link ι J h x := by
   intro γ hγ
   rw [Function.mem_support] at hγ
   by_contra hn
   have hn' : h⁻¹ * (ι γ)⁻¹ * x ∉ J := hn
   exact hγ (by rw [lamExt_of_not_mem J lam hn', zero_smul])
 
-theorem traceForm_eq_zero (h : Hf) (p : P) {x : Hf} (hx : ¬ ∃ (γ : Γ) (k : J), x = ι γ * h * k) :
-    traceForm ι J lam ρ h p x = 0 := by
+theorem traceForm_eq_zero (h : Hf) (p : P) {x : Hf} (hx : ¬ ∃ (γ : Γ) (k : J), x = ι γ * h * k)
+    : traceForm ι J lam ρ h p x = 0 := by
   unfold traceForm
   have hz : ∀ γ : Γ, lamExt J lam (h⁻¹ * (ι γ)⁻¹ * x) • ρ γ p = 0 := by
     intro γ
@@ -85,8 +91,8 @@ theorem traceForm_eq_zero (h : Hf) (p : P) {x : Hf} (hx : ¬ ∃ (γ : Γ) (k : 
     rw [lamExt_of_not_mem J lam hn, zero_smul]
   simp only [hz, finsum_zero]
 
-theorem traceForm_law (hfin : ∀ x, Finite (stab ι J x)) (h : Hf) (p : P) (γ₀ : Γ) (x : Hf) (k : J) :
-    traceForm ι J lam ρ h p (ι γ₀ * x * k) = (lam k : O) • ρ γ₀ (traceForm ι J lam ρ h p x) := by
+theorem traceForm_law (hfin : ∀ x, Finite (stab ι J x)) (h : Hf) (p : P) (γ₀ : Γ) (x : Hf) (k : J)
+    : traceForm ι J lam ρ h p (ι γ₀ * x * k) = (lam k : O) • ρ γ₀ (traceForm ι J lam ρ h p x) := by
   have hf : (Function.support fun γ : Γ => lamExt J lam (h⁻¹ * (ι γ)⁻¹ * x) • ρ γ p).Finite :=
     (link_finite ι J hfin h x).subset (support_subset ι J lam ρ h p x)
   unfold traceForm
@@ -108,15 +114,20 @@ def classSum (θ : Hf → P →ₛₗ[e] W) {I : Type} [Fintype I] (y : I → Hf
 def DualLaw (θ : Hf → P →ₛₗ[e] W) : Prop :=
   ∀ (γ : Γ) (h : Hf) (k : J) (p : P), e (lam k) • θ (ι γ * h * k) (ρ γ p) = θ h p
 
-theorem kernel_traceForm (hfin : ∀ x, Finite (stab ι J x)) {θ : Hf → P →ₛₗ[e] W} (hθ : DualLaw ι J lam ρ θ)
-    (h : Hf) (p : P) {x : Hf} {γ₀ : Γ} (h0 : γ₀ ∈ link ι J h x) :
-    θ x (traceForm ι J lam ρ h p x) = (Nat.card (stab ι J x) : C) • θ h p := by
+theorem kernel_traceForm
+    (hfin : ∀ x, Finite (stab ι J x))
+    {θ : Hf → P →ₛₗ[e] W} (hθ : DualLaw ι J lam ρ θ)
+    (h : Hf)
+    (p : P)
+    {x : Hf} {γ₀ : Γ} (h0 : γ₀ ∈ link ι J h x)
+    : θ x (traceForm ι J lam ρ h p x) = (Nat.card (stab ι J x) : C) • θ h p := by
   classical
   have hL := link_finite ι J hfin h x
   have hf : (Function.support fun γ : Γ => lamExt J lam (h⁻¹ * (ι γ)⁻¹ * x) • ρ γ p).Finite :=
     hL.subset (support_subset ι J lam ρ h p x)
-  have hterm : ∀ γ : Γ, θ x (lamExt J lam (h⁻¹ * (ι γ)⁻¹ * x) • ρ γ p) =
-      if γ ∈ link ι J h x then θ h p else 0 := by
+  have hterm
+      : ∀ γ : Γ,
+        θ x (lamExt J lam (h⁻¹ * (ι γ)⁻¹ * x) • ρ γ p) = if γ ∈ link ι J h x then θ h p else 0 := by
     intro γ
     split_ifs with hγ
     · obtain ⟨k, hk⟩ := (mem_link_iff ι J).1 hγ
@@ -126,8 +137,9 @@ theorem kernel_traceForm (hfin : ∀ x, Finite (stab ι J x)) {θ : Hf → P →
       rw [hk', lamExt_coe, map_smulₛₗ, ← hθ γ h k p, ← hk]
     · have hn : h⁻¹ * (ι γ)⁻¹ * x ∉ J := hγ
       rw [lamExt_of_not_mem J lam hn, zero_smul, map_zero]
-  have hsub : Function.support (fun γ : Γ => if γ ∈ link ι J h x then θ h p else 0) ⊆
-      (hL.toFinset : Set Γ) := by
+  have hsub
+      : Function.support (fun γ : Γ => if γ ∈ link ι J h x then θ h p else 0)
+        ⊆ (hL.toFinset : Set Γ) := by
     intro γ hγ
     rw [Set.Finite.coe_toFinset]
     by_contra hn
@@ -138,12 +150,17 @@ theorem kernel_traceForm (hfin : ∀ x, Finite (stab ι J x)) {θ : Hf → P →
   rw [map_finsum (θ x) hf]
   simp only [hterm]
   rw [finsum_eq_sum_of_support_subset _ hsub,
-    Finset.sum_congr rfl (fun γ hγ => if_pos ((Set.Finite.mem_toFinset hL).1 hγ)),
-    Finset.sum_const, hc, Nat.cast_smul_eq_nsmul]
+    Finset.sum_congr rfl (fun γ hγ => if_pos ((Set.Finite.mem_toFinset hL).1 hγ)), Finset.sum_const,
+    hc, Nat.cast_smul_eq_nsmul]
 
-theorem classSum_traceForm [CharZero C] (hfin : ∀ x, Finite (stab ι J x)) {θ : Hf → P →ₛₗ[e] W}
-    (hθ : DualLaw ι J lam ρ θ) {I : Type} [Fintype I] {y : I → Hf} (hy : IsReps ι J y) (h : Hf) (p : P) :
-    classSum ι J θ y (traceForm ι J lam ρ h p) = θ h p := by
+theorem classSum_traceForm
+    [CharZero C]
+    (hfin : ∀ x, Finite (stab ι J x))
+    {θ : Hf → P →ₛₗ[e] W} (hθ : DualLaw ι J lam ρ θ)
+    {I : Type} [Fintype I]
+    {y : I → Hf} (hy : IsReps ι J y)
+    (h : Hf) (p : P)
+    : classSum ι J θ y (traceForm ι J lam ρ h p) = θ h p := by
   obtain ⟨i₀, ⟨γ, k, hh⟩, huniq⟩ := hy h
   unfold classSum
   rw [Finset.sum_eq_single i₀]
@@ -170,16 +187,18 @@ theorem classSum_traceForm [CharZero C] (hfin : ∀ x, Finite (stab ι J x)) {θ
   · intro hi
     exact absurd (Finset.mem_univ i₀) hi
 
-theorem finite_stab_of_reps {I : Type} {y : I → Hf} (hy : IsReps ι J y) (hfin : ∀ i, Finite (stab ι J (y i)))
-    (x : Hf) : Finite (stab ι J x) := by
+theorem finite_stab_of_reps
+    {I : Type} {y : I → Hf} (hy : IsReps ι J y) (hfin : ∀ i, Finite (stab ι J (y i))) (x : Hf)
+    : Finite (stab ι J x) := by
   obtain ⟨i, ⟨γ, k, hx⟩, -⟩ := hy x
   subst hx
   have := hfin i
   refine Finite.of_injective (β := stab ι J (y i)) (fun δ => ⟨γ⁻¹ * δ * γ, ?_⟩) ?_
   · rw [mem_stab]
     have hδ := (mem_stab ι).1 δ.2
-    have e : (y i)⁻¹ * ι (γ⁻¹ * δ * γ) * y i =
-        (k : Hf) * ((ι γ * y i * k)⁻¹ * ι δ * (ι γ * y i * k)) * (k : Hf)⁻¹ := by
+    have e
+        : (y i)⁻¹ * ι (γ⁻¹ * δ * γ) * y i
+          = (k : Hf) * ((ι γ * y i * k)⁻¹ * ι δ * (ι γ * y i * k)) * (k : Hf)⁻¹ := by
       simp only [map_mul, map_inv]
       group
     rw [e]

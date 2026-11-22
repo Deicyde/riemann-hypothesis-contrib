@@ -14,22 +14,25 @@ variable {k r : ℕ}
 
 def pw (i : Fin (2 * r + k + 1)) : ℂ := if r ≤ i.val ∧ i.val ≤ r + k then 1 else 0
 
-theorem pw_mulVec (x : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) :
-    (diagonal (pw (k := k) (r := r)) *ᵥ x) i = pw (k := k) (r := r) i * x i := mulVec_diagonal _ _ _
+theorem pw_mulVec (x : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1))
+    : (diagonal (pw (k := k) (r := r)) *ᵥ x) i = pw (k := k) (r := r) i * x i :=
+  mulVec_diagonal _ _ _
 
-theorem pw_inWb (x : Fin (2 * r + k + 1) → ℂ) : inWb k r (diagonal (pw (k := k) (r := r)) *ᵥ x) := by
+theorem pw_inWb (x : Fin (2 * r + k + 1) → ℂ)
+    : inWb k r (diagonal (pw (k := k) (r := r)) *ᵥ x) := by
   intro i hi
   rw [pw_mulVec, pw, if_neg (by omega), zero_mul]
 
-theorem pw_fix {u : Fin (2 * r + k + 1) → ℂ} (hu : inWb k r u) : diagonal (pw (k := k) (r := r)) *ᵥ u = u := by
+theorem pw_fix {u : Fin (2 * r + k + 1) → ℂ} (hu : inWb k r u)
+    : diagonal (pw (k := k) (r := r)) *ᵥ u = u := by
   funext i
   rw [pw_mulVec, pw]
   split_ifs with h
   · rw [one_mul]
   · rw [zero_mul, hu i (by omega)]
 
-theorem herm_pw_right {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (x : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) v (diagonal (pw (k := k) (r := r)) *ᵥ x) = herm (Hpk k r) v x := by
+theorem herm_pw_right {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (x : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) v (diagonal (pw (k := k) (r := r)) *ᵥ x) = herm (Hpk k r) v x := by
   rw [herm_eq, herm_eq]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [hpk_mulVec_wb hv, pw_mulVec, pw]
@@ -37,12 +40,12 @@ theorem herm_pw_right {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (x : F
   · rw [one_mul]
   · rw [hv i (by omega), mul_zero, mul_zero, mul_zero]
 
-theorem herm_pw_left {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (x : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) (diagonal (pw (k := k) (r := r)) *ᵥ x) v = herm (Hpk k r) x v := by
+theorem herm_pw_left {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (x : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (diagonal (pw (k := k) (r := r)) *ᵥ x) v = herm (Hpk k r) x v := by
   rw [herm_swap, herm_pw_right hv, ← herm_swap]
 
-theorem flt_sub_pw (x : Fin (2 * r + k + 1) → ℂ) (hx : ∀ b : Fin r, x (esI k r b) = 0) :
-    Flt r (x - diagonal (pw (k := k) (r := r)) *ᵥ x) := by
+theorem flt_sub_pw (x : Fin (2 * r + k + 1) → ℂ) (hx : ∀ b : Fin r, x (esI k r b) = 0)
+    : Flt r (x - diagonal (pw (k := k) (r := r)) *ᵥ x) := by
   intro i hi
   rw [Pi.sub_apply, pw_mulVec, pw]
   by_cases h : i.val ≤ r + k
@@ -50,14 +53,17 @@ theorem flt_sub_pw (x : Fin (2 * r + k + 1) → ℂ) (hx : ∀ b : Fin r, x (esI
   · have e : i = esI k r ⟨2 * r + k - i.val, by omega⟩ := by apply Fin.ext; simp [esI]; omega
     rw [if_neg (by omega), zero_mul, sub_zero, e, hx]
 
-theorem flt_of_orth (x : Fin (2 * r + k + 1) → ℂ)
-    (h : ∀ v : Fin (2 * r + k + 1) → ℂ, (∀ b : Fin r, v (esI k r b) = 0) → herm (Hpk k r) x v = 0) : Flt r x := by
+theorem flt_of_orth
+    (x : Fin (2 * r + k + 1) → ℂ)
+    (h : ∀ v : Fin (2 * r + k + 1) → ℂ, (∀ b : Fin r, v (esI k r b) = 0) → herm (Hpk k r) x v = 0)
+    : Flt r x := by
   intro i hi
   by_cases h2 : i.val ≤ r + k
   · have hw := herm_w x i hi h2
-    have h0 := h (bvec i) (fun b => by
-      have : esI k r b ≠ i := by intro e; have := congrArg Fin.val e; simp [esI] at this; omega
-      simp [bvec, this])
+    have h0 :=
+      h (bvec i) (fun b => by
+        have : esI k r b ≠ i := by intro e; have := congrArg Fin.val e; simp [esI] at this; omega
+        simp [bvec, this])
     rw [hw] at h0
     split_ifs at h0
     · exact neg_eq_zero.1 h0
@@ -77,7 +83,8 @@ theorem symbolNil_direct : SymbolNil := by
   set H := Hpk k r with hH
   have hgu : gᴴ * H * g = H := hg
   have hdetH : H.det ≠ 0 := by
-    have := congrArg Matrix.det (Formalism.QuantumDeterminants.WeylGroupFacts.hpk_sq (k := k) (r := r))
+    have :=
+      congrArg Matrix.det (Formalism.QuantumDeterminants.WeylGroupFacts.hpk_sq (k := k) (r := r))
     rw [det_mul, det_one] at this
     exact left_ne_zero_of_mul_eq_one this
   have hdetg : IsUnit g.det := by
@@ -97,24 +104,30 @@ theorem symbolNil_direct : SymbolNil := by
     | zero => rw [pow_zero, pow_zero, Matrix.mul_one, hgg']
     | succ m ih =>
       rw [pow_succ, ih, pow_succ, hηdef]
-      calc g⁻¹ * ξ ^ m * g * (g⁻¹ * ξ * g) = g⁻¹ * ξ ^ m * (g * g⁻¹) * ξ * g := by
-            simp only [Matrix.mul_assoc]
+      calc
+        g⁻¹ * ξ ^ m * g * (g⁻¹ * ξ * g)
+          = g⁻¹ * ξ ^ m * (g * g⁻¹) * ξ * g := by simp only [Matrix.mul_assoc]
         _ = g⁻¹ * (ξ ^ m * ξ) * g := by rw [hgg, Matrix.mul_one]; simp only [Matrix.mul_assoc]
   have hηN : η ^ N = 0 := by rw [hηpow, hN, Matrix.mul_zero, Matrix.zero_mul]
   have e1 : (g⁻¹)ᴴ * H = H * g := by
-    calc (g⁻¹)ᴴ * H = (g⁻¹)ᴴ * (gᴴ * H * g) := by rw [hgu]
+    calc
+      (g⁻¹)ᴴ * H
+        = (g⁻¹)ᴴ * (gᴴ * H * g) := by rw [hgu]
       _ = (g * g⁻¹)ᴴ * H * g := by rw [conjTranspose_mul]; simp only [Matrix.mul_assoc]
       _ = H * g := by rw [hgg, conjTranspose_one, Matrix.one_mul]
   have e2 : H * g⁻¹ = gᴴ * H := by
-    calc H * g⁻¹ = gᴴ * H * g * g⁻¹ := by rw [hgu]
+    calc
+      H * g⁻¹
+        = gᴴ * H * g * g⁻¹ := by rw [hgu]
       _ = gᴴ * H := by rw [Matrix.mul_assoc, hgg, Matrix.mul_one]
   have hη : B.inLie k r η := by
     have hξ' : ξᴴ * H + H * ξ = 0 := hξ
     show ηᴴ * H + H * η = 0
-    calc ηᴴ * H + H * η = gᴴ * ξᴴ * ((g⁻¹)ᴴ * H) + (H * g⁻¹) * ξ * g := by
-          rw [hηdef]; simp only [conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      ηᴴ * H + H * η = gᴴ * ξᴴ * ((g⁻¹)ᴴ * H) + (H * g⁻¹) * ξ * g := by
+        rw [hηdef]; simp only [conjTranspose_mul, Matrix.mul_assoc]
       _ = gᴴ * (ξᴴ * H + H * ξ) * g := by
-          rw [e1, e2]; simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
+        rw [e1, e2]; simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
       _ = 0 := by rw [hξ', Matrix.mul_zero, Matrix.zero_mul]
   have hS'η : ∀ X ∈ lieOf (Sset k r z'), (Matrix.trace (η * X)).re = 0 := by
     intro X hX
@@ -123,7 +136,8 @@ theorem symbolNil_direct : SymbolNil := by
       rw [show ξ * (g * X * g⁻¹) = (ξ * g * X) * g⁻¹ by simp only [Matrix.mul_assoc],
         Matrix.trace_mul_comm, hηdef]
       simp only [Matrix.mul_assoc]
-    rw [← e]; exact this
+    rw [← e]
+    exact this
   have hD : ∀ a (ha : a ≤ r), Dmin k r z z' g ⟨a, by omega⟩ ≠ 0 := by
     intro a ha
     cases a with
@@ -147,8 +161,9 @@ theorem symbolNil_direct : SymbolNil := by
     intro w; rw [mulVec_mulVec, mulVec_mulVec, Matrix.mul_assoc]
   have hPfix : ∀ u, inWb k r u → P *ᵥ u = u := fun u hu => by rw [hP]; exact pw_fix hu
   have hPin : ∀ x, inWb k r (P *ᵥ x) := fun x => by rw [hP]; exact pw_inWb x
-  have hPl : ∀ v, inWb k r v → ∀ x, herm (Hpk k r) (P *ᵥ x) v = herm (Hpk k r) x v :=
-    fun v hv x => by rw [hP]; exact herm_pw_left hv x
+  have hPl
+      : ∀ v, inWb k r v → ∀ x, herm (Hpk k r) (P *ᵥ x) v = herm (Hpk k r) x v := fun v hv x => by
+    rw [hP]; exact herm_pw_left hv x
   have hWcomp : ∀ u, inWb k r u → ∀ m, ((P * ξ * P) ^ m) *ᵥ u = P *ᵥ ((ξ ^ m) *ᵥ u) := by
     intro u hu m
     induction m with
@@ -159,16 +174,20 @@ theorem symbolNil_direct : SymbolNil := by
         cases m with
         | zero => rw [pow_zero, one_mulVec]; exact hu _ (Or.inr (by simp [esI]; omega))
         | succ m => rw [pow_succ', ← mulVec_mulVec]; exact hrange _ b
-      rw [pow_succ', ← mulVec_mulVec, ih, hcomp, hPfix _ (hPin _), hξP _ hy, pow_succ', ← mulVec_mulVec]
+      rw [pow_succ', ← mulVec_mulVec, ih, hcomp, hPfix _ (hPin _), hξP _ hy, pow_succ',
+        ← mulVec_mulVec]
   have hW := fun X (hX : X ∈ lieOf (UWset k r z)) => hS X (lieOf_mono (UWset_sub_Sset k r z) hX)
-  have hcore := coreW hz hT (P * ξ * P)
-    (fun u _ => by rw [hcomp]; exact hPin _)
-    (fun u v hu hv => by
-      rw [hcomp, hcomp, hPfix u hu, hPfix v hv, hPl v hv, herm_swap u, hPl u hu, herm_skew hξ u v, herm_swap u])
-    (fun u v hu hv huz hvz => by
-      rw [hcomp, hPfix u hu, hPl v hv]
-      exact herm_zero_of_lieW hξ z hW u v hu hv huz hvz)
-    N (fun u hu => by rw [hWcomp u hu, hN, zero_mulVec, mulVec_zero])
+  have hcore :=
+    coreW hz hT (P * ξ * P)
+      (fun u _ => by rw [hcomp]; exact hPin _)
+      (fun u v hu hv => by
+        rw [hcomp, hcomp, hPfix u hu, hPfix v hv, hPl v hv, herm_swap u, hPl u hu, herm_skew hξ u v,
+          herm_swap u])
+      (fun u v hu hv huz hvz => by
+        rw [hcomp, hPfix u hu, hPl v hv]
+        exact herm_zero_of_lieW hξ z hW u v hu hv huz hvz)
+      N
+      (fun u hu => by rw [hWcomp u hu, hN, zero_mulVec, mulVec_zero])
   have hWb : ∀ u, inWb k r u → ξ *ᵥ u = 0 := by
     intro u hu
     have hc := hcore u hu
@@ -180,7 +199,8 @@ theorem symbolNil_direct : SymbolNil := by
         rw [pw_mulVec, pw, if_pos ⟨hi, h2⟩, one_mul] at this
         exact this
       · have e : i = esI k r ⟨2 * r + k - i.val, by omega⟩ := by apply Fin.ext; simp [esI]; omega
-        rw [e]; exact hrange u _
+        rw [e]
+        exact hrange u _
     refine dlem_ii z z' g r le_rfl (hD r le_rfl) _ hflt (fun c _ => ?_)
     rw [herm_skew hξ, hξgX, herm_zero_right, neg_zero]
   have hperp : ∀ y, (∀ b : Fin r, y (esI k r b) = 0) → ξ *ᵥ y = 0 := by

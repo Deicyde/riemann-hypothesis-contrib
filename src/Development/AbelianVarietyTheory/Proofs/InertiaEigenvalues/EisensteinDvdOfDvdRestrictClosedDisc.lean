@@ -8,14 +8,22 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilK
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
 
-theorem dvd_of_dvd_restrict_discS : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (ρ : ℝ≥0), bk.ρ₀ ≤ ρ → ρ < 1 → ∀ R : bk.DS ρ →+* bk.DS bk.ρ₀, IsDiscMap (l := _) (u := _) (ρ := _) (RingHom.id bk.S) R → ∀ y, toDisc l (X : bk.S) bk.ρ₀ bk.E ∣ R y → toDisc l (X : bk.S) ρ bk.E ∣ y := by
+theorem dvd_of_dvd_restrict_discS
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (ρ : ℝ≥0),
+      bk.ρ₀ ≤ ρ → ρ < 1
+        → ∀ R : bk.DS ρ →+* bk.DS bk.ρ₀,
+          IsDiscMap (l := _) (u := _) (ρ := _) (RingHom.id bk.S) R
+            → ∀ y, toDisc l (X : bk.S) bk.ρ₀ bk.E ∣ R y → toDisc l (X : bk.S) ρ bk.E ∣ y := by
   intro l _ K bk ρ h0 h1 R hR y hy
-  obtain ⟨q, k, r, hr, e⟩ := GlobalTheory.T.weierstrass_division_closedDisc_breuilKisin l K bk ρ h0 h1 y
+  obtain ⟨q, k, r, hr, e⟩ :=
+    GlobalTheory.T.weierstrass_division_closedDisc_breuilKisin l K bk ρ h0 h1 y
   have e' := congrArg R e
   rw [map_mul, map_add (f := _), map_mul, hR.ext, hR.ext, RingHom.id_apply, RingHom.id_apply] at e'
   have hd : toDisc l (X : bk.S) bk.ρ₀ bk.E ∣ toDisc l (X : bk.S) bk.ρ₀ (r : bk.S) := by

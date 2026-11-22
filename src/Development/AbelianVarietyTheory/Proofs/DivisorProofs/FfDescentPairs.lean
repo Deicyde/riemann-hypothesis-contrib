@@ -10,18 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FfDescentEle
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem ff_descent_pairs : ∀ (R : Type) [CommRing R] (D D' : Type) [CommRing D] [Algebra R D]
-    [CommRing D'] [Algebra R D'] (ψ : D →ₐ[R] D'), (ψ : D →+* D').FaithfullyFlat → ∀ a : D',
-    (∀ (E : Type) [CommRing E] [Algebra R E] (α β : D' →ₐ[R] E), α.comp ψ = β.comp ψ → α a = β a) →
-      ∃! e : D, ψ e = a := by
+theorem ff_descent_pairs
+    : ∀ (R : Type) [CommRing R] (D D' : Type) [CommRing D] [Algebra R D] [CommRing D']
+        [Algebra R D'] (ψ : D →ₐ[R] D'),
+      (ψ : D →+* D').FaithfullyFlat
+        → ∀ a : D',
+          (∀ (E : Type) [CommRing E] [Algebra R E] (α β : D' →ₐ[R] E),
+              α.comp ψ = β.comp ψ → α a = β a)
+            → ∃! e : D, ψ e = a := by
   intro R _ D D' _ _ _ _ ψ hψ a h
   letI : Algebra D D' := (ψ : D →+* D').toAlgebra
   haveI : Module.FaithfullyFlat D D' := hψ

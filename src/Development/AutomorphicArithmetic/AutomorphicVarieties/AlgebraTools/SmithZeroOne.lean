@@ -6,8 +6,15 @@ public import Mathlib
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.smith_zero_one :
-    ∀ {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {F V : Type} [Field F] [Algebra A F] [IsFractionRing A F] [AddCommGroup V] [Module F V] [Module A V] [IsScalarTower A F V] [Module.Finite F V] (ϖ : A) (Y Z : Submodule A V), Irreducible ϖ → Submodule.IsFullLattice F Z → Y ≤ Z → maximalIdeal A • Z ≤ Y → ∃ (b : Module.Basis (Fin (Module.finrank F V)) F V) (S : Finset (Fin (Module.finrank F V))), Z = Submodule.span A (Set.range b) ∧ Y = Submodule.span A (Set.range fun i => if i ∈ S then ϖ • b i else b i) := by
+theorem UpperTheory.V.AlgebraTools.smith_zero_one
+    : ∀ {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {F V : Type} [Field F]
+        [Algebra A F] [IsFractionRing A F] [AddCommGroup V] [Module F V] [Module A V]
+        [IsScalarTower A F V] [Module.Finite F V] (ϖ : A) (Y Z : Submodule A V),
+      Irreducible ϖ → Submodule.IsFullLattice F Z → Y ≤ Z → maximalIdeal A • Z ≤ Y
+        → ∃ (b : Module.Basis (Fin (Module.finrank F V)) F V)
+            (S : Finset (Fin (Module.finrank F V))),
+          Z = Submodule.span A (Set.range b)
+            ∧ Y = Submodule.span A (Set.range fun i => if i ∈ S then ϖ • b i else b i) := by
   intro A _ _ _ F V _ _ _ _ _ _ _ _ ϖ Y Z hϖ hZ hYZ hmY
   classical
   haveI : Submodule.IsFullLattice F Z := hZ

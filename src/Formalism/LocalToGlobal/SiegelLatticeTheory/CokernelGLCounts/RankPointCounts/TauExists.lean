@@ -14,10 +14,13 @@ namespace Formalism.L2.SG.NGCut.NormalVectorPairings
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
-private theorem sub_mem_X_of_mem_Asp_of_hT_orth {F : FlagG S r T} {F' : FlagG S r T'} (hG : Gflag F F' ≠ 0) (hT : T ≠ 0)
-    (hTs : star T = T) (σ : S.V →ₗ[E] S.V) (hσf : ∀ x ∈ F.X, σ x - x ∈ F.X) (hσz : σ F.z - F.z ∈ F.X)
-    (hσω : σ (omp F F') - omp F F' ∈ F.X) {a : S.V} (ha : a ∈ Asp F F')
-    (hX : ∀ x ∈ F.X, S.hT x a = 0) : σ a - a ∈ F.X := by
+private theorem sub_mem_X_of_mem_Asp_of_hT_orth
+    {F : FlagG S r T} {F' : FlagG S r T'} (hG : Gflag F F' ≠ 0)
+    (hT : T ≠ 0) (hTs : star T = T)
+    (σ : S.V →ₗ[E] S.V)
+    (hσf : ∀ x ∈ F.X, σ x - x ∈ F.X) (hσz : σ F.z - F.z ∈ F.X) (hσω : σ (omp F F') - omp F F' ∈ F.X)
+    {a : S.V} (ha : a ∈ Asp F F') (hX : ∀ x ∈ F.X, S.hT x a = 0)
+    : σ a - a ∈ F.X := by
   classical
   have hz : F.z ∈ Asp F F' := by
     simpa [FlagG.fvec, Fin.snoc_last] using fvec_mem_Asp F F' (Fin.last r)
@@ -61,7 +64,10 @@ private theorem sub_mem_X_of_mem_Asp_of_hT_orth {F : FlagG S r T} {F' : FlagG S 
     simp only [map_add (f := _), map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul,
       starRingEnd_apply, hoz, hzz, hTs]
     ring
-  have hy0o : S.hT y0 (omp F F') = T * (-T' * (Dl F F' r * star (Dl F F' r))) + star (Dl F F' (r + 1)) * Dl F F' (r + 1) := by
+  have hy0o
+      : S.hT y0 (omp F F')
+        = T * (-T' * (Dl F F' r * star (Dl F F' r)))
+          + star (Dl F F' (r + 1)) * Dl F F' (r + 1) := by
     rw [hy0]
     simp only [map_add (f := _), map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul,
       starRingEnd_apply, hoo, hzo, hTs]
@@ -75,8 +81,9 @@ private theorem sub_mem_X_of_mem_Asp_of_hT_orth {F : FlagG S r T} {F' : FlagG S 
   have hy0ne : S.hT y0 y0 ≠ 0 := by
     rw [hy0y0]
     exact mul_ne_zero hT hG
-  have horth : ∀ u : S.V, (∀ x ∈ F.X, S.hT x u = 0) → S.hT F.z u = 0 → u ∈ Asp F F' →
-      u ∈ Qsp F (Hsp F F') := by
+  have horth
+      : ∀ u : S.V,
+        (∀ x ∈ F.X, S.hT x u = 0) → S.hT F.z u = 0 → u ∈ Asp F F' → u ∈ Qsp F (Hsp F F') := by
     intro u h1 h2 h3
     have hle : F.X ⊔ E ∙ F.z ⊔ Hsp F F' ≤ LinearMap.ker (S.hT.flip u) := by
       refine sup_le (sup_le ?_ ?_) ?_
@@ -89,7 +96,8 @@ private theorem sub_mem_X_of_mem_Asp_of_hT_orth {F : FlagG S r T} {F' : FlagG S 
     simp only [Qsp, Lat.orth, Submodule.mem_iInf, LinearMap.mem_ker]
     intro x hx
     simpa using hle hx
-  obtain ⟨v, hv⟩ : ∃ v : S.V, v = a - (-(S.hT F.z a) / T) • F.z - (S.hT y0 a / (T * Gflag F F')) • y0 :=
+  obtain ⟨v, hv⟩
+      : ∃ v : S.V, v = a - (-(S.hT F.z a) / T) • F.z - (S.hT y0 a / (T * Gflag F F')) • y0 :=
     ⟨_, rfl⟩
   have hvA : v ∈ Asp F F' := by
     rw [hv]
@@ -111,13 +119,15 @@ private theorem sub_mem_X_of_mem_Asp_of_hT_orth {F : FlagG S r T} {F' : FlagG S 
     ring
   have hy0Q : y0 ∈ Qsp F (Hsp F F') := horth y0 hXy0 hzy0 hy0A
   have hvQ : v ∈ Qsp F (Hsp F F') := horth v hvXo hzv hvA
-  have hvX : v ∈ F.X := line F hT (Hsp F F') (fun x hx h hh => hT_A_H (X_le_Asp F F' hx) hh)
+  have hvX : v ∈ F.X :=
+    line F hT (Hsp F F')
+      (fun x hx h hh => hT_A_H (X_le_Asp F F' hx) hh)
       (fun h hh => hT_A_H hz hh)
       (fun x hx hxH => by
         have hm : x ∈ Asp F F' ⊓ Hsp F F' := ⟨X_le_Asp F F' hx, hxH⟩
         rwa [Asp_inf_Hsp F F' hG, Submodule.mem_bot] at hm)
-      (by have := finrank_Hsp F F' hG; omega)
-      hy0Q (by simpa [brS] using hy0ne) hvQ (by simpa [brS] using hy0v)
+      (by have := finrank_Hsp F F' hG; omega) hy0Q (by simpa [brS] using hy0ne) hvQ
+      (by simpa [brS] using hy0v)
   have hW : ∀ u, u ∈ F.X.comap (σ - LinearMap.id) ↔ σ u - u ∈ F.X := fun u => by simp
   have hy0W : σ y0 - y0 ∈ F.X := by
     have e : σ y0 - y0 = T • (σ (omp F F') - omp F F') + Dl F F' (r + 1) • (σ F.z - F.z) := by
@@ -130,17 +140,21 @@ private theorem sub_mem_X_of_mem_Asp_of_hT_orth {F : FlagG S r T} {F' : FlagG S 
     rw [hv]
     abel
   rw [← hW, hav]
-  exact Submodule.add_mem _ (Submodule.add_mem _ ((hW v).2 (hσf v hvX))
-    (Submodule.smul_mem _ _ ((hW _).2 hσz))) (Submodule.smul_mem _ _ ((hW _).2 hy0W))
+  exact Submodule.add_mem _
+    (Submodule.add_mem _ ((hW v).2 (hσf v hvX)) (Submodule.smul_mem _ _ ((hW _).2 hσz)))
+    (Submodule.smul_mem _ _ ((hW _).2 hy0W))
 
-theorem tau_exists (F : FlagG S r T) (F1 : FlagG S r T') (hG : Gflag F F1 ≠ 0) (hT : T ≠ 0) (hTs : star T = T)
-    (hT' : T' ≠ 0) (hTs' : star T' = T') (σ ς : S.V ≃ₗ[E] S.V) (hσi : σ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+theorem tau_exists
+    (F : FlagG S r T) (F1 : FlagG S r T') (hG : Gflag F F1 ≠ 0)
+    (hT : T ≠ 0) (hTs : star T = T) (hT' : T' ≠ 0) (hTs' : star T' = T')
+    (σ ς : S.V ≃ₗ[E] S.V) (hσi : σ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
     (hσf : ∀ x ∈ F.X, σ x - x ∈ F.X) (hσX : ∀ x ∈ F.X, σ.symm x ∈ F.X) (hσz : σ F.z - F.z ∈ F.X)
     (hςf : ∀ x ∈ F1.X, ς x - x ∈ F1.X) (hςz : ς F1.z - F1.z ∈ F1.X)
     (hσω : σ (omp F F1) - omp F F1 ∈ F.X) (hςω : ς (omp F1 F) - omp F1 F ∈ F1.X)
-    (h3 : ∀ w ∈ Hsp F F1, ∃ w0 ∈ Hsp F F1, σ w - w0 ∈ F.X ∧ ς w - w0 ∈ F1.X) :
-    ∃ τ : S.V ≃ₗ[E] S.V, τ ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ a ∈ Asp F F1, τ a = a) ∧
-      (∀ y ∈ Lat.orth S F.X, τ y - σ y ∈ F.X) ∧ (∀ y ∈ Lat.orth S F1.X, τ y - ς y ∈ F1.X) := by
+    (h3 : ∀ w ∈ Hsp F F1, ∃ w0 ∈ Hsp F F1, σ w - w0 ∈ F.X ∧ ς w - w0 ∈ F1.X)
+    : ∃ τ : S.V ≃ₗ[E] S.V,
+      τ ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ a ∈ Asp F F1, τ a = a)
+        ∧ (∀ y ∈ Lat.orth S F.X, τ y - σ y ∈ F.X) ∧ (∀ y ∈ Lat.orth S F1.X, τ y - ς y ∈ F1.X) := by
   classical
   have hc := isCompl_AH F F1 hG
   have hσ : ∀ x y, S.hT (σ x) (σ y) = S.hT x y := hσi
@@ -153,24 +167,32 @@ theorem tau_exists (F : FlagG S r T) (F1 : FlagG S r T') (hG : Gflag F F1 ≠ 0)
       rwa [sub_sub_sub_cancel_left] at h
     rw [Asp_inf_Hsp F F1 hG, Submodule.mem_bot] at hd
     exact sub_eq_zero.mp hd
-  let Pl : Hsp F F1 →ₗ[E] S.V :=
-    { toFun := p
-      map_add' := fun w1 w2 => huniq (w1 + w2) (p w1 + p w2) (Submodule.add_mem _ (hpH w1) (hpH w2)) (by
+  let Pl : Hsp F F1 →ₗ[E] S.V := {
+    toFun := p
+    map_add' := fun w1 w2 =>
+      huniq (w1 + w2) (p w1 + p w2) (Submodule.add_mem _ (hpH w1) (hpH w2)) (by
         have h := Submodule.add_mem _ (hpσ w1) (hpσ w2)
         rw [Submodule.coe_add, map_add (f := _)]
         convert h using 1
         abel)
-      map_smul' := fun c w => huniq (c • w) (c • p w) (Submodule.smul_mem _ c (hpH w)) (by
+    map_smul' := fun c w =>
+      huniq (c • w) (c • p w) (Submodule.smul_mem _ c (hpH w)) (by
         have h := Submodule.smul_mem _ c (hpσ w)
         rw [Submodule.coe_smul, map_smul]
         convert h using 1
-        rw [smul_sub]) }
+        rw [smul_sub])
+  }
   have hp0 : p 0 = 0 := map_zero Pl
-  let τl : S.V →ₗ[E] S.V := (Asp F F1).subtype ∘ₗ (Asp F F1).projectionOnto (Hsp F F1) hc +
-    Pl ∘ₗ (Hsp F F1).projectionOnto (Asp F F1) hc.symm
-  have hsplit : ∀ y, ∃ a ∈ Asp F F1, ∃ w : Hsp F F1, y = a + w ∧ τl y = a + p w := fun y =>
-    ⟨_, Submodule.projection_apply_mem hc y, (Hsp F F1).projectionOnto (Asp F F1) hc.symm y,
-      (Submodule.projection_add_projection_eq_self hc y).symm, rfl⟩
+  let τl : S.V →ₗ[E] S.V :=
+    (Asp F F1).subtype ∘ₗ (Asp F F1).projectionOnto (Hsp F F1) hc
+      + Pl ∘ₗ (Hsp F F1).projectionOnto (Asp F F1) hc.symm
+  have hsplit : ∀ y, ∃ a ∈ Asp F F1, ∃ w : Hsp F F1, y = a + w ∧ τl y = a + p w := fun y => ⟨
+    _,
+    Submodule.projection_apply_mem hc y,
+    (Hsp F F1).projectionOnto (Asp F F1) hc.symm y,
+    (Submodule.projection_add_projection_eq_self hc y).symm,
+    rfl
+  ⟩
   have hσXH : ∀ x ∈ F.X, ∀ w : Hsp F F1, S.hT (σ w) x = 0 ∧ S.hT x (σ w) = 0 := by
     intro x hx w
     have hx' : σ.symm x ∈ Asp F F1 := X_le_Asp F F1 (hσX x hx)
@@ -219,8 +241,7 @@ theorem tau_exists (F : FlagG S r T) (F1 : FlagG S r T') (hG : Gflag F F1 ≠ 0)
     rw [hτa, hw, hp0, add_zero]
     rw [hs, hw0, add_zero]
   · intro y hy
-    have hyo : ∀ x ∈ F.X, S.hT x y = 0 := by
-      simpa [Lat.orth, Submodule.mem_iInf] using hy
+    have hyo : ∀ x ∈ F.X, S.hT x y = 0 := by simpa [Lat.orth, Submodule.mem_iInf] using hy
     simp only [LinearEquiv.coe_ofInjectiveEndo]
     obtain ⟨a, ha, w, hs, hτy⟩ := hsplit y
     have hX : ∀ x ∈ F.X, S.hT x a = 0 := by
@@ -235,8 +256,7 @@ theorem tau_exists (F : FlagG S r T) (F1 : FlagG S r T') (hG : Gflag F F1 ≠ 0)
     rw [e]
     exact Submodule.sub_mem _ (Submodule.neg_mem _ key) (hpσ w)
   · intro y hy
-    have hyo : ∀ x ∈ F1.X, S.hT x y = 0 := by
-      simpa [Lat.orth, Submodule.mem_iInf] using hy
+    have hyo : ∀ x ∈ F1.X, S.hT x y = 0 := by simpa [Lat.orth, Submodule.mem_iInf] using hy
     simp only [LinearEquiv.coe_ofInjectiveEndo]
     obtain ⟨a, ha, w, hs, hτy⟩ := hsplit y
     have hX : ∀ x ∈ F1.X, S.hT x a = 0 := by

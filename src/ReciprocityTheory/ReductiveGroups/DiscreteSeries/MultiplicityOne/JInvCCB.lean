@@ -225,7 +225,8 @@ open scoped ContDiff
 
 section Linfty
 
-attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra Matrix.linftyOpNormedSpace
+attribute [local instance]
+  Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra Matrix.linftyOpNormedSpace
 
 lemma hasDerivAt_exp_linfty {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) :
     HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X)) X 0 := by
@@ -266,9 +267,11 @@ lemma hasDerivAt_curveR (g X : Mat k r) :
 lemma hasDerivAt_curveL (g X : Mat k r) :
     HasDerivAt (fun t : ℝ => NormedSpace.exp (-((t : ℂ) • X)) * g) (-(X * g)) 0 := hasDerivAt_iff_tendsto_slope.mpr (slope_curveL g X)
 
-def mulR (X : Mat k r) : Mat k r →L[ℝ] Mat k r := LinearMap.toContinuousLinearMap (LinearMap.mulRight ℝ X)
+def mulR (X : Mat k r) : Mat k r →L[ℝ] Mat k r :=
+  LinearMap.toContinuousLinearMap (LinearMap.mulRight ℝ X)
 
-def mulL (X : Mat k r) : Mat k r →L[ℝ] Mat k r := LinearMap.toContinuousLinearMap (LinearMap.mulLeft ℝ X)
+def mulL (X : Mat k r) : Mat k r →L[ℝ] Mat k r :=
+  LinearMap.toContinuousLinearMap (LinearMap.mulLeft ℝ X)
 
 lemma expL_mem {X : Mat k r} (hX : inLie k r X) (t : ℝ) {g : Mat k r} (hg : g ∈ GV k r) :
     NormedSpace.exp (-((t : ℂ) • X)) * g ∈ GV k r := by

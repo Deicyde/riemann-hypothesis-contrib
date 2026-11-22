@@ -20,44 +20,55 @@ open PI.SelfDualLoc
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem hform_incl {n : ℕ} (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E)
-    (v : HeightOneSpectrum (𝓞 F)) (a b : Fin n → E) :
-    hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F)))
-      (fun i => inclE (F := F) (v.adicCompletion F) (a i))
-      (fun i => inclE (F := F) (v.adicCompletion F) (b i)) =
-      inclE (F := F) (v.adicCompletion F) (hform (σ : E →+* E) J a b) := by
+theorem hform_incl
+    {n : ℕ}
+    (σ : E →ₐ[F] E) (J : Matrix (Fin n) (Fin n) E) (v : HeightOneSpectrum (𝓞 F)) (a b : Fin n → E)
+    : hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F)))
+        (fun i => inclE (F := F) (v.adicCompletion F) (a i))
+        (fun i => inclE (F := F) (v.adicCompletion F) (b i))
+      = inclE (F := F) (v.adicCompletion F) (hform (σ : E →+* E) J a b) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [hform, Matrix.map_apply, sigR_inclE, map_sum, map_mul]
   rfl
 
-private theorem hform_add_left_self_dual_local_basis {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin m) (Fin m) A) (x x' y : Fin m → A) :
-    hform σ J (x + x') y = hform σ J x y + hform σ J x' y := by
+private theorem hform_add_left_self_dual_local_basis
+    {A : Type} [CommRing A]
+    {m : ℕ}
+    (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (x x' y : Fin m → A)
+    : hform σ J (x + x') y = hform σ J x y + hform σ J x' y := by
   simp only [hform, Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib]
 
-private theorem hform_add_right_self_dual_local_basis {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin m) (Fin m) A) (x y y' : Fin m → A) :
-    hform σ J x (y + y') = hform σ J x y + hform σ J x y' := by
+private theorem hform_add_right_self_dual_local_basis
+    {A : Type} [CommRing A]
+    {m : ℕ}
+    (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (x y y' : Fin m → A)
+    : hform σ J x (y + y') = hform σ J x y + hform σ J x y' := by
   simp only [hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-private theorem hform_smul_left_self_dual_local_basis {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin m) (Fin m) A) (c : A) (x y : Fin m → A) :
-    hform σ J (c • x) y = σ c * hform σ J x y := by
+private theorem hform_smul_left_self_dual_local_basis
+    {A : Type} [CommRing A]
+    {m : ℕ}
+    (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (c : A) (x y : Fin m → A)
+    : hform σ J (c • x) y = σ c * hform σ J x y := by
   simp only [hform, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-private theorem hform_smul_right_self_dual_local_basis {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin m) (Fin m) A) (c : A) (x y : Fin m → A) :
-    hform σ J x (c • y) = c * hform σ J x y := by
+private theorem hform_smul_right_self_dual_local_basis
+    {A : Type} [CommRing A]
+    {m : ℕ}
+    (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (c : A) (x y : Fin m → A)
+    : hform σ J x (c • y) = c * hform σ J x y := by
   simp only [hform, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-private theorem hform_zero_left' {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin m) (Fin m) A) (y : Fin m → A) : hform σ J 0 y = 0 := by
+private theorem hform_zero_left'
+    {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (y : Fin m → A)
+    : hform σ J 0 y = 0 := by
   simp [hform]
 
-private theorem hform_zero_right' {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin m) (Fin m) A) (x : Fin m → A) : hform σ J x 0 = 0 := by
+private theorem hform_zero_right'
+    {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (x : Fin m → A)
+    : hform σ J x 0 = 0 := by
   simp [hform]
 
 theorem fwdDir_of (hS : SigInt) : FwdDir := by
@@ -72,39 +83,51 @@ theorem fwdDir_of (hS : SigInt) : FwdDir := by
       dsimp only
       rw [hform_incl]
       exact inclE_mem_Oloc v (hLb a ha b hb)
-    | zero => rw [hform_zero_left']; exact zero_mem _
-    | add z z' _ _ h1 h2 => rw [hform_add_left_self_dual_local_basis]; exact add_mem h1 h2
+    | zero =>
+      rw [hform_zero_left']; exact zero_mem _
+    | add z z' _ _ h1 h2 =>
+      rw [hform_add_left_self_dual_local_basis]; exact add_mem h1 h2
     | smul c z _ h =>
       rw [Subring.smul_def, hform_smul_left_self_dual_local_basis]
       exact mul_mem (hS F E σ v c c.2) h
-  | zero => rw [hform_zero_right']; exact zero_mem _
-  | add y y' _ _ h1 h2 => rw [hform_add_right_self_dual_local_basis]; exact add_mem h1 h2
+  | zero =>
+    rw [hform_zero_right']; exact zero_mem _
+  | add y y' _ _ h1 h2 =>
+    rw [hform_add_right_self_dual_local_basis]; exact add_mem h1 h2
   | smul c y _ h =>
     rw [Subring.smul_def, hform_smul_right_self_dual_local_basis]
     exact mul_mem c.2 h
 
-private theorem hform_finset_sum_smul_left {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin m) (Fin m) A) {ι : Type*} (s : Finset ι) (c : ι → A) (x : ι → Fin m → A)
-    (y : Fin m → A) :
-    hform σ J (∑ i ∈ s, c i • x i) y = ∑ i ∈ s, σ (c i) * hform σ J (x i) y := by
+private theorem hform_finset_sum_smul_left
+    {A : Type} [CommRing A]
+    {m : ℕ}
+    (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A)
+    {ι : Type*} (s : Finset ι) (c : ι → A) (x : ι → Fin m → A)
+    (y : Fin m → A)
+    : hform σ J (∑ i ∈ s, c i • x i) y = ∑ i ∈ s, σ (c i) * hform σ J (x i) y := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [hform_zero_left']
   | insert a s ha ih =>
-    rw [Finset.sum_insert ha, Finset.sum_insert ha, hform_add_left_self_dual_local_basis, hform_smul_left_self_dual_local_basis, ih]
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, hform_add_left_self_dual_local_basis,
+      hform_smul_left_self_dual_local_basis, ih]
 
-private theorem hform_finset_sum_smul_right {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A)
-    (J : Matrix (Fin m) (Fin m) A) {ι : Type*} (s : Finset ι) (c : ι → A) (x : Fin m → A)
-    (y : ι → Fin m → A) :
-    hform σ J x (∑ i ∈ s, c i • y i) = ∑ i ∈ s, c i * hform σ J x (y i) := by
+private theorem hform_finset_sum_smul_right
+    {A : Type} [CommRing A]
+    {m : ℕ}
+    (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A)
+    {ι : Type*} (s : Finset ι) (c : ι → A)
+    (x : Fin m → A) (y : ι → Fin m → A)
+    : hform σ J x (∑ i ∈ s, c i • y i) = ∑ i ∈ s, c i * hform σ J x (y i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [hform_zero_right']
   | insert a s ha ih =>
-    rw [Finset.sum_insert ha, Finset.sum_insert ha, hform_add_right_self_dual_local_basis, hform_smul_right_self_dual_local_basis, ih]
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, hform_add_right_self_dual_local_basis,
+      hform_smul_right_self_dual_local_basis, ih]
 
-theorem bwdDir_of (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis)
-    (hU : UnitLoc) : BwdDir := by
+theorem bwdDir_of (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis) (hU : UnitLoc)
+    : BwdDir := by
   intro F E _ _ _ _ _ n σ J v Lb T hfin hLb hdual hT y hy
 
   have hT0 : T ≠ 0 := by
@@ -119,11 +142,15 @@ theorem bwdDir_of (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis)
     exact fun h => hs0 (RingOfIntegers.coe_eq_zero_iff.mp h)
   have hσs : (σ : E →+* E) sE = sE := σ.commutes _
 
-  have hσint : ∀ a : 𝓞 E, (σ : E →+* E) (a : E) ∈ intOE E := fun a =>
-    ⟨⟨σ (a : E), by
-      rw [mem_integralClosure_iff]
-      exact (RingOfIntegers.isIntegral_coe a).map σ.toRingHom.toIntAlgHom⟩,
-      RingOfIntegers.map_mk _ _⟩
+  have hσint : ∀ a : 𝓞 E, (σ : E →+* E) (a : E) ∈ intOE E := fun a => ⟨
+    ⟨
+      σ (a : E),
+      by
+        rw [mem_integralClosure_iff]
+        exact (RingOfIntegers.isIntegral_coe a).map σ.toRingHom.toIntAlgHom
+    ⟩,
+    RingOfIntegers.map_mk _ _
+  ⟩
 
   have hspanx : Submodule.span E (Set.range x) = ⊤ := by
     rw [eq_top_iff, ← hspan, Submodule.span_le]
@@ -131,14 +158,14 @@ theorem bwdDir_of (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis)
     obtain ⟨a, ha⟩ := hxs z hz
     have h1 : sE • z ∈ Submodule.span E (Set.range x) := by
       rw [ha]
-      exact Submodule.sum_mem _ fun i _ =>
-        Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+      exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
     have h2 := Submodule.smul_mem _ sE⁻¹ h1
     rwa [smul_smul, inv_mul_cancel₀ hsE0, one_smul] at h2
 
-  have hpair : ∀ z ∈ Lb, ∀ w : Fin n → E, ∃ a : Fin n → 𝓞 E,
-      sE * hform (σ : E →+* E) J z w =
-        ∑ i, (σ : E →+* E) ((a i : 𝓞 E) : E) * hform (σ : E →+* E) J (x i) w := by
+  have hpair
+      : ∀ z ∈ Lb, ∀ w : Fin n → E, ∃ a : Fin n → 𝓞 E,
+        sE * hform (σ : E →+* E) J z w
+          = ∑ i, (σ : E →+* E) ((a i : 𝓞 E) : E) * hform (σ : E →+* E) J (x i) w := by
     intro z hz w
     obtain ⟨a, ha⟩ := hxs z hz
     refine ⟨a, ?_⟩
@@ -165,15 +192,18 @@ theorem bwdDir_of (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis)
   obtain ⟨u, hu, hu1⟩ := hU F E v (T * s) hTsv
   have hwmem : ∀ j, w j ∈ Lloc F E n v Lb := by
     intro j
-    have hg : (fun k => inclE (F := F) (v.adicCompletion F) (((T : E) • (sE • yd j)) k)) ∈
-        Lloc F E n v Lb := Submodule.subset_span ⟨_, hTs j, rfl⟩
+    have hg
+        : (fun k => inclE (F := F) (v.adicCompletion F) (((T : E) • (sE • yd j)) k))
+          ∈ Lloc F E n v Lb :=
+      Submodule.subset_span ⟨_, hTs j, rfl⟩
     have h2 := Submodule.smul_mem (Lloc F E n v Lb) (⟨u, hu⟩ : Oloc F E v) hg
     convert h2 using 1
     funext k
     rw [Subring.smul_def, Pi.smul_apply, smul_eq_mul]
     simp only [Pi.smul_apply, smul_eq_mul, map_mul, hw]
-    have e : inclE (F := F) (v.adicCompletion F) (T : E) * inclE (F := F) (v.adicCompletion F) sE *
-        u = 1 := by
+    have e
+        : inclE (F := F) (v.adicCompletion F) (T : E) * inclE (F := F) (v.adicCompletion F) sE * u
+          = 1 := by
       rw [← hu1]
       simp only [map_mul, map_natCast, hsE]
     linear_combination (-inclE (F := F) (v.adicCompletion F) (yd j k)) * e
@@ -183,23 +213,26 @@ theorem bwdDir_of (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis)
     fun j => ∑ k, y k * inclE (F := F) (v.adicCompletion F) (d k j) with hc
   have hyc : y = ∑ j, c j • w j := by
     funext l
-    have hl : ∀ k, inclE (F := F) (v.adicCompletion F) ((Pi.single k (1 : E) : Fin n → E) l) =
-        ∑ j, inclE (F := F) (v.adicCompletion F) (d k j) *
-          inclE (F := F) (v.adicCompletion F) (yd j l) := by
+    have hl
+        : ∀ k,
+          inclE (F := F) (v.adicCompletion F) ((Pi.single k (1 : E) : Fin n → E) l)
+            = ∑ j, inclE (F := F) (v.adicCompletion F) (d k j) *
+                inclE (F := F) (v.adicCompletion F) (yd j l) := by
       intro k
       conv_lhs => rw [hd k]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
-    calc y l = ∑ k, y k * inclE (F := F) (v.adicCompletion F) ((Pi.single k (1 : E) : Fin n → E) l) := by
-          simp [Pi.single_apply]
+      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
+    calc
+      y l = ∑ k, y k * inclE (F := F) (v.adicCompletion F) ((Pi.single k (1 : E) : Fin n → E) l) :=
+        by simp [Pi.single_apply]
       _ = ∑ k, ∑ j, y k * inclE (F := F) (v.adicCompletion F) (d k j) *
             inclE (F := F) (v.adicCompletion F) (yd j l) := by
-          refine Finset.sum_congr rfl fun k _ => ?_
-          rw [hl k, Finset.mul_sum]
-          exact Finset.sum_congr rfl fun j _ => by ring
+        refine Finset.sum_congr rfl fun k _ => ?_
+        rw [hl k, Finset.mul_sum]
+        exact Finset.sum_congr rfl fun j _ => by ring
       _ = (∑ j, c j • w j) l := by
-          rw [Finset.sum_comm]
-          simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hc, hw, Finset.sum_mul]
+        rw [Finset.sum_comm]
+        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, hc, hw, Finset.sum_mul]
 
   have hcint : ∀ i, c i ∈ Oloc F E v := by
     intro i
@@ -208,9 +241,12 @@ theorem bwdDir_of (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis)
     have h := hy _ hxi
     unfold hloc at h
     rw [hyc, hform_finset_sum_smul_right] at h
-    have h' : ∀ j, hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F)))
-        (fun k => inclE (F := F) (v.adicCompletion F) (x i k)) (w j) =
-          if i = j then 1 else 0 := by
+    have h'
+        : ∀ j,
+          hform (sigR σ (v.adicCompletion F)) (J.map (inclE (F := F) (v.adicCompletion F)))
+              (fun k => inclE (F := F) (v.adicCompletion F) (x i k))
+              (w j)
+            = if i = j then 1 else 0 := by
       intro j
       rw [hw]
       dsimp only
@@ -223,8 +259,9 @@ theorem bwdDir_of (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis)
     have := Submodule.smul_mem (Lloc F E n v Lb) (⟨c j, hcint j⟩ : Oloc F E v) (hwmem j)
     simpa [Subring.smul_def] using this
 
-theorem selfDualLoc_of (hS : SigInt) (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis)
-    (hD : DualBasis) (hU : UnitLoc) : PI.SelfDualLoc :=
+theorem selfDualLoc_of
+    (hS : SigInt) (hN : Nondeg) (hSp : SpanTop) (hL : LocBasis) (hD : DualBasis) (hU : UnitLoc)
+    : PI.SelfDualLoc :=
   selfDualLoc_of_dirs (fwdDir_of hS) (bwdDir_of hN hSp hL hD hU)
 
 end PI.SelfDualLoc.W

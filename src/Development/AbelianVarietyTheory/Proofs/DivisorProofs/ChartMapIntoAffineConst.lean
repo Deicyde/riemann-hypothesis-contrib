@@ -7,18 +7,20 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.OfDeriv
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-
 open Polynomial in
-theorem poly_eq_C_of_eq_aeval_invSelf {K : Type} [CommRing K] (p q : K[X])
-    (h : algebraMap K[X] (Localization.Away (X : K[X])) p =
-      aeval (IsLocalization.Away.invSelf (X : K[X]) : Localization.Away (X : K[X])) q) :
-    p = C (p.eval 0) := by
+theorem poly_eq_C_of_eq_aeval_invSelf
+    {K : Type} [CommRing K]
+    (p q : K[X])
+    (h : algebraMap K[X] (Localization.Away (X : K[X])) p
+      = aeval (IsLocalization.Away.invSelf (X : K[X]) : Localization.Away (X : K[X])) q)
+    : p = C (p.eval 0) := by
   set L := Localization.Away (X : K[X])
   set n := q.natDegree
   letI : Invertible (algebraMap K[X] L X) :=
@@ -50,12 +52,16 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem chart_map_into_affine_const (K : Type) [CommRing K] (Y : Scheme.{0}) (W : Y.Opens)
-    (hW : IsAffineOpen W) (g₀ g₁ : Sp (Polynomial K) ⟶ Y) (h₀ : ∀ x, g₀ x ∈ W) (h₁ : ∀ x, g₁ x ∈ W)
-    (h : spMap (algebraMap (Polynomial K) (Localization.Away (Polynomial.X : Polynomial K))) ≫ g₀ =
-      spMap (Polynomial.aeval (IsLocalization.Away.invSelf (Polynomial.X : Polynomial K) :
-        Localization.Away (Polynomial.X : Polynomial K))).toRingHom ≫ g₁) :
-    g₀ = spMap (algebraMap K (Polynomial K)) ≫ spMap (Polynomial.evalRingHom 0) ≫ g₀ := by
+theorem chart_map_into_affine_const
+    (K : Type) [CommRing K]
+    (Y : Scheme.{0}) (W : Y.Opens) (hW : IsAffineOpen W) (g₀ g₁ : Sp (Polynomial K) ⟶ Y)
+    (h₀ : ∀ x, g₀ x ∈ W) (h₁ : ∀ x, g₁ x ∈ W)
+    (h : spMap (algebraMap (Polynomial K) (Localization.Away (Polynomial.X : Polynomial K))) ≫ g₀
+      = spMap (Polynomial.aeval
+          (IsLocalization.Away.invSelf (Polynomial.X : Polynomial K)
+            : Localization.Away (Polynomial.X : Polynomial K))).toRingHom
+        ≫ g₁)
+    : g₀ = spMap (algebraMap K (Polynomial K)) ≫ spMap (Polynomial.evalRingHom 0) ≫ g₀ := by
   haveI := hW.isOpenImmersion_fromSpec
   have r₀ : Set.range g₀.base ⊆ Set.range hW.fromSpec.base := by
     rw [hW.range_fromSpec]; rintro _ ⟨x, rfl⟩; exact h₀ x

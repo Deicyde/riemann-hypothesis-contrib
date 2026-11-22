@@ -5,15 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
 open UpperTheory.V.Af.Smo (EigAt)
 open scoped ComplexOrder
 
-private theorem ex_idele (u : ∀ v : H.P ℚ, (H.Kv v)ˣ) (S : Finset (H.P ℚ)) :
-    ∃ ζ : (A ℚ)ˣ, (ζ : A ℚ).1 = 1 ∧ ∀ v, H.cp v (ζ : A ℚ) = if v ∈ S then (u v : H.Kv v) else 1 := by
+private theorem ex_idele (u : ∀ v : H.P ℚ, (H.Kv v)ˣ) (S : Finset (H.P ℚ))
+    : ∃ ζ : (A ℚ)ˣ,
+      (ζ : A ℚ).1 = 1 ∧ ∀ v, H.cp v (ζ : A ℚ) = if v ∈ S then (u v : H.Kv v) else 1 := by
   induction S using Finset.induction_on with
   | empty => exact ⟨1, rfl, fun v => by simp⟩
   | insert w S hw ih =>
@@ -40,8 +43,9 @@ private theorem val_bad {N : ℕ} {v : H.P ℚ} (h : Bad N v) : Valued.v (N : H.
   refine lt_of_eq_of_lt this ?_
   exact (HeightOneSpectrum.valuation_lt_one_iff_mem v _).2 h
 
-private theorem val_unit {N : ℕ} {k : G1 ℚ} (hk : k ∈ KK ℚ) (hs : k ∈ SS N) {v : H.P ℚ} (h : Bad N v) :
-    Valued.v (H.cp v (k 1 1)) = 1 := by
+private theorem val_unit
+    {N : ℕ} {k : G1 ℚ} (hk : k ∈ KK ℚ) (hs : k ∈ SS N) {v : H.P ℚ} (h : Bad N v)
+    : Valued.v (H.cp v (k 1 1)) = 1 := by
   have hi : ∀ i j, Valued.v (H.cp v (k i j)) ≤ 1 := fun i j => hk.2 v i j
   have hd := k.det_coe
   rw [Matrix.det_fin_two] at hd
@@ -51,18 +55,28 @@ private theorem val_unit {N : ℕ} {k : G1 ℚ} (hk : k ∈ KK ℚ) (hs : k ∈ 
     exact (sub_eq_iff_eq_add.1 this)
   have h2 : Valued.v (H.cp v (k 0 1) * H.cp v (k 1 0)) < 1 := by
     rw [map_mul]
-    calc _ ≤ 1 * Valued.v (H.cp v (k 1 0)) := mul_le_mul_left (hi 0 1) _
+    calc
+      _ ≤ 1 * Valued.v (H.cp v (k 1 0)) := mul_le_mul_left (hi 0 1) _
       _ < 1 := by rw [one_mul]; exact lt_of_le_of_lt (hs v) (val_bad h)
   have h3 : Valued.v (H.cp v (k 0 0)) * Valued.v (H.cp v (k 1 1)) = 1 := by
     rw [← map_mul, h1]
     exact Valuation.map_one_add_of_lt _ h2
   refine le_antisymm (hi 1 1) ?_
-  calc 1 = _ := h3.symm
+  calc
+    1 = _ := h3.symm
     _ ≤ 1 * Valued.v (H.cp v (k 1 1)) := mul_le_mul_left (hi 0 0) _
     _ = _ := one_mul _
 
-theorem UpperTheory.exists_idele_correcting_lowerRight_entry :
-    ∀ N : ℕ, 0 < N → ∀ k ∈ KK ℚ, k ∈ SS N → ∃ ζ : (A ℚ)ˣ, ζ ∈ UU ∧ ∀ v : H.P ℚ, (Bad N v → Dv N v ((ζ : A ℚ) * k 1 1 - 1)) ∧ (¬ Bad N v → H.cp v (ζ : A ℚ) = 1) := by
+theorem UpperTheory.exists_idele_correcting_lowerRight_entry
+    : ∀ N : ℕ,
+      0 < N
+        → ∀ k ∈ KK ℚ,
+          k ∈ SS N
+            → ∃ ζ : (A ℚ)ˣ,
+              ζ ∈ UU
+                ∧ ∀ v : H.P ℚ,
+                  (Bad N v → Dv N v ((ζ : A ℚ) * k 1 1 - 1))
+                    ∧ (¬ Bad N v → H.cp v (ζ : A ℚ) = 1) := by
   intro N hN k hk hs
   have hfin : {v : H.P ℚ | Bad N v}.Finite := by
     have h0 : Ideal.span {(N : 𝓞 ℚ)} ≠ ⊥ := by
@@ -74,7 +88,8 @@ theorem UpperTheory.exists_idele_correcting_lowerRight_entry :
     have := val_unit hk hs hv
     rw [h0, map_zero] at this
     exact zero_ne_one this
-  obtain ⟨ζ, h1, h2⟩ := ex_idele (fun v => if h : Bad N v then (Units.mk0 _ (hne v h))⁻¹ else 1) hfin.toFinset
+  obtain ⟨ζ, h1, h2⟩ :=
+    ex_idele (fun v => if h : Bad N v then (Units.mk0 _ (hne v h))⁻¹ else 1) hfin.toFinset
   have hb : ∀ v, Bad N v → H.cp v (ζ : A ℚ) = (H.cp v (k 1 1))⁻¹ := fun v hv => by
     rw [h2 v, if_pos (hfin.mem_toFinset.2 hv), dite_eq_left hv]
     simp

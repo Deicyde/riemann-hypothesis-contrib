@@ -19,7 +19,8 @@ def baseVol (B : Base) (cd : CDHaar) (W : @HSpace B.host.E _ _ B.host.cmStar) : 
   letI := B.host.cmStar
   GlobalTheory.Mem.Vol.trueVol B.sp.cm (fun τ : Tau B.R => B.host.emb τ.1) cd W
 
-theorem baseVol_pos (B : Base) (cd : CDHaar) (W : @HSpace B.host.E _ _ B.host.cmStar) : 0 < baseVol B cd W :=
+theorem baseVol_pos (B : Base) (cd : CDHaar) (W : @HSpace B.host.E _ _ B.host.cmStar)
+    : 0 < baseVol B cd W :=
   letI := B.host.cmStar
   GlobalTheory.Mem.Vol.trueVol_pos B.sp.cm (fun τ : Tau B.R => B.host.emb τ.1) cd W
 
@@ -39,19 +40,23 @@ def noJet {R : Ranks} (H : Host R) : ThetaJet R H where
   firstJet_lowerRank_eq := fun i => i.elim
   firstJet_upperRank_eq := fun i => i.elim
 
-def oneJet {R : Ranks} (H : Host R) (hm : 1 ≤ R.m) (l : ℕ) (hl : l.Prime) (h5 : 5 ≤ l)
-    (hc : H.cls l = .signal ∨ H.cls l = .inertClass) : ThetaJet R H where
+def oneJet
+    {R : Ranks} (H : Host R) (hm : 1 ≤ R.m)
+    (l : ℕ) (hl : l.Prime) (h5 : 5 ≤ l) (hc : H.cls l = .signal ∨ H.cls l = .inertClass)
+    : ThetaJet R H where
   Sit := Unit
   loc := fun _ =>
     haveI : Fact l.Prime := ⟨hl⟩
-    { l := l
+    {
+      l := l
       five_le_l := h5
       d := 2
       d_even := even_two
       two_le_d := le_rfl
       N0 := R.N 0
       N1 := R.N 1
-      Th := 1 }
+      Th := 1
+    }
   l_inert := fun _ => hc
   jOf := fun _ => 1
   j_mem := fun _ => ⟨le_rfl, hm⟩
@@ -65,22 +70,32 @@ def oneJet {R : Ranks} (H : Host R) (hm : 1 ≤ R.m) (l : ℕ) (hl : l.Prime) (h
   firstJet_lowerRank_eq := fun i => i.elim
   firstJet_upperRank_eq := fun i => i.elim
 
-theorem exists_noJet (B : Base) (C : Cols B) (cd : CDHaar) :
-    ∃ J : GJStage B C, J.cd = cd ∧ J.vol = baseVol B J.cd ∧ J.jet = noJet B.host ∧
-      ∀ u w h, (J.gat u w h).FinClasses := by
-  obtain ⟨J, hv, hcd, hj, -, hf⟩ := GJModel.exists_of_jet B C (baseVol B cd) (baseVol_pos B cd) cd
-    (noJet B.host) (GJModel.gxOne B) (fun i => i.elim) (fun i => i.elim)
+theorem exists_noJet (B : Base) (C : Cols B) (cd : CDHaar)
+    : ∃ J : GJStage B C,
+      J.cd = cd ∧ J.vol = baseVol B J.cd ∧ J.jet = noJet B.host
+        ∧ ∀ u w h, (J.gat u w h).FinClasses := by
+  obtain ⟨J, hv, hcd, hj, -, hf⟩ :=
+    GJModel.exists_of_jet B C (baseVol B cd) (baseVol_pos B cd) cd (noJet B.host) (GJModel.gxOne B)
+      (fun i => i.elim)
+      (fun i => i.elim)
   exact ⟨J, hcd, by rw [hv, hcd], hj, hf⟩
 
-theorem exists_oneJet (B : Base) (C : Cols B) (cd : CDHaar) (hm : 1 ≤ B.R.m) (u : B.Word)
-    (h0 : Nonempty ((C.mem u).C.cls 0)) (h1 : Nonempty ((C.mem u).C.cls 1))
-    (l : ℕ) (hl : l.Prime) (h5 : 5 ≤ l) (hc : B.host.cls l = .signal ∨ B.host.cls l = .inertClass) :
-    ∃ J : GJStage B C, J.cd = cd ∧ J.vol = baseVol B J.cd ∧ J.jet = oneJet B.host hm l hl h5 hc ∧
-      (∃ i : J.jet.Sit, J.jet.jOf i = 1 ∧ (J.jet.loc i).l = l ∧ (J.jet.loc i).d = 2 ∧
-        B.places.resChar (J.jetW i) = l) ∧
-      ∀ u w h, (J.gat u w h).FinClasses := by
-  obtain ⟨J, hv, hcd, hj, -, hf⟩ := GJModel.exists_of_jet B C (baseVol B cd) (baseVol_pos B cd) cd
-    (oneJet B.host hm l hl h5 hc) (GJModel.gxOne B) (fun _ => ⟨u, h0, h1⟩) (fun i => i.elim)
+theorem exists_oneJet
+    (B : Base) (C : Cols B)
+    (cd : CDHaar) (hm : 1 ≤ B.R.m)
+    (u : B.Word) (h0 : Nonempty ((C.mem u).C.cls 0)) (h1 : Nonempty ((C.mem u).C.cls 1))
+    (l : ℕ) (hl : l.Prime) (h5 : 5 ≤ l) (hc : B.host.cls l = .signal ∨ B.host.cls l = .inertClass)
+    : ∃ J : GJStage B C,
+      J.cd = cd ∧ J.vol = baseVol B J.cd ∧ J.jet = oneJet B.host hm l hl h5 hc
+        ∧ (∃ i : J.jet.Sit,
+          J.jet.jOf i = 1 ∧ (J.jet.loc i).l = l ∧ (J.jet.loc i).d = 2
+            ∧ B.places.resChar (J.jetW i) = l)
+        ∧ ∀ u w h, (J.gat u w h).FinClasses := by
+  obtain ⟨J, hv, hcd, hj, -, hf⟩ :=
+    GJModel.exists_of_jet B C (baseVol B cd) (baseVol_pos B cd) cd (oneJet B.host hm l hl h5 hc)
+      (GJModel.gxOne B)
+      (fun _ => ⟨u, h0, h1⟩)
+      (fun i => i.elim)
   have key : ∃ i : J.jet.Sit, J.jet.jOf i = 1 ∧ (J.jet.loc i).l = l ∧ (J.jet.loc i).d = 2 := by
     rw [hj]
     exact ⟨(), rfl, rfl, rfl⟩
@@ -92,15 +107,18 @@ theorem nonempty_stage (B : Base) (C : Cols B) : Nonempty (GJStage B C) := by
   obtain ⟨J, -⟩ := exists_noJet B C cd
   exact ⟨J⟩
 
-theorem inhabited_stage (B : Base) (C : Cols B) :
-    (∃ J : GJStage B C, J.vol = baseVol B J.cd) ∧
-    (1 ≤ B.R.m → Nonempty ((C.mem B.u₀).C.cls 0) → Nonempty ((C.mem B.u₀).C.cls 1) →
-      ∀ l : ℕ, l.Prime → 5 ≤ l → (B.host.cls l = .signal ∨ B.host.cls l = .inertClass) →
-        ∃ J : GJStage B C, J.vol = baseVol B J.cd ∧ Nonempty J.jet.Sit ∧
-          ∃ i : J.jet.Sit, J.jet.jOf i = 1 ∧ (J.jet.loc i).l = l ∧ (J.jet.loc i).d = 2 ∧
-            B.places.resChar (J.jetW i) = l) ∧
-    (Nonempty ((C.mem B.u₀).C.cls 0) → Nonempty ((C.mem B.u₀).C.cls 1) →
-      ∃ J : GJStage B C, J.vol = baseVol B J.cd ∧ Nonempty J.jet.Sit) := by
+theorem inhabited_stage (B : Base) (C : Cols B)
+    : (∃ J : GJStage B C, J.vol = baseVol B J.cd)
+      ∧ (1 ≤ B.R.m → Nonempty ((C.mem B.u₀).C.cls 0) → Nonempty ((C.mem B.u₀).C.cls 1)
+        → ∀ l : ℕ,
+          l.Prime → 5 ≤ l → (B.host.cls l = .signal ∨ B.host.cls l = .inertClass)
+            → ∃ J : GJStage B C,
+              J.vol = baseVol B J.cd ∧ Nonempty J.jet.Sit
+                ∧ ∃ i : J.jet.Sit,
+                  J.jet.jOf i = 1 ∧ (J.jet.loc i).l = l ∧ (J.jet.loc i).d = 2
+                    ∧ B.places.resChar (J.jetW i) = l)
+      ∧ (Nonempty ((C.mem B.u₀).C.cls 0) → Nonempty ((C.mem B.u₀).C.cls 1)
+        → ∃ J : GJStage B C, J.vol = baseVol B J.cd ∧ Nonempty J.jet.Sit) := by
   obtain ⟨cd⟩ := GlobalTheory.T.nonempty_compactDualHaar
   refine ⟨?_, fun hm h0 h1 l hl h5 hc => ?_, fun h0 h1 => ?_⟩
   · obtain ⟨J, -, hv, -⟩ := exists_noJet B C cd

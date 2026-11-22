@@ -9,11 +9,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCh
 
 open IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Ws.H5
 
-theorem UpperTheory.V.Ws.H5.twMapUniq :
-    ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ} {r : Resid F O n} (B : UniversalOrdinaryDeterminantRing r) {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (f₀ : B.B →+* R) (γ : F.G₀ →* Rˣ) (f f' : B.B →ₐ[O] R), TwMap B f₀ (f : B.B →+* R) γ → TwMap B f₀ (f' : B.B →+* R) γ → f = f' := by
+theorem UpperTheory.V.Ws.H5.twMapUniq
+    : ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O]
+        [Algebra ℤ_[l] O] {n : ℕ} {r : Resid F O n} (B : UniversalOrdinaryDeterminantRing r)
+        {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (f₀ : B.B →+* R) (γ : F.G₀ →* Rˣ)
+        (f f' : B.B →ₐ[O] R),
+      TwMap B f₀ (f : B.B →+* R) γ → TwMap B f₀ (f' : B.B →+* R) γ → f = f' := by
   intro l _ F O _ _ _ n r B R _ _ _ f₀ γ f f' hf hf'
   obtain ⟨p, hp⟩ := exists_determinantPair_map_of_algHom l F O n r B.B R f B.u
-  have hs : ∀ (φ : B.B →+* R) (g : F.G₀), MonoidAlgebra.mapRingHom F.G₀ φ (MonoidAlgebra.single g 1) = MonoidAlgebra.single g 1 := by
+  have hs
+      : ∀ (φ : B.B →+* R) (g : F.G₀),
+        MonoidAlgebra.mapRingHom F.G₀ φ (MonoidAlgebra.single g 1) = MonoidAlgebra.single g 1 := by
     intro φ g
     simp [MonoidAlgebra.mapRingHom]
   have hD : B.u.D.map (f' : B.B →+* R) = B.u.D.map (f : B.B →+* R) := by

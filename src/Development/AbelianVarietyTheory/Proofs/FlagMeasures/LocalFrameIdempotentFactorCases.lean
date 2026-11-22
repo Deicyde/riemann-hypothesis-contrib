@@ -7,7 +7,8 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.SplitIntLoc
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix GlobalTheory.St.G
+open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix
+  GlobalTheory.St.G
 open scoped TensorProduct
 
 namespace GlobalTheory.St.G
@@ -16,19 +17,23 @@ section
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-theorem not_forall_loc_eq_natCast_smul (v : HeightOneSpectrum (𝓞 F))
+theorem not_forall_loc_eq_natCast_smul
+    (v : HeightOneSpectrum (𝓞 F))
     (sp : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F)
     (hdiag : ∀ a : v.adicCompletion F, sp ((1 : E) ⊗ₜ[F] a) = (a, a))
-    (g : ℕ) (hg : (g : 𝓞 F) ∈ v.asIdeal) (L : Submodule (𝓞 E) (Fin n → E)) (hL : IsLat L) (hn : 0 < n) :
-    ¬ ∀ y ∈ loc v L, ∃ z ∈ loc v L, y = (g : E ⊗[F] v.adicCompletion F) • z := by
+    (g : ℕ) (hg : (g : 𝓞 F) ∈ v.asIdeal)
+    (L : Submodule (𝓞 E) (Fin n → E)) (hL : IsLat L)
+    (hn : 0 < n)
+    : ¬ ∀ y ∈ loc v L, ∃ z ∈ loc v L, y = (g : E ⊗[F] v.adicCompletion F) • z := by
   classical
   intro h
   have hs := split_integral_local F E v sp hdiag
   have hint : ∀ r ∈ intV E v, (sp r).1 ∈ v.adicCompletionIntegers F := fun r hr => ((hs r).1 hr).1
   have hOE : ∀ c : 𝓞 E, inclE (F := F) (v.adicCompletion F) (c : E) ∈ intV E v := by
     intro c
-    have hc : ((c : E) ⊗ₜ[F] (1 : v.adicCompletion F)) ∈ PI.SplitIntLoc.tensInt (v.adicCompletion F)
-        (PI.SplitIntLoc.intOE E) (v.adicCompletionIntegers F).toSubring :=
+    have hc
+        : ((c : E) ⊗ₜ[F] (1 : v.adicCompletion F)) ∈ PI.SplitIntLoc.tensInt (v.adicCompletion F)
+          (PI.SplitIntLoc.intOE E) (v.adicCompletionIntegers F).toSubring :=
       Subring.subset_closure (Or.inl ⟨⟨(c : E), c, rfl⟩, rfl⟩)
     exact hc
   have hv : Valued.v ((g : v.adicCompletion F)) < 1 := by
@@ -41,8 +46,8 @@ theorem not_forall_loc_eq_natCast_smul (v : HeightOneSpectrum (𝓞 F))
     exact h1
   obtain ⟨hfin, hspan⟩ := hL
   obtain ⟨G, hG⟩ := Module.Finite.iff_fg.1 hfin
-  have hgen : ∀ x ∈ L, (fun i => inclE (F := F) (v.adicCompletion F) (x i)) ∈ loc v L :=
-    fun x hx => Submodule.subset_span ⟨x, hx, rfl⟩
+  have hgen : ∀ x ∈ L, (fun i => inclE (F := F) (v.adicCompletion F) (x i)) ∈ loc v L := fun x hx =>
+    Submodule.subset_span ⟨x, hx, rfl⟩
   set M : Submodule (v.adicCompletionIntegers F) (v.adicCompletion F) := Submodule.span _
     (Set.range fun p : G × Fin n => (sp (inclE (F := F) (v.adicCompletion F) ((p.1 : Fin n → E) p.2))).1) with hMdef
   have hMx : ∀ x ∈ L, ∀ i, (sp (inclE (F := F) (v.adicCompletion F) (x i))).1 ∈ M := by
@@ -54,8 +59,10 @@ theorem not_forall_loc_eq_natCast_smul (v : HeightOneSpectrum (𝓞 F))
     | add a b _ _ ha hb => simpa using M.add_mem ha hb
     | smul c a _ ha =>
       have hc := hint _ (hOE c)
-      have e : (sp (inclE (F := F) (v.adicCompletion F) ((c • a) i))).1 =
-          (⟨_, hc⟩ : v.adicCompletionIntegers F) • (sp (inclE (F := F) (v.adicCompletion F) (a i))).1 := by
+      have e
+          : (sp (inclE (F := F) (v.adicCompletion F) ((c • a) i))).1
+            = (⟨_, hc⟩ : v.adicCompletionIntegers F)
+              • (sp (inclE (F := F) (v.adicCompletion F) (a i))).1 := by
         rw [Pi.smul_apply, Algebra.smul_def, map_mul, map_mul, Prod.fst_mul, Algebra.smul_def]
         rfl
       rw [e]
@@ -66,8 +73,10 @@ theorem not_forall_loc_eq_natCast_smul (v : HeightOneSpectrum (𝓞 F))
     | mem x hx =>
       obtain ⟨x, hxL, rfl⟩ := hx
       exact hMx x hxL
-    | zero => intro i; simp
-    | add a b _ _ ha hb => intro i; simpa using M.add_mem (ha i) (hb i)
+    | zero =>
+      intro i; simp
+    | add a b _ _ ha hb =>
+      intro i; simpa using M.add_mem (ha i) (hb i)
     | smul r a _ ha =>
       intro i
       have hr := hint _ r.2
@@ -81,14 +90,17 @@ theorem not_forall_loc_eq_natCast_smul (v : HeightOneSpectrum (𝓞 F))
     rintro _ ⟨⟨⟨s, hsG⟩, i⟩, rfl⟩
     have hsL : s ∈ L := hG ▸ Submodule.subset_span hsG
     obtain ⟨z, hz, hyz⟩ := h _ (hgen s hsL)
-    have e : (sp (inclE (F := F) (v.adicCompletion F) (s i))).1 =
-        (g : v.adicCompletionIntegers F) • (sp (z i)).1 := by
-      have hi : inclE (F := F) (v.adicCompletion F) (s i) = ((g : E ⊗[F] v.adicCompletion F) • z) i :=
+    have e
+        : (sp (inclE (F := F) (v.adicCompletion F) (s i))).1
+          = (g : v.adicCompletionIntegers F) • (sp (z i)).1 := by
+      have hi
+          : inclE (F := F) (v.adicCompletion F) (s i) = ((g : E ⊗[F] v.adicCompletion F) • z) i :=
         congrFun hyz i
       rw [hi, Pi.smul_apply, smul_eq_mul, map_mul, map_natCast, Prod.fst_mul, Algebra.smul_def]
       simp
-    change (sp (inclE (F := F) (v.adicCompletion F) (s i))).1 ∈
-      ((Ideal.span {((g : v.adicCompletionIntegers F))} • M : Submodule _ _) : Set (v.adicCompletion F))
+    change (sp (inclE (F := F) (v.adicCompletion F) (s i))).1
+      ∈ ((Ideal.span {((g : v.adicCompletionIntegers F))} • M : Submodule _ _)
+        : Set (v.adicCompletion F))
     rw [SetLike.mem_coe, e]
     exact Submodule.smul_mem_smul (Ideal.mem_span_singleton_self _) (hM z hz i)
   have hjac : Ideal.span {((g : v.adicCompletionIntegers F))} ≤ Ideal.jacobson ⊥ := by
@@ -99,7 +111,8 @@ theorem not_forall_loc_eq_natCast_smul (v : HeightOneSpectrum (𝓞 F))
     have hb' : (b : v.adicCompletion F) * (g : v.adicCompletion F) = 1 := by
       have := congrArg Subtype.val hb
       simpa using this
-    have hbv : Valued.v (b : v.adicCompletion F) ≤ 1 := (HeightOneSpectrum.mem_adicCompletionIntegers (R := 𝓞 F) (K := F) (v := v)).1 b.2
+    have hbv : Valued.v (b : v.adicCompletion F) ≤ 1 :=
+      (HeightOneSpectrum.mem_adicCompletionIntegers (R := 𝓞 F) (K := F) (v := v)).1 b.2
     have hlt : Valued.v ((b : v.adicCompletion F) * (g : v.adicCompletion F)) < 1 := by
       rw [map_mul]
       exact (mul_le_of_le_one_left' hbv).trans_lt hv
@@ -113,7 +126,8 @@ theorem not_forall_loc_eq_natCast_smul (v : HeightOneSpectrum (𝓞 F))
       intro s hs
       funext i
       exact hcon s hs i
-    have h1 : (fun _ : Fin n => (1 : E)) ∈ Submodule.span E (L : Set (Fin n → E)) := hspan ▸ Submodule.mem_top
+    have h1 : (fun _ : Fin n => (1 : E)) ∈ Submodule.span E (L : Set (Fin n → E)) :=
+      hspan ▸ Submodule.mem_top
     rw [hL0, Submodule.bot_coe, Submodule.span_zero_singleton, Submodule.mem_bot] at h1
     exact one_ne_zero (congrFun h1 ⟨0, hn⟩)
   obtain ⟨s, hsG, i, hsi⟩ := hne
@@ -121,15 +135,32 @@ theorem not_forall_loc_eq_natCast_smul (v : HeightOneSpectrum (𝓞 F))
     ((isUnit_iff_ne_zero.2 hsi).map (inclE (F := F) (v.adicCompletion F))).map sp
   have ha : (sp (inclE (F := F) (v.adicCompletion F) (s i))).1 ≠ 0 :=
     (hu.map (RingHom.fst (v.adicCompletion F) (v.adicCompletion F))).ne_zero
-  have hbot := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot _ M (Submodule.fg_span (Set.finite_range _)) hle hjac
-  have hmem : (sp (inclE (F := F) (v.adicCompletion F) (s i))).1 ∈ M := Submodule.subset_span ⟨(⟨s, hsG⟩, i), rfl⟩
+  have hbot :=
+    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot _ M (Submodule.fg_span (Set.finite_range _)) hle
+      hjac
+  have hmem : (sp (inclE (F := F) (v.adicCompletion F) (s i))).1 ∈ M :=
+    Submodule.subset_span ⟨(⟨s, hsG⟩, i), rfl⟩
   rw [hbot, Submodule.mem_bot] at hmem
   exact ha hmem
 
 end
 
-theorem local_idempotent_cases :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (n : ℕ) (v : HeightOneSpectrum (𝓞 F)) (sp : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F), (∀ x, sp (sigR σ (v.adicCompletion F) x) = swapR _ (sp x)) → (∀ a : v.adicCompletion F, sp ((1 : E) ⊗ₜ[F] a) = (a, a)) → ∀ (g : ℕ), (g : 𝓞 F) ∈ v.asIdeal → ∀ (L : Submodule (𝓞 E) (Fin n → E)), IsLat L → 0 < n → ∀ e : E ⊗[F] v.adicCompletion F, e * e = e → e * sigR σ (v.adicCompletion F) e = 0 → (∀ y ∈ loc v L, ∃ z ∈ loc v L, (1 - e - sigR σ (v.adicCompletion F) e) • y = (g : E ⊗[F] v.adicCompletion F) • z) → sp e = (1, 0) ∨ sp e = (0, 1) := by
+theorem local_idempotent_cases
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (n : ℕ) (v : HeightOneSpectrum (𝓞 F))
+        (sp : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F),
+      (∀ x, sp (sigR σ (v.adicCompletion F) x) = swapR _ (sp x))
+        → (∀ a : v.adicCompletion F, sp ((1 : E) ⊗ₜ[F] a) = (a, a))
+        → ∀ (g : ℕ),
+          (g : 𝓞 F) ∈ v.asIdeal
+            → ∀ (L : Submodule (𝓞 E) (Fin n → E)),
+              IsLat L → 0 < n
+                → ∀ e : E ⊗[F] v.adicCompletion F,
+                  e * e = e → e * sigR σ (v.adicCompletion F) e = 0
+                    → (∀ y ∈ loc v L, ∃ z ∈ loc v L,
+                      (1 - e - sigR σ (v.adicCompletion F) e) • y
+                        = (g : E ⊗[F] v.adicCompletion F) • z)
+                    → sp e = (1, 0) ∨ sp e = (0, 1) := by
   intro F E _ _ _ _ _ σ n v sp hsw hdiag g hg L hL hn e he heo hfull
   have hse : sp (sigR σ (v.adicCompletion F) e) = ((sp e).2, (sp e).1) := by
     rw [hsw]

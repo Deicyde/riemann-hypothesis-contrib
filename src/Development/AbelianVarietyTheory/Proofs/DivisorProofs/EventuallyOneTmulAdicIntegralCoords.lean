@@ -6,16 +6,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIntBTmulBa
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount IsDedekindDomain GlobalTheory.AdicSpan
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount IsDedekindDomain GlobalTheory.AdicSpan
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.AdicSpan
 
-theorem exists_finset_isIntB_one_tmul (M : Type) [AddCommGroup M] [Module ℚ M] (κ : Type)
-    (b : Module.Basis κ ℚ M) (x : M) :
-    ∃ S : Finset (HeightOneSpectrum ℤ), ∀ v ∉ S, IsIntB v b ((1 : v.adicCompletion ℚ) ⊗ₜ[ℚ] x) := by
-  have hfin : (⋃ i ∈ ((b.repr x).support : Set κ), HeightOneSpectrum.Support ℤ (b.repr x i)).Finite :=
-    (b.repr x).support.finite_toSet.biUnion fun i _ => HeightOneSpectrum.Support.finite ℤ (b.repr x i)
+theorem exists_finset_isIntB_one_tmul
+    (M : Type) [AddCommGroup M] [Module ℚ M] (κ : Type) (b : Module.Basis κ ℚ M) (x : M)
+    : ∃ S : Finset (HeightOneSpectrum ℤ), ∀ v ∉ S,
+      IsIntB v b ((1 : v.adicCompletion ℚ) ⊗ₜ[ℚ] x) := by
+  have hfin
+      : (⋃ i ∈ ((b.repr x).support : Set κ), HeightOneSpectrum.Support ℤ (b.repr x i)).Finite :=
+    (b.repr x).support.finite_toSet.biUnion fun i _ =>
+      HeightOneSpectrum.Support.finite ℤ (b.repr x i)
   refine ⟨hfin.toFinset, fun v hv i => ?_⟩
   rw [Algebra.TensorProduct.basis_repr_tmul, one_smul, Finsupp.mapRange_apply]
   by_cases hi : b.repr x i = 0

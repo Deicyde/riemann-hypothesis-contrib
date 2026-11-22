@@ -21,8 +21,10 @@ def IsU (a : ∀ (K : Type) [Field K] [CharZero K], K → K → K) : Prop :=
   ∃ p : MvPolynomial (Fin 2) ℚ, ∀ (K : Type) [Field K] [CharZero K] (g2 g3 : K),
     a K g2 g3 = MvPolynomial.aeval ![g2, g3] p
 
-theorem IsU.congr {a b : ∀ (K : Type) [Field K] [CharZero K], K → K → K} (h : IsU a)
-    (hab : ∀ (K : Type) [Field K] [CharZero K] (g2 g3 : K), b K g2 g3 = a K g2 g3) : IsU b := by
+theorem IsU.congr
+    {a b : ∀ (K : Type) [Field K] [CharZero K], K → K → K}
+    (h : IsU a) (hab : ∀ (K : Type) [Field K] [CharZero K] (g2 g3 : K), b K g2 g3 = a K g2 g3)
+    : IsU b := by
   obtain ⟨p, hp⟩ := h
   exact ⟨p, fun K _ _ g2 g3 => by rw [hab, hp]⟩
 
@@ -35,25 +37,32 @@ theorem universal_g2 : IsU (fun K [Field K] [CharZero K] g2 _ => g2) :=
 theorem universal_g3 : IsU (fun K [Field K] [CharZero K] _ g3 => g3) :=
   ⟨MvPolynomial.X 1, fun K _ _ g2 g3 => by simp⟩
 
-theorem IsU.add {a b : ∀ (K : Type) [Field K] [CharZero K], K → K → K} (ha : IsU a) (hb : IsU b) :
-    IsU (fun K [Field K] [CharZero K] g2 g3 => a K g2 g3 + b K g2 g3) := by
+theorem IsU.add {a b : ∀ (K : Type) [Field K] [CharZero K], K → K → K} (ha : IsU a) (hb : IsU b)
+    : IsU (fun K [Field K] [CharZero K] g2 g3 => a K g2 g3 + b K g2 g3) := by
   obtain ⟨p, hp⟩ := ha
   obtain ⟨q, hq⟩ := hb
-  exact ⟨p + q, fun K _ _ g2 g3 => by
-    show a K g2 g3 + b K g2 g3 = _
-    rw [map_add (f := _), hp, hq]⟩
+  exact ⟨
+    p + q,
+    fun K _ _ g2 g3 => by
+      show a K g2 g3 + b K g2 g3 = _
+      rw [map_add (f := _), hp, hq]
+  ⟩
 
-theorem IsU.mul {a b : ∀ (K : Type) [Field K] [CharZero K], K → K → K} (ha : IsU a) (hb : IsU b) :
-    IsU (fun K [Field K] [CharZero K] g2 g3 => a K g2 g3 * b K g2 g3) := by
+theorem IsU.mul {a b : ∀ (K : Type) [Field K] [CharZero K], K → K → K} (ha : IsU a) (hb : IsU b)
+    : IsU (fun K [Field K] [CharZero K] g2 g3 => a K g2 g3 * b K g2 g3) := by
   obtain ⟨p, hp⟩ := ha
   obtain ⟨q, hq⟩ := hb
-  exact ⟨p * q, fun K _ _ g2 g3 => by
-    show a K g2 g3 * b K g2 g3 = _
-    rw [map_mul, hp, hq]⟩
+  exact ⟨
+    p * q,
+    fun K _ _ g2 g3 => by
+      show a K g2 g3 * b K g2 g3 = _
+      rw [map_mul, hp, hq]
+  ⟩
 
-theorem IsU.sum {ι : Type} (s : Finset ι) (a : ι → ∀ (K : Type) [Field K] [CharZero K], K → K → K)
-    (h : ∀ i ∈ s, IsU (a i)) :
-    IsU (fun K [Field K] [CharZero K] g2 g3 => ∑ i ∈ s, a i K g2 g3) := by
+theorem IsU.sum
+    {ι : Type}
+    (s : Finset ι) (a : ι → ∀ (K : Type) [Field K] [CharZero K], K → K → K) (h : ∀ i ∈ s, IsU (a i))
+    : IsU (fun K [Field K] [CharZero K] g2 g3 => ∑ i ∈ s, a i K g2 g3) := by
   classical
   induction s using Finset.induction_on with
   | empty => exact (isU_const 0).congr fun K _ _ g2 g3 => by simp
@@ -77,9 +86,10 @@ theorem isU_cW (k : ℕ) : IsU (fun K [Field K] [CharZero K] g2 g3 => cW g2 g3 k
       ring
     by_cases h4 : 4 ≤ k
     · refine ((isU_const (3 / ((2 * (k : ℚ) + 1) * ((k : ℚ) - 3)))).mul
-        (IsU.sum Finset.univ (fun (m : Fin (k - 3)) K [Field K] [CharZero K] g2 g3 =>
-          cW g2 g3 (m.val + 2) * cW g2 g3 (k - (m.val + 2)))
-          fun m _ => (ih (m.val + 2) (by omega)).mul (ih (k - (m.val + 2)) (by omega)))).congr
+          (IsU.sum Finset.univ
+            (fun (m : Fin (k - 3)) K [Field K] [CharZero K] g2 g3 =>
+              cW g2 g3 (m.val + 2) * cW g2 g3 (k - (m.val + 2)))
+            fun m _ => (ih (m.val + 2) (by omega)).mul (ih (k - (m.val + 2)) (by omega)))).congr
         fun K _ _ g2 g3 => ?_
       rw [POf.cW_eq, if_neg h2, if_neg h3, if_pos h4]
       push_cast

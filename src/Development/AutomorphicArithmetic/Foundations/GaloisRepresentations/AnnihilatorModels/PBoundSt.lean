@@ -6,12 +6,13 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsSstAtOf
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.GalOfCusp TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.boundSt_of :
-    BoundSt := by
+theorem UpperTheory.Gal.crystallineComparison.boundSt_of : BoundSt := by
   intro l _ P AI hT K LL
   obtain ⟨T⟩ := hT
   refine ⟨?_, fun f g => ?_⟩
@@ -23,8 +24,9 @@ theorem UpperTheory.Gal.crystallineComparison.boundSt_of :
     have hD : Dst P (GlobalTheory.PstCoeff.resQ ρ) = (Dst P ρ).restrictScalars ℚ_[l] := by
       ext x
       simp [mem_Dst, GlobalTheory.PstCoeff.stRep_resQ]
-    have e : finrank ℚ_[l] ↥(Dst P (GlobalTheory.PstCoeff.resQ ρ)) =
-        finrank ℚ_[l] ↥LL.1 * finrank ↥LL.1 ↥(Dst P ρ) := by
+    have e
+        : finrank ℚ_[l] ↥(Dst P (GlobalTheory.PstCoeff.resQ ρ))
+          = finrank ℚ_[l] ↥LL.1 * finrank ↥LL.1 ↥(Dst P ρ) := by
       rw [hD, finrank_mul_finrank]
       rfl
     have hfin' : FiniteDimensional ℚ_[l] ↥((Dst P ρ).restrictScalars ℚ_[l]) := hD ▸ hfin
@@ -36,7 +38,8 @@ theorem UpperTheory.Gal.crystallineComparison.boundSt_of :
       (finrank_mul_finrank ℚ_[l] ↥LL.1 U).symm
     rw [e, hV] at hb
     refine Nat.le_of_mul_le_mul_left ?_ (finrank_pos (R := ℚ_[l]) (M := ↥LL.1))
-    calc finrank ℚ_[l] ↥LL.1 * finrank ↥LL.1 ↥(Dst P ρ)
+    calc
+      finrank ℚ_[l] ↥LL.1 * finrank ↥LL.1 ↥(Dst P ρ)
         ≤ finrank ℚ_[l] ↥LL.1 * finrank ↥LL.1 U * finrank ℚ_[l] ↥(K0 K) := hb
       _ = finrank ℚ_[l] ↥LL.1 * (finrank ℚ_[l] ↥(K0 K) * finrank ↥LL.1 U) := by ring
   · refine Commute.pow_right ?_ f

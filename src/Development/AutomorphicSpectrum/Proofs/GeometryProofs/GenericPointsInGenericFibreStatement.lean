@@ -9,31 +9,40 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.M0
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.M0
 open scoped CategoryTheory.Obj
 namespace GenericFibreProof
 
-theorem spMap_field_pt {R K : Type} [CommRing R] [Field K] (δ : R →+* K) (z : Sp K) :
-    (spMap δ z).asIdeal = RingHom.ker δ := by
+theorem spMap_field_pt {R K : Type} [CommRing R] [Field K] (δ : R →+* K) (z : Sp K)
+    : (spMap δ z).asIdeal = RingHom.ker δ := by
   have hz : z.asIdeal = ⊥ := Ideal.eq_bot_of_prime _ (h := z.2)
   show Ideal.comap δ z.asIdeal = _
-  rw [hz]; rfl
+  rw [hz]
+  rfl
 
-theorem preimm_frac {O F : Type} [CommRing O] [Field F] (β : O →+* F)
-    (h : letI := β.toAlgebra; IsFractionRing O F) : IsPreimmersion (spMap β) := by
+theorem preimm_frac
+    {O F : Type} [CommRing O] [Field F] (β : O →+* F) (h : letI := β.toAlgebra; IsFractionRing O F)
+    : IsPreimmersion (spMap β) := by
   letI := β.toAlgebra
   haveI := h
   exact IsPreimmersion.of_isLocalization (nonZeroDivisors O)
 
-theorem generic_max {X : Type} [TopologicalSpace X] [T0Space X] {v v' : X} (h : v ∈ genericPoints X)
-    (hs : v' ⤳ v) : v' = v := by
+theorem generic_max
+    {X : Type} [TopologicalSpace X] [T0Space X] {v v' : X} (h : v ∈ genericPoints X) (hs : v' ⤳ v)
+    : v' = v := by
   have h1 : closure {v} ⊆ closure {v'} := specializes_iff_closure_subset.1 hs
   have h2 : closure {v'} ⊆ closure {v} := h.2 isIrreducible_singleton.closure h1
   exact (hs.antisymm (specializes_iff_closure_subset.2 h2)).eq
 
-theorem mem_of_dense_of_max {X : Type} [TopologicalSpace X] [TopologicalSpace.NoetherianSpace X] [QuasiSober X]
-    {U : Set X} (ho : IsOpen U) (hd : Dense U) {z : X} (hz : ∀ z', z' ⤳ z → z' = z) : z ∈ U := by
+theorem mem_of_dense_of_max
+    {X : Type} [TopologicalSpace X] [TopologicalSpace.NoetherianSpace X] [QuasiSober X]
+    {U : Set X} (ho : IsOpen U) (hd : Dense U)
+    {z : X} (hz : ∀ z', z' ⤳ z → z' = z)
+    : z ∈ U := by
   have hC := irreducibleComponent_mem_irreducibleComponents z
   obtain ⟨o, hoo, ⟨u, hu⟩, hoC⟩ :=
     TopologicalSpace.NoetherianSpace.exists_isOpen_nonempty_subset_irreducibleComponent _ hC
@@ -44,8 +53,11 @@ theorem mem_of_dense_of_max {X : Type} [TopologicalSpace X] [TopologicalSpace.No
   have hzw : z ⤳ w := hgz ▸ hg.specializes (hoC hwo)
   exact hzw.mem_open ho hwU
 
-private theorem isLocallyNoetherian_of_closedImmersion_pSpace (O F : Type) [CommRing O] [Field F] (β : O →+* F) (X : Scheme.{0}) (s : X ⟶ Sp O)
-    (hp : IsProjOver s) : TopologicalSpace.NoetherianSpace ↥(pullback (C := Scheme.{0}) s (spMap β)) := by
+private theorem isLocallyNoetherian_of_closedImmersion_pSpace
+    (O F : Type) [CommRing O] [Field F]
+    (β : O →+* F)
+    (X : Scheme.{0}) (s : X ⟶ Sp O) (hp : IsProjOver s)
+    : TopologicalSpace.NoetherianSpace ↥(pullback (C := Scheme.{0}) s (spMap β)) := by
   obtain ⟨N, i, hi, hs⟩ := hp
   haveI := hi
   haveI : Algebra.FiniteType ((MvPolynomial.homogeneousSubmodule (Fin (N + 1)) O) 0)
@@ -53,11 +65,12 @@ private theorem isLocallyNoetherian_of_closedImmersion_pSpace (O F : Type) [Comm
     haveI : IsScalarTower O ((MvPolynomial.homogeneousSubmodule (Fin (N + 1)) O) 0)
         (MvPolynomial (Fin (N + 1)) O) := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
     Algebra.FiniteType.of_restrictScalars_finiteType O _ _
-  have hsurj : Function.Surjective
-      (algebraMap O ((MvPolynomial.homogeneousSubmodule (Fin (N + 1)) O) 0)) := by
+  have hsurj : Function.Surjective (algebraMap O
+      ((MvPolynomial.homogeneousSubmodule (Fin (N + 1)) O) 0)) := by
     rintro ⟨p, hp⟩
-    have h0 : p.totalDegree = 0 := (MvPolynomial.totalDegree_zero_iff_isHomogeneous (p := p)).mpr
-      ((MvPolynomial.mem_homogeneousSubmodule _ _).mp hp)
+    have h0 : p.totalDegree = 0 :=
+      (MvPolynomial.totalDegree_zero_iff_isHomogeneous (p := p)).mpr
+        ((MvPolynomial.mem_homogeneousSubmodule _ _).mp hp)
     refine ⟨p.coeff 0, Subtype.ext ?_⟩
     exact (MvPolynomial.totalDegree_eq_zero_iff_eq_C.mp h0).symm
   haveI : LocallyOfFiniteType (spMap (algebraMap O ((MvPolynomial.homogeneousSubmodule (Fin (N + 1)) O) 0))) := by
@@ -82,7 +95,12 @@ private theorem isLocallyNoetherian_of_closedImmersion_pSpace (O F : Type) [Comm
   haveI : IsNoetherian (pullback s (spMap β)) := {}
   infer_instance
 
-theorem generic_points_range_local : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β), IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F) → genericPoints Y.X ⊆ Set.range Y.j := by
+theorem generic_points_range_local
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O]
+        (β : O →+* c.F) (Y : Model Xo c β),
+      IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F)
+        → genericPoints Y.X ⊆ Set.range Y.j := by
   intro E _ _ _ H D l Xo c O _ β Y hO h v hv
   haveI : IsPreimmersion (spMap β) := preimm_frac β h
   haveI := Y.flat
@@ -115,5 +133,10 @@ theorem generic_points_range_local : ∀ (E : Type) [Field E] [NumberField E] [I
 end GenericFibreProof
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.generic_points_in_generic_fibre : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β), IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F) → genericPoints Y.X ⊆ Set.range Y.j := by
+theorem _root_.GlobalTheory.T.generic_points_in_generic_fibre
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O]
+        (β : O →+* c.F) (Y : Model Xo c β),
+      IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F)
+        → genericPoints Y.X ⊆ Set.range Y.j := by
   exact @GenericFibreProof.generic_points_range_local

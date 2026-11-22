@@ -19,13 +19,13 @@ variable {k K : Type*} [Field k] [Field K] [Algebra k K] [IsFunctionField k K]
 
 namespace Divisor
 
-theorem deg_sub_finrank_L_mono {D E : Divisor k K} (h : D ≤ E) :
-    deg D - (finrank k (L D) : ℤ) ≤ deg E - finrank k (L E) := by
+theorem deg_sub_finrank_L_mono {D E : Divisor k K} (h : D ≤ E)
+    : deg D - (finrank k (L D) : ℤ) ≤ deg E - finrank k (L E) := by
   have := finrank_L_le_of_le h
   linarith
 
-theorem exists_bound_deg_sub_finrank_L :
-    ∃ γ : ℤ, ∀ D : Divisor k K, deg D - (finrank k (L D) : ℤ) ≤ γ := by
+theorem exists_bound_deg_sub_finrank_L
+    : ∃ γ : ℤ, ∀ D : Divisor k K, deg D - (finrank k (L D) : ℤ) ≤ γ := by
   classical
   obtain ⟨x, hx, hfin⟩ := IsFunctionField.exists_transcendental_finiteDimensional (k := k) (K := K)
   set F := IntermediateField.adjoin k {x} with hF
@@ -36,8 +36,10 @@ theorem exists_bound_deg_sub_finrank_L :
   have hB : 0 ≤ B := poleDivisor_nonneg x
   have hC : 0 ≤ C := Finset.sum_nonneg fun j _ => poleDivisor_nonneg _
   have hCj : ∀ j, (poleDivisor (b j) : Divisor k K) ≤ C := fun j =>
-    Finset.single_le_sum (f := fun j => (poleDivisor (b j) : Divisor k K))
-      (fun j _ => poleDivisor_nonneg _) (Finset.mem_univ j)
+    Finset.single_le_sum
+      (f := fun j => (poleDivisor (b j) : Divisor k K))
+      (fun j _ => poleDivisor_nonneg _)
+      (Finset.mem_univ j)
   have key : ∀ l : ℕ, ((l + 1 : ℤ) * n) ≤ finrank k (L (l • B + C)) := by
     intro l
     set D : Divisor k K := l • B + C with hD'
@@ -45,18 +47,20 @@ theorem exists_bound_deg_sub_finrank_L :
       rintro ⟨i, j⟩ v
       rw [map_mul, map_pow]
       have hx' := valuation_le_exp_poleDivisor x v
-      have hb' := (valuation_le_exp_poleDivisor (b j) v).trans
-        (WithZero.exp_le_exp.2 (Finsupp.le_def.1 (hCj j) v))
+      have hb' :=
+        (valuation_le_exp_poleDivisor (b j) v).trans
+          (WithZero.exp_le_exp.2 (Finsupp.le_def.1 (hCj j) v))
       have hBv : 0 ≤ B v := by simpa using Finsupp.le_def.1 hB v
       have hil : ((i : ℕ) : ℤ) ≤ l := by exact_mod_cast Nat.lt_succ_iff.1 i.2
-      calc v.valuation x ^ (i : ℕ) * v.valuation (b j)
-          ≤ WithZero.exp (B v) ^ (i : ℕ) * WithZero.exp (C v) :=
-            mul_le_mul' (pow_le_pow_left' hx' _) hb'
+      calc
+        v.valuation x ^ (i : ℕ) * v.valuation (b j)
+            ≤ WithZero.exp (B v) ^ (i : ℕ) * WithZero.exp (C v) :=
+          mul_le_mul' (pow_le_pow_left' hx' _) hb'
         _ ≤ WithZero.exp (D v) := by
-            rw [← WithZero.exp_nsmul, ← WithZero.exp_add, WithZero.exp_le_exp]
-            simp only [hD', Finsupp.add_apply, Finsupp.smul_apply, nsmul_eq_mul]
-            have := mul_le_mul_of_nonneg_right hil hBv
-            linarith
+          rw [← WithZero.exp_nsmul, ← WithZero.exp_add, WithZero.exp_le_exp]
+          simp only [hD', Finsupp.add_apply, Finsupp.smul_apply, nsmul_eq_mul]
+          have := mul_le_mul_of_nonneg_right hil hBv
+          linarith
     let G : Fin (l + 1) × Fin n → L D := fun p => ⟨x ^ (p.1 : ℕ) * b p.2, hmem p⟩
     have hli : LinearIndependent k G := by
       apply LinearIndependent.of_comp (L D).subtype
@@ -64,9 +68,10 @@ theorem exists_bound_deg_sub_finrank_L :
           (IntermediateField.AdjoinSimple.gen k x) ^ (i : ℕ) := by
         apply LinearIndependent.of_comp F.val.toLinearMap
         have h := linearIndependent_pow_of_transcendental hx (l + 1)
-        have heq : (F.val.toLinearMap ∘ fun i : Fin (l + 1) =>
-            (IntermediateField.AdjoinSimple.gen k x) ^ (i : ℕ)) =
-            fun i : Fin (l + 1) => x ^ (i : ℕ) := by
+        have heq
+            : (F.val.toLinearMap
+                ∘ fun i : Fin (l + 1) => (IntermediateField.AdjoinSimple.gen k x) ^ (i : ℕ))
+              = fun i : Fin (l + 1) => x ^ (i : ℕ) := by
           funext i
           simp
         rw [heq]
@@ -118,15 +123,14 @@ end Divisor
 
 open Divisor
 
-theorem bddAbove_range_deg_add_one_sub :
-    BddAbove (Set.range fun D : Divisor k K => deg D + 1 - (finrank k (L D) : ℤ)) := by
+theorem bddAbove_range_deg_add_one_sub
+    : BddAbove (Set.range fun D : Divisor k K => deg D + 1 - (finrank k (L D) : ℤ)) := by
   obtain ⟨γ, hγ⟩ := exists_bound_deg_sub_finrank_L (k := k) (K := K)
   refine ⟨γ + 1, ?_⟩
   rintro _ ⟨D, rfl⟩
   have := hγ D
   simp only
   linarith
-
 
 variable (k K) in
 noncomputable def genusInt : ℤ :=
@@ -135,24 +139,25 @@ noncomputable def genusInt : ℤ :=
 theorem le_genusInt (D : Divisor k K) : deg D + 1 - (finrank k (L D) : ℤ) ≤ genusInt k K :=
   le_csSup bddAbove_range_deg_add_one_sub ⟨D, rfl⟩
 
-theorem exists_eq_genusInt : ∃ D : Divisor k K, deg D + 1 - (finrank k (L D) : ℤ) = genusInt k K := by
-  obtain ⟨D, hD⟩ := Int.csSup_mem (Set.range_nonempty _) (bddAbove_range_deg_add_one_sub (k := k) (K := K))
+theorem exists_eq_genusInt
+    : ∃ D : Divisor k K, deg D + 1 - (finrank k (L D) : ℤ) = genusInt k K := by
+  obtain ⟨D, hD⟩ :=
+    Int.csSup_mem (Set.range_nonempty _) (bddAbove_range_deg_add_one_sub (k := k) (K := K))
   exact ⟨D, hD⟩
 
-theorem eq_genusInt_of_le {D E : Divisor k K}
-    (hD : deg D + 1 - (finrank k (L D) : ℤ) = genusInt k K) (h : D ≤ E) :
-    deg E + 1 - (finrank k (L E) : ℤ) = genusInt k K :=
+theorem eq_genusInt_of_le
+    {D E : Divisor k K} (hD : deg D + 1 - (finrank k (L D) : ℤ) = genusInt k K) (h : D ≤ E)
+    : deg E + 1 - (finrank k (L E) : ℤ) = genusInt k K :=
   le_antisymm (le_genusInt E) (by have := deg_sub_finrank_L_mono h; linarith)
 
-theorem finrank_L_zero_eq_one (hk : algebraicClosure k K = ⊥) :
-    finrank k (L (0 : Divisor k K)) = 1 := by
+theorem finrank_L_zero_eq_one (hk : algebraicClosure k K = ⊥)
+    : finrank k (L (0 : Divisor k K)) = 1 := by
   rw [finrank_L_zero, hk, IntermediateField.finrank_bot]
 
 theorem genusInt_nonneg (hk : algebraicClosure k K = ⊥) : 0 ≤ genusInt k K := by
   have h := le_genusInt (0 : Divisor k K)
   rw [finrank_L_zero_eq_one hk, map_zero] at h
   simpa using h
-
 
 variable (k K) in
 noncomputable def genus : ℕ := (genusInt k K).toNat
@@ -162,16 +167,16 @@ theorem genus_eq_genusInt (hk : algebraicClosure k K = ⊥) : (genus k K : ℤ) 
 
 namespace Divisor
 
-theorem riemann_inequality (hk : algebraicClosure k K = ⊥) (D : Divisor k K) :
-    deg D + 1 - (genus k K : ℤ) ≤ finrank k (L D) := by
+theorem riemann_inequality (hk : algebraicClosure k K = ⊥) (D : Divisor k K)
+    : deg D + 1 - (genus k K : ℤ) ≤ finrank k (L D) := by
   have := le_genusInt D
   rw [← genus_eq_genusInt hk] at this
   linarith
 
 theorem exists_mem_A (a : Repartition k K) : ∃ D : Divisor k K, a ∈ A D := by
   classical
-  have hsupp : (Function.support fun v : Place k K => max (-v.ord (a v)) 0) ⊆
-      {v | a v ∉ v.ring} := by
+  have hsupp
+      : (Function.support fun v : Place k K => max (- v.ord (a v)) 0) ⊆ {v | a v ∉ v.ring} := by
     intro v hv
     rw [Function.mem_support] at hv
     show a v ∉ v.ring
@@ -188,8 +193,9 @@ theorem exists_mem_A (a : Repartition k K) : ∃ D : Divisor k K, a ∈ A D := b
   · rw [v.valuation_eq_exp_neg_ord h0, WithZero.exp_le_exp]
     exact le_max_left _ _
 
-theorem sup_principal_eq_top {E : Divisor k K}
-    (hE : deg E + 1 - (finrank k (L E) : ℤ) = genusInt k K) : A E ⊔ principal k K = ⊤ := by
+theorem sup_principal_eq_top
+    {E : Divisor k K} (hE : deg E + 1 - (finrank k (L E) : ℤ) = genusInt k K)
+    : A E ⊔ principal k K = ⊤ := by
   rw [eq_top_iff]
   intro a _
   obtain ⟨Da, ha⟩ := exists_mem_A a
@@ -207,13 +213,14 @@ theorem sup_principal_eq_top {E : Divisor k K}
   rw [hbot, Submodule.mem_bot, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at hmem
   exact hmem
 
-theorem relSpace_sup_eq_top (D : Divisor k K) {E : Divisor k K}
-    (hE : deg E + 1 - (finrank k (L E) : ℤ) = genusInt k K) : relSpace D (D ⊔ E) = ⊤ := by
+theorem relSpace_sup_eq_top
+    (D : Divisor k K) {E : Divisor k K} (hE : deg E + 1 - (finrank k (L E) : ℤ) = genusInt k K)
+    : relSpace D (D ⊔ E) = ⊤ := by
   rw [relSpace, sup_principal_eq_top (eq_genusInt_of_le hE le_sup_right), Submodule.map_top,
     Submodule.range_mkQ]
 
-instance finiteDimensional_quotient (D : Divisor k K) :
-    FiniteDimensional k (Repartition k K ⧸ (A D ⊔ principal k K)) := by
+instance finiteDimensional_quotient (D : Divisor k K)
+    : FiniteDimensional k (Repartition k K ⧸ (A D ⊔ principal k K)) := by
   obtain ⟨E, hE⟩ := exists_eq_genusInt (k := k) (K := K)
   have h := relSpace_sup_eq_top D hE
   have := finiteDimensional_relSpace_of_le (le_sup_left : D ≤ D ⊔ E)
@@ -223,8 +230,8 @@ instance finiteDimensional_quotient (D : Divisor k K) :
 noncomputable def indexOfSpeciality (D : Divisor k K) : ℕ :=
   finrank k (Repartition k K ⧸ (A D ⊔ principal k K))
 
-theorem indexOfSpeciality_eq_genusInt (D : Divisor k K) :
-    (indexOfSpeciality D : ℤ) = finrank k (L D) - deg D - 1 + genusInt k K := by
+theorem indexOfSpeciality_eq_genusInt (D : Divisor k K)
+    : (indexOfSpeciality D : ℤ) = finrank k (L D) - deg D - 1 + genusInt k K := by
   obtain ⟨E, hE⟩ := exists_eq_genusInt (k := k) (K := K)
   have h := relSpace_sup_eq_top D hE
   have hr := finrank_relSpace (le_sup_left : D ≤ D ⊔ E)

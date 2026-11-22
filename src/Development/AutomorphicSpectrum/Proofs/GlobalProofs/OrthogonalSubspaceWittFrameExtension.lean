@@ -8,27 +8,37 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WittFrameCon
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Matrix
+open NumberField Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.Published GlobalTheory.Published.AutFin GlobalTheory.StdPar GlobalTheory.ThK.SmoothLev GlobalTheory.CompanionTheory.Hypotheses₂.ConstFin GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart
+open GlobalTheory.Published GlobalTheory.Published.AutFin GlobalTheory.StdPar
+  GlobalTheory.ThK.SmoothLev GlobalTheory.CompanionTheory.Hypotheses₂.ConstFin
+  GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart
 open GlobalTheory.UAut GlobalTheory.AdelicU GlobalTheory.SiegelSet
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.AdaptedBasis
 
-theorem exists_basis_of_duality {E : Type} [Field E] {n m : ℕ} (X Y : Matrix (Fin n) (Fin m) E)
-    (A B : Matrix (Fin m) (Fin n) E) (hAX : A * X = 1) (hAY : A * Y = 0) (hBX : B * X = 0) (hBY : B * Y = 1) :
-    2 * m ≤ n ∧ ∃ C : GL (Fin n) E,
-      (∀ (i : Fin n) (j : Fin m), i.val = j.val → ∀ k, C.1 k i = X k j) ∧
-      (∀ (i : Fin n) (j : Fin m), i.val + j.val + 1 = n → ∀ k, C.1 k i = Y k j) ∧
-      (∀ i : Fin n, m ≤ i.val → i.val + m < n →
-        A *ᵥ (fun k => C.1 k i) = 0 ∧ B *ᵥ (fun k => C.1 k i) = 0) := by
+theorem exists_basis_of_duality
+    {E : Type} [Field E]
+    {n m : ℕ} (X Y : Matrix (Fin n) (Fin m) E) (A B : Matrix (Fin m) (Fin n) E) (hAX : A * X = 1)
+    (hAY : A * Y = 0) (hBX : B * X = 0) (hBY : B * Y = 1)
+    : 2 * m ≤ n
+      ∧ ∃ C : GL (Fin n) E,
+        (∀ (i : Fin n) (j : Fin m), i.val = j.val → ∀ k, C.1 k i = X k j)
+          ∧ (∀ (i : Fin n) (j : Fin m), i.val + j.val + 1 = n → ∀ k, C.1 k i = Y k j)
+          ∧ (∀ i : Fin n,
+            m ≤ i.val → i.val + m < n
+              → A *ᵥ (fun k => C.1 k i) = 0 ∧ B *ᵥ (fun k => C.1 k i) = 0) := by
   classical
   set P : Matrix (Fin m ⊕ Fin m) (Fin n) E := Matrix.fromRows A B with hP
   have hPQ : P * Matrix.fromCols X Y = 1 := by
     rw [hP, Matrix.fromRows_mul_fromCols, hAX, hAY, hBX, hBY, Matrix.fromBlocks_one]
-  have hsurj : Function.Surjective P.mulVecLin := fun u => ⟨Matrix.fromCols X Y *ᵥ u, by
-    rw [Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, hPQ, Matrix.one_mulVec]⟩
+  have hsurj : Function.Surjective P.mulVecLin := fun u => ⟨
+    Matrix.fromCols X Y *ᵥ u,
+    by rw [Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, hPQ, Matrix.one_mulVec]
+  ⟩
   have hrk := LinearMap.finrank_range_add_finrank_ker P.mulVecLin
   rw [LinearMap.range_eq_top.2 hsurj, finrank_top] at hrk
   simp only [Module.finrank_fintype_fun_eq_card, Fintype.card_sum, Fintype.card_fin] at hrk
@@ -46,14 +56,19 @@ theorem exists_basis_of_duality {E : Type} [Field E] {n m : ℕ} (X Y : Matrix (
   have hle : 2 * m ≤ n := by omega
   refine ⟨hle, ?_⟩
   let col : Fin n → Fin n → E := fun i =>
-    if h1 : i.val < m then fun k => X k ⟨i.val, h1⟩
-    else if h2 : i.val + m < n then (b ⟨i.val - m, by have := i.2; omega⟩ : K).1
-    else fun k => Y k ⟨n - 1 - i.val, by have := i.2; omega⟩
+    if h1 : i.val < m then fun k =>
+      X k ⟨i.val, h1⟩
+    else if h2 : i.val + m < n then
+      (b ⟨i.val - m, by have := i.2; omega⟩ : K).1
+    else fun k =>
+      Y k ⟨n - 1 - i.val, by have := i.2; omega⟩
   let C0 : Matrix (Fin n) (Fin n) E := Matrix.of fun k i => col i k
-  have hcol : ∀ i, col i ∈ LinearMap.range C0.mulVecLin := fun i =>
-    ⟨Pi.single i 1, by
+  have hcol : ∀ i, col i ∈ LinearMap.range C0.mulVecLin := fun i => ⟨
+    Pi.single i 1,
+    by
       funext k
-      simp [Matrix.mulVecLin_apply, C0]⟩
+      simp [Matrix.mulVecLin_apply, C0]
+  ⟩
   have hX : ∀ (j : Fin m), (fun k => X k j) ∈ LinearMap.range C0.mulVecLin := by
     intro j
     have hi : j.val < n := by have := j.2; omega
@@ -64,8 +79,8 @@ theorem exists_basis_of_duality {E : Type} [Field E] {n m : ℕ} (X Y : Matrix (
     have hj := j.2
     have hi : n - 1 - j.val < n := by omega
     have := hcol ⟨n - 1 - j.val, hi⟩
-    have e1 : ¬ (n - 1 - j.val < m) := by omega
-    have e2 : ¬ (n - 1 - j.val + m < n) := by omega
+    have e1 : ¬(n - 1 - j.val < m) := by omega
+    have e2 : ¬(n - 1 - j.val + m < n) := by omega
     have e3 : n - 1 - (n - 1 - j.val) = j.val := by omega
     simpa [col, e1, e2, e3] using this
   have hb : ∀ (t : Fin (Module.finrank E K)), (b t : K).1 ∈ LinearMap.range C0.mulVecLin := by
@@ -73,7 +88,7 @@ theorem exists_basis_of_duality {E : Type} [Field E] {n m : ℕ} (X Y : Matrix (
     have ht := t.2
     have hi : t.val + m < n := by omega
     have := hcol ⟨t.val + m, hi⟩
-    have e1 : ¬ (t.val + m < m) := by omega
+    have e1 : ¬(t.val + m < m) := by omega
     have e2 : t.val + m + m < n := by omega
     simpa [col, e1, e2] using this
   have hKr : ∀ k : K, k.1 ∈ LinearMap.range C0.mulVecLin := by
@@ -81,8 +96,10 @@ theorem exists_basis_of_duality {E : Type} [Field E] {n m : ℕ} (X Y : Matrix (
     rw [← b.sum_repr k]
     simp only [Submodule.coe_sum, Submodule.coe_smul]
     exact Submodule.sum_mem _ fun t _ => Submodule.smul_mem _ _ (hb t)
-  have hmv : ∀ (Z : Matrix (Fin n) (Fin m) E), (∀ j : Fin m, (fun k => Z k j) ∈ LinearMap.range C0.mulVecLin) →
-      ∀ u, Z *ᵥ u ∈ LinearMap.range C0.mulVecLin := by
+  have hmv
+      : ∀ (Z : Matrix (Fin n) (Fin m) E),
+        (∀ j : Fin m, (fun k => Z k j) ∈ LinearMap.range C0.mulVecLin)
+          → ∀ u, Z *ᵥ u ∈ LinearMap.range C0.mulVecLin := by
     intro Z hZ u
     have : Z *ᵥ u = ∑ j, u j • (fun k => Z k j) := by
       funext k
@@ -92,10 +109,14 @@ theorem exists_basis_of_duality {E : Type} [Field E] {n m : ℕ} (X Y : Matrix (
   have hs : Function.Surjective C0.mulVec := by
     intro v
     have hk : v - X *ᵥ (A *ᵥ v) - Y *ᵥ (B *ᵥ v) ∈ K := by
-      have eAX : ∀ w, A *ᵥ (X *ᵥ w) = w := fun w => by rw [Matrix.mulVec_mulVec, hAX, Matrix.one_mulVec]
-      have eAY : ∀ w, A *ᵥ (Y *ᵥ w) = 0 := fun w => by rw [Matrix.mulVec_mulVec, hAY, Matrix.zero_mulVec]
-      have eBX : ∀ w, B *ᵥ (X *ᵥ w) = 0 := fun w => by rw [Matrix.mulVec_mulVec, hBX, Matrix.zero_mulVec]
-      have eBY : ∀ w, B *ᵥ (Y *ᵥ w) = w := fun w => by rw [Matrix.mulVec_mulVec, hBY, Matrix.one_mulVec]
+      have eAX : ∀ w, A *ᵥ (X *ᵥ w) = w := fun w => by
+        rw [Matrix.mulVec_mulVec, hAX, Matrix.one_mulVec]
+      have eAY : ∀ w, A *ᵥ (Y *ᵥ w) = 0 := fun w => by
+        rw [Matrix.mulVec_mulVec, hAY, Matrix.zero_mulVec]
+      have eBX : ∀ w, B *ᵥ (X *ᵥ w) = 0 := fun w => by
+        rw [Matrix.mulVec_mulVec, hBX, Matrix.zero_mulVec]
+      have eBY : ∀ w, B *ᵥ (Y *ᵥ w) = w := fun w => by
+        rw [Matrix.mulVec_mulVec, hBY, Matrix.one_mulVec]
       rw [hK, hmem]
       constructor
       · simp only [Matrix.mulVec_sub, eAX, eAY, sub_self, sub_zero]
@@ -120,14 +141,14 @@ theorem exists_basis_of_duality {E : Type} [Field E] {n m : ℕ} (X Y : Matrix (
     exact Fin.ext h
   · intro i j h k
     have hj := j.2
-    have e1 : ¬ (i.val < m) := by omega
-    have e2 : ¬ (i.val + m < n) := by omega
+    have e1 : ¬(i.val < m) := by omega
+    have e2 : ¬(i.val + m < n) := by omega
     rw [hCk]
     simp only [col, dif_neg e1, dif_neg e2]
     congr 1
     exact Fin.ext (by simp; omega)
   · intro i h1 h2
-    have e1 : ¬ (i.val < m) := by omega
+    have e1 : ¬(i.val < m) := by omega
     have : (fun k => C.1 k i) = (b ⟨i.val - m, by have := i.2; omega⟩ : K).1 := by
       funext k
       rw [hCk]
@@ -135,16 +156,19 @@ theorem exists_basis_of_duality {E : Type} [Field E] {n m : ℕ} (X Y : Matrix (
     rw [this]
     exact (hmem _).1 (b _).2
 
-theorem exists_isAdapted : ∀ (D : D7) (V : HSp D) (m : ℕ) (X Y : Matrix (Fin V.rank) (Fin m) D.host.E),
-    IsWittFrame D.sp.cm.sig V.gram X Y → ∃ C : GL (Fin V.rank) D.host.E, GlobalTheory.BlockForms.IsAdapted D.sp.cm.sig V.gram X Y C := by
+theorem exists_isAdapted
+    : ∀ (D : D7) (V : HSp D) (m : ℕ) (X Y : Matrix (Fin V.rank) (Fin m) D.host.E),
+      IsWittFrame D.sp.cm.sig V.gram X Y
+        → ∃ C : GL (Fin V.rank) D.host.E,
+          GlobalTheory.BlockForms.IsAdapted D.sp.cm.sig V.gram X Y C := by
   intro D V m X Y hW
   have hyx := GlobalTheory.WittFrame.yx_eq_one D V m X Y hW
   have hxx := hW.xx
   have hyy := hW.yy
   have hxy := hW.xy
-  obtain ⟨hle, C, h1, h2, h3⟩ := exists_basis_of_duality X Y
-    (Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) Y * V.gram)
-    (Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) X * V.gram) hyx hyy hxx hxy
+  obtain ⟨hle, C, h1, h2, h3⟩ :=
+    exists_basis_of_duality X Y (Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) Y * V.gram)
+      (Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) X * V.gram) hyx hyy hxx hxy
   exact ⟨C, ⟨hle, h1, h2, fun i a b => (h3 i a b).2, fun i a b => (h3 i a b).1⟩⟩
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.AdaptedBasis

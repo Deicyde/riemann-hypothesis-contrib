@@ -30,14 +30,19 @@ public import GroundTheory.GlobalFields.TateThesis.FiniteOrderParams
 noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace PositivityTheory.Pf1.LocalLanglands.HeckeKernelConditions
 
-theorem valuation_algebraMap_le_one {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {F : Type} [Field F] [NumberField F]
-    [Algebra F Ω] (x : 𝓞 F) : A.valuation (algebraMap F Ω (x : F)) ≤ 1 := by
+theorem valuation_algebraMap_le_one
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {F : Type} [Field F] [NumberField F] [Algebra F Ω]
+    (x : 𝓞 F)
+    : A.valuation (algebraMap F Ω (x : F)) ≤ 1 := by
   have hint : IsIntegral ℤ (algebraMap F Ω (x : F)) :=
     (RingOfIntegers.isIntegral_coe x).map (algebraMap F Ω).toIntAlgHom
   have hA : IsIntegral A (algebraMap F Ω (x : F)) := hint.tower_top
@@ -45,8 +50,9 @@ theorem valuation_algebraMap_le_one {Ω : Type} [Field Ω] (A : ValuationSubring
   rw [← hy]
   exact A.valuation_le_one y
 
-theorem card_le_of_pow_eq_self {R : Type} [CommRing R] [IsDomain R] [Fintype R] {q : ℕ} (hq : 1 < q)
-    (H : ∀ z : R, z ^ q = z) : Fintype.card R ≤ q := by
+theorem card_le_of_pow_eq_self
+    {R : Type} [CommRing R] [IsDomain R] [Fintype R] {q : ℕ} (hq : 1 < q) (H : ∀ z : R, z ^ q = z)
+    : Fintype.card R ≤ q := by
   classical
   have hdeg : (Polynomial.X ^ q - Polynomial.X : Polynomial R).natDegree = q := by
     have h1 : (Polynomial.X : Polynomial R).degree < (Polynomial.X ^ q : Polynomial R).degree := by
@@ -55,7 +61,8 @@ theorem card_le_of_pow_eq_self {R : Type} [CommRing R] [IsDomain R] [Fintype R] 
       Polynomial.natDegree_X_pow]
   have hp : (Polynomial.X ^ q - Polynomial.X : Polynomial R) ≠ 0 := by
     intro h0; rw [h0, Polynomial.natDegree_zero] at hdeg; omega
-  have hsub : (Finset.univ : Finset R).val ⊆ (Polynomial.X ^ q - Polynomial.X : Polynomial R).roots := by
+  have hsub
+      : (Finset.univ : Finset R).val ⊆ (Polynomial.X ^ q - Polynomial.X : Polynomial R).roots := by
     intro z _
     rw [Polynomial.mem_roots hp, Polynomial.IsRoot.def]
     simp [H z]
@@ -64,16 +71,18 @@ theorem card_le_of_pow_eq_self {R : Type} [CommRing R] [IsDomain R] [Fintype R] 
 
 section Transport
 
-variable {Ω : Type} [Field Ω] {A : ValuationSubring Ω}
-  {K F : Type} [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
+variable
+  {Ω : Type} [Field Ω]
+  {A : ValuationSubring Ω} {K F : Type} [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
   [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω] [Algebra K F] [IsScalarTower K F Ω]
   {v : HeightOneSpectrum (𝓞 K)} {w : HeightOneSpectrum (𝓞 F)}
 
-
 omit [IsAlgClosure F Ω] in
-theorem normV_eq_of_localDegreeOne (h : IsPlaceOver A v) (h' : IsPlaceOver A w)
-    (hloc : ∀ (σ : Weil h) (x : F), (σ : G K Ω) (algebraMap F Ω x) = algebraMap F Ω x) :
-    normV w = normV v := by
+theorem normV_eq_of_localDegreeOne
+    (h : IsPlaceOver A v)
+    (h' : IsPlaceOver A w)
+    (hloc : ∀ (σ : Weil h) (x : F), (σ : G K Ω) (algebraMap F Ω x) = algebraMap F Ω x)
+    : normV w = normV v := by
   classical
   obtain ⟨f, hf⟩ := GlobalTheory.WeilRestrict.normV_eq_pow_of_isPlaceOver h h'
   obtain ⟨φ, hφ⟩ := exists_isFrob h
@@ -85,8 +94,9 @@ theorem normV_eq_of_localDegreeOne (h : IsPlaceOver A v) (h' : IsPlaceOver A w)
     have h1 := hφ.2 _ (valuation_algebraMap_le_one A x)
     have h2 : φ (algebraMap F Ω (x : F)) = algebraMap F Ω (x : F) := hloc ⟨φ, hφW⟩ (x : F)
     rw [h2, Valuation.map_sub_swap] at h1
-    have e : algebraMap F Ω ((x ^ normV v - x : 𝓞 F) : F) =
-        algebraMap F Ω (x : F) ^ normV v - algebraMap F Ω (x : F) := by
+    have e
+        : algebraMap F Ω ((x ^ normV v - x : 𝓞 F) : F)
+          = algebraMap F Ω (x : F) ^ normV v - algebraMap F Ω (x : F) := by
       push_cast
       rfl
     rw [e]

@@ -61,8 +61,7 @@ theorem LocalRingHypotheses.proof : LocalRingHypotheses.Statement := by
   have hli : LinearIndependent F ![(1 : E), β] := by
     rw [LinearIndependent.pair_iff]
     intro s u hsu
-    have hsu' : algebraMap F E s + algebraMap F E u * β = 0 := by
-      simpa [Algebra.smul_def] using hsu
+    have hsu' : algebraMap F E s + algebraMap F E u * β = 0 := by simpa [Algebra.smul_def] using hsu
     have hc' : algebraMap F E s + algebraMap F E u * -β = 0 := by
       have := congrArg c hsu'
       rwa [map_add, map_mul, AlgEquiv.commutes, AlgEquiv.commutes, hcβ, map_zero] at this
@@ -81,8 +80,8 @@ theorem LocalRingHypotheses.proof : LocalRingHypotheses.Statement := by
     simp [B, coe_basisOfLinearIndependentOfCardEqFinrank]
   let BK : Module.Basis (Fin 2) (v.adicCompletion F) (Kv E v) := Algebra.TensorProduct.basis _ B
 
-  have hdecomp : ∀ x : Kv E v, ∃ a b : v.adicCompletion F,
-      x = algebraMap _ _ a + algebraMap _ _ b * t := by
+  have hdecomp
+      : ∀ x : Kv E v, ∃ a b : v.adicCompletion F, x = algebraMap _ _ a + algebraMap _ _ b * t := by
     intro x
     refine ⟨BK.repr x 0, BK.repr x 1, ?_⟩
     conv_lhs => rw [← BK.sum_repr x]
@@ -120,7 +119,7 @@ theorem LocalRingHypotheses.proof : LocalRingHypotheses.Statement := by
   intro N J x y
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [hf, map_sum, map_mul, Matrix.map_apply, Function.comp_apply, AlgHom.toRingHom_eq_coe,
-    RingHom.coe_coe, hsig_incl]
+      RingHom.coe_coe, hsig_incl]
   rfl
 
 end GroundTheory.Heights₂.Heights.StrongApprox

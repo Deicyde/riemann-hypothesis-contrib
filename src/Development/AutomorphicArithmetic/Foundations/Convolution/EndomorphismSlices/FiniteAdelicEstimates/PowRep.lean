@@ -12,8 +12,11 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F
+  PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf TypeB TypeH)
 open UpperTheory.V.Z.Tf.GlobalTraceComparison
@@ -34,8 +37,7 @@ theorem powRep : PowRep := by
   obtain ⟨-, hrep, hmono, hmul⟩ := repAlg E A.blk (chi l₁) (chi l₂)
   obtain ⟨hrt₁, hrt₂, -⟩ := PositivityTheory.Rg.BcB.F.BlockFiniteConvolution.rtAlg' E A.blk u₁ u₂
   have hc : 0 ≤ A.blk.c := A.c_nonneg
-  have ok₁ : (A.ptB (A.fx S L T φ (fun _ => .one) fun _ => .one)).Ok :=
-    hpt _ _ _ (hfx T φ _ _ hφ).1
+  have ok₁ : (A.ptB (A.fx S L T φ (fun _ => .one) fun _ => .one)).Ok := hpt _ _ _ (hfx T φ _ _ hφ).1
   have ok₂ : (A.ptB (rt u₁ u₂ (A.idm S L))).Ok := by
     obtain ⟨r, hr⟩ := hrt₂ (A.ptB (A.idm S L)) (hpt _ _ _ hidm)
     exact hpt _ _ _ hr.ψ
@@ -50,9 +52,10 @@ theorem powRep : PowRep := by
   have base₂ : Rep A.blk (chi l₁) (chi l₂) t₂.ψ 1 (max t₂.T t₂.r) t₂.op := by
     have := hrep t₂ ok₂
     rwa [hval] at this
-  have step : ∀ k : ℕ, Rep A.blk (chi l₁) (chi l₂)
-      (A.fx S L T φ (fun w => (e₁ w).pow k) fun w => (e₂ w).pow k) 1
-      (max t₁.T t₁.r + k * (R + A.blk.c)) (t₁.op * U ^ k) := by
+  have step
+      : ∀ k : ℕ,
+        Rep A.blk (chi l₁) (chi l₂) (A.fx S L T φ (fun w => (e₁ w).pow k) fun w => (e₂ w).pow k) 1
+          (max t₁.T t₁.r + k * (R + A.blk.c)) (t₁.op * U ^ k) := by
     intro k
     induction k with
     | zero =>
@@ -61,16 +64,24 @@ theorem powRep : PowRep := by
     | succ k ih =>
       have h := hmul _ _ _ _ _ _ _ _ ih hU
       rw [(hfx T φ _ _ hφ).2.2 e₁ e₂, one_mul] at h
-      have e : max t₁.T t₁.r + (k : ℝ) * (R + A.blk.c) + R + A.blk.c =
-          max t₁.T t₁.r + ((k + 1 : ℕ) : ℝ) * (R + A.blk.c) := by
+      have e
+          : max t₁.T t₁.r + (k : ℝ) * (R + A.blk.c) + R + A.blk.c
+            = max t₁.T t₁.r + ((k + 1 : ℕ) : ℝ) * (R + A.blk.c) := by
         push_cast; ring
       rw [e, mul_assoc, ← pow_succ] at h
       exact h
-  refine ⟨max t₁.T t₁.r + max t₂.T t₂.r + A.blk.c, R + A.blk.c, by positivity, by positivity, fun k => ?_⟩
+  refine ⟨
+    max t₁.T t₁.r + max t₂.T t₂.r + A.blk.c,
+    R + A.blk.c,
+    by positivity,
+    by positivity,
+    fun k => ?_
+  ⟩
   have h := hmul _ _ _ _ _ _ _ _ (step k) base₂
   rw [one_mul] at h
-  have hψ : mulF A.blk.ν (A.fx S L T φ (fun w => (e₁ w).pow k) fun w => (e₂ w).pow k) t₂.ψ =
-      rt u₁ u₂ (A.fx S L T φ (fun w => (e₁ w).pow k) fun w => (e₂ w).pow k) := by
+  have hψ
+      : mulF A.blk.ν (A.fx S L T φ (fun w => (e₁ w).pow k) fun w => (e₂ w).pow k) t₂.ψ
+        = rt u₁ u₂ (A.fx S L T φ (fun w => (e₁ w).pow k) fun w => (e₂ w).pow k) := by
     show mulF A.blk.ν _ (rt u₁ u₂ (A.idm S L)) = _
     rw [hrt₁, (hfx T φ _ _ hφ).2.1]
   rw [hψ] at h

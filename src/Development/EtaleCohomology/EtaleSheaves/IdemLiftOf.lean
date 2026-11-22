@@ -5,7 +5,8 @@ public import Development.EtaleCohomology.EtaleSheaves.FMrangePf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Polynomial LateralTheory.E.BuildCut LateralTheory.E.SysFMPf LateralTheory.E.FMrangePf
+open CategoryTheory Limits AlgebraicGeometry Polynomial LateralTheory.E.BuildCut
+  LateralTheory.E.SysFMPf LateralTheory.E.FMrangePf
 
 namespace LateralTheory.E.IdempotentLifting
 
@@ -36,8 +37,9 @@ theorem IdemLift_of : IdemLift := by
   refine ⟨d.appTop ((pullback.snd (specZIsTerminal.from P) t).appTop r), ?_⟩
   have key : w.toNormalization ≫ d ≫ pullback.snd (specZIsTerminal.from P) t = g := by
     rw [← Category.assoc, w.toNormalization_normalizationDesc, pullback.lift_snd]
-  have h1 : w.toNormalization.appTop (d.appTop ((pullback.snd (specZIsTerminal.from P) t).appTop r)) =
-      g.appTop r := by
+  have h1
+      : w.toNormalization.appTop (d.appTop ((pullback.snd (specZIsTerminal.from P) t).appTop r))
+        = g.appTop r := by
     rw [← key]; simp only [Scheme.Hom.comp_appTop, CommRingCat.comp_apply]
   have h2 : (Scheme.ΓSpecIso (CommRingCat.of W)).hom (g.appTop r) = e := by
     rw [← CommRingCat.comp_apply, Scheme.ΓSpecIso_naturality, CommRingCat.comp_apply]

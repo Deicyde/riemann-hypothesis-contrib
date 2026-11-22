@@ -9,11 +9,12 @@ open Polynomial
 
 namespace GlobalTheory.SplittingAlgebra
 
-theorem exists_monomials_span (t : ℕ) : ∃ e : Fin t.factorial → Fin t → ℕ,
-    ∀ (R A : Type) [CommRing R] [CommRing A] [Algebra R A] (y : Fin t → A),
-      (∏ c, (X - C (y c))) ∈ Polynomial.lifts (algebraMap R A) →
-      ∀ a ∈ Algebra.adjoin R (Set.range y),
-        ∃ cf : Fin t.factorial → R, a = ∑ k, cf k • ∏ c, y c ^ e k c := by
+theorem exists_monomials_span (t : ℕ)
+    : ∃ e : Fin t.factorial → Fin t → ℕ,
+      ∀ (R A : Type) [CommRing R] [CommRing A] [Algebra R A] (y : Fin t → A),
+        (∏ c, (X - C (y c))) ∈ Polynomial.lifts (algebraMap R A)
+          → ∀ a ∈ Algebra.adjoin R (Set.range y), ∃ cf : Fin t.factorial → R,
+            a = ∑ k, cf k • ∏ c, y c ^ e k c := by
   induction t with
   | zero =>
     refine ⟨fun _ _ => 0, fun R A _ _ _ y _ a ha => ?_⟩
@@ -56,12 +57,11 @@ theorem exists_monomials_span (t : ℕ) : ∃ e : Fin t.factorial → Fin t → 
       refine ⟨(q.map (algebraMap R R1)) /ₘ (X - C y0), ?_⟩
       rw [coe_mapRingHom, map_divByMonic _ (monic_X_sub_C _), Polynomial.map_map,
         ← IsScalarTower.algebraMap_eq, hq, Fin.prod_univ_succ]
-      have : Polynomial.map (algebraMap R1 A) (X - C y0) = X - C (y 0) := by
-        simp [y0]
+      have : Polynomial.map (algebraMap R1 A) (X - C y0) = X - C (y 0) := by simp [y0]
       rw [this, mul_divByMonic_cancel_left _ (monic_X_sub_C _)]
     have ha' : a ∈ Algebra.adjoin R1 (Set.range fun c : Fin t => y c.succ) := by
-      have : Algebra.adjoin R (Set.range y) ≤
-          (Algebra.adjoin R1 (Set.range fun c : Fin t => y c.succ)).restrictScalars R := by
+      have : Algebra.adjoin R (Set.range y)
+          ≤ (Algebra.adjoin R1 (Set.range fun c : Fin t => y c.succ)).restrictScalars R := by
         refine Algebra.adjoin_le ?_
         rintro _ ⟨c, rfl⟩
         refine Fin.cases ?_ (fun c => ?_) c
@@ -78,30 +78,32 @@ theorem exists_monomials_span (t : ℕ) : ∃ e : Fin t.factorial → Fin t → 
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [Fin.prod_univ_succ]
 
-theorem adjoin_perm_eq_top {K : Type} [Field K] {t : ℕ} (α : Fin t → K)
-    (hα : Function.Injective α) (f : Equiv.Perm (Fin t) → K) :
-    f ∈ Algebra.adjoin K (Set.range fun (c : Fin t) (σ : Equiv.Perm (Fin t)) => α (σ c)) := by
+theorem adjoin_perm_eq_top
+    {K : Type} [Field K]
+    {t : ℕ} (α : Fin t → K) (hα : Function.Injective α) (f : Equiv.Perm (Fin t) → K)
+    : f ∈ Algebra.adjoin K (Set.range fun (c : Fin t) (σ : Equiv.Perm (Fin t)) => α (σ c)) := by
   classical
   set S := Algebra.adjoin K (Set.range fun (c : Fin t) (σ : Equiv.Perm (Fin t)) => α (σ c))
   have h1 : ∀ σ : Equiv.Perm (Fin t), (Pi.single σ (1 : K) : Equiv.Perm (Fin t) → K) ∈ S := by
     intro σ
-    have : (Pi.single σ (1 : K) : Equiv.Perm (Fin t) → K) =
-        ∏ c, aeval (fun τ : Equiv.Perm (Fin t) => α (τ c)) (Lagrange.basis Finset.univ α (σ c)) := by
-      funext τ
-      rw [Finset.prod_apply]
-      simp only [aeval_pi_apply₂, coe_aeval_eq_eval]
-      by_cases h : τ = σ
-      · subst h
-        rw [Pi.single_eq_same]
-        exact (Finset.prod_eq_one fun c _ =>
-          Lagrange.eval_basis_self hα.injOn (Finset.mem_univ _)).symm
-      · rw [Pi.single_eq_of_ne h]
-        obtain ⟨c, hc⟩ : ∃ c, σ c ≠ τ c := by
-          by_contra hh
-          push_neg at hh
-          exact h (Equiv.ext fun c => (hh c).symm)
-        exact (Finset.prod_eq_zero (Finset.mem_univ c)
-          (Lagrange.eval_basis_of_ne hc (Finset.mem_univ _))).symm
+    have : (Pi.single σ (1 : K) : Equiv.Perm (Fin t) → K)
+        = ∏ c, aeval (fun τ : Equiv.Perm (Fin t) => α (τ c)) (Lagrange.basis Finset.univ α (σ c)) :=
+      by
+        funext τ
+        rw [Finset.prod_apply]
+        simp only [aeval_pi_apply₂, coe_aeval_eq_eval]
+        by_cases h : τ = σ
+        · subst h
+          rw [Pi.single_eq_same]
+          exact (Finset.prod_eq_one fun c _ =>
+            Lagrange.eval_basis_self hα.injOn (Finset.mem_univ _)).symm
+        · rw [Pi.single_eq_of_ne h]
+          obtain ⟨c, hc⟩ : ∃ c, σ c ≠ τ c := by
+            by_contra hh
+            push_neg at hh
+            exact h (Equiv.ext fun c => (hh c).symm)
+          exact (Finset.prod_eq_zero (Finset.mem_univ c)
+            (Lagrange.eval_basis_of_ne hc (Finset.mem_univ _))).symm
     rw [this]
     refine Subalgebra.prod_mem _ fun c _ => ?_
     refine Algebra.adjoin_mono ?_ (aeval_mem_adjoin_singleton K _)
@@ -110,23 +112,26 @@ theorem adjoin_perm_eq_top {K : Type} [Field K] {t : ℕ} (α : Fin t → K)
   rw [pi_eq_sum_univ' f]
   exact Subalgebra.sum_mem _ fun σ _ => Subalgebra.smul_mem _ (h1 σ) _
 
-theorem coeff_prod_apply {O I : Type} [CommRing O] {t : ℕ} (y : Fin t → I → O) (i : I) (j : ℕ) :
-    (∏ c, (X - C (y c))).coeff j i = (∏ c, (X - C (y c i))).coeff j := by
+theorem coeff_prod_apply {O I : Type} [CommRing O] {t : ℕ} (y : Fin t → I → O) (i : I) (j : ℕ)
+    : (∏ c, (X - C (y c))).coeff j i = (∏ c, (X - C (y c i))).coeff j := by
   have := coeff_map (p := ∏ c, (X - C (y c))) (Pi.evalRingHom (fun _ : I => O) i) j
   rw [Polynomial.map_prod] at this
   simpa using this.symm
 
-theorem main : ∀ {O X : Type} [CommRing O] [IsDomain O] [Finite X]
-    (T : Subalgebra O (X → O)) (t : ℕ) (α : X → Fin t → O),
-    (∀ x, Function.Injective (α x)) →
-    (∀ x y, x ≠ y → ∃ f ∈ T, f x ≠ f y) →
-    (∀ j, (fun x => (∏ c, (Polynomial.X - Polynomial.C (α x c))).coeff j) ∈ T) →
-    (let T' : Subalgebra O (X × Equiv.Perm (Fin t) → O) :=
-        Algebra.adjoin O ((fun f : X → O => fun x' => f x'.1) '' (T : Set (X → O)) ∪
-          Set.range (fun c : Fin t => fun x' => α x'.1 (x'.2 c)))
-      ∃ b : Fin t.factorial → X × Equiv.Perm (Fin t) → O,
-        (∀ k, b k ∈ T') ∧ ∀ f ∈ T', ∃! cf : Fin t.factorial → T,
-          f = ∑ k, (fun x' => (cf k : X → O) x'.1) * b k) := by
+theorem main
+    : ∀ {O X : Type} [CommRing O] [IsDomain O] [Finite X] (T : Subalgebra O (X → O)) (t : ℕ)
+        (α : X → Fin t → O),
+      (∀ x, Function.Injective (α x)) → (∀ x y, x ≠ y → ∃ f ∈ T, f x ≠ f y)
+        → (∀ j, (fun x => (∏ c, (Polynomial.X - Polynomial.C (α x c))).coeff j) ∈ T)
+        → (let T' : Subalgebra O (X × Equiv.Perm (Fin t) → O) :=
+             Algebra.adjoin O
+               ((fun f : X → O => fun x' => f x'.1) '' (T : Set (X → O))
+                 ∪ Set.range (fun c : Fin t => fun x' => α x'.1 (x'.2 c)))
+           ∃ b : Fin t.factorial → X × Equiv.Perm (Fin t) → O,
+             (∀ k, b k ∈ T')
+               ∧ ∀ f ∈ T',
+                 ∃! cf : Fin t.factorial → T,
+                   f = ∑ k, (fun x' => (cf k : X → O) x'.1) * b k) := by
   intro O Y _ _ _ T t α hα _ hT T'
   obtain ⟨e, he⟩ := exists_monomials_span t
   let y : Fin t → Y × Equiv.Perm (Fin t) → O := fun c x' => α x'.1 (x'.2 c)
@@ -134,8 +139,9 @@ theorem main : ∀ {O X : Type} [CommRing O] [IsDomain O] [Finite X]
   · have hy : ∀ c, y c ∈ T' := fun c =>
       Algebra.subset_adjoin (Set.mem_union_right _ (Set.mem_range_self c))
     exact Subalgebra.prod_mem _ fun c _ => Subalgebra.pow_mem _ (hy c) _
-  have hind : ∀ (x : Y) (d : Fin t.factorial → O),
-      (∀ σ : Equiv.Perm (Fin t), ∑ k, d k * ∏ c, α x (σ c) ^ e k c = 0) → ∀ k, d k = 0 := by
+  have hind
+      : ∀ (x : Y) (d : Fin t.factorial → O),
+        (∀ σ : Equiv.Perm (Fin t), ∑ k, d k * ∏ c, α x (σ c) ^ e k c = 0) → ∀ k, d k = 0 := by
     intro x d hd k
     let K := FractionRing O
     have hi : Function.Injective (algebraMap O K) := IsFractionRing.injective O K
@@ -152,16 +158,20 @@ theorem main : ∀ {O X : Type} [CommRing O] [IsDomain O] [Finite X]
       · obtain ⟨cf, hcf⟩ := he K _ z hl g (adjoin_perm_eq_top β (hi.comp (hα x)) g)
         exact (Submodule.mem_span_range_iff_exists_fun K).2 ⟨cf, hcf.symm⟩
       · simp [Fintype.card_perm]
-    have := Fintype.linearIndependent_iff.1 hli (fun k => algebraMap O K (d k)) (by
-      funext σ
-      have := congrArg (algebraMap O K) (hd σ)
-      simpa [z, β, Finset.sum_apply, Finset.prod_apply, Algebra.smul_def] using this) k
+    have :=
+      Fintype.linearIndependent_iff.1 hli
+        (fun k => algebraMap O K (d k))
+        (by
+          funext σ
+          have := congrArg (algebraMap O K) (hd σ)
+          simpa [z, β, Finset.sum_apply, Finset.prod_apply, Algebra.smul_def] using this)
+        k
     exact hi (by simpa using this)
   let φ : T →+* (Y × Equiv.Perm (Fin t) → O) :=
     Pi.ringHom fun x' => (Pi.evalRingHom (fun _ : Y => O) x'.1).comp T.val.toRingHom
   letI : Algebra T (Y × Equiv.Perm (Fin t) → O) := φ.toAlgebra
-  have hl : (∏ c, (X - C (y c))) ∈
-      Polynomial.lifts (algebraMap T (Y × Equiv.Perm (Fin t) → O)) := by
+  have hl
+      : (∏ c, (X - C (y c))) ∈ Polynomial.lifts (algebraMap T (Y × Equiv.Perm (Fin t) → O)) := by
     rw [lifts_iff_coeff_lifts]
     intro j
     refine ⟨⟨_, hT j⟩, funext fun x' => ?_⟩

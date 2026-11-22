@@ -8,12 +8,17 @@ namespace ReciprocityTheory.ChartRestriction.G.FreeQuotientRank.QuotShiftPfH
 
 open IsDedekindDomain
 
-noncomputable abbrev Rv {R : Type*} [CommRing R] [IsDedekindDomain R] (F : Type*) [Field F]
-    [Algebra R F] [IsFractionRing R F] (v : HeightOneSpectrum R) : Subring F :=
+noncomputable abbrev Rv
+    {R : Type*} [CommRing R] [IsDedekindDomain R]
+    (F : Type*) [Field F] [Algebra R F] [IsFractionRing R F]
+    (v : HeightOneSpectrum R)
+    : Subring F :=
   (v.valuationSubringAtPrime F).toSubring
 
-variable {R : Type*} [CommRing R] [IsDedekindDomain R] {F : Type*} [Field F] [Algebra R F]
-  [IsFractionRing R F] (v : HeightOneSpectrum R)
+variable
+  {R : Type*} [CommRing R] [IsDedekindDomain R]
+  {F : Type*} [Field F] [Algebra R F] [IsFractionRing R F]
+  (v : HeightOneSpectrum R)
 
 lemma val_eq_exp {x : F} (hx : x ≠ 0) : v.valuation F x = WithZero.exp (-(ordAt v x)) := by
   unfold ordAt
@@ -118,8 +123,7 @@ lemma hasFactorization : IsDiscreteValuationRing.HasUnitMulPowIrreducibleFactori
   exact ⟨_, u, by rw [hu, mul_comm]⟩
 
 instance dvr_Rv : IsDiscreteValuationRing (Rv F v) :=
-  IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
-    (hasFactorization v)
+  IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization (hasFactorization v)
 
 lemma addVal_eq_ord (x : Rv F v) (hx : (x : F) ≠ 0) :
     IsDiscreteValuationRing.addVal (Rv F v) x = ((ordAt v (x : F)).toNat : ℕ∞) := by

@@ -13,13 +13,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsProperOfIs
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SerreTateProperness
 
-theorem main : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : ℕ) [Fact p.Prime] [CharP k p] (G : Over (Sp k)) [GrpObj G], GlobalTheory.SS.SmConn G → ∀ g : ℕ, SmoothOfRelativeDimension g G.hom → ∀ m : ℕ, (m : k) ≠ 0 → ∀ s : Finset (𝟙_ (Over (Sp k)) ⟶ G), (∀ x ∈ s, x ^ m = 1) → m ^ (2 * g) < m * s.card → IsProper G.hom := by
+theorem main
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : ℕ) [Fact p.Prime] [CharP k p] (G : Over (Sp k))
+        [GrpObj G],
+      GlobalTheory.SS.SmConn G
+        → ∀ g : ℕ,
+          SmoothOfRelativeDimension g G.hom
+            → ∀ m : ℕ,
+              (m : k) ≠ 0
+                → ∀ s : Finset (𝟙_ (Over (Sp k)) ⟶ G),
+                  (∀ x ∈ s, x ^ m = 1) → m ^ (2 * g) < m * s.card → IsProper G.hom := by
   intro k _ _ p _ _ G _ hG g hg m hm s hs hcard
   classical
   obtain ⟨N, _, ν, hN, hνmon, hνci, hpdiv, hlift, -, hdim⟩ :=
@@ -52,7 +62,8 @@ theorem main : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : ℕ) [Fact p.Prime]
     intro x hx x' hx' h
     rw [← hf1 x hx, ← hf1 x' hx', h]
   have hcardN : (s.image f).card ≤ m ^ (Module.finrank ℤ X + 2 * a) := by
-    refine GlobalTheory.T.card_torsion_torusExtension_abelianVariety_le k N hN.1 X B i q hq hB a ha m hm (s.image f) ?_
+    refine GlobalTheory.T.card_torsion_torusExtension_abelianVariety_le k N hN.1 X B i q hq hB a ha
+      m hm (s.image f) ?_
     intro y hy
     obtain ⟨x, hx, rfl⟩ := Finset.mem_image.mp hy
     exact hf2 x hx
@@ -60,11 +71,10 @@ theorem main : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : ℕ) [Fact p.Prime]
 
   have hpt : Nonempty (𝟙_ (Over (Sp k))).left := by
     change Nonempty (Sp k)
-    first
-    | infer_instance
-    | exact ⟨IsLocalRing.closedPoint k⟩
+    first | infer_instance | exact ⟨IsLocalRing.closedPoint k⟩
   have hne : Nonempty N.left := ⟨(1 : 𝟙_ (Over (Sp k)) ⟶ N).left hpt.some⟩
-  have hgle : g' ≤ g := GlobalTheory.T.relDim_le_of_smooth_of_isClosedImmersion k N G ν hνci hne g g' hg hg'
+  have hgle : g' ≤ g :=
+    GlobalTheory.T.relDim_le_of_smooth_of_isClosedImmersion k N G ν hνci hne g g' hg hg'
 
   have hm1 : 1 < m := by
     rcases Nat.lt_or_ge 1 m with h | h
@@ -75,7 +85,9 @@ theorem main : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : ℕ) [Fact p.Prime]
       simp at hcard hcardN
       omega
   have hlt : m ^ (2 * g) < m ^ (Module.finrank ℤ X + 2 * a + 1) := by
-    calc m ^ (2 * g) < m * s.card := hcard
+    calc
+      m ^ (2 * g)
+        < m * s.card := hcard
       _ ≤ m * m ^ (Module.finrank ℤ X + 2 * a) := Nat.mul_le_mul_left m hcardN
       _ = m ^ (Module.finrank ℤ X + 2 * a + 1) := by ring
   have hexp := (Nat.pow_lt_pow_iff_right (by omega)).mp hlt

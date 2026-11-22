@@ -13,22 +13,27 @@ noncomputable section
 namespace Formalism.L2.Pj
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
 def PartIAt (Xo : Moduli Dw l) (c : Coeff l) : Prop :=
-  ∀ (p : ℕ) (W : ValuationSubring ℂ), p.Prime → (p : ℂ) ∈ W.nonunits → l.GoodAt p →
-    ∃ Y : Model Xo c (c.V W).subtype, Y.N3 ∧ PushInvertible Y.t.G Y.t.PP.L
+  ∀ (p : ℕ) (W : ValuationSubring ℂ),
+    p.Prime → (p : ℂ) ∈ W.nonunits → l.GoodAt p
+      → ∃ Y : Model Xo c (c.V W).subtype, Y.N3 ∧ PushInvertible Y.t.G Y.t.PP.L
 
-theorem exists_lieElement_middleBlockPart (c : Coeff l) (la : HeightOneSpectrum (𝓞 c.F)) :
-    ∃ W : ValuationSubring ℂ, (∀ x : 𝓞 c.F, x ∈ la.asIdeal → (((algebraMap (𝓞 c.F) c.F x : c.F) : ℂ)) ∈ W.nonunits) ∧
-      ∀ x : c.F, (x : ℂ) ∈ W → la.valuation c.F x ≤ 1 := by
+theorem exists_lieElement_middleBlockPart (c : Coeff l) (la : HeightOneSpectrum (𝓞 c.F))
+    : ∃ W : ValuationSubring ℂ,
+      (∀ x : 𝓞 c.F, x ∈ la.asIdeal → (((algebraMap (𝓞 c.F) c.F x : c.F) : ℂ)) ∈ W.nonunits)
+        ∧ ∀ x : c.F, (x : ℂ) ∈ W → la.valuation c.F x ≤ 1 := by
   set V := (la.valuation c.F).valuationSubring with hVdef
   let g : V →+* ℂ := c.F.val.toRingHom.comp V.subtype
   have hg : Function.Injective g := fun a b h => Subtype.ext (c.F.val.injective h)
-  let e : V ≃+* g.range := RingEquiv.ofBijective g.rangeRestrict ⟨fun a b h => hg (congrArg (fun z : g.range => (z : ℂ)) h),
-    g.rangeRestrict_surjective⟩
+  let e : V ≃+* g.range :=
+    RingEquiv.ofBijective g.rangeRestrict
+      ⟨fun a b h => hg (congrArg (fun z : g.range => (z : ℂ)) h), g.rangeRestrict_surjective⟩
   have hmax : ((IsLocalRing.maximalIdeal V).map e).IsMaximal := Ideal.map_isMaximal_of_equiv e
   obtain ⟨W, hAW, hIW⟩ := Ideal.image_subset_nonunits_valuationSubring _ hmax.ne_top
   have hnon : ∀ y : V, y ∈ IsLocalRing.maximalIdeal V → g y ∈ W.nonunits := fun y hy =>
@@ -42,11 +47,13 @@ theorem exists_lieElement_middleBlockPart (c : Coeff l) (la : HeightOneSpectrum 
       intro hu
       obtain ⟨w, hw⟩ := isUnit_iff_exists_inv.1 hu
       have h1 : la.valuation c.F (algebraMap (𝓞 c.F) c.F x) < 1 := by
-        rw [HeightOneSpectrum.valuation_of_algebraMap]; exact (la.intValuation_lt_one_iff_mem x).2 hx
+        rw [HeightOneSpectrum.valuation_of_algebraMap]
+        exact (la.intValuation_lt_one_iff_mem x).2 hx
       have h2 : la.valuation c.F ((w : V) : c.F) ≤ 1 := w.2
       have h3 := congrArg (fun z : V => la.valuation c.F (z : c.F)) hw
       simp only [MulMemClass.coe_mul, OneMemClass.coe_one, map_mul, map_one] at h3
-      have h4 : la.valuation c.F (algebraMap (𝓞 c.F) c.F x) * la.valuation c.F ((w : V) : c.F) < 1 :=
+      have h4
+          : la.valuation c.F (algebraMap (𝓞 c.F) c.F x) * la.valuation c.F ((w : V) : c.F) < 1 :=
         lt_of_lt_of_le (mul_lt_one_of_nonneg_of_lt_one_left zero_le h1 h2) le_rfl
       rw [h3] at h4
       exact lt_irrefl _ h4
@@ -76,12 +83,13 @@ theorem exists_lieElement_middleBlockPart (c : Coeff l) (la : HeightOneSpectrum 
       show ((x⁻¹ : c.F) : ℂ) = _
       exact map_inv₀ c.F.val x
     rw [h7, map_inv₀] at h5
-    have hW0 : W.valuation (x : ℂ) ≠ 0 := by
-      rw [Valuation.ne_zero_iff]; exact_mod_cast hx0
+    have hW0 : W.valuation (x : ℂ) ≠ 0 := by rw [Valuation.ne_zero_iff]; exact_mod_cast hx0
     exact absurd ((inv_lt_one₀ (zero_lt_iff.2 hW0)).1 h5) (not_lt.2 h6)
 
-theorem modelAtSt_of {Xo : Moduli Dw l} {c : Coeff l} (hI : PartIAt Xo c) (hgood : ∀ p : ℕ, p.Prime → l.GoodAt p)
-    (la : HeightOneSpectrum (𝓞 c.F)) : ModelAtSt Xo c la := by
+theorem modelAtSt_of
+    {Xo : Moduli Dw l} {c : Coeff l} (hI : PartIAt Xo c)
+    (hgood : ∀ p : ℕ, p.Prime → l.GoodAt p) (la : HeightOneSpectrum (𝓞 c.F))
+    : ModelAtSt Xo c la := by
   obtain ⟨W, hWnon, hWkey⟩ := exists_lieElement_middleBlockPart c la
   have hp : (Formalism.MainNotions.WeightAlgebra.resCh la).Prime := resCh_prime la
   have hmem : ((Formalism.MainNotions.WeightAlgebra.resCh la : ℕ) : 𝓞 c.F) ∈ la.asIdeal := by
@@ -117,16 +125,23 @@ theorem modelAtSt_of {Xo : Moduli Dw l} {c : Coeff l} (hI : PartIAt Xo c) (hgood
     rw [← WithZero.exp_log hval0, ← WithZero.exp_zero, WithZero.exp_le_exp]
     linarith
   let f : c.V W →+* (algebraMap Tc.V Tc.Fr).range := (io.comp (c.V W).subtype).codRestrict _ hint
-  let eq : Tc.V ≃+* (algebraMap Tc.V Tc.Fr).range := RingEquiv.ofBijective (algebraMap Tc.V Tc.Fr).rangeRestrict
-    ⟨fun a b h => IsFractionRing.injective Tc.V Tc.Fr (congrArg (fun z : (algebraMap Tc.V Tc.Fr).range => (z : Tc.Fr)) h),
-      (algebraMap Tc.V Tc.Fr).rangeRestrict_surjective⟩
+  let eq : Tc.V ≃+* (algebraMap Tc.V Tc.Fr).range :=
+    RingEquiv.ofBijective (algebraMap Tc.V Tc.Fr).rangeRestrict ⟨
+      fun a b h =>
+        IsFractionRing.injective Tc.V Tc.Fr
+          (congrArg (fun z : (algebraMap Tc.V Tc.Fr).range => (z : Tc.Fr)) h),
+      (algebraMap Tc.V Tc.Fr).rangeRestrict_surjective
+    ⟩
   refine ⟨eq.symm.toRingHom.comp f, ?_⟩
   ext x
-  have := congrArg (fun z : (algebraMap Tc.V Tc.Fr).range => (z : Tc.Fr)) (eq.apply_symm_apply (f x))
+  have :=
+    congrArg (fun z : (algebraMap Tc.V Tc.Fr).range => (z : Tc.Fr)) (eq.apply_symm_apply (f x))
   exact this
 
-theorem goodAt_of_two_primes {g0 g1 : ℕ} (hM : l.M = g0 * g1) (h0 : g0.Prime) (h1 : g1.Prime)
-    (hne : g0 ≠ g1) (p : ℕ) (hp : p.Prime) : l.GoodAt p := by
+theorem goodAt_of_two_primes
+    {g0 g1 : ℕ} (hM : l.M = g0 * g1) (h0 : g0.Prime) (h1 : g1.Prime) (hne : g0 ≠ g1)
+    (p : ℕ) (hp : p.Prime)
+    : l.GoodAt p := by
   unfold Level.GoodAt
   have hodd : Odd (g0 * g1) := hM ▸ l.odd
   have h3 : 3 ≤ g0 * g1 := hM ▸ l.three_le
@@ -140,7 +155,8 @@ theorem goodAt_of_two_primes {g0 g1 : ℕ} (hM : l.M = g0 * g1) (h0 : g0.Prime) 
     have := h1.two_le
     have := Nat.odd_iff.1 o1
     omega
-  rw [hM, Nat.factorization_mul h0.ne_zero h1.ne_zero, Finsupp.add_apply, h0.factorization, h1.factorization]
+  rw [hM, Nat.factorization_mul h0.ne_zero h1.ne_zero, Finsupp.add_apply, h0.factorization,
+    h1.factorization]
   by_cases e0 : p = g0
   · have e : (Finsupp.single g0 1 : ℕ →₀ ℕ) p + (Finsupp.single g1 1 : ℕ →₀ ℕ) p = 1 := by
       simp [Finsupp.single_apply, e0, hne, hne.symm]
@@ -156,7 +172,8 @@ theorem goodAt_of_two_primes {g0 g1 : ℕ} (hM : l.M = g0 * g1) (h0 : g0.Prime) 
       rw [e, pow_zero, Nat.div_one]
       exact h3
 
-theorem partIAt_of (hP : PartI) (hN : N1ab) (Xo : Moduli Dw l) (c : Coeff l) (hpq : 1 ≤ Dw.p + Dw.q) : PartIAt Xo c := by
+theorem partIAt_of (hP : PartI) (hN : N1ab) (Xo : Moduli Dw l) (c : Coeff l) (hpq : 1 ≤ Dw.p + Dw.q)
+    : PartIAt Xo c := by
   classical
   obtain ⟨-, hI⟩ := hP
   let Xf : ∀ l' : Level H, Moduli Dw l' := fun l' =>
@@ -168,8 +185,12 @@ theorem partIAt_of (hP : PartI) (hN : N1ab) (Xo : Moduli Dw l) (c : Coeff l) (hp
   have hPIi := (hN2.1 i).2.2.1
   have hN3 := (hrest i).2.1
   have hX : Xf l = Xo := by simp [Xf]
-  have key : ∀ (X' : Moduli Dw l), X' = Xo → ∀ Y' : Model X' c (c.V W).subtype, Y'.N3 →
-      PushInvertible Y'.t.G Y'.t.PP.L → ∃ Y : Model Xo c (c.V W).subtype, Y.N3 ∧ PushInvertible Y.t.G Y.t.PP.L := by
+  have key
+      : ∀ (X' : Moduli Dw l),
+        X' = Xo
+          → ∀ Y' : Model X' c (c.V W).subtype,
+            Y'.N3 → PushInvertible Y'.t.G Y'.t.PP.L
+              → ∃ Y : Model Xo c (c.V W).subtype, Y.N3 ∧ PushInvertible Y.t.G Y.t.PP.L := by
     rintro X' rfl Y' h1 h2
     exact ⟨Y', h1, h2⟩
   exact key (Xf l) hX (Y p W hp hW i) hN3 hPIi

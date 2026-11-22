@@ -9,7 +9,9 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.BesselExpansion
 
-open MeasureTheory Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions Formalism.MainNotions.BesselShellMomentBounds Formalism.MainNotions.RotatedPoints Formalism.MainNotions.S.Pv.Frames
+open MeasureTheory Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.BasicNotions Formalism.MainNotions.BesselShellMomentBounds
+  Formalism.MainNotions.RotatedPoints Formalism.MainNotions.S.Pv.Frames
 
 section Loc
 
@@ -17,10 +19,12 @@ variable (D : D7)
 
 variable {D}
 
-theorem frame_bounds {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} {v : D.what₂.Tau} {L : LocBessel D.R.k D.R.rS}
-    {f : Mx D.R.k D.R.rS → (L.Wq →L[ℂ] L.Wp)} {μsec : ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
-    (hCg : 2 ≤ Cg) (hok : PlaceOKR D Ch Cg T T' b dist v L f μsec) :
-    2 ≤ b ∧ 1 ≤ b ^ (3 + Ch) ∧ D.host.rdE ≤ b ^ (3 + Ch) := by
+theorem frame_bounds
+    {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} {v : D.what₂.Tau} {L : LocBessel D.R.k D.R.rS}
+    {f : Mx D.R.k D.R.rS → (L.Wq →L[ℂ] L.Wp)}
+    {μsec : ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
+    (hCg : 2 ≤ Cg) (hok : PlaceOKR D Ch Cg T T' b dist v L f μsec)
+    : 2 ≤ b ∧ 1 ≤ b ^ (3 + Ch) ∧ D.host.rdE ≤ b ^ (3 + Ch) := by
   obtain ⟨⟨hk, -, -, -, -, hStd, -, -⟩, -⟩ := hok
   have hb2 : 2 ≤ b := by
     have h1 := b_ge_of_StdHyp0 hk hStd.to0
@@ -41,9 +45,12 @@ theorem frame_bounds {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} {v : D.what₂.Ta
     nlinarith
   exact ⟨hb2, hb3, Formalism.MainNotions.TheoremBConstants.rdE_le D b Ch hb2 hka hk2⟩
 
-theorem ch_nonneg {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} {v : D.what₂.Tau} {L : LocBessel D.R.k D.R.rS}
-    {f : Mx D.R.k D.R.rS → (L.Wq →L[ℂ] L.Wp)} {μsec : ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
-    (hCg : 2 ≤ Cg) (hok : PlaceOKR D Ch Cg T T' b dist v L f μsec) : 0 ≤ Ch := by
+theorem ch_nonneg
+    {Ch Cg : ℝ} {T T' : ℕ} {b dist : ℝ} {v : D.what₂.Tau} {L : LocBessel D.R.k D.R.rS}
+    {f : Mx D.R.k D.R.rS → (L.Wq →L[ℂ] L.Wp)}
+    {μsec : ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
+    (hCg : 2 ≤ Cg) (hok : PlaceOKR D Ch Cg T T' b dist v L f μsec)
+    : 0 ≤ Ch := by
   have hb2 := (frame_bounds hCg hok).1
   obtain ⟨⟨-, -, -, -, -, hStd, -, -⟩, -⟩ := hok
   have hka : 0 < kaRe D := hStd.2.2.2.1

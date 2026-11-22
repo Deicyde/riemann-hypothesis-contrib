@@ -16,11 +16,9 @@ section Basic
 
 variable {V : Type} [TopologicalSpace V]
 
-theorem sb_add {φ φ' : V → ℂ} (h : SB φ) (h' : SB φ') : SB (φ + φ') :=
-  ⟨h.1.add h'.1, h.2.add h'.2⟩
+theorem sb_add {φ φ' : V → ℂ} (h : SB φ) (h' : SB φ') : SB (φ + φ') := ⟨h.1.add h'.1, h.2.add h'.2⟩
 
-theorem sb_mul {m φ : V → ℂ} (hm : IsLocallyConstant m) (h : SB φ) :
-    SB (fun u => m u * φ u) :=
+theorem sb_mul {m φ : V → ℂ} (hm : IsLocallyConstant m) (h : SB φ) : SB (fun u => m u * φ u) :=
   ⟨hm.mul h.1, h.2.mul_left⟩
 
 theorem sb_smul (c : ℂ) {φ : V → ℂ} (h : SB φ) : SB (c • φ) :=
@@ -32,35 +30,40 @@ def Comm (T : (V → ℂ) → (V → ℂ)) (m : V → ℂ) : Prop :=
 theorem comm_one (T : (V → ℂ) → (V → ℂ)) : Comm T (fun _ => 1) :=
   ⟨IsLocallyConstant.const 1, fun φ _ => by simp⟩
 
-theorem comm_mul {T : (V → ℂ) → (V → ℂ)} {m m' : V → ℂ} (h : Comm T m) (h' : Comm T m') :
-    Comm T (fun u => m u * m' u) := by
+theorem comm_mul {T : (V → ℂ) → (V → ℂ)} {m m' : V → ℂ} (h : Comm T m) (h' : Comm T m')
+    : Comm T (fun u => m u * m' u) := by
   refine ⟨h.1.mul h'.1, fun φ hφ => ?_⟩
   have e : (fun u => m u * m' u * φ u) = fun u => m u * (m' u * φ u) := by
     funext u; exact mul_assoc _ _ _
   rw [e, h.2 _ (sb_mul h'.1 hφ), h'.2 φ hφ]
-  funext u; exact (mul_assoc _ _ _).symm
+  funext u
+  exact (mul_assoc _ _ _).symm
 
-theorem comm_sub_const {T : (V → ℂ) → (V → ℂ)}
-    (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
+theorem comm_sub_const
+    {T : (V → ℂ) → (V → ℂ)} (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
     (hsmul : ∀ (c : ℂ) φ, SB φ → T (c • φ) = c • T φ)
-    {f : V → ℂ} (h : Comm T f) (c : ℂ) : Comm T (fun u => f u - c) := by
+    {f : V → ℂ} (h : Comm T f)
+    (c : ℂ)
+    : Comm T (fun u => f u - c) := by
   refine ⟨h.1.sub (IsLocallyConstant.const c), fun φ hφ => ?_⟩
   have e : (fun u => (f u - c) * φ u) = (fun u => f u * φ u) + (-c) • φ := by
     funext u; simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]; ring
   rw [e, hadd _ _ (sb_mul h.1 hφ) (sb_smul _ hφ), hsmul _ _ hφ, h.2 φ hφ]
-  funext u; simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]; ring
+  funext u
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+  ring
 
 end Basic
 
-variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V]
+variable
+  {V : Type} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V]
   {χ : V → V → ℂ} {μ : Measure V}
 
 theorem char_zero (h : NADual V χ μ) (y : V) : χ 0 y = 1 := by
   obtain ⟨-, -, -, -, -, -, -, -, -, -, hnorm, hadd, -⟩ := h
   have h1 := hadd 0 0 y
   rw [add_zero] at h1
-  have h2 : χ 0 y ≠ 0 := by
-    intro h0; have := hnorm 0 y; rw [h0] at this; simp at this
+  have h2 : χ 0 y ≠ 0 := by intro h0; have := hnorm 0 y; rw [h0] at this; simp at this
   exact (mul_eq_left₀ h2).mp h1.symm
 
 theorem char_locConst (h : NADual V χ μ) (y : V) : IsLocallyConstant (fun u => χ u y) := by
@@ -72,18 +75,25 @@ theorem char_locConst (h : NADual V χ μ) (y : V) : IsLocallyConstant (fun u =>
   have h0P : (0 : V) ∈ perp χ L := fun x _ => by rw [hsymm]; exact h0 x
   rw [IsLocallyConstant.iff_exists_open]
   intro u
-  refine ⟨(fun v => v - u) ⁻¹' perp χ L, hPo.preimage (continuous_sub_right u), by simpa using h0P, ?_⟩
+  refine
+    ⟨(fun v => v - u) ⁻¹' perp χ L, hPo.preimage (continuous_sub_right u), by simpa using h0P, ?_⟩
   intro v hv
   have h1 : χ (v - u) y = 1 := by rw [hsymm]; exact hv y hy
-  calc χ v y = χ ((v - u) + u) y := by simp
+  calc
+    χ v y
+      = χ ((v - u) + u) y := by simp
     _ = χ u y := by rw [hadd, h1, one_mul]
 
-theorem apply_eq_zero (h : NADual V χ μ) {T : (V → ℂ) → (V → ℂ)}
-    (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
+theorem apply_eq_zero
+    (h : NADual V χ μ)
+    {T : (V → ℂ) → (V → ℂ)} (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
     (hsmul : ∀ (c : ℂ) φ, SB φ → T (c • φ) = c • T φ)
     (hchar : ∀ y φ, SB φ → T (fun u => χ u y * φ u) = fun u => χ u y * T φ u)
-    {φ : V → ℂ} (hφ : SB φ) {x : V} (hx : φ x = 0) : T φ x = 0 := by
-  have hcomm : ∀ y, Comm T (fun u => χ u y) := fun y => ⟨char_locConst h y, fun φ hφ => hchar y φ hφ⟩
+    {φ : V → ℂ} (hφ : SB φ)
+    {x : V} (hx : φ x = 0)
+    : T φ x = 0 := by
+  have hcomm : ∀ y, Comm T (fun u => χ u y) := fun y =>
+    ⟨char_locConst h y, fun φ hφ => hchar y φ hφ⟩
   obtain ⟨hTG, -, -, -, -, -, hsmall, -, -, hsymm, hnorm, hχadd, hperp⟩ := h
   haveI := hTG
   have hS : IsCompact (tsupport φ) := hφ.2
@@ -119,25 +129,27 @@ theorem apply_eq_zero (h : NADual V χ μ) {T : (V → ℂ) → (V → ℂ)}
         exact hsL (hpp fun z hz => hcon z hz)
       obtain ⟨z, hzL, hzne⟩ := hz
       have hzne' : χ (s - x) z ≠ 1 := by rwa [hsymm]
-      have hxz : χ x z ≠ 0 := by
-        intro h0; have := hnorm x z; rw [h0] at this; simp at this
+      have hxz : χ x z ≠ 0 := by intro h0; have := hnorm x z; rw [h0] at this; simp at this
       have hopen : {u : V | u - s ∈ (L : Set V)} ∈ 𝓝 s := by
         have hc : ContinuousAt (fun u : V => u - s) s := by fun_prop
         apply hc.preimage_mem_nhds
         simpa using hLo.mem_nhds L.zero_mem
-      refine ⟨{u : V | u - s ∈ (L : Set V)}, mem_nhdsWithin_of_mem_nhds hopen,
-        fun u => χ u z - χ s z, comm_sub_const hadd hsmul (hcomm z) _, ?_, ?_⟩
+      refine ⟨
+        {u : V | u - s ∈ (L : Set V)},
+        mem_nhdsWithin_of_mem_nhds hopen,
+        fun u => χ u z - χ s z,
+        comm_sub_const hadd hsmul (hcomm z) _,
+        ?_,
+        ?_
+      ⟩
       · intro hzero
         apply hzne'
-        have e : χ s z = χ (s - x) z * χ x z := by
-          rw [← hχadd]; simp
-        have e2 : χ x z = χ (s - x) z * χ x z := by
-          rw [← e]; exact sub_eq_zero.mp hzero
+        have e : χ s z = χ (s - x) z * χ x z := by rw [← hχadd]; simp
+        have e2 : χ x z = χ (s - x) z * χ x z := by rw [← e]; exact sub_eq_zero.mp hzero
         exact (mul_eq_right₀ hxz).mp e2.symm
       · intro u hu
         have h1 : χ (u - s) z = 1 := hzL _ hu
-        have e : χ u z = χ (u - s) z * χ s z := by
-          rw [← hχadd]; simp
+        have e : χ u z = χ (u - s) z * χ s z := by rw [← hχadd]; simp
         show χ u z - χ s z = 0
         rw [e, h1, one_mul, sub_self]
   obtain ⟨m, hm, hmx, hm0⟩ := key
@@ -152,14 +164,15 @@ theorem apply_eq_zero (h : NADual V χ μ) {T : (V → ℂ) → (V → ℂ)}
   simp only [Pi.smul_apply, Pi.zero_apply, zero_smul, smul_eq_mul, zero_mul] at h3
   exact (mul_eq_zero.mp h3.symm).resolve_left hmx
 
-theorem schur_translations_characters (V : Type) [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V]
-    (χ : V → V → ℂ) (μ : Measure V) (h : NADual V χ μ) (T : (V → ℂ) → (V → ℂ))
-    (hSB : ∀ φ, SB φ → SB (T φ))
-    (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
+theorem schur_translations_characters
+    (V : Type) [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V]
+    (χ : V → V → ℂ) (μ : Measure V) (h : NADual V χ μ)
+    (T : (V → ℂ) → (V → ℂ))
+    (hSB : ∀ φ, SB φ → SB (T φ)) (hadd : ∀ φ φ', SB φ → SB φ' → T (φ + φ') = T φ + T φ')
     (hsmul : ∀ (c : ℂ) φ, SB φ → T (c • φ) = c • T φ)
     (hchar : ∀ y φ, SB φ → T (fun u => χ u y * φ u) = fun u => χ u y * T φ u)
-    (htr : ∀ x φ, SB φ → T (fun u => φ (u + x)) = fun u => T φ (u + x)) :
-    ∃ c : ℂ, ∀ φ, SB φ → T φ = c • φ := by
+    (htr : ∀ x φ, SB φ → T (fun u => φ (u + x)) = fun u => T φ (u + x))
+    : ∃ c : ℂ, ∀ φ, SB φ → T φ = c • φ := by
   have hloc := fun {φ : V → ℂ} (hφ : SB φ) {x : V} (hx : φ x = 0) =>
     apply_eq_zero h hadd hsmul hchar hφ hx
   obtain ⟨hTG, hT2, -, -, -, -, -, hcover, -⟩ := h
@@ -172,22 +185,25 @@ theorem schur_translations_characters (V : Type) [AddCommGroup V] [TopologicalSp
     rw [IsLocallyConstant.iff_exists_open]
     intro u
     by_cases hu : u ∈ (L : Set V)
-    · exact ⟨L, hLo, hu, fun v hv => by
-        rw [hφ₀, Set.indicator_of_mem hv, Set.indicator_of_mem hu]⟩
-    · exact ⟨(L : Set V)ᶜ, hLc.isClosed.isOpen_compl, hu, fun v hv => by
-        rw [hφ₀, Set.indicator_of_notMem hv, Set.indicator_of_notMem hu]⟩
+    · exact ⟨L, hLo, hu, fun v hv => by rw [hφ₀, Set.indicator_of_mem hv, Set.indicator_of_mem hu]⟩
+    · exact ⟨
+        (L : Set V)ᶜ,
+        hLc.isClosed.isOpen_compl,
+        hu,
+        fun v hv => by rw [hφ₀, Set.indicator_of_notMem hv, Set.indicator_of_notMem hu]
+      ⟩
   have hφ₀SB : SB φ₀ :=
     ⟨hφ₀lc, HasCompactSupport.intro hLc fun u hu => Set.indicator_of_notMem hu _⟩
   have hφ₀0 : φ₀ 0 = 1 := Set.indicator_of_mem L.zero_mem _
   refine ⟨T φ₀ 0, fun φ hφ => ?_⟩
   funext x
   set φ₁ : V → ℂ := fun u => φ₀ (u + -x) with hφ₁
-  have hφ₁SB : SB φ₁ :=
-    ⟨hφ₀SB.1.comp_continuous (continuous_add_const _),
-      hφ₀SB.2.comp_homeomorph (Homeomorph.addRight (-x))⟩
-  have hψ := sb_add hφ (sb_smul (-φ x) hφ₁SB)
-  have hz : (φ + (-φ x) • φ₁) x = 0 := by
-    simp [hφ₁, hφ₀0]
+  have hφ₁SB : SB φ₁ := ⟨
+    hφ₀SB.1.comp_continuous (continuous_add_const _),
+    hφ₀SB.2.comp_homeomorph (Homeomorph.addRight (-x))
+  ⟩
+  have hψ := sb_add hφ (sb_smul (- φ x) hφ₁SB)
+  have hz : (φ + (- φ x) • φ₁) x = 0 := by simp [hφ₁, hφ₀0]
   have h1 := hloc hψ hz
   rw [hadd _ _ hφ (sb_smul _ hφ₁SB), hsmul _ _ hφ₁SB, htr (-x) φ₀ hφ₀SB] at h1
   simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, add_neg_cancel] at h1

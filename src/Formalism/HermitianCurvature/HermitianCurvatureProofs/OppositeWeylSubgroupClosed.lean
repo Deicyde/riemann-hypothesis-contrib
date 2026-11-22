@@ -13,7 +13,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.B2x3
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 lemma hpk_unit (k r : ℕ) : IsUnit (Hpk k r).det := by
   have h := (hpkFacts k r).2.1
@@ -46,7 +47,9 @@ lemma closed_stab (k r : ℕ) (F : Set (Fin (2 * r + k + 1) → ℂ)) :
 
 theorem closedW : ClosedW := by
   intro k r z
-  have h := closed_stab k r (Set.range (fun a => bvec (eI k r a)) ∪ Set.range (fun a => bvec (esI k r a)) ∪ {z})
+  have h :=
+    closed_stab k r
+      (Set.range (fun a => bvec (eI k r a)) ∪ Set.range (fun a => bvec (esI k r a)) ∪ {z})
   convert h using 1
   ext g
   constructor
@@ -57,11 +60,16 @@ theorem closedW : ClosedW := by
     · exact (h2 a).2
     · exact h3
   · rintro ⟨h1, h2⟩
-    exact ⟨h1, fun a => ⟨h2 _ (Or.inl (Or.inl ⟨a, rfl⟩)), h2 _ (Or.inl (Or.inr ⟨a, rfl⟩))⟩, h2 _ (Or.inr rfl)⟩
+    exact ⟨
+      h1,
+      fun a => ⟨h2 _ (Or.inl (Or.inl ⟨a, rfl⟩)), h2 _ (Or.inl (Or.inr ⟨a, rfl⟩))⟩,
+      h2 _ (Or.inr rfl)
+    ⟩
 
 theorem closedWb : ClosedWb := by
   intro k r
-  have h := closed_stab k r (Set.range (fun a => bvec (eI k r a)) ∪ Set.range (fun a => bvec (esI k r a)))
+  have h :=
+    closed_stab k r (Set.range (fun a => bvec (eI k r a)) ∪ Set.range (fun a => bvec (esI k r a)))
   convert h using 1
   ext g
   constructor
@@ -139,8 +147,10 @@ theorem haarG : HaarGExists := by
   have hemb := uJEmb _ ε
   let c : Mt k r → Mt k r := fun x => (P⁻¹ * Matrix.of x * P : Mat k r)
   let c' : Mt k r → Mt k r := fun x => (P * Matrix.of x * P⁻¹ : Mat k r)
-  have hc : Continuous c := (Continuous.matrix_mul (Continuous.matrix_mul continuous_const continuous_id) continuous_const)
-  have hc' : Continuous c' := (Continuous.matrix_mul (Continuous.matrix_mul continuous_const continuous_id) continuous_const)
+  have hc : Continuous c :=
+    (Continuous.matrix_mul (Continuous.matrix_mul continuous_const continuous_id) continuous_const)
+  have hc' : Continuous c' :=
+    (Continuous.matrix_mul (Continuous.matrix_mul continuous_const continuous_id) continuous_const)
   have h1 : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul _ hP
   have h2 : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv _ hP
   have hli : Function.LeftInverse c' c := by
@@ -148,7 +158,8 @@ theorem haarG : HaarGExists := by
     show (P * (P⁻¹ * Matrix.of x * P) * P⁻¹ : Mat k r) = x
     have : (P * (P⁻¹ * Matrix.of x * P) * P⁻¹ : Mat k r) = (P * P⁻¹) * Matrix.of x * (P * P⁻¹) := by
       simp only [Matrix.mul_assoc]
-    rw [this, h2, Matrix.one_mul, Matrix.mul_one]; rfl
+    rw [this, h2, Matrix.one_mul, Matrix.mul_one]
+    rfl
   have hce : IsClosedEmbedding c := hli.isClosedEmbedding hc' hc
   let ι : UJ ε → Mt k r := fun g => ((g : (Mat k r)ˣ) : Mat k r)
   have hι : IsClosedEmbedding ι := hemb.1
@@ -160,9 +171,10 @@ theorem haarG : HaarGExists := by
   · intro a b
     show (P⁻¹ * ((a : (Mat k r)ˣ) * (b : (Mat k r)ˣ) : Mat k r) * P : Mat k r) =
       (P⁻¹ * ((a : (Mat k r)ˣ) : Mat k r) * P) * (P⁻¹ * ((b : (Mat k r)ˣ) : Mat k r) * P)
-    calc (P⁻¹ * ((a : (Mat k r)ˣ) * (b : (Mat k r)ˣ) : Mat k r) * P : Mat k r)
-        = P⁻¹ * ((a : (Mat k r)ˣ) : Mat k r) * 1 * ((b : (Mat k r)ˣ) : Mat k r) * P := by
-          simp only [Matrix.mul_assoc, Matrix.one_mul]
+    calc
+      (P⁻¹ * ((a : (Mat k r)ˣ) * (b : (Mat k r)ˣ) : Mat k r) * P : Mat k r)
+          = P⁻¹ * ((a : (Mat k r)ˣ) : Mat k r) * 1 * ((b : (Mat k r)ˣ) : Mat k r) * P := by
+        simp only [Matrix.mul_assoc, Matrix.one_mul]
       _ = _ := by rw [← h2]; simp only [Matrix.mul_assoc]
   · ext g
     constructor
@@ -170,15 +182,17 @@ theorem haarG : HaarGExists := by
       apply (uHConj _ ε _ P hP hPH _).mpr
       have : (P * Matrix.of (c (ι x)) * P⁻¹ : Mat k r) = Matrix.of (ι x) := hli (ι x)
       show inUJ ε (P * Matrix.of (c (ι x)) * P⁻¹)
-      rw [this]; exact (hιr _).mpr ⟨x, rfl⟩
+      rw [this]
+      exact (hιr _).mpr ⟨x, rfl⟩
     · intro hg
       obtain ⟨x, hx⟩ := (hιr _).mp ((uHConj _ ε _ P hP hPH g).mp hg)
       refine ⟨x, ?_⟩
       show (P⁻¹ * Matrix.of (ι x) * P : Mat k r) = g
       rw [hx]
       show (P⁻¹ * (P * Matrix.of g * P⁻¹) * P : Mat k r) = Matrix.of g
-      calc (P⁻¹ * (P * Matrix.of g * P⁻¹) * P : Mat k r) = (P⁻¹ * P) * Matrix.of g * (P⁻¹ * P) := by
-            simp only [Matrix.mul_assoc]
+      calc
+        (P⁻¹ * (P * Matrix.of g * P⁻¹) * P : Mat k r)
+          = (P⁻¹ * P) * Matrix.of g * (P⁻¹ * P) := by simp only [Matrix.mul_assoc]
         _ = Matrix.of g := by rw [h1, Matrix.one_mul, Matrix.mul_one]
 
 def Grp {k r : ℕ} (U : Set (Mat k r)) (_h : IsClosedSubgroup U) : Type := U
@@ -211,7 +225,8 @@ lemma range_val : Set.range (val : Grp U h → Mat k r) = U := Subtype.range_val
 instance : IsTopologicalGroup (Grp U h) where
   continuous_mul := by
     rw [emb.isInducing.continuous_iff]
-    exact Continuous.matrix_mul (emb.continuous.comp continuous_fst) (emb.continuous.comp continuous_snd)
+    exact Continuous.matrix_mul (emb.continuous.comp continuous_fst)
+      (emb.continuous.comp continuous_snd)
   continuous_inv := by
     rw [emb.isInducing.continuous_iff]
     have : (val ∘ fun a : Grp U h => a⁻¹) = fun a : Grp U h => (a.val.det)⁻¹ • a.val.adjugate := by
@@ -220,7 +235,8 @@ instance : IsTopologicalGroup (Grp U h) where
       rw [Matrix.inv_def, Ring.inverse_eq_inv']
     rw [this]
     have hv : Continuous (val : Grp U h → Mat k r) := emb.continuous
-    refine Continuous.smul (Continuous.inv₀ hv.matrix_det fun a => (h.unit _ a.mem).ne_zero) hv.matrix_adjugate
+    refine Continuous.smul (Continuous.inv₀ hv.matrix_det fun a => (h.unit _ a.mem).ne_zero)
+      hv.matrix_adjugate
 
 instance : LocallyCompactSpace (Grp U h) :=
   have : LocallyCompactSpace (Mat k r) := inferInstanceAs (LocallyCompactSpace (Mt k r))
@@ -256,7 +272,8 @@ variable {k r : ℕ}
 
 abbrev mid (k r : ℕ) (i : Fin (2 * r + k + 1)) : Prop := r ≤ i.val ∧ i.val ≤ r + k
 
-def midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : Fin (k + 1) := ⟨i.val - r, by have := hi; omega⟩
+def midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : Fin (k + 1) :=
+  ⟨i.val - r, by have := hi; omega⟩
 
 lemma wI_midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : wI k r (midx hi) = i := by
   have := hi
@@ -295,7 +312,8 @@ lemma emb_mid (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (q j : Fin (2 * r + 
   rw [dite_eq_left ⟨hq, hj⟩]
   rfl
 
-def Em (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (k + 1)) ℂ := fun i m => if i = wI k r m then 1 else 0
+def Em (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (k + 1)) ℂ := fun i m =>
+  if i = wI k r m then 1 else 0
 
 lemma Em_mul_mid {X : Type*} (A : Matrix (Fin (k + 1)) X ℂ) (i : Fin (2 * r + k + 1)) (x : X) (hi : mid k r i) :
     (Em k r * A) i x = A (midx hi) x := by
@@ -622,13 +640,17 @@ theorem haarWb : HaarWbExists := by
   intro k r
   have : (muG (εb k)).IsMulRightInvariant := ⟨fun g => unimodular _ (εb k) g⟩
   have hemb := uJEmb _ (εb k)
-  let ι : UJ (εb k) → (Fin (k + 1) → Fin (k + 1) → ℂ) :=
-    fun g => ((g : (Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)ˣ) : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+  let ι : UJ (εb k) → (Fin (k + 1) → Fin (k + 1) → ℂ) := fun g =>
+    ((g : (Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)ˣ) : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
   have hι : IsClosedEmbedding ι := hemb.1
   have hιr : ∀ x : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ, inUJ (εb k) x ↔ ∃ g, ι g = x := fun x => by
     have := Set.ext_iff.mp hemb.2 x
     exact this.symm
-  refine ⟨(muG (εb k)).map ((fun x : Fin (k + 1) → Fin (k + 1) → ℂ => (embWb k r (Matrix.of x) : Mt k r)) ∘ ι), ?_⟩
+  refine ⟨
+    (muG (εb k)).map
+      ((fun x : Fin (k + 1) → Fin (k + 1) → ℂ => (embWb k r (Matrix.of x) : Mt k r)) ∘ ι),
+    ?_
+  ⟩
   apply haar_push (muG (εb k)) (haar_ne_zero _) _ (emb_closedEmb.comp hι)
   · intro a b
     exact emb_mul _ _
@@ -807,8 +829,8 @@ theorem compactW : CompactW := by
     unfold Tz at hT
     linarith
   obtain ⟨R, hR⟩ := col_bound zb hT'
-  have hK0 : IsCompact (Set.pi Set.univ fun _ : Fin (k + 1) => Set.pi Set.univ fun _ : Fin (k + 1) =>
-      Metric.closedBall (0 : ℂ) R) :=
+  have hK0 : IsCompact (Set.pi Set.univ fun _ : Fin (k + 1) =>
+      Set.pi Set.univ fun _ : Fin (k + 1) => Metric.closedBall (0 : ℂ) R) :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
   have hK := hK0.image (emb_cont (k := k) (r := r))
   refine IsCompact.of_isClosed_subset hK (closedW k r z).closed ?_
@@ -822,7 +844,8 @@ theorem compactW : CompactW := by
   rw [mem_closedBall_zero_iff]
   exact hR a ha hfix i j
 
-theorem haarW : HaarWExists := fun k r z hz hT => compactHaar k r _ (closedW k r z) (compactW k r z hz hT)
+theorem haarW : HaarWExists := fun k r z hz hT =>
+  compactHaar k r _ (closedW k r z) (compactW k r z hz hT)
 
 end Formalism.FourierDecayAlt.P.B2x3
 

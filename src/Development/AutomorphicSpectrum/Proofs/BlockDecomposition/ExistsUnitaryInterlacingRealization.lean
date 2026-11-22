@@ -25,19 +25,21 @@ lemma sg_cast (b : Bool) : ((sg b : ℝ) : ℂ) = if b then 1 else -1 := by case
 
 variable {n : ℕ}
 
-def cc (d : Fin (n + 1) → ℝ) (d' : Fin n → ℝ) (i : Fin (n + 1)) : ℝ := 1 / √|pfD d d' i|
+def cc (d : Fin (n + 1) → ℝ) (d' : Fin n → ℝ) (i : Fin (n + 1)) : ℝ := 1 / √ |pfD d d' i|
 
 def yy (ε' : Fin n → Bool) (d : Fin (n + 1) → ℝ) (d' : Fin n → ℝ) (j : Fin n) : ℝ :=
   √(-(sg (ε' j) * pfR d d' j))
 
-def G0 (ε' : Fin n → Bool) (d : Fin (n + 1) → ℝ) (d' : Fin n → ℝ) (r : Fin n ⊕ Unit)
-    (i : Fin (n + 1)) : ℝ :=
+def G0
+    (ε' : Fin n → Bool) (d : Fin (n + 1) → ℝ) (d' : Fin n → ℝ) (r : Fin n ⊕ Unit) (i : Fin (n + 1))
+    : ℝ :=
   Sum.elim (fun j => cc d d' i * yy ε' d d' j / (d i - d' j)) (fun _ => cc d d' i) r
 
 def X0 (ε' : Fin n → Bool) (d : Fin (n + 1) → ℝ) (d' : Fin n → ℝ) (r t : Fin n ⊕ Unit) : ℝ :=
   Sum.elim
     (fun a => Sum.elim (fun b => if a = b then d' a else 0) (fun _ => yy ε' d d' a) t)
-    (fun _ => Sum.elim (fun b => sg (ε' b) * yy ε' d d' b) (fun _ => pfX d d') t) r
+    (fun _ => Sum.elim (fun b => sg (ε' b) * yy ε' d d' b) (fun _ => pfX d d') t)
+    r
 
 lemma yy_sq {ε' : Fin n → Bool} {d : Fin (n + 1) → ℝ} {d' : Fin n → ℝ} {j : Fin n}
     (h : 0 < -(sg (ε' j) * pfR d d' j)) :
@@ -147,14 +149,31 @@ lemma inter {d : Fin (n + 1) → ℝ} {ε' : Fin n → Bool} {d' : Fin n → ℝ
     rw [h1]
     linear_combination (-cc d d' i) * h0
 
-theorem build : ∀ (n : ℕ) (ε : Fin (n + 1) → Bool) (d : Fin (n + 1) → ℝ) (ε' : Fin n → Bool) (d' : Fin n → ℝ) (e : Fin n ⊕ Unit ≃ Fin (n + 1)), ε (e (Sum.inr ())) = true → (∀ a, ε (e (Sum.inl a)) = ε' a) → Function.Injective (Sum.elim d d') → (∀ i, 0 < (if ε i then (1 : ℝ) else -1) * pfD d d' i) → (∀ j, 0 < -((if ε' j then (1 : ℝ) else -1) * pfR d d' j)) → ∃ g X : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ, Formalism.REAL.inUJ ε g ∧ X * g = g * diagonal (fun i => ((d i : ℝ) : ℂ)) ∧ (∀ a b, X (e (Sum.inl a)) (e (Sum.inl b)) = if a = b then ((d' a : ℝ) : ℂ) else 0) ∧ ∀ i, ((Formalism.REAL.Jm ε * gᴴ * Formalism.REAL.Jm ε) *ᵥ (Pi.single (e (Sum.inr ())) (1 : ℂ) : Fin (n + 1) → ℂ)) i ≠ 0 := by
+theorem build
+    : ∀ (n : ℕ) (ε : Fin (n + 1) → Bool) (d : Fin (n + 1) → ℝ) (ε' : Fin n → Bool) (d' : Fin n → ℝ)
+        (e : Fin n ⊕ Unit ≃ Fin (n + 1)),
+      ε (e (Sum.inr ())) = true → (∀ a, ε (e (Sum.inl a)) = ε' a)
+        → Function.Injective (Sum.elim d d') → (∀ i, 0 < (if ε i then (1 : ℝ) else -1) * pfD d d' i)
+        → (∀ j, 0 < -((if ε' j then (1 : ℝ) else -1) * pfR d d' j))
+        → ∃ g X : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ,
+          Formalism.REAL.inUJ ε g ∧ X * g = g * diagonal (fun i => ((d i : ℝ) : ℂ))
+            ∧ (∀ a b, X (e (Sum.inl a)) (e (Sum.inl b)) = if a = b then ((d' a : ℝ) : ℂ) else 0)
+            ∧ ∀ i,
+              ((Formalism.REAL.Jm ε * gᴴ * Formalism.REAL.Jm ε)
+                    *ᵥ (Pi.single (e (Sum.inr ())) (1 : ℂ) : Fin (n + 1) → ℂ))
+                  i
+                ≠ 0 := by
   intro n ε d ε' d' e hz hs hinj hD hR
   have hD' : ∀ i, 0 < sg (ε i) * pfD d d' i := hD
   have hR' : ∀ j, 0 < -(sg (ε' j) * pfR d d' j) := hR
-  obtain ⟨g, hg⟩ : ∃ g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ,
-      ∀ r i, g r i = ((G0 ε' d d' (e.symm r) i : ℝ) : ℂ) := ⟨Matrix.of _, fun _ _ => rfl⟩
-  obtain ⟨X, hX⟩ : ∃ X : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ,
-      ∀ r t, X r t = ((X0 ε' d d' (e.symm r) (e.symm t) : ℝ) : ℂ) := ⟨Matrix.of _, fun _ _ => rfl⟩
+  obtain ⟨g, hg⟩
+      : ∃ g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ, ∀ r i,
+        g r i = ((G0 ε' d d' (e.symm r) i : ℝ) : ℂ) :=
+    ⟨Matrix.of _, fun _ _ => rfl⟩
+  obtain ⟨X, hX⟩
+      : ∃ X : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ, ∀ r t,
+        X r t = ((X0 ε' d d' (e.symm r) (e.symm t) : ℝ) : ℂ) :=
+    ⟨Matrix.of _, fun _ _ => rfl⟩
   refine ⟨g, X, ?_, ?_, ?_, ?_⟩
   · unfold Formalism.REAL.inUJ Formalism.REAL.Jm
     ext i k

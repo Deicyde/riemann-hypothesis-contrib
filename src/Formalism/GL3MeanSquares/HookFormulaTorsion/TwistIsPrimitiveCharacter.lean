@@ -88,7 +88,8 @@ private lemma chi_eight_primitive : Formalism.HermitianLattices.ZeroFreeRegionGL
   rw [h6, map_one, Formalism.HermitianLattices.ZeroFreeRegionGL2.chi8, MulChar.ringHomComp_apply, h7] at h5
   norm_num at h5
 
-theorem twist_is_primitive_character : Formalism.HermitianLattices.ZeroFreeRegionGL2.TwPrimitive := by
+theorem twist_is_primitive_character
+    : Formalism.HermitianLattices.ZeroFreeRegionGL2.TwPrimitive := by
   refine ⟨⟨chi_eight_primitive, chi_eight_sq⟩, ?_⟩
   intro t θ q _ hθ h2 hco
   have hq : q.Prime := Fact.out
@@ -98,7 +99,8 @@ theorem twist_is_primitive_character : Formalism.HermitianLattices.ZeroFreeRegio
     exact hq.one_lt.ne' hco
   have : NeZero t := ⟨ht⟩
   have hp : (Formalism.HermitianLattices.ZeroFreeRegionGL2.tw θ q).IsPrimitive :=
-    prim_mul _ _ hco.symm rfl θ (Formalism.HermitianLattices.ZeroFreeRegionGL2.qc q) hθ (qc_prim q h2)
+    prim_mul _ _ hco.symm rfl θ (Formalism.HermitianLattices.ZeroFreeRegionGL2.qc q) hθ
+      (qc_prim q h2)
   refine ⟨hp, ?_, ?_⟩
   · intro h1
     rw [isPrimitive_def, h1, conductor_one] at hp
@@ -106,6 +108,7 @@ theorem twist_is_primitive_character : Formalism.HermitianLattices.ZeroFreeRegio
     have h4 : 1 ≤ t := Nat.pos_of_ne_zero ht
     nlinarith
   · intro hs
-    rw [Formalism.HermitianLattices.ZeroFreeRegionGL2.tw, mul_pow, ← map_pow, ← map_pow, hs, qc_sq, map_one, map_one, one_mul]
+    rw [Formalism.HermitianLattices.ZeroFreeRegionGL2.tw, mul_pow, ← map_pow, ← map_pow, hs, qc_sq,
+      map_one, map_one, one_mul]
 
 end Formalism.HermitianLattices.ThinSetIntegral

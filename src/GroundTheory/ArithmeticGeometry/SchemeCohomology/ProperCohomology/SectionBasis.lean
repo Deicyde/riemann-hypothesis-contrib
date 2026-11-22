@@ -31,10 +31,13 @@ lemma IsBasisOn.isUnit_smul {P : PMod X} {U : X.Opens} {s : P.obj (op U)} (hs : 
   change r * ↑hu.unit⁻¹ * resR h a = r
   rw [mul_assoc, hu.val_inv_mul, mul_one]
 
-theorem exists_isBasisOn_generatingSection (L : X.Modules) [L.IsQuasicoherent]
-    (hL : IsInvertibleSheaf L) (σ : L.GeneratingSections) [σ.IsFiniteType] (x : X) :
-    ∃ (k : σ.I) (W : X.Opens), x ∈ W ∧
-      IsBasisOn ((preMod X).obj L) W
+theorem exists_isBasisOn_generatingSection
+    (L : X.Modules) [L.IsQuasicoherent]
+    (hL : IsInvertibleSheaf L)
+    (σ : L.GeneratingSections) [σ.IsFiniteType]
+    (x : X)
+    : ∃ (k : σ.I) (W : X.Opens),
+      x ∈ W ∧ IsBasisOn ((preMod X).obj L) W
         (resM ((preMod X).obj L) le_top (show Γ(L, ⊤) from (σ.s k).val (op ⊤))) := by
   classical
   set P := (preMod X).obj L
@@ -43,11 +46,9 @@ theorem exists_isBasisOn_generatingSection (L : X.Modules) [L.IsQuasicoherent]
   replace hVU : V ≤ U := hVU
   have hb : IsBasisOn P V (resM P hVU e) := he.restrict hVU
   let φ : ringOn X V ≃ₗ[ringOn X V] P.obj (op V) :=
-    LinearEquiv.ofBijective (LinearMap.toSpanSingleton (ringOn X V) _ (resM P hVU e))
-      (by
-        have h := hb V le_rfl
-        rwa [show resM P (le_refl V) (resM P hVU e) = resM P hVU e by
-          rw [resM_resM]] at h)
+    LinearEquiv.ofBijective (LinearMap.toSpanSingleton (ringOn X V) _ (resM P hVU e)) (by
+      have h := hb V le_rfl
+      rwa [show resM P (le_refl V) (resM P hVU e) = resM P hVU e by rw [resM_resM]] at h)
   let g : σ.I → P.obj (op V) := fun k => resM P le_top (show Γ(L, ⊤) from (σ.s k).val (op ⊤))
   let a : σ.I → ringOn X V := fun k => φ.symm (g k)
   have hga : ∀ k, g k = a k • resM P hVU e := fun k => by
@@ -57,8 +58,7 @@ theorem exists_isBasisOn_generatingSection (L : X.Modules) [L.IsQuasicoherent]
     span_eq_top_of_generatingSections L σ hVaff
   have hIdeal : Ideal.span (Set.range a) = ⊤ := by
     have h2 : Submodule.map φ.symm.toLinearMap (Submodule.span (ringOn X V) (Set.range g)) = ⊤ := by
-      rw [hspan, Submodule.map_top,
-        LinearMap.range_eq_top]
+      rw [hspan, Submodule.map_top, LinearMap.range_eq_top]
       exact φ.symm.surjective
     rw [Submodule.map_span, ← Set.range_comp] at h2
     exact h2
@@ -71,8 +71,9 @@ theorem exists_isBasisOn_generatingSection (L : X.Modules) [L.IsQuasicoherent]
   have hWV : X.basicOpen (a k) ≤ V := X.basicOpen_le _
   refine ⟨k, X.basicOpen (a k), hk, ?_⟩
   have hu : IsUnit (resR hWV (a k)) := X.toRingedSpace.isUnit_res_basicOpen (a k)
-  have key : resM P le_top (show Γ(L, ⊤) from (σ.s k).val (op ⊤)) =
-      resR hWV (a k) • resM P hWV (resM P hVU e) := by
+  have key
+      : resM P le_top (show Γ(L, ⊤) from (σ.s k).val (op ⊤))
+        = resR hWV (a k) • resM P hWV (resM P hVU e) := by
     have h1 : resM P hWV (g k) = resM P (hWV.trans le_top) _ := resM_resM P le_top hWV _
     rw [hga k, resM_smul] at h1
     exact h1.symm

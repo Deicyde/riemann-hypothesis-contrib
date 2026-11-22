@@ -12,62 +12,79 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Congruen
 noncomputable section
 
 open GlobalTheory.PRep GlobalTheory.SmGL ValuativeRel PositivityTheory.Lbc
-open GlobalTheory.CompanionTheory.LbElem.ConjMonomial GlobalTheory.CompanionTheory.LbElem.MonomialInJ GlobalTheory.CompanionTheory.LbElem.IwahoriLDU
+open GlobalTheory.CompanionTheory.LbElem.ConjMonomial
+  GlobalTheory.CompanionTheory.LbElem.MonomialInJ GlobalTheory.CompanionTheory.LbElem.IwahoriLDU
 
 namespace GlobalTheory.CompanionTheory.LbElem.JPredDom
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem entry_diag_mul {N : ℕ} {a b : GL (Fin N) k} (n : GL (Fin N) k) {α β : Fin N → k}
-    (ha : (a : Matrix (Fin N) (Fin N) k) = Matrix.diagonal α)
-    (hb : (b : Matrix (Fin N) (Fin N) k) = Matrix.diagonal β) (i j : Fin N) :
-    ((a * n * b : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j =
-      α i * (n : Matrix (Fin N) (Fin N) k) i j * β j := by
+theorem entry_diag_mul
+    {N : ℕ} {a b : GL (Fin N) k} (n : GL (Fin N) k)
+    {α β : Fin N → k} (ha : (a : Matrix (Fin N) (Fin N) k) = Matrix.diagonal α)
+    (hb : (b : Matrix (Fin N) (Fin N) k) = Matrix.diagonal β)
+    (i j : Fin N)
+    : ((a * n * b : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j
+      = α i * (n : Matrix (Fin N) (Fin N) k) i j * β j := by
   rw [Units.val_mul, Units.val_mul, ha, hb, Matrix.mul_diagonal, Matrix.diagonal_mul]
 
-theorem diag_ne_zero {N : ℕ} {x : GL (Fin N) k} {d : Fin N → k}
-    (hx : (x : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d) (i : Fin N) : d i ≠ 0 := by
+theorem diag_ne_zero
+    {N : ℕ} {x : GL (Fin N) k} {d : Fin N → k}
+    (hx : (x : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d) (i : Fin N)
+    : d i ≠ 0 := by
   have h := diag_ne_zero_of_offDiag x (fun i j hij => by rw [hx, Matrix.diagonal_apply_ne _ hij]) i
   rwa [hx, Matrix.diagonal_apply_eq] at h
 
-theorem val_inv_diag {N : ℕ} {x : GL (Fin N) k} {d : Fin N → k}
-    (hx : (x : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d) :
-    ((x⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) = Matrix.diagonal fun i => (d i)⁻¹ := by
+theorem val_inv_diag
+    {N : ℕ} {x : GL (Fin N) k} {d : Fin N → k}
+    (hx : (x : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d)
+    : ((x⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) = Matrix.diagonal fun i => (d i)⁻¹ := by
   have h1 : (x : Matrix (Fin N) (Fin N) k) * Matrix.diagonal (fun i => (d i)⁻¹) = 1 := by
     rw [hx, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
     congr 1
     funext i
     exact mul_inv_cancel₀ (diag_ne_zero hx i)
-  calc ((x⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
-      = ((x⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) *
-          ((x : Matrix (Fin N) (Fin N) k) * Matrix.diagonal (fun i => (d i)⁻¹)) := by rw [h1, mul_one]
+  calc
+    ((x⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
+        = ((x⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
+          * ((x : Matrix (Fin N) (Fin N) k) * Matrix.diagonal (fun i => (d i)⁻¹)) := by
+      rw [h1, mul_one]
     _ = Matrix.diagonal fun i => (d i)⁻¹ := by
       rw [← mul_assoc, ← Units.val_mul, inv_mul_cancel, Units.val_one, one_mul]
 
-theorem val_pow_diag {N : ℕ} {x : GL (Fin N) k} {d : Fin N → k}
-    (hx : (x : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d) (r : ℕ) :
-    ((x ^ r : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) = Matrix.diagonal fun i => d i ^ r := by
+theorem val_pow_diag
+    {N : ℕ} {x : GL (Fin N) k} {d : Fin N → k}
+    (hx : (x : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d)
+    (r : ℕ)
+    : ((x ^ r : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) = Matrix.diagonal fun i => d i ^ r := by
   rw [Units.val_pow_eq_pow_val, hx, Matrix.diagonal_pow]
   rfl
 
-theorem val_conj_up (a b c : k) (r : ℕ) :
-    valuation k (a ^ r * c * (b ^ r)⁻¹) = (valuation k a / valuation k b) ^ r * valuation k c := by
+theorem val_conj_up (a b c : k) (r : ℕ)
+    : valuation k (a ^ r * c * (b ^ r)⁻¹)
+      = (valuation k a / valuation k b) ^ r * valuation k c := by
   rw [map_mul, map_mul, map_inv₀, map_pow, map_pow, div_pow, div_eq_mul_inv, mul_right_comm]
 
-theorem val_conj_lo (a b c : k) (r : ℕ) :
-    valuation k ((b ^ r)⁻¹ * c * a ^ r) = (valuation k a / valuation k b) ^ r * valuation k c := by
+theorem val_conj_lo (a b c : k) (r : ℕ)
+    : valuation k ((b ^ r)⁻¹ * c * a ^ r)
+      = (valuation k a / valuation k b) ^ r * valuation k c := by
   rw [← val_conj_up]
   congr 1
   ring
 
-theorem up_entries {N : ℕ} {t n : GL (Fin N) k} {d : Fin N → k}
+theorem up_entries
+    {N : ℕ} {t n : GL (Fin N) k} {d : Fin N → k}
     (ht : (t : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d)
     (h0 : ∀ i j : Fin N, j < i → (n : Matrix (Fin N) (Fin N) k) i j = 0)
-    (h1 : ∀ i : Fin N, (n : Matrix (Fin N) (Fin N) k) i i = 1) (r : ℕ) :
-    (∀ i j : Fin N, j < i → ((t ^ r * n * (t ^ r)⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j = 0) ∧
-    (∀ i : Fin N, ((t ^ r * n * (t ^ r)⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i i = 1) ∧
-    ∀ i j : Fin N, valuation k (((t ^ r * n * (t ^ r)⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j) =
-      (valuation k (d i) / valuation k (d j)) ^ r * valuation k ((n : Matrix (Fin N) (Fin N) k) i j) := by
+    (h1 : ∀ i : Fin N, (n : Matrix (Fin N) (Fin N) k) i i = 1)
+    (r : ℕ)
+    : (∀ i j : Fin N,
+        j < i → ((t ^ r * n * (t ^ r)⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j = 0)
+      ∧ (∀ i : Fin N, ((t ^ r * n * (t ^ r)⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i i = 1)
+      ∧ ∀ i j : Fin N,
+        valuation k (((t ^ r * n * (t ^ r)⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j)
+          = (valuation k (d i) / valuation k (d j)) ^ r
+            * valuation k ((n : Matrix (Fin N) (Fin N) k) i j) := by
   have hp := val_pow_diag ht r
   have hq := val_inv_diag hp
   have he := entry_diag_mul n hp hq
@@ -78,14 +95,19 @@ theorem up_entries {N : ℕ} {t n : GL (Fin N) k} {d : Fin N → k}
   · rw [he]
     exact val_conj_up _ _ _ r
 
-theorem lo_entries {N : ℕ} {t n : GL (Fin N) k} {d : Fin N → k}
+theorem lo_entries
+    {N : ℕ} {t n : GL (Fin N) k} {d : Fin N → k}
     (ht : (t : Matrix (Fin N) (Fin N) k) = Matrix.diagonal d)
     (h0 : ∀ i j : Fin N, i < j → (n : Matrix (Fin N) (Fin N) k) i j = 0)
-    (h1 : ∀ i : Fin N, (n : Matrix (Fin N) (Fin N) k) i i = 1) (r : ℕ) :
-    (∀ i j : Fin N, i < j → (((t ^ r)⁻¹ * n * t ^ r : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j = 0) ∧
-    (∀ i : Fin N, (((t ^ r)⁻¹ * n * t ^ r : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i i = 1) ∧
-    ∀ i j : Fin N, valuation k ((((t ^ r)⁻¹ * n * t ^ r : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j) =
-      (valuation k (d j) / valuation k (d i)) ^ r * valuation k ((n : Matrix (Fin N) (Fin N) k) i j) := by
+    (h1 : ∀ i : Fin N, (n : Matrix (Fin N) (Fin N) k) i i = 1)
+    (r : ℕ)
+    : (∀ i j : Fin N,
+        i < j → (((t ^ r)⁻¹ * n * t ^ r : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j = 0)
+      ∧ (∀ i : Fin N, (((t ^ r)⁻¹ * n * t ^ r : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i i = 1)
+      ∧ ∀ i j : Fin N,
+        valuation k ((((t ^ r)⁻¹ * n * t ^ r : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j)
+          = (valuation k (d j) / valuation k (d i)) ^ r
+            * valuation k ((n : Matrix (Fin N) (Fin N) k) i j) := by
   have hp := val_pow_diag ht r
   have hq := val_inv_diag hp
   have he := entry_diag_mul n hq hp
@@ -99,13 +121,15 @@ theorem lo_entries {N : ℕ} {t n : GL (Fin N) k} {d : Fin N → k}
 theorem ratio_lt_one {a b : ValueGroupWithZero k} (h : a < b) : a / b < 1 :=
   (div_lt_one₀ (lt_of_le_of_lt zero_le' h)).2 h
 
-theorem exists_contract {N : ℕ} {d : Fin N → k} (hd : ∀ i, d i ≠ 0)
-    (hinc : ∀ i j : Fin N, i < j → valuation k (d i) < valuation k (d j))
-    {γ : ValueGroupWithZero k} (hγ : γ ≠ 0) :
-    ∃ r : ℕ, ∀ i j : Fin N, i < j → (valuation k (d i) / valuation k (d j)) ^ r < γ := by
+theorem exists_contract
+    {N : ℕ} {d : Fin N → k}
+    (hd : ∀ i, d i ≠ 0) (hinc : ∀ i j : Fin N, i < j → valuation k (d i) < valuation k (d j))
+    {γ : ValueGroupWithZero k} (hγ : γ ≠ 0)
+    : ∃ r : ℕ, ∀ i j : Fin N, i < j → (valuation k (d i) / valuation k (d j)) ^ r < γ := by
   classical
-  have h : ∀ p : Fin N × Fin N, ∃ r : ℕ, p.1 < p.2 → ∀ r' : ℕ, r ≤ r' →
-      (valuation k (d p.1) / valuation k (d p.2)) ^ r' < γ := by
+  have h
+      : ∀ p : Fin N × Fin N, ∃ r : ℕ,
+        p.1 < p.2 → ∀ r' : ℕ, r ≤ r' → (valuation k (d p.1) / valuation k (d p.2)) ^ r' < γ := by
     intro p
     by_cases hp : p.1 < p.2
     · have h1 := ratio_lt_one (hinc _ _ hp)
@@ -128,9 +152,10 @@ theorem levi_comm {N : ℕ} (s x : Levi k (Bl (ones N))) : s * x = x * s := by
   simp only [Units.val_mul, Matrix.mul_apply, Pi.mul_apply]
   rw [Fintype.sum_subsingleton _ i, Fintype.sum_subsingleton _ i, mul_comm]
 
-theorem torEmb_diag {N : ℕ} (s : Levi k (Bl (ones N))) :
-    ((torEmb k N s : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) =
-      Matrix.diagonal fun i => ((torEmb k N s : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i i := by
+theorem torEmb_diag {N : ℕ} (s : Levi k (Bl (ones N)))
+    : ((torEmb k N s : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
+      = Matrix.diagonal fun i =>
+        ((torEmb k N s : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i i := by
   ext i j
   by_cases h : i = j
   · subst h
@@ -138,10 +163,12 @@ theorem torEmb_diag {N : ℕ} (s : Levi k (Bl (ones N))) :
   · rw [Matrix.diagonal_apply_ne _ h]
     exact tor_offDiag (⟨s, rfl⟩ : torEmb k N s ∈ Tor k N) h
 
-theorem sub_one_le {N : ℕ} {x : GL (Fin N) k} {γ : ValueGroupWithZero k}
+theorem sub_one_le
+    {N : ℕ} {x : GL (Fin N) k} {γ : ValueGroupWithZero k}
     (h1 : ∀ i, (x : Matrix (Fin N) (Fin N) k) i i = 1)
-    (h2 : ∀ i j, i ≠ j → valuation k ((x : Matrix (Fin N) (Fin N) k) i j) ≤ γ) (i j : Fin N) :
-    valuation k ((x : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ γ := by
+    (h2 : ∀ i j, i ≠ j → valuation k ((x : Matrix (Fin N) (Fin N) k) i j) ≤ γ) (i j : Fin N)
+    : valuation k ((x : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j)
+      ≤ γ := by
   by_cases h : i = j
   · subst h
     rw [h1, Matrix.one_apply_eq, sub_self, map_zero]
@@ -149,13 +176,22 @@ theorem sub_one_le {N : ℕ} {x : GL (Fin N) k} {γ : ValueGroupWithZero k}
   · rw [Matrix.one_apply_ne h, sub_zero]
     exact h2 i j h
 
-theorem exists_value_subset {N : ℕ} {U : Set (GL (Fin N) k)} (hU : IsOpen U) (h1 : (1 : GL (Fin N) k) ∈ U) :
-    ∃ γ : ValueGroupWithZero k, γ ≠ 0 ∧ ∀ g : GL (Fin N) k, (∀ i j,
-      valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤ γ) → g ∈ U := by
+theorem exists_value_subset
+    {N : ℕ} {U : Set (GL (Fin N) k)} (hU : IsOpen U) (h1 : (1 : GL (Fin N) k) ∈ U)
+    : ∃ γ : ValueGroupWithZero k,
+      γ ≠ 0
+        ∧ ∀ g : GL (Fin N) k,
+          (∀ i j,
+              valuation k ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j)
+                ≤ γ)
+            → g ∈ U := by
   have hne : algebraMap 𝒪[k] k (Zls.unif k) ≠ 0 :=
-    (map_ne_zero_iff (algebraMap 𝒪[k] k) (IsFractionRing.injective 𝒪[k] k)).2 Zls.irreducible_unif.ne_zero
-  obtain ⟨M, -, hsub⟩ := GlobalTheory.CompanionTheory.CongruenceBasis.exists_congruence_subset k N _ hne
-    GlobalTheory.CompanionTheory.CongruenceBasis.val_unif_lt_one GlobalTheory.CompanionTheory.CongruenceBasis.val_le_val_unif U (hU.mem_nhds h1)
+    (map_ne_zero_iff (algebraMap 𝒪[k] k) (IsFractionRing.injective 𝒪[k] k)).2
+      Zls.irreducible_unif.ne_zero
+  obtain ⟨M, -, hsub⟩ :=
+    GlobalTheory.CompanionTheory.CongruenceBasis.exists_congruence_subset k N _ hne
+      GlobalTheory.CompanionTheory.CongruenceBasis.val_unif_lt_one
+      GlobalTheory.CompanionTheory.CongruenceBasis.val_le_val_unif U (hU.mem_nhds h1)
   exact ⟨_, (Valuation.ne_zero_iff _).2 (pow_ne_zero M hne), fun g hg => hsub hg⟩
 
 end GlobalTheory.CompanionTheory.LbElem.JPredDom

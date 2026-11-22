@@ -18,13 +18,16 @@ attribute [local instance] Over.cartesianMonoidalCategory
 namespace ReciprocityTheory.ChartRestriction.G.Out.CubePf
 
 open Semi
-open ReciprocityTheory.ChartRestriction.G.Pdiv.PullbackComparison (gU unit_ext gU_res gU_pullU gU_pullU_congr gU_pullU_res pullU_res'
-  base_eq germ_pull germ_pull_pull germ_div)
+open ReciprocityTheory.ChartRestriction.G.Pdiv.PullbackComparison
+  (gU unit_ext gU_res gU_pullU gU_pullU_congr gU_pullU_res pullU_res' base_eq germ_pull
+    germ_pull_pull germ_div)
 
 section Sym
 
-variable {S S' : Scheme.{0}} {G' : Over S'} {G : Over S} [GrpObj G'] [IsCommMonObj G'] [GrpObj G]
-  [IsCommMonObj G] (m : CubeMap G' G)
+variable
+  {S S' : Scheme.{0}} {G' : Over S'} {G : Over S}
+  [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G]
+  (m : CubeMap G' G)
 
 lemma eSec_inv {S₀ : Scheme.{0}} (H : Over S₀) [GrpObj H] :
     eSec H ≫ (GrpObj.inv (X := H)).left = 𝟙 _ ≫ eSec H := by
@@ -36,9 +39,10 @@ lemma eSec_inv {S₀ : Scheme.{0}} (H : Over S₀) [GrpObj H] :
   show (η[H] ≫ GrpObj.inv (X := H)).left = η[H].left
   rw [h]
 
-private theorem memW_lemma_2 {X Y : Scheme.{0}} (L : LB X) (φ : PUnit.{1} → (Y ⟶ X))
-    (j : PUnit.{1} → L.ι) (x : Y) (h : (φ PUnit.unit).base x ∈ L.U (j PUnit.unit)) :
-    x ∈ LB.wchart L φ j := by
+private theorem memW_lemma_2
+    {X Y : Scheme.{0}} (L : LB X) (φ : PUnit.{1} → (Y ⟶ X)) (j : PUnit.{1} → L.ι) (x : Y)
+    (h : (φ PUnit.unit).base x ∈ L.U (j PUnit.unit))
+    : x ∈ LB.wchart L φ j := by
   show x ∈ (⋂ k, (φ k).base ⁻¹' (L.U (j k) : Set X))
   exact Set.mem_iInter.2 fun k => by cases k; exact h
 
@@ -62,10 +66,10 @@ lemma symLe (L : LB G.left)
     ⟨memW_lemma_2 L (fun _ : PUnit => (GrpObj.inv (X := G)).left)
       (fun _ => p.1 PUnit.unit PUnit.unit) (m.F.base y) h3, h2⟩)
 
-def symIso (L : LB G.left) (w₀ : LB.Iso L (L.pull (GrpObj.inv (X := G)).left)) :
-    LB.Iso (L.pull m.F) ((L.pull m.F).pull (GrpObj.inv (X := G')).left) where
-  s := fun p => res (symLe m L p) (pullU m.F _ (w₀.s ((fun _ => p.1 PUnit.unit PUnit.unit),
-    p.2 PUnit.unit)))
+def symIso (L : LB G.left) (w₀ : LB.Iso L (L.pull (GrpObj.inv (X := G)).left))
+    : LB.Iso (L.pull m.F) ((L.pull m.F).pull (GrpObj.inv (X := G')).left) where
+  s := fun p =>
+    res (symLe m L p) (pullU m.F _ (w₀.s ((fun _ => p.1 PUnit.unit PUnit.unit), p.2 PUnit.unit)))
 
 lemma mul_inv_mul_cancel_comm {M N : Type} [CommGroup M] [CommGroup N] (φ : M →* N)
     (w0p gi gl w0q : M) (B A wp wq : N) (h0 : w0p = gi * gl⁻¹ * w0q) (hwp : wp = φ w0p)
@@ -73,11 +77,10 @@ lemma mul_inv_mul_cancel_comm {M N : Type} [CommGroup M] [CommGroup N] (φ : M �
   subst h0 hwp hwq hB hA
   simp only [map_mul, map_inv]
 
-private theorem pullU_comp_lemma {X Y Z : Scheme.{0}} (f : Z ⟶ Y) (g : Y ⟶ X) (U : X.Opens)
-    (x : Γ(X, U)ˣ) : pullU (f ≫ g) U x = pullU f (g ⁻¹ᵁ U) (pullU g U x) := by
-  first
-  | rfl
-  | (ext; simp [pullU])
+private theorem pullU_comp_lemma
+    {X Y Z : Scheme.{0}} (f : Z ⟶ Y) (g : Y ⟶ X) (U : X.Opens) (x : Γ(X, U)ˣ)
+    : pullU (f ≫ g) U x = pullU f (g ⁻¹ᵁ U) (pullU g U x) := by
+  first | rfl | (ext; simp [pullU])
 
 lemma symIso_isGen (L : LB G.left) (w₀ : LB.Iso L (L.pull (GrpObj.inv (X := G)).left))
     (hw₀ : w₀.IsGen) : (symIso m L w₀).IsGen := by
@@ -157,9 +160,9 @@ lemma gU_linCombIso_unit {X Y : Scheme.{0}} {L M : LB X} (w : LB.Iso L M) (φ₀
   | simp only [Fintype.prod_unique, zpow_one, gU_res]
   all_goals rfl
 
-private theorem gU_pullU_id_lemma_3 {X : Scheme.{0}} (U : X.Opens) (y : X) (hy : y ∈ U)
-    (hy' : y ∈ (𝟙 X) ⁻¹ᵁ U) (u : Γ(X, U)ˣ) :
-    gU y hy' (pullU (𝟙 X) U u) = gU y hy u :=
+private theorem gU_pullU_id_lemma_3
+    {X : Scheme.{0}} (U : X.Opens) (y : X) (hy : y ∈ U) (hy' : y ∈ (𝟙 X) ⁻¹ᵁ U) (u : Γ(X, U)ˣ)
+    : gU y hy' (pullU (𝟙 X) U u) = gU y hy u :=
   gU_pullU_id U y hy' u
 
 lemma pt1 (y : (𝟙_ (Over S')).left) :
@@ -260,8 +263,8 @@ lemma sym_maps (L : RigLB G) (he : eSec G ≫ (GrpObj.inv (X := G)).left = 𝟙 
   · dsimp only [CubeMap.rigPull, rigPullOf]
     exact (gU_res _ y _ _).trans (gU_pullU m.e _ y _ _)
 
-theorem sym_pull (L : RigLB G) (hL : (L.L.pull m.F).IsLB) (hr : (m.rigPull L.L L.rig).IsGen) :
-    L.IsSymmetric → (m.rigLB L hL hr).IsSymmetric := by
+theorem sym_pull (L : RigLB G) (hL : (L.L.pull m.F).IsLB) (hr : (m.rigPull L.L L.rig).IsGen)
+    : L.IsSymmetric → (m.rigLB L hL hr).IsSymmetric := by
   intro h
   unfold RigLB.IsSymmetric at h ⊢
   obtain ⟨he, w, hw, hmaps⟩ := h

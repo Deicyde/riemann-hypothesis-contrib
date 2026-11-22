@@ -36,21 +36,25 @@ def LocFam.Φ (D : LocFam F ℓ ι) : ℚ_[ℓ] ⊗[ℚ] F →ₐ[ℚ_[ℓ]] (�
   Algebra.TensorProduct.lift (Algebra.ofId ℚ_[ℓ] _) (AlgHom.pi fun i => (D.ιF i).toRatAlgHom)
     (fun _ _ => Commute.all _ _)
 
-theorem LocFam.Φ_tmul (D : LocFam F ℓ ι) (c : ℚ_[ℓ]) (x : F) (i : ι) :
-    D.Φ (c ⊗ₜ x) i = algebraMap ℚ_[ℓ] (D.K i) c * D.ιF i x := by
+theorem LocFam.Φ_tmul (D : LocFam F ℓ ι) (c : ℚ_[ℓ]) (x : F) (i : ι)
+    : D.Φ (c ⊗ₜ x) i = algebraMap ℚ_[ℓ] (D.K i) c * D.ιF i x := by
   simp [LocFam.Φ, Algebra.ofId_apply]
 
 def TrSurj : Prop :=
   ∀ (F : Type) [Field F] [NumberField F] (ℓ : ℕ) [Fact ℓ.Prime] (ι : Type) [Fintype ι]
-    (D : LocFam F ℓ ι), D.Over → Function.Surjective D.Φ
+      (D : LocFam F ℓ ι),
+    D.Over → Function.Surjective D.Φ
 
 def TrInj : Prop :=
   ∀ (F : Type) [Field F] [NumberField F] (ℓ : ℕ) [Fact ℓ.Prime] (ι : Type) [Fintype ι]
-    (D : LocFam F ℓ ι), D.Over → Function.Injective D.Φ
+      (D : LocFam F ℓ ι),
+    D.Over → Function.Injective D.Φ
 
 def TrSum : Prop :=
   ∀ (F : Type) [Field F] [NumberField F] (ℓ : ℕ) [Fact ℓ.Prime] (ι : Type) [Fintype ι]
-    (D : LocFam F ℓ ι), D.Over → ∀ y : F,
-      ∑ i, Algebra.trace ℚ_[ℓ] (D.K i) (D.ιF i y) = algebraMap ℚ ℚ_[ℓ] (Algebra.trace ℚ F y)
+      (D : LocFam F ℓ ι),
+    D.Over
+      → ∀ y : F,
+        ∑ i, Algebra.trace ℚ_[ℓ] (D.K i) (D.ιF i y) = algebraMap ℚ ℚ_[ℓ] (Algebra.trace ℚ F y)
 
 end PI.ProdFormulaE.Tr

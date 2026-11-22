@@ -24,8 +24,8 @@ section Germ
 
 open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
-def addF (k : Type) [CommRing k] (d : ℕ) : Fin d → PS k 2 d :=
-  fun j => MvPowerSeries.X ((0 : Fin 2), j) + MvPowerSeries.X ((1 : Fin 2), j)
+def addF (k : Type) [CommRing k] (d : ℕ) : Fin d → PS k 2 d := fun j =>
+  MvPowerSeries.X ((0 : Fin 2), j) + MvPowerSeries.X ((1 : Fin 2), j)
 
 end Germ
 

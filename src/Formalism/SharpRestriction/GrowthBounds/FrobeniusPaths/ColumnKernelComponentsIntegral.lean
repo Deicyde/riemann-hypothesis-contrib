@@ -14,23 +14,29 @@ section Gen
 
 variable {R : Type*} [CommRing R] {N k : ℕ}
 
-def KKs (p : ℕ) (x : Fin N → Fin k → R) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) :
-    ℕ → (Finset (Fin k) → R) × Option ℤ
+def KKs (p : ℕ) (x : Fin N → Fin k → R) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ)
+    : ℕ → (Finset (Fin k) → R) × Option ℤ
   | 0 => (extOne, none)
   | j + 1 =>
     if h : j < N then
       let st := KKs p x pos mu c j
       let hP := colH (mu ⟨j, by omega⟩) c
       let hN := colH (mu ⟨j + 1, by omega⟩) c
-      if hP = hN then st else
-        let P := match st.2 with
+      if hP = hN then
+        st
+      else
+        let P :=
+          match st.2 with
           | none => 1
           | some sl => p ^ (pos ⟨j, h⟩ - sl).toNat
         (colStep c hP hN (x ⟨j, h⟩) (powC P st.1), some (pos ⟨j, h⟩))
-    else KKs p x pos mu c j
+    else
+      KKs p x pos mu c j
 
-def ZZ (p : ℕ) (x : Fin N → Fin k → R) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ) (s : ℤ) :
-    Finset (Fin k) → R :=
+def ZZ
+    (p : ℕ) (x : Fin N → Fin k → R) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (j : ℕ)
+    (s : ℤ)
+    : Finset (Fin k) → R :=
   match (KKs p x pos mu c j).2 with
   | none => (KKs p x pos mu c j).1
   | some sl => powC (p ^ (s - sl).toNat) (KKs p x pos mu c j).1
@@ -60,7 +66,8 @@ end Gen
 
 section Link
 
-variable (p f : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [Algebra (WF p f) O] {N k : ℕ}
+variable
+  (p f : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [Algebra (WF p f) O] {N k : ℕ}
 
 lemma KKstate_eq (LL : LiftLetters (Fin N)) (g : Matrix (Fin k) (Fin k) (WF p f)) (mu : Fin (N + 1) → Fin k → ℤ)
     (c : ℤ) (j : ℕ) :
@@ -114,8 +121,10 @@ end Closure
 
 section Clause1
 
-variable (p f : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Algebra (WF p f) O] {N k : ℕ}
+variable
+  (p f : ℕ) [Fact p.Prime]
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra (WF p f) O]
+  {N k : ℕ}
 
 lemma letG_int (LL : LiftLetters (Fin N)) (g : Matrix (Fin k) (Fin k) (WF p f)) (hg : IsGLW g) (i : Fin N)
     (b : Fin k) : letG p f (O := O) LL g i b ∈ intSub O (Fin N × Fin k) := by
@@ -126,8 +135,11 @@ lemma letG_int (LL : LiftLetters (Fin N)) (g : Matrix (Fin k) (Fin k) (WF p f)) 
   · refine Subalgebra.sum_mem _ fun a _ => Subalgebra.mul_mem _ (X_mem_goodSub _ rfl) ?_
     rw [sigMat_inv p f O g hg, sigMat_apply]; exact C_mem_sub _ _
 
-theorem column_kernel_components_integral (LL : LiftLetters (Fin N)) (g : Matrix (Fin k) (Fin k) (WF p f)) (hg : IsGLW g) (z : ℤ)
-    (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (J : Finset (Fin k)) : InA (KKc p f (O := O) LL g z mu c J) := by
+theorem column_kernel_components_integral
+    (LL : LiftLetters (Fin N))
+    (g : Matrix (Fin k) (Fin k) (WF p f)) (hg : IsGLW g)
+    (z : ℤ) (mu : Fin (N + 1) → Fin k → ℤ) (c : ℤ) (J : Finset (Fin k))
+    : InA (KKc p f (O := O) LL g z mu c J) := by
   rw [KKc_eq, ← mem_intSub]
   exact ZZ_mem _ p _ _ mu c (letG_int p f LL g hg) N le_rfl z J
 
@@ -141,35 +153,48 @@ lemma costly_used (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (i : Fin 
     IsUsed mu c i := by
   unfold IsUsed; rcases h with ⟨h, _⟩ | ⟨h, _⟩ <;> omega
 
-theorem column_order_le_two_power [NeZero N] (p : ℕ) (hp : 2 ≤ p) (pos : Fin N → ℤ) (z : ℤ) (hmono : Monotone pos)
-    (hz : ∀ i, pos i ≤ z) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ)
-    (hpos : ∀ i j : Fin N, i < j → IsUsed mu c i → IsCostly mu c j → pos i < pos j) :
-    oc (fun i => p ^ (z - pos i).toNat) mu c ≤ 2 * p ^ (z - pos 0).toNat := by
+theorem column_order_le_two_power
+    [NeZero N]
+    (p : ℕ) (hp : 2 ≤ p)
+    (pos : Fin N → ℤ)
+    (z : ℤ)
+    (hmono : Monotone pos) (hz : ∀ i, pos i ≤ z)
+    (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ)
+    (hpos : ∀ i j : Fin N, i < j → IsUsed mu c i → IsCostly mu c j → pos i < pos j)
+    : oc (fun i => p ^ (z - pos i).toNat) mu c ≤ 2 * p ^ (z - pos 0).toNat := by
   classical
   set E := (z - pos 0).toNat with hE
-  have h1 : oc (fun i => p ^ (z - pos i).toNat) mu c =
-      ∑ i ∈ univ.filter (fun i => IsCostly mu c i), p ^ (z - pos i).toNat := by
+  have h1
+      : oc (fun i => p ^ (z - pos i).toNat) mu c
+        = ∑ i ∈ univ.filter (fun i => IsCostly mu c i), p ^ (z - pos i).toNat := by
     unfold oc; rw [Finset.sum_filter]
-  have hinj : Set.InjOn (fun i : Fin N => (z - pos i).toNat) (univ.filter (fun i => IsCostly mu c i) : Finset (Fin N)) := by
+  have hinj : Set.InjOn
+      (fun i : Fin N => (z - pos i).toNat)
+      (univ.filter (fun i => IsCostly mu c i) : Finset (Fin N)) := by
     intro i hi j hj hij
     simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_ofPred_eq] at hi hj
-    have hzi := hz i; have hzj := hz j
+    have hzi := hz i
+    have hzj := hz j
     simp only at hij
     rcases lt_trichotomy i j with h | h | h
     · have := hpos i j h (costly_used mu c i hi) hj; omega
     · exact h
     · have := hpos j i h (costly_used mu c j hj) hi; omega
   rw [h1, ← Finset.sum_image (f := fun e => p ^ e) hinj]
-  have hsub : (univ.filter (fun i => IsCostly mu c i)).image (fun i : Fin N => (z - pos i).toNat) ⊆ range (E + 1) := by
+  have hsub
+      : (univ.filter (fun i => IsCostly mu c i)).image (fun i : Fin N => (z - pos i).toNat)
+        ⊆ range (E + 1) := by
     intro e he
     obtain ⟨i, _, rfl⟩ := Finset.mem_image.mp he
     have : pos 0 ≤ pos i := hmono (Fin.zero_le i)
-    rw [Finset.mem_range]; omega
-  calc _ ≤ ∑ e ∈ range (E + 1), p ^ e := Finset.sum_le_sum_of_subset hsub
+    rw [Finset.mem_range]
+    omega
+  calc
+    _ ≤ ∑ e ∈ range (E + 1), p ^ e := Finset.sum_le_sum_of_subset hsub
     _ = ∑ e ∈ range E, p ^ e + p ^ E := Finset.sum_range_succ _ _
     _ ≤ p ^ E + p ^ E := by
-        have := Nat.geomSum_lt hp (s := range E) (n := E) (fun k hk => Finset.mem_range.mp hk)
-        omega
+      have := Nat.geomSum_lt hp (s := range E) (n := E) (fun k hk => Finset.mem_range.mp hk)
+      omega
     _ = 2 * p ^ E := by ring
 
 end Clause5

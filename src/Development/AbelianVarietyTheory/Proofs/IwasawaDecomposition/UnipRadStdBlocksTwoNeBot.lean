@@ -7,14 +7,18 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocDict
+open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocDict
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory
 
-
 open GlobalTheory.SmGL in
-theorem unipRad_stdBlocks_two_ne_bot : ∀ (R : Type) [CommRing R] [Nontrivial R] (n a b : ℕ) (h : ∑ i, ![a, b] i = n), 0 < a → 0 < b → unipRad R (stdBlocks ![a, b] h) ≠ ⊥ := by
+theorem unipRad_stdBlocks_two_ne_bot
+    : ∀ (R : Type) [CommRing R] [Nontrivial R] (n a b : ℕ) (h : ∑ i, ![a, b] i = n),
+      0 < a → 0 < b → unipRad R (stdBlocks ![a, b] h) ≠ ⊥ := by
   intro R _ _ n a b h ha hb
   set e := stdBlocks ![a, b] h with he
   let i : Fin n := e ⟨0, ⟨0, by simpa using ha⟩⟩
@@ -23,14 +27,18 @@ theorem unipRad_stdBlocks_two_ne_bot : ∀ (R : Type) [CommRing R] [Nontrivial R
     intro hh
     have := congrArg Sigma.fst (e.injective hh)
     simp at this
-  let g : GL (Fin n) R :=
-    ⟨Matrix.transvection i j 1, Matrix.transvection i j (-1),
-      by
-        show Matrix.transvection i j (1 : R) * Matrix.transvection i j (-1) = 1
-        rw [Matrix.transvection_mul_transvection_same i j hij]; simp,
-      by
-        show Matrix.transvection i j (-1 : R) * Matrix.transvection i j 1 = 1
-        rw [Matrix.transvection_mul_transvection_same i j hij]; simp⟩
+  let g : GL (Fin n) R := ⟨
+    Matrix.transvection i j 1,
+    Matrix.transvection i j (-1),
+    by
+      show Matrix.transvection i j (1 : R) * Matrix.transvection i j (-1) = 1
+      rw [Matrix.transvection_mul_transvection_same i j hij]
+      simp,
+    by
+      show Matrix.transvection i j (-1 : R) * Matrix.transvection i j 1 = 1
+      rw [Matrix.transvection_mul_transvection_same i j hij]
+      simp
+  ⟩
   have hg : (g : Matrix (Fin n) (Fin n) R) = 1 + Matrix.single i j 1 := rfl
   have hmem : g ∈ unipRad R e := by
     rw [mem_unipRad]
@@ -41,13 +49,16 @@ theorem unipRad_stdBlocks_two_ne_bot : ∀ (R : Type) [CommRing R] [Nontrivial R
       rw [hg, Matrix.add_apply, Matrix.one_apply_ne hne, zero_add]
       by_cases hp : p = i
       · by_cases hq : q = j
-        · subst hp; subst hq
+        · subst hp
+          subst hq
           rw [blk_apply, blk_apply] at hpq
           exact absurd hpq (by decide)
         · rw [Matrix.single_apply, if_neg]
-          rintro ⟨_, h'⟩; exact hq h'.symm
+          rintro ⟨_, h'⟩
+          exact hq h'.symm
       · rw [Matrix.single_apply, if_neg]
-        rintro ⟨h', _⟩; exact hp h'.symm
+        rintro ⟨h', _⟩
+        exact hp h'.symm
     · intro c x y
       rw [hg, Matrix.add_apply]
       have h1 : (1 : Matrix (Fin n) (Fin n) R) (e ⟨c, x⟩) (e ⟨c, y⟩) = (1 : Matrix _ _ R) x y := by

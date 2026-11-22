@@ -11,8 +11,8 @@ namespace GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization
 
 open MvPolynomial
 
-theorem exists_poly_backDiff_pow (n : ℕ) :
-    ∃ P : Polynomial ℚ, ∀ t : ℚ, P.eval t - P.eval (t - 1) = t ^ n := by
+theorem exists_poly_backDiff_pow (n : ℕ)
+    : ∃ P : Polynomial ℚ, ∀ t : ℚ, P.eval t - P.eval (t - 1) = t ^ n := by
   refine ⟨(1 / ((n : ℚ) + 1)) • (Polynomial.bernoulli (n + 1)).comp (Polynomial.X + 1), fun t => ?_⟩
   have h1 := Polynomial.bernoulli_eval_one_add (n + 1) (t - 1 + 1)
   simp only [Polynomial.eval_smul, Polynomial.eval_comp, Polynomial.eval_add, Polynomial.eval_X,
@@ -24,14 +24,16 @@ theorem exists_poly_backDiff_pow (n : ℕ) :
   field_simp
   ring
 
-theorem exists_mvpoly_backDiff {K : Type} [DecidableEq K] (k : K) (q : MvPolynomial K ℚ) :
-    ∃ R : MvPolynomial K ℚ, ∀ x : K → ℚ, eval x R - eval (x - Pi.single k 1) R = eval x q := by
+theorem exists_mvpoly_backDiff {K : Type} [DecidableEq K] (k : K) (q : MvPolynomial K ℚ)
+    : ∃ R : MvPolynomial K ℚ, ∀ x : K → ℚ, eval x R - eval (x - Pi.single k 1) R = eval x q := by
   induction q using MvPolynomial.induction_on' with
   | monomial u a =>
     obtain ⟨P, hP⟩ := exists_poly_backDiff_pow (u k)
     refine ⟨monomial (u.erase k) a * Polynomial.aeval (X k : MvPolynomial K ℚ) P, fun x => ?_⟩
-    have hm : ∀ y : K → ℚ, (∀ i, i ≠ k → y i = x i) →
-        eval y (monomial (u.erase k) a) = eval x (monomial (u.erase k) a) := by
+    have hm
+        : ∀ y : K → ℚ,
+          (∀ i, i ≠ k → y i = x i)
+            → eval y (monomial (u.erase k) a) = eval x (monomial (u.erase k) a) := by
       intro y hy
       simp only [eval_monomial]
       congr 1
@@ -39,7 +41,8 @@ theorem exists_mvpoly_backDiff {K : Type} [DecidableEq K] (k : K) (q : MvPolynom
       intro i hi
       rw [Finsupp.support_erase, Finset.mem_erase] at hi
       rw [hy i hi.1]
-    have hP' : ∀ y : K → ℚ, eval y (Polynomial.aeval (X k : MvPolynomial K ℚ) P) = P.eval (y k) := by
+    have hP'
+        : ∀ y : K → ℚ, eval y (Polynomial.aeval (X k : MvPolynomial K ℚ) P) = P.eval (y k) := by
       intro y
       clear hP
       induction P using Polynomial.induction_on' with
@@ -64,9 +67,11 @@ theorem PolyOfDiffsExact.full : PolyOfDiffsExact.Statement := by
   choose q hq using hq
   choose R hR using fun k => exists_mvpoly_backDiff k (q k)
 
-  have step : ∀ k (m : K → ℤ) (t : ℤ),
-      h (Function.update m k t) - eval (fun j => ((Function.update m k t j : ℤ) : ℚ)) (R k) =
-        h (Function.update m k (t - 1)) - eval (fun j => ((Function.update m k (t - 1) j : ℤ) : ℚ)) (R k) := by
+  have step
+      : ∀ k (m : K → ℤ) (t : ℤ),
+        h (Function.update m k t) - eval (fun j => ((Function.update m k t j : ℤ) : ℚ)) (R k)
+          = h (Function.update m k (t - 1))
+            - eval (fun j => ((Function.update m k (t - 1) j : ℤ) : ℚ)) (R k) := by
     intro k m t
     have e1 := hq k (Function.update m k t)
     have e2 := hR k (fun j => ((Function.update m k t j : ℤ) : ℚ))
@@ -75,8 +80,9 @@ theorem PolyOfDiffsExact.full : PolyOfDiffsExact.Statement := by
       by_cases hj : j = k
       · subst hj; simp
       · simp [hj]
-    have s' : (fun j => ((Function.update m k t j : ℤ) : ℚ)) - Pi.single k 1 =
-        fun j => ((Function.update m k (t - 1) j : ℤ) : ℚ) := by
+    have s'
+        : (fun j => ((Function.update m k t j : ℤ) : ℚ)) - Pi.single k 1
+          = fun j => ((Function.update m k (t - 1) j : ℤ) : ℚ) := by
       funext j
       by_cases hj : j = k
       · subst hj; simp
@@ -84,16 +90,19 @@ theorem PolyOfDiffsExact.full : PolyOfDiffsExact.Statement := by
     rw [s] at e1
     rw [s'] at e2
     linear_combination e1 - e2
-  have line : ∀ k (m : K → ℤ) (t : ℤ),
-      h (Function.update m k t) - eval (fun j => ((Function.update m k t j : ℤ) : ℚ)) (R k) =
-        h (Function.update m k 0) - eval (fun j => ((Function.update m k 0 j : ℤ) : ℚ)) (R k) := by
+  have line
+      : ∀ k (m : K → ℤ) (t : ℤ),
+        h (Function.update m k t) - eval (fun j => ((Function.update m k t j : ℤ) : ℚ)) (R k)
+          = h (Function.update m k 0)
+            - eval (fun j => ((Function.update m k 0 j : ℤ) : ℚ)) (R k) := by
     intro k m t
     induction t using Int.induction_on with
     | zero => rfl
     | succ i ih => rw [step, add_sub_cancel_right, ih]
     | pred i ih => rw [← ih, step k m (-(i : ℤ))]
-  have key : ∀ s : Finset K, ∃ p : MvPolynomial K ℚ, ∀ m : K → ℤ, (∀ j ∉ s, m j = 0) →
-      h m = eval (fun j => (m j : ℚ)) p := by
+  have key
+      : ∀ s : Finset K, ∃ p : MvPolynomial K ℚ, ∀ m : K → ℤ,
+        (∀ j ∉ s, m j = 0) → h m = eval (fun j => (m j : ℚ)) p := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -112,8 +121,10 @@ theorem PolyOfDiffsExact.full : PolyOfDiffsExact.Statement := by
         · subst hjk; simp
         · rw [Function.update_of_ne hjk]
           exact hm j (by simp [hjk, hj])
-      have hz : ∀ P : MvPolynomial K ℚ, eval (fun j => (m j : ℚ)) (bind₁ z P) =
-          eval (fun j => ((Function.update m k 0 j : ℤ) : ℚ)) P := by
+      have hz
+          : ∀ P : MvPolynomial K ℚ,
+            eval (fun j => (m j : ℚ)) (bind₁ z P)
+              = eval (fun j => ((Function.update m k 0 j : ℤ) : ℚ)) P := by
         intro P
         induction P using MvPolynomial.induction_on with
         | C a => simp

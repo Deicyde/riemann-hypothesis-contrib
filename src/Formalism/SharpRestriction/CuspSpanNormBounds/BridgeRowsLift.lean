@@ -11,22 +11,28 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeRowsLift
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat NumberField Module Formalism.MainNotions.BridgeLemma
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat NumberField Module
+  Formalism.MainNotions.BridgeLemma
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E}
 
 def rlift_Spl (Λ : Submodule (𝓞 E) S.V) (X : Submodule E S.V) (P P' : S.V →ₗ[E] S.V) : Prop :=
-  LAdj S P P' ∧ (∀ x ∈ X, P x = x) ∧ (∀ y, P y ∈ X) ∧ LInt Λ P ∧ LInt Λ P' ∧ ∀ w y, S.hT (P' w) (P' y) = 0
+  LAdj S P P' ∧ (∀ x ∈ X, P x = x) ∧ (∀ y, P y ∈ X) ∧ LInt Λ P ∧ LInt Λ P'
+    ∧ ∀ w y, S.hT (P' w) (P' y) = 0
 
 theorem rlift_swap {x y : S.V} (h : S.hT x y = 0) : S.hT y x = 0 := by
   have := S.herm.eq x y
   rw [h, map_zero] at this
   exact this.symm
 
-theorem rlift_spl_of_retr (hcm : Formalism.HermitianLatticesTheory.IsCMUnram E) (Λ : Submodule (𝓞 E) S.V) (X : Submodule E S.V)
-    (huni : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0)
-    (P0 : S.V →ₗ[E] S.V) (hid : ∀ x ∈ X, P0 x = x) (hX : ∀ y, P0 y ∈ X) (hint : LInt Λ P0) :
-    ∃ P P' : S.V →ₗ[E] S.V, rlift_Spl Λ X P P' ∧ ∀ y, (∀ x ∈ X, S.hT x y = 0) → P0 y = 0 → P y = 0 := by
+theorem rlift_spl_of_retr
+    (hcm : Formalism.HermitianLatticesTheory.IsCMUnram E)
+    (Λ : Submodule (𝓞 E) S.V) (X : Submodule E S.V)
+    (huni : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ)
+    (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0)
+    (P0 : S.V →ₗ[E] S.V) (hid : ∀ x ∈ X, P0 x = x) (hX : ∀ y, P0 y ∈ X) (hint : LInt Λ P0)
+    : ∃ P P' : S.V →ₗ[E] S.V,
+      rlift_Spl Λ X P P' ∧ ∀ y, (∀ x ∈ X, S.hT x y = 0) → P0 y = 0 → P y = 0 := by
   obtain ⟨P0', hadj, hint'⟩ := l_adj E S Λ huni P0 hint
   obtain ⟨θ, hθ⟩ := l_theta E hcm
   have hbar : star (θ : E) = ((1 - θ : 𝓞 E) : E) := by
@@ -46,7 +52,8 @@ theorem rlift_spl_of_retr (hcm : Formalism.HermitianLatticesTheory.IsCMUnram E) 
     rw [← hadj]
     exact hy _ (hX w)
   have hzero : ∀ x ∈ X, P0' x = 0 := fun x hx => hzero' x (fun w hw => hiso w hw x hx)
-  refine ⟨P0 - (θ : E) • (P0 ∘ₗ P0'), P0' - star (θ : E) • (P0 ∘ₗ P0'), ⟨?_, ?_, ?_, ?_, ?_, ?_⟩, ?_⟩
+  refine
+    ⟨P0 - (θ : E) • (P0 ∘ₗ P0'), P0' - star (θ : E) • (P0 ∘ₗ P0'), ⟨?_, ?_, ?_, ?_, ?_, ?_⟩, ?_⟩
   · intro x y
     simp only [LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.comp_apply, map_sub, map_smulₛₗ,
       smul_eq_mul, starRingEnd_apply, RingHom.id_apply]
@@ -66,10 +73,8 @@ theorem rlift_spl_of_retr (hcm : Formalism.HermitianLatticesTheory.IsCMUnram E) 
     exact Λ.sub_mem (hint' l hl) (liso_smul_mem Λ (1 - θ) (hint _ (hint' l hl)))
   · intro w y
     have e1 : S.hT (P0' w) (P0' y) = S.hT w (P0 (P0' y)) := hrev _ _
-    have e2 : S.hT (P0' w) (P0 (P0' y)) = S.hT w (P0 (P0' y)) := by
-      rw [hrev, hid _ (hHX y)]
-    have e3 : S.hT (P0 (P0' w)) (P0' y) = S.hT w (P0 (P0' y)) := by
-      rw [← hadj, hid _ (hHX w), hHH]
+    have e2 : S.hT (P0' w) (P0 (P0' y)) = S.hT w (P0 (P0' y)) := by rw [hrev, hid _ (hHX y)]
+    have e3 : S.hT (P0 (P0' w)) (P0' y) = S.hT w (P0 (P0' y)) := by rw [← hadj, hid _ (hHX w), hHH]
     have e4 : S.hT (P0 (P0' w)) (P0 (P0' y)) = 0 := hiso _ (hHX w) _ (hHX y)
     simp only [LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.comp_apply, map_sub, map_smulₛₗ,
       smul_eq_mul, starRingEnd_apply, star_star, RingHom.id_apply]
@@ -83,7 +88,8 @@ section Spl
 
 variable {Λ : Submodule (𝓞 E) S.V} {X : Submodule E S.V} {P P' : S.V →ₗ[E] S.V}
 
-theorem rlift_P'_perp (h : rlift_Spl Λ X P P') {y : S.V} (hy : ∀ x ∈ X, S.hT x y = 0) : P' y = 0 := by
+theorem rlift_P'_perp (h : rlift_Spl Λ X P P') {y : S.V} (hy : ∀ x ∈ X, S.hT x y = 0)
+    : P' y = 0 := by
   refine S.nondeg.2 _ (fun w => ?_)
   rw [← h.1]
   exact hy _ (h.2.2.1 w)
@@ -97,8 +103,8 @@ def rlift_R (P P' : S.V →ₗ[E] S.V) : S.V →ₗ[E] S.V := LinearMap.id - P -
 
 theorem rlift_R_apply (y : S.V) : rlift_R P P' y = y - P y - P' y := rfl
 
-theorem rlift_R_perp (h : rlift_Spl Λ X P P') (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0) (y : S.V) :
-    ∀ x ∈ X, S.hT x (rlift_R P P' y) = 0 := by
+theorem rlift_R_perp (h : rlift_Spl Λ X P P') (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0) (y : S.V)
+    : ∀ x ∈ X, S.hT x (rlift_R P P' y) = 0 := by
   intro x hx
   rw [rlift_R_apply, map_sub, map_sub, hiso x hx _ (h.2.2.1 y), ← h.1, h.2.1 x hx]
   ring
@@ -106,42 +112,48 @@ theorem rlift_R_perp (h : rlift_Spl Λ X P P') (hiso : ∀ x ∈ X, ∀ y ∈ X,
 theorem rlift_PR (h : rlift_Spl Λ X P P') (y : S.V) : P (rlift_R P P' y) = 0 := by
   rw [rlift_R_apply, map_sub, map_sub, h.2.1 _ (h.2.2.1 y), rlift_PP' h, sub_self, sub_zero]
 
-theorem rlift_R_X (h : rlift_Spl Λ X P P') (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0) {x : S.V} (hx : x ∈ X) :
-    rlift_R P P' x = 0 := by
+theorem rlift_R_X
+    (h : rlift_Spl Λ X P P') (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0) {x : S.V} (hx : x ∈ X)
+    : rlift_R P P' x = 0 := by
   rw [rlift_R_apply, h.2.1 x hx, rlift_P'_perp h (fun w hw => hiso w hw x hx), sub_self, sub_zero]
 
-theorem rlift_R_of_perp (h : rlift_Spl Λ X P P') {y : S.V} (hy : ∀ x ∈ X, S.hT x y = 0) :
-    rlift_R P P' y = y - P y := by
+theorem rlift_R_of_perp (h : rlift_Spl Λ X P P') {y : S.V} (hy : ∀ x ∈ X, S.hT x y = 0)
+    : rlift_R P P' y = y - P y := by
   rw [rlift_R_apply, rlift_P'_perp h hy, sub_zero]
 
 theorem rlift_R_int (h : rlift_Spl Λ X P P') {l : S.V} (hl : l ∈ Λ) : rlift_R P P' l ∈ Λ :=
   Λ.sub_mem (Λ.sub_mem hl (h.2.2.2.1 l hl)) (h.2.2.2.2.1 l hl)
 
-theorem rlift_decomp (y : S.V) : y = P y + rlift_R P P' y + P' y := by
-  rw [rlift_R_apply]; abel
+theorem rlift_decomp (y : S.V) : y = P y + rlift_R P P' y + P' y := by rw [rlift_R_apply]; abel
 
 end Spl
 
-theorem rlift_three {X : Submodule E S.V} (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0)
-    {x w y x' w' y' : S.V} (hx : x ∈ X) (hx' : x' ∈ X) (hw : ∀ v ∈ X, S.hT v w = 0) (hw' : ∀ v ∈ X, S.hT v w' = 0)
-    (hyy : S.hT y y' = 0) (hwy : S.hT w y' = 0) (hyw : S.hT y w' = 0) :
-    S.hT (x + w + y) (x' + w' + y') = S.hT x y' + S.hT w w' + S.hT y x' := by
+theorem rlift_three
+    {X : Submodule E S.V} (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0)
+    {x w y x' w' y' : S.V} (hx : x ∈ X) (hx' : x' ∈ X) (hw : ∀ v ∈ X, S.hT v w = 0)
+    (hw' : ∀ v ∈ X, S.hT v w' = 0) (hyy : S.hT y y' = 0) (hwy : S.hT w y' = 0) (hyw : S.hT y w' = 0)
+    : S.hT (x + w + y) (x' + w' + y') = S.hT x y' + S.hT w w' + S.hT y x' := by
   simp only [map_add (f := _), LinearMap.add_apply]
   rw [hiso x hx x' hx', hw' x hx, rlift_swap (hw x' hx'), hyy, hwy, hyw]
   ring
 
-theorem rlift_main {X : Submodule E S.V} (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0)
-    {Λ₁ Λ₂ : Submodule (𝓞 E) S.V} (hu₁ : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ₁) (hu₂ : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ₂)
+theorem rlift_main
+    {X : Submodule E S.V} (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT x y = 0)
+    {Λ₁ Λ₂ : Submodule (𝓞 E) S.V} (hu₁ : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ₁)
+    (hu₂ : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ₂)
     {P₁ P₁' P₂ P₂' : S.V →ₗ[E] S.V} (h₁ : rlift_Spl Λ₁ X P₁ P₁') (h₂ : rlift_Spl Λ₂ X P₂ P₂')
     {z : S.V} (hzX : ∀ x ∈ X, S.hT x z = 0) (hz₁ : P₁ z = 0) (hz₂ : P₂ z = 0)
-    (hA : ∀ x ∈ X, x ∈ Λ₁ ↔ x ∈ Λ₂)
-    (hL : ∀ l ∈ Λ₁, (∀ x ∈ X, S.hT x l = 0) → ∃ l₂ ∈ Λ₂, l - l₂ ∈ X) :
-    ∃ n : S.V ≃ₗ[E] S.V, n ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ x ∈ X, n x = x) ∧ n z = z ∧
-      (∀ y, (∀ x ∈ X, S.hT x y = 0) → n y - y ∈ X) ∧ Formalism.HermitianLatticesTheory.gmap n Λ₁ = Λ₂ := by
+    (hA : ∀ x ∈ X, x ∈ Λ₁ ↔ x ∈ Λ₂) (hL : ∀ l ∈ Λ₁, (∀ x ∈ X, S.hT x l = 0) → ∃ l₂ ∈ Λ₂, l - l₂ ∈ X)
+    : ∃ n : S.V ≃ₗ[E] S.V,
+      n ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ (∀ x ∈ X, n x = x) ∧ n z = z
+        ∧ (∀ y, (∀ x ∈ X, S.hT x y = 0) → n y - y ∈ X)
+        ∧ Formalism.HermitianLatticesTheory.gmap n Λ₁ = Λ₂ := by
   set nL : S.V →ₗ[E] S.V := P₁ + rlift_R P₂ P₂' ∘ₗ rlift_R P₁ P₁' + P₂' ∘ₗ P₁' with hnL
   have hn : ∀ a, nL a = P₁ a + rlift_R P₂ P₂' (rlift_R P₁ P₁' a) + P₂' (P₁' a) := fun a => rfl
-  have hmem : ∀ (Λ : Submodule (𝓞 E) S.V), Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ → ∀ y,
-      y ∈ Λ ↔ ∀ l ∈ Λ, S.hT l y ∈ (1 : Submodule (𝓞 E) E) := by
+  have hmem
+      : ∀ (Λ : Submodule (𝓞 E) S.V),
+        Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ
+          → ∀ y, y ∈ Λ ↔ ∀ l ∈ Λ, S.hT l y ∈ (1 : Submodule (𝓞 E) E) := by
     intro Λ hu y
     conv_lhs => rw [← hu]
     unfold Formalism.HermitianLatticesTheory.dual Formalism.E.hdual
@@ -150,15 +162,21 @@ theorem rlift_main {X : Submodule E S.V} (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT 
     intro a b
     have hwa := rlift_R_perp h₁ hiso a
     have hwb := rlift_R_perp h₁ hiso b
-    have e1 : S.hT (nL a) (nL b) = S.hT (P₁ a) (P₂' (P₁' b)) +
-        S.hT (rlift_R P₂ P₂' (rlift_R P₁ P₁' a)) (rlift_R P₂ P₂' (rlift_R P₁ P₁' b)) + S.hT (P₂' (P₁' a)) (P₁ b) := by
+    have e1
+        : S.hT (nL a) (nL b)
+          = S.hT (P₁ a) (P₂' (P₁' b))
+            + S.hT (rlift_R P₂ P₂' (rlift_R P₁ P₁' a)) (rlift_R P₂ P₂' (rlift_R P₁ P₁' b))
+            + S.hT (P₂' (P₁' a)) (P₁ b) := by
       rw [hn, hn]
-      refine rlift_three hiso (h₁.2.2.1 a) (h₁.2.2.1 b) (rlift_R_perp h₂ hiso _) (rlift_R_perp h₂ hiso _)
-        (h₂.2.2.2.2.2 _ _) ?_ ?_
+      refine rlift_three hiso (h₁.2.2.1 a) (h₁.2.2.1 b) (rlift_R_perp h₂ hiso _)
+        (rlift_R_perp h₂ hiso _) (h₂.2.2.2.2.2 _ _) ?_ ?_
       · rw [← h₂.1, rlift_PR h₂, map_zero, LinearMap.zero_apply]
       · refine rlift_swap ?_
         rw [← h₂.1, rlift_PR h₂, map_zero, LinearMap.zero_apply]
-    have e2 : S.hT a b = S.hT (P₁ a) (P₁' b) + S.hT (rlift_R P₁ P₁' a) (rlift_R P₁ P₁' b) + S.hT (P₁' a) (P₁ b) := by
+    have e2
+        : S.hT a b
+          = S.hT (P₁ a) (P₁' b) + S.hT (rlift_R P₁ P₁' a) (rlift_R P₁ P₁' b)
+            + S.hT (P₁' a) (P₁ b) := by
       conv_lhs => rw [rlift_decomp (P := P₁) (P' := P₁') a, rlift_decomp (P := P₁) (P' := P₁') b]
       refine rlift_three hiso (h₁.2.2.1 a) (h₁.2.2.1 b) hwa hwb (h₁.2.2.2.2.2 _ _) ?_ ?_
       · rw [← h₁.1, rlift_PR h₁, map_zero, LinearMap.zero_apply]
@@ -170,11 +188,13 @@ theorem rlift_main {X : Submodule E S.V} (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT 
     have e4 : ∀ x ∈ X, ∀ y, S.hT (P₂' y) x = S.hT y x := by
       intro x hx y
       rw [← S.herm.eq x (P₂' y), e3 x hx, S.herm.eq]
-    have e5 : S.hT (rlift_R P₂ P₂' (rlift_R P₁ P₁' a)) (rlift_R P₂ P₂' (rlift_R P₁ P₁' b)) =
-        S.hT (rlift_R P₁ P₁' a) (rlift_R P₁ P₁' b) := by
+    have e5
+        : S.hT (rlift_R P₂ P₂' (rlift_R P₁ P₁' a)) (rlift_R P₂ P₂' (rlift_R P₁ P₁' b))
+          = S.hT (rlift_R P₁ P₁' a) (rlift_R P₁ P₁' b) := by
       rw [rlift_R_of_perp h₂ hwa, rlift_R_of_perp h₂ hwb]
       simp only [map_sub, LinearMap.sub_apply]
-      rw [hwb _ (h₂.2.2.1 _), rlift_swap (hwa _ (h₂.2.2.1 (rlift_R P₁ P₁' b))), hiso _ (h₂.2.2.1 _) _ (h₂.2.2.1 _)]
+      rw [hwb _ (h₂.2.2.1 _), rlift_swap (hwa _ (h₂.2.2.1 (rlift_R P₁ P₁' b))),
+        hiso _ (h₂.2.2.1 _) _ (h₂.2.2.1 _)]
       ring
     rw [e1, e2, e3 _ (h₁.2.2.1 a), e4 _ (h₁.2.2.1 b), e5]
   have hinj : Function.Injective nL := by
@@ -186,11 +206,12 @@ theorem rlift_main {X : Submodule E S.V} (hiso : ∀ x ∈ X, ∀ y ∈ X, S.hT 
   have hnn : ∀ a, n a = nL a := fun a => congrFun (LinearEquiv.coe_ofInjectiveEndo nL hinj) a
   have hX : ∀ x ∈ X, nL x = x := by
     intro x hx
-    rw [hn, h₁.2.1 x hx, rlift_R_X h₁ hiso hx, map_zero, rlift_P'_perp h₁ (fun w hw => hiso w hw x hx), map_zero,
-      add_zero, add_zero]
+    rw [hn, h₁.2.1 x hx, rlift_R_X h₁ hiso hx, map_zero,
+      rlift_P'_perp h₁ (fun w hw => hiso w hw x hx), map_zero, add_zero, add_zero]
   have hperp : ∀ y, (∀ x ∈ X, S.hT x y = 0) → nL y = y - P₂ (rlift_R P₁ P₁' y) := by
     intro y hy
-    rw [hn, rlift_P'_perp h₁ hy, map_zero, add_zero, rlift_R_of_perp h₂ (rlift_R_perp h₁ hiso y), rlift_R_of_perp h₁ hy]
+    rw [hn, rlift_P'_perp h₁ hy, map_zero, add_zero, rlift_R_of_perp h₂ (rlift_R_perp h₁ hiso y),
+      rlift_R_of_perp h₁ hy]
     abel
   have hsub : ∀ l ∈ Λ₁, nL l ∈ Λ₂ := by
     intro l hl

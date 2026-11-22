@@ -6,23 +6,33 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.CyclotomicQExpansion GlobalTheory.KummerEisensteinGalois GlobalTheory.K4 GlobalTheory.LambdaValuationPowers
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.CyclotomicQExpansion
+  GlobalTheory.KummerEisensteinGalois GlobalTheory.K4 GlobalTheory.LambdaValuationPowers
 
 namespace UpperTheory.V.Z.Kato.Joint
 
 theorem chiFix : ChiFix := by
   intro l _ ι N χ χd hχ
-  have hinj : ∀ x y : ℤ_[l], ι (algebraMap ℚ_[l] (Qbar l) (x : ℚ_[l])) =
-      ι (algebraMap ℚ_[l] (Qbar l) (y : ℚ_[l])) → x = y := by
+  have hinj
+      : ∀ x y : ℤ_[l],
+        ι (algebraMap ℚ_[l] (Qbar l) (x : ℚ_[l])) = ι (algebraMap ℚ_[l] (Qbar l) (y : ℚ_[l]))
+          → x = y := by
     intro x y h
     exact PadicInt.ext ((algebraMap ℚ_[l] (Qbar l)).injective (ι.injective h))
   have hF1 : ι (algebraMap ℚ_[l] (Qbar l) ((1 : ℤ_[l]) : ℚ_[l])) = 1 := by simp
-  have hFm : ∀ x y : ℤ_[l], ι (algebraMap ℚ_[l] (Qbar l) ((x * y : ℤ_[l]) : ℚ_[l])) =
-      ι (algebraMap ℚ_[l] (Qbar l) (x : ℚ_[l])) * ι (algebraMap ℚ_[l] (Qbar l) (y : ℚ_[l])) := by
+  have hFm
+      : ∀ x y : ℤ_[l],
+        ι (algebraMap ℚ_[l] (Qbar l) ((x * y : ℤ_[l]) : ℚ_[l]))
+          = ι (algebraMap ℚ_[l] (Qbar l) (x : ℚ_[l]))
+            * ι (algebraMap ℚ_[l] (Qbar l) (y : ℚ_[l])) := by
     intro x y
     simp
-  have hFp : ∀ (x : ℤ_[l]) (k : ℕ), ι (algebraMap ℚ_[l] (Qbar l) ((x ^ k : ℤ_[l]) : ℚ_[l])) =
-      ι (algebraMap ℚ_[l] (Qbar l) (x : ℚ_[l])) ^ k := by
+  have hFp
+      : ∀ (x : ℤ_[l]) (k : ℕ),
+        ι (algebraMap ℚ_[l] (Qbar l) ((x ^ k : ℤ_[l]) : ℚ_[l]))
+          = ι (algebraMap ℚ_[l] (Qbar l) (x : ℚ_[l])) ^ k := by
     intro x k
     simp
   have hcop : ∀ a : ℕ, a.Coprime N ↔ (a % N).Coprime N := by

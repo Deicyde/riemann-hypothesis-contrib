@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.AlgEquivTrivialPowerCongruence
 
-theorem sub_mem_pow_succ {B : Type} [CommRing B] (Q : Ideal B) (ρ : B →+* B)
-    (h0 : ∀ x, ρ x - x ∈ Q) (h1 : ∀ x ∈ Q, ρ x - x ∈ Q ^ 2) :
-    ∀ (k : ℕ), ∀ x ∈ Q ^ k, ρ x - x ∈ Q ^ (k + 1) := by
+theorem sub_mem_pow_succ
+    {B : Type} [CommRing B]
+    (Q : Ideal B) (ρ : B →+* B) (h0 : ∀ x, ρ x - x ∈ Q) (h1 : ∀ x ∈ Q, ρ x - x ∈ Q ^ 2)
+    : ∀ (k : ℕ), ∀ x ∈ Q ^ k, ρ x - x ∈ Q ^ (k + 1) := by
   intro k
   induction k with
   | zero => intro x _; simpa using h0 x
@@ -22,8 +23,7 @@ theorem sub_mem_pow_succ {B : Type} [CommRing B] (Q : Ideal B) (ρ : B →+* B)
         have h2 : ρ a - a ∈ Q ^ k := Ideal.pow_le_pow_right (Nat.le_succ k) hd
         have h3 := Ideal.add_mem _ h2 ha
         simpa using h3
-      have e : ρ (a * q) - a * q = ρ a * (ρ q - q) + (ρ a - a) * q := by
-        rw [map_mul]; ring
+      have e : ρ (a * q) - a * q = ρ a * (ρ q - q) + (ρ a - a) * q := by rw [map_mul]; ring
       rw [e]
       refine Ideal.add_mem _ ?_ ?_
       · have h4 := Ideal.mul_mem_mul hρa (h1 q hq)
@@ -33,15 +33,15 @@ theorem sub_mem_pow_succ {B : Type} [CommRing B] (Q : Ideal B) (ρ : B →+* B)
         rw [← pow_succ] at h4
         exact h4
     · intro a b ha hb
-      have e : ρ (a + b) - (a + b) = (ρ a - a) + (ρ b - b) := by
-        rw [map_add (f := _)]; ring
+      have e : ρ (a + b) - (a + b) = (ρ a - a) + (ρ b - b) := by rw [map_add (f := _)]; ring
       rw [e]
       exact Ideal.add_mem _ ha hb
 
-theorem algEquiv_eq_one (A B : Type) [CommRing A] [CommRing B] [IsDomain B] [IsNoetherianRing B]
-    [Algebra A B] (Q : Ideal B) (ρ : B ≃ₐ[A] B) (m : ℕ) (hQ : Q ≠ ⊤) (hm : IsUnit (m : B))
-    (hρ : ρ ^ m = 1) (h0 : ∀ x : B, ρ x - x ∈ Q) (h1 : ∀ x ∈ Q, ρ x - x ∈ Q ^ 2) :
-    ρ = 1 := by
+theorem algEquiv_eq_one
+    (A B : Type) [CommRing A] [CommRing B] [IsDomain B] [IsNoetherianRing B] [Algebra A B]
+    (Q : Ideal B) (ρ : B ≃ₐ[A] B) (m : ℕ) (hQ : Q ≠ ⊤) (hm : IsUnit (m : B)) (hρ : ρ ^ m = 1)
+    (h0 : ∀ x : B, ρ x - x ∈ Q) (h1 : ∀ x ∈ Q, ρ x - x ∈ Q ^ 2)
+    : ρ = 1 := by
   have step : ∀ (k : ℕ), ∀ x ∈ Q ^ k, ρ x - x ∈ Q ^ (k + 1) :=
     sub_mem_pow_succ Q (ρ : B →+* B) h0 h1
   have key : ∀ (k : ℕ) (x : B), ρ x - x ∈ Q ^ k := by

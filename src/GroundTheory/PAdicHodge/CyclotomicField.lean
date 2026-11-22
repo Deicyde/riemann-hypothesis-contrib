@@ -43,12 +43,13 @@ theorem exists_isPrimitiveRoot (n : ℕ) : ∃ ζ : PadicAlgCl p, IsPrimitiveRoo
   haveI : NeZero ((p ^ n : ℕ) : PadicAlgCl p) :=
     ⟨Nat.cast_ne_zero.2 (pow_ne_zero n (Fact.out : p.Prime).ne_zero)⟩
   have hpos : 0 < p ^ n := pow_pos (Fact.out : p.Prime).pos n
-  obtain ⟨ζ, hζ⟩ := IsAlgClosed.exists_root (cyclotomic (p ^ n) (PadicAlgCl p))
-    (degree_cyclotomic_pos (p ^ n) (PadicAlgCl p) hpos).ne'
+  obtain ⟨ζ, hζ⟩ :=
+    IsAlgClosed.exists_root (cyclotomic (p ^ n) (PadicAlgCl p))
+      (degree_cyclotomic_pos (p ^ n) (PadicAlgCl p) hpos).ne'
   exact ⟨ζ, (isRoot_cyclotomic_iff).1 hζ⟩
 
-theorem cycl_eq_adjoin {n : ℕ} {ζ : PadicAlgCl p} (hζ : IsPrimitiveRoot ζ (p ^ n)) :
-    cycl p n = ℚ_[p]⟮ζ⟯ := by
+theorem cycl_eq_adjoin {n : ℕ} {ζ : PadicAlgCl p} (hζ : IsPrimitiveRoot ζ (p ^ n))
+    : cycl p n = ℚ_[p]⟮ζ⟯ := by
   apply le_antisymm
   · rw [cycl, adjoin_le_iff]
     intro x (hx : x ^ (p ^ n) = 1)
@@ -57,8 +58,8 @@ theorem cycl_eq_adjoin {n : ℕ} {ζ : PadicAlgCl p} (hζ : IsPrimitiveRoot ζ (
   · rw [adjoin_simple_le_iff]
     exact pow_eq_one_mem_cycl hζ.pow_eq_one
 
-theorem cycl_map (σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p) (n : ℕ) :
-    (cycl p n).map (σ : PadicAlgCl p →ₐ[ℚ_[p]] PadicAlgCl p) = cycl p n := by
+theorem cycl_map (σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p) (n : ℕ)
+    : (cycl p n).map (σ : PadicAlgCl p →ₐ[ℚ_[p]] PadicAlgCl p) = cycl p n := by
   rw [cycl, adjoin_map]
   congr 1
   ext x

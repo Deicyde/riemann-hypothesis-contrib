@@ -12,32 +12,34 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.TyFin
 
-theorem nonempty_iso_iff_intertwiner {Γ : Type} [Group Γ] (τ σ : FDRep ℂ Γ) :
-    Nonempty (τ ≅ σ) ↔ ∃ e : τ ≃ₗ[ℂ] σ, ∀ γ v, e (τ.ρ γ v) = σ.ρ γ (e v) := by
+theorem nonempty_iso_iff_intertwiner {Γ : Type} [Group Γ] (τ σ : FDRep ℂ Γ)
+    : Nonempty (τ ≅ σ) ↔ ∃ e : τ ≃ₗ[ℂ] σ, ∀ γ v, e (τ.ρ γ v) = σ.ρ γ (e v) := by
   constructor
   · rintro ⟨i⟩
     refine ⟨FDRep.isoToLinearEquiv i, fun γ v => ?_⟩
     rw [FDRep.Iso.conj_ρ i γ, LinearEquiv.conj_apply_apply, LinearEquiv.symm_apply_apply]
   · rintro ⟨e, he⟩
-    have h1 : ∀ g, e.toLinearMap ∘ₗ τ.ρ g = σ.ρ g ∘ₗ e.toLinearMap :=
-      fun g => LinearMap.ext fun v => he g v
+    have h1 : ∀ g, e.toLinearMap ∘ₗ τ.ρ g = σ.ρ g ∘ₗ e.toLinearMap := fun g =>
+      LinearMap.ext fun v => he g v
     have h2 : ∀ g, e.symm.toLinearMap ∘ₗ σ.ρ g = τ.ρ g ∘ₗ e.symm.toLinearMap := by
       intro g
       refine LinearMap.ext fun v => ?_
       show e.symm (σ.ρ g v) = τ.ρ g (e.symm v)
       apply e.injective
       rw [he, LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply]
-    refine ⟨{ hom := basicsMk e.toLinearMap h1
-              inv := basicsMk e.symm.toLinearMap h2
-              hom_inv_id := ?_
-              inv_hom_id := ?_ }⟩
+    refine ⟨{
+      hom := basicsMk e.toLinearMap h1
+      inv := basicsMk e.symm.toLinearMap h2
+      hom_inv_id := ?_
+      inv_hom_id := ?_
+    }⟩
     · ext v
       simp [basicsMk]
     · ext v
       simp [basicsMk]
 
-private theorem simple_iff_isIrr {Γ : Type} [Group Γ] (τ : FDRep ℂ Γ) :
-    CategoryTheory.Simple τ ↔ ReciprocityTheory.Ty.Fin.IsIrr τ.ρ := by
+private theorem simple_iff_isIrr {Γ : Type} [Group Γ] (τ : FDRep ℂ Γ)
+    : CategoryTheory.Simple τ ↔ ReciprocityTheory.Ty.Fin.IsIrr τ.ρ := by
   constructor
   · intro hs
     refine ⟨?_, fun W hW => ?_⟩
@@ -74,10 +76,8 @@ private theorem simple_iff_isIrr {Γ : Type} [Group Γ] (τ : FDRep ℂ Γ) :
   · rintro ⟨hnt, hirr⟩
     refine ⟨fun {Y} f hf => ⟨fun hiso h0 => ?_, fun h0 => ?_⟩⟩
     · subst h0
-      have h1 : 𝟙 τ = 0 := by
-        rw [← IsIso.inv_hom_id (0 : Y ⟶ τ), Limits.comp_zero]
-      have h2 : basicsLin (𝟙 τ) = 0 := by
-        rw [h1, basics_lin_zero]
+      have h1 : 𝟙 τ = 0 := by rw [← IsIso.inv_hom_id (0 : Y ⟶ τ), Limits.comp_zero]
+      have h2 : basicsLin (𝟙 τ) = 0 := by rw [h1, basics_lin_zero]
       rw [basics_lin_id] at h2
       obtain ⟨⟨x, y, hxy⟩⟩ := hnt
       apply hxy
@@ -86,8 +86,9 @@ private theorem simple_iff_isIrr {Γ : Type} [Group Γ] (τ : FDRep ℂ Γ) :
       simp only [LinearMap.id_apply, LinearMap.zero_apply] at hx hy
       rw [hx, hy]
     · have hinj := basics_inj_of_mono f
-      have hinv : ∀ g : Γ, ∀ v ∈ LinearMap.range (basicsLin f),
-          τ.ρ g v ∈ LinearMap.range (basicsLin f) := by
+      have hinv
+          : ∀ g : Γ, ∀ v ∈ LinearMap.range (basicsLin f),
+            τ.ρ g v ∈ LinearMap.range (basicsLin f) := by
         rintro g v ⟨y, rfl⟩
         refine ⟨Y.ρ g y, ?_⟩
         exact LinearMap.congr_fun (basics_lin_comm f g) y

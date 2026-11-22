@@ -5,19 +5,24 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-private theorem two_pow_dvd_intCast_padic_iff (k : ℤ) (n : ℕ) : (2 : ℤ_[2]) ^ n ∣ (k : ℤ_[2]) ↔ (2 : ℤ) ^ n ∣ k := by
-  have h := (PadicInt.norm_le_pow_iff_mem_span_pow (p := 2) (k : ℤ_[2]) n).symm.trans
-    (PadicInt.norm_int_le_pow_iff_dvd (p := 2) (k := k) (n := n))
+private theorem two_pow_dvd_intCast_padic_iff (k : ℤ) (n : ℕ)
+    : (2 : ℤ_[2]) ^ n ∣ (k : ℤ_[2]) ↔ (2 : ℤ) ^ n ∣ k := by
+  have h :=
+    (PadicInt.norm_le_pow_iff_mem_span_pow (p := 2) (k : ℤ_[2]) n).symm.trans
+      (PadicInt.norm_int_le_pow_iff_dvd (p := 2) (k := k) (n := n))
   rw [Ideal.mem_span_singleton] at h
   exact_mod_cast h
 
-private theorem index_closed_dyadic_subgroup (H : Subgroup ℤ_[2]ˣ) (u : ℤ_[2]ˣ) (p a : ℕ) (hH : IsClosed (H : Set ℤ_[2]ˣ))
-    (hu : u ∈ H) (hp : (u : ℤ_[2]) = p) (ha : 2 ≤ a) (h1 : (2 : ℤ) ^ a ∣ (p : ℤ) ^ 2 - 1)
-    (h2 : ¬ (2 : ℤ) ^ (a + 1) ∣ (p : ℤ) ^ 2 - 1) (h3 : ¬ (2 : ℤ) ^ a ∣ (p : ℤ) - 1) :
-    H.index ≠ 0 ∧ 2 * H.index ≤ Nat.totient (2 ^ a) := by
+private theorem index_closed_dyadic_subgroup
+    (H : Subgroup ℤ_[2]ˣ) (u : ℤ_[2]ˣ) (p a : ℕ) (hH : IsClosed (H : Set ℤ_[2]ˣ)) (hu : u ∈ H)
+    (hp : (u : ℤ_[2]) = p) (ha : 2 ≤ a) (h1 : (2 : ℤ) ^ a ∣ (p : ℤ) ^ 2 - 1)
+    (h2 : ¬ (2 : ℤ) ^ (a + 1) ∣ (p : ℤ) ^ 2 - 1) (h3 : ¬ (2 : ℤ) ^ a ∣ (p : ℤ) - 1)
+    : H.index ≠ 0 ∧ 2 * H.index ≤ Nat.totient (2 ^ a) := by
   have hu2 : ((u ^ 2 : ℤ_[2]ˣ) : ℤ_[2]) - 1 = (((p : ℤ) ^ 2 - 1 : ℤ) : ℤ_[2]) := by
     push_cast [Units.val_pow_eq_pow_val, hp]
     ring
@@ -34,13 +39,15 @@ private theorem index_closed_dyadic_subgroup (H : Subgroup ℤ_[2]ˣ) (u : ℤ_[
     rw [← two_pow_dvd_intCast_padic_iff]
     exact_mod_cast h
   have hidx : (KStar.TotallyRealRoots.princ 2 a).index ≤ Nat.totient (2 ^ a) := by
-    rw [KStar.TotallyRealRoots.princ, Subgroup.index_ker, ← ZMod.card_units_eq_totient, ← Nat.card_eq_fintype_card]
+    rw [KStar.TotallyRealRoots.princ, Subgroup.index_ker, ← ZMod.card_units_eq_totient,
+      ← Nat.card_eq_fintype_card]
     exact Subgroup.card_le_card_group _
   have hpos : 0 < (KStar.TotallyRealRoots.princ 2 a).index := by
     rw [KStar.TotallyRealRoots.princ, Subgroup.index_ker]
     exact Nat.card_pos
   have hr := Subgroup.relIndex_mul_index hle
-  have hr1 : (KStar.TotallyRealRoots.princ 2 a).relIndex H ≠ 1 := fun h => hnot (Subgroup.relIndex_eq_one.mp h hu)
+  have hr1 : (KStar.TotallyRealRoots.princ 2 a).relIndex H ≠ 1 := fun h =>
+    hnot (Subgroup.relIndex_eq_one.mp h hu)
   have hr0 : (KStar.TotallyRealRoots.princ 2 a).relIndex H ≠ 0 := by
     intro h
     rw [h, zero_mul] at hr
@@ -49,13 +56,16 @@ private theorem index_closed_dyadic_subgroup (H : Subgroup ℤ_[2]ˣ) (u : ℤ_[
   · intro h
     rw [h, mul_zero] at hr
     omega
-  · calc 2 * H.index ≤ (KStar.TotallyRealRoots.princ 2 a).relIndex H * H.index :=
-          Nat.mul_le_mul_right _ (by omega)
+  · calc
+      2 * H.index ≤ (KStar.TotallyRealRoots.princ 2 a).relIndex H * H.index :=
+        Nat.mul_le_mul_right _ (by omega)
       _ = (KStar.TotallyRealRoots.princ 2 a).index := hr
       _ ≤ Nat.totient (2 ^ a) := hidx
 
-theorem UpperTheory.V.Two.idxAdic :
-    ∀ (H : Subgroup ℤ_[2]ˣ) (u : ℤ_[2]ˣ) (p c : ℕ), IsClosed (H : Set ℤ_[2]ˣ) → u ∈ H → (u : ℤ_[2]) = p → (p % 8 = 3 ∧ c = 2 ∨ p % 16 = 7 ∧ c = 4) → H.index ≠ 0 ∧ H.index ≤ c := by
+theorem UpperTheory.V.Two.idxAdic
+    : ∀ (H : Subgroup ℤ_[2]ˣ) (u : ℤ_[2]ˣ) (p c : ℕ),
+      IsClosed (H : Set ℤ_[2]ˣ) → u ∈ H → (u : ℤ_[2]) = p → (p % 8 = 3 ∧ c = 2 ∨ p % 16 = 7 ∧ c = 4)
+        → H.index ≠ 0 ∧ H.index ≤ c := by
   intro H u p c hH hu hp hpc
   rcases hpc with ⟨hp8, rfl⟩ | ⟨hp16, rfl⟩
   · have hk : p = 8 * (p / 8) + 3 := by omega
@@ -104,7 +114,8 @@ theorem UpperTheory.V.Two.idxAdic :
       push_cast at ht
       norm_num at ht
       omega
-    obtain ⟨h0, h⟩ := index_closed_dyadic_subgroup H u (16 * k + 7) 4 hH hu hp (by norm_num) d1 d2 d3
+    obtain ⟨h0, h⟩ :=
+      index_closed_dyadic_subgroup H u (16 * k + 7) 4 hH hu hp (by norm_num) d1 d2 d3
     refine ⟨h0, ?_⟩
     have ht : Nat.totient (2 ^ 4) = 8 := by decide
     omega

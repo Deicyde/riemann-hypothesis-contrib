@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralMulC
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
 open GlobalTheory.RawLift
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,8 +23,11 @@ namespace GlobalTheory.Cmp.RallisRange
 
 variable {D : D7} {V W : HSp D}
 
-theorem vol_lt_top (V : HSp D) {ν : Measure (GA D V)} {𝓗 : Set (GA D V)} (hν : ν.IsHaarMeasure)
-    (h : IsFundamentalDomain (GQ V) 𝓗 ν) : ν 𝓗 < ⊤ :=
+theorem vol_lt_top
+    (V : HSp D)
+    {ν : Measure (GA D V)} {𝓗 : Set (GA D V)}
+    (hν : ν.IsHaarMeasure) (h : IsFundamentalDomain (GQ V) 𝓗 ν)
+    : ν 𝓗 < ⊤ :=
   GlobalTheory.CuspDecay.measure_lt_top GlobalTheory.Mem.VolFin.finVol V ν 𝓗 hν h
 
 end GlobalTheory.Cmp.RallisRange

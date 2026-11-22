@@ -11,7 +11,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open NumberField AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj GlobalTheory.LevelCusp
+open NumberField AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj GlobalTheory.LevelCusp
 open GlobalTheory.Dict (castFr)
 open GlobalTheory.FrameNorm (IsUnitFr)
 open scoped Matrix ComplexConjugate
@@ -24,9 +26,11 @@ open GlobalTheory.FramePeriod
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem eq_zero_of_lattice (X : Data E r) (τ : E →+* ℂ) (f : (Fin r → ℂ) → ℂ) (φ : ℂ → ℂ)
+theorem eq_zero_of_lattice
+    (X : Data E r) (τ : E →+* ℂ) (f : (Fin r → ℂ) → ℂ) (φ : ℂ → ℂ)
     (hadd : ∀ u w, f (u + w) = f u + f w) (hsm : ∀ (c : ℂ) u, f (c • u) = φ c * f u)
-    (h : ∀ v ∈ X.Λ, f (Data.emb τ v) = 0) (u : Fin r → ℂ) : f u = 0 := by
+    (h : ∀ v ∈ X.Λ, f (Data.emb τ v) = 0) (u : Fin r → ℂ)
+    : f u = 0 := by
   classical
   have h0 : f 0 = 0 := by
     have := hadd 0 0
@@ -57,20 +61,23 @@ theorem eq_zero_of_lattice (X : Data E r) (τ : E →+* ℂ) (f : (Fin r → ℂ
   show f _ = 0
   rw [hsm, hE, mul_zero]
 
-def natPer (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (q : ℕ) (M : Matrix (Fin r) (Fin r) ℂ)
-    (u : Fin r → ℂ) (n : ℕ) : ℂ :=
+def natPer
+    (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (q : ℕ) (M : Matrix (Fin r) (Fin r) ℂ)
+    (u : Fin r → ℂ) (n : ℕ)
+    : ℂ :=
   if h : n < r then locPer τ G q M u ⟨n, h⟩ else 0
 
-theorem perFr_mem (X : Data E r) (x : Frame X.Ψ r) (v : Fin r → E) (τ : E →+* ℂ) (h : τ ∈ X.Ψ) (i : ℕ) :
-    Formalism.L2.PjFree.perFr X x v τ i = natPer τ X.Gm X.p0 (mat x ⟨τ, h⟩) (Data.emb τ v) (X.p0 + i) := by
+theorem perFr_mem
+    (X : Data E r) (x : Frame X.Ψ r) (v : Fin r → E) (τ : E →+* ℂ) (h : τ ∈ X.Ψ) (i : ℕ)
+    : Formalism.L2.PjFree.perFr X x v τ i
+      = natPer τ X.Gm X.p0 (mat x ⟨τ, h⟩) (Data.emb τ v) (X.p0 + i) := by
   unfold Formalism.L2.PjFree.perFr natPer
   rw [dite_eq_left h]
   split_ifs with hi
   · rw [locPer_apply, if_neg (by simp)]
   · rfl
 
-theorem conjEmb_conjEmb (τ : E →+* ℂ) : conjEmb (conjEmb τ) = τ := by
-  ext x; simp [conjEmb]
+theorem conjEmb_conjEmb (τ : E →+* ℂ) : conjEmb (conjEmb τ) = τ := by ext x; simp [conjEmb]
 
 theorem conjEmb_not_mem (X : Data E r) {τ : E →+* ℂ} (h : τ ∈ X.Ψ) : conjEmb τ ∉ X.Ψ :=
   (X.cmType τ).1 h
@@ -79,10 +86,13 @@ theorem conjEmb_mem (X : Data E r) {τ : E →+* ℂ} (h : τ ∉ X.Ψ) : conjEm
   by_contra h'
   exact h ((X.cmType τ).2 h')
 
-theorem perFr_conj (X : Data E r) (x : Frame X.Ψ r) (v : Fin r → E) (τ : E →+* ℂ) (h : τ ∈ X.Ψ) (i : ℕ)
-    (hi : i < X.p0) :
-    Formalism.L2.PjFree.perFr X x v (conjEmb τ) i =
-      natPer τ X.Gm X.p0 (mat x ⟨τ, h⟩) (Data.emb τ v) (X.p0 - 1 - i) := by
+theorem perFr_conj
+    (X : Data E r) (x : Frame X.Ψ r)
+    (v : Fin r → E)
+    (τ : E →+* ℂ) (h : τ ∈ X.Ψ)
+    (i : ℕ) (hi : i < X.p0)
+    : Formalism.L2.PjFree.perFr X x v (conjEmb τ) i
+      = natPer τ X.Gm X.p0 (mat x ⟨τ, h⟩) (Data.emb τ v) (X.p0 - 1 - i) := by
   have hn := conjEmb_not_mem X h
   have e := conjEmb_conjEmb τ
   generalize conjEmb τ = σ at hn e
@@ -93,12 +103,15 @@ theorem perFr_conj (X : Data E r) (x : Frame X.Ψ r) (v : Fin r → E) (τ : E �
   · rw [locPer_apply, if_pos (by simp only; omega)]
   · rfl
 
-theorem natPer_move {X X' : Data E r} {a : GL (Fin r) E} (h : IsMatch X X' a) (τ : E →+* ℂ) (q : ℕ)
-    (M : Matrix (Fin r) (Fin r) ℂ) (v : Fin r → E) (n : ℕ) :
-    natPer τ X'.Gm q ((a : Matrix (Fin r) (Fin r) E).map τ * M)
-      (Data.emb τ ((a : Matrix (Fin r) (Fin r) E) *ᵥ v)) n = natPer τ X.Gm q M (Data.emb τ v) n := by
-  have he : Data.emb τ ((a : Matrix (Fin r) (Fin r) E) *ᵥ v) =
-      (a : Matrix (Fin r) (Fin r) E).map τ *ᵥ Data.emb τ v := by
+theorem natPer_move
+    {X X' : Data E r} {a : GL (Fin r) E} (h : IsMatch X X' a)
+    (τ : E →+* ℂ) (q : ℕ) (M : Matrix (Fin r) (Fin r) ℂ) (v : Fin r → E) (n : ℕ)
+    : natPer τ X'.Gm q ((a : Matrix (Fin r) (Fin r) E).map τ * M)
+        (Data.emb τ ((a : Matrix (Fin r) (Fin r) E) *ᵥ v)) n
+      = natPer τ X.Gm q M (Data.emb τ v) n := by
+  have he
+      : Data.emb τ ((a : Matrix (Fin r) (Fin r) E) *ᵥ v)
+        = (a : Matrix (Fin r) (Fin r) E).map τ *ᵥ Data.emb τ v := by
     funext k; simp [Data.emb, Matrix.mulVec, dotProduct, map_sum, map_mul]
   have hu : IsUnit ((a : Matrix (Fin r) (Fin r) E).map τ).det := by
     rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
@@ -111,39 +124,53 @@ theorem natPer_move {X X' : Data E r} {a : GL (Fin r) E} (h : IsMatch X X' a) (�
     · rw [Matrix.mul_inv_rev, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul_cancel_right _ _ hu]
   · rfl
 
-theorem loc_borel (X : Data E r) (τ : E →+* ℂ) (M M' : Matrix (Fin r) (Fin r) ℂ) (hM : M.det ≠ 0)
-    (hM' : M'.det ≠ 0) (A A' : ℕ → ℕ → ℂ) (hA : ∀ i j, j < i → A i j = 0) (hA' : ∀ i j, j < i → A' i j = 0)
-    (h1 : ∀ i < r - X.p0, ∀ v ∈ X.Λ, natPer τ X.Gm X.p0 M' (Data.emb τ v) (X.p0 + i) =
-      ∑ j ∈ Finset.range (r - X.p0), A i j * natPer τ X.Gm X.p0 M (Data.emb τ v) (X.p0 + j))
-    (h2 : ∀ i < X.p0, ∀ v ∈ X.Λ, natPer τ X.Gm X.p0 M' (Data.emb τ v) (X.p0 - 1 - i) =
-      ∑ j ∈ Finset.range X.p0, A' i j * natPer τ X.Gm X.p0 M (Data.emb τ v) (X.p0 - 1 - j)) :
-    (∀ a c : Fin r, c < a → (M⁻¹ * M') a c = 0) ∧
-      ((∀ a, ‖(M⁻¹ * M') a a‖ = 1) → (∀ i < r - X.p0, ‖A i i‖ = 1) ∧ ∀ i < X.p0, ‖A' i i‖ = 1) := by
+theorem loc_borel
+    (X : Data E r) (τ : E →+* ℂ)
+    (M M' : Matrix (Fin r) (Fin r) ℂ) (hM : M.det ≠ 0) (hM' : M'.det ≠ 0)
+    (A A' : ℕ → ℕ → ℂ) (hA : ∀ i j, j < i → A i j = 0) (hA' : ∀ i j, j < i → A' i j = 0)
+    (h1 : ∀ i < r - X.p0, ∀ v ∈ X.Λ,
+      natPer τ X.Gm X.p0 M' (Data.emb τ v) (X.p0 + i)
+        = ∑ j ∈ Finset.range (r - X.p0), A i j * natPer τ X.Gm X.p0 M (Data.emb τ v) (X.p0 + j))
+    (h2 : ∀ i < X.p0, ∀ v ∈ X.Λ,
+      natPer τ X.Gm X.p0 M' (Data.emb τ v) (X.p0 - 1 - i)
+        = ∑ j ∈ Finset.range X.p0, A' i j * natPer τ X.Gm X.p0 M (Data.emb τ v) (X.p0 - 1 - j))
+    : (∀ a c : Fin r, c < a → (M⁻¹ * M') a c = 0)
+      ∧ ((∀ a, ‖(M⁻¹ * M') a a‖ = 1)
+        → (∀ i < r - X.p0, ‖A i i‖ = 1) ∧ ∀ i < X.p0, ‖A' i i‖ = 1) := by
   classical
   have hq := X.p0_le
   set q := X.p0 with hqd
   let K0 : ℕ → ℕ → ℂ := fun a c =>
-    if a < q then (if c < q then A' (q - 1 - a) (q - 1 - c) else 0) else (if c < q then 0 else A (a - q) (c - q))
+    if a < q then
+      (if c < q then A' (q - 1 - a) (q - 1 - c) else 0)
+    else
+      (if c < q then 0 else A (a - q) (c - q))
   let K : Matrix (Fin r) (Fin r) ℂ := Matrix.of fun a c => K0 a c
-  have hK0 : ∀ a c : Fin r, ¬ ((a : ℕ) < q ↔ (c : ℕ) < q) → K a c = 0 := by
+  have hK0 : ∀ a c : Fin r, ¬((a : ℕ) < q ↔ (c : ℕ) < q) → K a c = 0 := by
     intro a c hac
     simp only [K, K0, Matrix.of_apply]
     split_ifs <;> tauto
-  have hlat : ∀ v ∈ X.Λ, ∀ a, locPer τ X.Gm q M' (Data.emb τ v) a =
-      (K *ᵥ locPer τ X.Gm q M (Data.emb τ v)) a := by
+  have hlat
+      : ∀ v ∈ X.Λ, ∀ a,
+        locPer τ X.Gm q M' (Data.emb τ v) a = (K *ᵥ locPer τ X.Gm q M (Data.emb τ v)) a := by
     intro v hv a
-    have e1 : (K *ᵥ locPer τ X.Gm q M (Data.emb τ v)) a =
-        ∑ n ∈ Finset.range (q + (r - q)), K0 a n * natPer τ X.Gm q M (Data.emb τ v) n := by
-      rw [Nat.add_sub_cancel' hq, ← Fin.sum_univ_eq_sum_range (fun n => K0 a n * natPer τ X.Gm q M (Data.emb τ v) n)]
+    have e1
+        : (K *ᵥ locPer τ X.Gm q M (Data.emb τ v)) a
+          = ∑ n ∈ Finset.range (q + (r - q)), K0 a n * natPer τ X.Gm q M (Data.emb τ v) n := by
+      rw [Nat.add_sub_cancel' hq,
+        ← Fin.sum_univ_eq_sum_range (fun n => K0 a n * natPer τ X.Gm q M (Data.emb τ v) n)]
       rw [Matrix.mulVec, dotProduct]
       refine Finset.sum_congr rfl fun c _ => ?_
       simp [natPer, K]
-    have e2 : locPer τ X.Gm q M' (Data.emb τ v) a = natPer τ X.Gm q M' (Data.emb τ v) a := by simp [natPer]
+    have e2 : locPer τ X.Gm q M' (Data.emb τ v) a = natPer τ X.Gm q M' (Data.emb τ v) a := by
+      simp [natPer]
     rw [e1, e2, Finset.sum_range_add]
     by_cases ha : (a : ℕ) < q
     · have := h2 (q - 1 - a) (by omega) v hv
       rw [show q - 1 - (q - 1 - a) = a by omega] at this
-      have z0 : ∑ j ∈ Finset.range (r - q), K0 a (q + j) * natPer τ X.Gm q M (Data.emb τ v) (q + j) = 0 :=
+      have z0
+          : ∑ j ∈ Finset.range (r - q), K0 a (q + j) * natPer τ X.Gm q M (Data.emb τ v) (q + j)
+            = 0 :=
         Finset.sum_eq_zero fun j _ => by simp [K0, ha]
       rw [this, ← Finset.sum_range_reflect, z0, add_zero]
       refine Finset.sum_congr rfl fun j hj => ?_
@@ -161,12 +188,18 @@ theorem loc_borel (X : Data E r) (τ : E →+* ℂ) (M M' : Matrix (Fin r) (Fin 
     intro u
     funext a
     rw [← sub_eq_zero]
-    refine eq_zero_of_lattice X τ (fun u => locPer τ X.Gm q M' u a - (K *ᵥ locPer τ X.Gm q M u) a)
-      (fun c => if (a : ℕ) < q then conj c else c) (fun u w => ?_) (fun c u => ?_)
-      (fun v hv => sub_eq_zero.2 (hlat v hv a)) u
+    refine eq_zero_of_lattice X τ
+      (fun u => locPer τ X.Gm q M' u a - (K *ᵥ locPer τ X.Gm q M u) a)
+      (fun c => if (a : ℕ) < q then conj c else c)
+      (fun u w => ?_)
+      (fun c u => ?_)
+      (fun v hv => sub_eq_zero.2 (hlat v hv a))
+      u
     · simp only [map_add (f := _), Matrix.mulVec_add, Pi.add_apply]; ring
-    · have hs : ∀ (N : Matrix (Fin r) (Fin r) ℂ) (e : Fin r), locPer τ X.Gm q N (c • u) e =
-          (if (e : ℕ) < q then conj c else c) * locPer τ X.Gm q N u e := by
+    · have hs
+          : ∀ (N : Matrix (Fin r) (Fin r) ℂ) (e : Fin r),
+            locPer τ X.Gm q N (c • u) e
+              = (if (e : ℕ) < q then conj c else c) * locPer τ X.Gm q N u e := by
         intro N e
         rw [locPer_apply, locPer_apply]
         split_ifs
@@ -184,7 +217,8 @@ theorem loc_borel (X : Data E r) (τ : E →+* ℂ) (M M' : Matrix (Fin r) (Fin 
     rw [hB, Matrix.det_mul, Matrix.det_nonsing_inv, Ring.inverse_eq_inv']
     exact mul_ne_zero (inv_ne_zero hM) hM'
   have hup : ∀ a c : Fin r, c < a → B a c = 0 := by
-    refine GlobalTheory.FibreFlag.upper_of_blocks q B hBd (fun a c hc hca => ?_) (fun a c hc hca => ?_)
+    refine
+      GlobalTheory.FibreFlag.upper_of_blocks q B hBd (fun a c hc hca => ?_) (fun a c hc hca => ?_)
     · rw [← c1 c a hc]
       rw [Fin.lt_def] at hca
       simp only [K, K0, Matrix.of_apply, if_pos hc]
@@ -221,33 +255,48 @@ theorem loc_borel (X : Data E r) (τ : E →+* ℂ) (M M' : Matrix (Fin r) (Fin 
     simp only [K, K0, Matrix.of_apply, if_pos ha] at e2
     rwa [show q - 1 - (a : ℕ) = i by simp only [a]; omega] at e2
 
-theorem borel_of_periods : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X X' : Data E r) (a : GL (Fin r) E) (h : IsMatch X X' a), ∀ (m : (E →+* ℂ) → ℕ), (∀ τ ∈ X.Ψ, m τ = r - X.p0) → (∀ τ ∉ X.Ψ, m τ = X.p0) → ∀ x ∈ X.dom, ∀ x' ∈ X'.dom, ∀ (A : (E →+* ℂ) → ℕ → ℕ → ℂ), (∀ τ i j, j < i → A τ i j = 0) → (∀ τ, ∀ i < m τ, ∀ v ∈ X.Λ, Formalism.L2.PjFree.perFr X' x' ((a : Matrix (Fin r) (Fin r) E) *ᵥ v) τ i = ∑ j ∈ Finset.range (m τ), A τ i j * Formalism.L2.PjFree.perFr X x v τ j) → ∃ b ∈ Bor X'.Ψ r, x' = rmul (lact a (castFr h.psi x)) b ∧ (IsUnitFr X x → IsUnitFr X' x' → (∀ τ i, ‖b τ i i‖ = 1) ∧ ∀ τ, ∀ i < m τ, ‖A τ i i‖ = 1) := by
+theorem borel_of_periods
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X X' : Data E r)
+        (a : GL (Fin r) E) (h : IsMatch X X' a),
+      ∀ (m : (E →+* ℂ) → ℕ),
+        (∀ τ ∈ X.Ψ, m τ = r - X.p0) → (∀ τ ∉ X.Ψ, m τ = X.p0)
+          → ∀ x ∈ X.dom, ∀ x' ∈ X'.dom, ∀ (A : (E →+* ℂ) → ℕ → ℕ → ℂ),
+            (∀ τ i j, j < i → A τ i j = 0)
+              → (∀ τ, ∀ i < m τ, ∀ v ∈ X.Λ,
+                Formalism.L2.PjFree.perFr X' x' ((a : Matrix (Fin r) (Fin r) E) *ᵥ v) τ i
+                  = ∑ j ∈ Finset.range (m τ), A τ i j * Formalism.L2.PjFree.perFr X x v τ j)
+              → ∃ b ∈ Bor X'.Ψ r,
+                x' = rmul (lact a (castFr h.psi x)) b
+                  ∧ (IsUnitFr X x → IsUnitFr X' x'
+                    → (∀ τ i, ‖b τ i i‖ = 1) ∧ ∀ τ, ∀ i < m τ, ‖A τ i i‖ = 1) := by
   intro E _ _ _ r X X' a h m hm1 hm2 x hx x' hx' A hA hper
   have hz := h.mem_dom hx
   set z := lact a (castFr h.psi x) with hzd
   have hlat : ∀ w ∈ X'.Λ, ∃ v ∈ X.Λ, (a : Matrix (Fin r) (Fin r) E) *ᵥ v = w := by
     intro w hw
-    have e : (a : Matrix (Fin r) (Fin r) E) *ᵥ (((a⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) *ᵥ w) = w := by
+    have e
+        : (a : Matrix (Fin r) (Fin r) E) *ᵥ (((a⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) *ᵥ w)
+          = w := by
       rw [Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec]
     exact ⟨_, (h.lat _).2 (by rw [e]; exact hw), e⟩
-  have hloc := fun τ : X'.Ψ => loc_borel X' τ.1 (mat z τ) (mat x' τ) (hz τ).1 (hx' τ).1 (A τ.1) (A (conjEmb τ.1))
-    (hA _) (hA _)
-    (fun i hi w hw => by
-      obtain ⟨v, hv, rfl⟩ := hlat w hw
-      have hm := hm1 τ.1 (h.mem τ)
-      rw [h.p0] at hm
-      rw [← perFr_mem X' x' _ τ.1 τ.2, hper τ.1 i (hm ▸ hi) v hv, hm]
-      refine Finset.sum_congr rfl fun j _ => ?_
-      rw [perFr_mem X x v τ.1 (h.mem τ), ← natPer_move h, h.p0]
-      rfl)
-    (fun i hi w hw => by
-      obtain ⟨v, hv, rfl⟩ := hlat w hw
-      have hm := hm2 _ (conjEmb_not_mem X (h.mem τ))
-      rw [h.p0] at hm
-      rw [← perFr_conj X' x' _ τ.1 τ.2 i hi, hper _ i (hm ▸ hi) v hv, hm]
-      refine Finset.sum_congr rfl fun j hj => ?_
-      rw [perFr_conj X x v τ.1 (h.mem τ) j (h.p0 ▸ Finset.mem_range.1 hj), ← natPer_move h, h.p0]
-      rfl)
+  have hloc := fun τ : X'.Ψ =>
+    loc_borel X' τ.1 (mat z τ) (mat x' τ) (hz τ).1 (hx' τ).1 (A τ.1) (A (conjEmb τ.1)) (hA _) (hA _)
+      (fun i hi w hw => by
+        obtain ⟨v, hv, rfl⟩ := hlat w hw
+        have hm := hm1 τ.1 (h.mem τ)
+        rw [h.p0] at hm
+        rw [← perFr_mem X' x' _ τ.1 τ.2, hper τ.1 i (hm ▸ hi) v hv, hm]
+        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [perFr_mem X x v τ.1 (h.mem τ), ← natPer_move h, h.p0]
+        rfl)
+      (fun i hi w hw => by
+        obtain ⟨v, hv, rfl⟩ := hlat w hw
+        have hm := hm2 _ (conjEmb_not_mem X (h.mem τ))
+        rw [h.p0] at hm
+        rw [← perFr_conj X' x' _ τ.1 τ.2 i hi, hper _ i (hm ▸ hi) v hv, hm]
+        refine Finset.sum_congr rfl fun j hj => ?_
+        rw [perFr_conj X x v τ.1 (h.mem τ) j (h.p0 ▸ Finset.mem_range.1 hj), ← natPer_move h, h.p0]
+        rfl)
   let b : Frame X'.Ψ r := fun τ => ((mat z τ)⁻¹ * mat x' τ : Matrix (Fin r) (Fin r) ℂ)
   have hb : b ∈ Bor X'.Ψ r := fun τ => by
     refine ⟨?_, (hloc τ).1⟩
@@ -256,12 +305,14 @@ theorem borel_of_periods : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
     exact mul_ne_zero (inv_ne_zero (hz τ).1) (hx' τ).1
   have hxb : x' = rmul z b := by
     funext τ
-    exact (Matrix.mul_nonsing_inv_cancel_left (mat z τ) (mat x' τ) (isUnit_iff_ne_zero.2 (hz τ).1)).symm
+    exact (Matrix.mul_nonsing_inv_cancel_left (mat z τ) (mat x' τ)
+      (isUnit_iff_ne_zero.2 (hz τ).1)).symm
   refine ⟨b, hb, hxb, fun hu hu' => ?_⟩
   have hbd : ∀ τ i, ‖b τ i i‖ = 1 := by
     intro τ i
     have e := FrameDegreeData.ratio_rmul X' z hz hb τ i
-    rw [← hxb, norm_div, norm_div, hu', hu', hzd, h.dmin_eq, h.dmin_eq, hu, hu, div_one, mul_one] at e
+    rw [← hxb, norm_div, norm_div, hu', hu', hzd, h.dmin_eq, h.dmin_eq, hu, hu, div_one, mul_one]
+      at e
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).1 e.symm
   refine ⟨hbd, fun τ i hi => ?_⟩
   by_cases hτ : τ ∈ X.Ψ

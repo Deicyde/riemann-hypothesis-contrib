@@ -21,8 +21,9 @@ theorem DominatingDVR.closed : DominatingDVR.Statement :=
     (KrullAkizuki.proof (KrullAkizukiQuotientLength.proof TorsionFreeQuotientLength.proof))
     BlowUpChart.proof
 
-theorem not_isField_stalk_of_ne_genericPoint (Z : Scheme.{0}) [IsIntegral Z] (z : Z)
-    (hz : z ≠ genericPoint Z) : ¬ IsField (Z.presheaf.stalk z) := by
+theorem not_isField_stalk_of_ne_genericPoint
+    (Z : Scheme.{0}) [IsIntegral Z] (z : Z) (hz : z ≠ genericPoint Z)
+    : ¬ IsField (Z.presheaf.stalk z) := by
   intro hF
   have hgen : genericPoint Z ⤳ z := (genericPoint_spec Z).specializes trivial
   have hmem : genericPoint Z ∈ Set.range (Z.fromSpecStalk z) := by

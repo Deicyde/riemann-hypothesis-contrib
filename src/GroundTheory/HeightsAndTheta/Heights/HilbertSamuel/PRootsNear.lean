@@ -11,9 +11,9 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 open MvPolynomial Filter Topology
 
-theorem RootsNear.pow_card_le_norm_prod (s : Multiset ℂ) (t₀ : ℂ) {ε : ℝ} (hε : 0 ≤ ε)
-    (h : ∀ a ∈ s, ε ≤ dist a t₀) :
-    ε ^ Multiset.card s ≤ ‖(s.map fun a => t₀ - a).prod‖ := by
+theorem RootsNear.pow_card_le_norm_prod
+    (s : Multiset ℂ) (t₀ : ℂ) {ε : ℝ} (hε : 0 ≤ ε) (h : ∀ a ∈ s, ε ≤ dist a t₀)
+    : ε ^ Multiset.card s ≤ ‖(s.map fun a => t₀ - a).prod‖ := by
   induction s using Multiset.induction_on with
   | empty => simp
   | cons a s ih =>
@@ -23,12 +23,12 @@ theorem RootsNear.pow_card_le_norm_prod (s : Multiset ℂ) (t₀ : ℂ) {ε : �
     have h2 := ih (fun b hb => h b (Multiset.mem_cons_of_mem hb))
     exact mul_le_mul h1 h2 (pow_nonneg hε _) (norm_nonneg _)
 
-theorem RootsNear.continuous_eval₂ {e : ℕ} (G : Polynomial (MvPolynomial (Fin e) ℚ)) (t : ℂ) :
-    Continuous fun y : Fin e → ℂ => G.eval₂ (aeval y).toRingHom t := by
+theorem RootsNear.continuous_eval₂ {e : ℕ} (G : Polynomial (MvPolynomial (Fin e) ℚ)) (t : ℂ)
+    : Continuous fun y : Fin e → ℂ => G.eval₂ (aeval y).toRingHom t := by
   simp only [Polynomial.eval₂_eq_sum_range]
   refine continuous_finsetSum _ fun i _ => Continuous.mul ?_ continuous_const
-  have : (fun y : Fin e → ℂ => (aeval y).toRingHom (G.coeff i)) =
-      fun y => eval y (MvPolynomial.map (algebraMap ℚ ℂ) (G.coeff i)) := by
+  have : (fun y : Fin e → ℂ => (aeval y).toRingHom (G.coeff i))
+      = fun y => eval y (MvPolynomial.map (algebraMap ℚ ℂ) (G.coeff i)) := by
     funext y
     simp [MvPolynomial.eval_map, MvPolynomial.aeval_def]
   rw [this]
@@ -56,11 +56,12 @@ theorem RootsNear.proof : RootsNear.Statement := by
     apply Multiset.map_congr rfl
     intro a _
     simp
-  have hle := RootsNear.pow_card_le_norm_prod p.roots t₀ hε.le (fun a ha => by
-    have ha' : p.eval₂ (RingHom.id ℂ) a = 0 := by
-      rw [Polynomial.eval₂_id]; exact (Polynomial.mem_roots hpm.ne_zero).1 ha
-    have := hno a (by rw [hp, Polynomial.eval₂_map] at ha'; simpa using ha')
-    exact this)
+  have hle :=
+    RootsNear.pow_card_le_norm_prod p.roots t₀ hε.le (fun a ha => by
+      have ha' : p.eval₂ (RingHom.id ℂ) a = 0 := by
+        rw [Polynomial.eval₂_id]; exact (Polynomial.mem_roots hpm.ne_zero).1 ha
+      have := hno a (by rw [hp, Polynomial.eval₂_map] at ha'; simpa using ha')
+      exact this)
   rw [hcard, hdeg, ← hev] at hle
   exact absurd hy (not_lt.2 hle)
 

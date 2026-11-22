@@ -18,28 +18,33 @@ noncomputable section
 
 namespace Formalism.RepresentationBoundsCohomology.ringDataObjects
 
-open Formalism.NG Formalism.TruncatedSeriesCounting.TruncatedSeriesCountingIdentities Formalism.RepresentationBoundsCohomology.BR
+open Formalism.NG Formalism.TruncatedSeriesCounting.TruncatedSeriesCountingIdentities
+  Formalism.RepresentationBoundsCohomology.BR
 
 theorem bcSpan : StatBcSpan := by
   intro O O' _ _ _ X T
   let φ : (X → O) →+* (X → O') := (algebraMap O O').compLeft X
-  have h1 : ((fun f : X → O => algebraMap O O' ∘ f) '' (T : Set (X → O))) =
-      ((T.toSubsemiring.toSubmonoid.map φ.toMonoidHom : Submonoid (X → O')) : Set (X → O')) := rfl
+  have h1
+      : ((fun f : X → O => algebraMap O O' ∘ f) '' (T : Set (X → O)))
+        = ((T.toSubsemiring.toSubmonoid.map φ.toMonoidHom : Submonoid (X → O')) : Set (X → O')) :=
+    rfl
   have h2 := Algebra.adjoin_eq_span O' ((fun f : X → O => algebraMap O O' ∘ f) '' (T : Set (X → O)))
   have h3 : (bcT O' T : Set (X → O')) = (Subalgebra.toSubmodule (bcT O' T) : Set (X → O')) := rfl
   rw [h3]
   unfold bcT
   rw [h2, h1, Submonoid.closure_eq]
 
-theorem mem_bcT {O : Type} (O' : Type) [CommRing O] [CommRing O'] [Algebra O O'] {X : Type}
-    (T : Subalgebra O (X → O)) {f : X → O} (hf : f ∈ T) :
-    (fun x => algebraMap O O' (f x)) ∈ bcT O' T :=
+theorem mem_bcT
+    {O : Type} (O' : Type) [CommRing O] [CommRing O'] [Algebra O O']
+    {X : Type} (T : Subalgebra O (X → O))
+    {f : X → O} (hf : f ∈ T)
+    : (fun x => algebraMap O O' (f x)) ∈ bcT O' T :=
   Algebra.subset_adjoin ⟨f, hf, rfl⟩
 
 theorem bcLocal : StatBcLocal := by
   intro O O' _ _ _ _ _ _ X _ _ T hT
-  have hres : ∀ f ∈ bcT O' T, ∀ x y : X,
-      IsLocalRing.residue O' (f x) = IsLocalRing.residue O' (f y) := by
+  have hres
+      : ∀ f ∈ bcT O' T, ∀ x y : X, IsLocalRing.residue O' (f x) = IsLocalRing.residue O' (f y) := by
     intro f hf x y
     induction hf using Algebra.adjoin_induction with
     | mem f hf =>
@@ -72,9 +77,12 @@ theorem bcLocal : StatBcLocal := by
   · exact Or.inl (hunit a h)
   · exact Or.inr (hunit (1 - a) h)
 
-theorem absIrr_of_span {k : Type} [Field k] {n : Type} [Fintype n] [DecidableEq n] {G : Type}
-    (ρ : G → Matrix n n k) (h : ∀ i j, Matrix.single i j (1 : k) ∈ Submodule.span k (Set.range ρ)) :
-    AbsIrr ρ := by
+theorem absIrr_of_span
+    {k : Type} [Field k]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {G : Type}
+    (ρ : G → Matrix n n k) (h : ∀ i j, Matrix.single i j (1 : k) ∈ Submodule.span k (Set.range ρ))
+    : AbsIrr ρ := by
   constructor
   · intro W hW
     have hall : ∀ A ∈ Submodule.span k (Set.range ρ), ∀ v ∈ W, A.mulVec v ∈ W := by
@@ -115,8 +123,8 @@ theorem absIrr_of_span {k : Type} [Field k] {n : Type} [Fintype n] [DecidableEq 
       | zero => simp
       | add A B _ _ hA hB => rw [mul_add, add_mul, hA, hB]
       | smul c A _ hA => rw [Matrix.mul_smul, Matrix.smul_mul, hA]
-    obtain ⟨c, hc⟩ := Matrix.mem_range_scalar_iff_commute_single'.mpr
-      (fun i j => (hall _ (h i j)).symm)
+    obtain ⟨c, hc⟩ :=
+      Matrix.mem_range_scalar_iff_commute_single'.mpr (fun i j => (hall _ (h i j)).symm)
     exact ⟨c, by rw [← hc, Matrix.scalar_apply, Matrix.smul_one_eq_diagonal]⟩
 
 theorem absIrrExt : StatAbsIrrExt := by
@@ -124,17 +132,18 @@ theorem absIrrExt : StatAbsIrrExt := by
   rcases isEmpty_or_nonempty n with hn | hn
   · exact ⟨fun W _ => Or.inl (Subsingleton.elim _ _), fun M _ => ⟨0, Subsingleton.elim _ _⟩⟩
   have hspan := burnsideMat k n G ρ hρ
-  have hmap : ∀ A ∈ Submodule.span k (Set.range ρ),
-      A.map f ∈ Submodule.span k' (Set.range fun g => (ρ g).map f) := by
+  have hmap
+      : ∀ A ∈ Submodule.span k (Set.range ρ),
+        A.map f ∈ Submodule.span k' (Set.range fun g => (ρ g).map f) := by
     intro A hA
     induction hA using Submodule.span_induction with
     | mem A hA => obtain ⟨g, rfl⟩ := hA; exact Submodule.subset_span ⟨g, rfl⟩
     | zero => rw [Matrix.map_zero f f.map_zero]; exact Submodule.zero_mem _
     | add A B _ _ hA hB => rw [Matrix.map_add f f.map_add]; exact Submodule.add_mem _ hA hB
     | smul c A _ hA =>
-      have h1 : (c • A).map f = f c • A.map f := by
-        ext i j; simp
-      rw [h1]; exact Submodule.smul_mem _ _ hA
+      have h1 : (c • A).map f = f c • A.map f := by ext i j; simp
+      rw [h1]
+      exact Submodule.smul_mem _ _ hA
   refine absIrr_of_span _ fun i j => ?_
   have h1 := hmap (Matrix.single i j (1 : k)) (hspan ▸ Submodule.mem_top)
   have h2 : (Matrix.single i j (1 : k)).map f = Matrix.single i j (1 : k') := by
@@ -153,13 +162,16 @@ theorem bcSplit : StatBcSplit := by
   have hcard : Fintype.card S = t := by
     rw [← hrk, ← hUW]
     apply le_antisymm
-    · calc Fintype.card S = (1 : Matrix S S K).rank := (Matrix.rank_one).symm
+    · calc
+        Fintype.card S
+          = (1 : Matrix S S K).rank := (Matrix.rank_one).symm
         _ = (W * (U * W) * U).rank := by
-            rw [Matrix.mul_assoc, Matrix.mul_assoc, hWU, Matrix.mul_one, hWU]
+          rw [Matrix.mul_assoc, Matrix.mul_assoc, hWU, Matrix.mul_one, hWU]
         _ ≤ (U * W).rank := (Matrix.rank_mul_le_left _ _).trans (Matrix.rank_mul_le_right _ _)
     · exact (Matrix.rank_mul_le_left _ _).trans (Matrix.rank_le_card_width U)
   have ha : a = U * (W * a * U) * W := by
-    calc a = e * a * e := by rw [hea, hae]
+    calc
+      a = e * a * e := by rw [hea, hae]
       _ = _ := by rw [← hUW]; simp only [Matrix.mul_assoc]
   have hpoly : blockPoly e a = (W * a * U).charpoly := by
     conv_lhs => rw [ha, ← hUW]
@@ -179,32 +191,43 @@ theorem bcSplit : StatBcSplit := by
   conv_lhs => rw [hspl.eq_prod_roots_of_monic hmon]
   rw [Finset.prod, Multiset.toFinset_val, Multiset.dedup_eq_self.mpr hnd]
 
-theorem bcM_mem {O : Type} (O' : Type) [CommRing O] [CommRing O'] [Algebra O O'] {X d G : Type} [Fintype d]
-    [DecidableEq d] [Group G] (T : Subalgebra O (X → O)) (r : G →* (X → Matrix d d O))
-    {a : X → Matrix d d O} (ha : a ∈ tSpan T r) : bcM O' a ∈ tSpan (bcT O' T) (bcR O' r) := by
+theorem bcM_mem
+    {O : Type} (O' : Type) [CommRing O] [CommRing O'] [Algebra O O']
+    {X d G : Type} [Fintype d] [DecidableEq d] [Group G]
+    (T : Subalgebra O (X → O)) (r : G →* (X → Matrix d d O))
+    {a : X → Matrix d d O} (ha : a ∈ tSpan T r)
+    : bcM O' a ∈ tSpan (bcT O' T) (bcR O' r) := by
   obtain ⟨S, c, hc, rfl⟩ := ha
   refine ⟨S, fun g x => algebraMap O O' (c g x), fun g => mem_bcT O' T (hc g), ?_⟩
-  funext x; ext i j
+  funext x
+  ext i j
   simp [bcM, bcR, Finset.sum_apply, Matrix.sum_apply]
   exact Finset.sum_congr rfl fun g _ => (Algebra.smul_def _ _).symm
 
-theorem bcM_mul {O : Type} (O' : Type) [CommRing O] [CommRing O'] [Algebra O O'] {X d : Type} [Fintype d]
-    (a b : X → Matrix d d O) : bcM O' (a * b) = bcM O' a * bcM O' b := by
+theorem bcM_mul
+    {O : Type} (O' : Type) [CommRing O] [CommRing O'] [Algebra O O']
+    {X d : Type} [Fintype d]
+    (a b : X → Matrix d d O)
+    : bcM O' (a * b) = bcM O' a * bcM O' b := by
   funext x
   simp [bcM, Matrix.map_mul]
 
-theorem sep_ext {O : Type} [CommRing O] [IsDomain O] {F : Type} [Field F] (f : O →+* F)
-    (hf : Function.Injective f) (P : Polynomial O)
-    (h : (P.map (algebraMap O (FractionRing O))).Separable) : (P.map f).Separable := by
-  have hκ : (IsFractionRing.lift hf : FractionRing O →+* F).comp (algebraMap O (FractionRing O)) = f :=
+theorem sep_ext
+    {O : Type} [CommRing O] [IsDomain O]
+    {F : Type} [Field F]
+    (f : O →+* F) (hf : Function.Injective f)
+    (P : Polynomial O) (h : (P.map (algebraMap O (FractionRing O))).Separable)
+    : (P.map f).Separable := by
+  have hκ
+      : (IsFractionRing.lift hf : FractionRing O →+* F).comp (algebraMap O (FractionRing O)) = f :=
     RingHom.ext (IsFractionRing.lift_algebraMap hf)
   rw [← hκ, ← Polynomial.map_map, Polynomial.separable_map]
   exact h
 
 set_option maxHeartbeats 1000000 in
 theorem stageC : StatStageC := by
-  intro O O' _ _ _ _ _ _ _ _ _ e he X _ T d _ _ G _ r π t bl χ₁ ε hP hA eB e₁ hI g₀ s hsm hes hse hsπ
-    hsep hspl
+  intro O O' _ _ _ _ _ _ _ _ _ e he X _ T d _ _ G _ r π t bl χ₁ ε hP hA eB e₁ hI g₀ s hsm hes hse
+    hsπ hsep hspl
   obtain ⟨hloc, hpts, hG1, hbd, hc1, hχ⟩ := hP
   obtain ⟨heBm, he1m, heBB, he11, heB1, he1B, hrkB, hrk1, heBπ, he1π⟩ := hI
   let j : O →+* O' := algebraMap O O'
@@ -214,14 +237,20 @@ theorem stageC : StatStageC := by
   let ι' : O' →+* FractionRing O' := algebraMap O' (FractionRing O')
   have hι' : Function.Injective ι' := IsFractionRing.injective O' (FractionRing O')
   have : Nonempty X := ⟨π⟩
-  refine ⟨⟨bcLocal O O' X T hloc, ?_, ?_, ?_, hc1, ?_⟩, ?_, ⟨bcM_mem O' T r heBm, bcM_mem O' T r he1m,
-    ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩, ⟨bcM_mem O' T r hsm, ?_, ?_, ?_, ?_⟩, ?_⟩
+  refine ⟨
+    ⟨bcLocal O O' X T hloc, ?_, ?_, ?_, hc1, ?_⟩,
+    ?_,
+    ⟨bcM_mem O' T r heBm, bcM_mem O' T r he1m, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩,
+    ⟨bcM_mem O' T r hsm, ?_, ?_, ?_, ?_⟩,
+    ?_
+  ⟩
   · intro x y hxy
     obtain ⟨f, hf, hne⟩ := hpts x y hxy
     exact ⟨_, mem_bcT O' T hf, fun h => hne (hj h)⟩
   · intro g k
-    have h1 : (fun x => (Matrix.charpolyRev (bcR O' r g x)).coeff k) =
-        fun x => algebraMap O O' ((Matrix.charpolyRev (r g x)).coeff k) := by
+    have h1
+        : (fun x => (Matrix.charpolyRev (bcR O' r g x)).coeff k)
+          = fun x => algebraMap O O' ((Matrix.charpolyRev (r g x)).coeff k) := by
       funext x
       show (Matrix.charpolyRev ((r g x).map j)).coeff k = _
       rw [← charpolyRev_map, Polynomial.coeff_map]
@@ -234,18 +263,17 @@ theorem stageC : StatStageC := by
     show j (r g π a a) = _
     rw [hχ g a ha, map_mul]
     simp [bcChar, j]
-  ·
-    let ρ0 : G →* Matrix {a // bl a = 0} {a // bl a = 0} (IsLocalRing.ResidueField O) :=
-      { toFun := fun g => ((r g π).toSquareBlock bl 0).map (IsLocalRing.residue O)
-        map_one' := by
-          rw [map_one]
-          ext a b
-          by_cases h : a = b
-          · subst h; simp [Matrix.toSquareBlock_def]
-          · have h' : a.1 ≠ b.1 := fun e => h (Subtype.ext e)
-            simp [Matrix.toSquareBlock_def, Matrix.one_apply, h, h']
-        map_mul' := fun g h => by
-          rw [map_mul, Pi.mul_apply, blk_mul bl (hbd g) 0, Matrix.map_mul] }
+  · let ρ0 : G →* Matrix {a // bl a = 0} {a // bl a = 0} (IsLocalRing.ResidueField O) := {
+      toFun := fun g => ((r g π).toSquareBlock bl 0).map (IsLocalRing.residue O)
+      map_one' := by
+        rw [map_one]
+        ext a b
+        by_cases h : a = b
+        · subst h; simp [Matrix.toSquareBlock_def]
+        · have h' : a.1 ≠ b.1 := fun e => h (Subtype.ext e)
+          simp [Matrix.toSquareBlock_def, Matrix.one_apply, h, h']
+      map_mul' := fun g h => by rw [map_mul, Pi.mul_apply, blk_mul bl (hbd g) 0, Matrix.map_mul]
+    }
     exact absIrrExt _ _ (IsLocalRing.ResidueField.map (algebraMap O O')) _ G ρ0 hA
   · rw [← bcM_mul, heBB]
   · rw [← bcM_mul, he11]
@@ -271,14 +299,17 @@ theorem stageC : StatStageC := by
   · rw [← bcM_mul, hes]
   · rw [← bcM_mul, hse]
   · show (s π).map j = 0
-    rw [hsπ]; ext a b; simp
+    rw [hsπ]
+    ext a b
+    simp
   · intro x
     let X0 : Matrix d d O := eB x * r g₀ x * eB x + s x
     have hX0 : (bcM O' eB x * bcR O' r g₀ x * bcM O' eB x + bcM O' s x) = X0.map j := by
       show (eB x).map j * (r g₀ x).map j * (eB x).map j + (s x).map j = _
       rw [← Matrix.map_mul, ← Matrix.map_mul, ← Matrix.map_add j j.map_add]
-    have hpoly : blockPoly ((bcM O' eB x).map ι') ((X0.map j).map ι') =
-        (blockPoly (eB x) X0).map (ι'.comp j) := by
+    have hpoly
+        : blockPoly ((bcM O' eB x).map ι') ((X0.map j).map ι')
+          = (blockPoly (eB x) X0).map (ι'.comp j) := by
       show blockPoly (((eB x).map j).map ι') _ = _
       rw [Matrix.map_map, Matrix.map_map]
       exact (blockPoly_map (ι'.comp j) _ _).symm
@@ -287,8 +318,9 @@ theorem stageC : StatStageC := by
       refine sep_ext _ hinj _ ?_
       rw [blockPoly_map]
       exact hsep x
-    have hmm : ∀ u v w : Matrix d d O, u * v = w →
-        (u.map j).map ι' * (v.map j).map ι' = (w.map j).map ι' := by
+    have hmm
+        : ∀ u v w : Matrix d d O,
+          u * v = w → (u.map j).map ι' * (v.map j).map ι' = (w.map j).map ι' := by
       intro u v w h
       rw [← Matrix.map_mul, ← Matrix.map_mul, h]
     have hbb : eB x * eB x = eB x := congrFun heBB x
@@ -304,24 +336,30 @@ theorem stageC : StatStageC := by
       show (((eB x).map j).map ι').rank = t
       rw [Matrix.map_map, ← hrkB x]
       exact bcRank O _ _ ι (ι'.comp j) d (eB x) (congrFun heBB x)
-    obtain ⟨-, -, h3⟩ := bcSplit (FractionRing O') d ((bcM O' eB x).map ι') ((X0.map j).map ι') t
-      (hmm _ _ _ (congrFun heBB x)) (hmm _ _ _ heX0) (hmm _ _ _ hX0e) hrk
+    obtain ⟨-, -, h3⟩ :=
+      bcSplit (FractionRing O') d ((bcM O' eB x).map ι') ((X0.map j).map ι') t
+        (hmm _ _ _ (congrFun heBB x)) (hmm _ _ _ heX0) (hmm _ _ _ hX0e) hrk
     rw [hX0]
     exact h3 (hpoly ▸ hsep') (hpoly ▸ hspl x)
   · intro Z
     exact vccBaseChange O O' e he X T (bcT O' T) (bcSpan O O' X T) Z π
 
-theorem deltaO_eq {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {X d G : Type}
-    [Fintype d] [DecidableEq d] [Group G] {t : ℕ} {bl : d → Fin (t + 1)} {T : Subalgebra O (X → O)}
-    {r₀ : G →* (X → Matrix d d O)} {π : X} {χ₁ ε : G →* Oˣ} {g₀ : G} {eB e₁ s : X → Matrix d d O}
-    {D : RingData O X d G t bl} (hD : RingDef O T r₀ π χ₁ ε g₀ eB e₁ s D) :
-    D.δO = ∏ i ∈ Finset.Ioo 0 t, ((χ₁ g₀ : O) - (χ₁ g₀ : O) * (((ε g₀)⁻¹ ^ i : Oˣ) : O)) := by
+theorem deltaO_eq
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {X d G : Type} [Fintype d] [DecidableEq d] [Group G]
+    {t : ℕ} {bl : d → Fin (t + 1)} {T : Subalgebra O (X → O)} {r₀ : G →* (X → Matrix d d O)} {π : X}
+    {χ₁ ε : G →* Oˣ} {g₀ : G} {eB e₁ s : X → Matrix d d O} {D : RingData O X d G t bl}
+    (hD : RingDef O T r₀ π χ₁ ε g₀ eB e₁ s D)
+    : D.δO = ∏ i ∈ Finset.Ioo 0 t, ((χ₁ g₀ : O) - (χ₁ g₀ : O) * (((ε g₀)⁻¹ ^ i : Oˣ) : O)) := by
   obtain ⟨-, -, -, -, -, hrr, -⟩ := hD
-  have h2 : D.δO = ∏ i ∈ Finset.Ioo 0 t,
-      ((D.rr 0 : D.X' → O) D.π' - (D.rr i : D.X' → O) D.π') := by
+  have h2
+      : D.δO
+        = ∏ i ∈ Finset.Ioo 0 t,
+          ((D.rr 0 : D.X' → O) D.π' - (D.rr i : D.X' → O) D.π') := by
     show ((Pi.evalRingHom (fun _ : D.X' => O) D.π').comp D.T'.val.toRingHom) D.δ = _
     unfold RingData.δ
-    rw [map_prod]; rfl
+    rw [map_prod]
+    rfl
   rw [h2]
   refine Finset.prod_congr rfl fun i hi => ?_
   rw [Finset.mem_Ioo] at hi

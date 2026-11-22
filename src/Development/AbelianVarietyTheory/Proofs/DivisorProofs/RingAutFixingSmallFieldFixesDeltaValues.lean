@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TwistCh
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions Formalism.IndefR.Links Formalism.L2.Host GlobalTheory.SeriesTie
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions Formalism.IndefR.Links Formalism.L2.Host
+  GlobalTheory.SeriesTie
 open GlobalTheory.HeckeGal (Gab toAb IsGlobalArtin)
 open Formalism.L2.JoinChr (IsPlIdem locE)
 
@@ -18,11 +20,24 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.DeltaFixed
 
-theorem aut_fixes_delta_values : ∀ {D : D7} (ρ : Setup D.ntw), ρ.Good → ∀ (i : D.ntw.Tw) (j : Fin D.R.m) (b : Bool) (χ : HChar D.host.E),
-    ChrEq (ρ.B i j b).de.chi χ → χ.ValuesIn 0 (embLL0 D) → ∀ τ : ℂ ≃+* ℂ, (∀ y, τ (embLL0 D y) = embLL0 D y) →
-    ∀ σ, τ (ρ.eO i b (algebraMap (D.ntw.O0 i) (D.ntw.O i)
-        ((Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i) σ : (D.ntw.O0 i)ˣ) : D.ntw.O0 i))) =
-      ρ.eO i b (algebraMap (D.ntw.O0 i) (D.ntw.O i) ((Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i) σ : (D.ntw.O0 i)ˣ) : D.ntw.O0 i)) := by
+theorem aut_fixes_delta_values
+    : ∀ {D : D7} (ρ : Setup D.ntw),
+      ρ.Good
+        → ∀ (i : D.ntw.Tw) (j : Fin D.R.m) (b : Bool) (χ : HChar D.host.E),
+          ChrEq (ρ.B i j b).de.chi χ → χ.ValuesIn 0 (embLL0 D)
+            → ∀ τ : ℂ ≃+* ℂ,
+              (∀ y, τ (embLL0 D y) = embLL0 D y)
+                → ∀ σ,
+                  τ (ρ.eO i b
+                      (algebraMap (D.ntw.O0 i) (D.ntw.O i)
+                        ((Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i) σ
+                            : (D.ntw.O0 i)ˣ)
+                          : D.ntw.O0 i)))
+                    = ρ.eO i b
+                      (algebraMap (D.ntw.O0 i) (D.ntw.O i)
+                        ((Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i) σ
+                            : (D.ntw.O0 i)ˣ)
+                          : D.ntw.O0 i)) := by
   intro D ρ hρ i j b χ hχ hval τ hτ σ
   set ψ := Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (D.ntw.delta i) with hψ
   set f : D.ntw.O0 i →+* ℂ := (ρ.eO i b).comp (algebraMap (D.ntw.O0 i) (D.ntw.O i)) with hf
@@ -36,7 +51,11 @@ theorem aut_fixes_delta_values : ∀ {D : D7} (ρ : Setup D.ntw), ρ.Good → �
       exact D.ntw.delta_open i
     · simpa [hψ, Formalism.MainNotions.BlochKatoReduction.Gen.psiAt] using D.ntw.delta_open i
 
-  have hram : ∀ v, v ∉ D.ntw.pD i → ∀ A : ValuationSubring D.nd.Om, IsPlaceOver A v → ∀ g ∈ Ine (F := D.host.E) A, ψ g = 1 := by
+  have hram
+      : ∀ v,
+        v ∉ D.ntw.pD i
+          → ∀ A : ValuationSubring D.nd.Om,
+            IsPlaceOver A v → ∀ g ∈ Ine (F := D.host.E) A, ψ g = 1 := by
     intro v hv A hA g hg
     have h1 : D.ntw.delta i g = 1 := by
       by_contra h
@@ -56,8 +75,11 @@ theorem aut_fixes_delta_values : ∀ {D : D7} (ρ : Setup D.ntw), ρ.Good → �
 
   let r' : G D.host.E D.nd.Om →* ℂˣ := (Units.map f.toMonoidHom).comp ψ
   let r : G D.host.E D.nd.Om →* ℂˣ := (Units.map ((τ : ℂ →+* ℂ).comp f).toMonoidHom).comp ψ
-  have hr' : Continuous r' := GlobalTheory.DeltaGal.continuous_comp_of_isOpen_ker ψ hker (Units.map f.toMonoidHom)
-  have hr : Continuous r := GlobalTheory.DeltaGal.continuous_comp_of_isOpen_ker ψ hker (Units.map ((τ : ℂ →+* ℂ).comp f).toMonoidHom)
+  have hr' : Continuous r' :=
+    GlobalTheory.DeltaGal.continuous_comp_of_isOpen_ker ψ hker (Units.map f.toMonoidHom)
+  have hr : Continuous r :=
+    GlobalTheory.DeltaGal.continuous_comp_of_isOpen_ker ψ hker
+      (Units.map ((τ : ℂ →+* ℂ).comp f).toMonoidHom)
   have hart : IsGlobalArtin ρ.rc.art := hρ.rc.artin
   obtain ⟨_, _, _, _, hidem, _⟩ := GlobalTheory.EtaProduct.exists_ev D
   have key : r = r' := by

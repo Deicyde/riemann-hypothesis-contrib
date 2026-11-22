@@ -41,7 +41,9 @@ structure Chain (Λ A B K : Type) [CommRing Λ] [CommRing A] [CommRing B] [Field
   b : ∀ j, Z j →ₛₗ[ι] W j
   μ : ∀ j, V j →ₛₗ[o] W j
 
-attribute [instance] Chain.sab Chain.smd Chain.znab Chain.znmd Chain.zab Chain.zmd Chain.wab Chain.wmd Chain.vab Chain.vmd
+attribute [instance]
+  Chain.sab Chain.smd Chain.znab Chain.znmd Chain.zab Chain.zmd Chain.wab Chain.wmd Chain.vab
+  Chain.vmd
 
 variable {Λ A B K : Type} [CommRing Λ] [CommRing A] [CommRing B] [Field K]
 
@@ -54,22 +56,28 @@ def Comp {j : ℕ} (x : ∀ n, C.S n j) : Prop := ∀ n, C.tS n j (x (n + 1)) = 
 structure Good : Prop where
   unit : IsUnit (C.ℓ : B)
   fin : ∀ j, FiniteDimensional K (C.V j)
-  basis : ∀ (j : ℕ) {m : ℕ} (bs : Module.Basis (Fin m) K (C.V j)) (w : C.W j),
-    ∃! g : Fin m → B, w = ∑ s, g s • C.μ j (bs s)
+  basis
+    : ∀ (j : ℕ) {m : ℕ} (bs : Module.Basis (Fin m) K (C.V j)) (w : C.W j),
+      ∃! g : Fin m → B, w = ∑ s, g s • C.μ j (bs s)
   r_tr : ∀ n j (x : C.S (n + 1) j), C.tZ n j (C.r (n + 1) j x) = C.r n j (C.tS n j x)
   red_tr : ∀ n j (z : C.Z j), C.tZ n j (C.red (n + 1) j z) = C.red n j z
-  lift : ∀ j (x : ∀ n, C.S n j), C.Comp x → ∃ (e : ℕ) (z : C.Z j), ∀ n, C.red n j z = ((C.ℓ : A) ^ e) • C.r n j (x n)
+  lift
+    : ∀ j (x : ∀ n, C.S n j),
+      C.Comp x → ∃ (e : ℕ) (z : C.Z j), ∀ n, C.red n j z = ((C.ℓ : A) ^ e) • C.r n j (x n)
   sep : ∀ j (z : C.Z j), (∀ n, C.red n j z = 0) → C.b j z = 0
 
 def Rho {j : ℕ} (x : ∀ n, C.S n j) (f : Module.Dual K (C.V j) →+ B) : Prop :=
-  (∀ (k : K) (φ : Module.Dual K (C.V j)), f (k • φ) = C.o k * f φ) ∧
-  ∃ (e : ℕ) (z : C.Z j), (∀ n, C.red n j z = ((C.ℓ : A) ^ e) • C.r n j (x n)) ∧
-    ∀ {m : ℕ} (bs : Module.Basis (Fin m) K (C.V j)), ((C.ℓ : B) ^ e) • ∑ s, f (bs.coord s) • C.μ j (bs s) = C.b j z
+  (∀ (k : K) (φ : Module.Dual K (C.V j)), f (k • φ) = C.o k * f φ)
+    ∧ ∃ (e : ℕ) (z : C.Z j),
+      (∀ n, C.red n j z = ((C.ℓ : A) ^ e) • C.r n j (x n))
+        ∧ ∀ {m : ℕ} (bs : Module.Basis (Fin m) K (C.V j)),
+          ((C.ℓ : B) ^ e) • ∑ s, f (bs.coord s) • C.μ j (bs s) = C.b j z
 
 end Chain
 
-structure Hom {Λ' A' B' : Type} [CommRing Λ'] [CommRing A'] [CommRing B'] (C : Chain.{u} Λ A B K)
-    (C' : Chain.{u} Λ' A' B' K) where
+structure Hom
+    {Λ' A' B' : Type} [CommRing Λ'] [CommRing A'] [CommRing B']
+    (C : Chain.{u} Λ A B K) (C' : Chain.{u} Λ' A' B' K) where
   sΛ : Λ →+* Λ'
   sA : A →+* A'
   sB : B →+* B'
@@ -79,8 +87,10 @@ structure Hom {Λ' A' B' : Type} [CommRing Λ'] [CommRing A'] [CommRing B'] (C :
   fW : ∀ j, C.W j →ₛₗ[sB] C'.W j
   fV : ∀ j, C.V j →ₗ[K] C'.V j
 
-structure Hom.Good {Λ' A' B' : Type} [CommRing Λ'] [CommRing A'] [CommRing B'] {C : Chain.{u} Λ A B K}
-    {C' : Chain.{u} Λ' A' B' K} (h : Hom C C') : Prop where
+structure Hom.Good
+    {Λ' A' B' : Type} [CommRing Λ'] [CommRing A'] [CommRing B']
+    {C : Chain.{u} Λ A B K} {C' : Chain.{u} Λ' A' B' K} (h : Hom C C')
+    : Prop where
   ℓ : C'.ℓ = C.ℓ
   lam : ∀ c, h.sA (C.lam c) = C'.lam (h.sΛ c)
   ι : ∀ a, h.sB (C.ι a) = C'.ι (h.sA a)
@@ -91,9 +101,11 @@ structure Hom.Good {Λ' A' B' : Type} [CommRing Λ'] [CommRing A'] [CommRing B']
   b : ∀ j z, h.fW j (C.b j z) = C'.b j (h.fZ j z)
   μ : ∀ j v, h.fW j (C.μ j v) = C'.μ j (h.fV j v)
 
-def Hom.tr {Λ' A' B' : Type} [CommRing Λ'] [CommRing A'] [CommRing B'] {C : Chain.{u} Λ A B K}
-    {C' : Chain.{u} Λ' A' B' K} (h : Hom C C') (j : ℕ) (f : Module.Dual K (C.V j) →+ B) :
-    Module.Dual K (C'.V j) →+ B' :=
+def Hom.tr
+    {Λ' A' B' : Type} [CommRing Λ'] [CommRing A'] [CommRing B']
+    {C : Chain.{u} Λ A B K} {C' : Chain.{u} Λ' A' B' K} (h : Hom C C')
+    (j : ℕ) (f : Module.Dual K (C.V j) →+ B)
+    : Module.Dual K (C'.V j) →+ B' :=
   h.sB.toAddMonoidHom.comp (f.comp (Module.Dual.transpose (R := K) (h.fV j)).toAddMonoidHom)
 
 structure Cup (C : Chain.{u} Λ A B K) where

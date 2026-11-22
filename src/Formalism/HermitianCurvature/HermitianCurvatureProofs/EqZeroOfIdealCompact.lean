@@ -4,20 +4,22 @@ public import Formalism.HermitianCurvature.ThetaExistenceInductiveFromPieces
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6 Formalism.DoubleCosetMeasures Matrix Filter Topology
+open Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6 Formalism.DoubleCosetMeasures Matrix
+  Filter Topology
 
 namespace Formalism.FourierDecayAlt.P.A6x5
 
-theorem roots_finite_domain {F : Type} [CommRing F] [IsDomain F] (s : ℕ) (hs : 1 ≤ s) (d : F) :
-    {x : F | x ^ s = d}.Finite := by
+theorem roots_finite_domain {F : Type} [CommRing F] [IsDomain F] (s : ℕ) (hs : 1 ≤ s) (d : F)
+    : {x : F | x ^ s = d}.Finite := by
   classical
   refine (Polynomial.nthRoots s d).toFinset.finite_toSet.subset ?_
   intro x hx
   simp only [Finset.mem_coe, Multiset.mem_toFinset]
   exact (Polynomial.mem_nthRoots hs).2 hx
 
-theorem roots_finite {K : Type} [CommRing K] [IsArtinianRing K] [IsReduced K] (s : ℕ)
-    (hs : 1 ≤ s) (d : K) : {x : K | x ^ s = d}.Finite := by
+theorem roots_finite
+    {K : Type} [CommRing K] [IsArtinianRing K] [IsReduced K] (s : ℕ) (hs : 1 ≤ s) (d : K)
+    : {x : K | x ^ s = d}.Finite := by
   have h1 : (Set.pi Set.univ fun I : MaximalSpectrum K =>
       {x : K ⧸ I.asIdeal | x ^ s = IsArtinianRing.equivPi K d I}).Finite :=
     Set.Finite.pi fun I => roots_finite_domain s hs _
@@ -31,10 +33,15 @@ section Top
 
 variable {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K]
 
-theorem multiples_near_zero (C : Set K) (hC : IsCompact C) (i : K) (hi : ∀ a : K, a * i ∈ C)
-    (W : Set K) (hW : W ∈ 𝓝 (0 : K)) : ∃ k : ℕ, ((k + 1 : ℕ) : K) * i ∈ W := by
-  obtain ⟨a, _, ha⟩ := hC.exists_mapClusterPt_of_frequently (l := atTop)
-    (f := fun n : ℕ => (n : K) * i) (Eventually.of_forall fun n => hi _).frequently
+theorem multiples_near_zero
+    (C : Set K) (hC : IsCompact C)
+    (i : K) (hi : ∀ a : K, a * i ∈ C)
+    (W : Set K) (hW : W ∈ 𝓝 (0 : K))
+    : ∃ k : ℕ, ((k + 1 : ℕ) : K) * i ∈ W := by
+  obtain ⟨a, _, ha⟩ :=
+    hC.exists_mapClusterPt_of_frequently (l := atTop)
+      (f := fun n : ℕ => (n : K) * i)
+      (Eventually.of_forall fun n => hi _).frequently
   have hc : Tendsto (fun p : K × K => p.2 - p.1) (𝓝 (a, a)) (𝓝 0) := by
     have : Continuous (fun p : K × K => p.2 - p.1) := continuous_snd.sub continuous_fst
     simpa using this.tendsto (a, a)
@@ -49,12 +56,15 @@ theorem multiples_near_zero (C : Set K) (hC : IsCompact C) (i : K) (hi : ∀ a :
   have h2 : (((n : K) * i, ((n + 1 + k : ℕ) : K) * i) : K × K) ∈ W' ×ˢ W' := ⟨hn, hm'⟩
   have h3 := hsub h2
   simp only [Set.mem_preimage] at h3
-  have h4 : ((n + 1 + k : ℕ) : K) * i - (n : K) * i = ((k + 1 : ℕ) : K) * i := by
-    push_cast; ring
+  have h4 : ((n + 1 + k : ℕ) : K) * i - (n : K) * i = ((k + 1 : ℕ) : K) * i := by push_cast; ring
   rwa [h4] at h3
 
-theorem eq_zero_of_ideal_compact [T2Space K] [IsReduced K] (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
-    (C : Set K) (hC : IsCompact C) (i : K) (hi : ∀ a : K, a * i ∈ C) : i = 0 := by
+theorem eq_zero_of_ideal_compact
+    [T2Space K] [IsReduced K]
+    (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
+    (C : Set K) (hC : IsCompact C)
+    (i : K) (hi : ∀ a : K, a * i ∈ C)
+    : i = 0 := by
   set S : Set (K × K) := Set.range fun k : ℕ =>
     (((k + 1 : ℕ) : K) * i, Ring.inverse ((k + 1 : ℕ) : K) * i) with hS
   have hSC : S ⊆ C ×ˢ C := by
@@ -67,7 +77,8 @@ theorem eq_zero_of_ideal_compact [T2Space K] [IsReduced K] (hn : ∀ n : ℕ, n 
     rintro _ ⟨k, rfl⟩
     change ((k + 1 : ℕ) : K) * i * (Ring.inverse ((k + 1 : ℕ) : K) * i) = i ^ 2
     have := Ring.mul_inverse_cancel _ (hn (k + 1) (by omega))
-    calc ((k + 1 : ℕ) : K) * i * (Ring.inverse ((k + 1 : ℕ) : K) * i)
+    calc
+      ((k + 1 : ℕ) : K) * i * (Ring.inverse ((k + 1 : ℕ) : K) * i)
         = (((k + 1 : ℕ) : K) * Ring.inverse ((k + 1 : ℕ) : K)) * i ^ 2 := by ring
       _ = i ^ 2 := by rw [this, one_mul]
   have himg : Prod.fst '' closure S = closure (Prod.fst '' S) :=
@@ -86,9 +97,11 @@ theorem eq_zero_of_ideal_compact [T2Space K] [IsReduced K] (hn : ∀ n : ℕ, n 
 
 variable {R : Subring K} {ψ : AddChar K ℂ}
 
-theorem eq_zero_of_forall_pow (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
-    (ϖ : Kˣ) (hϖ : ∀ x : K, ∃ m : ℕ, (ϖ : K) ^ m * x ∈ R) (x : K)
-    (hx : ∀ N : ℕ, ∃ r ∈ R, x = (ϖ : K) ^ N * r) : x = 0 := by
+theorem eq_zero_of_forall_pow
+    (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
+    (ϖ : Kˣ) (hϖ : ∀ x : K, ∃ m : ℕ, (ϖ : K) ^ m * x ∈ R)
+    (x : K) (hx : ∀ N : ℕ, ∃ r ∈ R, x = (ϖ : K) ^ N * r)
+    : x = 0 := by
   have := hD.t2
   have := hD.red
   refine eq_zero_of_ideal_compact hn (R : Set K) hD.isCompact x ?_
@@ -99,16 +112,20 @@ theorem eq_zero_of_forall_pow (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 
   rw [this]
   exact R.mul_mem hm hr
 
-theorem pow_small (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
+theorem pow_small
+    (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
     (ϖ : Kˣ) (hϖR : (ϖ : K) ∈ R) (hϖ : ∀ x : K, ∃ m : ℕ, (ϖ : K) ^ m * x ∈ R)
-    (V : Set K) (hV : V ∈ 𝓝 (0 : K)) : ∃ N : ℕ, ∀ r ∈ R, (ϖ : K) ^ N * r ∈ V := by
+    (V : Set K) (hV : V ∈ 𝓝 (0 : K))
+    : ∃ N : ℕ, ∀ r ∈ R, (ϖ : K) ^ N * r ∈ V := by
   have := hD.t2
   by_contra hcon
   push Not at hcon
   have hcomp : ∀ N : ℕ, IsCompact ((fun r => (ϖ : K) ^ N * r) '' (R : Set K)) := fun N =>
     hD.isCompact.image (continuous_const.mul continuous_id)
-  have hne := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed
-    (fun N : ℕ => ((fun r => (ϖ : K) ^ N * r) '' (R : Set K)) ∩ (interior V)ᶜ) ?_ ?_ ?_ ?_
+  have hne :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed
+      (fun N : ℕ => ((fun r => (ϖ : K) ^ N * r) '' (R : Set K)) ∩ (interior V)ᶜ)
+      ?_ ?_ ?_ ?_
   · obtain ⟨x, hx⟩ := hne
     rw [Set.mem_iInter] at hx
     have hx0 : x = 0 := by
@@ -128,19 +145,25 @@ theorem pow_small (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit
   · intro N
     exact (hcomp N).isClosed.inter isOpen_interior.isClosed_compl
 
-theorem one_add_unit (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
-    (ϖ : Kˣ) (hϖR : (ϖ : K) ∈ R) (hϖ : ∀ x : K, ∃ m : ℕ, (ϖ : K) ^ m * x ∈ R) (r : K)
-    (hr : r ∈ R) : ∃ u ∈ R, (1 + (ϖ : K) * r) * u = 1 := by
+theorem one_add_unit
+    (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
+    (ϖ : Kˣ) (hϖR : (ϖ : K) ∈ R) (hϖ : ∀ x : K, ∃ m : ℕ, (ϖ : K) ^ m * x ∈ R)
+    (r : K) (hr : r ∈ R)
+    : ∃ u ∈ R, (1 + (ϖ : K) * r) * u = 1 := by
   have := hD.artin
-  have hgeo : ∀ k : ℕ, (1 + (ϖ : K) * r) * ∑ j ∈ Finset.range k, (-((ϖ : K) * r)) ^ j =
-      1 - (-((ϖ : K) * r)) ^ k := by
+  have hgeo
+      : ∀ k : ℕ,
+        (1 + (ϖ : K) * r) * ∑ j ∈ Finset.range k, (-((ϖ : K) * r)) ^ j
+          = 1 - (-((ϖ : K) * r)) ^ k := by
     intro k
     have := mul_neg_geom_sum (-((ϖ : K) * r)) k
     rwa [sub_neg_eq_add] at this
-  have hsmall : ∀ (y : K) (N : ℕ), ∃ k : ℕ, ∃ r' ∈ R, (-((ϖ : K) * r)) ^ k * y = (ϖ : K) ^ N * r' := by
+  have hsmall
+      : ∀ (y : K) (N : ℕ), ∃ k : ℕ, ∃ r' ∈ R, (-((ϖ : K) * r)) ^ k * y = (ϖ : K) ^ N * r' := by
     intro y N
     obtain ⟨m, hm⟩ := hϖ y
-    refine ⟨N + m, (-r) ^ (N + m) * ((ϖ : K) ^ m * y), R.mul_mem (R.pow_mem (R.neg_mem hr) _) hm, ?_⟩
+    refine
+      ⟨N + m, (-r) ^ (N + m) * ((ϖ : K) ^ m * y), R.mul_mem (R.pow_mem (R.neg_mem hr) _) hm, ?_⟩
     have : -((ϖ : K) * r) = (ϖ : K) * (-r) := by ring
     rw [this, mul_pow, pow_add]
     ring
@@ -152,7 +175,8 @@ theorem one_add_unit (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsU
       intro k
       have h1 : (1 - (-((ϖ : K) * r)) ^ k) * y = 0 := by
         rw [← hgeo k]
-        calc _ = (y * (1 + (ϖ : K) * r)) * ∑ j ∈ Finset.range k, (-((ϖ : K) * r)) ^ j := by ring
+        calc
+          _ = (y * (1 + (ϖ : K) * r)) * ∑ j ∈ Finset.range k, (-((ϖ : K) * r)) ^ j := by ring
           _ = 0 := by rw [hy, zero_mul]
       have h2 : y - (-((ϖ : K) * r)) ^ k * y = 0 := by rw [← h1]; ring
       exact sub_eq_zero.1 h2
@@ -164,17 +188,19 @@ theorem one_add_unit (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsU
   refine ⟨u, ?_, hu⟩
   obtain ⟨k, r', hr', h⟩ := hsmall u 0
   have h1 : u = ∑ j ∈ Finset.range k, (-((ϖ : K) * r)) ^ j + (-((ϖ : K) * r)) ^ k * u := by
-    have h2 : ((1 + (ϖ : K) * r) * u) * ∑ j ∈ Finset.range k, (-((ϖ : K) * r)) ^ j =
-        (1 - (-((ϖ : K) * r)) ^ k) * u := by rw [← hgeo k]; ring
+    have h2
+        : ((1 + (ϖ : K) * r) * u) * ∑ j ∈ Finset.range k, (-((ϖ : K) * r)) ^ j
+          = (1 - (-((ϖ : K) * r)) ^ k) * u := by
+      rw [← hgeo k]; ring
     rw [hu, one_mul] at h2
-    rw [h2]; ring
+    rw [h2]
+    ring
   rw [h1, h, pow_zero, one_mul]
   refine R.add_mem (R.sum_mem fun j _ => R.pow_mem (R.neg_mem (R.mul_mem hϖR hr)) _) hr'
 
-theorem image_pow_eq_preimage (ϖ : Kˣ) (N : ℕ) (S : Set K) :
-    (fun r => (ϖ : K) ^ N * r) '' S = (fun x => ((ϖ⁻¹ : Kˣ) : K) ^ N * x) ⁻¹' S := by
-  have h1 : ((ϖ⁻¹ : Kˣ) : K) ^ N * (ϖ : K) ^ N = 1 := by
-    rw [← mul_pow, Units.inv_mul, one_pow]
+theorem image_pow_eq_preimage (ϖ : Kˣ) (N : ℕ) (S : Set K)
+    : (fun r => (ϖ : K) ^ N * r) '' S = (fun x => ((ϖ⁻¹ : Kˣ) : K) ^ N * x) ⁻¹' S := by
+  have h1 : ((ϖ⁻¹ : Kˣ) : K) ^ N * (ϖ : K) ^ N = 1 := by rw [← mul_pow, Units.inv_mul, one_pow]
   ext x
   constructor
   · rintro ⟨r, hr, rfl⟩
@@ -185,8 +211,8 @@ theorem image_pow_eq_preimage (ϖ : Kˣ) (N : ℕ) (S : Set K) :
     change (ϖ : K) ^ N * (((ϖ⁻¹ : Kˣ) : K) ^ N * x) = x
     rw [← mul_assoc, mul_comm ((ϖ : K) ^ N), h1, one_mul]
 
-theorem preimage_pow_eq_image (ϖ : Kˣ) (N : ℕ) (S : Set K) :
-    (fun x => (ϖ : K) ^ N * x) ⁻¹' S = (fun r => ((ϖ⁻¹ : Kˣ) : K) ^ N * r) '' S := by
+theorem preimage_pow_eq_image (ϖ : Kˣ) (N : ℕ) (S : Set K)
+    : (fun x => (ϖ : K) ^ N * x) ⁻¹' S = (fun r => ((ϖ⁻¹ : Kˣ) : K) ^ N * r) '' S := by
   have := image_pow_eq_preimage ϖ⁻¹ N S
   rw [inv_inv] at this
   exact this.symm
@@ -194,8 +220,8 @@ theorem preimage_pow_eq_image (ϖ : Kˣ) (N : ℕ) (S : Set K) :
 def unitBox (R : Subring K) (ϖ : Kˣ) (j : ℕ) : Set K :=
   {z | ∃ y, z * y = 1 ∧ (ϖ : K) ^ j * z ∈ R ∧ (ϖ : K) ^ j * y ∈ R}
 
-theorem unitBox_mono (ϖ : Kˣ) (hϖR : (ϖ : K) ∈ R) {j j' : ℕ} (h : j ≤ j') :
-    unitBox R ϖ j ⊆ unitBox R ϖ j' := by
+theorem unitBox_mono (ϖ : Kˣ) (hϖR : (ϖ : K) ∈ R) {j j' : ℕ} (h : j ≤ j')
+    : unitBox R ϖ j ⊆ unitBox R ϖ j' := by
   rintro z ⟨y, hzy, hz, hy⟩
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
   refine ⟨y, hzy, ?_, ?_⟩
@@ -204,17 +230,21 @@ theorem unitBox_mono (ϖ : Kˣ) (hϖR : (ϖ : K) ∈ R) {j j' : ℕ} (h : j ≤ 
   · rw [pow_add, mul_comm ((ϖ : K) ^ j), mul_assoc]
     exact R.mul_mem (R.pow_mem hϖR _) hy
 
-theorem unitBox_isCompact (hD : LocalDatum K R ψ) (ϖ : Kˣ) (j : ℕ) :
-    IsCompact (unitBox R ϖ j) := by
+theorem unitBox_isCompact (hD : LocalDatum K R ψ) (ϖ : Kˣ) (j : ℕ) : IsCompact (unitBox R ϖ j) := by
   have := hD.t2
   have hA : IsCompact ((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K)) := by
     rw [preimage_pow_eq_image]
     exact hD.isCompact.image (continuous_const.mul continuous_id)
-  have hP : IsCompact ((((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K)) ×ˢ
-      ((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K))) ∩ {p : K × K | p.1 * p.2 = 1}) :=
+  have hP : IsCompact
+      ((((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K))
+          ×ˢ ((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K)))
+        ∩ {p : K × K | p.1 * p.2 = 1}) :=
     (hA.prod hA).inter_right (isClosed_eq (continuous_fst.mul continuous_snd) continuous_const)
-  have : unitBox R ϖ j = Prod.fst '' ((((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K)) ×ˢ
-      ((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K))) ∩ {p : K × K | p.1 * p.2 = 1}) := by
+  have : unitBox R ϖ j
+      = Prod.fst
+        '' ((((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K))
+            ×ˢ ((fun x => (ϖ : K) ^ j * x) ⁻¹' (R : Set K)))
+          ∩ {p : K × K | p.1 * p.2 = 1}) := by
     ext z
     constructor
     · rintro ⟨y, hzy, hz, hy⟩
@@ -224,9 +254,11 @@ theorem unitBox_isCompact (hD : LocalDatum K R ψ) (ϖ : Kˣ) (j : ℕ) :
   rw [this]
   exact hP.image continuous_fst
 
-theorem unitBox_isOpen (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
-    (ϖ : Kˣ) (hϖR : (ϖ : K) ∈ R) (hϖ : ∀ x : K, ∃ m : ℕ, (ϖ : K) ^ m * x ∈ R) (j : ℕ) :
-    IsOpen (unitBox R ϖ j) := by
+theorem unitBox_isOpen
+    (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → IsUnit (n : K))
+    (ϖ : Kˣ) (hϖR : (ϖ : K) ∈ R) (hϖ : ∀ x : K, ∃ m : ℕ, (ϖ : K) ^ m * x ∈ R)
+    (j : ℕ)
+    : IsOpen (unitBox R ϖ j) := by
   rw [isOpen_iff_mem_nhds]
   rintro z ⟨y, hzy, hz, hy⟩
   have hO : IsOpen ((fun w => ((ϖ⁻¹ : Kˣ) : K) ^ (j + 1) * (w - z)) ⁻¹' (R : Set K)) :=
@@ -243,7 +275,9 @@ theorem unitBox_isOpen (hD : LocalDatum K R ψ) (hn : ∀ n : ℕ, n ≠ 0 → I
     have hwz : w = z + (ϖ : K) ^ (j + 1) * r := by rw [hrw']; ring
     obtain ⟨u, hu, hu1⟩ := one_add_unit hD hn ϖ hϖR hϖ (r * ((ϖ : K) ^ j * y)) (R.mul_mem hr hy)
     refine ⟨y * u, ?_, ?_, ?_⟩
-    · calc w * (y * u) = (z * y + (ϖ : K) * (r * ((ϖ : K) ^ j * y))) * u := by rw [hwz]; ring
+    · calc
+        w * (y * u)
+          = (z * y + (ϖ : K) * (r * ((ϖ : K) ^ j * y))) * u := by rw [hwz]; ring
         _ = 1 := by rw [hzy, hu1]
     · have : (ϖ : K) ^ j * w = (ϖ : K) ^ j * z + (ϖ : K) ^ j * (ϖ : K) ^ (j + 1) * r := by
         rw [hwz]; ring
@@ -284,8 +318,11 @@ theorem rootsSeparated : Formalism.FourierDecayAlt.A6.RootsSeparated := by
     have h1 : (1 - ζ) ^ s = 0 := (hQu d hd).mul_left_eq_zero.1 h
     have h2 : 1 - ζ = 0 := IsNilpotent.eq_zero ⟨s, h1⟩
     exact hζ.2 (sub_eq_zero.1 h2).symm
-  refine ⟨(fun w => w ^ s) ⁻¹'
-    (⋃ ζ ∈ {ζ : K | ζ ^ s = 1 ∧ ζ ≠ 1}, (fun d => (1 - ζ) ^ s * d) '' Q)ᶜ, ?_, ?_⟩
+  refine ⟨
+    (fun w => w ^ s) ⁻¹' (⋃ ζ ∈ {ζ : K | ζ ^ s = 1 ∧ ζ ≠ 1}, (fun d => (1 - ζ) ^ s * d) '' Q)ᶜ,
+    ?_,
+    ?_
+  ⟩
   · apply (hC.isClosed.isOpen_compl.preimage (continuous_pow s)).mem_nhds
     simp only [Set.mem_preimage, Set.mem_compl_iff]
     rw [zero_pow (by omega)]
@@ -306,8 +343,9 @@ theorem smallModules : Formalism.FourierDecayAlt.A6.SmallModules := by
   intro K _ _ _ R ψ hD hn V hV
   obtain ⟨ϖ, hϖR, hϖ⟩ := hD.unif
   obtain ⟨N, hN⟩ := pow_small hD hn ϖ hϖR hϖ V hV
-  have hset : ((Submodule.span R {(ϖ : K) ^ N} : Submodule R K) : Set K) =
-      (fun r => (ϖ : K) ^ N * r) '' (R : Set K) := by
+  have hset
+      : ((Submodule.span R {(ϖ : K) ^ N} : Submodule R K) : Set K)
+        = (fun r => (ϖ : K) ^ N * r) '' (R : Set K) := by
     ext x
     simp only [SetLike.mem_coe, Submodule.mem_span_singleton, Set.mem_image]
     constructor
@@ -331,8 +369,10 @@ theorem rootStableExhaustion : Formalism.FourierDecayAlt.A6.Exhaust := by
   have := hD.red
   obtain ⟨ϖ, hϖR, hϖ⟩ := hD.unif
   have hfin : {ζ : K | ζ ^ s = 1}.Finite := roots_finite s hs 1
-  have hOm : ∀ j : ℕ, {z : K | ∀ ζ : K, ζ ^ s = 1 → ζ * z ∈ unitBox R ϖ j} =
-      ⋂ ζ ∈ {ζ : K | ζ ^ s = 1}, (fun z => ζ * z) ⁻¹' unitBox R ϖ j := by
+  have hOm
+      : ∀ j : ℕ,
+        {z : K | ∀ ζ : K, ζ ^ s = 1 → ζ * z ∈ unitBox R ϖ j}
+          = ⋂ ζ ∈ {ζ : K | ζ ^ s = 1}, (fun z => ζ * z) ⁻¹' unitBox R ϖ j := by
     intro j
     ext z
     simp only [Set.mem_iInter, Set.mem_preimage]
@@ -367,9 +407,9 @@ theorem rootStableExhaustion : Formalism.FourierDecayAlt.A6.Exhaust := by
       obtain ⟨m₁, h₁⟩ := hϖ (ζ * (z : K))
       obtain ⟨m₂, h₂⟩ := hϖ (ζ ^ (s - 1) * ((z⁻¹ : Kˣ) : K))
       refine ⟨max m₁ m₂, ζ ^ (s - 1) * ((z⁻¹ : Kˣ) : K), ?_, ?_, ?_⟩
-      · have : ζ * ζ ^ (s - 1) = 1 := by
-          rw [← pow_succ', Nat.sub_add_cancel hs, hζ]
-        calc ζ * (z : K) * (ζ ^ (s - 1) * ((z⁻¹ : Kˣ) : K))
+      · have : ζ * ζ ^ (s - 1) = 1 := by rw [← pow_succ', Nat.sub_add_cancel hs, hζ]
+        calc
+          ζ * (z : K) * (ζ ^ (s - 1) * ((z⁻¹ : Kˣ) : K))
             = (ζ * ζ ^ (s - 1)) * ((z : K) * ((z⁻¹ : Kˣ) : K)) := by ring
           _ = 1 := by rw [this, Units.mul_inv, one_mul]
       · obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le (le_max_left m₁ m₂)

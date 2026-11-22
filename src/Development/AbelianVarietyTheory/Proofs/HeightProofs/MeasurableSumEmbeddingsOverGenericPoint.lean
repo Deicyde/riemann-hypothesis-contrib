@@ -12,13 +12,14 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-
 open Polynomial in
-theorem finsum_embeddings_over_eq_sum_roots {F L : Type} [Field F] [Field L] [Algebra F L]
-    [Algebra.IsSeparable F L] (pb : PowerBasis F L) (τ : F →+* ℂ) {δ : ℕ} (r : Fin δ → ℂ)
-    (hr : ∏ i, (X - C (r i)) = (minpoly F pb.gen).map τ) (g : (L →+* ℂ) → ℝ) (g' : ℂ → ℝ)
-    (hg : ∀ P : L →+* ℂ, P.comp (algebraMap F L) = τ → g P = g' (P pb.gen)) :
-    ∑ᶠ P ∈ {P : L →+* ℂ | P.comp (algebraMap F L) = τ}, g P = ∑ k, g' (r k) := by
+theorem finsum_embeddings_over_eq_sum_roots
+    {F L : Type} [Field F] [Field L] [Algebra F L] [Algebra.IsSeparable F L]
+    (pb : PowerBasis F L) (τ : F →+* ℂ)
+    {δ : ℕ} (r : Fin δ → ℂ) (hr : ∏ i, (X - C (r i)) = (minpoly F pb.gen).map τ)
+    (g : (L →+* ℂ) → ℝ) (g' : ℂ → ℝ)
+    (hg : ∀ P : L →+* ℂ, P.comp (algebraMap F L) = τ → g P = g' (P pb.gen))
+    : ∑ᶠ P ∈ {P : L →+* ℂ | P.comp (algebraMap F L) = τ}, g P = ∑ k, g' (r k) := by
   classical
   letI : Algebra F ℂ := τ.toAlgebra
   have hτ : algebraMap F ℂ = τ := rfl

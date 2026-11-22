@@ -10,7 +10,9 @@ set_option autoImplicit false
 noncomputable section
 
 open NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo
 open GlobalTheory.HeckeApprox
 open UpperTheory.Gal.Int.Geo (Integ)
 open scoped TensorProduct
@@ -24,7 +26,8 @@ private def DvdInt (g : ℤ) (a : AfP p) : Prop := ∃ t : AfP p, IsIntAf t ∧ 
 private theorem DvdInt.zero (g : ℤ) : DvdInt g (0 : AfP p) :=
   ⟨0, by simpa using isInt_intCast (p := p) 0, by simp⟩
 
-private theorem DvdInt.add {g : ℤ} {a b : AfP p} (ha : DvdInt g a) (hb : DvdInt g b) : DvdInt g (a + b) := by
+private theorem DvdInt.add {g : ℤ} {a b : AfP p} (ha : DvdInt g a) (hb : DvdInt g b)
+    : DvdInt g (a + b) := by
   obtain ⟨s, hs, rfl⟩ := ha
   obtain ⟨t, ht, rfl⟩ := hb
   exact ⟨s + t, isInt_add hs ht, by ring⟩
@@ -32,12 +35,16 @@ private theorem DvdInt.add {g : ℤ} {a b : AfP p} (ha : DvdInt g a) (hb : DvdIn
 private theorem DvdInt.neg {g : ℤ} {a : AfP p} (ha : DvdInt g a) : DvdInt g (-a) := by
   obtain ⟨s, hs, rfl⟩ := ha
   refine ⟨(-1 : ℤ) * s, isInt_mul (isInt_intCast _) hs, ?_⟩
-  push_cast; ring
+  push_cast
+  ring
 
-private theorem dvdInt_form (D : Datum p) (g : ℤ) (hg : ∀ x y, g ∣ D.EF x y) (v w : AfP p ⊗[ℚ] VQ D)
-    (hv : v ∈ LaHat D) (hw : w ∈ LaHat D) : DvdInt g (fAf D v w) := by
-  have hgen : ∀ z ∈ {z | ∃ (a : AfP p) (x : D.La), IsIntAf a ∧ z = a ⊗ₜ ((1 : ℚ) ⊗ₜ x)},
-      ∀ w ∈ LaHat D, DvdInt g (fAf D z w) := by
+private theorem dvdInt_form
+    (D : Datum p) (g : ℤ) (hg : ∀ x y, g ∣ D.EF x y)
+    (v w : AfP p ⊗[ℚ] VQ D) (hv : v ∈ LaHat D) (hw : w ∈ LaHat D)
+    : DvdInt g (fAf D v w) := by
+  have hgen
+      : ∀ z ∈ {z | ∃ (a : AfP p) (x : D.La), IsIntAf a ∧ z = a ⊗ₜ ((1 : ℚ) ⊗ₜ x)}, ∀ w ∈ LaHat D,
+        DvdInt g (fAf D z w) := by
     rintro z ⟨a, x, ha, rfl⟩ w hw
     induction hw using AddSubgroup.closure_induction with
     | mem w hw' =>
@@ -87,12 +94,16 @@ theorem pNuInt : NuInt := by
     induction hz using Submodule.span_induction with
     | mem z hz =>
       obtain ⟨⟨x, y⟩, rfl⟩ := hz
-      have e := GlobalTheory.T.harrisTaylor_action_form_eq_similitude_mul p D G L h (inAf D x) (inAf D y)
-      have e' : mul h * ((D.EF x y : ℤ) : AfP p) = fAf D (L.actG h (inAf D x)) (L.actG h (inAf D y)) := by
+      have e :=
+        GlobalTheory.T.harrisTaylor_action_form_eq_similitude_mul p D G L h (inAf D x) (inAf D y)
+      have e'
+          : mul h * ((D.EF x y : ℤ) : AfP p)
+            = fAf D (L.actG h (inAf D x)) (L.actG h (inAf D y)) := by
         rw [← form_inAf]; exact e.symm
       simp only [e']
       exact dvdInt_form D g hdvd _ _ (hh _ (inAf_mem D x)) (hh _ (inAf_mem D y))
-    | zero => simpa using DvdInt.zero g
+    | zero =>
+      simpa using DvdInt.zero g
     | add a b _ _ ha hb =>
       push_cast
       rw [mul_add]

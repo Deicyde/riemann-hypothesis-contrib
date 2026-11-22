@@ -7,15 +7,20 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open scoped Classical
 
-private theorem finite_family_of_compact {X T V : Type} [TopologicalSpace X] [AddCommGroup T] [Module ℂ T]
+private theorem finite_family_of_compact
+    {X T V : Type} [TopologicalSpace X] [AddCommGroup T] [Module ℂ T]
     (ev : V → T →ₗ[ℂ] ℂ) (hev : ∀ t : T, (∀ v, ev v t = 0) → t = 0)
-    (U : Submodule ℂ T) [FiniteDimensional ℂ U] (K : Set X) (hK : IsCompact K) (f : X → T)
-    (hf : ∀ k ∈ K, f k ∈ U) (hc : ∀ v, ContinuousOn (fun k => ev v (f k)) K) :
-    ∃ (n : ℕ) (e : Fin n → T), ∀ k ∈ K, ∃ c : Fin n → ℂ, (∀ i, ‖c i‖ ≤ 1) ∧ f k = ∑ i, c i • e i := by
+    (U : Submodule ℂ T) [FiniteDimensional ℂ U]
+    (K : Set X) (hK : IsCompact K)
+    (f : X → T) (hf : ∀ k ∈ K, f k ∈ U) (hc : ∀ v, ContinuousOn (fun k => ev v (f k)) K)
+    : ∃ (n : ℕ) (e : Fin n → T), ∀ k ∈ K, ∃ c : Fin n → ℂ,
+      (∀ i, ‖c i‖ ≤ 1) ∧ f k = ∑ i, c i • e i := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.mp hK
   let r : V → Module.Dual ℂ U := fun v => (ev v).domRestrict U
   let S : Submodule ℂ (Module.Dual ℂ U) := Submodule.span ℂ (Set.range r)
@@ -38,7 +43,8 @@ private theorem finite_family_of_compact {X T V : Type} [TopologicalSpace X] [Ad
     | mem x hx =>
       obtain ⟨v, rfl⟩ := hx
       exact continuousOn_iff_continuous_restrict.mp (hc v)
-    | zero => simpa using continuous_const
+    | zero =>
+      simpa using continuous_const
     | add x y _ _ hx hy =>
       change Continuous fun k : K => x (g k) + y (g k)
       exact hx.add hy
@@ -63,14 +69,25 @@ private theorem finite_family_of_compact {X T V : Type} [TopologicalSpace X] [Ad
     have hne : (R i : ℂ) ≠ 0 := by exact_mod_cast (hR0 i).ne'
     rw [smul_smul, div_mul_cancel₀ _ hne]
 
-theorem UpperTheory.ConvolutionTheory.R2.Ff.omFin :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D), OmFin W := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.omFin
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D),
+      OmFin W := by
   intro F E _ _ _ _ _ _ _ D W φ hφ
   obtain ⟨hKc, -⟩ := iwa F
   obtain ⟨U, -, hfd, hmem⟩ := (fockSt F E D W).om φ hφ (KK F) hKc fun k hk => hk.1
-  let ev : V4 F → S4 F →ₗ[ℂ] ℂ := fun v =>
-    { toFun := fun t => t.1 v, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
-  refine finite_family_of_compact ev (fun t ht => Subtype.ext (funext ht)) U (KK F) hKc
-    (fun k => W.Om k φ) hmem fun v => ?_
+  let ev : V4 F → S4 F →ₗ[ℂ] ℂ := fun v => {
+    toFun := fun t => t.1 v
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
+  refine finite_family_of_compact ev
+    (fun t ht => Subtype.ext (funext ht))
+    U (KK F) hKc
+    (fun k => W.Om k φ)
+    hmem
+    fun v => ?_
   have h := W.cont φ
-  exact (h.comp (Continuous.prodMk continuous_id continuous_const : Continuous fun k : G1 F => (k, v))).continuousOn
+  exact (h.comp
+    (Continuous.prodMk continuous_id continuous_const
+      : Continuous fun k : G1 F => (k, v))).continuousOn

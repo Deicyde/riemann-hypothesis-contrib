@@ -15,11 +15,12 @@ open ValuativeRel Formalism.MainNotions.ArithmeticCylinders
 
 section Val
 
-variable {g : ℕ} [Fact g.Prime] {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-  [IsNonarchimedeanLocalField F]
+variable
+  {g : ℕ} [Fact g.Prime]
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-theorem val_lt_one_of_norm_lt_one (e : ℚ_[g] ≃+* F) (he : Continuous e) {z : ℚ_[g]} (hz : ‖z‖ < 1) :
-    valuation F (e z) < 1 := by
+theorem val_lt_one_of_norm_lt_one (e : ℚ_[g] ≃+* F) (he : Continuous e) {z : ℚ_[g]} (hz : ‖z‖ < 1)
+    : valuation F (e z) < 1 := by
   have h1 : Filter.Tendsto (fun n : ℕ => z ^ n) Filter.atTop (nhds 0) :=
     tendsto_pow_atTop_nhds_zero_of_norm_lt_one hz
   have h2 : Filter.Tendsto (fun n : ℕ => e z ^ n) Filter.atTop (nhds 0) := by
@@ -40,8 +41,8 @@ theorem val_natCast_le_one (c : ℕ) : valuation F (c : F) ≤ 1 := by
     push_cast
     exact (valuation F).map_add_le ih (by simp)
 
-theorem val_le_one_of_norm_le_one (e : ℚ_[g] ≃+* F) (he : Continuous e) {z : ℚ_[g]} (hz : ‖z‖ ≤ 1) :
-    valuation F (e z) ≤ 1 := by
+theorem val_le_one_of_norm_le_one (e : ℚ_[g] ≃+* F) (he : Continuous e) {z : ℚ_[g]} (hz : ‖z‖ ≤ 1)
+    : valuation F (e z) ≤ 1 := by
   let zi : ℤ_[g] := ⟨z, hz⟩
   have hm := PadicInt.sub_zmodRepr_mem zi
   rw [IsLocalRing.mem_maximalIdeal, PadicInt.mem_nonunits] at hm
@@ -54,8 +55,9 @@ theorem val_le_one_of_norm_le_one (e : ℚ_[g] ≃+* F) (he : Continuous e) {z :
   rw [hz']
   exact (valuation F).map_add_le h1.le (val_natCast_le_one _)
 
-theorem norm_lt_one_of_val_lt_one (e : ℚ_[g] ≃+* F) (he : Continuous e) {y : ℚ_[g]}
-    (hy : valuation F (e y) < 1) : ‖y‖ < 1 := by
+theorem norm_lt_one_of_val_lt_one
+    (e : ℚ_[g] ≃+* F) (he : Continuous e) {y : ℚ_[g]} (hy : valuation F (e y) < 1)
+    : ‖y‖ < 1 := by
   by_contra hc
   push_neg at hc
   have hy0 : y ≠ 0 := by rintro rfl; simp at hc; exact absurd hc (by norm_num)
@@ -67,8 +69,9 @@ theorem norm_lt_one_of_val_lt_one (e : ℚ_[g] ≃+* F) (he : Continuous e) {y :
   rw [h3, mul_one] at h4
   exact absurd hy (not_lt.2 h4)
 
-theorem entry_of_val (e : ℚ_[g] ≃+* F) (he : Continuous e) (x : F) (c : ℕ) (hx : valuation F (x - c) < 1) :
-    ∃ hA : ‖e.symm x‖ ≤ 1, PadicInt.toZMod (⟨e.symm x, hA⟩ : ℤ_[g]) = c := by
+theorem entry_of_val
+    (e : ℚ_[g] ≃+* F) (he : Continuous e) (x : F) (c : ℕ) (hx : valuation F (x - c) < 1)
+    : ∃ hA : ‖e.symm x‖ ≤ 1, PadicInt.toZMod (⟨e.symm x, hA⟩ : ℤ_[g]) = c := by
   have h1 : ‖e.symm x - c‖ < 1 :=
     norm_lt_one_of_val_lt_one e he (by rwa [map_sub, map_natCast, e.apply_symm_apply])
   have hc : ‖(c : ℚ_[g])‖ ≤ 1 := by
@@ -99,8 +102,12 @@ section Mat
 variable {g : ℕ} [Fact g.Prime]
 
 def bm (r t : ℕ) (h : Gn g r) : Mt g (r + t) := fun i j =>
-  if (i : ℕ) < r ∧ (j : ℕ) < r then entN (h : Mt g r) i j
-  else if r ≤ (i : ℕ) ∧ r ≤ (j : ℕ) then entN ((1 : Gn g t) : Mt g t) (i - r) (j - r) else 0
+  if (i : ℕ) < r ∧ (j : ℕ) < r then
+    entN (h : Mt g r) i j
+  else if r ≤ (i : ℕ) ∧ r ≤ (j : ℕ) then
+    entN ((1 : Gn g t) : Mt g t) (i - r) (j - r)
+  else
+    0
 
 theorem bm_isUnit (r t : ℕ) (h : Gn g r) : IsUnit (bm r t h) := by
   set M := bm r t h with hM
@@ -119,14 +126,21 @@ theorem bm_isUnit (r t : ℕ) (h : Gn g r) : IsUnit (bm r t h) := by
   rw [Matrix.isUnit_iff_isUnit_det, hd]
   exact Matrix.isUnits_det_units h
 
-theorem blk_val (r t : ℕ) (h : Gn g r) : ((blk r t (r + t) h 1 : Gn g (r + t)) : Mt g (r + t)) = bm r t h := by
+theorem blk_val (r t : ℕ) (h : Gn g r)
+    : ((blk r t (r + t) h 1 : Gn g (r + t)) : Mt g (r + t)) = bm r t h := by
   show ((toG (bm r t h) : Gn g (r + t)) : Mt g (r + t)) = bm r t h
   unfold toG
   rw [dif_pos (bm_isUnit r t h)]
   exact IsUnit.unit_spec _
 
-theorem bm_apply (r t : ℕ) (h : Gn g r) (a b : Fin (r + t)) : bm r t h a b =
-    if hab : (a : ℕ) < r ∧ (b : ℕ) < r then (h : Mt g r) ⟨a, hab.1⟩ ⟨b, hab.2⟩ else if a = b then 1 else 0 := by
+theorem bm_apply (r t : ℕ) (h : Gn g r) (a b : Fin (r + t))
+    : bm r t h a b
+      = if hab : (a : ℕ) < r ∧ (b : ℕ) < r then
+          (h : Mt g r) ⟨a, hab.1⟩ ⟨b, hab.2⟩
+        else if a = b then
+          1
+        else
+          0 := by
   unfold bm
   by_cases hab : (a : ℕ) < r ∧ (b : ℕ) < r
   · rw [if_pos hab, dif_pos hab]; simp [entN, hab]
@@ -140,7 +154,9 @@ theorem bm_apply (r t : ℕ) (h : Gn g r) (a b : Fin (r + t)) : bm r t h a b =
       apply propext
       omega
     · rw [if_neg h2, if_neg]
-      intro e; subst e; omega
+      intro e
+      subst e
+      omega
 
 end Mat
 
@@ -150,15 +166,21 @@ namespace GlobalTheory.SerSys.BlockLift
 
 open ValuativeRel Formalism.MainNotions.ArithmeticCylinders
 
-theorem blockLift_act (g : ℕ) [Fact g.Prime] (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] (e : ℚ_[g] ≃+* F) (he : Continuous e) (r t : ℕ) (V : Type) [AddCommGroup V]
-    [Module ℂ V] (ρ : Representation ℂ (GL (Fin (r + t)) F) V) (u : V)
-    (hu : u ∈ fixK1 (ρ.comp (Matrix.GeneralLinearGroup.map e.toRingHom))) (h : GL (Fin r) (ZMod g))
-    (h' : GL (Fin (r + t)) F) (hl : GlobalTheory.PendOf.IsLiftN h h') :
-    ρ h' u = ρ (Matrix.GeneralLinearGroup.map e.toRingHom (lift g (r + t) (blk r t (r + t) h 1))) u := by
+theorem blockLift_act
+    (g : ℕ) [Fact g.Prime]
+    (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    (e : ℚ_[g] ≃+* F) (he : Continuous e)
+    (r t : ℕ)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL (Fin (r + t)) F) V) (u : V)
+    (hu : u ∈ fixK1 (ρ.comp (Matrix.GeneralLinearGroup.map e.toRingHom)))
+    (h : GL (Fin r) (ZMod g)) (h' : GL (Fin (r + t)) F) (hl : GlobalTheory.PendOf.IsLiftN h h')
+    : ρ h' u
+      = ρ (Matrix.GeneralLinearGroup.map e.toRingHom (lift g (r + t) (blk r t (r + t) h 1))) u := by
   classical
-  have hent : ∀ a b : Fin (r + t), ∃ hA : ‖e.symm (h'.val a b)‖ ≤ 1,
-      PadicInt.toZMod (⟨e.symm (h'.val a b), hA⟩ : ℤ_[g]) = bm r t h a b := by
+  have hent
+      : ∀ a b : Fin (r + t), ∃ hA : ‖e.symm (h'.val a b)‖ ≤ 1,
+        PadicInt.toZMod (⟨e.symm (h'.val a b), hA⟩ : ℤ_[g]) = bm r t h a b := by
     intro a b
     have hab := hl a b
     rw [bm_apply]
@@ -167,8 +189,8 @@ theorem blockLift_act (g : ℕ) [Fact g.Prime] (F : Type) [Field F] [ValuativeRe
       obtain ⟨hA, hA'⟩ := entry_of_val e he _ _ hab
       exact ⟨hA, by rw [hA', ZMod.natCast_zmod_val]⟩
     · rw [dite_eq_right hc] at hab ⊢
-      obtain ⟨hA, hA'⟩ := entry_of_val e he (h'.val a b) (if a = b then 1 else 0)
-        (by rw [hab]; split_ifs <;> simp)
+      obtain ⟨hA, hA'⟩ :=
+        entry_of_val e he (h'.val a b) (if a = b then 1 else 0) (by rw [hab]; split_ifs <;> simp)
       exact ⟨hA, by rw [hA']; split_ifs <;> simp⟩
   choose hA hA' using hent
   let A : Matrix (Fin (r + t)) (Fin (r + t)) ℤ_[g] := fun a b => ⟨e.symm (h'.val a b), hA a b⟩
@@ -190,15 +212,19 @@ theorem blockLift_act (g : ℕ) [Fact g.Prime] (F : Type) [Field F] [ValuativeRe
     show e (algebraMap ℤ_[g] ℚ_[g] (A a b)) = h'.val a b
     rw [PadicInt.algebraMap_apply]
     exact e.apply_symm_apply _
-  have hx0 : red g (r + t) (Function.invFun (red g (r + t)) (blk r t (r + t) h 1)) = blk r t (r + t) h 1 :=
+  have hx0
+      : red g (r + t) (Function.invFun (red g (r + t)) (blk r t (r + t) h 1))
+        = blk r t (r + t) h 1 :=
     Function.invFun_eq ⟨A', hred⟩
   have hk : red g (r + t) ((Function.invFun (red g (r + t)) (blk r t (r + t) h 1))⁻¹ * A') = 1 := by
     rw [map_mul, map_inv, hx0, hred, inv_mul_cancel]
   have hfix := (Submodule.mem_iInf _).1 hu ⟨_, hk⟩
   rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, sub_eq_zero] at hfix
-  have hsplit : h' = Matrix.GeneralLinearGroup.map e.toRingHom (lift g (r + t) (blk r t (r + t) h 1)) *
-      Matrix.GeneralLinearGroup.map e.toRingHom
-        (inc g (r + t) ((Function.invFun (red g (r + t)) (blk r t (r + t) h 1))⁻¹ * A')) := by
+  have hsplit
+      : h'
+        = Matrix.GeneralLinearGroup.map e.toRingHom (lift g (r + t) (blk r t (r + t) h 1))
+          * Matrix.GeneralLinearGroup.map e.toRingHom
+            (inc g (r + t) ((Function.invFun (red g (r + t)) (blk r t (r + t) h 1))⁻¹ * A')) := by
     rw [← hh', lift, ← map_mul, ← map_mul, mul_inv_cancel_left]
   rw [hsplit, map_mul, Module.End.mul_apply]
   congr 1

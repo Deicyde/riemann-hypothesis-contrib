@@ -20,14 +20,25 @@ def pairsK (dK p : ℕ) [Fact p.Prime] (ι : ℂ ≃+* ℂ_[p]) : Set (ℂ_[p] �
     (ι ((mn.1 : ℂ) + (mn.2 : ℂ) * omegaK dK), ι ((mn.1 : ℂ) + (mn.2 : ℂ) * (1 - omegaK dK))))
 
 def CalcP : Prop :=
-  ∀ (dK : ℕ) (L : PeriodPair), dK % 4 = 3 → HasCMBy dK L →
-  ∀ (p : ℕ) [Fact p.Prime], 5 ≤ p → ∀ ι : ℂ ≃+* ℂ_[p], IntCurve (curveL p L ι) →
-    Formalism.L2.Th1.C.Frame (unitBall ℂ_[p]) (logSer (curveL p L ι)) (expSer (curveL p L ι)) (phC p L ι) ∧
-    Formalism.L2.Th1.C.F1 (unitBall ℂ_[p]) (logSer (curveL p L ι)) (expSer (curveL p L ι)) (phC p L ι) ∧
-    (∀ a b : ℂ_[p], (a, b) ∈ pairsK dK p ι →
-      Formalism.L2.Th1.C.EndInt (unitBall ℂ_[p]) (logSer (curveL p L ι)) (expSer (curveL p L ι)) a ∧
-      Formalism.L2.Th1.C.PhNormAt (unitBall ℂ_[p]) (logSer (curveL p L ι)) (expSer (curveL p L ι)) (phC p L ι) a b ∧
-      Formalism.L2.Th1.C.AdjAt (unitBall ℂ_[p]) (logSer (curveL p L ι)) (expSer (curveL p L ι)) (phC p L ι) a b) ∧
-    (∀ a : ℂ_[p], (a, a) ∈ pairsK dK p ι → Formalism.L2.Th1.C.IsBinomScalar (unitBall ℂ_[p]) a)
+  ∀ (dK : ℕ) (L : PeriodPair),
+    dK % 4 = 3 → HasCMBy dK L
+      → ∀ (p : ℕ) [Fact p.Prime],
+        5 ≤ p
+          → ∀ ι : ℂ ≃+* ℂ_[p],
+            IntCurve (curveL p L ι)
+              → Formalism.L2.Th1.C.Frame (unitBall ℂ_[p]) (logSer (curveL p L ι))
+                  (expSer (curveL p L ι)) (phC p L ι)
+                ∧ Formalism.L2.Th1.C.F1 (unitBall ℂ_[p]) (logSer (curveL p L ι))
+                  (expSer (curveL p L ι)) (phC p L ι)
+                ∧ (∀ a b : ℂ_[p],
+                  (a, b) ∈ pairsK dK p ι
+                    → Formalism.L2.Th1.C.EndInt (unitBall ℂ_[p]) (logSer (curveL p L ι))
+                        (expSer (curveL p L ι)) a
+                      ∧ Formalism.L2.Th1.C.PhNormAt (unitBall ℂ_[p]) (logSer (curveL p L ι))
+                        (expSer (curveL p L ι)) (phC p L ι) a b
+                      ∧ Formalism.L2.Th1.C.AdjAt (unitBall ℂ_[p]) (logSer (curveL p L ι))
+                        (expSer (curveL p L ι)) (phC p L ι) a b)
+                ∧ (∀ a : ℂ_[p],
+                  (a, a) ∈ pairsK dK p ι → Formalism.L2.Th1.C.IsBinomScalar (unitBall ℂ_[p]) a)
 
 end Formalism.L2.Th1.Top

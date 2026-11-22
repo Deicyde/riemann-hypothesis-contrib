@@ -16,8 +16,8 @@ section SpecDetAux
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-def metMat {d : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (v : InfinitePlace K) :
-    Matrix (Fin d) (Fin d) ℂ :=
+def metMat {d : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (v : InfinitePlace K)
+    : Matrix (Fin d) (Fin d) ℂ :=
   ((X v)⁻¹).conjTranspose * (X v)⁻¹
 
 def cv {d : ℕ} (σ : K →+* ℂ) (x : Fin d → K) : Fin d → ℂ := fun i => σ (x i)
@@ -169,8 +169,8 @@ theorem spectral_determinant_formula : SpecDet := by
     detRatio_of_scalar v XQ XE (hXQ v) ι Qp hind htop (fun p => s * ∏ j, lam j p) hQ
   have h2 : ∀ j, detRatio (XT j) (XW j) (θ j) v = ∏ p, lam j p ^ finrank K (Qp p) := by
     intro j
-    obtain ⟨h, -⟩ := detRatio_of_scalar v (XT j) (XW j) (hXT j v) (θ j) (Tq j) (hindT j)
-      (htopT j) (lam j) (hT j)
+    obtain ⟨h, -⟩ :=
+      detRatio_of_scalar v (XT j) (XW j) (hXT j v) (θ j) (Tq j) (hindT j) (htopT j) (lam j) (hT j)
     rw [h]
     exact Finset.prod_congr rfl (fun p _ => by rw [hdim j p])
   rw [h1, Finset.prod_congr rfl (fun j _ => h2 j)]

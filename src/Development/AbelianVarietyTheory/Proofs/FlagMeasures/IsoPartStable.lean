@@ -10,7 +10,9 @@ public import Formalism.RealPlaceAnalysis.FinalF
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId GlobalTheory.Jet
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+  GlobalTheory.Jet
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -25,13 +27,16 @@ theorem ht_add {n : ℕ} (μ ν : Fin n → ℝ) : ht (μ + ν) = ht μ + ht ν 
 theorem ht_sub {n : ℕ} (μ ν : Fin n → ℝ) : ht (μ - ν) = ht μ - ht ν := by
   simp [ht, mul_sub, Finset.sum_sub_distrib]
 
-theorem ht_root {n : ℕ} (a b : Fin n) : ht (Formalism.REAL.root a b) = ((a : ℕ) : ℝ) - ((b : ℕ) : ℝ) := by
+theorem ht_root {n : ℕ} (a b : Fin n)
+    : ht (Formalism.REAL.root a b) = ((a : ℕ) : ℝ) - ((b : ℕ) : ℝ) := by
   simp [ht, Formalism.REAL.root, mul_sub, Finset.sum_sub_distrib, Pi.single_apply]
 
-theorem weight_shift {W : Type} [AddCommGroup W] [Module ℂ W] {n : ℕ} {ε : Fin n → Bool}
-    {F : Fin n → Fin n → Module.End ℂ W} (hF : Formalism.REAL.KRel ε F) {ν : Fin n → ℝ} {x : W}
-    (hx : Formalism.REAL.IsWeight F ν x) {a b : Fin n} (hab : ε a = ε b) :
-    Formalism.REAL.IsWeight F (ν + Formalism.REAL.root a b) (F a b x) := by
+theorem weight_shift
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {n : ℕ} {ε : Fin n → Bool} {F : Fin n → Fin n → Module.End ℂ W} (hF : Formalism.REAL.KRel ε F)
+    {ν : Fin n → ℝ} {x : W} (hx : Formalism.REAL.IsWeight F ν x)
+    {a b : Fin n} (hab : ε a = ε b)
+    : Formalism.REAL.IsWeight F (ν + Formalism.REAL.root a b) (F a b x) := by
   intro c
   have h := congrArg (fun T : Module.End ℂ W => T x) (hF c c a b rfl hab)
   simp only [LinearMap.sub_apply, Module.End.mul_apply, hx c, map_smul] at h
@@ -45,11 +50,12 @@ theorem weight_shift {W : Type} [AddCommGroup W] [Module ℂ W] {n : ℕ} {ε : 
     simp [Formalism.REAL.root, h1, Pi.single_apply, add_smul, sub_smul, add_comm]
   · simp [Formalism.REAL.root, h1, h2, Pi.single_apply, Ne.symm h2]
 
-theorem word_weight {W : Type} [AddCommGroup W] [Module ℂ W] {n : ℕ} {ε : Fin n → Bool}
-    {F : Fin n → Fin n → Module.End ℂ W} (hF : Formalism.REAL.KRel ε F) {μ : Fin n → ℝ} {x : W}
-    (hx : Formalism.REAL.IsWeight F μ x) (w : List (Fin n × Fin n))
-    (hw : ∀ p ∈ w, ε p.1 = ε p.2 ∧ p.2 < p.1) :
-    ∃ ν, ht μ ≤ ht ν ∧ Formalism.REAL.IsWeight F ν (ew F w x) := by
+theorem word_weight
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {n : ℕ} {ε : Fin n → Bool} {F : Fin n → Fin n → Module.End ℂ W} (hF : Formalism.REAL.KRel ε F)
+    {μ : Fin n → ℝ} {x : W} (hx : Formalism.REAL.IsWeight F μ x)
+    (w : List (Fin n × Fin n)) (hw : ∀ p ∈ w, ε p.1 = ε p.2 ∧ p.2 < p.1)
+    : ∃ ν, ht μ ≤ ht ν ∧ Formalism.REAL.IsWeight F ν (ew F w x) := by
   induction w with
   | nil => exact ⟨μ, le_rfl, by simpa [ew] using hx⟩
   | cons p w ih =>
@@ -61,10 +67,11 @@ theorem word_weight {W : Type} [AddCommGroup W] [Module ℂ W] {n : ℕ} {ε : F
       linarith
     · simpa only [ew, Module.End.mul_apply] using weight_shift hF h2 hp.1
 
-theorem comp_weight {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n : ℕ}
-    {E : Fin n → Fin n → Module.End ℂ V} {ν : Fin n → ℝ} {G : Arr V n 1}
-    (hG : Formalism.REAL.IsWeight (arrE E 1) ν G) (a b : Fin n) :
-    Formalism.REAL.IsWeight E (ν - Formalism.REAL.root a b) (G (fun _ => (a, b))) := by
+theorem comp_weight
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n : ℕ} {E : Fin n → Fin n → Module.End ℂ V} {ν : Fin n → ℝ} {G : Arr V n 1}
+    (hG : Formalism.REAL.IsWeight (arrE E 1) ν G) (a b : Fin n)
+    : Formalism.REAL.IsWeight E (ν - Formalism.REAL.root a b) (G (fun _ => (a, b))) := by
   intro c
   have h1 := congrArg (fun G : Arr V n 1 => G (fun _ => (a, b))) (hG c)
   simp only at h1
@@ -78,9 +85,11 @@ theorem comp_weight {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] 
     simp [Formalism.REAL.root, h1, Pi.single_apply, Ne.symm h1, add_smul, sub_smul]
   · simp [Formalism.REAL.root, h1, h2, Pi.single_apply, Ne.symm h2, Ne.symm h1]
 
-theorem isoPart_stable {W : Type} [AddCommGroup W] [Module ℂ W] {n : ℕ} {ε : Fin n → Bool}
-    {F : Fin n → Fin n → Module.End ℂ W} (T : Set (Fin n → ℝ)) (S : Submodule ℂ W) :
-    Formalism.REAL.KStable ε F (isoPart ε F T S) := by
+theorem isoPart_stable
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {n : ℕ} {ε : Fin n → Bool} {F : Fin n → Fin n → Module.End ℂ W} (T : Set (Fin n → ℝ))
+    (S : Submodule ℂ W)
+    : Formalism.REAL.KStable ε F (isoPart ε F T S) := by
   intro a b hab x hx
   have : isoPart ε F T S ≤ (isoPart ε F T S).comap (F a b) := by
     apply isotypic_part_le_of_forall
@@ -88,7 +97,13 @@ theorem isoPart_stable {W : Type} [AddCommGroup W] [Module ℂ W] {n : ℕ} {ε 
     exact compact_span_le_isotypic_part hy hμ hyh (compact_span_stable_general y a b hab z hz)
   exact this hx
 
-theorem vminus_comp : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (abelian₂ : Fin n → ℝ) (u : V), GlRel E → IsUnitary ε E → KHighest ε E abelian₂ u → FiniteDimensional ℂ (kSpan ε E u) → KStable ε (arrE E 1) (Vminus ε E abelian₂ u) ∧ Vminus ε E abelian₂ u ≤ arrV0 ε E u 1 ∧ FiniteDimensional ℂ (Vminus ε E abelian₂ u) ∧ ∀ G ∈ Vminus ε E abelian₂ u, ∀ a b, ¬ b < a → ⟪u, at1 G a b⟫_ℂ = 0 := by
+theorem vminus_comp
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ V) (abelian₂ : Fin n → ℝ) (u : V),
+      GlRel E → IsUnitary ε E → KHighest ε E abelian₂ u → FiniteDimensional ℂ (kSpan ε E u)
+        → KStable ε (arrE E 1) (Vminus ε E abelian₂ u) ∧ Vminus ε E abelian₂ u ≤ arrV0 ε E u 1
+          ∧ FiniteDimensional ℂ (Vminus ε E abelian₂ u)
+          ∧ ∀ G ∈ Vminus ε E abelian₂ u, ∀ a b, ¬ b < a → ⟪u, at1 G a b⟫_ℂ = 0 := by
   intro V _ _ n ε E abelian₂ u hg hu hΛ hfd
   have hle : Vminus ε E abelian₂ u ≤ arrV0 ε E u 1 := by
     apply isotypic_part_le_of_forall
@@ -98,8 +113,10 @@ theorem vminus_comp : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace �
   refine ⟨isoPart_stable _ _, hle, Submodule.finiteDimensional_of_le hle, ?_⟩
   intro G hG a b hab
   have hKR := glRel_kRel ε _ ((arrModule V n ε E 1).1 hg).1
-  let ℓ : Arr V n 1 →ₗ[ℂ] ℂ := (innerₛₗ ℂ u) ∘ₗ
-    (LinearMap.proj (R := ℂ) (φ := fun _ : Fin 1 → Fin n × Fin n => V) (fun _ => (a, b)) ∘ₗ arrOf V n 1)
+  let ℓ : Arr V n 1 →ₗ[ℂ] ℂ :=
+    (innerₛₗ ℂ u)
+      ∘ₗ (LinearMap.proj (R := ℂ) (φ := fun _ : Fin 1 → Fin n × Fin n => V) (fun _ => (a, b))
+        ∘ₗ arrOf V n 1)
   have hℓ : ∀ G : Arr V n 1, ℓ G = ⟪u, G (fun _ => (a, b))⟫_ℂ := fun G => rfl
   have hker : Vminus ε E abelian₂ u ≤ LinearMap.ker ℓ := by
     apply isotypic_part_le_of_forall

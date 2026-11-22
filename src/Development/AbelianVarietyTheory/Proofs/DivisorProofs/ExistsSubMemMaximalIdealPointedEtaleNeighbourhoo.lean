@@ -9,9 +9,9 @@ open IsLocalRing GlobalTheory.Henselisation
 
 namespace GlobalTheory.Henselisation
 
-theorem EtNbhd.exists_sub_mem_maximalIdeal :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] (i : EtNbhd R) (b : i.B),
-      ∃ r : R, b - algebraMap R i.B r ∈ maximalIdeal i.B := by
+theorem EtNbhd.exists_sub_mem_maximalIdeal
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (i : EtNbhd R) (b : i.B), ∃ r : R,
+      b - algebraMap R i.B r ∈ maximalIdeal i.B := by
   intro R _ _ i b
   obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective i.q.primeCompl b
   obtain ⟨r₁, hr₁⟩ := residue_surjective (i.pt a)
@@ -26,8 +26,9 @@ theorem EtNbhd.exists_sub_mem_maximalIdeal :
     exact (residue_eq_zero_iff r₂).2 hn
   obtain ⟨u, rfl⟩ := hu
   refine ⟨r₁ * ((u⁻¹ : Rˣ) : R), ?_⟩
-  have key : IsLocalization.mk' i.B a s - algebraMap R i.B (r₁ * ((u⁻¹ : Rˣ) : R)) =
-      IsLocalization.mk' i.B (a - (s : i.A) * algebraMap R i.A (r₁ * ((u⁻¹ : Rˣ) : R))) s := by
+  have key
+      : IsLocalization.mk' i.B a s - algebraMap R i.B (r₁ * ((u⁻¹ : Rˣ) : R))
+        = IsLocalization.mk' i.B (a - (s : i.A) * algebraMap R i.A (r₁ * ((u⁻¹ : Rˣ) : R))) s := by
     rw [IsLocalization.eq_mk'_iff_mul_eq, sub_mul, IsLocalization.mk'_spec,
       (algebraMap i.A i.B).map_sub, (algebraMap i.A i.B).map_mul,
       ← IsScalarTower.algebraMap_apply R i.A i.B]

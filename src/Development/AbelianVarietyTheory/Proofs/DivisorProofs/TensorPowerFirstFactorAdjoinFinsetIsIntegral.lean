@@ -10,9 +10,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory.EtC
 
-theorem firstAndFinite_isIntegral (R A : Type) [CommRing R] [CommRing A] [Algebra R A]
-    [Algebra.IsIntegral R A] (k : ℕ) (F : Finset A) :
-    Algebra.IsIntegral R (firstAndFinite R A k F) := by
+theorem firstAndFinite_isIntegral
+    (R A : Type) [CommRing R] [CommRing A] [Algebra R A] [Algebra.IsIntegral R A]
+    (k : ℕ) (F : Finset A)
+    : Algebra.IsIntegral R (firstAndFinite R A k F) := by
   unfold firstAndFinite
   apply Algebra.IsIntegral.adjoin
   rintro x (⟨a, rfl⟩ | hx)

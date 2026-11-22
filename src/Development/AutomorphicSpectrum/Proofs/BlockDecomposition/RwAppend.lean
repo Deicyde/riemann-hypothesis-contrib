@@ -20,7 +20,9 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-abbrev CLof (E F : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F] : Type :=
+abbrev CLof
+    (E F : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F]
+    : Type :=
   E →L[ℝ] F
 
 def expC (X : Mat n) (t : ℝ) : G n := (Matrix.isUnit_exp (t • X)).unit
@@ -31,20 +33,24 @@ theorem expC_zero (X : Mat n) : expC X 0 = 1 := by
   apply Units.ext
   simp [expC_val]
 
-def IsTest (φ : Mat n → ℝ) : Prop :=
-  ContDiff ℝ ∞ φ ∧ HasCompactSupport φ ∧ tsupport φ ⊆ GLs n
+def IsTest (φ : Mat n → ℝ) : Prop := ContDiff ℝ ∞ φ ∧ HasCompactSupport φ ∧ tsupport φ ⊆ GLs n
 
 section Mol
 
 variable [MeasurableSpace (G n)] (μ : Measure (G n))
 
-def Mol {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (φ : Mat n → ℝ) (x : G n → V) (z : Mat n) : V :=
+def Mol
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (φ : Mat n → ℝ) (x : G n → V) (z : Mat n)
+    : V :=
   ∫ u : G n, φ (z * (u⁻¹ : G n).val) • x u ∂μ
 
-variable [BorelSpace (G n)] [μ.IsHaarMeasure] (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  [BorelSpace (G n)] [μ.IsHaarMeasure] (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
 def lT (y : G n) : Lp V 2 μ →L[ℂ] Lp V 2 μ :=
-  (Lp.compMeasurePreservingₗᵢ ℂ (fun z : G n => y⁻¹ * z) (measurePreserving_mul_left μ y⁻¹)).toContinuousLinearMap
+  (Lp.compMeasurePreservingₗᵢ ℂ
+    (fun z : G n => y⁻¹ * z)
+    (measurePreserving_mul_left μ y⁻¹)).toContinuousLinearMap
 
 def lConv (φ : Mat n → ℝ) (x : Lp V 2 μ) : Lp V 2 μ := ∫ y : G n, φ y.val • lT μ V y x ∂μ
 
@@ -62,15 +68,15 @@ theorem rR_coe (hU : Unimod) (h : G n) (x : Lp V 2 μ) : rR μ V h x =ᵐ[μ] fu
   rw [this]
   exact Lp.coeFn_compMeasurePreserving x hm
 
-theorem cls_of_ae {f : Mat n → V} {x : Lp V 2 μ} (h : (fun y : G n => f y.val) =ᵐ[μ] x) :
-    MemLp (fun y : G n => f y.val) 2 μ ∧ cls μ f = x := by
+theorem cls_of_ae {f : Mat n → V} {x : Lp V 2 μ} (h : (fun y : G n => f y.val) =ᵐ[μ] x)
+    : MemLp (fun y : G n => f y.val) 2 μ ∧ cls μ f = x := by
   have hm : MemLp (fun y : G n => f y.val) 2 μ := (memLp_congr_ae h).2 (Lp.memLp x)
   refine ⟨hm, ?_⟩
   simp only [cls, dif_pos hm]
   exact Lp.ext (hm.coeFn_toLp.trans h)
 
-theorem coe_cls {f : Mat n → V} (h : MemLp (fun y : G n => f y.val) 2 μ) :
-    (cls μ f : G n → V) =ᵐ[μ] fun y => f y.val := by
+theorem coe_cls {f : Mat n → V} (h : MemLp (fun y : G n => f y.val) 2 μ)
+    : (cls μ f : G n → V) =ᵐ[μ] fun y => f y.val := by
   simp only [cls, dif_pos h]
   exact h.coeFn_toLp
 
@@ -84,14 +90,14 @@ section Words
 
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
 
-theorem Rd_congr {f f' : Mat n → V} (h : ∀ z ∈ GLs n, f z = f' z) (X : Mat n) :
-    ∀ z ∈ GLs n, Rd X f z = Rd X f' z := by
+theorem Rd_congr {f f' : Mat n → V} (h : ∀ z ∈ GLs n, f z = f' z) (X : Mat n)
+    : ∀ z ∈ GLs n, Rd X f z = Rd X f' z := by
   intro z hz
   have : f =ᶠ[𝓝 z] f' := Filter.eventuallyEq_of_mem (isOpen_GLs.mem_nhds hz) h
   simp only [Rd, this.fderiv_eq]
 
-theorem Rw_append (w w' : List (Bool × Fin n × Fin n)) (f : Mat n → V) :
-    Rw (w ++ w') f = Rw w (Rw w' f) := by
+theorem Rw_append (w w' : List (Bool × Fin n × Fin n)) (f : Mat n → V)
+    : Rw (w ++ w') f = Rw w (Rw w' f) := by
   induction w with
   | nil => rfl
   | cons p w ih => simp only [List.cons_append, Rw, ih]

@@ -61,8 +61,9 @@ lemma val_add_mem (p : ℕ) [NeZero p] (a b : ZMod p) :
 
 end
 
-theorem card_addChar (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (N : Type)
-    [AddCommGroup N] [Fintype N] : Nat.card (AddChar N C) = Fintype.card N := by
+theorem card_addChar
+    (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (N : Type) [AddCommGroup N] [Fintype N]
+    : Nat.card (AddChar N C) = Fintype.card N := by
   have hne : Monoid.exponent (Multiplicative N) ≠ 0 := Monoid.exponent_ne_zero_of_finite
   haveI : NeZero (Monoid.exponent (Multiplicative N)) := ⟨hne⟩
   haveI : NeZero (Monoid.exponent (Multiplicative N) : C) := ⟨Nat.cast_ne_zero.2 hne⟩

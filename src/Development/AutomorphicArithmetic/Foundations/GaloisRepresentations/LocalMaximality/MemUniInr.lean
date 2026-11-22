@@ -5,13 +5,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
-private def phiT {d : ℕ} : Fin (d + 1) ⊕ₗ Fin d → Fin (d + 1) := fun t => Sum.elim id Fin.succ (ofLex t)
+private def phiT {d : ℕ} : Fin (d + 1) ⊕ₗ Fin d → Fin (d + 1) := fun t =>
+  Sum.elim id Fin.succ (ofLex t)
 
-private def cT {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E) :
-    Fin (d + 1) ⊕ₗ Fin d → S :=
+private def cT
+    {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
+    : Fin (d + 1) ⊕ₗ Fin d → S :=
   app (fun _ => 1) (fun l : Fin d => (T.X l.succ : S))
 
 private lemma rowT_eq {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
@@ -91,13 +94,19 @@ private lemma prod_emb {α M : Type} [LinearOrder α] [CommMonoid M] (s : Finset
   rw [Finset.prod_map]
   rfl
 
-private theorem wd_lmul_app_detC_eq_zero_of_det (hD : Det) {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E]
-    [Module ℂ E] (T : Sys d S E) :
-    (wd fun t => (Algebra.lmul ℂ S) (app (fun _ => (1 : S)) (fun l : Fin d => (T.X l.succ : S)) t))
-      (detC T.rowT) = 0 := by
+private theorem wd_lmul_app_detC_eq_zero_of_det
+    (hD : Det)
+    {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
+    (T : Sys d S E)
+    : (wd fun t =>
+          (Algebra.lmul ℂ S) (app (fun _ => (1 : S)) (fun l : Fin d => (T.X l.succ : S)) t))
+        (detC T.rowT)
+      = 0 := by
   have key := hD S S (Algebra.lmul ℂ S) (Fin (d + 1) ⊕ₗ Fin d) (d + 1) T.rowT (fun _ => 1) 1
-  have h1 : (fun l => Algebra.lmul ℂ S (∑ b, T.rowT l b * 1)) =
-      fun t => Algebra.lmul ℂ S (app (fun _ => (1 : S)) (fun l : Fin d => (T.X l.succ : S)) t) := by
+  have h1
+      : (fun l => Algebra.lmul ℂ S (∑ b, T.rowT l b * 1))
+        = fun t =>
+          Algebra.lmul ℂ S (app (fun _ => (1 : S)) (fun l : Fin d => (T.X l.succ : S)) t) := by
     funext t
     rw [show (∑ b, T.rowT t b * 1) = cT T t by simp [rowT_eq]]
     rfl
@@ -107,16 +116,25 @@ private theorem wd_lmul_app_detC_eq_zero_of_det (hD : Det) {d : ℕ} {S E : Type
   rw [h1, h2] at key
   exact key
 
-private theorem detC_uni_univ_empty {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
-    (T : Sys d S E) : detC T.rowT (uni Finset.univ ∅) = 1 := by
-  rw [detC_id T (uni Finset.univ ∅) (by simp [card_uni']) (fun a => toLex (Sum.inl a))
-    (fun a => (mem_uni_inl _ _ a).2 (Finset.mem_univ a)) Sum.Lex.inl_strictMono (fun a => rfl)]
+private theorem detC_uni_univ_empty
+    {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
+    : detC T.rowT (uni Finset.univ ∅) = 1 := by
+  rw [detC_id T (uni Finset.univ ∅) (by simp [card_uni'])
+    (fun a => toLex (Sum.inl a))
+    (fun a => (mem_uni_inl _ _ a).2 (Finset.mem_univ a))
+    Sum.Lex.inl_strictMono
+    (fun a => rfl)]
   simp [cT, app]
 
-private theorem detC_uni_singleton_zero_univ {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
-    (T : Sys d S E) : detC T.rowT (uni {0} Finset.univ) = ∏ l : Fin d, (T.X l.succ : S) := by
+private theorem detC_uni_singleton_zero_univ
+    {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
+    : detC T.rowT (uni {0} Finset.univ) = ∏ l : Fin d, (T.X l.succ : S) := by
   let f : Fin (d + 1) → Fin (d + 1) ⊕ₗ Fin d := fun a =>
-    Fin.cases (motive := fun _ => Fin (d + 1) ⊕ₗ Fin d) (toLex (Sum.inl 0)) (fun l => toLex (Sum.inr l)) a
+    Fin.cases
+      (motive := fun _ => Fin (d + 1) ⊕ₗ Fin d)
+      (toLex (Sum.inl 0))
+      (fun l => toLex (Sum.inr l))
+      a
   have hfs : ∀ a, f a ∈ uni {0} Finset.univ := by
     intro a
     cases a using Fin.cases with
@@ -141,16 +159,20 @@ private theorem detC_uni_singleton_zero_univ {d : ℕ} {S E : Type} [CommRing S]
   rw [detC_id T _ hcard f hfs hf hφ, Fin.prod_univ_succ]
   simp [f, cT, app]
 
-private theorem detC_uni_eq_zero_or_eq_unit_smul_prod_compl {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
-    (T : Sys d S E) (I : Finset (Fin (d + 1))) (L : Finset (Fin d)) :
-    detC T.rowT (uni I L) = 0 ∨
-      0 ∈ I ∧ I.card + L.card = d + 1 ∧ ∃ ε : ℤˣ, detC T.rowT (uni I L) = ε • ∏ m ∈ Iᶜ, (T.X m : S) := by
+private theorem detC_uni_eq_zero_or_eq_unit_smul_prod_compl
+    {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
+    (T : Sys d S E) (I : Finset (Fin (d + 1))) (L : Finset (Fin d))
+    : detC T.rowT (uni I L) = 0
+      ∨ 0 ∈ I ∧ I.card + L.card = d + 1
+        ∧ ∃ ε : ℤˣ, detC T.rowT (uni I L) = ε • ∏ m ∈ Iᶜ, (T.X m : S) := by
   by_cases hc : (uni I L).card = d + 1
   swap
   · left
     simp only [detC, dif_neg hc]
-  rcases det_single (fun a => phiT ((uni I L).orderEmbOfFin hc a))
-      (fun a => cT T ((uni I L).orderEmbOfFin hc a)) with h0 | ⟨hbij, ε, hε⟩
+  rcases det_single
+      (fun a => phiT ((uni I L).orderEmbOfFin hc a))
+      (fun a => cT T ((uni I L).orderEmbOfFin hc a))
+    with h0 | ⟨hbij, ε, hε⟩
   · left
     rw [detC_eq T _ hc]
     exact h0
@@ -189,17 +211,22 @@ private theorem detC_uni_eq_zero_or_eq_unit_smul_prod_compl {d : ℕ} {S E : Typ
       · rintro ⟨l, hl, rfl⟩ hI
         obtain ⟨a, ha⟩ := (hmem (toLex (Sum.inl l.succ))).1 ((mem_uni_inl I L _).2 hI)
         obtain ⟨b, hb⟩ := (hmem (toLex (Sum.inr l))).1 ((mem_uni_inr I L _).2 hl)
-        have hab : a = b := hbij.1 (by
-          show phiT ((uni I L).orderEmbOfFin hc a) = phiT ((uni I L).orderEmbOfFin hc b)
-          rw [ha, hb]
-          rfl)
+        have hab : a = b :=
+          hbij.1 (by
+            show phiT ((uni I L).orderEmbOfFin hc a) = phiT ((uni I L).orderEmbOfFin hc b)
+            rw [ha, hb]
+            rfl)
         rw [hab, hb] at ha
         exact Sum.inl_ne_inr (toLex.injective ha.symm)
     refine ⟨h0I, hcard, ε, ?_⟩
     rw [hdet, prod_emb (uni I L) hc (cT T), prod_uni', hcompl, Finset.prod_map]
     simp [cT, app]
 
-theorem UpperTheory.Gal.productCup_of_system.thT_of :
-    Det → ThT := by
+theorem UpperTheory.Gal.productCup_of_system.thT_of : Det → ThT := by
   intro hD d S E _ _ _ _ T
-  exact ⟨wd_lmul_app_detC_eq_zero_of_det hD T, detC_uni_univ_empty T, detC_uni_singleton_zero_univ T, detC_uni_eq_zero_or_eq_unit_smul_prod_compl T⟩
+  exact ⟨
+    wd_lmul_app_detC_eq_zero_of_det hD T,
+    detC_uni_univ_empty T,
+    detC_uni_singleton_zero_univ T,
+    detC_uni_eq_zero_or_eq_unit_smul_prod_compl T
+  ⟩

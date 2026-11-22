@@ -7,24 +7,30 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Open
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.CompanionTheory.Rodier GlobalTheory.SplitWeil
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.CompanionTheory.Rodier GlobalTheory.SplitWeil
 
 namespace PositivityTheory.RgUd.CellA
 
 section General
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N) {W : Type} [AddCommGroup W] [Module ℂ W]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {h N : ℕ} (d : Fin h → ℕ) (hd : ∑ a, d a = N)
+  {W : Type} [AddCommGroup W] [Module ℂ W]
   (ρ : Representation ℂ (Levi k fun a => Fin (d a)) W)
 
-theorem translate_apply (a : GL (Fin N) k) (l : Levi k fun a => Fin (d a))
+theorem translate_apply
+    (a : GL (Fin N) k) (l : Levi k fun a => Fin (d a))
     (hl : pm k (wOpen d hd) * a * (pm k (wOpen d hd))⁻¹ = leviEmb k (stdBlocks d hd) l)
-    (f : IndSp (stdBlocks d hd) ρ) (u : GL (Fin N) k) :
-    (parInd (stdBlocks d hd) ρ a f).1.1 (pm k (wOpen d hd) * u) =
-      (deltaHalf k (fun a => Fin (d a)) l : ℂ) • ρ l (f.1.1 (pm k (wOpen d hd) * (a⁻¹ * u * a))) := by
+    (f : IndSp (stdBlocks d hd) ρ) (u : GL (Fin N) k)
+    : (parInd (stdBlocks d hd) ρ a f).1.1 (pm k (wOpen d hd) * u)
+      = (deltaHalf k (fun a => Fin (d a)) l : ℂ)
+        • ρ l (f.1.1 (pm k (wOpen d hd) * (a⁻¹ * u * a))) := by
   letI : DecidableEq (Fin h) := Classical.typeDecidableEq _
-  have hx : pm k (wOpen d hd) * u * a =
-      leviEmb k (stdBlocks d hd) l * (pm k (wOpen d hd) * (a⁻¹ * u * a)) := by
+  have hx
+      : pm k (wOpen d hd) * u * a
+        = leviEmb k (stdBlocks d hd) l * (pm k (wOpen d hd) * (a⁻¹ * u * a)) := by
     rw [← hl]
     group
   have hm : leviEmb k (stdBlocks d hd) l ∈ parab k (stdBlocks d hd) :=
@@ -42,11 +48,12 @@ theorem translate_apply (a : GL (Fin N) k) (l : Levi k fun a => Fin (d a))
   rw [MonoidHom.comp_apply, hp]
   rfl
 
-theorem translate_mem_openFns (a : GL (Fin N) k) (l : Levi k fun a => Fin (d a))
+theorem translate_mem_openFns
+    (a : GL (Fin N) k) (l : Levi k fun a => Fin (d a))
     (hl : pm k (wOpen d hd) * a * (pm k (wOpen d hd))⁻¹ = leviEmb k (stdBlocks d hd) l)
     (haB : ∀ u ∈ unipB k (Fin N), a * u * a⁻¹ ∈ unipB k (Fin N))
-    {f : IndSp (stdBlocks d hd) ρ} (hf : f ∈ openFns d hd ρ) :
-    parInd (stdBlocks d hd) ρ a f ∈ openFns d hd ρ := by
+    {f : IndSp (stdBlocks d hd) ρ} (hf : f ∈ openFns d hd ρ)
+    : parInd (stdBlocks d hd) ρ a f ∈ openFns d hd ρ := by
   letI : DecidableEq (Fin h) := Classical.typeDecidableEq _
   have hf' : ∀ g : GL (Fin N) k, f.1.1 g ≠ 0 → g ∈ cell k d hd (wOpen d hd) := hf
   show ∀ g : GL (Fin N) k, (parInd (stdBlocks d hd) ρ a f).1.1 g ≠ 0 → g ∈ cell k d hd (wOpen d hd)
@@ -56,8 +63,13 @@ theorem translate_mem_openFns (a : GL (Fin N) k) (l : Levi k fun a => Fin (d a))
     mem_parab_iff.2 fun _ _ i j hab => by
       simp [leviEmb]
       exact Matrix.blockDiagonal'_apply_ne _ _ _ hab.ne'
-  refine ⟨p * (leviEmb k (stdBlocks d hd) l)⁻¹,
-    (parab k _).mul_mem hp ((parab k _).inv_mem hm), a * n * a⁻¹, haB n hn, ?_⟩
+  refine ⟨
+    p * (leviEmb k (stdBlocks d hd) l)⁻¹,
+    (parab k _).mul_mem hp ((parab k _).inv_mem hm),
+    a * n * a⁻¹,
+    haB n hn,
+    ?_
+  ⟩
   have hg' : g = p * pm k (wOpen d hd) * n * a⁻¹ := by
     rw [← hpn]
     group
@@ -73,20 +85,22 @@ variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 theorem modExp_two_one (r m : ℕ) : modExp (fun a => Fin (dd r m a)) 1 = -(r : ℤ) := by
   simp [modExp, Finset.sum_filter, Fin.sum_univ_two, dd]
 
-theorem nabs_pow (z : kˣ) (n : ℕ) : nabs k (z ^ n) = nabs k z ^ n := by
-  simp [nabs, map_pow]
+theorem nabs_pow (z : kˣ) (n : ℕ) : nabs k (z ^ n) = nabs k z ^ n := by simp [nabs, map_pow]
 
-theorem deltaHalf_levZ (r m : ℕ) (z : kˣ) :
-    (deltaHalf k (fun a => Fin (dd r m a)) (levZ k r m z) : ℂ) =
-      ((nabs k z ^ (-((m * r : ℕ) : ℝ) / 2) : ℝ) : ℂ) := by
+theorem deltaHalf_levZ (r m : ℕ) (z : kˣ)
+    : (deltaHalf k (fun a => Fin (dd r m a)) (levZ k r m z) : ℂ)
+      = ((nabs k z ^ (-((m * r : ℕ) : ℝ) / 2) : ℝ) : ℂ) := by
   have h0 : levZ k r m z 0 = 1 := by simp [levZ] <;> rfl
   have h1 : levZ k r m z 1 = GeneralLinearGroup.scalar (Fin (dd r m 1)) z := by simp [levZ]
   have hdet : GeneralLinearGroup.det (GeneralLinearGroup.scalar (Fin (dd r m 1)) z) = z ^ m := by
     rw [GeneralLinearGroup.det_scalar]
     simp [dd]
-  have key : (deltaHalf k (fun a => Fin (dd r m a)) (levZ k r m z) : ℂ) =
-      ((nabs k (GeneralLinearGroup.det (levZ k r m z 0)) : ℂ) ^ ((modExp (fun a => Fin (dd r m a)) 0 : ℂ) / 2)) *
-      ((nabs k (GeneralLinearGroup.det (levZ k r m z 1)) : ℂ) ^ ((modExp (fun a => Fin (dd r m a)) 1 : ℂ) / 2)) := by
+  have key
+      : (deltaHalf k (fun a => Fin (dd r m a)) (levZ k r m z) : ℂ)
+        = ((nabs k (GeneralLinearGroup.det (levZ k r m z 0)) : ℂ)
+            ^ ((modExp (fun a => Fin (dd r m a)) 0 : ℂ) / 2))
+          * ((nabs k (GeneralLinearGroup.det (levZ k r m z 1)) : ℂ)
+            ^ ((modExp (fun a => Fin (dd r m a)) 1 : ℂ) / 2)) := by
     simp only [deltaHalf, Fin.prod_univ_two]
     rfl
   rw [key, h0, h1, hdet, map_one, modExp_two_one, nabs_pow]

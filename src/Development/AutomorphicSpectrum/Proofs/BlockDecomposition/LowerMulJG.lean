@@ -17,18 +17,16 @@ open PositivityTheory.Rg.Sw
 variable {n : ℕ}
 
 theorem JJ_inG : InG (JJ n) := by
-  have hc : (JJ n)ᴴ = -JJ n := by
+  have hc : (JJ n)ᴴ = - JJ n := by
     unfold JJ
     simp [Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_neg]
   show (JJ n)ᴴ * JJ n * JJ n = JJ n
   rw [hc, Matrix.mul_assoc, JJ_mul_JJ]
   simp
 
-def JG : GR n :=
-  ⟨⟨JJ n, -JJ n, by simp [JJ_mul_JJ], by simp [JJ_mul_JJ]⟩, JJ_inG⟩
+def JG : GR n := ⟨⟨JJ n, - JJ n, by simp [JJ_mul_JJ], by simp [JJ_mul_JJ]⟩, JJ_inG⟩
 
-theorem lower_mul_JG (y : GR n) :
-    (mR (y * JG)).toBlocks₂₁ = -(mR y).toBlocks₂₂ := by
+theorem lower_mul_JG (y : GR n) : (mR (y * JG)).toBlocks₂₁ = -(mR y).toBlocks₂₂ := by
   have h : mR (y * JG) = mR y * JJ n := rfl
   rw [h, ← Matrix.fromBlocks_toBlocks (mR y)]
   unfold JJ
@@ -37,8 +35,9 @@ theorem lower_mul_JG (y : GR n) :
 
 theorem dense_bigCell₂₂ : ∀ n : ℕ, Dense {y : GR n | ((mR y).toBlocks₂₂).det ≠ 0} := by
   intro n
-  have hset : {y : GR n | ((mR y).toBlocks₂₂).det ≠ 0} =
-      (fun y => y * (JG (n := n))) ⁻¹' {y : GR n | ((mR y).toBlocks₂₁).det ≠ 0} := by
+  have hset
+      : {y : GR n | ((mR y).toBlocks₂₂).det ≠ 0}
+        = (fun y => y * (JG (n := n))) ⁻¹' {y : GR n | ((mR y).toBlocks₂₁).det ≠ 0} := by
     ext y
     simp only [Set.mem_ofPred_eq, Set.mem_preimage, lower_mul_JG, Matrix.det_neg]
     constructor

@@ -8,5 +8,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Injectiv
 
 open GlobalTheory.CompanionTheory.PairMult
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.pair_multiplicity_generic_unitary : GlobalTheory.CompanionTheory.PairMult.GenCOU2 := by
-  first | exact @GlobalTheory.CompanionTheory.PairMult.COU.genCOU2 | exact GlobalTheory.CompanionTheory.PairMult.COU.genCOU2 | (intros; apply GlobalTheory.CompanionTheory.PairMult.COU.genCOU2 <;> assumption)
+theorem _root_.GlobalTheory.T.pair_multiplicity_generic_unitary
+    : GlobalTheory.CompanionTheory.PairMult.GenCOU2 := by
+  first
+  | exact @GlobalTheory.CompanionTheory.PairMult.COU.genCOU2
+  | exact GlobalTheory.CompanionTheory.PairMult.COU.genCOU2
+  | (intros; apply GlobalTheory.CompanionTheory.PairMult.COU.genCOU2 <;> assumption)

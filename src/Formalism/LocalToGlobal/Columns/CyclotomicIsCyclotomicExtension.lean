@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Host Formalism.FrobeniusOrbits
+open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Host
+  Formalism.FrobeniusOrbits
 
 section SplitGen
 
@@ -38,30 +39,38 @@ end Split
 
 section HostZ
 
-variable {φ₁ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ₁) (ι : Qb →+* ℂ) (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL] (hE : H.EQ ≤ LL)
+variable
+  {φ₁ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ₁)
+  (ι : Qb →+* ℂ)
+  (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL]
+  (hE : H.EQ ≤ LL)
 
 def hwQb (d : ℕ) : Qb := Classical.choose (exists_sqrt (-(d : ℤ)))
 
-theorem hwQb_mem (d : ℕ) : hwQb d ∈ sqrts (-(d : ℤ)) := Classical.choose_spec (exists_sqrt (-(d : ℤ)))
+theorem hwQb_mem (d : ℕ) : hwQb d ∈ sqrts (-(d : ℤ)) :=
+  Classical.choose_spec (exists_sqrt (-(d : ℤ)))
 
 theorem hwQb_sq (d : ℕ) : hwQb d ^ 2 = -(d : Qb) := by
   have h : hwQb d ^ 2 = ((-(d : ℤ) : ℤ) : Qb) := hwQb_mem d
-  rw [h]; simp
+  rw [h]
+  simp
 
-theorem hwQb_mem_EQ : hwQb H.d ∈ H.EQ :=
-  H.KQ_le_EQ (sqrts_sub _ (hwQb_mem H.d))
+theorem hwQb_mem_EQ : hwQb H.d ∈ H.EQ := H.KQ_le_EQ (sqrts_sub _ (hwQb_mem H.d))
 
 def hwE : (hostFields H ι LL hE).E := (⟨hwQb H.d, hwQb_mem_EQ H⟩ : H.EQ)
 
 theorem hwE_sq : hwE H ι LL hE ^ 2 = -(H.d : (hostFields H ι LL hE).E) := by
-  have h : ((⟨hwQb H.d, hwQb_mem_EQ H⟩ : H.EQ)) ^ 2 = -(H.d : H.EQ) := Subtype.val_injective (by
-    show hwQb H.d ^ 2 = _
-    rw [hwQb_sq]
-    simp)
+  have h : ((⟨hwQb H.d, hwQb_mem_EQ H⟩ : H.EQ)) ^ 2 = -(H.d : H.EQ) :=
+    Subtype.val_injective (by
+      show hwQb H.d ^ 2 = _
+      rw [hwQb_sq]
+      simp)
   exact h
 
-def hwO : 𝓞 (hostFields H ι LL hE).E :=
-  ⟨hwE H ι LL hE, IsIntegral.of_pow (n := 2) (by norm_num) (by rw [hwE_sq]; exact (isIntegral_natCast H.d).neg)⟩
+def hwO : 𝓞 (hostFields H ι LL hE).E := ⟨
+  hwE H ι LL hE,
+  IsIntegral.of_pow (n := 2) (by norm_num) (by rw [hwE_sq]; exact (isIntegral_natCast H.d).neg)
+⟩
 
 def hz (a b : ℤ) : 𝓞 (hostFields H ι LL hE).E :=
   (a : 𝓞 (hostFields H ι LL hE).E) + (b : 𝓞 (hostFields H ι LL hE).E) * hwO H ι LL hE
@@ -72,9 +81,11 @@ def toyFirstParameter : ℕ := 5812161310401002497
 
 def toySecondParameter : ℕ := 10580716767734447210497
 
-def nd2T : ℕ := 56194698826333161291662198507648755438473557111144279252246328293211974734191775333427954228508737780869538570051953955243454133837703637171933755744705457828859522702609327843686445057
+def nd2T : ℕ :=
+  56194698826333161291662198507648755438473557111144279252246328293211974734191775333427954228508737780869538570051953955243454133837703637171933755744705457828859522702609327843686445057
 
-def columnDegreeBound : ℕ := 175899382716746995995794692370095808443505986460327359316203003947391329197558870718244898147225575657278023097973275990081581282841096000378419862656504066221696375796925055794734493697
+def columnDegreeBound : ℕ :=
+  175899382716746995995794692370095808443505986460327359316203003947391329197558870718244898147225575657278023097973275990081581282841096000378419862656504066221696375796925055794734493697
 
 section CharsGen
 
@@ -87,7 +98,6 @@ end CharsGen
 section Hecke
 
 variable {X : Fields} {Pr : Primes X} {R : Ranks}
-
 
 end Hecke
 
@@ -104,17 +114,20 @@ variable (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL] (hLL : cycQ nd2N 
 
 abbrev nd2X : Fields := hostFields H0.toHostRaw ndIota LL (exampleField_le_cyclotomic.trans hLL)
 
-abbrev nd2z (a b : ℤ) : 𝓞 (nd2X LL hLL).E := hz H0.toHostRaw ndIota LL (exampleField_le_cyclotomic.trans hLL) a b
+abbrev nd2z (a b : ℤ) : 𝓞 (nd2X LL hLL).E :=
+  hz H0.toHostRaw ndIota LL (exampleField_le_cyclotomic.trans hLL) a b
 
 def toyPrimes : Primes (nd2X LL hLL) where
   cond := H0.condN
   g := ![toyFirstParameter, toySecondParameter]
-  piG := ![nd2z LL hLL 1 (((H0.condN : ℕ) : ℤ) * 18),
-    nd2z LL hLL 1 (((H0.condN : ℕ) : ℤ) * 768)]
+  piG :=
+    ![nd2z LL hLL 1 (((H0.condN : ℕ) : ℤ) * 18),
+      nd2z LL hLL 1 (((H0.condN : ℕ) : ℤ) * 768)]
   Word := Fin 2
   T := ![nd2T, columnDegreeBound]
-  piT := ![nd2z LL hLL 1 (((H0.condN * (toyFirstParameter * toySecondParameter) ^ 2 : ℕ) : ℤ) * 468),
-    nd2z LL hLL 1 (((H0.condN * (toyFirstParameter * toySecondParameter) ^ 2 : ℕ) : ℤ) * 828)]
+  piT :=
+    ![nd2z LL hLL 1 (((H0.condN * (toyFirstParameter * toySecondParameter) ^ 2 : ℕ) : ℤ) * 468),
+      nd2z LL hLL 1 (((H0.condN * (toyFirstParameter * toySecondParameter) ^ 2 : ℕ) : ℤ) * 828)]
 
 end Inst
 
@@ -126,11 +139,9 @@ variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Ch
 
 end Gen
 
-
 section Inst
 
 variable (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL] (hLL : cycQ nd2N ≤ LL)
-
 
 end Inst
 

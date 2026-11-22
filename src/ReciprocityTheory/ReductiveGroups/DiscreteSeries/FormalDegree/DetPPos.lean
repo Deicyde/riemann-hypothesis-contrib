@@ -18,17 +18,23 @@ namespace PolarJacobianDeterminant
 
 variable {n : ℕ}
 
-theorem det_pos_of_posForm {V : Type*} [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V]
-    (T : V →ₗ[ℝ] V) (B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hBs : ∀ v w, B v w = B w v)
-    (hB : ∀ v, v ≠ 0 → 0 < B v v) (hT : ∀ v w, B v (T w) = B (T v) w)
-    (hTp : ∀ v, v ≠ 0 → 0 < B v (T v)) : 0 < LinearMap.det T := by
+theorem det_pos_of_posForm
+    {V : Type*} [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V]
+    (T : V →ₗ[ℝ] V) (B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
+    (hBs : ∀ v w, B v w = B w v) (hB : ∀ v, v ≠ 0 → 0 < B v v) (hT : ∀ v w, B v (T w) = B (T v) w)
+    (hTp : ∀ v, v ≠ 0 → 0 < B v (T v))
+    : 0 < LinearMap.det T := by
   by_contra hneg
   push_neg at hneg
   set f : ℝ → ℝ := fun t => LinearMap.det (t • T + (1 - t) • LinearMap.id) with hf
   have hcont : Continuous f := by
     let b := Module.finBasis ℝ V
-    have e : f = fun t => (t • LinearMap.toMatrix b b T +
-        (1 - t) • (1 : Matrix (Fin (Module.finrank ℝ V)) (Fin (Module.finrank ℝ V)) ℝ)).det := by
+    have e
+        : f
+          = fun t =>
+            (t • LinearMap.toMatrix b b T
+              + (1 - t)
+                • (1 : Matrix (Fin (Module.finrank ℝ V)) (Fin (Module.finrank ℝ V)) ℝ)).det := by
       funext t
       show LinearMap.det (t • T + (1 - t) • LinearMap.id) = _
       rw [← LinearMap.det_toMatrix b, map_add (f := _), map_smul, map_smul, LinearMap.toMatrix_id]
@@ -37,13 +43,14 @@ theorem det_pos_of_posForm {V : Type*} [AddCommGroup V] [Module ℝ V] [FiniteDi
       ((continuous_const.sub continuous_id).smul continuous_const)).matrix_det
   have h1 : f 1 ≤ 0 := by simpa [hf] using hneg
   have h0 : 0 ≤ f 0 := by simp [hf]
-  obtain ⟨t, ht, hft⟩ := intermediate_value_Icc' (by norm_num : (0 : ℝ) ≤ 1) hcont.continuousOn ⟨h1, h0⟩
+  obtain ⟨t, ht, hft⟩ :=
+    intermediate_value_Icc' (by norm_num : (0 : ℝ) ≤ 1) hcont.continuousOn ⟨h1, h0⟩
   have hdet : LinearMap.det (t • T + (1 - t) • LinearMap.id) = 0 := hft
   obtain ⟨v, hvk, hv0⟩ :=
     Submodule.exists_mem_ne_zero_of_ne_bot (LinearMap.bot_lt_ker_of_det_eq_zero hdet).ne'
   have hSv : (t • T + (1 - t) • LinearMap.id : V →ₗ[ℝ] V) v = 0 := LinearMap.mem_ker.1 hvk
-  have hE : B v ((t • T + (1 - t) • LinearMap.id : V →ₗ[ℝ] V) v) =
-      t * B v (T v) + (1 - t) * B v v := by
+  have hE
+      : B v ((t • T + (1 - t) • LinearMap.id : V →ₗ[ℝ] V) v) = t * B v (T v) + (1 - t) * B v v := by
     simp
   rw [hSv, map_zero] at hE
   have ha := hTp v hv0
@@ -58,22 +65,25 @@ theorem det_pos_of_posForm {V : Type*} [AddCommGroup V] [Module ℝ V] [FiniteDi
 
 def trF (X Z : Matrix (Fin n) (Fin n) ℂ) : ℝ := (∑ a, ∑ b, star (X a b) * Z a b).re
 
-theorem sum_star_mul_eq_trace (X Z : Matrix (Fin n) (Fin n) ℂ) :
-    ∑ a, ∑ b, star (X a b) * Z a b = trace (Xᴴ * Z) := by
+theorem sum_star_mul_eq_trace (X Z : Matrix (Fin n) (Fin n) ℂ)
+    : ∑ a, ∑ b, star (X a b) * Z a b = trace (Xᴴ * Z) := by
   simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply]
   exact Finset.sum_comm
 
-theorem trace_conj_mul_left (U S X : Matrix (Fin n) (Fin n) ℂ) :
-    trace (Xᴴ * (U * S * Uᴴ)) = trace ((Uᴴ * X * U)ᴴ * S) := by
-  calc trace (Xᴴ * (U * S * Uᴴ)) = trace ((Xᴴ * U * S) * Uᴴ) := by simp only [Matrix.mul_assoc]
+theorem trace_conj_mul_left (U S X : Matrix (Fin n) (Fin n) ℂ)
+    : trace (Xᴴ * (U * S * Uᴴ)) = trace ((Uᴴ * X * U)ᴴ * S) := by
+  calc
+    trace (Xᴴ * (U * S * Uᴴ))
+      = trace ((Xᴴ * U * S) * Uᴴ) := by simp only [Matrix.mul_assoc]
     _ = trace (Uᴴ * (Xᴴ * U * S)) := Matrix.trace_mul_comm _ _
     _ = trace ((Uᴴ * X * U)ᴴ * S) := by
       simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.mul_assoc]
 
-theorem trace_conj_mul_right (U S Z : Matrix (Fin n) (Fin n) ℂ) :
-    trace ((U * S * Uᴴ)ᴴ * Z) = trace (Sᴴ * (Uᴴ * Z * U)) := by
-  calc trace ((U * S * Uᴴ)ᴴ * Z) = trace (U * (Sᴴ * Uᴴ * Z)) := by
-        simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.mul_assoc]
+theorem trace_conj_mul_right (U S Z : Matrix (Fin n) (Fin n) ℂ)
+    : trace ((U * S * Uᴴ)ᴴ * Z) = trace (Sᴴ * (Uᴴ * Z * U)) := by
+  calc
+    trace ((U * S * Uᴴ)ᴴ * Z) = trace (U * (Sᴴ * Uᴴ * Z)) := by
+      simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.mul_assoc]
     _ = trace ((Sᴴ * Uᴴ * Z) * U) := Matrix.trace_mul_comm _ _
     _ = trace (Sᴴ * (Uᴴ * Z * U)) := by simp only [Matrix.mul_assoc]
 
@@ -94,7 +104,8 @@ theorem shc_neg (u : ℝ) : shc (-u) = shc u := by
 section U
 variable {ε : Fin n → Bool} (y : PCoord ε → ℂ)
 
-abbrev Uy : Matrix (Fin n) (Fin n) ℂ := ((pmat_isHermitian y).eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+abbrev Uy : Matrix (Fin n) (Fin n) ℂ :=
+  ((pmat_isHermitian y).eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
 
 theorem Uy_star_mul : (Uy y)ᴴ * Uy y = 1 := by
   have h := Matrix.mem_unitaryGroup_iff'.mp (pmat_isHermitian y).eigenvectorUnitary.prop
@@ -103,13 +114,16 @@ theorem Uy_mul_star : Uy y * (Uy y)ᴴ = 1 := by
   have h := Matrix.mem_unitaryGroup_iff.mp (pmat_isHermitian y).eigenvectorUnitary.prop
   exact h
 
-theorem shcAd_eq (W : Matrix (Fin n) (Fin n) ℂ) :
-    shcAd y W = Uy y * Matrix.of (fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) *
-      ((Uy y)ᴴ * W * Uy y) i j) * (Uy y)ᴴ := rfl
+theorem shcAd_eq (W : Matrix (Fin n) (Fin n) ℂ)
+    : shcAd y W
+      = Uy y * Matrix.of (fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * W * Uy y) i j)
+        * (Uy y)ᴴ :=
+  rfl
 
-theorem trF_shcAd_right (X Z : Matrix (Fin n) (Fin n) ℂ) :
-    trF X (shcAd y Z) = (∑ i, ∑ j, ((shc (pev y i - pev y j) : ℝ) : ℂ) *
-      (star (((Uy y)ᴴ * X * Uy y) i j) * ((Uy y)ᴴ * Z * Uy y) i j)).re := by
+theorem trF_shcAd_right (X Z : Matrix (Fin n) (Fin n) ℂ)
+    : trF X (shcAd y Z)
+      = (∑ i, ∑ j, ((shc (pev y i - pev y j) : ℝ) : ℂ) *
+          (star (((Uy y)ᴴ * X * Uy y) i j) * ((Uy y)ᴴ * Z * Uy y) i j)).re := by
   unfold trF
   rw [shcAd_eq, sum_star_mul_eq_trace, trace_conj_mul_left, ← sum_star_mul_eq_trace]
   congr 1
@@ -117,9 +131,10 @@ theorem trF_shcAd_right (X Z : Matrix (Fin n) (Fin n) ℂ) :
   simp only [Matrix.of_apply]
   ring
 
-theorem trF_shcAd_left (X Z : Matrix (Fin n) (Fin n) ℂ) :
-    trF (shcAd y X) Z = (∑ i, ∑ j, ((shc (pev y i - pev y j) : ℝ) : ℂ) *
-      (star (((Uy y)ᴴ * X * Uy y) i j) * ((Uy y)ᴴ * Z * Uy y) i j)).re := by
+theorem trF_shcAd_left (X Z : Matrix (Fin n) (Fin n) ℂ)
+    : trF (shcAd y X) Z
+      = (∑ i, ∑ j, ((shc (pev y i - pev y j) : ℝ) : ℂ) *
+          (star (((Uy y)ᴴ * X * Uy y) i j) * ((Uy y)ᴴ * Z * Uy y) i j)).re := by
   have hs : ∀ r : ℝ, star (r : ℂ) = r := fun r => Complex.conj_ofReal r
   unfold trF
   rw [shcAd_eq, sum_star_mul_eq_trace, trace_conj_mul_right, ← sum_star_mul_eq_trace]
@@ -134,16 +149,19 @@ theorem trF_shcAd_pos (X : Matrix (Fin n) (Fin n) ℂ) (hX : X ≠ 0) : 0 < trF 
   have hW0 : W ≠ 0 := by
     intro h
     apply hX
-    calc X = Uy y * W * (Uy y)ᴴ := by
-          rw [hW, ← Matrix.mul_assoc, ← Matrix.mul_assoc, Uy_mul_star, Matrix.one_mul,
-            Matrix.mul_assoc, Uy_mul_star, Matrix.mul_one]
+    calc
+      X = Uy y * W * (Uy y)ᴴ := by
+        rw [hW, ← Matrix.mul_assoc, ← Matrix.mul_assoc, Uy_mul_star, Matrix.one_mul,
+          Matrix.mul_assoc, Uy_mul_star, Matrix.mul_one]
       _ = 0 := by rw [h, Matrix.mul_zero, Matrix.zero_mul]
   obtain ⟨i0, j0, hij⟩ : ∃ i j, W i j ≠ 0 := by
     by_contra h
     push_neg at h
     exact hW0 (Matrix.ext fun i j => h i j)
-  have hterm : ∀ i j, (((shc (pev y i - pev y j) : ℝ) : ℂ) * (star (W i j) * W i j)).re =
-      shc (pev y i - pev y j) * Complex.normSq (W i j) := by
+  have hterm
+      : ∀ i j,
+        (((shc (pev y i - pev y j) : ℝ) : ℂ) * (star (W i j) * W i j)).re
+          = shc (pev y i - pev y j) * Complex.normSq (W i j) := by
     intro i j
     have h : star (W i j) * W i j = ((Complex.normSq (W i j) : ℝ) : ℂ) :=
       Complex.normSq_eq_conj_mul_self.symm
@@ -163,7 +181,8 @@ end U
 theorem trF_add_left (X X' Z : Matrix (Fin n) (Fin n) ℂ) : trF (X + X') Z = trF X Z + trF X' Z := by
   simp only [trF, Matrix.add_apply, star_add, add_mul, Finset.sum_add_distrib, Complex.add_re]
 
-theorem trF_add_right (X Z Z' : Matrix (Fin n) (Fin n) ℂ) : trF X (Z + Z') = trF X Z + trF X Z' := by
+theorem trF_add_right (X Z Z' : Matrix (Fin n) (Fin n) ℂ)
+    : trF X (Z + Z') = trF X Z + trF X Z' := by
   simp only [trF, Matrix.add_apply, mul_add, Finset.sum_add_distrib, Complex.add_re]
 
 theorem trF_comm (X Z : Matrix (Fin n) (Fin n) ℂ) : trF X Z = trF Z X := by
@@ -240,29 +259,30 @@ theorem pmat_ne_zero (v : PCoord ε → ℂ) (hv : v ≠ 0) : pmat v ≠ 0 := by
   rw [h] at this
   simpa using this.symm
 
-theorem shcAd_add' (y : PCoord ε → ℂ) (W W' : Matrix (Fin n) (Fin n) ℂ) :
-    shcAd y (W + W') = shcAd y W + shcAd y W' := by
+theorem shcAd_add' (y : PCoord ε → ℂ) (W W' : Matrix (Fin n) (Fin n) ℂ)
+    : shcAd y (W + W') = shcAd y W + shcAd y W' := by
   simp only [shcAd_eq]
   rw [← Matrix.add_mul, ← Matrix.mul_add]
   congr 2
   ext i j
   simp only [Matrix.of_apply, Matrix.add_apply, Matrix.mul_add, Matrix.add_mul, mul_add]
 
-theorem shcAd_smul' (y : PCoord ε → ℂ) (c : ℝ) (W : Matrix (Fin n) (Fin n) ℂ) :
-    shcAd y (c • W) = c • shcAd y W := by
+theorem shcAd_smul' (y : PCoord ε → ℂ) (c : ℝ) (W : Matrix (Fin n) (Fin n) ℂ)
+    : shcAd y (c • W) = c • shcAd y W := by
   simp only [shcAd_eq]
   rw [← Matrix.smul_mul, ← Matrix.mul_smul]
   congr 2
   ext i j
-  simp only [Matrix.of_apply, Matrix.smul_apply, Matrix.smul_mul, Matrix.mul_smul, Complex.real_smul]
+  simp only [Matrix.of_apply, Matrix.smul_apply, Matrix.smul_mul, Matrix.mul_smul,
+    Complex.real_smul]
   ring
 
 def shcAdCL (y : PCoord ε → ℂ) : (PCoord ε → ℂ) →ₗ[ℝ] (PCoord ε → ℂ) where
   toFun w := fun ab => shcAd y (pmat w) ab.1.1 ab.1.2
-  map_add' v w := by
-    funext ab; simp only [pmat_add', shcAd_add', Matrix.add_apply, Pi.add_apply]
+  map_add' v w := by funext ab; simp only [pmat_add', shcAd_add', Matrix.add_apply, Pi.add_apply]
   map_smul' c v := by
-    funext ab; simp only [pmat_smul', shcAd_smul', Matrix.smul_apply, Pi.smul_apply, RingHom.id_apply]
+    funext ab
+    simp only [pmat_smul', shcAd_smul', Matrix.smul_apply, Pi.smul_apply, RingHom.id_apply]
 
 theorem pmat_shcAdCL (y w : PCoord ε → ℂ) : pmat (shcAdCL y w) = shcAd y (pmat w) := by
   have hs : ∀ r : ℝ, star (r : ℂ) = r := fun r => Complex.conj_ofReal r
@@ -270,13 +290,17 @@ theorem pmat_shcAdCL (y w : PCoord ε → ℂ) : pmat (shcAdCL y w) = shcAd y (p
   have hN : ((Uy y)ᴴ * pmat w * Uy y)ᴴ = (Uy y)ᴴ * pmat w * Uy y := by
     rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hZ,
       Matrix.mul_assoc]
-  have hM : (Matrix.of fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j)ᴴ =
-      Matrix.of fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j := by
+  have hM
+      : (Matrix.of fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j)ᴴ
+        = Matrix.of fun i j =>
+          ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j := by
     ext i j
     rw [Matrix.conjTranspose_apply, Matrix.of_apply, Matrix.of_apply, star_mul', hs,
-      ← Matrix.conjTranspose_apply, hN, show pev y j - pev y i = -(pev y i - pev y j) by ring, shc_neg]
+      ← Matrix.conjTranspose_apply, hN, show pev y j - pev y i = -(pev y i - pev y j) by ring,
+      shc_neg]
   have hH : (shcAd y (pmat w))ᴴ = shcAd y (pmat w) := by
-    rw [shcAd_eq, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hM]
+    rw [shcAd_eq, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
+      Matrix.conjTranspose_conjTranspose, hM]
     exact (Matrix.mul_assoc _ _ _).symm
   set s : Fin n → ℂ := fun a => if ε a then 1 else -1 with hsd
   set J : Matrix (Fin n) (Fin n) ℂ := diagonal s with hJd
@@ -285,7 +309,7 @@ theorem pmat_shcAdCL (y w : PCoord ε → ℂ) : pmat (shcAdCL y w) = shcAd y (p
     congr 1
     funext i
     cases hi : ε i <;> simp [hsd, hi]
-  have hJZ : ∀ z : PCoord ε → ℂ, J * pmat z * J = -pmat z := by
+  have hJZ : ∀ z : PCoord ε → ℂ, J * pmat z * J = - pmat z := by
     intro z
     ext a b
     simp only [hJd, Matrix.diagonal_mul, Matrix.mul_diagonal, Matrix.neg_apply]
@@ -305,26 +329,31 @@ theorem pmat_shcAdCL (y w : PCoord ε → ℂ) : pmat (shcAdCL y w) = shcAd y (p
   have hUU' := Uy_mul_star y
   have hQQ : Q * Q = 1 := by
     rw [hQ]
-    calc (Uy y)ᴴ * J * Uy y * ((Uy y)ᴴ * J * Uy y) = (Uy y)ᴴ * J * (Uy y * (Uy y)ᴴ) * J * Uy y := by
-          simp only [Matrix.mul_assoc]
-      _ = 1 := by rw [hUU', Matrix.mul_one, Matrix.mul_assoc ((Uy y)ᴴ) J J, hJJ, Matrix.mul_one, hUU]
-  have hQD : Q * diagonal Λ * Q = -diagonal Λ := by
-    have hJY : J * pmat y * J = -pmat y := hJZ y
+    calc
+      (Uy y)ᴴ * J * Uy y * ((Uy y)ᴴ * J * Uy y)
+        = (Uy y)ᴴ * J * (Uy y * (Uy y)ᴴ) * J * Uy y := by simp only [Matrix.mul_assoc]
+      _ = 1 := by
+        rw [hUU', Matrix.mul_one, Matrix.mul_assoc ((Uy y)ᴴ) J J, hJJ, Matrix.mul_one, hUU]
+  have hQD : Q * diagonal Λ * Q = - diagonal Λ := by
+    have hJY : J * pmat y * J = - pmat y := hJZ y
     rw [hY] at hJY
-    calc Q * diagonal Λ * Q = (Uy y)ᴴ * (J * (Uy y * diagonal Λ * (Uy y)ᴴ) * J) * Uy y := by
-          rw [hQ]
-          simp only [Matrix.mul_assoc]
+    calc
+      Q * diagonal Λ * Q = (Uy y)ᴴ * (J * (Uy y * diagonal Λ * (Uy y)ᴴ) * J) * Uy y := by
+        rw [hQ]
+        simp only [Matrix.mul_assoc]
       _ = (Uy y)ᴴ * (-(Uy y * diagonal Λ * (Uy y)ᴴ)) * Uy y := by rw [hJY]
-      _ = -diagonal Λ := by
-          rw [Matrix.mul_neg, Matrix.neg_mul]
-          refine congrArg Neg.neg ?_
-          simp only [← Matrix.mul_assoc]
-          rw [hUU, Matrix.one_mul, Matrix.mul_assoc, hUU, Matrix.mul_one]
+      _ = - diagonal Λ := by
+        rw [Matrix.mul_neg, Matrix.neg_mul]
+        refine congrArg Neg.neg ?_
+        simp only [← Matrix.mul_assoc]
+        rw [hUU, Matrix.one_mul, Matrix.mul_assoc, hUU, Matrix.mul_one]
   have hQDc : Q * diagonal Λ = -(diagonal Λ * Q) := by
-    calc Q * diagonal Λ = Q * diagonal Λ * (Q * Q) := by rw [hQQ, Matrix.mul_one]
+    calc
+      Q * diagonal Λ
+        = Q * diagonal Λ * (Q * Q) := by rw [hQQ, Matrix.mul_one]
       _ = (Q * diagonal Λ * Q) * Q := by simp only [Matrix.mul_assoc]
       _ = -(diagonal Λ * Q) := by rw [hQD, Matrix.neg_mul]
-  have hQent : ∀ i k, Q i k ≠ 0 → pev y k = -pev y i := by
+  have hQent : ∀ i k, Q i k ≠ 0 → pev y k = - pev y i := by
     intro i k hik
     have h := congrFun (congrFun hQDc i) k
     rw [Matrix.mul_diagonal, Matrix.neg_apply, Matrix.diagonal_mul] at h
@@ -333,26 +362,34 @@ theorem pmat_shcAdCL (y w : PCoord ε → ℂ) : pmat (shcAdCL y w) = shcAd y (p
     simp only [hΛ] at h3
     have h5 : pev y k + pev y i = 0 := by exact_mod_cast h3
     linarith
-  have hshc : ∀ i j k l, Q i k ≠ 0 → Q l j ≠ 0 → shc (pev y k - pev y l) = shc (pev y i - pev y j) := by
+  have hshc
+      : ∀ i j k l, Q i k ≠ 0 → Q l j ≠ 0 → shc (pev y k - pev y l) = shc (pev y i - pev y j) := by
     intro i j k l h1 h2
     have e1 := hQent i k h1
     have e2 := hQent l j h2
     rw [show pev y k - pev y l = -(pev y i - pev y j) by linarith, shc_neg]
   have hN' : Q * ((Uy y)ᴴ * pmat w * Uy y) * Q = -((Uy y)ᴴ * pmat w * Uy y) := by
-    calc Q * ((Uy y)ᴴ * pmat w * Uy y) * Q
-        = (Uy y)ᴴ * (J * ((Uy y * (Uy y)ᴴ) * pmat w * (Uy y * (Uy y)ᴴ)) * J) * Uy y := by
-          rw [hQ]
-          simp only [Matrix.mul_assoc]
+    calc
+      Q * ((Uy y)ᴴ * pmat w * Uy y) * Q
+          = (Uy y)ᴴ * (J * ((Uy y * (Uy y)ᴴ) * pmat w * (Uy y * (Uy y)ᴴ)) * J) * Uy y := by
+        rw [hQ]
+        simp only [Matrix.mul_assoc]
       _ = (Uy y)ᴴ * (J * pmat w * J) * Uy y := by rw [hUU', Matrix.one_mul, Matrix.mul_one]
       _ = -((Uy y)ᴴ * pmat w * Uy y) := by rw [hJZ w, Matrix.mul_neg, Matrix.neg_mul]
-  have hMQ : Q * (Matrix.of fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j) * Q =
-      -(Matrix.of fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j) := by
+  have hMQ
+      : Q * (Matrix.of fun i j =>
+            ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j)
+          * Q
+        = -(Matrix.of fun i j =>
+          ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j) := by
     set N := (Uy y)ᴴ * pmat w * Uy y with hNd
     ext i j
     have hE := congrFun (congrFun hN' i) j
     simp only [Matrix.mul_apply, Matrix.of_apply, Matrix.neg_apply] at hE ⊢
-    have key : ∀ l k, Q i k * (((shc (pev y k - pev y l) : ℝ) : ℂ) * N k l) * Q l j =
-        ((shc (pev y i - pev y j) : ℝ) : ℂ) * (Q i k * N k l * Q l j) := by
+    have key
+        : ∀ l k,
+          Q i k * (((shc (pev y k - pev y l) : ℝ) : ℂ) * N k l) * Q l j
+            = ((shc (pev y i - pev y j) : ℝ) : ℂ) * (Q i k * N k l * Q l j) := by
       intro l k
       by_cases h1 : Q i k = 0
       · simp [h1]
@@ -360,32 +397,43 @@ theorem pmat_shcAdCL (y w : PCoord ε → ℂ) : pmat (shcAdCL y w) = shcAd y (p
       · simp [h2]
       rw [hshc i j k l h1 h2]
       ring
-    calc ∑ l, (∑ k, Q i k * (((shc (pev y k - pev y l) : ℝ) : ℂ) * N k l)) * Q l j
-        = ∑ l, ∑ k, ((shc (pev y i - pev y j) : ℝ) : ℂ) * (Q i k * N k l * Q l j) := by
-          refine Finset.sum_congr rfl fun l _ => ?_
-          rw [Finset.sum_mul]
-          exact Finset.sum_congr rfl fun k _ => key l k
+    calc
+      ∑ l, (∑ k, Q i k * (((shc (pev y k - pev y l) : ℝ) : ℂ) * N k l)) * Q l j
+          = ∑ l, ∑ k, ((shc (pev y i - pev y j) : ℝ) : ℂ) * (Q i k * N k l * Q l j) := by
+        refine Finset.sum_congr rfl fun l _ => ?_
+        rw [Finset.sum_mul]
+        exact Finset.sum_congr rfl fun k _ => key l k
       _ = ((shc (pev y i - pev y j) : ℝ) : ℂ) * ∑ l, (∑ k, Q i k * N k l) * Q l j := by
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl fun l _ => ?_
-          rw [Finset.sum_mul, Finset.mul_sum]
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun l _ => ?_
+        rw [Finset.sum_mul, Finset.mul_sum]
       _ = -(((shc (pev y i - pev y j) : ℝ) : ℂ) * N i j) := by
-          rw [hE]
-          ring
-  have hJW : J * shcAd y (pmat w) * J = -shcAd y (pmat w) := by
+        rw [hE]
+        ring
+  have hJW : J * shcAd y (pmat w) * J = - shcAd y (pmat w) := by
     rw [shcAd_eq]
-    calc J * (Uy y * (Matrix.of fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) *
-            ((Uy y)ᴴ * pmat w * Uy y) i j) * (Uy y)ᴴ) * J
-        = Uy y * (Q * (Matrix.of fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) *
-            ((Uy y)ᴴ * pmat w * Uy y) i j) * Q) * (Uy y)ᴴ := by
-          rw [hQ]
-          simp only [← Matrix.mul_assoc]
-          rw [hUU', Matrix.one_mul]
-          simp only [Matrix.mul_assoc]
-          rw [hUU', Matrix.mul_one]
-      _ = -(Uy y * (Matrix.of fun i j => ((shc (pev y i - pev y j) : ℝ) : ℂ) *
-            ((Uy y)ᴴ * pmat w * Uy y) i j) * (Uy y)ᴴ) := by
-          rw [hMQ, Matrix.mul_neg, Matrix.neg_mul]
+    calc
+      J * (Uy y
+              * (Matrix.of fun i j =>
+                ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j)
+              * (Uy y)ᴴ)
+            * J
+          = Uy y
+            * (Q
+              * (Matrix.of fun i j =>
+                ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j)
+              * Q)
+            * (Uy y)ᴴ := by
+        rw [hQ]
+        simp only [← Matrix.mul_assoc]
+        rw [hUU', Matrix.one_mul]
+        simp only [Matrix.mul_assoc]
+        rw [hUU', Matrix.mul_one]
+      _ = -(Uy y
+          * (Matrix.of fun i j =>
+            ((shc (pev y i - pev y j) : ℝ) : ℂ) * ((Uy y)ᴴ * pmat w * Uy y) i j)
+          * (Uy y)ᴴ) := by
+        rw [hMQ, Matrix.mul_neg, Matrix.neg_mul]
   have hzero : ∀ a b, ε a = ε b → shcAd y (pmat w) a b = 0 := by
     intro a b hab
     have h := congrFun (congrFun hJW a) b
@@ -412,7 +460,8 @@ theorem pmat_shcAdCL (y w : PCoord ε → ℂ) : pmat (shcAdCL y w) = shcAd y (p
     · exact h1 ⟨hgt, hne⟩
 
 def Bp (ε : Fin n → Bool) : (PCoord ε → ℂ) →ₗ[ℝ] (PCoord ε → ℂ) →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ (fun v w => trF (pmat v) (pmat w))
+  LinearMap.mk₂ ℝ
+    (fun v w => trF (pmat v) (pmat w))
     (fun v v' w => by simp only [pmat_add', trF_add_left])
     (fun c v w => by simp only [pmat_smul', trF_smul_left, smul_eq_mul])
     (fun v w w' => by simp only [pmat_add', trF_add_right])

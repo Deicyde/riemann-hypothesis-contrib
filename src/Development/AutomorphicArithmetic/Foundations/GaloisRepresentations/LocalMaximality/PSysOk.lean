@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section SlopeTestRemainingChoices
@@ -29,7 +30,9 @@ private lemma pk_mem' {d : ℕ} {I : Finset (Fin (d + 1))} (h : I.Nonempty) : pk
   rw [dite_eq_left h]
   exact Finset.min'_mem _ _
 
-variable {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
+variable
+  {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
+  (T : Sys d S E)
   {κ : Type} [LinearOrder κ]
 
 private lemma u_quot (hT : T.Good) (n : κ → ℕ × ℕ) {I J : Finset (Fin (d + 1))} (hI : I.Nonempty) (hJ : J.Nonempty)
@@ -129,15 +132,16 @@ private lemma mix_step (hT : T.Good) (n : κ → ℕ × ℕ) (z : κ → S) (hA 
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.Gal.productCup_of_system.sysOk_of :
-    WdUni → SysOk := by
+theorem UpperTheory.Gal.productCup_of_system.sysOk_of : WdUni → SysOk := by
   intro _
   unfold SysOk
   intro d S E _ _ _ _ T κ _ _ n z hT hA
-  refine ⟨⟨?_, ?_⟩, fun I J i hi j hj => ⟨fun l => r_mem T hT n z hA hi hj l, col_eq T hT n z hi hj⟩, ?_⟩
+  refine
+    ⟨⟨?_, ?_⟩, fun I J i hi j hj => ⟨fun l => r_mem T hT n z hA hi hj l, col_eq T hT n z hi hj⟩, ?_⟩
   · intro i j
     unfold Sys.wt
-    rcases ofLex i with a | a <;> rcases ofLex j with b | b <;> simp only [Sum.elim_inl, Sum.elim_inr]
+    rcases ofLex i with a | a <;> rcases ofLex j with b | b
+      <;> simp only [Sum.elim_inl, Sum.elim_inr]
     · exact Commute.one_left _
     · exact Commute.one_left _
     · exact Commute.one_right _
@@ -148,9 +152,12 @@ theorem UpperTheory.Gal.productCup_of_system.sysOk_of :
     rcases x with a | l
     · have hw : T.wt z (toLex (Sum.inl a)) = 1 := rfl
       rw [hw, Module.End.one_apply]
-      have gen : ∀ s1 : Finset (Two d ⊕ₗ κ), lft s ⊆ lft s1 → rgt s1 = rgt s →
-          m ∈ mixF (fun I J => (T.M I J).map (T.act ((∏ l ∈ rgt s1, T.u n (pk I) (pk J) l : Sˣ) : S)))
-            (lft s1) := by
+      have gen
+          : ∀ s1 : Finset (Two d ⊕ₗ κ),
+            lft s ⊆ lft s1 → rgt s1 = rgt s
+              → m ∈ mixF
+                (fun I J => (T.M I J).map (T.act ((∏ l ∈ rgt s1, T.u n (pk I) (pk J) l : Sˣ) : S)))
+                (lft s1) := by
         intro s1 h1 h2
         rw [h2]
         exact mix_mono T hT n (rgt s) h1 hm
@@ -164,9 +171,12 @@ theorem UpperTheory.Gal.productCup_of_system.sysOk_of :
       have key := mix_step T hT n z hA (rgt s) hl (lft s) hm
       have hw : T.wt z (toLex (Sum.inr l)) = T.act (z l) := rfl
       rw [hw]
-      have gen : ∀ s1 : Finset (Two d ⊕ₗ κ), lft s1 = lft s → rgt s1 = insert l (rgt s) →
-          T.act (z l) m ∈ mixF (fun I J => (T.M I J).map (T.act ((∏ l ∈ rgt s1, T.u n (pk I) (pk J) l : Sˣ) : S)))
-            (lft s1) := by
+      have gen
+          : ∀ s1 : Finset (Two d ⊕ₗ κ),
+            lft s1 = lft s → rgt s1 = insert l (rgt s)
+              → T.act (z l) m ∈ mixF
+                (fun I J => (T.M I J).map (T.act ((∏ l ∈ rgt s1, T.u n (pk I) (pk J) l : Sˣ) : S)))
+                (lft s1) := by
         intro s1 h1 h2
         rw [h1, h2]
         exact key
@@ -177,7 +187,8 @@ theorem UpperTheory.Gal.productCup_of_system.sysOk_of :
         simp [mem_rgt']
   · intro I I' J J' hI hJ hII hJJ m x hx
     simp only [Cx.Z, Sys.colCx, kosT, acx, Submodule.mem_inf, Submodule.mem_pi, Set.mem_univ,
-      true_implies] at hx ⊢
+        true_implies]
+      at hx ⊢
     refine ⟨fun L => ?_, hx.2⟩
     have hxL := hx.1 L
     split_ifs at hxL ⊢

@@ -8,22 +8,29 @@ open scoped PowerSeries Pointwise
 
 namespace GlobalTheory.InertiaEigenvalues.PowerSeriesFree
 
-theorem coeff_term {O : Type} [CommRing O] (l : ℕ) (φ : O⟦X⟧ →ₐ[O] O⟦X⟧)
-    (hφ : ∀ (f : O⟦X⟧) (m : ℕ), PowerSeries.coeff m (φ f) = if l ∣ m then PowerSeries.coeff (m / l) f else 0)
-    (j m : ℕ) (g : O⟦X⟧) :
-    PowerSeries.coeff m (PowerSeries.X ^ j * φ g) =
-      if j ≤ m ∧ l ∣ (m - j) then PowerSeries.coeff ((m - j) / l) g else 0 := by
+theorem coeff_term
+    {O : Type} [CommRing O]
+    (l : ℕ) (φ : O⟦X⟧ →ₐ[O] O⟦X⟧)
+    (hφ : ∀ (f : O⟦X⟧) (m : ℕ),
+      PowerSeries.coeff m (φ f) = if l ∣ m then PowerSeries.coeff (m / l) f else 0)
+    (j m : ℕ) (g : O⟦X⟧)
+    : PowerSeries.coeff m (PowerSeries.X ^ j * φ g)
+      = if j ≤ m ∧ l ∣ (m - j) then PowerSeries.coeff ((m - j) / l) g else 0 := by
   rw [PowerSeries.coeff_X_pow_mul']
   by_cases h : j ≤ m
   · simp only [h, true_and, if_true]
     exact hφ g (m - j)
   · simp [h]
 
-theorem coeff_sum {O : Type} [CommRing O] (l : ℕ) (hl : 2 ≤ l) (φ : O⟦X⟧ →ₐ[O] O⟦X⟧)
-    (hφ : ∀ (f : O⟦X⟧) (m : ℕ), PowerSeries.coeff m (φ f) = if l ∣ m then PowerSeries.coeff (m / l) f else 0)
-    (g : Fin l → O⟦X⟧) (m : ℕ) :
-    PowerSeries.coeff m (∑ j : Fin l, PowerSeries.X ^ j.val * φ (g j)) =
-      PowerSeries.coeff (m / l) (g ⟨m % l, Nat.mod_lt _ (by omega)⟩) := by
+theorem coeff_sum
+    {O : Type} [CommRing O]
+    (l : ℕ) (hl : 2 ≤ l)
+    (φ : O⟦X⟧ →ₐ[O] O⟦X⟧)
+    (hφ : ∀ (f : O⟦X⟧) (m : ℕ),
+      PowerSeries.coeff m (φ f) = if l ∣ m then PowerSeries.coeff (m / l) f else 0)
+    (g : Fin l → O⟦X⟧) (m : ℕ)
+    : PowerSeries.coeff m (∑ j : Fin l, PowerSeries.X ^ j.val * φ (g j))
+      = PowerSeries.coeff (m / l) (g ⟨m % l, Nat.mod_lt _ (by omega)⟩) := by
   have hl0 : 0 < l := by omega
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -51,7 +58,14 @@ theorem coeff_sum {O : Type} [CommRing O] (l : ℕ) (hl : 2 ≤ l) (φ : O⟦X�
     exact (Nat.mod_eq_of_lt hjl).symm
   · intro h; exact absurd (Finset.mem_univ _) h
 
-theorem main : ∀ {O : Type} [CommRing O] (l : ℕ), 2 ≤ l → ∀ (φ : O⟦X⟧ →ₐ[O] O⟦X⟧), (∀ (f : O⟦X⟧) (m : ℕ), PowerSeries.coeff m (φ f) = if l ∣ m then PowerSeries.coeff (m / l) f else 0) → ∀ f : O⟦X⟧, ∃! g : Fin l → O⟦X⟧, f = ∑ j : Fin l, PowerSeries.X ^ j.val * φ (g j) := by
+theorem main
+    : ∀ {O : Type} [CommRing O] (l : ℕ),
+      2 ≤ l
+        → ∀ (φ : O⟦X⟧ →ₐ[O] O⟦X⟧),
+          (∀ (f : O⟦X⟧) (m : ℕ),
+              PowerSeries.coeff m (φ f) = if l ∣ m then PowerSeries.coeff (m / l) f else 0)
+            → ∀ f : O⟦X⟧,
+              ∃! g : Fin l → O⟦X⟧, f = ∑ j : Fin l, PowerSeries.X ^ j.val * φ (g j) := by
   intro O _ l hl φ hφ f
   have hl0 : 0 < l := by omega
   refine ⟨fun j => PowerSeries.mk (fun n => PowerSeries.coeff (n * l + j.val) f), ?_, ?_⟩

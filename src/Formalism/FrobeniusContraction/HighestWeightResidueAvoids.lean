@@ -22,7 +22,8 @@ def InWinN (G : Bool) (h η : ℕ) (x : ℤ) : Prop :=
 def ClN (G : Bool) (h η : ℕ) (U : Multiset ℤ) : Multiset ℤ := U.filter (fun x => ¬ InWinN G h η x)
 
 def ResidueAvoidance (ℓ : ℕ) (G : Bool) (h η : ℕ) (σ : ℤ) (U : Multiset ℤ) : Prop :=
-  ∀ x ∈ ClN G h η U, ∀ m : ℤ, -2 * σ - 2 ≤ m → m ≤ (η : ℤ) + 2 * σ + 3 →
-    (((if G then x else (h : ℤ) - x) : ℤ) : ZMod ℓ) ≠ (m : ZMod ℓ)
+  ∀ x ∈ ClN G h η U, ∀ m : ℤ,
+    -2 * σ - 2 ≤ m → m ≤ (η : ℤ) + 2 * σ + 3
+      → (((if G then x else (h : ℤ) - x) : ℤ) : ZMod ℓ) ≠ (m : ZMod ℓ)
 
 end Formalism.WachCohomologyFacts.V2

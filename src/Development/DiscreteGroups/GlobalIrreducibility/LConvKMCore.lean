@@ -17,7 +17,8 @@ namespace DiscreteGroups.sglob.LConvKM
 variable {M : Type*} [AddCommGroup M] [Module ℂ M]
 
 def InvF {G : Type*} [Group G] (ρ : Representation ℂ G M) (B : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ) : Prop :=
-  (∀ x y, (starRingEnd ℂ) (B x y) = B y x) ∧ (∀ x, 0 ≤ (B x x).re) ∧ ∀ g x y, B (ρ g x) (ρ g y) = B x y
+  (∀ x y, (starRingEnd ℂ) (B x y) = B y x) ∧ (∀ x, 0 ≤ (B x x).re)
+    ∧ ∀ g x y, B (ρ g x) (ρ g y) = B x y
 
 lemma InvF.smul {G : Type*} [Group G] {ρ : Representation ℂ G M} {B : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ}
     (hB : InvF ρ B) {r : ℝ} (hr : 0 ≤ r) : InvF ρ ((r : ℂ) • B) := by
@@ -133,11 +134,14 @@ lemma comb_apply (F G : M → M → ℂ) (a b : ℝ) (x y : M) :
 def ev (B : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ) : M → M → ℂ := fun x y => B x y
 
 def sesqSet : Set (M → M → ℂ) :=
-  {F | ∀ x y z, F (x + y) z = F x z + F y z} ∩ {F | ∀ (a : ℂ) x z, F (a • x) z = (starRingEnd ℂ) a * F x z} ∩
-    {F | ∀ x y z, F x (y + z) = F x y + F x z} ∩ {F | ∀ (a : ℂ) x y, F x (a • y) = a * F x y}
+  {F | ∀ x y z, F (x + y) z = F x z + F y z}
+    ∩ {F | ∀ (a : ℂ) x z, F (a • x) z = (starRingEnd ℂ) a * F x z}
+    ∩ {F | ∀ x y z, F x (y + z) = F x y + F x z} ∩ {F | ∀ (a : ℂ) x y, F x (a • y) = a * F x y}
 
 def mkForm (F : M → M → ℂ) (h : F ∈ (sesqSet : Set (M → M → ℂ))) : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ :=
-  LinearMap.mk₂'ₛₗ (starRingEnd ℂ) (RingHom.id ℂ) F h.1.1.1 (fun a x z => h.1.1.2 a x z) h.1.2
+  LinearMap.mk₂'ₛₗ (starRingEnd ℂ) (RingHom.id ℂ) F h.1.1.1
+    (fun a x z => h.1.1.2 a x z)
+    h.1.2
     (fun a x y => h.2 a x y)
 
 @[simp] lemma mkForm_apply (F : M → M → ℂ) (h : F ∈ (sesqSet : Set (M → M → ℂ))) (x y : M) :
@@ -166,8 +170,8 @@ variable {G : Type*} [Group G] (ρ : Representation ℂ G M) (c : ℕ → ℝ) (
 def Cap (F : M → M → ℂ) : Prop := ∀ n, ∑ i ∈ Finset.range n, c i * (F (xs i) (xs i)).re ≤ 1
 
 def capSet : Set (M → M → ℂ) :=
-  (sesqSet : Set (M → M → ℂ)) ∩ {F | ∀ x y, (starRingEnd ℂ) (F x y) = F y x} ∩ {F | ∀ x, 0 ≤ (F x x).re} ∩
-    {F | ∀ g x y, F (ρ g x) (ρ g y) = F x y} ∩ {F | Cap c xs F}
+  (sesqSet : Set (M → M → ℂ)) ∩ {F | ∀ x y, (starRingEnd ℂ) (F x y) = F y x}
+    ∩ {F | ∀ x, 0 ≤ (F x x).re} ∩ {F | ∀ g x y, F (ρ g x) (ρ g y) = F x y} ∩ {F | Cap c xs F}
 
 lemma invF_mkForm {F : M → M → ℂ} (h : F ∈ capSet ρ c xs) : InvF ρ (mkForm F h.1.1.1.1) :=
   ⟨h.1.1.1.2, h.1.1.2, h.1.2⟩
@@ -375,15 +379,22 @@ lemma ray (hsp : Submodule.span ℂ (Set.range xs) = ⊤) (hc : ∀ i, 0 < c i) 
 
 end cap
 
-theorem extreme_exists_core {G : Type*} [Group G] (ρ : Representation ℂ G M)
+theorem extreme_exists_core
+    {G : Type*} [Group G]
+    (ρ : Representation ℂ G M)
     (hspan : ∃ s : Set M, s.Countable ∧ Submodule.span ℂ s = ⊤)
-    (B₀ : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ) (h₀ : InvF ρ B₀) (f : M) (hf : B₀ f f ≠ 0) :
-    ∃ B : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ, (InvF ρ B ∧ ∀ B' : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ, InvF ρ B' → InvF ρ (B - B') →
-      ∃ c : ℂ, ∀ x y, B' x y = c * B x y) ∧ B f f ≠ 0 := by
+    (B₀ : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ) (h₀ : InvF ρ B₀)
+    (f : M) (hf : B₀ f f ≠ 0)
+    : ∃ B : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ,
+      (InvF ρ B
+          ∧ ∀ B' : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ,
+            InvF ρ B' → InvF ρ (B - B') → ∃ c : ℂ, ∀ x y, B' x y = c * B x y)
+        ∧ B f f ≠ 0 := by
   obtain ⟨s, hsc, hss⟩ := hspan
   obtain ⟨xs, hxs⟩ := (hsc.insert 0).exists_eq_range (Set.insert_nonempty 0 s)
   have hsp : Submodule.span ℂ (Set.range xs) = ⊤ := by rw [← hxs, Submodule.span_insert_zero, hss]
-  obtain ⟨c, hc_def⟩ : ∃ c : ℕ → ℝ, c = fun i => (1 / 2 : ℝ) ^ i / (1 + (B₀ (xs i) (xs i)).re) := ⟨_, rfl⟩
+  obtain ⟨c, hc_def⟩ : ∃ c : ℕ → ℝ, c = fun i => (1 / 2 : ℝ) ^ i / (1 + (B₀ (xs i) (xs i)).re) :=
+    ⟨_, rfl⟩
   have hc : ∀ i, 0 < c i := fun i => by
     simp only [hc_def]
     exact div_pos (by positivity) (by linarith [h₀.2.1 (xs i)])
@@ -391,21 +402,24 @@ theorem extreme_exists_core {G : Type*} [Group G] (ρ : Representation ℂ G M)
   have hmem₀ : ev (((1 / 2 : ℝ) : ℂ) • B₀) ∈ capSet ρ c xs := by
     refine ev_mem ρ c xs hhalf fun n => ?_
     show ∑ i ∈ Finset.range n, c i * ((((1 / 2 : ℝ) : ℂ) • B₀) (xs i) (xs i)).re ≤ 1
-    have hterm : ∀ i, c i * ((((1 / 2 : ℝ) : ℂ) • B₀) (xs i) (xs i)).re ≤ (1 / 2) * (1 / 2 : ℝ) ^ i := by
+    have hterm
+        : ∀ i, c i * ((((1 / 2 : ℝ) : ℂ) • B₀) (xs i) (xs i)).re ≤ (1 / 2) * (1 / 2 : ℝ) ^ i := by
       intro i
       have hr := h₀.2.1 (xs i)
       have hp : (0 : ℝ) < (1 / 2) ^ i := by positivity
       simp only [LinearMap.smul_apply, smul_eq_mul, Complex.re_ofReal_mul, hc_def]
       rw [div_mul_eq_mul_div, div_le_iff₀ (by linarith)]
       nlinarith
-    calc ∑ i ∈ Finset.range n, c i * ((((1 / 2 : ℝ) : ℂ) • B₀) (xs i) (xs i)).re
+    calc
+      ∑ i ∈ Finset.range n, c i * ((((1 / 2 : ℝ) : ℂ) • B₀) (xs i) (xs i)).re
         ≤ ∑ i ∈ Finset.range n, (1 / 2) * (1 / 2 : ℝ) ^ i := Finset.sum_le_sum fun i _ => hterm i
       _ = (1 / 2) * ∑ i ∈ Finset.range n, (1 / 2 : ℝ) ^ i := by rw [Finset.mul_sum]
       _ ≤ 1 := by linarith [sum_geometric_two_le n]
   obtain ⟨F, hFe, hFf⟩ : ∃ F ∈ (capSet ρ c xs).extremePoints ℝ, F f f ≠ 0 := by
     by_contra hcon
     simp only [not_exists, not_and, ne_eq, not_not] at hcon
-    have hZ : IsClosed {F : M → M → ℂ | F f f = 0} := isClosed_eq (continuous_eval f f) continuous_const
+    have hZ : IsClosed {F : M → M → ℂ | F f f = 0} :=
+      isClosed_eq (continuous_eval f f) continuous_const
     have hZc : Convex ℝ {F : M → M → ℂ | F f f = 0} := by
       intro F hF G hG a b _ _ _
       have hF' : F f f = 0 := hF
@@ -413,12 +427,17 @@ theorem extreme_exists_core {G : Type*} [Group G] (ρ : Representation ℂ G M)
       show (a • F + b • G) f f = 0
       rw [comb_apply, hF', hG', mul_zero, mul_zero, add_zero]
     have hsub : capSet ρ c xs ⊆ {F | F f f = 0} := by
-      rw [← closure_convexHull_extremePoints (isCompact_capSet ρ c xs hsp hc) (convex_capSet ρ c xs)]
+      rw [← closure_convexHull_extremePoints (isCompact_capSet ρ c xs hsp hc)
+        (convex_capSet ρ c xs)]
       exact closure_minimal (convexHull_min (fun F hF => hcon F hF) hZc) hZ
     have h : ((1 / 2 : ℝ) : ℂ) * B₀ f f = 0 := hsub hmem₀
     apply hf
     simpa using h
   have hFm := (mem_extremePoints.mp hFe).1
-  exact ⟨mkForm F hFm.1.1.1.1, ⟨invF_mkForm ρ c xs hFm, fun B' h1 h2 => ray ρ c xs hsp hc (mkForm F hFm.1.1.1.1) hFe B' h1 h2⟩, hFf⟩
+  exact ⟨
+    mkForm F hFm.1.1.1.1,
+    ⟨invF_mkForm ρ c xs hFm, fun B' h1 h2 => ray ρ c xs hsp hc (mkForm F hFm.1.1.1.1) hFe B' h1 h2⟩,
+    hFf
+  ⟩
 
 end DiscreteGroups.sglob.LConvKM

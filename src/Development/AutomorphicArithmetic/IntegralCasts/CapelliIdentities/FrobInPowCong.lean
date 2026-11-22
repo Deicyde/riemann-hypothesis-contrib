@@ -4,13 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qf16.frobIn_pow_cong :
-    ∀ {Ω : Type} [inst : Field Ω] (A : ValuationSubring Ω)
-    {a b : Ω},
-    (A.valuation : Ω → A.ValueGroup) a ≤ (1 : A.ValueGroup) →
-      (A.valuation : Ω → A.ValueGroup) b ≤ (1 : A.ValueGroup) →
-        (A.valuation : Ω → A.ValueGroup) (a - b) < (1 : A.ValueGroup) →
-          ∀ (m : ℕ), (A.valuation : Ω → A.ValueGroup) (a ^ m - b ^ m) < (1 : A.ValueGroup) := by
+theorem UpperTheory.Reformulated.B.Qf16.frobIn_pow_cong
+    : ∀ {Ω : Type} [inst : Field Ω] (A : ValuationSubring Ω) {a b : Ω},
+      (A.valuation : Ω → A.ValueGroup) a ≤ (1 : A.ValueGroup)
+        → (A.valuation : Ω → A.ValueGroup) b ≤ (1 : A.ValueGroup)
+        → (A.valuation : Ω → A.ValueGroup) (a - b) < (1 : A.ValueGroup)
+        → ∀ (m : ℕ), (A.valuation : Ω → A.ValueGroup) (a ^ m - b ^ m) < (1 : A.ValueGroup) := by
   intro Ω inst A a b ha hb hab m
   induction m with
   | zero => simp

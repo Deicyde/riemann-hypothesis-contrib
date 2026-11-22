@@ -11,7 +11,15 @@ open Filter
 
 namespace GlobalTheory.QSA
 
-theorem exists_nrm_one_re_sq_ne_one : ∀ (K : Type) [Field K] [TopologicalSpace K] [IsTopologicalDivisionRing K] [T2Space K], (2 : K) ≠ 0 → (𝓝[≠] (0 : K)).NeBot → ∀ a b : K, a ≠ 0 → ∀ g : ℍ[K, a, b], nrm g = 1 → ∀ W : Set ℍ[K, a, b], W ∈ 𝓝 g → ∃ g' : ℍ[K, a, b], nrm g' = 1 ∧ g'.re ^ 2 ≠ 1 ∧ W ∈ 𝓝 g' := by
+theorem exists_nrm_one_re_sq_ne_one
+    : ∀ (K : Type) [Field K] [TopologicalSpace K] [IsTopologicalDivisionRing K] [T2Space K],
+      (2 : K) ≠ 0 → (𝓝[≠] (0 : K)).NeBot
+        → ∀ a b : K,
+          a ≠ 0
+            → ∀ g : ℍ[K, a, b],
+              nrm g = 1
+                → ∀ W : Set ℍ[K, a, b],
+                  W ∈ 𝓝 g → ∃ g' : ℍ[K, a, b], nrm g' = 1 ∧ g'.re ^ 2 ≠ 1 ∧ W ∈ 𝓝 g' := by
   intro K _ _ _ _ h2 hne a b ha g hg W hW
   by_cases hre : g.re ^ 2 = 1
   swap
@@ -72,17 +80,20 @@ theorem exists_nrm_one_re_sq_ne_one : ∀ (K : Type) [Field K] [TopologicalSpace
   · have hr : (g * x τ).re = g.re * X0 τ + a * g.imI * X1 τ := by simp [x]
     rw [hr]
     intro h
-    have hm : g.re * X0 τ + a * g.imI * X1 τ - g.re
-        = 2 * a * τ * (g.re * τ + g.imI) / (1 - a * τ ^ 2) := by
+    have hm
+        : g.re * X0 τ + a * g.imI * X1 τ - g.re
+          = 2 * a * τ * (g.re * τ + g.imI) / (1 - a * τ ^ 2) := by
       simp only [X0, X1]
       field_simp
       ring
-    have hp : g.re * X0 τ + a * g.imI * X1 τ + g.re
-        = 2 * (g.re + a * τ * g.imI) / (1 - a * τ ^ 2) := by
+    have hp
+        : g.re * X0 τ + a * g.imI * X1 τ + g.re = 2 * (g.re + a * τ * g.imI) / (1 - a * τ ^ 2) := by
       simp only [X0, X1]
       field_simp
       ring
-    have hz : (g.re * X0 τ + a * g.imI * X1 τ - g.re) * (g.re * X0 τ + a * g.imI * X1 τ + g.re) = 0 := by
+    have hz
+        : (g.re * X0 τ + a * g.imI * X1 τ - g.re) * (g.re * X0 τ + a * g.imI * X1 τ + g.re)
+          = 0 := by
       linear_combination h - hre
     rw [hm, hp] at hz
     exact mul_ne_zero (div_ne_zero (mul_ne_zero (mul_ne_zero (mul_ne_zero h2 ha) h1) h4) h2')

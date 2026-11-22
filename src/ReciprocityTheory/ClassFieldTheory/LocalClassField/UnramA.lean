@@ -12,8 +12,11 @@ open _root_.Neutral.B1 ReciprocityTheory.Coh Function
 
 noncomputable section
 
-variable {R : Type} [CommRing R] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  (N : Subgroup G) [N.Normal] {M : Type} [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M]
+variable
+  {R : Type} [CommRing R]
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+  (N : Subgroup G) [N.Normal]
+  {M : Type} [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M]
   (rho : Representation R G M)
 
 def qRho (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) : Representation R (G ⧸ N) M :=
@@ -29,8 +32,10 @@ abbrev qT (hrho : ContAction rho) (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) : TRe
 
 variable {N rho}
 
-theorem exists_desc1 (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) (c : G → M) (hc : c ∈ Z1 rho) (h0 : ∀ σ ∈ N, c σ = 0) :
-    ∃ c' : G ⧸ N → M, c' ∈ ReciprocityTheory.Gal.Z1 (qRho N rho hN) ∧ ∀ g, c' (QuotientGroup.mk g) = c g := by
+theorem exists_desc1
+    (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) (c : G → M) (hc : c ∈ Z1 rho) (h0 : ∀ σ ∈ N, c σ = 0)
+    : ∃ c' : G ⧸ N → M,
+      c' ∈ ReciprocityTheory.Gal.Z1 (qRho N rho hN) ∧ ∀ g, c' (QuotientGroup.mk g) = c g := by
   have hw : ∀ a b : G, QuotientGroup.leftRel N a b → c a = c b := by
     intro a b hab
     have h1 : a⁻¹ * b ∈ N := QuotientGroup.leftRel_apply.1 hab
@@ -44,13 +49,22 @@ theorem exists_desc1 (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) (c : G → M) (hc 
     obtain ⟨h, rfl⟩ := QuotientGroup.mk_surjective b
     exact hc.2 g h
 
-theorem inflation_mem_one_cocycles (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) (c' : G ⧸ N → M) (hc : c' ∈ ReciprocityTheory.Gal.Z1 (qRho N rho hN)) :
-    (fun g : G => c' (QuotientGroup.mk g)) ∈ Z1 rho :=
+theorem inflation_mem_one_cocycles
+    (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) (c' : G ⧸ N → M)
+    (hc : c' ∈ ReciprocityTheory.Gal.Z1 (qRho N rho hN))
+    : (fun g : G => c' (QuotientGroup.mk g)) ∈ Z1 rho :=
   ⟨hc.1.comp QuotientGroup.continuous_mk, fun g h => hc.2 (QuotientGroup.mk g) (QuotientGroup.mk h)⟩
 
-theorem apply_eq_zero_of_mem_H1ur (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) (c : Z1 rho)
-    (hc : (Submodule.Quotient.mk c : H1 rho) ∈ H1ur rho N) (σ : G) (hσ : σ ∈ N) : c.1 σ = 0 := by
-  have h1 : (Submodule.Quotient.mk (restrictCocycles1 rho N.subtype continuous_subtype_val c) : H1 (rho.comp N.subtype)) = 0 := hc
+theorem apply_eq_zero_of_mem_H1ur
+    (hN : ∀ σ ∈ N, ∀ m, rho σ m = m)
+    (c : Z1 rho) (hc : (Submodule.Quotient.mk c : H1 rho) ∈ H1ur rho N)
+    (σ : G) (hσ : σ ∈ N)
+    : c.1 σ = 0 := by
+  have h1
+      : (Submodule.Quotient.mk (restrictCocycles1 rho N.subtype continuous_subtype_val c)
+          : H1 (rho.comp N.subtype))
+        = 0 :=
+    hc
   rw [Submodule.Quotient.mk_eq_zero] at h1
   obtain ⟨m, hm⟩ := (mem_contCoboundaries1 _ _).1 h1
   have h3 : c.1 σ = rho σ m - m := hm ⟨σ, hσ⟩
@@ -61,10 +75,13 @@ theorem torsion_of_finite [Finite M] (m : M) : ∃ k : ℕ, 0 < k ∧ k • m = 
 
 variable [CompactSpace (G ⧸ N)] [T2Space (G ⧸ N)] [TotallyDisconnectedSpace (G ⧸ N)] [Finite M]
 
-theorem ker_frobenius_sub_id_eq_invariants (hrho : ContAction rho) (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) {s : G}
-    (hs : IsZHat (G ⧸ N) (QuotientGroup.mk s)) : LinearMap.ker (rho s - LinearMap.id) = H0 rho := by
+theorem ker_frobenius_sub_id_eq_invariants
+    (hrho : ContAction rho) (hN : ∀ σ ∈ N, ∀ m, rho σ m = m)
+    {s : G} (hs : IsZHat (G ⧸ N) (QuotientGroup.mk s))
+    : LinearMap.ker (rho s - LinearMap.id) = H0 rho := by
   ext m
-  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, sub_eq_zero, mem_riemannRochSpace_iff_regularAt_everywhere]
+  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, sub_eq_zero,
+    mem_riemannRochSpace_iff_regularAt_everywhere]
   refine ⟨fun h g => ?_, fun h => h s⟩
   set W := ProcyclicCohomology.stab (qT N rho hrho hN) m with hW
   have hWo : IsOpen (W : Set (G ⧸ N)) := ProcyclicCohomology.stab_isOpen (qT N rho hrho hN) m
@@ -78,7 +95,8 @@ theorem ker_frobenius_sub_id_eq_invariants (hrho : ContAction rho) (hN : ∀ σ 
   have : (QuotientGroup.mk g : G ⧸ N) ∈ (W : Set (G ⧸ N)) := by rw [htop]; trivial
   exact this
 
-theorem card_quot_range (u : M →ₗ[R] M) : Nat.card (M ⧸ LinearMap.range u) = Nat.card (LinearMap.ker u) := by
+theorem card_quot_range (u : M →ₗ[R] M)
+    : Nat.card (M ⧸ LinearMap.range u) = Nat.card (LinearMap.ker u) := by
   have h1 := Submodule.card_eq_card_quotient_mul_card (LinearMap.range u)
   have h2 := Submodule.card_eq_card_quotient_mul_card (LinearMap.ker u)
   rw [Nat.card_congr u.quotKerEquivRange.toEquiv] at h2
@@ -86,8 +104,10 @@ theorem card_quot_range (u : M →ₗ[R] M) : Nat.card (M ⧸ LinearMap.range u)
   rw [h2, mul_comm] at h1
   exact (Nat.eq_of_mul_eq_mul_left h3 h1).symm
 
-theorem card_H1ur (hrho : ContAction rho) (hN : ∀ σ ∈ N, ∀ m, rho σ m = m) {s : G}
-    (hs : IsZHat (G ⧸ N) (QuotientGroup.mk s)) : Nat.card (H1ur rho N) = Nat.card (H0 rho) := by
+theorem card_H1ur
+    (hrho : ContAction rho) (hN : ∀ σ ∈ N, ∀ m, rho σ m = m)
+    {s : G} (hs : IsZHat (G ⧸ N) (QuotientGroup.mk s))
+    : Nat.card (H1ur rho N) = Nat.card (H0 rho) := by
   set P : Submodule R M := LinearMap.range (rho s - LinearMap.id) with hP
   let f : Z1 rho →ₗ[R] M ⧸ P := P.mkQ ∘ₗ ((LinearMap.proj s) ∘ₗ (Z1 rho).subtype)
   have hker : (Bd1 rho).comap (Z1 rho).subtype ≤ LinearMap.ker f := by
@@ -98,7 +118,8 @@ theorem card_H1ur (hrho : ContAction rho) (hN : ∀ σ ∈ N, ∀ m, rho σ m = 
     rw [Submodule.Quotient.mk_eq_zero]
     exact ⟨m, by simpa using (hm s).symm⟩
   let φ : H1 rho →ₗ[R] M ⧸ P := ((Bd1 rho).comap (Z1 rho).subtype).liftQ f hker
-  have hφ : ∀ c : Z1 rho, φ (Submodule.Quotient.mk c) = Submodule.Quotient.mk (c.1 s) := fun c => rfl
+  have hφ : ∀ c : Z1 rho, φ (Submodule.Quotient.mk c) = Submodule.Quotient.mk (c.1 s) := fun c =>
+    rfl
   have hinj0 : ∀ z ∈ H1ur rho N, φ z = 0 → z = 0 := by
     intro z hz hz0
     obtain ⟨c, rfl⟩ := Submodule.Quotient.mk_surjective _ z
@@ -119,12 +140,15 @@ theorem card_H1ur (hrho : ContAction rho) (hN : ∀ σ ∈ N, ∀ m, rho σ m = 
       exact Subtype.ext (sub_eq_zero.1 (hinj0 _ ((H1ur rho N).sub_mem x.2 y.2) h1))
     · intro y
       obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective _ y
-      obtain ⟨c', hc', hcs⟩ := ProcyclicCohomology.exists_cocycle (qT N rho hrho hN) (ProcyclicCohomology.comm_of_dense hs.1) hs.1 hs.2 m
-        (torsion_of_finite (M := M) m)
+      obtain ⟨c', hc', hcs⟩ :=
+        ProcyclicCohomology.exists_cocycle (qT N rho hrho hN)
+          (ProcyclicCohomology.comm_of_dense hs.1) hs.1 hs.2 m (torsion_of_finite (M := M) m)
       have hZ := inflation_mem_one_cocycles hN c' hc'
       refine ⟨⟨Submodule.Quotient.mk ⟨_, hZ⟩, ?_⟩, ?_⟩
-      · change (Submodule.Quotient.mk (restrictCocycles1 rho N.subtype continuous_subtype_val ⟨_, hZ⟩) :
-          H1 (rho.comp N.subtype)) = 0
+      · change (Submodule.Quotient.mk (restrictCocycles1 rho N.subtype continuous_subtype_val
+              ⟨_, hZ⟩)
+            : H1 (rho.comp N.subtype))
+          = 0
         rw [Submodule.Quotient.mk_eq_zero]
         refine (mem_contCoboundaries1 _ _).2 ⟨0, fun σ => ?_⟩
         change c' (QuotientGroup.mk σ.1) = _
@@ -135,7 +159,8 @@ theorem card_H1ur (hrho : ContAction rho) (hN : ∀ σ ∈ N, ∀ m, rho σ m = 
       · change φ (Submodule.Quotient.mk _) = _
         rw [hφ]
         exact congrArg _ hcs
-  rw [Nat.card_eq_of_bijective _ hbij, hP, card_quot_range, ker_frobenius_sub_id_eq_invariants hrho hN hs]
+  rw [Nat.card_eq_of_bijective _ hbij, hP, card_quot_range,
+    ker_frobenius_sub_id_eq_invariants hrho hN hs]
 
 end
 

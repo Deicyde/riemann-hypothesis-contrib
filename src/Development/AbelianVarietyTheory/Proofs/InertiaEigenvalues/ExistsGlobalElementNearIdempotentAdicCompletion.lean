@@ -10,15 +10,21 @@ open NumberField IsDedekindDomain TensorProduct Topology
 
 namespace GlobalTheory
 
-theorem exists_global_near_idempotent (E E' : Type) [Field E] [NumberField E] [Field E']
-    [Algebra E E'] [FiniteDimensional E E'] (w : HeightOneSpectrum (𝓞 E)) {ι : Type} [Fintype ι]
-    (b : Module.Basis ι E E') (ψ : w.adicCompletion E ⊗[E] E' →ₐ[w.adicCompletion E] w.adicCompletion E)
+theorem exists_global_near_idempotent
+    (E E' : Type) [Field E] [NumberField E] [Field E'] [Algebra E E'] [FiniteDimensional E E']
+    (w : HeightOneSpectrum (𝓞 E))
+    {ι : Type} [Fintype ι]
+    (b : Module.Basis ι E E')
+    (ψ : w.adicCompletion E ⊗[E] E' →ₐ[w.adicCompletion E] w.adicCompletion E)
     (e : w.adicCompletion E ⊗[E] E') (he : e * e = e) (hψ : ψ e = 1)
-    (p q : w.adicCompletion E ⊗[E] E') (n : ℕ) :
-    ∃ ε : E', (∀ i, w.valuation E (b.repr (ε * ε - ε) i) ≤ 1) ∧
-      Valued.v (ψ ((1 : w.adicCompletion E) ⊗ₜ ε) - 1) ≤ WithZero.exp (-(n : ℤ)) ∧
-      Valued.v (Algebra.norm (w.adicCompletion E) (p + q * ((1 : w.adicCompletion E) ⊗ₜ ε - e)) -
-        Algebra.norm (w.adicCompletion E) p) ≤ WithZero.exp (-(n : ℤ)) := by
+    (p q : w.adicCompletion E ⊗[E] E') (n : ℕ)
+    : ∃ ε : E',
+      (∀ i, w.valuation E (b.repr (ε * ε - ε) i) ≤ 1)
+        ∧ Valued.v (ψ ((1 : w.adicCompletion E) ⊗ₜ ε) - 1) ≤ WithZero.exp (-(n : ℤ))
+        ∧ Valued.v
+            (Algebra.norm (w.adicCompletion E) (p + q * ((1 : w.adicCompletion E) ⊗ₜ ε - e))
+              - Algebra.norm (w.adicCompletion E) p)
+          ≤ WithZero.exp (-(n : ℤ)) := by
   classical
   set K := w.adicCompletion E with hK
   set B := Algebra.TensorProduct.basis K b with hB
@@ -27,13 +33,14 @@ theorem exists_global_near_idempotent (E E' : Type) [Field E] [NumberField E] [F
     intro t
     ext i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [hΦ, map_sum, Finsupp.smul_apply, Finsupp.single_apply]
+    simp [hΦ, map_sum, Finsupp.smul_apply, Finsupp.single_apply]
   have hM : Continuous fun t => Algebra.leftMulMatrix B (Φ t) := by
-    have h : (fun t => Algebra.leftMulMatrix B (Φ t)) =
-        fun t => ∑ i, t i • Algebra.leftMulMatrix B (B i) := by
+    have h
+        : (fun t => Algebra.leftMulMatrix B (Φ t))
+          = fun t => ∑ i, t i • Algebra.leftMulMatrix B (B i) := by
       funext t
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hΦ, map_sum, map_smul]
+      simp only [hΦ, map_sum, map_smul]
     rw [h]
     exact continuous_finsetSum _ fun i _ => (continuous_apply i).smul continuous_const
 
@@ -57,9 +64,11 @@ theorem exists_global_near_idempotent (E E' : Type) [Field E] [NumberField E] [F
       simp [hΦ, Module.Basis.equivFun_symm_apply]
     exact hl.sub continuous_const
   have hf3c : Continuous f3 := by
-    have h : (fun t => Algebra.norm K (p + q * (Φ t - e))) = fun t =>
-        (Algebra.leftMulMatrix B (p - q * e) + Algebra.leftMulMatrix B q *
-          Algebra.leftMulMatrix B (Φ t)).det := by
+    have h
+        : (fun t => Algebra.norm K (p + q * (Φ t - e)))
+          = fun t =>
+            (Algebra.leftMulMatrix B (p - q * e)
+              + Algebra.leftMulMatrix B q * Algebra.leftMulMatrix B (Φ t)).det := by
       funext t
       rw [Algebra.norm_eq_matrix_det B, ← map_mul, ← map_add (f := _)]
       congr 2
@@ -73,15 +82,18 @@ theorem exists_global_near_idempotent (E E' : Type) [Field E] [NumberField E] [F
   have hball' : ∀ x₀ : K, Valued.v x₀ ≠ 0 → {z : K | Valued.v z ≤ Valued.v x₀} ∈ 𝓝 (0 : K) := by
     intro x₀ hx₀
     have hl : {y : K | Valued.v y = Valued.v x₀} ∈ 𝓝 x₀ := Valued.locally_const hx₀
-    have hc : ContinuousAt (fun z : K => z + x₀) 0 := (continuous_id.add continuous_const).continuousAt
+    have hc : ContinuousAt (fun z : K => z + x₀) 0 :=
+      (continuous_id.add continuous_const).continuousAt
     have h' := hc.preimage_mem_nhds (by simpa using hl)
     filter_upwards [h'] with z hz
     simp only [Set.mem_preimage, Set.mem_setOf_eq] at hz ⊢
-    calc Valued.v z = Valued.v ((z + x₀) - x₀) := by rw [add_sub_cancel_right]
+    calc
+      Valued.v z
+        = Valued.v ((z + x₀) - x₀) := by rw [add_sub_cancel_right]
       _ ≤ max (Valued.v (z + x₀)) (Valued.v x₀) := Valuation.map_sub _ _ _
       _ = Valued.v x₀ := by rw [hz, max_self]
-  have hva : ∀ x : E, Valued.v (algebraMap E K x) = w.valuation E x :=
-    fun x => HeightOneSpectrum.valuedAdicCompletion_eq_valuation' w x
+  have hva : ∀ x : E, Valued.v (algebraMap E K x) = w.valuation E x := fun x =>
+    HeightOneSpectrum.valuedAdicCompletion_eq_valuation' w x
   obtain ⟨π, hπ⟩ := w.valuation_exists_uniformizer E
   have hx₀ : Valued.v ((algebraMap E K π) ^ n) = WithZero.exp (-(n : ℤ)) := by
     rw [map_pow, hva, hπ, ← WithZero.exp_nsmul]
@@ -118,8 +130,9 @@ theorem exists_global_near_idempotent (E E' : Type) [Field E] [NumberField E] [F
   · intro i
     have h := hc1 i
     simp only [hf1, hΦc] at h
-    rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, ← TensorProduct.tmul_sub,
-      hB, Algebra.TensorProduct.basis_repr_tmul] at h
+    rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, ← TensorProduct.tmul_sub, hB,
+        Algebra.TensorProduct.basis_repr_tmul]
+      at h
     simp only [one_smul, Finsupp.mapRange_apply] at h
     rw [← hva]
     exact h

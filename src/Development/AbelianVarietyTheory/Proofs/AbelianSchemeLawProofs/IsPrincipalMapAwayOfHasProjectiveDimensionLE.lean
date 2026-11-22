@@ -5,31 +5,37 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
 open scoped TensorProduct
 
-theorem nonempty_equiv_prod_of_exact_of_projective {A : Type*} [CommRing A] {K F M : Type*}
-    [AddCommGroup K] [Module A K] [AddCommGroup F] [Module A F] [AddCommGroup M] [Module A M]
-    [Module.Projective A M] (g : K →ₗ[A] F) (f : F →ₗ[A] M) (hg : Function.Injective g)
-    (hf : Function.Surjective f) (h : Function.Exact g f) : Nonempty (F ≃ₗ[A] K × M) := by
+theorem nonempty_equiv_prod_of_exact_of_projective
+    {A : Type*} [CommRing A]
+    {K F M : Type*} [AddCommGroup K] [Module A K] [AddCommGroup F] [Module A F] [AddCommGroup M]
+    [Module A M] [Module.Projective A M]
+    (g : K →ₗ[A] F) (f : F →ₗ[A] M)
+    (hg : Function.Injective g) (hf : Function.Surjective f) (h : Function.Exact g f)
+    : Nonempty (F ≃ₗ[A] K × M) := by
   obtain ⟨s, hs⟩ := Module.projective_lifting_property f LinearMap.id hf
   exact ⟨(h.splitSurjectiveEquiv hg ⟨s, hs⟩).1⟩
 
-theorem isStablyFree_baseChange_of_hasProjectiveDimensionLE (R : Type) [CommRing R]
-    [IsNoetherianRing R] [IsLocalRing R] (A : Type) [CommRing A] [Algebra R A] [Module.Flat R A]
-    (n : ℕ) : ∀ (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M],
-      HasProjectiveDimensionLE (ModuleCat.of R M) n → Module.Projective A (A ⊗[R] M) →
-        Module.IsStablyFree A (A ⊗[R] M) := by
+theorem isStablyFree_baseChange_of_hasProjectiveDimensionLE
+    (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R]
+    (A : Type) [CommRing A] [Algebra R A] [Module.Flat R A]
+    (n : ℕ)
+    : ∀ (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M],
+      HasProjectiveDimensionLE (ModuleCat.of R M) n → Module.Projective A (A ⊗[R] M)
+        → Module.IsStablyFree A (A ⊗[R] M) := by
   induction n with
   | zero =>
     intro M _ _ _ h _
-    have h1 : Projective (ModuleCat.of R M) :=
-      (projective_iff_hasProjectiveDimensionLE_zero _).2 h
+    have h1 : Projective (ModuleCat.of R M) := (projective_iff_hasProjectiveDimensionLE_zero _).2 h
     have h2 : Module.Projective R M := (IsProjective.iff_projective M).2 h1
     have h3 : Module.Free R M := Module.free_of_flat_of_isLocalRing
     infer_instance
@@ -60,32 +66,38 @@ theorem isStablyFree_baseChange_of_hasProjectiveDimensionLE (R : Type) [CommRing
 
 section cofactor
 
-variable {A : Type*} [CommRing A] {M N : Type*} [AddCommGroup M] [Module A M]
-  [AddCommGroup N] [Module A N] {n : ℕ}
+variable
+  {A : Type*} [CommRing A]
+  {M N : Type*} [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
+  {n : ℕ}
 
-theorem exists_surjective_exteriorPower_prod (bN : Module.Basis (Fin n) A N) :
-    ∃ φ : ⋀[A]^(n + 1) (M × N) →ₗ[A] M, Function.Surjective φ := by
-  let c : M × N →ₗ[A] (M × N) [⋀^Fin n]→ₗ[A] M :=
-    { toFun := fun x ↦ (bN.det.compLinearMap (LinearMap.snd A M N)).smulRight x.1
-      map_add' := fun x y ↦ AlternatingMap.ext fun _ ↦ by simp
-      map_smul' := fun c x ↦ AlternatingMap.ext fun _ ↦ by simp [smul_smul, mul_comm] }
-  refine ⟨exteriorPower.alternatingMapLinearEquiv (AlternatingMap.alternatizeUncurryFin c),
-    fun m ↦ ⟨exteriorPower.ιMulti A (n + 1) (Fin.cons (m, 0) fun i ↦ (0, bN i)), ?_⟩⟩
+theorem exists_surjective_exteriorPower_prod (bN : Module.Basis (Fin n) A N)
+    : ∃ φ : ⋀[A]^(n + 1) (M × N) →ₗ[A] M, Function.Surjective φ := by
+  let c : M × N →ₗ[A] (M × N) [⋀^Fin n]→ₗ[A] M := {
+    toFun := fun x ↦ (bN.det.compLinearMap (LinearMap.snd A M N)).smulRight x.1
+    map_add' := fun x y ↦ AlternatingMap.ext fun _ ↦ by simp
+    map_smul' := fun c x ↦ AlternatingMap.ext fun _ ↦ by simp [smul_smul, mul_comm]
+  }
+  refine ⟨
+    exteriorPower.alternatingMapLinearEquiv (AlternatingMap.alternatizeUncurryFin c),
+    fun m ↦ ⟨exteriorPower.ιMulti A (n + 1) (Fin.cons (m, 0) fun i ↦ (0, bN i)), ?_⟩
+  ⟩
   simp [c, AlternatingMap.alternatizeUncurryFin_apply, Fin.sum_univ_succ, Module.Basis.det_self]
 
 end cofactor
 
-theorem isPrincipal_of_isStablyFree {A : Type} [CommRing A] (J : Ideal A) [Module.Finite A J]
-    [Module.IsStablyFree A J] : J.IsPrincipal := by
+theorem isPrincipal_of_isStablyFree
+    {A : Type} [CommRing A] (J : Ideal A) [Module.Finite A J] [Module.IsStablyFree A J]
+    : J.IsPrincipal := by
   rcases subsingleton_or_nontrivial A with _ | _
   · rw [Subsingleton.elim J ⊥]
     exact bot_isPrincipal
   obtain ⟨N, _, _, _, _, _⟩ := Module.IsStablyFree.exist_free_prod A J
   let n := Module.finrank A N
   have hp : Module.finrank A (J × N) ≤ n + 1 := by
-    have := LinearMap.finrank_le_finrank_of_injective
-      (f := J.subtype.prodMap (LinearMap.id : N →ₗ[A] N))
-      (Function.Injective.prodMap J.injective_subtype Function.injective_id)
+    have :=
+      LinearMap.finrank_le_finrank_of_injective (f := J.subtype.prodMap (LinearMap.id : N →ₗ[A] N))
+        (Function.Injective.prodMap J.injective_subtype Function.injective_id)
     rwa [Module.finrank_prod (M := A), Module.finrank_self, add_comm] at this
   have h1 : Module.finrank A (⋀[A]^(n + 1) (J × N)) ≤ 1 := by
     rw [exteriorPower.finrank_eq]
@@ -100,8 +112,11 @@ theorem isPrincipal_of_isStablyFree {A : Type} [CommRing A] (J : Ideal A) [Modul
   · rw [Submodule.span_singleton_le_iff_mem]
     exact (φ v).2
 
-theorem isPrincipal_map_away_of_hasProjectiveDimensionLE :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] [IsDomain R] (x : R) (R' : Type) [CommRing R'] [Algebra R R'] [IsLocalization.Away x R'] (I : Ideal R) (n : ℕ), HasProjectiveDimensionLE (ModuleCat.of R I) n → Module.Projective R' (I.map (algebraMap R R')) → (I.map (algebraMap R R')).IsPrincipal := by
+theorem isPrincipal_map_away_of_hasProjectiveDimensionLE
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] [IsDomain R] (x : R)
+        (R' : Type) [CommRing R'] [Algebra R R'] [IsLocalization.Away x R'] (I : Ideal R) (n : ℕ),
+      HasProjectiveDimensionLE (ModuleCat.of R I) n → Module.Projective R' (I.map (algebraMap R R'))
+        → (I.map (algebraMap R R')).IsPrincipal := by
   intro R _ _ _ _ x R' _ _ _ I n h hp
   have hflat : Module.Flat R R' := IsLocalization.flat R' (Submonoid.powers x)
   have hb : IsBaseChange R' (Algebra.idealMap R' I) :=

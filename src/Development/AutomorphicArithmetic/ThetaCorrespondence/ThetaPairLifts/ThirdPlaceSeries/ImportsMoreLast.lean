@@ -11,15 +11,37 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin GlobalTheory.PendOf
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+  GlobalTheory.PendOf
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace GlobalTheory.LiftOther
 end GlobalTheory.LiftOther
 namespace GlobalTheory.LiftOther
-theorem main_alt_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (i : D.nd.Loc) (PI : D.naut.AV i) (k : Fin 2) (v : D.nd.PlG k) (s : SplitPlace D.host.E), s.w = D.naut.plGw k v → ∀ c : s.v.adicCompletion (maximalRealSubfield D.host.E) ≃+* s.w.adicCompletion D.host.E, Continuous c → (∀ x : D.host.E, c (s.i x) = algebraMap D.host.E (s.w.adicCompletion D.host.E) x) → ∀ L : G0g D.nd → GAf D.host.E D.R.nV, IsTypeGroupBlockLift D D.R.nV L → ∀ F ∈ D.naut.typeV i PI, ∀ (h : GL (Fin D.R.r) (ZMod (D.host.g k))) (g : G0g D.nd), g ⟨k, v⟩ = h → (∀ kv, kv ≠ ⟨k, v⟩ → g kv = 1) → ∃ x : GAf D.host.E D.R.nV, TrivOutside {s.v} x ∧ IsLiftN h (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV x)) ∧ NG.rt D.host.E D.R.nV (L g) ((P.M.loc i).real F) = NG.rt D.host.E D.R.nV x ((P.M.loc i).real F) := by
+theorem main_alt_alt
+    : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7)
+        (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (i : D.nd.Loc) (PI : D.naut.AV i)
+        (k : Fin 2) (v : D.nd.PlG k) (s : SplitPlace D.host.E),
+      s.w = D.naut.plGw k v
+        → ∀ c : s.v.adicCompletion (maximalRealSubfield D.host.E) ≃+* s.w.adicCompletion D.host.E,
+          Continuous c
+            → (∀ x : D.host.E, c (s.i x) = algebraMap D.host.E (s.w.adicCompletion D.host.E) x)
+            → ∀ L : G0g D.nd → GAf D.host.E D.R.nV,
+              IsTypeGroupBlockLift D D.R.nV L
+                → ∀ F ∈ D.naut.typeV i PI,
+                  ∀ (h : GL (Fin D.R.r) (ZMod (D.host.g k))) (g : G0g D.nd),
+                    g ⟨k, v⟩ = h → (∀ kv, kv ≠ ⟨k, v⟩ → g kv = 1)
+                      → ∃ x : GAf D.host.E D.R.nV,
+                        TrivOutside {s.v} x
+                          ∧ IsLiftN h (Matrix.GeneralLinearGroup.map c.toRingHom (s.loc D.R.nV x))
+                          ∧ NG.rt D.host.E D.R.nV (L g) ((P.M.loc i).real F)
+                            = NG.rt D.host.E D.R.nV x ((P.M.loc i).real F) := by
   intro hL D P i PI k v s hs c hc hcs L hLift F hF h g hg1 hg2
   classical
-  obtain ⟨x, hxT, hxe⟩ := GlobalTheory.SplitLift.exists_trivOutside_loc_eq D.R.nV s (s.loc D.R.nV (L g))
+  obtain ⟨x, hxT, hxe⟩ :=
+    GlobalTheory.SplitLift.exists_trivOutside_loc_eq D.R.nV s (s.loc D.R.nV (L g))
   refine ⟨x, hxT, ?_, ?_⟩
   · rw [hxe]
     have := ((hLift g).2 ⟨k, v⟩ s hs)
@@ -40,8 +62,7 @@ theorem main_alt_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7
     · subst hws
       rw [GlobalTheory.T.splitPlace_component_unitaryAdelic_determined s (L g) x hxe.symm]
       exact map_inv_mul_self _ x
-    · have hwg : w ∉ PendOf.gPl D := by
-        intro hwg; apply hw; simp [T, hws, hwg]
+    · have hwg : w ∉ PendOf.gPl D := by intro hwg; apply hw; simp [T, hws, hwg]
       rw [(hLift g).1 w hwg]
       have hx1 := hxT w (by simpa using hws)
       have e := map_inv_mul_self w x
@@ -59,7 +80,8 @@ theorem main_alt_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7
       apply hwne
       rw [← hs'v]
       exact over_eq s' (by rw [hs', ← hs]; exact s.w_under)
-    obtain ⟨p, hpT, hpe⟩ := GlobalTheory.SplitLift.exists_trivOutside_loc_eq D.R.nV s' (s'.loc D.R.nV y)
+    obtain ⟨p, hpT, hpe⟩ :=
+      GlobalTheory.SplitLift.exists_trivOutside_loc_eq D.R.nV s' (s'.loc D.R.nV y)
     have hloc : s'.loc D.R.nV y = s'.loc D.R.nV (L g) := by
       rw [hy, map_mul]
       have : s'.loc D.R.nV x⁻¹ = 1 := by
@@ -69,8 +91,9 @@ theorem main_alt_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7
     have hlift := (hLift g).2 kv s' hs'
     rw [hg2 kv hkvne, ← hloc, ← hpe] at hlift
     obtain ⟨ψ₀, ξ, hψ, -, hU⟩ := P.H.level.uni i j hj kv.1 kv.2 s' hs'
-    obtain ⟨hpJ, hpχ⟩ := GlobalTheory.T.blockLiftIdentity_mem_unipotentLevel_character_one (P.M.loc i).J (P.M.loc i).χ s' D.R.r (D.host.g kv.1) (D.host.g_prime kv.1).one_lt
-      ψ₀ ξ hψ hU p hpT hlift
+    obtain ⟨hpJ, hpχ⟩ :=
+      GlobalTheory.T.blockLiftIdentity_mem_unipotentLevel_character_one (P.M.loc i).J (P.M.loc i).χ
+        s' D.R.r (D.host.g kv.1) (D.host.g_prime kv.1).one_lt ψ₀ ξ hψ hU p hpT hlift
     refine ⟨p, ⟨⟨p, hpJ⟩, hpχ, rfl⟩, hs'v ▸ hpT, ?_⟩
     rw [← hs'v]
     exact GlobalTheory.T.splitPlace_component_unitaryAdelic_determined s' p y hpe
@@ -83,7 +106,8 @@ theorem main_alt_alt : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7
       rw [show (P.M.loc i).χ ⟨y', hy'J⟩ = 1 from hy'χ]; rfl
     rw [h1, one_smul] at e
     have hy'y : y' = y := hy'e
-    rw [← hy'y]; exact e
+    rw [← hy'y]
+    exact e
   have hLg : L g = x * y := by rw [hy, mul_inv_cancel_left]
   rw [hLg]
   funext z

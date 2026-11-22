@@ -6,7 +6,8 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Herm
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.BZMir GlobalTheory.LocGL GlobalTheory.BZMir.Leib
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.BZMir
+  GlobalTheory.LocGL GlobalTheory.BZMir.Leib
 
 namespace PositivityTheory.RgUd.Form.U.Asm
 
@@ -18,9 +19,11 @@ section Factor
 
 variable {V D : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup D] [Module ℂ D]
 
-theorem factor {C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} (hC : ∀ v w, C w v = starRingEnd ℂ (C v w)) (q : V →ₗ[ℂ] D)
-    (hk : ∀ v ∈ LinearMap.ker q, ∀ w, C v w = 0) {v v' w w' : V} (hv : q v = q v') (hw : q w = q w') :
-    C v w = C v' w' := by
+theorem factor
+    {C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} (hC : ∀ v w, C w v = starRingEnd ℂ (C v w))
+    (q : V →ₗ[ℂ] D) (hk : ∀ v ∈ LinearMap.ker q, ∀ w, C v w = 0)
+    {v v' w w' : V} (hv : q v = q v') (hw : q w = q w')
+    : C v w = C v' w' := by
   have h1 : v - v' ∈ LinearMap.ker q := by rw [LinearMap.mem_ker, map_sub, hv, sub_self]
   have h2 : w - w' ∈ LinearMap.ker q := by rw [LinearMap.mem_ker, map_sub, hw, sub_self]
   have e1 : C v w = C v' w := by
@@ -35,26 +38,34 @@ theorem factor {C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} (hC : ∀ v w, C w v = s
 
 end Factor
 
-theorem dpow_val (n : ℕ) (t : ℝ) (g : GL (Fin n) k) :
-    ((dpow n t g : ℂˣ) : ℂ) = ((nabs k (GeneralLinearGroup.det g) ^ t : ℝ) : ℂ) := by
+theorem dpow_val (n : ℕ) (t : ℝ) (g : GL (Fin n) k)
+    : ((dpow n t g : ℂˣ) : ℂ) = ((nabs k (GeneralLinearGroup.det g) ^ t : ℝ) : ℂ) := by
   simp only [dpow, detChar, MonoidHom.coe_comp, Function.comp_apply, absPow]
   rw [MonoidHom.coe_toHomUnits]
   simp only [MonoidHom.coe_mk, OneHom.coe_mk]
   rw [Complex.ofReal_cpow (nabs_pos k _).le]
 
-theorem top_core {n N : ℕ} (h : n ≤ N) {V D : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup D] [Module ℂ D]
-    [Nontrivial D] (π : Representation ℂ (GL (Fin N) k) V) (ρ : Representation ℂ (GL (Fin n) k) D)
-    (hadm : IsAdmissible ρ) (q : V →ₗ[ℂ] D) (hqs : Function.Surjective q)
-    (hqe : ∀ g v, q (π (blkAt k n N h g) v) = ρ g (q v)) (s t : ℝ) (hst : 2 * t + s = 0)
+theorem top_core
+    {n N : ℕ} (h : n ≤ N)
+    {V D : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup D] [Module ℂ D] [Nontrivial D]
+    (π : Representation ℂ (GL (Fin N) k) V)
+    (ρ : Representation ℂ (GL (Fin n) k) D) (hadm : IsAdmissible ρ)
+    (q : V →ₗ[ℂ] D)
+    (hqs : Function.Surjective q) (hqe : ∀ g v, q (π (blkAt k n N h g) v) = ρ g (q v))
+    (s t : ℝ) (hst : 2 * t + s = 0)
     (E : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hE1 : IsPsd E) (hE2 : ∀ v ∈ LinearMap.ker q, ∀ w, E v w = 0)
     (hE3 : ∀ v, E v v = 0 → v ∈ LinearMap.ker q)
-    (hE4 : ∀ g v w, E (π (blkAt k n N h g) v) (π (blkAt k n N h g) w) =
-      ((nabs k (GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * E v w)
-    (hLift : ∀ C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ, IsPsd C → (∀ v ∈ LinearMap.ker q, ∀ w, C v w = 0) →
-      (∀ g v w, C (π (blkAt k n N h g) v) (π (blkAt k n N h g) w) =
-        ((nabs k (GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * C v w) →
-      (∀ v, (C v v).re ≤ (E v v).re) → ∃ c : ℂ, ∀ v w, C v w = c * E v w) :
-    (twist ρ (dpow n t)).IsIrreducible ∧ IsUnitarisable (twist ρ (dpow n t)) := by
+    (hE4 : ∀ g v w,
+      E (π (blkAt k n N h g) v) (π (blkAt k n N h g) w)
+        = ((nabs k (GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * E v w)
+    (hLift : ∀ C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ,
+      IsPsd C → (∀ v ∈ LinearMap.ker q, ∀ w, C v w = 0)
+        → (∀ g v w,
+          C (π (blkAt k n N h g) v) (π (blkAt k n N h g) w)
+            = ((nabs k (GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * C v w)
+        → (∀ v, (C v v).re ≤ (E v v).re)
+        → ∃ c : ℂ, ∀ v w, C v w = c * E v w)
+    : (twist ρ (dpow n t)).IsIrreducible ∧ IsUnitarisable (twist ρ (dpow n t)) := by
   obtain ⟨r, hr⟩ := LinearMap.exists_rightInverse_of_surjective q (LinearMap.range_eq_top.2 hqs)
   have hqr : ∀ x, q (r x) = x := fun x => LinearMap.congr_fun hr x
   set Bt : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ := (E ∘ₗ r).compl₂ r with hBt
@@ -75,22 +86,28 @@ theorem top_core {n N : ℕ} (h : n ≤ N) {V D : Type} [AddCommGroup V] [Module
       have := hE3 _ h0
       rw [LinearMap.mem_ker, hqr] at this
       exact this
-  have hBe : ∀ g x y, Bt (ρ g x) (ρ g y) = ((nabs k (GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * Bt x y := by
+  have hBe
+      : ∀ g x y,
+        Bt (ρ g x) (ρ g y) = ((nabs k (GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * Bt x y := by
     intro g x y
     obtain ⟨v, rfl⟩ := hqs x
     obtain ⟨w, rfl⟩ := hqs y
     rw [← hqe, ← hqe, hdesc, hdesc, hE4]
   refine ⟨?_, ⟨Bt, hBh, hBp, fun g x y => ?_⟩⟩
   · apply twist_irr
-    obtain ⟨K₁, hK₁o, hK₁c, -⟩ := GlobalTheory.T.compact_open_subgroups_basis k n Set.univ Filter.univ_mem
-    refine irr_of_forms ρ hadm K₁ hK₁o hK₁c (fun g => nabs k (GeneralLinearGroup.det g) ^ s) Bt hBh hBp hBe ?_
+    obtain ⟨K₁, hK₁o, hK₁c, -⟩ :=
+      GlobalTheory.T.compact_open_subgroups_basis k n Set.univ Filter.univ_mem
+    refine irr_of_forms ρ hadm K₁ hK₁o hK₁c
+      (fun g => nabs k (GeneralLinearGroup.det g) ^ s)
+      Bt hBh hBp hBe ?_
     intro Ct hCh hCp hCle hCe
     set C : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ := (Ct ∘ₗ q).compl₂ q with hC
     have hC_apply : ∀ v w, C v w = Ct (q v) (q w) := fun v w => rfl
-    obtain ⟨c, hc⟩ := hLift C ⟨fun v w => by rw [hC_apply, hC_apply, hCh], fun v => by rw [hC_apply]; exact hCp _⟩
-      (fun v hv w => by rw [hC_apply, LinearMap.mem_ker.1 hv, map_zero, LinearMap.zero_apply])
-      (fun g v w => by rw [hC_apply, hC_apply, hqe, hqe, hCe])
-      (fun v => by rw [hC_apply, ← hdesc]; exact hCle _)
+    obtain ⟨c, hc⟩ :=
+      hLift C ⟨fun v w => by rw [hC_apply, hC_apply, hCh], fun v => by rw [hC_apply]; exact hCp _⟩
+        (fun v hv w => by rw [hC_apply, LinearMap.mem_ker.1 hv, map_zero, LinearMap.zero_apply])
+        (fun g v w => by rw [hC_apply, hC_apply, hqe, hqe, hCe])
+        (fun v => by rw [hC_apply, ← hdesc]; exact hCle _)
     refine ⟨c, fun x y => ?_⟩
     obtain ⟨v, rfl⟩ := hqs x
     obtain ⟨w, rfl⟩ := hqs y
@@ -101,13 +118,23 @@ theorem top_core {n N : ℕ} (h : n ≤ N) {V D : Type} [AddCommGroup V] [Module
       rw [LinearMap.map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul, smul_eq_mul]
     rw [hsm, hBe, dpow_val, Complex.conj_ofReal]
     have hpos := nabs_pos k (GeneralLinearGroup.det g)
-    have e : (nabs k (GeneralLinearGroup.det g) ^ t) * ((nabs k (GeneralLinearGroup.det g) ^ t) *
-        (nabs k (GeneralLinearGroup.det g) ^ s)) = 1 := by
-      rw [← Real.rpow_add hpos, ← Real.rpow_add hpos, show t + (t + s) = 0 by linarith, Real.rpow_zero]
-    calc ((nabs k (GeneralLinearGroup.det g) ^ t : ℝ) : ℂ) * (((nabs k (GeneralLinearGroup.det g) ^ t : ℝ) : ℂ) *
-          (((nabs k (GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * Bt x y))
-        = (((nabs k (GeneralLinearGroup.det g) ^ t) * ((nabs k (GeneralLinearGroup.det g) ^ t) *
-          (nabs k (GeneralLinearGroup.det g) ^ s)) : ℝ) : ℂ) * Bt x y := by push_cast; ring
+    have e
+        : (nabs k (GeneralLinearGroup.det g) ^ t)
+            * ((nabs k (GeneralLinearGroup.det g) ^ t) * (nabs k (GeneralLinearGroup.det g) ^ s))
+          = 1 := by
+      rw [← Real.rpow_add hpos, ← Real.rpow_add hpos, show t + (t + s) = 0 by linarith,
+        Real.rpow_zero]
+    calc
+      ((nabs k (GeneralLinearGroup.det g) ^ t : ℝ) : ℂ)
+            * (((nabs k (GeneralLinearGroup.det g) ^ t : ℝ) : ℂ)
+              * (((nabs k (GeneralLinearGroup.det g) ^ s : ℝ) : ℂ) * Bt x y))
+          = (((nabs k (GeneralLinearGroup.det g) ^ t)
+                  * ((nabs k (GeneralLinearGroup.det g) ^ t)
+                    * (nabs k (GeneralLinearGroup.det g) ^ s))
+                : ℝ)
+              : ℂ)
+            * Bt x y := by
+        push_cast; ring
       _ = Bt x y := by rw [e]; simp
 
 end PositivityTheory.RgUd.Form.U.Asm

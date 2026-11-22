@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 open UpperTheory.V.Cj.A UpperTheory.V.Lit.Geo
 
-theorem UpperTheory.V.Cj.A.bwdLast :
-    BwdLast := by
+theorem UpperTheory.V.Cj.A.bwdLast : BwdLast := by
   intro Γ V S I _ _ _ _ d G φ hφ C F hC q u hu hhd hvan
   obtain ⟨P, hP1, hPeq, hPvan⟩ := partOp Γ V S I d G φ hφ q
   have hconst : ∀ i j : I, u [i] = u [j] := by

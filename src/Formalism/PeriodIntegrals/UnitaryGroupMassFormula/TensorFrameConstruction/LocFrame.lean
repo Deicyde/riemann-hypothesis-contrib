@@ -40,13 +40,18 @@ lemma phi_ite (I : Formalism.MainNotions.S.AutInst) (v : InfinitePlace I.F) {r :
     I.φ v (if a = b then (1 : I.E) else 0) = if a = b then 1 else 0 := by
   split_ifs <;> simp
 
-def locFrame (I : Formalism.MainNotions.S.AutInst) {r k : ℕ} (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E)
+def locFrame
+    (I : Formalism.MainNotions.S.AutInst)
+    {r k : ℕ} (e f : Fin r → Fin I.n → I.E)
+    (z : Fin I.n → I.E)
     (hn : I.n = 2 * r + k + 1) (hF : IsFrame I e f z)
-    (hz : Formalism.UG.hform (starRingEnd I.E) I.J z z ≠ 0) (v : InfinitePlace I.F) (w : Fin k → Fin I.n → ℂ)
-    (hw : (∀ a b, hJ (I.ε v) (w a) (w b) = if a = b then 1 else 0) ∧
-      ∀ a, (∀ c, hJ (I.ε v) (rv I v (e c)) (w a) = 0 ∧ hJ (I.ε v) (rv I v (f c)) (w a) = 0) ∧
-        hJ (I.ε v) (rv I v z) (w a) = 0) :
-    Loc.LocFrame I.n r k (I.ε v) where
+    (hz : Formalism.UG.hform (starRingEnd I.E) I.J z z ≠ 0)
+    (v : InfinitePlace I.F) (w : Fin k → Fin I.n → ℂ)
+    (hw : (∀ a b, hJ (I.ε v) (w a) (w b) = if a = b then 1 else 0)
+      ∧ ∀ a,
+        (∀ c, hJ (I.ε v) (rv I v (e c)) (w a) = 0 ∧ hJ (I.ε v) (rv I v (f c)) (w a) = 0)
+          ∧ hJ (I.ε v) (rv I v z) (w a) = 0)
+    : Loc.LocFrame I.n r k (I.ε v) where
   e := fun a => rv I v (e a)
   f := fun a => rv I v (f a)
   z := rv I v z
@@ -64,12 +69,17 @@ def locFrame (I : Formalism.MainNotions.S.AutInst) {r k : ℕ} (e f : Fin r → 
 
 section Simp
 
-variable (I : Formalism.MainNotions.S.AutInst) {r k : ℕ} (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E)
+variable
+  (I : Formalism.MainNotions.S.AutInst)
+  {r k : ℕ} (e f : Fin r → Fin I.n → I.E)
+  (z : Fin I.n → I.E)
   (hn : I.n = 2 * r + k + 1) (hF : IsFrame I e f z)
-  (hz : Formalism.UG.hform (starRingEnd I.E) I.J z z ≠ 0) (v : InfinitePlace I.F) (w : Fin k → Fin I.n → ℂ)
-  (hw : (∀ a b, hJ (I.ε v) (w a) (w b) = if a = b then 1 else 0) ∧
-      ∀ a, (∀ c, hJ (I.ε v) (rv I v (e c)) (w a) = 0 ∧ hJ (I.ε v) (rv I v (f c)) (w a) = 0) ∧
-        hJ (I.ε v) (rv I v z) (w a) = 0)
+  (hz : Formalism.UG.hform (starRingEnd I.E) I.J z z ≠ 0)
+  (v : InfinitePlace I.F) (w : Fin k → Fin I.n → ℂ)
+  (hw : (∀ a b, hJ (I.ε v) (w a) (w b) = if a = b then 1 else 0)
+    ∧ ∀ a,
+      (∀ c, hJ (I.ε v) (rv I v (e c)) (w a) = 0 ∧ hJ (I.ε v) (rv I v (f c)) (w a) = 0)
+        ∧ hJ (I.ε v) (rv I v z) (w a) = 0)
 
 end Simp
 

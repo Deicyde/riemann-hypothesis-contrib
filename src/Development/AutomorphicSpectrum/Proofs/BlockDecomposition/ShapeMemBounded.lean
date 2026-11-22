@@ -8,8 +8,10 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
-open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.One PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.F.F5
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC
+open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.One PositivityTheory.Rg.Rs
+  PositivityTheory.Rg.BcB.F.F5
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -20,9 +22,11 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 def Cov (S : Set (Pre E n)) : Prop :=
   ∃ (k : ℕ) (D : Fin k → Pre E n), ∀ D' ∈ S, ∃ j, PreEquiv (D j) D'
 
-theorem cov_of_rel {S : Set (Pre E n)} {ι : Type*} [Finite ι] (P : ι → Pre E n → Prop)
-    (h1 : ∀ D ∈ S, ∃ a, P a D)
-    (h2 : ∀ a, ∀ D₁ ∈ S, ∀ D₂ ∈ S, P a D₁ → P a D₂ → PreEquiv D₁ D₂) : Cov S := by
+theorem cov_of_rel
+    {S : Set (Pre E n)} {ι : Type*} [Finite ι]
+    (P : ι → Pre E n → Prop)
+    (h1 : ∀ D ∈ S, ∃ a, P a D) (h2 : ∀ a, ∀ D₁ ∈ S, ∀ D₂ ∈ S, P a D₁ → P a D₂ → PreEquiv D₁ D₂)
+    : Cov S := by
   classical
   by_cases hS : S.Nonempty
   · obtain ⟨D₀, -⟩ := hS
@@ -38,8 +42,10 @@ theorem cov_of_rel {S : Set (Pre E n)} {ι : Type*} [Finite ι] (P : ι → Pre 
     exact h2 _ _ hmem _ hD' hP (by rw [Equiv.symm_apply_apply]; exact ha)
   · exact ⟨0, Fin.elim0, fun D' hD' => (hS ⟨D', hD'⟩).elim⟩
 
-theorem cov_of_cover {S : Set (Pre E n)} {ι : Type*} [Finite ι] (A : ι → Set (Pre E n))
-    (hA : ∀ a, Cov (A a)) (hS : ∀ D ∈ S, ∃ a, D ∈ A a) : Cov S := by
+theorem cov_of_cover
+    {S : Set (Pre E n)} {ι : Type*} [Finite ι]
+    (A : ι → Set (Pre E n)) (hA : ∀ a, Cov (A a)) (hS : ∀ D ∈ S, ∃ a, D ∈ A a)
+    : Cov S := by
   classical
   choose k D hD using fun a => (hA a : ∃ (k : ℕ) (D : Fin k → Pre E n), ∀ D' ∈ A a, ∃ j, PreEquiv (D j) D')
   let e := Finite.equivFin (Σ a, Fin (k a))
@@ -52,8 +58,7 @@ theorem cov_of_cover {S : Set (Pre E n)} {ι : Type*} [Finite ι] (A : ι → Se
   rw [Equiv.symm_apply_apply]
   exact hj
 
-abbrev Shape (E : Type) [Field E] : Type :=
-  Σ c : ℕ, (Fin c → ℕ) × (Fin c → (E →+* ℂ) → Multiset ℂ)
+abbrev Shape (E : Type) [Field E] : Type := Σ c : ℕ, (Fin c → ℕ) × (Fin c → (E →+* ℂ) → Multiset ℂ)
 
 def shape (D : Pre E n) : Shape E := ⟨D.c, D.N, D.m⟩
 
@@ -66,31 +71,39 @@ theorem finite_le (s : Multiset ℂ) : {x : Multiset ℂ | x ≤ s}.Finite := by
 theorem bounded_finite (n : ℕ) (m : (E →+* ℂ) → Multiset ℂ) : (bounded E n m).Finite := by
   refine ((Set.finite_Iic n).biUnion fun c _ =>
     (((Set.Finite.pi fun _ : Fin c => Set.finite_Iic n).prod
-      (Set.Finite.pi fun _ : Fin c => Set.Finite.pi fun τ => finite_le (m τ))).image
-        (fun p => (⟨c, p⟩ : Shape E)))).subset ?_
+        (Set.Finite.pi fun _ : Fin c => Set.Finite.pi fun τ => finite_le (m τ))).image
+      (fun p => (⟨c, p⟩ : Shape E)))).subset ?_
   rintro ⟨c, N, mm⟩ ⟨hc, hN, hm⟩
   exact Set.mem_iUnion₂.mpr ⟨c, hc, ⟨(N, mm), ⟨fun i _ => hN i, fun i _ τ _ => hm i τ⟩, rfl⟩⟩
 
-theorem shape_mem_bounded (m : (E →+* ℂ) → Multiset ℂ) (D : Pre E n)
-    (hm : ∀ τ, ∑ i, D.m i τ = m τ) : shape D ∈ bounded E n m := by
+theorem shape_mem_bounded (m : (E →+* ℂ) → Multiset ℂ) (D : Pre E n) (hm : ∀ τ, ∑ i, D.m i τ = m τ)
+    : shape D ∈ bounded E n m := by
   refine ⟨?_, fun i => ?_, fun i τ => ?_⟩
   · show D.c ≤ n
-    calc D.c = ∑ _i : Fin D.c, 1 := by simp
+    calc
+      D.c
+        = ∑ _i : Fin D.c, 1 := by simp
       _ ≤ ∑ i, D.N i := Finset.sum_le_sum fun i _ => D.pos i
       _ = n := D.h
   · show D.N i ≤ n
-    exact (Finset.single_le_sum (f := D.N) (fun j _ => Nat.zero_le _) (Finset.mem_univ i)).trans D.h.le
+    exact (Finset.single_le_sum (f := D.N) (fun j _ => Nat.zero_le _) (Finset.mem_univ i)).trans
+      D.h.le
   · show D.m i τ ≤ m τ
     rw [← hm τ]
-    exact Finset.single_le_sum (f := fun j => D.m j τ) (fun j _ => Multiset.zero_le _) (Finset.mem_univ i)
+    exact Finset.single_le_sum
+      (f := fun j => D.m j τ)
+      (fun j _ => Multiset.zero_le _)
+      (Finset.mem_univ i)
 
-theorem cov_fibre (hL : LevelFactor) (hF : FinDiscN)
+theorem cov_fibre
+    (hL : LevelFactor) (hF : FinDiscN)
     (K : ∀ w : HeightOneSpectrum (𝓞 E), Subgroup (GL (Fin n) (w.adicCompletion E)))
-    (W : ∀ N : ℕ, Submodule ℂ (Kinf E N → ℂ)) (hK : IsLevel K) (hW : ∀ N, FiniteDimensional ℂ (W N))
-    (t : Shape E) :
-    Cov {D' : Pre E n | shape D' = t ∧
-      (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D'.h w (D'.σ · w)) (K w)) ∧
-      ∀ i, HasKType (W (D'.N i)) (D'.V i)} := by
+    (W : ∀ N : ℕ, Submodule ℂ (Kinf E N → ℂ))
+    (hK : IsLevel K) (hW : ∀ N, FiniteDimensional ℂ (W N)) (t : Shape E)
+    : Cov
+      {D' : Pre E n | shape D' = t ∧
+        (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D'.h w (D'.σ · w)) (K w)) ∧
+        ∀ i, HasKType (W (D'.N i)) (D'.V i)} := by
   classical
   obtain ⟨c, N, mm⟩ := t
   by_cases hsum : ∑ i, N i = n
@@ -106,8 +119,10 @@ theorem cov_fibre (hL : LevelFactor) (hF : FinDiscN)
   choose k σs hσs using fun i : Fin c =>
     hF E (N i) (fun w => Ki w i) (W (N i)) (mm i) (hlev i) (hW (N i))
   refine cov_of_rel (ι := (i : Fin c) → Fin (k i))
-    (fun a D => ∃ hc : D.c = c, ∀ (i : Fin D.c) w, ∃ hs hi,
-      D.cls i w = GlobalTheory.LocGL.IrrGL.of (σs (Fin.cast hc i) (a (Fin.cast hc i)) w).ρ hs hi) ?_ ?_
+    (fun a D =>
+      ∃ hc : D.c = c, ∀ (i : Fin D.c) w, ∃ hs hi,
+        D.cls i w = GlobalTheory.LocGL.IrrGL.of (σs (Fin.cast hc i) (a (Fin.cast hc i)) w).ρ hs hi)
+    ?_ ?_
   · rintro ⟨c', N', h', V', σ', m', pos', disc', loc', inf'⟩ ⟨hsh, hsph, hKt⟩
     obtain ⟨rfl, hh⟩ := Sigma.mk.inj_iff.mp hsh
     obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq hh)
@@ -127,14 +142,19 @@ theorem cov_fibre (hL : LevelFactor) (hF : FinDiscN)
 
 theorem finFamOf : FinFamOf := by
   intro hL hF E _ _ _ n K W m hK hW
-  have hS : Cov {D' : Pre E n | (∀ τ, ∑ i, D'.m i τ = m τ) ∧
-      (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D'.h w (D'.σ · w)) (K w)) ∧
-      ∀ i, HasKType (W (D'.N i)) (D'.V i)} := by
+  have hS : Cov
+      {D' : Pre E n | (∀ τ, ∑ i, D'.m i τ = m τ) ∧
+        (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D'.h w (D'.σ · w)) (K w)) ∧
+        ∀ i, HasKType (W (D'.N i)) (D'.V i)} := by
     have hfin := bounded_finite (E := E) n m
     haveI := hfin.to_subtype
-    refine cov_of_cover (ι := bounded E n m) (fun t => {D' : Pre E n | shape D' = t.1 ∧
-      (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D'.h w (D'.σ · w)) (K w)) ∧
-      ∀ i, HasKType (W (D'.N i)) (D'.V i)}) (fun t => cov_fibre hL hF K W hK hW t.1) ?_
+    refine cov_of_cover (ι := bounded E n m)
+      (fun t =>
+        {D' : Pre E n | shape D' = t.1 ∧
+          (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D'.h w (D'.σ · w)) (K w)) ∧
+          ∀ i, HasKType (W (D'.N i)) (D'.V i)})
+      (fun t => cov_fibre hL hF K W hK hW t.1)
+      ?_
     rintro D' ⟨hm, hsph, hKt⟩
     exact ⟨⟨shape D', shape_mem_bounded m D' hm⟩, rfl, hsph, hKt⟩
   obtain ⟨k, D, hD⟩ := hS

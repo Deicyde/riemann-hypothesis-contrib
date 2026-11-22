@@ -85,10 +85,10 @@ lemma rm_I_smul_vec (ξ : Fin n → ℂ) : Complex.I • rmVec ξ = ∑ j, (Comp
   rw [Finset.smul_sum]
   simp_rw [smul_smul]
 
-theorem rm_levi_re_ofReal (F : V n → ℝ) (y : V n) (hF : ContDiffAt ℝ 2 F y) (ξ : Fin n → ℂ) :
-    4 * (leviV n (fun x => (F x : ℂ)) y ξ).re =
-      fderiv ℝ (fderiv ℝ F) y (rmVec ξ) (rmVec ξ) +
-        fderiv ℝ (fderiv ℝ F) y (Complex.I • rmVec ξ) (Complex.I • rmVec ξ) := by
+theorem rm_levi_re_ofReal (F : V n → ℝ) (y : V n) (hF : ContDiffAt ℝ 2 F y) (ξ : Fin n → ℂ)
+    : 4 * (leviV n (fun x => (F x : ℂ)) y ξ).re
+      = fderiv ℝ (fderiv ℝ F) y (rmVec ξ) (rmVec ξ)
+        + fderiv ℝ (fderiv ℝ F) y (Complex.I • rmVec ξ) (Complex.I • rmVec ξ) := by
   rw [rm_I_smul_vec]
   unfold rmVec
   rw [rm_bil_sum, rm_bil_sum, ← Finset.sum_add_distrib]

@@ -10,10 +10,12 @@ open scoped ENNReal
 
 namespace GlobalTheory.CompanionTheory.Dblock
 
-theorem integral_norm_sq_le_toReal_lintegral_enorm_sq {α : Type} [MeasurableSpace α] (μ : Measure α) (f : α → ℂ) :
-    ∫ x, ‖f x‖ ^ 2 ∂μ ≤ (∫⁻ x, ‖f x‖ₑ ^ 2 ∂μ).toReal := by
+theorem integral_norm_sq_le_toReal_lintegral_enorm_sq
+    {α : Type} [MeasurableSpace α] (μ : Measure α) (f : α → ℂ)
+    : ∫ x, ‖f x‖ ^ 2 ∂μ ≤ (∫⁻ x, ‖f x‖ₑ ^ 2 ∂μ).toReal := by
   by_cases h : Integrable (fun x => ‖f x‖ ^ 2) μ
-  · rw [integral_eq_lintegral_of_nonneg_ae (Eventually.of_forall fun x => by positivity) h.aestronglyMeasurable]
+  · rw [integral_eq_lintegral_of_nonneg_ae (Eventually.of_forall fun x => by positivity)
+      h.aestronglyMeasurable]
     apply le_of_eq
     congr 1
     apply lintegral_congr

@@ -8,14 +8,19 @@ open NumberField
 
 namespace UpperTheory.Gal.FiniteEtaleModels.O
 
-private theorem idem_core {A : Type} [CommRing A] (bar : A ≃+* A) (ω : A) (tr nm r : ℤ) (q : ℕ)
+private theorem idem_core
+    {A : Type} [CommRing A]
+    (bar : A ≃+* A)
+    (ω : A)
+    (tr nm r : ℤ)
+    (q : ℕ)
     (h1 : ω + bar ω = (tr : A)) (h2 : ω * bar ω = (nm : A))
     (hd : IsCoprime (q : ℤ) (tr ^ 2 - 4 * nm)) (hr : (q : ℤ) ∣ r ^ 2 - tr * r + nm)
-    (u : Ideal A) (hu : u = Ideal.span {(q : A), ω - (r : A)}) :
-    ∃ ε : ℕ → A, ∀ e : ℕ,
-      1 - ε e ∈ u ^ e ∧ bar (ε e) ∈ u ^ e ∧ (∀ x ∈ u ^ e, (q : A) ^ e ∣ ε e * x) ∧
-      (q : A) ^ e ∣ ε e + bar (ε e) - 1 ∧ (q : A) ^ e ∣ ε (e + 1) - ε e ∧
-      ∀ (𝔞 : Ideal A), (∃ f : ℕ, u ^ f ≤ 𝔞) → (q : A) ^ e ∈ 𝔞 → u ^ e ≤ 𝔞 := by
+    (u : Ideal A) (hu : u = Ideal.span {(q : A), ω - (r : A)})
+    : ∃ ε : ℕ → A, ∀ e : ℕ,
+      1 - ε e ∈ u ^ e ∧ bar (ε e) ∈ u ^ e ∧ (∀ x ∈ u ^ e, (q : A) ^ e ∣ ε e * x)
+        ∧ (q : A) ^ e ∣ ε e + bar (ε e) - 1 ∧ (q : A) ^ e ∣ ε (e + 1) - ε e
+        ∧ ∀ (𝔞 : Ideal A), (∃ f : ℕ, u ^ f ≤ 𝔞) → (q : A) ^ e ∈ 𝔞 → u ^ e ≤ 𝔞 := by
   classical
   obtain ⟨m, hm⟩ := hr
   obtain ⟨s, t, hst⟩ := hd
@@ -51,10 +56,14 @@ private theorem idem_core {A : Type} [CommRing A] (bar : A ≃+* A) (ω : A) (tr
       have := Ideal.add_mem _ (Ideal.mem_sup_left hwu) (Ideal.mem_sup_right hwv)
       convert this using 1
       linear_combination -h1
-    have key : (1 : A) = (q : A) * ((s : A) - 4 * t * m) + (t : A) * ((tr : A) - 2 * r) * ((tr : A) - 2 * r) := by
+    have key
+        : (1 : A)
+          = (q : A) * ((s : A) - 4 * t * m)
+            + (t : A) * ((tr : A) - 2 * r) * ((tr : A) - 2 * r) := by
       linear_combination -hstA - 4 * (t : A) * hmA
     rw [key]
-    exact Ideal.add_mem _ (Ideal.mul_mem_right _ _ (Ideal.mem_sup_left hqu)) (Ideal.mul_mem_left _ _ hd')
+    exact Ideal.add_mem _ (Ideal.mul_mem_right _ _ (Ideal.mem_sup_left hqu))
+      (Ideal.mul_mem_left _ _ hd')
   have hmul : u * v ≤ Ideal.span {(q : A)} := by
     rw [hu, hv, Submodule.mul_le]
     intro x hx y hy
@@ -106,8 +115,7 @@ private theorem idem_core {A : Type} [CommRing A] (bar : A ≃+* A) (ω : A) (tr
 
 end UpperTheory.Gal.FiniteEtaleModels.O
 
-theorem UpperTheory.Gal.FiniteEtaleModels.O.idem :
-    UpperTheory.Gal.FiniteEtaleModels.O.Idem := by
+theorem UpperTheory.Gal.FiniteEtaleModels.O.idem : UpperTheory.Gal.FiniteEtaleModels.O.Idem := by
   intro q hq D r hr
   have hprime : Prime (q : ℤ) := Nat.prime_iff_prime_int.1 hq.out
   exact UpperTheory.Gal.FiniteEtaleModels.O.idem_core D.bar D.ω D.tr D.nm r q D.tr_eq D.nm_eq

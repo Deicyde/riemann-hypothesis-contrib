@@ -10,8 +10,10 @@ open NumberField
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem poin_of_inputs (hLU : LUStatement (E := E)) (hS : PoinPf.SumBallStatement (E := E))
-    (hF : PoinPf.FFStatement (E := E)) : PoinStatement (E := E) :=
+theorem poin_of_inputs
+    (hLU : LUStatement (E := E)) (hS : PoinPf.SumBallStatement (E := E))
+    (hF : PoinPf.FFStatement (E := E))
+    : PoinStatement (E := E) :=
   PoinPf.poin_of (PoinPf.loc_of (PoinPf.subMeanLoc_of hLU) hS)
     (PoinPf.ball_of PoinPf.subMean_holds hS) hF
 

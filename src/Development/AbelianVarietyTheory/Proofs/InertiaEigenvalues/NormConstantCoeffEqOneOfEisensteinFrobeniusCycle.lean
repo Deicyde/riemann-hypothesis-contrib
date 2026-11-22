@@ -12,12 +12,13 @@ open PowerSeries GlobalTheory.BK
 variable {K : Type} [NormedField K] [IsUltrametricDist K]
 
 def DomTerm (ρ : ℝ) (f : K⟦X⟧) (i : ℕ) (c : ℝ) : Prop :=
-  0 < c ∧ ‖coeff i f‖ * ρ ^ i = c ∧ (∀ n, ‖coeff n f‖ * ρ ^ n ≤ c) ∧
-    ∀ n < i, ‖coeff n f‖ * ρ ^ n < c
+  0 < c ∧ ‖coeff i f‖ * ρ ^ i = c ∧ (∀ n, ‖coeff n f‖ * ρ ^ n ≤ c)
+    ∧ ∀ n < i, ‖coeff n f‖ * ρ ^ n < c
 
 omit [IsUltrametricDist K] in
-theorem DomTerm.unique {ρ : ℝ} {f : K⟦X⟧} {i j : ℕ} {c d : ℝ} (h : DomTerm ρ f i c)
-    (h' : DomTerm ρ f j d) : i = j ∧ c = d := by
+theorem DomTerm.unique
+    {ρ : ℝ} {f : K⟦X⟧} {i j : ℕ} {c d : ℝ} (h : DomTerm ρ f i c) (h' : DomTerm ρ f j d)
+    : i = j ∧ c = d := by
   obtain ⟨hc, hi, hle, hlt⟩ := h
   obtain ⟨hd, hj, hle', hlt'⟩ := h'
   have hcd : c = d := le_antisymm (by rw [← hi]; exact hle' i) (by rw [← hj]; exact hle j)
@@ -31,8 +32,10 @@ theorem DomTerm.unique {ρ : ℝ} {f : K⟦X⟧} {i j : ℕ} {c d : ℝ} (h : Do
     rw [hj, ← hcd] at hx
     exact absurd hx (lt_irrefl c)
 
-theorem norm_sum_mul_lt {ι : Type} (s : Finset ι) (F : ι → K) {w c : ℝ} (hw : 0 ≤ w) (hc : 0 < c)
-    (h : ∀ p ∈ s, ‖F p‖ * w < c) : ‖∑ p ∈ s, F p‖ * w < c := by
+theorem norm_sum_mul_lt
+    {ι : Type} (s : Finset ι) (F : ι → K)
+    {w c : ℝ} (hw : 0 ≤ w) (hc : 0 < c) (h : ∀ p ∈ s, ‖F p‖ * w < c)
+    : ‖∑ p ∈ s, F p‖ * w < c := by
   rcases s.eq_empty_or_nonempty with rfl | hs
   · simpa using hc
   · obtain ⟨p, hp, hle⟩ := IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty hs F
@@ -50,45 +53,61 @@ private lemma norm_sum_mul_le_of_forall_norm_mul_le {ι : Type} (s : Finset ι) 
       (fun p hp => (le_div_iff₀ hw).mpr (h p hp))
   exact (le_div_iff₀ hw).mp hb
 
-theorem DomTerm.mul {ρ : ℝ} (hρ : 0 < ρ) {f g : K⟦X⟧} {i j : ℕ} {c d : ℝ} (h : DomTerm ρ f i c)
-    (h' : DomTerm ρ g j d) : DomTerm ρ (f * g) (i + j) (c * d) := by
+theorem DomTerm.mul
+    {ρ : ℝ} (hρ : 0 < ρ)
+    {f g : K⟦X⟧} {i j : ℕ} {c d : ℝ} (h : DomTerm ρ f i c) (h' : DomTerm ρ g j d)
+    : DomTerm ρ (f * g) (i + j) (c * d) := by
   obtain ⟨hc, hi, hle, hlt⟩ := h
   obtain ⟨hd, hj, hle', hlt'⟩ := h'
   have hcd : 0 < c * d := mul_pos hc hd
-  have hnn : ∀ (x : K) (n : ℕ), 0 ≤ ‖x‖ * ρ ^ n := fun x n => mul_nonneg (norm_nonneg x) (pow_pos hρ n).le
+  have hnn : ∀ (x : K) (n : ℕ), 0 ≤ ‖x‖ * ρ ^ n := fun x n =>
+    mul_nonneg (norm_nonneg x) (pow_pos hρ n).le
   have term_lt : ∀ a b, (a < i ∨ b < j) → ‖coeff a f * coeff b g‖ * ρ ^ (a + b) < c * d := by
     intro a b hab
     rw [norm_mul_mul_pow_add_eq_mul_weighted]
     rcases hab with ha | hb
-    · calc ‖coeff a f‖ * ρ ^ a * (‖coeff b g‖ * ρ ^ b)
+    · calc
+        ‖coeff a f‖ * ρ ^ a * (‖coeff b g‖ * ρ ^ b)
           ≤ ‖coeff a f‖ * ρ ^ a * d := mul_le_mul_of_nonneg_left (hle' b) (hnn _ a)
         _ < c * d := mul_lt_mul_of_pos_right (hlt a ha) hd
-    · calc ‖coeff a f‖ * ρ ^ a * (‖coeff b g‖ * ρ ^ b)
+    · calc
+        ‖coeff a f‖ * ρ ^ a * (‖coeff b g‖ * ρ ^ b)
           ≤ c * (‖coeff b g‖ * ρ ^ b) := mul_le_mul_of_nonneg_right (hle a) (hnn _ b)
         _ < c * d := mul_lt_mul_of_pos_left (hlt' b hb) hc
-  have sum_lt : ∀ (n : ℕ) (s : Finset (ℕ × ℕ)), (∀ p ∈ s, p.1 + p.2 = n ∧ (p.1 < i ∨ p.2 < j)) →
-      ‖∑ p ∈ s, coeff p.1 f * coeff p.2 g‖ * ρ ^ n < c * d := by
+  have sum_lt
+      : ∀ (n : ℕ) (s : Finset (ℕ × ℕ)),
+        (∀ p ∈ s, p.1 + p.2 = n ∧ (p.1 < i ∨ p.2 < j))
+          → ‖∑ p ∈ s, coeff p.1 f * coeff p.2 g‖ * ρ ^ n < c * d := by
     intro n s hs
-    refine norm_sum_mul_lt s (fun p : ℕ × ℕ => coeff p.1 f * coeff p.2 g) (pow_pos hρ n).le hcd fun p hp => ?_
+    refine norm_sum_mul_lt s
+      (fun p : ℕ × ℕ => coeff p.1 f * coeff p.2 g)
+      (pow_pos hρ n).le hcd
+      fun p hp => ?_
     obtain ⟨h1, h2⟩ := hs p hp
     rw [← h1]
     exact term_lt p.1 p.2 h2
   refine ⟨hcd, ?_, fun n => ?_, fun n hn => ?_⟩
-  · have hmem : (i, j) ∈ Finset.HasAntidiagonal.antidiagonal (i + j) := Finset.HasAntidiagonal.mem_antidiagonal.mpr rfl
+  · have hmem : (i, j) ∈ Finset.HasAntidiagonal.antidiagonal (i + j) :=
+      Finset.HasAntidiagonal.mem_antidiagonal.mpr rfl
     rw [coeff_mul, ← Finset.add_sum_erase _ _ hmem]
     have hmain : ‖coeff i f * coeff j g‖ * ρ ^ (i + j) = c * d := by
       rw [norm_mul_mul_pow_add_eq_mul_weighted, hi, hj]
-    have hrest := sum_lt (i + j) ((Finset.HasAntidiagonal.antidiagonal (i + j)).erase (i, j)) (by
-      rintro ⟨a, b⟩ hp
-      simp only [Finset.mem_erase, Finset.HasAntidiagonal.mem_antidiagonal, ne_eq, Prod.mk.injEq] at hp
-      show a + b = i + j ∧ (a < i ∨ b < j)
-      omega)
-    have hlt2 : ‖∑ p ∈ (Finset.HasAntidiagonal.antidiagonal (i + j)).erase (i, j), coeff p.1 f * coeff p.2 g‖ <
-        ‖coeff i f * coeff j g‖ :=
+    have hrest :=
+      sum_lt (i + j) ((Finset.HasAntidiagonal.antidiagonal (i + j)).erase (i, j)) (by
+        rintro ⟨a, b⟩ hp
+        simp only [Finset.mem_erase, Finset.HasAntidiagonal.mem_antidiagonal, ne_eq, Prod.mk.injEq]
+          at hp
+        show a + b = i + j ∧ (a < i ∨ b < j)
+        omega)
+    have hlt2
+        : ‖∑ p ∈ (Finset.HasAntidiagonal.antidiagonal (i + j)).erase (i, j), coeff p.1 f * coeff p.2 g‖
+          < ‖coeff i f * coeff j g‖ :=
       lt_of_mul_lt_mul_right (by rw [hmain]; exact hrest) (pow_pos hρ (i + j)).le
     rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hlt2.ne', max_eq_left hlt2.le, hmain]
   · rw [coeff_mul]
-    refine norm_sum_mul_le_of_forall_norm_mul_le _ (fun p : ℕ × ℕ => coeff p.1 f * coeff p.2 g) (pow_pos hρ n) hcd.le
+    refine norm_sum_mul_le_of_forall_norm_mul_le _
+      (fun p : ℕ × ℕ => coeff p.1 f * coeff p.2 g)
+      (pow_pos hρ n) hcd.le
       fun p hp => ?_
     rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
     rw [← hp, norm_mul_mul_pow_add_eq_mul_weighted]
@@ -110,8 +129,8 @@ theorem domTerm_one (ρ : ℝ) : DomTerm ρ (1 : K⟦X⟧) 0 1 := by
     · rw [norm_zero, zero_mul]
       exact zero_le_one
 
-theorem DomTerm.pow {ρ : ℝ} (hρ : 0 < ρ) {f : K⟦X⟧} {i : ℕ} {c : ℝ} (h : DomTerm ρ f i c) (n : ℕ) :
-    DomTerm ρ (f ^ n) (i * n) (c ^ n) := by
+theorem DomTerm.pow {ρ : ℝ} (hρ : 0 < ρ) {f : K⟦X⟧} {i : ℕ} {c : ℝ} (h : DomTerm ρ f i c) (n : ℕ)
+    : DomTerm ρ (f ^ n) (i * n) (c ^ n) := by
   induction n with
   | zero =>
     rw [pow_zero, mul_zero, pow_zero]
@@ -121,21 +140,27 @@ theorem DomTerm.pow {ρ : ℝ} (hρ : 0 < ρ) {f : K⟦X⟧} {i : ℕ} {c : ℝ}
     exact ih.mul hρ h
 
 omit [IsUltrametricDist K] in
-theorem exists_domTerm_of_max {ρ : ℝ} {f : K⟦X⟧} {c : ℝ} (hc : 0 < c)
-    (h : ∀ n, ‖coeff n f‖ * ρ ^ n ≤ c) (h' : ∃ n, ‖coeff n f‖ * ρ ^ n = c) :
-    ∃ i, DomTerm ρ f i c := by
+theorem exists_domTerm_of_max
+    {ρ : ℝ} {f : K⟦X⟧} {c : ℝ}
+    (hc : 0 < c) (h : ∀ n, ‖coeff n f‖ * ρ ^ n ≤ c) (h' : ∃ n, ‖coeff n f‖ * ρ ^ n = c)
+    : ∃ i, DomTerm ρ f i c := by
   classical
-  exact ⟨Nat.find h', hc, Nat.find_spec h', h,
-    fun n hn => lt_of_le_of_ne (h n) (Nat.find_min h' hn)⟩
+  exact
+    ⟨Nat.find h', hc, Nat.find_spec h', h, fun n hn => lt_of_le_of_ne (h n) (Nat.find_min h' hn)⟩
 
 omit [IsUltrametricDist K] in
-theorem exists_domTerm_of_lt_one {ρ : ℝ} (hρ : 0 < ρ) (hρ1 : ρ < 1) {f : K⟦X⟧}
-    (h : ∀ n, ‖coeff n f‖ ≤ 1) {m : ℕ} (hm : coeff m f ≠ 0) : ∃ i c, DomTerm ρ f i c := by
+theorem exists_domTerm_of_lt_one
+    {ρ : ℝ} (hρ : 0 < ρ) (hρ1 : ρ < 1)
+    {f : K⟦X⟧} (h : ∀ n, ‖coeff n f‖ ≤ 1)
+    {m : ℕ} (hm : coeff m f ≠ 0)
+    : ∃ i c, DomTerm ρ f i c := by
   classical
   have hv : 0 < ‖coeff m f‖ * ρ ^ m := mul_pos (norm_pos_iff.mpr hm) (pow_pos hρ m)
   obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one hv hρ1
   have htail : ∀ n, N ≤ n → ‖coeff n f‖ * ρ ^ n < ‖coeff m f‖ * ρ ^ m := fun n hn =>
-    calc ‖coeff n f‖ * ρ ^ n ≤ ρ ^ n := mul_le_of_le_one_left (pow_pos hρ n).le (h n)
+    calc
+      ‖coeff n f‖ * ρ ^ n
+        ≤ ρ ^ n := mul_le_of_le_one_left (pow_pos hρ n).le (h n)
       _ ≤ ρ ^ N := pow_le_pow_of_le_one hρ.le hρ1.le hn
       _ < ‖coeff m f‖ * ρ ^ m := hN
   have hmN : m ∈ Finset.range N := by
@@ -153,16 +178,18 @@ theorem exists_domTerm_of_lt_one {ρ : ℝ} (hρ : 0 < ρ) (hρ1 : ρ < 1) {f : 
   exact ⟨i, _, hi⟩
 
 omit [IsUltrametricDist K] in
-theorem exists_domTerm_one {f : K⟦X⟧} (h : ∀ n, ‖coeff n f‖ ≤ 1) (h' : ∃ n, ‖coeff n f‖ = 1) :
-    ∃ i, DomTerm 1 f i 1 := by
+theorem exists_domTerm_one {f : K⟦X⟧} (h : ∀ n, ‖coeff n f‖ ≤ 1) (h' : ∃ n, ‖coeff n f‖ = 1)
+    : ∃ i, DomTerm 1 f i 1 := by
   obtain ⟨n, hn⟩ := h'
   refine exists_domTerm_of_max one_pos (fun m => ?_) ⟨n, ?_⟩
   · rw [one_pow, mul_one]
     exact h m
   · rw [one_pow, mul_one, hn]
 
-theorem exists_domTerm_of_mul {f g : K⟦X⟧} (hf : ∀ n, ‖coeff n f‖ ≤ 1)
-    (hg : ∀ n, ‖coeff n g‖ ≤ 1) {j : ℕ} (h : DomTerm 1 (f * g) j 1) : ∃ i, DomTerm 1 f i 1 := by
+theorem exists_domTerm_of_mul
+    {f g : K⟦X⟧} (hf : ∀ n, ‖coeff n f‖ ≤ 1) (hg : ∀ n, ‖coeff n g‖ ≤ 1)
+    {j : ℕ} (h : DomTerm 1 (f * g) j 1)
+    : ∃ i, DomTerm 1 f i 1 := by
   apply exists_domTerm_one hf
   by_contra hno
   push Not at hno
@@ -171,17 +198,27 @@ theorem exists_domTerm_of_mul {f g : K⟦X⟧} (hf : ∀ n, ‖coeff n f‖ ≤ 
   rw [one_pow, mul_one] at hj
   have hsm : ‖coeff j (f * g)‖ * 1 < 1 := by
     rw [coeff_mul]
-    refine norm_sum_mul_lt _ (fun p : ℕ × ℕ => coeff p.1 f * coeff p.2 g) zero_le_one one_pos fun p _ => ?_
+    refine norm_sum_mul_lt _
+      (fun p : ℕ × ℕ => coeff p.1 f * coeff p.2 g)
+      zero_le_one one_pos
+      fun p _ => ?_
     rw [norm_mul, mul_one]
-    calc ‖coeff p.1 f‖ * ‖coeff p.2 g‖ ≤ ‖coeff p.1 f‖ * 1 :=
-          mul_le_mul_of_nonneg_left (hg p.2) (norm_nonneg _)
+    calc
+      ‖coeff p.1 f‖ * ‖coeff p.2 g‖
+        ≤ ‖coeff p.1 f‖ * 1 := mul_le_mul_of_nonneg_left (hg p.2) (norm_nonneg _)
       _ < 1 := by rw [mul_one]; exact hlt p.1
   rw [mul_one, hj] at hsm
   exact lt_irrefl 1 hsm
 
 omit [IsUltrametricDist K] in
-theorem coeff_E (l e n : ℕ) (he : 0 < e) :
-    coeff n (E K l e) = if n = e then 1 else if n = 0 then (l : K) else 0 := by
+theorem coeff_E (l e n : ℕ) (he : 0 < e)
+    : coeff n (E K l e)
+      = if n = e then
+          1
+        else if n = 0 then
+          (l : K)
+        else
+          0 := by
   unfold E
   rw [map_add (coeff n), coeff_X_pow, ← map_natCast (C (R := K)) l, coeff_C]
   split_ifs <;> first | omega | simp
@@ -203,8 +240,8 @@ theorem domTerm_E_one {l e : ℕ} (he : 0 < e) (hl : ‖(l : K)‖ < 1) : DomTer
       exact zero_lt_one
 
 omit [IsUltrametricDist K] in
-theorem domTerm_E_root {l e : ℕ} (he : 0 < e) {r : ℝ} (hr : 0 < r) (hre : r ^ e = ‖(l : K)‖) :
-    DomTerm r (E K l e) 0 (r ^ e) := by
+theorem domTerm_E_root {l e : ℕ} (he : 0 < e) {r : ℝ} (hr : 0 < r) (hre : r ^ e = ‖(l : K)‖)
+    : DomTerm r (E K l e) 0 (r ^ e) := by
   refine ⟨pow_pos hr e, ?_, fun n => ?_, fun n hn => absurd hn (Nat.not_lt_zero n)⟩
   · rw [coeff_E (K := K) l e 0 he, if_neg he.ne, if_pos rfl, pow_zero, mul_one, hre]
   · rw [coeff_E (K := K) l e n he]
@@ -215,11 +252,13 @@ theorem domTerm_E_root {l e : ℕ} (he : 0 < e) {r : ℝ} (hr : 0 < r) (hre : r 
       exact (pow_pos hr e).le
 
 omit [IsUltrametricDist K] in
-theorem DomTerm.frob (l : ℕ) [Fact l.Prime] {f : K⟦X⟧} {i : ℕ} (h : DomTerm 1 f i 1) :
-    DomTerm 1 (frob K l f) (l * i) 1 := by
+theorem DomTerm.frob (l : ℕ) [Fact l.Prime] {f : K⟦X⟧} {i : ℕ} (h : DomTerm 1 f i 1)
+    : DomTerm 1 (frob K l f) (l * i) 1 := by
   obtain ⟨-, hi, hle, hlt⟩ := h
   have hl0 : 0 < l := (Fact.out : l.Prime).pos
-  have hco : ∀ n, coeff n (GlobalTheory.BK.frob K l f) = if l ∣ n then coeff (n / l) f else 0 := fun n => by
+  have hco
+      : ∀ n,
+        coeff n (GlobalTheory.BK.frob K l f) = if l ∣ n then coeff (n / l) f else 0 := fun n => by
     exact GlobalTheory.BK.coeff_frob l f n
   refine ⟨one_pos, ?_, fun n => ?_, fun n hn => ?_⟩
   · rw [hco, if_pos (dvd_mul_right l i), Nat.mul_div_cancel_left i hl0, one_pow, mul_one]
@@ -244,10 +283,12 @@ theorem DomTerm.frob (l : ℕ) [Fact l.Prime] {f : K⟦X⟧} {i : ℕ} (h : DomT
     · rw [norm_zero]
       exact zero_lt_one
 
-theorem norm_constantCoeff_of_dvd {l e n d : ℕ} (he : 0 < e) {r : ℝ} (hr : 0 < r) (hr1 : r < 1)
-    (hre : r ^ e = ‖(l : K)‖) {k k' : K⟦X⟧} (hk : ∀ m, ‖coeff m k‖ ≤ 1)
-    (hk' : ∀ m, ‖coeff m k'‖ ≤ 1) (h : k * k' = E K l e ^ n) (hd : DomTerm 1 k d 1) :
-    ‖constantCoeff k‖ = r ^ d := by
+theorem norm_constantCoeff_of_dvd
+    {l e n d : ℕ} (he : 0 < e)
+    {r : ℝ} (hr : 0 < r) (hr1 : r < 1) (hre : r ^ e = ‖(l : K)‖)
+    {k k' : K⟦X⟧} (hk : ∀ m, ‖coeff m k‖ ≤ 1) (hk' : ∀ m, ‖coeff m k'‖ ≤ 1)
+    (h : k * k' = E K l e ^ n) (hd : DomTerm 1 k d 1)
+    : ‖constantCoeff k‖ = r ^ d := by
   have hl1 : ‖(l : K)‖ < 1 := hre ▸ pow_lt_one₀ hr.le hr1 he.ne'
   have hE1 : DomTerm 1 (E K l e ^ n) (e * n) 1 := by
     have hx := (domTerm_E_one (K := K) he hl1).pow one_pos n
@@ -261,10 +302,12 @@ theorem norm_constantCoeff_of_dvd {l e n d : ℕ} (he : 0 < e) {r : ℝ} (hr : 0
   have hkd' : ‖coeff d' k'‖ = 1 := by
     have hx := hd'.2.1
     rwa [one_pow, mul_one] at hx
-  obtain ⟨i, c, hic⟩ := exists_domTerm_of_lt_one hr hr1 hk (m := d)
-    (fun h0 => by rw [h0, norm_zero] at hkd; exact zero_ne_one hkd)
-  obtain ⟨i', c', hic'⟩ := exists_domTerm_of_lt_one hr hr1 hk' (m := d')
-    (fun h0 => by rw [h0, norm_zero] at hkd'; exact zero_ne_one hkd')
+  obtain ⟨i, c, hic⟩ :=
+    exists_domTerm_of_lt_one hr hr1 hk (m := d)
+      (fun h0 => by rw [h0, norm_zero] at hkd; exact zero_ne_one hkd)
+  obtain ⟨i', c', hic'⟩ :=
+    exists_domTerm_of_lt_one hr hr1 hk' (m := d')
+      (fun h0 => by rw [h0, norm_zero] at hkd'; exact zero_ne_one hkd')
   have hEr : DomTerm r (E K l e ^ n) (0 * n) ((r ^ e) ^ n) := (domTerm_E_root he hr hre).pow hr n
   rw [← h] at hEr
   obtain ⟨hsum, hcc⟩ := (hic.mul hr hic').unique hEr
@@ -287,8 +330,8 @@ theorem norm_constantCoeff_of_dvd {l e n d : ℕ} (he : 0 < e) {r : ℝ} (hr : 0
   linarith
 
 omit [IsUltrametricDist K] in
-theorem order_frob (l : ℕ) [Fact l.Prime] {f : K⟦X⟧} {n : ℕ} (h : f.order = n) :
-    (frob K l f).order = (l * n : ℕ) := by
+theorem order_frob (l : ℕ) [Fact l.Prime] {f : K⟦X⟧} {n : ℕ} (h : f.order = n)
+    : (frob K l f).order = (l * n : ℕ) := by
   change (PowerSeries.expand l (Fact.out : l.Prime).ne_zero f).order = (l * n : ℕ)
   rw [PowerSeries.order_expand, h, nsmul_eq_mul, Nat.cast_mul]
 
@@ -298,29 +341,36 @@ theorem order_eq_zero_of_ne {f : K⟦X⟧} (h : constantCoeff f ≠ 0) : f.order
   refine ⟨?_, fun i hi => absurd hi (Nat.not_lt_zero i)⟩
   rwa [coeff_zero_eq_constantCoeff_apply]
 
-theorem sum_sub_one {a : ℕ} [NeZero a] (d : ZMod a → ℕ) : ∑ τ, d (τ - 1) = ∑ τ, d τ := Fintype.sum_equiv (Equiv.subRight 1) _ _ (fun _ => rfl)
+theorem sum_sub_one {a : ℕ} [NeZero a] (d : ZMod a → ℕ) : ∑ τ, d (τ - 1) = ∑ τ, d τ :=
+  Fintype.sum_equiv (Equiv.subRight 1) _ _ (fun _ => rfl)
 
-theorem eq_zero_of_sum_eq_mul {a l : ℕ} [NeZero a] (hl : 1 < l) (d : ZMod a → ℕ)
-    (h : ∑ τ, d τ = l * ∑ τ, d τ) (τ : ZMod a) : d τ = 0 := by
+theorem eq_zero_of_sum_eq_mul
+    {a l : ℕ} [NeZero a] (hl : 1 < l) (d : ZMod a → ℕ) (h : ∑ τ, d τ = l * ∑ τ, d τ) (τ : ZMod a)
+    : d τ = 0 := by
   have hS : ∑ σ, d σ = 0 := by
     have h2 : 2 * ∑ σ, d σ ≤ l * ∑ σ, d σ := Nat.mul_le_mul hl le_rfl
     rw [← h] at h2
     omega
   exact Finset.sum_eq_zero_iff.mp hS τ (Finset.mem_univ τ)
 
-theorem norm_constantCoeff_eq_one_of_cycle (K : Type) [NormedField K] [IsUltrametricDist K]
-    (l e a M N : ℕ) [Fact l.Prime] [NeZero a] (he : 0 < e) (hl0 : (l : K) ≠ 0)
-    (hl : ‖(l : K)‖ < 1) (Δ k k' : ZMod a → K⟦X⟧) (hΔ : ∀ τ n, ‖coeff n (Δ τ)‖ ≤ 1)
-    (hΔ1 : ∀ τ, ∃ n, ‖coeff n (Δ τ)‖ = 1) (hk : ∀ τ n, ‖coeff n (k τ)‖ ≤ 1)
-    (hk' : ∀ τ n, ‖coeff n (k' τ)‖ ≤ 1) (hkk : ∀ τ, k τ * k' τ = E K l e ^ N)
-    (hcyc : ∀ τ, Δ τ * k τ = E K l e ^ M * frob K l (Δ (τ - 1))) (τ : ZMod a) :
-    ‖constantCoeff (Δ τ)‖ = 1 := by
+theorem norm_constantCoeff_eq_one_of_cycle
+    (K : Type) [NormedField K] [IsUltrametricDist K]
+    (l e a M N : ℕ) [Fact l.Prime] [NeZero a]
+    (he : 0 < e) (hl0 : (l : K) ≠ 0) (hl : ‖(l : K)‖ < 1)
+    (Δ k k' : ZMod a → K⟦X⟧) (hΔ : ∀ τ n, ‖coeff n (Δ τ)‖ ≤ 1) (hΔ1 : ∀ τ, ∃ n, ‖coeff n (Δ τ)‖ = 1)
+    (hk : ∀ τ n, ‖coeff n (k τ)‖ ≤ 1) (hk' : ∀ τ n, ‖coeff n (k' τ)‖ ≤ 1)
+    (hkk : ∀ τ, k τ * k' τ = E K l e ^ N)
+    (hcyc : ∀ τ, Δ τ * k τ = E K l e ^ M * frob K l (Δ (τ - 1)))
+    (τ : ZMod a)
+    : ‖constantCoeff (Δ τ)‖ = 1 := by
   classical
   have hlpos : 0 < ‖(l : K)‖ := norm_pos_iff.mpr hl0
-  obtain ⟨r, hr, hr1, hre⟩ : ∃ r : ℝ, 0 < r ∧ r < 1 ∧ r ^ e = ‖(l : K)‖ :=
-    ⟨‖(l : K)‖ ^ ((e : ℝ)⁻¹), Real.rpow_pos_of_pos hlpos _,
-      Real.rpow_lt_one (norm_nonneg _) hl (inv_pos.mpr (Nat.cast_pos.mpr he)),
-      Real.rpow_inv_natCast_pow (norm_nonneg _) he.ne'⟩
+  obtain ⟨r, hr, hr1, hre⟩ : ∃ r : ℝ, 0 < r ∧ r < 1 ∧ r ^ e = ‖(l : K)‖ := ⟨
+    ‖(l : K)‖ ^ ((e : ℝ)⁻¹),
+    Real.rpow_pos_of_pos hlpos _,
+    Real.rpow_lt_one (norm_nonneg _) hl (inv_pos.mpr (Nat.cast_pos.mpr he)),
+    Real.rpow_inv_natCast_pow (norm_nonneg _) he.ne'
+  ⟩
 
   have hEpow : ∀ n, DomTerm 1 (E K l e ^ n) (e * n) 1 := fun n => by
     have hx := (domTerm_E_one (K := K) he hl).pow one_pos n
@@ -356,7 +406,9 @@ theorem norm_constantCoeff_eq_one_of_cycle (K : Type) [NormedField K] [IsUltrame
     simp only [Nat.cast_zero, add_zero, zero_add, Nat.cast_inj] at h
     exact h
   have hsum_o : ∑ σ, o σ = l * ∑ σ, o σ :=
-    calc ∑ σ, o σ = ∑ σ, l * o (σ - 1) := Finset.sum_congr rfl fun σ _ => hord σ
+    calc
+      ∑ σ, o σ
+        = ∑ σ, l * o (σ - 1) := Finset.sum_congr rfl fun σ _ => hord σ
       _ = ∑ σ, l * o σ := sum_sub_one (fun σ => l * o σ)
       _ = l * ∑ σ, o σ := (Finset.mul_sum _ _ _).symm
   have hc0 : ∀ σ, constantCoeff (Δ σ) ≠ 0 := fun σ => by
@@ -369,26 +421,28 @@ theorem norm_constantCoeff_eq_one_of_cycle (K : Type) [NormedField K] [IsUltrame
     exact GlobalTheory.BK.constantCoeff_frob l F
   have hkn : ∀ σ, ‖constantCoeff (k σ)‖ = r ^ κ σ := fun σ =>
     norm_constantCoeff_of_dvd he hr hr1 hre (hk σ) (hk' σ) (hkk σ) (hκ σ)
-  have hcc : ∀ σ, ‖constantCoeff (Δ σ)‖ * r ^ κ σ =
-      (r ^ e) ^ M * ‖constantCoeff (Δ (σ - 1))‖ := fun σ => by
+  have hcc
+      : ∀ σ,
+        ‖constantCoeff (Δ σ)‖ * r ^ κ σ = (r ^ e) ^ M * ‖constantCoeff (Δ (σ - 1))‖ := fun σ => by
     have h := congrArg (fun F => ‖constantCoeff F‖) (hcyc σ)
     simp only [map_mul, map_pow, norm_mul, norm_pow, hE0, hF0] at h
     rw [← hkn σ, hre]
     exact h
-  have hP : 0 < ∏ σ, ‖constantCoeff (Δ σ)‖ :=
-    Finset.prod_pos fun σ _ => norm_pos_iff.mpr (hc0 σ)
-  have hprod : (∏ σ, ‖constantCoeff (Δ σ)‖) * r ^ (∑ σ, κ σ) =
-      (∏ σ, ‖constantCoeff (Δ σ)‖) * r ^ (e * M * a) :=
-    calc (∏ σ, ‖constantCoeff (Δ σ)‖) * r ^ (∑ σ, κ σ)
-        = ∏ σ, (‖constantCoeff (Δ σ)‖ * r ^ κ σ) := by
-          rw [Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum]
-      _ = ∏ σ, ((r ^ e) ^ M * ‖constantCoeff (Δ (σ - 1))‖) :=
-          Finset.prod_congr rfl fun σ _ => hcc σ
+  have hP : 0 < ∏ σ, ‖constantCoeff (Δ σ)‖ := Finset.prod_pos fun σ _ => norm_pos_iff.mpr (hc0 σ)
+  have hprod
+      : (∏ σ, ‖constantCoeff (Δ σ)‖) * r ^ (∑ σ, κ σ)
+        = (∏ σ, ‖constantCoeff (Δ σ)‖) * r ^ (e * M * a) :=
+    calc
+      (∏ σ, ‖constantCoeff (Δ σ)‖) * r ^ (∑ σ, κ σ) = ∏ σ, (‖constantCoeff (Δ σ)‖ * r ^ κ σ) := by
+        rw [Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum]
+      _ = ∏ σ, ((r ^ e) ^ M * ‖constantCoeff (Δ (σ - 1))‖) := Finset.prod_congr rfl fun σ _ => hcc σ
       _ = ((r ^ e) ^ M) ^ a * ∏ σ, ‖constantCoeff (Δ (σ - 1))‖ := by
-          rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, ZMod.card]
+        rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, ZMod.card]
       _ = ((r ^ e) ^ M) ^ a * ∏ σ, ‖constantCoeff (Δ σ)‖ := by
-          rw [Fintype.prod_equiv (Equiv.subRight (1 : ZMod a))
-            (fun σ => ‖constantCoeff (Δ (σ - 1))‖) (fun σ => ‖constantCoeff (Δ σ)‖) (fun _ => rfl)]
+        rw [Fintype.prod_equiv (Equiv.subRight (1 : ZMod a))
+          (fun σ => ‖constantCoeff (Δ (σ - 1))‖)
+          (fun σ => ‖constantCoeff (Δ σ)‖)
+          (fun _ => rfl)]
       _ = (∏ σ, ‖constantCoeff (Δ σ)‖) * r ^ (e * M * a) := by ring
   have hsumκ : ∑ σ, κ σ = e * M * a :=
     pow_right_injective₀ hr hr1.ne (mul_left_cancel₀ hP.ne' hprod)
@@ -397,8 +451,9 @@ theorem norm_constantCoeff_eq_one_of_cycle (K : Type) [NormedField K] [IsUltrame
     have h : ∑ σ, (δ σ + κ σ) = ∑ σ, (e * M + l * δ (σ - 1)) :=
       Finset.sum_congr rfl fun σ _ => hdeg σ
     rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
-      ZMod.card, smul_eq_mul, ← Finset.mul_sum, sum_sub_one δ, hsumκ, mul_comm (e * M) a,
-      add_comm (a * (e * M))] at h
+        ZMod.card, smul_eq_mul, ← Finset.mul_sum, sum_sub_one δ, hsumκ, mul_comm (e * M) a,
+        add_comm (a * (e * M))]
+      at h
     exact Nat.add_right_cancel h
   have hδ0 := eq_zero_of_sum_eq_mul (Fact.out : l.Prime).one_lt δ hsumδ τ
   have hx := (hδ τ).2.1

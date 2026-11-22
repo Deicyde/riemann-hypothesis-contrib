@@ -15,23 +15,32 @@ public import Development.AbelianVarietyTheory.Definitions.Uniformization.PointE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 open GlobalTheory.UU
 
 namespace GlobalTheory
 
-theorem exists_geometricPoint_rootOfUnity_eq_one_of_isDominant :
-    ∀ (X U V : Scheme.{0}) (j : U ⟶ X) (v : V ⟶ X), IsDominant j → IsOpenImmersion v → ∀ (ζ : Γ(V, ⊤)) (N : ℕ), ζ ^ N = 1 → ∀ (k : Type) [Field k] (y : Sp k ⟶ V), (N : k) ≠ 0 → y.appTop.hom ζ = 1 → ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (u : Sp K ⟶ U) (z : Sp K ⟶ V), z ≫ v = u ≫ j ∧ z.appTop.hom ζ = 1 := by
+theorem exists_geometricPoint_rootOfUnity_eq_one_of_isDominant
+    : ∀ (X U V : Scheme.{0}) (j : U ⟶ X) (v : V ⟶ X),
+      IsDominant j → IsOpenImmersion v
+        → ∀ (ζ : Γ(V, ⊤)) (N : ℕ),
+          ζ ^ N = 1
+            → ∀ (k : Type) [Field k] (y : Sp k ⟶ V),
+              (N : k) ≠ 0 → y.appTop.hom ζ = 1
+                → ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (u : Sp K ⟶ U) (z : Sp K ⟶ V),
+                  z ≫ v = u ≫ j ∧ z.appTop.hom ζ = 1 := by
   intro X U V j v hj hv ζ N hζ k _ y hN hy
   classical
   set s : Γ(V, ⊤) := ∑ i ∈ Finset.range N, ζ ^ i with hs
   have hmul : s * (ζ - 1) = 0 := by rw [hs, geom_sum_mul, hζ, sub_self]
   have hys : y.appTop.hom s = (N : Γ(Sp k, ⊤)) := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [hs, map_sum, map_pow, hy]
+    simp [hs, map_sum, map_pow, hy]
   have hunit : IsUnit (y.appTop.hom s) := by
     rw [hys]
     have h1 : IsUnit (N : k) := isUnit_iff_ne_zero.mpr hN
@@ -67,8 +76,7 @@ theorem exists_geometricPoint_rootOfUnity_eq_one_of_isDominant :
         rw [hz, Scheme.Hom.comp_apply, hq, hw1]
         exact hz₀
       rw [Scheme.preimage_basicOpen_top] at hp
-      have : (Sp K).basicOpen (z.appTop.hom s) = ⊥ := by
-        rw [h0]; exact (Sp K).basicOpen_zero _
+      have : (Sp K).basicOpen (z.appTop.hom s) = ⊥ := by rw [h0]; exact (Sp K).basicOpen_zero _
       have hp' : p ∈ (Sp K).basicOpen (z.appTop.hom s) := hp
       rw [this] at hp'
       exact hp'

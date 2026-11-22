@@ -9,7 +9,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DualClas
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc
 
 namespace GlobalTheory.CompanionTheory.SegDualPrec
 
@@ -21,15 +22,17 @@ variable (hc : ∀ x : IrrGL (k := k), x.IsCusp → (dualCl x).IsCusp)
 
 include hc
 
-theorem segDual_eq (Δ : Segment k) : segDual Δ =
-    Segment.ofFirst ((dualCl Δ.first).nu (1 - (Δ.len : ℂ))) ((hc _ Δ.isCusp_first).nu _) Δ.len Δ.len_pos :=
+theorem segDual_eq (Δ : Segment k)
+    : segDual Δ
+      = Segment.ofFirst ((dualCl Δ.first).nu (1 - (Δ.len : ℂ))) ((hc _ Δ.isCusp_first).nu _) Δ.len
+        Δ.len_pos :=
   dite_eq_left (hc _ Δ.isCusp_first)
 
-theorem first_segDual (Δ : Segment k) : (segDual Δ).first = (dualCl Δ.first).nu (1 - (Δ.len : ℂ)) := by
+theorem first_segDual (Δ : Segment k)
+    : (segDual Δ).first = (dualCl Δ.first).nu (1 - (Δ.len : ℂ)) := by
   rw [segDual_eq hc]; rfl
 
-theorem len_segDual (Δ : Segment k) : (segDual Δ).len = Δ.len := by
-  rw [segDual_eq hc]; rfl
+theorem len_segDual (Δ : Segment k) : (segDual Δ).len = Δ.len := by rw [segDual_eq hc]; rfl
 
 variable (hn : ∀ (x : IrrGL (k := k)) (s : ℂ), dualCl (x.nu s) = (dualCl x).nu (-s))
 
@@ -84,7 +87,8 @@ theorem linked_segDual {Δ Δ' : Segment k} (h : Δ.Linked Δ') : (segDual Δ).L
   · rw [carrier_segDual hc hn, carrier_segDual hc hn, Set.image_subset_image_iff hi]
     exact h2
 
-theorem precedes_segDual {Δ Δ' : Segment k} (h : Δ'.Precedes Δ) : (segDual Δ).Precedes (segDual Δ') := by
+theorem precedes_segDual {Δ Δ' : Segment k} (h : Δ'.Precedes Δ)
+    : (segDual Δ).Precedes (segDual Δ') := by
   obtain ⟨hl, j, hj, hf⟩ := h
   refine ⟨linked_segDual hc hn hd hl.symm, ?_⟩
   have hlen : Δ'.len < j + Δ.len := by
@@ -102,50 +106,54 @@ theorem precedes_segDual {Δ Δ' : Segment k} (h : Δ'.Precedes Δ) : (segDual �
   push_cast
   ring
 
-theorem segDual_precedes_iff (Δ Δ' : Segment k) : (segDual Δ).Precedes (segDual Δ') ↔ Δ'.Precedes Δ := by
+theorem segDual_precedes_iff (Δ Δ' : Segment k)
+    : (segDual Δ).Precedes (segDual Δ') ↔ Δ'.Precedes Δ := by
   refine ⟨fun h => ?_, precedes_segDual hc hn hd⟩
   have := precedes_segDual hc hn hd h
   rwa [segDual_segDual hc hn hd, segDual_segDual hc hn hd] at this
 
 end
 
-theorem segDual_precedes : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (Δ Δ' : Segment k),
-    (segDual Δ).Precedes (segDual Δ') ↔ Δ'.Precedes Δ := by
+theorem segDual_precedes
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (Δ Δ' : Segment k),
+      (segDual Δ).Precedes (segDual Δ') ↔ Δ'.Precedes Δ := by
   intro k _ _ _ _ hA Δ Δ'
-  have hadm (x : IrrGL (k := k)) : IsAdmissible x.rep :=
-    hA k x.1 _ x.rep x.2.rep.smooth x.2.rep.irr
+  have hadm (x : IrrGL (k := k)) : IsAdmissible x.rep := hA k x.1 _ x.rep x.2.rep.smooth x.2.rep.irr
   have hirr (x : IrrGL (k := k)) : (contra x.rep).IsIrreducible :=
-    GlobalTheory.ContraRefl.contra_isIrreducible
-      (GlobalTheory.SqIntUnit.compactOpen_basis k x.1) (hadm x) x.2.rep.irr
-  have hdual (x : IrrGL (k := k)) :
-      dualCl x = IrrGL.of (contra x.rep) (isSmooth_contra _) (hirr x) :=
+    GlobalTheory.ContraRefl.contra_isIrreducible (GlobalTheory.SqIntUnit.compactOpen_basis k x.1)
+      (hadm x) x.2.rep.irr
+  have hdual (x : IrrGL (k := k))
+      : dualCl x = IrrGL.of (contra x.rep) (isSmooth_contra _) (hirr x) :=
     dite_eq_left (hirr x)
   have hc (x : IrrGL (k := k)) (hx : x.IsCusp) : (dualCl x).IsCusp := by
     rw [hdual x, IrrGL.isCusp_of]
-    exact ⟨hx.1, GlobalTheory.SuperCusp.isCuspidal_of_isSupercuspidal k x.1 _ _
-      (GlobalTheory.CompanionTheory.DualCusp.isSupercuspidal_contra
-        (GlobalTheory.SqIntUnit.compactOpen_basis k x.1) (hadm x)
-        (GlobalTheory.CuspCoef.isSupercuspidal_of_isCuspidal k x.1 _ _ hx.2))⟩
+    exact ⟨
+      hx.1,
+      GlobalTheory.SuperCusp.isCuspidal_of_isSupercuspidal k x.1 _ _
+        (GlobalTheory.CompanionTheory.DualCusp.isSupercuspidal_contra
+          (GlobalTheory.SqIntUnit.compactOpen_basis k x.1) (hadm x)
+          (GlobalTheory.CuspCoef.isSupercuspidal_of_isCuspidal k x.1 _ _ hx.2))
+    ⟩
   have hn (x : IrrGL (k := k)) (s : ℂ) : dualCl (x.nu s) = (dualCl x).nu (-s) := by
     have hs : IsSmoothChar (absPow k s) := isSmoothChar_absPow s
     have hs_neg : IsSmoothChar (absPow k (-s)) := isSmoothChar_absPow (-s)
-    have hmul : absPow k s * absPow k (-s) = 1 := by
-      rw [absPow_neg, mul_inv_cancel]
-    obtain ⟨e⟩ := GlobalTheory.CompanionTheory.ZcDual.nonempty_equiv_contra_twist
-      hA x.rep x.2.rep.smooth x.2.rep.irr hs hs_neg hmul
+    have hmul : absPow k s * absPow k (-s) = 1 := by rw [absPow_neg, mul_inv_cancel]
+    obtain ⟨e⟩ :=
+      GlobalTheory.CompanionTheory.ZcDual.nonempty_equiv_contra_twist hA x.rep x.2.rep.smooth
+        x.2.rep.irr hs hs_neg hmul
     rw [hdual (x.nu s), hdual x]
-    change IrrGL.of (contra (x.nu s).rep) _ _ =
-      (IrrGL.of (contra x.rep) _ _).tw (absPow k (-s)) hs_neg
+    change IrrGL.of (contra (x.nu s).rep) _ _
+      = (IrrGL.of (contra x.rep) _ _).tw (absPow k (-s)) hs_neg
     rw [IrrGL.tw_of]
     exact IrrGL.of_eq_of.mpr ⟨(GlobalTheory.ContraRefl.contraEquiv (x.twEquiv _ hs)).trans e.symm⟩
   have hd (x : IrrGL (k := k)) : dualCl (dualCl x) = x := by
     rw [hdual x, hdual]
     conv_rhs => rw [← IrrGL.of_rep x]
-    exact IrrGL.of_eq_of.mpr ⟨
-      (GlobalTheory.ContraRefl.contraEquiv (IrrGL.equivOf (contra x.rep) _ _)).trans
-        (GlobalTheory.ContraRefl.evEquiv
-          (GlobalTheory.SqIntUnit.compactOpen_basis k x.1) (hadm x)).symm⟩
+    exact IrrGL.of_eq_of.mpr
+      ⟨(GlobalTheory.ContraRefl.contraEquiv (IrrGL.equivOf (contra x.rep) _ _)).trans
+        (GlobalTheory.ContraRefl.evEquiv (GlobalTheory.SqIntUnit.compactOpen_basis k x.1)
+          (hadm x)).symm⟩
   exact segDual_precedes_iff hc hn hd Δ Δ'
 
 end GlobalTheory.CompanionTheory.SegDualPrec

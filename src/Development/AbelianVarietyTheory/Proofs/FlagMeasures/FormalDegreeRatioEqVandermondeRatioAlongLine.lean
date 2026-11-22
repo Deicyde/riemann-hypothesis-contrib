@@ -26,7 +26,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HarishChandra
 @[expose] public section
 
 open scoped Classical
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf GlobalTheory.Core.Deg
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.RowsConc
+  Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf GlobalTheory.Core.Deg
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -35,11 +37,18 @@ namespace GlobalTheory.DegLine
 
 open Formalism.QuantumDeterminants Formalism.MainNotions.S
 
-theorem gap_near {N : ℕ} (ε : Fin N → Bool) (l ν : Fin N → ℝ) (G ρ : ℝ) (hg : GapAtLeast ε l G)
-    (hν : l1dist ν l ≤ ρ) : GapAtLeast ε ν (G - 2 * ρ) := by
+theorem gap_near
+    {N : ℕ} (ε : Fin N → Bool) (l ν : Fin N → ℝ)
+    (G ρ : ℝ) (hg : GapAtLeast ε l G) (hν : l1dist ν l ≤ ρ)
+    : GapAtLeast ε ν (G - 2 * ρ) := by
   intro a b hab
   have hco : ∀ j, |ν j - l j| ≤ ρ := fun j =>
-    le_trans (Finset.single_le_sum (f := fun j => |ν j - l j|) (fun _ _ => abs_nonneg _) (Finset.mem_univ j)) hν
+    le_trans
+      (Finset.single_le_sum
+        (f := fun j => |ν j - l j|)
+        (fun _ _ => abs_nonneg _)
+        (Finset.mem_univ j))
+      hν
   have h1 := hg a b hab
   have h2 := hco a
   have h3 := hco b
@@ -49,10 +58,14 @@ theorem gap_near {N : ℕ} (ε : Fin N → Bool) (l ν : Fin N → ℝ) (G ρ : 
     exact le_trans (abs_add_le _ _) (by have := abs_sub (ν a - ν b) (ν a - l a); linarith)
   linarith
 
-theorem gap_lamD (D : D7) (large₂ : SizeData₂ D) {C' Cl Cg cb Cu cT CT C0 : ℝ}
-    (hH : Cnt.Hyp0 D large₂ C' Cl Cg cb Cu cT CT C0) (τ : D.what₂.Tau) :
-    GapAtLeast (epsSH D.R) (lamD D τ) (Cl * (D.R.r : ℝ) ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L) := by
-  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, hbnd, _, _, _, _, hstep, _, _, _, hCl⟩ := hH.1
+theorem gap_lamD
+    (D : D7) (large₂ : SizeData₂ D)
+    {C' Cl Cg cb Cu cT CT C0 : ℝ} (hH : Cnt.Hyp0 D large₂ C' Cl Cg cb Cu cT CT C0)
+    (τ : D.what₂.Tau)
+    : GapAtLeast (epsSH D.R) (lamD D τ)
+      (Cl * (D.R.r : ℝ) ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L) := by
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, hbnd, _, _, _, _, hstep, _, _, _, hCl⟩ :=
+    hH.1
   have hL := one_lt_scL large₂
   have hG0 : 0 ≤ Cl * (D.R.r : ℝ) ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L := by
     have : 0 ≤ Cl := hCl.le
@@ -67,9 +80,12 @@ theorem gap_lamD (D : D7) (large₂ : SizeData₂ D) {C' Cl Cg cb Cu cT CT C0 : 
   intro a b hab
   exact g (Fin.cast (dimS_eq D.R) a) (Fin.cast (dimS_eq D.R) b) hab
 
-theorem deg_eq_fdegHC (D : D7) (ht : cdScaleTie D) {W : LocW D.R.k D.R.rS}
-    (l : Fin (2 * D.R.rS + D.R.k + 1) → ℝ) (A : LocS W) (hA : GoodS D l A) (h : ℝ)
-    (hg : GapAtLeast (epsSH D.R) l h) (hth : Formalism.MainNotions.GapDS.thrE (epsSH D.R) + 1 < h) : A.deg = fdegHC l := by
+theorem deg_eq_fdegHC
+    (D : D7) (ht : cdScaleTie D)
+    {W : LocW D.R.k D.R.rS} (l : Fin (2 * D.R.rS + D.R.k + 1) → ℝ) (A : LocS W) (hA : GoodS D l A)
+    (h : ℝ)
+    (hg : GapAtLeast (epsSH D.R) l h) (hth : Formalism.MainNotions.GapDS.thrE (epsSH D.R) + 1 < h)
+    : A.deg = fdegHC l := by
   obtain ⟨P, hP, hd⟩ := hA.2.2.2.2.2.2.2.2.2.2
   obtain ⟨Q, ⟨hQ, -⟩, hDS⟩ := hA.2.1
   have hPd : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det P).1 hP.1
@@ -78,10 +94,14 @@ theorem deg_eq_fdegHC (D : D7) (ht : cdScaleTie D) {W : LocW D.R.k D.R.rS}
   have hPP' : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul P hPd
   have hQQ : Q * Q⁻¹ = 1 := Matrix.mul_nonsing_inv Q hQd
   have hQQ' : Q⁻¹ * Q = 1 := Matrix.nonsing_inv_mul Q hQd
-  let u : (Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ)ˣ := ⟨Q * P⁻¹, P * Q⁻¹,
+  let u : (Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ)ˣ := ⟨
+    Q * P⁻¹,
+    P * Q⁻¹,
     by rw [Matrix.mul_assoc, ← Matrix.mul_assoc P⁻¹, hPP', Matrix.one_mul, hQQ],
-    by rw [Matrix.mul_assoc, ← Matrix.mul_assoc Q⁻¹, hQQ', Matrix.one_mul, hPP]⟩
-  let a : Formalism.REAL.UJ (epsSH D.R) := ⟨u, GlobalTheory.FormalDegreeDatum.inUJ_of_cayley _ P Q _ hP.1 hP.2 hQ.2⟩
+    by rw [Matrix.mul_assoc, ← Matrix.mul_assoc Q⁻¹, hQQ', Matrix.one_mul, hPP]
+  ⟩
+  let a : Formalism.REAL.UJ (epsSH D.R) :=
+    ⟨u, GlobalTheory.FormalDegreeDatum.inUJ_of_cayley _ P Q _ hP.1 hP.2 hQ.2⟩
   have hsc := (GlobalTheory.Mem.Vol.cdScaleTie_iff D).1 ht
   obtain ⟨a1, b1, hab⟩ := Formalism.MainNotions.TheoremBConstants.epsSH_both D
   have ht1 : ∃ x, epsSH D.R x = true := by
@@ -92,25 +112,46 @@ theorem deg_eq_fdegHC (D : D7) (ht : cdScaleTie D) {W : LocW D.R.k D.R.rS}
     cases h1 : epsSH D.R a1
     · exact ⟨a1, h1⟩
     · exact ⟨b1, by cases h2 : epsSH D.R b1 <;> simp_all⟩
-  have hF := GlobalTheory.T.harishChandra_formalDegree_compactDual_large_gaps D.cd D.s.cdScale hsc _ (epsSH D.R) l h hA.1 ht1 hf1 hg hth A.H
-    (fun g => A.σ (Q⁻¹ * g * Q)) hDS
+  have hF :=
+    GlobalTheory.T.harishChandra_formalDegree_compactDual_large_gaps D.cd D.s.cdScale hsc _
+      (epsSH D.R) l h hA.1 ht1 hf1 hg hth A.H
+      (fun g => A.σ (Q⁻¹ * g * Q))
+      hDS
   haveI := hDS.2.1
   obtain ⟨w, hw⟩ := exists_ne (0 : A.H)
-  have h2 := GlobalTheory.FormalDegreeDatum.fdeg_of_conj _ (fun g => A.σ (P⁻¹ * g * P))
-    (fun g => A.σ (Q⁻¹ * g * Q)) a (fun g => by
-      have e : umat (a * g * a⁻¹) = Q * P⁻¹ * umat g * (P * Q⁻¹) := rfl
-      have e2 : Q⁻¹ * (Q * P⁻¹ * umat g * (P * Q⁻¹)) * Q =
-          (Q⁻¹ * Q) * (P⁻¹ * umat g * P) * (Q⁻¹ * Q) := by
-        simp only [Matrix.mul_assoc]
-      simp only [e, e2, hQQ', Matrix.one_mul, Matrix.mul_one]) hDS.2.2.1 A.deg hd w hw
-  have h3 := GlobalTheory.FormalDegreeDatum.fdeg_of_conj _ (fun g => A.σ (Q⁻¹ * g * Q))
-    (fun g => A.σ (Q⁻¹ * g * Q)) 1 (fun g => by simp) hDS.2.2.1 (fdegHC l) hF w hw
+  have h2 :=
+    GlobalTheory.FormalDegreeDatum.fdeg_of_conj _
+      (fun g => A.σ (P⁻¹ * g * P))
+      (fun g => A.σ (Q⁻¹ * g * Q))
+      a
+      (fun g => by
+        have e : umat (a * g * a⁻¹) = Q * P⁻¹ * umat g * (P * Q⁻¹) := rfl
+        have e2
+            : Q⁻¹ * (Q * P⁻¹ * umat g * (P * Q⁻¹)) * Q
+              = (Q⁻¹ * Q) * (P⁻¹ * umat g * P) * (Q⁻¹ * Q) := by
+          simp only [Matrix.mul_assoc]
+        simp only [e, e2, hQQ', Matrix.one_mul, Matrix.mul_one])
+      hDS.2.2.1 A.deg hd w hw
+  have h3 :=
+    GlobalTheory.FormalDegreeDatum.fdeg_of_conj _
+      (fun g => A.σ (Q⁻¹ * g * Q))
+      (fun g => A.σ (Q⁻¹ * g * Q))
+      1
+      (fun g => by simp)
+      hDS.2.2.1 (fdegHC l) hF w hw
   exact h2.symm.trans h3
 
-theorem deg_eq_near (D : D7) (large₂ : SizeData₂ D) {C' Cl Cg cb Cu cT CT C0 Cn : ℝ} (hCl : 2 * |Cn| + 8 ≤ Cl)
-    (hH : Cnt.Hyp0 D large₂ C' Cl Cg cb Cu cT CT C0) (ht : cdScaleTie D) (τ : D.what₂.Tau) {W : LocW D.R.k D.R.rS}
-    (ν : Fin (2 * D.R.rS + D.R.k + 1) → ℝ) (hν : l1dist ν (lamD D τ) ≤ |Cn| * (D.R.r : ℝ) ^ 4 + D.R.r)
-    (A : LocS W) (hA : GoodS D ν A) : A.deg = fdegHC ν := by
+theorem deg_eq_near
+    (D : D7) (large₂ : SizeData₂ D)
+    {C' Cl Cg cb Cu cT CT C0 Cn : ℝ}
+    (hCl : 2 * |Cn| + 8 ≤ Cl) (hH : Cnt.Hyp0 D large₂ C' Cl Cg cb Cu cT CT C0)
+    (ht : cdScaleTie D)
+    (τ : D.what₂.Tau)
+    {W : LocW D.R.k D.R.rS}
+    (ν : Fin (2 * D.R.rS + D.R.k + 1) → ℝ)
+    (hν : l1dist ν (lamD D τ) ≤ |Cn| * (D.R.r : ℝ) ^ 4 + D.R.r)
+    (A : LocS W) (hA : GoodS D ν A)
+    : A.deg = fdegHC ν := by
   refine deg_eq_fdegHC D ht ν A hA _ (gap_near _ _ _ _ _ (gap_lamD D large₂ hH τ) hν) ?_
   obtain ⟨_, _, hmf, _⟩ := hH.1
   have hL := one_lt_scL large₂
@@ -119,7 +160,9 @@ theorem deg_eq_near (D : D7) (large₂ : SizeData₂ D) {C' Cl Cg cb Cu cT CT C0
   have hr6 : (6 : ℝ) ≤ D.R.r := by
     have : 6 ≤ D.R.r := by unfold Formalism.BasicNotions.Ranks.r; omega
     exact_mod_cast this
-  have hthr := Formalism.MainNotions.GapDS.thrE_le (epsSH D.R) (by rw [Formalism.MainNotions.BridgeLemma₂.deg_cast_r]; linarith)
+  have hthr :=
+    Formalism.MainNotions.GapDS.thrE_le (epsSH D.R)
+      (by rw [Formalism.MainNotions.BridgeLemma₂.deg_cast_r]; linarith)
   rw [Formalism.MainNotions.BridgeLemma₂.deg_cast_r] at hthr
   have hf : (1 : ℝ) ≤ D.R.f := by
     have : 1 ≤ D.R.f := le_trans (Nat.one_le_pow _ _ (by omega)) hmf
@@ -134,16 +177,23 @@ theorem deg_eq_near (D : D7) (large₂ : SizeData₂ D) {C' Cl Cg cb Cu cT CT C0
   have hCl0 : 0 ≤ Cl * (D.R.r : ℝ) ^ 19 := mul_nonneg (by linarith [abs_nonneg Cn]) (by positivity)
   have e1 : Cl * (D.R.r : ℝ) ^ 19 ≤ Cl * (D.R.r : ℝ) ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L := by
     have := mul_le_mul_of_nonneg_left hfl hCl0
-    have e : Cl * (D.R.r : ℝ) ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L = Cl * (D.R.r : ℝ) ^ 19 * ((D.R.f : ℝ) ^ 5 * large₂.sc.L) := by
+    have e
+        : Cl * (D.R.r : ℝ) ^ 19 * (D.R.f : ℝ) ^ 5 * large₂.sc.L
+          = Cl * (D.R.r : ℝ) ^ 19 * ((D.R.f : ℝ) ^ 5 * large₂.sc.L) := by
       ring
-    rw [e]; linarith
+    rw [e]
+    linarith
   have e2 : (2 * |Cn| + 8) * (D.R.r : ℝ) ^ 19 ≤ Cl * (D.R.r : ℝ) ^ 19 :=
     mul_le_mul_of_nonneg_right hCl (by positivity)
-  have e3 : |Cn| * (D.R.r : ℝ) ^ 4 ≤ |Cn| * (D.R.r : ℝ) ^ 19 := mul_le_mul_of_nonneg_left h419 (abs_nonneg _)
+  have e3 : |Cn| * (D.R.r : ℝ) ^ 4 ≤ |Cn| * (D.R.r : ℝ) ^ 19 :=
+    mul_le_mul_of_nonneg_left h419 (abs_nonneg _)
   nlinarith
 
-theorem deg_VandLine_of_gap : ∀ Cn : ℝ, ∃ thr : ℝ, ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl Cg cb Cu cT CT C0 C1 : ℝ),
-    thr ≤ C' → thr ≤ Cl → Ties D → Formalism.MainNotions.BridgeLemma₂.deg_VandLine D large₂ C' Cl Cg cb Cu cT CT C0 Cn C1 := by
+theorem deg_VandLine_of_gap
+    : ∀ Cn : ℝ, ∃ thr : ℝ, ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl Cg cb Cu cT CT C0 C1 : ℝ),
+      thr ≤ C' → thr ≤ Cl → Ties D
+        → Formalism.MainNotions.BridgeLemma₂.deg_VandLine D large₂ C' Cl Cg cb Cu cT CT C0 Cn
+          C1 := by
   intro Cn
   refine ⟨2 * |Cn| + 8, fun D large₂ C' Cl Cg cb Cu cT CT C0 C1 _ hCl hT => ?_⟩
   intro hH τ w w' _ θ _ W _ lam' hl A hA I s hs A' hA'
@@ -156,8 +206,9 @@ theorem deg_VandLine_of_gap : ∀ Cn : ℝ, ∃ thr : ℝ, ∀ (D : D7) (large�
     have : D.R.m ≤ D.R.r := by unfold Formalism.BasicNotions.Ranks.r; omega
     exact_mod_cast this
   have hn : (D.R.k : ℝ) * (D.R.m : ℝ) ^ 3 ≤ (D.R.r : ℝ) ^ 4 := by
-    calc (D.R.k : ℝ) * (D.R.m : ℝ) ^ 3 ≤ (D.R.r : ℝ) * (D.R.r : ℝ) ^ 3 :=
-          mul_le_mul hkr (pow_le_pow_left₀ (by positivity) hmr 3) (by positivity) (by positivity)
+    calc
+      (D.R.k : ℝ) * (D.R.m : ℝ) ^ 3 ≤ (D.R.r : ℝ) * (D.R.r : ℝ) ^ 3 :=
+        mul_le_mul hkr (pow_le_pow_left₀ (by positivity) hmr 3) (by positivity) (by positivity)
       _ = (D.R.r : ℝ) ^ 4 := by ring
   have hcard : (I.card : ℝ) ≤ D.R.r := by
     rw [← Formalism.MainNotions.BridgeLemma₂.deg_cast_r]

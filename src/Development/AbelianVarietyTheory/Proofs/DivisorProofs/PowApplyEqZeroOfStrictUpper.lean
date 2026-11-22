@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.StrictUpperNilpotent
 
-theorem pow_apply_eq_zero_of_strictUpper {L : Type} [inst : Field L] {n : ℕ}
-    {y : Matrix (Fin n) (Fin n) L} (hy : ∀ (i j : Fin n), j ≤ i → y i j = (0 : L)) :
-    ∀ (k : ℕ) (i j : Fin n), (↑j : ℕ) < (↑i : ℕ) + k → (y ^ k) i j = (0 : L) := by
+theorem pow_apply_eq_zero_of_strictUpper
+    {L : Type} [inst : Field L]
+    {n : ℕ} {y : Matrix (Fin n) (Fin n) L} (hy : ∀ (i j : Fin n), j ≤ i → y i j = (0 : L))
+    : ∀ (k : ℕ) (i j : Fin n), (↑j : ℕ) < (↑i : ℕ) + k → (y ^ k) i j = (0 : L) := by
   intro k
   induction k with
   | zero =>

@@ -6,8 +6,21 @@ public import Mathlib
 
 open MeasureTheory
 
-theorem UpperTheory.innerProduct_integral_fundamentalDomain_of_compact :
-    ∀ {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [MeasurableSpace H] [BorelSpace H] (μ : Measure H) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant] [μ.IsOpenPosMeasure] (Γ : Subgroup H) [Countable Γ] (𝓕 : Set H), IsFundamentalDomain Γ 𝓕 μ → μ 𝓕 < ⊤ → ∀ Ω : Set H, IsCompact Ω → (∀ g, ∃ γ ∈ Γ, γ * g ∈ Ω) → ∀ f g : H → ℂ, Continuous f → Continuous g → (∀ γ ∈ Γ, ∀ h, f (γ * h) = f h) → (∀ γ ∈ Γ, ∀ h, g (γ * h) = g h) → IntegrableOn (fun h => f h * starRingEnd ℂ (g h)) 𝓕 μ ∧ (∀ y, ∫ h in 𝓕, f (h * y) * starRingEnd ℂ (g (h * y)) ∂μ = ∫ h in 𝓕, f h * starRingEnd ℂ (g h) ∂μ) ∧ (f ≠ 0 → 0 < (∫ h in 𝓕, f h * starRingEnd ℂ (f h) ∂μ).re) := by
+theorem UpperTheory.innerProduct_integral_fundamentalDomain_of_compact
+    : ∀ {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [MeasurableSpace H]
+        [BorelSpace H] (μ : Measure H) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
+        [μ.IsOpenPosMeasure] (Γ : Subgroup H) [Countable Γ] (𝓕 : Set H),
+      IsFundamentalDomain Γ 𝓕 μ → μ 𝓕 < ⊤
+        → ∀ Ω : Set H,
+          IsCompact Ω → (∀ g, ∃ γ ∈ Γ, γ * g ∈ Ω)
+            → ∀ f g : H → ℂ,
+              Continuous f → Continuous g → (∀ γ ∈ Γ, ∀ h, f (γ * h) = f h)
+                → (∀ γ ∈ Γ, ∀ h, g (γ * h) = g h)
+                → IntegrableOn (fun h => f h * starRingEnd ℂ (g h)) 𝓕 μ
+                  ∧ (∀ y,
+                    ∫ h in 𝓕, f (h * y) * starRingEnd ℂ (g (h * y)) ∂μ
+                      = ∫ h in 𝓕, f h * starRingEnd ℂ (g h) ∂μ)
+                  ∧ (f ≠ 0 → 0 < (∫ h in 𝓕, f h * starRingEnd ℂ (f h) ∂μ).re) := by
   intro H _ _ _ _ _ μ _ _ _ Γ _ 𝓕 h𝓕 hfin Ω hΩ hcov f g hf hg hfi hgi
   have bdd : ∀ u : H → ℂ, Continuous u → (∀ γ ∈ Γ, ∀ h, u (γ * h) = u h) → ∃ C, ∀ h, ‖u h‖ ≤ C := by
     intro u hu hinv
@@ -30,9 +43,9 @@ theorem UpperTheory.innerProduct_integral_fundamentalDomain_of_compact :
   · intro y
     let t := (fun h => h * y⁻¹) ⁻¹' 𝓕
     have ht : IsFundamentalDomain Γ t μ :=
-      h𝓕.preimage_of_equiv (measurePreserving_mul_right μ y⁻¹).quasiMeasurePreserving
-        (e := id) Function.bijective_id (fun γ x => by
-          simp only [id, Subgroup.smul_def, smul_eq_mul, mul_assoc])
+      h𝓕.preimage_of_equiv (measurePreserving_mul_right μ y⁻¹).quasiMeasurePreserving (e := id)
+        Function.bijective_id
+        (fun γ x => by simp only [id, Subgroup.smul_def, smul_eq_mul, mul_assoc])
     have hset : 𝓕 = (fun h => h * y) ⁻¹' t := by
       ext h
       simp [t]
@@ -46,14 +59,17 @@ theorem UpperTheory.innerProduct_integral_fundamentalDomain_of_compact :
         exact hui γ γ.2 x)
     exact h1.trans h2
   · intro hne
-    have hff : ∀ h, f h * starRingEnd ℂ (f h) = ((Complex.normSq (f h) : ℝ) : ℂ) :=
-      fun h => Complex.mul_conj _
+    have hff : ∀ h, f h * starRingEnd ℂ (f h) = ((Complex.normSq (f h) : ℝ) : ℂ) := fun h =>
+      Complex.mul_conj _
     simp_rw [hff]
     rw [integral_complex_ofReal, Complex.ofReal_re]
     have hnn : 0 ≤ fun h => Complex.normSq (f h) := fun h => Complex.normSq_nonneg _
     have hint : IntegrableOn (fun h => Complex.normSq (f h)) 𝓕 μ := by
-      have := (intg (fun h => f h * starRingEnd ℂ (f h)) (hf.mul (Complex.continuous_conj.comp hf))
-        (fun γ hγ h => by simp [hfi γ hγ])).re
+      have :=
+        (intg
+          (fun h => f h * starRingEnd ℂ (f h))
+          (hf.mul (Complex.continuous_conj.comp hf))
+          (fun γ hγ h => by simp [hfi γ hγ])).re
       simp only [hff, Complex.ofReal_re] at this
       exact this
     refine lt_of_le_of_ne (integral_nonneg hnn) (fun h0 => hne ?_)

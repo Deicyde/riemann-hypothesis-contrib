@@ -5,21 +5,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-private theorem mul_rowM_apply {R : Type} [CommRing R] {n : ℕ} (m : Fin n) (ξ : Fin n → R)
-    (q : Matrix (Fin n) (Fin n) R) (i j : Fin n) :
-    (q * rowM m ξ) i j
-      = (if j = m then 0 else q i j) + q i m * (if j ≤ m then ξ j else 0) := by
+private theorem mul_rowM_apply
+    {R : Type} [CommRing R]
+    {n : ℕ} (m : Fin n) (ξ : Fin n → R) (q : Matrix (Fin n) (Fin n) R) (i j : Fin n)
+    : (q * rowM m ξ) i j = (if j = m then 0 else q i j) + q i m * (if j ≤ m then ξ j else 0) := by
   rw [Matrix.mul_apply, ← Finset.add_sum_erase _ _ (Finset.mem_univ m)]
   have hs : ∑ k ∈ Finset.univ.erase m, q i k * rowM m ξ k j = if j = m then 0 else q i j := by
-    have hk1 : ∀ k ∈ Finset.univ.erase m,
-        q i k * rowM m ξ k j = q i k * (1 : Matrix (Fin n) (Fin n) R) k j := by
+    have hk1
+        : ∀ k ∈ Finset.univ.erase m,
+          q i k * rowM m ξ k j = q i k * (1 : Matrix (Fin n) (Fin n) R) k j := by
       intro k hk
       have hkm : k ≠ m := Finset.ne_of_mem_erase hk
       simp [rowM, hkm]
@@ -41,23 +43,27 @@ private theorem mul_rowM_apply {R : Type} [CommRing R] {n : ℕ} (m : Fin n) (ξ
   · have hmj : m ≠ j := fun h => hjm (le_of_eq h.symm)
     simp [rowM, hjm, Matrix.one_apply_ne hmj]
 
-theorem UpperTheory.V.Af.Smo.rowStep :
-    UpperTheory.V.Af.Smo.RowStep := by
+theorem UpperTheory.V.Af.Smo.rowStep : UpperTheory.V.Af.Smo.RowStep := by
   unfold UpperTheory.V.Af.Smo.RowStep IsY
   intro R _ n m p s hp hs
-  have key : ∀ i j, (p : Matrix (Fin n) (Fin n) R) i j
-      = (if j = m then 0 else ((p * s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j)
-        + ((p * s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i m
-          * (if j ≤ m then (p : Matrix (Fin n) (Fin n) R) m j else 0) := by
+  have key
+      : ∀ i j,
+        (p : Matrix (Fin n) (Fin n) R) i j
+          = (if j = m then 0 else ((p * s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j)
+            + ((p * s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i m
+              * (if j ≤ m then (p : Matrix (Fin n) (Fin n) R) m j else 0) := by
     intro i j
-    have h := mul_rowM_apply m ((p : Matrix (Fin n) (Fin n) R) m)
-      ((p * s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j
+    have h :=
+      mul_rowM_apply m ((p : Matrix (Fin n) (Fin n) R) m)
+        ((p * s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i j
     rw [← hs, ← Units.val_mul, inv_mul_cancel_right] at h
     exact h
-  have hu : ((s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) m m
-      * (p : Matrix (Fin n) (Fin n) R) m m = 1 := by
-    have h := mul_rowM_apply m ((p : Matrix (Fin n) (Fin n) R) m)
-      ((s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) m m
+  have hu
+      : ((s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) m m * (p : Matrix (Fin n) (Fin n) R) m m
+        = 1 := by
+    have h :=
+      mul_rowM_apply m ((p : Matrix (Fin n) (Fin n) R) m)
+        ((s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) m m
     rw [← hs, ← Units.val_mul, inv_mul_cancel] at h
     simpa using h.symm
   generalize ((s⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) m m = t at hu

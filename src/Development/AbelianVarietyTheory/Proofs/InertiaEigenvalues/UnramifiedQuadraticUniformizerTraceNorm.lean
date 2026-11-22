@@ -10,9 +10,23 @@ open ValuativeRel
 
 namespace GlobalTheory
 
-
 open GroundTheory.LocalField IsLocalRing in
-theorem unramified_quadratic_uniformizer_trace_norm : ∀ (K L : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L], (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) = 1 → Module.finrank K L = 2 → ∃ ϖ : K, ϖ ≠ 0 ∧ ϖ ≤ᵥ 1 ∧ ¬ (1 : K) ≤ᵥ ϖ ∧ (¬ ∃ y : L, Algebra.norm K y = ϖ) ∧ (∀ y : L, y ≤ᵥ 1 → (∃ z : L, z ≤ᵥ 1 ∧ y = algebraMap K L ϖ * z) ∨ ∃ z : L, z ≤ᵥ 1 ∧ y * z = 1) ∧ (∀ s : K, s ≤ᵥ 1 → ∃ z : L, z ≤ᵥ 1 ∧ Algebra.trace K L z = s) ∧ ∀ s : K, s ≤ᵥ 1 → 1 ≤ᵥ s → ∃ w : L, w ≤ᵥ 1 ∧ Algebra.norm K w = s := by
+theorem unramified_quadratic_uniformizer_trace_norm
+    : ∀ (K L : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+        [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+        [ValuativeExtension K L] [FiniteDimensional K L],
+      (_root_.Ideal.ramificationIdx
+            (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer
+              (_root_.ValuativeRel.valuation L)))
+            (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+          = 1
+        → Module.finrank K L = 2
+        → ∃ ϖ : K,
+          ϖ ≠ 0 ∧ ϖ ≤ᵥ 1 ∧ ¬ (1 : K) ≤ᵥ ϖ ∧ (¬ ∃ y : L, Algebra.norm K y = ϖ)
+            ∧ (∀ y : L,
+              y ≤ᵥ 1 → (∃ z : L, z ≤ᵥ 1 ∧ y = algebraMap K L ϖ * z) ∨ ∃ z : L, z ≤ᵥ 1 ∧ y * z = 1)
+            ∧ (∀ s : K, s ≤ᵥ 1 → ∃ z : L, z ≤ᵥ 1 ∧ Algebra.trace K L z = s)
+            ∧ ∀ s : K, s ≤ᵥ 1 → 1 ≤ᵥ s → ∃ w : L, w ≤ᵥ 1 ∧ Algebra.norm K w = s := by
   open GroundTheory.LocalField IsLocalRing in
   intro K L _ _ _ _ _ _ _ _ _ _ _ he h2
   haveI : IsUnramified K L := ⟨he⟩
@@ -23,19 +37,16 @@ theorem unramified_quadratic_uniformizer_trace_norm : ∀ (K L : Type) [Field K]
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[K]
   have hϖ0 : (ϖ : K) ≠ 0 := by exact_mod_cast hϖ.ne_zero
   refine ⟨(ϖ : K), hϖ0, (memK _).1 ϖ.2, ?_, ?_, ?_, ?_, ?_⟩
-  ·
-    intro h1
+  · intro h1
     have hv : ValuativeRel.valuation K (ϖ : K) = 1 :=
       le_antisymm ((Valuation.vle_iff_le _).1 ((memK _).1 ϖ.2) |>.trans_eq (map_one _))
         ((map_one (ValuativeRel.valuation K)).symm.trans_le ((Valuation.vle_iff_le _).1 h1))
     exact hϖ.not_isUnit ((Valuation.integer.integers _).isUnit_iff_valuation_eq_one.2 hv)
-  ·
-    rintro ⟨y, hy⟩
+  · rintro ⟨y, hy⟩
     have h := ord_norm (K := K) y
     rw [hy, ord_uniformizer hϖ, IsUnramified.residueDegree_eq_finrank K L, h2] at h
     omega
-  ·
-    intro y hy
+  · intro y hy
     have hπ := irreducible_algebraMap_of_isUnramified (L := L) hϖ
     set y' : 𝒪[L] := ⟨y, (memL y).2 hy⟩
     by_cases hu : IsUnit y'
@@ -54,13 +65,11 @@ theorem unramified_quadratic_uniformizer_trace_norm : ∀ (K L : Type) [Field K]
       have := congrArg (fun u : 𝒪[L] ↦ (u : L)) hc
       simp only [y', MulMemClass.coe_mul, coe_algebraMap_integer] at this
       exact this
-  ·
-    intro s hs
+  · intro s hs
     obtain ⟨a, ha⟩ := trace_integer_surjective (K := K) (L := L) ⟨s, (memK s).2 hs⟩
     refine ⟨(a : L), (memL _).1 a.2, ?_⟩
     rw [← coe_trace_integer, ha]
-  ·
-    intro s hs1 hs2
+  · intro s hs1 hs2
     set s' : 𝒪[K] := ⟨s, (memK s).2 hs1⟩
     have hv : ValuativeRel.valuation K s = 1 :=
       le_antisymm ((Valuation.vle_iff_le _).1 hs1 |>.trans_eq (map_one _))

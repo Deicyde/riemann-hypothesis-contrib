@@ -4,21 +4,36 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsVolData
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN
+open NumberField IsDedekindDomain MeasureTheory Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
+  GlobalTheory.SnMass.VolN
 open scoped TensorProduct ENNReal nonZeroDivisors
 
 namespace GlobalTheory.SnMass.VolN
 
-theorem existsUnique_layered_fundamentalDomain :
-    ∀ {G X B : Type} [Group G] [Finite B] {V : B → Type} [∀ β, AddCommGroup (V β)] (ρ : G → X → X) (NN : Set X) (o : X) (deg : B → ℕ) (c : ∀ β, X → V β) (L D : ∀ β, Set (V β)), o ∈ NN → (∀ x, ρ 1 x = x) → (∀ g h x, ρ (g * h) x = ρ g (ρ h x)) → (∀ g, ∀ x ∈ NN, ρ g x ∈ NN) → (∀ β, (0 : V β) ∈ L β) → (∀ β v, ∃! l, l ∈ L β ∧ v + l ∈ D β) → (∀ β, c β o = 0) → (∀ (d : ℕ) (g : G), (∀ β, deg β < d → c β (ρ g o) = 0) → ∀ x ∈ NN, ∀ β, deg β ≤ d → c β (ρ g x) = c β x + c β (ρ g o)) → (∀ (g : G) (β : B), (∀ β', deg β' < deg β → c β' (ρ g o) = 0) → c β (ρ g o) ∈ L β) → (∀ β, ∀ l ∈ L β, ∃ g : G, c β (ρ g o) = l ∧ ∀ β', β' ≠ β → deg β' ≤ deg β → c β' (ρ g o) = 0) → (∀ g : G, (∀ β, c β (ρ g o) = 0) → g = 1) → ∀ x ∈ NN, ∃! g : G, ∀ β, c β (ρ g x) ∈ D β := by
+theorem existsUnique_layered_fundamentalDomain
+    : ∀ {G X B : Type} [Group G] [Finite B] {V : B → Type} [∀ β, AddCommGroup (V β)] (ρ : G → X → X)
+        (NN : Set X) (o : X) (deg : B → ℕ) (c : ∀ β, X → V β) (L D : ∀ β, Set (V β)),
+      o ∈ NN → (∀ x, ρ 1 x = x) → (∀ g h x, ρ (g * h) x = ρ g (ρ h x)) → (∀ g, ∀ x ∈ NN, ρ g x ∈ NN)
+        → (∀ β, (0 : V β) ∈ L β) → (∀ β v, ∃! l, l ∈ L β ∧ v + l ∈ D β) → (∀ β, c β o = 0)
+        → (∀ (d : ℕ) (g : G),
+          (∀ β, deg β < d → c β (ρ g o) = 0)
+            → ∀ x ∈ NN, ∀ β, deg β ≤ d → c β (ρ g x) = c β x + c β (ρ g o))
+        → (∀ (g : G) (β : B), (∀ β', deg β' < deg β → c β' (ρ g o) = 0) → c β (ρ g o) ∈ L β)
+        → (∀ β, ∀ l ∈ L β, ∃ g : G,
+          c β (ρ g o) = l ∧ ∀ β', β' ≠ β → deg β' ≤ deg β → c β' (ρ g o) = 0)
+        → (∀ g : G, (∀ β, c β (ρ g o) = 0) → g = 1)
+        → ∀ x ∈ NN, ∃! g : G, ∀ β, c β (ρ g x) ∈ D β := by
   intro G X B _ _ V _ ρ NN o deg c L D ho h1 hmul hst hL0 hD hco htr hL hon hinj x hx
   classical
   haveI := Fintype.ofFinite B
   have hgx : ∀ (g : G) (y : X), y ∈ NN → ρ g y ∈ NN := fun g y hy => hst g y hy
 
-  have step : ∀ (d : ℕ) (T : Finset B), (∀ β ∈ T, deg β = d) →
-      (∃ g : G, ∀ β, deg β < d → c β (ρ g x) ∈ D β) →
-      ∃ g : G, ∀ β, (deg β < d ∨ β ∈ T) → c β (ρ g x) ∈ D β := by
+  have step
+      : ∀ (d : ℕ) (T : Finset B),
+        (∀ β ∈ T, deg β = d) → (∃ g : G, ∀ β, deg β < d → c β (ρ g x) ∈ D β)
+          → ∃ g : G, ∀ β, (deg β < d ∨ β ∈ T) → c β (ρ g x) ∈ D β := by
     intro d T
     induction T using Finset.induction_on with
     | empty =>
@@ -57,8 +72,10 @@ theorem existsUnique_layered_fundamentalDomain :
     induction d with
     | zero => exact ⟨1, fun β hβ => absurd hβ (Nat.not_lt_zero _)⟩
     | succ d ih =>
-      obtain ⟨g, hg⟩ := step d (Finset.univ.filter (fun β => deg β = d))
-        (fun β hβ => (Finset.mem_filter.mp hβ).2) ih
+      obtain ⟨g, hg⟩ :=
+        step d (Finset.univ.filter (fun β => deg β = d))
+          (fun β hβ => (Finset.mem_filter.mp hβ).2)
+          ih
       refine ⟨g, fun β hβ => hg β ?_⟩
       rcases Nat.lt_succ_iff_lt_or_eq.mp hβ with h | h
       · exact Or.inl h
@@ -70,8 +87,7 @@ theorem existsUnique_layered_fundamentalDomain :
   intro g₂ hg₂
   have hg₁ : ∀ β, c β (ρ g₀ x) ∈ D β := fun β => hg₀ β (Nat.lt_succ_of_le (hM ⟨β, rfl⟩))
   have hy : ρ g₀ x ∈ NN := hgx g₀ x hx
-  have hδy : ρ (g₂ * g₀⁻¹) (ρ g₀ x) = ρ g₂ x := by
-    rw [← hmul, inv_mul_cancel_right]
+  have hδy : ρ (g₂ * g₀⁻¹) (ρ g₀ x) = ρ g₂ x := by rw [← hmul, inv_mul_cancel_right]
   have vanish : ∀ d : ℕ, ∀ β, deg β < d → c β (ρ (g₂ * g₀⁻¹) o) = 0 := by
     intro d
     induction d with
@@ -86,8 +102,7 @@ theorem existsUnique_layered_fundamentalDomain :
         have hmem : c β (ρ g₀ x) + c β (ρ (g₂ * g₀⁻¹) o) ∈ D β := hadd ▸ hg₂ β
         have hzero : c β (ρ g₀ x) + 0 ∈ D β := by simpa using hg₁ β
         exact (hD β (c β (ρ g₀ x))).unique ⟨hin, hmem⟩ ⟨hL0 β, hzero⟩
-  have hone : g₂ * g₀⁻¹ = 1 :=
-    hinj _ (fun β => vanish (M + 1) β (Nat.lt_succ_of_le (hM ⟨β, rfl⟩)))
+  have hone : g₂ * g₀⁻¹ = 1 := hinj _ (fun β => vanish (M + 1) β (Nat.lt_succ_of_le (hM ⟨β, rfl⟩)))
   exact mul_inv_eq_one.mp hone
 
 end GlobalTheory.SnMass.VolN

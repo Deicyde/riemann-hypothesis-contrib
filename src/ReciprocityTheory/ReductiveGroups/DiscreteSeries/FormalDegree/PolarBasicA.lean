@@ -22,17 +22,20 @@ theorem pmat_continuous (ε : Fin n → Bool) : Continuous (fun z : PCoord ε �
     · simp only [pmat, dif_neg h1, dif_pos h2]; exact (continuous_apply _).star
     · simp only [pmat, dif_neg h1, dif_neg h2]; exact continuous_const
 
-theorem pb_trace_pow_herm {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (j : ℕ) :
-    (A ^ j).trace = ∑ a, ((hA.eigenvalues a : ℝ) : ℂ) ^ j := by
+theorem pb_trace_pow_herm {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (j : ℕ)
+    : (A ^ j).trace = ∑ a, ((hA.eigenvalues a : ℝ) : ℂ) ^ j := by
   conv_lhs => rw [hA.spectral_theorem, ← map_pow]
   first
-    | (rw [Unitary.conjStarAlgAut_apply, Matrix.trace_mul_cycle, Unitary.coe_star_mul_self, one_mul,
+  | (
+      rw [Unitary.conjStarAlgAut_apply, Matrix.trace_mul_cycle, Unitary.coe_star_mul_self, one_mul,
         Matrix.diagonal_pow, Matrix.trace_diagonal]
-       simp)
-    | simp [Unitary.conjStarAlgAut_apply, Matrix.trace_mul_cycle, Matrix.diagonal_pow, Matrix.trace_diagonal]
+      simp
+    )
+  | simp [Unitary.conjStarAlgAut_apply, Matrix.trace_mul_cycle, Matrix.diagonal_pow,
+      Matrix.trace_diagonal]
 
-theorem psum_continuous (ε : Fin n → Bool) (j : ℕ) :
-    Continuous (fun z : PCoord ε → ℂ => ∑ a, pev z a ^ j) := by
+theorem psum_continuous (ε : Fin n → Bool) (j : ℕ)
+    : Continuous (fun z : PCoord ε → ℂ => ∑ a, pev z a ^ j) := by
   have h : (fun z : PCoord ε → ℂ => ∑ a, pev z a ^ j) = fun z => ((pmat z) ^ j).trace.re := by
     funext z
     rw [pb_trace_pow_herm (pmat_isHermitian z) j, Complex.re_sum]
@@ -42,20 +45,23 @@ theorem psum_continuous (ε : Fin n → Bool) (j : ℕ) :
   rw [h]
   exact Complex.continuous_re.comp (((pmat_continuous ε).pow j).matrix_trace)
 
-theorem negpsum_continuous (ε : Fin n → Bool) (j : ℕ) :
-    Continuous (fun z : PCoord ε → ℂ => ∑ b, (-pev z b) ^ j) := by
-  have h : (fun z : PCoord ε → ℂ => ∑ b, (-pev z b) ^ j) = fun z => (-1) ^ j * ∑ b, pev z b ^ j := by
+theorem negpsum_continuous (ε : Fin n → Bool) (j : ℕ)
+    : Continuous (fun z : PCoord ε → ℂ => ∑ b, (-pev z b) ^ j) := by
+  have h
+      : (fun z : PCoord ε → ℂ => ∑ b, (-pev z b) ^ j) = fun z => (-1) ^ j * ∑ b, pev z b ^ j := by
     funext z
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun b _ => neg_pow _ _
   rw [h]
   exact continuous_const.mul (psum_continuous ε j)
 
-theorem pairpow_continuous (ε : Fin n → Bool) (k : ℕ) :
-    Continuous (fun z : PCoord ε → ℂ => ∑ a, ∑ b, (pev z a - pev z b) ^ k) := by
-  have h : (fun z : PCoord ε → ℂ => ∑ a, ∑ b, (pev z a - pev z b) ^ k) =
-      fun z => ∑ i ∈ range (k + 1),
-        (∑ a, pev z a ^ i) * (∑ b, (-pev z b) ^ (k - i)) * (k.choose i : ℝ) := by
+theorem pairpow_continuous (ε : Fin n → Bool) (k : ℕ)
+    : Continuous (fun z : PCoord ε → ℂ => ∑ a, ∑ b, (pev z a - pev z b) ^ k) := by
+  have h
+      : (fun z : PCoord ε → ℂ => ∑ a, ∑ b, (pev z a - pev z b) ^ k)
+        = fun z =>
+          ∑ i ∈ range (k + 1),
+            (∑ a, pev z a ^ i) * (∑ b, (-pev z b) ^ (k - i)) * (k.choose i : ℝ) := by
     funext z
     simp_rw [sub_eq_add_neg, add_pow, Finset.sum_mul_sum, Finset.sum_mul]
     conv_rhs => rw [Finset.sum_comm]; arg 2; ext a; rw [Finset.sum_comm]
@@ -63,24 +69,26 @@ theorem pairpow_continuous (ε : Fin n → Bool) (k : ℕ) :
   exact continuous_finsetSum _ fun i _ =>
     ((psum_continuous ε i).mul (negpsum_continuous ε (k - i))).mul continuous_const
 
-theorem pairpoly_continuous (ε : Fin n → Bool) (P : Polynomial ℝ) :
-    Continuous (fun z : PCoord ε → ℂ => ∑ a, ∑ b, P.eval (pev z a - pev z b)) := by
-  have h : (fun z : PCoord ε → ℂ => ∑ a, ∑ b, P.eval (pev z a - pev z b)) =
-      fun z => ∑ i ∈ range (P.natDegree + 1), P.coeff i * ∑ a, ∑ b, (pev z a - pev z b) ^ i := by
+theorem pairpoly_continuous (ε : Fin n → Bool) (P : Polynomial ℝ)
+    : Continuous (fun z : PCoord ε → ℂ => ∑ a, ∑ b, P.eval (pev z a - pev z b)) := by
+  have h
+      : (fun z : PCoord ε → ℂ => ∑ a, ∑ b, P.eval (pev z a - pev z b))
+        = fun z =>
+          ∑ i ∈ range (P.natDegree + 1), P.coeff i * ∑ a, ∑ b, (pev z a - pev z b) ^ i := by
     funext z
     simp_rw [Polynomial.eval_eq_sum_range, Finset.mul_sum]
     conv_rhs => rw [Finset.sum_comm]; arg 2; ext a; rw [Finset.sum_comm]
   rw [h]
   exact continuous_finsetSum _ fun i _ => continuous_const.mul (pairpow_continuous ε i)
 
-theorem pb_abs_pev_le {ε : Fin n → Bool} (z : PCoord ε → ℂ) (a : Fin n) :
-    |pev z a| ≤ Real.sqrt (∑ b, pev z b ^ 2) := by
+theorem pb_abs_pev_le {ε : Fin n → Bool} (z : PCoord ε → ℂ) (a : Fin n)
+    : |pev z a| ≤ Real.sqrt (∑ b, pev z b ^ 2) := by
   rw [← Real.sqrt_sq_eq_abs]
-  exact Real.sqrt_le_sqrt (Finset.single_le_sum (f := fun b => pev z b ^ 2)
-    (fun b _ => sq_nonneg _) (Finset.mem_univ a))
+  exact Real.sqrt_le_sqrt
+    (Finset.single_le_sum (f := fun b => pev z b ^ 2) (fun b _ => sq_nonneg _) (Finset.mem_univ a))
 
-theorem pairfun_continuous (ε : Fin n → Bool) (h : ℝ → ℝ) (hc : Continuous h) :
-    Continuous (fun z : PCoord ε → ℂ => ∑ a, ∑ b, h (pev z a - pev z b)) := by
+theorem pairfun_continuous (ε : Fin n → Bool) (h : ℝ → ℝ) (hc : Continuous h)
+    : Continuous (fun z : PCoord ε → ℂ => ∑ a, ∑ b, h (pev z a - pev z b)) := by
   have hS : Continuous (fun z : PCoord ε → ℂ => Real.sqrt (∑ b, pev z b ^ 2)) :=
     (psum_continuous ε 2).sqrt
   rw [Metric.continuous_iff]
@@ -98,13 +106,18 @@ theorem pairfun_continuous (ε : Fin n → Bool) (h : ℝ → ℝ) (hc : Continu
     constructor <;> linarith [ha.1, ha.2, hb.1, hb.2]
   obtain ⟨η, hη⟩ : ∃ η : ℝ, η = e / (3 * ((n : ℝ) * n + 1)) := ⟨_, rfl⟩
   have hηpos : 0 < η := by rw [hη]; positivity
-  obtain ⟨p, hp⟩ := exists_polynomial_near_of_continuousOn (-(2 * R)) (2 * R) h hc.continuousOn η hηpos
-  obtain ⟨δ2, hδ2, h2⟩ := Metric.continuous_iff.1 (pairpoly_continuous ε p) z0 (e / 3) (by positivity)
+  obtain ⟨p, hp⟩ :=
+    exists_polynomial_near_of_continuousOn (-(2 * R)) (2 * R) h hc.continuousOn η hηpos
+  obtain ⟨δ2, hδ2, h2⟩ :=
+    Metric.continuous_iff.1 (pairpoly_continuous ε p) z0 (e / 3) (by positivity)
   refine ⟨min δ1 δ2, lt_min hδ1 hδ2, fun z hz => ?_⟩
   have hz1 : dist z z0 < δ1 := hz.trans_le (min_le_left _ _)
   have hz2 : dist z z0 < δ2 := hz.trans_le (min_le_right _ _)
-  have happrox : ∀ w, dist w z0 < δ1 →
-      |∑ a, ∑ b, h (pev w a - pev w b) - ∑ a, ∑ b, p.eval (pev w a - pev w b)| ≤ n * n * η := by
+  have happrox
+      : ∀ w,
+        dist w z0 < δ1
+          → |∑ a, ∑ b, h (pev w a - pev w b) - ∑ a, ∑ b, p.eval (pev w a - pev w b)|
+            ≤ n * n * η := by
     intro w hw
     rw [← Finset.sum_sub_distrib]
     refine (Finset.abs_sum_le_sum_abs _ _).trans ?_
@@ -112,14 +125,16 @@ theorem pairfun_continuous (ε : Fin n → Bool) (h : ℝ → ℝ) (hc : Continu
       intro a
       rw [← Finset.sum_sub_distrib]
       refine (Finset.abs_sum_le_sum_abs _ _).trans ?_
-      calc ∑ b, |h (pev w a - pev w b) - p.eval (pev w a - pev w b)| ≤ ∑ _b : Fin n, η :=
-            Finset.sum_le_sum fun b _ => by
-              rw [abs_sub_comm]; exact (hp _ (hbd w hw a b)).le
-        _ = n * η := by simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-    calc ∑ a, |∑ b, h (pev w a - pev w b) - ∑ b, p.eval (pev w a - pev w b)| ≤ ∑ _a : Fin n, (n * η) :=
-          Finset.sum_le_sum fun a _ => hrow a
+      calc
+        ∑ b, |h (pev w a - pev w b) - p.eval (pev w a - pev w b)| ≤ ∑ _b : Fin n, η :=
+          Finset.sum_le_sum fun b _ => by rw [abs_sub_comm]; exact (hp _ (hbd w hw a b)).le
+        _ = n * η := by
+          simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+    calc
+      ∑ a, |∑ b, h (pev w a - pev w b) - ∑ b, p.eval (pev w a - pev w b)|
+        ≤ ∑ _a : Fin n, (n * η) := Finset.sum_le_sum fun a _ => hrow a
       _ = n * n * η := by
-          simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
+        simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]; ring
   have hA := abs_le.1 (happrox z hz1)
   have hB := abs_le.1 (happrox z0 (by simpa using hδ1))
   have hC := h2 z hz2
@@ -133,8 +148,10 @@ theorem pairfun_continuous (ε : Fin n → Bool) (h : ℝ → ℝ) (hc : Continu
     exact mul_lt_of_lt_one_right (by positivity) hq
   rw [Real.dist_eq]
   have hC' := abs_lt.1 hC
-  exact abs_sub_lt_iff.2 ⟨by linarith [hA.1, hA.2, hB.1, hB.2, hC'.1, hC'.2],
-    by linarith [hA.1, hA.2, hB.1, hB.2, hC'.1, hC'.2]⟩
+  exact abs_sub_lt_iff.2 ⟨
+    by linarith [hA.1, hA.2, hB.1, hB.2, hC'.1, hC'.2],
+    by linarith [hA.1, hA.2, hB.1, hB.2, hC'.1, hC'.2]
+  ⟩
 
 theorem pb_shc_eq_update : shc = Function.update (fun u : ℝ => Real.sinh u / u) 0 1 := by
   funext u
@@ -169,8 +186,9 @@ theorem pb_shc_neg (u : ℝ) : shc (-u) = shc u := by
   · simp [shc, hu]
   · simp [shc, hu, Real.sinh_neg, neg_div_neg_eq]
 
-theorem pb_sum_pairs_half {f : Fin n → Fin n → ℝ} (hsym : ∀ a b, f a b = f b a) (hd : ∀ a, f a a = 0) :
-    ∑ a, ∑ b ∈ univ.filter (fun b => a < b), f a b = (∑ a, ∑ b, f a b) / 2 := by
+theorem pb_sum_pairs_half
+    {f : Fin n → Fin n → ℝ} (hsym : ∀ a b, f a b = f b a) (hd : ∀ a, f a a = 0)
+    : ∑ a, ∑ b ∈ univ.filter (fun b => a < b), f a b = (∑ a, ∑ b, f a b) / 2 := by
   have hpt : ∀ a b, f a b = (if a < b then f a b else 0) + (if b < a then f a b else 0) := by
     intro a b
     rcases lt_trichotomy a b with h | rfl | h
@@ -192,8 +210,8 @@ theorem pb_sum_pairs_half {f : Fin n → Fin n → ℝ} (hsym : ∀ a b, f a b =
   rw [htot]
   ring
 
-theorem pb_jac_eq_exp {ε : Fin n → Bool} (z : PCoord ε → ℂ) :
-    Jac z = Real.exp ((∑ a, ∑ b, Real.log (shc (pev z a - pev z b))) / 2) := by
+theorem pb_jac_eq_exp {ε : Fin n → Bool} (z : PCoord ε → ℂ)
+    : Jac z = Real.exp ((∑ a, ∑ b, Real.log (shc (pev z a - pev z b))) / 2) := by
   have hsym : ∀ a b, Real.log (shc (pev z a - pev z b)) = Real.log (shc (pev z b - pev z a)) := by
     intro a b
     rw [← neg_sub (pev z a) (pev z b), pb_shc_neg]
@@ -210,10 +228,12 @@ theorem pb_jac_eq_exp {ε : Fin n → Bool} (z : PCoord ε → ℂ) :
   rw [Real.exp_log (pb_shc_pos _)]
 
 theorem pb_jac_continuous (ε : Fin n → Bool) : Continuous (fun z : PCoord ε → ℂ => Jac z) := by
-  have h : (fun z : PCoord ε → ℂ => Jac z) =
-      fun z => Real.exp ((∑ a, ∑ b, Real.log (shc (pev z a - pev z b))) / 2) := funext pb_jac_eq_exp
+  have h
+      : (fun z : PCoord ε → ℂ => Jac z)
+        = fun z => Real.exp ((∑ a, ∑ b, Real.log (shc (pev z a - pev z b))) / 2) :=
+    funext pb_jac_eq_exp
   rw [h]
-  exact Real.continuous_exp.comp ((pairfun_continuous ε _
-    (pb_shc_continuous.log fun u => (pb_shc_pos u).ne')).div_const 2)
+  exact Real.continuous_exp.comp
+    ((pairfun_continuous ε _ (pb_shc_continuous.log fun u => (pb_shc_pos u).ne')).div_const 2)
 
 end ReciprocityTheory.ChartRestriction.DS

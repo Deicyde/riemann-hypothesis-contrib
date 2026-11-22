@@ -15,13 +15,39 @@ set_option maxHeartbeats 800000
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Th
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Th
 open UpperTheory.GalN.V UpperTheory.Zero.LLC UpperTheory.V.Z.Win
 open scoped Pointwise
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-theorem UpperTheory.V.Z.Win.RR.purLocA_alt :
-    _root_.UpperTheory.V.Af.Hypotheses' → ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (ι : Qbar l ≃+* ℂ) (n : ℕ) (r : G F Ω →* GL (Fin n) (Qbar l)), Continuous r → ∀ (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w), ((l : ℕ) : 𝓞 F) ∈ w.asIdeal → ∀ x : WD h, (∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l F Ω (Dec (F := F) A) O) (hj : Induces Bw), IsPstAt (Loc.PP l) Bw (r.comp (Dec (F := F) A).subtype) ∧ Lev.SsCmp (wdAt (Loc.PP l) ι Bw h hj (r.comp (Dec (F := F) A).subtype)) x) → (x.mono0 → RatioW x) → ∀ (ψ : Fin n → Dec (F := F) A →* (Qbar l)ˣ) (m : Fin n → ℤ) (k : ℕ), W.HasFlag (r.comp (Dec (F := F) A).subtype) ψ → StrictAnti m → 0 < k → (∀ i (g : Dec (F := F) A), (g : G F Ω) ∈ Ine (F := F) A → (ψ i g * cycBar F Ω l g ^ (-m i)) ^ k = 1) → ((∀ i j, ψ i ≠ ψ j * (cycBar F Ω l).comp (Dec (F := F) A).subtype) ∨ x.mono0) → ∃ g : Dec (F := F) A, cycZ F Ω l g = 1 ∧ Pr.FreeRatios fun i => ψ i g := by
+theorem UpperTheory.V.Z.Win.RR.purLocA_alt
+    : _root_.UpperTheory.V.Af.Hypotheses'
+      → ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+          [Fact l.Prime],
+        l ≠ 2
+          → ∀ (ι : Qbar l ≃+* ℂ) (n : ℕ) (r : G F Ω →* GL (Fin n) (Qbar l)),
+            Continuous r
+              → ∀ (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w),
+                ((l : ℕ) : 𝓞 F) ∈ w.asIdeal
+                  → ∀ x : WD h,
+                    (∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+                          (Bw : LocBridge l F Ω (Dec (F := F) A) O) (hj : Induces Bw),
+                        IsPstAt (Loc.PP l) Bw (r.comp (Dec (F := F) A).subtype) ∧ Lev.SsCmp
+                          (wdAt (Loc.PP l) ι Bw h hj (r.comp (Dec (F := F) A).subtype)) x)
+                      → (x.mono0 → RatioW x)
+                      → ∀ (ψ : Fin n → Dec (F := F) A →* (Qbar l)ˣ) (m : Fin n → ℤ) (k : ℕ),
+                        W.HasFlag (r.comp (Dec (F := F) A).subtype) ψ → StrictAnti m → 0 < k
+                          → (∀ i (g : Dec (F := F) A),
+                            (g : G F Ω) ∈ Ine (F := F) A
+                              → (ψ i g * cycBar F Ω l g ^ (- m i)) ^ k = 1)
+                          → ((∀ i j, ψ i ≠ ψ j * (cycBar F Ω l).comp (Dec (F := F) A).subtype)
+                            ∨ x.mono0)
+                          → ∃ g : Dec (F := F) A,
+                            cycZ F Ω l g = 1 ∧ Pr.FreeRatios fun i => ψ i g := by
   intro P F Ω _ _ _ _ _ l _ _ ι n r hr w A h hw x hx ht ψ m k hf hm hk hI hor
   have hN := P.litN
   have H := hN.aut.art
@@ -33,52 +59,72 @@ theorem UpperTheory.V.Z.Win.RR.purLocA_alt :
     intro i
     obtain ⟨g, hg⟩ := hf
     have hval : Continuous fun s => (ψ i s : Qbar l) :=
-      ((Units.continuous_val.comp ((continuous_const.mul hc).mul continuous_const)).matrix_elem i i).congr
-        fun s => (hg s).2 i
+      ((Units.continuous_val.comp ((continuous_const.mul hc).mul continuous_const)).matrix_elem i
+        i).congr fun s => (hg s).2 i
     exact Units.continuous_iff.2 ⟨hval, (hval.comp continuous_inv).congr fun s => by simp⟩
   choose ω hω using fun i => (Loc.ordCharIff H h ι a ha (fun _ => -m i) (ψ i)).1.2
     ⟨hψc i, Loc.laArith H h hw (ψ i) (hψc i) (m i) k hk (hI i)⟩
-  have hpol : ∀ s, (wdAt (Loc.PP l) ι Bw h hj (r.comp (Dec (F := F) A).subtype)).charPol s =
-      ∏ i, (X - C (((ω i).comp a) s : ℂ)) := fun s => by
+  have hpol
+      : ∀ s,
+        (wdAt (Loc.PP l) ι Bw h hj (r.comp (Dec (F := F) A).subtype)).charPol s
+          = ∏ i, (X - C (((ω i).comp a) s : ℂ)) := fun s => by
     obtain ⟨M, hM⟩ := hf
     obtain ⟨T⟩ := UpperTheory.V.Loc.tiedP l
-    have hc := fun i => (_root_.UpperTheory.V.Loc.hecke_char_de_rham_of_local_artin_above_l hN h hw ι a ha (ω i) _ (ψ i) (hω i)).1 O Bw hj
-    obtain ⟨-, F₂⟩ := UpperTheory.V.Loc.PstExact.flag T ι Bw h hj _ (fun i => GlobalTheory.TripleGal.rk1 (ψ i)) M
-      (fun g => (hM g).1) (fun g i => ((hM g).2 i).trans (by simp [GlobalTheory.TripleGal.rk1]))
+    have hc := fun i =>
+      (_root_.UpperTheory.V.Loc.hecke_char_de_rham_of_local_artin_above_l hN h hw ι a ha (ω i) _
+        (ψ i) (hω i)).1 O Bw hj
+    obtain ⟨-, F₂⟩ :=
+      UpperTheory.V.Loc.PstExact.flag T ι Bw h hj _
+        (fun i => GlobalTheory.TripleGal.rk1 (ψ i))
+        M
+        (fun g => (hM g).1)
+        (fun g i => ((hM g).2 i).trans (by simp [GlobalTheory.TripleGal.rk1]))
     rw [(F₂ hp).2 s]
     exact Finset.prod_congr rfl fun i _ => (hc i).2.2 s
   have hxp := fun s => (hcmp (Or.inl ((Lev.ssCalc F Ω A w h).1 n _ _ hpol)) s).symm.trans (hpol s)
   let inc := Subgroup.inclusion (Weil_le_Dec h)
   let ε : ↥(Dec (F := F) A) →* (Qbar l)ˣ := (cycBar F Ω l).comp (Dec (F := F) A).subtype
-  let χ : Fin n → ↥(Dec (F := F) A) →* (Qbar l)ˣ := fun i => ψ i * ε ^ (-m i)
+  let χ : Fin n → ↥(Dec (F := F) A) →* (Qbar l)ˣ := fun i => ψ i * ε ^ (- m i)
   have hεc : Continuous ε :=
     ((Continuous.units_map ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom).toMonoidHom
-      ((continuous_algebraMap ℚ_[l] (Qbar l)).comp continuous_subtype_val)).comp
+        ((continuous_algebraMap ℚ_[l] (Qbar l)).comp continuous_subtype_val)).comp
       (continuous_cycZ F Ω l)).comp continuous_subtype_val
-  have hχc : ∀ i, Continuous (χ i) := fun i => (hψc i).mul ((continuous_zpow (-m i)).comp hεc)
+  have hχc : ∀ i, Continuous (χ i) := fun i => (hψc i).mul ((continuous_zpow (- m i)).comp hεc)
   have hq : ((normV w : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (one_lt_normV w).ne_bot
   have hq' : ((normV w : ℕ) : Qbar l) ≠ 0 := Nat.cast_ne_zero.mpr (one_lt_normV w).ne_bot
-  have hAlgPow (c : ℤ) (y : w.adicCompletion F) :
-      Hi.algPow (l := l) w (-fun _ => -c) y = Hi.algPow w (fun _ => 1) y ^ c := by
+  have hAlgPow (c : ℤ) (y : w.adicCompletion F)
+      : Hi.algPow (l := l) w (- fun _ => -c) y = Hi.algPow w (fun _ => 1) y ^ c := by
     have := GlobalTheory.HeckeGal.finite_contEmb (l := l) w
     let _ := Fintype.ofFinite (W.Emb l w)
     unfold Hi.algPow
     rw [finprod_eq_prod_of_fintype, finprod_eq_prod_of_fintype, ← Finset.prod_zpow]
     exact Finset.prod_congr rfl fun j _ => by rw [Pi.neg_apply, neg_neg, zpow_one]
-  have hμ : ∀ i s, (((ω i).comp a) s : ℂ) = ((normV w : ℕ) : ℂ) ^ (m i * deg s) * ι (χ i (inc s) : Qbar l) := fun i s => by
-    have h1 : (ψ i (inc s) : Qbar l) = ι.symm (ω i (a s)) * Hi.algPow w (-fun _ => -m i) (a s : w.adicCompletion F) :=
+  have hμ
+      : ∀ i s,
+        (((ω i).comp a) s : ℂ)
+          = ((normV w : ℕ) : ℂ) ^ (m i * deg s) * ι (χ i (inc s) : Qbar l) := fun i s => by
+    have h1
+        : (ψ i (inc s) : Qbar l)
+          = ι.symm (ω i (a s)) * Hi.algPow w (- fun _ => - m i) (a s : w.adicCompletion F) :=
       (hω i).val s _ rfl (Set.mem_univ _)
     have h2 : (ε (inc s) : Qbar l) = _ := UpperTheory.V.Loc.epsArt H h hw a ha s
     have h3 : Hi.algPow (l := l) w (fun _ => 1) (a s : w.adicCompletion F) ≠ 0 := fun h0 =>
       (ε (inc s)).ne_zero (by rw [h2, h0, mul_zero])
-    have h4 : (χ i (inc s) : Qbar l) = (ψ i (inc s) : Qbar l) * (ε (inc s) : Qbar l) ^ (-m i) := by simp [χ]
-    have h5 : (χ i (inc s) : Qbar l) = ι.symm (ω i (a s)) * ((normV w : ℕ) : Qbar l) ^ (-(m i * deg s)) := by
-      rw [h4, h1, h2, hAlgPow, mul_zpow, ← zpow_mul, mul_mul_mul_comm, ← zpow_add₀ h3, add_neg_cancel, zpow_zero, mul_one,
-        mul_neg, mul_comm (deg s)]
-    rw [h5, map_mul, ι.apply_symm_apply, map_zpow₀, map_natCast, mul_left_comm, ← zpow_add₀ hq, add_neg_cancel, zpow_zero, mul_one]
+    have h4 : (χ i (inc s) : Qbar l) = (ψ i (inc s) : Qbar l) * (ε (inc s) : Qbar l) ^ (- m i) := by
+      simp [χ]
+    have h5
+        : (χ i (inc s) : Qbar l)
+          = ι.symm (ω i (a s)) * ((normV w : ℕ) : Qbar l) ^ (-(m i * deg s)) := by
+      rw [h4, h1, h2, hAlgPow, mul_zpow, ← zpow_mul, mul_mul_mul_comm, ← zpow_add₀ h3,
+        add_neg_cancel, zpow_zero, mul_one, mul_neg, mul_comm (deg s)]
+    rw [h5, map_mul, ι.apply_symm_apply, map_zpow₀, map_natCast, mul_left_comm, ← zpow_add₀ hq,
+      add_neg_cancel, zpow_zero, mul_one]
     rfl
-  have norm_one {Γ K : Type} [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] [NormedField K]
-      (ψ : Γ →* Kˣ) (hψ : Continuous fun s => (ψ s : K)) (s : Γ) : ‖(ψ s : K)‖ = 1 := by
+  have norm_one
+      {Γ K : Type} [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] [NormedField K]
+      (ψ : Γ →* Kˣ) (hψ : Continuous fun s => (ψ s : K))
+      (s : Γ)
+      : ‖(ψ s : K)‖ = 1 := by
     have key : ∀ t, ‖(ψ t : K)‖ ≤ 1 := fun t => by
       obtain ⟨C, hC⟩ := (isCompact_range hψ.norm).bddAbove
       refine not_lt.1 fun hlt => ?_
@@ -96,45 +142,64 @@ theorem UpperTheory.V.Z.Win.RR.purLocA_alt :
     have : CompactSpace (Dec (F := F) A) := isCompact_iff_compactSpace.1 (isClosed_Dec A).isCompact
     have : CharZero (w.adicCompletion F) := algebraRat.charZero _
     have hl : (l : Qbar l) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
-    obtain ⟨s, hs⟩ := ha.surj (Units.mk0 (l : w.adicCompletion F) (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero))
+    obtain ⟨s, hs⟩ :=
+      ha.surj (Units.mk0 (l : w.adicCompletion F) (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero))
     refine ⟨s, fun h0 => ?_, ?_⟩
     · have h2 := ha.ord_eq s
       rw [h0, neg_zero, hs] at h2
       have : (Valued.v : Valuation (w.adicCompletion F) (WithZero (Multiplicative ℤ))).Compatible :=
         Valuation.Compatible.ofValuation _
-      have h3 := (ValuativeRel.isEquiv (ValuativeRel.valuation (w.adicCompletion F))
-        (Valued.v : Valuation (w.adicCompletion F) (WithZero (Multiplicative ℤ)))).eq_one_iff_eq_one.1
-        (GlobalTheory.SmGL.ord_eq_zero_iff.1 h2)
+      have h3 :=
+        (ValuativeRel.isEquiv (ValuativeRel.valuation (w.adicCompletion F))
+            (Valued.v
+              : Valuation (w.adicCompletion F) (WithZero (Multiplicative ℤ)))).eq_one_iff_eq_one.1
+          (GlobalTheory.SmGL.ord_eq_zero_iff.1 h2)
       have h4 : Valued.v (algebraMap F (w.adicCompletion F) (((l : ℕ) : 𝓞 F) : F)) < 1 := by
-        rw [show Valued.v (algebraMap F (w.adicCompletion F) (((l : ℕ) : 𝓞 F) : F)) =
-          w.valuation F (algebraMap (𝓞 F) F ((l : ℕ) : 𝓞 F)) from HeightOneSpectrum.valuedAdicCompletion_eq_valuation' w _]
+        rw [show Valued.v (algebraMap F (w.adicCompletion F) (((l : ℕ) : 𝓞 F) : F))
+            = w.valuation F (algebraMap (𝓞 F) F ((l : ℕ) : 𝓞 F)) from
+          HeightOneSpectrum.valuedAdicCompletion_eq_valuation' w _]
         exact (HeightOneSpectrum.valuation_lt_one_iff_mem w _).2 hw
       refine h4.ne (Eq.trans ?_ h3)
       simp
     · have h1 := UpperTheory.V.Loc.epsArt H h hw a ha s
-      rw [hs, Hi.algPow, finprod_eq_prod_of_fintype, GlobalTheory.Pst.normV_eq_pow (l := l) hw] at h1
+      rw [hs, Hi.algPow, finprod_eq_prod_of_fintype, GlobalTheory.Pst.normV_eq_pow (l := l) hw]
+        at h1
       simp only [Units.val_mk0, map_natCast, zpow_one, Finset.prod_const, Nat.cast_pow] at h1
       rw [← zpow_natCast, ← zpow_mul, ← zpow_natCast, ← zpow_add₀ hl] at h1
       have h2 : ‖(cycBar F Ω l s : Qbar l)‖ = 1 :=
         norm_one ε (Units.continuous_val.comp hεc) (inc s)
       rw [h1, norm_zpow] at h2
-      rw [(zpow_eq_one_iff_right₀ (norm_nonneg _) (GlobalTheory.PlaceBridge.norm_l_lt_one (l := l)).ne).1 h2, zpow_zero] at h1
+      rw [(zpow_eq_one_iff_right₀ (norm_nonneg _)
+            (GlobalTheory.PlaceBridge.norm_l_lt_one (l := l)).ne).1 h2,
+          zpow_zero]
+        at h1
       refine Units.ext (Subtype.ext ((algebraMap ℚ_[l] (Qbar l)).injective (Eq.trans h1 ?_)))
       simp
   obtain ⟨s, hs, hs1⟩ := hex
-  have map_zpow_eq_intCast_mul_of_map_mul_eq_add {Γ R : Type} [Group Γ] [Ring R] (f : Γ → R) (hf : ∀ a b, f (a * b) = f a + f b)
-      (g : Γ) (m : ℤ) : f (g ^ m) = (m : R) * f g := by
-    let D : Γ →* Multiplicative R := MonoidHom.mk' (fun x => Multiplicative.ofAdd (f x)) (by
-      intro a b
-      rw [hf]
-      rfl)
+  have map_zpow_eq_intCast_mul_of_map_mul_eq_add
+      {Γ R : Type} [Group Γ] [Ring R]
+      (f : Γ → R) (hf : ∀ a b, f (a * b) = f a + f b)
+      (g : Γ) (m : ℤ)
+      : f (g ^ m) = (m : R) * f g := by
+    let D : Γ →* Multiplicative R :=
+      MonoidHom.mk' (fun x => Multiplicative.ofAdd (f x)) (by
+        intro a b
+        rw [hf]
+        rfl)
     have h := congrArg Multiplicative.toAdd (map_zpow D g m)
     simp only [toAdd_zpow] at h
     rw [zsmul_eq_mul] at h
     exact h
-  have int_zero {Γ : Type} [Group Γ] (d : Γ → ℤ) (L : Γ → ℝ) (hd : ∀ a b, d (a * b) = d a + d b)
-      (hL : ∀ a b, L (a * b) = L a + L b) (φ : Γ) (hφ : d φ = 1) {c : ℝ} (hc : 0 < c) (hw : ∀ g, d g = 1 → |L g| < c)
-      (s : Γ) (hs : d s ≠ 0) (k : ℤ) (hk : L s = k * d s * c) : k = 0 := by
+  have int_zero
+      {Γ : Type} [Group Γ]
+      (d : Γ → ℤ)
+      (L : Γ → ℝ)
+      (hd : ∀ a b, d (a * b) = d a + d b) (hL : ∀ a b, L (a * b) = L a + L b)
+      (φ : Γ) (hφ : d φ = 1)
+      {c : ℝ} (hc : 0 < c) (hw : ∀ g, d g = 1 → |L g| < c)
+      (s : Γ) (hs : d s ≠ 0)
+      (k : ℤ) (hk : L s = k * d s * c)
+      : k = 0 := by
     have hD := map_zpow_eq_intCast_mul_of_map_mul_eq_add d hd
     have hLz := map_zpow_eq_intCast_mul_of_map_mul_eq_add L hL
     have key : ∀ m : ℤ, |(m : ℝ) * (d s : ℝ) * (k * c - L φ) + L φ| < c := by
@@ -176,9 +241,12 @@ theorem UpperTheory.V.Z.Win.RR.purLocA_alt :
       nlinarith
     have : |k| < 1 := by exact_mod_cast hk1
     exact Int.abs_lt_one_iff.mp this
-  have mono0_of_charPol_eq_prod_of_ne_normV_pow_mul {n : ℕ} (x : WD h) (μ : Fin n → Weil h →* ℂˣ) (hμ : ∀ i, GlobalTheory.WeilDeligne.IsSmooth (μ i))
+  have mono0_of_charPol_eq_prod_of_ne_normV_pow_mul
+      {n : ℕ}
+      (x : WD h) (μ : Fin n → Weil h →* ℂˣ) (hμ : ∀ i, GlobalTheory.WeilDeligne.IsSmooth (μ i))
       (hx : ∀ s, x.charPol s = ∏ i, (X - C (μ i s : ℂ)))
-      (hne : ∀ i j, ∃ s, (μ i s : ℂ) ≠ ((normV w : ℕ) : ℂ) ^ deg s * μ j s) : x.mono0 := by
+      (hne : ∀ i j, ∃ s, (μ i s : ℂ) ≠ ((normV w : ℕ) : ℂ) ^ deg s * μ j s)
+      : x.mono0 := by
     obtain ⟨na, a, rfl⟩ := x.exists_rep
     rw [WD.monodromyZero_ofWeilDeligneRepClass_iff]
     let b := WDRep.ofChars h μ hμ
@@ -208,7 +276,8 @@ theorem UpperTheory.V.Z.Win.RR.purLocA_alt :
       obtain ⟨σ, hσ⟩ := hne i j
       have h1 := congrFun (hN' σ (Pi.single j 1)) i
       rw [hsingle, LinearMap.map_smul, WDRep.ofChars_ρ, diagEnd_apply, Pi.smul_apply, Pi.smul_apply,
-        smul_eq_mul, smul_eq_mul] at h1
+          smul_eq_mul, smul_eq_mul]
+        at h1
       have h2 : ((μ i σ : ℂ) - ((normV w : ℕ) : ℂ) ^ deg σ * μ j σ) * N' (Pi.single j 1) i = 0 := by
         rw [sub_mul, h1]
         ring
@@ -220,18 +289,27 @@ theorem UpperTheory.V.Z.Win.RR.purLocA_alt :
       intro j
       apply LinearMap.ext_ring
       funext i
-      simp only [LinearMap.comp_apply, LinearMap.coe_single, LinearMap.zero_comp, LinearMap.zero_apply, Pi.zero_apply]
+      simp only [LinearMap.comp_apply, LinearMap.coe_single, LinearMap.zero_comp,
+        LinearMap.zero_apply, Pi.zero_apply]
       exact hM i j
     apply LinearMap.ext
     intro v
     have h4 := LinearMap.congr_fun hN0 (e v)
-    simp only [N', LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply, LinearMap.zero_apply] at h4
+    simp only [N', LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply,
+        LinearMap.zero_apply]
+      at h4
     rw [LinearMap.zero_apply]
     exact (LinearEquiv.map_eq_zero_iff e).mp h4
-  have ratio_lt {n : ℕ} (x : WD h) (μ : Fin n → Weil h →* ℂˣ) (hμ : ∀ i, GlobalTheory.WeilDeligne.IsSmooth (μ i))
-      (hx : ∀ s, x.charPol s = ∏ i, (X - C (μ i s : ℂ))) (ht : x.mono0 → RatioW x)
-      (hor : (∀ i j, ∃ s, (μ i s : ℂ) ≠ ((normV w : ℕ) : ℂ) ^ deg s * μ j s) ∨ x.mono0) (i j : Fin n) (s : Weil h) (hs : deg s ≠ 0) (k : ℤ)
-      (hk : ‖(μ i s : ℂ)‖ = ((normV w : ℕ) : ℝ) ^ (k * deg s) * ‖(μ j s : ℂ)‖) : k = 0 := by
+  have ratio_lt
+      {n : ℕ}
+      (x : WD h) (μ : Fin n → Weil h →* ℂˣ) (hμ : ∀ i, GlobalTheory.WeilDeligne.IsSmooth (μ i))
+      (hx : ∀ s, x.charPol s = ∏ i, (X - C (μ i s : ℂ)))
+      (ht : x.mono0 → RatioW x)
+      (hor : (∀ i j, ∃ s, (μ i s : ℂ) ≠ ((normV w : ℕ) : ℂ) ^ deg s * μ j s) ∨ x.mono0)
+      (i j : Fin n)
+      (s : Weil h) (hs : deg s ≠ 0)
+      (k : ℤ) (hk : ‖(μ i s : ℂ)‖ = ((normV w : ℕ) : ℝ) ^ (k * deg s) * ‖(μ j s : ℂ)‖)
+      : k = 0 := by
     have hm : x.mono0 := by
       rcases hor with h1 | h1
       · exact mono0_of_charPol_eq_prod_of_ne_normV_pow_mul x μ hμ hx h1
@@ -244,11 +322,13 @@ theorem UpperTheory.V.Z.Win.RR.purLocA_alt :
       intro g l
       show (μ l g : ℂ) ∈ (x.charPol g).roots
       rw [hx]
-      have hmon : (∏ k, (X - C (μ k g : ℂ))).Monic := monic_prod_of_monic _ _ (fun k _ => monic_X_sub_C _)
+      have hmon : (∏ k, (X - C (μ k g : ℂ))).Monic :=
+        monic_prod_of_monic _ _ (fun k _ => monic_X_sub_C _)
       rw [mem_roots hmon.ne_zero, IsRoot, eval_prod]
       exact Finset.prod_eq_zero (Finset.mem_univ l) (by simp)
-    refine int_zero (Γ := Weil h) deg (fun g => Real.log ‖(μ i g : ℂ)‖ - Real.log ‖(μ j g : ℂ)‖) deg_mul ?_ (frob h)
-      deg_frob (Real.log_pos hq1) ?_ s hs k ?_
+    refine int_zero (Γ := Weil h) deg
+      (fun g => Real.log ‖(μ i g : ℂ)‖ - Real.log ‖(μ j g : ℂ)‖)
+      deg_mul ?_ (frob h) deg_frob (Real.log_pos hq1) ?_ s hs k ?_
     · intro a b
       simp only [map_mul, Units.val_mul, norm_mul]
       rw [Real.log_mul (hpos i a).ne' (hpos i b).ne', Real.log_mul (hpos j a).ne' (hpos j b).ne']
@@ -266,88 +346,125 @@ theorem UpperTheory.V.Z.Win.RR.purLocA_alt :
       push_cast
       ring
   refine ⟨inc s, hs1, fun i j hij N hN0 e => hij ?_⟩
-  have hn := ratio_lt x _ (fun i => ha.smooth (hω i).smooth) hxp ht (hor.imp_left fun hne i j => by
-    by_contra hij
-    simp only [not_exists, not_not, hμ] at hij
-    obtain ⟨ha, h1⟩ := UpperTheory.continuous_character_compact_unit_values F Ω l ι w A h hw (χ i * (χ j)⁻¹) (1 + m j - m i)
-      (Units.continuous_val.comp ((hχc i).mul (hχc j).inv)) (fun σ => by
-        have h2 := hij σ
-        have h3 : ι (χ j (inc σ) : Qbar l) ≠ 0 := (map_ne_zero ι).mpr (Units.ne_zero _)
-        have h4 : ((normV w : ℕ) : ℂ) ^ (m i * deg σ) ≠ 0 := zpow_ne_zero _ hq
-        change ι ((χ i (inc σ) * (χ j (inc σ))⁻¹ : (Qbar l)ˣ) : Qbar l) = _
-        rw [Units.val_mul, Units.val_inv_eq_inv_val, map_mul, map_inv₀, sub_mul, add_mul, one_mul, zpow_sub₀ hq,
-          zpow_add₀ hq, mul_inv_eq_iff_eq_mul₀ h3, div_mul_eq_mul_div, eq_div_iff h4, mul_comm, mul_assoc]
-        exact h2)
-    refine hne i j ?_
-    have h5 : χ i = χ j := mul_inv_eq_one.mp h1
-    have h6 : -m j = 1 + -m i := by omega
-    simp only [χ] at h5
-    rw [h6, zpow_add, zpow_one, ← mul_assoc] at h5
-    exact mul_right_cancel h5) i j
-  have h7 : ε (inc s) = 1 := congrArg (Units.map ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom).toMonoidHom) hs1 |>.trans
-    (map_one _)
+  have hn :=
+    ratio_lt x _
+      (fun i => ha.smooth (hω i).smooth)
+      hxp ht
+      (hor.imp_left fun hne i j => by
+        by_contra hij
+        simp only [not_exists, not_not, hμ] at hij
+        obtain ⟨ha, h1⟩ :=
+          UpperTheory.continuous_character_compact_unit_values F Ω l ι w A h hw (χ i * (χ j)⁻¹)
+            (1 + m j - m i) (Units.continuous_val.comp ((hχc i).mul (hχc j).inv))
+            (fun σ => by
+              have h2 := hij σ
+              have h3 : ι (χ j (inc σ) : Qbar l) ≠ 0 := (map_ne_zero ι).mpr (Units.ne_zero _)
+              have h4 : ((normV w : ℕ) : ℂ) ^ (m i * deg σ) ≠ 0 := zpow_ne_zero _ hq
+              change ι ((χ i (inc σ) * (χ j (inc σ))⁻¹ : (Qbar l)ˣ) : Qbar l) = _
+              rw [Units.val_mul, Units.val_inv_eq_inv_val, map_mul, map_inv₀, sub_mul, add_mul,
+                one_mul, zpow_sub₀ hq, zpow_add₀ hq, mul_inv_eq_iff_eq_mul₀ h3, div_mul_eq_mul_div,
+                eq_div_iff h4, mul_comm, mul_assoc]
+              exact h2)
+        refine hne i j ?_
+        have h5 : χ i = χ j := mul_inv_eq_one.mp h1
+        have h6 : - m j = 1 + - m i := by omega
+        simp only [χ] at h5
+        rw [h6, zpow_add, zpow_one, ← mul_assoc] at h5
+        exact mul_right_cancel h5)
+      i j
+  have h7 : ε (inc s) = 1 :=
+    congrArg (Units.map ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom).toMonoidHom) hs1
+      |>.trans (map_one _)
   have h8 : ∀ i, χ i (inc s) = ψ i (inc s) := fun i => by simp [χ, h7]
   have h9 : ‖ι (ψ i (inc s) : Qbar l)‖ = ‖ι (ψ j (inc s) : Qbar l)‖ := by
     refine (pow_left_inj₀ (norm_nonneg _) (norm_nonneg _) hN0.ne').1 ?_
-    rw [← norm_pow, ← norm_pow, ← map_pow, ← map_pow, ← Units.val_pow_eq_pow_val, ← Units.val_pow_eq_pow_val]
+    rw [← norm_pow, ← norm_pow, ← map_pow, ← map_pow, ← Units.val_pow_eq_pow_val,
+      ← Units.val_pow_eq_pow_val]
     exact congrArg (fun u : (Qbar l)ˣ => ‖ι (u : Qbar l)‖) e
-  have h0 : ‖ι (ψ j (inc s) : Qbar l)‖ ≠ 0 := norm_ne_zero_iff.2 ((map_ne_zero ι).mpr (Units.ne_zero _))
+  have h0 : ‖ι (ψ j (inc s) : Qbar l)‖ ≠ 0 :=
+    norm_ne_zero_iff.2 ((map_ne_zero ι).mpr (Units.ne_zero _))
   have hq1 : (1 : ℝ) < (normV w : ℕ) := by exact_mod_cast one_lt_normV w
   refine hm.injective (sub_eq_zero.1 (hn s hs (m i - m j) ?_))
-  rw [hμ, hμ, h8, h8, norm_mul, norm_mul, h9, norm_zpow, norm_zpow, Complex.norm_natCast, ← mul_assoc,
-    ← zpow_add₀ (zero_lt_one.trans hq1).ne']
+  rw [hμ, hμ, h8, h8, norm_mul, norm_mul, h9, norm_zpow, norm_zpow, Complex.norm_natCast,
+    ← mul_assoc, ← zpow_add₀ (zero_lt_one.trans hq1).ne']
   congr 2
   ring
 namespace UpperTheory.V.Z.Win.RR
-theorem free_core_alt (PH : _root_.UpperTheory.V.Af.HypothesesH') (F Ω : Type) [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    (l : ℕ) [Fact l.Prime] (hl : l ≠ 2) (ι : Qbar l ≃+* ℂ) (n : ℕ) (hn : 1 ≤ n) (r : G F Ω →* GL (Fin n) (Qbar l)) (hr : Continuous r)
-    (π : CuspSub F n) (hreg : (CG.mk π).IsRegAlg) (hpol : ∃ χ, GlobalTheory.ContraPair.PolarizedPair π χ) (hatt : AttC ι r π) (hW : WitA ι r)
-    (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w) (hw : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal)
+theorem free_core_alt
+    (PH : _root_.UpperTheory.V.Af.HypothesesH')
+    (F Ω : Type) [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (l : ℕ) [Fact l.Prime]
+    (hl : l ≠ 2)
+    (ι : Qbar l ≃+* ℂ) (n : ℕ) (hn : 1 ≤ n) (r : G F Ω →* GL (Fin n) (Qbar l)) (hr : Continuous r)
+    (π : CuspSub F n) (hreg : (CG.mk π).IsRegAlg)
+    (hpol : ∃ χ, GlobalTheory.ContraPair.PolarizedPair π χ) (hatt : AttC ι r π) (hW : WitA ι r)
+    (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω) (h : IsPlaceOver A w)
+    (hw : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal)
     (ψ : Fin n → Dec (F := F) A →* (Qbar l)ˣ) (m : Fin n → ℤ) (k : ℕ)
     (hflag : W.HasFlag (r.comp (Dec (F := F) A).subtype) ψ) (hm : StrictAnti m) (hk : 0 < k)
-    (hine : ∀ i (g : Dec (F := F) A), (g : G F Ω) ∈ Ine (F := F) A → (ψ i g * cycBar F Ω l g ^ (-m i)) ^ k = 1)
-    (hgen : ∀ i j, ψ i ≠ ψ j * (cycBar F Ω l).comp (Dec (F := F) A).subtype) :
-    ∃ g : Dec (F := F) A, cycZ F Ω l g = 1 ∧ Pr.FreeRatios fun i => ψ i g := by
+    (hine : ∀ i (g : Dec (F := F) A),
+      (g : G F Ω) ∈ Ine (F := F) A → (ψ i g * cycBar F Ω l g ^ (- m i)) ^ k = 1)
+    (hgen : ∀ i j, ψ i ≠ ψ j * (cycBar F Ω l).comp (Dec (F := F) A).subtype)
+    : ∃ g : Dec (F := F) A, cycZ F Ω l g = 1 ∧ Pr.FreeRatios fun i => ψ i g := by
   have P := PH.toClassicalTheorems
   have hU := local_condition_of_flag_of_characters_not_cyclotomic_shift h hflag hgen
   obtain ⟨⟨σ, hσ⟩, -⟩ := _root_.UpperTheory.V.Af.local_comp_complex_of_printed_results P F n π w
   obtain ⟨rc, hrc⟩ := recTExists F Ω A w h
   obtain ⟨-, g1, g2⟩ := guard_of plainRec hreg hatt hW (Or.inr (Or.inl hU)) hrc hσ
-  obtain ⟨HT, -, hloc⟩ := compatTOf (_root_.UpperTheory.Gal.SV.rowOf' P.litN.aut.gal) plainRec F Ω l ι n hn r π hr hreg hpol hatt
+  obtain ⟨HT, -, hloc⟩ :=
+    compatTOf (_root_.UpperTheory.Gal.SV.rowOf' P.litN.aut.gal) plainRec F Ω l ι n hn r π hr hreg
+      hpol hatt
   obtain ⟨t, ht⟩ := hW.2 π hreg hatt
   have hc := ((hloc w σ hσ).1 A h rc hrc).2
   exact _root_.UpperTheory.V.Z.Win.RR.purLocA_alt P F Ω l hl ι n r hr w A h hw (rc (algNorm σ))
     (fun O _ _ _ Bw hj => ⟨(hc O Bw hj ⟨g1, g2⟩).1, Lev.SsCmp.of_eq (hc O Bw hj ⟨g1, g2⟩).2⟩)
-    (fun _ => UpperTheory.Gal.SV.ratioT F Ω A w h rc hrc n π t (ht w (Or.inr (hW.1 w hw hU))) σ hσ) ψ m k hflag hm hk hine (Or.inl hgen)
-theorem exists_cycZ_eq_one_freeRatios_of_ne_mul_cycBar :
-    _root_.UpperTheory.V.Af.HypothesesH' → ∀ (F Ω : Type) [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 →
-        ∀ (ι : Qbar l ≃+* ℂ) (n : ℕ), 1 ≤ n → ∀ r : G F Ω →* GL (Fin n) (Qbar l), Continuous r → IsAutCsdA ι r →
-        ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∀ (ψ : Fin n → Dec (F := F) A →* (Qbar l)ˣ) (m : Fin n → ℤ) (k : ℕ),
-          W.HasFlag (r.comp (Dec (F := F) A).subtype) ψ → StrictAnti m → 0 < k →
-          (∀ i (g : Dec (F := F) A), (g : G F Ω) ∈ Ine (F := F) A → (ψ i g * cycBar F Ω l g ^ (-m i)) ^ k = 1) →
-          (∀ i j, ψ i ≠ ψ j * (cycBar F Ω l).comp (Dec (F := F) A).subtype) →
-          ∃ g : Dec (F := F) A, cycZ F Ω l g = 1 ∧ Pr.FreeRatios fun i => ψ i g := by
+    (fun _ => UpperTheory.Gal.SV.ratioT F Ω A w h rc hrc n π t (ht w (Or.inr (hW.1 w hw hU))) σ hσ)
+    ψ m k hflag hm hk hine (Or.inl hgen)
+theorem exists_cycZ_eq_one_freeRatios_of_ne_mul_cycBar
+    : _root_.UpperTheory.V.Af.HypothesesH'
+      → ∀ (F Ω : Type) [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω]
+          [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime],
+        l ≠ 2
+          → ∀ (ι : Qbar l ≃+* ℂ) (n : ℕ),
+            1 ≤ n
+              → ∀ r : G F Ω →* GL (Fin n) (Qbar l),
+                Continuous r → IsAutCsdA ι r
+                  → ∀ A : ValuationSubring Ω,
+                    A.valuation (l : Ω) < 1
+                      → ∀ (ψ : Fin n → Dec (F := F) A →* (Qbar l)ˣ) (m : Fin n → ℤ) (k : ℕ),
+                        W.HasFlag (r.comp (Dec (F := F) A).subtype) ψ → StrictAnti m → 0 < k
+                          → (∀ i (g : Dec (F := F) A),
+                            (g : G F Ω) ∈ Ine (F := F) A
+                              → (ψ i g * cycBar F Ω l g ^ (- m i)) ^ k = 1)
+                          → (∀ i j, ψ i ≠ ψ j * (cycBar F Ω l).comp (Dec (F := F) A).subtype)
+                          → ∃ g : Dec (F := F) A,
+                            cycZ F Ω l g = 1 ∧ Pr.FreeRatios fun i => ψ i g := by
   intro PH F Ω _ _ _ _ _ _ l _ hl ι n hn r hr haut A hA ψ m k hflag hm hk hine hgen
   obtain ⟨⟨π, hreg, hcsd, hatt⟩, hW⟩ := haut
-  have hpol : GlobalTheory.ContraPair.PolarizedPair π (quadChar F ^ n) :=
-    ⟨fun v => by
+  have hpol : GlobalTheory.ContraPair.PolarizedPair π (quadChar F ^ n) := ⟨
+    fun v => by
       have e : (quadChar F ^ n).locInf v (-1) = (quadChar F).locInf v (-1) ^ n := rfl
       rw [e, quadChar_locInf],
-     by rw [map_pow, compNorm_quadChar, one_pow]; exact (GlobalTheory.ContraPair.dualIsConjBy_one π).2 hcsd⟩
+    by
+      rw [map_pow, compNorm_quadChar, one_pow]
+      exact (GlobalTheory.ContraPair.dualIsConjBy_one π).2 hcsd
+  ⟩
   have hplace : ∃ w : HeightOneSpectrum (𝓞 F), IsPlaceOver A w ∧ (l : 𝓞 F) ∈ w.asIdeal := by
-    have hint : A.valuation.Integers A :=
-      { hom_inj := Subtype.coe_injective
-        map_le_one := fun a => A.valuation_le_one a
-        exists_of_le_one := fun r hr => ⟨⟨r, (A.valuation_le_one_iff r).1 hr⟩, rfl⟩ }
+    have hint : A.valuation.Integers A := {
+      hom_inj := Subtype.coe_injective
+      map_le_one := fun a => A.valuation_le_one a
+      exists_of_le_one := fun r hr => ⟨⟨r, (A.valuation_le_one_iff r).1 hr⟩, rfl⟩
+    }
     have hle : ∀ x : 𝓞 F, A.valuation (algebraMap F Ω (x : F)) ≤ 1 := by
       intro x
       have h1 : IsIntegral ℤ (algebraMap F Ω (x : F)) :=
         (RingOfIntegers.isIntegral_coe x).map (IsScalarTower.toAlgHom ℤ F Ω)
       exact hint.mem_of_integral (h1.tower_top (A := A))
-    let f : 𝓞 F →+* A := (algebraMap (𝓞 F) Ω).codRestrict A
-      (fun x => (A.valuation_le_one_iff _).1 (by
-        rw [IsScalarTower.algebraMap_apply (𝓞 F) F Ω]
-        exact hle x))
+    let f : 𝓞 F →+* A :=
+      (algebraMap (𝓞 F) Ω).codRestrict A (fun x =>
+        (A.valuation_le_one_iff _).1 (by
+          rw [IsScalarTower.algebraMap_apply (𝓞 F) F Ω]
+          exact hle x))
     let I := (IsLocalRing.maximalIdeal A).comap f
     have hmem (x : 𝓞 F) : x ∈ I ↔ A.valuation (algebraMap F Ω (x : F)) < 1 := by
       change f x ∈ IsLocalRing.maximalIdeal A ↔ _
@@ -364,27 +481,40 @@ theorem exists_cycZ_eq_one_freeRatios_of_ne_mul_cycBar :
       exact (Fact.out : l.Prime).ne_zero (by exact_mod_cast hpI)
     exact ⟨⟨I, Ideal.IsPrime.comap f, hne⟩, fun x => (hmem x).symm, hpI⟩
   obtain ⟨w, h, hw⟩ := hplace
-  exact _root_.UpperTheory.V.Z.Win.RR.free_core_alt PH F Ω l hl ι n hn r hr π hreg ⟨_, hpol⟩ hatt (hW hr) w A h hw ψ m k hflag hm hk hine hgen
+  exact _root_.UpperTheory.V.Z.Win.RR.free_core_alt PH F Ω l hl ι n hn r hr π hreg ⟨_, hpol⟩ hatt
+    (hW hr) w A h hw ψ m k hflag hm hk hine hgen
 end UpperTheory.V.Z.Win.RR
 open UpperTheory.V.Z.Win.RR in
-theorem UpperTheory.V.Z.Win.RR.freeAt_of_autPA_of_unl_of_finrank_eq_two :
-    _root_.UpperTheory.V.Af.HypothesesH' → ∀ (K Ω : Type) [Field K] [NumberField K] [IsCMField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω], Module.finrank ℚ K = 2 → ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (ι : Qbar l ≃+* ℂ) (n : ℕ), 2 ≤ n → ∀ (r : G K Ω →* GL (Fin n) (Qbar l)) (M : ℕ) (m : Fin n → ℤ), 1 ≤ M → StrictAnti m → Continuous r → AutPA ι r → Th.Unl l M m r → FreeAt l r := by
+theorem UpperTheory.V.Z.Win.RR.freeAt_of_autPA_of_unl_of_finrank_eq_two
+    : _root_.UpperTheory.V.Af.HypothesesH'
+      → ∀ (K Ω : Type) [Field K] [NumberField K] [IsCMField K] [Field Ω] [Algebra K Ω]
+          [IsAlgClosure K Ω],
+        Module.finrank ℚ K = 2
+          → ∀ (l : ℕ) [Fact l.Prime],
+            l ≠ 2
+              → ∀ (ι : Qbar l ≃+* ℂ) (n : ℕ),
+                2 ≤ n
+                  → ∀ (r : G K Ω →* GL (Fin n) (Qbar l)) (M : ℕ) (m : Fin n → ℤ),
+                    1 ≤ M → StrictAnti m → Continuous r → AutPA ι r → Th.Unl l M m r
+                      → FreeAt l r := by
   intro PH K Ω _ _ _ _ _ _ hK l _ hl ι n hn r M m hM hm hr haut hU B hB
   have P : _root_.UpperTheory.V.Af.Hypotheses' := PH.toClassicalTheorems
   have hplace : ∃ w : HeightOneSpectrum (𝓞 K), IsPlaceOver B w ∧ (l : 𝓞 K) ∈ w.asIdeal := by
-    have hint : B.valuation.Integers B :=
-      { hom_inj := Subtype.coe_injective
-        map_le_one := fun a => B.valuation_le_one a
-        exists_of_le_one := fun r hr => ⟨⟨r, (B.valuation_le_one_iff r).1 hr⟩, rfl⟩ }
+    have hint : B.valuation.Integers B := {
+      hom_inj := Subtype.coe_injective
+      map_le_one := fun a => B.valuation_le_one a
+      exists_of_le_one := fun r hr => ⟨⟨r, (B.valuation_le_one_iff r).1 hr⟩, rfl⟩
+    }
     have hle : ∀ x : 𝓞 K, B.valuation (algebraMap K Ω (x : K)) ≤ 1 := by
       intro x
       have h1 : IsIntegral ℤ (algebraMap K Ω (x : K)) :=
         (RingOfIntegers.isIntegral_coe x).map (IsScalarTower.toAlgHom ℤ K Ω)
       exact hint.mem_of_integral (h1.tower_top (A := B))
-    let f : 𝓞 K →+* B := (algebraMap (𝓞 K) Ω).codRestrict B
-      (fun x => (B.valuation_le_one_iff _).1 (by
-        rw [IsScalarTower.algebraMap_apply (𝓞 K) K Ω]
-        exact hle x))
+    let f : 𝓞 K →+* B :=
+      (algebraMap (𝓞 K) Ω).codRestrict B (fun x =>
+        (B.valuation_le_one_iff _).1 (by
+          rw [IsScalarTower.algebraMap_apply (𝓞 K) K Ω]
+          exact hle x))
     let I := (IsLocalRing.maximalIdeal B).comap f
     have hmem (x : 𝓞 K) : x ∈ I ↔ B.valuation (algebraMap K Ω (x : K)) < 1 := by
       change f x ∈ IsLocalRing.maximalIdeal B ↔ _
@@ -404,15 +534,16 @@ theorem UpperTheory.V.Z.Win.RR.freeAt_of_autPA_of_unl_of_finrank_eq_two :
   obtain ⟨⟨π, hreg, hpol, hatt⟩, hW⟩ := haut
   obtain ⟨A, hA, κ, hF, hunl⟩ := hU w hw
   obtain ⟨χ, hχ, hflag, hκ⟩ := id hF
-  have pow_eq_one_of_kills {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
-      {M : ℕ} (hM : 1 ≤ M) : ∃ k : ℕ, 0 < k ∧ ∀ (C : Type) [Monoid C] (χ : G F Ω →* C), KillsMu M χ → ∀ s, χ s ^ k = 1 := by
+  have pow_eq_one_of_kills {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {M : ℕ} (hM : 1 ≤ M)
+      : ∃ k : ℕ,
+        0 < k ∧ ∀ (C : Type) [Monoid C] (χ : G F Ω →* C), KillsMu M χ → ∀ s, χ s ^ k = 1 := by
     classical
     refine ⟨M.factorial, Nat.factorial_pos M, ?_⟩
     intro C _ χ hχ s
     rw [← map_pow]
     refine hχ _ (fun ζ hζ => ?_)
-    have hmem : ∀ z : Ω, z ∈ Polynomial.nthRootsFinset M (1 : Ω) ↔ z ^ M = 1 :=
-      fun z => Polynomial.mem_nthRootsFinset hM 1
+    have hmem : ∀ z : Ω, z ∈ Polynomial.nthRootsFinset M (1 : Ω) ↔ z ^ M = 1 := fun z =>
+      Polynomial.mem_nthRootsFinset hM 1
     have hcard : (Polynomial.nthRootsFinset M (1 : Ω)).card ≤ M :=
       (Multiset.toFinset_card_le _).trans (Polynomial.card_nthRoots _ _)
     let σ : Equiv.Perm (Polynomial.nthRootsFinset M (1 : Ω)) :=
@@ -424,8 +555,9 @@ theorem UpperTheory.V.Z.Win.RR.freeAt_of_autPA_of_unl_of_finrank_eq_two :
       rw [Fintype.card_perm, Fintype.card_coe] at h1
       obtain ⟨c, hc⟩ := Nat.factorial_dvd_factorial hcard
       rw [hc, pow_mul, h1, one_pow]
-    have hit : ∀ (m : ℕ) (z : Polynomial.nthRootsFinset M (1 : Ω)),
-        (((σ ^ m) z : Polynomial.nthRootsFinset M (1 : Ω)) : Ω) = (s ^ m) (z : Ω) := by
+    have hit
+        : ∀ (m : ℕ) (z : Polynomial.nthRootsFinset M (1 : Ω)),
+          (((σ ^ m) z : Polynomial.nthRootsFinset M (1 : Ω)) : Ω) = (s ^ m) (z : Ω) := by
       intro m
       induction m with
       | zero =>
@@ -440,24 +572,31 @@ theorem UpperTheory.V.Z.Win.RR.freeAt_of_autPA_of_unl_of_finrank_eq_two :
     exact h2.symm
   obtain ⟨k, hk, hpow⟩ := pow_eq_one_of_kills (F := K) (Ω := Ω) hM
   have hflag' : W.HasFlag (r.comp (Dec (F := K) A).subtype) κ := hflag
-  obtain ⟨g, hg, hfree⟩ := _root_.UpperTheory.V.Z.Win.RR.free_core_alt PH K Ω l hl ι n (by omega) r hr π hreg hpol hatt (hW hr) w A hA hw κ m k hflag' hm hk
-    (fun i s hs => by
-      rw [hκ i s hs, zpow_neg, mul_inv_cancel_comm]
-      exact hpow _ _ (hχ i) _) hunl
+  obtain ⟨g, hg, hfree⟩ :=
+    _root_.UpperTheory.V.Z.Win.RR.free_core_alt PH K Ω l hl ι n (by omega) r hr π hreg hpol hatt
+      (hW hr) w A hA hw κ m k hflag' hm hk
+      (fun i s hs => by
+        rw [hκ i s hs, zpow_neg, mul_inv_cancel_comm]
+        exact hpow _ _ (hχ i) _)
+      hunl
   obtain ⟨t, rfl⟩ := exists_smul_eq_of_isPlaceOver (F := K) hA hBw
   refine ⟨t * g * t⁻¹, ?_, ?_, fun i => κ i g, hfree, ?_⟩
   · have h1 : (g : G K Ω) • A = A := g.2
     show (t * (g : G K Ω) * t⁻¹) • t • A = t • A
     rw [mul_smul, mul_smul, inv_smul_smul, h1]
   · rw [map_mul, map_mul, map_inv, mul_inv_cancel_comm, hg]
-  · have h1 : ((r t * r (g : G K Ω) * (r t)⁻¹ : GL (Fin n) (Qbar l)) :
-        Matrix (Fin n) (Fin n) (Qbar l)).charpoly = ∏ i, (X - C (κ i g : Qbar l)) := by
+  · have h1
+        : ((r t * r (g : G K Ω) * (r t)⁻¹ : GL (Fin n) (Qbar l))
+            : Matrix (Fin n) (Fin n) (Qbar l)).charpoly
+          = ∏ i, (X - C (κ i g : Qbar l)) := by
       obtain ⟨b, hb⟩ := hflag'
-      rw [show r t * r (g : G K Ω) * (r t)⁻¹ =
-        (r t * b⁻¹) * (b * r (g : G K Ω) * b⁻¹) * (r t * b⁻¹)⁻¹ by group]
+      rw [show r t * r (g : G K Ω) * (r t)⁻¹
+          = (r t * b⁻¹) * (b * r (g : G K Ω) * b⁻¹) * (r t * b⁻¹)⁻¹ by
+        group]
       rw [Units.val_mul, Units.val_mul, Matrix.coe_units_inv, Matrix.charpoly_units_conj]
-      change (↑(b * (r.comp (Dec (F := K) A).subtype) g * b⁻¹) :
-        Matrix (Fin n) (Fin n) (Qbar l)).charpoly = _
+      change (↑(b * (r.comp (Dec (F := K) A).subtype) g * b⁻¹)
+          : Matrix (Fin n) (Fin n) (Qbar l)).charpoly
+        = _
       rw [Matrix.charpoly_of_isUpperTriangular _ (fun i j hij => (hb g).1 i j hij)]
       exact Finset.prod_congr rfl (fun i _ => by rw [(hb g).2 i])
     rw [← h1]

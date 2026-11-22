@@ -22,12 +22,15 @@ namespace GlobalTheory.CompanionTheory.Hypotheses₂.TDSwap
 
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL.SupportUnique
 
-variable {G H V Y Y' W₀ W₁ : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup Y] [Module ℂ Y]
-  [AddCommGroup Y'] [Module ℂ Y'] [AddCommGroup W₀] [Module ℂ W₀] [AddCommGroup W₁] [Module ℂ W₁]
+variable
+  {G H V Y Y' W₀ W₁ : Type}
+  [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup Y] [Module ℂ Y] [AddCommGroup Y']
+  [Module ℂ Y'] [AddCommGroup W₀] [Module ℂ W₀] [AddCommGroup W₁] [Module ℂ W₁]
 
-theorem exists_quot_map {μ : Representation ℂ G V} {τ : Representation ℂ G Y}
-    (A T : Subrepresentation μ) (hT : T = ⊤) (E : (subQuot T A).Equiv τ) :
-    ∃ q : μ.IntertwiningMap τ, Function.Surjective q ∧ ∀ v, q v = 0 ↔ v ∈ A.toSubmodule := by
+theorem exists_quot_map
+    {μ : Representation ℂ G V} {τ : Representation ℂ G Y}
+    (A T : Subrepresentation μ) (hT : T = ⊤) (E : (subQuot T A).Equiv τ)
+    : ∃ q : μ.IntertwiningMap τ, Function.Surjective q ∧ ∀ v, q v = 0 ↔ v ∈ A.toSubmodule := by
   have hv : ∀ v : V, v ∈ T.toSubmodule := by
     subst hT
     intro v
@@ -54,7 +57,10 @@ theorem exists_quot_map {μ : Representation ℂ G V} {τ : Representation ℂ G
     rw [hL]
     constructor
     · intro h0
-      have h1 : (Submodule.Quotient.mk (j v) : T.toSubmodule ⧸ A.toSubmodule.comap T.toSubmodule.subtype) = 0 := by
+      have h1
+          : (Submodule.Quotient.mk (j v)
+              : T.toSubmodule ⧸ A.toSubmodule.comap T.toSubmodule.subtype)
+            = 0 := by
         rw [← E.symm_apply_apply (Submodule.Quotient.mk (j v))]
         change E.symm (E.toIntertwiningMap (Submodule.Quotient.mk (j v))) = 0
         rw [h0]
@@ -62,15 +68,19 @@ theorem exists_quot_map {μ : Representation ℂ G V} {τ : Representation ℂ G
       rw [Submodule.Quotient.mk_eq_zero, Submodule.mem_comap] at h1
       exact h1
     · intro h0
-      have h1 : (Submodule.Quotient.mk (j v) : T.toSubmodule ⧸ A.toSubmodule.comap T.toSubmodule.subtype) = 0 := by
+      have h1
+          : (Submodule.Quotient.mk (j v)
+              : T.toSubmodule ⧸ A.toSubmodule.comap T.toSubmodule.subtype)
+            = 0 := by
         rw [Submodule.Quotient.mk_eq_zero, Submodule.mem_comap]
         exact h0
       rw [h1]
       exact map_zero E.toIntertwiningMap
 
-theorem exists_sub_equiv {μ : Representation ℂ G V} {τ : Representation ℂ G Y}
-    (X B : Subrepresentation μ) (hB : B = ⊥) (E : (subQuot X B).Equiv τ) :
-    Nonempty (X.toRepresentation.Equiv τ) := by
+theorem exists_sub_equiv
+    {μ : Representation ℂ G V} {τ : Representation ℂ G Y}
+    (X B : Subrepresentation μ) (hB : B = ⊥) (E : (subQuot X B).Equiv τ)
+    : Nonempty (X.toRepresentation.Equiv τ) := by
   subst hB
   let m : X.toRepresentation.IntertwiningMap (subQuot X ⊥) :=
     ⟨Submodule.mkQ _, fun g => LinearMap.ext fun _ => rfl⟩
@@ -92,11 +102,13 @@ theorem exists_sub_equiv {μ : Representation ℂ G V} {τ : Representation ℂ 
   exact ⟨Representation.Equiv.mk' f (Function.surjInv bij.2) (Function.leftInverse_surjInv bij)
     (Function.rightInverse_surjInv bij.2)⟩
 
-theorem central_dichotomy {μ : Representation ℂ G V} {τ : Representation ℂ G Y} {ρ : Representation ℂ G Y'}
+theorem central_dichotomy
+    {μ : Representation ℂ G V} {τ : Representation ℂ G Y} {ρ : Representation ℂ G Y'}
     (X : Subrepresentation μ) (a : X.toRepresentation.Equiv τ) (q : μ.IntertwiningMap ρ)
-    (hq : ∀ v, q v = 0 ↔ v ∈ X.toSubmodule) (z : G) (hz : ∀ g, g * z = z * g) (c : ℂ)
-    (hc : ∀ y, ρ z y = c • y) :
-    (∃ (φ : μ.IntertwiningMap τ) (v : V), φ v ≠ 0) ∨ ∀ v, μ z v = c • v := by
+    (hq : ∀ v, q v = 0 ↔ v ∈ X.toSubmodule)
+    (z : G) (hz : ∀ g, g * z = z * g)
+    (c : ℂ) (hc : ∀ y, ρ z y = c • y)
+    : (∃ (φ : μ.IntertwiningMap τ) (v : V), φ v ≠ 0) ∨ ∀ v, μ z v = c • v := by
   have hcomm : ∀ (g : G) (v : V), μ z (μ g v) = μ g (μ z v) := by
     intro g v
     rw [← Module.End.mul_apply, ← map_mul, ← hz g, map_mul, Module.End.mul_apply]
@@ -133,52 +145,64 @@ theorem central_dichotomy {μ : Representation ℂ G V} {τ : Representation ℂ
     rw [hP] at h2
     exact sub_eq_zero.1 h2
 
-def imageSub (ψ : H →* G) (A : Representation ℂ H W₀) (μ : Representation ℂ G V)
-    (hdec : ∀ g, ∃ (h : H) (g' : G), g = ψ h * g' ∧ ∀ x, ψ x * g' = g' * ψ x) : Subrepresentation μ where
+def imageSub
+    (ψ : H →* G)
+    (A : Representation ℂ H W₀) (μ : Representation ℂ G V)
+    (hdec : ∀ g, ∃ (h : H) (g' : G), g = ψ h * g' ∧ ∀ x, ψ x * g' = g' * ψ x)
+    : Subrepresentation μ where
   toSubmodule := Submodule.span ℂ {u | ∃ (ι : A.IntertwiningMap (μ.comp ψ)) (w : W₀), ι w = u}
   apply_mem_toSubmodule g v hv := by
     obtain ⟨h, g', rfl, hg'⟩ := hdec g
     induction hv using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨ι, w, rfl⟩ := hx
-      refine Submodule.subset_span ⟨⟨μ g' ∘ₗ ι.toLinearMap, fun x => LinearMap.ext fun w => ?_⟩, A h w, ?_⟩
+      refine Submodule.subset_span
+        ⟨⟨μ g' ∘ₗ ι.toLinearMap, fun x => LinearMap.ext fun w => ?_⟩, A h w, ?_⟩
       · show μ g' (ι (A x w)) = μ (ψ x) (μ g' (ι w))
         have h1 : ι (A x w) = μ (ψ x) (ι w) := ι.isIntertwining _ _ x w
         rw [h1, ← Module.End.mul_apply, ← map_mul, ← hg', map_mul, Module.End.mul_apply]
       · show μ g' (ι (A h w)) = μ (ψ h * g') (ι w)
         have h1 : ι (A h w) = μ (ψ h) (ι w) := ι.isIntertwining _ _ h w
         rw [h1, ← Module.End.mul_apply, ← map_mul, ← hg']
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [LinearMap.map_add (μ (ψ h * g'))]
       exact add_mem hx hy
     | smul r x _ hx => rw [map_smul]; exact Submodule.smul_mem _ r hx
 
-theorem exists_map_of_image (ψ : H →* G) {A : Representation ℂ H W₀} {B : Representation ℂ H W₁}
-    (hB : B.IsIrreducible) (hAB : ¬ IsSubquotient B A) {μ : Representation ℂ G V} {τ : Representation ℂ G Y}
-    {ρ : Representation ℂ G Y'} (hτ : τ.IsIrreducible) (hρ : ρ.IsIrreducible)
-    (X : Subrepresentation μ) (a : X.toRepresentation.Equiv τ) (q : μ.IntertwiningMap ρ)
-    (hqs : Function.Surjective q) (hq : ∀ v, q v = 0 ↔ v ∈ X.toSubmodule)
-    (hBτ : IsSubquotient B (τ.comp ψ : Representation ℂ H Y))
-    (ι₀ : A.IntertwiningMap (μ.comp ψ)) (hι₀ : ι₀ ≠ 0)
-    (hdec : ∀ g, ∃ (h : H) (g' : G), g = ψ h * g' ∧ ∀ x, ψ x * g' = g' * ψ x) :
-    ∃ (φ : μ.IntertwiningMap τ) (v : V), φ v ≠ 0 := by
+theorem exists_map_of_image
+    (ψ : H →* G)
+    {A : Representation ℂ H W₀} {B : Representation ℂ H W₁}
+    (hB : B.IsIrreducible) (hAB : ¬ IsSubquotient B A)
+    {μ : Representation ℂ G V} {τ : Representation ℂ G Y} {ρ : Representation ℂ G Y'}
+    (hτ : τ.IsIrreducible) (hρ : ρ.IsIrreducible) (X : Subrepresentation μ)
+    (a : X.toRepresentation.Equiv τ) (q : μ.IntertwiningMap ρ) (hqs : Function.Surjective q)
+    (hq : ∀ v, q v = 0 ↔ v ∈ X.toSubmodule)
+    (hBτ : IsSubquotient B (τ.comp ψ : Representation ℂ H Y)) (ι₀ : A.IntertwiningMap (μ.comp ψ))
+    (hι₀ : ι₀ ≠ 0)
+    (hdec : ∀ g, ∃ (h : H) (g' : G), g = ψ h * g' ∧ ∀ x, ψ x * g' = g' * ψ x)
+    : ∃ (φ : μ.IntertwiningMap τ) (v : V), φ v ≠ 0 := by
   classical
   haveI := hτ
   haveI := hρ
   let W' := imageSub ψ A μ hdec
-  have hWspan : W'.toSubmodule =
-      Submodule.span ℂ {u | ∃ (ι : A.IntertwiningMap (μ.comp ψ)) (w : W₀), ι w = u} := rfl
-  have hmemW : ∀ (ι : A.IntertwiningMap (μ.comp ψ)) (w : W₀), ι w ∈ W'.toSubmodule :=
-    fun ι w => Submodule.subset_span ⟨ι, w, rfl⟩
-  let P' : Subrepresentation τ :=
-    { toSubmodule := W'.toSubmodule.comap (X.toSubmodule.subtype ∘ₗ a.symm.toIntertwiningMap.toLinearMap)
-      apply_mem_toSubmodule := by
-        intro g y hy
-        rw [Submodule.mem_comap] at hy ⊢
-        show ((a.symm.toIntertwiningMap (τ g y) : X.toSubmodule) : V) ∈ W'.toSubmodule
-        rw [Representation.IntertwiningMap.isIntertwining _ _ a.symm.toIntertwiningMap g y]
-        exact W'.apply_mem_toSubmodule g hy }
+  have hWspan
+      : W'.toSubmodule
+        = Submodule.span ℂ {u | ∃ (ι : A.IntertwiningMap (μ.comp ψ)) (w : W₀), ι w = u} :=
+    rfl
+  have hmemW : ∀ (ι : A.IntertwiningMap (μ.comp ψ)) (w : W₀), ι w ∈ W'.toSubmodule := fun ι w =>
+    Submodule.subset_span ⟨ι, w, rfl⟩
+  let P' : Subrepresentation τ := {
+    toSubmodule :=
+      W'.toSubmodule.comap (X.toSubmodule.subtype ∘ₗ a.symm.toIntertwiningMap.toLinearMap)
+    apply_mem_toSubmodule := by
+      intro g y hy
+      rw [Submodule.mem_comap] at hy ⊢
+      show ((a.symm.toIntertwiningMap (τ g y) : X.toSubmodule) : V) ∈ W'.toSubmodule
+      rw [Representation.IntertwiningMap.isIntertwining _ _ a.symm.toIntertwiningMap g y]
+      exact W'.apply_mem_toSubmodule g hy
+  }
   rcases eq_bot_or_eq_top P' with hP | hP
   · have hXW0 : ∀ x : V, x ∈ X.toSubmodule → x ∈ W'.toSubmodule → x = 0 := by
       intro x hx hxW
@@ -208,7 +232,8 @@ theorem exists_map_of_image (ψ : H →* G) {A : Representation ℂ H W₀} {B :
     have hrange : r.range = ⊤ := by
       rcases eq_bot_or_eq_top r.range with h | h
       · exfalso
-        have hm : r ⟨ι₀ w0, hmemW ι₀ w0⟩ ∈ r.range.toSubmodule := LinearMap.mem_range_self r.toLinearMap _
+        have hm : r ⟨ι₀ w0, hmemW ι₀ w0⟩ ∈ r.range.toSubmodule :=
+          LinearMap.mem_range_self r.toLinearMap _
         rw [h] at hm
         have h0 : q (ι₀ w0) = 0 := (Submodule.mem_bot ℂ).1 hm
         exact hw0 (hXW0 _ ((hq _).1 h0) (hmemW ι₀ w0))
@@ -282,25 +307,33 @@ theorem exists_map_of_image (ψ : H →* G) {A : Representation ℂ H W₀} {B :
       have h2 : ((a.symm (a ⟨x, hx⟩) : X.toSubmodule) : V) ∈ W'.toSubmodule := h1
       rw [a.symm_apply_apply] at h2
       exact h2
-    let f : τ.IntertwiningMap W'.toRepresentation :=
-      ⟨LinearMap.codRestrict W'.toSubmodule (X.toSubmodule.subtype ∘ₗ a.symm.toIntertwiningMap.toLinearMap)
-        (fun y => hXW _ (a.symm y).2), fun g => by
-          refine LinearMap.ext fun y => ?_
-          apply Subtype.ext
-          show ((a.symm.toIntertwiningMap (τ g y) : X.toSubmodule) : V) =
-            μ g ((a.symm.toIntertwiningMap y : X.toSubmodule) : V)
-          rw [Representation.IntertwiningMap.isIntertwining _ _ a.symm.toIntertwiningMap g y]
-          rfl⟩
+    let f : τ.IntertwiningMap W'.toRepresentation := ⟨
+      LinearMap.codRestrict W'.toSubmodule
+        (X.toSubmodule.subtype ∘ₗ a.symm.toIntertwiningMap.toLinearMap)
+        (fun y => hXW _ (a.symm y).2),
+      fun g => by
+        refine LinearMap.ext fun y => ?_
+        apply Subtype.ext
+        show ((a.symm.toIntertwiningMap (τ g y) : X.toSubmodule) : V) =
+          μ g ((a.symm.toIntertwiningMap y : X.toSubmodule) : V)
+        rw [Representation.IntertwiningMap.isIntertwining _ _ a.symm.toIntertwiningMap g y]
+        rfl
+    ⟩
     have hfi : Function.Injective f := by
       intro y1 y2 h12
-      have h4 : ((f y1 : W'.toSubmodule) : V) = ((f y2 : W'.toSubmodule) : V) := congrArg Subtype.val h12
+      have h4 : ((f y1 : W'.toSubmodule) : V) = ((f y2 : W'.toSubmodule) : V) :=
+        congrArg Subtype.val h12
       have h3 : a.symm y1 = a.symm y2 := Subtype.ext h4
       rw [← a.apply_symm_apply y1, ← a.apply_symm_apply y2, h3]
-    have hsub1 : IsSubquotient τ W'.toRepresentation := GlobalTheory.SmGL.IsSubquotient.of_injective f hfi
+    have hsub1 : IsSubquotient τ W'.toRepresentation :=
+      GlobalTheory.SmGL.IsSubquotient.of_injective f hfi
     have hsub2 := GlobalTheory.LocGL.SupportUnique.isSubquotient_comp hsub1 ψ
     have hsub3 := GlobalTheory.SmGL.IsSubquotient.trans hBτ hsub2
-    have hspan : Submodule.span ℂ {u : W'.toSubmodule |
-        ∃ (ι : A.IntertwiningMap (W'.toRepresentation.comp ψ)) (w : W₀), ι w = u} = ⊤ := by
+    have hspan
+        : Submodule.span ℂ
+            {u : W'.toSubmodule |
+              ∃ (ι : A.IntertwiningMap (W'.toRepresentation.comp ψ)) (w : W₀), ι w = u}
+          = ⊤ := by
       apply Submodule.map_injective_of_injective W'.toSubmodule.injective_subtype
       rw [Submodule.map_span, Submodule.map_subtype_top]
       refine Eq.trans ?_ hWspan.symm
@@ -308,27 +341,47 @@ theorem exists_map_of_image (ψ : H →* G) {A : Representation ℂ H W₀} {B :
       ext u
       constructor
       · rintro ⟨u', ⟨ι, w, rfl⟩, rfl⟩
-        refine ⟨⟨W'.toSubmodule.subtype ∘ₗ ι.toLinearMap, fun g => LinearMap.ext fun w' => ?_⟩, w, rfl⟩
+        refine
+          ⟨⟨W'.toSubmodule.subtype ∘ₗ ι.toLinearMap, fun g => LinearMap.ext fun w' => ?_⟩, w, rfl⟩
         exact congrArg Subtype.val (Representation.IntertwiningMap.isIntertwining _ _ ι g w')
       · rintro ⟨ι, w, rfl⟩
-        refine ⟨⟨ι w, hmemW ι w⟩, ⟨⟨LinearMap.codRestrict W'.toSubmodule ι.toLinearMap (fun w' => hmemW ι w'),
-          fun g => LinearMap.ext fun w' => ?_⟩, w, rfl⟩, rfl⟩
+        refine ⟨
+          ⟨ι w, hmemW ι w⟩,
+          ⟨
+            ⟨
+              LinearMap.codRestrict W'.toSubmodule ι.toLinearMap (fun w' => hmemW ι w'),
+              fun g => LinearMap.ext fun w' => ?_
+            ⟩,
+            w,
+            rfl
+          ⟩,
+          rfl
+        ⟩
         apply Subtype.ext
         exact Representation.IntertwiningMap.isIntertwining _ _ ι g w'
     exact GlobalTheory.LocGL.SupportUnique.isSubquotient_of_span hB hsub3 hspan
 
-theorem eq_of_subsingleton_step {μ : Representation ℂ G V} {A B : Subrepresentation μ} (hBA : B ≤ A)
-    (h : Subsingleton (A.toSubmodule ⧸ B.toSubmodule.comap A.toSubmodule.subtype)) : A = B := by
+theorem eq_of_subsingleton_step
+    {μ : Representation ℂ G V} {A B : Subrepresentation μ}
+    (hBA : B ≤ A) (h : Subsingleton (A.toSubmodule ⧸ B.toSubmodule.comap A.toSubmodule.subtype))
+    : A = B := by
   refine le_antisymm (fun x hx => ?_) hBA
-  have h1 : (Submodule.Quotient.mk ⟨x, hx⟩ : A.toSubmodule ⧸ B.toSubmodule.comap A.toSubmodule.subtype) = 0 :=
+  have h1
+      : (Submodule.Quotient.mk ⟨x, hx⟩ : A.toSubmodule ⧸ B.toSubmodule.comap A.toSubmodule.subtype)
+        = 0 :=
     Subsingleton.elim _ _
   rw [Submodule.Quotient.mk_eq_zero] at h1
   exact h1
 
-theorem eq_of_steps {μ : Representation ℂ G V} {N : ℕ} (S : Fin (N + 1) → Subrepresentation μ) (hS : Monotone S)
-    (i j : Fin (N + 1)) (hij : i ≤ j)
-    (h : ∀ t : Fin N, i ≤ t.castSucc → t.succ ≤ j → Subsingleton ((S t.succ).toSubmodule ⧸
-      (S t.castSucc).toSubmodule.comap (S t.succ).toSubmodule.subtype)) : S i = S j := by
+theorem eq_of_steps
+    {μ : Representation ℂ G V} {N : ℕ}
+    (S : Fin (N + 1) → Subrepresentation μ) (hS : Monotone S) (i j : Fin (N + 1)) (hij : i ≤ j)
+    (h : ∀ t : Fin N,
+      i ≤ t.castSucc → t.succ ≤ j
+        → Subsingleton
+          ((S t.succ).toSubmodule ⧸
+            (S t.castSucc).toSubmodule.comap (S t.succ).toSubmodule.subtype))
+    : S i = S j := by
   have hij' : i.val ≤ j.val := hij
   have key : ∀ k : ℕ, ∀ hk : i.val + k < N + 1, i.val + k ≤ j.val → S i = S ⟨i.val + k, hk⟩ := by
     intro k
@@ -340,8 +393,9 @@ theorem eq_of_steps {μ : Representation ℂ G V} {N : ℕ} (S : Fin (N + 1) →
       intro hk hkj
       have hk' : i.val + k < N := by omega
       rw [ih (by omega) (by omega)]
-      have hst := h ⟨i.val + k, hk'⟩ (by rw [Fin.le_def]; exact Nat.le_add_right _ _)
-        (by rw [Fin.le_def]; show i.val + k + 1 ≤ j.val; omega)
+      have hst :=
+        h ⟨i.val + k, hk'⟩ (by rw [Fin.le_def]; exact Nat.le_add_right _ _)
+          (by rw [Fin.le_def]; show i.val + k + 1 ≤ j.val; omega)
       have e := eq_of_subsingleton_step (hS (Fin.castSucc_le_succ (⟨i.val + k, hk'⟩ : Fin N))) hst
       exact e.symm
   rw [key (j.val - i.val) (by omega) (by omega)]
@@ -350,11 +404,17 @@ theorem eq_of_steps {μ : Representation ℂ G V} {N : ℕ} (S : Fin (N + 1) →
   show i.val + (j.val - i.val) = j.val
   omega
 
-theorem exists_map_of_top {μ : Representation ℂ G V} {τ : Representation ℂ G Y} [Nontrivial Y] {N : ℕ}
+theorem exists_map_of_top
+    {μ : Representation ℂ G V} {τ : Representation ℂ G Y} [Nontrivial Y]
+    {N : ℕ}
     (S : Fin (N + 1) → Subrepresentation μ) (hS : Monotone S) (hN : S (Fin.last N) = ⊤) (t₀ : Fin N)
-    (h : ∀ t : Fin N, t₀ < t → Subsingleton ((S t.succ).toSubmodule ⧸
-      (S t.castSucc).toSubmodule.comap (S t.succ).toSubmodule.subtype))
-    (E : (subQuot (S t₀.succ) (S t₀.castSucc)).Equiv τ) : ∃ (φ : μ.IntertwiningMap τ) (v : V), φ v ≠ 0 := by
+    (h : ∀ t : Fin N,
+      t₀ < t
+        → Subsingleton
+          ((S t.succ).toSubmodule ⧸
+            (S t.castSucc).toSubmodule.comap (S t.succ).toSubmodule.subtype))
+    (E : (subQuot (S t₀.succ) (S t₀.castSucc)).Equiv τ)
+    : ∃ (φ : μ.IntertwiningMap τ) (v : V), φ v ≠ 0 := by
   have htop : S t₀.succ = ⊤ := by
     rw [← hN]
     apply eq_of_steps S hS t₀.succ (Fin.last N) (Fin.le_last _)

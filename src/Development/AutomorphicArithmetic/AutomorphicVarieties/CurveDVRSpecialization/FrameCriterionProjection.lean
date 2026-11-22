@@ -4,10 +4,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
 
-theorem UpperTheory.frame_criterion_projection :
-    UpperTheory.V.Pr.CrPi := by
+theorem UpperTheory.frame_criterion_projection : UpperTheory.V.Pr.CrPi := by
   unfold UpperTheory.V.Pr.CrPi
   intro Ω _ _ _ l _ O _ _ η Ψ σ g₁ B M L _ _ _ _ _ Φ k s x V hS
   have hup : Continuous (toUpl Ω L) := by
@@ -40,8 +41,7 @@ theorem UpperTheory.frame_criterion_projection :
     · rw [natCast_place hA]
       exact hl
     · exact k.unr A ⟨hti, (toUpl Ω L t).2⟩
-    · have hΨ : Ψ (galEmb ℚ (W.Lp L) Ω t) = 1 :=
-        x.unr A (by rw [natCast_place hA]; exact hMv) hti
+    · have hΨ : Ψ (galEmb ℚ (W.Lp L) Ω t) = 1 := x.unr A (by rw [natCast_place hA]; exact hMv) hti
       unfold barChar
       show Units.map _ (Ψ (galEmb ℚ (W.Lp L) Ω t)) = 1
       rw [hΨ, map_one]

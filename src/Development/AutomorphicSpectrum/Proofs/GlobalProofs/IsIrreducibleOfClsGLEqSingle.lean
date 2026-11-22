@@ -17,15 +17,21 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.RankOne
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Published GlobalTheory.JHMult GlobalTheory.LocGL.SupportRing GlobalTheory.LocGL.UnramSupport
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.Published GlobalTheory.JHMult GlobalTheory.LocGL.SupportRing
+  GlobalTheory.LocGL.UnramSupport
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {V : Type} [AddCommGroup V] [Module ℂ V]
 
-private theorem irrGL_of_eq_of_cls_single {N : ℕ} {B : Representation ℂ (GL (Fin N) k) V}
-    (hB : HasFiniteLength B) {w : IrrGL (k := k)} (h : clsGL B hB = Finsupp.single w 1)
-    {W : Type} [AddCommGroup W] [Module ℂ W] {σ : Representation ℂ (GL (Fin N) k) W}
-    (hs : IsSmooth σ) (hi : σ.IsIrreducible) (hsq : IsSubquotient σ B) : IrrGL.of σ hs hi = w := by
+private theorem irrGL_of_eq_of_cls_single
+    {N : ℕ} {B : Representation ℂ (GL (Fin N) k) V} (hB : HasFiniteLength B)
+    {w : IrrGL (k := k)} (h : clsGL B hB = Finsupp.single w 1)
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {σ : Representation ℂ (GL (Fin N) k) W}
+    (hs : IsSmooth σ) (hi : σ.IsIrreducible) (hsq : IsSubquotient σ B)
+    : IrrGL.of σ hs hi = w := by
   classical
   have e := clsGL_of_pos hB hs hi hsq
   rw [h, Finsupp.single_apply] at e
@@ -33,19 +39,23 @@ private theorem irrGL_of_eq_of_cls_single {N : ℕ} {B : Representation ℂ (GL 
   · exact heq.symm
   · exact absurd e (lt_irrefl 0)
 
-private theorem isSubquotient_of_irrGL_of_eq {N : ℕ} {W₁ W₂ : Type} [AddCommGroup W₁] [Module ℂ W₁]
-    [AddCommGroup W₂] [Module ℂ W₂] {σ₁ : Representation ℂ (GL (Fin N) k) W₁}
-    {σ₂ : Representation ℂ (GL (Fin N) k) W₂} (hs₁ : IsSmooth σ₁) (hi₁ : σ₁.IsIrreducible)
-    (hs₂ : IsSmooth σ₂) (hi₂ : σ₂.IsIrreducible) (h : IrrGL.of σ₁ hs₁ hi₁ = IrrGL.of σ₂ hs₂ hi₂) :
-    IsSubquotient σ₁ σ₂ := by
+private theorem isSubquotient_of_irrGL_of_eq
+    {N : ℕ} {W₁ W₂ : Type} [AddCommGroup W₁] [Module ℂ W₁] [AddCommGroup W₂] [Module ℂ W₂]
+    {σ₁ : Representation ℂ (GL (Fin N) k) W₁} {σ₂ : Representation ℂ (GL (Fin N) k) W₂}
+    (hs₁ : IsSmooth σ₁) (hi₁ : σ₁.IsIrreducible) (hs₂ : IsSmooth σ₂) (hi₂ : σ₂.IsIrreducible)
+    (h : IrrGL.of σ₁ hs₁ hi₁ = IrrGL.of σ₂ hs₂ hi₂)
+    : IsSubquotient σ₁ σ₂ := by
   have h' := eq_of_heq (Sigma.mk.inj_iff.mp h).2
   obtain ⟨e⟩ := Quotient.exact h'
   exact IsSubquotient.of_injective e.toIntertwiningMap e.toLinearEquiv.injective
 
-private theorem jhMult_eq_one_of_cls_single {N : ℕ} {B : Representation ℂ (GL (Fin N) k) V}
-    (hB : HasFiniteLength B) {w : IrrGL (k := k)} (h : clsGL B hB = Finsupp.single w 1)
-    {W : Type} [AddCommGroup W] [Module ℂ W] {σ : Representation ℂ (GL (Fin N) k) W}
-    (hs : IsSmooth σ) (hi : σ.IsIrreducible) (hsq : IsSubquotient σ B) : jhMult σ B = 1 := by
+private theorem jhMult_eq_one_of_cls_single
+    {N : ℕ} {B : Representation ℂ (GL (Fin N) k) V} (hB : HasFiniteLength B)
+    {w : IrrGL (k := k)} (h : clsGL B hB = Finsupp.single w 1)
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {σ : Representation ℂ (GL (Fin N) k) W}
+    (hs : IsSmooth σ) (hi : σ.IsIrreducible) (hsq : IsSubquotient σ B)
+    : jhMult σ B = 1 := by
   obtain ⟨r, hr1, hr2⟩ := cls_apply_cl B hB (IrrRep.mk W σ hs hi)
   have e : clsGL B hB (IrrGL.of σ hs hi) = 1 := by
     rw [h, irrGL_of_eq_of_cls_single hB h hs hi hsq, Finsupp.single_eq_same]
@@ -56,9 +66,10 @@ private theorem jhMult_eq_one_of_cls_single {N : ℕ} {B : Representation ℂ (G
   rw [hr1, hr]
   rfl
 
-theorem isIrreducible_of_clsGL_eq_single {N : ℕ} {B : Representation ℂ (GL (Fin N) k) V}
-    (hB : HasFiniteLength B) (hsm : IsSmooth B) {w : IrrGL (k := k)}
-    (h : clsGL B hB = Finsupp.single w 1) : B.IsIrreducible := by
+theorem isIrreducible_of_clsGL_eq_single
+    {N : ℕ} {B : Representation ℂ (GL (Fin N) k) V} (hB : HasFiniteLength B) (hsm : IsSmooth B)
+    {w : IrrGL (k := k)} (h : clsGL B hB = Finsupp.single w 1)
+    : B.IsIrreducible := by
   classical
   have hV : Nontrivial V := by
     by_contra hnt
@@ -82,16 +93,19 @@ theorem isIrreducible_of_clsGL_eq_single {N : ℕ} {B : Representation ℂ (GL (
   obtain ⟨hS0, hS1⟩ := hS
   have hn1 : Nontrivial S.toSubmodule :=
     Submodule.nontrivial_iff_ne_bot.mpr (fun e => hS0 (Subrepresentation.toSubmodule_injective e))
-  have hn2 : Nontrivial (↥(⊤ : Subrepresentation B).toSubmodule ⧸
-      Submodule.comap (⊤ : Subrepresentation B).toSubmodule.subtype S.toSubmodule) := by
+  have hn2 : Nontrivial
+      (↥(⊤ : Subrepresentation B).toSubmodule ⧸
+        Submodule.comap (⊤ : Subrepresentation B).toSubmodule.subtype S.toSubmodule) := by
     have hp : Submodule.comap (⊤ : Subrepresentation B).toSubmodule.subtype S.toSubmodule ≠ ⊤ := by
       intro e
       rw [Submodule.comap_subtype_eq_top] at e
       exact hS1 (Subrepresentation.toSubmodule_injective (eq_top_iff.mpr e))
     obtain ⟨x, -, hx⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hp)
     exact nontrivial_of_ne (Submodule.Quotient.mk x) 0 (by rwa [Ne, Submodule.Quotient.mk_eq_zero])
-  obtain ⟨Y₁, i₁, j₁, σ₁, hi₁, hq₁⟩ := IrrSubquot.exists_irreducible_subquotient _ _ S.toRepresentation hn1
-  obtain ⟨Y₂, i₂, j₂, σ₂, hi₂, hq₂⟩ := IrrSubquot.exists_irreducible_subquotient _ _ (subQuot ⊤ S) hn2
+  obtain ⟨Y₁, i₁, j₁, σ₁, hi₁, hq₁⟩ :=
+    IrrSubquot.exists_irreducible_subquotient _ _ S.toRepresentation hn1
+  obtain ⟨Y₂, i₂, j₂, σ₂, hi₂, hq₂⟩ :=
+    IrrSubquot.exists_irreducible_subquotient _ _ (subQuot ⊤ S) hn2
   have hsum := jhMult_sub_add_quot hi₁ S
   have a₁ : jhMult σ₁ S.toRepresentation ≠ 0 := jhMult_ne_zero_iff.mpr hq₁
   have b₁ : IsSubquotient σ₁ B := by
@@ -120,20 +134,24 @@ open MvPolynomial
 
 def msum (m : Segment k →₀ ℕ) : Multiset (IrrGL (k := k)) := ∑ Δ ∈ m.support, m Δ • Δ.ms
 
-variable {Z : ∀ Δ : Segment k, IrrCl (GL (Fin (Δ.len * Δ.d)) k)}
+variable
+  {Z : ∀ Δ : Segment k, IrrCl (GL (Fin (Δ.len * Δ.d)) k)}
   {Ψ : GrothGL k ≃+ MvPolynomial (Segment k) ℤ}
 
-private theorem hasSupport_of_symm_monomial_ne_zero (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
+private theorem hasSupport_of_symm_monomial_ne_zero
+    (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
     (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
-    (u : IrrGL (k := k)) (m : Segment k →₀ ℕ) (h : (Ψ.symm (monomial m 1)) u ≠ 0) :
-    HasSupport u.rep (msum m) := by
+    (u : IrrGL (k := k)) (m : Segment k →₀ ℕ) (h : (Ψ.symm (monomial m 1)) u ≠ 0)
+    : HasSupport u.rep (msum m) := by
   refine hasSupport_of_monomial hS hΨ hX u.snd.rep.smooth u.snd.rep.irr m ?_
   rwa [IrrGL.of_rep]
 
-private theorem exists_hasSupport_of_symm_sum_ne_zero (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
+private theorem exists_hasSupport_of_symm_sum_ne_zero
+    (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
     (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
     (F : Finset (Segment k →₀ ℕ)) (c : (Segment k →₀ ℕ) → ℤ) (u : IrrGL (k := k))
-    (h : (Ψ.symm (∑ n ∈ F, monomial n (c n))) u ≠ 0) : ∃ n ∈ F, HasSupport u.rep (msum n) := by
+    (h : (Ψ.symm (∑ n ∈ F, monomial n (c n))) u ≠ 0)
+    : ∃ n ∈ F, HasSupport u.rep (msum n) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, Finsupp.finsetSum_apply] at h
   obtain ⟨n, hn, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero h
@@ -144,11 +162,12 @@ private theorem exists_hasSupport_of_symm_sum_ne_zero (hS : IsSegmentClass k Z) 
     rw [smul_monomial, smul_eq_mul, mul_one]
   rw [e, map_zsmul, Finsupp.smul_apply, h0, smul_zero]
 
-theorem msum_eq_of_coeff_ne (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness)
-    (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
-    (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
-    {w : IrrGL (k := k)} {s : Multiset (IrrGL (k := k))} (hw : HasSupport w.rep s) {m : Segment k →₀ ℕ}
-    (hm : AddMonoidAlgebra.coeff (Ψ (Finsupp.single w 1)) m ≠ 0) : msum m = s := by
+theorem msum_eq_of_coeff_ne
+    (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness) (hS : IsSegmentClass k Z)
+    (hΨ : IsProductIso k Ψ) (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
+    {w : IrrGL (k := k)} {s : Multiset (IrrGL (k := k))} (hw : HasSupport w.rep s)
+    {m : Segment k →₀ ℕ} (hm : AddMonoidAlgebra.coeff (Ψ (Finsupp.single w 1)) m ≠ 0)
+    : msum m = s := by
   classical
   set P := Ψ (Finsupp.single w 1) with hP
   by_contra hne
@@ -163,7 +182,8 @@ theorem msum_eq_of_coeff_ne (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFini
   have hz : ∀ u, (Ψ.symm P1) u = 0 := by
     intro u
     by_contra hu
-    obtain ⟨n, hnS, hn⟩ := exists_hasSupport_of_symm_sum_ne_zero hS hΨ hX S (fun n => AddMonoidAlgebra.coeff P n) u hu
+    obtain ⟨n, hnS, hn⟩ :=
+      exists_hasSupport_of_symm_sum_ne_zero hS hΨ hX S (fun n => AddMonoidAlgebra.coeff P n) u hu
     have hnS' := (Finset.mem_filter.mp hnS).2
     by_cases huw : u = w
     · subst huw
@@ -174,7 +194,8 @@ theorem msum_eq_of_coeff_ne (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFini
         have e := congrArg (fun f => f u) hsum
         simp only [Finsupp.add_apply, h2, add_zero, Finsupp.single_apply, if_neg (Ne.symm huw)] at e
         exact e
-      obtain ⟨n', hn'S, hn'⟩ := exists_hasSupport_of_symm_sum_ne_zero hS hΨ hX _ (fun n => AddMonoidAlgebra.coeff P n) u h2
+      obtain ⟨n', hn'S, hn'⟩ :=
+        exists_hasSupport_of_symm_sum_ne_zero hS hΨ hX _ (fun n => AddMonoidAlgebra.coeff P n) u h2
       have h3 := (Finset.mem_filter.mp hn'S).2
       exact hnS' ((TD.hasSupport_unique hG hBZ hn hn').trans (not_not.mp h3))
   have hP1 : P1 = 0 := by
@@ -212,8 +233,9 @@ theorem ms_of_len {Δ : Segment k} (h : Δ.len = 1) : Δ.ms = {Δ.first} := by
   rw [ms_single]
 
 open scoped Classical in
-theorem count_msum {m : Segment k →₀ ℕ} (hl : ∀ Δ ∈ m.support, Δ.len = 1) {z : IrrGL (k := k)}
-    (hz : z.IsCusp) : (msum m).count z = m (single z hz) := by
+theorem count_msum
+    {m : Segment k →₀ ℕ} (hl : ∀ Δ ∈ m.support, Δ.len = 1) {z : IrrGL (k := k)} (hz : z.IsCusp)
+    : (msum m).count z = m (single z hz) := by
   have hf : (single z hz).first = z := first_ofFirst z hz 1 (by norm_num)
   have key : ∀ Δ ∈ m.support, (m Δ • Δ.ms).count z = if Δ = single z hz then m Δ else 0 := by
     intro Δ hΔ
@@ -240,13 +262,15 @@ theorem msum_add (a b : Segment k →₀ ℕ) : msum (a + b) = msum a + msum b :
   rw [msum_eq, msum_eq, msum_eq]
   exact Finsupp.sum_add_index' (fun _ => zero_nsmul _) (fun _ _ _ => add_nsmul _ _ _)
 
-theorem msum_single (Δ : Segment k) : msum (Finsupp.single Δ 1) = Δ.ms := by
-  simp [msum]
+theorem msum_single (Δ : Segment k) : msum (Finsupp.single Δ 1) = Δ.ms := by simp [msum]
 
 variable {x y : IrrGL (k := k)}
 
-theorem len_eq_one (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ)) {m : Segment k →₀ ℕ}
-    (hm : msum m = {x} + {y}) {Δ : Segment k} (h : Δ ∈ m.support) : Δ.len = 1 := by
+theorem len_eq_one
+    (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ))
+    {m : Segment k →₀ ℕ} (hm : msum m = {x} + {y})
+    {Δ : Segment k} (h : Δ ∈ m.support)
+    : Δ.len = 1 := by
   by_contra hne
   have hΔ := ms_le_msum h
   rw [hm] at hΔ
@@ -269,13 +293,14 @@ theorem len_eq_one (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ)) {m : S
   push_cast
   ring
 
-theorem eq_pair (hx : x.IsCusp) (hy : y.IsCusp) (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ))
-    {m : Segment k →₀ ℕ} (hm : msum m = {x} + {y}) :
-    m = Finsupp.single (single x hx) 1 + Finsupp.single (single y hy) 1 := by
+theorem eq_pair
+    (hx : x.IsCusp) (hy : y.IsCusp) (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ))
+    {m : Segment k →₀ ℕ} (hm : msum m = {x} + {y})
+    : m = Finsupp.single (single x hx) 1 + Finsupp.single (single y hy) 1 := by
   have hL : ∀ Δ ∈ m.support, Δ.len = 1 := fun Δ h => len_eq_one hl hm h
   have hsl : ∀ (z : IrrGL (k := k)) (hz : z.IsCusp), (single z hz).len = 1 := fun _ _ => rfl
-  have hsf : ∀ (z : IrrGL (k := k)) (hz : z.IsCusp), (single z hz).first = z :=
-    fun z hz => first_ofFirst z hz 1 (by norm_num)
+  have hsf : ∀ (z : IrrGL (k := k)) (hz : z.IsCusp), (single z hz).first = z := fun z hz =>
+    first_ofFirst z hz 1 (by norm_num)
   classical
   ext Γ
   simp only [Finsupp.add_apply, Finsupp.single_apply]
@@ -308,10 +333,11 @@ theorem eq_pair (hx : x.IsCusp) (hy : y.IsCusp) (hl : ∀ j : ℤ, |j| ≤ 1 →
 
 end Monomials
 
-
 set_option maxHeartbeats 2000000 in
-theorem prod₂_cls {A : Type 1} [CommRing A] {Ψ : GrothGL k ≃+ A} (hΨ : IsProductIso k Ψ) (x y : IrrGL (k := k)) :
-    ∃ h : HasFiniteLength (prod₂ x.rep y.rep), Ψ (clsGL (prod₂ x.rep y.rep) h) = bas Ψ x * bas Ψ y := by
+theorem prod₂_cls
+    {A : Type 1} [CommRing A] {Ψ : GrothGL k ≃+ A} (hΨ : IsProductIso k Ψ) (x y : IrrGL (k := k))
+    : ∃ h : HasFiniteLength (prod₂ x.rep y.rep),
+      Ψ (clsGL (prod₂ x.rep y.rep) h) = bas Ψ x * bas Ψ y := by
   have hx := hasFiniteLength_of_isIrreducible x.snd.rep.irr
   have hy := hasFiniteLength_of_isIrreducible y.snd.rep.irr
   obtain ⟨h, e⟩ := hΨ.2 x.fst y.fst _ _ x.rep y.rep hx hy x.snd.rep.smooth y.snd.rep.smooth
@@ -321,12 +347,15 @@ section Main
 
 open MvPolynomial
 
-variable {Z : ∀ Δ : Segment k, IrrCl (GL (Fin (Δ.len * Δ.d)) k)}
+variable
+  {Z : ∀ Δ : Segment k, IrrCl (GL (Fin (Δ.len * Δ.d)) k)}
   {Ψ : GrothGL k ≃+ MvPolynomial (Segment k) ℤ}
 
-theorem bas_eq_X (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
+theorem bas_eq_X
+    (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
     (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
-    (z : IrrGL (k := k)) (hz : z.IsCusp) : bas Ψ z = X (Segment.single z hz) := by
+    (z : IrrGL (k := k)) (hz : z.IsCusp)
+    : bas Ψ z = X (Segment.single z hz) := by
   classical
   obtain ⟨h1, h2⟩ := pos_X hS hΨ hX (Segment.single z hz)
   rw [Segment.ms_single] at h2
@@ -372,16 +401,21 @@ theorem bas_eq_X (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
   apply Ψ.symm.injective
   rw [hb, ← hQ1]
 
-theorem eq_monomial_of_hasSupport (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness)
-    (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
-    (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
-    {x y w : IrrGL (k := k)} (hx : x.IsCusp) (hy : y.IsCusp) (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ))
-    (hw : HasSupport w.rep ({x} + {y})) :
-    ∃ c : ℤ, Ψ (Finsupp.single w 1) =
-      monomial (Finsupp.single (Segment.single x hx) 1 + Finsupp.single (Segment.single y hy) 1) c := by
+theorem eq_monomial_of_hasSupport
+    (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness) (hS : IsSegmentClass k Z)
+    (hΨ : IsProductIso k Ψ) (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
+    {x y w : IrrGL (k := k)} (hx : x.IsCusp) (hy : y.IsCusp)
+    (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ)) (hw : HasSupport w.rep ({x} + {y}))
+    : ∃ c : ℤ,
+      Ψ (Finsupp.single w 1)
+        = monomial (Finsupp.single (Segment.single x hx) 1 + Finsupp.single (Segment.single y hy) 1)
+          c := by
   classical
-  refine ⟨AddMonoidAlgebra.coeff (Ψ (Finsupp.single w 1))
-    (Finsupp.single (Segment.single x hx) 1 + Finsupp.single (Segment.single y hy) 1), ?_⟩
+  refine ⟨
+    AddMonoidAlgebra.coeff (Ψ (Finsupp.single w 1))
+      (Finsupp.single (Segment.single x hx) 1 + Finsupp.single (Segment.single y hy) 1),
+    ?_
+  ⟩
   ext n
   rw [coeff_monomial]
   split_ifs with h
@@ -390,12 +424,14 @@ theorem eq_monomial_of_hasSupport (hG : GeometricLemma) (hBZ : BernsteinZelevins
   · by_contra hne
     exact h (eq_pair hx hy hl (msum_eq_of_coeff_ne hG hBZ hS hΨ hX hw hne)).symm
 
-theorem isIrreducible_of_cls_eq_mul (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness)
-    (hS : IsSegmentClass k Z) (hΨ : IsProductIso k Ψ)
-    (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
-    {x y : IrrGL (k := k)} (hx : x.IsCusp) (hy : y.IsCusp) (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ))
-    {N : ℕ} {B : Representation ℂ (GL (Fin N) k) V} (hB : HasFiniteLength B) (hsm : IsSmooth B)
-    (eB : Ψ (clsGL B hB) = bas Ψ x * bas Ψ y) : B.IsIrreducible := by
+theorem isIrreducible_of_cls_eq_mul
+    (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness) (hS : IsSegmentClass k Z)
+    (hΨ : IsProductIso k Ψ) (hX : ∀ Δ, Ψ (Finsupp.single ⟨Δ.len * Δ.d, Z Δ⟩ 1) = MvPolynomial.X Δ)
+    {x y : IrrGL (k := k)}
+    (hx : x.IsCusp) (hy : y.IsCusp) (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ))
+    {N : ℕ} {B : Representation ℂ (GL (Fin N) k) V}
+    (hB : HasFiniteLength B) (hsm : IsSmooth B) (eB : Ψ (clsGL B hB) = bas Ψ x * bas Ψ y)
+    : B.IsIrreducible := by
   classical
   set m0 := Finsupp.single (Segment.single x hx) 1 + Finsupp.single (Segment.single y hy) 1 with hm0
   have hmon : Ψ (clsGL B hB) = monomial m0 1 := by
@@ -429,18 +465,18 @@ theorem isIrreducible_of_cls_eq_mul (hG : GeometricLemma) (hBZ : BernsteinZelevi
     rcases Int.eq_one_or_neg_one_of_mul_eq_one' hw1 with h | h
     · exact h.1
     · omega
-  have hCeq : C = Finsupp.single w 1 := by
-    rw [hsw, hc1, one_smul]
+  have hCeq : C = Finsupp.single w 1 := by rw [hsw, hc1, one_smul]
   exact isIrreducible_of_clsGL_eq_single hB hsm hCeq
 
 end Main
 
-
 set_option maxHeartbeats 2000000 in
-theorem isIrreducible_prod₂_of_polynomialRing (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness)
-    (hZ : ZelevinskyPolynomialRing) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (x y : IrrGL (k := k)) (hx : x.IsCusp) (hy : y.IsCusp)
-    (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ)) : (prod₂ x.rep y.rep).IsIrreducible := by
+theorem isIrreducible_prod₂_of_polynomialRing
+    (hG : GeometricLemma) (hBZ : BernsteinZelevinskyFiniteness) (hZ : ZelevinskyPolynomialRing)
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (x y : IrrGL (k := k))
+    (hx : x.IsCusp) (hy : y.IsCusp) (hl : ∀ j : ℤ, |j| ≤ 1 → x ≠ y.nu (j : ℂ))
+    : (prod₂ x.rep y.rep).IsIrreducible := by
   obtain ⟨Z, Ψ, hS, hΨ, hX⟩ := hZ k
   obtain ⟨hB, eB⟩ := prod₂_cls hΨ x y
   exact isIrreducible_of_cls_eq_mul hG hBZ hS hΨ hX hx hy hl hB (isSmooth_prod₂ _ _) eB

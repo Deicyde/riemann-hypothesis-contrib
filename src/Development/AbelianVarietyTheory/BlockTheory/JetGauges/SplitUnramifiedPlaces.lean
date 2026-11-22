@@ -27,8 +27,8 @@ def extend {O : Type} [CommRing O] [Algebra ℤ_[p] O] (σ : OE →+* O) : Op p 
 
 end Ring
 
-@[ext] structure Place (p : ℕ) [Fact p.Prime] (OE : Type) [CommRing OE] where
-
+@[ext]
+structure Place (p : ℕ) [Fact p.Prime] (OE : Type) [CommRing OE] where
   e : Op p OE
   idem : IsIdempotentElem e
   ne_zero : e ≠ 0
@@ -41,8 +41,7 @@ variable {p : ℕ} [Fact p.Prime] {OE : Type} [CommRing OE]
 abbrev Ow (w : Place p OE) : Type := Op p OE ⧸ Ideal.span {1 - w.e}
 
 def toOw (w : Place p OE) : OE →+* w.Ow :=
-  (Ideal.Quotient.mk _).comp
-    (Algebra.TensorProduct.includeRight : OE →ₐ[ℤ] Op p OE).toRingHom
+  (Ideal.Quotient.mk _).comp (Algebra.TensorProduct.includeRight : OE →ₐ[ℤ] Op p OE).toRingHom
 
 end Place
 

@@ -10,11 +10,13 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.LimV
 
-theorem finiteDimensional_prodSpan_of_fd : ∀ {A B : Type} (U₁ : Submodule ℂ (A → ℂ)) (U₂ : Submodule ℂ (B → ℂ)),
-    FiniteDimensional ℂ U₁ → FiniteDimensional ℂ U₂ → FiniteDimensional ℂ (prodSpan U₁ U₂) := by
+theorem finiteDimensional_prodSpan_of_fd
+    : ∀ {A B : Type} (U₁ : Submodule ℂ (A → ℂ)) (U₂ : Submodule ℂ (B → ℂ)),
+      FiniteDimensional ℂ U₁ → FiniteDimensional ℂ U₂ → FiniteDimensional ℂ (prodSpan U₁ U₂) := by
   intro A B U₁ U₂ h₁ h₂
   let φ : U₁ →ₗ[ℂ] U₂ →ₗ[ℂ] (A × B → ℂ) :=
-    LinearMap.mk₂ ℂ (fun a b x => a.1 x.1 * b.1 x.2)
+    LinearMap.mk₂ ℂ
+      (fun a b x => a.1 x.1 * b.1 x.2)
       (fun a a' b => by ext x; simp [add_mul])
       (fun c a b => by ext x; simp [mul_assoc])
       (fun a b b' => by ext x; simp [mul_add])

@@ -16,9 +16,9 @@ variable {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n]
 open Matrix in
 variable {R : Type} [CommRing R] in
 variable {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] in
-private theorem det_updateRow_mem_span_adjugate_entries {α : Type} [Fintype α] [DecidableEq α]
-    (Φ : Matrix α α R) (k : α) (w : α → R) :
-    (Φ.updateRow k w).det ∈ Ideal.span (Set.range fun p : α × α => Φ.adjugate p.1 p.2) := by
+private theorem det_updateRow_mem_span_adjugate_entries
+    {α : Type} [Fintype α] [DecidableEq α] (Φ : Matrix α α R) (k : α) (w : α → R)
+    : (Φ.updateRow k w).det ∈ Ideal.span (Set.range fun p : α × α => Φ.adjugate p.1 p.2) := by
   rw [← det_transpose, ← updateCol_transpose, ← cramer_apply, cramer_eq_adjugate_mulVec,
     ← adjugate_transpose]
   simp only [mulVec, dotProduct, transpose_apply]
@@ -27,9 +27,9 @@ private theorem det_updateRow_mem_span_adjugate_entries {α : Type} [Fintype α]
 open Matrix in
 variable {R : Type} [CommRing R] in
 variable {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] in
-private theorem det_mem_span_adjugate_entries {α : Type} [Fintype α] [DecidableEq α] [Nonempty α]
-    (Φ : Matrix α α R) :
-    Φ.det ∈ Ideal.span (Set.range fun p : α × α => Φ.adjugate p.1 p.2) := by
+private theorem det_mem_span_adjugate_entries
+    {α : Type} [Fintype α] [DecidableEq α] [Nonempty α] (Φ : Matrix α α R)
+    : Φ.det ∈ Ideal.span (Set.range fun p : α × α => Φ.adjugate p.1 p.2) := by
   obtain ⟨i⟩ := ‹Nonempty α›
   have h := det_updateRow_mem_span_adjugate_entries Φ i (Φ i)
   rwa [updateRow_eq_self] at h
@@ -37,32 +37,35 @@ private theorem det_mem_span_adjugate_entries {α : Type} [Fintype α] [Decidabl
 open Matrix in
 variable {R : Type} [CommRing R] in
 variable {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] in
-private theorem det_eq_mul_of_toBlocks₂₁_eq_zero {α β : Type} [Fintype α] [DecidableEq α]
-    [Fintype β] [DecidableEq β] (M : Matrix (α ⊕ β) (α ⊕ β) R) (h : M.toBlocks₂₁ = 0) :
-    M.det = M.toBlocks₁₁.det * M.toBlocks₂₂.det := by
+private theorem det_eq_mul_of_toBlocks₂₁_eq_zero
+    {α β : Type} [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β]
+    (M : Matrix (α ⊕ β) (α ⊕ β) R) (h : M.toBlocks₂₁ = 0)
+    : M.det = M.toBlocks₁₁.det * M.toBlocks₂₂.det := by
   conv_lhs => rw [← fromBlocks_toBlocks M, h]
   exact det_fromBlocks_zero₂₁ _ _ _
 
 open Matrix in
 variable {R : Type} [CommRing R] in
 variable {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] in
-private theorem det_eq_mul_of_toBlocks₁₂_eq_zero {α β : Type} [Fintype α] [DecidableEq α]
-    [Fintype β] [DecidableEq β] (M : Matrix (α ⊕ β) (α ⊕ β) R) (h : M.toBlocks₁₂ = 0) :
-    M.det = M.toBlocks₁₁.det * M.toBlocks₂₂.det := by
+private theorem det_eq_mul_of_toBlocks₁₂_eq_zero
+    {α β : Type} [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β]
+    (M : Matrix (α ⊕ β) (α ⊕ β) R) (h : M.toBlocks₁₂ = 0)
+    : M.det = M.toBlocks₁₁.det * M.toBlocks₂₂.det := by
   conv_lhs => rw [← fromBlocks_toBlocks M, h]
   exact det_fromBlocks_zero₁₂ _ _ _
-
 
 open Matrix in
 variable {R : Type} [CommRing R] in
 variable {m n : Type} [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] in
-theorem _root_.GlobalTheory.FitSquare.relations_mem {M : Type} [AddCommGroup M] [Module R M]
-    (π : (n → R) →ₗ[R] M) (hπ : Function.Surjective π) (Φ : Matrix n n R)
-    (hΦ : ∀ y, π y = 0 → ∃ z, Φ *ᵥ z = y)
-    (q : (m → R) →ₗ[R] M) (hq : Function.Surjective q) (T : Matrix m m R)
-    (hT : ∀ y, q (T *ᵥ y) = 0) :
-    T.det ∈ Ideal.span {Φ.det} ∧ (Nonempty n → ∀ i j, T.adjugate i j ∈
-      Ideal.span (Set.range fun p : n × n => Φ.adjugate p.1 p.2)) := by
+theorem _root_.GlobalTheory.FitSquare.relations_mem
+    {M : Type} [AddCommGroup M] [Module R M]
+    (π : (n → R) →ₗ[R] M) (hπ : Function.Surjective π)
+    (Φ : Matrix n n R) (hΦ : ∀ y, π y = 0 → ∃ z, Φ *ᵥ z = y)
+    (q : (m → R) →ₗ[R] M) (hq : Function.Surjective q)
+    (T : Matrix m m R) (hT : ∀ y, q (T *ᵥ y) = 0)
+    : T.det ∈ Ideal.span {Φ.det}
+      ∧ (Nonempty n
+        → ∀ i j, T.adjugate i j ∈ Ideal.span (Set.range fun p : n × n => Φ.adjugate p.1 p.2)) := by
   choose a ha using fun j : m => hπ (q (Pi.single j 1))
   choose b hb using fun i : n => hq (π (Pi.single i 1))
   let A : Matrix n m R := Matrix.of fun i j => a j i
@@ -87,14 +90,15 @@ theorem _root_.GlobalTheory.FitSquare.relations_mem {M : Type} [AddCommGroup M] 
     simp [U, D, fromBlocks_mulVec, hz, neg_mulVec]
   have hcol : ∀ c, ∃ w, (U * D) *ᵥ w = fun r => N r c := by
     rintro (i | j)
-    · obtain ⟨w, hw⟩ := hker (Pi.single i 1) (-b i) (by rw [map_neg, hb, add_neg_cancel])
+    · obtain ⟨w, hw⟩ := hker (Pi.single i 1) (- b i) (by rw [map_neg, hb, add_neg_cancel])
       refine ⟨w, hw.trans ?_⟩
       ext (r | r) <;> simp [N, B, Pi.single_apply, Matrix.one_apply]
-    · obtain ⟨w, hw⟩ := hker 0 (fun r => T r j) (by
-        have h := hT (Pi.single j 1)
-        rw [mulVec_single_one] at h
-        rw [map_zero, zero_add]
-        exact h)
+    · obtain ⟨w, hw⟩ :=
+        hker 0 (fun r => T r j) (by
+          have h := hT (Pi.single j 1)
+          rw [mulVec_single_one] at h
+          rw [map_zero, zero_add]
+          exact h)
       refine ⟨w, hw.trans ?_⟩
       ext (r | r) <;> simp [N]
   choose w hw using hcol
@@ -108,14 +112,15 @@ theorem _root_.GlobalTheory.FitSquare.relations_mem {M : Type} [AddCommGroup M] 
     exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)
   · intro hn p p'
     have hdetJ := det_mem_span_adjugate_entries Φ
-    have hD : ∀ x y, D.adjugate x y ∈
-        Ideal.span (Set.range fun p : n × n => Φ.adjugate p.1 p.2) := by
+    have hD
+        : ∀ x y, D.adjugate x y ∈ Ideal.span (Set.range fun p : n × n => Φ.adjugate p.1 p.2) := by
       intro x y
       rw [adjugate_apply]
       rcases y with k | k
       · rw [det_eq_mul_of_toBlocks₂₁_eq_zero]
-        · have h : (D.updateRow (Sum.inl k) (Pi.single x 1)).toBlocks₁₁ =
-              Φ.updateRow k (fun l => (Pi.single x 1 : n ⊕ m → R) (Sum.inl l)) := by
+        · have h
+              : (D.updateRow (Sum.inl k) (Pi.single x 1)).toBlocks₁₁
+                = Φ.updateRow k (fun l => (Pi.single x 1 : n ⊕ m → R) (Sum.inl l)) := by
             ext s t
             by_cases hs : s = k <;> simp [D, toBlocks₁₁, updateRow_apply, hs]
           rw [h]
@@ -135,8 +140,9 @@ theorem _root_.GlobalTheory.FitSquare.relations_mem {M : Type} [AddCommGroup M] 
       · have h₁ : (N.updateRow (Sum.inr p') (Pi.single (Sum.inr p) 1)).toBlocks₁₁ = 1 := by
           ext s t
           simp [N, toBlocks₁₁, updateRow_apply]
-        have h₂ : (N.updateRow (Sum.inr p') (Pi.single (Sum.inr p) 1)).toBlocks₂₂ =
-            T.updateRow p' (Pi.single p 1) := by
+        have h₂
+            : (N.updateRow (Sum.inr p') (Pi.single (Sum.inr p) 1)).toBlocks₂₂
+              = T.updateRow p' (Pi.single p 1) := by
           ext s t
           by_cases hs : s = p' <;> simp [N, toBlocks₂₂, updateRow_apply, hs, Pi.single_apply]
         rw [h₁, h₂, det_one, one_mul]
@@ -149,17 +155,31 @@ theorem _root_.GlobalTheory.FitSquare.relations_mem {M : Type} [AddCommGroup M] 
 
 end blocks
 
-
 open Matrix in
 variable {R : Type} [CommRing R] in
-theorem _root_.GlobalTheory.FitSquare.fitting_exact : ∀ (R : Type) [CommRing R] (M₁ M₂ M₃ : Type) [AddCommGroup M₁] [Module R M₁] [AddCommGroup M₂] [Module R M₂] [AddCommGroup M₃] [Module R M₃] (f : M₁ →ₗ[R] M₂) (g : M₂ →ₗ[R] M₃), Function.Exact f g → Function.Surjective g → ∀ (k : ℕ) (x : R) (v : Fin k → M₁), Submodule.span R (Set.range v) = ⊤ → (∀ m : M₁, x • m = 0) → ∀ (a b : ℕ) (Φ : Matrix (Fin a) (Fin a) R) (Ψ : Matrix (Fin b) (Fin b) R), Nonempty (M₂ ≃ₗ[R] ((Fin a → R) ⧸ LinearMap.range Φ.mulVecLin)) → Nonempty (M₃ ≃ₗ[R] ((Fin b → R) ⧸ LinearMap.range Ψ.mulVecLin)) → x ^ k * Ψ.det ∈ Ideal.span {Φ.det} ∧ (a = 0 ∨ ((∀ p q, x ^ k * Ψ.adjugate p q ∈ Ideal.span (Set.range fun p : Fin a × Fin a => Φ.adjugate p.1 p.2)) ∧ (b = 0 → x ^ k ∈ Ideal.span (Set.range fun p : Fin a × Fin a => Φ.adjugate p.1 p.2)))) := by
+theorem _root_.GlobalTheory.FitSquare.fitting_exact
+    : ∀ (R : Type) [CommRing R] (M₁ M₂ M₃ : Type) [AddCommGroup M₁] [Module R M₁] [AddCommGroup M₂]
+        [Module R M₂] [AddCommGroup M₃] [Module R M₃] (f : M₁ →ₗ[R] M₂) (g : M₂ →ₗ[R] M₃),
+      Function.Exact f g → Function.Surjective g
+        → ∀ (k : ℕ) (x : R) (v : Fin k → M₁),
+          Submodule.span R (Set.range v) = ⊤ → (∀ m : M₁, x • m = 0)
+            → ∀ (a b : ℕ) (Φ : Matrix (Fin a) (Fin a) R) (Ψ : Matrix (Fin b) (Fin b) R),
+              Nonempty (M₂ ≃ₗ[R] ((Fin a → R) ⧸ LinearMap.range Φ.mulVecLin))
+                → Nonempty (M₃ ≃ₗ[R] ((Fin b → R) ⧸ LinearMap.range Ψ.mulVecLin))
+                → x ^ k * Ψ.det ∈ Ideal.span {Φ.det}
+                  ∧ (a = 0
+                    ∨ ((∀ p q,
+                        x ^ k * Ψ.adjugate p q
+                          ∈ Ideal.span (Set.range fun p : Fin a × Fin a => Φ.adjugate p.1 p.2))
+                      ∧ (b = 0
+                        → x ^ k ∈ Ideal.span (Set.range fun p : Fin a × Fin a =>
+                          Φ.adjugate p.1 p.2)))) := by
   intro R _ M₁ M₂ M₃ _ _ _ _ _ _ f g hfg hg k x v hv hx a b Φ Ψ ⟨e₂⟩ ⟨e₃⟩
   let π : (Fin a → R) →ₗ[R] M₂ := e₂.symm.toLinearMap ∘ₗ (LinearMap.range Φ.mulVecLin).mkQ
   have hπ : Function.Surjective π := e₂.symm.surjective.comp (Submodule.mkQ_surjective _)
   have hΦ : ∀ y, π y = 0 → ∃ z, Φ *ᵥ z = y := by
     intro y hy
-    have hy' : (LinearMap.range Φ.mulVecLin).mkQ y = 0 := by
-      simpa [π] using hy
+    have hy' : (LinearMap.range Φ.mulVecLin).mkQ y = 0 := by simpa [π] using hy
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at hy'
     obtain ⟨z, hz⟩ := hy'
     exact ⟨z, hz⟩
@@ -193,18 +213,18 @@ theorem _root_.GlobalTheory.FitSquare.fitting_exact : ∀ (R : Type) [CommRing R
     intro j
     apply hkerg
     rw [hgH]
-    simp only [ρ, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
-      Submodule.mkQ_apply]
-    rw [(Submodule.Quotient.mk_eq_zero _).2 (LinearMap.mem_range.2 ⟨Pi.single j 1, by
-      rw [mulVecLin_apply, mulVec_single_one]; rfl⟩), map_zero]
+    simp only [ρ, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply, Submodule.mkQ_apply]
+    rw [(Submodule.Quotient.mk_eq_zero _).2
+        (LinearMap.mem_range.2 ⟨Pi.single j 1, by rw [mulVecLin_apply, mulVec_single_one]; rfl⟩),
+      map_zero]
   choose C hC using hcolΨ
   let T : Matrix (Fin k ⊕ Fin b) (Fin k ⊕ Fin b) R :=
-    fromBlocks (x • 1) (-Matrix.of fun i j => C j i) 0 Ψ
+    fromBlocks (x • 1) (- Matrix.of fun i j => C j i) 0 Ψ
   have hT : ∀ y, q (T *ᵥ y) = 0 := by
     have h0 : q ∘ₗ T.mulVecLin = 0 := by
       ext c
-      simp only [LinearMap.coe_comp, Function.comp_apply, mulVecLin_apply,
-        LinearMap.single_apply, mulVec_single_one, LinearMap.zero_apply]
+      simp only [LinearMap.coe_comp, Function.comp_apply, mulVecLin_apply, LinearMap.single_apply,
+        mulVec_single_one, LinearMap.zero_apply]
       rw [Fintype.linearCombination_apply, Fintype.sum_sum_type]
       rcases c with i | j
       · simp [T, col]
@@ -226,12 +246,12 @@ theorem _root_.GlobalTheory.FitSquare.fitting_exact : ∀ (R : Type) [CommRing R
     refine ⟨fun p p' => ?_, fun hb0 => ?_⟩
     · have hadj : T.adjugate (Sum.inr p) (Sum.inr p') = x ^ k * Ψ.adjugate p p' := by
         rw [adjugate_apply, adjugate_apply, det_eq_mul_of_toBlocks₂₁_eq_zero]
-        · have h₁₁ : (T.updateRow (Sum.inr p') (Pi.single (Sum.inr p) 1)).toBlocks₁₁ =
-              x • 1 := by
+        · have h₁₁ : (T.updateRow (Sum.inr p') (Pi.single (Sum.inr p) 1)).toBlocks₁₁ = x • 1 := by
             ext s t
             simp [T, toBlocks₁₁, updateRow_apply]
-          have h₂₂ : (T.updateRow (Sum.inr p') (Pi.single (Sum.inr p) 1)).toBlocks₂₂ =
-              Ψ.updateRow p' (Pi.single p 1) := by
+          have h₂₂
+              : (T.updateRow (Sum.inr p') (Pi.single (Sum.inr p) 1)).toBlocks₂₂
+                = Ψ.updateRow p' (Pi.single p 1) := by
             ext s t
             by_cases hs : s = p' <;> simp [T, toBlocks₂₂, updateRow_apply, hs, Pi.single_apply]
           rw [h₁₁, h₂₂, det_smul, det_one, mul_one, Fintype.card_fin]

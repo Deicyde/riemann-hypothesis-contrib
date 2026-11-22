@@ -7,72 +7,77 @@ public import Mathlib
 namespace ReciprocityTheory.ChartRestriction.G.TB
 
 def IndepDescentSt : Prop :=
-  ∀ (K F : Type) [Field K] [Field F] [Algebra K F] [IsGalois K F] (ι : F →+* ℂ)
-    (C : Type) [AddCommGroup C] [Module K C] (Pt : Type) (v : C →ₗ[K] (Pt → F))
-    (act : (F ≃ₐ[K] F) → Pt → Pt),
-    (∀ g, Function.Bijective (act g)) →
-    (∀ g f y, v f (act g y) = g (v f y)) →
-    Function.Injective v →
-    ∀ (n : ℕ) (b : Fin n → C), LinearIndependent K b →
-      LinearIndependent ℂ (fun i => (fun y => ι (v (b i) y) : Pt → ℂ))
+  ∀ (K F : Type) [Field K] [Field F] [Algebra K F] [IsGalois K F] (ι : F →+* ℂ) (C : Type)
+      [AddCommGroup C] [Module K C] (Pt : Type) (v : C →ₗ[K] (Pt → F))
+      (act : (F ≃ₐ[K] F) → Pt → Pt),
+    (∀ g, Function.Bijective (act g)) → (∀ g f y, v f (act g y) = g (v f y)) → Function.Injective v
+      → ∀ (n : ℕ) (b : Fin n → C),
+        LinearIndependent K b → LinearIndependent ℂ (fun i => (fun y => ι (v (b i) y) : Pt → ℂ))
 
-theorem mem_bot_of_fixed {K F : Type} [Field K] [Field F] [Algebra K F] [IsGalois K F] (a : F)
-    (ha : ∀ g : F ≃ₐ[K] F, g a = a) : a ∈ (⊥ : IntermediateField K F) := by
+theorem mem_bot_of_fixed
+    {K F : Type} [Field K] [Field F] [Algebra K F] [IsGalois K F]
+    (a : F) (ha : ∀ g : F ≃ₐ[K] F, g a = a)
+    : a ∈ (⊥ : IntermediateField K F) := by
   exact (InfiniteGalois.mem_bot_iff_fixed a).mpr ha
 
-theorem rel_zero {K F C Pt : Type} [Field K] [Field F] [Algebra K F] [IsGalois K F]
-    [AddCommGroup C] [Module K C] (v : C →ₗ[K] (Pt → F)) (act : (F ≃ₐ[K] F) → Pt → Pt)
+theorem rel_zero
+    {K F C Pt : Type} [Field K] [Field F] [Algebra K F] [IsGalois K F] [AddCommGroup C] [Module K C]
+    (v : C →ₗ[K] (Pt → F)) (act : (F ≃ₐ[K] F) → Pt → Pt)
     (hbij : ∀ g, Function.Bijective (act g)) (heq : ∀ g f y, v f (act g y) = g (v f y))
-    (hinj : Function.Injective v) {n : ℕ} (b : Fin n → C) (hb : LinearIndependent K b) :
-    ∀ (s : Finset (Fin n)) (a : Fin n → F), (∀ y, ∑ i ∈ s, a i * v (b i) y = 0) → ∀ i ∈ s, a i = 0 := by
+    (hinj : Function.Injective v)
+    {n : ℕ} (b : Fin n → C) (hb : LinearIndependent K b)
+    : ∀ (s : Finset (Fin n)) (a : Fin n → F),
+      (∀ y, ∑ i ∈ s, a i * v (b i) y = 0) → ∀ i ∈ s, a i = 0 := by
   intro s
   induction s using Finset.strongInduction with
   | H s ih =>
-  intro a ha i0 hi0
-  by_contra hne
-  obtain ⟨a', ha'⟩ : ∃ a' : Fin n → F, ∀ i, a' i = (a i0)⁻¹ * a i := ⟨_, fun _ => rfl⟩
-  have ha'rel : ∀ y, ∑ i ∈ s, a' i * v (b i) y = 0 := by
-    intro y
-    simp only [ha', mul_assoc]
-    rw [← Finset.mul_sum, ha y, mul_zero]
-  have ha'1 : a' i0 = 1 := by rw [ha']; exact inv_mul_cancel₀ hne
-  have hfix : ∀ i ∈ s, ∀ g : F ≃ₐ[K] F, g (a' i) = a' i := by
-    intro i hi g
-    have hrel_g : ∀ y, ∑ j ∈ s, g (a' j) * v (b j) y = 0 := by
+    intro a ha i0 hi0
+    by_contra hne
+    obtain ⟨a', ha'⟩ : ∃ a' : Fin n → F, ∀ i, a' i = (a i0)⁻¹ * a i := ⟨_, fun _ => rfl⟩
+    have ha'rel : ∀ y, ∑ i ∈ s, a' i * v (b i) y = 0 := by
       intro y
-      obtain ⟨x, rfl⟩ := (hbij g).2 y
-      have h1 := congrArg g (ha'rel x)
+      simp only [ha', mul_assoc]
+      rw [← Finset.mul_sum, ha y, mul_zero]
+    have ha'1 : a' i0 = 1 := by rw [ha']; exact inv_mul_cancel₀ hne
+    have hfix : ∀ i ∈ s, ∀ g : F ≃ₐ[K] F, g (a' i) = a' i := by
+      intro i hi g
+      have hrel_g : ∀ y, ∑ j ∈ s, g (a' j) * v (b j) y = 0 := by
+        intro y
+        obtain ⟨x, rfl⟩ := (hbij g).2 y
+        have h1 := congrArg g (ha'rel x)
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sum, map_zero] at h1
+        simp only [map_mul, ← heq] at h1
+        exact h1
+      have hdiff : ∀ y, ∑ j ∈ s.erase i0, (g (a' j) - a' j) * v (b j) y = 0 := by
+        intro y
+        rw [Finset.sum_erase]
+        · simp only [sub_mul, Finset.sum_sub_distrib, hrel_g y, ha'rel y, sub_zero]
+        · rw [ha'1, map_one, sub_self, zero_mul]
+      by_cases hii : i = i0
+      · rw [hii, ha'1, map_one]
+      · have h2 :=
+          ih (s.erase i0) (Finset.erase_ssubset hi0)
+            (fun j => g (a' j) - a' j)
+            hdiff i (Finset.mem_erase.mpr ⟨hii, hi⟩)
+        exact sub_eq_zero.mp h2
+    have hK : ∀ i ∈ s, ∃ c : K, algebraMap K F c = a' i := fun i hi =>
+      IntermediateField.mem_bot.mp (mem_bot_of_fixed (a' i) (hfix i hi))
+    choose! c hc using hK
+    have hv0 : v (∑ i ∈ s, c i • b i) = 0 := by
+      funext y
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero] at h1
-      simp only [map_mul, ← heq] at h1
-      exact h1
-    have hdiff : ∀ y, ∑ j ∈ s.erase i0, (g (a' j) - a' j) * v (b j) y = 0 := by
-      intro y
-      rw [Finset.sum_erase]
-      · simp only [sub_mul, Finset.sum_sub_distrib, hrel_g y, ha'rel y, sub_zero]
-      · rw [ha'1, map_one, sub_self, zero_mul]
-    by_cases hii : i = i0
-    · rw [hii, ha'1, map_one]
-    · have h2 := ih (s.erase i0) (Finset.erase_ssubset hi0) (fun j => g (a' j) - a' j) hdiff i
-        (Finset.mem_erase.mpr ⟨hii, hi⟩)
-      exact sub_eq_zero.mp h2
-  have hK : ∀ i ∈ s, ∃ c : K, algebraMap K F c = a' i := fun i hi =>
-    IntermediateField.mem_bot.mp (mem_bot_of_fixed (a' i) (hfix i hi))
-  choose! c hc using hK
-  have hv0 : v (∑ i ∈ s, c i • b i) = 0 := by
-    funext y
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_apply, Pi.zero_apply, ← ha'rel y]
-    refine Finset.sum_congr rfl fun i hi => ?_
-    rw [map_smul, Pi.smul_apply, Algebra.smul_def, hc i hi]
-  have hsum0 : ∑ i ∈ s, c i • b i = 0 := hinj (by rw [hv0, map_zero])
-  have hc0 := (linearIndependent_iff'.mp hb) s c hsum0 i0 hi0
-  rw [← hc i0 hi0, hc0, map_zero] at ha'1
-  exact zero_ne_one ha'1
+        rw [map_sum, Finset.sum_apply, Pi.zero_apply, ← ha'rel y]
+      refine Finset.sum_congr rfl fun i hi => ?_
+      rw [map_smul, Pi.smul_apply, Algebra.smul_def, hc i hi]
+    have hsum0 : ∑ i ∈ s, c i • b i = 0 := hinj (by rw [hv0, map_zero])
+    have hc0 := (linearIndependent_iff'.mp hb) s c hsum0 i0 hi0
+    rw [← hc i0 hi0, hc0, map_zero] at ha'1
+    exact zero_ne_one ha'1
 
-private theorem exists_finset_linearIndependent_restrict {F Pt : Type} [Field F] {n : ℕ} (w : Fin n → Pt → F)
-    (hw : LinearIndependent F w) :
-    ∃ S : Finset Pt, LinearIndependent F (fun i (y : S) => w i y) := by
+private theorem exists_finset_linearIndependent_restrict
+    {F Pt : Type} [Field F] {n : ℕ} (w : Fin n → Pt → F) (hw : LinearIndependent F w)
+    : ∃ S : Finset Pt, LinearIndependent F (fun i (y : S) => w i y) := by
   classical
   let Ker : Finset Pt → Submodule F (Fin n → F) := fun S =>
     LinearMap.ker (Fintype.linearCombination F (fun i (y : S) => w i y))
@@ -84,8 +89,7 @@ private theorem exists_finset_linearIndependent_restrict {F Pt : Type} [Field F]
   by_contra hne
   push Not at hne
   obtain ⟨i1, hi1⟩ := hne
-  have hsum : (∑ i, c i • w i) ≠ 0 := fun h =>
-    hi1 (Fintype.linearIndependent_iff.mp hw c h i1)
+  have hsum : (∑ i, c i • w i) ≠ 0 := fun h => hi1 (Fintype.linearIndependent_iff.mp hw c h i1)
   obtain ⟨y, hy⟩ : ∃ y, (∑ i, c i • w i) y ≠ 0 := by
     by_contra h
     push Not at h

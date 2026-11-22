@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL ValuativeRel Matrix MeasureTheory
+  UpperTheory.ConvolutionTheory.Loc MulAction UpperTheory.Gal.LocD
 
-theorem UpperTheory.Gal.LocD.prMem :
-    PrMem := by
+theorem UpperTheory.Gal.LocD.prMem : PrMem := by
   intro G _ _ _ _ _ _ _ B hB _ _ μ _ χ hker
   haveI : SecondCountableTopology B := TopologicalSpace.Subtype.secondCountableTopology _
   have hχc : Continuous (fun x : B => (χ x : ℂ)) := by
@@ -18,8 +18,7 @@ theorem UpperTheory.Gal.LocD.prMem :
       filter_upwards [hker.mem_nhds (one_mem χ.ker)] with x hx
       have hx' : χ x = 1 := MonoidHom.mem_ker.mp hx
       simp [hx']
-  have hint : ∀ f ∈ Cc G, ∀ g : G,
-      Integrable (fun x : B => (χ x : ℂ) * f ((x : G)⁻¹ * g)) μ := by
+  have hint : ∀ f ∈ Cc G, ∀ g : G, Integrable (fun x : B => (χ x : ℂ) * f ((x : G)⁻¹ * g)) μ := by
     intro f hf g
     rw [GroundTheory.Automorphic.mem_locallyConstantCompactSupport] at hf
     obtain ⟨hlc, hcs⟩ := hf
@@ -28,8 +27,8 @@ theorem UpperTheory.Gal.LocD.prMem :
         hB.isClosedEmbedding_subtypeVal
     have hcs' : HasCompactSupport (fun x : B => f ((x : G)⁻¹ * g)) :=
       hcs.comp_isClosedEmbedding hemb
-    exact Continuous.integrable_of_hasCompactSupport
-      (hχc.mul (hlc.continuous.comp hemb.continuous)) hcs'.mul_left
+    exact Continuous.integrable_of_hasCompactSupport (hχc.mul (hlc.continuous.comp hemb.continuous))
+      hcs'.mul_left
   refine ⟨fun f hf => ?_, fun f hf f' hf' => ?_⟩
   · rw [mem_indF]
     constructor

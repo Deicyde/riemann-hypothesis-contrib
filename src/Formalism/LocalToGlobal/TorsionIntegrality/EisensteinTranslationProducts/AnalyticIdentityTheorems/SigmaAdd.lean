@@ -209,11 +209,14 @@ lemma additionQuotient_order (he : SigmaEntire) (ho : SigmaOdd) (hz : SigmaZero)
 end SigmaAdditionFormula
 
 open SigmaAdditionFormula in
-theorem sigmaAdd_of (hN : EllipticNoPole) (he : SigmaEntire) (ho : SigmaOdd) (hz : SigmaZero)
-    (hs : SigmaSimple) (hq : SigmaQuasi) (hord : SigmaOrder) : SigmaAdd := by
+theorem sigmaAdd_of
+    (hN : EllipticNoPole) (he : SigmaEntire) (ho : SigmaOdd) (hz : SigmaZero) (hs : SigmaSimple)
+    (hq : SigmaQuasi) (hord : SigmaOrder)
+    : SigmaAdd := by
   intro L z w hzL hwL
-  obtain ⟨c, hc⟩ := hN L (additionQuotient L w) (additionQuotient_meromorphicAt L w he) (additionQuotient_periodic L w hq)
-    (additionQuotient_order L w he ho hz hs hq hord)
+  obtain ⟨c, hc⟩ :=
+    hN L (additionQuotient L w) (additionQuotient_meromorphicAt L w he)
+      (additionQuotient_periodic L w hq) (additionQuotient_order L w he ho hz hs hq hord)
   have hfz := hc z (additionQuotient_analyticAt L w he hz z hzL).continuousAt
   have hfw := hc w (additionQuotient_analyticAt L w he hz w hwL).continuousAt
   have hσz : wSigma L z ≠ 0 := fun h => hzL ((hz L z).1 h)
@@ -221,25 +224,30 @@ theorem sigmaAdd_of (hN : EllipticNoPole) (he : SigmaEntire) (ho : SigmaOdd) (hz
   rw [← hfw] at hfz
   unfold additionQuotient at hfz
   rw [sub_self, h0, mul_zero, zero_div, zero_add] at hfz
-  have e : wSigma L (z + w) * wSigma L (z - w) / wSigma L z ^ 2 * wSigma L z ^ 2
-      = wSigma L (z + w) * wSigma L (z - w) := div_mul_cancel₀ _ (pow_ne_zero 2 hσz)
+  have e
+      : wSigma L (z + w) * wSigma L (z - w) / wSigma L z ^ 2 * wSigma L z ^ 2
+        = wSigma L (z + w) * wSigma L (z - w) :=
+    div_mul_cancel₀ _ (pow_ne_zero 2 hσz)
   linear_combination (wSigma L z ^ 2) * hfz - e
 
 theorem sgStarAdd_of (h : SigmaAdd) : SgStarAdd := by
   intro L z w hz hw
   unfold sgStar
   have e := h L z w hz hw
-  have ex : Complex.exp (-(s2 L) * (z + w) ^ 2 / 2) * Complex.exp (-(s2 L) * (z - w) ^ 2 / 2)
-      = Complex.exp (-(s2 L) * z ^ 2 / 2) ^ 2 * Complex.exp (-(s2 L) * w ^ 2 / 2) ^ 2 := by
+  have ex
+      : Complex.exp (-(s2 L) * (z + w) ^ 2 / 2) * Complex.exp (-(s2 L) * (z - w) ^ 2 / 2)
+        = Complex.exp (-(s2 L) * z ^ 2 / 2) ^ 2 * Complex.exp (-(s2 L) * w ^ 2 / 2) ^ 2 := by
     rw [← Complex.exp_nat_mul, ← Complex.exp_nat_mul, ← Complex.exp_add, ← Complex.exp_add]
     congr 1
     push_cast
     ring
-  calc _ = (wSigma L (z + w) * wSigma L (z - w)) * (Complex.exp (-(s2 L) * (z + w) ^ 2 / 2)
-          * Complex.exp (-(s2 L) * (z - w) ^ 2 / 2)) := by ring
+  calc
+    _ = (wSigma L (z + w) * wSigma L (z - w))
+        * (Complex.exp (-(s2 L) * (z + w) ^ 2 / 2) * Complex.exp (-(s2 L) * (z - w) ^ 2 / 2)) := by
+      ring
     _ = _ := by
-        rw [e, ex]
-        ring
+      rw [e, ex]
+      ring
 
 theorem pInjective_of (h : SigmaAdd) (hz : SigmaZero) : PInjective := by
   intro L z w hzL hwL

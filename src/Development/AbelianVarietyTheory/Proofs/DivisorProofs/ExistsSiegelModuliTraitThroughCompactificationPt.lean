@@ -10,9 +10,13 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RangeAlge
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin GlobalTheory.TChart
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin
+  GlobalTheory.TChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,21 +24,35 @@ noncomputable section
 
 namespace GlobalTheory.TChart
 
-theorem exists_complete_dvr_of_local (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] :
-    ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W)
-      (_ : IsAdicComplete (maximalIdeal W) W) (ψ : A →+* W), Function.Injective ψ ∧ IsLocalHom ψ := by
+theorem exists_complete_dvr_of_local
+    (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A]
+    : ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W)
+        (_ : IsAdicComplete (maximalIdeal W) W) (ψ : A →+* W),
+      Function.Injective ψ ∧ IsLocalHom ψ := by
   by_cases h : IsField A
   · letI := h.toField
-    refine ⟨PowerSeries A, inferInstance, inferInstance, inferInstance, ?_, PowerSeries.C,
-      RingHom.injective _, inferInstance⟩
-    rw [PowerSeries.maximalIdeal_eq_span_X]; infer_instance
-  · obtain ⟨O, _, _, _, _, φ, h1, h2⟩ := GlobalTheory.exists_complete_discreteValuationRing_dominating A h
+    refine ⟨
+      PowerSeries A,
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      ?_,
+      PowerSeries.C,
+      RingHom.injective _,
+      inferInstance
+    ⟩
+    rw [PowerSeries.maximalIdeal_eq_span_X]
+    infer_instance
+  · obtain ⟨O, _, _, _, _, φ, h1, h2⟩ :=
+      GlobalTheory.exists_complete_discreteValuationRing_dominating A h
     exact ⟨O, inferInstance, inferInstance, inferInstance, inferInstance, φ, h1, h2⟩
 
-theorem exists_trait_at : ∀ {g n : ℕ} (F : SFam g n (zetaAway n)) (S : Scheme.{0}) (s : S ⟶ Sp (cycAway n))
-    [LocallyOfFiniteType s] [IsLocallyNoetherian S] (j : F.X ⟶ S) [IsOpenImmersion j], 3 ≤ n → Dense (Set.range j) →
-    j ≫ s = F.s → ∀ x : S, ∃ (T : GlobalTheory.Poinc.Trait F) (ξT : Sp T.V ⟶ S) (b : cycAway n →+* T.V),
-      ξT (closedPoint T.V) = x ∧ jK T.V ≫ ξT = T.y ≫ j ∧ ξT ≫ s = spMap b := by
+theorem exists_trait_at
+    : ∀ {g n : ℕ} (F : SFam g n (zetaAway n)) (S : Scheme.{0}) (s : S ⟶ Sp (cycAway n))
+        [LocallyOfFiniteType s] [IsLocallyNoetherian S] (j : F.X ⟶ S) [IsOpenImmersion j],
+      3 ≤ n → Dense (Set.range j) → j ≫ s = F.s
+        → ∀ x : S, ∃ (T : GlobalTheory.Poinc.Trait F) (ξT : Sp T.V ⟶ S) (b : cycAway n →+* T.V),
+          ξT (closedPoint T.V) = x ∧ jK T.V ≫ ξT = T.y ≫ j ∧ ξT ≫ s = spMap b := by
   intro g n F S s _ _ j _ _ hd hjs x
   haveI := F.smooth
   haveI : Smooth F.s := SmoothOfRelativeDimension.smooth (g * (g + 1) / 2) F.s
@@ -43,17 +61,20 @@ theorem exists_trait_at : ∀ {g n : ℕ} (F : SFam g n (zetaAway n)) (S : Schem
     GlobalTheory.BlowOpen.exists_specializes_of_dense_scheme S _ j.isOpenEmbedding.isOpen_range hd x
   obtain ⟨y1, hy1, e1⟩ := Flat.generalizingMap F.s (genericPoint_specializes (F.s y0))
   have hη : j y1 ⤳ x := (hy1.map j.continuous).trans hw
-  obtain ⟨q, hq⟩ : j y1 ∈ Set.range (S.fromSpecStalk x) := by rw [Scheme.range_fromSpecStalk]; exact hη
+  obtain ⟨q, hq⟩ : j y1 ∈ Set.range (S.fromSpecStalk x) := by
+    rw [Scheme.range_fromSpecStalk]; exact hη
   haveI : q.asIdeal.IsPrime := q.isPrime
   haveI : IsLocalRing (S.presheaf.stalk x ⧸ q.asIdeal) := .of_surjective' _ Ideal.Quotient.mk_surjective
-  obtain ⟨W, _, _, _, hWc, ψ, hψi, hψl⟩ := exists_complete_dvr_of_local (S.presheaf.stalk x ⧸ q.asIdeal)
+  obtain ⟨W, _, _, _, hWc, ψ, hψi, hψl⟩ :=
+    exists_complete_dvr_of_local (S.presheaf.stalk x ⧸ q.asIdeal)
   haveI : IsLocalHom (Ideal.Quotient.mk q.asIdeal) := .of_surjective _ Ideal.Quotient.mk_surjective
   let ψ' : S.presheaf.stalk x →+* W := ψ.comp (Ideal.Quotient.mk q.asIdeal)
   haveI : IsLocalHom ψ' := RingHom.isLocalHom_comp _ _
   let ξ0 : Sp W ⟶ S := spMap ψ' ≫ S.fromSpecStalk x
   have hξc : ξ0 (closedPoint W) = x := by
     show S.fromSpecStalk x (spMap ψ' (closedPoint W)) = x
-    have e : spMap ψ' (closedPoint W) = closedPoint (S.presheaf.stalk x) := IsLocalRing.comap_closedPoint ψ'
+    have e : spMap ψ' (closedPoint W) = closedPoint (S.presheaf.stalk x) :=
+      IsLocalRing.comap_closedPoint ψ'
     rw [e]
     exact Scheme.fromSpecStalk_closedPoint
   have hξg : ξ0 (⊥ : PrimeSpectrum W) = j y1 := by
@@ -65,7 +86,8 @@ theorem exists_trait_at : ∀ {g n : ℕ} (F : SFam g n (zetaAway n)) (S : Schem
     rw [this, hq]
   have hjKbot : ∀ pt : Sp (FractionRing W), jK W pt = (⊥ : PrimeSpectrum W) := fun pt => by
     apply PrimeSpectrum.ext
-    have hpt : pt = (⊥ : PrimeSpectrum (FractionRing W)) := Subsingleton.elim (α := PrimeSpectrum (FractionRing W)) _ _
+    have hpt : pt = (⊥ : PrimeSpectrum (FractionRing W)) :=
+      Subsingleton.elim (α := PrimeSpectrum (FractionRing W)) _ _
     subst hpt
     show Ideal.comap (algebraMap W (FractionRing W)) ⊥ = ⊥
     exact (RingHom.injective_iff_ker_eq_bot _).1 (IsFractionRing.injective W (FractionRing W))
@@ -86,8 +108,11 @@ theorem exists_trait_at : ∀ {g n : ℕ} (F : SFam g n (zetaAway n)) (S : Schem
     rw [RingHom.injective_iff_ker_eq_bot, RingHom.ker_eq_comap_bot]
     exact congrArg PrimeSpectrum.asIdeal h1
   haveI : CharZero W := charZero_of_injective_ringHom hb0i
-  have hBase : GlobalTheory.Mum.Base W := ⟨⟨inferInstance, inferInstance, inferInstance, hWc⟩, inferInstance⟩
-  obtain ⟨T, f, fK, -, hfl, -, hcomp, hTy⟩ := GlobalTheory.T.traitExistsAfterFiniteExtension_of_completeDVR g n (cycAway n) (zetaAway n) F W hBase inferInstance y
+  have hBase : GlobalTheory.Mum.Base W :=
+    ⟨⟨inferInstance, inferInstance, inferInstance, hWc⟩, inferInstance⟩
+  obtain ⟨T, f, fK, -, hfl, -, hcomp, hTy⟩ :=
+    GlobalTheory.T.traitExistsAfterFiniteExtension_of_completeDVR g n (cycAway n) (zetaAway n) F W
+      hBase inferInstance y
   haveI := hfl
   refine ⟨T, spMap f ≫ ξ0, f.comp b0, ?_, ?_, ?_⟩
   · show ξ0 (spMap f (closedPoint T.V)) = x

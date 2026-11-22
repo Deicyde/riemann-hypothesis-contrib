@@ -6,19 +6,24 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.LeviIso
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.LeviIso
 
 noncomputable section
 
 namespace GlobalTheory.LeviIso.Size
 
-theorem detOn_of_frame {n : ℕ} {m : Type} [Fintype m] [DecidableEq m] (g : Matrix (Fin n) (Fin n) ℂ)
-    (C : Matrix (Fin n) m ℂ) (X : Matrix m m ℂ) (W : Submodule ℂ (Fin n → ℂ)) (hC : Cᴴ * C = 1)
-    (hW : ∀ y, y ∈ W ↔ ∃ u, y = C *ᵥ u) (hg : g * C = C * X) : detOn g W = ‖X.det‖ := by
+theorem detOn_of_frame
+    {n : ℕ} {m : Type} [Fintype m] [DecidableEq m]
+    (g : Matrix (Fin n) (Fin n) ℂ) (C : Matrix (Fin n) m ℂ) (X : Matrix m m ℂ)
+    (W : Submodule ℂ (Fin n → ℂ))
+    (hC : Cᴴ * C = 1) (hW : ∀ y, y ∈ W ↔ ∃ u, y = C *ᵥ u) (hg : g * C = C * X)
+    : detOn g W = ‖X.det‖ := by
   have hst : ∀ y ∈ W, Matrix.toLin' g y ∈ W := by
     intro y hy
     obtain ⟨u, rfl⟩ := (hW y).1 hy
-    exact (hW _).2 ⟨X *ᵥ u, by rw [Matrix.toLin'_apply, Matrix.mulVec_mulVec, hg, Matrix.mulVec_mulVec]⟩
+    exact (hW _).2
+      ⟨X *ᵥ u, by rw [Matrix.toLin'_apply, Matrix.mulVec_mulVec, hg, Matrix.mulVec_mulVec]⟩
   let f : (m → ℂ) →ₗ[ℂ] W := (Matrix.toLin' C).codRestrict W fun u => (hW _).2 ⟨u, rfl⟩
   have hf : Function.Bijective f := by
     refine ⟨fun u v h => ?_, fun y => ?_⟩
@@ -28,8 +33,9 @@ theorem detOn_of_frame {n : ℕ} {m : Type} [Fintype m] [DecidableEq m] (g : Mat
     · obtain ⟨u, hu⟩ := (hW y).1 y.2
       exact ⟨u, Subtype.ext hu.symm⟩
   let e := LinearEquiv.ofBijective f hf
-  have he : (Matrix.toLin' g).restrict hst =
-      (e : (m → ℂ) →ₗ[ℂ] W) ∘ₗ Matrix.toLin' X ∘ₗ (e.symm : W →ₗ[ℂ] (m → ℂ)) := by
+  have he
+      : (Matrix.toLin' g).restrict hst
+        = (e : (m → ℂ) →ₗ[ℂ] W) ∘ₗ Matrix.toLin' X ∘ₗ (e.symm : W →ₗ[ℂ] (m → ℂ)) := by
     refine LinearMap.ext fun y => ?_
     obtain ⟨u, rfl⟩ := e.surjective y
     simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply]
@@ -39,13 +45,15 @@ theorem detOn_of_frame {n : ℕ} {m : Type} [Fintype m] [DecidableEq m] (g : Mat
   unfold detOn
   rw [dite_eq_left hst, he, LinearMap.det_conj, LinearMap.det_toLin']
 
-theorem detOn_blocks {n a : ℕ} {j : Fin a → ℕ} (B : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ)
-    (p : Fin a → Prop) [DecidablePred p] (W : Submodule ℂ (Fin n → ℂ))
+theorem detOn_blocks
+    {n a : ℕ} {j : Fin a → ℕ} (B : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ) (p : Fin a → Prop)
+    [DecidablePred p]
+    (W : Submodule ℂ (Fin n → ℂ))
     (h1 : ∀ i, (B i)ᴴ * B i = 1) (h2 : ∀ i k, i ≠ k → (B i)ᴴ * B k = 0)
     (hW : ∀ y, y ∈ W ↔ ∃ u : ∀ i, Fin (j i) → ℂ, (∀ i, ¬ p i → u i = 0) ∧ y = ∑ i, B i *ᵥ u i)
     (g : Matrix (Fin n) (Fin n) ℂ) (x : ∀ i, Matrix (Fin (j i)) (Fin (j i)) ℂ)
-    (hg : ∀ i, g * B i = B i * x i) :
-    detOn g W = ∏ i ∈ Finset.univ.filter p, ‖(x i).det‖ := by
+    (hg : ∀ i, g * B i = B i * x i)
+    : detOn g W = ∏ i ∈ Finset.univ.filter p, ‖(x i).det‖ := by
   let C : Matrix (Fin n) (Σ i : {i // p i}, Fin (j i)) ℂ := Matrix.of fun r s => B s.1 r s.2
   have hCv : ∀ u, C *ᵥ u = ∑ i : {i // p i}, B i *ᵥ fun s => u ⟨i, s⟩ := by
     intro u
@@ -60,7 +68,8 @@ theorem detOn_blocks {n a : ℕ} {j : Fin a → ℕ} (B : ∀ i, Matrix (Fin n) 
     · subst h
       rw [h1]
       simp [Matrix.one_apply]
-    · rw [h2 i k (fun e => h (Subtype.ext e)), Matrix.one_apply_ne (fun e => h (congrArg Sigma.fst e))]
+    · rw [h2 i k (fun e => h (Subtype.ext e)),
+        Matrix.one_apply_ne (fun e => h (congrArg Sigma.fst e))]
       rfl
   · intro y
     rw [hW]
@@ -91,15 +100,22 @@ theorem detOn_blocks {n a : ℕ} {j : Fin a → ℕ} (B : ∀ i, Matrix (Fin n) 
       simp [Matrix.blockDiagonal'_apply_ne _ _ _ hi]
     · simp
 
-theorem locSize_blocks : ∀ (n a : ℕ) (j : Fin a → ℕ) (B : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ) (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)), (∀ i, (B i)ᴴ * B i = 1) → (∀ i k, i ≠ k → (B i)ᴴ * B k = 0) → SpansFlag B W → ∀ (g : Matrix (Fin n) (Fin n) ℂ) (x : ∀ i, Matrix (Fin (j i)) (Fin (j i)) ℂ), (∀ i, (x i).det ≠ 0) → (∀ i, g * B i = B i * x i) → ∀ i, locSize j W g i = ‖(x i).det‖ ^ (-(1 : ℝ) / j i) := by
+theorem locSize_blocks
+    : ∀ (n a : ℕ) (j : Fin a → ℕ) (B : ∀ i, Matrix (Fin n) (Fin (j i)) ℂ)
+        (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)),
+      (∀ i, (B i)ᴴ * B i = 1) → (∀ i k, i ≠ k → (B i)ᴴ * B k = 0) → SpansFlag B W
+        → ∀ (g : Matrix (Fin n) (Fin n) ℂ) (x : ∀ i, Matrix (Fin (j i)) (Fin (j i)) ℂ),
+          (∀ i, (x i).det ≠ 0) → (∀ i, g * B i = B i * x i)
+            → ∀ i, locSize j W g i = ‖(x i).det‖ ^ (-(1 : ℝ) / j i) := by
   intro n a j B W h1 h2 hW g x hx hg i
   unfold locSize
   rw [detOn_blocks B _ _ h1 h2 (hW i.succ) g x hg, detOn_blocks B _ _ h1 h2 (hW i.castSucc) g x hg]
-  have e : (Finset.univ.filter fun k : Fin a => k.castSucc < i.succ) =
-      insert i (Finset.univ.filter fun k : Fin a => k.castSucc < i.castSucc) := by
+  have e
+      : (Finset.univ.filter fun k : Fin a => k.castSucc < i.succ)
+        = insert i (Finset.univ.filter fun k : Fin a => k.castSucc < i.castSucc) := by
     ext k
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.lt_def, Fin.ext_iff,
-      Fin.val_succ, Fin.val_castSucc]
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.lt_def,
+      Fin.ext_iff, Fin.val_succ, Fin.val_castSucc]
     omega
   rw [e, Finset.prod_insert (by simp), mul_div_cancel_right₀]
   exact Finset.prod_ne_zero_iff.2 fun k _ => norm_ne_zero_iff.2 (hx k)

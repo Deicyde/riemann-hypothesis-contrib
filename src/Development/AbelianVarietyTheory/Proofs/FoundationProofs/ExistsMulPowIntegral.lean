@@ -19,12 +19,13 @@ namespace GlobalTheory.Square.AwayClosure
 
 variable {K : Type} [Field K] [NumberField K]
 
-
 open NumberField IsDedekindDomain Finset in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Square.AwayClosure.of_integral {m k l : ℕ} {x : K} (hx : x ≠ 0) {a b : 𝓞 K}
-    (ha : x * (m : K) ^ k = a) (hb : x⁻¹ * (m : K) ^ l = b) : _root_.GlobalTheory.Square.IsAwayUnit m x := by
+theorem _root_.GlobalTheory.Square.AwayClosure.of_integral
+    {m k l : ℕ} {x : K} (hx : x ≠ 0)
+    {a b : 𝓞 K} (ha : x * (m : K) ^ k = a) (hb : x⁻¹ * (m : K) ^ l = b)
+    : _root_.GlobalTheory.Square.IsAwayUnit m x := by
   have hab : ((m : K)) ^ (k + l) = (a : K) * (b : K) := by
     rw [← ha, ← hb, pow_add]
     field_simp
@@ -34,8 +35,9 @@ theorem _root_.GlobalTheory.Square.AwayClosure.of_integral {m k l : ℕ} {x : K}
 open NumberField IsDedekindDomain Finset in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Square.AwayClosure.of_pow_eq_one (m : ℕ) {x : K} {k : ℕ} (hk : 0 < k) (h : x ^ k = 1) :
-    _root_.GlobalTheory.Square.IsAwayUnit m x := by
+theorem _root_.GlobalTheory.Square.AwayClosure.of_pow_eq_one
+    (m : ℕ) {x : K} {k : ℕ} (hk : 0 < k) (h : x ^ k = 1)
+    : _root_.GlobalTheory.Square.IsAwayUnit m x := by
   have hx : x ≠ 0 := by
     rintro rfl
     simp [zero_pow hk.ne'] at h
@@ -48,28 +50,31 @@ theorem _root_.GlobalTheory.Square.AwayClosure.of_pow_eq_one (m : ℕ) {x : K} {
 open NumberField IsDedekindDomain Finset in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Square.AwayClosure.of_dvd {m k : ℕ} {a : 𝓞 K} (h : a ∣ (m : 𝓞 K) ^ k) :
-    _root_.GlobalTheory.Square.IsAwayUnit m (a : K) :=
+theorem _root_.GlobalTheory.Square.AwayClosure.of_dvd {m k : ℕ} {a : 𝓞 K} (h : a ∣ (m : 𝓞 K) ^ k)
+    : _root_.GlobalTheory.Square.IsAwayUnit m (a : K) :=
   ⟨a, 0, k, h, by simp⟩
 
 open NumberField IsDedekindDomain Finset in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Square.AwayClosure.mul {m : ℕ} {x y : K} (hx : _root_.GlobalTheory.Square.IsAwayUnit m x)
-    (hy : _root_.GlobalTheory.Square.IsAwayUnit m y) : _root_.GlobalTheory.Square.IsAwayUnit m (x * y) :=
-  by
-    obtain ⟨a, k, j, ha, hx⟩ := hx
-    obtain ⟨b, l, i, hb, hy⟩ := hy
-    refine ⟨a * b, k + l, j + i, by rw [pow_add]; exact mul_dvd_mul ha hb, ?_⟩
-    calc
-      x * y * (m : K) ^ (k + l) = (x * (m : K) ^ k) * (y * (m : K) ^ l) := by rw [pow_add]; ring
-      _ = ((a * b : 𝓞 K) : K) := by rw [hx, hy]; push_cast; rfl
+theorem _root_.GlobalTheory.Square.AwayClosure.mul
+    {m : ℕ} {x y : K} (hx : _root_.GlobalTheory.Square.IsAwayUnit m x)
+    (hy : _root_.GlobalTheory.Square.IsAwayUnit m y)
+    : _root_.GlobalTheory.Square.IsAwayUnit m (x * y) := by
+  obtain ⟨a, k, j, ha, hx⟩ := hx
+  obtain ⟨b, l, i, hb, hy⟩ := hy
+  refine ⟨a * b, k + l, j + i, by rw [pow_add]; exact mul_dvd_mul ha hb, ?_⟩
+  calc
+    x * y * (m : K) ^ (k + l)
+      = (x * (m : K) ^ k) * (y * (m : K) ^ l) := by rw [pow_add]; ring
+    _ = ((a * b : 𝓞 K) : K) := by rw [hx, hy]; push_cast; rfl
 
 open NumberField IsDedekindDomain Finset in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Square.AwayClosure.inv {m : ℕ} (hm : 0 < m) {x : K} (hx : _root_.GlobalTheory.Square.IsAwayUnit m x) :
-    _root_.GlobalTheory.Square.IsAwayUnit m x⁻¹ := by
+theorem _root_.GlobalTheory.Square.AwayClosure.inv
+    {m : ℕ} (hm : 0 < m) {x : K} (hx : _root_.GlobalTheory.Square.IsAwayUnit m x)
+    : _root_.GlobalTheory.Square.IsAwayUnit m x⁻¹ := by
   obtain ⟨a, k, k', ⟨c, hc⟩, hxa⟩ := hx
   have hcK : (m : K) ^ k' = (a : K) * (c : K) := by
     have := congrArg (fun t : 𝓞 K => (t : K)) hc
@@ -180,29 +185,42 @@ private lemma exists_mul_pow_integer_of_count_eq_zero_coprime {m : ℕ} (hm : 0 
         positivity
   exact ⟨n, b, hb⟩
 
-
 open NumberField IsDedekindDomain Finset in
 open scoped nonZeroDivisors in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.Square.isAwayUnit_closure : ∀ (K : Type) [Field K] [NumberField K]
-    [StarRing K] (m : ℕ), 0 < m →
-    (∀ (x : K) (k : ℕ), 0 < k → x ^ k = 1 → _root_.GlobalTheory.Square.IsAwayUnit m x) ∧
-    (∀ (a : 𝓞 K) (k : ℕ), a ∣ (m : 𝓞 K) ^ k → _root_.GlobalTheory.Square.IsAwayUnit m (a : K)) ∧
-    (∀ x y : K, _root_.GlobalTheory.Square.IsAwayUnit m x → _root_.GlobalTheory.Square.IsAwayUnit m y →
-      _root_.GlobalTheory.Square.IsAwayUnit m (x * y)) ∧
-    (∀ x : K, _root_.GlobalTheory.Square.IsAwayUnit m x → _root_.GlobalTheory.Square.IsAwayUnit m x⁻¹) ∧
-    (∀ x : K, x ≠ 0 → (∀ w : _root_.Formalism.PairingDivisionLocalBalance.Pl K, (m : 𝓞 K) ∉ w.asIdeal → _root_.Formalism.DivisionValues.vw w x = 0) →
-      _root_.GlobalTheory.Square.IsAwayUnit m x) := by
+theorem _root_.GlobalTheory.Square.isAwayUnit_closure
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (m : ℕ),
+      0 < m
+        → (∀ (x : K) (k : ℕ), 0 < k → x ^ k = 1 → _root_.GlobalTheory.Square.IsAwayUnit m x)
+          ∧ (∀ (a : 𝓞 K) (k : ℕ),
+            a ∣ (m : 𝓞 K) ^ k → _root_.GlobalTheory.Square.IsAwayUnit m (a : K))
+          ∧ (∀ x y : K,
+            _root_.GlobalTheory.Square.IsAwayUnit m x → _root_.GlobalTheory.Square.IsAwayUnit m y
+              → _root_.GlobalTheory.Square.IsAwayUnit m (x * y))
+          ∧ (∀ x : K,
+            _root_.GlobalTheory.Square.IsAwayUnit m x → _root_.GlobalTheory.Square.IsAwayUnit m x⁻¹)
+          ∧ (∀ x : K,
+            x ≠ 0
+              → (∀ w : _root_.Formalism.PairingDivisionLocalBalance.Pl K,
+                (m : 𝓞 K) ∉ w.asIdeal → _root_.Formalism.DivisionValues.vw w x = 0)
+              → _root_.GlobalTheory.Square.IsAwayUnit m x) := by
   intro K _ _ _ m hm
-  refine ⟨fun x k hk h => _root_.GlobalTheory.Square.AwayClosure.of_pow_eq_one m hk h,
+  refine ⟨
+    fun x k hk h => _root_.GlobalTheory.Square.AwayClosure.of_pow_eq_one m hk h,
     fun a k h => _root_.GlobalTheory.Square.AwayClosure.of_dvd h,
     fun x y hx hy => _root_.GlobalTheory.Square.AwayClosure.mul hx hy,
-    fun x hx => _root_.GlobalTheory.Square.AwayClosure.inv hm hx, fun x hx hv => ?_⟩
-  have hI : ∀ w : HeightOneSpectrum (𝓞 K), (m : 𝓞 K) ∉ w.asIdeal →
-      FractionalIdeal.count K w (FractionalIdeal.spanSingleton (𝓞 K)⁰ x) = 0 :=
-    fun w hw => hv w hw
-  have hI' : ∀ w : HeightOneSpectrum (𝓞 K), (m : 𝓞 K) ∉ w.asIdeal →
-      FractionalIdeal.count K w (FractionalIdeal.spanSingleton (𝓞 K)⁰ x⁻¹) = 0 := by
+    fun x hx => _root_.GlobalTheory.Square.AwayClosure.inv hm hx,
+    fun x hx hv => ?_
+  ⟩
+  have hI
+      : ∀ w : HeightOneSpectrum (𝓞 K),
+        (m : 𝓞 K) ∉ w.asIdeal
+          → FractionalIdeal.count K w (FractionalIdeal.spanSingleton (𝓞 K)⁰ x) = 0 := fun w hw =>
+    hv w hw
+  have hI'
+      : ∀ w : HeightOneSpectrum (𝓞 K),
+        (m : 𝓞 K) ∉ w.asIdeal
+          → FractionalIdeal.count K w (FractionalIdeal.spanSingleton (𝓞 K)⁰ x⁻¹) = 0 := by
     intro w hw
     rw [← FractionalIdeal.spanSingleton_inv, FractionalIdeal.count_inv, hI w hw, neg_zero]
   obtain ⟨k, a, ha⟩ := exists_mul_pow_integer_of_count_eq_zero_coprime hm hx hI

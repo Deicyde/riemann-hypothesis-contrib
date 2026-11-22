@@ -34,16 +34,21 @@ lemma fifth_volume_constant_nonneg {S : Finset (Fin D)} (m : Fin D → ℕ) {u :
     exact Real.log_le_log (Real.exp_pos 1) (rLoc_ge S m (norm_coord_le_of_ball hR2 hxB))
   nlinarith
 
-theorem oscGen {S : Finset (Fin D)} (m : Fin D → ℕ) {u : (Fin D → ℂ) → ℝ} {R C₅ : ℝ}
-    (hR2 : R ≤ 2) (hR : 5 / 4 < R)
+theorem oscGen
+    {S : Finset (Fin D)}
+    (m : Fin D → ℕ)
+    {u : (Fin D → ℂ) → ℝ} {R C₅ : ℝ} (hR2 : R ≤ 2) (hR : 5 / 4 < R)
     (hc : ContinuousOn u (ball 0 R \ coordDiv S)) (hp : IsPsh (ball 0 R \ coordDiv S) u)
     (hb : ∀ z ∈ ball (0 : Fin D → ℂ) R \ coordDiv S, -C₅ * Real.log (rLoc S m z) ≤ u z ∧ u z ≤ C₅)
-    {C₁ : ℝ} (hC₁ : 1 ≤ C₁) :
-    ∃ C ℓ₀ : ℝ, 1 ≤ C ∧ ∀ t, 0 < t → ℓ₀ ≤ Real.log (1 / t) →
-      Real.exp 1 ≤ Real.log (1 / t) ∧ C₁ * t ≤ (R - 5 / 4) / 2 ∧
-      ∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4),
-        -C * Real.log (Real.log (1 / t)) ≤ pmoff S u z (t / (8 * C₁)) ∧
-        pmoff S u z (C₁ * t) - pmoff S u z (t / (4 * C₁)) ≤ epsT C t := by
+    {C₁ : ℝ} (hC₁ : 1 ≤ C₁)
+    : ∃ C ℓ₀ : ℝ,
+      1 ≤ C
+        ∧ ∀ t,
+          0 < t → ℓ₀ ≤ Real.log (1 / t)
+            → Real.exp 1 ≤ Real.log (1 / t) ∧ C₁ * t ≤ (R - 5 / 4) / 2
+              ∧ ∀ z ∈ ball (0 : Fin D → ℂ) (5 / 4),
+                -C * Real.log (Real.log (1 / t)) ≤ pmoff S u z (t / (8 * C₁))
+                  ∧ pmoff S u z (C₁ * t) - pmoff S u z (t / (4 * C₁)) ≤ epsT C t := by
   have hC₅ : 0 ≤ C₅ := fifth_volume_constant_nonneg m hR2 (by linarith) hb
   have hub : ∀ x ∈ ball (0 : Fin D → ℂ) R \ coordDiv S, u x ≤ C₅ := fun x hx => (hb x hx).2
   set R' := R - 5 / 4 with hR'
@@ -57,20 +62,22 @@ theorem oscGen {S : Finset (Fin D)} (m : Fin D → ℕ) {u : (Fin D → ℂ) →
   set K₁ := Real.exp 1 + mTot S m * (Real.log 4 + 2 * Real.log (8 * C₁) + 2) with hK₁
   have hmT := mTot_nonneg S m
   have he1 : 1 ≤ Real.exp 1 := by linarith [Real.add_one_le_exp (1 : ℝ)]
-  refine ⟨6 * C₅ * Λ + 2 * C₅ + 1,
+  refine ⟨
+    6 * C₅ * Λ + 2 * C₅ + 1,
     max (max (Real.exp 1) K₁) (max (Real.log (2 * C₁ / R')) (2 * (Real.log C₁ - Real.log R'))),
-    by have := mul_nonneg (mul_nonneg (by norm_num : (0:ℝ) ≤ 6) hC₅) hΛ0.le; linarith,
-    fun t ht hℓ => ?_⟩
+    by have := mul_nonneg (mul_nonneg (by norm_num : (0 : ℝ) ≤ 6) hC₅) hΛ0.le; linarith,
+    fun t ht hℓ => ?_
+  ⟩
   set ℓ := Real.log (1 / t) with hℓdef
   have hℓt : Real.log t = -ℓ := by rw [hℓdef, one_div, Real.log_inv, neg_neg]
   have h1 : Real.exp 1 ≤ ℓ := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hℓ
   have h2 : K₁ ≤ ℓ := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hℓ
-  have h3 : Real.log (2 * C₁ / R') ≤ ℓ := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hℓ
+  have h3 : Real.log (2 * C₁ / R') ≤ ℓ :=
+    le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hℓ
   have h4 : 2 * (Real.log C₁ - Real.log R') ≤ ℓ :=
     le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hℓ
   have hℓ1 : 1 ≤ ℓ := he1.trans h1
-  have hlℓ : 1 ≤ Real.log ℓ := by
-    rw [← Real.log_exp 1]; exact Real.log_le_log (Real.exp_pos 1) h1
+  have hlℓ : 1 ≤ Real.log ℓ := by rw [← Real.log_exp 1]; exact Real.log_le_log (Real.exp_pos 1) h1
   have hteq : t = Real.exp (-ℓ) := by rw [← hℓt, Real.exp_log ht]
   have hCt : C₁ * t ≤ R' / 2 := by
     have : 2 * C₁ / R' ≤ Real.exp ℓ := by
@@ -105,17 +112,18 @@ theorem oscGen {S : Finset (Fin D)} (m : Fin D → ℕ) {u : (Fin D → ℂ) →
     have hlog : Real.log (4 / s₈ ^ 2) = Real.log 4 + 2 * ℓ + 2 * Real.log (8 * C₁) := by
       rw [Real.log_div (by norm_num) (by positivity), Real.log_pow, hs₈,
         Real.log_div ht.ne' (by positivity), hℓt]
-      push_cast; ring
+      push_cast
+      ring
     rw [hlog]
     have hK0 : 0 < K₁ := by
-      have : 0 ≤ mTot S m * (Real.log 4 + 2 * Real.log (8 * C₁) + 2) :=
-        mul_nonneg hmT (by linarith)
+      have : 0 ≤ mTot S m * (Real.log 4 + 2 * Real.log (8 * C₁) + 2) := mul_nonneg hmT (by linarith)
       linarith [Real.exp_pos 1]
     have hA : Real.exp 1 + mTot S m * (Real.log 4 + 2 * ℓ + 2 * Real.log (8 * C₁)) ≤ K₁ * ℓ := by
       rw [hK₁]
       have e1 : Real.exp 1 ≤ Real.exp 1 * ℓ := le_mul_of_one_le_right (Real.exp_pos 1).le hℓ1
-      have e2 : mTot S m * (Real.log 4 + 2 * ℓ + 2 * Real.log (8 * C₁)) ≤
-          mTot S m * (Real.log 4 + 2 * Real.log (8 * C₁) + 2) * ℓ := by
+      have e2
+          : mTot S m * (Real.log 4 + 2 * ℓ + 2 * Real.log (8 * C₁))
+            ≤ mTot S m * (Real.log 4 + 2 * Real.log (8 * C₁) + 2) * ℓ := by
         rw [mul_assoc]
         refine mul_le_mul_of_nonneg_left ?_ hmT
         nlinarith [mul_nonneg (by linarith : 0 ≤ Real.log 4 + 2 * Real.log (8 * C₁))
@@ -125,39 +133,42 @@ theorem oscGen {S : Finset (Fin D)} (m : Fin D → ℕ) {u : (Fin D → ℂ) →
       have : 0 ≤ mTot S m * (Real.log 4 + 2 * ℓ + 2 * Real.log (8 * C₁)) :=
         mul_nonneg hmT (by linarith)
       linarith [Real.exp_pos 1]
-    have hB : Real.log (Real.exp 1 + mTot S m * (Real.log 4 + 2 * ℓ + 2 * Real.log (8 * C₁)))
-        ≤ 2 * Real.log ℓ := by
-      calc _ ≤ Real.log (K₁ * ℓ) := Real.log_le_log hApos hA
+    have hB
+        : Real.log (Real.exp 1 + mTot S m * (Real.log 4 + 2 * ℓ + 2 * Real.log (8 * C₁)))
+          ≤ 2 * Real.log ℓ := by
+      calc
+        _ ≤ Real.log (K₁ * ℓ) := Real.log_le_log hApos hA
         _ = Real.log K₁ + Real.log ℓ := Real.log_mul hK0.ne' (by linarith)
         _ ≤ 2 * Real.log ℓ := by linarith [Real.log_le_log hK0 h2]
     have := mul_le_mul_of_nonneg_left hB hC₅
     linarith
   have hκlow : -κ < pmoff S u z s₄ := by
     have := pmo_mono hub hs₈0 hs84.le (hsub s₄ (by linarith))
-    rw [hκ]; linarith
+    rw [hκ]
+    linarith
 
   set g : ℝ → ℝ := fun σ => polyMax w z (Real.exp σ) with hg
   have hconv := (polyMaxLogConvex_thm D (ball 0 R) w z R' isOpen_ball hW1 hR'0 (hsub R' le_rfl)).1
   set a := Real.log s₈ with ha
   set b := Real.log (C₁ * t) with hbdef
   set σ := Real.log R' with hσ
-  have ha' : a = -ℓ - Real.log (8 * C₁) := by
-    rw [ha, hs₈, Real.log_div ht.ne' (by positivity), hℓt]
-  have hb' : b = Real.log C₁ - ℓ := by
-    rw [hbdef, Real.log_mul hC0.ne' ht.ne', hℓt]; ring
+  have ha' : a = -ℓ - Real.log (8 * C₁) := by rw [ha, hs₈, Real.log_div ht.ne' (by positivity), hℓt]
+  have hb' : b = Real.log C₁ - ℓ := by rw [hbdef, Real.log_mul hC0.ne' ht.ne', hℓt]; ring
   have hab : a < b := by rw [ha', hb']; linarith
   have hbσ : ℓ / 2 ≤ σ - b := by rw [hb']; linarith
   have hbσ' : b < σ := by linarith
-  have hslope := hconv.slope_mono_adjacent (by simp only [Set.mem_Iic]; linarith)
-    (by simp only [Set.mem_Iic]; exact le_rfl) hab hbσ'
+  have hslope :=
+    hconv.slope_mono_adjacent (by simp only [Set.mem_Iic]; linarith)
+      (by simp only [Set.mem_Iic]; exact le_rfl) hab hbσ'
   have hga : g a = polyMax w z s₈ := by simp only [hg, ha, Real.exp_log hs₈0]
   have hgb : g b = polyMax w z (C₁ * t) := by simp only [hg, hbdef, Real.exp_log (mul_pos hC0 ht)]
   have hgσ : g σ ≤ C₅ := by
     simp only [hg, hσ, Real.exp_log hR'0]
     refine polyMax_le' hR'0.le fun x hx => le_of_forall_pos_le_add fun δ hδ => ?_
     obtain ⟨y, hy, -, hwy⟩ := hW3 x (hsub R' le_rfl hx) δ hδ
-    have : max (u y) (-κ) ≤ C₅ := max_le (hub y hy) (by
-      have := mul_nonneg hC₅ (by linarith : (0:ℝ) ≤ Real.log ℓ); rw [hκ]; linarith)
+    have : max (u y) (-κ) ≤ C₅ :=
+      max_le (hub y hy)
+        (by have := mul_nonneg hC₅ (by linarith : (0 : ℝ) ≤ Real.log ℓ); rw [hκ]; linarith)
     linarith
   have hga_low : -C₅ * (2 * Real.log ℓ) ≤ g a := by
     rw [hga]; exact hlow.trans (pmo_le_polyMax hW1.1 hwu hs₈0 (hsub _ (by linarith)))
@@ -169,7 +180,8 @@ theorem oscGen {S : Finset (Fin D)} (m : Fin D → ℕ) {u : (Fin D → ℂ) →
     rw [hgb]; exact pmo_le_polyMax hW1.1 hwu (by positivity) (hsub _ hCtR)
   have hgab : g a ≤ g b := by
     have := polyMax_mono' hW1.1 hs₈0.le (by linarith) (hsub _ hCtR) (z := z)
-    rw [hga, hgb]; exact this
+    rw [hga, hgb]
+    exact this
 
   have hCl : 0 ≤ C₅ * Real.log ℓ := mul_nonneg hC₅ (by linarith)
   have hN : g σ - g b ≤ C₅ + 2 * C₅ * Real.log ℓ := by linarith
@@ -186,14 +198,14 @@ theorem oscGen {S : Finset (Fin D)} (m : Fin D → ℕ) {u : (Fin D → ℂ) →
     linarith
   refine ⟨?_, ?_⟩
   · refine le_trans ?_ hlow
-    have : 2 * C₅ ≤ 6 * C₅ * Λ + 2 * C₅ + 1 := by
-      have := mul_nonneg hC₅ hΛ0.le; linarith
-    have := mul_le_mul_of_nonneg_right this (by linarith : (0:ℝ) ≤ Real.log ℓ)
+    have : 2 * C₅ ≤ 6 * C₅ * Λ + 2 * C₅ + 1 := by have := mul_nonneg hC₅ hΛ0.le; linarith
+    have := mul_le_mul_of_nonneg_right this (by linarith : (0 : ℝ) ≤ Real.log ℓ)
     linarith
   · have hℓ0 : 0 < ℓ := by linarith
     have key : Λ * ((C₅ + 2 * C₅ * Real.log ℓ) / (ℓ / 2)) ≤ epsT (6 * C₅ * Λ + 2 * C₅ + 1) t := by
-      have e : Λ * ((C₅ + 2 * C₅ * Real.log ℓ) / (ℓ / 2)) =
-          2 * Λ * (C₅ + 2 * C₅ * Real.log ℓ) / ℓ := by
+      have e
+          : Λ * ((C₅ + 2 * C₅ * Real.log ℓ) / (ℓ / 2))
+            = 2 * Λ * (C₅ + 2 * C₅ * Real.log ℓ) / ℓ := by
         field_simp
       rw [e, epsT, ← hℓdef]
       refine div_le_div_of_nonneg_right ?_ hℓ0.le

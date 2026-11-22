@@ -29,36 +29,41 @@ theorem levi_one (b : Fin r → Fin s) (c : Fin s) : levi K b c 1 = 1 := by
   apply Units.ext
   exact Matrix.submatrix_one _ Subtype.val_injective
 
-theorem levi_mul (b : Fin r → Fin s) (c : Fin s) (p q : parab K b) :
-    levi K b c (p * q) = levi K b c p * levi K b c q := by
+theorem levi_mul (b : Fin r → Fin s) (c : Fin s) (p q : parab K b)
+    : levi K b c (p * q) = levi K b c p * levi K b c q := by
   apply Units.ext
   exact blk_mul b c p.2.1 q.2.1
 
 variable (b : Fin r → Fin s) (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K))
 
-def leviTensor : Representation ℂ (blockTri (κ := K) (natBlocks b))
-    (PiTensorProduct ℂ (fun c => (lam c : Type))) where
+def leviTensor
+    : Representation ℂ (blockTri (κ := K) (natBlocks b))
+      (PiTensorProduct ℂ (fun c => (lam c : Type))) where
   toFun p := infl K b lam (Subgroup.inclusion (blockTri_le_parab b) p)
   map_one' := by
-    have : ∀ c, (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) 1)) = LinearMap.id := by
+    have : ∀ c,
+        (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) 1)) = LinearMap.id := by
       intro c
       rw [map_one, levi_one, map_one]
       rfl
     simp only [infl, this]
     exact PiTensorProduct.map_id
   map_mul' p q := by
-    have : ∀ c, (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) (p * q))) =
-        (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) p)) ∘ₗ
-          (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) q)) := by
+    have : ∀ c,
+        (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) (p * q)))
+          = (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) p))
+            ∘ₗ (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) q)) := by
       intro c
       rw [map_mul, levi_mul, map_mul]
       rfl
     simp only [infl, this]
     exact PiTensorProduct.map_comp _ _
 
-theorem leviTensor_apply (p : blockTri (κ := K) (natBlocks b)) :
-    leviTensor b lam p = PiTensorProduct.map (fun c =>
-      (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) p))) := rfl
+theorem leviTensor_apply (p : blockTri (κ := K) (natBlocks b))
+    : leviTensor b lam p
+      = PiTensorProduct.map (fun c =>
+        (lam c).ρ (levi K b c (Subgroup.inclusion (blockTri_le_parab b) p))) :=
+  rfl
 
 instance finiteTensor : FiniteDimensional ℂ (PiTensorProduct ℂ (fun c => (lam c : Type))) :=
   Module.Finite.of_basis (Basis.piTensorProduct fun c => Module.finBasis ℂ (lam c : Type))

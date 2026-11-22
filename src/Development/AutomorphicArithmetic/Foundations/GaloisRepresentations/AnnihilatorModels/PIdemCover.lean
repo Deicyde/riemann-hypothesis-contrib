@@ -64,8 +64,7 @@ private lemma cover_step {B : Type} [CommRing B] (Λ : Type) [Fintype Λ] (J : �
     have := hall 1 (by rw [ht]; trivial)
     rwa [one_mul] at this
 
-theorem UpperTheory.Gal.crystallineComparison.idemCover_of :
-    IdemCover := by
+theorem UpperTheory.Gal.crystallineComparison.idemCover_of : IdemCover := by
   intro B _ Λ _ J h
   classical
   obtain ⟨f, hfi, hfJ, hf0⟩ := cover_step Λ J h
@@ -89,7 +88,11 @@ theorem UpperTheory.Gal.crystallineComparison.idemCover_of :
     intro σ τ hτ
     have : (f σ * P σ) * (f τ * P τ) = f σ * (P σ * f τ) * P τ := by ring
     rw [this, hkill σ τ hτ, mul_zero, zero_mul]
-  refine ⟨fun σ => f σ * P σ, ⟨⟨fun σ => (hfi σ).mul (hP σ), ?_⟩, ?_⟩, fun σ => (J σ).mul_mem_right _ (hfJ σ)⟩
+  refine ⟨
+    fun σ => f σ * P σ,
+    ⟨⟨fun σ => (hfi σ).mul (hP σ), ?_⟩, ?_⟩,
+    fun σ => (J σ).mul_mem_right _ (hfJ σ)
+  ⟩
   · intro σ τ hne
     rcases lt_or_gt_of_ne hne with hl | hl
     · show (f σ * P σ) * (f τ * P τ) = 0

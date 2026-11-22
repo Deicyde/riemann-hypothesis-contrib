@@ -29,15 +29,15 @@ theorem finite_of_isQuadraticExtension : Module.Finite K E :=
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-abbrev unitaryMat {H : Matrix ι ι E} {R : Type*} [CommRing R] [Algebra K R]
-    (g : unitaryPoints K E H R) : Matrix ι ι (R ⊗[K] E) :=
+abbrev unitaryMat
+    {H : Matrix ι ι E} {R : Type*} [CommRing R] [Algebra K R] (g : unitaryPoints K E H R)
+    : Matrix ι ι (R ⊗[K] E) :=
   ((g : GL ι (R ⊗[K] E)) : Matrix ι ι (R ⊗[K] E))
 
 section Algebraic
 
 variable (H : Matrix ι ι E)
 variable (R : Type*) [CommRing R] [Algebra K R]
-
 
 variable (K) in
 abbrev baseMatrix : Matrix ι ι (R ⊗[K] E) :=
@@ -51,12 +51,12 @@ theorem isUnit_det_baseMatrix (hH : IsUnit H.det) : IsUnit (baseMatrix K H R).de
 
 variable {κ : Type*} [Fintype κ] (b : Basis κ K E)
 
-def unitaryCoords (g : unitaryPoints K E H R) : ι × ι × κ → R :=
-  matrixCoords b R (unitaryMat g)
+def unitaryCoords (g : unitaryPoints K E H R) : ι × ι × κ → R := matrixCoords b R (unitaryMat g)
 
-theorem unitaryCoords_apply (g : unitaryPoints K E H R) (i j : ι) (k : κ) :
-    unitaryCoords H R b g (i, j, k) =
-      (Algebra.TensorProduct.basis R b).repr (unitaryMat g i j) k := rfl
+theorem unitaryCoords_apply (g : unitaryPoints K E H R) (i j : ι) (k : κ)
+    : unitaryCoords H R b g (i, j, k)
+      = (Algebra.TensorProduct.basis R b).repr (unitaryMat g i j) k :=
+  rfl
 
 theorem unitaryCoords_injective : Function.Injective (unitaryCoords H R b) := by
   intro g h hgh
@@ -66,96 +66,111 @@ theorem unitaryCoords_injective : Function.Injective (unitaryCoords H R b) := by
 
 variable {H R}
 
-theorem unitaryMat_unitaryMap {S : Type*} [CommRing S] [Algebra K S] (f : R →ₐ[K] S)
-    (g : unitaryPoints K E H R) :
-    unitaryMat (unitaryMap K E H f g) = (unitaryMat g).map (tensorMap (E := E) f) := rfl
+theorem unitaryMat_unitaryMap
+    {S : Type*} [CommRing S] [Algebra K S] (f : R →ₐ[K] S) (g : unitaryPoints K E H R)
+    : unitaryMat (unitaryMap K E H f g) = (unitaryMat g).map (tensorMap (E := E) f) :=
+  rfl
 
-theorem unitaryCoords_unitaryMap {S : Type*} [CommRing S] [Algebra K S] (f : R →ₐ[K] S)
-    (g : unitaryPoints K E H R) :
-    unitaryCoords H S b (unitaryMap K E H f g) = f ∘ unitaryCoords H R b g := by
-  have hrepr (z : R ⊗[K] E) (k : κ) :
-      (Algebra.TensorProduct.basis S b).repr (tensorMap E f z) k =
-        f ((Algebra.TensorProduct.basis R b).repr z k) := by
+theorem unitaryCoords_unitaryMap
+    {S : Type*} [CommRing S] [Algebra K S] (f : R →ₐ[K] S) (g : unitaryPoints K E H R)
+    : unitaryCoords H S b (unitaryMap K E H f g) = f ∘ unitaryCoords H R b g := by
+  have hrepr (z : R ⊗[K] E) (k : κ)
+      : (Algebra.TensorProduct.basis S b).repr (tensorMap E f z) k
+        = f ((Algebra.TensorProduct.basis R b).repr z k) := by
     induction z using TensorProduct.inductionOn with
     | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul, Finsupp.mapRange_apply]
     | add x y hx hy => simp only [map_add, Finsupp.add_apply, hx, hy]
   funext ⟨i, j, k⟩
   exact hrepr (unitaryMat g i j) k
 
-theorem eq_zero_of_tensorMap {J : Type*} {T : J → Type*} [∀ j, CommRing (T j)]
-    [∀ j, Algebra K (T j)] (π : ∀ j, R →ₐ[K] T j) (hπ : ∀ a, (∀ j, π j a = 0) → a = 0)
-    (z : R ⊗[K] E) (hz : ∀ j, tensorMap (E := E) (π j) z = 0) : z = 0 := by
+theorem eq_zero_of_tensorMap
+    {J : Type*} {T : J → Type*} [∀ j, CommRing (T j)] [∀ j, Algebra K (T j)]
+    (π : ∀ j, R →ₐ[K] T j) (hπ : ∀ a, (∀ j, π j a = 0) → a = 0)
+    (z : R ⊗[K] E) (hz : ∀ j, tensorMap (E := E) (π j) z = 0)
+    : z = 0 := by
   let b := Module.finBasis K E
   apply (Algebra.TensorProduct.basis R b).repr.injective
   ext k
   simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
   apply hπ
   intro j
-  have hrepr (x : R ⊗[K] E) :
-      (Algebra.TensorProduct.basis (T j) b).repr (tensorMap E (π j) x) k =
-        π j ((Algebra.TensorProduct.basis R b).repr x k) := by
+  have hrepr (x : R ⊗[K] E)
+      : (Algebra.TensorProduct.basis (T j) b).repr (tensorMap E (π j) x) k
+        = π j ((Algebra.TensorProduct.basis R b).repr x k) := by
     induction x using TensorProduct.inductionOn with
     | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul, Finsupp.mapRange_apply]
     | add x y hx hy => simp only [map_add, Finsupp.add_apply, hx, hy]
   rw [← hrepr z, hz j]
   simp
 
-theorem map_unitaryExpr_eq {S : Type*} [CommRing S] [Algebra K S] (f : R →ₐ[K] S)
-    (M : Matrix ι ι (R ⊗[K] E)) (g : unitaryPoints K E H S)
-    (hg : unitaryMat g = M.map (tensorMap (E := E) f)) :
-    (((M.map (conjBase K E R))ᵀ * baseMatrix K H R * M).map (tensorMap (E := E) f)) =
-      (baseMatrix K H R).map (tensorMap (E := E) f) := by
-  have h1 := map_unitaryExpr ((tensorMap (E := E) f : R ⊗[K] E →ₐ[K] S ⊗[K] E) : R ⊗[K] E →+* S ⊗[K] E)
-    (tensorMap_conjBase f) (baseMatrix K H R) M
+theorem map_unitaryExpr_eq
+    {S : Type*} [CommRing S] [Algebra K S]
+    (f : R →ₐ[K] S) (M : Matrix ι ι (R ⊗[K] E)) (g : unitaryPoints K E H S)
+    (hg : unitaryMat g = M.map (tensorMap (E := E) f))
+    : (((M.map (conjBase K E R))ᵀ * baseMatrix K H R * M).map (tensorMap (E := E) f))
+      = (baseMatrix K H R).map (tensorMap (E := E) f) := by
+  have h1 :=
+    map_unitaryExpr ((tensorMap (E := E) f : R ⊗[K] E →ₐ[K] S ⊗[K] E) : R ⊗[K] E →+* S ⊗[K] E)
+      (tensorMap_conjBase f) (baseMatrix K H R) M
   have h2 := map_includeRight_tensorMap (H := H) f
-  have h3 : ((unitaryMat g).map (conjBase K E S))ᵀ * baseMatrix K H S * unitaryMat g =
-      baseMatrix K H S := g.2
+  have h3
+      : ((unitaryMat g).map (conjBase K E S))ᵀ * baseMatrix K H S * unitaryMat g
+        = baseMatrix K H S :=
+    g.2
   simp only [RingHom.coe_coe] at h1 h2
   rw [h1, h2, ← hg, h3]
 
-theorem exists_unitaryPoints_of_forall (hH : IsUnit H.det) {J : Type*} {T : J → Type*}
-    [∀ j, CommRing (T j)] [∀ j, Algebra K (T j)] (π : ∀ j, R →ₐ[K] T j)
-    (hπ : ∀ a, (∀ j, π j a = 0) → a = 0) (M : Matrix ι ι (R ⊗[K] E))
-    (hM : ∀ j, ∃ g : unitaryPoints K E H (T j), unitaryMat g = M.map (tensorMap (E := E) (π j))) :
-    ∃ g : unitaryPoints K E H R, unitaryMat g = M := by
-  obtain ⟨g, hg, hgM⟩ := (exists_mem_unitaryGroupMatrix_iff (conjBase K E R)
-    (isUnit_det_baseMatrix (K := K) H R hH) M).2 (by
-      ext i l
-      rw [← sub_eq_zero]
-      refine eq_zero_of_tensorMap π hπ _ fun j => ?_
-      obtain ⟨g, hg⟩ := hM j
-      have := congrFun (congrFun (map_unitaryExpr_eq (π j) M g hg) i) l
-      simp only [Matrix.map_apply] at this
-      rw [map_sub, this]
-      exact sub_self _)
+theorem exists_unitaryPoints_of_forall
+    (hH : IsUnit H.det)
+    {J : Type*} {T : J → Type*} [∀ j, CommRing (T j)] [∀ j, Algebra K (T j)]
+    (π : ∀ j, R →ₐ[K] T j) (hπ : ∀ a, (∀ j, π j a = 0) → a = 0)
+    (M : Matrix ι ι (R ⊗[K] E))
+    (hM : ∀ j, ∃ g : unitaryPoints K E H (T j), unitaryMat g = M.map (tensorMap (E := E) (π j)))
+    : ∃ g : unitaryPoints K E H R, unitaryMat g = M := by
+  obtain ⟨g, hg, hgM⟩ :=
+    (exists_mem_unitaryGroupMatrix_iff (conjBase K E R) (isUnit_det_baseMatrix (K := K) H R hH) M).2
+      (by
+        ext i l
+        rw [← sub_eq_zero]
+        refine eq_zero_of_tensorMap π hπ _ fun j => ?_
+        obtain ⟨g, hg⟩ := hM j
+        have := congrFun (congrFun (map_unitaryExpr_eq (π j) M g hg) i) l
+        simp only [Matrix.map_apply] at this
+        rw [map_sub, this]
+        exact sub_self _)
   exact ⟨⟨g, hg⟩, hgM⟩
 
-theorem exists_unitaryPoints_prod (hH : IsUnit H.det) {S : Type*} [CommRing S] [Algebra K S]
+theorem exists_unitaryPoints_prod
+    (hH : IsUnit H.det)
+    {S : Type*} [CommRing S] [Algebra K S]
     (M : Matrix ι ι ((R × S) ⊗[K] E))
     (h₁ : ∃ g : unitaryPoints K E H R, unitaryMat g = M.map (tensorMap (E := E) (AlgHom.fst K R S)))
-    (h₂ : ∃ g : unitaryPoints K E H S, unitaryMat g = M.map (tensorMap (E := E) (AlgHom.snd K R S))) :
-    ∃ g : unitaryPoints K E H (R × S), unitaryMat g = M := by
+    (h₂ : ∃ g : unitaryPoints K E H S, unitaryMat g = M.map (tensorMap (E := E) (AlgHom.snd K R S)))
+    : ∃ g : unitaryPoints K E H (R × S), unitaryMat g = M := by
   let b := Module.finBasis K E
-  have hinj : ∀ z : (R × S) ⊗[K] E, tensorMap (E := E) (AlgHom.fst K R S) z = 0 →
-      tensorMap (E := E) (AlgHom.snd K R S) z = 0 → z = 0 := by
+  have hinj
+      : ∀ z : (R × S) ⊗[K] E,
+        tensorMap (E := E) (AlgHom.fst K R S) z = 0 → tensorMap (E := E) (AlgHom.snd K R S) z = 0
+          → z = 0 := by
     intro z hz₁ hz₂
     apply (Algebra.TensorProduct.basis (R × S) b).repr.injective
     ext k : 1
     simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
-    have hrepr :
-        ((Algebra.TensorProduct.basis R b).repr (tensorMap E (AlgHom.fst K R S) z) k =
-          AlgHom.fst K R S ((Algebra.TensorProduct.basis (R × S) b).repr z k)) ∧
-        ((Algebra.TensorProduct.basis S b).repr (tensorMap E (AlgHom.snd K R S) z) k =
-          AlgHom.snd K R S ((Algebra.TensorProduct.basis (R × S) b).repr z k)) := by
+    have hrepr
+        : ((Algebra.TensorProduct.basis R b).repr (tensorMap E (AlgHom.fst K R S) z) k
+            = AlgHom.fst K R S ((Algebra.TensorProduct.basis (R × S) b).repr z k))
+          ∧ ((Algebra.TensorProduct.basis S b).repr (tensorMap E (AlgHom.snd K R S) z) k
+            = AlgHom.snd K R S ((Algebra.TensorProduct.basis (R × S) b).repr z k)) := by
       clear hz₁ hz₂
       constructor <;> induction z using TensorProduct.inductionOn with
-      | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul, Finsupp.mapRange_apply]
-      | add x y hx hy => simp only [map_add, Finsupp.add_apply, hx, hy]
+        | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul, Finsupp.mapRange_apply]
+        | add x y hx hy => simp only [map_add, Finsupp.add_apply, hx, hy]
     rw [hz₁, hz₂] at hrepr
     simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply] at hrepr
     exact Prod.ext hrepr.1.symm hrepr.2.symm
-  obtain ⟨g, hg, hgM⟩ := (exists_mem_unitaryGroupMatrix_iff (conjBase K E (R × S))
-    (isUnit_det_baseMatrix (K := K) H (R × S) hH) M).2 (by
+  obtain ⟨g, hg, hgM⟩ :=
+    (exists_mem_unitaryGroupMatrix_iff (conjBase K E (R × S))
+        (isUnit_det_baseMatrix (K := K) H (R × S) hH) M).2 (by
       ext i l
       rw [← sub_eq_zero]
       obtain ⟨g₁, hg₁⟩ := h₁
@@ -168,8 +183,9 @@ theorem exists_unitaryPoints_prod (hH : IsUnit H.det) {S : Type*} [CommRing S] [
 
 end Algebraic
 
-instance unitaryPoints.instTopologicalSpace (H : Matrix ι ι E) (R : Type*) [CommRing R]
-    [Algebra K R] [TopologicalSpace R] : TopologicalSpace (unitaryPoints K E H R) :=
+instance unitaryPoints.instTopologicalSpace
+    (H : Matrix ι ι E) (R : Type*) [CommRing R] [Algebra K R] [TopologicalSpace R]
+    : TopologicalSpace (unitaryPoints K E H R) :=
   letI := tensorTopology K E R
   inferInstance
 
@@ -196,77 +212,86 @@ variable {κ : Type*} [Fintype κ] (b : Basis κ K E)
 
 def tensorCoordsHomeomorph : R ⊗[K] E ≃ₜ (κ → R) where
   toEquiv := (Algebra.TensorProduct.basis R b).equivFun.toEquiv
-  continuous_toFun := IsModuleTopology.continuous_of_linearMap
-    (Algebra.TensorProduct.basis R b).equivFun.toLinearMap
-  continuous_invFun := IsModuleTopology.continuous_of_linearMap
-    (Algebra.TensorProduct.basis R b).equivFun.symm.toLinearMap
+  continuous_toFun :=
+    IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.toLinearMap
+  continuous_invFun :=
+    IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
+      b).equivFun.symm.toLinearMap
 
-theorem tensorCoordsHomeomorph_apply (z : R ⊗[K] E) (k : κ) :
-    tensorCoordsHomeomorph R b z k = (Algebra.TensorProduct.basis R b).repr z k := rfl
+theorem tensorCoordsHomeomorph_apply (z : R ⊗[K] E) (k : κ)
+    : tensorCoordsHomeomorph R b z k = (Algebra.TensorProduct.basis R b).repr z k :=
+  rfl
 
 theorem t2Space_tensor [T2Space R] : T2Space (R ⊗[K] E) :=
   (tensorCoordsHomeomorph R (Module.finBasis K E)).isEmbedding.t2Space
 
 def matrixCoordsHomeomorph : Matrix ι ι (R ⊗[K] E) ≃ₜ (ι × ι × κ → R) where
   toEquiv := matrixCoords b R
-  continuous_toFun := continuous_pi fun p =>
-    ((continuous_apply p.2.2).comp (tensorCoordsHomeomorph R b).continuous).comp
-      ((continuous_apply p.2.1).comp (continuous_apply p.1))
+  continuous_toFun :=
+    continuous_pi fun p =>
+      ((continuous_apply p.2.2).comp (tensorCoordsHomeomorph R b).continuous).comp
+        ((continuous_apply p.2.1).comp (continuous_apply p.1))
   continuous_invFun := by
     refine continuous_pi fun i => continuous_pi fun j => ?_
     show Continuous fun x : ι × ι × κ → R => (matrixCoords b R).symm x i j
-    have : (fun x : ι × ι × κ → R => (matrixCoords b R).symm x i j) =
-        (tensorCoordsHomeomorph R b).symm ∘ fun x k => x (i, j, k) := by
+    have : (fun x : ι × ι × κ → R => (matrixCoords b R).symm x i j)
+        = (tensorCoordsHomeomorph R b).symm ∘ fun x k => x (i, j, k) := by
       funext x
       rfl
     rw [this]
-    exact (tensorCoordsHomeomorph R b).symm.continuous.comp (continuous_pi fun k => continuous_apply _)
+    exact (tensorCoordsHomeomorph R b).symm.continuous.comp
+      (continuous_pi fun k => continuous_apply _)
 
 theorem continuous_conjBase : Continuous (conjBase K E R) :=
-  IsModuleTopology.continuous_of_linearMap
-    (show R ⊗[K] E →ₐ[R] R ⊗[K] E from
-      Algebra.TensorProduct.map (AlgHom.id R R) (conj K E).toAlgHom).toLinearMap
+  IsModuleTopology.continuous_of_linearMap (show R ⊗[K] E →ₐ[R] R ⊗[K] E from
+    Algebra.TensorProduct.map (AlgHom.id R R) (conj K E).toAlgHom).toLinearMap
 
 variable {H R}
 
-theorem coe_inv_unitaryPoints (hH : IsUnit H.det) (g : unitaryPoints K E H R) :
-    (unitaryMat (g⁻¹ : unitaryPoints K E H R)) =
-      (baseMatrix K H R)⁻¹ * ((unitaryMat g).map (conjBase K E R))ᵀ *
-        baseMatrix K H R := by
-  have hg : ((unitaryMat g).map (conjBase K E R))ᵀ * baseMatrix K H R * unitaryMat g =
-      baseMatrix K H R := g.2
+theorem coe_inv_unitaryPoints (hH : IsUnit H.det) (g : unitaryPoints K E H R)
+    : (unitaryMat (g⁻¹ : unitaryPoints K E H R))
+      = (baseMatrix K H R)⁻¹ * ((unitaryMat g).map (conjBase K E R))ᵀ * baseMatrix K H R := by
+  have hg
+      : ((unitaryMat g).map (conjBase K E R))ᵀ * baseMatrix K H R * unitaryMat g
+        = baseMatrix K H R :=
+    g.2
   have hU := isUnit_det_baseMatrix (K := K) H R hH
-  have h1 : ((g : GL ι (R ⊗[K] E)) : Matrix ι ι (R ⊗[K] E)) *
-      (unitaryMat (g⁻¹ : unitaryPoints K E H R)) = 1 := by
+  have h1
+      : ((g : GL ι (R ⊗[K] E)) : Matrix ι ι (R ⊗[K] E)) * (unitaryMat (g⁻¹ : unitaryPoints K E H R))
+        = 1 := by
     rw [← Units.val_mul]
     simp
-  calc (unitaryMat (g⁻¹ : unitaryPoints K E H R))
-      = ((baseMatrix K H R)⁻¹ * baseMatrix K H R) * (unitaryMat (g⁻¹ : unitaryPoints K E H R)) := by rw [Matrix.nonsing_inv_mul _ hU, Matrix.one_mul]
-    _ = (baseMatrix K H R)⁻¹ * (((unitaryMat g).map (conjBase K E R))ᵀ *
-          baseMatrix K H R * unitaryMat g) * (unitaryMat (g⁻¹ : unitaryPoints K E H R)) := by
-        rw [hg]
-    _ = (baseMatrix K H R)⁻¹ * ((unitaryMat g).map (conjBase K E R))ᵀ *
-          baseMatrix K H R * (((g : GL ι (R ⊗[K] E)) : Matrix ι ι (R ⊗[K] E)) *
-          (unitaryMat (g⁻¹ : unitaryPoints K E H R))) := by
-        simp only [Matrix.mul_assoc]
+  calc
+    (unitaryMat (g⁻¹ : unitaryPoints K E H R))
+        = ((baseMatrix K H R)⁻¹ * baseMatrix K H R)
+          * (unitaryMat (g⁻¹ : unitaryPoints K E H R)) := by
+      rw [Matrix.nonsing_inv_mul _ hU, Matrix.one_mul]
+    _ = (baseMatrix K H R)⁻¹
+        * (((unitaryMat g).map (conjBase K E R))ᵀ * baseMatrix K H R * unitaryMat g)
+        * (unitaryMat (g⁻¹ : unitaryPoints K E H R)) := by
+      rw [hg]
+    _ = (baseMatrix K H R)⁻¹ * ((unitaryMat g).map (conjBase K E R))ᵀ * baseMatrix K H R
+        * (((g : GL ι (R ⊗[K] E)) : Matrix ι ι (R ⊗[K] E))
+          * (unitaryMat (g⁻¹ : unitaryPoints K E H R))) := by
+      simp only [Matrix.mul_assoc]
     _ = _ := by rw [h1, Matrix.mul_one]
 
 variable (H R)
 
-theorem isEmbedding_coe_unitaryPoints (hH : IsUnit H.det) :
-    IsEmbedding (fun g : unitaryPoints K E H R => (unitaryMat g)) := by
-  let G : Matrix ι ι (R ⊗[K] E) → Matrix ι ι (R ⊗[K] E) × (Matrix ι ι (R ⊗[K] E))ᵐᵒᵖ :=
-    fun M => (M, MulOpposite.op ((baseMatrix K H R)⁻¹ * (M.map (conjBase K E R))ᵀ * baseMatrix K H R))
+theorem isEmbedding_coe_unitaryPoints (hH : IsUnit H.det)
+    : IsEmbedding (fun g : unitaryPoints K E H R => (unitaryMat g)) := by
+  let G : Matrix ι ι (R ⊗[K] E) → Matrix ι ι (R ⊗[K] E) × (Matrix ι ι (R ⊗[K] E))ᵐᵒᵖ := fun M =>
+    (M, MulOpposite.op ((baseMatrix K H R)⁻¹ * (M.map (conjBase K E R))ᵀ * baseMatrix K H R))
   have hG : Continuous G :=
-    continuous_id.prodMk (MulOpposite.continuous_op.comp
-      ((continuous_const.matrix_mul
+    continuous_id.prodMk (MulOpposite.continuous_op.comp ((continuous_const.matrix_mul
         (continuous_id.matrix_map (continuous_conjBase R)).matrix_transpose).matrix_mul
-        continuous_const))
+      continuous_const))
   have hf : Continuous (fun g : unitaryPoints K E H R => (unitaryMat g)) :=
     Units.continuous_val.comp continuous_subtype_val
   refine IsEmbedding.of_comp hf hG ?_
-  have hGf : G ∘ (fun g : unitaryPoints K E H R => (unitaryMat g)) =
-      Units.embedProduct _ ∘ (Subtype.val : unitaryPoints K E H R → GL ι (R ⊗[K] E)) := by
+  have hGf
+      : G ∘ (fun g : unitaryPoints K E H R => (unitaryMat g))
+        = Units.embedProduct _ ∘ (Subtype.val : unitaryPoints K E H R → GL ι (R ⊗[K] E)) := by
     funext g
     simp only [Function.comp_apply, G, Units.embedProduct_apply]
     rw [← coe_inv_unitaryPoints hH g]
@@ -280,11 +305,12 @@ theorem continuous_unitaryCoords : Continuous (unitaryCoords H R b) :=
 theorem isEmbedding_unitaryCoords (hH : IsUnit H.det) : IsEmbedding (unitaryCoords H R b) :=
   (matrixCoordsHomeomorph R b).isEmbedding.comp (isEmbedding_coe_unitaryPoints H R hH)
 
-theorem range_coe_unitaryPoints (hH : IsUnit H.det) :
-    Set.range (fun g : unitaryPoints K E H R => (unitaryMat g)) =
-      {M | (M.map (conjBase K E R))ᵀ * baseMatrix K H R * M = baseMatrix K H R} := by
+theorem range_coe_unitaryPoints (hH : IsUnit H.det)
+    : Set.range (fun g : unitaryPoints K E H R => (unitaryMat g))
+      = {M | (M.map (conjBase K E R))ᵀ * baseMatrix K H R * M = baseMatrix K H R} := by
   ext M
-  have := exists_mem_unitaryGroupMatrix_iff (conjBase K E R) (isUnit_det_baseMatrix (K := K) H R hH) M
+  have :=
+    exists_mem_unitaryGroupMatrix_iff (conjBase K E R) (isUnit_det_baseMatrix (K := K) H R hH) M
   constructor
   · rintro ⟨g, rfl⟩
     exact this.1 ⟨g, g.2, rfl⟩
@@ -292,38 +318,39 @@ theorem range_coe_unitaryPoints (hH : IsUnit H.det) :
     obtain ⟨g, hg, rfl⟩ := this.2 hM
     exact ⟨⟨g, hg⟩, rfl⟩
 
-theorem isClosedEmbedding_coe_unitaryPoints (hH : IsUnit H.det) [T2Space R] :
-    IsClosedEmbedding (fun g : unitaryPoints K E H R => (unitaryMat g)) := by
+theorem isClosedEmbedding_coe_unitaryPoints (hH : IsUnit H.det) [T2Space R]
+    : IsClosedEmbedding (fun g : unitaryPoints K E H R => (unitaryMat g)) := by
   have : T2Space (R ⊗[K] E) := t2Space_tensor R
   refine ⟨isEmbedding_coe_unitaryPoints H R hH, ?_⟩
   rw [range_coe_unitaryPoints H R hH]
   exact isClosed_eq
     (((continuous_id.matrix_map (continuous_conjBase R)).matrix_transpose.matrix_mul
-      continuous_const).matrix_mul continuous_id) continuous_const
+      continuous_const).matrix_mul continuous_id)
+    continuous_const
 
-theorem isClosedEmbedding_unitaryCoords (hH : IsUnit H.det) [T2Space R] :
-    IsClosedEmbedding (unitaryCoords H R b) :=
+theorem isClosedEmbedding_unitaryCoords (hH : IsUnit H.det) [T2Space R]
+    : IsClosedEmbedding (unitaryCoords H R b) :=
   (matrixCoordsHomeomorph R b).isClosedEmbedding.comp (isClosedEmbedding_coe_unitaryPoints H R hH)
 
-theorem locallyCompactSpace_unitaryPoints (hH : IsUnit H.det) [T2Space R]
-    [LocallyCompactSpace R] : LocallyCompactSpace (unitaryPoints K E H R) :=
+theorem locallyCompactSpace_unitaryPoints (hH : IsUnit H.det) [T2Space R] [LocallyCompactSpace R]
+    : LocallyCompactSpace (unitaryPoints K E H R) :=
   (isClosedEmbedding_unitaryCoords H R (Module.finBasis K E) hH).locallyCompactSpace
 
 variable {H R}
 variable {S : Type*} [CommRing S] [Algebra K S] [TopologicalSpace S] [IsTopologicalRing S]
 
-theorem continuous_tensorMap (f : R →ₐ[K] S) (hf : Continuous f) :
-    Continuous (tensorMap (E := E) f) := by
+theorem continuous_tensorMap (f : R →ₐ[K] S) (hf : Continuous f)
+    : Continuous (tensorMap (E := E) f) := by
   let b := Module.finBasis K E
-  have : (tensorMap (E := E) f : R ⊗[K] E → S ⊗[K] E) =
-      (tensorCoordsHomeomorph S b).symm ∘ (fun x k => f (x k)) ∘ tensorCoordsHomeomorph R b := by
+  have : (tensorMap (E := E) f : R ⊗[K] E → S ⊗[K] E)
+      = (tensorCoordsHomeomorph S b).symm ∘ (fun x k => f (x k)) ∘ tensorCoordsHomeomorph R b := by
     funext z
     apply (tensorCoordsHomeomorph S b).injective
     simp only [Function.comp_apply, Homeomorph.apply_symm_apply]
     funext k
-    have hrepr (x : R ⊗[K] E) :
-        (Algebra.TensorProduct.basis S b).repr (tensorMap E f x) k =
-          f ((Algebra.TensorProduct.basis R b).repr x k) := by
+    have hrepr (x : R ⊗[K] E)
+        : (Algebra.TensorProduct.basis S b).repr (tensorMap E f x) k
+          = f ((Algebra.TensorProduct.basis R b).repr x k) := by
       induction x using TensorProduct.inductionOn with
       | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul, Finsupp.mapRange_apply]
       | add x y hx hy => simp only [map_add, Finsupp.add_apply, hx, hy]
@@ -333,17 +360,17 @@ theorem continuous_tensorMap (f : R →ₐ[K] S) (hf : Continuous f) :
     ((continuous_pi fun k => hf.comp (continuous_apply k)).comp
       (tensorCoordsHomeomorph R b).continuous)
 
-theorem continuous_unitaryMap (f : R →ₐ[K] S) (hf : Continuous f) :
-    Continuous (unitaryMap K E H f) := by
+theorem continuous_unitaryMap (f : R →ₐ[K] S) (hf : Continuous f)
+    : Continuous (unitaryMap K E H f) := by
   have hm : Continuous fun M : Matrix ι ι (R ⊗[K] E) => M.map (tensorMap (E := E) f) :=
     continuous_id.matrix_map (continuous_tensorMap f hf)
   apply continuous_induced_rng.2
   rw [Units.continuous_iff]
   refine ⟨hm.comp (Units.continuous_val.comp continuous_subtype_val), ?_⟩
   have : (fun g : unitaryPoints K E H R =>
-      (((Subtype.val ∘ unitaryMap K E H f) g)⁻¹ : GL ι (S ⊗[K] E)).val) =
-      (fun M : Matrix ι ι (R ⊗[K] E) => M.map (tensorMap (E := E) f)) ∘
-        fun g : unitaryPoints K E H R => unitaryMat g⁻¹ := by
+        (((Subtype.val ∘ unitaryMap K E H f) g)⁻¹ : GL ι (S ⊗[K] E)).val)
+      = (fun M : Matrix ι ι (R ⊗[K] E) => M.map (tensorMap (E := E) f))
+        ∘ fun g : unitaryPoints K E H R => unitaryMat g⁻¹ := by
     funext g
     simp only [Function.comp_apply]
     rw [← Subgroup.coe_inv, ← map_inv]
@@ -360,12 +387,13 @@ variable (K R S)
 def unitaryProdHom : unitaryPoints K E H (R × S) →* unitaryPoints K E H R × unitaryPoints K E H S :=
   (unitaryMap K E H (AlgHom.fst K R S)).prod (unitaryMap K E H (AlgHom.snd K R S))
 
-theorem unitaryProdHom_apply (g : unitaryPoints K E H (R × S)) :
-    unitaryProdHom K H R S g =
-      (unitaryMap K E H (AlgHom.fst K R S) g, unitaryMap K E H (AlgHom.snd K R S) g) := rfl
+theorem unitaryProdHom_apply (g : unitaryPoints K E H (R × S))
+    : unitaryProdHom K H R S g
+      = (unitaryMap K E H (AlgHom.fst K R S) g, unitaryMap K E H (AlgHom.snd K R S) g) :=
+  rfl
 
-theorem unitaryProdHom_bijective (hH : IsUnit H.det) :
-    Function.Bijective (unitaryProdHom K H R S) := by
+theorem unitaryProdHom_bijective (hH : IsUnit H.det)
+    : Function.Bijective (unitaryProdHom K H R S) := by
   let b := Module.finBasis K E
   constructor
   · intro g g' h
@@ -376,52 +404,56 @@ theorem unitaryProdHom_bijective (hH : IsUnit H.det) :
     simp only [unitaryProdHom_apply, unitaryCoords_unitaryMap] at h₁ h₂
     exact Prod.ext (congrFun h₁ p) (congrFun h₂ p)
   · intro y
-    let M : Matrix ι ι ((R × S) ⊗[K] E) := (matrixCoords b (R × S)).symm fun p =>
-      (unitaryCoords H R b y.1 p, unitaryCoords H S b y.2 p)
-    have hrepr (z : (R × S) ⊗[K] E) (k : Fin (finrank K E)) :
-        ((Algebra.TensorProduct.basis R b).repr (tensorMap E (AlgHom.fst K R S) z) k =
-          AlgHom.fst K R S ((Algebra.TensorProduct.basis (R × S) b).repr z k)) ∧
-        ((Algebra.TensorProduct.basis S b).repr (tensorMap E (AlgHom.snd K R S) z) k =
-          AlgHom.snd K R S ((Algebra.TensorProduct.basis (R × S) b).repr z k)) := by
+    let M : Matrix ι ι ((R × S) ⊗[K] E) :=
+      (matrixCoords b (R × S)).symm fun p => (unitaryCoords H R b y.1 p, unitaryCoords H S b y.2 p)
+    have hrepr (z : (R × S) ⊗[K] E) (k : Fin (finrank K E))
+        : ((Algebra.TensorProduct.basis R b).repr (tensorMap E (AlgHom.fst K R S) z) k
+            = AlgHom.fst K R S ((Algebra.TensorProduct.basis (R × S) b).repr z k))
+          ∧ ((Algebra.TensorProduct.basis S b).repr (tensorMap E (AlgHom.snd K R S) z) k
+            = AlgHom.snd K R S ((Algebra.TensorProduct.basis (R × S) b).repr z k)) := by
       constructor <;> induction z using TensorProduct.inductionOn with
-      | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul, Finsupp.mapRange_apply]
-      | add x y hx hy => simp only [map_add, Finsupp.add_apply, hx, hy]
+        | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul, Finsupp.mapRange_apply]
+        | add x y hx hy => simp only [map_add, Finsupp.add_apply, hx, hy]
     have h₁ : M.map (tensorMap (E := E) (AlgHom.fst K R S)) = unitaryMat y.1 := by
       apply (matrixCoords b R).injective
-      have hmap : matrixCoords b R (M.map (tensorMap (E := E) (AlgHom.fst K R S))) =
-          AlgHom.fst K R S ∘ matrixCoords b (R × S) M := by
+      have hmap
+          : matrixCoords b R (M.map (tensorMap (E := E) (AlgHom.fst K R S)))
+            = AlgHom.fst K R S ∘ matrixCoords b (R × S) M := by
         funext ⟨i, j, k⟩
         exact (hrepr (M i j) k).1
       rw [hmap, Equiv.apply_symm_apply]
       rfl
     have h₂ : M.map (tensorMap (E := E) (AlgHom.snd K R S)) = unitaryMat y.2 := by
       apply (matrixCoords b S).injective
-      have hmap : matrixCoords b S (M.map (tensorMap (E := E) (AlgHom.snd K R S))) =
-          AlgHom.snd K R S ∘ matrixCoords b (R × S) M := by
+      have hmap
+          : matrixCoords b S (M.map (tensorMap (E := E) (AlgHom.snd K R S)))
+            = AlgHom.snd K R S ∘ matrixCoords b (R × S) M := by
         funext ⟨i, j, k⟩
         exact (hrepr (M i j) k).2
       rw [hmap, Equiv.apply_symm_apply]
       rfl
     obtain ⟨g, hg⟩ := exists_unitaryPoints_prod hH M ⟨y.1, h₁.symm⟩ ⟨y.2, h₂.symm⟩
     refine ⟨g, Prod.ext ?_ ?_⟩
-    · apply Subtype.ext; apply Units.ext
+    · apply Subtype.ext
+      apply Units.ext
       change unitaryMat (unitaryMap K E H _ g) = unitaryMat y.1
       rw [unitaryMat_unitaryMap, hg, h₁]
-    · apply Subtype.ext; apply Units.ext
+    · apply Subtype.ext
+      apply Units.ext
       change unitaryMat (unitaryMap K E H _ g) = unitaryMat y.2
       rw [unitaryMat_unitaryMap, hg, h₂]
 
-def unitaryProdEquiv (hH : IsUnit H.det) :
-    unitaryPoints K E H (R × S) ≃ₜ* unitaryPoints K E H R × unitaryPoints K E H S where
+def unitaryProdEquiv (hH : IsUnit H.det)
+    : unitaryPoints K E H (R × S) ≃ₜ* unitaryPoints K E H R × unitaryPoints K E H S where
   toMulEquiv := MulEquiv.ofBijective (unitaryProdHom K H R S) (unitaryProdHom_bijective K H R S hH)
-  continuous_toFun := (continuous_unitaryMap _ continuous_fst).prodMk
-    (continuous_unitaryMap _ continuous_snd)
+  continuous_toFun :=
+    (continuous_unitaryMap _ continuous_fst).prodMk (continuous_unitaryMap _ continuous_snd)
   continuous_invFun := by
     let b := Module.finBasis K E
     rw [(isEmbedding_unitaryCoords H (R × S) b hH).continuous_iff]
     have : unitaryCoords H (R × S) b ∘ (MulEquiv.ofBijective (unitaryProdHom K H R S)
-        (unitaryProdHom_bijective K H R S hH)).symm =
-        fun y p => (unitaryCoords H R b y.1 p, unitaryCoords H S b y.2 p) := by
+          (unitaryProdHom_bijective K H R S hH)).symm
+        = fun y p => (unitaryCoords H R b y.1 p, unitaryCoords H S b y.2 p) := by
       funext y
       have hy := (MulEquiv.ofBijective _ (unitaryProdHom_bijective K H R S hH)).apply_symm_apply y
       funext p
@@ -429,19 +461,22 @@ def unitaryProdEquiv (hH : IsUnit H.det) :
       simp only [Function.comp_apply, MulEquiv.ofBijective_apply, unitaryProdHom_apply,
         unitaryCoords_unitaryMap]
       rfl
-    exact Continuous.congr (continuous_pi fun p =>
-      (((continuous_apply p).comp (continuous_unitaryCoords H R b)).comp continuous_fst).prodMk
-        (((continuous_apply p).comp (continuous_unitaryCoords H S b)).comp continuous_snd))
+    exact Continuous.congr
+      (continuous_pi fun p =>
+        (((continuous_apply p).comp (continuous_unitaryCoords H R b)).comp continuous_fst).prodMk
+          (((continuous_apply p).comp (continuous_unitaryCoords H S b)).comp continuous_snd))
       (fun y => (congrFun this y).symm)
 
-variable {J : Type*} (T : J → Type*) [∀ j, CommRing (T j)] [∀ j, Algebra K (T j)]
+variable
+  {J : Type*} (T : J → Type*) [∀ j, CommRing (T j)] [∀ j, Algebra K (T j)]
   [∀ j, TopologicalSpace (T j)] [∀ j, IsTopologicalRing (T j)]
 
 def unitaryPiHom : unitaryPoints K E H (∀ j, T j) →* ∀ j, unitaryPoints K E H (T j) :=
   MonoidHom.pi fun j => unitaryMap K E H (Pi.evalAlgHom K T j)
 
-theorem unitaryPiHom_apply (g : unitaryPoints K E H (∀ j, T j)) (j : J) :
-    unitaryPiHom K H T g j = unitaryMap K E H (Pi.evalAlgHom K T j) g := rfl
+theorem unitaryPiHom_apply (g : unitaryPoints K E H (∀ j, T j)) (j : J)
+    : unitaryPiHom K H T g j = unitaryMap K E H (Pi.evalAlgHom K T j) g :=
+  rfl
 
 theorem unitaryPiHom_bijective (hH : IsUnit H.det) : Function.Bijective (unitaryPiHom K H T) := by
   let b := Module.finBasis K E
@@ -458,35 +493,41 @@ theorem unitaryPiHom_bijective (hH : IsUnit H.det) : Function.Bijective (unitary
     have hMj : ∀ j, M.map (tensorMap (E := E) (Pi.evalAlgHom K T j)) = unitaryMat (y j) := by
       intro j
       apply (matrixCoords b (T j)).injective
-      have hmap : matrixCoords b (T j) (M.map (tensorMap (E := E) (Pi.evalAlgHom K T j))) =
-          Pi.evalAlgHom K T j ∘ matrixCoords b (∀ j, T j) M := by
+      have hmap
+          : matrixCoords b (T j) (M.map (tensorMap (E := E) (Pi.evalAlgHom K T j)))
+            = Pi.evalAlgHom K T j ∘ matrixCoords b (∀ j, T j) M := by
         funext ⟨i, l, k⟩
-        have hrepr (x : (∀ j, T j) ⊗[K] E) :
-            (Algebra.TensorProduct.basis (T j) b).repr (tensorMap E (Pi.evalAlgHom K T j) x) k =
-              Pi.evalAlgHom K T j ((Algebra.TensorProduct.basis (∀ j, T j) b).repr x k) := by
+        have hrepr (x : (∀ j, T j) ⊗[K] E)
+            : (Algebra.TensorProduct.basis (T j) b).repr (tensorMap E (Pi.evalAlgHom K T j) x) k
+              = Pi.evalAlgHom K T j ((Algebra.TensorProduct.basis (∀ j, T j) b).repr x k) := by
           induction x using TensorProduct.inductionOn with
           | tmul r e => simp [Algebra.TensorProduct.basis_repr_tmul, Finsupp.mapRange_apply]
           | add x y hx hy => simp only [map_add, Finsupp.add_apply, hx, hy]
         exact hrepr (M i l)
       rw [hmap, Equiv.apply_symm_apply]
       rfl
-    obtain ⟨g, hg⟩ := exists_unitaryPoints_of_forall hH (fun j => Pi.evalAlgHom K T j)
-      (fun a ha => funext ha) M fun j => ⟨y j, (hMj j).symm⟩
+    obtain ⟨g, hg⟩ :=
+      exists_unitaryPoints_of_forall hH
+        (fun j => Pi.evalAlgHom K T j)
+        (fun a ha => funext ha)
+        M
+        fun j => ⟨y j, (hMj j).symm⟩
     refine ⟨g, funext fun j => ?_⟩
-    apply Subtype.ext; apply Units.ext
+    apply Subtype.ext
+    apply Units.ext
     change unitaryMat (unitaryMap K E H _ g) = unitaryMat (y j)
     rw [unitaryMat_unitaryMap, hg, hMj]
 
-def unitaryPiEquiv (hH : IsUnit H.det) :
-    unitaryPoints K E H (∀ j, T j) ≃ₜ* ∀ j, unitaryPoints K E H (T j) where
+def unitaryPiEquiv (hH : IsUnit H.det)
+    : unitaryPoints K E H (∀ j, T j) ≃ₜ* ∀ j, unitaryPoints K E H (T j) where
   toMulEquiv := MulEquiv.ofBijective (unitaryPiHom K H T) (unitaryPiHom_bijective K H T hH)
   continuous_toFun := continuous_pi fun j => continuous_unitaryMap _ (continuous_apply j)
   continuous_invFun := by
     let b := Module.finBasis K E
     rw [(isEmbedding_unitaryCoords H (∀ j, T j) b hH).continuous_iff]
-    have : unitaryCoords H (∀ j, T j) b ∘ (MulEquiv.ofBijective (unitaryPiHom K H T)
-        (unitaryPiHom_bijective K H T hH)).symm =
-        fun y p j => unitaryCoords H (T j) b (y j) p := by
+    have : unitaryCoords H (∀ j, T j) b
+          ∘ (MulEquiv.ofBijective (unitaryPiHom K H T) (unitaryPiHom_bijective K H T hH)).symm
+        = fun y p j => unitaryCoords H (T j) b (y j) p := by
       funext y
       have hy := (MulEquiv.ofBijective _ (unitaryPiHom_bijective K H T hH)).apply_symm_apply y
       funext p j
@@ -494,8 +535,11 @@ def unitaryPiEquiv (hH : IsUnit H.det) :
       simp only [Function.comp_apply, MulEquiv.ofBijective_apply, unitaryPiHom_apply,
         unitaryCoords_unitaryMap]
       rfl
-    exact Continuous.congr (continuous_pi fun p => continuous_pi fun j =>
-      ((continuous_apply p).comp (continuous_unitaryCoords H (T j) b)).comp (continuous_apply j))
+    exact Continuous.congr
+      (continuous_pi fun p =>
+        continuous_pi fun j =>
+          ((continuous_apply p).comp (continuous_unitaryCoords H (T j) b)).comp
+            (continuous_apply j))
       (fun y => (congrFun this y).symm)
 
 end Products

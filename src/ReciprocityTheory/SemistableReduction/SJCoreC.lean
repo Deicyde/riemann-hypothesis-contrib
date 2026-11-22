@@ -10,19 +10,22 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open MeasureTheory Metric Set Real
 
-theorem gauss_pair {n : ℕ} (hn : 0 < n) (c : EuclideanSpace ℂ (Fin n)) (hc : c ≠ 0) :
-    ∃ s : ℝ, 0 < s ∧
-      Integrable (fun x : EuclideanSpace ℂ (Fin n) ↦
-        log ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ * exp (-‖x‖ ^ 2)) ∧
-      ∫ x : EuclideanSpace ℂ (Fin n), log ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ *
-        exp (-‖x‖ ^ 2) = s * (gaussLogC ‖c‖ * gaussOneC ^ (n - 1)) ∧
-      ∫ x : EuclideanSpace ℂ (Fin n), exp (-‖x‖ ^ 2) = s * gaussOneC ^ n := by
+theorem gauss_pair {n : ℕ} (hn : 0 < n) (c : EuclideanSpace ℂ (Fin n)) (hc : c ≠ 0)
+    : ∃ s : ℝ,
+      0 < s
+        ∧ Integrable (fun x : EuclideanSpace ℂ (Fin n) ↦
+          log ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ * exp (- ‖x‖ ^ 2))
+        ∧ ∫ x : EuclideanSpace ℂ (Fin n), log ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ *
+            exp (-‖x‖ ^ 2)
+          = s * (gaussLogC ‖c‖ * gaussOneC ^ (n - 1))
+        ∧ ∫ x : EuclideanSpace ℂ (Fin n), exp (-‖x‖ ^ 2) = s * gaussOneC ^ n := by
   classical
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
   rw [Nat.add_sub_cancel]
   set v : EuclideanSpace ℂ (Fin (m + 1)) := WithLp.toLp 2 (fun i => star (WithLp.ofLp c i)) with hvdef
-  have hvx : ∀ x : EuclideanSpace ℂ (Fin (m + 1)),
-      inner ℂ v x = ∑ i, WithLp.ofLp c i * WithLp.ofLp x i := by
+  have hvx
+      : ∀ x : EuclideanSpace ℂ (Fin (m + 1)),
+        inner ℂ v x = ∑ i, WithLp.ofLp c i * WithLp.ofLp x i := by
     intro x
     rw [PiLp.inner_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -44,14 +47,18 @@ theorem gauss_pair {n : ℕ} (hn : 0 < n) (c : EuclideanSpace ℂ (Fin n)) (hc :
     simp only [Set.restrict_apply, if_true]
     rw [inner_self_eq_norm_sq_to_K]
     show ((‖u0‖ : ℝ) : ℂ) ^ 2 = 1
-    rw [hu0n]; simp
-  obtain ⟨b, hb⟩ := Orthonormal.exists_orthonormalBasis_extension_of_card_eq (𝕜 := ℂ)
-    (by rw [finrank_euclideanSpace]) hon
+    rw [hu0n]
+    simp
+  obtain ⟨b, hb⟩ :=
+    Orthonormal.exists_orthonormalBasis_extension_of_card_eq (𝕜 := ℂ)
+      (by rw [finrank_euclideanSpace]) hon
   have hb0 : b 0 = u0 := hb 0 (Set.mem_singleton 0)
   let M : EuclideanSpace ℂ (Fin (m + 1)) ≃L[ℂ] (Fin (m + 1) → ℂ) :=
     b.repr.toContinuousLinearEquiv.trans (EuclideanSpace.equiv (Fin (m + 1)) ℂ)
   have hMr : ∀ x i, M x i = b.repr x i := fun x i => rfl
-  have hnorm1 : ∀ x : EuclideanSpace ℂ (Fin (m + 1)), ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ = ‖c‖ * ‖M x 0‖ := by
+  have hnorm1
+      : ∀ x : EuclideanSpace ℂ (Fin (m + 1)),
+        ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ = ‖c‖ * ‖M x 0‖ := by
     intro x
     rw [hMr, OrthonormalBasis.repr_apply_apply, hb0, hu0, inner_smul_left, hvx, norm_mul,
       Complex.conj_ofReal, Complex.norm_real, Real.norm_eq_abs, abs_inv, abs_of_pos hc0,
@@ -61,21 +68,21 @@ theorem gauss_pair {n : ℕ} (hn : 0 < n) (c : EuclideanSpace ℂ (Fin n)) (hc :
     rw [← b.repr.norm_map x, EuclideanSpace.norm_sq_eq]
     rfl
   let f : Fin (m + 1) → ℂ → ℝ := fun i z =>
-    if i = 0 then log (‖c‖ * ‖z‖) * exp (-‖z‖ ^ 2) else exp (-‖z‖ ^ 2)
-  let g : Fin (m + 1) → ℂ → ℝ := fun _ z => exp (-‖z‖ ^ 2)
-  have hexp : ∀ y : Fin (m + 1) → ℂ, exp (-∑ i, ‖y i‖ ^ 2) = ∏ i, exp (-‖y i‖ ^ 2) := by
+    if i = 0 then log (‖c‖ * ‖z‖) * exp (- ‖z‖ ^ 2) else exp (- ‖z‖ ^ 2)
+  let g : Fin (m + 1) → ℂ → ℝ := fun _ z => exp (- ‖z‖ ^ 2)
+  have hexp : ∀ y : Fin (m + 1) → ℂ, exp (- ∑ i, ‖y i‖ ^ 2) = ∏ i, exp (-‖y i‖ ^ 2) := by
     intro y; rw [← Real.exp_sum, Finset.sum_neg_distrib]
-  have hf : ∀ y : Fin (m + 1) → ℂ,
-      ∏ i, f i (y i) = log (‖c‖ * ‖y 0‖) * ∏ i, exp (-‖y i‖ ^ 2) := by
+  have hf : ∀ y : Fin (m + 1) → ℂ, ∏ i, f i (y i) = log (‖c‖ * ‖y 0‖) * ∏ i, exp (-‖y i‖ ^ 2) := by
     intro y
-    rw [Fin.prod_univ_succ, Fin.prod_univ_succ (fun i => exp (-‖y i‖ ^ 2))]
+    rw [Fin.prod_univ_succ, Fin.prod_univ_succ (fun i => exp (- ‖y i‖ ^ 2))]
     simp only [f, if_pos rfl, Fin.succ_ne_zero, if_false]
     ring
-  have hF1 : ∀ x : EuclideanSpace ℂ (Fin (m + 1)),
-      log ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ * exp (-‖x‖ ^ 2) = ∏ i, f i (M x i) := by
+  have hF1
+      : ∀ x : EuclideanSpace ℂ (Fin (m + 1)),
+        log ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ * exp (- ‖x‖ ^ 2) = ∏ i, f i (M x i) := by
     intro x
     rw [hf (M x), hnorm1, hnorm2, hexp]
-  have hF2 : ∀ x : EuclideanSpace ℂ (Fin (m + 1)), exp (-‖x‖ ^ 2) = ∏ i, g i (M x i) := by
+  have hF2 : ∀ x : EuclideanSpace ℂ (Fin (m + 1)), exp (- ‖x‖ ^ 2) = ∏ i, g i (M x i) := by
     intro x
     rw [hnorm2, hexp]
   set μ := (volume : Measure (EuclideanSpace ℂ (Fin (m + 1)))) with hμ
@@ -89,7 +96,9 @@ theorem gauss_pair {n : ℕ} (hn : 0 < n) (c : EuclideanSpace ℂ (Fin n)) (hc :
   have hk : 0 < k := Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure _ _
   have hint : ∀ H : (Fin (m + 1) → ℂ) → ℝ, ∫ x, H (M x) ∂μ = (k : ℝ) * ∫ y, H y := by
     intro H
-    calc ∫ x, H (M x) ∂μ = ∫ x, H (Me x) ∂μ := rfl
+    calc
+      ∫ x, H (M x) ∂μ
+        = ∫ x, H (Me x) ∂μ := rfl
       _ = ∫ y, H y ∂(μ.map Me) := (Me.measurableEmbedding.integral_map H).symm
       _ = (k : ℝ) * ∫ y, H y := by
         rw [hν, integral_smul_nnreal_measure, NNReal.smul_def, smul_eq_mul]
@@ -113,11 +122,13 @@ theorem gauss_pair {n : ℕ} (hn : 0 < n) (c : EuclideanSpace ℂ (Fin n)) (hc :
   refine ⟨(k : ℝ), NNReal.coe_pos.mpr hk, ?_, ?_, ?_⟩
   · exact (hintg _ hI1).congr (Filter.Eventually.of_forall fun x => (hF1 x).symm)
   · rw [show (fun x : EuclideanSpace ℂ (Fin (m + 1)) =>
-        log ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ * exp (-‖x‖ ^ 2)) =
-        fun x => ∏ i, f i (M x i) from funext hF1]
+          log ‖∑ i, WithLp.ofLp c i * WithLp.ofLp x i‖ * exp (- ‖x‖ ^ 2))
+        = fun x => ∏ i, f i (M x i) from
+      funext hF1]
     rw [hint (fun y => ∏ i, f i (y i)), hP1]
-  · rw [show (fun x : EuclideanSpace ℂ (Fin (m + 1)) => exp (-‖x‖ ^ 2)) =
-        fun x => ∏ i, g i (M x i) from funext hF2]
+  · rw [show (fun x : EuclideanSpace ℂ (Fin (m + 1)) => exp (- ‖x‖ ^ 2))
+        = fun x => ∏ i, g i (M x i) from
+      funext hF2]
     rw [hint (fun y => ∏ i, g i (y i)), hP2]
 
 end ReciprocityTheory.MultiplicativeHeights

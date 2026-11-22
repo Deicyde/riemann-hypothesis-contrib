@@ -35,14 +35,19 @@ theorem l_theta : IntegralTraceSurjective := by
     | mem t ht =>
       obtain ⟨x, rfl⟩ := ht
       exact ⟨(x + σ x) * x, by simp only [map_add (f := _), map_mul, hσσ]; ring⟩
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add y y' _ _ ih ih' =>
       obtain ⟨x, hx⟩ := ih
       obtain ⟨x', hx'⟩ := ih'
-      exact ⟨x + x' + y * σ y', by simp only [map_add (f := _), map_mul, hσσ]; linear_combination hx + hx'⟩
+      exact ⟨
+        x + x' + y * σ y',
+        by simp only [map_add (f := _), map_mul, hσσ]; linear_combination hx + hx'
+      ⟩
     | smul a y _ ih =>
       obtain ⟨x, hx⟩ := ih
-      exact ⟨a * σ a * x, by simp only [smul_eq_mul, map_mul, hσσ]; linear_combination (a * σ a) * hx⟩
+      exact
+        ⟨a * σ a * x, by simp only [smul_eq_mul, map_mul, hσσ]; linear_combination (a * σ a) * hx⟩
   obtain ⟨x, hx⟩ := key 1 (by rw [hJ]; exact Submodule.mem_top)
   refine ⟨x, ?_⟩
   rw [map_one, mul_one] at hx

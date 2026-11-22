@@ -10,13 +10,17 @@ public import GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.QdetSub
 
 noncomputable section
 
-open NumberField GlobalTheory.CuspRep MeasureTheory PositivityTheory.Affgl GlobalTheory.CompanionTheory.CTFin Polynomial
+open NumberField GlobalTheory.CuspRep MeasureTheory PositivityTheory.Affgl
+  GlobalTheory.CompanionTheory.CTFin Polynomial
 
 namespace GlobalTheory.CompanionTheory.CTFin.MonicCofin
 
-theorem exists_finiteDimensional_sub_mem {C : Type*} [CommRing C] [Algebra ℂ C] (I : Ideal C) {s : Set C}
-    (hs : s.Finite) (hgen : Algebra.adjoin ℂ s = ⊤) (hq : ∀ x ∈ s, ∃ q : ℂ[X], q.Monic ∧ aeval x q ∈ I) :
-    ∃ V : Submodule ℂ C, FiniteDimensional ℂ V ∧ ∀ z : C, ∃ v ∈ V, z - v ∈ I := by
+theorem exists_finiteDimensional_sub_mem
+    {C : Type*} [CommRing C] [Algebra ℂ C]
+    (I : Ideal C)
+    {s : Set C} (hs : s.Finite) (hgen : Algebra.adjoin ℂ s = ⊤)
+    (hq : ∀ x ∈ s, ∃ q : ℂ[X], q.Monic ∧ aeval x q ∈ I)
+    : ∃ V : Submodule ℂ C, FiniteDimensional ℂ V ∧ ∀ z : C, ∃ v ∈ V, z - v ∈ I := by
   let π : C →ₐ[ℂ] C ⧸ I := Ideal.Quotient.mkₐ ℂ I
   have hπ : Function.Surjective π := Ideal.Quotient.mkₐ_surjective ℂ I
   have hint : ∀ y ∈ π '' s, IsIntegral ℂ y := by
@@ -31,15 +35,20 @@ theorem exists_finiteDimensional_sub_mem {C : Type*} [CommRing C] [Algebra ℂ C
   have hfg := fg_adjoin_of_finite (hs.image π) hint
   rw [htop, Algebra.top_toSubmodule] at hfg
   obtain ⟨t, ht⟩ := hfg
-  refine ⟨Submodule.span ℂ (Function.surjInv hπ '' (t : Set (C ⧸ I))),
-    FiniteDimensional.span_of_finite ℂ (t.finite_toSet.image _), fun z => ?_⟩
-  have hmap : (Submodule.span ℂ (Function.surjInv hπ '' (t : Set (C ⧸ I)))).map π.toLinearMap = ⊤ := by
+  refine ⟨
+    Submodule.span ℂ (Function.surjInv hπ '' (t : Set (C ⧸ I))),
+    FiniteDimensional.span_of_finite ℂ (t.finite_toSet.image _),
+    fun z => ?_
+  ⟩
+  have hmap
+      : (Submodule.span ℂ (Function.surjInv hπ '' (t : Set (C ⧸ I)))).map π.toLinearMap = ⊤ := by
     rw [Submodule.map_span, ← Set.image_comp, ← ht]
     congr 1
     convert Set.image_id _
     funext y
     exact Function.surjInv_eq hπ y
-  have hz : π z ∈ (Submodule.span ℂ (Function.surjInv hπ '' (t : Set (C ⧸ I)))).map π.toLinearMap := by
+  have hz
+      : π z ∈ (Submodule.span ℂ (Function.surjInv hπ '' (t : Set (C ⧸ I)))).map π.toLinearMap := by
     rw [hmap]; exact Submodule.mem_top
   obtain ⟨v, hv, hvz⟩ := hz
   refine ⟨v, hv, ?_⟩
@@ -48,43 +57,59 @@ theorem exists_finiteDimensional_sub_mem {C : Type*} [CommRing C] [Algebra ℂ C
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {n : ℕ}
 
-theorem cap_mem_span_coeffs (τ : E →+* ℂ) (u : ℂ) :
-    cap (a := n) τ u ∈ Submodule.span ℂ
-      ((GroundTheory.BlockD.FourierDecayAlt.GaugeExists.qdetPoly (Eop (a := n) τ)).coeffs : Set (Module.End ℂ (Sm E n))) := by
-  rw [cap, ← GroundTheory.BlockD.FourierDecayAlt.GaugeExists.evU_qdetPoly, GroundTheory.BlockD.FourierDecayAlt.GaugeExists.evU_apply, eval₂_eq_sum,
-    Polynomial.sum]
+theorem cap_mem_span_coeffs (τ : E →+* ℂ) (u : ℂ)
+    : cap (a := n) τ u ∈ Submodule.span ℂ
+      ((GroundTheory.BlockD.FourierDecayAlt.GaugeExists.qdetPoly (Eop (a := n) τ)).coeffs
+        : Set (Module.End ℂ (Sm E n))) := by
+  rw [cap, ← GroundTheory.BlockD.FourierDecayAlt.GaugeExists.evU_qdetPoly,
+    GroundTheory.BlockD.FourierDecayAlt.GaugeExists.evU_apply, eval₂_eq_sum, Polynomial.sum]
   refine Submodule.sum_mem _ fun k hk => ?_
   rw [RingHom.id_apply, ← map_pow, ← Algebra.commutes, ← Algebra.smul_def]
   exact Submodule.smul_mem _ _ (Submodule.subset_span (coeff_mem_coeffs (by simpa using hk)))
 
-theorem exists_finite_subset_span_cap :
-    ∃ b : Set (Module.End ℂ (Sm E n)), b.Finite ∧ b ⊆ {z | ∃ τ u, z = cap (a := n) τ u} ∧
-      Submodule.span ℂ b = Submodule.span ℂ {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = cap (a := n) τ u} := by
-  obtain ⟨b, hb, hspan, hli⟩ := exists_linearIndependent ℂ {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = cap (a := n) τ u}
-  have hF : (⋃ τ : E →+* ℂ, ((GroundTheory.BlockD.FourierDecayAlt.GaugeExists.qdetPoly (Eop (a := n) τ)).coeffs :
-      Set (Module.End ℂ (Sm E n)))).Finite := Set.finite_iUnion fun τ => Finset.finite_toSet _
+theorem exists_finite_subset_span_cap
+    : ∃ b : Set (Module.End ℂ (Sm E n)),
+      b.Finite ∧ b ⊆ {z | ∃ τ u, z = cap (a := n) τ u}
+        ∧ Submodule.span ℂ b
+          = Submodule.span ℂ {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = cap (a := n) τ u} := by
+  obtain ⟨b, hb, hspan, hli⟩ :=
+    exists_linearIndependent ℂ {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = cap (a := n) τ u}
+  have hF
+      : (⋃ τ : E →+* ℂ, ((GroundTheory.BlockD.FourierDecayAlt.GaugeExists.qdetPoly (Eop (a := n) τ)).coeffs :
+          Set (Module.End ℂ (Sm E n)))).Finite :=
+    Set.finite_iUnion fun τ => Finset.finite_toSet _
   haveI := FiniteDimensional.span_of_finite ℂ hF
-  have hle : Submodule.span ℂ {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = cap (a := n) τ u} ≤ Submodule.span ℂ
-      (⋃ τ : E →+* ℂ, ((GroundTheory.BlockD.FourierDecayAlt.GaugeExists.qdetPoly (Eop (a := n) τ)).coeffs :
-      Set (Module.End ℂ (Sm E n)))) := by
+  have hle
+      : Submodule.span ℂ {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = cap (a := n) τ u}
+        ≤ Submodule.span ℂ
+          (⋃ τ : E →+* ℂ, ((GroundTheory.BlockD.FourierDecayAlt.GaugeExists.qdetPoly (Eop (a := n) τ)).coeffs :
+            Set (Module.End ℂ (Sm E n)))) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨τ, u, rfl⟩
-    exact Submodule.span_mono (Set.subset_iUnion (fun τ : E →+* ℂ =>
-      ((GroundTheory.BlockD.FourierDecayAlt.GaugeExists.qdetPoly (Eop (a := n) τ)).coeffs : Set (Module.End ℂ (Sm E n)))) τ)
+    exact Submodule.span_mono
+      (Set.subset_iUnion
+        (fun τ : E →+* ℂ =>
+          ((GroundTheory.BlockD.FourierDecayAlt.GaugeExists.qdetPoly (Eop (a := n) τ)).coeffs
+            : Set (Module.End ℂ (Sm E n))))
+        τ)
       (cap_mem_span_coeffs τ u)
   haveI := Submodule.finiteDimensional_of_le hle
   have hfin : b.Finite := by
-    have hli' : LinearIndependent ℂ (fun x : b => (⟨x.1, hspan ▸ Submodule.subset_span x.2⟩ :
-        Submodule.span ℂ {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = cap (a := n) τ u})) :=
+    have hli' : LinearIndependent ℂ (fun x : b =>
+        (⟨x.1, hspan ▸ Submodule.subset_span x.2⟩
+          : Submodule.span ℂ {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = cap (a := n) τ u})) :=
       LinearIndependent.of_comp (Submodule.subtype _) hli
     have := hli'.finite
     exact Set.toFinite b
   exact ⟨b, hfin, hb, hspan⟩
 
-theorem cofin_of_algHom {C : Type} [CommRing C] [Algebra ℂ C] (ι : C →ₐ[ℂ] Module.End ℂ (Sm E n))
-    (hι : Function.Injective ι) (hr : ι.range = Zalg E n) (J : Set (Module.End ℂ (Sm E n))) (hJ : J ⊆ Zalg E n)
-    (hq : ∀ (τ : E →+* ℂ) (u : ℂ), ∃ q : Polynomial ℂ, q.Monic ∧ Polynomial.aeval (cap (a := n) τ u) q ∈ J) :
-    Cofin J := by
+theorem cofin_of_algHom
+    {C : Type} [CommRing C] [Algebra ℂ C]
+    (ι : C →ₐ[ℂ] Module.End ℂ (Sm E n)) (hι : Function.Injective ι) (hr : ι.range = Zalg E n)
+    (J : Set (Module.End ℂ (Sm E n))) (hJ : J ⊆ Zalg E n)
+    (hq : ∀ (τ : E →+* ℂ) (u : ℂ), ∃ q : Polynomial ℂ,
+      q.Monic ∧ Polynomial.aeval (cap (a := n) τ u) q ∈ J)
+    : Cofin J := by
   have hZ : ∀ c : C, ι c ∈ Zalg E n := fun c => hr ▸ AlgHom.mem_range_self ι c
   have hZ' : ∀ z ∈ Zalg E n, ∃ c : C, ι c = z := fun z hz => by
     rw [← hr] at hz
@@ -100,8 +125,9 @@ theorem cofin_of_algHom {C : Type} [CommRing C] [Algebra ℂ C] (ι : C →ₐ[�
     refine le_antisymm (Algebra.adjoin_le hbZ) (Algebra.adjoin_le ?_)
     intro x hx
     have h1 : x ∈ Submodule.span ℂ b := hspan ▸ Submodule.subset_span hx
-    exact (Submodule.span_le.2 Algebra.subset_adjoin :
-      Submodule.span ℂ b ≤ Subalgebra.toSubmodule (Algebra.adjoin ℂ b)) h1
+    exact (Submodule.span_le.2 Algebra.subset_adjoin
+        : Submodule.span ℂ b ≤ Subalgebra.toSubmodule (Algebra.adjoin ℂ b))
+      h1
   let I : Ideal C := Ideal.span (ι ⁻¹' J)
   have hI : ∀ w ∈ I, ι w ∈ Submodule.span ℂ {y | ∃ x ∈ Zalg E n, ∃ j ∈ J, y = x * j} := by
     intro w hw
@@ -128,14 +154,16 @@ theorem cofin_of_algHom {C : Type} [CommRing C] [Algebra ℂ C] (ι : C →ₐ[�
   rw [map_sub]
   abel
 
-theorem cofin_of_monic (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (n : ℕ)
-    (J : Set (Module.End ℂ (Sm E n))) (hJ : J ⊆ Zalg E n)
-    (hq : ∀ (τ : E →+* ℂ) (u : ℂ), ∃ q : Polynomial ℂ, q.Monic ∧ Polynomial.aeval (cap (a := n) τ u) q ∈ J) :
-    Cofin J := by
+theorem cofin_of_monic
+    (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    (n : ℕ) (J : Set (Module.End ℂ (Sm E n))) (hJ : J ⊆ Zalg E n)
+    (hq : ∀ (τ : E →+* ℂ) (u : ℂ), ∃ q : Polynomial ℂ,
+      q.Monic ∧ Polynomial.aeval (cap (a := n) τ u) q ∈ J)
+    : Cofin J := by
   letI : CommRing (Zalg E n) := { (inferInstance : Ring (Zalg E n)) with
     mul_comm := fun x y => Subtype.ext (GlobalTheory.AutGrowth.KilledFin.Zalg_commute x.property y.property).eq }
-  exact @cofin_of_algHom E _ _ _ n (Zalg E n) inferInstance (Subalgebra.algebra _)
-    (Zalg E n).val Subtype.val_injective (Subalgebra.range_val _) J hJ hq
+  exact @cofin_of_algHom E _ _ _ n (Zalg E n) inferInstance (Subalgebra.algebra _) (Zalg E n).val
+    Subtype.val_injective (Subalgebra.range_val _) J hJ hq
 
 end GlobalTheory.CompanionTheory.CTFin.MonicCofin
 

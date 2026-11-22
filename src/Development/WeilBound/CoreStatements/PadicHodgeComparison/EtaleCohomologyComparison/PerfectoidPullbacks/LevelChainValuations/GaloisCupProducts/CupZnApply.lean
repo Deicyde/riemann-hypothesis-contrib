@@ -29,44 +29,56 @@ section
 variable (M : Model l K)
 
 def cupS (n i j : ℕ) : M.Hc false n i →ₗ[Acris l] M.Hc false n j →ₗ[Acris l] M.Hc false n (i + j) :=
-  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (B.OcA (B.schFn M.p) (okToOC l K) false n)) (rfl : i + j = i + j)).choose
+  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (B.OcA (B.schFn M.p) (okToOC l K) false n))
+    (rfl : i + j = i + j)).choose
 
-theorem cupS_apply (n i j : ℕ) (x : M.Hc false n i) (y : M.Hc false n j) :
-    cupS M n i j x y = (CH.mulP (B.OcA (B.schFn M.p) (okToOC l K) false n)).cup rfl x y :=
-  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (B.OcA (B.schFn M.p) (okToOC l K) false n)) (rfl : i + j = i + j)).choose_spec x y
+theorem cupS_apply (n i j : ℕ) (x : M.Hc false n i) (y : M.Hc false n j)
+    : cupS M n i j x y = (CH.mulP (B.OcA (B.schFn M.p) (okToOC l K) false n)).cup rfl x y :=
+  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (B.OcA (B.schFn M.p) (okToOC l K) false n))
+    (rfl : i + j = i + j)).choose_spec x y
 
 end
 
 section
 variable {m : ℕ} (L : Lev (per l K) m) (M : Model l K) (s : ℕ)
 
-def cupZn (n i j : ℕ) : HM (QA L M s) none ((l : L.A) ^ n) i →ₗ[L.A] HM (QA L M s) none ((l : L.A) ^ n) j →ₗ[L.A]
-    HM (QA L M s) none ((l : L.A) ^ n) (i + j) :=
-  (CrystallineSemistableComparison.P.cup_bilin (sqP (stdI (QA L M s) none ((l : L.A) ^ n))) (rfl : i + j = i + j)).choose
+def cupZn (n i j : ℕ)
+    : HM (QA L M s) none ((l : L.A) ^ n) i →ₗ[L.A] HM (QA L M s) none ((l : L.A) ^ n) j →ₗ[L.A]
+      HM (QA L M s) none ((l : L.A) ^ n) (i + j) :=
+  (CrystallineSemistableComparison.P.cup_bilin (sqP (stdI (QA L M s) none ((l : L.A) ^ n)))
+    (rfl : i + j = i + j)).choose
 
-theorem cupZn_apply (n i j : ℕ) (x : HM (QA L M s) none ((l : L.A) ^ n) i) (y : HM (QA L M s) none ((l : L.A) ^ n) j) :
-    cupZn L M s n i j x y = (sqP (stdI (QA L M s) none ((l : L.A) ^ n))).cup rfl x y :=
-  (CrystallineSemistableComparison.P.cup_bilin (sqP (stdI (QA L M s) none ((l : L.A) ^ n))) (rfl : i + j = i + j)).choose_spec x y
+theorem cupZn_apply
+    (n i j : ℕ)
+    (x : HM (QA L M s) none ((l : L.A) ^ n) i) (y : HM (QA L M s) none ((l : L.A) ^ n) j)
+    : cupZn L M s n i j x y = (sqP (stdI (QA L M s) none ((l : L.A) ^ n))).cup rfl x y :=
+  (CrystallineSemistableComparison.P.cup_bilin (sqP (stdI (QA L M s) none ((l : L.A) ^ n)))
+    (rfl : i + j = i + j)).choose_spec x y
 
 def cupZ (i j : ℕ) : HO (QA L M s) i →ₗ[L.A] HO (QA L M s) j →ₗ[L.A] HO (QA L M s) (i + j) :=
-  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (sP (QA L M s)).A) (rfl : i + j = i + j)).choose
+  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (sP (QA L M s)).A)
+    (rfl : i + j = i + j)).choose
 
-theorem cupZ_apply (i j : ℕ) (x : HO (QA L M s) i) (y : HO (QA L M s) j) :
-    cupZ L M s i j x y = (CH.mulP (sP (QA L M s)).A).cup rfl x y :=
-  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (sP (QA L M s)).A) (rfl : i + j = i + j)).choose_spec x y
+theorem cupZ_apply (i j : ℕ) (x : HO (QA L M s) i) (y : HO (QA L M s) j)
+    : cupZ L M s i j x y = (CH.mulP (sP (QA L M s)).A).cup rfl x y :=
+  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (sP (QA L M s)).A)
+    (rfl : i + j = i + j)).choose_spec x y
 
 def cupW (i j : ℕ) : HO (QB L M s) i →ₗ[L.B] HO (QB L M s) j →ₗ[L.B] HO (QB L M s) (i + j) :=
-  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (sP (QB L M s)).A) (rfl : i + j = i + j)).choose
+  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (sP (QB L M s)).A)
+    (rfl : i + j = i + j)).choose
 
-theorem cupW_apply (i j : ℕ) (x : HO (QB L M s) i) (y : HO (QB L M s) j) :
-    cupW L M s i j x y = (CH.mulP (sP (QB L M s)).A).cup rfl x y :=
-  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (sP (QB L M s)).A) (rfl : i + j = i + j)).choose_spec x y
+theorem cupW_apply (i j : ℕ) (x : HO (QB L M s) i) (y : HO (QB L M s) j)
+    : cupW L M s i j x y = (CH.mulP (sP (QB L M s)).A).cup rfl x y :=
+  (CrystallineSemistableComparison.P.cup_bilin (CH.mulP (sP (QB L M s)).A)
+    (rfl : i + j = i + j)).choose_spec x y
 
 end
 
 section
-variable {m : ℕ} {L : Lev (per l K) m} (hL : L.Good) (M : Model l K) (s : ℕ)
-  (hQ : ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T))
+variable
+  {m : ℕ} {L : Lev (per l K) m} (hL : L.Good)
+  (M : Model l K) (s : ℕ) (hQ : ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T))
   (d : ∀ n, RedIn (B.DD false (PAlg.base l) n) (B.κb (okToOC l K) false n) L.γ l n)
   (hc : ∀ n (c : Acris l), (d n).ρ ((PAlg.base l).cris n c) = Ideal.Quotient.mk _ (L.lam c))
 
@@ -77,11 +89,12 @@ end CupProductChain
 end
 
 section
-variable {m : ℕ} {L : Lev (per l K) m} (hL : L.Good) (M : Model l K) (s : ℕ)
-  (hQ : ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T))
+variable
+  {m : ℕ} {L : Lev (per l K) m} (hL : L.Good)
+  (M : Model l K) (s : ℕ) (hQ : ∀ T, QB L M s T → QA L M s (((nmB M hL).mor 0).obj T))
 
-def cupOf (rH : ∀ n j, M.Hc false n j →ₛₗ[L.lam] HM (QA L M s) none ((l : L.A) ^ n) j) :
-    Cup (chainOf hL M s hQ rH) where
+def cupOf (rH : ∀ n j, M.Hc false n j →ₛₗ[L.lam] HM (QA L M s) none ((l : L.A) ^ n) j)
+    : Cup (chainOf hL M s hQ rH) where
   cS n i j := cupS M n i j
   cZn n i j := cupZn L M s n i j
   cZ i j := cupZ L M s i j
@@ -91,9 +104,11 @@ def cupOf (rH : ∀ n j, M.Hc false n j →ₛₗ[L.lam] HM (QA L M s) none ((l 
   oneZ := CH.oneH (sP (QA L M s)).A
   oneV := oneK M.q
 
-theorem one_iff (rH : ∀ n j, M.Hc false n j →ₛₗ[L.lam] HM (QA L M s) none ((l : L.A) ^ n) j)
-    {Amp : ∀ M : Model l K, E.LineData M.X → Prop} (a : (dat Amp).Ch M) (x : ((dat Amp).H a).N 0) :
-    ((dat Amp).H a).one x ↔ ∀ n, (show (M.HS false 0).lim from x).1 n = (cupOf hL M s hQ rH).oneS n :=
+theorem one_iff
+    (rH : ∀ n j, M.Hc false n j →ₛₗ[L.lam] HM (QA L M s) none ((l : L.A) ^ n) j)
+    {Amp : ∀ M : Model l K, E.LineData M.X → Prop} (a : (dat Amp).Ch M) (x : ((dat Amp).H a).N 0)
+    : ((dat Amp).H a).one x
+      ↔ ∀ n, (show (M.HS false 0).lim from x).1 n = (cupOf hL M s hQ rH).oneS n :=
   Iff.rfl
 
 end

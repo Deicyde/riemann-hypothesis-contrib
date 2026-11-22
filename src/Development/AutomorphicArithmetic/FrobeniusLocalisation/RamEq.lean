@@ -34,8 +34,7 @@ private theorem tower_le {φ : Frame} (H : HostRaw φ) : φ.e + 2 ≤ H.condE.fa
     exact Nat.mul_dvd_mul_left _ (pow_dvd_pow _ (by omega))
   have hall := (H.imgOne_eq_bot_iff hf).1 hbot
   have hk : 2 ∣ a * 2 ^ (φ.e + 1) := Dvd.dvd.mul_left (dvd_pow_self 2 (by omega)) a
-  have hp1 : 1 + a * 2 ^ (φ.e + 1) ≡ 1 [MOD a * 2 ^ (φ.e + 1)] := by
-    simp [Nat.ModEq]
+  have hp1 : 1 + a * 2 ^ (φ.e + 1) ≡ 1 [MOD a * 2 ^ (φ.e + 1)] := by simp [Nat.ModEq]
   have hcop : Nat.Coprime (1 + a * 2 ^ (φ.e + 1)) H.condN := by
     rw [← haN]
     refine Nat.Coprime.mul_right ?_ (Nat.Coprime.pow_right _ ?_)
@@ -48,7 +47,9 @@ private theorem tower_le {φ : Frame} (H : HostRaw φ) : φ.e + 2 ≤ H.condE.fa
   have hh := Der.Rd.hH_art H u
   rw [h1] at hh
   simp only [Prod.snd_one, map_one] at hh
-  have hM : (((u : ZMod H.condN).val : ℕ) : ZMod (2 ^ (φ.e + 2))) = ((1 + a * 2 ^ (φ.e + 1) : ℕ) : ZMod (2 ^ (φ.e + 2))) :=
+  have hM
+      : (((u : ZMod H.condN).val : ℕ) : ZMod (2 ^ (φ.e + 2)))
+        = ((1 + a * 2 ^ (φ.e + 1) : ℕ) : ZMod (2 ^ (φ.e + 2))) :=
     (ZMod.natCast_eq_natCast_iff _ _ _).2 (hu.of_dvd H.tower_dvd_condN)
   rw [ZMod.natCast_val] at hM
   rcases Der.Rd.hcl_eq_one hh.symm with hv | hv
@@ -77,8 +78,12 @@ private theorem tower_le {φ : Frame} (H : HostRaw φ) : φ.e + 2 ≤ H.condE.fa
     rw [show 1 + a * 2 ^ (φ.e + 1) + 1 = 2 + a * 2 ^ (φ.e + 1) by ring, Nat.dvd_add_left h4X] at h42
     norm_num at h42
 
-theorem UpperTheory.HF.ram_eq :
-    ∀ {φ : Frame} (H : HostAx φ), (∀ l, l ∈ H.ram ↔ l ∈ H.smallR ∨ (l = H.q ∧ H.q ∈ H.ram) ∨ l = H.d) ∧ 2 ∈ H.smallR ∧ H.ram = H.condE.primeFactors ∧ H.condE = H.QSc * (if H.q ∈ H.ram then H.q else 1) * H.d ∧ H.QSc ∣ H.QS ∧ 2 ^ (φ.e + 2) ∣ H.QSc ∧ (∀ l ∈ H.smallR, H.sl l = H.condE.factorization l) ∧ (∀ l ∈ H.ramI, l ∣ H.QS * H.q) := by
+theorem UpperTheory.HF.ram_eq
+    : ∀ {φ : Frame} (H : HostAx φ),
+      (∀ l, l ∈ H.ram ↔ l ∈ H.smallR ∨ (l = H.q ∧ H.q ∈ H.ram) ∨ l = H.d) ∧ 2 ∈ H.smallR
+        ∧ H.ram = H.condE.primeFactors ∧ H.condE = H.QSc * (if H.q ∈ H.ram then H.q else 1) * H.d
+        ∧ H.QSc ∣ H.QS ∧ 2 ^ (φ.e + 2) ∣ H.QSc ∧ (∀ l ∈ H.smallR, H.sl l = H.condE.factorization l)
+        ∧ (∀ l ∈ H.ramI, l ∣ H.QS * H.q) := by
   intro φ H
   have hd := H.d_prime
   have hq := H.q_prime
@@ -156,7 +161,8 @@ theorem UpperTheory.HF.ram_eq :
     refine Nat.Coprime.prod_left (fun l hl => Nat.Coprime.pow_left _ ?_)
     have hr := (hS l).1 hl
     have hl' := hprime l hr.2
-    refine Nat.Coprime.mul_right ((Nat.coprime_primes hl' hq).2 ?_) ((Nat.coprime_primes hl' hd).2 ?_)
+    refine Nat.Coprime.mul_right ((Nat.coprime_primes hl' hq).2 ?_)
+      ((Nat.coprime_primes hl' hd).2 ?_)
     · rintro rfl
       exact H.q_notMem_small hr.1
     · rintro rfl

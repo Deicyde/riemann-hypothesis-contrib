@@ -8,8 +8,8 @@ open NumberField
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem root_of_unity_eq_one_of_dvd_sub_one :
-    ∀ (E : Type) [Field E] [NumberField E] (u : 𝓞 E) (n M : ℕ),
+theorem root_of_unity_eq_one_of_dvd_sub_one
+    : ∀ (E : Type) [Field E] [NumberField E] (u : 𝓞 E) (n M : ℕ),
       0 < n → u ^ n = 1 → 3 ≤ M → (M : 𝓞 E) ∣ u - 1 → u = 1 := by
   intro E _ _ u n M hn hu hM ⟨x, hx⟩
   have hlt : ∀ φ : E →+* ℂ, ‖φ (x : E)‖ < 1 := by
@@ -36,8 +36,9 @@ theorem root_of_unity_eq_one_of_dvd_sub_one :
     have : x = 0 := by exact_mod_cast h0
     rw [this, mul_zero, sub_eq_zero] at hx
     exact hne hx
-  obtain ⟨k, hk, hpow⟩ := NumberField.Embeddings.pow_eq_one_of_norm_le_one E ℂ hx0
-    (RingOfIntegers.isIntegral_coe x) (fun φ => (hlt φ).le)
+  obtain ⟨k, hk, hpow⟩ :=
+    NumberField.Embeddings.pow_eq_one_of_norm_le_one E ℂ hx0 (RingOfIntegers.isIntegral_coe x)
+      (fun φ => (hlt φ).le)
   obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
   have h7 := congrArg (fun y : E => ‖φ y‖) hpow
   simp only [map_pow, norm_pow, map_one, norm_one] at h7

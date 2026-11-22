@@ -15,17 +15,20 @@ section Abstract
 
 variable {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
 
-theorem mem_fixed_iff_forall {π : Representation ℂ G V} {K : Subgroup G} {x : V} :
-    x ∈ fixed π K ↔ ∀ k ∈ K, π k x = x := by
+theorem mem_fixed_iff_forall {π : Representation ℂ G V} {K : Subgroup G} {x : V}
+    : x ∈ fixed π K ↔ ∀ k ∈ K, π k x = x := by
   show (∀ h : K, π h x = ((1 : K →* ℂˣ) h : ℂ) • x) ↔ _
   simp only [MonoidHom.one_apply, Units.val_one, one_smul]
   exact ⟨fun h k hk => h ⟨k, hk⟩, fun h k => h k k.2⟩
 
-theorem fixed_sup_eq_zero [TopologicalSpace G] [IsTopologicalGroup G] {π : Representation ℂ G V}
-    (hπ : IsSmooth π) {K : Subgroup G} (hK : IsCompact (K : Set G)) {A B : Submodule ℂ V}
-    (hA : ∀ g, ∀ ⦃x⦄, x ∈ A → π g x ∈ A) (hB : ∀ g, ∀ ⦃x⦄, x ∈ B → π g x ∈ B)
+theorem fixed_sup_eq_zero
+    [TopologicalSpace G] [IsTopologicalGroup G]
+    {π : Representation ℂ G V} (hπ : IsSmooth π)
+    {K : Subgroup G} (hK : IsCompact (K : Set G))
+    {A B : Submodule ℂ V} (hA : ∀ g, ∀ ⦃x⦄, x ∈ A → π g x ∈ A) (hB : ∀ g, ∀ ⦃x⦄, x ∈ B → π g x ∈ B)
     (hA0 : ∀ x ∈ A, x ∈ fixed π K → x = 0) (hB0 : ∀ x ∈ B, x ∈ fixed π K → x = 0)
-    {x : V} (hx : x ∈ A ⊔ B) (hf : x ∈ fixed π K) : x = 0 := by
+    {x : V} (hx : x ∈ A ⊔ B) (hf : x ∈ fixed π K)
+    : x = 0 := by
   obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hx
   let S : Subrepresentation π := ⟨B, hB⟩
   have hS : IsSmooth S.toRepresentation := by
@@ -35,18 +38,20 @@ theorem fixed_sup_eq_zero [TopologicalSpace G] [IsTopologicalGroup G] {π : Repr
       exact ⟨fun h => congrArg Subtype.val h, fun h => Subtype.ext h⟩
     rw [e]
     exact hπ w
-  have hinv : ∀ h ∈ K, ((A.mkQ).comp B.subtype) (S.toRepresentation h ⟨b, hb⟩) =
-      ((A.mkQ).comp B.subtype) ⟨b, hb⟩ := by
+  have hinv
+      : ∀ h ∈ K,
+        ((A.mkQ).comp B.subtype) (S.toRepresentation h ⟨b, hb⟩)
+          = ((A.mkQ).comp B.subtype) ⟨b, hb⟩ := by
     intro h hh
     have hx' := (mem_fixed_iff_forall.mp hf) h hh
     rw [map_add (f := _)] at hx'
     have e : (S.toRepresentation h ⟨b, hb⟩ : V) = π h b := rfl
-    have e2 : π h b - b = a - π h a := by
-      rw [sub_eq_sub_iff_add_eq_add, add_comm, hx']
+    have e2 : π h b - b = a - π h a := by rw [sub_eq_sub_iff_add_eq_add, add_comm, hx']
     show A.mkQ ((S.toRepresentation h ⟨b, hb⟩ : V)) = A.mkQ b
     rw [e, Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq, e2]
     exact A.sub_mem ha (hA h ha)
-  obtain ⟨v, hvK, hv⟩ := GlobalTheory.SmGL.IwahoriOnto.exists_fixed_map_eq hS hK ((A.mkQ).comp B.subtype) ⟨b, hb⟩ hinv
+  obtain ⟨v, hvK, hv⟩ :=
+    GlobalTheory.SmGL.IwahoriOnto.exists_fixed_map_eq hS hK ((A.mkQ).comp B.subtype) ⟨b, hb⟩ hinv
   have hvK' : (v : V) ∈ fixed π K := by
     rw [mem_fixed_iff_forall] at hvK ⊢
     intro k hk
@@ -58,22 +63,27 @@ theorem fixed_sup_eq_zero [TopologicalSpace G] [IsTopologicalGroup G] {π : Repr
     simpa using A.neg_mem h1
   exact hA0 _ (A.add_mem ha hbA) hf
 
-theorem exists_irreducible_of_fixed {π : Representation ℂ G V} {K : Subgroup G} {W : Submodule ℂ V}
-    (hW : ∀ g, ∀ ⦃x⦄, x ∈ W → π g x ∈ W) (hW0 : W ≠ ⊥)
-    (hfin : FiniteDimensional ℂ ↥(W ⊓ fixed π K))
-    (hnz : ∀ A : Submodule ℂ V, (∀ g, ∀ ⦃x⦄, x ∈ A → π g x ∈ A) → A ≠ ⊥ →
-      ∃ x ∈ A, x ∈ fixed π K ∧ x ≠ 0) :
-    ∃ (S : Subrepresentation π) (u : V), u ∈ S.toSubmodule ∧ u ≠ 0 ∧ u ∈ fixed π K ∧
-      S.toRepresentation.IsIrreducible ∧ FiniteDimensional ℂ (fixed S.toRepresentation K) := by
+theorem exists_irreducible_of_fixed
+    {π : Representation ℂ G V} {K : Subgroup G} {W : Submodule ℂ V}
+    (hW : ∀ g, ∀ ⦃x⦄, x ∈ W → π g x ∈ W) (hW0 : W ≠ ⊥) (hfin : FiniteDimensional ℂ ↥(W ⊓ fixed π K))
+    (hnz : ∀ A : Submodule ℂ V,
+      (∀ g, ∀ ⦃x⦄, x ∈ A → π g x ∈ A) → A ≠ ⊥ → ∃ x ∈ A, x ∈ fixed π K ∧ x ≠ 0)
+    : ∃ (S : Subrepresentation π) (u : V),
+      u ∈ S.toSubmodule ∧ u ≠ 0 ∧ u ∈ fixed π K ∧ S.toRepresentation.IsIrreducible
+        ∧ FiniteDimensional ℂ (fixed S.toRepresentation K) := by
   classical
   haveI := hfin
-  have hfinM : ∀ M : Submodule ℂ V, M ≤ W → FiniteDimensional ℂ ↥(M ⊓ fixed π K) :=
-    fun M hM => Submodule.finiteDimensional_of_le (inf_le_inf_right (fixed π K) hM)
-  have hex : ∃ n, ∃ M : Submodule ℂ V, (∀ g, ∀ ⦃x⦄, x ∈ M → π g x ∈ M) ∧ M ≤ W ∧ M ≠ ⊥ ∧
-      Module.finrank ℂ ↥(M ⊓ fixed π K) = n := ⟨_, W, hW, le_rfl, hW0, rfl⟩
+  have hfinM : ∀ M : Submodule ℂ V, M ≤ W → FiniteDimensional ℂ ↥(M ⊓ fixed π K) := fun M hM =>
+    Submodule.finiteDimensional_of_le (inf_le_inf_right (fixed π K) hM)
+  have hex
+      : ∃ n, ∃ M : Submodule ℂ V,
+        (∀ g, ∀ ⦃x⦄, x ∈ M → π g x ∈ M) ∧ M ≤ W ∧ M ≠ ⊥ ∧ Module.finrank ℂ ↥(M ⊓ fixed π K) = n :=
+    ⟨_, W, hW, le_rfl, hW0, rfl⟩
   obtain ⟨M0, hM0inv, hM0W, hM0ne, hM0d⟩ := Nat.find_spec hex
-  have hmin : ∀ M : Submodule ℂ V, (∀ g, ∀ ⦃x⦄, x ∈ M → π g x ∈ M) → M ≤ W → M ≠ ⊥ →
-      Module.finrank ℂ ↥(M0 ⊓ fixed π K) ≤ Module.finrank ℂ ↥(M ⊓ fixed π K) := by
+  have hmin
+      : ∀ M : Submodule ℂ V,
+        (∀ g, ∀ ⦃x⦄, x ∈ M → π g x ∈ M) → M ≤ W → M ≠ ⊥
+          → Module.finrank ℂ ↥(M0 ⊓ fixed π K) ≤ Module.finrank ℂ ↥(M ⊓ fixed π K) := by
     intro M hMinv hMW hMne
     rw [hM0d]
     exact Nat.find_min' hex ⟨M, hMinv, hMW, hMne, rfl⟩
@@ -153,27 +163,32 @@ theorem exists_irreducible_of_fixed {π : Representation ℂ G V} {K : Subgroup 
       exact congrArg Subtype.val (hy k hk)
     haveI : FiniteDimensional ℂ ↥((fixed S.toRepresentation K).map S1.subtype) :=
       Submodule.finiteDimensional_of_le hle
-    exact LinearEquiv.finiteDimensional
-      (Submodule.equivMapOfInjective S1.subtype Subtype.val_injective _).symm
+    exact LinearEquiv.finiteDimensional (Submodule.equivMapOfInjective S1.subtype
+      Subtype.val_injective _).symm
 
 end Abstract
 
-theorem inl_inr_comm {G H V : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ (G × H) V) (g : G) (h : H) (x : V) :
-    ρ (g, 1) (ρ (1, h) x) = ρ (1, h) (ρ (g, 1) x) := by
+theorem inl_inr_comm
+    {G H V : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (G × H) V) (g : G) (h : H) (x : V)
+    : ρ (g, 1) (ρ (1, h) x) = ρ (1, h) (ρ (g, 1) x) := by
   have hc : ((g, 1) * (1, h) : G × H) = (1, h) * (g, 1) := Prod.ext (by simp) (by simp)
   rw [← Module.End.mul_apply, ← map_mul, hc, map_mul, Module.End.mul_apply]
 
 section Product
 
-variable {G H V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [Group H] [AddCommGroup V] [Module ℂ V]
+variable
+  {G H V : Type}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H] [AddCommGroup V] [Module ℂ V]
 
-theorem exists_fixed_of_ne_bot (ρ : Representation ℂ (G × H) V) (hi : ρ.IsIrreducible)
-    (hs : IsSmooth (ρ.comp (MonoidHom.inl G H))) {K : Subgroup G} (hK : IsCompact (K : Set G))
+theorem exists_fixed_of_ne_bot
+    (ρ : Representation ℂ (G × H) V)
+    (hi : ρ.IsIrreducible) (hs : IsSmooth (ρ.comp (MonoidHom.inl G H)))
+    {K : Subgroup G} (hK : IsCompact (K : Set G))
     {v : V} (hv : v ≠ 0) (hvK : v ∈ fixed (ρ.comp (MonoidHom.inl G H)) K)
-    (A : Submodule ℂ V) (hA : ∀ g, ∀ ⦃x⦄, x ∈ A → (ρ.comp (MonoidHom.inl G H)) g x ∈ A) (hA0 : A ≠ ⊥) :
-    ∃ x ∈ A, x ∈ fixed (ρ.comp (MonoidHom.inl G H)) K ∧ x ≠ 0 := by
+    (A : Submodule ℂ V)
+    (hA : ∀ g, ∀ ⦃x⦄, x ∈ A → (ρ.comp (MonoidHom.inl G H)) g x ∈ A) (hA0 : A ≠ ⊥)
+    : ∃ x ∈ A, x ∈ fixed (ρ.comp (MonoidHom.inl G H)) K ∧ x ≠ 0 := by
   classical
   by_contra hcon
   have hno : ∀ x ∈ A, x ∈ fixed (ρ.comp (MonoidHom.inl G H)) K → x = 0 := by
@@ -202,9 +217,10 @@ theorem exists_fixed_of_ne_bot (ρ : Representation ℂ (G × H) V) (hi : ρ.IsI
       rwa [hinv1, hinv1] at e2
     show ρ (1, h) a = 0
     rw [hno a ha haK, map_zero]
-  have hP : ∀ s : Finset H,
-      (∀ g, ∀ ⦃x⦄, x ∈ ⨆ h ∈ s, T h → (ρ.comp (MonoidHom.inl G H)) g x ∈ ⨆ h ∈ s, T h) ∧
-      (∀ x ∈ ⨆ h ∈ s, T h, x ∈ fixed (ρ.comp (MonoidHom.inl G H)) K → x = 0) := by
+  have hP
+      : ∀ s : Finset H,
+        (∀ g, ∀ ⦃x⦄, x ∈ ⨆ h ∈ s, T h → (ρ.comp (MonoidHom.inl G H)) g x ∈ ⨆ h ∈ s, T h)
+          ∧ (∀ x ∈ ⨆ h ∈ s, T h, x ∈ fixed (ρ.comp (MonoidHom.inl G H)) K → x = 0) := by
     intro s
     refine Finset.induction_on s ?_ ?_
     · have e : (⨆ h ∈ (∅ : Finset H), T h) = ⊥ := by simp
@@ -256,7 +272,19 @@ theorem exists_fixed_of_ne_bot (ρ : Representation ℂ (G × H) V) (hi : ρ.IsI
 
 end Product
 
-theorem exists_irreducible_sub_inl : ∀ {G H V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup V] [Module ℂ V], (∀ U ∈ 𝓝 (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U) → (∀ U ∈ 𝓝 (1 : H), ∃ K : Subgroup H, IsOpen (K : Set H) ∧ IsCompact (K : Set H) ∧ (K : Set H) ⊆ U) → ∀ ρ : Representation ℂ (G × H) V, IsAdmissible ρ → ρ.IsIrreducible → ∃ (K : Subgroup G) (S : Subrepresentation (ρ.comp (MonoidHom.inl G H))) (u : V), IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ u ∈ S.toSubmodule ∧ u ≠ 0 ∧ (∀ x ∈ K, ρ (x, 1) u = u) ∧ S.toRepresentation.IsIrreducible ∧ FiniteDimensional ℂ (fixed S.toRepresentation K) := by
+theorem exists_irreducible_sub_inl
+    : ∀ {G H V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
+        [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup V] [Module ℂ V],
+      (∀ U ∈ 𝓝 (1 : G), ∃ K : Subgroup G,
+          IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
+        → (∀ U ∈ 𝓝 (1 : H), ∃ K : Subgroup H,
+          IsOpen (K : Set H) ∧ IsCompact (K : Set H) ∧ (K : Set H) ⊆ U)
+        → ∀ ρ : Representation ℂ (G × H) V,
+          IsAdmissible ρ → ρ.IsIrreducible
+            → ∃ (K : Subgroup G) (S : Subrepresentation (ρ.comp (MonoidHom.inl G H))) (u : V),
+              IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ u ∈ S.toSubmodule ∧ u ≠ 0
+                ∧ (∀ x ∈ K, ρ (x, 1) u = u) ∧ S.toRepresentation.IsIrreducible
+                ∧ FiniteDimensional ℂ (fixed S.toRepresentation K) := by
   intro G H V _ _ _ _ _ _ _ _ hG hH ρ hadm hi
   haveI : IsSimpleOrder (Subrepresentation ρ) := hi
   obtain ⟨v, hv0⟩ : ∃ v : V, v ≠ 0 := by
@@ -268,7 +296,8 @@ theorem exists_irreducible_sub_inl : ∀ {G H V : Type} [Group G] [TopologicalSp
     rw [hcon x]
     exact ⟨fun _ => Submodule.zero_mem _, fun _ => Submodule.zero_mem _⟩
   have hU : {gh : G × H | ρ gh v = v} ∈ 𝓝 ((1 : G), (1 : H)) :=
-    (hadm.1 v).mem_nhds (by show ρ (1, 1) v = v; rw [Prod.mk_one_one, map_one, Module.End.one_apply])
+    (hadm.1 v).mem_nhds
+      (by show ρ (1, 1) v = v; rw [Prod.mk_one_one, map_one, Module.End.one_apply])
   obtain ⟨U1, hU1, U2, hU2, hUU⟩ := mem_nhds_prod_iff.mp hU
   obtain ⟨K1, hK1o, hK1c, hK1U⟩ := hG U1 hU1
   obtain ⟨K2, hK2o, hK2c, hK2U⟩ := hH U2 hU2
@@ -325,10 +354,13 @@ theorem exists_irreducible_sub_inl : ∀ {G H V : Type} [Group G] [TopologicalSp
     intro x
     have hc : Continuous fun g : G => ((g, 1) : G × H) := by fun_prop
     exact (hadm.1 x).preimage hc
-  have hnz : ∀ A : Submodule ℂ V, (∀ g, ∀ ⦃x⦄, x ∈ A → (ρ.comp (MonoidHom.inl G H)) g x ∈ A) → A ≠ ⊥ →
-      ∃ x ∈ A, x ∈ fixed (ρ.comp (MonoidHom.inl G H)) K1 ∧ x ≠ 0 :=
-    fun A hA hA0 => exists_fixed_of_ne_bot ρ hi hs hK1c hv0 hvK A hA hA0
+  have hnz
+      : ∀ A : Submodule ℂ V,
+        (∀ g, ∀ ⦃x⦄, x ∈ A → (ρ.comp (MonoidHom.inl G H)) g x ∈ A) → A ≠ ⊥
+          → ∃ x ∈ A, x ∈ fixed (ρ.comp (MonoidHom.inl G H)) K1 ∧ x ≠ 0 := fun A hA hA0 =>
+    exists_fixed_of_ne_bot ρ hi hs hK1c hv0 hvK A hA hA0
   obtain ⟨S, u, huS, hu0, huK, hSirr, hSfin⟩ := exists_irreducible_of_fixed hW hW0 hfin hnz
-  exact ⟨K1, S, u, hK1o, hK1c, huS, hu0, fun x hx => (mem_fixed_iff_forall.mp huK) x hx, hSirr, hSfin⟩
+  exact
+    ⟨K1, S, u, hK1o, hK1c, huS, hu0, fun x hx => (mem_fixed_iff_forall.mp huK) x hx, hSirr, hSfin⟩
 
 end GlobalTheory.CompanionTheory.ProdSub

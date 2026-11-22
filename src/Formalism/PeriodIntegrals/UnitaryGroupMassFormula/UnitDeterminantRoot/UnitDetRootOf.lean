@@ -11,8 +11,10 @@ namespace PI.UnitaryGroupMassFormula.UnitDetRoot
 
 open PI
 
-theorem unitDetRoot_of (h1 : DetInK) (h2 : LocalStd) (h3 : GlobalLUnit) (h4 : NormOne)
-    (h5 : RootStep) (h6 : ConjMem) (h7 : ConjLUnit) : PI.UnitDetRoot := by
+theorem unitDetRoot_of
+    (h1 : DetInK) (h2 : LocalStd) (h3 : GlobalLUnit) (h4 : NormOne) (h5 : RootStep) (h6 : ConjMem)
+    (h7 : ConjLUnit)
+    : PI.UnitDetRoot := by
   intro a b c d ha hd lam hlam hOK m _ _ Λa hSD hθ hi1 hi2
   have hH : Hyp a b c d ha hd lam hlam m Λa := ⟨hOK, hSD, hθ, hi1, hi2⟩
   obtain ⟨γ, hγK, hγ0, n, hn, hγ⟩ := h3 a b c d ha hd lam hlam m Λa hH

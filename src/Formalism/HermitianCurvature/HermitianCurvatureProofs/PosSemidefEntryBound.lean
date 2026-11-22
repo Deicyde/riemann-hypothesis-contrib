@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.ThetaExistenceInductiveFromPieces
 
 noncomputable section
 
-open Matrix Formalism.DoubleCosetMeasures Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6 Filter Topology
+open Matrix Formalism.DoubleCosetMeasures Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6
+  Filter Topology
 open scoped ComplexConjugate ComplexOrder
 
 namespace Formalism.FourierDecayAlt.P.A6x2
@@ -54,8 +55,10 @@ theorem parsevalGroup : ParsevalGroup := by
   have hN : (Fintype.card G : ℝ) ≠ 0 := by
     have : 0 < Fintype.card G := Fintype.card_pos_iff.2 ⟨0⟩
     positivity
-  have h1 : ∀ χ : AddChar G ℂ, ‖(Fintype.card G : ℂ)⁻¹ • ∑ g, χ (-g) • v g‖ ^ 2 =
-      ((Fintype.card G : ℝ)⁻¹) ^ 2 * ‖∑ g, χ (-g) • v g‖ ^ 2 := by
+  have h1
+      : ∀ χ : AddChar G ℂ,
+        ‖(Fintype.card G : ℂ)⁻¹ • ∑ g, χ (-g) • v g‖ ^ 2
+          = ((Fintype.card G : ℝ)⁻¹) ^ 2 * ‖∑ g, χ (-g) • v g‖ ^ 2 := by
     intro χ
     rw [norm_smul, mul_pow, norm_inv, Complex.norm_natCast]
   simp_rw [h1]
@@ -64,19 +67,23 @@ theorem parsevalGroup : ParsevalGroup := by
 
 theorem pSDClosed : PSDClosed := by
   intro X F k l hk hl a
-  have ht : Tendsto (fun j => ∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k j x y) atTop
-      (𝓝 (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * l x y)) :=
+  have ht : Tendsto
+      (fun j => ∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k j x y)
+      atTop (𝓝 (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * l x y)) :=
     tendsto_finsetSum _ fun x hx => tendsto_finsetSum _ fun y hy => (hl x hx y hy).const_mul _
   constructor
   · have h1 := (Complex.continuous_im.tendsto _).comp ht
     have h2 : (fun j => (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k j x y).im) = fun _ => (0 : ℝ) := by
       funext j; exact (hk j a).1
-    have h3 : Tendsto (fun j => (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k j x y).im) atTop
-        (𝓝 ((∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * l x y).im)) := h1
+    have h3 : Tendsto
+        (fun j => (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k j x y).im)
+        atTop (𝓝 ((∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * l x y).im)) :=
+      h1
     rw [h2] at h3
     exact (tendsto_nhds_unique h3 tendsto_const_nhds)
-  · have h1 : Tendsto (fun j => (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k j x y).re) atTop
-        (𝓝 ((∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * l x y).re)) :=
+  · have h1 : Tendsto
+        (fun j => (∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * k j x y).re)
+        atTop (𝓝 ((∑ x ∈ F, ∑ y ∈ F, a x * conj (a y) * l x y).re)) :=
       (Complex.continuous_re.tendsto _).comp ht
     exact ge_of_tendsto' h1 fun j => (hk j a).2
 
@@ -134,16 +141,19 @@ theorem gramRealiseCut : GramRealiseCut := by
   obtain ⟨S2, hS2⟩ := exists_factor F _ h2
   let e : (F ⊕ F) ≃ Fin (Fintype.card (F ⊕ F)) := Fintype.equivFin _
   let u : X → EuclideanSpace ℂ (Fin (Fintype.card (F ⊕ F))) := fun x =>
-    WithLp.toLp 2 (fun i => if hx : x ∈ F then
-      Sum.elim (fun j => S1 j ⟨x, hx⟩) (fun j => S2 j ⟨x, hx⟩) (e.symm i) else 0)
+    WithLp.toLp 2 (fun i =>
+      if hx : x ∈ F then
+        Sum.elim (fun j => S1 j ⟨x, hx⟩) (fun j => S2 j ⟨x, hx⟩) (e.symm i)
+      else
+        0)
   let d : Fin (Fintype.card (F ⊕ F)) → ℂ := fun i => if (e.symm i).isLeft then 1 else 0
-  let T : EuclideanSpace ℂ (Fin (Fintype.card (F ⊕ F))) →ₗ[ℂ]
-      EuclideanSpace ℂ (Fin (Fintype.card (F ⊕ F))) :=
-    { toFun := fun v => WithLp.toLp 2 (fun i => d i * v i)
-      map_add' := by
-        intro v w; ext i; simp [mul_add]
-      map_smul' := by
-        intro c v; ext i; simp; ring }
+  let T
+      : EuclideanSpace ℂ (Fin (Fintype.card (F ⊕ F))) →ₗ[ℂ]
+        EuclideanSpace ℂ (Fin (Fintype.card (F ⊕ F))) := {
+    toFun := fun v => WithLp.toLp 2 (fun i => d i * v i)
+    map_add' := by intro v w; ext i; simp [mul_add]
+    map_smul' := by intro c v; ext i; simp; ring
+  }
   refine ⟨_, u, T, ?_, ?_, ?_⟩
   · intro v
     rw [EuclideanSpace.norm_eq, EuclideanSpace.norm_eq]
@@ -177,7 +187,9 @@ theorem pSDEntryBound : PSDEntryBound := by
     exact (inner_self_eq_norm_sq (𝕜 := ℂ) (u z)).symm
   rw [← hGc x hx y hy, ← hn x hx, ← hn y hy, ← mul_pow]
   have h3 : ‖inner ℂ (T (u y)) (T (u x))‖ ≤ ‖u x‖ * ‖u y‖ :=
-    calc ‖inner ℂ (T (u y)) (T (u x))‖ ≤ ‖T (u y)‖ * ‖T (u x)‖ := norm_inner_le_norm _ _
+    calc
+      ‖inner ℂ (T (u y)) (T (u x))‖
+        ≤ ‖T (u y)‖ * ‖T (u x)‖ := norm_inner_le_norm _ _
       _ ≤ ‖u y‖ * ‖u x‖ := mul_le_mul (hT _) (hT _) (norm_nonneg _) (norm_nonneg _)
       _ = ‖u x‖ * ‖u y‖ := mul_comm _ _
   exact pow_le_pow_left₀ (norm_nonneg _) h3 2

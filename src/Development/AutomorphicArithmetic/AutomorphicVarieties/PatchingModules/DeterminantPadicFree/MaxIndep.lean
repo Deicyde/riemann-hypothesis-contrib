@@ -6,14 +6,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.Det.maxIndep :
-    ∀ {A M : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [AddCommGroup M] [Module A M] (t : A) (S B : Submodule A M), Irreducible t → S.FG → ∃ (g : ℕ) (κ : Fin g → M), (∀ j, κ j ∈ S) ∧ (∀ c : Fin g → A, ∑ j, c j • κ j ∈ B → c = 0) ∧ ∀ z ∈ S, ∃ (s : ℕ) (c : Fin g → A), t ^ s • z - ∑ j, c j • κ j ∈ B := by
+theorem UpperTheory.V.Pa.Det.maxIndep
+    : ∀ {A M : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [AddCommGroup M]
+        [Module A M] (t : A) (S B : Submodule A M),
+      Irreducible t → S.FG
+        → ∃ (g : ℕ) (κ : Fin g → M),
+          (∀ j, κ j ∈ S) ∧ (∀ c : Fin g → A, ∑ j, c j • κ j ∈ B → c = 0)
+            ∧ ∀ z ∈ S, ∃ (s : ℕ) (c : Fin g → A), t ^ s • z - ∑ j, c j • κ j ∈ B := by
   intro A M _ _ _ _ _ t S B ht hS
   haveI : Module.Finite A (S.map B.mkQ) := Module.Finite.iff_fg.mpr (hS.map _)
   obtain ⟨n, ι, _, p, hp, e, ⟨φ⟩⟩ := Module.equiv_free_prod_directSum A (S.map B.mkQ)
   let ψ : (Fin n →₀ A) →ₗ[A] S.map B.mkQ := φ.symm.toLinearMap ∘ₗ LinearMap.inl A _ _
-  have hlift : ∀ j : Fin n, ∃ m ∈ S, B.mkQ m = (ψ (Finsupp.single j 1) : M ⧸ B) :=
-    fun j => Submodule.mem_map.mp (ψ (Finsupp.single j 1)).2
+  have hlift : ∀ j : Fin n, ∃ m ∈ S, B.mkQ m = (ψ (Finsupp.single j 1) : M ⧸ B) := fun j =>
+    Submodule.mem_map.mp (ψ (Finsupp.single j 1)).2
   choose κ hκS hκ using hlift
   have hψinj : Function.Injective ψ := φ.symm.injective.comp LinearMap.inl_injective
   have hli : LinearIndependent A (fun j => (ψ (Finsupp.single j 1) : M ⧸ B)) := by
@@ -36,9 +41,12 @@ theorem UpperTheory.V.Pa.Det.maxIndep :
       refine DFinsupp.ext fun i => ?_
       rw [DirectSum.smul_apply, DirectSum.zero_apply]
       obtain ⟨x, hx⟩ := Submodule.Quotient.mk_surjective _ ((φ w).2 i)
-      rw [← hx, ← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero, Submodule.mem_span_singleton]
-      obtain ⟨u, hu⟩ := ((IsDiscreteValuationRing.associated_of_irreducible A (hp i) ht).pow_pow (n := e i)).dvd.trans
-        (pow_dvd_pow t (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ i)))
+      rw [← hx, ← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero,
+        Submodule.mem_span_singleton]
+      obtain ⟨u, hu⟩ :=
+        ((IsDiscreteValuationRing.associated_of_irreducible A (hp i) ht).pow_pow
+            (n := e i)).dvd.trans
+          (pow_dvd_pow t (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ i)))
       exact ⟨u * x, by rw [hu, smul_eq_mul, smul_eq_mul]; ring⟩
     have hφ : t ^ K • w = ψ (t ^ K • (φ w).1) := by
       apply φ.injective

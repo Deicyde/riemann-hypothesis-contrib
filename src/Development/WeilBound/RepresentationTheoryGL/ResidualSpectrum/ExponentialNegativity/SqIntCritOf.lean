@@ -25,7 +25,9 @@ theorem expNeg_of (h : An.Count) : ExpNeg :=
 
 theorem sqIntCrit_of (h1 : InitBnd) (h2 : FinTr) (h3 : An.BoxVol) : SqIntCrit :=
   sqIntGlue_holds dict_holds niceAut_holds h1 h2 killPoly_holds
-    (GlobalTheory.CompanionTheory.AnBoot.bootGlue diffstep_holds (ctstepglue_holds GlobalTheory.CompanionTheory.LinRec.recBound)) (GlobalTheory.CompanionTheory.SlabGlue.slabGlue h3)
+    (GlobalTheory.CompanionTheory.AnBoot.bootGlue diffstep_holds
+      (ctstepglue_holds GlobalTheory.CompanionTheory.LinRec.recBound))
+    (GlobalTheory.CompanionTheory.SlabGlue.slabGlue h3)
 
 theorem gap_of (h1 : LatOf) (h2 : GapOp) : Gap :=
   gapGlue_holds h1 (gapAbs_of h2 GlobalTheory.CompanionTheory.GapPolyProof.gapPoly)

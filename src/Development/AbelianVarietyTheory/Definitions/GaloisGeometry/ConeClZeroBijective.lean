@@ -17,8 +17,8 @@ open GlobalTheory.CatCoh GlobalTheory.CechDR
 
 universe v u
 
-theorem eq_of_zsmul_add {A : Type*} [AddCommGroup A] {x y : A} (h : (1 : ℤ) • x + (-1 : ℤ) • y = 0) :
-    x = y := by
+theorem eq_of_zsmul_add {A : Type*} [AddCommGroup A] {x y : A} (h : (1 : ℤ) • x + (-1 : ℤ) • y = 0)
+    : x = y := by
   rw [one_smul, neg_one_smul, add_neg_eq_zero] at h; exact h
 
 theorem zsmul_add_cancel {A : Type*} [AddCommGroup A] (x : A) : (1 : ℤ) • x + (-1 : ℤ) • x = 0 := by
@@ -28,25 +28,29 @@ section Zero
 
 variable {R : Type} [CommRing R] {C : Type u} [Category.{v} C]
 
-theorem map_cochain_congr (M : C ⥤ ModuleCat.{0} R) (f : CatH.Cn M 0) {t t' : ComposableArrows C 0}
-    (h : t = t') {Y : C} (u : t.obj (Fin.last 0) ⟶ Y) (u' : t'.obj (Fin.last 0) ⟶ Y) (hu : HEq u u') :
-    (M.map u).hom (f t) = (M.map u').hom (f t') := by
+theorem map_cochain_congr
+    (M : C ⥤ ModuleCat.{0} R) (f : CatH.Cn M 0)
+    {t t' : ComposableArrows C 0} (h : t = t')
+    {Y : C} (u : t.obj (Fin.last 0) ⟶ Y) (u' : t'.obj (Fin.last 0) ⟶ Y) (hu : HEq u u')
+    : (M.map u).hom (f t) = (M.map u').hom (f t') := by
   subst h
   rw [eq_of_heq hu]
 
-theorem compat_of_d_eq_zero (M : C ⥤ ModuleCat.{0} R) {f : CatH.Cn M 0} (hf : CatH.d M 0 f = 0)
-    {T T' : C} (φ : T ⟶ T') :
-    (M.map φ).hom (f (ComposableArrows.mk₀ T)) = f (ComposableArrows.mk₀ T') := by
+theorem compat_of_d_eq_zero
+    (M : C ⥤ ModuleCat.{0} R) {f : CatH.Cn M 0} (hf : CatH.d M 0 f = 0) {T T' : C} (φ : T ⟶ T')
+    : (M.map φ).hom (f (ComposableArrows.mk₀ T)) = f (ComposableArrows.mk₀ T') := by
   let s := ComposableArrows.mk₁ φ
   have h0 : (M.map (CatH.toLast 0 s)).hom (f (CatH.face 0 s)) = f (ComposableArrows.mk₀ T') :=
     (map_cochain_congr M f (t := CatH.face 0 s) (t' := ComposableArrows.mk₀ T')
-      (ComposableArrows.ext₀ rfl) (CatH.toLast 0 s) (𝟙 T') HEq.rfl).trans
+        (ComposableArrows.ext₀ rfl) (CatH.toLast 0 s) (𝟙 T') HEq.rfl).trans
       (congrArg (fun g : M.obj T' ⟶ M.obj T' ↦ g.hom (f (ComposableArrows.mk₀ T'))) (M.map_id T'))
-  have h1 : (M.map (CatH.toLast 1 s)).hom (f (CatH.face 1 s)) =
-      (M.map φ).hom (f (ComposableArrows.mk₀ T)) :=
+  have h1
+      : (M.map (CatH.toLast 1 s)).hom (f (CatH.face 1 s))
+        = (M.map φ).hom (f (ComposableArrows.mk₀ T)) :=
     map_cochain_congr M f (t := CatH.face 1 s) (t' := ComposableArrows.mk₀ T)
       (ComposableArrows.ext₀ rfl) (CatH.toLast 1 s) φ HEq.rfl
-  have e : ∑ i : Fin 2, (-1 : ℤ) ^ (i : ℕ) • (M.map (CatH.toLast i s)).hom (f (CatH.face i s)) = 0 :=
+  have e
+      : ∑ i : Fin 2, (-1 : ℤ) ^ (i : ℕ) • (M.map (CatH.toLast i s)).hom (f (CatH.face i s)) = 0 :=
     congrFun hf s
   rw [Fin.sum_univ_two, h0, h1] at e
   simp only [Fin.val_zero, Fin.val_one, pow_zero, pow_one] at e
@@ -61,8 +65,8 @@ theorem BF_self : ∀ n : ℕ, BF F n n = ⊥
     rw [TotF_eq_bot F (Nat.lt_succ_self n), Submodule.map_bot]
 
 theorem HypF.toHyp_zero_bijective (n : ℕ) : Function.Bijective (HypF.toHyp F 0 n) := by
-  refine ⟨(injective_iff_map_eq_zero _).2 fun x hx ↦ ?_,
-    LinearMap.range_eq_top.1 (Hyp.fil_zero F n)⟩
+  refine
+    ⟨(injective_iff_map_eq_zero _).2 fun x hx ↦ ?_, LinearMap.range_eq_top.1 (Hyp.fil_zero F n)⟩
   obtain ⟨c, rfl⟩ := HypF.mk_surjective F 0 n x
   have h : c.1 ∈ BTot F n := Hyp.mk_eq_zero.1 hx
   refine HypF.mk_eq_zero.2 ?_
@@ -80,11 +84,13 @@ theorem ofTop_same {n : ℕ} (c : Term F 0 n) (h : 0 + n = n) : ofTop F n c ⟨(
   Pi.single_eq_same (M := fun b : Bidegree n ↦ Term F b.1.1 b.1.2) _ _
 
 theorem ofTop_mem_TotF {n : ℕ} (c : Term F 0 n) : ofTop F n c ∈ TotF F n n := fun b hb ↦
-  Pi.single_eq_of_ne (M := fun b : Bidegree n ↦ Term F b.1.1 b.1.2)
-    (fun e ↦ by rw [e] at hb; exact lt_irrefl _ hb) _
+  Pi.single_eq_of_ne
+    (M := fun b : Bidegree n ↦ Term F b.1.1 b.1.2)
+    (fun e ↦ by rw [e] at hb; exact lt_irrefl _ hb)
+    _
 
-theorem eq_ofTop {n : ℕ} {c : Tot F n} (hc : c ∈ TotF F n n) :
-    c = ofTop F n (c ⟨(0, n), zero_add n⟩) := by
+theorem eq_ofTop {n : ℕ} {c : Tot F n} (hc : c ∈ TotF F n n)
+    : c = ofTop F n (c ⟨(0, n), zero_add n⟩) := by
   funext ⟨(a, q), h⟩
   rcases a with _ | a
   · obtain rfl : q = n := by simpa using h
@@ -92,8 +98,8 @@ theorem eq_ofTop {n : ℕ} {c : Tot F n} (hc : c ∈ TotF F n n) :
   · have hq : q < n := by dsimp only at h; omega
     rw [hc _ hq, ofTop_mem_TotF _ _ hq]
 
-theorem ofTop_mem_ZF {n : ℕ} {c : Term F 0 n} (h1 : dH F 0 n c = 0) (h2 : dV F 0 n c = 0) :
-    ofTop F n c ∈ ZF F n n := by
+theorem ofTop_mem_ZF {n : ℕ} {c : Term F 0 n} (h1 : dH F 0 n c = 0) (h2 : dV F 0 n c = 0)
+    : ofTop F n c ∈ ZF F n n := by
   refine ⟨ofTop_mem_TotF c, funext fun ⟨(a, q), h⟩ ↦ ?_⟩
   dsimp only at h
   have hH : totH F n (ofTop F n c) ⟨(a, q), h⟩ = 0 := by
@@ -109,38 +115,44 @@ theorem ofTop_mem_ZF {n : ℕ} {c : Term F 0 n} (h1 : dH F 0 n c = 0) (h2 : dV F
     · obtain rfl : q = n := by omega
       rw [totV_succ, ofTop_same, h2, smul_zero]
     · rw [totV_succ, ofTop_mem_TotF c _ (by dsimp only; omega), map_zero, smul_zero]
-  rw [dTot_apply, hH, hV, add_zero]; rfl
+  rw [dTot_apply, hH, hV, add_zero]
+  rfl
 
-theorem dTot_top {n : ℕ} (c : Tot F n) (h : 0 + (n + 1) = n + 1) :
-    dTot F n c ⟨(0, n + 1), h⟩ = dV F 0 n (c ⟨(0, n), zero_add n⟩) := by
+theorem dTot_top {n : ℕ} (c : Tot F n) (h : 0 + (n + 1) = n + 1)
+    : dTot F n c ⟨(0, n + 1), h⟩ = dV F 0 n (c ⟨(0, n), zero_add n⟩) := by
   rw [dTot_apply, totH_zero, totV_succ, zero_add, pow_zero, one_smul]
 
 end Zero
 
 section Cone
 
-variable {R B : Type} [CommRing R] [CommRing B] [Algebra R B]
-  {C : Type u} [Category.{v} C] {F : C ⥤ CommAlgCat.{0} R}
+variable
+  {R B : Type} [CommRing R] [CommRing B] [Algebra R B]
+  {C : Type u} [Category.{v} C]
+  {F : C ⥤ CommAlgCat.{0} R}
   (e : ∀ T : C, B →ₐ[R] F.obj T) (he : ∀ ⦃T T' : C⦄ (φ : T ⟶ T') (b : B), mp F φ (e T b) = e T' b)
 
 def coneTerm (q : ℕ) : Om R B q →ₗ[R] Term F 0 q :=
   LinearMap.pi fun s ↦ (SemiHom.of_algHom (e (s.obj (Fin.last 0)))).mOm q
 
-
 include he in
 theorem dH_coneTerm {q : ℕ} (ω : Om R B q) : dH F 0 q (coneTerm e q ω) = 0 := by
   funext s
-  have k : ∀ i : Fin 2, ((OmF F q).map (CatH.toLast i s)).hom (coneTerm e q ω (CatH.face i s)) =
-      (SemiHom.of_algHom (e (s.obj (Fin.last 1)))).mOm q ω := fun i ↦
+  have k
+      : ∀ i : Fin 2,
+        ((OmF F q).map (CatH.toLast i s)).hom (coneTerm e q ω (CatH.face i s))
+          = (SemiHom.of_algHom (e (s.obj (Fin.last 1)))).mOm q ω := fun i ↦
     SemiHom.mOm_mOm _ (semiHom_mp F (CatH.toLast i s)) _ (he _) ω
-  change ∑ i : Fin 2, (-1 : ℤ) ^ (i : ℕ) •
-    ((OmF F q).map (CatH.toLast i s)).hom (coneTerm e q ω (CatH.face i s)) = 0
+  change
+    ∑ i : Fin 2, (-1 : ℤ) ^ (i : ℕ) •
+        ((OmF F q).map (CatH.toLast i s)).hom (coneTerm e q ω (CatH.face i s))
+      = 0
   rw [Fin.sum_univ_two, k, k]
   simp only [Fin.val_zero, Fin.val_one, pow_zero, pow_one]
   exact zsmul_add_cancel _
 
-theorem dV_coneTerm {q : ℕ} (ω : Om R B q) :
-    dV F 0 q (coneTerm e q ω) = coneTerm e (q + 1) (dOm R B q ω) :=
+theorem dV_coneTerm {q : ℕ} (ω : Om R B q)
+    : dV F 0 q (coneTerm e q ω) = coneTerm e (q + 1) (dOm R B q ω) :=
   funext fun _ ↦ (SemiHom.mOm_dOm _ ω).symm
 
 def coneZ (n : ℕ) : LinearMap.ker (dOm R B n) →ₗ[R] ZF F n n :=
@@ -179,16 +191,15 @@ variable {T₀ : C} (hb : Function.Bijective (e T₀))
 def backOm (q : ℕ) : Om R (F.obj T₀) q →ₗ[R] Om R B q :=
   (SemiHom.of_algHom (AlgEquiv.ofBijective _ hb).symm.toAlgHom).mOm q
 
-theorem backOm_coneTerm {q : ℕ} (ω : Om R B q) :
-    backOm e hb q (coneTerm e q ω (ComposableArrows.mk₀ T₀)) = ω :=
+theorem backOm_coneTerm {q : ℕ} (ω : Om R B q)
+    : backOm e hb q (coneTerm e q ω (ComposableArrows.mk₀ T₀)) = ω :=
   (SemiHom.mOm_mOm (SemiHom.of_algHom (e T₀)) _ (SemiHom.of_algHom (AlgHom.id R B))
-    (fun b ↦ (AlgEquiv.ofBijective _ hb).symm_apply_apply b) ω).trans
-    (SemiHom.mOm_id _ (fun _ ↦ rfl) ω)
-
+    (fun b ↦ (AlgEquiv.ofBijective _ hb).symm_apply_apply b)
+    ω).trans (SemiHom.mOm_id _ (fun _ ↦ rfl) ω)
 
 include hb in
-theorem coneCl_eq_zero_iff {n : ℕ} (ω : LinearMap.ker (dOm R B (n + 1))) :
-    coneCl e he (n + 1) ω = 0 ↔ ∃ η, dOm R B n η = ω.1 := by
+theorem coneCl_eq_zero_iff {n : ℕ} (ω : LinearMap.ker (dOm R B (n + 1)))
+    : coneCl e he (n + 1) ω = 0 ↔ ∃ η, dOm R B n η = ω.1 := by
   refine ⟨fun h ↦ ?_, fun ⟨η, hη⟩ ↦ ?_⟩
   · obtain ⟨c, hc⟩ := Hyp.mk_eq_zero.1 h
     have h1 := congrFun hc ⟨(0, n + 1), zero_add _⟩
@@ -199,21 +210,21 @@ theorem coneCl_eq_zero_iff {n : ℕ} (ω : LinearMap.ker (dOm R B (n + 1))) :
     exact (SemiHom.mOm_dOm _ _).symm
   · rw [show ω = ⟨dOm R B n η, dOm_dOm η⟩ from Subtype.ext hη.symm, coneCl_dOm]
 
-
 include hb in
 theorem coneF_bijective (h : Limits.IsInitial T₀) (n : ℕ) : Function.Bijective (coneF e he n) := by
   refine ⟨(injective_iff_map_eq_zero _).2 fun ω hω ↦ ?_, fun x ↦ ?_⟩
   · have h1 : ofTop F n (coneTerm e n ω.1) ∈ BF F n n := HypF.mk_eq_zero.1 hω
     rw [BF_self] at h1
-    have h2 := (ofTop_same (coneTerm e n ω.1) (zero_add n)).symm.trans
-      (congrFun (show ofTop F n (coneTerm e n ω.1) = 0 from h1) _)
+    have h2 :=
+      (ofTop_same (coneTerm e n ω.1) (zero_add n)).symm.trans
+        (congrFun (show ofTop F n (coneTerm e n ω.1) = 0 from h1) _)
     refine Subtype.ext ?_
     rw [← backOm_coneTerm e hb ω.1, h2]
     exact map_zero _
   · obtain ⟨c, rfl⟩ := HypF.mk_surjective F n n x
     have h1 := dH_lead F (zero_add n) c
-    have h2 := (dTot_top c.1 (zero_add _)).symm.trans
-      (congrFun (show dTot F n c.1 = 0 from c.2.2) _)
+    have h2 :=
+      (dTot_top c.1 (zero_add _)).symm.trans (congrFun (show dTot F n c.1 = 0 from c.2.2) _)
     refine ⟨⟨backOm e hb n (c.1 ⟨(0, n), zero_add n⟩ (ComposableArrows.mk₀ T₀)), ?_⟩, ?_⟩
     · refine (SemiHom.mOm_dOm _ _).symm.trans ?_
       have h3 : dOm R (F.obj T₀) n (c.1 ⟨(0, n), zero_add n⟩ (ComposableArrows.mk₀ T₀)) = 0 :=
@@ -224,9 +235,10 @@ theorem coneF_bijective (h : Limits.IsInitial T₀) (n : ℕ) : Function.Bijecti
       obtain ⟨T, rfl⟩ := s.mk₀_surjective
       refine Eq.trans ?_ (compat_of_d_eq_zero (OmF F n) h1 (h.to T))
       exact SemiHom.mOm_mOm _ (SemiHom.of_algHom (e T)) (semiHom_mp F (h.to T))
-        (fun b ↦ (he (h.to T) _).symm.trans
-          (congrArg (mp F (h.to T)) ((AlgEquiv.ofBijective _ hb).apply_symm_apply b))) _
-
+        (fun b ↦
+          (he (h.to T) _).symm.trans
+            (congrArg (mp F (h.to T)) ((AlgEquiv.ofBijective _ hb).apply_symm_apply b)))
+        _
 
 include hb in
 theorem coneCl_zero_bijective (h : Limits.IsInitial T₀) : Function.Bijective (coneCl e he 0) :=

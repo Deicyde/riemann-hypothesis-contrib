@@ -8,7 +8,8 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.DataN
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N Polynomial
 open GlobalTheory.WeilDeligne GlobalTheory.Cong
 
 namespace UpperTheory.Gal.NearKilling
@@ -17,7 +18,8 @@ section Abstract
 
 variable {k Γ I : Type} [Field k] [Group Γ] {a c : ℕ}
 
-abbrev mat (ρ : Γ →* GL (Fin a) k) (g : Γ) : Matrix (Fin a) (Fin a) k := ((ρ g : GL (Fin a) k) : Matrix (Fin a) (Fin a) k)
+abbrev mat (ρ : Γ →* GL (Fin a) k) (g : Γ) : Matrix (Fin a) (Fin a) k :=
+  ((ρ g : GL (Fin a) k) : Matrix (Fin a) (Fin a) k)
 
 def word (ρ : Γ →* GL (Fin a) k) (L : List (Γ × k)) : Matrix (Fin a) (Fin a) k :=
   (L.map fun p => mat ρ p.1 - p.2 • (1 : Matrix (Fin a) (Fin a) k)).prod
@@ -38,7 +40,8 @@ end Limit
 
 section Weil
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
   {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
 
 end Weil

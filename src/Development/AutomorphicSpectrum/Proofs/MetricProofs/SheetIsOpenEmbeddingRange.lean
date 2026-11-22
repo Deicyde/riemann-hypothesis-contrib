@@ -11,10 +11,13 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.EqO
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Filter Topology
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Points GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjSpace GlobalTheory.CompanionTheory.Ar.BaseZ
+open GlobalTheory GlobalTheory.Points GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts
+  GlobalTheory.ProjSpace GlobalTheory.CompanionTheory.Ar.BaseZ
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
 
 noncomputable section
@@ -47,12 +50,12 @@ theorem finite_ringHom (k : Type) [CommRing k] [Module.Finite ℤ k] : Finite (k
 
 variable {k : Type} [CommRing k] {X : Scheme.{0}}
 
-theorem emb_apply (p : X ⟶ Sp k) {t : X ⟶ Sp ℤ} {τ : ℤ →+* ℂ} (y : CxPts t τ) (a : k) :
-    emb p y a = ev t τ ⊤ (algX p ⊤ a) y :=
+theorem emb_apply (p : X ⟶ Sp k) {t : X ⟶ Sp ℤ} {τ : ℤ →+* ℂ} (y : CxPts t τ) (a : k)
+    : emb p y a = ev t τ ⊤ (algX p ⊤ a) y :=
   (ev_algX (y := unsheet p y) mem_ptsIn_top a).symm
 
-theorem range_sheet (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ) (τ : ℤ →+* ℂ) (σ : k →+* ℂ) :
-    Set.range (sheet t τ : CxPts p σ → CxPts t τ) = {y | emb p y = σ} := by
+theorem range_sheet (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ) (τ : ℤ →+* ℂ) (σ : k →+* ℂ)
+    : Set.range (sheet t τ : CxPts p σ → CxPts t τ) = {y | emb p y = σ} := by
   ext y
   constructor
   · rintro ⟨z, rfl⟩
@@ -62,13 +65,14 @@ theorem range_sheet (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ) (τ : ℤ →+* ℂ) (σ
     subst h'
     exact ⟨unsheet p y, rfl⟩
 
-theorem isOpen_emb_eq [Finite (k →+* ℂ)] (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ) (τ : ℤ →+* ℂ) (σ : k →+* ℂ) :
-    IsOpen {y : CxPts t τ | emb p y = σ} := by
+theorem isOpen_emb_eq [Finite (k →+* ℂ)] (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ) (τ : ℤ →+* ℂ) (σ : k →+* ℂ)
+    : IsOpen {y : CxPts t τ | emb p y = σ} := by
   have hc (a : k) : Continuous fun y : CxPts t τ => emb p y a := by
     simp only [emb_apply]
     exact (Points.continuous_valR_top _).comp continuous_subtype_val
-  have e : {y : CxPts t τ | emb p y = σ} =
-      ⋂ σ' : {s : k →+* ℂ // s ≠ σ}, ⋃ a : k, {y | emb p y a ≠ σ'.1 a} := by
+  have e
+      : {y : CxPts t τ | emb p y = σ}
+        = ⋂ σ' : {s : k →+* ℂ // s ≠ σ}, ⋃ a : k, {y | emb p y a ≠ σ'.1 a} := by
     ext y
     simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_iUnion]
     constructor
@@ -81,14 +85,25 @@ theorem isOpen_emb_eq [Finite (k →+* ℂ)] (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ)
       obtain ⟨a, ha⟩ := h ⟨_, he⟩
       exact ha rfl
   rw [e]
-  exact isOpen_iInter_of_finite fun σ' => isOpen_iUnion fun a => isOpen_ne_fun (hc a) continuous_const
+  exact isOpen_iInter_of_finite fun σ' =>
+    isOpen_iUnion fun a => isOpen_ne_fun (hc a) continuous_const
 
-theorem isOpenEmbedding_and_range : ∀ (k : Type) [CommRing k] [Module.Finite ℤ k] (X : Scheme.{0}) (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ) (τ : ℤ →+* ℂ) (σ : k →+* ℂ), Topology.IsOpenEmbedding (sheet t τ : CxPts p σ → CxPts t τ) ∧ Set.range (sheet t τ : CxPts p σ → CxPts t τ) = {y | emb p y = σ} := by
+theorem isOpenEmbedding_and_range
+    : ∀ (k : Type) [CommRing k] [Module.Finite ℤ k] (X : Scheme.{0}) (p : X ⟶ Sp k) (t : X ⟶ Sp ℤ)
+        (τ : ℤ →+* ℂ) (σ : k →+* ℂ),
+      Topology.IsOpenEmbedding (sheet t τ : CxPts p σ → CxPts t τ)
+        ∧ Set.range (sheet t τ : CxPts p σ → CxPts t τ) = {y | emb p y = σ} := by
   intro k _ _ X p t τ σ
   have := finite_ringHom k
   have hr := range_sheet p t τ σ
-  refine ⟨⟨IsEmbedding.of_comp (continuous_subtype_val.subtype_mk _) continuous_subtype_val
-    IsEmbedding.subtypeVal, ?_⟩, hr⟩
+  refine ⟨
+    ⟨
+      IsEmbedding.of_comp (continuous_subtype_val.subtype_mk _) continuous_subtype_val
+        IsEmbedding.subtypeVal,
+      ?_
+    ⟩,
+    hr
+  ⟩
   rw [hr]
   exact isOpen_emb_eq p t τ σ
 

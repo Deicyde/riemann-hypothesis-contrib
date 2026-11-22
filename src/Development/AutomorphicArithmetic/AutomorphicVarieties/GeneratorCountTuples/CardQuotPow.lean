@@ -8,9 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LengthEqL
 open scoped TensorProduct
 open GlobalTheory.TateLimit
 
-private theorem step (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Module ℤ_[l] X] [Finite X]
-    (c : ℕ) : Nat.card (X ⧸ lpow l X (c + 1)) ≤
-      Nat.card (X ⧸ lpow l X 1) * Nat.card (X ⧸ lpow l X c) := by
+private theorem step
+    (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Module ℤ_[l] X] [Finite X] (c : ℕ)
+    : Nat.card (X ⧸ lpow l X (c + 1)) ≤ Nat.card (X ⧸ lpow l X 1) * Nat.card (X ⧸ lpow l X c) := by
   haveI : ∀ P : Submodule ℤ_[l] X, Finite (X ⧸ P) := fun P =>
     Finite.of_surjective _ P.mkQ_surjective
   let f : X →ₗ[ℤ_[l]] X ⧸ lpow l X (c + 1) :=
@@ -30,13 +30,10 @@ private theorem step (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Modul
     simp only [p, LinearMap.mem_ker, LinearMap.comp_apply, Submodule.mkQ_apply,
       Submodule.Quotient.mk_eq_zero]
     exact ⟨Submodule.Quotient.mk y, rfl⟩
-  have hps : Function.Surjective p :=
-    R.mkQ_surjective.comp (lpow l X (c + 1)).mkQ_surjective
+  have hps : Function.Surjective p := R.mkQ_surjective.comp (lpow l X (c + 1)).mkQ_surjective
   have h2 : Nat.card ((X ⧸ lpow l X (c + 1)) ⧸ R) ≤ Nat.card (X ⧸ lpow l X c) := by
     refine Nat.card_le_card_of_surjective ((lpow l X c).liftQ p hp) fun z => ?_
     obtain ⟨x, rfl⟩ := hps z
     exact ⟨Submodule.Quotient.mk x, rfl⟩
   rw [Submodule.card_eq_card_quotient_mul_card R]
-  first
-    | exact Nat.mul_le_mul h1 h2
-    | exact (Nat.mul_le_mul h2 h1).trans_eq (mul_comm _ _)
+  first | exact Nat.mul_le_mul h1 h2 | exact (Nat.mul_le_mul h2 h1).trans_eq (mul_comm _ _)

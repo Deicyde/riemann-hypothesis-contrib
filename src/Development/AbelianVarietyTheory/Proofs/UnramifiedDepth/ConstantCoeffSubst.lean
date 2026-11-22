@@ -19,10 +19,11 @@ variable {R : Type*} [CommRing R] {κ : Type*}
 
 def wt (R : Type*) [CommRing R] (A : κ →₀ ℕ) : R := A.prod fun _ e => (e.factorial : R)
 
-def pair (P Q : MvPolynomial κ R) : R := ∑ A ∈ P.support, AddMonoidAlgebra.coeff P A * wt R A * AddMonoidAlgebra.coeff Q A
+def pair (P Q : MvPolynomial κ R) : R :=
+  ∑ A ∈ P.support, AddMonoidAlgebra.coeff P A * wt R A * AddMonoidAlgebra.coeff Q A
 
-theorem wt_add_single (B : κ →₀ ℕ) (v : κ) :
-    wt R (B + Finsupp.single v 1) = wt R B * ((B v : R) + 1) := by
+theorem wt_add_single (B : κ →₀ ℕ) (v : κ)
+    : wt R (B + Finsupp.single v 1) = wt R B * ((B v : R) + 1) := by
   classical
   unfold wt
   have h1 : (B + Finsupp.single v 1).support ⊆ insert v B.support := by
@@ -38,9 +39,10 @@ theorem wt_add_single (B : κ →₀ ℕ) (v : κ) :
     Finsupp.prod_of_support_subset _ h2 (fun _ e => (e.factorial : R)) (fun _ _ => by simp),
     ← Finset.mul_prod_erase _ _ (Finset.mem_insert_self v B.support),
     ← Finset.mul_prod_erase _ (fun x => ((B x).factorial : R)) (Finset.mem_insert_self v B.support)]
-  have h3 : ∏ x ∈ (insert v B.support).erase v,
-        (((B + Finsupp.single v 1 : κ →₀ ℕ) x).factorial : R) =
-      ∏ x ∈ (insert v B.support).erase v, ((B x).factorial : R) := by
+  have h3
+      : ∏ x ∈ (insert v B.support).erase v,
+          (((B + Finsupp.single v 1 : κ →₀ ℕ) x).factorial : R)
+        = ∏ x ∈ (insert v B.support).erase v, ((B x).factorial : R) := by
     apply Finset.prod_congr rfl
     intro x hx
     have hxv : x ≠ v := Finset.ne_of_mem_erase hx
@@ -50,8 +52,8 @@ theorem wt_add_single (B : κ →₀ ℕ) (v : κ) :
   push_cast
   ring
 
-theorem pair_eq_sum (P Q : MvPolynomial κ R) (S : Finset (κ →₀ ℕ)) (hS : P.support ⊆ S) :
-    pair P Q = ∑ A ∈ S, AddMonoidAlgebra.coeff P A * wt R A * AddMonoidAlgebra.coeff Q A := by
+theorem pair_eq_sum (P Q : MvPolynomial κ R) (S : Finset (κ →₀ ℕ)) (hS : P.support ⊆ S)
+    : pair P Q = ∑ A ∈ S, AddMonoidAlgebra.coeff P A * wt R A * AddMonoidAlgebra.coeff Q A := by
   unfold pair
   apply Finset.sum_subset hS
   intro A _ hA
@@ -62,16 +64,15 @@ theorem pair_add_left (P P' Q : MvPolynomial κ R) : pair (P + P') Q = pair P Q 
   classical
   rw [pair_eq_sum (P + P') Q (P.support ∪ P'.support) MvPolynomial.support_add,
     pair_eq_sum P Q (P.support ∪ P'.support) Finset.subset_union_left,
-    pair_eq_sum P' Q (P.support ∪ P'.support) Finset.subset_union_right,
-    ← Finset.sum_add_distrib]
+    pair_eq_sum P' Q (P.support ∪ P'.support) Finset.subset_union_right, ← Finset.sum_add_distrib]
   apply Finset.sum_congr rfl
   intro A _
   simp only [MvPolynomial.coeff_add]
   ring
 
 theorem pair_C_mul_left (c : R) (P Q : MvPolynomial κ R) : pair (C c * P) Q = c * pair P Q := by
-  rw [← smul_eq_C_mul, pair_eq_sum (c • P) Q P.support MvPolynomial.support_smul,
-    pair, Finset.mul_sum]
+  rw [← smul_eq_C_mul, pair_eq_sum (c • P) Q P.support MvPolynomial.support_smul, pair,
+    Finset.mul_sum]
   apply Finset.sum_congr rfl
   intro A _
   simp only [coeff_smul, smul_eq_mul]
@@ -84,16 +85,16 @@ theorem pair_C_mul_right (c : R) (P Q : MvPolynomial κ R) : pair P (C c * Q) = 
   simp only [coeff_C_mul]
   ring
 
-theorem pair_sum_right {α : Type*} (s : Finset α) (P : MvPolynomial κ R)
-    (f : α → MvPolynomial κ R) : pair P (∑ i ∈ s, f i) = ∑ i ∈ s, pair P (f i) := by
+theorem pair_sum_right {α : Type*} (s : Finset α) (P : MvPolynomial κ R) (f : α → MvPolynomial κ R)
+    : pair P (∑ i ∈ s, f i) = ∑ i ∈ s, pair P (f i) := by
   unfold pair
   rw [Finset.sum_comm]
   apply Finset.sum_congr rfl
   intro A _
   rw [coeff_sum, Finset.mul_sum]
 
-theorem pair_sum_left {α : Type*} (s : Finset α) (f : α → MvPolynomial κ R)
-    (Q : MvPolynomial κ R) : pair (∑ i ∈ s, f i) Q = ∑ i ∈ s, pair (f i) Q := by
+theorem pair_sum_left {α : Type*} (s : Finset α) (f : α → MvPolynomial κ R) (Q : MvPolynomial κ R)
+    : pair (∑ i ∈ s, f i) Q = ∑ i ∈ s, pair (f i) Q := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [pair]
@@ -109,8 +110,7 @@ theorem pair_C_left (c : R) (Q : MvPolynomial κ R) : pair (C c) Q = c * constan
     exact hA (if_neg (Ne.symm h)))]
   simp [wt, constantCoeff_eq]
 
-theorem pair_mul_X (P Q : MvPolynomial κ R) (v : κ) :
-    pair (P * X v) Q = pair P (pderiv v Q) := by
+theorem pair_mul_X (P Q : MvPolynomial κ R) (v : κ) : pair (P * X v) Q = pair P (pderiv v Q) := by
   classical
   have hs : (P * X v).support ⊆ P.support.map (addRightEmbedding (Finsupp.single v 1)) := by
     intro A hA
@@ -136,15 +136,15 @@ theorem subst_X (g : κ → κ → R) (i : κ) : subst g (X i) = ∑ j, C (g i j
 
 theorem subst_C (g : κ → κ → R) (c : R) : subst g (C c) = C c := by simp [subst]
 
-theorem constantCoeff_subst (g : κ → κ → R) (Q : MvPolynomial κ R) :
-    constantCoeff (subst g Q) = constantCoeff Q := by
+theorem constantCoeff_subst (g : κ → κ → R) (Q : MvPolynomial κ R)
+    : constantCoeff (subst g Q) = constantCoeff Q := by
   induction Q using MvPolynomial.induction_on with
   | C a => rw [subst_C]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | mul_X p i hp => simp [subst_X]
 
-theorem pderiv_subst (g : κ → κ → R) (j : κ) (Q : MvPolynomial κ R) :
-    pderiv j (subst g Q) = ∑ i, C (g i j) * subst g (pderiv i Q) := by
+theorem pderiv_subst (g : κ → κ → R) (j : κ) (Q : MvPolynomial κ R)
+    : pderiv j (subst g Q) = ∑ i, C (g i j) * subst g (pderiv i Q) := by
   classical
   induction Q using MvPolynomial.induction_on with
   | C a => simp [subst_C]
@@ -168,8 +168,8 @@ theorem pderiv_subst (g : κ → κ → R) (j : κ) (Q : MvPolynomial κ R) :
     intro i _
     simp only [pderiv_mul, map_add (f := _), map_mul, mul_add, mul_assoc]
 
-theorem pair_subst (g : κ → κ → R) (P Q : MvPolynomial κ R) :
-    pair P (subst g Q) = pair (subst (fun i j => g j i) P) Q := by
+theorem pair_subst (g : κ → κ → R) (P Q : MvPolynomial κ R)
+    : pair P (subst g Q) = pair (subst (fun i j => g j i) P) Q := by
   induction P using MvPolynomial.induction_on generalizing Q with
   | C a => rw [subst_C, pair_C_left, pair_C_left, constantCoeff_subst]
   | add p q hp hq => rw [map_add (f := _), pair_add_left, pair_add_left, hp, hq]

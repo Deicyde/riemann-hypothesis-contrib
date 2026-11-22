@@ -17,8 +17,11 @@ open scoped Classical
 
 namespace GlobalTheory.Lin.LogFree
 
-theorem principal_height : ∃ η : ℝ, 0 < η ∧ ∀ (q : ℕ) [NeZero q] (s : ℂ), 1 - η ≤ s.re → s.re < 1 →
-    LFunction (1 : DirichletCharacter ℂ q) s = 0 → 3 ≤ |s.im| := by
+theorem principal_height
+    : ∃ η : ℝ,
+      0 < η
+        ∧ ∀ (q : ℕ) [NeZero q] (s : ℂ),
+          1 - η ≤ s.re → s.re < 1 → LFunction (1 : DirichletCharacter ℂ q) s = 0 → 3 ≤ |s.im| := by
   obtain ⟨c, hc, H⟩ := GlobalTheory.ZeroFreePrincipal.zero_free
   have h5 : 0 < Real.log 5 := Real.log_pos (by norm_num)
   refine ⟨min (1 / 2) (c / Real.log 5), by positivity, fun q _ s h1 h2 h0 => ?_⟩
@@ -49,12 +52,15 @@ theorem principal_height : ∃ η : ℝ, 0 < η ∧ ∀ (q : ℕ) [NeZero q] (s 
   have := min_le_right (1 / 2 : ℝ) (c / Real.log 5)
   linarith
 
-theorem count_le (Z : Finset ℂ) (w : ℂ → ℝ) (F : ℝ → ℝ) (U h δ M : ℝ) (hh : 0 ≤ h) (hU : 0 ≤ U)
-    (hM : 0 ≤ M) (hδ : 0 ≤ δ) (hZ : ∀ ρ ∈ Z, |ρ.im| + h ≤ U)
-    (hF : IntervalIntegrable F volume (-U) U) (hF0 : ∀ τ, 0 ≤ F τ)
-    (h1 : ∀ ρ ∈ Z, ∀ τ, |τ - ρ.im| ≤ h → δ ≤ F τ ∧
-      ∑ z ∈ Z.filter (fun z => |τ - z.im| ≤ h), w z ≤ M) :
-    δ * (2 * h) * ∑ ρ ∈ Z, w ρ ≤ M * ∫ τ in (-U)..U, F τ := by
+theorem count_le
+    (Z : Finset ℂ)
+    (w : ℂ → ℝ)
+    (F : ℝ → ℝ) (U h δ M : ℝ) (hh : 0 ≤ h) (hU : 0 ≤ U) (hM : 0 ≤ M) (hδ : 0 ≤ δ)
+    (hZ : ∀ ρ ∈ Z, |ρ.im| + h ≤ U) (hF : IntervalIntegrable F volume (-U) U)
+    (hF0 : ∀ τ, 0 ≤ F τ)
+    (h1
+      : ∀ ρ ∈ Z, ∀ τ, |τ - ρ.im| ≤ h → δ ≤ F τ ∧ ∑ z ∈ Z.filter (fun z => |τ - z.im| ≤ h), w z ≤ M)
+    : δ * (2 * h) * ∑ ρ ∈ Z, w ρ ≤ M * ∫ τ in (-U)..U, F τ := by
   have hU' : -U ≤ U := by linarith
   set g : ℂ → ℝ → ℝ := fun ρ => (Set.Icc (ρ.im - h) (ρ.im + h)).indicator (fun _ => δ * w ρ) with hg
   have hgi : ∀ ρ, IntegrableOn (g ρ) (Set.Icc (-U) U) := fun ρ =>
@@ -90,7 +96,8 @@ theorem count_le (Z : Finset ℂ) (w : ℂ → ℝ) (F : ℝ → ℝ) (U h δ M 
     · rw [h0]; simpa using mul_nonneg hM (hF0 τ)
     · obtain ⟨a, b⟩ := Finset.mem_filter.1 hρ
       obtain ⟨c, d⟩ := h1 ρ a τ b
-      calc _ ≤ δ * M := mul_le_mul_of_nonneg_left d hδ
+      calc
+        _ ≤ δ * M := mul_le_mul_of_nonneg_left d hδ
         _ ≤ F τ * M := mul_le_mul_of_nonneg_right c hM
         _ = _ := mul_comm _ _
 
@@ -104,11 +111,12 @@ theorem norm_cpow_le (n : ℕ) (τ : ℝ) : ‖(n : ℂ) ^ (-(τ * I))‖ ≤ 1 
     · rw [Nat.cast_zero, Complex.zero_cpow h]; simp
   · rw [Complex.norm_natCast_cpow_of_pos hn]; simp
 
-theorem integrable_primeSum {q : ℕ} (χ : DirichletCharacter ℂ q) (N M T : ℝ) (hN : 1 ≤ N) :
-    Integrable (Function.uncurry fun τ y : ℝ => ‖primeSum χ N y τ‖ ^ 2 / y)
+theorem integrable_primeSum {q : ℕ} (χ : DirichletCharacter ℂ q) (N M T : ℝ) (hN : 1 ≤ N)
+    : Integrable (Function.uncurry fun τ y : ℝ => ‖primeSum χ N y τ‖ ^ 2 / y)
       ((volume.restrict (Set.Ioc (-T) T)).prod (volume.restrict (Set.Ioc N M))) := by
-  have hm1 : Measurable (fun x : ℝ × ℕ => ∑ p ∈ (Finset.Ioc ⌊N⌋₊ x.2).filter Nat.Prime,
-      ((Real.log p : ℂ) / p) * χ (p : ZMod q) * (p : ℂ) ^ (-(x.1 * I))) := by
+  have hm1 : Measurable (fun x : ℝ × ℕ =>
+      ∑ p ∈ (Finset.Ioc ⌊N⌋₊ x.2).filter Nat.Prime,
+        ((Real.log p : ℂ) / p) * χ (p : ZMod q) * (p : ℂ) ^ (-(x.1 * I))) := by
     refine measurable_from_prod_countable_left fun n => ?_
     show Measurable (fun τ : ℝ => ∑ p ∈ (Finset.Ioc ⌊N⌋₊ n).filter Nat.Prime,
       ((Real.log p : ℂ) / p) * χ (p : ZMod q) * (p : ℂ) ^ (-(τ * I)))
@@ -129,8 +137,9 @@ theorem integrable_primeSum {q : ℕ} (χ : DirichletCharacter ℂ q) (N M T : �
   rintro ⟨τ, y⟩ ⟨-, hy1, hy2⟩
   simp only at hy1 hy2
   have hb : ‖primeSum χ N y τ‖ ≤ ∑ p ∈ primesIoc N M, ‖(Real.log p : ℂ) / p‖ := by
-    refine (norm_sum_le _ _).trans ((Finset.sum_le_sum fun p _ => ?_).trans
-      (Finset.sum_le_sum_of_subset_of_nonneg ?_ fun _ _ _ => norm_nonneg _))
+    refine (norm_sum_le _ _).trans
+      ((Finset.sum_le_sum fun p _ => ?_).trans
+        (Finset.sum_le_sum_of_subset_of_nonneg ?_ fun _ _ _ => norm_nonneg _))
     · rw [norm_mul, norm_mul, mul_assoc]
       exact mul_le_of_le_one_right (norm_nonneg _)
         (mul_le_one₀ (χ.norm_le_one _) (norm_nonneg _) (norm_cpow_le p τ))
@@ -139,15 +148,22 @@ theorem integrable_primeSum {q : ℕ} (χ : DirichletCharacter ℂ q) (N M T : �
   rw [Real.norm_of_nonneg (div_nonneg (by positivity) (by linarith))]
   exact (div_le_self (by positivity) (by linarith)).trans (pow_le_pow_left₀ (norm_nonneg _) hb 2)
 
-theorem sum_log_div_le : ∃ CM : ℝ, 0 ≤ CM ∧ ∀ N y : ℝ, 1 ≤ y →
-    ∑ p ∈ primesIoc N y, (p : ℝ) * ‖(Real.log p : ℂ) / p‖ ^ 2 / Real.log p ≤ Real.log y + CM := by
+theorem sum_log_div_le
+    : ∃ CM : ℝ,
+      0 ≤ CM
+        ∧ ∀ N y : ℝ,
+          1 ≤ y
+            → ∑ p ∈ primesIoc N y, (p : ℝ) * ‖(Real.log p : ℂ) / p‖ ^ 2 / Real.log p
+              ≤ Real.log y + CM := by
   obtain ⟨CM, h0, H⟩ := GlobalTheory.mertens_first_vonMangoldt
   refine ⟨CM, h0, fun N y hy => ?_⟩
   have h1 := (abs_le.1 (H y hy)).2
-  have : ∑ p ∈ primesIoc N y, (p : ℝ) * ‖(Real.log p : ℂ) / p‖ ^ 2 / Real.log p ≤
-      ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, Λ n / (n : ℝ) := by
+  have : ∑ p ∈ primesIoc N y, (p : ℝ) * ‖(Real.log p : ℂ) / p‖ ^ 2 / Real.log p
+      ≤ ∑ n ∈ Finset.Icc 1 ⌊y⌋₊, Λ n / (n : ℝ) := by
     refine (le_of_eq (Finset.sum_congr rfl fun p hp => ?_)).trans
-      (Finset.sum_le_sum_of_subset_of_nonneg (f := fun n : ℕ => Λ n / (n : ℝ)) ?_
+      (Finset.sum_le_sum_of_subset_of_nonneg
+        (f := fun n : ℕ => Λ n / (n : ℝ))
+        ?_
         fun _ _ _ => div_nonneg vonMangoldt_nonneg (Nat.cast_nonneg _))
     · have hpp := (Finset.mem_filter.1 hp).2
       have hl : 0 < Real.log p := Real.log_pos (by exact_mod_cast hpp.one_lt)
@@ -160,10 +176,13 @@ theorem sum_log_div_le : ∃ CM : ℝ, 0 ≤ CM ∧ ∀ N y : ℝ, 1 ≤ y →
       exact Finset.mem_Icc.2 ⟨by omega, this.2⟩
   linarith
 
-theorem mean_le : ∃ C CM : ℝ, 0 < C ∧ 0 ≤ CM ∧ ∀ (q : ℕ) [NeZero q] (T N M : ℝ), 1 ≤ T → 1 ≤ N → N ≤ M →
-    (2 * q * T) ^ 2 ≤ N →
-    ∑ χ : DirichletCharacter ℂ q, (∫ τ in (-T)..T, ∫ y in N..M, ‖primeSum χ N y τ‖ ^ 2 / y) ≤
-      C * (Real.log M + CM) * Real.log M := by
+theorem mean_le
+    : ∃ C CM : ℝ,
+      0 < C ∧ 0 ≤ CM
+        ∧ ∀ (q : ℕ) [NeZero q] (T N M : ℝ),
+          1 ≤ T → 1 ≤ N → N ≤ M → (2 * q * T) ^ 2 ≤ N
+            → ∑ χ : DirichletCharacter ℂ q, (∫ τ in (-T)..T, ∫ y in N..M, ‖primeSum χ N y τ‖ ^ 2 / y)
+              ≤ C * (Real.log M + CM) * Real.log M := by
   obtain ⟨C, hC, H⟩ := GlobalTheory.T.primeMeanValue_characters_twist_integral_le
   obtain ⟨CM, hCM, HM⟩ := sum_log_div_le
   refine ⟨C, CM, hC, hCM, fun q _ T N M hT hN hNM hq => ?_⟩
@@ -171,37 +190,42 @@ theorem mean_le : ∃ C CM : ℝ, 0 < C ∧ 0 ≤ CM ∧ ∀ (q : ℕ) [NeZero q
   simp only [intervalIntegral.integral_of_le hT', intervalIntegral.integral_of_le hNM]
   have hI := fun χ : DirichletCharacter ℂ q => integrable_primeSum χ N M T hN
   simp only [fun χ => integral_integral_swap (hI χ)]
-  have hJ : ∀ χ : DirichletCharacter ℂ q, Integrable (fun y : ℝ =>
-      ∫ τ in Set.Ioc (-T) T, ‖primeSum χ N y τ‖ ^ 2 / y) (volume.restrict (Set.Ioc N M)) :=
-    fun χ => (hI χ).integral_prod_right
+  have hJ
+      : ∀ χ : DirichletCharacter ℂ q,
+        Integrable
+          (fun y : ℝ => ∫ τ in Set.Ioc (-T) T, ‖primeSum χ N y τ‖ ^ 2 / y)
+          (volume.restrict (Set.Ioc N M)) := fun χ =>
+    (hI χ).integral_prod_right
   rw [← integral_finsetSum _ (fun χ _ => hJ χ)]
   have hlM : 0 ≤ Real.log M := Real.log_nonneg (by linarith)
   have hc : IntegrableOn (fun y : ℝ => C * (Real.log M + CM) * y⁻¹) (Set.Ioc N M) := by
     refine (ContinuousOn.integrableOn_Icc ?_).mono_set Set.Ioc_subset_Icc_self
     exact continuousOn_const.mul (continuousOn_id.inv₀ fun y hy => by
       have := hy.1; simp only [id]; linarith)
-  calc _ ≤ ∫ y in Set.Ioc N M, C * (Real.log M + CM) * y⁻¹ := by
-        refine setIntegral_mono_on (integrable_finsetSum _
-          (fun χ _ => hJ χ)) hc measurableSet_Ioc fun y hy => ?_
-        have hy1 : 1 ≤ y := by linarith [hy.1]
-        simp only [integral_div]
-        rw [← Finset.sum_div, div_eq_mul_inv]
-        refine mul_le_mul_of_nonneg_right ?_ (by positivity)
-        have h1 := H q T N y (fun p => (Real.log p : ℂ) / p) hT hq
-        simp only [intervalIntegral.integral_of_le hT'] at h1
-        refine h1.trans (mul_le_mul_of_nonneg_left ((HM N y hy1).trans ?_) hC.le)
-        have := Real.log_le_log (by linarith) hy.2
-        linarith
+  calc
+    _ ≤ ∫ y in Set.Ioc N M, C * (Real.log M + CM) * y⁻¹ := by
+      refine setIntegral_mono_on (integrable_finsetSum _ (fun χ _ => hJ χ)) hc measurableSet_Ioc
+        fun y hy => ?_
+      have hy1 : 1 ≤ y := by linarith [hy.1]
+      simp only [integral_div]
+      rw [← Finset.sum_div, div_eq_mul_inv]
+      refine mul_le_mul_of_nonneg_right ?_ (by positivity)
+      have h1 := H q T N y (fun p => (Real.log p : ℂ) / p) hT hq
+      simp only [intervalIntegral.integral_of_le hT'] at h1
+      refine h1.trans (mul_le_mul_of_nonneg_left ((HM N y hy1).trans ?_) hC.le)
+      have := Real.log_le_log (by linarith) hy.2
+      linarith
     _ = C * (Real.log M + CM) * Real.log (M / N) := by
-        rw [← intervalIntegral.integral_of_le hNM, intervalIntegral.integral_const_mul,
-          integral_inv_of_pos (by linarith) (by linarith)]
+      rw [← intervalIntegral.integral_of_le hNM, intervalIntegral.integral_const_mul,
+        integral_inv_of_pos (by linarith) (by linarith)]
     _ ≤ _ := by
-        refine mul_le_mul_of_nonneg_left (Real.log_le_log (div_pos (by linarith) (by linarith))
-          (div_le_self (by linarith) hN)) (by positivity)
+      refine mul_le_mul_of_nonneg_left
+        (Real.log_le_log (div_pos (by linarith) (by linarith)) (div_le_self (by linarith) hN))
+        (by positivity)
 
-theorem derSeries_twist {q : ℕ} (χ : DirichletCharacter ℂ q) (k : ℕ) (x τ : ℝ) :
-    derSeries (fun n : ℕ => χ (n : ZMod q)) k ((x : ℝ) + τ * I) =
-      derSeries (fun n : ℕ => χ (n : ZMod q) * (n : ℂ) ^ (-(τ * I))) k (x : ℝ) := by
+theorem derSeries_twist {q : ℕ} (χ : DirichletCharacter ℂ q) (k : ℕ) (x τ : ℝ)
+    : derSeries (fun n : ℕ => χ (n : ZMod q)) k ((x : ℝ) + τ * I)
+      = derSeries (fun n : ℕ => χ (n : ZMod q) * (n : ℂ) ^ (-(τ * I))) k (x : ℝ) := by
   unfold derSeries
   refine tsum_congr fun n => ?_
   rcases n.eq_zero_or_pos with rfl | hn
@@ -209,26 +233,33 @@ theorem derSeries_twist {q : ℕ} (χ : DirichletCharacter ℂ q) (k : ℕ) (x �
   · rw [neg_add, Complex.cpow_add _ _ (by exact_mod_cast hn.ne')]
     ring
 
-theorem finite_zerosBox {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {σ : ℝ} (T : ℝ) (hσ : 0 < σ) :
-    (zerosBox χ σ T).Finite :=
+theorem finite_zerosBox {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {σ : ℝ} (T : ℝ) (hσ : 0 < σ)
+    : (zerosBox χ σ T).Finite :=
   (GlobalTheory.Mem.An.ZeroWindow.finite_zeros χ 0 T).subset fun _ h =>
     ⟨hσ.trans_le h.1, h.2.1, by simpa using h.2.2.1, h.2.2.2⟩
 
-theorem detect : ∃ a b C C' r₀ K₀ : ℝ, 0 < a ∧ a < b ∧ 0 < C ∧ 0 < C' ∧ 0 < r₀ ∧
-    ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (τ r L : ℝ) (K : ℕ) (ρ : ℂ), (χ ≠ 1 ∨ 2 ≤ |τ|) →
-      Real.log (q * (|τ| + 2)) ≤ L → 0 < r → 1 / L ≤ r → r ≤ r₀ → C' * r * L ≤ K → K₀ ≤ K →
-      LFunction χ ρ = 0 → ‖ρ - (1 + τ * I)‖ ≤ r →
-      Real.exp (-(C * K)) / r ^ 3 ≤ ∫ y in (Real.exp (a * K / r))..(Real.exp (b * K / r)),
-        ‖primeSum χ (Real.exp (a * K / r)) y τ‖ ^ 2 / y := by
-  obtain ⟨A, C3, r3, hA, hC3, hr3, H3⟩ := GlobalTheory.T.exists_large_vonMangoldtLogPowerSeries_near_zero
-  obtain ⟨a, b, C4, r4, K0, ha, hab, hC4, hr4, H4⟩ := GlobalTheory.T.integral_prime_sum_sq_ge_of_derSeries_large A hA
+theorem detect
+    : ∃ a b C C' r₀ K₀ : ℝ,
+      0 < a ∧ a < b ∧ 0 < C ∧ 0 < C' ∧ 0 < r₀
+        ∧ ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (τ r L : ℝ) (K : ℕ) (ρ : ℂ),
+          (χ ≠ 1 ∨ 2 ≤ |τ|) → Real.log (q * (|τ| + 2)) ≤ L → 0 < r → 1 / L ≤ r → r ≤ r₀
+            → C' * r * L ≤ K → K₀ ≤ K → LFunction χ ρ = 0 → ‖ρ - (1 + τ * I)‖ ≤ r
+            → Real.exp (-(C * K)) / r ^ 3
+              ≤ ∫ y in (Real.exp (a * K / r))..(Real.exp (b * K / r)),
+                ‖primeSum χ (Real.exp (a * K / r)) y τ‖ ^ 2 / y := by
+  obtain ⟨A, C3, r3, hA, hC3, hr3, H3⟩ :=
+    GlobalTheory.T.exists_large_vonMangoldtLogPowerSeries_near_zero
+  obtain ⟨a, b, C4, r4, K0, ha, hab, hC4, hr4, H4⟩ :=
+    GlobalTheory.T.integral_prime_sum_sq_ge_of_derSeries_large A hA
   refine ⟨a, b, C4, C3, min r3 r4, K0, ha, hab, hC4, hC3, lt_min hr3 hr4, ?_⟩
   intro q _ χ τ r L K ρ h1 h2 h3 h4 h5 h6 h7 h8 h9
   obtain ⟨k, k1, k2, k3⟩ := H3 q χ τ r L K ρ h1 h2 h4 (h5.trans (min_le_left _ _)) h6 h8 h9
   rw [derSeries_twist] at k3
-  have := H4 _ r K k (fun n => by
-    rw [norm_mul]; exact mul_le_one₀ (χ.norm_le_one _) (norm_nonneg _) (norm_cpow_le n τ))
-    h3 (h5.trans (min_le_right _ _)) h7 k1 k2 k3
+  have :=
+    H4 _ r K k
+      (fun n => by
+        rw [norm_mul]; exact mul_le_one₀ (χ.norm_le_one _) (norm_nonneg _) (norm_cpow_le n τ))
+      h3 (h5.trans (min_le_right _ _)) h7 k1 k2 k3
   refine this.trans (le_of_eq ?_)
   congr 1
   ext y
@@ -237,27 +268,46 @@ theorem detect : ∃ a b C C' r₀ K₀ : ℝ, 0 < a ∧ a < b ∧ 0 < C ∧ 0 <
   refine Finset.sum_congr rfl fun p _ => ?_
   ring
 
-theorem near {ρ : ℂ} {σ r τ : ℝ} (h1 : σ ≤ ρ.re) (h2 : ρ.re < 1) (h3 : 2 * (1 - σ) ≤ r)
-    (h4 : |τ - ρ.im| ≤ r / 2) : ‖ρ - (1 + τ * I)‖ ≤ r := by
+theorem near
+    {ρ : ℂ} {σ r τ : ℝ}
+    (h1 : σ ≤ ρ.re) (h2 : ρ.re < 1) (h3 : 2 * (1 - σ) ≤ r) (h4 : |τ - ρ.im| ≤ r / 2)
+    : ‖ρ - (1 + τ * I)‖ ≤ r := by
   refine (Complex.norm_le_abs_re_add_abs_im _).trans ?_
   have e1 : (ρ - (1 + τ * I)).re = ρ.re - 1 := by simp
   have e2 : (ρ - (1 + τ * I)).im = ρ.im - τ := by simp
   rw [e1, e2, abs_sub_comm ρ.im, abs_of_neg (by linarith)]
   linarith
 
-theorem count_param : ∃ a D C C' r₀ K₀ η : ℝ, 0 < a ∧ 0 < D ∧ 0 < C ∧ 0 < C' ∧ 0 < r₀ ∧ 0 < η ∧
-    ∀ (q : ℕ) [NeZero q] (T σ r L : ℝ) (K : ℕ), 2 ≤ T → 1 - η ≤ σ → 2 * (1 - σ) ≤ r → 0 < r →
-      r ≤ r₀ → 1 / L ≤ r → Real.log (q * (T + 3)) ≤ L → C' * r * L ≤ K → K₀ ≤ K → 1 ≤ K →
-      (2 * q * (T + 1)) ^ 2 ≤ Real.exp (a * K / r) →
-      ∑ χ : DirichletCharacter ℂ q, (∑ᶠ ρ ∈ zerosBox χ σ T, (ord χ ρ : ℝ)) ≤
-        D * (1 + r * L) * Real.exp (C * K) * (K : ℝ) ^ 2 := by
+theorem count_param
+    : ∃ a D C C' r₀ K₀ η : ℝ,
+      0 < a ∧ 0 < D ∧ 0 < C ∧ 0 < C' ∧ 0 < r₀ ∧ 0 < η
+        ∧ ∀ (q : ℕ) [NeZero q] (T σ r L : ℝ) (K : ℕ),
+          2 ≤ T → 1 - η ≤ σ → 2 * (1 - σ) ≤ r → 0 < r → r ≤ r₀ → 1 / L ≤ r
+            → Real.log (q * (T + 3)) ≤ L → C' * r * L ≤ K → K₀ ≤ K → 1 ≤ K
+            → (2 * q * (T + 1)) ^ 2 ≤ Real.exp (a * K / r)
+            → ∑ χ : DirichletCharacter ℂ q, (∑ᶠ ρ ∈ zerosBox χ σ T, (ord χ ρ : ℝ))
+              ≤ D * (1 + r * L) * Real.exp (C * K) * (K : ℝ) ^ 2 := by
   obtain ⟨η, hη, H1⟩ := principal_height
   obtain ⟨C2, hC2, H2⟩ := GlobalTheory.T.dirichletL_few_zeros_small_disc
   obtain ⟨a, b, C4, C3, r0, K0, ha, hab, hC4, hC3, hr0, H3⟩ := detect
   obtain ⟨C5, CM, hC5, hCM, H5⟩ := mean_le
   have hb : 0 < b := ha.trans hab
-  refine ⟨a, C2 * C5 * (b + CM) * b, C4, C3, min (1 / 2) r0, K0, η, ha, by positivity, hC4, hC3,
-    by positivity, hη, ?_⟩
+  refine ⟨
+    a,
+    C2 * C5 * (b + CM) * b,
+    C4,
+    C3,
+    min (1 / 2) r0,
+    K0,
+    η,
+    ha,
+    by positivity,
+    hC4,
+    hC3,
+    by positivity,
+    hη,
+    ?_
+  ⟩
   intro q _ T σ r L K hT hσ hσr hr hrr hL hqL hK3 hK0 hK1 hN
   have hr2 : r ≤ 1 / 2 := hrr.trans (min_le_left _ _)
   have hq : (1 : ℝ) ≤ q := by exact_mod_cast NeZero.one_le
@@ -268,14 +318,19 @@ theorem count_param : ∃ a D C C' r₀ K₀ η : ℝ, 0 < a ∧ 0 < D ∧ 0 < C
   have hN1 : 1 ≤ N := Real.one_le_exp (by positivity)
   have hNM : N ≤ M := Real.exp_le_exp.2 (by gcongr)
   have hmean := H5 q (T + 1) N M (by linarith) hN1 hNM hN
-  have hchar : ∀ χ : DirichletCharacter ℂ q,
-      Real.exp (-(C4 * K)) / r ^ 3 * (2 * (r / 2)) * (∑ᶠ ρ ∈ zerosBox χ σ T, (ord χ ρ : ℝ)) ≤
-      C2 * (1 + r * L) * ∫ τ in (-(T + 1))..(T + 1), ∫ y in N..M, ‖primeSum χ N y τ‖ ^ 2 / y := by
+  have hchar
+      : ∀ χ : DirichletCharacter ℂ q,
+        Real.exp (-(C4 * K)) / r ^ 3 * (2 * (r / 2)) * (∑ᶠ ρ ∈ zerosBox χ σ T, (ord χ ρ : ℝ))
+          ≤ C2 * (1 + r * L)
+            * ∫ τ in (-(T + 1))..(T + 1), ∫ y in N..M, ‖primeSum χ N y τ‖ ^ 2 / y := by
     intro χ
     have hfin := finite_zerosBox χ (σ := σ) T (by linarith)
     rw [finsum_mem_eq_finite_toFinset_sum _ hfin]
     refine count_le _ _ _ _ _ _ _ (by positivity) (by linarith) (by positivity) (by positivity)
-      (fun ρ hρ => ?_) ?_ (fun τ => ?_) (fun ρ hρ τ hτ => ?_)
+      (fun ρ hρ => ?_)
+      ?_
+      (fun τ => ?_)
+      (fun ρ hρ τ hτ => ?_)
     · have := (hfin.mem_toFinset.1 hρ).2.2.1
       linarith
     · rw [intervalIntegrable_iff_integrableOn_Ioc_of_le (by linarith)]
@@ -291,12 +346,16 @@ theorem count_param : ∃ a D C C' r₀ K₀ η : ℝ, 0 < a ∧ 0 < D ∧ 0 < C
         by_cases h : χ = 1
         · subst h
           have := H1 q ρ (by linarith) z2 z4
-          right; linarith
+          right
+          linarith
         · exact Or.inl h
       have hlog : Real.log (q * (|τ| + 2)) ≤ L :=
         (Real.log_le_log (by positivity) (by gcongr ?_ * ?_; linarith)).trans hqL
-      refine ⟨H3 q χ τ r L K ρ hc hlog hr hL (hrr.trans (min_le_right _ _)) hK3 hK0 z4
-        (near z1 z2 hσr hτ), ?_⟩
+      refine ⟨
+        H3 q χ τ r L K ρ hc hlog hr hL (hrr.trans (min_le_right _ _)) hK3 hK0 z4
+          (near z1 z2 hσr hτ),
+        ?_
+      ⟩
       obtain ⟨f1, f2⟩ := H2 q χ τ r hc hr hr2
       rw [finsum_mem_eq_finite_toFinset_sum _ f1] at f2
       refine le_trans (Finset.sum_le_sum_of_subset_of_nonneg ?_ fun _ _ _ => Nat.cast_nonneg _)
@@ -315,16 +374,21 @@ theorem count_param : ∃ a D C C' r₀ K₀ η : ℝ, 0 < a ∧ 0 < D ∧ 0 < C
   have he := Real.exp_pos (C4 * K)
   have h7 := mul_le_mul_of_nonneg_left h6 (show 0 ≤ Real.exp (C4 * K) * r ^ 2 by positivity)
   rw [Real.exp_neg] at h7
-  calc S = Real.exp (C4 * K) * r ^ 2 * ((Real.exp (C4 * K))⁻¹ / r ^ 3 * (2 * (r / 2)) * S) := by
-        field_simp
+  calc
+    S = Real.exp (C4 * K) * r ^ 2 * ((Real.exp (C4 * K))⁻¹ / r ^ 3 * (2 * (r / 2)) * S) := by
+      field_simp
     _ ≤ _ := h7
-    _ = C2 * C5 * (b * K + CM * r) * b * (1 + r * L) * Real.exp (C4 * K) * K := by
-        field_simp
-    _ ≤ C2 * C5 * (b * K + CM * K) * b * (1 + r * L) * Real.exp (C4 * K) * K := by
-        gcongr; linarith
+    _ = C2 * C5 * (b * K + CM * r) * b * (1 + r * L) * Real.exp (C4 * K) * K := by field_simp
+    _ ≤ C2 * C5 * (b * K + CM * K) * b * (1 + r * L) * Real.exp (C4 * K) * K := by gcongr; linarith
     _ = _ := by ring
 
-theorem zero_density : ∃ A C η : ℝ, 0 < A ∧ 0 < C ∧ 0 < η ∧ ∀ (q : ℕ) [NeZero q] (T σ : ℝ), 2 ≤ T → 1 - η ≤ σ → σ ≤ 1 → ∑ χ : DirichletCharacter ℂ q, (∑ᶠ ρ ∈ zerosBox χ σ T, (ord χ ρ : ℝ)) ≤ C * ((q : ℝ) * T) ^ (A * (1 - σ)) := by
+theorem zero_density
+    : ∃ A C η : ℝ,
+      0 < A ∧ 0 < C ∧ 0 < η
+        ∧ ∀ (q : ℕ) [NeZero q] (T σ : ℝ),
+          2 ≤ T → 1 - η ≤ σ → σ ≤ 1
+            → ∑ χ : DirichletCharacter ℂ q, (∑ᶠ ρ ∈ zerosBox χ σ T, (ord χ ρ : ℝ))
+              ≤ C * ((q : ℝ) * T) ^ (A * (1 - σ)) := by
   obtain ⟨a, D, C, C3, r0, K0, η, ha, hD, hC, hC3, hr0, hη, H⟩ := count_param
   obtain ⟨E, hE⟩ : ∃ E : ℝ, E = C3 + |K0| + 4 / a := ⟨_, rfl⟩
   have hK0 := abs_nonneg K0
@@ -332,8 +396,15 @@ theorem zero_density : ∃ A C η : ℝ, 0 < A ∧ 0 < C ∧ 0 < η ∧ ∀ (q :
   have hE0 : 0 < E := by linarith
   obtain ⟨B, hB⟩ : ∃ B : ℝ, B = C * (E + 1) + 3 := ⟨_, rfl⟩
   have hB0 : 0 < B := by rw [hB]; positivity
-  refine ⟨6 * B, D * (E + 1) ^ 2 * Real.exp (2 * B), min η (r0 / 2), by positivity, by positivity,
-    by positivity, fun q _ T σ hT hσ hσ1 => ?_⟩
+  refine ⟨
+    6 * B,
+    D * (E + 1) ^ 2 * Real.exp (2 * B),
+    min η (r0 / 2),
+    by positivity,
+    by positivity,
+    by positivity,
+    fun q _ T σ hT hσ hσ1 => ?_
+  ⟩
   have hq : (1 : ℝ) ≤ q := by exact_mod_cast NeZero.one_le
   have m1 := min_le_left η (r0 / 2)
   have m2 := min_le_right η (r0 / 2)
@@ -348,20 +419,22 @@ theorem zero_density : ∃ A C η : ℝ, 0 < A ∧ 0 < C ∧ 0 < η ∧ ∀ (q :
   have r4 : r ≤ r0 := by
     rw [hr]
     refine max_le (by linarith) ?_
-    rw [div_le_comm₀ hL0 hr0]; linarith
+    rw [div_le_comm₀ hL0 hr0]
+    linarith
   have x1 : 1 ≤ r * L := (div_le_iff₀ hL0).1 r2
   have hlT : Real.log (q * (T + 3)) ≤ 3 * Real.log (q * T) := by
     have hT2 : 4 ≤ T ^ 2 := by nlinarith
     have h3 : T + 3 ≤ T ^ 3 := by nlinarith
     have h4 : (q : ℝ) ≤ q ^ 3 := le_self_pow₀ hq (by norm_num)
-    calc _ ≤ Real.log ((q * T) ^ 3) := by
-          refine Real.log_le_log (by positivity) ?_
-          rw [mul_pow]; gcongr
+    calc
+      _ ≤ Real.log ((q * T) ^ 3) := by
+        refine Real.log_le_log (by positivity) ?_
+        rw [mul_pow]
+        gcongr
       _ = _ := by rw [Real.log_pow]; norm_num
   have x2 : r * L ≤ 2 + 6 * (1 - σ) * Real.log (q * T) := by
     have s0 : 0 ≤ 1 - σ := by linarith
-    have s1 : 2 * (1 - σ) * (1 / r0) ≤ 1 := by
-      rw [mul_one_div, div_le_one hr0]; linarith
+    have s1 : 2 * (1 - σ) * (1 / r0) ≤ 1 := by rw [mul_one_div, div_le_one hr0]; linarith
     have s2 := mul_le_mul_of_nonneg_left hlT s0
     have s3 := mul_nonneg s0 hl0
     rcases max_choice (2 * (1 - σ)) (1 / L) with h | h
@@ -381,20 +454,24 @@ theorem zero_density : ∃ A C η : ℝ, 0 < A ∧ 0 < C ∧ 0 < η ∧ ∀ (q :
       rw [le_div_iff₀ r3]
       have : 4 / a * (r * L) ≤ K := le_trans (by gcongr; linarith) k1
       have := mul_le_mul_of_nonneg_left this ha.le
-      calc 4 * L * r = a * (4 / a * (r * L)) := by field_simp
+      calc
+        4 * L * r
+          = a * (4 / a * (r * L)) := by field_simp
         _ ≤ _ := this
     have n2 : 2 * q * (T + 1) ≤ (q * (T + 3)) ^ 2 := by
       have : (q : ℝ) ≤ q ^ 2 := by nlinarith
       have : 2 * (T + 1) ≤ (T + 3) ^ 2 := by nlinarith
-      calc 2 * q * (T + 1) = q * (2 * (T + 1)) := by ring
+      calc
+        2 * q * (T + 1)
+          = q * (2 * (T + 1)) := by ring
         _ ≤ q ^ 2 * (T + 3) ^ 2 := by gcongr
         _ = _ := by ring
-    calc _ ≤ ((q * (T + 3)) ^ 2) ^ 2 := by gcongr
+    calc
+      _ ≤ ((q * (T + 3)) ^ 2) ^ 2 := by gcongr
       _ = Real.exp (Real.log (q * (T + 3))) ^ 4 := by rw [Real.exp_log (by positivity)]; ring
       _ = Real.exp (4 * Real.log (q * (T + 3))) := by rw [← Real.exp_nat_mul]; norm_num
       _ ≤ _ := Real.exp_le_exp.2 (by linarith)
-  have k4 : C3 * r * L ≤ K := by
-    rw [mul_assoc]; exact le_trans (by gcongr; linarith) k1
+  have k4 : C3 * r * L ≤ K := by rw [mul_assoc]; exact le_trans (by gcongr; linarith) k1
   have k5 : K0 ≤ K := by
     have := le_abs_self K0
     have : E * 1 ≤ E * (r * L) := by gcongr
@@ -403,15 +480,18 @@ theorem zero_density : ∃ A C η : ℝ, 0 < A ∧ 0 < C ∧ 0 < η ∧ ∀ (q :
   generalize r * L = x at *
   have e1 : 1 + x ≤ Real.exp x := by linarith [Real.add_one_le_exp x]
   have e2 : x ≤ Real.exp x := by linarith
-  calc _ ≤ D * Real.exp x * Real.exp (C * ((E + 1) * x)) * ((E + 1) * Real.exp x) ^ 2 := by
-        gcongr
-        exact k2.trans (by gcongr)
+  calc
+    _ ≤ D * Real.exp x * Real.exp (C * ((E + 1) * x)) * ((E + 1) * Real.exp x) ^ 2 := by
+      gcongr
+      exact k2.trans (by gcongr)
     _ = D * (E + 1) ^ 2 * Real.exp (B * x) := by
-        rw [show B * x = x + C * ((E + 1) * x) + x + x by rw [hB]; ring]
-        simp only [Real.exp_add]; ring
+      rw [show B * x = x + C * ((E + 1) * x) + x + x by rw [hB]; ring]
+      simp only [Real.exp_add]
+      ring
     _ ≤ D * (E + 1) ^ 2 * Real.exp (B * (2 + 6 * (1 - σ) * Real.log (q * T))) := by gcongr
     _ = _ := by
-        rw [Real.rpow_def_of_pos (by positivity), mul_assoc _ (Real.exp _), ← Real.exp_add]
-        congr 2; ring
+      rw [Real.rpow_def_of_pos (by positivity), mul_assoc _ (Real.exp _), ← Real.exp_add]
+      congr 2
+      ring
 
 end GlobalTheory.Lin.LogFree

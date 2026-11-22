@@ -6,21 +6,25 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemTwKer
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.HBBump
 
-theorem exists_bump : ∀ {G Z : Type} [Group G] [AddCommGroup Z] [Module ℂ Z] [TopologicalSpace G]
-    [IsTopologicalGroup G] (H : Subgroup G) (ρ : Representation ℂ H Z) (B : Subgroup G),
-    IsOpen (B : Set G) → IsCompact (B : Set G) → ∀ z : Z, (∀ h : H, (h : G) ∈ B → ρ h z = z) →
-    ∃ b : cIndSpace H ρ, (∀ (h : H) (β : G), β ∈ B → b.1.1.1 ((h : G) * β) = ρ h z) ∧
-      ∀ p : G, (¬ ∃ h : H, ∃ β ∈ B, p = (h : G) * β) → b.1.1.1 p = 0 := by
+theorem exists_bump
+    : ∀ {G Z : Type} [Group G] [AddCommGroup Z] [Module ℂ Z] [TopologicalSpace G]
+        [IsTopologicalGroup G] (H : Subgroup G) (ρ : Representation ℂ H Z) (B : Subgroup G),
+      IsOpen (B : Set G) → IsCompact (B : Set G)
+        → ∀ z : Z,
+          (∀ h : H, (h : G) ∈ B → ρ h z = z)
+            → ∃ b : cIndSpace H ρ,
+              (∀ (h : H) (β : G), β ∈ B → b.1.1.1 ((h : G) * β) = ρ h z)
+                ∧ ∀ p : G, (¬ ∃ h : H, ∃ β ∈ B, p = (h : G) * β) → b.1.1.1 p = 0 := by
   intro G Z _ _ _ _ _ H ρ B hBo hBc z hz
   classical
-
-  have hwell : ∀ (h h' : H) (β β' : G), β ∈ B → β' ∈ B → (h : G) * β = (h' : G) * β' →
-      ρ h z = ρ h' z := by
+  have hwell
+      : ∀ (h h' : H) (β β' : G), β ∈ B → β' ∈ B → (h : G) * β = (h' : G) * β' → ρ h z = ρ h' z := by
     intro h h' β β' hβ hβ' e
     have ha : ((h'⁻¹ * h : H) : G) ∈ B := by
       have : ((h'⁻¹ * h : H) : G) = β' * β⁻¹ := by
@@ -67,27 +71,27 @@ theorem exists_bump : ∀ {G Z : Type} [Group G] [AddCommGroup Z] [Module ℂ Z]
       rw [hzero _ hn, hzero _ hp]
   let F : indSpace H ρ := ⟨f, hleft⟩
   have hsm : F ∈ smoothPart (ind H ρ) := by
-    let T : Subgroup G :=
-      { carrier := {g | ind H ρ g F = F}
-        mul_mem' := by
-          intro a b ha hb
-          simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
-          rw [hb, ha]
-        one_mem' := by simp
-        inv_mem' := by
-          intro a ha
-          simp only [Set.mem_setOf_eq] at *
-          conv_lhs => rw [← ha]
-          rw [← Module.End.mul_apply, ← map_mul]
-          simp }
+    let T : Subgroup G := {
+      carrier := {g | ind H ρ g F = F}
+      mul_mem' := by
+        intro a b ha hb
+        simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
+        rw [hb, ha]
+      one_mem' := by simp
+      inv_mem' := by
+        intro a ha
+        simp only [Set.mem_setOf_eq] at *
+        conv_lhs => rw [← ha]
+        rw [← Module.End.mul_apply, ← map_mul]
+        simp
+    }
     have hBT : (B : Set G) ⊆ T := by
       intro x hx
       show ind H ρ x F = F
       apply Subtype.ext
       funext p
       exact hright p x hx
-    exact T.isOpen_of_mem_nhds (g := 1)
-      (Filter.mem_of_superset (hBo.mem_nhds B.one_mem) hBT)
+    exact T.isOpen_of_mem_nhds (g := 1) (Filter.mem_of_superset (hBo.mem_nhds B.one_mem) hBT)
   refine ⟨⟨⟨F, hsm⟩, ⟨(B : Set G), hBc, ?_⟩⟩, hval, hzero⟩
   intro g hg
   by_contra hc

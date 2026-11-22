@@ -13,32 +13,44 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HasFramesOfAm
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models GlobalTheory.ModelSum
 
 namespace GlobalTheory.AbLocusLocal
 
-private theorem isProper_of_isPullback_of_pullback_snd {A B C D : Scheme.{0}} {fst : A ⟶ B} {snd : A ⟶ C} {f : B ⟶ D}
-    {g : C ⟶ D} (h : IsPullback fst snd f g) (H : IsProper (pullback.snd f g)) : IsProper snd := by
+private theorem isProper_of_isPullback_of_pullback_snd
+    {A B C D : Scheme.{0}} {fst : A ⟶ B} {snd : A ⟶ C} {f : B ⟶ D} {g : C ⟶ D}
+    (h : IsPullback fst snd f g) (H : IsProper (pullback.snd f g))
+    : IsProper snd := by
   rw [← h.isoPullback_hom_snd]
-  exact (MorphismProperty.cancel_left_of_respectsIso @IsProper h.isoPullback.hom (pullback.snd f g)).2 H
+  exact
+    (MorphismProperty.cancel_left_of_respectsIso @IsProper h.isoPullback.hom (pullback.snd f g)).2 H
 
-private theorem isProper_pullback_snd_of_isPullback {A B C D : Scheme.{0}} {fst : A ⟶ B} {snd : A ⟶ C} {f : B ⟶ D}
-    {g : C ⟶ D} (h : IsPullback fst snd f g) (H : IsProper snd) : IsProper (pullback.snd f g) := by
+private theorem isProper_pullback_snd_of_isPullback
+    {A B C D : Scheme.{0}} {fst : A ⟶ B} {snd : A ⟶ C} {f : B ⟶ D} {g : C ⟶ D}
+    (h : IsPullback fst snd f g) (H : IsProper snd)
+    : IsProper (pullback.snd f g) := by
   rw [← h.isoPullback_inv_snd]
   exact (MorphismProperty.cancel_left_of_respectsIso @IsProper h.isoPullback.inv snd).2 H
 
-private theorem isProper_snd_of_isPullback_of_isProper {A B C D : Scheme.{0}} {fst : A ⟶ B} {snd : A ⟶ C} {f : B ⟶ D}
-    {g : C ⟶ D} (h : IsPullback fst snd f g) (hf : IsProper f) : IsProper snd :=
+private theorem isProper_snd_of_isPullback_of_isProper
+    {A B C D : Scheme.{0}} {fst : A ⟶ B} {snd : A ⟶ C} {f : B ⟶ D} {g : C ⟶ D}
+    (h : IsPullback fst snd f g) (hf : IsProper f)
+    : IsProper snd :=
   isProper_of_isPullback_of_pullback_snd h inferInstance
 
-theorem isProper_restrict_of_cover {X Z : Scheme.{0}} (p : X ⟶ Z) {I : Type} {Y X' : I → Scheme.{0}}
-    (f : ∀ i, Y i ⟶ Z) [∀ i, IsOpenImmersion (f i)] (p' : ∀ i, X' i ⟶ Y i) (F : ∀ i, X' i ⟶ X)
-    (h : ∀ i, IsPullback (F i) (p' i) p (f i)) (V : ∀ i, (Y i).Opens) (hV : ∀ i, IsProper (p' i ∣_ V i))
+theorem isProper_restrict_of_cover
+    {X Z : Scheme.{0}} (p : X ⟶ Z)
+    {I : Type} {Y X' : I → Scheme.{0}} (f : ∀ i, Y i ⟶ Z) [∀ i, IsOpenImmersion (f i)]
+    (p' : ∀ i, X' i ⟶ Y i) (F : ∀ i, X' i ⟶ X) (h : ∀ i, IsPullback (F i) (p' i) p (f i))
+    (V : ∀ i, (Y i).Opens) (hV : ∀ i, IsProper (p' i ∣_ V i))
     (U : Z.Opens) (hle : ∀ i, Set.range ((V i).ι ≫ f i) ⊆ Set.range U.ι)
-    (hc : ∀ z ∈ U, ∃ i, z ∈ Set.range ((V i).ι ≫ f i)) : IsProper (p ∣_ U) := by
+    (hc : ∀ z ∈ U, ∃ i, z ∈ Set.range ((V i).ι ≫ f i))
+    : IsProper (p ∣_ U) := by
   have hsq : ∀ i, IsPullback (((p' i) ⁻¹ᵁ V i).ι ≫ F i) (p' i ∣_ V i) p ((V i).ι ≫ f i) := fun i =>
     (isPullback_morphismRestrict (p' i) (V i)).flip.paste_horiz (h i)
   refine IsZariskiLocalAtTarget.of_iSup_eq_top (fun i => U.ι ⁻¹ᵁ ((V i).ι ≫ f i).opensRange) ?_ ?_
@@ -56,7 +68,9 @@ theorem isProper_restrict_of_cover {X Z : Scheme.{0}} (p : X ⟶ Z) {I : Type} {
       exact hx
     let e := IsOpenImmersion.lift ((V i).ι ≫ f i) (W.ι ≫ U.ι) hr
     have he : e ≫ ((V i).ι ≫ f i) = W.ι ≫ U.ι := IsOpenImmersion.lift_fac _ _ _
-    have big := (isPullback_morphismRestrict (p ∣_ U) W).flip.paste_horiz (isPullback_morphismRestrict p U).flip
+    have big :=
+      (isPullback_morphismRestrict (p ∣_ U) W).flip.paste_horiz
+        (isPullback_morphismRestrict p U).flip
     rw [← he] at big
     have hw : ((((p ∣_ U) ⁻¹ᵁ W).ι ≫ (p ⁻¹ᵁ U).ι)) ≫ p = ((p ∣_ U) ∣_ W ≫ e) ≫ ((V i).ι ≫ f i) := by
       rw [big.w, Category.assoc]
@@ -66,18 +80,21 @@ theorem isProper_restrict_of_cover {X Z : Scheme.{0}} (p : X ⟶ Z) {I : Type} {
       exact big
     exact isProper_snd_of_isPullback_of_isProper sq (hV i)
 
-private theorem mem_abLocus_of_map_mem_of_isPullback {Y Z : Scheme.{0}} {A : Over Y} {B : Over Z} {g : Y ⟶ Z}
-    {φ : A.left ⟶ B.left} (h : IsPullback φ A.hom B.hom g) (y : Y) (hy : g y ∈ abLocus B) :
-    y ∈ abLocus A := by
+private theorem mem_abLocus_of_map_mem_of_isPullback
+    {Y Z : Scheme.{0}} {A : Over Y} {B : Over Z} {g : Y ⟶ Z} {φ : A.left ⟶ B.left}
+    (h : IsPullback φ A.hom B.hom g) (y : Y) (hy : g y ∈ abLocus B)
+    : y ∈ abLocus A := by
   simp only [abLocus, Set.mem_setOf_eq] at hy ⊢
   intro K _ _ s hs
   obtain ⟨x, rfl⟩ := hs
   have big := (IsPullback.of_hasPullback A.hom s).paste_horiz h
   exact isProper_of_isPullback_of_pullback_snd big (hy K (s ≫ g) ⟨x, by rw [Scheme.Hom.comp_apply]⟩)
 
-private theorem map_mem_abLocus_of_isPullback {Y Z : Scheme.{0}} {A : Over Y} {B : Over Z} {g : Y ⟶ Z}
-    [IsOpenImmersion g] {φ : A.left ⟶ B.left} (h : IsPullback φ A.hom B.hom g) (y : Y)
-    (hy : y ∈ abLocus A) : g y ∈ abLocus B := by
+private theorem map_mem_abLocus_of_isPullback
+    {Y Z : Scheme.{0}} {A : Over Y} {B : Over Z} {g : Y ⟶ Z} [IsOpenImmersion g]
+    {φ : A.left ⟶ B.left} (h : IsPullback φ A.hom B.hom g)
+    (y : Y) (hy : y ∈ abLocus A)
+    : g y ∈ abLocus B := by
   simp only [abLocus, Set.mem_setOf_eq] at hy ⊢
   intro K _ _ s hs
   obtain ⟨x0, hx0⟩ := hs
@@ -93,7 +110,12 @@ private theorem map_mem_abLocus_of_isPullback {Y Z : Scheme.{0}} {A : Over Y} {B
     rw [← Scheme.Hom.comp_apply, hs', hx0]
   exact isProper_pullback_snd_of_isPullback big (hy K _ hy')
 
-theorem abOpen_of_cover : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Z : Scheme.{0}) (t : SAB H Z) (I : Type) (Y : I → Scheme.{0}) (f : ∀ i, Y i ⟶ Z) (u : ∀ i, SAB H (Y i)) (_ : ∀ i, SABMap (u i) t (f i)), (∀ i, IsOpenImmersion (f i)) → (∀ z : Z, ∃ i, z ∈ Set.range (f i)) → (∀ i, AbOpen (u i).G) → AbOpen t.G := by
+theorem abOpen_of_cover
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Z : Scheme.{0})
+        (t : SAB H Z) (I : Type) (Y : I → Scheme.{0}) (f : ∀ i, Y i ⟶ Z) (u : ∀ i, SAB H (Y i))
+        (_ : ∀ i, SABMap (u i) t (f i)),
+      (∀ i, IsOpenImmersion (f i)) → (∀ z : Z, ∃ i, z ∈ Set.range (f i)) → (∀ i, AbOpen (u i).G)
+        → AbOpen t.G := by
   intro E _ _ _ H Z t I Y f u m hf hc hab
   unfold AbOpen at hab ⊢
   choose V hVs hVp using hab
@@ -113,7 +135,8 @@ theorem abOpen_of_cover : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
   · refine isProper_restrict_of_cover t.G.hom f (fun i => (u i).G.hom) _ hpb V hVp _ ?_ ?_
     · intro i z hz
       rw [Scheme.Opens.range_ι]
-      exact TopologicalSpace.Opens.mem_iSup.2 ⟨i, by rw [← SetLike.mem_coe, Scheme.Hom.coe_opensRange]; exact hz⟩
+      exact TopologicalSpace.Opens.mem_iSup.2
+        ⟨i, by rw [← SetLike.mem_coe, Scheme.Hom.coe_opensRange]; exact hz⟩
     · intro z hz
       obtain ⟨i, hi⟩ := TopologicalSpace.Opens.mem_iSup.1 hz
       rw [← SetLike.mem_coe, Scheme.Hom.coe_opensRange] at hi

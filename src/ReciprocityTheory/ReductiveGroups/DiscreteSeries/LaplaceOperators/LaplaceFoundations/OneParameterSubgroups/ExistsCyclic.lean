@@ -14,8 +14,8 @@ theorem formV_symm {m : ℕ} (u v : Fin m → ℝ) : formV u v = formV v u := by
   unfold formV
   exact Finset.sum_congr rfl fun s _ => by ring
 
-theorem sign_prod {m : ℕ} (x : Fin m → ℝ) (hx : StrictAnti x) (s : Fin m) :
-    0 < (-1) ^ s.val * ∏ j ∈ univ.erase s, (x s - x j) := by
+theorem sign_prod {m : ℕ} (x : Fin m → ℝ) (hx : StrictAnti x) (s : Fin m)
+    : 0 < (-1) ^ s.val * ∏ j ∈ univ.erase s, (x s - x j) := by
   classical
   have habs : ∀ j ∈ univ.erase s, |x s - x j| = (if j < s then -1 else 1) * (x s - x j) := by
     intro j hj
@@ -34,27 +34,30 @@ theorem sign_prod {m : ℕ} (x : Fin m → ℝ) (hx : StrictAnti x) (s : Fin m) 
       simp only [Finset.mem_filter, Finset.mem_erase, Finset.mem_univ, and_true, Finset.mem_Iio]
       exact ⟨fun h => h.2, fun h => ⟨ne_of_lt h, h⟩⟩
     rw [he, Fin.card_Iio]
-  have hprod : ∏ j ∈ univ.erase s, |x s - x j| = (-1) ^ s.val * ∏ j ∈ univ.erase s, (x s - x j) := by
+  have hprod
+      : ∏ j ∈ univ.erase s, |x s - x j| = (-1) ^ s.val * ∏ j ∈ univ.erase s, (x s - x j) := by
     rw [Finset.prod_congr rfl habs, Finset.prod_mul_distrib, Finset.prod_ite, Finset.prod_const,
       Finset.prod_const, one_pow, mul_one, hc]
   rw [← hprod]
   exact Finset.prod_pos fun j hj =>
     abs_pos.2 (sub_ne_zero.2 (hx.injective.ne (Finset.ne_of_mem_erase hj).symm))
 
-private theorem sum_pow_mul_inv_prod_sub_eq_ite {m : ℕ} (x : Fin m → ℝ) (hx : Function.Injective x) (k : ℕ)
-    (hk : k < m) :
-    ∑ s : Fin m, x s ^ k * (∏ j ∈ univ.erase s, (x s - x j))⁻¹ = if k + 1 = m then 1 else 0 := by
+private theorem sum_pow_mul_inv_prod_sub_eq_ite
+    {m : ℕ} (x : Fin m → ℝ) (hx : Function.Injective x) (k : ℕ) (hk : k < m)
+    : ∑ s : Fin m, x s ^ k * (∏ j ∈ univ.erase s, (x s - x j))⁻¹ = if k + 1 = m then 1 else 0 := by
   classical
   have hinj : Set.InjOn x ((univ : Finset (Fin m)) : Set (Fin m)) := fun a _ b _ h => hx h
-  have hdeg : (Polynomial.X ^ k : Polynomial ℝ).degree < ((univ : Finset (Fin m)).card : WithBot ℕ) := by
+  have hdeg
+      : (Polynomial.X ^ k : Polynomial ℝ).degree < ((univ : Finset (Fin m)).card : WithBot ℕ) := by
     rw [card_univ, Fintype.card_fin, Polynomial.degree_X_pow]
     exact_mod_cast hk
   have hI := Lagrange.eq_interpolate hinj hdeg
   have hc := congrArg (fun p : Polynomial ℝ => p.coeff (m - 1)) hI
   try simp only at hc
   rw [Lagrange.interpolate_apply, Polynomial.finsetSum_coeff] at hc
-  have hb : ∀ s : Fin m, (Lagrange.basis univ x s).coeff (m - 1) =
-      (∏ j ∈ univ.erase s, (x s - x j))⁻¹ := by
+  have hb
+      : ∀ s : Fin m,
+        (Lagrange.basis univ x s).coeff (m - 1) = (∏ j ∈ univ.erase s, (x s - x j))⁻¹ := by
     intro s
     simp only [Lagrange.basis, Lagrange.basisDivisor]
     rw [Finset.prod_mul_distrib, ← map_prod, Polynomial.coeff_C_mul]
@@ -65,14 +68,19 @@ private theorem sum_pow_mul_inv_prod_sub_eq_ite {m : ℕ} (x : Fin m → ℝ) (h
       simp [Polynomial.natDegree_X_sub_C, card_erase_of_mem]
     rw [← hnd, hmon.coeff_natDegree, mul_one, prod_inv_distrib]
   simp only [Polynomial.coeff_C_mul, hb, Polynomial.eval_pow, Polynomial.eval_X,
-    Polynomial.coeff_X_pow] at hc
+      Polynomial.coeff_X_pow]
+    at hc
   have e : (m - 1 = k) ↔ (k + 1 = m) := by omega
   simp only [e] at hc
   exact hc.symm
 
-theorem exists_cyclic (r : ℕ) (x : Fin (2 * r + 1) → ℝ) (hx : StrictAnti x) :
-    ∃ c : Fin (2 * r + 1) → ℝ, (∀ s, c s ≠ 0) ∧ ∀ i j : ℕ, i + j ≤ 2 * r →
-      formV (fun s => x s ^ i * c s) (fun s => x s ^ j * c s) = if i + j = 2 * r then -1 else 0 := by
+theorem exists_cyclic (r : ℕ) (x : Fin (2 * r + 1) → ℝ) (hx : StrictAnti x)
+    : ∃ c : Fin (2 * r + 1) → ℝ,
+      (∀ s, c s ≠ 0)
+        ∧ ∀ i j : ℕ,
+          i + j ≤ 2 * r
+            → formV (fun s => x s ^ i * c s) (fun s => x s ^ j * c s)
+              = if i + j = 2 * r then -1 else 0 := by
   classical
   have hP : ∀ s, 0 < (-1) ^ s.val * ∏ j ∈ univ.erase s, (x s - x j) := fun s => sign_prod x hx s
   have hPne : ∀ s, ∏ j ∈ univ.erase s, (x s - x j) ≠ 0 := fun s h => by
@@ -80,20 +88,25 @@ theorem exists_cyclic (r : ℕ) (x : Fin (2 * r + 1) → ℝ) (hx : StrictAnti x
     rw [h, mul_zero] at h1
     exact lt_irrefl _ h1
   have hq : ∀ s, 0 < (-1) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j) := fun s => by
-    have h1 : (-1 : ℝ) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j) =
-        ((-1) ^ s.val * ∏ j ∈ univ.erase s, (x s - x j)) / (∏ j ∈ univ.erase s, (x s - x j)) ^ 2 := by
+    have h1
+        : (-1 : ℝ) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j)
+          = ((-1) ^ s.val * ∏ j ∈ univ.erase s, (x s - x j))
+            / (∏ j ∈ univ.erase s, (x s - x j)) ^ 2 := by
       have := hPne s
-      first
-      | (field_simp; done)
-      | (field_simp; ring)
+      first | (field_simp; done) | (field_simp; ring)
     rw [h1]
     exact div_pos (hP s) (lt_of_le_of_ne (sq_nonneg _) (Ne.symm (pow_ne_zero 2 (hPne s))))
-  refine ⟨fun s => Real.sqrt ((-1) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j)),
-    fun s => (Real.sqrt_pos.2 (hq s)).ne', fun i j hij => ?_⟩
-  have hterm : ∀ s : Fin (2 * r + 1),
-      (-1 : ℝ) ^ (s.val + 1) * (x s ^ i * Real.sqrt ((-1) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j))) *
-        (x s ^ j * Real.sqrt ((-1) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j))) =
-      -(x s ^ (i + j) * (∏ j ∈ univ.erase s, (x s - x j))⁻¹) := by
+  refine ⟨
+    fun s => Real.sqrt ((-1) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j)),
+    fun s => (Real.sqrt_pos.2 (hq s)).ne',
+    fun i j hij => ?_
+  ⟩
+  have hterm
+      : ∀ s : Fin (2 * r + 1),
+        (-1 : ℝ) ^ (s.val + 1)
+            * (x s ^ i * Real.sqrt ((-1) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j)))
+            * (x s ^ j * Real.sqrt ((-1) ^ s.val / ∏ j ∈ univ.erase s, (x s - x j)))
+          = -(x s ^ (i + j) * (∏ j ∈ univ.erase s, (x s - x j))⁻¹) := by
     intro s
     have hs := Real.mul_self_sqrt (hq s).le
     have hne := hPne s
@@ -111,8 +124,9 @@ theorem exists_cyclic (r : ℕ) (x : Fin (2 * r + 1) → ℝ) (hx : StrictAnti x
   · rw [if_pos h, if_pos (by omega)]
   · rw [if_neg h, if_neg (by omega), neg_zero]
 
-theorem exists_dual {m : ℕ} (x c : Fin m → ℝ) (hx : Function.Injective x) (hc : ∀ s, c s ≠ 0)
-    (y : Fin m → ℝ) : ∃ v : Fin m → ℝ, ∀ i : Fin m, formV v (fun s => x s ^ i.val * c s) = y i := by
+theorem exists_dual
+    {m : ℕ} (x c : Fin m → ℝ) (hx : Function.Injective x) (hc : ∀ s, c s ≠ 0) (y : Fin m → ℝ)
+    : ∃ v : Fin m → ℝ, ∀ i : Fin m, formV v (fun s => x s ^ i.val * c s) = y i := by
   classical
   have hW : IsUnit (Matrix.vandermonde x)ᵀ.det := by
     rw [Matrix.det_transpose]
@@ -125,30 +139,28 @@ theorem exists_dual {m : ℕ} (x c : Fin m → ℝ) (hx : Function.Injective x) 
   refine Finset.sum_congr rfl fun s _ => ?_
   have h1 : ((-1 : ℝ) ^ (s.val + 1) * c s) ≠ 0 := mul_ne_zero (pow_ne_zero _ (by norm_num)) (hc s)
   have h2 := hc s
-  first
-  | (field_simp; done)
-  | (field_simp; ring)
+  first | (field_simp; done) | (field_simp; ring)
 
-theorem formV_sub_sum {m r : ℕ} (u w : Fin m → ℝ) (k : Fin r → ℝ) (g : Fin r → Fin m → ℝ) :
-    formV (fun s => u s - ∑ b, k b * g b s) w = formV u w - ∑ b, k b * formV (g b) w := by
+theorem formV_sub_sum {m r : ℕ} (u w : Fin m → ℝ) (k : Fin r → ℝ) (g : Fin r → Fin m → ℝ)
+    : formV (fun s => u s - ∑ b, k b * g b s) w = formV u w - ∑ b, k b * formV (g b) w := by
   simp only [formV, mul_sub, sub_mul, Finset.sum_sub_distrib, Finset.mul_sum, Finset.sum_mul]
   congr 1
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun s _ => by ring
 
-theorem frame (r : ℕ) (x : Fin (2 * r + 1) → ℝ) (hx : StrictAnti x) :
-    ∃ (e f : Fin r → Fin (2 * r + 1) → ℝ) (z : Fin (2 * r + 1) → ℝ),
-      (∀ a b, formV (e a) (e b) = 0) ∧ (∀ a b, formV (f a) (f b) = 0) ∧
-      (∀ a b, formV (f a) (e b) = if a = b then 1 else 0) ∧
-      (∀ a, formV (e a) z = 0) ∧ (∀ a, formV (f a) z = 0) ∧ formV z z = -1 ∧
-      (∀ a s, x s * e a s = if h : a.val + 1 < r then e ⟨a.val + 1, h⟩ s else z s) := by
+theorem frame (r : ℕ) (x : Fin (2 * r + 1) → ℝ) (hx : StrictAnti x)
+    : ∃ (e f : Fin r → Fin (2 * r + 1) → ℝ) (z : Fin (2 * r + 1) → ℝ),
+      (∀ a b, formV (e a) (e b) = 0) ∧ (∀ a b, formV (f a) (f b) = 0)
+        ∧ (∀ a b, formV (f a) (e b) = if a = b then 1 else 0) ∧ (∀ a, formV (e a) z = 0)
+        ∧ (∀ a, formV (f a) z = 0) ∧ formV z z = -1
+        ∧ (∀ a s, x s * e a s = if h : a.val + 1 < r then e ⟨a.val + 1, h⟩ s else z s) := by
   classical
   obtain ⟨c, hc0, hc⟩ := exists_cyclic r x hx
   let g : ℕ → Fin (2 * r + 1) → ℝ := fun i s => x s ^ i * c s
-  have hG : ∀ i j : ℕ, i + j ≤ 2 * r →
-      formV (g i) (g j) = if i + j = 2 * r then -1 else 0 := hc
-  have hdual : ∀ a : Fin r, ∃ v : Fin (2 * r + 1) → ℝ, ∀ i : Fin (2 * r + 1),
-      formV v (g i.val) = if i.val = a.val then 1 else 0 := fun a =>
+  have hG : ∀ i j : ℕ, i + j ≤ 2 * r → formV (g i) (g j) = if i + j = 2 * r then -1 else 0 := hc
+  have hdual
+      : ∀ a : Fin r, ∃ v : Fin (2 * r + 1) → ℝ, ∀ i : Fin (2 * r + 1),
+        formV v (g i.val) = if i.val = a.val then 1 else 0 := fun a =>
     exists_dual x c hx.injective hc0 _
   choose f' hf' using hdual
   let e : Fin r → Fin (2 * r + 1) → ℝ := fun a => g a.val
@@ -203,10 +215,8 @@ theorem frame (r : ℕ) (x : Fin (2 * r + 1) → ℝ) (hx : StrictAnti x) :
     have h2 : formV (f' a) (f b) = Q b a - ∑ d, (1 / 2 * Q b d) * formV (e d) (f' a) := by
       rw [formV_symm]
       exact formV_sub_sum _ _ _ _
-    have h3 : ∀ c, formV (e c) (f b) = if b = c then 1 else 0 := fun c => by
-      rw [formV_symm, hfe]
-    have h4 : ∀ d, formV (e d) (f' a) = if a = d then 1 else 0 := fun d => by
-      rw [formV_symm, hf'e]
+    have h3 : ∀ c, formV (e c) (f b) = if b = c then 1 else 0 := fun c => by rw [formV_symm, hfe]
+    have h4 : ∀ d, formV (e d) (f' a) = if a = d then 1 else 0 := fun d => by rw [formV_symm, hf'e]
     rw [h1, h2]
     simp only [h3, h4, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     have hQ : Q b a = Q a b := formV_symm _ _

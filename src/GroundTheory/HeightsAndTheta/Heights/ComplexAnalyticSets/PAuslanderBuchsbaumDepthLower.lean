@@ -23,20 +23,23 @@ noncomputable abbrev residueModule (R : Type u) [CommRing R] [IsLocalRing R] : M
 instance (R : Type u) [CommRing R] [IsLocalRing R] : Module.Finite R (residueModule R) :=
   Module.Finite.equiv (Shrink.linearEquiv R (R ⧸ maximalIdeal R)).symm
 
-theorem support_residueModule :
-    Module.support R (residueModule R) = PrimeSpectrum.zeroLocus (maximalIdeal R) := by
+theorem support_residueModule
+    : Module.support R (residueModule R) = PrimeSpectrum.zeroLocus (maximalIdeal R) := by
   rw [(Shrink.linearEquiv R _).support_eq, Module.support_eq_zeroLocus, Ideal.annihilator_quotient]
 
-theorem maximalIdeal_smul_top_lt_top (M : Type u) [AddCommGroup M] [Module R M] [Module.Finite R M]
-    [Nontrivial M] : maximalIdeal R • (⊤ : Submodule R M) < ⊤ := by
+theorem maximalIdeal_smul_top_lt_top
+    (M : Type u) [AddCommGroup M] [Module R M] [Module.Finite R M] [Nontrivial M]
+    : maximalIdeal R • (⊤ : Submodule R M) < ⊤ := by
   refine (Submodule.top_ne_ideal_smul_of_le_jacobson_annihilator ?_).symm.lt_top
   have H : Module.annihilator R M ≠ ⊤ := fun h =>
     not_subsingleton M (Module.annihilator_eq_top_iff.mp h)
   rw [IsLocalRing.jacobson_eq_maximalIdeal _ H]
 
-theorem subsingleton_ext_of_flat [IsNoetherianRing R] (rs : List R) (hmem : ∀ r ∈ rs, r ∈ maximalIdeal R)
-    (hrs : IsWeaklyRegular R rs) (P : ModuleCat.{u} R) [Module.Finite R P] [Module.Flat R P] :
-    ∀ i < rs.length, Subsingleton (Ext (residueModule R) P i) := by
+theorem subsingleton_ext_of_flat
+    [IsNoetherianRing R]
+    (rs : List R) (hmem : ∀ r ∈ rs, r ∈ maximalIdeal R) (hrs : IsWeaklyRegular R rs)
+    (P : ModuleCat.{u} R) [Module.Finite R P] [Module.Flat R P]
+    : ∀ i < rs.length, Subsingleton (Ext (residueModule R) P i) := by
   intro i hi
   rcases subsingleton_or_nontrivial P with hP | hP
   · have hZ : IsZero P := ModuleCat.isZero_of_subsingleton P
@@ -52,10 +55,13 @@ theorem subsingleton_ext_of_flat [IsNoetherianRing R] (rs : List R) (hmem : ∀ 
     exact ModuleCat.subsingleton_ext_of_exists_isRegular (maximalIdeal R) (residueModule R)
       support_residueModule.le P (maximalIdeal_smul_top_lt_top P) rs hmem hreg' i hi
 
-theorem subsingleton_ext_of_hasProjectiveDimensionLE [IsNoetherianRing R] (rs : List R)
-    (hmem : ∀ r ∈ rs, r ∈ maximalIdeal R) (hrs : IsWeaklyRegular R rs) (ℓ : ℕ) :
-    ∀ (M : ModuleCat.{u} R) [Module.Finite R M], HasProjectiveDimensionLE M ℓ →
-      ∀ i, i + ℓ < rs.length → Subsingleton (Ext (residueModule R) M i) := by
+theorem subsingleton_ext_of_hasProjectiveDimensionLE
+    [IsNoetherianRing R]
+    (rs : List R) (hmem : ∀ r ∈ rs, r ∈ maximalIdeal R) (hrs : IsWeaklyRegular R rs)
+    (ℓ : ℕ)
+    : ∀ (M : ModuleCat.{u} R) [Module.Finite R M],
+      HasProjectiveDimensionLE M ℓ
+        → ∀ i, i + ℓ < rs.length → Subsingleton (Ext (residueModule R) M i) := by
   induction ℓ with
   | zero =>
     intro M _ hM i hi
@@ -82,13 +88,14 @@ end AuslanderBuchsbaumDepthLower
 
 theorem AuslanderBuchsbaumDepthLower.proof : AuslanderBuchsbaumDepthLower.Statement.{u} := by
   intro R _ _ _ M _ _ _ _ ℓ rs hpd hmem hrs
-  obtain ⟨ms, hlen, hms, hreg⟩ := ModuleCat.exists_isRegular_of_exists_subsingleton_ext
-    (maximalIdeal R) (rs.length - ℓ) (ModuleCat.of R M)
-    (AuslanderBuchsbaumDepthLower.maximalIdeal_smul_top_lt_top M)
-    (AuslanderBuchsbaumDepthLower.residueModule R)
-    AuslanderBuchsbaumDepthLower.support_residueModule
-    (fun i hi => AuslanderBuchsbaumDepthLower.subsingleton_ext_of_hasProjectiveDimensionLE rs hmem hrs ℓ
-      (ModuleCat.of R M) hpd i (by omega))
+  obtain ⟨ms, hlen, hms, hreg⟩ :=
+    ModuleCat.exists_isRegular_of_exists_subsingleton_ext (maximalIdeal R) (rs.length - ℓ)
+      (ModuleCat.of R M) (AuslanderBuchsbaumDepthLower.maximalIdeal_smul_top_lt_top M)
+      (AuslanderBuchsbaumDepthLower.residueModule R)
+      AuslanderBuchsbaumDepthLower.support_residueModule
+      (fun i hi =>
+        AuslanderBuchsbaumDepthLower.subsingleton_ext_of_hasProjectiveDimensionLE rs hmem hrs ℓ
+          (ModuleCat.of R M) hpd i (by omega))
   exact ⟨ms, hms, hreg.toIsWeaklyRegular, hlen⟩
 
 end GroundTheory.Heights₂.Heights

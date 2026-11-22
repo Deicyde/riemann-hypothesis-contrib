@@ -13,9 +13,11 @@ namespace Formalism.L2.SG.Pf.StabilizerIndexVolumes
 
 variable {K : Type*} [Field K]
 
-def antiB (t : K) (s : ℕ) : Matrix (Fin s) (Fin s) K := fun i j => if i.val + j.val + 1 = s then t else 0
+def antiB (t : K) (s : ℕ) : Matrix (Fin s) (Fin s) K := fun i j =>
+  if i.val + j.val + 1 = s then t else 0
 
-theorem antiB_sq (t : K) (s : ℕ) : antiB t s * antiB t s = (t * t) • (1 : Matrix (Fin s) (Fin s) K) := by
+theorem antiB_sq (t : K) (s : ℕ)
+    : antiB t s * antiB t s = (t * t) • (1 : Matrix (Fin s) (Fin s) K) := by
   ext i k
   have hi := i.isLt
   have hk := k.isLt
@@ -37,13 +39,16 @@ theorem antiB_sq (t : K) (s : ℕ) : antiB t s * antiB t s = (t * t) • (1 : Ma
 theorem antiB_det (t : K) (ht : t ≠ 0) (s : ℕ) : (antiB t s).det ≠ 0 := by
   intro h
   have h2 := congrArg Matrix.det (antiB_sq t s)
-  rw [Matrix.det_mul, h, zero_mul, Matrix.det_smul, Matrix.det_one, mul_one,
-    Fintype.card_fin] at h2
+  rw [Matrix.det_mul, h, zero_mul, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin] at h2
   exact pow_ne_zero s (mul_ne_zero ht ht) h2.symm
 
-private theorem det_ptEntry_ne_zero_of_blocks : ∀ (bs : List (K × ℕ)), (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) →
-    ∀ (n : ℕ), (bs.map Prod.snd).sum = n →
-    (Matrix.of fun (a b : Fin n) => Formalism.MainNotions.S.ptEntry bs a.val b.val).det ≠ 0 := fun
+private theorem det_ptEntry_ne_zero_of_blocks
+    : ∀ (bs : List (K × ℕ)),
+      (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2)
+        → ∀ (n : ℕ),
+          (bs.map Prod.snd).sum = n
+            → (Matrix.of fun (a b : Fin n) => Formalism.MainNotions.S.ptEntry bs a.val b.val).det
+              ≠ 0 := fun
   | [], _, n, hn => by
     simp only [List.map_nil, List.sum_nil] at hn
     subst hn
@@ -55,10 +60,13 @@ private theorem det_ptEntry_ne_zero_of_blocks : ∀ (bs : List (K × ℕ)), (∀
     have ht : t ≠ 0 := (hb (t, s) (List.mem_cons_self ..)).1
     have hrest : ∀ b ∈ rest, b.1 ≠ 0 ∧ 1 ≤ b.2 := fun b hb' => hb b (List.mem_cons_of_mem _ hb')
     have ih := det_ptEntry_ne_zero_of_blocks rest hrest _ rfl
-    have hM : (Matrix.of fun (a b : Fin (s + (rest.map Prod.snd).sum)) =>
-        Formalism.MainNotions.S.ptEntry ((t, s) :: rest) a.val b.val).submatrix finSumFinEquiv finSumFinEquiv =
-        Matrix.fromBlocks (antiB t s) 0 0
-          (Matrix.of fun (a b : Fin (rest.map Prod.snd).sum) => Formalism.MainNotions.S.ptEntry rest a.val b.val) := by
+    have hM
+        : (Matrix.of fun (a b : Fin (s + (rest.map Prod.snd).sum)) =>
+              Formalism.MainNotions.S.ptEntry ((t, s) :: rest) a.val b.val).submatrix finSumFinEquiv
+            finSumFinEquiv
+          = Matrix.fromBlocks (antiB t s) 0 0
+            (Matrix.of fun (a b : Fin (rest.map Prod.snd).sum) =>
+              Formalism.MainNotions.S.ptEntry rest a.val b.val) := by
       ext (i | i) (j | j)
       all_goals
         have hi := i.isLt
@@ -71,11 +79,13 @@ private theorem det_ptEntry_ne_zero_of_blocks : ∀ (bs : List (K × ℕ)), (∀
     rw [← Matrix.det_submatrix_equiv_self finSumFinEquiv, hM, Matrix.det_fromBlocks_zero₂₁]
     exact mul_ne_zero (antiB_det t ht s) ih
 
-theorem ptMat_det {n : ℕ} (w : Formalism.MainNotions.S.Point K n) : (Formalism.MainNotions.S.ptMat w).det ≠ 0 := by
+theorem ptMat_det {n : ℕ} (w : Formalism.MainNotions.S.Point K n)
+    : (Formalism.MainNotions.S.ptMat w).det ≠ 0 := by
   have h := det_ptEntry_ne_zero_of_blocks w.1 w.2.1 n w.2.2
   exact h
 
-theorem ptMat_isUnit {n : ℕ} (w : Formalism.MainNotions.S.Point K n) : IsUnit (Formalism.MainNotions.S.ptMat w).det :=
+theorem ptMat_isUnit {n : ℕ} (w : Formalism.MainNotions.S.Point K n)
+    : IsUnit (Formalism.MainNotions.S.ptMat w).det :=
   isUnit_iff_ne_zero.mpr (ptMat_det w)
 
 end Formalism.L2.SG.Pf.StabilizerIndexVolumes

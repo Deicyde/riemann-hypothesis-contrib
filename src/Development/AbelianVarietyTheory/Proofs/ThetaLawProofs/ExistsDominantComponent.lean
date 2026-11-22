@@ -12,18 +12,22 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyPow GlobalTheory.KeyKa
 
 namespace GlobalTheory.KeyCx
 
-
 open TensorProduct in
-theorem exists_dominant_component :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [Algebra.FiniteType ℤ R] (g : R →+* ℂ), ∃ (E : Type) (_ : CommRing E) (_ : IsDomain E) (_ : Algebra ℂ E) (ρ : R →+* E) (e : E →ₐ[ℂ] ℂ), Algebra.FiniteType ℂ E ∧ Function.Injective ρ ∧ e.toRingHom.comp ρ = g := by
+theorem exists_dominant_component
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [Algebra.FiniteType ℤ R] (g : R →+* ℂ),
+      ∃ (E : Type) (_ : CommRing E) (_ : IsDomain E) (_ : Algebra ℂ E) (ρ : R →+* E)
+          (e : E →ₐ[ℂ] ℂ),
+        Algebra.FiniteType ℂ E ∧ Function.Injective ρ ∧ e.toRingHom.comp ρ = g := by
   intro R _ _ _ g
   letI : Algebra R (ℂ ⊗[ℤ] R) := Algebra.TensorProduct.rightAlgebra
   haveI : Module.Flat R (ℂ ⊗[ℤ] R) :=
@@ -36,15 +40,22 @@ theorem exists_dominant_component :
     simp [e₀]
   let Q : Ideal (ℂ ⊗[ℤ] R) := RingHom.ker e₀.toRingHom
   haveI : Q.IsPrime := RingHom.ker_isPrime _
-  obtain ⟨q, hqQ, hq, hlo⟩ := Ideal.exists_ideal_le_liesOver_of_le
-    (p := (⊥ : Ideal R)) (q := Q.under R) Q bot_le
-  refine ⟨(ℂ ⊗[ℤ] R) ⧸ q, inferInstance, inferInstance, inferInstance,
+  obtain ⟨q, hqQ, hq, hlo⟩ :=
+    Ideal.exists_ideal_le_liesOver_of_le (p := (⊥ : Ideal R)) (q := Q.under R) Q bot_le
+  refine ⟨
+    (ℂ ⊗[ℤ] R) ⧸ q,
+    inferInstance,
+    inferInstance,
+    inferInstance,
     (Ideal.Quotient.mk q).comp (algebraMap R _),
-    Ideal.Quotient.liftₐ q e₀ (fun a ha => hqQ ha), inferInstance, ?_, ?_⟩
+    Ideal.Quotient.liftₐ q e₀ (fun a ha => hqQ ha),
+    inferInstance,
+    ?_,
+    ?_
+  ⟩
   · rw [injective_iff_map_eq_zero]
     intro r hr
-    have h1 : r ∈ q.under R :=
-      Ideal.mem_comap.mpr (Ideal.Quotient.eq_zero_iff_mem.mp hr)
+    have h1 : r ∈ q.under R := Ideal.mem_comap.mpr (Ideal.Quotient.eq_zero_iff_mem.mp hr)
     rw [← hlo.over] at h1
     exact h1
   · ext r

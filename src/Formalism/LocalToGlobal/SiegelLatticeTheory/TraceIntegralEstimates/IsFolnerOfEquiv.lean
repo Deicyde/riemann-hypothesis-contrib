@@ -16,13 +16,15 @@ namespace Formalism.L2.S.Pv.FolnerT
 
 open Formalism.L2.SG.Pf.EnergyAbs
 
-variable {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [SecondCountableTopology G]
-  [MeasurableSpace G] [BorelSpace G]
-  [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [T2Space H] [SecondCountableTopology H]
-  [MeasurableSpace H] [BorelSpace H]
+variable
+  {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [Group H] [TopologicalSpace H]
+  [IsTopologicalGroup H] [T2Space H] [SecondCountableTopology H] [MeasurableSpace H] [BorelSpace H]
 
-theorem isHaarSub_comap (Φ : G ≃* H) (hΦ : Continuous Φ) (hΦ' : Continuous Φ.symm) {S : Set H} {μ : Measure H}
-    (hμ : IsHaarSub S μ) : IsHaarSub (Φ ⁻¹' S) (μ.map Φ.symm) := by
+theorem isHaarSub_comap
+    (Φ : G ≃* H) (hΦ : Continuous Φ) (hΦ' : Continuous Φ.symm)
+    {S : Set H} {μ : Measure H} (hμ : IsHaarSub S μ)
+    : IsHaarSub (Φ ⁻¹' S) (μ.map Φ.symm) := by
   obtain ⟨hC, h1, hm, hi, hσ, h0, hc, hl, hK, hr, hinv⟩ := hμ
   have hs : Measurable Φ.symm := hΦ'.measurable
   let E : G ≃ₜ H := { Φ.toEquiv with continuous_toFun := hΦ, continuous_invFun := hΦ' }
@@ -44,11 +46,13 @@ theorem isHaarSub_comap (Φ : G ≃* H) (hΦ : Continuous Φ) (hΦ' : Continuous
   · haveI := hσ
     show SigmaFinite (μ.map M.symm)
     first
-      | exact M.symm.sigmaFinite_map
-      | exact MeasurableEquiv.sigmaFinite_map M.symm
-      | (refine SigmaFinite.of_map _ M.measurable.aemeasurable ?_
-         rw [Measure.map_map M.measurable M.symm.measurable, M.self_comp_symm, Measure.map_id]
-         exact hσ)
+    | exact M.symm.sigmaFinite_map
+    | exact MeasurableEquiv.sigmaFinite_map M.symm
+    | (
+        refine SigmaFinite.of_map _ M.measurable.aemeasurable ?_
+        rw [Measure.map_map M.measurable M.symm.measurable, M.self_comp_symm, Measure.map_id]
+        exact hσ
+      )
   · intro h
     exact h0 ((Measure.map_eq_zero_iff hs.aemeasurable).1 h)
   · rw [hmap]
@@ -76,8 +80,10 @@ theorem isHaarSub_comap (Φ : G ≃* H) (hΦ : Continuous Φ) (hΦ' : Continuous
       simp
     rw [e1, ← Measure.map_map hs continuous_inv.measurable, hinv]
 
-theorem isFolner_of_equiv (Φ : G ≃* H) (hΦ : Continuous Φ) (hΦ' : Continuous Φ.symm) {S : Set H} {μ : Measure H}
-    (hμ : IsHaarSub S μ) (hF : IsFolner (Φ ⁻¹' S) (μ.map Φ.symm)) : IsFolner S μ := by
+theorem isFolner_of_equiv
+    (Φ : G ≃* H) (hΦ : Continuous Φ) (hΦ' : Continuous Φ.symm)
+    {S : Set H} {μ : Measure H} (hμ : IsHaarSub S μ) (hF : IsFolner (Φ ⁻¹' S) (μ.map Φ.symm))
+    : IsFolner S μ := by
   have hs : Measurable Φ.symm := hΦ'.measurable
   let E : G ≃ₜ H := { Φ.toEquiv with continuous_toFun := hΦ, continuous_invFun := hΦ' }
   let M : G ≃ᵐ H := E.toMeasurableEquiv
@@ -94,8 +100,9 @@ theorem isFolner_of_equiv (Φ : G ≃* H) (hΦ : Continuous Φ) (hΦ' : Continuo
     exact hpos
   · rw [← hmap]
     exact hfin
-  · have hset : {t | t ∈ ⇑Φ.symm ⁻¹' Ω ∧ ∀ k ∈ K, k * t ∈ ⇑Φ.symm ⁻¹' Ω} =
-        ⇑Φ.symm ⁻¹' {t | t ∈ Ω ∧ ∀ k ∈ ⇑Φ ⁻¹' K, k * t ∈ Ω} := by
+  · have hset
+        : {t | t ∈ ⇑Φ.symm ⁻¹' Ω ∧ ∀ k ∈ K, k * t ∈ ⇑Φ.symm ⁻¹' Ω}
+          = ⇑Φ.symm ⁻¹' {t | t ∈ Ω ∧ ∀ k ∈ ⇑Φ ⁻¹' K, k * t ∈ Ω} := by
       ext t
       simp only [Set.mem_setOf_eq, Set.mem_preimage, map_mul]
       constructor

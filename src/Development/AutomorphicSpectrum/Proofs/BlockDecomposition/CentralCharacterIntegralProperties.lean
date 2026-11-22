@@ -8,8 +8,10 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.CuspidalContinui
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Filter Topology
-open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.GodementSection (localChar adeleAt glAt restrictedTensor2 godementSection archSection partialLFunction modPow)
+open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.GodementSection
+  (localChar adeleAt glAt restrictedTensor2 godementSection archSection partialLFunction modPow)
 open GroundTheory.Automorphic.GL2Classical (realEmb realPart Gamma0Level archLift)
 open GroundTheory.Automorphic.Reduction (finAt infAt maxCompact)
 open GroundTheory.Automorphic.GLnLocal (integralGL)
@@ -24,14 +26,13 @@ theorem countable_range : Countable (AdelicGLn.diagonal ℚ 2).range := by
   exact (Set.countable_range (AdelicGLn.diagonal ℚ 2)).to_subtype
 
 theorem md_pos (a : Jd) : 0 < md a := (IdeleGroup.ideleModule ℚ a).2
-theorem md_mul (a b : Jd) : md (a * b) = md a * md b := by
-  simp [md, map_mul]
+theorem md_mul (a b : Jd) : md (a * b) = md a * md b := by simp [md, map_mul]
 theorem md_one : md 1 = 1 := by simp [md]
-theorem continuous_md : Continuous md := continuous_subtype_val.comp IdeleGroup.continuous_ideleModule
+theorem continuous_md : Continuous md :=
+  continuous_subtype_val.comp IdeleGroup.continuous_ideleModule
 theorem continuous_Dt : Continuous Dt := continuous_md.comp (AdelicGLn.continuous_det ℚ 2)
 theorem Dt_pos (g : G2) : 0 < Dt g := md_pos _
-theorem Dt_mul (g h : G2) : Dt (g * h) = Dt g * Dt h := by
-  simp [Dt, map_mul, md_mul]
+theorem Dt_mul (g h : G2) : Dt (g * h) = Dt g * Dt h := by simp [Dt, map_mul, md_mul]
 theorem Dt_inv (g : G2) : Dt g⁻¹ = (Dt g)⁻¹ := by
   have := Dt_mul g g⁻¹
   have h1 : Dt (1 : G2) = 1 := by simp [Dt, md_one]
@@ -61,8 +62,7 @@ theorem exists_ne_one {η : HeckeCharacter ℚ} (h : η ≠ 1) : ∃ z : Jd, η.
 open scoped Pointwise
 
 theorem measurableSet_band : MeasurableSet band := by
-  have : band = Dt ⁻¹' Set.Ico 1 2 := by
-    ext g; simp [band]
+  have : band = Dt ⁻¹' Set.Ico 1 2 := by ext g; simp [band]
   rw [this]
   exact continuous_Dt.measurable measurableSet_Ico
 
@@ -82,14 +82,13 @@ theorem fundamental_domain_integral_central_vanishing : Ad3.R.G1a → Ad3.R.G1 :
     · rw [Set.indicator_of_mem hg, Set.indicator_of_mem (mem_band_dia.2 hg), hL]
     · rw [Set.indicator_of_notMem hg, Set.indicator_of_notMem (fun h => hg (mem_band_dia.1 h))]
   have hIndM : Measurable (band.indicator F) := Fm.indicator hbM
-  have hI : ∀ f : G2 → ℂ, ∫ g in 𝓕 ∩ band, f g ∂μ = ∫ g in 𝓕, band.indicator f g ∂μ :=
-    fun f => (setIntegral_indicator hbM).symm
+  have hI : ∀ f : G2 → ℂ, ∫ g in 𝓕 ∩ band, f g ∂μ = ∫ g in 𝓕, band.indicator f g ∂μ := fun f =>
+    (setIntegral_indicator hbM).symm
   refine ⟨?_, ?_, ?_⟩
   · intro hC h
     obtain ⟨z, hz1, -⟩ := hz (Dt h)⁻¹ (inv_pos.2 (Dt_pos h))
     set Bh : Set G2 := {g | g * h⁻¹ ∈ band} with hBh
-    have hBhM : MeasurableSet Bh :=
-      hbM.preimage (continuous_id.mul continuous_const).measurable
+    have hBhM : MeasurableSet Bh := hbM.preimage (continuous_id.mul continuous_const).measurable
     have hBhL : LInv (Bh.indicator F) := by
       intro γ g
       have hm : dia2 γ * g ∈ Bh ↔ g ∈ Bh := by
@@ -145,7 +144,8 @@ theorem fundamental_domain_integral_central_vanishing : Ad3.R.G1a → Ad3.R.G1 :
     exact (mul_eq_zero.1 this).resolve_left (sub_ne_zero.2 hηz')
   · intro hC hne hI0
     apply hne
-    have hn : ∀ g, F g * conj (F g) = ((Complex.normSq (F g) : ℝ) : ℂ) := fun g => Complex.mul_conj _
+    have hn : ∀ g, F g * conj (F g) = ((Complex.normSq (F g) : ℝ) : ℂ) := fun g =>
+      Complex.mul_conj _
     simp_rw [hn] at hI0
     rw [integral_complex_ofReal] at hI0
     have hI1 : ∫ g in 𝓕 ∩ band, Complex.normSq (F g) ∂μ = 0 := by exact_mod_cast hI0
@@ -157,8 +157,9 @@ theorem fundamental_domain_integral_central_vanishing : Ad3.R.G1a → Ad3.R.G1 :
       refine Eventually.of_forall fun g => ?_
       rw [Real.norm_of_nonneg (Complex.normSq_nonneg _), Complex.normSq_eq_norm_sq]
       exact pow_le_pow_left₀ (norm_nonneg _) (hCb g) 2
-    have hae := (setIntegral_eq_zero_iff_of_nonneg_ae
-      (Eventually.of_forall fun g => Complex.normSq_nonneg (F g)) hint).1 hI1
+    have hae :=
+      (setIntegral_eq_zero_iff_of_nonneg_ae
+        (Eventually.of_forall fun g => Complex.normSq_nonneg (F g)) hint).1 hI1
     set t : Set G2 := band ∩ {g | F g ≠ 0} with ht
     have h0 : μ (t ∩ 𝓕) = 0 := by
       have h1 := (ae_iff.1 ((ae_restrict_iff' hmeas).1 hae))
@@ -183,8 +184,9 @@ theorem fundamental_domain_integral_central_vanishing : Ad3.R.G1a → Ad3.R.G1 :
     have hUo : IsOpen U := by
       refine (isOpen_lt continuous_const continuous_Dt).inter
         ((isOpen_lt continuous_Dt continuous_const).inter (isOpen_ne_fun hF continuous_const))
-    have hU0 : U = ∅ := hUo.eq_empty_of_measure_zero
-      (measure_mono_null (show U ⊆ t from fun g hg => ⟨⟨hg.1.le, hg.2.1⟩, hg.2.2⟩) hμt)
+    have hU0 : U = ∅ :=
+      hUo.eq_empty_of_measure_zero (measure_mono_null
+        (show U ⊆ t from fun g hg => ⟨⟨hg.1.le, hg.2.1⟩, hg.2.2⟩) hμt)
     funext g
     by_contra hg
     obtain ⟨z, hz1, -⟩ := hz (3 / 2 / Dt g) (div_pos (by norm_num) (Dt_pos g))

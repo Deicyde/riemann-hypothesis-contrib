@@ -13,15 +13,19 @@ namespace PI.LocHaarRRW
 
 section None
 
-variable {K V : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K V : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   [CharZero K] [CommRing V] [Algebra K V]
 
-theorem key_bound [Nontrivial V] [Module.Finite K V] {θ : V} {d : K}
+theorem key_bound
+    [Nontrivial V] [Module.Finite K V]
+    {θ : V} {d : K}
     (hθr : θ ∉ (algebraMap K V).range) (hθ : θ * θ = algebraMap K V d) (hdO : d ∈ 𝒪[K])
-    {a b : K} (hx : IsIntegral 𝒪[K] (algebraMap K V a + algebraMap K V b * θ)) :
-    2 * a ∈ 𝒪[K] ∧ 2 * b * d ∈ 𝒪[K] := by
-  obtain ⟨hxi, hx'⟩ : IsIntegral 𝒪[K] (algebraMap K V a + algebraMap K V b * θ) ∧
-      IsIntegral 𝒪[K] (algebraMap K V a - algebraMap K V b * θ) := by
+    {a b : K} (hx : IsIntegral 𝒪[K] (algebraMap K V a + algebraMap K V b * θ))
+    : 2 * a ∈ 𝒪[K] ∧ 2 * b * d ∈ 𝒪[K] := by
+  obtain ⟨hxi, hx'⟩
+      : IsIntegral 𝒪[K] (algebraMap K V a + algebraMap K V b * θ)
+        ∧ IsIntegral 𝒪[K] (algebraMap K V a - algebraMap K V b * θ) := by
     refine ⟨hx, ?_⟩
     by_cases hb : b = 0
     · subst hb
@@ -29,13 +33,17 @@ theorem key_bound [Nontrivial V] [Module.Finite K V] {θ : V} {d : K}
     · obtain ⟨p, hpm, hp⟩ := hx
       have hqm : ((X - C a) ^ 2 - C (b ^ 2 * d) : K[X]).Monic := by monicity!
       have hqd : ((X - C a) ^ 2 - C (b ^ 2 * d) : K[X]).natDegree = 2 := by compute_degree!
-      have hQx : ∀ y : V, (y - algebraMap K V a) ^ 2 = algebraMap K V (b ^ 2 * d) →
-          aeval y ((X - C a) ^ 2 - C (b ^ 2 * d) : K[X]) = 0 := by
+      have hQx
+          : ∀ y : V,
+            (y - algebraMap K V a) ^ 2 = algebraMap K V (b ^ 2 * d)
+              → aeval y ((X - C a) ^ 2 - C (b ^ 2 * d) : K[X]) = 0 := by
         intro y hy
         simp only [map_sub, map_pow, aeval_X, aeval_C, hy, sub_self]
       generalize ((X - C a) ^ 2 - C (b ^ 2 * d) : K[X]) = Q at hqm hqd hQx
-      have e : ∀ y : V, aeval y (p.map (algebraMap 𝒪[K] K)) = eval₂ (algebraMap 𝒪[K] V) y p :=
-        fun y => by rw [aeval_map_algebraMap, aeval_def]
+      have e
+          : ∀ y : V,
+            aeval y (p.map (algebraMap 𝒪[K] K)) = eval₂ (algebraMap 𝒪[K] V) y p := fun y => by
+        rw [aeval_map_algebraMap, aeval_def]
       generalize p.map (algebraMap 𝒪[K] K) = P at e
       have key : ∀ y : V, aeval y Q = 0 → aeval y P = aeval y (P %ₘ Q) := by
         intro y hy
@@ -49,11 +57,13 @@ theorem key_bound [Nontrivial V] [Module.Finite K V] {θ : V} {d : K}
         omega
       generalize P %ₘ Q = r at key hrd
       have hr := eq_X_add_C_of_natDegree_le_one hrd
-      have hx1 : (algebraMap K V a + algebraMap K V b * θ - algebraMap K V a) ^ 2 =
-          algebraMap K V (b ^ 2 * d) := by
+      have hx1
+          : (algebraMap K V a + algebraMap K V b * θ - algebraMap K V a) ^ 2
+            = algebraMap K V (b ^ 2 * d) := by
         rw [map_mul, map_pow, ← hθ]; ring
-      have hx2 : (algebraMap K V a - algebraMap K V b * θ - algebraMap K V a) ^ 2 =
-          algebraMap K V (b ^ 2 * d) := by
+      have hx2
+          : (algebraMap K V a - algebraMap K V b * θ - algebraMap K V a) ^ 2
+            = algebraMap K V (b ^ 2 * d) := by
         rw [map_mul, map_pow, ← hθ]; ring
       have hrx : aeval (algebraMap K V a + algebraMap K V b * θ) r = 0 := by
         rw [← key _ (hQx _ hx1), e]
@@ -64,8 +74,9 @@ theorem key_bound [Nontrivial V] [Module.Finite K V] {θ : V} {d : K}
         by_contra hw
         apply hθr
         have hwb : r.coeff 1 * b ≠ 0 := mul_ne_zero hw hb
-        have hinv : algebraMap K V (r.coeff 1 * b)⁻¹ *
-            (algebraMap K V (r.coeff 1) * algebraMap K V b) = 1 := by
+        have hinv
+            : algebraMap K V (r.coeff 1 * b)⁻¹ * (algebraMap K V (r.coeff 1) * algebraMap K V b)
+              = 1 := by
           rw [← map_mul, ← map_mul, inv_mul_cancel₀ hwb, map_one]
         refine ⟨-(r.coeff 1 * a + r.coeff 0) * (r.coeff 1 * b)⁻¹, ?_⟩
         rw [map_mul, map_neg, map_add (f := _), map_mul]
@@ -81,21 +92,27 @@ theorem key_bound [Nontrivial V] [Module.Finite K V] {θ : V} {d : K}
     refine IsIntegral.of_pow (n := 2) (by norm_num) ?_
     rw [pow_two, hθ]
     exact integral_V_of_memO hdO
-  have hA : algebraMap K V (2 * a) = (algebraMap K V a + algebraMap K V b * θ) +
-      (algebraMap K V a - algebraMap K V b * θ) := by
+  have hA
+      : algebraMap K V (2 * a)
+        = (algebraMap K V a + algebraMap K V b * θ)
+          + (algebraMap K V a - algebraMap K V b * θ) := by
     rw [map_mul, map_ofNat]; ring
-  have hB : algebraMap K V (2 * b * d) = (algebraMap K V a + algebraMap K V b * θ) * θ +
-      (algebraMap K V a - algebraMap K V b * θ) * (-θ) := by
+  have hB
+      : algebraMap K V (2 * b * d)
+        = (algebraMap K V a + algebraMap K V b * θ) * θ
+          + (algebraMap K V a - algebraMap K V b * θ) * (-θ) := by
     rw [map_mul, map_mul, map_ofNat]
     linear_combination (-2 * algebraMap K V b) * hθ
   refine ⟨memO_of_integral_V (V := V) ?_, memO_of_integral_V (V := V) ?_⟩
   · rw [hA]; exact hxi.add hx'
   · rw [hB]; exact (hxi.mul hθi).add (hx'.mul hθi.neg)
 
-theorem integral_mem_nhds_and_subset_compact_of_finrank_two [Module.Free K V] (hr : Module.finrank K V = 2) [IsReduced V]
-    [TopologicalSpace V] [IsModuleTopology K V]
-    (O : Subring V) (hO : ∀ x, x ∈ O ↔ IsIntegral 𝒪[K] x) :
-    ∃ _ : K × K ≃ₜ V, (O : Set V) ∈ 𝓝 (0 : V) ∧ ∃ C : Set V, IsCompact C ∧ (O : Set V) ⊆ C := by
+theorem integral_mem_nhds_and_subset_compact_of_finrank_two
+    [Module.Free K V]
+    (hr : Module.finrank K V = 2)
+    [IsReduced V] [TopologicalSpace V] [IsModuleTopology K V]
+    (O : Subring V) (hO : ∀ x, x ∈ O ↔ IsIntegral 𝒪[K] x)
+    : ∃ _ : K × K ≃ₜ V, (O : Set V) ∈ 𝓝 (0 : V) ∧ ∃ C : Set V, IsCompact C ∧ (O : Set V) ⊆ C := by
   classical
   obtain ⟨θ, d, hθr, hθ, hd0, hdO⟩ := exists_sq (K := K) (V := V) hr
   haveI : Module.Finite K V := Module.finite_of_finrank_pos (by rw [hr]; norm_num)
@@ -130,16 +147,18 @@ theorem integral_mem_nhds_and_subset_compact_of_finrank_two [Module.Free K V] (h
     have : Module.finrank K (K × K) = Module.finrank K V := by
       rw [Module.finrank_prod, Module.finrank_self, hr]
     exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank this).mp hinj
-  obtain ⟨e, he⟩ : ∃ e : (K × K) ≃ₗ[K] V,
-      ∀ p, e p = algebraMap K V p.1 + algebraMap K V p.2 * θ :=
+  obtain ⟨e, he⟩ : ∃ e : (K × K) ≃ₗ[K] V, ∀ p, e p = algebraMap K V p.1 + algebraMap K V p.2 * θ :=
     ⟨LinearEquiv.ofBijective L (show Function.Bijective L from ⟨hinj, hsurj⟩), fun p => hL p⟩
   haveI : ContinuousAdd V := IsModuleTopology.toContinuousAdd (R := K) (A := V)
   haveI : ContinuousSMul K V := IsModuleTopology.toContinuousSMul (R := K) (A := V)
-  obtain ⟨h, hh⟩ : ∃ h : K × K ≃ₜ V, ∀ p, h p = e p :=
-    ⟨{ toEquiv := e.toEquiv
-       continuous_toFun := IsModuleTopology.continuous_of_linearMap e.toLinearMap
-       continuous_invFun := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap },
-     fun _ => rfl⟩
+  obtain ⟨h, hh⟩ : ∃ h : K × K ≃ₜ V, ∀ p, h p = e p := ⟨
+    {
+      toEquiv := e.toEquiv
+      continuous_toFun := IsModuleTopology.continuous_of_linearMap e.toLinearMap
+      continuous_invFun := IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap
+    },
+    fun _ => rfl
+  ⟩
   refine ⟨h, ?_, ?_⟩
   · have hsub : h '' ((𝒪[K] : Set K) ×ˢ (𝒪[K] : Set K)) ⊆ (O : Set V) := by
       rintro _ ⟨p, ⟨hp1, hp2⟩, rfl⟩
@@ -151,14 +170,18 @@ theorem integral_mem_nhds_and_subset_compact_of_finrank_two [Module.Free K V] (h
     have h0 : (0 : V) ∈ h '' ((𝒪[K] : Set K) ×ˢ (𝒪[K] : Set K)) :=
       ⟨(0, 0), ⟨Subring.zero_mem _, Subring.zero_mem _⟩, by rw [hh]; exact map_zero e⟩
     exact Filter.mem_of_superset (hopen.mem_nhds h0) hsub
-  · refine ⟨h '' ((fun q : K × K => (q.1 * 2⁻¹, q.2 * (2 * d)⁻¹)) ''
-      ((𝒪[K] : Set K) ×ˢ (𝒪[K] : Set K))), ?_, ?_⟩
-    · exact (((isCompact_integer (K := K)).prod (isCompact_integer (K := K))).image
-        (by fun_prop)).image h.continuous
+  · refine ⟨
+      h '' ((fun q : K × K => (q.1 * 2⁻¹, q.2 * (2 * d)⁻¹)) '' ((𝒪[K] : Set K) ×ˢ (𝒪[K] : Set K))),
+      ?_,
+      ?_
+    ⟩
+    · exact
+        (((isCompact_integer (K := K)).prod (isCompact_integer (K := K))).image (by fun_prop)).image
+          h.continuous
     · intro x hx
       have hpx : h (h.symm x) = x := h.apply_symm_apply x
-      have hint : IsIntegral 𝒪[K]
-          (algebraMap K V (h.symm x).1 + algebraMap K V (h.symm x).2 * θ) := by
+      have hint
+          : IsIntegral 𝒪[K] (algebraMap K V (h.symm x).1 + algebraMap K V (h.symm x).2 * θ) := by
         rw [← he, ← hh, hpx]
         exact (hO x).mp hx
       obtain ⟨h1, h2⟩ := key_bound hθr hθ hdO hint

@@ -9,18 +9,24 @@ public import ReciprocityTheory.GroupCohomology.Shapiro
 
 namespace ReciprocityTheory.DiscreteGroups.LocalClassField.Deg2
 
-open ReciprocityTheory.Coh ReciprocityTheory.Coh.InflationRestrictionInvariants ReciprocityTheory.Gal Cx Function
+open ReciprocityTheory.Coh ReciprocityTheory.Coh.InflationRestrictionInvariants
+  ReciprocityTheory.Gal Cx Function
 
 noncomputable section
 
 universe u
 
-variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {R : Type u} [CommRing R]
+  {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
   {G' : Type u} [Group G'] [TopologicalSpace G'] [IsTopologicalGroup G']
 
-theorem pair_bij {M : TRep R G} {M' : TRep R G'} (P : Pair M M') (hφ : IsHomeomorph P.φ)
-    (hu : IsHomeomorph P.u) (n : ℕ) : Bijective (P.hom.H n) := by
-  refine shp_qi_of_bij P.hom (fun n => ⟨hom_f_injective P hφ.surjective hu.injective n, fun t' => ?_⟩) n
+theorem pair_bij
+    {M : TRep R G} {M' : TRep R G'} (P : Pair M M') (hφ : IsHomeomorph P.φ) (hu : IsHomeomorph P.u)
+    (n : ℕ)
+    : Bijective (P.hom.H n) := by
+  refine
+    shp_qi_of_bij P.hom (fun n => ⟨hom_f_injective P hφ.surjective hu.injective n, fun t' => ?_⟩) n
   let eφ := IsHomeomorph.homeomorph _ hφ
   let eu := IsHomeomorph.homeomorph _ hu
   have hc : Continuous fun v : Fin n → G => eu.symm (t'.1 fun i => eφ.symm (v i)) :=
@@ -31,15 +37,18 @@ theorem pair_bij {M : TRep R G} {M' : TRep R G'} (P : Pair M M') (hφ : IsHomeom
   rw [eu.apply_symm_apply]
   exact congrArg t'.1 (funext fun i => eφ.symm_apply_apply (g i))
 
-theorem exists_normal_index {H : Type*} [Group H] [Finite H] [Nontrivial H] (l : ℕ) [hl : Fact l.Prime]
-    (hH : IsPGroup l H) : ∃ N : Subgroup H, N.Normal ∧ N.index = l := by
+theorem exists_normal_index
+    {H : Type*} [Group H] [Finite H] [Nontrivial H] (l : ℕ) [hl : Fact l.Prime] (hH : IsPGroup l H)
+    : ∃ N : Subgroup H, N.Normal ∧ N.index = l := by
   obtain ⟨k, hk⟩ := IsPGroup.iff_card.1 hH
   have hk0 : k ≠ 0 := by
     rintro rfl
     rw [pow_zero] at hk
     exact absurd hk (Finite.one_lt_card (α := H)).ne'
   obtain ⟨j, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hk0
-  obtain ⟨K, hK⟩ := Sylow.exists_subgroup_card_pow_prime (G := H) l (n := j) (by rw [hk]; exact pow_dvd_pow _ (Nat.le_succ j))
+  obtain ⟨K, hK⟩ :=
+    Sylow.exists_subgroup_card_pow_prime (G := H) l (n := j)
+      (by rw [hk]; exact pow_dvd_pow _ (Nat.le_succ j))
   have hidx : K.index = l := by
     have := K.card_mul_index
     rw [hK, hk, pow_succ] at this

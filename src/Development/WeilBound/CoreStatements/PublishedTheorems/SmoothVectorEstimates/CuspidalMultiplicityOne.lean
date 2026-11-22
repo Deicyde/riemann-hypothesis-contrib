@@ -8,6 +8,8 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 
 namespace PositivityTheory.jumpWindows
 
-theorem cuspidalMultiplicityOne : GlobalTheory.Published.CuspidalMultiplicityOne := cuspidal_multiplicity_one PositivityTheory.JacquetShalikaLocal.minuscule_eigenvalue PositivityTheory.JacquetShalikaLocal.satake_eigenvalue_formula
+theorem cuspidalMultiplicityOne : GlobalTheory.Published.CuspidalMultiplicityOne :=
+  cuspidal_multiplicity_one PositivityTheory.JacquetShalikaLocal.minuscule_eigenvalue
+    PositivityTheory.JacquetShalikaLocal.satake_eigenvalue_formula
 
 end PositivityTheory.jumpWindows

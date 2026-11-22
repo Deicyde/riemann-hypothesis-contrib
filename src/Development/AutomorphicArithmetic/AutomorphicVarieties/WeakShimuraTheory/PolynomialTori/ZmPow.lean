@@ -9,7 +9,8 @@ open IsLocalRing UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
 
 section
 
-variable {O : Type} [CommRing O] {Γ : Type} [Group Γ] {R : Type} [CommRing R] [Algebra O R] (ρ : Γ →* M4 R)
+variable
+  {O : Type} [CommRing O] {Γ : Type} [Group Γ] {R : Type} [CommRing R] [Algebra O R] (ρ : Γ →* M4 R)
 
 private lemma zm_one : (1 : R) ∈ Submodule.span O (mono ρ 0) :=
   Submodule.subset_span ⟨[], by simp, by simp⟩
@@ -32,11 +33,14 @@ private lemma zm_pow {v : ℤ × ℤ} {x : R} (hx : x ∈ Submodule.span O (mono
 
 end
 
-theorem UpperTheory.V.Ws.Po.zMono :
-    ∀ (O : Type) [CommRing O] (Γ : Type) [Group Γ] (R : Type) [CommRing R] [Algebra O R] (ρ : Γ →* M4 R) (W : WPres O (ℤ × ℤ) R)
-      (c : Γ → Fin 4 → Fin 4 → O), (∀ g a b, a ≠ b → c g a b = 0) →
-      (∀ i, ∃ g a b, W.z i = ρ g a b - algebraMap O R (c g a b) ∧ W.wt i = wt a b) →
-      ∀ n : W.σ →₀ ℕ, Finsupp.weight W.wt n = 0 → (n.prod fun s k => W.z s ^ k) ∈ Algebra.adjoin O (mono ρ 0) := by
+theorem UpperTheory.V.Ws.Po.zMono
+    : ∀ (O : Type) [CommRing O] (Γ : Type) [Group Γ] (R : Type) [CommRing R] [Algebra O R]
+        (ρ : Γ →* M4 R) (W : WPres O (ℤ × ℤ) R) (c : Γ → Fin 4 → Fin 4 → O),
+      (∀ g a b, a ≠ b → c g a b = 0)
+        → (∀ i, ∃ g a b, W.z i = ρ g a b - algebraMap O R (c g a b) ∧ W.wt i = wt a b)
+        → ∀ n : W.σ →₀ ℕ,
+          Finsupp.weight W.wt n = 0
+            → (n.prod fun s k => W.z s ^ k) ∈ Algebra.adjoin O (mono ρ 0) := by
   intro O _ Γ _ R _ _ ρ W c hc hz n hn
   have hmem : ∀ i, W.z i ∈ Submodule.span O (mono ρ (W.wt i)) := by
     intro i
@@ -51,8 +55,9 @@ theorem UpperTheory.V.Ws.Po.zMono :
     · rw [hc g a b hab, map_zero, sub_zero]
       exact Submodule.subset_span ⟨[(g, a, b)], by simp, by simp⟩
   classical
-  have hall : ∀ t : Finset W.σ,
-      (∏ s ∈ t, W.z s ^ n s) ∈ Submodule.span O (mono ρ (∑ s ∈ t, n s • W.wt s)) := by
+  have hall
+      : ∀ t : Finset W.σ,
+        (∏ s ∈ t, W.z s ^ n s) ∈ Submodule.span O (mono ρ (∑ s ∈ t, n s • W.wt s)) := by
     intro t
     induction t using Finset.induction_on with
     | empty => simpa using zm_one (O := O) ρ

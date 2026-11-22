@@ -6,8 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-theorem UpperTheory.V.FW.sepChar :
-    ∀ (k D A : Type) [Field k] [IsAlgClosed k] [CommGroup D] [Finite D] [CommRing A] [Algebra k A] (ρ : D →* A) (x : A), (Nat.card D : k) ≠ 0 → (∀ (ψ : D →* kˣ) (e : A), (∀ d, ρ d * e = (ψ d : k) • e) → x * e = 0) → x = 0 := by
+theorem UpperTheory.V.FW.sepChar
+    : ∀ (k D A : Type) [Field k] [IsAlgClosed k] [CommGroup D] [Finite D] [CommRing A] [Algebra k A]
+        (ρ : D →* A) (x : A),
+      (Nat.card D : k) ≠ 0 → (∀ (ψ : D →* kˣ) (e : A), (∀ d, ρ d * e = (ψ d : k) • e) → x * e = 0)
+        → x = 0 := by
   intro k D A _ _ _ _ _ _ ρ x hD h
   classical
   letI := Fintype.ofFinite D
@@ -15,7 +18,9 @@ theorem UpperTheory.V.FW.sepChar :
     intro h0
     obtain ⟨c, hc⟩ := Group.exponent_dvd_nat_card (G := D)
     apply hD
-    rw [hc]; push_cast; rw [h0, zero_mul]
+    rw [hc]
+    push_cast
+    rw [h0, zero_mul]
   haveI : NeZero ((Monoid.exponent D : ℕ) : k) := ⟨hexp⟩
   haveI : NeZero (Monoid.exponent D) := ⟨fun h0 => hexp (by rw [h0]; simp)⟩
   haveI : HasEnoughRootsOfUnity k (Monoid.exponent D) := inferInstance
@@ -35,8 +40,10 @@ theorem UpperTheory.V.FW.sepChar :
     rw [mul_inv, mul_inv_cancel_left]
   have h2 : ∀ d : D, d ≠ 1 → ∑ ψ : D →* kˣ, ((ψ d⁻¹ : kˣ) : k) = 0 := by
     intro d hd
-    obtain ⟨φ, hφ⟩ := CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity D k (a := d⁻¹) (inv_ne_one.mpr hd)
-    have e : ∑ ψ : D →* kˣ, ((ψ d⁻¹ : kˣ) : k) = (φ d⁻¹ : k) * ∑ ψ : D →* kˣ, ((ψ d⁻¹ : kˣ) : k) := by
+    obtain ⟨φ, hφ⟩ :=
+      CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity D k (a := d⁻¹) (inv_ne_one.mpr hd)
+    have e
+        : ∑ ψ : D →* kˣ, ((ψ d⁻¹ : kˣ) : k) = (φ d⁻¹ : k) * ∑ ψ : D →* kˣ, ((ψ d⁻¹ : kˣ) : k) := by
       rw [Finset.mul_sum]
       refine (Fintype.sum_equiv (Equiv.mulLeft φ) _ _ ?_).symm
       intro ψ

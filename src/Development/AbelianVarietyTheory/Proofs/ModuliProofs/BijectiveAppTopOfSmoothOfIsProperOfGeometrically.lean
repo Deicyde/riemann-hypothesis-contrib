@@ -10,15 +10,17 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsIsoApp
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
-theorem bijective_appTop_of_smooth_of_isProper_of_geometricallyConnected :
-    ∀ (K : Type) [Field K] (X : Scheme.{0}) (p : X ⟶ Sp K), Smooth p → IsProper p →
-      GeometricallyConnected p → Function.Bijective p.appTop.hom := by
+theorem bijective_appTop_of_smooth_of_isProper_of_geometricallyConnected
+    : ∀ (K : Type) [Field K] (X : Scheme.{0}) (p : X ⟶ Sp K),
+      Smooth p → IsProper p → GeometricallyConnected p → Function.Bijective p.appTop.hom := by
   intro K _ X p hs hp hg
 
   haveI := hs

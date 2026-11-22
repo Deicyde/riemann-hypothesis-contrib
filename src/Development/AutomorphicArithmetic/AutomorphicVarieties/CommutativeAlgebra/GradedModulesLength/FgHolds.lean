@@ -6,10 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Filter Formalism.MainNotions.V.Pf.V2.Calc UpperTheory.V.Alg UpperTheory.V.Alg.M
 
-theorem UpperTheory.V.Alg.M.fg_holds :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (A : Type) [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O), IsWRing 𝒜 x →
-    ∀ j, (oz 𝒜 j).FG := by
+theorem UpperTheory.V.Alg.M.fg_holds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (A : Type) [CommRing A] [Algebra O A]
+        (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O),
+      IsWRing 𝒜 x → ∀ j, (oz 𝒜 j).FG := by
   classical
   intro O _ _ _ _ _ A _ _ 𝒜 _ _ x hx j
   obtain ⟨s, -, hadj⟩ := hx.gen
@@ -17,8 +18,9 @@ theorem UpperTheory.V.Alg.M.fg_holds :
     rw [eq_top_iff]
     intro y _
     have hy : y ∈ Algebra.adjoin O ((𝒜 0 : Set A) ∪ ↑s) := by rw [hadj]; trivial
-    have hle : Algebra.adjoin O ((𝒜 0 : Set A) ∪ ↑s) ≤
-        (Algebra.adjoin (𝒜 0) (s : Set A)).restrictScalars O := by
+    have hle
+        : Algebra.adjoin O ((𝒜 0 : Set A) ∪ ↑s)
+          ≤ (Algebra.adjoin (𝒜 0) (s : Set A)).restrictScalars O := by
       rw [Algebra.adjoin_le_iff]
       rintro z (hz | hz)
       · rw [SetLike.mem_coe, Subalgebra.mem_restrictScalars]

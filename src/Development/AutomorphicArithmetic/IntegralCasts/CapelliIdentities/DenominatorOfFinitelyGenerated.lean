@@ -26,10 +26,10 @@ private lemma UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.den
     obtain ⟨c, hc⟩ := hx
     exact ⟨a * c, by rw [map_mul, hc, Pi.smul_apply, Algebra.smul_def]; ring⟩
 
-theorem UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator :
-    ∀ (I : Formalism.MainNotions.S.AutInst),
-      ∃ (b : NumberField.RingOfIntegers I.E),
-        b ≠ (0 : NumberField.RingOfIntegers I.E) ∧
-          ∀ y ∈ I.L, ∀ (i : Fin I.n), ∃ (c : NumberField.RingOfIntegers I.E), (↑c : I.E) = (↑b : I.E) * y i := by
+theorem UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator
+    : ∀ (I : Formalism.MainNotions.S.AutInst), ∃ (b : NumberField.RingOfIntegers I.E),
+      b ≠ (0 : NumberField.RingOfIntegers I.E)
+        ∧ ∀ y ∈ I.L, ∀ (i : Fin I.n), ∃ (c : NumberField.RingOfIntegers I.E),
+          (↑c : I.E) = (↑b : I.E) * y i := by
   intro I
   exact UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.denom_of_fg I.L I.L_fg

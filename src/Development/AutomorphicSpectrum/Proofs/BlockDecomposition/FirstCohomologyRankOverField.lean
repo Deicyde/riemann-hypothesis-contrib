@@ -7,7 +7,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge
 open scoped CategoryTheory.Obj
 
 set_option autoImplicit false
@@ -18,9 +21,14 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.AbelianFirstCohomologyOverField
 
-theorem vb_of_field (hFlat : FlatBCSt) (hLe : PositivityTheory.ObstructionTrivialLocus.H1StructureDimLe) (hGe : H1DimGeAbelianDim) (k : Type) [Field k]
-    (A : Over (Sp k)) [GrpObj A] (g : ℕ) (hab : IsAbelianScheme A)
-    (hsm : SmoothOfRelativeDimension g A.hom) : VB k (HO1 A.hom) g := by
+theorem vb_of_field
+    (hFlat : FlatBCSt) (hLe : PositivityTheory.ObstructionTrivialLocus.H1StructureDimLe)
+    (hGe : H1DimGeAbelianDim)
+    (k : Type) [Field k]
+    (A : Over (Sp k)) [GrpObj A]
+    (g : ℕ)
+    (hab : IsAbelianScheme A) (hsm : SmoothOfRelativeDimension g A.hom)
+    : VB k (HO1 A.hom) g := by
   let K := AlgebraicClosure k
   have hφ := isGrpPullback_pullback A (spMap (algebraMap k K))
   have hab' := GlobalTheory.PolPull.isAbelianScheme_of_isGrpPullback hab hφ
@@ -39,7 +47,9 @@ theorem vb_of_field (hFlat : FlatBCSt) (hLe : PositivityTheory.ObstructionTrivia
   rw [Module.rankAtStalk_eq_finrank_of_free, hrank]
   rfl
 
-theorem first_cohomology_rank_over_field : FlatBCSt → PositivityTheory.ObstructionTrivialLocus.H1StructureDimLe → H1DimGeAbelianDim → H1StructureFieldDim := by
+theorem first_cohomology_rank_over_field
+    : FlatBCSt → PositivityTheory.ObstructionTrivialLocus.H1StructureDimLe → H1DimGeAbelianDim
+      → H1StructureFieldDim := by
   intro hFlat hLe hGe R _ A _ g hab hsm hR
   letI := hR.toField
   exact vb_of_field hFlat hLe hGe R A g hab hsm

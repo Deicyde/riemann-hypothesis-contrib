@@ -190,9 +190,10 @@ lemma eq_of_lt {s : ℂ} (hs : -(15/8 : ℝ) < s.re) (h1 : s ≠ 1) :
   rw [← hf s h1]
   exact this hs
 
-theorem norm_sub_one_mul_riemannZeta_le :
-    ∃ C : ℝ, 0 < C ∧ ∀ s : ℂ, -(7/4 : ℝ) ≤ s.re → s ≠ 1 →
-      ‖(s - 1) * riemannZeta s‖ ≤ C * (‖s‖ + 2) ^ 5 := by
+theorem norm_sub_one_mul_riemannZeta_le
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ s : ℂ, -(7 / 4 : ℝ) ≤ s.re → s ≠ 1 → ‖(s - 1) * riemannZeta s‖ ≤ C * (‖s‖ + 2) ^ 5 := by
   set K : ℝ := ∑' n : ℕ, ((n : ℝ) + 1) ^ (-(9/8 : ℝ)) with hK
   have hK0 : 0 ≤ K := tsum_nonneg fun n => by positivity
   refine ⟨3 + K, by linarith, fun s hs h1 => ?_⟩
@@ -204,7 +205,8 @@ theorem norm_sub_one_mul_riemannZeta_le :
       (fun n => norm_emE_le (by simp) (by linarith))
   have c0 : ‖1 - s‖ ≤ R := by
     have := norm_sub_le 1 s
-    rw [norm_one] at this; linarith
+    rw [norm_one] at this
+    linarith
   have c1 : ‖1 - s - 1‖ ≤ R := by simp [hR]
   have h3 : ‖emT 1 s‖ ≤ 1 + R / 2 + R * R / 12 := by
     simp only [emT, Complex.ofReal_one, Complex.one_cpow, mul_one]

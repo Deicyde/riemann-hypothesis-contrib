@@ -17,11 +17,14 @@ namespace GlobalTheory.PsCo.PcEF.HarishChandraWeightIntegral
 
 variable {n : ℕ}
 
-theorem card_split (ε : Fin n → Bool) (a : Fin n) :
-    (univ.filter fun b => a < b ∧ ε b = ε a).card + (univ.filter fun b => b < a ∧ ε b = ε a).card + 1 =
-      (univ.filter fun b => ε b = ε a).card := by
-  have h : (univ.filter fun b => ε b = ε a) =
-      ((univ.filter fun b => a < b ∧ ε b = ε a) ∪ (univ.filter fun b => b < a ∧ ε b = ε a)) ∪ {a} := by
+theorem card_split (ε : Fin n → Bool) (a : Fin n)
+    : (univ.filter fun b => a < b ∧ ε b = ε a).card + (univ.filter fun b => b < a ∧ ε b = ε a).card
+        + 1
+      = (univ.filter fun b => ε b = ε a).card := by
+  have h
+      : (univ.filter fun b => ε b = ε a)
+        = ((univ.filter fun b => a < b ∧ ε b = ε a) ∪ (univ.filter fun b => b < a ∧ ε b = ε a))
+          ∪ {a} := by
     ext b
     simp only [mem_filter, mem_univ, true_and, mem_union, mem_singleton]
     constructor
@@ -34,11 +37,13 @@ theorem card_split (ε : Fin n → Bool) (a : Fin n) :
       · exact h
       · exact h
       · rfl
-  have d1 : Disjoint (univ.filter fun b => a < b ∧ ε b = ε a) (univ.filter fun b => b < a ∧ ε b = ε a) := by
+  have d1 : Disjoint (univ.filter fun b => a < b ∧ ε b = ε a)
+      (univ.filter fun b => b < a ∧ ε b = ε a) := by
     rw [disjoint_filter]
     intro x _ h1 h2
     exact lt_asymm h1.1 h2.1
-  have d2 : Disjoint ((univ.filter fun b => a < b ∧ ε b = ε a) ∪ (univ.filter fun b => b < a ∧ ε b = ε a))
+  have d2 : Disjoint
+      ((univ.filter fun b => a < b ∧ ε b = ε a) ∪ (univ.filter fun b => b < a ∧ ε b = ε a))
       {a} := by
     rw [disjoint_singleton_right]
     simp
@@ -49,12 +54,20 @@ theorem p_add_q (ε : Fin n → Bool) : pOf ε + qOf ε = n := by
   have := card_filter_add_card_filter_not (s := (univ : Finset (Fin n))) (fun a => ε a = true)
   simpa using this
 
-theorem gaW_eq (ε : Fin n → Bool) (lam : Fin n → ℝ) (m : Fin n → ℤ)
-    (hm : ∀ a, lam a + ((n : ℝ) - 1) / 2 = m a) (a : Fin n) :
-    gaW ε lam a = ((m a - (if ε a then 0 else (pOf ε : ℤ)) - ReciprocityTheory.ChartRestriction.TR.Weyl.rhoK ε a : ℤ) : ℝ) := by
-  have hcR : ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℝ) +
-      ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℝ) + 1 =
-      ((univ.filter fun b => ε b = ε a).card : ℝ) := by exact_mod_cast card_split ε a
+theorem gaW_eq
+    (ε : Fin n → Bool)
+    (lam : Fin n → ℝ) (m : Fin n → ℤ) (hm : ∀ a, lam a + ((n : ℝ) - 1) / 2 = m a)
+    (a : Fin n)
+    : gaW ε lam a
+      = ((m a - (if ε a then 0 else (pOf ε : ℤ))
+            - ReciprocityTheory.ChartRestriction.TR.Weyl.rhoK ε a
+          : ℤ)
+        : ℝ) := by
+  have hcR
+      : ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℝ)
+          + ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℝ) + 1
+        = ((univ.filter fun b => ε b = ε a).card : ℝ) := by
+    exact_mod_cast card_split ε a
   have hpqR : (pOf ε : ℝ) + qOf ε = n := by exact_mod_cast p_add_q ε
   have hma := hm a
   delta gaW rhoC rhoHol ReciprocityTheory.ChartRestriction.TR.Weyl.rhoK
@@ -90,7 +103,8 @@ theorem harishChandraWeight_integral_dominant : GaInt := by
     linarith
   let Λ : Fin n → ℤ := fun a =>
     m a - (if ε a then 0 else (pOf ε : ℤ)) - ReciprocityTheory.ChartRestriction.TR.Weyl.rhoK ε a
-  have hg : gaW ε lam = fun a => (Λ a : ℝ) := funext fun a => HarishChandraWeightIntegral.gaW_eq ε lam m hm a
+  have hg : gaW ε lam = fun a => (Λ a : ℝ) :=
+    funext fun a => HarishChandraWeightIntegral.gaW_eq ε lam m hm a
   refine ⟨Λ, m, hg, ?_, hm, ?_⟩
   · intro a b hab he
     have hBA : BlockAnti ε lam := by

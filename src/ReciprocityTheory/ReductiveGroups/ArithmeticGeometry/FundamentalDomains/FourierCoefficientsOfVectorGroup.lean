@@ -8,11 +8,13 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD
 
-open NumberField Complex MeasureTheory FourierCoefficientMatrices FourierCubeVolume FourierCubeIntegral
+open NumberField Complex MeasureTheory FourierCoefficientMatrices FourierCubeVolume
+  FourierCubeIntegral
 
 variable {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
 
-theorem fourier_coefficients_of_vector_group (hL1 : UnipotentVectorGroup (E := E)) : FourierCoefficientProperties (E := E) := by
+theorem fourier_coefficients_of_vector_group (hL1 : UnipotentVectorGroup (E := E))
+    : FourierCoefficientProperties (E := E) := by
   intro r X u g hiso hg la G hGd hB hper χ
   classical
   obtain ⟨hadd, hH⟩ := hL1 r X u hiso
@@ -21,19 +23,23 @@ theorem fourier_coefficients_of_vector_group (hL1 : UnipotentVectorGroup (E := E
   have hex : ∃ ω, X.IsLZBasis g ω := FixedPointImaginarySpan.exists_basis X g hg
   obtain ⟨ω, hωdef⟩ : ∃ ω, ω = hex.choose := ⟨_, rfl⟩
   have hω : X.IsLZBasis g ω := hωdef ▸ hex.choose_spec
-  have hfz : ∀ ψ x, X.fz u g ψ G x =
-      if IsHermFam ψ ∧ X.IsFreqZ g ψ then Ich X u ω G ψ x else 0 := by
+  have hfz
+      : ∀ ψ x, X.fz u g ψ G x = if IsHermFam ψ ∧ X.IsFreqZ g ψ then Ich X u ω G ψ x else 0 := by
     intro ψ x
     unfold Data.fz
     rw [dite_eq_left hex, ← hωdef]
     rfl
-  have hsum : ∀ x ∈ X.dom, Summable (fun ψ : X.Ψ → Fin 2 → Fin 2 → ℂ => ‖X.fz u g ψ G x‖) →
-      HasSum (fun ψ : X.Ψ → Fin 2 → Fin 2 → ℂ => X.fz u g ψ G x) (G x) := by
+  have hsum
+      : ∀ x ∈ X.dom,
+        Summable (fun ψ : X.Ψ → Fin 2 → Fin 2 → ℂ => ‖X.fz u g ψ G x‖)
+          → HasSum (fun ψ : X.Ψ → Fin 2 → Fin 2 → ℂ => X.fz u g ψ G x) (G x) := by
     intro x hx hs
     have hωh := herm_ω hω
     have hli := hω.2.2
-    obtain ⟨c, hc⟩ : ∃ c : (Fin (4 * Fintype.card X.Ψ) → ℤ) → X.Ψ → Fin 2 → Fin 2 → ℂ,
-        c = fun m => chiOf ω hωh hli rfl fun j => (m j : ℝ) := ⟨_, rfl⟩
+    obtain ⟨c, hc⟩
+        : ∃ c : (Fin (4 * Fintype.card X.Ψ) → ℤ) → X.Ψ → Fin 2 → Fin 2 → ℂ,
+          c = fun m => chiOf ω hωh hli rfl fun j => (m j : ℝ) :=
+      ⟨_, rfl⟩
     have hcm : ∀ m, c m = chiOf ω hωh hli rfl fun j => (m j : ℝ) := fun m => by rw [hc]
     have hc_inj : Function.Injective c := by
       intro m m' h
@@ -57,10 +63,15 @@ theorem fourier_coefficients_of_vector_group (hL1 : UnipotentVectorGroup (E := E
       have hp : 2 * pr (c m) (ω j) = (m j : ℝ) := by
         rw [hcm]
         exact chiOf_pair ω hωh hli rfl _ j
-      calc 2 * ((n j : ℝ) * pr (c m) (ω j)) = (n j : ℝ) * (2 * pr (c m) (ω j)) := by ring
+      calc
+        2 * ((n j : ℝ) * pr (c m) (ω j))
+          = (n j : ℝ) * (2 * pr (c m) (ω j)) := by ring
         _ = (n j : ℝ) * (m j : ℝ) := by rw [hp]
-    obtain ⟨D, hD⟩ := I2.DimB.descend (fun t => G (X.Zb u (Bv ω t) x))
-      (psi_cont hω hdomH hGd hx) (fun n t => psi_per hω hadd hdomH hper hx n t)
+    obtain ⟨D, hD⟩ :=
+      I2.DimB.descend
+        (fun t => G (X.Zb u (Bv ω t) x))
+        (psi_cont hω hdomH hGd hx)
+        (fun n t => psi_per hω hadd hdomH hper hx n t)
     have hcoef : ∀ m, X.fz u g (c m) G x = UnitAddTorus.mFourierCoeff D m := by
       intro m
       rw [hfz, if_pos (hcfreq m)]
@@ -82,15 +93,14 @@ theorem fourier_coefficients_of_vector_group (hL1 : UnipotentVectorGroup (E := E
     have hsm : Summable (UnitAddTorus.mFourierCoeff D) := by
       refine Summable.of_norm ((hs.comp_injective hc_inj).congr fun m => ?_)
       simp only [Function.comp, hcoef]
-    have hG0 : D (I2.DimB.tproj 0) = G x := by
-      rw [hD, Bv_zero, Zb_zero]
+    have hG0 : D (I2.DimB.tproj 0) = G x := by rw [hD, Bv_zero, Zb_zero]
     have hF := UnitAddTorus.hasSum_mFourier_series_apply_of_summable hsm (I2.DimB.tproj 0)
     rw [hG0] at hF
-    have hF' : HasSum (UnitAddTorus.mFourierCoeff D) (G x) := by
-      simpa [I2.DimB.mF_tproj] using hF
+    have hF' : HasSum (UnitAddTorus.mFourierCoeff D) (G x) := by simpa [I2.DimB.mF_tproj] using hF
     rw [← hc_inj.hasSum_iff hsupp]
-    have hcomp : (fun ψ : X.Ψ → Fin 2 → Fin 2 → ℂ => X.fz u g ψ G x) ∘ c =
-        UnitAddTorus.mFourierCoeff D := funext fun m => hcoef m
+    have hcomp
+        : (fun ψ : X.Ψ → Fin 2 → Fin 2 → ℂ => X.fz u g ψ G x) ∘ c = UnitAddTorus.mFourierCoeff D :=
+      funext fun m => hcoef m
     rw [hcomp]
     exact hF'
   by_cases hχ : IsHermFam χ ∧ X.IsFreqZ g χ

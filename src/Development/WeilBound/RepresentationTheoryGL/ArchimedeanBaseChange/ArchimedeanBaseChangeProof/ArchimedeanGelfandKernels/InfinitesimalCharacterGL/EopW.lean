@@ -19,10 +19,9 @@ namespace PositivityTheory.RgBcC.Bridge
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-
 open Classical in
-def atW (w : InfinitePlace E) (x : Matrix (Fin a) (Fin a) ℂ) : Lie E a :=
-  fun i j v => if v = w then x i j else (1 : Matrix (Fin a) (Fin a) ℂ) i j
+def atW (w : InfinitePlace E) (x : Matrix (Fin a) (Fin a) ℂ) : Lie E a := fun i j v =>
+  if v = w then x i j else (1 : Matrix (Fin a) (Fin a) ℂ) i j
 
 def along (w : InfinitePlace E) (g : GA E a) (φ : GA E a → ℂ) : Matrix (Fin a) (Fin a) ℂ → ℂ :=
   fun x => chart φ g (atW w x)
@@ -31,7 +30,7 @@ def eopW (w : InfinitePlace E) (s : Bool) : Fin a → Fin a → Module.End ℂ (
   if s then Eop w.embedding else Eop (ComplexEmbedding.conjugate w.embedding)
 
 def defect (t : ℕ → ℂ) (m N : ℕ) (D : ℂ[X]) : ℂ[X] :=
-  (X - C (m : ℂ)) ^ (N + 1) * (D.comp (X + 1) - D) -
-    D * ∑ k ∈ range (N + 1), C ((-1) ^ k * t k) * (X - C (m : ℂ)) ^ (N - k)
+  (X - C (m : ℂ)) ^ (N + 1) * (D.comp (X + 1) - D)
+    - D * ∑ k ∈ range (N + 1), C ((-1) ^ k * t k) * (X - C (m : ℂ)) ^ (N - k)
 
 end PositivityTheory.RgBcC.Bridge

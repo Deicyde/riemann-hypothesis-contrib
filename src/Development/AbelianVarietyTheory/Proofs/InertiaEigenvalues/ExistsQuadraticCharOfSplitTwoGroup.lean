@@ -8,8 +8,9 @@ open scoped commutatorElement Pointwise
 
 namespace GlobalTheory
 
-theorem normal_of_commutator_le {G : Type} [Group G] (M : Subgroup G)
-    (h : ⁅(⊤ : Subgroup G), ⊤⁆ ≤ M) : M.Normal := by
+theorem normal_of_commutator_le
+    {G : Type} [Group G] (M : Subgroup G) (h : ⁅(⊤ : Subgroup G), ⊤⁆ ≤ M)
+    : M.Normal := by
   constructor
   intro n hn g
   have h1 : ⁅g, n⁆ ∈ M :=

@@ -13,9 +13,9 @@ open MvPolynomial Topology
 
 def NormalLocallyIrreducible.Statement : Prop :=
   ∀ (σ : Type) [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (h : MvPolynomial σ ℂ) (w : σ → ℂ),
-    I.IsPrime → IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I) → h ∉ I → w ∈ zeroSetIn I →
-    ∀ U ∈ 𝓝 w, ∃ B : Set (σ → ℂ), IsOpen B ∧ w ∈ B ∧ B ⊆ U ∧
-      IsPreconnected ((zeroSetIn I ∩ B) \ {z | eval z h = 0}) ∧
-      zeroSetIn I ∩ B ⊆ closure ((zeroSetIn I ∩ B) \ {z | eval z h = 0})
+    I.IsPrime → IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I) → h ∉ I → w ∈ zeroSetIn I
+      → ∀ U ∈ 𝓝 w, ∃ B : Set (σ → ℂ),
+        IsOpen B ∧ w ∈ B ∧ B ⊆ U ∧ IsPreconnected ((zeroSetIn I ∩ B) \ {z | eval z h = 0})
+          ∧ zeroSetIn I ∩ B ⊆ closure ((zeroSetIn I ∩ B) \ {z | eval z h = 0})
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets

@@ -42,53 +42,61 @@ theorem le_of_hom {W : J → Z.Opens} {V V' : (Bas W)ᵒᵖ} (a : V ⟶ V') : V'
   leOfHom a.unop
 
 def IsCocycle (c : ∀ i i' : J, Γ(Z, W i ⊓ W i')) : Prop :=
-  ∀ i i' i'', resG Z (inf_le_left : W i ⊓ W i' ⊓ W i'' ≤ W i ⊓ W i') (c i i') +
-    resG Z (le_inf (inf_le_left.trans inf_le_right) inf_le_right : W i ⊓ W i' ⊓ W i'' ≤ W i' ⊓ W i'')
-      (c i' i'') =
-    resG Z (le_inf (inf_le_left.trans inf_le_left) inf_le_right : W i ⊓ W i' ⊓ W i'' ≤ W i ⊓ W i'')
-      (c i i'')
+  ∀ i i' i'',
+    resG Z (inf_le_left : W i ⊓ W i' ⊓ W i'' ≤ W i ⊓ W i') (c i i') + resG Z
+        (le_inf (inf_le_left.trans inf_le_right) inf_le_right : W i ⊓ W i' ⊓ W i'' ≤ W i' ⊓ W i'')
+        (c i' i'')
+      = resG Z
+        (le_inf (inf_le_left.trans inf_le_left) inf_le_right : W i ⊓ W i' ⊓ W i'' ≤ W i ⊓ W i'')
+        (c i i'')
 
-def fc (c : ∀ i i' : J, Γ(Z, W i ⊓ W i')) : CatCoh.C1 (incl W ⋙ OAff s) :=
-  fun V V' a ↦ resG Z (le_inf ((le_of_hom a).trans (le_idx V.unop)) (le_idx V'.unop))
+def fc (c : ∀ i i' : J, Γ(Z, W i ⊓ W i')) : CatCoh.C1 (incl W ⋙ OAff s) := fun V V' a ↦
+  resG Z (le_inf ((le_of_hom a).trans (le_idx V.unop)) (le_idx V'.unop))
     (c (idx V.unop) (idx V'.unop))
 
-theorem resG_resG' {U V V' : Z.Opens} (h : V ≤ U) (h' : V' ≤ V) (x : Γ(Z, U)) :
-    resG Z h' (resG Z h x) = resG Z (h'.trans h) x := by
+theorem resG_resG' {U V V' : Z.Opens} (h : V ≤ U) (h' : V' ≤ V) (x : Γ(Z, U))
+    : resG Z h' (resG Z h x) = resG Z (h'.trans h) x := by
   simp only [resG, ← CommRingCat.comp_apply, ← Functor.map_comp]
   rfl
 
-theorem fc_mem {c : ∀ i i' : J, Γ(Z, W i ⊓ W i')} (hc : IsCocycle W c) : fc s W c ∈ Z1 (incl W ⋙ OAff s) := by
+theorem fc_mem {c : ∀ i i' : J, Γ(Z, W i ⊓ W i')} (hc : IsCocycle W c)
+    : fc s W c ∈ Z1 (incl W ⋙ OAff s) := by
   intro V V' V'' a b
   have hV'' : V''.unop.1.1 ≤ W (idx V.unop) ⊓ W (idx V'.unop) ⊓ W (idx V''.unop) :=
-    le_inf (le_inf ((le_of_hom b).trans ((le_of_hom a).trans (le_idx V.unop)))
-      ((le_of_hom b).trans (le_idx V'.unop))) (le_idx V''.unop)
+    le_inf
+      (le_inf ((le_of_hom b).trans ((le_of_hom a).trans (le_idx V.unop)))
+        ((le_of_hom b).trans (le_idx V'.unop)))
+      (le_idx V''.unop)
   have e := congrArg (resG Z hV'') (hc (idx V.unop) (idx V'.unop) (idx V''.unop))
   simp only [map_add (f := _), resG_resG'] at e
-  have key : resG Z (le_inf ((le_of_hom (a ≫ b)).trans (le_idx V.unop)) (le_idx V''.unop))
-      (c (idx V.unop) (idx V''.unop)) =
-      resG Z (le_of_hom b) (resG Z (le_inf ((le_of_hom a).trans (le_idx V.unop)) (le_idx V'.unop))
-        (c (idx V.unop) (idx V'.unop))) +
-      resG Z (le_inf ((le_of_hom b).trans (le_idx V'.unop)) (le_idx V''.unop))
-        (c (idx V'.unop) (idx V''.unop)) := by
+  have key
+      : resG Z (le_inf ((le_of_hom (a ≫ b)).trans (le_idx V.unop)) (le_idx V''.unop))
+          (c (idx V.unop) (idx V''.unop))
+        = resG Z (le_of_hom b)
+            (resG Z (le_inf ((le_of_hom a).trans (le_idx V.unop)) (le_idx V'.unop))
+              (c (idx V.unop) (idx V'.unop)))
+          + resG Z (le_inf ((le_of_hom b).trans (le_idx V'.unop)) (le_idx V''.unop))
+            (c (idx V'.unop) (idx V''.unop)) := by
     rw [resG_resG']
     exact e.symm
   exact key
 
 def cmp (hW : ⨆ i, W i = ⊤) (c : ∀ i i' : J, Γ(Z, W i ⊓ W i')) : HO1 s := by
   classical
-  exact if h : fc s W c ∈ Z1 (incl W ⋙ OAff s) then
-    (resEquiv s W hW).symm (H1.mk _ ⟨fc s W c, h⟩) else 0
+  exact
+    if h : fc s W c ∈ Z1 (incl W ⋙ OAff s) then
+      (resEquiv s W hW).symm (H1.mk _ ⟨fc s W c, h⟩)
+    else
+      0
 
-theorem cmp_of_isCocycle (hW : ⨆ i, W i = ⊤) {c : ∀ i i' : J, Γ(Z, W i ⊓ W i')}
-    (hc : IsCocycle W c) :
-    cmp s W hW c = (resEquiv s W hW).symm (H1.mk _ ⟨fc s W c, fc_mem s W hc⟩) := by
+theorem cmp_of_isCocycle (hW : ⨆ i, W i = ⊤) {c : ∀ i i' : J, Γ(Z, W i ⊓ W i')} (hc : IsCocycle W c)
+    : cmp s W hW c = (resEquiv s W hW).symm (H1.mk _ ⟨fc s W c, fc_mem s W hc⟩) := by
   unfold cmp
   rw [dite_eq_left (fc_mem s W hc)]
 
-theorem restrict_cmp (hW : ⨆ i, W i = ⊤) {c : ∀ i i' : J, Γ(Z, W i ⊓ W i')}
-    (hc : IsCocycle W c) :
-    (CoefMap.restrict (OAff s) (incl W)).pull1 (cmp s W hW c) =
-      H1.mk _ ⟨fc s W c, fc_mem s W hc⟩ := by
+theorem restrict_cmp (hW : ⨆ i, W i = ⊤) {c : ∀ i i' : J, Γ(Z, W i ⊓ W i')} (hc : IsCocycle W c)
+    : (CoefMap.restrict (OAff s) (incl W)).pull1 (cmp s W hW c)
+      = H1.mk _ ⟨fc s W c, fc_mem s W hc⟩ := by
   rw [cmp_of_isCocycle s W hW hc]
   exact (resEquiv s W hW).apply_symm_apply _
 

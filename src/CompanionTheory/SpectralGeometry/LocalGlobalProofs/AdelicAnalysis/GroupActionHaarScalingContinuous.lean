@@ -9,18 +9,18 @@ open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.Adelic.ModulusAction
 
-theorem exists_continuous_modulus :
-    ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
-      [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
-      (μ : Measure V) [μ.IsAddHaarMeasure] (T : Type) [Group T] [TopologicalSpace T]
-      [FirstCountableTopology T] [LocallyCompactSpace T] (a : T → V →+ V),
-      (Continuous fun p : T × V => a p.1 p.2) → Continuous (fun t : T => t⁻¹) →
-      (∀ y, a 1 y = y) → (∀ s t y, a (s * t) y = a s (a t y)) →
-      ∃ χ : T →* ℝ≥0, Continuous χ ∧ ∀ t, μ.map (a t) = χ t • μ := by
+theorem exists_continuous_modulus
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+        [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+        (μ : Measure V) [μ.IsAddHaarMeasure] (T : Type) [Group T] [TopologicalSpace T]
+        [FirstCountableTopology T] [LocallyCompactSpace T] (a : T → V →+ V),
+      (Continuous fun p : T × V => a p.1 p.2) → Continuous (fun t : T => t⁻¹) → (∀ y, a 1 y = y)
+        → (∀ s t y, a (s * t) y = a s (a t y))
+        → ∃ χ : T →* ℝ≥0, Continuous χ ∧ ∀ t, μ.map (a t) = χ t • μ := by
   intro V _ _ _ _ _ _ _ _ μ _ T _ _ _ _ a ha hinv h1 hmul
   have hat : ∀ t, Continuous (a t) := fun t => by
-    have h := ha.comp (continuous_const.prodMk (continuous_id (X := V)) :
-      Continuous fun y : V => (t, y))
+    have h :=
+      ha.comp (continuous_const.prodMk (continuous_id (X := V)) : Continuous fun y : V => (t, y))
     exact h
   have hleft : ∀ t y, a t⁻¹ (a t y) = y := by
     intro t y
@@ -42,8 +42,7 @@ theorem exists_continuous_modulus :
     have e : (fun x => g + x) ∘ a t = a t ∘ fun x => a t⁻¹ g + x := by
       funext x
       simp only [Function.comp_apply, map_add (f := _), hright]
-    rw [e, ← Measure.map_map (hat t).measurable (measurable_const_add _),
-      map_add_left_eq_self]
+    rw [e, ← Measure.map_map (hat t).measurable (measurable_const_add _), map_add_left_eq_self]
   have hscale : ∀ t, ∃ c : ℝ≥0, μ.map (a t) = c • μ := by
     intro t
     haveI := hfin t
@@ -53,8 +52,7 @@ theorem exists_continuous_modulus :
   obtain ⟨f, hfc, hf0, hfx⟩ := exists_continuous_nonneg_pos (0 : V)
   have hI : 0 < ∫ y, f y ∂μ :=
     f.continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero hfc hf0 hfx
-  have hint : ∀ t (g : V → ℝ), Continuous g →
-      ∫ y, g (a t y) ∂μ = (c t : ℝ) * ∫ y, g y ∂μ := by
+  have hint : ∀ t (g : V → ℝ), Continuous g → ∫ y, g (a t y) ∂μ = (c t : ℝ) * ∫ y, g y ∂μ := by
     intro t g hg
     rw [← integral_map (hat t).measurable.aemeasurable hg.aestronglyMeasurable, hc t,
       integral_smul_nnreal_measure, NNReal.smul_def, smul_eq_mul]
@@ -70,7 +68,9 @@ theorem exists_continuous_modulus :
     apply NNReal.coe_injective
     apply mul_right_cancel₀ hI.ne'
     rw [hform, NNReal.coe_mul]
-    calc ∫ y, f (a (s * t) y) ∂μ = ∫ y, f (a s (a t y)) ∂μ := by simp only [hmul]
+    calc
+      ∫ y, f (a (s * t) y) ∂μ
+        = ∫ y, f (a s (a t y)) ∂μ := by simp only [hmul]
       _ = (c t : ℝ) * ∫ y, f (a s y) ∂μ := hint t (fun z => f (a s z)) (f.continuous.comp (hat s))
       _ = (c s : ℝ) * (c t : ℝ) * ∫ y, f y ∂μ := by rw [← hform s]; ring
   have hF : Continuous fun t => ∫ y, f (a t y) ∂μ := by

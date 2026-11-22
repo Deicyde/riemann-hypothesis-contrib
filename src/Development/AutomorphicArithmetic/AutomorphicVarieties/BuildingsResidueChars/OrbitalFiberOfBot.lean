@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MulAction in
-theorem UpperTheory.orbitalFiber_of_bot :
-    UpperTheory.V.Z.Sym.Glob.Fib.Bot := by
+theorem UpperTheory.orbitalFiber_of_bot : UpperTheory.V.Z.Sym.Glob.Fib.Bot := by
   intro H Y _ _ H₀ k
-  have hmul : ∀ (a : ℂ) (g : orbitRel.Quotient H Y → ℂ), ∑ᶠ o, a * g o = a * ∑ᶠ o, g o :=
-    fun a g => by simpa only [smul_eq_mul] using (smul_finsum a g).symm
+  have hmul
+      : ∀ (a : ℂ) (g : orbitRel.Quotient H Y → ℂ), ∑ᶠ o, a * g o = a * ∑ᶠ o, g o := fun a g => by
+    simpa only [smul_eq_mul] using (smul_finsum a g).symm
   refine ⟨fun a => ?_, fun hc htriv => ?_⟩
   · unfold UpperTheory.V.Z.Sym.gq
     rw [← hmul]

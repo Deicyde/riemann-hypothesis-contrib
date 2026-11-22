@@ -17,15 +17,18 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo CurveVerticalPointCha
 
 noncomputable section
 
-theorem CurveVertPointChart.proof (hF : CurveRingFinite.Statement) (hCP : CurveClosedPointChart.Statement) :
-    CurveVertPointChart.Statement := by
+theorem CurveVertPointChart.proof
+    (hF : CurveRingFinite.Statement) (hCP : CurveClosedPointChart.Statement)
+    : CurveVertPointChart.Statement := by
   classical
   intro K _ ι _ Ω _ y s d hy hs hsP W hW c hc
   have hWp : W.IsPrime := hW.1.1.1
   have hPW : mCoordIdeal y ≤ W := le_sup_left.trans hW.1.1.2
   have hyc : ∀ k, y ⟨k, c k⟩ ≠ 0 := fun k => ne_zero_of_X_notMem fun h => hc k (hPW h)
 
-  have hv := IndefiniteRowSideFullHecke.HeightsSet.CurveDivVertical.full K ι (mCoordIdeal y) s d hy hs hsP W hW
+  have hv :=
+    IndefiniteRowSideFullHecke.HeightsSet.CurveDivVertical.full K ι (mCoordIdeal y) s d hy hs hsP W
+      hW
   rw [IsHorizontal, ← Ne, Submodule.ne_bot_iff] at hv
   obtain ⟨n, hn, hn0⟩ := hv
   have hmax := chartPrimeB_isMaximal y (hF K ι Ω y hy) hPW hWp hc hyc hn0 (Ideal.mem_comap.mp hn)
@@ -49,8 +52,8 @@ theorem CurveVertPointChart.proof (hF : CurveRingFinite.Statement) (hCP : CurveC
         refine mem_chartPrimeB.mpr ⟨f, w, hw, ?_, hbw⟩
         have h1 : X ⟨k, c k⟩ * (HilbertSamuel.SmallSectionsNonzero.chartMono c e * w) ∈ W := by
           refine mem_of_aeval_eq y hPW
-            (Inter.AvoidRing.isMultiHomog_mul (Inter.AvoidRing.isMultiHomog_mul hg
-              (Inter.AvoidRing.isMultiHomog_X k (c' k)))
+            (Inter.AvoidRing.isMultiHomog_mul
+              (Inter.AvoidRing.isMultiHomog_mul hg (Inter.AvoidRing.isMultiHomog_X k (c' k)))
               (HilbertSamuel.SmallSectionsNonzero.isMultiHomog_chartMono c f))
             (Inter.AvoidRing.isMultiHomog_mul (Inter.AvoidRing.isMultiHomog_X k (c k))
               (Inter.AvoidRing.isMultiHomog_mul
@@ -67,7 +70,8 @@ theorem CurveVertPointChart.proof (hF : CurveRingFinite.Statement) (hCP : CurveC
     obtain ⟨a, b, hb, hab⟩ := h' p
     have hu : y p / y ⟨p.1, c' p.1⟩ ∈ locSub y _ hmp := mem_locSub.mpr ⟨a, b, hb, hab⟩
     have hprod := mul_mem hu (hinv p.1)
-    have he : y p / y ⟨p.1, c' p.1⟩ * (y ⟨p.1, c' p.1⟩ / y ⟨p.1, c p.1⟩) = y p / y ⟨p.1, c p.1⟩ := by
+    have he
+        : y p / y ⟨p.1, c' p.1⟩ * (y ⟨p.1, c' p.1⟩ / y ⟨p.1, c p.1⟩) = y p / y ⟨p.1, c p.1⟩ := by
       field_simp [hyc' p.1, hyc p.1]
     rwa [he] at hprod
   have hY : ∀ e : K → ℕ, ∏ k, y ⟨k, c k⟩ ^ e k ≠ 0 := fun e =>
@@ -86,7 +90,8 @@ theorem CurveVertPointChart.proof (hF : CurveRingFinite.Statement) (hCP : CurveC
       field_simp [hY e]
     refine ⟨a, b, ?_, hb, hab'⟩
     obtain ⟨f, w, hw, hbw⟩ := exists_rep y hyc (mem_chart y hyc b)
-    refine mem_chartPrimeB.mpr ⟨f + e, w * g, Inter.AvoidRing.isMultiHomog_mul hw hg, W.mul_mem_left _ hgW, ?_⟩
+    refine mem_chartPrimeB.mpr
+      ⟨f + e, w * g, Inter.AvoidRing.isMultiHomog_mul hw hg, W.mul_mem_left _ hgW, ?_⟩
     rw [prod_pow_add, map_mul]
     linear_combination (-(∏ k, y ⟨k, c k⟩ ^ f k)) * hab' + (aeval y g) * hbw
   · rintro ⟨a, b, ha, hb, hab⟩
@@ -95,10 +100,13 @@ theorem CurveVertPointChart.proof (hF : CurveRingFinite.Statement) (hCP : CurveC
     have hwW : w ∉ W := fun h => hb (mem_chartPrimeB.mpr ⟨f', w, hw, h, hbw⟩)
     have h1 : HilbertSamuel.SmallSectionsNonzero.chartMono c f * (w * g) ∈ W := by
       refine mem_of_aeval_eq y hPW
-        (Inter.AvoidRing.isMultiHomog_mul (Inter.AvoidRing.isMultiHomog_mul
-          (HilbertSamuel.SmallSectionsNonzero.isMultiHomog_chartMono c e)
-          (HilbertSamuel.SmallSectionsNonzero.isMultiHomog_chartMono c f')) hv)
-        (Inter.AvoidRing.isMultiHomog_mul (HilbertSamuel.SmallSectionsNonzero.isMultiHomog_chartMono c f)
+        (Inter.AvoidRing.isMultiHomog_mul
+          (Inter.AvoidRing.isMultiHomog_mul
+            (HilbertSamuel.SmallSectionsNonzero.isMultiHomog_chartMono c e)
+            (HilbertSamuel.SmallSectionsNonzero.isMultiHomog_chartMono c f'))
+          hv)
+        (Inter.AvoidRing.isMultiHomog_mul
+          (HilbertSamuel.SmallSectionsNonzero.isMultiHomog_chartMono c f)
           (Inter.AvoidRing.isMultiHomog_mul hw hg))
         (by abel) ?_ (W.mul_mem_left _ hvW)
       simp only [map_mul, HilbertSamuel.SmallSectionsNonzero.aeval_chartMono]

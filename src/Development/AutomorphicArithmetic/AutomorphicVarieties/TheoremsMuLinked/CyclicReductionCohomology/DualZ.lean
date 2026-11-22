@@ -5,20 +5,30 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th GlobalTheory.GalOfCusp
+open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV
+  UpperTheory.V.Th GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Th.dualZ :
-    ∀ (N : ℕ) [NeZero N] (V : Type) [AddCommGroup V] [Module (ZMod N) V] [Finite V], Nat.card (Module.Dual (ZMod N) V) = Nat.card V ∧ (∀ v : V, (∀ f : Module.Dual (ZMod N) V, f v = 0) → v = 0) ∧ ∀ (V' : Type) [AddCommGroup V'] [Module (ZMod N) V'] [Finite V'] (b : V →+ V' →+ ZMod N), (∀ x, (∀ y, b x y = 0) → x = 0) → (∀ y, (∀ x, b x y = 0) → y = 0) → Function.Bijective fun y : V' => ((b.flip y).toZModLinearMap N : Module.Dual (ZMod N) V) := by
+theorem UpperTheory.V.Th.dualZ
+    : ∀ (N : ℕ) [NeZero N] (V : Type) [AddCommGroup V] [Module (ZMod N) V] [Finite V],
+      Nat.card (Module.Dual (ZMod N) V) = Nat.card V
+        ∧ (∀ v : V, (∀ f : Module.Dual (ZMod N) V, f v = 0) → v = 0)
+        ∧ ∀ (V' : Type) [AddCommGroup V'] [Module (ZMod N) V'] [Finite V'] (b : V →+ V' →+ ZMod N),
+          (∀ x, (∀ y, b x y = 0) → x = 0) → (∀ y, (∀ x, b x y = 0) → y = 0)
+            → Function.Bijective fun y : V' =>
+              ((b.flip y).toZModLinearMap N : Module.Dual (ZMod N) V) := by
   intro N _ V _ _ _
-  have sep : ∀ {W : Type} [AddCommGroup W] [Module (ZMod N) W] (w : W),
-      (∀ f : Module.Dual (ZMod N) W, f w = 0) → w = 0 := by
+  have sep
+      : ∀ {W : Type} [AddCommGroup W] [Module (ZMod N) W] (w : W),
+        (∀ f : Module.Dual (ZMod N) W, f w = 0) → w = 0 := by
     intro W _ _ w hw
     by_contra hne
-    obtain ⟨f, -, hf⟩ := KStar.Selmer.exists_form_ne_zero (⊥ : Submodule (ZMod N) W)
-      (z := w) (by simpa using hne)
+    obtain ⟨f, -, hf⟩ :=
+      KStar.Selmer.exists_form_ne_zero (⊥ : Submodule (ZMod N) W) (z := w) (by simpa using hne)
     exact hf (hw f)
-  have fin : ∀ {W : Type} [AddCommGroup W] [Module (ZMod N) W] [Finite W],
-      Finite (Module.Dual (ZMod N) W) := by
+  have fin
+      : ∀ {W : Type} [AddCommGroup W] [Module (ZMod N) W] [Finite W],
+        Finite (Module.Dual (ZMod N) W) := by
     intro W _ _ _
     apply Nat.finite_of_card_ne_zero
     rw [KStar.Selmer.card_dual]
@@ -36,8 +46,8 @@ theorem UpperTheory.V.Th.dualZ :
       simp only [AddMonoidHom.coe_toZModLinearMap, AddMonoidHom.flip_apply] at this
       rw [map_sub, this, sub_self]
     exact sub_eq_zero.mp (hr _ h')
-  have inj' : Function.Injective fun x : V =>
-      ((b x).toZModLinearMap N : Module.Dual (ZMod N) V') := by
+  have inj'
+      : Function.Injective fun x : V => ((b x).toZModLinearMap N : Module.Dual (ZMod N) V') := by
     intro x x' h
     have h' : ∀ y, b (x - x') y = 0 := by
       intro y

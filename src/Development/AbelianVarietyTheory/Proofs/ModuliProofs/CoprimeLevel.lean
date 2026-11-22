@@ -11,22 +11,25 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CmGeneratorSq
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
 namespace GlobalTheory.Models
 
-theorem exists_prime_gt_neg_not_isSquare (d : ℕ) (hd : d.Prime) (hd4 : d % 4 = 3) (b : ℕ) :
-    ∃ n : ℕ, b < n ∧ n.Prime ∧ Odd n ∧ ¬ IsSquare (-(d : ZMod n)) := by
+theorem exists_prime_gt_neg_not_isSquare (d : ℕ) (hd : d.Prime) (hd4 : d % 4 = 3) (b : ℕ)
+    : ∃ n : ℕ, b < n ∧ n.Prime ∧ Odd n ∧ ¬ IsSquare (-(d : ZMod n)) := by
   haveI : NeZero (4 * d) := ⟨by have := hd.pos; omega⟩
   obtain ⟨n, hn, hp, hmod⟩ :=
     Nat.forall_exists_prime_gt_and_eq_mod (q := 4 * d) (a := -1) isUnit_one.neg (max b d)
   have hdvd : 4 * d ∣ n + 1 := by
     rw [← ZMod.natCast_eq_zero_iff]
     push_cast
-    rw [hmod]; ring
+    rw [hmod]
+    ring
   have h4 : n % 4 = 3 := by
     have : 4 ∣ n + 1 := Dvd.dvd.trans (Dvd.intro _ rfl) hdvd
     omega
@@ -55,18 +58,27 @@ theorem exists_prime_gt_neg_not_isSquare (d : ℕ) (hd : d.Prime) (hd4 : d % 4 =
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_eq_of_mem_adjoin_quadratic_generator (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0}) :
-    ∃ u v : ℤ, a = (u : 𝓞 E) + (v : 𝓞 E) * H.w0 := by
+theorem exists_eq_of_mem_adjoin_quadratic_generator
+    (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0})
+    : ∃ u v : ℤ, a = (u : 𝓞 E) + (v : 𝓞 E) * H.w0 := by
   first
   | exact @_root_.GlobalTheory.CMGeneratorSquareModuli.main
   | exact _root_.GlobalTheory.CMGeneratorSquareModuli.main
   | (apply _root_.GlobalTheory.CMGeneratorSquareModuli.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.CMGeneratorSquareModuli.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.CMGeneratorSquareModuli.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.CMGeneratorSquareModuli.main
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.CMGeneratorSquareModuli.main ..)
 
-theorem bar_mem_of_mem (H : Host E) {n : ℕ} (hn : AuxiliaryInertOddPrime H n) (P : Ideal (𝓞 E)) (hP : P.IsPrime)
-    (hnP : (n : 𝓞 E) ∈ P) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0}) (haP : a ∈ P) : H.bar a ∈ P := by
+theorem bar_mem_of_mem
+    (H : Host E)
+    {n : ℕ} (hn : AuxiliaryInertOddPrime H n)
+    (P : Ideal (𝓞 E)) (hP : P.IsPrime) (hnP : (n : 𝓞 E) ∈ P)
+    {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0}) (haP : a ∈ P)
+    : H.bar a ∈ P := by
   obtain ⟨hp, hodd, hsq, -⟩ := hn
   haveI : Fact n.Prime := ⟨hp⟩
   have key : ∀ m : ℤ, (m : 𝓞 E) ∈ P → (n : ℤ) ∣ m := by
@@ -84,8 +96,8 @@ theorem bar_mem_of_mem (H : Host E) {n : ℕ} (hn : AuxiliaryInertOddPrime H n) 
   obtain ⟨u, v, rfl⟩ := exists_eq_of_mem_adjoin_quadratic_generator H ha
   have hN : (n : ℤ) ∣ (2 * u + v) ^ 2 + H.d * v ^ 2 := by
     apply key
-    have : (((2 * u + v) ^ 2 + H.d * v ^ 2 : ℤ) : 𝓞 E) =
-        (2 * ((2 * u + v : 𝓞 E) - v * H.rt)) * ((u : 𝓞 E) + v * H.w0) := by
+    have : (((2 * u + v) ^ 2 + H.d * v ^ 2 : ℤ) : 𝓞 E)
+        = (2 * ((2 * u + v : 𝓞 E) - v * H.rt)) * ((u : 𝓞 E) + v * H.w0) := by
       push_cast
       linear_combination (-((2 * u + v : 𝓞 E) - v * H.rt) * v) * H.two_weight_eq_one_add_root + (v : 𝓞 E) ^ 2 * H.rt_sq
     rw [this]
@@ -111,16 +123,20 @@ theorem bar_mem_of_mem (H : Host E) {n : ℕ} (hn : AuxiliaryInertOddPrime H n) 
   rw [ZMod.intCast_zmod_eq_zero_iff_dvd] at hu hv
   obtain ⟨u', rfl⟩ := hu
   obtain ⟨v', rfl⟩ := hv
-  have : H.bar (((n * u' : ℤ) : 𝓞 E) + ((n * v' : ℤ) : 𝓞 E) * H.w0) =
-      ((u' : 𝓞 E) + v' * H.bar H.w0) * n := by
+  have : H.bar (((n * u' : ℤ) : 𝓞 E) + ((n * v' : ℤ) : 𝓞 E) * H.w0)
+      = ((u' : 𝓞 E) + v' * H.bar H.w0) * n := by
     simp only [map_add (f := _), map_mul, map_intCast]
     push_cast
     ring
   rw [this]
   exact P.mul_mem_left _ hnP
 
-theorem not_Mb_le (H : Host E) {n : ℕ} (hn : AuxiliaryInertOddPrime H n) (l : Level H) (P : Ideal (𝓞 E)) (hP : P.IsPrime)
-    (hnP : (n : 𝓞 E) ∈ P) : ¬ l.Mb ≤ P := by
+theorem not_Mb_le
+    (H : Host E)
+    {n : ℕ} (hn : AuxiliaryInertOddPrime H n)
+    (l : Level H)
+    (P : Ideal (𝓞 E)) (hP : P.IsPrime) (hnP : (n : 𝓞 E) ∈ P)
+    : ¬ l.Mb ≤ P := by
   intro h
   apply hP.ne_top
   rw [eq_top_iff, ← l.coprime]
@@ -129,7 +145,9 @@ theorem not_Mb_le (H : Host E) {n : ℕ} (hn : AuxiliaryInertOddPrime H n) (l : 
   rintro a ⟨haM, ha⟩
   exact bar_mem_of_mem H hn P hP hnP ha (h haM)
 
-theorem AuxiliaryInertOddPrime.coprime_level {H : Host E} {n : ℕ} (hn : AuxiliaryInertOddPrime H n) (l : Level H) : n.Coprime l.M := by
+theorem AuxiliaryInertOddPrime.coprime_level
+    {H : Host E} {n : ℕ} (hn : AuxiliaryInertOddPrime H n) (l : Level H)
+    : n.Coprime l.M := by
   rw [Nat.Prime.coprime_iff_not_dvd hn.1]
   rintro ⟨m, hm⟩
   have hnu : Ideal.span {(n : 𝓞 E)} ≠ ⊤ := by
@@ -154,18 +172,20 @@ theorem AuxiliaryInertOddPrime.coprime_level {H : Host E} {n : ℕ} (hn : Auxili
     rw [Ideal.mem_comap, map_natCast]
     exact hnP
 
-theorem exists_large_auxiliary_prime (H : Host E) (b : ℕ) : ∃ n : ℕ, b < n ∧ AuxiliaryInertOddPrime H n := by
-  obtain ⟨n, hn, hp, hodd, hsq⟩ := exists_prime_gt_neg_not_isSquare H.d H.d_prime
-    (by have := H.d_mod; omega) (max b (NumberField.discr E).natAbs)
+theorem exists_large_auxiliary_prime (H : Host E) (b : ℕ)
+    : ∃ n : ℕ, b < n ∧ AuxiliaryInertOddPrime H n := by
+  obtain ⟨n, hn, hp, hodd, hsq⟩ :=
+    exists_prime_gt_neg_not_isSquare H.d H.d_prime (by have := H.d_mod; omega)
+      (max b (NumberField.discr E).natAbs)
   refine ⟨n, lt_of_le_of_lt (le_max_left _ _) hn, hp, hodd, hsq, ?_⟩
   rw [Int.natCast_dvd]
   exact Nat.not_dvd_of_pos_of_lt (Int.natAbs_pos.mpr (NumberField.discr_ne_zero E))
     (lt_of_le_of_lt (le_max_right _ _) hn)
 
-theorem exists_two_auxiliary_inert_odd_primes_coprime_level :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
-      (∃ n n' : ℕ, AuxiliaryInertOddPrime H n ∧ AuxiliaryInertOddPrime H n' ∧ n ≠ n') ∧
-        ∀ n : ℕ, AuxiliaryInertOddPrime H n → ∀ l : Level H, n.Coprime l.M := by
+theorem exists_two_auxiliary_inert_odd_primes_coprime_level
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
+      (∃ n n' : ℕ, AuxiliaryInertOddPrime H n ∧ AuxiliaryInertOddPrime H n' ∧ n ≠ n')
+        ∧ ∀ n : ℕ, AuxiliaryInertOddPrime H n → ∀ l : Level H, n.Coprime l.M := by
   intro E _ _ _ H
   obtain ⟨n, -, hn⟩ := exists_large_auxiliary_prime H 0
   obtain ⟨n', hlt, hn'⟩ := exists_large_auxiliary_prime H n

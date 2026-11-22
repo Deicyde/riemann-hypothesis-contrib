@@ -8,9 +8,14 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocalLa
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC UpperTheory.V.Af
-open UpperTheory.V.Af UpperTheory.V.Af.Gu UpperTheory.V.Z.Win UpperTheory.V.Z.Win.Gu UpperTheory.Zero.LLC
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC
+  UpperTheory.V.Af
+open UpperTheory.V.Af UpperTheory.V.Af.Gu UpperTheory.V.Z.Win UpperTheory.V.Z.Win.Gu
+  UpperTheory.Zero.LLC
 
 open scoped commutatorElement
 
@@ -18,11 +23,12 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 
 namespace UpperTheory.V.Z.Win.Gu.ClosureUnderSumAndTwist
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
   {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
 
-private theorem pow_iff (x : WD h) (σ : Weil h) :
-    x.charPol σ = (X - 1) ^ x.lpDim ↔ ∀ α ∈ x.eig σ, α = 1 := by
+private theorem pow_iff (x : WD h) (σ : Weil h)
+    : x.charPol σ = (X - 1) ^ x.lpDim ↔ ∀ α ∈ x.eig σ, α = 1 := by
   constructor
   · intro hx α hα
     rw [WD.eig, hx, ← C_1, roots_pow, roots_X_sub_C] at hα
@@ -35,15 +41,19 @@ private theorem eig_sum (x y : WD h) (σ : Weil h) : (x.lpSum y).eig σ = x.eig 
   rw [WD.eig, WD.eig, WD.eig, WD.charPol_lpSum, roots_mul]
   exact mul_ne_zero (WD.charPol_monic x σ).ne_zero (WD.charPol_monic y σ).ne_zero
 
-private theorem tor_iff (x : WD h) :
-    UpperTheory.GalStar.Tor x ↔ ∀ s t : ↥(Weil h), ∀ α ∈ x.eig ⁅s, t⁆, α = 1 :=
+private theorem tor_iff (x : WD h)
+    : UpperTheory.GalStar.Tor x ↔ ∀ s t : ↥(Weil h), ∀ α ∈ x.eig ⁅s, t⁆, α = 1 :=
   forall_congr' fun s => forall_congr' fun t => pow_iff x ⁅s, t⁆
 
 private theorem gd_sum (x y : WD h) : Gd (x.lpSum y) ↔ Gd x ∧ Gd y := by
-  have ht : UpperTheory.GalStar.Tor (x.lpSum y) ↔ UpperTheory.GalStar.Tor x ∧ UpperTheory.GalStar.Tor y := by
+  have ht
+      : UpperTheory.GalStar.Tor (x.lpSum y)
+        ↔ UpperTheory.GalStar.Tor x ∧ UpperTheory.GalStar.Tor y := by
     simp only [tor_iff, eig_sum, Multiset.mem_add]
-    exact ⟨fun H => ⟨fun s t α hα => H s t α (Or.inl hα), fun s t α hα => H s t α (Or.inr hα)⟩,
-      fun H s t α hα => hα.elim (H.1 s t α) (H.2 s t α)⟩
+    exact ⟨
+      fun H => ⟨fun s t α hα => H s t α (Or.inl hα), fun s t α hα => H s t α (Or.inr hα)⟩,
+      fun H s t α hα => hα.elim (H.1 s t α) (H.2 s t α)
+    ⟩
   unfold Gd
   rw [ht, WD.monomial_sum_iff]
   tauto
@@ -93,7 +103,6 @@ private theorem gd_unr {x : WD h} (hx : x.unr) : Gd x := by
 end UpperTheory.V.Z.Win.Gu.ClosureUnderSumAndTwist
 
 open UpperTheory.V.Z.Win.Gu.ClosureUnderSumAndTwist in
-theorem UpperTheory.V.Z.Win.Gu.gdLaws :
-    GdLaws := by
+theorem UpperTheory.V.Z.Win.Gu.gdLaws : GdLaws := by
   intro E Ω _ _ _ _ _ A w h
   exact ⟨gd_sum, gd_tw, gd_list, fun _ => gd_unr⟩

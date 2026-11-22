@@ -4,11 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DYhc4.main :
-    ∀ {K A : Type} [inst : Field K] [inst_1 : CommRing A] [inst_2 : Algebra K A] [Algebra.FiniteType K A] (σ : K →+* ℂ)
-      (p : Ideal A) [hp : p.IsPrime] {b : A},
-      b ∉ p →
-        ∃ (ψ : A →+* ℂ), ψ.comp (Algebra.algebraMap K A) = σ ∧ (∀ a ∈ p, (ψ : A → ℂ) a = (0 : ℂ)) ∧ (ψ : A → ℂ) b ≠ (0 : ℂ) := by
+theorem UpperTheory.Reformulated.B.DYhc4.main
+    : ∀ {K A : Type} [inst : Field K] [inst_1 : CommRing A] [inst_2 : Algebra K A]
+        [Algebra.FiniteType K A] (σ : K →+* ℂ) (p : Ideal A) [hp : p.IsPrime] {b : A},
+      b ∉ p
+        → ∃ (ψ : A →+* ℂ),
+          ψ.comp (Algebra.algebraMap K A) = σ ∧ (∀ a ∈ p, (ψ : A → ℂ) a = (0 : ℂ))
+            ∧ (ψ : A → ℂ) b ≠ (0 : ℂ) := by
   intro K A _ _ _ _ σ p hp b hb
   haveI : IsJacobsonRing A := isJacobsonRing_of_finiteType (A := K)
   have hj : p.jacobson = p := IsJacobsonRing.out' p hp.isRadical
@@ -28,8 +30,7 @@ theorem UpperTheory.Reformulated.B.DYhc4.main :
   letI : Algebra K ℂ := σ.toAlgebra
   let f : (A ⧸ m) →ₐ[K] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨(f : (A ⧸ m) →+* ℂ).comp (Ideal.Quotient.mk m), ?_, ?_, ?_⟩
   · ext x
@@ -41,6 +42,5 @@ theorem UpperTheory.Reformulated.B.DYhc4.main :
     simp [this]
   · intro h0
     have h1 : f (Ideal.Quotient.mk m b) = 0 := h0
-    have h2 : Ideal.Quotient.mk m b = 0 := by
-      simpa using (map_eq_zero f).1 h1
+    have h2 : Ideal.Quotient.mk m b = 0 := by simpa using (map_eq_zero f).1 h1
     exact hbm (Ideal.Quotient.eq_zero_iff_mem.1 h2)

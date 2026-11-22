@@ -16,9 +16,11 @@ noncomputable section
 
 universe u
 
-theorem map_comap_renameEquiv {F : Type u} [Field F] {S K' : Type} {κ : S → Type}
-    {ι' : K' → Type} (σ : (Σ s, κ s) ≃ (Σ k', ι' k')) (P : Ideal (MRing ι' F)) :
-    (P.comap (rename σ)).map (renameEquiv F σ) = P := by
+theorem map_comap_renameEquiv
+    {F : Type u} [Field F]
+    {S K' : Type} {κ : S → Type} {ι' : K' → Type}
+    (σ : (Σ s, κ s) ≃ (Σ k', ι' k')) (P : Ideal (MRing ι' F))
+    : (P.comap (rename σ)).map (renameEquiv F σ) = P := by
   have h : P.comap (rename σ) = P.comap (renameEquiv F σ) := rfl
   rw [h]
   exact Ideal.map_comap_of_surjective _ (renameEquiv F σ).surjective P

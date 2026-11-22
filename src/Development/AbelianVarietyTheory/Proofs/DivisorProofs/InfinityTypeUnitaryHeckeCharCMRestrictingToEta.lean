@@ -8,23 +8,28 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Circle
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.MuInfType
 
-theorem char_eq_zpow (χ : ℂˣ →* ℂˣ) (hc : Continuous χ) (hu : ∀ z, ‖(χ z : ℂ)‖ = 1)
-    (hp : ∀ z : ℂˣ, (((‖(z : ℂ)‖ : ℝ) : ℂ)) = z → χ z = 1) :
-    ∃ n : ℤ, ∀ z : ℂˣ, (χ z : ℂ) = ((z : ℂ) / (‖(z : ℂ)‖ : ℂ)) ^ n := by
+theorem char_eq_zpow
+    (χ : ℂˣ →* ℂˣ) (hc : Continuous χ) (hu : ∀ z, ‖(χ z : ℂ)‖ = 1)
+    (hp : ∀ z : ℂˣ, (((‖(z : ℂ)‖ : ℝ) : ℂ)) = z → χ z = 1)
+    : ∃ n : ℤ, ∀ z : ℂˣ, (χ z : ℂ) = ((z : ℂ) / (‖(z : ℂ)‖ : ℂ)) ^ n := by
   have hmem : ∀ z, (χ (Circle.toUnits z) : ℂ) ∈ Submonoid.unitSphere ℂ := fun z => by
     simpa [Submonoid.unitSphere, mem_sphere_zero_iff_norm] using hu _
-  let f : Circle →* Circle :=
-    { toFun := fun z => (⟨(χ (Circle.toUnits z) : ℂ), hmem z⟩ : Circle)
-      map_one' := Circle.ext (by simp)
-      map_mul' := fun a b => Circle.ext (by
-        change ((χ (Circle.toUnits (a * b))) : ℂ) = (χ (Circle.toUnits a) : ℂ) * (χ (Circle.toUnits b) : ℂ)
-        rw [map_mul, map_mul, Units.val_mul]) }
+  let f : Circle →* Circle := {
+    toFun := fun z => (⟨(χ (Circle.toUnits z) : ℂ), hmem z⟩ : Circle)
+    map_one' := Circle.ext (by simp)
+    map_mul' := fun a b =>
+      Circle.ext (by
+        change ((χ (Circle.toUnits (a * b))) : ℂ)
+          = (χ (Circle.toUnits a) : ℂ) * (χ (Circle.toUnits b) : ℂ)
+        rw [map_mul, map_mul, Units.val_mul])
+  }
   have hcu : Continuous (Circle.toUnits : Circle → ℂˣ) := by
     rw [Units.continuous_iff]
     refine ⟨?_, ?_⟩
@@ -44,9 +49,10 @@ theorem char_eq_zpow (χ : ℂˣ →* ℂˣ) (hc : Continuous χ) (hu : ∀ z, �
     simp [Submonoid.unitSphere, mem_sphere_zero_iff_norm, norm_div, hz0]
   let w : Circle := (⟨_, hw⟩ : Circle)
   let r : ℂˣ := Units.mk0 (‖(z : ℂ)‖ : ℂ) hn0
-  have hzr : z = Circle.toUnits w * r := Units.ext (by
-    change (z : ℂ) = (z : ℂ) / (‖(z : ℂ)‖ : ℂ) * (‖(z : ℂ)‖ : ℂ)
-    field_simp)
+  have hzr : z = Circle.toUnits w * r :=
+    Units.ext (by
+      change (z : ℂ) = (z : ℂ) / (‖(z : ℂ)‖ : ℂ) * (‖(z : ℂ)‖ : ℂ)
+      field_simp)
   have hr : χ r = 1 := hp r (by simp [r])
   have h1 := congrArg (fun c : Circle => (c : ℂ)) (hn w)
   have hχ : χ z = χ (Circle.toUnits w) := by rw [hzr, map_mul, hr, mul_one]
@@ -64,24 +70,26 @@ namespace GlobalTheory.MuInfType
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-def single (v : InfinitePlace E) : ℂˣ →* (Cinf E)ˣ := Units.map (MonoidHom.mulSingle (fun _ : InfinitePlace E => ℂ) v)
+def single (v : InfinitePlace E) : ℂˣ →* (Cinf E)ˣ :=
+  Units.map (MonoidHom.mulSingle (fun _ : InfinitePlace E => ℂ) v)
 
 theorem continuous_single (v : InfinitePlace E) : Continuous (single v) :=
   Continuous.units_map _ (by
     show Continuous (fun z : ℂ => (Pi.mulSingle v z : InfinitePlace E → ℂ))
     exact continuous_mulSingle (A := fun _ : InfinitePlace E => ℂ) v)
 
-
 variable (E) in
-abbrev below (v : InfinitePlace E) : InfinitePlace (maximalRealSubfield E) := v.comap (algebraMap (maximalRealSubfield E) E)
+abbrev below (v : InfinitePlace E) : InfinitePlace (maximalRealSubfield E) :=
+  v.comap (algebraMap (maximalRealSubfield E) E)
 
 def iota (v : InfinitePlace E) : (below E v).Completion →+* ℂ :=
-  (InfinitePlace.Completion.ringEquivComplexOfIsComplex (IsTotallyComplex.isComplex v)).toRingHom.comp
-    (AbsoluteValue.Completion.map (below E v).1 v.1)
+  (InfinitePlace.Completion.ringEquivComplexOfIsComplex (IsTotallyComplex.isComplex
+    v)).toRingHom.comp (AbsoluteValue.Completion.map (below E v).1 v.1)
 
-theorem ideleMap_infIdele (v : InfinitePlace E) (x : ((below E v).Completion)ˣ) :
-    GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.ideleMap (maximalRealSubfield E) E (infIdele _ (below E v) x) =
-      infId E (single v (Units.map (iota v).toMonoidHom x)) := by
+theorem ideleMap_infIdele (v : InfinitePlace E) (x : ((below E v).Completion)ˣ)
+    : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.ideleMap
+        (maximalRealSubfield E) E (infIdele _ (below E v) x)
+      = infId E (single v (Units.map (iota v).toMonoidHom x)) := by
   classical
   refine Units.ext (ad_ext ?_ ?_)
   · funext w
@@ -100,20 +108,30 @@ theorem ideleMap_infIdele (v : InfinitePlace E) (x : ((below E v).Completion)ˣ)
         h ((IsCMField.equivInfinitePlace E).injective e)
       rw [Pi.mulSingle_eq_of_ne h']
       simp [single, Pi.mulSingle_eq_of_ne h]
-  · change pFin E (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.ideleMap (maximalRealSubfield E) E (infIdele _ (below E v) x) : Ad E) =
-      pFin E (infId E _).val
-    refine (map_one (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.finiteAdeleMap (maximalRealSubfield E) E)).trans ?_
+  · change pFin E
+        (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.ideleMap
+            (maximalRealSubfield E) E (infIdele _ (below E v) x)
+          : Ad E)
+      = pFin E (infId E _).val
+    refine (map_one
+      (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.finiteAdeleMap
+        (maximalRealSubfield E) E)).trans ?_
     change (1 : Af E) = 1 - 0 + 0
     simp
 
-theorem iota_real (v : InfinitePlace E) (s : ℝ) :
-    iota v ((InfinitePlace.Completion.ringEquivRealOfIsReal (IsTotallyReal.isReal (below E v))).symm s) = s := by
-  let ψ : ℝ →+* ℂ := (iota v).comp
-    (InfinitePlace.Completion.ringEquivRealOfIsReal (IsTotallyReal.isReal (below E v))).symm.toRingHom
+theorem iota_real (v : InfinitePlace E) (s : ℝ)
+    : iota v
+        ((InfinitePlace.Completion.ringEquivRealOfIsReal (IsTotallyReal.isReal (below E v))).symm s)
+      = s := by
+  let ψ : ℝ →+* ℂ :=
+    (iota v).comp
+      (InfinitePlace.Completion.ringEquivRealOfIsReal (IsTotallyReal.isReal (below E
+        v))).symm.toRingHom
   have hψ : Continuous ψ :=
-    ((InfinitePlace.Completion.isometryEquivComplexOfIsComplex (IsTotallyComplex.isComplex v)).continuous.comp
-      (AbsoluteValue.Completion.continuous_map (below E v).1 v.1)).comp
-      (InfinitePlace.Completion.isometryEquivRealOfIsReal (IsTotallyReal.isReal (below E v))).symm.continuous
+    ((InfinitePlace.Completion.isometryEquivComplexOfIsComplex (IsTotallyComplex.isComplex
+        v)).continuous.comp (AbsoluteValue.Completion.continuous_map (below E v).1 v.1)).comp
+      (InfinitePlace.Completion.isometryEquivRealOfIsReal (IsTotallyReal.isReal (below E
+        v))).symm.continuous
   have := map_real_smul ψ hψ s 1
   simpa [ψ] using this
 
@@ -127,16 +145,24 @@ open ReciprocityTheory.Neutral.Bridge.HCFR
 
 namespace GlobalTheory.MuInfType
 
-theorem infType : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (μ : HChar E), μ.IsUnitary →
-    (∀ x, μ.1 (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.ideleMap (maximalRealSubfield E) E x) = (GlobalTheory.GalOfCusp.quadChar E).1 x) →
-    ∃ e : InfinitePlace E → ℤ, (∀ v, Odd (e v)) ∧
-      ∀ z : (Cinf E)ˣ, (chiInf μ z : ℂ) = ∏ v, (z.1 v / (‖z.1 v‖ : ℂ)) ^ e v := by
+theorem infType
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (μ : HChar E),
+      μ.IsUnitary
+        → (∀ x,
+          μ.1 (GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.ideleMap
+              (maximalRealSubfield E) E x)
+            = (GlobalTheory.GalOfCusp.quadChar E).1 x)
+        → ∃ e : InfinitePlace E → ℤ,
+          (∀ v, Odd (e v))
+            ∧ ∀ z : (Cinf E)ˣ, (chiInf μ z : ℂ) = ∏ v, (z.1 v / (‖z.1 v‖ : ℂ)) ^ e v := by
   intro E _ _ _ μ hU hη
   let χv : InfinitePlace E → ℂˣ →* ℂˣ := fun v => (chiInf μ).comp (single v)
   have hcont : ∀ v, Continuous (χv v) := fun v => (continuous_chiInf μ).comp (continuous_single v)
   have hunit : ∀ v z, ‖(χv v z : ℂ)‖ = 1 := fun v z => hU _
-  have hval : ∀ v (x : ((below E v).Completion)ˣ),
-      χv v (Units.map (iota v).toMonoidHom x) = (GlobalTheory.GalOfCusp.quadChar E).1 (infIdele _ (below E v) x) := by
+  have hval
+      : ∀ v (x : ((below E v).Completion)ˣ),
+        χv v (Units.map (iota v).toMonoidHom x)
+          = (GlobalTheory.GalOfCusp.quadChar E).1 (infIdele _ (below E v) x) := by
     intro v x
     change μ.1 (infId E (single v _)) = _
     rw [← ideleMap_infIdele, hη]
@@ -153,15 +179,19 @@ theorem infType : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (μ : H
     have hs0 : s ≠ 0 := by
       rw [hs]
       exact (Real.sqrt_pos.2 (norm_pos_iff.2 z.ne_zero)).ne'
-    have hx0 : (InfinitePlace.Completion.ringEquivRealOfIsReal (IsTotallyReal.isReal (below E v))).symm s ≠ 0 := by
+    have hx0
+        : (InfinitePlace.Completion.ringEquivRealOfIsReal (IsTotallyReal.isReal (below E v))).symm s
+          ≠ 0 := by
       simpa using hs0
     let x : ((below E v).Completion)ˣ := Units.mk0 _ hx0
-    have hx : Units.map (iota v).toMonoidHom x ^ 2 = z := Units.ext (by
-      simp only [Units.val_pow_eq_pow_val, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, x,
-        Units.val_mk0, iota_real]
-      rw [← Complex.ofReal_pow, hs, Real.sq_sqrt (norm_nonneg _), hz])
+    have hx : Units.map (iota v).toMonoidHom x ^ 2 = z :=
+      Units.ext (by
+        simp only [Units.val_pow_eq_pow_val, Units.coe_map, RingHom.toMonoidHom_eq_coe,
+          MonoidHom.coe_coe, x, Units.val_mk0, iota_real]
+        rw [← Complex.ofReal_pow, hs, Real.sq_sqrt (norm_nonneg _), hz])
     rw [← hx, map_pow, hval]
-    change (Units.map (Int.castRingHom ℂ).toMonoidHom (GlobalTheory.IdeleNormChar.normSign E _)) ^ 2 = 1
+    change (Units.map (Int.castRingHom ℂ).toMonoidHom (GlobalTheory.IdeleNormChar.normSign E _)) ^ 2
+      = 1
     rw [← map_pow, Int.units_sq, map_one]
   choose e he using fun v => GlobalTheory.MuInfType.char_eq_zpow (χv v) (hcont v) (hunit v) (hpos v)
   refine ⟨e, fun v => ?_, fun z => ?_⟩
@@ -172,11 +202,14 @@ theorem infType : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (μ : H
     · rw [h'.neg_one_zpow] at h
       norm_num at h
     · exact h'
-  · let zv : InfinitePlace E → ℂˣ := fun v => Units.map (Pi.evalMonoidHom (fun _ : InfinitePlace E => ℂ) v) z
-    have hz : z = ∏ v, single v (zv v) := Units.ext (by
-      rw [Units.coe_prod]
-      simp only [single, zv, Units.coe_map, MonoidHom.coe_coe, MonoidHom.mulSingle_apply, Pi.evalMonoidHom_apply]
-      exact (Finset.univ_prod_mulSingle z.val).symm)
+  · let zv : InfinitePlace E → ℂˣ := fun v =>
+      Units.map (Pi.evalMonoidHom (fun _ : InfinitePlace E => ℂ) v) z
+    have hz : z = ∏ v, single v (zv v) :=
+      Units.ext (by
+        rw [Units.coe_prod]
+        simp only [single, zv, Units.coe_map, MonoidHom.coe_coe, MonoidHom.mulSingle_apply,
+          Pi.evalMonoidHom_apply]
+        exact (Finset.univ_prod_mulSingle z.val).symm)
     conv_lhs => rw [hz]
     rw [map_prod, Units.coe_prod]
     exact Finset.prod_congr rfl fun v _ => he v (zv v)

@@ -6,8 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.PrimeDvdNatCastMem
 
-theorem exists_prime_dvd_natCast_mem {O : Type} [CommRing O] (P : Ideal O) [hP : Ideal.IsPrime P]
-    (m : ℕ) : m ≠ (0 : ℕ) → (↑m : O) ∈ P → ∃ (p : ℕ), Nat.Prime p ∧ p ∣ m ∧ (↑p : O) ∈ P := by
+theorem exists_prime_dvd_natCast_mem
+    {O : Type} [CommRing O] (P : Ideal O) [hP : Ideal.IsPrime P] (m : ℕ)
+    : m ≠ (0 : ℕ) → (↑m : O) ∈ P → ∃ (p : ℕ), Nat.Prime p ∧ p ∣ m ∧ (↑p : O) ∈ P := by
   induction m using Nat.strong_induction_on with
   | _ m ih =>
     intro hm0 hm

@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open GlobalTheory.Grid GlobalTheory.ChiGrid GlobalTheory.GridJoin
@@ -21,28 +23,54 @@ noncomputable section
 
 namespace GlobalTheory.GridJoin
 
-theorem natCast_mem_under_iff (Aa : Type) [CommRing Aa] [IsDomain Aa] {B : Type} [CommRing B] [IsDomain B]
-    [Algebra Aa B] [Algebra.IsIntegral Aa B] (w : HeightOneSpectrum B) (n : ℕ) :
-    (n : Aa) ∈ (w.under Aa).asIdeal ↔ (n : B) ∈ w.asIdeal := by
+theorem natCast_mem_under_iff
+    (Aa : Type) [CommRing Aa] [IsDomain Aa]
+    {B : Type} [CommRing B] [IsDomain B] [Algebra Aa B] [Algebra.IsIntegral Aa B]
+    (w : HeightOneSpectrum B) (n : ℕ)
+    : (n : Aa) ∈ (w.under Aa).asIdeal ↔ (n : B) ∈ w.asIdeal := by
   rw [HeightOneSpectrum.under_asIdeal, Ideal.mem_under, map_natCast]
 
-theorem placeDat_of_grid : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 T : Type} {A : FamIn D.what₂.LL Γ Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} {sc : GlobalTheory.ChiGrid.Consts}, ∀ {F : Face D A}, GlobalTheory.Hk3.Core R F → ∀ {G' : GlobalTheory.ChiGrid.GridData R.toLevCh sc}, (∀ PP ∈ R.Pg, ∀ PP' ∈ R.Pg, (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) = (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP') → PP = PP') → Formalism.L2.Host.SplitsCompletely {G'.pl.w G'.pl.v0} → (∀ k, GlobalTheory.ChiGrid.q0 D ≠ D.host.g k) → (GlobalTheory.ChiGrid.q0 D ≠ D.sp.T ∧ ∀ u : D.what₂.Word, GlobalTheory.ChiGrid.q0 D ≠ (D.mem u).A.T) → ∀ e : AE D, IsIdemSum e G'.pl.W0 → ∃ Z : GlobalTheory.Grid.PlaceDat D, Z.Is R.Pg R.Q e ∧ Z.q0 = GlobalTheory.ChiGrid.q0 D ∧ Z.w0 = G'.pl.w G'.pl.v0 ∧ Z.e0 = G'.pl.depth sc G'.pl.v0 ∧ Z.W R.Pg = G'.pl.W0 ∧ Z.ideal R.Pg = G'.modul ∧ Z.S0 R.Pg = G'.pl.S0 ∧ ∀ w, w ∈ R.Pg ∨ w ∈ Z.Wd → w.under (𝓞 D.host.F) ∈ GlobalTheory.ChiGrid.S1 D := by
+theorem placeDat_of_grid
+    : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL Γ Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} {sc : GlobalTheory.ChiGrid.Consts},
+      ∀ {F : Face D A},
+        GlobalTheory.Hk3.Core R F
+          → ∀ {G' : GlobalTheory.ChiGrid.GridData R.toLevCh sc},
+            (∀ PP ∈ R.Pg, ∀ PP' ∈ R.Pg,
+                (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)
+                    = (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP')
+                  → PP = PP')
+              → Formalism.L2.Host.SplitsCompletely {G'.pl.w G'.pl.v0}
+              → (∀ k, GlobalTheory.ChiGrid.q0 D ≠ D.host.g k)
+              → (GlobalTheory.ChiGrid.q0 D ≠ D.sp.T
+                ∧ ∀ u : D.what₂.Word, GlobalTheory.ChiGrid.q0 D ≠ (D.mem u).A.T)
+              → ∀ e : AE D,
+                IsIdemSum e G'.pl.W0
+                  → ∃ Z : GlobalTheory.Grid.PlaceDat D,
+                    Z.Is R.Pg R.Q e ∧ Z.q0 = GlobalTheory.ChiGrid.q0 D ∧ Z.w0 = G'.pl.w G'.pl.v0
+                      ∧ Z.e0 = G'.pl.depth sc G'.pl.v0 ∧ Z.W R.Pg = G'.pl.W0
+                      ∧ Z.ideal R.Pg = G'.modul ∧ Z.S0 R.Pg = G'.pl.S0
+                      ∧ ∀ w,
+                        w ∈ R.Pg ∨ w ∈ Z.Wd → w.under (𝓞 D.host.F) ∈ GlobalTheory.ChiGrid.S1 D := by
   intro D Γ _ _ Pl0 T A Ks _ _ _ R sc F hR G' hPg hsplit hg hT e he
   classical
-
   have hPgOver : ∀ PP ∈ R.Pg, ∃ k, ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ PP.asIdeal := by
     intro PP hPP
     obtain ⟨k, hk⟩ := (hR.lev.Pg PP).1 hPP
     refine ⟨k, (natCast_mem_under_iff (𝓞 D.host.K) PP _).1 ?_⟩
     rw [show PP.under (𝓞 D.host.K) = R.C.P.pb k from hk]
     exact R.C.P.pb_over k
-  have gS1 : ∀ (v : Pl D.host.F) (k : Fin 2), ((D.host.g k : ℕ) : 𝓞 D.host.F) ∈ v.asIdeal → v ∈ S1 D := by
+  have gS1
+      : ∀ (v : Pl D.host.F) (k : Fin 2),
+        ((D.host.g k : ℕ) : 𝓞 D.host.F) ∈ v.asIdeal → v ∈ S1 D := by
     intro v k hk
     rw [S1_mem_OmF]
     fin_cases k
     · exact Or.inl hk
     · exact Or.inr (Or.inl hk)
-  have hPgS1 : ∀ PP ∈ R.Pg, (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ∈ S1 D := by
+  have hPgS1
+      : ∀ PP ∈ R.Pg, (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP) ∈ S1 D := by
     intro PP hPP
     obtain ⟨k, hk⟩ := hPgOver PP hPP
     exact gS1 _ k ((natCast_mem_under_iff (𝓞 D.host.F) PP _).2 hk)
@@ -50,7 +78,9 @@ theorem placeDat_of_grid : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0
   have hS0 : ∀ v ∈ S1 D, v ∈ insert P.v0 (S1 D) := fun v hv => Finset.mem_insert_of_mem hv
   have hv0 : P.v0 ∈ insert P.v0 (S1 D) := Finset.mem_insert_self _ _
 
-  have hPgw : ∀ PP ∈ R.Pg, P.w ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)) = PP := by
+  have hPgw
+      : ∀ PP ∈ R.Pg,
+        P.w ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)) = PP := by
     intro PP hPP
     obtain ⟨k, hk⟩ := hPgOver PP hPP
     have hkF := (natCast_mem_under_iff (𝓞 D.host.F) PP _).2 hk
@@ -65,8 +95,8 @@ theorem placeDat_of_grid : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0
 
   have hW : Z.W R.Pg = P.W0 := by
     ext x
-    simp only [GlobalTheory.Grid.PlaceDat.W, Places.W0, Places.S0, Finset.mem_union, Finset.mem_singleton, Finset.mem_image,
-      Finset.mem_insert, Z]
+    simp only [GlobalTheory.Grid.PlaceDat.W, Places.W0, Places.S0, Finset.mem_union,
+      Finset.mem_singleton, Finset.mem_image, Finset.mem_insert, Z]
     constructor
     · rintro ((hx | hx) | rfl)
       · exact ⟨_, Or.inr (hPgS1 x hx), hPgw x hx⟩
@@ -105,28 +135,36 @@ theorem placeDat_of_grid : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0
   have hWdS1 : ∀ w ∈ Wd, w.under (𝓞 D.host.F) ∈ S1 D := by
     intro w hw
     obtain ⟨v, hv, -, rfl⟩ := (hmemWd w).1 hw
-    rw [P.w_over v (hS0 v hv)]; exact hv
+    rw [P.w_over v (hS0 v hv)]
+    exact hv
   have hq := leastSplitAuxiliaryPrimeThetaChain_spec D
   refine ⟨Z, ?_, rfl, rfl, rfl, hW, hIdeal, hS0eq, ?_⟩
-  · refine
-      { prime := hq.1
-        five_le := ?_
-        referencePlaceOverPrime := ?_
-        split := hsplit
-        ne_g := hg
-        ne_pde := leastSplitAuxiliaryPrime_ne_typePrimes D
-        referencePrimeNeTwist := hT
-        coprime := Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hq.1).2 hq.2.2)
-        offQ := ?_
-        depth_pos := P.depth_pos sc P.v0
-        Wd_over := ?_
-        Wd_all := ?_
-        idem := by rw [hW]; exact he }
+  · refine {
+      prime := hq.1
+      five_le := ?_
+      referencePlaceOverPrime := ?_
+      split := hsplit
+      ne_g := hg
+      ne_pde := leastSplitAuxiliaryPrime_ne_typePrimes D
+      referencePrimeNeTwist := hT
+      coprime := Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hq.1).2 hq.2.2)
+      offQ := ?_
+      depth_pos := P.depth_pos sc P.v0
+      Wd_over := ?_
+      Wd_all := ?_
+      idem := by rw [hW]; exact he
+    }
     · have h1 : 0 < LevelStarExponents.condE D := by
         have := D.host.qd_big
         unfold LevelStarExponents.condE
         exact mul_pos (mul_pos D.host.QS_pos (by omega)) (by omega)
-      have h4 : 4 ≤ LevelStarExponents.condE D := Nat.le_of_dvd h1 (by unfold LevelStarExponents.condE; exact dvd_mul_of_dvd_left (dvd_mul_of_dvd_left ((Dvd.intro_left (2 ^ D.R.e) (by rw [pow_add]; norm_num)).trans D.host.tower_dvd) _) _)
+      have h4 : 4 ≤ LevelStarExponents.condE D :=
+        Nat.le_of_dvd h1 (by
+          unfold LevelStarExponents.condE
+          exact dvd_mul_of_dvd_left
+            (dvd_mul_of_dvd_left
+              ((Dvd.intro_left (2 ^ D.R.e) (by rw [pow_add]; norm_num)).trans D.host.tower_dvd) _)
+            _)
       have h2 := (rPr_spec D).1.two_le
       have h3 : 5 < Formalism.MainNotions.rPrAv D * LevelStarExponents.condE D := by nlinarith
       show 5 ≤ q0 D
@@ -136,7 +174,8 @@ theorem placeDat_of_grid : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0
       exact hq.1.one_lt.ne' hm
     · show (((q0 D : ℕ) : 𝓞 D.host.E) ∈ (P.w P.v0).asIdeal)
       refine (natCast_mem_under_iff (𝓞 D.host.F) _ _).1 ?_
-      rw [P.w_over _ hv0]; exact P.basePlace_over_qZero
+      rw [P.w_over _ hv0]
+      exact P.basePlace_over_qZero
     · intro t w hw
       show w.under (𝓞 D.host.F) ≠ (P.w P.v0).under (𝓞 D.host.F)
       rw [P.w_over _ hv0]
@@ -145,9 +184,11 @@ theorem placeDat_of_grid : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0
       obtain ⟨v, hv, hpd, rfl⟩ := (hmemWd w).1 hw
       have hu := P.w_over v (hS0 v hv)
       rcases hpd with h | h
-      · left; show ((D.host.pde : ℕ) : 𝓞 D.host.E) ∈ (P.w v).asIdeal
+      · left
+        show ((D.host.pde : ℕ) : 𝓞 D.host.E) ∈ (P.w v).asIdeal
         exact (natCast_mem_under_iff (𝓞 D.host.F) _ _).1 (by rw [hu]; exact h)
-      · right; show ((D.host.pde' : ℕ) : 𝓞 D.host.E) ∈ (P.w v).asIdeal
+      · right
+        show ((D.host.pde' : ℕ) : 𝓞 D.host.E) ∈ (P.w v).asIdeal
         exact (natCast_mem_under_iff (𝓞 D.host.F) _ _).1 (by rw [hu]; exact h)
     · intro p hp
       have hpd : ∀ v : Pl D.host.F, ((p : ℕ) : 𝓞 D.host.F) ∈ v.asIdeal → pd v := by
@@ -163,8 +204,11 @@ theorem placeDat_of_grid : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0
       refine ⟨?_, ?_, ?_⟩
       · intro w hw
         have h := (natCast_mem_under_iff (𝓞 D.host.F) w p).2 hw
-        exact ⟨P.w (w.under (𝓞 D.host.F)), (hmemWd _).2 ⟨_, hS1 _ h, hpd _ h, rfl⟩,
-          P.w_over _ (hS0 _ (hS1 _ h))⟩
+        exact ⟨
+          P.w (w.under (𝓞 D.host.F)),
+          (hmemWd _).2 ⟨_, hS1 _ h, hpd _ h, rfl⟩,
+          P.w_over _ (hS0 _ (hS1 _ h))
+        ⟩
       · obtain ⟨𝔭, h𝔭⟩ := P.w_de p hp
         refine ⟨𝔭, fun w hw hpw => ?_⟩
         obtain ⟨v, hv, -, rfl⟩ := (hmemWd w).1 hw

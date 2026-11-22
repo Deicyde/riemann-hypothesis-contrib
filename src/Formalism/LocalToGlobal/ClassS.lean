@@ -24,17 +24,15 @@ namespace Formalism.L2
 
 section
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L} {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D}
-  {cX : ExtraC}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L}
+  {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
 
 structure LinkedFamilyData (ex : Extra D L hT Gi Gl K Y cX) where
   host : Host.HostTied D
   level : Host.LevelTied D
-
   cols : Forms.ColsTiedSym D
-
   full : Forms.ColsFullS cols
-
   extra : Forms.ColsExtraTiedS full ex
   provA : TH.ProvA
   theta : Theta.AllTied D ex.th provA
@@ -49,15 +47,10 @@ structure LinkedFamilyData (ex : Extra D L hT Gi Gl K Y cX) where
   chrPsi : Host.PsiChoiceCompatible D n.cf ex.nch n.tp
   sameChr : JoinChr.SameChr theta.T thetaChr
   what₂ : Rows.RowsCompatible D host n.cf n.tp
-
   inK : Y.Lev → ℕ → Prop
-
   geo : Geo.GeoTiedP Y inK
-
   tw : Forms.SymmetricTwistedColumnsAtPrimes n.tp cols ex.tw
-
   emt : Rows.EMtTied D cols tw
-
   g : G.GroupCompatibilityAll D hT ex.cmp
   herm_eq : g.herm = full.1.to0
   forms_eq : g.forms = fun u => (cols.forms u).to0

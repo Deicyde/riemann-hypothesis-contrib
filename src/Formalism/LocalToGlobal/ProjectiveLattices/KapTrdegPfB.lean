@@ -8,9 +8,10 @@ namespace Formalism.L2.Pj.TranscendenceDegreeLemmas
 
 open AlgebraicGeometry CategoryTheory
 
-theorem primeIdealOf_mem_minimalPrimes {X : Scheme.{0}} {V : X.Opens} (hV : IsAffineOpen V) {Z : Set X}
-    (hZ : Z ∈ irreducibleComponents X) (hx : hZ.1.genericPoint ∈ V) :
-    (hV.primeIdealOf ⟨_, hx⟩).asIdeal ∈ minimalPrimes Γ(X, V) := by
+theorem primeIdealOf_mem_minimalPrimes
+    {X : Scheme.{0}} {V : X.Opens} (hV : IsAffineOpen V)
+    {Z : Set X} (hZ : Z ∈ irreducibleComponents X) (hx : hZ.1.genericPoint ∈ V)
+    : (hV.primeIdealOf ⟨_, hx⟩).asIdeal ∈ minimalPrimes Γ(X, V) := by
   have hZc : IsClosed Z := isClosed_of_mem_irreducibleComponents Z hZ
   have hgen : IsGenericPoint hZ.1.genericPoint Z := by
     have := hZ.1.isGenericPoint_genericPoint_closure
@@ -24,7 +25,8 @@ theorem primeIdealOf_mem_minimalPrimes {X : Scheme.{0}} {V : X.Opens} (hV : IsAf
   have hirr : IsIrreducible (closure {hV.fromSpec y}) := isIrreducible_singleton.closure
   have hZle : Z ⊆ closure {hV.fromSpec y} := by
     rw [← hgen.def]
-    exact closure_minimal (Set.singleton_subset_iff.2 (specializes_iff_mem_closure.1 hsp')) isClosed_closure
+    exact closure_minimal (Set.singleton_subset_iff.2 (specializes_iff_mem_closure.1 hsp'))
+      isClosed_closure
   have heq : closure {hV.fromSpec y} = Z := (hZ.2 hirr hZle).antisymm hZle
   have hmem : hV.fromSpec y ∈ Z := heq ▸ subset_closure rfl
   have hxy : hV.fromSpec y = hZ.1.genericPoint := (hsp'.antisymm (hgen.specializes hmem)).eq
@@ -33,13 +35,16 @@ theorem primeIdealOf_mem_minimalPrimes {X : Scheme.{0}} {V : X.Opens} (hV : IsAf
   have := congrArg PrimeSpectrum.asIdeal hy
   exact le_of_eq this.symm
 
-theorem fg_residueField_genericPoint {K : Type} [Field K] [CharZero K] [FiniteDimensional ℚ K]
-    {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of K)) (n : ℕ) [SmoothOfRelativeDimension n f]
-    {Z : Set X} (hZ : Z ∈ irreducibleComponents X) [Algebra K (X.residueField hZ.1.genericPoint)] :
-    (⊤ : IntermediateField K (X.residueField hZ.1.genericPoint)).FG := by
+theorem fg_residueField_genericPoint
+    {K : Type} [Field K] [CharZero K] [FiniteDimensional ℚ K]
+    {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of K))
+    (n : ℕ) [SmoothOfRelativeDimension n f]
+    {Z : Set X} (hZ : Z ∈ irreducibleComponents X) [Algebra K (X.residueField hZ.1.genericPoint)]
+    : (⊤ : IntermediateField K (X.residueField hZ.1.genericPoint)).FG := by
   classical
   obtain ⟨U, hU, V, hV, hxV, e, hP⟩ :=
-    SmoothOfRelativeDimension.exists_isStandardSmoothOfRelativeDimension (n := n) (f := f) hZ.1.genericPoint
+    SmoothOfRelativeDimension.exists_isStandardSmoothOfRelativeDimension (n := n) (f := f)
+      hZ.1.genericPoint
   have hUtop : U = ⊤ := by
     refine eq_top_iff.2 fun y _ => ?_
     have hfx : f hZ.1.genericPoint ∈ U := e hxV
@@ -55,8 +60,9 @@ theorem fg_residueField_genericPoint {K : Type} [Field K] [CharZero K] [FiniteDi
   let _ : Algebra Γ(X, V) (X.presheaf.stalk hZ.1.genericPoint) :=
     TopCat.Presheaf.algebra_section_stalk X.presheaf ⟨hZ.1.genericPoint, hxV⟩
   have hloc := hV.isLocalization_stalk ⟨hZ.1.genericPoint, hxV⟩
-  let eL := IsLocalization.algEquiv (hV.primeIdealOf ⟨_, hxV⟩).asIdeal.primeCompl
-    (Localization.AtPrime (hV.primeIdealOf ⟨_, hxV⟩).asIdeal) (X.presheaf.stalk hZ.1.genericPoint)
+  let eL :=
+    IsLocalization.algEquiv (hV.primeIdealOf ⟨_, hxV⟩).asIdeal.primeCompl
+      (Localization.AtPrime (hV.primeIdealOf ⟨_, hxV⟩).asIdeal) (X.presheaf.stalk hZ.1.genericPoint)
   let eR : (hV.primeIdealOf ⟨_, hxV⟩).asIdeal.ResidueField ≃+* X.residueField hZ.1.genericPoint :=
     IsLocalRing.ResidueField.mapEquiv eL.toRingEquiv
   have hc1 : CharZero (X.residueField hZ.1.genericPoint) :=
@@ -67,7 +73,8 @@ theorem fg_residueField_genericPoint {K : Type} [Field K] [CharZero K] [FiniteDi
     IsScalarTower.of_algebraMap_eq fun q => ((algebraMap K _).map_rat_algebraMap q).symm
   have t2 : IsScalarTower ℚ K (hV.primeIdealOf ⟨_, hxV⟩).asIdeal.ResidueField :=
     IsScalarTower.of_algebraMap_eq fun q => ((algebraMap K _).map_rat_algebraMap q).symm
-  have f00 : Algebra.IsStandardSmooth K Γ(X, V) := Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth n
+  have f00 : Algebra.IsStandardSmooth K Γ(X, V) :=
+    Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth n
   have f01 : Algebra.FinitePresentation K Γ(X, V) := inferInstance
   have f0 : Algebra.EssFiniteType K Γ(X, V) := inferInstance
   have f1 : Algebra.EssFiniteType K (hV.primeIdealOf ⟨_, hxV⟩).asIdeal.ResidueField :=
@@ -77,7 +84,8 @@ theorem fg_residueField_genericPoint {K : Type} [Field K] [CharZero K] [FiniteDi
     Algebra.EssFiniteType.comp ℚ K _
   have f4 : Algebra.EssFiniteType ℚ (X.residueField hZ.1.genericPoint) :=
     (Algebra.EssFiniteType.iff_of_algEquiv eR.toRatAlgEquiv).1 f3
-  have f5 : Algebra.EssFiniteType K (X.residueField hZ.1.genericPoint) := Algebra.EssFiniteType.of_comp ℚ K _
+  have f5 : Algebra.EssFiniteType K (X.residueField hZ.1.genericPoint) :=
+    Algebra.EssFiniteType.of_comp ℚ K _
   exact IntermediateField.fg_top K _
 
 end Formalism.L2.Pj.TranscendenceDegreeLemmas

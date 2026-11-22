@@ -17,9 +17,12 @@ namespace AscentPotential
 
 variable {n : ℕ} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
 
-theorem nsq_le_of_eig (hS : SqId) {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E)
-    (hU : IsInfUnitary ε E) {ω : Fin n → ℝ} {κ : ℝ} {w : M} (hw0 : w ≠ 0) (hwt : IsWt E ω w)
-    (hc : casimirK ε E w = (κ : ℂ) • w) : nsq ω ≤ κ := by
+theorem nsq_le_of_eig
+    (hS : SqId)
+    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (hU : IsInfUnitary ε E)
+    {ω : Fin n → ℝ} {κ : ℝ} {w : M}
+    (hw0 : w ≠ 0) (hwt : IsWt E ω w) (hc : casimirK ε E w = (κ : ℂ) • w)
+    : nsq ω ≤ κ := by
   have h := (hS n ε M E hE hU w).1
   rw [hc, inner_smul_left, inner_self_eq_norm_sq_to_K] at h
   simp only [Complex.conj_ofReal] at h
@@ -27,7 +30,9 @@ theorem nsq_le_of_eig (hS : SqId) {ε : Fin n → Bool} {E : Fin n → Fin n →
     rw [← Complex.ofReal_pow, ← Complex.ofReal_mul, Complex.ofReal_re]
   have h2 : ∑ a, ‖E a a w‖ ^ 2 ≤ ∑ a, ∑ b ∈ univ.filter (fun b => ε b = ε a), ‖E a b w‖ ^ 2 := by
     refine Finset.sum_le_sum fun a _ => ?_
-    exact Finset.single_le_sum (f := fun b => ‖E a b w‖ ^ 2) (fun _ _ => by positivity)
+    exact Finset.single_le_sum
+      (f := fun b => ‖E a b w‖ ^ 2)
+      (fun _ _ => by positivity)
       (Finset.mem_filter.2 ⟨Finset.mem_univ a, rfl⟩)
   have h3 : ∑ a, ‖E a a w‖ ^ 2 = nsq ω * ‖w‖ ^ 2 := by
     unfold nsq dot
@@ -36,17 +41,17 @@ theorem nsq_le_of_eig (hS : SqId) {ε : Fin n → Bool} {E : Fin n → Fin n →
     rw [hwt a, norm_smul, Complex.norm_real, Real.norm_eq_abs, mul_pow, sq_abs]
     ring
   have hw : 0 < ‖w‖ ^ 2 := by positivity
-  have : nsq ω * ‖w‖ ^ 2 ≤ κ * ‖w‖ ^ 2 := by
-    rw [← h3, ← h1]; exact h2.trans (le_of_eq h.symm)
+  have : nsq ω * ‖w‖ ^ 2 ≤ κ * ‖w‖ ^ 2 := by rw [← h3, ← h1]; exact h2.trans (le_of_eq h.symm)
   exact le_of_mul_le_mul_right this hw
 
 def pot (ω : Fin n → ℝ) : ℝ := ∑ c : Fin n, ((c : ℕ) : ℝ) * ω c
 
-theorem pot_root {a b : Fin n} (hab : a ≠ b) (ω : Fin n → ℝ) :
-    pot (fun c => ω c + (if c = a then 1 else 0) - (if c = b then 1 else 0)) = pot ω + (a : ℕ) - (b : ℕ) := by
+theorem pot_root {a b : Fin n} (hab : a ≠ b) (ω : Fin n → ℝ)
+    : pot (fun c => ω c + (if c = a then 1 else 0) - (if c = b then 1 else 0))
+      = pot ω + (a : ℕ) - (b : ℕ) := by
   unfold pot
-  simp only [mul_sub, mul_add, Finset.sum_sub_distrib, Finset.sum_add_distrib, mul_ite, mul_one, mul_zero,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [mul_sub, mul_add, Finset.sum_sub_distrib, Finset.sum_add_distrib, mul_ite, mul_one,
+    mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
 theorem pot_lower {ω : Fin n → ℝ} {κ : ℝ} (h : nsq ω ≤ κ) : -((n : ℝ) ^ 2 * (1 + |κ|)) ≤ pot ω := by
   unfold pot
@@ -54,7 +59,11 @@ theorem pot_lower {ω : Fin n → ℝ} {κ : ℝ} (h : nsq ω ≤ κ) : -((n : �
     intro c
     have h1 : ω c ^ 2 ≤ nsq ω := by
       unfold nsq dot
-      exact Finset.single_le_sum (f := fun a => ω a * ω a) (fun _ _ => mul_self_nonneg _) (Finset.mem_univ c) |>.trans_eq' (by ring)
+      exact Finset.single_le_sum
+          (f := fun a => ω a * ω a)
+          (fun _ _ => mul_self_nonneg _)
+          (Finset.mem_univ c)
+        |>.trans_eq' (by ring)
     have h2 : |ω c| ≤ 1 + |κ| := by
       have : ω c ^ 2 ≤ |κ| := h1.trans (h.trans (le_abs_self κ))
       nlinarith [abs_nonneg (ω c), sq_abs (ω c)]
@@ -62,28 +71,37 @@ theorem pot_lower {ω : Fin n → ℝ} {κ : ℝ} (h : nsq ω ≤ κ) : -((n : �
     have := neg_abs_le (ω c)
     nlinarith
   have h4 : ∑ c : Fin n, ((c : ℕ) : ℝ) ≤ (n : ℝ) ^ 2 := by
-    calc ∑ c : Fin n, ((c : ℕ) : ℝ) ≤ ∑ _c : Fin n, (n : ℝ) :=
-          Finset.sum_le_sum fun c _ => by exact_mod_cast c.2.le
+    calc
+      ∑ c : Fin n, ((c : ℕ) : ℝ)
+        ≤ ∑ _c : Fin n, (n : ℝ) := Finset.sum_le_sum fun c _ => by exact_mod_cast c.2.le
       _ = (n : ℝ) ^ 2 := by simp [sq]
-  calc -((n : ℝ) ^ 2 * (1 + |κ|)) ≤ -((∑ c : Fin n, ((c : ℕ) : ℝ)) * (1 + |κ|)) := by
-        have : 0 ≤ 1 + |κ| := by positivity
-        nlinarith
-    _ = ∑ c : Fin n, -(((c : ℕ) : ℝ) * (1 + |κ|)) := by rw [Finset.sum_mul, ← Finset.sum_neg_distrib]
+  calc
+    -((n : ℝ) ^ 2 * (1 + |κ|)) ≤ -((∑ c : Fin n, ((c : ℕ) : ℝ)) * (1 + |κ|)) := by
+      have : 0 ≤ 1 + |κ| := by positivity
+      nlinarith
+    _ = ∑ c : Fin n, -(((c : ℕ) : ℝ) * (1 + |κ|)) := by
+      rw [Finset.sum_mul, ← Finset.sum_neg_distrib]
     _ ≤ _ := Finset.sum_le_sum fun c _ => hc c
 
-theorem dot_root_nonneg {μ : Fin n → ℝ} (hμ : Antitone μ) {a b : Fin n} (hab : a < b) :
-    0 ≤ dot (fun c => (if c = a then (1 : ℝ) else 0) - (if c = b then 1 else 0)) μ := by
+theorem dot_root_nonneg {μ : Fin n → ℝ} (hμ : Antitone μ) {a b : Fin n} (hab : a < b)
+    : 0 ≤ dot (fun c => (if c = a then (1 : ℝ) else 0) - (if c = b then 1 else 0)) μ := by
   unfold dot
-  simp only [sub_mul, ite_mul, one_mul, zero_mul, Finset.sum_sub_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  simp only [sub_mul, ite_mul, one_mul, zero_mul, Finset.sum_sub_distrib, Finset.sum_ite_eq',
+    Finset.mem_univ, if_true]
   linarith [hμ hab.le]
 
-theorem main (hS : SqId) {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E)
-    (hU : IsInfUnitary ε E) (N F : Submodule ℂ M) (hN : Stab E N) (hF : IsKStableSub ε E F) (μ ν : Fin n → ℝ) (κ : ℝ)
-    (hμ : Antitone μ) :
-    ∀ m : ℕ, ∀ (w : M) (ω : Fin n → ℝ), w ∈ N → w ∈ F → w ≠ 0 → IsWt E ω w → casimirK ε E w = (κ : ℂ) • w →
-      0 ≤ dot (ω - ν) μ → pot ω + (n : ℝ) ^ 2 * (1 + |κ|) ≤ m →
-      ∃ y' ∈ N, ∃ L : Fin n → ℝ, y' ∈ F ∧ y' ≠ 0 ∧ IsKHWVec ε E L y' ∧ casimirK ε E y' = (κ : ℂ) • y' ∧
-        0 ≤ dot (L - ν) μ := by
+theorem main
+    (hS : SqId)
+    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hE : IsGlRep E) (hU : IsInfUnitary ε E)
+    (N F : Submodule ℂ M) (hN : Stab E N) (hF : IsKStableSub ε E F)
+    (μ ν : Fin n → ℝ)
+    (κ : ℝ) (hμ : Antitone μ)
+    : ∀ m : ℕ, ∀ (w : M) (ω : Fin n → ℝ),
+      w ∈ N → w ∈ F → w ≠ 0 → IsWt E ω w → casimirK ε E w = (κ : ℂ) • w → 0 ≤ dot (ω - ν) μ
+        → pot ω + (n : ℝ) ^ 2 * (1 + |κ|) ≤ m
+        → ∃ y' ∈ N, ∃ L : Fin n → ℝ,
+          y' ∈ F ∧ y' ≠ 0 ∧ IsKHWVec ε E L y' ∧ casimirK ε E y' = (κ : ℂ) • y'
+            ∧ 0 ≤ dot (L - ν) μ := by
   intro m
   induction m with
   | zero =>
@@ -117,11 +135,14 @@ theorem main (hS : SqId) {ε : Fin n → Bool} {E : Fin n → Fin n → Module.E
         simp only [Module.End.mul_apply] at this
         rw [this, hc, map_smul]
       refine ih (E a b w) ω' (hN a b w hwN) (hF a b hε w hwF) hne hwt' hc' ?_ ?_
-      · have e : ω' - ν = (ω - ν) + fun c => (if c = a then (1 : ℝ) else 0) - (if c = b then 1 else 0) := by
+      · have e
+            : ω' - ν
+              = (ω - ν) + fun c => (if c = a then (1 : ℝ) else 0) - (if c = b then 1 else 0) := by
           funext c; simp only [hω', Pi.sub_apply, Pi.add_apply]; ring
         rw [e]
-        have : dot ((ω - ν) + fun c => (if c = a then (1 : ℝ) else 0) - (if c = b then 1 else 0)) μ =
-            dot (ω - ν) μ + dot (fun c => (if c = a then (1 : ℝ) else 0) - (if c = b then 1 else 0)) μ := by
+        have : dot ((ω - ν) + fun c => (if c = a then (1 : ℝ) else 0) - (if c = b then 1 else 0)) μ
+            = dot (ω - ν) μ
+              + dot (fun c => (if c = a then (1 : ℝ) else 0) - (if c = b then 1 else 0)) μ := by
           unfold dot; simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib]
         rw [this]
         linarith [dot_root_nonneg hμ hab]
@@ -138,8 +159,8 @@ theorem ascent_of_square_identity : SqId → Ascent := by
   intro hS n ε M _ _ E hE hU N hN μ ν κ S y hyN hy hμ hS1 hS2
   obtain ⟨F, hFd, hFk, hyF⟩ := hy.fin
   obtain ⟨y', hy'N, L, hy'F, hy'0, hhw, hc, hd⟩ :=
-    main hS hE hU N F hN hFk μ ν κ hμ ⌈pot ν + (n : ℝ) ^ 2 * (1 + |κ|)⌉₊ y ν hyN hyF hy.ne hy.wt hy.cas
-      (by simp [dot]) (Nat.le_ceil _)
+    main hS hE hU N F hN hFk μ ν κ hμ ⌈pot ν + (n : ℝ) ^ 2 * (1 + |κ|)⌉₊ y ν hyN hyF hy.ne hy.wt
+      hy.cas (by simp [dot]) (Nat.le_ceil _)
   refine ⟨y', hy'N, L, hy'0, ⟨F, hFd, hFk, hy'F⟩, hhw, ?_, ?_⟩
   · have h1 := casimirK_khwVec ε hE hhw
     rw [hc] at h1

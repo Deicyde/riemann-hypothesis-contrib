@@ -7,7 +7,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host
 open GlobalTheory.BCT
 open scoped Classical
 
@@ -15,21 +16,27 @@ namespace PositivityTheory.Rg.BcB.G8
 
 open PositivityTheory.Rg.Tf.Loc (quotIntegral IsQuotNormaliser twConj)
 
-theorem termof_twConj_cont {n : ℕ} (hθ : Continuous (thetaR (starRingEnd ℂ) n)) (d : GL (Fin n) ℂ) :
-    Continuous fun x : GL (Fin n) ℂ => twConj (thetaR (starRingEnd ℂ) n) x d := by
+theorem termof_twConj_cont {n : ℕ} (hθ : Continuous (thetaR (starRingEnd ℂ) n)) (d : GL (Fin n) ℂ)
+    : Continuous fun x : GL (Fin n) ℂ => twConj (thetaR (starRingEnd ℂ) n) x d := by
   show Continuous fun x : GL (Fin n) ℂ => x⁻¹ * d * thetaR (starRingEnd ℂ) n x
   exact (continuous_inv.mul continuous_const).mul hθ
 
-theorem termof_hcs {a b : ℕ} (hEP : EllProper) (ψ : GL (Fin a) ℂ × GL (Fin b) ℂ → ℂ) (hψ : HasCompactSupport ψ)
-    (d₁ : GL (Fin a) ℂ) (d₂ : GL (Fin b) ℂ) (h₁ : EllC d₁) (h₂ : EllC d₂) :
-    HasCompactSupport fun y : GL (Fin a) ℂ × GL (Fin b) ℂ =>
+theorem termof_hcs
+    {a b : ℕ}
+    (hEP : EllProper)
+    (ψ : GL (Fin a) ℂ × GL (Fin b) ℂ → ℂ) (hψ : HasCompactSupport ψ)
+    (d₁ : GL (Fin a) ℂ) (d₂ : GL (Fin b) ℂ) (h₁ : EllC d₁) (h₂ : EllC d₂)
+    : HasCompactSupport fun y : GL (Fin a) ℂ × GL (Fin b) ℂ =>
       ψ (twConj (thetaR (starRingEnd ℂ) a) y.1 d₁, twConj (thetaR (starRingEnd ℂ) b) y.2 d₂) := by
-  have hK := (hEP a d₁ h₁ _ (hψ.isCompact.image continuous_fst)).prod
-    (hEP b d₂ h₂ _ (hψ.isCompact.image continuous_snd))
+  have hK :=
+    (hEP a d₁ h₁ _ (hψ.isCompact.image continuous_fst)).prod
+      (hEP b d₂ h₂ _ (hψ.isCompact.image continuous_snd))
   refine HasCompactSupport.intro hK fun y hy => ?_
   by_contra hne
   apply hy
-  have hm : (twConj (thetaR (starRingEnd ℂ) a) y.1 d₁, twConj (thetaR (starRingEnd ℂ) b) y.2 d₂) ∈ tsupport ψ :=
+  have hm
+      : (twConj (thetaR (starRingEnd ℂ) a) y.1 d₁, twConj (thetaR (starRingEnd ℂ) b) y.2 d₂)
+        ∈ tsupport ψ :=
     subset_tsupport _ hne
   exact ⟨⟨_, hm, rfl⟩, ⟨_, hm, rfl⟩⟩
 
@@ -63,8 +70,10 @@ theorem termOf_holds : TermOf := by
   obtain ⟨hP₂, hPv₂⟩ := hPE E b u₂ hu₂ d₂
   have hCE' := hCE E a b u₁ u₂ hu₁ hu₂ d₁ d₂
   let f : InfinitePlace E → GL (Fin a) ℂ × GL (Fin b) ℂ → ℂ := fun v y =>
-    ψ v (twConj (thetaR (starRingEnd ℂ) a) y.1 (GeneralLinearGroup.map v.embedding d₁),
-      twConj (thetaR (starRingEnd ℂ) b) y.2 (GeneralLinearGroup.map v.embedding d₂))
+    ψ v (
+      twConj (thetaR (starRingEnd ℂ) a) y.1 (GeneralLinearGroup.map v.embedding d₁),
+      twConj (thetaR (starRingEnd ℂ) b) y.2 (GeneralLinearGroup.map v.embedding d₂)
+    )
   let F₁ : Gi E a b → ℂ := fun y => ∏ v, f v (y v)
   let F₂ : Gf E a b → ℂ := orbFn S φ₁ φ₂ (d₁ * u₁⁻¹) (d₂ * u₂⁻¹)
   have hfc : ∀ v, Continuous (f v) := fun v =>
@@ -72,7 +81,8 @@ theorem termOf_holds : TermOf := by
       ((termof_twConj_cont hθB _).comp continuous_snd))
   have hfs : ∀ v, HasCompactSupport (f v) := fun v =>
     termof_hcs hEP (ψ v) (hLef v).2.1 _ _ ((hPv₁ v).2 hd₁) ((hPv₂ v).2 hd₂)
-  have hint : ∀ v, Integrable (f v) (ν₁.prod ν₂) := fun v => (hfc v).integrable_of_hasCompactSupport (hfs v)
+  have hint : ∀ v, Integrable (f v) (ν₁.prod ν₂) := fun v =>
+    (hfc v).integrable_of_hasCompactSupport (hfs v)
   have hF₁i : Integrable F₁ α := Integrable.fintype_prod hint
   have hF₁m : Measurable F₁ :=
     (continuous_finsetProd _ fun v _ => (hfc v).comp (continuous_apply v)).measurable
@@ -85,7 +95,9 @@ theorem termOf_holds : TermOf := by
       obtain ⟨g₂, -, hg₂⟩ := Subgroup.mem_map.1 hx.2
       exact ⟨(g₁, g₂), Prod.ext hg₁ hg₂⟩
     exact ((Set.countable_range _).mono hsub).to_subtype
-  have hΓ : ((ratCent d₁).prod (ratCent d₂)).map ((MonoidHom.snd _ _).comp e') = gam (d₁ * u₁⁻¹) (d₂ * u₂⁻¹) := by
+  have hΓ
+      : ((ratCent d₁).prod (ratCent d₂)).map ((MonoidHom.snd _ _).comp e')
+        = gam (d₁ * u₁⁻¹) (d₂ * u₂⁻¹) := by
     ext y
     rw [Subgroup.mem_map, hCE'.1 y]
     constructor
@@ -103,16 +115,22 @@ theorem termOf_holds : TermOf := by
     rw [he']
     refine Finset.prod_congr rfl fun v _ => ?_
     simp only [f, Pi.mul_apply, Prod.fst_mul, Prod.snd_mul]
-    rw [PositivityTheory.Rg.Tf.Loc.twConj_mul_left _ _ (hc v).1, PositivityTheory.Rg.Tf.Loc.twConj_mul_left _ _ (hc v).2]
+    rw [PositivityTheory.Rg.Tf.Loc.twConj_mul_left _ _ (hc v).1,
+      PositivityTheory.Rg.Tf.Loc.twConj_mul_left _ _ (hc v).2]
   have hF₂inv : ∀ γ ∈ gam (d₁ * u₁⁻¹) (d₂ * u₂⁻¹), ∀ y, F₂ (γ * y) = F₂ y := by
     intro γ hγ y
-    have h : γ * (ratF E a (d₁ * u₁⁻¹), ratF E b (d₂ * u₂⁻¹)) =
-        (ratF E a (d₁ * u₁⁻¹), ratF E b (d₂ * u₂⁻¹)) * thP E a b γ := (Subgroup.mem_inf.1 hγ).2
+    have h
+        : γ * (ratF E a (d₁ * u₁⁻¹), ratF E b (d₂ * u₂⁻¹))
+          = (ratF E a (d₁ * u₁⁻¹), ratF E b (d₂ * u₂⁻¹)) * thP E a b γ :=
+      (Subgroup.mem_inf.1 hγ).2
     simp only [F₂, orbFn]
     congr 1
     generalize (ratF E a (d₁ * u₁⁻¹), ratF E b (d₂ * u₂⁻¹)) = δ at h ⊢
-    rw [(thP E a b).map_mul γ y, show (γ * y)⁻¹ * δ * (thP E a b γ * thP E a b y) =
-      y⁻¹ * (γ⁻¹ * (δ * thP E a b γ)) * thP E a b y by group, ← h]
+    rw [(thP E a b).map_mul γ y,
+      show (γ * y)⁻¹ * δ * (thP E a b γ * thP E a b y)
+          = y⁻¹ * (γ⁻¹ * (δ * thP E a b γ)) * thP E a b y by
+        group,
+      ← h]
     group
   obtain ⟨U, hUo, hUinv⟩ := hFL E hU a b S φ₁ φ₂ hφ₁ hφ₂
   have hF₂U : ∀ u ∈ U, ∀ y, F₂ (y * u) = F₂ y := by
@@ -125,17 +143,22 @@ theorem termOf_holds : TermOf := by
     group
   obtain ⟨hfin, hstab, hdc⟩ :=
     hFH E hU a b S hS φ₁ φ₂ hφ₁ hφ₂ (d₁ * u₁⁻¹) (d₂ * u₂⁻¹) (hP₁.1 hd₁) (hP₂.1 hd₂)
-  have hQ := hQS (GA E a × GA E b) (Gi E a b) (Gf E a b) (μ₁.prod μ₂) α β e' (map_continuous e).measurable hmap
-    ((ratCent d₁).prod (ratCent d₂)) (gam (d₁ * u₁⁻¹) (d₂ * u₂⁻¹)) ((Kf E a).prod (Kf E b)) U hΓ hinj hKo hKc hUo
-    F₁ F₂ hF₁m hF₁i hF₁inv hF₂inv hF₂U hfin hstab
-  have hEq : orbTerm2 μ₁ μ₂ (adel S u₁ u₂ ψ φ₁ φ₂) d₁ d₂ = quotIntegral (μ₁.prod μ₂) ((ratCent d₁).prod (ratCent d₂))
-      Measure.count (fun x => F₁ (e' x).1 * F₂ (e' x).2) := by
+  have hQ :=
+    hQS (GA E a × GA E b) (Gi E a b) (Gf E a b) (μ₁.prod μ₂) α β e' (map_continuous e).measurable
+      hmap ((ratCent d₁).prod (ratCent d₂)) (gam (d₁ * u₁⁻¹) (d₂ * u₂⁻¹)) ((Kf E a).prod (Kf E b)) U
+      hΓ hinj hKo hKc hUo F₁ F₂ hF₁m hF₁i hF₁inv hF₂inv hF₂U hfin hstab
+  have hEq
+      : orbTerm2 μ₁ μ₂ (adel S u₁ u₂ ψ φ₁ φ₂) d₁ d₂
+        = quotIntegral (μ₁.prod μ₂) ((ratCent d₁).prod (ratCent d₂)) Measure.count
+          (fun x => F₁ (e' x).1 * F₂ (e' x).2) := by
     unfold orbTerm2
     congr 1
     funext x
     rw [hAE E a b S u₁ u₂ hu₁ hu₂ ψ φ₁ φ₂ d₁ d₂ x, he' x]
-  have hI : ∫ x, F₁ x ∂α = ∏ v, (val v * starRingEnd ℂ (chAt (l₁ v) ((polE (d₁ * u₁⁻¹)).map v.embedding)) *
-      starRingEnd ℂ (chAt (l₂ v) ((polE (d₂ * u₂⁻¹)).map v.embedding))) := by
+  have hI
+      : ∫ x, F₁ x ∂α
+        = ∏ v, (val v * starRingEnd ℂ (chAt (l₁ v) ((polE (d₁ * u₁⁻¹)).map v.embedding)) *
+          starRingEnd ℂ (chAt (l₂ v) ((polE (d₂ * u₂⁻¹)).map v.embedding))) := by
     rw [integral_fintype_prod_eq_prod]
     refine Finset.prod_congr rfl fun v _ => ?_
     rw [(hLef v).2.2 _ _ ((hPv₁ v).2 hd₁) ((hPv₂ v).2 hd₂), (hPv₁ v).1, (hPv₂ v).1]

@@ -17,16 +17,17 @@ open Topology Filter Metric Complex Real
 noncomputable section
 
 def pointWithLastCLM (σ : Type) : ((σ → ℂ) × ℂ) →L[ℂ] (Option σ → ℂ) :=
-  ContinuousLinearMap.pi fun o => match o with
+  ContinuousLinearMap.pi fun o =>
+    match o with
     | none => ContinuousLinearMap.snd ℂ (σ → ℂ) ℂ
     | some i => (ContinuousLinearMap.proj i).comp (ContinuousLinearMap.fst ℂ (σ → ℂ) ℂ)
 
-theorem pointWithLastCLM_apply {σ : Type} (p : (σ → ℂ) × ℂ) :
-    pointWithLastCLM σ p = pointWithLast p.1 p.2 := by
+theorem pointWithLastCLM_apply {σ : Type} (p : (σ → ℂ) × ℂ)
+    : pointWithLastCLM σ p = pointWithLast p.1 p.2 := by
   funext o; cases o <;> rfl
 
-theorem pointWithLast_coords {σ : Type} (x : Option σ → ℂ) :
-    pointWithLast (fun i => x (some i)) (x none) = x := by
+theorem pointWithLast_coords {σ : Type} (x : Option σ → ℂ)
+    : pointWithLast (fun i => x (some i)) (x none) = x := by
   funext o; cases o <;> rfl
 
 theorem natCast_eq_of_norm_sub_lt_one {m n : ℕ} (h : ‖(m : ℂ) - n‖ < 1) : m = n := by
@@ -38,19 +39,23 @@ theorem natCast_eq_of_norm_sub_lt_one {m n : ℕ} (h : ‖(m : ℂ) - n‖ < 1) 
   have h2 : n < m + 1 := by exact_mod_cast (show (n : ℝ) < m + 1 by linarith)
   omega
 
-theorem esymm_replicate_zero {n k : ℕ} (hk : 1 ≤ k) : (Multiset.replicate n (0 : ℂ)).esymm k = 0 := by
+theorem esymm_replicate_zero {n k : ℕ} (hk : 1 ≤ k)
+    : (Multiset.replicate n (0 : ℂ)).esymm k = 0 := by
   unfold Multiset.esymm
   refine Multiset.sum_eq_zero fun x hx => ?_
   obtain ⟨t, ht, rfl⟩ := Multiset.mem_map.1 hx
   obtain ⟨hle, hcard⟩ := Multiset.mem_powersetCard.1 ht
   have : t = Multiset.replicate k 0 :=
-    Multiset.eq_replicate.2 ⟨hcard, fun b hb => Multiset.eq_of_mem_replicate (Multiset.mem_of_le hle hb)⟩
+    Multiset.eq_replicate.2
+      ⟨hcard, fun b hb => Multiset.eq_of_mem_replicate (Multiset.mem_of_le hle hb)⟩
   rw [this, Multiset.prod_replicate, zero_pow (by omega)]
 
-theorem weierstrassPolynomial_eq_prod {σ : Type} {d : ℕ} (c : Fin d → (σ → ℂ) → ℂ) (z : σ → ℂ)
+theorem weierstrassPolynomial_eq_prod
+    {σ : Type} {d : ℕ} (c : Fin d → (σ → ℂ) → ℂ) (z : σ → ℂ)
     (Z : Multiset ℂ) (hZ : Multiset.card Z = d)
-    (hc : ∀ j : Fin d, c j z = (-1) ^ (d - (j : ℕ)) * Z.esymm (d - (j : ℕ))) (t : ℂ) :
-    weierstrassPolynomial c (pointWithLast z t) = (Z.map fun a => t - a).prod := by
+    (hc : ∀ j : Fin d, c j z = (-1) ^ (d - (j : ℕ)) * Z.esymm (d - (j : ℕ)))
+    (t : ℂ)
+    : weierstrassPolynomial c (pointWithLast z t) = (Z.map fun a => t - a).prod := by
   subst hZ
   set p : Polynomial ℂ := (Z.map fun a => Polynomial.X - Polynomial.C a).prod with hp
   have hdeg : p.natDegree = Multiset.card Z := Polynomial.natDegree_multiset_prod_X_sub_C_eq_card Z
@@ -58,20 +63,24 @@ theorem weierstrassPolynomial_eq_prod {σ : Type} {d : ℕ} (c : Fin d → (σ �
     rw [hp, Polynomial.eval_multiset_prod, Multiset.map_map]
     congr 1
     exact Multiset.map_congr rfl fun a _ => by simp
-  rw [← h1, Polynomial.eval_eq_sum_range' (n := Multiset.card Z + 1) (by omega), Finset.sum_range_succ,
-    hp, Multiset.prod_X_sub_C_coeff Z le_rfl, ← hp]
-  simp only [weierstrassPolynomial, Nat.sub_self, pow_zero, Multiset.esymm, Multiset.powersetCard_zero_left,
-    Multiset.map_singleton, Multiset.prod_zero, Multiset.sum_singleton, one_mul]
+  rw [← h1, Polynomial.eval_eq_sum_range' (n := Multiset.card Z + 1) (by omega),
+    Finset.sum_range_succ, hp, Multiset.prod_X_sub_C_coeff Z le_rfl, ← hp]
+  simp only [weierstrassPolynomial, Nat.sub_self, pow_zero, Multiset.esymm,
+    Multiset.powersetCard_zero_left, Multiset.map_singleton, Multiset.prod_zero,
+    Multiset.sum_singleton, one_mul]
   rw [add_comm]
   congr 1
-  simp only [show (fun i => pointWithLast z t (some i)) = z from rfl, show pointWithLast z t none = t from rfl, hc]
-  rw [Fin.sum_univ_eq_sum_range (fun i => (-1) ^ (Multiset.card Z - i) * Z.esymm (Multiset.card Z - i) * t ^ i)]
+  simp only [show (fun i => pointWithLast z t (some i)) = z from rfl,
+    show pointWithLast z t none = t from rfl, hc]
+  rw [Fin.sum_univ_eq_sum_range (fun i =>
+    (-1) ^ (Multiset.card Z - i) * Z.esymm (Multiset.card Z - i) * t ^ i)]
   refine Finset.sum_congr rfl fun i hi => ?_
   rw [hp, Multiset.prod_X_sub_C_coeff Z (Finset.mem_range.1 hi).le]
 
-theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Statement)
-    (hA : CircleArgumentPrinciple.Statement) (hN : PowerSumsEsymmAnalytic.Statement) :
-    WeierstrassPreparation.Statement := by
+theorem WeierstrassPreparation.proof
+    (hC : ParametricCircleIntegralAnalytic.Statement) (hA : CircleArgumentPrinciple.Statement)
+    (hN : PowerSumsEsymmAnalytic.Statement)
+    : WeierstrassPreparation.Statement := by
   intro σ _ d f hf hord
 
   set L := pointWithLastCLM σ
@@ -83,7 +92,8 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
   set O1 : Set ((σ → ℂ) × ℂ) := L ⁻¹' O with hO1def
   have hO1 : IsOpen O1 := hOo.preimage L.continuous
   have hFd : DifferentiableOn ℂ F O1 := fun p hp =>
-    ((show AnalyticAt ℂ f (L p) from hp).differentiableAt.comp p L.differentiableAt).differentiableWithinAt
+    ((show AnalyticAt ℂ f (L p) from hp).differentiableAt.comp p
+      L.differentiableAt).differentiableWithinAt
   have hslice : ∀ z, IsOpen {s : ℂ | (z, s) ∈ O1} := fun z =>
     hO1.preimage (continuous_const.prodMk continuous_id)
   have hsliced : ∀ z, DifferentiableOn ℂ (fun s => F (z, s)) {s | (z, s) ∈ O1} := fun z =>
@@ -102,16 +112,18 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
     · exact h
   have h00 : ((0 : σ → ℂ), (0 : ℂ)) ∈ O1 := by
     show AnalyticAt ℂ f (L (0, 0))
-    rw [hL0]; exact hf
-  have hO1t : ∀ᶠ t in 𝓝 (0 : ℂ), ((0 : σ → ℂ), t) ∈ O1 :=
-    (hslice 0).mem_nhds h00
-  obtain ⟨ε, hε, hball⟩ := Metric.eventually_nhds_iff_ball.1 ((eventually_nhdsWithin_iff.1 hne).and hO1t)
+    rw [hL0]
+    exact hf
+  have hO1t : ∀ᶠ t in 𝓝 (0 : ℂ), ((0 : σ → ℂ), t) ∈ O1 := (hslice 0).mem_nhds h00
+  obtain ⟨ε, hε, hball⟩ :=
+    Metric.eventually_nhds_iff_ball.1 ((eventually_nhdsWithin_iff.1 hne).and hO1t)
   set r := ε / 2 with hrdef
   have hr : 0 < r := half_pos hε
   have hrb : closedBall (0 : ℂ) r ⊆ ball 0 ε := closedBall_subset_ball (half_lt_self hε)
 
-  have hev : ∀ᶠ z : σ → ℂ in 𝓝 0,
-      (∀ s ∈ closedBall (0 : ℂ) r, (z, s) ∈ O1) ∧ (∀ s ∈ sphere (0 : ℂ) r, F (z, s) ≠ 0) := by
+  have hev
+      : ∀ᶠ z : σ → ℂ in 𝓝 0,
+        (∀ s ∈ closedBall (0 : ℂ) r, (z, s) ∈ O1) ∧ (∀ s ∈ sphere (0 : ℂ) r, F (z, s) ≠ 0) := by
     refine ((isCompact_closedBall 0 r).eventually_forall_of_forall_eventually fun s hs => ?_).and
       ((isCompact_sphere 0 r).eventually_forall_of_forall_eventually fun s hs => ?_)
     · exact hO1.mem_nhds (hball s (hrb hs)).2
@@ -121,16 +133,20 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
       exact (hFd.continuousOn.continuousAt (hO1.mem_nhds hb.2)).eventually_ne hF0
   obtain ⟨U, hUgood, hUo, hU0⟩ := _root_.eventually_nhds_iff.1 hev
 
-  have hex : ∀ z, ∃ (Z : Multiset ℂ) (u : ℂ → ℂ), z ∈ U →
-      ((∀ a ∈ Z, a ∈ ball (0 : ℂ) r) ∧ DifferentiableOn ℂ u {s | (z, s) ∈ O1} ∧
-        (∀ s ∈ closedBall (0 : ℂ) r, u s ≠ 0) ∧
-        (∀ s ∈ {s | (z, s) ∈ O1}, F (z, s) = (Z.map fun a => s - a).prod * u s) ∧
-        ∀ φ : ℂ → ℂ, DifferentiableOn ℂ φ {s | (z, s) ∈ O1} →
-          (2 * π * I)⁻¹ * (∮ s in C(0, r), φ s * deriv (fun s => F (z, s)) s / F (z, s)) = (Z.map φ).sum) := by
+  have hex
+      : ∀ z, ∃ (Z : Multiset ℂ) (u : ℂ → ℂ),
+        z ∈ U
+          → ((∀ a ∈ Z, a ∈ ball (0 : ℂ) r) ∧ DifferentiableOn ℂ u {s | (z, s) ∈ O1}
+            ∧ (∀ s ∈ closedBall (0 : ℂ) r, u s ≠ 0)
+            ∧ (∀ s ∈ {s | (z, s) ∈ O1}, F (z, s) = (Z.map fun a => s - a).prod * u s)
+            ∧ ∀ φ : ℂ → ℂ,
+              DifferentiableOn ℂ φ {s | (z, s) ∈ O1}
+                → (2 * π * I)⁻¹ * (∮ s in C(0, r), φ s * deriv (fun s => F (z, s)) s / F (z, s))
+                  = (Z.map φ).sum) := by
     intro z
     by_cases hz : z ∈ U
-    · obtain ⟨Z, u, h⟩ := hA (fun s => F (z, s)) _ 0 r hr (hslice z) (hUgood z hz).1 (hsliced z)
-        (hUgood z hz).2
+    · obtain ⟨Z, u, h⟩ :=
+        hA (fun s => F (z, s)) _ 0 r hr (hslice z) (hUgood z hz).1 (hsliced z) (hUgood z hz).2
       exact ⟨Z, u, fun _ => h⟩
     · exact ⟨0, 0, fun h => absurd h hz⟩
   choose Z u hZu using hex
@@ -157,12 +173,17 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
     have hO2 : IsOpen O2 := hFd.continuousOn.isOpen_inter_preimage hO1 isOpen_compl_singleton
     have hnum : DifferentiableOn ℂ (fun p : (σ → ℂ) × ℂ => p.2 ^ k * Dt p) O2 :=
       (differentiableOn_snd.pow k).mul (hDt.mono Set.inter_subset_left)
-    have hΦ : DifferentiableOn ℂ (fun p : (σ → ℂ) × ℂ => p.2 ^ k * Dt p / F p) O2 :=
-      by simp only [div_eq_mul_inv]; exact hnum.mul ((hFd.mono Set.inter_subset_left).inv fun p (hp : p ∈ O2) => hp.2)
-    have hint := hC σ (fun p => p.2 ^ k * Dt p / F p) O2 U 0 r hr.le hO2 hUo hΦ
-      fun z hz s hs => ⟨(hUgood z hz).1 s (sphere_subset_closedBall hs), (hUgood z hz).2 s hs⟩
+    have hΦ : DifferentiableOn ℂ (fun p : (σ → ℂ) × ℂ => p.2 ^ k * Dt p / F p) O2 := by
+      simp only [div_eq_mul_inv]
+      exact hnum.mul ((hFd.mono Set.inter_subset_left).inv fun p (hp : p ∈ O2) => hp.2)
+    have hint :=
+      hC σ
+        (fun p => p.2 ^ k * Dt p / F p)
+        O2 U 0 r hr.le hO2 hUo hΦ
+        fun z hz s hs => ⟨(hUgood z hz).1 s (sphere_subset_closedBall hs), (hUgood z hz).2 s hs⟩
     intro z hz
-    have h1 : AnalyticAt ℂ (fun z => (2 * π * I)⁻¹ * ∮ s in C(0, r), s ^ k * Dt (z, s) / F (z, s)) z :=
+    have h1
+        : AnalyticAt ℂ (fun z => (2 * π * I)⁻¹ * ∮ s in C(0, r), s ^ k * Dt (z, s) / F (z, s)) z :=
       analyticAt_const.mul (hint z hz)
     refine h1.congr (Filter.eventually_of_mem (hUo.mem_nhds hz) fun w hw => ?_)
     beta_reduce
@@ -183,9 +204,12 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
   have hcard0 : Multiset.card (Z 0) = d := by
     have h := hZu 0 hU0
     have h0B : (0 : ℂ) ∈ closedBall (0 : ℂ) r := mem_closedBall_self hr.le
-    have hmem : {s : ℂ | ((0 : σ → ℂ), s) ∈ O1} ∈ 𝓝 (0 : ℂ) := (hslice 0).mem_nhds ((hUgood 0 hU0).1 0 h0B)
-    have hrep : Z 0 = Multiset.replicate (Multiset.card (Z 0)) 0 := Multiset.eq_replicate.2 ⟨rfl, hZ0⟩
-    have hord' : analyticOrderAt (fun t => f (pointWithLast 0 t)) 0 = (Multiset.card (Z 0) : ℕ) := by
+    have hmem : {s : ℂ | ((0 : σ → ℂ), s) ∈ O1} ∈ 𝓝 (0 : ℂ) :=
+      (hslice 0).mem_nhds ((hUgood 0 hU0).1 0 h0B)
+    have hrep : Z 0 = Multiset.replicate (Multiset.card (Z 0)) 0 :=
+      Multiset.eq_replicate.2 ⟨rfl, hZ0⟩
+    have hord'
+        : analyticOrderAt (fun t => f (pointWithLast 0 t)) 0 = (Multiset.card (Z 0) : ℕ) := by
       refine hg0.analyticOrderAt_eq_natCast.2 ⟨u 0, h.2.1.analyticAt hmem, h.2.2.1 0 h0B, ?_⟩
       filter_upwards [hmem] with s hs
       rw [← hFapply, h.2.2.2.1 s hs]
@@ -216,8 +240,11 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
   have hWprod : ∀ z ∈ U2, ∀ s, W (z, s) = ((Z z).map fun a => s - a).prod := fun z hz s =>
     weierstrassPolynomial_eq_prod c z (Z z) (hU2 z hz).1 (fun j => rfl) s
   have hWd : DifferentiableOn ℂ W (Prod.fst ⁻¹' U2) := by
-    have h1 : DifferentiableOn ℂ (fun p : (σ → ℂ) × ℂ => p.2 ^ d) (Prod.fst ⁻¹' U2) := differentiableOn_snd.pow d
-    have h2 : DifferentiableOn ℂ (fun p : (σ → ℂ) × ℂ => ∑ j, c j p.1 * p.2 ^ (j : ℕ)) (Prod.fst ⁻¹' U2) :=
+    have h1 : DifferentiableOn ℂ (fun p : (σ → ℂ) × ℂ => p.2 ^ d) (Prod.fst ⁻¹' U2) :=
+      differentiableOn_snd.pow d
+    have h2 : DifferentiableOn ℂ
+        (fun p : (σ → ℂ) × ℂ => ∑ j, c j p.1 * p.2 ^ (j : ℕ))
+        (Prod.fst ⁻¹' U2) :=
       DifferentiableOn.fun_sum fun j _ => by
         have hc1 : DifferentiableOn ℂ (fun p : (σ → ℂ) × ℂ => c j p.1) (Prod.fst ⁻¹' U2) :=
           (hcan j).differentiableOn.comp differentiableOn_fst fun p hp => hp
@@ -235,8 +262,9 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
   set G : (Option σ → ℂ) × ℂ → ℂ := fun p => W (q p) * (p.2 - p.1 none) with hGdef
   have hGd : DifferentiableOn ℂ G A := by
     have hlast : DifferentiableOn ℂ (fun p : (Option σ → ℂ) × ℂ => p.2 - p.1 none) A :=
-      differentiableOn_snd.sub ((ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Option σ => ℂ) none).comp
-        (ContinuousLinearMap.fst ℂ (Option σ → ℂ) ℂ)).differentiableOn
+      differentiableOn_snd.sub
+        ((ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Option σ => ℂ) none).comp
+          (ContinuousLinearMap.fst ℂ (Option σ → ℂ) ℂ)).differentiableOn
     exact (hWd.comp hqd.differentiableOn fun p (hp : p ∈ A) => hp.2).mul hlast
   set O3 : Set ((Option σ → ℂ) × ℂ) := A ∩ G ⁻¹' {0}ᶜ with hO3def
   have hO3 : IsOpen O3 := hGd.continuousOn.isOpen_inter_preimage hAo isOpen_compl_singleton
@@ -247,7 +275,8 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
       ((hGd.mono Set.inter_subset_left).inv fun p (hp : p ∈ O3) => hp.2)
   set U3 : Set (Option σ → ℂ) := P ⁻¹' U2 ∩ {x | ‖x none‖ < r} with hU3def
   have hU3o : IsOpen U3 :=
-    (hU2o.preimage P.continuous).inter (isOpen_lt (continuous_norm.comp (continuous_apply none)) continuous_const)
+    (hU2o.preimage P.continuous).inter
+      (isOpen_lt (continuous_norm.comp (continuous_apply none)) continuous_const)
   have hmem3 : ∀ x ∈ U3, ∀ s ∈ sphere (0 : ℂ) r, (x, s) ∈ O3 := by
     intro x hx s hs
     have hzU := (hU2 (P x) hx.1).2
@@ -277,9 +306,11 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
     have h := hZu (P x) hzU
     have hw : x none ∈ ball (0 : ℂ) r := mem_ball_zero_iff.2 hx.2
     have hcl : ∀ s ∈ closedBall (0 : ℂ) r, (P x, s) ∈ O1 := (hUgood _ hzU).1
-    have hcauchy := two_pi_I_inv_smul_circleIntegral_sub_inv_smul_of_differentiable_on_off_countable
-      Set.countable_empty hw (h.2.1.continuousOn.mono hcl)
-      fun s hs => h.2.1.differentiableAt ((hslice _).mem_nhds (hcl s (ball_subset_closedBall hs.1)))
+    have hcauchy :=
+      two_pi_I_inv_smul_circleIntegral_sub_inv_smul_of_differentiable_on_off_countable
+        Set.countable_empty hw (h.2.1.continuousOn.mono hcl)
+        fun s hs =>
+          h.2.1.differentiableAt ((hslice _).mem_nhds (hcl s (ball_subset_closedBall hs.1)))
     rw [← hcauchy, smul_eq_mul]
     show (2 * π * I)⁻¹ * _ = _
     congr 1
@@ -297,7 +328,8 @@ theorem WeierstrassPreparation.proof (hC : ParametricCircleIntegralAnalytic.Stat
   have hU30 : (0 : Option σ → ℂ) ∈ U3 := by
     refine ⟨?_, ?_⟩
     · show P 0 ∈ U2
-      rw [map_zero]; exact hU20
+      rw [map_zero]
+      exact hU20
     · show ‖(0 : Option σ → ℂ) none‖ < r
       simpa using hr
   refine ⟨e, c, analyticAt_const.mul (hint3 0 hU30), ?_, fun j => hcan j 0 hU20, hc0, ?_⟩

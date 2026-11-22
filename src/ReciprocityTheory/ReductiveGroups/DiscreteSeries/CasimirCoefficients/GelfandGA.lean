@@ -42,8 +42,8 @@ lemma continuous_conjK (ε : Fin n → Bool) : Continuous (conjK ε) := by
 def Lop {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (k : KG ε) : ℂ →L[ℂ] (T.V →L[ℂ] T.V) :=
   (ContinuousLinearMap.lsmul ℂ ℂ).flip (T.op k * projW T * T.op k⁻¹)
 
-theorem psM_contDiffOn {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ) :
-    ContDiffOn ℂ ∞ (psM T μ) (Ps1.Uset ε) := by
+theorem psM_contDiffOn {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ)
+    : ContDiffOn ℂ ∞ (psM T μ) (Ps1.Uset ε) := by
   have := compactSpace_KG ε
   have : IsFiniteMeasureOnCompacts (muK ε) := by unfold muK; infer_instance
   have : IsFiniteMeasure (muK ε) := inferInstance
@@ -53,8 +53,10 @@ theorem psM_contDiffOn {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KType ε 
     ((ContinuousLinearMap.lsmul ℂ ℂ).flip).continuous.comp (Ps1.continuous_P T)
   have hU : IsOpen (Ps1.Uset ε : Set 𝕄) := Ps1.isOpen_Uset
   have hΩ : IsOpen (OmegaSet n : Set 𝕄) := isOpen_omega
-  have h := GelfandGB.contDiffOn_param (muK ε) (conjK ε) (continuous_conjK ε) hU hΩ
-    (fun x hx k => hx k) (Ps1.PhiP μ) (Lop T) hφ hL
+  have h :=
+    GelfandGB.contDiffOn_param (muK ε) (conjK ε) (continuous_conjK ε) hU hΩ
+      (fun x hx k => hx k)
+      (Ps1.PhiP μ) (Lop T) hφ hL
   have h' : ContDiffOn ℂ ∞ (fun x : 𝕄 => psM T μ x) (Ps1.Uset ε : Set 𝕄) :=
     (h.const_smul ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))).congr fun x _ => rfl
   exact h'

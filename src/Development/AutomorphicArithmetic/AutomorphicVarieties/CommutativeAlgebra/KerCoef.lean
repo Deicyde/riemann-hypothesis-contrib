@@ -7,8 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
 open Classical in
-private theorem wcomp_of_mem_ite {O : Type} [CommRing O] {σ X : Type} [AddCommGroup X] (wt : σ → X) {i j : X}
-    {f : MvPowerSeries σ O} (hf : f ∈ wtPart O wt i) : wcomp O wt j f = if i = j then f else 0 := by
+private theorem wcomp_of_mem_ite
+    {O : Type} [CommRing O]
+    {σ X : Type} [AddCommGroup X]
+    (wt : σ → X)
+    {i j : X} {f : MvPowerSeries σ O} (hf : f ∈ wtPart O wt i)
+    : wcomp O wt j f = if i = j then f else 0 := by
   ext n
   rw [coeff_wcomp]
   by_cases h : i = j
@@ -22,10 +26,18 @@ private theorem wcomp_of_mem_ite {O : Type} [CommRing O] {σ X : Type} [AddCommG
     · exact hf n (fun hi => h (hi.symm.trans hn))
     · rfl
 
-theorem UpperTheory.V.Alg.ker_coef :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (X : Type) [AddCommGroup X] (A : Type) [CommRing A] [Algebra O A] [IsCO O A] (K : Ideal A), maximalIdeal A * K = ⊥ → ∀ (W : WPres O X A) (κ : Type) [Fintype κ] (ε : κ → A) (wf : κ → X), (∀ u, ε u ∈ W.part (wf u)) → K = Ideal.span (Set.range ε) → (∀ c : κ → O, ∑ u, c u • ε u = 0 → ∀ u, c u ∈ maximalIdeal O) →
-          ∃ co : κ → A → ResidueField O, (∀ u, ∀ x ∈ K, ∀ y ∈ K, co u (x + y) = co u x + co u y) ∧ (∀ u (a : A), ∀ x ∈ K, co u (a * x) = res O A a * co u x) ∧
-            (∀ u j, j ≠ wf u → ∀ x ∈ K, x ∈ W.part j → co u x = 0) ∧ ∀ x ∈ K, ∃ a : κ → O, (∀ u, residue O (a u) = co u x) ∧ x = ∑ u, a u • ε u := by
+theorem UpperTheory.V.Alg.ker_coef
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (X : Type) [AddCommGroup X] (A : Type) [CommRing A]
+        [Algebra O A] [IsCO O A] (K : Ideal A),
+      maximalIdeal A * K = ⊥
+        → ∀ (W : WPres O X A) (κ : Type) [Fintype κ] (ε : κ → A) (wf : κ → X),
+          (∀ u, ε u ∈ W.part (wf u)) → K = Ideal.span (Set.range ε)
+            → (∀ c : κ → O, ∑ u, c u • ε u = 0 → ∀ u, c u ∈ maximalIdeal O)
+            → ∃ co : κ → A → ResidueField O,
+              (∀ u, ∀ x ∈ K, ∀ y ∈ K, co u (x + y) = co u x + co u y)
+                ∧ (∀ u (a : A), ∀ x ∈ K, co u (a * x) = res O A a * co u x)
+                ∧ (∀ u j, j ≠ wf u → ∀ x ∈ K, x ∈ W.part j → co u x = 0)
+                ∧ ∀ x ∈ K, ∃ a : κ → O, (∀ u, residue O (a u) = co u x) ∧ x = ∑ u, a u • ε u := by
   intro O _ _ X _ A _ _ _ K hK W κ _ ε wf hε hspan hrel
   classical
   have hεK : ∀ v, ε v ∈ K := fun v => by
@@ -99,8 +111,8 @@ theorem UpperTheory.V.Alg.ker_coef :
       simp only [map_smul, hfε]
       rw [hgx, ← ha, sub_self]
     have hh := W.homog _ hk (wf u)
-    have hfw : ∀ v, wcomp O W.wt (wf u) (f v) = if wf v = wf u then f v else 0 :=
-      fun v => wcomp_of_mem_ite W.wt (hf v)
+    have hfw : ∀ v, wcomp O W.wt (wf u) (f v) = if wf v = wf u then f v else 0 := fun v =>
+      wcomp_of_mem_ite W.wt (hf v)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sub, map_sum, wcomp_of_mem_ite W.wt hg, if_neg hj] at hh
     simp only [map_smul, hfw] at hh

@@ -7,23 +7,31 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.P
 
 open UpperTheory.V.Loc UpperTheory.V.Alg IsLocalRing
 
-private theorem cg_max {E σ : Type} [Field E] : maximalIdeal (MvPowerSeries σ E) = GlobalTheory.germIdeal σ E := by
+private theorem cg_max {E σ : Type} [Field E]
+    : maximalIdeal (MvPowerSeries σ E) = GlobalTheory.germIdeal σ E := by
   ext g
-  rw [mem_maximalIdeal, mem_nonunits_iff, MvPowerSeries.isUnit_iff_constantCoeff, isUnit_iff_ne_zero, not_not]
+  rw [mem_maximalIdeal, mem_nonunits_iff, MvPowerSeries.isUnit_iff_constantCoeff,
+    isUnit_iff_ne_zero, not_not]
   simp [GlobalTheory.germIdeal, RingHom.mem_ker]
 
-private theorem cg_ext {O R E : Type} [CommRing O] [IsDomain O] [CommRing R] [Algebra O R] [Field E] [Algebra O E]
-    [IsFractionRing O E] {n : ℕ} {I : Ideal R} {x : R →ₐ[O] O} {φ : R →ₐ[O] MvPowerSeries (Fin n) E}
-    (hφ : UpperTheory.V.Loc.IsCompl I x φ) {z : Fin n → R} (hz : ∀ i, φ (z i) = MvPowerSeries.X i)
+private theorem cg_ext
+    {O R E : Type} [CommRing O] [IsDomain O] [CommRing R] [Algebra O R] [Field E] [Algebra O E]
+    [IsFractionRing O E]
+    {n : ℕ} {I : Ideal R} {x : R →ₐ[O] O} {φ : R →ₐ[O] MvPowerSeries (Fin n) E}
+    (hφ : UpperTheory.V.Loc.IsCompl I x φ)
+    {z : Fin n → R} (hz : ∀ i, φ (z i) = MvPowerSeries.X i)
     (α β : R →ₐ[O] MvPowerSeries (Fin n) E)
     (hα : ∀ a, MvPowerSeries.constantCoeff (α a) = algebraMap O E (x a))
-    (hβ : ∀ a, MvPowerSeries.constantCoeff (β a) = algebraMap O E (x a))
-    (hI : ∀ a ∈ I, α a = β a) (hzz : ∀ i, α (z i) = β (z i)) (a : R) : α a = β a := by
+    (hβ : ∀ a, MvPowerSeries.constantCoeff (β a) = algebraMap O E (x a)) (hI : ∀ a ∈ I, α a = β a)
+    (hzz : ∀ i, α (z i) = β (z i))
+    (a : R)
+    : α a = β a := by
   classical
   have hm := cg_max (E := E) (σ := Fin n)
-  have hA : ∀ (γ : R →ₐ[O] MvPowerSeries (Fin n) E),
-      (∀ a, MvPowerSeries.constantCoeff (γ a) = algebraMap O E (x a)) →
-      ∀ N, ∀ b ∈ RingHom.ker x ^ N, γ b ∈ GlobalTheory.germIdeal (Fin n) E ^ N := by
+  have hA
+      : ∀ (γ : R →ₐ[O] MvPowerSeries (Fin n) E),
+        (∀ a, MvPowerSeries.constantCoeff (γ a) = algebraMap O E (x a))
+          → ∀ N, ∀ b ∈ RingHom.ker x ^ N, γ b ∈ GlobalTheory.germIdeal (Fin n) E ^ N := by
     intro γ hγ N b hb
     have h1 : Ideal.map γ (RingHom.ker x) ≤ GlobalTheory.germIdeal (Fin n) E := by
       rw [Ideal.map_le_iff_le_comap]
@@ -40,29 +48,35 @@ private theorem cg_ext {O R E : Type} [CommRing O] [IsDomain O] [CommRing R] [Al
     have hv0 : α v - β v = 0 := sub_eq_zero.mpr (hI v hv)
     rw [map_add (f := _), map_add (f := _), add_sub_add_comm, hv0, add_zero]
     exact Ideal.sub_mem _ (hA α hα N u hu) (hA β hβ N u hu)
-  have hC : ∀ p : MvPolynomial (Fin n) O, α (MvPolynomial.aeval z p) = β (MvPolynomial.aeval z p) := by
+  have hC
+      : ∀ p : MvPolynomial (Fin n) O, α (MvPolynomial.aeval z p) = β (MvPolynomial.aeval z p) := by
     intro p
     have hcomp : α.comp (MvPolynomial.aeval z) = β.comp (MvPolynomial.aeval z) := by
       apply MvPolynomial.algHom_ext
       intro i
       simp [hzz i]
     exact AlgHom.congr_fun hcomp p
-  have hP : ∀ p : MvPolynomial (Fin n) O, φ (MvPolynomial.aeval z p) =
-      ((MvPolynomial.map (algebraMap O E) p : MvPolynomial (Fin n) E) : MvPowerSeries (Fin n) E) := by
+  have hP
+      : ∀ p : MvPolynomial (Fin n) O,
+        φ (MvPolynomial.aeval z p)
+          = ((MvPolynomial.map (algebraMap O E) p : MvPolynomial (Fin n) E)
+            : MvPowerSeries (Fin n) E) := by
     intro p
     induction p using MvPolynomial.induction_on with
     | C c =>
       rw [MvPolynomial.aeval_C, AlgHom.commutes, MvPolynomial.map_C, MvPolynomial.coe_C,
         MvPowerSeries.algebraMap_apply]
-    | add p q hp hq => simp only [map_add (f := _), hp, hq, MvPolynomial.coe_add]
+    | add p q hp hq =>
+      simp only [map_add (f := _), hp, hq, MvPolynomial.coe_add]
     | mul_X p i hp =>
       simp only [map_mul, hp, MvPolynomial.aeval_X, hz i, MvPolynomial.map_X, MvPolynomial.coe_mul,
         MvPolynomial.coe_X]
   have hmain : ∀ N, ∃ e : O, e ≠ 0 ∧ e • (α a - β a) ∈ GlobalTheory.germIdeal (Fin n) E ^ N := by
     intro N
     set s := (Finsupp.finite_of_degree_lt (σ := Fin n) N).toFinset with hs
-    obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors O) s
-      (fun d => MvPowerSeries.coeff d (φ a))
+    obtain ⟨b, hb⟩ :=
+      IsLocalization.exist_integer_multiples (nonZeroDivisors O) s
+        (fun d => MvPowerSeries.coeff d (φ a))
     have hb' : ∀ d ∈ s, ∃ k : O, algebraMap O E k = (b : O) • MvPowerSeries.coeff d (φ a) :=
       fun d hd => RingHom.mem_rangeS.mp (hb d hd)
     choose! k hk using hb'
@@ -101,8 +115,15 @@ private theorem cg_ext {O R E : Type} [CommRing O] [IsDomain O] [CommRing R] [Al
   · rw [map_zero]
     exact h1
 
-theorem UpperTheory.V.Loc.chartGraded :
-    ∀ {O R E : Type} [CommRing O] [IsDomain O] [CommRing R] [Algebra O R] [Field E] [Algebra O E] [IsFractionRing O E] (n : ℕ) (I : Ideal R) (x : R →ₐ[O] O) (φ : R →ₐ[O] MvPowerSeries (Fin n) E) (z : Fin n → R) (w : Fin n → ℤ) (θ : R →ₐ[O] R) (t : Oˣ), UpperTheory.V.Loc.IsCompl I x φ → (∀ i, φ (z i) = MvPowerSeries.X i) → x.comp θ = x → (∀ a ∈ I, θ a ∈ I) → (Function.Injective fun j : ℤ => t ^ j) → (∀ i, θ (z i) = algebraMap O R ((t ^ w i : Oˣ) : O) * z i) → ∀ (j : ℤ) (a : R), θ a = algebraMap O R ((t ^ j : Oˣ) : O) * a → φ a ∈ wtPart E w j := by
+theorem UpperTheory.V.Loc.chartGraded
+    : ∀ {O R E : Type} [CommRing O] [IsDomain O] [CommRing R] [Algebra O R] [Field E] [Algebra O E]
+        [IsFractionRing O E] (n : ℕ) (I : Ideal R) (x : R →ₐ[O] O)
+        (φ : R →ₐ[O] MvPowerSeries (Fin n) E) (z : Fin n → R) (w : Fin n → ℤ) (θ : R →ₐ[O] R)
+        (t : Oˣ),
+      UpperTheory.V.Loc.IsCompl I x φ → (∀ i, φ (z i) = MvPowerSeries.X i) → x.comp θ = x
+        → (∀ a ∈ I, θ a ∈ I) → (Function.Injective fun j : ℤ => t ^ j)
+        → (∀ i, θ (z i) = algebraMap O R ((t ^ w i : Oˣ) : O) * z i)
+        → ∀ (j : ℤ) (a : R), θ a = algebraMap O R ((t ^ j : Oˣ) : O) * a → φ a ∈ wtPart E w j := by
   intro O R E _ _ _ _ _ _ _ n I x φ z w θ t hφ hz hxθ hθI hinj hθz j a ha
   classical
   obtain ⟨c, hc⟩ : ∃ c : Fin n → E, c = fun i => algebraMap O E ((t ^ w i : Oˣ) : O) := ⟨_, rfl⟩
@@ -123,34 +144,40 @@ theorem UpperTheory.V.Loc.chartGraded :
     intro r hr
     rw [← RingHom.mem_ker, hφ.ker]
     exact hr
-  have key := cg_ext hφ hz (φ.comp θ) β
-    (by
-      intro r
-      rw [AlgHom.comp_apply, hφ.const, ← AlgHom.comp_apply, hxθ])
-    (by
-      intro r
-      rw [hβ_apply, ← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_rescale,
-        Finsupp.prod_zero_index, one_mul, MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hφ.const])
-    (by
-      intro r hr
-      rw [AlgHom.comp_apply, hker _ (hθI r hr), hβ_apply, hker r hr, map_zero])
-    (by
-      intro i
-      rw [AlgHom.comp_apply, hθz i, map_mul, AlgHom.commutes, hz i, hβ_apply, hz i,
-        MvPowerSeries.algebraMap_apply]
-      ext m
-      rw [MvPowerSeries.coeff_rescale, MvPowerSeries.coeff_C_mul, MvPowerSeries.coeff_X]
-      split_ifs with hm
-      · subst hm
-        simp [hc]
-      · simp) a
+  have key :=
+    cg_ext hφ hz (φ.comp θ) β
+      (by
+        intro r
+        rw [AlgHom.comp_apply, hφ.const, ← AlgHom.comp_apply, hxθ])
+      (by
+        intro r
+        rw [hβ_apply, ← MvPowerSeries.coeff_zero_eq_constantCoeff_apply,
+          MvPowerSeries.coeff_rescale, Finsupp.prod_zero_index, one_mul,
+          MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hφ.const])
+      (by
+        intro r hr
+        rw [AlgHom.comp_apply, hker _ (hθI r hr), hβ_apply, hker r hr, map_zero])
+      (by
+        intro i
+        rw [AlgHom.comp_apply, hθz i, map_mul, AlgHom.commutes, hz i, hβ_apply, hz i,
+          MvPowerSeries.algebraMap_apply]
+        ext m
+        rw [MvPowerSeries.coeff_rescale, MvPowerSeries.coeff_C_mul, MvPowerSeries.coeff_X]
+        split_ifs with hm
+        · subst hm
+          simp [hc]
+        · simp)
+      a
   have hθa : φ (θ a) = MvPowerSeries.C (algebraMap O E ((t ^ j : Oˣ) : O)) * φ a := by
     rw [ha, map_mul, AlgHom.commutes, MvPowerSeries.algebraMap_apply]
-  have key' : MvPowerSeries.C (algebraMap O E ((t ^ j : Oˣ) : O)) * φ a = MvPowerSeries.rescale c (φ a) := by
+  have key'
+      : MvPowerSeries.C (algebraMap O E ((t ^ j : Oˣ) : O)) * φ a
+        = MvPowerSeries.rescale c (φ a) := by
     rw [← hθa]
     exact key
-  have hprod : ∀ m : Fin n →₀ ℕ,
-      (m.prod fun i k => c i ^ k) = algebraMap O E ((t ^ (Finsupp.weight w m) : Oˣ) : O) := by
+  have hprod
+      : ∀ m : Fin n →₀ ℕ,
+        (m.prod fun i k => c i ^ k) = algebraMap O E ((t ^ (Finsupp.weight w m) : Oˣ) : O) := by
     intro m
     rw [hc, Finsupp.prod, Finsupp.weight_apply, Finsupp.sum]
     simp only [← map_pow, ← map_prod, ← Units.val_pow_eq_pow_val, ← Units.coe_prod]
@@ -167,7 +194,8 @@ theorem UpperTheory.V.Loc.chartGraded :
   intro m hm
   have hcm := congrArg (MvPowerSeries.coeff m) key'
   rw [MvPowerSeries.coeff_C_mul, MvPowerSeries.coeff_rescale, hprod m, ← sub_eq_zero, ← sub_mul,
-    mul_eq_zero] at hcm
+      mul_eq_zero]
+    at hcm
   rcases hcm with h | h
   · exfalso
     apply hm

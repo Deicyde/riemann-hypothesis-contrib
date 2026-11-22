@@ -6,10 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SesqMap
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL UpperTheory.Gal.TP.Loc
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.ThetaGL UpperTheory.Gal.TP.Loc
 
-theorem UpperTheory.Gal.TP.Loc.contraUnit :
-    UpperTheory.Gal.TP.Loc.ContraIrr → UpperTheory.Gal.TP.Loc.ContraUnit := by
+theorem UpperTheory.Gal.TP.Loc.contraUnit
+    : UpperTheory.Gal.TP.Loc.ContraIrr → UpperTheory.Gal.TP.Loc.ContraUnit := by
   intro hci k _ _ _ _ n V _ _ ρ hsm hirr hu
   obtain ⟨B, hherm, hpos, hinv⟩ := hu
   have hnd : ∀ w : V, (∀ v : V, B v w = 0) → w = 0 := by
@@ -56,11 +57,12 @@ theorem UpperTheory.Gal.TP.Loc.contraUnit :
       have h := congrArg (fun l : smoothPart ρ.dual => (l : Module.Dual ℂ V) v) hw
       simpa [hSapply] using h
     refine ⟨hi, ?_⟩
-    let R : Subrepresentation (contra ρ) :=
-      { toSubmodule := LinearMap.range S
-        apply_mem_toSubmodule := fun g l hl => by
-          obtain ⟨w, rfl⟩ := hl
-          exact ⟨ρ g w, hcomm g w⟩ }
+    let R : Subrepresentation (contra ρ) := {
+      toSubmodule := LinearMap.range S
+      apply_mem_toSubmodule := fun g l hl => by
+        obtain ⟨w, rfl⟩ := hl
+        exact ⟨ρ g w, hcomm g w⟩
+    }
     rcases hcirr.eq_bot_or_eq_top R with hR | hR
     · exfalso
       have h : S w0 ∈ R.toSubmodule := ⟨w0, rfl⟩
@@ -77,8 +79,15 @@ theorem UpperTheory.Gal.TP.Loc.contraUnit :
   have hTg : ∀ g f, T (contra ρ g f) = ρ g (T f) := by
     intro g f
     rw [← hST f, ← hcomm, hTS, hTS]
-  refine ⟨⟨LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun f f' => B (T f') (T f))
-    ?_ ?_ ?_ ?_, ?_, ?_, ?_⟩, ⟨e, fun g x => hcomm g x⟩⟩
+  refine ⟨
+    ⟨
+      LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun f f' => B (T f') (T f)) ?_ ?_ ?_ ?_,
+      ?_,
+      ?_,
+      ?_
+    ⟩,
+    ⟨e, fun g x => hcomm g x⟩
+  ⟩
   · intro f₁ f₂ f'
     simp [map_add (f := _)]
   · intro c f f'

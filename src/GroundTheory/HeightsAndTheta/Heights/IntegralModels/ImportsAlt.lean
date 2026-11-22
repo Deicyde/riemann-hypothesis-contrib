@@ -10,9 +10,9 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model
 
-theorem KrullAkizuki.equiv :
-    GroundTheory.Heights₂.Heights.Model.KrullAkizuki.Statement ↔
-      GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.KrullAkizuki.Statement := by
+theorem KrullAkizuki.equiv
+    : GroundTheory.Heights₂.Heights.Model.KrullAkizuki.Statement
+      ↔ GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Model.KrullAkizuki.Statement := by
   constructor
   · rintro ⟨h₁, h₂⟩ R K L _ _ _ _ _ _ _ _ _ _ _ hR
     exact ⟨h₁ R hR K L, h₂ R hR K⟩

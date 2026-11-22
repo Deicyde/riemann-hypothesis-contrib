@@ -11,7 +11,10 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -22,10 +25,13 @@ section Quad
 
 open ValuativeRel Polynomial
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-  [Algebra F E] [TopologicalSpace E] (L : Formalism.MainNotions.S.Loc.LocE F E)
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+  (L : Formalism.MainNotions.S.Loc.LocE F E)
 
-theorem exists_quad (L : Formalism.MainNotions.S.Loc.LocE F E) (d : E) : ∃ t n : F, d * d - algebraMap F E t * d + algebraMap F E n = 0 := by
+theorem exists_quad (L : Formalism.MainNotions.S.Loc.LocE F E) (d : E)
+    : ∃ t n : F, d * d - algebraMap F E t * d + algebraMap F E n = 0 := by
   haveI := L.free
   haveI : Module.Finite F E := Module.finite_of_finrank_eq_succ L.rank
   set f : E →ₗ[F] E := Algebra.lmul F E d with hf
@@ -42,14 +48,17 @@ theorem exists_quad (L : Formalism.MainNotions.S.Loc.LocE F E) (d : E) : ∃ t n
   rw [hdeg] at hs
   rw [hs] at h0
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_pow, aeval_X, map_sum, map_mul, aeval_C, Finset.sum_range_succ, Finset.sum_range_zero,
-    zero_add, pow_zero, pow_one, mul_one] at h0
-  refine ⟨-f.charpoly.coeff 1, f.charpoly.coeff 0, ?_⟩
+    simp only [map_add (f := _), map_pow, aeval_X, map_sum, map_mul, aeval_C, Finset.sum_range_succ,
+        Finset.sum_range_zero, zero_add, pow_zero, pow_one, mul_one]
+      at h0
+  refine ⟨- f.charpoly.coeff 1, f.charpoly.coeff 0, ?_⟩
   rw [map_neg]
   linear_combination h0
 
-theorem mem_O_of_quad (x : E) (a b : F) (h : x * x - algebraMap F E a * x + algebraMap F E b = 0)
-    (ha : valuation F a ≤ 1) (hb : valuation F b ≤ 1) : x ∈ L.O := by
+theorem mem_O_of_quad
+    (x : E) (a b : F) (h : x * x - algebraMap F E a * x + algebraMap F E b = 0)
+    (ha : valuation F a ≤ 1) (hb : valuation F b ≤ 1)
+    : x ∈ L.O := by
   rw [L.O_def]
   set a' : (valuation F).integer := ⟨a, (Valuation.mem_integer_iff _ _).2 ha⟩
   set b' : (valuation F).integer := ⟨b, (Valuation.mem_integer_iff _ _).2 hb⟩
@@ -61,10 +70,11 @@ theorem mem_O_of_quad (x : E) (a b : F) (h : x * x - algebraMap F E a * x + alge
     rw [ea, eb]
     linear_combination h
 
-theorem inv_mem_O_of_quad (u : E) (t n : F) (h : u * u - algebraMap F E t * u + algebraMap F E n = 0)
-    (hn : 1 ≤ valuation F n) (ht : valuation F t ≤ valuation F n) : ∃ w ∈ L.O, u * w = 1 := by
-  have hn0 : n ≠ 0 := by
-    intro h0; rw [h0, map_zero] at hn; exact absurd hn (not_le.2 zero_lt_one)
+theorem inv_mem_O_of_quad
+    (u : E) (t n : F) (h : u * u - algebraMap F E t * u + algebraMap F E n = 0)
+    (hn : 1 ≤ valuation F n) (ht : valuation F t ≤ valuation F n)
+    : ∃ w ∈ L.O, u * w = 1 := by
+  have hn0 : n ≠ 0 := by intro h0; rw [h0, map_zero] at hn; exact absurd hn (not_le.2 zero_lt_one)
   have hvn : valuation F n ≠ 0 := by rw [Ne, map_eq_zero]; exact hn0
   refine ⟨algebraMap F E n⁻¹ * (algebraMap F E t - u), ?_, ?_⟩
   · refine mem_O_of_quad L _ (t * n⁻¹) n⁻¹ ?_ ?_ ?_
@@ -79,12 +89,14 @@ theorem inv_mem_O_of_quad (u : E) (t n : F) (h : u * u - algebraMap F E t * u + 
       rw [← map_mul, mul_inv_cancel₀ hn0, map_one]
     linear_combination (-(algebraMap F E n⁻¹)) * h + e
 
-theorem exists_shift_inv : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Formalism.MainNotions.S.Loc.LocE F E) (d : E), d ∉ L.O →
-    ∃ s ∈ L.O, ∃ w ∈ L.O, (d + s) * w = 1 := by
+theorem exists_shift_inv
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] (L : Formalism.MainNotions.S.Loc.LocE F E) (d : E),
+      d ∉ L.O → ∃ s ∈ L.O, ∃ w ∈ L.O, (d + s) * w = 1 := by
   intro F _ _ _ E _ _ _ L d hd
   obtain ⟨t, n, h⟩ := exists_quad L d
-  have hnot : ¬ (valuation F t ≤ 1 ∧ valuation F n ≤ 1) := fun hh => hd (mem_O_of_quad L d t n h hh.1 hh.2)
+  have hnot : ¬(valuation F t ≤ 1 ∧ valuation F n ≤ 1) := fun hh =>
+    hd (mem_O_of_quad L d t n h hh.1 hh.2)
   by_cases hc : 1 ≤ valuation F n ∧ valuation F t ≤ valuation F n
   · obtain ⟨w, hw, hdw⟩ := inv_mem_O_of_quad L d t n h hc.1 hc.2
     exact ⟨0, L.O.zero_mem, w, hw, by rw [add_zero]; exact hdw⟩
@@ -104,11 +116,14 @@ theorem exists_shift_inv : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologica
     have hn' : valuation F (t + (n + 1)) = valuation F t := Valuation.map_add_eq_of_lt_left _ hn1
     have ht' : valuation F (t + 2) ≤ valuation F t :=
       le_trans (Valuation.map_add _ _ _) (max_le le_rfl (le_trans hv2 ht1.1.le))
-    have hq : (d + 1) * (d + 1) - algebraMap F E (t + 2) * (d + 1) + algebraMap F E (t + (n + 1)) = 0 := by
+    have hq
+        : (d + 1) * (d + 1) - algebraMap F E (t + 2) * (d + 1) + algebraMap F E (t + (n + 1))
+          = 0 := by
       simp only [map_add (f := _), map_one, map_ofNat]
       linear_combination h
-    obtain ⟨w, hw, hdw⟩ := inv_mem_O_of_quad L (d + 1) (t + 2) (t + (n + 1)) hq
-      (by rw [hn']; exact ht1.1.le) (by rw [hn']; exact ht')
+    obtain ⟨w, hw, hdw⟩ :=
+      inv_mem_O_of_quad L (d + 1) (t + 2) (t + (n + 1)) hq (by rw [hn']; exact ht1.1.le)
+        (by rw [hn']; exact ht')
     exact ⟨1, L.O.one_mem, w, hw, hdw⟩
 
 end Quad
@@ -117,9 +132,11 @@ open Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
 
 section Herm
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-  [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] {M : Model F E} {V : Type} [AddCommGroup V]
-  [Module E V] (H : HermSp M V)
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  (H : HermSp M V)
 
 theorem h_add_right' (x y y' : V) : H.h x (y + y') = H.h x y + H.h x y' := by
   rw [H.h_herm (y + y') x, H.h_add_left, map_add (f := _), ← H.h_herm, ← H.h_herm]
@@ -127,20 +144,26 @@ theorem h_add_right' (x y y' : V) : H.h x (y + y') = H.h x y + H.h x y' := by
 theorem h_smul_right' (c : E) (x y : V) : H.h x (c • y) = M.L.cj c * H.h x y := by
   rw [H.h_herm (c • y) x, H.h_smul_left, map_mul, ← H.h_herm]
 
-theorem h_zero_right' (x : V) : H.h x 0 = 0 := by
-  rw [H.h_herm 0 x, H.h_zero_left, map_zero]
+theorem h_zero_right' (x : V) : H.h x 0 = 0 := by rw [H.h_herm 0 x, H.h_zero_left, map_zero]
 
 end Herm
 
-theorem mkW_mem_of_mem_img : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-    [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] {M : Formalism.MainNotions.S.Loc.Model F E} {V : Type} [AddCommGroup V]
-    [Module E V] {H : Formalism.MainNotions.S.Loc.HermSp M V} {r : ℕ} (Fr : Formalism.MainNotions.S.LocNG.FrameD H r)
-    (L : Submodule M.L.O (H.Wb Fr.f)) (n : V ≃ₗ[E] V), n ∈ Fr.N →
-    ∀ v : ↥(H.perp (H.X Fr.f)), (v : V) ∈ Formalism.MainNotions.S.LocNG.img n (Fr.LamStd L) → H.mkW Fr.f v ∈ L := by
+theorem mkW_mem_of_mem_img
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+        {M : Formalism.MainNotions.S.Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
+        {H : Formalism.MainNotions.S.Loc.HermSp M V} {r : ℕ}
+        (Fr : Formalism.MainNotions.S.LocNG.FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f))
+        (n : V ≃ₗ[E] V),
+      n ∈ Fr.N
+        → ∀ v : ↥(H.perp (H.X Fr.f)),
+          (v : V) ∈ Formalism.MainNotions.S.LocNG.img n (Fr.LamStd L) → H.mkW Fr.f v ∈ L := by
   intro F _ _ _ E _ _ _ _ M V _ _ H r Fr L n hn v hv
   obtain ⟨u, hu, hnu⟩ := Submodule.mem_map.1 hv
   have hnu' : n u = v := hnu
-  have hnS := Formalism.MainNotions.BridgeLemma.NSet_inv Fr (Formalism.MainNotions.BridgeLemma.mem_NSet_of_mem_N Fr hn)
+  have hnS :=
+    Formalism.MainNotions.BridgeLemma.NSet_inv Fr
+      (Formalism.MainNotions.BridgeLemma.mem_NSet_of_mem_N Fr hn)
   have h1 : n.symm (v : V) - v ∈ H.X Fr.f := hnS.2.2 v v.2
   rw [← hnu', LinearEquiv.symm_apply_apply, hnu'] at h1
   have hprF_add : ∀ a b : V, Fr.prF (a + b) = Fr.prF a + Fr.prF b := by
@@ -166,30 +189,40 @@ theorem mkW_mem_of_mem_img : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologi
       obtain ⟨b, rfl⟩ := hy
       show H.h (Fr.prF a) (Fr.e b) = 0
       unfold FrameD.prF
-      rw [Formalism.MainNotions.BridgeLemma.h_sub_left, Formalism.MainNotions.BridgeLemma.h_sub_left, Formalism.MainNotions.BridgeLemma.h_sum_left,
+      rw [Formalism.MainNotions.BridgeLemma.h_sub_left,
+        Formalism.MainNotions.BridgeLemma.h_sub_left, Formalism.MainNotions.BridgeLemma.h_sum_left,
         Formalism.MainNotions.BridgeLemma.h_sum_left]
       have z1 : ∑ i, H.h a (Fr.es i) * H.h (Fr.e i) (Fr.e b) = 0 :=
         Finset.sum_eq_zero (fun i _ => by
-          rw [show H.h (Fr.e i) (Fr.e b) = 0 from Fr.h_iso _ _ (Or.inl (Fin.castSucc_lt_last i).ne), mul_zero])
+          rw [show H.h (Fr.e i) (Fr.e b) = 0 from Fr.h_iso _ _ (Or.inl (Fin.castSucc_lt_last i).ne),
+            mul_zero])
       have z2 : ∑ i, H.h a (Fr.e i) * H.h (Fr.es i) (Fr.e b) = H.h a (Fr.e b) := by
         simp only [hes_e, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-        rw [Finset.sum_ite_eq]; simp
-      rw [z1, z2]; ring
+        rw [Finset.sum_ite_eq]
+        simp
+      rw [z1, z2]
+      ring
     | zero => exact h_zero_right' H _
     | add y y' _ _ ih ih' => rw [h_add_right', ih, ih', add_zero]
     | smul t y _ ih => rw [h_smul_right', ih, mul_zero]
-  have hcls : ∀ a ∈ Fr.LamStd L, ∃ w : ↥(H.perp (H.X Fr.f)), (w : V) = Fr.prF a ∧ H.mkW Fr.f w ∈ L := by
+  have hcls
+      : ∀ a ∈ Fr.LamStd L, ∃ w : ↥(H.perp (H.X Fr.f)), (w : V) = Fr.prF a ∧ H.mkW Fr.f w ∈ L := by
     intro a ha
     unfold FrameD.LamStd at ha
     induction ha using Submodule.span_induction with
     | mem a ha => exact ha.2.2
     | zero =>
       refine ⟨0, ?_, by rw [map_zero]; exact L.zero_mem⟩
-      unfold FrameD.prF; simp [H.h_zero_left]
+      unfold FrameD.prF
+      simp [H.h_zero_left]
     | add a b _ _ iha ihb =>
       obtain ⟨w, hw, hwL⟩ := iha
       obtain ⟨w', hw', hwL'⟩ := ihb
-      exact ⟨w + w', by rw [Submodule.coe_add, hw, hw', hprF_add], by rw [map_add (f := _)]; exact L.add_mem hwL hwL'⟩
+      exact ⟨
+        w + w',
+        by rw [Submodule.coe_add, hw, hw', hprF_add],
+        by rw [map_add (f := _)]; exact L.add_mem hwL hwL'
+      ⟩
     | smul c a _ iha =>
       obtain ⟨w, hw, hwL⟩ := iha
       refine ⟨(c : E) • w, ?_, ?_⟩
@@ -208,7 +241,8 @@ theorem mkW_mem_of_mem_img : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologi
       have : ∑ a, H.h u (Fr.e a) • Fr.es a = 0 :=
         Finset.sum_eq_zero (fun a _ => by
           rw [show H.h u (Fr.e a) = 0 from hup _ (Submodule.subset_span ⟨a, rfl⟩), zero_smul])
-      rw [this]; abel
+      rw [this]
+      abel
     rw [e]
     exact Submodule.sum_mem _ (fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩))
   have hvw : H.mkW Fr.f v = H.mkW Fr.f w := by
@@ -223,13 +257,17 @@ theorem mkW_mem_of_mem_img : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologi
 
 section Local
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-  [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] {M : Model F E} {V : Type} [AddCommGroup V]
-  [Module E V] {H : HermSp M V} {r : ℕ}
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ}
 
-theorem coef_mem_O (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L)
-    (n : V ≃ₗ[E] V) (hn : n ∈ Fr.N) (d : E) (x : V) (hx : x ∈ H.X Fr.f)
-    (h : d • Fr.z + x ∈ img n (Fr.LamStd L)) : d ∈ M.L.O := by
+theorem coef_mem_O
+    (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L)
+    (n : V ≃ₗ[E] V) (hn : n ∈ Fr.N)
+    (d : E) (x : V) (hx : x ∈ H.X Fr.f) (h : d • Fr.z + x ∈ img n (Fr.LamStd L))
+    : d ∈ M.L.O := by
   obtain ⟨xz, hxz, hxzL, hprim⟩ := hL.2.2
   have hvp : d • Fr.z + x ∈ H.perp (H.X Fr.f) :=
     Submodule.add_mem _ (Submodule.smul_mem _ d (Formalism.MainNotions.BridgeLemma.z_mem_perp Fr))
@@ -252,7 +290,9 @@ theorem coef_mem_O (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.
   obtain ⟨b, hb⟩ := (hprim ⟨w, hw⟩ ((d + s) • xz) hyL hmk).exists_right_inv
   have hb' : w * (b : E) = 1 := by simpa using congrArg Subtype.val hb
   have hds : d + s = (b : E) := by
-    calc d + s = (d + s) * (w * (b : E)) := by rw [hb', mul_one]
+    calc
+      d + s
+        = (d + s) * (w * (b : E)) := by rw [hb', mul_one]
       _ = ((d + s) * w) * (b : E) := by ring
       _ = (b : E) := by rw [hsw, one_mul]
   apply hd
@@ -262,7 +302,15 @@ theorem coef_mem_O (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.
 
 end Local
 
-theorem coef_integral : ∀ (D : D7) (T : D.host.E) (G : LFlag (D.sp.Y 0) D.R.rS T) (Z : LocDat D) (A : ∀ p : PlF D, LocNG.FrameD (locH Z p) D.R.rS), (∀ p, (A p).f = fun a => frFac Z.δ p a • baseChange₂ D p (frame G a)) → ∀ Λ : LV D, Submodule.IsLattice D.host.E Λ → (∀ p, ∃ n ∈ (A p).N, ∃ L, (A p).IsInner L ∧ lattice₂ D Z.M p Λ = LocNG.img n ((A p).LamStd L)) → ∀ c : D.host.E, c • G.fl.z ∈ Lsub Λ G → ∃ o : 𝓞 D.host.E, (o : D.host.E) = c := by
+theorem coef_integral
+    : ∀ (D : D7) (T : D.host.E) (G : LFlag (D.sp.Y 0) D.R.rS T) (Z : LocDat D)
+        (A : ∀ p : PlF D, LocNG.FrameD (locH Z p) D.R.rS),
+      (∀ p, (A p).f = fun a => frFac Z.δ p a • baseChange₂ D p (frame G a))
+        → ∀ Λ : LV D,
+          Submodule.IsLattice D.host.E Λ
+            → (∀ p, ∃ n ∈ (A p).N, ∃ L,
+              (A p).IsInner L ∧ lattice₂ D Z.M p Λ = LocNG.img n ((A p).LamStd L))
+            → ∀ c : D.host.E, c • G.fl.z ∈ Lsub Λ G → ∃ o : 𝓞 D.host.E, (o : D.host.E) = c := by
   intro D T G Z A hA Λ _ hloc c hc
   obtain ⟨l, hl, x, hx, hlx⟩ := Submodule.mem_sup.1 (Submodule.mem_inf.1 hc).1
   have hlΛ : l ∈ Λ := (Submodule.mem_inf.1 hl).1
@@ -280,7 +328,8 @@ theorem coef_integral : ∀ (D : D7) (T : D.host.E) (G : LFlag (D.sp.Y 0) D.R.rS
       rw [hf]; exact GlobalTheory.LocExt.bcP_Xsp_mem Z p G hxX
     have hmem : (D.s.atP p).ιE c • (A p).z + -(baseChange₂ D p x) ∈ img n ((A p).LamStd L) := by
       rw [← hlat, hz, ← baseChange_smul₂, ← hlx, map_add (f := _)]
-      have : baseChange₂ D p l + baseChange₂ D p x + -(baseChange₂ D p x) = baseChange₂ D p l := by abel
+      have : baseChange₂ D p l + baseChange₂ D p x + -(baseChange₂ D p x) = baseChange₂ D p l := by
+        abel
       rw [this]
       exact Submodule.subset_span ⟨l, hlΛ, rfl⟩
     rw [← hO]

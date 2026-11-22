@@ -14,8 +14,8 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem isReduced_tensor_int_numberField (F K : Type) [Field F] [NumberField F] [Field K] :
-    IsReduced (K ⊗[ℤ] F) := by
+theorem isReduced_tensor_int_numberField (F K : Type) [Field F] [NumberField F] [Field K]
+    : IsReduced (K ⊗[ℤ] F) := by
   haveI : Algebra.FormallyUnramified ℤ ℚ := Algebra.FormallyUnramified.of_isLocalization (nonZeroDivisors ℤ)
   haveI : Algebra.FormallyUnramified ℚ F := Algebra.FormallyUnramified.of_isSeparable ℚ F
   haveI : Algebra.FormallyUnramified ℤ F := Algebra.FormallyUnramified.comp ℤ ℚ F

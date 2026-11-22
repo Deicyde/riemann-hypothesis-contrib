@@ -12,8 +12,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyKa
@@ -24,42 +26,58 @@ namespace GlobalTheory.GrpDescent
 
 variable {S S₀ : Scheme.{0}}
 
-theorem grpObj_descends (f : S ⟶ S₀) [Flat f] [Surjective f] (A : Over S) [GrpObj A] (A₀ : Over S₀)
-    (π : A.left ⟶ A₀.left) (e₀ : 𝟙_ (Over S₀) ⟶ A₀) (m₀ : A₀ ⊗ A₀ ⟶ A₀) (i₀ : A₀ ⟶ A₀)
-    (π₂ : (A ⊗ A).left ⟶ (A₀ ⊗ A₀).left) (hπ : IsPullback π A.hom A₀.hom f)
-    (h1 : π₂ ≫ (fst A₀ A₀).left = (fst A A).left ≫ π) (h2 : π₂ ≫ (snd A₀ A₀).left = (snd A A).left ≫ π)
-    (he : η[A].left ≫ π = f ≫ e₀.left) (hm : μ[A].left ≫ π = π₂ ≫ m₀.left)
-    (hi : (GrpObj.inv : A ⟶ A).left ≫ π = π ≫ i₀.left) :
-    ∃ _ : GrpObj A₀, IsGrpPullback A A₀ f π := by
-
-  have rmul : ∀ {T' : Over S} {T : Over S₀} (p : T'.left ⟶ T.left) {x' y' : T' ⟶ A} {x y : T ⟶ A₀},
-      x'.left ≫ π = p ≫ x.left → y'.left ≫ π = p ≫ y.left →
-      (x' * y').left ≫ π = p ≫ (lift x y ≫ m₀).left := by
+theorem grpObj_descends
+    (f : S ⟶ S₀) [Flat f] [Surjective f]
+    (A : Over S) [GrpObj A]
+    (A₀ : Over S₀) (π : A.left ⟶ A₀.left) (e₀ : 𝟙_ (Over S₀) ⟶ A₀) (m₀ : A₀ ⊗ A₀ ⟶ A₀)
+    (i₀ : A₀ ⟶ A₀) (π₂ : (A ⊗ A).left ⟶ (A₀ ⊗ A₀).left)
+    (hπ : IsPullback π A.hom A₀.hom f) (h1 : π₂ ≫ (fst A₀ A₀).left = (fst A A).left ≫ π)
+    (h2 : π₂ ≫ (snd A₀ A₀).left = (snd A A).left ≫ π) (he : η[A].left ≫ π = f ≫ e₀.left)
+    (hm : μ[A].left ≫ π = π₂ ≫ m₀.left) (hi : (GrpObj.inv : A ⟶ A).left ≫ π = π ≫ i₀.left)
+    : ∃ _ : GrpObj A₀, IsGrpPullback A A₀ f π := by
+  have rmul
+      : ∀ {T' : Over S} {T : Over S₀} (p : T'.left ⟶ T.left) {x' y' : T' ⟶ A} {x y : T ⟶ A₀},
+        x'.left ≫ π = p ≫ x.left → y'.left ≫ π = p ≫ y.left
+          → (x' * y').left ≫ π = p ≫ (lift x y ≫ m₀).left := by
     intro T' T p x' y' x y hx hy
     have : (lift x' y').left ≫ π₂ = p ≫ (lift x y).left := by
       apply pullback.hom_ext
-      · change ((lift x' y').left ≫ π₂) ≫ (fst A₀ A₀).left = (p ≫ (lift x y).left) ≫ (fst A₀ A₀).left
-        rw [Category.assoc, h1, ← Category.assoc, ← Over.comp_left, lift_fst, Category.assoc, ← Over.comp_left,
-          lift_fst, hx]
-      · change ((lift x' y').left ≫ π₂) ≫ (snd A₀ A₀).left = (p ≫ (lift x y).left) ≫ (snd A₀ A₀).left
-        rw [Category.assoc, h2, ← Category.assoc, ← Over.comp_left, lift_snd, Category.assoc, ← Over.comp_left,
-          lift_snd, hy]
-    rw [Hom.mul_def, Over.comp_left, Category.assoc, hm, ← Category.assoc, this, Over.comp_left, Category.assoc]
-  have rone : ∀ {T' : Over S} {T : Over S₀} (p : T'.left ⟶ T.left), p ≫ T.hom = T'.hom ≫ f →
-      (1 : T' ⟶ A).left ≫ π = p ≫ (toUnit T ≫ e₀).left := by
+      · change ((lift x' y').left ≫ π₂) ≫ (fst A₀ A₀).left
+          = (p ≫ (lift x y).left) ≫ (fst A₀ A₀).left
+        rw [Category.assoc, h1, ← Category.assoc, ← Over.comp_left, lift_fst, Category.assoc,
+          ← Over.comp_left, lift_fst, hx]
+      · change ((lift x' y').left ≫ π₂) ≫ (snd A₀ A₀).left
+          = (p ≫ (lift x y).left) ≫ (snd A₀ A₀).left
+        rw [Category.assoc, h2, ← Category.assoc, ← Over.comp_left, lift_snd, Category.assoc,
+          ← Over.comp_left, lift_snd, hy]
+    rw [Hom.mul_def, Over.comp_left, Category.assoc, hm, ← Category.assoc, this, Over.comp_left,
+      Category.assoc]
+  have rone
+      : ∀ {T' : Over S} {T : Over S₀} (p : T'.left ⟶ T.left),
+        p ≫ T.hom = T'.hom ≫ f → (1 : T' ⟶ A).left ≫ π = p ≫ (toUnit T ≫ e₀).left := by
     intro T' T p hp
-    rw [Hom.one_def, Over.comp_left, Category.assoc, he, Over.comp_left, Over.toUnit_left, Over.toUnit_left]
+    rw [Hom.one_def, Over.comp_left, Category.assoc, he, Over.comp_left, Over.toUnit_left,
+      Over.toUnit_left]
     exact (Category.assoc _ _ _).symm.trans (by rw [← hp]; exact Category.assoc _ _ _)
-  have rinv : ∀ {T' : Over S} {T : Over S₀} (p : T'.left ⟶ T.left) {x' : T' ⟶ A} {x : T ⟶ A₀},
-      x'.left ≫ π = p ≫ x.left → (x'⁻¹).left ≫ π = p ≫ (x ≫ i₀).left := by
+  have rinv
+      : ∀ {T' : Over S} {T : Over S₀} (p : T'.left ⟶ T.left) {x' : T' ⟶ A} {x : T ⟶ A₀},
+        x'.left ≫ π = p ≫ x.left → (x'⁻¹).left ≫ π = p ≫ (x ≫ i₀).left := by
     intro T' T p x' x hx
-    rw [Hom.inv_def, Over.comp_left, Category.assoc, hi, ← Category.assoc, hx, Over.comp_left, Category.assoc]
+    rw [Hom.inv_def, Over.comp_left, Category.assoc, hi, ← Category.assoc, hx, Over.comp_left,
+      Category.assoc]
 
-  have cov : ∀ T : Over S₀, ∃ (T' : Over S) (p : T'.left ⟶ T.left), p ≫ T.hom = T'.hom ≫ f ∧
-      (∀ a b : T ⟶ A₀, p ≫ a.left = p ≫ b.left → a = b) ∧
-      ∀ x : T ⟶ A₀, ∃ x' : T' ⟶ A, x'.left ≫ π = p ≫ x.left := by
+  have cov
+      : ∀ T : Over S₀, ∃ (T' : Over S) (p : T'.left ⟶ T.left),
+        p ≫ T.hom = T'.hom ≫ f ∧ (∀ a b : T ⟶ A₀, p ≫ a.left = p ≫ b.left → a = b)
+          ∧ ∀ x : T ⟶ A₀, ∃ x' : T' ⟶ A, x'.left ≫ π = p ≫ x.left := by
     intro T
-    refine ⟨Over.mk (pullback.snd T.hom f), pullback.fst T.hom f, pullback.condition, fun a b h => ?_, fun x => ?_⟩
+    refine ⟨
+      Over.mk (pullback.snd T.hom f),
+      pullback.fst T.hom f,
+      pullback.condition,
+      fun a b h => ?_,
+      fun x => ?_
+    ⟩
     · have : Epi (pullback.fst T.hom f) := Flat.epi_of_flat_of_surjective _
       ext1
       exact (cancel_epi (pullback.fst T.hom f)).1 h
@@ -79,8 +97,9 @@ theorem grpObj_descends (f : S ⟶ S₀) [Flat f] [Surjective f] (A : Over S) [G
     obtain ⟨x', hx⟩ := hl x
     apply hinj
     rw [← rmul p hx (rone p hp), _root_.mul_one, hx]
-  have assoc' : ∀ {T : Over S₀} (x y z : T ⟶ A₀),
-      lift (lift x y ≫ m₀) z ≫ m₀ = lift x (lift y z ≫ m₀) ≫ m₀ := by
+  have assoc'
+      : ∀ {T : Over S₀} (x y z : T ⟶ A₀),
+        lift (lift x y ≫ m₀) z ≫ m₀ = lift x (lift y z ≫ m₀) ≫ m₀ := by
     intro T x y z
     obtain ⟨T', p, hp, hinj, hl⟩ := cov T
     obtain ⟨x', hx⟩ := hl x
@@ -100,46 +119,62 @@ theorem grpObj_descends (f : S ⟶ S₀) [Flat f] [Surjective f] (A : Over S) [G
     obtain ⟨x', hx⟩ := hl x
     apply hinj
     rw [← rmul p hx (rinv p hx), ← rone p hp, mul_inv_cancel]
-  let G : GrpObj A₀ :=
-    { one := e₀
-      mul := m₀
-      one_mul := by
-        rw [← one_mul' (λ_ A₀).hom]
+  let G : GrpObj A₀ := {
+    one := e₀
+    mul := m₀
+    one_mul := by
+      rw [← one_mul' (λ_ A₀).hom]
+      congr 1
+    mul_one := by
+      rw [← mul_one' (ρ_ A₀).hom]
+      congr 1
+      apply CartesianMonoidalCategory.hom_ext
+      · rw [whiskerLeft_fst, lift_fst, rightUnitor_hom]
+      · rw [whiskerLeft_snd, lift_snd]
         congr 1
-      mul_one := by
-        rw [← mul_one' (ρ_ A₀).hom]
-        congr 1
+        exact toUnit_unique _ _
+    mul_assoc := by
+      have h :=
+        assoc' (fst (A₀ ⊗ A₀) A₀ ≫ fst A₀ A₀) (fst (A₀ ⊗ A₀) A₀ ≫ snd A₀ A₀) (snd (A₀ ⊗ A₀) A₀)
+      have a1
+          : m₀ ▷ A₀
+            = lift (lift (fst (A₀ ⊗ A₀) A₀ ≫ fst A₀ A₀) (fst (A₀ ⊗ A₀) A₀ ≫ snd A₀ A₀) ≫ m₀)
+              (snd (A₀ ⊗ A₀) A₀) := by
         apply CartesianMonoidalCategory.hom_ext
-        · rw [whiskerLeft_fst, lift_fst, rightUnitor_hom]
-        · rw [whiskerLeft_snd, lift_snd]
+        · rw [whiskerRight_fst, lift_fst, ← comp_lift, lift_fst_snd, Category.comp_id]
+        · rw [whiskerRight_snd, lift_snd]
+      have a2
+          : (α_ A₀ A₀ A₀).hom ≫ A₀ ◁ m₀
+            = lift (fst (A₀ ⊗ A₀) A₀ ≫ fst A₀ A₀)
+              (lift (fst (A₀ ⊗ A₀) A₀ ≫ snd A₀ A₀) (snd (A₀ ⊗ A₀) A₀) ≫ m₀) := by
+        apply CartesianMonoidalCategory.hom_ext
+        · rw [Category.assoc, whiskerLeft_fst, lift_fst, associator_hom_fst]
+        · rw [Category.assoc, whiskerLeft_snd, lift_snd, ← Category.assoc]
           congr 1
-          exact toUnit_unique _ _
-      mul_assoc := by
-        have h := assoc' (fst (A₀ ⊗ A₀) A₀ ≫ fst A₀ A₀) (fst (A₀ ⊗ A₀) A₀ ≫ snd A₀ A₀) (snd (A₀ ⊗ A₀) A₀)
-        have a1 : m₀ ▷ A₀ = lift (lift (fst (A₀ ⊗ A₀) A₀ ≫ fst A₀ A₀) (fst (A₀ ⊗ A₀) A₀ ≫ snd A₀ A₀) ≫ m₀)
-            (snd (A₀ ⊗ A₀) A₀) := by
           apply CartesianMonoidalCategory.hom_ext
-          · rw [whiskerRight_fst, lift_fst, ← comp_lift, lift_fst_snd, Category.comp_id]
-          · rw [whiskerRight_snd, lift_snd]
-        have a2 : (α_ A₀ A₀ A₀).hom ≫ A₀ ◁ m₀ = lift (fst (A₀ ⊗ A₀) A₀ ≫ fst A₀ A₀)
-            (lift (fst (A₀ ⊗ A₀) A₀ ≫ snd A₀ A₀) (snd (A₀ ⊗ A₀) A₀) ≫ m₀) := by
-          apply CartesianMonoidalCategory.hom_ext
-          · rw [Category.assoc, whiskerLeft_fst, lift_fst, associator_hom_fst]
-          · rw [Category.assoc, whiskerLeft_snd, lift_snd, ← Category.assoc]
-            congr 1
-            apply CartesianMonoidalCategory.hom_ext
-            · rw [Category.assoc, lift_fst, associator_hom_snd_fst]
-            · rw [Category.assoc, lift_snd, associator_hom_snd_snd]
-        rw [← Category.assoc, a2, a1, h]
-      inv := i₀
-      left_inv := by simpa only [Category.id_comp] using linv' (𝟙 A₀)
-      right_inv := by simpa only [Category.id_comp] using rinv' (𝟙 A₀) }
+          · rw [Category.assoc, lift_fst, associator_hom_snd_fst]
+          · rw [Category.assoc, lift_snd, associator_hom_snd_snd]
+      rw [← Category.assoc, a2, a1, h]
+    inv := i₀
+    left_inv := by simpa only [Category.id_comp] using linv' (𝟙 A₀)
+    right_inv := by simpa only [Category.id_comp] using rinv' (𝟙 A₀)
+  }
   refine ⟨G, hπ, fun T x y x₀ y₀ hx hy => ?_⟩
-  have := rmul (T' := T) (T := Over.mk (T.hom ≫ f)) (𝟙 T.left) (x' := x) (y' := y) (x := x₀) (y := y₀)
-    (hx.symm.trans (Category.id_comp _).symm) (hy.symm.trans (Category.id_comp _).symm)
+  have :=
+    rmul (T' := T) (T := Over.mk (T.hom ≫ f)) (𝟙 T.left) (x' := x) (y' := y) (x := x₀) (y := y₀)
+      (hx.symm.trans (Category.id_comp _).symm) (hy.symm.trans (Category.id_comp _).symm)
   exact (this.trans (Category.id_comp _)).symm
 
-theorem grpObj_descends_faithfullyFlat : ∀ (R₀ R : Type) [CommRing R₀] [CommRing R] [Algebra R₀ R] [Module.FaithfullyFlat R₀ R] (A : Over (Sp R)) [GrpObj A] (A₀ : Over (Sp R₀)) [Flat A₀.hom] [IsSeparated A₀.hom] [QuasiCompact A₀.hom] (π : A.left ⟶ A₀.left) (e₀ : 𝟙_ (Over (Sp R₀)) ⟶ A₀) (m₀ : A₀ ⊗ A₀ ⟶ A₀) (i₀ : A₀ ⟶ A₀) (π₂ : (A ⊗ A).left ⟶ (A₀ ⊗ A₀).left), IsPullback π A.hom A₀.hom (spMap (algebraMap R₀ R)) → π₂ ≫ (fst A₀ A₀).left = (fst A A).left ≫ π → π₂ ≫ (snd A₀ A₀).left = (snd A A).left ≫ π → η[A].left ≫ π = spMap (algebraMap R₀ R) ≫ e₀.left → μ[A].left ≫ π = π₂ ≫ m₀.left → (GrpObj.inv : A ⟶ A).left ≫ π = π ≫ i₀.left → ∃ _ : GrpObj A₀, IsGrpPullback A A₀ (spMap (algebraMap R₀ R)) π := by
+theorem grpObj_descends_faithfullyFlat
+    : ∀ (R₀ R : Type) [CommRing R₀] [CommRing R] [Algebra R₀ R] [Module.FaithfullyFlat R₀ R]
+        (A : Over (Sp R)) [GrpObj A] (A₀ : Over (Sp R₀)) [Flat A₀.hom] [IsSeparated A₀.hom]
+        [QuasiCompact A₀.hom] (π : A.left ⟶ A₀.left) (e₀ : 𝟙_ (Over (Sp R₀)) ⟶ A₀)
+        (m₀ : A₀ ⊗ A₀ ⟶ A₀) (i₀ : A₀ ⟶ A₀) (π₂ : (A ⊗ A).left ⟶ (A₀ ⊗ A₀).left),
+      IsPullback π A.hom A₀.hom (spMap (algebraMap R₀ R))
+        → π₂ ≫ (fst A₀ A₀).left = (fst A A).left ≫ π → π₂ ≫ (snd A₀ A₀).left = (snd A A).left ≫ π
+        → η[A].left ≫ π = spMap (algebraMap R₀ R) ≫ e₀.left → μ[A].left ≫ π = π₂ ≫ m₀.left
+        → (GrpObj.inv : A ⟶ A).left ≫ π = π ≫ i₀.left
+        → ∃ _ : GrpObj A₀, IsGrpPullback A A₀ (spMap (algebraMap R₀ R)) π := by
   intro R₀ R _ _ _ _ A _ A₀ _ _ _ π e₀ m₀ i₀ π₂ hπ h1 h2 he hm hi
   have hff : (algebraMap R₀ R).FaithfullyFlat := RingHom.faithfullyFlat_algebraMap_iff.2 ‹_›
   obtain ⟨_, _⟩ := (flat_and_surjective_SpecMap_iff (CommRingCat.ofHom (algebraMap R₀ R))).2 hff

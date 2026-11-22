@@ -8,9 +8,10 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.RealBands.Is
 open MeasureTheory Filter UpperTheory.Lit.Cusp
 open scoped Topology
 
-theorem UpperTheory.Lit.Cusp.conv_isEig :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-      [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (N : Set G) (a : ℝ → G) (f h : G → ℂ) (s C : ℝ),
+theorem UpperTheory.Lit.Cusp.conv_isEig
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G)
+        [μ.IsHaarMeasure] (N : Set G) (a : ℝ → G) (f h : G → ℂ) (s C : ℝ),
       Integrable f μ → IsEig N a s C h → IsEig N a s ((∫ g, ‖f g‖ ∂μ) * C) (conv μ f h) := by
   intro G _ _ _ _ _ _ _ _ μ _ N a f h s C hf hh
   obtain ⟨hc, hb, hN, ha⟩ := hh

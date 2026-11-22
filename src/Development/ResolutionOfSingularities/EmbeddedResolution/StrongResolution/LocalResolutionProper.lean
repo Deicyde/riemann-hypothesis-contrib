@@ -17,15 +17,18 @@ namespace FunctorialResolution.EmbeddedResolution
 
 namespace LocalResolutionData
 
-variable {k : Type u} [Field k] {X : Scheme.{u}} {f : X ⟶ Spec (CommRingCat.of k)}
-  [LocallyOfFiniteType f] {s : SequenceOfBlowups X}
+variable
+  {k : Type u} [Field k]
+  {X : Scheme.{u}} {f : X ⟶ Spec (CommRingCat.of k)} [LocallyOfFiniteType f]
+  {s : SequenceOfBlowups X}
 
-def pullbackIsoLastObj (d : LocalResolutionData k f s) (i : d.cover.I₀) :
-    ((pullback s.lastStructMap (d.cover.f i) : Scheme.{u}) ≅ (d.seq i).lastObj) :=
+def pullbackIsoLastObj (d : LocalResolutionData k f s) (i : d.cover.I₀)
+    : ((pullback s.lastStructMap (d.cover.f i) : Scheme.{u}) ≅ (d.seq i).lastObj) :=
   (pullbackSymmetry s.lastStructMap (d.cover.f i)).trans (d.lastObjIsoPullback i).symm
 
-theorem pullbackIsoLastObj_hom_lastStructMap (d : LocalResolutionData k f s) (i : d.cover.I₀) :
-    (d.pullbackIsoLastObj i).hom ≫ (d.seq i).lastStructMap = pullback.snd s.lastStructMap (d.cover.f i) := by
+theorem pullbackIsoLastObj_hom_lastStructMap (d : LocalResolutionData k f s) (i : d.cover.I₀)
+    : (d.pullbackIsoLastObj i).hom ≫ (d.seq i).lastStructMap
+      = pullback.snd s.lastStructMap (d.cover.f i) := by
   rw [pullbackIsoLastObj]
   simp only [Iso.trans_hom, Iso.symm_hom, Category.assoc]
   rw [← d.lastObjIsoPullback_hom_fst i, Iso.inv_hom_id_assoc]
@@ -36,8 +39,8 @@ theorem isProper_lastStructMap (d : LocalResolutionData k f s) : IsProper s.last
     intro i
     obtain ⟨-, h, -⟩ := d.isResolution i
     exact h
-  obtain ⟨-, h2⟩ := (inferInstance :
-    MorphismProperty.IsLocalAtTarget (@IsProper) Scheme.zariskiPrecoverage)
+  obtain ⟨-, h2⟩ :=
+    (inferInstance : MorphismProperty.IsLocalAtTarget (@IsProper) Scheme.zariskiPrecoverage)
   refine h2 (R := d.cover.presieve₀) d.cover.mem₀ ?_
   intro U g _inst hg
   obtain ⟨i⟩ := hg

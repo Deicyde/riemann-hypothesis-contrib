@@ -8,15 +8,18 @@ open Module
 
 namespace GlobalTheory
 
-private theorem int_eq_zero_of_forall_pow_dvd (n : ℕ) (hn : 2 ≤ n) (c : ℤ)
-    (h : ∀ j : ℕ, (n : ℤ) ^ j ∣ c) : c = 0 := by
+private theorem int_eq_zero_of_forall_pow_dvd
+    (n : ℕ) (hn : 2 ≤ n) (c : ℤ) (h : ∀ j : ℕ, (n : ℤ) ^ j ∣ c)
+    : c = 0 := by
   refine Int.eq_zero_of_dvd_of_natAbs_lt_natAbs (h c.natAbs) ?_
   rw [Int.natAbs_pow, Int.natAbs_natCast]
   exact Nat.lt_pow_self (by omega)
 
-private theorem eq_zero_of_forall_pow_nsmul_dvd (X : Type) [AddCommGroup X] [Module.Free ℤ X]
-    [Module.Finite ℤ X] (n : ℕ) (hn : 2 ≤ n) (z : X) (h : ∀ j : ℕ, ∃ μ : X, z = n ^ j • μ) :
-    z = 0 := by
+private theorem eq_zero_of_forall_pow_nsmul_dvd
+    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (n : ℕ) (hn : 2 ≤ n)
+    (z : X) (h : ∀ j : ℕ, ∃ μ : X, z = n ^ j • μ)
+    : z = 0 := by
   set b := Module.Free.chooseBasis ℤ X
   apply b.repr.injective
   ext i
@@ -28,10 +31,19 @@ private theorem eq_zero_of_forall_pow_nsmul_dvd (X : Type) [AddCommGroup X] [Mod
   push_cast
   ring
 
-
 open Module in
-theorem _root_.GlobalTheory.existsUnique_addEquiv_of_compatible_congr :
-    ∀ (X X' : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [AddCommGroup X'] [Module.Free ℤ X'] [Module.Finite ℤ X'] (n : ℕ), 2 ≤ n → ∀ r : ℕ → X → X' → Prop, (∀ j x, ∃ x', r j x x') → (∀ j x', ∃ x, r j x x') → (∀ j x y x' y', r j x x' → r j y y' → r j (x + y) (x' + y')) → (∀ j x y x' y', r j x x' → r j y y' → ((∃ μ, y = x + n ^ j • μ) ↔ ∃ μ', y' = x' + n ^ j • μ')) → (∀ j x x' μ μ', r j x x' → r j (x + n ^ j • μ) (x' + n ^ j • μ')) → (∀ x, ∃ x', ∀ j, r j x x') → (∀ x', ∃ x, ∀ j, r j x x') → ∃! e : X ≃+ X', ∀ j x, r j x (e x) := by
+theorem _root_.GlobalTheory.existsUnique_addEquiv_of_compatible_congr
+    : ∀ (X X' : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [AddCommGroup X']
+        [Module.Free ℤ X'] [Module.Finite ℤ X'] (n : ℕ),
+      2 ≤ n
+        → ∀ r : ℕ → X → X' → Prop,
+          (∀ j x, ∃ x', r j x x') → (∀ j x', ∃ x, r j x x')
+            → (∀ j x y x' y', r j x x' → r j y y' → r j (x + y) (x' + y'))
+            → (∀ j x y x' y',
+              r j x x' → r j y y' → ((∃ μ, y = x + n ^ j • μ) ↔ ∃ μ', y' = x' + n ^ j • μ'))
+            → (∀ j x x' μ μ', r j x x' → r j (x + n ^ j • μ) (x' + n ^ j • μ'))
+            → (∀ x, ∃ x', ∀ j, r j x x') → (∀ x', ∃ x, ∀ j, r j x x')
+            → ∃! e : X ≃+ X', ∀ j x, r j x (e x) := by
   intro X X' _ _ _ _ _ _ n hn r _ _ hadd hcong _ hfwd hbwd
   have sepR : ∀ x x' y', (∀ j, r j x x') → (∀ j, r j x y') → x' = y' := by
     intro x x' y' hx hy

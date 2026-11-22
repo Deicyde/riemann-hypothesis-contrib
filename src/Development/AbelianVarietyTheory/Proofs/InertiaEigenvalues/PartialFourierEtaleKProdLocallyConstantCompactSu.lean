@@ -12,15 +12,26 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR.TildeTest
 
-theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ), IsStdChar ψ → ∀ (μK : Measure A.K), μK.IsAddHaarMeasure → ∀ φ' : A.K × A.K → ℂ, IsTest φ' → IsTest (fun p : A.K × A.K => A.tilde μK ψ φ' p.1 p.2) := by
+theorem main
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ
+        → ∀ (μK : Measure A.K),
+          μK.IsAddHaarMeasure
+            → ∀ φ' : A.K × A.K → ℂ,
+              IsTest φ' → IsTest (fun p : A.K × A.K => A.tilde μK ψ φ' p.1 p.2) := by
   intro F E _ _ _ _ _ A ψ hψ μK hμ φ' hφ
   set T : A.K → A.K → ℂ := fun c u => A.tilde μK ψ φ' c u with hTdef
   have hslice : ∀ c, IsTest (fun u => T c u) := by
     intro c
     have hnd := (GlobalTheory.T.etaleHermitianPair_structure_facts F E A).2.2.1
-    have h := (GlobalTheory.T.selfDual_measure_exists_unique_fourier_inversion F E ψ hψ A.K (Algebra.traceForm F A.K) (Algebra.traceForm_isSymm F) hnd).2 μK hμ
-      (fun b => φ' (b, c)) (GlobalTheory.TestFn.slice_test φ' hφ c)
-    have heq : (fun u => T c u) = fourB μK (fun x y => ψ ((Algebra.traceForm F A.K) x y)) (fun b => φ' (b, c)) := by
+    have h :=
+      (GlobalTheory.T.selfDual_measure_exists_unique_fourier_inversion F E ψ hψ A.K
+        (Algebra.traceForm F A.K) (Algebra.traceForm_isSymm F)
+        hnd).2 μK hμ (fun b => φ' (b, c)) (GlobalTheory.TestFn.slice_test φ' hφ c)
+    have heq
+        : (fun u => T c u)
+          = fourB μK (fun x y => ψ ((Algebra.traceForm F A.K) x y)) (fun b => φ' (b, c)) := by
       funext u
       simp [hTdef, Et.tilde, fourB, Et.psiK, Algebra.traceForm_apply, mul_comm]
     rw [heq]
@@ -29,11 +40,13 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
   set V₂ : Set A.K := {v | ((0 : A.K), v) ∈ V} with hV₂def
   have hV₂ : V₂ ∈ 𝓝 (0 : A.K) := by
     have hc : Continuous (fun v : A.K => ((0 : A.K), v)) := by fun_prop
-    exact hc.continuousAt.preimage_mem_nhds (by rw [show ((0 : A.K), (0 : A.K)) = (0 : A.K × A.K) from rfl]; exact hV)
+    exact hc.continuousAt.preimage_mem_nhds (by
+      rw [show ((0 : A.K), (0 : A.K)) = (0 : A.K × A.K) from rfl]; exact hV)
   have hshift : ∀ c c', c' - c ∈ V₂ → ∀ u, T c' u = T c u := by
     intro c c' hcc u
     simp only [hTdef, Et.tilde]
-    congr 1; funext b
+    congr 1
+    funext b
     have := hVf (b, c) (0, c' - c) hcc
     simp only [Prod.mk_add_mk, add_zero, add_sub_cancel] at this
     rw [this]
@@ -47,7 +60,8 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
     have hu : {u | T c₀ u = T c₀ u₀} ∈ 𝓝 u₀ := ((hslice c₀).1.isOpen_fiber _).mem_nhds rfl
     rw [nhds_prod_eq]
     filter_upwards [prod_mem_prod (hnbhd c₀) hu] with p hp
-    rw [hshift c₀ p.1 hp.1 p.2]; exact hp.2
+    rw [hshift c₀ p.1 hp.1 p.2]
+    exact hp.2
   refine ⟨hlc, ?_⟩
   have hC₂ : IsCompact (Prod.snd '' tsupport φ') := hφ.2.image continuous_snd
   obtain ⟨t, -, hcover⟩ := hC₂.elim_nhds_subcover (fun c => {c' | c' - c ∈ V₂}) (fun c _ => hnbhd c)
@@ -55,23 +69,28 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
     hC₂.prod (t.isCompact_biUnion fun c _ => (hslice c).2)
   have hzero : ∀ c ∉ Prod.snd '' tsupport φ', ∀ u, T c u = 0 := by
     intro c hc u
-    have h0 : ∀ b, φ' (b, c) = 0 := fun b => image_eq_zero_of_notMem_tsupport (fun h => hc ⟨(b, c), h, rfl⟩)
+    have h0 : ∀ b, φ' (b, c) = 0 := fun b =>
+      image_eq_zero_of_notMem_tsupport (fun h => hc ⟨(b, c), h, rfl⟩)
     simp [hTdef, Et.tilde, h0]
-  have hsupp : Function.support (fun p : A.K × A.K => T p.1 p.2) ⊆
-      (Prod.snd '' tsupport φ') ×ˢ ⋃ c ∈ t, tsupport (fun u => T c u) := by
+  have hsupp
+      : Function.support (fun p : A.K × A.K => T p.1 p.2)
+        ⊆ (Prod.snd '' tsupport φ') ×ˢ ⋃ c ∈ t, tsupport (fun u => T c u) := by
     rintro ⟨c, u⟩ hp
-    have hc : c ∈ Prod.snd '' tsupport φ' := by
-      by_contra hc; exact hp (hzero c hc u)
+    have hc : c ∈ Prod.snd '' tsupport φ' := by by_contra hc; exact hp (hzero c hc u)
     refine ⟨hc, ?_⟩
     obtain ⟨c', hc't, hcc'⟩ := Set.mem_iUnion₂.mp (hcover hc)
     refine Set.mem_iUnion₂.mpr ⟨c', hc't, subset_tsupport _ ?_⟩
     show T c' u ≠ 0
-    rw [← hshift c' c hcc' u]; exact hp
+    rw [← hshift c' c hcc' u]
+    exact hp
   have hclosed : IsClosed (Function.support (fun p : A.K × A.K => T p.1 p.2)) := by
     have := (hlc.isOpen_fiber 0).isClosed_compl
     convert this using 1
-    ext p; simp [Function.mem_support]
-  have hts : tsupport (fun p : A.K × A.K => T p.1 p.2) = Function.support (fun p : A.K × A.K => T p.1 p.2) :=
+    ext p
+    simp [Function.mem_support]
+  have hts
+      : tsupport (fun p : A.K × A.K => T p.1 p.2)
+        = Function.support (fun p : A.K × A.K => T p.1 p.2) :=
     hclosed.closure_eq
   unfold HasCompactSupport
   rw [hts]

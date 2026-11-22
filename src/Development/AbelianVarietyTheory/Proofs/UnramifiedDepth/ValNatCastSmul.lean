@@ -7,14 +7,17 @@ public import ReciprocityTheory.DualLattices.EvActStatement
 
 noncomputable section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory.EvAct
 
 variable {R₀ : Type} [CommRing R₀]
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw}
-  [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe}
-  {cp : (Tw.O : Type)}
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)]
+  {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe]
+  {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
 
 private lemma val_natCast_smul {M : Type} [AddCommGroup M] (x : M) (hx : p • x = 0) (n : ℕ) :
     ((n : ZMod p)).val • x = n • x := by
@@ -91,8 +94,11 @@ private lemma evAll_act (D : Dat p g B Tw Dt Oe σ cp) (C : Type) [Field C]
   rw [← eval_congr D F _ _ h4 h5]
   rfl
 
-theorem evImg_act_stable :
-  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), EvActStatement D) := by
+theorem evImg_act_stable
+    : (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
+        {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
+        [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp),
+      EvActStatement D) := by
   intro R₀ _ p _ g B Tw Dt _ Oe _ _ σ cp D C _ _ a f hf
   refine ⟨fun t => f (((D.H.ρ a).map PadicInt.toZMod) *ᵥ t), ?_, fun t => by rw [red_mulVec]⟩
   induction hf using Submodule.span_induction with

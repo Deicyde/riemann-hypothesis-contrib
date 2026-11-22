@@ -7,15 +7,21 @@ public import Formalism.LocalToGlobal.GroupLattices.PendingLemmas.SuccMulSuccSub
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp
+  Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection
+  Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
+  Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.TwV.DelA
 
-theorem adjugate_transpose_rev {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (h : A.det ≠ 0) :
-    (A.transpose.submatrix Fin.rev id).adjugate = (sgRev n * A.det) • (A⁻¹.transpose.submatrix id Fin.rev) := by
+theorem adjugate_transpose_rev {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (h : A.det ≠ 0)
+    : (A.transpose.submatrix Fin.rev id).adjugate
+      = (sgRev n * A.det) • (A⁻¹.transpose.submatrix id Fin.rev) := by
   have hB : (A.transpose.submatrix Fin.rev id).det = sgRev n * A.det := by
     show (A.transpose.submatrix (Fin.revPerm : Equiv.Perm (Fin n)) id).det = _
     rw [Matrix.det_permute, Matrix.det_transpose, sgRev]
@@ -27,40 +33,58 @@ theorem adjugate_transpose_rev {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (h : A
     rw [hB]
     refine mul_ne_zero ?_ h
     unfold sgRev
-    rcases Int.units_eq_one_or (Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin n))) with h1 | h1 <;> rw [h1] <;> norm_num
+    rcases Int.units_eq_one_or (Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin n))) with h1 | h1
+      <;> rw [h1] <;> norm_num
   rw [← hI, ← hB, Matrix.inv_def, smul_smul, Ring.inverse_eq_inv', mul_inv_cancel₀ hne, one_smul]
 
 end GlobalTheory.TwV.DelA
 
 namespace GlobalTheory.TwV.DelA
 
-variable {p : ℕ} [Fact p.Prime] (X : Sys p) (D : D7) (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau)
+variable
+  {p : ℕ} [Fact p.Prime] (X : Sys p) (D : D7) (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau)
 
-theorem posJ_blkJ (j : ℕ) (x : Σ v : Fin (X.Fl.Pj j).nV, Fin ((X.Fl.Pj j).n' v) × (Fin ((X.Fl.Pj j).m + 1) × Fin ((X.Fl.Pj j).m + 1))) :
-    posJ X D pos j ⟨x.1, x.2.1⟩ = pos (blkJ X j x) := by
+theorem posJ_blkJ
+    (j : ℕ)
+    (x : Σ v : Fin (X.Fl.Pj j).nV,
+      Fin ((X.Fl.Pj j).n' v) × (Fin ((X.Fl.Pj j).m + 1) × Fin ((X.Fl.Pj j).m + 1)))
+    : posJ X D pos j ⟨x.1, x.2.1⟩ = pos (blkJ X j x) := by
   cases j <;> rfl
 
-theorem levelIndex_row_val_eq (j : ℕ) (x : Σ v : Fin (X.Fl.Pj j).nV, Fin ((X.Fl.Pj j).n' v) × (Fin ((X.Fl.Pj j).m + 1) × Fin ((X.Fl.Pj j).m + 1))) :
-    ((idxJ X j x).2.2.1 : ℕ) = x.2.2.1 := by
+theorem levelIndex_row_val_eq
+    (j : ℕ)
+    (x : Σ v : Fin (X.Fl.Pj j).nV,
+      Fin ((X.Fl.Pj j).n' v) × (Fin ((X.Fl.Pj j).m + 1) × Fin ((X.Fl.Pj j).m + 1)))
+    : ((idxJ X j x).2.2.1 : ℕ) = x.2.2.1 := by
   cases j <;> rfl
 
-theorem levelIndex_col_val_eq (j : ℕ) (x : Σ v : Fin (X.Fl.Pj j).nV, Fin ((X.Fl.Pj j).n' v) × (Fin ((X.Fl.Pj j).m + 1) × Fin ((X.Fl.Pj j).m + 1))) :
-    ((idxJ X j x).2.2.2 : ℕ) = x.2.2.2 := by
+theorem levelIndex_col_val_eq
+    (j : ℕ)
+    (x : Σ v : Fin (X.Fl.Pj j).nV,
+      Fin ((X.Fl.Pj j).n' v) × (Fin ((X.Fl.Pj j).m + 1) × Fin ((X.Fl.Pj j).m + 1)))
+    : ((idxJ X j x).2.2.2 : ℕ) = x.2.2.2 := by
   cases j <;> rfl
 
-def kOdd {j : ℕ} (hN : RankTie X D j) (d : D.what₂.Tau → Matrix (Fin (D.R.N j)) (Fin (D.R.N (j + 1))) ℂ)
-    (f' : D.what₂.Tau → Matrix (Fin (D.R.N (j + 1))) (Fin (D.R.N (j + 1))) ℂ) (τ : D.what₂.Tau) : ℂ :=
+def kOdd
+    {j : ℕ} (hN : RankTie X D j) (d : D.what₂.Tau → Matrix (Fin (D.R.N j)) (Fin (D.R.N (j + 1))) ℂ)
+    (f' : D.what₂.Tau → Matrix (Fin (D.R.N (j + 1))) (Fin (D.R.N (j + 1))) ℂ)
+    (τ : D.what₂.Tau)
+    : ℂ :=
   (zT X D pos f' τ).det ^ ((D.R.N j : ℤ) - 1) * sgRev (D.R.N j) * (dfr X D hN d f' τ).det
 
-theorem evD_ySub (Kc : Type) [Field Kc] [Algebra X.G.Kf Kc] (ι : ℂ →+* Kc) {j : ℕ} (hN : RankTie X D j)
-    (d : D.what₂.Tau → Matrix (Fin (D.R.N j)) (Fin (D.R.N (j + 1))) ℂ)
+theorem evD_ySub
+    (Kc : Type) [Field Kc] [Algebra X.G.Kf Kc]
+    (ι : ℂ →+* Kc)
+    {j : ℕ} (hN : RankTie X D j) (d : D.what₂.Tau → Matrix (Fin (D.R.N j)) (Fin (D.R.N (j + 1))) ℂ)
     (f' : D.what₂.Tau → Matrix (Fin (D.R.N (j + 1))) (Fin (D.R.N (j + 1))) ℂ)
-    (hf : ∀ τ, (f' τ).det ≠ 0) (hd : ∀ τ, (dfr X D hN d f' τ).det ≠ 0) (v : X.Pl) (s : Fin (X.G.P.n' v))
-    (a t : Fin (NN X.G.P.m X.t j)) :
-    evD X D pos ι hN d f' (ySub X Kc j v s a t) =
-      (if IsOddPos s then ι (kOdd X D pos hN d f' (pos ⟨v, s⟩)) else 1) *
-        ι (zT X D pos (dfr X D hN d f') (pos ⟨v, s⟩) (Fin.cast hN.1.symm a) (Fin.cast hN.1.symm t)) := by
-  obtain ⟨_, hE, hO⟩ := GlobalTheory.T.operatorMatrices_at_complexPoint X D pos Kc ι j hN d f' hf hd v s
+    (hf : ∀ τ, (f' τ).det ≠ 0) (hd : ∀ τ, (dfr X D hN d f' τ).det ≠ 0)
+    (v : X.Pl) (s : Fin (X.G.P.n' v))
+    (a t : Fin (NN X.G.P.m X.t j))
+    : evD X D pos ι hN d f' (ySub X Kc j v s a t)
+      = (if IsOddPos s then ι (kOdd X D pos hN d f' (pos ⟨v, s⟩)) else 1) * ι (zT X D pos
+        (dfr X D hN d f') (pos ⟨v, s⟩) (Fin.cast hN.1.symm a) (Fin.cast hN.1.symm t)) := by
+  obtain ⟨_, hE, hO⟩ :=
+    GlobalTheory.T.operatorMatrices_at_complexPoint X D pos Kc ι j hN d f' hf hd v s
   have hsym : IsOddPos (pos.symm (pos ⟨v, s⟩)).2 ↔ IsOddPos s := by
     have hb : ∀ b : (Σ v : X.Pl, Fin (X.G.P.n' v)), b = ⟨v, s⟩ → (IsOddPos b.2 ↔ IsOddPos s) := by
       rintro _ rfl; exact Iff.rfl
@@ -72,18 +96,24 @@ theorem evD_ySub (Kc : Type) [Field Kc] [Algebra X.G.Kf Kc] (ι : ℂ →+* Kc) 
     have h2 := congrFun (congrFun h1 a) t
     rw [Matrix.map_apply] at h2
     rw [h2, hO ho, Matrix.adjugate_smul, Fintype.card_fin,
-      show (Fin.cast hN.1.symm : Fin (NN X.G.P.m X.t j) → Fin (D.R.N j)) = ⇑(finCongr hN.1.symm) from rfl,
+      show (Fin.cast hN.1.symm : Fin (NN X.G.P.m X.t j) → Fin (D.R.N j))
+          = ⇑(finCongr hN.1.symm) from
+        rfl,
       Matrix.adjugate_submatrix_equiv_self]
-    have h3 := RingHom.map_adjugate ι ((dfr X D hN d f' (pos ⟨v, s⟩)).transpose.submatrix Fin.rev id)
+    have h3 :=
+      RingHom.map_adjugate ι ((dfr X D hN d f' (pos ⟨v, s⟩)).transpose.submatrix Fin.rev id)
     simp only [RingHom.mapMatrix_apply] at h3
     rw [← h3, adjugate_transpose_rev _ (hd _)]
-    have hz : zT X D pos (dfr X D hN d f') (pos ⟨v, s⟩) = ((dfr X D hN d f' (pos ⟨v, s⟩))⁻¹).transpose.submatrix id Fin.rev := by
+    have hz
+        : zT X D pos (dfr X D hN d f') (pos ⟨v, s⟩)
+          = ((dfr X D hN d f' (pos ⟨v, s⟩))⁻¹).transpose.submatrix id Fin.rev := by
       unfold zT; rw [if_pos (hsym.2 ho)]
     have hpos : 1 ≤ D.R.N j := by have := rkS X D hN; omega
     have he : ((D.R.N j : ℤ) - 1) = ((NN X.G.P.m X.t j - 1 : ℕ) : ℤ) := by
       rw [← hN.1]; push_cast [Nat.cast_sub hpos]; ring
     rw [hz, kOdd, he, zpow_natCast]
-    simp only [Matrix.smul_apply, Matrix.submatrix_apply, Matrix.map_apply, smul_eq_mul, map_mul, map_pow, mul_assoc]
+    simp only [Matrix.smul_apply, Matrix.submatrix_apply, Matrix.map_apply, smul_eq_mul, map_mul,
+      map_pow, mul_assoc]
   · rw [if_neg ho, one_mul]
     have h0 : ySub X Kc j v s = dyMat X Kc j v s := by unfold ySub; rw [if_neg ho]
     have hz : zT X D pos (dfr X D hN d f') (pos ⟨v, s⟩) = dfr X D hN d f' (pos ⟨v, s⟩) := by

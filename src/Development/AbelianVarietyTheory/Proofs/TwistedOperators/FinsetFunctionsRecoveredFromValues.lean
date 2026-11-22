@@ -8,9 +8,9 @@ namespace GlobalTheory
 
 open Module
 
-theorem finset_functions_recovered_from_values {X : Type} (V : Submodule ℂ (X → ℂ)) (F : Finset (X → ℂ))
-    (hF : ∀ u ∈ F, u ∈ V) :
-    ∃ (s : Finset X) (E : X → X → ℂ), (∀ x, E x ∈ V) ∧ ∀ u ∈ F, u = ∑ x ∈ s, u x • E x := by
+theorem finset_functions_recovered_from_values
+    {X : Type} (V : Submodule ℂ (X → ℂ)) (F : Finset (X → ℂ)) (hF : ∀ u ∈ F, u ∈ V)
+    : ∃ (s : Finset X) (E : X → X → ℂ), (∀ x, E x ∈ V) ∧ ∀ u ∈ F, u = ∑ x ∈ s, u x • E x := by
   classical
   set W : Submodule ℂ (X → ℂ) := Submodule.span ℂ (F : Set (X → ℂ)) with hWdef
   haveI : FiniteDimensional ℂ W := FiniteDimensional.span_finset ℂ F
@@ -38,9 +38,9 @@ theorem finset_functions_recovered_from_values {X : Type} (V : Submodule ℂ (X 
     exact Finsupp.mem_span_range_iff_exists_finsupp.mp this
   choose μ hμ using hμ
   set s : Finset X := Finset.univ.biUnion (fun i => (μ i).support) with hsdef
-  have hsub : ∀ i, (μ i).support ⊆ s := fun i x hx => Finset.mem_biUnion.mpr ⟨i, Finset.mem_univ _, hx⟩
-  refine ⟨s,
-    fun x => ∑ i, μ i x • ((b i : W) : X → ℂ), ?_, ?_⟩
+  have hsub : ∀ i, (μ i).support ⊆ s := fun i x hx =>
+    Finset.mem_biUnion.mpr ⟨i, Finset.mem_univ _, hx⟩
+  refine ⟨s, fun x => ∑ i, μ i x • ((b i : W) : X → ℂ), ?_, ?_⟩
   · intro x
     exact Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ (hWV (b i).2))
   · intro u hu
@@ -52,9 +52,10 @@ theorem finset_functions_recovered_from_values {X : Type} (V : Submodule ℂ (X 
       rw [h1, ← hμ i, Finsupp.sum_of_support_subset (μ i) (hsub i)]
       · simp [LinearMap.sum_apply, hev, hw]
       · intro x _; simp
-    calc u = ((∑ i, b.repr w i • b i : W) : X → ℂ) := by rw [b.sum_repr w]
+    calc
+      u = ((∑ i, b.repr w i • b i : W) : X → ℂ) := by rw [b.sum_repr w]
       _ = ∑ i, b.repr w i • ((b i : W) : X → ℂ) := by
-          rw [Submodule.coe_sum]; simp only [Submodule.coe_smul]
+        rw [Submodule.coe_sum]; simp only [Submodule.coe_smul]
       _ = _ := by
         simp_rw [hrep, Finset.smul_sum, Finset.sum_smul, smul_smul]
         rw [Finset.sum_comm]

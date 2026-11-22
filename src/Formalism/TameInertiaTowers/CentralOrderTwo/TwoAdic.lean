@@ -92,7 +92,8 @@ theorem twoAdicVal : TwoAdicVal := by
   intro a ha ha2 e he
   by_cases hev : Even e
   · have h := val_even a ha ha2 e he hev
-    have hl : padicValNat 2 e ≤ Nat.log 2 e := by simpa only [Nat.padicValNat_def] using (multiplicity_le_nat_log (p := 2) e)
+    have hl : padicValNat 2 e ≤ Nat.log 2 e := by
+      simpa only [Nat.padicValNat_def] using (multiplicity_le_nat_log (p := 2) e)
     rw [if_pos hev]
     constructor <;> omega
   · have hod : Odd e := Nat.not_even_iff_odd.mp hev
@@ -107,14 +108,13 @@ theorem twoAdicOrder : TwoAdicOrder := by
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   split_ifs with h1
   · rw [h1, orderOf_one]
-  · have hv : ∀ j : ℕ, 1 ≤ j →
-        padicValInt 2 (a ^ 2 ^ j - 1) + 1 = padicValInt 2 (a ^ 2 - 1) + j := by
+  · have hv
+        : ∀ j : ℕ, 1 ≤ j → padicValInt 2 (a ^ 2 ^ j - 1) + 1 = padicValInt 2 (a ^ 2 - 1) + j := by
       intro j hj
       have := val_even a ha ha2 (2 ^ j) (by positivity) (Nat.even_pow.mpr ⟨even_two, by omega⟩)
       rwa [Nat.padicValNat_def, Nat.multiplicity_prime_pow] at this
-    have hpow : ∀ j : ℕ,
-        ((a : ZMod (2 ^ N)) ^ 2 ^ j = 1 ↔ N ≤ padicValInt 2 (a ^ 2 ^ j - 1)) := fun j =>
-      powEq N (2 ^ j) a (pow_sub_one_ne a ha2 _ (by positivity))
+    have hpow : ∀ j : ℕ, ((a : ZMod (2 ^ N)) ^ 2 ^ j = 1 ↔ N ≤ padicValInt 2 (a ^ 2 ^ j - 1)) :=
+      fun j => powEq N (2 ^ j) a (pow_sub_one_ne a ha2 _ (by positivity))
     set K := max 1 (N + 1 - padicValInt 2 (a ^ 2 - 1)) with hK
     have hK1 : 1 ≤ K := le_max_left _ _
     have hK2 : N + 1 - padicValInt 2 (a ^ 2 - 1) ≤ K := le_max_right _ _

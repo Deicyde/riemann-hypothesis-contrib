@@ -17,44 +17,56 @@ section AlternatingWeights
 
 variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
 
-private theorem w_coord_mAct (E : Fin n → Fin n → Module.End ℂ M) (k : ℕ) (a b : Fin n)
-    (κ : Fin k → Fin n × Fin n) (F : Big n k M) :
-    coord k κ (mAct E k a b F) = E a b (F κ) := rfl
+private theorem w_coord_mAct
+    (E : Fin n → Fin n → Module.End ℂ M)
+    (k : ℕ)
+    (a b : Fin n) (κ : Fin k → Fin n × Fin n) (F : Big n k M)
+    : coord k κ (mAct E k a b F) = E a b (F κ) :=
+  rfl
 
-private theorem w_coord_positionAd (k : ℕ) (i : Fin k) (a b : Fin n) (κ : Fin k → Fin n × Fin n)
-    (F : Big n k M) :
-    coord k κ (factorAd k i a b F) =
-      (if (κ i).1 = a then F (Function.update κ i (b, (κ i).2)) else 0) -
-      (if (κ i).2 = b then F (Function.update κ i ((κ i).1, a)) else 0) := by
-  change (((if (κ i).1 = a then coord k (Function.update κ i (b, (κ i).2)) else 0) -
-      (if (κ i).2 = b then coord k (Function.update κ i ((κ i).1, a)) else 0) :
-        Big n k M →ₗ[ℂ] M)) F = _
+private theorem w_coord_positionAd
+    (k : ℕ) (i : Fin k) (a b : Fin n) (κ : Fin k → Fin n × Fin n) (F : Big n k M)
+    : coord k κ (factorAd k i a b F)
+      = (if (κ i).1 = a then F (Function.update κ i (b, (κ i).2)) else 0)
+        - (if (κ i).2 = b then F (Function.update κ i ((κ i).1, a)) else 0) := by
+  change (((if (κ i).1 = a then coord k (Function.update κ i (b, (κ i).2)) else 0)
+          - (if (κ i).2 = b then coord k (Function.update κ i ((κ i).1, a)) else 0)
+        : Big n k M →ₗ[ℂ] M))
+      F
+    = _
   split_ifs <;> rfl
 
-private theorem w_coord_bAct (E : Fin n → Fin n → Module.End ℂ M) (k : ℕ) (a b : Fin n)
-    (κ : Fin k → Fin n × Fin n) (F : Big n k M) :
-    coord k κ (bAct E k a b F) = E a b (F κ) + ∑ i, ((if (κ i).1 = a then
-      F (Function.update κ i (b, (κ i).2)) else 0) -
-      (if (κ i).2 = b then F (Function.update κ i ((κ i).1, a)) else 0)) := by
+private theorem w_coord_bAct
+    (E : Fin n → Fin n → Module.End ℂ M)
+    (k : ℕ)
+    (a b : Fin n) (κ : Fin k → Fin n × Fin n) (F : Big n k M)
+    : coord k κ (bAct E k a b F)
+      = E a b (F κ)
+        + ∑ i, ((if (κ i).1 = a then
+          F (Function.update κ i (b, (κ i).2)) else 0) -
+          (if (κ i).2 = b then F (Function.update κ i ((κ i).1, a)) else 0)) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [bAct, LinearMap.add_apply, LinearMap.sum_apply, map_add (f := _), map_sum, w_coord_mAct,
-    w_coord_positionAd]
+  simp only [bAct, LinearMap.add_apply, LinearMap.sum_apply, map_add (f := _), map_sum,
+    w_coord_mAct, w_coord_positionAd]
 
-private theorem w_sum_update (φ : Fin n × Fin n → ℤ) {k : ℕ} (κ : Fin k → Fin n × Fin n) (i : Fin k)
-    (p : Fin n × Fin n) :
-    ∑ j, φ (Function.update κ i p j) + φ (κ i) = ∑ j, φ (κ j) + φ p := by
+private theorem w_sum_update
+    (φ : Fin n × Fin n → ℤ) {k : ℕ} (κ : Fin k → Fin n × Fin n) (i : Fin k) (p : Fin n × Fin n)
+    : ∑ j, φ (Function.update κ i p j) + φ (κ i) = ∑ j, φ (κ j) + φ p := by
   classical
-  have hfun : (fun j => φ (Function.update κ i p j)) = Function.update (fun j => φ (κ j)) i (φ p) := by
+  have hfun
+      : (fun j => φ (Function.update κ i p j)) = Function.update (fun j => φ (κ j)) i (φ p) := by
     funext j
     by_cases h : j = i
     · subst h; simp
     · simp [Function.update_apply, h]
   have h1 : ∑ j, φ (Function.update κ i p j) = φ p + ∑ j ∈ Finset.univ \ {i}, φ (κ j) := by
-    rw [show (∑ j, φ (Function.update κ i p j)) = ∑ j, Function.update (fun j => φ (κ j)) i (φ p) j
-      from congrArg (fun f => ∑ j, f j) hfun, Finset.sum_update_of_mem (Finset.mem_univ i)]
-  have h2 : ∑ j, φ (κ j) = φ (κ i) + ∑ j ∈ Finset.univ \ {i}, φ (κ j) :=
-by
-    rw [Finset.sdiff_singleton_eq_erase, Finset.add_sum_erase _ (fun j => φ (κ j)) (Finset.mem_univ i)]
+    rw [show (∑ j, φ (Function.update κ i p j))
+          = ∑ j, Function.update (fun j => φ (κ j)) i (φ p) j from
+        congrArg (fun f => ∑ j, f j) hfun,
+      Finset.sum_update_of_mem (Finset.mem_univ i)]
+  have h2 : ∑ j, φ (κ j) = φ (κ i) + ∑ j ∈ Finset.univ \ {i}, φ (κ j) := by
+    rw [Finset.sdiff_singleton_eq_erase,
+      Finset.add_sum_erase _ (fun j => φ (κ j)) (Finset.mem_univ i)]
   rw [h1, h2]
   ring
 
@@ -62,27 +74,36 @@ end AlternatingWeights
 
 section Weights
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {Λ : Fin n → ℝ}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {Λ : Fin n → ℝ}
 
-theorem khw_big_weight (hE : IsGlRep E) (hV : IsKIrrHW ε E Λ V) {k : ℕ} {F : Big n k M}
-    (hF : F ∈ ncV ε V k) (hF0 : F ≠ 0) {ν : Fin n → ℝ} (hν : IsKHWVec ε (bAct E k) ν F) :
-    IsNCSum ε k (ν - Λ) := by
+theorem khw_big_weight
+    (hE : IsGlRep E) (hV : IsKIrrHW ε E Λ V)
+    {k : ℕ} {F : Big n k M} (hF : F ∈ ncV ε V k) (hF0 : F ≠ 0)
+    {ν : Fin n → ℝ} (hν : IsKHWVec ε (bAct E k) ν F)
+    : IsNCSum ε k (ν - Λ) := by
   classical
-  have hcoord : ∀ (a b : Fin n) (κ : Fin k → Fin n × Fin n), (bAct E k a b F) κ = E a b (F κ) +
-      ∑ i, ((if (κ i).1 = a then F (Function.update κ i (b, (κ i).2)) else 0) -
-        (if (κ i).2 = b then F (Function.update κ i ((κ i).1, a)) else 0)) :=
-    fun a b κ => w_coord_bAct E k a b κ F
+  have hcoord
+      : ∀ (a b : Fin n) (κ : Fin k → Fin n × Fin n),
+        (bAct E k a b F) κ
+          = E a b (F κ)
+            + ∑ i, ((if (κ i).1 = a then F (Function.update κ i (b, (κ i).2)) else 0) -
+                (if (κ i).2 = b then F (Function.update κ i ((κ i).1, a)) else 0)) := fun a b κ =>
+    w_coord_bAct E k a b κ F
 
-  have hwt : ∀ (κ : Fin k → Fin n × Fin n) (a : Fin n),
-      E a a (F κ) = (((ν - ∑ j, root (κ j).1 (κ j).2) a : ℝ) : ℂ) • F κ := by
+  have hwt
+      : ∀ (κ : Fin k → Fin n × Fin n) (a : Fin n),
+        E a a (F κ) = (((ν - ∑ j, root (κ j).1 (κ j).2) a : ℝ) : ℂ) • F κ := by
     intro κ a
     have h0 := congrArg (fun G : Big n k M => G κ) (hν.1 a)
     simp only at h0
     rw [hcoord, PiLp.smul_apply] at h0
-    have hterm : ∀ i, ((if (κ i).1 = a then F (Function.update κ i (a, (κ i).2)) else 0) -
-        (if (κ i).2 = a then F (Function.update κ i ((κ i).1, a)) else 0)) =
-        ((root (κ i).1 (κ i).2 a : ℝ) : ℂ) • F κ := by
+    have hterm
+        : ∀ i,
+          ((if (κ i).1 = a then F (Function.update κ i (a, (κ i).2)) else 0)
+              - (if (κ i).2 = a then F (Function.update κ i ((κ i).1, a)) else 0))
+            = ((root (κ i).1 (κ i).2 a : ℝ) : ℂ) • F κ := by
       intro i
       have e1 : (κ i).1 = a → Function.update κ i (a, (κ i).2) = κ := fun h => by
         rw [← h, Prod.mk.eta, Function.update_eq_self]
@@ -119,8 +140,11 @@ theorem khw_big_weight (hE : IsGlRep E) (hV : IsKIrrHW ε E Λ V) {k : ℕ} {F :
     have h0 := congrArg (fun G : Big n k M => G κ) (hν.2 a b hab hεab)
     simp only at h0
     rw [hcoord] at h0
-    have hterm : ∀ i, ((if (κ i).1 = a then F (Function.update κ i (b, (κ i).2)) else 0) -
-        (if (κ i).2 = b then F (Function.update κ i ((κ i).1, a)) else 0)) = 0 := by
+    have hterm
+        : ∀ i,
+          ((if (κ i).1 = a then F (Function.update κ i (b, (κ i).2)) else 0)
+              - (if (κ i).2 = b then F (Function.update κ i ((κ i).1, a)) else 0))
+            = 0 := by
       intro i
       have u1 : (κ i).1 = a → F (Function.update κ i (b, (κ i).2)) = 0 := fun h => by
         apply hzero

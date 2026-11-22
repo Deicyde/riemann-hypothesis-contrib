@@ -11,9 +11,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
@@ -21,7 +25,8 @@ namespace UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 
 section Abs
 
-variable {G : Type} [Group G] [TopologicalSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
 private lemma orbit_finite [IsTopologicalGroup G] (π : UnitaryRep G H) {L L' : Subgroup G} (hL : IsCompact (L : Set G))
@@ -128,9 +133,14 @@ end Cl
 
 end UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.xSimple :
-    ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (μ : Measure (G1 K 2)) [μ.IsHaarMeasure] (τ : Submodule ℂ (L2 μ)) (κ : Measure (archCompact K 2)) (p : archCompact K 2 → ℂ), CuspIrr μ τ → RankInf μ τ κ p → ∀ {r : ℕ} (w : Fin r → Pl K) (ι : GS 2 w →* FA K 2), Function.Injective w → IsEmb w ι →
-      SimpleIn (rS ι) (Xs μ τ κ p (im w)) ∧ SchurIn (rS ι) (Xs μ τ κ p (im w)) := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.xSimple
+    : ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+        (μ : Measure (G1 K 2)) [μ.IsHaarMeasure] (τ : Submodule ℂ (L2 μ))
+        (κ : Measure (archCompact K 2)) (p : archCompact K 2 → ℂ),
+      CuspIrr μ τ → RankInf μ τ κ p
+        → ∀ {r : ℕ} (w : Fin r → Pl K) (ι : GS 2 w →* FA K 2),
+          Function.Injective w → IsEmb w ι
+            → SimpleIn (rS ι) (Xs μ τ κ p (im w)) ∧ SchurIn (rS ι) (Xs μ τ κ p (im w)) := by
   intro K _ _ _ μ _ τ κ p hτ hR r w ι hw hι
   have hp : IdemA κ p := hR.1
   obtain ⟨hX, hX'⟩ := xMem μ τ κ p hp
@@ -149,8 +159,9 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.xSimple 
   have hCO := (levLaws (K := K) 2 (im w)).1
   have hrS : ∀ g (φ : G1 K 2 → ℂ) x, rS ι g φ x = φ (x * fin1 (ι g)) := fun _ _ _ => rfl
 
-  have hdec : ∀ U, ∀ u ∈ levOn (im w) U, ∃ g, ι g ∈ levOn (im w) U ∧
-      ∀ φ ∈ Xs μ τ κ p (im w), ∀ x, φ (x * fin1 u) = rS ι g φ x := by
+  have hdec
+      : ∀ U, ∀ u ∈ levOn (im w) U, ∃ g,
+        ι g ∈ levOn (im w) U ∧ ∀ φ ∈ Xs μ τ κ p (im w), ∀ x, φ (x * fin1 u) = rS ι g φ x := by
     intro U u hu
     obtain ⟨g, h', rfl, hg, h1, h2⟩ := (hlev U u).1 hu
     refine ⟨g, (hlev U _).2 ⟨g, 1, (mul_one _).symm, hg, hcw1, fun v => ?_⟩, fun φ hφ x => ?_⟩
@@ -161,20 +172,25 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.xSimple 
       rw [hrS, ← this]
       simp only [fin1, map_mul, mul_assoc]
   let π : UnitaryRep (FA K 2) (L2 μ) :=
-    (rightRegularRep (rationalGLOne (K := K) (n := 2)) μ).compHom (MultiplicityOne.finProj K 2) MultiplicityOne.continuous_finProj
+    (rightRegularRep (rationalGLOne (K := K) (n := 2)) μ).compHom (MultiplicityOne.finProj K 2)
+      MultiplicityOne.continuous_finProj
   have hπ : ∀ h, π h = rhoF μ h := fun _ => rfl
-  have hfixJ : ∀ (L : Subgroup (FA K 2)) (φ : Xs μ τ κ p (im w)), FixF L φ.1 → ∀ u ∈ L, rhoF μ u (J φ) = J φ :=
-    fun L φ hφ u hu => (hJr u φ φ fun x => (hφ u hu x).symm).symm
+  have hfixJ
+      : ∀ (L : Subgroup (FA K 2)) (φ : Xs μ τ κ p (im w)),
+        FixF L φ.1 → ∀ u ∈ L, rhoF μ u (J φ) = J φ := fun L φ hφ u hu =>
+    (hJr u φ φ fun x => (hφ u hu x).symm).symm
   have hS : SimpleIn (rS ι) (Xs μ τ κ p (im w)) := by
     refine ⟨fun g φ hφ => hstab φ hφ g, fun Q hQ hQs => ?_⟩
     let M : Submodule ℂ (L2 μ) := (Q.comap (Xs μ τ κ p (im w)).subtype).map J
     have hM : ∀ g, ∀ m ∈ M, rhoF μ (ι g) m ∈ M := by
       rintro g _ ⟨φ, hφ, rfl⟩
       exact ⟨⟨rS ι g φ.1, hstab _ φ.2 g⟩, hQs g _ hφ, hJr _ _ _ fun x => rfl⟩
-    have hT := xTop μ τ κ p hτ hR w ι hw hι M.topologicalClosure M.isClosed_topologicalClosure
-      (fun v hv => closure_minimal (s := (M : Set (L2 μ))) (by rintro _ ⟨φ, -, rfl⟩; exact (hJ φ).2)
-        (isClosed_inH μ hτ hp (im w)) hv)
-      (fun g v hv => map_mem_closure (rhoF μ (ι g)).continuous hv (hM g))
+    have hT :=
+      xTop μ τ κ p hτ hR w ι hw hι M.topologicalClosure M.isClosed_topologicalClosure
+        (fun v hv =>
+          closure_minimal (s := (M : Set (L2 μ))) (by rintro _ ⟨φ, -, rfl⟩; exact (hJ φ).2)
+            (isClosed_inH μ hτ hp (im w)) hv)
+        (fun g v hv => map_mem_closure (rhoF μ (ι g)).continuous hv (hM g))
     rcases hT with hT | hT
     · left
       rw [eq_bot_iff]
@@ -191,8 +207,8 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.xSimple 
           (((Xs μ τ κ p (im w)).subtype.domRestrict (E.comap (Xs μ τ κ p (im w)).subtype)).codRestrict E fun a => a.2)
           fun a b h => Subtype.ext (Subtype.ext (congrArg (fun z : E => (z : G1 K 2 → ℂ)) h))
       have key : J ⟨φ, hφ⟩ ∈ M := by
-        refine mem_of_closure π (levOn (im w) U) M ((E.comap (Xs μ τ κ p (im w)).subtype).map J) ?_ ?_ ?_
-          (hT _ (hJ _).2) (hfixJ _ ⟨φ, hφ⟩ hφU)
+        refine mem_of_closure π (levOn (im w) U) M ((E.comap (Xs μ τ κ p (im w)).subtype).map J) ?_
+          ?_ ?_ (hT _ (hJ _).2) (hfixJ _ ⟨φ, hφ⟩ hφU)
         · rintro u hu _ ⟨ψ, hψ, rfl⟩
           obtain ⟨g, -, hg⟩ := hdec U u hu
           exact ⟨⟨rS ι g ψ.1, hstab _ ψ.2 g⟩, hQs g _ hψ, hJr _ _ _ fun x => (hg _ ψ.2 x).symm⟩
@@ -212,11 +228,12 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.xSimple 
   obtain ⟨φ, hφ0⟩ := h0
   obtain ⟨-, -, -, U, hU, hφU⟩ := (hX _ _).1 φ.2
   obtain ⟨-, E, hE, hEU⟩ := hJU U hU
-  let F : Submodule ℂ (Xs μ τ κ p (im w)) :=
-    { carrier := {ψ | FixF (levOn (im w) U) ψ.1}
-      add_mem' := fun ha hb u hu g => by simp [ha u hu g, hb u hu g]
-      zero_mem' := fun u hu g => rfl
-      smul_mem' := fun c _ ha u hu g => by simp [ha u hu g] }
+  let F : Submodule ℂ (Xs μ τ κ p (im w)) := {
+    carrier := {ψ | FixF (levOn (im w) U) ψ.1}
+    add_mem' := fun ha hb u hu g => by simp [ha u hu g, hb u hu g]
+    zero_mem' := fun u hu g => rfl
+    smul_mem' := fun c _ ha u hu g => by simp [ha u hu g]
+  }
   haveI : FiniteDimensional ℂ ↥(E.comap (Xs μ τ κ p (im w)).subtype) :=
     FiniteDimensional.of_injective
           (((Xs μ τ κ p (im w)).subtype.domRestrict (E.comap (Xs μ τ κ p (im w)).subtype)).codRestrict E fun a => a.2)
@@ -232,11 +249,14 @@ theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.xSimple 
   obtain ⟨ψ, hψ⟩ := hc.exists_hasEigenvector
   have hψ1 : T ψ.1 = c • ψ.1 := congrArg Subtype.val hψ.apply_eq_smul
   refine ⟨c, ?_⟩
-  rcases hS.2 ((Module.End.eigenspace T c).map (Xs μ τ κ p (im w)).subtype) (Submodule.map_subtype_le _ _) (by
-    rintro g _ ⟨a, ha, rfl⟩
-    refine ⟨⟨rS ι g a.1, hstab _ a.2 g⟩, Module.End.mem_eigenspace_iff.2 (Subtype.ext ?_), rfl⟩
-    rw [hT g a _ rfl, Module.End.mem_eigenspace_iff.1 ha]
-    simp) with h | h
+  rcases hS.2 ((Module.End.eigenspace T c).map (Xs μ τ κ p (im w)).subtype)
+      (Submodule.map_subtype_le _ _)
+      (by
+        rintro g _ ⟨a, ha, rfl⟩
+        refine ⟨⟨rS ι g a.1, hstab _ a.2 g⟩, Module.End.mem_eigenspace_iff.2 (Subtype.ext ?_), rfl⟩
+        rw [hT g a _ rfl, Module.End.mem_eigenspace_iff.1 ha]
+        simp)
+    with h | h
   · have : (ψ.1 : G1 K 2 → ℂ) ∈ (Module.End.eigenspace T c).map (Xs μ τ κ p (im w)).subtype :=
       ⟨ψ.1, Module.End.mem_eigenspace_iff.2 hψ1, rfl⟩
     rw [h, Submodule.mem_bot] at this

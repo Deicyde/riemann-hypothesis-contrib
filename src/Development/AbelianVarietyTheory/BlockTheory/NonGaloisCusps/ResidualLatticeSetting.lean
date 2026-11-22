@@ -9,15 +9,19 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsTa
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.ResidualLatticeSetting
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂} (X : NTw D.R D.host D.what₂ D.LL0 N)
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+  (X : NTw D.R D.host D.what₂ D.LL0 N)
 
 def maxLam (i : X.Tw) (M : ℕ) (ι : Type) : Ideal (abelian₂ X i M ι) :=
-  (IsLocalRing.maximalIdeal (X.O0 i)).map (algebraMap (X.O0 i) (abelian₂ X i M ι)) ⊔
-    Ideal.span (Set.range fun q : ι => toLam X i M ι (MvPolynomial.X q))
+  (IsLocalRing.maximalIdeal (X.O0 i)).map (algebraMap (X.O0 i) (abelian₂ X i M ι))
+    ⊔ Ideal.span (Set.range fun q : ι => toLam X i M ι (MvPolynomial.X q))
 
 theorem maxLam_ne_top (i : X.Tw) (M : ℕ) (ι : Type) : maxLam X i M ι ≠ ⊤ := by
   classical
@@ -37,7 +41,6 @@ theorem maxLam_ne_top (i : X.Tw) (M : ℕ) (ι : Type) : maxLam X i M ι ≠ ⊤
   exact ne_top_of_le_ne_top (RingHom.ker_ne_top φ) hle
 
 variable {X} (bkP : BKPh X)
-
 
 end GlobalTheory.IndefiniteRowSideFullHecke.ResidualLatticeSetting
 

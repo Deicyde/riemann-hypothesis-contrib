@@ -48,17 +48,21 @@ lemma pt_iota (x : Discrete (ULift.{1} (V ⟶ X))) : pt V ((Iota V).obj x) = x.a
 
 def uH (c : KK (X := X) V) : c ⟶ (Iota V).obj ⟨pt V c⟩ :=
   CostructuredArrow.homMk
-    (Over.homMk (U := Over.mk (pt V c).down) (V := c.left.unop) (c.hom.unop : V ⟶ c.left.unop.left) rfl).op
+    (Over.homMk (U := Over.mk (pt V c).down) (V := c.left.unop) (c.hom.unop : V ⟶ c.left.unop.left)
+      rfl).op
     (by apply Quiver.Hom.unop_inj; exact Category.id_comp _)
 
-def adj : P V ⊣ Iota (X := X) V := Adjunction.mkOfHomEquiv
-  { homEquiv := fun c x =>
-      { toFun := fun e => uH V c ≫ (Iota V).map e
-        invFun := fun g => Discrete.eqToHom ((pt_eq V g).trans (pt_iota V x))
-        left_inv := fun _ => Subsingleton.elim _ _
-        right_inv := fun _ => (sub V c x).elim _ _ }
+def adj : P V ⊣ Iota (X := X) V :=
+  Adjunction.mkOfHomEquiv {
+    homEquiv := fun c x => {
+      toFun := fun e => uH V c ≫ (Iota V).map e
+      invFun := fun g => Discrete.eqToHom ((pt_eq V g).trans (pt_iota V x))
+      left_inv := fun _ => Subsingleton.elim _ _
+      right_inv := fun _ => (sub V c x).elim _ _
+    }
     homEquiv_naturality_left_symm := fun _ _ => Subsingleton.elim _ _
-    homEquiv_naturality_right := fun {c} {_} {x'} _ _ => (sub V c x').elim _ _ }
+    homEquiv_naturality_right := fun {c} {_} {x'} _ _ => (sub V c x').elim _ _
+  }
 
 instance : (Iota (X := X) V).Final := Functor.final_of_adjunction (adj V)
 
@@ -116,16 +120,24 @@ lemma lanMono (R : Type) [CommRing R] (X : Scheme.{0}) :
 theorem PullMono_of : LateralTheory.E.LocSlicePf.PullMono := by
   intro R _ X
   haveI := lanMono R X
-  have h1 : (sheafToPresheaf (Scheme.etaleTopology.{0}.over X) (ModuleCat.{1} (ULift.{1} R))).PreservesMonomorphisms :=
+  have h1 : (sheafToPresheaf (Scheme.etaleTopology.{0}.over X)
+      (ModuleCat.{1} (ULift.{1} R))).PreservesMonomorphisms :=
     inferInstance
-  have h3 : (presheafToSheaf Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R))).PreservesMonomorphisms :=
+  have h3 : (presheafToSheaf Scheme.etaleTopology.{0}
+      (ModuleCat.{1} (ULift.{1} R))).PreservesMonomorphisms :=
     inferInstance
-  have h4 : (sheafToPresheaf (Scheme.etaleTopology.{0}.over X) (ModuleCat.{1} (ULift.{1} R)) ⋙
-      (Over.forget X).op.lan ⋙ presheafToSheaf Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R))).PreservesMonomorphisms :=
+  have h4
+      : (sheafToPresheaf (Scheme.etaleTopology.{0}.over X) (ModuleCat.{1} (ULift.{1} R))
+        ⋙ (Over.forget X).op.lan
+        ⋙ presheafToSheaf Scheme.etaleTopology.{0}
+          (ModuleCat.{1} (ULift.{1} R))).PreservesMonomorphisms :=
     inferInstance
-  exact Functor.PreservesMonomorphisms.of_iso (F := sheafToPresheaf (Scheme.etaleTopology.{0}.over X) (ModuleCat.{1} (ULift.{1} R)) ⋙
-      (Over.forget X).op.lan ⋙ presheafToSheaf Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R)))
-    (Functor.sheafPullbackConstruction.sheafPullbackIso (Over.forget X) (ModuleCat.{1} (ULift.{1} R))
-      (Scheme.etaleTopology.{0}.over X) Scheme.etaleTopology.{0}).symm
+  exact Functor.PreservesMonomorphisms.of_iso
+    (F :=
+      sheafToPresheaf (Scheme.etaleTopology.{0}.over X) (ModuleCat.{1} (ULift.{1} R))
+        ⋙ (Over.forget X).op.lan
+        ⋙ presheafToSheaf Scheme.etaleTopology.{0} (ModuleCat.{1} (ULift.{1} R)))
+    (Functor.sheafPullbackConstruction.sheafPullbackIso (Over.forget X)
+      (ModuleCat.{1} (ULift.{1} R)) (Scheme.etaleTopology.{0}.over X) Scheme.etaleTopology.{0}).symm
 
 end LateralTheory.E.PullMonoPf

@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Admissi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -17,29 +19,32 @@ noncomputable section
 namespace GlobalTheory.Mum
 open KaehlerDifferential TensorProduct
 
-theorem bijective_of_bijective_lTensor_residueField {R M N : Type*} [CommRing R] [IsLocalRing R]
-    [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    [Module.Finite R M] [Module.Finite R N] [Module.Projective R N] (l : M →ₗ[R] N)
-    (h : Function.Bijective (l.lTensor (ResidueField R))) : Function.Bijective l := by
+theorem bijective_of_bijective_lTensor_residueField
+    {R M N : Type*} [CommRing R] [IsLocalRing R] [AddCommGroup M] [Module R M] [AddCommGroup N]
+    [Module R N] [Module.Finite R M] [Module.Finite R N] [Module.Projective R N]
+    (l : M →ₗ[R] N) (h : Function.Bijective (l.lTensor (ResidueField R)))
+    : Function.Bijective l := by
   have : Module.Free R N := Module.free_of_flat_of_isLocalRing
   refine ⟨?_, ?_⟩
   · obtain ⟨l', hl'⟩ := (IsLocalRing.split_injective_iff_lTensor_residueField_injective l).mpr h.1
     exact Function.HasLeftInverse.injective ⟨l', LinearMap.congr_fun hl'⟩
-  · have hex := lTensor_exact (ResidueField R) (LinearMap.exact_map_mkQ_range l)
-      (Submodule.mkQ_surjective _)
+  · have hex :=
+      lTensor_exact (ResidueField R) (LinearMap.exact_map_mkQ_range l) (Submodule.mkQ_surjective _)
     have hsub : Subsingleton (ResidueField R ⊗[R] (N ⧸ LinearMap.range l)) := by
       refine subsingleton_of_forall_eq 0 fun y => ?_
-      obtain ⟨x, rfl⟩ := LinearMap.lTensor_surjective (ResidueField R) (Submodule.mkQ_surjective _) y
+      obtain ⟨x, rfl⟩ :=
+        LinearMap.lTensor_surjective (ResidueField R) (Submodule.mkQ_surjective _) y
       obtain ⟨z, rfl⟩ := h.2 x
       exact hex.apply_apply_eq_zero z
     rw [IsLocalRing.subsingleton_tensorProduct] at hsub
     rw [← LinearMap.range_eq_top]
     exact Submodule.Quotient.subsingleton_iff.mp hsub
 
-theorem formallyEtale_of_bijective_mapBaseChange (R P B : Type*) [CommRing R] [CommRing P]
-    [CommRing B] [Algebra R P] [Algebra R B] [Algebra P B] [IsScalarTower R P B]
-    [Algebra.FormallySmooth R B] (h : Function.Bijective (mapBaseChange R P B)) :
-    Algebra.FormallyEtale P B := by
+theorem formallyEtale_of_bijective_mapBaseChange
+    (R P B : Type*) [CommRing R] [CommRing P] [CommRing B] [Algebra R P] [Algebra R B] [Algebra P B]
+    [IsScalarTower R P B] [Algebra.FormallySmooth R B]
+    (h : Function.Bijective (mapBaseChange R P B))
+    : Algebra.FormallyEtale P B := by
   have h1 : Subsingleton Ω[B⁄P] := by
     refine subsingleton_of_forall_eq 0 fun x => ?_
     obtain ⟨y, rfl⟩ := map_surjective R P B x
@@ -54,10 +59,11 @@ theorem formallyEtale_of_bijective_mapBaseChange (R P B : Type*) [CommRing R] [C
     rw [Subsingleton.elim y 0, map_zero]
   exact ⟨h1, h2⟩
 
-theorem bijective_lTensor_baseChange_of_bijective {B M N : Type*} [CommRing B]
-    [AddCommGroup M] [Module B M] [AddCommGroup N] [Module B N] (Q : Ideal B) [Q.IsPrime]
-    (φ : M →ₗ[B] N) (h : Function.Bijective (φ.lTensor Q.ResidueField)) :
-    Function.Bijective ((φ.baseChange (Localization.AtPrime Q)).lTensor
+theorem bijective_lTensor_baseChange_of_bijective
+    {B M N : Type*} [CommRing B] [AddCommGroup M] [Module B M] [AddCommGroup N] [Module B N]
+    (Q : Ideal B) [Q.IsPrime]
+    (φ : M →ₗ[B] N) (h : Function.Bijective (φ.lTensor Q.ResidueField))
+    : Function.Bijective ((φ.baseChange (Localization.AtPrime Q)).lTensor
       (ResidueField (Localization.AtPrime Q))) := by
   let BQ := Localization.AtPrime Q
   let k := ResidueField BQ
@@ -78,20 +84,24 @@ theorem bijective_lTensor_baseChange_of_bijective {B M N : Type*} [CommRing B]
   rw [this]
   exact eN.symm.bijective.comp (h.comp eM.bijective)
 
-theorem kaehler_map_map_apply (A C B BQ : Type) [CommRing A] [CommRing C] [CommRing B] [CommRing BQ] [Algebra A C] [Algebra A B] [Algebra C B] [IsScalarTower A C B]
-   [Algebra B BQ] [Algebra A BQ] [Algebra C BQ] [IsScalarTower A B BQ] [IsScalarTower C B BQ] [IsScalarTower A C BQ] (ω : Ω[C⁄A]) :
-    map A A B BQ (map A A C B ω) = map A A C BQ ω := by
+theorem kaehler_map_map_apply
+    (A C B BQ : Type) [CommRing A] [CommRing C] [CommRing B] [CommRing BQ] [Algebra A C]
+    [Algebra A B] [Algebra C B] [IsScalarTower A C B] [Algebra B BQ] [Algebra A BQ] [Algebra C BQ]
+    [IsScalarTower A B BQ] [IsScalarTower C B BQ] [IsScalarTower A C BQ]
+    (ω : Ω[C⁄A])
+    : map A A B BQ (map A A C B ω) = map A A C BQ ω := by
   have : ((map A A B BQ).restrictScalars C).comp (map A A C B) = map A A C BQ := by
     apply Derivation.liftKaehlerDifferential_unique
     ext x
     simp [map_D, ← IsScalarTower.algebraMap_apply]
   exact LinearMap.congr_fun this ω
 
-theorem exists_etale_away_of_bijective_mapBaseChange : ∀ (A C B : Type) [CommRing A] [CommRing C]
-    [CommRing B] [Algebra A C] [Algebra A B] [Algebra C B] [IsScalarTower A C B] [Algebra.Smooth A C]
-    [Algebra.Smooth A B] (Q : Ideal B) [Q.IsPrime],
-    Function.Bijective ((KaehlerDifferential.mapBaseChange A C B).lTensor Q.ResidueField) →
-      ∃ f : B, f ∉ Q ∧ Algebra.Etale C (Localization.Away f) := by
+theorem exists_etale_away_of_bijective_mapBaseChange
+    : ∀ (A C B : Type) [CommRing A] [CommRing C] [CommRing B] [Algebra A C] [Algebra A B]
+        [Algebra C B] [IsScalarTower A C B] [Algebra.Smooth A C] [Algebra.Smooth A B] (Q : Ideal B)
+        [Q.IsPrime],
+      Function.Bijective ((KaehlerDifferential.mapBaseChange A C B).lTensor Q.ResidueField)
+        → ∃ f : B, f ∉ Q ∧ Algebra.Etale C (Localization.Away f) := by
   intro A C B _ _ _ _ _ _ _ _ _ Q _ h
   let BQ := Localization.AtPrime Q
   let φ := mapBaseChange A C B
@@ -116,8 +126,7 @@ theorem exists_etale_away_of_bijective_mapBaseChange : ∀ (A C B : Type) [CommR
           LinearMap.baseChange_tmul]
         rw [IsBaseChange.equiv_tmul, map_smul, kaehler_map_map_apply, smul_assoc, smul_comm q b]
   have hψ : Function.Bijective (mapBaseChange A C BQ) := by
-    have : ⇑(mapBaseChange A C BQ) = eN ∘ (φ.baseChange BQ) ∘ eM.symm := by
-      funext x; simp [← key]
+    have : ⇑(mapBaseChange A C BQ) = eN ∘ (φ.baseChange BQ) ∘ eM.symm := by funext x; simp [← key]
     rw [this]
     exact eN.bijective.comp (hψ₀.comp eM.symm.bijective)
   haveI : Algebra.FormallySmooth B BQ := Algebra.FormallySmooth.of_isLocalization Q.primeCompl

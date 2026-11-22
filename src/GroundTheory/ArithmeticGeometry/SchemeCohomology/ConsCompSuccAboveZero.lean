@@ -27,8 +27,7 @@ variable (P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}) (U : ι → Opens X)
 
 abbrev Cochain (n : ℕ) : Type (max w u) := ∀ i : Fin (n + 1) → ι, P.obj (op (inter U i))
 
-def res {V W : Opens X} (h : V ≤ W) : P.obj (op W) →+ P.obj (op V) :=
-  (P.map (homOfLE h).op).hom
+def res {V W : Opens X} (h : V ≤ W) : P.obj (op W) →+ P.obj (op V) := (P.map (homOfLE h).op).hom
 
 @[simp] lemma res_res {V W Z : Opens X} (h₁ : V ≤ W) (h₂ : W ≤ Z) (x : P.obj (op Z)) :
     res P h₁ (res P h₂ x) = res P (h₁.trans h₂) x := by
@@ -83,10 +82,9 @@ lemma d_d (n : ℕ) (σ : Cochain P U n) : d P U (n + 1) (d P U n σ) = 0 := by
   have h2 := congrArg (fun f => f.hom σ) this
   exact h2
 
-
 variable {P} in
-def push {P' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (φ : P ⟶ P') (n : ℕ) :
-    Cochain P U n →+ Cochain P' U n where
+def push {P' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (φ : P ⟶ P') (n : ℕ)
+    : Cochain P U n →+ Cochain P' U n where
   toFun σ i := φ.app _ (σ i)
   map_zero' := by ext i; simp
   map_add' σ τ := by ext i; simp
@@ -129,7 +127,6 @@ lemma push_injective {P' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (φ : P ⟶ P'
     Function.Injective (push U φ n) := fun _ _ hστ =>
   funext fun i => h i (congrFun hστ i)
 
-
 variable {P} in
 lemma CechAcyclic.of_retract {G : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (ι' : P ⟶ G) (r : G ⟶ P)
     (hr : ι' ≫ r = 𝟙 P) (hG : CechAcyclic G U) : CechAcyclic P U := by
@@ -138,13 +135,14 @@ lemma CechAcyclic.of_retract {G : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (ι' : 
   refine ⟨push U r n τ, ?_⟩
   rw [← push_d, hτ, push_comp, hr, push_id]
 
-
 def discPresheaf (A : X → AddCommGrpCat.{u}) : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u} where
   obj W := AddCommGrpCat.of (∀ x : W.unop, A x.1)
-  map h := AddCommGrpCat.ofHom
-    { toFun := fun s x => s ⟨x.1, h.unop.le x.2⟩
+  map h :=
+    AddCommGrpCat.ofHom {
+      toFun := fun s x => s ⟨x.1, h.unop.le x.2⟩
       map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+      map_add' := fun _ _ => rfl
+    }
   map_id _ := rfl
   map_comp _ _ := rfl
 
@@ -207,9 +205,9 @@ lemma mem_inter_cons {m : ℕ} (j : Fin (m + 1) → ι) {x : X} (hx : x ∈ inte
   | zero => simpa using mem_chosenIdx U x _
   | succ a => simpa using (mem_inter_iff U j x).1 hx a
 
-noncomputable def homotopy {n : ℕ} (σ : Cochain (discPresheaf A) U (n + 1)) :
-    Cochain (discPresheaf A) U n :=
-  fun j y => ev A y.1 (mem_inter_cons U j y.2)
+noncomputable def homotopy {n : ℕ} (σ : Cochain (discPresheaf A) U (n + 1))
+    : Cochain (discPresheaf A) U n := fun j y =>
+  ev A y.1 (mem_inter_cons U j y.2)
     (σ (Fin.cons (chosenIdx U y.1 (exists_mem_of_mem_inter U j y.2)) j))
 
 lemma ev_homotopy {n : ℕ} (σ : Cochain (discPresheaf A) U (n + 1)) (j : Fin (n + 1) → ι)
@@ -222,15 +220,17 @@ theorem cechAcyclic_discPresheaf : CechAcyclic (discPresheaf A) U := by
   refine ⟨homotopy U A σ, funext fun i => funext fun y => ?_⟩
   obtain ⟨x, hx⟩ := y
   have hJ := mem_inter_cons U i hx
-  have hcoc : ev A x hJ (d (discPresheaf A) U (n + 1) σ
-      (Fin.cons (chosenIdx U x (exists_mem_of_mem_inter U i hx)) i)) = 0 := by
+  have hcoc
+      : ev A x hJ
+          (d (discPresheaf A) U (n + 1) σ
+            (Fin.cons (chosenIdx U x (exists_mem_of_mem_inter U i hx)) i))
+        = 0 := by
     rw [hσ]
     rfl
   rw [ev_d, Fin.sum_univ_succ] at hcoc
   change ev A x hx (d (discPresheaf A) U n (homotopy U A σ) i) = ev A x hx (σ i)
   rw [ev_d]
-  rw [Fin.val_zero, pow_zero, one_smul,
-    ev_congr A σ (cons_comp_succAbove_zero _ i) x _ hx] at hcoc
+  rw [Fin.val_zero, pow_zero, one_smul, ev_congr A σ (cons_comp_succAbove_zero _ i) x _ hx] at hcoc
   rw [eq_neg_of_add_eq_zero_left hcoc, ← Finset.sum_neg_distrib]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Fin.val_succ, pow_succ, mul_neg_one, neg_smul, neg_neg, ev_homotopy]

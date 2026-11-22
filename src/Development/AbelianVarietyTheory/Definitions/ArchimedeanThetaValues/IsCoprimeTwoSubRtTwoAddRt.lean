@@ -18,11 +18,12 @@ theorem coe_rt_sq (H : Host E) : (H.rt : E) ^ 2 = -(H.d : E) := by
   have h := congrArg (algebraMap (𝓞 E) E) H.rt_sq
   simpa using h
 
-theorem conj_embedding_rt (H : Host E) (τ : E →+* ℂ) :
-    starRingEnd ℂ (τ (H.rt : E)) = -τ (H.rt : E) :=
+theorem conj_embedding_rt (H : Host E) (τ : E →+* ℂ)
+    : starRingEnd ℂ (τ (H.rt : E)) = - τ (H.rt : E) :=
   _root_.UpperTheory.Reformulated.B.Gc4.conj_embedding_rt H τ
 
-@[simp] theorem bar_rt (H : Host E) : H.bar H.rt = -H.rt := by
+@[simp]
+theorem bar_rt (H : Host E) : H.bar H.rt = -H.rt := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   apply RingOfIntegers.ext
   apply τ.injective
@@ -30,18 +31,20 @@ theorem conj_embedding_rt (H : Host E) (τ : E →+* ℂ) :
   rw [H.bar_eq, h, conj_embedding_rt]
   simp
 
-@[simp] theorem bar_bar (H : Host E) (a : 𝓞 E) : H.bar (H.bar a) = a := by
+@[simp]
+theorem bar_bar (H : Host E) (a : 𝓞 E) : H.bar (H.bar a) = a := by
   apply RingOfIntegers.ext
   rw [H.bar_eq, H.bar_eq, IsCMField.complexConj_apply_apply]
 
-@[simp] theorem cmHost_bar_halfIntegerGenerator (H : Host E) : H.bar H.w0 = 1 - H.w0 := by
+@[simp]
+theorem cmHost_bar_halfIntegerGenerator (H : Host E) : H.bar H.w0 = 1 - H.w0 := by
   have h := congrArg H.bar H.two_weight_eq_one_add_root
   rw [map_mul, map_add (f := _), bar_rt, map_one, map_ofNat] at h
   apply mul_left_cancel₀ (two_ne_zero : (2 : 𝓞 E) ≠ 0)
-  rw [h, mul_sub, H.two_weight_eq_one_add_root]; ring
+  rw [h, mul_sub, H.two_weight_eq_one_add_root]
+  ring
 
-theorem rt_eq (H : Host E) : H.rt = 2 * H.w0 - 1 := by
-  rw [H.two_weight_eq_one_add_root]; ring
+theorem rt_eq (H : Host E) : H.rt = 2 * H.w0 - 1 := by rw [H.two_weight_eq_one_add_root]; ring
 
 theorem rt_mem_adjoin (H : Host E) : H.rt ∈ Algebra.adjoin ℤ {H.w0} := by
   rw [rt_eq]
@@ -54,13 +57,14 @@ theorem rt_ne_zero (H : Host E) : H.rt ≠ 0 := by
   have : (H.d : 𝓞 E) = 0 := by simpa using h2.symm
   exact H.d_prime.ne_zero (by exact_mod_cast this)
 
-theorem two_sub_rt_mul_two_add_rt (H : Host E) : (2 - H.rt) * (2 + H.rt) = ((H.d + 4 : ℕ) : 𝓞 E) := by
+theorem two_sub_rt_mul_two_add_rt (H : Host E)
+    : (2 - H.rt) * (2 + H.rt) = ((H.d + 4 : ℕ) : 𝓞 E) := by
   have h := H.rt_sq
   push_cast
   linear_combination -h
 
-theorem map_bar_span_two_sub_rt (H : Host E) :
-    (Ideal.span {2 - H.rt}).map (H.bar : 𝓞 E →+* 𝓞 E) = Ideal.span {2 + H.rt} := by
+theorem map_bar_span_two_sub_rt (H : Host E)
+    : (Ideal.span {2 - H.rt}).map (H.bar : 𝓞 E →+* 𝓞 E) = Ideal.span {2 + H.rt} := by
   rw [Ideal.map_span, Set.image_singleton]
   congr 2
   change H.bar (2 - H.rt) = _
@@ -95,9 +99,11 @@ def level (H : Host E) (A : ℕ) (hA : 0 < A) : Level H where
   A := A
   A_pos := hA
 
-@[simp] theorem level_M (H : Host E) (A : ℕ) (hA : 0 < A) : (level H A hA).M = H.d + 4 := rfl
+@[simp]
+theorem level_M (H : Host E) (A : ℕ) (hA : 0 < A) : (level H A hA).M = H.d + 4 := rfl
 
-@[simp] theorem level_A (H : Host E) (A : ℕ) (hA : 0 < A) : (level H A hA).A = A := rfl
+@[simp]
+theorem level_A (H : Host E) (A : ℕ) (hA : 0 < A) : (level H A hA).A = A := rfl
 
 theorem Mb_ne_top {H : Host E} (l : Level H) : l.Mb ≠ ⊤ := by
   intro h
@@ -110,8 +116,8 @@ theorem Mb_ne_top {H : Host E} (l : Level H) : l.Mb ≠ ⊤ := by
   have h3 := l.three_le
   rcases Int.isUnit_iff.mp h1 with h2 | h2 <;> omega
 
-theorem level_goodAt (H : Host E) (A : ℕ) (hA : 0 < A) {p : ℕ} (hp : ¬ p ∣ H.d + 4) :
-    (level H A hA).GoodAt p := by
+theorem level_goodAt (H : Host E) (A : ℕ) (hA : 0 < A) {p : ℕ} (hp : ¬ p ∣ H.d + 4)
+    : (level H A hA).GoodAt p := by
   unfold Level.GoodAt
   rw [level_M, Nat.factorization_eq_zero_of_not_dvd hp]
   simp

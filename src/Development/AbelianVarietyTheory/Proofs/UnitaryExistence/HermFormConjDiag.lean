@@ -72,8 +72,8 @@ lemma exists_upper_diag {n : ℕ} (q : ℕ) (A : Matrix (Fin n) (Fin n) ℂ) (hA
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-def locPer (τ : E →+* ℂ) (Gm : Matrix (Fin r) (Fin r) E) (q : ℕ) (M : Matrix (Fin r) (Fin r) ℂ) :
-    (Fin r → ℂ) →ₗ[ℝ] (Fin r → ℂ) where
+def locPer (τ : E →+* ℂ) (Gm : Matrix (Fin r) (Fin r) E) (q : ℕ) (M : Matrix (Fin r) (Fin r) ℂ)
+    : (Fin r → ℂ) →ₗ[ℝ] (Fin r → ℂ) where
   toFun u a := if (a : ℕ) < q then FD.hermC τ Gm (FD.col M a) u else (M⁻¹ *ᵥ u) a
   map_add' u w := by
     funext a
@@ -83,8 +83,8 @@ def locPer (τ : E →+* ℂ) (Gm : Matrix (Fin r) (Fin r) E) (q : ℕ) (M : Mat
     funext a
     have : t • u = (t : ℂ) • u := by funext k; simp
     rw [this]
-    simp only [FD.hermC_smul_right, mulVec_smul, Pi.smul_apply, RingHom.id_apply, Complex.conj_ofReal,
-      smul_eq_mul, Complex.real_smul]
+    simp only [FD.hermC_smul_right, mulVec_smul, Pi.smul_apply, RingHom.id_apply,
+      Complex.conj_ofReal, smul_eq_mul, Complex.real_smul]
     split_ifs <;> rfl
 
 lemma locPer_apply (τ : E →+* ℂ) (Gm : Matrix (Fin r) (Fin r) E) (q : ℕ) (M : Matrix (Fin r) (Fin r) ℂ)
@@ -205,7 +205,6 @@ lemma exists_loc (τ : E →+* ℂ) (Gm : Matrix (Fin r) (Fin r) E) (hG : ∀ a 
     · simp; ring
     · ring
 
-
 omit [IsCMField E] in
 lemma trace_re (Ψ : Finset (E →+* ℂ))
     (h : ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ) (z : E) :
@@ -320,8 +319,11 @@ lemma isTypeFn (H : Host E) (p q : ℕ) (Ψ : Finset (E →+* ℂ)) (hΨ : ∀ �
       intro h
       exact hτ (h ▸ (idx k).1.2)
 
-def allPer {Ψ : Finset (E →+* ℂ)} (Gm : Matrix (Fin r) (Fin r) E) (q : ℕ) (x : FD.Frame Ψ r) {g : ℕ}
-    (idx : Fin g ≃ Ψ × Fin r) : (Ψ → Fin r → ℂ) →ₗ[ℝ] (Fin g → ℂ) where
+def allPer
+    {Ψ : Finset (E →+* ℂ)}
+    (Gm : Matrix (Fin r) (Fin r) E) (q : ℕ) (x : FD.Frame Ψ r)
+    {g : ℕ} (idx : Fin g ≃ Ψ × Fin r)
+    : (Ψ → Fin r → ℂ) →ₗ[ℝ] (Fin g → ℂ) where
   toFun y k := locPer (idx k).1.1 Gm q (FD.mat x (idx k).1) (y (idx k).1) (idx k).2
   map_add' u w := by funext k; simp
   map_smul' t u := by funext k; simp
@@ -366,21 +368,62 @@ lemma hermForm_block {ι : Type} [Fintype ι] [DecidableEq ι] {g : ℕ} (idx : 
     simp [hσ.symm]
   · simp
 
-theorem isPeriod_frame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (r : ℕ) (ξ : E) (Gm : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E)) (Ψ : Finset (E →+* ℂ)) (hΨ : ∀ τ, τ ∈ Ψ ↔ τ (H.rt : E) = H.rt0) (g : ℕ) (idx : Fin g ≃ Ψ × Fin r) (ty : Fin g → (E →+* ℂ)) (hty : ∀ k, ty k = if ((idx k).2 : ℕ) < D.q then ComplexEmbedding.conjugate (idx k).1.1 else (idx k).1.1), FD.cc ξ = -ξ → (∀ τ ∈ Ψ, 0 < (τ ξ).im) → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤ ∧ (∀ a b, FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧ ∀ x y, ((D.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * FD.herm Gm (φ x) (φ y))) → r = D.p + D.q → IsTypeFn H D.p D.q ty ∧ ∀ x ∈ FD.GG Ψ Gm D.q, (∃ P : D.La →+ (Fin g → ℂ), (∀ v k, P v k = if ((idx k).2 : ℕ) < D.q then FD.hermC (idx k).1.1 Gm (FD.col (FD.mat x (idx k).1) (idx k).2) (FD.Data.emb (idx k).1.1 (φ v)) else ((FD.mat x (idx k).1)⁻¹ *ᵥ FD.Data.emb (idx k).1.1 (φ v)) (idx k).2)) ∧ ∀ P : D.La →+ (Fin g → ℂ), (∀ v k, P v k = if ((idx k).2 : ℕ) < D.q then FD.hermC (idx k).1.1 Gm (FD.col (FD.mat x (idx k).1) (idx k).2) (FD.Data.emb (idx k).1.1 (φ v)) else ((FD.mat x (idx k).1)⁻¹ *ᵥ FD.Data.emb (idx k).1.1 (φ v)) (idx k).2) → IsPeriod D ty P := by
+theorem isPeriod_frame
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (r : ℕ)
+        (ξ : E) (Gm : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E))
+        (Ψ : Finset (E →+* ℂ)) (hΨ : ∀ τ, τ ∈ Ψ ↔ τ (H.rt : E) = H.rt0) (g : ℕ)
+        (idx : Fin g ≃ Ψ × Fin r) (ty : Fin g → (E →+* ℂ))
+        (hty : ∀ k,
+          ty k
+            = if ((idx k).2 : ℕ) < D.q then
+                ComplexEmbedding.conjugate (idx k).1.1
+              else
+                (idx k).1.1),
+      FD.cc ξ = -ξ → (∀ τ ∈ Ψ, 0 < (τ ξ).im)
+        → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤
+          ∧ (∀ a b, FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0
+          ∧ ∀ x y, ((D.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * FD.herm Gm (φ x) (φ y)))
+        → r = D.p + D.q
+        → IsTypeFn H D.p D.q ty
+          ∧ ∀ x ∈ FD.GG Ψ Gm D.q,
+            (∃ P : D.La →+ (Fin g → ℂ),
+                (∀ v k,
+                  P v k
+                    = if ((idx k).2 : ℕ) < D.q then
+                        FD.hermC (idx k).1.1 Gm (FD.col (FD.mat x (idx k).1) (idx k).2)
+                          (FD.Data.emb (idx k).1.1 (φ v))
+                      else
+                        ((FD.mat x (idx k).1)⁻¹ *ᵥ FD.Data.emb (idx k).1.1 (φ v)) (idx k).2))
+              ∧ ∀ P : D.La →+ (Fin g → ℂ),
+                (∀ v k,
+                    P v k
+                      = if ((idx k).2 : ℕ) < D.q then
+                          FD.hermC (idx k).1.1 Gm (FD.col (FD.mat x (idx k).1) (idx k).2)
+                            (FD.Data.emb (idx k).1.1 (φ v))
+                        else
+                          ((FD.mat x (idx k).1)⁻¹ *ᵥ FD.Data.emb (idx k).1.1 (φ v)) (idx k).2)
+                  → IsPeriod D ty P := by
   classical
   intro E _ _ _ H D r ξ Gm φ Ψ hΨ g idx ty hty hξ hpos ⟨hφ, hspan, hG, _, hEF⟩ hr
   refine ⟨isTypeFn H _ _ Ψ hΨ g idx ty hty hr, fun x hx => ?_⟩
   have hcm := cmType H Ψ hΨ
   have hloc := fun τ : Ψ => exists_loc τ.1 Gm hG D.q (FD.mat x τ) (hx τ).1 (hx τ).2
-  refine ⟨⟨((allPer Gm D.q x idx).toAddMonoidHom.comp
-    (CMLattice.embAll Ψ r).toAddMonoidHom).comp φ.toAddMonoidHom, fun v k => rfl⟩, fun P hP => ?_⟩
+  refine ⟨
+    ⟨
+      ((allPer Gm D.q x idx).toAddMonoidHom.comp (CMLattice.embAll Ψ r).toAddMonoidHom).comp
+        φ.toAddMonoidHom,
+      fun v k => rfl
+    ⟩,
+    fun P hP => ?_
+  ⟩
   have hP' : ∀ v, P v = allPer Gm D.q x idx (CMLattice.embAll Ψ r (φ v)) := fun v =>
     funext fun k => hP v k
   let L := LinearEquiv.ofBijective _ (allPer_bijective Gm D.q x idx fun τ => (hloc τ).1)
   have hL : ∀ y, L y = allPer Gm D.q x idx y := fun _ => rfl
   have := D.fin
-  obtain ⟨b, hb⟩ := CMLattice.exists_basis_of_cmType Ψ hcm r (LinearMap.range φ)
-    (Module.Finite.iff_fg.1 inferInstance) (by rw [LinearMap.coe_range]; exact hspan)
+  obtain ⟨b, hb⟩ :=
+    CMLattice.exists_basis_of_cmType Ψ hcm r (LinearMap.range φ)
+      (Module.Finite.iff_fg.1 inferInstance) (by rw [LinearMap.coe_range]; exact hspan)
   have hrange : ∀ z, z ∈ Set.range P ↔ z ∈ Submodule.span ℤ (Set.range (b.map L)) := by
     intro z
     have h1 : Set.range (b.map L) = (L.toLinearMap.restrictScalars ℤ) '' Set.range b := by
@@ -394,8 +437,9 @@ theorem isPeriod_frame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] 
       exact ⟨v, hP' v⟩
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro a v k
-    have h1 : FD.Data.emb (idx k).1.1 (φ (a • v)) =
-        (idx k).1.1 (a : E) • FD.Data.emb (idx k).1.1 (φ v) := by
+    have h1
+        : FD.Data.emb (idx k).1.1 (φ (a • v))
+          = (idx k).1.1 (a : E) • FD.Data.emb (idx k).1.1 (φ v) := by
       funext j
       simp [FD.Data.emb, Algebra.smul_def]
     rw [hP, hP, hty, h1]
@@ -420,8 +464,16 @@ theorem isPeriod_frame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] 
   · rw [eq_top_iff, ← (b.map L).span_eq]
     exact Submodule.span_mono fun z hz => (hrange z).2 (Submodule.subset_span hz)
   · choose Hl hH hp hI using fun τ => (hloc τ).2
-    refine ⟨Matrix.of fun k l => if (idx k).1 = (idx l).1 then
-      ((2 * ((idx k).1.1 ξ).im : ℝ) : ℂ) * Hl (idx k).1 (idx k).2 (idx l).2 else 0, ?_, ?_, ?_⟩
+    refine ⟨
+      Matrix.of fun k l =>
+        if (idx k).1 = (idx l).1 then
+          ((2 * ((idx k).1.1 ξ).im : ℝ) : ℂ) * Hl (idx k).1 (idx k).2 (idx l).2
+        else
+          0,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · ext k l
       simp only [conjTranspose_apply, of_apply]
       by_cases h : (idx k).1 = (idx l).1
@@ -433,7 +485,8 @@ theorem isPeriod_frame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] 
       rw [hermForm_block idx (fun τ : Ψ => 2 * (τ.1 ξ).im) Hl, Complex.re_sum]
       simp only [Complex.re_ofReal_mul]
       obtain ⟨k, hk⟩ := Function.ne_iff.1 hz
-      refine Finset.sum_pos' (fun τ _ => mul_nonneg (by linarith [hpos τ.1 τ.2]) ?_)
+      refine Finset.sum_pos'
+        (fun τ _ => mul_nonneg (by linarith [hpos τ.1 τ.2]) ?_)
         ⟨(idx k).1, Finset.mem_univ _, mul_pos (by linarith [hpos _ (idx k).1.2]) (hp _ _ ?_)⟩
       · by_cases h : (fun a => z (idx.symm (τ, a))) = 0
         · rw [h]; simp [hermForm]
@@ -443,8 +496,8 @@ theorem isPeriod_frame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] 
         simpa using congrFun h (idx k).2
     · intro v w
       rw [hermForm_block idx (fun τ : Ψ => 2 * (τ.1 ξ).im) Hl, Complex.im_sum, hP', hP']
-      have h1 : ((D.EF v w : ℤ) : ℝ) =
-          ((Algebra.trace ℚ E (ξ * FD.herm Gm (φ v) (φ w)) : ℚ) : ℝ) := by
+      have h1
+          : ((D.EF v w : ℤ) : ℝ) = ((Algebra.trace ℚ E (ξ * FD.herm Gm (φ v) (φ w)) : ℚ) : ℝ) := by
         rw [← hEF]; simp
       rw [h1, trace_re Ψ hcm]
       refine Finset.sum_congr rfl fun τ _ => ?_

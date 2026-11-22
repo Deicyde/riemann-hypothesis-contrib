@@ -6,13 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Loc.PK
 
-theorem UpperTheory.ncard_unit_translates_order_eq_relIndex :
-    ∀ (O K : Type) [CommRing O] [Field K] [Algebra O K] (τ : K) (a : (Etau K τ)ˣ) (y : Etau K τ), {S : Set (Etau K τ) | ∃ u ∈ Gu O τ, S = PS.ml (a * u) (Ord O y)}.ncard = (Hu O y).relIndex (Gu O τ) := by
+theorem UpperTheory.ncard_unit_translates_order_eq_relIndex
+    : ∀ (O K : Type) [CommRing O] [Field K] [Algebra O K] (τ : K) (a : (Etau K τ)ˣ) (y : Etau K τ),
+      {S : Set (Etau K τ) | ∃ u ∈ Gu O τ, S = PS.ml (a * u) (Ord O y)}.ncard
+        = (Hu O y).relIndex (Gu O τ) := by
   intro O K _ _ _ τ a y
   set G := Gu O τ
   set H := (Hu O y).subgroupOf G
-  have key : ∀ g₁ g₂ : G, PS.ml (a * (g₁ : (Etau K τ)ˣ)) (PK.Ord O y) =
-      PS.ml (a * (g₂ : (Etau K τ)ˣ)) (PK.Ord O y) ↔ g₁⁻¹ * g₂ ∈ H := by
+  have key
+      : ∀ g₁ g₂ : G,
+        PS.ml (a * (g₁ : (Etau K τ)ˣ)) (PK.Ord O y) = PS.ml (a * (g₂ : (Etau K τ)ˣ)) (PK.Ord O y)
+          ↔ g₁⁻¹ * g₂ ∈ H := by
     intro g₁ g₂
     rw [Subgroup.mem_subgroupOf]
     show _ ↔ PS.ml (((g₁⁻¹ * g₂ : G)) : (Etau K τ)ˣ) (PK.Ord O y) = PK.Ord O y
@@ -24,7 +28,8 @@ theorem UpperTheory.ncard_unit_translates_order_eq_relIndex :
       conv_lhs => rw [← h]
       rw [← PS.ml_mul, mul_inv_cancel, PS.ml_one]
   let f : G ⧸ H → Set (Etau K τ) :=
-    Quotient.lift (fun g : G => PS.ml (a * (g : (Etau K τ)ˣ)) (PK.Ord O y))
+    Quotient.lift
+      (fun g : G => PS.ml (a * (g : (Etau K τ)ˣ)) (PK.Ord O y))
       (fun g₁ g₂ hg => (key g₁ g₂).2 (QuotientGroup.leftRel_apply.1 hg))
   have hf : Function.Injective f := by
     intro q₁ q₂ hq

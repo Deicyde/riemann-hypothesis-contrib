@@ -9,15 +9,15 @@ open GlobalTheory.NeedB Polynomial
 
 namespace GlobalTheory
 
-theorem exists_ne_zero_common_zero_of_constantCoeff_eq_zero :
-    ∀ (k : Type) [Field k] [IsAlgClosed k] (n r : ℕ) (f : Fin r → MvPolynomial (Fin n) k),
-      (∀ i, MvPolynomial.constantCoeff (f i) = 0) → r < n →
-        ∃ x : Fin n → k, x ≠ 0 ∧ ∀ i, MvPolynomial.eval x (f i) = 0 := by
+theorem exists_ne_zero_common_zero_of_constantCoeff_eq_zero
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (n r : ℕ) (f : Fin r → MvPolynomial (Fin n) k),
+      (∀ i, MvPolynomial.constantCoeff (f i) = 0) → r < n
+        → ∃ x : Fin n → k, x ≠ 0 ∧ ∀ i, MvPolynomial.eval x (f i) = 0 := by
   intro k _ _ n r f hf hrn
   classical
   set m : Ideal (MvPolynomial (Fin n) k) := RingHom.ker (MvPolynomial.eval (0 : Fin n → k)) with hm
-  have hsurj : Function.Surjective (MvPolynomial.eval (0 : Fin n → k)) :=
-    fun c => ⟨MvPolynomial.C c, by simp⟩
+  have hsurj : Function.Surjective (MvPolynomial.eval (0 : Fin n → k)) := fun c =>
+    ⟨MvPolynomial.C c, by simp⟩
   haveI hmax : m.IsMaximal := RingHom.ker_isMaximal_of_surjective _ hsurj
   set I : Ideal (MvPolynomial (Fin n) k) := Ideal.span ((Finset.univ.image f : Finset _) : Set (MvPolynomial (Fin n) k)) with hI
   have hIm : I ≤ m := by

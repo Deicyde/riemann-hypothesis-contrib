@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EndValuedFor
 
 @[expose] public section
 
-open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.GoodTop
+open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
+  GlobalTheory.GoodMetric GlobalTheory.GoodTop
 open ReciprocityTheory.L2DbarEstimates (V)
 open scoped ContDiff Matrix
 
@@ -19,7 +21,6 @@ private lemma mem_offHyp_iff {n : ℕ} {S : Finset (Fin n)}
     v ∈ _root_.GlobalTheory.GoodTop.offHyp S U ↔ v ∈ U ∧ ∀ a ∈ S, v.ofLp a ≠ 0 := by
   unfold _root_.GlobalTheory.GoodTop.offHyp
   exact Iff.rfl
-
 
 open MeasureTheory Filter Topology in
 open scoped ContDiff Matrix in

@@ -10,12 +10,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeightDivisi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Indef.Tree NumberField GlobalTheory.MeanTop
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Indef.Tree
+  NumberField GlobalTheory.MeanTop
 
 namespace GlobalTheory.MeanTop.DividedSlope
 
-theorem strictAnti_of_adj {N : ℕ} (v : Fin N → ℝ)
-    (h : ∀ a b : Fin N, (b : ℕ) = a + 1 → v b < v a) : ∀ a b : Fin N, a < b → v b < v a := by
+theorem strictAnti_of_adj {N : ℕ} (v : Fin N → ℝ) (h : ∀ a b : Fin N, (b : ℕ) = a + 1 → v b < v a)
+    : ∀ a b : Fin N, a < b → v b < v a := by
   intro a b hab
   obtain ⟨b, hb⟩ := b
   have hab' : (a : ℕ) < b := hab
@@ -56,8 +57,9 @@ theorem g_le_of (hW : W.Hyp) {x : ℤ} (hx : W.h0 ≤ 4 * W.T * x) : W.g ≤ (x 
   rw [div_le_iff₀ (by positivity)]
   linarith
 
-theorem adj_ge (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (b : ℕ) = a + 1) (hb : W.p ≤ (b : ℕ)) :
-    W.g ≤ reWt W.u' τ a - reWt W.u' τ b := by
+theorem adj_ge
+    (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (b : ℕ) = a + 1) (hb : W.p ≤ (b : ℕ))
+    : W.g ≤ reWt W.u' τ a - reWt W.u' τ b := by
   obtain ⟨-, h2, h3⟩ := GlobalTheory.T.dividedWeight_gaps_block_and_bar ι N W hW hD τ a b hab
   have hk := hW.kc_lt
   by_cases hp : (b : ℕ) = W.p
@@ -74,8 +76,8 @@ theorem adj_ge (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (b : �
     push_cast at this ⊢
     linarith
 
-theorem adj_lt (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (b : ℕ) = a + 1) :
-    reWt W.u' τ b < reWt W.u' τ a := by
+theorem adj_lt (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (b : ℕ) = a + 1)
+    : reWt W.u' τ b < reWt W.u' τ a := by
   by_cases hb : W.p ≤ (b : ℕ)
   · have := adj_ge W hW hD τ a b hab hb
     have := g_pos W hW
@@ -88,18 +90,18 @@ theorem adj_lt (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : (b : �
     simp only [reWt, Wts.u', ha, hb', if_true]
     exact_mod_cast h'
 
-theorem regular (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : a < b) :
-    reWt W.u' τ b < reWt W.u' τ a :=
+theorem regular (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : a < b)
+    : reWt W.u' τ b < reWt W.u' τ a :=
   strictAnti_of_adj _ (adj_lt W hW hD τ) a b hab
 
-theorem anti (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : a ≤ b) :
-    reWt W.u' τ b ≤ reWt W.u' τ a := by
+theorem anti (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (hab : a ≤ b)
+    : reWt W.u' τ b ≤ reWt W.u' τ a := by
   rcases hab.eq_or_lt with h | h
   · rw [h]
   · exact (regular W hW hD τ a b h).le
 
-theorem far (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (ha : W.p ≤ (a : ℕ)) (hab : a ≠ b) :
-    W.g ≤ |reWt W.u' τ a - reWt W.u' τ b| := by
+theorem far (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (ha : W.p ≤ (a : ℕ)) (hab : a ≠ b)
+    : W.g ≤ |reWt W.u' τ a - reWt W.u' τ b| := by
   have hk := hW.kc_lt
   rcases lt_or_gt_of_ne hab with h | h
   · have h' : (a : ℕ) < b := h
@@ -113,13 +115,14 @@ theorem far (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (a b : Fin N) (ha : W.p ≤ (a
     have h2 := anti W hW hD τ b ⟨a - 1, by omega⟩ (show (b : ℕ) ≤ a - 1 by omega)
     exact le_trans (by linarith) (neg_le_abs _)
 
-theorem entry_le (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (i : Fin N) :
-    |reWt W.u' τ i| ≤ 2 * W.b / W.T := by
+theorem entry_le (hW : W.Hyp) (hD : W.IsDiv) (τ : ι) (i : Fin N)
+    : |reWt W.u' τ i| ≤ 2 * W.b / W.T := by
   have hT := T_pos W hW
   have h1 := (GlobalTheory.MeanTop.divided_entries ι N W hW hD τ i).1
   have h2 := (GlobalTheory.T.weight_division_l1_bound ι N W hW hD).2.2 τ i
   have h3 := hW.h5 τ i
-  have h1' : ((W.T : ℝ) + W.Dd + 1) * |(W.u1 τ i : ℝ)| ≤ |(W.u τ i : ℝ)| + W.c0 + 4 * N := by exact_mod_cast h1
+  have h1' : ((W.T : ℝ) + W.Dd + 1) * |(W.u1 τ i : ℝ)| ≤ |(W.u τ i : ℝ)| + W.c0 + 4 * N := by
+    exact_mod_cast h1
   have h2' : |(W.u' τ i : ℝ)| ≤ |(W.u1 τ i : ℝ)| := by exact_mod_cast h2
   have h4 : (0 : ℝ) ≤ W.Dd := Nat.cast_nonneg _
   have h5 := abs_nonneg (W.u1 τ i : ℝ)

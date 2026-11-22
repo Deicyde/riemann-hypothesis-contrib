@@ -14,31 +14,34 @@ namespace ReciprocityTheory.ChartRestriction.L1
 theorem rootPoly_monic' {E : Type} [Field E] (xs : Finset E) : (rootPoly xs).Monic :=
   monic_prod_of_monic _ _ fun x _ => monic_X_sub_C x
 
-theorem rootPoly_inter_mul_sdiff {E : Type} [Field E] (xs ys : Finset E) :
-    rootPoly (xs ∩ ys) * rootPoly (xs \ ys) = rootPoly xs := by
+theorem rootPoly_inter_mul_sdiff {E : Type} [Field E] (xs ys : Finset E)
+    : rootPoly (xs ∩ ys) * rootPoly (xs \ ys) = rootPoly xs := by
   unfold rootPoly
   rw [← Finset.prod_union (Finset.disjoint_sdiff_inter xs ys).symm, Finset.union_comm,
     Finset.sdiff_union_inter]
 
-theorem rootPoly_isCoprime_of_disjoint {E : Type} [Field E] (xs ys : Finset E) (h : Disjoint xs ys) :
-    IsCoprime (rootPoly xs) (rootPoly ys) := by
+theorem rootPoly_isCoprime_of_disjoint {E : Type} [Field E] (xs ys : Finset E) (h : Disjoint xs ys)
+    : IsCoprime (rootPoly xs) (rootPoly ys) := by
   unfold rootPoly
   refine IsCoprime.prod_left fun x hx => IsCoprime.prod_right fun y hy => ?_
   refine isCoprime_X_sub_C_of_isUnit_sub ?_
   have hne : x ≠ y := fun e => Finset.disjoint_left.1 h hx (e ▸ hy)
   exact (sub_ne_zero.2 hne).isUnit
 
-theorem exists_poly_map_subfield {E : Type} [Field E] [DecidableEq E] (k : Subfield E) (P : E[X])
-    (h : ∀ i, P.coeff i ∈ k) : ∃ p : (k)[X], p.map k.subtype = P := by
+theorem exists_poly_map_subfield
+    {E : Type} [Field E] [DecidableEq E] (k : Subfield E) (P : E[X]) (h : ∀ i, P.coeff i ∈ k)
+    : ∃ p : (k)[X], p.map k.subtype = P := by
   have : P ∈ Polynomial.lifts k.subtype := by
     rw [Polynomial.lifts_iff_coeff_lifts]
     intro n
     exact ⟨⟨_, h n⟩, rfl⟩
   exact this
 
-theorem rootPoly_inter_mem {E : Type} [Field E] (k : Subfield E) (xs ys : Finset E)
-    (hx : ∀ i, (rootPoly xs).coeff i ∈ k) (hy : ∀ i, (rootPoly ys).coeff i ∈ k) :
-    ∀ i, (rootPoly (xs ∩ ys)).coeff i ∈ k := by
+theorem rootPoly_inter_mem
+    {E : Type} [Field E]
+    (k : Subfield E) (xs ys : Finset E)
+    (hx : ∀ i, (rootPoly xs).coeff i ∈ k) (hy : ∀ i, (rootPoly ys).coeff i ∈ k)
+    : ∀ i, (rootPoly (xs ∩ ys)).coeff i ∈ k := by
   obtain ⟨p, hp⟩ := exists_poly_map_subfield k _ hx
   obtain ⟨q, hq⟩ := exists_poly_map_subfield k _ hy
   set R := rootPoly (xs ∩ ys) with hR

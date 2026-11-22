@@ -9,25 +9,29 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open Module Submodule
 
-theorem gtE_bound (m lam A Bt N : ℝ) (hm : 0 ≤ m) (hlam : 0 < lam) (hA0 : 0 ≤ A)
-    (hA : A ≤ m ^ 2 / lam) (hB0 : 0 ≤ Bt) (hBt : Bt ≤ 1 / 2) (hN0 : 0 ≤ N)
-    (hN : N ≤ (m + 1) / lam) : A ^ 2 + (Bt * N) ^ 2 ≤ ((m + 1) ^ 2 / lam) ^ 2 := by
+theorem gtE_bound
+    (m lam A Bt N : ℝ) (hm : 0 ≤ m) (hlam : 0 < lam) (hA0 : 0 ≤ A) (hA : A ≤ m ^ 2 / lam)
+    (hB0 : 0 ≤ Bt) (hBt : Bt ≤ 1 / 2) (hN0 : 0 ≤ N) (hN : N ≤ (m + 1) / lam)
+    : A ^ 2 + (Bt * N) ^ 2 ≤ ((m + 1) ^ 2 / lam) ^ 2 := by
   have hA' : A * lam ≤ m ^ 2 := by rwa [le_div_iff₀ hlam] at hA
   have hN' : N * lam ≤ m + 1 := by rwa [le_div_iff₀ hlam] at hN
   have h1 : (A * lam) ^ 2 ≤ (m ^ 2) ^ 2 := pow_le_pow_left₀ (by positivity) hA' 2
-  have hBN : Bt * (N * lam) ≤ 1 / 2 * (m + 1) :=
-    mul_le_mul hBt hN' (by positivity) (by norm_num)
-  have h2 : (Bt * (N * lam)) ^ 2 ≤ (1 / 2 * (m + 1)) ^ 2 :=
-    pow_le_pow_left₀ (by positivity) hBN 2
+  have hBN : Bt * (N * lam) ≤ 1 / 2 * (m + 1) := mul_le_mul hBt hN' (by positivity) (by norm_num)
+  have h2 : (Bt * (N * lam)) ^ 2 ≤ (1 / 2 * (m + 1)) ^ 2 := pow_le_pow_left₀ (by positivity) hBN 2
   have h3 : (m ^ 2) ^ 2 + (1 / 2 * (m + 1)) ^ 2 ≤ ((m + 1) ^ 2) ^ 2 := by
     nlinarith [pow_nonneg hm 3, sq_nonneg m, hm]
   rw [div_pow, le_div_iff₀ (by positivity)]
-  calc (A ^ 2 + (Bt * N) ^ 2) * lam ^ 2 = (A * lam) ^ 2 + (Bt * (N * lam)) ^ 2 := by ring
+  calc
+    (A ^ 2 + (Bt * N) ^ 2) * lam ^ 2
+      = (A * lam) ^ 2 + (Bt * (N * lam)) ^ 2 := by ring
     _ ≤ ((m + 1) ^ 2) ^ 2 := by linarith
 
-private theorem exists_int_inner_of_mem_span_int' {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    {k : ℕ} (b : Fin k → E) (y : E) (h : ∀ j, ∃ m : ℤ, inner ℝ y (b j) = m) (v : E)
-    (hv : v ∈ span ℤ (Set.range b)) : ∃ m : ℤ, inner ℝ y v = m := by
+private theorem exists_int_inner_of_mem_span_int'
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    {k : ℕ} (b : Fin k → E)
+    (y : E) (h : ∀ j, ∃ m : ℤ, inner ℝ y (b j) = m)
+    (v : E) (hv : v ∈ span ℤ (Set.range b))
+    : ∃ m : ℤ, inner ℝ y v = m := by
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).mp hv
   choose f hf using h
   refine ⟨∑ j, c j * f j, ?_⟩
@@ -36,15 +40,17 @@ private theorem exists_int_inner_of_mem_span_int' {E : Type*} [NormedAddCommGrou
   refine Finset.sum_congr rfl fun j _ ↦ ?_
   rw [← Int.cast_smul_eq_zsmul ℝ, real_inner_smul_right, hf j]
 
-theorem gtE_main (n : ℕ) : ∀ (b : Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin n))) (lam : ℝ), 0 < lam →
-    (∀ x ∈ span ℤ (Set.range b), x ≠ 0 → lam ≤ ‖x‖) →
-    ∃ y : Fin n → EuclideanSpace ℝ (Fin n), LinearIndependent ℝ y ∧
-      (∀ i j, ∃ m : ℤ, inner ℝ (y i) (b j) = m) ∧ ∀ i, ‖y i‖ ≤ (n : ℝ) ^ 2 / lam := by
+theorem gtE_main (n : ℕ)
+    : ∀ (b : Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin n))) (lam : ℝ),
+      0 < lam → (∀ x ∈ span ℤ (Set.range b), x ≠ 0 → lam ≤ ‖x‖)
+        → ∃ y : Fin n → EuclideanSpace ℝ (Fin n),
+          LinearIndependent ℝ y ∧ (∀ i j, ∃ m : ℤ, inner ℝ (y i) (b j) = m)
+            ∧ ∀ i, ‖y i‖ ≤ (n : ℝ) ^ 2 / lam := by
   induction n with
   | zero =>
     intro b lam hlam hmin
-    exact ⟨fun i ↦ Fin.elim0 i, linearIndependent_empty_type, fun i ↦ Fin.elim0 i,
-      fun i ↦ Fin.elim0 i⟩
+    exact
+      ⟨fun i ↦ Fin.elim0 i, linearIndependent_empty_type, fun i ↦ Fin.elim0 i, fun i ↦ Fin.elim0 i⟩
   | succ m ih =>
     intro b lam hlam hmin
     classical
@@ -74,11 +80,12 @@ theorem gtE_main (n : ℕ) : ∀ (b : Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin
         rw [map_zsmul, hbE, LinearIsometryEquiv.symm_apply_apply]
     have hminE : ∀ x ∈ span ℤ (Set.range bE), x ≠ 0 → lam ≤ ‖x‖ := by
       intro x hx hx0
-      have h1 := hmin _ (hWL _ (hspanφ' x hx)) (by
-        intro h
-        apply hx0
-        have h2 : φ.symm x = 0 := Subtype.ext h
-        simpa using congrArg φ h2)
+      have h1 :=
+        hmin _ (hWL _ (hspanφ' x hx)) (by
+          intro h
+          apply hx0
+          have h2 : φ.symm x = 0 := Subtype.ext h
+          simpa using congrArg φ h2)
       exact h1.trans (le_of_eq (φ.symm.norm_map x))
     obtain ⟨z, hzli, hzint, hzn⟩ := ih bE lam hlam hminE
     set w : Fin m → EuclideanSpace ℝ (Fin (m + 1)) :=
@@ -87,8 +94,8 @@ theorem gtE_main (n : ℕ) : ∀ (b : Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin
       Submodule.mem_orthogonal_singleton_iff_inner_right.mp (φ.symm (z i)).2
     have hwn : ∀ i, ‖w i‖ = ‖z i‖ := fun i ↦ φ.symm.norm_map (z i)
     have hwli : LinearIndependent ℝ w :=
-      (hzli.map' φ.symm.toLinearEquiv.toLinearMap φ.symm.toLinearEquiv.ker).map'
-        (ℝ ∙ y0)ᗮ.subtype (Submodule.ker_subtype _)
+      (hzli.map' φ.symm.toLinearEquiv.toLinearMap φ.symm.toLinearEquiv.ker).map' (ℝ ∙ y0)ᗮ.subtype
+        (Submodule.ker_subtype _)
     set u : Fin m → EuclideanSpace ℝ (Fin (m + 1)) :=
       fun i ↦ w i - (inner ℝ (w i) xu - round (inner ℝ (w i) xu)) • y0 with hu
     refine ⟨Fin.cons y0 u, ?_, ?_, ?_⟩
@@ -96,17 +103,23 @@ theorem gtE_main (n : ℕ) : ∀ (b : Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin
       intro g hg
       rw [Fin.sum_univ_succ] at hg
       simp only [Fin.cons_zero, Fin.cons_succ] at hg
-      have hexp : ∑ i : Fin m, g i.succ • u i = ∑ i : Fin m, g i.succ • w i -
-          (∑ i : Fin m, g i.succ * (inner ℝ (w i) xu - round (inner ℝ (w i) xu))) • y0 := by
+      have hexp
+          : ∑ i : Fin m, g i.succ • u i
+            = ∑ i : Fin m, g i.succ • w i
+              - (∑ i : Fin m, g i.succ * (inner ℝ (w i) xu - round (inner ℝ (w i) xu))) • y0 := by
         simp only [hu, smul_sub, Finset.sum_sub_distrib, smul_smul, Finset.sum_smul]
       rw [hexp] at hg
       have hin := congrArg (fun v ↦ inner ℝ y0 v) hg
-      simp only [inner_add_right, inner_sub_right, inner_sum, real_inner_smul_right, hwy0,
-        mul_zero, Finset.sum_const_zero, inner_zero_right, real_inner_self_eq_norm_sq] at hin
+      simp only [inner_add_right, inner_sub_right, inner_sum, real_inner_smul_right, hwy0, mul_zero,
+          Finset.sum_const_zero, inner_zero_right, real_inner_self_eq_norm_sq]
+        at hin
       have hy0sq : ‖y0‖ ^ 2 ≠ 0 := pow_ne_zero 2 (norm_ne_zero_iff.mpr hy0)
       have hg0 : g 0 = ∑ i : Fin m, g i.succ * (inner ℝ (w i) xu - round (inner ℝ (w i) xu)) := by
-        have h3 : (g 0 - ∑ i : Fin m, g i.succ * (inner ℝ (w i) xu - round (inner ℝ (w i) xu))) *
-            ‖y0‖ ^ 2 = 0 := by linear_combination hin
+        have h3
+            : (g 0 - ∑ i : Fin m, g i.succ * (inner ℝ (w i) xu - round (inner ℝ (w i) xu)))
+                * ‖y0‖ ^ 2
+              = 0 := by
+          linear_combination hin
         rcases mul_eq_zero.mp h3 with h | h
         · linarith
         · exact absurd h hy0sq
@@ -137,8 +150,10 @@ theorem gtE_main (n : ℕ) : ∀ (b : Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin
         have h1 : inner ℝ (w k) (b j) = mp + k0 * inner ℝ (w k) xu := by
           conv_lhs => rw [hb]
           rw [inner_add_right, real_inner_smul_right, hk0, hwp, hmp]
-        have h2 : inner ℝ (u k) (b j) = inner ℝ (w k) (b j) -
-            (inner ℝ (w k) xu - round (inner ℝ (w k) xu)) * inner ℝ y0 (b j) := by
+        have h2
+            : inner ℝ (u k) (b j)
+              = inner ℝ (w k) (b j)
+                - (inner ℝ (w k) xu - round (inner ℝ (w k) xu)) * inner ℝ y0 (b j) := by
           simp only [hu, inner_sub_left, real_inner_smul_left]
         rw [h2, h1, hk0]
         push_cast
@@ -148,15 +163,18 @@ theorem gtE_main (n : ℕ) : ∀ (b : Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin
       cases i using Fin.cases with
       | zero =>
         simp only [Fin.cons_zero]
-        calc ‖y0‖ ≤ ‖y1‖ := hy0n
+        calc
+          ‖y0‖
+            ≤ ‖y1‖ := hy0n
           _ ≤ ((m + 1 : ℕ) : ℝ) / lam := hy1n
           _ ≤ ((m + 1 : ℕ) : ℝ) ^ 2 / lam := by gcongr; exact le_self_pow₀ h1 two_ne_zero
       | succ k =>
         simp only [Fin.cons_succ]
         have hc' : |inner ℝ (w k) xu - round (inner ℝ (w k) xu)| ≤ 1 / 2 := abs_sub_round _
         have hwy0' : inner ℝ (w k) y0 = 0 := by rw [real_inner_comm]; exact hwy0 k
-        have hsq : ‖u k‖ ^ 2 = ‖w k‖ ^ 2 +
-            (|inner ℝ (w k) xu - round (inner ℝ (w k) xu)| * ‖y0‖) ^ 2 := by
+        have hsq
+            : ‖u k‖ ^ 2
+              = ‖w k‖ ^ 2 + (|inner ℝ (w k) xu - round (inner ℝ (w k) xu)| * ‖y0‖) ^ 2 := by
           simp only [hu]
           rw [norm_sub_sq_real, real_inner_smul_right, hwy0', norm_smul, Real.norm_eq_abs]
           ring
@@ -164,18 +182,20 @@ theorem gtE_main (n : ℕ) : ∀ (b : Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin
         have hN : ‖y0‖ ≤ ((m : ℝ) + 1) / lam := by
           have := hy0n.trans hy1n
           simpa using this
-        have hbd := gtE_bound m lam ‖w k‖ _ ‖y0‖ (Nat.cast_nonneg m) hlam (norm_nonneg _) hA
-          (abs_nonneg _) hc' (norm_nonneg _) hN
+        have hbd :=
+          gtE_bound m lam ‖w k‖ _ ‖y0‖ (Nat.cast_nonneg m) hlam (norm_nonneg _) hA (abs_nonneg _)
+            hc' (norm_nonneg _) hN
         rw [← hsq] at hbd
         have h5 : ‖u k‖ ≤ ((m : ℝ) + 1) ^ 2 / lam :=
           (pow_le_pow_iff_left₀ (norm_nonneg _) (by positivity) two_ne_zero).mp hbd
         simpa using h5
 
-theorem transference_dual {n : ℕ} (b : Module.Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin n)))
-    (lam : ℝ) (hlam : 0 < lam)
-    (hmin : ∀ x ∈ Submodule.span ℤ (Set.range b), x ≠ 0 → lam ≤ ‖x‖) :
-    ∃ y : Fin n → EuclideanSpace ℝ (Fin n), LinearIndependent ℝ y ∧
-      (∀ i j, ∃ m : ℤ, inner ℝ (y i) (b j) = m) ∧ ∀ i, ‖y i‖ ≤ (n : ℝ) ^ 2 / lam :=
+theorem transference_dual
+    {n : ℕ} (b : Module.Basis (Fin n) ℝ (EuclideanSpace ℝ (Fin n)))
+    (lam : ℝ) (hlam : 0 < lam) (hmin : ∀ x ∈ Submodule.span ℤ (Set.range b), x ≠ 0 → lam ≤ ‖x‖)
+    : ∃ y : Fin n → EuclideanSpace ℝ (Fin n),
+      LinearIndependent ℝ y ∧ (∀ i j, ∃ m : ℤ, inner ℝ (y i) (b j) = m)
+        ∧ ∀ i, ‖y i‖ ≤ (n : ℝ) ^ 2 / lam :=
   gtE_main n b lam hlam hmin
 
 end ReciprocityTheory.ChartRestriction.G.T0

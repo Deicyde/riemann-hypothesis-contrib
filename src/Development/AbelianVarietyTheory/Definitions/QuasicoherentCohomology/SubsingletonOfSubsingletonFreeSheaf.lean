@@ -12,27 +12,28 @@ noncomputable section
 
 namespace GlobalTheory.SiteCoh
 
-variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C)
-  [HasSheafify J AddCommGrpCat.{v}]
+variable
+  {C : Type u} [Category.{v} C] (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}]
 
 abbrev freeSheaf : C ⥤ Sheaf J AddCommGrpCat.{v} :=
   yoneda ⋙ (Functor.whiskeringRight _ _ _).obj AddCommGrpCat.free ⋙ presheafToSheaf _ _
 
 variable {J}
 
-def freeSheafHomEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v}) :
-    ((freeSheaf J).obj U ⟶ F) ≃+ F.obj.obj (op U) where
-  toEquiv := ((sheafificationAdjunction J AddCommGrpCat.{v}).homEquiv _ F).trans
-    (((AddCommGrpCat.adj.whiskerRight Cᵒᵖ).homEquiv (yoneda.obj U) F.obj).trans yonedaEquiv)
+def freeSheafHomEquiv (U : C) (F : Sheaf J AddCommGrpCat.{v})
+    : ((freeSheaf J).obj U ⟶ F) ≃+ F.obj.obj (op U) where
+  toEquiv :=
+    ((sheafificationAdjunction J AddCommGrpCat.{v}).homEquiv _ F).trans
+      (((AddCommGrpCat.adj.whiskerRight Cᵒᵖ).homEquiv (yoneda.obj U) F.obj).trans yonedaEquiv)
   map_add' _ _ := rfl
 
 lemma freeSheafHomEquiv_comp (U : C) {F G : Sheaf J AddCommGrpCat.{v}}
     (φ : (freeSheaf J).obj U ⟶ F) (f : F ⟶ G) :
     freeSheafHomEquiv U G (φ ≫ f) = f.hom.app (op U) (freeSheafHomEquiv U F φ) := rfl
 
-def freePresheafIsoConst {T : C} (hT : IsTerminal T) :
-    yoneda.obj T ⋙ AddCommGrpCat.free.{v} ≅
-      (Functor.const Cᵒᵖ).obj (AddCommGrpCat.of (ULift.{v} ℤ)) :=
+def freePresheafIsoConst {T : C} (hT : IsTerminal T)
+    : yoneda.obj T ⋙ AddCommGrpCat.free.{v}
+      ≅ (Functor.const Cᵒᵖ).obj (AddCommGrpCat.of (ULift.{v} ℤ)) :=
   NatIso.ofComponents
     (fun V ↦
       letI : Unique (V.unop ⟶ T) := ⟨⟨hT.from _⟩, fun _ ↦ hT.hom_ext _ _⟩
@@ -43,36 +44,34 @@ def freePresheafIsoConst {T : C} (hT : IsTerminal T) :
       intro x
       rfl)
 
-def freeSheafIsoConst {T : C} (hT : IsTerminal T) :
-    (freeSheaf J).obj T ≅ (constantSheaf J AddCommGrpCat.{v}).obj (AddCommGrpCat.of (ULift ℤ)) :=
+def freeSheafIsoConst {T : C} (hT : IsTerminal T)
+    : (freeSheaf J).obj T ≅ (constantSheaf J AddCommGrpCat.{v}).obj (AddCommGrpCat.of (ULift ℤ)) :=
   (presheafToSheaf J _).mapIso (freePresheafIsoConst hT)
 
 variable [HasExt.{w} (Sheaf J AddCommGrpCat.{v})]
 
-def extEquiv (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) (U : C) :
-    F.H' n U ≃+ Ext.{w} ((freeSheaf J).obj U) F n :=
+def extEquiv (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) (U : C)
+    : F.H' n U ≃+ Ext.{w} ((freeSheaf J).obj U) F n :=
   AddEquiv.refl _
 
-abbrev map {F G : Sheaf J AddCommGrpCat.{v}} (f : F ⟶ G) (n : ℕ) (U : C) :
-    F.H' n U ⟶ G.H' n U :=
+abbrev map {F G : Sheaf J AddCommGrpCat.{v}} (f : F ⟶ G) (n : ℕ) (U : C) : F.H' n U ⟶ G.H' n U :=
   ((Sheaf.cohomologyPresheafFunctor J n).map f).app (op U)
 
-abbrev res (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {U V : C} (i : V ⟶ U) :
-    F.H' n U ⟶ F.H' n V :=
+abbrev res (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {U V : C} (i : V ⟶ U) : F.H' n U ⟶ F.H' n V :=
   (F.cohomologyPresheaf n).map i.op
 
 lemma extEquiv_map {F G : Sheaf J AddCommGrpCat.{v}} (f : F ⟶ G) (n : ℕ) (U : C)
     (x : F.H' n U) :
     extEquiv G n U (map f n U x) = (extEquiv F n U x).comp (Ext.mk₀ f) (add_zero n) := rfl
 
-instance cohomologyPresheafFunctor_additive (n : ℕ) :
-    (Sheaf.cohomologyPresheafFunctor.{w} J n).Additive where
+instance cohomologyPresheafFunctor_additive (n : ℕ)
+    : (Sheaf.cohomologyPresheafFunctor.{w} J n).Additive where
   map_add {F G f g} := by
     ext U x
     apply (extEquiv G n U.unop).injective
-    change (extEquiv F n U.unop x).comp (Ext.mk₀ (f + g)) (add_zero n) =
-      (extEquiv F n U.unop x).comp (Ext.mk₀ f) (add_zero n) +
-        (extEquiv F n U.unop x).comp (Ext.mk₀ g) (add_zero n)
+    change (extEquiv F n U.unop x).comp (Ext.mk₀ (f + g)) (add_zero n)
+      = (extEquiv F n U.unop x).comp (Ext.mk₀ f) (add_zero n)
+        + (extEquiv F n U.unop x).comp (Ext.mk₀ g) (add_zero n)
     rw [Ext.mk₀_add, Ext.comp_add]
 
 def zeroEquiv (F : Sheaf J AddCommGrpCat.{v}) (U : C) : F.H' 0 U ≃+ F.obj.obj (op U) :=
@@ -93,10 +92,11 @@ lemma zeroEquiv_map {F G : Sheaf J AddCommGrpCat.{v}} (f : F ⟶ G) (U : C) (x :
   apply (extEquiv G 0 U).injective
   rw [extEquiv_map, AddEquiv.apply_symm_apply, AddEquiv.apply_symm_apply, Ext.mk₀_comp_mk₀]
 
-def terminalEquiv (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {T : C} (hT : IsTerminal T) :
-    F.H' n T ≃+ F.H n :=
+def terminalEquiv (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {T : C} (hT : IsTerminal T)
+    : F.H' n T ≃+ F.H n :=
   (extEquiv F n T).trans
-    (((extFunctor n).mapIso (freeSheafIsoConst (J := J) hT).symm.op).app F).addCommGroupIsoToAddEquiv
+    (((extFunctor n).mapIso (freeSheafIsoConst (J := J) hT).symm.op).app
+      F).addCommGroupIsoToAddEquiv
 
 lemma terminalEquiv_apply (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) {T : C} (hT : IsTerminal T)
     (x : F.H' n T) :

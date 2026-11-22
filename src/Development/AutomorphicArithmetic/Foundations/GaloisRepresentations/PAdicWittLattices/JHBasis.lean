@@ -6,24 +6,31 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.GoodCove
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.HodgeCoh GlobalTheory.CechDR PositivityTheory.AutomorphicGaloisHodgeTate.G8.HBC UpperTheory.Gal.G3.HN
+open CategoryTheory Limits AlgebraicGeometry Opposite ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory GlobalTheory.HodgeCoh GlobalTheory.CechDR
+  PositivityTheory.AutomorphicGaloisHodgeTate.G8.HBC UpperTheory.Gal.G3.HN
 
-theorem UpperTheory.Gal.G3.jHBasis :
-    PositivityTheory.AutomorphicGaloisHodgeTate.G8.HBC.P_basis := by
+theorem UpperTheory.Gal.G3.jHBasis
+    : PositivityTheory.AutomorphicGaloisHodgeTate.G8.HBC.P_basis := by
   classical
   intro k k' _ _ _ J e M N _ _ _ _ ψ hψ I c
   let T : (I →₀ k') ≃+ (J →₀ M) :=
-    (Finsupp.mapRange.addEquiv e.repr.toAddEquiv).trans ((Finsupp.curryAddEquiv).symm.trans
-      ((Finsupp.domCongr (Equiv.prodComm I J)).trans
-        (Finsupp.curryAddEquiv.trans (Finsupp.mapRange.addEquiv c.repr.symm.toAddEquiv))))
-  have hTs : ∀ (i : I) (a : k'),
-      T (Finsupp.single i a) = Finsupp.mapRange (fun b : k => b • c i) (zero_smul k _) (e.repr a) := by
+    (Finsupp.mapRange.addEquiv e.repr.toAddEquiv).trans
+      ((Finsupp.curryAddEquiv).symm.trans
+        ((Finsupp.domCongr (Equiv.prodComm I J)).trans
+          (Finsupp.curryAddEquiv.trans (Finsupp.mapRange.addEquiv c.repr.symm.toAddEquiv))))
+  have hTs
+      : ∀ (i : I) (a : k'),
+        T (Finsupp.single i a)
+          = Finsupp.mapRange (fun b : k => b • c i) (zero_smul k _) (e.repr a) := by
     intro i a
     ext j
     simp only [Finsupp.mapRange_apply]
     simp [T, Finsupp.curryAddEquiv]
-    have h : ((Finsupp.equivMapDomain (Equiv.prodComm I J) (Finsupp.single i (e.repr a)).uncurry).curry j)
-        = Finsupp.single i (e.repr a j) := by
+    have h
+        : ((Finsupp.equivMapDomain (Equiv.prodComm I J) (Finsupp.single i (e.repr a)).uncurry).curry
+            j)
+          = Finsupp.single i (e.repr a j) := by
       ext i'
       simp only [Finsupp.curry_apply, Finsupp.equivMapDomain_apply, Finsupp.uncurry_apply]
       rw [Finsupp.single_apply, Finsupp.single_apply]
@@ -31,7 +38,8 @@ theorem UpperTheory.Gal.G3.jHBasis :
     rw [h, Finsupp.linearCombination_single]
   have hbc : ∀ f : J →₀ M, bcSum e ψ f = f.sum (fun j m => e j • ψ m) := by
     intro f
-    simp [bcSum]; rfl
+    simp [bcSum]
+    rfl
   let Φ : (I →₀ k') →ₗ[k'] N := Finsupp.linearCombination k' (fun i => ψ (c i))
   have key : ∀ g, Φ g = bcSum e ψ (T g) := by
     intro g

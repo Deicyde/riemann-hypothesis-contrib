@@ -7,41 +7,58 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.Hi
 
-private theorem pres_pow {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] (N : Submodule A M)
-    (T : Module.End A M) (h : ∀ y ∈ N, T y ∈ N) (n : ℕ) : ∀ y ∈ N, (T ^ n) y ∈ N := by
+private theorem pres_pow
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (N : Submodule A M) (T : Module.End A M) (h : ∀ y ∈ N, T y ∈ N)
+    (n : ℕ)
+    : ∀ y ∈ N, (T ^ n) y ∈ N := by
   induction n with
   | zero => intro y hy; simpa using hy
   | succ n ih => intro y hy; rw [pow_succ', mul_apply_eq_comp]; exact h _ (ih y hy)
 
-private theorem pres_smul {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] (N : Submodule A M)
-    (I : Ideal A) (T : Module.End A M) (h : ∀ y ∈ N, T y ∈ N) : ∀ y ∈ I • N, T y ∈ I • N := by
+private theorem pres_smul
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (N : Submodule A M)
+    (I : Ideal A)
+    (T : Module.End A M) (h : ∀ y ∈ N, T y ∈ N)
+    : ∀ y ∈ I • N, T y ∈ I • N := by
   intro y hy
   refine Submodule.smul_induction_on hy (fun r hr n hn => ?_) (fun x y hx hy => ?_)
   · rw [map_smul]; exact Submodule.smul_mem_smul hr (h n hn)
   · rw [map_add]; exact add_mem hx hy
 
-private theorem pres_sub {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] (N : Submodule A M)
-    (T : Module.End A M) (c : A) (h : ∀ y ∈ N, T y ∈ N) :
-    ∀ y ∈ N, (T - algebraMap A (Module.End A M) c) y ∈ N := by
+private theorem pres_sub
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (N : Submodule A M) (T : Module.End A M)
+    (c : A) (h : ∀ y ∈ N, T y ∈ N)
+    : ∀ y ∈ N, (T - algebraMap A (Module.End A M) c) y ∈ N := by
   intro y hy
   rw [LinearMap.sub_apply, Module.algebraMap_end_apply]
   exact sub_mem (h y hy) (N.smul_mem c hy)
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.locFree :
-    ∀ (A M ι : Type) [CommRing A] [IsCNL A] [AddCommGroup M] [Module A M] (Y : Submodule A M) [Module.Finite A Y] (op : ι → Module.End A M) (a : ι → A), CommOn Y op → CommOn (locPart Y op a) op ∧ locPart (locPart Y op a) op a = locPart Y op a ∧ Module.Finite A (locPart Y op a) ∧ (∃ Z : Submodule A M, Disjoint (locPart Y op a) Z ∧ locPart Y op a ⊔ Z = Y ∧ ∀ i, ∀ z ∈ Z, op i z ∈ Z) ∧ (Module.Projective A Y → Module.Free A (locPart Y op a)) := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.locFree
+    : ∀ (A M ι : Type) [CommRing A] [IsCNL A] [AddCommGroup M] [Module A M] (Y : Submodule A M)
+        [Module.Finite A Y] (op : ι → Module.End A M) (a : ι → A),
+      CommOn Y op
+        → CommOn (locPart Y op a) op ∧ locPart (locPart Y op a) op a = locPart Y op a
+          ∧ Module.Finite A (locPart Y op a)
+          ∧ (∃ Z : Submodule A M,
+            Disjoint (locPart Y op a) Z ∧ locPart Y op a ⊔ Z = Y ∧ ∀ i, ∀ z ∈ Z, op i z ∈ Z)
+          ∧ (Module.Projective A Y → Module.Free A (locPart Y op a)) := by
   intro A M ι _ _ _ _ Y _ op a h
-  obtain ⟨e, -, he, hmem, hcomm⟩ := UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.locIdem A M ι Y op a h
+  obtain ⟨e, -, he, hmem, hcomm⟩ :=
+    UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.locIdem A M ι Y op a h
   have hLY : locPart Y op a ≤ Y := inf_le_left
-  have hee : ∀ y : Y, e (e y) = e y := fun y => by
-    rw [← mul_apply_eq_comp, he.eq]
+  have hee : ∀ y : Y, e (e y) = e y := fun y => by rw [← mul_apply_eq_comp, he.eq]
   have heL : ∀ y : Y, (e y : M) ∈ locPart Y op a := fun y => (hmem _).2 (hee y)
   have hc : ∀ j (y : Y), e ⟨op j y, h.1 j y y.2⟩ = ⟨op j (e y), h.1 j _ (e y).2⟩ := by
     intro j y
-    have := hcomm ((op j).restrict (h.1 j)) (fun i t ht => by
-      ext z
-      have h1 : ∀ w : Y, (t w : M) = op i w := ht
-      simp only [mul_apply_eq_comp, h1, LinearMap.coe_restrict_apply]
-      exact h.2 j i z z.2)
+    have :=
+      hcomm ((op j).restrict (h.1 j)) (fun i t ht => by
+        ext z
+        have h1 : ∀ w : Y, (t w : M) = op i w := ht
+        simp only [mul_apply_eq_comp, h1, LinearMap.coe_restrict_apply]
+        exact h.2 j i z z.2)
     exact (LinearMap.congr_fun this y).symm
   have hst : ∀ i, ∀ y ∈ locPart Y op a, op i y ∈ locPart Y op a := by
     intro i y hy

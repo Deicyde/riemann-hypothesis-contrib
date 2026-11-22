@@ -4,16 +4,40 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.EpsVEqOne
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.RowUnf GlobalTheory.RowChain GlobalTheory.SeeSaw GlobalTheory.RowVal GlobalTheory.RowReal
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.RowUnf
+  GlobalTheory.RowChain GlobalTheory.SeeSaw GlobalTheory.RowVal GlobalTheory.RowReal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open GlobalTheory.FlatPlace GlobalTheory.LocMod GlobalTheory.SplitWeil
 
 namespace GlobalTheory.LocMod.Witness
 
-theorem exists_isModel_of_isThetaAt : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (p : Place D k) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)), IsSelfDualC S ΛS → IsSelfDualC T ΛT → ∀ (Y Y' : Type) [Fintype Y] [DecidableEq Y] [Fintype Y'] [DecidableEq Y'] (FS : Frame k S.rank Y') (FT : Frame k T.rank Y), (∀ x, p.up FS FT x ∈ latO S T (ΛS : Set _) (ΛT : Set _) (fun _ => True) ↔ ∀ a b, x a b ∈ Valuation.integer (ValuativeRel.valuation k)) → ∀ f₀ φ f : WO S T → ℂ, IsThetaFunO ψ S T f₀ → IsSBHalf p.e (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) φ → IsThetaAt ψ (symplO S T) (heisO ψ S T) p.e (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) 1 f₀ φ f → ∃ Tm, p.IsModel ψ FS FT Tm ∧ (∀ O, IsOne O → Tm O = f₀) ∧ ∃ Φ : SB (Matrix Y Y' k), (∀ x, Φ.1 x = φ (p.up FS FT x)) ∧ Tm Φ = f := by
+theorem exists_isModel_of_isThetaAt
+    : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+        [IsNonarchimedeanLocalField k] (p : Place D k) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1)
+        → ∀ (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+            (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
+          IsSelfDualC S ΛS → IsSelfDualC T ΛT
+            → ∀ (Y Y' : Type) [Fintype Y] [DecidableEq Y] [Fintype Y'] [DecidableEq Y']
+                (FS : Frame k S.rank Y') (FT : Frame k T.rank Y),
+              (∀ x,
+                  p.up FS FT x ∈ latO S T (ΛS : Set _) (ΛT : Set _) (fun _ => True)
+                    ↔ ∀ a b, x a b ∈ Valuation.integer (ValuativeRel.valuation k))
+                → ∀ f₀ φ f : WO S T → ℂ,
+                  IsThetaFunO ψ S T f₀
+                    → IsSBHalf p.e (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) φ
+                    → IsThetaAt ψ (symplO S T) (heisO ψ S T) p.e
+                      (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) 1 f₀ φ f
+                    → ∃ Tm,
+                      p.IsModel ψ FS FT Tm ∧ (∀ O, IsOne O → Tm O = f₀)
+                        ∧ ∃ Φ : SB (Matrix Y Y' k), (∀ x, Φ.1 x = φ (p.up FS FT x)) ∧ Tm Φ = f := by
   classical
   intro D k _ _ _ _ p ψ hψ S T ΛS ΛT hS hT Y Y' _ _ _ _ FS FT hlat f₀ φ f hf₀ hφ hθ
   obtain ⟨⟨T₀, h₀⟩, hall⟩ := hθ
@@ -27,19 +51,26 @@ theorem exists_isModel_of_isThetaAt : ∀ (D : D7) (k : Type) [Field k] [Valuati
   have hN0 := hNk N hN
   have hA := lat_compact p FS FT hS hT
   have hAo := lat_open p FS FT hS hT
-  generalize hAd : ((latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True).comap (upH p FS FT) : AddSubgroup _) = A at hA hAo
-  have memA : ∀ x, x ∈ A ↔ p.up FS FT x ∈ (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) := fun x => by
+  generalize hAd
+      : ((latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True).comap (upH p FS FT) : AddSubgroup _) = A
+    at hA hAo
+  have memA
+      : ∀ x,
+        x ∈ A ↔ p.up FS FT x ∈ (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) := fun x => by
     rw [← hAd]; rfl
-  have hup_smul : ∀ x : Matrix Y Y' k, p.up FS FT (N • x) = N • p.up FS FT x := fun x => map_nsmul (upH p FS FT) N x
+  have hup_smul : ∀ x : Matrix Y Y' k, p.up FS FT (N • x) = N • p.up FS FT x := fun x =>
+    map_nsmul (upH p FS FT) N x
   have hNx : ∀ x : Matrix Y Y' k, (N : k) • x = N • x := fun x => Nat.cast_smul_eq_nsmul k N x
 
   let g : Matrix Y Y' k → ℂ := fun x => φ (p.up FS FT x)
   have hlc : IsLocallyConstant g := by
     rw [IsLocallyConstant.iff_eventually_eq]
     intro x
-    have hU : IsOpen ((fun y : Matrix Y Y' k => (N : k)⁻¹ • (y - x)) ⁻¹' (A : Set (Matrix Y Y' k))) :=
+    have hU
+        : IsOpen ((fun y : Matrix Y Y' k => (N : k)⁻¹ • (y - x)) ⁻¹' (A : Set (Matrix Y Y' k))) :=
       hAo.preimage ((continuous_const_smul ((N : k)⁻¹)).comp (continuous_id.sub continuous_const))
-    have hx : x ∈ ((fun y : Matrix Y Y' k => (N : k)⁻¹ • (y - x)) ⁻¹' (A : Set (Matrix Y Y' k))) := by
+    have hx
+        : x ∈ ((fun y : Matrix Y Y' k => (N : k)⁻¹ • (y - x)) ⁻¹' (A : Set (Matrix Y Y' k))) := by
       simp only [Set.mem_preimage, sub_self, smul_zero]; exact A.zero_mem
     filter_upwards [hU.mem_nhds hx] with y hy
     have hy' : (N : k)⁻¹ • (y - x) ∈ A := hy
@@ -59,11 +90,20 @@ theorem exists_isModel_of_isThetaAt : ∀ (D : D7) (k : Type) [Field k] [Valuati
     rw [← hNx, smul_smul, inv_mul_cancel₀ hN0, one_smul]
   let Φ : SB (Matrix Y Y' k) := ⟨g, hlc, hcs⟩
 
-  have hext : ∀ Ψ : SB (Matrix Y Y' k), IsSBHalf p.e (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) (ext p FS FT Ψ) :=
+  have hext
+      : ∀ Ψ : SB (Matrix Y Y' k),
+        IsSBHalf p.e (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) (ext p FS FT Ψ) :=
     ext_sb p FS FT hS hT
-  refine ⟨T₀.comp (ext p FS FT), ⟨fun Ψ => ?_, fun x Ψ Ψ' h => ?_, fun y hy Ψ Ψ' h => ?_⟩, fun O hO => ?_, Φ, fun x => rfl, ?_⟩
-  · exact GlobalTheory.SchrTheta.isTheta_placeModel D ψ hψ S T _ _ hS hT p.e p.split.1 (GlobalTheory.PlaceCoord.infPart_split p.split)
-      _ hf₀ T₀ h₀ _ (hext Ψ)
+  refine ⟨
+    T₀.comp (ext p FS FT),
+    ⟨fun Ψ => ?_, fun x Ψ Ψ' h => ?_, fun y hy Ψ Ψ' h => ?_⟩,
+    fun O hO => ?_,
+    Φ,
+    fun x => rfl,
+    ?_
+  ⟩
+  · exact GlobalTheory.SchrTheta.isTheta_placeModel D ψ hψ S T _ _ hS hT p.e p.split.1
+      (GlobalTheory.PlaceCoord.infPart_split p.split) _ hf₀ T₀ h₀ _ (hext Ψ)
   · refine Eq.trans (congrArg T₀ ?_) (h₀.trans _ (hext Ψ) _ (up_half p FS FT x))
     funext t
     rw [ext_apply, ext_apply, down_add, down_up, h]
@@ -74,7 +114,9 @@ theorem exists_isModel_of_isThetaAt : ∀ (D : D7) (k : Type) [Field k] [Valuati
     split_ifs with ht
     · rw [up_down p FS FT ht]
     · rw [mul_zero]
-  · have e1 : ext p FS FT O = (1 : ℂ) • halfInd p.e (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) := by
+  · have e1
+        : ext p FS FT O
+          = (1 : ℂ) • halfInd p.e (latO S T (ΛS : Set _) (ΛT : Set _) fun _ => True) := by
       funext t
       rw [one_smul, ext_apply, halfInd]
       by_cases ht : IsHalf p.e t

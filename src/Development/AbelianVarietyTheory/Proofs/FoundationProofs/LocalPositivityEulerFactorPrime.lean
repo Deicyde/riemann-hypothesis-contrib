@@ -10,13 +10,15 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.TwoStepRe
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.LocIneq
 
-theorem term_prime_pow (b : ℕ → ℂ) (s : ℝ) (p : ℕ) (hp : p.Prime) (e : ℕ) :
-    LSeries.term b ((1 + s : ℝ) : ℂ) (p ^ e) = b (p ^ e) * ((1 / (p : ℝ) ^ (1 + s) : ℝ) : ℂ) ^ e := by
+theorem term_prime_pow (b : ℕ → ℂ) (s : ℝ) (p : ℕ) (hp : p.Prime) (e : ℕ)
+    : LSeries.term b ((1 + s : ℝ) : ℂ) (p ^ e)
+      = b (p ^ e) * ((1 / (p : ℝ) ^ (1 + s) : ℝ) : ℂ) ^ e := by
   have hp0 : (0 : ℝ) ≤ p := Nat.cast_nonneg p
   have hne : p ^ e ≠ 0 := pow_ne_zero _ hp.ne_zero
   rw [LSeries.term_of_ne_zero hne]
@@ -30,13 +32,22 @@ theorem term_prime_pow (b : ℕ → ℂ) (s : ℝ) (p : ℕ) (hp : p.Prime) (e :
   push_cast
   rw [one_div, inv_pow]
 
-theorem real_term_prime_pow (b : ℕ → ℂ) (s : ℝ) (p : ℕ) (e : ℕ) :
-    ‖b (p ^ e)‖ ^ 2 / ((p ^ e : ℕ) : ℝ) ^ (1 + s) = ‖b (p ^ e)‖ ^ 2 * (1 / (p : ℝ) ^ (1 + s)) ^ e := by
+theorem real_term_prime_pow (b : ℕ → ℂ) (s : ℝ) (p : ℕ) (e : ℕ)
+    : ‖b (p ^ e)‖ ^ 2 / ((p ^ e : ℕ) : ℝ) ^ (1 + s)
+      = ‖b (p ^ e)‖ ^ 2 * (1 / (p : ℝ) ^ (1 + s)) ^ e := by
   have hp0 : (0 : ℝ) ≤ p := Nat.cast_nonneg p
-  rw [Nat.cast_pow, ← Real.rpow_natCast_mul hp0, mul_comm, Real.rpow_mul_natCast hp0, div_eq_mul_inv,
-    one_div, inv_pow]
+  rw [Nat.cast_pow, ← Real.rpow_natCast_mul hp0, mul_comm, Real.rpow_mul_natCast hp0,
+    div_eq_mul_inv, one_div, inv_pow]
 
-theorem local_positivity_eulerFactor : ∀ (b ω : ℕ → ℂ) (s C : ℝ) (p : ℕ), 0 < s → p.Prime → b 1 = 1 → ‖ω p‖ = 1 → (∀ r : ℕ, b (p ^ (r + 2)) = b p * b (p ^ (r + 1)) - ω p * b (p ^ r)) → (∀ n : ℕ, ‖b n‖ ^ 2 ≤ C * n) → Real.exp (‖1 + b p‖ ^ 2 / (p : ℝ) ^ (1 + s)) ≤ (1 - 1 / (p : ℝ) ^ (1 + s))⁻¹ * ‖∑' e : ℕ, LSeries.term b ((1 + s : ℝ) : ℂ) (p ^ e)‖ ^ 2 * (∑' e : ℕ, ‖b (p ^ e)‖ ^ 2 / ((p ^ e : ℕ) : ℝ) ^ (1 + s)) * (1 - 1 / (p : ℝ) ^ (2 * (1 + s)))⁻¹ := by
+theorem local_positivity_eulerFactor
+    : ∀ (b ω : ℕ → ℂ) (s C : ℝ) (p : ℕ),
+      0 < s → p.Prime → b 1 = 1 → ‖ω p‖ = 1
+        → (∀ r : ℕ, b (p ^ (r + 2)) = b p * b (p ^ (r + 1)) - ω p * b (p ^ r))
+        → (∀ n : ℕ, ‖b n‖ ^ 2 ≤ C * n)
+        → Real.exp (‖1 + b p‖ ^ 2 / (p : ℝ) ^ (1 + s))
+          ≤ (1 - 1 / (p : ℝ) ^ (1 + s))⁻¹ * ‖∑' e : ℕ, LSeries.term b ((1 + s : ℝ) : ℂ) (p ^ e)‖ ^ 2
+            * (∑' e : ℕ, ‖b (p ^ e)‖ ^ 2 / ((p ^ e : ℕ) : ℝ) ^ (1 + s))
+            * (1 - 1 / (p : ℝ) ^ (2 * (1 + s)))⁻¹ := by
   intro b ω s C p hs hp hb1 hω hrec hbd
   have hp1 : (1 : ℝ) < p := by exact_mod_cast hp.one_lt
   have hp0 : (0 : ℝ) < p := by linarith
@@ -54,13 +65,16 @@ theorem local_positivity_eulerFactor : ∀ (b ω : ℕ → ℂ) (s C : ℝ) (p :
   have hc1 : b (p ^ 1) = x + y := by rw [pow_one, hxy]
   have hcr : ∀ r, b (p ^ (r + 2)) = (x + y) * b (p ^ (r + 1)) - x * y * b (p ^ r) := by
     intro r; rw [hxy, hxy']; exact hrec r
-  have hroots := GlobalTheory.roots_norm_le_of_bounded_two_step_recursion x y (fun r => b (p ^ r))
-    (Real.sqrt C) (Real.sqrt p) (Real.sqrt_nonneg _) hc0 hc1 hcr (by
-      intro r
-      have h := hbd (p ^ r)
-      refine (pow_le_pow_iff_left₀ (norm_nonneg _) (by positivity) two_ne_zero).1 ?_
-      rw [mul_pow, ← pow_mul, mul_comm r 2, pow_mul, Real.sq_sqrt hC, Real.sq_sqrt hp0.le]
-      simpa using h)
+  have hroots :=
+    GlobalTheory.roots_norm_le_of_bounded_two_step_recursion x y
+      (fun r => b (p ^ r))
+      (Real.sqrt C) (Real.sqrt p) (Real.sqrt_nonneg _) hc0 hc1 hcr
+      (by
+        intro r
+        have h := hbd (p ^ r)
+        refine (pow_le_pow_iff_left₀ (norm_nonneg _) (by positivity) two_ne_zero).1 ?_
+        rw [mul_pow, ← pow_mul, mul_comm r 2, pow_mul, Real.sq_sqrt hC, Real.sq_sqrt hp0.le]
+        simpa using h)
   have hP : (p : ℝ) < (p : ℝ) ^ (1 + s) := by
     conv_lhs => rw [← Real.rpow_one (p : ℝ)]
     exact Real.rpow_lt_rpow_of_exponent_lt hp1 (by linarith)
@@ -70,8 +84,7 @@ theorem local_positivity_eulerFactor : ∀ (b ω : ℕ → ℂ) (s C : ℝ) (p :
   simp only [term_prime_pow b s p hp, real_term_prime_pow b s p, hsq]
   rw [div_eq_mul_one_div (‖1 + b p‖ ^ 2)]
   have hT0 : 0 < 1 / (p : ℝ) ^ (1 + s) := by positivity
-  have hpT : p * (1 / (p : ℝ) ^ (1 + s)) < 1 := by
-    rw [mul_one_div, div_lt_one hP0]; exact hP
+  have hpT : p * (1 / (p : ℝ) ^ (1 + s)) < 1 := by rw [mul_one_div, div_lt_one hP0]; exact hP
   generalize 1 / (p : ℝ) ^ (1 + s) = T at hT0 hpT ⊢
   have hT1 : T < 1 := by nlinarith
   have hb : ∀ w : ℂ, ‖w‖ ≤ Real.sqrt p → ‖w‖ ^ 2 * T < 1 := by
@@ -82,7 +95,10 @@ theorem local_positivity_eulerFactor : ∀ (b ω : ℕ → ℂ) (s C : ℝ) (p :
     nlinarith
   have hxT := hb x hroots.1
   have hyT := hb y hroots.2
-  obtain ⟨hL, hR⟩ := GlobalTheory.T.twoStepRecursion_localEulerFactors x y (fun r => b (p ^ r)) T hT0.le hT1 hxT hyT hc0 hc1 hcr
+  obtain ⟨hL, hR⟩ :=
+    GlobalTheory.T.twoStepRecursion_localEulerFactors x y
+      (fun r => b (p ^ r))
+      T hT0.le hT1 hxT hyT hc0 hc1 hcr
   have hI := GlobalTheory.EisM.locineq x y T hT0.le hT1 hxT hyT
   rw [add_assoc, hxy] at hI
   rw [hxy', hω] at hR
@@ -101,7 +117,8 @@ theorem local_positivity_eulerFactor : ∀ (b ω : ℕ → ℂ) (s C : ℝ) (p :
   rw [one_pow, one_mul] at hR
   have hK : 0 ≤ (1 - T)⁻¹ * L * R * (1 - T ^ 2)⁻¹ := by positivity
   have hone : ((1 - T) * D * E) * ((1 - T)⁻¹ * L * R * (1 - T ^ 2)⁻¹) = 1 := by
-    calc ((1 - T) * D * E) * ((1 - T)⁻¹ * L * R * (1 - T ^ 2)⁻¹)
+    calc
+      ((1 - T) * D * E) * ((1 - T)⁻¹ * L * R * (1 - T ^ 2)⁻¹)
         = ((1 - T) * (1 - T)⁻¹) * (L * D) * ((R * E) * (1 - T ^ 2)⁻¹) := by ring
       _ = 1 := by rw [hLn, hR, mul_inv_cancel₀ h1.ne', mul_inv_cancel₀ h2.ne']; ring
   have h3 := mul_le_mul_of_nonneg_right hI hK

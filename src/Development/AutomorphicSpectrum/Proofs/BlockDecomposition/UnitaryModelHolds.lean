@@ -12,12 +12,12 @@ open PositivityTheory.Rg.BcB.F.Eig
 
 namespace GlobalTheory.CompanionTheory.UMod
 
-def op {d : ℕ} (P : Matrix (Fin d) (Fin d) ℂ) :
-    EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d) :=
+def op {d : ℕ} (P : Matrix (Fin d) (Fin d) ℂ)
+    : EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d) :=
   LinearMap.toContinuousLinearMap (Matrix.toLpLin 2 2 P)
 
-theorem op_apply {d : ℕ} (P : Matrix (Fin d) (Fin d) ℂ) (x : EuclideanSpace ℂ (Fin d)) :
-    op P x = WithLp.toLp 2 (P *ᵥ x.ofLp) := by
+theorem op_apply {d : ℕ} (P : Matrix (Fin d) (Fin d) ℂ) (x : EuclideanSpace ℂ (Fin d))
+    : op P x = WithLp.toLp 2 (P *ᵥ x.ofLp) := by
   simp [op, Matrix.toLpLin_apply]
 
 theorem op_mul {d : ℕ} (P Q : Matrix (Fin d) (Fin d) ℂ) : op (P * Q) = op P * op Q := by
@@ -33,27 +33,32 @@ theorem op_pow {d : ℕ} (P : Matrix (Fin d) (Fin d) ℂ) (k : ℕ) : op (P ^ k)
   | zero => simp [op_one]
   | succ k ih => rw [pow_succ, pow_succ, op_mul, ih]
 
-theorem trace_op {d : ℕ} (P : Matrix (Fin d) (Fin d) ℂ) :
-    LinearMap.trace ℂ _ ((op P : EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d)) :
-      EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin d)) = P.trace := by
-  have : ((op P : EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d)) :
-      EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin d)) = Matrix.toEuclideanLin P := rfl
+theorem trace_op {d : ℕ} (P : Matrix (Fin d) (Fin d) ℂ)
+    : LinearMap.trace ℂ _
+        ((op P : EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d))
+          : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin d))
+      = P.trace := by
+  have : ((op P : EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d))
+        : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin d))
+      = Matrix.toEuclideanLin P :=
+    rfl
   rw [this, Matrix.toEuclideanLin_eq_toLin_orthonormal, Matrix.trace_toLin_eq]
 
-theorem diagOp_eq {ι : Type} {d : ℕ} (blk : Fin d → ι) (c : ι → ℂ) :
-    diagOp blk c = op (Matrix.diagonal fun j => c (blk j)) := rfl
+theorem diagOp_eq {ι : Type} {d : ℕ} (blk : Fin d → ι) (c : ι → ℂ)
+    : diagOp blk c = op (Matrix.diagonal fun j => c (blk j)) :=
+  rfl
 
-def kron {B : Type} [Fintype B] {n : B → Type} (M : ∀ w, Matrix (n w) (n w) ℂ) :
-    Matrix (∀ w, n w) (∀ w, n w) ℂ :=
+def kron {B : Type} [Fintype B] {n : B → Type} (M : ∀ w, Matrix (n w) (n w) ℂ)
+    : Matrix (∀ w, n w) (∀ w, n w) ℂ :=
   Matrix.of fun a b => ∏ w, M w (a w) (b w)
 
 section Kron
 
-variable {B : Type} [Fintype B] [DecidableEq B] {n : B → Type} [∀ w, Fintype (n w)]
-  [∀ w, DecidableEq (n w)]
+variable
+  {B : Type} [Fintype B] [DecidableEq B]
+  {n : B → Type} [∀ w, Fintype (n w)] [∀ w, DecidableEq (n w)]
 
-theorem kron_mul (M N : ∀ w, Matrix (n w) (n w) ℂ) :
-    kron M * kron N = kron fun w => M w * N w := by
+theorem kron_mul (M N : ∀ w, Matrix (n w) (n w) ℂ) : kron M * kron N = kron fun w => M w * N w := by
   ext a b
   simp only [kron, Matrix.mul_apply, Matrix.of_apply]
   rw [Finset.prod_univ_sum]
@@ -69,40 +74,42 @@ theorem kron_one : kron (fun w => (1 : Matrix (n w) (n w) ℂ)) = 1 := by
     rw [Matrix.one_apply_ne h]
     exact Finset.prod_eq_zero (Finset.mem_univ w) (Matrix.one_apply_ne hw)
 
-theorem kron_pow (M : ∀ w, Matrix (n w) (n w) ℂ) (k : ℕ) :
-    kron M ^ k = kron fun w => M w ^ k := by
+theorem kron_pow (M : ∀ w, Matrix (n w) (n w) ℂ) (k : ℕ) : kron M ^ k = kron fun w => M w ^ k := by
   induction k with
   | zero => simp [kron_one]
   | succ k ih => simp only [pow_succ, ih, kron_mul]
 
-theorem trace_kron (M : ∀ w, Matrix (n w) (n w) ℂ) :
-    (kron M).trace = ∏ w, (M w).trace := by
+theorem trace_kron (M : ∀ w, Matrix (n w) (n w) ℂ) : (kron M).trace = ∏ w, (M w).trace := by
   simp only [Matrix.trace, Matrix.diag, kron, Matrix.of_apply]
   rw [Finset.prod_univ_sum]
   simp [Fintype.piFinset_univ]
 
-theorem kron_mulVec (M : ∀ w, Matrix (n w) (n w) ℂ) (a : ∀ w, n w → ℂ) (x : ∀ w, n w) :
-    (kron M *ᵥ fun y => ∏ w, a w (y w)) x = ∏ w, (M w *ᵥ a w) (x w) := by
+theorem kron_mulVec (M : ∀ w, Matrix (n w) (n w) ℂ) (a : ∀ w, n w → ℂ) (x : ∀ w, n w)
+    : (kron M *ᵥ fun y => ∏ w, a w (y w)) x = ∏ w, (M w *ᵥ a w) (x w) := by
   simp only [Matrix.mulVec, dotProduct, kron, Matrix.of_apply]
   rw [Finset.prod_univ_sum]
   simp [Fintype.piFinset_univ, Finset.prod_mul_distrib]
 
 end Kron
 
-theorem transfer {ι J : Type} [Fintype J] [DecidableEq J] (b : J → ι) (A : Matrix J J ℂ)
-    (hc : ∀ c : ι → ℂ, Commute A (Matrix.diagonal fun j => c (b j))) :
-    ∃ (d : ℕ) (blk : Fin d → ι) (u : EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d)),
-      (∀ c, Commute u (diagOp blk c)) ∧
-      (∀ (c : ι → ℂ) (k : ℕ), LinearMap.trace ℂ _ ((u ^ k * diagOp blk c :
-          EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d)) :
-          EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin d)) =
-        (A ^ k * Matrix.diagonal fun j => c (b j)).trace) ∧
-      ∀ (i₀ : ι) (v : J → ℂ), v ≠ 0 → A *ᵥ v = v → (∀ j, v j ≠ 0 → b j = i₀) →
-        ∃ v', v' ≠ 0 ∧ u v' = v' ∧ ∀ c, diagOp blk c v' = c i₀ • v' := by
+theorem transfer
+    {ι J : Type} [Fintype J] [DecidableEq J]
+    (b : J → ι) (A : Matrix J J ℂ) (hc : ∀ c : ι → ℂ, Commute A (Matrix.diagonal fun j => c (b j)))
+    : ∃ (d : ℕ) (blk : Fin d → ι) (u : EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d)),
+      (∀ c, Commute u (diagOp blk c))
+        ∧ (∀ (c : ι → ℂ) (k : ℕ),
+          LinearMap.trace ℂ _
+              ((u ^ k * diagOp blk c : EuclideanSpace ℂ (Fin d) →L[ℂ] EuclideanSpace ℂ (Fin d))
+                : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin d))
+            = (A ^ k * Matrix.diagonal fun j => c (b j)).trace)
+        ∧ ∀ (i₀ : ι) (v : J → ℂ),
+          v ≠ 0 → A *ᵥ v = v → (∀ j, v j ≠ 0 → b j = i₀)
+            → ∃ v', v' ≠ 0 ∧ u v' = v' ∧ ∀ c, diagOp blk c v' = c i₀ • v' := by
   let e := Fintype.equivFin J
   let R := Matrix.reindexAlgEquiv ℂ ℂ e
-  have hD : ∀ c : ι → ℂ, R (Matrix.diagonal fun j => c (b j)) =
-      Matrix.diagonal fun j => c (b (e.symm j)) := by
+  have hD
+      : ∀ c : ι → ℂ,
+        R (Matrix.diagonal fun j => c (b j)) = Matrix.diagonal fun j => c (b (e.symm j)) := by
     intro c
     ext i j
     simp [R, Matrix.reindexAlgEquiv_apply, Matrix.diagonal_apply]
@@ -113,7 +120,8 @@ theorem transfer {ι J : Type} [Fintype J] [DecidableEq J] (b : J → ι) (A : M
     simp only [map_mul, op_mul, hD] at h2
     exact h2
   · intro c k
-    have : (op (R A) ^ k * diagOp (b ∘ e.symm) c) = op (R (A ^ k * Matrix.diagonal fun j => c (b j))) := by
+    have : (op (R A) ^ k * diagOp (b ∘ e.symm) c)
+        = op (R (A ^ k * Matrix.diagonal fun j => c (b j))) := by
       rw [map_mul, map_pow, hD, op_mul, op_pow]
       rfl
     rw [this, trace_op]
@@ -147,9 +155,10 @@ theorem transfer {ι J : Type} [Fintype J] [DecidableEq J] (b : J → ι) (A : M
       · rw [hs _ h0]
         rfl
 
-theorem diagonal_sigma {ι : Type} [DecidableEq ι] {κ : ι → Type} [∀ i, DecidableEq (κ i)]
-    (c : ι → ℂ) : (Matrix.diagonal fun j : (Σ i, κ i) => c j.1) =
-      Matrix.blockDiagonal' fun i => c i • (1 : Matrix (κ i) (κ i) ℂ) := by
+theorem diagonal_sigma
+    {ι : Type} [DecidableEq ι] {κ : ι → Type} [∀ i, DecidableEq (κ i)] (c : ι → ℂ)
+    : (Matrix.diagonal fun j : (Σ i, κ i) => c j.1)
+      = Matrix.blockDiagonal' fun i => c i • (1 : Matrix (κ i) (κ i) ℂ) := by
   ext ⟨i, a⟩ ⟨j, b⟩
   by_cases h : i = j
   · subst h
@@ -159,9 +168,12 @@ theorem diagonal_sigma {ι : Type} [DecidableEq ι] {κ : ι → Type} [∀ i, D
     · simp [Matrix.blockDiagonal'_apply, Matrix.diagonal_apply, h2, Matrix.one_apply]
   · simp [Matrix.blockDiagonal'_apply, Matrix.diagonal_apply, h]
 
-theorem blockDiagonal_mulVec {ι : Type} [Fintype ι] [DecidableEq ι] {κ : ι → Type}
-    [∀ i, Fintype (κ i)] (T : ∀ i, Matrix (κ i) (κ i) ℂ) (v : (Σ i, κ i) → ℂ) (i : ι) (α : κ i) :
-    (Matrix.blockDiagonal' T *ᵥ v) ⟨i, α⟩ = (T i *ᵥ fun β => v ⟨i, β⟩) α := by
+theorem blockDiagonal_mulVec
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {κ : ι → Type} [∀ i, Fintype (κ i)]
+    (T : ∀ i, Matrix (κ i) (κ i) ℂ) (v : (Σ i, κ i) → ℂ)
+    (i : ι) (α : κ i)
+    : (Matrix.blockDiagonal' T *ᵥ v) ⟨i, α⟩ = (T i *ᵥ fun β => v ⟨i, β⟩) α := by
   simp only [Matrix.mulVec, dotProduct, Fintype.sum_sigma]
   rw [Finset.sum_eq_single i]
   · simp [Matrix.blockDiagonal'_apply]
@@ -172,15 +184,18 @@ theorem blockDiagonal_mulVec {ι : Type} [Fintype ι] [DecidableEq ι] {κ : ι 
 theorem uModel : UModel := by
   classical
   intro ι B _ _ X _ _ _ L
-  let bs : ∀ i w, Module.Basis (Fin (Module.finrank ℂ (X i w))) ℂ (X i w) :=
-    fun i w => Module.finBasis ℂ (X i w)
+  let bs : ∀ i w, Module.Basis (Fin (Module.finrank ℂ (X i w))) ℂ (X i w) := fun i w =>
+    Module.finBasis ℂ (X i w)
   let M : ∀ i w, Matrix (Fin (Module.finrank ℂ (X i w))) (Fin (Module.finrank ℂ (X i w))) ℂ :=
     fun i w => LinearMap.toMatrix (bs i w) (bs i w) (L i w)
-  let T : ∀ i, Matrix (∀ w, Fin (Module.finrank ℂ (X i w))) (∀ w, Fin (Module.finrank ℂ (X i w))) ℂ :=
+  let T
+      : ∀ i, Matrix (∀ w, Fin (Module.finrank ℂ (X i w))) (∀ w, Fin (Module.finrank ℂ (X i w))) ℂ :=
     fun i => kron (M i)
   let A := Matrix.blockDiagonal' T
-  have hc : ∀ c : ι → ℂ, Commute A
-      (Matrix.diagonal fun j : (Σ i, ∀ w, Fin (Module.finrank ℂ (X i w))) => c j.1) := by
+  have hc
+      : ∀ c : ι → ℂ,
+        Commute A
+          (Matrix.diagonal fun j : (Σ i, ∀ w, Fin (Module.finrank ℂ (X i w))) => c j.1) := by
     intro c
     rw [diagonal_sigma]
     show A * _ = _ * A
@@ -188,7 +203,8 @@ theorem uModel : UModel := by
     rw [← Matrix.blockDiagonal'_mul, ← Matrix.blockDiagonal'_mul]
     funext k
     simp
-  obtain ⟨d, blk, u, h1, h2, h3⟩ := transfer (fun j : (Σ i, ∀ w, Fin (Module.finrank ℂ (X i w))) => j.1) A hc
+  obtain ⟨d, blk, u, h1, h2, h3⟩ :=
+    transfer (fun j : (Σ i, ∀ w, Fin (Module.finrank ℂ (X i w))) => j.1) A hc
   refine ⟨d, blk, u, h1, fun c k => ?_, fun i₀ h => ?_⟩
   · rw [h2, diagonal_sigma]
     simp only [A]
@@ -197,7 +213,8 @@ theorem uModel : UModel := by
     have hT : ∀ w, LinearMap.trace ℂ _ (L i w ^ k) = (M i w ^ k).trace := by
       intro w
       rw [LinearMap.trace_eq_matrix_trace ℂ (bs i w), ← LinearMap.toMatrix_pow]
-    simp only [Pi.pow_apply, Matrix.mul_smul, mul_one, Matrix.trace_smul, smul_eq_mul, hT, T, kron_pow, trace_kron]
+    simp only [Pi.pow_apply, Matrix.mul_smul, mul_one, Matrix.trace_smul, smul_eq_mul, hT, T,
+      kron_pow, trace_kron]
   · have hy : ∀ i w, ∃ y : X i w, i = i₀ → (y ≠ 0 ∧ L i w y = y) := by
       intro i w
       by_cases hi : i = i₀
@@ -220,8 +237,8 @@ theorem uModel : UModel := by
       ext x
       exact hcon x
     choose x hx using hne
-    let v : (Σ i, ∀ w, Fin (Module.finrank ℂ (X i w))) → ℂ :=
-      fun j => if j.1 = i₀ then ∏ w, a j.1 w (j.2 w) else 0
+    let v : (Σ i, ∀ w, Fin (Module.finrank ℂ (X i w))) → ℂ := fun j =>
+      if j.1 = i₀ then ∏ w, a j.1 w (j.2 w) else 0
     refine h3 i₀ v ?_ ?_ ?_
     · intro h0
       have h1 := congrFun h0 ⟨i₀, x⟩

@@ -13,8 +13,8 @@ namespace Formalism.REAL
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-def mulRightRealCLM {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) :
-    Matrix (Fin n) (Fin n) ℂ →L[ℝ] Matrix (Fin n) (Fin n) ℂ :=
+def mulRightRealCLM {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ)
+    : Matrix (Fin n) (Fin n) ℂ →L[ℝ] Matrix (Fin n) (Fin n) ℂ :=
   LinearMap.toContinuousLinearMap (LinearMap.mulRight ℝ X)
 
 lemma mulRightCLM_apply {n : ℕ} (X h : Matrix (Fin n) (Fin n) ℂ) : mulRightRealCLM X h = h * X := rfl
@@ -51,13 +51,16 @@ theorem rdBracket_of (h : RdExt) (hs : RdSmooth) : RdBracket := by
   have hFa : ContDiffAt ℝ ∞ F g := hF.contDiffAt (hU.mem_nhds hgU)
   have ext : ∀ Z, inG ε Z → ∀ k ∈ U, inUJ ε k → Rd Z f k = fderiv ℝ F k (k * Z) :=
     fun Z hZ k hk hkJ => h n ε f F U k Z hU hk hkJ hF hfF hZ
-  have hsm : ∀ Z : Matrix (Fin n) (Fin n) ℂ,
-      ContDiffOn ℝ ∞ (fun k => fderiv ℝ F k (k * Z)) U := fun Z =>
-    (hF.fderiv_of_isOpen hU withTop_enat_infty_add_one_le_infty).clm_apply (mulRightRealCLM Z).contDiff.contDiffOn
+  have hsm
+      : ∀ Z : Matrix (Fin n) (Fin n) ℂ, ContDiffOn ℝ ∞ (fun k => fderiv ℝ F k (k * Z)) U := fun Z =>
+    (hF.fderiv_of_isOpen hU withTop_enat_infty_add_one_le_infty).clm_apply
+      (mulRightRealCLM Z).contDiff.contDiffOn
   have hc : DifferentiableAt ℝ (fderiv ℝ F) g :=
     (hFa.fderiv_right (m := ∞) withTop_enat_infty_add_one_le_infty).differentiableAt (by simp)
-  have hd : ∀ Z W : Matrix (Fin n) (Fin n) ℂ, fderiv ℝ (fun k => fderiv ℝ F k (k * Z)) g W
-      = fderiv ℝ (fderiv ℝ F) g W (g * Z) + fderiv ℝ F g (W * Z) := by
+  have hd
+      : ∀ Z W : Matrix (Fin n) (Fin n) ℂ,
+        fderiv ℝ (fun k => fderiv ℝ F k (k * Z)) g W
+          = fderiv ℝ (fderiv ℝ F) g W (g * Z) + fderiv ℝ F g (W * Z) := by
     intro Z W
     have H := (hc.hasFDerivAt.clm_apply (mulRightRealCLM Z).hasFDerivAt).fderiv
     erw [H]
@@ -67,7 +70,8 @@ theorem rdBracket_of (h : RdExt) (hs : RdSmooth) : RdBracket := by
   have e2 : Rd Y (Rd X f) g = fderiv ℝ (fun k => fderiv ℝ F k (k * X)) g (g * Y) :=
     h n ε (Rd X f) _ U g Y hU hgU hg (hsm X) (ext X hX) hY
   have e3 := ext _ (lie_algebra_bracket_mem hX hY) g hgU hg
-  have hsym : IsSymmSndFDerivAt ℝ F g := hFa.isSymmSndFDerivAt (by rw [minSmoothness_of_isRCLikeNormedField]; norm_cast)
+  have hsym : IsSymmSndFDerivAt ℝ F g :=
+    hFa.isSymmSndFDerivAt (by rw [minSmoothness_of_isRCLikeNormedField]; norm_cast)
   have hs2 := hsym (g * X) (g * Y)
   rw [e1, e2, e3, hd, hd]
   simp only [Matrix.mul_sub, Matrix.mul_assoc, map_sub]
@@ -190,8 +194,10 @@ theorem eabGl_of (hc : CpartMem) (hl : RdLin) (hb : RdBracket) (hs : RdSmooth) :
   intro n ε f a b c d g hf hg
   unfold Eab
   rw [complexified_derivative_commutator hc hl hb hs ε f _ _ g hf hg]
-  have hm : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 - Matrix.single c d 1 * Matrix.single a b 1 =
-      (if b = c then Matrix.single a d 1 else 0) - (if d = a then Matrix.single c b 1 else 0) := by
+  have hm
+      : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 - Matrix.single c d 1 * Matrix.single a b 1
+        = (if b = c then Matrix.single a d 1 else 0)
+          - (if d = a then Matrix.single c b 1 else 0) := by
     by_cases h1 : b = c <;> by_cases h2 : d = a
     · subst h1; subst h2; simp
     · subst h1; simp [h2]

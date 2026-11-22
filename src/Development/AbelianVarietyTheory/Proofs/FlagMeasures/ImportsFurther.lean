@@ -8,10 +8,11 @@ namespace GlobalTheory.ExistsSmulMemLattice
 
 open NumberField
 
-theorem exists_smul_mem {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
+theorem exists_smul_mem
+    {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
     [Module (RingOfIntegers K) V] [IsScalarTower (RingOfIntegers K) K V]
-    {M : Submodule (RingOfIntegers K) V} {v : V} (hv : v ∈ Submodule.span K (M : Set V)) :
-    ∃ d : RingOfIntegers K, d ≠ 0 ∧ d • v ∈ M := by
+    {M : Submodule (RingOfIntegers K) V} {v : V} (hv : v ∈ Submodule.span K (M : Set V))
+    : ∃ d : RingOfIntegers K, d ≠ 0 ∧ d • v ∈ M := by
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -33,7 +34,9 @@ theorem exists_smul_mem {K V : Type} [Field K] [NumberField K] [AddCommGroup V] 
         ← algebraMap_smul K d x, smul_smul, smul_smul, map_mul]
       congr 1
       simp only at hs
-      rw [← hs]; ring
-    rw [key]; exact M.smul_mem _ h
+      rw [← hs]
+      ring
+    rw [key]
+    exact M.smul_mem _ h
 
 end GlobalTheory.ExistsSmulMemLattice

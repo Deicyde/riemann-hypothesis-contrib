@@ -21,9 +21,11 @@ section Trace
 variable {F : Type} [Field F] [NumberField F]
 end Trace
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-theorem isStdCharF_of_isGood_k : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (B : Base F E),
-    _root_.UpperTheory.TP.W.GoodK σ B → Formalism.IndefR.DatumF.IsStdCharF (fun w : InfinitePlace F => (B.emb w).1) B.ψ (-1) := by
+theorem isStdCharF_of_isGood_k
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      _root_.UpperTheory.TP.W.GoodK σ B
+        → Formalism.IndefR.DatumF.IsStdCharF (fun w : InfinitePlace F => (B.emb w).1) B.ψ (-1) := by
   intro F E _ _ _ _ _ σ B hB
   haveI : IsTotallyReal F := hB.cm.1
   refine ⟨isCharAF hB.std, ⟨?_, fun θ hθ x => ?_⟩⟩

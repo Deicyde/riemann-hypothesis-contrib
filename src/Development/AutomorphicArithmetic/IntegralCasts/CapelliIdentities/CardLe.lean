@@ -22,8 +22,8 @@ private lemma card_le (F K : Type) [Field F] [Fintype F] [Field K] :
 
 end AddCharEqMulShift
 
-theorem UpperTheory.Reformulated.B.Yde4.main :
-    ∀ {F K : Type} [inst : Field F] [Fintype F] [inst_2 : Field K] (ψ₀ ψ : AddChar F K),
+theorem UpperTheory.Reformulated.B.Yde4.main
+    : ∀ {F K : Type} [inst : Field F] [Fintype F] [inst_2 : Field K] (ψ₀ ψ : AddChar F K),
       ψ₀ ≠ (1 : AddChar F K) → ∃ (c : F), ψ = ψ₀.mulShift c := by
   intro F K _ _ _ ψ₀ ψ h
   obtain ⟨hfin, hle⟩ := AddCharEqMulShift.card_le F K

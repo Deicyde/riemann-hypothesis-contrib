@@ -66,8 +66,8 @@ theorem RelevantPrimeDimGe.full : RelevantPrimeDimGe.Statement.{u} := RelevantPr
 
 theorem HilbDegreeBound.full : HilbDegreeBound.Statement.{u} :=
   HilbDegreeBound.proof HilbEventuallyPoly.full HilbExactDivide.full PolyOfDiffs.full
-    PrimeFiltration.full EventuallyPolyUnique.full EventuallyPolyShift.full
-    HilbIrrelevantZero.full RelevantPrimeDimGe.full
+    PrimeFiltration.full EventuallyPolyUnique.full EventuallyPolyShift.full HilbIrrelevantZero.full
+    RelevantPrimeDimGe.full
 
 theorem MixedDiffConst.full : MixedDiffConst.Statement.{u} :=
   MixedDiffConst.proof HilbDegreeBound.full HilbEventuallyPoly.full
@@ -100,8 +100,8 @@ theorem IntNumUnique.full : IntNumUnique.Statement.{u} :=
 theorem ProjectionFormulaContracted.full : ProjectionFormulaContracted.Statement.{u} :=
   PFContracted.proof MixedDiffConst.full CutRational.full
 
-theorem ProjectionFormulaDegree.of_divPushForward (h : DivPushForward.Statement.{u}) :
-    ProjectionFormulaDegree.Statement.{u} :=
+theorem ProjectionFormulaDegree.of_divPushForward (h : DivPushForward.Statement.{u})
+    : ProjectionFormulaDegree.Statement.{u} :=
   ProjectionFormulaDegree.proof CutRational.full IntNumBase.full ProjectionFormulaContracted.full h
 
 theorem RenameHilbFn.full : RenameHilbFn.Statement.{u} := RenameHilbFn.proof

@@ -11,12 +11,22 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-theorem UpperTheory.HF.rad_bounds :
-    ∀ {φ : Frame} (H : HostAx φ), Real.log H.rad ≤ 2 * Real.log H.rd ∧ (H.ram.card : ℝ) ≤ 2 * Real.log H.rd / Real.log 2 ∧ (∀ D₀ : ℝ, 0 ≤ D₀ → ∑ l ∈ H.ram, (⌈H.vdH l * D₀⌉ : ℝ) * Real.log l ≤ (D₀ + 2) * Real.log H.rd) ∧ ((∏ l ∈ H.ram, l ^ ⌈H.vdH l⌉₊ : ℕ) : ℝ) ≤ H.rd ^ 2 ∧ ∀ g₁ g₂ L : ℝ, 0 < g₁ → 0 < g₂ → Real.log g₁ ≤ 9 * L + 1 → Real.log g₂ ≤ 9 * L + 1 → Real.log H.rd ≤ L / 100 → Real.log (g₁ * g₂ * H.rad) ≤ Real.log (g₁ * g₂) + 2 * Real.log H.rd ∧ Real.log (g₁ * g₂) + 2 * Real.log H.rd ≤ 18 * L + 2 + L / 50 := by
+theorem UpperTheory.HF.rad_bounds
+    : ∀ {φ : Frame} (H : HostAx φ),
+      Real.log H.rad ≤ 2 * Real.log H.rd ∧ (H.ram.card : ℝ) ≤ 2 * Real.log H.rd / Real.log 2
+        ∧ (∀ D₀ : ℝ,
+          0 ≤ D₀ → ∑ l ∈ H.ram, (⌈H.vdH l * D₀⌉ : ℝ) * Real.log l ≤ (D₀ + 2) * Real.log H.rd)
+        ∧ ((∏ l ∈ H.ram, l ^ ⌈H.vdH l⌉₊ : ℕ) : ℝ) ≤ H.rd ^ 2
+        ∧ ∀ g₁ g₂ L : ℝ,
+          0 < g₁ → 0 < g₂ → Real.log g₁ ≤ 9 * L + 1 → Real.log g₂ ≤ 9 * L + 1
+            → Real.log H.rd ≤ L / 100
+            → Real.log (g₁ * g₂ * H.rad) ≤ Real.log (g₁ * g₂) + 2 * Real.log H.rd
+              ∧ Real.log (g₁ * g₂) + 2 * Real.log H.rd ≤ 18 * L + 2 + L / 50 := by
   intro φ H
   obtain ⟨hs, -, -, hrd⟩ := UpperTheory.HF.log_rd_sum H
   have hp : ∀ l ∈ H.ram, l.Prime := fun l hl => Nat.prime_of_mem_primeFactors hl
-  have hv : ∀ l ∈ H.ram, 1 / 2 ≤ H.vdH l := fun l hl => (UpperTheory.HF.mem_ram H (hp l hl)).2.2.2.1 hl
+  have hv : ∀ l ∈ H.ram, 1 / 2 ≤ H.vdH l := fun l hl =>
+    (UpperTheory.HF.mem_ram H (hp l hl)).2.2.2.1 hl
   have hl0 : ∀ l ∈ H.ram, (0 : ℝ) < l := fun l hl => Nat.cast_pos.2 (hp l hl).pos
   have hlog2 : ∀ l ∈ H.ram, Real.log 2 ≤ Real.log l := fun l hl =>
     Real.log_le_log (by norm_num) (by exact_mod_cast (hp l hl).two_le)
@@ -49,10 +59,10 @@ theorem UpperTheory.HF.rad_bounds :
     exact mul_le_mul_of_nonneg_right hc (hlog l hl)
   · have hpos : (0 : ℝ) < ((∏ l ∈ H.ram, l ^ ⌈H.vdH l⌉₊ : ℕ) : ℝ) := by
       rw [Nat.cast_prod]
-      exact Finset.prod_pos fun l hl => by
-        rw [Nat.cast_pow]; exact pow_pos (hl0 l hl) _
+      exact Finset.prod_pos fun l hl => by rw [Nat.cast_pow]; exact pow_pos (hl0 l hl) _
     rw [← Real.log_le_log_iff hpos (pow_pos hrd 2), Real.log_pow, Nat.cast_prod,
-      Real.log_prod fun l hl => by rw [Nat.cast_pow]; exact (pow_pos (hl0 l hl) _).ne', hs, Finset.mul_sum]
+      Real.log_prod fun l hl => by rw [Nat.cast_pow]; exact (pow_pos (hl0 l hl) _).ne', hs,
+      Finset.mul_sum]
     refine Finset.sum_le_sum fun l hl => ?_
     rw [Nat.cast_pow, Real.log_pow, ← mul_assoc]
     refine mul_le_mul_of_nonneg_right ?_ (hlog l hl)

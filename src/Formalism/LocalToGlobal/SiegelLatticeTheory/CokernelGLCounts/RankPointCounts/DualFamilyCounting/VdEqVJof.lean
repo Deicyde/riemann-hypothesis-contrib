@@ -12,29 +12,38 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.G1
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem vd_eq_vJof (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K}
-    (L : Submodule (𝓞 K) V) (𝔭 : Ideal (𝓞 F)) (h𝔭 : 𝔭.IsMaximal)
+theorem vd_eq_vJof
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K}
+    (L : Submodule (𝓞 K) V)
+    (𝔭 : Ideal (𝓞 F)) (h𝔭 : 𝔭.IsMaximal)
     (b : Fin (finrank K (⊤ : Submodule K V)) → V) (a : Fin (finrank K (⊤ : Submodule K V)) → 𝓞 F)
-    (hJ : Cnt.IsJordanIn h ⊤ L 𝔭 b a) : vd h L 𝔭 = Cnt.vJof 𝔭 a := by
+    (hJ : Cnt.IsJordanIn h ⊤ L 𝔭 b a)
+    : vd h L 𝔭 = Cnt.vJof 𝔭 a := by
   classical
   obtain ⟨P, hP, hPc⟩ := exists_over (K := K) 𝔭 h𝔭
   haveI := h𝔭.isPrime
   have e : Fin (finrank K (⊤ : Submodule K V)) ≃ Fin (finrank K V) := finCongr (finrank_top K V)
-  have hmap : ∀ x : 𝓞 F, algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) x) = algebraMap F K (x : F) := fun x => by
+  have hmap
+      : ∀ x : 𝓞 F,
+        algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) x) = algebraMap F K (x : F) := fun x => by
     rw [← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K, IsScalarTower.algebraMap_apply (𝓞 F) F K]
   have hA0 : (∏ i, a i) ≠ 0 := Finset.prod_ne_zero_iff.2 fun i _ => hJ.2.2.2.2 i
-  have horth : ∀ i j, i ≠ j → h (b (e.symm i)) (b (e.symm j)) = 0 :=
-    fun i j hij => hJ.2.2.1 _ _ fun h' => hij (e.symm.injective h')
+  have horth : ∀ i j, i ≠ j → h (b (e.symm i)) (b (e.symm j)) = 0 := fun i j hij =>
+    hJ.2.2.1 _ _ fun h' => hij (e.symm.injective h')
   have hrange : Set.range (fun j => b (e.symm j)) = Set.range b := e.symm.surjective.range_comp b
 
-  have hgb : (U0.gram h fun j => b (e.symm j)).det =
-      algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) (∏ i, a i)) := by
+  have hgb
+      : (U0.gram h fun j => b (e.symm j)).det
+        = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) (∏ i, a i)) := by
     rw [gram_det_orth horth]
     have hp : ∏ j, h (b (e.symm j)) (b (e.symm j)) = ∏ i, h (b i) (b i) :=
       Fintype.prod_equiv e.symm _ _ fun _ => rfl
@@ -56,11 +65,13 @@ theorem vd_eq_vJof (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : Is
         rw [vF_prod h𝔭 Finset.univ t ht0]
         exact Finset.sum_eq_zero fun i _ => vF_of_notMem h𝔭 (ht1 i)
       have hst : ∀ u : F, star (algebraMap F K u) = algebraMap F K u := fun u => (hF _).2 ⟨u, rfl⟩
-      have hx : (U0.gram h fun j => algebraMap F K (t (e.symm j) : F) • b (e.symm j)).det =
-          algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) ((∏ i, t i) * (∏ i, t i) * ∏ i, a i)) := by
+      have hx
+          : (U0.gram h fun j => algebraMap F K (t (e.symm j) : F) • b (e.symm j)).det
+            = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) ((∏ i, t i) * (∏ i, t i) * ∏ i, a i)) := by
         rw [gram_det_smul_orth horth]
-        have hp1 : ∏ j, star (algebraMap F K (t (e.symm j) : F)) * algebraMap F K (t (e.symm j) : F) =
-            ∏ i, algebraMap F K (t i : F) * algebraMap F K (t i : F) :=
+        have hp1
+            : ∏ j, star (algebraMap F K (t (e.symm j) : F)) * algebraMap F K (t (e.symm j) : F)
+              = ∏ i, algebraMap F K (t i : F) * algebraMap F K (t i : F) :=
           Fintype.prod_equiv e.symm _ _ fun j => by rw [hst]
         have hp2 : ∏ j, h (b (e.symm j)) (b (e.symm j)) = ∏ i, h (b i) (b i) :=
           Fintype.prod_equiv e.symm _ _ fun _ => rfl
@@ -76,8 +87,9 @@ theorem vd_eq_vJof (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : Is
       have h3 : (∏ i, t i) * (∏ i, t i) * ∏ i, a i ∈ 𝔭 ^ m := by
         rw [← MeanB.comap_extP_pow (K := K) 𝔭 m]
         exact h2
-      rw [mem_pow_iff h𝔭 (mul_ne_zero (mul_ne_zero hT0 hT0) hA0), vF_mul h𝔭 (mul_ne_zero hT0 hT0) hA0,
-        vF_mul h𝔭 hT0 hT0, hvT] at h3
+      rw [mem_pow_iff h𝔭 (mul_ne_zero (mul_ne_zero hT0 hT0) hA0),
+          vF_mul h𝔭 (mul_ne_zero hT0 hT0) hA0, vF_mul h𝔭 hT0 hT0, hvT]
+        at h3
       simpa using h3
     · intro hv
       unfold discrIdeal

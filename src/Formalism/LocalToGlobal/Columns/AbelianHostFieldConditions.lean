@@ -21,11 +21,8 @@ namespace Formalism.L2.Col
 open Formalism.BasicNotions Formalism.L2.Host Formalism.L2.DIV Formalism.FrobeniusOrbits
 
 structure Fields where
-
   F : Type
-
   E : Type
-
   K : Type
   [fieldF : Field F]
   [nfF : NumberField F]
@@ -34,18 +31,15 @@ structure Fields where
   [fieldK : Field K]
   [nfK : NumberField K]
   [algFE : Algebra F E]
-
   [starE : StarRing E]
-
   [starK : StarRing K]
-
   Tau : Type
   [ftTau : Fintype Tau]
   [deTau : DecidableEq Tau]
-
   emb : Tau → (E →+* K)
 
-attribute [instance] Fields.fieldF Fields.nfF Fields.fieldE Fields.nfE Fields.fieldK Fields.nfK Fields.algFE
+attribute [instance]
+  Fields.fieldF Fields.nfF Fields.fieldE Fields.nfE Fields.fieldK Fields.nfK Fields.algFE
   Fields.starE Fields.starK Fields.ftTau Fields.deTau
 
 namespace Fields
@@ -82,48 +76,30 @@ def Kq : Subfield X.E where
     rw [map_inv₀, map_inv₀, ha τ τ']
 
 structure Ok : Prop where
-
   realF : IsTotallyReal X.F
-
   rankE : Module.finrank X.F X.E = 2
-
   star_F : ∀ x : X.F, star (algebraMap X.F X.E x) = algebraMap X.F X.E x
-
   conjE : ∀ (φ : X.E →+* ℂ) (x : X.E), φ (star x) = starRingEnd ℂ (φ x)
-
   cplxE : IsTotallyComplex X.E
-
   emb_star : ∀ (τ : X.Tau) (x : X.E), X.emb τ (star x) = star (X.emb τ x)
-
   card_Tau : Fintype.card X.Tau = Module.finrank ℚ X.F
-
   emb_inj : Function.Injective X.emb
-
   emb_ne : ∀ τ τ' : X.Tau, X.emb τ ≠ X.embBar τ'
-
   emb_all : ∀ φ : X.E →+* X.K, ∃ τ : X.Tau, φ = X.emb τ ∨ φ = X.embBar τ
-
   cplxK : IsTotallyComplex X.K
-
   normalK : Normal ℚ X.K
-
   conjK : ∃ σ₀ : X.K →+* ℂ, ∀ x : X.K, σ₀ (star x) = starRingEnd ℂ (σ₀ x)
-
   quad : Module.finrank ℚ X.Kq = 2
 
 structure AbelianUnramifiedExtensionConditions : Prop where
   ok : X.Ok
-
   eight_dvd : 8 ∣ X.f
-
   galE : IsGalois ℚ X.E
-
   abelE : ∀ s t : X.E ≃ₐ[ℚ] X.E, s * t = t * s
-
-  unram : ∀ P : HeightOneSpectrum (𝓞 X.E),
-    ¬ (P.asIdeal.comap (algebraMap (𝓞 X.F) (𝓞 X.E))).map (algebraMap (𝓞 X.F) (𝓞 X.E)) ≤ P.asIdeal ^ 2
-
-
+  unram
+    : ∀ P : HeightOneSpectrum (𝓞 X.E),
+      ¬ (P.asIdeal.comap (algebraMap (𝓞 X.F) (𝓞 X.E))).map (algebraMap (𝓞 X.F) (𝓞 X.E))
+        ≤ P.asIdeal ^ 2
 
 variable {X} in
 theorem Ok.f_pos (h : X.Ok) : 0 < X.f := by
@@ -131,16 +107,11 @@ theorem Ok.f_pos (h : X.Ok) : 0 < X.f := by
   rw [h.card_Tau]
   exact Module.finrank_pos
 
-
-
-
-
 def IsCond (N : ℕ) : Prop := ∀ j : X.E →ₐ[ℚ] Qb, Formalism.L2.Host.IsCond j.fieldRange N
 
 def embC (σ₀ : X.K →+* ℂ) (τ : X.Tau) : X.E →+* ℂ := σ₀.comp (X.emb τ)
 
 end Fields
-
 
 open Classical in
 def divs {A : Type} [CommRing A] [IsDedekindDomain A] (a : A) : Finset (HeightOneSpectrum A) :=
@@ -148,19 +119,13 @@ def divs {A : Type} [CommRing A] [IsDedekindDomain A] (a : A) : Finset (HeightOn
   if h : {P : HeightOneSpectrum A | a ∈ P.asIdeal}.Finite then h.toFinset else ∅
 
 structure Primes (X : Fields) where
-
   cond : ℕ
-
   g : Fin 2 → ℕ
-
   piG : Fin 2 → 𝓞 X.E
-
   Word : Type
   [ftWord : Fintype Word]
   [deWord : DecidableEq Word]
-
   T : Word → ℕ
-
   piT : Word → 𝓞 X.E
 
 attribute [instance] Primes.ftWord Primes.deWord
@@ -173,46 +138,34 @@ def vT (u : Pr.Word) : Finset (HeightOneSpectrum (𝓞 X.E)) := divs (Pr.piT u)
 
 def vG (i : Fin 2) : Finset (HeightOneSpectrum (𝓞 X.E)) := divs (X.conjO (Pr.piG i))
 
-
 open Classical in
-def vGs : Finset (HeightOneSpectrum (𝓞 X.E)) := open Classical in Pr.vG 0 ∪ Pr.vG 1
+def vGs : Finset (HeightOneSpectrum (𝓞 X.E)) :=
+  open Classical in
+  Pr.vG 0 ∪ Pr.vG 1
 
 structure Ok : Prop where
-
   g_prime : ∀ i, (Pr.g i).Prime
-
   piG_Kq : ∀ i, ((Pr.piG i : 𝓞 X.E) : X.E) ∈ X.Kq
-
   piG_norm : ∀ i, Pr.piG i * X.conjO (Pr.piG i) = (Pr.g i : 𝓞 X.E)
-
   piG_cop : ∀ i, IsCoprime (Pr.piG i) (X.conjO (Pr.piG i))
-
   vG_card : ∀ i, (Pr.vG i).card = X.f
-
   vG_norm : ∀ i, ∀ w ∈ Pr.vG i, Ideal.absNorm w.asIdeal = Pr.g i
-
   g_cong : ∀ i, Pr.g i ≡ 1 [MOD Pr.cond]
-
   g_ne : Pr.g 0 ≠ Pr.g 1
-
   T_prime : ∀ u, (Pr.T u).Prime
-
   piT_Kq : ∀ u, ((Pr.piT u : 𝓞 X.E) : X.E) ∈ X.Kq
   piT_norm : ∀ u, Pr.piT u * X.conjO (Pr.piT u) = (Pr.T u : 𝓞 X.E)
-
   piT_cop : ∀ u, IsCoprime (Pr.piT u) (X.conjO (Pr.piT u))
-
   vT_card : ∀ u, (Pr.vT u).card = X.f
   vT_norm : ∀ u, ∀ P ∈ Pr.vT u, Ideal.absNorm P.asIdeal = Pr.T u
-
   piT_cong : ∀ u, ((Pr.cond * (Pr.g 0 * Pr.g 1) ^ 2 : ℕ) : 𝓞 X.E) ∣ Pr.piT u - 1
-
   T_ne_g : ∀ u i, Pr.T u ≠ Pr.g i
 
 def PiGCong : Prop := ∀ i, ((Pr.cond : ℕ) : 𝓞 X.E) ∣ Pr.piG i - 1
 
-theorem natCast_dvd_intCast {E : Type} [Field E] [NumberField E] {c : ℕ} {n : ℤ} (h : ((c : ℕ) : 𝓞 E) ∣ ((n : ℤ) : 𝓞 E)) :
-    (c : ℤ) ∣ n := by
+theorem natCast_dvd_intCast
+    {E : Type} [Field E] [NumberField E] {c : ℕ} {n : ℤ} (h : ((c : ℕ) : 𝓞 E) ∣ ((n : ℤ) : 𝓞 E))
+    : (c : ℤ) ∣ n := by
   classical
   let b := NumberField.RingOfIntegers.basis E
   have hd := map_dvd (Algebra.norm ℤ) h
@@ -224,17 +177,18 @@ theorem natCast_dvd_intCast {E : Type} [Field E] [NumberField E] {c : ℕ} {n : 
     exact Module.finrank_pos.ne'
   exact (Int.pow_dvd_pow_iff hpos).1 hd
 
-
 variable {Pr} in
-theorem PiGCong.g_cong (h : Pr.PiGCong) (hn : ∀ i, Pr.piG i * X.conjO (Pr.piG i) = (Pr.g i : 𝓞 X.E)) (i : Fin 2) :
-    Pr.g i ≡ 1 [MOD Pr.cond] := by
+theorem PiGCong.g_cong
+    (h : Pr.PiGCong) (hn : ∀ i, Pr.piG i * X.conjO (Pr.piG i) = (Pr.g i : 𝓞 X.E)) (i : Fin 2)
+    : Pr.g i ≡ 1 [MOD Pr.cond] := by
   have hx := h i
   have hc : ((Pr.cond : ℕ) : 𝓞 X.E) ∣ X.conjO (Pr.piG i) - 1 := by
     have := map_dvd X.conjO hx
     rwa [map_sub, map_one, map_natCast] at this
   have hg : ((Pr.cond : ℕ) : 𝓞 X.E) ∣ (((Pr.g i : ℤ) - 1 : ℤ) : 𝓞 X.E) := by
-    have he : (((Pr.g i : ℤ) - 1 : ℤ) : 𝓞 X.E)
-        = (Pr.piG i - 1) * X.conjO (Pr.piG i) + (X.conjO (Pr.piG i) - 1) := by
+    have he
+        : (((Pr.g i : ℤ) - 1 : ℤ) : 𝓞 X.E)
+          = (Pr.piG i - 1) * X.conjO (Pr.piG i) + (X.conjO (Pr.piG i) - 1) := by
       push_cast
       rw [← hn i]
       ring
@@ -245,13 +199,9 @@ theorem PiGCong.g_cong (h : Pr.PiGCong) (hn : ∀ i, Pr.piG i * X.conjO (Pr.piG 
 end Primes
 
 structure Chars (X : Fields) (Pr : Primes X) (m : ℕ) where
-
   psi0 : ∀ w : {w // w ∈ Pr.vGs}, AddChar (𝓞 X.E ⧸ w.1.asIdeal) X.K
-
   chi : Fin m → ∀ w : {w // w ∈ Pr.vGs}, (𝓞 X.E ⧸ w.1.asIdeal)ˣ →* X.Kˣ
-
   muVal : Fin m → HeightOneSpectrum (𝓞 X.E) → X.Kˣ
-
   etaVal : HeightOneSpectrum (𝓞 X.E) → X.Kˣ
 
 namespace Chars
@@ -259,23 +209,27 @@ namespace Chars
 variable {X : Fields} {Pr : Primes X} {m : ℕ} (Ch : Chars X Pr m)
 
 structure Ok : Prop where
-
   psi_zero_nontrivial_character : ∀ w, Ch.psi0 w ≠ 1
-
   chi_inj : ∀ w, Function.Injective fun j => Ch.chi j w
-
-  chi_same : ∀ (i : Fin 2) (w w' : {w // w ∈ Pr.vGs}), w.1 ∈ Pr.vG i → w'.1 ∈ Pr.vG i →
-    ∀ (j : Fin m) (a : ℤ) (x : (𝓞 X.E ⧸ w.1.asIdeal)ˣ) (x' : (𝓞 X.E ⧸ w'.1.asIdeal)ˣ),
-      (x : 𝓞 X.E ⧸ w.1.asIdeal) = (a : 𝓞 X.E ⧸ w.1.asIdeal) →
-      (x' : 𝓞 X.E ⧸ w'.1.asIdeal) = (a : 𝓞 X.E ⧸ w'.1.asIdeal) → Ch.chi j w x = Ch.chi j w' x'
-
-  characterAgreesOnPlaces : ∀ (i : Fin 2) (w w' : {w // w ∈ Pr.vGs}), w.1 ∈ Pr.vG i → w'.1 ∈ Pr.vG i →
-    ∀ a : ℤ, Ch.psi0 w (a : 𝓞 X.E ⧸ w.1.asIdeal) = Ch.psi0 w' (a : 𝓞 X.E ⧸ w'.1.asIdeal)
-
-  chi_om : ∀ i : Fin 2, ∃ om : (ZMod (Pr.g i))ˣ →* X.Kˣ, Function.Injective om ∧
-    ∀ w : {w // w ∈ Pr.vGs}, w.1 ∈ Pr.vG i → ∀ (j : Fin m) (a : (ZMod (Pr.g i))ˣ) (x : (𝓞 X.E ⧸ w.1.asIdeal)ˣ),
-      (x : 𝓞 X.E ⧸ w.1.asIdeal) = (((a : ZMod (Pr.g i)).val : ℕ) : 𝓞 X.E ⧸ w.1.asIdeal) →
-      Ch.chi j w x = om a ^ (2 * (j.1 + 1))
+  chi_same
+    : ∀ (i : Fin 2) (w w' : {w // w ∈ Pr.vGs}),
+      w.1 ∈ Pr.vG i → w'.1 ∈ Pr.vG i
+        → ∀ (j : Fin m) (a : ℤ) (x : (𝓞 X.E ⧸ w.1.asIdeal)ˣ) (x' : (𝓞 X.E ⧸ w'.1.asIdeal)ˣ),
+          (x : 𝓞 X.E ⧸ w.1.asIdeal) = (a : 𝓞 X.E ⧸ w.1.asIdeal)
+            → (x' : 𝓞 X.E ⧸ w'.1.asIdeal) = (a : 𝓞 X.E ⧸ w'.1.asIdeal)
+            → Ch.chi j w x = Ch.chi j w' x'
+  characterAgreesOnPlaces
+    : ∀ (i : Fin 2) (w w' : {w // w ∈ Pr.vGs}),
+      w.1 ∈ Pr.vG i → w'.1 ∈ Pr.vG i
+        → ∀ a : ℤ, Ch.psi0 w (a : 𝓞 X.E ⧸ w.1.asIdeal) = Ch.psi0 w' (a : 𝓞 X.E ⧸ w'.1.asIdeal)
+  chi_om
+    : ∀ i : Fin 2, ∃ om : (ZMod (Pr.g i))ˣ →* X.Kˣ,
+      Function.Injective om
+        ∧ ∀ w : {w // w ∈ Pr.vGs},
+          w.1 ∈ Pr.vG i
+            → ∀ (j : Fin m) (a : (ZMod (Pr.g i))ˣ) (x : (𝓞 X.E ⧸ w.1.asIdeal)ˣ),
+              (x : 𝓞 X.E ⧸ w.1.asIdeal) = (((a : ZMod (Pr.g i)).val : ℕ) : 𝓞 X.E ⧸ w.1.asIdeal)
+                → Ch.chi j w x = om a ^ (2 * (j.1 + 1))
 
 end Chars
 
@@ -285,29 +239,34 @@ structure IsEtaT (X : Fields) (σ₀ : X.K →+* ℂ) (χ : HChar X.E) : Prop wh
   res : χ.ResEta X.F
   inf : χ.HasInf (X.embC σ₀) (fun _ => 1)
 
-structure IsMu0 {X : Fields} {Pr : Primes X} {m : ℕ} (Ch : Chars X Pr m) (σ₀ : X.K →+* ℂ) (e : X.Tau → ℚ) (j : Fin m)
-    (χ : HChar X.E) : Prop where
+structure IsMu0
+    {X : Fields} {Pr : Primes X} {m : ℕ}
+    (Ch : Chars X Pr m) (σ₀ : X.K →+* ℂ) (e : X.Tau → ℚ) (j : Fin m) (χ : HChar X.E)
+    : Prop where
   unitary : χ.IsUnitary
   triv : χ.TrivOn X.F
-  inf : χ.HasInfQ (X.embC σ₀) (fun τ => -e τ)
+  inf : χ.HasInfQ (X.embC σ₀) (fun τ => - e τ)
   unr : ∀ v : HeightOneSpectrum (𝓞 X.E), (∀ i, ((Pr.g i : ℕ) : 𝓞 X.E) ∉ v.asIdeal) → χ.UnrAt v
   tame : ∀ v, χ.TameAt v
-  atg : ∀ (w : {w // w ∈ Pr.vGs}) (x : X.Eˣ) (y : 𝓞 X.E) (c : (𝓞 X.E ⧸ w.1.asIdeal)ˣ), (x : X.E) = (y : X.E) →
-    (c : 𝓞 X.E ⧸ w.1.asIdeal) = Ideal.Quotient.mk w.1.asIdeal y →
-    ((χ.locK w.1 x : ℂˣ) : ℂ) = σ₀ (((Ch.chi j w c)⁻¹ : X.Kˣ) : X.K)
+  atg
+    : ∀ (w : {w // w ∈ Pr.vGs}) (x : X.Eˣ) (y : 𝓞 X.E) (c : (𝓞 X.E ⧸ w.1.asIdeal)ˣ),
+      (x : X.E) = (y : X.E) → (c : 𝓞 X.E ⧸ w.1.asIdeal) = Ideal.Quotient.mk w.1.asIdeal y
+        → ((χ.locK w.1 x : ℂˣ) : ℂ) = σ₀ (((Ch.chi j w c)⁻¹ : X.Kˣ) : X.K)
 
-structure Chars.Tied {X : Fields} {Pr : Primes X} {m : ℕ} (Ch : Chars X Pr m) (σ₀ : X.K →+* ℂ) (e : Fin m → X.Tau → ℚ)
-    (mu : Fin m → HChar X.E) (eta : HChar X.E) : Prop where
+structure Chars.Tied
+    {X : Fields} {Pr : Primes X} {m : ℕ} (Ch : Chars X Pr m) (σ₀ : X.K →+* ℂ)
+    (e : Fin m → X.Tau → ℚ) (mu : Fin m → HChar X.E) (eta : HChar X.E)
+    : Prop where
   mu0 : ∀ j, IsMu0 Ch σ₀ (e j) j (mu j)
-  muVal : ∀ (j : Fin m) (v : HeightOneSpectrum (𝓞 X.E)), (∀ i, ((Pr.g i : ℕ) : 𝓞 X.E) ∉ v.asIdeal) →
-    σ₀ (Ch.muVal j v : X.K) = (((mu j).val v : ℂˣ) : ℂ)
+  muVal
+    : ∀ (j : Fin m) (v : HeightOneSpectrum (𝓞 X.E)),
+      (∀ i, ((Pr.g i : ℕ) : 𝓞 X.E) ∉ v.asIdeal)
+        → σ₀ (Ch.muVal j v : X.K) = (((mu j).val v : ℂˣ) : ℂ)
   etaT : IsEtaT X σ₀ eta
   etaVal : ∀ v : HeightOneSpectrum (𝓞 X.E), σ₀ (Ch.etaVal v : X.K) = eta.valTw (1 / 2) v
 
 structure QDat (X : Fields) where
-
   Q : Finset (HeightOneSpectrum (𝓞 X.E))
-
   xi : ∀ P : {P // P ∈ Q}, (𝓞 X.E ⧸ P.1.asIdeal)ˣ →* X.Kˣ
 
 namespace QDat
@@ -315,15 +274,10 @@ namespace QDat
 variable {X : Fields} (Z : QDat X)
 
 structure Ok : Prop where
-
   deg_one : ∀ P ∈ Z.Q, (Ideal.absNorm P.asIdeal).Prime
-
   unram : ∀ P ∈ Z.Q, ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 X.E) ∉ P.asIdeal ^ 2
-
   one_over : ∀ P ∈ Z.Q, ∀ P' ∈ Z.Q, P'.asIdeal ≠ P.asIdeal.comap X.conjO
-
   xi_ne : ∀ P, Z.xi P ≠ 1
-
 
 end QDat
 
@@ -342,10 +296,12 @@ theorem spread_shiftW {N : ℕ} (lam : DomWeight N) (c : ℤ) : (shiftW lam c).s
     ring
   · rfl
 
-
 open Classical in
 def ofQ {N : ℕ} (x : Fin N → ℚ) : DomWeight N :=
-  if h : Antitone x then ⟨fun i => ⌊x i⌋, fun _ _ hij => Int.floor_mono (h hij)⟩ else ⟨fun _ => 0, fun _ _ _ => le_rfl⟩
+  if h : Antitone x then
+    ⟨fun i => ⌊x i⌋, fun _ _ hij => Int.floor_mono (h hij)⟩
+  else
+    ⟨fun _ => 0, fun _ _ _ => le_rfl⟩
 
 structure RowPar (R : Ranks) where
   v : Fin (R.k - 1) → ℚ
@@ -364,13 +320,17 @@ def bAt (n : ℕ) : ℚ := if h : n < R.m then S.b ⟨n, h⟩ else 0
 
 def eAt (n : ℕ) : ℚ := if h : n < R.m then S.e ⟨n, h⟩ else 0
 
-def vb (n : ℕ) : ℚ := if h : n < R.k - 1 then S.v ⟨n, h⟩ else -S.bAt (n - (R.k - 1))
+def vb (n : ℕ) : ℚ := if h : n < R.k - 1 then S.v ⟨n, h⟩ else - S.bAt (n - (R.k - 1))
 
 def sgHC (n : ℕ) : ℚ :=
-  ((R.m : ℚ) * ((R.t : ℚ) + 1)) / 2 +
-  if h1 : n < R.k - 1 then S.v ⟨n, h1⟩
-  else if (n - (R.k - 1)) % (R.t + 1) = 0 then -S.bAt ((n - (R.k - 1)) / (R.t + 1))
-  else -S.eAt ((n - (R.k - 1)) / (R.t + 1)) + ((R.t : ℚ) - 1) / 2 - ((((n - (R.k - 1)) % (R.t + 1) : ℕ) : ℚ) - 1)
+  ((R.m : ℚ) * ((R.t : ℚ) + 1)) / 2
+    + if h1 : n < R.k - 1 then
+        S.v ⟨n, h1⟩
+      else if (n - (R.k - 1)) % (R.t + 1) = 0 then
+        - S.bAt ((n - (R.k - 1)) / (R.t + 1))
+      else
+        - S.eAt ((n - (R.k - 1)) / (R.t + 1)) + ((R.t : ℚ) - 1) / 2
+          - ((((n - (R.k - 1)) % (R.t + 1) : ℕ) : ℚ) - 1)
 
 def sgQ (i : Fin (R.N R.m - 1)) : ℚ := S.sgHC i.1 - rhoVec (R.N R.m - 1) i
 
@@ -385,25 +345,28 @@ def qOf (R : Ranks) (j : ℕ) : ℕ := R.m - j
 def dV (j : ℕ) : ℚ := ((pOf R j : ℚ) - (qOf R j : ℚ)) / 2 - S.eAt (j - 1) - 1 / 2
 
 def aPlus (j i : ℕ) : ℚ :=
-  (S.vb (i - 1) + S.eAt (j - 1)) - ((R.nV : ℚ) + 1 - 2 * (i : ℚ)) / 2 - ((pOf R j : ℚ) - (qOf R j : ℚ)) / 2
+  (S.vb (i - 1) + S.eAt (j - 1)) - ((R.nV : ℚ) + 1 - 2 * (i : ℚ)) / 2
+    - ((pOf R j : ℚ) - (qOf R j : ℚ)) / 2
 
-def aMinusRev (j c : ℕ) : ℚ := (S.bAt (j + c - 1) - S.eAt (j - 1)) + (1 - (R.t : ℚ) - 2 * (c : ℚ)) / 2
+def aMinusRev (j c : ℕ) : ℚ :=
+  (S.bAt (j + c - 1) - S.eAt (j - 1)) + (1 - (R.t : ℚ) - 2 * (c : ℚ)) / 2
 
 def lamVQ (j : ℕ) (i : Fin R.nV) : ℚ :=
-  (if i.1 < pOf R j then S.aPlus j (i.1 + 1)
-   else if i.1 < pOf R j + R.t then 0
-   else -S.aMinusRev j (i.1 - (pOf R j + R.t) + 1)) + S.dV j
+  (if i.1 < pOf R j then
+     S.aPlus j (i.1 + 1)
+   else if i.1 < pOf R j + R.t then
+     0
+   else
+     - S.aMinusRev j (i.1 - (pOf R j + R.t) + 1))
+    + S.dV j
 
 def lamV (j : ℕ) : DomWeight R.nV := ofQ (S.lamVQ j)
 
 end RowPar
 
 structure Wts (X : Fields) (Word : Type) (R : Ranks) where
-
   row : X.Tau → RowPar R
-
   hc : Word → X.Tau → HCParam R
-
   tops : Finset X.Tau
 
 namespace Wts
@@ -411,7 +374,6 @@ namespace Wts
 variable {X : Fields} {Word : Type} {R : Ranks} (W : Wts X Word R)
 
 structure Ok : Prop where
-
   row_ok : ∀ τ, ∃ P : HCParam R, RowPar.of P = W.row τ
   hc_row : ∀ u τ, RowPar.of (W.hc u τ) = W.row τ
   u_first : ∀ u u' τ (h : 0 < R.k), (W.hc u τ).u ⟨0, h⟩ = (W.hc u' τ).u ⟨0, h⟩
@@ -436,21 +398,17 @@ def bTop (u : Word) (τ : X.Tau) : ℤ := -(W.lamN u 0 τ).detShift
 end Wts
 
 structure Sizes {X : Fields} (Pr : Primes X) {R : Ranks} (W : Wts X Pr.Word R) (a : ℝ) : Prop where
-
   g_big : ∀ i, 2 * X.f * R.k < Pr.g i - 1
-
   T_gt : ∀ u, 4 * a < (Pr.T u : ℝ)
-
   a_gt : ((2 * X.f * R.N R.m + 1 : ℕ) : ℝ) < 4 * a
-
   spread_le : ∀ u j, j ≤ R.m → ∀ τ, ((W.lamTrue u j τ).spread : ℝ) ≤ 2 * a
 
 namespace Sizes
 
 variable {X : Fields} {Pr : Primes X} {R : Ranks} {W : Wts X Pr.Word R} {a : ℝ}
 
-theorem two_spread_lt (h : Sizes Pr W a) (u : Pr.Word) (j : ℕ) (hj : j ≤ R.m) (τ : X.Tau) :
-    2 * (W.lamTrue u j τ).spread < (Pr.T u : ℤ) := by
+theorem two_spread_lt (h : Sizes Pr W a) (u : Pr.Word) (j : ℕ) (hj : j ≤ R.m) (τ : X.Tau)
+    : 2 * (W.lamTrue u j τ).spread < (Pr.T u : ℤ) := by
   have h1 := h.spread_le u j hj τ
   have h2 := h.T_gt u
   have h3 : (2 * (W.lamTrue u j τ).spread : ℝ) < (Pr.T u : ℝ) := by linarith
@@ -458,39 +416,32 @@ theorem two_spread_lt (h : Sizes Pr W a) (u : Pr.Word) (j : ℕ) (hj : j ≤ R.m
 
 end Sizes
 
-def Chars.FromHecke {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m) (W : Wts X Pr.Word R)
-    (σ₀ : X.K →+* ℂ) : Prop :=
+def Chars.FromHecke
+    {X : Fields} {Pr : Primes X} {R : Ranks}
+    (Ch : Chars X Pr R.m) (W : Wts X Pr.Word R) (σ₀ : X.K →+* ℂ)
+    : Prop :=
   ∃ (mu : Fin R.m → HChar X.E) (eta : HChar X.E), Ch.Tied σ₀ (fun j τ => (W.row τ).e j) mu eta
 
 structure Dat where
   R : Ranks
   X : Fields
-
   sig0 : X.K →+* ℂ
   Pr : Primes X
   Ch : Chars X Pr R.m
   W : Wts X Pr.Word R
-
   a : ℝ
 
 structure Dat.Ok (D : Dat) : Prop where
   fields : D.X.Ok
-
   fieldsConditions : D.X.AbelianUnramifiedExtensionConditions
-
   embeddingStarConj : ∀ x : D.X.K, D.sig0 (star x) = starRingEnd ℂ (D.sig0 x)
-
   f_eq : D.X.f = D.R.f
   primes : D.Pr.Ok
-
   piG_cong : D.Pr.PiGCong
-
   cond : D.X.IsCond D.Pr.cond
   chars : D.Ch.Ok
-
   hecke : D.Ch.FromHecke D.W D.sig0
   wts : D.W.Ok
-
   e_even : ∀ j : Fin D.R.m, ∃ z : ℤ, ∑ τ, (D.W.row τ).e j = 2 * (z : ℚ)
   sizes : Sizes D.Pr D.W D.a
 
@@ -505,9 +456,12 @@ theorem fin_adjoin {S : Set Qb} (hS : S.Finite) : FiniteDimensional ℚ (adjoin 
   haveI : Finite S := hS.to_subtype
   exact IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
 
-theorem normal_of_map_le (L : Fld) (h : ∀ s : Qb ≃ₐ[ℚ] Qb, L.map (s : Qb →ₐ[ℚ] Qb) ≤ L) : Normal ℚ L := IntermediateField.normal_iff_forall_map_le'.2 h
+theorem normal_of_map_le (L : Fld) (h : ∀ s : Qb ≃ₐ[ℚ] Qb, L.map (s : Qb →ₐ[ℚ] Qb) ≤ L)
+    : Normal ℚ L :=
+  IntermediateField.normal_iff_forall_map_le'.2 h
 
-theorem normal_adjoin {S : Set Qb} (hS : ∀ (s : Qb ≃ₐ[ℚ] Qb), ∀ x ∈ S, s x ∈ S) : Normal ℚ (adjoin ℚ S) := by
+theorem normal_adjoin {S : Set Qb} (hS : ∀ (s : Qb ≃ₐ[ℚ] Qb), ∀ x ∈ S, s x ∈ S)
+    : Normal ℚ (adjoin ℚ S) := by
   apply normal_of_map_le
   intro s
   rw [IntermediateField.adjoin_map]
@@ -515,12 +469,13 @@ theorem normal_adjoin {S : Set Qb} (hS : ∀ (s : Qb ≃ₐ[ℚ] Qb), ∀ x ∈ 
   rintro x ⟨y, hy, rfl⟩
   exact IntermediateField.subset_adjoin ℚ S (hS s y hy)
 
-instance fin_sqQ (m : ℤ) : FiniteDimensional ℚ (sqQ m) := fin_adjoin (finite_pow_eq 2 (by norm_num) _)
+instance fin_sqQ (m : ℤ) : FiniteDimensional ℚ (sqQ m) :=
+  fin_adjoin (finite_pow_eq 2 (by norm_num) _)
 
-instance normal_sqQ (m : ℤ) : Normal ℚ (sqQ m) := normal_adjoin fun s x hx => by
-  show (s x) ^ 2 = (m : Qb)
-  rw [← map_pow, show x ^ 2 = (m : Qb) from hx, map_intCast]
-
+instance normal_sqQ (m : ℤ) : Normal ℚ (sqQ m) :=
+  normal_adjoin fun s x hx => by
+    show (s x) ^ 2 = (m : Qb)
+    rw [← map_pow, show x ^ 2 = (m : Qb) from hx, map_intCast]
 
 open Classical in
 def embQ {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ) (g : φ.GG) : H.EQ →ₐ[ℚ] Qb :=
@@ -528,8 +483,12 @@ def embQ {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ) (g : φ.GG) : H
 
 instance fintypePsi (φ : Formalism.HC.Frame) : Fintype φ.Psi := Fintype.ofFinite _
 
-def hostFields {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ) (ι : Qb →+* ℂ) (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL]
-    (hE : H.EQ ≤ LL) : Fields where
+def hostFields
+    {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ)
+    (ι : Qb →+* ℂ)
+    (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL]
+    (hE : H.EQ ≤ LL)
+    : Fields where
   F := H.FQ
   E := H.EQ
   K := CoF ι LL
@@ -539,6 +498,5 @@ def hostFields {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ) (ι : Qb 
   starE := starLL ι H.EQ
   Tau := φ.Psi
   emb := fun g => (tauLL hE (embQ H (g : φ.GG))).toRingHom
-
 
 end Formalism.L2.Col

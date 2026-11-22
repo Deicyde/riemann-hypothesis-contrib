@@ -18,10 +18,28 @@ open IsLocalRing TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem exists_finite_depth_two_hull_of_etale_off_closed_point : ∀ (S : Type) [CommRing S] [IsRegularLocalRing S], 2 ≤ ringKrullDim S → ∀ (A : Type) [CommRing A] [Algebra S A] [Module.Finite S A], ReciprocityTheory.CA.ModDepthGE S A 1 → (∀ (p : Ideal S) [p.IsPrime], p ≠ maximalIdeal S → Algebra.Etale (Localization.AtPrime p) (TensorProduct S (Localization.AtPrime p) A)) → ∃ (A' : Type) (_ : CommRing A') (_ : Algebra S A'), Module.Finite S A' ∧ ∃ ι : A →ₐ[S] A', Function.Injective ι ∧ ReciprocityTheory.CA.ModDepthGE S A' 2 ∧ (∀ (p : Ideal S) [p.IsPrime], p ≠ maximalIdeal S → Algebra.Etale (Localization.AtPrime p) (TensorProduct S (Localization.AtPrime p) A')) ∧ ∃ k : ℕ, ∀ x ∈ maximalIdeal S ^ k, ∀ y : A', x • y ∈ ι.range := by
+theorem exists_finite_depth_two_hull_of_etale_off_closed_point
+    : ∀ (S : Type) [CommRing S] [IsRegularLocalRing S],
+      2 ≤ ringKrullDim S
+        → ∀ (A : Type) [CommRing A] [Algebra S A] [Module.Finite S A],
+          ReciprocityTheory.CA.ModDepthGE S A 1
+            → (∀ (p : Ideal S) [p.IsPrime],
+              p ≠ maximalIdeal S
+                → Algebra.Etale (Localization.AtPrime p)
+                  (TensorProduct S (Localization.AtPrime p) A))
+            → ∃ (A' : Type) (_ : CommRing A') (_ : Algebra S A'),
+              Module.Finite S A'
+                ∧ ∃ ι : A →ₐ[S] A',
+                  Function.Injective ι ∧ ReciprocityTheory.CA.ModDepthGE S A' 2
+                    ∧ (∀ (p : Ideal S) [p.IsPrime],
+                      p ≠ maximalIdeal S
+                        → Algebra.Etale (Localization.AtPrime p)
+                          (TensorProduct S (Localization.AtPrime p) A'))
+                    ∧ ∃ k : ℕ, ∀ x ∈ maximalIdeal S ^ k, ∀ y : A', x • y ∈ ι.range := by
   intro S _ _ hdim A _ _ _ hdep het
   obtain ⟨hSd, hSic⟩ := isDomain_and_isIntegrallyClosed_of_isRegularLocalRing S
-  have htf : ∀ s : S, s ≠ 0 → IsSMulRegular A s := GlobalTheory.T.isSMulRegular_of_etale_punctured_of_depth_pos_domain' S A hdep het
+  have htf : ∀ s : S, s ≠ 0 → IsSMulRegular A s :=
+    GlobalTheory.T.isSMulRegular_of_etale_punctured_of_depth_pos_domain' S A hdep het
   let K := FractionRing S
   let j : A →ₐ[S] K ⊗[S] A := Algebra.TensorProduct.includeRight
   have hj : ∀ a, j a = TensorProduct.mk S K A 1 a := fun a => rfl
@@ -51,7 +69,8 @@ theorem exists_finite_depth_two_hull_of_etale_off_closed_point : ∀ (S : Type) 
     · rintro ⟨a, ha⟩; exact ⟨a, Subtype.ext ha⟩
 
   have hfg : (Subalgebra.toSubmodule B).FG := by
-    refine GlobalTheory.T.fg_of_ideal_pow_smul_mem_range_tensor S (maximalIdeal S) (GlobalTheory.T.isInteger_of_maximalIdeal_pow_smul_isInteger' S hdim) A _ fun z hz => ?_
+    refine GlobalTheory.T.fg_of_ideal_pow_smul_mem_range_tensor S (maximalIdeal S)
+      (GlobalTheory.T.isInteger_of_maximalIdeal_pow_smul_isInteger' S hdim) A _ fun z hz => ?_
     obtain ⟨k, hk⟩ := hz
     exact ⟨k, fun a ha => by obtain ⟨b, hb⟩ := hk a ha; exact ⟨b, hb⟩⟩
   haveI hfin : Module.Finite S B := Module.Finite.iff_fg.mpr hfg
@@ -61,8 +80,7 @@ theorem exists_finite_depth_two_hull_of_etale_off_closed_point : ∀ (S : Type) 
     obtain ⟨k, hk⟩ := y.2
     exact ⟨k, fun a ha => (hrange _).2 (hk a ha)⟩
   refine ⟨B, inferInstance, inferInstance, hfin, ι, hιinj, ?_, ?_, k, hk⟩
-  ·
-    obtain ⟨q, -, hq0, hqm⟩ := exists_isPrime_ne_bot_lt_maximalIdeal_of_two_le_ringKrullDim S hdim
+  · obtain ⟨q, -, hq0, hqm⟩ := exists_isPrime_ne_bot_lt_maximalIdeal_of_two_le_ringKrullDim S hdim
     have hm0 : maximalIdeal S ≠ ⊥ := (bot_le.trans_lt hqm).ne'
     obtain ⟨x, hxm, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hm0
     haveI : Nontrivial A := by
@@ -87,13 +105,16 @@ theorem exists_finite_depth_two_hull_of_etale_off_closed_point : ∀ (S : Type) 
         apply hVtf x hx0
         rw [smul_comm, hxw]
         exact (congrArg Subtype.val hv).symm
-      rw [this]; exact v.2
-    exact (Submodule.mem_smul_pointwise_iff_exists _ _ _).mpr ⟨⟨w, hwB⟩, Submodule.mem_top, Subtype.ext hxw⟩
+      rw [this]
+      exact v.2
+    exact (Submodule.mem_smul_pointwise_iff_exists _ _ _).mpr
+      ⟨⟨w, hwB⟩, Submodule.mem_top, Subtype.ext hxw⟩
   · intro p _ hp
     have hnot : ¬ maximalIdeal S ^ k ≤ p := fun h =>
       hp ((maximalIdeal.isMaximal S).eq_of_le (Ideal.IsPrime.ne_top inferInstance)
         (Ideal.IsPrime.le_of_pow_le h)).symm
     obtain ⟨s, hs, hsp⟩ := Set.not_subset.mp hnot
-    exact GlobalTheory.T.etale_localization_of_injective_cokernel_killed S A B ι hιinj p s hsp (hk s hs) (het p hp)
+    exact GlobalTheory.T.etale_localization_of_injective_cokernel_killed S A B ι hιinj p s hsp
+      (hk s hs) (het p hp)
 
 end GlobalTheory

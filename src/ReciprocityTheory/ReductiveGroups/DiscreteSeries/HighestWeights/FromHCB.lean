@@ -98,12 +98,15 @@ lemma fh_unitary (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H))
       _ = π (toMK g⁻¹) := by rw [← mul_assoc, h1, one_mul]
   exact Unitary.mem_iff.mpr ⟨h1, by rw [hstar, hTR]⟩
 
-def fhTau (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H))
-    (hU : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset (Formalism.MainNotions.S.allPos k)) π) :
-    KG (fun _ : Fin k => true) →* unitary (H →L[ℂ] H) where
+def fhTau
+    (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H))
+    (hU : Formalism.MainNotions.S.IsURepOn
+      (Formalism.MainNotions.S.UJset (Formalism.MainNotions.S.allPos k)) π)
+    : KG (fun _ : Fin k => true) →* unitary (H →L[ℂ] H) where
   toFun g := ⟨π (toMK g), fh_unitary π hU g⟩
   map_one' := Subtype.ext hU.1.1
-  map_mul' a b := Subtype.ext (hU.1.2 _ (a : UJ (fun _ : Fin k => true)).2 _ (b : UJ (fun _ : Fin k => true)).2)
+  map_mul' a b :=
+    Subtype.ext (hU.1.2 _ (a : UJ (fun _ : Fin k => true)).2 _ (b : UJ (fun _ : Fin k => true)).2)
 
 lemma fhTau_coe (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H))
     (hU : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset (Formalism.MainNotions.S.allPos k)) π) (g : KG (fun _ : Fin k => true)) :
@@ -123,12 +126,15 @@ end Tau
 
 section Der
 
-variable {k : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {k : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   (τ : KG (fun _ : Fin k => true) →* unitary (H →L[ℂ] H))
   (dτ : Matrix (Fin k) (Fin k) ℂ →ₗ[ℂ] (H →L[ℂ] H))
-  (hder : ∀ X, inK (fun _ : Fin k => true) X → ∀ γ : ℝ → KG (fun _ : Fin k => true),
-    (∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X)) →
-      HasDerivAt (fun t => ((τ (γ t) : unitary (H →L[ℂ] H)) : H →L[ℂ] H)) (dτ X) 0)
+  (hder : ∀ X,
+    inK (fun _ : Fin k => true) X
+      → ∀ γ : ℝ → KG (fun _ : Fin k => true),
+        (∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+          → HasDerivAt (fun t => ((τ (γ t) : unitary (H →L[ℂ] H)) : H →L[ℂ] H)) (dτ X) 0)
   (σ : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H))
   (hσ : ∀ g : KG (fun _ : Fin k => true), σ (toMK g) = ((τ g : unitary (H →L[ℂ] H)) : H →L[ℂ] H))
 

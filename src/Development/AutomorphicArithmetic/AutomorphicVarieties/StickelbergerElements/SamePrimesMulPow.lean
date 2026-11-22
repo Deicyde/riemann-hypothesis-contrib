@@ -35,11 +35,12 @@ variable {M : ℕ} [NeZero M] {Γ : Type} [Group Γ]
 def sumEl {R : Type} [CommRing R] (φ : (ZMod M)ˣ →* Γ) (f : ZMod M → R) : MonoidAlgebra R Γ :=
   ∑ b : (ZMod M)ˣ, MonoidAlgebra.single (φ b)⁻¹ (f b)
 
-def yForm (k a : ℕ) (φ : (ZMod M)ˣ →* Γ) : MonoidAlgebra ℚ Γ := -sumEl φ (Eva M k a)
+def yForm (k a : ℕ) (φ : (ZMod M)ˣ →* Γ) : MonoidAlgebra ℚ Γ := - sumEl φ (Eva M k a)
 
-def xEl (a : ℕ) (φ : (ZMod M)ˣ →* Γ) : MonoidAlgebra ℤ Γ := -sumEl φ (Eone M a)
+def xEl (a : ℕ) (φ : (ZMod M)ˣ →* Γ) : MonoidAlgebra ℤ Γ := - sumEl φ (Eone M a)
 
-def ytEl (e a : ℕ) (φ : (ZMod M)ˣ →* Γ) : MonoidAlgebra ℤ Γ := -sumEl φ fun b => (b.val : ℤ) ^ e * Eone M a b
+def ytEl (e a : ℕ) (φ : (ZMod M)ˣ →* Γ) : MonoidAlgebra ℤ Γ :=
+  - sumEl φ fun b => (b.val : ℤ) ^ e * Eone M a b
 
 end Elements
 
@@ -50,17 +51,17 @@ variable {G Γ : Type} [Group G] [Group Γ]
 abbrev cf (R Γ : Type) [CommRing R] [Group Γ] : MonoidAlgebra ℤ Γ →+* MonoidAlgebra R Γ :=
   MonoidAlgebra.mapRingHom Γ (Int.castRingHom R)
 
-theorem cf_single (R : Type) [CommRing R] (g : Γ) (n : ℤ) :
-    cf R Γ (MonoidAlgebra.single g n) = MonoidAlgebra.single g (n : R) := by
+theorem cf_single (R : Type) [CommRing R] (g : Γ) (n : ℤ)
+    : cf R Γ (MonoidAlgebra.single g n) = MonoidAlgebra.single g (n : R) := by
   simp [cf]
 
-theorem cf_sumEl (R : Type) [CommRing R] {M : ℕ} [NeZero M] (φ : (ZMod M)ˣ →* Γ) (f : ZMod M → ℤ) :
-    cf R Γ (sumEl φ f) = sumEl φ fun b => (f b : R) := by
+theorem cf_sumEl (R : Type) [CommRing R] {M : ℕ} [NeZero M] (φ : (ZMod M)ˣ →* Γ) (f : ZMod M → ℤ)
+    : cf R Γ (sumEl φ f) = sumEl φ fun b => (f b : R) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [sumEl, map_sum, cf_single]
+  simp only [sumEl, map_sum, cf_single]
 
-theorem sumEl_add {R : Type} [CommRing R] {M : ℕ} [NeZero M] (φ : (ZMod M)ˣ →* Γ) (f g : ZMod M → R) :
-    sumEl φ (fun b => f b + g b) = sumEl φ f + sumEl φ g := by
+theorem sumEl_add {R : Type} [CommRing R] {M : ℕ} [NeZero M] (φ : (ZMod M)ˣ →* Γ) (f g : ZMod M → R)
+    : sumEl φ (fun b => f b + g b) = sumEl φ f + sumEl φ g := by
   simp only [sumEl, MonoidAlgebra.single_add, Finset.sum_add_distrib]
 
 end Maps

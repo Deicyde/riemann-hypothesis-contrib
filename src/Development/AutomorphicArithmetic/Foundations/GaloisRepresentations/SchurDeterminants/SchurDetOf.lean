@@ -54,8 +54,7 @@ private lemma sch_add_X (tie : Comparison₂) (n : ℕ) (lam : Fin n → ℕ) (m
   rw [altn_add, ← tie (MvPolynomial (Fin n) ℚ) n lam X, ← mul_assoc] at h
   exact mul_right_cancel₀ (vdm_X_ne n) h
 
-theorem schurDet_of :
-    Comparison₂ → SchurDet := by
+theorem schurDet_of : Comparison₂ → SchurDet := by
   intro tie R _ _ n g
   refine ⟨?_, fun lam m => ?_⟩
   · rw [← aeval_sch, sch_zero_X tie, map_one]

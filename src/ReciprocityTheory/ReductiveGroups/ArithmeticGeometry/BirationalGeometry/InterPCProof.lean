@@ -17,9 +17,9 @@ open MvPolynomial ReciprocityTheory.AnForm.R
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem map_int_comp :
-    (MvPolynomial.map (algebraMap ℚ ℂ)).comp (MvPolynomial.map (Int.castRingHom ℚ)) =
-      (MvPolynomial.map (Int.castRingHom ℂ) : MRing ι →+* MRingOver ℂ ι) := by
+theorem map_int_comp
+    : (MvPolynomial.map (algebraMap ℚ ℂ)).comp (MvPolynomial.map (Int.castRingHom ℚ))
+      = (MvPolynomial.map (Int.castRingHom ℂ) : MRing ι →+* MRingOver ℂ ι) := by
   apply RingHom.ext
   intro p
   rw [RingHom.comp_apply, MvPolynomial.map_map]
@@ -30,16 +30,16 @@ theorem pC_eq_extC_extQ (P : Ideal (MRing ι)) : pC P = extC (extQ P) := by
   rw [Ideal.map_map, map_int_comp]
   rfl
 
-theorem horizontal_spec {P : Ideal (MRing ι)} (h : IsHorizontal P) :
-    ∀ m : ℤ, (C m : MRing ι) ∈ P → m = 0 := by
+theorem horizontal_spec {P : Ideal (MRing ι)} (h : IsHorizontal P)
+    : ∀ m : ℤ, (C m : MRing ι) ∈ P → m = 0 := by
   intro m hm
   have h1 : m ∈ P.comap (C : ℤ →+* MRing ι) := hm
   unfold IsHorizontal at h
   rw [h] at h1
   exact Ideal.mem_bot.mp h1
 
-theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ}
-    (h : a + 1 = ((n + 1 : ℕ) : WithBot ℕ∞)) : a = (n : WithBot ℕ∞) := by
+theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 = ((n + 1 : ℕ) : WithBot ℕ∞))
+    : a = (n : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot =>
     rw [WithBot.bot_add] at h
@@ -82,7 +82,10 @@ theorem pcContract : PCContractStatement := by
   haveI : P.IsPrime := hMP.1
   obtain ⟨_, hcomap, _⟩ := extQ_spec P (horizontal_spec hH)
   rw [pC_eq_extC_extQ] at hf
-  have h1 : f ∈ (extC (extQ P)).comap (MvPolynomial.map (Int.castRingHom ℂ) : MRing ι →+* MRingOver ℂ ι) := hf
+  have h1
+      : f ∈ (extC (extQ P)).comap
+        (MvPolynomial.map (Int.castRingHom ℂ) : MRing ι →+* MRingOver ℂ ι) :=
+    hf
   rw [← map_int_comp, ← Ideal.comap_comap, comap_extC, hcomap] at h1
   exact h1
 

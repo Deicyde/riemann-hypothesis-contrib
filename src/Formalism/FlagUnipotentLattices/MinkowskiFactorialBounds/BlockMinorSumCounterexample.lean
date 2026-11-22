@@ -9,27 +9,29 @@ namespace Formalism.HermitianLatticeCounting.P
 section G0
 open Finset Real MeasureTheory NumberField Formalism.HermitianLatticeCounting.ExpansionTerms
 
-theorem integral_norm_estimate_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.AlgebraicIntegerNormGeOne := by
+theorem integral_norm_estimate_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.AlgebraicIntegerNormGeOne := by
   intro E _ _ x hx
   rw [InfinitePlace.prod_eq_abs_norm]
-  have h : (Algebra.norm ℤ x) ≠ 0 := by
-    simpa [Algebra.norm_eq_zero_iff] using hx
-  have h2 : (Algebra.norm ℚ (x : E)) = ((Algebra.norm ℤ x : ℤ) : ℚ) := by
-    rw [Algebra.coe_norm_int]
+  have h : (Algebra.norm ℤ x) ≠ 0 := by simpa [Algebra.norm_eq_zero_iff] using hx
+  have h2 : (Algebra.norm ℚ (x : E)) = ((Algebra.norm ℤ x : ℤ) : ℚ) := by rw [Algebra.coe_norm_int]
   rw [h2]
   have : (1 : ℤ) ≤ |Algebra.norm ℤ x| := Int.one_le_abs h
   exact_mod_cast this
 
-theorem prod_max_inv_le_prod_max' : Formalism.HermitianLatticeCounting.ExpansionTerms.ProdMaxInvLeProdMax := by
+theorem prod_max_inv_le_prod_max'
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.ProdMaxInvLeProdMax := by
   intro ι _ G hG h1
   have h : ∀ v, max 1 (1 / G v) = max 1 (G v) / G v := by
     intro v
     have h0 := hG v
     rcases le_total 1 (G v) with h | h
     · rw [max_eq_left, max_eq_right h, div_self h0.ne']
-      rw [div_le_one h0]; exact h
+      rw [div_le_one h0]
+      exact h
     · rw [max_eq_right, max_eq_left h]
-      rw [le_div_iff₀ h0]; simpa using h
+      rw [le_div_iff₀ h0]
+      simpa using h
   simp_rw [h, Finset.prod_div_distrib]
   apply div_le_self
   · exact Finset.prod_nonneg fun v _ => by positivity
@@ -40,14 +42,17 @@ end G0
 section G1
 open Finset Real MeasureTheory NumberField Formalism.HermitianLatticeCounting.ExpansionTerms
 
-theorem disjointness_of_supports_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.SeparatedPolydiscsDisjoint := by
+theorem disjointness_of_supports_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.SeparatedPolydiscsDisjoint := by
   intro ι _ ro D D' hro hne hprod
   rw [Set.disjoint_left]
   intro x hx hx'
   have hlt : ∀ v, ‖D v - D' v‖ < ro := fun v => by
     have h1 := hx v
     have h2 := hx' v
-    calc ‖D v - D' v‖ = ‖(x v - D' v) - (x v - D v)‖ := by ring_nf
+    calc
+      ‖D v - D' v‖
+        = ‖(x v - D' v) - (x v - D v)‖ := by ring_nf
       _ ≤ ‖x v - D' v‖ + ‖x v - D v‖ := norm_sub_le _ _
       _ < ro := by linarith
   have hne' : Nonempty ι := by
@@ -61,8 +66,10 @@ theorem disjointness_of_supports_holds : Formalism.HermitianLatticeCounting.Expa
     linarith
   · simp only [not_exists] at h0
     have h1 : ∏ v, ‖D v - D' v‖ < ∏ _v : ι, ro :=
-      Finset.prod_lt_prod_of_nonempty₀ (fun i _ => lt_of_le_of_ne (norm_nonneg _) (Ne.symm (h0 i)))
-        (fun i _ => hlt i) Finset.univ_nonempty
+      Finset.prod_lt_prod_of_nonempty₀
+        (fun i _ => lt_of_le_of_ne (norm_nonneg _) (Ne.symm (h0 i)))
+        (fun i _ => hlt i)
+        Finset.univ_nonempty
     simp only [Finset.prod_const, Finset.card_univ] at h1
     linarith
 
@@ -99,15 +106,20 @@ lemma tendsto_inv_one_add_sq_atTop :
   have h2 := (tendsto_inv_atTop_zero.comp h1).const_mul (-(1 / 2) : ℝ)
   simpa using h2
 
-theorem inverse_power_integral_pi : Formalism.HermitianLatticeCounting.ExpansionTerms.InversePowerIntegralPi := by
+theorem inverse_power_integral_pi
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.InversePowerIntegralPi := by
   have hnn : ∀ y ∈ Set.Ioi (0 : ℝ), 0 ≤ y * ((1 + y ^ 2) ^ 2)⁻¹ := fun y hy => by
     have : (0 : ℝ) < y := hy
     positivity
   constructor
   · rw [integrable_radial_iff (fun y => ((1 + y ^ 2) ^ 2)⁻¹)]
-    exact integrableOn_Ioi_deriv_of_nonneg' (fun y _ => hasDerivAt_inv_one_add_sq y) hnn tendsto_inv_one_add_sq_atTop
+    exact integrableOn_Ioi_deriv_of_nonneg'
+      (fun y _ => hasDerivAt_inv_one_add_sq y)
+      hnn tendsto_inv_one_add_sq_atTop
   · rw [integral_complex_radial_eq_two_pi_mul_integral_Ioi (fun y => ((1 + y ^ 2) ^ 2)⁻¹),
-      integral_Ioi_of_hasDerivAt_of_nonneg' (fun y _ => hasDerivAt_inv_one_add_sq y) hnn tendsto_inv_one_add_sq_atTop]
+      integral_Ioi_of_hasDerivAt_of_nonneg'
+        (fun y _ => hasDerivAt_inv_one_add_sq y)
+        hnn tendsto_inv_one_add_sq_atTop]
     ring
 
 lemma mul_cutoff_of_le {K L y : ℝ} (hK : 0 ≤ K) (hy : 0 < y) (h : y ≤ L) : y * TruncationCutoff K L y = y := by
@@ -133,7 +145,8 @@ lemma integrable_cutoff_beyond {K L : ℝ} (hK : 2 < K) (hL : 0 < L) :
   (integrableOn_congr_fun (fun _ hy => (mul_cutoff_of_gt (by linarith) hL hy).symm) measurableSet_Ioi).1
     ((integrableOn_Ioi_rpow_of_lt (by linarith : 1 - K < -1) hL).const_mul (L ^ K))
 
-theorem cutoff_integral_formula : Formalism.HermitianLatticeCounting.ExpansionTerms.CutoffIntegralFormula := by
+theorem cutoff_integral_formula
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.CutoffIntegralFormula := by
   intro K L hK hL
   have hK0 : 0 ≤ K := by linarith
   have hU : Set.Ioi (0 : ℝ) = Set.Ioc 0 L ∪ Set.Ioi L := (Set.Ioc_union_Ioi_eq_Ioi hL.le).symm
@@ -141,8 +154,8 @@ theorem cutoff_integral_formula : Formalism.HermitianLatticeCounting.ExpansionTe
   · rw [integrable_radial_iff (fun y => TruncationCutoff K L y), hU]
     exact (integrable_cutoff_below hK0).union (integrable_cutoff_beyond hK hL)
   · rw [integral_complex_radial_eq_two_pi_mul_integral_Ioi (fun y => TruncationCutoff K L y), hU,
-      setIntegral_union (Set.Ioc_disjoint_Ioi le_rfl) measurableSet_Ioi (integrable_cutoff_below hK0)
-        (integrable_cutoff_beyond hK hL),
+      setIntegral_union (Set.Ioc_disjoint_Ioi le_rfl) measurableSet_Ioi
+        (integrable_cutoff_below hK0) (integrable_cutoff_beyond hK hL),
       setIntegral_congr_fun measurableSet_Ioc (fun y hy => mul_cutoff_of_le hK0 hy.1 hy.2),
       setIntegral_congr_fun measurableSet_Ioi (fun y hy => mul_cutoff_of_gt hK0 hL hy),
       integral_const_mul, integral_Ioi_rpow_of_lt (by linarith : 1 - K < -1) hL,
@@ -157,7 +170,7 @@ theorem cutoff_integral_formula : Formalism.HermitianLatticeCounting.ExpansionTe
       intro h
       apply hK2
       linarith
-    have e2 : L ^ K * (-L ^ (1 - K + 1) / (1 - K + 1)) = L ^ 2 / (K - 2) := by
+    have e2 : L ^ K * (- L ^ (1 - K + 1) / (1 - K + 1)) = L ^ 2 / (K - 2) := by
       rw [← e]
       field_simp
       ring
@@ -217,11 +230,18 @@ lemma separated_sum_le_prod_integrals (hd : SeparatedPolydiscsDisjoint) {ι : Ty
         setIntegral_le_integral hF (Filter.Eventually.of_forall fun x =>
           Finset.prod_nonneg fun v _ => hψ v _)
 
-theorem separated_set_sum_bound_of_disjoint_integral (hd : SeparatedPolydiscsDisjoint) (hi : InversePowerIntegralPi) : SeparatedSetSumBound := by
+theorem separated_set_sum_bound_of_disjoint_integral
+    (hd : SeparatedPolydiscsDisjoint) (hi : InversePowerIntegralPi)
+    : SeparatedSetSumBound := by
   intro ι _ ro S hro hro1 hS
-  have h := separated_sum_le_prod_integrals hd ro S hro hS (fun _ z => ((1 + ‖z‖ ^ 2) ^ 2)⁻¹)
-    (fun _ x => 4 * ((1 + ‖x‖ ^ 2) ^ 2)⁻¹)
-    (fun _ _ => by positivity) (fun _ _ => by positivity) (fun _ => hi.1.const_mul 4) ?_
+  have h :=
+    separated_sum_le_prod_integrals hd ro S hro hS
+      (fun _ z => ((1 + ‖z‖ ^ 2) ^ 2)⁻¹)
+      (fun _ x => 4 * ((1 + ‖x‖ ^ 2) ^ 2)⁻¹)
+      (fun _ _ => by positivity)
+      (fun _ _ => by positivity)
+      (fun _ => hi.1.const_mul 4)
+      ?_
   · simp only [integral_const_mul, hi.2, Finset.prod_const, Finset.card_univ] at h
     have hV : 0 < (π * (ro / 2) ^ 2) ^ Fintype.card ι := by positivity
     rw [← le_div_iff₀ hV, ← div_pow] at h
@@ -234,7 +254,9 @@ theorem separated_set_sum_bound_of_disjoint_integral (hd : SeparatedPolydiscsDis
     have h2 : 1 + ‖x‖ ^ 2 ≤ 2 * (1 + ‖D‖ ^ 2) := by
       nlinarith [norm_nonneg x, norm_nonneg D, sq_nonneg (‖D‖ - 1 / 2)]
     have h3 : (1 + ‖x‖ ^ 2) ^ 2 ≤ 4 * (1 + ‖D‖ ^ 2) ^ 2 := by
-      calc (1 + ‖x‖ ^ 2) ^ 2 ≤ (2 * (1 + ‖D‖ ^ 2)) ^ 2 := by gcongr
+      calc
+        (1 + ‖x‖ ^ 2) ^ 2
+          ≤ (2 * (1 + ‖D‖ ^ 2)) ^ 2 := by gcongr
         _ = 4 * (1 + ‖D‖ ^ 2) ^ 2 := by ring
     show ((1 + ‖D‖ ^ 2) ^ 2)⁻¹ ≤ 4 * ((1 + ‖x‖ ^ 2) ^ 2)⁻¹
     rw [← div_eq_mul_inv, inv_eq_one_div, div_le_div_iff₀ (by positivity) (by positivity)]
@@ -281,17 +303,21 @@ lemma cutoff_comparison_nearby (K ro abelian₂ : ℝ) (hK : 0 ≤ K) (hro : 0 <
       calc abelian₂ * ‖x‖ ≤ L * (3 / 2 * ‖D‖) := by gcongr
         _ = 3 / 2 * L * ‖D‖ := by ring
 
-theorem separated_cutoff_sum_of_disjoint_polydiscs (hd : SeparatedPolydiscsDisjoint) (hi : CutoffIntegralFormula) : SeparatedCutoffSum := by
+theorem separated_cutoff_sum_of_disjoint_polydiscs
+    (hd : SeparatedPolydiscsDisjoint) (hi : CutoffIntegralFormula)
+    : SeparatedCutoffSum := by
   intro ι _ ro K abelian₂ S hro hK hLam hS
   have hLpos : ∀ v, 0 < 3 / 2 * max ro (abelian₂ v) := fun v => by
     have : 0 < max ro (abelian₂ v) := lt_of_lt_of_le hro (le_max_left _ _)
     positivity
-  have h := separated_sum_le_prod_integrals hd ro S hro hS (fun v z => TruncationCutoff K (abelian₂ v) ‖z‖)
-    (fun v x => TruncationCutoff K (3 / 2 * max ro (abelian₂ v)) ‖x‖)
-    (fun v z => E3cut_nonneg_of_nonneg_of_nonneg _ _ _ (hLpos v).le (norm_nonneg z))
-    (fun v z => E3cut_nonneg_of_nonneg_of_nonneg _ _ _ (hLam v).le (norm_nonneg z))
-    (fun v => (hi K _ hK (hLpos v)).1)
-    (fun v D x hx => cutoff_comparison_nearby K ro (abelian₂ v) (by linarith) hro (hLam v) D x hx)
+  have h :=
+    separated_sum_le_prod_integrals hd ro S hro hS
+      (fun v z => TruncationCutoff K (abelian₂ v) ‖z‖)
+      (fun v x => TruncationCutoff K (3 / 2 * max ro (abelian₂ v)) ‖x‖)
+      (fun v z => E3cut_nonneg_of_nonneg_of_nonneg _ _ _ (hLpos v).le (norm_nonneg z))
+      (fun v z => E3cut_nonneg_of_nonneg_of_nonneg _ _ _ (hLam v).le (norm_nonneg z))
+      (fun v => (hi K _ hK (hLpos v)).1)
+      (fun v D x hx => cutoff_comparison_nearby K ro (abelian₂ v) (by linarith) hro (hLam v) D x hx)
   have hV : 0 < (π * (ro / 2) ^ 2) ^ Fintype.card ι := by positivity
   rw [← le_div_iff₀ hV] at h
   refine le_trans h ?_
@@ -308,17 +334,18 @@ theorem separated_cutoff_sum_of_disjoint_polydiscs (hd : SeparatedPolydiscsDisjo
     have hpw : (9 / 4 : ℝ) ≤ (3 / 2 : ℝ) ^ K := by
       have : ((3 / 2 : ℝ)) ^ (2 : ℝ) ≤ (3 / 2 : ℝ) ^ K :=
         Real.rpow_le_rpow_of_exponent_le (by norm_num) hK.le
-      have h2 : ((3 / 2 : ℝ)) ^ (2 : ℝ) = 9 / 4 := by
-        rw [Real.rpow_two]; norm_num
+      have h2 : ((3 / 2 : ℝ)) ^ (2 : ℝ) = 9 / 4 := by rw [Real.rpow_two]; norm_num
       linarith
-    have e1 : π * (3 / 2 * max ro (abelian₂ v)) ^ 2 * (K / (K - 2)) / (π * (ro / 2) ^ 2) =
-        4 * (9 / 4) * (K / (K - 2)) * (max ro (abelian₂ v)) ^ 2 / ro ^ 2 := by
+    have e1
+        : π * (3 / 2 * max ro (abelian₂ v)) ^ 2 * (K / (K - 2)) / (π * (ro / 2) ^ 2)
+          = 4 * (9 / 4) * (K / (K - 2)) * (max ro (abelian₂ v)) ^ 2 / ro ^ 2 := by
       field_simp; ring
     rw [e1]
     have hk : 0 ≤ K / (K - 2) := by apply div_nonneg <;> linarith
     gcongr
 
-theorem gaussian_lattice_cutoff_sum_of_separated_cutoff_sum (h : SeparatedCutoffSum) : GaussianLatticeCutoffSum := by
+theorem gaussian_lattice_cutoff_sum_of_separated_cutoff_sum (h : SeparatedCutoffSum)
+    : GaussianLatticeCutoffSum := by
   intro K abelian₂ hK hLam S
   classical
   let f : GaussianInt → (Unit → ℂ) := fun a _ => (abelian₂ : ℂ) * GaussianInt.toComplex a
@@ -346,8 +373,10 @@ theorem gaussian_lattice_cutoff_sum_of_separated_cutoff_sum (h : SeparatedCutoff
   have h3 := h Unit abelian₂ K (fun _ => abelian₂) (S.image f) hLam hK (fun _ => hLam) hsep
   rw [Finset.sum_image (fun a _ b _ hab => hf hab)] at h3
   simp only [Finset.univ_unique, Finset.prod_singleton, max_self, f] at h3
-  have e : 4 * (3 / 2 : ℝ) ^ K * (K / (K - 2)) * abelian₂ ^ 2 / abelian₂ ^ 2 =
-      4 * (3 / 2 : ℝ) ^ K * (K / (K - 2)) := by field_simp
+  have e
+      : 4 * (3 / 2 : ℝ) ^ K * (K / (K - 2)) * abelian₂ ^ 2 / abelian₂ ^ 2
+        = 4 * (3 / 2 : ℝ) ^ K * (K / (K - 2)) := by
+    field_simp
   rwa [e] at h3
 
 end G2
@@ -383,7 +412,8 @@ lemma absNorm_le_abs_norm_of_mem' (E : Type) [Field E] [NumberField E]
   rw [← FractionalIdeal.absNorm_span_singleton (R := 𝓞 E), hprod, map_mul]
   exact le_mul_of_one_le_left (FractionalIdeal.absNorm_nonneg _) hN
 
-theorem ideal_norm_product_lower_bound : Formalism.HermitianLatticeCounting.ExpansionTerms.IdealNormProductLowerBound := by
+theorem ideal_norm_product_lower_bound
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.IdealNormProductLowerBound := by
   intro E _ _ _ aa haa x hx hx0
   have h1 := absNorm_le_abs_norm_of_mem' E aa haa x hx hx0
   have h2 : (∏ w : InfinitePlace E, w x) ^ 2 = ((|Algebra.norm ℚ x| : ℚ) : ℝ) := by
@@ -393,7 +423,8 @@ theorem ideal_norm_product_lower_bound : Formalism.HermitianLatticeCounting.Expa
   rw [← Real.sqrt_sq h3, h2]
   exact Real.sqrt_le_sqrt (by exact_mod_cast h1)
 
-noncomputable def infinitePlaceEmbedding (E : Type) [Field E] (x : E) : InfinitePlace E → ℂ := fun w => w.embedding x
+noncomputable def infinitePlaceEmbedding (E : Type) [Field E] (x : E) : InfinitePlace E → ℂ :=
+  fun w => w.embedding x
 
 lemma norm_placeEmbedding (E : Type) [Field E] (x : E) (w : InfinitePlace E) : ‖infinitePlaceEmbedding E x w‖ = w x :=
   InfinitePlace.norm_embedding_eq w x
@@ -407,8 +438,9 @@ lemma placeEmbedding_injective (E : Type) [Field E] [NumberField E] : Function.I
   obtain ⟨w⟩ := (inferInstance : Nonempty (InfinitePlace E))
   exact w.embedding.injective (congrFun h w)
 
-noncomputable def idealRadius (E : Type) [Field E] [NumberField E]
-    (aa : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : ℝ :=
+noncomputable def idealRadius
+    (E : Type) [Field E] [NumberField E] (aa : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
+    : ℝ :=
   (FractionalIdeal.absNorm aa : ℝ) ^ (1 / (2 * (Fintype.card (InfinitePlace E) : ℝ)))
 
 lemma absNorm_pos_of_ne_zero (E : Type) [Field E] [NumberField E]
@@ -459,13 +491,19 @@ lemma embedded_ideal_points_separated (hn : IdealNormProductLowerBound) (E : Typ
   exact hn E aa haa (x - y) hmem hxy
 
 open Classical in
-theorem ideal_inverse_power_sum_of_norm_separated (hn : IdealNormProductLowerBound) (hs : SeparatedSetSumBound) : Formalism.HermitianLatticeCounting.ExpansionTerms.IdealInversePowerSum := by
+theorem ideal_inverse_power_sum_of_norm_separated
+    (hn : IdealNormProductLowerBound) (hs : SeparatedSetSumBound)
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.IdealInversePowerSum := by
   intro E _ _ _ aa haa h1 S hS
   have hp := absNorm_pos_of_ne_zero E aa haa
-  have hro1 : idealRadius E aa ≤ 1 := Real.rpow_le_one hp.le h1 (by have := card_infinite_places_pos E; positivity)
-  have h := hs (InfinitePlace E) (idealRadius E aa) (S.image (infinitePlaceEmbedding E)) (idealRadius_pos E aa haa) hro1
-    (embedded_ideal_points_separated hn E aa haa S hS)
-  rw [Finset.sum_image (fun x _ y _ hxy => placeEmbedding_injective E hxy), div_pow, radius_sq_pow_card_places E aa haa] at h
+  have hro1 : idealRadius E aa ≤ 1 :=
+    Real.rpow_le_one hp.le h1 (by have := card_infinite_places_pos E; positivity)
+  have h :=
+    hs (InfinitePlace E) (idealRadius E aa) (S.image (infinitePlaceEmbedding E))
+      (idealRadius_pos E aa haa) hro1 (embedded_ideal_points_separated hn E aa haa S hS)
+  rw [Finset.sum_image (fun x _ y _ hxy => placeEmbedding_injective E hxy), div_pow,
+      radius_sq_pow_card_places E aa haa]
+    at h
   simpa only [norm_placeEmbedding] using h
 
 end G3
@@ -490,7 +528,8 @@ lemma list_prod_le_exp_sum_div_e (l : List ℕ) : ((l.prod : ℕ) : ℝ) ≤ Rea
     rw [Nat.cast_mul, Nat.cast_add, add_div, Real.exp_add]
     exact mul_le_mul (le_exp_div_e a) ih (Nat.cast_nonneg _) (Real.exp_pos _).le
 
-theorem composition_block_prod_bound : Formalism.HermitianLatticeCounting.ExpansionTerms.CompositionBlockProdBound := by
+theorem composition_block_prod_bound
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.CompositionBlockProdBound := by
   intro n c
   have h := list_prod_le_exp_sum_div_e c.blocks
   rwa [c.blocks_sum] at h
@@ -527,21 +566,27 @@ lemma pow_eq_of_signed_minors_eq {F : Type} [Field F] {p : ℕ} (s : Fin p → �
       Finset.prod_ne_zero_iff.mpr fun x _ => mul_ne_zero (E5sign_intCast_ne_zero _) (pow_ne_zero _ (h0 x))
     exact mul_left_cancel₀ (E5sign_intCast_ne_zero _) (mul_left_cancel₀ h3 h1)
 
-theorem block_end_minor_fibre_finite' : Formalism.HermitianLatticeCounting.ExpansionTerms.BlockEndMinorFibreFinite := by
+theorem block_end_minor_fibre_finite'
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.BlockEndMinorFibreFinite := by
   classical
   intro F _ p s d T hs hT
   rcases T.eq_empty_or_nonempty with rfl | ⟨t0, ht0⟩
   · simp
-  have hsub : T ⊆ Fintype.piFinset (fun a => (Polynomial.nthRoots (s a) (t0 a ^ s a)).toFinset) := by
+  have hsub
+      : T ⊆ Fintype.piFinset (fun a => (Polynomial.nthRoots (s a) (t0 a ^ s a)).toFinset) := by
     intro t ht
     rw [Fintype.mem_piFinset]
     intro a
     rw [Multiset.mem_toFinset, Polynomial.mem_nthRoots (hs a)]
-    exact pow_eq_of_signed_minors_eq s t t0 (hT t0 ht0).1 (fun a => ((hT t ht).2 a).trans ((hT t0 ht0).2 a).symm) a
-  calc T.card ≤ (Fintype.piFinset (fun a => (Polynomial.nthRoots (s a) (t0 a ^ s a)).toFinset)).card :=
-        Finset.card_le_card hsub
+    exact pow_eq_of_signed_minors_eq s t t0 (hT t0 ht0).1
+      (fun a => ((hT t ht).2 a).trans ((hT t0 ht0).2 a).symm)
+      a
+  calc
+    T.card ≤ (Fintype.piFinset (fun a => (Polynomial.nthRoots (s a) (t0 a ^ s a)).toFinset)).card :=
+      Finset.card_le_card hsub
     _ = ∏ a, ((Polynomial.nthRoots (s a) (t0 a ^ s a)).toFinset).card := Fintype.card_piFinset _
-    _ ≤ ∏ a, s a := Finset.prod_le_prod' fun a _ =>
+    _ ≤ ∏ a, s a :=
+      Finset.prod_le_prod' fun a _ =>
         (Multiset.toFinset_card_le _).trans (Polynomial.card_nthRoots _ _)
 
 end G4
@@ -567,7 +612,8 @@ lemma exp_div_e_le_two_pow (n : ℕ) : Real.exp ((n : ℝ) / Real.exp 1) ≤ 2 ^
   rw [h2]
   exact pow_le_pow_left₀ (Real.exp_pos _).le h1 n
 
-theorem blockMinorSumPowSixtyFour_of_blockMinorSumExplicit (h : BlockMinorSumExplicit) : BlockMinorSumPowSixtyFour := by
+theorem blockMinorSumPowSixtyFour_of_blockMinorSumExplicit (h : BlockMinorSumExplicit)
+    : BlockMinorSumPowSixtyFour := by
   intro E _ _ _ r S hS
   refine (h E r S hS).trans ?_
   set f := Fintype.card (InfinitePlace E) with hf
@@ -575,16 +621,15 @@ theorem blockMinorSumPowSixtyFour_of_blockMinorSumExplicit (h : BlockMinorSumExp
   have h1 : Real.exp (((r : ℝ) + 1) / Real.exp 1) ≤ 2 ^ (r + 1) := by
     have := exp_div_e_le_two_pow (r + 1); push_cast at this; exact this
   have h2 : (2 : ℝ) ^ r ≤ 2 ^ (r + 1) := pow_le_pow_right₀ (by norm_num) (by omega)
-  have h3 : (2 : ℝ) ^ (r + 1) * 2 ^ (r + 1) = 4 ^ (r + 1) := by
-    rw [← mul_pow]; norm_num
-  have h4 : (4 : ℝ) ^ (r + 1) ≤ 4 ^ (f * (r + 1)) :=
-    pow_le_pow_right₀ (by norm_num) (by nlinarith)
+  have h3 : (2 : ℝ) ^ (r + 1) * 2 ^ (r + 1) = 4 ^ (r + 1) := by rw [← mul_pow]; norm_num
+  have h4 : (4 : ℝ) ^ (r + 1) ≤ 4 ^ (f * (r + 1)) := pow_le_pow_right₀ (by norm_num) (by nlinarith)
   have h5 : (64 : ℝ) ^ (f * (r + 1)) = 4 ^ (f * (r + 1)) * 16 ^ (f * (r + 1)) := by
     rw [← mul_pow]; norm_num
   rw [h5]
   apply mul_le_mul_of_nonneg_right _ (by positivity)
-  calc (2 : ℝ) ^ r * Real.exp (((r : ℝ) + 1) / Real.exp 1) ≤ 2 ^ (r + 1) * 2 ^ (r + 1) :=
-        mul_le_mul h2 h1 (Real.exp_pos _).le (by positivity)
+  calc
+    (2 : ℝ) ^ r * Real.exp (((r : ℝ) + 1) / Real.exp 1)
+      ≤ 2 ^ (r + 1) * 2 ^ (r + 1) := mul_le_mul h2 h1 (Real.exp_pos _).le (by positivity)
     _ = 4 ^ (r + 1) := h3
     _ ≤ _ := h4
 
@@ -658,44 +703,59 @@ lemma integral_minors_weight_sum_le (hf : BlockEndMinorFibreFinite) (hs : IdealI
   refine (Finset.prod_le_prod₀ (fun a _ => Finset.sum_nonneg fun x _ => hφ0 x) e4).trans ?_
   rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin, ← pow_mul]
 
-theorem block_minor_sum_explicit_of_fibre_finite_of_prod_bound (hf : BlockEndMinorFibreFinite) (hb : CompositionBlockProdBound) (hs : IdealInversePowerSum) : BlockMinorSumExplicit := by
+theorem block_minor_sum_explicit_of_fibre_finite_of_prod_bound
+    (hf : BlockEndMinorFibreFinite) (hb : CompositionBlockProdBound) (hs : IdealInversePowerSum)
+    : BlockMinorSumExplicit := by
   classical
   intro E _ _ _ r S hS
   set f := Fintype.card (InfinitePlace E) with hfdef
   set B : ℝ := Real.exp (((r : ℝ) + 1) / Real.exp 1) * 16 ^ (f * (r + 1)) with hB
   have hB0 : 0 ≤ B := by positivity
-  have key : ∀ c : Composition (r + 1),
-      ∑ t ∈ S.preimage (Sigma.mk c) sigma_mk_injective.injOn, (blockMinorWeight (⟨c, t⟩ : Σ c : Composition (r + 1), (Fin c.length → E)))⁻¹ ≤ B := by
+  have key
+      : ∀ c : Composition (r + 1),
+        ∑ t ∈ S.preimage (Sigma.mk c) sigma_mk_injective.injOn, (blockMinorWeight (⟨c, t⟩ : Σ c : Composition (r + 1), (Fin c.length → E)))⁻¹
+          ≤ B := by
     intro c
-    have hmemT : ∀ t ∈ S.preimage (Sigma.mk c) sigma_mk_injective.injOn,
-        (⟨c, t⟩ : Σ c : Composition (r + 1), (Fin c.length → E)) ∈ S := fun t ht => Finset.mem_preimage.mp ht
+    have hmemT
+        : ∀ t ∈ S.preimage (Sigma.mk c) sigma_mk_injective.injOn,
+          (⟨c, t⟩ : Σ c : Composition (r + 1), (Fin c.length → E)) ∈ S := fun t ht =>
+      Finset.mem_preimage.mp ht
     generalize S.preimage (Sigma.mk c) sigma_mk_injective.injOn = T at hmemT ⊢
-    have hpt : ∀ t ∈ T, ∀ a : Fin c.length,
-        IsIntegral ℤ (IndexedMinorEntry c.blocksFun t a) ∧ IndexedMinorEntry c.blocksFun t a ≠ 0 := by
+    have hpt
+        : ∀ t ∈ T, ∀ a : Fin c.length,
+          IsIntegral ℤ (IndexedMinorEntry c.blocksFun t a)
+            ∧ IndexedMinorEntry c.blocksFun t a ≠ 0 := by
       intro t ht
       have h := hS _ (hmemT t ht)
       unfold BlockEndMinorsIntegral at h
       exact h
-    have h1 := integral_minors_weight_sum_le hf hs E c.length c.blocksFun (fun a => c.one_le_blocksFun a)
-      T hpt
-    have h0 : ∀ t : Fin c.length → E, blockMinorWeight (⟨c, t⟩ : Σ c : Composition (r + 1), (Fin c.length → E)) =
-        ∏ a : Fin c.length, ∏ w : InfinitePlace E, (1 + (w (IndexedMinorEntry c.blocksFun t a)) ^ 2) ^ 2 := fun t => rfl
+    have h1 :=
+      integral_minors_weight_sum_le hf hs E c.length c.blocksFun
+        (fun a => c.one_le_blocksFun a)
+        T hpt
+    have h0
+        : ∀ t : Fin c.length → E,
+          blockMinorWeight (⟨c, t⟩ : Σ c : Composition (r + 1), (Fin c.length → E))
+            = ∏ a : Fin c.length, ∏ w : InfinitePlace E, (1 + (w (IndexedMinorEntry c.blocksFun t a)) ^ 2) ^ 2 :=
+      fun t => rfl
     simp_rw [h0]
     refine h1.trans ?_
     have h2 : ((∏ a, c.blocksFun a : ℕ) : ℝ) ≤ Real.exp (((r : ℝ) + 1) / Real.exp 1) := by
       have := hb (r + 1) c
-      have e : c.blocks.prod = ∏ a, c.blocksFun a := by
-        rw [← c.ofFn_blocksFun, List.prod_ofFn]
+      have e : c.blocks.prod = ∏ a, c.blocksFun a := by rw [← c.ofFn_blocksFun, List.prod_ofFn]
       rw [e] at this
       push_cast at this ⊢
       exact this
     have h3 : (16 : ℝ) ^ (f * c.length) ≤ 16 ^ (f * (r + 1)) :=
       pow_le_pow_right₀ (by norm_num) (Nat.mul_le_mul_left _ c.length_le)
     exact mul_le_mul h2 h3 (by positivity) (Real.exp_pos _).le
-  have e0 : ∑ γ ∈ S, (blockMinorWeight γ)⁻¹ = ∑ c ∈ S.image Sigma.fst,
-      ∑ t ∈ S.preimage (Sigma.mk c) sigma_mk_injective.injOn, (blockMinorWeight (⟨c, t⟩ : Σ c : Composition (r + 1), (Fin c.length → E)))⁻¹ := by
-    conv_lhs => rw [← Finset.sigma_image_fst_preimage_mk S]
-    rw [Finset.sum_sigma]
+  have e0
+      : ∑ γ ∈ S, (blockMinorWeight γ)⁻¹
+        = ∑ c ∈ S.image Sigma.fst,
+          ∑ t ∈ S.preimage (Sigma.mk c) sigma_mk_injective.injOn, (blockMinorWeight (⟨c, t⟩ : Σ c : Composition (r + 1), (Fin c.length → E)))⁻¹ :=
+    by
+      conv_lhs => rw [← Finset.sigma_image_fst_preimage_mk S]
+      rw [Finset.sum_sigma]
   rw [e0]
   refine (Finset.sum_le_sum fun c _ => key c).trans ?_
   rw [Finset.sum_const, nsmul_eq_mul]
@@ -704,7 +764,9 @@ theorem block_minor_sum_explicit_of_fibre_finite_of_prod_bound (hf : BlockEndMin
     rw [composition_card] at h1
     simp only [Nat.add_sub_cancel] at h1
     exact_mod_cast h1
-  calc ((S.image Sigma.fst).card : ℝ) * B ≤ 2 ^ r * B := mul_le_mul_of_nonneg_right hc hB0
+  calc
+    ((S.image Sigma.fst).card : ℝ) * B
+      ≤ 2 ^ r * B := mul_le_mul_of_nonneg_right hc hB0
     _ = _ := by rw [hB]; ring
 
 end G5
@@ -712,11 +774,13 @@ end G5
 section G6
 open Finset Real MeasureTheory NumberField Formalism.HermitianLatticeCounting.ExpansionTerms
 
-theorem integral_norm_application_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.NormGeOneMaxBound := by
+theorem integral_norm_application_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.NormGeOneMaxBound := by
   intro ι _ G D A hG h1 hD
   constructor
   · rw [Finset.prod_pow, Finset.prod_pow]
-    exact pow_le_pow_left₀ (Finset.prod_nonneg fun v _ => by positivity) (prod_max_inv_le_prod_max' ι G hG h1) A
+    exact pow_le_pow_left₀ (Finset.prod_nonneg fun v _ => by positivity)
+      (prod_max_inv_le_prod_max' ι G hG h1) A
   · apply Finset.prod_le_prod₀
     · intro v _; positivity
     · intro v _
@@ -791,75 +855,85 @@ lemma moment_ratio_telescoping {Ω : Type} [MeasurableSpace Ω] (μ : Measure Ω
     have h2 := hpos i ω
     positivity
 
-theorem corollary_upper_estimate_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.MomentUpwardHolder := by
+theorem corollary_upper_estimate_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.MomentUpwardHolder := by
   intro Ω _ μ _ r q l H0 R hm hpos hH0 hR h0 hc a
   have ha : a.val ≤ r := Nat.lt_succ_iff.1 a.isLt
   let M : ℕ → Ω → ℝ := fun i ω => if i = 0 then 1 else l ⟨min (i - 1) r, by omega⟩ ω
   let B : ℕ → ℝ := fun i => if i = 0 then H0 else R
   have hq : (a.val + 1) * q ≤ (r + 1) * q := Nat.mul_le_mul_right _ (by omega)
-  have key := moment_ratio_telescoping μ M (a.val + 1) q B
-    (by
-      intro i
-      by_cases hi : i = 0
-      · simp only [M, hi, if_true]; exact measurable_const
-      · simp only [M, hi, if_false]; exact hm _)
-    (by
-      intro i ω
-      by_cases hi : i = 0
-      · simp [M, hi]
-      · simp only [M, hi, if_false]; exact hpos _ _)
-    (by
-      intro i
-      by_cases hi : i = 0
-      · simp [B, hi, hH0]
-      · simp [B, hi, hR])
-    (by
-      intro i hi
-      rcases Nat.eq_zero_or_pos i with rfl | hi0
-      · have e0 : (⟨min (0 + 1 - 1) r, by omega⟩ : Fin (r + 1)) = 0 := Fin.ext (by simp)
-        simp only [M, B, if_true, Nat.add_eq_zero_iff, one_ne_zero, and_false, if_false, e0, div_one]
-        exact h0 _ hq
-      · obtain ⟨k, rfl⟩ : ∃ k, i = k + 1 := ⟨i - 1, by omega⟩
-        have hk : k < r := by omega
-        have e1 : (⟨min (k + 1 + 1 - 1) r, by omega⟩ : Fin (r + 1)) = (⟨k, hk⟩ : Fin r).succ :=
-          Fin.ext (by simp; omega)
-        have e2 : (⟨min (k + 1 - 1) r, by omega⟩ : Fin (r + 1)) = (⟨k, hk⟩ : Fin r).castSucc :=
-          Fin.ext (by simp; omega)
-        simp only [M, B, Nat.add_eq_zero_iff, one_ne_zero, and_false, if_false, e1, e2]
-        exact hc _ _ hq)
+  have key :=
+    moment_ratio_telescoping μ M (a.val + 1) q B
+      (by
+        intro i
+        by_cases hi : i = 0
+        · simp only [M, hi, if_true]; exact measurable_const
+        · simp only [M, hi, if_false]; exact hm _)
+      (by
+        intro i ω
+        by_cases hi : i = 0
+        · simp [M, hi]
+        · simp only [M, hi, if_false]; exact hpos _ _)
+      (by
+        intro i
+        by_cases hi : i = 0
+        · simp [B, hi, hH0]
+        · simp [B, hi, hR])
+      (by
+        intro i hi
+        rcases Nat.eq_zero_or_pos i with rfl | hi0
+        · have e0 : (⟨min (0 + 1 - 1) r, by omega⟩ : Fin (r + 1)) = 0 := Fin.ext (by simp)
+          simp only [M, B, if_true, Nat.add_eq_zero_iff, one_ne_zero, and_false, if_false, e0,
+            div_one]
+          exact h0 _ hq
+        · obtain ⟨k, rfl⟩ : ∃ k, i = k + 1 := ⟨i - 1, by omega⟩
+          have hk : k < r := by omega
+          have e1 : (⟨min (k + 1 + 1 - 1) r, by omega⟩ : Fin (r + 1)) = (⟨k, hk⟩ : Fin r).succ :=
+            Fin.ext (by simp; omega)
+          have e2 : (⟨min (k + 1 - 1) r, by omega⟩ : Fin (r + 1)) = (⟨k, hk⟩ : Fin r).castSucc :=
+            Fin.ext (by simp; omega)
+          simp only [M, B, Nat.add_eq_zero_iff, one_ne_zero, and_false, if_false, e1, e2]
+          exact hc _ _ hq)
   have ea : (⟨min (a.val + 1 - 1) r, by omega⟩ : Fin (r + 1)) = a := Fin.ext (by simp; omega)
   simp only [M, Nat.add_eq_zero_iff, one_ne_zero, and_false, if_false, if_true, ea, div_one] at key
   refine key.trans (le_of_eq ?_)
   congr 1
   rw [prod_range_succ']
-  simp only [B, Nat.add_eq_zero_iff, one_ne_zero, and_false, if_false, if_true, prod_const, card_range]
+  simp only [B, Nat.add_eq_zero_iff, one_ne_zero, and_false, if_false, if_true, prod_const,
+    card_range]
   rw [← pow_mul, mul_comm]
 
-theorem corollary_product_estimate_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.MomentProductBound := by
+theorem corollary_product_estimate_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.MomentProductBound := by
   intro Ω _ μ _ r q L l H1 hm hpos hH1 hL h
   have hcard : (univ.filter (fun a : Fin (r + 1) => a.val < L)).card = L := by
     have := Fin.card_filter_val_lt (n := r + 1) (m := L)
     simpa [hL] using this
-  have e : ∀ ω, ENNReal.ofReal ((∏ a ∈ univ.filter (fun a : Fin (r + 1) => a.val < L), l a ω) ^ (2 * q)) =
-      ∏ a ∈ univ.filter (fun a : Fin (r + 1) => a.val < L), ENNReal.ofReal (l a ω ^ (2 * q)) := by
-    intro ω
-    rw [← Finset.prod_pow, ENNReal.ofReal_prod_of_nonneg]
-    intro i _
-    have := hpos i ω
-    positivity
+  have e
+      : ∀ ω,
+        ENNReal.ofReal ((∏ a ∈ univ.filter (fun a : Fin (r + 1) => a.val < L), l a ω) ^ (2 * q))
+          = ∏ a ∈ univ.filter (fun a : Fin (r + 1) => a.val < L), ENNReal.ofReal (l a ω ^ (2 * q)) :=
+    by
+      intro ω
+      rw [← Finset.prod_pow, ENNReal.ofReal_prod_of_nonneg]
+      intro i _
+      have := hpos i ω
+      positivity
   simp_rw [e]
-  have key := holder_lintegral_prod_le μ (univ.filter (fun a : Fin (r + 1) => a.val < L))
-    (fun a ω => ENNReal.ofReal (l a ω ^ (2 * q))) (fun _ => ENNReal.ofReal (H1 ^ (2 * q)))
-    (fun a _ => ENNReal.measurable_ofReal.comp ((hm a).pow_const _))
-    (by
-      intro a ha
-      rw [hcard]
-      have h3 := h a (by simpa using ha)
-      rw [← ENNReal.ofReal_pow (by positivity), ← pow_mul]
-      refine le_trans (le_of_eq ?_) h3
-      refine lintegral_congr fun ω => ?_
-      have := hpos a ω
-      rw [← ENNReal.ofReal_pow (by positivity), ← pow_mul])
+  have key :=
+    holder_lintegral_prod_le μ (univ.filter (fun a : Fin (r + 1) => a.val < L))
+      (fun a ω => ENNReal.ofReal (l a ω ^ (2 * q)))
+      (fun _ => ENNReal.ofReal (H1 ^ (2 * q)))
+      (fun a _ => ENNReal.measurable_ofReal.comp ((hm a).pow_const _))
+      (by
+        intro a ha
+        rw [hcard]
+        have h3 := h a (by simpa using ha)
+        rw [← ENNReal.ofReal_pow (by positivity), ← pow_mul]
+        refine le_trans (le_of_eq ?_) h3
+        refine lintegral_congr fun ω => ?_
+        have := hpos a ω
+        rw [← ENNReal.ofReal_pow (by positivity), ← pow_mul])
   refine key.trans (le_of_eq ?_)
   rw [prod_const, hcard, ← ENNReal.ofReal_pow (by positivity), ← pow_mul]
 
@@ -893,7 +967,8 @@ lemma lOneNorm_sum_le {P κ : Type} (s : Finset κ) (x : κ → P →₀ ℂ) :
 lemma lOneNorm_single {P : Type} (p : P) (c : ℂ) : lOneNorm (Finsupp.single p c) = ‖c‖ := by
   simp [lOneNorm]
 
-theorem iterated_sum_bound_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.IteratedHighestWeightBound := by
+theorem iterated_sum_bound_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.IteratedHighestWeightBound := by
   classical
   intro V P Λ _ _ _ jh Dop wt N1 Ninf lam Gam c0 q0 hGam hN1 hNinf hN10 hNinf0 hstep μ al
   induction al with
@@ -910,9 +985,12 @@ theorem iterated_sum_bound_holds : Formalism.HermitianLatticeCounting.ExpansionT
     intro hq
     simp only [List.map_cons, List.sum_cons, List.prod_cons, List.length_cons] at hq ⊢
     obtain ⟨a, ha1, ha2, ha3⟩ := ih (by omega)
-    have hb : ∀ ν, ∃ b : P →₀ ℂ, ν ∈ a.support →
-        (Dop l (jh (μ + ν)) = b.sum (fun ν' c => c • jh (μ + ν + ν')) ∧
-        (b.sum fun _ c => ‖c‖) ≤ Gam ^ wt l ∧ ∀ ν' ∈ b.support, N1 ν' ≤ wt l ∧ Ninf ν' ≤ 1) := by
+    have hb
+        : ∀ ν, ∃ b : P →₀ ℂ,
+          ν ∈ a.support
+            → (Dop l (jh (μ + ν)) = b.sum (fun ν' c => c • jh (μ + ν + ν'))
+              ∧ (b.sum fun _ c => ‖c‖) ≤ Gam ^ wt l
+              ∧ ∀ ν' ∈ b.support, N1 ν' ≤ wt l ∧ Ninf ν' ≤ 1) := by
       intro ν
       by_cases hν : ν ∈ a.support
       · have h1 := (ha3 ν hν).1
@@ -927,8 +1005,9 @@ theorem iterated_sum_bound_holds : Formalism.HermitianLatticeCounting.ExpansionT
     let a' : P →₀ ℂ := ∑ ν ∈ a.support, ∑ ν' ∈ (b ν).support, Finsupp.single (ν + ν') (a ν * b ν ν')
     refine ⟨a', ?_, ?_, ?_⟩
     · rw [Module.End.mul_apply, ha1]
-      have hΨ : a'.sum (fun ν c => c • jh (μ + ν)) =
-          Finsupp.linearCombination ℂ (fun ν => jh (μ + ν)) a' :=
+      have hΨ
+          : a'.sum (fun ν c => c • jh (μ + ν))
+            = Finsupp.linearCombination ℂ (fun ν => jh (μ + ν)) a' :=
         (Finsupp.linearCombination_apply ℂ a').symm
       rw [hΨ]
       set_option synthInstance.maxHeartbeats 100000 in
@@ -943,11 +1022,13 @@ theorem iterated_sum_bound_holds : Formalism.HermitianLatticeCounting.ExpansionT
         refine (lOneNorm_sum_le _ _).trans (Finset.sum_le_sum fun ν _ => ?_)
         refine (lOneNorm_sum_le _ _).trans (Finset.sum_le_sum fun ν' _ => ?_)
         rw [lOneNorm_single, norm_mul]
-      calc (a'.sum fun _ c => ‖c‖) ≤ ∑ ν ∈ a.support, ∑ ν' ∈ (b ν).support, ‖a ν‖ * ‖b ν ν'‖ := h1
+      calc
+        (a'.sum fun _ c => ‖c‖)
+          ≤ ∑ ν ∈ a.support, ∑ ν' ∈ (b ν).support, ‖a ν‖ * ‖b ν ν'‖ := h1
         _ ≤ ∑ ν ∈ a.support, ‖a ν‖ * Gam ^ wt l := by
-            refine Finset.sum_le_sum fun ν hν => ?_
-            rw [← Finset.mul_sum]
-            exact mul_le_mul_of_nonneg_left (hb ν hν).2.1 (norm_nonneg _)
+          refine Finset.sum_le_sum fun ν hν => ?_
+          rw [← Finset.mul_sum]
+          exact mul_le_mul_of_nonneg_left (hb ν hν).2.1 (norm_nonneg _)
         _ = (a.sum fun _ c => ‖c‖) * Gam ^ wt l := by rw [Finsupp.sum, Finset.sum_mul]
         _ ≤ Gam ^ (al.map wt).sum * Gam ^ wt l := by gcongr
         _ = Gam ^ (wt l + (al.map wt).sum) := by rw [← pow_add, add_comm]
@@ -971,12 +1052,27 @@ end G8
 section Compose
 open Formalism.HermitianLatticeCounting.ExpansionTerms
 
-theorem separated_sum_estimate_second_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.SeparatedSetSumBound := separated_set_sum_bound_of_disjoint_integral disjointness_of_supports_holds inverse_power_integral_pi
-theorem separated_sum_estimate_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.SeparatedCutoffSum := separated_cutoff_sum_of_disjoint_polydiscs disjointness_of_supports_holds cutoff_integral_formula
-theorem gaussian_lattice_cutoff_sum : Formalism.HermitianLatticeCounting.ExpansionTerms.GaussianLatticeCutoffSum := gaussian_lattice_cutoff_sum_of_separated_cutoff_sum separated_sum_estimate_holds
-theorem ideal_sum_estimate_second_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.IdealInversePowerSum := ideal_inverse_power_sum_of_norm_separated ideal_norm_product_lower_bound separated_sum_estimate_second_holds
-theorem block_minor_sum_explicit : Formalism.HermitianLatticeCounting.ExpansionTerms.BlockMinorSumExplicit := block_minor_sum_explicit_of_fibre_finite_of_prod_bound block_end_minor_fibre_finite' composition_block_prod_bound ideal_sum_estimate_second_holds
-theorem block_minor_sum_pow_sixty_four : Formalism.HermitianLatticeCounting.ExpansionTerms.BlockMinorSumPowSixtyFour := blockMinorSumPowSixtyFour_of_blockMinorSumExplicit block_minor_sum_explicit
+theorem separated_sum_estimate_second_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.SeparatedSetSumBound :=
+  separated_set_sum_bound_of_disjoint_integral disjointness_of_supports_holds
+    inverse_power_integral_pi
+theorem separated_sum_estimate_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.SeparatedCutoffSum :=
+  separated_cutoff_sum_of_disjoint_polydiscs disjointness_of_supports_holds cutoff_integral_formula
+theorem gaussian_lattice_cutoff_sum
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.GaussianLatticeCutoffSum :=
+  gaussian_lattice_cutoff_sum_of_separated_cutoff_sum separated_sum_estimate_holds
+theorem ideal_sum_estimate_second_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.IdealInversePowerSum :=
+  ideal_inverse_power_sum_of_norm_separated ideal_norm_product_lower_bound
+    separated_sum_estimate_second_holds
+theorem block_minor_sum_explicit
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.BlockMinorSumExplicit :=
+  block_minor_sum_explicit_of_fibre_finite_of_prod_bound block_end_minor_fibre_finite'
+    composition_block_prod_bound ideal_sum_estimate_second_holds
+theorem block_minor_sum_pow_sixty_four
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.BlockMinorSumPowSixtyFour :=
+  blockMinorSumPowSixtyFour_of_blockMinorSumExplicit block_minor_sum_explicit
 
 end Compose
 

@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.EqPlaceId
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl Matrix
 open IsDedekindDomain NumberField
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -17,68 +19,82 @@ set_option synthInstance.maxHeartbeats 160000
 namespace GlobalTheory.FinPl.LatMem
 variable {D : D7}
 
-
 open Classical in
-def indP (F : Type) [Field F] [NumberField F] (P : HeightOneSpectrum (𝓞 F) → Prop) : Af F :=
-  ⟨fun v => if P v then 1 else 0, Filter.Eventually.of_forall fun v => by
+def indP (F : Type) [Field F] [NumberField F] (P : HeightOneSpectrum (𝓞 F) → Prop) : Af F := ⟨
+  fun v => if P v then 1 else 0,
+  Filter.Eventually.of_forall fun v => by
     show (if P v then (1 : Fv F v) else 0) ∈ (v.adicCompletionIntegers F : Set (Fv F v))
     split_ifs
     · exact (v.adicCompletionIntegers F).one_mem
-    · exact (v.adicCompletionIntegers F).zero_mem⟩
+    · exact (v.adicCompletionIntegers F).zero_mem
+⟩
 
 open Classical in
-theorem evalV_indP (F : Type) [Field F] [NumberField F] (P : HeightOneSpectrum (𝓞 F) → Prop)
-    (v : HeightOneSpectrum (𝓞 F)) : evalV F v (indP F P) = if P v then 1 else 0 := rfl
+theorem evalV_indP
+    (F : Type) [Field F] [NumberField F]
+    (P : HeightOneSpectrum (𝓞 F) → Prop) (v : HeightOneSpectrum (𝓞 F))
+    : evalV F v (indP F P) = if P v then 1 else 0 :=
+  rfl
 
-theorem indicatorAdele_mem_integralAdeles' (F : Type) [Field F] [NumberField F] (P : HeightOneSpectrum (𝓞 F) → Prop) :
-    indP F P ∈ intAf F := fun v => by
+theorem indicatorAdele_mem_integralAdeles'
+    (F : Type) [Field F] [NumberField F] (P : HeightOneSpectrum (𝓞 F) → Prop)
+    : indP F P ∈ intAf F := fun v => by
   classical
   rw [evalV_indP]
   split_ifs
   · exact (v.adicCompletionIntegers F).one_mem
   · exact (v.adicCompletionIntegers F).zero_mem
 
-theorem indicatorAdele_supported (F : Type) [Field F] [NumberField F] (P : HeightOneSpectrum (𝓞 F) → Prop) :
-    ∀ v, ¬ P v → evalV F v (indP F P) = 0 := fun v hv => by
+theorem indicatorAdele_supported
+    (F : Type) [Field F] [NumberField F] (P : HeightOneSpectrum (𝓞 F) → Prop)
+    : ∀ v, ¬ P v → evalV F v (indP F P) = 0 := fun v hv => by
   classical
   rw [evalV_indP, if_neg hv]
 
-theorem compFin_eq_compAt (a : AE D) (v : Pl D) :
-    GlobalTheory.AdelicU.compFin D.host.F D.host.E v a = compAt D v a := by
-  change Algebra.TensorProduct.map ((evalV D.host.F v).comp (sndA D.host.F)) (AlgHom.id _ _) a =
-    Algebra.TensorProduct.map (evalV D.host.F v) (AlgHom.id _ _)
+theorem compFin_eq_compAt (a : AE D) (v : Pl D)
+    : GlobalTheory.AdelicU.compFin D.host.F D.host.E v a = compAt D v a := by
+  change Algebra.TensorProduct.map ((evalV D.host.F v).comp (sndA D.host.F)) (AlgHom.id _ _) a
+    = Algebra.TensorProduct.map (evalV D.host.F v) (AlgHom.id _ _)
       (Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id _ _) a)
   rw [GlobalTheory.AdelicU.Supp.tens_map_map]
 
-theorem compInf_eq_zero {a : AE D} (h : infPart D a = 0) (w : NumberField.InfinitePlace D.host.F) :
-    GlobalTheory.AdelicU.compInf D.host.F D.host.E w a = 0 := by
-  change Algebra.TensorProduct.map ((GlobalTheory.AutFunCompare.evW w).comp (fstA D.host.F)) (AlgHom.id _ _) a = 0
+theorem compInf_eq_zero {a : AE D} (h : infPart D a = 0) (w : NumberField.InfinitePlace D.host.F)
+    : GlobalTheory.AdelicU.compInf D.host.F D.host.E w a = 0 := by
+  change Algebra.TensorProduct.map ((GlobalTheory.AutFunCompare.evW w).comp (fstA D.host.F))
+      (AlgHom.id _ _) a
+    = 0
   rw [← GlobalTheory.AdelicU.Supp.tens_map_map]
-  change Algebra.TensorProduct.map (GlobalTheory.AutFunCompare.evW w) (AlgHom.id _ _) (infPart D a) = 0
+  change Algebra.TensorProduct.map (GlobalTheory.AutFunCompare.evW w) (AlgHom.id _ _) (infPart D a)
+    = 0
   rw [h, map_zero]
 
-theorem mem_idAt_iff {P : Pl D → Prop} {a : AE D} :
-    a ∈ idAt D P ↔ infPart D a = 0 ∧ ∀ w, ¬ P w → compAt D w a = 0 := by
+theorem mem_idAt_iff {P : Pl D → Prop} {a : AE D}
+    : a ∈ idAt D P ↔ infPart D a = 0 ∧ ∀ w, ¬ P w → compAt D w a = 0 := by
   unfold idAt
   rw [Submodule.mem_inf, RingHom.mem_ker, Submodule.mem_iInf]
-  exact and_congr_right fun _ => ⟨fun h w hw => RingHom.mem_ker.1 (h ⟨w, hw⟩), fun h w => RingHom.mem_ker.2 (h w.1 w.2)⟩
+  exact and_congr_right fun _ =>
+    ⟨fun h w hw => RingHom.mem_ker.1 (h ⟨w, hw⟩), fun h w => RingHom.mem_ker.2 (h w.1 w.2)⟩
 
-theorem mul_indP {P : Pl D → Prop} {a : AE D} (ha : a ∈ idAt D P) :
-    a * (pairA D.host.F 0 (indP D.host.F P) ⊗ₜ[D.host.F] (1 : D.host.E)) = a := by
+theorem mul_indP {P : Pl D → Prop} {a : AE D} (ha : a ∈ idAt D P)
+    : a * (pairA D.host.F 0 (indP D.host.F P) ⊗ₜ[D.host.F] (1 : D.host.E)) = a := by
   classical
   obtain ⟨h0, hw⟩ := mem_idAt_iff.1 ha
   refine GlobalTheory.AdelicU.Supp.adTens_ext (fun w => ?_) fun v => ?_
   · rw [map_mul, compInf_eq_zero h0, zero_mul]
   · rw [map_mul]
-    have he : GlobalTheory.AdelicU.compFin D.host.F D.host.E v (pairA D.host.F 0 (indP D.host.F P) ⊗ₜ[D.host.F] (1 : D.host.E)) =
-        evalV D.host.F v (indP D.host.F P) ⊗ₜ[D.host.F] (1 : D.host.E) := rfl
+    have he
+        : GlobalTheory.AdelicU.compFin D.host.F D.host.E v
+            (pairA D.host.F 0 (indP D.host.F P) ⊗ₜ[D.host.F] (1 : D.host.E))
+          = evalV D.host.F v (indP D.host.F P) ⊗ₜ[D.host.F] (1 : D.host.E) :=
+      rfl
     by_cases hv : P v
     · rw [he, evalV_indP, if_pos hv]
       exact mul_one _
     · rw [compFin_eq_compAt, hw v hv, zero_mul]
 
-theorem tmul_mem_idAt {P : Pl D → Prop} {α : Af D.host.F} (hα : ∀ v, ¬ P v → evalV D.host.F v α = 0) (e : D.host.E) :
-    pairA D.host.F 0 α ⊗ₜ[D.host.F] e ∈ idAt D P := by
+theorem tmul_mem_idAt
+    {P : Pl D → Prop} {α : Af D.host.F} (hα : ∀ v, ¬ P v → evalV D.host.F v α = 0) (e : D.host.E)
+    : pairA D.host.F 0 α ⊗ₜ[D.host.F] e ∈ idAt D P := by
   refine mem_idAt_iff.2 ⟨?_, fun w hw => ?_⟩
   · change fstA D.host.F (pairA D.host.F 0 α) ⊗ₜ[D.host.F] e = 0
     exact TensorProduct.zero_tmul _ _
@@ -88,17 +104,21 @@ theorem tmul_mem_idAt {P : Pl D → Prop} {α : Af D.host.F} (hα : ∀ v, ¬ P 
 theorem star_int (c : 𝓞 D.host.E) : ∃ c' : 𝓞 D.host.E, (c' : D.host.E) = star (c : D.host.E) :=
   ⟨NumberField.RingOfIntegers.mapRingHom (starRingEnd D.host.E) c, rfl⟩
 
-private theorem dual_row {K : Type} [CommRing K] [StarRing K] {r : ℕ} (G G' : Matrix (Fin r) (Fin r) K) (w : Fin r → K)
-    (hGe : ∀ l b, ∑ k, G' l k * G k b = if l = b then 1 else 0) (b : Fin r) :
-    ∑ k, star (star (∑ l, w l * G' l k)) * G k b = w b := by
+private theorem dual_row
+    {K : Type} [CommRing K] [StarRing K]
+    {r : ℕ} (G G' : Matrix (Fin r) (Fin r) K) (w : Fin r → K)
+    (hGe : ∀ l b, ∑ k, G' l k * G k b = if l = b then 1 else 0) (b : Fin r)
+    : ∑ k, star (star (∑ l, w l * G' l k)) * G k b = w b := by
   simp only [star_star, Finset.sum_mul]
   rw [Finset.sum_comm]
   simp only [mul_assoc, ← Finset.mul_sum, hGe]
   simp
 
-private theorem dual_key {K : Type} [CommRing K] [StarRing K] {r : ℕ} (G G' : Matrix (Fin r) (Fin r) K) (w x : Fin r → K)
-    (hGe : ∀ l b, ∑ k, G' l k * G k b = if l = b then 1 else 0) (hst : ∀ a b, star (G a b) = G b a) :
-    star (∑ a, ∑ b, star (x a) * G a b * star (∑ l, w l * G' l b)) = ∑ j, x j * w j := by
+private theorem dual_key
+    {K : Type} [CommRing K] [StarRing K]
+    {r : ℕ} (G G' : Matrix (Fin r) (Fin r) K) (w x : Fin r → K)
+    (hGe : ∀ l b, ∑ k, G' l k * G k b = if l = b then 1 else 0) (hst : ∀ a b, star (G a b) = G b a)
+    : star (∑ a, ∑ b, star (x a) * G a b * star (∑ l, w l * G' l b)) = ∑ j, x j * w j := by
   simp only [star_sum, star_mul', star_star, hst]
   refine Finset.sum_congr rfl fun a _ => ?_
   have h2 : ∑ l, w l * (∑ b, G' l b * G b a) = w a := by simp [hGe]
@@ -108,9 +128,12 @@ private theorem dual_key {K : Type} [CommRing K] [StarRing K] {r : ℕ} (G G' : 
   refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun b _ => ?_
   ring
 
-theorem exists_dualBasis (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)} (hΛ : IsSelfDualC S Λ) :
-    ∃ (m : ℕ) (s s' : Fin m → Fin S.rank → D.host.E), (∀ i, s i ∈ Λ) ∧ (∀ i, s' i ∈ Λ) ∧
-      ∀ a b : Fin S.rank, ∑ i, s i a * ∑ k, star (s' i k) * S.gram k b = if a = b then 1 else 0 := by
+theorem exists_dualBasis
+    (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)} (hΛ : IsSelfDualC S Λ)
+    : ∃ (m : ℕ) (s s' : Fin m → Fin S.rank → D.host.E),
+      (∀ i, s i ∈ Λ) ∧ (∀ i, s' i ∈ Λ)
+        ∧ ∀ a b : Fin S.rank,
+          ∑ i, s i a * ∑ k, star (s' i k) * S.gram k b = if a = b then 1 else 0 := by
   classical
   set E := D.host.E
   set O := 𝓞 E
@@ -121,8 +144,7 @@ theorem exists_dualBasis (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank
     obtain ⟨t, ht⟩ := hΛ.1.fg
     apply eq_top_iff.mpr
     intro y _
-    let p : (Fin S.rank → D.host.E) → D.host.E := fun x =>
-      ∑ i, ∑ j, star (x i) * S.gram i j * y j
+    let p : (Fin S.rank → D.host.E) → D.host.E := fun x => ∑ i, ∑ j, star (x i) * S.gram i j * y j
     obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 D.host.E)) t p
     have hp : ∀ x ∈ Λ, IsIntegral ℤ ((b : 𝓞 D.host.E) • p x) := by
       intro x hx
@@ -132,17 +154,19 @@ theorem exists_dualBasis (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank
         obtain ⟨a, ha⟩ := hb x hx
         rw [← ha]
         exact RingOfIntegers.isIntegral_coe a
-      | zero => simpa [p] using (isIntegral_zero : IsIntegral ℤ (0 : D.host.E))
+      | zero =>
+        simpa [p] using (isIntegral_zero : IsIntegral ℤ (0 : D.host.E))
       | add x z hx hz ihx ihz =>
-        have heq : p (x + z) = p x + p z := by
-          simp [p, star_add, add_mul, Finset.sum_add_distrib]
+        have heq : p (x + z) = p x + p z := by simp [p, star_add, add_mul, Finset.sum_add_distrib]
         rw [heq, smul_add]
         exact ihx.add ihz
       | smul c x hx ih =>
         have heq : p (c • x) = star (c : D.host.E) * p x := by
           simp only [p, Pi.smul_apply, algebraMap_smul, star_mul', Finset.mul_sum]
-          apply Finset.sum_congr rfl; intro i _
-          apply Finset.sum_congr rfl; intro j _
+          apply Finset.sum_congr rfl
+          intro i _
+          apply Finset.sum_congr rfl
+          intro j _
           change star ((c : D.host.E) * x i) * S.gram i j * y j = _
           rw [star_mul']
           ring
@@ -150,30 +174,36 @@ theorem exists_dualBasis (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank
         have hc := (RingOfIntegers.isIntegral_coe c).map (starRingEnd D.host.E).toIntAlgHom
         have hc' : IsIntegral ℤ (star (c : D.host.E)) := hc
         convert hc'.mul ih using 1 <;> simp only [Algebra.smul_def] <;> ring
-    have hy : (b : 𝓞 D.host.E) • y ∈ Λ := (hΛ.2 _).2 (by
-      intro x hx
-      have hi := hp x hx
-      refine ⟨⟨_, ?_⟩, rfl⟩
-      have heq : (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j) =
-          (b : 𝓞 D.host.E) • p x := by
-        simp only [p, Pi.smul_apply, algebraMap_smul, Algebra.smul_def, Finset.mul_sum]
-        apply Finset.sum_congr rfl; intro i _
-        apply Finset.sum_congr rfl; intro j _
-        change star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y j) = _
-        rw [Algebra.smul_def]
-        ring
-      change IsIntegral ℤ (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j)
-      rw [heq]
-      exact hi)
+    have hy : (b : 𝓞 D.host.E) • y ∈ Λ :=
+      (hΛ.2 _).2 (by
+        intro x hx
+        have hi := hp x hx
+        refine ⟨⟨_, ?_⟩, rfl⟩
+        have heq
+            : (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j)
+              = (b : 𝓞 D.host.E) • p x := by
+          simp only [p, Pi.smul_apply, algebraMap_smul, Algebra.smul_def, Finset.mul_sum]
+          apply Finset.sum_congr rfl
+          intro i _
+          apply Finset.sum_congr rfl
+          intro j _
+          change star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y j) = _
+          rw [Algebra.smul_def]
+          ring
+        change IsIntegral ℤ (∑ i, ∑ j, star (x i) * S.gram i j * ((b : 𝓞 D.host.E) • y) j)
+        rw [heq]
+        exact hi)
     have hb0 : (algebraMap (𝓞 D.host.E) D.host.E b) ≠ 0 :=
       IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors b.2
     have hy' : (b : 𝓞 D.host.E) • y ∈ Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E)) :=
       Submodule.subset_span hy
-    have hy'' : (algebraMap (𝓞 D.host.E) D.host.E b) • y ∈
-        Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E)) := by
+    have hy''
+        : (algebraMap (𝓞 D.host.E) D.host.E b) • y
+          ∈ Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E)) := by
       simpa only [algebraMap_smul] using hy'
-    have := (Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E))).smul_mem
-      (algebraMap (𝓞 D.host.E) D.host.E b)⁻¹ hy''
+    have :=
+      (Submodule.span D.host.E (Λ : Set (Fin S.rank → D.host.E))).smul_mem
+        (algebraMap (𝓞 D.host.E) D.host.E b)⁻¹ hy''
     rw [smul_smul, inv_mul_cancel₀ hb0, one_smul] at this
     exact this
   haveI hfin : Module.Finite O Λ := Module.Finite.iff_fg.2 hfg
@@ -208,7 +238,8 @@ theorem exists_dualBasis (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank
   have hden : ∀ v : V, ∃ d : O, d ≠ 0 ∧ d • v ∈ Λ := by
     intro v
     have hv : v ∈ Submodule.span E (Λ : Set V) := by rw [hsp]; trivial
-    obtain ⟨d, hd⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors O) E (Λ : Set V) v hv
+    obtain ⟨d, hd⟩ :=
+      multiple_mem_span_of_mem_localization_span (nonZeroDivisors O) E (Λ : Set V) v hv
     rw [Submodule.span_eq] at hd
     exact ⟨d, nonZeroDivisors.coe_ne_zero d, hd⟩
   have hunitV : ∀ x : nonZeroDivisors O, IsUnit (algebraMap O (Module.End O V) x) :=
@@ -220,7 +251,8 @@ theorem exists_dualBasis (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank
     obtain ⟨d, hd, hv⟩ := hden v
     exact ⟨(⟨d • v, hv⟩, ⟨d, mem_nonZeroDivisors_of_ne_zero hd⟩), rfl⟩
   let φ : Fin m → Λ →ₗ[O] E := fun i => (Algebra.linearMap O E) ∘ₗ (LinearMap.proj i) ∘ₗ σ
-  let Φ0 : Fin m → V →ₗ[O] E := fun i => IsLocalizedModule.lift (nonZeroDivisors O) Λ.subtype (φ i) hunitE
+  let Φ0 : Fin m → V →ₗ[O] E := fun i =>
+    IsLocalizedModule.lift (nonZeroDivisors O) Λ.subtype (φ i) hunitE
   have hΦ0 : ∀ i (x : Λ), Φ0 i (x : V) = ((σ x i : O) : E) := fun i x =>
     IsLocalizedModule.lift_apply _ Λ.subtype (φ i) hunitE x
   let Φ : Fin m → V →ₗ[E] E := fun i => (Φ0 i).extendScalarsOfIsLocalization (nonZeroDivisors O) E
@@ -245,7 +277,8 @@ theorem exists_dualBasis (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank
       exact congrArg (· • g i) (hΦ i ⟨y, hy⟩).symm
     have := LinearMap.congr_fun hL x
     simpa using this
-  have hG : S.gram⁻¹ * S.gram = 1 := Matrix.nonsing_inv_mul _ (GlobalTheory.LatVac.gram_det_isUnit S)
+  have hG : S.gram⁻¹ * S.gram = 1 :=
+    Matrix.nonsing_inv_mul _ (GlobalTheory.LatVac.gram_det_isUnit S)
   have hGe : ∀ l b, ∑ k, S.gram⁻¹ l k * S.gram k b = if l = b then 1 else 0 := fun l b => by
     have := congrFun (congrFun hG l) b
     rwa [Matrix.mul_apply, Matrix.one_apply] at this
@@ -265,18 +298,21 @@ theorem exists_dualBasis (S : HSp D) {Λ : Submodule (𝓞 D.host.E) (Fin S.rank
   · have := congrFun (hid (Pi.single b 1)) a
     rw [Finset.sum_apply] at this
     simp only [Pi.smul_apply, smul_eq_mul, hw, Pi.single_apply, ite_mul, one_mul, zero_mul,
-      Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true] at this
+        Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
+      at this
     simp only [hs'row]
     rw [this]
     exact Finset.sum_congr rfl fun i _ => mul_comm _ _
 
-theorem intAf_mul' {α β : Af D.host.F} (hα : α ∈ intAf D.host.F) (hβ : β ∈ intAf D.host.F) :
-    α * β ∈ intAf D.host.F := fun v => by
+theorem intAf_mul' {α β : Af D.host.F} (hα : α ∈ intAf D.host.F) (hβ : β ∈ intAf D.host.F)
+    : α * β ∈ intAf D.host.F := fun v => by
   rw [map_mul]
   exact mul_mem (hα v) (hβ v)
 
-theorem latO_mxAt {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Set (Fin T.rank → D.host.E)}
-    {P : Pl D → Prop} {u : WO S T} (hu : u ∈ latO S T LS LT P) : MxAt P u := by
+theorem latO_mxAt
+    {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Set (Fin T.rank → D.host.E)}
+    {P : Pl D → Prop} {u : WO S T} (hu : u ∈ latO S T LS LT P)
+    : MxAt P u := by
   induction hu using AddSubgroup.closure_induction with
   | mem w hw =>
     obtain ⟨α, -, hα, a, -, s, -, t, -, rfl⟩ := hw
@@ -286,23 +322,31 @@ theorem latO_mxAt {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Set (
   | add x y _ _ hx hy => intro i j; exact add_mem (hx i j) (hy i j)
   | neg x _ hx => intro i j; exact neg_mem (hx i j)
 
-theorem gen_mulVec (S T : HSp D) (α β : Af D.host.F) (a : D.host.E) (s x : Fin S.rank → D.host.E)
-    (t : Fin T.rank → D.host.E) :
-    (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] (a * t i * ∑ k, star (s k) * S.gram k j) : WO S T) *ᵥ
-      (fun j => pairA D.host.F 0 β ⊗ₜ[D.host.F] (1 * x j)) =
-    fun i => pairA D.host.F 0 (α * β) ⊗ₜ[D.host.F] ((a * ∑ k, ∑ j, star (s k) * S.gram k j * x j) * t i) := by
-  funext i
-  simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Algebra.TensorProduct.tmul_mul_tmul, ← TensorProduct.tmul_sum]
-  have hp : pairA D.host.F 0 α * pairA D.host.F 0 β = pairA D.host.F 0 (α * β) := Prod.ext (zero_mul _) rfl
-  rw [hp]
-  congr 1
-  simp only [Finset.mul_sum, Finset.sum_mul]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
+theorem gen_mulVec
+    (S T : HSp D)
+    (α β : Af D.host.F) (a : D.host.E) (s x : Fin S.rank → D.host.E) (t : Fin T.rank → D.host.E)
+    : (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] (a * t i * ∑ k, star (s k) * S.gram k j)
+          : WO S T)
+        *ᵥ (fun j => pairA D.host.F 0 β ⊗ₜ[D.host.F] (1 * x j))
+      = fun i =>
+        pairA D.host.F 0 (α * β) ⊗ₜ[D.host.F] ((a * ∑ k, ∑ j, star (s k) * S.gram k j * x j) * t i) :=
+  by
+    funext i
+    simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Algebra.TensorProduct.tmul_mul_tmul,
+      ← TensorProduct.tmul_sum]
+    have hp : pairA D.host.F 0 α * pairA D.host.F 0 β = pairA D.host.F 0 (α * β) :=
+      Prod.ext (zero_mul _) rfl
+    rw [hp]
+    congr 1
+    simp only [Finset.mul_sum, Finset.sum_mul]
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem latO_maps {S T : HSp D} {LS : Lat S} {LT : Lat T} (hS : IsSelfDualC S LS) {P : Pl D → Prop} {u : WO S T}
-    (hu : u ∈ latO S T (LS : Set _) (LT : Set _) P) {y : Fin S.rank → AE D} (hy : y ∈ latV S LS P) :
-    u *ᵥ y ∈ latA T LT P := by
+theorem latO_maps
+    {S T : HSp D} {LS : Lat S} {LT : Lat T} (hS : IsSelfDualC S LS)
+    {P : Pl D → Prop} {u : WO S T} (hu : u ∈ latO S T (LS : Set _) (LT : Set _) P)
+    {y : Fin S.rank → AE D} (hy : y ∈ latV S LS P)
+    : u *ᵥ y ∈ latA T LT P := by
   induction hu using AddSubgroup.closure_induction with
   | mem w hw =>
     obtain ⟨α, hαi, hα, a, ha, s, hs, t, ht, rfl⟩ := hw
@@ -313,8 +357,16 @@ theorem latO_maps {S T : HSp D} {LS : Lat S} {LT : Lat T} (hS : IsSelfDualC S LS
       subst hc
       rw [gen_mulVec]
       obtain ⟨b, hb⟩ := (hS.2 x).1 hx s hs
-      refine AddSubgroup.subset_closure ⟨α * β, intAf_mul' hαi hβi,
-        fun v hv => by rw [map_mul, hα v hv, zero_mul], b • a, ?_, t, ht, ?_⟩
+      refine AddSubgroup.subset_closure ⟨
+        α * β,
+        intAf_mul' hαi hβi,
+        fun v hv => by rw [map_mul, hα v hv, zero_mul],
+        b • a,
+        ?_,
+        t,
+        ht,
+        ?_
+      ⟩
       · exact Submodule.smul_mem (D.host.AA : Submodule (𝓞 D.host.E) D.host.E) b ha
       · funext i
         congr 1
@@ -332,9 +384,11 @@ theorem latO_maps {S T : HSp D} {LS : Lat S} {LT : Lat T} (hS : IsSelfDualC S LS
 def rowMul (S T : HSp D) (s' : Fin S.rank → D.host.E) (z : Fin T.rank → AE D) : WO S T :=
   Matrix.of fun k j => z k * ((1 : AF D.host.F) ⊗ₜ[D.host.F] (∑ l, star (s' l) * S.gram l j))
 
-theorem rowMul_mem {S T : HSp D} {LS : Lat S} {LT : Lat T} {P : Pl D → Prop} {s' : Fin S.rank → D.host.E}
-    (hs' : s' ∈ LS) {z : Fin T.rank → AE D} (hz : z ∈ latA T LT P) :
-    rowMul S T s' z ∈ latO S T (LS : Set _) (LT : Set _) P := by
+theorem rowMul_mem
+    {S T : HSp D} {LS : Lat S} {LT : Lat T} {P : Pl D → Prop} {s' : Fin S.rank → D.host.E}
+    (hs' : s' ∈ LS)
+    {z : Fin T.rank → AE D} (hz : z ∈ latA T LT P)
+    : rowMul S T s' z ∈ latO S T (LS : Set _) (LT : Set _) P := by
   induction hz using AddSubgroup.closure_induction with
   | mem y hy =>
     obtain ⟨β, hβi, hβ, a, ha, x, hx, rfl⟩ := hy
@@ -343,26 +397,47 @@ theorem rowMul_mem {S T : HSp D} {LS : Lat S} {LT : Lat T} {P : Pl D → Prop} {
     simp only [rowMul, Matrix.of_apply, Algebra.TensorProduct.tmul_mul_tmul, mul_one]
   | zero =>
     have : rowMul S T s' 0 = 0 := by ext k j; simp [rowMul]
-    rw [this]; exact zero_mem _
+    rw [this]
+    exact zero_mem _
   | add z z' _ _ hz hz' =>
-    have : rowMul S T s' (z + z') = rowMul S T s' z + rowMul S T s' z' := by ext k j; simp [rowMul, add_mul]
-    rw [this]; exact add_mem hz hz'
+    have : rowMul S T s' (z + z') = rowMul S T s' z + rowMul S T s' z' := by
+      ext k j; simp [rowMul, add_mul]
+    rw [this]
+    exact add_mem hz hz'
   | neg z _ hz =>
-    have : rowMul S T s' (-z) = -rowMul S T s' z := by ext k j; exact neg_mul (z k) _
-    rw [this]; exact neg_mem hz
+    have : rowMul S T s' (-z) = - rowMul S T s' z := by ext k j; exact neg_mul (z k) _
+    rw [this]
+    exact neg_mem hz
 
-theorem mem_latO_iff : ∀ (D : D7) (S T : HSp D) (LS : Lat S) (LT : Lat T), IsSelfDualC S LS → IsSelfDualC T LT →
-    ∀ (P : Pl D → Prop) (u : WO S T), u ∈ latO S T (LS : Set _) (LT : Set _) P ↔
-      MxAt P u ∧ ∀ y ∈ latV S LS P, Matrix.mulVec (show Matrix (Fin T.rank) (Fin S.rank) (AE D) from u) y ∈ latA T LT P := by
+theorem mem_latO_iff
+    : ∀ (D : D7) (S T : HSp D) (LS : Lat S) (LT : Lat T),
+      IsSelfDualC S LS → IsSelfDualC T LT
+        → ∀ (P : Pl D → Prop) (u : WO S T),
+          u ∈ latO S T (LS : Set _) (LT : Set _) P
+            ↔ MxAt P u
+              ∧ ∀ y ∈ latV S LS P,
+                Matrix.mulVec (show Matrix (Fin T.rank) (Fin S.rank) (AE D) from u) y
+                  ∈ latA T LT P := by
   intro D S T LS LT hS _ P u
   refine ⟨fun hu => ⟨latO_mxAt hu, fun y hy => latO_maps hS hu hy⟩, fun ⟨hP, hmap⟩ => ?_⟩
   obtain ⟨m, s, s', hs, hs', hdual⟩ := exists_dualBasis S hS
-  let yv : Fin m → Fin S.rank → AE D := fun i l => pairA D.host.F 0 (indP D.host.F P) ⊗ₜ[D.host.F] (1 * s i l)
+  let yv : Fin m → Fin S.rank → AE D := fun i l =>
+    pairA D.host.F 0 (indP D.host.F P) ⊗ₜ[D.host.F] (1 * s i l)
   have hyv : ∀ i, yv i ∈ latV S LS P := fun i =>
-    AddSubgroup.subset_closure ⟨indP D.host.F P, indicatorAdele_mem_integralAdeles' _ _, indicatorAdele_supported _ _, 1, rfl, s i, hs i, rfl⟩
+    AddSubgroup.subset_closure ⟨
+      indP D.host.F P,
+      indicatorAdele_mem_integralAdeles' _ _,
+      indicatorAdele_supported _ _,
+      1,
+      rfl,
+      s i,
+      hs i,
+      rfl
+    ⟩
   have hu : u = ∑ i, rowMul S T (s' i) (u *ᵥ yv i) := by
     ext k j
-    simp only [Matrix.sum_apply, rowMul, Matrix.of_apply, Matrix.mulVec, dotProduct, Finset.sum_mul, yv]
+    simp only [Matrix.sum_apply, rowMul, Matrix.of_apply, Matrix.mulVec, dotProduct, Finset.sum_mul,
+      yv]
     simp only [mul_assoc, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
     rw [Finset.sum_comm]
     simp only [← Finset.mul_sum, ← TensorProduct.tmul_sum, hdual]

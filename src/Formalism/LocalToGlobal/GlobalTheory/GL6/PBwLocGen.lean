@@ -18,7 +18,8 @@ def pZ (l : ℕ) : Ideal ℤ := Ideal.span {(l : ℤ)}
 variable (l : ℕ) [hl : Fact l.Prime]
 
 instance pZ_isPrime : (pZ l).IsPrime :=
-  (Ideal.span_singleton_prime (by exact_mod_cast hl.out.ne_zero)).2 (Nat.prime_iff_prime_int.1 hl.out)
+  (Ideal.span_singleton_prime (by exact_mod_cast hl.out.ne_zero)).2
+    (Nat.prime_iff_prime_int.1 hl.out)
 
 theorem pZ_ne_bot : pZ l ≠ ⊥ := by
   unfold pZ
@@ -55,7 +56,8 @@ theorem zero_notMem_Ml : (0 : 𝓞 K) ∉ Ml l K := by
 
 variable (l K)
 
-theorem Ml_le : Ml l K ≤ nonZeroDivisors (𝓞 K) := le_nonZeroDivisors_of_noZeroDivisors zero_notMem_Ml
+theorem Ml_le : Ml l K ≤ nonZeroDivisors (𝓞 K) :=
+  le_nonZeroDivisors_of_noZeroDivisors zero_notMem_Ml
 
 instance Rl_isDomain : IsDomain (Rl l K) := IsLocalization.isDomain_localization (Ml_le l K)
 
@@ -85,17 +87,21 @@ theorem rl_pid : IsPrincipalIdealRing (Rl l K) :=
 theorem algebraMap_rl_injective : Function.Injective (algebraMap (Rl l K) K) :=
   IsFractionRing.injective (Rl l K) K
 
-theorem mem_range_rl_iff (y : K) :
-    y ∈ (algebraMap (Rl l K) K).range ↔ ∃ s : ℕ, ¬ l ∣ s ∧ (s : K) * y ∈ (algebraMap (𝓞 K) K).range := by
+theorem mem_range_rl_iff (y : K)
+    : y ∈ (algebraMap (Rl l K) K).range
+      ↔ ∃ s : ℕ, ¬ l ∣ s ∧ (s : K) * y ∈ (algebraMap (𝓞 K) K).range := by
   constructor
   · rintro ⟨r, rfl⟩
     obtain ⟨a, ⟨m, hm⟩, rfl⟩ := IsLocalization.exists_mk'_eq (Ml l K) r
     obtain ⟨z, hz, rfl⟩ := (mem_Ml_iff _).1 hm
-    have key : (z : K) * algebraMap (Rl l K) K (IsLocalization.mk' (Rl l K) a ⟨_, hm⟩) = algebraMap (𝓞 K) K a := by
+    have key
+        : (z : K) * algebraMap (Rl l K) K (IsLocalization.mk' (Rl l K) a ⟨_, hm⟩)
+          = algebraMap (𝓞 K) K a := by
       have h1 := IsLocalization.mk'_spec (Rl l K) a ⟨_, hm⟩
       have h2 := congrArg (algebraMap (Rl l K) K) h1
       rw [map_mul, ← IsScalarTower.algebraMap_apply (𝓞 K) (Rl l K) K a,
-        ← IsScalarTower.algebraMap_apply (𝓞 K) (Rl l K) K] at h2
+          ← IsScalarTower.algebraMap_apply (𝓞 K) (Rl l K) K]
+        at h2
       have h5 : algebraMap (𝓞 K) K (algebraMap ℤ (𝓞 K) z) = (z : K) := by simp
       rw [← h2, mul_comm]
       congr 1
@@ -127,7 +133,8 @@ section Mod
 
 variable (V : Type) [AddCommGroup V] [Module K V]
 
-@[reducible] def rlModule : Module (Rl l K) V := Module.compHom V (algebraMap (Rl l K) K)
+@[reducible]
+def rlModule : Module (Rl l K) V := Module.compHom V (algebraMap (Rl l K) K)
 
 attribute [local instance] rlModule
 
@@ -153,9 +160,30 @@ variable {V} [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 def atL (L : Submodule (𝓞 K) V) : Submodule (Rl l K) V := Submodule.span (Rl l K) (L : Set V)
 
-theorem mem_atL_iff {L : Submodule (𝓞 K) V} {x : V} :
-    x ∈ atL l K L ↔ ∃ s ∈ Ml l K, s • x ∈ L := by
-  first | exact UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff .. | (apply UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption) | (intros; apply UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption) | (apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption) | (apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> first | assumption | infer_instance) | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› ‹_› L x | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› ‹_› L | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› ‹_› | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l
+theorem mem_atL_iff {L : Submodule (𝓞 K) V} {x : V} : x ∈ atL l K L ↔ ∃ s ∈ Ml l K, s • x ∈ L := by
+  first
+  | exact UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff ..
+  | (apply UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption)
+  | (intros; apply UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption)
+  | (apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption)
+  | (intros; apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff <;> assumption)
+  | (
+      apply @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff
+        <;> first | assumption | infer_instance
+    )
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› ‹_› L
+      x
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› ‹_› L
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_› ‹_›
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_› ‹_›
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_› ‹_›
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V ‹_›
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_› V
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_› ‹_›
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K ‹_›
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl K
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l hl
+  | exact @UpperTheory.Reformulated.B.StandardLattice.mem_atL_iff l
 
 theorem atL_fg {L : Submodule (𝓞 K) V} (h : L.FG) : (atL l K L).FG := by
   obtain ⟨S, hS⟩ := h
@@ -165,8 +193,8 @@ theorem atL_fg {L : Submodule (𝓞 K) V} (h : L.FG) : (atL l K L).FG := by
 
 theorem le_atL (L : Submodule (𝓞 K) V) : (L : Set V) ⊆ atL l K L := Submodule.subset_span
 
-theorem span_atL (L : Submodule (𝓞 K) V) :
-    Submodule.span K (atL l K L : Set V) = Submodule.span K (L : Set V) := by
+theorem span_atL (L : Submodule (𝓞 K) V)
+    : Submodule.span K (atL l K L : Set V) = Submodule.span K (L : Set V) := by
   apply le_antisymm
   · refine Submodule.span_le.2 ?_
     have : atL l K L ≤ (Submodule.span K (L : Set V)).restrictScalars (Rl l K) :=
@@ -174,10 +202,12 @@ theorem span_atL (L : Submodule (𝓞 K) V) :
     exact this
   · exact Submodule.span_mono (le_atL l K L)
 
-theorem exists_basis_atL {A : Submodule (𝓞 K) V} (hfg : A.FG)
-    (hsp : Submodule.span K (A : Set V) = ⊤) :
-    ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι (Rl l K) (atL l K A)) (bK : Module.Basis ι K V),
-      ∀ i, bK i = (b i : V) := by
+theorem exists_basis_atL
+    {A : Submodule (𝓞 K) V} (hfg : A.FG) (hsp : Submodule.span K (A : Set V) = ⊤)
+    : ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι (Rl l K) (atL l K A))
+        (bK : Module.Basis ι K V),
+      ∀ i,
+        bK i = (b i : V) := by
   have := rl_pid l K
   have : Module.Finite (Rl l K) (atL l K A) := Module.Finite.iff_fg.2 (atL_fg l K hfg)
   have : Module.Free (Rl l K) (atL l K A) := inferInstance
@@ -187,16 +217,22 @@ theorem exists_basis_atL {A : Submodule (𝓞 K) V} (hfg : A.FG)
   have hliK : LinearIndependent K (fun i => ((b i : atL l K A) : V)) :=
     (LinearIndependent.iff_fractionRing (Rl l K) K).1 hli
   have hs : Submodule.span (Rl l K) (Set.range fun i => ((b i : atL l K A) : V)) = atL l K A := by
-    have h1 : (Set.range fun i => ((b i : atL l K A) : V)) = (atL l K A).subtype '' Set.range b := by
+    have h1
+        : (Set.range fun i => ((b i : atL l K A) : V)) = (atL l K A).subtype '' Set.range b := by
       rw [← Set.range_comp]; rfl
     rw [h1, ← Submodule.map_span, b.span_eq, Submodule.map_top, Submodule.range_subtype]
-  have key : ∀ S : Set V, Submodule.span (Rl l K) S = atL l K A → Submodule.span K S = ⊤ := fun S hS => by
+  have key
+      : ∀ S : Set V,
+        Submodule.span (Rl l K) S = atL l K A → Submodule.span K S = ⊤ := fun S hS => by
     rw [← hsp, ← span_atL l K A, ← hS, Submodule.span_span_of_tower]
-  exact ⟨_, inferInstance, b, Module.Basis.mk hliK (key _ hs).ge, fun i => Module.Basis.mk_apply _ _ i⟩
+  exact
+    ⟨_, inferInstance, b, Module.Basis.mk hliK (key _ hs).ge, fun i => Module.Basis.mk_apply _ _ i⟩
 
-theorem mem_atL_iff_repr {A : Submodule (𝓞 K) V} {ι : Type} [Fintype ι] (b : Module.Basis ι (Rl l K) (atL l K A))
-    (bK : Module.Basis ι K V) (hb : ∀ i, bK i = (b i : V)) (x : V) :
-    x ∈ atL l K A ↔ ∀ i, bK.repr x i ∈ (algebraMap (Rl l K) K).range := by
+theorem mem_atL_iff_repr
+    {A : Submodule (𝓞 K) V} {ι : Type} [Fintype ι]
+    (b : Module.Basis ι (Rl l K) (atL l K A)) (bK : Module.Basis ι K V) (hb : ∀ i, bK i = (b i : V))
+    (x : V)
+    : x ∈ atL l K A ↔ ∀ i, bK.repr x i ∈ (algebraMap (Rl l K) K).range := by
   classical
   constructor
   · intro hx i
@@ -219,8 +255,8 @@ theorem mem_atL_iff_repr {A : Submodule (𝓞 K) V} {ι : Type} [Fintype ι] (b 
     rw [e]
     exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (b j).2
 
-theorem mem_atL_iff_nat {L : Submodule (𝓞 K) V} {x : V} :
-    x ∈ atL l K L ↔ ∃ s : ℕ, ¬ l ∣ s ∧ s • x ∈ L := by
+theorem mem_atL_iff_nat {L : Submodule (𝓞 K) V} {x : V}
+    : x ∈ atL l K L ↔ ∃ s : ℕ, ¬ l ∣ s ∧ s • x ∈ L := by
   rw [mem_atL_iff]
   constructor
   · rintro ⟨s, hs, hx⟩
@@ -249,9 +285,10 @@ section Vec
 
 variable {n : ℕ}
 
-theorem exists_isLocBasis (A : Submodule (𝓞 K) (Fin n → K)) (hfg : A.FG)
-    (hsp : Submodule.span K (A : Set (Fin n → K)) = ⊤) :
-    ∃ B : GL (Fin n) K, Formalism.L2.Forms.IsLocBasis l (A : Set (Fin n → K)) B := by
+theorem exists_isLocBasis
+    (A : Submodule (𝓞 K) (Fin n → K))
+    (hfg : A.FG) (hsp : Submodule.span K (A : Set (Fin n → K)) = ⊤)
+    : ∃ B : GL (Fin n) K, Formalism.L2.Forms.IsLocBasis l (A : Set (Fin n → K)) B := by
   classical
   let _ := rlModule l K (Fin n → K)
   obtain ⟨ι, hι, b, bK, hb⟩ := exists_basis_atL l K hfg hsp
@@ -263,9 +300,12 @@ theorem exists_isLocBasis (A : Submodule (𝓞 K) (Fin n → K)) (hfg : A.FG)
   have hb' : ∀ i, b' i = (b'' i : Fin n → K) := fun i => by
     simp only [b', b'', Module.Basis.reindex_apply]
     exact hb _
-  let B : GL (Fin n) K :=
-    ⟨(Pi.basisFun K (Fin n)).toMatrix b', b'.toMatrix (Pi.basisFun K (Fin n)),
-      Module.Basis.toMatrix_mul_toMatrix_flip _ _, Module.Basis.toMatrix_mul_toMatrix_flip _ _⟩
+  let B : GL (Fin n) K := ⟨
+    (Pi.basisFun K (Fin n)).toMatrix b',
+    b'.toMatrix (Pi.basisFun K (Fin n)),
+    Module.Basis.toMatrix_mul_toMatrix_flip _ _,
+    Module.Basis.toMatrix_mul_toMatrix_flip _ _
+  ⟩
   have key : ∀ x, ((B⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) *ᵥ x = b'.repr x := fun x => by
     show b'.toMatrix (Pi.basisFun K (Fin n)) *ᵥ x = _
     have hx : ((Pi.basisFun K (Fin n)).repr x : Fin n → K) = x := funext fun a => by simp
@@ -285,7 +325,8 @@ theorem exists_isLocBasis (A : Submodule (𝓞 K) (Fin n → K)) (hfg : A.FG)
     refine ⟨∏ a, s a, fun hd => ?_, fun a => ?_⟩
     · obtain ⟨a, _, ha⟩ := (Prime.dvd_finsetProd_iff hl.out.prime _).1 hd
       exact hs a ha
-    · rw [← Finset.mul_prod_erase Finset.univ s (Finset.mem_univ a), mul_comm (s a), Nat.cast_mul, mul_assoc]
+    · rw [← Finset.mul_prod_erase Finset.univ s (Finset.mem_univ a), mul_comm (s a), Nat.cast_mul,
+        mul_assoc]
       obtain ⟨r, hr⟩ := hy a
       rw [← hr]
       exact ⟨((∏ b ∈ Finset.univ.erase a, s b : ℕ) : 𝓞 K) * r, by rw [map_mul, map_natCast]⟩
@@ -300,10 +341,11 @@ open Formalism.L2.DIV Formalism.L2.Col
 
 variable {K} {n : ℕ}
 
-def bnd (d : 𝓞 K) : Submodule (𝓞 K) (Fin n → K) := (colLat (1 : GL (Fin n) K)).comap (d • LinearMap.id)
+def bnd (d : 𝓞 K) : Submodule (𝓞 K) (Fin n → K) :=
+  (colLat (1 : GL (Fin n) K)).comap (d • LinearMap.id)
 
-theorem mem_bnd (d : 𝓞 K) (x : Fin n → K) :
-    x ∈ bnd d ↔ ∀ a, algebraMap (𝓞 K) K d * x a ∈ (algebraMap (𝓞 K) K).range := by
+theorem mem_bnd (d : 𝓞 K) (x : Fin n → K)
+    : x ∈ bnd d ↔ ∀ a, algebraMap (𝓞 K) K d * x a ∈ (algebraMap (𝓞 K) K).range := by
   unfold bnd
   rw [Submodule.mem_comap, LinearMap.smul_apply, LinearMap.id_apply, lc_mem_colLat_one]
   refine forall_congr' fun a => ?_
@@ -312,13 +354,15 @@ theorem mem_bnd (d : 𝓞 K) (x : Fin n → K) :
 theorem algebraMap_ne_zero {d : 𝓞 K} (hd : d ≠ 0) : algebraMap (𝓞 K) K d ≠ 0 :=
   (map_ne_zero_iff _ (FaithfulSMul.algebraMap_injective (𝓞 K) K)).2 hd
 
-theorem fg_of_le_bnd {L : Submodule (𝓞 K) (Fin n → K)} {d : 𝓞 K} (hd : d ≠ 0) (h : L ≤ bnd d) : L.FG := by
+theorem fg_of_le_bnd {L : Submodule (𝓞 K) (Fin n → K)} {d : 𝓞 K} (hd : d ≠ 0) (h : L ≤ bnd d)
+    : L.FG := by
   have : IsNoetherian (𝓞 K) (colLat (1 : GL (Fin n) K)) :=
     isNoetherian_of_fg_of_noetherian _ (Submodule.fg_span (Set.finite_range _))
-  let φ : L →ₗ[𝓞 K] colLat (1 : GL (Fin n) K) :=
-    { toFun := fun x => ⟨d • (x : Fin n → K), h x.2⟩
-      map_add' := fun x y => by ext1; simp [smul_add]
-      map_smul' := fun a x => by ext1; simp [smul_comm d a] }
+  let φ : L →ₗ[𝓞 K] colLat (1 : GL (Fin n) K) := {
+    toFun := fun x => ⟨d • (x : Fin n → K), h x.2⟩
+    map_add' := fun x y => by ext1; simp [smul_add]
+    map_smul' := fun a x => by ext1; simp [smul_comm d a]
+  }
   have hinj : Function.Injective φ := by
     intro x y hxy
     have h1 : d • (x : Fin n → K) = d • (y : Fin n → K) := congrArg Subtype.val hxy
@@ -334,12 +378,13 @@ theorem bnd_mono (d e : 𝓞 K) : (bnd d : Submodule (𝓞 K) (Fin n → K)) ≤
   obtain ⟨r, hr⟩ := hx a
   exact ⟨e * r, by rw [map_mul, hr, map_mul, mul_assoc]⟩
 
-theorem exists_le_bnd (L : Submodule (𝓞 K) (Fin n → K)) (hL : Submodule.IsLattice K L) :
-    ∃ d : 𝓞 K, d ≠ 0 ∧ L ≤ bnd d := by
+theorem exists_le_bnd (L : Submodule (𝓞 K) (Fin n → K)) (hL : Submodule.IsLattice K L)
+    : ∃ d : 𝓞 K, d ≠ 0 ∧ L ≤ bnd d := by
   classical
   obtain ⟨S, hS⟩ := hL.fg
-  obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
-    (S.biUnion fun x => Finset.univ.image fun a : Fin n => x a)
+  obtain ⟨d, hd⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
+      (S.biUnion fun x => Finset.univ.image fun a : Fin n => x a)
   refine ⟨d, nonZeroDivisors.ne_zero d.2, ?_⟩
   intro x hx
   rw [← hS] at hx
@@ -347,42 +392,54 @@ theorem exists_le_bnd (L : Submodule (𝓞 K) (Fin n → K)) (hL : Submodule.IsL
   | mem y hy =>
     rw [mem_bnd]
     intro a
-    obtain ⟨r, hr⟩ := hd (y a) (Finset.mem_biUnion.2 ⟨y, hy, Finset.mem_image.2 ⟨a, Finset.mem_univ _, rfl⟩⟩)
+    obtain ⟨r, hr⟩ :=
+      hd (y a) (Finset.mem_biUnion.2 ⟨y, hy, Finset.mem_image.2 ⟨a, Finset.mem_univ _, rfl⟩⟩)
     exact ⟨r, by simpa [Algebra.smul_def] using hr⟩
   | zero => exact Submodule.zero_mem _
   | add y z _ _ hy hz => exact Submodule.add_mem _ hy hz
   | smul r y _ hy => exact Submodule.smul_mem _ r hy
 
-theorem sig_int (σ : K →+* K) (r : 𝓞 K) : ∃ r' : 𝓞 K, algebraMap (𝓞 K) K r' = σ (algebraMap (𝓞 K) K r) :=
-  IsIntegralClosure.isIntegral_iff.1 ((NumberField.RingOfIntegers.isIntegral_coe r).map σ.toIntAlgHom)
+theorem sig_int (σ : K →+* K) (r : 𝓞 K)
+    : ∃ r' : 𝓞 K, algebraMap (𝓞 K) K r' = σ (algebraMap (𝓞 K) K r) :=
+  IsIntegralClosure.isIntegral_iff.1 ((NumberField.RingOfIntegers.isIntegral_coe r).map
+    σ.toIntAlgHom)
 
 theorem sig_ne_zero (σ : K →+* K) {d : 𝓞 K} (hd : d ≠ 0) : σ (algebraMap (𝓞 K) K d) ≠ 0 :=
   (map_ne_zero_iff σ σ.injective).2 (algebraMap_ne_zero hd)
 
-theorem dual_le_bnd (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K) (hJ : IsUnit J.det)
-    (L : Submodule (𝓞 K) (Fin n → K)) (hL : Submodule.IsFullLattice K L) :
-    ∃ d : 𝓞 K, d ≠ 0 ∧ Submodule.span (𝓞 K) (Formalism.BasicNotions.dualSet σ J L) ≤ bnd d := by
+theorem dual_le_bnd
+    (σ : K →+* K)
+    (J : Matrix (Fin n) (Fin n) K) (hJ : IsUnit J.det)
+    (L : Submodule (𝓞 K) (Fin n → K)) (hL : Submodule.IsFullLattice K L)
+    : ∃ d : 𝓞 K, d ≠ 0 ∧ Submodule.span (𝓞 K) (Formalism.BasicNotions.dualSet σ J L) ≤ bnd d := by
   classical
   obtain ⟨d0, hd0, -, h2⟩ := lc_sandwich L hL
   obtain ⟨d0', hd0'⟩ := sig_int σ d0
-  obtain ⟨d1, hd1⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
-    (Finset.univ.image fun p : Fin n × Fin n => J⁻¹ p.1 p.2)
+  obtain ⟨d1, hd1⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
+      (Finset.univ.image fun p : Fin n × Fin n => J⁻¹ p.1 p.2)
   have hd0'0 : d0' ≠ 0 := by
     intro h
     apply sig_ne_zero σ hd0
     rw [← hd0', h, map_zero]
-  refine ⟨(d1 : 𝓞 K) * d0', mul_ne_zero (nonZeroDivisors.ne_zero d1.2) hd0'0, Submodule.span_le.2 fun y hy => ?_⟩
+  refine ⟨
+    (d1 : 𝓞 K) * d0',
+    mul_ne_zero (nonZeroDivisors.ne_zero d1.2) hd0'0,
+    Submodule.span_le.2 fun y hy => ?_
+  ⟩
   have hJy : ∀ a, σ (algebraMap (𝓞 K) K d0) * (J *ᵥ y) a ∈ (algebraMap (𝓞 K) K).range := by
     intro a
     have hx : d0 • (fun b : Fin n => ((1 : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) b a) ∈ L :=
       h2 _ (lc_col_mem_colLat 1 a)
     have h3 := hy _ hx
-    have e : Formalism.UG.hform σ J (d0 • (fun b : Fin n => ((1 : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) b a)) y =
-        σ (algebraMap (𝓞 K) K d0) * (J *ᵥ y) a := by
+    have e
+        : Formalism.UG.hform σ J
+            (d0 • (fun b : Fin n => ((1 : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) b a)) y
+          = σ (algebraMap (𝓞 K) K d0) * (J *ᵥ y) a := by
       unfold Formalism.UG.hform
       rw [Finset.sum_eq_single a]
-      · simp only [Pi.smul_apply, Units.val_one, Matrix.one_apply_eq, Algebra.smul_def, mul_one, Matrix.mulVec,
-          dotProduct, Finset.mul_sum, mul_assoc]
+      · simp only [Pi.smul_apply, Units.val_one, Matrix.one_apply_eq, Algebra.smul_def, mul_one,
+          Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc]
       · intro b _ hb
         simp [Matrix.one_apply, hb]
       · simp
@@ -400,10 +457,13 @@ theorem dual_le_bnd (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K) (hJ : IsUnit
   rw [map_mul, hr, hq, Algebra.smul_def]
   ring
 
-theorem dual_span (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K)
-    (L : Submodule (𝓞 K) (Fin n → K)) (hL : Submodule.IsLattice K L) :
-    Submodule.span K ((Submodule.span (𝓞 K) (Formalism.BasicNotions.dualSet σ J L) : Submodule (𝓞 K) (Fin n → K)) :
-      Set (Fin n → K)) = ⊤ := by
+theorem dual_span
+    (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K)
+    (L : Submodule (𝓞 K) (Fin n → K)) (hL : Submodule.IsLattice K L)
+    : Submodule.span K
+        ((Submodule.span (𝓞 K) (Formalism.BasicNotions.dualSet σ J L) : Submodule (𝓞 K) (Fin n → K))
+          : Set (Fin n → K))
+      = ⊤ := by
   classical
   obtain ⟨d0, hd0, hbound⟩ := exists_le_bnd L hL
   have h1 : ∀ x ∈ L, d0 • x ∈ colLat (1 : GL (Fin n) K) := by
@@ -415,10 +475,12 @@ theorem dual_span (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K)
     apply sig_ne_zero σ hd0
     rw [← hd0', h, map_zero]
   refine eq_top_iff.2 fun z _ => ?_
-  obtain ⟨e, he⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
-    (Finset.univ.image fun p : Fin n × Fin n => J p.1 p.2 * z p.2)
+  obtain ⟨e, he⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
+      (Finset.univ.image fun p : Fin n × Fin n => J p.1 p.2 * z p.2)
   set c : K := algebraMap (𝓞 K) K d0' * algebraMap (𝓞 K) K (e : 𝓞 K) with hc
-  have hc0 : c ≠ 0 := mul_ne_zero (algebraMap_ne_zero hd0'0) (algebraMap_ne_zero (nonZeroDivisors.ne_zero e.2))
+  have hc0 : c ≠ 0 :=
+    mul_ne_zero (algebraMap_ne_zero hd0'0) (algebraMap_ne_zero (nonZeroDivisors.ne_zero e.2))
   have hmem : c • z ∈ Formalism.BasicNotions.dualSet σ J L := by
     intro x hx
     have hx' := (lc_mem_colLat_one _).1 (h1 x hx)
@@ -428,8 +490,8 @@ theorem dual_span (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K)
     obtain ⟨r', hr'⟩ := sig_int σ r
     obtain ⟨q, hq⟩ := he (J i j * z j) (Finset.mem_image.2 ⟨(i, j), Finset.mem_univ _, rfl⟩)
     refine ⟨r' * q, ?_⟩
-    rw [map_mul, hr', hq, hr, Pi.smul_apply, Algebra.smul_def, map_mul, ← hd0', Pi.smul_apply, smul_eq_mul,
-      Algebra.smul_def, hc]
+    rw [map_mul, hr', hq, hr, Pi.smul_apply, Algebra.smul_def, map_mul, ← hd0', Pi.smul_apply,
+      smul_eq_mul, Algebra.smul_def, hc]
     ring
   have e2 : z = c⁻¹ • (c • z) := by rw [smul_smul, inv_mul_cancel₀ hc0, one_smul]
   rw [e2]

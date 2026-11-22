@@ -5,20 +5,25 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MidChar
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Forms Formalism.UG
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Forms Formalism.UG
 open NumberField IsDedekindDomain Matrix GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.AdForm
 
-theorem finM_eq_one_iff_mem_GinfC :
-    ∀ (D : D7) (V : HSp D) (n : ℕ) (hn : V.rank = n) (g : GA D V), finM V hn g = 1 ↔ g ∈ GinfC V := by
+theorem finM_eq_one_iff_mem_GinfC
+    : ∀ (D : D7) (V : HSp D) (n : ℕ) (hn : V.rank = n) (g : GA D V),
+      finM V hn g = 1 ↔ g ∈ GinfC V := by
   intro D V n hn g
   subst hn
   have e0 : finM V rfl g = (Formalism.L2.Theta.mt V g).map (toEAf D) := by simp [finM]
-  have e : (Formalism.L2.Theta.mt V g).map (toEAf D) = (finHom V g).val.map
-      (Algebra.TensorProduct.comm D.host.F (Af D.host.F) D.host.E) := rfl
+  have e
+      : (Formalism.L2.Theta.mt V g).map (toEAf D)
+        = (finHom V g).val.map (Algebra.TensorProduct.comm D.host.F (Af D.host.F) D.host.E) :=
+    rfl
   rw [e0, e]
   constructor
   · intro h

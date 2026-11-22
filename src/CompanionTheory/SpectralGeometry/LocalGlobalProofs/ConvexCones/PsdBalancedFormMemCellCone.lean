@@ -10,29 +10,50 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.ConvexCones.Cel
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.Mark GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.Mark
+  GlobalTheory.CompanionTheory.Ar.Fan
 open GlobalTheory.PolFan.Mark.FaceIn
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan.RationalConeOfSum
 
-theorem inRCone_of_add : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O),
-    CMOrd O bar → ∀ (q : ℕ) (ψ lab : InvFun O), IsPolyFan bar q ψ → IsCarrierDim bar q ψ lab → ∀ (X : Type)
-    [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X], Module.finrank O X ≤ q →
-    Dominates bar X → ∀ (m : ℕ) (v : Fin m → LinearMap.BilinForm ℤ X), IsCell bar ψ v → ∀ β ∈ balForms bar X,
-    (∀ y, 0 ≤ β y y) → InRCone v β → ∀ x ∈ balForms bar X, (∀ y, 0 ≤ x y y) →
-    ψ.evalZ (β + x) = ψ.evalZ β + ψ.evalZ x → lab.evalZ (β + x) = lab.evalZ β → InRCone v x := by
+theorem inRCone_of_add
+    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O),
+      CMOrd O bar
+        → ∀ (q : ℕ) (ψ lab : InvFun O),
+          IsPolyFan bar q ψ → IsCarrierDim bar q ψ lab
+            → ∀ (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X]
+                [Module.Projective O X],
+              Module.finrank O X ≤ q → Dominates bar X
+                → ∀ (m : ℕ) (v : Fin m → LinearMap.BilinForm ℤ X),
+                  IsCell bar ψ v
+                    → ∀ β ∈ balForms bar X,
+                      (∀ y, 0 ≤ β y y) → InRCone v β
+                        → ∀ x ∈ balForms bar X,
+                          (∀ y, 0 ≤ x y y) → ψ.evalZ (β + x) = ψ.evalZ β + ψ.evalZ x
+                            → lab.evalZ (β + x) = lab.evalZ β
+                            → InRCone v x := by
   intro O _ _ _ _ bar hb q ψ lab hψ hlab X _ _ _ _ hX hD m v hv β hβ hβp hvβ x hx hxp hadd hl
   classical
   have hs : β + x ∈ balForms bar X := Submodule.add_mem _ hβ hx
   have hsp : ∀ y, 0 ≤ (β + x) y y := fun y => add_nonneg (hβp y) (hxp y)
-  have hne : {k : ℕ | ∃ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X), IsCell bar ψ γ ∧ InRCone γ (β + x) ∧
-      genRank γ = k}.Nonempty := by
+  have hne
+      : {k : ℕ | ∃ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X), IsCell bar ψ γ ∧ InRCone γ (β + x) ∧
+        genRank γ = k}.Nonempty := by
     have hR : toReal (β + x) ∈ psdCone (bar := bar) (X := X) := by
-      simpa using GlobalTheory.PolFan.ConeSub.sum_smul_toReal_mem_psdCone O bar X 1 ![β + x] ![1] (by simp [hs])
-        (by simpa using hsp) (by simp)
+      simpa using
+        GlobalTheory.PolFan.ConeSub.sum_smul_toReal_mem_psdCone O bar X 1 ![β + x] ![1]
+          (by simp [hs]) (by simpa using hsp) (by simp)
     obtain ⟨S, -, hcov⟩ := (hψ X hX).finite
     obtain ⟨e, mm, γ, c, hγ, -, hc, hsum⟩ := hcov _ hR
-    refine ⟨_, mm, fun i => pull e.symm.toLinearMap (γ i), CarDim.isCell_pull_equiv hγ e.symm, ⟨c, hc, ?_⟩, rfl⟩
+    refine ⟨
+      _,
+      mm,
+      fun i => pull e.symm.toLinearMap (γ i),
+      CarDim.isCell_pull_equiv hγ e.symm,
+      ⟨c, hc, ?_⟩,
+      rfl
+    ⟩
     exact LinearMap.ext₂ fun a b => by
       have := LinearMap.congr_fun₂ hsum (e.symm a) (e.symm b)
       simpa [LinearMap.sum_apply] using this
@@ -65,10 +86,11 @@ theorem inRCone_of_add : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZ
     · have : Set.range s = Z := Z.range_orderEmbOfFin rfl
       rw [this]
       simp [Z]
-  have hface := GlobalTheory.CompanionTheory.Ar.Fan.FaceCells.isCell_face_of_isFaceCut O bar hb q ψ hψ X hX hD n γ hγ _ s h hcut
+  have hface :=
+    GlobalTheory.CompanionTheory.Ar.Fan.FaceCells.isCell_face_of_isFaceCut O bar hb q ψ hψ X hX hD n
+      γ hγ _ s h hcut
   have hβ0 : h β = 0 := by
-    have : (h β : ℝ) = 0 := by
-      rw [happ, apply_eq_of_inRCone hv.linear h1' hvβ, ← eβ]; ring
+    have : (h β : ℝ) = 0 := by rw [happ, apply_eq_of_inRCone hv.linear h1' hvβ, ← eβ]; ring
     exact_mod_cast this
   have hle : genRank γ ≤ genRank fun j => γ (s j) := by
     rw [hlab X hX _ hs hsp, hlab X hX _ hβ hβp, Nat.cast_inj] at hl

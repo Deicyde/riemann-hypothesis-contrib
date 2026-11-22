@@ -12,13 +12,15 @@ namespace Elliptic
 
 noncomputable section
 
-open NumberField Module IsDedekindDomain WeierstrassCurve WeierstrassCurve.Affine GroundTheory.Arith.Abelian
+open NumberField Module IsDedekindDomain WeierstrassCurve WeierstrassCurve.Affine
+  GroundTheory.Arith.Abelian
 open GroundTheory.LocalField (maximalAbelianExtension)
 open scoped nonZeroDivisors
 
-variable {K : Type} [Field K] [NumberField K] [Algebra K ℂ] (hK : finrank ℚ K = 2)
+variable
+  {K : Type} [Field K] [NumberField K] [Algebra K ℂ]
+  (hK : finrank ℚ K = 2)
   [_root_.NumberField.IsTotallyComplex K]
-
 
 omit [Algebra K ℂ] in
 include hK in
@@ -35,15 +37,16 @@ theorem finite_units : Finite (𝓞 K)ˣ := by
     rw [Fintype.prod_empty, mul_one] at hx
     rw [hx]
     exact ζ.2
-  exact Finite.of_injective (fun x ↦ (⟨x, htors x⟩ : Units.torsion K)) fun a b h ↦
-    congrArg Subtype.val h
-
+  exact Finite.of_injective
+    (fun x ↦ (⟨x, htors x⟩ : Units.torsion K))
+    fun a b h ↦ congrArg Subtype.val h
 
 omit [Algebra K ℂ] [_root_.NumberField.IsTotallyComplex K] in
-theorem exists_nat_mul_mem (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (t : K) :
-    ∃ k : ℕ, 0 < k ∧ (k : K) * t ∈ (𝔞 : FractionalIdeal (𝓞 K)⁰ K) := by
-  obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot
-    (FractionalIdeal.coeToSubmodule_ne_bot.2 (Units.ne_zero 𝔞))
+theorem exists_nat_mul_mem (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (t : K)
+    : ∃ k : ℕ, 0 < k ∧ (k : K) * t ∈ (𝔞 : FractionalIdeal (𝓞 K)⁰ K) := by
+  obtain ⟨a, ha, ha0⟩ :=
+    Submodule.exists_mem_ne_zero_of_ne_bot (FractionalIdeal.coeToSubmodule_ne_bot.2 (Units.ne_zero
+      𝔞))
   have halg : IsAlgebraic ℤ (t / a) :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ K).2 (Algebra.IsAlgebraic.isAlgebraic _)
   obtain ⟨y, hy0, hy⟩ := halg.exists_integral_multiple
@@ -66,31 +69,36 @@ theorem exists_nat_mul_mem (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (t : K) :
   rw [this, ← Algebra.smul_def]
   exact (𝔞 : Submodule (𝓞 K) K).smul_mem b ha
 
-
 include hK in
-theorem main_theorem_complexMultiplication (σ : ℂ ≃ₐ[K] ℂ) (s : IdeleGroup K)
+theorem main_theorem_complexMultiplication
+    (σ : ℂ ≃ₐ[K] ℂ) (s : IdeleGroup K)
     (hs : ∀ x : maximalAbelianExtension K (algebraicClosure K ℂ),
-      ((artinMap K (algebraicClosure K ℂ) (IdeleClassGroup.mk K s) x : algebraicClosure K ℂ) : ℂ) =
-        σ ((x : algebraicClosure K ℂ) : ℂ))
-    (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {E : WeierstrassCurve ℂ} [E.IsElliptic]
-    {f : ℂ →+ E.toAffine.Point} (hf : IsAnalyticUniformization (idealLattice (algebraMap K ℂ) 𝔞) f) :
-    ∃! f' : ℂ →+ (E.map (σ : ℂ →+* ℂ)).toAffine.Point,
-      IsAnalyticUniformization (idealLattice (algebraMap K ℂ) ↑(s⁻¹ • 𝔞)) f' ∧
-      ∀ t y : K, IdeleGroup.smulQuotient s⁻¹ 𝔞 (Submodule.Quotient.mk t) = Submodule.Quotient.mk y →
-        f' (algebraMap K ℂ y) = pointMapRing (σ : ℂ →+* ℂ) E (f (algebraMap K ℂ t)) := by
+      ((artinMap K (algebraicClosure K ℂ) (IdeleClassGroup.mk K s) x : algebraicClosure K ℂ) : ℂ)
+        = σ ((x : algebraicClosure K ℂ) : ℂ))
+    (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    {E : WeierstrassCurve ℂ} [E.IsElliptic]
+    {f : ℂ →+ E.toAffine.Point} (hf : IsAnalyticUniformization (idealLattice (algebraMap K ℂ) 𝔞) f)
+    : ∃! f' : ℂ →+ (E.map (σ : ℂ →+* ℂ)).toAffine.Point,
+        IsAnalyticUniformization (idealLattice (algebraMap K ℂ) ↑(s⁻¹ • 𝔞)) f' ∧
+        ∀ t y : K, IdeleGroup.smulQuotient s⁻¹ 𝔞 (Submodule.Quotient.mk t) = Submodule.Quotient.mk y →
+          f' (algebraMap K ℂ y) = pointMapRing (σ : ℂ →+* ℂ) E (f (algebraMap K ℂ t)) := by
   classical
   have := finite_units hK
   have hLs := lattice_idealPeriodPair (algebraMap K ℂ) hK (s⁻¹ • 𝔞)
 
-  have hlev : ∀ n : ℕ, ∃ F : ℂ →+ (E.map (σ : ℂ →+* ℂ)).toAffine.Point,
-      IsAnalyticUniformization (idealLattice (algebraMap K ℂ) ↑(s⁻¹ • 𝔞)) F ∧
-      ∀ t y : K, (((n + 1).factorial : ℕ) : K) * t ∈ (𝔞 : FractionalIdeal (𝓞 K)⁰ K) →
-        IdeleGroup.smulQuotient s⁻¹ 𝔞 (Submodule.Quotient.mk t) = Submodule.Quotient.mk y →
-          F (algebraMap K ℂ y) = pointMapRing (σ : ℂ →+* ℂ) E (f (algebraMap K ℂ t)) :=
+  have hlev
+      : ∀ n : ℕ, ∃ F : ℂ →+ (E.map (σ : ℂ →+* ℂ)).toAffine.Point,
+        IsAnalyticUniformization (idealLattice (algebraMap K ℂ) ↑(s⁻¹ • 𝔞)) F
+          ∧ ∀ t y : K,
+            (((n + 1).factorial : ℕ) : K) * t ∈ (𝔞 : FractionalIdeal (𝓞 K)⁰ K)
+              → IdeleGroup.smulQuotient s⁻¹ 𝔞 (Submodule.Quotient.mk t) = Submodule.Quotient.mk y
+              → F (algebraMap K ℂ y) = pointMapRing (σ : ℂ →+* ℂ) E (f (algebraMap K ℂ t)) :=
     fun n ↦ exists_uniformization_level hK σ s hs 𝔞 hf (Nat.factorial_ne_zero (n + 1))
   choose F hF hFp using hlev
-  have hF' : ∀ n, IsAnalyticUniformization
-      (idealPeriodPair (algebraMap K ℂ) hK (s⁻¹ • 𝔞)).lattice (F n) := fun n ↦ by
+  have hF'
+      : ∀ n,
+        IsAnalyticUniformization (idealPeriodPair (algebraMap K ℂ) hK (s⁻¹ • 𝔞)).lattice
+          (F n) := fun n ↦ by
     rw [hLs]
     exact hF n
 
@@ -105,9 +113,10 @@ theorem main_theorem_complexMultiplication (σ : ℂ ≃ₐ[K] ℂ) (s : IdeleGr
   obtain ⟨ε₀, hinf⟩ := Finite.exists_infinite_fiber ε
   have hinf' : (ε ⁻¹' {ε₀}).Infinite := Set.infinite_coe_iff.1 hinf
   obtain ⟨n₀, hn₀⟩ := hinf'.nonempty
-  have hprop : ∀ t y : K,
-      IdeleGroup.smulQuotient s⁻¹ 𝔞 (Submodule.Quotient.mk t) = Submodule.Quotient.mk y →
-        F n₀ (algebraMap K ℂ y) = pointMapRing (σ : ℂ →+* ℂ) E (f (algebraMap K ℂ t)) := by
+  have hprop
+      : ∀ t y : K,
+        IdeleGroup.smulQuotient s⁻¹ 𝔞 (Submodule.Quotient.mk t) = Submodule.Quotient.mk y
+          → F n₀ (algebraMap K ℂ y) = pointMapRing (σ : ℂ →+* ℂ) E (f (algebraMap K ℂ t)) := by
     intro t y hq
     obtain ⟨k, hk0, hk⟩ := exists_nat_mul_mem 𝔞 t
     obtain ⟨n, hn, hkn⟩ := hinf'.exists_gt k
@@ -122,12 +131,14 @@ theorem main_theorem_complexMultiplication (σ : ℂ ≃ₐ[K] ℂ) (s : IdeleGr
     exact hFp n t y hmt hq
   refine ⟨F n₀, ⟨hF n₀, hprop⟩, fun g ⟨hg, hgp⟩ ↦ ?_⟩
 
-  have hg' : IsAnalyticUniformization (idealPeriodPair (algebraMap K ℂ) hK (s⁻¹ • 𝔞)).lattice g := by
+  have hg'
+      : IsAnalyticUniformization (idealPeriodPair (algebraMap K ℂ) hK (s⁻¹ • 𝔞)).lattice g := by
     rw [hLs]
     exact hg
   obtain ⟨c, -, -, hcz⟩ := exists_mul_eq_of_isAnalyticUniformization (hF' n₀) hg'
-  have hker : ∀ y : K, (c - 1) * algebraMap K ℂ y ∈
-      (idealPeriodPair (algebraMap K ℂ) hK (s⁻¹ • 𝔞)).lattice := by
+  have hker
+      : ∀ y : K,
+        (c - 1) * algebraMap K ℂ y ∈ (idealPeriodPair (algebraMap K ℂ) hK (s⁻¹ • 𝔞)).lattice := by
     intro y
     obtain ⟨q, hq⟩ := (IdeleGroup.smulQuotient s⁻¹ 𝔞).surjective (Submodule.Quotient.mk y)
     obtain ⟨t, rfl⟩ := Submodule.Quotient.mk_surjective _ q

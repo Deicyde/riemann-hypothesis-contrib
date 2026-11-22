@@ -12,12 +12,19 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-theorem monomial_exponent_le_multidegree {ι : Type*} {n : ℕ} (m : ι × Fin n →₀ ℕ) (l : ι) (a : Fin n) : m (l, a) ≤ multideg m l := by
+theorem monomial_exponent_le_multidegree
+    {ι : Type*} {n : ℕ} (m : ι × Fin n →₀ ℕ) (l : ι) (a : Fin n)
+    : m (l, a) ≤ multideg m l := by
   exact Finset.single_le_sum (f := fun c => m (l, c)) (fun _ _ => Nat.zero_le _) (Finset.mem_univ a)
 
-theorem polynomial_weight_difference_le {ι : Type*} [Fintype ι] {n : ℕ} (LL : Letters ι) (S : Set ι) (d : ι → ℕ)
-    (m m' : ι × Fin n →₀ ℕ) (hm : ∀ i, multideg m i = d i) (hm' : ∀ i, multideg m' i = d i) (a b : Fin n) :
-    wtS LL S m a - wtS LL S m' b ≤ (degIn d S : ℤ) := by
+theorem polynomial_weight_difference_le
+    {ι : Type*} [Fintype ι]
+    {n : ℕ}
+    (LL : Letters ι) (S : Set ι)
+    (d : ι → ℕ) (m m' : ι × Fin n →₀ ℕ)
+    (hm : ∀ i, multideg m i = d i) (hm' : ∀ i, multideg m' i = d i)
+    (a b : Fin n)
+    : wtS LL S m a - wtS LL S m' b ≤ (degIn d S : ℤ) := by
   unfold wtS degIn
   rw [← Finset.sum_sub_distrib]
   push_cast
@@ -28,26 +35,37 @@ theorem polynomial_weight_difference_le {ι : Type*} [Fintype ι] {n : ℕ} (LL 
   rw [hm' l] at h2
   split_ifs <;> omega
 
-theorem prime_pow_smul_cast {O : Type} [CommRing O] [IsDomain O] {σ : Type} (p k : ℕ) (y : MvPolynomial σ (KK O)) :
-    ((p : O) ^ k) • y = ((p : KK O) ^ k) • y := by
+theorem prime_pow_smul_cast
+    {O : Type} [CommRing O] [IsDomain O] {σ : Type} (p k : ℕ) (y : MvPolynomial σ (KK O))
+    : ((p : O) ^ k) • y = ((p : KK O) ^ k) • y := by
   rw [← algebraMap_smul (KK O) ((p : O) ^ k) y, map_pow, map_natCast]
 
-theorem isotypic_projector_lattice_scaling (D : Formalism.BasicNotions.D7) (hDom : HighestWeightDominant) (hRes : SubrepRestrictionRep) (hPol : PolynomialGLRepresentation) (h13 : IsotypicProjectorTheoremField D)
-    (p n' : ℕ) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (S0 : UniformizedDVR p O)
-    (hG : AdmissibleDVR p n' O) [CharZero (KK O)] (n : ℕ) (ι : Type) [Fintype ι] (LL : Letters ι) (S : Set ι)
-    (d : ι → ℕ) (lam : Fin n → ℤ) (e : Module.End (KK O) (MvPolynomial (ι × Fin n) (KK O)))
-    (he : IsIsoProj (glOps (KK O) n LL S) lam e) :
-    (∀ F ∈ Pol (KK O) n d, e F ∈ Pol (KK O) n d) ∧
-    ∀ L : Submodule O (MvPolynomial (ι × Fin n) (KK O)),
-      (∀ u ∈ UZgens (glOps (KK O) n LL S), ∀ F ∈ L, u F ∈ L) → (latticeMultidegreePart L d).FG →
-      MQ (K := KK O) (latticeMultidegreePart L d) = ⊤ →
-      ∀ F ∈ Pol (KK O) n d, F ∈ L →
-        ((p : KK O) ^ (N0 n * Nat.log p (2 * degIn d S + n - 1))) • e F ∈ L := by
+theorem isotypic_projector_lattice_scaling
+    (D : Formalism.BasicNotions.D7)
+    (hDom : HighestWeightDominant) (hRes : SubrepRestrictionRep) (hPol : PolynomialGLRepresentation)
+    (h13 : IsotypicProjectorTheoremField D)
+    (p n' : ℕ)
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (S0 : UniformizedDVR p O) (hG : AdmissibleDVR p n' O)
+    [CharZero (KK O)]
+    (n : ℕ)
+    (ι : Type) [Fintype ι]
+    (LL : Letters ι) (S : Set ι)
+    (d : ι → ℕ)
+    (lam : Fin n → ℤ) (e : Module.End (KK O) (MvPolynomial (ι × Fin n) (KK O)))
+    (he : IsIsoProj (glOps (KK O) n LL S) lam e)
+    : (∀ F ∈ Pol (KK O) n d, e F ∈ Pol (KK O) n d)
+      ∧ ∀ L : Submodule O (MvPolynomial (ι × Fin n) (KK O)),
+        (∀ u ∈ UZgens (glOps (KK O) n LL S), ∀ F ∈ L, u F ∈ L) → (latticeMultidegreePart L d).FG
+          → MQ (K := KK O) (latticeMultidegreePart L d) = ⊤
+          → ∀ F ∈ Pol (KK O) n d,
+            F ∈ L → ((p : KK O) ^ (N0 n * Nat.log p (2 * degIn d S + n - 1))) • e F ∈ L := by
   obtain ⟨hRep, -, -, hStab, hFD, hWt, -⟩ := hPol (KK O) ι n LL
   have hStabS : ∀ a b, ∀ x ∈ Pol (KK O) n d, glOps (KK O) n LL S a b x ∈ Pol (KK O) n d :=
     fun a b x hx => hStab S d a b x hx
   obtain ⟨hResRep, hResWt, hResDiv, hResBin, hResProj, hResZero⟩ :=
-    hRes (KK O) (MvPolynomial (ι × Fin n) (KK O)) n (glOps (KK O) n LL S) (hRep S) (Pol (KK O) n d) hStabS
+    hRes (KK O) (MvPolynomial (ι × Fin n) (KK O)) n (glOps (KK O) n LL S) (hRep S) (Pol (KK O) n d)
+      hStabS
   obtain ⟨e', he'P, he'eq⟩ := hResProj lam e he
   have hPres : ∀ F ∈ Pol (KK O) n d, e F ∈ Pol (KK O) n d := by
     intro F hF
@@ -69,20 +87,28 @@ theorem isotypic_projector_lattice_scaling (D : Formalism.BasicNotions.D7) (hDom
   · have : NeZero n := ⟨hn.ne'⟩
     have : FiniteDimensional (KK O) (Pol (KK O) n d) := hFD d
 
-    have hwt : ∀ (mu : Fin n → ℤ) (x : Pol (KK O) n d), x ≠ 0 →
-        x ∈ weightSp (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) mu →
-        ∃ m : ι × Fin n →₀ ℕ, (∀ i, multideg m i = d i) ∧ wtS LL S m = mu := by
+    have hwt
+        : ∀ (mu : Fin n → ℤ) (x : Pol (KK O) n d),
+          x ≠ 0
+            → x
+              ∈ weightSp (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) mu
+            → ∃ m : ι × Fin n →₀ ℕ, (∀ i, multideg m i = d i) ∧ wtS LL S m = mu := by
       intro mu x hx0 hx
       have hxV := (hResWt mu x).mp hx
       have hne : (x : MvPolynomial (ι × Fin n) (KK O)) ≠ 0 := by simpa using hx0
       obtain ⟨m, hm⟩ : (x : MvPolynomial (ι × Fin n) (KK O)).support.Nonempty :=
         Finset.nonempty_iff_ne_empty.mpr (by rwa [Ne, MvPolynomial.support_eq_empty])
       refine ⟨m, ?_, hWt S mu _ hxV m hm⟩
-      have hx2 : (x : MvPolynomial (ι × Fin n) (KK O)) ∈
-          MvPolynomial.restrictSupport (KK O) {m : ι × Fin n →₀ ℕ | ∀ i, multideg m i = d i} := x.2
-      exact (show ((x : MvPolynomial (ι × Fin n) (KK O)).support : Set (ι × Fin n →₀ ℕ)) ⊆
-        {m : ι × Fin n →₀ ℕ | ∀ i, multideg m i = d i} from hx2) hm
-    by_cases hhw : ∃ v : Pol (KK O) n d,
+      have hx2
+          : (x : MvPolynomial (ι × Fin n) (KK O))
+            ∈ MvPolynomial.restrictSupport (KK O) {m : ι × Fin n →₀ ℕ | ∀ i, multideg m i = d i} :=
+        x.2
+      exact (show ((x : MvPolynomial (ι × Fin n) (KK O)).support : Set (ι × Fin n →₀ ℕ))
+            ⊆ {m : ι × Fin n →₀ ℕ | ∀ i, multideg m i = d i} from
+          hx2)
+        hm
+    by_cases hhw
+      : ∃ v : Pol (KK O) n d,
         IsHWV (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) lam v
     · have hdom : Dominant lam := by
         obtain ⟨v, hv⟩ := hhw
@@ -94,7 +120,9 @@ theorem isotypic_projector_lattice_scaling (D : Formalism.BasicNotions.D7) (hDom
         rw [hmw] at h
         unfold ellWt
         omega
-      have hEllBound : ellOf (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) ⊤ ≤ degIn d S := by
+      have hEllBound
+          : ellOf (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) ⊤
+            ≤ degIn d S := by
         unfold ellOf
         apply csSup_le'
         rintro k ⟨mu, hmu, nu, hnu, a, b, hab, hk⟩
@@ -110,7 +138,8 @@ theorem isotypic_projector_lattice_scaling (D : Formalism.BasicNotions.D7) (hDom
         rw [hmw] at d1
         rw [hmw'] at d2
         omega
-      have hLat : UZLattice (O := O) (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS)
+      have hLat : UZLattice (O := O)
+          (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS)
           (latticeMultidegreePart L d) := by
         refine ⟨?_, hFG⟩
         intro u hu x hx
@@ -122,15 +151,26 @@ theorem isotypic_projector_lattice_scaling (D : Formalism.BasicNotions.D7) (hDom
         · change ((binomE _ a k x : Pol (KK O) n d) : MvPolynomial (ι × Fin n) (KK O)) ∈ L
           rw [hResBin a k x]
           exact hLst _ (Or.inr ⟨a, k, rfl⟩) _ hx
-      have key := h13 p n' O S0 hG n (Pol (KK O) n d) _ hResRep (latticeMultidegreePart L d) hLat hMQ {lam}
-        (by simpa using hdom) (fun _ => e') (by simpa using he'P) ⟨F, hF⟩ hFL
+      have key :=
+        h13 p n' O S0 hG n (Pol (KK O) n d) _ hResRep (latticeMultidegreePart L d) hLat hMQ {lam}
+          (by simpa using hdom)
+          (fun _ => e')
+          (by simpa using he'P) ⟨F, hF⟩ hFL
       simp only [Finset.sup_singleton, Finset.sum_singleton, hMQ] at key
       rw [latticeMultidegreePart, Submodule.mem_comap] at key
-      have key' : ((p : O) ^ (N0 n * deF p n (ellOf (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) ⊤
-          + ellWt lam))) • e F ∈ L := by
+      have key'
+          : ((p : O)
+                ^ (N0 n * deF p n
+                  (ellOf (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) ⊤
+                    + ellWt lam)))
+              • e F
+            ∈ L := by
         simpa [he'eq] using key
-      have hle : N0 n * deF p n (ellOf (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) ⊤ + ellWt lam)
-          ≤ N0 n * Nat.log p (2 * degIn d S + n - 1) := by
+      have hle
+          : N0 n * deF p n
+              (ellOf (restrictStableOperators (glOps (KK O) n LL S) (Pol (KK O) n d) hStabS) ⊤
+                + ellWt lam)
+            ≤ N0 n * Nat.log p (2 * degIn d S + n - 1) := by
         unfold deF
         exact Nat.mul_le_mul_left _ (Nat.log_mono_right (by omega))
       obtain ⟨j, hj⟩ := Nat.exists_eq_add_of_le hle

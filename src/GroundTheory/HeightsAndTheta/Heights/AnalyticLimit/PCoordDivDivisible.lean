@@ -12,9 +12,12 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 open ReciprocityTheory.AnForm.A (coordDiv)
 open Filter Topology
 
-theorem cofactor_vanish {D : ℕ} {Ω : Set (Fin D → ℂ)} (hΩ : IsOpen Ω) {F G : (Fin D → ℂ) → ℂ}
-    {i k : Fin D} (hik : k ≠ i) (hG : AnalyticOnNhd ℂ G Ω) (hFG : ∀ z ∈ Ω, F z = z i * G z)
-    (hF : ∀ z ∈ Ω, z k = 0 → F z = 0) {z : Fin D → ℂ} (hz : z ∈ Ω) (hzk : z k = 0) : G z = 0 := by
+theorem cofactor_vanish
+    {D : ℕ} {Ω : Set (Fin D → ℂ)} (hΩ : IsOpen Ω)
+    {F G : (Fin D → ℂ) → ℂ} {i k : Fin D} (hik : k ≠ i) (hG : AnalyticOnNhd ℂ G Ω)
+    (hFG : ∀ z ∈ Ω, F z = z i * G z) (hF : ∀ z ∈ Ω, z k = 0 → F z = 0)
+    {z : Fin D → ℂ} (hz : z ∈ Ω) (hzk : z k = 0)
+    : G z = 0 := by
   classical
   by_cases hzi : z i = 0
   swap
@@ -46,19 +49,21 @@ theorem cofactor_vanish {D : ℕ} {Ω : Set (Fin D → ℂ)} (hΩ : IsOpen Ω) {
   have h := tendsto_nhds_unique ht1 ht2
   rwa [hw0] at h
 
-theorem CoordDivDivisible.proof (hH : HyperplaneDivisible.Statement) : CoordDivDivisible.Statement := by
+theorem CoordDivDivisible.proof (hH : HyperplaneDivisible.Statement)
+    : CoordDivDivisible.Statement := by
   classical
   intro D Ω F S hΩ hFa hF
   induction S using Finset.induction_on generalizing F with
   | empty => exact ⟨F, hFa, fun z _ => by simp⟩
   | insert i S hi ih =>
-    obtain ⟨G₁, hG₁a, hG₁⟩ := hH D Ω F i hΩ hFa fun z hz hzi =>
-      hF z hz ⟨i, Finset.mem_insert_self i S, hzi⟩
+    obtain ⟨G₁, hG₁a, hG₁⟩ :=
+      hH D Ω F i hΩ hFa fun z hz hzi => hF z hz ⟨i, Finset.mem_insert_self i S, hzi⟩
     have hG₁0 : ∀ z ∈ Ω, z ∈ coordDiv S → G₁ z = 0 := by
       rintro z hz ⟨k, hk, hzk⟩
       have hki : k ≠ i := fun h => hi (h ▸ hk)
       exact cofactor_vanish hΩ hki hG₁a hG₁
-        (fun y hy hyk => hF y hy ⟨k, Finset.mem_insert_of_mem hk, hyk⟩) hz hzk
+        (fun y hy hyk => hF y hy ⟨k, Finset.mem_insert_of_mem hk, hyk⟩)
+        hz hzk
     obtain ⟨G, hGa, hG⟩ := ih G₁ hG₁a hG₁0
     refine ⟨G, hGa, fun z hz => ?_⟩
     rw [hG₁ z hz, hG z hz, Finset.prod_insert hi, mul_assoc]

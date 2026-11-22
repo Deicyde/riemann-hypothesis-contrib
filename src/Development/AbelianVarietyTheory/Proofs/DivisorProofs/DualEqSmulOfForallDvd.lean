@@ -5,13 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CobOneEqZero
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz
+  GlobalTheory.QLog GlobalTheory.PDivGroup
 
 namespace GlobalTheory
 
-theorem dual_eq_smul_of_forall_dvd :
-    ∀ (O M : Type) [CommRing O] [AddCommGroup M] [Module O M] (a : O), (∀ x : O, a * x = 0 → x = 0) →
-      ∀ l : Module.Dual O M, (∀ w, a ∣ l w) → ∃ l' : Module.Dual O M, l = a • l' := by
+theorem dual_eq_smul_of_forall_dvd
+    : ∀ (O M : Type) [CommRing O] [AddCommGroup M] [Module O M] (a : O),
+      (∀ x : O, a * x = 0 → x = 0)
+        → ∀ l : Module.Dual O M, (∀ w, a ∣ l w) → ∃ l' : Module.Dual O M, l = a • l' := by
   intro O M _ _ _ a ha l hl
   have cancel : ∀ x y : O, a * x = a * y → x = y := by
     intro x y hxy

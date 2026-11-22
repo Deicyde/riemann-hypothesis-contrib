@@ -8,12 +8,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-
 open MvPolynomial in
-theorem exists_field_combination_norm_ne_zero {k B A : Type} [Field k] [Infinite k] [CommRing B]
-    [IsDomain B] [Algebra k B] [CommRing A] [Algebra B A] [Module.Free B A] [Module.Finite B A]
-    {d : ℕ} (y : Fin d → A) (hx : ∃ x : Fin d → B, Algebra.norm B (∑ i, x i • y i) ≠ 0) :
-    ∃ a : Fin d → k, Algebra.norm B (∑ i, algebraMap k B (a i) • y i) ≠ 0 := by
+theorem exists_field_combination_norm_ne_zero
+    {k B A : Type} [Field k] [Infinite k] [CommRing B] [IsDomain B] [Algebra k B] [CommRing A]
+    [Algebra B A] [Module.Free B A] [Module.Finite B A]
+    {d : ℕ} (y : Fin d → A) (hx : ∃ x : Fin d → B, Algebra.norm B (∑ i, x i • y i) ≠ 0)
+    : ∃ a : Fin d → k, Algebra.norm B (∑ i, algebraMap k B (a i) • y i) ≠ 0 := by
   classical
   obtain ⟨x₀, hx₀⟩ := hx
   let b := Module.Free.chooseBasis B A
@@ -26,7 +26,7 @@ theorem exists_field_combination_norm_ne_zero {k B A : Type} [Field k] [Infinite
     congr 1
     ext j l
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [M, map_sum, Matrix.sum_apply, mul_comm]
+    simp [M, map_sum, Matrix.sum_apply, mul_comm]
   by_contra hcon
   push_neg at hcon
   have hinf : ∀ _ : Fin d, (Set.range (algebraMap k B)).Infinite := fun _ =>

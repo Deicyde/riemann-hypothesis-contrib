@@ -11,17 +11,19 @@ namespace PI.WMI
 open PI.UpqRep Formalism.BasicNotions Formalism.GradedWeylDivisibility MvPolynomial Matrix
 open scoped InnerProductSpace
 
-theorem detSplit_fullMinor {N : ℕ} (s : ℕ) (I : Fin s → Fin N) (hs : s ≤ N) (hN : s = N) :
-    ∃ e : ℂ, initMinor ℂ (n := N) I hs = C e * detPoly N := by
+theorem detSplit_fullMinor {N : ℕ} (s : ℕ) (I : Fin s → Fin N) (hs : s ≤ N) (hN : s = N)
+    : ∃ e : ℂ, initMinor ℂ (n := N) I hs = C e * detPoly N := by
   subst hN
   by_cases hI : Function.Injective I
   · have hb : Function.Bijective I := (Fintype.bijective_iff_injective_and_card I).2 ⟨hI, rfl⟩
     refine ⟨((Equiv.Perm.sign (Equiv.ofBijective I hb) : ℤ) : ℂ), ?_⟩
-    have h := Matrix.det_permute (Equiv.ofBijective I hb)
-      (Matrix.of fun i j : Fin s => (X (i, j) : MvPolynomial (Fin s × Fin s) ℂ))
-    have hM : initMinor ℂ (n := s) I hs =
-        ((Matrix.of fun i j : Fin s => (X (i, j) : MvPolynomial (Fin s × Fin s) ℂ)).submatrix
-          (Equiv.ofBijective I hb) id).det := by
+    have h :=
+      Matrix.det_permute (Equiv.ofBijective I hb)
+        (Matrix.of fun i j : Fin s => (X (i, j) : MvPolynomial (Fin s × Fin s) ℂ))
+    have hM
+        : initMinor ℂ (n := s) I hs
+          = ((Matrix.of fun i j : Fin s => (X (i, j) : MvPolynomial (Fin s × Fin s) ℂ)).submatrix
+            (Equiv.ofBijective I hb) id).det := by
       unfold initMinor
       congr 1
     rw [hM, h, detPoly, map_intCast]
@@ -32,10 +34,11 @@ theorem detSplit_fullMinor {N : ℕ} (s : ℕ) (I : Fin s → Fin N) (hs : s ≤
     unfold initMinor
     exact Matrix.det_zero_of_row_eq hne (funext fun q => by simp [hij])
 
-theorem detSplit_prodMem {N K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ N) (I : ∀ k, Fin (sz k) → Fin N)
-    (s : Finset (Fin K)) :
-    ∏ k ∈ s, initMinor ℂ (I k) (hsz k) ∈
-      Formalism.GradedWeylDivisibility.dualWeyl ℂ N N (fun t => (s.filter fun k => t.val < sz k).card) := by
+theorem detSplit_prodMem
+    {N K : ℕ}
+    (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ N) (I : ∀ k, Fin (sz k) → Fin N) (s : Finset (Fin K))
+    : ∏ k ∈ s, initMinor ℂ (I k) (hsz k) ∈ Formalism.GradedWeylDivisibility.dualWeyl ℂ N N
+      (fun t => (s.filter fun k => t.val < sz k).card) := by
   classical
   refine Finset.induction_on s ?_ ?_
   · have h := (Formalism.GradedWeylDivisibility.dualWeylMul ℂ N N 0 0 1 1).2
@@ -43,8 +46,14 @@ theorem detSplit_prodMem {N K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤
     · funext t; simp
     · simp
   · intro a s ha ih
-    have h1 : initMinor ℂ (I a) (hsz a) ∈ Formalism.GradedWeylDivisibility.dualWeyl ℂ N N (shapeDeg (fun _ : Fin 1 => sz a)) := by
-      have := Formalism.GradedWeylDivisibility.bidetMem ℂ N N 1 (fun _ => sz a) (fun _ => hsz a) (fun _ => I a)
+    have h1
+        : initMinor ℂ (I a) (hsz a)
+          ∈ Formalism.GradedWeylDivisibility.dualWeyl ℂ N N (shapeDeg (fun _ : Fin 1 => sz a)) := by
+      have :=
+        Formalism.GradedWeylDivisibility.bidetMem ℂ N N 1
+          (fun _ => sz a)
+          (fun _ => hsz a)
+          (fun _ => I a)
       simpa only [bideterminant, Fin.prod_univ_one] using this
     have h2 := (Formalism.GradedWeylDivisibility.dualWeylMul ℂ N N _ _ _ _).1 h1 ih
     rw [Finset.prod_insert ha]
@@ -72,8 +81,10 @@ theorem determinant_splitting_formula : DetSplit := by
     refine (Submodule.span_le.2 ?_) hf
     rintro _ ⟨K, sz, hsz, I, hshape, rfl⟩
     let A : Finset (Fin K) := Finset.univ.filter fun k => sz k = N
-    have hcard : ∀ t : Fin N, (Finset.univ.filter fun k => t.val < sz k).card =
-        (Aᶜ.filter fun k => t.val < sz k).card + A.card := by
+    have hcard
+        : ∀ t : Fin N,
+          (Finset.univ.filter fun k => t.val < sz k).card
+            = (Aᶜ.filter fun k => t.val < sz k).card + A.card := by
       intro t
       rw [Finset.card_filter, Finset.card_filter, ← Finset.sum_add_sum_compl A, add_comm,
         Finset.card_eq_sum_ones A]

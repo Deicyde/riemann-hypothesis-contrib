@@ -17,10 +17,13 @@ open PositivityTheory.RgBcC PositivityTheory.RgBcC.Fc
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem inner_cls_eq {n : ℕ} [MeasurableSpace (G n)] (μ : Measure (G n)) {V : Type} [NormedAddCommGroup V]
-    [InnerProductSpace ℂ V] {a b : Mat n → V} (ha : MemLp (fun y : G n => a y.val) 2 μ)
-    (hb : MemLp (fun y : G n => b y.val) 2 μ) :
-    ⟪cls μ a, cls μ b⟫_ℂ = ∫ y : G n, ⟪a y.val, b y.val⟫_ℂ ∂μ := by
+theorem inner_cls_eq
+    {n : ℕ} [MeasurableSpace (G n)]
+    (μ : Measure (G n))
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {a b : Mat n → V}
+    (ha : MemLp (fun y : G n => a y.val) 2 μ) (hb : MemLp (fun y : G n => b y.val) 2 μ)
+    : ⟪cls μ a, cls μ b⟫_ℂ = ∫ y : G n, ⟪a y.val, b y.val⟫_ℂ ∂μ := by
   have e1 : cls μ a = ha.toLp _ := dif_pos ha
   have e2 : cls μ b = hb.toLp _ := dif_pos hb
   rw [e1, e2, L2.inner_def]
@@ -28,22 +31,29 @@ theorem inner_cls_eq {n : ℕ} [MeasurableSpace (G n)] (μ : Measure (G n)) {V :
   filter_upwards [ha.coeFn_toLp, hb.coeFn_toLp] with y h1 h2
   rw [h1, h2]
 
-theorem integrable_inner_of_memLp {n : ℕ} [MeasurableSpace (G n)] (μ : Measure (G n)) {V : Type}
-    [NormedAddCommGroup V] [InnerProductSpace ℂ V] {a b : G n → V} (ha : MemLp a 2 μ) (hb : MemLp b 2 μ) :
-    Integrable (fun y => ⟪a y, b y⟫_ℂ) μ := by
+theorem integrable_inner_of_memLp
+    {n : ℕ} [MeasurableSpace (G n)]
+    (μ : Measure (G n))
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {a b : G n → V} (ha : MemLp a 2 μ) (hb : MemLp b 2 μ)
+    : Integrable (fun y => ⟪a y, b y⟫_ℂ) μ := by
   have h := L2.integrable_inner (𝕜 := ℂ) (ha.toLp _) (hb.toLp _)
   refine h.congr ?_
   filter_upwards [ha.coeFn_toLp, hb.coeFn_toLp] with y h1 h2
   rw [h1, h2]
 
-theorem integrable_adjoint_apply {n : ℕ} [MeasurableSpace (G n)] (μ : Measure (G n)) {V : Type}
+theorem integrable_adjoint_apply
+    {n : ℕ} [MeasurableSpace (G n)]
+    (μ : Measure (G n))
+    {V : Type}
     [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] [CompleteSpace V]
-    {A : G n → (V →L[ℂ] V)} {φ : G n → V} (hA : ∀ v, MemLp (fun y => A y v) 2 μ) (hφ : MemLp φ 2 μ) :
-    Integrable (fun y => ContinuousLinearMap.adjoint (A y) (φ y)) μ := by
+    {A : G n → (V →L[ℂ] V)} {φ : G n → V} (hA : ∀ v, MemLp (fun y => A y v) 2 μ) (hφ : MemLp φ 2 μ)
+    : Integrable (fun y => ContinuousLinearMap.adjoint (A y) (φ y)) μ := by
   classical
   let b := stdOrthonormalBasis ℂ V
-  have key : (fun y => ContinuousLinearMap.adjoint (A y) (φ y)) =
-      fun y => ∑ i, ⟪A y (b i), φ y⟫_ℂ • b i := by
+  have key
+      : (fun y => ContinuousLinearMap.adjoint (A y) (φ y))
+        = fun y => ∑ i, ⟪A y (b i), φ y⟫_ℂ • b i := by
     funext y
     rw [← b.sum_repr' (ContinuousLinearMap.adjoint (A y) (φ y))]
     simp only [ContinuousLinearMap.adjoint_inner_right]
@@ -78,8 +88,8 @@ theorem actFormula (hLt : LtSob) (hComm : LtComm) : ActFormula := by
     hComm n μ E Ω T F c hStd h x₀ f f' hfS hSob' hcls
   have hφL : MemLp (fun y : G n => lTr x₀ f y.val) 2 μ := hφS.2 []
   have hAL : ∀ v, MemLp (fun y : G n => A y.val v) 2 μ := fun v => (hRow v).1.2 []
-  have hint : Integrable
-      (fun y : G n => ContinuousLinearMap.adjoint (A y.val) (lTr x₀ f y.val)) μ :=
+  have hint
+      : Integrable (fun y : G n => ContinuousLinearMap.adjoint (A y.val) (lTr x₀ f y.val)) μ :=
     integrable_adjoint_apply μ (A := fun y : G n => A y.val) hAL hφL
   refine ext_inner_left ℂ fun v => ?_
   have hrow := (hRow v).2.2 (lTr x₀ f) (lTr x₀ f') hφS hφE hψS hψE hclsT
@@ -90,7 +100,9 @@ theorem actFormula (hLt : LtSob) (hComm : LtComm) : ActFormula := by
   rw [hval] at hrow
   rw [← hrow]
   show ⟪v, ∫ y : G n, ContinuousLinearMap.adjoint (A y.val) (f (x * y.val)) ∂μ⟫_ℂ = _
-  have hint' : Integrable (fun y : G n => ContinuousLinearMap.adjoint (A y.val) (f (x * y.val))) μ := hint
+  have hint'
+      : Integrable (fun y : G n => ContinuousLinearMap.adjoint (A y.val) (f (x * y.val))) μ :=
+    hint
   rw [← integral_inner hint' v]
   refine integral_congr_ae (Eventually.of_forall fun y => ?_)
   show ⟪v, ContinuousLinearMap.adjoint (A y.val) (f (x * y.val))⟫_ℂ = ⟪A y.val v, f (x₀.val * y.val)⟫_ℂ

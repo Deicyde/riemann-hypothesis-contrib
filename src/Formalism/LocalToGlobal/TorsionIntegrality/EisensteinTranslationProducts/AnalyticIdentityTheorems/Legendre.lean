@@ -196,11 +196,13 @@ theorem legendre_of (h : EtaEisenstein) : Legendre := by
     exact LegendreModelEllipticTorsion.key L.ω₁ L.ω₂ hp
   · have hp' := LegendreModelEllipticTorsion.im_pos_of_not L hp
     have k := LegendreModelEllipticTorsion.key L.ω₂ L.ω₁ hp'
-    have e1 : (∑' n : ℤ, ∑' m : ℤ, 1 / ((m : ℂ) * L.ω₂ + (n : ℂ) * L.ω₁) ^ 2)
-        = ∑' m : ℤ, ∑' n : ℤ, 1 / ((m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂) ^ 2 := by
+    have e1
+        : (∑' n : ℤ, ∑' m : ℤ, 1 / ((m : ℂ) * L.ω₂ + (n : ℂ) * L.ω₁) ^ 2)
+          = ∑' m : ℤ, ∑' n : ℤ, 1 / ((m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂) ^ 2 := by
       congr 1; funext a; congr 1; funext b; ring
-    have e2 : (∑' m : ℤ, ∑' n : ℤ, 1 / ((m : ℂ) * L.ω₂ + (n : ℂ) * L.ω₁) ^ 2)
-        = ∑' n : ℤ, ∑' m : ℤ, 1 / ((m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂) ^ 2 := by
+    have e2
+        : (∑' m : ℤ, ∑' n : ℤ, 1 / ((m : ℂ) * L.ω₂ + (n : ℂ) * L.ω₁) ^ 2)
+          = ∑' n : ℤ, ∑' m : ℤ, 1 / ((m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂) ^ 2 := by
       congr 1; funext a; congr 1; funext b; ring
     rw [e1, e2] at k
     linear_combination -k

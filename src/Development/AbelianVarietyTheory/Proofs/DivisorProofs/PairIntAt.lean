@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPa
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat
 open Formalism.DivisionValues (vw lw)
 
 namespace GlobalTheory.SumSize
@@ -20,12 +23,17 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Claims
 
-variable {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 T : Type} {A : FamIn D.what₂.LL Γ Pl0 T D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} (ch : Choice R) (C b : ℝ)
+variable
+  {D : D7} {Γ : Type} [Group Γ] [Fintype Γ]
+  {Pl0 T : Type} {A : FamIn D.what₂.LL Γ Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+  {R : RealDat D A Ks} (ch : Choice R)
+  (C b : ℝ)
 
 end Claims
 
-theorem BigC.and {Q Q' : ChQ} (h : BigC Q) (h' : BigC Q') : BigC fun F ch C b => Q F ch C b ∧ Q' F ch C b := by
+theorem BigC.and {Q Q' : ChQ} (h : BigC Q) (h' : BigC Q')
+    : BigC fun F ch C b => Q F ch C b ∧ Q' F ch C b := by
   obtain ⟨CF0, h⟩ := h
   obtain ⟨CF0', h'⟩ := h'
   refine ⟨max CF0 CF0', fun CF hCF => ?_⟩

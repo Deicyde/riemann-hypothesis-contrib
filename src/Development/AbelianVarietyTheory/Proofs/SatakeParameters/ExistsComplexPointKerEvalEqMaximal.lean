@@ -15,9 +15,13 @@ noncomputable section
 
 namespace GlobalTheory.MaxPt
 
-theorem exists_cxPts_ker_eq : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] (U : X.Opens), IsAffineOpen U →
-    ∀ m : Ideal Γ(X, U), m.IsMaximal → ∃ (y : CxPts p (RingHom.id ℂ)) (hy : y ∈ CxPts.ptsIn p (RingHom.id ℂ) U),
-      m = RingHom.ker (CxPts.evHom hy) := by
+theorem exists_cxPts_ker_eq
+    : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] (U : X.Opens),
+      IsAffineOpen U
+        → ∀ m : Ideal Γ(X, U),
+          m.IsMaximal
+            → ∃ (y : CxPts p (RingHom.id ℂ)) (hy : y ∈ CxPts.ptsIn p (RingHom.id ℂ) U),
+              m = RingHom.ker (CxPts.evHom hy) := by
   intro X p _ U hU m hm
   have h1 := p.finiteType_appLE (isAffineOpen_top (Sp ℂ)) hU (by simp)
   have h2 : ((Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv).hom.FiniteType :=

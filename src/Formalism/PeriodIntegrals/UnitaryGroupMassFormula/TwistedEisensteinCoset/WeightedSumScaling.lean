@@ -17,9 +17,10 @@ section Perm
 
 variable {K : Type} [Field K]
 
-theorem perm_range (M : ℕ) (f : ℕ → ℕ) (hf : ∀ i < M, f i < M)
-    (hinj : ∀ i < M, ∀ j < M, f i = f j → i = j) (g : ℕ → K) :
-    ∑ i ∈ Finset.range M, g (f i) = ∑ i ∈ Finset.range M, g i := by
+theorem perm_range
+    (M : ℕ) (f : ℕ → ℕ) (hf : ∀ i < M, f i < M) (hinj : ∀ i < M, ∀ j < M, f i = f j → i = j)
+    (g : ℕ → K)
+    : ∑ i ∈ Finset.range M, g (f i) = ∑ i ∈ Finset.range M, g i := by
   have hI : Set.InjOn f (Finset.range M : Set ℕ) := fun i hi j hj h =>
     hinj i (Finset.mem_range.1 hi) j (Finset.mem_range.1 hj) h
   rw [← Finset.sum_image (g := f) hI]
@@ -30,9 +31,12 @@ theorem perm_range (M : ℕ) (f : ℕ → ℕ) (hf : ∀ i < M, f i < M)
     exact Finset.mem_range.2 (hf i (Finset.mem_range.1 hi))
   · rw [Finset.card_image_of_injOn hI]
 
-theorem sum_range_mul (M m : ℕ) (g : ℕ → K) (hg : ∀ i, g (i + M) = g i) :
-    ∑ i ∈ Finset.range (M * m), g i = (m : K) * ∑ i ∈ Finset.range M, g i := by
-  first | exact Bl.PeriodicFunctions.goal1 .. | (apply Bl.PeriodicFunctions.goal1 <;> assumption) | (intros; apply Bl.PeriodicFunctions.goal1 <;> assumption)
+theorem sum_range_mul (M m : ℕ) (g : ℕ → K) (hg : ∀ i, g (i + M) = g i)
+    : ∑ i ∈ Finset.range (M * m), g i = (m : K) * ∑ i ∈ Finset.range M, g i := by
+  first
+  | exact Bl.PeriodicFunctions.goal1 ..
+  | (apply Bl.PeriodicFunctions.goal1 <;> assumption)
+  | (intros; apply Bl.PeriodicFunctions.goal1 <;> assumption)
 
 end Perm
 
@@ -44,13 +48,13 @@ def Sg (P : HeightOneSpectrum (𝓞 E)) (A B : ℕ) (φ : E → K) : K :=
 def W1 (P : HeightOneSpectrum (𝓞 E)) (A B : ℕ) (φ : E → K) : K := ((qOf P : K) ^ B)⁻¹ * Sg P A B φ
 
 def Good1 (P : HeightOneSpectrum (𝓞 E)) (a b : ℕ) (φ : E → K) : Prop :=
-  (∀ u, φ u ≠ 0 → IntAt P ((qOf P : E) ^ a * u)) ∧
-  (∀ u δ, IntAt P (δ / (qOf P : E) ^ b) → φ (u + δ) = φ u)
+  (∀ u, φ u ≠ 0 → IntAt P ((qOf P : E) ^ a * u))
+    ∧ (∀ u δ, IntAt P (δ / (qOf P : E) ^ b) → φ (u + δ) = φ u)
 
 variable {P : HeightOneSpectrum (𝓞 E)}
 
-theorem sum_vals (hp : (Ideal.absNorm P.asIdeal).Prime) (A B : ℕ) (φ : E → K) :
-    ∑ u ∈ valsQ E (qOf P) A B, φ u = Sg P A B φ := by
+theorem sum_vals (hp : (Ideal.absNorm P.asIdeal).Prime) (A B : ℕ) (φ : E → K)
+    : ∑ u ∈ valsQ E (qOf P) A B, φ u = Sg P A B φ := by
   classical
   have hq := pow_ne_zero A (qE_ne P hp)
   unfold valsQ Sg
@@ -61,26 +65,30 @@ theorem sum_vals (hp : (Ideal.absNorm P.asIdeal).Prime) (A B : ℕ) (φ : E → 
     simpa [div_mul_cancel₀ _ hq] using this
   exact_mod_cast h2
 
-theorem good_function_mono {a b a' : ℕ} (ha : a ≤ a') {φ : E → K} (h : Good1 P a b φ) : Good1 P a' b φ :=
+theorem good_function_mono {a b a' : ℕ} (ha : a ≤ a') {φ : E → K} (h : Good1 P a b φ)
+    : Good1 P a' b φ :=
   ⟨fun u hu => ia_up P ha (h.1 u hu), h.2⟩
 
 section Main
 
-variable (hN : NTAll) (hp : (Ideal.absNorm P.asIdeal).Prime)
-    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) (hK : ((qOf P : ℕ) : K) ≠ 0)
+variable
+  (hN : NTAll) (hp : (Ideal.absNorm P.asIdeal).Prime)
+  (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) (hK : ((qOf P : ℕ) : K) ≠ 0)
 include hN hp hq
 
-theorem sg_stab {a b A B : ℕ} (hA : a ≤ A) (hB : b ≤ B) {φ : E → K} (h : Good1 P a b φ) :
-    Sg P A B φ = ((qOf P ^ (B - b) : ℕ) : K) * Sg P a b φ := by
+theorem sg_stab {a b A B : ℕ} (hA : a ≤ A) (hB : b ≤ B) {φ : E → K} (h : Good1 P a b φ)
+    : Sg P A B φ = ((qOf P ^ (B - b) : ℕ) : K) * Sg P a b φ := by
   have hq0 := qE_ne P hp
   have qp : 0 < qOf P := hp.pos
 
   have s1 : Sg P A B φ = ∑ i ∈ Finset.range (qOf P ^ (a + B)), φ ((i : E) / (qOf P : E) ^ a) := by
     unfold Sg
-    have hI : Set.InjOn (fun i : ℕ => qOf P ^ (A - a) * i) (Finset.range (qOf P ^ (a + B)) : Set ℕ) :=
+    have hI
+        : Set.InjOn (fun i : ℕ => qOf P ^ (A - a) * i) (Finset.range (qOf P ^ (a + B)) : Set ℕ) :=
       fun i _ j _ h => Nat.eq_of_mul_eq_mul_left (pow_pos qp _) h
-    have hsub : (Finset.range (qOf P ^ (a + B))).image (fun i : ℕ => qOf P ^ (A - a) * i) ⊆
-        Finset.range (qOf P ^ (A + B)) := by
+    have hsub
+        : (Finset.range (qOf P ^ (a + B))).image (fun i : ℕ => qOf P ^ (A - a) * i)
+          ⊆ Finset.range (qOf P ^ (A + B)) := by
       intro x hx
       obtain ⟨i, hi, rfl⟩ := Finset.mem_image.1 hx
       rw [Finset.mem_range] at hi ⊢
@@ -120,7 +128,9 @@ theorem sg_stab {a b A B : ℕ} (hA : a ≤ A) (hB : b ≤ B) {φ : E → K} (h 
   rw [e2, sum_range_mul]
   · rfl
   · intro i
-    have e3 : (((i + qOf P ^ (a + b) : ℕ) : E) / (qOf P : E) ^ a) = (i : E) / (qOf P : E) ^ a + (qOf P : E) ^ b := by
+    have e3
+        : (((i + qOf P ^ (a + b) : ℕ) : E) / (qOf P : E) ^ a)
+          = (i : E) / (qOf P : E) ^ a + (qOf P : E) ^ b := by
       push_cast
       rw [pow_add]
       field_simp
@@ -130,8 +140,8 @@ theorem sg_stab {a b A B : ℕ} (hA : a ≤ A) (hB : b ≤ B) {φ : E → K} (h 
     exact ia_one P
 
 include hK in
-theorem weighted_sum_stable {a b A B : ℕ} (hA : a ≤ A) (hB : b ≤ B) {φ : E → K} (h : Good1 P a b φ) :
-    W1 P A B φ = W1 P a b φ := by
+theorem weighted_sum_stable {a b A B : ℕ} (hA : a ≤ A) (hB : b ≤ B) {φ : E → K} (h : Good1 P a b φ)
+    : W1 P A B φ = W1 P a b φ := by
   unfold W1
   rw [sg_stab hN hp hq hA hB h]
   push_cast
@@ -140,8 +150,9 @@ theorem weighted_sum_stable {a b A B : ℕ} (hA : a ≤ A) (hB : b ≤ B) {φ : 
   rw [e]
   field_simp
 
-theorem sg_transl {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {β : E} (hβ : IntAt P ((qOf P : E) ^ a * β)) :
-    Good1 P a b (fun u => φ (u + β)) ∧ Sg P a b (fun u => φ (u + β)) = Sg P a b φ := by
+theorem sg_transl
+    {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {β : E} (hβ : IntAt P ((qOf P : E) ^ a * β))
+    : Good1 P a b (fun u => φ (u + β)) ∧ Sg P a b (fun u => φ (u + β)) = Sg P a b φ := by
   have hq0 := qE_ne P hp
   have qp : 0 < qOf P := hp.pos
   refine ⟨⟨fun u hu => ?_, fun u δ hδ => ?_⟩, ?_⟩
@@ -157,13 +168,19 @@ theorem sg_transl {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {β : E} (hβ 
     have Mpos : 0 < M := pow_pos qp _
     unfold Sg
     rw [← hM]
-    have key : ∀ i : ℕ, φ ((i : E) / (qOf P : E) ^ a + β) = φ ((((i + j) % M : ℕ) : E) / (qOf P : E) ^ a) := by
+    have key
+        : ∀ i : ℕ,
+          φ ((i : E) / (qOf P : E) ^ a + β) = φ ((((i + j) % M : ℕ) : E) / (qOf P : E) ^ a) := by
       intro i
       have hd := congrArg (Nat.cast (R := E)) (Nat.mod_add_div (i + j) M)
       push_cast at hd
-      have e : (i : E) / (qOf P : E) ^ a + β = (((i + j) % M : ℕ) : E) / (qOf P : E) ^ a +
-          ((((i + j) / M : ℕ) : E) * (qOf P : E) ^ b + (β - (j : E) / (qOf P : E) ^ a)) := by
-        have hr : (((i + j) % M : ℕ) : E) = (i : E) + j - (qOf P : E) ^ (a + b) * (((i + j) / M : ℕ) : E) := by
+      have e
+          : (i : E) / (qOf P : E) ^ a + β
+            = (((i + j) % M : ℕ) : E) / (qOf P : E) ^ a
+              + ((((i + j) / M : ℕ) : E) * (qOf P : E) ^ b + (β - (j : E) / (qOf P : E) ^ a)) := by
+        have hr
+            : (((i + j) % M : ℕ) : E)
+              = (i : E) + j - (qOf P : E) ^ (a + b) * (((i + j) / M : ℕ) : E) := by
           rw [hM] at hd
           push_cast at hd ⊢
           linear_combination hd
@@ -172,27 +189,30 @@ theorem sg_transl {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {β : E} (hβ 
         ring
       rw [e]
       apply h.2
-      have e2 : ((((i + j) / M : ℕ) : E) * (qOf P : E) ^ b + (β - (j : E) / (qOf P : E) ^ a)) / (qOf P : E) ^ b =
-          (((i + j) / M : ℕ) : E) + ((qOf P : E) ^ a * β - j) / (qOf P : E) ^ (a + b) := by
+      have e2
+          : ((((i + j) / M : ℕ) : E) * (qOf P : E) ^ b + (β - (j : E) / (qOf P : E) ^ a))
+              / (qOf P : E) ^ b
+            = (((i + j) / M : ℕ) : E) + ((qOf P : E) ^ a * β - j) / (qOf P : E) ^ (a + b) := by
         rw [pow_add]
         field_simp
       rw [e2]
       exact ia_add P (ia_nat P _) hj
     simp only [key]
-    exact perm_range M (fun i => (i + j) % M) (fun i _ => Nat.mod_lt _ Mpos)
+    exact perm_range M
+      (fun i => (i + j) % M)
+      (fun i _ => Nat.mod_lt _ Mpos)
       (fun i hi i' hi' hii => by
         have h3 : i % M = i' % M := Nat.ModEq.add_right_cancel' j hii
         rwa [Nat.mod_eq_of_lt hi, Nat.mod_eq_of_lt hi'] at h3)
       (fun i => φ ((i : E) / (qOf P : E) ^ a))
 
-theorem sg_unit {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {w : E} (hw : UnitAt P w) :
-    Good1 P a b (fun u => φ (w * u)) ∧ Sg P a b (fun u => φ (w * u)) = Sg P a b φ := by
+theorem sg_unit {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {w : E} (hw : UnitAt P w)
+    : Good1 P a b (fun u => φ (w * u)) ∧ Sg P a b (fun u => φ (w * u)) = Sg P a b φ := by
   have hq0 := qE_ne P hp
   have qp : 0 < qOf P := hp.pos
   refine ⟨⟨fun u hu => ?_, fun u δ hδ => ?_⟩, ?_⟩
   · have h1 := h.1 _ hu
-    have e : (qOf P : E) ^ a * u = w⁻¹ * ((qOf P : E) ^ a * (w * u)) := by
-      field_simp [hw.1]
+    have e : (qOf P : E) ^ a * u = w⁻¹ * ((qOf P : E) ^ a * (w * u)) := by field_simp [hw.1]
     rw [e]
     exact ia_mul P hw.2.2 h1
   · show φ (w * (u + δ)) = φ (w * u)
@@ -205,12 +225,19 @@ theorem sg_unit {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {w : E} (hw : Un
     have Mpos : 0 < M := pow_pos qp _
     unfold Sg
     rw [← hM]
-    have key : ∀ i : ℕ, φ (w * ((i : E) / (qOf P : E) ^ a)) = φ ((((w0 * i) % M : ℕ) : E) / (qOf P : E) ^ a) := by
+    have key
+        : ∀ i : ℕ,
+          φ (w * ((i : E) / (qOf P : E) ^ a)) = φ ((((w0 * i) % M : ℕ) : E) / (qOf P : E) ^ a) := by
       intro i
       have hd := congrArg (Nat.cast (R := E)) (Nat.mod_add_div (w0 * i) M)
-      have e : w * ((i : E) / (qOf P : E) ^ a) = (((w0 * i) % M : ℕ) : E) / (qOf P : E) ^ a +
-          ((((w0 * i) / M : ℕ) : E) * (qOf P : E) ^ b + (w - w0) * (i : E) / (qOf P : E) ^ a) := by
-        have hr : (((w0 * i) % M : ℕ) : E) = (w0 : E) * i - (qOf P : E) ^ (a + b) * (((w0 * i) / M : ℕ) : E) := by
+      have e
+          : w * ((i : E) / (qOf P : E) ^ a)
+            = (((w0 * i) % M : ℕ) : E) / (qOf P : E) ^ a
+              + ((((w0 * i) / M : ℕ) : E) * (qOf P : E) ^ b
+                + (w - w0) * (i : E) / (qOf P : E) ^ a) := by
+        have hr
+            : (((w0 * i) % M : ℕ) : E)
+              = (w0 : E) * i - (qOf P : E) ^ (a + b) * (((w0 * i) / M : ℕ) : E) := by
           rw [hM] at hd
           push_cast at hd ⊢
           linear_combination hd
@@ -219,8 +246,10 @@ theorem sg_unit {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {w : E} (hw : Un
         ring
       rw [e]
       apply h.2
-      have e2 : ((((w0 * i) / M : ℕ) : E) * (qOf P : E) ^ b + (w - w0) * (i : E) / (qOf P : E) ^ a) / (qOf P : E) ^ b =
-          (((w0 * i) / M : ℕ) : E) + (i : E) * ((w - w0) / (qOf P : E) ^ (a + b)) := by
+      have e2
+          : ((((w0 * i) / M : ℕ) : E) * (qOf P : E) ^ b + (w - w0) * (i : E) / (qOf P : E) ^ a)
+              / (qOf P : E) ^ b
+            = (((w0 * i) / M : ℕ) : E) + (i : E) * ((w - w0) / (qOf P : E) ^ (a + b)) := by
         rw [pow_add]
         field_simp
       rw [e2]
@@ -229,15 +258,17 @@ theorem sg_unit {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) {w : E} (hw : Un
     have hcoM : Nat.gcd M w0 = 1 := by
       rw [hM, Nat.gcd_comm]
       exact Nat.Coprime.pow_right _ hco
-    exact perm_range M (fun i => (w0 * i) % M) (fun i _ => Nat.mod_lt _ Mpos)
+    exact perm_range M
+      (fun i => (w0 * i) % M)
+      (fun i _ => Nat.mod_lt _ Mpos)
       (fun i hi i' hi' hii => by
         have h3 : i % M = i' % M := Nat.ModEq.cancel_left_of_coprime hcoM hii
         rwa [Nat.mod_eq_of_lt hi, Nat.mod_eq_of_lt hi'] at h3)
       (fun i => φ ((i : E) / (qOf P : E) ^ a))
 
-theorem sg_qpow {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) (f : ℕ) :
-    Good1 P (a + f) b (fun u => φ ((qOf P : E) ^ f * u)) ∧
-      Sg P (a + f) b (fun u => φ ((qOf P : E) ^ f * u)) = ((qOf P ^ f : ℕ) : K) * Sg P a b φ := by
+theorem sg_qpow {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) (f : ℕ)
+    : Good1 P (a + f) b (fun u => φ ((qOf P : E) ^ f * u))
+      ∧ Sg P (a + f) b (fun u => φ ((qOf P : E) ^ f * u)) = ((qOf P ^ f : ℕ) : K) * Sg P a b φ := by
   have hq0 := qE_ne P hp
   refine ⟨⟨fun u hu => ?_, fun u δ hδ => ?_⟩, ?_⟩
   · have h1 := h.1 _ hu
@@ -257,9 +288,9 @@ theorem sg_qpow {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) (f : ℕ) :
       field_simp
     rw [e, sg_stab hN hp hq le_rfl (Nat.le_add_right b f) h, Nat.add_sub_cancel_left]
 
-theorem sg_qinv {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) (f : ℕ) :
-    Good1 P a (b + f) (fun u => φ (u / (qOf P : E) ^ f)) ∧
-      Sg P a (b + f) (fun u => φ (u / (qOf P : E) ^ f)) = Sg P a b φ := by
+theorem sg_qinv {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) (f : ℕ)
+    : Good1 P a (b + f) (fun u => φ (u / (qOf P : E) ^ f))
+      ∧ Sg P a (b + f) (fun u => φ (u / (qOf P : E) ^ f)) = Sg P a b φ := by
   have hq0 := qE_ne P hp
   refine ⟨⟨fun u hu => ?_, fun u δ hδ => ?_⟩, ?_⟩
   · have h1 := h.1 _ hu
@@ -282,13 +313,15 @@ theorem sg_qinv {a b : ℕ} {φ : E → K} (h : Good1 P a b φ) (f : ℕ) :
       congr 1
       rw [pow_add]
       field_simp
-    rw [e, sg_stab hN hp hq (Nat.le_add_right a f) le_rfl h, Nat.sub_self, pow_zero, Nat.cast_one, one_mul]
-
+    rw [e, sg_stab hN hp hq (Nat.le_add_right a f) le_rfl h, Nat.sub_self, pow_zero, Nat.cast_one,
+      one_mul]
 
 include hK in
-theorem weighted_sum_scaling {d : E} (hd : d ≠ 0) (a b : ℕ) :
-    ∃ a' b' : ℕ, ∀ φ : E → K, Good1 P a b φ →
-      Good1 P a' b' (fun u => φ (d * u)) ∧ W1 P a' b' (fun u => φ (d * u)) = (qOf P : K) ^ vq P d * W1 P a b φ := by
+theorem weighted_sum_scaling {d : E} (hd : d ≠ 0) (a b : ℕ)
+    : ∃ a' b' : ℕ, ∀ φ : E → K,
+      Good1 P a b φ
+        → Good1 P a' b' (fun u => φ (d * u))
+          ∧ W1 P a' b' (fun u => φ (d * u)) = (qOf P : K) ^ vq P d * W1 P a b φ := by
   have hq0 := qE_ne P hp
   obtain ⟨w, hdw, hw⟩ := vq_spec hN hp hq hd
   rcases Int.eq_nat_or_neg (vq P d) with ⟨f, hf | hf⟩

@@ -6,20 +6,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteSemilo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds GlobalTheory.ColNorms
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds
+  GlobalTheory.ColNorms
 open scoped ComplexOrder
 
 namespace GlobalTheory
 
-theorem latSum_tower_reps (E : Type) [Field E] [NumberField E] (W : Type) [AddCommGroup W] [Module (𝓞 E) W]
-    (D G C B : Submodule (𝓞 E) W) (hBC : B ≤ C) (hCG : C ≤ G) (hGD : G ≤ D)
-    (hfin : Finite (↥D ⧸ B.comap D.subtype)) :
-    ∃ R : Finset W, (∀ x ∈ R, x ∈ G) ∧ R.card = Nat.card (↥G ⧸ C.comap G.subtype) ∧
-      ∀ f : W → ℂ, (∀ x, f x ≠ 0 → x ∈ G) → (∀ x y, x - y ∈ B → f x = f y) →
-        latSum D B f = ∑ x ∈ R, latSum C B fun y => f (x + y) := by
+theorem latSum_tower_reps
+    (E : Type) [Field E] [NumberField E]
+    (W : Type) [AddCommGroup W] [Module (𝓞 E) W]
+    (D G C B : Submodule (𝓞 E) W)
+    (hBC : B ≤ C) (hCG : C ≤ G) (hGD : G ≤ D) (hfin : Finite (↥D ⧸ B.comap D.subtype))
+    : ∃ R : Finset W,
+      (∀ x ∈ R, x ∈ G) ∧ R.card = Nat.card (↥G ⧸ C.comap G.subtype)
+        ∧ ∀ f : W → ℂ,
+          (∀ x, f x ≠ 0 → x ∈ G) → (∀ x y, x - y ∈ B → f x = f y)
+            → latSum D B f = ∑ x ∈ R, latSum C B fun y => f (x + y) := by
   classical
-  have key : ∀ (P Q : Submodule (𝓞 E) W) (t u : ↥P),
-      (Submodule.Quotient.mk t : ↥P ⧸ Q.comap P.subtype) = Submodule.Quotient.mk u ↔ (t : W) - u ∈ Q := by
+  have key
+      : ∀ (P Q : Submodule (𝓞 E) W) (t u : ↥P),
+        (Submodule.Quotient.mk t : ↥P ⧸ Q.comap P.subtype) = Submodule.Quotient.mk u
+          ↔ (t : W) - u ∈ Q := by
     intro P Q t u
     rw [Submodule.Quotient.eq, Submodule.mem_comap]
     rfl
@@ -34,8 +42,8 @@ theorem latSum_tower_reps (E : Type) [Field E] [NumberField E] (W : Type) [AddCo
   have ht' : ∀ z, Submodule.Quotient.mk (t z) = z := fun z => Function.surjInv_eq _ z
   have hmem : ∀ p : (↥G ⧸ C.comap G.subtype) × (↥C ⧸ B.comap C.subtype), (r p.1 : W) + s p.2 ∈ D :=
     fun p => hGD (G.add_mem (r p.1).2 (hCG (s p.2).2))
-  let φ : (↥G ⧸ C.comap G.subtype) × (↥C ⧸ B.comap C.subtype) → (↥D ⧸ B.comap D.subtype) :=
-    fun p => Submodule.Quotient.mk ⟨_, hmem p⟩
+  let φ : (↥G ⧸ C.comap G.subtype) × (↥C ⧸ B.comap C.subtype) → (↥D ⧸ B.comap D.subtype) := fun p =>
+    Submodule.Quotient.mk ⟨_, hmem p⟩
   have hinj : Function.Injective φ := by
     rintro ⟨x, j⟩ ⟨x', j'⟩ h
     have h1 : (r x : W) + s j - (r x' + s j') ∈ B := (key D B _ _).1 h
@@ -75,9 +83,11 @@ theorem latSum_tower_reps (E : Type) [Field E] [NumberField E] (W : Type) [AddCo
       have hG : (t z : W) ∈ G := hf0 _ hne
       apply hz
       have h1 : (r (Submodule.Quotient.mk ⟨_, hG⟩) : W) - t z ∈ C := (key G C _ ⟨_, hG⟩).1 (hr' _)
-      have h1' : (t z : W) - r (Submodule.Quotient.mk ⟨_, hG⟩) ∈ C := by
-        simpa using C.neg_mem h1
-      have h2 : (s (Submodule.Quotient.mk ⟨_, h1'⟩) : W) - ((t z : W) - r (Submodule.Quotient.mk ⟨_, hG⟩)) ∈ B :=
+      have h1' : (t z : W) - r (Submodule.Quotient.mk ⟨_, hG⟩) ∈ C := by simpa using C.neg_mem h1
+      have h2
+          : (s (Submodule.Quotient.mk ⟨_, h1'⟩) : W)
+              - ((t z : W) - r (Submodule.Quotient.mk ⟨_, hG⟩))
+            ∈ B :=
         (key C B _ ⟨_, h1'⟩).1 (hs' _)
       refine ⟨(Submodule.Quotient.mk ⟨_, hG⟩, Submodule.Quotient.mk ⟨_, h1'⟩), ?_⟩
       refine Eq.trans ?_ (ht' z)
@@ -89,9 +99,12 @@ theorem latSum_tower_reps (E : Type) [Field E] [NumberField E] (W : Type) [AddCo
       apply hf
       exact (key D B ⟨_, hmem p⟩ _).1 (ht' _).symm
 
-theorem thInd_congr_of_sub_mem {X : Fields} (A : Amb X) {a b : ℕ} (S : Finset (HeightOneSpectrum (𝓞 X.E)))
-    (L : Submodule (𝓞 X.E) (Sp X.E a)) (L' : Submodule (𝓞 X.E) (Sp X.E b)) (c : ℕ) (x y : HomE X.E a b)
-    (h : x - y ∈ mulLat c (homAt S L L')) : A.thInd S L L' c x = A.thInd S L L' c y := by
+theorem thInd_congr_of_sub_mem
+    {X : Fields} (A : Amb X)
+    {a b : ℕ} (S : Finset (HeightOneSpectrum (𝓞 X.E))) (L : Submodule (𝓞 X.E) (Sp X.E a))
+    (L' : Submodule (𝓞 X.E) (Sp X.E b)) (c : ℕ) (x y : HomE X.E a b)
+    (h : x - y ∈ mulLat c (homAt S L L'))
+    : A.thInd S L L' c x = A.thInd S L L' c y := by
   have h1 : A.IsLift S L L' c x = A.IsLift S L L' c y := by
     funext s
     unfold Amb.IsLift
@@ -105,7 +118,18 @@ theorem thInd_congr_of_sub_mem {X : Fields} (A : Amb X) {a b : ℕ} (S : Finset 
   unfold Amb.thInd Amb.liftW
   rw [h1]
 
-theorem latSum_thInd_regroup : ∀ (X : Fields) (A : Amb X) (a b : ℕ) (S : Finset (HeightOneSpectrum (𝓞 X.E))) (L : Submodule (𝓞 X.E) (Sp X.E a)) (L' : Submodule (𝓞 X.E) (Sp X.E b)) (cA c c' : ℕ) (Ξ : HomE X.E a b → ℂ), A.IndAdd a b S (cA * (c * c')) → IsSdLat L → IsSdLat L' → 0 < cA → 0 < c → 0 < c' → (∀ x, Ξ x ≠ 0 → x ∈ homAt S L L') → (∀ x, ∀ y ∈ mulLat c (homAt S L L'), Ξ (x + y) = Ξ x) → ∃ R : Finset (HomE X.E a b), R.card ≤ c ^ (Module.finrank ℚ X.E * a * b) ∧ ∀ z, latSum (divLat cA (homAt S L L')) (mulLat (c * c') (homAt S L L')) (fun x => Ξ x * A.thInd S L L' (c * c') x z) = ∑ x ∈ R, Ξ x * A.thInd S L L' c x z := by
+theorem latSum_thInd_regroup
+    : ∀ (X : Fields) (A : Amb X) (a b : ℕ) (S : Finset (HeightOneSpectrum (𝓞 X.E)))
+        (L : Submodule (𝓞 X.E) (Sp X.E a)) (L' : Submodule (𝓞 X.E) (Sp X.E b)) (cA c c' : ℕ)
+        (Ξ : HomE X.E a b → ℂ),
+      A.IndAdd a b S (cA * (c * c')) → IsSdLat L → IsSdLat L' → 0 < cA → 0 < c → 0 < c'
+        → (∀ x, Ξ x ≠ 0 → x ∈ homAt S L L') → (∀ x, ∀ y ∈ mulLat c (homAt S L L'), Ξ (x + y) = Ξ x)
+        → ∃ R : Finset (HomE X.E a b),
+          R.card ≤ c ^ (Module.finrank ℚ X.E * a * b)
+            ∧ ∀ z,
+              latSum (divLat cA (homAt S L L')) (mulLat (c * c') (homAt S L L'))
+                  (fun x => Ξ x * A.thInd S L L' (c * c') x z)
+                = ∑ x ∈ R, Ξ x * A.thInd S L L' c x z := by
   intro X A a b S L L' cA c c' Ξ hadd hL hL' hcA hc hc' hsupp hinv
   have hdiv : ∀ (n : ℕ) x, x ∈ homAt S L L' → x ∈ divLat n (homAt S L L') := fun n x hx =>
     Submodule.smul_mem (homAt S L L') (n : 𝓞 X.E) hx
@@ -118,15 +142,22 @@ theorem latSum_thInd_regroup : ∀ (X : Fields) (A : Amb X) (a b : ℕ) (S : Fin
   have hCG : mulLat c (homAt S L L') ≤ divLat 1 (homAt S L L') := by
     rintro _ ⟨x, hx, rfl⟩
     exact hdiv 1 _ (Submodule.smul_mem (homAt S L L') (c : 𝓞 X.E) hx)
-  have hfin := (GlobalTheory.SemilocalClasses.finite_card_classes X.E a b S L L' cA (c * c') hL.1 hL'.1 hcA (Nat.mul_pos hc hc')).1
-  have hcard := (GlobalTheory.SemilocalClasses.finite_card_classes X.E a b S L L' 1 c hL.1 hL'.1 Nat.one_pos hc).2
-  obtain ⟨R, hR, hRc, hsum⟩ := latSum_tower_reps X.E (HomE X.E a b) (divLat cA (homAt S L L'))
-    (divLat 1 (homAt S L L')) (mulLat c (homAt S L L')) (mulLat (c * c') (homAt S L L')) hBC hCG
-    (fun x hx => hdiv cA x (hone x hx)) hfin
+  have hfin :=
+    (GlobalTheory.SemilocalClasses.finite_card_classes X.E a b S L L' cA (c * c') hL.1 hL'.1 hcA
+      (Nat.mul_pos hc hc')).1
+  have hcard :=
+    (GlobalTheory.SemilocalClasses.finite_card_classes X.E a b S L L' 1 c hL.1 hL'.1 Nat.one_pos
+      hc).2
+  obtain ⟨R, hR, hRc, hsum⟩ :=
+    latSum_tower_reps X.E (HomE X.E a b) (divLat cA (homAt S L L')) (divLat 1 (homAt S L L'))
+      (mulLat c (homAt S L L')) (mulLat (c * c') (homAt S L L')) hBC hCG
+      (fun x hx => hdiv cA x (hone x hx))
+      hfin
   refine ⟨R, by rw [hRc]; simpa using hcard, fun z => ?_⟩
   rw [hsum]
   · refine Finset.sum_congr rfl fun x hx => ?_
-    rw [hadd L L' c c' x hc hc' ⟨hL, hL', Nat.mul_pos hc hc', Dvd.intro_left _ rfl, hdiv _ x (hone x (hR x hx))⟩ z]
+    rw [hadd L L' c c' x hc hc'
+      ⟨hL, hL', Nat.mul_pos hc hc', Dvd.intro_left _ rfl, hdiv _ x (hone x (hR x hx))⟩ z]
     unfold latSum
     rw [mul_finsum]
     exact finsum_congr fun q => by beta_reduce; rw [hinv x _ (Subtype.property _)]

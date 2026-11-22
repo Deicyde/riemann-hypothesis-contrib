@@ -34,8 +34,10 @@ theorem iteratedPartialFourierChar : DwExp := by
   | nil => funext y; simp [dw]
   | cons j w ih =>
     funext x
-    have hfun : dw w (eF ξ) =
-        fun y => (w.map fun j => -(2 * Real.pi * Complex.I * ((ξ j : ℝ) : ℂ))).prod * eF ξ y := ih
+    have hfun
+        : dw w (eF ξ)
+          = fun y => (w.map fun j => -(2 * Real.pi * Complex.I * ((ξ j : ℝ) : ℂ))).prod * eF ξ y :=
+      ih
     show fderiv ℝ (dw w (eF ξ)) x (ev j) = _
     rw [hfun, ((hasFDerivAt_eF ξ x).const_mul _).fderiv]
     simp only [ContinuousLinearMap.smul_apply, smul_eq_mul, eL_ev, List.map_cons, List.prod_cons,

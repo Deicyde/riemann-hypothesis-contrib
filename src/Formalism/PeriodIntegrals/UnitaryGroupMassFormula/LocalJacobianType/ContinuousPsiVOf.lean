@@ -9,7 +9,8 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.LocJacTyp.Sd
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField IsDedekindDomain Topology Filter PI.LocJacTyp
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain Topology Filter PI.LocJacTyp
 open scoped TensorProduct
 
 attribute [local instance] PI.VolStabSW.secondCountable_Fv PI.VolStabSW.locallyCompact_Fv finDim
@@ -23,9 +24,11 @@ theorem piu_ne : piu v ≠ 0 := (PI.VolStabSW.exists_unif_Fv v).choose_spec.1
 theorem piu_tendsto : Tendsto (fun k : ℕ => piu v ^ k) atTop (𝓝 0) :=
   (PI.VolStabSW.exists_unif_Fv v).choose_spec.2.1
 
-theorem tube {X : Type} [AddCommGroup X] [Module (Fv F v) X] [TopologicalSpace X]
-    [ContinuousSMul (Fv F v) X] {C : Set X} (hC : IsCompact C) {U : Set X}
-    (hU : U ∈ 𝓝 (0 : X)) : ∀ᶠ k : ℕ in atTop, ∀ c ∈ C, piu v ^ k • c ∈ U := by
+theorem tube
+    {X : Type} [AddCommGroup X] [Module (Fv F v) X] [TopologicalSpace X] [ContinuousSMul (Fv F v) X]
+    {C : Set X} (hC : IsCompact C)
+    {U : Set X} (hU : U ∈ 𝓝 (0 : X))
+    : ∀ᶠ k : ℕ in atTop, ∀ c ∈ C, piu v ^ k • c ∈ U := by
   have hP : ∀ c ∈ C, ∀ᶠ z : Fv F v × X in 𝓝 ((0 : Fv F v), c), z.1 • z.2 ∈ U := by
     intro c _
     have hc : Continuous fun z : Fv F v × X => z.1 • z.2 := continuous_fst.smul continuous_snd
@@ -50,8 +53,8 @@ theorem psiV_add' (r s : Fv F v) : psiV F ψ v (r + s) = psiV F ψ v r * psiV F 
 theorem psiV_neg_mul (r : Fv F v) : psiV F ψ v (-r) * psiV F ψ v r = 1 := by
   rw [← psiV_add', neg_add_cancel, psiV_zero]
 
-theorem psiV_sum {ι : Type} (s : Finset ι) (f : ι → Fv F v) :
-    psiV F ψ v (∑ i ∈ s, f i) = ∏ i ∈ s, psiV F ψ v (f i) := by
+theorem psiV_sum {ι : Type} (s : Finset ι) (f : ι → Fv F v)
+    : psiV F ψ v (∑ i ∈ s, f i) = ∏ i ∈ s, psiV F ψ v (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [psiV_zero]
@@ -62,8 +65,7 @@ theorem psiV_nsmul (n : ℕ) (r : Fv F v) : psiV F ψ v (n • r) = psiV F ψ v 
   | zero => simp [psiV_zero]
   | succ n ih => rw [succ_nsmul, psiV_add', ih, pow_succ]
 
-def OpenKer : Prop :=
-  ∃ k : ℕ, ∀ c ∈ v.adicCompletionIntegers F, psiV F ψ v (piu v ^ k * c) = 1
+def OpenKer : Prop := ∃ k : ℕ, ∀ c ∈ v.adicCompletionIntegers F, psiV F ψ v (piu v ^ k * c) = 1
 
 def ballK (k : ℕ) : Set (Fv F v) := {t | (piu v ^ k)⁻¹ * t ∈ v.adicCompletionIntegers F}
 
@@ -72,8 +74,10 @@ theorem ballK_mem_nhds (k : ℕ) : ballK v k ∈ 𝓝 (0 : Fv F v) := by
     (Valued.isOpen_valuationSubring _).preimage (continuous_const.mul continuous_id)
   exact ho.mem_nhds (by simp [ballK, zero_mem])
 
-theorem psiV_ballK {k : ℕ} (hk : ∀ c ∈ v.adicCompletionIntegers F, psiV F ψ v (piu v ^ k * c) = 1)
-    {t : Fv F v} (ht : t ∈ ballK v k) : psiV F ψ v t = 1 := by
+theorem psiV_ballK
+    {k : ℕ} (hk : ∀ c ∈ v.adicCompletionIntegers F, psiV F ψ v (piu v ^ k * c) = 1)
+    {t : Fv F v} (ht : t ∈ ballK v k)
+    : psiV F ψ v t = 1 := by
   have h := hk _ ht
   rwa [← mul_assoc, mul_inv_cancel₀ (pow_ne_zero k (piu_ne v)), one_mul] at h
 
@@ -93,9 +97,11 @@ theorem norm_psiV_of (h : OpenKer v ψ) (r : Fv F v) : ‖psiV F ψ v r‖ = 1 :
 
   have hbd : ∀ x : Fv F v, ∃ B : ℝ, ∀ n : ℕ, ‖psiV F ψ v x‖ ^ n ≤ B := by
     intro x
-    obtain ⟨j, hj⟩ := ((piu_tendsto v).mul_const x).eventually
-      ((Valued.isOpen_valuationSubring (Fv F v)).mem_nhds (by simp [zero_mem]) :
-        ((v.adicCompletionIntegers F : Set (Fv F v))) ∈ 𝓝 (0 * x)) |>.exists
+    obtain ⟨j, hj⟩ :=
+      ((piu_tendsto v).mul_const x).eventually
+          ((Valued.isOpen_valuationSubring (Fv F v)).mem_nhds (by simp [zero_mem])
+            : ((v.adicCompletionIntegers F : Set (Fv F v))) ∈ 𝓝 (0 * x))
+        |>.exists
     set H : Set (Fv F v) := {t | piu v ^ j * t ∈ v.adicCompletionIntegers F}
     have hHc : IsCompact H := by
       have e : H = (fun t => (piu v ^ j)⁻¹ * t) '' (v.adicCompletionIntegers F : Set (Fv F v)) := by
@@ -107,7 +113,8 @@ theorem norm_psiV_of (h : OpenKer v ψ) (r : Fv F v) : ‖psiV F ψ v r‖ = 1 :
         · rintro ⟨s, hs, rfl⟩
           simpa [H, ← mul_assoc, mul_inv_cancel₀ (pow_ne_zero j (piu_ne v))] using hs
       rw [e]
-      exact (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F v).image (continuous_const.mul continuous_id)
+      exact (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F v).image
+        (continuous_const.mul continuous_id)
     obtain ⟨B, hB⟩ := hHc.exists_bound_of_continuousOn (hc.norm.continuousOn)
     refine ⟨B, fun n => ?_⟩
     have hn : (n • x) ∈ H := by
@@ -129,12 +136,14 @@ theorem norm_psiV_of (h : OpenKer v ψ) (r : Fv F v) : ‖psiV F ψ v r‖ = 1 :
   have h3 : ‖psiV F ψ v (-r)‖ * ‖psiV F ψ v r‖ = 1 := by rw [← norm_mul, psiV_neg_mul, norm_one]
   nlinarith [norm_nonneg (psiV F ψ v r), norm_nonneg (psiV F ψ v (-r))]
 
-theorem openKer_of (t : Fv F v) (ht : t ≠ 0)
-    (h : ∀ c ∈ v.adicCompletionIntegers F, psiV F ψ v (c * t) = 1) : OpenKer v ψ := by
+theorem openKer_of
+    (t : Fv F v) (ht : t ≠ 0) (h : ∀ c ∈ v.adicCompletionIntegers F, psiV F ψ v (c * t) = 1)
+    : OpenKer v ψ := by
   have hU : {s : Fv F v | t⁻¹ * s ∈ v.adicCompletionIntegers F} ∈ 𝓝 (0 : Fv F v) :=
     ((Valued.isOpen_valuationSubring _).preimage (continuous_const.mul continuous_id)).mem_nhds
       (by simp [zero_mem])
-  obtain ⟨k, hk⟩ := (tube v (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F v) hU).exists
+  obtain ⟨k, hk⟩ :=
+    (tube v (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F v) hU).exists
   refine ⟨k, fun c hc => ?_⟩
   have h1 := h _ (hk c hc)
   simp only [smul_eq_mul] at h1

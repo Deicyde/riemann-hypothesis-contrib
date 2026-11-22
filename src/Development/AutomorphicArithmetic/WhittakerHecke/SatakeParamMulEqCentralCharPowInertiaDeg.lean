@@ -10,50 +10,62 @@ public import CompanionTheory.AutomorphicTheory.UnitriangularMeasure.AdeleCoordi
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical ComplexOrder
 
-private theorem sc_comm {R : Type} [CommRing R] (y : Rˣ) (g : GL (Fin 2) R) :
-    Matrix.GeneralLinearGroup.scalar (Fin 2) y * g = g * Matrix.GeneralLinearGroup.scalar (Fin 2) y :=
+private theorem sc_comm {R : Type} [CommRing R] (y : Rˣ) (g : GL (Fin 2) R)
+    : Matrix.GeneralLinearGroup.scalar (Fin 2) y * g
+      = g * Matrix.GeneralLinearGroup.scalar (Fin 2) y :=
   Units.ext (Matrix.scalar_commute (y : R) (fun _ => Commute.all _ _) g.val).eq
 
-private theorem val_of_norm {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
-    (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 L)) (y : (v.adicCompletion K)ˣ) (x : (w.adicCompletion L)ˣ)
-    (h : ‖(y : v.adicCompletion K)‖ = ‖(x : w.adicCompletion L)‖) (f : ℕ) (hf : normV w = normV v ^ f) :
-    Valued.v (y : v.adicCompletion K) = Valued.v (x : w.adicCompletion L) ^ f := by
-  have hn : ∀ {F : Type} [Field F] [NumberField F] (u : HeightOneSpectrum (𝓞 F)),
-      normV u = Ideal.absNorm u.asIdeal := by
+private theorem val_of_norm
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
+    (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 L)) (y : (v.adicCompletion K)ˣ)
+    (x : (w.adicCompletion L)ˣ) (h : ‖(y : v.adicCompletion K)‖ = ‖(x : w.adicCompletion L)‖)
+    (f : ℕ) (hf : normV w = normV v ^ f)
+    : Valued.v (y : v.adicCompletion K) = Valued.v (x : w.adicCompletion L) ^ f := by
+  have hn
+      : ∀ {F : Type} [Field F] [NumberField F] (u : HeightOneSpectrum (𝓞 F)),
+        normV u = Ideal.absNorm u.asIdeal := by
     intro F _ _ u
     rw [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]
-  have hf' : Ideal.absNorm w.asIdeal = Ideal.absNorm v.asIdeal ^ f := by
-    simpa only [hn] using hf
+  have hf' : Ideal.absNorm w.asIdeal = Ideal.absNorm v.asIdeal ^ f := by simpa only [hn] using hf
   have hy : Valued.v (y : v.adicCompletion K) ≠ 0 := (Valuation.ne_zero_iff _).2 y.ne_zero
   have hx : Valued.v (x : w.adicCompletion L) ≠ 0 := (Valuation.ne_zero_iff _).2 x.ne_zero
   rw [FinitePlace.norm_def, FinitePlace.norm_def] at h
-  rw [WithZeroMulInt.toNNReal_neg_apply _ hy, WithZeroMulInt.toNNReal_neg_apply _ hx, NNReal.coe_inj, hf',
-    Nat.cast_pow, ← zpow_natCast, ← _root_.zpow_mul] at h
+  rw [WithZeroMulInt.toNNReal_neg_apply _ hy, WithZeroMulInt.toNNReal_neg_apply _ hx,
+      NNReal.coe_inj, hf', Nat.cast_pow, ← zpow_natCast, ← _root_.zpow_mul]
+    at h
   have h1 := HeightOneSpectrum.one_lt_absNorm_nnreal v
   have h2 := zpow_right_injective₀ (zero_lt_one.trans h1) h1.ne' h
   rw [← WithZero.coe_unzero hy, ← WithZero.coe_unzero hx, ← WithZero.coe_pow]
   refine congrArg _ (Multiplicative.toAdd.injective ?_)
-  rw [toAdd_pow, nsmul_eq_mul, WithZero.toAdd_unzero_eq_log hy,
-    WithZero.toAdd_unzero_eq_log hx, h2]
+  rw [toAdd_pow, nsmul_eq_mul, WithZero.toAdd_unzero_eq_log hy, WithZero.toAdd_unzero_eq_log hx, h2]
 
-private theorem norm_loc {E : Type} [Field E] [NumberField E] (w : H.P E) (x : (H.Kv w)ˣ) (f : ℕ)
-    (hf : normV w = normV (w.under (𝓞 ℚ)) ^ f) :
-    ∃ y : (H.Kv (w.under (𝓞 ℚ)))ˣ, ideleNorm ℚ E (localIdele E w x) = localIdele ℚ (w.under (𝓞 ℚ)) y ∧
-      Valued.v (y : H.Kv (w.under (𝓞 ℚ))) = Valued.v (x : H.Kv w) ^ f := by
+private theorem norm_loc
+    {E : Type} [Field E] [NumberField E]
+    (w : H.P E) (x : (H.Kv w)ˣ)
+    (f : ℕ) (hf : normV w = normV (w.under (𝓞 ℚ)) ^ f)
+    : ∃ y : (H.Kv (w.under (𝓞 ℚ)))ˣ,
+      ideleNorm ℚ E (localIdele E w x) = localIdele ℚ (w.under (𝓞 ℚ)) y
+        ∧ Valued.v (y : H.Kv (w.under (𝓞 ℚ))) = Valued.v (x : H.Kv w) ^ f := by
   have h := GroundTheory.Global.ideleNorm_finiteEmbedding (K := ℚ) w x
-  have hm := GroundTheory.Automorphic.EllipticTorus.ideleModule_ideleNorm (K := ℚ)
-    (GroundTheory.Global.IdeleGroup.finiteEmbedding w x)
+  have hm :=
+    GroundTheory.Automorphic.EllipticTorus.ideleModule_ideleNorm (K := ℚ)
+      (GroundTheory.Global.IdeleGroup.finiteEmbedding w x)
   rw [h] at hm
   have hm' := congrArg Subtype.val hm
-  rw [GroundTheory.Global.IdeleGroup.ideleModule_finiteEmbedding, GroundTheory.Global.IdeleGroup.ideleModule_finiteEmbedding] at hm'
+  rw [GroundTheory.Global.IdeleGroup.ideleModule_finiteEmbedding,
+      GroundTheory.Global.IdeleGroup.ideleModule_finiteEmbedding]
+    at hm'
   exact ⟨_, h, val_of_norm _ w _ x hm' _ hf⟩
 
-private theorem val_nat {K : Type} [Field K] [NumberField K] (v : H.P K) (n : ℕ) (hb : ((n : 𝓞 K)) ∉ v.asIdeal) :
-    Valued.v ((n : ℕ) : H.Kv v) = 1 := by
+private theorem val_nat
+    {K : Type} [Field K] [NumberField K] (v : H.P K) (n : ℕ) (hb : ((n : 𝓞 K)) ∉ v.asIdeal)
+    : Valued.v ((n : ℕ) : H.Kv v) = 1 := by
   have h1 : v.valuation K (((n : 𝓞 K)) : K) = 1 := by
     refine le_antisymm (v.valuation_le_one _) (not_lt.1 fun h => hb ?_)
     exact (HeightOneSpectrum.valuation_lt_one_iff_mem (K := K) v _).1 h
@@ -63,10 +75,12 @@ private theorem val_nat {K : Type} [Field K] [NumberField K] (v : H.P K) (n : �
   rw [← h2]
   simp
 
-private theorem unr_of_ok {ω : HChar ℚ} {L : ℕ} (hc : ChOk ω⁻¹ L) {v : H.P ℚ} (hb : ¬ Bad L v) : ω.UnrAt v := by
+private theorem unr_of_ok {ω : HChar ℚ} {L : ℕ} (hc : ChOk ω⁻¹ L) {v : H.P ℚ} (hb : ¬ Bad L v)
+    : ω.UnrAt v := by
   intro x hx
   have hL : Valued.v ((L : ℕ) : H.Kv v) = 1 := val_nat v L hb
-  have hs : ∀ w : H.P ℚ, w ≠ v → (localIdele ℚ v x).val.2 w = 1 := fun w h => Pi.mulSingle_eq_of_ne h _
+  have hs : ∀ w : H.P ℚ, w ≠ v → (localIdele ℚ v x).val.2 w = 1 := fun w h =>
+    Pi.mulSingle_eq_of_ne h _
   have he : (localIdele ℚ v x).val.2 v = x := Pi.mulSingle_eq_same v _
   have hU : (localIdele ℚ v x : (A ℚ)ˣ) ∈ UU := by
     refine ⟨rfl, fun w => ?_⟩
@@ -93,10 +107,13 @@ private theorem unr_of_ok {ω : HChar ℚ} {L : ℕ} (hc : ChOk ω⁻¹ L) {v : 
   have h : (ω.1 (localIdele ℚ v x))⁻¹ = 1 := hc _ hU hD
   exact inv_eq_one.1 h
 
-theorem UpperTheory.satake_param_mul_eq_central_char_pow_inertiaDeg :
-    ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (P : CuspSub E 2) (ω : HChar ℚ) (L : ℕ), CenN P ω → ChOk ω⁻¹ L →
-        ∀ (w : H.P E) (α β : ℂˣ) (f : ℕ), ¬ Bad L (w.under (𝓞 ℚ)) → normV w = normV (w.under (𝓞 ℚ)) ^ f →
-          (CG.mk P).HasSat w {α, β} → α * β = ω.val (w.under (𝓞 ℚ)) ^ f := by
+theorem UpperTheory.satake_param_mul_eq_central_char_pow_inertiaDeg
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+        (P : CuspSub E 2) (ω : HChar ℚ) (L : ℕ),
+      CenN P ω → ChOk ω⁻¹ L
+        → ∀ (w : H.P E) (α β : ℂˣ) (f : ℕ),
+          ¬ Bad L (w.under (𝓞 ℚ)) → normV w = normV (w.under (𝓞 ℚ)) ^ f → (CG.mk P).HasSat w {α, β}
+            → α * β = ω.val (w.under (𝓞 ℚ)) ^ f := by
   intro E _ _ _ P ω L hC hO w α β f hb hf hS
   have hU := unr_of_ok hO hb
   obtain ⟨p, hp⟩ := GlobalTheory.LFun.exists_isUnifV w
@@ -107,26 +124,35 @@ theorem UpperTheory.satake_param_mul_eq_central_char_pow_inertiaDeg :
   obtain ⟨g, hg⟩ : ∃ g, x.1.1 g ≠ 0 := by
     by_contra! hn
     exact hx.1 (Subtype.ext (Subtype.ext (funext hn)))
-  have hfix : ∀ g, ∀ k ∈ GlobalTheory.LFun.KGL w (n := 2), x.1.1 (g * finGL E 2 (locGL E 2 w k)) = x.1.1 g := fun g k hk =>
+  have hfix
+      : ∀ g, ∀ k ∈ GlobalTheory.LFun.KGL w (n := 2),
+        x.1.1 (g * finGL E 2 (locGL E 2 w k)) = x.1.1 g := fun g k hk =>
     congrFun (congrArg (fun y : P.V => y.1.1) (GlobalTheory.LGrp.mem_fixed.1 hx.2.1 k hk)) g
   have hEig : UpperTheory.V.Af.Smo.EigAt w {α, β} x.1.1 := by
     intro g
     refine ⟨hB.card, fun y k hk => ?_, fun ϖ hϖ j hj y => ?_⟩
     · rw [map_mul, map_mul, ← mul_assoc, hfix _ k hk]
-    · have he := (hB.2 x (GlobalTheory.LGrp.mem_fixed.2 fun k hk =>
-        Subtype.ext (Subtype.ext (funext fun z => hfix z k hk))) hx.1).2.2.2 ϖ hϖ j hj
-      let ev : P.V →+ ℂ :=
-        { toFun := fun ψ => ψ.1.1 (g * finGL E 2 (locGL E 2 w y))
-          map_zero' := rfl
-          map_add' := fun _ _ => rfl }
-      have hs := ev.map_finsum (GlobalTheory.LFun.finite_heckeVec (Formalism.UG.Final.GLintComm E w 2)
-        (GlobalTheory.LFun.Tj_mem_hecke hϖ j) (P.locRep w) x)
+    · have he :=
+        (hB.2 x
+          (GlobalTheory.LGrp.mem_fixed.2 fun k hk =>
+            Subtype.ext (Subtype.ext (funext fun z => hfix z k hk)))
+          hx.1).2.2.2 ϖ hϖ j hj
+      let ev : P.V →+ ℂ := {
+        toFun := fun ψ => ψ.1.1 (g * finGL E 2 (locGL E 2 w y))
+        map_zero' := rfl
+        map_add' := fun _ _ => rfl
+      }
+      have hs :=
+        ev.map_finsum (GlobalTheory.LFun.finite_heckeVec (Formalism.UG.Final.GLintComm E w 2)
+          (GlobalTheory.LFun.Tj_mem_hecke hϖ j) (P.locRep w) x)
       refine Eq.trans (finsum_congr fun c => ?_) (hs.symm.trans (congrArg ev he))
       rw [map_mul, map_mul, ← mul_assoc]
       rfl
   obtain ⟨R, -, -, hR⟩ := H.heckeExpl E w _ hϖ
   have hc := (hR α β _ (hEig g) 1).2
-  have hc' : x.1.1 (g * Matrix.GeneralLinearGroup.scalar (Fin 2) (H.idl w (Units.mk0 p hp0))) = (α : ℂ) * β * x.1.1 g := by
+  have hc'
+      : x.1.1 (g * Matrix.GeneralLinearGroup.scalar (Fin 2) (H.idl w (Units.mk0 p hp0)))
+        = (α : ℂ) * β * x.1.1 g := by
     simp only [one_mul, map_one, mul_one] at hc
     rw [← (H.lcLaws E w).2.2.2.2.1]
     exact hc
@@ -134,12 +160,14 @@ theorem UpperTheory.satake_param_mul_eq_central_char_pow_inertiaDeg :
   rw [sc_comm, hc'] at h2
   have h3 := mul_right_cancel₀ hg h2
   obtain ⟨y, hy, hv⟩ := norm_loc w (Units.mk0 p hp0) f hf
-  have hu : IsUnitAt (w.under (𝓞 ℚ)) (y * (atFin (w.under (𝓞 ℚ)) (unif (w.under (𝓞 ℚ))) ^ f)⁻¹) := by
+  have hu
+      : IsUnitAt (w.under (𝓞 ℚ)) (y * (atFin (w.under (𝓞 ℚ)) (unif (w.under (𝓞 ℚ))) ^ f)⁻¹) := by
     have hun := unif_spec (w.under (𝓞 ℚ))
     have hp' : Valued.v ((Units.mk0 p hp0 : (H.Kv w)ˣ) : H.Kv w) = WithZero.exp (-1 : ℤ) := hp
     unfold IsUnitAt
     unfold IsUnifAt at hun
-    rw [Units.val_mul, Units.val_inv_eq_inv_val, Units.val_pow_eq_pow_val, map_mul, map_inv₀, map_pow, hv, hp', hun]
+    rw [Units.val_mul, Units.val_inv_eq_inv_val, Units.val_pow_eq_pow_val, map_mul, map_inv₀,
+      map_pow, hv, hp', hun]
     exact mul_inv_cancel₀ (pow_ne_zero _ WithZero.exp_ne_zero)
   have h4 := hU _ hu
   rw [map_mul, map_inv, map_pow, mul_inv_eq_one] at h4

@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotDominates
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 namespace GlobalTheory.FieldPair.Place
@@ -47,14 +49,19 @@ end GlobalTheory.FieldPair.Place
 
 namespace GlobalTheory.FieldPair
 
-theorem dForm_comp_perm {k K : Type} [Field k] [Field K] (c : k →+* K) {n : ℕ} (x : Fin n → K)
-    (σ : Equiv.Perm (Fin n)) : dForm c (x ∘ σ) = Equiv.Perm.sign σ • dForm c x := by
+theorem dForm_comp_perm
+    {k K : Type} [Field k] [Field K] (c : k →+* K) {n : ℕ} (x : Fin n → K) (σ : Equiv.Perm (Fin n))
+    : dForm c (x ∘ σ) = Equiv.Perm.sign σ • dForm c x := by
   rw [dForm_eq, dForm_eq]
   exact (exteriorPower.ιMulti K n).map_perm (fun i => dFun c (x i)) σ
 
-theorem disc_dForm_perm_neg {k K : Type} [Field k] [CharZero k] [Field K] (c : k →+* K) (n : ℕ)
-    (x : Fin n → K) (σ : Equiv.Perm (Fin n)) (E : Place c) (φ : K →₀ ℚ) :
-    E.disc (dForm c (x ∘ σ)) φ = E.disc (dForm c x) φ ∧ E.disc (-dForm c x) φ = E.disc (dForm c x) φ := by
+theorem disc_dForm_perm_neg
+    {k K : Type} [Field k] [CharZero k] [Field K]
+    (c : k →+* K)
+    (n : ℕ) (x : Fin n → K) (σ : Equiv.Perm (Fin n))
+    (E : Place c) (φ : K →₀ ℚ)
+    : E.disc (dForm c (x ∘ σ)) φ = E.disc (dForm c x) φ
+      ∧ E.disc (- dForm c x) φ = E.disc (dForm c x) φ := by
   refine ⟨?_, E.disc_neg _ φ⟩
   rw [dForm_comp_perm]
   rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h

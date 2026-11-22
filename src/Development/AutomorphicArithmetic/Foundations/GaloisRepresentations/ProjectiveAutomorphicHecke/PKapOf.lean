@@ -6,14 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProductOfLoc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal
+  UpperTheory.Gal.CertificateRingHomMap
 open GlobalTheory.LFun (KGL)
 open scoped Classical
 
-private theorem scal_mem_KGL {E : Type} [Field E] [NumberField E] {n : ℕ} {u : Plc E}
-    (a b : GL (Fin n) (u.adicCompletion E)) (t q : u.adicCompletion E)
-    (ha : a.val = t • (1 : Matrix (Fin n) (Fin n) _)) (hb : b.val = q • (1 : Matrix (Fin n) (Fin n) _))
-    (hq : q ≠ 0) (hv : Valued.v t = Valued.v q) : a⁻¹ * b ∈ KGL u (n := n) := by
+private theorem scal_mem_KGL
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} {u : Plc E} (a b : GL (Fin n) (u.adicCompletion E)) (t q : u.adicCompletion E)
+    (ha : a.val = t • (1 : Matrix (Fin n) (Fin n) _))
+    (hb : b.val = q • (1 : Matrix (Fin n) (Fin n) _)) (hq : q ≠ 0) (hv : Valued.v t = Valued.v q)
+    : a⁻¹ * b ∈ KGL u (n := n) := by
   have hq' : Valued.v q ≠ 0 := (Valuation.ne_zero_iff _).2 hq
   have ht : t ≠ 0 := by
     rintro rfl
@@ -26,12 +30,12 @@ private theorem scal_mem_KGL {E : Type} [Field E] [NumberField E] {n : ℕ} {u :
     rw [Units.val_mul, hai, hb]; simp [smul_smul, mul_comm]
   have e2 : ((a⁻¹ * b)⁻¹).val = (q⁻¹ * t) • (1 : Matrix (Fin n) (Fin n) _) := by
     rw [_root_.mul_inv_rev, inv_inv, Units.val_mul, hbi, ha]; simp [smul_smul, mul_comm]
-  have v1 : Valued.v (t⁻¹ * q) = 1 := by
-    rw [map_mul, map_inv₀, hv, inv_mul_cancel₀ hq']
-  have v2 : Valued.v (q⁻¹ * t) = 1 := by
-    rw [map_mul, map_inv₀, hv, inv_mul_cancel₀ hq']
-  have key : ∀ (c : u.adicCompletion E), Valued.v c = 1 → ∀ i j,
-      Valued.v ((c • (1 : Matrix (Fin n) (Fin n) (u.adicCompletion E))) i j) ≤ 1 := by
+  have v1 : Valued.v (t⁻¹ * q) = 1 := by rw [map_mul, map_inv₀, hv, inv_mul_cancel₀ hq']
+  have v2 : Valued.v (q⁻¹ * t) = 1 := by rw [map_mul, map_inv₀, hv, inv_mul_cancel₀ hq']
+  have key
+      : ∀ (c : u.adicCompletion E),
+        Valued.v c = 1
+          → ∀ i j, Valued.v ((c • (1 : Matrix (Fin n) (Fin n) (u.adicCompletion E))) i j) ≤ 1 := by
     intro c hc i j
     rw [Matrix.smul_apply, Matrix.one_apply]
     split_ifs <;> simp [hc]
@@ -39,15 +43,19 @@ private theorem scal_mem_KGL {E : Type} [Field E] [NumberField E] {n : ℕ} {u :
   · rw [e1]; exact key _ v1 i j
   · rw [e2]; exact key _ v2 i j
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pKapOf_of :
-    UpperTheory.Gal.CertificateRingHomMap.FinToHecke → UpperTheory.Gal.CertificateRingHomMap.XiZeta → UpperTheory.Gal.CertificateRingHomMap.IntSim → UpperTheory.Gal.CertificateRingHomMap.LevOpen → UpperTheory.Gal.CertificateRingHomMap.KapOf := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pKapOf_of
+    : UpperTheory.Gal.CertificateRingHomMap.FinToHecke
+      → UpperTheory.Gal.CertificateRingHomMap.XiZeta → UpperTheory.Gal.CertificateRingHomMap.IntSim
+      → UpperTheory.Gal.CertificateRingHomMap.LevOpen
+      → UpperTheory.Gal.CertificateRingHomMap.KapOf := by
   intro hFH hXi hIS hLO E _ _ _ n hn x ζ hζ U W j Up w₀ S Kw hS χ hχ Φ ψ hΦ hψ
   obtain ⟨g₀, hg₀⟩ : ∃ g₀, Φ g₀ ≠ 0 := by
     by_contra h
     push_neg at h
     exact hΦ.ne (funext h)
   have cancel : ∀ a b : ℂ, a • Φ g₀ = b • Φ g₀ → a = b := fun a b h => smul_left_injective ℂ hg₀ h
-  have A : ∀ k ∈ lev S Kw, ∀ h : comp w₀ k ∈ Kw w₀, χ ⟨comp w₀ k, h⟩ = 1 → ∀ g, Φ (g * k) = Φ g := by
+  have A
+      : ∀ k ∈ lev S Kw, ∀ h : comp w₀ k ∈ Kw w₀, χ ⟨comp w₀ k, h⟩ = 1 → ∀ g, Φ (g * k) = Φ g := by
     intro k hk h h1 g
     rw [hΦ.right k hk h g, h1]
     simp
@@ -56,8 +64,10 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pKapOf_of :
     have h := hy g₀
     rw [hψ] at h
     exact Units.ext (cancel _ 1 (by simpa using h))
-  have C : ∀ k : GUf E n, (∀ u, comp u k ∈ KGL u (n := n)) → (∀ u ∈ S, comp u k = 1) → k ∈ lev S Kw :=
-    fun k h1 h2 => mem_lev.2 ⟨hIS E n hn k h1, fun u hu => by rw [h2 u hu]; exact one_mem _, fun u _ _ => h1 u⟩
+  have C
+      : ∀ k : GUf E n,
+        (∀ u, comp u k ∈ KGL u (n := n)) → (∀ u ∈ S, comp u k = 1) → k ∈ lev S Kw := fun k h1 h2 =>
+    mem_lev.2 ⟨hIS E n hn k h1, fun u hu => by rw [h2 u hu]; exact one_mem _, fun u _ _ => h1 u⟩
   have D : ∀ k ∈ lev S Kw, comp w₀ k = 1 → ∀ g, Φ (g * k) = Φ g := by
     intro k hk h1 g
     have h : comp w₀ k ∈ Kw w₀ := by rw [h1]; exact one_mem _
@@ -66,20 +76,23 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pKapOf_of :
     rw [e, map_one]
 
   have hKo : IsOpen ((χ.ker.map (Kw w₀).subtype : Subgroup (GLw n w₀)) : Set (GLw n w₀)) := by
-    have e : ((χ.ker.map (Kw w₀).subtype : Subgroup (GLw n w₀)) : Set (GLw n w₀)) =
-        Subtype.val '' {k : Kw w₀ | χ k = 1} := by
+    have e
+        : ((χ.ker.map (Kw w₀).subtype : Subgroup (GLw n w₀)) : Set (GLw n w₀))
+          = Subtype.val '' {k : Kw w₀ | χ k = 1} := by
       ext a
       simp [Subgroup.mem_map, MonoidHom.mem_ker]
     rw [e]
     exact (hS.opn w₀ hS.mem).isOpenMap_subtype_val _ hχ
-  have hK' := hLO E n S (Function.update Kw w₀ (χ.ker.map (Kw w₀).subtype)) (by
-    intro w hw
-    by_cases h : w = w₀
-    · subst h
-      simpa using hKo
-    · simpa [Function.update_of_ne h] using hS.opn w hw)
+  have hK' :=
+    hLO E n S (Function.update Kw w₀ (χ.ker.map (Kw w₀).subtype)) (by
+      intro w hw
+      by_cases h : w = w₀
+      · subst h
+        simpa using hKo
+      · simpa [Function.update_of_ne h] using hS.opn w hw)
   have hker : IsOpen (((ψ⁻¹).ker : Subgroup (Af E)ˣ) : Set (Af E)ˣ) := by
-    refine Subgroup.isOpen_mono (H₁ := (lev S (Function.update Kw w₀ (χ.ker.map (Kw w₀).subtype))).comap ζ) ?_
+    refine Subgroup.isOpen_mono
+      (H₁ := (lev S (Function.update Kw w₀ (χ.ker.map (Kw w₀).subtype))).comap ζ) ?_
       (hK'.preimage hζ.cont)
     intro y hy
     have hy' := mem_lev.1 (Subgroup.mem_comap.1 hy)
@@ -100,7 +113,8 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pKapOf_of :
       rw [e]
       exact ha
     rw [MonoidHom.mem_ker, MonoidHom.inv_apply, h1, inv_one]
-  have hprin : ∀ k : Eˣ, (((ψ⁻¹) (diagF E k) : ℂˣ) : ℂ) = (∏ φ : E →+* ℂ, φ (k : E) ^ mOf x W j φ)⁻¹ := by
+  have hprin
+      : ∀ k : Eˣ, (((ψ⁻¹) (diagF E k) : ℂˣ) : ℂ) = (∏ φ : E →+* ℂ, φ (k : E) ^ mOf x W j φ)⁻¹ := by
     intro k
     obtain ⟨γ, h1, h2⟩ := hXi E n W j x ζ hζ k
     have e : ((ψ (diagF E k) : ℂˣ) : ℂ) = ∏ φ : E →+* ℂ, φ (k : E) ^ mOf x W j φ := by
@@ -120,11 +134,12 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pKapOf_of :
       rw [hloc, MonoidHom.inv_apply]
     have hq : ∀ u : Plc E, ((Ideal.absNorm w.asIdeal : ℕ) : u.adicCompletion E) ≠ 0 := by
       intro u
-      have h0 : Ideal.absNorm w.asIdeal ≠ 0 := by
-        simpa [Ideal.absNorm_eq_zero_iff] using w.ne_bot
+      have h0 : Ideal.absNorm w.asIdeal ≠ 0 := by simpa [Ideal.absNorm_eq_zero_iff] using w.ne_bot
       exact Nat.cast_ne_zero.2 h0
-    have hc : ∀ u, comp u ((ζ (sgl w (atFin w (unif w))))⁻¹ * z) ∈ KGL u (n := n) ∧
-        (¬ SameK x (cj u) w → comp u ((ζ (sgl w (atFin w (unif w))))⁻¹ * z) = 1) := by
+    have hc
+        : ∀ u,
+          comp u ((ζ (sgl w (atFin w (unif w))))⁻¹ * z) ∈ KGL u (n := n)
+            ∧ (¬ SameK x (cj u) w → comp u ((ζ (sgl w (atFin w (unif w))))⁻¹ * z) = 1) := by
       intro u
       have hoff : ¬ SameK x (cj u) w → comp u ((ζ (sgl w (atFin w (unif w))))⁻¹ * z) = 1 := by
         intro h

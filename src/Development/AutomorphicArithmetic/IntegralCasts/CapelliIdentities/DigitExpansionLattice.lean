@@ -6,13 +6,13 @@ public import Mathlib
 
 open IsLocalRing
 
-theorem UpperTheory.digit_expansion_lattice :
-    ∀ {O Ω : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-        [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [NormedField Ω] [IsUltrametricDist Ω] [Algebra O Ω]
-        (hO : ∀ a : O, ‖algebraMap O Ω a‖ ≤ 1) (ϖ : O) (hϖ : Irreducible ϖ) (hlt : ‖algebraMap O Ω ϖ‖ < 1)
-        (S : Submodule O Ω) (hS : ∀ s ∈ S, ‖s‖ ≤ 1) (E : Finset Ω) (hE : ∀ e ∈ E, e ∈ S)
-        (hdig : ∀ s ∈ S, ∃ e ∈ E, ∃ s' ∈ S, s = e + ϖ • s'),
-        Module.Finite O S := by
+theorem UpperTheory.digit_expansion_lattice
+    : ∀ {O Ω : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [NormedField Ω] [IsUltrametricDist Ω]
+        [Algebra O Ω] (hO : ∀ a : O, ‖algebraMap O Ω a‖ ≤ 1) (ϖ : O) (hϖ : Irreducible ϖ)
+        (hlt : ‖algebraMap O Ω ϖ‖ < 1) (S : Submodule O Ω) (hS : ∀ s ∈ S, ‖s‖ ≤ 1) (E : Finset Ω)
+        (hE : ∀ e ∈ E, e ∈ S) (hdig : ∀ s ∈ S, ∃ e ∈ E, ∃ s' ∈ S, s = e + ϖ • s'),
+      Module.Finite O S := by
   intro O Ω _ _ _ _ _ _ _ hO ϖ hϖ hlt S hS E hE hdig
   classical
   have hI : maximalIdeal O = Ideal.span {ϖ} := hϖ.maximalIdeal_eq
@@ -23,8 +23,7 @@ theorem UpperTheory.digit_expansion_lattice :
       have h := hx n
       rw [SModEq.zero, hI, Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul] at h
       obtain ⟨t, -, rfl⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 h
-      have : (((ϖ ^ n) • t : S) : Ω) = algebraMap O Ω ϖ ^ n * (t : Ω) := by
-        simp [Algebra.smul_def]
+      have : (((ϖ ^ n) • t : S) : Ω) = algebraMap O Ω ϖ ^ n * (t : Ω) := by simp [Algebra.smul_def]
       rw [this, norm_mul, norm_pow]
       exact mul_le_of_le_one_right (by positivity) (hS _ t.2)
     have hlim : Filter.Tendsto (fun n : ℕ => ‖algebraMap O Ω ϖ‖ ^ n) Filter.atTop (nhds 0) :=
@@ -33,8 +32,9 @@ theorem UpperTheory.digit_expansion_lattice :
     exact Subtype.ext (norm_le_zero_iff.1 h0)
   have hpre : IsPrecomplete (maximalIdeal O) (E → O) := by
     refine ⟨fun g hg => ?_⟩
-    have hcoord : ∀ {m : ℕ} (x : E → O),
-        x ∈ (maximalIdeal O ^ m • ⊤ : Submodule O (E → O)) → ∀ i, x i ∈ maximalIdeal O ^ m := by
+    have hcoord
+        : ∀ {m : ℕ} (x : E → O),
+          x ∈ (maximalIdeal O ^ m • ⊤ : Submodule O (E → O)) → ∀ i, x i ∈ maximalIdeal O ^ m := by
       intro m x hx i
       have h := Submodule.mem_map_of_mem (f := (LinearMap.proj i : (E → O) →ₗ[O] O)) hx
       rw [Submodule.map_smul''] at h
@@ -43,7 +43,8 @@ theorem UpperTheory.digit_expansion_lattice :
       simpa using h2
     have hc : ∀ i : E, ∃ L : O, ∀ n, g n i ≡ L [SMOD (maximalIdeal O ^ n • ⊤ : Submodule O O)] := by
       intro i
-      refine IsPrecomplete.prec (I := maximalIdeal O) (M := O) inferInstance (f := fun n => g n i) ?_
+      refine
+        IsPrecomplete.prec (I := maximalIdeal O) (M := O) inferInstance (f := fun n => g n i) ?_
       intro m n hmn
       have h := (SModEq.sub_mem.1 (hg hmn))
       refine SModEq.sub_mem.2 ?_

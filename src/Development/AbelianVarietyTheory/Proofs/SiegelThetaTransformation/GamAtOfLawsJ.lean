@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CoreArith
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra ReciprocityTheory.ChartRestriction.G.PullbackSections GlobalTheory.RunIn
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.BasicNotions
+  Formalism.MainNotions Formalism.MainNotions.WeightAlgebra
+  ReciprocityTheory.ChartRestriction.G.PullbackSections GlobalTheory.RunIn
 
 namespace GlobalTheory.RunIn
 
@@ -31,15 +34,18 @@ theorem gamAt_of_lawsM (D : D7) (T : Core D) (h : LawsM T) : GamAt T := by
     simpa [ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level.GoodAt, h0] using this
   have hU := (Formalism.L2.PjFree.isUnf_ofPj (T.U j σ)).2 (h.unf j hj σ hσ)
   obtain ⟨γ', hγ', u, n, hn, hu, he⟩ :=
-    GlobalTheory.unf_group_contains_congruence_upto_rootsOfUnity _ _ _ _ _ _ _ _ _ hU hA hr k γ hst hc
+    GlobalTheory.unf_group_contains_congruence_upto_rootsOfUnity _ _ _ _ _ _ _ _ _ hU hA hr k γ hst
+      hc
   obtain ⟨th, hrk, hth, hD⟩ := h.dictU j hj σ hσ
-  have hc' : ∀ x ∈ ((T.U j σ).X k).Λ, ∃ y ∈ ((T.U j σ).X k).Λ,
-      Matrix.mulVec (γ : Matrix (Fin D.R.r) (Fin D.R.r) D.host.E) x - x =
-        ((D.host.g 0 * D.host.g 1 : ℕ) : D.host.E) • y := by
+  have hc'
+      : ∀ x ∈ ((T.U j σ).X k).Λ, ∃ y ∈ ((T.U j σ).X k).Λ,
+        Matrix.mulVec (γ : Matrix (Fin D.R.r) (Fin D.R.r) D.host.E) x - x
+          = ((D.host.g 0 * D.host.g 1 : ℕ) : D.host.E) • y := by
     rw [← hM]; exact hc
   have hu1 : u = 1 :=
-    GlobalTheory.PrincCore.root_eq_one (T.V j σ) hrk hr (T.U j σ).X (T.dict j σ) (T.mu j σ) (T.Kf j σ) th hth hD
-      (h.muUnit j hj σ hσ) (D.host.g 0 * D.host.g 1) (hM ▸ h3) (h.levelK j hj σ hσ) k γ γ' hγ' hc' u n hn hu he
+    GlobalTheory.PrincCore.root_eq_one (T.V j σ) hrk hr (T.U j σ).X (T.dict j σ) (T.mu j σ)
+      (T.Kf j σ) th hth hD (h.muUnit j hj σ hσ) (D.host.g 0 * D.host.g 1) (hM ▸ h3)
+      (h.levelK j hj σ hσ) k γ γ' hγ' hc' u n hn hu he
   have hγγ : γ' = γ := by
     ext a b
     have := congrFun (congrFun he a) b

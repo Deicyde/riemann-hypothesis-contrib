@@ -12,34 +12,48 @@ namespace ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-def lowerWedgeAlt (ε : Fin n → Bool) : LfIdx ε :=
-  ⟨(lfPhysModes ε).filter fun m => (finProdFinEquiv.symm m).2 < (finProdFinEquiv.symm m).1, filter_subset _ _⟩
+def lowerWedgeAlt (ε : Fin n → Bool) : LfIdx ε := ⟨
+  (lfPhysModes ε).filter fun m => (finProdFinEquiv.symm m).2 < (finProdFinEquiv.symm m).1,
+  filter_subset _ _
+⟩
 
-theorem mem_lowerWedge_iff (ε : Fin n → Bool) (x : Fin n × Fin n) :
-    finProdFinEquiv x ∈ (lowerWedgeAlt ε).1 ↔ ε x.1 = true ∧ ε x.2 = false ∧ x.2 < x.1 := by
-  simp only [lowerWedgeAlt, lfPhysModes, Finset.mem_filter, Finset.mem_univ, true_and, Equiv.symm_apply_apply,
-    and_assoc]
+theorem mem_lowerWedge_iff (ε : Fin n → Bool) (x : Fin n × Fin n)
+    : finProdFinEquiv x ∈ (lowerWedgeAlt ε).1 ↔ ε x.1 = true ∧ ε x.2 = false ∧ x.2 < x.1 := by
+  simp only [lowerWedgeAlt, lfPhysModes, Finset.mem_filter, Finset.mem_univ, true_and,
+    Equiv.symm_apply_apply, and_assoc]
 
-theorem lf_rhoHol_sub_rhoN (ε : Fin n → Bool) (c : Fin n) :
-    (rhoHol ε - rhoN ε) c = if ε c = true then ((univ.filter fun a => ε a = false ∧ a < c).card : ℝ)
-      else -((univ.filter fun i => ε i = true ∧ c < i).card : ℝ) := by
+theorem lf_rhoHol_sub_rhoN (ε : Fin n → Bool) (c : Fin n)
+    : (rhoHol ε - rhoN ε) c
+      = if ε c = true then
+          ((univ.filter fun a => ε a = false ∧ a < c).card : ℝ)
+        else
+          -((univ.filter fun i => ε i = true ∧ c < i).card : ℝ) := by
   rw [cfa_rho_coord]
   cases hc : ε c <;> simp [hc, Finset.sum_boole]
 
-theorem lowerWedge_weight (ε : Fin n → Bool) (c : Fin n) :
-    sgE ε cpFock cmFock c c (fockBasis n (lowerWedgeAlt ε).1) =
-      (((rhoHol ε - rhoN ε) c : ℝ) : ℂ) • fockBasis n (lowerWedgeAlt ε).1 := by
+theorem lowerWedge_weight (ε : Fin n → Bool) (c : Fin n)
+    : sgE ε cpFock cmFock c c (fockBasis n (lowerWedgeAlt ε).1)
+      = (((rhoHol ε - rhoN ε) c : ℝ) : ℂ) • fockBasis n (lowerWedgeAlt ε).1 := by
   have hw : fockWt ε (lowerWedgeAlt ε).1 c = (rhoHol ε - rhoN ε) c := by
     rw [cfa_rho_coord, fockWt, Finset.sum_apply]
-    have hS : (lowerWedgeAlt ε).1 = univ.filter fun k => ε (finProdFinEquiv.symm k).1 = true ∧
-        ε (finProdFinEquiv.symm k).2 = false ∧ (finProdFinEquiv.symm k).2 < (finProdFinEquiv.symm k).1 := by
+    have hS
+        : (lowerWedgeAlt ε).1
+          = univ.filter fun k =>
+            ε (finProdFinEquiv.symm k).1 = true ∧ ε (finProdFinEquiv.symm k).2 = false
+              ∧ (finProdFinEquiv.symm k).2 < (finProdFinEquiv.symm k).1 := by
       ext k
-      simp only [lowerWedgeAlt, lfPhysModes, Finset.mem_filter, Finset.mem_univ, true_and, and_assoc]
+      simp only [lowerWedgeAlt, lfPhysModes, Finset.mem_filter, Finset.mem_univ, true_and,
+        and_assoc]
     rw [hS, Finset.sum_filter, ← Equiv.sum_comp finProdFinEquiv, Fintype.sum_prod_type]
     simp only [Equiv.symm_apply_apply]
-    have key : ∀ i b : Fin n, (if ε i = true ∧ ε b = false ∧ b < i then modeWt ε (i, b) c else 0) =
-        (if c = i then (if ε i = true ∧ ε b = false ∧ b < i then (1 : ℝ) else 0) else 0) -
-        (if c = b then (if ε i = true ∧ ε b = false ∧ b < i then (1 : ℝ) else 0) else 0) := by
+    have key
+        : ∀ i b : Fin n,
+          (if ε i = true ∧ ε b = false ∧ b < i then modeWt ε (i, b) c else 0)
+            = (if c = i then (if ε i = true ∧ ε b = false ∧ b < i then (1 : ℝ) else 0) else 0)
+              - (if c = b then
+                   (if ε i = true ∧ ε b = false ∧ b < i then (1 : ℝ) else 0)
+                 else
+                   0) := by
       intro i b
       by_cases h : ε i = true ∧ ε b = false ∧ b < i
       · simp only [if_pos h]
@@ -54,8 +68,9 @@ theorem lowerWedge_weight (ε : Fin n → Bool) (c : Fin n) :
     · simp
   rw [fockBasis_wt, hw]
 
-theorem lowerWedge_killed_by_lowering (ε : Fin n → Bool) {a b : Fin n} (hba : b < a) (he : ε a = ε b) :
-    sgE ε cpFock cmFock a b (fockBasis n (lowerWedgeAlt ε).1) = 0 := by
+theorem lowerWedge_killed_by_lowering
+    (ε : Fin n → Bool) {a b : Fin n} (hba : b < a) (he : ε a = ε b)
+    : sgE ε cpFock cmFock a b (fockBasis n (lowerWedgeAlt ε).1) = 0 := by
   have hab : a ≠ b := (ne_of_lt hba).symm
   unfold sgE
   split_ifs with h1 h2
@@ -70,8 +85,10 @@ theorem lowerWedge_killed_by_lowering (ε : Fin n → Bool) {a b : Fin n} (hba :
       have hxb : x < b := ((mem_lowerWedge_iff ε (b, x)).1 hbx).2.2
       have hmem : finProdFinEquiv (a, x) ∈ (lowerWedgeAlt ε).1.erase (finProdFinEquiv (b, x)) := by
         rw [Finset.mem_erase]
-        exact ⟨fun h => hab (congrArg Prod.fst (finProdFinEquiv.injective h)),
-          (mem_lowerWedge_iff ε (a, x)).2 ⟨h1.1, hxm, hxb.trans hba⟩⟩
+        exact ⟨
+          fun h => hab (congrArg Prod.fst (finProdFinEquiv.injective h)),
+          (mem_lowerWedge_iff ε (a, x)).2 ⟨h1.1, hxm, hxb.trans hba⟩
+        ⟩
       have h0 := lf_cp_basis_of_mem (x := (a, x)) hmem
       dsimp only at h0
       rw [h0, smul_zero]
@@ -89,8 +106,10 @@ theorem lowerWedge_killed_by_lowering (ε : Fin n → Bool) {a b : Fin n} (hba :
       have hai : a < i := ((mem_lowerWedge_iff ε (i, a)).1 hia).2.2
       have hmem : finProdFinEquiv (i, b) ∈ (lowerWedgeAlt ε).1.erase (finProdFinEquiv (i, a)) := by
         rw [Finset.mem_erase]
-        exact ⟨fun h => hab (congrArg Prod.snd (finProdFinEquiv.injective h)).symm,
-          (mem_lowerWedge_iff ε (i, b)).2 ⟨hip, h2.2, hba.trans hai⟩⟩
+        exact ⟨
+          fun h => hab (congrArg Prod.snd (finProdFinEquiv.injective h)).symm,
+          (mem_lowerWedge_iff ε (i, b)).2 ⟨hip, h2.2, hba.trans hai⟩
+        ⟩
       have h0 := lf_cp_basis_of_mem (x := (i, b)) hmem
       dsimp only at h0
       rw [h0, smul_zero]

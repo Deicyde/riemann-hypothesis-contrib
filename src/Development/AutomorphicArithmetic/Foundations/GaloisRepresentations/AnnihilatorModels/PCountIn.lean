@@ -8,11 +8,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.countIn_of :
-    CountIn := by
+theorem UpperTheory.Gal.crystallineComparison.countIn_of : CountIn := by
   intro k H _ _ _ _ C hC
-  have key : ∀ D : Submodule k H, Module.finrank k D
-      = Module.finrank k (Submodule.map C.mkQ D) + Module.finrank k ↥(D ⊓ C) := by
+  have key
+      : ∀ D : Submodule k H,
+        Module.finrank k D
+          = Module.finrank k (Submodule.map C.mkQ D) + Module.finrank k ↥(D ⊓ C) := by
     intro D
     have h := (C.mkQ.domRestrict D).finrank_range_add_finrank_ker
     rw [LinearMap.range_domRestrict, LinearMap.ker_domRestrict, Submodule.ker_mkQ] at h

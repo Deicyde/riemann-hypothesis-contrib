@@ -17,7 +17,9 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SmulEq
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct ContDiff Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -25,7 +27,15 @@ open GlobalTheory.Unf
 
 namespace GlobalTheory.HeisNearZero
 
-theorem heisO_near_zero_unif : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (A T : HSp D) (q : WO A T → ℂ), Continuous q → (∀ (γ : Matrix (Fin T.rank) (Fin A.rank) D.host.E) (u : WO A T), q (ratW T A γ + u) = ψ (-(symplOH A T (ratW T A γ) u)) * q u) → ∀ ε : ℝ, 0 < ε → ∃ N ∈ 𝓝 (0 : WO A T), ∀ a ∈ N, ∀ w, ‖heisO ψ A T a q w - q w‖ ≤ ε := by
+theorem heisO_near_zero_unif
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1)
+        → ∀ (A T : HSp D) (q : WO A T → ℂ),
+          Continuous q
+            → (∀ (γ : Matrix (Fin T.rank) (Fin A.rank) D.host.E) (u : WO A T),
+              q (ratW T A γ + u) = ψ (-(symplOH A T (ratW T A γ) u)) * q u)
+            → ∀ ε : ℝ,
+              0 < ε → ∃ N ∈ 𝓝 (0 : WO A T), ∀ a ∈ N, ∀ w, ‖heisO ψ A T a q w - q w‖ ≤ ε := by
   intro D ψ hψ A T q hq hlaw ε hε
   obtain ⟨i1, i2, i3, i4, i5, K, hK, hKc⟩ := GlobalTheory.MixModel.lattice_Mx D T.rank A.rank
   have hc : Continuous ψ := hψ.1.1
@@ -34,10 +44,12 @@ theorem heisO_near_zero_unif : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), Is
   have hΦ : Continuous Φ := by
     have h1 : Continuous fun p : WO A T × WO A T => symplOH A T p.2 p.1 :=
       GlobalTheory.OrientedHeis.continuous_symplOH continuous_snd continuous_fst
-    exact ((hc.comp h1).mul (hq.comp (continuous_snd.add continuous_fst))).sub (hq.comp continuous_snd)
+    exact ((hc.comp h1).mul (hq.comp (continuous_snd.add continuous_fst))).sub
+      (hq.comp continuous_snd)
   have hΦ0 : ∀ w, Φ (0, w) = 0 := by
     intro w
-    simp only [Φ, heisO, GlobalTheory.MixModel.symplOH_zero_right, AddChar.map_zero_eq_one, one_mul, add_zero, sub_self]
+    simp only [Φ, heisO, GlobalTheory.MixModel.symplOH_zero_right, AddChar.map_zero_eq_one, one_mul,
+      add_zero, sub_self]
   have hev : ∀ᶠ a in 𝓝 (0 : WO A T), ∀ w ∈ K, ‖Φ (a, w)‖ < ε := by
     refine hK.eventually_forall_of_forall_eventually fun w _ => ?_
     have ht : Filter.Tendsto Φ (𝓝 ((0 : WO A T), w)) (𝓝 0) := by
@@ -46,9 +58,11 @@ theorem heisO_near_zero_unif : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), Is
   refine ⟨_, hev, fun a ha w => ?_⟩
   obtain ⟨g, hg, hgw⟩ := hKc w
   obtain ⟨γ, rfl⟩ := GlobalTheory.MixModel.mem_ratMx.1 hg
-  have e : Φ (a, GlobalTheory.MixModel.rat γ + w) = ψ (-(symplOH A T (ratW T A γ) w)) * Φ (a, w) := by
+  have e
+      : Φ (a, GlobalTheory.MixModel.rat γ + w) = ψ (-(symplOH A T (ratW T A γ) w)) * Φ (a, w) := by
     simp only [Φ]
-    rw [← GlobalTheory.MixModel.ratW_eq, GlobalTheory.OrientedHeis.heisO_quasi a q hlaw γ w, hlaw γ w, mul_sub]
+    rw [← GlobalTheory.MixModel.ratW_eq, GlobalTheory.OrientedHeis.heisO_quasi a q hlaw γ w,
+      hlaw γ w, mul_sub]
   have h := ha _ hgw
   rw [e, norm_mul, hn, one_mul] at h
   exact h.le

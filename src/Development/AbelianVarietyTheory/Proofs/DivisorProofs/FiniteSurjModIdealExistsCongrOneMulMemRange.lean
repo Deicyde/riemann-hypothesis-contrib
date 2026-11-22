@@ -11,10 +11,12 @@ open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.AbLaw GlobalTheory.Fo
 
 namespace GlobalTheory
 
-theorem finite_surj_mod_ideal_exists_congr_one_mul_mem_range :
-    ∀ (B C : Type) [CommRing B] [CommRing C] (f : B →+* C), f.Finite → ∀ J : Ideal B,
-      Function.Surjective ((Ideal.Quotient.mk (J.map f)).comp f) →
-      ∃ r : B, r - 1 ∈ J ∧ ∀ c : C, ∃ b : B, f r * c = f b := by
+theorem finite_surj_mod_ideal_exists_congr_one_mul_mem_range
+    : ∀ (B C : Type) [CommRing B] [CommRing C] (f : B →+* C),
+      f.Finite
+        → ∀ J : Ideal B,
+          Function.Surjective ((Ideal.Quotient.mk (J.map f)).comp f)
+            → ∃ r : B, r - 1 ∈ J ∧ ∀ c : C, ∃ b : B, f r * c = f b := by
   intro B C _ _ f hf J hs
   letI := f.toAlgebra
   haveI : Module.Finite B C := hf
@@ -32,8 +34,8 @@ theorem finite_surj_mod_ideal_exists_congr_one_mul_mem_range :
     have h1 : P.mkQ (c - f b) ∈ (J • (⊤ : Submodule B C)).map P.mkQ := Submodule.mem_map_of_mem hy
     rw [Submodule.map_smul''] at h1
     exact Submodule.smul_mono le_rfl le_top h1
-  obtain ⟨r, hr1, hr⟩ := Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul J ⊤
-    Module.Finite.fg_top hle
+  obtain ⟨r, hr1, hr⟩ :=
+    Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul J ⊤ Module.Finite.fg_top hle
   refine ⟨r, hr1, fun c => ?_⟩
   have h := hr (P.mkQ c) trivial
   rw [← map_smul, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at h

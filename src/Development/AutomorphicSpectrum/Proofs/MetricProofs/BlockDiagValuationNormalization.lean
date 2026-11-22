@@ -9,17 +9,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsOfValI
 
 noncomputable section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.IwBlock
 
-theorem exists_blocks_add {L : Type} [Field L] (V : ValuationSubring L) (n m : ℕ)
-    (A : Matrix (Fin (n + m)) (Fin (n + m)) L)
-    (hA : ∀ a b : Fin (n + m), ¬ ((a : ℕ) < n ↔ (b : ℕ) < n) → A a b = 0) (hd : A.det ≠ 0) :
-    ∃ (K : Matrix (Fin (n + m)) (Fin (n + m)) V) (U : Matrix (Fin (n + m)) (Fin (n + m)) L),
-      IsUnit K.det ∧ (∀ a b : Fin (n + m), ¬ ((a : ℕ) < n ↔ (b : ℕ) < n) → U a b = 0) ∧
-      U.BlockTriangular id ∧ (∀ a, U a a ≠ 0) ∧ A = K.map (algebraMap V L) * U := by
+theorem exists_blocks_add
+    {L : Type} [Field L]
+    (V : ValuationSubring L)
+    (n m : ℕ) (A : Matrix (Fin (n + m)) (Fin (n + m)) L)
+    (hA : ∀ a b : Fin (n + m), ¬((a : ℕ) < n ↔ (b : ℕ) < n) → A a b = 0) (hd : A.det ≠ 0)
+    : ∃ (K : Matrix (Fin (n + m)) (Fin (n + m)) V) (U : Matrix (Fin (n + m)) (Fin (n + m)) L),
+      IsUnit K.det ∧ (∀ a b : Fin (n + m), ¬((a : ℕ) < n ↔ (b : ℕ) < n) → U a b = 0)
+        ∧ U.BlockTriangular id ∧ (∀ a, U a a ≠ 0) ∧ A = K.map (algebraMap V L) * U := by
   let e : Fin n ⊕ Fin m ≃ Fin (n + m) := finSumFinEquiv
   let A₁ : Matrix (Fin n) (Fin n) L := fun i k => A (e (Sum.inl i)) (e (Sum.inl k))
   let A₂ : Matrix (Fin m) (Fin m) L := fun i k => A (e (Sum.inr i)) (e (Sum.inr k))
@@ -36,10 +42,19 @@ theorem exists_blocks_add {L : Type} [Field L] (V : ValuationSubring L) (n m : �
   have hdet : A₁.det * A₂.det ≠ 0 := by
     rw [← det_fromBlocks_zero₂₁ A₁ 0 A₂, ← hB, det_submatrix_equiv_self]
     exact hd
-  obtain ⟨k₁, U₁, hk₁, hU₁, hd₁, e₁⟩ := GlobalTheory.ValIwasawa.iwasawa_matrix (V := V) A₁ (left_ne_zero_of_mul hdet)
-  obtain ⟨k₂, U₂, hk₂, hU₂, hd₂, e₂⟩ := GlobalTheory.ValIwasawa.iwasawa_matrix (V := V) A₂ (right_ne_zero_of_mul hdet)
-  refine ⟨(fromBlocks k₁ 0 0 k₂).submatrix e.symm e.symm, (fromBlocks U₁ 0 0 U₂).submatrix e.symm e.symm,
-    ?_, ?_, ?_, ?_, ?_⟩
+  obtain ⟨k₁, U₁, hk₁, hU₁, hd₁, e₁⟩ :=
+    GlobalTheory.ValIwasawa.iwasawa_matrix (V := V) A₁ (left_ne_zero_of_mul hdet)
+  obtain ⟨k₂, U₂, hk₂, hU₂, hd₂, e₂⟩ :=
+    GlobalTheory.ValIwasawa.iwasawa_matrix (V := V) A₂ (right_ne_zero_of_mul hdet)
+  refine ⟨
+    (fromBlocks k₁ 0 0 k₂).submatrix e.symm e.symm,
+    (fromBlocks U₁ 0 0 U₂).submatrix e.symm e.symm,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [det_submatrix_equiv_self, det_fromBlocks_zero₂₁]
     exact hk₁.mul hk₂
   · intro a b h
@@ -66,40 +81,52 @@ theorem exists_blocks_add {L : Type} [Field L] (V : ValuationSubring L) (n m : �
     rcases x with i | i
     · simpa using hd₁ i
     · simpa using hd₂ i
-  · have h1 : A = (fromBlocks A₁ 0 0 A₂).submatrix e.symm e.symm := by
-      rw [← hB]; ext a b; simp
-    have h3 : fromBlocks A₁ 0 0 A₂ =
-        (fromBlocks k₁ 0 0 k₂).map (algebraMap V L) * fromBlocks U₁ 0 0 U₂ := by
+  · have h1 : A = (fromBlocks A₁ 0 0 A₂).submatrix e.symm e.symm := by rw [← hB]; ext a b; simp
+    have h3
+        : fromBlocks A₁ 0 0 A₂
+          = (fromBlocks k₁ 0 0 k₂).map (algebraMap V L) * fromBlocks U₁ 0 0 U₂ := by
       rw [fromBlocks_map, fromBlocks_multiply, ← e₁, ← e₂,
-        Matrix.map_zero _ (map_zero (algebraMap V L)), Matrix.map_zero _ (map_zero (algebraMap V L))]
+        Matrix.map_zero _ (map_zero (algebraMap V L)),
+        Matrix.map_zero _ (map_zero (algebraMap V L))]
       simp
     rw [h1, h3, ← submatrix_mul_equiv _ _ _ e.symm _]
     rfl
 
-theorem exists_blocks {L : Type} [Field L] (V : ValuationSubring L) (N n : ℕ) (hn : n ≤ N)
-    (A : Matrix (Fin N) (Fin N) L)
-    (hA : ∀ a b : Fin N, ¬ ((a : ℕ) < n ↔ (b : ℕ) < n) → A a b = 0) (hd : A.det ≠ 0) :
-    ∃ (K : Matrix (Fin N) (Fin N) V) (U : Matrix (Fin N) (Fin N) L),
-      IsUnit K.det ∧ (∀ a b : Fin N, ¬ ((a : ℕ) < n ↔ (b : ℕ) < n) → U a b = 0) ∧
-      U.BlockTriangular id ∧ (∀ a, U a a ≠ 0) ∧ A = K.map (algebraMap V L) * U := by
+theorem exists_blocks
+    {L : Type} [Field L]
+    (V : ValuationSubring L)
+    (N n : ℕ) (hn : n ≤ N) (A : Matrix (Fin N) (Fin N) L)
+    (hA : ∀ a b : Fin N, ¬((a : ℕ) < n ↔ (b : ℕ) < n) → A a b = 0) (hd : A.det ≠ 0)
+    : ∃ (K : Matrix (Fin N) (Fin N) V) (U : Matrix (Fin N) (Fin N) L),
+      IsUnit K.det ∧ (∀ a b : Fin N, ¬((a : ℕ) < n ↔ (b : ℕ) < n) → U a b = 0)
+        ∧ U.BlockTriangular id ∧ (∀ a, U a a ≠ 0) ∧ A = K.map (algebraMap V L) * U := by
   obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hn
   exact exists_blocks_add V n m A hA hd
 
-theorem inv_diag_ne_zero {L : Type} [Field L] {N : ℕ} {U : Matrix (Fin N) (Fin N) L}
-    (hU : U.BlockTriangular id) (hd : IsUnit U.det) (a : Fin N) : U⁻¹ a a ≠ 0 := by
+theorem inv_diag_ne_zero
+    {L : Type} [Field L]
+    {N : ℕ} {U : Matrix (Fin N) (Fin N) L}
+    (hU : U.BlockTriangular id) (hd : IsUnit U.det) (a : Fin N)
+    : U⁻¹ a a ≠ 0 := by
   have hI : U⁻¹.BlockTriangular id := by
     letI := Matrix.invertibleOfIsUnitDet U hd
     exact blockTriangular_inv_of_blockTriangular hU
   intro e
   have h := congrFun (congrFun (nonsing_inv_mul U hd) a) a
   rw [Matrix.mul_apply, Matrix.one_apply_eq, Finset.sum_eq_single a (fun c _ hc => ?_) (by simp), e,
-    zero_mul] at h
+      zero_mul]
+    at h
   · exact zero_ne_one h
   · rcases lt_or_gt_of_ne hc with l | l
     · rw [hI l, zero_mul]
     · rw [hU l, mul_zero]
 
-theorem main : ∀ (L : Type) [Field L] (V : ValuationSubring L) (N j : ℕ) (A : Matrix (Fin N) (Fin N) L), IsBlockDiag j A → A.det ≠ 0 → ∃ b : Matrix (Fin N) (Fin N) L, IsBlockDiag j b ∧ b.BlockTriangular id ∧ (∀ a, b a a ≠ 0) ∧ (∀ a c, (A * b) a c ∈ V) ∧ (A * b).det ≠ 0 ∧ ((A * b).det)⁻¹ ∈ V := by
+theorem main
+    : ∀ (L : Type) [Field L] (V : ValuationSubring L) (N j : ℕ) (A : Matrix (Fin N) (Fin N) L),
+      IsBlockDiag j A → A.det ≠ 0
+        → ∃ b : Matrix (Fin N) (Fin N) L,
+          IsBlockDiag j b ∧ b.BlockTriangular id ∧ (∀ a, b a a ≠ 0) ∧ (∀ a c, (A * b) a c ∈ V)
+            ∧ (A * b).det ≠ 0 ∧ ((A * b).det)⁻¹ ∈ V := by
   intro L _ V N j A hA hd
   obtain ⟨K, U, hK, hUb, hUt, hUd, hAe⟩ := exists_blocks V N (N - j) (Nat.sub_le N j) A hA hd
   have hUdet : IsUnit U.det := by

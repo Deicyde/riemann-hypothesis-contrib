@@ -7,7 +7,16 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.real_tower_A1 : PB.Inputs → ∀ II : IntersectionSystem, IsFullIntersectionSystem II → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (R : RealTower T), R.Smooth → R.Flat → R.Pos → T.A1 := by
-  first | exact @GlobalTheory.CompanionTheory.Ar.Top.tower_A1_of_real_tower | exact GlobalTheory.CompanionTheory.Ar.Top.tower_A1_of_real_tower | (intros; apply GlobalTheory.CompanionTheory.Ar.Top.tower_A1_of_real_tower <;> assumption)
+theorem _root_.GlobalTheory.T.real_tower_A1
+    : PB.Inputs
+      → ∀ II : IntersectionSystem,
+        IsFullIntersectionSystem II
+          → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (R : RealTower T),
+            R.Smooth → R.Flat → R.Pos → T.A1 := by
+  first
+  | exact @GlobalTheory.CompanionTheory.Ar.Top.tower_A1_of_real_tower
+  | exact GlobalTheory.CompanionTheory.Ar.Top.tower_A1_of_real_tower
+  | (intros; apply GlobalTheory.CompanionTheory.Ar.Top.tower_A1_of_real_tower <;> assumption)

@@ -10,17 +10,19 @@ noncomputable section
 
 namespace Formalism.L2.Geo.ExtensionFiltration.ExtInvS7cd
 
-open Formalism.BasicNotions Formalism.HN Formalism.HermitianLatticesTheory Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.L2.Geo.ExtensionFiltration.ExtInvSk
+open Formalism.BasicNotions Formalism.HN Formalism.HermitianLatticesTheory
+  Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.L2.Geo.ExtensionFiltration.ExtInvSk
 
 section ExtensionInterSubspace
 
-variable {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem exists_compl_inf (L : Submodule (𝓞 K) V) (hL : L.FG) (W₀ : Submodule K V) :
-    ∃ C : Submodule (𝓞 K) V, C ≤ L ∧
-      (∀ x ∈ L, ∃ a ∈ L ⊓ W₀.restrictScalars (𝓞 K), ∃ c ∈ C, x = a + c) ∧
-      ∀ u ∈ Submodule.span K (C : Set V), u ∈ W₀ → u = 0 := by
+theorem exists_compl_inf (L : Submodule (𝓞 K) V) (hL : L.FG) (W₀ : Submodule K V)
+    : ∃ C : Submodule (𝓞 K) V,
+      C ≤ L ∧ (∀ x ∈ L, ∃ a ∈ L ⊓ W₀.restrictScalars (𝓞 K), ∃ c ∈ C, x = a + c)
+        ∧ ∀ u ∈ Submodule.span K (C : Set V), u ∈ W₀ → u = 0 := by
   classical
   let N : Submodule (𝓞 K) L := (W₀.restrictScalars (𝓞 K)).comap L.subtype
   have htor : Submodule.torsion (𝓞 K) (L ⧸ N) = ⊥ := by
@@ -55,8 +57,13 @@ theorem exists_compl_inf (L : Submodule (𝓞 K) V) (hL : L.FG) (W₀ : Submodul
       have := hs' (N.mkQ ⟨x, hx⟩)
       simp only [Submodule.mkQ_apply] at this ⊢
       rw [this, sub_self]
-    refine ⟨x - (s (N.mkQ ⟨x, hx⟩) : V), ⟨L.sub_mem hx (s _).2, hmem⟩,
-      (s (N.mkQ ⟨x, hx⟩) : V), ⟨s (N.mkQ ⟨x, hx⟩), ⟨_, rfl⟩, rfl⟩, by abel⟩
+    refine ⟨
+      x - (s (N.mkQ ⟨x, hx⟩) : V),
+      ⟨L.sub_mem hx (s _).2, hmem⟩,
+      (s (N.mkQ ⟨x, hx⟩) : V),
+      ⟨s (N.mkQ ⟨x, hx⟩), ⟨_, rfl⟩, rfl⟩,
+      by abel
+    ⟩
   · intro u hu huW
     obtain ⟨d, hd, hdu⟩ := Formalism.LFunctionChainParameters.LLcv.span_le_locS _ hu
     obtain ⟨_, ⟨q, rfl⟩, hq⟩ := hdu
@@ -66,8 +73,7 @@ theorem exists_compl_inf (L : Submodule (𝓞 K) V) (hL : L.FG) (W₀ : Submodul
     have hq0 : q = 0 := by
       rw [← hs' q]
       exact (Submodule.Quotient.mk_eq_zero N).2 hW
-    have h5 : d • u = 0 := by
-      rw [← hq, hq0, map_zero, map_zero]
+    have h5 : d • u = 0 := by rw [← hq, hq0, map_zero, map_zero]
     rw [← algebraMap_smul K d u] at h5
     exact (smul_eq_zero.1 h5).resolve_left (IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hd)
 
@@ -75,7 +81,9 @@ end ExtensionInterSubspace
 
 section Transport
 
-variable {R : Type*} [Ring R] {V : Type*} [AddCommGroup V] [Module R V]
+variable
+  {R : Type*} [Ring R]
+  {V : Type*} [AddCommGroup V] [Module R V]
   {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
 
 end Transport

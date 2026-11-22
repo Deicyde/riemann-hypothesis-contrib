@@ -22,8 +22,12 @@ namespace CrystallineSemistableComparison.D
 
 variable (l : ℕ) [Fact l.Prime]
 
-theorem powers_good (h : ObFacts l) (N : Type) [AddCommGroup N] [Module (Ob l) N] (M : ℕ) (hN : ∀ x : N, pFlat l ^ M • x = 0)
-    (A : PfC l (Ob l)) : ∃ P : Powers (testι l ⋙ toPf l) A,
+theorem powers_good
+    (h : ObFacts l)
+    (N : Type) [AddCommGroup N] [Module (Ob l) N]
+    (M : ℕ) (hN : ∀ x : N, pFlat l ^ M • x = 0)
+    (A : PfC l (Ob l))
+    : ∃ P : Powers (testι l ⋙ toPf l) A,
       P.Good (testι l ⋙ toPf l) (tensF l (Ob l) N) (Ideal.span (Set.range (rt l))) := by
   obtain ⟨_, _, hdiv, -⟩ := h
   obtain ⟨hr, hr0⟩ := isRt_rt l
@@ -33,7 +37,7 @@ theorem powers_good (h : ObFacts l) (N : Type) [AddCommGroup N] [Module (Ob l) N
   let _ : Algebra (Ob l) B := ((algebraMap A.obj B).comp (algebraMap (Ob l) A.obj)).toAlgebra
   have _ : IsScalarTower (Ob l) A.obj B := IsScalarTower.of_algebraMap_eq fun _ => rfl
   exact powers_abs l (testι l ⋙ toPf l) (rt l) hr
-    (fun a ha => by obtain ⟨M, hM⟩ := hdiv a ha; exact ⟨M, hr0 ▸ hM⟩) N A B hB hC
-    (split_clause l A B hB hS) (test_clause l N M hN B hB hAIC hVAL)
+    (fun a ha => by obtain ⟨M, hM⟩ := hdiv a ha; exact ⟨M, hr0 ▸ hM⟩)
+    N A B hB hC (split_clause l A B hB hS) (test_clause l N M hN B hB hAIC hVAL)
 
 end CrystallineSemistableComparison.D

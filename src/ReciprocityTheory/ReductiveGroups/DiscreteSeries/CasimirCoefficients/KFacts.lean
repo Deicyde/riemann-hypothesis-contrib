@@ -18,19 +18,20 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-instance kf_isHaar (ε : Fin n → Bool) : (muK ε).IsHaarMeasure :=
-  Measure.isHaarMeasure_haarMeasure _
+instance kf_isHaar (ε : Fin n → Bool) : (muK ε).IsHaarMeasure := Measure.isHaarMeasure_haarMeasure _
 
 theorem compactSpace_KG (ε : Fin n → Bool) : CompactSpace (KG ε) := by
   have hc : IsCompact (Kset ε) := by
-    have hsub : Kset ε ⊆ Set.pi Set.univ (fun _ : Fin n => Set.pi Set.univ
-        (fun _ : Fin n => Metric.closedBall (0 : ℂ) 1)) := by
+    have hsub
+        : Kset ε
+          ⊆ Set.pi Set.univ
+            (fun _ : Fin n => Set.pi Set.univ (fun _ : Fin n => Metric.closedBall (0 : ℂ) 1)) := by
       intro g hg i _ j _
       simpa [Metric.mem_closedBall, dist_zero_right] using entry_norm_bound_of_unitary hg.1 i j
-    exact (isCompact_univ_pi fun _ => isCompact_univ_pi fun _ =>
-      isCompact_closedBall (0 : ℂ) 1).of_isClosed_subset (isClosed_Kset ε) hsub
-  have hK : IsCompact ((KG ε : Set (UJ ε))) :=
-    (isClosedEmbedding_toM ε).isCompact_preimage hc
+    exact (isCompact_univ_pi fun _ =>
+        isCompact_univ_pi fun _ => isCompact_closedBall (0 : ℂ) 1).of_isClosed_subset
+      (isClosed_Kset ε) hsub
+  have hK : IsCompact ((KG ε : Set (UJ ε))) := (isClosedEmbedding_toM ε).isCompact_preimage hc
   exact isCompact_iff_compactSpace.mp hK
 
 theorem muK_univ_pos (ε : Fin n → Bool) : 0 < (muK ε Set.univ).toReal := by
@@ -55,12 +56,14 @@ theorem muK_rightInvariant (ε : Fin n → Bool) : (muK ε).IsMulRightInvariant 
     exact this
   rw [h, ENNReal.coe_eq_one.mp hc, one_smul]
 
-theorem exists_oneParam (ε : Fin n → Bool) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y) :
-    ∃ γ : ℝ → KG ε, Continuous γ ∧ (∀ t, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Y)) ∧
-      ∀ s t, γ (s + t) = γ s * γ t := by
+theorem exists_oneParam (ε : Fin n → Bool) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y)
+    : ∃ γ : ℝ → KG ε,
+      Continuous γ ∧ (∀ t, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Y))
+        ∧ ∀ s t, γ (s + t) = γ s * γ t := by
   exact ⟨kfaKG ε hY, kfa_continuous ε hY, kfa_toMK ε hY, kfa_add ε hY⟩
 
-theorem inK_iff (ε : Fin n → Bool) (Y : Matrix (Fin n) (Fin n) ℂ) : inK ε Y ↔ Yᴴ = -Y ∧ IsBlock ε Y := by
+theorem inK_iff (ε : Fin n → Bool) (Y : Matrix (Fin n) (Fin n) ℂ)
+    : inK ε Y ↔ Yᴴ = -Y ∧ IsBlock ε Y := by
   unfold inK IsBlock inG
   have hJJ : Jm ε * Jm ε = 1 := by
     unfold Jm
@@ -93,7 +96,9 @@ theorem inK_iff (ε : Fin n → Bool) (Y : Matrix (Fin n) (Fin n) ℂ) : inK ε 
     have h3 : Yᴴ * Jm ε = -(Y * Jm ε) := by
       rw [h2]
       exact eq_neg_of_add_eq_zero_left h1
-    calc Yᴴ = Yᴴ * Jm ε * Jm ε := by rw [Matrix.mul_assoc, hJJ, Matrix.mul_one]
+    calc
+      Yᴴ
+        = Yᴴ * Jm ε * Jm ε := by rw [Matrix.mul_assoc, hJJ, Matrix.mul_one]
       _ = -(Y * Jm ε) * Jm ε := by rw [h3]
       _ = -Y := by rw [Matrix.neg_mul, Matrix.mul_assoc, hJJ, Matrix.mul_one]
   · rintro ⟨h1, h2⟩

@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 
 noncomputable section
 
@@ -19,20 +22,24 @@ namespace GlobalTheory.InertiaTwoPlaces
 
 open Polynomial
 
-theorem fix_of_fix_integral {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (σ : G E Ω) (h : ∀ b : Ω, IsIntegral ℤ b → σ b = b) : σ = 1 := by
+theorem fix_of_fix_integral
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (σ : G E Ω) (h : ∀ b : Ω, IsIntegral ℤ b → σ b = b)
+    : σ = 1 := by
   ext x
-  obtain ⟨s, t, hs, ht, hs1, e⟩ := ReciprocityTheory.Gal.exists_den E (⊤ : ValuationSubring Ω) (x := x)
-    ((ValuationSubring.valuation_le_one_iff _ _).mpr trivial)
+  obtain ⟨s, t, hs, ht, hs1, e⟩ :=
+    ReciprocityTheory.Gal.exists_den E (⊤ : ValuationSubring Ω) (x := x)
+      ((ValuationSubring.valuation_le_one_iff _ _).mpr trivial)
   have hs0 : s ≠ 0 := by rintro rfl; simp at hs1
   have h2 : σ s * σ x = σ t := by rw [← map_mul, e]
   rw [h s hs, h t ht, ← e] at h2
   exact mul_left_cancel₀ hs0 h2
 
-theorem eq_of_mem_Ine_of_mem_Ine : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (A A' : ValuationSubring Ω) (P : HeightOneSpectrum (𝓞 E)),
-    IsPlaceOver (F := E) A P → IsPlaceOver (F := E) A' P → ∀ σ ∈ Ine (F := E) A,
-    σ ∈ Ine (F := E) A' → σ ≠ 1 → A' = A := by
+theorem eq_of_mem_Ine_of_mem_Ine
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A A' : ValuationSubring Ω) (P : HeightOneSpectrum (𝓞 E)),
+      IsPlaceOver (F := E) A P → IsPlaceOver (F := E) A' P
+        → ∀ σ ∈ Ine (F := E) A, σ ∈ Ine (F := E) A' → σ ≠ 1 → A' = A := by
   intro E Ω _ _ _ _ _ A A' P hA hA' σ hσ hσ' hne
   by_contra hAA
   apply hne
@@ -44,7 +51,8 @@ theorem eq_of_mem_Ine_of_mem_Ine : ∀ (E Ω : Type) [Field E] [NumberField E] [
   have hf0m : f0.Monic := minpoly.monic hb
   have hf0b : Polynomial.aeval b f0 = 0 := minpoly.aeval ℤ b
   set d := f0.natDegree with hd
-  have hnat : ∀ n : ℕ, A'.valuation (n : Ω) ≤ 1 := fun n => ReciprocityTheory.Gal.valuation_natCast_le_one A' n
+  have hnat : ∀ n : ℕ, A'.valuation (n : Ω) ≤ 1 := fun n =>
+    ReciprocityTheory.Gal.valuation_natCast_le_one A' n
   obtain ⟨m, hdm, hmu⟩ : ∃ m : ℕ, d ≤ m ∧ A'.valuation (m : Ω) = 1 := by
     by_cases h1 : A'.valuation (d : Ω) = 1
     · exact ⟨d, le_rfl, h1⟩
@@ -64,18 +72,26 @@ theorem eq_of_mem_Ine_of_mem_Ine : ∀ (E Ω : Type) [Field E] [NumberField E] [
     omega
   have hf1b : Polynomial.aeval b f1 = 0 := by simp [hf1, hf0b]
   have hσA : σ ∈ Dec (F := E) A := Ine_le_Dec A hσ
-  have hbD : IsIntegral ℤ (σ b - b) :=
-    (hb.map ((σ : Ω ≃ₐ[E] Ω).toAlgHom.restrictScalars ℤ)).sub hb
+  have hbD : IsIntegral ℤ (σ b - b) := (hb.map ((σ : Ω ≃ₐ[E] Ω).toAlgHom.restrictScalars ℤ)).sub hb
   have hc : IsIntegral ℤ ((σ b - b) ^ m) := hbD.pow m
   have hc0 : (σ b - b) ^ m ≠ 0 := pow_ne_zero _ hD0
-  obtain ⟨e0, he0i, he0A, he0A'⟩ := GlobalTheory.T.exists_integer_deep_at_one_place_unit_at_other E Ω A A' P hA hA' (Ne.symm hAA) _ hc hc0
-  obtain ⟨e, hei, hef, heA, heA'⟩ := GlobalTheory.T.exists_inertiaFixed_integral_of_separating_element E Ω A A' σ hσ' e0 _ he0i he0A he0A'
-  obtain ⟨ys, hcard, hys, hprod⟩ := GlobalTheory.T.exists_inertia_fixed_roots_perturbed_polynomial E Ω A' σ hσ' b e m f1 hei hef heA' hmu hf1m hf1d hf1b
+  obtain ⟨e0, he0i, he0A, he0A'⟩ :=
+    GlobalTheory.T.exists_integer_deep_at_one_place_unit_at_other E Ω A A' P hA hA' (Ne.symm hAA) _
+      hc hc0
+  obtain ⟨e, hei, hef, heA, heA'⟩ :=
+    GlobalTheory.T.exists_inertiaFixed_integral_of_separating_element E Ω A A' σ hσ' e0 _ he0i he0A
+      he0A'
+  obtain ⟨ys, hcard, hys, hprod⟩ :=
+    GlobalTheory.T.exists_inertia_fixed_roots_perturbed_polynomial E Ω A' σ hσ' b e m f1 hei hef
+      heA' hmu hf1m hf1d hf1b
   have hbm : A.valuation (b ^ m - 1) ≤ 1 :=
-    (A.valuation_le_one_iff _).mpr (ReciprocityTheory.Gal.mem_of_isIntegral_int A ((hb.pow m).sub isIntegral_one))
+    (A.valuation_le_one_iff _).mpr
+      (ReciprocityTheory.Gal.mem_of_isIntegral_int A ((hb.pow m).sub isIntegral_one))
   have h1 : A.valuation (e * (b ^ m - 1)) < A.valuation (σ b - b) ^ m := by
     rw [Valuation.map_mul, ← Valuation.map_pow]
-    calc A.valuation e * A.valuation (b ^ m - 1) ≤ A.valuation e * 1 := mul_le_mul_of_nonneg_left hbm zero_le'
+    calc
+      A.valuation e * A.valuation (b ^ m - 1)
+        ≤ A.valuation e * 1 := mul_le_mul_of_nonneg_left hbm zero_le'
       _ = A.valuation e := mul_one _
       _ < _ := heA
   have h2 : A.valuation (σ b - b) ^ m ≤ A.valuation ((ys.map (fun y => b - y)).prod) := by

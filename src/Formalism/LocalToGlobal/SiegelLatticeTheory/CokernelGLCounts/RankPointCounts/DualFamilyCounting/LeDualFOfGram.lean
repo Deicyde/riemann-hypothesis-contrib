@@ -13,12 +13,13 @@ namespace Formalism.L2.SG.Pf.GluingBases
 
 open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt Formalism.HermitianLattices.Ext.L3.HU
 
-variable {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F]
-  [Algebra F K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+  [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem isLattice_span {ι' : Type} [Finite ι'] (β : ι' → V)
-    (hβ : Submodule.span K (Set.range β) = ⊤) :
-    Submodule.IsFullLattice K (Submodule.span (𝓞 K) (Set.range β)) := by
+theorem isLattice_span
+    {ι' : Type} [Finite ι'] (β : ι' → V) (hβ : Submodule.span K (Set.range β) = ⊤)
+    : Submodule.IsFullLattice K (Submodule.span (𝓞 K) (Set.range β)) := by
   let : Submodule.IsLattice K (Submodule.span (𝓞 K) (Set.range β)) :=
     Submodule.IsLattice.of_fg K (Submodule.fg_span (Set.finite_range β))
   exact { span_eq_top := (Submodule.span_span_of_tower (𝓞 K) K (Set.range β)).trans hβ }
@@ -41,13 +42,16 @@ def ldualF (h : V →ₗ⋆[K] V →ₗ[K] K) (𝔭 : Ideal (𝓞 F)) (x : V) : 
       ← hr, ← smul_eq_mul, algebraMap_smul]
     exact Submodule.smul_mem _ r hz
 
-theorem le_dualF_of_gram (hF : IsFixF K F) (h : V →ₗ⋆[K] V →ₗ[K] K) {𝔭 : Ideal (𝓞 F)}
-    (hp : 𝔭.IsPrime) {ι' : Type} (β : ι' → V)
-    (hβ : ∀ i j, h (β i) (β j) ∈ locF 𝔭 (1 : Submodule (𝓞 K) K)) :
-    locF 𝔭 (Submodule.span (𝓞 K) (Set.range β)) ≤
-      dualF h 𝔭 (locF 𝔭 (Submodule.span (𝓞 K) (Set.range β))) := by
-  have key : ∀ y ∈ Submodule.span (𝓞 K) (Set.range β), ∀ x ∈ Submodule.span (𝓞 K) (Set.range β),
-      h y x ∈ locF 𝔭 (1 : Submodule (𝓞 K) K) := by
+theorem le_dualF_of_gram
+    (hF : IsFixF K F)
+    (h : V →ₗ⋆[K] V →ₗ[K] K)
+    {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime)
+    {ι' : Type} (β : ι' → V) (hβ : ∀ i j, h (β i) (β j) ∈ locF 𝔭 (1 : Submodule (𝓞 K) K))
+    : locF 𝔭 (Submodule.span (𝓞 K) (Set.range β))
+      ≤ dualF h 𝔭 (locF 𝔭 (Submodule.span (𝓞 K) (Set.range β))) := by
+  have key
+      : ∀ y ∈ Submodule.span (𝓞 K) (Set.range β), ∀ x ∈ Submodule.span (𝓞 K) (Set.range β),
+        h y x ∈ locF 𝔭 (1 : Submodule (𝓞 K) K) := by
     intro y hy x hx
     have hx' : Submodule.span (𝓞 K) (Set.range β) ≤ rdualF h 𝔭 y := by
       rw [Submodule.span_le]

@@ -5,17 +5,22 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-private theorem finrank_quotient_eq_add_finrank_ker_factor (κ Λ : Type) [Field κ] [CommRing Λ] [Algebra κ Λ]
-    [Module.Finite κ Λ] (I J : Ideal Λ) (h : I ≤ J) :
-    Module.finrank κ (Λ ⧸ I) = Module.finrank κ (Λ ⧸ J) +
-      Module.finrank κ (LinearMap.ker (Ideal.Quotient.factorₐ κ h).toLinearMap) := by
+private theorem finrank_quotient_eq_add_finrank_ker_factor
+    (κ Λ : Type) [Field κ] [CommRing Λ] [Algebra κ Λ] [Module.Finite κ Λ]
+    (I J : Ideal Λ) (h : I ≤ J)
+    : Module.finrank κ (Λ ⧸ I)
+      = Module.finrank κ (Λ ⧸ J)
+        + Module.finrank κ (LinearMap.ker (Ideal.Quotient.factorₐ κ h).toLinearMap) := by
   haveI : Module.Finite κ (Λ ⧸ I) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ κ I).toLinearMap Ideal.Quotient.mk_surjective
   have hs : Function.Surjective (Ideal.Quotient.factorₐ κ h).toLinearMap :=
@@ -24,10 +29,12 @@ private theorem finrank_quotient_eq_add_finrank_ker_factor (κ Λ : Type) [Field
     LinearMap.range_eq_top.mpr hs, finrank_top]
 
 set_option maxHeartbeats 400000 in
-private theorem ideal_eq_span_pow_of_finrank (κ Λ : Type) [Field κ] [CommRing Λ] [IsLocalRing Λ] [Algebra κ Λ]
-    [Module.Finite κ Λ] (ε : Λ →ₐ[κ] κ) (t : Λ)
-    (ht : IsLocalRing.maximalIdeal Λ = Ideal.span {t}) (q : ℕ) :
-    ∀ J : Ideal Λ, Module.finrank κ (Λ ⧸ J) = q → J = Ideal.span {t ^ q} := by
+private theorem ideal_eq_span_pow_of_finrank
+    (κ Λ : Type) [Field κ] [CommRing Λ] [IsLocalRing Λ] [Algebra κ Λ] [Module.Finite κ Λ]
+    (ε : Λ →ₐ[κ] κ)
+    (t : Λ) (ht : IsLocalRing.maximalIdeal Λ = Ideal.span {t})
+    (q : ℕ)
+    : ∀ J : Ideal Λ, Module.finrank κ (Λ ⧸ J) = q → J = Ideal.span {t ^ q} := by
   classical
   intro J hJ
   haveI : IsArtinianRing Λ := IsArtinianRing.of_finite κ Λ
@@ -56,14 +63,17 @@ private theorem ideal_eq_span_pow_of_finrank (κ Λ : Type) [Field κ] [CommRing
   have drop : ∀ k, t ^ k ∈ Ideal.span {t ^ (k + 1)} → t ^ k = 0 := by
     intro k hk
     obtain ⟨a, ha⟩ := (mem_pow _ _).1 hk
-    have hu : IsUnit (1 - a * t) := unit_of _ (fun h ↦ by
-      have h1 : (1 : Λ) ∈ IsLocalRing.maximalIdeal Λ := by
-        have := (IsLocalRing.maximalIdeal Λ).add_mem h
-          ((IsLocalRing.maximalIdeal Λ).mul_mem_left a tm)
-        simpa using this
-      exact (IsLocalRing.mem_maximalIdeal _).1 h1 isUnit_one)
+    have hu : IsUnit (1 - a * t) :=
+      unit_of _ (fun h ↦ by
+        have h1 : (1 : Λ) ∈ IsLocalRing.maximalIdeal Λ := by
+          have :=
+            (IsLocalRing.maximalIdeal Λ).add_mem h ((IsLocalRing.maximalIdeal Λ).mul_mem_left a tm)
+          simpa using this
+        exact (IsLocalRing.mem_maximalIdeal _).1 h1 isUnit_one)
     have e : t ^ k * (1 - a * t) = 0 := by
-      calc t ^ k * (1 - a * t) = t ^ k - a * t ^ (k + 1) := by ring
+      calc
+        t ^ k * (1 - a * t)
+          = t ^ k - a * t ^ (k + 1) := by ring
         _ = 0 := by rw [ha, sub_self]
     exact hu.mul_left_eq_zero.1 e
   have hNex : ∃ N, t ^ N = 0 := by
@@ -106,7 +116,8 @@ private theorem ideal_eq_span_pow_of_finrank (κ Λ : Type) [Field κ] [CommRing
             linear_combination (t ^ k) * hb
           have hb0 : Ideal.Quotient.mk (Ideal.span {t ^ (k + 1)}) (b * t ^ (k + 1)) = 0 :=
             Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mul_mem_left _ b (Ideal.subset_span rfl))
-          rw [e, map_add (f := _), hb0, add_zero, map_mul, Algebra.smul_def, Ideal.Quotient.mk_algebraMap]
+          rw [e, map_add (f := _), hb0, add_zero, map_mul, Algebra.smul_def,
+            Ideal.Quotient.mk_algebraMap]
         exact (Submodule.finrank_mono hsub).trans
           (by simpa using finrank_span_le_card ({v} : Set (Λ ⧸ Ideal.span {t ^ (k + 1)})))
       · have hvk : v ∈ LinearMap.ker (Ideal.Quotient.factorₐ κ hle).toLinearMap := by
@@ -125,10 +136,13 @@ private theorem ideal_eq_span_pow_of_finrank (κ Λ : Type) [Field κ] [CommRing
       rw [hn, Ideal.span_singleton_eq_bot.2 rfl]
       exact bot_le
     · have hex : ∃ k, ¬ J ≤ Ideal.span {t ^ k} := ⟨n, h0⟩
-      obtain ⟨k0, hk0, hk0n, hmin⟩ : ∃ k0, ¬ J ≤ Ideal.span {t ^ k0} ∧ k0 ≤ n ∧
-          ∀ j < k0, J ≤ Ideal.span {t ^ j} :=
-        ⟨Nat.find hex, Nat.find_spec hex, Nat.find_min' hex h0,
-          fun j hj ↦ not_not.1 (Nat.find_min hex hj)⟩
+      obtain ⟨k0, hk0, hk0n, hmin⟩
+          : ∃ k0, ¬ J ≤ Ideal.span {t ^ k0} ∧ k0 ≤ n ∧ ∀ j < k0, J ≤ Ideal.span {t ^ j} := ⟨
+        Nat.find hex,
+        Nat.find_spec hex,
+        Nat.find_min' hex h0,
+        fun j hj ↦ not_not.1 (Nat.find_min hex hj)
+      ⟩
       have hk0pos : k0 ≠ 0 := by
         intro hz
         apply hk0
@@ -155,7 +169,6 @@ private theorem ideal_eq_span_pow_of_finrank (κ Λ : Type) [Field κ] [CommRing
   rw [dimB k hkn] at hJ
   rw [hJ]
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.chainLoc_of :
-    ChainLoc := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.chainLoc_of : ChainLoc := by
   intro κ Λ _ _ _ _ _ ε t ht J q hq
   exact ideal_eq_span_pow_of_finrank κ Λ ε t ht q J hq

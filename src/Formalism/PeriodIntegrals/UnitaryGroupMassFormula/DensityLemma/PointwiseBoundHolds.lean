@@ -11,7 +11,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnitaryQuotientC
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C6
+open MeasureTheory Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.C6
 
 noncomputable section
 
@@ -19,7 +20,8 @@ namespace PI.UnitaryGroupMassFormula.DLm
 
 section Frob
 
-attribute [local instance] Matrix.frobeniusSeminormedAddCommGroup Matrix.frobeniusNormedAddCommGroup
+attribute [local instance]
+  Matrix.frobeniusSeminormedAddCommGroup Matrix.frobeniusNormedAddCommGroup
   Matrix.frobeniusNormedSpace
 
 end Frob

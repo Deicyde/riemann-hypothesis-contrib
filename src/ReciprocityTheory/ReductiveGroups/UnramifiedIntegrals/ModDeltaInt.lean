@@ -12,14 +12,16 @@ open ModularForm EisensteinSeries ModularFormClass UpperHalfPlane Formalism.L2.T
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem twelve_dvd_five_pow_three_add_seven_pow_five (d : ℤ) : (12 : ℤ) ∣ 5 * d ^ 3 + 7 * d ^ 5 := by
+theorem twelve_dvd_five_pow_three_add_seven_pow_five (d : ℤ)
+    : (12 : ℤ) ∣ 5 * d ^ 3 + 7 * d ^ 5 := by
   have key : ∀ x : ZMod 12, 5 * x ^ 3 + 7 * x ^ 5 = 0 := by decide
-  have h := (ZMod.intCast_zmod_eq_zero_iff_dvd (5 * d ^ 3 + 7 * d ^ 5) 12).mp
-    (by push_cast; exact key _)
+  have h :=
+    (ZMod.intCast_zmod_eq_zero_iff_dvd (5 * d ^ 3 + 7 * d ^ 5) 12).mp (by push_cast; exact key _)
   exact_mod_cast h
 
-theorem sigma_congr (n : ℕ) :
-    (12 : ℤ) ∣ 5 * (ArithmeticFunction.sigma 3 n : ℤ) + 7 * (ArithmeticFunction.sigma 5 n : ℤ) := by
+theorem sigma_congr (n : ℕ)
+    : (12 : ℤ)
+      ∣ 5 * (ArithmeticFunction.sigma 3 n : ℤ) + 7 * (ArithmeticFunction.sigma 5 n : ℤ) := by
   rw [ArithmeticFunction.sigma_apply, ArithmeticFunction.sigma_apply]
   push_cast
   rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
@@ -29,8 +31,9 @@ def s3Z : PowerSeries ℤ := PowerSeries.mk fun n => (ArithmeticFunction.sigma 3
 
 def s5Z : PowerSeries ℤ := PowerSeries.mk fun n => (ArithmeticFunction.sigma 5 n : ℤ)
 
-def tZ : PowerSeries ℤ := PowerSeries.mk fun n =>
-  (5 * (ArithmeticFunction.sigma 3 n : ℤ) + 7 * (ArithmeticFunction.sigma 5 n : ℤ)) / 12
+def tZ : PowerSeries ℤ :=
+  PowerSeries.mk fun n =>
+    (5 * (ArithmeticFunction.sigma 3 n : ℤ) + 7 * (ArithmeticFunction.sigma 5 n : ℤ)) / 12
 
 theorem eisensteinFourInt_eq : e4Z = 1 + PowerSeries.C (240 : ℤ) * s3Z := by
   ext n
@@ -48,15 +51,17 @@ theorem eisensteinSixInt_eq : e6Z = 1 - PowerSeries.C (504 : ℤ) * s5Z := by
   · subst h; simp
   · ring
 
-theorem tZ_mul : PowerSeries.C (12 : ℤ) * tZ =
-    PowerSeries.C (5 : ℤ) * s3Z + PowerSeries.C (7 : ℤ) * s5Z := by
+theorem tZ_mul
+    : PowerSeries.C (12 : ℤ) * tZ = PowerSeries.C (5 : ℤ) * s3Z + PowerSeries.C (7 : ℤ) * s5Z := by
   ext n
   simp only [map_add (f := _), PowerSeries.coeff_C_mul, tZ, s3Z, s5Z, PowerSeries.coeff_mk]
   exact Int.mul_ediv_cancel' (sigma_congr n)
 
-theorem eisenstein_cube_sub_sq_eq : e4Z ^ 3 - e6Z ^ 2 = PowerSeries.C (1728 : ℤ) *
-    (tZ + PowerSeries.C (100 : ℤ) * s3Z ^ 2 + PowerSeries.C (8000 : ℤ) * s3Z ^ 3
-      - PowerSeries.C (147 : ℤ) * s5Z ^ 2) := by
+theorem eisenstein_cube_sub_sq_eq
+    : e4Z ^ 3 - e6Z ^ 2
+      = PowerSeries.C (1728 : ℤ)
+        * (tZ + PowerSeries.C (100 : ℤ) * s3Z ^ 2 + PowerSeries.C (8000 : ℤ) * s3Z ^ 3
+          - PowerSeries.C (147 : ℤ) * s5Z ^ 2) := by
   have h := tZ_mul
   rw [eisensteinFourInt_eq, eisensteinSixInt_eq]
   simp only [map_ofNat] at h ⊢
@@ -64,11 +69,14 @@ theorem eisenstein_cube_sub_sq_eq : e4Z ^ 3 - e6Z ^ 2 = PowerSeries.C (1728 : �
 
 theorem dZ_mul : PowerSeries.C (1728 : ℤ) * dZ = e4Z ^ 3 - e6Z ^ 2 := by
   ext n
-  rw [PowerSeries.coeff_C_mul, dZ, PowerSeries.coeff_mk, eisenstein_cube_sub_sq_eq, PowerSeries.coeff_C_mul]
+  rw [PowerSeries.coeff_C_mul, dZ, PowerSeries.coeff_mk, eisenstein_cube_sub_sq_eq,
+    PowerSeries.coeff_C_mul]
   exact Int.mul_ediv_cancel' (dvd_mul_right _ _)
 
-private theorem dZ_eq_tZ_add_s3Z_sq_add_s3Z_cube_sub_s5Z_sq : dZ = tZ + PowerSeries.C (100 : ℤ) * s3Z ^ 2 +
-    PowerSeries.C (8000 : ℤ) * s3Z ^ 3 - PowerSeries.C (147 : ℤ) * s5Z ^ 2 := by
+private theorem dZ_eq_tZ_add_s3Z_sq_add_s3Z_cube_sub_s5Z_sq
+    : dZ
+      = tZ + PowerSeries.C (100 : ℤ) * s3Z ^ 2 + PowerSeries.C (8000 : ℤ) * s3Z ^ 3
+        - PowerSeries.C (147 : ℤ) * s5Z ^ 2 := by
   have h := dZ_mul.trans eisenstein_cube_sub_sq_eq
   refine mul_left_cancel₀ (fun h0 => ?_) h
   have := congrArg PowerSeries.constantCoeff h0
@@ -102,10 +110,13 @@ theorem dC_eq : dC = qExpansion 1 DD := by
       ModularForm.coe_smul, ModularForm.coe_mul, Pi.smul_apply, Pi.mul_apply, smul_eq_mul]
     ring
   have hd := congrArg (PowerSeries.map (Int.castRingHom ℂ)) dZ_mul
-  rw [map_mul, map_sub, map_pow, map_pow, PowerSeries.map_C, map_eisensteinFourInt, map_eisensteinSixInt] at hd
-  rw [hfun, ModularForm.qExpansion_sub one_pos (by simp), ModularForm.coe_smul, ModularForm.coe_smul,
-    ModularForm.qExpansion_smul one_pos (by simp), ModularForm.qExpansion_smul one_pos (by simp),
-    h4, h6, ← smul_sub, ← hd, PowerSeries.smul_eq_C_mul, ← mul_assoc, ← map_mul]
+  rw [map_mul, map_sub, map_pow, map_pow, PowerSeries.map_C, map_eisensteinFourInt,
+      map_eisensteinSixInt]
+    at hd
+  rw [hfun, ModularForm.qExpansion_sub one_pos (by simp), ModularForm.coe_smul,
+    ModularForm.coe_smul, ModularForm.qExpansion_smul one_pos (by simp),
+    ModularForm.qExpansion_smul one_pos (by simp), h4, h6, ← smul_sub, ← hd,
+    PowerSeries.smul_eq_C_mul, ← mul_assoc, ← map_mul]
   rw [show (1 / 1728 : ℂ) * (Int.castRingHom ℂ) 1728 = 1 by norm_num, map_one, one_mul]
   rfl
 

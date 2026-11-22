@@ -8,22 +8,25 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat NumberField Module IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat NumberField Module
+  IsDedekindDomain
 
 section
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E}
 
-theorem lframe_mem_locP {P : Ideal (𝓞 E)} [P.IsPrime] {M : Submodule (𝓞 E) S.V} {y : S.V} :
-    y ∈ Formalism.HermitianLatticesTheory.localization₂ P M ↔ ∃ s : 𝓞 E, s ∉ P ∧ s • y ∈ M := by
+theorem lframe_mem_locP {P : Ideal (𝓞 E)} [P.IsPrime] {M : Submodule (𝓞 E) S.V} {y : S.V}
+    : y ∈ Formalism.HermitianLatticesTheory.localization₂ P M ↔ ∃ s : 𝓞 E, s ∉ P ∧ s • y ∈ M := by
   constructor
   · rintro ⟨s, hs, h⟩
     exact ⟨s, hs, h⟩
   · rintro ⟨s, hs, h⟩
     exact ⟨s, hs, h⟩
 
-theorem lframe_local_global (M : Submodule (𝓞 E) S.V) (y : S.V)
-    (h : ∀ P : HeightOneSpectrum (𝓞 E), ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • y ∈ M) : y ∈ M := by
+theorem lframe_local_global
+    (M : Submodule (𝓞 E) S.V) (y : S.V)
+    (h : ∀ P : HeightOneSpectrum (𝓞 E), ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • y ∈ M)
+    : y ∈ M := by
   let I : Ideal (𝓞 E) := M.comap (LinearMap.toSpanSingleton (𝓞 E) S.V y)
   have hI : ∀ s, s ∈ I ↔ s • y ∈ M := fun s => by
     simp [I, Submodule.mem_comap, LinearMap.toSpanSingleton_apply]
@@ -35,12 +38,13 @@ theorem lframe_local_global (M : Submodule (𝓞 E) S.V) (y : S.V)
     obtain ⟨s, hs, hsy⟩ := h ⟨m, hm.isPrime, hne⟩
     exact absurd (hle ((hI s).2 hsy)) hs
 
-theorem lframe_dual {r : ℕ} {T : E} (F : FlagG S r T) (a : Fin r) :
-    ∃ φ : S.V →ₗ[E] E, ∀ b, φ (F.e b) = if b = a then 1 else 0 := by
+theorem lframe_dual {r : ℕ} {T : E} (F : FlagG S r T) (a : Fin r)
+    : ∃ φ : S.V →ₗ[E] E, ∀ b, φ (F.e b) = if b = a then 1 else 0 := by
   let B := Basis.span F.e_indep
   obtain ⟨φ, hφ⟩ := LinearMap.exists_extend (B.coord a)
   refine ⟨φ, fun b => ?_⟩
-  have h1 : F.e b = ((B b : Submodule.span E (Set.range F.e)) : S.V) := (congrArg Subtype.val (Basis.span_apply F.e_indep b)).symm
+  have h1 : F.e b = ((B b : Submodule.span E (Set.range F.e)) : S.V) :=
+    (congrArg Subtype.val (Basis.span_apply F.e_indep b)).symm
   have h2 : φ ((B b : Submodule.span E (Set.range F.e)) : S.V) = B.coord a (B b) := by
     rw [← hφ]
     rfl
@@ -61,9 +65,14 @@ theorem l_frame : UnitriangularFrameIntegral := by
   have h1P : (1 : 𝓞 E) ∉ P.asIdeal := fun h => P.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h)
   obtain ⟨c, _, _, hc⟩ := hF.1 P
   obtain ⟨c', _, _, hc'⟩ := hF'.1 P
-  have hA : ∀ a, c a • F'.fl.e a ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F') := by
+  have hA
+      : ∀ a,
+        c a • F'.fl.e a
+          ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F') := by
     intro a
-    have h1 : c a • F.fl.e a ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F') := by
+    have h1
+        : c a • F.fl.e a
+          ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F') := by
       rw [hXL, hc]
       exact lframe_mem_locP.2 ⟨1, h1P, by rw [one_smul]; exact Submodule.subset_span ⟨a, rfl⟩⟩
     rw [hc'] at h1 ⊢
@@ -86,8 +95,10 @@ theorem l_frame : UnitriangularFrameIntegral := by
     have key : algebraMap (𝓞 E) E t * c a = algebraMap (𝓞 E) E (o a) * c' a := by
       have h4 := congrArg φ ho
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, LinearMap.map_smul_of_tower, map_smul, hφ, hea, smul_eq_mul, Algebra.smul_def, mul_ite,
-        mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] at h4
+        simp only [map_sum, LinearMap.map_smul_of_tower, map_smul, hφ, hea, smul_eq_mul,
+            Algebra.smul_def, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
+            if_true]
+          at h4
       exact h4.symm
     refine lframe_mem_locP.2 ⟨t, ht, ?_⟩
     have h5 : t • (c a • F'.fl.e a) = o a • (c' a • F'.fl.e a) := by

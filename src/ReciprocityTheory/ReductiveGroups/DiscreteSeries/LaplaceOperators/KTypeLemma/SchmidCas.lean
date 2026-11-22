@@ -26,15 +26,18 @@ variable {n : ℕ}
 
 section No
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
 
-theorem sc_no_of_schmid (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h) (hn : (n : ℝ) < h)
-    (hS : ∀ x ∈ Wm ε E V, phi E 1 x = 0) :
-    ∀ a b : Fin n, a < b → ε a ≠ ε b → ∀ w ∈ layer ε E V 1,
-      IsKHWVec ε E (lowK ε lam - root a b) w → w = 0 := by
+theorem sc_no_of_schmid
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h)
+    (hn : (n : ℝ) < h)
+    (hS : ∀ x ∈ Wm ε E V, phi E 1 x = 0)
+    : ∀ a b : Fin n,
+      a < b → ε a ≠ ε b → ∀ w ∈ layer ε E V 1, IsKHWVec ε E (lowK ε lam - root a b) w → w = 0 := by
   intro a b hab hε w hw hμ
   by_contra hw0
   have : FiniteDimensional ℂ V := hV.1
@@ -54,8 +57,7 @@ theorem sc_no_of_schmid (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW
     exact (Submodule.mem_orthogonal V w).1 hwo u hu
   obtain ⟨P, hPnc, hP0, hPμ, hPperp⟩ := lift_layer hE hU hV.1 hV.2.1 (k := 0) hw hperp hμ hw0
   obtain ⟨xm, hxm, xp, hxp, hsum⟩ := ncV_one_decomp hE hU hV hmono hh hbig hPnc
-  have hxm0 : inner ℂ xm P = 0 :=
-    hPperp xm (Wm_le_ncV hxm) (by rw [hS xm hxm]; exact zero_mem _)
+  have hxm0 : inner ℂ xm P = 0 := hPperp xm (Wm_le_ncV hxm) (by rw [hS xm hxm]; exact zero_mem _)
   have hmp : inner ℂ xm xp = 0 := Wm_perp_Wp hU hxm hxp
   have hxm_eq : xm = 0 := by
     have h3 : inner ℂ xm xm = 0 := by
@@ -90,19 +92,22 @@ end No
 theorem schmid_casimir (n : ℕ) : SchmidCasimirStatement n := by
   intro ε ν h c N _ _ EN W hE hU hW hS hc hint hmono hgap hneed hp hq
   set lam : Fin n → ℝ := ν + rhoC ε - rhoN ε with hlam
-  have hlow : lowK ε lam = ν := by
-    ext a; simp only [lowK, hlam, Pi.add_apply, Pi.sub_apply]; ring
+  have hlow : lowK ε lam = ν := by ext a; simp only [lowK, hlam, Pi.add_apply, Pi.sub_apply]; ring
   have hW' : IsKIrrHW ε EN (lowK ε lam) W := by rw [hlow]; exact hW
   have hN1 : 2 + (1 + (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ)) ≤ hNeed ε := by
     unfold hNeed
-    exact le_trans (by linarith [le_max_right (3 * (n : ℝ) / 2) (1 + (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ))])
+    exact le_trans
+      (by linarith [le_max_right (3 * (n : ℝ) / 2) (1 + (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ))])
       (le_max_left _ _)
   have hN2 : 2 + 3 * (n : ℝ) / 2 ≤ hNeed ε := by
     unfold hNeed
-    exact le_trans (by linarith [le_max_left (3 * (n : ℝ) / 2) (1 + (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ))])
+    exact le_trans
+      (by linarith [le_max_left (3 * (n : ℝ) / 2) (1 + (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ))])
       (le_max_left _ _)
-  have hN3 : 16 * (n : ℝ) * (min (pOf ε) (qOf ε) : ℝ) + 8 * Real.sqrt (2 * (min (pOf ε) (qOf ε) : ℝ)) + 2
-      ≤ hNeed ε := (le_max_left _ _).trans (le_max_right _ _)
+  have hN3
+      : 16 * (n : ℝ) * (min (pOf ε) (qOf ε) : ℝ) + 8 * Real.sqrt (2 * (min (pOf ε) (qOf ε) : ℝ)) + 2
+        ≤ hNeed ε :=
+    (le_max_left _ _).trans (le_max_right _ _)
   have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   have hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h := by linarith
   have hn : (n : ℝ) < h := by linarith
@@ -112,8 +117,7 @@ theorem schmid_casimir (n : ℕ) : SchmidCasimirStatement n := by
   obtain ⟨μ, hμ⟩ := S7.exists_mu hHC
   have hq0 : 1 ≤ S7.q0 ε := le_min hp hq
   have h8 : 8 * (n : ℝ) * (S7.q0 ε : ℝ) < h := by
-    have e : ((S7.q0 ε : ℕ) : ℝ) = (min (pOf ε) (qOf ε) : ℝ) := by
-      simp only [S7.q0, Nat.cast_min]
+    have e : ((S7.q0 ε : ℕ) : ℝ) = (min (pOf ε) (qOf ε) : ℝ) := by simp only [S7.q0, Nat.cast_min]
     have hm : 0 ≤ (n : ℝ) * (min (pOf ε) (qOf ε) : ℝ) := by positivity
     have hs := Real.sqrt_nonneg (2 * (min (pOf ε) (qOf ε) : ℝ))
     rw [e]
@@ -126,9 +130,10 @@ theorem schmid_casimir (n : ℕ) : SchmidCasimirStatement n := by
     exact zero_ne_one h1
   have hσ := rreg_isURepOn ε
   have hD := isDerivedOn_smE hσ
-  have hcas := casimir_eq_casVal_of_model hstd hE hU hW'
-    (sc_no_of_schmid hE hU hW' hmono hgap hbig hn hS) hD.glRep (isInfUnitary_of_isDerivedOn hσ hD)
-    (datumV_isKIrrHW hPsi hv₀) (datumV_casimir hPsi T.w)
+  have hcas :=
+    casimir_eq_casVal_of_model hstd hE hU hW' (sc_no_of_schmid hE hU hW' hmono hgap hbig hn hS)
+      hD.glRep (isInfUnitary_of_isDerivedOn hσ hD) (datumV_isKIrrHW hPsi hv₀)
+      (datumV_casimir hPsi T.w)
   obtain ⟨w, hwW, hw0, -⟩ := hW.2.2.2
   have h1 := hc w hwW
   rw [hcas w hwW] at h1

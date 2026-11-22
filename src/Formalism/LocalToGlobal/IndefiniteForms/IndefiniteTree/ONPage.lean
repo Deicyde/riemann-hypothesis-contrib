@@ -16,7 +16,9 @@ namespace OnPage
 open Formalism.DivisionValues Formalism.EigenvalueLevelCeiling Formalism.L2.Indef
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
-variable {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P : Type} [Group P] [Finite P] {c : OnConst}
+variable
+  {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P : Type} [Group P] [Finite P]
+  {c : OnConst}
 
 def nH (O : OnObj S P c) : ℝ := O.f / 2
 
@@ -36,7 +38,8 @@ def ExponentSmallBound (O : OnObj S P c) : Prop := 0 < O.eps ∧ O.eps < 1 / 52
 
 def HalfDegreeAtLeastFour (O : OnObj S P c) : Prop := 4 ≤ nH O
 
-def PrimeCongruenceConditions (O : OnObj S P c) : Prop := O.q1.Prime ∧ O.dd.Prime ∧ O.q1 % 8 = 3 ∧ O.dd % 16 = 7
+def PrimeCongruenceConditions (O : OnObj S P c) : Prop :=
+  O.q1.Prime ∧ O.dd.Prime ∧ O.q1 % 8 = 3 ∧ O.dd % 16 = 7
 
 def DegreeAtLeastFortyFour (O : OnObj S P c) : Prop := 44 ≤ O.m ∧ 0 ≤ nH O
 
@@ -47,7 +50,8 @@ def RankAndLengthLowerBounds (O : OnObj S P c) : Prop := 9 ≤ O.rr ∧ 10 ≤ O
 def LeafSZ1 (O : OnObj S P c) : Prop := 0 ≤ O.T ∧ O.T ≤ O.b
 
 def LeafW (O : OnObj S P c) : Prop :=
-  ∃ nf : ℕ, (nf : ℝ) = O.f ∧ ∀ j, ∃ ws : Fin nf → ℝ, O.wt j = ∑ τ, ws τ ∧ ∀ τ, 0 ≤ ws τ ∧ ws τ ≤ 2 * O.b
+  ∃ nf : ℕ,
+    (nf : ℝ) = O.f ∧ ∀ j, ∃ ws : Fin nf → ℝ, O.wt j = ∑ τ, ws τ ∧ ∀ τ, 0 ≤ ws τ ∧ ws τ ≤ 2 * O.b
 
 def SupportGapBounds (O : OnObj S P c) : Prop := O.k * O.Sc ≤ wpp O ∧ Xp O * (O.Sc + O.eta) ≤ O.b
 
@@ -62,19 +66,21 @@ def LogPrimeProductBound (O : OnObj S P c) : Prop := Real.log ((O.q1 * O.dd : �
 def ProductWithRatioBound (O : OnObj S P c) : Prop := O.k * O.bp ≤ O.b
 
 def ConductorCongruentPrimePair (O : OnObj S P c) : Prop :=
-  O.g1.Prime ∧ O.g2.Prime ∧ (O.g1 : ℝ) ≤ O.b ^ 9 ∧ (O.g2 : ℝ) ≤ O.b ^ 9 ∧ O.g1 ≠ O.g2 ∧
-    ∃ M : ℕ, (O.q1 ∣ M ∧ O.dd ∣ M ∧ ∀ p ∈ O.sm, 1 < p ∧ p ∣ M) ∧ O.g1 % M = 1 ∧ O.g2 % M = 1
+  O.g1.Prime ∧ O.g2.Prime ∧ (O.g1 : ℝ) ≤ O.b ^ 9 ∧ (O.g2 : ℝ) ≤ O.b ^ 9 ∧ O.g1 ≠ O.g2
+    ∧ ∃ M : ℕ, (O.q1 ∣ M ∧ O.dd ∣ M ∧ ∀ p ∈ O.sm, 1 < p ∧ p ∣ M) ∧ O.g1 % M = 1 ∧ O.g2 % M = 1
 
 def SquaredTimeBound (O : OnObj S P c) : Prop := ∃ PP : ℝ, 1 ≤ PP ∧ PP ^ 3 * O.T ^ 2 ≤ O.b
 
 def PowerTwelveBound (O : OnObj S P c) : Prop := (O.f * O.rr * O.L) ^ 12 ≤ O.b
 
-def DiscriminantDegreeBound (O : OnObj S P c) : Prop := 0 ≤ O.DF ∧ ∃ nW : ℝ, 40 ≤ nW ∧ 2 * Real.pi * nW ≤ O.DF ^ 2
+def DiscriminantDegreeBound (O : OnObj S P c) : Prop :=
+  0 ≤ O.DF ∧ ∃ nW : ℝ, 40 ≤ nW ∧ 2 * Real.pi * nW ≤ O.DF ^ 2
 
 def ProductLowerBoundTwist (O : OnObj S P c) : Prop :=
   ∃ PP D : ℝ, 1 ≤ PP ∧ 1 ≤ D ∧ PP ^ 4 * D ^ 3 * O.k * O.f * O.x ≤ O.T * O.m * dl2 O
 
-def TwistDensityBounds (O : OnObj S P c) : Prop := O.x ^ (-O.eps) ≤ dl2 O ∧ ∃ Lw : ℝ, 22 ≤ Lw ∧ dl2 O ≤ 1 / (4 * Lw)
+def TwistDensityBounds (O : OnObj S P c) : Prop :=
+  O.x ^ (-O.eps) ≤ dl2 O ∧ ∃ Lw : ℝ, 22 ≤ Lw ∧ dl2 O ≤ 1 / (4 * Lw)
 
 def TimeDiscriminantBound (O : OnObj S P c) (C2 : ℝ) : Prop := O.T * O.DF ≤ 3 * C2 * O.k * O.f * O.b
 
@@ -97,12 +103,15 @@ theorem one_le_b (O : OnObj S P c) (hx : 0 ≤ O.x) : 1 ≤ O.b :=
 theorem one_le_Xp (O : OnObj S P c) (hx : 0 ≤ O.x) : 1 ≤ Xp O :=
   Real.one_le_exp (Real.rpow_nonneg hx _)
 
-theorem wt_bound (O : OnObj S P c) (hW : LeafW O) (j : Bs.J) : 0 ≤ O.wt j ∧ O.wt j ≤ 2 * O.f * O.b := by
+theorem wt_bound (O : OnObj S P c) (hW : LeafW O) (j : Bs.J)
+    : 0 ≤ O.wt j ∧ O.wt j ≤ 2 * O.f * O.b := by
   obtain ⟨nf, hnf, hw⟩ := hW
   obtain ⟨ws, hs, hb⟩ := hw j
   rw [hs]
   refine ⟨Finset.sum_nonneg (fun τ _ => (hb τ).1), ?_⟩
-  calc ∑ τ, ws τ ≤ ∑ _τ : Fin nf, 2 * O.b := Finset.sum_le_sum (fun τ _ => (hb τ).2)
+  calc
+    ∑ τ, ws τ
+      ≤ ∑ _τ : Fin nf, 2 * O.b := Finset.sum_le_sum (fun τ _ => (hb τ).2)
     _ = 2 * O.f * O.b := by
       rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hnf]; ring
 
@@ -128,40 +137,46 @@ theorem le_of_sq_le_sq' (a b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) (h : a ^ 2 ≤
   have h1 : b * b < a * a := mul_self_lt_mul_self hb hc
   nlinarith
 
-theorem bad_b (w fSe T fkb lq f m b C1 : ℝ) (hw : w ≤ 2 * f * b) (hfS : fSe ≤ f * b) (hT : T ≤ b)
-    (hfk : fkb ≤ f * b) (hlq0 : 0 ≤ lq) (hlq : lq ≤ m) (hf : 8 ≤ f) (hm : 44 ≤ m) (hb : 1 ≤ b)
-    (hC1 : 14 ≤ C1) : (2 * (w + fSe + T + 1) + 4 * fkb) * lq ≤ C1 * (f * m * b) := by
+theorem bad_b
+    (w fSe T fkb lq f m b C1 : ℝ)
+    (hw : w ≤ 2 * f * b) (hfS : fSe ≤ f * b) (hT : T ≤ b) (hfk : fkb ≤ f * b) (hlq0 : 0 ≤ lq)
+    (hlq : lq ≤ m) (hf : 8 ≤ f) (hm : 44 ≤ m) (hb : 1 ≤ b) (hC1 : 14 ≤ C1)
+    : (2 * (w + fSe + T + 1) + 4 * fkb) * lq ≤ C1 * (f * m * b) := by
   have hfb : 0 ≤ f * b := mul_nonneg (by linarith) (by linarith)
   have hB : 2 * (w + fSe + T + 1) + 4 * fkb ≤ 10 * (f * b) + 2 * b + 2 := by linarith
   have hB0 : 0 ≤ 10 * (f * b) + 2 * b + 2 := by linarith
   have hbm0 : 0 ≤ b * m := mul_nonneg (by linarith) (by linarith)
   have h1 : b * m ≤ f * m * b := by
-    calc b * m = 1 * (b * m) := by ring
+    calc
+      b * m
+        = 1 * (b * m) := by ring
       _ ≤ f * (b * m) := mul_le_mul_of_nonneg_right (by linarith) hbm0
       _ = f * m * b := by ring
   have h2 : m ≤ b * m := by
-    calc m = 1 * m := by ring
+    calc
+      m = 1 * m := by ring
       _ ≤ b * m := mul_le_mul_of_nonneg_right hb (by linarith)
   have hfmb : 0 ≤ f * m * b := by linarith
-  calc (2 * (w + fSe + T + 1) + 4 * fkb) * lq ≤ (10 * (f * b) + 2 * b + 2) * lq :=
-        mul_le_mul_of_nonneg_right hB hlq0
+  calc
+    (2 * (w + fSe + T + 1) + 4 * fkb) * lq
+      ≤ (10 * (f * b) + 2 * b + 2) * lq := mul_le_mul_of_nonneg_right hB hlq0
     _ ≤ (10 * (f * b) + 2 * b + 2) * m := mul_le_mul_of_nonneg_left hlq hB0
     _ = 10 * (f * m * b) + 2 * (b * m) + 2 * m := by ring
     _ ≤ 14 * (f * m * b) := by linarith
     _ ≤ C1 * (f * m * b) := mul_le_mul_of_nonneg_right hC1 hfmb
 
-theorem bad_c (C m v w fSe T f b s L C2 : ℝ) (hC : 0 ≤ C) (hv0 : 0 ≤ v) (hs : 0 ≤ s) (hv1 : s * (2 + v) ≤ 11 * L)
-    (hw0 : 0 ≤ w + fSe) (hw : w ≤ 2 * f * b) (hfS : fSe ≤ f * b) (hT : T ≤ b) (hf : 8 ≤ f) (hm : 44 ≤ m) (hb : 1 ≤ b)
-    (hC2 : 66 * C + 4 ≤ C2) :
-    s * (2 * (C * m * (2 + v) * (w + fSe)) + 2 * T + 2) ≤ C2 * (f * m * b * L) := by
+theorem bad_c
+    (C m v w fSe T f b s L C2 : ℝ) (hC : 0 ≤ C) (hv0 : 0 ≤ v) (hs : 0 ≤ s)
+    (hv1 : s * (2 + v) ≤ 11 * L) (hw0 : 0 ≤ w + fSe) (hw : w ≤ 2 * f * b) (hfS : fSe ≤ f * b)
+    (hT : T ≤ b) (hf : 8 ≤ f) (hm : 44 ≤ m) (hb : 1 ≤ b) (hC2 : 66 * C + 4 ≤ C2)
+    : s * (2 * (C * m * (2 + v) * (w + fSe)) + 2 * T + 2) ≤ C2 * (f * m * b * L) := by
   have hfb : 0 ≤ f * b := mul_nonneg (by linarith) (by linarith)
   have hm0 : 0 ≤ m := by linarith
   have hsv : 0 ≤ s * v := mul_nonneg hs hv0
   have hL : 0 ≤ L := by nlinarith
   have hs2 : 2 * s ≤ 11 * L := by nlinarith
   have hwS : w + fSe ≤ 3 * (f * b) := by linarith
-  have hA : s * (2 + v) * (w + fSe) ≤ 11 * L * (3 * (f * b)) :=
-    mul_le_mul hv1 hwS hw0 (by linarith)
+  have hA : s * (2 + v) * (w + fSe) ≤ 11 * L * (3 * (f * b)) := mul_le_mul hv1 hwS hw0 (by linarith)
   have hB : C * m * (s * (2 + v) * (w + fSe)) ≤ C * m * (11 * L * (3 * (f * b))) :=
     mul_le_mul_of_nonneg_left hA (mul_nonneg hC hm0)
   have hfm : 352 ≤ f * m := by nlinarith
@@ -170,16 +185,20 @@ theorem bad_c (C m v w fSe T f b s L C2 : ℝ) (hC : 0 ≤ C) (hv0 : 0 ≤ v) (h
   have h2 : 2 * s * b ≤ 11 * L * b := mul_le_mul_of_nonneg_right hs2 (by linarith)
   have h3 : 352 * (b * L) ≤ f * m * (b * L) := mul_le_mul_of_nonneg_right hfm hbL
   have hU : 0 ≤ f * m * b * L := by nlinarith
-  have h4 : (66 * C + 4) * (f * m * b * L) ≤ C2 * (f * m * b * L) := mul_le_mul_of_nonneg_right hC2 hU
+  have h4 : (66 * C + 4) * (f * m * b * L) ≤ C2 * (f * m * b * L) :=
+    mul_le_mul_of_nonneg_right hC2 hU
   nlinarith
 
-theorem bad_d (T f r L b lg : ℝ) (hT0 : 0 ≤ T) (hT2 : T ^ 2 ≤ b) (hf : 8 ≤ f) (hr : 9 ≤ r) (hL : 10 ≤ L)
-    (hZ : (f * r * L) ^ 12 ≤ b) (hlg0 : 0 ≤ lg) (hlg1 : lg ≤ 18 * L) : (4 * T + 4 * f * r ^ 2) * lg ≤ 4 * b := by
+theorem bad_d
+    (T f r L b lg : ℝ) (hT0 : 0 ≤ T) (hT2 : T ^ 2 ≤ b) (hf : 8 ≤ f) (hr : 9 ≤ r) (hL : 10 ≤ L)
+    (hZ : (f * r * L) ^ 12 ≤ b) (hlg0 : 0 ≤ lg) (hlg1 : lg ≤ 18 * L)
+    : (4 * T + 4 * f * r ^ 2) * lg ≤ 4 * b := by
   have hb0 : 0 ≤ b := le_trans (sq_nonneg T) hT2
   have hfr : 1 ≤ f * r := by nlinarith
   have hL0 : 0 ≤ L := by linarith
   have hLZ : L ≤ f * r * L := by
-    calc L = 1 * L := by ring
+    calc
+      L = 1 * L := by ring
       _ ≤ f * r * L := mul_le_mul_of_nonneg_right hfr hL0
   have hL12 : L ^ 12 ≤ b := le_trans (pow_le_pow_left₀ hL0 hLZ 12) hZ
   have hL2 : 1296 * L ^ 2 ≤ b := by
@@ -203,7 +222,9 @@ theorem bad_d (T f r L b lg : ℝ) (hT0 : 0 ≤ T) (hT2 : T ^ 2 ≤ b) (hf : 8 �
     have h1' : 1 ≤ f * L := by nlinarith
     have h0' : 0 ≤ f * r ^ 2 * L := mul_nonneg (mul_nonneg (by linarith) (sq_nonneg r)) hL0
     rw [e]
-    calc f * r ^ 2 * L = (f * r ^ 2 * L) * 1 := by ring
+    calc
+      f * r ^ 2 * L
+        = (f * r ^ 2 * L) * 1 := by ring
       _ ≤ (f * r ^ 2 * L) * (f * L) := mul_le_mul_of_nonneg_left h1' h0'
   have h36 : 36 * (f * r * L) ^ 2 ≤ (f * r * L) ^ 12 := by
     have h10 : (720 : ℝ) ^ 10 ≤ (f * r * L) ^ 10 := pow_le_pow_left₀ (by norm_num) hZ0 10
@@ -214,20 +235,26 @@ theorem bad_d (T f r L b lg : ℝ) (hT0 : 0 ≤ T) (hT2 : T ^ 2 ≤ b) (hf : 8 �
     exact mul_le_mul_of_nonneg_right h36' hz0
   have hfr2 : 36 * (f * r ^ 2 * L) ≤ b := by linarith
   have hfr20 : 0 ≤ f * r ^ 2 := mul_nonneg (by linarith) (sq_nonneg r)
-  calc (4 * T + 4 * f * r ^ 2) * lg = 4 * T * lg + 4 * (f * r ^ 2) * lg := by ring
+  calc
+    (4 * T + 4 * f * r ^ 2) * lg
+      = 4 * T * lg + 4 * (f * r ^ 2) * lg := by ring
     _ ≤ 4 * T * (18 * L) + 4 * (f * r ^ 2) * (18 * L) := by
-        have a1 : 4 * T * lg ≤ 4 * T * (18 * L) := mul_le_mul_of_nonneg_left hlg1 (by linarith)
-        have a2 : 4 * (f * r ^ 2) * lg ≤ 4 * (f * r ^ 2) * (18 * L) :=
-          mul_le_mul_of_nonneg_left hlg1 (by linarith)
-        linarith
+      have a1 : 4 * T * lg ≤ 4 * T * (18 * L) := mul_le_mul_of_nonneg_left hlg1 (by linarith)
+      have a2 : 4 * (f * r ^ 2) * lg ≤ 4 * (f * r ^ 2) * (18 * L) :=
+        mul_le_mul_of_nonneg_left hlg1 (by linarith)
+      linarith
     _ = 2 * (36 * (T * L)) + 2 * (36 * (f * r ^ 2 * L)) := by ring
     _ ≤ 4 * b := by linarith
 
-theorem leafBad_of_page (O : OnObj S P c)
+theorem leafBad_of_page
+    (O : OnObj S P c)
     (hC : 0 ≤ c.C) (hCb1 : 14 ≤ c.Cb1) (hCb2 : 66 * c.C + 4 ≤ c.Cb2) (hx : 3 ≤ O.x)
-    (hEps : ExponentSmallBound O) (hN4 : HalfDegreeAtLeastFour O) (h1246 : DegreeAtLeastFortyFour O) (h21 : RankAndLengthLowerBounds O) (h1 : LeafSZ1 O) (hW : LeafW O)
-    (h14 : SupportGapBounds O) (h121 : LogPrimeProductBound O) (h1232 : ProductWithRatioBound O) (h75 : ConductorCongruentPrimePair O) (h19 : SquaredTimeBound O) (h18 : PowerTwelveBound O)
-    (tVd : TieVd O) : LeafBad O := by
+    (hEps : ExponentSmallBound O) (hN4 : HalfDegreeAtLeastFour O) (h1246 : DegreeAtLeastFortyFour O)
+    (h21 : RankAndLengthLowerBounds O) (h1 : LeafSZ1 O) (hW : LeafW O) (h14 : SupportGapBounds O)
+    (h121 : LogPrimeProductBound O) (h1232 : ProductWithRatioBound O)
+    (h75 : ConductorCongruentPrimePair O) (h19 : SquaredTimeBound O) (h18 : PowerTwelveBound O)
+    (tVd : TieVd O)
+    : LeafBad O := by
   have hx0 : 0 ≤ O.x := by linarith
   have hb := one_le_b O hx0
   have hf : 8 ≤ O.f := by
@@ -240,16 +267,21 @@ theorem leafBad_of_page (O : OnObj S P c)
   · obtain ⟨_, hw1⟩ := wt_bound O hW j
     have hfk : O.f * O.k * O.bp ≤ O.f * O.b := by
       rw [mul_assoc]; exact mul_le_mul_of_nonneg_left h1232 (by linarith)
-    exact bad_b (O.wt j) (O.f * O.Se) O.T (O.f * O.k * O.bp) (Real.log ((O.q1 * O.dd : ℕ) : ℝ)) O.f O.m O.b
-      c.Cb1 hw1 hfS h1.2 hfk (Real.log_natCast_nonneg _) h121 hf hm hb hCb1
+    exact bad_b (O.wt j) (O.f * O.Se) O.T (O.f * O.k * O.bp) (Real.log ((O.q1 * O.dd : ℕ) : ℝ)) O.f
+      O.m O.b c.Cb1 hw1 hfS h1.2 hfk (Real.log_natCast_nonneg _) h121 hf hm hb hCb1
   · obtain ⟨hw0, hw1⟩ := wt_bound O hW j
     by_cases hS0 : 0 ≤ O.wt j + O.f * O.Se
     · exact bad_c c.C O.m O.vd (O.wt j) (O.f * O.Se) O.T O.f O.b _ O.L c.Cb2 hC tVd.1
-        (Finset.sum_nonneg fun p _ => Real.log_natCast_nonneg p) tVd.2.1 hS0 hw1 hfS h1.2 hf hm hb hCb2
-    · have h0 := bad_c c.C O.m O.vd 0 0 O.T O.f O.b _ O.L c.Cb2 hC tVd.1
-        (Finset.sum_nonneg fun p _ => Real.log_natCast_nonneg p) tVd.2.1 (by norm_num) (by nlinarith) (by nlinarith) h1.2 hf hm hb hCb2
-      refine le_trans (mul_le_mul_of_nonneg_left ?_ (Finset.sum_nonneg fun p _ => Real.log_natCast_nonneg p)) h0
-      have hcm : 0 ≤ c.C * O.m * (2 + O.vd) := mul_nonneg (mul_nonneg hC (by linarith)) (by linarith [tVd.1])
+        (Finset.sum_nonneg fun p _ => Real.log_natCast_nonneg p) tVd.2.1 hS0 hw1 hfS h1.2 hf hm hb
+        hCb2
+    · have h0 :=
+        bad_c c.C O.m O.vd 0 0 O.T O.f O.b _ O.L c.Cb2 hC tVd.1
+          (Finset.sum_nonneg fun p _ => Real.log_natCast_nonneg p) tVd.2.1 (by norm_num)
+          (by nlinarith) (by nlinarith) h1.2 hf hm hb hCb2
+      refine le_trans
+        (mul_le_mul_of_nonneg_left ?_ (Finset.sum_nonneg fun p _ => Real.log_natCast_nonneg p)) h0
+      have hcm : 0 ≤ c.C * O.m * (2 + O.vd) :=
+        mul_nonneg (mul_nonneg hC (by linarith)) (by linarith [tVd.1])
       have := mul_nonpos_of_nonneg_of_nonpos hcm (le_of_lt (not_le.1 hS0))
       show 2 * (c.C * O.m * (2 + O.vd) * (O.wt j + O.f * O.Se)) + 2 * O.T + 2 ≤ _
       linarith
@@ -259,10 +291,14 @@ theorem leafBad_of_page (O : OnObj S P c)
     have hg1p : (0 : ℝ) < (O.g1 : ℝ) := by exact_mod_cast hp1.pos
     have hg2p : (0 : ℝ) < (O.g2 : ℝ) := by exact_mod_cast hp2.pos
     have hlg1 : Real.log (O.g1 : ℝ) ≤ 9 * O.L := by
-      calc Real.log (O.g1 : ℝ) ≤ Real.log (O.b ^ 9) := Real.log_le_log hg1p hg1
+      calc
+        Real.log (O.g1 : ℝ)
+          ≤ Real.log (O.b ^ 9) := Real.log_le_log hg1p hg1
         _ = 9 * O.L := by rw [Real.log_pow, hlogb]; norm_num
     have hlg2 : Real.log (O.g2 : ℝ) ≤ 9 * O.L := by
-      calc Real.log (O.g2 : ℝ) ≤ Real.log (O.b ^ 9) := Real.log_le_log hg2p hg2
+      calc
+        Real.log (O.g2 : ℝ)
+          ≤ Real.log (O.b ^ 9) := Real.log_le_log hg2p hg2
         _ = 9 * O.L := by rw [Real.log_pow, hlogb]; norm_num
     have hlg : Real.log ((O.g1 * O.g2 : ℕ) : ℝ) = Real.log (O.g1 : ℝ) + Real.log (O.g2 : ℝ) := by
       rw [Nat.cast_mul, Real.log_mul hg1p.ne' hg2p.ne']
@@ -275,29 +311,39 @@ theorem leafBad_of_page (O : OnObj S P c)
     exact bad_d O.T O.f O.rr O.L O.b _ h1.1 hT2 hf h21.1 h21.2 h18 (by rw [hlg]; linarith)
       (by rw [hlg]; linarith)
 
-theorem dfx_bound (DF x k f m b T de2 PP D C2 : ℝ) (hDF0 : 0 ≤ DF) (hPP : 1 ≤ PP) (hD : 1 ≤ D)
-    (hT : PP ^ 4 * D ^ 3 * k * f * x ≤ T * m * de2) (hde0 : 0 ≤ de2) (hde1 : de2 ≤ 1)
-    (hZ3 : T * DF ≤ 3 * C2 * k * f * b) (hC2 : 0 ≤ C2) (hk : 0 < k) (hf : 0 < f) (hx0 : 0 ≤ x)
-    (hm0 : 0 ≤ m) (hb0 : 0 ≤ b) : DF * x ≤ 3 * C2 * m * b := by
+theorem dfx_bound
+    (DF x k f m b T de2 PP D C2 : ℝ)
+    (hDF0 : 0 ≤ DF) (hPP : 1 ≤ PP) (hD : 1 ≤ D) (hT : PP ^ 4 * D ^ 3 * k * f * x ≤ T * m * de2)
+    (hde0 : 0 ≤ de2) (hde1 : de2 ≤ 1) (hZ3 : T * DF ≤ 3 * C2 * k * f * b) (hC2 : 0 ≤ C2)
+    (hk : 0 < k) (hf : 0 < f) (hx0 : 0 ≤ x) (hm0 : 0 ≤ m) (hb0 : 0 ≤ b)
+    : DF * x ≤ 3 * C2 * m * b := by
   have hQ : 1 ≤ PP ^ 4 * D ^ 3 := by
     have h1' : 1 ≤ PP ^ 4 := one_le_pow₀ hPP
     have h2' : 1 ≤ D ^ 3 := one_le_pow₀ hD
-    calc (1 : ℝ) = 1 * 1 := by ring
+    calc
+      (1 : ℝ)
+        = 1 * 1 := by ring
       _ ≤ PP ^ 4 * D ^ 3 := mul_le_mul h1' h2' (by norm_num) (by linarith)
   have hkfx : 0 ≤ k * f * x := mul_nonneg (mul_nonneg hk.le hf.le) hx0
   have e1 : DF * (k * f * x) ≤ DF * (PP ^ 4 * D ^ 3 * k * f * x) := by
     apply mul_le_mul_of_nonneg_left _ hDF0
-    calc k * f * x = 1 * (k * f * x) := by ring
+    calc
+      k * f * x
+        = 1 * (k * f * x) := by ring
       _ ≤ (PP ^ 4 * D ^ 3) * (k * f * x) := mul_le_mul_of_nonneg_right hQ hkfx
       _ = PP ^ 4 * D ^ 3 * k * f * x := by ring
-  have e2 : DF * (PP ^ 4 * D ^ 3 * k * f * x) ≤ DF * (T * m * de2) := mul_le_mul_of_nonneg_left hT hDF0
+  have e2 : DF * (PP ^ 4 * D ^ 3 * k * f * x) ≤ DF * (T * m * de2) :=
+    mul_le_mul_of_nonneg_left hT hDF0
   have e4 : (T * DF) * (m * de2) ≤ (3 * C2 * k * f * b) * (m * de2) :=
     mul_le_mul_of_nonneg_right hZ3 (mul_nonneg hm0 hde0)
   have hK0 : 0 ≤ 3 * C2 * k * f * b := by positivity
   have hmd : m * de2 ≤ m := by
-    calc m * de2 ≤ m * 1 := mul_le_mul_of_nonneg_left hde1 hm0
+    calc
+      m * de2
+        ≤ m * 1 := mul_le_mul_of_nonneg_left hde1 hm0
       _ = m := by ring
-  have e5 : (3 * C2 * k * f * b) * (m * de2) ≤ (3 * C2 * k * f * b) * m := mul_le_mul_of_nonneg_left hmd hK0
+  have e5 : (3 * C2 * k * f * b) * (m * de2) ≤ (3 * C2 * k * f * b) * m :=
+    mul_le_mul_of_nonneg_left hmd hK0
   have hkf : 0 < k * f := mul_pos hk hf
   have e6 : (k * f) * (DF * x) ≤ (k * f) * (3 * C2 * m * b) := by
     have a : (k * f) * (DF * x) = DF * (k * f * x) := by ring
@@ -314,13 +360,17 @@ theorem two_cube_le (y n : ℝ) (hy : 0 ≤ y) (hn : 4 ≤ n) : 2 * y ^ 3 ≤ Re
   have : Real.exp y * 4 ≤ Real.exp y * n := mul_le_mul_of_nonneg_left hn he.le
   linarith
 
-
 set_option maxHeartbeats 1000000 in
-theorem leafSizes_of_page (O : OnObj S P c) (C2 : ℝ) (hC2 : 0 ≤ C2) (hC : 1 ≤ c.C)
-    (hx : 3 ≤ O.x) (hxC : 3 * c.C * C2 ≤ O.x)
-    (hEps : ExponentSmallBound O) (hN4 : HalfDegreeAtLeastFour O) (h1246 : DegreeAtLeastFortyFour O) (h29 : DimensionExceedsDegreeByThree O) (h21 : RankAndLengthLowerBounds O) (hW : LeafW O)
-    (h14 : SupportGapBounds O) (h011 : EtaPowerBound O) (hSg : LeafSign O) (h1243 : NodeCountBound O) (h13 : DiscriminantDegreeBound O)
-    (h231 : ProductLowerBoundTwist O) (h44 : TwistDensityBounds O) (tX2 : SecondRatioDefinition O) (tZ3 : TimeDiscriminantBound O C2) : LeafSizes O := by
+theorem leafSizes_of_page
+    (O : OnObj S P c)
+    (C2 : ℝ) (hC2 : 0 ≤ C2)
+    (hC : 1 ≤ c.C) (hx : 3 ≤ O.x) (hxC : 3 * c.C * C2 ≤ O.x) (hEps : ExponentSmallBound O)
+    (hN4 : HalfDegreeAtLeastFour O) (h1246 : DegreeAtLeastFortyFour O)
+    (h29 : DimensionExceedsDegreeByThree O) (h21 : RankAndLengthLowerBounds O) (hW : LeafW O)
+    (h14 : SupportGapBounds O) (h011 : EtaPowerBound O) (hSg : LeafSign O)
+    (h1243 : NodeCountBound O) (h13 : DiscriminantDegreeBound O) (h231 : ProductLowerBoundTwist O)
+    (h44 : TwistDensityBounds O) (tX2 : SecondRatioDefinition O) (tZ3 : TimeDiscriminantBound O C2)
+    : LeafSizes O := by
   have hx0 : 0 ≤ O.x := by linarith
   have hxp : 0 < O.x := by linarith
   have hb := one_le_b O hx0
@@ -341,7 +391,9 @@ theorem leafSizes_of_page (O : OnObj S P c) (C2 : ℝ) (hC2 : 0 ≤ C2) (hC : 1 
     linarith
   have hkpos : 0 < O.k := by linarith
   have hlogk : Real.log O.k ≤ O.L := by
-    calc Real.log O.k ≤ Real.log (Xp O) := Real.log_le_log hkpos hkX
+    calc
+      Real.log O.k
+        ≤ Real.log (Xp O) := Real.log_le_log hkpos hkX
       _ = O.x ^ (O.eps / 3) := Real.log_exp _
       _ ≤ O.x ^ O.eps := Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
       _ = O.L := hLx.symm
@@ -362,15 +414,18 @@ theorem leafSizes_of_page (O : OnObj S P c) (C2 : ℝ) (hC2 : 0 ≤ C2) (hC : 1 
   have hde1 : dl2 O ≤ 1 := by
     have : 1 / (4 * Lw) ≤ 1 := by rw [div_le_one (by linarith)]; linarith
     linarith
-  have hDFx := dfx_bound O.DF O.x O.k O.f O.m O.b O.T (dl2 O) PP D C2 hDF0 hPP hD hT hde0 hde1 tZ3 hC2 hkpos
-    (by linarith) hx0 (by linarith) hbpos.le
+  have hDFx :=
+    dfx_bound O.DF O.x O.k O.f O.m O.b O.T (dl2 O) PP D C2 hDF0 hPP hD hT hde0 hde1 tZ3 hC2 hkpos
+      (by linarith) hx0 (by linarith) hbpos.le
   have hYmb : O.Y ≤ O.m * O.b := by
     show c.C * O.DF ≤ O.m * O.b
     have h1' : (c.C * O.DF) * O.x ≤ c.C * (3 * C2 * O.m * O.b) := by
       rw [mul_assoc]; exact mul_le_mul_of_nonneg_left hDFx (by linarith)
     have hmb : 0 ≤ O.m * O.b := mul_nonneg (by linarith) hbpos.le
     have h2' : c.C * (3 * C2 * O.m * O.b) ≤ (O.m * O.b) * O.x := by
-      calc c.C * (3 * C2 * O.m * O.b) = (3 * c.C * C2) * (O.m * O.b) := by ring
+      calc
+        c.C * (3 * C2 * O.m * O.b)
+          = (3 * c.C * C2) * (O.m * O.b) := by ring
         _ ≤ O.x * (O.m * O.b) := mul_le_mul_of_nonneg_right hxC hmb
         _ = (O.m * O.b) * O.x := by ring
     exact le_of_mul_le_mul_right (le_trans h1' h2') hxp
@@ -378,7 +433,9 @@ theorem leafSizes_of_page (O : OnObj S P c) (C2 : ℝ) (hC2 : 0 ≤ C2) (hC : 1 
     have hY0 : 0 < O.Y := by linarith
     have hmp : 0 < O.m := by linarith
     have hlm : Real.log O.m ≤ Real.log O.k := Real.log_le_log hmp (by linarith)
-    calc Real.log O.Y ≤ Real.log (O.m * O.b) := Real.log_le_log hY0 hYmb
+    calc
+      Real.log O.Y
+        ≤ Real.log (O.m * O.b) := Real.log_le_log hY0 hYmb
       _ = Real.log O.m + O.L := by rw [Real.log_mul hmp.ne' hbpos.ne']; rfl
       _ ≤ 2 * O.L := by linarith
   have hy : O.x ^ O.eps = (O.x ^ (O.eps / 3)) ^ 3 := by
@@ -398,7 +455,9 @@ theorem leafSizes_of_page (O : OnObj S P c) (C2 : ℝ) (hC2 : 0 ≤ C2) (hC : 1 
     have hyy : O.x ^ (O.eps / 3) ≤ (O.x ^ (O.eps / 3)) ^ 3 * (4 / 5) := by
       have h4 : (0 : ℝ) ≤ (O.x ^ (O.eps / 3)) ^ 2 * (4 / 5) - 1 := by nlinarith
       nlinarith [mul_nonneg hy0 h4]
-    calc O.k ≤ Xp O := hkX
+    calc
+      O.k
+        ≤ Xp O := hkX
       _ = Real.exp (O.x ^ (O.eps / 3)) := rfl
       _ ≤ Real.exp ((O.x ^ (O.eps / 3)) ^ 3 * (4 / 5)) := Real.exp_le_exp.mpr hyy
   have hXn : 0 < Xp O * nH O := mul_pos (by linarith) (by linarith)
@@ -421,25 +480,37 @@ theorem leafSizes_of_page (O : OnObj S P c) (C2 : ℝ) (hC2 : 0 ≤ C2) (hC : 1 
     exact two_cube_le _ _ hy0 hn4
   have hkSL : O.k * O.Se * O.L ≤ O.m * O.b := by
     have hL0 : 0 ≤ O.L := by linarith
-    calc O.k * O.Se * O.L ≤ 2 * wpp O * O.L := mul_le_mul_of_nonneg_right hkS hL0
+    calc
+      O.k * O.Se * O.L
+        ≤ 2 * wpp O * O.L := mul_le_mul_of_nonneg_right hkS hL0
       _ = O.b * (2 * O.L) / (Xp O * nH O) := by rw [hwpp]; ring
       _ ≤ O.b * (Xp O * nH O) / (Xp O * nH O) := by
-          apply div_le_div_of_nonneg_right _ hXn.le
-          exact mul_le_mul_of_nonneg_left hexp hbpos.le
+        apply div_le_div_of_nonneg_right _ hXn.le
+        exact mul_le_mul_of_nonneg_left hexp hbpos.le
       _ = O.b := by field_simp
       _ = 1 * O.b := by ring
       _ ≤ O.m * O.b := mul_le_mul_of_nonneg_right (by linarith) hbpos.le
   have hX2 : O.k ≤ O.X2 := by
     rw [tX2, hwpp]
     unfold aa
-    have e : O.x * O.b / (O.b / (Xp O * nH O)) = (O.x * nH O) * Xp O := by
-      field_simp
+    have e : O.x * O.b / (O.b / (Xp O * nH O)) = (O.x * nH O) * Xp O := by field_simp
     rw [e]
     have hxn : 1 ≤ O.x * nH O := by nlinarith
-    calc O.k ≤ Xp O := hkX
+    calc
+      O.k
+        ≤ Xp O := hkX
       _ = 1 * Xp O := by ring
       _ ≤ (O.x * nH O) * Xp O := mul_le_mul_of_nonneg_right hxn (le_trans zero_le_one hXp)
-  exact ⟨fun j => wt_bound O hW j, hY1, hlogY, hYmb, hkSL, hX2, hlogk, le_trans (by norm_num : (1 : ℝ) ≤ 10) hL⟩
+  exact ⟨
+    fun j => wt_bound O hW j,
+    hY1,
+    hlogY,
+    hYmb,
+    hkSL,
+    hX2,
+    hlogk,
+    le_trans (by norm_num : (1 : ℝ) ≤ 10) hL
+  ⟩
 
 theorem ne_of_mod_dvd {g a M : ℕ} (h : g % M = 1) (ha : a ∣ M) (ha1 : 1 < a) : a ≠ g := by
   intro hag
@@ -448,9 +519,13 @@ theorem ne_of_mod_dvd {g a M : ℕ} (h : g % M = 1) (ha : a ∣ M) (ha1 : 1 < a)
   rw [h, Nat.mod_self, Nat.mod_eq_of_lt ha1] at h2
   exact absurd h2 (by norm_num)
 
-theorem leafPage_of (O : OnObj S P c) (hC : ConstC c) (hx : 3 ≤ O.x) (hN4 : HalfDegreeAtLeastFour O) (h12 : PrimeCongruenceConditions O)
-    (h1246 : DegreeAtLeastFortyFour O) (h29 : DimensionExceedsDegreeByThree O) (h1 : LeafSZ1 O) (hSg : LeafSign O) (h75 : ConductorCongruentPrimePair O)
-    (tVd : TieVd O) (tBp : TieBp O) (tNc : TieNc O) : LeafPage O := by
+theorem leafPage_of
+    (O : OnObj S P c)
+    (hC : ConstC c) (hx : 3 ≤ O.x) (hN4 : HalfDegreeAtLeastFour O)
+    (h12 : PrimeCongruenceConditions O) (h1246 : DegreeAtLeastFortyFour O)
+    (h29 : DimensionExceedsDegreeByThree O) (h1 : LeafSZ1 O) (hSg : LeafSign O)
+    (h75 : ConductorCongruentPrimePair O) (tVd : TieVd O) (tBp : TieBp O) (tNc : TieNc O)
+    : LeafPage O := by
   obtain ⟨hq, hd, hq8, hd16⟩ := h12
   obtain ⟨hg1, hg2, -, -, hne, n, ⟨dq, dd', hsm⟩, hm1, hm2⟩ := h75
   have hx0 : 0 ≤ O.x := by linarith
@@ -461,25 +536,54 @@ theorem leafPage_of (O : OnObj S P c) (hC : ConstC c) (hx : 3 ≤ O.x) (hN4 : Ha
   have hm : 44 ≤ O.m := h1246.1
   have hk : O.m + 3 ≤ O.k := h29
   have hbp : 0 ≤ O.bp := by
-    rw [tBp]; unfold aa Xp
+    rw [tBp]
+    unfold aa Xp
     exact div_nonneg (mul_nonneg hx0 (by linarith)) (Real.exp_pos _).le
   have hvd : 0 ≤ O.vd := tVd.1
   have hNc : 0 ≤ O.Nc := by
-    rw [tNc]; unfold dl2
+    rw [tNc]
+    unfold dl2
     have : 0 ≤ (O.T2 : ℝ) / nH O := div_nonneg (Nat.cast_nonneg _) hnp.le
     have : 0 ≤ O.x ^ (2 * O.eps) := Real.rpow_nonneg hx0 _
     have : 0 ≤ (O.T2 : ℝ) / nH O * O.k * O.b := by
       apply mul_nonneg (mul_nonneg (by assumption) (by linarith)) (by linarith)
     exact div_nonneg (mul_nonneg (by assumption) (by assumption)) hnp.le
-  refine ⟨hC, by linarith, by linarith, hf, h1.1, hSg.1, hSg.2, hbp, hvd, hNc, hg1, hg2, hq, hd, hne, by omega,
-    ne_of_mod_dvd hm1 dq hq.one_lt, ne_of_mod_dvd hm2 dq hq.one_lt, ne_of_mod_dvd hm1 dd' hd.one_lt,
-    ne_of_mod_dvd hm2 dd' hd.one_lt, fun h => ne_of_mod_dvd hm1 (hsm _ h).2 (hsm _ h).1 rfl,
-    fun h => ne_of_mod_dvd hm2 (hsm _ h).2 (hsm _ h).1 rfl, tVd.2.2.1, tVd.2.2.2, by linarith⟩
+  refine ⟨
+    hC,
+    by linarith,
+    by linarith,
+    hf,
+    h1.1,
+    hSg.1,
+    hSg.2,
+    hbp,
+    hvd,
+    hNc,
+    hg1,
+    hg2,
+    hq,
+    hd,
+    hne,
+    by omega,
+    ne_of_mod_dvd hm1 dq hq.one_lt,
+    ne_of_mod_dvd hm2 dq hq.one_lt,
+    ne_of_mod_dvd hm1 dd' hd.one_lt,
+    ne_of_mod_dvd hm2 dd' hd.one_lt,
+    fun h => ne_of_mod_dvd hm1 (hsm _ h).2 (hsm _ h).1 rfl,
+    fun h => ne_of_mod_dvd hm2 (hsm _ h).2 (hsm _ h).1 rfl,
+    tVd.2.2.1,
+    tVd.2.2.2,
+    by linarith
+  ⟩
 
 def PageLeaves (O : OnObj S P c) (C2 : ℝ) : Prop :=
-  ExponentSmallBound O ∧ HalfDegreeAtLeastFour O ∧ PrimeCongruenceConditions O ∧ DegreeAtLeastFortyFour O ∧ DimensionExceedsDegreeByThree O ∧ RankAndLengthLowerBounds O ∧ LeafSZ1 O ∧ LeafW O ∧ SupportGapBounds O ∧
-    EtaPowerBound O ∧ LeafSign O ∧ NodeCountBound O ∧ LogPrimeProductBound O ∧ ProductWithRatioBound O ∧ ConductorCongruentPrimePair O ∧ SquaredTimeBound O ∧ PowerTwelveBound O ∧
-    DiscriminantDegreeBound O ∧ ProductLowerBoundTwist O ∧ TwistDensityBounds O ∧ TimeDiscriminantBound O C2 ∧ TieVd O ∧ SecondRatioDefinition O ∧ TieBp O ∧ TieNc O
+  ExponentSmallBound O ∧ HalfDegreeAtLeastFour O ∧ PrimeCongruenceConditions O
+    ∧ DegreeAtLeastFortyFour O ∧ DimensionExceedsDegreeByThree O ∧ RankAndLengthLowerBounds O
+    ∧ LeafSZ1 O ∧ LeafW O ∧ SupportGapBounds O ∧ EtaPowerBound O ∧ LeafSign O ∧ NodeCountBound O
+    ∧ LogPrimeProductBound O ∧ ProductWithRatioBound O ∧ ConductorCongruentPrimePair O
+    ∧ SquaredTimeBound O ∧ PowerTwelveBound O ∧ DiscriminantDegreeBound O ∧ ProductLowerBoundTwist O
+    ∧ TwistDensityBounds O ∧ TimeDiscriminantBound O C2 ∧ TieVd O ∧ SecondRatioDefinition O
+    ∧ TieBp O ∧ TieNc O
 
 variable (K)
 

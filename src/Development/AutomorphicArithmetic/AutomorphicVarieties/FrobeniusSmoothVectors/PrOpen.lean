@@ -6,8 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.V.Fr.pr_open :
-    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ}, F.Ok C₀ → ∀ (O : Type) [CommRing O] [IsLocalRing O], ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (B : Box F n R), B.Cont (maximalIdeal R) → IsOpen ((B.bar O).r.ker : Set F.Γ) ∧ IsOpen ((B.bar O).ad.ker : Set F.Γ) ∧ IsLocallyConstant fun s => ((B.bar O).r s).mat := by
+theorem UpperTheory.V.Fr.pr_open
+    : ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ},
+      F.Ok C₀
+        → ∀ (O : Type) [CommRing O] [IsLocalRing O],
+          ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (B : Box F n R),
+            B.Cont (maximalIdeal R)
+              → IsOpen ((B.bar O).r.ker : Set F.Γ) ∧ IsOpen ((B.bar O).ad.ker : Set F.Γ)
+                ∧ IsLocallyConstant fun s => ((B.bar O).r s).mat := by
   intro l _ k _ _ F C₀ n hF O _ _ R _ _ _ B hB
   have hent : ∀ i j, IsLocallyConstant fun s => ((B.bar O).r s).mat i j := fun i j => by
     have hk : ∀ a ∈ maximalIdeal R ^ 1, (res O R : R →+* ResidueField O) a = 0 := fun a ha => by
@@ -21,8 +27,8 @@ theorem UpperTheory.V.Fr.pr_open :
       Filter.eventually_all.2 fun i => Filter.eventually_all.2 fun j => (hent i j).eventually_eq x
     exact h.mono fun y hy => Matrix.ext hy
   have hr : IsOpen ((B.bar O).r.ker : Set F.Γ) := by
-    have e : ((B.bar O).r.ker : Set F.Γ) =
-        {s | ((B.bar O).r s).mat = 1} ∩ (F.del.ker : Set F.Γ) := by
+    have e
+        : ((B.bar O).r.ker : Set F.Γ) = {s | ((B.bar O).r s).mat = 1} ∩ (F.del.ker : Set F.Γ) := by
       ext s
       constructor
       · intro hs

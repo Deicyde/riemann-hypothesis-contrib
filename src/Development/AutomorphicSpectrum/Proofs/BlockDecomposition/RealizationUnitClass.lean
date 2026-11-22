@@ -9,12 +9,17 @@ open CrystallineSemistableComparison.Pb.Kap
 
 namespace GlobalTheory.CompanionTheory.KapUnit
 
-theorem rho_one_eval : ∀ {Λ A B K : Type} [CommRing Λ] [CommRing A] [CommRing B] [Field K] (C : Chain.{1} Λ A B K) (hC : C.Good) (P : Cup C), P.Good → ∀ h : Module.Dual K (C.V 0) →+ B, C.Rho P.oneS h → ∀ φ : Module.Dual K (C.V 0), h φ = C.o (φ P.oneV) := by
+theorem rho_one_eval
+    : ∀ {Λ A B K : Type} [CommRing Λ] [CommRing A] [CommRing B] [Field K] (C : Chain.{1} Λ A B K)
+        (hC : C.Good) (P : Cup C),
+      P.Good
+        → ∀ h : Module.Dual K (C.V 0) →+ B,
+          C.Rho P.oneS h → ∀ φ : Module.Dual K (C.V 0), h φ = C.o (φ P.oneV) := by
   intro Λ A B K _ _ _ _ C hC P hP h hR φ
   obtain ⟨hsem, e, z, hz, hb⟩ := hR
   have hw : C.b 0 z = ((C.ℓ : B) ^ e) • C.μ 0 P.oneV := by
-    have h0 : C.b 0 (z - ((C.ℓ : A) ^ e) • P.oneZ) = 0 := hC.sep 0 _ (fun n => by
-      rw [map_sub, map_smul, hP.one_r, hz, sub_self])
+    have h0 : C.b 0 (z - ((C.ℓ : A) ^ e) • P.oneZ) = 0 :=
+      hC.sep 0 _ (fun n => by rw [map_sub, map_smul, hP.one_r, hz, sub_self])
     rw [map_sub, map_smulₛₗ, hP.one_b, sub_eq_zero] at h0
     rw [h0]
     simp

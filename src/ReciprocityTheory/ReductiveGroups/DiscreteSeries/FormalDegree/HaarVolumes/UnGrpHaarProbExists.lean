@@ -18,8 +18,8 @@ variable {N : ℕ}
 theorem unGrp_compactSpace (N : ℕ) : CompactSpace (UNgrp N) :=
   cmpt_compact (ε := fun _ : Fin N => true) fun _ _ => rfl
 
-theorem unGrp_haarProb_exists (N : ℕ) :
-    ∃ μ : Measure (UNgrp N), μ.IsHaarMeasure ∧ IsProbabilityMeasure μ := by
+theorem unGrp_haarProb_exists (N : ℕ)
+    : ∃ μ : Measure (UNgrp N), μ.IsHaarMeasure ∧ IsProbabilityMeasure μ := by
   have := unGrp_compactSpace N
   let K : TopologicalSpace.PositiveCompacts (UNgrp N) := ⊤
   refine ⟨Measure.haarMeasure K, inferInstance, ⟨?_⟩⟩

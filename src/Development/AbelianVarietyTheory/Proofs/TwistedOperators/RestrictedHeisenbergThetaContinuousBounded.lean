@@ -9,21 +9,31 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.ResCont
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem continuous_bounded_setIntegral {X Y : Type} [TopologicalSpace X] [FirstCountableTopology X] [TopologicalSpace Y]
-    [MeasurableSpace Y] [OpensMeasurableSpace Y] (μ : Measure Y) (s : Set Y) (hs : μ s < ⊤) (F : X → Y → ℂ)
-    (hc : Continuous fun q : X × Y => F q.1 q.2) (K : ℝ) (hb : ∀ x y, ‖F x y‖ ≤ K) :
-    Continuous (fun x => ∫ y in s, F x y ∂μ) ∧ ∀ x, ‖∫ y in s, F x y ∂μ‖ ≤ K * (μ.restrict s).real Set.univ := by
+theorem continuous_bounded_setIntegral
+    {X Y : Type} [TopologicalSpace X] [FirstCountableTopology X] [TopologicalSpace Y]
+    [MeasurableSpace Y] [OpensMeasurableSpace Y]
+    (μ : Measure Y) (s : Set Y) (hs : μ s < ⊤)
+    (F : X → Y → ℂ) (hc : Continuous fun q : X × Y => F q.1 q.2)
+    (K : ℝ) (hb : ∀ x y, ‖F x y‖ ≤ K)
+    : Continuous (fun x => ∫ y in s, F x y ∂μ)
+      ∧ ∀ x, ‖∫ y in s, F x y ∂μ‖ ≤ K * (μ.restrict s).real Set.univ := by
   haveI : IsFiniteMeasure (μ.restrict s) := isFiniteMeasure_restrict.2 hs.ne
   refine ⟨?_, fun x => norm_integral_le_of_norm_le_const (.of_forall fun y => hb x y)⟩
-  refine continuous_of_dominated (bound := fun _ => K) (fun x => ?_) (fun x => .of_forall fun y => hb x y)
+  refine continuous_of_dominated
+    (bound := fun _ => K)
+    (fun x => ?_)
+    (fun x => .of_forall fun y => hb x y)
     (integrable_const K) (.of_forall fun y => ?_)
-  · exact (hc.comp (continuous_const.prodMk continuous_id) : Continuous fun y => F x y).aestronglyMeasurable
+  · exact (hc.comp (continuous_const.prodMk continuous_id)
+      : Continuous fun y => F x y).aestronglyMeasurable
   · exact (hc.comp (continuous_id.prodMk continuous_const) : Continuous fun x => F x y)
 
 theorem res_heisO_continuous_bounded : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C C' : Matrix (Fin V.rank) (Fin r) D.host.E)

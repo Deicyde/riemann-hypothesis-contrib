@@ -15,9 +15,10 @@ open Formalism.L2.Th1.CM Formalism.L2.Th1.F
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem three_dvd_of_norm_relations (l x : ℝ) (hl : 1 < l) (hx : 0 < x) (n a : ℤ) (t : ℕ)
-    (h1 : x ^ 12 * (l ^ n) ^ 2 = 1) (h2 : x ^ (2 * t) * l ^ a = 1) (ht : ¬ 3 ∣ t) :
-    ∃ m : ℤ, n = 3 * m := by
+theorem three_dvd_of_norm_relations
+    (l x : ℝ) (hl : 1 < l) (hx : 0 < x)
+    (n a : ℤ) (t : ℕ) (h1 : x ^ 12 * (l ^ n) ^ 2 = 1) (h2 : x ^ (2 * t) * l ^ a = 1) (ht : ¬ 3 ∣ t)
+    : ∃ m : ℤ, n = 3 * m := by
   have hl0 : 0 < l := by linarith
   have e1 : x ^ (12 * t) * l ^ (2 * n * t) = 1 := by
     have : (x ^ 12 * (l ^ n) ^ 2) ^ t = 1 := by rw [h1, one_pow]
@@ -71,15 +72,16 @@ theorem norm_1728_eq_one_of_five_le' (h5 : 5 ≤ l) : ‖(1728 : ℂ_[l])‖ = 1
       omega
   simpa using red_norm_natCast l h
 
-theorem norm_sub_1728_eq_one_of_norm_lt_one (h5 : 5 ≤ l) {J : ℂ_[l]} (hJ : ‖J‖ < 1) : ‖J - 1728‖ = 1 := by
+theorem norm_sub_1728_eq_one_of_norm_lt_one (h5 : 5 ≤ l) {J : ℂ_[l]} (hJ : ‖J‖ < 1)
+    : ‖J - 1728‖ = 1 := by
   have h := norm_1728_eq_one_of_five_le' l h5
   have hne : ‖J‖ ≠ ‖-(1728 : ℂ_[l])‖ := by rw [norm_neg, h]; exact hJ.ne
   rw [sub_eq_add_neg, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hne, norm_neg, h]
   exact max_eq_right hJ.le
 
-theorem norm_weierstrass_coeff_small_j (h5 : 5 ≤ l) {J : ℂ_[l]} (hJ : ‖J‖ < 1) :
-    ‖27 * J / (J - 1728)‖ = ‖J‖ ∧
-      ‖(27 * J / (J - 1728)) ^ 3 - 27 * (27 * J / (J - 1728)) ^ 2‖ = ‖J‖ ^ 2 := by
+theorem norm_weierstrass_coeff_small_j (h5 : 5 ≤ l) {J : ℂ_[l]} (hJ : ‖J‖ < 1)
+    : ‖27 * J / (J - 1728)‖ = ‖J‖
+      ∧ ‖(27 * J / (J - 1728)) ^ 3 - 27 * (27 * J / (J - 1728)) ^ 2‖ = ‖J‖ ^ 2 := by
   have h1 := norm_sub_1728_eq_one_of_norm_lt_one l h5 hJ
   have h27 := norm_twentySeven_eq_one_of_five_le l h5
   have h1728 := norm_1728_eq_one_of_five_le' l h5
@@ -87,11 +89,11 @@ theorem norm_weierstrass_coeff_small_j (h5 : 5 ≤ l) {J : ℂ_[l]} (hJ : ‖J�
     intro h
     rw [h, norm_zero] at h1
     exact zero_ne_one h1
-  have hc : ‖27 * J / (J - 1728)‖ = ‖J‖ := by
-    rw [norm_div, norm_mul, h1, h27, one_mul, div_one]
+  have hc : ‖27 * J / (J - 1728)‖ = ‖J‖ := by rw [norm_div, norm_mul, h1, h27, one_mul, div_one]
   refine ⟨hc, ?_⟩
-  have e : (27 * J / (J - 1728)) ^ 3 - 27 * (27 * J / (J - 1728)) ^ 2
-      = (27 * J / (J - 1728)) ^ 2 * (27 * 1728 / (J - 1728)) := by
+  have e
+      : (27 * J / (J - 1728)) ^ 3 - 27 * (27 * J / (J - 1728)) ^ 2
+        = (27 * J / (J - 1728)) ^ 2 * (27 * 1728 / (J - 1728)) := by
     field_simp
     ring
   rw [e, norm_mul, norm_pow, hc, norm_div, norm_mul, h1, h27, h1728]
@@ -99,10 +101,15 @@ theorem norm_weierstrass_coeff_small_j (h5 : 5 ≤ l) {J : ℂ_[l]} (hJ : ‖J�
 
 end Norms
 
-theorem valDiv3 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3) (hCM : HasCMBy d L) (l : ℕ)
-    [Fact l.Prime] (h5 : 5 ≤ l) (hld : ¬ l ∣ d) (ι : ℂ ≃+* ℂ_[l]) (hJ : ι (jInv L) ∈ MaximalUnramifiedExtension l)
-    (hJ1 : ‖ι (jInv L)‖ ≤ 1) (h0 : ι (jInv L) ≠ 0) :
-    ∃ m : ℤ, ‖ι (jInv L)‖ = (l : ℝ) ^ (3 * m) := by
+theorem valDiv3
+    (d : ℕ)
+    (L : PeriodPair)
+    (hsq : Squarefree d) (hd4 : d % 4 = 3) (hCM : HasCMBy d L)
+    (l : ℕ) [Fact l.Prime]
+    (h5 : 5 ≤ l) (hld : ¬ l ∣ d)
+    (ι : ℂ ≃+* ℂ_[l])
+    (hJ : ι (jInv L) ∈ MaximalUnramifiedExtension l) (hJ1 : ‖ι (jInv L)‖ ≤ 1) (h0 : ι (jInv L) ≠ 0)
+    : ∃ m : ℤ, ‖ι (jInv L)‖ = (l : ℝ) ^ (3 * m) := by
   rcases hJ1.eq_or_lt with hJ1 | hJ1
   · exact ⟨0, by simpa using hJ1⟩
   have hj0 : jInv L ≠ 0 := fun h => h0 (by rw [h, map_zero])
@@ -120,22 +127,18 @@ theorem valDiv3 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3
     exact zero_ne_one hsub
   obtain ⟨L0, hCM0, hj, hc2, hc3⟩ := exists_cm_lattice_equal_invariants d L hCM hg2 hg3
   set J : ℂ_[l] := ι (jInv L) with hJdef
-  have hι2 : ι L0.g₂ = 27 * J / (J - 1728) := by
-    rw [hc2]; simp [hJdef, i27, i1728]
-  have hι3 : ι L0.g₃ = 27 * J / (J - 1728) := by
-    rw [hc3]; simp [hJdef, i27, i1728]
+  have hι2 : ι L0.g₂ = 27 * J / (J - 1728) := by rw [hc2]; simp [hJdef, i27, i1728]
+  have hι3 : ι L0.g₃ = 27 * J / (J - 1728) := by rw [hc3]; simp [hJdef, i27, i1728]
   obtain ⟨hnc, hnD⟩ := norm_weierstrass_coeff_small_j l h5 hJ1
   set c : ℂ_[l] := 27 * J / (J - 1728) with hcdef
-  have hιD : ι (L0.g₂ ^ 3 - 27 * L0.g₃ ^ 2) = c ^ 3 - 27 * c ^ 2 := by
-    simp [hι2, hι3, i27]
+  have hιD : ι (L0.g₂ ^ 3 - 27 * L0.g₃ ^ 2) = c ^ 3 - 27 * c ^ 2 := by simp [hι2, hι3, i27]
   have hJpos : 0 < ‖J‖ := norm_pos_iff.2 h0
   have hD0 : c ^ 3 - 27 * c ^ 2 ≠ 0 := by
     intro h
     rw [h, norm_zero] at hnD
     exact (pow_pos hJpos 2).ne hnD
   obtain ⟨μ, hμ⟩ := IsAlgClosed.exists_pow_nat_eq (c ^ 3 - 27 * c ^ 2)⁻¹ (n := 12) (by norm_num)
-  have hμ1 : μ ^ 12 * ι (L0.g₂ ^ 3 - 27 * L0.g₃ ^ 2) = 1 := by
-    rw [hιD, hμ, inv_mul_cancel₀ hD0]
+  have hμ1 : μ ^ 12 * ι (L0.g₂ ^ 3 - 27 * L0.g₃ ^ 2) = 1 := by rw [hιD, hμ, inv_mul_cancel₀ hD0]
   have hμn : ‖μ‖ ^ 12 * ‖J‖ ^ 2 = 1 := by
     have := congrArg norm hμ1
     rwa [hιD, norm_mul, norm_pow, hnD, norm_one] at this
@@ -147,7 +150,9 @@ theorem valDiv3 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3
   have hn4 : ‖μ ^ 4 * ι L0.g₂‖ < 1 := by
     have e : ‖μ ^ 4 * ι L0.g₂‖ ^ 3 = ‖J‖ := by
       rw [hι2, norm_mul, norm_pow, hnc]
-      calc (‖μ‖ ^ 4 * ‖J‖) ^ 3 = (‖μ‖ ^ 12 * ‖J‖ ^ 2) * ‖J‖ := by ring
+      calc
+        (‖μ‖ ^ 4 * ‖J‖) ^ 3
+          = (‖μ‖ ^ 12 * ‖J‖ ^ 2) * ‖J‖ := by ring
         _ = ‖J‖ := by rw [hμn, one_mul]
     by_contra hcon
     have : 1 ≤ ‖μ ^ 4 * ι L0.g₂‖ ^ 3 := one_le_pow₀ (not_lt.1 hcon)
@@ -156,7 +161,9 @@ theorem valDiv3 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3
   have hn6 : ‖μ ^ 6 * ι L0.g₃‖ = 1 := by
     have e : ‖μ ^ 6 * ι L0.g₃‖ ^ 2 = 1 := by
       rw [hι3, norm_mul, norm_pow, hnc]
-      calc (‖μ‖ ^ 6 * ‖J‖) ^ 2 = ‖μ‖ ^ 12 * ‖J‖ ^ 2 := by ring
+      calc
+        (‖μ‖ ^ 6 * ‖J‖) ^ 2
+          = ‖μ‖ ^ 12 * ‖J‖ ^ 2 := by ring
         _ = 1 := hμn
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (by norm_num)).1 e
   obtain ⟨N, T, hlN, h3N, h3T, hT, hk⟩ :=
@@ -169,10 +176,11 @@ theorem valDiv3 (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hd4 : d % 4 = 3
       exact_mod_cast natCast_mem (MaximalUnramifiedExtension l) 1728
     exact div_mem (mul_mem h27 hJ) (sub_mem hJ h1728)
   have hP : ι (∏ z ∈ T, L0.weierstrassP z) ∈ MaximalUnramifiedExtension l := by
-    have := hk ((MaximalUnramifiedExtension l).comap (ι : ℂ →+* ℂ_[l]))
-      (by rw [Subfield.mem_comap]; simpa [hι2] using hcK)
-      (by rw [Subfield.mem_comap]; simpa [hι3] using hcK)
-      (by rw [Subfield.mem_comap]; exact omega_mem_kur d hsq hd4 l hld ι)
+    have :=
+      hk ((MaximalUnramifiedExtension l).comap (ι : ℂ →+* ℂ_[l]))
+        (by rw [Subfield.mem_comap]; simpa [hι2] using hcK)
+        (by rw [Subfield.mem_comap]; simpa [hι3] using hcK)
+        (by rw [Subfield.mem_comap]; exact omega_mem_kur d hsq hd4 l hld ι)
     simpa [Subfield.mem_comap] using this
   have hP0 : ι (∏ z ∈ T, L0.weierstrassP z) ≠ 0 := by
     intro h

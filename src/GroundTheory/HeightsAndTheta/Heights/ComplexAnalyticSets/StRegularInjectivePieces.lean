@@ -15,10 +15,12 @@ open scoped ContDiff
 noncomputable section
 
 def RegularInjectivePieces.Statement : Prop :=
-  ∀ (d : ℕ) (U : Set (Fin d → ℂ)) (g : (Fin d → ℂ) → Fin d → ℂ), IsOpen U → DifferentiableOn ℂ g U →
-    ∃ P : ℕ → Set (Fin d → ℂ), (∀ i, MeasurableSet (P i)) ∧ Pairwise (Function.onFun Disjoint P) ∧
-      ⋃ i, P i = {w | w ∈ U ∧ LinearMap.det (fderiv ℂ g w : (Fin d → ℂ) →ₗ[ℂ] Fin d → ℂ) ≠ 0} ∧
-      ∀ i, Set.InjOn g (P i)
+  ∀ (d : ℕ) (U : Set (Fin d → ℂ)) (g : (Fin d → ℂ) → Fin d → ℂ),
+    IsOpen U → DifferentiableOn ℂ g U
+      → ∃ P : ℕ → Set (Fin d → ℂ),
+        (∀ i, MeasurableSet (P i)) ∧ Pairwise (Function.onFun Disjoint P)
+          ∧ ⋃ i, P i = {w | w ∈ U ∧ LinearMap.det (fderiv ℂ g w : (Fin d → ℂ) →ₗ[ℂ] Fin d → ℂ) ≠ 0}
+          ∧ ∀ i, Set.InjOn g (P i)
 
 end
 

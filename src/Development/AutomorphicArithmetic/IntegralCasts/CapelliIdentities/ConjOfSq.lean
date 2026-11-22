@@ -4,9 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qh56.conj_of_sq :
-    ∀ {w : ℂ} {q : ℕ},
-    (0 : ℕ) < q → w ^ (2 : ℕ) = (↑q : ℂ) → (starRingEnd ℂ : ℂ → ℂ) w = w := by
+theorem UpperTheory.Reformulated.B.Qh56.conj_of_sq
+    : ∀ {w : ℂ} {q : ℕ}, (0 : ℕ) < q → w ^ (2 : ℕ) = (↑q : ℂ) → (starRingEnd ℂ : ℂ → ℂ) w = w := by
   intro w q _ h
   have hs : ((Real.sqrt q : ℝ) : ℂ) ^ 2 = (q : ℂ) := by
     rw [← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg q), Complex.ofReal_natCast]

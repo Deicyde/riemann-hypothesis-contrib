@@ -17,36 +17,32 @@ namespace GodementJacquet
 
 open Matrix GLnLocal ValuativeRel Topology Filter
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
 def IsSchwartzBruhat (Φ : Matrix (Fin n) (Fin n) F → ℂ) : Prop :=
   IsLocallyConstant Φ ∧ HasCompactSupport Φ
 
-def absDet (g : GL (Fin n) F) : ℝ :=
-  (LocalField.modulus ((g : Matrix (Fin n) (Fin n) F).det) : ℝ)
+def absDet (g : GL (Fin n) F) : ℝ := (LocalField.modulus ((g : Matrix (Fin n) (Fin n) F).det) : ℝ)
 
-def detPow (g : GL (Fin n) F) (s : ℂ) : ℂ :=
-  (absDet g : ℂ) ^ s
-
+def detPow (g : GL (Fin n) F) (s : ℂ) : ℂ := (absDet g : ℂ) ^ s
 
 variable (F) in
-def qs (s : ℂ) : ℂ :=
-  (LocalField.residueCard F : ℂ) ^ (-s)
+def qs (s : ℂ) : ℂ := (LocalField.residueCard F : ℂ) ^ (-s)
 
-def ordDet (g : GL (Fin n) F) : ℤ :=
-  LocalField.ord ((g : Matrix (Fin n) (Fin n) F).det)
+def ordDet (g : GL (Fin n) F) : ℤ := LocalField.ord ((g : Matrix (Fin n) (Fin n) F).det)
 
 def IsLeviSchwartz {α : Type*} (β : Fin n → α) (Ψ : Matrix (Fin n) (Fin n) F → ℂ) : Prop :=
   ∃ r A : ℕ,
-    (∀ X Y : Matrix (Fin n) (Fin n) F, (∀ i j, β i ≠ β j → X i j = 0) →
-      (∀ i j, β i ≠ β j → Y i j = 0) →
-      (∀ i j, ∃ a ∈ 𝒪[F], Y i j = (uniformizer F : F) ^ r * a) → Ψ (X + Y) = Ψ X) ∧
-    (∀ X : Matrix (Fin n) (Fin n) F, (∀ i j, β i ≠ β j → X i j = 0) → Ψ X ≠ 0 →
-      ∀ i j, (uniformizer F : F) ^ A * X i j ∈ 𝒪[F])
+    (∀ X Y : Matrix (Fin n) (Fin n) F,
+        (∀ i j, β i ≠ β j → X i j = 0) → (∀ i j, β i ≠ β j → Y i j = 0)
+          → (∀ i j, ∃ a ∈ 𝒪[F], Y i j = (uniformizer F : F) ^ r * a)
+          → Ψ (X + Y) = Ψ X)
+      ∧ (∀ X : Matrix (Fin n) (Fin n) F,
+        (∀ i j, β i ≠ β j → X i j = 0) → Ψ X ≠ 0 → ∀ i j, (uniformizer F : F) ^ A * X i j ∈ 𝒪[F])
 
-theorem mem_valBall_iff_exists {r : ℕ} {y : F} :
-    y ∈ LocalField.valBall F r ↔ ∃ a ∈ 𝒪[F], y = (uniformizer F : F) ^ r * a := by
+theorem mem_valBall_iff_exists {r : ℕ} {y : F}
+    : y ∈ LocalField.valBall F r ↔ ∃ a ∈ 𝒪[F], y = (uniformizer F : F) ^ r * a := by
   have hϖ : (uniformizer F : F) ≠ 0 := Cartan.uniformizer_ne_zero F
   have hord : LocalField.ord (uniformizer F : F) = 1 :=
     LocalField.ord_uniformizer (irreducible_uniformizer F)
@@ -60,20 +56,19 @@ theorem mem_valBall_iff_exists {r : ℕ} {y : F} :
     refine ⟨y / (uniformizer F : F) ^ r, ?_, by field_simp⟩
     have hne : y / (uniformizer F : F) ^ r ≠ 0 := div_ne_zero h0 (pow_ne_zero _ hϖ)
     rw [← LocalField.mem_valBall_zero_iff, LocalField.mem_valBall_iff_le_ord hne, div_eq_mul_inv,
-      LocalField.ord_mul h0 (inv_ne_zero (pow_ne_zero _ hϖ)),
-      LocalField.ord_inv (pow_ne_zero _ hϖ), LocalField.ord_pow hϖ, hord]
+      LocalField.ord_mul h0 (inv_ne_zero (pow_ne_zero _ hϖ)), LocalField.ord_inv (pow_ne_zero _ hϖ),
+      LocalField.ord_pow hϖ, hord]
     have := (LocalField.mem_valBall_iff_le_ord h0).1 hy
     linarith
   · rintro ⟨a, ha, rfl⟩
     have := LocalField.mul_mem_valBall hϖr (LocalField.mem_valBall_zero_iff.2 ha)
     simpa using this
 
-theorem exists_valBall_subset {S : Set (Matrix (Fin n) (Fin n) F)}
-    (hS : S ∈ 𝓝 (0 : Matrix (Fin n) (Fin n) F)) :
-    ∃ r : ℕ, {Y : Matrix (Fin n) (Fin n) F | ∀ i j, Y i j ∈ LocalField.valBall F r} ⊆ S := by
+theorem exists_valBall_subset
+    {S : Set (Matrix (Fin n) (Fin n) F)} (hS : S ∈ 𝓝 (0 : Matrix (Fin n) (Fin n) F))
+    : ∃ r : ℕ, {Y : Matrix (Fin n) (Fin n) F | ∀ i j, Y i j ∈ LocalField.valBall F r} ⊆ S := by
   classical
-  have hS' : S ∈ Filter.pi fun _ : Fin n => 𝓝 (0 : Fin n → F) := by
-    rw [← nhds_pi]; exact hS
+  have hS' : S ∈ Filter.pi fun _ : Fin n => 𝓝 (0 : Fin n → F) := by rw [← nhds_pi]; exact hS
   obtain ⟨I, t, ht, hIt⟩ := Filter.mem_pi'.1 hS'
   have ht' : ∀ i, t i ∈ Filter.pi fun _ : Fin n => 𝓝 (0 : F) := fun i => by
     rw [← nhds_pi]; exact ht i
@@ -86,62 +81,78 @@ theorem exists_valBall_subset {S : Set (Matrix (Fin n) (Fin n) F)}
   intro i _
   refine hJu i ?_
   intro j _
-  refine hr i j (LocalField.valBall_antitone (by
-    have : (r i j).toNat ≤ Finset.univ.sup fun p : Fin n × Fin n => (r p.1 p.2).toNat :=
-      Finset.le_sup (f := fun p : Fin n × Fin n => (r p.1 p.2).toNat) (Finset.mem_univ (i, j))
-    omega) (hY i j))
+  refine hr i j
+    (LocalField.valBall_antitone
+      (by
+        have : (r i j).toNat ≤ Finset.univ.sup fun p : Fin n × Fin n => (r p.1 p.2).toNat :=
+          Finset.le_sup (f := fun p : Fin n × Fin n => (r p.1 p.2).toNat) (Finset.mem_univ (i, j))
+        omega)
+      (hY i j))
 
-theorem exists_valBall_of_isCompact {K : Set (Matrix (Fin n) (Fin n) F)} (hK : IsCompact K) :
-    ∃ A : ℕ, ∀ X ∈ K, ∀ i j, X i j ∈ LocalField.valBall F (-(A : ℤ)) := by
+theorem exists_valBall_of_isCompact {K : Set (Matrix (Fin n) (Fin n) F)} (hK : IsCompact K)
+    : ∃ A : ℕ, ∀ X ∈ K, ∀ i j, X i j ∈ LocalField.valBall F (-(A : ℤ)) := by
   classical
-  let U : ℕ → Set (Matrix (Fin n) (Fin n) F) :=
-    fun m => {X | ∀ i j, X i j ∈ LocalField.valBall F (-(m : ℤ))}
+  let U : ℕ → Set (Matrix (Fin n) (Fin n) F) := fun m =>
+    {X | ∀ i j, X i j ∈ LocalField.valBall F (-(m : ℤ))}
   have hU : ∀ m, IsOpen (U m) := fun m => by
-    have : U m = ⋂ i, ⋂ j, (fun X : Matrix (Fin n) (Fin n) F => X i j) ⁻¹'
-        (LocalField.valBall F (-(m : ℤ)) : Set F) := by
+    have : U m
+        = ⋂ i, ⋂ j, (fun X : Matrix (Fin n) (Fin n) F => X i j) ⁻¹'
+          (LocalField.valBall F (-(m : ℤ)) : Set F) := by
       ext X; simp [U]
     rw [this]
-    exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-      (LocalField.isOpen_valBall _).preimage ((continuous_apply j).comp (continuous_apply i))
+    exact isOpen_iInter_of_finite fun i =>
+      isOpen_iInter_of_finite fun j =>
+        (LocalField.isOpen_valBall _).preimage ((continuous_apply j).comp (continuous_apply i))
   have hcover : K ⊆ ⋃ m, U m := by
     intro X _
     choose m hm using fun p : Fin n × Fin n => LocalField.exists_mem_valBall_neg_nat (X p.1 p.2)
-    refine Set.mem_iUnion.2 ⟨Finset.univ.sup m, fun i j => LocalField.valBall_antitone (by
-      have := Finset.le_sup (f := m) (Finset.mem_univ (i, j))
-      omega) (hm (i, j))⟩
+    refine Set.mem_iUnion.2 ⟨
+      Finset.univ.sup m,
+      fun i j =>
+        LocalField.valBall_antitone
+          (by
+            have := Finset.le_sup (f := m) (Finset.mem_univ (i, j))
+            omega)
+          (hm (i, j))
+    ⟩
   have hdir : Directed (· ⊆ ·) U := by
     intro a b
-    refine ⟨max a b, fun X hX i j => LocalField.valBall_antitone ?_ (hX i j),
-      fun X hX i j => LocalField.valBall_antitone ?_ (hX i j)⟩ <;> omega
+    refine ⟨
+        max a b,
+        fun X hX i j => LocalField.valBall_antitone ?_ (hX i j),
+        fun X hX i j => LocalField.valBall_antitone ?_ (hX i j)
+      ⟩
+      <;> omega
   obtain ⟨A, hA⟩ := hK.elim_directed_cover U hU hcover hdir
   exact ⟨A, fun X hX => hA hX⟩
 
-theorem IsSchwartzBruhat.exists_invariant {Φ : Matrix (Fin n) (Fin n) F → ℂ}
-    (hΦ : IsSchwartzBruhat Φ) :
-    ∃ r A : ℕ,
-      (∀ X Y : Matrix (Fin n) (Fin n) F, (∀ i j, ∃ a ∈ 𝒪[F], Y i j = (uniformizer F : F) ^ r * a) →
-        Φ (X + Y) = Φ X) ∧
-      (∀ X : Matrix (Fin n) (Fin n) F, Φ X ≠ 0 → ∀ i j, (uniformizer F : F) ^ A * X i j ∈ 𝒪[F]) := by
+theorem IsSchwartzBruhat.exists_invariant
+    {Φ : Matrix (Fin n) (Fin n) F → ℂ} (hΦ : IsSchwartzBruhat Φ)
+    : ∃ r A : ℕ,
+      (∀ X Y : Matrix (Fin n) (Fin n) F,
+          (∀ i j, ∃ a ∈ 𝒪[F], Y i j = (uniformizer F : F) ^ r * a) → Φ (X + Y) = Φ X)
+        ∧ (∀ X : Matrix (Fin n) (Fin n) F,
+          Φ X ≠ 0 → ∀ i j, (uniformizer F : F) ^ A * X i j ∈ 𝒪[F]) := by
   classical
   obtain ⟨hlc, hcs⟩ := hΦ
   set K := tsupport Φ
   have hK : IsCompact K := hcs
 
-  let L : ℕ → Set (Matrix (Fin n) (Fin n) F) :=
-    fun r => {Y | ∀ i j, Y i j ∈ LocalField.valBall F r}
+  let L : ℕ → Set (Matrix (Fin n) (Fin n) F) := fun r => {Y | ∀ i j, Y i j ∈ LocalField.valBall F r}
   have hLadd : ∀ r, ∀ Y ∈ L r, ∀ Z ∈ L r, Y + Z ∈ L r := fun r Y hY Z hZ i j =>
     add_mem (hY i j) (hZ i j)
-  have hLneg : ∀ r, ∀ Y ∈ L r, -Y ∈ L r := fun r Y hY i j => by
-    simpa using neg_mem (hY i j)
+  have hLneg : ∀ r, ∀ Y ∈ L r, -Y ∈ L r := fun r Y hY i j => by simpa using neg_mem (hY i j)
   have hLanti : ∀ {r r'}, r ≤ r' → L r' ⊆ L r := fun h Y hY i j =>
     LocalField.valBall_antitone (by exact_mod_cast h) (hY i j)
   have hLopen : ∀ r, IsOpen (L r) := fun r => by
-    have : L r = ⋂ i, ⋂ j, (fun X : Matrix (Fin n) (Fin n) F => X i j) ⁻¹'
-        (LocalField.valBall F (r : ℤ) : Set F) := by
+    have : L r
+        = ⋂ i, ⋂ j, (fun X : Matrix (Fin n) (Fin n) F => X i j) ⁻¹'
+          (LocalField.valBall F (r : ℤ) : Set F) := by
       ext X; simp [L]
     rw [this]
-    exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-      (LocalField.isOpen_valBall _).preimage ((continuous_apply j).comp (continuous_apply i))
+    exact isOpen_iInter_of_finite fun i =>
+      isOpen_iInter_of_finite fun j =>
+        (LocalField.isOpen_valBall _).preimage ((continuous_apply j).comp (continuous_apply i))
 
   let Wr : ℕ → Set (Matrix (Fin n) (Fin n) F) := fun r => {X | ∀ Y ∈ L r, Φ (X + Y) = Φ X}
   have hWopen : ∀ r, IsOpen (Wr r) := by
@@ -169,8 +180,11 @@ theorem IsSchwartzBruhat.exists_invariant {Φ : Matrix (Fin n) (Fin n) F → ℂ
     exact Set.mem_iUnion.2 ⟨r, fun Y hY => hr hY⟩
   have hdir : Directed (· ⊆ ·) Wr := by
     intro a b
-    refine ⟨max a b, fun X hX Y hY => hX Y (hLanti (le_max_left a b) hY),
-      fun X hX Y hY => hX Y (hLanti (le_max_right a b) hY)⟩
+    refine ⟨
+      max a b,
+      fun X hX Y hY => hX Y (hLanti (le_max_left a b) hY),
+      fun X hX Y hY => hX Y (hLanti (le_max_right a b) hY)
+    ⟩
   obtain ⟨r, hr⟩ := hK.elim_directed_cover Wr hWopen hcover hdir
   obtain ⟨A, hA⟩ := exists_valBall_of_isCompact hK
   have hϖ : (uniformizer F : F) ≠ 0 := Cartan.uniformizer_ne_zero F

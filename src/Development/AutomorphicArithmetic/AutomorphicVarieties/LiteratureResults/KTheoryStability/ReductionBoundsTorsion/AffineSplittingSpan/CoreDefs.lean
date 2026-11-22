@@ -26,8 +26,8 @@ def Rt (t : P) {a b : ℕ} (F : Bi P Q a b) : Bi P Q a b := fun x y => F x (fun 
 
 def Tc (t : P) {a b : ℕ} (F : Bi P Q a b) : Bi P Q a b := fun x y => F x (fun j => t⁻¹ * y j * t)
 
-def Hv (t : P) {a b : ℕ} (F : Bi P Q a (b + 1)) : Bi P Q a b :=
-  fun x y => PrismSpan.prism (fun p => p * t) (F x) y
+def Hv (t : P) {a b : ℕ} (F : Bi P Q a (b + 1)) : Bi P Q a b := fun x y =>
+  PrismSpan.prism (fun p => p * t) (F x) y
 
 def RuL (u : Q) (a b : ℕ) : Module.End ℝ (Bi P Q a b) where
   toFun := Ru u
@@ -40,12 +40,18 @@ def TcL (t : P) (a b : ℕ) : Module.End ℝ (Bi P Q a b) where
   map_smul' _ _ := rfl
 
 def cat {a c : ℕ} (x : Fin a → Q) (z : Fin c → Q) (n : ℕ) : Fin n → Q := fun i =>
-  if h : (i : ℕ) < a then x ⟨i, h⟩ else if h' : (i : ℕ) - a < c then z ⟨(i : ℕ) - a, h'⟩ else 1
+  if h : (i : ℕ) < a then
+    x ⟨i, h⟩
+  else if h' : (i : ℕ) - a < c then
+    z ⟨(i : ℕ) - a, h'⟩
+  else
+    1
 
-def zz (pr : P →* Q) {n : ℕ} (b : (Fin n → Q) → ℝ) (a c : ℕ) : Bi P Q a c :=
-  fun x y => b (cat x (fun j => pr (y j)) n)
+def zz (pr : P →* Q) {n : ℕ} (b : (Fin n → Q) → ℝ) (a c : ℕ) : Bi P Q a c := fun x y =>
+  b (cat x (fun j => pr (y j)) n)
 
-def Wtop (pr : P →* Q) {n : ℕ} (b : (Fin n → Q) → ℝ) : Bi P Q 1 n := fun _ y => b (fun j => pr (y j))
+def Wtop (pr : P →* Q) {n : ℕ} (b : (Fin n → Q) → ℝ) : Bi P Q 1 n := fun _ y =>
+  b (fun j => pr (y j))
 
 def QC {n : ℕ} (b : (Fin (n + 1) → Q) → ℝ) : Prop :=
   (∀ (g : Q) x, b (fun i => g * x i) = b x) ∧ dc b = 0

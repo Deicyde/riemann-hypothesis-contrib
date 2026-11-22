@@ -42,11 +42,14 @@ private theorem cyc_unitsOne {φ : Frame} (H : HostRaw φ) : IsCyclic (H.unitsOn
   intro a b hab
   have ha := (H.mem_unitsOne (QSd_dvd H) a).1 a.2
   have hb := (H.mem_unitsOne (QSd_dvd H) b).1 b.2
-  have hq : ((a : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ ((b : (ZMod H.condN)ˣ) : ZMod H.condN).val [MOD H.q] := by
-    simp only [f, MonoidHom.coe_comp, Function.comp_apply, Units.coeHom_apply, Subgroup.coe_subtype,
-      ZMod.unitsMap_val] at hab
-    rw [← ZMod.natCast_eq_natCast_iff, ZMod.natCast_val, ZMod.natCast_val]
-    exact hab
+  have hq
+      : ((a : (ZMod H.condN)ˣ) : ZMod H.condN).val ≡ ((b : (ZMod H.condN)ˣ) : ZMod H.condN).val [MOD H.q] :=
+    by
+      simp only [f, MonoidHom.coe_comp, Function.comp_apply, Units.coeHom_apply,
+          Subgroup.coe_subtype, ZMod.unitsMap_val]
+        at hab
+      rw [← ZMod.natCast_eq_natCast_iff, ZMod.natCast_val, ZMod.natCast_val]
+      exact hab
   have hm := (Nat.modEq_and_modEq_iff_modEq_mul H.coprime_QSd_q).1 ⟨ha.trans hb.symm, hq⟩
   rw [← hN] at hm
   have := Nat.ModEq.eq_of_lt_of_lt hm (ZMod.val_lt _) (ZMod.val_lt _)
@@ -97,11 +100,15 @@ private theorem el_q_ne_one {φ : Frame} (H : HostRaw φ) (h : H.PsQ) : H.el H.q
     push_cast [Nat.cast_sub hq.one_le]
     ring
   rw [hc, jacobiSym.mod_left, Int.add_mul_emod_self_left, ← jacobiSym.mod_left,
-    jacobiSym.at_neg_one (hq.odd_of_ne_two H.q_ne_two), ZMod.χ₄_nat_three_mod_four H.q_mod_four] at hJ
+      jacobiSym.at_neg_one (hq.odd_of_ne_two H.q_ne_two), ZMod.χ₄_nat_three_mod_four H.q_mod_four]
+    at hJ
   simp at hJ
 
-theorem UpperTheory.HF.inert_q :
-    ∀ {φ : Frame} (H : HostAx φ), H.el H.q ≤ 2 ∧ H.sl H.q = 1 ∧ (H.q ∈ H.ram → H.el H.q = 2 ∧ H.vdH H.q = 1 / 2 ∧ H.condE.factorization H.q = 1) ∧ (H.q ∉ H.ram → H.vdH H.q = 0) ∧ (H.PsQ → H.q ∈ H.ram) := by
+theorem UpperTheory.HF.inert_q
+    : ∀ {φ : Frame} (H : HostAx φ),
+      H.el H.q ≤ 2 ∧ H.sl H.q = 1
+        ∧ (H.q ∈ H.ram → H.el H.q = 2 ∧ H.vdH H.q = 1 / 2 ∧ H.condE.factorization H.q = 1)
+        ∧ (H.q ∉ H.ram → H.vdH H.q = 0) ∧ (H.PsQ → H.q ∈ H.ram) := by
   intro φ H
   have hq := H.q_prime
   have h2 := el_q_dvd H.toHostRaw

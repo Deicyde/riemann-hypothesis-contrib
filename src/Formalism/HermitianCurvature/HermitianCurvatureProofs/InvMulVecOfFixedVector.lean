@@ -252,54 +252,76 @@ lemma om_expand {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp
   simp_rw [om_eq Bs hB hg]
   exact om_complete Bs.z'_mem Bs.T'_pos hB (om_N3om_mem Bs hg).1 (om_N3om_mem Bs hg).2
 
-theorem om_norm {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] (Bs : B.RealPlaceData k r Wp Wq) {B0 : Fin k → Fin (2 * r + k + 1) → ℂ}
-    (hB : Q.IsFrameOf k r [Bs.z'] B0) {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (hg : g ∈ UH (Hpk k r)) : C6.sq2 (omC Bs B0 g) = Gf k r Bs.z Bs.z' g / Tz k r Bs.z' := by
-  have hm := (HermitianLatticeCounting.P.dual_vector_norm_on_group k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem Bs.T'_pos g hg).1
+theorem om_norm
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq]
+    (Bs : B.RealPlaceData k r Wp Wq)
+    {B0 : Fin k → Fin (2 * r + k + 1) → ℂ} (hB : Q.IsFrameOf k r [Bs.z'] B0)
+    {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r))
+    : C6.sq2 (omC Bs B0 g) = Gf k r Bs.z Bs.z' g / Tz k r Bs.z' := by
+  have hm :=
+    (HermitianLatticeCounting.P.dual_vector_norm_on_group k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem
+      Bs.T'_pos g hg).1
   rw [← om_expand Bs hB hg] at hm
-  simp only [om_herm_sum, om_herm_smul, om_herm_sum_right, om_herm_smul_right, hB.2.1,
-    mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true] at hm
+  simp only [om_herm_sum, om_herm_smul, om_herm_sum_right, om_herm_smul_right, hB.2.1, mul_ite,
+      mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    at hm
   simp only [Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true] at hm
   apply Complex.ofReal_injective
   rw [← hm]
   simp only [C6.sq2, Complex.ofReal_sum, Complex.normSq_eq_conj_mul_self]
 
-theorem om_equiv {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] (Bs : B.RealPlaceData k r Wp Wq) {B0 : Fin k → Fin (2 * r + k + 1) → ℂ}
-    (hB : Q.IsFrameOf k r [Bs.z'] B0) (p : B.SS k r) (hp : Bs.inSS p)
-    {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r)) :
-    ∑ j, omC Bs B0 (B.sgs p g) j • B0 j = (Matrix.of p.2.1)⁻¹ *ᵥ ∑ j, omC Bs B0 g j • B0 j := by
+theorem om_equiv
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq]
+    (Bs : B.RealPlaceData k r Wp Wq)
+    {B0 : Fin k → Fin (2 * r + k + 1) → ℂ} (hB : Q.IsFrameOf k r [Bs.z'] B0)
+    (p : B.SS k r) (hp : Bs.inSS p)
+    {g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hg : g ∈ UH (Hpk k r))
+    : ∑ j, omC Bs B0 (B.sgs p g) j • B0 j = (Matrix.of p.2.1)⁻¹ *ᵥ ∑ j, omC Bs B0 g j • B0 j := by
   obtain ⟨hA, hN1, hD, hN2⟩ := hp
   have hA' := Formalism.QuantumDeterminants.WeylGroupFacts.uw_inv hA
   have hN1' := Formalism.QuantumDeterminants.WeylGroupFacts.mem_n_inv hN1
-  have hsg : B.sgs p g = (Matrix.of p.1.1)⁻¹ * ((Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2) *
-      Matrix.of p.2.1 := by
+  have hsg
+      : B.sgs p g
+        = (Matrix.of p.1.1)⁻¹ * ((Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2) * Matrix.of p.2.1 := by
     simp only [B.sgs, Matrix.mul_assoc]
   have hm : (Matrix.of p.1.2)⁻¹ * g * Matrix.of p.2.2 ∈ UH (Hpk k r) :=
-    Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul (Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul hN1'.1 hg) hN2.1
+    Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul
+      (Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul hN1'.1 hg) hN2.1
   have hsU : B.sgs p g ∈ UH (Hpk k r) := by
     rw [hsg]
-    exact Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul (Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul hA'.1 hm) hD.1
+    exact Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul
+      (Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul hA'.1 hm) hD.1
   rw [om_expand Bs hB hsU, om_expand Bs hB hg, hsg,
-    HermitianLatticeCounting.P.dual_vector_equivariant k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem _ hm _ hA' _ hD,
-    HermitianLatticeCounting.P.dual_vector_unipotent_invariant k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem g hg _ hN1' _ hN2]
+    HermitianLatticeCounting.P.dual_vector_equivariant k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem _ hm _ hA'
+      _ hD,
+    HermitianLatticeCounting.P.dual_vector_unipotent_invariant k r Bs.z Bs.z' Bs.z_mem Bs.z'_mem g
+      hg _ hN1' _ hN2]
 
 def OmPolyP : Prop :=
-  ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (Bs : B.RealPlaceData k r Wp Wq) (B0 : Fin k → Fin (2 * r + k + 1) → ℂ),
+  ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+      [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+      (Bs : B.RealPlaceData k r Wp Wq) (B0 : Fin k → Fin (2 * r + k + 1) → ℂ),
     Q.IsFrameOf k r [Bs.z'] B0 → ∀ j, U.IsPolyDeg (r + 1) fun g => omC Bs B0 g j
 
 def OmCellP : Prop :=
-  ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (Bs : B.RealPlaceData k r Wp Wq) (B0 : Fin k → Fin (2 * r + k + 1) → ℂ),
-    Q.IsFrameOf k r [Bs.z'] B0 → ∀ x ∈ Q.DomR k r Bs.z Bs.z', ∀ j, omC Bs B0 (Q.wCell k r (Fin.last r) x.1 * x.2) j =
-      conj (∏ a, x.1 a) * herm (Hpk k r) (x.2⁻¹ *ᵥ Bs.z) (B0 j)
+  ∀ (k r : ℕ) (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+      [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+      (Bs : B.RealPlaceData k r Wp Wq) (B0 : Fin k → Fin (2 * r + k + 1) → ℂ),
+    Q.IsFrameOf k r [Bs.z'] B0
+      → ∀ x ∈ Q.DomR k r Bs.z Bs.z', ∀ j,
+        omC Bs B0 (Q.wCell k r (Fin.last r) x.1 * x.2) j
+          = conj (∏ a, x.1 a) * herm (Hpk k r) (x.2⁻¹ *ᵥ Bs.z) (B0 j)
 
 theorem om_facts_of (h1 : OmPolyP) (h4 : OmCellP) : OmFacts := by
   intro k r Wp Wq _ _ _ _ _ Bs B0 hB
-  exact ⟨h1 k r Wp Wq Bs B0 hB, fun g hg => om_norm Bs hB hg,
-    fun p hp g hg => om_equiv Bs hB p hp hg.1, h4 k r Wp Wq Bs B0 hB⟩
+  exact ⟨
+    h1 k r Wp Wq Bs B0 hB,
+    fun g hg => om_norm Bs hB hg,
+    fun p hp g hg => om_equiv Bs hB p hp hg.1,
+    h4 k r Wp Wq Bs B0 hB
+  ⟩
 
 lemma om_prod_erase (r : ℕ) (c : Fin r → ℂ) (ζ : ℂ) :
     ∏ j ∈ Finset.univ.erase (Fin.last r), (if h : j.val < r then c ⟨j.val, h⟩ else ζ) = ∏ a, c a := by
@@ -316,15 +338,24 @@ lemma inv_mulVec_of_fixed_vector {n : ℕ} (W M : Matrix (Fin n) (Fin n) ℂ) (z
   conv_lhs => rw [← hW]
   rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hWd, Matrix.one_mulVec]
 
-theorem om_cell {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] (Bs : B.RealPlaceData k r Wp Wq) {B0 : Fin k → Fin (2 * r + k + 1) → ℂ}
-    (x : (Fin r → ℂ) × Q.Mx k r) (hx : x ∈ Q.DomR k r Bs.z Bs.z') (j : Fin k) :
-    omC Bs B0 (Q.wCell k r (Fin.last r) x.1 * x.2) j = conj (∏ a, x.1 a) * herm (Hpk k r) (x.2⁻¹ *ᵥ Bs.z) (B0 j) := by
+theorem om_cell
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq]
+    (Bs : B.RealPlaceData k r Wp Wq)
+    {B0 : Fin k → Fin (2 * r + k + 1) → ℂ}
+    (x : (Fin r → ℂ) × Q.Mx k r) (hx : x ∈ Q.DomR k r Bs.z Bs.z')
+    (j : Fin k)
+    : omC Bs B0 (Q.wCell k r (Fin.last r) x.1 * x.2) j
+      = conj (∏ a, x.1 a) * herm (Hpk k r) (x.2⁻¹ *ᵥ Bs.z) (B0 j) := by
   obtain ⟨hc, hM, -⟩ := hx
-  have hWU : bigCell k r x.1 1 ∈ UH (Hpk k r) := Formalism.QuantumDeterminants.big_cell_mem_holds k r x.1 1 hc (by simp)
-  have hgU : bigCell k r x.1 1 * x.2 ∈ UH (Hpk k r) := Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul hWU hM.1
-  have hfix : ∀ b, (bigCell k r x.1 1 * x.2) *ᵥ fvec k r Bs.z' b =
-      bigCell k r x.1 1 *ᵥ fvec k r (x.2 *ᵥ Bs.z') b := by
+  have hWU : bigCell k r x.1 1 ∈ UH (Hpk k r) :=
+    Formalism.QuantumDeterminants.big_cell_mem_holds k r x.1 1 hc (by simp)
+  have hgU : bigCell k r x.1 1 * x.2 ∈ UH (Hpk k r) :=
+    Formalism.QuantumDeterminants.WeylGroupFacts.uh_mul hWU hM.1
+  have hfix
+      : ∀ b,
+        (bigCell k r x.1 1 * x.2) *ᵥ fvec k r Bs.z' b
+          = bigCell k r x.1 1 *ᵥ fvec k r (x.2 *ᵥ Bs.z') b := by
     intro b
     rw [← Matrix.mulVec_mulVec]
     congr 1
@@ -332,7 +363,9 @@ theorem om_cell {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp
     split_ifs with hb
     · exact (hM.2 ⟨b.val, hb⟩ (by simp only [Fin.val_last]; exact hb)).1
     · rfl
-  have hZ : Zhat k r Bs.z Bs.z' (bigCell k r x.1 1 * x.2) = Zhat k r Bs.z (x.2 *ᵥ Bs.z') (bigCell k r x.1 1) := by
+  have hZ
+      : Zhat k r Bs.z Bs.z' (bigCell k r x.1 1 * x.2)
+        = Zhat k r Bs.z (x.2 *ᵥ Bs.z') (bigCell k r x.1 1) := by
     ext a b
     simp only [Zhat, hfix]
   have hMz' := (Formalism.FourierDecayAlt.Q.LieAlgebraWeightVectors.glev_inWb hM Bs.z'_mem).1
@@ -347,12 +380,15 @@ theorem om_cell {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp
       rw [Matrix.diagonal_apply_ne _ (Ne.symm hb), map_zero, zero_smul]
     · simp
   have hWz : bigCell k r x.1 1 *ᵥ Bs.z = Bs.z := by
-    rw [← Formalism.FourierDecayAlt.P.TwoByOneBlock.jV_wbPart Bs.z_mem, Formalism.FourierDecayAlt.P.BigCellHermitian.bigCell_mulVec_jV, Matrix.one_mulVec]
+    rw [← Formalism.FourierDecayAlt.P.TwoByOneBlock.jV_wbPart Bs.z_mem,
+      Formalism.FourierDecayAlt.P.BigCellHermitian.bigCell_mulVec_jV, Matrix.one_mulVec]
   rw [Formalism.FourierDecayAlt.P5.Rad.wCell_last_eq]
   show herm (Hpk k r) ((Hpk k r * (bigCell k r x.1 1 * x.2)ᴴ * Hpk k r) *ᵥ
     D.cofL Bs (bigCell k r x.1 1 * x.2)) (B0 j) = _
   rw [om_inv_eq hgU, hcof, Matrix.mulVec_smul, om_herm_smul,
-    inv_mulVec_of_fixed_vector _ _ _ (Formalism.QuantumDeterminants.WeylGroupFacts.isUnit_of_uh hM.1) (Formalism.QuantumDeterminants.WeylGroupFacts.isUnit_of_uh hgU) hWz]
+    inv_mulVec_of_fixed_vector _ _ _
+      (Formalism.QuantumDeterminants.WeylGroupFacts.isUnit_of_uh hM.1)
+      (Formalism.QuantumDeterminants.WeylGroupFacts.isUnit_of_uh hgU) hWz]
 
 end
 
@@ -363,7 +399,8 @@ namespace Formalism.FourierDecayAlt.P
 open Formalism.FourierDecayAlt.P.TLC
 
 theorem omega_polynomial_facts : TL.OmFacts := by
-  exact om_facts_of (fun k r Wp Wq _ _ _ _ _ Bs B0 _ j => omp_poly Bs B0 j)
+  exact om_facts_of
+    (fun k r Wp Wq _ _ _ _ _ Bs B0 _ j => omp_poly Bs B0 j)
     (fun k r Wp Wq _ _ _ _ _ Bs B0 _ x hx j => om_cell Bs x hx j)
 
 end Formalism.FourierDecayAlt.P

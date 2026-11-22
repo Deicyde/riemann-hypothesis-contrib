@@ -19,13 +19,15 @@ section Fold
 
 variable {S : Type} [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
-def foldTensor {n : ℕ} (L : Fin n → Kleiman.LineBundle S x) (l : List (Fin n)) (Q : Kleiman.LineBundle S x) :
-    Kleiman.LineBundle S x :=
+def foldTensor
+    {n : ℕ} (L : Fin n → Kleiman.LineBundle S x) (l : List (Fin n)) (Q : Kleiman.LineBundle S x)
+    : Kleiman.LineBundle S x :=
   l.foldl (fun P i => P.tensor (L i)) Q
 
-theorem foldTensor_toSubSystem {n : ℕ} (L : Fin n → Kleiman.LineBundle S x) (l : List (Fin n))
-    (Q : Kleiman.LineBundle S x) :
-    (foldTensor L l Q).toSubSystem = l.foldl (fun P i => P.twist (L i).toSubSystem) Q.toSubSystem := by
+theorem foldTensor_toSubSystem
+    {n : ℕ} (L : Fin n → Kleiman.LineBundle S x) (l : List (Fin n)) (Q : Kleiman.LineBundle S x)
+    : (foldTensor L l Q).toSubSystem
+      = l.foldl (fun P i => P.twist (L i).toSubSystem) Q.toSubSystem := by
   induction l generalizing Q with
   | nil => rfl
   | cons a l ih =>
@@ -34,13 +36,19 @@ theorem foldTensor_toSubSystem {n : ℕ} (L : Fin n → Kleiman.LineBundle S x) 
 
 end Fold
 
-theorem realises_foldTensor (hT : TensorRealises.Statement)
-    {F : Type} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {Ω : Type} [Field Ω] [Algebra F Ω] {y : (Σ k, ι k) → Ω} {k₀ : K} {N : ℕ} {e : ι k₀ ≃ Fin (N + 1)}
-    (hmod : IndefiniteRowSideFullHecke.Kleiman2.IsModelWithBase F y k₀) {n : ℕ}
-    (L : Fin n → Kleiman.LineBundle F (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm)) (δ : Fin n → K → ℤ)
-    (hL : ∀ i, BundleRealises y k₀ (L i) (δ i)) (l : List (Fin n)) :
-    ∀ (Q : Kleiman.LineBundle F (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm)) (β : K → ℤ),
+theorem realises_foldTensor
+    (hT : TensorRealises.Statement)
+    {F : Type} [Field F]
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω] [Algebra F Ω]
+    {y : (Σ k, ι k) → Ω} {k₀ : K} {N : ℕ} {e : ι k₀ ≃ Fin (N + 1)}
+    (hmod : IndefiniteRowSideFullHecke.Kleiman2.IsModelWithBase F y k₀)
+    {n : ℕ}
+    (L : Fin n → Kleiman.LineBundle F (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm))
+    (δ : Fin n → K → ℤ) (hL : ∀ i, BundleRealises y k₀ (L i) (δ i)) (l : List (Fin n))
+    : ∀ (Q : Kleiman.LineBundle F (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm))
+        (β : K → ℤ),
       BundleRealises y k₀ Q β → BundleRealises y k₀ (foldTensor L l Q) (β + (l.map δ).sum) := by
   induction l with
   | nil => intro Q β hQ; simpa [foldTensor] using hQ

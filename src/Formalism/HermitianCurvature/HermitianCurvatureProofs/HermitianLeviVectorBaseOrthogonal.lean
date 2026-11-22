@@ -17,7 +17,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.B2x9
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -251,7 +252,8 @@ end Formalism.FourierDecayAlt.P.B2x9
 
 namespace Formalism.FourierDecayAlt.P.B2x9
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r r' : ℕ}
 
@@ -260,14 +262,14 @@ def detF (x : Mt k r) : ℂ := (Matrix.of x : Mat k r).det
 
 theorem detF_cont : Continuous (detF (k := k) (r := r)) := by
   first
-    | exact Continuous.matrix_det continuous_id
-    | (unfold detF; fun_prop)
-    | (unfold detF; continuity)
+  | exact Continuous.matrix_det continuous_id
+  | (unfold detF; fun_prop)
+  | (unfold detF; continuity)
 theorem adjF_cont : Continuous (adjF (k := k) (r := r)) := by
   first
-    | exact Continuous.matrix_adjugate continuous_id
-    | (unfold adjF; fun_prop)
-    | (unfold adjF; continuity)
+  | exact Continuous.matrix_adjugate continuous_id
+  | (unfold adjF; fun_prop)
+  | (unfold adjF; continuity)
 
 theorem invM_smul : (invM : Mt k r → Mt k r) = fun x => (detF x)⁻¹ • adjF x := by
   funext x
@@ -277,9 +279,15 @@ theorem invM_smul : (invM : Mt k r → Mt k r) = fun x => (detF x)⁻¹ • adjF
 theorem invM_meas : Measurable (invM : Mt k r → Mt k r) := by
   rw [invM_smul]
   first
-    | exact (detF_cont.measurable.inv).smul adjF_cont.measurable
-    | (apply measurable_pi_lambda; intro i; apply measurable_pi_lambda; intro j
-       exact (detF_cont.measurable.inv).mul (((continuous_apply j).comp ((continuous_apply i).comp adjF_cont)).measurable))
+  | exact (detF_cont.measurable.inv).smul adjF_cont.measurable
+  | (
+      apply measurable_pi_lambda
+      intro i
+      apply measurable_pi_lambda
+      intro j
+      exact (detF_cont.measurable.inv).mul
+        (((continuous_apply j).comp ((continuous_apply i).comp adjF_cont)).measurable)
+    )
 
 theorem invM_contOn : ContinuousOn (invM : Mt k r → Mt k r) {x | detF x ≠ 0} := by
   rw [invM_smul]
@@ -287,17 +295,18 @@ theorem invM_contOn : ContinuousOn (invM : Mt k r → Mt k r) {x | detF x ≠ 0}
 
 theorem lmulM_cont (a : Mat k r) : Continuous (lmulM a : Mt k r → Mt k r) := by
   first
-    | exact continuous_const.matrix_mul continuous_id
-    | (unfold lmulM; fun_prop)
-    | (unfold lmulM; continuity)
+  | exact continuous_const.matrix_mul continuous_id
+  | (unfold lmulM; fun_prop)
+  | (unfold lmulM; continuity)
 
 theorem mulM_cont : Continuous (mulM : Mt k r × Mt k r → Mt k r) := by
   first
-    | exact continuous_fst.matrix_mul continuous_snd
-    | (unfold mulM; fun_prop)
-    | (unfold mulM; continuity)
+  | exact continuous_fst.matrix_mul continuous_snd
+  | (unfold mulM; fun_prop)
+  | (unfold mulM; continuity)
 
-theorem sigmaFinite_of_haar {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ) : SigmaFinite μ := by
+theorem sigmaFinite_of_haar {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ)
+    : SigmaFinite μ := by
   haveI : IsFiniteMeasureOnCompacts μ := ⟨@fun K hK => h.finite_compact K hK⟩
   infer_instance
 
@@ -473,7 +482,8 @@ end Formalism.FourierDecayAlt.P.B2x9
 
 namespace Formalism.FourierDecayAlt.P.B2x9
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -492,9 +502,11 @@ def mCone (k r' : ℕ) : Measure (ℂ × HPar k r') := (mC k r').prod volume
 
 lemma cone_eq : coneMeas k r' = (mCone k r').map (xi k r') := rfl
 
-def muP (μG₁ : Measure (Mt k r')) : Measure (Mt k (1 + r')) := ((μHeis k r').prod (μG₁.map (levM k r'))).map mulM
+def muP (μG₁ : Measure (Mt k r')) : Measure (Mt k (1 + r')) :=
+  ((μHeis k r').prod (μG₁.map (levM k r'))).map mulM
 
-def Ff (μP : Measure (Mt k (1 + r'))) (f : Mt k (1 + r') → ℝ≥0∞) (g : Mt k (1 + r')) : ℝ≥0∞ := ∫⁻ q, f (mulM (g, q)) ∂μP
+def Ff (μP : Measure (Mt k (1 + r'))) (f : Mt k (1 + r') → ℝ≥0∞) (g : Mt k (1 + r')) : ℝ≥0∞ :=
+  ∫⁻ q, f (mulM (g, q)) ∂μP
 
 lemma Ff_meas (μP : Measure (Mt k (1 + r'))) [SFinite μP] {f : Mt k (1 + r') → ℝ≥0∞} (hf : Measurable f) :
     Measurable (Ff μP f) := by
@@ -608,7 +620,8 @@ end Formalism.FourierDecayAlt.P.B2x9
 
 namespace Formalism.FourierDecayAlt.P.B2x9
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -887,9 +900,10 @@ theorem assembleOneStep : AssembleOneStep := by
   intro HU HIv hG HA HI OM OC CI CF SD SH k r' μG μG₁ hμG h₁
   obtain ⟨hP, hμP⟩ := SH k r' μG₁ h₁
   have := sigmaFinite_of_haar h₁
-  obtain ⟨c, hc⟩ := HU k (1 + r') (GV k (1 + r')) μG (nu μG₁) (hG _ _) hμG (nu_conc HIv hG HI OM μG₁ h₁ hP hμP)
-    (fun a ha => nu_left HIv hG HA HI OM OC CI SD μG₁ h₁ hP hμP a ha)
-    (fun K hK => nu_fin HIv hG HA HI OM CF μG₁ h₁ hP hμP K hK)
+  obtain ⟨c, hc⟩ :=
+    HU k (1 + r') (GV k (1 + r')) μG (nu μG₁) (hG _ _) hμG (nu_conc HIv hG HI OM μG₁ h₁ hP hμP)
+      (fun a ha => nu_left HIv hG HA HI OM OC CI SD μG₁ h₁ hP hμP a ha)
+      (fun K hK => nu_fin HIv hG HA HI OM CF μG₁ h₁ hP hμP K hK)
   have hc0 : c ≠ 0 := by
     rintro rfl
     rw [zero_smul] at hc
@@ -904,7 +918,8 @@ end Formalism.FourierDecayAlt.P.B2x9
 
 namespace Formalism.FourierDecayAlt.P.B2x9.S1
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -984,20 +999,20 @@ lemma parabolic_subgroup_closed (hG : ClosedG) : IsClosed (P1set k r') := by
 theorem assembleStab : AssembleStab := by
   intro hSemi hLev hG hHC hHH hConj hConjM hStab k r' μG₁ hμ
   obtain ⟨hBcl, hBhaar⟩ := hLev k r' (GV k r') μG₁ (hG k r') hμ
-  have key := hSemi k (1 + r') (Hset k r') (ιLev k 1 r' '' GV k r') (μHeis k r') (μG₁.map (levM k r')) (rho k r')
-    (hHC k r').2 hBcl
-    (by
-      rintro _ ⟨g, hg, rfl⟩ _ ⟨x, rfl⟩
-      exact ⟨_, (hConj k r' g hg x).symm⟩)
-    (by rw [← hStab]; exact parabolic_subgroup_closed hG)
-    rho_cont
-    (by
-      rintro _ ⟨x, rfl⟩ _ ⟨g, _, rfl⟩
-      exact rho_prod x g)
-    (hHH k r') hBhaar
-    (by
-      rintro _ ⟨g, hg, rfl⟩
-      exact hConjM k r' g hg)
+  have key :=
+    hSemi k (1 + r') (Hset k r') (ιLev k 1 r' '' GV k r') (μHeis k r') (μG₁.map (levM k r'))
+      (rho k r') (hHC k r').2 hBcl
+      (by
+        rintro _ ⟨g, hg, rfl⟩ _ ⟨x, rfl⟩
+        exact ⟨_, (hConj k r' g hg x).symm⟩)
+      (by rw [← hStab]; exact parabolic_subgroup_closed hG) rho_cont
+      (by
+        rintro _ ⟨x, rfl⟩ _ ⟨g, _, rfl⟩
+        exact rho_prod x g)
+      (hHH k r') hBhaar
+      (by
+        rintro _ ⟨g, hg, rfl⟩
+        exact hConjM k r' g hg)
   rw [← hStab] at key
   exact key
 
@@ -1005,9 +1020,11 @@ end Formalism.FourierDecayAlt.P.B2x9.S1
 
 namespace Formalism.FourierDecayAlt.P.B2x9.S2
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
-theorem sigmaFinite_of_haar {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ) : SigmaFinite μ := by
+theorem sigmaFinite_of_haar {k r : ℕ} {U : Set (Mat k r)} {μ : Measure (Mt k r)} (h : IsHaarOn U μ)
+    : SigmaFinite μ := by
   haveI : IsFiniteMeasureOnCompacts μ := ⟨@fun K hK => h.finite_compact K hK⟩
   infer_instance
 
@@ -1021,15 +1038,17 @@ theorem stabilizer_haar_of_parts : Formalism.FourierDecayAlt.B2.AssembleStab := 
   exact Formalism.FourierDecayAlt.P.B2x9.S1.assembleStab
 
 theorem stabilizer_haar_measure : Formalism.FourierDecayAlt.B2.StabHaar := by
-  exact stabilizer_haar_of_parts semidirect_product_haar levi_haar_measure_exists unitary_group_closed heisenberg_subgroup_closed
-    heisenberg_haar_measure heisenberg_conjugation_by_levi heisenberg_levi_conjugation_measure stabilizer_factorization
+  exact stabilizer_haar_of_parts semidirect_product_haar levi_haar_measure_exists
+    unitary_group_closed heisenberg_subgroup_closed heisenberg_haar_measure
+    heisenberg_conjugation_by_levi heisenberg_levi_conjugation_measure stabilizer_factorization
 
 theorem stabilizer_integration_of_parts : Formalism.FourierDecayAlt.B2.AssembleOneStep := by
   exact Formalism.FourierDecayAlt.P.B2x9.assembleOneStep
 
 theorem stabilizer_integration_formula : Formalism.FourierDecayAlt.B2.OneStepInt := by
-  exact stabilizer_integration_of_parts haar_measure_unique_up_to_scalar haar_measure_inversion unitary_group_closed heisenberg_action_formula
-    heisenberg_inverse stabilizer_one_parameter_mem rank_one_coordinates_formula isotropic_cone_invariance isotropic_cone_finite_measure
+  exact stabilizer_integration_of_parts haar_measure_unique_up_to_scalar haar_measure_inversion
+    unitary_group_closed heisenberg_action_formula heisenberg_inverse stabilizer_one_parameter_mem
+    rank_one_coordinates_formula isotropic_cone_invariance isotropic_cone_finite_measure
     stabilizer_factorization stabilizer_haar_measure
 
 end Formalism.FourierDecayAlt.P

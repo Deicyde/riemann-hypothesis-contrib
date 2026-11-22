@@ -10,9 +10,23 @@ open scoped BigOperators ComplexConjugate Real Classical
 
 namespace GlobalTheory.UnitaryTheta
 
-theorem integral_gaussian_unitary_pos : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V), IsPosHerm H → ∀ a : V ≃ₗ[ℂ] V, (∀ z w, H (a z) (a w) = H z w) → LinearMap.det (1 - (a : V →ₗ[ℂ] V)) ≠ 0 → ∃ κ : ℝ, 0 < κ ∧ ∀ y v : V, Integrable (fun z => cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v)) μ ∧ ∫ z, cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v) ∂μ = κ / LinearMap.det (1 - (a : V →ₗ[ℂ] V)) * cexp (π * H y v) := by
+theorem integral_gaussian_unitary_pos
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
+        [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V),
+      IsPosHerm H
+        → ∀ a : V ≃ₗ[ℂ] V,
+          (∀ z w, H (a z) (a w) = H z w) → LinearMap.det (1 - (a : V →ₗ[ℂ] V)) ≠ 0
+            → ∃ κ : ℝ,
+              0 < κ
+                ∧ ∀ y v : V,
+                  Integrable
+                      (fun z => cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v))
+                      μ
+                    ∧ ∫ z, cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v) ∂μ
+                      = κ / LinearMap.det (1 - (a : V →ₗ[ℂ] V)) * cexp (π * H y v) := by
   intro V _ _ _ _ _ μ _ H hH a ha hdet
-  obtain ⟨n, e, l, he, hl⟩ := GlobalTheory.UnitaryTheta.unitary_exists_orthonormal_eigenbasis V H hH a ha
+  obtain ⟨n, e, l, he, hl⟩ :=
+    GlobalTheory.UnitaryTheta.unitary_exists_orthonormal_eigenbasis V H hH a ha
   have hb : ∀ i, (1 - (a : V →ₗ[ℂ] V)) (e i) = (1 - l i) • e i := fun i => by
     simp [(hl i).2, sub_smul]
   have hd := det_of_eigen e _ _ hb
@@ -39,14 +53,20 @@ theorem integral_gaussian_unitary_pos : ∀ (V : Type) [NormedAddCommGroup V] [N
   have hT : ∀ z i, Tm z i = e.repr z i := fun z i => rfl
   haveI : (μ.map Tm).IsAddHaarMeasure := T.isAddHaarMeasure_map μ
   have hν := Measure.isAddLeftInvariant_eq_smul (μ.map Tm) (volume : Measure (Fin n → ℂ))
-  have hpos := Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure (μ.map Tm) (volume : Measure (Fin n → ℂ))
+  have hpos :=
+    Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure (μ.map Tm) (volume : Measure (Fin n → ℂ))
   set c := Measure.addHaarScalarFactor (μ.map Tm) (volume : Measure (Fin n → ℂ)) with hc
   refine ⟨(c : ℝ), by exact_mod_cast hpos, fun y v => ?_⟩
-  let g : Fin n → ℂ → ℂ := fun i z => cexp (-(π : ℂ) * (1 - l i) * (z * conj z) +
-    π * (((1 - l i) * e.repr y i) * conj z) + π * (z * conj (e.repr v i)))
-  have hg := fun i => GlobalTheory.T.integral_cexp_complex_gaussian_linear (1 - l i) ((1 - l i) * e.repr y i) (e.repr v i) (hre i)
-  have hF : (fun z => cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v)) =
-      (fun x : Fin n → ℂ => ∏ i, g i (x i)) ∘ Tm := by
+  let g : Fin n → ℂ → ℂ := fun i z =>
+    cexp
+      (-(π : ℂ) * (1 - l i) * (z * conj z) + π * (((1 - l i) * e.repr y i) * conj z)
+        + π * (z * conj (e.repr v i)))
+  have hg := fun i =>
+    GlobalTheory.T.integral_cexp_complex_gaussian_linear (1 - l i) ((1 - l i) * e.repr y i)
+      (e.repr v i) (hre i)
+  have hF
+      : (fun z => cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v))
+        = (fun x : Fin n → ℂ => ∏ i, g i (x i)) ∘ Tm := by
     funext z
     simp only [Function.comp, g, hT, ← Complex.exp_sum, sesq_eq_sum_repr H e he, hr, Finset.mul_sum,
       ← Finset.sum_add_distrib]
@@ -63,7 +83,8 @@ theorem integral_gaussian_unitary_pos : ∀ (V : Type) [NormedAddCommGroup V] [N
     simp only [Function.comp_def]
     rw [← h1, hν, integral_smul_nnreal_measure, integral_fintype_prod_volume_eq_prod, hd,
       sesq_eq_sum_repr H e he, Finset.mul_sum, Complex.exp_sum]
-    have h2 : ∀ i, ∫ z, g i z = (1 - l i)⁻¹ * cexp (π * (e.repr y i * conj (e.repr v i))) := fun i => by
+    have h2
+        : ∀ i, ∫ z, g i z = (1 - l i)⁻¹ * cexp (π * (e.repr y i * conj (e.repr v i))) := fun i => by
       rw [show ∫ z, g i z = _ from (hg i).2]
       congr 2
       field_simp [hne i]

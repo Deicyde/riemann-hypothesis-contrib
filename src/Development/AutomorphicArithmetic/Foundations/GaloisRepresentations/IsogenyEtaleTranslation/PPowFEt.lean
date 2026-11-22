@@ -13,8 +13,8 @@ section Coord
 
 variable {C : Type*} [Category C] {A : C} {k : ℕ} [HasProduct (fun _ : Fin k => A)]
 
-private noncomputable def coordMap (j : Fin k) (φ : A ⟶ A) :
-    (∏ᶜ fun _ : Fin k => A) ⟶ ∏ᶜ fun _ : Fin k => A :=
+private noncomputable def coordMap (j : Fin k) (φ : A ⟶ A)
+    : (∏ᶜ fun _ : Fin k => A) ⟶ ∏ᶜ fun _ : Fin k => A :=
   Pi.lift fun i => if i = j then Pi.π (fun _ : Fin k => A) j ≫ φ else Pi.π (fun _ : Fin k => A) i
 
 private lemma coordMap_π (j i : Fin k) (φ : A ⟶ A) :
@@ -94,8 +94,10 @@ private lemma pow_prop (P : MorphismProperty Scheme.{0}) [P.IsMultiplicative]
 
 theorem powFEt_of : PowFEt := by
   intro S A k f hf g hg
-  exact ⟨pow_prop @IsFinite A k f (fun i => (hf i).1) g hg,
+  exact ⟨
+    pow_prop @IsFinite A k f (fun i => (hf i).1) g hg,
     pow_prop @Etale A k f (fun i => (hf i).2.1) g hg,
-    pow_prop @Surjective A k f (fun i => (hf i).2.2) g hg⟩
+    pow_prop @Surjective A k f (fun i => (hf i).2.2) g hg
+  ⟩
 
 end UpperTheory.Gal.FixZ

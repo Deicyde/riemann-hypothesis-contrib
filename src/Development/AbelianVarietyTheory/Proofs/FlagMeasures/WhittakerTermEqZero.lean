@@ -12,8 +12,8 @@ namespace GlobalTheory.GLm.NonOpenCell
 
 variable {g : ℕ} [Fact g.Prime] {n : ℕ}
 
-theorem pm_val (σ : Equiv.Perm (Fin n)) :
-    ((pm g σ : Gn g n) : Mt g n) = fun r j : Fin n => if r = σ j then 1 else 0 := by
+theorem pm_val (σ : Equiv.Perm (Fin n))
+    : ((pm g σ : Gn g n) : Mt g n) = fun r j : Fin n => if r = σ j then 1 else 0 := by
   have h : IsUnit (show Mt g n from fun r j : Fin n => if r = σ j then 1 else 0) := by
     refine IsUnit.of_mul_eq_one (show Mt g n from fun r j : Fin n => if j = σ r then 1 else 0) ?_
     ext r c
@@ -27,10 +27,11 @@ theorem pm_val (σ : Equiv.Perm (Fin n)) :
   rw [dite_eq_left h]
   rfl
 
-theorem conj_apply (σ : Equiv.Perm (Fin n)) (x : Gn g n) (r c : Fin n) :
-    (((pm g σ)⁻¹ * x * pm g σ : Gn g n) : Mt g n) r c = (x : Mt g n) (σ r) (σ c) := by
-  have h : ((pm g σ : Gn g n) : Mt g n) * (((pm g σ)⁻¹ * x * pm g σ : Gn g n) : Mt g n)
-      = (x : Mt g n) * ((pm g σ : Gn g n) : Mt g n) := by
+theorem conj_apply (σ : Equiv.Perm (Fin n)) (x : Gn g n) (r c : Fin n)
+    : (((pm g σ)⁻¹ * x * pm g σ : Gn g n) : Mt g n) r c = (x : Mt g n) (σ r) (σ c) := by
+  have h
+      : ((pm g σ : Gn g n) : Mt g n) * (((pm g σ)⁻¹ * x * pm g σ : Gn g n) : Mt g n)
+        = (x : Mt g n) * ((pm g σ : Gn g n) : Mt g n) := by
     rw [← Units.val_mul, ← Units.val_mul, ← mul_assoc, ← mul_assoc, mul_inv_cancel, one_mul]
   generalize (((pm g σ)⁻¹ * x * pm g σ : Gn g n) : Mt g n) = Y at h ⊢
   have h2 := congrFun (congrFun h (σ r)) c
@@ -39,21 +40,26 @@ theorem conj_apply (σ : Equiv.Perm (Fin n)) (x : Gn g n) (r c : Fin n) :
     rw [pm_val]
   simpa [h3] using h2
 
-noncomputable def elem (p q : Fin n) (h : p ≠ q) (t : ZMod g) : Gn g n :=
-  ⟨Matrix.transvection p q t, Matrix.transvection p q (-t),
-    by rw [Matrix.transvection_mul_transvection_same _ _ h]; simp,
-    by rw [Matrix.transvection_mul_transvection_same _ _ h]; simp⟩
+noncomputable def elem (p q : Fin n) (h : p ≠ q) (t : ZMod g) : Gn g n := ⟨
+  Matrix.transvection p q t,
+  Matrix.transvection p q (-t),
+  by rw [Matrix.transvection_mul_transvection_same _ _ h]; simp,
+  by rw [Matrix.transvection_mul_transvection_same _ _ h]; simp
+⟩
 
-theorem mul_elem_apply (p q : Fin n) (h : p ≠ q) (t : ZMod g) (x : Gn g n) (r c : Fin n) :
-    ((x * elem p q h t : Gn g n) : Mt g n) r c
+theorem mul_elem_apply (p q : Fin n) (h : p ≠ q) (t : ZMod g) (x : Gn g n) (r c : Fin n)
+    : ((x * elem p q h t : Gn g n) : Mt g n) r c
       = (x : Mt g n) r c + if c = q then t * (x : Mt g n) r p else 0 := by
   change ((x : Mt g n) * Matrix.transvection p q t) r c = _
   by_cases hc : c = q
   · subst hc; simp
   · simp [hc]
 
-theorem isUniUp_of_col {M M' : Mt g n} {p q : Fin n} (hpq : p < q) (t : ZMod g)
-    (h : ∀ r c, M' r c = M r c + if c = q then t * M r p else 0) (hM : IsUniUp M) : IsUniUp M' := by
+theorem isUniUp_of_col
+    {M M' : Mt g n} {p q : Fin n} (hpq : p < q)
+    (t : ZMod g) (h : ∀ r c, M' r c = M r c + if c = q then t * M r p else 0)
+    (hM : IsUniUp M)
+    : IsUniUp M' := by
   intro r c
   refine ⟨fun hc => ?_, fun hc => ?_⟩
   · rw [h, (hM r c).1 hc]
@@ -65,15 +71,19 @@ theorem isUniUp_of_col {M M' : Mt g n} {p q : Fin n} (hpq : p < q) (t : ZMod g)
     · rw [(hM r p).1 (by subst h1; subst hc; exact hpq)]; simp
     · simp
 
-theorem isUniUp_iff_of_col {M M' : Mt g n} {p q : Fin n} (hpq : p < q) (t : ZMod g)
-    (h : ∀ r c, M' r c = M r c + if c = q then t * M r p else 0) : IsUniUp M' ↔ IsUniUp M := by
+theorem isUniUp_iff_of_col
+    {M M' : Mt g n} {p q : Fin n} (hpq : p < q)
+    (t : ZMod g) (h : ∀ r c, M' r c = M r c + if c = q then t * M r p else 0)
+    : IsUniUp M' ↔ IsUniUp M := by
   refine ⟨isUniUp_of_col hpq (-t) fun r c => ?_, isUniUp_of_col hpq t h⟩
   rw [h r c, h r p, if_neg hpq.ne]
   split_ifs <;> ring
 
-theorem supFrom_of_col {M M' : Mt g n} {p q : Fin n} (hpq : (q : ℕ) = p + 1) (t : ZMod g)
-    (h : ∀ r c, M' r c = M r c + if c = q then t * M r p else 0) (hM : IsUniUp M) :
-    supFrom 0 M' = supFrom 0 M + t := by
+theorem supFrom_of_col
+    {M M' : Mt g n} {p q : Fin n} (hpq : (q : ℕ) = p + 1)
+    (t : ZMod g) (h : ∀ r c, M' r c = M r c + if c = q then t * M r p else 0)
+    (hM : IsUniUp M)
+    : supFrom 0 M' = supFrom 0 M + t := by
   have hq := q.2
   have : ∀ k ∈ Finset.Ico 0 (n - 1),
       entN M' k (k + 1) = entN M k (k + 1) + if k = (p : ℕ) then t else 0 := by
@@ -91,15 +101,20 @@ theorem supFrom_of_col {M M' : Mt g n} {p q : Fin n} (hpq : (q : ℕ) = p + 1) (
       omega
   unfold supFrom
   rw [Finset.sum_congr rfl this, Finset.sum_add_distrib, Finset.sum_ite_eq', if_pos]
-  rw [Finset.mem_Ico]; omega
+  rw [Finset.mem_Ico]
+  omega
 
-theorem inPar_iff_of_col {M M' : Mt g n} {a : ℕ} {i j : Fin n} (hj : a ≤ (j : ℕ)) (t : ZMod g)
-    (h : ∀ r c, M' r c = M r c + if c = j then t * M r i else 0) : InPar a M' ↔ InPar a M := by
+theorem inPar_iff_of_col
+    {M M' : Mt g n} {a : ℕ} {i j : Fin n} (hj : a ≤ (j : ℕ))
+    (t : ZMod g) (h : ∀ r c, M' r c = M r c + if c = j then t * M r i else 0)
+    : InPar a M' ↔ InPar a M := by
   refine forall_congr' fun r => forall_congr' fun c => forall_congr' fun hc => ?_
   rw [h, if_neg (by rintro rfl; omega), add_zero]
 
-theorem tl_of_col {M M' : Mt g n} {a : ℕ} {i j : Fin n} (hj : a ≤ (j : ℕ)) (t : ZMod g)
-    (h : ∀ r c, M' r c = M r c + if c = j then t * M r i else 0) : tl a M' = tl a M := by
+theorem tl_of_col
+    {M M' : Mt g n} {a : ℕ} {i j : Fin n} (hj : a ≤ (j : ℕ))
+    (t : ZMod g) (h : ∀ r c, M' r c = M r c + if c = j then t * M r i else 0)
+    : tl a M' = tl a M := by
   ext r c
   unfold tl entN
   split_ifs with h1
@@ -110,9 +125,11 @@ theorem tl_of_col {M M' : Mt g n} {a : ℕ} {i j : Fin n} (hj : a ≤ (j : ℕ))
     omega
   · rfl
 
-theorem br_of_col {M M' : Mt g n} {a b : ℕ} {i j : Fin n} (hi : (i : ℕ) < a) (t : ZMod g)
-    (h : ∀ r c, M' r c = M r c + if c = j then t * M r i else 0) (hM : InPar a M) :
-    br a b M' = br a b M := by
+theorem br_of_col
+    {M M' : Mt g n} {a b : ℕ} {i j : Fin n} (hi : (i : ℕ) < a)
+    (t : ZMod g) (h : ∀ r c, M' r c = M r c + if c = j then t * M r i else 0)
+    (hM : InPar a M)
+    : br a b M' = br a b M := by
   ext r c
   unfold br entN
   split_ifs with h1

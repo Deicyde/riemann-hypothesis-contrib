@@ -12,10 +12,12 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.StrongApprox
 
-open Matrix NumberField IsDedekindDomain TensorProduct Topology ReciprocityTheory.ChartRestriction.G.SA
+open Matrix NumberField IsDedekindDomain TensorProduct Topology
+  ReciprocityTheory.ChartRestriction.G.SA
 
-theorem sigA_inclA_apply {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E)
-    (x : E) : sigA c (inclA F E x) = inclA F E (c x) := by
+theorem sigA_inclA_apply
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] (c : E ≃ₐ[F] E) (x : E)
+    : sigA c (inclA F E x) = inclA F E (c x) := by
   simp [sigA, inclA, Algebra.TensorProduct.map_tmul]
 
 theorem OrthProjection.proof (hT : AETopologicalRing.Statement) : OrthProjection.Statement := by
@@ -38,11 +40,13 @@ theorem OrthProjection.proof (hT : AETopologicalRing.Statement) : OrthProjection
     refine ⟨?_, fun u => ?_⟩
     · unfold perpProj hf
       fun_prop
-    · have hmap : ∀ x y : Fin N → E, inclA F E (hf c.toRingHom J x y) =
-          hf (sigA c) (J.map (inclA F E)) (inclA F E ∘ x) (inclA F E ∘ y) := by
+    · have hmap
+          : ∀ x y : Fin N → E,
+            inclA F E (hf c.toRingHom J x y)
+              = hf (sigA c) (J.map (inclA F E)) (inclA F E ∘ x) (inclA F E ∘ y) := by
         intro x y
         set_option synthInstance.maxHeartbeats 100000 in
-          simp [hf, map_sum, map_mul, sigA_inclA_apply]
+        simp [hf, map_sum, map_mul, sigA_inclA_apply]
       funext i
       simp only [perpProj, Function.comp_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, map_sub,
         map_mul, hmap]

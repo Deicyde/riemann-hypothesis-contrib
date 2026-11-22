@@ -11,8 +11,10 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.SplitOfNegPrime
 
-theorem sqrt_neg_not_mem_maximalRealSubfield (L : Type) [Field L] [NumberField L] [IsCMField L]
-    (p : ℕ) (δ : L) (hp : 0 < p) (hδ : δ ^ 2 = -(p : L)) : δ ∉ maximalRealSubfield L := by
+theorem sqrt_neg_not_mem_maximalRealSubfield
+    (L : Type) [Field L] [NumberField L] [IsCMField L]
+    (p : ℕ) (δ : L) (hp : 0 < p) (hδ : δ ^ 2 = -(p : L))
+    : δ ∉ maximalRealSubfield L := by
   intro hmem
   let x : maximalRealSubfield L := ⟨δ, hmem⟩
   have hx : x ^ 2 = -(p : maximalRealSubfield L) := Subtype.ext (by simpa [x] using hδ)
@@ -23,7 +25,11 @@ theorem sqrt_neg_not_mem_maximalRealSubfield (L : Type) [Field L] [NumberField L
   have h1 : (0 : ℝ) < p := by exact_mod_cast hp
   nlinarith [sq_nonneg (InfinitePlace.embedding_of_isReal hv x)]
 
-theorem isSplitAt : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (p q : ℕ) (δ : L), 0 < p → δ ^ 2 = -(p : L) → ((8 * q : ℕ) : ℤ) ∣ (p : ℤ) + 1 → ∀ w : HeightOneSpectrum (𝓞 L), (q : 𝓞 L) ∈ w.asIdeal → GlobalTheory.UnitaryBC.IsSplitAt w := by
+theorem isSplitAt
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (p q : ℕ) (δ : L),
+      0 < p → δ ^ 2 = -(p : L) → ((8 * q : ℕ) : ℤ) ∣ (p : ℤ) + 1
+        → ∀ w : HeightOneSpectrum (𝓞 L),
+          (q : 𝓞 L) ∈ w.asIdeal → GlobalTheory.UnitaryBC.IsSplitAt w := by
   intro L _ _ _ p q δ hp hδ hdvd w hw
   set Lp := maximalRealSubfield L
   set u := w.under (𝓞 Lp)
@@ -44,8 +50,8 @@ theorem isSplitAt : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (p q 
     linear_combination hk'
   have h1 := GlobalTheory.HenselSquare.isSquare_one_add_four_mul Lp u z hzu
   rw [hsq] at h1
-  refine GlobalTheory.SplitOfSquare.isSplitAt_of_isSquare L (-(p : Lp)) δ (by rw [hδ]; push_cast; rfl)
-    (sqrt_neg_not_mem_maximalRealSubfield L p δ hp hδ) w ?_
+  refine GlobalTheory.SplitOfSquare.isSplitAt_of_isSquare L (-(p : Lp)) δ
+    (by rw [hδ]; push_cast; rfl) (sqrt_neg_not_mem_maximalRealSubfield L p δ hp hδ) w ?_
   simpa using h1
 
 end GlobalTheory.SplitOfNegPrime

@@ -12,12 +12,21 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsGener
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
 
 namespace GlobalTheory.CompanionTheory.Ar.SubFrame
 
-theorem isFrameAt_comp : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (V' : Submodule Ω E) (q : Cpt ξ) (g n : ℕ) (b : Fin g → E) (ix : Fin n → Fin g), Function.Injective ix → LinearIndependent Ω b → L q = Submodule.span (regAt ξ q) (Set.range b) → V' = Submodule.span Ω (Set.range (b ∘ ix)) → (L.inter V').IsFrameAt (b ∘ ix) q := by
+theorem isFrameAt_comp
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (E : Type) [AddCommGroup E]
+        [Module Ω E] (L : Lat ξ E) (V' : Submodule Ω E) (q : Cpt ξ) (g n : ℕ) (b : Fin g → E)
+        (ix : Fin n → Fin g),
+      Function.Injective ix → LinearIndependent Ω b → L q = Submodule.span (regAt ξ q) (Set.range b)
+        → V' = Submodule.span Ω (Set.range (b ∘ ix))
+        → (L.inter V').IsFrameAt (b ∘ ix) q := by
   intro X Ω _ ξ E _ _ L V' q g n b ix hix hb hL hV
   subst hV
   refine And.intro (hb.comp ix hix) ?_
@@ -35,10 +44,12 @@ theorem isFrameAt_comp : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω
       rw [Finset.sum_comm]
       simp [Finset.sum_ite_eq]
     have key : ∀ i, (c i : Ω) = ∑ j, if ix j = i then d j else 0 := by
-      have h0 := Fintype.linearIndependent_iff.1 hb
-        (fun i => (c i : Ω) - ∑ j, if ix j = i then d j else 0) (by
-          simp only [sub_smul, Finset.sum_sub_distrib]
-          rw [hc', hD, sub_self])
+      have h0 :=
+        Fintype.linearIndependent_iff.1 hb
+          (fun i => (c i : Ω) - ∑ j, if ix j = i then d j else 0)
+          (by
+            simp only [sub_smul, Finset.sum_sub_distrib]
+            rw [hc', hD, sub_self])
       intro i
       exact sub_eq_zero.1 (h0 i)
     rw [← hc]

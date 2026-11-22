@@ -10,24 +10,34 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Unramif
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 noncomputable section
 
 namespace GlobalTheory.PMon
 
-
 set_option maxHeartbeats 1000000 in
-theorem lt_period_conj_ratio : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI) (s : ℕ), 0 < s → ∀ (x : P.R.B), IsUnit x → P.φB^[s] x = (l : P.R.B) * x → P.ιB x ∈ Fil P 1 → P.ιB x ∉ Fil P 2 → (∀ j, 0 < j → j < s → ev P j x ∈ Fil P 0 ∧ ev P j x ∉ Fil P 1) → ∀ g : GQ l, ∃ a : ↥(MaximalUnramifiedExtension l), fr l s a = a ∧ P.actQ g x = algebraMap ↥(MaximalUnramifiedExtension l) P.R.B a * x := by
+theorem lt_period_conj_ratio
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI) (s : ℕ),
+      0 < s
+        → ∀ (x : P.R.B),
+          IsUnit x → P.φB^[s] x = (l : P.R.B) * x → P.ιB x ∈ Fil P 1 → P.ιB x ∉ Fil P 2
+            → (∀ j, 0 < j → j < s → ev P j x ∈ Fil P 0 ∧ ev P j x ∉ Fil P 1)
+            → ∀ g : GQ l, ∃ a : ↥(MaximalUnramifiedExtension l),
+              fr l s a = a
+                ∧ P.actQ g x = algebraMap ↥(MaximalUnramifiedExtension l) P.R.B a * x := by
   intro l _ P AI T s hs x hx hφ h1 h2 hj g
-  obtain ⟨-, -, hsh, hinv, -, -, -, htz, tadd, t0, -⟩ := GlobalTheory.T.deRhamPeriodRing_field_tPow_filtration_units l P AI T
+  obtain ⟨-, -, hsh, hinv, -, -, -, htz, tadd, t0, -⟩ :=
+    GlobalTheory.T.deRhamPeriodRing_field_tPow_filtration_units l P AI T
   have iter_mul : ∀ (m : ℕ) (a b : P.R.B), P.φB^[m] (a * b) = P.φB^[m] a * P.φB^[m] b := by
     intro m a b
     induction m generalizing a b with
     | zero => rfl
-    | succ m ih => rw [Function.iterate_succ_apply', Function.iterate_succ_apply',
-        Function.iterate_succ_apply', ih, map_mul]
+    | succ m ih =>
+      rw [Function.iterate_succ_apply', Function.iterate_succ_apply', Function.iterate_succ_apply',
+        ih, map_mul]
   have iter_one : ∀ m : ℕ, P.φB^[m] (1 : P.R.B) = 1 := by
     intro m
     induction m with
@@ -49,15 +59,21 @@ theorem lt_period_conj_ratio : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI
     have e1 : P.φB^[s] x * P.φB^[s] w = 1 := by rw [← iter_mul, hw, iter_one]
     rw [hφ] at e1
     rw [hy, iter_mul, iter_act, hφ, map_mul, map_natCast]
-    calc (l : P.R.B) * P.actQ g x * P.φB^[s] w = P.actQ g x * (((l : P.R.B) * x * P.φB^[s] w) * w) := by
-          linear_combination (-(l : P.R.B) * P.actQ g x * P.φB^[s] w) * hw
+    calc
+      (l : P.R.B) * P.actQ g x * P.φB^[s] w
+          = P.actQ g x * (((l : P.R.B) * x * P.φB^[s] w) * w) := by
+        linear_combination (-(l : P.R.B) * P.actQ g x * P.φB^[s] w) * hw
       _ = P.actQ g x * w := by rw [e1, one_mul]
 
-  have key : ∀ (k : ℤ) (e u v z : P.R.BdR), e = tz P k * u → u * v = 1 → u ∈ Fil P 0 → v ∈ Fil P 0 →
-      z * e = P.actQdR g e → z ∈ Fil P 0 := by
+  have key
+      : ∀ (k : ℤ) (e u v z : P.R.BdR),
+        e = tz P k * u → u * v = 1 → u ∈ Fil P 0 → v ∈ Fil P 0 → z * e = P.actQdR g e
+          → z ∈ Fil P 0 := by
     intro k e u v z he huv hu hv hz
     have hk : tz P k * tz P (-k) = 1 := by rw [← tadd, add_neg_cancel, t0]
-    have hz' : z * e = algebraMap ℚ_[l] P.R.BdR ((P.χQ g ^ k : ℚ_[l]ˣ) : ℚ_[l]) * tz P k * P.actQdR g u := by
+    have hz'
+        : z * e
+          = algebraMap ℚ_[l] P.R.BdR ((P.χQ g ^ k : ℚ_[l]ˣ) : ℚ_[l]) * tz P k * P.actQdR g u := by
       rw [hz, he, map_mul, htz]
     have hzz : z = algebraMap ℚ_[l] P.R.BdR ((P.χQ g ^ k : ℚ_[l]ˣ) : ℚ_[l]) * P.actQdR g u * v := by
       linear_combination (-z + algebraMap ℚ_[l] P.R.BdR ((P.χQ g ^ k : ℚ_[l]ˣ) : ℚ_[l]) * P.actQdR g u * v) * hk
@@ -84,7 +100,8 @@ theorem lt_period_conj_ratio : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI
     · obtain ⟨e0, e1⟩ := hj j hpos hjs
       obtain ⟨v, hv, huv⟩ := hinv _ e0 e1
       exact key 0 (ev P j x) (ev P j x) v _ (by rw [t0, one_mul]) huv e0 hv (hev j)
-  obtain ⟨a, ha, hya⟩ := GlobalTheory.T.unramified_of_frobeniusIterate_fixed_filZero l P AI T s hs y hfix hfil
+  obtain ⟨a, ha, hya⟩ :=
+    GlobalTheory.T.unramified_of_frobeniusIterate_fixed_filZero l P AI T s hs y hfix hfil
   exact ⟨a, ha, by rw [← hyx, hya]⟩
 
 end GlobalTheory.PMon

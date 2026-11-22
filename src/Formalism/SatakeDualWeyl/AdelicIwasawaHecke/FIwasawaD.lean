@@ -12,11 +12,14 @@ section FIwasawaStep
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] (σ : L →+* L) {n : ℕ}
 
-theorem fIwasawa_exists_max_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (M : Matrix (Fin n) (Fin n) L)
-    (hM : fIwasawaUn σ M) (r : ℕ) (hT : fIwasawaTri r M) (ρ : Fin n) (hρr : ρ.val = r)
-    (hρ : ρ < Fin.rev ρ) :
-    ∃ k, fIwasawaKm σ k ∧ fIwasawaTri r (k * M) ∧ (k * M) ρ ρ ≠ 0 ∧
-      ∀ i, ρ ≤ i → i ≤ Fin.rev ρ → Valued.v ((k * M) i ρ) ≤ Valued.v ((k * M) ρ ρ) := by
+theorem fIwasawa_exists_max_pivot
+    (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M)
+    (r : ℕ) (hT : fIwasawaTri r M)
+    (ρ : Fin n) (hρr : ρ.val = r) (hρ : ρ < Fin.rev ρ)
+    : ∃ k,
+      fIwasawaKm σ k ∧ fIwasawaTri r (k * M) ∧ (k * M) ρ ρ ≠ 0
+        ∧ ∀ i, ρ ≤ i → i ≤ Fin.rev ρ → Valued.v ((k * M) i ρ) ≤ Valued.v ((k * M) ρ ρ) := by
   classical
   set W : Finset (Fin n) := Finset.univ.filter (fun i => ρ ≤ i ∧ i ≤ Fin.rev ρ) with hW
   have hmem : ∀ i, ρ ≤ i → i ≤ Fin.rev ρ → i ∈ W := fun i h1 h2 =>
@@ -38,7 +41,8 @@ theorem fIwasawa_exists_max_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (
       refine Finset.sum_eq_zero fun j _ => ?_
       by_cases hj1 : j < ρ
       · have hjr : j.val < r := by rw [← hρr]; exact hj1
-        rw [(fIwasawa_rows σ M hM r hT j hjr).2 (Fin.rev ρ) (Fin.rev_lt_rev.2 hj1), map_zero, zero_mul]
+        rw [(fIwasawa_rows σ M hM r hT j hjr).2 (Fin.rev ρ) (Fin.rev_lt_rev.2 hj1), map_zero,
+          zero_mul]
       · by_cases hj2 : Fin.rev ρ < j
         · rw [hcz j hj2, mul_zero]
         · rw [hcon j (hmem j (not_lt.1 hj1) (not_lt.1 hj2)), mul_zero]
@@ -57,8 +61,8 @@ theorem fIwasawa_exists_max_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (
     obtain ⟨_, h1, h2⟩ := Finset.mem_filter.1 hj
     exact hmem _ (by simpa using Fin.rev_le_rev.2 h2) (Fin.rev_le_rev.2 h1)
 
-  obtain ⟨a, haW, hamax, hne⟩ : ∃ a ∈ W, (∀ i ∈ W, Valued.v (M i ρ) ≤ Valued.v (M a ρ)) ∧
-      a ≠ Fin.rev a := by
+  obtain ⟨a, haW, hamax, hne⟩
+      : ∃ a ∈ W, (∀ i ∈ W, Valued.v (M i ρ) ≤ Valued.v (M a ρ)) ∧ a ≠ Fin.rev a := by
     by_cases h₀ : a₀ = Fin.rev a₀
     · by_contra hcon
       push_neg at hcon
@@ -73,25 +77,28 @@ theorem fIwasawa_exists_max_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (
         exact Fin.ext (by omega)
       have hiso := fIwasawa_iso σ M hM ρ hρ
       rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a₀)] at hiso
-      have hbig : Valued.v (σ (M (Fin.rev a₀) ρ) * M a₀ ρ) = Valued.v (M a₀ ρ) * Valued.v (M a₀ ρ) := by
+      have hbig
+          : Valued.v (σ (M (Fin.rev a₀) ρ) * M a₀ ρ) = Valued.v (M a₀ ρ) * Valued.v (M a₀ ρ) := by
         rw [← h₀, map_mul, hσv]
       have hpos : (0 : WithZero (Multiplicative ℤ)) < Valued.v (M a₀ ρ) * Valued.v (M a₀ ρ) :=
         zero_lt_iff.2 (mul_ne_zero hV hV)
-      have hsmall : Valued.v (∑ j ∈ Finset.univ.erase a₀, σ (M (Fin.rev j) ρ) * M j ρ)
-          < Valued.v (M a₀ ρ) * Valued.v (M a₀ ρ) := by
+      have hsmall
+          : Valued.v (∑ j ∈ Finset.univ.erase a₀, σ (M (Fin.rev j) ρ) * M j ρ)
+            < Valued.v (M a₀ ρ) * Valued.v (M a₀ ρ) := by
         apply Valuation.map_sum_lt _ (mul_ne_zero hV hV)
         intro j hj
         have hja := Finset.ne_of_mem_erase hj
         rw [map_mul, hσv]
         by_cases hjW : j ∈ W
-        · have hra : Fin.rev j ≠ a₀ := by
-            intro h; apply hja; rw [← Fin.rev_rev j, h, ← h₀]
+        · have hra : Fin.rev j ≠ a₀ := by intro h; apply hja; rw [← Fin.rev_rev j, h, ← h₀]
           exact mul_lt_mul_of_le_of_lt_of_nonneg_of_pos (ha₀max _ (hWrev j hjW)) (hlt j hjW hja)
             zero_le' (zero_lt_iff.2 hV)
         · rcases hout j hjW with h | h
           · rw [hcz (Fin.rev j) (Fin.rev_lt_rev.2 h), map_zero, zero_mul]; exact hpos
           · rw [hcz j h, map_zero, mul_zero]; exact hpos
-      have h3 : σ (M (Fin.rev a₀) ρ) * M a₀ ρ = -∑ j ∈ Finset.univ.erase a₀, σ (M (Fin.rev j) ρ) * M j ρ :=
+      have h3
+          : σ (M (Fin.rev a₀) ρ) * M a₀ ρ
+            = - ∑ j ∈ Finset.univ.erase a₀, σ (M (Fin.rev j) ρ) * M j ρ :=
         eq_neg_of_add_eq_zero_left hiso
       rw [h3, Valuation.map_neg] at hbig
       rw [hbig] at hsmall
@@ -125,10 +132,12 @@ theorem fIwasawa_exists_max_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (
     rw [permMatrix_mul_apply₂, permMatrix_mul_apply₂, hπa]
     exact hamax (π i) (hπW i (hmem i h1 h2))
 
-theorem fIwasawa_E_fix (ρ : Fin n) (z : Fin n → L) (c : L)
-    (hz : ∀ t, z t ≠ 0 → ρ < t ∧ t < Fin.rev ρ) (w : Fin n → L) (hwρ : w ρ = 0)
-    (hw : ∀ t, ρ < t → t < Fin.rev ρ → w t = 0) :
-    fIwasawaE σ (Pi.single (Fin.rev ρ) 1) z c *ᵥ w = w := by
+theorem fIwasawa_E_fix
+    (ρ : Fin n)
+    (z : Fin n → L)
+    (c : L) (hz : ∀ t, z t ≠ 0 → ρ < t ∧ t < Fin.rev ρ)
+    (w : Fin n → L) (hwρ : w ρ = 0) (hw : ∀ t, ρ < t → t < Fin.rev ρ → w t = 0)
+    : fIwasawaE σ (Pi.single (Fin.rev ρ) 1) z c *ᵥ w = w := by
   have h1 : fIwasawaH σ (Pi.single (Fin.rev ρ) 1) w = 0 := by
     unfold fIwasawaH
     refine Finset.sum_eq_zero fun j _ => ?_

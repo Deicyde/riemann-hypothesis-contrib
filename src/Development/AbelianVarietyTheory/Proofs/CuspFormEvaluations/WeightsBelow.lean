@@ -13,17 +13,22 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps Formalism.L2.Pj GlobalTheory.RunIn
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps
+  Formalism.L2.Pj GlobalTheory.RunIn
 
 namespace GlobalTheory.RunWeights
 
-theorem size_le_mul {D : D7} {j : ℕ} (x z : WeightFamilies.Wt D j) (c : ℕ) (hc : 1 ≤ c)
-    (h1 : ∀ τ i, x.aP τ i ≤ c * z.aP τ i) (h2 : ∀ τ i, x.aM τ i ≤ c * z.aM τ i) (h3 : x.n ≤ c * z.n) :
-    x.size ≤ (c : ℝ) * z.size := by
+theorem size_le_mul
+    {D : D7} {j : ℕ} (x z : WeightFamilies.Wt D j)
+    (c : ℕ) (hc : 1 ≤ c) (h1 : ∀ τ i, x.aP τ i ≤ c * z.aP τ i) (h2 : ∀ τ i, x.aM τ i ≤ c * z.aM τ i)
+    (h3 : x.n ≤ c * z.n)
+    : x.size ≤ (c : ℝ) * z.size := by
   have hK : (0 : ℝ) ≤ (D.R.f : ℝ) * ((max (D.R.sigW j).2 1 : ℕ) : ℝ) * (D.R.r : ℝ) := by positivity
   have hc1 : (1 : ℝ) ≤ c := by exact_mod_cast hc
-  have hS : (∑ τ, ((∑ i, (x.aP τ i : ℝ)) + ∑ i, (x.aM τ i : ℝ))) ≤
-      (c : ℝ) * ∑ τ, ((∑ i, (z.aP τ i : ℝ)) + ∑ i, (z.aM τ i : ℝ)) := by
+  have hS
+      : (∑ τ, ((∑ i, (x.aP τ i : ℝ)) + ∑ i, (x.aM τ i : ℝ)))
+        ≤ (c : ℝ) * ∑ τ, ((∑ i, (z.aP τ i : ℝ)) + ∑ i, (z.aM τ i : ℝ)) := by
     rw [Finset.mul_sum]
     refine Finset.sum_le_sum fun τ _ => ?_
     rw [mul_add, Finset.mul_sum, Finset.mul_sum]
@@ -35,33 +40,82 @@ theorem size_le_mul {D : D7} {j : ℕ} (x z : WeightFamilies.Wt D j) (c : ℕ) (
   unfold WeightFamilies.Wt.size
   nlinarith
 
-theorem DF_le {D : D7} {j : ℕ} (x z : WeightFamilies.Wt D j)
-    (h1 : ∀ τ i, x.aP τ i ≤ z.aP τ i) (h2 : ∀ τ i, x.aM τ i ≤ z.aM τ i) : WeightAlgebra.DF x ≤ WeightAlgebra.DF z := by
+theorem DF_le
+    {D : D7} {j : ℕ} (x z : WeightFamilies.Wt D j) (h1 : ∀ τ i, x.aP τ i ≤ z.aP τ i)
+    (h2 : ∀ τ i, x.aM τ i ≤ z.aM τ i)
+    : WeightAlgebra.DF x ≤ WeightAlgebra.DF z := by
   unfold WeightAlgebra.DF WeightAlgebra.degP
   exact Finset.sum_le_sum fun τ _ =>
     add_le_add (Finset.sum_le_sum fun i _ => h1 τ i) (Finset.sum_le_sum fun i _ => h2 τ i)
 
-theorem weights_below : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ) (X : PJ D B P j) (large₂ : SizeData₂ D) (H : KHyp) (C2 A2 CR CT : ℝ) (ka wL wF : WeightFamilies.Wt D j) (Tn nP nW : ℕ) (h0 : ℝ), 1 ≤ j → FamilyHypotheses.HypPage large₂ X H C2 A2 CR CT ka wL wF Tn nP nW h0 → (∀ w ∈ ({wL, wF, X.wF0 wL wF, ka} : Set (WeightFamilies.Wt D j)), WeightAlgebra.DF w ≤ WeightAlgebra.DF ka ∧ w.n ≤ ka.n ∧ D.R.r ≤ w.n ∧ w.LastPos) ∧ (∀ w ∈ ({wF, X.wF0 wL wF, ka} : Set (WeightFamilies.Wt D j)), 8 * D.R.f * D.R.r + 4 ≤ w.n) ∧ (∀ w2, IsG2 wL wF w2 → WeightAlgebra.DF w2 ≤ WeightAlgebra.DF ka ∧ w2.n ≤ ka.n ∧ w2.size ≤ ((WeightFamilies.dimY D j : ℝ) + 4) * wL.size) ∧ (∀ w1, IsDoubledWeightWithShift wL w1 nW → WeightAlgebra.DF w1 ≤ WeightAlgebra.DF ka ∧ w1.n ≤ ka.n ∧ w1.size ≤ 2 * wL.size) := by
+theorem weights_below
+    : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ)
+        (X : PJ D B P j) (large₂ : SizeData₂ D) (H : KHyp) (C2 A2 CR CT : ℝ)
+        (ka wL wF : WeightFamilies.Wt D j) (Tn nP nW : ℕ) (h0 : ℝ),
+      1 ≤ j → FamilyHypotheses.HypPage large₂ X H C2 A2 CR CT ka wL wF Tn nP nW h0
+        → (∀ w ∈ ({wL, wF, X.wF0 wL wF, ka} : Set (WeightFamilies.Wt D j)),
+            WeightAlgebra.DF w ≤ WeightAlgebra.DF ka ∧ w.n ≤ ka.n ∧ D.R.r ≤ w.n ∧ w.LastPos)
+          ∧ (∀ w ∈ ({wF, X.wF0 wL wF, ka} : Set (WeightFamilies.Wt D j)),
+            8 * D.R.f * D.R.r + 4 ≤ w.n)
+          ∧ (∀ w2,
+            IsG2 wL wF w2
+              → WeightAlgebra.DF w2 ≤ WeightAlgebra.DF ka ∧ w2.n ≤ ka.n
+                ∧ w2.size ≤ ((WeightFamilies.dimY D j : ℝ) + 4) * wL.size)
+          ∧ (∀ w1,
+            IsDoubledWeightWithShift wL w1 nW
+              → WeightAlgebra.DF w1 ≤ WeightAlgebra.DF ka ∧ w1.n ≤ ka.n
+                ∧ w1.size ≤ 2 * wL.size) := by
   intro D B P j X large₂ H C2 A2 CR CT ka wL wF Tn nP nW h0 hj hH
   unfold FamilyHypotheses.HypPage at hH
   obtain ⟨_, hSet, _, _, _⟩ := hH
   unfold SetC at hSet
-  obtain ⟨hkan, _, _, hh0, _, hlastP, _, _, _, hnP8, hnPW, _, _, hnV, hL, hF, _, hT0, hDT, h40, hDnW,
-    h40n, _, _, _, hDom⟩ := hSet
+  obtain ⟨
+      hkan,
+      _,
+      _,
+      hh0,
+      _,
+      hlastP,
+      _,
+      _,
+      _,
+      hnP8,
+      hnPW,
+      _,
+      _,
+      hnV,
+      hL,
+      hF,
+      _,
+      hT0,
+      hDT,
+      h40,
+      hDnW,
+      h40n,
+      _,
+      _,
+      _,
+      hDom
+    ⟩ :=
+    hSet
   obtain ⟨hLn, hLP, _⟩ := hL
   obtain ⟨hFn, hFP, hFM⟩ := hF
 
   have kaP : ∀ τ i, ka.aP τ i = Tn * wL.aP τ i + wF.aP τ i := fun τ i => by
     have e := hFP τ i
-    have e' : ((ka.aP τ i : ℕ) : ℤ) = ((Tn * wL.aP τ i + wF.aP τ i : ℕ) : ℤ) := by push_cast; linarith
+    have e' : ((ka.aP τ i : ℕ) : ℤ) = ((Tn * wL.aP τ i + wF.aP τ i : ℕ) : ℤ) := by
+      push_cast; linarith
     exact_mod_cast e'
   have kaM : ∀ τ i, ka.aM τ i = Tn * wL.aM τ i + wF.aM τ i := fun τ i => by
     have e := hFM τ i
-    have e' : ((ka.aM τ i : ℕ) : ℤ) = ((Tn * wL.aM τ i + wF.aM τ i : ℕ) : ℤ) := by push_cast; linarith
+    have e' : ((ka.aM τ i : ℕ) : ℤ) = ((Tn * wL.aM τ i + wF.aM τ i : ℕ) : ℤ) := by
+      push_cast; linarith
     exact_mod_cast e'
   have kan : ka.n = nP + Tn * nW := by rw [hkan, hnV]
-  have f0P : ∀ τ i, (X.wF0 wL wF).aP τ i = wF.aP τ i + WeightFamilies.dimY D j * wL.aP τ i := fun _ _ => rfl
-  have f0M : ∀ τ i, (X.wF0 wL wF).aM τ i = wF.aM τ i + WeightFamilies.dimY D j * wL.aM τ i := fun _ _ => rfl
+  have f0P : ∀ τ i, (X.wF0 wL wF).aP τ i = wF.aP τ i + WeightFamilies.dimY D j * wL.aP τ i :=
+    fun _ _ => rfl
+  have f0M : ∀ τ i, (X.wF0 wL wF).aM τ i = wF.aM τ i + WeightFamilies.dimY D j * wL.aM τ i :=
+    fun _ _ => rfl
   have f0n : (X.wF0 wL wF).n = wF.n + WeightFamilies.dimY D j * wL.n := rfl
   have hT1 : 1 ≤ Tn := hT0
   have hT2 : 2 ≤ Tn := by omega
@@ -79,18 +133,25 @@ theorem weights_below : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliInte
     have := Nat.mul_le_mul hf (le_refl D.R.r)
     omega
 
-  have leKa : ∀ w : WeightFamilies.Wt D j, (∀ τ i, w.aP τ i ≤ ka.aP τ i) → (∀ τ i, w.aM τ i ≤ ka.aM τ i) →
-      WeightAlgebra.DF w ≤ WeightAlgebra.DF ka := fun w a b => DF_le w ka a b
+  have leKa
+      : ∀ w : WeightFamilies.Wt D j,
+        (∀ τ i, w.aP τ i ≤ ka.aP τ i) → (∀ τ i, w.aM τ i ≤ ka.aM τ i)
+          → WeightAlgebra.DF w ≤ WeightAlgebra.DF ka := fun w a b =>
+    DF_le w ka a b
 
-  have kaLast : ∀ τ (i : Fin (D.R.sigW j).1), i.1 + 1 = (D.R.sigW j).1 → 2 * Tn * Tn ≤ ka.aP τ i := by
+  have kaLast
+      : ∀ τ (i : Fin (D.R.sigW j).1), i.1 + 1 = (D.R.sigW j).1 → 2 * Tn * Tn ≤ ka.aP τ i := by
     intro τ i hi
     have e := hlastP τ i hi
     have e' : (2 * (Tn : ℝ) * Tn) ≤ ka.aP τ i := by nlinarith
     exact_mod_cast e'
 
-  have wLLast : ∀ τ (i : Fin (D.R.sigW j).1), i.1 + 1 = (D.R.sigW j).1 →
-      1 ≤ wL.aP τ i ∧ ((Tn + WeightFamilies.dimY D j + 2 : ℕ) : ℤ) * wL.aP τ i ≤
-        (ka.aP τ i : ℤ) - ((WeightFamilies.dimY D j : ℤ) + 2) * nW - 2 * D.R.r := by
+  have wLLast
+      : ∀ τ (i : Fin (D.R.sigW j).1),
+        i.1 + 1 = (D.R.sigW j).1
+          → 1 ≤ wL.aP τ i
+            ∧ ((Tn + WeightFamilies.dimY D j + 2 : ℕ) : ℤ) * wL.aP τ i
+              ≤ (ka.aP τ i : ℤ) - ((WeightFamilies.dimY D j : ℤ) + 2) * nW - 2 * D.R.r := by
     intro τ i hi
     have e := hLP τ i
     unfold gapZ at e
@@ -105,7 +166,8 @@ theorem weights_below : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliInte
         rw [e, Int.le_ediv_iff_mul_le hb]
         have hk' : ((2 * Tn * Tn : ℕ) : ℤ) ≤ (ka.aP τ i : ℤ) := by exact_mod_cast hk
         have hTT' : ((2 * Tn : ℕ) : ℤ) ≤ ((Tn * Tn : ℕ) : ℤ) := by exact_mod_cast hTT
-        have hDnW' : (((WeightFamilies.dimY D j + 2) * nW + 2 * D.R.r : ℕ) : ℤ) ≤ (Tn : ℤ) := by exact_mod_cast hDnW
+        have hDnW' : (((WeightFamilies.dimY D j + 2) * nW + 2 * D.R.r : ℕ) : ℤ) ≤ (Tn : ℤ) := by
+          exact_mod_cast hDnW
         have hDT' : ((WeightFamilies.dimY D j : ℕ) : ℤ) ≤ (Tn : ℤ) := by exact_mod_cast hDT
         push_cast at hk' hTT' hDnW' hDT' ⊢
         nlinarith
@@ -146,7 +208,8 @@ theorem weights_below : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliInte
       · rw [f0n, hFn]; omega
       · intro τ i hi
         have := wFLast τ i hi
-        rw [f0P]; omega
+        rw [f0P]
+        omega
     · refine ⟨le_refl _, le_refl _, ?_, ?_⟩
       · rw [kan]; omega
       · intro τ i hi
@@ -181,7 +244,8 @@ theorem weights_below : ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliInte
     · have := Nat.mul_le_mul hT2 (le_refl (wL.aP τ i)); have := h1P τ i; rw [kaP]; omega
     · have := Nat.mul_le_mul hT2 (le_refl (wL.aM τ i)); have := h1M τ i; rw [kaM]; omega
     · have := Nat.mul_le_mul hT2 (le_refl nW); rw [kan]; rw [hLn] at bn; omega
-    · have := size_le_mul w1 wL 2 (by norm_num) (fun τ i => (h1P τ i).le) (fun τ i => (h1M τ i).le) bn
+    · have :=
+        size_le_mul w1 wL 2 (by norm_num) (fun τ i => (h1P τ i).le) (fun τ i => (h1M τ i).le) bn
       push_cast at this
       exact this
 

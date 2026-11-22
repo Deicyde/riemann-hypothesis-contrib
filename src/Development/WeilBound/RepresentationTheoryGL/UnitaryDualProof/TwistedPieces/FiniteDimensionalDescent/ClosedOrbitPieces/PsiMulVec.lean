@@ -10,7 +10,9 @@ open Matrix
 
 namespace PositivityTheory.RgUd.TP.Desc.Piece.PDich
 
-variable {k : Type} [Field k] {N : ℕ} {A : Subalgebra k (Matrix (Fin N) (Fin N) k)} {e : Matrix (Fin N) (Fin N) k}
+variable
+  {k : Type} [Field k]
+  {N : ℕ} {A : Subalgebra k (Matrix (Fin N) (Fin N) k)} {e : Matrix (Fin N) (Fin N) k}
   (hA : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (he : e ∈ A)
 
 instance Fe_tower : IsScalarTower k (Fe hA he) (Wd e) := ⟨fun _ _ _ => rfl⟩
@@ -35,7 +37,8 @@ lemma Pe_smul (a : A) (v : Fin N → k) :
   show e *ᵥ (a.1 *ᵥ v) = a.1 *ᵥ (e *ᵥ v)
   rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hA _ a.2 _ he]
 
-def phiOf (c : Matrix (Fin N) (Fin N) k) (hc : ∀ a ∈ A, a * c = c * a) : Module.End (Fe hA he) (Wd e) where
+def phiOf (c : Matrix (Fin N) (Fin N) k) (hc : ∀ a ∈ A, a * c = c * a)
+    : Module.End (Fe hA he) (Wd e) where
   toFun w := ⟨c *ᵥ (w : Fin N → k), W_stable (hc e he).symm w.2⟩
   map_add' w w' := by apply Subtype.ext; exact Matrix.mulVec_add c w.1 w'.1
   map_smul' := by

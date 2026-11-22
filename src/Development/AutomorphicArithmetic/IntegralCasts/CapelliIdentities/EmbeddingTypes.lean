@@ -11,20 +11,20 @@ public import Formalism.LocalRingCardinality.DataHost
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-private theorem UpperTheory.Reformulated.B.EmbeddingTypes.core {R K V : Type*} [CommRing R] [Field K] [Algebra R K]
-    [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
-    (L : Submodule R V) (hL : Submodule.span K (L : Set V) = ⊤) (y : V) :
-    ∃ s ∈ nonZeroDivisors R, s • y ∈ L := by
+private theorem UpperTheory.Reformulated.B.EmbeddingTypes.core
+    {R K V : Type*} [CommRing R] [Field K] [Algebra R K] [IsFractionRing R K] [AddCommGroup V]
+    [Module K V] [Module R V] [IsScalarTower R K V]
+    (L : Submodule R V) (hL : Submodule.span K (L : Set V) = ⊤)
+    (y : V)
+    : ∃ s ∈ nonZeroDivisors R, s • y ∈ L := by
   have hy : y ∈ Submodule.span K (L : Set V) := hL ▸ Submodule.mem_top
   obtain ⟨t, ht⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors R) K _ y hy
   exact ⟨t, t.2, by simpa [Submonoid.smul_def] using ht⟩
 
-theorem UpperTheory.Reformulated.B.EmbeddingTypes.exists_smul_mem_base_lattice_alt :
-    ∀ (D : Formalism.BasicNotions.D7) (j : ℕ) (y : (D.sp.W j).V),
-    ∃ s ∈ nonZeroDivisors (NumberField.RingOfIntegers D.host.E),
-      s • y ∈
-        (D.sp.W
-            j).L0 := by
+theorem UpperTheory.Reformulated.B.EmbeddingTypes.exists_smul_mem_base_lattice_alt
+    : ∀ (D : Formalism.BasicNotions.D7) (j : ℕ) (y : (D.sp.W j).V),
+      ∃ s ∈ nonZeroDivisors (NumberField.RingOfIntegers D.host.E),
+        s • y ∈ (D.sp.W j).L0 := by
   intro D j y
   classical
   let S := D.sp.W j
@@ -35,7 +35,9 @@ theorem UpperTheory.Reformulated.B.EmbeddingTypes.exists_smul_mem_base_lattice_a
     let b := Module.finBasis D.host.E W
     let g : S.V →ₗ[D.host.E] (Fin (Module.finrank D.host.E W) → D.host.E) :=
       LinearMap.pi fun k => S.hT (b k)
-    have hdim : Module.finrank D.host.E (Fin (Module.finrank D.host.E W) → D.host.E) < Module.finrank D.host.E S.V := by
+    have hdim
+        : Module.finrank D.host.E (Fin (Module.finrank D.host.E W) → D.host.E)
+          < Module.finrank D.host.E S.V := by
       simp only [Module.finrank_fintype_fun_eq_card, Fintype.card_fin]
       exact Submodule.finrank_lt h
     obtain ⟨x, hx, hx₀⟩ :=
@@ -66,5 +68,7 @@ theorem UpperTheory.Reformulated.B.EmbeddingTypes.exists_smul_mem_base_lattice_a
       Module.Finite.of_injective i fun a b hab =>
         smul_left_injective D.host.E hx₀ (congrArg Subtype.val hab)
     exact NumberField.RingOfIntegers.not_isField D.host.E
-      (isField_of_isIntegral_of_isField (IsFractionRing.injective (NumberField.RingOfIntegers D.host.E) D.host.E) (Field.toIsField D.host.E))
+      (isField_of_isIntegral_of_isField
+        (IsFractionRing.injective (NumberField.RingOfIntegers D.host.E) D.host.E)
+        (Field.toIsField D.host.E))
   exact UpperTheory.Reformulated.B.EmbeddingTypes.core (K := D.host.E) _ hspan y

@@ -15,7 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Continu
 
 noncomputable section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
 open scoped Topology
 
 namespace GlobalTheory.WeakClosed
@@ -33,7 +34,19 @@ theorem ring_cb : letI := cbTop l; IsTopologicalRing (Cb l) := by
   letI := cbValued l
   infer_instance
 
-theorem jD_piN_closed : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) (T : Lt K LL), IsCrys ((D.loc l).PD K) T.ρ → ∃ τ : TopologicalSpace (TW (RW LL) T), letI := τ; T2Space (TW (RW LL) T) ∧ IsTopologicalAddGroup (TW (RW LL) T) ∧ (∀ b : TW (RW LL) T, Continuous (fun g : ↥(GK K) => TWact ((D.locA l).gRW LL (g : GQ l)) T g b)) ∧ Continuous (fun t : ↥T.L.T => (1 : RW LL) ⊗ₜ[↥(OL LL)] t) ∧ IsClosed (((F l).E K s LL h).tie.jD T '' (aN ((HW l).W K s LL h) T letπ : Set (((HW l).W K s LL h).DD T))) := by
+theorem jD_piN_closed
+    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ)
+        [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) (T : Lt K LL),
+      IsCrys ((D.loc l).PD K) T.ρ
+        → ∃ τ : TopologicalSpace (TW (RW LL) T),
+          letI := τ
+          T2Space (TW (RW LL) T) ∧ IsTopologicalAddGroup (TW (RW LL) T)
+            ∧ (∀ b : TW (RW LL) T,
+              Continuous (fun g : ↥(GK K) => TWact ((D.locA l).gRW LL (g : GQ l)) T g b))
+            ∧ Continuous (fun t : ↥T.L.T => (1 : RW LL) ⊗ₜ[↥(OL LL)] t)
+            ∧ IsClosed
+              (((F l).E K s LL h).tie.jD T
+                '' (aN ((HW l).W K s LL h) T letπ : Set (((HW l).W K s LL h).DD T))) := by
   intro D HW F l _ K s LL h T _
   haveI := LL.2
   haveI : Module.Free ℤ_[l] ↥(OL LL) :=
@@ -56,13 +69,21 @@ theorem jD_piN_closed : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F
     T2Space.of_injective_continuous (GlobalTheory.WeakTop.coords (WCb l) ↥(OL LL) b).injective hc
   haveI hAG : IsTopologicalAddGroup (TW (RW LL) T) :=
     Topology.IsInducing.topologicalAddGroup (GlobalTheory.WeakTop.coords (WCb l) ↥(OL LL) b) ⟨rfl⟩
-  refine ⟨τ, hT2, hAG, GlobalTheory.T.continuous_galois_orbit_wittTensorLatticeWeakTopology (D.locA l) T b, GlobalTheory.T.continuous_one_tmul_latB T b, ?_⟩
+  refine ⟨
+    τ,
+    hT2,
+    hAG,
+    GlobalTheory.T.continuous_galois_orbit_wittTensorLatticeWeakTopology (D.locA l) T b,
+    GlobalTheory.T.continuous_one_tmul_latB T b,
+    ?_
+  ⟩
   obtain ⟨r, y, hy⟩ := GlobalTheory.T.exists_image_aN_eq_range_sum ((F l).E K s LL h) T
   rw [hy]
   letI := aTop (K := K) bO
   haveI := GlobalTheory.T.compactSpace_aTop' (K := K) bO
   refine (isCompact_range ?_).isClosed
   refine continuous_finsetSum _ fun i _ => ?_
-  exact (GlobalTheory.T.continuous_wittCbInclusion_smul_weakTopology ((F l).E K s LL h) T b bO (y i)).comp (continuous_apply i)
+  exact (GlobalTheory.T.continuous_wittCbInclusion_smul_weakTopology ((F l).E K s LL h) T b bO
+    (y i)).comp (continuous_apply i)
 
 end GlobalTheory.WeakClosed

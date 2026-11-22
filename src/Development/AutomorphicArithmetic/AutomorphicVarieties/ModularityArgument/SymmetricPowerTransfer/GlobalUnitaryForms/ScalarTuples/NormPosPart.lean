@@ -22,58 +22,68 @@ variable {K : Type} [Field K] {Δ τ : K}
 private theorem st_alg' (c : K) : star (algebraMap K (Lsq K Δ) c) = algebraMap K _ c := by
   ext <;> simp
 
-private theorem tr_form (m x y : EL Δ τ) :
-    QuadraticAlgebra.trace (m * x * star (sigL y)) =
-      (2 * m.re + algebraMap K (Lsq K Δ) τ * m.im) * x.re * star y.re +
-      (algebraMap K (Lsq K Δ) τ * m.re + 2 * m.im) * x.re * star y.im +
-      (algebraMap K (Lsq K Δ) τ * m.re + ((algebraMap K (Lsq K Δ) τ) ^ 2 - 2) * m.im) * x.im * star y.re +
-      (2 * m.re + algebraMap K (Lsq K Δ) τ * m.im) * x.im * star y.im := by
+private theorem tr_form (m x y : EL Δ τ)
+    : QuadraticAlgebra.trace (m * x * star (sigL y))
+      = (2 * m.re + algebraMap K (Lsq K Δ) τ * m.im) * x.re * star y.re
+        + (algebraMap K (Lsq K Δ) τ * m.re + 2 * m.im) * x.re * star y.im
+        + (algebraMap K (Lsq K Δ) τ * m.re + ((algebraMap K (Lsq K Δ) τ) ^ 2 - 2) * m.im) * x.im
+          * star y.re
+        + (2 * m.re + algebraMap K (Lsq K Δ) τ * m.im) * x.im * star y.im := by
   simp only [QuadraticAlgebra.trace, LinearMap.coe_mk, AddHom.coe_mk, QuadraticAlgebra.re_mul,
     QuadraticAlgebra.im_mul, QuadraticAlgebra.re_star, QuadraticAlgebra.im_star, sigL]
   ring
 
-private theorem star_parts {m : EL Δ τ} (h : star (sigL m) = m) :
-    star m.im = -m.im ∧ star m.re = m.re + algebraMap K (Lsq K Δ) τ * m.im := by
+private theorem star_parts {m : EL Δ τ} (h : star (sigL m) = m)
+    : star m.im = -m.im ∧ star m.re = m.re + algebraMap K (Lsq K Δ) τ * m.im := by
   have h1 := congrArg QuadraticAlgebra.re h
   have h2 := congrArg QuadraticAlgebra.im h
   simp only [QuadraticAlgebra.re_star, QuadraticAlgebra.im_star, sigL] at h1 h2
   refine ⟨by linear_combination -h2, by linear_combination h1 + algebraMap K (Lsq K Δ) τ * h2⟩
 
-private theorem diag_sum (Pm : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) (g : Fin 3 → Lsq K Δ)
-    (e : diagonal g = Pmᵀ * Pm.map star) (a a' : Fin 3 → Lsq K Δ) :
-    ∑ k, (Pm *ᵥ a) k * star ((Pm *ᵥ a') k) = ∑ i, g i * a i * star (a' i) := by
+private theorem diag_sum
+    (Pm : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) (g : Fin 3 → Lsq K Δ)
+    (e : diagonal g = Pmᵀ * Pm.map star)
+    (a a' : Fin 3 → Lsq K Δ)
+    : ∑ k, (Pm *ᵥ a) k * star ((Pm *ᵥ a') k) = ∑ i, g i * a i * star (a' i) := by
   have hij : ∀ i j, ∑ k, Pm k i * star (Pm k j) = diagonal g i j := by
     intro i j
     rw [e]
     simp [Matrix.mul_apply]
-  calc ∑ k, (Pm *ᵥ a) k * star ((Pm *ᵥ a') k)
-      = ∑ k, ∑ i, ∑ j, Pm k i * star (Pm k j) * (a i * star (a' j)) := by
-        refine Finset.sum_congr rfl fun k _ => ?_
-        simp only [Matrix.mulVec, dotProduct, star_sum, star_mul', Finset.sum_mul, Finset.mul_sum]
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-        ring
+  calc
+    ∑ k, (Pm *ᵥ a) k * star ((Pm *ᵥ a') k)
+        = ∑ k, ∑ i, ∑ j, Pm k i * star (Pm k j) * (a i * star (a' j)) := by
+      refine Finset.sum_congr rfl fun k _ => ?_
+      simp only [Matrix.mulVec, dotProduct, star_sum, star_mul', Finset.sum_mul, Finset.mul_sum]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+      ring
     _ = ∑ i, ∑ j, (∑ k, Pm k i * star (Pm k j)) * (a i * star (a' j)) := by
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [Finset.sum_comm]
-        simp only [Finset.sum_mul]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [Finset.sum_comm]
+      simp only [Finset.sum_mul]
     _ = ∑ i, g i * a i * star (a' i) := by
-        refine Finset.sum_congr rfl fun i _ => ?_
-        simp_rw [hij]
-        rw [Finset.sum_eq_single i]
-        · simp [mul_assoc]
-        · intro j _ hj
-          rw [Matrix.diagonal_apply_ne _ (Ne.symm hj)]
-          ring
-        · simp
+      refine Finset.sum_congr rfl fun i _ => ?_
+      simp_rw [hij]
+      rw [Finset.sum_eq_single i]
+      · simp [mul_assoc]
+      · intro j _ hj
+        rw [Matrix.diagonal_apply_ne _ (Ne.symm hj)]
+        ring
+      · simp
 
-private theorem gram_diag [CharZero K] {c : K} {d m : EL Δ τ} (h : IsDat c d m) :
-    ∃ g : K, algebraMap K (Lsq K Δ) g = QuadraticAlgebra.trace m ∧ (g ≠ 0 → ∃ (g2 : K) (b y : Lsq K Δ),
-      (∀ u v : Sp Δ τ, herm c m u v = algebraMap K (Lsq K Δ) c * u.1 * star v.1 +
-        algebraMap K (Lsq K Δ) g * (u.2.re + u.2.im * b) * star (v.2.re + v.2.im * b) +
-        algebraMap K (Lsq K Δ) g2 * u.2.im * star v.2.im) ∧
-      algebraMap K (Lsq K Δ) (g * g2) = algebraMap K (Lsq K Δ) (2 - τ) * (y * star y)) := by
+private theorem gram_diag [CharZero K] {c : K} {d m : EL Δ τ} (h : IsDat c d m)
+    : ∃ g : K,
+      algebraMap K (Lsq K Δ) g = QuadraticAlgebra.trace m
+        ∧ (g ≠ 0
+          → ∃ (g2 : K) (b y : Lsq K Δ),
+            (∀ u v : Sp Δ τ,
+                herm c m u v
+                  = algebraMap K (Lsq K Δ) c * u.1 * star v.1
+                    + algebraMap K (Lsq K Δ) g * (u.2.re + u.2.im * b) * star (v.2.re + v.2.im * b)
+                    + algebraMap K (Lsq K Δ) g2 * u.2.im * star v.2.im)
+              ∧ algebraMap K (Lsq K Δ) (g * g2)
+                = algebraMap K (Lsq K Δ) (2 - τ) * (y * star y)) := by
   obtain ⟨hsi, hsr⟩ := star_parts h.m_star
   have fix : ∀ z : Lsq K Δ, star z = z → algebraMap K (Lsq K Δ) z.re = z := by
     intro z hz
@@ -91,19 +101,29 @@ private theorem gram_diag [CharZero K] {c : K} {d m : EL Δ τ} (h : IsDat c d m
     simp only [star_add, star_mul', st_alg', star_ofNat, hsr, hsi]
     ring
   refine ⟨(QuadraticAlgebra.trace m).re, fix _ hAs, fun hg0 => ?_⟩
-  have hG : algebraMap K (Lsq K Δ) (QuadraticAlgebra.trace m).re =
-      2 * m.re + algebraMap K (Lsq K Δ) τ * m.im := (fix _ hAs).trans hA
+  have hG
+      : algebraMap K (Lsq K Δ) (QuadraticAlgebra.trace m).re
+        = 2 * m.re + algebraMap K (Lsq K Δ) τ * m.im :=
+    (fix _ hAs).trans hA
   obtain ⟨y, hy⟩ := exG_norm h
-  have hGi : algebraMap K (Lsq K Δ) ((QuadraticAlgebra.trace m).re)⁻¹ *
-      algebraMap K (Lsq K Δ) (QuadraticAlgebra.trace m).re = 1 := by
+  have hGi
+      : algebraMap K (Lsq K Δ) ((QuadraticAlgebra.trace m).re)⁻¹
+          * algebraMap K (Lsq K Δ) (QuadraticAlgebra.trace m).re
+        = 1 := by
     rw [← map_mul, inv_mul_cancel₀ hg0, map_one]
-  have hG2 : algebraMap K (Lsq K Δ) ((2 - τ) * QuadraticAlgebra.norm y / (QuadraticAlgebra.trace m).re) *
-      algebraMap K (Lsq K Δ) (QuadraticAlgebra.trace m).re =
-      algebraMap K (Lsq K Δ) (2 - τ) * (y * star y) := by
+  have hG2
+      : algebraMap K (Lsq K Δ) ((2 - τ) * QuadraticAlgebra.norm y / (QuadraticAlgebra.trace m).re)
+          * algebraMap K (Lsq K Δ) (QuadraticAlgebra.trace m).re
+        = algebraMap K (Lsq K Δ) (2 - τ) * (y * star y) := by
     rw [← map_mul, div_mul_cancel₀ _ hg0, map_mul, QuadraticAlgebra.algebraMap_norm_eq_mul_star]
-  refine ⟨(2 - τ) * QuadraticAlgebra.norm y / (QuadraticAlgebra.trace m).re,
-    algebraMap K (Lsq K Δ) ((QuadraticAlgebra.trace m).re)⁻¹ *
-      (algebraMap K (Lsq K Δ) τ * m.re + ((algebraMap K (Lsq K Δ) τ) ^ 2 - 2) * m.im), y, ?_, ?_⟩
+  refine ⟨
+    (2 - τ) * QuadraticAlgebra.norm y / (QuadraticAlgebra.trace m).re,
+    algebraMap K (Lsq K Δ) ((QuadraticAlgebra.trace m).re)⁻¹
+      * (algebraMap K (Lsq K Δ) τ * m.re + ((algebraMap K (Lsq K Δ) τ) ^ 2 - 2) * m.im),
+    y,
+    ?_,
+    ?_
+  ⟩
   · intro u v
     simp only [herm]
     rw [tr_form]
@@ -131,7 +151,9 @@ section Main
 
 variable {F : Type} [Field F] [NumberField F]
 
-private theorem hs_sq {K : Type} [Field K] [CharZero K] {D : K} (h0 : D ≠ 0) (h : IsSquare D) (x : K) : hs D x = 1 := by
+private theorem hs_sq
+    {K : Type} [Field K] [CharZero K] {D : K} (h0 : D ≠ 0) (h : IsSquare D) (x : K)
+    : hs D x = 1 := by
   obtain ⟨r, rfl⟩ := h
   have hr : r ≠ 0 := by
     rintro rfl
@@ -142,8 +164,10 @@ private theorem hs_sq {K : Type} [Field K] [CharZero K] {D : K} (h0 : D ≠ 0) (
   field_simp
   ring
 
-private theorem disc_norm {Δ : F} (D : Dat Δ) (hok : D.Ok) (hΔ0 : Δ ≠ 0) {w : F} (hw : TPos w) (hw0 : w ≠ 0) (hev : D.Ev w) :
-    ∃ u : Lsq F Δ, algebraMap F (Lsq F Δ) w = u * star u := by
+private theorem disc_norm
+    {Δ : F} (D : Dat Δ) (hok : D.Ok) (hΔ0 : Δ ≠ 0)
+    {w : F} (hw : TPos w) (hw0 : w ≠ 0) (hev : D.Ev w)
+    : ∃ u : Lsq F Δ, algebraMap F (Lsq F Δ) w = u * star u := by
   have harch : ∀ σ : F →+* ℝ, hs (σ Δ) (σ w) = 1 := by
     intro σ
     unfold hs
@@ -168,8 +192,8 @@ private theorem disc_norm {Δ : F} (D : Dat Δ) (hok : D.Ok) (hΔ0 : Δ ≠ 0) {
     linear_combination -hab
   · norm_num at hH
 
-private theorem norm_pos_part {Δ : F} (hneg : ∀ σ : F →+* ℝ, σ Δ < 0) (y : Lsq F Δ) (σ : F →+* ℝ) :
-    0 ≤ σ (QuadraticAlgebra.norm y) := by
+private theorem norm_pos_part {Δ : F} (hneg : ∀ σ : F →+* ℝ, σ Δ < 0) (y : Lsq F Δ) (σ : F →+* ℝ)
+    : 0 ≤ σ (QuadraticAlgebra.norm y) := by
   have h := hneg σ
   rw [QuadraticAlgebra.norm_def]
   simp only [map_add (f := _), map_sub, map_mul, map_zero, zero_mul, add_zero]
@@ -242,40 +266,43 @@ theorem exG : ExG := by
     · exact hgpos
     · exact hg2pos
   have hprod3 : algebraMap F (Lsq F Δ) (∏ i, gi i) = (u * y) * star (u * y) := by
-    have hp : ∏ i, gi i = c * (g * g2) := by
-      simp [gi, Fin.prod_univ_three, mul_assoc]
+    have hp : ∏ i, gi i = c * (g * g2) := by simp [gi, Fin.prod_univ_three, mul_assoc]
     have hu' : algebraMap F (Lsq F Δ) c * algebraMap F (Lsq F Δ) (2 - τ) = u * star u := by
       rw [← map_mul]
       exact hu
     rw [hp, map_mul, hprod, star_mul']
     linear_combination (y * star y) * hu'
   obtain ⟨P, hPdet, hPe⟩ := exG_land hok.neg gi hgi (u * y) hprod3
-  let Co : Sp Δ τ ≃ₗ[Lsq F Δ] (Fin 3 → Lsq F Δ) :=
-    { toFun := fun x => ![x.1, x.2.re + x.2.im * b, x.2.im]
-      invFun := fun a => (a 0, (⟨a 1 - a 2 * b, a 2⟩ : EL Δ τ))
-      map_add' := by
-        intro x x'
-        funext i
-        fin_cases i <;> simp <;> ring
-      map_smul' := by
-        intro r x
-        funext i
-        fin_cases i <;> simp [QuadraticAlgebra.re_smul, QuadraticAlgebra.im_smul] <;> ring
-      left_inv := by
-        intro x
-        ext <;> simp
-      right_inv := by
-        intro a
-        funext i
-        fin_cases i <;> simp }
+  let Co : Sp Δ τ ≃ₗ[Lsq F Δ] (Fin 3 → Lsq F Δ) := {
+    toFun := fun x => ![x.1, x.2.re + x.2.im * b, x.2.im]
+    invFun := fun a => (a 0, (⟨a 1 - a 2 * b, a 2⟩ : EL Δ τ))
+    map_add' := by
+      intro x x'
+      funext i
+      fin_cases i <;> simp <;> ring
+    map_smul' := by
+      intro r x
+      funext i
+      fin_cases i <;> simp [QuadraticAlgebra.re_smul, QuadraticAlgebra.im_smul] <;> ring
+    left_inv := by
+      intro x
+      ext <;> simp
+    right_inv := by
+      intro a
+      funext i
+      fin_cases i <;> simp
+  }
   let Pe := Co.trans (P.toLinearEquiv' (P.invertibleOfIsUnitDet hPdet))
   have hherm : ∀ x x' : Sp Δ τ, herm c m x x' = ∑ i, Pe x i * star (Pe x' i) := by
     intro x x'
     have e1 : ∀ z, Pe z = P *ᵥ Co z := fun z => by
       first
-        | rfl
-        | (simp only [Pe, LinearEquiv.trans_apply]; rw [← Matrix.toLin'_apply]; rfl)
-        | (simp only [Pe, LinearEquiv.trans_apply, ← LinearEquiv.coe_toLinearMap, Matrix.toLinearEquiv'_apply, Matrix.toLin'_apply])
+      | rfl
+      | (simp only [Pe, LinearEquiv.trans_apply]; rw [← Matrix.toLin'_apply]; rfl)
+      | (
+          simp only [Pe, LinearEquiv.trans_apply, ← LinearEquiv.coe_toLinearMap,
+            Matrix.toLinearEquiv'_apply, Matrix.toLin'_apply]
+        )
     rw [e1, e1, diag_sum P (fun i => algebraMap F (Lsq F Δ) (gi i)) hPe, Fin.sum_univ_three, hform]
     simp [Co, gi]
   obtain ⟨δ, ι', hM⟩ := exG_models hdat Pe hherm

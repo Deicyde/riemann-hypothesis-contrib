@@ -13,7 +13,9 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory GlobalTheory.Doubling
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory GlobalTheory.Doubling
 open scoped TensorProduct ENNReal NNReal ComplexConjugate
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,10 +23,11 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7}
 
 def schwartzA (θ : InfFam D) (m n : ℕ) : Submodule ℂ (Mx D m n → ℂ) :=
-  Submodule.span ℂ {φ | ∃ (f : SchwartzMap (D.what₂.Tau → Fin m → Fin n → ℂ) ℂ)
-    (g : (Fin m → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ),
-      g ∈ WeilM.SB (Fin m → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) ∧
-      φ = fun x => f (fun τ i j => compAt θ τ x i j) * g (fun i j => finPart D (x i j))}
+  Submodule.span ℂ
+    {φ | ∃ (f : SchwartzMap (D.what₂.Tau → Fin m → Fin n → ℂ) ℂ)
+      (g : (Fin m → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) → ℂ),
+        g ∈ WeilM.SB (Fin m → Fin n → Af D.host.F ⊗[D.host.F] D.host.E) ∧
+        φ = fun x => f (fun τ i j => compAt θ τ x i j) * g (fun i j => finPart D (x i j))}
 
 variable (A B : HSp D)
 
@@ -46,18 +49,20 @@ def yOf (w : WO (dblSp A) B) : WO A B := half D • (fstCols A B w - sndCols A B
 
 variable {A B}
 
-def thetaInt (om : GA D A × GA D B →* Module.End ℂ (WO A B → ℂ)) (μ : Measure (GA D B)) (𝓕 : Set (GA D B))
-    (f₁ f₂ : WO A B → ℂ) (g₁ g₂ : GA D A) : ℝ≥0∞ :=
+def thetaInt
+    (om : GA D A × GA D B →* Module.End ℂ (WO A B → ℂ)) (μ : Measure (GA D B)) (𝓕 : Set (GA D B))
+    (f₁ f₂ : WO A B → ℂ) (g₁ g₂ : GA D A)
+    : ℝ≥0∞ :=
   ∫⁻ h in 𝓕, ‖thetaKO om g₁ h f₁ * thetaKO om g₂ h f₂‖ₑ ∂μ
 
 abbrev ht (V : HSp D) (g : GA D V) : ℝ≥0 := AdelicU.height D.sp.cm.sig V.gram g
 
 variable (A B)
 
-def InRange : Prop := 1 ≤ A.rank ∧ A.rank < B.rank ∧ (Cusp.wittIndex B = 0 ∨ A.rank + Cusp.wittIndex B < B.rank)
+def InRange : Prop :=
+  1 ≤ A.rank ∧ A.rank < B.rank ∧ (Cusp.wittIndex B = 0 ∨ A.rank + Cusp.wittIndex B < B.rank)
 
-theorem half_add_half : half D + half D = 1 := by
-  rw [half, ← map_add (f := _), add_halves, map_one]
+theorem half_add_half : half D + half D = 1 := by rw [half, ← map_add (f := _), add_halves, map_one]
 
 theorem fstCols_cols (x y : WO A B) : fstCols A B (cols A B x y) = x := by
   ext i j; simp [fstCols, cols]
@@ -65,8 +70,9 @@ theorem fstCols_cols (x y : WO A B) : fstCols A B (cols A B x y) = x := by
 theorem sndCols_cols (x y : WO A B) : sndCols A B (cols A B x y) = y := by
   ext i j; simp only [sndCols, cols, Matrix.submatrix_apply, Equiv.symm_apply_apply]; rfl
 
-theorem coords (x y : WO A B) : xOf A B (onX A B x) = x ∧ yOf A B (onX A B x) = 0 ∧
-    xOf A B (onY A B y) = 0 ∧ yOf A B (onY A B y) = y := by
+theorem coords (x y : WO A B)
+    : xOf A B (onX A B x) = x ∧ yOf A B (onX A B x) = 0 ∧ xOf A B (onY A B y) = 0
+      ∧ yOf A B (onY A B y) = y := by
   refine ⟨?_, ?_, ?_, ?_⟩ <;> simp only [xOf, yOf, onX, onY, fstCols_cols, sndCols_cols]
   · rw [← add_smul, half_add_half, one_smul]
   · simp

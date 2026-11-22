@@ -11,14 +11,12 @@ open scoped ComplexConjugate BigOperators Topology
 
 namespace GlobalTheory.MomOne
 
-theorem thue_normSq (d e : ℕ) (he : d + 1 = 4 * e) (u v : ℤ) :
-    Complex.normSq ((u : ℂ) + (v : ℂ) * wK d) = ((u ^ 2 + u * v + e * v ^ 2 : ℤ) : ℝ) := by
+theorem thue_normSq (d e : ℕ) (he : d + 1 = 4 * e) (u v : ℤ)
+    : Complex.normSq ((u : ℂ) + (v : ℂ) * wK d) = ((u ^ 2 + u * v + e * v ^ 2 : ℤ) : ℝ) := by
   have hs : Real.sqrt d * Real.sqrt d = d := Real.mul_self_sqrt (Nat.cast_nonneg d)
   have he' : (d : ℝ) + 1 = 4 * e := by exact_mod_cast he
-  have h1 : ((u : ℂ) + (v : ℂ) * wK d).re = u + v / 2 := by
-    simp [wK]; ring
-  have h2 : ((u : ℂ) + (v : ℂ) * wK d).im = v * Real.sqrt d / 2 := by
-    simp [wK]; ring
+  have h1 : ((u : ℂ) + (v : ℂ) * wK d).re = u + v / 2 := by simp [wK]; ring
+  have h2 : ((u : ℂ) + (v : ℂ) * wK d).im = v * Real.sqrt d / 2 := by simp [wK]; ring
   rw [Complex.normSq_apply, h1, h2]
   push_cast
   linear_combination ((v : ℝ) ^ 2 / 4) * hs + ((v : ℝ) ^ 2 / 4) * he'
@@ -27,9 +25,10 @@ theorem thue_norm_zc {q : ℕ} [Fact q.Prime] (a : ℤ_[q]) : ‖zc a‖ = ‖a�
   unfold zc
   rw [norm_algebraMap', PadicInt.padic_norm_e_of_padicInt]
 
-theorem thue_pigeon {q : ℕ} [Fact q.Prime] (a : ℤ_[q]) (k : ℕ) :
-    ∃ u v : ℤ, (u ≠ 0 ∨ v ≠ 0) ∧ u ^ 2 ≤ (q : ℤ) ^ k ∧ v ^ 2 ≤ (q : ℤ) ^ k ∧
-      ‖(u : ℤ_[q]) + (v : ℤ_[q]) * a‖ ≤ (q : ℝ) ^ (-(k : ℤ)) := by
+theorem thue_pigeon {q : ℕ} [Fact q.Prime] (a : ℤ_[q]) (k : ℕ)
+    : ∃ u v : ℤ,
+      (u ≠ 0 ∨ v ≠ 0) ∧ u ^ 2 ≤ (q : ℤ) ^ k ∧ v ^ 2 ≤ (q : ℤ) ^ k
+        ∧ ‖(u : ℤ_[q]) + (v : ℤ_[q]) * a‖ ≤ (q : ℝ) ^ (-(k : ℤ)) := by
   have hq : q.Prime := Fact.out
   haveI : NeZero (q ^ k) := ⟨pow_ne_zero _ hq.ne_zero⟩
   set m := Nat.sqrt (q ^ k) with hm
@@ -48,7 +47,8 @@ theorem thue_pigeon {q : ℕ} [Fact q.Prime] (a : ℤ_[q]) (k : ℕ) :
     have hj := j.2
     refine le_trans ?_ hm2
     apply sq_le_sq' <;> omega
-  refine ⟨((x.1 : ℕ) : ℤ) - ((y.1 : ℕ) : ℤ), ((x.2 : ℕ) : ℤ) - ((y.2 : ℕ) : ℤ), ?_, hb _ _, hb _ _, ?_⟩
+  refine
+    ⟨((x.1 : ℕ) : ℤ) - ((y.1 : ℕ) : ℤ), ((x.2 : ℕ) : ℤ) - ((y.2 : ℕ) : ℤ), ?_, hb _ _, hb _ _, ?_⟩
   · by_contra h
     push_neg at h
     apply hxy
@@ -56,17 +56,25 @@ theorem thue_pigeon {q : ℕ} [Fact q.Prime] (a : ℤ_[q]) (k : ℕ) :
     · have := h.1; omega
     · have := h.2; omega
   · rw [PadicInt.norm_le_pow_iff_mem_span_pow, ← PadicInt.ker_toZModPow, RingHom.mem_ker]
-    have : PadicInt.toZModPow k ((((x.1 : ℕ) : ℤ_[q]) + ((x.2 : ℕ) : ℤ_[q]) * a) -
-        (((y.1 : ℕ) : ℤ_[q]) + ((y.2 : ℕ) : ℤ_[q]) * a)) = 0 := by
+    have : PadicInt.toZModPow k
+          ((((x.1 : ℕ) : ℤ_[q]) + ((x.2 : ℕ) : ℤ_[q]) * a)
+            - (((y.1 : ℕ) : ℤ_[q]) + ((y.2 : ℕ) : ℤ_[q]) * a))
+        = 0 := by
       rw [map_sub, sub_eq_zero]; exact hf
     rw [← this]
     congr 1
     push_cast
     ring
 
-theorem exists_small_in_prime_pow : ∀ (d q : ℕ) [Fact q.Prime] (ι : ℂ ≃+* ℂ_[q]), d.Prime → d % 16 = 7 → Split d q → ∀ k : ℕ, ∃ (β : ℂ) (N : ℕ), InOK d β ∧ β ≠ 0 ∧ ‖ι β‖ ≤ (q : ℝ) ^ (-(k : ℤ)) ∧ (N : ℂ) = β * conj β ∧ N ≤ (d + 3) * q ^ k := by
+theorem exists_small_in_prime_pow
+    : ∀ (d q : ℕ) [Fact q.Prime] (ι : ℂ ≃+* ℂ_[q]),
+      d.Prime → d % 16 = 7 → Split d q
+        → ∀ k : ℕ, ∃ (β : ℂ) (N : ℕ),
+          InOK d β ∧ β ≠ 0 ∧ ‖ι β‖ ≤ (q : ℝ) ^ (-(k : ℤ)) ∧ (N : ℂ) = β * conj β
+            ∧ N ≤ (d + 3) * q ^ k := by
   intro d q _ ι hd h16 hs k
-  obtain ⟨⟨-, hw, -⟩, h2, -⟩ := GlobalTheory.T.imagQuadraticMaximalOrder_arithmetic_at_split_prime d q ι hd h16 hs
+  obtain ⟨⟨-, hw, -⟩, h2, -⟩ :=
+    GlobalTheory.T.imagQuadraticMaximalOrder_arithmetic_at_split_prime d q ι hd h16 hs
   obtain ⟨⟨a, ha⟩, -⟩ := h2 _ hw
   obtain ⟨u, v, huv, hu, hv, hn⟩ := thue_pigeon a k
   obtain ⟨e, he⟩ : ∃ e : ℕ, d + 1 = 4 * e := ⟨(d + 1) / 4, by omega⟩
@@ -93,8 +101,7 @@ theorem exists_small_in_prime_pow : ∀ (d q : ℕ) [Fact q.Prime] (ι : ℂ ≃
     exact hn
   · rw [Complex.mul_conj, hN, hNe]
     simp
-  · have h5 : (e : ℤ) * v ^ 2 ≤ d * (q : ℤ) ^ k :=
-      mul_le_mul hed hv (sq_nonneg v) (by positivity)
+  · have h5 : (e : ℤ) * v ^ 2 ≤ d * (q : ℤ) ^ k := mul_le_mul hed hv (sq_nonneg v) (by positivity)
     have h6 : (N : ℤ) ≤ (d + 3) * (q : ℤ) ^ k := by
       rw [← hNe]
       nlinarith [sq_nonneg (u - v), sq_nonneg u, sq_nonneg v]

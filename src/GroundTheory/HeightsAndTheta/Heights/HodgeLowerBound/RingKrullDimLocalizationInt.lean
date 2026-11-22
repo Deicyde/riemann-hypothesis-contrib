@@ -16,10 +16,11 @@ namespace GroundTheory.Heights₂.Heights
 open Algebra MvPolynomial TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Geo (MRing IsArithVar)
 
-theorem DimX.ringKrullDim_localization_int (B : Type) [CommRing B] [IsDomain B]
-    [inst : Algebra ℤ B] [Algebra.FiniteType ℤ B] (hinj : Function.Injective (algebraMap ℤ B)) (t : ℕ)
-    (ht : trdeg ℤ B = t) :
-    ringKrullDim (Localization (Algebra.algebraMapSubmonoid B (nonZeroDivisors ℤ))) = t := by
+theorem DimX.ringKrullDim_localization_int
+    (B : Type) [CommRing B] [IsDomain B] [inst : Algebra ℤ B] [Algebra.FiniteType ℤ B]
+    (hinj : Function.Injective (algebraMap ℤ B))
+    (t : ℕ) (ht : trdeg ℤ B = t)
+    : ringKrullDim (Localization (Algebra.algebraMapSubmonoid B (nonZeroDivisors ℤ))) = t := by
   obtain rfl : inst = Ring.toIntAlgebra B := Subsingleton.elim _ _
   let : Algebra B (ℚ ⊗[ℤ] B) := Algebra.TensorProduct.rightAlgebra
   let M := Algebra.algebraMapSubmonoid B (nonZeroDivisors ℤ)
@@ -38,10 +39,12 @@ theorem DimX.ringKrullDim_localization_int (B : Type) [CommRing B] [IsDomain B]
     (faithfulSMul_iff_algebraMap_injective _ _).2 (algebraMap ℤ ℚ).injective_int
   have : FaithfulSMul ℚ (ℚ ⊗[ℤ] B) :=
     (faithfulSMul_iff_algebraMap_injective _ _).2 (algebraMap ℚ (ℚ ⊗[ℤ] B)).injective
-  have := IsScalarTower.of_algebraMap_eq' (RingHom.ext_int (algebraMap ℤ (ℚ ⊗[ℤ] B))
-    ((algebraMap B (ℚ ⊗[ℤ] B)).comp (algebraMap ℤ B)))
-  have := IsScalarTower.of_algebraMap_eq' (RingHom.ext_int (algebraMap ℤ (ℚ ⊗[ℤ] B))
-    ((algebraMap ℚ (ℚ ⊗[ℤ] B)).comp (algebraMap ℤ ℚ)))
+  have :=
+    IsScalarTower.of_algebraMap_eq' (RingHom.ext_int (algebraMap ℤ (ℚ ⊗[ℤ] B))
+      ((algebraMap B (ℚ ⊗[ℤ] B)).comp (algebraMap ℤ B)))
+  have :=
+    IsScalarTower.of_algebraMap_eq' (RingHom.ext_int (algebraMap ℤ (ℚ ⊗[ℤ] B))
+      ((algebraMap ℚ (ℚ ⊗[ℤ] B)).comp (algebraMap ℤ ℚ)))
   have : Algebra.IsAlgebraic B (ℚ ⊗[ℤ] B) := IsLocalization.isAlgebraic _ M
   have : Algebra.IsAlgebraic ℤ ℚ := IsLocalization.isAlgebraic ℚ (nonZeroDivisors ℤ)
   have h1 := trdeg_add_eq ℤ B (A := ℚ ⊗[ℤ] B)
@@ -51,8 +54,8 @@ theorem DimX.ringKrullDim_localization_int (B : Type) [CommRing B] [IsDomain B]
   have htL : trdeg ℚ (ℚ ⊗[ℤ] B) = t := by rw [h2, ← h1, ht]
 
   rw [← ReciprocityTheory.CA.ringKrullDim_eq_of_trdeg_eq_field (K := ℚ) (A := ℚ ⊗[ℤ] B) t htL]
-  exact ringKrullDim_eq_of_ringEquiv
-    (IsLocalization.algEquiv M (Localization M) (ℚ ⊗[ℤ] B)).toRingEquiv
+  exact ringKrullDim_eq_of_ringEquiv (IsLocalization.algEquiv M (Localization M)
+    (ℚ ⊗[ℤ] B)).toRingEquiv
 
 theorem DimX.proof : DimX.Statement := by
   intro K _ ι _ P n hP
@@ -60,11 +63,13 @@ theorem DimX.proof : DimX.Statement := by
   have := hPp
 
   have hinj : Function.Injective (algebraMap ℤ (MRing ι ⧸ P)) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro m hm
     have hm' : m ∈ P.comap (C : ℤ →+* MRing ι) := by
       rw [Ideal.mem_comap, ← Ideal.Quotient.eq_zero_iff_mem, ← hm]
-      exact congrArg (fun f : ℤ →+* MRing ι ⧸ P => f m)
+      exact congrArg
+        (fun f : ℤ →+* MRing ι ⧸ P => f m)
         (RingHom.ext_int ((Ideal.Quotient.mk P).comp C) (algebraMap ℤ (MRing ι ⧸ P)))
     rw [hhor, Ideal.mem_bot] at hm'
     exact hm'

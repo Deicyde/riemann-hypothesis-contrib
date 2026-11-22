@@ -14,17 +14,22 @@ namespace Formalism.L2.SG.Pf.CarrierT
 
 open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built
 
-private theorem list_prod_apply_eq_foldr {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
-    (l : List (Module.End ℂ W)) (v : W) :
-    l.prod v = List.foldr (fun (T : W → W) (h : W) => T h) v
-      (l.map (fun (T : Module.End ℂ W) => (T : W → W))) := by
+private theorem list_prod_apply_eq_foldr
+    {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W] (l : List (Module.End ℂ W)) (v : W)
+    : l.prod v
+      = List.foldr
+        (fun (T : W → W) (h : W) => T h)
+        v (l.map (fun (T : Module.End ℂ W) => (T : W → W))) := by
   induction l with
   | nil => rfl
   | cons a l ih => simp [List.prod_cons, Module.End.mul_apply, ih]
 
-private theorem qmF_eq_qdet_apply {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W] {m : ℕ}
-    (E : Fin m → Fin m → Module.End ℂ W) (w : ℂ) (v : W) :
-    Formalism.FourierDecayAlt.Q.qmF (fun a b => (E a b : W → W)) id id w v = (Formalism.REAL.qdet E w) v := by
+private theorem qmF_eq_qdet_apply
+    {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
+    {m : ℕ} (E : Fin m → Fin m → Module.End ℂ W)
+    (w : ℂ) (v : W)
+    : Formalism.FourierDecayAlt.Q.qmF (fun a b => (E a b : W → W)) id id w v
+      = (Formalism.REAL.qdet E w) v := by
   simp only [Formalism.FourierDecayAlt.Q.qmF, Formalism.REAL.qdet, Formalism.REAL.qminor]
   rw [LinearMap.sum_apply]
   refine Finset.sum_congr rfl (fun σ _ => ?_)
@@ -42,13 +47,20 @@ theorem capacity_from_hermitian_char : CapFromHC := by
   haveI : FiniteDimensional ℂ Wp := hU.2.1
   intro Bs hBs w v
   have hfr := Formalism.FourierDecayAlt.P.QrCap.fr_frame hgU hgfix _ hgz
-  have hcore := Formalism.FourierDecayAlt.P.QrCap.core (u := u) hz hT ⟨hrep, hcont⟩ hgU hgfix _ hgz hU.2.2.2 w v
-  have hE : (fun a b => Formalism.FourierDecayAlt.Q.EcRep (Formalism.QuantumDeterminants.Hpk k r) π (Formalism.FourierDecayAlt.Q.unitB (Formalism.QuantumDeterminants.Hpk k r) Bs a b))
-      = fun a b => ((Formalism.FourierDecayAlt.Qr.EB π Bs a b : Module.End ℂ Wp) : Wp → Wp) := by
+  have hcore :=
+    Formalism.FourierDecayAlt.P.QrCap.core (u := u) hz hT ⟨hrep, hcont⟩ hgU hgfix _ hgz hU.2.2.2 w v
+  have hE
+      : (fun a b =>
+          Formalism.FourierDecayAlt.Q.EcRep (Formalism.QuantumDeterminants.Hpk k r) π
+            (Formalism.FourierDecayAlt.Q.unitB (Formalism.QuantumDeterminants.Hpk k r) Bs a b))
+        = fun a b => ((Formalism.FourierDecayAlt.Qr.EB π Bs a b : Module.End ℂ Wp) : Wp → Wp) := by
     funext a b y
-    exact Formalism.FourierDecayAlt.P.QrD.ecRep_eq hrep hcont (Formalism.FourierDecayAlt.P.QrD.frame_lie hBs a b).1
+    exact Formalism.FourierDecayAlt.P.QrD.ecRep_eq hrep hcont
+      (Formalism.FourierDecayAlt.P.QrD.frame_lie hBs a b).1
       (Formalism.FourierDecayAlt.P.QrD.frame_lie hBs a b).2 y
-  have hcap : Formalism.FourierDecayAlt.Q.capRep k r π Bs w v = (Formalism.REAL.qdet (Formalism.FourierDecayAlt.Qr.EB π Bs) w) v := by
+  have hcap
+      : Formalism.FourierDecayAlt.Q.capRep k r π Bs w v
+        = (Formalism.REAL.qdet (Formalism.FourierDecayAlt.Qr.EB π Bs) w) v := by
     simp only [Formalism.FourierDecayAlt.Q.capRep]
     rw [hE, qmF_eq_qdet_apply]
   rw [hcap, Formalism.FourierDecayAlt.P.QrCap.capChange hz hT ⟨hrep, hcont⟩ hBs hfr w, hcore]
@@ -68,6 +80,8 @@ theorem capacity_from_hermitian_char : CapFromHC := by
   push_cast
   ring
 
-variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) {θ : ℝ} (C : Formalism.L2.SG.LocWSOf.Choice X θ)
+variable
+  {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+  {θ : ℝ} (C : Formalism.L2.SG.LocWSOf.Choice X θ)
 
 end Formalism.L2.SG.Pf.CarrierT

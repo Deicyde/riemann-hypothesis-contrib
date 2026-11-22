@@ -11,7 +11,8 @@ open NumberField
 
 namespace PI.TripleFrameDeterminant.W
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

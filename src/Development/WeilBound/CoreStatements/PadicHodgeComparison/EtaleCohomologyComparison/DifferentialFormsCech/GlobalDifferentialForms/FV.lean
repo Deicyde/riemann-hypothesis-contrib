@@ -14,8 +14,9 @@ open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistable
 
 namespace CrystallineSemistableComparison.Om.Glob
 
-abbrev FV {K : Type} [CommRing K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) (V : X.Opens) (a : ℕ) :
-    (KS q (a + 1) {V}).FullSubcategory ⥤ ModuleCat.{0} K :=
+abbrev FV
+    {K : Type} [CommRing K] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K)) (V : X.Opens) (a : ℕ)
+    : (KS q (a + 1) {V}).FullSubcategory ⥤ ModuleCat.{0} K :=
   (KS q (a + 1) {V}).ι ⋙ HT.grT (smFun X q) a
 
 end CrystallineSemistableComparison.Om.Glob

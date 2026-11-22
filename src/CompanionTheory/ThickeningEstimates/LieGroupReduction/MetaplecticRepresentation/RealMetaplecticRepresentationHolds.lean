@@ -10,7 +10,8 @@ public import CompanionTheory.ThickeningEstimates.LieGroupReduction.MetaplecticR
 @[expose] public section
 
 open CompanionTheory.ThKR.Mp in
-theorem CompanionTheory.ThKR.realMetaplecticRepresentation_holds : GlobalTheory.Published.RealMetaplecticRepresentation :=
+theorem CompanionTheory.ThKR.realMetaplecticRepresentation_holds
+    : GlobalTheory.Published.RealMetaplecticRepresentation :=
   realMetaplectic_of_forall fun l _ _ _ =>
     have hS : SecEx l := secEx_of mkElt nrmUp
     have hO : Surj l := surj_of ddNe hS

@@ -14,11 +14,9 @@ variable {k : Type*} [Field k] [Fintype k] [DecidableEq k] {r : ℕ} {R : Type*}
 
 def pair (f x : Fin r → k) : k := ∑ i, f i * x i
 
-def opU (ψ : (Fin r → k) → R) (f : Fin r → k) : R :=
-  ∑ x ∈ univ.filter (fun x => pair f x = 1), ψ x
+def opU (ψ : (Fin r → k) → R) (f : Fin r → k) : R := ∑ x ∈ univ.filter (fun x => pair f x = 1), ψ x
 
-def opD (φ : (Fin r → k) → R) (x : Fin r → k) : R :=
-  ∑ f ∈ univ.filter (fun f => pair f x = 1), φ f
+def opD (φ : (Fin r → k) → R) (x : Fin r → k) : R := ∑ f ∈ univ.filter (fun f => pair f x = 1), φ f
 
 def diaP (c : kˣ) (φ : (Fin r → k) → R) (f : Fin r → k) : R := φ ((c : k) • f)
 
@@ -34,8 +32,8 @@ def trP (φ : (Fin r → k) → R) : R := ∑ f ∈ univ.filter (fun f => f ≠ 
 
 end Ops
 
-def ramSub (ι H X K : Type) [DecidableEq ι] [Group H] [Fintype H] [MulAction (ι → H) X] [Field K] :
-    Submodule K (X → K) where
+def ramSub (ι H X K : Type) [DecidableEq ι] [Group H] [Fintype H] [MulAction (ι → H) X] [Field K]
+    : Submodule K (X → K) where
   carrier := {φ | ∀ (v : ι) (x : X), ∑ c : H, φ ((Pi.mulSingle v c : ι → H) • x) = 0}
   add_mem' := fun {a b} ha hb v x => by
     have h1 : ∑ c : H, a ((Pi.mulSingle v c : ι → H) • x) = 0 := ha v x
@@ -50,9 +48,9 @@ def ramSub (ι H X K : Type) [DecidableEq ι] [Group H] [Fintype H] [MulAction (
 
 def FinrankFiberSumZero : Prop :=
   ∀ (ι H X K : Type) [Fintype ι] [DecidableEq ι] [Group H] [Fintype H] [Fintype X]
-    [MulAction (ι → H) X] [Field K],
-    (∀ (g : ι → H) (x : X), g • x = x → g = 1) →
-    Module.finrank K (ramSub ι H X K) * Fintype.card H ^ Fintype.card ι =
-      Fintype.card X * (Fintype.card H - 1) ^ Fintype.card ι
+      [MulAction (ι → H) X] [Field K],
+    (∀ (g : ι → H) (x : X), g • x = x → g = 1)
+      → Module.finrank K (ramSub ι H X K) * Fintype.card H ^ Fintype.card ι
+        = Fintype.card X * (Fintype.card H - 1) ^ Fintype.card ι
 
 end Formalism.LogVandermondeBounds.product_first_zeroth_parts

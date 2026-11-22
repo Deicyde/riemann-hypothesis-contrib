@@ -4,21 +4,27 @@ public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.Lan
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
-private theorem ka_pw {Ω : Type} [Field Ω] {N : ℕ} [NeZero N] {z : Ω} (hz : z ^ N = 1) (a : ℕ) (k : ZMod N)
-    (h : (a : ZMod N) = k) : z ^ k.val = z ^ a := by
+private theorem ka_pw
+    {Ω : Type} [Field Ω]
+    {N : ℕ} [NeZero N]
+    {z : Ω} (hz : z ^ N = 1)
+    (a : ℕ) (k : ZMod N) (h : (a : ZMod N) = k)
+    : z ^ k.val = z ^ a := by
   rw [← h, ZMod.val_natCast]
   exact (pow_eq_pow_mod a hz).symm
 
-private theorem ka_down {Ω : Type} [Field Ω] {l : ℕ} {ζ : ℕ → Ω} (h : ∀ m, ζ (m + 1) ^ l = ζ m) (n d : ℕ) :
-    ζ (n + d) ^ l ^ d = ζ n := by
+private theorem ka_down
+    {Ω : Type} [Field Ω] {l : ℕ} {ζ : ℕ → Ω} (h : ∀ m, ζ (m + 1) ^ l = ζ m) (n d : ℕ)
+    : ζ (n + d) ^ l ^ d = ζ n := by
   induction d with
   | zero => simp
   | succ d ih => rw [pow_succ', pow_mul, ← Nat.add_assoc, h, ih]
 
-theorem UpperTheory.Kd.C7.pKumAlg :
-    UpperTheory.Kd.C7.SKumAlg := by
+theorem UpperTheory.Kd.C7.pKumAlg : UpperTheory.Kd.C7.SKumAlg := by
   intro l hl _ Ω _ _ _ A _ ζ hζ m n _ s _
   have hne : ∀ r : ℕ, NeZero (l ^ r) := fun r => ⟨(pow_pos hl.out.pos r).ne'⟩
   have h1 : ∀ r, ζ r ^ l ^ r = 1 := fun r => (hζ r).1.pow_eq_one
@@ -47,5 +53,7 @@ theorem UpperTheory.Kd.C7.pKumAlg :
       cyclotomicCharacter.spec (L := Ω) l (MulSemiringAction.toRingAut (G ℚ Ω) Ω t) (ζ n) (h1 n)
     refine ⟨t v, ?_, ?_⟩
     · rw [← map_pow, hu, ← AlgEquiv.mul_apply, mul_inv_cancel, AlgEquiv.one_apply]
-    · rw [← AlgEquiv.mul_apply, inv_mul_cancel_right, AlgEquiv.mul_apply, hv, map_mul, map_pow, ht, ← pow_mul,
-        ka_pw (h1 n) (((cycMod ℚ Ω l n t : (ZMod (l ^ n))ˣ) : ZMod (l ^ n)).val * k.val) _ (by simp)]
+    · rw [← AlgEquiv.mul_apply, inv_mul_cancel_right, AlgEquiv.mul_apply, hv, map_mul, map_pow, ht,
+        ← pow_mul,
+        ka_pw (h1 n) (((cycMod ℚ Ω l n t : (ZMod (l ^ n))ˣ) : ZMod (l ^ n)).val * k.val) _
+          (by simp)]

@@ -9,13 +9,14 @@ open PowerSeries IsLocalRing UpperTheory.V.abelian₂
 open IsDiscreteValuationRing (addVal)
 open scoped Pointwise TensorProduct Topology
 
-theorem UpperTheory.V.abelian₂.adicComplete :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O],
+theorem UpperTheory.V.abelian₂.adicComplete
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O],
       IsAdicComplete (maximalIdeal O⟦X⟧) O⟦X⟧ := by
   intro O _ _ _
-  have key : ∀ (x y : O⟦X⟧) (n : ℕ),
-      x ≡ y [SMOD (maximalIdeal O⟦X⟧) ^ n • (⊤ : Submodule O⟦X⟧ O⟦X⟧)] ↔
-        ∀ i, coeff i x - coeff i y ∈ maximalIdeal O ^ (n - i) := by
+  have key
+      : ∀ (x y : O⟦X⟧) (n : ℕ),
+        x ≡ y [SMOD (maximalIdeal O⟦X⟧) ^ n • (⊤ : Submodule O⟦X⟧ O⟦X⟧)]
+          ↔ ∀ i, coeff i x - coeff i y ∈ maximalIdeal O ^ (n - i) := by
     intro x y n
     rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, mem_max_pow]
     simp only [map_sub]
@@ -29,8 +30,8 @@ theorem UpperTheory.V.abelian₂.adicComplete :
   · intro f hf
     have hc : ∀ i, ∃ L : O, ∀ n, coeff i (f (n + i)) - L ∈ maximalIdeal O ^ n := by
       intro i
-      obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := maximalIdeal O) (M := O)
-        (fun m => coeff i (f (m + i))) (by
+      obtain ⟨L, hL⟩ :=
+        IsPrecomplete.prec' (I := maximalIdeal O) (M := O) (fun m => coeff i (f (m + i))) (by
           intro m n hmn
           have h := (key _ _ (m + i)).1 (hf (Nat.add_le_add_right hmn i)) i
           rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]

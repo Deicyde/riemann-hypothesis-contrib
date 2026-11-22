@@ -13,7 +13,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHaarIn
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates Topology
+open NumberField MeasureTheory Matrix GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates Topology
 open scoped ENNReal
 
 namespace GlobalTheory.SUHaarOver
@@ -22,8 +24,12 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem norm_det_eq_one (X : Data E r) {x : Frame X.Ψ r} (hx : IsOrth X x)
-    {n : X.Ψ → Matrix (Fin r) (Fin r) ℂ} (hn : X.IsUnitaryC n) (τ : X.Ψ) : ‖(n τ).det‖ = 1 := by
+theorem norm_det_eq_one
+    (X : Data E r)
+    {x : Frame X.Ψ r} (hx : IsOrth X x)
+    {n : X.Ψ → Matrix (Fin r) (Fin r) ℂ} (hn : X.IsUnitaryC n)
+    (τ : X.Ψ)
+    : ‖(n τ).det‖ = 1 := by
   have h := UnitaryInvMeasure.gram_lmulC X hn x τ
   have hm : mat (X.lmulC n x) τ = n τ * mat x τ := rfl
   rw [hm, UnitaryFrames.gram_eq_mul, UnitaryFrames.gram_eq_mul] at h
@@ -47,14 +53,17 @@ theorem norm_det_eq_one (X : Data E r) {x : Frame X.Ψ r} (hx : IsOrth X x)
   have h6 : 0 ≤ ‖(n τ).det‖ := norm_nonneg _
   nlinarith [h5, h6]
 
-
 open UnitaryInvMeasure in
-theorem exists_haar_lying_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r)
-    (x : Frame X.Ψ r) [MeasurableSpace (realSU X.Ψ X.Gm)] [BorelSpace (realSU X.Ψ X.Gm)], 1 ≤ r → IsOrth X x →
-    ∃ ν : Measure (realSU X.Ψ X.Gm), ν.IsHaarMeasure ∧ ∀ φ : Frame X.Ψ r → ℝ≥0∞, Measurable φ →
-      (∀ y ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (rmul y b) = φ y) →
-      ∫⁻ g, φ (X.lmulC (fun τ => (((g : realSU X.Ψ X.Gm) : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x) ∂ν =
-        ∫⁻ z, φ (cpt X x z) ∂muF X x := by
+theorem exists_haar_lying_over
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (x : Frame X.Ψ r)
+        [MeasurableSpace (realSU X.Ψ X.Gm)] [BorelSpace (realSU X.Ψ X.Gm)],
+      1 ≤ r → IsOrth X x
+        → ∃ ν : Measure (realSU X.Ψ X.Gm),
+          ν.IsHaarMeasure
+            ∧ ∀ φ : Frame X.Ψ r → ℝ≥0∞,
+              Measurable φ → (∀ y ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (rmul y b) = φ y)
+                → ∫⁻ g, φ (X.lmulC (fun τ => (((g : realSU X.Ψ X.Gm) : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x) ∂ν
+                  = ∫⁻ z, φ (cpt X x z) ∂muF X x := by
   intro E _ _ _ r X x _ _ hr hx
   classical
   set H := UnitaryFrames.unitarySubgroup X with hHdef
@@ -65,13 +74,15 @@ theorem exists_haar_lying_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
   haveI := hLC
   haveI := hSC
   obtain ⟨-, ι, hιc, hι1, -⟩ := hfr x hx
-  obtain ⟨νU, hνl, hνf, hν⟩ := invMeas FrameMeasureClosed.measure_statements.2.1
-    GramSchmidtCont.exists_continuous_gramSchmidt isOrth_rmul_iff_unitary_diagonal
-    (SatFin.muF_sat_lt_top FrameMeasureClosed.measure_statements.2.1)
-    UnitaryFrames.unitary_group_frames.2 r X H hHm x hx
+  obtain ⟨νU, hνl, hνf, hν⟩ :=
+    invMeas FrameMeasureClosed.measure_statements.2.1 GramSchmidtCont.exists_continuous_gramSchmidt
+      isOrth_rmul_iff_unitary_diagonal
+      (SatFin.muF_sat_lt_top FrameMeasureClosed.measure_statements.2.1)
+      UnitaryFrames.unitary_group_frames.2 r X H hHm x hx
   haveI := hνl
   haveI := hνf
-  let M : (X.Ψ → GL (Fin r) ℂ) → X.Ψ → Matrix (Fin r) (Fin r) ℂ := fun g τ => (g τ : Matrix (Fin r) (Fin r) ℂ)
+  let M : (X.Ψ → GL (Fin r) ℂ) → X.Ψ → Matrix (Fin r) (Fin r) ℂ := fun g τ =>
+    (g τ : Matrix (Fin r) (Fin r) ℂ)
   have hU : ∀ g : H, X.IsUnitaryC (M g.1) := fun g => g.2
   have hMmul : ∀ g h : X.Ψ → GL (Fin r) ℂ, ∀ τ, M (g * h) τ = M g τ * M h τ := fun g h τ => by
     simp only [M, Pi.mul_apply, Units.val_mul]
@@ -88,8 +99,8 @@ theorem exists_haar_lying_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     (isOrth_rmul_iff_unitary_diagonal r X x _ hx (diagF_mem X t)).2 (diagF_unit X t)
   have hcx : ∀ t, X.lmulC (M (cT t).1) x = rmul x (diagF X t) := fun t => hι1 _ (horthT t)
 
-  have hdCc : Continuous dC := continuous_pi fun τ =>
-    Continuous.subtype_mk ((hMc τ).comp continuous_subtype_val).matrix_det _
+  have hdCc : Continuous dC :=
+    continuous_pi fun τ => Continuous.subtype_mk ((hMc τ).comp continuous_subtype_val).matrix_det _
   have htUc : Continuous tU := by
     refine continuous_pi fun τ => continuous_pi fun a => ?_
     by_cases ha : (a : ℕ) = 0
@@ -170,21 +181,25 @@ theorem exists_haar_lying_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     rw [hMmul, Matrix.mul_assoc, hc', Matrix.mul_assoc]
 
   set ν : Measure (realSU X.Ψ X.Gm) := νU.map p with hνdef
-  have hνinv : ν.IsMulLeftInvariant := ⟨fun s => by
-    have hm1 : Measurable fun h : realSU X.Ψ X.Gm => s * h := (continuous_const.mul continuous_id).measurable
-    have hm2 : Measurable fun h : H => incl s * h := (continuous_const.mul continuous_id).measurable
-    rw [hνdef, Measure.map_map hm1 hpm,
-      show (fun h => s * h) ∘ p = p ∘ (fun h => incl s * h) from funext fun g => (hpinv s g).symm,
-      ← Measure.map_map hpm hm2, map_mul_left_eq_self]⟩
-  have hνfin : IsFiniteMeasureOnCompacts ν := ⟨fun K hK => by
-    rw [hνdef, Measure.map_apply hpm hK.measurableSet]
-    have hC : IsCompact (Set.range cT) := isCompact_range hcTc
-    have hK' : IsCompact (incl '' K) := hK.image hinclc
-    refine lt_of_le_of_lt (measure_mono ?_) (hK'.mul hC.inv).measure_lt_top
-    intro g hg
-    refine Set.mem_mul.2 ⟨incl (p g), ⟨p g, hg, rfl⟩, (cU g)⁻¹, Set.inv_mem_inv.2 ⟨tU g, rfl⟩, ?_⟩
-    have : incl (p g) = g * cU g := rfl
-    rw [this, mul_inv_cancel_right]⟩
+  have hνinv : ν.IsMulLeftInvariant :=
+    ⟨fun s => by
+      have hm1 : Measurable fun h : realSU X.Ψ X.Gm => s * h :=
+        (continuous_const.mul continuous_id).measurable
+      have hm2 : Measurable fun h : H => incl s * h :=
+        (continuous_const.mul continuous_id).measurable
+      rw [hνdef, Measure.map_map hm1 hpm,
+        show (fun h => s * h) ∘ p = p ∘ (fun h => incl s * h) from funext fun g => (hpinv s g).symm,
+        ← Measure.map_map hpm hm2, map_mul_left_eq_self]⟩
+  have hνfin : IsFiniteMeasureOnCompacts ν :=
+    ⟨fun K hK => by
+      rw [hνdef, Measure.map_apply hpm hK.measurableSet]
+      have hC : IsCompact (Set.range cT) := isCompact_range hcTc
+      have hK' : IsCompact (incl '' K) := hK.image hinclc
+      refine lt_of_le_of_lt (measure_mono ?_) (hK'.mul hC.inv).measure_lt_top
+      intro g hg
+      refine Set.mem_mul.2 ⟨incl (p g), ⟨p g, hg, rfl⟩, (cU g)⁻¹, Set.inv_mem_inv.2 ⟨tU g, rfl⟩, ?_⟩
+      have : incl (p g) = g * cU g := rfl
+      rw [this, mul_inv_cancel_right]⟩
   have huniv : ν Set.univ = muF X x Set.univ := by
     have h1 := hν (fun _ => 1) measurable_const (fun _ _ _ _ => rfl)
     simp only [lintegral_const, one_mul] at h1
@@ -200,11 +215,15 @@ theorem exists_haar_lying_over : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
   · rw [hs, ENNReal.smul_def]
     exact Measure.IsHaarMeasure.smul _ (ENNReal.coe_ne_zero.2 hc0) ENNReal.coe_ne_top
   · have hLc : Continuous fun g : realSU X.Ψ X.Gm =>
-        X.lmulC (fun τ => (((g : realSU X.Ψ X.Gm) : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x := by
+        X.lmulC
+          (fun τ => (((g : realSU X.Ψ X.Gm) : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ))
+          x := by
       refine continuous_pi fun τ => ?_
       exact ((hMc τ).comp continuous_subtype_val).matrix_mul continuous_const
     have hm : Measurable fun g : realSU X.Ψ X.Gm =>
-        φ (X.lmulC (fun τ => (((g : realSU X.Ψ X.Gm) : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ)) x) :=
+        φ (X.lmulC
+          (fun τ => (((g : realSU X.Ψ X.Gm) : X.Ψ → GL (Fin r) ℂ) τ : Matrix (Fin r) (Fin r) ℂ))
+          x) :=
       hφ.comp hLc.measurable
     rw [hνdef, lintegral_map hm hpm, ← hν φ hφ hφb]
     refine lintegral_congr fun g => ?_

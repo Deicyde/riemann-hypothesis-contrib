@@ -9,15 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.L2.Forms Formalism.UG Formalism.L2.GlobalTheoryTheory.LocalLatticeBases NumberField IsDedekindDomain Matrix GlobalTheory.LevelHecke
+open Formalism.BasicNotions Formalism.L2.Forms Formalism.UG
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases NumberField IsDedekindDomain Matrix
+  GlobalTheory.LevelHecke
 open scoped TensorProduct
 
 namespace GlobalTheory.LevelCommensurable
 
-theorem exists_nsmul_map_mem {K V W : Type*} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
-    (A : Submodule (𝓞 K) W) (hA : A.FG) (L : Submodule (𝓞 K) V) (hL : Submodule.span K (L : Set V) = ⊤)
-    (f : W →ₗ[K] V) : ∃ n : ℕ, n ≠ 0 ∧ ∀ x ∈ A, n • f x ∈ L := by
+theorem exists_nsmul_map_mem
+    {K V W : Type*} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+    [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
+    [IsScalarTower (𝓞 K) K W]
+    (A : Submodule (𝓞 K) W) (hA : A.FG)
+    (L : Submodule (𝓞 K) V) (hL : Submodule.span K (L : Set V) = ⊤)
+    (f : W →ₗ[K] V)
+    : ∃ n : ℕ, n ≠ 0 ∧ ∀ x ∈ A, n • f x ∈ L := by
   classical
   obtain ⟨s, rfl⟩ := hA
   have h : ∀ x : W, ∃ n : ℕ, n ≠ 0 ∧ n • f x ∈ L := fun x =>
@@ -29,15 +35,23 @@ theorem exists_nsmul_map_mem {K V W : Type*} [Field K] [NumberField K] [AddCommG
     obtain ⟨k, hk⟩ := Finset.dvd_prod_of_mem c (Finset.mem_coe.1 hy)
     rw [hk, mul_comm, mul_smul]
     exact L.toAddSubmonoid.nsmul_mem (hc y) k
-  | zero => simp
-  | add y z _ _ hy hz => rw [map_add (f := _), smul_add]; exact L.add_mem hy hz
+  | zero =>
+    simp
+  | add y z _ _ hy hz =>
+    rw [map_add (f := _), smul_add]; exact L.add_mem hy hz
   | smul r y _ hy =>
     rw [← algebraMap_smul K r y, map_smul, smul_comm, algebraMap_smul]
     exact L.smul_mem r hy
 
-
 open GlobalTheory.LevelIndexCompare GlobalTheory.IndefiniteRowSideFullHecke.IndexAtLevelRanks in
-theorem commensurable : ∀ (D : D7) (u : D.what₂.Word), (∀ v, ∀ x ∈ (D.fm u).ramSub, ∃ y ∈ (D.fm u).ramSub, (D.fm u).emb 0 y = LT.Uop D u 0 v ((D.fm u).emb 0 x)) → (∀ v, ∀ φ ∈ (D.mem u).A.Mram, LT.Uop D u 0 v φ = 0 → φ = 0) → ∀ w : D.what₂.places.Pl, ∃ n : ℕ, n ≠ 0 ∧ (∀ x ∈ DV.MramL D u, D.nuIn u (n • x) ∈ LT.Nlam D u w) ∧ ∀ x, D.nuIn u x ∈ LT.Nlam D u w → InLoc (D.plEq w) (DV.MramL D u) (n • x) := by
+theorem commensurable
+    : ∀ (D : D7) (u : D.what₂.Word),
+      (∀ v, ∀ x ∈ (D.fm u).ramSub, ∃ y ∈ (D.fm u).ramSub,
+          (D.fm u).emb 0 y = LT.Uop D u 0 v ((D.fm u).emb 0 x))
+        → (∀ v, ∀ φ ∈ (D.mem u).A.Mram, LT.Uop D u 0 v φ = 0 → φ = 0)
+        → ∀ w : D.what₂.places.Pl, ∃ n : ℕ,
+          n ≠ 0 ∧ (∀ x ∈ DV.MramL D u, D.nuIn u (n • x) ∈ LT.Nlam D u w)
+            ∧ ∀ x, D.nuIn u x ∈ LT.Nlam D u w → InLoc (D.plEq w) (DV.MramL D u) (n • x) := by
   classical
   intro D u hst hinj w
   have hex : ∀ v, ∃ g, IsScaledU D u w v g := fun v => (exists_isScaledU_iff D u w v).2 (hst v)
@@ -60,10 +74,12 @@ theorem commensurable : ∀ (D : D7) (u : D.what₂.Word), (∀ v, ∀ x ∈ (D.
   obtain ⟨H, hH⟩ := hGu.exists_right_inv
   have hmem : ∀ x, D.nuIn u x ∈ (D.fm u).ramSub := fun x => D.nuIn_range u ▸ ⟨x, rfl⟩
   let e : (D.div.Nu u).V →ₗ[D.what₂.LL] (D.fm u).ramSub := LinearMap.codRestrict _ (D.nuIn u) hmem
-  obtain ⟨n₁, hn₁, h₁⟩ := exists_nsmul_map_mem (DV.MramL D u) (D.MramL_fg u) ((D.fm u).lat 0).L
-    ((D.fm u).lat_good 0).2.2 ((D.fm u).ramSub.subtype ∘ₗ H ∘ₗ e)
-  obtain ⟨n₂, hn₂, h₂⟩ := exists_nsmul_map_mem (DV.MramL D u) (D.MramL_fg u) ((D.fm u).lat 0).L
-    ((D.fm u).lat_good 0).2.2 ((D.fm u).ramSub.subtype ∘ₗ G ∘ₗ e)
+  obtain ⟨n₁, hn₁, h₁⟩ :=
+    exists_nsmul_map_mem (DV.MramL D u) (D.MramL_fg u) ((D.fm u).lat 0).L ((D.fm u).lat_good 0).2.2
+      ((D.fm u).ramSub.subtype ∘ₗ H ∘ₗ e)
+  obtain ⟨n₂, hn₂, h₂⟩ :=
+    exists_nsmul_map_mem (DV.MramL D u) (D.MramL_fg u) ((D.fm u).lat 0).L ((D.fm u).lat_good 0).2.2
+      ((D.fm u).ramSub.subtype ∘ₗ G ∘ₗ e)
   refine ⟨n₁ * n₂, mul_ne_zero hn₁ hn₂, fun x hx => ?_, fun x hx => ?_⟩
   · rw [mem_Nlam_iff D u w g (fun v _ => hg v)]
     have hL : (((n₁ * n₂) • H (e x) : (D.fm u).ramSub) : LT.Vl D u 0) ∈ ((D.fm u).lat 0).L := by
@@ -82,7 +98,8 @@ theorem commensurable : ∀ (D : D7) (u : D.what₂.Word), (∀ v, ∀ x ∈ (D.
       map_smul ((D.nuIn u).restrictScalars (𝓞 D.what₂.LL)) s t
     have hzM : s • z ∈ DV.MramL D u := by
       show D.nuIn u (s • z) ∈ ((D.fm u).lat 0).L
-      rw [hsm, hz]; exact hsy
+      rw [hsm, hz]
+      exact hsy
     have h3 := h₂ _ hzM
     have hez : e z = incl D u w y := Subtype.ext hz
     have h4 : ((D.fm u).ramSub.subtype ∘ₗ G ∘ₗ e) (s • z) = s • D.nuIn u x := by

@@ -21,7 +21,8 @@ theorem UpperTheory.V.Z.Sym.Loc.kappaZero : UpperTheory.V.Z.Sym.Loc.KappaZero :=
       · obtain ⟨a, b, e⟩ := h'
         exact hno ⟨⟨a, b⟩, by rw [← e, QuadraticAlgebra.norm_def]; ring⟩
       · norm_num at this
-    refine ⟨(kapRam O K Δ τ L c d m h hτ hodd).2, fun j hj χ z hz => gOdd O K Δ τ L j χ z h.reg hj ?_⟩
+    refine
+      ⟨(kapRam O K Δ τ L c d m h hτ hodd).2, fun j hj χ z hz => gOdd O K Δ τ L j χ z h.reg hj ?_⟩
     have hn : QuadraticAlgebra.norm (1 + ω : Etau K τ) = 2 + τ := by
       simp [QuadraticAlgebra.norm_def, QuadraticAlgebra.re_one, QuadraticAlgebra.im_one]; ring
     rwa [hz, hn]

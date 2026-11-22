@@ -10,7 +10,8 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open MeasureTheory MvPolynomial NumberField
 
-theorem harmonic_pred_le_one_add_log {n : ℕ} (hn : 0 < n) : (harmonic (n - 1) : ℝ) ≤ 1 + Real.log n := by
+theorem harmonic_pred_le_one_add_log {n : ℕ} (hn : 0 < n)
+    : (harmonic (n - 1) : ℝ) ≤ 1 + Real.log n := by
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
   have h1 := harmonic_le_one_add_log (m + 1)
   have h2 : harmonic (m + 1 - 1) ≤ harmonic (m + 1) := by
@@ -21,24 +22,29 @@ theorem harmonic_pred_le_one_add_log {n : ℕ} (hn : 0 < n) : (harmonic (n - 1) 
   have h3 : (harmonic (m + 1 - 1) : ℝ) ≤ harmonic (m + 1) := by exact_mod_cast h2
   linarith
 
-theorem log_norm_coeff_sub_le_blockSphereLogMean (hSJ : SJStatement) (hInt : SphereLogIntegrableStatement) {B n : ℕ}
-    (hn : 0 < n) {a : Fin B → ℕ} {g : MvPolynomial (Fin B × Fin n) ℂ}
-    (hg : IsMultiHomogeneous a g) (s : Fin B × Fin n →₀ ℕ) (hs : g.coeff s ≠ 0) :
-    Real.log ‖g.coeff s‖ - ∑ b, (a b : ℝ) * (Real.log n + 1 / 2) ≤ blockSphereMean B n g := by
+theorem log_norm_coeff_sub_le_blockSphereLogMean
+    (hSJ : SJStatement) (hInt : SphereLogIntegrableStatement)
+    {B n : ℕ} (hn : 0 < n)
+    {a : Fin B → ℕ} {g : MvPolynomial (Fin B × Fin n) ℂ} (hg : IsMultiHomogeneous a g)
+    (s : Fin B × Fin n →₀ ℕ) (hs : g.coeff s ≠ 0)
+    : Real.log ‖g.coeff s‖ - ∑ b, (a b : ℝ) * (Real.log n + 1 / 2) ≤ blockSphereMean B n g := by
   obtain ⟨z, hz1, hzc⟩ := exists_torus_coeff_le g s
   have hnpos : (0 : ℝ) < n := by exact_mod_cast hn
   set r : ℝ := Real.sqrt n with hrdef
   have hr : 0 < r := Real.sqrt_pos.mpr hnpos
   have hr2 : r ^ 2 = n := Real.sq_sqrt hnpos.le
 
-  have hmem : ∀ b : Fin B, (WithLp.toLp 2 (fun j => z (b, j) / (r : ℂ)) : EuclideanSpace ℂ (Fin n)) ∈
-      Metric.sphere (0 : EuclideanSpace ℂ (Fin n)) 1 := by
+  have hmem
+      : ∀ b : Fin B,
+        (WithLp.toLp 2 (fun j => z (b, j) / (r : ℂ)) : EuclideanSpace ℂ (Fin n))
+          ∈ Metric.sphere (0 : EuclideanSpace ℂ (Fin n)) 1 := by
     intro b
     have hj : ∀ j, ‖z (b, j) / (r : ℂ)‖ = 1 / r := by
       intro j
       rw [norm_div, hz1, Complex.norm_of_nonneg hr.le]
     rw [mem_sphere_zero_iff_norm, EuclideanSpace.norm_eq]
-    simp only [PiLp.toLp_apply, hj, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+    simp only [PiLp.toLp_apply, hj, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      nsmul_eq_mul]
     rw [div_pow, one_pow, hr2, mul_one_div_cancel hnpos.ne', Real.sqrt_one]
   let u : BlockSphere B n := fun b => ⟨WithLp.toLp 2 (fun j => z (b, j) / (r : ℂ)), hmem b⟩
   have hrC : (r : ℂ) ≠ 0 := by exact_mod_cast hr.ne'
@@ -59,8 +65,9 @@ theorem log_norm_coeff_sub_le_blockSphereLogMean (hSJ : SJStatement) (hInt : Sph
   have hbb := blockSphere_logMean_bound hSJ hInt hn B a g u hg hgu
   have hH := harmonic_pred_le_one_add_log hn
   have hlogr : Real.log r = Real.log n / 2 := Real.log_sqrt hnpos.le
-  have hlz : Real.log ‖eval z g‖ =
-      ((∑ b, a b : ℕ) : ℝ) * Real.log r + Real.log ‖eval (blockPoint u) g‖ := by
+  have hlz
+      : Real.log ‖eval z g‖
+        = ((∑ b, a b : ℕ) : ℝ) * Real.log r + Real.log ‖eval (blockPoint u) g‖ := by
     rw [hnorm, Real.log_mul (by positivity) (norm_ne_zero_iff.mpr hgu), Real.log_pow]
   have hlc : Real.log ‖g.coeff s‖ ≤ Real.log ‖eval z g‖ := Real.log_le_log hcpos hzc
   set A : ℝ := ∑ b, (a b : ℝ) with hAdef
@@ -74,24 +81,30 @@ theorem log_norm_coeff_sub_le_blockSphereLogMean (hSJ : SJStatement) (hInt : Sph
   rw [hsum, hlogr] at hlz
   nlinarith
 
-theorem neg_log_norm_coeff_le_finitePlaces {K : Type*} [Field K] [NumberField K] {ι : Type*} (f : MvPolynomial ι K)
-    (s : ι →₀ ℕ) (hs : s ∈ f.support) :
-    -Real.log |((Algebra.norm ℚ (f.coeff s) : ℚ) : ℝ)| ≤
-      ∑ᶠ w : FinitePlace K, Real.log (gaussAbs w f) := by
+theorem neg_log_norm_coeff_le_finitePlaces
+    {K : Type*} [Field K] [NumberField K]
+    {ι : Type*} (f : MvPolynomial ι K) (s : ι →₀ ℕ) (hs : s ∈ f.support)
+    : - Real.log |((Algebra.norm ℚ (f.coeff s) : ℚ) : ℝ)|
+      ≤ ∑ᶠ w : FinitePlace K, Real.log (gaussAbs w f) := by
   classical
   have hc : f.coeff s ≠ 0 := MvPolynomial.mem_support_iff.mp hs
   have hA : ∀ w : FinitePlace K, w (f.coeff s) ≤ gaussAbs w f := by
     intro w
     unfold gaussAbs
     have h1 := Finset.le_sup (f := fun t => (w (f.coeff t)).toNNReal) hs
-    calc w (f.coeff s) ≤ ((w (f.coeff s)).toNNReal : ℝ) := Real.le_coe_toNNReal _
+    calc
+      w (f.coeff s)
+        ≤ ((w (f.coeff s)).toNNReal : ℝ) := Real.le_coe_toNNReal _
       _ ≤ _ := by exact_mod_cast h1
-  have hpos : ∀ w : FinitePlace K, 0 < w (f.coeff s) := fun w => NumberField.FinitePlace.pos_iff.mpr hc
-  have hU : (⋃ t ∈ f.support, Function.mulSupport (fun w : FinitePlace K => w (f.coeff t))).Finite :=
+  have hpos : ∀ w : FinitePlace K, 0 < w (f.coeff s) := fun w =>
+    NumberField.FinitePlace.pos_iff.mpr hc
+  have hU
+      : (⋃ t ∈ f.support, Function.mulSupport (fun w : FinitePlace K => w (f.coeff t))).Finite :=
     Set.Finite.biUnion f.support.finite_toSet
       (fun t ht => NumberField.FinitePlace.hasFiniteMulSupport (MvPolynomial.mem_support_iff.mp ht))
   set T := hU.toFinset with hT
-  have hsubG : Function.support (fun w : FinitePlace K => Real.log (gaussAbs w f)) ⊆ (T : Set _) := by
+  have hsubG
+      : Function.support (fun w : FinitePlace K => Real.log (gaussAbs w f)) ⊆ (T : Set _) := by
     intro w hw
     rw [hT, Set.Finite.coe_toFinset]
     by_contra hnot
@@ -120,8 +133,8 @@ theorem neg_log_norm_coeff_le_finitePlaces {K : Type*} [Field K] [NumberField K]
   rw [Real.log_inv] at hlog
   linarith
 
-theorem sum_log_norm_embedding_eq {K : Type*} [Field K] [NumberField K] (c : K) (hc : c ≠ 0) :
-    ∑ σ : K →+* ℂ, Real.log ‖σ c‖ = Real.log |((Algebra.norm ℚ c : ℚ) : ℝ)| := by
+theorem sum_log_norm_embedding_eq {K : Type*} [Field K] [NumberField K] (c : K) (hc : c ≠ 0)
+    : ∑ σ : K →+* ℂ, Real.log ‖σ c‖ = Real.log |((Algebra.norm ℚ c : ℚ) : ℝ)| := by
   classical
   have hne : ∀ σ : K →+* ℂ, ‖σ c‖ ≠ 0 := fun σ => norm_ne_zero_iff.mpr ((map_ne_zero σ).mpr hc)
   have h := Algebra.norm_eq_prod_embeddings ℚ ℂ c

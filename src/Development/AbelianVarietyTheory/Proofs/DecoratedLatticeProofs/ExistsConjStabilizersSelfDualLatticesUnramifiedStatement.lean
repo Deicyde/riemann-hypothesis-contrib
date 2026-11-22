@@ -13,20 +13,25 @@ import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsBoun
 @[expose] public section
 
 open scoped NNReal Matrix TensorProduct Topology
-open Filter NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.RegSW GlobalTheory.EisCont GlobalTheory.SiegelSet GlobalTheory.UAut GlobalTheory.EisLine
+open Filter NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+  GlobalTheory.RegSW GlobalTheory.EisCont GlobalTheory.SiegelSet GlobalTheory.UAut
+  GlobalTheory.EisLine
 open GlobalTheory.Core.Rk.SWLaw (dblDec zeroSp)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 private theorem fullLattice_of_isSelfDualAt
     {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
-    (hJ : IsHermND σ J) {L : Submodule (𝓞 E) (Fin n → E)} (hLat : Submodule.IsLattice E L)
-    {v : HeightOneSpectrum (𝓞 F)} (hL : IsSelfDualAt σ J L v) : Submodule.IsFullLattice E L := by
+    {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (hJ : IsHermND σ J)
+    {L : Submodule (𝓞 E) (Fin n → E)} (hLat : Submodule.IsLattice E L)
+    {v : HeightOneSpectrum (𝓞 F)} (hL : IsSelfDualAt σ J L v)
+    : Submodule.IsFullLattice E L := by
   classical
   refine { toIsLattice := hLat, span_eq_top := ?_ }
   by_contra hspan
-  obtain ⟨f, hf, hker⟩ := (Submodule.span E (L : Set (Fin n → E))).exists_le_ker_of_lt_top
-    (lt_top_iff_ne_top.mpr hspan)
+  obtain ⟨f, hf, hker⟩ :=
+    (Submodule.span E (L : Set (Fin n → E))).exists_le_ker_of_lt_top (lt_top_iff_ne_top.mpr hspan)
   let coeff (i : Fin n) : E := f (fun j => if i = j then 1 else 0)
   have hcoeff (x : Fin n → E) : f x = ∑ i, x i * coeff i := f.pi_apply_eq_sum_univ x
   let w := J⁻¹ *ᵥ fun i => σ (coeff i)
@@ -35,8 +40,7 @@ private theorem fullLattice_of_isSelfDualAt
     rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hJ.2.isUnit, Matrix.one_mulVec]
   have hw_ne : w ≠ 0 := by
     intro hw_zero
-    have hc (i : Fin n) : coeff i = 0 := σ.injective (by
-      simpa [hw_zero] using (congrFun hw i).symm)
+    have hc (i : Fin n) : coeff i = 0 := σ.injective (by simpa [hw_zero] using (congrFun hw i).symm)
     apply hf
     exact LinearMap.ext fun x => by simp [hcoeff, hc]
   have hOrth (x : Fin n → E) (hx : x ∈ L) : hE σ J x w = 0 := by
@@ -49,20 +53,25 @@ private theorem fullLattice_of_isSelfDualAt
       _ = σ (f x) := by rw [hcoeff, map_sum]; simp only [map_mul]
       _ = 0 := by rw [hfx, map_zero]
   let wLoc : Fin n → Fv F v ⊗[F] E := fun i => (1 : Fv F v) ⊗ₜ[F] w i
-  let pairing : (Fin n → Fv F v ⊗[F] E) →+ (Fv F v ⊗[F] E) :=
-    { toFun := fun x => hLin σ J (Fv F v) wLoc x
-      map_zero' := by simp [hLin, hR, Formalism.UG.hform]
-      map_add' := fun x y => by
-        simp [hLin, hR, Formalism.UG.hform, add_mul, Finset.sum_add_distrib] }
+  let pairing : (Fin n → Fv F v ⊗[F] E) →+ (Fv F v ⊗[F] E) := {
+    toFun := fun x => hLin σ J (Fv F v) wLoc x
+    map_zero' := by simp [hLin, hR, Formalism.UG.hform]
+    map_add' := fun x y => by simp [hLin, hR, Formalism.UG.hform, add_mul, Finset.sum_add_distrib]
+  }
   have hZero : ∀ x ∈ latLoc F L v, pairing x = 0 := by
     intro z hz
-    refine latLoc_induction (p := fun x => pairing x = 0) (fun a _ x hx => ?_) (map_zero pairing)
+    refine latLoc_induction
+      (p := fun x => pairing x = 0)
+      (fun a _ x hx => ?_)
+      (map_zero pairing)
       (fun x y hx hy => by rw [map_add, hx, hy, add_zero])
-      (fun x hx => by rw [map_neg, hx, neg_zero]) hz
+      (fun x hx => by rw [map_neg, hx, neg_zero])
+      hz
     change hLin σ J (Fv F v) wLoc (fun i => a ⊗ₜ[F] x i) = 0
     have h := congrArg (fun z : E => a ⊗ₜ[F] z) (hOrth x hx)
-    simpa [hLin, hR, hE, Formalism.UG.hform, wLoc, sigR, JR, inclR,
-      TensorProduct.tmul_sum, Algebra.TensorProduct.tmul_mul_tmul] using h
+    simpa [hLin, hR, hE, Formalism.UG.hform, wLoc, sigR, JR, inclR, TensorProduct.tmul_sum,
+        Algebra.TensorProduct.tmul_mul_tmul]
+      using h
   have hLine (a : Fv F v) : (fun i => a ⊗ₜ[F] w i) ∈ latLoc F L v := by
     rw [show latLoc F L v = dualLoc σ J L v from hL]
     change ∀ x ∈ latLoc F L v, hLin σ J (Fv F v) (fun i => a ⊗ₜ[F] w i) x ∈ intLoc F E v
@@ -87,8 +96,18 @@ private theorem fullLattice_of_isSelfDualAt
   exact (not_lt_of_ge hbound) ((div_lt_iff₀ hpos).mp ha)
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_conj_stabilizers_selfDual_lattices_unramified : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → Algebra.Unramified (𝓞 F) (𝓞 E) → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J → ∀ (L L' : Submodule (𝓞 E) (Fin n → E)), Submodule.IsLattice E L → Submodule.IsLattice E L' → ∀ v : HeightOneSpectrum (𝓞 F), IsSelfDualAt σ J L v → IsSelfDualAt σ J L' v → ∃ g : GLoc σ J v, ∀ k : GLoc σ J v, k ∈ stabLoc σ J L' v ↔ g⁻¹ * k * g ∈ stabLoc σ J L v := by
+theorem _root_.GlobalTheory.T.exists_conj_stabilizers_selfDual_lattices_unramified
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ → Algebra.Unramified (𝓞 F) (𝓞 E)
+        → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+          IsHermND σ J
+            → ∀ (L L' : Submodule (𝓞 E) (Fin n → E)),
+              Submodule.IsLattice E L → Submodule.IsLattice E L'
+                → ∀ v : HeightOneSpectrum (𝓞 F),
+                  IsSelfDualAt σ J L v → IsSelfDualAt σ J L' v
+                    → ∃ g : GLoc σ J v, ∀ k : GLoc σ J v,
+                      k ∈ stabLoc σ J L' v ↔ g⁻¹ * k * g ∈ stabLoc σ J L v := by
   intro F E _ _ _ _ _ σ hCM hU n J hJ L L' hLat hLat' v hL hL'
   exact GlobalTheory.SelfDualStabConj.exists_conj_stabLoc F E σ hCM hU n J hJ L L'
-    (fullLattice_of_isSelfDualAt hJ hLat hL)
-    (fullLattice_of_isSelfDualAt hJ hLat' hL') v hL hL'
+    (fullLattice_of_isSelfDualAt hJ hLat hL) (fullLattice_of_isSelfDualAt hJ hLat' hL') v hL hL'

@@ -10,10 +10,11 @@ open scoped Classical
 
 namespace GlobalTheory
 
-theorem henselStep_card_comap {W T : Type} [AddCommGroup W] [AddCommGroup T]
-    (T1 T2 : AddSubgroup T) (h21 : T2 ≤ T1) (d : W →+ T) (hd1 : ∀ w, d w ∈ T1)
-    (hd2 : ∀ t ∈ T1, ∃ w, d w - t ∈ T2) :
-    Nat.card (T2.comap d) * Nat.card T1 = Nat.card W * Nat.card T2 := by
+theorem henselStep_card_comap
+    {W T : Type} [AddCommGroup W] [AddCommGroup T]
+    (T1 T2 : AddSubgroup T) (h21 : T2 ≤ T1)
+    (d : W →+ T) (hd1 : ∀ w, d w ∈ T1) (hd2 : ∀ t ∈ T1, ∃ w, d w - t ∈ T2)
+    : Nat.card (T2.comap d) * Nat.card T1 = Nat.card W * Nat.card T2 := by
   have hsup : d.range ⊔ T2 = T1 := by
     apply le_antisymm
     · refine sup_le ?_ h21
@@ -35,28 +36,30 @@ theorem henselStep_card_comap {W T : Type} [AddCommGroup W] [AddCommGroup T]
   unfold AddSubgroup.relIndex
   ring
 
-theorem henselStep_count {V W T : Type} [AddCommGroup V] [AddCommGroup W] [AddCommGroup T]
-    [Finite V] [Finite W] [Finite T] (ι : W →+ V) (f : V → T) (P : Set V)
-    (T1 T2 : AddSubgroup T) (τ : T) (h21 : T2 ≤ T1) (hP : ∀ y ∈ P, ∀ w, y + ι w ∈ P)
-    (hd : ∀ y ∈ P, ∃ d : W →+ T, (∀ w, d w ∈ T1) ∧ (∀ t ∈ T1, ∃ w, d w - t ∈ T2) ∧
-      ∀ w, f (y + ι w) - f y - d w ∈ T2) :
-    Set.ncard {y | y ∈ P ∧ f y - τ ∈ T1} * Nat.card T2 =
-      Set.ncard {y | y ∈ P ∧ f y - τ ∈ T2} * Nat.card T1 := by
+theorem henselStep_count
+    {V W T : Type}
+    [AddCommGroup V] [AddCommGroup W] [AddCommGroup T] [Finite V] [Finite W] [Finite T]
+    (ι : W →+ V) (f : V → T) (P : Set V) (T1 T2 : AddSubgroup T)
+    (τ : T) (h21 : T2 ≤ T1) (hP : ∀ y ∈ P, ∀ w, y + ι w ∈ P)
+    (hd : ∀ y ∈ P, ∃ d : W →+ T,
+      (∀ w, d w ∈ T1) ∧ (∀ t ∈ T1, ∃ w, d w - t ∈ T2) ∧ ∀ w, f (y + ι w) - f y - d w ∈ T2)
+    : Set.ncard {y | y ∈ P ∧ f y - τ ∈ T1} * Nat.card T2
+      = Set.ncard {y | y ∈ P ∧ f y - τ ∈ T2} * Nat.card T1 := by
   set S1 : Set V := {y | y ∈ P ∧ f y - τ ∈ T1} with hS1
   set S2 : Set V := {y | y ∈ P ∧ f y - τ ∈ T2} with hS2
 
   have ha : Nat.card (Σ y : S1, {w : W // (y : V) + ι w ∈ S2}) = S2.ncard * Nat.card W := by
     rw [← Nat.card_coe_set_eq, ← Nat.card_prod]
-    refine Nat.card_congr
-      { toFun := fun p => (⟨p.1.1 + ι p.2.1, p.2.2⟩, p.2.1)
-        invFun := fun q => ⟨⟨q.1.1 + ι (-q.2), ?_⟩, ⟨q.2, ?_⟩⟩
-        left_inv := ?_
-        right_inv := ?_ }
+    refine Nat.card_congr {
+      toFun := fun p => (⟨p.1.1 + ι p.2.1, p.2.2⟩, p.2.1)
+      invFun := fun q => ⟨⟨q.1.1 + ι (-q.2), ?_⟩, ⟨q.2, ?_⟩⟩
+      left_inv := ?_
+      right_inv := ?_
+    }
     · obtain ⟨⟨u, hu, hu2⟩, w⟩ := q
       refine ⟨hP u hu _, ?_⟩
       obtain ⟨d, h1, -, h3⟩ := hd u hu
-      have : f (u + ι (-w)) - τ = (f (u + ι (-w)) - f u - d (-w)) + d (-w) + (f u - τ) := by
-        abel
+      have : f (u + ι (-w)) - τ = (f (u + ι (-w)) - f u - d (-w)) + d (-w) + (f u - τ) := by abel
       simp only
       rw [this]
       exact T1.add_mem (T1.add_mem (h21 (h3 _)) (h1 _)) (h21 hu2)
@@ -67,8 +70,9 @@ theorem henselStep_count {V W T : Type} [AddCommGroup V] [AddCommGroup W] [AddCo
       exact Subtype.ext this
     · rintro ⟨⟨u, hu⟩, w⟩
       simp
-  have hb : ∀ y : S1, Nat.card {w : W // (y : V) + ι w ∈ S2} * Nat.card T1 =
-      Nat.card W * Nat.card T2 := by
+  have hb
+      : ∀ y : S1,
+        Nat.card {w : W // (y : V) + ι w ∈ S2} * Nat.card T1 = Nat.card W * Nat.card T2 := by
     rintro ⟨y, hy, hy1⟩
     obtain ⟨d, h1, h2, h3⟩ := hd y hy
     rw [← henselStep_card_comap T1 T2 h21 d h1 h2]
@@ -77,8 +81,9 @@ theorem henselStep_count {V W T : Type} [AddCommGroup V] [AddCommGroup W] [AddCo
     refine Nat.card_congr ((Equiv.subRight w0).subtypeEquiv ?_)
     intro w
     simp only [hS2, Set.mem_setOf_eq, Equiv.subRight_apply, AddSubgroup.mem_comap, map_sub]
-    have key : f (y + ι w) - τ =
-        (f (y + ι w) - f y - d w) + (d w0 - -(f y - τ)) + (d w - d w0) := by abel
+    have key
+        : f (y + ι w) - τ = (f (y + ι w) - f y - d w) + (d w0 - -(f y - τ)) + (d w - d w0) := by
+      abel
     rw [key]
     constructor
     · rintro ⟨-, h⟩

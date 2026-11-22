@@ -10,11 +10,25 @@ public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsC
 
 @[expose] public section
 
-open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top GroundTheory.Heights₂.Heights.ModelLeaves
-open ReciprocityTheory.ChartRestriction.G.Geo (HermLine IsSmoothHerm IsArithVar IsHorizontal mcPts mCoordIdeal IsIntersectionFamily IsIntersectionSystem IntersectionSystem ptsIntegral geoNum charOf recR arInt ChartBundle chartRing)
+open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num
+  GlobalTheory.CompanionTheory.Ar.Top GroundTheory.Heights₂.Heights.ModelLeaves
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (HermLine IsSmoothHerm IsArithVar IsHorizontal mcPts mCoordIdeal IsIntersectionFamily
+    IsIntersectionSystem IntersectionSystem ptsIntegral geoNum charOf recR arInt ChartBundle
+    chartRing)
 open NumberField
 
-theorem GlobalTheory.CompanionTheory.Ar.Num.mem_chartRing_atPrime_iff : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (y : (Σ k, ι k) → Ω) (A : Type) [CommRing A] [Algebra A Ω], HasConstants ℤ A y → ∀ (m : Ideal A) [m.IsPrime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra A O] [IsLocalization.AtPrime O m] [Algebra O Ω] [IsScalarTower A O Ω] (c : ∀ k, ι k), segreVec y c ≠ 0 → ∀ t : Ω, t ∈ chartRing O (segreVec y) c ↔ ∃ s : A, s ∉ m ∧ algebraMap A Ω s * t ∈ chartRing ℤ (segreVec y) c := by
+theorem GlobalTheory.CompanionTheory.Ar.Num.mem_chartRing_atPrime_iff
+    : ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type)
+        [Field Ω] (y : (Σ k, ι k) → Ω) (A : Type) [CommRing A] [Algebra A Ω],
+      HasConstants ℤ A y
+        → ∀ (m : Ideal A) [m.IsPrime] (O : Type) [CommRing O] [IsDomain O]
+            [IsDiscreteValuationRing O] [Algebra A O] [IsLocalization.AtPrime O m] [Algebra O Ω]
+            [IsScalarTower A O Ω] (c : ∀ k, ι k),
+          segreVec y c ≠ 0
+            → ∀ t : Ω,
+              t ∈ chartRing O (segreVec y) c
+                ↔ ∃ s : A, s ∉ m ∧ algebraMap A Ω s * t ∈ chartRing ℤ (segreVec y) c := by
   intro K _ _ ι _ Ω _ y A _ _ hA m _ O _ _ _ _ _ _ _ c hc t
   have hconst : ∀ a : A, algebraMap A Ω a ∈ chartRing ℤ (segreVec y) c := hA c hc
   have hmul : ∀ {a b : A}, a ∉ m → b ∉ m → a * b ∉ m := fun ha hb h =>
@@ -38,8 +52,9 @@ theorem GlobalTheory.CompanionTheory.Ar.Num.mem_chartRing_atPrime_iff : ∀ (K :
       obtain ⟨s, hs, ha⟩ := ha
       obtain ⟨r, hr, hb⟩ := hb
       refine ⟨s * r, hmul hs hr, ?_⟩
-      have : algebraMap A Ω (s * r) * (a + b) =
-          algebraMap A Ω r * (algebraMap A Ω s * a) + algebraMap A Ω s * (algebraMap A Ω r * b) := by
+      have : algebraMap A Ω (s * r) * (a + b)
+          = algebraMap A Ω r * (algebraMap A Ω s * a)
+            + algebraMap A Ω s * (algebraMap A Ω r * b) := by
         rw [map_mul]; ring
       rw [this]
       exact add_mem (mul_mem (hconst r) ha) (mul_mem (hconst s) hb)
@@ -47,7 +62,8 @@ theorem GlobalTheory.CompanionTheory.Ar.Num.mem_chartRing_atPrime_iff : ∀ (K :
       obtain ⟨s, hs, ha⟩ := ha
       obtain ⟨r, hr, hb⟩ := hb
       refine ⟨s * r, hmul hs hr, ?_⟩
-      have : algebraMap A Ω (s * r) * (a * b) = (algebraMap A Ω s * a) * (algebraMap A Ω r * b) := by
+      have : algebraMap A Ω (s * r) * (a * b)
+          = (algebraMap A Ω s * a) * (algebraMap A Ω r * b) := by
         rw [map_mul]; ring
       rw [this]
       exact mul_mem ha hb

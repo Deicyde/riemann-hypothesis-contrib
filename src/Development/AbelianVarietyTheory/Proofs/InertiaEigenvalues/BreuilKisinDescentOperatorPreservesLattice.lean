@@ -12,9 +12,16 @@ open PowerSeries GlobalTheory.BK
 
 namespace GlobalTheory.Proof.breuilKisin_descent_operator_preserves_lattice
 
-theorem integral : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H), η < H → 10 * H + 2 ≤ l → GlobalTheory.IndefiniteRowSideFullHecke.ImagePolynomialAction.Integral D := by
+theorem integral
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+        [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H),
+      η < H → 10 * H + 2 ≤ l
+        → GlobalTheory.IndefiniteRowSideFullHecke.ImagePolynomialAction.Integral D := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ η H D hηH hl
-  obtain ⟨-, hfil, hcomp⟩ := GlobalTheory.T.breuilKisin_integrality_computation O K l e a ι η H D hηH hl
+  obtain ⟨-, hfil, hcomp⟩ :=
+    GlobalTheory.T.breuilKisin_integrality_computation O K l e a ι η H D hηH hl
   intro w hw
   obtain ⟨⟨y, hyM, rfl⟩, hinv⟩ := (D.desc.mem_Z).1 hw
   obtain ⟨p, hp, f, hf, hEq⟩ := hcomp y hyM

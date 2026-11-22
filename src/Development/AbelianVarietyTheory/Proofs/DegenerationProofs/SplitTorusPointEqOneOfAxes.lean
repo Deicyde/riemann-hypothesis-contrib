@@ -10,16 +10,27 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsMonHo
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
-theorem splitTorus_point_eq_one_of_axes (K : Type) [Field K] [IsAlgClosed K] (E : SplitExt (Sp K))
-    (G : Over (Sp K)) [GrpObj G] (h : E.IsGt G) (X : Type) [AddCommGroup X]
+theorem splitTorus_point_eq_one_of_axes
+    (K : Type) [Field K] [IsAlgClosed K]
+    (E : SplitExt (Sp K))
+    (G : Over (Sp K)) [GrpObj G]
+    (h : E.IsGt G)
+    (X : Type) [AddCommGroup X]
     (t : G ⊗ G ⟶ splitTorus (Sp K) X)
-    (h₁ : lift (𝟙 G) (1 : G ⟶ G) ≫ t = 1) (h₂ : lift (1 : G ⟶ G) (𝟙 G) ≫ t = 1) : t = 1 := by
-  have key : ∀ (a : G ⟶ G ⊗ G), a ≫ t = 1 → ∀ χ : X, a.left.appTop.hom
-      (splitTorusPointsEquiv (Sp K) X (G ⊗ G) t (Multiplicative.ofAdd χ)).val = 1 := by
+    (h₁ : lift (𝟙 G) (1 : G ⟶ G) ≫ t = 1) (h₂ : lift (1 : G ⟶ G) (𝟙 G) ≫ t = 1)
+    : t = 1 := by
+  have key
+      : ∀ (a : G ⟶ G ⊗ G),
+        a ≫ t = 1
+          → ∀ χ : X,
+            a.left.appTop.hom (splitTorusPointsEquiv (Sp K) X (G ⊗ G) t
+                (Multiplicative.ofAdd χ)).val
+              = 1 := by
     intro a ha χ
     have := splitTorusPointsEquiv_val (Sp K) X G (a ≫ t) χ
     rw [Over.comp_left, Scheme.Hom.comp_appTop, CommRingCat.comp_apply, ha, map_one] at this
@@ -30,14 +41,17 @@ theorem splitTorus_point_eq_one_of_axes (K : Type) [Field K] [IsAlgClosed K] (E 
   ext χ
   exact unit_eq_one_of_axes_of_isGt K E G h _ (Units.isUnit _) (key _ h₁ χ) (key _ h₂ χ)
 
-theorem isMonHom_of_isGt_of_one :
-    ∀ (K : Type) [Field K] [IsAlgClosed K] (E E' : SplitExt (Sp K)) (G G' : Over (Sp K)) [GrpObj G] [GrpObj G'] [IsCommMonObj G] [IsCommMonObj G'], E.IsGt G → E'.IsGt G' → ∀ f : G ⟶ G', η[G] ≫ f = η[G'] → IsMonHom f := by
+theorem isMonHom_of_isGt_of_one
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (E E' : SplitExt (Sp K)) (G G' : Over (Sp K))
+        [GrpObj G] [GrpObj G'] [IsCommMonObj G] [IsCommMonObj G'],
+      E.IsGt G → E'.IsGt G' → ∀ f : G ⟶ G', η[G] ≫ f = η[G'] → IsMonHom f := by
   intro K _ _ E E' G G' _ _ _ _ h ⟨D⟩ f hf
   have := D.q_hom
   have := D.i_hom
   have hk := D.isKernel
-  have hq : IsMonHom (f ≫ D.q) := GlobalTheory.T.isMonHom_pointed_splitExt_to_abelianVariety K E G h E'.B E'.isAbelian (f ≫ D.q) (by
-    rw [reassoc_of% hf]; exact IsMonHom.one_hom D.q)
+  have hq : IsMonHom (f ≫ D.q) :=
+    GlobalTheory.T.isMonHom_pointed_splitExt_to_abelianVariety K E G h E'.B E'.isAbelian (f ≫ D.q)
+      (by rw [reassoc_of% hf]; exact IsMonHom.one_hom D.q)
   have hf1 : ∀ {W : Over (Sp K)}, (1 : W ⟶ G) ≫ f = 1 := by
     intro W
     rw [Hom.one_def, Hom.one_def, Category.assoc, hf]

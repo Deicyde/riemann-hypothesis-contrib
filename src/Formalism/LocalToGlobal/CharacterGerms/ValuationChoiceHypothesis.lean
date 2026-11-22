@@ -16,9 +16,11 @@ open Formalism.IncomingBounds Formalism.UnitaryBoundIntegral Formalism.L2.DIV Fo
 
 def i0 (k l : ℕ) : ℕ := sInf {i : ℕ | Odd i ∧ 3 ≤ i ∧ (k : ℝ) ^ ((3 : ℝ) / 2) < (l : ℝ) ^ i}
 
-def ThlEq : Prop := ∀ k l : ℕ, 1 ≤ k → 2 ≤ l →
-  Odd (i0 k l) ∧ 3 ≤ i0 k l ∧ (k : ℝ) ^ ((3 : ℝ) / 2) < (l : ℝ) ^ i0 k l ∧
-    thl k l = ((l : ℝ) ^ i0 k l)⁻¹
+def ThlEq : Prop :=
+  ∀ k l : ℕ,
+    1 ≤ k → 2 ≤ l
+      → Odd (i0 k l) ∧ 3 ≤ i0 k l ∧ (k : ℝ) ^ ((3 : ℝ) / 2) < (l : ℝ) ^ i0 k l
+        ∧ thl k l = ((l : ℝ) ^ i0 k l)⁻¹
 
 def LevelBound : Prop := ∀ k l : ℕ, 1 ≤ k → 5 ≤ l → ((i0 k l : ℝ) - 1) ≤ 2 + 2 * Real.log k
 
@@ -26,8 +28,9 @@ structure Plan (l d : ℕ) [NeZero d] (W : ZMod d → ℕ) where
   y : ZMod d → ℕ → ℕ
   u : ZMod d → ℕ
   supp : ∀ a i, i ∉ oddLevels d → y a i = 0
-  bal : ∀ a, W a = (∑ i ∈ oddLevels d, l ^ i * y a i) +
-    (∑ i ∈ oddLevels d, y (a - (i : ZMod d)) i) + u a
+  bal
+    : ∀ a,
+      W a = (∑ i ∈ oddLevels d, l ^ i * y a i) + (∑ i ∈ oddLevels d, y (a - (i : ZMod d)) i) + u a
 
 def Plan.triv (l d : ℕ) [NeZero d] (W : ZMod d → ℕ) : Plan l d W where
   y := fun _ _ => 0
@@ -48,19 +51,22 @@ def Windows (S : ℕ) (G : Set ℕ) : Prop := 0 ∈ G ∧ ∀ Y0 : ℕ, ∃ y �
 def IsReps (N : NumDatum) (l : ℕ) (Z : Finset (RPl N.R)) : Prop :=
   ∀ z' : RPl N.R, ∃! p : RPl N.R × ZMod (N.ordP l), p.1 ∈ Z ∧ N.pos l p.1 p.2.val = z'
 
-def alongOrb {X : Type} (N : NumDatum) (l : ℕ) (z : RPl N.R) (W : RPl N.R → X) : ZMod (N.ordP l) → X :=
-  fun s => W (N.pos l z s.val)
+def alongOrb {X : Type} (N : NumDatum) (l : ℕ) (z : RPl N.R) (W : RPl N.R → X)
+    : ZMod (N.ordP l) → X := fun s =>
+  W (N.pos l z s.val)
 
 def FInertReps : Prop :=
-  ∀ (N : NumDatum) (j l : ℕ) (Z : Finset (RPl N.R)), IsReps N l Z →
-    (N.cls l = PrimeClass.inertClass ∨ N.cls l = PrimeClass.signal) →
-    ¬ (N.cls l = PrimeClass.inertClass ∧ N.hP l = 0) →
-    N.FInert j l = ∑ z ∈ Z, Fnum l (N.ordP l)
-        (fun s => ((N.R.k : ℝ) - 1) * alongOrb N l z (N.w j) s) ∧
-      (l ≠ N.g 0 → l ≠ N.g 1 → (l : ℝ) ≤ N.sc.X'' N.R.n → N.FjP j l = N.FInert j l)
+  ∀ (N : NumDatum) (j l : ℕ) (Z : Finset (RPl N.R)),
+    IsReps N l Z → (N.cls l = PrimeClass.inertClass ∨ N.cls l = PrimeClass.signal)
+      → ¬(N.cls l = PrimeClass.inertClass ∧ N.hP l = 0)
+      → N.FInert j l
+          = ∑ z ∈ Z, Fnum l (N.ordP l)
+            (fun s => ((N.R.k : ℝ) - 1) * alongOrb N l z (N.w j) s)
+        ∧ (l ≠ N.g 0 → l ≠ N.g 1 → (l : ℝ) ≤ N.sc.X'' N.R.n → N.FjP j l = N.FInert j l)
 
 def LemmaFe : Prop :=
-  ∀ (l d : ℕ) [NeZero d], 2 ≤ l → 2 ≤ d → Even d → ∀ D : ZMod d → ℝ, (∀ a, 0 ≤ D a) →
-    (∀ a a', D a' ≤ l * D a) → Fnum l d D = rho l * ∑ a, D a
+  ∀ (l d : ℕ) [NeZero d],
+    2 ≤ l → 2 ≤ d → Even d
+      → ∀ D : ZMod d → ℝ, (∀ a, 0 ≤ D a) → (∀ a a', D a' ≤ l * D a) → Fnum l d D = rho l * ∑ a, D a
 
 end Formalism.L2.FormalSeriesBounds

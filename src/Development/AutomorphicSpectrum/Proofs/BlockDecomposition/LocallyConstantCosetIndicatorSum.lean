@@ -17,7 +17,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompac
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG GlobalTheory.CompanionTheory.BZPsiPG.FibKer
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
+  GlobalTheory.CompanionTheory.BZPsiPG.FibKer
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.BZPsiPG.FibKer
@@ -31,24 +33,25 @@ theorem self_mem_cosetSet_decomp (t : ℕ) (c : k) (a : Fin t → k) : a ∈ cos
   rw [sub_self, ofAdd_zero]
   exact (Lc t c).one_mem
 
-theorem cosetSet_symm_decomp {t : ℕ} {c : k} {a b : Fin t → k} (h : a ∈ cosetSet t c b) :
-    b ∈ cosetSet t c a := by
+theorem cosetSet_symm_decomp {t : ℕ} {c : k} {a b : Fin t → k} (h : a ∈ cosetSet t c b)
+    : b ∈ cosetSet t c a := by
   have h' : Multiplicative.ofAdd (a - b) ∈ Lc t c := h
   show Multiplicative.ofAdd (b - a) ∈ Lc t c
   rw [← neg_sub, ofAdd_neg]
   exact (Lc t c).inv_mem h'
 
-theorem cosetSet_trans_decomp {t : ℕ} {c : k} {a b d : Fin t → k} (h : a ∈ cosetSet t c b)
-    (h' : b ∈ cosetSet t c d) : a ∈ cosetSet t c d := by
+theorem cosetSet_trans_decomp
+    {t : ℕ} {c : k} {a b d : Fin t → k} (h : a ∈ cosetSet t c b) (h' : b ∈ cosetSet t c d)
+    : a ∈ cosetSet t c d := by
   have h1 : Multiplicative.ofAdd (a - b) ∈ Lc t c := h
   have h2 : Multiplicative.ofAdd (b - d) ∈ Lc t c := h'
   show Multiplicative.ofAdd (a - d) ∈ Lc t c
   rw [← sub_add_sub_cancel a b d, ofAdd_add]
   exact (Lc t c).mul_mem h1 h2
 
-theorem exists_coset_reps (t : ℕ) (c : k) (S : Finset (Fin t → k)) :
-    ∃ A : Finset (Fin t → k), (∀ s ∈ S, ∃ a ∈ A, s ∈ cosetSet t c a) ∧
-      ∀ a ∈ A, ∀ b ∈ A, a ∈ cosetSet t c b → a = b := by
+theorem exists_coset_reps (t : ℕ) (c : k) (S : Finset (Fin t → k))
+    : ∃ A : Finset (Fin t → k),
+      (∀ s ∈ S, ∃ a ∈ A, s ∈ cosetSet t c a) ∧ ∀ a ∈ A, ∀ b ∈ A, a ∈ cosetSet t c b → a = b := by
   classical
   refine Finset.induction_on S ?_ ?_
   · exact ⟨∅, by simp, by simp⟩
@@ -81,7 +84,12 @@ theorem exists_coset_reps (t : ℕ) (c : k) (S : Finset (Fin t → k)) :
 
 end CosetDecomp
 
-theorem eq_sum_coset_indicators : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (t : ℕ) {Z : Type} [AddCommGroup Z] [Module ℂ Z] (φ : (Fin t → k) → Z) (c : k), c ≠ 0 → HasCompactSupport φ → (∀ o ∈ Lc t c, ∀ v, φ (v + o.toAdd) = φ v) → ∃ A : Finset (Fin t → k), ∀ v, φ v = ∑ a ∈ A, (cosetSet t c a).indicator (fun _ => φ a) v := by
+theorem eq_sum_coset_indicators
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (t : ℕ) {Z : Type} [AddCommGroup Z] [Module ℂ Z] (φ : (Fin t → k) → Z) (c : k),
+      c ≠ 0 → HasCompactSupport φ → (∀ o ∈ Lc t c, ∀ v, φ (v + o.toAdd) = φ v)
+        → ∃ A : Finset (Fin t → k), ∀ v,
+          φ v = ∑ a ∈ A, (cosetSet t c a).indicator (fun _ => φ a) v := by
   intro k _ _ _ _ t Z _ _ φ c _ hφ hinv
   classical
   have hval : ∀ a v, v ∈ cosetSet t c a → φ v = φ a := by
@@ -91,14 +99,19 @@ theorem eq_sum_coset_indicators : ∀ (k : Type) [Field k] [ValuativeRel k] [Top
   have hopen : ∀ a, IsOpen (cosetSet t c a) := by
     intro a
     open ValuativeRel in
-    have e : cosetSet t c a = ⋂ j, (fun v : Fin t → k => c * (v j - a j)) ⁻¹' ((𝒪[k] : Subring k) : Set k) := by
+    have e
+        : cosetSet t c a
+          = ⋂ j, (fun v : Fin t → k => c * (v j - a j)) ⁻¹' ((𝒪[k] : Subring k) : Set k) := by
       ext v
       simp only [Set.mem_iInter, Set.mem_preimage]
       exact Iff.rfl
     rw [e]
     exact isOpen_iInter_of_finite fun j => (SplitWeil.isOpen_int k).preimage (by fun_prop)
-  obtain ⟨S, hS⟩ := hφ.elim_finite_subcover (fun a : tsupport φ => cosetSet t c a) (fun a => hopen a)
-    (fun v hv => Set.mem_iUnion.2 ⟨⟨v, hv⟩, self_mem_cosetSet_decomp t c v⟩)
+  obtain ⟨S, hS⟩ :=
+    hφ.elim_finite_subcover
+      (fun a : tsupport φ => cosetSet t c a)
+      (fun a => hopen a)
+      (fun v hv => Set.mem_iUnion.2 ⟨⟨v, hv⟩, self_mem_cosetSet_decomp t c v⟩)
   obtain ⟨A, hAcov, hAuniq⟩ := exists_coset_reps t c (S.image Subtype.val)
   refine ⟨A, fun v => ?_⟩
   by_cases hv : ∃ a ∈ A, v ∈ cosetSet t c a

@@ -11,7 +11,10 @@ open scoped ENNReal
 
 namespace GlobalTheory.ResLine
 
-def conjNormalEquiv {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (N : Subgroup G) (b : G) (h : ∀ u, u ∈ N ↔ b * u * b⁻¹ ∈ N) : N ≃ₜ* N := GlobalTheory.ConjugationEquiv.conjEquiv N b h
+def conjNormalEquiv
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (N : Subgroup G) (b : G) (h : ∀ u, u ∈ N ↔ b * u * b⁻¹ ∈ N)
+    : N ≃ₜ* N :=
+  GlobalTheory.ConjugationEquiv.conjEquiv N b h
 
 end GlobalTheory.ResLine

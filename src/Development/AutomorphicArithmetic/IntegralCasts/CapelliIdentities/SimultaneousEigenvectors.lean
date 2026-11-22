@@ -5,15 +5,13 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.SimultaneousEigenvectorInvariantSubspace.simEig :
-    ∀ {K M : Type} [inst : Field K] [IsAlgClosed K] [inst_2 : AddCommGroup M]
-    [inst_3 : _root_.Module K M] [FiniteDimensional K M] {J : Type} (T : J → Module.End K M),
-    (∀ (i j : J), T i * T j = T j * T i) →
-      ∀ (d : ℕ) (U : Submodule K M),
-        Module.finrank K ↥U = d →
-          U ≠ ⊥ →
-            (∀ (j : J), ∀ x ∈ U, (T j : M → M) x ∈ U) →
-              ∃ v ∈ U, v ≠ (0 : M) ∧ ∀ (j : J), ∃ (c : K), (T j : M → M) v = c • v := by
+theorem UpperTheory.Reformulated.B.SimultaneousEigenvectorInvariantSubspace.simEig
+    : ∀ {K M : Type} [inst : Field K] [IsAlgClosed K] [inst_2 : AddCommGroup M]
+        [inst_3 : _root_.Module K M] [FiniteDimensional K M] {J : Type} (T : J → Module.End K M),
+      (∀ (i j : J), T i * T j = T j * T i)
+        → ∀ (d : ℕ) (U : Submodule K M),
+          Module.finrank K ↥U = d → U ≠ ⊥ → (∀ (j : J), ∀ x ∈ U, (T j : M → M) x ∈ U)
+            → ∃ v ∈ U, v ≠ (0 : M) ∧ ∀ (j : J), ∃ (c : K), (T j : M → M) v = c • v := by
   intro K M _ _ _ _ _ J T hT d
   induction d using Nat.strong_induction_on with
   | _ d ih =>
@@ -38,8 +36,7 @@ theorem UpperTheory.Reformulated.B.SimultaneousEigenvectorInvariantSubspace.simE
         exact Module.End.mem_eigenspace_iff.mp hx.2
       have hne : U ⊓ (T i).eigenspace c ≠ ⊥ := by
         intro h0
-        have hm : (w : M) ∈ U ⊓ (T i).eigenspace c :=
-          ⟨w.2, Module.End.mem_eigenspace_iff.mpr hw1⟩
+        have hm : (w : M) ∈ U ⊓ (T i).eigenspace c := ⟨w.2, Module.End.mem_eigenspace_iff.mpr hw1⟩
         rw [h0] at hm
         exact hw0 ((Submodule.mem_bot K).mp hm)
       have hst : ∀ j, ∀ x ∈ U ⊓ (T i).eigenspace c, T j x ∈ U ⊓ (T i).eigenspace c := by
@@ -49,6 +46,5 @@ theorem UpperTheory.Reformulated.B.SimultaneousEigenvectorInvariantSubspace.simE
         have h3 := LinearMap.congr_fun (hT i j) x
         simp only [Module.End.mul_apply] at h3
         rw [h3, h2, map_smul]
-      obtain ⟨v, hv, hv0, hvj⟩ :=
-        ih _ (hd ▸ Submodule.finrank_lt_finrank_of_lt hlt) _ rfl hne hst
+      obtain ⟨v, hv, hv0, hvj⟩ := ih _ (hd ▸ Submodule.finrank_lt_finrank_of_lt hlt) _ rfl hne hst
       exact ⟨v, hv.1, hv0, hvj⟩

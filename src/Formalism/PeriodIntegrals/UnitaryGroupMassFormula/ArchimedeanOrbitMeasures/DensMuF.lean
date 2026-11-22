@@ -10,11 +10,12 @@ noncomputable section
 namespace PI.AprimeInfW
 
 open scoped TensorProduct RealInnerProductSpace FourierTransform
-open MeasureTheory NumberField Topology Set Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.TypedSets
+open MeasureTheory NumberField Topology Set Formalism.BasicNotions Formalism.L2.SG.HidaSetting
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.TypedSets
   Formalism.L2.SG.Sub Matrix
 
-def BetaSym : Prop := ∀ {D : D7} (X : HidaSetting D) (x y : EuclideanSpace ℝ (KapI X)), betaI X x y = betaI X y x
-
+def BetaSym : Prop :=
+  ∀ {D : D7} (X : HidaSetting D) (x y : EuclideanSpace ℝ (KapI X)), betaI X x y = betaI X y x
 
 open Classical in
 def MatND : Prop := ∀ {D : D7} (X : HidaSetting D), (matI X).det ≠ 0
@@ -22,12 +23,13 @@ def MatND : Prop := ∀ {D : D7} (X : HidaSetting D), (matI X).det ≠ 0
 section
 variable {D : D7} (X : HidaSetting D)
 
-
 open Classical in
 def Alin : EuclideanSpace ℝ (KapI X) →ₗ[ℝ] EuclideanSpace ℝ (KapI X) :=
-  ((EuclideanSpace.equiv (KapI X) ℝ).toLinearEquiv.symm : (KapI X → ℝ) →ₗ[ℝ] EuclideanSpace ℝ (KapI X)) ∘ₗ
-    Matrix.toLin' (matI X) ∘ₗ
-    ((EuclideanSpace.equiv (KapI X) ℝ).toLinearEquiv.symm.symm : EuclideanSpace ℝ (KapI X) →ₗ[ℝ] (KapI X → ℝ))
+  ((EuclideanSpace.equiv (KapI X) ℝ).toLinearEquiv.symm
+      : (KapI X → ℝ) →ₗ[ℝ] EuclideanSpace ℝ (KapI X))
+    ∘ₗ Matrix.toLin' (matI X)
+    ∘ₗ ((EuclideanSpace.equiv (KapI X) ℝ).toLinearEquiv.symm.symm
+      : EuclideanSpace ℝ (KapI X) →ₗ[ℝ] (KapI X → ℝ))
 
 open Classical in
 theorem det_Alin : LinearMap.det (Alin X) = (matI X).det := by
@@ -48,6 +50,5 @@ theorem inner_Alin (x y : EuclideanSpace ℝ (KapI X)) : ⟪x, Alin X y⟫ = bet
   ring
 
 end
-
 
 end PI.AprimeInfW

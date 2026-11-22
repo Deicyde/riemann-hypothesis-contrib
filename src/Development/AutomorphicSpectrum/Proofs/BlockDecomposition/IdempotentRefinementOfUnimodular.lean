@@ -7,7 +7,9 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry DividedPowers GroundTheory.PAdicHodge GlobalTheory.LogCris GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.PAlg CrystallineSemistableComparison.B
+open CategoryTheory AlgebraicGeometry DividedPowers GroundTheory.PAdicHodge GlobalTheory.LogCris
+  GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.PAlg CrystallineSemistableComparison.B
 
 namespace GlobalTheory.CompanionTheory.TestCover
 
@@ -15,29 +17,29 @@ section Ring
 
 variable {S : Type*} [CommRing S]
 
-theorem mem_of_compare {f g d : S} (h : Ideal.span {f, g} = ⊤) (h1 : d * f ∈ Ideal.span {g})
-    (h2 : (1 - d) * g ∈ Ideal.span {f}) : d ∈ Ideal.span {g} ∧ 1 - d ∈ Ideal.span {f} := by
+theorem mem_of_compare
+    {f g d : S}
+    (h : Ideal.span {f, g} = ⊤) (h1 : d * f ∈ Ideal.span {g}) (h2 : (1 - d) * g ∈ Ideal.span {f})
+    : d ∈ Ideal.span {g} ∧ 1 - d ∈ Ideal.span {f} := by
   obtain ⟨x, y, hxy⟩ := Ideal.mem_span_pair.1 (Ideal.eq_top_iff_one _ |>.1 h)
   constructor
-  · have e : d = x * (d * f) + (d * y) * g := by
-      linear_combination (-d) * hxy
+  · have e : d = x * (d * f) + (d * y) * g := by linear_combination (-d) * hxy
     rw [e]
     exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ h1)
       (Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self g))
-  · have e : 1 - d = ((1 - d) * x) * f + y * ((1 - d) * g) := by
-      linear_combination (-(1 - d)) * hxy
+  · have e : 1 - d = ((1 - d) * x) * f + y * ((1 - d) * g) := by linear_combination (-(1 - d)) * hxy
     rw [e]
     exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self f))
       (Ideal.mul_mem_left _ _ h2)
 
-theorem idem_prod {ι : Type*} (t : Finset ι) (f : ι → S) (h : ∀ k, IsIdempotentElem (f k)) :
-    IsIdempotentElem (∏ k ∈ t, f k) := by
+theorem idem_prod {ι : Type*} (t : Finset ι) (f : ι → S) (h : ∀ k, IsIdempotentElem (f k))
+    : IsIdempotentElem (∏ k ∈ t, f k) := by
   unfold IsIdempotentElem
   rw [← Finset.prod_mul_distrib]
   exact Finset.prod_congr rfl fun k _ => h k
 
-theorem span_top_of_prod {m : ℕ} (e : Fin m → S) (h : ∏ k, (1 - e k) = 0) :
-    Ideal.span (Set.range e) = ⊤ := by
+theorem span_top_of_prod {m : ℕ} (e : Fin m → S) (h : ∏ k, (1 - e k) = 0)
+    : Ideal.span (Set.range e) = ⊤ := by
   rw [Ideal.eq_top_iff_one, ← Ideal.Quotient.eq_zero_iff_mem]
   have hk : ∀ k, Ideal.Quotient.mk (Ideal.span (Set.range e)) (1 - e k) = 1 := fun k => by
     have h0 : Ideal.Quotient.mk (Ideal.span (Set.range e)) (e k) = 0 :=
@@ -48,11 +50,14 @@ theorem span_top_of_prod {m : ℕ} (e : Fin m → S) (h : ∏ k, (1 - e k) = 0) 
   rw [map_one, this]
 
 theorem idem_refine
-    (hV : ∀ f g : S, Ideal.span {f, g} = ⊤ →
-      ∃ e : S, IsIdempotentElem e ∧ e * f ∈ Ideal.span {g} ∧ (1 - e) * g ∈ Ideal.span {f}) :
-    ∀ (m : ℕ) (s : Fin m → S) (c : S), IsIdempotentElem c → c ∈ Ideal.span (Set.range s) →
-      ∃ e : Fin m → S, (∀ k, IsIdempotentElem (e k)) ∧ (∀ k, e k ∈ Ideal.span {s k}) ∧
-        c * ∏ k, (1 - e k) = 0 := by
+    (hV : ∀ f g : S,
+      Ideal.span {f, g} = ⊤
+        → ∃ e : S, IsIdempotentElem e ∧ e * f ∈ Ideal.span {g} ∧ (1 - e) * g ∈ Ideal.span {f})
+    : ∀ (m : ℕ) (s : Fin m → S) (c : S),
+      IsIdempotentElem c → c ∈ Ideal.span (Set.range s)
+        → ∃ e : Fin m → S,
+          (∀ k, IsIdempotentElem (e k)) ∧ (∀ k, e k ∈ Ideal.span {s k})
+            ∧ c * ∏ k, (1 - e k) = 0 := by
   intro m
   induction m with
   | zero =>
@@ -98,12 +103,19 @@ theorem idem_refine
 
 end Ring
 
-theorem test_cover : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l), A.IsTest → ∀ {m : ℕ} (s : Fin m → A.U),
-    Ideal.span (Set.range s) = ⊤ → ∃ e : Fin m → A.A, (∀ k, IsIdempotentElem (e k)) ∧
-      Ideal.span (Set.range e) = ⊤ ∧ ∀ k, A.sharp (e k) ∈ Ideal.span {s k} := by
+theorem test_cover
+    : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l),
+      A.IsTest
+        → ∀ {m : ℕ} (s : Fin m → A.U),
+          Ideal.span (Set.range s) = ⊤
+            → ∃ e : Fin m → A.A,
+              (∀ k, IsIdempotentElem (e k)) ∧ Ideal.span (Set.range e) = ⊤
+                ∧ ∀ k, A.sharp (e k) ∈ Ideal.span {s k} := by
   intro l _ A hA m s hs
-  have hV : ∀ f g : A.U, Ideal.span {f, g} = ⊤ →
-      ∃ e : A.U, IsIdempotentElem e ∧ e * f ∈ Ideal.span {g} ∧ (1 - e) * g ∈ Ideal.span {f} :=
+  have hV
+      : ∀ f g : A.U,
+        Ideal.span {f, g} = ⊤
+          → ∃ e : A.U, IsIdempotentElem e ∧ e * f ∈ Ideal.span {g} ∧ (1 - e) * g ∈ Ideal.span {f} :=
     fun f g h => hA.val_aic.1 f g ⟨0, by rw [pow_zero, h]; trivial⟩
   obtain ⟨u, hi, hm, hp⟩ := idem_refine hV m s 1 IsIdempotentElem.one (by rw [hs]; trivial)
   rw [one_mul] at hp
@@ -117,8 +129,7 @@ theorem test_cover : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l), A.IsTest → ∀
   have hsp : A.sharp (∏ k, (1 - e k)) = 0 := by
     rw [map_prod, ← hp]
     exact Finset.prod_congr rfl fun k _ => by rw [hc _ (he k), hsh]
-  have hidem : IsIdempotentElem (∏ k, (1 - e k)) :=
-    idem_prod _ _ fun k => (he k).one_sub
+  have hidem : IsIdempotentElem (∏ k, (1 - e k)) := idem_prod _ _ fun k => (he k).one_sub
   have h0 : ∏ k, (1 - e k) = 0 :=
     (RL.idem_au A 0 IsIdempotentElem.zero).unique ⟨hidem, hsp⟩ ⟨IsIdempotentElem.zero, hzero⟩
   exact ⟨e, he, span_top_of_prod e h0, fun k => by rw [hsh]; exact hm k⟩

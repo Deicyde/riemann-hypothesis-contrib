@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PadicContinu
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 open TensorProduct
 
 set_option autoImplicit false
@@ -17,34 +19,35 @@ namespace GlobalTheory.SurjTens
 
 variable {O σ ι : Type} [CommRing O]
 
-
 open Classical in
-def pushVars (j : σ → ι) (f : MvPowerSeries σ O) : MvPowerSeries ι O :=
-  fun β => if h : ∃ α : σ →₀ ℕ, Finsupp.mapDomain j α = β then coeff h.choose f else 0
+def pushVars (j : σ → ι) (f : MvPowerSeries σ O) : MvPowerSeries ι O := fun β =>
+  if h : ∃ α : σ →₀ ℕ, Finsupp.mapDomain j α = β then coeff h.choose f else 0
 
-theorem coeff_pushVars_mapDomain {j : σ → ι} (hj : Function.Injective j) (f : MvPowerSeries σ O)
-    (α : σ →₀ ℕ) : coeff (Finsupp.mapDomain j α) (pushVars j f) = coeff α f := by
+theorem coeff_pushVars_mapDomain
+    {j : σ → ι} (hj : Function.Injective j) (f : MvPowerSeries σ O) (α : σ →₀ ℕ)
+    : coeff (Finsupp.mapDomain j α) (pushVars j f) = coeff α f := by
   have h : ∃ α' : σ →₀ ℕ, Finsupp.mapDomain j α' = Finsupp.mapDomain j α := ⟨α, rfl⟩
   rw [coeff_apply]
   unfold pushVars
   rw [dite_eq_left h, Finsupp.mapDomain_injective hj h.choose_spec]
 
-theorem coeff_pushVars_of_not {j : σ → ι} (f : MvPowerSeries σ O) (β : ι →₀ ℕ)
-    (h : ¬∃ α : σ →₀ ℕ, Finsupp.mapDomain j α = β) : coeff β (pushVars j f) = 0 := by
+theorem coeff_pushVars_of_not
+    {j : σ → ι} (f : MvPowerSeries σ O) (β : ι →₀ ℕ) (h : ¬ ∃ α : σ →₀ ℕ, Finsupp.mapDomain j α = β)
+    : coeff β (pushVars j f) = 0 := by
   rw [coeff_apply]
   unfold pushVars
   rw [dite_eq_right h]
 
-theorem pushVars_add {j : σ → ι} (hj : Function.Injective j) (f g : MvPowerSeries σ O) :
-    pushVars j (f + g) = pushVars j f + pushVars j g := by
+theorem pushVars_add {j : σ → ι} (hj : Function.Injective j) (f g : MvPowerSeries σ O)
+    : pushVars j (f + g) = pushVars j f + pushVars j g := by
   ext β
   by_cases h : ∃ α : σ →₀ ℕ, Finsupp.mapDomain j α = β
   · obtain ⟨α, rfl⟩ := h
     simp only [map_add (f := _), coeff_pushVars_mapDomain hj]
   · simp only [map_add (f := _), coeff_pushVars_of_not _ _ h, add_zero]
 
-theorem pushVars_monomial {j : σ → ι} (hj : Function.Injective j) (α : σ →₀ ℕ) (c : O) :
-    pushVars j (monomial α c) = monomial (Finsupp.mapDomain j α) c := by
+theorem pushVars_monomial {j : σ → ι} (hj : Function.Injective j) (α : σ →₀ ℕ) (c : O)
+    : pushVars j (monomial α c) = monomial (Finsupp.mapDomain j α) c := by
   classical
   ext β
   by_cases h : ∃ α' : σ →₀ ℕ, Finsupp.mapDomain j α' = β
@@ -55,8 +58,9 @@ theorem pushVars_monomial {j : σ → ι} (hj : Function.Injective j) (α : σ �
     rintro rfl
     exact h ⟨α, rfl⟩
 
-theorem pushVars_coe {j : σ → ι} (hj : Function.Injective j) (P : MvPolynomial σ O) :
-    pushVars j (P : MvPowerSeries σ O) = ((MvPolynomial.rename j P : MvPolynomial ι O) : MvPowerSeries ι O) := by
+theorem pushVars_coe {j : σ → ι} (hj : Function.Injective j) (P : MvPolynomial σ O)
+    : pushVars j (P : MvPowerSeries σ O)
+      = ((MvPolynomial.rename j P : MvPolynomial ι O) : MvPowerSeries ι O) := by
   induction P using MvPolynomial.induction_on' with
   | monomial u a =>
     rw [MvPolynomial.coe_monomial, MvPolynomial.rename_monomial, MvPolynomial.coe_monomial,
@@ -64,9 +68,11 @@ theorem pushVars_coe {j : σ → ι} (hj : Function.Injective j) (P : MvPolynomi
   | add P Q hP hQ =>
     rw [MvPolynomial.coe_add, pushVars_add hj, hP, hQ, map_add (f := _), MvPolynomial.coe_add]
 
-theorem eval_coe {R A κ : Type} [CommRing R] [CommRing A] [Algebra R A] (z : κ → A)
-    (E : MvPowerSeries κ R →ₐ[R] A) (hE : ∀ i, E (X i) = z i) (P : MvPolynomial κ R) :
-    E (P : MvPowerSeries κ R) = MvPolynomial.aeval z P := by
+theorem eval_coe
+    {R A κ : Type} [CommRing R] [CommRing A] [Algebra R A]
+    (z : κ → A) (E : MvPowerSeries κ R →ₐ[R] A) (hE : ∀ i, E (X i) = z i)
+    (P : MvPolynomial κ R)
+    : E (P : MvPowerSeries κ R) = MvPolynomial.aeval z P := by
   have h : E.comp (MvPolynomial.coeToMvPowerSeries.algHom R) = MvPolynomial.aeval z := by
     apply MvPolynomial.algHom_ext
     intro i
@@ -74,12 +80,15 @@ theorem eval_coe {R A κ : Type} [CommRing R] [CommRing A] [Algebra R A] (z : κ
   have := congrArg (fun φ => φ P) h
   simpa [MvPolynomial.coeToMvPowerSeries.algHom_apply] using this
 
-theorem exists_eval_pushVars (p : ℕ) {A C : Type} [CommRing A] [CommRing C] [Algebra O A] [Algebra O C]
-    [Fintype σ] [IsHausdorff (Ideal.span {(p : C)}) C] (j : σ → ι) (hj : Function.Injective j)
+theorem exists_eval_pushVars
+    (p : ℕ)
+    {A C : Type} [CommRing A] [CommRing C] [Algebra O A] [Algebra O C] [Fintype σ]
+    [IsHausdorff (Ideal.span {(p : C)}) C]
+    (j : σ → ι) (hj : Function.Injective j)
     (x : σ → A) (z : ι → C) (φ : A →ₐ[O] C) (evA : MvPowerSeries σ O →ₐ[O] A)
-    (E : MvPowerSeries ι O →ₐ[O] C) (hA : IsEval p x evA) (hE : IsEval p z E)
-    (hz : ∀ i, z (j i) = φ (x i)) (f : MvPowerSeries σ O) :
-    E (pushVars j f) = φ (evA f) := by
+    (E : MvPowerSeries ι O →ₐ[O] C)
+    (hA : IsEval p x evA) (hE : IsEval p z E) (hz : ∀ i, z (j i) = φ (x i)) (f : MvPowerSeries σ O)
+    : E (pushVars j f) = φ (evA f) := by
   classical
   have hpoly : ∀ P : MvPolynomial σ O, E (pushVars j (P : MvPowerSeries σ O)) = φ (evA P) := by
     intro P
@@ -128,21 +137,35 @@ theorem exists_eval_pushVars (p : ℕ) {A C : Type} [CommRing A] [CommRing C] [A
   rw [key]
   exact dvd_sub hgE hgφ
 
-theorem surjective_eval_tmul : ∀ (p : ℕ) (O A B σ τ : Type) [CommRing O] [CommRing A] [CommRing B] [Algebra O A] [Algebra O B] [Fintype σ] [Fintype τ] [IsHausdorff (Ideal.span {(p : A ⊗[O] B)}) (A ⊗[O] B)] (x : σ → A) (y : τ → B) (evA : MvPowerSeries σ O →ₐ[O] A) (evB : MvPowerSeries τ O →ₐ[O] B) (E : MvPowerSeries (σ ⊕ τ) O →ₐ[O] A ⊗[O] B), IsEval p x evA → IsEval p y evB → IsEval p (Sum.elim (fun i => x i ⊗ₜ[O] (1 : B)) fun j => (1 : A) ⊗ₜ[O] y j) E → Function.Surjective evA → Function.Surjective evB → Function.Surjective E := by
+theorem surjective_eval_tmul
+    : ∀ (p : ℕ) (O A B σ τ : Type) [CommRing O] [CommRing A] [CommRing B] [Algebra O A]
+        [Algebra O B] [Fintype σ] [Fintype τ] [IsHausdorff (Ideal.span {(p : A ⊗[O] B)}) (A ⊗[O] B)]
+        (x : σ → A) (y : τ → B) (evA : MvPowerSeries σ O →ₐ[O] A) (evB : MvPowerSeries τ O →ₐ[O] B)
+        (E : MvPowerSeries (σ ⊕ τ) O →ₐ[O] A ⊗[O] B),
+      IsEval p x evA → IsEval p y evB
+        → IsEval p (Sum.elim (fun i => x i ⊗ₜ[O] (1 : B)) fun j => (1 : A) ⊗ₜ[O] y j) E
+        → Function.Surjective evA → Function.Surjective evB
+        → Function.Surjective E := by
   intro p O A B σ τ _ _ _ _ _ _ _ _ x y evA evB E hA hB hE sA sB
   have hl : ∀ a : A, a ⊗ₜ[O] (1 : B) ∈ E.range := by
     intro a
     obtain ⟨f, rfl⟩ := sA a
     refine ⟨pushVars Sum.inl f, ?_⟩
-    have := exists_eval_pushVars p Sum.inl Sum.inl_injective x _ Algebra.TensorProduct.includeLeft
-      evA E hA hE (fun i => by simp) f
+    have :=
+      exists_eval_pushVars p Sum.inl Sum.inl_injective x _ Algebra.TensorProduct.includeLeft evA E
+        hA hE
+        (fun i => by simp)
+        f
     simpa using this
   have hr : ∀ b : B, (1 : A) ⊗ₜ[O] b ∈ E.range := by
     intro b
     obtain ⟨g, rfl⟩ := sB b
     refine ⟨pushVars Sum.inr g, ?_⟩
-    have := exists_eval_pushVars p Sum.inr Sum.inr_injective y _ Algebra.TensorProduct.includeRight
-      evB E hB hE (fun i => by simp) g
+    have :=
+      exists_eval_pushVars p Sum.inr Sum.inr_injective y _ Algebra.TensorProduct.includeRight evB E
+        hB hE
+        (fun i => by simp)
+        g
     simpa using this
   intro t
   have : t ∈ E.range := by

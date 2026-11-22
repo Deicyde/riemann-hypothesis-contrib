@@ -11,7 +11,8 @@ noncomputable section
 
 namespace GlobalTheory.RealLift
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU Classical
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU Classical
 
 section SignAdele
 
@@ -29,16 +30,18 @@ theorem evInf_sgnAd (w v : InfinitePlace F) : evInf F v (sgnAd w) = if v = w the
 
 variable {E : Type} [Field E] [NumberField E] [Algebra F E]
 
-theorem piInf_algebraMap {v : InfinitePlace F} (τ : EmbOver E v) (y : AF F) :
-    piInf τ (algebraMap (AF F) (AE F E) y) = InfinitePlace.Completion.extensionEmbedding v (evInf F v y) := by
+theorem piInf_algebraMap {v : InfinitePlace F} (τ : EmbOver E v) (y : AF F)
+    : piInf τ (algebraMap (AF F) (AE F E) y)
+      = InfinitePlace.Completion.extensionEmbedding v (evInf F v y) := by
   unfold piInf
   rw [RingHom.comp_apply, Algebra.TensorProduct.algebraMap_apply]
   simp [compInf]
 
-theorem at_algebraMap_sgnAd_sub_one (w : InfinitePlace F) :
-    At (evI F) (algebraMap (AF F) (AE F E) (sgnAd w) - 1) := by
+theorem at_algebraMap_sgnAd_sub_one (w : InfinitePlace F)
+    : At (evI F) (algebraMap (AF F) (AE F E) (sgnAd w) - 1) := by
   intro u hu
-  have h1 : u.1 = 0 := (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (by rw [map_zero]; exact hu)
+  have h1 : u.1 = 0 :=
+    (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (by rw [map_zero]; exact hu)
   have h2 : u * (sgnAd w - 1) = 0 := by
     refine Prod.ext ?_ ?_
     · show u.1 * _ = 0
@@ -59,10 +62,14 @@ theorem even_im_hermitian_sub : Parity := by
     show piInf (B.emb v) (algebraMap (AF F) (AE F E) (sgnAd w)) = _
     rw [piInf_algebraMap, evInf_sgnAd]
     split_ifs <;> simp
-  have hexp : ∀ m : InfinitePlace F → ℤ,
-      ∏ v, (piInf (B.emb v) (z : AE F E) / ‖piInf (B.emb v) (z : AE F E)‖) ^ m v = (-1 : ℂ) ^ m w := by
+  have hexp
+      : ∀ m : InfinitePlace F → ℤ,
+        ∏ v, (piInf (B.emb v) (z : AE F E) / ‖piInf (B.emb v) (z : AE F E)‖) ^ m v
+          = (-1 : ℂ) ^ m w := by
     intro m
-    rw [Finset.prod_eq_single w (fun v _ hv => by rw [hpi, if_neg hv]; simp) (fun h => absurd (Finset.mem_univ w) h),
+    rw [Finset.prod_eq_single w
+        (fun v _ hv => by rw [hpi, if_neg hv]; simp)
+        (fun h => absurd (Finset.mem_univ w) h),
       hpi, if_pos rfl]
     simp
   have eα := hT.chars.expα z hz
@@ -74,10 +81,10 @@ theorem even_im_hermitian_sub : Parity := by
     have he := hT.geo.even
     rcases Nat.even_or_odd a with ha | ha
     · rw [ha.neg_one_pow, ((Nat.even_add.1 he).1 ha).neg_one_pow]
-    · have ha' : Odd a' := Nat.not_even_iff_odd.1 fun h => Nat.not_even_iff_odd.2 ha ((Nat.even_add.1 he).2 h)
+    · have ha' : Odd a' :=
+        Nat.not_even_iff_odd.1 fun h => Nat.not_even_iff_odd.2 ha ((Nat.even_add.1 he).2 h)
       rw [ha.neg_one_pow, ha'.neg_one_pow]
-  have hab : (-1 : ℂ) ^ B.mα w = (-1) ^ B.mβ w := by
-    rw [← eα, ← eβ, rα, rβ, hpar]
+  have hab : (-1 : ℂ) ^ B.mα w = (-1) ^ B.mβ w := by rw [← eα, ← eβ, rα, rβ, hpar]
   rcases Int.even_or_odd (B.mα w - B.mβ w) with h | h
   · exact h
   · exfalso

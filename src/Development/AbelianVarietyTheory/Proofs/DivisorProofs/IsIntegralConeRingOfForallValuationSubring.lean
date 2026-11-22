@@ -8,8 +8,13 @@ open MvPolynomial
 
 namespace GlobalTheory
 
-theorem isIntegral_coneRing_of_forall_valuationSubring :
-    ∀ (F K : Type) [Field F] [Field K] (φ : F →+* K) (r e : ℕ) (w : Fin r → K) (τ : K), (∀ V : ValuationSubring K, (∀ c, φ c ∈ V) → ∃ i, w i ≠ 0 ∧ τ / w i ^ e ∈ V) → ∃ (m : ℕ) (b : Fin m → MvPolynomial (Fin r) F), (Polynomial.C τ * Polynomial.X ^ e) ^ m + ∑ k, MvPolynomial.eval₂ (Polynomial.C.comp φ) (fun i => Polynomial.C (w i) * Polynomial.X) (b k) * (Polynomial.C τ * Polynomial.X ^ e) ^ (k : ℕ) = 0 := by
+theorem isIntegral_coneRing_of_forall_valuationSubring
+    : ∀ (F K : Type) [Field F] [Field K] (φ : F →+* K) (r e : ℕ) (w : Fin r → K) (τ : K),
+      (∀ V : ValuationSubring K, (∀ c, φ c ∈ V) → ∃ i, w i ≠ 0 ∧ τ / w i ^ e ∈ V)
+        → ∃ (m : ℕ) (b : Fin m → MvPolynomial (Fin r) F),
+          (Polynomial.C τ * Polynomial.X ^ e) ^ m
+              + ∑ k, MvPolynomial.eval₂ (Polynomial.C.comp φ) (fun i => Polynomial.C (w i) * Polynomial.X) (b k) * (Polynomial.C τ * Polynomial.X ^ e) ^ (k : ℕ)
+            = 0 := by
   intro F K _ _ φ r e w τ h
   classical
   let L := FractionRing (Polynomial K)
@@ -50,7 +55,8 @@ theorem isIntegral_coneRing_of_forall_valuationSubring :
   have e1 := hpx
   rw [hp.as_sum] at e1
   simp only [Polynomial.eval₂_add, Polynomial.eval₂_finsetSum, Polynomial.eval₂_X_pow,
-    Polynomial.eval₂_mul, Polynomial.eval₂_C] at e1
+      Polynomial.eval₂_mul, Polynomial.eval₂_C]
+    at e1
   rw [Finset.sum_range (fun k => algebraMap (j.comp g).range L (p.coeff k) * j y ^ k)] at e1
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_zero, ← e1, map_add (f := _), map_sum, map_pow]

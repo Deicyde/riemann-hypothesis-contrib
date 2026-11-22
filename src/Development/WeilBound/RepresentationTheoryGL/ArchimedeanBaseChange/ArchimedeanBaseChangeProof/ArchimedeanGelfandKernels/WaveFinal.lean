@@ -27,7 +27,11 @@ theorem wave_existence_speed_multiplicity : WaveEx ∧ WaveSpeed ∧ KerEx ∧ M
   have hcpt : WaveCpt := Fc.asmCpt hL hU hR hS
   have hex : WaveEx := GlobalTheory.T.wave_solution_existence hL hR hsp hcpt
   have hk1 : KerOne := Fc.asmKerOne hL hU hR hS hA hsp
-  exact ⟨hex, hsp, GlobalTheory.T.wave_kernel_existence hL hR hsp hex hKU hk1,
-    GlobalTheory.CompanionTheory.WaveMult.asmMult_main hL hU hR hsp hex hKU hk1⟩
+  exact ⟨
+    hex,
+    hsp,
+    GlobalTheory.T.wave_kernel_existence hL hR hsp hex hKU hk1,
+    GlobalTheory.CompanionTheory.WaveMult.asmMult_main hL hU hR hsp hex hKU hk1
+  ⟩
 
 end PositivityTheory.RgBcC

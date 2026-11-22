@@ -20,7 +20,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Theta
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
@@ -114,40 +117,61 @@ lemma matched {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.
     (sub_mem ((m2 w).1 hw) hw') ((finVec_sub V _ _).trans (sub_eq_nsmul_sub e2 e'))
   exact ⟨x, hL' ▸ hx, by rw [← hx']; abel⟩
 
-theorem mark_unique : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (V : HSp D) (r : ℕ) (C : Ctx Xo c σ V r), C.OK → ∀ h, (∀ k k' γ γ', C.Mark h k γ → C.Mark h k' γ' → k = k') ∧ ∀ k γ γ', C.Mark h k γ → C.Mark h k γ' → ∃ δ ∈ (C.M.X k).Γ, C.fr (γ' * h) k = lact δ (C.fr (γ * h) k) := by
+theorem mark_unique
+    : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H)
+        (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (V : HSp D) (r : ℕ)
+        (C : Ctx Xo c σ V r),
+      C.OK
+        → ∀ h,
+          (∀ k k' γ γ', C.Mark h k γ → C.Mark h k' γ' → k = k')
+            ∧ ∀ k γ γ',
+              C.Mark h k γ → C.Mark h k γ'
+                → ∃ δ ∈ (C.M.X k).Γ, C.fr (γ' * h) k = lact δ (C.fr (γ * h) k) := by
   intro D H Dw l Xo c σ V r C hC h
   obtain rfl : V.rank = r := C.hr
   obtain ⟨-, r2, -, -, r5⟩ := GlobalTheory.T.rational_points_adelicUnitary_eq_unitary D V
-  have hG : ∀ k, (C.M.X k).Gm = -V.gramᵀ := fun k => (hC.modelW k).1
+  have hG : ∀ k, (C.M.X k).Gm = - V.gramᵀ := fun k => (hC.modelW k).1
   refine ⟨fun k k' γ γ' hm hm' => ?_, fun k γ γ' hm hm' => ?_⟩
   · obtain ⟨δ, hδ, hΛ, hmk⟩ := matched C h k k' γ γ' hm hm'
-    refine GlobalTheory.ClassUniq.eq_of_matched GlobalTheory.T.thetaUniformisation_complexAbelianVariety GlobalTheory.firstFiveLaws.1 _ H Dw l Xo _ C.g _ C.F _ C.M k k' δ
-      hC.pos hC.good ((GlobalTheory.T.relabelEmbeddings_good_bijective_conj_compat _ H l c σ hC.good).2.2.2 Dw C.g C.e) hC.base
-      ((hG k').trans (hG k).symm) ((hC.modelW k').2.trans (hC.modelW k).2.symm)
+    refine GlobalTheory.ClassUniq.eq_of_matched
+      GlobalTheory.T.thetaUniformisation_complexAbelianVariety GlobalTheory.firstFiveLaws.1 _ H Dw l
+      Xo _ C.g _ C.F _ C.M k k' δ hC.pos hC.good
+      ((GlobalTheory.T.relabelEmbeddings_good_bijective_conj_compat _ H l c σ hC.good).2.2.2 Dw C.g
+        C.e)
+      hC.base ((hG k').trans (hG k).symm) ((hC.modelW k').2.trans (hC.modelW k).2.symm)
       (by rw [hG k]; exact r2 _ δ hδ) hΛ hmk (fun a => ?_)
     refine ⟨_ - _, sub_mem ((hΛ _).1 (C.M.φ k (C.F.t k a)).2) (C.M.φ k' (C.F.t k' a)).2, ?_⟩
-    rw [hC.lA, one_smul]; abel
+    rw [hC.lA, one_smul]
+    abel
   · obtain ⟨δ, hδ, hΛ, hmk⟩ := matched C h k k γ γ' hm hm'
     have hφ : ∀ w ∈ (C.M.X k).Λ, ∃ b, (C.M.φ k b : Fin V.rank → D.host.E) = w := fun w hw =>
       ⟨(C.M.φ k).symm ⟨w, hw⟩, by rw [LinearEquiv.apply_symm_apply]⟩
-    refine ⟨δ, (hC.base.gam k δ).2 ⟨⟨by rw [hG k]; exact r2 _ δ hδ, hΛ⟩, fun b hb => ?_, fun a => ?_⟩, ?_⟩
+    refine ⟨
+      δ,
+      (hC.base.gam k δ).2 ⟨⟨by rw [hG k]; exact r2 _ δ hδ, hΛ⟩, fun b hb => ?_, fun a => ?_⟩,
+      ?_
+    ⟩
     · have hM : l.M' = l.M := by rw [Level.M', hC.lA, Nat.lcm_one_right]
       obtain ⟨a, ha, e, rfl⟩ := half_surj l (C.F.t k) (fun b => hM ▸ C.F.t_surj k b) b hb
       obtain ⟨w, hw, hw'⟩ := hmk a ha
       obtain ⟨b', hb'⟩ := hφ _ (sub_mem (add_mem hw ((hΛ _).1 (C.M.φ k e).2)) (C.M.φ k e).2)
       refine ⟨b', ?_⟩
-      rw [hb', map_add (f := _), map_nsmul, Submodule.coe_add, AddSubmonoidClass.coe_nsmul, Matrix.mulVec_add,
-        Matrix.mulVec_smul, hw', smul_sub, smul_add]
+      rw [hb', map_add (f := _), map_nsmul, Submodule.coe_add, AddSubmonoidClass.coe_nsmul,
+        Matrix.mulVec_add, Matrix.mulVec_smul, hw', smul_sub, smul_add]
       abel
     · obtain ⟨b', hb'⟩ := hφ _ (sub_mem ((hΛ _).1 (C.M.φ k a).2) (C.M.φ k a).2)
       refine ⟨b', ?_⟩
-      rw [hb', hC.lA, one_smul]; abel
+      rw [hb', hC.lA, one_smul]
+      abel
     · funext τ
       have hg : γ' * h = γ' * γ⁻¹ * (γ * h) := by group
-      have e := ((GlobalTheory.T.archimedeanMatrix_unitary_continuous_multiplicative D V C.θ hC.inf).1 τ.1).2.1 (γ' * γ⁻¹) (γ * h)
+      have e :=
+        ((GlobalTheory.T.archimedeanMatrix_unitary_continuous_multiplicative D V C.θ hC.inf).1
+          τ.1).2.1 (γ' * γ⁻¹) (γ * h)
       rw [← hg, (r5 _ δ hδ).2 τ.1 _ (hC.inf τ.1)] at e
-      change archM V (C.θ τ.1) (γ' * h) * C.x₀ τ.1 =
-        (δ : Matrix (Fin V.rank) (Fin V.rank) D.host.E).map τ.1 * (archM V (C.θ τ.1) (γ * h) * C.x₀ τ.1)
+      change archM V (C.θ τ.1) (γ' * h) * C.x₀ τ.1
+        = (δ : Matrix (Fin V.rank) (Fin V.rank) D.host.E).map τ.1
+          * (archM V (C.θ τ.1) (γ * h) * C.x₀ τ.1)
       rw [e, Matrix.mul_assoc]
 
 end GlobalTheory.MarkUniq

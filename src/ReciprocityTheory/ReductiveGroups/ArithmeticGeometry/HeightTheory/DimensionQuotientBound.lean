@@ -31,10 +31,13 @@ lemma one_le_dim {R : Type*} [CommRing R] (p m : Ideal R) [p.IsPrime] [m.IsPrime
     Order.LTSeries.length_le_krullDim ((RelSeries.singleton _ a).snoc b hab)
   exact_mod_cast hs
 
-theorem local_step {B : Type*} [CommRing B] [IsDomain B] [IsNoetherianRing B] (M : Ideal B) [hM : M.IsMaximal]
-    (w e : B) (hw : w ∈ M) (hw0 : w ≠ 0) (he : e ≠ 0) :
-    ∃ q : Ideal B, q.IsPrime ∧ q ≤ M ∧ e ∉ q ∧ w ∉ q ∧
-      ∀ P : Ideal B, P.IsPrime → q ≤ P → P ≤ M → w ∈ P → P = M := by
+theorem local_step
+    {B : Type*} [CommRing B] [IsDomain B] [IsNoetherianRing B]
+    (M : Ideal B) [hM : M.IsMaximal]
+    (w e : B) (hw : w ∈ M) (hw0 : w ≠ 0) (he : e ≠ 0)
+    : ∃ q : Ideal B,
+      q.IsPrime ∧ q ≤ M ∧ e ∉ q ∧ w ∉ q
+        ∧ ∀ P : Ideal B, P.IsPrime → q ≤ P → P ≤ M → w ∈ P → P = M := by
   classical
   let R := Localization.AtPrime M
   haveI : IsDomain R := IsLocalization.isDomain_localization (Ideal.primeCompl_le_nonZeroDivisors M)

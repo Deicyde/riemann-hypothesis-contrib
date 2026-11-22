@@ -67,8 +67,8 @@ lemma tendsto_one_div_linear (c w : ℂ) (hw : w ≠ 0) :
 
 def tm (l x : ℂ) : ℂ := 1 / (x - l) + 1 / l + x / l ^ 2
 
-private theorem summable_inv_sq_nat_mul_add (c w : ℂ) (hw : w ≠ 0) :
-    Summable fun N : ℕ => 1 / ((N : ℂ) * w + c) ^ 2 := by
+private theorem summable_inv_sq_nat_mul_add (c w : ℂ) (hw : w ≠ 0)
+    : Summable fun N : ℕ => 1 / ((N : ℂ) * w + c) ^ 2 := by
   have hw' : 0 < ‖w‖ := norm_pos_iff.mpr hw
   obtain ⟨K, hK⟩ := exists_nat_gt (2 * ‖c‖ / ‖w‖)
   have hg : Summable fun N : ℕ => 4 / ‖w‖ ^ 2 * (1 / ((N + K : ℕ) : ℝ) ^ 2) := by
@@ -80,12 +80,12 @@ private theorem summable_inv_sq_nat_mul_add (c w : ℂ) (hw : w ≠ 0) :
   have hMK : K ≤ N + K := Nat.le_add_left K N
   generalize N + K = M at hMK ⊢
   have h1 : 2 * ‖c‖ / ‖w‖ < (M : ℝ) := lt_of_lt_of_le hK (by exact_mod_cast hMK)
-  have h2 : 2 * ‖c‖ < (M : ℝ) * ‖w‖ := by
-    exact (div_lt_iff₀ hw').mp h1
-  have e : ‖(M : ℂ) * w‖ = (M : ℝ) * ‖w‖ := by
-    simp
+  have h2 : 2 * ‖c‖ < (M : ℝ) * ‖w‖ := by exact (div_lt_iff₀ hw').mp h1
+  have e : ‖(M : ℂ) * w‖ = (M : ℝ) * ‖w‖ := by simp
   have h4 : ‖(M : ℂ) * w‖ ≤ ‖(M : ℂ) * w + c‖ + ‖c‖ := by
-    calc ‖(M : ℂ) * w‖ = ‖((M : ℂ) * w + c) - c‖ := by rw [add_sub_cancel_right]
+    calc
+      ‖(M : ℂ) * w‖
+        = ‖((M : ℂ) * w + c) - c‖ := by rw [add_sub_cancel_right]
       _ ≤ ‖(M : ℂ) * w + c‖ + ‖c‖ := norm_sub_le _ _
   rw [e] at h4
   have h3 : (M : ℝ) * ‖w‖ / 2 ≤ ‖(M : ℂ) * w + c‖ := by linarith [norm_nonneg c]
@@ -93,8 +93,9 @@ private theorem summable_inv_sq_nat_mul_add (c w : ℂ) (hw : w ≠ 0) :
   have h6 : ((M : ℝ) * ‖w‖ / 2) ^ 2 ≤ ‖(M : ℂ) * w + c‖ ^ 2 := by
     rw [sq, sq]; exact mul_le_mul h3 h3 h5.le (norm_nonneg _)
   rw [norm_div, norm_one, norm_pow]
-  calc 1 / ‖(M : ℂ) * w + c‖ ^ 2 ≤ 1 / ((M : ℝ) * ‖w‖ / 2) ^ 2 :=
-        one_div_le_one_div_of_le (pow_pos h5 2) h6
+  calc
+    1 / ‖(M : ℂ) * w + c‖ ^ 2
+      ≤ 1 / ((M : ℝ) * ‖w‖ / 2) ^ 2 := one_div_le_one_div_of_le (pow_pos h5 2) h6
     _ = 4 / ‖w‖ ^ 2 * (1 / (M : ℝ) ^ 2) := by ring
 
 lemma summable_inv_sq (u v : ℂ) (hu : u ≠ 0) (n : ℤ) :
@@ -107,50 +108,63 @@ lemma summable_inv_sq (u v : ℂ) (hu : u ≠ 0) (n : ℤ) :
     rw [Int.cast_neg, Int.cast_natCast, neg_mul, mul_neg]
   exact summable_int_iff_summable_nat_and_neg.mpr ⟨hp, hm⟩
 
-private theorem tm_half_sub_tm_neg_half (u l : ℂ) :
-    tm l (u / 2) - tm l (-(u / 2))
+private theorem tm_half_sub_tm_neg_half (u l : ℂ)
+    : tm l (u / 2) - tm l (-(u / 2))
       = 1 / (u / 2 - l) - 1 / (u / 2 - (l + u)) + u * (1 / l ^ 2) := by
   unfold tm
   rw [show -(u / 2) - l = u / 2 - (l + u) by ring]
   ring
 
-private theorem tsum_zeta_half_diff_eq_mul_tsum_inv_sq (u v : ℂ) (hu : u ≠ 0) (n : ℤ)
-    (hfib : Summable fun m : ℤ => tm ((m : ℂ) * u + (n : ℂ) * v) (u / 2)
-      - tm ((m : ℂ) * u + (n : ℂ) * v) (-(u / 2))) :
-    ∑' m : ℤ, (tm ((m : ℂ) * u + (n : ℂ) * v) (u / 2)
-      - tm ((m : ℂ) * u + (n : ℂ) * v) (-(u / 2)))
+private theorem tsum_zeta_half_diff_eq_mul_tsum_inv_sq
+    (u v : ℂ) (hu : u ≠ 0)
+    (n : ℤ)
+    (hfib : Summable fun m : ℤ =>
+      tm ((m : ℂ) * u + (n : ℂ) * v) (u / 2) - tm ((m : ℂ) * u + (n : ℂ) * v) (-(u / 2)))
+    : ∑' m : ℤ, (tm ((m : ℂ) * u + (n : ℂ) * v) (u / 2)
+        - tm ((m : ℂ) * u + (n : ℂ) * v) (-(u / 2)))
       = u * ∑' m : ℤ, 1 / ((m : ℂ) * u + (n : ℂ) * v) ^ 2 := by
   have hq := summable_inv_sq u v hu n
-  have hsplit : ∀ m : ℤ, tm ((m : ℂ) * u + (n : ℂ) * v) (u / 2)
-      - tm ((m : ℂ) * u + (n : ℂ) * v) (-(u / 2))
-      = (1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
-          - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)))
-        + u * (1 / ((m : ℂ) * u + (n : ℂ) * v) ^ 2) := by
+  have hsplit
+      : ∀ m : ℤ,
+        tm ((m : ℂ) * u + (n : ℂ) * v) (u / 2) - tm ((m : ℂ) * u + (n : ℂ) * v) (-(u / 2))
+          = (1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
+              - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)))
+            + u * (1 / ((m : ℂ) * u + (n : ℂ) * v) ^ 2) := by
     intro m
     rw [tm_half_sub_tm_neg_half, Int.cast_add, Int.cast_one,
       show ((m : ℂ) + 1) * u + (n : ℂ) * v = (m : ℂ) * u + (n : ℂ) * v + u by ring]
-  have htel : Summable fun m : ℤ => 1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
-      - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)) := by
+  have htel : Summable fun m : ℤ =>
+      1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
+        - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)) := by
     refine (hfib.sub (hq.mul_left u)).congr (fun m => ?_)
-    rw [hsplit m]; ring
-  have hlim1 : Tendsto (fun N : ℕ => 1 / (u / 2 - (((N : ℤ) : ℂ) * u + (n : ℂ) * v)))
-      atTop (𝓝 0) := by
+    rw [hsplit m]
+    ring
+  have hlim1
+      : Tendsto (fun N : ℕ => 1 / (u / 2 - (((N : ℤ) : ℂ) * u + (n : ℂ) * v))) atTop (𝓝 0) := by
     refine (tendsto_one_div_linear (u / 2 - (n : ℂ) * v) (-u) (neg_ne_zero.mpr hu)).congr
       (fun N => ?_)
-    push_cast; congr 1; ring
-  have hlim2 : Tendsto (fun N : ℕ => 1 / (u / 2 - (((-(N : ℤ) : ℤ) : ℂ) * u + (n : ℂ) * v)))
+    push_cast
+    congr 1
+    ring
+  have hlim2 : Tendsto
+      (fun N : ℕ => 1 / (u / 2 - (((-(N : ℤ) : ℤ) : ℂ) * u + (n : ℂ) * v)))
       atTop (𝓝 0) := by
     refine (tendsto_one_div_linear (u / 2 - (n : ℂ) * v) u hu).congr (fun N => ?_)
-    push_cast; congr 1; ring
-  have ht : ∑' m : ℤ, (1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
-      - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v))) = 0 :=
+    push_cast
+    congr 1
+    ring
+  have ht
+      : ∑' m : ℤ, (1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
+          - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)))
+        = 0 :=
     tsum_int_telescope (fun k : ℤ => 1 / (u / 2 - ((k : ℂ) * u + (n : ℂ) * v))) htel hlim1 hlim2
-  have hadd : ∑' m : ℤ, ((1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
-          - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)))
-        + u * (1 / ((m : ℂ) * u + (n : ℂ) * v) ^ 2))
-      = ∑' m : ℤ, (1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
-          - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)))
-        + ∑' m : ℤ, u * (1 / ((m : ℂ) * u + (n : ℂ) * v) ^ 2) := by
+  have hadd
+      : ∑' m : ℤ, ((1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
+            - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)))
+          + u * (1 / ((m : ℂ) * u + (n : ℂ) * v) ^ 2))
+        = ∑' m : ℤ, (1 / (u / 2 - ((m : ℂ) * u + (n : ℂ) * v))
+            - 1 / (u / 2 - (((m + 1 : ℤ) : ℂ) * u + (n : ℂ) * v)))
+          + ∑' m : ℤ, u * (1 / ((m : ℂ) * u + (n : ℂ) * v) ^ 2) := by
     exact htel.tsum_add (hq.mul_left u)
   rw [tsum_congr hsplit, hadd, ht, zero_add, tsum_mul_left]
 
@@ -183,10 +197,8 @@ end EtaEis
 open EtaEis in
 theorem etaEisenstein_of (hs : ZetaSummable) (ho : ZetaOdd) : EtaEisenstein := by
   intro L
-  have hu1 : L.ω₁ ≠ 0 := by
-    intro h; exact L.ω₁_div_two_notMem_lattice (by rw [h]; simp)
-  have hu2 : L.ω₂ ≠ 0 := by
-    intro h; exact L.ω₂_div_two_notMem_lattice (by rw [h]; simp)
+  have hu1 : L.ω₁ ≠ 0 := by intro h; exact L.ω₁_div_two_notMem_lattice (by rw [h]; simp)
+  have hu2 : L.ω₂ ≠ 0 := by intro h; exact L.ω₂_div_two_notMem_lattice (by rw [h]; simp)
 
   have hS2 : ∀ x : ℂ, Summable fun p : ℤ × ℤ => tm ((p.2 : ℂ) * L.ω₂ + (p.1 : ℂ) * L.ω₁) x := by
     intro x
@@ -217,7 +229,9 @@ theorem etaEisenstein_of (hs : ZetaSummable) (ho : ZetaOdd) : EtaEisenstein := b
   · have h := core L.ω₂ L.ω₁ hu2 hS2
     rw [← hZ2, ← hZ2, ho] at h
     rw [hE2]
-    calc 2 * wZeta L (L.ω₂ / 2) = wZeta L (L.ω₂ / 2) - -wZeta L (L.ω₂ / 2) := by ring
+    calc
+      2 * wZeta L (L.ω₂ / 2)
+        = wZeta L (L.ω₂ / 2) - - wZeta L (L.ω₂ / 2) := by ring
       _ = _ := h
       _ = _ := by
         congr 1

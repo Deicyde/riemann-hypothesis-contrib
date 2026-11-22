@@ -13,12 +13,16 @@ namespace PI.TrDualLocW
 open NumberField ValuativeRel PI.CntNotIntW
 open scoped TensorProduct
 
-theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {Fp : Type} [Field Fp]
-    [CharZero Fp] [ValuativeRel Fp] [TopologicalSpace Fp] [IsNonarchimedeanLocalField Fp] [Algebra ℚ_[ℓ] Fp]
-    (hc : Continuous (algebraMap ℚ_[ℓ] Fp)) (hfin : FiniteDimensional ℚ_[ℓ] Fp) (ι : K →+* Fp)
-    (hsurj : Function.Surjective (piMap K ℓ Fp ι)) (t : K)
-    (ht : ∀ a : 𝓞 K, ∃ n : ℤ, Algebra.trace ℚ K (t * a) = n) (c : Fp) (hcO : c ∈ 𝒪[Fp]) :
-    ‖Algebra.trace ℚ_[ℓ] Fp (c * ι t)‖ ≤ 1 := by
+theorem main
+    {K : Type} [Field K] [NumberField K]
+    {ℓ : ℕ} [Fact ℓ.Prime]
+    {Fp : Type} [Field Fp] [CharZero Fp] [ValuativeRel Fp] [TopologicalSpace Fp]
+    [IsNonarchimedeanLocalField Fp] [Algebra ℚ_[ℓ] Fp]
+    (hc : Continuous (algebraMap ℚ_[ℓ] Fp)) (hfin : FiniteDimensional ℚ_[ℓ] Fp)
+    (ι : K →+* Fp) (hsurj : Function.Surjective (piMap K ℓ Fp ι))
+    (t : K) (ht : ∀ a : 𝓞 K, ∃ n : ℤ, Algebra.trace ℚ K (t * a) = n)
+    (c : Fp) (hcO : c ∈ 𝒪[Fp])
+    : ‖Algebra.trace ℚ_[ℓ] Fp (c * ι t)‖ ≤ 1 := by
   let π := piMap K ℓ Fp ι
   have hπ1 : ∀ y : K, π (1 ⊗ₜ y) = ι y := piMap_one_tmul K ℓ Fp ι
   let b := NumberField.integralBasis K
@@ -30,13 +34,15 @@ theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {
   let BD := Algebra.TensorProduct.basis ℚ_[ℓ] bd
   have hBD : ∀ i, BD i = 1 ⊗ₜ bd i := fun i => Algebra.TensorProduct.basis_apply bd i
   have : FiniteDimensional ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) := Module.Finite.of_basis BD
-  have htb : ∀ i j, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) ((1 ⊗ₜ bd i) * (1 ⊗ₜ b j)) =
-      if j = i then 1 else 0 := by
+  have htb
+      : ∀ i j,
+        Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) ((1 ⊗ₜ bd i) * (1 ⊗ₜ b j)) = if j = i then 1 else 0 := by
     intro i j
     rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, trace_one_tmul, hdb]
     split_ifs <;> simp
-  have hnd : ∀ γ : ℚ_[ℓ] ⊗[ℚ] K,
-      (∀ j, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (γ * (1 ⊗ₜ b j)) = 0) → γ = 0 := by
+  have hnd
+      : ∀ γ : ℚ_[ℓ] ⊗[ℚ] K,
+        (∀ j, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (γ * (1 ⊗ₜ b j)) = 0) → γ = 0 := by
     intro γ hγ
     have hexp := BD.sum_repr γ
     have hc0 : ∀ j, BD.repr γ j = 0 := by
@@ -45,7 +51,8 @@ theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {
       set_option synthInstance.maxHeartbeats 100000 in
         rw [← hexp, Finset.sum_mul, map_sum] at h
       simpa only [smul_mul_assoc, map_smul, hBD, htb, smul_eq_mul, mul_ite, mul_one, mul_zero,
-        Finset.sum_ite_eq, Finset.mem_univ, if_true] using h
+          Finset.sum_ite_eq, Finset.mem_univ, if_true]
+        using h
     rw [← hexp]
     simp [hc0]
   let φ : ℚ_[ℓ] ⊗[ℚ] K →ₗ[ℚ_[ℓ]] ℚ_[ℓ] := (Algebra.trace ℚ_[ℓ] Fp).comp π.toLinearMap
@@ -56,11 +63,14 @@ theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {
       apply (BA K ℓ).ext
       intro j
       rw [BA_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply]
-      have htb' : ∀ i, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) ((1 ⊗ₜ bd i) * (1 ⊗ₜ integralBasis K j)) =
-          if j = i then 1 else 0 := fun i => htb i j
+      have htb'
+          : ∀ i,
+            Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) ((1 ⊗ₜ bd i) * (1 ⊗ₜ integralBasis K j))
+              = if j = i then 1 else 0 := fun i =>
+        htb i j
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [β, Finset.sum_mul, map_sum, smul_mul_assoc, map_smul, htb', smul_eq_mul, mul_ite, mul_one,
-        mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+        simp only [β, Finset.sum_mul, map_sum, smul_mul_assoc, map_smul, htb', smul_eq_mul, mul_ite,
+          mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
       rfl
     intro x
     exact congrArg (fun L => L x) hL
@@ -69,8 +79,8 @@ theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {
     apply hnd
     intro j
     rw [mul_assoc, hβ, hφ, map_mul π, hx, zero_mul, map_zero]
-  have htr : ∀ x, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (β * x) =
-      Algebra.trace ℚ_[ℓ] Fp (π β * π x) := by
+  have htr
+      : ∀ x, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (β * x) = Algebra.trace ℚ_[ℓ] Fp (π β * π x) := by
     intro x
     rw [trace_of_ker π hsurj (β * x), map_mul]
     intro y hy
@@ -81,8 +91,9 @@ theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {
     obtain ⟨x, hx⟩ := hsurj (π β - 1)⁻¹
     have e1 : Algebra.trace ℚ_[ℓ] Fp ((π β - 1) * π x) = 0 := by
       rw [sub_mul, one_mul, map_sub, ← htr, hβ, hφ, sub_self]
-    rw [hx, mul_inv_cancel₀ hd0, ← map_one (algebraMap ℚ_[ℓ] Fp), Algebra.trace_algebraMap, nsmul_eq_mul,
-      mul_one] at e1
+    rw [hx, mul_inv_cancel₀ hd0, ← map_one (algebraMap ℚ_[ℓ] Fp), Algebra.trace_algebraMap,
+        nsmul_eq_mul, mul_one]
+      at e1
     exact (Nat.cast_ne_zero.2 Module.finrank_pos.ne') e1
   have hidem : β * β = β := by
     have h0 := hker (β - 1) (by rw [map_sub, hπβ, map_one, sub_self])
@@ -103,7 +114,8 @@ theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {
   have hF : Continuous F := by
     refine continuous_pi fun i => ?_
     exact (((BA K ℓ).coord i).comp σ).continuous_of_finiteDimensional
-  have hK : IsCompact (𝒪[Fp] : Set Fp) := isCompact_iff_compactSpace.mpr (inferInstanceAs (CompactSpace 𝒪[Fp]))
+  have hK : IsCompact (𝒪[Fp] : Set Fp) :=
+    isCompact_iff_compactSpace.mpr (inferInstanceAs (CompactSpace 𝒪[Fp]))
   obtain ⟨C, hC⟩ := hK.exists_bound_of_continuousOn hF.continuousOn
   have hℓ1 : (1 : ℝ) < ℓ := by exact_mod_cast (Fact.out : ℓ.Prime).one_lt
   obtain ⟨D, hD⟩ := pow_unbounded_of_one_lt C hℓ1
@@ -111,7 +123,8 @@ theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {
     intro x hx
     rw [mem_S]
     intro i
-    rw [BA_repr_natPow_mul, PadicInt.mem_subring_iff, norm_mul, Padic.norm_p_pow, zpow_neg, zpow_natCast]
+    rw [BA_repr_natPow_mul, PadicInt.mem_subring_iff, norm_mul, Padic.norm_p_pow, zpow_neg,
+      zpow_natCast]
     have hxi : ‖(BA K ℓ).repr (σ x) i‖ ≤ C := (norm_le_pi_norm (F x) i).trans (hC x hx)
     have hpos : (0 : ℝ) < (ℓ : ℝ) ^ D := pow_pos (by linarith) D
     rw [inv_mul_le_one₀ hpos]
@@ -126,17 +139,19 @@ theorem main {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {
       rw [hσpow]
       exact hbound _ (pow_mem hcO _)
 
-  have etr : Algebra.trace ℚ_[ℓ] Fp (c * ι t) =
-      Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (σ c * (1 ⊗ₜ t)) := by
+  have etr
+      : Algebra.trace ℚ_[ℓ] Fp (c * ι t) = Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (σ c * (1 ⊗ₜ t)) := by
     rw [hσ, mul_assoc, hβ, hφ, map_mul π, hg', hπ1]
-  have e : Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (σ c * (1 ⊗ₜ t)) =
-      ∑ i, (BA K ℓ).repr (σ c) i * algebraMap ℚ ℚ_[ℓ] (Algebra.trace ℚ K (integralBasis K i * t)) := by
-    conv_lhs => rw [← (BA K ℓ).sum_repr (σ c)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_mul, map_sum]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    rw [smul_mul_assoc, map_smul, BA_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul, trace_one_tmul,
-      smul_eq_mul]
+  have e
+      : Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (σ c * (1 ⊗ₜ t))
+        = ∑ i, (BA K ℓ).repr (σ c) i * algebraMap ℚ ℚ_[ℓ] (Algebra.trace ℚ K (integralBasis K i * t)) :=
+    by
+      conv_lhs => rw [← (BA K ℓ).sum_repr (σ c)]
+      set_option synthInstance.maxHeartbeats 100000 in
+        rw [Finset.sum_mul, map_sum]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [smul_mul_assoc, map_smul, BA_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul,
+        trace_one_tmul, smul_eq_mul]
   rw [etr, e, ← PadicInt.mem_subring_iff]
   refine Subring.sum_mem _ fun i _ => Subring.mul_mem _ (mem_S.1 hy i) ?_
   obtain ⟨z, hz⟩ := ht (RingOfIntegers.basis K i)

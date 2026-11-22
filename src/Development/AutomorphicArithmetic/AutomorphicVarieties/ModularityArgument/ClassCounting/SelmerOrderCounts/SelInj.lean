@@ -6,8 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-private theorem selInj_delI_inj {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I)
-    (v : I) (hv : D.delI v = 0) : v = 0 := by
+private theorem selInj_delI_inj
+    {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I) (v : I) (hv : D.delI v = 0)
+    : v = 0 := by
   have h1 : D.gI v = (D.a : ℤ) • v := by
     have h := hv
     simp only [Dat.delI, LinearMap.sub_apply, sub_eq_zero] at h
@@ -27,8 +28,8 @@ private theorem selInj_delI_inj {Y I : Type} [AddCommGroup Y] [AddCommGroup I] (
     omega
   · rw [sub_smul, one_smul, ← hn, sub_self]
 
-private theorem selInj_tors_iff {Y : Type} [AddCommGroup Y] (t : Y) :
-    t ∈ Submodule.torsion ℤ Y ↔ ∃ m : ℤ, m ≠ 0 ∧ m • t = 0 := by
+private theorem selInj_tors_iff {Y : Type} [AddCommGroup Y] (t : Y)
+    : t ∈ Submodule.torsion ℤ Y ↔ ∃ m : ℤ, m ≠ 0 ∧ m • t = 0 := by
   rw [Submodule.mem_torsion_iff]
   constructor
   · rintro ⟨⟨m, hm⟩, h⟩
@@ -36,8 +37,8 @@ private theorem selInj_tors_iff {Y : Type} [AddCommGroup Y] (t : Y) :
   · rintro ⟨m, hm, h⟩
     exact ⟨⟨m, mem_nonZeroDivisors_of_ne_zero hm⟩, h⟩
 
-private theorem selInj_mem_mt {Y : Type} [AddCommGroup Y] (l : ℕ) (x : Y) :
-    x ∈ mt Y l ↔ ∃ z : Y, ∃ t ∈ Submodule.torsion ℤ Y, (l : ℤ) • z + t = x := by
+private theorem selInj_mem_mt {Y : Type} [AddCommGroup Y] (l : ℕ) (x : Y)
+    : x ∈ mt Y l ↔ ∃ z : Y, ∃ t ∈ Submodule.torsion ℤ Y, (l : ℤ) • z + t = x := by
   simp only [Ct.mt, Submodule.mem_sup, LinearMap.mem_range]
   constructor
   · rintro ⟨y, ⟨z, rfl⟩, t, ht, h⟩
@@ -45,8 +46,10 @@ private theorem selInj_mem_mt {Y : Type} [AddCommGroup Y] (l : ℕ) (x : Y) :
   · rintro ⟨z, t, ht, h⟩
     exact ⟨_, ⟨z, rfl⟩, t, ht, by simpa using h⟩
 
-theorem UpperTheory.V.ZK.Ct.selInj :
-    ∀ (Y I : Type) [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I), ∀ l : ℕ, (l : ℤ) ∣ (D.a : ℤ) - 1 → 0 < l → Finite (D.SelInv l) → Nat.card {w : D.W // (l : ℤ) • w = 0} ≤ Nat.card (D.SelInv l) := by
+theorem UpperTheory.V.ZK.Ct.selInj
+    : ∀ (Y I : Type) [AddCommGroup Y] [AddCommGroup I] (D : Dat Y I), ∀ l : ℕ,
+      (l : ℤ) ∣ (D.a : ℤ) - 1 → 0 < l → Finite (D.SelInv l)
+        → Nat.card {w : D.W // (l : ℤ) • w = 0} ≤ Nat.card (D.SelInv l) := by
   intro Y I _ _ D l hl hl0 hfin
   have hdel_apply : ∀ y, D.del y = D.g y - (D.a : ℤ) • y := by
     intro y
@@ -54,7 +57,8 @@ theorem UpperTheory.V.ZK.Ct.selInj :
   have hdelI_apply : ∀ v, D.delI v = D.gI v - (D.a : ℤ) • v := by
     intro v
     simp [Dat.delI]
-  have htor : ∀ {y : Y} (m : ℤ), m ≠ 0 → m • y ∈ Submodule.torsion ℤ Y → y ∈ Submodule.torsion ℤ Y := by
+  have htor
+      : ∀ {y : Y} (m : ℤ), m ≠ 0 → m • y ∈ Submodule.torsion ℤ Y → y ∈ Submodule.torsion ℤ Y := by
     intro y m hm h
     obtain ⟨m', hm', h'⟩ := (selInj_tors_iff _).1 h
     exact (selInj_tors_iff y).2 ⟨m' * m, mul_ne_zero hm' hm, by rw [mul_smul, h']⟩
@@ -69,8 +73,10 @@ theorem UpperTheory.V.ZK.Ct.selInj :
     intro t ht
     obtain ⟨m, hm, h⟩ := (selInj_tors_iff t).1 ht
     exact (selInj_tors_iff _).2 ⟨m, hm, by rw [← map_zsmul, h, map_zero]⟩
-  have key : ∀ w : {w : D.W // (l : ℤ) • w = 0}, ∃ u : D.U, Submodule.Quotient.mk u = w.1 ∧
-      ∃ y : Y, ∃ t ∈ Submodule.torsion ℤ Y, (l : ℤ) • (u : Y) = D.del y + t := by
+  have key
+      : ∀ w : {w : D.W // (l : ℤ) • w = 0}, ∃ u : D.U,
+        Submodule.Quotient.mk u = w.1
+          ∧ ∃ y : Y, ∃ t ∈ Submodule.torsion ℤ Y, (l : ℤ) • (u : Y) = D.del y + t := by
     rintro ⟨w, hw⟩
     obtain ⟨u, rfl⟩ := Submodule.Quotient.mk_surjective _ w
     refine ⟨u, rfl, ?_⟩
@@ -84,7 +90,7 @@ theorem UpperTheory.V.ZK.Ct.selInj :
     obtain ⟨c, hc⟩ := hl
     refine ⟨y w, rfl, ?_, ?_⟩
     · rw [selInj_mem_mt]
-      refine ⟨(u w : Y) + c • y w, -t w, neg_mem (ht w), ?_⟩
+      refine ⟨(u w : Y) + c • y w, - t w, neg_mem (ht w), ?_⟩
       rw [smul_add, hyt w, hdel_apply, smul_smul, ← hc, sub_smul, one_smul]
       abel
     · obtain ⟨i, hi⟩ := (u w).2

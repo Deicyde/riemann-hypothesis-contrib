@@ -9,12 +9,18 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverC
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.SncBase
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.SncBase
 
 namespace GlobalTheory.CompanionTheory.Ar.SncBase.Segre
 
-theorem isProjOver_of_closed_product : ∀ (K : Type) [Field K] (M r : ℕ) (X' : Scheme.{0}) (j : X' ⟶ pullback (PSpace.str K M) (PSpace.str K r)), IsClosedImmersion j → IsProjOver (j ≫ pullback.fst _ _ ≫ PSpace.str K M) := by
+theorem isProjOver_of_closed_product
+    : ∀ (K : Type) [Field K] (M r : ℕ) (X' : Scheme.{0})
+        (j : X' ⟶ pullback (PSpace.str K M) (PSpace.str K r)),
+      IsClosedImmersion j → IsProjOver (j ≫ pullback.fst _ _ ≫ PSpace.str K M) := by
   intro K _ M r X' j hj
   have := hj
   exact GlobalTheory.ProjSpace.isProjOver_comp_of_isClosedImmersion j

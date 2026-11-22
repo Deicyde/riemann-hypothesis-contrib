@@ -4,13 +4,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Inclu
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.HeightCounting.FormsStep NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.FormsStep NumberField IsDedekindDomain Polynomial
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem contragredient_isIrreducible : ∀ (k : Type) [Field k] (G : Type) [Group G] (V : Type) [AddCommGroup V] [Module k V] [FiniteDimensional k V]
-    (ρ : Representation k G V), ρ.IsIrreducible → ρ.dual.IsIrreducible := by
+theorem contragredient_isIrreducible
+    : ∀ (k : Type) [Field k] (G : Type) [Group G] (V : Type) [AddCommGroup V] [Module k V]
+        [FiniteDimensional k V] (ρ : Representation k G V),
+      ρ.IsIrreducible → ρ.dual.IsIrreducible := by
   intro k _ G _ V _ _ _ ρ hρ
   haveI : Nontrivial V := by
     by_contra hV
@@ -25,11 +30,14 @@ theorem contragredient_isIrreducible : ∀ (k : Type) [Field k] (G : Type) [Grou
     have hy : y ∈ (⊤ : Subrepresentation ρ.dual).toSubmodule := Submodule.mem_top
     rw [← h'] at hx hy
     exact hxy (((Submodule.mem_bot k).1 hx).trans ((Submodule.mem_bot k).1 hy).symm)
-  · let T : Subrepresentation ρ := ⟨S.toSubmodule.dualCoannihilator, fun g v hv => by
-      rw [Submodule.mem_dualCoannihilator] at hv ⊢
-      intro φ hφ
-      have h1 := hv _ (S.apply_mem_toSubmodule g⁻¹ hφ)
-      simpa [Representation.dual_apply, Module.Dual.transpose_apply] using h1⟩
+  · let T : Subrepresentation ρ := ⟨
+      S.toSubmodule.dualCoannihilator,
+      fun g v hv => by
+        rw [Submodule.mem_dualCoannihilator] at hv ⊢
+        intro φ hφ
+        have h1 := hv _ (S.apply_mem_toSubmodule g⁻¹ hφ)
+        simpa [Representation.dual_apply, Module.Dual.transpose_apply] using h1
+    ⟩
     have hST : S.toSubmodule = T.toSubmodule.dualAnnihilator :=
       (Subspace.dualCoannihilator_dualAnnihilator_eq (W := S.toSubmodule)).symm
     rcases hρ.eq_bot_or_eq_top T with hT | hT

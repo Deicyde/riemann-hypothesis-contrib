@@ -5,15 +5,18 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAmbOfIsAri
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.MixHt
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt
+  GlobalTheory.MixHt
 open Limits
 
 namespace GlobalTheory
 
-theorem range_closedImmersion_eq_closure_genericPoint {X Y : Scheme.{0}} [IsIntegral Y] (i : Y ⟶ X)
-    [IsClosedImmersion i] : Set.range i = closure {i (genericPoint Y)} := by
+theorem range_closedImmersion_eq_closure_genericPoint
+    {X Y : Scheme.{0}} [IsIntegral Y] (i : Y ⟶ X) [IsClosedImmersion i]
+    : Set.range i = closure {i (genericPoint Y)} := by
   have hc : IsClosedMap i := i.isClosedEmbedding.isClosedMap
   have h1 : Set.range i = i '' closure {genericPoint Y} := by
     rw [(genericPoint_spec Y).def, Set.image_univ]
@@ -23,13 +26,15 @@ theorem range_closedImmersion_eq_closure_genericPoint {X Y : Scheme.{0}} [IsInte
   · rw [← Set.image_singleton]
     exact closure_minimal (Set.image_mono subset_closure) (hc _ isClosed_closure)
 
-theorem iso_of_closedImmersion_genericPoint_eq :
-    ∀ (X Y Y' : Scheme.{0}) [IsIntegral Y] [IsIntegral Y'] (i : Y ⟶ X) (i' : Y' ⟶ X)
-      [IsClosedImmersion i] [IsClosedImmersion i'], i (genericPoint Y) = i' (genericPoint Y') →
-      ∃ g : Y' ⟶ Y, IsIso g ∧ g ≫ i = i' ∧ g (genericPoint Y') = genericPoint Y := by
+theorem iso_of_closedImmersion_genericPoint_eq
+    : ∀ (X Y Y' : Scheme.{0}) [IsIntegral Y] [IsIntegral Y'] (i : Y ⟶ X) (i' : Y' ⟶ X)
+        [IsClosedImmersion i] [IsClosedImmersion i'],
+      i (genericPoint Y) = i' (genericPoint Y')
+        → ∃ g : Y' ⟶ Y, IsIso g ∧ g ≫ i = i' ∧ g (genericPoint Y') = genericPoint Y := by
   intro X Y Y' _ _ i i' _ _ h
   have hr : Set.range i = Set.range i' := by
-    rw [range_closedImmersion_eq_closure_genericPoint, range_closedImmersion_eq_closure_genericPoint, h]
+    rw [range_closedImmersion_eq_closure_genericPoint,
+      range_closedImmersion_eq_closure_genericPoint, h]
   have hs : Function.Surjective (pullback.snd i i') := by
     intro y'
     obtain ⟨y, hy⟩ : i' y' ∈ Set.range i := hr ▸ ⟨y', rfl⟩
@@ -47,8 +52,11 @@ theorem iso_of_closedImmersion_genericPoint_eq :
   refine ⟨inv (pullback.snd i i') ≫ pullback.fst i i', inferInstance, ?_, ?_⟩
   · rw [Category.assoc, pullback.condition, IsIso.inv_hom_id_assoc]
   · apply i.isClosedEmbedding.injective
-    have e := congrArg (fun f : Y' ⟶ X => f (genericPoint Y')) (show (inv (pullback.snd i i') ≫ pullback.fst i i') ≫ i = i' by
-      rw [Category.assoc, pullback.condition, IsIso.inv_hom_id_assoc])
+    have e :=
+      congrArg
+        (fun f : Y' ⟶ X => f (genericPoint Y'))
+        (show (inv (pullback.snd i i') ≫ pullback.fst i i') ≫ i = i' by
+          rw [Category.assoc, pullback.condition, IsIso.inv_hom_id_assoc])
     rw [Scheme.Hom.comp_apply] at e
     rw [e, h]
 

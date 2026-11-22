@@ -18,18 +18,20 @@ noncomputable section
 
 section Units
 
-variable {F : Type*} [NormedField F] [LocallyCompactSpace F] [SecondCountableTopology F]
+variable
+  {F : Type*} [NormedField F] [LocallyCompactSpace F] [SecondCountableTopology F]
   [MeasurableSpace F] [BorelSpace F]
 
-theorem integral_unitsMeasure (μ : Measure F) (hμ : μ {0} = 0) (m : ℕ) (g : F → ℂ) :
-    ∫ a : Fˣ, g a ∂unitsMeasure μ m = ∫ x, ((‖x‖ ^ m)⁻¹ : ℝ) • g x ∂μ := by
+theorem integral_unitsMeasure (μ : Measure F) (hμ : μ {0} = 0) (m : ℕ) (g : F → ℂ)
+    : ∫ a : Fˣ, g a ∂unitsMeasure μ m = ∫ x, ((‖x‖ ^ m)⁻¹ : ℝ) • g x ∂μ := by
   have he := measurableEmbedding_units_val (F := F)
   rw [← he.integral_map, unitsMeasure, he.map_comap]
   have hr : Set.range (Units.val : Fˣ → F) = {0}ᶜ := by
     ext x
     simp only [Set.mem_range, Set.mem_compl_iff, Set.mem_singleton_iff]
     exact ⟨fun ⟨u, hu⟩ ↦ hu ▸ u.ne_zero, fun hx ↦ ⟨Units.mk0 x hx, rfl⟩⟩
-  have hac : μ.withDensity (fun x ↦ ENNReal.ofReal (‖x‖ ^ m)⁻¹) ≪ μ := withDensity_absolutelyContinuous _ _
+  have hac : μ.withDensity (fun x ↦ ENNReal.ofReal (‖x‖ ^ m)⁻¹) ≪ μ :=
+    withDensity_absolutelyContinuous _ _
   rw [hr, Measure.restrict_eq_self_of_ae_mem (s := {0}ᶜ) (compl_mem_ae_iff.2 (hac hμ)),
     integral_withDensity_eq_integral_toReal_smul (measurable_density_unitsMeasure m)
       (Filter.Eventually.of_forall fun _ ↦ ENNReal.ofReal_lt_top)]
@@ -39,8 +41,8 @@ theorem integral_unitsMeasure (μ : Measure F) (hμ : μ {0} = 0) (m : ℕ) (g :
 
 end Units
 
-theorem ofReal_pow_cpow {r : ℝ} (hr : 0 < r) (n : ℕ) (c : ℂ) :
-    ((r ^ n : ℝ) : ℂ) ^ c = (r : ℂ) ^ ((n : ℂ) * c) := by
+theorem ofReal_pow_cpow {r : ℝ} (hr : 0 < r) (n : ℕ) (c : ℂ)
+    : ((r ^ n : ℝ) : ℂ) ^ c = (r : ℂ) ^ ((n : ℂ) * c) := by
   have h1 : ((r ^ n : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (pow_pos hr n).ne'
   have h2 : (r : ℂ) ≠ 0 := by exact_mod_cast hr.ne'
   rw [cpow_def_of_ne_zero h1, cpow_def_of_ne_zero h2, ← ofReal_log (pow_pos hr n).le,
@@ -48,8 +50,8 @@ theorem ofReal_pow_cpow {r : ℝ} (hr : 0 < r) (n : ℕ) (c : ℂ) :
   push_cast
   ring_nf
 
-theorem ofReal_div_abs_eq_sign {x : ℝ} (hx : x ≠ 0) :
-    (x : ℂ) / ((|x| : ℝ) : ℂ) = (Real.sign x : ℂ) := by
+theorem ofReal_div_abs_eq_sign {x : ℝ} (hx : x ≠ 0)
+    : (x : ℂ) / ((|x| : ℝ) : ℂ) = (Real.sign x : ℂ) := by
   rcases lt_or_gt_of_ne hx with h | h
   · rw [abs_of_neg h, Real.sign_of_neg h]
     have : (x : ℂ) ≠ 0 := by exact_mod_cast hx
@@ -67,30 +69,32 @@ variable {K : Type*} [Field K] [NumberField K]
 omit [NumberField K] in
 theorem infinitePlaceMeasure_zero (w : InfinitePlace K) : infinitePlaceMeasure w {0} = 0 := by
   by_cases hw : w.IsReal
-  · rw [infinitePlaceMeasure_of_isReal hw, Measure.map_apply
-      (isometryEquivRealOfIsReal hw).symm.continuous.measurable (measurableSet_singleton 0)]
+  · rw [infinitePlaceMeasure_of_isReal hw,
+      Measure.map_apply (isometryEquivRealOfIsReal hw).symm.continuous.measurable
+        (measurableSet_singleton 0)]
     refine measure_mono_null (fun x hx ↦ ?_) (measure_singleton (0 : ℝ))
     simp only [Set.mem_preimage, Set.mem_singleton_iff] at hx ⊢
     rw [← (isometryEquivRealOfIsReal hw).apply_symm_apply x, hx]
     change ringEquivRealOfIsReal hw 0 = 0
     exact map_zero _
   · have hc := not_isReal_iff_isComplex.1 hw
-    rw [infinitePlaceMeasure_of_isComplex hc, Measure.map_apply
-      (isometryEquivComplexOfIsComplex hc).symm.continuous.measurable (measurableSet_singleton 0),
+    rw [infinitePlaceMeasure_of_isComplex hc,
+      Measure.map_apply (isometryEquivComplexOfIsComplex hc).symm.continuous.measurable
+        (measurableSet_singleton 0),
       Measure.smul_apply]
-    refine (mul_eq_zero.2 (Or.inr (measure_mono_null (fun x hx ↦ ?_)
-      (measure_singleton (0 : ℂ))))).trans (by rfl)
+    refine
+      (mul_eq_zero.2 (Or.inr (measure_mono_null (fun x hx ↦ ?_) (measure_singleton (0 : ℂ))))).trans
+        (by rfl)
     simp only [Set.mem_preimage, Set.mem_singleton_iff] at hx ⊢
     rw [← (isometryEquivComplexOfIsComplex hc).apply_symm_apply x, hx]
     change ringEquivComplexOfIsComplex hc 0 = 0
     exact map_zero _
 
-
 omit [NumberField K] in
-theorem integral_infinitePlaceUnitsMeasure_of_isReal {w : InfinitePlace K} (hw : w.IsReal)
-    (g : w.Completion → ℂ) :
-    ∫ a : (w.Completion)ˣ, g a ∂infinitePlaceUnitsMeasure w =
-      ∫ x : ℝ, g ((isometryEquivRealOfIsReal hw).symm x) / ((|x| : ℝ) : ℂ) := by
+theorem integral_infinitePlaceUnitsMeasure_of_isReal
+    {w : InfinitePlace K} (hw : w.IsReal) (g : w.Completion → ℂ)
+    : ∫ a : (w.Completion)ˣ, g a ∂infinitePlaceUnitsMeasure w
+      = ∫ x : ℝ, g ((isometryEquivRealOfIsReal hw).symm x) / ((|x| : ℝ) : ℂ) := by
   rw [infinitePlaceUnitsMeasure, integral_unitsMeasure _ (infinitePlaceMeasure_zero w),
     infinitePlaceMeasure_of_isReal hw]
   have he : MeasurableEmbedding (isometryEquivRealOfIsReal hw).symm :=
@@ -105,13 +109,12 @@ theorem integral_infinitePlaceUnitsMeasure_of_isReal {w : InfinitePlace K} (hw :
   push_cast
   rw [div_eq_inv_mul]
 
-
 omit [NumberField K] in
-theorem integral_infinitePlaceUnitsMeasure_of_isComplex {w : InfinitePlace K} (hw : w.IsComplex)
-    (g : w.Completion → ℂ) :
-    ∫ a : (w.Completion)ˣ, g a ∂infinitePlaceUnitsMeasure w =
-      ∫ z : ℂ, g ((isometryEquivComplexOfIsComplex hw).symm z) / ((‖z‖ ^ 2 : ℝ) : ℂ)
-        ∂complexPlaceMeasure := by
+theorem integral_infinitePlaceUnitsMeasure_of_isComplex
+    {w : InfinitePlace K} (hw : w.IsComplex) (g : w.Completion → ℂ)
+    : ∫ a : (w.Completion)ˣ, g a ∂infinitePlaceUnitsMeasure w
+      = ∫ z : ℂ, g ((isometryEquivComplexOfIsComplex hw).symm z) / ((‖z‖ ^ 2 : ℝ) : ℂ)
+          ∂complexPlaceMeasure := by
   rw [infinitePlaceUnitsMeasure, integral_unitsMeasure _ (infinitePlaceMeasure_zero w),
     infinitePlaceMeasure_of_isComplex hw]
   have he : MeasurableEmbedding (isometryEquivComplexOfIsComplex hw).symm :=
@@ -123,28 +126,31 @@ theorem integral_infinitePlaceUnitsMeasure_of_isComplex {w : InfinitePlace K} (h
     rw [← (isometryEquivComplexOfIsComplex hw).symm.isometry.norm_map_of_map_zero]
     change (ringEquivComplexOfIsComplex hw).symm 0 = 0
     exact map_zero _
-  simp only [mult, if_neg (not_isReal_iff_isComplex.2 hw), hn,
-    Complex.real_smul]
+  simp only [mult, if_neg (not_isReal_iff_isComplex.2 hw), hn, Complex.real_smul]
   push_cast
   rw [div_eq_inv_mul]
 
 end Place
 
-def unitsContinuousHom {A B : Type*} [Ring A] [Ring B] [TopologicalSpace A] [TopologicalSpace B]
-    (e : A ≃+* B) (he : Continuous e) : Aˣ →ₜ* Bˣ where
+def unitsContinuousHom
+    {A B : Type*} [Ring A] [Ring B] [TopologicalSpace A] [TopologicalSpace B]
+    (e : A ≃+* B) (he : Continuous e)
+    : Aˣ →ₜ* Bˣ where
   toMonoidHom := Units.map (e : A →* B)
-  continuous_toFun := Units.continuous_iff.2
-    ⟨he.comp Units.continuous_val, he.comp Units.continuous_coe_inv⟩
+  continuous_toFun :=
+    Units.continuous_iff.2 ⟨he.comp Units.continuous_val, he.comp Units.continuous_coe_inv⟩
 
 namespace HeckeCharacter
 
 variable {K : Type*} [Field K] [NumberField K] (χ : HeckeCharacter K)
 
-theorem exists_infiniteParams (w : InfinitePlace K) :
-    ∃ p : ℤ × ℝ, (w.IsReal → 0 ≤ p.1 ∧ p.1 < 2) ∧ ∀ a : (w.Completion)ˣ,
-      (χ.infiniteComponent w a : ℂ) =
-        (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ p.1 *
-          ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((p.2 : ℂ) * I) := by
+theorem exists_infiniteParams (w : InfinitePlace K)
+    : ∃ p : ℤ × ℝ,
+      (w.IsReal → 0 ≤ p.1 ∧ p.1 < 2)
+        ∧ ∀ a : (w.Completion)ˣ,
+          (χ.infiniteComponent w a : ℂ)
+            = (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ p.1
+              * ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((p.2 : ℂ) * I) := by
   by_cases hw : w.IsReal
   · set e := ringEquivRealOfIsReal hw
     have hec : Continuous e.symm := (isometryEquivRealOfIsReal hw).symm.continuous
@@ -153,8 +159,9 @@ theorem exists_infiniteParams (w : InfinitePlace K) :
     refine ⟨(((a' : ℕ) : ℤ), τ), fun _ ↦ ⟨by positivity, by have := a'.2; omega⟩, fun a ↦ ?_⟩
     have hx := hp (Units.map (e : w.Completion →* ℝ) a)
     have hψ : ψ (Units.map (e : w.Completion →* ℝ) a) = χ.infiniteComponent w a := by
-      change χ.infiniteComponent w (Units.map (e.symm : ℝ →* w.Completion)
-        (Units.map (e : w.Completion →* ℝ) a)) = _
+      change χ.infiniteComponent w
+          (Units.map (e.symm : ℝ →* w.Completion) (Units.map (e : w.Completion →* ℝ) a))
+        = _
       congr 1
       ext
       simp
@@ -177,8 +184,9 @@ theorem exists_infiniteParams (w : InfinitePlace K) :
     refine ⟨(m, τ / 2), fun h ↦ absurd h hw, fun a ↦ ?_⟩
     have hx := hp (Units.map (e : w.Completion →* ℂ) a)
     have hψ : ψ (Units.map (e : w.Completion →* ℂ) a) = χ.infiniteComponent w a := by
-      change χ.infiniteComponent w (Units.map (e.symm : ℂ →* w.Completion)
-        (Units.map (e : w.Completion →* ℂ) a)) = _
+      change χ.infiniteComponent w
+          (Units.map (e.symm : ℂ →* w.Completion) (Units.map (e : w.Completion →* ℂ) a))
+        = _
       congr 1
       ext
       simp
@@ -200,14 +208,14 @@ def infiniteWeight (w : InfinitePlace K) : ℤ := (χ.infiniteParams w).1
 
 def infiniteTau (w : InfinitePlace K) : ℝ := (χ.infiniteParams w).2
 
-theorem infiniteWeight_of_isReal {w : InfinitePlace K} (hw : w.IsReal) :
-    0 ≤ χ.infiniteWeight w ∧ χ.infiniteWeight w < 2 :=
+theorem infiniteWeight_of_isReal {w : InfinitePlace K} (hw : w.IsReal)
+    : 0 ≤ χ.infiniteWeight w ∧ χ.infiniteWeight w < 2 :=
   (χ.exists_infiniteParams w).choose_spec.1 hw
 
-theorem infiniteComponent_eq (w : InfinitePlace K) (a : (w.Completion)ˣ) :
-    (χ.infiniteComponent w a : ℂ) =
-      (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ χ.infiniteWeight w *
-        ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((χ.infiniteTau w : ℂ) * I) :=
+theorem infiniteComponent_eq (w : InfinitePlace K) (a : (w.Completion)ˣ)
+    : (χ.infiniteComponent w a : ℂ)
+      = (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ χ.infiniteWeight w
+        * ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((χ.infiniteTau w : ℂ) * I) :=
   (χ.exists_infiniteParams w).choose_spec.2 a
 
 end HeckeCharacter
@@ -217,29 +225,32 @@ namespace HeckeCharacter
 variable {K : Type*} [Field K] [NumberField K] (χ : HeckeCharacter K)
 
 def infiniteTest (w : InfinitePlace K) (a : w.Completion) : ℂ :=
-  (if 0 < χ.infiniteWeight w then conj (extensionEmbedding w a) else extensionEmbedding w a) ^
-      (χ.infiniteWeight w).natAbs * ((Real.exp (-(π * w.mult * ‖a‖ ^ 2)) : ℝ) : ℂ)
-
+  (if 0 < χ.infiniteWeight w then conj (extensionEmbedding w a) else extensionEmbedding w a)
+      ^ (χ.infiniteWeight w).natAbs
+    * ((Real.exp (-(π * w.mult * ‖a‖ ^ 2)) : ℝ) : ℂ)
 
 open Classical in
 def infiniteGamma (w : InfinitePlace K) (s : ℂ) : ℂ :=
-  if w.IsReal then Gammaℝ (s + χ.infiniteTau w * I + χ.infiniteWeight w)
-  else Gammaℂ (s + χ.infiniteTau w * I + ((χ.infiniteWeight w).natAbs : ℂ) / 2)
-
+  if w.IsReal then
+    Gammaℝ (s + χ.infiniteTau w * I + χ.infiniteWeight w)
+  else
+    Gammaℂ (s + χ.infiniteTau w * I + ((χ.infiniteWeight w).natAbs : ℂ) / 2)
 
 open Classical in
 def infiniteConst (w : InfinitePlace K) : ℂ := if w.IsReal then 1 else π
 
-
-theorem integral_infiniteTest (w : InfinitePlace K) {s : ℂ} (hs : 0 < s.re) :
-    ∫ a : (w.Completion)ˣ, χ.infiniteTest w a * χ.infiniteComponent w a *
-      ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ s ∂infinitePlaceUnitsMeasure w =
-      infiniteConst w * χ.infiniteGamma w s := by
+theorem integral_infiniteTest (w : InfinitePlace K) {s : ℂ} (hs : 0 < s.re)
+    : ∫ a : (w.Completion)ˣ, χ.infiniteTest w a * χ.infiniteComponent w a *
+        ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ s ∂infinitePlaceUnitsMeasure w
+      = infiniteConst w * χ.infiniteGamma w s := by
   set h : w.Completion → ℂ := fun x ↦ χ.infiniteTest w x *
       (extensionEmbedding w x / (‖x‖ : ℂ)) ^ χ.infiniteWeight w *
       (((‖x‖ ^ w.mult : ℝ) : ℂ) ^ ((χ.infiniteTau w : ℂ) * I) * ((‖x‖ ^ w.mult : ℝ) : ℂ) ^ s) with hh
-  have hfun : (fun a : (w.Completion)ˣ ↦ χ.infiniteTest w a * χ.infiniteComponent w a *
-      ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ s) = fun a : (w.Completion)ˣ ↦ h a := by
+  have hfun
+      : (fun a : (w.Completion)ˣ ↦
+          χ.infiniteTest w a * χ.infiniteComponent w a
+            * ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ s)
+        = fun a : (w.Completion)ˣ ↦ h a := by
     funext a
     simp only [h, χ.infiniteComponent_eq]
     ring
@@ -265,8 +276,8 @@ theorem integral_infiniteTest (w : InfinitePlace K) {s : ℂ} (hs : 0 < s.re) :
       by_cases hx : x = 0
       · simp [hx]
       have hx' : (0 : ℝ) < |x| := abs_pos.2 hx
-      simp only [h, infiniteTest, h0, hn, hmult', pow_one, zpow_zero, mul_one,
-        Int.natAbs_zero, pow_zero, one_mul, realGaussian_eq_ofReal, sq_abs]
+      simp only [h, infiniteTest, h0, hn, hmult', pow_one, zpow_zero, mul_one, Int.natAbs_zero,
+        pow_zero, one_mul, realGaussian_eq_ofReal, sq_abs]
       rw [← cpow_add _ _ (by exact_mod_cast hx'.ne')]
       ring_nf
     · rw [h1, Int.cast_one, ← integral_realGaussianOdd_mul_sign_mul_abs_cpow (by linarith)]
@@ -274,8 +285,8 @@ theorem integral_infiniteTest (w : InfinitePlace K) {s : ℂ} (hs : 0 < s.re) :
       by_cases hx : x = 0
       · simp [hx]
       have hx' : (0 : ℝ) < |x| := abs_pos.2 hx
-      simp only [h, infiniteTest, h1, hι, hn, hmult', pow_one, zpow_one,
-        Int.natAbs_one, if_pos zero_lt_one, conj_ofReal, realGaussianOdd, sq_abs]
+      simp only [h, infiniteTest, h1, hι, hn, hmult', pow_one, zpow_one, Int.natAbs_one,
+        if_pos zero_lt_one, conj_ofReal, realGaussianOdd, sq_abs]
       rw [← cpow_add _ _ (by exact_mod_cast hx'.ne'), ofReal_div_abs_eq_sign hx, ofReal_exp]
       push_cast
       ring_nf
@@ -290,19 +301,19 @@ theorem integral_infiniteTest (w : InfinitePlace K) {s : ℂ} (hs : 0 < s.re) :
       exact map_zero _
     have hmult : (w.mult : ℝ) = 2 := by rw [mult, if_neg hw, Nat.cast_ofNat]
     have hmult' : w.mult = 2 := by rw [mult, if_neg hw]
-    have hs'' : 0 < (s + χ.infiniteTau w * I).re + ((-χ.infiniteWeight w).natAbs : ℝ) / 2 := by
+    have hs'' : 0 < (s + χ.infiniteTau w * I).re + ((- χ.infiniteWeight w).natAbs : ℝ) / 2 := by
       positivity
-    have key := integral_complexGaussian_mul_zpow_mul_cpow (-χ.infiniteWeight w) hs''
+    have key := integral_complexGaussian_mul_zpow_mul_cpow (- χ.infiniteWeight w) hs''
     rw [Int.natAbs_neg, neg_neg] at key
     rw [← key]
     refine integral_congr_ae (Filter.Eventually.of_forall fun z ↦ ?_)
     by_cases hz : z = 0
     · simp [hz]
     have hz' : (0 : ℝ) < ‖z‖ ^ 2 := by positivity
-    have htest : χ.infiniteTest w (e.symm z) = complexGaussian (-χ.infiniteWeight w) z := by
+    have htest : χ.infiniteTest w (e.symm z) = complexGaussian (- χ.infiniteWeight w) z := by
       simp only [infiniteTest, hι, hn, hmult, complexGaussian, Int.natAbs_neg]
-      have hexp : ((Real.exp (-(π * 2 * ‖z‖ ^ 2)) : ℝ) : ℂ) =
-          Complex.exp (-2 * π * (‖z‖ : ℂ) ^ 2) := by
+      have hexp
+          : ((Real.exp (-(π * 2 * ‖z‖ ^ 2)) : ℝ) : ℂ) = Complex.exp (-2 * π * (‖z‖ : ℂ) ^ 2) := by
         rw [ofReal_exp]; push_cast; ring_nf
       rw [hexp]
       congr 1

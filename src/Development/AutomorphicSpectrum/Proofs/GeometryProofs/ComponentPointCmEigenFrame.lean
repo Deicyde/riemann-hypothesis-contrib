@@ -14,19 +14,24 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelEige
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
 open GlobalTheory.CompanionTheory.Ar.Flat.Rep
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.Flat.Rep.ValExists
 
 section Linear
-variable {Ω F V ER : Type} [Field Ω] [Field F] [AddCommGroup V] [Module Ω V] [AddCommGroup ER] [Module F ER]
+variable
+  {Ω F V ER : Type}
+  [Field Ω] [Field F] [AddCommGroup V] [Module Ω V] [AddCommGroup ER] [Module F ER]
   {A : Subring Ω} {L : Submodule A V}
 
-theorem mem_span_of_val (Q : Set L) (e : L) (h : (e : V) ∈ Submodule.span A (Subtype.val '' Q)) :
-    e ∈ Submodule.span A Q := by
+theorem mem_span_of_val (Q : Set L) (e : L) (h : (e : V) ∈ Submodule.span A (Subtype.val '' Q))
+    : e ∈ Submodule.span A Q := by
   have h1 : Submodule.span A (Subtype.val '' Q) = (Submodule.span A Q).map L.subtype := by
     rw [Submodule.map_span]; rfl
   rw [h1] at h
@@ -34,8 +39,10 @@ theorem mem_span_of_val (Q : Set L) (e : L) (h : (e : V) ∈ Submodule.span A (S
   have : e' = e := Subtype.ext h2
   exact this ▸ he'
 
-theorem ev_mem_span (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, ∀ e : L, ev (a • e) = r • ev e) (Q : Set L) (e : L)
-    (h : e ∈ Submodule.span A Q) : ev e ∈ Submodule.span F (ev '' Q) := by
+theorem ev_mem_span
+    (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, ∀ e : L, ev (a • e) = r • ev e)
+    (Q : Set L) (e : L) (h : e ∈ Submodule.span A Q)
+    : ev e ∈ Submodule.span F (ev '' Q) := by
   induction h using Submodule.span_induction with
   | mem e he => exact Submodule.subset_span ⟨e, he, rfl⟩
   | zero => rw [map_zero]; exact Submodule.zero_mem _
@@ -45,26 +52,31 @@ theorem ev_mem_span (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, ∀ e : L, ev 
     rw [hr]
     exact Submodule.smul_mem _ _ he
 
-theorem span_ev_le (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, ∀ e : L, ev (a • e) = r • ev e) (Q Q' : Set L)
-    (h : Submodule.span A (Subtype.val '' Q) ≤ Submodule.span A (Subtype.val '' Q')) :
-    Submodule.span F (ev '' Q) ≤ Submodule.span F (ev '' Q') := by
+theorem span_ev_le
+    (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, ∀ e : L, ev (a • e) = r • ev e)
+    (Q Q' : Set L) (h : Submodule.span A (Subtype.val '' Q) ≤ Submodule.span A (Subtype.val '' Q'))
+    : Submodule.span F (ev '' Q) ≤ Submodule.span F (ev '' Q') := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨e, he, rfl⟩
   exact ev_mem_span ev hev Q' e (mem_span_of_val Q' e (h (Submodule.subset_span ⟨e, he, rfl⟩)))
 
-theorem frame_values {O I : Type} (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, ∀ e : L, ev (a • e) = r • ev e)
-    (hspan : Submodule.span F (Set.range ev) = ⊤) {g : ℕ} (hER : Module.finrank F ER = g)
-    (c : Fin g → L) (hcli : LinearIndependent Ω fun i => (c i : V))
-    (hcL : ∀ e : L, e ∈ Submodule.span A (Set.range c))
-    (S : I → Finset (Fin g)) (hcov : ∀ i, ∃ s, i ∈ S s)
+theorem frame_values
+    {O I : Type}
+    (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, ∀ e : L, ev (a • e) = r • ev e)
+    (hspan : Submodule.span F (Set.range ev) = ⊤)
+    {g : ℕ}
+    (hER : Module.finrank F ER = g) (c : Fin g → L) (hcli : LinearIndependent Ω fun i => (c i : V))
+    (hcL : ∀ e : L, e ∈ Submodule.span A (Set.range c)) (S : I → Finset (Fin g))
+    (hcov : ∀ i, ∃ s, i ∈ S s)
     (T : O → (ER →ₗ[F] ER)) (χ : I → O → F)
     (hT : ∀ s, ∀ i ∈ S s, ∀ a, T a (ev (c i)) = χ s a • ev (c i))
-    (hχ : ∀ s t, s ≠ t → ∃ a, χ s a ≠ χ t a) (s₀ : I) {n : ℕ} (b : Fin n → L)
-    (hbli : LinearIndependent Ω fun i => (b i : V))
-    (hbs : Submodule.span A (Set.range fun i => (b i : V)) =
-      Submodule.span A ((fun i => (c i : V)) '' (S s₀ : Set (Fin g)))) :
-    LinearIndependent F (fun i => ev (b i)) ∧
-      ∀ w, (∀ a, T a w = χ s₀ a • w) → w ∈ Submodule.span F (Set.range fun i => ev (b i)) := by
+    (hχ : ∀ s t, s ≠ t → ∃ a, χ s a ≠ χ t a)
+    (s₀ : I)
+    {n : ℕ} (b : Fin n → L) (hbli : LinearIndependent Ω fun i => (b i : V))
+    (hbs : Submodule.span A (Set.range fun i => (b i : V))
+      = Submodule.span A ((fun i => (c i : V)) '' (S s₀ : Set (Fin g))))
+    : LinearIndependent F (fun i => ev (b i))
+      ∧ ∀ w, (∀ a, T a w = χ s₀ a • w) → w ∈ Submodule.span F (Set.range fun i => ev (b i)) := by
   classical
   let f : Fin g → ER := fun i => ev (c i)
   have hfspan : ⊤ ≤ Submodule.span F (Set.range f) := by
@@ -76,15 +88,19 @@ theorem frame_values {O I : Type} (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, 
   have hcard : Fintype.card (Fin g) = Module.finrank F ER := by simp [hER]
   haveI : Module.Finite F ER := ⟨⟨Finset.univ.image f, by
     rw [eq_top_iff]; simpa using hfspan⟩⟩
-  have hfli : LinearIndependent F f := linearIndependent_of_top_le_span_of_card_eq_finrank hfspan hcard
+  have hfli : LinearIndependent F f :=
+    linearIndependent_of_top_le_span_of_card_eq_finrank hfspan hcard
 
-  have himg : (fun i => (c i : V)) '' (S s₀ : Set (Fin g)) = Subtype.val '' (c '' (S s₀ : Set (Fin g))) := by
+  have himg
+      : (fun i => (c i : V)) '' (S s₀ : Set (Fin g))
+        = Subtype.val '' (c '' (S s₀ : Set (Fin g))) := by
     rw [Set.image_image]
   have hrng : (Set.range fun i => (b i : V)) = Subtype.val '' Set.range b := by
     rw [← Set.range_comp]; rfl
-  have hF : Submodule.span F (Set.range fun i => ev (b i)) = Submodule.span F (f '' (S s₀ : Set (Fin g))) := by
-    have e1 : (Set.range fun i => ev (b i)) = ev '' Set.range b := by
-      rw [← Set.range_comp]; rfl
+  have hF
+      : Submodule.span F (Set.range fun i => ev (b i))
+        = Submodule.span F (f '' (S s₀ : Set (Fin g))) := by
+    have e1 : (Set.range fun i => ev (b i)) = ev '' Set.range b := by rw [← Set.range_comp]; rfl
     have e2 : f '' (S s₀ : Set (Fin g)) = ev '' (c '' (S s₀ : Set (Fin g))) := by
       rw [Set.image_image]
     rw [e1, e2]
@@ -92,8 +108,9 @@ theorem frame_values {O I : Type} (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, 
     · rw [← himg, ← hrng, hbs]
     · rw [← himg, ← hrng, hbs]
 
-  have hΩ : Submodule.span Ω (Set.range fun i => (b i : V)) =
-      Submodule.span Ω ((fun i => (c i : V)) '' (S s₀ : Set (Fin g))) := by
+  have hΩ
+      : Submodule.span Ω (Set.range fun i => (b i : V))
+        = Submodule.span Ω ((fun i => (c i : V)) '' (S s₀ : Set (Fin g))) := by
     refine le_antisymm (Submodule.span_le.2 ?_) (Submodule.span_le.2 ?_)
     · intro v hv
       have h1 : v ∈ Submodule.span A ((fun i => (c i : V)) '' (S s₀ : Set (Fin g))) := by
@@ -103,10 +120,13 @@ theorem frame_values {O I : Type} (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, 
       have h1 : v ∈ Submodule.span A (Set.range fun i => (b i : V)) := by
         rw [hbs]; exact Submodule.subset_span hv
       exact Submodule.span_le_restrictScalars A Ω _ h1
-  have hsub : ∀ {K W : Type} [Field K] [AddCommGroup W] [Module K W] (u : Fin g → W), LinearIndependent K u →
-      Module.finrank K (Submodule.span K (u '' (S s₀ : Set (Fin g)))) = (S s₀).card := by
+  have hsub
+      : ∀ {K W : Type} [Field K] [AddCommGroup W] [Module K W] (u : Fin g → W),
+        LinearIndependent K u
+          → Module.finrank K (Submodule.span K (u '' (S s₀ : Set (Fin g)))) = (S s₀).card := by
     intro K W _ _ _ u hu
-    have h1 : LinearIndependent K (fun i : (S s₀ : Set (Fin g)) => u i) := hu.comp _ Subtype.val_injective
+    have h1 : LinearIndependent K (fun i : (S s₀ : Set (Fin g)) => u i) :=
+      hu.comp _ Subtype.val_injective
     have h2 := finrank_span_eq_card h1
     rw [← Set.image_eq_range] at h2
     simpa using h2
@@ -146,8 +166,7 @@ theorem frame_values {O I : Type} (ev : L →+ ER) (hev : ∀ a : A, ∃ r : F, 
         rw [smul_smul, hB]
       have e3 := congrArg (fun q => B.repr q i) (e1.symm.trans e2)
       simp only [Module.Basis.repr_sum_self] at e3
-      have e4 : d i * (χ (t i) a - χ s₀ a) = 0 := by
-        rw [mul_sub, e3, mul_comm]; ring
+      have e4 : d i * (χ (t i) a - χ s₀ a) = 0 := by rw [mul_sub, e3, mul_comm]; ring
       exact (mul_eq_zero.1 e4).elim hi (fun h => ha (sub_eq_zero.1 h))
     rw [hw']
     refine Submodule.sum_mem _ fun i _ => ?_
@@ -160,10 +179,13 @@ section Geo
 
 open GlobalTheory.CompanionTheory.Ar.LieTangent GlobalTheory.CompanionTheory.Ar.Flat.EigVb
 
-theorem finrank_lie_eq {X : Scheme.{0}} (G : Over X) [GrpObj G] [IsCommMonObj G] [Smooth G.hom] {Ω F : Type} [Field Ω]
-    [Field F] (ξ : Sp Ω ⟶ X) (z : Sp F ⟶ X) (h : genPt ξ ⤳ centre z) {V ER : Type} [AddCommGroup V] [Module Ω V]
-    [AddCommGroup ER] [Module F ER] (M : LieModel G ξ V) (MR : LieModel G z ER) :
-    Module.finrank F ER = Module.finrank Ω V := by
+theorem finrank_lie_eq
+    {X : Scheme.{0}} (G : Over X) [GrpObj G] [IsCommMonObj G] [Smooth G.hom]
+    {Ω F : Type} [Field Ω] [Field F]
+    (ξ : Sp Ω ⟶ X) (z : Sp F ⟶ X) (h : genPt ξ ⤳ centre z)
+    {V ER : Type} [AddCommGroup V] [Module Ω V] [AddCommGroup ER] [Module F ER]
+    (M : LieModel G ξ V) (MR : LieModel G z ER)
+    : Module.finrank F ER = Module.finrank Ω V := by
   obtain ⟨R, _, x, hx, F', _, _, MC, n, bas, hp⟩ := LieVB.exists_chart G (centre z)
   obtain ⟨a, ha⟩ := LieVB.exists_lift x z hp
   have hgen : genPt ξ ∈ x.opensRange := h.mem_open x.opensRange.isOpen hp
@@ -172,36 +194,54 @@ theorem finrank_lie_eq {X : Scheme.{0}} (G : Over X) [GrpObj G] [IsCommMonObj G]
   obtain ⟨_, B', -, -⟩ := LieVB.basis_tr φ x ξ hφ MC M bas
   rw [Module.finrank_eq_card_basis B, Module.finrank_eq_card_basis B']
 
-theorem valAt_act {X : Scheme.{0}} {G : Over X} [GrpObj G] {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {V : Type}
-    [AddCommGroup V] [Module Ω V] (M : LieModel G ξ V) (f : G ⟶ G) [IsMonHom f] (A : V →ₗ[Ω] V)
-    (hA : M.IsDiffOf f A) {R : Type} [CommRing R] [IsLocalRing R] {z : Sp R ⟶ X} {e : V} {w : epsAt z ⟶ G}
-    (h : M.ValAt z e w) : M.ValAt z (A e) (w ≫ f) := by
+theorem valAt_act
+    {X : Scheme.{0}} {G : Over X} [GrpObj G]
+    {Ω : Type} [Field Ω]
+    {ξ : Sp Ω ⟶ X} {V : Type} [AddCommGroup V] [Module Ω V]
+    (M : LieModel G ξ V)
+    (f : G ⟶ G) [IsMonHom f]
+    (A : V →ₗ[Ω] V) (hA : M.IsDiffOf f A)
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {z : Sp R ⟶ X} {e : V} {w : epsAt z ⟶ G} (h : M.ValAt z e w)
+    : M.ValAt z (A e) (w ≫ f) := by
   obtain ⟨h1, v, hv, hw⟩ := h
   refine ⟨h1, v ≫ f, extends_act M f A hA _ hv, ?_⟩
   rw [Over.comp_left, hw, Over.comp_left]
   exact Category.assoc _ _ _
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F} {Y : Model Xo c β} {U : Set (Xo.XF c)}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F} {Y : Model Xo c β} {U : Set (Xo.XF c)}
 
-theorem mem_genFib (Z : CptOver Y U) {F : Type} [Field F] (y : Sp F ⟶ Xo.XF c)
-    (h : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j)) : (⟨_, h⟩ : Cpt (Z.ξ₀ ≫ Y.j)) ∈ Z.genFib :=
-  ⟨Y.jQ (y (IsLocalRing.closedPoint F)), ((Scheme.Hom.comp_apply y (Y.jQ ≫ pullback.fst _ _) _).trans
-      (Scheme.Hom.comp_apply Y.jQ (pullback.fst _ _) _)).symm⟩
+theorem mem_genFib
+    (Z : CptOver Y U)
+    {F : Type} [Field F]
+    (y : Sp F ⟶ Xo.XF c) (h : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j))
+    : (⟨_, h⟩ : Cpt (Z.ξ₀ ≫ Y.j)) ∈ Z.genFib := ⟨
+  Y.jQ (y (IsLocalRing.closedPoint F)),
+  ((Scheme.Hom.comp_apply y (Y.jQ ≫ pullback.fst _ _) _).trans
+    (Scheme.Hom.comp_apply Y.jQ (pullback.fst _ _) _)).symm
+⟩
 
-theorem pt_over {F : Type} [Field F] (βF : c.F →+* F) (y : Sp F ⟶ Xo.XF c)
-    (hy : y ≫ pullback.snd _ _ = spMap βF) : (y ≫ Y.j) ≫ Y.s = spMap (βF.comp β) := by
+theorem pt_over
+    {F : Type} [Field F]
+    (βF : c.F →+* F) (y : Sp F ⟶ Xo.XF c) (hy : y ≫ pullback.snd _ _ = spMap βF)
+    : (y ≫ Y.j) ≫ Y.s = spMap (βF.comp β) := by
   have h1 : Y.j ≫ Y.s = pullback.snd _ _ ≫ spMap β := by
     show (Y.jQ ≫ pullback.fst _ _) ≫ Y.s = _
     rw [Category.assoc, pullback.condition, ← Category.assoc, Y.jQ_over]
   rw [Category.assoc, h1, ← Category.assoc, hy]
   simp only [spMap, CommRingCat.ofHom_comp, Spec.map_comp]
 
-theorem val_inc (Z : CptOver Y U) (hβ : Function.Injective β)
-    (hfr : ∀ x : c.F, ∃ a b : O, β b ≠ 0 ∧ x * β b = β a) {F : Type} [Field F] (βF : c.F →+* F)
-    (y : Sp F ⟶ Xo.XF c) (hy : y ≫ pullback.snd _ _ = spMap βF)
-    (h : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j)) (t : c.F) :
-    ValAt (Z.ξ₀ ≫ Y.j) (y ≫ Y.j) (Z.inc t) (βF t) := by
+theorem val_inc
+    (Z : CptOver Y U)
+    (hβ : Function.Injective β) (hfr : ∀ x : c.F, ∃ a b : O, β b ≠ 0 ∧ x * β b = β a)
+    {F : Type} [Field F]
+    (βF : c.F →+* F) (y : Sp F ⟶ Xo.XF c)
+    (hy : y ≫ pullback.snd _ _ = spMap βF) (h : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j))
+    (t : c.F)
+    : ValAt (Z.ξ₀ ≫ Y.j) (y ≫ Y.j) (Z.inc t) (βF t) := by
   let p : Cpt (Z.ξ₀ ≫ Y.j) := ⟨_, h⟩
   obtain ⟨s, hs⟩ := inc_mem_regAt Z hβ hfr p (mem_genFib Z y h) t
   refine ⟨h, s, hs, ?_⟩
@@ -220,7 +260,8 @@ theorem val_inc (Z : CptOver Y U) (hβ : Function.Injective β)
     refine LieVB.spec_cancel (𝟙 _) ?_
     rw [Category.comp_id, Category.comp_id, ← LieVB.spec_comp', ht]
     refine Eq.trans ?_ (pt_over (Y := Y) βF y hy)
-    have e : Spec.map (CommRingCat.ofHom vz) ≫ Y.X.fromSpecStalk p.1 = y ≫ Y.j := spec_centre (y ≫ Y.j)
+    have e : Spec.map (CommRingCat.ofHom vz) ≫ Y.X.fromSpecStalk p.1 = y ≫ Y.j :=
+      spec_centre (y ≫ Y.j)
     show _ ≫ Y.X.fromSpecStalk p.1 ≫ Y.s = _
     rw [← Category.assoc, e]
   obtain ⟨a, b, hb, hx⟩ := hfr t
@@ -233,9 +274,11 @@ theorem val_inc (Z : CptOver Y U) (hβ : Function.Injective β)
   rw [map_mul, v1, v2, ← hx, map_mul] at h4
   exact mul_right_cancel₀ ((map_ne_zero βF).2 hb) h4
 
-theorem lat_eq_iSup (Z : CptOver Y U) (hβ : Function.Injective β)
-    (hfr : ∀ x : c.F, ∃ a b : O, β b ≠ 0 ∧ x * β b = β a) (x : Cpt (Z.ξ₀ ≫ Y.j)) (hx : x ∈ Z.genFib) :
-    Z.M.lat x = ⨆ s : E →+* ℂ, Z.eig s x := by
+theorem lat_eq_iSup
+    (Z : CptOver Y U)
+    (hβ : Function.Injective β) (hfr : ∀ x : c.F, ∃ a b : O, β b ≠ 0 ∧ x * β b = β a)
+    (x : Cpt (Z.ξ₀ ≫ Y.j)) (hx : x ∈ Z.genFib)
+    : Z.M.lat x = ⨆ s : E →+* ℂ, Z.eig s x := by
   classical
   haveI : CharZero Z.Ω := charZero_of_injective_ringHom Z.inc.injective
   let σ : (E →+* ℂ) → (𝓞 E →+* Z.Ω) := fun s => Z.inc.comp (tauIn c s)
@@ -257,8 +300,8 @@ theorem lat_eq_iSup (Z : CptOver Y U) (hβ : Function.Injective β)
   have hst : ∀ p ∈ Z.genFib, ∀ a, ∀ e ∈ Z.M.lat p, Z.ρ a e ∈ Z.M.lat p := fun p _ a e he => by
     haveI := Y.t.act.hom a
     exact lat_stable Z.M _ (Z.ρ a) (Z.act a) p he
-  have hreg : ∀ p ∈ Z.genFib, ∀ s a, σ s a ∈ regAt (Z.ξ₀ ≫ Y.j) p :=
-    fun p hp s a => inc_mem_regAt Z hβ hfr p hp (tauIn c s a)
+  have hreg : ∀ p ∈ Z.genFib, ∀ s a, σ s a ∈ regAt (Z.ξ₀ ≫ Y.j) p := fun p hp s a =>
+    inc_mem_regAt Z hβ hfr p hp (tauIn c s a)
   have hdisc : ∀ p ∈ Z.genFib, unitAt (Z.ξ₀ ≫ Y.j) p ((discr E : ℤ) : Z.Ω) := by
     intro p hp
     have hmem := inc_mem_regAt Z hβ hfr p hp
@@ -267,11 +310,11 @@ theorem lat_eq_iSup (Z : CptOver Y U) (hβ : Function.Injective β)
     refine ⟨by rw [e]; exact (map_ne_zero _).2 h0, by rw [e]; exact hmem _, ?_⟩
     rw [e, ← map_inv₀]
     exact hmem _
-  exact (EigSplit.isVBOn_eigSp Y.X Z.Ω (Z.ξ₀ ≫ Y.j) Z.V E Z.ρ Z.M.lat Z.genFib _ (E →+* ℂ) σ Z.gen hσ
-    hcard hVB hst hreg hdisc).2 x hx
+  exact (EigSplit.isVBOn_eigSp Y.X Z.Ω (Z.ξ₀ ≫ Y.j) Z.V E Z.ρ Z.M.lat Z.genFib _ (E →+* ℂ) σ Z.gen
+    hσ hcard hVB hst hreg hdisc).2 x hx
 
-theorem exists_ne_tauIn {F : Type} [Field F] (βF : c.F →+* F) (s t : E →+* ℂ) (h : s ≠ t) :
-    ∃ a : 𝓞 E, βF (tauIn c s a) ≠ βF (tauIn c t a) := by
+theorem exists_ne_tauIn {F : Type} [Field F] (βF : c.F →+* F) (s t : E →+* ℂ) (h : s ≠ t)
+    : ∃ a : 𝓞 E, βF (tauIn c s a) ≠ βF (tauIn c t a) := by
   by_contra hn
   push_neg at hn
   refine h (IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E)) ?_)
@@ -285,7 +328,19 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat.Rep
 
 open GlobalTheory.CompanionTheory.Ar.Flat.Rep.ValExists GlobalTheory.CompanionTheory.Ar.Flat.EigVb
 
-theorem valFam_eigFrame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (U : Set (Xo.XF c)) (Z : CptOver Y U) (τ : E →+* ℂ), (Function.Injective β ∧ IsNoetherianRing O ∧ ∀ x : c.F, ∃ a b : O, β b ≠ 0 ∧ x * β b = β a) → τ (H.rt : E) = H.rt0 → ∀ (F : Type) [Field F] (βF : c.F →+* F) (y : Sp F ⟶ Xo.XF c), y ≫ pullback.snd _ _ = spMap βF → Set.range y ⊆ U → ∀ (h : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j)) (σ : E →+* ℂ) (n : ℕ) (b : Fin n → Z.V), (Z.eig σ).IsFrameAt b ⟨_, h⟩ → ∃ v : Vecs y n, IsValFam Z y b v ∧ IsEigFrame Xo.univ.t.act (under y) (βF.comp (tauIn c σ)) v := by
+theorem valFam_eigFrame
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
+        (U : Set (Xo.XF c)) (Z : CptOver Y U) (τ : E →+* ℂ),
+      (Function.Injective β ∧ IsNoetherianRing O ∧ ∀ x : c.F, ∃ a b : O, β b ≠ 0 ∧ x * β b = β a)
+        → τ (H.rt : E) = H.rt0
+        → ∀ (F : Type) [Field F] (βF : c.F →+* F) (y : Sp F ⟶ Xo.XF c),
+          y ≫ pullback.snd _ _ = spMap βF → Set.range y ⊆ U
+            → ∀ (h : genPt (Z.ξ₀ ≫ Y.j) ⤳ centre (y ≫ Y.j)) (σ : E →+* ℂ) (n : ℕ) (b : Fin n → Z.V),
+              (Z.eig σ).IsFrameAt b ⟨_, h⟩
+                → ∃ v : Vecs y n,
+                  IsValFam Z y b v
+                    ∧ IsEigFrame Xo.univ.t.act (under y) (βF.comp (tauIn c σ)) v := by
   intro E _ _ _ H D l Xo c O _ β Y U Z τ hβ hτ F _ βF y hy _ h σ n b hb
   classical
   obtain ⟨hinj, -, hfr⟩ := id hβ
@@ -298,12 +353,16 @@ theorem valFam_eigFrame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
   obtain ⟨g, cc, ⟨hcli, hcL⟩, hS⟩ := h3 x hx
   choose S hS using hS
   obtain ⟨ER, _, _, ⟨MR⟩⟩ := lieModel_exists Y.X Y.t.G F z
-  obtain ⟨ρF, hρF, -⟩ := lieModel_exists_unique_act _ Y.t.G F z ER MR (𝓞 E) Y.t.act.act Y.t.act.hom Y.t.act.one
-    Y.t.act.mul Y.t.act.add
-  obtain ⟨ev, hev1, hev2, hev3⟩ := GlobalTheory.T.lie_lattice_eval_at_local_ring Y.X Y.t.G Z.Ω ξ Z.V Z.M F z h ER MR Z.gen inferInstance
+  obtain ⟨ρF, hρF, -⟩ :=
+    lieModel_exists_unique_act _ Y.t.G F z ER MR (𝓞 E) Y.t.act.act Y.t.act.hom Y.t.act.one
+      Y.t.act.mul Y.t.act.add
+  obtain ⟨ev, hev1, hev2, hev3⟩ :=
+    GlobalTheory.T.lie_lattice_eval_at_local_ring Y.X Y.t.G Z.Ω ξ Z.V Z.M F z h ER MR Z.gen
+      inferInstance
   have hval : ∀ e : Z.M.lat x, Z.M.ValAt z e (MR.pt (ev e)) := fun e => (hev1 e _).2 ⟨e.2, rfl⟩
-  have hEig : ∀ (s : E →+* ℂ) (e : Z.M.lat x), (e : Z.V) ∈ Z.eig s x → ∀ a : 𝓞 E,
-      ρF a (ev e) = βF (tauIn c s a) • ev e := by
+  have hEig
+      : ∀ (s : E →+* ℂ) (e : Z.M.lat x),
+        (e : Z.V) ∈ Z.eig s x → ∀ a : 𝓞 E, ρF a (ev e) = βF (tauIn c s a) • ev e := by
     intro s e he a
     haveI := Y.t.act.hom a
     have hmem : (e : Z.V) ∈ eigSp Z.ρ (Z.inc.comp (tauIn c s)) := he.2
@@ -316,8 +375,7 @@ theorem valFam_eigFrame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
     have h4 : (⟨Z.ρ a e, he'⟩ : Z.M.lat x) = (⟨_, hreg⟩ : regAt ξ x) • e := Subtype.ext hρ
     rw [← h2, h4]
     exact hev2 ⟨_, hreg⟩ _ e (val_inc Z hinj hfr βF y hy h _)
-  have hmemL : ∀ i, cc i ∈ Z.M.lat x := fun i => by
-    rw [hcL]; exact Submodule.subset_span ⟨i, rfl⟩
+  have hmemL : ∀ i, cc i ∈ Z.M.lat x := fun i => by rw [hcL]; exact Submodule.subset_span ⟨i, rfl⟩
   let cL : Fin g → Z.M.lat x := fun i => ⟨cc i, hmemL i⟩
   have hcov : ∀ i, ∃ s, i ∈ S s := by
     intro i
@@ -337,37 +395,39 @@ theorem valFam_eigFrame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
     have htop : Submodule.span Z.Ω (Set.range cc) = ⊤ := by
       rw [eq_top_iff, ← hb₀, Submodule.span_le]
       rintro _ ⟨j, rfl⟩
-      have h1 : b₀ j ∈ Z.M.lat x := by
-        rw [hL]; exact Submodule.subset_span ⟨j, rfl⟩
+      have h1 : b₀ j ∈ Z.M.lat x := by rw [hL]; exact Submodule.subset_span ⟨j, rfl⟩
       rw [hcL] at h1
       exact Submodule.span_le_restrictScalars (regAt ξ x) Z.Ω _ h1
     have h2 := finrank_span_eq_card hcli
     rw [htop, finrank_top] at h2
     simpa using h2
-  have hbmem : ∀ i, b i ∈ Z.eig σ x := fun i => by
-    rw [hb.2]; exact Submodule.subset_span ⟨i, rfl⟩
+  have hbmem : ∀ i, b i ∈ Z.eig σ x := fun i => by rw [hb.2]; exact Submodule.subset_span ⟨i, rfl⟩
   let bL : Fin n → Z.M.lat x := fun i => ⟨b i, (hbmem i).1⟩
   have hcE : ∀ s, ∀ i ∈ S s, cc i ∈ Z.eig s x := fun s i hi => by
     rw [hS s]; exact Submodule.subset_span ⟨i, hi, rfl⟩
   have hcLs : ∀ e : Z.M.lat x, e ∈ Submodule.span (regAt ξ x) (Set.range cL) := by
     intro e
     refine mem_span_of_val _ e ?_
-    have h1 : Subtype.val '' Set.range cL = Set.range cc := by
-      rw [← Set.range_comp]; rfl
+    have h1 : Subtype.val '' Set.range cL = Set.range cc := by rw [← Set.range_comp]; rfl
     rw [h1, ← hcL]
     exact e.2
-  obtain ⟨li, sp⟩ := frame_values (A := regAt ξ x) (L := Z.M.lat x) ev
-    (fun a => by
-      obtain ⟨s, hs⟩ := a.2
-      exact ⟨_, fun e => hev2 a _ e ⟨h, s, hs, rfl⟩⟩) hev3 hfin cL hcli hcLs S hcov
-    (fun a => (ρF a : ER →ₗ[F] ER)) (fun s a => βF (tauIn c s a))
-    (fun s i hi a => hEig s (cL i) (hcE s i hi) a)
-    (fun s t hst => exists_ne_tauIn βF s t hst) σ bL hb.1 (hb.2.symm.trans (hS σ))
+  obtain ⟨li, sp⟩ :=
+    frame_values (A := regAt ξ x) (L := Z.M.lat x) ev
+      (fun a => by
+        obtain ⟨s, hs⟩ := a.2
+        exact ⟨_, fun e => hev2 a _ e ⟨h, s, hs, rfl⟩⟩)
+      hev3 hfin cL hcli hcLs S hcov
+      (fun a => (ρF a : ER →ₗ[F] ER))
+      (fun s a => βF (tauIn c s a))
+      (fun s i hi a => hEig s (cL i) (hcE s i hi) a)
+      (fun s t hst => exists_ne_tauIn βF s t hst)
+      σ bL hb.1 (hb.2.symm.trans (hS σ))
   have hmemE : ∀ u, u ∈ eigSp ρF (βF.comp (tauIn c σ)) ↔ ∀ a, ρF a u = βF (tauIn c σ a) • u := by
     intro u
     simp [eigSp, Submodule.mem_iInf, sub_eq_zero]
   have final : IsEigFrame Y.t.act z (βF.comp (tauIn c σ)) (fun k => MR.pt (ev (bL k))) := by
-    refine (((GlobalTheory.T.lie_model_eigenvectors_action Y.X F Y.t.G z ER MR).2 (𝓞 E) Y.t.act ρF _ hρF).2 n _).2 ⟨li, le_antisymm ?_ ?_⟩
+    refine (((GlobalTheory.T.lie_model_eigenvectors_action Y.X F Y.t.G z ER MR).2 (𝓞 E) Y.t.act ρF _
+      hρF).2 n _).2 ⟨li, le_antisymm ?_ ?_⟩
     · refine Submodule.span_le.2 ?_
       rintro _ ⟨k, rfl⟩
       exact (hmemE _).2 (hEig σ (bL k) (hbmem k))

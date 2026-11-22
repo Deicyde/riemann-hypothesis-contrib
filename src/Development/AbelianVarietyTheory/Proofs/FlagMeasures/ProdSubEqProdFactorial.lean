@@ -9,14 +9,15 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp
+open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf
+  GlobalTheory.Amp
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.WeylDimU
 
-theorem prod_sub_eq_prod_factorial (k : ℕ) :
-    ∏ a : Fin k, ∏ b ∈ Finset.univ.filter (fun b : Fin k => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ)) =
-      ∏ i ∈ Finset.range k, (i.factorial : ℝ) := by
+theorem prod_sub_eq_prod_factorial (k : ℕ)
+    : ∏ a : Fin k, ∏ b ∈ Finset.univ.filter (fun b : Fin k => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ))
+      = ∏ i ∈ Finset.range k, (i.factorial : ℝ) := by
   rcases k with _ | m
   · simp
   have h := Matrix.det_vandermonde_id_eq_superFactorial (R := ℝ) m
@@ -24,10 +25,13 @@ theorem prod_sub_eq_prod_factorial (k : ℕ) :
   simp only [Finset.filter_lt_eq_Ioi]
   rw [← h]
 
-theorem finrank_space {k : ℕ} (lam : Formalism.BasicNotions.DomWeight k) (u : Fin k → ℝ)
-    (hu : ∀ a, (lam.w a : ℝ) = u a - (((k : ℝ) - 1) / 2 - (a : ℕ))) :
-    (Module.finrank ℂ (GlobalTheory.DualWeyl.Space lam.natW) : ℝ) = vand u / ∏ i ∈ Finset.range k, (i.factorial : ℝ) := by
-  have h := Formalism.L2.G.Model.weyl_dualWeyl ℂ k lam.natW (Formalism.BasicNotions.factNatW k lam).1
+theorem finrank_space
+    {k : ℕ} (lam : Formalism.BasicNotions.DomWeight k) (u : Fin k → ℝ)
+    (hu : ∀ a, (lam.w a : ℝ) = u a - (((k : ℝ) - 1) / 2 - (a : ℕ)))
+    : (Module.finrank ℂ (GlobalTheory.DualWeyl.Space lam.natW) : ℝ)
+      = vand u / ∏ i ∈ Finset.range k, (i.factorial : ℝ) := by
+  have h :=
+    Formalism.L2.G.Model.weyl_dualWeyl ℂ k lam.natW (Formalism.BasicNotions.factNatW k lam).1
   have h2 := congrArg (fun q : ℚ => (q : ℝ)) h
   simp only [Rat.cast_natCast, Rat.cast_prod] at h2
   refine Eq.trans h2 ?_
@@ -41,9 +45,11 @@ theorem finrank_space {k : ℕ} (lam : Formalism.BasicNotions.DomWeight k) (u : 
     linarith [hu a, hu b, GlobalTheory.NablaType.natW_add lam a, GlobalTheory.NablaType.natW_add lam b]
   · simp
 
-theorem finrank_eq (k : ℕ) (u : Fin k → ℝ) (hu : IsHCParam u) (H : Type) [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)) (hπ : IsHCTypeU k u π) :
-    (Module.finrank ℂ H : ℝ) = vand u / ∏ i ∈ Finset.range k, (i.factorial : ℝ) := by
+theorem finrank_eq
+    (k : ℕ) (u : Fin k → ℝ) (hu : IsHCParam u)
+    (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)) (hπ : IsHCTypeU k u π)
+    : (Module.finrank ℂ H : ℝ) = vand u / ∏ i ∈ Finset.range k, (i.factorial : ℝ) := by
   obtain ⟨hs, hm⟩ := hu
   choose m hm using hm
   have hm' : StrictAnti m := fun a b hab => by
@@ -72,16 +78,25 @@ theorem finrank_eq (k : ℕ) (u : Fin k → ℝ) (hu : IsHCParam u) (H : Type) [
       funext a
       unfold allPos
       rw [GlobalTheory.DefiniteCheck.lowK_const, hw]
-  obtain ⟨A, -⟩ := GlobalTheory.UnitaryHighestWeightUnique.exists_equiv_of_isHCTypeU k u _ _ _ _ hπ hT
+  obtain ⟨A, -⟩ :=
+    GlobalTheory.UnitaryHighestWeightUnique.exists_equiv_of_isHCTypeU k u _ _ _ _ hπ hT
   rw [A.finrank_eq]
   exact finrank_space lam u hw
 
-theorem weyl_dimension : ∀ (k : ℕ) (u : Fin k → ℝ), IsHCParam u → (∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)), IsHCTypeU k u π → (Module.finrank ℂ H : ℝ) = vand u / ∏ i ∈ Finset.range k, (i.factorial : ℝ)) ∧ (dimPiU k u : ℝ) = vand u / ∏ i ∈ Finset.range k, (i.factorial : ℝ) := by
+theorem weyl_dimension
+    : ∀ (k : ℕ) (u : Fin k → ℝ),
+      IsHCParam u
+        → (∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+              (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)),
+            IsHCTypeU k u π
+              → (Module.finrank ℂ H : ℝ) = vand u / ∏ i ∈ Finset.range k, (i.factorial : ℝ))
+          ∧ (dimPiU k u : ℝ) = vand u / ∏ i ∈ Finset.range k, (i.factorial : ℝ) := by
   intro k u hu
   refine ⟨fun H _ _ π hπ => finrank_eq k u hu H π hπ, ?_⟩
   obtain ⟨H, _, _, π, hπ⟩ := GlobalTheory.CompactDS.exists_isHCTypeU k u hu
-  have hne : {d | ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
-      (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)), IsHCTypeU k u π ∧ Module.finrank ℂ H = d}.Nonempty :=
+  have hne
+      : {d | ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
+        (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)), IsHCTypeU k u π ∧ Module.finrank ℂ H = d}.Nonempty :=
     ⟨_, H, _, _, π, hπ, rfl⟩
   obtain ⟨H', _, _, π', hπ', e⟩ := Nat.sInf_mem hne
   rw [dimPiU, ← e]

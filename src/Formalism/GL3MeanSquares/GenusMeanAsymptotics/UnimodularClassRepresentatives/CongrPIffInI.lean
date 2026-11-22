@@ -30,26 +30,32 @@ theorem inI_int (h𝔭 : 𝔭.IsMaximal) {k : ℕ} {z : 𝓞 K} : InI 𝔭 k (κ
 theorem inI_ι (h𝔭 : 𝔭.IsMaximal) {k : ℕ} {n : 𝓞 F} : InI 𝔭 k (κ (ι n)) ↔ n ∈ 𝔭 ^ k :=
   (inI_int (z := ι n) h𝔭).trans (mem_pow_iff (K := K) 𝔭 k n)
 
-theorem InI.of_mul (hp : 𝔭.IsPrime) {k : ℕ} {t : 𝓞 F} (ht : t ∉ 𝔭) {a : K}
-    (h : InI 𝔭 k (κ (ι t) * a)) : InI 𝔭 k a := by
+theorem InI.of_mul
+    (hp : 𝔭.IsPrime) {k : ℕ} {t : 𝓞 F} (ht : t ∉ 𝔭) {a : K} (h : InI 𝔭 k (κ (ι t) * a))
+    : InI 𝔭 k a := by
   obtain ⟨u, hu, z, hz, e⟩ := h
-  exact ⟨u * t, fun h => (hp.mem_or_mem h).elim hu ht, z, hz, by rw [e, map_mul, map_mul, mul_assoc]⟩
+  exact
+    ⟨u * t, fun h => (hp.mem_or_mem h).elim hu ht, z, hz, by rw [e, map_mul, map_mul, mul_assoc]⟩
 
 theorem InI.zero (hp : 𝔭.IsPrime) (k : ℕ) : InI (K := K) 𝔭 k 0 :=
   ⟨1, fun h => hp.ne_top ((Ideal.eq_top_iff_one 𝔭).2 h), 0, zero_mem _, by simp⟩
 
-theorem exists_frac (hF : IsFixF K F) {D : K} (hD : star D = D) (h0 : InI 𝔭 0 D) :
-    ∃ t δ : 𝓞 F, t ∉ 𝔭 ∧ κ (ι δ) = κ (ι t) * D := by
+theorem exists_frac (hF : IsFixF K F) {D : K} (hD : star D = D) (h0 : InI 𝔭 0 D)
+    : ∃ t δ : 𝓞 F, t ∉ 𝔭 ∧ κ (ι δ) = κ (ι t) * D := by
   obtain ⟨t, ht, z, -, e⟩ := h0
-  obtain ⟨δ, hδ⟩ := (conjO_eq_iff_mem_range hF z).1 (by
-    apply RingOfIntegers.coe_injective
-    show star (κ z) = κ z
-    rw [e, star_mul', hD, star_ι hF])
+  obtain ⟨δ, hδ⟩ :=
+    (conjO_eq_iff_mem_range hF z).1 (by
+      apply RingOfIntegers.coe_injective
+      show star (κ z) = κ z
+      rw [e, star_mul', hD, star_ι hF])
   exact ⟨t, δ, ht, by rw [hδ, e]⟩
 
-theorem InI.divK (h𝔭 : 𝔭.IsMaximal) (hF : IsFixF K F) {D : K} (hD : star D = D) (h0 : InI 𝔭 0 D)
-    {v : ℕ} (hv : ¬ InI 𝔭 (v + 1) D) {k : ℕ} {a : K} (ha : InI 𝔭 (v + k) a) :
-    InI 𝔭 k (D⁻¹ * a) := by
+theorem InI.divK
+    (h𝔭 : 𝔭.IsMaximal) (hF : IsFixF K F)
+    {D : K} (hD : star D = D) (h0 : InI 𝔭 0 D)
+    {v : ℕ} (hv : ¬ InI 𝔭 (v + 1) D)
+    {k : ℕ} {a : K} (ha : InI 𝔭 (v + k) a)
+    : InI 𝔭 k (D⁻¹ * a) := by
   obtain ⟨t, δ, ht, e⟩ := exists_frac hF hD h0
   have hδv : δ ∉ 𝔭 ^ (v + 1) := fun h =>
     hv (InI.of_mul h𝔭.isPrime ht (by rw [← e]; exact (inI_ι h𝔭).2 h))

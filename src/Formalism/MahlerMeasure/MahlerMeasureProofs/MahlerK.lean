@@ -14,8 +14,9 @@ theorem mahler_binomial_unit_ball : MahlerK := by
   have : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ_[p] K).injective
   set P : ℚ[X] := Polynomial.C ((k.factorial : ℚ)⁻¹) *
     (descPochhammer ℚ k).comp (Polynomial.C ((p : ℚ) ^ h) * X + Polynomial.C (t₀ : ℚ)) with hP
-  have hmap : P.map (Rat.castHom K) =
-      (binK K k).comp (Polynomial.C ((p : K) ^ h) * X + Polynomial.C (t₀ : K)) := by
+  have hmap
+      : P.map (Rat.castHom K)
+        = (binK K k).comp (Polynomial.C ((p : K) ^ h) * X + Polynomial.C (t₀ : K)) := by
     rw [hP, binK, Polynomial.map_mul, Polynomial.map_C, Polynomial.map_comp, descPochhammer_map,
       mul_comp, C_comp]
     simp

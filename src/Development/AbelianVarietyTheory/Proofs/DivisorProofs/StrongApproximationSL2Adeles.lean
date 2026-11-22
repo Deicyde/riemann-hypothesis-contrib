@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsOrthog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.QSA GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.QSA GlobalTheory.Published
 open Matrix
 open scoped Quaternion Topology TensorProduct
 
@@ -20,14 +21,14 @@ section General
 variable {K R : Type} [CommRing K] [CommRing R] (φ : K →+* R) (ε : R)
 
 def prodMonoid : Submonoid (Matrix (Fin 2) (Fin 2) R) where
-  carrier := {x | ∃ γ : Matrix (Fin 2) (Fin 2) K, γ.det = 1 ∧ ∃ h : Matrix (Fin 2) (Fin 2) R,
-    h.det = 1 ∧ ε • (h - 1) = h - 1 ∧ x = γ.map φ * h}
+  carrier :=
+    {x | ∃ γ : Matrix (Fin 2) (Fin 2) K, γ.det = 1 ∧ ∃ h : Matrix (Fin 2) (Fin 2) R,
+      h.det = 1 ∧ ε • (h - 1) = h - 1 ∧ x = γ.map φ * h}
   one_mem' := ⟨1, by simp, 1, by simp, by simp, by simp⟩
   mul_mem' := by
     rintro _ _ ⟨γ, hγ, h, hh, hε, rfl⟩ ⟨γ', hγ', h', hh', hε', rfl⟩
     set G := γ'.map φ with hG
-    have hGd : G.det = 1 := by
-      rw [hG, ← RingHom.mapMatrix_apply, ← RingHom.map_det, hγ', map_one]
+    have hGd : G.det = 1 := by rw [hG, ← RingHom.mapMatrix_apply, ← RingHom.map_det, hγ', map_one]
     have h1 : G * G.adjugate = 1 := by rw [Matrix.mul_adjugate, hGd, one_smul]
     have h2 : G.adjugate * G = 1 := by rw [Matrix.adjugate_mul, hGd, one_smul]
     have h3 : G.adjugate.det = 1 := by
@@ -40,7 +41,9 @@ def prodMonoid : Submonoid (Matrix (Fin 2) (Fin 2) R) where
         abel
       rw [e, smul_add, hε', ← Matrix.smul_mul, ← Matrix.smul_mul, ← Matrix.mul_smul, hε]
     · rw [Matrix.map_mul, ← hG]
-      calc γ.map φ * h * (G * h') = γ.map φ * (G * G.adjugate) * h * (G * h') := by rw [h1, Matrix.mul_one]
+      calc
+        γ.map φ * h * (G * h')
+          = γ.map φ * (G * G.adjugate) * h * (G * h') := by rw [h1, Matrix.mul_one]
         _ = _ := by simp only [Matrix.mul_assoc]
 
 theorem upper_mem (hε : ε * ε = ε) (t : K) (s : R) : !![1, φ t + ε * s; 0, 1] ∈ prodMonoid φ ε := by
@@ -57,14 +60,21 @@ theorem lower_mem (hε : ε * ε = ε) (t : K) (s : R) : !![1, 0; φ t + ε * s,
   · ext i j
     fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, add_comm]
 
-theorem mem_of_elementary (M : Submonoid (Matrix (Fin 2) (Fin 2) R)) (hU : ∀ x : R, !![1, x; 0, 1] ∈ M)
-    (hL : ∀ x : R, !![1, 0; x, 1] ∈ M) (g : Matrix (Fin 2) (Fin 2) R) (hg : g.det = 1) (s u : R)
-    (hu : (g 1 0 + g 1 1 * s) * u = 1) : g ∈ M := by
+theorem mem_of_elementary
+    (M : Submonoid (Matrix (Fin 2) (Fin 2) R))
+    (hU : ∀ x : R, !![1, x; 0, 1] ∈ M) (hL : ∀ x : R, !![1, 0; x, 1] ∈ M)
+    (g : Matrix (Fin 2) (Fin 2) R) (hg : g.det = 1)
+    (s u : R) (hu : (g 1 0 + g 1 1 * s) * u = 1)
+    : g ∈ M := by
   rw [det_fin_two] at hg
-  have e : g = !![1, (g 0 0 + g 0 1 * s - 1) * u; 0, 1] * !![1, 0; g 1 0 + g 1 1 * s, 1] *
-      !![1, (g 1 1 - 1) * u; 0, 1] * !![1, 0; -s, 1] := by
-    have e1 : g * !![1, 0; s, 1] = !![1, (g 0 0 + g 0 1 * s - 1) * u; 0, 1] * !![1, 0; g 1 0 + g 1 1 * s, 1] *
-        !![1, (g 1 1 - 1) * u; 0, 1] := by
+  have e
+      : g
+        = !![1, (g 0 0 + g 0 1 * s - 1) * u; 0, 1] * !![1, 0; g 1 0 + g 1 1 * s, 1]
+          * !![1, (g 1 1 - 1) * u; 0, 1] * !![1, 0; -s, 1] := by
+    have e1
+        : g * !![1, 0; s, 1]
+          = !![1, (g 0 0 + g 0 1 * s - 1) * u; 0, 1] * !![1, 0; g 1 0 + g 1 1 * s, 1]
+            * !![1, (g 1 1 - 1) * u; 0, 1] := by
       ext i j
       fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
       · linear_combination (-(g 0 0 + g 0 1 * s - 1)) * hu
@@ -77,8 +87,10 @@ theorem mem_of_elementary (M : Submonoid (Matrix (Fin 2) (Fin 2) R)) (hU : ∀ x
   rw [e]
   exact M.mul_mem (M.mul_mem (M.mul_mem (hU _) (hL _)) (hU _)) (hL _)
 
-theorem exists_unit_of_idem {c d a b : R} (haa : a * a = a) (hbb : b * b = b) (hab : a * b = 0) (hs : a + b = 1)
-    (hw : IsUnit (a * c + b * d)) : ∃ s u : R, (c + d * s) * u = 1 := by
+theorem exists_unit_of_idem
+    {c d a b : R} (haa : a * a = a) (hbb : b * b = b) (hab : a * b = 0) (hs : a + b = 1)
+    (hw : IsUnit (a * c + b * d))
+    : ∃ s u : R, (c + d * s) * u = 1 := by
   obtain ⟨w, hw⟩ := hw.exists_right_inv
   have h1 : a * c * w = a := by linear_combination a * hw - c * w * haa - d * w * hab
   have h2 : b * d * w = b := by linear_combination b * hw - d * w * hbb - c * w * hab
@@ -87,12 +99,16 @@ theorem exists_unit_of_idem {c d a b : R} (haa : a * a = a) (hbb : b * b = b) (h
   rw [h3]
   linear_combination hs + h1 + hbb + (c + w) * hab + c * w * haa
 
-theorem mem_closure_of_dense [TopologicalSpace R] [IsTopologicalRing R] (hε : ε * ε = ε)
-    (hd : ∀ (x : R) (U : Set R), U ∈ 𝓝 x → ∃ t : K, ∃ s : R, φ t + ε * s ∈ U)
-    (g : Matrix (Fin 2) (Fin 2) R) (hg : g.det = 1) (s u : R) (hu : (g 1 0 + g 1 1 * s) * u = 1) :
-    g ∈ closure (prodMonoid φ ε : Set (Matrix (Fin 2) (Fin 2) R)) := by
-  have key : ∀ f : R → Matrix (Fin 2) (Fin 2) R, Continuous f → (∀ t s, f (φ t + ε * s) ∈ prodMonoid φ ε) →
-      ∀ x, f x ∈ (prodMonoid φ ε).topologicalClosure := by
+theorem mem_closure_of_dense
+    [TopologicalSpace R] [IsTopologicalRing R]
+    (hε : ε * ε = ε) (hd : ∀ (x : R) (U : Set R), U ∈ 𝓝 x → ∃ t : K, ∃ s : R, φ t + ε * s ∈ U)
+    (g : Matrix (Fin 2) (Fin 2) R) (hg : g.det = 1)
+    (s u : R) (hu : (g 1 0 + g 1 1 * s) * u = 1)
+    : g ∈ closure (prodMonoid φ ε : Set (Matrix (Fin 2) (Fin 2) R)) := by
+  have key
+      : ∀ f : R → Matrix (Fin 2) (Fin 2) R,
+        Continuous f → (∀ t s, f (φ t + ε * s) ∈ prodMonoid φ ε)
+          → ∀ x, f x ∈ (prodMonoid φ ε).topologicalClosure := by
     intro f hf h x
     change f x ∈ closure _
     rw [mem_closure_iff_nhds]
@@ -109,8 +125,11 @@ theorem mem_closure_of_dense [TopologicalSpace R] [IsTopologicalRing R] (hε : �
 
 end General
 
-theorem idem_of_isPlacesIdem {F : Type} [Field F] [NumberField F] {S₁ : Finset (InfinitePlace F)}
-    {S₂ : Finset (HeightOneSpectrum (𝓞 F))} {ε : AF F} (h : IsPlacesIdem S₁ S₂ ε) : ε * ε = ε := by
+theorem idem_of_isPlacesIdem
+    {F : Type} [Field F] [NumberField F]
+    {S₁ : Finset (InfinitePlace F)} {S₂ : Finset (HeightOneSpectrum (𝓞 F))} {ε : AF F}
+    (h : IsPlacesIdem S₁ S₂ ε)
+    : ε * ε = ε := by
   obtain ⟨h1, h2, h3, h4⟩ := h
   refine Prod.ext (funext fun w => ?_) (RestrictedProduct.ext _ _ fun v => ?_)
   · change fstA F ε w * fstA F ε w = fstA F ε w

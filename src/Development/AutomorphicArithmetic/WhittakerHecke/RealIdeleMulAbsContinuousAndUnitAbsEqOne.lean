@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IdeleModuleI
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical ENNReal NNReal
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -20,8 +22,9 @@ private theorem nrm_unit {v : H.P ℚ} {x : H.Kv v} (h : Valued.v x = 1) : ‖x�
   le_antisymm ((Valued.toNormedField.norm_le_one_iff (x := x)).2 h.le)
     ((Valued.toNormedField.one_le_norm_iff (x := x)).2 h.ge)
 
-theorem UpperTheory.realIdele_mul_abs_continuous_and_unit_abs_eq_one :
-    (∀ y y' : ℝ, y ≠ 0 → y' ≠ 0 → iy (y * y') = iy y * iy y') ∧ (∀ y : ℝ, y ≠ 0 → ab (iy y) = |y|) ∧ Continuous (fun t : ℝ => iy (Real.exp t)) ∧ ∀ u ∈ UU, ab u = 1 := by
+theorem UpperTheory.realIdele_mul_abs_continuous_and_unit_abs_eq_one
+    : (∀ y y' : ℝ, y ≠ 0 → y' ≠ 0 → iy (y * y') = iy y * iy y') ∧ (∀ y : ℝ, y ≠ 0 → ab (iy y) = |y|)
+      ∧ Continuous (fun t : ℝ => iy (Real.exp t)) ∧ ∀ u ∈ UU, ab u = 1 := by
   refine ⟨fun y y' hy hy' => ?_, fun y hy => ?_, ?_, fun u hu => ?_⟩
   · rw [iy_eq (mul_ne_zero hy hy'), iy_eq hy, iy_eq hy', ← map_mul]
     congr 1
@@ -34,7 +37,9 @@ theorem UpperTheory.realIdele_mul_abs_continuous_and_unit_abs_eq_one :
       refine Units.continuous_iff.2 ⟨?_, ?_⟩
       · exact continuous_pi fun _ => Real.continuous_exp
       · exact continuous_pi fun _ => Real.continuous_exp.inv₀ Real.exp_ne_zero
-    have he : (fun t : ℝ => iy (Real.exp t)) = fun t => TR.infId ℚ (cu (Real.exp t) (Real.exp_ne_zero t)) :=
+    have he
+        : (fun t : ℝ => iy (Real.exp t))
+          = fun t => TR.infId ℚ (cu (Real.exp t) (Real.exp_ne_zero t)) :=
       funext fun t => iy_eq (Real.exp_ne_zero t)
     rw [he]
     exact (TR.continuous_infId ℚ).comp hu

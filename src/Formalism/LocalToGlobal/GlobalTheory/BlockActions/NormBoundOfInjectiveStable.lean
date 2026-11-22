@@ -24,7 +24,8 @@ theorem chiTors : ChiTors := by
     intro a v h
     haveI : Finite (Formalism.L2.Forms.kv D.host.F v) := Formalism.UG.P.glint_finite_residueField v
     refine ⟨orderOf ((Tf.glevM).red a v h (Tf.tilAd.ka c)), orderOf_pos _, ?_⟩
-    rw [inv_pow, ← Units.val_pow_eq_pow_val, ← map_pow, pow_orderOf_eq_one, map_one, Units.val_one, inv_one]
+    rw [inv_pow, ← Units.val_pow_eq_pow_val, ← map_pow, pow_orderOf_eq_one, map_one, Units.val_one,
+      inv_one]
   show P _
   rw [(Tf.glevM).chi_eq]
   refine Finset.prod_induction _ P hmul h1 fun a _ => ?_
@@ -33,7 +34,8 @@ theorem chiTors : ChiTors := by
 
 theorem normClsAt_holds : NormClsAt := normClsAt_of_tors chiTors
 
-theorem norm_bound_of_injective_stable (h1 : ClassMapInjective) (h2 : StabiliserMapBijective) : NormBoundAtInfinity :=
+theorem norm_bound_of_injective_stable (h1 : ClassMapInjective) (h2 : StabiliserMapBijective)
+    : NormBoundAtInfinity :=
   norm_bound_of_classes h1 h2 normClsAt_holds
 
 end Formalism.L2.GlobalTheoryTheory.Br

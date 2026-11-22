@@ -14,15 +14,20 @@ open Classical
 
 namespace FC
 
-variable {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
-  [TopologicalSpace E] [MeasurableSpace E] {M : Loc.Model F E}
-  {V : Type} [AddCommGroup V] [Module E V]
-variable {ϖ : 𝒪[F]} {k : Type} [Field k] {r : M.L.O →+* k} {n : ℕ} {b : Fin n → V}
-  {Λ : Submodule M.L.O V}
+variable
+  {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
+  [TopologicalSpace E] [MeasurableSpace E]
+  {M : Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
+variable
+  {ϖ : 𝒪[F]} {k : Type} [Field k] {r : M.L.O →+* k} {n : ℕ} {b : Fin n → V} {Λ : Submodule M.L.O V}
 
-theorem prim_of (hR : RedData ϖ k r n b Λ) (H : Loc.HermSp M V) (hϖ : Irreducible ϖ)
-    {ι : Type} [Fintype ι] (v : ι → V) (hv : ∀ a, v a ∈ Λ) (hP : H.Prim Λ v) :
-    LinearIndependent k (fun a => red hR (v a)) := by
+theorem prim_of
+    (hR : RedData ϖ k r n b Λ)
+    (H : Loc.HermSp M V)
+    (hϖ : Irreducible ϖ)
+    {ι : Type} [Fintype ι]
+    (v : ι → V) (hv : ∀ a, v a ∈ Λ) (hP : H.Prim Λ v)
+    : LinearIndependent k (fun a => red hR (v a)) := by
   obtain ⟨-, hind, hsat⟩ := hP
   have hϖ0 : ((ϖ : 𝒪[F]) : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   rw [Fintype.linearIndependent_iff]
@@ -40,8 +45,8 @@ theorem prim_of (hR : RedData ϖ k r n b Λ) (H : Loc.HermSp M V) (hϖ : Irreduc
     have e : w = algebraMap F E ((ϖ : F))⁻¹ • ∑ a, ((h a : M.L.O) : E) • v a := by
       rw [hweq, smul_smul, ← map_mul, inv_mul_cancel₀ hϖ0, map_one, one_smul]
     rw [e]
-    exact Submodule.smul_mem _ _ (Submodule.sum_mem _ fun a _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩))
+    exact Submodule.smul_mem _ _
+      (Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩))
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun M.L.O).mp (hsat w hw hwspan)
 
   have hzero : ∑ a, (((h a : M.L.O) : E) - algebraMap F E (ϖ : F) * (c a : E)) • v a = 0 := by
@@ -52,17 +57,20 @@ theorem prim_of (hR : RedData ϖ k r n b Λ) (H : Loc.HermSp M V) (hϖ : Irreduc
   rw [← hh a0]
   exact (hR.ker (h a0)).mpr ⟨c a0, (c a0).2, sub_eq_zero.mp ha0⟩
 
-theorem indep_of (hR : RedData ϖ k r n b Λ) (hϖ : Irreducible ϖ)
-    (o2 : ∀ x : E, ∃ c : 𝒪[F], c ≠ 0 ∧ algebraMap F E c * x ∈ M.L.O)
-    (o3 : ∀ x ∈ M.L.O, x ≠ 0 → ∃ j : ℕ, ∃ u ∈ M.L.O, (∃ w ∈ M.L.O, u * w = 1) ∧
-      x = algebraMap F E ϖ ^ j * u)
-    {ι : Type} [Fintype ι] (v : ι → V) (hv : ∀ a, v a ∈ Λ)
-    (hX : LinearIndependent k (fun a => red hR (v a))) : LinearIndependent E v := by
+theorem indep_of
+    (hR : RedData ϖ k r n b Λ)
+    (hϖ : Irreducible ϖ) (o2 : ∀ x : E, ∃ c : 𝒪[F], c ≠ 0 ∧ algebraMap F E c * x ∈ M.L.O)
+    (o3 : ∀ x ∈ M.L.O,
+      x ≠ 0 → ∃ j : ℕ, ∃ u ∈ M.L.O, (∃ w ∈ M.L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ j * u)
+    {ι : Type} [Fintype ι]
+    (v : ι → V) (hv : ∀ a, v a ∈ Λ) (hX : LinearIndependent k (fun a => red hR (v a)))
+    : LinearIndependent E v := by
   have hϖ0 : ((ϖ : 𝒪[F]) : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   have hOalg : ∀ c : 𝒪[F], algebraMap F E (c : F) ∈ M.L.O := by
     intro c
     rw [M.L.O_def]
-    exact (isIntegral_algebraMap (R := 𝒪[F]) (A := F) (x := c)).map (IsScalarTower.toAlgHom 𝒪[F] F E)
+    exact (isIntegral_algebraMap (R := 𝒪[F]) (A := F) (x := c)).map
+      (IsScalarTower.toAlgHom 𝒪[F] F E)
   rw [Fintype.linearIndependent_iff]
   intro g hg a0
   by_contra hne
@@ -72,7 +80,8 @@ theorem indep_of (hR : RedData ϖ k r n b Λ) (hϖ : Irreducible ϖ)
   have hD0 : (((∏ a, c a : 𝒪[F])) : F) ≠ 0 := fun h => hDne (Subtype.ext h)
   have hDg : ∀ a, algebraMap F E ((∏ b, c b : 𝒪[F]) : F) * g a ∈ M.L.O := by
     intro a
-    have e : ((∏ b, c b : 𝒪[F]) : F) = (c a : F) * ((∏ b ∈ Finset.univ.erase a, c b : 𝒪[F]) : F) := by
+    have e
+        : ((∏ b, c b : 𝒪[F]) : F) = (c a : F) * ((∏ b ∈ Finset.univ.erase a, c b : 𝒪[F]) : F) := by
       rw [← Finset.mul_prod_erase Finset.univ c (Finset.mem_univ a)]
       rfl
     rw [e, map_mul, mul_comm (algebraMap F E (c a : F)), mul_assoc]
@@ -96,25 +105,28 @@ theorem indep_of (hR : RedData ϖ k r n b Λ) (hϖ : Irreducible ϖ)
     rw [e1] at hsum
     have h2 := congrArg (fun x => (algebraMap F E ((ϖ : F))⁻¹) ^ j • x) hsum
     simp only [smul_smul, ← mul_pow, ← map_mul, inv_mul_cancel₀ hϖ0, map_one, one_pow, one_smul,
-      smul_zero] at h2
+        smul_zero]
+      at h2
     exact h2
   have hred : ∑ a, r ⟨z a, hz a⟩ • red hR (v a) = 0 := by
     rw [← red_lincomb hR (fun a => (⟨z a, hz a⟩ : M.L.O)) v hv]
     simp only [hsumz, red_zero]
   exact ha1 (Fintype.linearIndependent_iff.mp hX _ hred a1)
 
-theorem sat_of (hR : RedData ϖ k r n b Λ) (hϖ : Irreducible ϖ)
-    (o2 : ∀ x : E, ∃ c : 𝒪[F], c ≠ 0 ∧ algebraMap F E c * x ∈ M.L.O)
-    (o3 : ∀ x ∈ M.L.O, x ≠ 0 → ∃ j : ℕ, ∃ u ∈ M.L.O, (∃ w ∈ M.L.O, u * w = 1) ∧
-      x = algebraMap F E ϖ ^ j * u)
-    {ι : Type} [Fintype ι] (v : ι → V) (hv : ∀ a, v a ∈ Λ)
-    (hX : LinearIndependent k (fun a => red hR (v a))) :
-    ∀ x ∈ Λ, x ∈ Submodule.span E (Set.range v) → x ∈ Submodule.span M.L.O (Set.range v) := by
+theorem sat_of
+    (hR : RedData ϖ k r n b Λ)
+    (hϖ : Irreducible ϖ) (o2 : ∀ x : E, ∃ c : 𝒪[F], c ≠ 0 ∧ algebraMap F E c * x ∈ M.L.O)
+    (o3 : ∀ x ∈ M.L.O,
+      x ≠ 0 → ∃ j : ℕ, ∃ u ∈ M.L.O, (∃ w ∈ M.L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ j * u)
+    {ι : Type} [Fintype ι]
+    (v : ι → V) (hv : ∀ a, v a ∈ Λ) (hX : LinearIndependent k (fun a => red hR (v a)))
+    : ∀ x ∈ Λ, x ∈ Submodule.span E (Set.range v) → x ∈ Submodule.span M.L.O (Set.range v) := by
   have hϖ0 : ((ϖ : 𝒪[F]) : F) ≠ 0 := fun h => hϖ.ne_zero (Subtype.ext h)
   have hOalg : ∀ c : 𝒪[F], algebraMap F E (c : F) ∈ M.L.O := by
     intro c
     rw [M.L.O_def]
-    exact (isIntegral_algebraMap (R := 𝒪[F]) (A := F) (x := c)).map (IsScalarTower.toAlgHom 𝒪[F] F E)
+    exact (isIntegral_algebraMap (R := 𝒪[F]) (A := F) (x := c)).map
+      (IsScalarTower.toAlgHom 𝒪[F] F E)
   have hϖO : algebraMap F E (ϖ : F) ∈ M.L.O := hOalg ϖ
   have hϖu : IsUnit (algebraMap F E (ϖ : F)) := (isUnit_iff_ne_zero.mpr hϖ0).map (algebraMap F E)
   intro x hx hxs
@@ -125,7 +137,8 @@ theorem sat_of (hR : RedData ϖ k r n b Λ) (hϖ : Irreducible ϖ)
   have hD0 : (((∏ a, c a : 𝒪[F])) : F) ≠ 0 := fun h => hDne (Subtype.ext h)
   have hDg : ∀ a, algebraMap F E ((∏ b, c b : 𝒪[F]) : F) * g a ∈ M.L.O := by
     intro a
-    have e : ((∏ b, c b : 𝒪[F]) : F) = (c a : F) * ((∏ b ∈ Finset.univ.erase a, c b : 𝒪[F]) : F) := by
+    have e
+        : ((∏ b, c b : 𝒪[F]) : F) = (c a : F) * ((∏ b ∈ Finset.univ.erase a, c b : 𝒪[F]) : F) := by
       rw [← Finset.mul_prod_erase Finset.univ c (Finset.mem_univ a)]
       rfl
     rw [e, map_mul, mul_comm (algebraMap F E (c a : F)), mul_assoc]
@@ -157,8 +170,8 @@ theorem sat_of (hR : RedData ϖ k r n b Λ) (hϖ : Irreducible ϖ)
     have h11 := congrArg r h10
     simp at h11
   obtain ⟨m, u, huO, ⟨w, hwO, huw⟩, hdeq⟩ := o3 _ hdO hdu.ne_zero
-  have key : (algebraMap F E (ϖ : F)) ^ m • (u • x) =
-      (algebraMap F E (ϖ : F)) ^ j • ∑ a, z a • v a := by
+  have key
+      : (algebraMap F E (ϖ : F)) ^ m • (u • x) = (algebraMap F E (ϖ : F)) ^ j • ∑ a, z a • v a := by
     rw [smul_smul, ← hdeq, hdx, Finset.smul_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [hzeq a, mul_smul]
@@ -174,14 +187,16 @@ theorem sat_of (hR : RedData ϖ k r n b Λ) (hϖ : Irreducible ϖ)
     refine Submodule.sum_mem _ fun a _ => ?_
     have hmem : w * (algebraMap F E (ϖ : F)) ^ (j - m) * z a ∈ M.L.O :=
       M.L.O.mul_mem (M.L.O.mul_mem hwO (M.L.O.pow_mem hϖO _)) (hz a)
-    have h3 := Submodule.smul_mem (Submodule.span M.L.O (Set.range v)) (⟨_, hmem⟩ : M.L.O)
-      (Submodule.subset_span ⟨a, rfl⟩)
+    have h3 :=
+      Submodule.smul_mem (Submodule.span M.L.O (Set.range v)) (⟨_, hmem⟩ : M.L.O)
+        (Submodule.subset_span ⟨a, rfl⟩)
     rwa [Subring.smul_def] at h3
   · push_neg at hjm
     rw [show m = j + ((m - j - 1) + 1) by omega, pow_add, mul_smul] at key
     have e1 := (hϖu.pow j).smul_left_cancel.mp key
-    have hzs : ∑ a, z a • v a = algebraMap F E (ϖ : F) •
-        ((algebraMap F E (ϖ : F)) ^ (m - j - 1) • (u • x)) := by
+    have hzs
+        : ∑ a, z a • v a
+          = algebraMap F E (ϖ : F) • ((algebraMap F E (ϖ : F)) ^ (m - j - 1) • (u • x)) := by
       rw [← e1, pow_succ, mul_smul, smul_comm]
     have hmemΛ : ∑ a, z a • v a ∈ Λ :=
       Submodule.sum_mem _ fun a _ => Λ.smul_mem (⟨z a, hz a⟩ : M.L.O) (hv a)
@@ -197,12 +212,14 @@ theorem sat_of (hR : RedData ϖ k r n b Λ) (hϖ : Irreducible ϖ)
       exact hred0
     exact absurd (Fintype.linearIndependent_iff.mp hX _ hred a1) ha1
 
-theorem prim_iff (hR : RedData ϖ k r n b Λ) (H : Loc.HermSp M V) (hϖ : Irreducible ϖ)
+theorem prim_iff
+    (hR : RedData ϖ k r n b Λ) (H : Loc.HermSp M V) (hϖ : Irreducible ϖ)
     (o2 : ∀ x : E, ∃ c : 𝒪[F], c ≠ 0 ∧ algebraMap F E c * x ∈ M.L.O)
-    (o3 : ∀ x ∈ M.L.O, x ≠ 0 → ∃ j : ℕ, ∃ u ∈ M.L.O, (∃ w ∈ M.L.O, u * w = 1) ∧
-      x = algebraMap F E ϖ ^ j * u)
-    {ι : Type} [Fintype ι] (v : ι → V) (hv : ∀ a, v a ∈ Λ) :
-    H.Prim Λ v ↔ LinearIndependent k (fun a => red hR (v a)) :=
+    (o3 : ∀ x ∈ M.L.O,
+      x ≠ 0 → ∃ j : ℕ, ∃ u ∈ M.L.O, (∃ w ∈ M.L.O, u * w = 1) ∧ x = algebraMap F E ϖ ^ j * u)
+    {ι : Type} [Fintype ι]
+    (v : ι → V) (hv : ∀ a, v a ∈ Λ)
+    : H.Prim Λ v ↔ LinearIndependent k (fun a => red hR (v a)) :=
   ⟨prim_of hR H hϖ v hv, fun hX => ⟨hv, indep_of hR hϖ o2 o3 v hv hX, sat_of hR hϖ o2 o3 v hv hX⟩⟩
 
 end FC

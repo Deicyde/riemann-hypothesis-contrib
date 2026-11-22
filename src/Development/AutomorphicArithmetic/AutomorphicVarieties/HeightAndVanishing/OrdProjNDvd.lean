@@ -9,9 +9,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem ordProj_N_dvd (h : Host) (p : ℕ) (hp : p.Prime) (h2 : p ≠ 2) (hq : p ∣ h.q) : ordProj[p] h.N ∣ h.q := by
+private theorem ordProj_N_dvd (h : Host) (p : ℕ) (hp : p.Prime) (h2 : p ≠ 2) (hq : p ∣ h.q)
+    : ordProj[p] h.N ∣ h.q := by
   obtain ⟨hq1, _, hd, _, hcop⟩ := h.pair
   have hq0 : h.q ≠ 0 := h.chi.ne.out
   have hqd : ¬ p ∣ h.q1 * h.d := fun hpd =>
@@ -26,10 +28,13 @@ private theorem ordProj_N_dvd (h : Host) (p : ℕ) (hp : p.Prime) (h2 : p ≠ 2)
     Nat.factorization_eq_zero_of_not_dvd hqd, add_zero]
   exact Nat.ordProj_dvd _ _
 
-private theorem rem_comp {O : Type} [CommRing O] [IsDomain O] {N : ℕ} [NeZero N] (χ : DirichletCharacter O N) (r : ℕ)
-    (hr : r.Prime) :
-    comp r (χ * (comp r χ)⁻¹) = 1 ∧ (∀ p, p.Prime → p ≠ r → comp p (χ * (comp r χ)⁻¹) = comp p χ) ∧
-      orderOf (χ * (comp r χ)⁻¹) ∣ orderOf χ := by
+private theorem rem_comp
+    {O : Type} [CommRing O] [IsDomain O]
+    {N : ℕ} [NeZero N]
+    (χ : DirichletCharacter O N)
+    (r : ℕ) (hr : r.Prime)
+    : comp r (χ * (comp r χ)⁻¹) = 1 ∧ (∀ p, p.Prime → p ≠ r → comp p (χ * (comp r χ)⁻¹) = comp p χ)
+      ∧ orderOf (χ * (comp r χ)⁻¹) ∣ orderOf χ := by
   have hA := compAlg O N r hr
   refine ⟨?_, fun p hp hpr => ?_, ?_⟩
   · rw [hA.2.1, hA.2.2.2.1, (hA.2.2.2.2.2.1 χ).1, mul_inv_cancel]
@@ -38,12 +43,16 @@ private theorem rem_comp {O : Type} [CommRing O] [IsDomain O] {N : ℕ} [NeZero 
   · rw [orderOf_dvd_iff_pow_eq_one, mul_pow, inv_pow, pow_orderOf_eq_one,
       orderOf_dvd_iff_pow_eq_one.mp (hA.2.2.2.2.2.1 χ).2.1, inv_one, mul_one]
 
-theorem UpperTheory.V.HV.hostTh1 :
-    ∀ (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N), h.IsChar ψ → ∀ l, l.Prime → l ≠ 2 →
-      comp 2 (th0 l ψ) = psi2 ψ ∧ th0 l ψ = psi2 ψ * th1 l ψ ∧ orderOf (th1 l ψ) ∣ 2 * h.o ∧ ¬ l ∣ orderOf (th1 l ψ) ∧
-      Odd (th1 l ψ).conductor ∧ (th1 l ψ ^ 2).conductor ∣ h.q ∧ comp 2 (chiP l ψ) = psi2 ψ ∧ comp l (chiP l ψ) = 1 ∧
-      ¬ l ∣ orderOf (chiP l ψ) ∧ (∀ r, r.Prime → r ≠ l → comp r (chiP l ψ) = comp r (th0 l ψ)) ∧
-      ∀ r, r.Prime → r ≠ 2 → orderOf (comp r (th0 l ψ)) ∣ 2 * h.o := by
+theorem UpperTheory.V.HV.hostTh1
+    : ∀ (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N),
+      h.IsChar ψ
+        → ∀ l,
+          l.Prime → l ≠ 2
+            → comp 2 (th0 l ψ) = psi2 ψ ∧ th0 l ψ = psi2 ψ * th1 l ψ ∧ orderOf (th1 l ψ) ∣ 2 * h.o
+              ∧ ¬ l ∣ orderOf (th1 l ψ) ∧ Odd (th1 l ψ).conductor ∧ (th1 l ψ ^ 2).conductor ∣ h.q
+              ∧ comp 2 (chiP l ψ) = psi2 ψ ∧ comp l (chiP l ψ) = 1 ∧ ¬ l ∣ orderOf (chiP l ψ)
+              ∧ (∀ r, r.Prime → r ≠ l → comp r (chiP l ψ) = comp r (th0 l ψ))
+              ∧ ∀ r, r.Prime → r ≠ 2 → orderOf (comp r (th0 l ψ)) ∣ 2 * h.o := by
   intro h O _ _ ψ hψ l hl hl2
   have hC := hostComp h O ψ hψ
   have hpos := hC.2.1
@@ -68,7 +77,8 @@ theorem UpperTheory.V.HV.hostTh1 :
     · exfalso
       rw [ha] at hdk
       have h2l := (dvd_pow_self 2 h0.ne').trans hdk
-      exact hl2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hl).1 (Nat.prime_two.dvd_of_dvd_pow h2l)).symm
+      exact hl2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hl).1
+        (Nat.prime_two.dvd_of_dvd_pow h2l)).symm
   have h1 : comp 2 (th0 l ψ) = psi2 ψ := by
     show comp 2 (th0 l ψ) = comp 2 ψ
     conv_rhs => rw [← dirichletPrimeToLPart_mul_lPowerPart l ψ]
@@ -85,8 +95,19 @@ theorem UpperTheory.V.HV.hostTh1 :
     exact hR2.2.1 p hp hp2
   have hnlθ : ¬ l ∣ orderOf (th0 l ψ) := hPO.2.2.1
   have hNpf : ∀ p ∈ h.N.primeFactors, p.Prime := fun p hp => Nat.prime_of_mem_primeFactors hp
-  refine ⟨h1, ?_, ?_, fun hd => hnlθ (hd.trans (by rw [hth1]; exact hR2.2.2)), ?_, ?_, ?_, ?_,
-    fun hd => hnlθ (hd.trans (by rw [hchi]; exact hRl.2.2)), fun r hr hrl => ?_, h11⟩
+  refine ⟨
+    h1,
+    ?_,
+    ?_,
+    fun hd => hnlθ (hd.trans (by rw [hth1]; exact hR2.2.2)),
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    fun hd => hnlθ (hd.trans (by rw [hchi]; exact hRl.2.2)),
+    fun r hr hrl => ?_,
+    h11
+  ⟩
   · rw [hth1, h1, mul_comm, inv_mul_cancel_right]
   · apply orderOf_dvd_of_pow_eq_one
     apply (compAlg O h.N 2 Nat.prime_two).2.2.2.2.2.2.2
@@ -111,8 +132,8 @@ theorem UpperTheory.V.HV.hostTh1 :
         apply Nat.pow_dvd_pow
         exact (Nat.factorization_le_iff_dvd (th1 l ψ ^ 2).conductor_ne_zero (NeZero.ne h.N)).mpr
           (DirichletCharacter.conductor_dvd_level _) p
-      · rw [(compAlg O h.N p hpp).2.2.2.2.1, hcp p hpp hp2, hcθ p hpp, ← pow_mul, mul_comm n 2, pow_mul,
-          (hC.2.2 p hpp hp2).2.2.1 hpq, one_pow, DirichletCharacter.conductor_one]
+      · rw [(compAlg O h.N p hpp).2.2.2.2.1, hcp p hpp hp2, hcθ p hpp, ← pow_mul, mul_comm n 2,
+          pow_mul, (hC.2.2 p hpp hp2).2.2.1 hpq, one_pow, DirichletCharacter.conductor_one]
         exact one_dvd _
   · rw [hchi, hRl.2.1 2 Nat.prime_two (Ne.symm hl2), h1]
   · rw [hchi]

@@ -16,8 +16,11 @@ public import GroundTheory.GlobalFields.LocalAtPlace
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge
 open scoped Classical
 open ValuativeRel GroundTheory.LocalField GroundTheory.LocalField.FormalGroup
 open scoped GroundTheory.PAdicHodge.CyclNorms
@@ -28,9 +31,12 @@ theorem isClosed_finExt {l : ℕ} [Fact l.Prime] (K : FinExt l) : IsClosed (K.1 
   haveI : FiniteDimensional ℚ_[l] K.1.toSubmodule := K.2
   exact Submodule.closed_of_finiteDimensional K.1.toSubmodule
 
-theorem valued_le_one_of_norm_le_one {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E]
+theorem valued_le_one_of_norm_le_one
+    {l : ℕ} [Fact l.Prime]
+    {E : Type} [Field E] [NumberField E]
     (w : HeightOneSpectrum (𝓞 E)) (φ : w.adicCompletion E →+* Om l) (hφ : Continuous φ)
-    (x : w.adicCompletion E) (hx : ‖φ x‖ ≤ 1) : Valued.v x ≤ 1 := by
+    (x : w.adicCompletion E) (hx : ‖φ x‖ ≤ 1)
+    : Valued.v x ≤ 1 := by
   by_contra hv
   have hv' : 1 < Valued.v x := not_le.1 hv
   have hx0 : x ≠ 0 := by
@@ -54,18 +60,21 @@ theorem valued_le_one_of_norm_le_one {l : ℕ} [Fact l.Prime] {E : Type} [Field 
   have := ge_of_tendsto' hn hge
   linarith
 
-theorem isClosed_image_integers {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E]
-    (w : HeightOneSpectrum (𝓞 E)) (φ : w.adicCompletion E →+* Om l) (hφ : Continuous φ) :
-    IsClosed (φ '' (w.adicCompletionIntegers E : Set (w.adicCompletion E))) := by
+theorem isClosed_image_integers
+    {l : ℕ} [Fact l.Prime]
+    {E : Type} [Field E] [NumberField E]
+    (w : HeightOneSpectrum (𝓞 E)) (φ : w.adicCompletion E →+* Om l) (hφ : Continuous φ)
+    : IsClosed (φ '' (w.adicCompletionIntegers E : Set (w.adicCompletion E))) := by
   have hc : IsCompact (w.adicCompletionIntegers E : Set (w.adicCompletion E)) :=
     isCompact_iff_compactSpace.2 (inferInstanceAs (CompactSpace (w.adicCompletionIntegers E)))
   exact (hc.image hφ).isClosed
 
-theorem range_eq_Kw : ∀ {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] {Gw : Subgroup (Ω ≃ₐ[E] Ω)}
-    {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l E Ω Gw O)
-    (w : HeightOneSpectrum (𝓞 E)) (φ : w.adicCompletion E →+* Om l), Continuous φ →
-    (∀ y : E, φ (algebraMap E (w.adicCompletion E) y) = Bw.j (algebraMap E Ω y)) →
-    Set.range φ = (Bw.Kw.1 : Set (Om l)) := by
+theorem range_eq_Kw
+    : ∀ {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+        {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+        (Bw : LocBridge l E Ω Gw O) (w : HeightOneSpectrum (𝓞 E)) (φ : w.adicCompletion E →+* Om l),
+      Continuous φ → (∀ y : E, φ (algebraMap E (w.adicCompletion E) y) = Bw.j (algebraMap E Ω y))
+        → Set.range φ = (Bw.Kw.1 : Set (Om l)) := by
   intro l _ E Ω _ _ _ _ Gw O _ _ _ Bw w φ hφ hE
   have hcl := isClosed_finExt Bw.Kw
 
@@ -80,8 +89,9 @@ theorem range_eq_Kw : ∀ {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [Numb
     have hk' : k ∈ Metric.closedBall (0 : Om l) 1 := by simpa using hk1
     have h2 : k ∈ closure (Metric.closedBall (0 : Om l) 1 ∩ Set.range φ) :=
       hS.inter_closure ⟨hk', hden⟩
-    have h3 : Metric.closedBall (0 : Om l) 1 ∩ Set.range φ ⊆
-        φ '' (w.adicCompletionIntegers E : Set (w.adicCompletion E)) := by
+    have h3
+        : Metric.closedBall (0 : Om l) 1 ∩ Set.range φ
+          ⊆ φ '' (w.adicCompletionIntegers E : Set (w.adicCompletion E)) := by
       rintro _ ⟨hb, x, rfl⟩
       refine ⟨x, ?_, rfl⟩
       exact valued_le_one_of_norm_le_one w φ hφ x (by simpa using hb)
@@ -91,7 +101,9 @@ theorem range_eq_Kw : ∀ {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [Numb
   refine Set.Subset.antisymm ?_ fun k hk => ?_
   · rintro _ ⟨x, rfl⟩
     refine (HeightOneSpectrum.denseRange_algebraMap E w).induction_on
-      (p := fun x => φ x ∈ (Bw.Kw.1 : Set (Om l))) x (hcl.preimage hφ) fun y => ?_
+      (p := fun x => φ x ∈ (Bw.Kw.1 : Set (Om l)))
+      x (hcl.preimage hφ)
+      fun y => ?_
     rw [hE y]
     exact Bw.j_E y
   · rcases le_total ‖k‖ 1 with h | h

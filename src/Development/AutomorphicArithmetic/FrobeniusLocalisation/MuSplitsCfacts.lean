@@ -21,14 +21,16 @@ open UpperTheory.HF
 open NumberField IsDedekindDomain Formalism.HC Formalism.L2.Host GlobalTheory.Mem.Chr GlobalTheory
 open scoped Pointwise
 
-private theorem exists_place {L : Type} [Field L] [NumberField L] {p : ℕ} (hs : SplitsC L p) :
-    ∃ v : HeightOneSpectrum (𝓞 L), ((p : ℕ) : 𝓞 L) ∈ v.asIdeal := by
+private theorem exists_place {L : Type} [Field L] [NumberField L] {p : ℕ} (hs : SplitsC L p)
+    : ∃ v : HeightOneSpectrum (𝓞 L), ((p : ℕ) : 𝓞 L) ∈ v.asIdeal := by
   unfold SplitsC at hs
   exact Set.nonempty_of_ncard_ne_zero (hs ▸ Module.finrank_pos.ne')
 
-private theorem pow_sub_one_mem {L : Type} [Field L] [NumberField L] {p : ℕ} (v : HeightOneSpectrum (𝓞 L))
-    (hN : Ideal.absNorm v.asIdeal = p) {x : 𝓞 L} {m : ℕ} (hm : m ≠ 0) (hx : x ^ m = 1) :
-    x ^ (p - 1) - 1 ∈ v.asIdeal := by
+private theorem pow_sub_one_mem
+    {L : Type} [Field L] [NumberField L]
+    {p : ℕ} (v : HeightOneSpectrum (𝓞 L)) (hN : Ideal.absNorm v.asIdeal = p)
+    {x : 𝓞 L} {m : ℕ} (hm : m ≠ 0) (hx : x ^ m = 1)
+    : x ^ (p - 1) - 1 ∈ v.asIdeal := by
   have := v.isMaximal
   let := Ideal.Quotient.field v.asIdeal
   have : Finite (𝓞 L ⧸ v.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ v.ne_bot

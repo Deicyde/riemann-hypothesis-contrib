@@ -5,18 +5,29 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HESmulRig
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.InertSign
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.InertSign
 open scoped BigOperators
 
 namespace GlobalTheory.NormGauss
 
-theorem exists_norm_eq {k : Type} [Field k] [Finite k] (s : k →+* k) (hs : ∀ a, s (s a) = a)
-    (hne : ∃ a, s a ≠ a) (u : k) (hu : s u = u) : ∃ t, t * s t = u := by
+theorem exists_norm_eq
+    {k : Type} [Field k] [Finite k]
+    (s : k →+* k) (hs : ∀ a, s (s a) = a) (hne : ∃ a, s a ≠ a)
+    (u : k) (hu : s u = u)
+    : ∃ t, t * s t = u := by
   classical
   let F : Subfield k := RingHom.eqLocusField s (RingHom.id k)
-  let σ : k ≃ₐ[F] k :=
-    { toFun := s, invFun := s, left_inv := hs, right_inv := hs,
-      map_mul' := map_mul s, map_add' := map_add s, commutes' := fun r => r.2 }
+  let σ : k ≃ₐ[F] k := {
+    toFun := s
+    invFun := s
+    left_inv := hs
+    right_inv := hs
+    map_mul' := map_mul s
+    map_add' := map_add s
+    commutes' := fun r => r.2
+  }
   have hσ_apply : ∀ x, σ x = s x := fun _ => rfl
   have hσ1 : σ ≠ 1 := by
     obtain ⟨a, ha⟩ := hne
@@ -59,9 +70,11 @@ theorem exists_norm_eq {k : Type} [Field k] [Finite k] (s : k →+* k) (hs : ∀
   rw [← hnorm, ht]
   rfl
 
-theorem sum_norm_neg {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ a, s (s a) = a)
-    (hne : ∃ a, s a ≠ a) (ψ : AddChar k ℂ) (hψ : ∃ a, ψ (a + s a) ≠ 1) :
-    ∃ m : ℝ, 0 < m ∧ ∑ t : k, ψ (t * s t) = -(m : ℂ) := by
+theorem sum_norm_neg
+    {k : Type} [Field k] [Fintype k]
+    (s : k →+* k) (hs : ∀ a, s (s a) = a) (hne : ∃ a, s a ≠ a)
+    (ψ : AddChar k ℂ) (hψ : ∃ a, ψ (a + s a) ≠ 1)
+    : ∃ m : ℝ, 0 < m ∧ ∑ t : k, ψ (t * s t) = -(m : ℂ) := by
   classical
   let F : Subfield k := RingHom.eqLocusField s (RingHom.id k)
   have hs0 : ∀ x : k, s x = 0 → x = 0 := by
@@ -87,8 +100,8 @@ theorem sum_norm_neg {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ 
   have hsumφ : ∑ u : F, ψ (u : k) = 0 := by
     simpa only [hφ_apply] using AddChar.sum_eq_zero_of_ne_one hφ
   obtain ⟨c, hc⟩ : ∃ c : ℕ, c = (Finset.univ.filter (fun t : k => t * s t = 1)).card := ⟨_, rfl⟩
-  have hfib : ∀ u : F,
-      (Finset.univ.filter (fun t : k => N t = u)).card = if u = 0 then 1 else c := by
+  have hfib
+      : ∀ u : F, (Finset.univ.filter (fun t : k => N t = u)).card = if u = 0 then 1 else c := by
     intro u
     split_ifs with hu
     · subst hu
@@ -133,18 +146,20 @@ theorem sum_norm_neg {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ 
         exact inv_mul_cancel_right₀ ht0ne t
       · intro t _
         exact mul_inv_cancel_right₀ ht0ne t
-  have hsplit : ∑ t : k, ψ (t * s t) =
-      ∑ u : F, ((Finset.univ.filter (fun t : k => N t = u)).card : ℂ) * ψ (u : k) := by
+  have hsplit
+      : ∑ t : k, ψ (t * s t)
+        = ∑ u : F, ((Finset.univ.filter (fun t : k => N t = u)).card : ℂ) * ψ (u : k) := by
     rw [← Finset.sum_fiberwise Finset.univ N (fun t => ψ (t * s t))]
     refine Finset.sum_congr rfl (fun u _ => ?_)
     rw [Finset.sum_congr rfl (g := fun _ => ψ (u : k)), Finset.sum_const, nsmul_eq_mul]
     intro t ht
     have := (Finset.mem_filter.1 ht).2
     rw [← this]
-  have hψ0 : ψ ((0 : F) : k) = 1 := by
-    rw [ZeroMemClass.coe_zero, AddChar.map_zero_eq_one]
-  have key : ∀ u : F, (((if u = 0 then 1 else c : ℕ)) : ℂ) * ψ (u : k) =
-      (c : ℂ) * ψ (u : k) + (if u = 0 then (1 - (c : ℂ)) else 0) := by
+  have hψ0 : ψ ((0 : F) : k) = 1 := by rw [ZeroMemClass.coe_zero, AddChar.map_zero_eq_one]
+  have key
+      : ∀ u : F,
+        (((if u = 0 then 1 else c : ℕ)) : ℂ) * ψ (u : k)
+          = (c : ℂ) * ψ (u : k) + (if u = 0 then (1 - (c : ℂ)) else 0) := by
     intro u
     split_ifs with h
     · subst h
@@ -168,7 +183,8 @@ theorem sum_norm_neg {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ 
       rw [mul_inv_eq_one₀ hsa0] at h
       exact h.symm
     rw [hc]
-    calc 2 = ({1, a * (s a)⁻¹} : Finset k).card := (Finset.card_pair hne1.symm).symm
+    calc
+      2 = ({1, a * (s a)⁻¹} : Finset k).card := (Finset.card_pair hne1.symm).symm
       _ ≤ _ := by
         apply Finset.card_le_card
         intro x hx
@@ -187,15 +203,21 @@ theorem sum_norm_neg {k : Type} [Field k] [Fintype k] (s : k →+* k) (hs : ∀ 
     push_cast
     ring
 
-theorem finsum_norm_neg : ∀ (R : Type) [CommRing R] (σ : R →+* R) (P : Ideal R) [P.IsMaximal] [Finite (R ⧸ P)], (∀ a, σ (σ a) = a) → (∀ a ∈ P, σ a ∈ P) → (∃ a, a - σ a ∉ P) → ∀ χ : R → ℂ, (∀ a b, χ (a + b) = χ a * χ b) → (∀ a ∈ P, χ a = 1) → (∃ a, χ (a + σ a) ≠ 1) → ∃ m : ℝ, 0 < m ∧ ∑ᶠ q : R ⧸ P, χ (Quotient.out q * σ (Quotient.out q)) = -(m : ℂ) := by
+theorem finsum_norm_neg
+    : ∀ (R : Type) [CommRing R] (σ : R →+* R) (P : Ideal R) [P.IsMaximal] [Finite (R ⧸ P)],
+      (∀ a, σ (σ a) = a) → (∀ a ∈ P, σ a ∈ P) → (∃ a, a - σ a ∉ P)
+        → ∀ χ : R → ℂ,
+          (∀ a b, χ (a + b) = χ a * χ b) → (∀ a ∈ P, χ a = 1) → (∃ a, χ (a + σ a) ≠ 1)
+            → ∃ m : ℝ,
+              0 < m ∧ ∑ᶠ q : R ⧸ P, χ (Quotient.out q * σ (Quotient.out q)) = -(m : ℂ) := by
   intro R _ σ P _ _ hσ hP hne χ hχ hχP hχa
   classical
   let _ : Field (R ⧸ P) := Ideal.Quotient.field P
   let _ : Fintype (R ⧸ P) := Fintype.ofFinite _
   have hle : P ≤ P.comap σ := fun a ha => hP a ha
   let s : R ⧸ P →+* R ⧸ P := Ideal.quotientMap P σ hle
-  have hs_mk : ∀ a : R, s (Ideal.Quotient.mk P a) = Ideal.Quotient.mk P (σ a) :=
-    fun a => Ideal.quotientMap_mk
+  have hs_mk : ∀ a : R, s (Ideal.Quotient.mk P a) = Ideal.Quotient.mk P (σ a) := fun a =>
+    Ideal.quotientMap_mk
   have hs : ∀ x, s (s x) = x := by
     intro x
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
@@ -213,17 +235,18 @@ theorem finsum_norm_neg : ∀ (R : Type) [CommRing R] (σ : R →+* R) (P : Idea
     have e : x = y + (x - y) := by ring
     conv_lhs => rw [e]
     rw [hχ, hχP _ h, mul_one]
-  let ψ : AddChar (R ⧸ P) ℂ :=
-    { toFun := fun q => χ (Quotient.out q)
-      map_zero_eq_one' := by
-        apply hχP
-        rw [← Ideal.Quotient.eq_zero_iff_mem, Ideal.Quotient.mk_out]
-      map_add_eq_mul' := by
-        intro q₁ q₂
-        rw [← hχ]
-        apply hχ_congr
-        rw [← Ideal.Quotient.eq, map_add (f := _), Ideal.Quotient.mk_out, Ideal.Quotient.mk_out,
-          Ideal.Quotient.mk_out] }
+  let ψ : AddChar (R ⧸ P) ℂ := {
+    toFun := fun q => χ (Quotient.out q)
+    map_zero_eq_one' := by
+      apply hχP
+      rw [← Ideal.Quotient.eq_zero_iff_mem, Ideal.Quotient.mk_out]
+    map_add_eq_mul' := by
+      intro q₁ q₂
+      rw [← hχ]
+      apply hχ_congr
+      rw [← Ideal.Quotient.eq, map_add (f := _), Ideal.Quotient.mk_out, Ideal.Quotient.mk_out,
+        Ideal.Quotient.mk_out]
+  }
   have hψ_mk : ∀ a, ψ (Ideal.Quotient.mk P a) = χ a := fun a =>
     hχ_congr _ _ (by rw [← Ideal.Quotient.eq, Ideal.Quotient.mk_out])
   have hψne : ∃ x, ψ (x + s x) ≠ 1 := by

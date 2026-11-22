@@ -9,7 +9,10 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IntEmbInjectiv
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+  GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
 open scoped ENNReal InnerProductSpace
 open scoped ComplexOrder
 
@@ -37,7 +40,8 @@ theorem embOf_injective : Function.Injective (embOf : (𝓞 E →+* ℂ) → (E 
   ext a
   rw [← embOf_coe s a, ← embOf_coe s' a, h]
 
-theorem conj_eq_complexConj (x : E) : conj (maximalRealSubfield E) E x = IsCMField.complexConj E x := by
+theorem conj_eq_complexConj (x : E)
+    : conj (maximalRealSubfield E) E x = IsCMField.complexConj E x := by
   set K := maximalRealSubfield E
   set t := IsCMField.complexConj E
   set y := conj K E x with hy
@@ -60,17 +64,18 @@ theorem conj_eq_complexConj (x : E) : conj (maximalRealSubfield E) E x = IsCMFie
     rw [h2, hx]
   · exact (sub_eq_zero.1 h).symm
 
-theorem embOf_conj (s : 𝓞 E →+* ℂ) (x : E) :
-    embOf s (conjHom (maximalRealSubfield E) E x) = starRingEnd ℂ (embOf s x) := by
+theorem embOf_conj (s : 𝓞 E →+* ℂ) (x : E)
+    : embOf s (conjHom (maximalRealSubfield E) E x) = starRingEnd ℂ (embOf s x) := by
   rw [conjHom_apply, conj_eq_complexConj]
   exact IsCMField.complexEmbedding_complexConj E _ x
 
-theorem emb_bij {Ψ : Type} {σ : Ψ → (𝓞 E →+* ℂ)} (h : IsCMFam σ) :
-    Function.Bijective (fun p : Ψ × Bool =>
+theorem emb_bij {Ψ : Type} {σ : Ψ → (𝓞 E →+* ℂ)} (h : IsCMFam σ)
+    : Function.Bijective (fun p : Ψ × Bool =>
       if p.2 then (starRingEnd ℂ).comp (embOf (σ p.1)) else embOf (σ p.1)) := by
   have hres : ∀ s : 𝓞 E →+* ℂ, (embOf s).comp (algebraMap (𝓞 E) E) = s := by
     intro s; ext a; simp [embOf_coe]
-  have hconj : ∀ s : 𝓞 E →+* ℂ, (starRingEnd ℂ).comp (embOf s) = embOf ((starRingEnd ℂ).comp s) := by
+  have hconj
+      : ∀ s : 𝓞 E →+* ℂ, (starRingEnd ℂ).comp (embOf s) = embOf ((starRingEnd ℂ).comp s) := by
     intro s
     rw [← embOf_of_comp ((starRingEnd ℂ).comp (embOf s))]
     congr 1
@@ -96,17 +101,19 @@ theorem emb_bij {Ψ : Type} {σ : Ψ → (𝓞 E →+* ℂ)} (h : IsCMFam σ) :
         exact hs ((h.2 _).2 hn)
       obtain ⟨τ, hτ⟩ := this
       refine ⟨(τ, true), ?_⟩
-      have e : (starRingEnd ℂ).comp ((starRingEnd ℂ).comp (φ.comp (algebraMap (𝓞 E) E))) =
-          φ.comp (algebraMap (𝓞 E) E) := by
+      have e
+          : (starRingEnd ℂ).comp ((starRingEnd ℂ).comp (φ.comp (algebraMap (𝓞 E) E)))
+            = φ.comp (algebraMap (𝓞 E) E) := by
         ext a; simp
       simp only [if_true, hconj, hτ, e, embOf_of_comp]
 
-theorem trace_eq {Ψ : Type} [Fintype Ψ] {σ : Ψ → (𝓞 E →+* ℂ)} (h : IsCMFam σ) (x : E) :
-    ((Algebra.trace ℚ E x : ℚ) : ℝ) = ∑ τ, 2 * (embOf (σ τ) x).re := by
+theorem trace_eq {Ψ : Type} [Fintype Ψ] {σ : Ψ → (𝓞 E →+* ℂ)} (h : IsCMFam σ) (x : E)
+    : ((Algebra.trace ℚ E x : ℚ) : ℝ) = ∑ τ, 2 * (embOf (σ τ) x).re := by
   classical
   have h1 := trace_eq_sum_embeddings ℂ (K := ℚ) (L := E) (x := x)
-  rw [← (RingHom.equivRatAlgHom (R := E) (S := ℂ)).sum_comp, ← (Equiv.ofBijective _ (emb_bij h)).sum_comp,
-    Fintype.sum_prod_type] at h1
+  rw [← (RingHom.equivRatAlgHom (R := E) (S := ℂ)).sum_comp,
+      ← (Equiv.ofBijective _ (emb_bij h)).sum_comp, Fintype.sum_prod_type]
+    at h1
   have h2 := congrArg Complex.re h1
   rw [eq_ratCast, Complex.ratCast_re, Complex.re_sum] at h2
   rw [h2]
@@ -118,20 +125,25 @@ end Field
 
 section Lat
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Ψ : Type} [Fintype Ψ] {j j' n g : ℕ} {Λ : Type}
-  [AddCommGroup Λ] [Module (𝓞 E) Λ] {F : UnivFam E Ψ j j' n g Λ} (C : LatEmb F)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Ψ : Type} [Fintype Ψ]
+  {j j' n g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+  {F : UnivFam E Ψ j j' n g Λ} (C : LatEmb F)
 
-theorem gr_apply (τ : Ψ) (u w : Fin (j + j') → E) :
-    star (fun i => embOf (F.σ τ) (u i)) ⬝ᵥ (C.gr τ *ᵥ fun i => embOf (F.σ τ) (w i)) =
-      embOf (F.σ τ) (C.h.toSesq u w) := by
+theorem gr_apply (τ : Ψ) (u w : Fin (j + j') → E)
+    : star (fun i => embOf (F.σ τ) (u i)) ⬝ᵥ (C.gr τ *ᵥ fun i => embOf (F.σ τ) (w i))
+      = embOf (F.σ τ) (C.h.toSesq u w) := by
   have hu : u = ∑ a, u a • Pi.basisFun E (Fin (j + j')) a := ((Pi.basisFun E _).sum_repr u).symm
   have hw : w = ∑ b, w b • Pi.basisFun E (Fin (j + j')) b := ((Pi.basisFun E _).sum_repr w).symm
-  have hB : C.h.toSesq u w = ∑ a, ∑ b, conjHom (maximalRealSubfield E) E (u a) * (w b *
-      gram C.h.toSesq (Pi.basisFun E (Fin (j + j'))) a b) := by
+  have hB
+      : C.h.toSesq u w
+        = ∑ a, ∑ b, conjHom (maximalRealSubfield E) E (u a) * (w b *
+          gram C.h.toSesq (Pi.basisFun E (Fin (j + j'))) a b) := by
     conv_lhs => rw [hu, hw]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-      RingHom.id_apply, GroundTheory.Automorphic.gram]
+      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
+        smul_eq_mul, RingHom.id_apply, GroundTheory.Automorphic.gram]
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
@@ -139,7 +151,7 @@ theorem gr_apply (τ : Ψ) (u w : Fin (j + j') → E) :
   rw [hB]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [dotProduct, mulVec, map_sum, map_mul, embOf_conj, Finset.mul_sum, Pi.star_apply,
-    RCLike.star_def]
+      RCLike.star_def]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   have hg : C.gr τ a b = embOf (F.σ τ) (gram C.h.toSesq (Pi.basisFun E (Fin (j + j'))) a b) := rfl
   rw [hg]
@@ -171,48 +183,51 @@ theorem Fm_vec (x y : Λ) : C.Fm (C.vec x) (C.vec y) = (F.form x y : ℝ) := by
 def FmB : (Ψ → Fin (j + j') → ℂ) →ₗ[ℝ] (Ψ → Fin (j + j') → ℂ) →ₗ[ℝ] ℝ :=
   LinearMap.mk₂ ℝ C.Fm
     (fun a b c => by
-      simp only [LatEmb.Fm, Pi.add_apply, mulVec_add, dotProduct_add, mul_add, Complex.add_re, ← Finset.sum_add_distrib]
-      )
+      simp only [LatEmb.Fm, Pi.add_apply, mulVec_add, dotProduct_add, mul_add, Complex.add_re,
+        ← Finset.sum_add_distrib])
     (fun r a c => by
-      simp only [LatEmb.Fm, Pi.smul_apply, mulVec_smul, dotProduct_smul, mul_smul_comm, Complex.smul_re, smul_eq_mul,
-        Finset.mul_sum]
+      simp only [LatEmb.Fm, Pi.smul_apply, mulVec_smul, dotProduct_smul, mul_smul_comm,
+        Complex.smul_re, smul_eq_mul, Finset.mul_sum]
       refine Finset.sum_congr rfl fun τ _ => ?_
       ring)
     (fun a b c => by
-      simp only [LatEmb.Fm, Pi.add_apply, star_add, add_dotProduct, mul_add, Complex.add_re, ← Finset.sum_add_distrib])
+      simp only [LatEmb.Fm, Pi.add_apply, star_add, add_dotProduct, mul_add, Complex.add_re,
+        ← Finset.sum_add_distrib])
     (fun r a c => by
-      simp only [LatEmb.Fm, Pi.smul_apply, Pi.star_apply, star_smul, star_trivial, smul_dotProduct, mul_smul_comm,
-        Complex.smul_re, smul_eq_mul, Finset.mul_sum]
+      simp only [LatEmb.Fm, Pi.smul_apply, Pi.star_apply, star_smul, star_trivial, smul_dotProduct,
+        mul_smul_comm, Complex.smul_re, smul_eq_mul, Finset.mul_sum]
       refine Finset.sum_congr rfl fun τ _ => ?_
       ring)
 
 def HB (R : RiemLat E g Λ) : (Ψ → Fin (j + j') → ℂ) →ₗ[ℝ] (Ψ → Fin (j + j') → ℂ) →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ (fun y y' => (C.perExt R y ⬝ᵥ R.Hm *ᵥ star (C.perExt R y')).im)
+  LinearMap.mk₂ ℝ
+    (fun y y' => (C.perExt R y ⬝ᵥ R.Hm *ᵥ star (C.perExt R y')).im)
     (fun a b c => by simp [add_dotProduct])
-    (fun r a c => by
-      simp)
+    (fun r a c => by simp)
     (fun a b c => by simp [mulVec_add, dotProduct_add, star_add])
-    (fun r a c => by
-      simp [mulVec_smul, dotProduct_smul])
+    (fun r a c => by simp [mulVec_smul, dotProduct_smul])
 
 end Lat
 
 section Adapted
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Ψ : Type} [Fintype Ψ] {j j' n g : ℕ} {Λ : Type}
-  [AddCommGroup Λ] [Module (𝓞 E) Λ] {F : UnivFam E Ψ j j' n g Λ} (C : LatEmb F) (R : RiemLat E g Λ)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Ψ : Type} [Fintype Ψ]
+  {j j' n g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+  {F : UnivFam E Ψ j j' n g Λ} (C : LatEmb F)
+  (R : RiemLat E g Λ)
   {A : Ψ → Matrix (Fin (j + j')) (Sg j j') ℂ}
 
-theorem form_ext (hR : R.form = F.form) (y y' : Ψ → Fin (j + j') → ℂ) :
-    (C.perExt R y ⬝ᵥ R.Hm *ᵥ star (C.perExt R y')).im = C.Fm y y' := by
+theorem form_ext (hR : R.form = F.form) (y y' : Ψ → Fin (j + j') → ℂ)
+    : (C.perExt R y ⬝ᵥ R.Hm *ᵥ star (C.perExt R y')).im = C.Fm y y' := by
   have h : HB C R = FmB C := by
     refine C.bas.ext fun k => C.bas.ext fun l => ?_
     show (C.perExt R (C.bas k) ⬝ᵥ R.Hm *ᵥ star (C.perExt R (C.bas l))).im = C.Fm (C.bas k) (C.bas l)
     rw [← vec_lam, ← vec_lam, perExt_vec, perExt_vec, R.im, Fm_vec, hR]
   exact LinearMap.congr_fun₂ h y y'
 
-theorem sgI_mul_self : sgI j j' * sgI j j' = 1 := by
-  simp [sgI, fromBlocks_multiply, fromBlocks_one]
+theorem sgI_mul_self : sgI j j' * sgI j j' = 1 := by simp [sgI, fromBlocks_multiply, fromBlocks_one]
 
 variable {C R}
 
@@ -227,8 +242,8 @@ def tw (v : Sg j j' → ℂ) : Sg j j' → ℂ :=
   Sum.elim (-Complex.I • (v ∘ Sum.inl)) (Complex.I • (v ∘ Sum.inr))
 
 open Classical in
-theorem perExt_single_tw (h : C.IsAdapted R A) (τ : Ψ) (v : Sg j j' → ℂ) :
-    C.perExt R (Pi.single τ (A τ *ᵥ tw v)) = Complex.I • C.perExt R (Pi.single τ (A τ *ᵥ v)) := by
+theorem perExt_single_tw (h : C.IsAdapted R A) (τ : Ψ) (v : Sg j j' → ℂ)
+    : C.perExt R (Pi.single τ (A τ *ᵥ tw v)) = Complex.I • C.perExt R (Pi.single τ (A τ *ᵥ v)) := by
   set l : (Fin (j + j') → ℂ) →+ (Fin g → ℂ) :=
     (C.perExt R).toAddMonoidHom.comp (AddMonoidHom.single (fun _ : Ψ => Fin (j + j') → ℂ) τ) with hl
   have hl' : ∀ w, C.perExt R (Pi.single τ w) = l w := fun _ => rfl
@@ -259,52 +274,61 @@ theorem perExt_single_tw (h : C.IsAdapted R A) (τ : Ψ) (v : Sg j j' → ℂ) :
     congr 1
     ext (i | i) <;> simp [tw]
   rw [hl', hl', hv, hw, map_add (f := _), map_add (f := _), map_neg, smul_add]
-  have e1 : Complex.I • l p = -l (Complex.I • p) := by rw [h1, hII]
-  have e2 : Complex.I • l q = l (Complex.I • q) := by
-    rw [h2, smul_neg, hII, neg_neg]
+  have e1 : Complex.I • l p = - l (Complex.I • p) := by rw [h1, hII]
+  have e2 : Complex.I • l q = l (Complex.I • q) := by rw [h2, smul_neg, hII, neg_neg]
   rw [e1, e2]
 
-theorem perExt_tw (h : C.IsAdapted R A) (y : Ψ → Fin (j + j') → ℂ) :
-    C.perExt R (fun τ => A τ *ᵥ tw (C.cinv (A τ) τ *ᵥ y τ)) = Complex.I • C.perExt R y := by
+theorem perExt_tw (h : C.IsAdapted R A) (y : Ψ → Fin (j + j') → ℂ)
+    : C.perExt R (fun τ => A τ *ᵥ tw (C.cinv (A τ) τ *ᵥ y τ)) = Complex.I • C.perExt R y := by
   classical
-  have hs : ∀ u : Ψ → Fin (j + j') → ℂ, u = ∑ τ, Pi.single τ (u τ) := fun u => (Finset.univ_sum_single u).symm
+  have hs : ∀ u : Ψ → Fin (j + j') → ℂ, u = ∑ τ, Pi.single τ (u τ) := fun u =>
+    (Finset.univ_sum_single u).symm
   conv_lhs => rw [hs (fun τ => A τ *ᵥ tw (C.cinv (A τ) τ *ᵥ y τ))]
   conv_rhs => rw [hs y]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_sum, Finset.smul_sum]
   refine Finset.sum_congr rfl fun τ _ => ?_
   rw [perExt_single_tw h]
-  have : A τ *ᵥ (C.cinv (A τ) τ *ᵥ y τ) = y τ := by
-    rw [mulVec_mulVec, mul_cinv h, one_mulVec]
+  have : A τ *ᵥ (C.cinv (A τ) τ *ᵥ y τ) = y τ := by rw [mulVec_mulVec, mul_cinv h, one_mulVec]
   rw [this]
 
 theorem sgI_mulVec_tw (v : Sg j j' → ℂ) : sgI j j' *ᵥ tw v = -Complex.I • v := by
   ext (i | i) <;> simp [sgI, tw, fromBlocks_mulVec, mulVec_neg, neg_mulVec]
 
-theorem term_eq (h : C.IsAdapted R A) (τ : Ψ) (v : Sg j j' → ℂ) :
-    2 * (embOf (F.σ τ) C.xi * (star (A τ *ᵥ v) ⬝ᵥ (C.gr τ *ᵥ (A τ *ᵥ tw v)))).re =
-      2 * C.c * (star v ⬝ᵥ v).re := by
-  have key : star (A τ *ᵥ v) ⬝ᵥ (C.gr τ *ᵥ (A τ *ᵥ tw v)) = star v ⬝ᵥ (((A τ)ᴴ * C.gr τ * A τ) *ᵥ tw v) := by
+theorem term_eq (h : C.IsAdapted R A) (τ : Ψ) (v : Sg j j' → ℂ)
+    : 2 * (embOf (F.σ τ) C.xi * (star (A τ *ᵥ v) ⬝ᵥ (C.gr τ *ᵥ (A τ *ᵥ tw v)))).re
+      = 2 * C.c * (star v ⬝ᵥ v).re := by
+  have key
+      : star (A τ *ᵥ v) ⬝ᵥ (C.gr τ *ᵥ (A τ *ᵥ tw v))
+        = star v ⬝ᵥ (((A τ)ᴴ * C.gr τ * A τ) *ᵥ tw v) := by
     rw [star_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec, Matrix.mul_assoc]
   have hu : ((C.eps τ : ℝ) : ℂ) • ((A τ)ᴴ * C.gr τ * A τ) = sgI j j' := by
     rw [← h.unit τ, LatEmb.sgr]
     simp [Matrix.mul_smul, Matrix.smul_mul]
-  have hX : ((C.eps τ : ℝ) : ℂ) * (star v ⬝ᵥ (((A τ)ᴴ * C.gr τ * A τ) *ᵥ tw v)) =
-      -Complex.I * (star v ⬝ᵥ v) := by
-    rw [← smul_eq_mul, ← dotProduct_smul, ← smul_mulVec, hu, sgI_mulVec_tw, dotProduct_smul, smul_eq_mul]
-  have hz : embOf (F.σ τ) C.xi * (star (A τ *ᵥ v) ⬝ᵥ (C.gr τ *ᵥ (A τ *ᵥ tw v))) =
-      ((C.c : ℝ) : ℂ) * (star v ⬝ᵥ v) := by
+  have hX
+      : ((C.eps τ : ℝ) : ℂ) * (star v ⬝ᵥ (((A τ)ᴴ * C.gr τ * A τ) *ᵥ tw v))
+        = -Complex.I * (star v ⬝ᵥ v) := by
+    rw [← smul_eq_mul, ← dotProduct_smul, ← smul_mulVec, hu, sgI_mulVec_tw, dotProduct_smul,
+      smul_eq_mul]
+  have hz
+      : embOf (F.σ τ) C.xi * (star (A τ *ᵥ v) ⬝ᵥ (C.gr τ *ᵥ (A τ *ᵥ tw v)))
+        = ((C.c : ℝ) : ℂ) * (star v ⬝ᵥ v) := by
     rw [key, C.xi_eq τ]
     push_cast
-    have : Complex.I * ((C.c : ℂ) * ((C.eps τ : ℝ) : ℂ)) * (star v ⬝ᵥ (((A τ)ᴴ * C.gr τ * A τ) *ᵥ tw v)) =
-        Complex.I * (C.c : ℂ) * (((C.eps τ : ℝ) : ℂ) * (star v ⬝ᵥ (((A τ)ᴴ * C.gr τ * A τ) *ᵥ tw v))) := by ring
+    have : Complex.I * ((C.c : ℂ) * ((C.eps τ : ℝ) : ℂ))
+          * (star v ⬝ᵥ (((A τ)ᴴ * C.gr τ * A τ) *ᵥ tw v))
+        = Complex.I * (C.c : ℂ)
+          * (((C.eps τ : ℝ) : ℂ) * (star v ⬝ᵥ (((A τ)ᴴ * C.gr τ * A τ) *ᵥ tw v))) := by
+      ring
     rw [this, hX]
     linear_combination (-(C.c : ℂ) * (star v ⬝ᵥ v)) * Complex.I_mul_I
   rw [hz, Complex.re_ofReal_mul]
   ring
 
-theorem normSq_eq_adapted (hR : R.form = F.form) (h : C.IsAdapted R A) (x : Λ) :
-    R.normSq x = 2 * C.c * ∑ τ, (star (C.cinv (A τ) τ *ᵥ C.vec x τ) ⬝ᵥ (C.cinv (A τ) τ *ᵥ C.vec x τ)).re := by
+theorem normSq_eq_adapted (hR : R.form = F.form) (h : C.IsAdapted R A) (x : Λ)
+    : R.normSq x
+      = 2 * C.c
+        * ∑ τ, (star (C.cinv (A τ) τ *ᵥ C.vec x τ) ⬝ᵥ (C.cinv (A τ) τ *ᵥ C.vec x τ)).re := by
   have hz : C.perExt R (C.vec x) = R.P x := perExt_vec C R x
   have h1 : R.normSq x = ((Complex.I • R.P x) ⬝ᵥ R.Hm *ᵥ star (R.P x)).im := by
     rw [smul_dotProduct, smul_eq_mul]
@@ -320,6 +344,14 @@ end Adapted
 
 end GlobalTheory.CompanionTheory.Ar.Cusp.Dict.AdaptedLen
 
-theorem GlobalTheory.CompanionTheory.Ar.Cusp.Dict.AdaptedLen.normSq_adapted : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Type) [Fintype Ψ] (j j' n g : ℕ) (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (F : UnivFam E Ψ j j' n g Λ) (C : LatEmb F) (R : RiemLat E g Λ) (A : Ψ → Matrix (Fin (j + j')) (Sg j j') ℂ), R.form = F.form → C.IsAdapted R A → ∀ x, R.normSq x = 2 * C.c * ∑ τ, (star (C.cinv (A τ) τ *ᵥ C.vec x τ) ⬝ᵥ (C.cinv (A τ) τ *ᵥ C.vec x τ)).re := by
+theorem GlobalTheory.CompanionTheory.Ar.Cusp.Dict.AdaptedLen.normSq_adapted
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Type) [Fintype Ψ] (j j' n g : ℕ)
+        (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (F : UnivFam E Ψ j j' n g Λ) (C : LatEmb F)
+        (R : RiemLat E g Λ) (A : Ψ → Matrix (Fin (j + j')) (Sg j j') ℂ),
+      R.form = F.form → C.IsAdapted R A
+        → ∀ x,
+          R.normSq x
+            = 2 * C.c
+              * ∑ τ, (star (C.cinv (A τ) τ *ᵥ C.vec x τ) ⬝ᵥ (C.cinv (A τ) τ *ᵥ C.vec x τ)).re := by
   intro E _ _ _ Ψ _ j j' n g Λ _ _ F C R A hR h x
   exact GlobalTheory.CompanionTheory.Ar.Cusp.Dict.AdaptedLen.normSq_eq_adapted hR h x

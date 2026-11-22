@@ -10,26 +10,36 @@ noncomputable section
 
 namespace GlobalTheory.TwV.DelA
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference Formalism.L2.KerInert.SecondKernelHermitian
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp
+  Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection
+  Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
+  Formalism.L2.KerInert.SecondKernelHermitian
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {p : ℕ} [Fact p.Prime] (X : Sys p) (D : D7) (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau)
+variable
+  {p : ℕ} [Fact p.Prime] (X : Sys p) (D : D7) (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau)
 
-theorem pow_toNat_split {K : Type} [Field K] {a : K} (ha : a ≠ 0) (e : ℤ) :
-    a ^ e.toNat = a ^ (-e).toNat * a ^ e := by
+theorem pow_toNat_split {K : Type} [Field K] {a : K} (ha : a ≠ 0) (e : ℤ)
+    : a ^ e.toNat = a ^ (-e).toNat * a ^ e := by
   have h := Int.toNat_sub_toNat_neg e
-  calc a ^ e.toNat = a ^ (-e).toNat * a ^ ((e.toNat : ℤ) - ((-e).toNat : ℤ)) := by
-        rw [zpow_sub₀ ha, zpow_natCast, zpow_natCast]
-        field_simp
+  calc
+    a ^ e.toNat = a ^ (-e).toNat * a ^ ((e.toNat : ℤ) - ((-e).toNat : ℤ)) := by
+      rw [zpow_sub₀ ha, zpow_natCast, zpow_natCast]
+      field_simp
     _ = _ := by rw [h]
 
-theorem zT_det_ne {n : ℕ} (f : D.what₂.Tau → Matrix (Fin n) (Fin n) ℂ) (hf : ∀ τ, (f τ).det ≠ 0) (τ : D.what₂.Tau) :
-    (zT X D pos f τ).det ≠ 0 := by
+theorem zT_det_ne
+    {n : ℕ} (f : D.what₂.Tau → Matrix (Fin n) (Fin n) ℂ) (hf : ∀ τ, (f τ).det ≠ 0) (τ : D.what₂.Tau)
+    : (zT X D pos f τ).det ≠ 0 := by
   unfold zT
   split_ifs
-  · have h1 : (((f τ)⁻¹).transpose.submatrix id Fin.rev).det
-        = ((Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin n)) : ℤˣ) : ℤ) * (((f τ)⁻¹).transpose).det := by
+  · have h1
+        : (((f τ)⁻¹).transpose.submatrix id Fin.rev).det
+          = ((Equiv.Perm.sign (Fin.revPerm : Equiv.Perm (Fin n)) : ℤˣ) : ℤ)
+            * (((f τ)⁻¹).transpose).det := by
       exact Matrix.det_permute' (Fin.revPerm : Equiv.Perm (Fin n)) (((f τ)⁻¹).transpose)
     rw [h1, Matrix.det_transpose, Matrix.det_nonsing_inv]
     refine mul_ne_zero (by simp) ?_
@@ -37,19 +47,25 @@ theorem zT_det_ne {n : ℕ} (f : D.what₂.Tau → Matrix (Fin n) (Fin n) ℂ) (
     exact inv_ne_zero (hf τ)
   · exact hf τ
 
-theorem det_rev_transpose {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) :
-    (A.transpose.submatrix Fin.rev id).det = sgRev n * A.det := by
-  have : (A.transpose.submatrix Fin.rev id).det = _ := Matrix.det_permute (Fin.revPerm : Equiv.Perm (Fin n)) A.transpose
+theorem det_rev_transpose {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ)
+    : (A.transpose.submatrix Fin.rev id).det = sgRev n * A.det := by
+  have : (A.transpose.submatrix Fin.rev id).det = _ :=
+    Matrix.det_permute (Fin.revPerm : Equiv.Perm (Fin n)) A.transpose
   rw [this, Matrix.det_transpose, sgRev]
 
-theorem evD_det {Kc : Type} [Field Kc] [Algebra X.G.Kf Kc] (ι : ℂ →+* Kc) {j : ℕ} (hN : RankTie X D j)
-    (d : D.what₂.Tau → Matrix (Fin (D.R.N j)) (Fin (D.R.N (j + 1))) ℂ)
-    (f' : D.what₂.Tau → Matrix (Fin (D.R.N (j + 1))) (Fin (D.R.N (j + 1))) ℂ) {n : Type} [Fintype n] [DecidableEq n]
-    (M : Matrix n n (DA X Kc j)) : evD X D pos ι hN d f' M.det = (M.map (evD X D pos ι hN d f')).det :=
+theorem evD_det
+    {Kc : Type} [Field Kc] [Algebra X.G.Kf Kc]
+    (ι : ℂ →+* Kc)
+    {j : ℕ} (hN : RankTie X D j) (d : D.what₂.Tau → Matrix (Fin (D.R.N j)) (Fin (D.R.N (j + 1))) ℂ)
+    (f' : D.what₂.Tau → Matrix (Fin (D.R.N (j + 1))) (Fin (D.R.N (j + 1))) ℂ)
+    {n : Type} [Fintype n] [DecidableEq n]
+    (M : Matrix n n (DA X Kc j))
+    : evD X D pos ι hN d f' M.det = (M.map (evD X D pos ι hN d f')).det :=
   RingHom.map_det _ M
 
-theorem det_map_cast {Kc : Type} [Field Kc] (ι : ℂ →+* Kc) {a b : ℕ} (h : a = b) (B : Matrix (Fin b) (Fin b) ℂ) :
-    ((B.map ι).submatrix (Fin.cast h) (Fin.cast h)).det = ι B.det := by
+theorem det_map_cast
+    {Kc : Type} [Field Kc] (ι : ℂ →+* Kc) {a b : ℕ} (h : a = b) (B : Matrix (Fin b) (Fin b) ℂ)
+    : ((B.map ι).submatrix (Fin.cast h) (Fin.cast h)).det = ι B.det := by
   have : ((B.map ι).submatrix (Fin.cast h) (Fin.cast h)).det = (B.map ι).det :=
     Matrix.det_submatrix_equiv_self (finCongr h) (B.map ι)
   rw [this, RingHom.map_det]

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedOrbit
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat GlobalTheory.KapOrb
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat GlobalTheory.KapOrb
 open scoped Classical
 
 noncomputable section
@@ -15,8 +16,10 @@ namespace GlobalTheory.KapOrb.SDual
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem cj_int {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E} (hB : Bridge w K e)
-    (t : w.adicCompletion E) (ht : t ∈ w.adicCompletionIntegers E) : cj w t ∈ w.adicCompletionIntegers E := by
+theorem cj_int
+    {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E}
+    (hB : Bridge w K e) (t : w.adicCompletion E) (ht : t ∈ w.adicCompletionIntegers E)
+    : cj w t ∈ w.adicCompletionIntegers E := by
   rw [HeightOneSpectrum.mem_adicCompletionIntegers] at ht ⊢
   have h1 : e.symm t ∈ (algebraMap K.O K.E).range := (hB.2.1 _).2 (by simpa using ht)
   obtain ⟨o, ho⟩ := h1
@@ -26,14 +29,18 @@ theorem cj_int {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicC
   rw [h2]
   exact (hB.2.1 _).1 ⟨o', rfl⟩
 
-theorem cj_cj {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E} (hB : Bridge w K e)
-    (t : w.adicCompletion E) : cj w (cj w t) = t := by
+theorem cj_cj
+    {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E}
+    (hB : Bridge w K e) (t : w.adicCompletion E)
+    : cj w (cj w t) = t := by
   obtain ⟨a, rfl⟩ := e.surjective t
   rw [← hB.1, ← hB.1, K.c_c]
 
-theorem stdH_unitary {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E} (hB : Bridge w K e)
-    {n : ℕ} (M : Matrix (Fin n) (Fin n) (w.adicCompletion E)) (hM : Formalism.UG.cT (cj w) M * 1 * M = 1)
-    (v v' : Fin n → w.adicCompletion E) : stdH w (M *ᵥ v) (M *ᵥ v') = stdH w v v' := by
+theorem stdH_unitary
+    {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E} (hB : Bridge w K e)
+    {n : ℕ} (M : Matrix (Fin n) (Fin n) (w.adicCompletion E))
+    (hM : Formalism.UG.cT (cj w) M * 1 * M = 1) (v v' : Fin n → w.adicCompletion E)
+    : stdH w (M *ᵥ v) (M *ᵥ v') = stdH w v v' := by
   have hM' : Mᵀ * M.map (cj w) = 1 := by
     have h := congrArg (fun X => X.map (cj w)) hM
     simp only [Formalism.UG.cT, Matrix.mul_one] at h
@@ -41,13 +48,31 @@ theorem stdH_unitary {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w
     have hid : (cj w) ∘ (cj w) = id := funext (cj_cj hB)
     rw [hid, Matrix.map_id, Matrix.map_one _ (map_zero _) (map_one _)] at h
     exact h
-  have hc : ∀ u : Fin n → w.adicCompletion E, (fun k => cj w ((M *ᵥ u) k)) = M.map (cj w) *ᵥ (fun k => cj w (u k)) := by
-    intro u; funext k
+  have hc
+      : ∀ u : Fin n → w.adicCompletion E,
+        (fun k => cj w ((M *ᵥ u) k)) = M.map (cj w) *ᵥ (fun k => cj w (u k)) := by
+    intro u
+    funext k
     exact RingHom.map_mulVec (cj w) M u k
-  have hs : ∀ u u' : Fin n → w.adicCompletion E, stdH w u u' = u ⬝ᵥ (fun k => cj w (u' k)) := fun _ _ => rfl
-  rw [hs, hs, hc, Matrix.dotProduct_mulVec, ← Matrix.vecMul_transpose, Matrix.vecMul_vecMul, hM', Matrix.vecMul_one]
+  have hs : ∀ u u' : Fin n → w.adicCompletion E, stdH w u u' = u ⬝ᵥ (fun k => cj w (u' k)) :=
+    fun _ _ => rfl
+  rw [hs, hs, hc, Matrix.dotProduct_mulVec, ← Matrix.vecMul_transpose, Matrix.vecMul_vecMul, hM',
+    Matrix.vecMul_one]
 
-theorem pullLat_selfDual : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E), ¬ IsSplitAt w → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E), Bridge w K e → ∀ (B : GlobalTheory.UnitLemma.InvAlg K) (x : B.A) (n : ℕ) (ψ : B.A ≃+ (Fin n → w.adicCompletion E)), (∀ (c : K.E) (y : B.A), ψ (c • y) = e c • ψ y) → (∀ y z, stdH w (ψ y) (ψ z) = e (B.herm x y z)) → ∀ g ∈ UL n w, GlobalTheory.UnitLemma.IsLat K.O K.E (pullLat w B ψ g) ∧ ∀ y, y ∈ pullLat w B ψ g ↔ ∀ z ∈ pullLat w B ψ g, B.herm x y z ∈ (algebraMap K.O K.E).range := by
+theorem pullLat_selfDual
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E),
+      ¬ IsSplitAt w
+        → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E),
+          Bridge w K e
+            → ∀ (B : GlobalTheory.UnitLemma.InvAlg K) (x : B.A) (n : ℕ)
+                (ψ : B.A ≃+ (Fin n → w.adicCompletion E)),
+              (∀ (c : K.E) (y : B.A), ψ (c • y) = e c • ψ y)
+                → (∀ y z, stdH w (ψ y) (ψ z) = e (B.herm x y z))
+                → ∀ g ∈ UL n w,
+                  GlobalTheory.UnitLemma.IsLat K.O K.E (pullLat w B ψ g)
+                    ∧ ∀ y,
+                      y ∈ pullLat w B ψ g
+                        ↔ ∀ z ∈ pullLat w B ψ g, B.herm x y z ∈ (algebraMap K.O K.E).range := by
   intro E _ _ _ w hw K e hB B x n ψ hlin hherm g hg
   set M : Matrix (Fin n) (Fin n) (w.adicCompletion E) := (g⁻¹ : GLw n w).val with hMdef
   have hgi : g⁻¹ ∈ UL n w := inv_mem hg
@@ -73,11 +98,16 @@ theorem pullLat_selfDual : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
     simpa only [Matrix.mulVec_mulVec, hgM, Matrix.one_mulVec] using this
   let pre : (Fin n → w.adicCompletion E) → B.A := fun v => ψ.symm (g.val *ᵥ v)
   have hpre : ∀ v, φ (pre v) = v := by
-    intro v; rw [hφ]; simp only [pre, AddEquiv.apply_symm_apply, Matrix.mulVec_mulVec, hMg, Matrix.one_mulVec]
+    intro v
+    rw [hφ]
+    simp only [pre, AddEquiv.apply_symm_apply, Matrix.mulVec_mulVec, hMg, Matrix.one_mulVec]
   have hmem : ∀ y, y ∈ pullLat w B ψ g ↔ ∀ i, φ y i ∈ w.adicCompletionIntegers E := by
     intro y
-    have key : y ∈ pullLat w B ψ g ↔ ∀ (c : K.O) (i : Fin n),
-        ((g⁻¹ : GLw n w).val *ᵥ ψ (c • y)) i ∈ w.adicCompletionIntegers E := Iff.rfl
+    have key
+        : y ∈ pullLat w B ψ g
+          ↔ ∀ (c : K.O) (i : Fin n),
+            ((g⁻¹ : GLw n w).val *ᵥ ψ (c • y)) i ∈ w.adicCompletionIntegers E :=
+      Iff.rfl
     rw [key]
     constructor
     · intro h i
@@ -88,7 +118,9 @@ theorem pullLat_selfDual : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
       exact mul_mem ((hint _).1 ⟨c, rfl⟩) (h i)
   let z : Fin n → B.A := fun i => pre (Pi.single i 1)
   have hz : ∀ i, z i ∈ pullLat w B ψ g := by
-    intro i; rw [hmem]; intro j
+    intro i
+    rw [hmem]
+    intro j
     simp only [z, hpre, Pi.single_apply]
     split_ifs
     · exact one_mem _
@@ -100,13 +132,18 @@ theorem pullLat_selfDual : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
       rw [map_sum]
     funext j
     rw [Finset.sum_apply]
-    simp only [hφs, z, hpre, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    simp only [hφs, z, hpre, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one,
+      mul_zero, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     exact (ha j).symm
-  have hsd : ∀ y, (∀ i, φ y i ∈ w.adicCompletionIntegers E) ↔
-      ∀ z' ∈ pullLat w B ψ g, B.herm x y z' ∈ (algebraMap K.O K.E).range := by
+  have hsd
+      : ∀ y,
+        (∀ i, φ y i ∈ w.adicCompletionIntegers E)
+          ↔ ∀ z' ∈ pullLat w B ψ g, B.herm x y z' ∈ (algebraMap K.O K.E).range := by
     intro y
-    have hh : ∀ z', B.herm x y z' ∈ (algebraMap K.O K.E).range ↔ stdH w (φ y) (φ z') ∈ w.adicCompletionIntegers E := by
+    have hh
+        : ∀ z',
+          B.herm x y z' ∈ (algebraMap K.O K.E).range
+            ↔ stdH w (φ y) (φ z') ∈ w.adicCompletionIntegers E := by
       intro z'
       rw [hint, ← hherm, hφ, hφ, SDual.stdH_unitary hB M hMu]
     constructor
@@ -129,7 +166,8 @@ theorem pullLat_selfDual : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E
   · rw [Submodule.fg_def]
     refine ⟨Set.range z, Set.finite_range z, le_antisymm ?_ ?_⟩
     · rw [Submodule.span_le]
-      rintro _ ⟨i, rfl⟩; exact hz i
+      rintro _ ⟨i, rfl⟩
+      exact hz i
     · intro y hy
       rw [hmem] at hy
       have hc : ∀ i, ∃ o : K.O, e (algebraMap K.O K.E o) = φ y i := by

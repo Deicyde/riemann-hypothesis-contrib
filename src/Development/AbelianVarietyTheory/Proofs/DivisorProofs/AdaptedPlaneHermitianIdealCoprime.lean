@@ -9,7 +9,8 @@ public import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.HCFFromR
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.AdelicU Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped nonZeroDivisors Matrix TensorProduct
 
 namespace GlobalTheory.AdaptedPlaneIdeal
@@ -20,8 +21,9 @@ namespace GlobalTheory.AdaptedPlaneIdeal
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem det_ne_zero_of_hasSig {n r s : ℕ} {J : Matrix (Fin n) (Fin n) E} (φ : E →+* ℂ)
-    (h : HasSig (J.map φ) r s) : J.det ≠ 0 := by
+theorem det_ne_zero_of_hasSig
+    {n r s : ℕ} {J : Matrix (Fin n) (Fin n) E} (φ : E →+* ℂ) (h : HasSig (J.map φ) r s)
+    : J.det ≠ 0 := by
   obtain ⟨hrs, A, hA⟩ := h
   intro h0
   have hM : (J.map φ).det = 0 := by
@@ -29,7 +31,8 @@ theorem det_ne_zero_of_hasSig {n r s : ℕ} {J : Matrix (Fin n) (Fin n) E} (φ :
     rw [h0, map_zero] at this
     exact this.symm
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hM
-  have hD : IsUnit (Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1 : Matrix (Fin s) (Fin s) ℂ)) := by
+  have hD : IsUnit (Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0
+      (-1 : Matrix (Fin s) (Fin s) ℂ)) := by
     rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_fromBlocks_zero₂₁]; simp [Matrix.det_neg]
   have h1 := Matrix.rank_of_isUnit _ hD
   rw [← hA] at h1

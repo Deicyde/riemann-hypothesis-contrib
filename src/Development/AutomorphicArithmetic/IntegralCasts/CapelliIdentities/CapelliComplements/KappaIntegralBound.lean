@@ -294,31 +294,40 @@ private lemma kappaIntBound {K : Type} [Field K] [NumberField K] (p : Nat.Primes
   have h2 : ‖κ (algebraMap (NumberField.RingOfIntegers K) K r)‖₊ ≤ 1 := hm
   exact_mod_cast h2
 
-theorem goal1 :
-  ∀ {K : Type} [inst : Field.{0} K] [inst_1 : NumberField.{0} K] (p : Nat.Primes)
-  (κ : RingHom.{0, 0} K (PadicComplex (Subtype.val.{1} p))),
-  Exists.{1} fun (la : IsDedekindDomain.HeightOneSpectrum.{0} (NumberField.RingOfIntegers.{0} K)) ↦
-    ∀ (a : K),
-      Iff (LE.le.{0} (DFunLike.coe.{1, 1, 1} (IsDedekindDomain.HeightOneSpectrum.valuation.{0, 0} K la) a) 1)
-        (LE.le.{0} (Norm.norm.{0} (DFunLike.coe.{1, 1, 1} κ a)) 1) := by
+theorem goal1
+    : ∀ {K : Type} [inst : Field.{0} K] [inst_1 : NumberField.{0} K] (p : Nat.Primes)
+        (κ : RingHom.{0, 0} K (PadicComplex (Subtype.val.{1} p))),
+      Exists.{1}
+        fun (la : IsDedekindDomain.HeightOneSpectrum.{0} (NumberField.RingOfIntegers.{0} K)) ↦
+          ∀ (a : K),
+            Iff
+              (LE.le.{0}
+                (DFunLike.coe.{1, 1, 1} (IsDedekindDomain.HeightOneSpectrum.valuation.{0, 0} K la)
+                  a)
+                1)
+              (LE.le.{0} (Norm.norm.{0} (DFunLike.coe.{1, 1, 1} κ a)) 1) := by
   intro K _ _ p κ
-  have hle : ∀ r : NumberField.RingOfIntegers K,
-      ‖κ (algebraMap (NumberField.RingOfIntegers K) K r)‖ ≤ 1 := fun r => kappaIntBound p κ r
-  let I : Ideal (NumberField.RingOfIntegers K) :=
-    { carrier := {r | ‖κ (algebraMap (NumberField.RingOfIntegers K) K r)‖ < 1}
-      add_mem' := by
-        intro a b ha hb
-        simp only [Set.mem_ofPred_eq, map_add (f := _)] at ha hb ⊢
-        exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ha hb)
-      zero_mem' := by simp
-      smul_mem' := by
-        intro c a ha
-        simp only [Set.mem_ofPred_eq, smul_eq_mul, map_mul, norm_mul] at ha ⊢
-        calc ‖κ (algebraMap _ K c)‖ * ‖κ (algebraMap _ K a)‖
-            ≤ 1 * ‖κ (algebraMap _ K a)‖ := mul_le_mul_of_nonneg_right (hle c) (norm_nonneg _)
-          _ < 1 := by rw [one_mul]; exact ha }
-  have hmem : ∀ r, r ∈ I ↔ ‖κ (algebraMap (NumberField.RingOfIntegers K) K r)‖ < 1 :=
-    fun r => Iff.rfl
+  have hle
+      : ∀ r : NumberField.RingOfIntegers K,
+        ‖κ (algebraMap (NumberField.RingOfIntegers K) K r)‖ ≤ 1 := fun r =>
+    kappaIntBound p κ r
+  let I : Ideal (NumberField.RingOfIntegers K) := {
+    carrier := {r | ‖κ (algebraMap (NumberField.RingOfIntegers K) K r)‖ < 1}
+    add_mem' := by
+      intro a b ha hb
+      simp only [Set.mem_ofPred_eq, map_add (f := _)] at ha hb ⊢
+      exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ha hb)
+    zero_mem' := by simp
+    smul_mem' := by
+      intro c a ha
+      simp only [Set.mem_ofPred_eq, smul_eq_mul, map_mul, norm_mul] at ha ⊢
+      calc
+        ‖κ (algebraMap _ K c)‖ * ‖κ (algebraMap _ K a)‖
+          ≤ 1 * ‖κ (algebraMap _ K a)‖ := mul_le_mul_of_nonneg_right (hle c) (norm_nonneg _)
+        _ < 1 := by rw [one_mul]; exact ha
+  }
+  have hmem : ∀ r, r ∈ I ↔ ‖κ (algebraMap (NumberField.RingOfIntegers K) K r)‖ < 1 := fun r =>
+    Iff.rfl
   have hIprime : I.IsPrime := by
     refine ⟨?_, ?_⟩
     · rw [Ne, Ideal.eq_top_iff_one, hmem]
@@ -334,8 +343,9 @@ theorem goal1 :
       exact lt_irrefl _ hab
   have hpI : ((p.val : ℕ) : NumberField.RingOfIntegers K) ∈ I := by
     rw [hmem, map_natCast, map_natCast]
-    rw [show ((p.val : ℕ) : PadicComplex p.val) = (((p.val : ℕ) : Padic p.val) : PadicComplex p.val)
-      from by simp]
+    rw [show ((p.val : ℕ) : PadicComplex p.val)
+        = (((p.val : ℕ) : Padic p.val) : PadicComplex p.val) from by
+      simp]
     rw [PadicComplex.norm_extends', Padic.norm_p]
     exact inv_lt_one_of_one_lt₀ (by exact_mod_cast p.2.one_lt)
   have hne : I ≠ ⊥ := by
@@ -353,18 +363,15 @@ theorem goal1 :
       le_antisymm (hle _) (not_lt.mp hd)
     have hv : la.valuation K a = la.valuation K (algebraMap _ K n) := by
       rw [← h, map_mul, hvd, mul_one]
-    have hN : ‖κ a‖ = ‖κ (algebraMap _ K n)‖ := by
-      rw [← h, map_mul, norm_mul, hNd, mul_one]
+    have hN : ‖κ a‖ = ‖κ (algebraMap _ K n)‖ := by rw [← h, map_mul, norm_mul, hNd, mul_one]
     rw [hv, hN]
     exact iff_of_true (la.valuation_le_one (K := K) n) (hle n)
   · have hd : (d : NumberField.RingOfIntegers K) ∉ la.asIdeal := d.2
     have hvd := (la.valuation_eq_one_iff_notMem (K := K)).mpr hd
     have hNd : ‖κ (algebraMap _ K (d : NumberField.RingOfIntegers K))‖ = 1 :=
       le_antisymm (hle _) (not_lt.mp hd)
-    have hv2 : la.valuation K a * la.valuation K (algebraMap _ K n) = 1 := by
-      rw [← map_mul, h, hvd]
-    have hN2 : ‖κ a‖ * ‖κ (algebraMap _ K n)‖ = 1 := by
-      rw [← norm_mul, ← map_mul, h, hNd]
+    have hv2 : la.valuation K a * la.valuation K (algebraMap _ K n) = 1 := by rw [← map_mul, h, hvd]
+    have hN2 : ‖κ a‖ * ‖κ (algebraMap _ K n)‖ = 1 := by rw [← norm_mul, ← map_mul, h, hNd]
     have key1 : la.valuation K a ≤ 1 ↔ n ∉ la.asIdeal := by
       constructor
       · intro ha

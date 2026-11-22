@@ -13,26 +13,32 @@ public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.FrameBor
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg
 
 namespace GlobalTheory.Reg.ChartCompat
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
 
 def liftF {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) : Sp S ⟶ Xo.XF c :=
-  pullback.lift y.x (spMap (algebraMap c.F S)) (by
-    rw [y.x_over, spMap_comp_ring]; rfl)
+  pullback.lift y.x (spMap (algebraMap c.F S)) (by rw [y.x_over, spMap_comp_ring]; rfl)
 
-theorem liftF_fst {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) :
-    liftF y ≫ pullback.fst _ _ = y.x := pullback.lift_fst _ _ _
+theorem liftF_fst {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S)
+    : liftF y ≫ pullback.fst _ _ = y.x :=
+  pullback.lift_fst _ _ _
 
-theorem liftF_snd {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) :
-    liftF y ≫ pullback.snd _ _ = spMap (algebraMap c.F S) := pullback.lift_snd _ _ _
+theorem liftF_snd {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S)
+    : liftF y ≫ pullback.snd _ _ = spMap (algebraMap c.F S) :=
+  pullback.lift_snd _ _ _
 
-theorem liftF_map {S T : Type} [CommRing S] [Algebra c.F S] [CommRing T] [Algebra c.F T] {φ : S →ₐ[c.F] T}
-    {y : FrPt Xo c S} {z : FrPt Xo c T} (h : FrMap φ y z) : liftF z = spMap φ.toRingHom ≫ liftF y := by
+theorem liftF_map
+    {S T : Type} [CommRing S] [Algebra c.F S] [CommRing T] [Algebra c.F T]
+    {φ : S →ₐ[c.F] T} {y : FrPt Xo c S} {z : FrPt Xo c T} (h : FrMap φ y z)
+    : liftF z = spMap φ.toRingHom ≫ liftF y := by
   apply pullback.hom_ext
   · rw [Category.assoc, liftF_fst, liftF_fst, h.1]
   · rw [Category.assoc, liftF_snd, liftF_snd, spMap_comp_ring]
@@ -40,22 +46,24 @@ theorem liftF_map {S T : Type} [CommRing S] [Algebra c.F S] [CommRing T] [Algebr
     ext a
     simp
 
-theorem liftF_bor {S : Type} [CommRing S] [Algebra c.F S] {t : Ix Dw → Sˣ}
-    {y z : FrPt Xo c S} (h : FrBor t y z) : liftF z = liftF y := by
+theorem liftF_bor
+    {S : Type} [CommRing S] [Algebra c.F S] {t : Ix Dw → Sˣ} {y z : FrPt Xo c S} (h : FrBor t y z)
+    : liftF z = liftF y := by
   apply pullback.hom_ext
   · rw [liftF_fst, liftF_fst, h.1]
   · rw [liftF_snd, liftF_snd]
 
-theorem liftF_gen (h : GenFrEx Xo c) (Z : Comp Xo c) :
-    liftF (genFr h Z) = spMap (algebraMap (kap Z) (Om Z)) ≫ genSp Z := by
+theorem liftF_gen (h : GenFrEx Xo c) (Z : Comp Xo c)
+    : liftF (genFr h Z) = spMap (algebraMap (kap Z) (Om Z)) ≫ genSp Z := by
   apply pullback.hom_ext
   · rw [Category.assoc, liftF_fst, (isGenFr_genFr h Z).1]; rfl
-  · rw [Category.assoc, liftF_snd, IsScalarTower.algebraMap_eq c.F (kap Z) (Om Z), ← spMap_comp_ring]
+  · rw [Category.assoc, liftF_snd, IsScalarTower.algebraMap_eq c.F (kap Z) (Om Z),
+      ← spMap_comp_ring]
     congr 1
     exact Spec.map_preimage (genSp Z ≫ strK)
 
-theorem liftF_gen_apply (h : GenFrEx Xo c) (Z : Comp Xo c) (p : Sp (Om Z)) :
-    (liftF (genFr h Z)) p = genPt Z := by
+theorem liftF_gen_apply (h : GenFrEx Xo c) (Z : Comp Xo c) (p : Sp (Om Z))
+    : (liftF (genFr h Z)) p = genPt Z := by
   rw [liftF_gen, Scheme.Hom.comp_apply]
   exact Scheme.fromSpecResidueField_apply _ _
 
@@ -64,7 +72,8 @@ theorem closure_genPt' (Z : Comp Xo c) : closure {genPt Z} = (Z : Set (Xo.XF c))
     (isClosed_of_mem_irreducibleComponents _ Z.2).closure_eq
 
 attribute [local instance 1100] Subalgebra.algebra in
-theorem chart_mem {h : GenFrEx Xo c} (C : FChart h) (p : Sp C.R) : (liftF C.y) p ∈ (C.Z : Set (Xo.XF c)) := by
+theorem chart_mem {h : GenFrEx Xo c} (C : FChart h) (p : Sp C.R)
+    : (liftF C.y) p ∈ (C.Z : Set (Xo.XF c)) := by
   have hcl : IsClosed ((liftF C.y) ⁻¹' (C.Z : Set (Xo.XF c))) :=
     (isClosed_of_mem_irreducibleComponents _ C.Z.2).preimage (liftF C.y).continuous
   let q : Sp (Om C.Z) := (⊥ : PrimeSpectrum (Om C.Z))
@@ -85,29 +94,36 @@ theorem chart_mem {h : GenFrEx Xo c} (C : FChart h) (p : Sp C.R) : (liftF C.y) p
 
 attribute [local instance 1100] Subalgebra.algebra in
 attribute [local instance 100] IntermediateField.instAlgebraSubtypeMem in
-theorem comp_eq {h : GenFrEx Xo c} (C C' : FChart h) (ψ : C'.R →ₐ[c.F] Om C.Z) (z : FrPt Xo c (Om C.Z))
-    (t : Ix Dw → (Om C.Z)ˣ) (hz : FrMap ψ C'.y z) (hb : FrBor t z C.yg) : C.Z = C'.Z := by
+theorem comp_eq
+    {h : GenFrEx Xo c} (C C' : FChart h) (ψ : C'.R →ₐ[c.F] Om C.Z) (z : FrPt Xo c (Om C.Z))
+    (t : Ix Dw → (Om C.Z)ˣ) (hz : FrMap ψ C'.y z) (hb : FrBor t z C.yg)
+    : C.Z = C'.Z := by
   let q : Sp (Om C.Z) := (⊥ : PrimeSpectrum (Om C.Z))
   have h1 : genPt C.Z ∈ (C'.Z : Set (Xo.XF c)) := by
-    rw [← liftF_gen_apply h C.Z q, ← liftF_bor C.bor, liftF_bor hb, liftF_map hz, Scheme.Hom.comp_apply]
+    rw [← liftF_gen_apply h C.Z q, ← liftF_bor C.bor, liftF_bor hb, liftF_map hz,
+      Scheme.Hom.comp_apply]
     exact chart_mem C' _
   have h2 : (C.Z : Set (Xo.XF c)) ⊆ (C'.Z : Set (Xo.XF c)) := by
     rw [← closure_genPt']
-    exact closure_minimal (Set.singleton_subset_iff.2 h1) (isClosed_of_mem_irreducibleComponents _ C'.Z.2)
+    exact closure_minimal (Set.singleton_subset_iff.2 h1)
+      (isClosed_of_mem_irreducibleComponents _ C'.Z.2)
   exact Subtype.ext (Set.Subset.antisymm h2 (C.Z.2.2 C'.Z.2.1 h2))
 
-theorem wchar_mul {J S : Type} [Fintype J] [CommRing S] (e : J → ℕ) (t t' : J → Sˣ) :
-    wchar e (t * t') = wchar e t * wchar e t' := by
+theorem wchar_mul {J S : Type} [Fintype J] [CommRing S] (e : J → ℕ) (t t' : J → Sˣ)
+    : wchar e (t * t') = wchar e t * wchar e t' := by
   simp [wchar, mul_pow, Finset.prod_mul_distrib]
 
-theorem wchar_map {J K S T : Type} [Fintype J] [Field K] [CommRing S] [CommRing T] [Algebra K S] [Algebra K T]
-    (φ : S →ₐ[K] T) (e : J → ℕ) (t : J → Sˣ) :
-    wchar e (fun i => Units.map (φ : S →* T) (t i)) = φ (wchar e t) := by
+theorem wchar_map
+    {J K S T : Type} [Fintype J] [Field K] [CommRing S] [CommRing T] [Algebra K S] [Algebra K T]
+    (φ : S →ₐ[K] T) (e : J → ℕ) (t : J → Sˣ)
+    : wchar e (fun i => Units.map (φ : S →* T) (t i)) = φ (wchar e t) := by
   simp [wchar]
 
-theorem away_lift {K R T : Type} [Field K] [CommRing R] [Algebra K R] [Field T] [Algebra K T] (g : R)
-    (φ : R →ₐ[K] T) (hφ : φ g ≠ 0) :
-    ∃ m : Localization.Away g →ₐ[K] T, m.comp (IsScalarTower.toAlgHom K R (Localization.Away g)) = φ := by
+theorem away_lift
+    {K R T : Type} [Field K] [CommRing R] [Algebra K R] [Field T] [Algebra K T]
+    (g : R) (φ : R →ₐ[K] T) (hφ : φ g ≠ 0)
+    : ∃ m : Localization.Away g →ₐ[K] T,
+      m.comp (IsScalarTower.toAlgHom K R (Localization.Away g)) = φ := by
   have hu : ∀ m : Submonoid.powers g, IsUnit (φ m) := by
     rintro ⟨_, n, rfl⟩
     simpa using Ne.isUnit (pow_ne_zero n hφ)
@@ -115,14 +131,16 @@ theorem away_lift {K R T : Type} [Field K] [CommRing R] [Algebra K R] [Field T] 
   ext a
   simp
 
-theorem away_inj {K R T : Type} [Field K] [CommRing R] [Algebra K R] [CommRing T] [Algebra K T] (g : R)
-    (m : Localization.Away g →ₐ[K] T)
-    (h : Function.Injective (m.comp (IsScalarTower.toAlgHom K R (Localization.Away g)))) : Function.Injective m := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem away_inj
+    {K R T : Type} [Field K] [CommRing R] [Algebra K R] [CommRing T] [Algebra K T]
+    (g : R) (m : Localization.Away g →ₐ[K] T)
+    (h : Function.Injective (m.comp (IsScalarTower.toAlgHom K R (Localization.Away g))))
+    : Function.Injective m := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro s hs
   obtain ⟨⟨a, n⟩, hm⟩ := IsLocalization.surj (Submonoid.powers g) s
-  have h1 : m (algebraMap R _ a) = 0 := by
-    rw [← hm, map_mul, hs, zero_mul]
+  have h1 : m (algebraMap R _ a) = 0 := by rw [← hm, map_mul, hs, zero_mul]
   have h3 : a = 0 := (injective_iff_map_eq_zero _).1 h a h1
   dsimp only at hm
   rw [h3, map_zero] at hm
@@ -136,7 +154,18 @@ open ChartCompat
 set_option maxHeartbeats 1000000 in
 attribute [local instance 1100] Subalgebra.algebra OreLocalization.instAlgebra in
 attribute [local instance 100] IntermediateField.instAlgebraSubtypeMem in
-theorem FChart.compat : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), EvLaws Xo c → ∀ h : GenFrEx Xo c, ∀ (C C' : FChart h) (L : Type) [Field L] [Algebra c.F L] (ψ : C.R →ₐ[c.F] L) (ψ' : C'.R →ₐ[c.F] L) (z z' : FrPt Xo c L) (t : Ix Dw → Lˣ), FrMap ψ C.y z → FrMap ψ' C'.y z' → FrBor t z z' → C.Z = C'.Z ∧ ∀ (e : Ix Dw → ℕ) (b : ∀ Z : Comp Xo c, Om Z) (hb : wchar e C.t * b C.Z ∈ C.R) (hb' : wchar e C'.t * b C'.Z ∈ C'.R), ψ' ⟨_, hb'⟩ = wchar e t * ψ ⟨_, hb⟩ := by
+theorem FChart.compat
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      EvLaws Xo c
+        → ∀ h : GenFrEx Xo c,
+          ∀ (C C' : FChart h) (L : Type) [Field L] [Algebra c.F L] (ψ : C.R →ₐ[c.F] L)
+              (ψ' : C'.R →ₐ[c.F] L) (z z' : FrPt Xo c L) (t : Ix Dw → Lˣ),
+            FrMap ψ C.y z → FrMap ψ' C'.y z' → FrBor t z z'
+              → C.Z = C'.Z
+                ∧ ∀ (e : Ix Dw → ℕ) (b : ∀ Z : Comp Xo c, Om Z) (hb : wchar e C.t * b C.Z ∈ C.R)
+                    (hb' : wchar e C'.t * b C'.Z ∈ C'.R),
+                  ψ' ⟨_, hb'⟩ = wchar e t * ψ ⟨_, hb⟩ := by
   intro E _ _ _ H Dw l Xo c hev h C C' L _ _ ψ ψ' z z' t hz hz' hbor
   have G := GlobalTheory.Reg.BorelGroupoid.frBor_groupoid E H Dw l Xo c
   have U := GlobalTheory.Frames.frMap_unique_refl_iff E H Dw l Xo c
@@ -180,8 +209,7 @@ theorem FChart.compat : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (
   have e4 : nu.comp φ = ψ' := mono' _ _ _ _ _ _ m4 hz' b4
   have e5 : vnu = z' := (U _ _ ψ' y').1 _ _ (e4 ▸ m4) hz'
   subst e5
-  have e6 : (fun i => Units.map (nu : S →* L) (s i)) * t = 1 :=
-    (G _).2.2.2 _ _ _ _ b4 ((G _).1 _)
+  have e6 : (fun i => Units.map (nu : S →* L) (s i)) * t = 1 := (G _).2.2.2 _ _ _ _ b4 ((G _).1 _)
   have e7 : lam ⟨_, hb⟩ = wchar e s * φ ⟨_, hb'⟩ := by
     apply hinj
     have a1 : mu (lam ⟨_, hb⟩) = wchar e tC * b Z := DFunLike.congr_fun hmu ⟨_, hb⟩

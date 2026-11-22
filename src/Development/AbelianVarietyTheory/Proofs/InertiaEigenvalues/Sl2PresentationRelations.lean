@@ -33,7 +33,6 @@ lemma en_wS : en (wS K) 0 0 = 0 ∧ en (wS K) 0 1 = 1 ∧ en (wS K) 1 0 = -1 ∧
 
 variable {M : Type} [Monoid M]
 
-
 open Classical in
 def mx (m : Kˣ → M) (x : K) : M := by
   classical
@@ -45,12 +44,14 @@ lemma mx_ne (m : Kˣ → M) {x : K} (hx : x ≠ 0) : mx m x = m (Units.mk0 x hx)
 lemma mx_unit (m : Kˣ → M) (s : Kˣ) : mx m (s : K) = m s := by
   rw [mx_ne m s.ne_zero, Units.mk0_val]
 
-
 open Classical in
 def rho (n : K → M) (m : Kˣ → M) (t : M) (g : SpecialLinearGroup (Fin 2) K) : M := by
   classical
-  exact if en g 1 0 = 0 then mx m (en g 0 0) * n (en g 0 1 / en g 0 0)
-  else n (en g 0 0 / en g 1 0) * mx m (-1 / en g 1 0) * t * n (en g 1 1 / en g 1 0)
+  exact
+    if en g 1 0 = 0 then
+      mx m (en g 0 0) * n (en g 0 1 / en g 0 0)
+    else
+      n (en g 0 0 / en g 1 0) * mx m (-1 / en g 1 0) * t * n (en g 1 1 / en g 1 0)
 
 lemma a_ne (g : SpecialLinearGroup (Fin 2) K) (hc : en g 1 0 = 0) : en g 0 0 ≠ 0 := by
   intro h; have := det_en g; rw [h, hc] at this; simp at this
@@ -259,18 +260,23 @@ end GlobalTheory.BruhatRep
 
 namespace GlobalTheory.BruhatRep
 
-theorem exists_hom_of_bruhat : ∀ (K : Type) [CommRing K], IsField K → ∀ (M : Type) [Monoid M] (n : K → M)
-    (m : Kˣ → M) (t : M), n 0 = 1 → (∀ a b, n (a + b) = n a * n b) → m 1 = 1 →
-    (∀ a b, m (a * b) = m a * m b) → (∀ s z, m s * n z = n ((s : K) ^ 2 * z) * m s) → t * t = m (-1) →
-    (∀ s, t * m s = m s⁻¹ * t) →
-    (∀ u : Kˣ, t * n u * t = n (-((u⁻¹ : Kˣ) : K)) * m (-u⁻¹) * t * n (-((u⁻¹ : Kˣ) : K))) →
-    ∃ ρ : SpecialLinearGroup (Fin 2) K →* M, (∀ z, ρ (nS z) = n z) ∧ (∀ s, ρ (mS s) = m s) ∧ ρ (wS K) = t := by
+theorem exists_hom_of_bruhat
+    : ∀ (K : Type) [CommRing K],
+      IsField K
+        → ∀ (M : Type) [Monoid M] (n : K → M) (m : Kˣ → M) (t : M),
+          n 0 = 1 → (∀ a b, n (a + b) = n a * n b) → m 1 = 1 → (∀ a b, m (a * b) = m a * m b)
+            → (∀ s z, m s * n z = n ((s : K) ^ 2 * z) * m s) → t * t = m (-1)
+            → (∀ s, t * m s = m s⁻¹ * t)
+            → (∀ u : Kˣ, t * n u * t = n (-((u⁻¹ : Kˣ) : K)) * m (-u⁻¹) * t * n (-((u⁻¹ : Kˣ) : K)))
+            → ∃ ρ : SpecialLinearGroup (Fin 2) K →* M,
+              (∀ z, ρ (nS z) = n z) ∧ (∀ s, ρ (mS s) = m s) ∧ ρ (wS K) = t := by
   intro K _ hK M _ n m t hn0 hn hm1 hm hmn htt htm htnt
   letI := hK.toField
-  let ρ : SpecialLinearGroup (Fin 2) K →* M :=
-    { toFun := rho n m t
-      map_one' := rho_one n m t hn0 hm1
-      map_mul' := rho_mul n m t hn0 hn hm hmn htt htm htnt }
+  let ρ : SpecialLinearGroup (Fin 2) K →* M := {
+    toFun := rho n m t
+    map_one' := rho_one n m t hn0 hm1
+    map_mul' := rho_mul n m t hn0 hn hm hmn htt htm htnt
+  }
   refine ⟨ρ, ?_, ?_, ?_⟩
   · intro z
     have := rho_n n m t hn 1 z

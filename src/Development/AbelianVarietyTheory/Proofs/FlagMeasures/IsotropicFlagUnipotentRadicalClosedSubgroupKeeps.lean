@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGau
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.FlagMeas.UnipRad
 
@@ -66,24 +67,33 @@ private lemma closed_step (V : Submodule ℂ (Fin n → ℂ)) (y : Fin n → ℂ
   exact V.closed_of_finiteDimensional.preimage
     ((hc.matrix_mulVec continuous_const).sub continuous_const)
 
-theorem flagN_subgroup_closed_keeps (n : ℕ) (ε : Fin n → Bool) (a : ℕ) (j : Fin a → ℕ)
-    (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)) (hW : IsIsoFlag ε j W) :
-    (∃ N : Subgroup (Formalism.REAL.UJ ε), (N : Set (Formalism.REAL.UJ ε)) = flagN ε W) ∧ IsClosed (flagN ε W) ∧
-      ∀ u ∈ flagN ε W, ∀ i, ∀ y ∈ W i, uMat u *ᵥ y ∈ W i := by
-  refine ⟨⟨{ carrier := flagN ε W, mul_mem' := ?_, one_mem' := ?_, inv_mem' := ?_ }, rfl⟩, ?_,
-    fun u hu i => keeps hW u hu i⟩
+theorem flagN_subgroup_closed_keeps
+    (n : ℕ) (ε : Fin n → Bool)
+    (a : ℕ) (j : Fin a → ℕ) (W : Fin (a + 1) → Submodule ℂ (Fin n → ℂ)) (hW : IsIsoFlag ε j W)
+    : (∃ N : Subgroup (Formalism.REAL.UJ ε), (N : Set (Formalism.REAL.UJ ε)) = flagN ε W)
+      ∧ IsClosed (flagN ε W) ∧ ∀ u ∈ flagN ε W, ∀ i, ∀ y ∈ W i, uMat u *ᵥ y ∈ W i := by
+  refine ⟨
+    ⟨{ carrier := flagN ε W, mul_mem' := ?_, one_mem' := ?_, inv_mem' := ?_ }, rfl⟩,
+    ?_,
+    fun u hu i => keeps hW u hu i
+  ⟩
   · intro g h hg hh
-    exact ⟨fun i y hy => step_mul g h _ y (keeps hW g hg _) (hg.1 i y hy) (hh.1 i y hy),
-      fun y hy => step_mul g h _ y (keeps hW g hg _) (hg.2 y hy) (hh.2 y hy)⟩
-  · refine ⟨fun i y _ => ?_, fun y _ => ?_⟩ <;>
-    · rw [uMat_one', Matrix.one_mulVec, sub_self]
-      exact Submodule.zero_mem _
+    exact ⟨
+      fun i y hy => step_mul g h _ y (keeps hW g hg _) (hg.1 i y hy) (hh.1 i y hy),
+      fun y hy => step_mul g h _ y (keeps hW g hg _) (hg.2 y hy) (hh.2 y hy)
+    ⟩
+  · refine ⟨fun i y _ => ?_, fun y _ => ?_⟩
+      <;> · rw [uMat_one', Matrix.one_mulVec, sub_self]
+            exact Submodule.zero_mem _
   · intro g hg
-    exact ⟨fun i y hy => step_inv g _ y (keeps hW g hg _) (hg.1 i y hy),
-      fun y hy => step_inv g _ y (keeps hW g hg _) (hg.2 y hy)⟩
+    exact ⟨
+      fun i y hy => step_inv g _ y (keeps hW g hg _) (hg.1 i y hy),
+      fun y hy => step_inv g _ y (keeps hW g hg _) (hg.2 y hy)
+    ⟩
   · unfold flagN
     simp only [Set.ofPred_and, Set.ofPred_forall]
-    exact (isClosed_iInter fun i => isClosed_iInter fun y => isClosed_iInter fun _ => closed_step _ y).inter
+    exact (isClosed_iInter fun i =>
+        isClosed_iInter fun y => isClosed_iInter fun _ => closed_step _ y).inter
       (isClosed_iInter fun y => isClosed_iInter fun _ => closed_step _ y)
 
 end GlobalTheory.FlagMeas.UnipRad

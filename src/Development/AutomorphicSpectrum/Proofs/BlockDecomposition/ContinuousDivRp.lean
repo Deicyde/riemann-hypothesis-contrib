@@ -20,14 +20,15 @@ variable {G : Type} [Group G] [TopologicalSpace G]
 def secOf (P : Subgroup G) (h : G → ℝ) (F : G ⧸ P → ℂ) (g : G) : ℂ :=
   F (QuotientGroup.mk g⁻¹) * (h g : ℂ)
 
-theorem mk_inv_mul {P : Subgroup G} {p : G} (hp : p ∈ P) (g : G) :
-    (QuotientGroup.mk (p * g)⁻¹ : G ⧸ P) = QuotientGroup.mk g⁻¹ := by
+theorem mk_inv_mul {P : Subgroup G} {p : G} (hp : p ∈ P) (g : G)
+    : (QuotientGroup.mk (p * g)⁻¹ : G ⧸ P) = QuotientGroup.mk g⁻¹ := by
   rw [mul_inv_rev]
   exact QuotientGroup.mk_mul_of_mem _ (P.inv_mem hp)
 
-theorem div_rp {P : Subgroup G} {h : G → ℝ} {f : G → ℂ} (hpos : ∀ g, 0 < h g) (hf : Sec P h f) (g : G) :
-    f (rp (QuotientGroup.mk g⁻¹ : G ⧸ P)) / (h (rp (QuotientGroup.mk g⁻¹ : G ⧸ P)) : ℂ) =
-      f g / (h g : ℂ) := by
+theorem div_rp
+    {P : Subgroup G} {h : G → ℝ} {f : G → ℂ} (hpos : ∀ g, 0 < h g) (hf : Sec P h f) (g : G)
+    : f (rp (QuotientGroup.mk g⁻¹ : G ⧸ P)) / (h (rp (QuotientGroup.mk g⁻¹ : G ⧸ P)) : ℂ)
+      = f g / (h g : ℂ) := by
   obtain ⟨p, hp⟩ := QuotientGroup.mk_out_eq_mul P g⁻¹
   have hr : rp (QuotientGroup.mk g⁻¹ : G ⧸ P) = (p : G)⁻¹ * g := by
     show (Quotient.out (QuotientGroup.mk g⁻¹ : G ⧸ P))⁻¹ = _
@@ -41,8 +42,9 @@ theorem div_rp {P : Subgroup G} {h : G → ℝ} {f : G → ℂ} (hpos : ∀ g, 0
 
 variable [IsTopologicalGroup G]
 
-theorem secOf_sec {P : Subgroup G} {h : G → ℝ} (hc : Continuous h) {F : G ⧸ P → ℂ}
-    (hF : Continuous F) : Sec P h (secOf P h F) := by
+theorem secOf_sec
+    {P : Subgroup G} {h : G → ℝ} (hc : Continuous h) {F : G ⧸ P → ℂ} (hF : Continuous F)
+    : Sec P h (secOf P h F) := by
   refine ⟨?_, fun p hp g => ?_⟩
   · unfold secOf
     exact (hF.comp (QuotientGroup.continuous_mk.comp continuous_inv)).mul
@@ -51,8 +53,9 @@ theorem secOf_sec {P : Subgroup G} {h : G → ℝ} (hc : Continuous h) {F : G �
     rw [mk_inv_mul hp g]
     ring
 
-theorem compact_quot {P : Subgroup G}
-    (hco : ∃ C : Set G, IsCompact C ∧ ∀ g, ∃ q ∈ P, ∃ c ∈ C, g = q * c) : CompactSpace (G ⧸ P) := by
+theorem compact_quot
+    {P : Subgroup G} (hco : ∃ C : Set G, IsCompact C ∧ ∀ g, ∃ q ∈ P, ∃ c ∈ C, g = q * c)
+    : CompactSpace (G ⧸ P) := by
   obtain ⟨C, hC, hcov⟩ := hco
   have huniv : (Set.univ : Set (G ⧸ P)) = (fun c => (QuotientGroup.mk c⁻¹ : G ⧸ P)) '' C := by
     ext x
@@ -66,12 +69,14 @@ theorem compact_quot {P : Subgroup G}
   rw [huniv]
   exact hC.image (QuotientGroup.continuous_mk.comp continuous_inv)
 
-theorem continuous_div_rp {P : Subgroup G} {h : G → ℝ} {f : G → ℂ} (hc : Continuous h)
-    (hpos : ∀ g, 0 < h g) (hf : Sec P h f) :
-    Continuous fun q : G ⧸ P => f (rp q) / (h (rp q) : ℂ) := by
+theorem continuous_div_rp
+    {P : Subgroup G} {h : G → ℝ} {f : G → ℂ}
+    (hc : Continuous h) (hpos : ∀ g, 0 < h g) (hf : Sec P h f)
+    : Continuous fun q : G ⧸ P => f (rp q) / (h (rp q) : ℂ) := by
   rw [(QuotientGroup.isQuotientMap_mk P).continuous_iff]
-  have hcomp : ((fun q : G ⧸ P => f (rp q) / (h (rp q) : ℂ)) ∘ QuotientGroup.mk) =
-      fun a => f a⁻¹ / (h a⁻¹ : ℂ) := by
+  have hcomp
+      : ((fun q : G ⧸ P => f (rp q) / (h (rp q) : ℂ)) ∘ QuotientGroup.mk)
+        = fun a => f a⁻¹ / (h a⁻¹ : ℂ) := by
     funext a
     have := div_rp hpos hf a⁻¹
     rw [inv_inv] at this
@@ -80,37 +85,43 @@ theorem continuous_div_rp {P : Subgroup G} {h : G → ℝ} {f : G → ℂ} (hc :
   exact (hf.1.comp continuous_inv).div (Complex.continuous_ofReal.comp (hc.comp continuous_inv))
     fun a => by exact_mod_cast (hpos _).ne'
 
-theorem exists_repr [T2Space G] (P : Subgroup G) [MeasurableSpace (G ⧸ P)] [BorelSpace (G ⧸ P)]
-    (h : G → ℝ) (mu : (G → ℂ) → ℂ) (S : Setup P h mu) : ∃ ν, Repr P h mu ν := by
+theorem exists_repr
+    [T2Space G]
+    (P : Subgroup G) [MeasurableSpace (G ⧸ P)] [BorelSpace (G ⧸ P)]
+    (h : G → ℝ) (mu : (G → ℂ) → ℂ) (S : Setup P h mu)
+    : ∃ ν, Repr P h mu ν := by
   haveI : CompactSpace (G ⧸ P) := compact_quot S.cocpt
   haveI : IsClosed (P : Set G) := S.closed
-  let Λ : C(G ⧸ P, ℂ) →ₗ[ℂ] ℂ :=
-    { toFun := fun F => mu (secOf P h F)
-      map_add' := fun F F' => by
-        have he : secOf P h ⇑(F + F') = secOf P h F + secOf P h F' := by
-          funext g
-          simp only [secOf, ContinuousMap.add_apply, Pi.add_apply]
-          ring
-        rw [he]
-        exact S.add _ _ (secOf_sec S.cont F.continuous) (secOf_sec S.cont F'.continuous)
-      map_smul' := fun c F => by
-        have he : secOf P h ⇑(c • F) = c • secOf P h F := by
-          funext g
-          simp only [secOf, ContinuousMap.smul_apply, Pi.smul_apply, smul_eq_mul]
-          ring
-        rw [he]
-        exact S.smul c _ (secOf_sec S.cont F.continuous) }
+  let Λ : C(G ⧸ P, ℂ) →ₗ[ℂ] ℂ := {
+    toFun := fun F => mu (secOf P h F)
+    map_add' := fun F F' => by
+      have he : secOf P h ⇑(F + F') = secOf P h F + secOf P h F' := by
+        funext g
+        simp only [secOf, ContinuousMap.add_apply, Pi.add_apply]
+        ring
+      rw [he]
+      exact S.add _ _ (secOf_sec S.cont F.continuous) (secOf_sec S.cont F'.continuous)
+    map_smul' := fun c F => by
+      have he : secOf P h ⇑(c • F) = c • secOf P h F := by
+        funext g
+        simp only [secOf, ContinuousMap.smul_apply, Pi.smul_apply, smul_eq_mul]
+        ring
+      rw [he]
+      exact S.smul c _ (secOf_sec S.cont F.continuous)
+  }
   have hpos : ∀ F : C(G ⧸ P, ℂ), 0 ≤ Λ (star F * F) := by
     intro F
-    have hval : ∀ g, secOf P h ⇑(star F * F) g =
-        ((Complex.normSq (F (QuotientGroup.mk g⁻¹)) * h g : ℝ) : ℂ) := by
+    have hval
+        : ∀ g,
+          secOf P h ⇑(star F * F) g
+            = ((Complex.normSq (F (QuotientGroup.mk g⁻¹)) * h g : ℝ) : ℂ) := by
       intro g
       simp only [secOf, ContinuousMap.mul_apply, ContinuousMap.star_apply]
       push_cast
       rw [Complex.normSq_eq_conj_mul_self]
       rfl
-    have hnn := S.nonneg (secOf P h ⇑(star F * F)) (secOf_sec S.cont (star F * F).continuous)
-      (fun g => by
+    have hnn :=
+      S.nonneg (secOf P h ⇑(star F * F)) (secOf_sec S.cont (star F * F).continuous) (fun g => by
         rw [hval g, Complex.ofReal_re, Complex.ofReal_im]
         exact ⟨mul_nonneg (Complex.normSq_nonneg _) (S.pos g).le, rfl⟩)
     exact Complex.nonneg_iff.2 ⟨hnn.1, hnn.2.symm⟩
@@ -125,9 +136,10 @@ theorem exists_repr [T2Space G] (P : Subgroup G) [MeasurableSpace (G ⧸ P)] [Bo
     field_simp
   refine ⟨?_, ?_⟩
   · exact Fc.continuous.integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)
-  · calc mu f = Λ Fc := by
-          show mu f = mu (secOf P h ⇑Fc)
-          rw [hsec]
+  · calc
+      mu f = Λ Fc := by
+        show mu f = mu (secOf P h ⇑Fc)
+        rw [hsec]
       _ = ∫ q, Fc q ∂ν := hrep Fc
 
 theorem riesz : Riesz := by

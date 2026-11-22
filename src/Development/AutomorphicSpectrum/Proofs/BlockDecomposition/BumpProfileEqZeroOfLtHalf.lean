@@ -11,11 +11,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.TestFun
 
-theorem contDiff_mul_of_vanish {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    {N : E → ℝ} (hN : ContDiff ℝ (⊤ : ℕ∞) N) {φ : ℝ → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ)
-    (hφ0 : ∀ s, s < 1 / 2 → φ s = 0) {H : E → ℝ}
-    (hH : ∀ y, 0 < N y → ContDiffAt ℝ (⊤ : ℕ∞) H y) :
-    ContDiff ℝ (⊤ : ℕ∞) (fun y => φ (N y) * H y) := by
+theorem contDiff_mul_of_vanish
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {N : E → ℝ} (hN : ContDiff ℝ (⊤ : ℕ∞) N)
+    {φ : ℝ → ℝ} (hφ : ContDiff ℝ (⊤ : ℕ∞) φ) (hφ0 : ∀ s, s < 1 / 2 → φ s = 0)
+    {H : E → ℝ} (hH : ∀ y, 0 < N y → ContDiffAt ℝ (⊤ : ℕ∞) H y)
+    : ContDiff ℝ (⊤ : ℕ∞) (fun y => φ (N y) * H y) := by
   rw [contDiff_iff_contDiffAt]
   intro y
   by_cases hy : 0 < N y
@@ -33,8 +34,8 @@ theorem sqSum_contDiff {ι : Type} [Fintype ι] : ContDiff ℝ (⊤ : ℕ∞) (s
   unfold sqSum
   exact ContDiff.sum fun j _ => (contDiff_apply ℝ (fun _ => ℝ) j).pow 2
 
-theorem sqSum_smul {ι : Type} [Fintype ι] (t : ℝ) (v : ι → ℝ) :
-    sqSum (t • v) = t ^ 2 * sqSum v := by
+theorem sqSum_smul {ι : Type} [Fintype ι] (t : ℝ) (v : ι → ℝ)
+    : sqSum (t • v) = t ^ 2 * sqSum v := by
   unfold sqSum
   rw [Finset.mul_sum]
   exact Finset.sum_congr rfl fun j _ => by simp [mul_pow]
@@ -43,8 +44,9 @@ theorem sq_le_sqSum {ι : Type} [Fintype ι] (y : ι → ℝ) (j : ι) : y j ^ 2
   unfold sqSum
   exact Finset.single_le_sum (f := fun j => y j ^ 2) (fun i _ => sq_nonneg _) (Finset.mem_univ j)
 
-theorem hasCompactSupport_of_sqSum {ι : Type} [Fintype ι] {F : (ι → ℝ) → ℝ}
-    (h : ∀ y, 2 < sqSum y → F y = 0) : HasCompactSupport F := by
+theorem hasCompactSupport_of_sqSum
+    {ι : Type} [Fintype ι] {F : (ι → ℝ) → ℝ} (h : ∀ y, 2 < sqSum y → F y = 0)
+    : HasCompactSupport F := by
   refine HasCompactSupport.intro (isCompact_closedBall (0 : ι → ℝ) 2) ?_
   intro y hy
   apply h
@@ -52,8 +54,8 @@ theorem hasCompactSupport_of_sqSum {ι : Type} [Fintype ι] {F : (ι → ℝ) �
   have : ∃ j, 2 < |y j| := by
     by_contra hc
     push Not at hc
-    have : ‖y‖ ≤ 2 := (pi_norm_le_iff_of_nonneg (by norm_num)).2 fun j => by
-      simpa [Real.norm_eq_abs] using hc j
+    have : ‖y‖ ≤ 2 :=
+      (pi_norm_le_iff_of_nonneg (by norm_num)).2 fun j => by simpa [Real.norm_eq_abs] using hc j
     linarith
   obtain ⟨j, hj⟩ := this
   have h4 : (2 : ℝ) ^ 2 < y j ^ 2 := by
@@ -63,8 +65,7 @@ theorem hasCompactSupport_of_sqSum {ι : Type} [Fintype ι] {F : (ι → ℝ) �
 
 def phi0 : ContDiffBump (1 : ℝ) := ⟨1 / 4, 1 / 2, by norm_num, by norm_num⟩
 
-theorem bumpProfile_one : phi0 1 = 1 :=
-  phi0.one_of_mem_closedBall (by simp [phi0])
+theorem bumpProfile_one : phi0 1 = 1 := phi0.one_of_mem_closedBall (by simp [phi0])
 
 theorem bumpProfile_eq_zero_of_lt_half (s : ℝ) (hs : s < 1 / 2) : phi0 s = 0 := by
   refine phi0.zero_of_le_dist ?_
@@ -80,8 +81,7 @@ theorem bumpProfile_eq_zero_of_two_lt (s : ℝ) (hs : 2 < s) : phi0 s = 0 := by
 
 theorem bumpProfile_contDiff : ContDiff ℝ (⊤ : ℕ∞) (fun s : ℝ => phi0 s) := phi0.contDiff
 
-def bumpAt (δ : ℝ) (hδ : 0 < δ) : ContDiffBump (1 : ℝ) :=
-  ⟨δ / 2, δ, half_pos hδ, half_lt_self hδ⟩
+def bumpAt (δ : ℝ) (hδ : 0 < δ) : ContDiffBump (1 : ℝ) := ⟨δ / 2, δ, half_pos hδ, half_lt_self hδ⟩
 
 theorem bumpAt_one (δ : ℝ) (hδ : 0 < δ) : bumpAt δ hδ 1 = 1 :=
   (bumpAt δ hδ).one_of_mem_closedBall (by simp [bumpAt]; linarith)
@@ -96,16 +96,20 @@ theorem bumpAt_ne (δ : ℝ) (hδ : 0 < δ) {s : ℝ} (h : bumpAt δ hδ s ≠ 0
 def angular {ι : Type} [Fintype ι] (i₀ : ι) (m : ℕ) (δ : ℝ) (hδ : 0 < δ) (y : ι → ℝ) : ℝ :=
   bumpAt δ hδ (y i₀ ^ 2 / sqSum y) * (y i₀ / Real.sqrt (sqSum y)) ^ m
 
-theorem angular_contDiffAt {ι : Type} [Fintype ι] (i₀ : ι) (m : ℕ) (δ : ℝ) (hδ : 0 < δ)
-    (y : ι → ℝ) (hy : 0 < sqSum y) : ContDiffAt ℝ (⊤ : ℕ∞) (angular i₀ m δ hδ) y := by
+theorem angular_contDiffAt
+    {ι : Type} [Fintype ι] (i₀ : ι) (m : ℕ) (δ : ℝ) (hδ : 0 < δ) (y : ι → ℝ) (hy : 0 < sqSum y)
+    : ContDiffAt ℝ (⊤ : ℕ∞) (angular i₀ m δ hδ) y := by
   have hN : ContDiffAt ℝ (⊤ : ℕ∞) (sqSum (ι := ι)) y := sqSum_contDiff.contDiffAt
-  have hc : ContDiffAt ℝ (⊤ : ℕ∞) (fun y : ι → ℝ => y i₀) y := (contDiff_apply ℝ (fun _ => ℝ) i₀).contDiffAt
+  have hc : ContDiffAt ℝ (⊤ : ℕ∞) (fun y : ι → ℝ => y i₀) y :=
+    (contDiff_apply ℝ (fun _ => ℝ) i₀).contDiffAt
   have hq : ContDiffAt ℝ (⊤ : ℕ∞) (fun y : ι → ℝ => y i₀ ^ 2 / sqSum y) y :=
     (hc.pow 2).div hN hy.ne'
   have hbc : ContDiff ℝ (⊤ : ℕ∞) (fun s : ℝ => bumpAt δ hδ s) := (bumpAt δ hδ).contDiff
   have hb : ContDiffAt ℝ (⊤ : ℕ∞) (fun y : ι → ℝ => bumpAt δ hδ (y i₀ ^ 2 / sqSum y)) y :=
-    ContDiff.comp_contDiffAt (g := fun s : ℝ => bumpAt δ hδ s)
-      (f := fun y : ι → ℝ => y i₀ ^ 2 / sqSum y) y hbc hq
+    ContDiff.comp_contDiffAt
+      (g := fun s : ℝ => bumpAt δ hδ s)
+      (f := fun y : ι → ℝ => y i₀ ^ 2 / sqSum y)
+      y hbc hq
   have hs : ContDiffAt ℝ (⊤ : ℕ∞) (fun y : ι → ℝ => Real.sqrt (sqSum y)) y := hN.sqrt hy.ne'
   exact hb.mul ((hc.div hs (Real.sqrt_pos.2 hy).ne').pow m)
 
@@ -115,8 +119,11 @@ def bigF {ι : Type} [Fintype ι] (i₀ : ι) (m : ℕ) (δ : ℝ) (hδ : 0 < δ
 def smallF (m : ℕ) (t : ℝ) : ℝ := phi0 (t ^ 2) * (t / Real.sqrt (t ^ 2)) ^ m
 
 theorem smallF_contDiff (m : ℕ) : ContDiff ℝ (⊤ : ℕ∞) (smallF m) := by
-  refine contDiff_mul_of_vanish (N := fun t : ℝ => t ^ 2) (contDiff_id.pow 2) bumpProfile_contDiff
-    bumpProfile_eq_zero_of_lt_half (H := fun t => (t / Real.sqrt (t ^ 2)) ^ m) ?_
+  refine contDiff_mul_of_vanish
+    (N := fun t : ℝ => t ^ 2)
+    (contDiff_id.pow 2) bumpProfile_contDiff bumpProfile_eq_zero_of_lt_half
+    (H := fun t => (t / Real.sqrt (t ^ 2)) ^ m)
+    ?_
   intro y hy
   have hN : ContDiffAt ℝ (⊤ : ℕ∞) (fun t : ℝ => t ^ 2) y := (contDiff_id.pow 2).contDiffAt
   exact (contDiffAt_id.div (hN.sqrt hy.ne') (Real.sqrt_pos.2 hy).ne').pow m
@@ -130,13 +137,18 @@ theorem smallF_compact (m : ℕ) : HasCompactSupport (smallF m) := by
     exact pow_lt_pow_left₀ hn (by norm_num) (by norm_num)
   simp [smallF, bumpProfile_eq_zero_of_two_lt (t ^ 2) (by linarith)]
 
-theorem bigF_unit {ι : Type} [Fintype ι] (i₀ : ι) (m : ℕ) (δ : ℝ) (hδ : 0 < δ) (v : ι → ℝ)
-    (hv : sqSum v = 1) : bigF i₀ m δ hδ v = bumpAt δ hδ (v i₀ ^ 2) * v i₀ ^ m := by
+theorem bigF_unit
+    {ι : Type} [Fintype ι] (i₀ : ι) (m : ℕ) (δ : ℝ) (hδ : 0 < δ) (v : ι → ℝ) (hv : sqSum v = 1)
+    : bigF i₀ m δ hδ v = bumpAt δ hδ (v i₀ ^ 2) * v i₀ ^ m := by
   simp [bigF, angular, hv, bumpProfile_one]
 
-theorem bigF_smul {ι : Type} [Fintype ι] (i₀ : ι) (m : ℕ) (δ : ℝ) (hδ : 0 < δ) (v : ι → ℝ)
-    (hv : sqSum v = 1) (t : ℝ) :
-    bigF i₀ m δ hδ (t • v) = smallF m t * bigF i₀ m δ hδ v := by
+theorem bigF_smul
+    {ι : Type} [Fintype ι]
+    (i₀ : ι) (m : ℕ)
+    (δ : ℝ) (hδ : 0 < δ)
+    (v : ι → ℝ) (hv : sqSum v = 1)
+    (t : ℝ)
+    : bigF i₀ m δ hδ (t • v) = smallF m t * bigF i₀ m δ hδ v := by
   rw [bigF_unit i₀ m δ hδ v hv]
   have hN : sqSum (t • v) = t ^ 2 := by rw [sqSum_smul, hv, mul_one]
   by_cases ht : t = 0

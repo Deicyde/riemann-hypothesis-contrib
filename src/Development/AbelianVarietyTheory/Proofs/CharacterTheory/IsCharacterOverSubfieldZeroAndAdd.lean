@@ -8,15 +8,19 @@ public import Development.AbelianVarietyTheory.Definitions.CommutativeAlgebra.Ab
 open GlobalTheory.BI
 namespace GlobalTheory.BI
 
-private theorem exists_representation_character_eq_add (K : Type) [Field K] (G : Type) [Group G]
-    (n m : ℕ) (ρ : Representation K G (Fin n → K)) (σ : Representation K G (Fin m → K)) :
-    ∃ τ : Representation K G (Fin (n + m) → K),
-      ∀ g, τ.character g = ρ.character g + σ.character g := by
+private theorem exists_representation_character_eq_add
+    (K : Type) [Field K]
+    (G : Type) [Group G]
+    (n m : ℕ) (ρ : Representation K G (Fin n → K)) (σ : Representation K G (Fin m → K))
+    : ∃ τ : Representation K G (Fin (n + m) → K), ∀ g,
+      τ.character g = ρ.character g + σ.character g := by
   let e : ((Fin n → K) × (Fin m → K)) ≃ₗ[K] (Fin (n + m) → K) :=
-    (LinearEquiv.sumArrowLequivProdArrow (Fin n) (Fin m) K K).symm ≪≫ₗ
-      LinearEquiv.funCongrLeft K K finSumFinEquiv.symm
-  refine ⟨{ toFun := fun g => e.conj ((ρ g).prodMap (σ g)), map_one' := ?_, map_mul' := ?_ },
-    fun g => ?_⟩
+    (LinearEquiv.sumArrowLequivProdArrow (Fin n) (Fin m) K K).symm
+      ≪≫ₗ LinearEquiv.funCongrLeft K K finSumFinEquiv.symm
+  refine ⟨
+    { toFun := fun g => e.conj ((ρ g).prodMap (σ g)), map_one' := ?_, map_mul' := ?_ },
+    fun g => ?_
+  ⟩
   · simp only [map_one, LinearMap.prodMap_one]
     exact e.conj_id
   · intro g h
@@ -27,10 +31,12 @@ private theorem exists_representation_character_eq_add (K : Type) [Field K] (G :
     show LinearMap.trace K _ (e.conj _) = _
     rw [LinearMap.trace_conj', LinearMap.trace_prodMap']
 
-theorem _root_.GlobalTheory.BI.isChar_zero_and_add : ∀ (K L : Type) [Field K] [Field L] [Algebra K L]
-    (G : Type) [Group G], _root_.GlobalTheory.BI.IsChar K L (0 : G → L) ∧
-      ∀ a b : G → L, _root_.GlobalTheory.BI.IsChar K L a → _root_.GlobalTheory.BI.IsChar K L b →
-        _root_.GlobalTheory.BI.IsChar K L (a + b) := by
+theorem _root_.GlobalTheory.BI.isChar_zero_and_add
+    : ∀ (K L : Type) [Field K] [Field L] [Algebra K L] (G : Type) [Group G],
+      _root_.GlobalTheory.BI.IsChar K L (0 : G → L)
+        ∧ ∀ a b : G → L,
+          _root_.GlobalTheory.BI.IsChar K L a → _root_.GlobalTheory.BI.IsChar K L b
+            → _root_.GlobalTheory.BI.IsChar K L (a + b) := by
   intro K L _ _ _ G _
   refine ⟨?_, ?_⟩
   · unfold _root_.GlobalTheory.BI.IsChar

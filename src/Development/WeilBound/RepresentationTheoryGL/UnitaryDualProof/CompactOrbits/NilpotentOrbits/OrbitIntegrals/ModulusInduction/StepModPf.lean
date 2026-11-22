@@ -16,8 +16,10 @@ open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil PositivityTheory.RgUd.T
 
 attribute [local instance] t2Sp lcSp tdSp contSMul lcH tdH scH contSMulH
 
-theorem stepMod_pf (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    [CharZero k] : StepMod (k := k) := by
+theorem stepMod_pf
+    (k : Type)
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
+    : StepMod (k := k) := by
   intro n Z hZ t p g hg hgp hp2 K hKG hKo hKc L hLo hLK hLn hLn' C U hC hU hUC hCinv hCsig ξ hξ hξC
   classical
   haveI : T2Space (SpT k n) := t2Sp
@@ -70,12 +72,18 @@ theorem stepMod_pf (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
         exact ⟨h2, h.1, h.2, hq⟩
     rw [e]
     refine isOpen_UU.inter (isOpen_iUnion fun h => hU.preimage ?_)
-    exact (continuous_const_smul (h : GL (Fin n) k) : Continuous fun q : SpT k n => (h : GL (Fin n) k) • q)
+    exact (continuous_const_smul (h : GL (Fin n) k)
+      : Continuous fun q : SpT k n => (h : GL (Fin n) k) • q)
   have hU₁UU : U₁ ⊆ UU := fun q hq => hq.1
-  have hU₁inv : ∀ h : GzS Z, ∀ x : SpT k n, x ∈ (U₁ : Set (SpT k n)) → h • x ∈ (U₁ : Set (SpT k n)) := by
+  have hU₁inv
+      : ∀ h : GzS Z, ∀ x : SpT k n, x ∈ (U₁ : Set (SpT k n)) → h • x ∈ (U₁ : Set (SpT k n)) := by
     rintro h x ⟨hx2, h', hh', hx⟩
-    refine ⟨act_snd_ne (h : GL (Fin n) k) hx2, h' * (h : GL (Fin n) k)⁻¹,
-      (GzS Z).mul_mem hh' ((GzS Z).inv_mem h.2), ?_⟩
+    refine ⟨
+      act_snd_ne (h : GL (Fin n) k) hx2,
+      h' * (h : GL (Fin n) k)⁻¹,
+      (GzS Z).mul_mem hh' ((GzS Z).inv_mem h.2),
+      ?_
+    ⟩
     have e : act (h' * (h : GL (Fin n) k)⁻¹) (act (h : GL (Fin n) k) (x : Sp k n)) = act h' x := by
       rw [act_mul]
       exact congrArg (act h') (act_inv_act _ _)
@@ -97,11 +105,15 @@ theorem stepMod_pf (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
       have hq' := horb hq
       obtain ⟨h, _, rfl⟩ := hq
       exact ⟨⟨act_snd_ne h hp2, 1, (GzS Z).one_mem, by rw [act_one]; exact hq'.1⟩, hq'.2⟩
-  have hOorb : orbit (GzS Z) (toT p) = orb Z p := Set.ext fun q => mem_orbit_iff' Z (p := p) (q := q)
+  have hOorb : orbit (GzS Z) (toT p) = orb Z p :=
+    Set.ext fun q => mem_orbit_iff' Z (p := p) (q := q)
   have hO₁' : ((U₁ : Set (SpT k n)) ∩ C) = orbit (GzS Z) (toT p) := by rw [hOorb]; exact hO₁
   have hp0 : toT p ∈ orbit (GzS Z) (toT p) := mem_orbit_self (toT p)
-  have hlift : ∀ B : Subgroup (GzS Z), IsCompact (B : Set (GzS Z)) → IsOpen (B : Set (GzS Z)) →
-      ∃ f ∈ supportedIn U₁, ∀ x ∈ orb Z p, f x = (orbitPiece B (toT p)).indicator 1 (toT x) := by
+  have hlift
+      : ∀ B : Subgroup (GzS Z),
+        IsCompact (B : Set (GzS Z)) → IsOpen (B : Set (GzS Z))
+          → ∃ f ∈ supportedIn U₁, ∀ x ∈ orb Z p,
+            f x = (orbitPiece B (toT p)).indicator 1 (toT x) := by
     intro B hBc hBo
     obtain ⟨f, hf, hfO⟩ := exists_lift_orbit_piece (X := SpT k n) hU₁oT hCT hO₁' hBc hBo hp0
     exact ⟨f, hf, fun x hx => hfO (toT x) (hOorb ▸ hx)⟩
@@ -129,9 +141,13 @@ theorem stepMod_pf (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
     change ψ (transl (X := SpT k n) h f - f) = 0
     have e1 : ξ (fun q => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q)) = ξ f :=
       hξ _ (h⁻¹).2 f (supportedIn_mono (Set.subset_univ _) hf)
-    have e2 : ξ (fun q => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) (sig Z t q))) = ξ (fun q => f (sig Z t q)) := by
-      have := hξ _ (h⁻¹).2 (fun q => f (sig Z t q))
-        (supportedIn_mono (Set.subset_univ _) (comp_sig_mem Z hZ t hfUU))
+    have e2
+        : ξ (fun q => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) (sig Z t q)))
+          = ξ (fun q => f (sig Z t q)) := by
+      have :=
+        hξ _ (h⁻¹).2
+          (fun q => f (sig Z t q))
+          (supportedIn_mono (Set.subset_univ _) (comp_sig_mem Z hZ t hfUU))
       rw [← this]
       congr 1
       funext q
@@ -139,14 +155,16 @@ theorem stepMod_pf (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
     have key : ψ (fun q => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q)) = ψ f := by
       rw [hψ (fun q => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q)), hψ f, e1]
       exact congrArg (· - m * ξ f) e2
-    have hs : ψ (fun q : Sp k n => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q) - f q) =
-        ψ (fun q => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q)) - ψ f :=
+    have hs
+        : ψ (fun q : Sp k n => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q) - f q)
+          = ψ (fun q => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q)) - ψ f :=
       ψ.map_sub (fun q => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q)) f
     change ψ (fun q : Sp k n => f (act ((h⁻¹ : GzS Z) : GL (Fin n) k) q) - f q) = 0
     rw [hs, key, sub_self]
 
-  have hsig_piece : ∀ q : Sp k n, toT (sig Z t q) ∈ orbitPiece KH (toT p) ↔
-      toT (act g q) ∈ orbitPiece K'H (toT p) := by
+  have hsig_piece
+      : ∀ q : Sp k n,
+        toT (sig Z t q) ∈ orbitPiece KH (toT p) ↔ toT (act g q) ∈ orbitPiece K'H (toT p) := by
     intro q
     constructor
     · rintro ⟨κ, hκ, e⟩
@@ -187,24 +205,31 @@ theorem stepMod_pf (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
     · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem (fun h' => h ((hsig_piece q).2 h'))]
 
   have hc0 := piece_count Z hξ hC hU₁o hU₁UU hCinv hO₁ hξC hKHc hLHo hLKH hnK hf₀ hfL hf₀O hfLO
-  have hc1 := piece_count Z hξ hC hU₁o hU₁UU hCinv hO₁ hξC hK'Hco.1 hLHo hLK'H hnK' hf₁ hfL hf₁O hfLO
+  have hc1 :=
+    piece_count Z hξ hC hU₁o hU₁UU hCinv hO₁ hξC hK'Hco.1 hLHo hLK'H hnK' hf₁ hfL hf₁O hfLO
   have ha0 : LH.relIndex KH ≠ 0 := relIndex_ne_zero hKHc hLHo
   have ha1 : LH.relIndex K'H ≠ 0 := relIndex_ne_zero hK'Hco.1 hLHo
   have hb0 := right_ne_zero_of_mul ((count KH LH hLKH hnK (toT p)).symm ▸ ha0)
   have hb1 := right_ne_zero_of_mul ((count K'H LH hLK'H hnK' (toT p)).symm ▸ ha1)
   obtain ⟨r0, s0⟩ := relIndex_H Z p (L := L) hKG
   obtain ⟨r1, s1⟩ := relIndex_H Z p (L := L) hK'G
-  have hmodul : modul (stab Z p) K L g =
-      ((LH.relIndex K'H : ℝ) / ((LH ⊓ stabilizer (GzS Z) (toT p)).relIndex (K'H ⊓ stabilizer (GzS Z) (toT p)) : ℝ)) /
-      ((LH.relIndex KH : ℝ) / ((LH ⊓ stabilizer (GzS Z) (toT p)).relIndex (KH ⊓ stabilizer (GzS Z) (toT p)) : ℝ)) := by
+  have hmodul
+      : modul (stab Z p) K L g
+        = ((LH.relIndex K'H : ℝ)
+            / ((LH ⊓ stabilizer (GzS Z) (toT p)).relIndex (K'H ⊓ stabilizer (GzS Z) (toT p)) : ℝ))
+          / ((LH.relIndex KH : ℝ)
+            / ((LH ⊓ stabilizer (GzS Z) (toT p)).relIndex (KH ⊓ stabilizer (GzS Z) (toT p))
+              : ℝ)) := by
     rw [modul, ← hK'def, r0, s0, r1, s1]
   have hP : ψ f₀ = 0 := by
     rw [hψ, hX1, hm, hmodul]
     have ha0' : (LH.relIndex KH : ℂ) ≠ 0 := Nat.cast_ne_zero.2 ha0
     have ha1' : (LH.relIndex K'H : ℂ) ≠ 0 := Nat.cast_ne_zero.2 ha1
-    have hb0' : ((LH ⊓ stabilizer (GzS Z) (toT p)).relIndex (KH ⊓ stabilizer (GzS Z) (toT p)) : ℂ) ≠ 0 :=
+    have hb0'
+        : ((LH ⊓ stabilizer (GzS Z) (toT p)).relIndex (KH ⊓ stabilizer (GzS Z) (toT p)) : ℂ) ≠ 0 :=
       Nat.cast_ne_zero.2 hb0
-    have hb1' : ((LH ⊓ stabilizer (GzS Z) (toT p)).relIndex (K'H ⊓ stabilizer (GzS Z) (toT p)) : ℂ) ≠ 0 :=
+    have hb1'
+        : ((LH ⊓ stabilizer (GzS Z) (toT p)).relIndex (K'H ⊓ stabilizer (GzS Z) (toT p)) : ℂ) ≠ 0 :=
       Nat.cast_ne_zero.2 hb1
     have e0 := eq_div_of_mul_eq hb0' hc0
     have e1 := eq_div_of_mul_eq hb1' hc1
@@ -213,17 +238,24 @@ theorem stepMod_pf (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
     field_simp
     ring
 
-  have hWU : relSpan (X := SpT k n) (1 : GzS Z →* ℂ) U₁ ⊔ Submodule.span ℂ {f₀} ≤ supportedIn (X := SpT k n) U₁ :=
+  have hWU
+      : relSpan (X := SpT k n) (1 : GzS Z →* ℂ) U₁ ⊔ Submodule.span ℂ {f₀}
+        ≤ supportedIn (X := SpT k n) U₁ :=
     sup_le (relSpan_le_supportedIn _ hU₁inv) ((Submodule.span_singleton_le_iff_mem _ _).2 hf₀)
-  have hle := supportedIn_le_of_base (X := SpT k n) hU₁oT hCT hO₁' hU₁inv (1 : GzS Z →* ℂ) hWU le_sup_left KH hKHc hKHo
-    (fun _ _ => rfl) f₀ (fun x hx => hf₀O x (hOorb ▸ hx))
-    (Submodule.mem_sup_left (Submodule.mem_sup_right (Submodule.mem_span_singleton_self f₀)))
+  have hle :=
+    supportedIn_le_of_base (X := SpT k n) hU₁oT hCT hO₁' hU₁inv (1 : GzS Z →* ℂ) hWU le_sup_left KH
+      hKHc hKHo
+      (fun _ _ => rfl)
+      f₀
+      (fun x hx => hf₀O x (hOorb ▸ hx))
+      (Submodule.mem_sup_left (Submodule.mem_sup_right (Submodule.mem_span_singleton_self f₀)))
   have hker : supportedIn (X := SpT k n) U₁ ≤ LinearMap.ker ψ :=
-    hle.trans (sup_le (sup_le hR ((Submodule.span_singleton_le_iff_mem _ _).2 hP))
-      fun v hv => hV v (supportedIn_mono hU₁UU hv.1) hv.2)
+    hle.trans (sup_le (sup_le hR ((Submodule.span_singleton_le_iff_mem _ _).2 hP)) fun v hv =>
+      hV v (supportedIn_mono hU₁UU hv.1) hv.2)
 
   intro f hf hfCU
-  have hKc' : IsCompact (X := SpT k n) (C ∩ Function.support f) := (isCompact_support hf.1).inter_left hC
+  have hKc' : IsCompact (X := SpT k n) (C ∩ Function.support f) :=
+    (isCompact_support hf.1).inter_left hC
   have hsub : C ∩ Function.support f ⊆ U₁ := by
     rintro q ⟨hqC, hqf⟩
     have hqU : q ∈ U := by

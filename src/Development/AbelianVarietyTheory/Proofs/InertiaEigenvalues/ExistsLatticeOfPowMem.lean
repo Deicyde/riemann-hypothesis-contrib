@@ -9,31 +9,37 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Faithfu
 
 noncomputable section
 
-open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions GlobalTheory.EtaleExact TensorProduct
+open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions GlobalTheory.EtaleExact
+  TensorProduct
 
 namespace GlobalTheory.EtaleSub
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {W : LocWach PD LL O v n} {RA RW : Type} [CommRing RA] [CommRing RW] [Algebra O RA]
-    [Algebra O RW] {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
-    (E : EtTie W RA RW inclR φR gR πA)
-
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {W : LocWach PD LL O v n} {RA RW : Type}
+  [CommRing RA] [CommRing RW] [Algebra O RA] [Algebra O RW]
+  {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
+  (E : EtTie W RA RW inclR φR gR πA)
 
 include E in
-theorem surjective_of_tie (hfl : Module.Flat O RW) {T' T : LocLat G Qp LL O}
-    (hfix : ∀ b, TWmap φR T' b = b → ∃ t : ↥T'.L.T, b = (1 : RW) ⊗ₜ[O] t)
-    (hone : Function.Injective fun t : ↥T.L.T => (1 : RW) ⊗ₜ[O] t)
-    (ι : LatHom T'.L T.L) (hι : Function.Injective ι.f) (m : ℕ) (hm : (m : LL) ≠ 0)
-    (hall : ∀ x : W.DD T, ((m : ℕ) : W.EE) • x ∈ LinearMap.range (W.map ι)) :
-    Function.Surjective ι.f := by
+theorem surjective_of_tie
+    (hfl : Module.Flat O RW)
+    {T' T : LocLat G Qp LL O} (hfix : ∀ b, TWmap φR T' b = b → ∃ t : ↥T'.L.T, b = (1 : RW) ⊗ₜ[O] t)
+    (hone : Function.Injective fun t : ↥T.L.T => (1 : RW) ⊗ₜ[O] t) (ι : LatHom T'.L T.L)
+    (hι : Function.Injective ι.f)
+    (m : ℕ)
+    (hm : (m : LL) ≠ 0) (hall : ∀ x : W.DD T, ((m : ℕ) : W.EE) • x ∈ LinearMap.range (W.map ι))
+    : Function.Surjective ι.f := by
   have hU := span_range_map E ι
   have hkill : ∀ y : TW RW T, m • y ∈ LinearMap.range ((latMap ι).baseChange RW) := by
     intro y
@@ -51,8 +57,9 @@ theorem surjective_of_tie (hfl : Module.Flat O RW) {T' T : LocLat G Qp LL O}
   have hinj : Function.Injective ((latMap ι).baseChange RW) :=
     Module.Flat.lTensor_preserves_injective_linearMap (M := RW) (latMap ι)
       (fun x y hxy => Subtype.ext (hι (congrArg Subtype.val hxy)))
-  have hcomm : ∀ c : TW RW T', (latMap ι).baseChange RW (TWmap φR T' c) =
-      TWmap φR T ((latMap ι).baseChange RW c) := by
+  have hcomm
+      : ∀ c : TW RW T',
+        (latMap ι).baseChange RW (TWmap φR T' c) = TWmap φR T ((latMap ι).baseChange RW c) := by
     intro c
     induction c using TensorProduct.induction_on with
     | zero => simp
@@ -75,13 +82,14 @@ theorem surjective_of_tie (hfl : Module.Flat O RW) {T' T : LocLat G Qp LL O}
     refine ⟨(m : LL)⁻¹ • (t' : T'.V), ?_⟩
     have h3 : ι.f (t' : T'.V) = m • t := congrArg Subtype.val h'
     rw [map_smul, h3, ← Nat.cast_smul_eq_nsmul LL, smul_smul, inv_mul_cancel₀ hm, one_smul]
-  have htop : LinearMap.range ι.f = ⊤ :=
-    top_le_iff.1 (T.L.span ▸ Submodule.span_le.2 hle)
+  have htop : LinearMap.range ι.f = ⊤ := top_le_iff.1 (T.L.span ▸ Submodule.span_le.2 hle)
   exact LinearMap.range_eq_top.1 htop
 
 end Generic
 
-theorem exists_lattice_of_pow_mem : ∀ (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW), InvariantsGenerators.LitSub D HW F := by
+theorem exists_lattice_of_pow_mem
+    : ∀ (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW),
+      InvariantsGenerators.LitSub D HW F := by
   intro D HW F l _ K LL hA T D' hpow hφ hγ
   obtain ⟨T', ι, hι, hr⟩ := exists_sublattice (D.locA l) (HW l) (F l) K 1 LL hA.2.2 T D' hφ hγ
   obtain ⟨a, ha⟩ := hpow

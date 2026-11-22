@@ -14,16 +14,22 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc.AwayT
 
-theorem away_of_injective {R S : Type} [CommRing R] [CommRing S] [Algebra R S] (t : R)
-    (hu : IsUnit (algebraMap R S t))
+theorem away_of_injective
+    {R S : Type} [CommRing R] [CommRing S] [Algebra R S]
+    (t : R) (hu : IsUnit (algebraMap R S t))
     (hs : ∀ b : S, ∃ (r : ℕ) (x : R), b * algebraMap R S t ^ r = algebraMap R S x)
-    (hi : Function.Injective (algebraMap R S)) : IsLocalization.Away t S :=
+    (hi : Function.Injective (algebraMap R S))
+    : IsLocalization.Away t S :=
   IsLocalization.Away.mk t hu hs fun _ _ h => ⟨0, by rw [hi h]⟩
 
-theorem lift_injective {R P S : Type} [CommRing R] [CommRing P] [CommRing S] [Algebra R P] (x : R)
-    [IsLocalization.Away x P] (f : R →+* S) (g : P →+* S) (hg : ∀ a, g (algebraMap R P a) = f a)
-    (hf : Function.Injective f) : Function.Injective g := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem lift_injective
+    {R P S : Type} [CommRing R] [CommRing P] [CommRing S] [Algebra R P]
+    (x : R) [IsLocalization.Away x P]
+    (f : R →+* S) (g : P →+* S) (hg : ∀ a, g (algebraMap R P a) = f a)
+    (hf : Function.Injective f)
+    : Function.Injective g := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro z hz
   obtain ⟨n, a, ha⟩ := IsLocalization.Away.surj x z
   have h1 : f a = 0 := by rw [← hg, ← ha, map_mul, hz, zero_mul]
@@ -39,17 +45,21 @@ theorem plusInj (C : Core l) : C.PlusInj :=
 theorem plusToB_injective (C : Core l) : Function.Injective (plusToB l) := fun x y h =>
   plusInj C ((BdRField.bdR_isField l).2.1 (by rw [← C.ι_plusToB, ← C.ι_plusToB, h]))
 
-theorem acris_injective (C : Core l) : Function.Injective (algebraMap (Per.Acris l) (Per.Bcris l)) :=
-  fun x y h => crisP_injective l C.j C.j_cris
-    ((BdRField.bdR_isField l).2.1 (by rw [← C.ι_j, ← C.ι_j, h]))
+theorem acris_injective (C : Core l)
+    : Function.Injective (algebraMap (Per.Acris l) (Per.Bcris l)) := fun x y h =>
+  crisP_injective l C.j C.j_cris ((BdRField.bdR_isField l).2.1 (by rw [← C.ι_j, ← C.ι_j, h]))
 
 theorem awayT (C : Core l) : C.AwayT :=
-  away_of_injective C.t (core_t_unit_fil l C).1 (GlobalTheory.T.bcris_eq_acris_localization_periodT l C) (acris_injective C)
+  away_of_injective C.t (core_t_unit_fil l C).1
+    (GlobalTheory.T.bcris_eq_acris_localization_periodT l C) (acris_injective C)
 
 theorem plusAwayT (C : Core l) : C.PlusAwayT := by
   letI := (plusToB l).toAlgebra
-  have e : ∀ x : Per.Acris l, algebraMap (BcrisP l) (Per.Bcris l) (algebraMap _ _ x) =
-      algebraMap (Per.Acris l) (Per.Bcris l) x := plusToB_alg
+  have e
+      : ∀ x : Per.Acris l,
+        algebraMap (BcrisP l) (Per.Bcris l) (algebraMap _ _ x)
+          = algebraMap (Per.Acris l) (Per.Bcris l) x :=
+    plusToB_alg
   refine away_of_injective _ ?_ (fun b => ?_) (plusToB_injective C)
   · rw [e]
     exact (core_t_unit_fil l C).1

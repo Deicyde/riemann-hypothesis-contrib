@@ -8,9 +8,11 @@ open NumberField IsDedekindDomain UniqueFactorizationMonoid
 
 namespace GlobalTheory.CompanionTheory.Ggeo
 
-def ltOneIdeal {R : Type} [CommRing R] [IsDomain R] (μ : R →*₀ ℝ)
-    (h0 : ∀ x, 0 ≤ μ x) (h1 : ∀ x, μ x ≤ 1)
-    (hadd : ∀ x y, μ (x + y) ≤ max (μ x) (μ y)) : Ideal R where
+def ltOneIdeal
+    {R : Type} [CommRing R] [IsDomain R]
+    (μ : R →*₀ ℝ)
+    (h0 : ∀ x, 0 ≤ μ x) (h1 : ∀ x, μ x ≤ 1) (hadd : ∀ x y, μ (x + y) ≤ max (μ x) (μ y))
+    : Ideal R where
   carrier := {x | μ x < 1}
   add_mem' := by
     intro x y hx hy
@@ -25,15 +27,23 @@ def ltOneIdeal {R : Type} [CommRing R] [IsDomain R] (μ : R →*₀ ℝ)
     have hx' : μ x < 1 := hx
     nlinarith [h0 c, h0 x, h1 c]
 
-private theorem eq_pow_count_normalizedFactors_of_uniformizer {R : Type} [CommRing R] [IsDedekindDomain R]
-    (μ : R →*₀ ℝ) (P : Ideal R) [P.IsPrime] (hone : ∀ x, x ∉ P → μ x = 1)
-    (π : R) (hπ : π ∈ P) (hπ2 : π ∉ P ^ 2) (x : R) (hx : x ≠ 0) :
-    μ x = μ π ^ (normalizedFactors (Ideal.span {x})).count P := by
+private theorem eq_pow_count_normalizedFactors_of_uniformizer
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    (μ : R →*₀ ℝ)
+    (P : Ideal R) [P.IsPrime]
+    (hone : ∀ x, x ∉ P → μ x = 1)
+    (π : R) (hπ : π ∈ P) (hπ2 : π ∉ P ^ 2)
+    (x : R) (hx : x ≠ 0)
+    : μ x = μ π ^ (normalizedFactors (Ideal.span {x})).count P := by
   have hspan : ∀ y : R, y ≠ 0 → Ideal.span {y} ≠ 0 := fun y hy => by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact hy
-  have hadd : ∀ y z : R, y ≠ 0 → z ≠ 0 → (normalizedFactors (Ideal.span {y * z})).count P =
-      (normalizedFactors (Ideal.span {y})).count P + (normalizedFactors (Ideal.span {z})).count P := by
+  have hadd
+      : ∀ y z : R,
+        y ≠ 0 → z ≠ 0
+          → (normalizedFactors (Ideal.span {y * z})).count P
+            = (normalizedFactors (Ideal.span {y})).count P
+              + (normalizedFactors (Ideal.span {z})).count P := by
     intro y z hy hz
     rw [← Ideal.span_singleton_mul_span_singleton, normalizedFactors_mul (hspan y hy) (hspan z hz),
       Multiset.count_add]
@@ -55,7 +65,7 @@ private theorem eq_pow_count_normalizedFactors_of_uniformizer {R : Type} [CommRi
       exact hπ2
   obtain ⟨A, hA⟩ : P ∣ Ideal.span {π} :=
     Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem P).2 hπ)
-  have hAP : ¬A ≤ P := by
+  have hAP : ¬ A ≤ P := by
     intro hle
     apply hπ2
     rw [← Ideal.span_singleton_le_iff_mem, hA, pow_two]
@@ -70,9 +80,14 @@ private theorem eq_pow_count_normalizedFactors_of_uniformizer {R : Type} [CommRi
       rw [hA, mul_comm s y]
       exact Ideal.mul_mem_mul hy hsA
     exact Ideal.mem_span_singleton.1 this
-  have hdiv : ∀ y : R, y ≠ 0 → y ∈ P → ∃ z, z ≠ 0 ∧
-      (normalizedFactors (Ideal.span {y})).count P =
-        (normalizedFactors (Ideal.span {z})).count P + 1 ∧ μ y = μ π * μ z := by
+  have hdiv
+      : ∀ y : R,
+        y ≠ 0 → y ∈ P
+          → ∃ z,
+            z ≠ 0
+              ∧ (normalizedFactors (Ideal.span {y})).count P
+                = (normalizedFactors (Ideal.span {z})).count P + 1
+              ∧ μ y = μ π * μ z := by
     intro y hy hyP
     obtain ⟨z, hz⟩ := hstep y hyP
     have hz0 : z ≠ 0 := by
@@ -84,8 +99,10 @@ private theorem eq_pow_count_normalizedFactors_of_uniformizer {R : Type} [CommRi
     refine ⟨z, hz0, by omega, ?_⟩
     have hμ : μ s * μ y = μ π * μ z := by rw [← map_mul, ← map_mul, hz]
     rwa [hone s hsP, one_mul] at hμ
-  suffices H : ∀ n : ℕ, ∀ y : R, y ≠ 0 → (normalizedFactors (Ideal.span {y})).count P = n →
-      μ y = μ π ^ n from H _ x hx rfl
+  suffices H
+      : ∀ n : ℕ, ∀ y : R,
+        y ≠ 0 → (normalizedFactors (Ideal.span {y})).count P = n → μ y = μ π ^ n from
+    H _ x hx rfl
   intro n
   induction n with
   | zero =>
@@ -102,12 +119,13 @@ private theorem eq_pow_count_normalizedFactors_of_uniformizer {R : Type} [CommRi
     · rw [hzero y hyP] at hn
       omega
 
-theorem map_eq_pow_count_of_ultrametric :
-    ∀ (R : Type) [CommRing R] [IsDedekindDomain R] (μ : R →*₀ ℝ) (a : R), a ≠ 0 →
-      (∀ x, 0 ≤ μ x) → (∀ x, μ x ≤ 1) → (∀ x y, μ (x + y) ≤ max (μ x) (μ y)) →
-      μ a < 1 → μ a ≠ 0 →
-      ∃ (P : Ideal R) (c : ℝ), P.IsPrime ∧ P ≠ ⊥ ∧ a ∈ P ∧ 0 < c ∧
-        ∀ x : R, x ≠ 0 → μ x = c ^ (normalizedFactors (Ideal.span {x})).count P := by
+theorem map_eq_pow_count_of_ultrametric
+    : ∀ (R : Type) [CommRing R] [IsDedekindDomain R] (μ : R →*₀ ℝ) (a : R),
+      a ≠ 0 → (∀ x, 0 ≤ μ x) → (∀ x, μ x ≤ 1) → (∀ x y, μ (x + y) ≤ max (μ x) (μ y)) → μ a < 1
+        → μ a ≠ 0
+        → ∃ (P : Ideal R) (c : ℝ),
+          P.IsPrime ∧ P ≠ ⊥ ∧ a ∈ P ∧ 0 < c
+            ∧ ∀ x : R, x ≠ 0 → μ x = c ^ (normalizedFactors (Ideal.span {x})).count P := by
   intro R _ _ μ a ha h0 h1 hadd hlt hne
   set P := GlobalTheory.CompanionTheory.Ggeo.ltOneIdeal μ h0 h1 hadd with hPdef
   have hmem : ∀ x, x ∈ P ↔ μ x < 1 := fun x => Iff.rfl
@@ -124,8 +142,8 @@ theorem map_eq_pow_count_of_ultrametric :
       exact (hmem _).1 hxy
     by_contra hc
     rw [not_or] at hc
-    have hx1 : ¬μ x < 1 := fun h => hc.1 ((hmem x).2 h)
-    have hy1 : ¬μ y < 1 := fun h => hc.2 ((hmem y).2 h)
+    have hx1 : ¬ μ x < 1 := fun h => hc.1 ((hmem x).2 h)
+    have hy1 : ¬ μ y < 1 := fun h => hc.2 ((hmem y).2 h)
     rw [not_lt] at hx1 hy1
     nlinarith [h0 x, h0 y]
   haveI := hPprime
@@ -134,8 +152,8 @@ theorem map_eq_pow_count_of_ultrametric :
     intro h
     rw [h, Submodule.mem_bot] at haP
     exact ha haP
-  obtain ⟨π, hπ, hπ2⟩ : ∃ π ∈ P ^ 1, π ∉ P ^ 2 := SetLike.exists_of_lt
-    (Ideal.pow_right_strictAnti P hbot hPtop (by norm_num : 1 < 2))
+  obtain ⟨π, hπ, hπ2⟩ : ∃ π ∈ P ^ 1, π ∉ P ^ 2 :=
+    SetLike.exists_of_lt (Ideal.pow_right_strictAnti P hbot hPtop (by norm_num : 1 < 2))
   rw [pow_one] at hπ
   have hone : ∀ x, x ∉ P → μ x = 1 := fun x hx =>
     le_antisymm (h1 x) (not_lt.1 fun h => hx ((hmem x).2 h))

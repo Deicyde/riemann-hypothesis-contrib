@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ
 
@@ -16,13 +17,14 @@ namespace ParabolicMaximalCompact
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem leviProj_mem_KO {s n : ℕ} (d : Fin s → ℕ) (hd : ∑ a, d a = n) (p : parab k (stdBlocks d hd))
-    (hp : (p : GL (Fin n) k) ∈ KO k (Fin n)) (a : Fin s) :
-    leviProj k (stdBlocks d hd) p a ∈ KO k (Fin (d a)) := by
+theorem leviProj_mem_KO
+    {s n : ℕ} (d : Fin s → ℕ) (hd : ∑ a, d a = n) (p : parab k (stdBlocks d hd))
+    (hp : (p : GL (Fin n) k) ∈ KO k (Fin n)) (a : Fin s)
+    : leviProj k (stdBlocks d hd) p a ∈ KO k (Fin (d a)) := by
   rw [GlobalTheory.StepData.mem_KO] at hp ⊢
-  have hinv : ((GlobalTheory.SmGL.leviProj k (GlobalTheory.SmGL.stdBlocks d hd) p a)⁻¹ :
-      GL (Fin (d a)) k) =
-      GlobalTheory.SmGL.leviProj k (GlobalTheory.SmGL.stdBlocks d hd) p⁻¹ a := by
+  have hinv
+      : ((GlobalTheory.SmGL.leviProj k (GlobalTheory.SmGL.stdBlocks d hd) p a)⁻¹ : GL (Fin (d a)) k)
+        = GlobalTheory.SmGL.leviProj k (GlobalTheory.SmGL.stdBlocks d hd) p⁻¹ a := by
     rw [map_inv, Pi.inv_apply]
   refine ⟨fun i j => ?_, fun i j => ?_⟩
   · rw [GlobalTheory.SmGL.leviProj_apply]

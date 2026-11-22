@@ -32,16 +32,16 @@ omit [Fintype I] in
 theorem scaleMap_apply (t : I → ℂˣ) (b : I → ℂ) (i : I) : scaleMap t b i = (t i : ℂ) * b i := by
   simp [scaleMap]
 
-theorem det_scaleMap (t : I → ℂˣ) :
-    LinearMap.det (scaleMap t) = ∏ i, Complex.normSq (t i : ℂ) := by
+theorem det_scaleMap (t : I → ℂˣ) : LinearMap.det (scaleMap t) = ∏ i, Complex.normSq (t i : ℂ) := by
   rw [scaleMap, LinearMap.det_pi]
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [← Algebra.norm_apply, Algebra.norm_complex_apply]
 
 theorem measurable_units_val : Measurable (Units.val : ℂˣ → ℂ) := fun _ hs => ⟨_, hs, rfl⟩
 
-theorem measurable_to_units {α : Type*} [MeasurableSpace α] {f : α → ℂˣ}
-    (hf : Measurable fun x => (f x : ℂ)) : Measurable f := by
+theorem measurable_to_units
+    {α : Type*} [MeasurableSpace α] {f : α → ℂˣ} (hf : Measurable fun x => (f x : ℂ))
+    : Measurable f := by
   rintro _ ⟨t, ht, rfl⟩
   exact hf ht
 
@@ -51,7 +51,8 @@ theorem measurable_invSqWeight : Measurable (invSqWeight : (I → ℂ) → ℝ�
 omit [Fintype I] in
 theorem measurable_invUnits : Measurable (invUnits : (I → ℂ) → I → ℂˣ) := by
   refine Measurable.of_eval fun i => measurable_to_units ?_
-  have : (fun b : I → ℂ => ((invUnits b i : ℂˣ) : ℂ)) = fun b => if b i = 0 then 1 else (b i)⁻¹ := by
+  have : (fun b : I → ℂ => ((invUnits b i : ℂˣ) : ℂ))
+      = fun b => if b i = 0 then 1 else (b i)⁻¹ := by
     funext b
     by_cases h : b i = 0 <;> simp [invUnits, h]
   rw [this]
@@ -72,7 +73,8 @@ theorem map_scaleMap (t : I → ℂˣ) : (weightedVolume I).map (scaleMap t) = w
     Finset.prod_pos fun i _ => Complex.normSq_pos.2 (t i).ne_zero
   have hD : LinearMap.det (scaleMap t) ≠ 0 := by rw [det_scaleMap]; exact hDpos.ne'
   set κ : ℝ≥0∞ := ∏ i, ‖(t i : ℂ)‖ₑ ^ 2 with hκdef
-  have hκ0 : κ ≠ 0 := Finset.prod_ne_zero_iff.2 fun i _ => pow_ne_zero _ (enorm_ne_zero.2 (t i).ne_zero)
+  have hκ0 : κ ≠ 0 :=
+    Finset.prod_ne_zero_iff.2 fun i _ => pow_ne_zero _ (enorm_ne_zero.2 (t i).ne_zero)
   have hκtop : κ ≠ ⊤ := ENNReal.prod_ne_top fun i _ => ENNReal.pow_ne_top enorm_ne_top
   have hκD : ENNReal.ofReal (∏ i, Complex.normSq (t i : ℂ)) = κ := by
     rw [ENNReal.ofReal_prod_of_nonneg fun i _ => Complex.normSq_nonneg _]
@@ -91,8 +93,9 @@ theorem map_scaleMap (t : I → ℂˣ) : (weightedVolume I).map (scaleMap t) = w
   ext s hs
   rw [map_apply hL hs, weightedVolume, withDensity_apply _ (hL hs), withDensity_apply _ hs,
     ← lintegral_indicator (hL hs), ← lintegral_indicator hs]
-  have hind : (scaleMap t ⁻¹' s).indicator invSqWeight =
-      fun b => κ * s.indicator invSqWeight (scaleMap t b) := by
+  have hind
+      : (scaleMap t ⁻¹' s).indicator invSqWeight
+        = fun b => κ * s.indicator invSqWeight (scaleMap t b) := by
     funext b
     by_cases hb : scaleMap t b ∈ s
     · rw [indicator_of_mem (show b ∈ scaleMap t ⁻¹' s from hb), indicator_of_mem hb, hW]
@@ -102,9 +105,8 @@ theorem map_scaleMap (t : I → ℂˣ) : (weightedVolume I).map (scaleMap t) = w
   rw [hind]
   beta_reduce
   rw [lintegral_const_mul _ (f := fun b => s.indicator invSqWeight (scaleMap t b)) (hm.comp hL),
-    ← lintegral_map hm hL,
-    map_linearMap_addHaar_eq_smul_addHaar _ hD, lintegral_smul_measure, smul_eq_mul, ← mul_assoc,
-    hκ, one_mul]
+    ← lintegral_map hm hL, map_linearMap_addHaar_eq_smul_addHaar _ hD, lintegral_smul_measure,
+    smul_eq_mul, ← mul_assoc, hκ, one_mul]
 
 instance : IsMulLeftInvariant (invHaar I) := by
   refine ⟨fun s => ?_⟩
@@ -134,8 +136,10 @@ instance : IsFiniteMeasureOnCompacts (invHaar I) := by
     intro a ha i
     have h1 : φ a ≤ R₀ := hR₀ ⟨a, ha, rfl⟩
     have h2 : ‖(a i : ℂ)‖ + ‖(((a i)⁻¹ : ℂˣ) : ℂ)‖ ≤ φ a :=
-      Finset.single_le_sum (f := fun j => ‖(a j : ℂ)‖ + ‖(((a j)⁻¹ : ℂˣ) : ℂ)‖)
-        (fun j _ => by positivity) (Finset.mem_univ i)
+      Finset.single_le_sum
+        (f := fun j => ‖(a j : ℂ)‖ + ‖(((a j)⁻¹ : ℂˣ) : ℂ)‖)
+        (fun j _ => by positivity)
+        (Finset.mem_univ i)
     have := le_max_left R₀ 0
     constructor <;> linarith [norm_nonneg (a i : ℂ), norm_nonneg (((a i)⁻¹ : ℂˣ) : ℂ)]
   have hR : 0 ≤ R := le_max_right _ _
@@ -144,35 +148,40 @@ instance : IsFiniteMeasureOnCompacts (invHaar I) := by
     measurable_invUnits hK.isClosed.measurableSet
   rw [invHaar, map_apply measurable_invUnits hK.isClosed.measurableSet, weightedVolume,
     withDensity_apply _ hKm, ← lintegral_indicator hKm]
-  have hle : ∀ᵐ b ∂(volume : Measure (I → ℂ)),
-      (invUnits ⁻¹' K).indicator invSqWeight b ≤ (Metric.closedBall 0 R).indicator (fun _ => C) b := by
-    filter_upwards [ae_ne_zero] with b hb
-    by_cases hbK : invUnits b ∈ K
-    · have hval : ∀ i, ((invUnits b i : ℂˣ) : ℂ) = (b i)⁻¹ := fun i => by simp [invUnits, hb i]
-      have hval' : ∀ i, (((invUnits b i)⁻¹ : ℂˣ) : ℂ) = b i := fun i => by simp [invUnits, hb i]
-      have hball : b ∈ Metric.closedBall (0 : I → ℂ) R := by
-        rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg hR]
-        intro i
-        rw [← hval' i]
-        exact (hbd _ hbK i).2
-      rw [indicator_of_mem (show b ∈ invUnits ⁻¹' K from hbK), indicator_of_mem hball, invSqWeight]
-      refine Finset.prod_le_prod' fun i _ => ?_
-      gcongr
-      rw [← enorm_inv (hb i), ← hval i, ← ofReal_norm]
-      exact ENNReal.ofReal_le_ofReal (hbd _ hbK i).1
-    · rw [indicator_of_notMem (show b ∉ invUnits ⁻¹' K from hbK)]
-      exact bot_le
+  have hle
+      : ∀ᵐ b ∂(volume : Measure (I → ℂ)),
+        (invUnits ⁻¹' K).indicator invSqWeight b ≤ (Metric.closedBall 0 R).indicator (fun _ => C) b :=
+    by
+      filter_upwards [ae_ne_zero] with b hb
+      by_cases hbK : invUnits b ∈ K
+      · have hval : ∀ i, ((invUnits b i : ℂˣ) : ℂ) = (b i)⁻¹ := fun i => by simp [invUnits, hb i]
+        have hval' : ∀ i, (((invUnits b i)⁻¹ : ℂˣ) : ℂ) = b i := fun i => by simp [invUnits, hb i]
+        have hball : b ∈ Metric.closedBall (0 : I → ℂ) R := by
+          rw [mem_closedBall_zero_iff, pi_norm_le_iff_of_nonneg hR]
+          intro i
+          rw [← hval' i]
+          exact (hbd _ hbK i).2
+        rw [indicator_of_mem (show b ∈ invUnits ⁻¹' K from hbK), indicator_of_mem hball,
+          invSqWeight]
+        refine Finset.prod_le_prod' fun i _ => ?_
+        gcongr
+        rw [← enorm_inv (hb i), ← hval i, ← ofReal_norm]
+        exact ENNReal.ofReal_le_ofReal (hbd _ hbK i).1
+      · rw [indicator_of_notMem (show b ∉ invUnits ⁻¹' K from hbK)]
+        exact bot_le
   refine (lintegral_mono_ae hle).trans_lt ?_
   rw [lintegral_indicator_const measurableSet_closedBall]
-  exact ENNReal.mul_lt_top (ENNReal.prod_ne_top fun i _ => ENNReal.pow_ne_top ENNReal.ofReal_ne_top).lt_top
+  exact ENNReal.mul_lt_top
+    (ENNReal.prod_ne_top fun i _ => ENNReal.pow_ne_top ENNReal.ofReal_ne_top).lt_top
     measure_closedBall_lt_top
 
 theorem invHaar_ne_zero : invHaar I ≠ 0 := by
   intro h
   have h1 : invHaar I univ = 0 := by rw [h]; rfl
   rw [invHaar, map_apply measurable_invUnits MeasurableSet.univ, preimage_univ, weightedVolume,
-    withDensity_apply _ MeasurableSet.univ, Measure.restrict_univ,
-    lintegral_eq_zero_iff measurable_invSqWeight] at h1
+      withDensity_apply _ MeasurableSet.univ, Measure.restrict_univ,
+      lintegral_eq_zero_iff measurable_invSqWeight]
+    at h1
   have hpos : ∀ b : I → ℂ, invSqWeight b ≠ 0 := fun b =>
     Finset.prod_ne_zero_iff.2 fun i _ => pow_ne_zero _ (ENNReal.inv_ne_zero.2 enorm_ne_top)
   have hF : ∀ᵐ b ∂(volume : Measure (I → ℂ)), False := h1.mono fun b hb => hpos b hb
@@ -187,8 +196,7 @@ theorem proof (I : Type*) [Fintype I] : UnitsInvHaar.Statement I := by
     apply invHaar_ne_zero (I := I)
     rw [hlam, h, zero_smul]
   refine ⟨c'⁻¹, inv_ne_zero hc', fun k g g' hg hg' => ?_⟩
-  have hρ : ρ = (c'⁻¹ : ℝ≥0) • invHaar I := by
-    rw [hlam, smul_smul, inv_mul_cancel₀ hc', one_smul]
+  have hρ : ρ = (c'⁻¹ : ℝ≥0) • invHaar I := by rw [hlam, smul_smul, inv_mul_cancel₀ hc', one_smul]
   have hF : Measurable fun a : I → ℂˣ => (∏ i, ‖(a i : ℂ)‖ₑ⁻¹ ^ (2 * (k + 1))) * g a :=
     (Finset.measurable_prod _ fun i _ =>
       ((measurable_units_val.comp (measurable_pi_apply i)).enorm.inv).pow_const _).mul hg
@@ -200,8 +208,7 @@ theorem proof (I : Type*) [Fintype I] : UnitsInvHaar.Statement I := by
       (hF.comp measurable_invUnits)]
   apply lintegral_congr_ae
   filter_upwards [ae_ne_zero] with b hb
-  have hinv : invUnits b = fun i => (Units.mk0 (b i) (hb i))⁻¹ := by
-    funext i; simp [invUnits, hb i]
+  have hinv : invUnits b = fun i => (Units.mk0 (b i) (hb i))⁻¹ := by funext i; simp [invUnits, hb i]
   simp only [Pi.mul_apply]
   rw [hinv, ← hg' b hb, ← mul_assoc]
   congr 1

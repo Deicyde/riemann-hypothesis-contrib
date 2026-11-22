@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.MinSt5OfMinS
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc
 open ReciprocityTheory.AnForm.R
 open scoped CategoryTheory.Obj
 open GlobalTheory.SiegJoin
@@ -17,7 +20,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.FinLift
 
-theorem lift_fieldPoint : ∀ (U X : Scheme.{0}) (c : U ⟶ X) [IsFinite c] [Surjective c] (K : Type) [Field K] (y : Sp K ⟶ X), ∃ (K' : Type) (_ : Field K') (_ : Algebra K K') (_ : FiniteDimensional K K') (y' : Sp K' ⟶ U), y' ≫ c = spMap (algebraMap K K') ≫ y := by
+theorem lift_fieldPoint
+    : ∀ (U X : Scheme.{0}) (c : U ⟶ X) [IsFinite c] [Surjective c] (K : Type) [Field K]
+        (y : Sp K ⟶ X),
+      ∃ (K' : Type) (_ : Field K') (_ : Algebra K K') (_ : FiniteDimensional K K') (y' : Sp K' ⟶ U),
+        y' ≫ c = spMap (algebraMap K K') ≫ y := by
   intro U X c _ _ K _ y
   set P := pullback y c
   haveI : IsAffine P := inferInstance
@@ -37,8 +44,14 @@ theorem lift_fieldPoint : ∀ (U X : Scheme.{0}) (c : U ⟶ X) [IsFinite c] [Sur
   letI : Algebra K A := φ.hom.toAlgebra
   haveI : Module.Finite K A := hfin
   haveI : Module.Finite K (A ⧸ m) := Module.Finite.trans A (A ⧸ m)
-  refine ⟨A ⧸ m, inferInstance, inferInstance, inferInstance,
-    Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk m)) ≫ P.isoSpec.inv ≫ pullback.snd y c, ?_⟩
+  refine ⟨
+    A ⧸ m,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk m)) ≫ P.isoSpec.inv ≫ pullback.snd y c,
+    ?_
+  ⟩
   simp only [Category.assoc]
   rw [← pullback.condition, ← Category.assoc P.isoSpec.inv, ← hφ, ← Category.assoc, ← Spec.map_comp]
   rfl

@@ -7,20 +7,24 @@ public import Formalism.DoubleCosetMeasures.LatticeCoset
 
 @[expose] public section
 
-open MeasureTheory Matrix NumberField IsDedekindDomain Formalism.BasicNotions Formalism.DoubleCosetMeasures Formalism.L2.Host Formalism.L2.DIV Formalism.L2.DIV.QLoc GlobalTheory.Mem.HD
+open MeasureTheory Matrix NumberField IsDedekindDomain Formalism.BasicNotions
+  Formalism.DoubleCosetMeasures Formalism.L2.Host Formalism.L2.DIV Formalism.L2.DIV.QLoc
+  GlobalTheory.Mem.HD
 
 namespace GlobalTheory.Mem.HD
 
-private theorem lt_one_iff_le_exp_neg_one (g : WithZero (Multiplicative ℤ)) :
-    g < 1 ↔ g ≤ WithZero.exp (-1 : ℤ) := by
+private theorem lt_one_iff_le_exp_neg_one (g : WithZero (Multiplicative ℤ))
+    : g < 1 ↔ g ≤ WithZero.exp (-1 : ℤ) := by
   induction g using WithZero.expRecOn with
   | zero => simp
   | exp a => rw [← WithZero.exp_zero, WithZero.exp_lt_exp, WithZero.exp_le_exp]; omega
 
-theorem isLocalAt_adicCompletionIntegers_uniformizer (L : Type) [Field L] [NumberField L] (P : HeightOneSpectrum (𝓞 L)) :
-    IsLocalAt (OP P) ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) := by
-  have hv : Valued.v ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L)
-      = WithZero.exp (-1 : ℤ) := unif_spec P
+theorem isLocalAt_adicCompletionIntegers_uniformizer
+    (L : Type) [Field L] [NumberField L] (P : HeightOneSpectrum (𝓞 L))
+    : IsLocalAt (OP P) ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) := by
+  have hv
+      : Valued.v ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) = WithZero.exp (-1 : ℤ) :=
+    unif_spec P
   have hne : ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) ≠ 0 := Units.ne_zero _
   have mem : ∀ x : P.adicCompletion L, x ∈ OP P ↔ Valued.v x ≤ 1 := fun x =>
     HeightOneSpectrum.mem_adicCompletionIntegers (R := 𝓞 L) (K := L) (v := P)

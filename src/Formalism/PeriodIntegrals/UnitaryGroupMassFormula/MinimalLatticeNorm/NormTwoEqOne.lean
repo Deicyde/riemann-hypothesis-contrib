@@ -51,11 +51,14 @@ lemma bound_span (B : V → V → ℚ_[p])
     calc ‖(c : ℚ_[p])‖ * ‖B x w‖ ≤ 1 * ‖B x w‖ := mul_le_mul_of_nonneg_right hc (norm_nonneg _)
       _ ≤ M := by rw [one_mul]; exact hx
 
-theorem main (hp2 : p ≠ 2) (B : V → V → ℚ_[p]) (L : Submodule ℤ_[p] V) (hL : L.FG)
+theorem main
+    (hp2 : p ≠ 2)
+    (B : V → V → ℚ_[p])
+    (L : Submodule ℤ_[p] V) (hL : L.FG)
     (hsm : ∀ (c : ℤ_[p]) u v, B (c • u) v = (c : ℚ_[p]) * B u v)
-    (hadd : ∀ u u' v, B (u + u') v = B u v + B u' v)
-    (hsym : ∀ u ∈ L, ∀ v ∈ L, B u v = B v u) (hne : ∃ u ∈ L, ∃ v ∈ L, B u v ≠ 0) :
-    ∃ x ∈ L, B x x ≠ 0 ∧ ∀ u ∈ L, ∃ c : ℤ_[p], B u x = (c : ℚ_[p]) * B x x := by
+    (hadd : ∀ u u' v, B (u + u') v = B u v + B u' v) (hsym : ∀ u ∈ L, ∀ v ∈ L, B u v = B v u)
+    (hne : ∃ u ∈ L, ∃ v ∈ L, B u v ≠ 0)
+    : ∃ x ∈ L, B x x ≠ 0 ∧ ∀ u ∈ L, ∃ c : ℤ_[p], B u x = (c : ℚ_[p]) * B x x := by
   classical
   obtain ⟨S, hS⟩ := hL
   obtain ⟨u0, hu0, v0, hv0, hne0⟩ := hne
@@ -69,7 +72,8 @@ theorem main (hp2 : p ≠ 2) (B : V → V → ℚ_[p]) (L : Submodule ℤ_[p] V)
       subst hu0
       exact absurd (hB0 v0) hne0
     · exact h
-  obtain ⟨q, hq, hqmax⟩ := (S ×ˢ S).exists_max_image (fun q : V × V => ‖B q.1 q.2‖) (hSn.product hSn)
+  obtain ⟨q, hq, hqmax⟩ :=
+    (S ×ˢ S).exists_max_image (fun q : V × V => ‖B q.1 q.2‖) (hSn.product hSn)
   obtain ⟨a, b⟩ := q
   have ha : a ∈ S := (Finset.mem_product.1 hq).1
   have hb : b ∈ S := (Finset.mem_product.1 hq).2
@@ -98,19 +102,23 @@ theorem main (hp2 : p ≠ 2) (B : V → V → ℚ_[p]) (L : Submodule ℤ_[p] V)
     refine ⟨a + b, habL, ?_⟩
     have e : B (a + b) (a + b) = 2 * B a b + (B a a + B b b) := by
       rw [hadd, hsym a haL _ habL, hsym b hbL _ habL, hadd, hadd, hsym b hbL a haL]; ring
-    have hlt : ‖B a a + B b b‖ < ‖B a b‖ := lt_of_le_of_lt (show ‖B a a + B b b‖ ≤ max ‖B a a‖ ‖B b b‖ by first | exact Padic.nonarchimedean _ _ | exact IsUltrametricDist.norm_add_le_max _ _)
-      (max_lt (lt_of_le_of_ne (hbound a haL a haL) haa) (lt_of_le_of_ne (hbound b hbL b hbL) hbb))
+    have hlt : ‖B a a + B b b‖ < ‖B a b‖ :=
+      lt_of_le_of_lt
+        (show ‖B a a + B b b‖ ≤ max ‖B a a‖ ‖B b b‖ by
+          first | exact Padic.nonarchimedean _ _ | exact IsUltrametricDist.norm_add_le_max _ _)
+        (max_lt (lt_of_le_of_ne (hbound a haL a haL) haa) (lt_of_le_of_ne (hbound b hbL b hbL) hbb))
     have h2ab : ‖2 * B a b‖ = ‖B a b‖ := by rw [norm_mul, norm_two_eq_one hp2, one_mul]
-    rw [e, (show ‖2 * B a b + (B a a + B b b)‖ = max ‖2 * B a b‖ ‖B a a + B b b‖ by
-      first
+    rw [e,
+      (show ‖2 * B a b + (B a a + B b b)‖ = max ‖2 * B a b‖ ‖B a a + B b b‖ by
+        first
         | exact Padic.add_eq_max_of_ne (by rw [h2ab]; exact hlt.ne')
-        | exact IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [h2ab]; exact hlt.ne')), h2ab]
+        | exact IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [h2ab]; exact hlt.ne')),
+      h2ab]
     exact max_eq_left hlt.le
   obtain ⟨x, hxL, hxn⟩ := hx
   have hxx : B x x ≠ 0 := fun h => by rw [h, norm_zero] at hxn; linarith
   refine ⟨x, hxL, hxx, fun u hu => ?_⟩
-  have hc : ‖B u x / B x x‖ ≤ 1 := by
-    rw [norm_div, hxn, div_le_one hMpos]; exact hbound u hu x hxL
+  have hc : ‖B u x / B x x‖ ≤ 1 := by rw [norm_div, hxn, div_le_one hMpos]; exact hbound u hu x hxL
   exact ⟨(⟨B u x / B x x, hc⟩ : {y : ℚ_[p] // ‖y‖ ≤ 1}), (div_mul_cancel₀ _ hxx).symm⟩
 
 end PI.LatMinWork

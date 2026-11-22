@@ -13,24 +13,35 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIntegralWe
 @[expose] public section
 
 open scoped UpperHalfPlane MatrixGroups Matrix ModularForm ComplexConjugate
-open NumberField GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
+open NumberField GlobalTheory.QFam GlobalTheory.WpFam GlobalTheory.LatVal
+  ReciprocityTheory.ChartRestriction.L1 Formalism.L2.Th1.F
 open GlobalTheory.CMVal GlobalTheory.HeckeGal
 open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.AlgebraicitySecondEisenstein
 
-theorem main : ∀ (L : PeriodPair) (β Ω : ℂ), MulStable L β → β.im ≠ 0 → Ω ^ 12 = latDisc L →
-    IsAlgebraic ℚ (s2 L / Ω ^ 2) ∧ ∀ (M : ℕ) (P : ℂ), 0 < M → (M : ℂ) * P ∈ L.lattice →
-      IsAlgebraic ℚ (L.weierstrassP P / Ω ^ 2) ∧ IsAlgebraic ℚ (L.derivWeierstrassP P / Ω ^ 3) := by
+theorem main
+    : ∀ (L : PeriodPair) (β Ω : ℂ),
+      MulStable L β → β.im ≠ 0 → Ω ^ 12 = latDisc L
+        → IsAlgebraic ℚ (s2 L / Ω ^ 2)
+          ∧ ∀ (M : ℕ) (P : ℂ),
+            0 < M → (M : ℂ) * P ∈ L.lattice
+              → IsAlgebraic ℚ (L.weierstrassP P / Ω ^ 2)
+                ∧ IsAlgebraic ℚ (L.derivWeierstrassP P / Ω ^ 3) := by
   intro L β Ω hst him hΩ
-  have alg : ∀ x : ℂ, IsAlgebraic ℚ x ↔ x ∈ algebraicClosure ℚ ℂ := fun x => mem_algebraicClosure_iff.symm
+  have alg : ∀ x : ℂ, IsAlgebraic ℚ x ↔ x ∈ algebraicClosure ℚ ℂ := fun x =>
+    mem_algebraicClosure_iff.symm
   have intAlg : ∀ x : ℂ, IsIntegral ℤ x → x ∈ algebraicClosure ℚ ℂ := fun x hx =>
     (alg x).1 (hx.tower_top (A := ℚ)).isAlgebraic
   have natMem : ∀ k : ℕ, (k : ℂ) ∈ algebraicClosure ℚ ℂ := fun k => natCast_mem _ k
-  have part2 : ∀ (M : ℕ) (P : ℂ), 0 < M → (M : ℂ) * P ∈ L.lattice →
-      IsAlgebraic ℚ (L.weierstrassP P / Ω ^ 2) ∧ IsAlgebraic ℚ (L.derivWeierstrassP P / Ω ^ 3) := by
+  have part2
+      : ∀ (M : ℕ) (P : ℂ),
+        0 < M → (M : ℂ) * P ∈ L.lattice
+          → IsAlgebraic ℚ (L.weierstrassP P / Ω ^ 2)
+            ∧ IsAlgebraic ℚ (L.derivWeierstrassP P / Ω ^ 3) := by
     intro M P hM hP
-    obtain ⟨h1, -⟩ := GlobalTheory.T.isIntegral_weierstrassP_torsion_nonreal_multiplier L β Ω M hst him hΩ hM
+    obtain ⟨h1, -⟩ :=
+      GlobalTheory.T.isIntegral_weierstrassP_torsion_nonreal_multiplier L β Ω M hst him hΩ hM
     obtain ⟨i1, i2⟩ := h1 P hP
     have a1 := intAlg _ i1
     have a2 := intAlg _ i2
@@ -69,13 +80,14 @@ theorem main : ∀ (L : PeriodPair) (β Ω : ℂ), MulStable L β → β.im ≠ 
   have hβint : IsIntegral ℤ β := by
     refine ⟨Polynomial.X ^ 2 - Polynomial.C t * Polynomial.X + Polynomial.C n, ?_, ?_⟩
     · monicity!
-    · simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul, Polynomial.eval₂_pow,
-        Polynomial.eval₂_X, Polynomial.eval₂_C]
+    · simp only [Polynomial.eval₂_add, Polynomial.eval₂_sub, Polynomial.eval₂_mul,
+        Polynomial.eval₂_pow, Polynomial.eval₂_X, Polynomial.eval₂_C]
       simpa using hq
   have hβm := intAlg _ hβint
   have hcm : conj β ∈ algebraicClosure ℚ ℂ := by
     have e : conj β = (t : ℂ) - β := by rw [← ht]; ring
-    rw [e]; exact sub_mem (intCast_mem _ t) hβm
+    rw [e]
+    exact sub_mem (intCast_mem _ t) hβm
   rw [alg, hs2, div_div, mul_comm (β * _), ← div_div, Finset.sum_div]
   exact div_mem (sum_mem hP) (mul_mem hβm (sub_mem hβm hcm))
 

@@ -9,7 +9,14 @@ open Matrix
 
 namespace PositivityTheory.HtPt.Ra
 
-theorem carry : ∀ (p f : ℕ), 2 ≤ p → 0 < f → ∀ (y : ℕ → NNReal), (∀ n, y (n + f) = y n) → (∀ n, y n ≤ 1) → (∀ n, y n ^ p ≤ y (n + 1)) → ∀ (e : Fin f → ℕ) (j : ℕ), 2 ≤ ∑ n, e n → (∑ n : Fin f, e n * p ^ (n : ℕ)) ≡ p ^ (j + 1) [MOD (p ^ f - 1)] → ∏ n : Fin f, y n ^ e n ≤ y j ^ p := by
+theorem carry
+    : ∀ (p f : ℕ),
+      2 ≤ p → 0 < f
+        → ∀ (y : ℕ → NNReal),
+          (∀ n, y (n + f) = y n) → (∀ n, y n ≤ 1) → (∀ n, y n ^ p ≤ y (n + 1))
+            → ∀ (e : Fin f → ℕ) (j : ℕ),
+              2 ≤ ∑ n, e n → (∑ n : Fin f, e n * p ^ (n : ℕ)) ≡ p ^ (j + 1) [MOD (p ^ f - 1)]
+                → ∏ n : Fin f, y n ^ e n ≤ y j ^ p := by
   intro p f hp hf y hper hle1 hstep e j he hcong
   have hperm : ∀ a c, y (a + f * c) = y a := by
     intro a c
@@ -25,8 +32,9 @@ theorem carry : ∀ (p f : ℕ), 2 ≤ p → 0 < f → ∀ (y : ℕ → NNReal),
       exact (pow_le_pow_left₀ zero_le ih p).trans (hstep _)
   obtain ⟨q, s, hs, hj⟩ : ∃ q s, s < f ∧ j = s + f * q :=
     ⟨j / f, j % f, Nat.mod_lt _ hf, (Nat.mod_add_div j f).symm⟩
-  have hk : ∀ n : Fin f, ∃ k c m c', k + m = f - 1 ∧ (n : ℕ) + k = s + f * c ∧
-      m + (j + 1) = n + f * c' := by
+  have hk
+      : ∀ n : Fin f, ∃ k c m c',
+        k + m = f - 1 ∧ (n : ℕ) + k = s + f * c ∧ m + (j + 1) = n + f * c' := by
     intro n
     have hn := n.isLt
     by_cases h : (n : ℕ) ≤ s
@@ -74,21 +82,21 @@ theorem carry : ∀ (p f : ℕ), 2 ≤ p → 0 < f → ∀ (y : ℕ → NNReal),
     omega
   have hP : 0 < p ^ (f - 1) := pow_pos (by omega) _
   refine (pow_le_pow_iff_left₀ zero_le zero_le hP.ne').1 ?_
-  calc (∏ n : Fin f, y n ^ e n) ^ p ^ (f - 1)
-      = ∏ n : Fin f, (y n ^ p ^ k n) ^ (e n * p ^ m n) := by
-        rw [← Finset.prod_pow]
-        refine Finset.prod_congr rfl fun n _ => ?_
-        rw [← pow_mul, ← pow_mul]
-        congr 1
-        rw [← hkm n, pow_add]
-        ring
+  calc
+    (∏ n : Fin f, y n ^ e n) ^ p ^ (f - 1) = ∏ n : Fin f, (y n ^ p ^ k n) ^ (e n * p ^ m n) := by
+      rw [← Finset.prod_pow]
+      refine Finset.prod_congr rfl fun n _ => ?_
+      rw [← pow_mul, ← pow_mul]
+      congr 1
+      rw [← hkm n, pow_add]
+      ring
     _ ≤ ∏ n : Fin f, y j ^ (e n * p ^ m n) :=
-        Finset.prod_le_prod₀ (fun _ _ => zero_le) fun n _ => pow_le_pow_left₀ zero_le (hyk n) _
+      Finset.prod_le_prod₀ (fun _ _ => zero_le) fun n _ => pow_le_pow_left₀ zero_le (hyk n) _
     _ = y j ^ (∑ n : Fin f, e n * p ^ m n) := Finset.prod_pow_eq_pow_sum _ _ _
     _ ≤ y j ^ p ^ f := pow_le_pow_of_le_one zero_le (hle1 j) hTf
     _ = (y j ^ p) ^ p ^ (f - 1) := by
-        rw [← pow_mul, ← pow_succ']
-        congr 2
-        omega
+      rw [← pow_mul, ← pow_succ']
+      congr 2
+      omega
 
 end PositivityTheory.HtPt.Ra

@@ -7,14 +7,17 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.SmoothVecto
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter BoundedContinuousFunction
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.LFun Formalism.UG Formalism.L2.Host
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
+  GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.LFun
+  Formalism.UG Formalism.L2.Host
 
 namespace PositivityTheory.jumpWindows
 
 namespace MirrorMap
 
-theorem mir_map {R S : Type} [CommRing R] [CommRing S] {a m : ℕ} (p : R →+* S) {γ : GL (Fin a) R}
-    (h : Mir m γ) : Mir m (GeneralLinearGroup.map p γ) := by
+theorem mir_map
+    {R S : Type} [CommRing R] [CommRing S] {a m : ℕ} (p : R →+* S) {γ : GL (Fin a) R} (h : Mir m γ)
+    : Mir m (GeneralLinearGroup.map p γ) := by
   intro i k hik
   change p (γ.val i k) = _
   rw [h i k hik, Matrix.one_apply, Matrix.one_apply]
@@ -22,8 +25,10 @@ theorem mir_map {R S : Type} [CommRing R] [CommRing S] {a m : ℕ} (p : R →+* 
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem mirS_mul (h10 : MirabolicColumnBlock) {S : Finset (Pl E)} {x g : GA E a} (hx : Mir (a - 1) x) (hg : MirS S g) :
-    MirS S (x * g) := by
+theorem mirS_mul
+    (h10 : MirabolicColumnBlock)
+    {S : Finset (Pl E)} {x g : GA E a} (hx : Mir (a - 1) x) (hg : MirS S g)
+    : MirS S (x * g) := by
   refine ⟨?_, fun w hw => ?_⟩
   · rw [map_mul]
     exact (h10 _ a (a - 1)).2.2.2.2.1 _ _ (mir_map (pInf E) hx) hg.1
@@ -32,7 +37,10 @@ theorem mirS_mul (h10 : MirabolicColumnBlock) {S : Finset (Pl E)} {x g : GA E a}
 
 end MirrorMap
 
-theorem mirror_global_of : MirabolicColumnBlock → G0 → G5 → G9 → PlacewiseToOutsideS → FourierUniquenessMirabolic → WeakApproximationGL → WhittakerVanishingImpliesZero := by
+theorem mirror_global_of
+    : MirabolicColumnBlock → G0 → G5 → G9 → PlacewiseToOutsideS → FourierUniquenessMirabolic
+      → WeakApproximationGL
+      → WhittakerVanishingImpliesZero := by
   intro h10 h0 h5 h9 h9b h11 h12 E _ _ _ a ψ hψ S hcond φ hgood hleft hsat hvan
   obtain ⟨-, -, -, -, -, -, -, -, -, -, hproj, -⟩ := h0 E a
   have hcont : Continuous (Wh ψ φ) := ((h5 E a ψ hψ).2.2.2 φ hgood).1

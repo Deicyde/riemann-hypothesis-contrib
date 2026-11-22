@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Exists
 
 @[expose] public section
 
-open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk GlobalTheory.Mem
+open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk
+  GlobalTheory.Mem
 open scoped Classical
 
 namespace GlobalTheory.Hk.ShortInt
@@ -220,11 +221,24 @@ lemma err_le {B A c c₇ c₉ C L h : ℝ} (hB : 4 ≤ B) (hA : 0 < A) (hc : 0 <
       ring
     _ ≤ h * c₉ := by gcongr; exact a4.trans hh
 
-theorem trivialClass_shortInterval : ∃ A c c' : ℝ, 0 < A ∧ 0 < c ∧ 0 < c' ∧ ∀ (𝓕 : LFam) (X h : ℝ), 1 ≤ X → Real.log 𝓕.B ≤ c * Real.sqrt (Real.log X) → Real.exp (-c * Real.sqrt (Real.log X)) ≤ h → h ≤ 1 → c' * h * X / 𝓕.B ^ A ≤ ∑ n ∈ Finset.Ioc ⌊X⌋₊ ⌊X * (1 + h)⌋₊, 𝓕.lam 0 n := by
+theorem trivialClass_shortInterval
+    : ∃ A c c' : ℝ,
+      0 < A ∧ 0 < c ∧ 0 < c'
+        ∧ ∀ (𝓕 : LFam) (X h : ℝ),
+          1 ≤ X → Real.log 𝓕.B ≤ c * Real.sqrt (Real.log X)
+            → Real.exp (-c * Real.sqrt (Real.log X)) ≤ h → h ≤ 1
+            → c' * h * X / 𝓕.B ^ A ≤ ∑ n ∈ Finset.Ioc ⌊X⌋₊ ⌊X * (1 + h)⌋₊, 𝓕.lam 0 n := by
   obtain ⟨c₀, A, c₉, hc₀, hc₀', hA, hc₉, hc₉', hz⟩ := zeros
   obtain ⟨c₇, C, hc₇, hC, h7⟩ := GlobalTheory.T.rayClassFamily_psi_with_exceptional_zero c₀ hc₀ hc₀'
-  refine ⟨A + 1, min 1 (min (c₇ / 2 / (A + 2)) (c₇ * c₉ / (24 * C))), c₉ / 4, by positivity,
-    by positivity, by positivity, ?_⟩
+  refine ⟨
+    A + 1,
+    min 1 (min (c₇ / 2 / (A + 2)) (c₇ * c₉ / (24 * C))),
+    c₉ / 4,
+    by positivity,
+    by positivity,
+    by positivity,
+    ?_
+  ⟩
   set c := min 1 (min (c₇ / 2 / (A + 2)) (c₇ * c₉ / (24 * C))) with hcdef
   have hc : 0 < c := by positivity
   have hc1 : c ≤ 1 := min_le_left _ _
@@ -242,8 +256,7 @@ theorem trivialClass_shortInterval : ∃ A c c' : ℝ, 0 < A ∧ 0 < c ∧ 0 < c
   have herr := err_le hB hA hc hc₇ hc₉ hC hc2 hc3 hL hh
   have hL0 := Real.sqrt_nonneg (Real.log X)
   have hL' : Real.log 𝓕.B ≤ Real.sqrt (Real.log X) := hL.trans (mul_le_of_le_one_left hL0 hc1)
-  have hlogB : 1 ≤ Real.log 𝓕.B := by
-    rw [Real.le_log_iff_exp_le hB0]; linarith [Real.exp_one_lt_d9]
+  have hlogB : 1 ≤ Real.log 𝓕.B := by rw [Real.le_log_iff_exp_le hB0]; linarith [Real.exp_one_lt_d9]
   have hlogX : 1 ≤ Real.log X := Real.one_le_sqrt.1 (hlogB.trans hL')
   have hXe : Real.exp 1 ≤ X := (Real.le_log_iff_exp_le hX0).1 hlogX
   have hX2 : 2 ≤ X := by linarith [Real.exp_one_gt_d9]
@@ -254,23 +267,31 @@ theorem trivialClass_shortInterval : ∃ A c c' : ℝ, 0 < A ∧ 0 < c ∧ 0 < c
   set E := Real.exp (-c₇ * Real.sqrt (Real.log X)) with hE
   have hE0 : 0 < E := Real.exp_pos _
   have e1 := sum_est 𝓕 Z X (C * X * E) hX0.le (by positivity) fun χ => h7 𝓕 χ (Z χ) X (hZ χ) hX2 hL'
-  have e2 := sum_est 𝓕 Z (X * (1 + h)) (C * (2 * X) * E) (by positivity) (by positivity) fun χ =>
-    (h7 𝓕 χ (Z χ) (X * (1 + h)) (hZ χ) (hX2.trans hXY) (hL'.trans hLY)).trans (by
-      have : Real.exp (-c₇ * Real.sqrt (Real.log (X * (1 + h)))) ≤ E :=
-        Real.exp_le_exp.2 (by nlinarith)
-      gcongr)
+  have e2 :=
+    sum_est 𝓕 Z (X * (1 + h)) (C * (2 * X) * E) (by positivity) (by positivity) fun χ =>
+      (h7 𝓕 χ (Z χ) (X * (1 + h)) (hZ χ) (hX2.trans hXY) (hL'.trans hLY)).trans (by
+        have : Real.exp (-c₇ * Real.sqrt (Real.log (X * (1 + h)))) ≤ E :=
+          Real.exp_le_exp.2 (by nlinarith)
+        gcongr)
   set δ := c₉ / 𝓕.B ^ A with hδ
   have hBA : 1 ≤ 𝓕.B ^ A := Real.one_le_rpow (by linarith) hA.le
   have hδ0 : 0 < δ := by positivity
   have hδ1 : δ ≤ 1 := (div_le_self hc₉.le hBA).trans hc₉'
-  have e3 := sum_le_of_unique Z (fun β => (X * (1 + h)) ^ β / β - X ^ β / β) (h * X * (1 - δ / 2))
-    (by have : 0 ≤ 1 - δ / 2 := by linarith
-        positivity) huniq
-    fun χ β hβ => exc_le hXe hh0.le (hgap χ β hβ).1 hδ0 (hgap χ β hβ).2
+  have e3 :=
+    sum_le_of_unique Z
+      (fun β => (X * (1 + h)) ^ β / β - X ^ β / β)
+      (h * X * (1 - δ / 2))
+      (by
+        have : 0 ≤ 1 - δ / 2 := by linarith
+        positivity)
+      huniq
+      fun χ β hβ => exc_le hXe hh0.le (hgap χ β hβ).1 hδ0 (hgap χ β hβ).2
   simp only [Finset.sum_sub_distrib] at e3
-  have hsplit : ∑ n ∈ Finset.Icc 1 ⌊X * (1 + h)⌋₊, 𝓕.lam 0 n = ∑ n ∈ Finset.Icc 1 ⌊X⌋₊, 𝓕.lam 0 n +
-      ∑ n ∈ Finset.Ioc ⌊X⌋₊ ⌊X * (1 + h)⌋₊, 𝓕.lam 0 n := by
-    have := Finset.sum_Ioc_consecutive (fun n => 𝓕.lam 0 n) (Nat.zero_le ⌊X⌋₊) (Nat.floor_le_floor hXY)
+  have hsplit
+      : ∑ n ∈ Finset.Icc 1 ⌊X * (1 + h)⌋₊, 𝓕.lam 0 n
+        = ∑ n ∈ Finset.Icc 1 ⌊X⌋₊, 𝓕.lam 0 n + ∑ n ∈ Finset.Ioc ⌊X⌋₊ ⌊X * (1 + h)⌋₊, 𝓕.lam 0 n := by
+    have :=
+      Finset.sum_Ioc_consecutive (fun n => 𝓕.lam 0 n) (Nat.zero_le ⌊X⌋₊) (Nat.floor_le_floor hXY)
     exact this.symm
   set S := ∑ n ∈ Finset.Ioc ⌊X⌋₊ ⌊X * (1 + h)⌋₊, 𝓕.lam 0 n with hS
   have hS0 : 0 ≤ S := Finset.sum_nonneg fun n _ => 𝓕.lam_nonneg 0 n
@@ -281,7 +302,9 @@ theorem trivialClass_shortInterval : ∃ A c c' : ℝ, 0 < A ∧ 0 < c ∧ 0 < c
   have main : h * X * δ / 4 ≤ (Fintype.card 𝓕.G : ℝ) * S := by nlinarith
   have main2 : h * X * δ / 4 ≤ 𝓕.B * S := main.trans (mul_le_mul_of_nonneg_right 𝓕.card_le hS0)
   rw [Real.rpow_add_one hB0.ne', ← div_div, div_le_iff₀ hB0]
-  calc c₉ / 4 * h * X / 𝓕.B ^ A = h * X * δ / 4 := by rw [hδ]; ring
+  calc
+    c₉ / 4 * h * X / 𝓕.B ^ A
+      = h * X * δ / 4 := by rw [hδ]; ring
     _ ≤ 𝓕.B * S := main2
     _ = S * 𝓕.B := mul_comm _ _
 

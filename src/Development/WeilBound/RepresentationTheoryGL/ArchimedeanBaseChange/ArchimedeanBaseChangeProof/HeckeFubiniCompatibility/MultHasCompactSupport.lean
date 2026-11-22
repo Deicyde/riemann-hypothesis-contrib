@@ -23,16 +23,17 @@ theorem val_mem_GLs (y : G n) : y.val ∈ GLs n :=
 theorem isUnit_det_unitary (u : Matrix.unitaryGroup (Fin n) ℂ) : IsUnit (u.1.det) :=
   Matrix.isUnit_det_of_left_inverse (Unitary.star_mul_self_of_mem u.2)
 
-theorem mul_mem_GLs {y : Mat n} (hy : y ∈ GLs n) (u₁ u₂ : Matrix.unitaryGroup (Fin n) ℂ) :
-    u₁.1 * y * u₂.1 ∈ GLs n := by
+theorem mul_mem_GLs {y : Mat n} (hy : y ∈ GLs n) (u₁ u₂ : Matrix.unitaryGroup (Fin n) ℂ)
+    : u₁.1 * y * u₂.1 ∈ GLs n := by
   show (u₁.1 * y * u₂.1).det ≠ 0
   rw [Matrix.det_mul, Matrix.det_mul]
   exact mul_ne_zero (mul_ne_zero (isUnit_det_unitary u₁).ne_zero hy) (isUnit_det_unitary u₂).ne_zero
 
 section Mult
 
-variable [MeasurableSpace (G n)] {μ : Measure (G n)} {M : KMod n} {k : Mat n → (M.V →L[ℂ] M.V)}
-  {val : Inf n → ℂ} {T : ℝ}
+variable
+  [MeasurableSpace (G n)]
+  {μ : Measure (G n)} {M : KMod n} {k : Mat n → (M.V →L[ℂ] M.V)} {val : Inf n → ℂ} {T : ℝ}
 
 theorem mult_continuous (h : IsMult μ M k val T) : Continuous fun y : G n => k y.val := by
   obtain ⟨m, c, w, g, ks, hks, hk, -⟩ := h
@@ -48,15 +49,22 @@ theorem mult_exists_lg (h : IsMult μ M k val T) : ∃ R : ℝ, ∀ y ∈ GLs n,
   refine ⟨∑ i, |R i|, fun y hy hlt => ?_⟩
   rw [hk _ hy]
   refine Finset.sum_eq_zero fun i _ => ?_
-  rw [hR i y hy (lt_of_le_of_lt ((le_abs_self _).trans
-    (Finset.single_le_sum (fun j _ => abs_nonneg (R j)) (Finset.mem_univ i))) hlt), smul_zero]
+  rw [hR i y hy
+      (lt_of_le_of_lt
+        ((le_abs_self _).trans
+          (Finset.single_le_sum (fun j _ => abs_nonneg (R j)) (Finset.mem_univ i)))
+        hlt),
+    smul_zero]
 
-theorem mult_hasCompactSupport (h : IsMult μ M k val T) : HasCompactSupport fun y : G n => k y.val := by
+theorem mult_hasCompactSupport (h : IsMult μ M k val T)
+    : HasCompactSupport fun y : G n => k y.val := by
   obtain ⟨R, hR⟩ := mult_exists_lg h
-  exact HasCompactSupport.intro ((GlobalTheory.T.length_continuous_proper_sublevel n).2 R) fun y hy => hR _ (val_mem_GLs y) (not_le.1 hy)
+  exact HasCompactSupport.intro ((GlobalTheory.T.length_continuous_proper_sublevel n).2 R)
+    fun y hy => hR _ (val_mem_GLs y) (not_le.1 hy)
 
-theorem mult_equivariant (h : IsMult μ M k val T) : ∀ y ∈ GLs n, ∀ u₁ u₂ : Matrix.unitaryGroup (Fin n) ℂ,
-    k (u₁.1 * y * u₂.1) = M.ρ u₁ * k y * M.ρ u₂ := by
+theorem mult_equivariant (h : IsMult μ M k val T)
+    : ∀ y ∈ GLs n, ∀ u₁ u₂ : Matrix.unitaryGroup (Fin n) ℂ,
+      k (u₁.1 * y * u₂.1) = M.ρ u₁ * k y * M.ρ u₂ := by
   obtain ⟨m, c, w, g, ks, hks, hk, -⟩ := h
   intro y hy u₁ u₂
   rw [hk _ (mul_mem_GLs hy u₁ u₂), hk _ hy, Finset.mul_sum, Finset.sum_mul]
@@ -64,8 +72,9 @@ theorem mult_equivariant (h : IsMult μ M k val T) : ∀ y ∈ GLs n, ∀ u₁ u
   rw [(hks i).2.2.2.1 y hy u₁ u₂]
   simp only [mul_smul_comm, smul_mul_assoc]
 
-theorem mult_equivariant_val (h : IsMult μ M k val T) (y : G n) (u₁ u₂ : Matrix.unitaryGroup (Fin n) ℂ) :
-    k (u₁.1 * y.val * u₂.1) = M.ρ u₁ * k y.val * M.ρ u₂ :=
+theorem mult_equivariant_val
+    (h : IsMult μ M k val T) (y : G n) (u₁ u₂ : Matrix.unitaryGroup (Fin n) ℂ)
+    : k (u₁.1 * y.val * u₂.1) = M.ρ u₁ * k y.val * M.ρ u₂ :=
   mult_equivariant h _ (val_mem_GLs y) u₁ u₂
 
 end Mult
@@ -74,18 +83,25 @@ section Ent
 
 variable {M : KMod n}
 
-theorem continuous_ent {X : Type} [TopologicalSpace X] {f : X → (M.V →L[ℂ] M.V)} (hf : Continuous f) (i j : Ix M) :
-    Continuous fun x => ent M (f x) i j :=
+theorem continuous_ent
+    {X : Type} [TopologicalSpace X] {f : X → (M.V →L[ℂ] M.V)} (hf : Continuous f) (i j : Ix M)
+    : Continuous fun x => ent M (f x) i j :=
   continuous_const.inner (hf.clm_apply continuous_const)
 
-theorem hasCompactSupport_ent {X : Type} [TopologicalSpace X] {f : X → (M.V →L[ℂ] M.V)} (hf : HasCompactSupport f)
-    (i j : Ix M) : HasCompactSupport fun x => ent M (f x) i j :=
+theorem hasCompactSupport_ent
+    {X : Type} [TopologicalSpace X]
+    {f : X → (M.V →L[ℂ] M.V)} (hf : HasCompactSupport f)
+    (i j : Ix M)
+    : HasCompactSupport fun x => ent M (f x) i j :=
   hf.comp_left (g := fun A => ent M A i j) (ent_zero M i j)
 
-variable [MeasurableSpace (G n)] {μ : Measure (G n)} {k : Mat n → (M.V →L[ℂ] M.V)} {val : Inf n → ℂ} {T : ℝ}
+variable
+  [MeasurableSpace (G n)]
+  {μ : Measure (G n)} {k : Mat n → (M.V →L[ℂ] M.V)} {val : Inf n → ℂ} {T : ℝ}
 
-theorem mult_ent (h : IsMult μ M k val T) (i j : Ix M) :
-    Continuous (fun y : G n => ent M (k y.val) i j) ∧ HasCompactSupport (fun y : G n => ent M (k y.val) i j) :=
+theorem mult_ent (h : IsMult μ M k val T) (i j : Ix M)
+    : Continuous (fun y : G n => ent M (k y.val) i j)
+      ∧ HasCompactSupport (fun y : G n => ent M (k y.val) i j) :=
   ⟨continuous_ent (mult_continuous h) i j, hasCompactSupport_ent (mult_hasCompactSupport h) i j⟩
 
 end Ent

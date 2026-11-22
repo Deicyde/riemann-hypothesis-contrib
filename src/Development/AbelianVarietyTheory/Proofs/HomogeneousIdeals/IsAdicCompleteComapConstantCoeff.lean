@@ -14,12 +14,11 @@ section Eval
 
 variable {A S : Type*} [CommRing A] [CommRing S] [Algebra A S]
 
-theorem pow_dvd_sub_aeval_trunc (φ : A⟦X⟧ →ₐ[A] S) (n : ℕ) (f : A⟦X⟧) :
-    φ X ^ n ∣ φ f - Polynomial.aeval (φ X) (trunc n f) := by
+theorem pow_dvd_sub_aeval_trunc (φ : A⟦X⟧ →ₐ[A] S) (n : ℕ) (f : A⟦X⟧)
+    : φ X ^ n ∣ φ f - Polynomial.aeval (φ X) (trunc n f) := by
   have h1 : ∀ p : Polynomial A, φ (p : A⟦X⟧) = Polynomial.aeval (φ X) p := by
     intro p
-    have : φ.comp (Polynomial.coeToPowerSeries.algHom A) = Polynomial.aeval (φ X) := by
-      ext; simp
+    have : φ.comp (Polynomial.coeToPowerSeries.algHom A) = Polynomial.aeval (φ X) := by ext; simp
     simpa using DFunLike.congr_fun this p
   refine ⟨φ (mk fun i => coeff (i + n) f), ?_⟩
   conv_lhs => rw [f.eq_X_pow_mul_shift_add_trunc n]
@@ -28,17 +27,18 @@ theorem pow_dvd_sub_aeval_trunc (φ : A⟦X⟧ →ₐ[A] S) (n : ℕ) (f : A⟦X
   rw [← f.eq_X_pow_mul_shift_add_trunc n, sub_eq_iff_eq_add]
   exact f.eq_X_pow_mul_shift_add_trunc n
 
-theorem aeval_sub_mem_pow {J : Ideal S} {s : S} (hs : s ∈ J) {n : ℕ} {p q : Polynomial A}
-    (h : ∀ i < n, p.coeff i = q.coeff i) :
-    Polynomial.aeval s p - Polynomial.aeval s q ∈ J ^ n := by
+theorem aeval_sub_mem_pow
+    {J : Ideal S} {s : S} (hs : s ∈ J)
+    {n : ℕ} {p q : Polynomial A} (h : ∀ i < n, p.coeff i = q.coeff i)
+    : Polynomial.aeval s p - Polynomial.aeval s q ∈ J ^ n := by
   have : (Polynomial.X : Polynomial A) ^ n ∣ p - q :=
     Polynomial.X_pow_dvd_iff.2 fun i hi => by simp [h i hi]
   obtain ⟨r, hr⟩ := this
   rw [← map_sub, hr, map_mul, map_pow, Polynomial.aeval_X]
   exact Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow hs n)
 
-def evalMod (A : Type*) [CommRing A] [Algebra A S] (J : Ideal S) {s : S} (hs : s ∈ J) (n : ℕ) :
-    A⟦X⟧ →ₐ[A] S ⧸ J ^ n where
+def evalMod (A : Type*) [CommRing A] [Algebra A S] (J : Ideal S) {s : S} (hs : s ∈ J) (n : ℕ)
+    : A⟦X⟧ →ₐ[A] S ⧸ J ^ n where
   toFun f := Ideal.Quotient.mk _ (Polynomial.aeval s (trunc n f))
   map_one' := by
     rw [← map_one (Ideal.Quotient.mk (J ^ n)), Ideal.Quotient.eq,
@@ -60,24 +60,25 @@ def evalMod (A : Type*) [CommRing A] [Algebra A S] (J : Ideal S) {s : S} (hs : s
     refine aeval_sub_mem_pow hs fun i hi => ?_
     simp [coeff_trunc, hi, Polynomial.coeff_C, coeff_C]
 
-theorem factor_comp_evalMod (J : Ideal S) {s : S} (hs : s ∈ J) {m n : ℕ} (hle : m ≤ n) :
-    (Ideal.Quotient.factorₐ A (Ideal.pow_le_pow_right hle)).comp (evalMod A J hs n) =
-      evalMod A J hs m := by
+theorem factor_comp_evalMod (J : Ideal S) {s : S} (hs : s ∈ J) {m n : ℕ} (hle : m ≤ n)
+    : (Ideal.Quotient.factorₐ A (Ideal.pow_le_pow_right hle)).comp (evalMod A J hs n)
+      = evalMod A J hs m := by
   refine AlgHom.ext fun f => ?_
-  change Ideal.Quotient.mk _ (Polynomial.aeval s (trunc n f)) =
-    Ideal.Quotient.mk _ (Polynomial.aeval s (trunc m f))
+  change Ideal.Quotient.mk _ (Polynomial.aeval s (trunc n f))
+    = Ideal.Quotient.mk _ (Polynomial.aeval s (trunc m f))
   rw [Ideal.Quotient.eq]
   refine aeval_sub_mem_pow hs fun i hi => ?_
   rw [coeff_trunc, coeff_trunc, ite_eq_left hi, ite_eq_left (by omega)]
 
-def evalAdic (A : Type*) [CommRing A] [Algebra A S] (J : Ideal S) [IsAdicComplete J S] {s : S}
-    (hs : s ∈ J) : A⟦X⟧ →ₐ[A] S :=
+def evalAdic
+    (A : Type*) [CommRing A] [Algebra A S] (J : Ideal S) [IsAdicComplete J S] {s : S} (hs : s ∈ J)
+    : A⟦X⟧ →ₐ[A] S :=
   IsAdicComplete.liftAlgHom J (evalMod A J hs) (factor_comp_evalMod J hs)
 
 variable (J : Ideal S) [IsAdicComplete J S] {s : S} (hs : s ∈ J)
 
-theorem evalAdic_sub_aeval_trunc_mem (n : ℕ) (f : A⟦X⟧) :
-    evalAdic A J hs f - Polynomial.aeval s (trunc n f) ∈ J ^ n := by
+theorem evalAdic_sub_aeval_trunc_mem (n : ℕ) (f : A⟦X⟧)
+    : evalAdic A J hs f - Polynomial.aeval s (trunc n f) ∈ J ^ n := by
   rw [← Ideal.Quotient.eq]
   exact IsAdicComplete.mk_liftAlgHom J (evalMod A J hs) (factor_comp_evalMod J hs) n f
 
@@ -87,17 +88,19 @@ theorem eq_of_forall_sub_mem_pow {x y : S} (h : ∀ n, x - y ∈ J ^ n) : x = y 
   rw [SModEq.zero]
   simpa using h n
 
-@[simp] theorem evalAdic_X : evalAdic A J hs X = s := by
+@[simp]
+theorem evalAdic_X : evalAdic A J hs X = s := by
   refine eq_of_forall_sub_mem_pow J fun n => ?_
   have h1 := evalAdic_sub_aeval_trunc_mem J hs n (X : A⟦X⟧)
-  have h2 : Polynomial.aeval s (trunc n (X : A⟦X⟧)) -
-      Polynomial.aeval s (Polynomial.X : Polynomial A) ∈ J ^ n :=
-    aeval_sub_mem_pow hs fun i hi => by
-      simp [coeff_trunc, hi, coeff_X, Polynomial.coeff_X, eq_comm]
+  have h2
+      : Polynomial.aeval s (trunc n (X : A⟦X⟧)) - Polynomial.aeval s (Polynomial.X : Polynomial A)
+        ∈ J ^ n :=
+    aeval_sub_mem_pow hs fun i hi => by simp [coeff_trunc, hi, coeff_X, Polynomial.coeff_X, eq_comm]
   simpa using add_mem h1 h2
 
-theorem algHom_ext_of_isHausdorff (J : Ideal S) [IsHausdorff J S] {φ ψ : A⟦X⟧ →ₐ[A] S}
-    (hφ : φ X ∈ J) (h : φ X = ψ X) : φ = ψ := by
+theorem algHom_ext_of_isHausdorff
+    (J : Ideal S) [IsHausdorff J S] {φ ψ : A⟦X⟧ →ₐ[A] S} (hφ : φ X ∈ J) (h : φ X = ψ X)
+    : φ = ψ := by
   refine AlgHom.ext fun f => ?_
   rw [← sub_eq_zero]
   refine IsHausdorff.haus' (I := J) _ fun n => ?_
@@ -118,8 +121,10 @@ section Division
 variable {A : Type*} [CommRing A]
 
 theorem X_sub_C_dvd_sub_C (φ : A⟦X⟧ →ₐ[A] A) (f : A⟦X⟧) : X - C (φ X) ∣ f - C (φ f) := by
-  have key : ∀ n, φ (mk fun i => coeff (i + n) f) =
-      φ X * φ (mk fun i => coeff (i + (n + 1)) f) + coeff n f := by
+  have key
+      : ∀ n,
+        φ (mk fun i => coeff (i + n) f)
+          = φ X * φ (mk fun i => coeff (i + (n + 1)) f) + coeff n f := by
     intro n
     have h := (mk fun i => coeff (i + n) f).eq_X_mul_shift_add_const
     have hC : ∀ a, φ (C a) = a := fun a => φ.commutes a
@@ -133,13 +138,14 @@ theorem X_sub_C_dvd_sub_C (φ : A⟦X⟧ →ₐ[A] A) (f : A⟦X⟧) : X - C (φ
     have : (mk fun i => coeff (i + 0) f) = f := by ext; simp
     rw [this] at h0
     simp only [sub_mul, map_sub, coeff_zero_C, coeff_C_mul, coeff_mk, coeff_zero_X_mul]
-    rw [h0]; ring
+    rw [h0]
+    ring
   | succ n =>
     simp only [sub_mul, map_sub, coeff_C_mul, coeff_mk, coeff_succ_X_mul, coeff_succ_C]
-    rw [key (n + 1)]; ring
+    rw [key (n + 1)]
+    ring
 
-theorem ker_eq_span_X_sub_C (φ : A⟦X⟧ →ₐ[A] A) :
-    RingHom.ker φ = Ideal.span {X - C (φ X)} := by
+theorem ker_eq_span_X_sub_C (φ : A⟦X⟧ →ₐ[A] A) : RingHom.ker φ = Ideal.span {X - C (φ X)} := by
   apply le_antisymm
   · intro f hf
     have h := X_sub_C_dvd_sub_C φ f
@@ -154,8 +160,8 @@ section Complete
 
 variable {A : Type*} [CommRing A] (I : Ideal A)
 
-theorem map_C_sup_span_X :
-    I.map (C : A →+* A⟦X⟧) ⊔ Ideal.span {X} = I.comap (constantCoeff (R := A)) := by
+theorem map_C_sup_span_X
+    : I.map (C : A →+* A⟦X⟧) ⊔ Ideal.span {X} = I.comap (constantCoeff (R := A)) := by
   apply le_antisymm
   · refine sup_le ?_ ?_
     · rw [Ideal.map_le_iff_le_comap]
@@ -164,12 +170,11 @@ theorem map_C_sup_span_X :
     · simp [Ideal.span_singleton_le_iff_mem]
   · intro f hf
     rw [f.eq_X_mul_shift_add_const]
-    exact add_mem
-      (Ideal.mem_sup_right (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)))
+    exact add_mem (Ideal.mem_sup_right (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)))
       (Ideal.mem_sup_left (Ideal.mem_map_of_mem _ hf))
 
-theorem mem_pow_comap_constantCoeff_iff (n : ℕ) (f : A⟦X⟧) :
-    f ∈ I.comap (constantCoeff (R := A)) ^ n ↔ ∀ i, coeff i f ∈ I ^ (n - i) := by
+theorem mem_pow_comap_constantCoeff_iff (n : ℕ) (f : A⟦X⟧)
+    : f ∈ I.comap (constantCoeff (R := A)) ^ n ↔ ∀ i, coeff i f ∈ I ^ (n - i) := by
   constructor
   · induction n generalizing f with
     | zero => simp
@@ -197,18 +202,18 @@ theorem mem_pow_comap_constantCoeff_iff (n : ℕ) (f : A⟦X⟧) :
       rw [trunc_apply, ← Polynomial.coeToPowerSeries.ringHom_apply, map_sum]
     refine sum_mem fun i hi => ?_
     have hi' : i < n := (Finset.mem_Ico.1 hi).2
-    rw [Polynomial.coeToPowerSeries.ringHom_apply, Polynomial.coe_monomial,
-      monomial_eq_C_mul_X_pow]
+    rw [Polynomial.coeToPowerSeries.ringHom_apply, Polynomial.coe_monomial, monomial_eq_C_mul_X_pow]
     have h1 : C (coeff i f) ∈ I.comap (constantCoeff (R := A)) ^ (n - i) := by
       have := Ideal.mem_map_of_mem (C : A →+* A⟦X⟧) (h i)
       rw [Ideal.map_pow] at this
       refine Ideal.pow_right_mono ?_ _ this
-      rw [← map_C_sup_span_X]; exact le_sup_left
+      rw [← map_C_sup_span_X]
+      exact le_sup_left
     have h2 := Ideal.mul_mem_mul h1 (Ideal.pow_mem_pow hX i)
     rwa [← pow_add, Nat.sub_add_cancel hi'.le] at h2
 
-theorem isHausdorff_comap_constantCoeff [IsHausdorff I A] :
-    IsHausdorff (I.comap (constantCoeff (R := A))) A⟦X⟧ where
+theorem isHausdorff_comap_constantCoeff [IsHausdorff I A]
+    : IsHausdorff (I.comap (constantCoeff (R := A))) A⟦X⟧ where
   haus' f hf := by
     ext i
     refine IsHausdorff.haus' (I := I) _ fun n => ?_
@@ -217,16 +222,17 @@ theorem isHausdorff_comap_constantCoeff [IsHausdorff I A] :
     simp only [smul_eq_mul, Ideal.mul_top] at this ⊢
     simpa using (mem_pow_comap_constantCoeff_iff I _ f).1 this i
 
-theorem isPrecomplete_comap_constantCoeff [IsPrecomplete I A] :
-    IsPrecomplete (I.comap (constantCoeff (R := A))) A⟦X⟧ where
+theorem isPrecomplete_comap_constantCoeff [IsPrecomplete I A]
+    : IsPrecomplete (I.comap (constantCoeff (R := A))) A⟦X⟧ where
   prec' F hF := by
     simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, mem_pow_comap_constantCoeff_iff] at hF ⊢
     have : ∀ i, ∃ L : A, ∀ n, coeff i (F (n + i)) - L ∈ I ^ n := by
       intro i
-      have := IsPrecomplete.prec' (I := I) (fun n => coeff i (F (n + i))) (by
-        intro m n h
-        simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
-        simpa using hF (show m + i ≤ n + i by omega) i)
+      have :=
+        IsPrecomplete.prec' (I := I) (fun n => coeff i (F (n + i))) (by
+          intro m n h
+          simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
+          simpa using hF (show m + i ≤ n + i by omega) i)
       simpa only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top] using this
     choose L hL using this
     refine ⟨mk L, fun n i => ?_⟩
@@ -236,13 +242,15 @@ theorem isPrecomplete_comap_constantCoeff [IsPrecomplete I A] :
       simpa using this
     · rw [show n - i = 0 by omega]; simp
 
-theorem isAdicComplete_comap_constantCoeff [IsAdicComplete I A] :
-    IsAdicComplete (I.comap (constantCoeff (R := A))) A⟦X⟧ :=
-  { isHausdorff_comap_constantCoeff I, isPrecomplete_comap_constantCoeff I with }
+theorem isAdicComplete_comap_constantCoeff [IsAdicComplete I A]
+    : IsAdicComplete (I.comap (constantCoeff (R := A))) A⟦X⟧ := {
+  isHausdorff_comap_constantCoeff I, isPrecomplete_comap_constantCoeff I with
+}
 
-theorem map_comap_constantCoeff_le {S : Type*} [CommRing S] [Algebra A S] (J : Ideal S)
-    (φ : A⟦X⟧ →ₐ[A] S) (hI : I.map (algebraMap A S) ≤ J) (hX : φ X ∈ J) :
-    (I.comap (constantCoeff (R := A))).map φ ≤ J := by
+theorem map_comap_constantCoeff_le
+    {S : Type*} [CommRing S] [Algebra A S]
+    (J : Ideal S) (φ : A⟦X⟧ →ₐ[A] S) (hI : I.map (algebraMap A S) ≤ J) (hX : φ X ∈ J)
+    : (I.comap (constantCoeff (R := A))).map φ ≤ J := by
   rw [Ideal.map_le_iff_le_comap]
   intro f hf
   rw [Ideal.mem_comap, f.eq_X_mul_shift_add_const, map_add (f := _), map_mul]
@@ -251,8 +259,9 @@ theorem map_comap_constantCoeff_le {S : Type*} [CommRing S] [Algebra A S] (J : I
   rw [this]
   exact hI (Ideal.mem_map_of_mem _ hf)
 
-theorem continuous_adicTopology_of_map_le {S : Type*} [CommRing S] (J : Ideal S) (φ : A →+* S)
-    (h : I.map φ ≤ J) : @Continuous A S I.adicTopology J.adicTopology φ := by
+theorem continuous_adicTopology_of_map_le
+    {S : Type*} [CommRing S] (J : Ideal S) (φ : A →+* S) (h : I.map φ ≤ J)
+    : @Continuous A S I.adicTopology J.adicTopology φ := by
   letI : WithIdeal A := ⟨I⟩
   letI : WithIdeal S := ⟨J⟩
   exact (WithIdeal.uniformContinuous_of_map_le (f := φ) h).continuous

@@ -26,23 +26,26 @@ def coeffMap (ρ : Representation ℂ G V) (lam : Module.Dual ℂ V) : V →ₗ[
     funext g
     simp
 
-theorem coeffMap_apply (ρ : Representation ℂ G V) (lam : Module.Dual ℂ V) (v : V) (g : G) :
-    coeffMap ρ lam v g = lam (ρ g v) := rfl
+theorem coeffMap_apply (ρ : Representation ℂ G V) (lam : Module.Dual ℂ V) (v : V) (g : G)
+    : coeffMap ρ lam v g = lam (ρ g v) :=
+  rfl
 
-theorem coeffMap_equivariant (ρ : Representation ℂ G V) (lam : Module.Dual ℂ V) (g : G) (v : V) :
-    coeffMap ρ lam (ρ g v) = rightReg ℂ G ℂ g (coeffMap ρ lam v) := by
+theorem coeffMap_equivariant (ρ : Representation ℂ G V) (lam : Module.Dual ℂ V) (g : G) (v : V)
+    : coeffMap ρ lam (ρ g v) = rightReg ℂ G ℂ g (coeffMap ρ lam v) := by
   funext x
   change lam (ρ x (ρ g v)) = lam (ρ (x * g) v)
   rw [map_mul, Module.End.mul_apply]
 
-theorem coeffMap_injective {ρ : Representation ℂ G V} (hρ : ρ.IsIrreducible) {lam : Module.Dual ℂ V}
-    (hlam : lam ≠ 0) : Function.Injective (coeffMap ρ lam) := by
-  let S : Subrepresentation ρ :=
-    { toSubmodule := LinearMap.ker (coeffMap ρ lam)
-      apply_mem_toSubmodule := by
-        intro g v hv
-        rw [LinearMap.mem_ker] at hv ⊢
-        rw [coeffMap_equivariant, hv, map_zero] }
+theorem coeffMap_injective
+    {ρ : Representation ℂ G V} (hρ : ρ.IsIrreducible) {lam : Module.Dual ℂ V} (hlam : lam ≠ 0)
+    : Function.Injective (coeffMap ρ lam) := by
+  let S : Subrepresentation ρ := {
+    toSubmodule := LinearMap.ker (coeffMap ρ lam)
+    apply_mem_toSubmodule := by
+      intro g v hv
+      rw [LinearMap.mem_ker] at hv ⊢
+      rw [coeffMap_equivariant, hv, map_zero]
+  }
   rcases hρ.eq_bot_or_eq_top S with h | h
   · have h1 : LinearMap.ker (coeffMap ρ lam) = ⊥ := congrArg Subrepresentation.toSubmodule h
     exact LinearMap.ker_eq_bot.1 h1
@@ -59,11 +62,15 @@ section U
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L} {n : ℕ}
 
-theorem chiDeltaU_mul_uni {m : ℕ} (q : ℕ) (α : Fin m → ℂ) {t u : GU σ n}
-    (ht : IsDiagM (t : GL (Fin n) L)) (hu : IsUniM (u : GL (Fin n) L)) :
-    chiDeltaU q α (t * u) = chiDeltaU q α t := by
-  have h : ∀ i : Fin n, (((t * u : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i =
-      ((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i := by
+theorem chiDeltaU_mul_uni
+    {m : ℕ}
+    (q : ℕ) (α : Fin m → ℂ)
+    {t u : GU σ n} (ht : IsDiagM (t : GL (Fin n) L)) (hu : IsUniM (u : GL (Fin n) L))
+    : chiDeltaU q α (t * u) = chiDeltaU q α t := by
+  have h
+      : ∀ i : Fin n,
+        (((t * u : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i
+          = ((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i := by
     intro i
     simp only [Subgroup.coe_mul, Units.val_mul, Matrix.mul_apply]
     rw [Finset.sum_eq_single i]
@@ -79,18 +86,23 @@ theorem chiDeltaU_mul_uni {m : ℕ} (q : ℕ) (α : Fin m → ℂ) {t u : GU σ 
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem form_uni {ρ : Representation ℂ (GU σ n) V} {lam : Module.Dual ℂ V}
-    (hJ : ∀ x ∈ jacU ρ, lam x = 0) {u : GU σ n} (hu : IsUniM (u : GL (Fin n) L)) (w : V) :
-    lam (ρ u w) = lam w := by
+theorem form_uni
+    {ρ : Representation ℂ (GU σ n) V} {lam : Module.Dual ℂ V} (hJ : ∀ x ∈ jacU ρ, lam x = 0)
+    {u : GU σ n} (hu : IsUniM (u : GL (Fin n) L))
+    (w : V)
+    : lam (ρ u w) = lam w := by
   have h : ρ u w - w ∈ jacU ρ := Submodule.subset_span ⟨u, hu, w, rfl⟩
   have h0 := hJ _ h
   rwa [map_sub, sub_eq_zero] at h0
 
-theorem coeffMap_mem (hsplit : BorelSplitU) (hσ : ∀ x, σ (σ x) = x) {q : ℕ} {β : Fin (n / 2) → ℂˣ}
-    {ρ : Representation ℂ (GU σ n) V} {lam : Module.Dual ℂ V} (hJ : ∀ x ∈ jacU ρ, lam x = 0)
-    (hT : ∀ t : GU σ n, IsDiagM (t : GL (Fin n) L) → ∀ v,
-      lam (ρ t v) = chiDeltaU q (fun i => (β i : ℂ)) t * lam v) (v : V) :
-    coeffMap ρ lam v ∈ psSpaceU σ q β := by
+theorem coeffMap_mem
+    (hsplit : BorelSplitU) (hσ : ∀ x, σ (σ x) = x)
+    {q : ℕ} {β : Fin (n / 2) → ℂˣ} {ρ : Representation ℂ (GU σ n) V} {lam : Module.Dual ℂ V}
+    (hJ : ∀ x ∈ jacU ρ, lam x = 0)
+    (hT : ∀ t : GU σ n,
+      IsDiagM (t : GL (Fin n) L) → ∀ v, lam (ρ t v) = chiDeltaU q (fun i => (β i : ℂ)) t * lam v)
+    (v : V)
+    : coeffMap ρ lam v ∈ psSpaceU σ q β := by
   intro b g hb
   obtain ⟨t, u, ht, hu, rfl⟩ := hsplit L σ n hσ b hb
   rw [chiDeltaU_mul_uni q _ ht hu, coeffMap_apply, coeffMap_apply, map_mul, map_mul,

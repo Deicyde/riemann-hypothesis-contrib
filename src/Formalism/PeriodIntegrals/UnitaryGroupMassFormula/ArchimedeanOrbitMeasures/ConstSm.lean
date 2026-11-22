@@ -10,7 +10,8 @@ noncomputable section
 
 namespace PI.AprimeInfW
 
-open MeasureTheory Topology Filter NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open MeasureTheory Topology Filter NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.RealObj Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
   Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal
 open scoped TensorProduct
 
@@ -46,12 +47,13 @@ def sigLin (σ : E →ₐ[F] E) : (R ⊗[F] E) →ₗ[R] (R ⊗[F] E) where
 theorem continuous_sigR (σ : E →ₐ[F] E) : Continuous (sigR R σ) :=
   IsModuleTopology.continuous_of_linearMap (sigLin R σ)
 
-theorem isClosed_hermR [T2Space (R ⊗[F] E)] (σ : E →ₐ[F] E) (n : ℕ) :
-    IsClosed ((HermR R σ n : AddSubgroup (Matrix (Fin n) (Fin n) (R ⊗[F] E))) :
-      Set (Matrix (Fin n) (Fin n) (R ⊗[F] E))) := by
-  have : ((HermR R σ n : AddSubgroup (Matrix (Fin n) (Fin n) (R ⊗[F] E))) :
-      Set (Matrix (Fin n) (Fin n) (R ⊗[F] E))) =
-      ⋂ a, ⋂ b, {S : Matrix (Fin n) (Fin n) (R ⊗[F] E) | sigR R σ (S b a) = S a b} := by
+theorem isClosed_hermR [T2Space (R ⊗[F] E)] (σ : E →ₐ[F] E) (n : ℕ)
+    : IsClosed
+      ((HermR R σ n : AddSubgroup (Matrix (Fin n) (Fin n) (R ⊗[F] E)))
+        : Set (Matrix (Fin n) (Fin n) (R ⊗[F] E))) := by
+  have : ((HermR R σ n : AddSubgroup (Matrix (Fin n) (Fin n) (R ⊗[F] E)))
+        : Set (Matrix (Fin n) (Fin n) (R ⊗[F] E)))
+      = ⋂ a, ⋂ b, {S : Matrix (Fin n) (Fin n) (R ⊗[F] E) | sigR R σ (S b a) = S a b} := by
     ext S; simp [HermR]
   rw [this]
   refine isClosed_iInter fun a => isClosed_iInter fun b => isClosed_eq ?_ ?_
@@ -66,16 +68,20 @@ theorem hermLF_holds : HermLF := by
   have : νinf.IsAddHaarMeasure := hH.2.2.2.2.2.1.1
   have : LocallyCompactSpace (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
       (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) :=
-    inferInstanceAs (LocallyCompactSpace (Fin (D.R.rS + 1 + D.R.rS) → Fin (D.R.rS + 1 + D.R.rS) →
-      (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)))
+    inferInstanceAs (LocallyCompactSpace
+      (Fin (D.R.rS + 1 + D.R.rS) → Fin (D.R.rS + 1 + D.R.rS) → (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)))
   have : LocallyCompactSpace (HmI X) :=
-    (isClosed_hermR (Ainf X.B.I.F) X.B.I.cm.sig (D.R.rS + 1 + D.R.rS)).isClosedEmbedding_subtypeVal.locallyCompactSpace
+    (isClosed_hermR (Ainf X.B.I.F) X.B.I.cm.sig
+      (D.R.rS + 1 + D.R.rS)).isClosedEmbedding_subtypeVal.locallyCompactSpace
   obtain ⟨K, hK, hKc⟩ := exists_compact_mem_nhds (TI X u' hT)
   exact ⟨K, hKc, hK.measure_lt_top⟩
 
-theorem continuous_gramI {D : D7} (X : HidaSetting D) :
-    Continuous (gramR (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J :
-      TupI X → Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS)) (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) := by
+theorem continuous_gramI {D : D7} (X : HidaSetting D)
+    : Continuous
+      (gramR (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J
+        : TupI X
+          → Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
+            (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) := by
   have : FiniteDimensional X.B.I.F X.B.I.E := fd_of X
   have hs := continuous_sigR (Ainf X.B.I.F) X.B.I.cm.sig
   refine continuous_pi fun a => continuous_pi fun b => ?_
@@ -87,23 +93,30 @@ theorem continuous_gramI {D : D7} (X : HidaSetting D) :
 theorem gramMeas_holds : GramMeas := by
   intro D X S hS
   have : FiniteDimensional X.B.I.F X.B.I.E := fd_of X
-  have hS' : MeasurableSet[(borel (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
-      (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))).comap Subtype.val] S := by
+  have hS'
+      : MeasurableSet[(borel (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
+          (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))).comap Subtype.val]
+        S := by
     rw [← borel_comap]; exact hS
   obtain ⟨A, hA, rfl⟩ := hS'
   rw [Set.image_preimage_eq_inter_range, Subtype.range_coe_subtype, Set.preimage_inter]
-  have hg : @Measurable (TupI X) (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
-      (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) _ (borel _) (gramR (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J) := by
+  have hg : @Measurable (TupI X)
+      (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
+        (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))
+      _ (borel _) (gramR (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J) := by
     let _ : MeasurableSpace (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
-      (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) := borel _
+        (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) :=
+      borel _
     have : BorelSpace (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
-      (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) := ⟨rfl⟩
+        (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) :=
+      ⟨rfl⟩
     exact (continuous_gramI X).measurable
-  have hC : MeasurableSet[borel (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
-      (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))]
-      ((HermR (Ainf X.B.I.F) X.B.I.cm.sig (D.R.rS + 1 + D.R.rS) : AddSubgroup _) : Set _) :=
-    MeasurableSet.of_compl (MeasurableSpace.measurableSet_generateFrom
-      (isClosed_hermR (Ainf X.B.I.F) X.B.I.cm.sig (D.R.rS + 1 + D.R.rS)).isOpen_compl)
+  have hC
+      : MeasurableSet[borel (Matrix (Fin (D.R.rS + 1 + D.R.rS)) (Fin (D.R.rS + 1 + D.R.rS))
+          (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))]
+        ((HermR (Ainf X.B.I.F) X.B.I.cm.sig (D.R.rS + 1 + D.R.rS) : AddSubgroup _) : Set _) :=
+    MeasurableSet.of_compl (MeasurableSpace.measurableSet_generateFrom (isClosed_hermR
+      (Ainf X.B.I.F) X.B.I.cm.sig (D.R.rS + 1 + D.R.rS)).isOpen_compl)
   exact (hg hA).inter (hg hC)
 
 theorem constTest_of_polar (hP : PolarLoc) (hC : PushCont) : ConstTest :=

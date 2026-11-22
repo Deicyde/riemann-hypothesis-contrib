@@ -15,10 +15,13 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsOpe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.Published GlobalTheory.AboveL
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.Published
+  GlobalTheory.AboveL
 open GlobalTheory.Cong.AdaptLev
 
 noncomputable section
@@ -29,7 +32,8 @@ open Matrix GlobalTheory.BCT.GlobLev GroundTheory.Automorphic
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {a : ℕ}
 
-theorem eq_one_of_forall_cLoc {x : UA E a} (hx : x ∈ finU (E := E) (n := a)) (h : ∀ u, cLoc u x = 1) : x = 1 := by
+theorem eq_one_of_forall_cLoc {x : UA E a} (hx : x ∈ finU (E := E) (n := a)) (h : ∀ u, cLoc u x = 1)
+    : x = 1 := by
   refine Subtype.ext (ga_ext ?_ ?_)
   · exact (MonoidHom.mem_ker.1 hx).trans (map_one _).symm
   · rw [Subgroup.coe_one, map_one]
@@ -39,19 +43,27 @@ theorem eq_one_of_forall_cLoc {x : UA E a} (hx : x ∈ finU (E := E) (n := a)) (
     refine this.trans ?_
     split_ifs with hij <;> simp [hij] <;> rfl
 
-theorem mem_integral_iff (k : finU (E := E) (n := a)) :
-    k ∈ (AdelicGLn.integralFiniteGL E a).comap (finPart E a) ↔ ∀ u, cLoc u k.1 ∈ GlobalTheory.LFun.KGL u (n := a) := by
+theorem mem_integral_iff (k : finU (E := E) (n := a))
+    : k ∈ (AdelicGLn.integralFiniteGL E a).comap (finPart E a)
+      ↔ ∀ u, cLoc u k.1 ∈ GlobalTheory.LFun.KGL u (n := a) := by
   rw [Subgroup.mem_comap, AdelicGLn.mem_integralFiniteGL_iff, ← map_inv]
   simp only [mem_KGL_iff_val, ← map_inv, GroundTheory.Global.mem_integralFiniteAdeles]
-  exact ⟨fun h u => ⟨fun i j => h.1 i j u, fun i j => h.2 i j u⟩,
-    fun h => ⟨fun i j u => (h u).1 i j, fun i j u => (h u).2 i j⟩⟩
+  exact ⟨
+    fun h u => ⟨fun i j => h.1 i j u, fun i j => h.2 i j u⟩,
+    fun h => ⟨fun i j u => (h u).1 i j, fun i j u => (h u).2 i j⟩
+  ⟩
 
-theorem isCompact_integral :
-    IsCompact (((AdelicGLn.integralFiniteGL E a).comap (finPart E a) : Subgroup (finU (E := E) (n := a))) : Set (finU (E := E) (n := a))) := by
-  have hO : IsOpen (((AdelicGLn.integralFiniteGL E a).comap (finPart E a) : Subgroup (finU (E := E) (n := a))) : Set (finU (E := E) (n := a))) :=
+theorem isCompact_integral
+    : IsCompact
+      (((AdelicGLn.integralFiniteGL E a).comap (finPart E a) : Subgroup (finU (E := E) (n := a)))
+        : Set (finU (E := E) (n := a))) := by
+  have hO : IsOpen
+      (((AdelicGLn.integralFiniteGL E a).comap (finPart E a) : Subgroup (finU (E := E) (n := a)))
+        : Set (finU (E := E) (n := a))) :=
     (AdelicGLn.isOpen_integralFiniteGL E a).preimage continuous_finPart
-  refine IsCompact.of_isClosed_subset (isClosedEmbedding_finU.isCompact_preimage
-    ((AdelicGLn.isCompact_integralFiniteGL E a).image continuous_finGL_ad))
+  refine IsCompact.of_isClosed_subset
+    (isClosedEmbedding_finU.isCompact_preimage ((AdelicGLn.isCompact_integralFiniteGL E a).image
+      continuous_finGL_ad))
     (Subgroup.isClosed_of_isOpen _ hO) fun x hx => ⟨finPart E a x, hx, ?_⟩
   have h1 : GeneralLinearGroup.map (pInf E) ((x : UA E a) : GA E a) = 1 := x.2
   exact ga_ext (by rw [pInf_finGL, h1]) (by rw [pFin_finGL]; rfl)
@@ -62,8 +74,10 @@ namespace GlobalTheory.Cong.AutFormFix
 
 open Matrix GlobalTheory.BCT.GlobLev GroundTheory.Automorphic
 
-theorem fixed_intU_eventually : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a : ℕ) (φ : UA E a → ℂ),
-    IsAutFormU φ → ∀ᶠ w in Filter.cofinite, ∀ x ∈ GlobalTheory.Cong.AdaptLev.intU a w, RU E a x φ = φ := by
+theorem fixed_intU_eventually
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a : ℕ) (φ : UA E a → ℂ),
+      IsAutFormU φ
+        → ∀ᶠ w in Filter.cofinite, ∀ x ∈ GlobalTheory.Cong.AdaptLev.intU a w, RU E a x φ = φ := by
   intro E _ _ _ a φ hφ
   classical
   set St : Set (finU (E := E) (n := a)) := {k : finU (E := E) (n := a) | RU E a k φ = φ} with hSt
@@ -73,7 +87,8 @@ theorem fixed_intU_eventually : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
   have htc : ∀ S, IsClosed (t S) := by
     intro S
     refine IsClosed.inter ?_ hφ.level.isClosed_compl
-    have : {k : finU (E := E) (n := a) | ∀ u ∈ S, cLoc u k.1 = 1} = ⋂ u ∈ S, {k : finU (E := E) (n := a) | cLoc u k.1 = 1} := by
+    have : {k : finU (E := E) (n := a) | ∀ u ∈ S, cLoc u k.1 = 1}
+        = ⋂ u ∈ S, {k : finU (E := E) (n := a) | cLoc u k.1 = 1} := by
       ext k; simp
     rw [this]
     refine isClosed_biInter fun u _ => ?_
@@ -88,13 +103,18 @@ theorem fixed_intU_eventually : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
     apply hnot
     rw [h1]
     show RU E a ((1 : finU (E := E) (n := a)) : UA E a) φ = φ
-    rw [Subgroup.coe_one, map_one]; rfl
+    rw [Subgroup.coe_one, map_one]
+    rfl
   have hdt : Directed (· ⊇ ·) t := by
     intro S₁ S₂
-    refine ⟨S₁ ∪ S₂, ?_, ?_⟩ <;> rintro k ⟨hk, hk'⟩ <;> refine ⟨fun u hu => hk u ?_, hk'⟩ <;> simp [hu]
-  obtain ⟨S, hS⟩ := isCompact_integral.elim_directed_family_closed t htc (Set.disjoint_iff_inter_eq_empty.mpr hst) hdt
+    refine ⟨S₁ ∪ S₂, ?_, ?_⟩ <;> rintro k ⟨hk, hk'⟩ <;> refine ⟨fun u hu => hk u ?_, hk'⟩
+      <;> simp [hu]
+  obtain ⟨S, hS⟩ :=
+    isCompact_integral.elim_directed_family_closed t htc (Set.disjoint_iff_inter_eq_empty.mpr hst)
+      hdt
   have hfin : {w : HeightOneSpectrum (𝓞 E) | ¬ ∀ u ∈ S, Apart u w}.Finite := by
-    refine ((S.finite_toSet.biUnion fun u _ => (Set.toFinite ({u, conjSrc (GlobalTheory.SplitPts.conjE E) u} : Set _)))).subset ?_
+    refine ((S.finite_toSet.biUnion fun u _ =>
+      (Set.toFinite ({u, conjSrc (GlobalTheory.SplitPts.conjE E) u} : Set _)))).subset ?_
     intro w hw
     simp only [Set.mem_setOf_eq, not_forall, Apart, not_not] at hw
     obtain ⟨u, hu, he⟩ := hw
@@ -115,7 +135,8 @@ theorem fixed_intU_eventually : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
     refine (mem_integral_iff _).2 fun u => ?_
     by_cases hu : Apart u w
     · show cLoc u x ∈ _
-      rw [hcomp u hu]; exact one_mem _
+      rw [hcomp u hu]
+      exact one_mem _
     · exact hxi u hu
   by_contra hne
   have : (⟨x, hxf⟩ : finU (E := E) (n := a)) ∈ K₀ ∩ t S := ⟨hK, fun u hu => hcomp u (hS' u hu), hne⟩

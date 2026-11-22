@@ -20,12 +20,12 @@ theorem zOf_coeff (χ : G → ℂ) (y : G) : (zOf χ).coeff y = χ 1 / (Fintype.
   simp only [zOf, MonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply, MonoidAlgebra.single_apply,
     Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
-theorem irr_one_eq_finrank {χ : G → ℂ} {V : FDRep ℂ G} (hV : ∀ x, V.character x = χ x) :
-    χ 1 = (Module.finrank ℂ V : ℂ) := by
+theorem irr_one_eq_finrank {χ : G → ℂ} {V : FDRep ℂ G} (hV : ∀ x, V.character x = χ x)
+    : χ 1 = (Module.finrank ℂ V : ℂ) := by
   rw [← hV 1, FDRep.char_one]
 
-theorem zOf_eq_zIdem (χ : G → ℂ) (V : FDRep ℂ G) (hV : ∀ x, V.character x = χ x) :
-    zOf χ = Formalism.IrreducibleCountingLemmas.TYPES.zIdem V := by
+theorem zOf_eq_zIdem (χ : G → ℂ) (V : FDRep ℂ G) (hV : ∀ x, V.character x = χ x)
+    : zOf χ = Formalism.IrreducibleCountingLemmas.TYPES.zIdem V := by
   have h1 := irr_one_eq_finrank hV
   unfold zOf Formalism.IrreducibleCountingLemmas.TYPES.zIdem
   refine Finset.sum_congr rfl fun x _ => ?_
@@ -42,8 +42,9 @@ theorem zOf_injOn : Set.InjOn (zOf (G := G)) {χ | IsIrr χ} := by
   have e1 := congrArg (fun a => a.coeff 1) h
   simp only [zOf_coeff, inv_one] at e1
   rw [h1, h1'] at e1
-  have e2 : ((Module.finrank ℂ V * Module.finrank ℂ V : ℕ) : ℂ) =
-      ((Module.finrank ℂ V' * Module.finrank ℂ V' : ℕ) : ℂ) := by
+  have e2
+      : ((Module.finrank ℂ V * Module.finrank ℂ V : ℕ) : ℂ)
+        = ((Module.finrank ℂ V' * Module.finrank ℂ V' : ℕ) : ℂ) := by
     push_cast
     field_simp at e1
     linear_combination e1
@@ -59,22 +60,24 @@ theorem zOf_injOn : Set.InjOn (zOf (G := G)) {χ | IsIrr χ} := by
   rw [← h11] at e3
   exact mul_left_cancel₀ hk e3
 
-theorem zOf_image :
-    zOf '' {χ : G → ℂ | IsIrr χ} =
-      {z : MonoidAlgebra ℂ G | ∃ τ : FDRep ℂ G, Simple τ ∧ Formalism.IrreducibleCountingLemmas.TYPES.zIdem τ = z} := by
-  ext z
-  constructor
-  · rintro ⟨χ, ⟨V, hs, hV⟩, rfl⟩
-    exact ⟨V, hs, (zOf_eq_zIdem χ V hV).symm⟩
-  · rintro ⟨τ, hs, rfl⟩
-    exact ⟨τ.character, ⟨τ, hs, fun _ => rfl⟩, zOf_eq_zIdem _ τ fun _ => rfl⟩
+theorem zOf_image
+    : zOf '' {χ : G → ℂ | IsIrr χ}
+      = {z : MonoidAlgebra ℂ G | ∃ τ : FDRep ℂ G, Simple τ ∧ Formalism.IrreducibleCountingLemmas.TYPES.zIdem τ = z} :=
+  by
+    ext z
+    constructor
+    · rintro ⟨χ, ⟨V, hs, hV⟩, rfl⟩
+      exact ⟨V, hs, (zOf_eq_zIdem χ V hV).symm⟩
+    · rintro ⟨τ, hs, rfl⟩
+      exact ⟨τ.character, ⟨τ, hs, fun _ => rfl⟩, zOf_eq_zIdem _ τ fun _ => rfl⟩
 
 end GlobalTheory.GLq.ZSumOne
 
 namespace GlobalTheory.GLq
 
-theorem irr_finite_and_finsum_zOf_eq_one : ∀ (G : Type) [Group G] [Fintype G],
-    {χ : G → ℂ | IsIrr χ}.Finite ∧ ∑ᶠ χ ∈ {χ : G → ℂ | IsIrr χ}, zOf χ = 1 := by
+theorem irr_finite_and_finsum_zOf_eq_one
+    : ∀ (G : Type) [Group G] [Fintype G],
+      {χ : G → ℂ | IsIrr χ}.Finite ∧ ∑ᶠ χ ∈ {χ : G → ℂ | IsIrr χ}, zOf χ = 1 := by
   intro G _ _
   have hZ := GlobalTheory.SerOSys.zIdem_finite_and_finsum_eq_one G
   rw [← ZSumOne.zOf_image] at hZ

@@ -10,7 +10,13 @@ namespace GlobalTheory.UnimodularLatticeExistence
 
 open Representation
 
-theorem main : ∀ {G : Type u_1} [inst : Group G] {V : Type u_2} [inst_1 : AddCommGroup V] [inst_2 : Module ℂ V] (ρ : Representation ℂ G V), Representation.IsIrreducible ρ ↔ Nontrivial V ∧ ∀ (U : Submodule ℂ V), (∀ (g : G), ∀ v ∈ U, ((ρ : G → V →ₗ[ℂ] V) g : V → V) v ∈ U) → U = ⊥ ∨ U = ⊤ := by
+theorem main
+    : ∀ {G : Type u_1} [inst : Group G] {V : Type u_2} [inst_1 : AddCommGroup V]
+        [inst_2 : Module ℂ V] (ρ : Representation ℂ G V),
+      Representation.IsIrreducible ρ
+        ↔ Nontrivial V
+          ∧ ∀ (U : Submodule ℂ V),
+            (∀ (g : G), ∀ v ∈ U, ((ρ : G → V →ₗ[ℂ] V) g : V → V) v ∈ U) → U = ⊥ ∨ U = ⊤ := by
   intro G _ V _ _ ρ
   have hbot : (⊥ : Subrepresentation ρ).toSubmodule = ⊥ := rfl
   have htop : (⊤ : Subrepresentation ρ).toSubmodule = ⊤ := rfl

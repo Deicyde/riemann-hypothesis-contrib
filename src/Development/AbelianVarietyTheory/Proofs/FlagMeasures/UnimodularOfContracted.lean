@@ -15,10 +15,12 @@ namespace GlobalTheory.ModularAutomorphism
 
 section Group
 
-variable {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
+variable
+  {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
   [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H]
 
-theorem smul_haar_cancel (ρ : Measure H) [ρ.IsHaarMeasure] {c d : ℝ≥0} (h : c • ρ = d • ρ) : c = d := by
+theorem smul_haar_cancel (ρ : Measure H) [ρ.IsHaarMeasure] {c d : ℝ≥0} (h : c • ρ = d • ρ)
+    : c = d := by
   obtain ⟨K, hK, hK1⟩ := exists_compact_mem_nhds (1 : H)
   have h0 : ρ K ≠ 0 := (measure_pos_of_mem_nhds ρ hK1).ne'
   have h1 : ρ K ≠ ∞ := hK.measure_lt_top.ne
@@ -27,8 +29,8 @@ theorem smul_haar_cancel (ρ : Measure H) [ρ.IsHaarMeasure] {c d : ℝ≥0} (h 
     exact this
   exact ENNReal.coe_injective ((ENNReal.mul_left_inj h0 h1).1 h2)
 
-theorem map_right_eq (ρ : Measure H) [ρ.IsHaarMeasure] (g : H) :
-    ρ.map (· * g) = modularCharacterFun g • ρ := by
+theorem map_right_eq (ρ : Measure H) [ρ.IsHaarMeasure] (g : H)
+    : ρ.map (· * g) = modularCharacterFun g • ρ := by
   rw [modularCharacterFun_eq_haarScalarFactor ρ g]
   exact isMulLeftInvariant_eq_smul _ ρ
 
@@ -56,7 +58,8 @@ theorem continuous_modular : Continuous fun g : H => (modularCharacterFun g : �
     rw [modularCharacterFun_eq_haarScalarFactor ρ g,
       haarScalarFactor_eq_integral_div _ _ f.continuous hfc hI,
       integral_map (measurable_mul_const g).aemeasurable f.continuous.aestronglyMeasurable,
-      Measure.inv_def, integral_map measurable_inv.aemeasurable
+      Measure.inv_def,
+      integral_map measurable_inv.aemeasurable
         (by fun_prop : Continuous fun y : H => f (y⁻¹ * g)).aestronglyMeasurable]
     simp
   simp_rw [he]
@@ -83,8 +86,10 @@ theorem map_inv_eq (ρ : Measure H) [ρ.IsHaarMeasure] [ρ.IsMulRightInvariant] 
 
 end Group
 
-def conjAut {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (N : Subgroup G) (b : G)
-    (h1 : ∀ m ∈ N, b * m * b⁻¹ ∈ N) (h2 : ∀ m ∈ N, b⁻¹ * m * b ∈ N) : N ≃ₜ* N where
+def conjAut
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (N : Subgroup G) (b : G) (h1 : ∀ m ∈ N, b * m * b⁻¹ ∈ N) (h2 : ∀ m ∈ N, b⁻¹ * m * b ∈ N)
+    : N ≃ₜ* N where
   toFun m := ⟨b * m * b⁻¹, h1 m m.2⟩
   invFun m := ⟨b⁻¹ * m * b, h2 m m.2⟩
   left_inv m := Subtype.ext (by simp [mul_assoc])
@@ -93,17 +98,20 @@ def conjAut {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (N 
   continuous_toFun := Continuous.subtype_mk (by fun_prop) _
   continuous_invFun := Continuous.subtype_mk (by fun_prop) _
 
-theorem unimodular_of_contracted {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
-    (N : Subgroup G) (hN : IsClosed (N : Set G)) {ν : Measure G} (hν : GlobalTheory.Dec.IsHaarSub (N : Set G) ν)
-    (a : ℝ → G) (h1 : ∀ s : ℝ, ∀ m ∈ N, a s * m * (a s)⁻¹ ∈ N)
-    (h2 : ∀ s : ℝ, ∀ m ∈ N, (a s)⁻¹ * m * a s ∈ N)
-    (h3 : ∀ m ∈ N, Tendsto (fun s : ℝ => a s * m * (a s)⁻¹) atBot (nhds (1 : G))) :
-    (∀ m ∈ N, ν.map (fun x : G => x * m) = ν) ∧ ν.map (fun x : G => x⁻¹) = ν := by
+theorem unimodular_of_contracted
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
+    (N : Subgroup G) (hN : IsClosed (N : Set G))
+    {ν : Measure G} (hν : GlobalTheory.Dec.IsHaarSub (N : Set G) ν)
+    (a : ℝ → G)
+    (h1 : ∀ s : ℝ, ∀ m ∈ N, a s * m * (a s)⁻¹ ∈ N) (h2 : ∀ s : ℝ, ∀ m ∈ N, (a s)⁻¹ * m * a s ∈ N)
+    (h3 : ∀ m ∈ N, Tendsto (fun s : ℝ => a s * m * (a s)⁻¹) atBot (nhds (1 : G)))
+    : (∀ m ∈ N, ν.map (fun x : G => x * m) = ν) ∧ ν.map (fun x : G => x⁻¹) = ν := by
   obtain ⟨hne, hfin, hcar, hleft⟩ := hν
   haveI : LocallyCompactSpace N := hN.locallyCompactSpace
   haveI : SecondCountableTopology N := Topology.IsEmbedding.subtypeVal.secondCountableTopology
-  have hE : MeasurableEmbedding (Subtype.val : N → G) := MeasurableEmbedding.subtype_coe hN.measurableSet
+  have hE : MeasurableEmbedding (Subtype.val : N → G) :=
+    MeasurableEmbedding.subtype_coe hN.measurableSet
   have hv : Measurable (Subtype.val : N → G) := hE.measurable
   let μ : Measure N := ν.comap Subtype.val
   have hμ : μ.map Subtype.val = ν := by
@@ -136,6 +144,7 @@ theorem unimodular_of_contracted {G : Type} [Group G] [TopologicalSpace G] [IsTo
     rw [map_map (measurable_mul_const m) hv, this, ← map_map hv (measurable_mul_const _), hr, hμ]
   · have : (fun x : G => x⁻¹) ∘ (Subtype.val : N → G) = Subtype.val ∘ (Inv.inv : N → N) := rfl
     conv_lhs => rw [← hμ]
-    rw [map_map measurable_inv hv, this, ← map_map hv measurable_inv, ← Measure.inv_def, map_inv_eq, hμ]
+    rw [map_map measurable_inv hv, this, ← map_map hv measurable_inv, ← Measure.inv_def, map_inv_eq,
+      hμ]
 
 end GlobalTheory.ModularAutomorphism

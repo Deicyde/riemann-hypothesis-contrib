@@ -8,25 +8,36 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsTy
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
 
 namespace DiscreteGroups.sglob.DzType
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 def DepthZeroInertiaBig : Prop :=
-  ∀ (E Ω : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (g : ℕ)
-    [Fact g.Prime] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
-    (rc : IrrGL (k := w.adicCompletion E) → WD h), IsRec h rc →
-    ∀ (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i →
-    ∀ (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g) (L : LabelDatum g) (t : G E Ω), t ∈ Ine (F := E) A →
-    Formalism.L2.NT.TameCoupled A κ t L.gen →
-    ∀ n : ℕ, (n = 1 ∨ 16 * n ^ 2 < g) → ∀ σ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (w.adicCompletion E)), (cls σ).IsCusp →
-    ∀ (τ : FDRep ℂ (Gn g n)) (P : (ZMod g)[X]), IsCuspOf L P τ.character →
-    GlobalTheory.SerSys.TameGen.Inflates (σ.ρ.comp (Matrix.GeneralLinearGroup.map i.toRingHom)) τ →
-    (rc (cls σ)).inePol t = GlobalTheory.SerSys.TameGen.liftPoly L.teich P
+  ∀ (E Ω : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] [Field Ω]
+      [Algebra E Ω] [IsAlgClosure E Ω] (g : ℕ) [Fact g.Prime] (A : ValuationSubring Ω)
+      (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
+      (rc : IrrGL (k := w.adicCompletion E) → WD h),
+    IsRec h rc
+      → ∀ (i : ℚ_[g] ≃+* w.adicCompletion E),
+        Continuous i
+          → ∀ (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g)
+              (L : LabelDatum g) (t : G E Ω),
+            t ∈ Ine (F := E) A → Formalism.L2.NT.TameCoupled A κ t L.gen
+              → ∀ n : ℕ,
+                (n = 1 ∨ 16 * n ^ 2 < g)
+                  → ∀ σ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (w.adicCompletion E)),
+                    (cls σ).IsCusp
+                      → ∀ (τ : FDRep ℂ (Gn g n)) (P : (ZMod g)[X]),
+                        IsCuspOf L P τ.character
+                          → GlobalTheory.SerSys.TameGen.Inflates
+                            (σ.ρ.comp (Matrix.GeneralLinearGroup.map i.toRingHom)) τ
+                          → (rc (cls σ)).inePol t = GlobalTheory.SerSys.TameGen.liftPoly L.teich P
 
-theorem big_of_le_nV (D : Formalism.BasicNotions.D7) (k : Fin 2) {n : ℕ} (hn : n ≤ D.R.nV) : 16 * n ^ 2 < D.host.g k := by
+theorem big_of_le_nV (D : Formalism.BasicNotions.D7) (k : Fin 2) {n : ℕ} (hn : n ≤ D.R.nV)
+    : 16 * n ^ 2 < D.host.g k := by
   have hg : D.host.g k % (D.host.QS * D.host.q * D.host.d) = 1 := D.ntypes.g_cond k
   have hq := D.host.qd_big
   have ht : 0 < D.R.t := D.R.t_odd.pos
@@ -37,7 +48,8 @@ theorem big_of_le_nV (D : Formalism.BasicNotions.D7) (k : Fin 2) {n : ℕ} (hn :
     · rw [h] at hg; simp at hg; omega
     · exact h
   have h16 : 16 ≤ D.host.QS :=
-    Nat.le_of_dvd hQ0 ((pow_dvd_pow 2 (m := 4) (by have := D.host.two_le_e; omega)).trans D.host.tower_dvd)
+    Nat.le_of_dvd hQ0
+      ((pow_dvd_pow 2 (m := 4) (by have := D.host.two_le_e; omega)).trans D.host.tower_dvd)
   have hdvd : D.host.QS * D.host.q * D.host.d ∣ D.host.g k - 1 := by
     have := Nat.mod_add_div (D.host.g k) (D.host.QS * D.host.q * D.host.d)
     rw [hg] at this

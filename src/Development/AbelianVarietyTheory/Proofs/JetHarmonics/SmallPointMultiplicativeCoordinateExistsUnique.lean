@@ -153,8 +153,15 @@ lemma exists_ev_eq {f : ℂ_[q]⟦X⟧} (hf : Bd 1 f) (h0 : constantCoeff f = 0)
     · exact sub_eq_zero.1 h3
 
 def cub (W : WeierstrassCurve ℂ_[q]) (u : ℂ_[q]) : ℂ_[q]⟦X⟧ :=
-  PowerSeries.mk fun n => if n = 1 then 1 - (W.a₁ * u + W.a₂ * u ^ 2) else
-    if n = 2 then -(W.a₃ + W.a₄ * u) else if n = 3 then -W.a₆ else 0
+  PowerSeries.mk fun n =>
+    if n = 1 then
+      1 - (W.a₁ * u + W.a₂ * u ^ 2)
+    else if n = 2 then
+      -(W.a₃ + W.a₄ * u)
+    else if n = 3 then
+      -W.a₆
+    else
+      0
 
 lemma ev_cub (W : WeierstrassCurve ℂ_[q]) (u w : ℂ_[q]) :
     ev (cub W u) w = w - (W.a₁ * u * w + W.a₂ * u ^ 2 * w + W.a₃ * w ^ 2 + W.a₄ * u * w ^ 2 +
@@ -381,7 +388,12 @@ private lemma u_add_lattice {l : ℂ} (hl : l ∈ M.L.lattice) (p : ℂ) : M.u (
   · have hpl : p + l ∉ M.L.lattice := fun h' => hpL (by simpa using sub_mem h' hl)
     simp only [hpL, hpl, if_false, UW.x_add M hl p, UW.y_add M hl p]
 
-theorem at_exists_unique : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]), M.MChart ω → (∀ ζ : ℂ_[q], ‖ζ - 1‖ < 1 → ∃ p, M.At ω ζ p) ∧ (∀ p, M.Small p → ∃ ζ, M.At ω ζ p) ∧ (∀ ζ ζ' p, M.At ω ζ p → M.At ω ζ' p → ζ = ζ') ∧ (∀ ζ p p', M.At ω ζ p → (M.At ω ζ p' ↔ p - p' ∈ M.L.lattice)) ∧ M.At ω 1 0 := by
+theorem at_exists_unique
+    : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]),
+      M.MChart ω
+        → (∀ ζ : ℂ_[q], ‖ζ - 1‖ < 1 → ∃ p, M.At ω ζ p) ∧ (∀ p, M.Small p → ∃ ζ, M.At ω ζ p)
+          ∧ (∀ ζ ζ' p, M.At ω ζ p → M.At ω ζ' p → ζ = ζ')
+          ∧ (∀ ζ p p', M.At ω ζ p → (M.At ω ζ p' ↔ p - p' ∈ M.L.lattice)) ∧ M.At ω 1 0 := by
   intro q _ M ω hω
   have hch := hω
   unfold Mdl.MChart Mdl.Chart at hch
@@ -393,8 +405,11 @@ theorem at_exists_unique : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q
     rw [← coeff_zero_eq_constantCoeff_apply, coeff_map]
     simp [tay, hu0]
   have hev0 : ev (hat M.ι (C ω * logS) M.u) 0 = 0 := by rw [ev_zero, hg0]
-  have hAt : ∀ ζ p, M.At ω ζ p ↔ M.Small p ∧ ‖ζ - 1‖ < 1 ∧
-      ev (hat M.ι (C ω * logS) M.u) (ζ - 1) = M.ι (M.u p) := fun ζ p => Iff.rfl
+  have hAt
+      : ∀ ζ p,
+        M.At ω ζ p
+          ↔ M.Small p ∧ ‖ζ - 1‖ < 1 ∧ ev (hat M.ι (C ω * logS) M.u) (ζ - 1) = M.ι (M.u p) :=
+    fun ζ p => Iff.rfl
   have hnorm : ∀ a : ℂ_[q], ‖a‖ < 1 → ‖ev (hat M.ι (C ω * logS) M.u) a‖ = ‖a‖ := fun a ha => by
     have := norm_ev_sub_eq hbd hc1 ha (by simp : ‖(0 : ℂ_[q])‖ < 1)
     rwa [hev0, sub_zero, sub_zero] at this
@@ -407,7 +422,8 @@ theorem at_exists_unique : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q
     obtain ⟨hu1, -, -⟩ := norm_u_w_lt_one_and_w_eq_zero_iff_of_small h hp
     obtain ⟨a, ha, hea⟩ := exists_ev_eq hbd hg0 hc1 hu1
     refine ⟨a + 1, (hAt _ _).2 ⟨hp, by rw [add_sub_cancel_right]; exact ha, ?_⟩⟩
-    rw [add_sub_cancel_right]; exact hea
+    rw [add_sub_cancel_right]
+    exact hea
   · intro ζ ζ' p h1 h2
     obtain ⟨-, hζ1, he1⟩ := (hAt _ _).1 h1
     obtain ⟨-, hζ2, he2⟩ := (hAt _ _).1 h2

@@ -7,19 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsAsAlge
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Adel UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks
 open GlobalTheory.PRep GlobalTheory.SmGL Formalism.BasicNotions GlobalTheory.CuspRep
 open scoped TensorProduct Classical
 
-private theorem tens_sep {V B : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup B] [Module ℂ B]
-    (z : V ⊗[ℂ] B)
-    (h : ∀ φ : Module.Dual ℂ V, TensorProduct.lid ℂ B (LinearMap.rTensor B φ z) = 0) : z = 0 := by
+private theorem tens_sep
+    {V B : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup B] [Module ℂ B]
+    (z : V ⊗[ℂ] B) (h : ∀ φ : Module.Dual ℂ V, TensorProduct.lid ℂ B (LinearMap.rTensor B φ z) = 0)
+    : z = 0 := by
   let b := Module.Basis.ofVectorSpace ℂ V
   let F := TensorProduct.equivFinsuppOfBasisLeft (N := B) b
-  have key : ∀ (j : _) (y : V ⊗[ℂ] B),
-      F y j = TensorProduct.lid ℂ B (LinearMap.rTensor B (b.coord j) y) := by
+  have key
+      : ∀ (j : _) (y : V ⊗[ℂ] B),
+        F y j = TensorProduct.lid ℂ B (LinearMap.rTensor B (b.coord j) y) := by
     intro j y
     induction y using TensorProduct.induction_on with
     | zero => simp
@@ -31,27 +37,29 @@ private theorem tens_sep {V B : Type} [AddCommGroup V] [Module ℂ V] [AddCommGr
   rw [key, h]
   simp
 
-private theorem comm_ext {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] (X : Representation ℂ G V) (T : Representation ℂ H W)
-    (g : H × G) (z : V ⊗[ℂ] W) :
-    TensorProduct.comm ℂ V W (extTensor X T (g.2, g.1) z) =
-      extTensor T X g (TensorProduct.comm ℂ V W z) := by
+private theorem comm_ext
+    {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (X : Representation ℂ G V) (T : Representation ℂ H W) (g : H × G) (z : V ⊗[ℂ] W)
+    : TensorProduct.comm ℂ V W (extTensor X T (g.2, g.1) z)
+      = extTensor T X g (TensorProduct.comm ℂ V W z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul v w => simp
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-private noncomputable def swapSub {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] (X : Representation ℂ G V) (T : Representation ℂ H W)
-    (S : Subrepresentation (extTensor X T)) : Subrepresentation (extTensor T X) where
+private noncomputable def swapSub
+    {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (X : Representation ℂ G V) (T : Representation ℂ H W) (S : Subrepresentation (extTensor X T))
+    : Subrepresentation (extTensor T X) where
   toSubmodule := S.toSubmodule.map (TensorProduct.comm ℂ V W).toLinearMap
   apply_mem_toSubmodule g := by
     rintro _ ⟨z, hz, rfl⟩
     exact ⟨extTensor X T (g.2, g.1) z, S.apply_mem_toSubmodule _ hz, comm_ext X T g z⟩
 
-private theorem swapSub_swapSub {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] (X : Representation ℂ G V) (T : Representation ℂ H W)
-    (S : Subrepresentation (extTensor X T)) : swapSub T X (swapSub X T S) = S := by
+private theorem swapSub_swapSub
+    {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (X : Representation ℂ G V) (T : Representation ℂ H W) (S : Subrepresentation (extTensor X T))
+    : swapSub T X (swapSub X T S) = S := by
   apply Subrepresentation.toSubmodule_injective
   ext z
   constructor
@@ -60,9 +68,10 @@ private theorem swapSub_swapSub {G H V W : Type} [Group G] [Group H] [AddCommGro
   · intro hz
     exact ⟨TensorProduct.comm ℂ V W z, ⟨z, hz, rfl⟩, by simp⟩
 
-private noncomputable def swapIso {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] (X : Representation ℂ G V) (T : Representation ℂ H W) :
-    Subrepresentation (extTensor X T) ≃o Subrepresentation (extTensor T X) where
+private noncomputable def swapIso
+    {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (X : Representation ℂ G V) (T : Representation ℂ H W)
+    : Subrepresentation (extTensor X T) ≃o Subrepresentation (extTensor T X) where
   toFun := swapSub X T
   invFun := swapSub T X
   left_inv := swapSub_swapSub X T
@@ -71,16 +80,18 @@ private noncomputable def swapIso {G H V W : Type} [Group G] [Group H] [AddCommG
     intro S S'
     constructor
     · intro h z hz
-      obtain ⟨y, hy, e⟩ := h (show TensorProduct.comm ℂ V W z ∈ (swapSub X T S).toSubmodule from
-        ⟨z, hz, rfl⟩)
+      obtain ⟨y, hy, e⟩ :=
+        h (show TensorProduct.comm ℂ V W z ∈ (swapSub X T S).toSubmodule from ⟨z, hz, rfl⟩)
       have e' : y = z := (TensorProduct.comm ℂ V W).injective e
       exact e' ▸ hy
     · rintro h _ ⟨z, hz, rfl⟩
       exact ⟨z, h hz, rfl⟩
 
-private theorem schur_ext {G Γ V B : Type} [Group G] [Group Γ] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup B] [Module ℂ B] [Nontrivial B] (σ : Representation ℂ G V)
-    (m : Representation ℂ Γ B) (hσ : Schur σ) (hm : Schur m) : Schur (extTensor σ m) := by
+private theorem schur_ext
+    {G Γ V B : Type}
+    [Group G] [Group Γ] [AddCommGroup V] [Module ℂ V] [AddCommGroup B] [Module ℂ B] [Nontrivial B]
+    (σ : Representation ℂ G V) (m : Representation ℂ Γ B) (hσ : Schur σ) (hm : Schur m)
+    : Schur (extTensor σ m) := by
   intro T hT
   obtain ⟨b₀, hb₀⟩ := exists_ne (0 : B)
   obtain ⟨β, hβ⟩ : ∃ β : Module.Dual ℂ B, β b₀ = 1 := by
@@ -118,29 +129,33 @@ private theorem schur_ext {G Γ V B : Type} [Group G] [Group Γ] [AddCommGroup V
     rw [← sub_eq_zero]
     apply tens_sep
     intro φ
-    obtain ⟨c, hc⟩ := hm (L φ ∘ₗ T ∘ₗ TensorProduct.mk ℂ V B v) (by
-      intro c y
-      have h1 : v ⊗ₜ[ℂ] m c y = extTensor σ m (1, c) (v ⊗ₜ y) := by simp
-      simp only [LinearMap.comp_apply, TensorProduct.mk_apply]
-      rw [h1, hT, hL])
+    obtain ⟨c, hc⟩ :=
+      hm (L φ ∘ₗ T ∘ₗ TensorProduct.mk ℂ V B v) (by
+        intro c y
+        have h1 : v ⊗ₜ[ℂ] m c y = extTensor σ m (1, c) (v ⊗ₜ y) := by simp
+        simp only [LinearMap.comp_apply, TensorProduct.mk_apply]
+        rw [h1, hT, hL])
     have hc' : ∀ y, L φ (T (v ⊗ₜ y)) = c • y := hc
-    have hφS : φ (S v) = c := by
-      rw [hS, hLR, hc', map_smul, hβ, smul_eq_mul, mul_one]
+    have hφS : φ (S v) = c := by rw [hS, hLR, hc', map_smul, hβ, smul_eq_mul, mul_one]
     change L φ (T (v ⊗ₜ b) - S v ⊗ₜ b) = 0
     rw [map_sub, hc', hLt, hφS, sub_self]
-  obtain ⟨c, hc⟩ := hσ S (by
-    intro g v
-    have h1 : σ g v ⊗ₜ[ℂ] b₀ = extTensor σ m (g, 1) (v ⊗ₜ b₀) := by simp
-    rw [hS, h1, hT, hR, ← hS])
+  obtain ⟨c, hc⟩ :=
+    hσ S (by
+      intro g v
+      have h1 : σ g v ⊗ₜ[ℂ] b₀ = extTensor σ m (g, 1) (v ⊗ₜ b₀) := by simp
+      rw [hS, h1, hT, hR, ← hS])
   refine ⟨c, fun z => ?_⟩
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul x y => rw [hpure, hc, TensorProduct.smul_tmul']
   | add x y hx hy => simp only [map_add (f := _), hx, hy, smul_add]
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.tensSimple :
-    ∀ {G : Type} [Group G] {Γ : Type} [Group Γ] {V : Type} [AddCommGroup V] [Module ℂ V] {B : Type} [AddCommGroup B] [Module ℂ B] (σ : Representation ℂ G V) (m : Representation ℂ Γ B), σ.IsIrreducible → Schur σ → m.IsIrreducible →
-      (extTensor σ m).IsIrreducible ∧ (Schur m → Schur (extTensor σ m)) := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.tensSimple
+    : ∀ {G : Type} [Group G] {Γ : Type} [Group Γ] {V : Type} [AddCommGroup V] [Module ℂ V]
+        {B : Type} [AddCommGroup B] [Module ℂ B] (σ : Representation ℂ G V)
+        (m : Representation ℂ Γ B),
+      σ.IsIrreducible → Schur σ → m.IsIrreducible
+        → (extTensor σ m).IsIrreducible ∧ (Schur m → Schur (extTensor σ m)) := by
   intro G _ Γ _ V _ _ B _ _ σ m hσ hs hm
   haveI : Nontrivial B := GlobalTheory.SmGL.Model.nontrivial_of_isIrreducible hm
   have hsc : ∀ A : Module.End ℂ V, (∀ g, A * σ g = σ g * A) → ∃ c : ℂ, A = c • 1 := by

@@ -13,8 +13,10 @@ open UpperTheory.HF
 open NumberField Ideal Formalism.HC Formalism.FrobeniusOrbits
 open scoped Pointwise
 
-theorem UpperTheory.HF.inert_d :
-    ∀ {φ : Frame} (H : HostAx φ), H.inertG H.d = Subgroup.zpowers φ.iod ∧ H.el H.d = 2 ∧ H.vdH H.d = 1 / 2 ∧ H.sl H.d = 1 ∧ H.d ∈ H.ram ∧ 2 ∈ H.ram ∧ H.condE.factorization H.d = 1 := by
+theorem UpperTheory.HF.inert_d
+    : ∀ {φ : Frame} (H : HostAx φ),
+      H.inertG H.d = Subgroup.zpowers φ.iod ∧ H.el H.d = 2 ∧ H.vdH H.d = 1 / 2 ∧ H.sl H.d = 1
+        ∧ H.d ∈ H.ram ∧ 2 ∈ H.ram ∧ H.condE.factorization H.d = 1 := by
   intro φ H
   haveI : Fact (Nat.Prime H.d) := ⟨H.d_prime⟩
   have hd := H.d_prime
@@ -27,8 +29,8 @@ theorem UpperTheory.HF.inert_d :
     rw [hfac, pow_one]
     exact Nat.mul_div_cancel _ hd.pos
   have hmem : φ.iod ∈ H.inertG H.d := by
-    obtain ⟨P, hPm, hPl⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 H.E)
-      (Ideal.span {(H.d : ℤ)})
+    obtain ⟨P, hPm, hPl⟩ :=
+      Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 H.E) (Ideal.span {(H.d : ℤ)})
     have h1 := (H.der.inertia_d P (H.gal.symm φ.iod)).2 (Or.inr (by simp))
     obtain ⟨u, hu, h⟩ := (H.der.inertia H.d P (H.gal.symm φ.iod)).1 h1
     exact (H.mem_inertG H.d _).2 ⟨u, hu, by simpa using h⟩
@@ -41,7 +43,8 @@ theorem UpperTheory.HF.inert_d :
     · rw [h]; exact Subgroup.mem_zpowers _
   have hord : orderOf φ.iod = 2 := by
     haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-    exact orderOf_eq_prime (by simp [Frame.iod, sq, Prod.ext_iff]) (by simp [Frame.iod, Prod.ext_iff])
+    exact orderOf_eq_prime (by simp [Frame.iod, sq, Prod.ext_iff])
+      (by simp [Frame.iod, Prod.ext_iff])
   have hel : H.el H.d = 2 := by
     show Nat.card (H.inertG H.d) = 2
     rw [hG, Nat.card_zpowers, hord]
@@ -57,7 +60,8 @@ theorem UpperTheory.HF.inert_d :
   have hdram : H.d ∈ H.ram := hram.1.2 (by rw [hel]; norm_num)
   have h2ram : 2 ∈ H.ram := by
     show 2 ∈ (NumberField.discr H.E).natAbs.primeFactors
-    refine Nat.mem_primeFactors.2 ⟨Nat.prime_two, ?_, Int.natAbs_ne_zero.2 (NumberField.discr_ne_zero H.E)⟩
+    refine Nat.mem_primeFactors.2
+      ⟨Nat.prime_two, ?_, Int.natAbs_ne_zero.2 (NumberField.discr_ne_zero H.E)⟩
     exact Int.natAbs_dvd_natAbs.2 (H.der.discr_primes).2.1
   have hpos := (condE_spec H.toHostRaw).2.1
   have hdvd : H.d ∣ H.condE := hram.2.1.1 hdram

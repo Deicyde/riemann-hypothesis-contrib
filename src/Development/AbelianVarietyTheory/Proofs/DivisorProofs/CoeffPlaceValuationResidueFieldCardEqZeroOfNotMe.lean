@@ -17,18 +17,22 @@ public import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.VwEqZeroOf
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.RowTest GlobalTheory.SumSize GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SplitFlip
+  GlobalTheory.SplitWeil GlobalTheory.RowTest GlobalTheory.SumSize GlobalTheory.RowClaim
 open Formalism.DivisionValues (vw lw)
 open MeasureTheory ValuativeRel GlobalTheory.UnfoldLoss
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField GlobalTheory.FunObj.borelKw
-  GlobalTheory.FunObj.borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField GlobalTheory.FunObj.borelKw GlobalTheory.FunObj.borelSpaceKw
 
 namespace GlobalTheory.UnfoldLoss.ResCardAway
 
-theorem absNorm_eq_plc_pow {K : Type} [Field K] [NumberField K] (P : HeightOneSpectrum (𝓞 K)) :
-    ∃ n : ℕ, Ideal.absNorm P.asIdeal = ringChar (𝓞 K ⧸ P.asIdeal) ^ n := by
+theorem absNorm_eq_plc_pow {K : Type} [Field K] [NumberField K] (P : HeightOneSpectrum (𝓞 K))
+    : ∃ n : ℕ, Ideal.absNorm P.asIdeal = ringChar (𝓞 K ⧸ P.asIdeal) ^ n := by
   classical
   haveI : P.asIdeal.IsMaximal := P.isMaximal
   letI : Field (𝓞 K ⧸ P.asIdeal) := Ideal.Quotient.field _
@@ -39,9 +43,10 @@ theorem absNorm_eq_plc_pow {K : Type} [Field K] [NumberField K] (P : HeightOneSp
   rw [Ideal.absNorm_apply, Submodule.cardQuot_apply, Nat.card_eq_fintype_card]
   exact hn
 
-theorem vw_resCard_eq_zero : ∀ {D : D7} (P : Pl D.host.E) (w : PlL D),
-    ((Formalism.EigenvalueLevelCeiling.plc P : ℕ) : 𝓞 D.what₂.LL) ∉ w.asIdeal →
-    vw w ((resCard (Kw P) : ℕ) : D.what₂.LL) = 0 := by
+theorem vw_resCard_eq_zero
+    : ∀ {D : D7} (P : Pl D.host.E) (w : PlL D),
+      ((Formalism.EigenvalueLevelCeiling.plc P : ℕ) : 𝓞 D.what₂.LL) ∉ w.asIdeal
+        → vw w ((resCard (Kw P) : ℕ) : D.what₂.LL) = 0 := by
   intro D P w h
   obtain ⟨n, hn⟩ := absNorm_eq_plc_pow P
   have hq : resCard (Kw P) = Formalism.EigenvalueLevelCeiling.plc P ^ n :=

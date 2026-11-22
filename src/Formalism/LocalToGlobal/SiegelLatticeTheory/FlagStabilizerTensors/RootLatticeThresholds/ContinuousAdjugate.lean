@@ -17,16 +17,24 @@ section Pack
 
 variable {n : ℕ} (ε : Fin n → Bool)
 
-def mkUJ (y : Matrix (Fin n) (Fin n) ℂ) (hy : yᴴ * Formalism.REAL.Jm ε * y = Formalism.REAL.Jm ε) : Formalism.REAL.UJ ε :=
-  ⟨⟨y, Formalism.REAL.Jm ε * yᴴ * Formalism.REAL.Jm ε,
+def mkUJ (y : Matrix (Fin n) (Fin n) ℂ) (hy : yᴴ * Formalism.REAL.Jm ε * y = Formalism.REAL.Jm ε)
+    : Formalism.REAL.UJ ε := ⟨
+  ⟨
+    y,
+    Formalism.REAL.Jm ε * yᴴ * Formalism.REAL.Jm ε,
     mul_eq_one_comm.1 (by
-      calc Formalism.REAL.Jm ε * yᴴ * Formalism.REAL.Jm ε * y = Formalism.REAL.Jm ε * (yᴴ * Formalism.REAL.Jm ε * y) := by
-            simp only [Matrix.mul_assoc]
+      calc
+        Formalism.REAL.Jm ε * yᴴ * Formalism.REAL.Jm ε * y
+          = Formalism.REAL.Jm ε * (yᴴ * Formalism.REAL.Jm ε * y) := by simp only [Matrix.mul_assoc]
         _ = 1 := by rw [hy, Formalism.REAL.Jm_mul_self]),
     by
-      calc Formalism.REAL.Jm ε * yᴴ * Formalism.REAL.Jm ε * y = Formalism.REAL.Jm ε * (yᴴ * Formalism.REAL.Jm ε * y) := by
-            simp only [Matrix.mul_assoc]
-        _ = 1 := by rw [hy, Formalism.REAL.Jm_mul_self]⟩, hy⟩
+      calc
+        Formalism.REAL.Jm ε * yᴴ * Formalism.REAL.Jm ε * y
+          = Formalism.REAL.Jm ε * (yᴴ * Formalism.REAL.Jm ε * y) := by simp only [Matrix.mul_assoc]
+        _ = 1 := by rw [hy, Formalism.REAL.Jm_mul_self]
+  ⟩,
+  hy
+⟩
 
 end Pack
 

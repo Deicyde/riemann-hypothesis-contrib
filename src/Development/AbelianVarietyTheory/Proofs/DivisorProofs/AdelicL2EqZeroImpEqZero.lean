@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchrArchPair
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 open IsDedekindDomain NumberField
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chr incM)
@@ -22,9 +23,11 @@ noncomputable section
 open MeasureTheory
 namespace GlobalTheory.WeilL2Words
 
-theorem eq_zero_of_l2A_eq_zero : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ]
-    (μ : @MeasureTheory.Measure (κ → FiniteAdeleRing (𝓞 F) F) (borel _)), @MeasureTheory.Measure.IsAddHaarMeasure _ _ _ (borel _) μ →
-    ∀ D ∈ GlobalTheory.WeilM.schA F κ, GlobalTheory.WeilL2Words.l2A F μ D = 0 → D = 0 := by
+theorem eq_zero_of_l2A_eq_zero
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ]
+        (μ : @MeasureTheory.Measure (κ → FiniteAdeleRing (𝓞 F) F) (borel _)),
+      @MeasureTheory.Measure.IsAddHaarMeasure _ _ _ (borel _) μ
+        → ∀ D ∈ GlobalTheory.WeilM.schA F κ, GlobalTheory.WeilL2Words.l2A F μ D = 0 → D = 0 := by
   intro F _ _ κ _ μ hμ D hD h0
   letI : MeasurableSpace (κ → FiniteAdeleRing (𝓞 F) F) := borel _
   haveI : BorelSpace (κ → FiniteAdeleRing (𝓞 F) F) := ⟨rfl⟩
@@ -32,8 +35,7 @@ theorem eq_zero_of_l2A_eq_zero : ∀ (F : Type) [Field F] [NumberField F] (κ : 
   by_contra ha
   set x0 := archPart F a
   set y0 : κ → FiniteAdeleRing (𝓞 F) F := fun i => (a i).2
-  have ha0 : D (GlobalTheory.WeilCont.adeleJoin F x0 y0) ≠ 0 := by
-    rw [adeleJoin_archPart]; exact ha
+  have ha0 : D (GlobalTheory.WeilCont.adeleJoin F x0 y0) ≠ 0 := by rw [adeleJoin_archPart]; exact ha
   obtain ⟨n, f, g, hg, hDs⟩ := schA_exists_sum F hD
   obtain ⟨s, hs⟩ := GlobalTheory.WeilCont.exists_slice F hD y0
   set V : Set (κ → FiniteAdeleRing (𝓞 F) F) := {y | ∀ i, g i y = g i y0}
@@ -46,7 +48,8 @@ theorem eq_zero_of_l2A_eq_zero : ∀ (F : Type) [Field F] [NumberField F] (κ : 
     rw [hs, hDs, Finset.sum_apply, Finset.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [GlobalTheory.WeilCont.pureA_adeleJoin, GlobalTheory.WeilCont.pureA_adeleJoin, hy i]
-  have hsc : Continuous fun x => ‖s x‖ₑ ^ 2 := (ENNReal.continuous_pow 2).comp (continuous_enorm.comp s.continuous)
+  have hsc : Continuous fun x => ‖s x‖ₑ ^ 2 :=
+    (ENNReal.continuous_pow 2).comp (continuous_enorm.comp s.continuous)
   haveI : BorelSpace (mixedEmbedding.mixedSpace F) := inferInstance
   haveI : MeasurableAdd (mixedEmbedding.mixedSpace F) := inferInstance
   haveI h1 : (volume : Measure (mixedEmbedding.mixedSpace F)).IsAddHaarMeasure := inferInstance

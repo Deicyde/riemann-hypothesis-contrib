@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.SystemPr
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
@@ -23,9 +25,11 @@ theorem RZ.rt_coe (S A : ℕ) : ((RZ.rt H S A : RZ H S A) : ℂ) = H.rt0 := by
   rw [h2]
   ring
 
-theorem fullObj_of_obj {D : Datum H} {l : Level H} {n : ℕ} {S : Scheme.{0}} (s : S ⟶ Sp (KA l))
-    (o : Obj D l (baseKA l) s) (β : RZ H n l.A →+* KA l) (hβ : IsInc (RZ H n l.A).subtype (KA l).val.toRingHom β) :
-    FullObj D (s ≫ spMap β) o.t o.etaA := by
+theorem fullObj_of_obj
+    {D : Datum H} {l : Level H} {n : ℕ} {S : Scheme.{0}}
+    (s : S ⟶ Sp (KA l)) (o : Obj D l (baseKA l) s) (β : RZ H n l.A →+* KA l)
+    (hβ : IsInc (RZ H n l.A).subtype (KA l).val.toRingHom β)
+    : FullObj D (s ≫ spMap β) o.t o.etaA := by
   unfold IsInc at hβ
   have hρ : β (RZ.rt H n l.A) = (baseKA l).ρ := by
     apply Subtype.ext

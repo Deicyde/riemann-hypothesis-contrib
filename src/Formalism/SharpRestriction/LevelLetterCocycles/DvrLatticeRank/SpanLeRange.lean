@@ -8,25 +8,28 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34.UniversalFiltration
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.N.Ln34 Formalism.MainNotions.N.Ln34.ModelFPf
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.N.Ln34 Formalism.MainNotions.N.Ln34.ModelFPf
 open scoped TensorProduct
 
 section Span2
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O) (c : ZMod n) (ζ : LL)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
+  (T : LocLat G Qp LL O) (c : ZMod n) (ζ : LL)
 
-theorem N_φ' (x : W.DD T) (hx : x ∈ W.N T) : ∃ k : ℕ, W.Q ^ k • W.φD T x ∈ W.N T :=
-  W.N_φ T x hx
+theorem N_φ' (x : W.DD T) (hx : x ∈ W.N T) : ∃ k : ℕ, W.Q ^ k • W.φD T x ∈ W.N T := W.N_φ T x hx
 
-theorem Qpow_mono {x : W.DD T} {k K : ℕ} (hk : W.Q ^ k • W.φD T x ∈ W.N T) (hK : k ≤ K) :
-    W.Q ^ K • W.φD T x ∈ W.N T := by
+theorem Qpow_mono {x : W.DD T} {k K : ℕ} (hk : W.Q ^ k • W.φD T x ∈ W.N T) (hK : k ≤ K)
+    : W.Q ^ K • W.φD T x ∈ W.N T := by
   rw [show K = (K - k) + k by omega, pow_add, mul_smul]
   exact Submodule.smul_mem _ _ hk
 
@@ -36,10 +39,10 @@ theorem LV_zero (K : ℕ) : LV W T c ζ K 0 = 0 := by
   rw [show (⟨_, h0⟩ : ↥(W.N T)) = 0 from Subtype.ext (by simp), map_zero]
   rfl
 
-theorem LV_sum {ι : Type} (K : ℕ) (s : Finset ι) (f : ι → W.DD T)
-    (hf : ∀ i, W.Q ^ K • W.φD T (f i) ∈ W.N T) :
-    W.Q ^ K • W.φD T (∑ i ∈ s, f i) ∈ W.N T ∧
-      LV W T c ζ K (∑ i ∈ s, f i) = ∑ i ∈ s, LV W T c ζ K (f i) := by
+theorem LV_sum
+    {ι : Type} (K : ℕ) (s : Finset ι) (f : ι → W.DD T) (hf : ∀ i, W.Q ^ K • W.φD T (f i) ∈ W.N T)
+    : W.Q ^ K • W.φD T (∑ i ∈ s, f i) ∈ W.N T
+      ∧ LV W T c ζ K (∑ i ∈ s, f i) = ∑ i ∈ s, LV W T c ζ K (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -57,22 +60,28 @@ theorem letE_idem (d : ZMod n) : (letE d : LetA O n) * letE d = letE d := by
 
 variable {Pt : ZMod n → LL → (K →ₐ[Qp] LL) → Prop}
 
-theorem span_le_range (hp4 : Formalism.MainNotions.DeltaInvariantLattices.p4 W Pt T) {τ : K →ₐ[Qp] LL} (hPt : Pt c ζ τ)
-    (hc0 : PowerSeries.constantCoeff (W.lev c ζ W.Q) = 0) (hc1 : PowerSeries.coeff 1 (W.lev c ζ W.Q) ≠ 0)
+theorem span_le_range
+    (hp4 : Formalism.MainNotions.DeltaInvariantLattices.p4 W Pt T)
+    {τ : K →ₐ[Qp] LL} (hPt : Pt c ζ τ)
+    (hc0 : PowerSeries.constantCoeff (W.lev c ζ W.Q) = 0)
+    (hc1 : PowerSeries.coeff 1 (W.lev c ζ W.Q) ≠ 0)
     (π' : LetA O n) (hφπ : PowerSeries.constantCoeff (W.lev c ζ (W.φA π')) = 0)
     {r0 : ℕ} (b : Fin r0 → W.DD T) (hbΔ : ∀ j, b j ∈ W.NΔ T)
     (hbu : ∀ x ∈ W.N T, ∃! a : Fin r0 → LetA O n, x = ∑ j, a j • b j)
     {r : ℕ} (bL : Basis (Fin r) O (LcQ W T π' c)) (rep : Fin r → W.DD T)
-    (hrep : ∀ k, rep k ∈ NcS W T (c - 1)) (hbrep : ∀ k, bL k = mkL W T π' c (rep k) (hrep k)) :
-    Formalism.MainNotions.DeltaInvariantLattices.ιDi W T c ≤ LinearMap.range (UniversalLiftFrames.Phi W T c ζ rep) := by
+    (hrep : ∀ k, rep k ∈ NcS W T (c - 1)) (hbrep : ∀ k, bL k = mkL W T π' c (rep k) (hrep k))
+    : Formalism.MainNotions.DeltaInvariantLattices.ιDi W T c
+      ≤ LinearMap.range (UniversalLiftFrames.Phi W T c ζ rep) := by
   classical
   set R := LinearMap.range (UniversalLiftFrames.Phi W T c ζ rep)
   set c1 := PowerSeries.coeff 1 (W.lev c ζ W.Q)
-  have hvan : ∀ (x : W.DD T) (hx : x ∈ W.N T) (K : ℕ) (hK : W.Q ^ K • W.φD T x ∈ W.N T) (j : ℤ),
-      j < K → W.levN T c ζ ⟨_, hK⟩ j = 0 :=
-    fun x hx K hK j hj => ((hp4.2 c ζ τ hPt).1.1 ⟨x, hx⟩ K hK j).2 hj
-  have hLV : ∀ (x : W.DD T) (hx : x ∈ W.N T) (K : ℕ) (hK : W.Q ^ K • W.φD T x ∈ W.N T),
-      LV W T c ζ K x = c1 ^ K • valAt W T c ζ x := by
+  have hvan
+      : ∀ (x : W.DD T) (hx : x ∈ W.N T) (K : ℕ) (hK : W.Q ^ K • W.φD T x ∈ W.N T) (j : ℤ),
+        j < K → W.levN T c ζ ⟨_, hK⟩ j = 0 := fun x hx K hK j hj =>
+    ((hp4.2 c ζ τ hPt).1.1 ⟨x, hx⟩ K hK j).2 hj
+  have hLV
+      : ∀ (x : W.DD T) (hx : x ∈ W.N T) (K : ℕ) (hK : W.Q ^ K • W.φD T x ∈ W.N T),
+        LV W T c ζ K x = c1 ^ K • valAt W T c ζ x := by
     intro x hx K hK
     rw [LV_eq W T c ζ K _ hK, levN_val W T c ζ hp4 hPt hc0 hc1 x hx K hK]
   have hcancel : ∀ (K : ℕ) (u : T.V ⊗[Qp] BdR), c1 ^ K • u ∈ R → u ∈ R := by
@@ -95,8 +104,9 @@ theorem span_le_range (hp4 : Formalism.MainNotions.DeltaInvariantLattices.p4 W P
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_smul, hbrep]
       rfl
-    have h3 : (Submodule.Quotient.mk (⟨y, hy⟩ : ↥(NcS W T (c - 1))) : LcQ W T π' c) =
-        Submodule.Quotient.mk (∑ k, o k • (⟨rep k, hrep k⟩ : ↥(NcS W T (c - 1)))) := by
+    have h3
+        : (Submodule.Quotient.mk (⟨y, hy⟩ : ↥(NcS W T (c - 1))) : LcQ W T π' c)
+          = Submodule.Quotient.mk (∑ k, o k • (⟨rep k, hrep k⟩ : ↥(NcS W T (c - 1)))) := by
       have := bL.sum_repr (mkL W T π' c y hy)
       rw [h2] at this
       exact this.symm
@@ -118,8 +128,8 @@ theorem span_le_range (hp4 : Formalism.MainNotions.DeltaInvariantLattices.p4 W P
       Qpow_mono W T (hKr k) (by
         have := Finset.single_le_sum (f := Kr) (fun _ _ => Nat.zero_le _) (Finset.mem_univ k)
         omega)
-    have hKo : ∀ k, W.Q ^ K • W.φD T (o k • rep k) ∈ W.N T :=
-      fun k => (LV_smulO W T c ζ K (o k) (rep k) (hKk k)).1
+    have hKo : ∀ k, W.Q ^ K • W.φD T (o k • rep k) ∈ W.N T := fun k =>
+      (LV_smulO W T c ζ K (o k) (rep k) (hKk k)).1
     have hKz' : W.Q ^ K • W.φD T y' ∈ W.N T := Qpow_mono W T hKz (by omega)
     have hKy' : W.Q ^ K • W.φD T y ∈ W.N T := Qpow_mono W T hKy (by omega)
     obtain ⟨hKπ, hLπ⟩ := LV_smulA W T c ζ K π' y' hKz' (hvan y' hy'N K hKz')
@@ -137,9 +147,12 @@ theorem span_le_range (hp4 : Formalism.MainNotions.DeltaInvariantLattices.p4 W P
   rintro _ ⟨x, k, hk, rfl⟩
   set d : ZMod n := c - 1
   have hx'N : (letE d : LetA O n) • (x : W.DD T) ∈ W.N T := Submodule.smul_mem _ _ x.2
-  have ek : (letE c : LetA O n) • (W.Q ^ k • W.φD T x) = W.Q ^ k • W.φD T ((letE d : LetA O n) • (x : W.DD T)) := by
+  have ek
+      : (letE c : LetA O n) • (W.Q ^ k • W.φD T x)
+        = W.Q ^ k • W.φD T ((letE d : LetA O n) • (x : W.DD T)) := by
     rw [show d = c - 1 from rfl, φD_letE, smul_comm]
-  have hk' : W.Q ^ k • W.φD T ((letE d : LetA O n) • (x : W.DD T)) ∈ W.N T := ek ▸ Submodule.smul_mem _ _ hk
+  have hk' : W.Q ^ k • W.φD T ((letE d : LetA O n) • (x : W.DD T)) ∈ W.N T :=
+    ek ▸ Submodule.smul_mem _ _ hk
   have hw : W.levN T c ζ ⟨_, hk⟩ k = W.levN T c ζ ⟨_, hk'⟩ k := by
     rw [← levN_letE W T c ζ ⟨_, hk⟩ k]
     rw [show (letE c : LetA O n) • (⟨_, hk⟩ : ↥(W.N T)) = ⟨_, hk'⟩ from
@@ -167,8 +180,8 @@ theorem span_le_range (hp4 : Formalism.MainNotions.DeltaInvariantLattices.p4 W P
     Qpow_mono W T (hKb j) (by
       have := Finset.single_le_sum (f := Kb) (fun _ _ => Nat.zero_le _) (Finset.mem_univ j)
       omega)
-  have hKa : ∀ j, W.Q ^ K • W.φD T (a j • ((letE d : LetA O n) • b j)) ∈ W.N T :=
-    fun j => (LV_smulA W T c ζ K (a j) _ (hKb' j) (hvan _ (hebN' j) K (hKb' j))).1
+  have hKa : ∀ j, W.Q ^ K • W.φD T (a j • ((letE d : LetA O n) • b j)) ∈ W.N T := fun j =>
+    (LV_smulA W T c ζ K (a j) _ (hKb' j) (hvan _ (hebN' j) K (hKb' j))).1
   have hKx : W.Q ^ K • W.φD T x' ∈ W.N T := Qpow_mono W T hk' (by omega)
   apply hcancel K
   rw [← hLV x' hx'N K hKx]

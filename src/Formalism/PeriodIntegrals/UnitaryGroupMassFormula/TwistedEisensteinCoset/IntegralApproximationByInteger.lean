@@ -42,12 +42,14 @@ theorem iSub {a b : E} (ha : IntAt P a) (hb : IntAt P b) : IntAt P (a - b) := by
   · simp only [map_mul, map_sub]
     rw [← h1, ← h2]
     ring
-theorem iNat (m : ℕ) : IntAt P (m : E) := ⟨(m : 𝓞 E), 1, (Ideal.ne_top_iff_one _).mp P.isPrime.ne_top, by simp⟩
+theorem iNat (m : ℕ) : IntAt P (m : E) :=
+  ⟨(m : 𝓞 E), 1, (Ideal.ne_top_iff_one _).mp P.isPrime.ne_top, by simp⟩
 theorem iPow {a : E} (ha : IntAt P a) (m : ℕ) : IntAt P (a ^ m) := by
   induction m with
   | zero => simpa using iNat P 1
   | succ m ih => rw [pow_succ]; exact iMul P ih ha
-theorem iAlg (x : 𝓞 E) : IntAt P (algebraMap (𝓞 E) E x) := ⟨x, 1, (Ideal.ne_top_iff_one _).mp P.isPrime.ne_top, by simp⟩
+theorem iAlg (x : 𝓞 E) : IntAt P (algebraMap (𝓞 E) E x) :=
+  ⟨x, 1, (Ideal.ne_top_iff_one _).mp P.isPrime.ne_top, by simp⟩
 
 theorem qO_mem : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∈ P.asIdeal := Ideal.absNorm_mem P.asIdeal
 
@@ -65,8 +67,8 @@ theorem not_int_inv_q (hp : (Ideal.absNorm P.asIdeal).Prime) : ¬ IntAt P ((qOf 
   rw [IsFractionRing.injective (𝓞 E) E e]
   exact Ideal.mul_mem_left _ _ (qO_mem P)
 
-theorem natCast_notMem (hp : (Ideal.absNorm P.asIdeal).Prime) {m : ℕ} (hm : ¬ qOf P ∣ m) :
-    (m : 𝓞 E) ∉ P.asIdeal := by
+theorem natCast_notMem (hp : (Ideal.absNorm P.asIdeal).Prime) {m : ℕ} (hm : ¬ qOf P ∣ m)
+    : (m : 𝓞 E) ∉ P.asIdeal := by
   intro hmP
   have hcop : IsCoprime ((qOf P : ℕ) : ℤ) (m : ℤ) :=
     Nat.isCoprime_iff_coprime.mpr ((Nat.Prime.coprime_iff_not_dvd hp).mpr hm)
@@ -79,15 +81,16 @@ theorem natCast_notMem (hp : (Ideal.absNorm P.asIdeal).Prime) {m : ℕ} (hm : ¬
   push_cast
   exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (qO_mem P)) (Ideal.mul_mem_left _ _ hmP)
 
-theorem int_inv_nat (hp : (Ideal.absNorm P.asIdeal).Prime) {m : ℕ} (hm : ¬ qOf P ∣ m) : IntAt P ((m : E)⁻¹) := by
+theorem int_inv_nat (hp : (Ideal.absNorm P.asIdeal).Prime) {m : ℕ} (hm : ¬ qOf P ∣ m)
+    : IntAt P ((m : E)⁻¹) := by
   have hm0 : (m : E) ≠ 0 := by
     have : m ≠ 0 := fun h => hm (h ▸ dvd_zero _)
     exact_mod_cast this
   refine ⟨1, (m : 𝓞 E), natCast_notMem P hp hm, ?_⟩
   rw [map_natCast, map_one, mul_inv_cancel₀ hm0]
 
-theorem res_surj (hp : (Ideal.absNorm P.asIdeal).Prime) (x : 𝓞 E ⧸ P.asIdeal) :
-    ∃ d : ℕ, d < qOf P ∧ Ideal.Quotient.mk P.asIdeal (d : 𝓞 E) = x := by
+theorem res_surj (hp : (Ideal.absNorm P.asIdeal).Prime) (x : 𝓞 E ⧸ P.asIdeal)
+    : ∃ d : ℕ, d < qOf P ∧ Ideal.Quotient.mk P.asIdeal (d : 𝓞 E) = x := by
   have hcard : Nat.card (𝓞 E ⧸ P.asIdeal) = qOf P := by
     unfold qOf
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
@@ -106,22 +109,29 @@ theorem res_surj (hp : (Ideal.absNorm P.asIdeal).Prime) (x : 𝓞 E ⧸ P.asIdea
         rw [Nat.cast_sub hlt.le]
         have := P.asIdeal.neg_mem h'
         rwa [neg_sub] at this
-      exact natCast_notMem P hp (fun hdvd => by
-        have := Nat.le_of_dvd (by omega) hdvd
-        omega) hm
+      exact natCast_notMem P hp
+        (fun hdvd => by
+          have := Nat.le_of_dvd (by omega) hdvd
+          omega)
+        hm
     · have hm : ((d.val - d'.val : ℕ) : 𝓞 E) ∈ P.asIdeal := by
         rw [Nat.cast_sub hlt.le]
         exact h'
-      exact natCast_notMem P hp (fun hdvd => by
-        have := Nat.le_of_dvd (by omega) hdvd
-        omega) hm
-  have hbij := hinj.bijective_of_nat_card_le (by rw [hcard, Nat.card_eq_fintype_card, Fintype.card_fin])
+      exact natCast_notMem P hp
+        (fun hdvd => by
+          have := Nat.le_of_dvd (by omega) hdvd
+          omega)
+        hm
+  have hbij :=
+    hinj.bijective_of_nat_card_le (by rw [hcard, Nat.card_eq_fintype_card, Fintype.card_fin])
   obtain ⟨d, hd⟩ := hbij.2 x
   exact ⟨d.val, d.isLt, hd⟩
 
-private theorem intAt_div_qOf_of_mem (hp : (Ideal.absNorm P.asIdeal).Prime)
-    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) {α : 𝓞 E} (hα : α ∈ P.asIdeal) :
-    IntAt P (algebraMap (𝓞 E) E α / (qOf P : E)) := by
+private theorem intAt_div_qOf_of_mem
+    (hp : (Ideal.absNorm P.asIdeal).Prime)
+    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2)
+    {α : 𝓞 E} (hα : α ∈ P.asIdeal)
+    : IntAt P (algebraMap (𝓞 E) E α / (qOf P : E)) := by
   have hle : Ideal.span {((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E)} ≤ P.asIdeal :=
     (Ideal.span_singleton_le_iff_mem _).mpr (qO_mem P)
   obtain ⟨J, hJ⟩ := Ideal.dvd_iff_le.mpr hle
@@ -145,8 +155,11 @@ private theorem intAt_div_qOf_of_mem (hp : (Ideal.absNorm P.asIdeal).Prime)
   unfold qOf
   linear_combination -e
 
-theorem approx1 (hp : (Ideal.absNorm P.asIdeal).Prime) (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2)
-    {y : E} (hy : IntAt P y) : ∃ d : ℕ, d < qOf P ∧ IntAt P ((y - d) / (qOf P : E)) := by
+theorem approx1
+    (hp : (Ideal.absNorm P.asIdeal).Prime)
+    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2)
+    {y : E} (hy : IntAt P y)
+    : ∃ d : ℕ, d < qOf P ∧ IntAt P ((y - d) / (qOf P : E)) := by
   haveI : P.asIdeal.IsMaximal := P.isMaximal
   letI := Ideal.Quotient.field P.asIdeal
   obtain ⟨r, s, hs, hy'⟩ := hy
@@ -172,8 +185,10 @@ theorem approx1 (hp : (Ideal.absNorm P.asIdeal).Prime) (hq : ((Ideal.absNorm P.a
     rw [← hct, hy2, map_mul, map_sub, map_mul, map_natCast]
     field_simp
 
-theorem mem_pow_of (hp : (Ideal.absNorm P.asIdeal).Prime) {α : 𝓞 E} {K : ℕ}
-    (h : IntAt P (algebraMap (𝓞 E) E α / (qOf P : E) ^ K)) : α ∈ P.asIdeal ^ K := by
+theorem mem_pow_of
+    (hp : (Ideal.absNorm P.asIdeal).Prime)
+    {α : 𝓞 E} {K : ℕ} (h : IntAt P (algebraMap (𝓞 E) E α / (qOf P : E) ^ K))
+    : α ∈ P.asIdeal ^ K := by
   haveI := P.isPrime
   obtain ⟨r, s, hs, h⟩ := h
   have hq0 := q_ne P hp
@@ -185,8 +200,8 @@ theorem mem_pow_of (hp : (Ideal.absNorm P.asIdeal).Prime) {α : 𝓞 E} {K : ℕ
     exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_pow (qO_mem P) K)
   exact (Ideal.IsPrime.mul_mem_pow P.asIdeal hsα).resolve_left hs
 
-theorem exists_not_int (hp : (Ideal.absNorm P.asIdeal).Prime) {α : 𝓞 E} (hα : α ≠ 0) :
-    ∃ K : ℕ, ¬ IntAt P (algebraMap (𝓞 E) E α / (qOf P : E) ^ K) := by
+theorem exists_not_int (hp : (Ideal.absNorm P.asIdeal).Prime) {α : 𝓞 E} (hα : α ≠ 0)
+    : ∃ K : ℕ, ¬ IntAt P (algebraMap (𝓞 E) E α / (qOf P : E) ^ K) := by
   by_contra hcon
   push_neg at hcon
   have hall : ∀ K, α ∈ P.asIdeal ^ K := fun K => mem_pow_of P hp (hcon K)
@@ -195,9 +210,12 @@ theorem exists_not_int (hp : (Ideal.absNorm P.asIdeal).Prime) {α : 𝓞 E} (hα
   rw [hbot, Ideal.mem_bot] at hin
   exact hα hin
 
-theorem decomp (hp : (Ideal.absNorm P.asIdeal).Prime) (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2)
-    {α : 𝓞 E} (hα : α ≠ 0) : ∃ (k : ℕ) (u : E), algebraMap (𝓞 E) E α = (qOf P : E) ^ k * u ∧ u ≠ 0 ∧
-      IntAt P u ∧ IntAt P u⁻¹ := by
+theorem decomp
+    (hp : (Ideal.absNorm P.asIdeal).Prime)
+    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2)
+    {α : 𝓞 E} (hα : α ≠ 0)
+    : ∃ (k : ℕ) (u : E),
+      algebraMap (𝓞 E) E α = (qOf P : E) ^ k * u ∧ u ≠ 0 ∧ IntAt P u ∧ IntAt P u⁻¹ := by
   classical
   have hex := exists_not_int P hp hα
   have hK : ¬ IntAt P (algebraMap (𝓞 E) E α / (qOf P : E) ^ Nat.find hex) := Nat.find_spec hex
@@ -230,15 +248,18 @@ theorem decomp (hp : (Ideal.absNorm P.asIdeal).Prime) (hq : ((Ideal.absNorm P.as
     refine ⟨s, r, hrP, ?_⟩
     rw [← hrs, mul_assoc, mul_inv_cancel₀ hu0, mul_one]
 
-theorem no_shift (hp : (Ideal.absNorm P.asIdeal).Prime) (d : ℕ) {w w' : E} (hw : w ≠ 0) (hwi : IntAt P w⁻¹)
-    (hw' : IntAt P w') (h : w = (qOf P : E) ^ (d + 1) * w') : False := by
+theorem no_shift
+    (hp : (Ideal.absNorm P.asIdeal).Prime)
+    (d : ℕ)
+    {w w' : E}
+    (hw : w ≠ 0) (hwi : IntAt P w⁻¹) (hw' : IntAt P w') (h : w = (qOf P : E) ^ (d + 1) * w')
+    : False := by
   have hq0 := q_ne P hp
   have hw'0 : w' ≠ 0 := by
     rintro rfl
     rw [mul_zero] at h
     exact hw h
-  have hint : IntAt P (w⁻¹ * w' * (qOf P : E) ^ d) :=
-    iMul P (iMul P hwi hw') (iPow P (iNat P _) d)
+  have hint : IntAt P (w⁻¹ * w' * (qOf P : E) ^ d) := iMul P (iMul P hwi hw') (iPow P (iNat P _) d)
   have e : w⁻¹ * w' * (qOf P : E) ^ d = (qOf P : E)⁻¹ := by
     rw [h]
     field_simp
@@ -263,14 +284,15 @@ theorem integer_integral_iff_dvd : IntegerIntegralIffDvd := by
       by_contra hfe
       push_neg at hfe
       exact hnd (Dvd.dvd.mul_right (pow_dvd_pow _ hfe) _)
-    have h1 : IntAt P ((((qOf P ^ f * j : ℕ) : E) / (qOf P : E) ^ e) * (j : E)⁻¹ *
-        (qOf P : E) ^ (e - f - 1)) :=
+    have h1 : IntAt P
+        ((((qOf P ^ f * j : ℕ) : E) / (qOf P : E) ^ e) * (j : E)⁻¹ * (qOf P : E) ^ (e - f - 1)) :=
       iMul P (iMul P hI (int_inv_nat P hp hj)) (iPow P (iNat P _) _)
     have hj0 : (j : E) ≠ 0 := by
       have : j ≠ 0 := fun h => hj (h ▸ dvd_zero _)
       exact_mod_cast this
-    have e2 : (((qOf P ^ f * j : ℕ) : E) / (qOf P : E) ^ e) * (j : E)⁻¹ * (qOf P : E) ^ (e - f - 1) =
-        (qOf P : E)⁻¹ := by
+    have e2
+        : (((qOf P ^ f * j : ℕ) : E) / (qOf P : E) ^ e) * (j : E)⁻¹ * (qOf P : E) ^ (e - f - 1)
+          = (qOf P : E)⁻¹ := by
       obtain ⟨g, rfl⟩ : ∃ g, e = f + g + 1 := ⟨e - f - 1, by omega⟩
       have hg : f + g + 1 - f - 1 = g := by omega
       rw [hg]
@@ -296,12 +318,15 @@ theorem integral_approximation_by_integer : IntegralApproximationByInteger := by
     obtain ⟨i, hi, hz⟩ := ih
     obtain ⟨d, hd, hzd⟩ := approx1 P hp hq hz
     refine ⟨i + d * qOf P ^ N, ?_, ?_⟩
-    · calc i + d * qOf P ^ N < qOf P ^ N + d * qOf P ^ N := Nat.add_lt_add_right hi _
+    · calc
+        i + d * qOf P ^ N
+          < qOf P ^ N + d * qOf P ^ N := Nat.add_lt_add_right hi _
         _ = (d + 1) * qOf P ^ N := by ring
         _ ≤ qOf P * qOf P ^ N := Nat.mul_le_mul_right _ (Nat.succ_le_of_lt hd)
         _ = qOf P ^ (N + 1) := by ring
-    · have e : (x - ((i + d * qOf P ^ N : ℕ) : E)) / (qOf P : E) ^ (N + 1) =
-          ((x - i) / (qOf P : E) ^ N - d) / (qOf P : E) := by
+    · have e
+          : (x - ((i + d * qOf P ^ N : ℕ) : E)) / (qOf P : E) ^ (N + 1)
+            = ((x - i) / (qOf P : E) ^ N - d) / (qOf P : E) := by
         push_cast
         field_simp
         ring
@@ -366,15 +391,15 @@ theorem unit_congruent_to_integer : UnitCongruentToInteger := by
     rintro ⟨j, rfl⟩
     apply not_int_inv_q P hp
     have h1 : IntAt P (w / (qOf P : E)) := by
-      have e : w / (qOf P : E) = (w - ((qOf P * j : ℕ) : E)) / (qOf P : E) ^ (N + 1) *
-          (qOf P : E) ^ N + (j : E) := by
+      have e
+          : w / (qOf P : E)
+            = (w - ((qOf P * j : ℕ) : E)) / (qOf P : E) ^ (N + 1) * (qOf P : E) ^ N + (j : E) := by
         push_cast
         field_simp
         ring
       rw [e]
       exact iAdd P (iMul P hI (iPow P (iNat P _) N)) (iNat P j)
-    have e2 : (qOf P : E)⁻¹ = w / (qOf P : E) * w⁻¹ := by
-      field_simp
+    have e2 : (qOf P : E)⁻¹ = w / (qOf P : E) * w⁻¹ := by field_simp
     rw [e2]
     exact iMul P h1 hwii
 

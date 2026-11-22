@@ -6,14 +6,22 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.RowsOfMem
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-theorem pair_exists :
-    ∃ C : ℝ, 0 < C ∧ ∀ (ε τ K : ℝ) (N₀ : ℕ), 0 < ε → ε < 1 / 52 → 0 < τ → 1 ≤ K → 0 < N₀ → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀,
-      ∀ X z' : ℝ, X ≤ Y ^ K → Y ^ (ε / 5) * Real.log Y ^ 2 ≤ z' → z' ≤ K ^ 2 * (Y ^ (ε / 5) * Real.log Y ^ 2) →
-      ∃ q d : ℕ, Rows (Y ^ (ε / 5)) z' q d ∧ N₀ < q ∧ GoodQ N₀ C τ Y X (Y ^ (ε / 5)) q ∧ GoodD N₀ C τ Y X (Y ^ (ε / 5)) z' q d := by
+theorem pair_exists
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (ε τ K : ℝ) (N₀ : ℕ),
+          0 < ε → ε < 1 / 52 → 0 < τ → 1 ≤ K → 0 < N₀
+            → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀, ∀ X z' : ℝ,
+              X ≤ Y ^ K → Y ^ (ε / 5) * Real.log Y ^ 2 ≤ z'
+                → z' ≤ K ^ 2 * (Y ^ (ε / 5) * Real.log Y ^ 2)
+                → ∃ q d : ℕ,
+                  Rows (Y ^ (ε / 5)) z' q d ∧ N₀ < q ∧ GoodQ N₀ C τ Y X (Y ^ (ε / 5)) q
+                    ∧ GoodD N₀ C τ Y X (Y ^ (ε / 5)) z' q d := by
   obtain ⟨C, hC, H⟩ := pair_share
   refine ⟨C, hC, fun ε τ K N₀ hε hε' hτ hK hN => ?_⟩
   obtain ⟨Y₁, H1⟩ := H ε τ K (1 / 2) N₀ hε hε' hτ hK (by norm_num) hN

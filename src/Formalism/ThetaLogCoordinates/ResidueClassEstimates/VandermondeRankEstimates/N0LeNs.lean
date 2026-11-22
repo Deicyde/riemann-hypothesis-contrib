@@ -457,8 +457,8 @@ theorem pathInterlacingCriterion : PathInterlacingCriterion := by
     have hbe : (D.be : ℤ) = D.bePos + D.beNeg := by exact_mod_cast be_eq D
     refine ⟨hpre.1, hpre.2, hTR, fun i' h1 h2 => ?_⟩
     have hH' : ∀ m, m < i' → ent mu (D.n0 + i') m = D.be := hP.2.2.2.2.2.2 i' h1 h2
-    have hHm : ∀ m, m < i' - 1 → ent mu (D.n0 + (i' - 1)) m = D.be :=
-      fun m hm => hP.2.2.2.2.2.2 (i' - 1) (by omega) (by omega) m hm
+    have hHm : ∀ m, m < i' - 1 → ent mu (D.n0 + (i' - 1)) m = D.be := fun m hm =>
+      hP.2.2.2.2.2.2 (i' - 1) (by omega) (by omega) m hm
     have e1 := wsize_head i' (by omega) hH'
     have e2 := wsize_head (i' - 1) (by omega) hHm
     have hIj := interl_of_path hW hP (i' - 1) (by omega)
@@ -497,7 +497,7 @@ lemma tailPos_of_zero {n : ℕ} {a : ℕ → ℤ} (h : ∀ m, a m = 0) (u : ℕ)
 
 def actV (D : Letters) (l : ℕ) : Bool := decide (l ≤ D.n0) && D.vec l
 
-def actC (D : Letters) (l : ℕ) : Bool := decide (l ≤ D.n0) && !D.vec l
+def actC (D : Letters) (l : ℕ) : Bool := decide (l ≤ D.n0) && ! D.vec l
 
 lemma actV_true {l : ℕ} : actV D l = true ↔ l ≤ D.n0 ∧ D.vec l = true := by
   simp [actV]
@@ -651,18 +651,30 @@ theorem pathTailBounds : PathTailBounds := by
     apply tailPos_of_zero
     intro m
     simp [revW, stage_le 0 (Nat.zero_le _), hP.1]
-  have bP := abs_bound D.Ns (fun i u => tailPos (D.stLen i) (stage mu i) u) (fun u i => D.SPos u i) (actV D)
-    (fun u => by
-      show tailPos (D.stLen 0) (stage mu 0) u ≤ (D.SPos u 0 : ℤ)
-      rw [hk0]
-      exact Nat.cast_nonneg _)
-    (fun i u _ ha => pos_A hP i u ha) (fun i _ ha => pos_active_zero hP i ha) (fun i u hi ha => pos_I hW hP i u hi ha)
-  have bN := abs_bound D.Ns (fun i u => tailNeg (D.stLen i) (stage mu i) u) (fun u i => D.SNeg u i) (actC D)
-    (fun u => by
-      show tailNeg (D.stLen 0) (stage mu 0) u ≤ (D.SNeg u 0 : ℤ)
-      rw [hk0']
-      exact Nat.cast_nonneg _)
-    (fun i u _ ha => neg_A hP i u ha) (fun i _ ha => neg_active_zero hP i ha) (fun i u hi ha => neg_I hW hP i u hi ha)
+  have bP :=
+    abs_bound D.Ns
+      (fun i u => tailPos (D.stLen i) (stage mu i) u)
+      (fun u i => D.SPos u i)
+      (actV D)
+      (fun u => by
+        show tailPos (D.stLen 0) (stage mu 0) u ≤ (D.SPos u 0 : ℤ)
+        rw [hk0]
+        exact Nat.cast_nonneg _)
+      (fun i u _ ha => pos_A hP i u ha)
+      (fun i _ ha => pos_active_zero hP i ha)
+      (fun i u hi ha => pos_I hW hP i u hi ha)
+  have bN :=
+    abs_bound D.Ns
+      (fun i u => tailNeg (D.stLen i) (stage mu i) u)
+      (fun u i => D.SNeg u i)
+      (actC D)
+      (fun u => by
+        show tailNeg (D.stLen 0) (stage mu 0) u ≤ (D.SNeg u 0 : ℤ)
+        rw [hk0']
+        exact Nat.cast_nonneg _)
+      (fun i u _ ha => neg_A hP i u ha)
+      (fun i _ ha => neg_active_zero hP i ha)
+      (fun i u hi ha => neg_I hW hP i u hi ha)
   have hsP : ∀ v, D.SPos v D.Ns = D.SPos v D.n0 := fun v => by
     unfold Letters.SPos
     rw [latestV_frame D.Ns D.n0 (n0_le_Ns D) le_rfl]
@@ -670,13 +682,25 @@ theorem pathTailBounds : PathTailBounds := by
     unfold Letters.SNeg
     rw [latestC_frame D.Ns D.n0 (n0_le_Ns D) le_rfl]
   refine ⟨fun i u hi => ⟨bP i hi u, bN i hi u⟩, fun i₀ u X hi₀ _ h => ?_, fun i₀ u X hi₀ _ h => ?_⟩
-  · have h1 := deficit_persists_of_active_inactive_recursion D.Ns (fun i u => tailPos (D.stLen i) (stage mu i) u) (fun u i => D.SPos u i) (actV D)
-      (fun i u _ ha => pos_A hP i u ha) (fun i u hi ha => pos_I hW hP i u hi ha) i₀ u X h D.Ns hi₀ le_rfl
+  · have h1 :=
+      deficit_persists_of_active_inactive_recursion D.Ns
+        (fun i u => tailPos (D.stLen i) (stage mu i) u)
+        (fun u i => D.SPos u i)
+        (actV D)
+        (fun i u _ ha => pos_A hP i u ha)
+        (fun i u hi ha => pos_I hW hP i u hi ha)
+        i₀ u X h D.Ns hi₀ le_rfl
     beta_reduce at h1
     rw [card_actV, hsP] at h1
     exact h1
-  · have h1 := deficit_persists_of_active_inactive_recursion D.Ns (fun i u => tailNeg (D.stLen i) (stage mu i) u) (fun u i => D.SNeg u i) (actC D)
-      (fun i u _ ha => neg_A hP i u ha) (fun i u hi ha => neg_I hW hP i u hi ha) i₀ u X h D.Ns hi₀ le_rfl
+  · have h1 :=
+      deficit_persists_of_active_inactive_recursion D.Ns
+        (fun i u => tailNeg (D.stLen i) (stage mu i) u)
+        (fun u i => D.SNeg u i)
+        (actC D)
+        (fun i u _ ha => neg_A hP i u ha)
+        (fun i u hi ha => neg_I hW hP i u hi ha)
+        i₀ u X h D.Ns hi₀ le_rfl
     beta_reduce at h1
     rw [card_actC, hsN] at h1
     exact h1

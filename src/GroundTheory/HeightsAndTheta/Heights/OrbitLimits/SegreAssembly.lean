@@ -21,8 +21,9 @@ theorem SegreComponent.full : SegreComponent.Statement.{u, v, w} :=
 theorem SegreDivisor.full : SegreDivisor.Statement.{u, v, w} :=
   SegreDivisor.proof SegreComponent.full
 
-theorem Positivity.full {K : Type u} [Fintype K] (F : Type w) [Field F] (ι : K → Type v)
-    [∀ k, Fintype (ι k)] : ReciprocityTheory.ChartRestriction.G.AI.I1.PositivityStatement F ι :=
+theorem Positivity.full
+    {K : Type u} [Fintype K] (F : Type w) [Field F] (ι : K → Type v) [∀ k, Fintype (ι k)]
+    : ReciprocityTheory.ChartRestriction.G.AI.I1.PositivityStatement F ι :=
   Positivity.of_found SegreDivisor.full F ι
 
 end GroundTheory.Heights₂.Heights.Targets

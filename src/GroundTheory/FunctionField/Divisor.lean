@@ -29,16 +29,15 @@ theorem deg_apply (D : Divisor k K) : deg D = D.sum fun v n => n * v.deg := by
   simp [deg, Finsupp.liftAddHom_apply]
 
 @[simp]
-theorem deg_single (v : Place k K) (n : ℤ) : deg (Finsupp.single v n) = n * v.deg := by
-  simp [deg]
+theorem deg_single (v : Place k K) (n : ℤ) : deg (Finsupp.single v n) = n * v.deg := by simp [deg]
 
 theorem deg_eq_sum (D : Divisor k K) : deg D = ∑ v ∈ D.support, D v * v.deg := by
   rw [deg_apply, Finsupp.sum]
 
 theorem deg_nonneg {D : Divisor k K} (hD : 0 ≤ D) : 0 ≤ deg D := by
   rw [deg_eq_sum]
-  exact Finset.sum_nonneg fun v _ => mul_nonneg (by simpa using Finsupp.le_def.1 hD v)
-    (Int.natCast_nonneg _)
+  exact Finset.sum_nonneg fun v _ =>
+    mul_nonneg (by simpa using Finsupp.le_def.1 hD v) (Int.natCast_nonneg _)
 
 variable [IsFunctionField k K]
 
@@ -67,23 +66,21 @@ noncomputable def divisor (x : K) : Divisor k K :=
 theorem divisor_apply (x : K) (v : Place k K) : divisor x v = v.ord x := rfl
 
 @[simp]
-theorem divisor_zero : divisor (0 : K) = (0 : Divisor k K) := by
-  ext v; simp
+theorem divisor_zero : divisor (0 : K) = (0 : Divisor k K) := by ext v; simp
 
 @[simp]
-theorem divisor_one : divisor (1 : K) = (0 : Divisor k K) := by
-  ext v; simp
+theorem divisor_one : divisor (1 : K) = (0 : Divisor k K) := by ext v; simp
 
-theorem divisor_mul {x y : K} (hx : x ≠ 0) (hy : y ≠ 0) :
-    divisor (x * y) = (divisor x + divisor y : Divisor k K) := by
+theorem divisor_mul {x y : K} (hx : x ≠ 0) (hy : y ≠ 0)
+    : divisor (x * y) = (divisor x + divisor y : Divisor k K) := by
   ext v; simp [v.ord_mul hx hy]
 
 @[simp]
 theorem divisor_inv (x : K) : divisor x⁻¹ = -(divisor x : Divisor k K) := by
   ext v; simp [Place.ord_inv]
 
-theorem divisor_eq_zero_of_isAlgebraic {x : K} (hx : IsAlgebraic k x) (hx0 : x ≠ 0) :
-    divisor x = (0 : Divisor k K) := by
+theorem divisor_eq_zero_of_isAlgebraic {x : K} (hx : IsAlgebraic k x) (hx0 : x ≠ 0)
+    : divisor x = (0 : Divisor k K) := by
   ext v; simp [v.ord_eq_zero_of_isAlgebraic hx hx0]
 
 noncomputable def divisorHom : Additive Kˣ →+ Divisor k K where
@@ -93,7 +90,6 @@ noncomputable def divisorHom : Additive Kˣ →+ Divisor k K where
     simp only [toMul_add, Units.val_mul]
     exact divisor_mul (Additive.toMul x).ne_zero (Additive.toMul y).ne_zero
 
-
 variable (k K) in
 noncomputable def principalDivisors : AddSubgroup (Divisor k K) := (divisorHom (k := k)).range
 
@@ -102,12 +98,10 @@ noncomputable def zeroDivisor (x : K) : Divisor k K := divisor x ⊔ 0
 noncomputable def poleDivisor (x : K) : Divisor k K := divisor x⁻¹ ⊔ 0
 
 @[simp]
-theorem zeroDivisor_apply (x : K) (v : Place k K) :
-    zeroDivisor x v = max (v.ord x) 0 := rfl
+theorem zeroDivisor_apply (x : K) (v : Place k K) : zeroDivisor x v = max (v.ord x) 0 := rfl
 
 @[simp]
-theorem poleDivisor_apply (x : K) (v : Place k K) :
-    poleDivisor x v = max (-v.ord x) 0 := by
+theorem poleDivisor_apply (x : K) (v : Place k K) : poleDivisor x v = max (- v.ord x) 0 := by
   simp [poleDivisor, Finsupp.sup_apply]
 
 theorem poleDivisor_nonneg (x : K) : (0 : Divisor k K) ≤ poleDivisor x :=
@@ -120,8 +114,8 @@ theorem poleDivisor_inv (x : K) : poleDivisor x⁻¹ = (zeroDivisor x : Divisor 
 @[simp]
 theorem zeroDivisor_inv (x : K) : zeroDivisor x⁻¹ = (poleDivisor x : Divisor k K) := rfl
 
-theorem zeroDivisor_sub_poleDivisor (x : K) :
-    zeroDivisor x - poleDivisor x = (divisor x : Divisor k K) := by
+theorem zeroDivisor_sub_poleDivisor (x : K)
+    : zeroDivisor x - poleDivisor x = (divisor x : Divisor k K) := by
   ext v
   simp only [Finsupp.coe_sub, Pi.sub_apply, zeroDivisor_apply, poleDivisor_apply, divisor_apply]
   rcases le_total 0 (v.ord x) with h | h
@@ -140,11 +134,11 @@ def L (D : Divisor k K) : Submodule k K where
     · rw [hc, map_zero, map_zero, zero_mul]; exact zero_le
     · rw [v.valuation_algebraMap' hc, one_mul]; exact hz v
 
-theorem mem_L {D : Divisor k K} {z : K} :
-    z ∈ L D ↔ ∀ v : Place k K, v.valuation z ≤ WithZero.exp (D v) := Iff.rfl
+theorem mem_L {D : Divisor k K} {z : K}
+    : z ∈ L D ↔ ∀ v : Place k K, v.valuation z ≤ WithZero.exp (D v) :=
+  Iff.rfl
 
-theorem mem_L_iff_le {D : Divisor k K} {z : K} (hz : z ≠ 0) :
-    z ∈ L D ↔ 0 ≤ divisor z + D := by
+theorem mem_L_iff_le {D : Divisor k K} {z : K} (hz : z ≠ 0) : z ∈ L D ↔ 0 ≤ divisor z + D := by
   rw [mem_L, Finsupp.le_def]
   refine forall_congr' fun v => ?_
   rw [v.valuation_le_exp_iff hz]
@@ -159,51 +153,52 @@ theorem mem_L_zero {z : K} : z ∈ L (0 : Divisor k K) ↔ IsAlgebraic k z := by
   refine forall_congr' fun v => ?_
   rw [Finsupp.coe_zero, Pi.zero_apply, WithZero.exp_zero, v.valuation_le_one_iff]
 
-theorem L_eq_bot_of_nonpos {D : Divisor k K} (hD : D ≤ 0) {v : Place k K} (hv : D v < 0) :
-    L D = ⊥ := by
+theorem L_eq_bot_of_nonpos {D : Divisor k K} (hD : D ≤ 0) {v : Place k K} (hv : D v < 0)
+    : L D = ⊥ := by
   rw [eq_bot_iff]
   intro z hz
   rw [Submodule.mem_bot]
   by_contra hz0
   have hall : ∀ w : Place k K, z ∈ w.ring := fun w =>
-    (w.valuation_le_one_iff z).1 ((hz w).trans (by
-      rw [← WithZero.exp_zero, WithZero.exp_le_exp]; simpa using Finsupp.le_def.1 hD w))
+    (w.valuation_le_one_iff z).1
+      ((hz w).trans
+        (by rw [← WithZero.exp_zero, WithZero.exp_le_exp]; simpa using Finsupp.le_def.1 hD w))
   have h0 := v.ord_eq_zero_of_isAlgebraic (Place.isAlgebraic_iff_forall_mem.2 hall) hz0
   have := hz v
   rw [v.valuation_le_exp_iff hz0, h0] at this
   omega
 
-theorem finiteDimensional_L_add_single (D : Divisor k K) (v : Place k K)
-    [FiniteDimensional k (L D)] :
-    FiniteDimensional k (L (D + Finsupp.single v 1)) ∧
-      finrank k (L (D + Finsupp.single v 1)) ≤ finrank k (L D) + v.deg := by
+theorem finiteDimensional_L_add_single (D : Divisor k K) (v : Place k K) [FiniteDimensional k (L D)]
+    : FiniteDimensional k (L (D + Finsupp.single v 1))
+      ∧ finrank k (L (D + Finsupp.single v 1)) ≤ finrank k (L D) + v.deg := by
   classical
   set E := D + Finsupp.single v 1 with hE
   have hEv : E v = D v + 1 := by simp [E]
-  have hEw : ∀ w, w ≠ v → E w = D w := fun w hw => by
-    simp [E, Ne.symm hw]
+  have hEw : ∀ w, w ≠ v → E w = D w := fun w hw => by simp [E, Ne.symm hw]
   obtain ⟨t, ht⟩ := v.valuation_surjective (WithZero.exp (-(D v + 1)))
   have hmem : ∀ z : L E, t * (z : K) ∈ v.ring := fun z => by
     rw [← v.valuation_le_one_iff, map_mul, ht]
-    calc WithZero.exp (-(D v + 1)) * v.valuation (z : K)
+    calc
+      WithZero.exp (-(D v + 1)) * v.valuation (z : K)
         ≤ WithZero.exp (-(D v + 1)) * WithZero.exp (E v) := mul_le_mul' le_rfl (z.2 v)
       _ = 1 := by rw [hEv, ← WithZero.exp_add]; simp
-  let φ : L E →ₗ[k] v.ResidueField :=
-    { toFun := fun z => IsLocalRing.residue v.ring ⟨t * z, hmem z⟩
-      map_add' := fun a b => by
-        rw [← map_add (f := _)]
-        congr 1
-        ext
-        simp [mul_add]
-      map_smul' := fun c a => by
-        rw [RingHom.id_apply, Algebra.smul_def,
-          IsScalarTower.algebraMap_apply k v.ring v.ResidueField,
-          IsLocalRing.ResidueField.algebraMap_eq, ← map_mul]
-        congr 1
-        ext
-        change t * ((c • a : L E) : K) = (algebraMap k v.ring c : K) * (t * a)
-        rw [Submodule.coe_smul, Algebra.smul_def, Place.coe_algebraMap_apply]
-        ring }
+  let φ : L E →ₗ[k] v.ResidueField := {
+    toFun := fun z => IsLocalRing.residue v.ring ⟨t * z, hmem z⟩
+    map_add' := fun a b => by
+      rw [← map_add (f := _)]
+      congr 1
+      ext
+      simp [mul_add]
+    map_smul' := fun c a => by
+      rw [RingHom.id_apply, Algebra.smul_def,
+        IsScalarTower.algebraMap_apply k v.ring v.ResidueField,
+        IsLocalRing.ResidueField.algebraMap_eq, ← map_mul]
+      congr 1
+      ext
+      change t * ((c • a : L E) : K) = (algebraMap k v.ring c : K) * (t * a)
+      rw [Submodule.coe_smul, Algebra.smul_def, Place.coe_algebraMap_apply]
+      ring
+  }
   have hker : ∀ z : L E, φ z = 0 ↔ (z : K) ∈ L D := by
     intro z
     change IsLocalRing.residue v.ring ⟨t * z, hmem z⟩ = 0 ↔ _
@@ -217,17 +212,19 @@ theorem finiteDimensional_L_add_single (D : Divisor k K) (v : Place k K)
         by_cases hz : (z : K) = 0
         · rw [hz, map_zero]; exact zero_le
         · rw [v.valuation_eq_exp_neg_ord hz, ← WithZero.exp_add, ← WithZero.exp_zero,
-            WithZero.exp_lt_exp] at h
+              WithZero.exp_lt_exp]
+            at h
           rw [v.valuation_eq_exp_neg_ord hz, WithZero.exp_le_exp]
           omega
       · rw [← hEw w hw]; exact z.2 w
     · intro h
-      calc WithZero.exp (-(D v + 1)) * v.valuation (z : K)
+      calc
+        WithZero.exp (-(D v + 1)) * v.valuation (z : K)
           ≤ WithZero.exp (-(D v + 1)) * WithZero.exp (D v) := mul_le_mul' le_rfl (h v)
         _ < 1 := by rw [← WithZero.exp_add, ← WithZero.exp_zero, WithZero.exp_lt_exp]; omega
   let ψ : LinearMap.ker φ →ₗ[k] L D :=
-    ((L E).subtype.comp (LinearMap.ker φ).subtype).codRestrict (L D)
-      fun z => (hker z.1).1 (LinearMap.mem_ker.1 z.2)
+    ((L E).subtype.comp (LinearMap.ker φ).subtype).codRestrict (L D) fun z =>
+      (hker z.1).1 (LinearMap.mem_ker.1 z.2)
   have hψ : Function.Injective ψ := fun a b h => by
     have h' := congrArg Subtype.val h
     exact Subtype.ext (Subtype.ext h')
@@ -244,10 +241,10 @@ theorem finiteDimensional_L_add_single (D : Divisor k K) (v : Place k K)
     LinearMap.finrank_le_finrank_of_injective hψ
   omega
 
-theorem finiteDimensional_L_of_le_of_deg_lt (n : ℕ) :
-    ∀ {D E : Divisor k K}, D ≤ E → deg (E - D) < n → FiniteDimensional k (L D) →
-      FiniteDimensional k (L E) ∧
-        (finrank k (L E) : ℤ) ≤ finrank k (L D) + deg E - deg D := by
+theorem finiteDimensional_L_of_le_of_deg_lt (n : ℕ)
+    : ∀ {D E : Divisor k K},
+      D ≤ E → deg (E - D) < n → FiniteDimensional k (L D)
+        → FiniteDimensional k (L E) ∧ (finrank k (L E) : ℤ) ≤ finrank k (L D) + deg E - deg D := by
   classical
   induction n with
   | zero =>
@@ -264,11 +261,12 @@ theorem finiteDimensional_L_of_le_of_deg_lt (n : ℕ) :
       push Not at h
       exact hED (le_antisymm (Finsupp.le_def.2 h) hDE)
     set E' := E - Finsupp.single v 1 with hE'
-    have hDE' : D ≤ E' := Finsupp.le_def.2 fun w => by
-      rw [hE', Finsupp.coe_sub, Pi.sub_apply, Finsupp.single_apply]
-      split_ifs with h
-      · subst h; omega
-      · have := Finsupp.le_def.1 hDE w; omega
+    have hDE' : D ≤ E' :=
+      Finsupp.le_def.2 fun w => by
+        rw [hE', Finsupp.coe_sub, Pi.sub_apply, Finsupp.single_apply]
+        split_ifs with h
+        · subst h; omega
+        · have := Finsupp.le_def.1 hDE w; omega
     have hn' : deg (E' - D) < n := by
       have h1 : deg (E' - D) = deg (E - D) - v.deg := by
         rw [hE', map_sub, map_sub, map_sub, deg_single]; ring
@@ -284,34 +282,35 @@ theorem finiteDimensional_L_of_le_of_deg_lt (n : ℕ) :
     have : (finrank k (L E) : ℤ) ≤ finrank k (L E') + v.deg := by exact_mod_cast hle
     omega
 
-theorem finiteDimensional_L_of_le {D E : Divisor k K} (hDE : D ≤ E)
-    [FiniteDimensional k (L D)] :
-    FiniteDimensional k (L E) ∧
-      (finrank k (L E) : ℤ) ≤ finrank k (L D) + deg E - deg D :=
+theorem finiteDimensional_L_of_le {D E : Divisor k K} (hDE : D ≤ E) [FiniteDimensional k (L D)]
+    : FiniteDimensional k (L E) ∧ (finrank k (L E) : ℤ) ≤ finrank k (L D) + deg E - deg D :=
   finiteDimensional_L_of_le_of_deg_lt ((deg (E - D)).toNat + 1) hDE (by omega) inferInstance
 
 instance (D : Divisor k K) : FiniteDimensional k (L D) := by
   classical
   obtain ⟨v⟩ := Place.nonempty (k := k) (K := K)
-  have hbot : L (-Finsupp.single v 1 : Divisor k K) = ⊥ :=
-    L_eq_bot_of_nonpos (v := v) (Finsupp.le_def.2 fun w => by
-      have h := Finsupp.single_apply (a := v) (a' := w) (b := (1 : ℤ))
-      simp only [Finsupp.coe_neg, Pi.neg_apply, Finsupp.coe_zero, Pi.zero_apply]
-      split_ifs at h <;> omega) (by simp)
-  have : FiniteDimensional k (L (-Finsupp.single v 1 : Divisor k K)) := by
+  have hbot : L (- Finsupp.single v 1 : Divisor k K) = ⊥ :=
+    L_eq_bot_of_nonpos (v := v)
+      (Finsupp.le_def.2 fun w => by
+        have h := Finsupp.single_apply (a := v) (a' := w) (b := (1 : ℤ))
+        simp only [Finsupp.coe_neg, Pi.neg_apply, Finsupp.coe_zero, Pi.zero_apply]
+        split_ifs at h <;> omega)
+      (by simp)
+  have : FiniteDimensional k (L (- Finsupp.single v 1 : Divisor k K)) := by
     rw [hbot]; infer_instance
-  have := (finiteDimensional_L_of_le
-    (le_sup_right : (-Finsupp.single v 1 : Divisor k K) ≤ D ⊔ -Finsupp.single v 1)).1
+  have :=
+    (finiteDimensional_L_of_le
+      (le_sup_right : (- Finsupp.single v 1 : Divisor k K) ≤ D ⊔ - Finsupp.single v 1)).1
   exact Module.Finite.of_injective
-    (Submodule.inclusion (L_mono (le_sup_left : D ≤ D ⊔ -Finsupp.single v 1)))
+    (Submodule.inclusion (L_mono (le_sup_left : D ≤ D ⊔ - Finsupp.single v 1)))
     (Submodule.inclusion_injective _)
 
-theorem finrank_L_le_of_le {D E : Divisor k K} (hDE : D ≤ E) :
-    (finrank k (L E) : ℤ) ≤ finrank k (L D) + deg E - deg D :=
+theorem finrank_L_le_of_le {D E : Divisor k K} (hDE : D ≤ E)
+    : (finrank k (L E) : ℤ) ≤ finrank k (L D) + deg E - deg D :=
   (finiteDimensional_L_of_le hDE).2
 
-theorem L_zero :
-    L (0 : Divisor k K) = Subalgebra.toSubmodule (algebraicClosure k K).toSubalgebra := by
+theorem L_zero
+    : L (0 : Divisor k K) = Subalgebra.toSubmodule (algebraicClosure k K).toSubalgebra := by
   ext z
   rw [mem_L_zero]
   simp [mem_algebraicClosure_iff]
@@ -320,8 +319,8 @@ theorem finrank_L_zero : finrank k (L (0 : Divisor k K)) = finrank k (algebraicC
   rw [L_zero]
   rfl
 
-theorem finrank_L_le_deg_add {D : Divisor k K} (hD : 0 ≤ D) :
-    (finrank k (L D) : ℤ) ≤ deg D + finrank k (algebraicClosure k K) := by
+theorem finrank_L_le_deg_add {D : Divisor k K} (hD : 0 ≤ D)
+    : (finrank k (L D) : ℤ) ≤ deg D + finrank k (algebraicClosure k K) := by
   have := finrank_L_le_of_le hD
   rw [finrank_L_zero, map_zero] at this
   omega

@@ -6,13 +6,18 @@ public import Development.AutomorphicArithmetic.CMTraceForms.Places
 @[expose] public section
 
 open NumberField TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs Formalism.L2.Pj UpperTheory.Depth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs Formalism.L2.Pj UpperTheory.Depth
 
 namespace UpperTheory.TraceSumEquivalence
 
-private theorem exists_equiv (E : Type) [Field E] [NumberField E] (C : Type) [Field C] [CharZero C]
-    (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] (hv : v.Integers O) :
-    ∃ Φ : (E →ₐ[ℚ] C) ≃ (𝓞 E →+* O), ∀ σ (y : 𝓞 E), algebraMap O C (Φ σ y) = σ (y : E) := by
+private theorem exists_equiv
+    (E : Type) [Field E] [NumberField E]
+    (C : Type) [Field C] [CharZero C]
+    (v : Valuation C NNReal)
+    (O : Type) [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    : ∃ Φ : (E →ₐ[ℚ] C) ≃ (𝓞 E →+* O), ∀ σ (y : 𝓞 E), algebraMap O C (Φ σ y) = σ (y : E) := by
   classical
   have hinj : Function.Injective (algebraMap O C) := hv.hom_inj
   have hmem : ∀ (σ : E →ₐ[ℚ] C) (y : 𝓞 E), σ (y : E) ∈ (algebraMap O C).range := by
@@ -22,8 +27,7 @@ private theorem exists_equiv (E : Type) [Field E] [NumberField E] (C : Type) [Fi
     have hi' : IsIntegral O (σ (y : E)) := hi.tower_top
     obtain ⟨z, hz⟩ := hv.exists_of_le_one (hv.isIntegral_iff_v_le_one.mp hi')
     exact ⟨z, hz⟩
-  let e : O ≃+* (algebraMap O C).range :=
-    RingEquiv.ofLeftInverse (Function.leftInverse_invFun hinj)
+  let e : O ≃+* (algebraMap O C).range := RingEquiv.ofLeftInverse (Function.leftInverse_invFun hinj)
   have he : ∀ z, algebraMap O C (e.symm z) = z := by
     intro z
     obtain ⟨a, ha⟩ := z.2
@@ -39,8 +43,7 @@ private theorem exists_equiv (E : Type) [Field E] [NumberField E] (C : Type) [Fi
       have := congrArg (fun φ : 𝓞 E →+* O => algebraMap O C (φ y)) h
       simp only [hF] at this
       exact this
-    have h2 : σ.toRingHom = τ.toRingHom :=
-      IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E)) h1
+    have h2 : σ.toRingHom = τ.toRingHom := IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E)) h1
     exact AlgHom.coe_ringHom_injective h2
   have hFs : Function.Surjective F := by
     intro τ
@@ -60,31 +63,39 @@ private theorem exists_equiv (E : Type) [Field E] [NumberField E] (C : Type) [Fi
     exact IsFractionRing.lift_algebraMap hg y
   exact ⟨Equiv.ofBijective F ⟨hFi, hFs⟩, hF⟩
 
-private theorem trace_eq_sum (E : Type) [Field E] [NumberField E] (p : ℕ) [Fact p.Prime] (C : Type)
-    [Field C] [IsAlgClosed C] [CharZero C] (O : Type) [CommRing O] [Algebra O C]
-    [Algebra ℤ_[p] O] (Φ : (E →ₐ[ℚ] C) ≃ (𝓞 E →+* O))
-    (hΦ : ∀ σ (y : 𝓞 E), algebraMap O C (Φ σ y) = σ (y : E)) (x : ℤ_[p] ⊗[ℤ] 𝓞 E) :
-    algebraMap O C (algebraMap ℤ_[p] O (LinearMap.trace ℤ_[p] _ (LinearMap.mulLeft ℤ_[p] x))) =
-      ∑ σ : E →ₐ[ℚ] C, algebraMap O C (tauExt (Φ σ) x) := by
+private theorem trace_eq_sum
+    (E : Type) [Field E] [NumberField E]
+    (p : ℕ) [Fact p.Prime]
+    (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+    (O : Type) [CommRing O] [Algebra O C] [Algebra ℤ_[p] O]
+    (Φ : (E →ₐ[ℚ] C) ≃ (𝓞 E →+* O)) (hΦ : ∀ σ (y : 𝓞 E), algebraMap O C (Φ σ y) = σ (y : E))
+    (x : ℤ_[p] ⊗[ℤ] 𝓞 E)
+    : algebraMap O C (algebraMap ℤ_[p] O (LinearMap.trace ℤ_[p] _ (LinearMap.mulLeft ℤ_[p] x)))
+      = ∑ σ : E →ₐ[ℚ] C, algebraMap O C (tauExt (Φ σ) x) := by
   classical
   induction x using TensorProduct.induction_on with
   | zero => simp
   | add a b ha hb =>
-    have hadd : LinearMap.mulLeft ℤ_[p] (a + b) = LinearMap.mulLeft ℤ_[p] a + LinearMap.mulLeft ℤ_[p] b := by
+    have hadd
+        : LinearMap.mulLeft ℤ_[p] (a + b)
+          = LinearMap.mulLeft ℤ_[p] a + LinearMap.mulLeft ℤ_[p] b := by
       ext z
       simp [add_mul]
-    rw [hadd, map_add (f := _), map_add (f := _), map_add (f := _), ha, hb, ← Finset.sum_add_distrib]
+    rw [hadd, map_add (f := _), map_add (f := _), map_add (f := _), ha, hb,
+      ← Finset.sum_add_distrib]
     simp [map_add (f := _)]
   | tmul c y =>
     have h0 : (c ⊗ₜ[ℤ] y : ℤ_[p] ⊗[ℤ] 𝓞 E) = c • ((1 : ℤ_[p]) ⊗ₜ[ℤ] y) := by
       rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
-    have h1 : LinearMap.mulLeft ℤ_[p] (c ⊗ₜ[ℤ] y : ℤ_[p] ⊗[ℤ] 𝓞 E) =
-        c • (Algebra.lmul ℤ (𝓞 E) y).baseChange ℤ_[p] := by
+    have h1
+        : LinearMap.mulLeft ℤ_[p] (c ⊗ₜ[ℤ] y : ℤ_[p] ⊗[ℤ] 𝓞 E)
+          = c • (Algebra.lmul ℤ (𝓞 E) y).baseChange ℤ_[p] := by
       rw [Algebra.baseChange_lmul, h0]
       ext z
       simp [smul_mul_assoc]
-    have h2 : LinearMap.trace ℤ_[p] _ (LinearMap.mulLeft ℤ_[p] (c ⊗ₜ[ℤ] y : ℤ_[p] ⊗[ℤ] 𝓞 E)) =
-        c * ((Algebra.trace ℤ (𝓞 E) y : ℤ) : ℤ_[p]) := by
+    have h2
+        : LinearMap.trace ℤ_[p] _ (LinearMap.mulLeft ℤ_[p] (c ⊗ₜ[ℤ] y : ℤ_[p] ⊗[ℤ] 𝓞 E))
+          = c * ((Algebra.trace ℤ (𝓞 E) y : ℤ) : ℤ_[p]) := by
       rw [h1, map_smul, LinearMap.trace_baseChange, smul_eq_mul, Algebra.trace_apply]
       simp
     have h3 : ∑ σ : E →ₐ[ℚ] C, σ (y : E) = (((Algebra.trace ℤ (𝓞 E) y : ℤ) : ℚ) : C) := by
@@ -96,11 +107,17 @@ private theorem trace_eq_sum (E : Type) [Field E] [NumberField E] (p : ℕ) [Fac
 
 end UpperTheory.TraceSumEquivalence
 
-
 open UpperTheory.TraceSumEquivalence in
-theorem UpperTheory.trace_form_decomposition_CMDatum :
-    ∀ (E : Type) [Field E] [NumberField E] (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ [Algebra ℤ_[p] O] (e : ℤ_[p] ⊗[ℤ] 𝓞 E), e * e = e →
-      Nonempty (Fin (Module.finrank ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] e))) ≃ Emb (O := O) e) ∧ Nat.card (𝓞 E →+* O) = Module.finrank ℚ E := by
+theorem UpperTheory.trace_form_decomposition_CMDatum
+    : ∀ (E : Type) [Field E] [NumberField E] (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
+        [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
+      v.Integers O
+        → ∀ [Algebra ℤ_[p] O] (e : ℤ_[p] ⊗[ℤ] 𝓞 E),
+          e * e = e
+            → Nonempty
+                (Fin (Module.finrank ℤ_[p] (LinearMap.range (LinearMap.mulLeft ℤ_[p] e)))
+                  ≃ Emb (O := O) e)
+              ∧ Nat.card (𝓞 E →+* O) = Module.finrank ℚ E := by
   intro E _ _ p _ C _ _ _ v O _ _ hv _ e he
   classical
   obtain ⟨Φ, hΦ⟩ := UpperTheory.TraceSumEquivalence.exists_equiv E C v O hv
@@ -129,8 +146,9 @@ theorem UpperTheory.trace_form_decomposition_CMDatum :
       rw [if_neg hn, h, map_zero]
     · have hm : Φ σ ∈ Emb (O := O) e := h
       rw [if_pos hm, h, map_one]
-  have hsum' : ((Module.finrank ℤ_[p] (LinearMap.range f) : ℕ) : C) =
-      ((Finset.univ.filter (fun σ => Φ σ ∈ Emb (O := O) e)).card : C) := by
+  have hsum'
+      : ((Module.finrank ℤ_[p] (LinearMap.range f) : ℕ) : C)
+        = ((Finset.univ.filter (fun σ => Φ σ ∈ Emb (O := O) e)).card : C) := by
     have h := hsum
     change algebraMap O C (algebraMap ℤ_[p] O (LinearMap.trace ℤ_[p] _ f)) = _ at h
     rw [htr, map_natCast, map_natCast] at h
@@ -139,10 +157,11 @@ theorem UpperTheory.trace_form_decomposition_CMDatum :
     rw [Finset.sum_boole]
   have hn := Nat.cast_injective hsum'
   haveI : Finite (𝓞 E →+* O) := Finite.of_equiv _ Φ
-  have hEmb : Nat.card (Emb (O := O) e) =
-      (Finset.univ.filter (fun σ => Φ σ ∈ Emb (O := O) e)).card := by
-    calc Nat.card (Emb (O := O) e) = Nat.card {σ // Φ σ ∈ Emb (O := O) e} :=
-          (Nat.card_congr (Φ.subtypeEquiv (fun σ => Iff.rfl))).symm
+  have hEmb
+      : Nat.card (Emb (O := O) e) = (Finset.univ.filter (fun σ => Φ σ ∈ Emb (O := O) e)).card := by
+    calc
+      Nat.card (Emb (O := O) e) = Nat.card {σ // Φ σ ∈ Emb (O := O) e} :=
+        (Nat.card_congr (Φ.subtypeEquiv (fun σ => Iff.rfl))).symm
       _ = Fintype.card {σ // Φ σ ∈ Emb (O := O) e} := Nat.card_eq_fintype_card
       _ = _ := Fintype.card_subtype _
   exact ⟨(finCongr (hn.trans hEmb.symm)).trans (Finite.equivFin _).symm⟩

@@ -10,10 +10,13 @@ namespace PI.SzCt.UnitaryGroupMassFormula
 
 open Formalism.BasicNotions Formalism.MainNotions.G
 
-theorem ct_le (hA : RowA) (hB : RowB) (hC : RowC) (hS : SizeFacts) (hP : PlaceFacts)
-    (D : D7) (L : SizeData₂ D) (P : ParameterChoice' D L) (hx : 3 ≤ L.sc.x) (hSz : Formalism.MainNotions.SizesAt L)
-    (j : ℕ) (hj : j ∈ SizeData₂.lifts D) (u : D.what₂.Word) (t : HH D) :
-    ctD D u j t ≤ (if t ∈ D.host.TT then 2 * L.sc.b else 0) + 4 * (D.R.k : ℝ) * L.sc.b' := by
+theorem ct_le
+    (hA : RowA) (hB : RowB) (hC : RowC) (hS : SizeFacts) (hP : PlaceFacts)
+    (D : D7) (L : SizeData₂ D)
+    (P : ParameterChoice' D L) (hx : 3 ≤ L.sc.x) (hSz : Formalism.MainNotions.SizesAt L)
+    (j : ℕ) (hj : j ∈ SizeData₂.lifts D)
+    (u : D.what₂.Word) (t : HH D)
+    : ctD D u j t ≤ (if t ∈ D.host.TT then 2 * L.sc.b else 0) + 4 * (D.R.k : ℝ) * L.sc.b' := by
   obtain ⟨hbT, hη, hkSc, hw'', hmη, hb1, hb'0⟩ := hS D L hSz hx
   obtain ⟨hP1, hP2, hP3, hP4⟩ := hP D
   have hj' := hj
@@ -49,35 +52,44 @@ theorem ct_le (hA : RowA) (hB : RowB) (hC : RowC) (hS : SizeFacts) (hP : PlaceFa
     have hRC := hC D L P j hj u (tauPl D (true, t)) (hP3 t)
     have hwF := L.win_top j hj1 hj2 (tauPl D (false, t)) ⟨t, ht⟩ (hP1 t)
     have hbt := hbT ⟨t, ht⟩
-    have hwT : wj D j (tauPl D (true, t)) ≤ L.sc.b + L.etaSz + 1 ∨
-        wj D j (tauPl D (true, t)) ≤ L.sc.w'' D.R.n + L.etaSz := by
+    have hwT
+        : wj D j (tauPl D (true, t)) ≤ L.sc.b + L.etaSz + 1
+          ∨ wj D j (tauPl D (true, t)) ≤ L.sc.w'' D.R.n + L.etaSz := by
       rcases hP4 t with h | h
       · exact Or.inl (L.win_thick j hj1 hj2 _ h).2
       · exact Or.inr (L.win_thin j hj1 hj2 _ h).2
-    have hkw : (D.R.k : ℝ) * wj D j (tauPl D (false, t)) ≤
-        (D.R.k : ℝ) * ((L.bT ⟨t, ht⟩ : ℝ) + L.sc.b' / L.sc.x + L.etaSz) :=
+    have hkw
+        : (D.R.k : ℝ) * wj D j (tauPl D (false, t))
+          ≤ (D.R.k : ℝ) * ((L.bT ⟨t, ht⟩ : ℝ) + L.sc.b' / L.sc.x + L.etaSz) :=
       mul_le_mul_of_nonneg_left hwF.2 hk0
-    have e1 : (D.R.k : ℝ) * ((L.bT ⟨t, ht⟩ : ℝ) + L.sc.b' / L.sc.x + L.etaSz) =
-        (D.R.k : ℝ) * (L.bT ⟨t, ht⟩ : ℝ) + (D.R.k : ℝ) * (L.sc.b' / L.sc.x) +
-          (D.R.k : ℝ) * L.etaSz := by ring
-    have e2 : (D.R.k : ℝ) * (L.Sc + wj D j (tauPl D (false, t))) =
-        (D.R.k : ℝ) * L.Sc + (D.R.k : ℝ) * wj D j (tauPl D (false, t)) := by ring
+    have e1
+        : (D.R.k : ℝ) * ((L.bT ⟨t, ht⟩ : ℝ) + L.sc.b' / L.sc.x + L.etaSz)
+          = (D.R.k : ℝ) * (L.bT ⟨t, ht⟩ : ℝ) + (D.R.k : ℝ) * (L.sc.b' / L.sc.x)
+            + (D.R.k : ℝ) * L.etaSz := by
+      ring
+    have e2
+        : (D.R.k : ℝ) * (L.Sc + wj D j (tauPl D (false, t)))
+          = (D.R.k : ℝ) * L.Sc + (D.R.k : ℝ) * wj D j (tauPl D (false, t)) := by
+      ring
     have k1 : (D.R.k : ℝ) * (L.bT ⟨t, ht⟩ : ℝ) ≤ (D.R.k : ℝ) * (5 / 4 * L.sc.b') :=
       mul_le_mul_of_nonneg_left hbt hk0
     have k2 : (D.R.k : ℝ) * (L.sc.b' / L.sc.x) ≤ (D.R.k : ℝ) * (L.sc.b' / 3) :=
       mul_le_mul_of_nonneg_left (by linarith) hk0
     have k3 : (D.R.k : ℝ) * L.etaSz ≤ (D.R.k : ℝ) * (L.sc.b' / 3) :=
       mul_le_mul_of_nonneg_left (by linarith) hk0
-    have e3 : (D.R.k : ℝ) * (5 / 4 * L.sc.b') + (D.R.k : ℝ) * (L.sc.b' / 3) +
-        (D.R.k : ℝ) * (L.sc.b' / 3) = 23 / 12 * ((D.R.k : ℝ) * L.sc.b') := by ring
+    have e3
+        : (D.R.k : ℝ) * (5 / 4 * L.sc.b') + (D.R.k : ℝ) * (L.sc.b' / 3)
+            + (D.R.k : ℝ) * (L.sc.b' / 3)
+          = 23 / 12 * ((D.R.k : ℝ) * L.sc.b') := by
+      ring
     have e4 : 4 * (D.R.k : ℝ) * L.sc.b' = 4 * ((D.R.k : ℝ) * L.sc.b') := by ring
     rcases hwT with hT | hT <;> linarith
   · simp only [ctD, if_neg ht]
     have hthin := hP2 t ht
     have hRB := hB D L P j hj u (tauPl D (false, t)) hthin.2.1
     have hwF := (L.win_thin j hj1 hj2 (tauPl D (false, t)) hthin).2
-    have hkw : (D.R.k : ℝ) * wj D j (tauPl D (false, t)) ≤
-        (D.R.k : ℝ) * (L.sc.w'' D.R.n + L.etaSz) :=
+    have hkw
+        : (D.R.k : ℝ) * wj D j (tauPl D (false, t)) ≤ (D.R.k : ℝ) * (L.sc.w'' D.R.n + L.etaSz) :=
       mul_le_mul_of_nonneg_left hwF hk0
     have k1 : (D.R.k : ℝ) * (L.sc.w'' D.R.n + L.etaSz) ≤ (D.R.k : ℝ) * (2 * (L.sc.b' / 3)) :=
       mul_le_mul_of_nonneg_left (by linarith) hk0
@@ -86,14 +98,15 @@ theorem ct_le (hA : RowA) (hB : RowB) (hC : RowC) (hS : SizeFacts) (hP : PlaceFa
     have e4 : 4 * (D.R.k : ℝ) * L.sc.b' = 4 * ((D.R.k : ℝ) * L.sc.b') := by ring
     linarith
 
-theorem szCt_of (hA : RowA) (hB : RowB) (hC : RowC) (hS : SizeFacts) (hP : PlaceFacts) :
-    PI.SzCt.SzCt := by
+theorem szCt_of (hA : RowA) (hB : RowB) (hC : RowC) (hS : SizeFacts) (hP : PlaceFacts)
+    : PI.SzCt.SzCt := by
   unfold PI.SzCt.SzCt
   intro eps Ct CGam Cc CT2 PK
   refine ⟨3, ?_⟩
   intro D L P _ hx hSz j hj u
-  have hsum : ∑ t : HH D, ctD D u j t ≤
-      ∑ t : HH D, ((if t ∈ D.host.TT then 2 * L.sc.b else 0) + 4 * (D.R.k : ℝ) * L.sc.b') :=
+  have hsum
+      : ∑ t : HH D, ctD D u j t
+        ≤ ∑ t : HH D, ((if t ∈ D.host.TT then 2 * L.sc.b else 0) + 4 * (D.R.k : ℝ) * L.sc.b') :=
     Finset.sum_le_sum (fun t _ => ct_le hA hB hC hS hP D L P hx hSz j hj u t)
   refine le_trans hsum ?_
   obtain ⟨-, -, -, -, -, -, hb'0⟩ := hS D L hSz hx
@@ -108,7 +121,9 @@ theorem szCt_of (hA : RowA) (hB : RowB) (hC : RowC) (hS : SizeFacts) (hP : Place
     push_cast
     ring
   rw [hf]
-  have e : (D.R.n : ℝ) * (4 * (D.R.k : ℝ) * L.sc.b') = 2 * (2 * (D.R.n : ℝ)) * (D.R.k : ℝ) * L.sc.b' := by
+  have e
+      : (D.R.n : ℝ) * (4 * (D.R.k : ℝ) * L.sc.b')
+        = 2 * (2 * (D.R.n : ℝ)) * (D.R.k : ℝ) * L.sc.b' := by
     ring
   have e2 : (D.host.TT.card : ℝ) * (2 * L.sc.b) = 2 * (D.host.TT.card : ℝ) * L.sc.b := by ring
   linarith

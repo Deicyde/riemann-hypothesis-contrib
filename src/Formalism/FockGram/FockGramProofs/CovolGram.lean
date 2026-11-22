@@ -14,7 +14,6 @@ namespace Formalism.E
 theorem covolumeEqSqrtDetGram : CovolGram := by
   intro E ι _ _ _ _ _ _ _ b
   classical
-
   have hc : Fintype.card (Fin (Module.finrank ℝ E)) = Fintype.card ι := by
     rw [Fintype.card_fin, Module.finrank_eq_card_basis b]
   let o : OrthonormalBasis ι ℝ E := (stdOrthonormalBasis ℝ E).reindex (Fintype.equivOfCardEq hc)
@@ -22,7 +21,8 @@ theorem covolumeEqSqrtDetGram : CovolGram := by
     rw [measure_congr (ZSpan.fundamentalDomain_ae_parallelepiped o.toBasis volume),
       OrthonormalBasis.coe_toBasis, OrthonormalBasis.volume_parallelepiped]
   have hcov : ZLattice.covolume (Submodule.span ℤ (Set.range b)) = |o.toBasis.det b| := by
-    rw [ZLattice.covolume_eq_measure_fundamentalDomain _ volume (ZSpan.isAddFundamentalDomain b volume),
+    rw [ZLattice.covolume_eq_measure_fundamentalDomain _ volume
+        (ZSpan.isAddFundamentalDomain b volume),
       measureReal_def, ZSpan.measure_fundamentalDomain b volume o.toBasis, hfd, mul_one,
       ENNReal.toReal_ofReal (abs_nonneg _)]
 

@@ -13,153 +13,174 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology GlobalTheory.Shares
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology GlobalTheory.Shares
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.ParamSard
 
-noncomputable def colProj {n N : ℕ} (j0 : Fin N) :
-    (Fin (n + 1) × Fin N → ℂ) →L[ℂ] EuclideanSpace ℂ (Fin n) :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun p => WithLp.toLp 2 fun k => p (k.succ, j0)
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+noncomputable def colProj {n N : ℕ} (j0 : Fin N)
+    : (Fin (n + 1) × Fin N → ℂ) →L[ℂ] EuclideanSpace ℂ (Fin n) :=
+  LinearMap.toContinuousLinearMap {
+    toFun := fun p => WithLp.toLp 2 fun k => p (k.succ, j0)
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
 
-noncomputable def colInc {n N : ℕ} (j0 : Fin N) :
-    EuclideanSpace ℂ (Fin n) →L[ℂ] (Fin (n + 1) × Fin N → ℂ) :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun v q => if q.2 = j0 then (Fin.cons 0 (fun k => v k) : Fin (n + 1) → ℂ) q.1 else 0
-      map_add' := fun v w => by
-        funext ⟨i, j⟩
-        by_cases h : j = j0
-        · refine Fin.cases ?_ (fun k => ?_) i <;> simp [h]
-        · simp [h]
-      map_smul' := fun c v => by
-        funext ⟨i, j⟩
-        by_cases h : j = j0
-        · refine Fin.cases ?_ (fun k => ?_) i <;> simp [h]
-        · simp [h] }
+noncomputable def colInc {n N : ℕ} (j0 : Fin N)
+    : EuclideanSpace ℂ (Fin n) →L[ℂ] (Fin (n + 1) × Fin N → ℂ) :=
+  LinearMap.toContinuousLinearMap {
+    toFun := fun v q => if q.2 = j0 then (Fin.cons 0 (fun k => v k) : Fin (n + 1) → ℂ) q.1 else 0
+    map_add' := fun v w => by
+      funext ⟨i, j⟩
+      by_cases h : j = j0
+      · refine Fin.cases ?_ (fun k => ?_) i <;> simp [h]
+      · simp [h]
+    map_smul' := fun c v => by
+      funext ⟨i, j⟩
+      by_cases h : j = j0
+      · refine Fin.cases ?_ (fun k => ?_) i <;> simp [h]
+      · simp [h]
+  }
 
-theorem colInc_apply {n N : ℕ} (j0 : Fin N) (v : EuclideanSpace ℂ (Fin n)) (k : Fin n) (j : Fin N) :
-    colInc j0 v (k.succ, j) = if j = j0 then v k else 0 := by
+theorem colInc_apply {n N : ℕ} (j0 : Fin N) (v : EuclideanSpace ℂ (Fin n)) (k : Fin n) (j : Fin N)
+    : colInc j0 v (k.succ, j) = if j = j0 then v k else 0 := by
   simp [colInc]
 
-theorem colProj_colInc {n N : ℕ} (j0 : Fin N) (v : EuclideanSpace ℂ (Fin n)) :
-    colProj j0 (colInc j0 v) = v := by
+theorem colProj_colInc {n N : ℕ} (j0 : Fin N) (v : EuclideanSpace ℂ (Fin n))
+    : colProj j0 (colInc j0 v) = v := by
   ext k
   show colInc j0 v (k.succ, j0) = _
   simp [colInc_apply]
 
-theorem ae_simple_col {n N : ℕ} (U : Set (EuclideanSpace ℂ (Fin n))) (hU : IsOpen U)
-    (w : Fin N → EuclideanSpace ℂ (Fin n) → ℂ) (hw : ∀ j, DifferentiableOn ℂ (w j) U) (j0 : Fin N) :
-    ∀ᵐ t : Fin (n + 1) × Fin N → ℂ, ∀ z ∈ U, w j0 z ≠ 0 → ∑ j, t (0, j) * w j z ≠ 0 →
-      (∀ k : Fin n, ∑ j, t (k.succ, j) * w j z = 0) →
-      (fderiv ℂ (fun y => (WithLp.toLp 2 fun k : Fin n =>
-        (∑ j, t (k.succ, j) * w j y) / ∑ j, t (0, j) * w j y : EuclideanSpace ℂ (Fin n))) z).det ≠ 0 := by
-  set S : (Fin (n + 1) × Fin N → ℂ) → EuclideanSpace ℂ (Fin n) → EuclideanSpace ℂ (Fin n) :=
-    fun p y => WithLp.toLp 2 fun k => (∑ j, p (k.succ, j) * w j y) / w j0 y with hS
-  set G : (Fin (n + 1) × Fin N → ℂ) → (Fin (n + 1) × Fin N → ℂ) :=
-    fun p => p - colInc j0 (S p (colProj j0 p)) with hG
-  have hnull : volume (G '' {p | DifferentiableAt ℝ G p ∧ (fderiv ℝ G p).det = 0}) = 0 :=
-    addHaar_image_eq_zero_of_det_fderivWithin_eq_zero volume (f' := fun p => fderiv ℝ G p)
-      (fun p hp => hp.1.hasFDerivAt.hasFDerivWithinAt) (fun p hp => hp.2)
-  rw [← compl_mem_ae_iff] at hnull
-  filter_upwards [hnull] with t ht z hz hw0 hs0 hsk hdet
-  apply ht
-  set F : EuclideanSpace ℂ (Fin n) → EuclideanSpace ℂ (Fin n) := fun y => WithLp.toLp 2 fun k : Fin n =>
-        (∑ j, t (k.succ, j) * w j y) / ∑ j, t (0, j) * w j y with hF
-  have hwz : ∀ j, DifferentiableAt ℂ (w j) z := fun j => (hw j).differentiableAt (hU.mem_nhds hz)
-  set A : EuclideanSpace ℂ (Fin n) → (Fin (n + 1) × Fin N → ℂ) :=
-    fun y => t + colInc j0 (y - colProj j0 t) with hA
-  have hπA : ∀ y, colProj j0 (A y) = y := fun y => by simp [hA, colProj_colInc]
-  have hGA : ∀ y, w j0 y ≠ 0 → G (A y) = t - colInc j0 (S t y) := by
-    intro y hy
-    have : S (A y) y = S t y + (y - colProj j0 t) := by
+theorem ae_simple_col
+    {n N : ℕ} (U : Set (EuclideanSpace ℂ (Fin n))) (hU : IsOpen U)
+    (w : Fin N → EuclideanSpace ℂ (Fin n) → ℂ) (hw : ∀ j, DifferentiableOn ℂ (w j) U) (j0 : Fin N)
+    : ∀ᵐ t : Fin (n + 1) × Fin N → ℂ, ∀ z ∈ U, w j0 z ≠ 0 → ∑ j, t (0, j) * w j z ≠ 0 →
+        (∀ k : Fin n, ∑ j, t (k.succ, j) * w j z = 0) →
+        (fderiv ℂ (fun y => (WithLp.toLp 2 fun k : Fin n =>
+          (∑ j, t (k.succ, j) * w j y) / ∑ j, t (0, j) * w j y : EuclideanSpace ℂ (Fin n))) z).det ≠ 0 :=
+  by
+    set S : (Fin (n + 1) × Fin N → ℂ) → EuclideanSpace ℂ (Fin n) → EuclideanSpace ℂ (Fin n) :=
+      fun p y => WithLp.toLp 2 fun k => (∑ j, p (k.succ, j) * w j y) / w j0 y with hS
+    set G : (Fin (n + 1) × Fin N → ℂ) → (Fin (n + 1) × Fin N → ℂ) :=
+      fun p => p - colInc j0 (S p (colProj j0 p)) with hG
+    have hnull : volume (G '' {p | DifferentiableAt ℝ G p ∧ (fderiv ℝ G p).det = 0}) = 0 :=
+      addHaar_image_eq_zero_of_det_fderivWithin_eq_zero volume
+        (f' := fun p => fderiv ℝ G p)
+        (fun p hp => hp.1.hasFDerivAt.hasFDerivWithinAt)
+        (fun p hp => hp.2)
+    rw [← compl_mem_ae_iff] at hnull
+    filter_upwards [hnull] with t ht z hz hw0 hs0 hsk hdet
+    apply ht
+    set F : EuclideanSpace ℂ (Fin n) → EuclideanSpace ℂ (Fin n) := fun y => WithLp.toLp 2 fun k : Fin n =>
+          (∑ j, t (k.succ, j) * w j y) / ∑ j, t (0, j) * w j y with hF
+    have hwz : ∀ j, DifferentiableAt ℂ (w j) z := fun j => (hw j).differentiableAt (hU.mem_nhds hz)
+    set A : EuclideanSpace ℂ (Fin n) → (Fin (n + 1) × Fin N → ℂ) :=
+      fun y => t + colInc j0 (y - colProj j0 t) with hA
+    have hπA : ∀ y, colProj j0 (A y) = y := fun y => by simp [hA, colProj_colInc]
+    have hGA : ∀ y, w j0 y ≠ 0 → G (A y) = t - colInc j0 (S t y) := by
+      intro y hy
+      have : S (A y) y = S t y + (y - colProj j0 t) := by
+        ext k
+        simp only [hS, hA, Pi.add_apply, colInc_apply, add_mul, Finset.sum_add_distrib, ite_mul,
+          zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true, PiLp.add_apply]
+        field_simp
+      simp only [hG, hπA, this]
+      simp only [hA, map_add (f := _)]
+      abel
+    have hSz : S t z = 0 := by
       ext k
-      simp only [hS, hA, Pi.add_apply, colInc_apply, add_mul, Finset.sum_add_distrib, ite_mul, zero_mul,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true, PiLp.add_apply]
-      field_simp
-    simp only [hG, hπA, this]
-    simp only [hA, map_add (f := _)]
-    abel
-  have hSz : S t z = 0 := by
-    ext k
-    simp [hS, hsk]
-  have hFz : F z = 0 := by
-    ext k
-    simp [hF, hsk]
-  have hsum : ∀ i, DifferentiableAt ℂ (fun y => ∑ j, t (i, j) * w j y) z := fun i =>
-    DifferentiableAt.fun_sum fun j _ => (hwz j).const_mul _
-  have hFd : DifferentiableAt ℂ F z := by
-    refine (differentiableAt_piLp 2).2 fun k => ?_
-    have := (hsum k.succ).mul ((hsum 0).inv hs0)
-    simp only [hF, div_eq_mul_inv]
-    exact this
-  have hGd : DifferentiableAt ℂ G (A z) := by
-    refine differentiableAt_id.sub ((colInc j0).differentiableAt.comp _ ?_)
-    have hwp : ∀ j, DifferentiableAt ℂ (fun p => w j (colProj j0 p)) (A z) := fun j =>
-      DifferentiableAt.comp _ (by rw [hπA]; exact hwz j) (colProj j0).differentiableAt
-    refine (differentiableAt_piLp 2).2 fun k => ?_
-    have h1 : DifferentiableAt ℂ (fun p : Fin (n + 1) × Fin N → ℂ =>
-        ∑ j, p (k.succ, j) * w j (colProj j0 p)) (A z) :=
-      DifferentiableAt.fun_sum fun j _ => (differentiableAt_apply _ _).mul (hwp j)
-    have := h1.mul ((hwp j0).inv (by rw [hπA]; exact hw0))
-    simp only [hS, div_eq_mul_inv]
-    exact this
-  refine ⟨A z, ⟨hGd.restrictScalars ℝ, ?_⟩, by rw [hGA z hw0, hSz, map_zero, sub_zero]⟩
-  obtain ⟨v, hv, hv0⟩ : ∃ v, fderiv ℂ F z v = 0 ∧ v ≠ 0 := by
-    have := LinearMap.det_eq_zero_iff_ker_ne_bot.1 hdet
-    obtain ⟨v, hv, hv0⟩ := (Submodule.ne_bot_iff _).1 this
-    exact ⟨v, hv, hv0⟩
-  set c : EuclideanSpace ℂ (Fin n) → ℂ := fun y => (∑ j, t (0, j) * w j y) * (w j0 y)⁻¹ with hc
-  have hcd : DifferentiableAt ℂ c z := (hsum 0).mul ((hwz j0).inv hw0)
-  have hev : G ∘ A =ᶠ[𝓝 z] fun y => t - colInc j0 (c y • F y) := by
-    filter_upwards [(hwz j0).continuousAt.eventually_ne hw0, (hsum 0).continuousAt.eventually_ne hs0]
-      with y h1 h2
-    have : S t y = c y • F y := by
+      simp [hS, hsk]
+    have hFz : F z = 0 := by
       ext k
-      simp only [hS, hc, hF, PiLp.smul_apply, smul_eq_mul]
-      field_simp
-    rw [← this]
-    exact hGA y h1
-  have hAd : HasFDerivAt A (colInc j0) z := by
-    have := (((colInc j0).hasFDerivAt (x := z - colProj j0 t)).comp z
-      ((hasFDerivAt_id z).sub_const (colProj j0 t))).const_add t
-    rw [ContinuousLinearMap.comp_id] at this
-    exact this
-  have e1 := hGd.hasFDerivAt.comp z hAd
-  have e2 := (((colInc j0).hasFDerivAt).comp z (hcd.hasFDerivAt.smul hFd.hasFDerivAt)).const_sub t
-  have e3 := e1.unique (e2.congr_of_eventuallyEq hev)
-  have e4 : fderiv ℂ G (A z) (colInc j0 v) = 0 := by
-    have := congrArg (fun L => L v) e3
-    simpa [hv, hFz] using this
-  have e5 : fderiv ℝ G (A z) (colInc j0 v) = 0 := by
-    rw [(hGd.hasFDerivAt.restrictScalars ℝ).fderiv]
-    exact e4
-  refine LinearMap.det_eq_zero_iff_ker_ne_bot.2 ((Submodule.ne_bot_iff _).2 ⟨colInc j0 v, e5, fun h => hv0 ?_⟩)
-  rw [← colProj_colInc j0 v, h, map_zero]
+      simp [hF, hsk]
+    have hsum : ∀ i, DifferentiableAt ℂ (fun y => ∑ j, t (i, j) * w j y) z := fun i =>
+      DifferentiableAt.fun_sum fun j _ => (hwz j).const_mul _
+    have hFd : DifferentiableAt ℂ F z := by
+      refine (differentiableAt_piLp 2).2 fun k => ?_
+      have := (hsum k.succ).mul ((hsum 0).inv hs0)
+      simp only [hF, div_eq_mul_inv]
+      exact this
+    have hGd : DifferentiableAt ℂ G (A z) := by
+      refine differentiableAt_id.sub ((colInc j0).differentiableAt.comp _ ?_)
+      have hwp : ∀ j, DifferentiableAt ℂ (fun p => w j (colProj j0 p)) (A z) := fun j =>
+        DifferentiableAt.comp _ (by rw [hπA]; exact hwz j) (colProj j0).differentiableAt
+      refine (differentiableAt_piLp 2).2 fun k => ?_
+      have h1 : DifferentiableAt ℂ
+          (fun p : Fin (n + 1) × Fin N → ℂ => ∑ j, p (k.succ, j) * w j (colProj j0 p))
+          (A z) :=
+        DifferentiableAt.fun_sum fun j _ => (differentiableAt_apply _ _).mul (hwp j)
+      have := h1.mul ((hwp j0).inv (by rw [hπA]; exact hw0))
+      simp only [hS, div_eq_mul_inv]
+      exact this
+    refine ⟨A z, ⟨hGd.restrictScalars ℝ, ?_⟩, by rw [hGA z hw0, hSz, map_zero, sub_zero]⟩
+    obtain ⟨v, hv, hv0⟩ : ∃ v, fderiv ℂ F z v = 0 ∧ v ≠ 0 := by
+      have := LinearMap.det_eq_zero_iff_ker_ne_bot.1 hdet
+      obtain ⟨v, hv, hv0⟩ := (Submodule.ne_bot_iff _).1 this
+      exact ⟨v, hv, hv0⟩
+    set c : EuclideanSpace ℂ (Fin n) → ℂ := fun y => (∑ j, t (0, j) * w j y) * (w j0 y)⁻¹ with hc
+    have hcd : DifferentiableAt ℂ c z := (hsum 0).mul ((hwz j0).inv hw0)
+    have hev : G ∘ A =ᶠ[𝓝 z] fun y => t - colInc j0 (c y • F y) := by
+      filter_upwards [(hwz j0).continuousAt.eventually_ne hw0, (hsum 0).continuousAt.eventually_ne hs0]
+        with y h1 h2
+      have : S t y = c y • F y := by
+        ext k
+        simp only [hS, hc, hF, PiLp.smul_apply, smul_eq_mul]
+        field_simp
+      rw [← this]
+      exact hGA y h1
+    have hAd : HasFDerivAt A (colInc j0) z := by
+      have :=
+        (((colInc j0).hasFDerivAt (x := z - colProj j0 t)).comp z
+          ((hasFDerivAt_id z).sub_const (colProj j0 t))).const_add t
+      rw [ContinuousLinearMap.comp_id] at this
+      exact this
+    have e1 := hGd.hasFDerivAt.comp z hAd
+    have e2 := (((colInc j0).hasFDerivAt).comp z (hcd.hasFDerivAt.smul hFd.hasFDerivAt)).const_sub t
+    have e3 := e1.unique (e2.congr_of_eventuallyEq hev)
+    have e4 : fderiv ℂ G (A z) (colInc j0 v) = 0 := by
+      have := congrArg (fun L => L v) e3
+      simpa [hv, hFz] using this
+    have e5 : fderiv ℝ G (A z) (colInc j0 v) = 0 := by
+      rw [(hGd.hasFDerivAt.restrictScalars ℝ).fderiv]
+      exact e4
+    refine LinearMap.det_eq_zero_iff_ker_ne_bot.2 ((Submodule.ne_bot_iff _).2
+      ⟨colInc j0 v, e5, fun h => hv0 ?_⟩)
+    rw [← colProj_colInc j0 v, h, map_zero]
 
-theorem ae_simple {n N : ℕ} (U : Set (EuclideanSpace ℂ (Fin n))) (hU : IsOpen U)
-    (w : Fin N → EuclideanSpace ℂ (Fin n) → ℂ) (hw : ∀ j, DifferentiableOn ℂ (w j) U) :
-    ∀ᵐ t : Fin (n + 1) × Fin N → ℂ, ∀ z ∈ U, ∑ j, t (0, j) * w j z ≠ 0 →
-      (∀ k : Fin n, ∑ j, t (k.succ, j) * w j z = 0) →
-      (fderiv ℂ (fun y => (WithLp.toLp 2 fun k : Fin n =>
-        (∑ j, t (k.succ, j) * w j y) / ∑ j, t (0, j) * w j y : EuclideanSpace ℂ (Fin n))) z).det ≠ 0 := by
-  filter_upwards [ae_all_iff.2 (ae_simple_col U hU w hw)] with t ht z hz h0 hk
-  obtain ⟨j, -, hj⟩ := Finset.exists_ne_zero_of_sum_ne_zero h0
-  exact ht j z hz (right_ne_zero_of_mul hj) h0 hk
+theorem ae_simple
+    {n N : ℕ} (U : Set (EuclideanSpace ℂ (Fin n))) (hU : IsOpen U)
+    (w : Fin N → EuclideanSpace ℂ (Fin n) → ℂ) (hw : ∀ j, DifferentiableOn ℂ (w j) U)
+    : ∀ᵐ t : Fin (n + 1) × Fin N → ℂ, ∀ z ∈ U, ∑ j, t (0, j) * w j z ≠ 0 →
+        (∀ k : Fin n, ∑ j, t (k.succ, j) * w j z = 0) →
+        (fderiv ℂ (fun y => (WithLp.toLp 2 fun k : Fin n =>
+          (∑ j, t (k.succ, j) * w j y) / ∑ j, t (0, j) * w j y : EuclideanSpace ℂ (Fin n))) z).det ≠ 0 :=
+  by
+    filter_upwards [ae_all_iff.2 (ae_simple_col U hU w hw)] with t ht z hz h0 hk
+    obtain ⟨j, -, hj⟩ := Finset.exists_ne_zero_of_sum_ne_zero h0
+    exact ht j z hz (right_ne_zero_of_mul hj) h0 hk
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_cell {r : ℕ} (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X x0) :
-    ∃ O : Set (Frame X.Ψ r), IsOpen O ∧ (∀ b ∈ Bor X.Ψ r, rmul x0 b ∈ O) ∧
-      ∀ y ∈ O, ∃ z ∈ OmF X x0, ∃ b ∈ Bor X.Ψ r, y = rmul (cpt X x0 z) b ∧
-      ∀ (L : Wt X.Ψ r) (w0 : Frame X.Ψ r → ℂ) (s : Fin (nd X) → Frame X.Ψ r → ℂ), IsBEq X L w0 →
-        (∀ k, IsBEq X L (s k)) → w0 (cpt X x0 z) ≠ 0 →
-        (fderiv ℂ (fun u : V (nd X) => (WithLp.toLp 2 fun k =>
-          s k (cpt X x0 u) / w0 (cpt X x0 u) : V (nd X))) z).det ≠ 0 →
-        (fderiv ℂ (fun u : V (nd X) => (WithLp.toLp 2 fun k =>
-          s k (cpt X y u) / w0 (cpt X y u) : V (nd X))) 0).det ≠ 0 := by
+theorem exists_cell {r : ℕ} (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X x0)
+    : ∃ O : Set (Frame X.Ψ r),
+      IsOpen O ∧ (∀ b ∈ Bor X.Ψ r, rmul x0 b ∈ O)
+        ∧ ∀ y ∈ O, ∃ z ∈ OmF X x0, ∃ b ∈ Bor X.Ψ r,
+          y = rmul (cpt X x0 z) b
+            ∧ ∀ (L : Wt X.Ψ r) (w0 : Frame X.Ψ r → ℂ) (s : Fin (nd X) → Frame X.Ψ r → ℂ),
+              IsBEq X L w0 → (∀ k, IsBEq X L (s k)) → w0 (cpt X x0 z) ≠ 0
+                → (fderiv ℂ
+                    (fun u : V (nd X) =>
+                      (WithLp.toLp 2 fun k => s k (cpt X x0 u) / w0 (cpt X x0 u) : V (nd X)))
+                    z).det
+                  ≠ 0
+                → (fderiv ℂ
+                    (fun u : V (nd X) =>
+                      (WithLp.toLp 2 fun k => s k (cpt X y u) / w0 (cpt X y u) : V (nd X)))
+                    0).det
+                  ≠ 0 := by
   have hod : x0 ∈ X.dom := IW.orth_mem_dom X _ ho
   obtain ⟨Δ, zOf, bOf, hΔ, -, hz, -, hsplit, huniq⟩ := lu_holds r X x0 ho
   have hO : IsOpen {x | x ∈ X.dom ∧ Δ x ≠ 0} :=
@@ -183,9 +204,15 @@ theorem exists_cell {r : ℕ} (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X 
     show zOf (cpt X y 0) = _
     rw [IW.cpt_zero]
   have hJ : (fderiv ℂ Φ 0).det = bchar (kapW X) (bOf (cpt X y 0)) :=
-    KapPf.kappa_statement_holds r X y x0 1 U Φ (fun u => bOf (cpt X y u)) hU hΦ
-      (fun u hu => ⟨hu.1, (hsplit _ hu.1 hu.2).2.1, by
-        rw [FundSetPf.lact_one]; exact (hsplit _ hu.1 hu.2).2.2⟩) 0 h0U
+    KapPf.kappa_statement_holds r X y x0 1 U Φ
+      (fun u => bOf (cpt X y u))
+      hU hΦ
+      (fun u hu => ⟨
+        hu.1,
+        (hsplit _ hu.1 hu.2).2.1,
+        by rw [FundSetPf.lact_one]; exact (hsplit _ hu.1 hu.2).2.2
+      ⟩)
+      0 h0U
   have hJ0 : (fderiv ℂ Φ 0).det ≠ 0 := hJ ▸ OntoE.bchar_ne X _ (hsplit _ h0U.1 h0U.2).2.1
   have hΦd : DifferentiableAt ℂ Φ 0 := hΦ.differentiableAt (hU.mem_nhds h0U)
   have hnx : OmF X x0 ∈ 𝓝 (zOf y) := (OntoB.isOpen_OmF X x0).mem_nhds h1
@@ -201,8 +228,9 @@ theorem exists_cell {r : ℕ} (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X 
     have := (hsk k).mul (hw.inv hwx)
     simp only [div_eq_mul_inv]
     exact this
-  have hev : (fun u : V (nd X) => (WithLp.toLp 2 fun k =>
-      s k (cpt X y u) / w0 (cpt X y u) : V (nd X))) =ᶠ[𝓝 0] F ∘ Φ := by
+  have hev
+      : (fun u : V (nd X) => (WithLp.toLp 2 fun k =>
+        s k (cpt X y u) / w0 (cpt X y u) : V (nd X))) =ᶠ[𝓝 0] F ∘ Φ := by
     filter_upwards [hU.mem_nhds h0U] with u hu
     obtain ⟨g1, g2, g3⟩ := hsplit _ hu.1 hu.2
     have g1' : cpt X x0 (zOf (cpt X y u)) ∈ X.dom := g1
@@ -216,8 +244,8 @@ theorem exists_cell {r : ℕ} (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X 
     rw [← g3] at a1 a2
     rw [a1, a2, mul_div_mul_left _ _ (OntoE.bchar_ne X L g2)]
   rw [hev.fderiv_eq, fderiv_comp 0 (by rwa [hΦ0]) hΦd, hΦ0]
-  have : ((fderiv ℂ F (zOf y)).comp (fderiv ℂ Φ 0)).det =
-      (fderiv ℂ F (zOf y)).det * (fderiv ℂ Φ 0).det := by
+  have : ((fderiv ℂ F (zOf y)).comp (fderiv ℂ Φ 0)).det
+      = (fderiv ℂ F (zOf y)).det * (fderiv ℂ Φ 0).det := by
     unfold ContinuousLinearMap.det
     rw [← LinearMap.det_comp]
     rfl

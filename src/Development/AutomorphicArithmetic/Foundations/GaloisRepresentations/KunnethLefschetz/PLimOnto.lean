@@ -6,15 +6,15 @@ public import Mathlib.CategoryTheory.CofilteredSystem
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 
-theorem UpperTheory.Gal.KunnethLefschetz.limOnto_holds :
-    UpperTheory.Gal.KunnethLefschetz.LimOnto := by
+theorem UpperTheory.Gal.KunnethLefschetz.limOnto_holds
+    : UpperTheory.Gal.KunnethLefschetz.LimOnto := by
   intro A B _ ra rb f hf z hz hsurj
   let F : ℕ → Type 1 := fun j => {a : A j // f j a = z j}
-  let g : ∀ n, F (n + 1) → F n := fun n a =>
-    ⟨ra n a.1, by rw [← hf, a.2, hz]⟩
+  let g : ∀ n, F (n + 1) → F n := fun n a => ⟨ra n a.1, by rw [← hf, a.2, hz]⟩
   let G : ℕᵒᵖ ⥤ Type 1 := Functor.ofOpSequence (X := F) (fun n => TypeCat.ofHom (g n))
   haveI : ∀ j : ℕᵒᵖ, Finite (G.obj j) := fun j => (inferInstance : Finite (F j.unop))
   haveI : ∀ j : ℕᵒᵖ, Nonempty (G.obj j) := fun j => by

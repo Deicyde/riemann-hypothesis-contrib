@@ -8,8 +8,11 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.USt
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge GlobalTheory.CompanionTheory.Axis
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+  GlobalTheory.CompanionTheory.Axis
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
@@ -18,17 +21,22 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Axis
 
-theorem rTensor_coords_bijective {R : Type} [CommRing R] {I : Type} [Finite I] {P : Type}
-    [AddCommGroup P] [Module R P] (M : I → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)]
-    (e : P ≃ₗ[R] ∀ i, M i) (N : Type) [AddCommGroup N] [Module R N] :
-    Function.Bijective (LinearMap.pi fun i =>
+theorem rTensor_coords_bijective
+    {R : Type} [CommRing R]
+    {I : Type} [Finite I]
+    {P : Type} [AddCommGroup P] [Module R P]
+    (M : I → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)]
+    (e : P ≃ₗ[R] ∀ i, M i)
+    (N : Type) [AddCommGroup N] [Module R N]
+    : Function.Bijective (LinearMap.pi fun i =>
       ((LinearMap.proj i : (∀ i, M i) →ₗ[R] M i) ∘ₗ e.toLinearMap).rTensor N) := by
   classical
   cases nonempty_fintype I
-  have hcomp : (LinearMap.pi fun i =>
-      ((LinearMap.proj i : (∀ i, M i) →ₗ[R] M i) ∘ₗ e.toLinearMap).rTensor N) =
-      (TensorProduct.piLeft (R := R) (N := N) (M := M)).toLinearMap ∘ₗ
-        (LinearEquiv.rTensor N e).toLinearMap := by
+  have hcomp
+      : (LinearMap.pi fun i =>
+          ((LinearMap.proj i : (∀ i, M i) →ₗ[R] M i) ∘ₗ e.toLinearMap).rTensor N)
+        = (TensorProduct.piLeft (R := R) (N := N) (M := M)).toLinearMap
+          ∘ₗ (LinearEquiv.rTensor N e).toLinearMap := by
     apply TensorProduct.ext'
     intro p n
     funext i
@@ -49,8 +57,9 @@ def oneCochainsPiArrowsEquiv : C1 F ≃ₗ[R] ∀ a : (Σ T : C, Σ T' : C, (T �
   left_inv _ := rfl
   right_inv _ := rfl
 
-def twoCochainsPiComposableEquiv : C2 F ≃ₗ[R]
-    ∀ a : (Σ T : C, Σ T' : C, Σ T'' : C, (T ⟶ T') × (T' ⟶ T'')), F.obj a.2.2.1 where
+def twoCochainsPiComposableEquiv
+    : C2 F ≃ₗ[R]
+      ∀ a : (Σ T : C, Σ T' : C, Σ T'' : C, (T ⟶ T') × (T' ⟶ T'')), F.obj a.2.2.1 where
   toFun f a := f a.1 a.2.1 a.2.2.1 a.2.2.2.1 a.2.2.2.2
   invFun g T T' T'' φ ψ := g ⟨T, T', T'', φ, ψ⟩
   map_add' _ _ := rfl
@@ -63,23 +72,25 @@ def evC {T T' : C} (φ : T ⟶ T') : C1 F →ₗ[R] F.obj T' where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem evaluation_comp_coboundary_one {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') :
-    (LinearMap.proj (⟨T, T', T'', φ, ψ⟩ : Σ T : C, Σ T' : C, Σ T'' : C, (T ⟶ T') × (T' ⟶ T'')) :
-        (∀ a : (Σ T : C, Σ T' : C, Σ T'' : C, (T ⟶ T') × (T' ⟶ T'')), F.obj a.2.2.1) →ₗ[R] _) ∘ₗ
-      (twoCochainsPiComposableEquiv F).toLinearMap ∘ₗ d1 F =
-    (mp F ψ).toLinearMap ∘ₗ evC F φ - evC F (φ ≫ ψ) + evC F ψ := by
+theorem evaluation_comp_coboundary_one {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'')
+    : (LinearMap.proj (⟨T, T', T'', φ, ψ⟩ : Σ T : C, Σ T' : C, Σ T'' : C, (T ⟶ T') × (T' ⟶ T''))
+          : (∀ a : (Σ T : C, Σ T' : C, Σ T'' : C, (T ⟶ T') × (T' ⟶ T'')), F.obj a.2.2.1) →ₗ[R] _)
+        ∘ₗ (twoCochainsPiComposableEquiv F).toLinearMap ∘ₗ d1 F
+      = (mp F ψ).toLinearMap ∘ₗ evC F φ - evC F (φ ≫ ψ) + evC F ψ := by
   ext f
   rfl
 
 end Cochains
 
-theorem cocycle_of_flat (R : Type) [CommRing R] (C : Type) [Category.{0} C] [Finite C]
-    [Quiver.IsThin C] (F : C ⥤ CommAlgCat.{0} R)
+theorem cocycle_of_flat
+    (R : Type) [CommRing R]
+    (C : Type) [Category.{0} C] [Finite C] [Quiver.IsThin C]
+    (F : C ⥤ CommAlgCat.{0} R)
     (N : Type) [AddCommGroup N] [Module R N] [Module.Flat R N]
     (f : ∀ (T T' : C) (_ : T ⟶ T'), F.obj T' ⊗[R] N)
     (hf : ∀ (T T' T'' : C) (φ : T ⟶ T') (ψ : T' ⟶ T''),
-      f T T'' (φ ≫ ψ) = (mp F ψ).toLinearMap.rTensor N (f T T' φ) + f T' T'' ψ) :
-    ∃ t : Z1 F ⊗[R] N, ∀ (T T' : C) (φ : T ⟶ T'), (evZ F φ).rTensor N t = f T T' φ := by
+      f T T'' (φ ≫ ψ) = (mp F ψ).toLinearMap.rTensor N (f T T' φ) + f T' T'' ψ)
+    : ∃ t : Z1 F ⊗[R] N, ∀ (T T' : C) (φ : T ⟶ T'), (evZ F φ).rTensor N t = f T T' φ := by
   haveI : ∀ T T' : C, Finite (T ⟶ T') := fun _ _ => Finite.of_subsingleton
   have b1 := rTensor_coords_bijective (R := R) _ (oneCochainsPiArrowsEquiv F) N
   have b2 := rTensor_coords_bijective (R := R) _ (twoCochainsPiComposableEquiv F) N
@@ -92,7 +103,8 @@ theorem cocycle_of_flat (R : Type) [CommRing R] (C : Type) [Category.{0} C] [Fin
     funext ⟨T, T', T'', φ, ψ⟩
     have h := congrArg (fun g => LinearMap.rTensor N g v) (evaluation_comp_coboundary_one F φ ψ)
     simp only [LinearMap.rTensor_add, LinearMap.rTensor_sub, LinearMap.rTensor_comp,
-      LinearMap.add_apply, LinearMap.sub_apply, LinearMap.comp_apply, hv'] at h
+        LinearMap.add_apply, LinearMap.sub_apply, LinearMap.comp_apply, hv']
+      at h
     rw [hf T T' T'' φ ψ] at h
     simp only [LinearMap.pi_apply, Pi.zero_apply, LinearMap.rTensor_comp, LinearMap.comp_apply]
     rw [h]

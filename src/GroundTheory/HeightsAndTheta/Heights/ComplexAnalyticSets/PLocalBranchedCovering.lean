@@ -19,41 +19,52 @@ open MvPolynomial Topology Matrix
 
 namespace LocalBranchedCovering
 
-theorem isolated_of_finite {E : Type*} [TopologicalSpace E] [T1Space E] {F : Set E} (hF : F.Finite) (z : E) :
-    ∃ N ∈ 𝓝 z, ∀ z' ∈ N, z' ∈ F → z' = z := by
-  refine ⟨(F \ {z})ᶜ, (hF.subset Set.sdiff_subset).isClosed.compl_mem_nhds (fun h => h.2 rfl),
-    fun z' h1 h2 => ?_⟩
+theorem isolated_of_finite
+    {E : Type*} [TopologicalSpace E] [T1Space E] {F : Set E} (hF : F.Finite) (z : E)
+    : ∃ N ∈ 𝓝 z, ∀ z' ∈ N, z' ∈ F → z' = z := by
+  refine ⟨
+    (F \ {z})ᶜ,
+    (hF.subset Set.sdiff_subset).isClosed.compl_mem_nhds (fun h => h.2 rfl),
+    fun z' h1 h2 => ?_
+  ⟩
   by_contra hne
   exact h1 ⟨h2, hne⟩
 
-theorem of_sheets {σ : Type} [Fintype σ] {k : ℕ} (Z : Set (σ → ℂ)) (hZ : IsClosed Z)
-    (A : (σ → ℂ) →L[ℂ] (Fin k → ℂ)) (P : MvPolynomial (Fin k) ℂ) (hP : P ≠ 0)
+theorem of_sheets
+    {σ : Type} [Fintype σ]
+    {k : ℕ}
+    (Z : Set (σ → ℂ)) (hZ : IsClosed Z)
+    (A : (σ → ℂ) →L[ℂ] (Fin k → ℂ))
+    (P : MvPolynomial (Fin k) ℂ) (hP : P ≠ 0)
     (hfin : ∀ y, {z | z ∈ Z ∧ A z = y}.Finite)
-    (hsheet : ∀ y, eval y P ≠ 0 → ∃ (O : Set (Fin k → ℂ)) (N : ℕ) (s : Fin N → (Fin k → ℂ) → σ → ℂ),
-      IsOpen O ∧ y ∈ O ∧ (∀ j, DifferentiableOn ℂ (s j) O) ∧
-      ∀ y' ∈ O, (∀ j, s j y' ∈ Z ∧ A (s j y') = y') ∧ Function.Injective (fun j => s j y') ∧
-        ∀ z ∈ Z, A z = y' → z ∈ Set.range (fun j => s j y'))
-    (hopen : ∀ z ∈ Z, (∃ N ∈ 𝓝 z, ∀ z' ∈ N, z' ∈ Z → A z' = A z → z' = z) →
-      ∀ W' ∈ 𝓝 z, A '' (Z ∩ W') ∈ 𝓝 (A z))
-    (w : σ → ℂ) (U : Set (σ → ℂ)) (hU : U ∈ 𝓝 w) :
-    ∃ (W : Set (σ → ℂ)) (D : Set (Fin k → ℂ)) (m : ℕ) (δ : (Fin k → ℂ) → ℂ),
-      IsOpen W ∧ w ∈ W ∧ IsCompact (closure W) ∧ closure W ⊆ U ∧ IsOpen D ∧ A w ∈ D ∧
-      (∀ z ∈ Z ∩ W, A z = A w → z = w) ∧
-      (∀ z ∈ Z ∩ closure W, A z ∈ D → z ∈ W) ∧
-      DifferentiableOn ℂ δ D ∧
-      (∀ V : Set (Fin k → ℂ), IsOpen V → V ⊆ D → V.Nonempty → ∃ t ∈ V, δ t ≠ 0) ∧
-      (∀ y ∈ D, δ y ≠ 0 → ∃ (O : Set (Fin k → ℂ)) (s : Fin m → (Fin k → ℂ) → σ → ℂ),
-        IsOpen O ∧ y ∈ O ∧ (∀ j, DifferentiableOn ℂ (s j) O) ∧
-        ∀ y' ∈ O, (∀ j, s j y' ∈ Z ∩ W ∧ A (s j y') = y') ∧
-          Function.Injective (fun j => s j y') ∧
-          ∀ z ∈ Z ∩ W, A z = y' → z ∈ Set.range (fun j => s j y')) ∧
-      ∀ z ∈ Z ∩ W, ∀ ε > 0, A '' (Z ∩ Metric.ball z ε) ∈ 𝓝 (A z) := by
+    (hsheet : ∀ y,
+      eval y P ≠ 0
+        → ∃ (O : Set (Fin k → ℂ)) (N : ℕ) (s : Fin N → (Fin k → ℂ) → σ → ℂ),
+          IsOpen O ∧ y ∈ O ∧ (∀ j, DifferentiableOn ℂ (s j) O)
+            ∧ ∀ y' ∈ O,
+              (∀ j, s j y' ∈ Z ∧ A (s j y') = y') ∧ Function.Injective (fun j => s j y')
+                ∧ ∀ z ∈ Z, A z = y' → z ∈ Set.range (fun j => s j y'))
+    (hopen : ∀ z ∈ Z,
+      (∃ N ∈ 𝓝 z, ∀ z' ∈ N, z' ∈ Z → A z' = A z → z' = z) → ∀ W' ∈ 𝓝 z, A '' (Z ∩ W') ∈ 𝓝 (A z))
+    (w : σ → ℂ) (U : Set (σ → ℂ)) (hU : U ∈ 𝓝 w)
+    : ∃ (W : Set (σ → ℂ)) (D : Set (Fin k → ℂ)) (m : ℕ) (δ : (Fin k → ℂ) → ℂ),
+      IsOpen W ∧ w ∈ W ∧ IsCompact (closure W) ∧ closure W ⊆ U ∧ IsOpen D ∧ A w ∈ D
+        ∧ (∀ z ∈ Z ∩ W, A z = A w → z = w) ∧ (∀ z ∈ Z ∩ closure W, A z ∈ D → z ∈ W)
+        ∧ DifferentiableOn ℂ δ D
+        ∧ (∀ V : Set (Fin k → ℂ), IsOpen V → V ⊆ D → V.Nonempty → ∃ t ∈ V, δ t ≠ 0)
+        ∧ (∀ y ∈ D,
+          δ y ≠ 0
+            → ∃ (O : Set (Fin k → ℂ)) (s : Fin m → (Fin k → ℂ) → σ → ℂ),
+              IsOpen O ∧ y ∈ O ∧ (∀ j, DifferentiableOn ℂ (s j) O)
+                ∧ ∀ y' ∈ O,
+                  (∀ j, s j y' ∈ Z ∩ W ∧ A (s j y') = y') ∧ Function.Injective (fun j => s j y')
+                    ∧ ∀ z ∈ Z ∩ W, A z = y' → z ∈ Set.range (fun j => s j y'))
+        ∧ ∀ z ∈ Z ∩ W, ∀ ε > 0, A '' (Z ∩ Metric.ball z ε) ∈ 𝓝 (A z) := by
   classical
-
   obtain ⟨N₀, hN₀, hN₀w⟩ := isolated_of_finite (hfin (A w)) w
   obtain ⟨r, hr, hrU⟩ := Metric.nhds_basis_closedBall.mem_iff.1 (Filter.inter_mem hU hN₀)
-  have hfib : ∀ z ∈ Metric.closedBall w r, z ∈ Z → A z = A w → z = w :=
-    fun z hz hzZ hzA => hN₀w z (hrU hz).2 ⟨hzZ, hzA⟩
+  have hfib : ∀ z ∈ Metric.closedBall w r, z ∈ Z → A z = A w → z = w := fun z hz hzZ hzA =>
+    hN₀w z (hrU hz).2 ⟨hzZ, hzA⟩
   have hclos : closure (Metric.ball w r) = Metric.closedBall w r := closure_ball w hr.ne'
 
   have hKc : IsCompact (A '' (Z ∩ Metric.sphere w r)) :=
@@ -65,26 +76,32 @@ theorem of_sheets {σ : Type} [Fintype σ] {k : ℕ} (Z : Set (σ → ℂ)) (hZ 
     exact hr.ne hzs
   obtain ⟨ρ, hρ, hρK⟩ := Metric.isOpen_iff.1 hKc.isClosed.isOpen_compl (A w) hwK
 
-  have hprop : ∀ z ∈ Z ∩ Metric.closedBall w r, A z ∈ Metric.ball (A w) ρ → z ∈ Metric.ball w r := by
+  have hprop
+      : ∀ z ∈ Z ∩ Metric.closedBall w r, A z ∈ Metric.ball (A w) ρ → z ∈ Metric.ball w r := by
     rintro z ⟨hzZ, hzb⟩ hzD
     by_contra hzW
     have hzs : z ∈ Metric.sphere w r :=
       le_antisymm (Metric.mem_closedBall.1 hzb) (not_lt.1 (fun h => hzW (Metric.mem_ball.2 h)))
     exact hρK hzD ⟨z, ⟨hzZ, hzs⟩, rfl⟩
 
-  have hδa : AnalyticOnNhd ℂ (fun y : Fin k → ℂ => eval y P) Set.univ := AnalyticOnNhd.eval_mvPolynomial P
+  have hδa : AnalyticOnNhd ℂ (fun y : Fin k → ℂ => eval y P) Set.univ :=
+    AnalyticOnNhd.eval_mvPolynomial P
   have hdense := HilbertSamuel.IrreducibleBasicOpenConnected.dense_ne_zero hP
-  have hδV : ∀ V : Set (Fin k → ℂ), IsOpen V → V ⊆ Metric.ball (A w) ρ → V.Nonempty →
-      ∃ t ∈ V, eval t P ≠ 0 := by
+  have hδV
+      : ∀ V : Set (Fin k → ℂ),
+        IsOpen V → V ⊆ Metric.ball (A w) ρ → V.Nonempty → ∃ t ∈ V, eval t P ≠ 0 := by
     intro V hV _ hVn
     obtain ⟨t, ht⟩ := hdense.inter_open_nonempty V hV hVn
     exact ⟨t, ht.1, ht.2⟩
 
-  have hloc : ∀ y ∈ Metric.ball (A w) ρ, eval y P ≠ 0 → ∃ (O : Set (Fin k → ℂ)) (N : ℕ)
-      (s : Fin N → (Fin k → ℂ) → σ → ℂ) (S : Finset (Fin N)),
-      IsOpen O ∧ y ∈ O ∧ O ⊆ Metric.ball (A w) ρ ∧ (∀ j, DifferentiableOn ℂ (s j) O) ∧
-      ∀ y' ∈ O, (∀ j, s j y' ∈ Z ∧ A (s j y') = y') ∧ Function.Injective (fun j => s j y') ∧
-        {z | z ∈ Z ∩ Metric.ball w r ∧ A z = y'} = (fun j => s j y') '' S := by
+  have hloc
+      : ∀ y ∈ Metric.ball (A w) ρ,
+        eval y P ≠ 0
+          → ∃ (O : Set (Fin k → ℂ)) (N : ℕ) (s : Fin N → (Fin k → ℂ) → σ → ℂ) (S : Finset (Fin N)),
+            IsOpen O ∧ y ∈ O ∧ O ⊆ Metric.ball (A w) ρ ∧ (∀ j, DifferentiableOn ℂ (s j) O)
+              ∧ ∀ y' ∈ O,
+                (∀ j, s j y' ∈ Z ∧ A (s j y') = y') ∧ Function.Injective (fun j => s j y')
+                  ∧ {z | z ∈ Z ∩ Metric.ball w r ∧ A z = y'} = (fun j => s j y') '' S := by
     intro y hyD hy
     obtain ⟨O₁, N, s, hO₁, hyO₁, hsd, hs⟩ := hsheet y hy
     have hcont : ∀ j, ContinuousAt (s j) y := fun j =>
@@ -101,13 +118,23 @@ theorem of_sheets {σ : Type} [Fintype σ] {k : ℕ} (Z : Set (σ → ℂ)) (hZ 
         filter_upwards [hcont j (Metric.isClosed_closedBall.isOpen_compl.mem_nhds hnc)] with y' hy'
         simp only [S, Finset.mem_filter, Finset.mem_univ, true_and]
         exact iff_of_false (fun h => hy' (Metric.ball_subset_closedBall h)) hj
-    have hev : ∀ᶠ y' in 𝓝 y, y' ∈ O₁ ∧ y' ∈ Metric.ball (A w) ρ ∧
-        ∀ j, (s j y' ∈ Metric.ball w r ↔ j ∈ S) :=
+    have hev
+        : ∀ᶠ y' in 𝓝 y, y' ∈ O₁ ∧ y' ∈ Metric.ball (A w) ρ ∧
+          ∀ j, (s j y' ∈ Metric.ball w r ↔ j ∈ S) :=
       Filter.Eventually.and (hO₁.mem_nhds hyO₁)
         (Filter.Eventually.and (Metric.isOpen_ball.mem_nhds hyD) (Filter.eventually_all.2 hT))
     obtain ⟨O, hOsub, hO, hyO⟩ := mem_nhds_iff.1 hev
-    refine ⟨O, N, s, S, hO, hyO, fun y' h => (hOsub h).2.1,
-      fun j => (hsd j).mono fun y' h => (hOsub h).1, ?_⟩
+    refine ⟨
+      O,
+      N,
+      s,
+      S,
+      hO,
+      hyO,
+      fun y' h => (hOsub h).2.1,
+      fun j => (hsd j).mono fun y' h => (hOsub h).1,
+      ?_
+    ⟩
     intro y' hy'
     obtain ⟨h1, -, h3⟩ := hOsub hy'
     obtain ⟨hsec, hinj, hall⟩ := hs y' h1
@@ -120,11 +147,14 @@ theorem of_sheets {σ : Type} [Fintype σ] {k : ℕ} (Z : Set (σ → ℂ)) (hZ 
     · rintro ⟨j, hj, rfl⟩
       exact ⟨⟨(hsec j).1, (h3 j).2 hj⟩, (hsec j).2⟩
 
-  obtain ⟨c, hc⟩ : ∃ c : (Fin k → ℂ) → ℕ, ∀ y, c y = {z | z ∈ Z ∩ Metric.ball w r ∧ A z = y}.ncard :=
+  obtain ⟨c, hc⟩
+      : ∃ c : (Fin k → ℂ) → ℕ, ∀ y, c y = {z | z ∈ Z ∩ Metric.ball w r ∧ A z = y}.ncard :=
     ⟨_, fun _ => rfl⟩
-  have hcount : ∀ {N : ℕ} (s : Fin N → (Fin k → ℂ) → σ → ℂ) (S : Finset (Fin N)) (y' : Fin k → ℂ),
-      Function.Injective (fun j => s j y') →
-      {z | z ∈ Z ∩ Metric.ball w r ∧ A z = y'} = (fun j => s j y') '' S → c y' = S.card := by
+  have hcount
+      : ∀ {N : ℕ} (s : Fin N → (Fin k → ℂ) → σ → ℂ) (S : Finset (Fin N)) (y' : Fin k → ℂ),
+        Function.Injective (fun j => s j y')
+          → {z | z ∈ Z ∩ Metric.ball w r ∧ A z = y'} = (fun j => s j y') '' S
+          → c y' = S.card := by
     intro N s S y' hinj heq
     rw [hc, heq, Set.ncard_image_of_injective _ hinj, Set.ncard_coe_finset]
 
@@ -140,8 +170,24 @@ theorem of_sheets {σ : Type} [Fintype σ] {k : ℕ} (Z : Set (σ → ℂ)) (hZ 
       (convex_ball _ _) (hδa.mono (Set.subset_univ _))
   obtain ⟨y₀, hy₀⟩ : (Metric.ball (A w) ρ ∩ {y | eval y P ≠ 0}).Nonempty :=
     hdense.inter_open_nonempty _ Metric.isOpen_ball ⟨A w, Metric.mem_ball_self hρ⟩
-  refine ⟨Metric.ball w r, Metric.ball (A w) ρ, c y₀, fun y => eval y P, Metric.isOpen_ball,
-    Metric.mem_ball_self hr, ?_, ?_, Metric.isOpen_ball, Metric.mem_ball_self hρ, ?_, ?_, ?_, hδV, ?_, ?_⟩
+  refine ⟨
+    Metric.ball w r,
+    Metric.ball (A w) ρ,
+    c y₀,
+    fun y => eval y P,
+    Metric.isOpen_ball,
+    Metric.mem_ball_self hr,
+    ?_,
+    ?_,
+    Metric.isOpen_ball,
+    Metric.mem_ball_self hρ,
+    ?_,
+    ?_,
+    ?_,
+    hδV,
+    ?_,
+    ?_
+  ⟩
   · rw [hclos]
     exact isCompact_closedBall w r
   · rw [hclos]
@@ -179,11 +225,12 @@ theorem of_sheets {σ : Type} [Fintype σ] {k : ℕ} (Z : Set (σ → ℂ)) (hZ 
 
 end LocalBranchedCovering
 
-theorem LocalBranchedCovering.proof (hdsc : GroundTheory.Heights₂.Heights.DiscriminantSheetCover.Statement)
-    (hiso : IsolatedFibreOpen.Statement) : LocalBranchedCovering.Statement := by
+theorem LocalBranchedCovering.proof
+    (hdsc : GroundTheory.Heights₂.Heights.DiscriminantSheetCover.Statement)
+    (hiso : IsolatedFibreOpen.Statement)
+    : LocalBranchedCovering.Statement := by
   intro σ _ I w U hI _ hU
   classical
-
   let e : σ ≃ Fin (Fintype.card σ) := Fintype.equivFin σ
   let J : Ideal (MvPolynomial (Fin (Fintype.card σ)) ℂ) := I.comap (rename e.symm)
   have hJ : J.IsPrime := Ideal.comap_isPrime _ _
@@ -210,8 +257,9 @@ theorem LocalBranchedCovering.proof (hdsc : GroundTheory.Heights₂.Heights.Disc
 
   obtain ⟨d, hd⟩ := HilbertSamuel.IrreducibleBasicOpenConnected.exists_dim hJ
   obtain ⟨A₀, hA₀⟩ := ComplexSets.LinearNoetherNormalization.proof _ d J hd
-  let A : (σ → ℂ) →L[ℂ] (Fin d → ℂ) := LinearMap.toContinuousLinearMap
-    ((Matrix.toLin' A₀).comp (LinearEquiv.funCongrLeft ℂ ℂ e.symm).toLinearMap)
+  let A : (σ → ℂ) →L[ℂ] (Fin d → ℂ) :=
+    LinearMap.toContinuousLinearMap ((Matrix.toLin' A₀).comp
+      (LinearEquiv.funCongrLeft ℂ ℂ e.symm).toLinearMap)
   have hA : ∀ z, A z = A₀ *ᵥ Φ z := fun z => by
     simp [A, Matrix.toLin'_apply, LinearEquiv.funCongrLeft_apply]
     rfl
@@ -229,10 +277,14 @@ theorem LocalBranchedCovering.proof (hdsc : GroundTheory.Heights₂.Heights.Disc
     refine ⟨Φ z, ⟨(hZJ (Φ z)).2 (by rwa [hΨΦ]), by rw [← hA]; exact hzA⟩, hΨΦ z⟩
 
   obtain ⟨P, Uk, Dk, Nk, s, hP, hUD, -, hcov, -, hfib⟩ := hdsc _ d J A₀ hJ hd hA₀
-  have hsheet : ∀ y, eval y P ≠ 0 → ∃ (O : Set (Fin d → ℂ)) (N : ℕ) (t : Fin N → (Fin d → ℂ) → σ → ℂ),
-      IsOpen O ∧ y ∈ O ∧ (∀ j, DifferentiableOn ℂ (t j) O) ∧
-      ∀ y' ∈ O, (∀ j, t j y' ∈ zeroSetIn I ∧ A (t j y') = y') ∧ Function.Injective (fun j => t j y') ∧
-        ∀ z ∈ zeroSetIn I, A z = y' → z ∈ Set.range (fun j => t j y') := by
+  have hsheet
+      : ∀ y,
+        eval y P ≠ 0
+          → ∃ (O : Set (Fin d → ℂ)) (N : ℕ) (t : Fin N → (Fin d → ℂ) → σ → ℂ),
+            IsOpen O ∧ y ∈ O ∧ (∀ j, DifferentiableOn ℂ (t j) O)
+              ∧ ∀ y' ∈ O,
+                (∀ j, t j y' ∈ zeroSetIn I ∧ A (t j y') = y') ∧ Function.Injective (fun j => t j y')
+                  ∧ ∀ z ∈ zeroSetIn I, A z = y' → z ∈ Set.range (fun j => t j y') := by
     intro y hy
     have hyD : y ∈ ⋃ k, Dk k := by
       by_contra h
@@ -242,7 +294,10 @@ theorem LocalBranchedCovering.proof (hdsc : GroundTheory.Heights₂.Heights.Disc
     · exact differentiableOn_pi.2 fun i => differentiableOn_pi.1 ((hUD k).2.2.2 j) (e i)
     intro y' hy'
     obtain ⟨hfe, hinj, -⟩ := hfib k y' hy'
-    have hmem : ∀ j, s k j y' ∈ _root_.GroundTheory.Heights₂.Heights.ComplexSets.fibre J A₀ y' := fun j => by rw [hfe]; exact ⟨j, rfl⟩
+    have hmem
+        : ∀ j,
+          s k j y' ∈ _root_.GroundTheory.Heights₂.Heights.ComplexSets.fibre J A₀ y' := fun j => by
+      rw [hfe]; exact ⟨j, rfl⟩
     refine ⟨fun j => ⟨(hZJ _).1 (hmem j).1, by rw [hA, hΦΨ]; exact (hmem j).2⟩, ?_, ?_⟩
     · intro j₁ j₂ h
       apply hinj
@@ -255,22 +310,30 @@ theorem LocalBranchedCovering.proof (hdsc : GroundTheory.Heights₂.Heights.Disc
       obtain ⟨j, hj⟩ := hzf
       exact ⟨j, by simp only [hj, hΨΦ]⟩
 
-  have hopen : ∀ z ∈ zeroSetIn I, (∃ N ∈ 𝓝 z, ∀ z' ∈ N, z' ∈ zeroSetIn I → A z' = A z → z' = z) →
-      ∀ W' ∈ 𝓝 z, A '' (zeroSetIn I ∩ W') ∈ 𝓝 (A z) := by
+  have hopen
+      : ∀ z ∈ zeroSetIn I,
+        (∃ N ∈ 𝓝 z, ∀ z' ∈ N, z' ∈ zeroSetIn I → A z' = A z → z' = z)
+          → ∀ W' ∈ 𝓝 z, A '' (zeroSetIn I ∩ W') ∈ 𝓝 (A z) := by
     rintro z hz ⟨N, hN, hNz⟩ W' hW'
     have hpre : ∀ T ∈ 𝓝 z, Ψ ⁻¹' T ∈ 𝓝 (Φ z) := fun T hT =>
       hΨc.continuousAt.preimage_mem_nhds (by rw [hΨΦ]; exact hT)
     have hx : Φ z ∈ zeroLocus J := (hZJ (Φ z)).2 (by rwa [hΨΦ])
-    have himg := hiso _ d J A₀ (Φ z) ⟨hJ, hd⟩ hx
-      ⟨Ψ ⁻¹' N, hpre N hN, fun z' hz'N hz'J hz'A => by
-        have h1 := hNz (Ψ z') hz'N ((hZJ z').1 hz'J) (by rw [hA, hA, hΦΨ]; exact hz'A)
-        rw [← hΦΨ z', h1]⟩
-      (Ψ ⁻¹' W') (hpre W' hW')
+    have himg :=
+      hiso _ d J A₀ (Φ z) ⟨hJ, hd⟩ hx
+        ⟨
+          Ψ ⁻¹' N,
+          hpre N hN,
+          fun z' hz'N hz'J hz'A => by
+            have h1 := hNz (Ψ z') hz'N ((hZJ z').1 hz'J) (by rw [hA, hA, hΦΨ]; exact hz'A)
+            rw [← hΦΨ z', h1]
+        ⟩
+        (Ψ ⁻¹' W') (hpre W' hW')
     rw [hA]
     refine Filter.mem_of_superset himg ?_
     rintro _ ⟨x', ⟨hx'J, hx'W⟩, rfl⟩
     exact ⟨Ψ x', ⟨(hZJ x').1 hx'J, hx'W⟩, by rw [hA, hΦΨ]⟩
-  obtain ⟨W, D, m, δ, h⟩ := LocalBranchedCovering.of_sheets (zeroSetIn I) hZc A P hP hfin hsheet hopen w U hU
+  obtain ⟨W, D, m, δ, h⟩ :=
+    LocalBranchedCovering.of_sheets (zeroSetIn I) hZc A P hP hfin hsheet hopen w U hU
   exact ⟨d, A, W, D, m, δ, h⟩
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets

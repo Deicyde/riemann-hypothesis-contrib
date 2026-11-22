@@ -21,8 +21,7 @@ def leadForm (f : MvPolynomial (Fin n) ℂ) : MvPolynomial (Fin n) ℂ :=
 def leadIdeal (J : Ideal (MvPolynomial (Fin n) ℂ)) : Ideal (MvPolynomial (Fin n) ℂ) :=
   Ideal.span (leadForm '' (J : Set (MvPolynomial (Fin n) ℂ)))
 
-def originIdeal (n : ℕ) : Ideal (MvPolynomial (Fin n) ℂ) :=
-  Ideal.span (Set.range X)
+def originIdeal (n : ℕ) : Ideal (MvPolynomial (Fin n) ℂ) := Ideal.span (Set.range X)
 
 def linIdeal (A : Matrix (Fin d) (Fin n) ℂ) : Ideal (MvPolynomial (Fin n) ℂ) :=
   Ideal.span (Set.range (linPoly A))

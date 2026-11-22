@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.GalOfCusp TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
@@ -91,13 +93,13 @@ private lemma closed_mem {O' V : Type} [CommRing O'] [CommRing V] [IsLocalRing V
   rw [e] at hx
   exact hx
 
-theorem UpperTheory.Gal.crystallineComparison.ptIdBC_of :
-    PtIdBC := by
+theorem UpperTheory.Gal.crystallineComparison.ptIdBC_of : PtIdBC := by
   classical
-  intro l q n O O' _ _ σ hσ ϖ ϖ' hr hq Y Y' f f' h hp T T' g hg hrr hf hId V _ _ _ _ hl y hG φ hφ I _ z hz
+  intro l q n O O' _ _ σ hσ ϖ ϖ' hr hq Y Y' f f' h hp T T' g hg hrr hf hId V _ _ _ _ hl y hG φ hφ I
+    _ z hz
   have hG' : GenPt (fn f ϖ) ((y ≫ h) (IsLocalRing.closedPoint V)) := genPt_h σ hσ ϖ ϖ' hr hp _ hG
-  let z' : ∀ j, I j → (T j).Sec (y ≫ h) := fun j i => ⟨(z j i).1 ≫ g j, by
-    rw [Category.assoc, ← (hg j).w, ← Category.assoc, (z j i).2]⟩
+  let z' : ∀ j, I j → (T j).Sec (y ≫ h) := fun j i =>
+    ⟨(z j i).1 ≫ g j, by rw [Category.assoc, ← (hg j).w, ← Category.assoc, (z j i).2]⟩
   have hz' : ∀ j, Function.Bijective (z' j) := by
     intro j
     constructor
@@ -115,13 +117,18 @@ theorem UpperTheory.Gal.crystallineComparison.ptIdBC_of :
   let c : CommRingCat.of O' ⟶ CommRingCat.of V := Spec.preimage (y ≫ f')
   have hc : y ≫ f' = Spec.map c := (Spec.map_preimage _).symm
   have hmem := closed_mem ϖ' f' y c hc hG.1
-  let β : Spec (CommRingCat.of (IsLocalRing.ResidueField V)) ⟶ Spec (CommRingCat.of O') := resPt V ≫ y ≫ f'
+  let β : Spec (CommRingCat.of (IsLocalRing.ResidueField V)) ⟶ Spec (CommRingCat.of O') :=
+    resPt V ≫ y ≫ f'
   have hβ : Spec.map (CommRingCat.ofHom φ) ≫ β = β := by
     simp only [β, hc]
     exact beta_fix q ϖ' hq φ hφ c hmem
-  let Λ : (Spec (CommRingCat.of (IsLocalRing.ResidueField V)) ⟶ Y) → (Spec (CommRingCat.of (IsLocalRing.ResidueField V)) ⟶ Y') :=
-    fun x => if hx : x ≫ f = β ≫ Spec.map (CommRingCat.ofHom σ) then hp.lift x β hx else resPt V ≫ y
-  have hΛ : ∀ x' : Spec (CommRingCat.of (IsLocalRing.ResidueField V)) ⟶ Y', x' ≫ f' = β → Λ (x' ≫ h) = x' := by
+  let Λ
+      : (Spec (CommRingCat.of (IsLocalRing.ResidueField V)) ⟶ Y)
+        → (Spec (CommRingCat.of (IsLocalRing.ResidueField V)) ⟶ Y') := fun x =>
+    if hx : x ≫ f = β ≫ Spec.map (CommRingCat.ofHom σ) then hp.lift x β hx else resPt V ≫ y
+  have hΛ
+      : ∀ x' : Spec (CommRingCat.of (IsLocalRing.ResidueField V)) ⟶ Y',
+        x' ≫ f' = β → Λ (x' ≫ h) = x' := by
     intro x' e
     have hx : (x' ≫ h) ≫ f = β ≫ Spec.map (CommRingCat.ofHom σ) := by
       rw [Category.assoc, hp.w, ← Category.assoc, e]
@@ -137,8 +144,10 @@ theorem UpperTheory.Gal.crystallineComparison.ptIdBC_of :
     intro j i
     change resPt V ≫ ((z j i).1 ≫ g j) ≫ (T j).r = _
     simp only [Category.assoc, hrr j]
-  have hfin : ∀ (m : ℕ) j i, Λ ((twist φ Y)^[m] (resPt V ≫ (z' j i).1 ≫ (T j).r))
-      = (twist φ Y')^[m] (resPt V ≫ (z j i).1 ≫ (T' j).r) := by
+  have hfin
+      : ∀ (m : ℕ) j i,
+        Λ ((twist φ Y)^[m] (resPt V ≫ (z' j i).1 ≫ (T j).r))
+          = (twist φ Y')^[m] (resPt V ≫ (z j i).1 ≫ (T' j).r) := by
     intro m j i
     rw [e1, twist_comp]
     exact hΛ _ (twist_base φ f' β hβ _ (hv j i) m)

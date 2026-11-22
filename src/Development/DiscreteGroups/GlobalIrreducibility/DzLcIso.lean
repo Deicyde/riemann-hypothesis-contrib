@@ -13,11 +13,13 @@ open GroundTheory.Automorphic
 
 namespace DiscreteGroups.sglob.DzLc
 
-variable {g : ℕ} [Fact g.Prime] {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-  [IsNonarchimedeanLocalField k]
+variable
+  {g : ℕ} [Fact g.Prime]
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem norm_symm_le_one (i : ℚ_[g] ≃+* k) (hi : Continuous i) {x : k}
-    (hx : x ∈ (ValuativeRel.valuation k).integer) : ‖i.symm x‖ ≤ 1 := by
+theorem norm_symm_le_one
+    (i : ℚ_[g] ≃+* k) (hi : Continuous i) {x : k} (hx : x ∈ (ValuativeRel.valuation k).integer)
+    : ‖i.symm x‖ ≤ 1 := by
   by_contra hlt
   push Not at hlt
   obtain ⟨y, hy⟩ : ∃ y, i.symm x = y := ⟨_, rfl⟩
@@ -26,45 +28,64 @@ theorem norm_symm_le_one (i : ℚ_[g] ≃+* k) (hi : Continuous i) {x : k}
   have hy0 : y ≠ 0 := fun h => by rw [h, norm_zero] at hlt; exact absurd hlt (by norm_num)
   have hx0 : x ≠ 0 := by rw [← hix]; exact (map_ne_zero i).2 hy0
   have hz : ‖y⁻¹‖ < 1 := by rw [norm_inv]; exact inv_lt_one_of_one_lt₀ hlt
-  have hϖ1 : ValuativeRel.valuation k (GLnLocal.uniformizer k : k) < 1 := GLnLocal.valuation_uniformizer_lt_one k
+  have hϖ1 : ValuativeRel.valuation k (GLnLocal.uniformizer k : k) < 1 :=
+    GLnLocal.valuation_uniformizer_lt_one k
   have hϖ0 : (GLnLocal.uniformizer k : k) ≠ 0 := fun h =>
     GLnLocal.valuation_uniformizer_ne_zero k (by rw [h, map_zero])
-  have h1 : Filter.Tendsto (fun m : ℕ => y⁻¹ ^ m * i.symm (GLnLocal.uniformizer k : k)⁻¹) Filter.atTop (nhds 0) := by
-    simpa using (tendsto_pow_atTop_nhds_zero_of_norm_lt_one hz).mul_const (i.symm (GLnLocal.uniformizer k : k)⁻¹)
-  have hT : Filter.Tendsto (fun m : ℕ => i (y⁻¹ ^ m * i.symm (GLnLocal.uniformizer k : k)⁻¹)) Filter.atTop
-      (nhds 0) := by
+  have h1 : Filter.Tendsto
+      (fun m : ℕ => y⁻¹ ^ m * i.symm (GLnLocal.uniformizer k : k)⁻¹)
+      Filter.atTop (nhds 0) := by
+    simpa using
+      (tendsto_pow_atTop_nhds_zero_of_norm_lt_one hz).mul_const
+        (i.symm (GLnLocal.uniformizer k : k)⁻¹)
+  have hT : Filter.Tendsto
+      (fun m : ℕ => i (y⁻¹ ^ m * i.symm (GLnLocal.uniformizer k : k)⁻¹))
+      Filter.atTop (nhds 0) := by
     have := (hi.tendsto 0).comp h1
     rwa [map_zero] at this
   have hO : ((ValuativeRel.valuation k).integer : Set k) ∈ nhds (0 : k) :=
     Valuation.isOpen_integer.mem_nhds (zero_mem _)
   obtain ⟨m, hm⟩ := (hT.eventually hO).exists
-  have hm' : i (y⁻¹ ^ m * i.symm (GLnLocal.uniformizer k : k)⁻¹) ∈ (ValuativeRel.valuation k).integer := hm
+  have hm'
+      : i (y⁻¹ ^ m * i.symm (GLnLocal.uniformizer k : k)⁻¹) ∈ (ValuativeRel.valuation k).integer :=
+    hm
   have hval := (Valuation.mem_integer_iff _ _).1 hm'
   have hxv := (Valuation.mem_integer_iff _ _).1 hx
-  have hiy : i (y⁻¹ ^ m * i.symm (GLnLocal.uniformizer k : k)⁻¹) * x ^ m = (GLnLocal.uniformizer k : k)⁻¹ := by
+  have hiy
+      : i (y⁻¹ ^ m * i.symm (GLnLocal.uniformizer k : k)⁻¹) * x ^ m
+        = (GLnLocal.uniformizer k : k)⁻¹ := by
     rw [map_mul, map_pow, map_inv₀, hix, RingEquiv.apply_symm_apply, inv_pow,
       mul_comm ((x ^ m)⁻¹) _, mul_assoc, inv_mul_cancel₀ (pow_ne_zero m hx0), mul_one]
   have hle : ValuativeRel.valuation k (GLnLocal.uniformizer k : k)⁻¹ ≤ 1 := by
     rw [← hiy, map_mul, map_pow]
     exact mul_le_one' hval (pow_le_one' hxv m)
-  have hge : (1 : ValuativeRel.ValueGroupWithZero k) ≤ ValuativeRel.valuation k (GLnLocal.uniformizer k : k) := by
-    calc (1 : ValuativeRel.ValueGroupWithZero k)
-        = ValuativeRel.valuation k ((GLnLocal.uniformizer k : k) * (GLnLocal.uniformizer k : k)⁻¹) := by
-          rw [mul_inv_cancel₀ hϖ0, map_one]
-      _ = ValuativeRel.valuation k (GLnLocal.uniformizer k : k) *
-          ValuativeRel.valuation k (GLnLocal.uniformizer k : k)⁻¹ := map_mul _ _ _
+  have hge
+      : (1 : ValuativeRel.ValueGroupWithZero k)
+        ≤ ValuativeRel.valuation k (GLnLocal.uniformizer k : k) := by
+    calc
+      (1 : ValuativeRel.ValueGroupWithZero k)
+          = ValuativeRel.valuation k
+            ((GLnLocal.uniformizer k : k) * (GLnLocal.uniformizer k : k)⁻¹) := by
+        rw [mul_inv_cancel₀ hϖ0, map_one]
+      _ = ValuativeRel.valuation k (GLnLocal.uniformizer k : k)
+          * ValuativeRel.valuation k (GLnLocal.uniformizer k : k)⁻¹ :=
+        map_mul _ _ _
       _ ≤ ValuativeRel.valuation k (GLnLocal.uniformizer k : k) * 1 := by gcongr
       _ = _ := mul_one _
   exact absurd hϖ1 (not_lt.2 hge)
 
-theorem exists_inc_eq (i : ℚ_[g] ≃+* k) (hi : Continuous i) {n : ℕ} (k0 : GL (Fin n) k)
-    (hk : k0 ∈ GLnLocal.integralGL k n) :
-    ∃ κ : GL (Fin n) ℤ_[g], Matrix.GeneralLinearGroup.map i.toRingHom (GlobalTheory.GLp.inc g n κ) = k0 := by
+theorem exists_inc_eq
+    (i : ℚ_[g] ≃+* k) (hi : Continuous i)
+    {n : ℕ} (k0 : GL (Fin n) k) (hk : k0 ∈ GLnLocal.integralGL k n)
+    : ∃ κ : GL (Fin n) ℤ_[g],
+      Matrix.GeneralLinearGroup.map i.toRingHom (GlobalTheory.GLp.inc g n κ) = k0 := by
   obtain ⟨h1, h2⟩ := (GLnLocal.mem_integralGL_iff k n).1 hk
   let M : Matrix (Fin n) (Fin n) ℤ_[g] := fun a b =>
     ⟨i.symm ((k0 : Matrix (Fin n) (Fin n) k) a b), norm_symm_le_one i hi (h1 a b)⟩
-  let M' : Matrix (Fin n) (Fin n) ℤ_[g] := fun a b =>
-    ⟨i.symm (((k0⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) a b), norm_symm_le_one i hi (h2 a b)⟩
+  let M' : Matrix (Fin n) (Fin n) ℤ_[g] := fun a b => ⟨
+    i.symm (((k0⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) a b),
+    norm_symm_le_one i hi (h2 a b)
+  ⟩
   let φ : ℤ_[g] →+* k := i.toRingHom.comp (algebraMap ℤ_[g] ℚ_[g])
   have hφ : Function.Injective φ := fun a b h => Subtype.ext (i.injective h)
   have hMφ : M.map φ = (k0 : Matrix (Fin n) (Fin n) k) := by
@@ -86,15 +107,20 @@ theorem exists_inc_eq (i : ℚ_[g] ≃+* k) (hi : Continuous i) {n : ℕ} (k0 : 
   refine ⟨⟨M, M', hMM, hM'M⟩, Matrix.GeneralLinearGroup.ext fun a b => ?_⟩
   exact i.apply_symm_apply _
 
-theorem exists_lift (i : ℚ_[g] ≃+* k) {n a : ℕ} (u : GL (Fin n) (ZMod g))
-    (hu : u ∈ GlobalTheory.FiniteGL.unipRadical (ZMod g) (GlobalTheory.FiniteGL.twoBlocks n a)) :
-    ∃ κ : GL (Fin n) ℤ_[g], GlobalTheory.GLp.red g n κ = u ∧
-      Matrix.GeneralLinearGroup.map i.toRingHom (GlobalTheory.GLp.inc g n κ) ∈
-        GlobalTheory.FiniteGL.unipRadical k (GlobalTheory.FiniteGL.twoBlocks n a) := by
+theorem exists_lift
+    (i : ℚ_[g] ≃+* k)
+    {n a : ℕ} (u : GL (Fin n) (ZMod g))
+    (hu : u ∈ GlobalTheory.FiniteGL.unipRadical (ZMod g) (GlobalTheory.FiniteGL.twoBlocks n a))
+    : ∃ κ : GL (Fin n) ℤ_[g],
+      GlobalTheory.GLp.red g n κ = u
+        ∧ Matrix.GeneralLinearGroup.map i.toRingHom (GlobalTheory.GLp.inc g n κ)
+          ∈ GlobalTheory.FiniteGL.unipRadical k (GlobalTheory.FiniteGL.twoBlocks n a) := by
   classical
   have hu' := GlobalTheory.FiniteGL.mem_unipRadical.1 hu
-  have hoff : ∀ x y, x ≠ y → GlobalTheory.FiniteGL.twoBlocks n a y ≤ GlobalTheory.FiniteGL.twoBlocks n a x →
-      (u : Matrix (Fin n) (Fin n) (ZMod g)) x y = 0 := by
+  have hoff
+      : ∀ x y,
+        x ≠ y → GlobalTheory.FiniteGL.twoBlocks n a y ≤ GlobalTheory.FiniteGL.twoBlocks n a x
+          → (u : Matrix (Fin n) (Fin n) (ZMod g)) x y = 0 := by
     intro x y hxy h
     have := hu' x y h
     rwa [Matrix.sub_apply, Matrix.one_apply_ne hxy, sub_zero] at this

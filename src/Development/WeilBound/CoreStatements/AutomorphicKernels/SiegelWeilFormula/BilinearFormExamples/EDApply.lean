@@ -7,8 +7,11 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 
 noncomputable section
 open scoped TensorProduct NNReal Matrix Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.Ldexa
 open PositivityTheory.SiegelWeilFormula.Ald
@@ -17,47 +20,83 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 
 variable {m n : ℕ}
 
-def Pm (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E) :
-    Matrix (Fin m × Fin n × Fin 2) (Fin m × Fin n × Fin 2) (AF F) :=
+def Pm (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E)
+    : Matrix (Fin m × Fin n × Fin 2) (Fin m × Fin n × Fin 2) (AF F) :=
   ((Gm (n := n) σ J bs).map (algebraMap F (AF F)))ᵀ
 
-theorem Pm_unit [FiniteDimensional F E] (σ : E →ₐ[F] E) (hσ : ∀ a, σ (σ a) = a) (J : Matrix (Fin m) (Fin m) E)
-    (hJ : J.det ≠ 0) (bs : Module.Basis (Fin 2) F E) : IsUnit (Pm (n := n) σ J bs).det := by
+theorem Pm_unit
+    [FiniteDimensional F E]
+    (σ : E →ₐ[F] E) (hσ : ∀ a, σ (σ a) = a)
+    (J : Matrix (Fin m) (Fin m) E) (hJ : J.det ≠ 0)
+    (bs : Module.Basis (Fin 2) F E)
+    : IsUnit (Pm (n := n) σ J bs).det := by
   rw [Pm, Matrix.det_transpose, ← RingHom.mapMatrix_apply, ← RingHom.map_det]
   exact (Ne.isUnit (Gm_det σ hσ J hJ bs)).map _
 
-def eD (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E) (b : GL (Fin n ⊕ Fin n) E)
-    (hP : IsUnit (Pm (n := n) σ J bs).det) :
-    Matrix (Fin m) (Fin n ⊕ Fin n) (AE F E) ≃ₗ[AF F] (Fin m × Fin n × Fin 2 → AF F) × (Fin m × Fin n × Fin 2 → AF F) :=
+def eD
+    (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E)
+    (b : GL (Fin n ⊕ Fin n) E) (hP : IsUnit (Pm (n := n) σ J bs).det)
+    : Matrix (Fin m) (Fin n ⊕ Fin n) (AE F E) ≃ₗ[AF F] (Fin m × Fin n × Fin 2 → AF F) × (Fin m × Fin n × Fin 2 → AF F) :=
   let coords := (bM (m := m) (n := n) bs).equivFun
   let P := Pm (n := n) σ J bs
-  (eQ b).trans ((LinearEquiv.prodComm (AF F) (Mx F E m n) (Mx F E m n)).trans
-    (coords.prodCongr (coords.trans (P.toLinearEquiv' (P.invertibleOfIsUnitDet hP)))))
+  (eQ b).trans
+    ((LinearEquiv.prodComm (AF F) (Mx F E m n) (Mx F E m n)).trans
+      (coords.prodCongr (coords.trans (P.toLinearEquiv' (P.invertibleOfIsUnitDet hP)))))
 
-theorem eD_apply (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E) (b : GL (Fin n ⊕ Fin n) E)
-    (hP : IsUnit (Pm (n := n) σ J bs).det) (w : Matrix (Fin m) (Fin n ⊕ Fin n) (AE F E)) :
-    eD σ J bs b hP w = ((bM bs).equivFun (eQ b w).2, Pm σ J bs *ᵥ (bM bs).equivFun (eQ b w).1) := rfl
+theorem eD_apply
+    (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E)
+    (b : GL (Fin n ⊕ Fin n) E) (hP : IsUnit (Pm (n := n) σ J bs).det)
+    (w : Matrix (Fin m) (Fin n ⊕ Fin n) (AE F E))
+    : eD σ J bs b hP w = ((bM bs).equivFun (eQ b w).2, Pm σ J bs *ᵥ (bM bs).equivFun (eQ b w).1) :=
+  rfl
 
-theorem eD_frame [FiniteDimensional F E] (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E)
-    (b : GL (Fin n ⊕ Fin n) E) (hP : IsUnit (Pm (n := n) σ J bs).det) (Z X : Mx F E m n) :
-    eD σ J bs b hP (Z * ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) b.1.toCols₁)ᵀ + X * ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) b.1.toCols₂)ᵀ) = (crdB bs X, fun k => Bf σ J Z (Ek bs k)) := by
+theorem eD_frame
+    [FiniteDimensional F E]
+    (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E)
+    (b : GL (Fin n ⊕ Fin n) E) (hP : IsUnit (Pm (n := n) σ J bs).det) (Z X : Mx F E m n)
+    : eD σ J bs b hP
+        (Z * ((_root_.Matrix.map ·
+              (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+                (AF F)))
+            b.1.toCols₁)ᵀ
+          + X * ((_root_.Matrix.map ·
+              (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+                (AF F)))
+            b.1.toCols₂)ᵀ)
+      = (crdB bs X, fun k => Bf σ J Z (Ek bs k)) := by
   rw [eD_apply]
   erw [eQ_frame b Z X]
   refine Prod.ext (funext fun k => ?_) (funext fun k => ?_)
   · exact bM_repr bs X k
   · show (Pm σ J bs *ᵥ (bM bs).equivFun Z) k = Bf σ J Z (Ek bs k)
     rw [Bf_eq_sum_left σ J bs Z (Ek bs k)]
-    simp only [Matrix.mulVec, dotProduct, Module.Basis.equivFun_apply, bM_repr, Pm, Matrix.transpose_apply,
-      Matrix.map_apply]
+    simp only [Matrix.mulVec, dotProduct, Module.Basis.equivFun_apply, bM_repr, Pm,
+      Matrix.transpose_apply, Matrix.map_apply]
     refine Finset.sum_congr rfl fun k' _ => ?_
     rw [Bf_Ek_Ek, mul_comm]
 
-theorem eD_form [FiniteDimensional F E] (σ : E →ₐ[F] E) (J : Matrix (Fin m) (Fin m) E) (bs : Module.Basis (Fin 2) F E)
-    (YJ : Matrix (Fin n) (Fin n) E) (b : GL (Fin n ⊕ Fin n) E) (ε : ℤˣ) (hb : b.1ᵀ * dbl YJ * b.1.map σ = jeps n ε)
-    (u : ℤ) (hsym : ∀ X Z : Mx F E m n, Bf σ J X Z = (u : AF F) * Bf σ J Z X) (hεu : (ε : ℤ) * u = -1)
-    (hP : IsUnit (Pm (n := n) σ J bs).det) (w w' : Matrix (Fin m) (Fin n ⊕ Fin n) (AE F E)) :
-    symp (R := AF F) (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) J) (dbl ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) YJ)) w w' =
-      (eD σ J bs b hP w).1 ⬝ᵥ (eD σ J bs b hP w').2 - (eD σ J bs b hP w').1 ⬝ᵥ (eD σ J bs b hP w).2 := by
+theorem eD_form
+    [FiniteDimensional F E]
+    (σ : E →ₐ[F] E)
+    (J : Matrix (Fin m) (Fin m) E)
+    (bs : Module.Basis (Fin 2) F E)
+    (YJ : Matrix (Fin n) (Fin n) E) (b : GL (Fin n ⊕ Fin n) E) (ε : ℤˣ)
+    (hb : b.1ᵀ * dbl YJ * b.1.map σ = jeps n ε)
+    (u : ℤ)
+    (hsym : ∀ X Z : Mx F E m n, Bf σ J X Z = (u : AF F) * Bf σ J Z X) (hεu : (ε : ℤ) * u = -1)
+    (hP : IsUnit (Pm (n := n) σ J bs).det) (w w' : Matrix (Fin m) (Fin n ⊕ Fin n) (AE F E))
+    : symp (R := AF F) (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1)
+        ((_root_.Matrix.map ·
+            (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+              (AF F)))
+          J)
+        (dbl ((_root_.Matrix.map ·
+            (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+              (AF F)))
+          YJ))
+        w w'
+      = (eD σ J bs b hP w).1 ⬝ᵥ (eD σ J bs b hP w').2
+        - (eD σ J bs b hP w').1 ⬝ᵥ (eD σ J bs b hP w).2 := by
   obtain ⟨⟨Z, X⟩, rfl⟩ := (eQ (m := m) b).symm.surjective w
   obtain ⟨⟨Z', X'⟩, rfl⟩ := (eQ (m := m) b).symm.surjective w'
   rw [eQ_symm_apply, eQ_symm_apply]
@@ -76,16 +115,33 @@ theorem sDarb : SDarb := by
     let τ : E →+* ℂ := Classical.arbitrary _
     apply τ.injective
     rw [h, h, star_star]
-  obtain ⟨u, hsym, hεu, hJ⟩ : ∃ u : ℤ, (∀ i j, σ (A.J j i) = (u : E) * A.J i j) ∧ (ε : ℤ) * u = -1 ∧ A.J.det ≠ 0 := by
+  obtain ⟨u, hsym, hεu, hJ⟩
+      : ∃ u : ℤ, (∀ i j, σ (A.J j i) = (u : E) * A.J i j) ∧ (ε : ℤ) * u = -1 ∧ A.J.det ≠ 0 := by
     rcases hsg with ⟨hA, hY⟩ | ⟨hA, hY⟩
-    · refine ⟨1, fun i j => by simp [hA.herm], ?_, GlobalTheory.ThetaRatPair.det_ne_of_sig B A.J hA.sig⟩
+    · refine
+        ⟨1, fun i j => by simp [hA.herm], ?_, GlobalTheory.ThetaRatPair.det_ne_of_sig B A.J hA.sig⟩
       rw [eps_eq hσ Y.J (-1) (fun i j => by simp [hY]) b ε hε hn]
       norm_num
-    · refine ⟨-1, fun i j => by simp [hA.skew], ?_, GlobalTheory.ThetaRatPair.det_ne_of_sig' B A.J hA.sig⟩
+    · refine ⟨
+        -1,
+        fun i j => by simp [hA.skew],
+        ?_,
+        GlobalTheory.ThetaRatPair.det_ne_of_sig' B A.J hA.sig
+      ⟩
       rw [eps_eq hσ Y.J 1 (fun i j => by simp [hY]) b ε hε hn]
       norm_num
   have hP := Pm_unit (n := n) σ hσ A.J hJ bs
-  let dd : Darboux (symp (R := AF F) (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1) ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) A.J) (dbl ((_root_.Matrix.map · (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (AF F))) Y.J))) (Fin m × Fin n × Fin 2) :=
+  let dd : Darboux
+      (symp (R := AF F) (_root_.Algebra.TensorProduct.map (_root_.AlgHom.id (AF F) (AF F)) σ) (-1)
+        ((_root_.Matrix.map ·
+            (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+              (AF F)))
+          A.J)
+        (dbl ((_root_.Matrix.map ·
+            (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+              (AF F)))
+          Y.J)))
+      (Fin m × Fin n × Fin 2) :=
     ⟨eD σ A.J bs b hP, eD_form σ A.J bs Y.J b ε hε u (fun X Z => Bf_symm hσ A.J u hsym X Z) hεu hP⟩
   have hd : IsAdapted bs A Y b dd := fun Z X => eD_frame σ A.J bs b hP Z X
   refine ⟨dd, hd, fun x => ?_⟩

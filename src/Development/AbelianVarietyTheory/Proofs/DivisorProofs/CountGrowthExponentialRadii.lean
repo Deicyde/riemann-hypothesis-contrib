@@ -9,15 +9,16 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem hsGrowth_log_add_div_tendsto (D : ℕ) :
-    Tendsto (fun m : ℕ => Real.log ((m : ℝ) + D) / m) atTop (𝓝 0) := by
-  have h := (Real.tendsto_pow_log_div_mul_add_atTop 1 (-(D : ℝ)) 1 one_ne_zero).comp
-    (tendsto_atTop_add_const_right _ (D : ℝ) tendsto_natCast_atTop_atTop)
+theorem hsGrowth_log_add_div_tendsto (D : ℕ)
+    : Tendsto (fun m : ℕ => Real.log ((m : ℝ) + D) / m) atTop (𝓝 0) := by
+  have h :=
+    (Real.tendsto_pow_log_div_mul_add_atTop 1 (-(D : ℝ)) 1 one_ne_zero).comp
+      (tendsto_atTop_add_const_right _ (D : ℝ) tendsto_natCast_atTop_atTop)
   refine h.congr (fun m => ?_)
   simp
 
-theorem hsGrowth_log_floor_le {Y : ℝ} (hY : 0 < Y) :
-    Real.log ((2 * ⌊Y⌋₊ + 1 : ℕ) : ℝ) ≤ Real.log 3 + |Real.log Y| := by
+theorem hsGrowth_log_floor_le {Y : ℝ} (hY : 0 < Y)
+    : Real.log ((2 * ⌊Y⌋₊ + 1 : ℕ) : ℝ) ≤ Real.log 3 + |Real.log Y| := by
   have h3 := Real.log_nonneg (by norm_num : (1 : ℝ) ≤ 3)
   rcases lt_or_ge Y 1 with h | h
   · have : ⌊Y⌋₊ = 0 := Nat.floor_eq_zero.mpr h
@@ -27,7 +28,9 @@ theorem hsGrowth_log_floor_le {Y : ℝ} (hY : 0 < Y) :
       push_cast
       have := Nat.floor_le hY.le
       linarith
-    calc Real.log ((2 * ⌊Y⌋₊ + 1 : ℕ) : ℝ) ≤ Real.log (3 * Y) := Real.log_le_log (by positivity) h1
+    calc
+      Real.log ((2 * ⌊Y⌋₊ + 1 : ℕ) : ℝ)
+        ≤ Real.log (3 * Y) := Real.log_le_log (by positivity) h1
       _ = Real.log 3 + Real.log Y := Real.log_mul (by norm_num) hY.ne'
       _ ≤ Real.log 3 + |Real.log Y| := by linarith [le_abs_self (Real.log Y)]
 

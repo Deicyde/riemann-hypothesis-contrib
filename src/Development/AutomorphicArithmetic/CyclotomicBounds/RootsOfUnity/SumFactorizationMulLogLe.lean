@@ -12,31 +12,41 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.RootsOfUnity.Nu
 
 open NumberField Formalism.HC KStar.Tree
 
-private theorem sum_factorization_mul_log_le (m : ℕ) (S : Finset ℕ) :
-    ∑ l ∈ S, (m.factorization l : ℝ) * Real.log l ≤ Real.log m := by
+private theorem sum_factorization_mul_log_le (m : ℕ) (S : Finset ℕ)
+    : ∑ l ∈ S, (m.factorization l : ℝ) * Real.log l ≤ Real.log m := by
   classical
   rw [Real.log_nat_eq_sum_factorization, Finsupp.sum]
-  calc ∑ l ∈ S, (m.factorization l : ℝ) * Real.log l
-      = ∑ l ∈ S.filter (· ∈ m.factorization.support), (m.factorization l : ℝ) * Real.log l := by
-        refine (Finset.sum_filter_of_ne ?_).symm
-        intro l _ h
-        by_contra hs
-        rw [Finsupp.notMem_support_iff.mp hs] at h
-        simp at h
+  calc
+    ∑ l ∈ S, (m.factorization l : ℝ) * Real.log l
+        = ∑ l ∈ S.filter (· ∈ m.factorization.support), (m.factorization l : ℝ) * Real.log l := by
+      refine (Finset.sum_filter_of_ne ?_).symm
+      intro l _ h
+      by_contra hs
+      rw [Finsupp.notMem_support_iff.mp hs] at h
+      simp at h
     _ ≤ ∑ l ∈ m.factorization.support, (m.factorization l : ℝ) * Real.log l := by
-        apply Finset.sum_le_sum_of_subset_of_nonneg
-        · intro l hl
-          exact (Finset.mem_filter.mp hl).2
-        · intro l hl _
-          have hp : l.Prime := Nat.prime_of_mem_primeFactors (by simpa using hl)
-          apply mul_nonneg (Nat.cast_nonneg _)
-          exact Real.log_nonneg (by exact_mod_cast hp.one_lt.le)
+      apply Finset.sum_le_sum_of_subset_of_nonneg
+      · intro l hl
+        exact (Finset.mem_filter.mp hl).2
+      · intro l hl _
+        have hp : l.Prime := Nat.prime_of_mem_primeFactors (by simpa using hl)
+        apply mul_nonneg (Nat.cast_nonneg _)
+        exact Real.log_nonneg (by exact_mod_cast hp.one_lt.le)
 
-theorem UpperTheory.Mu.nuSum :
-    ∀ (φ : Frame) (H : HostRaw φ) (Ω : Type) [Field Ω] [Algebra H.E Ω] [IsAlgClosure H.E Ω] (n : ℕ), Odd n → ¬ (H.q - 1) / 2 ∣ n → ¬ (H.d - 1) / 2 ∣ n → ∀ ν : ℕ → ℕ, (∀ (l : ℕ) [Fact l.Prime], ν l = nuOf l (cyc l H.E Ω) n) → ∀ S : Finset ℕ, (∀ l ∈ S, l.Prime) → ∑ l ∈ S, (ν l : ℝ) * Real.log l ≤ Real.log H.QS + Real.log n := by
+theorem UpperTheory.Mu.nuSum
+    : ∀ (φ : Frame) (H : HostRaw φ) (Ω : Type) [Field Ω] [Algebra H.E Ω] [IsAlgClosure H.E Ω]
+        (n : ℕ),
+      Odd n → ¬ (H.q - 1) / 2 ∣ n → ¬ (H.d - 1) / 2 ∣ n
+        → ∀ ν : ℕ → ℕ,
+          (∀ (l : ℕ) [Fact l.Prime], ν l = nuOf l (cyc l H.E Ω) n)
+            → ∀ S : Finset ℕ,
+              (∀ l ∈ S, l.Prime)
+                → ∑ l ∈ S, (ν l : ℝ) * Real.log l ≤ Real.log H.QS + Real.log n := by
   intro φ H Ω _ _ _ n hn hq hd ν hν S hS
-  have key : ∀ l ∈ S, (ν l : ℝ) * Real.log l ≤
-      (H.QS.factorization l : ℝ) * Real.log l + (n.factorization l : ℝ) * Real.log l := by
+  have key
+      : ∀ l ∈ S,
+        (ν l : ℝ) * Real.log l
+          ≤ (H.QS.factorization l : ℝ) * Real.log l + (n.factorization l : ℝ) * Real.log l := by
     intro l hl
     have hp : l.Prime := hS l hl
     haveI : Fact l.Prime := ⟨hp⟩
@@ -54,10 +64,12 @@ theorem UpperTheory.Mu.nuSum :
     rw [← add_mul]
     apply mul_le_mul_of_nonneg_right _ hlog
     exact_mod_cast hnat
-  calc ∑ l ∈ S, (ν l : ℝ) * Real.log l
-      ≤ ∑ l ∈ S, ((H.QS.factorization l : ℝ) * Real.log l + (n.factorization l : ℝ) * Real.log l) :=
-        Finset.sum_le_sum key
-    _ = ∑ l ∈ S, (H.QS.factorization l : ℝ) * Real.log l + ∑ l ∈ S, (n.factorization l : ℝ) * Real.log l :=
-        Finset.sum_add_distrib
+  calc
+    ∑ l ∈ S, (ν l : ℝ) * Real.log l
+        ≤ ∑ l ∈ S, ((H.QS.factorization l : ℝ) * Real.log l + (n.factorization l : ℝ) * Real.log l) :=
+      Finset.sum_le_sum key
+    _ = ∑ l ∈ S, (H.QS.factorization l : ℝ) * Real.log l
+        + ∑ l ∈ S, (n.factorization l : ℝ) * Real.log l :=
+      Finset.sum_add_distrib
     _ ≤ Real.log H.QS + Real.log n :=
-        add_le_add (sum_factorization_mul_log_le H.QS S) (sum_factorization_mul_log_le n S)
+      add_le_add (sum_factorization_mul_log_le H.QS S) (sum_factorization_mul_log_le n S)

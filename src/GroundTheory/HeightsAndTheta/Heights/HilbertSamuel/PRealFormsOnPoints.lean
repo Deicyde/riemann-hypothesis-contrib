@@ -15,8 +15,9 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
-theorem RealFormsOnPoints.proof (hN : ComplexFormsOnPoints.Statement)
-    (hB : IndependentModBaseChange.Statement) : RealFormsOnPoints.Statement := by
+theorem RealFormsOnPoints.proof
+    (hN : ComplexFormsOnPoints.Statement) (hB : IndependentModBaseChange.Statement)
+    : RealFormsOnPoints.Statement := by
   intro K _ ι _ Ω _ y d e r g hP hg hli c hc
   obtain ⟨_, ⟨hprime, -, hrel⟩, -, -⟩ := hP
 
@@ -29,8 +30,9 @@ theorem RealFormsOnPoints.proof (hN : ComplexFormsOnPoints.Statement)
         rw [← Ideal.Quotient.eq_zero_iff_mem, map_sum]
       simpa only [map_zsmul] using hn
     have h0 : mConeMap y (∑ i, n i • g i) = 0 := hmem
-    have hsum : mConeMap y (∑ i, n i • g i) =
-        MvPolynomial.C (∑ i, n i • aeval y (g i)) * ∏ k, MvPolynomial.X k ^ e k := by
+    have hsum
+        : mConeMap y (∑ i, n i • g i)
+          = MvPolynomial.C (∑ i, n i • aeval y (g i)) * ∏ k, MvPolynomial.X k ^ e k := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum, map_sum, Finset.sum_mul]
       refine Finset.sum_congr rfl fun i _ => ?_
@@ -50,12 +52,16 @@ theorem RealFormsOnPoints.proof (hN : ComplexFormsOnPoints.Statement)
     simpa only [smul_eval] using hc z hz
   rw [Fintype.linearIndependent_iff] at hC
   funext i
-  have h := hC (fun i => (c i : ℂ)) (by
-    rw [← Ideal.Quotient.eq_zero_iff_mem] at hF
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hF, map_sum]
-    refine Finset.sum_congr rfl fun j _ => ?_
-    rw [← Ideal.Quotient.mkₐ_eq_mk ℂ, map_smul]) i
+  have h :=
+    hC
+      (fun i => (c i : ℂ))
+      (by
+        rw [← Ideal.Quotient.eq_zero_iff_mem] at hF
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [← hF, map_sum]
+        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [← Ideal.Quotient.mkₐ_eq_mk ℂ, map_smul])
+      i
   exact_mod_cast h
 
 end

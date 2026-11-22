@@ -96,20 +96,37 @@ lemma ME_le (S : Frames M.L r k) (A : Submodule E S.V) :
     Set.range_subset_iff, Set.range_subset_iff]
   rfl
 
-theorem terms_correspond : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), ∀ (S : Frames M.L r k) (c : Coord P S), (∀ (d : LocNG.Datum P) (t : Term V M r), LocNG.IsTermOver P d t → S.IsTerm (c.dat d) (c.lat t.abelian₂) ∧ LocNG.om P t = S.om (c.dat d) (c.lat t.abelian₂) ∧ (LocNG.BBne (H := H) t ↔ ¬ S.BBzero (c.dat d) (c.lat t.abelian₂))) ∧ (∀ (d : LocNG.Datum P) Λ, S.IsTerm (c.dat d) Λ → ∃ t, LocNG.IsTermOver P d t ∧ c.lat t.abelian₂ = Λ) ∧ ∀ δ Λ, S.IsTerm δ Λ → ∃ d : LocNG.Datum P, δ = c.dat d := by
+theorem terms_correspond
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
+            (P : LocNG.FPair H r),
+          ∀ (S : Frames M.L r k) (c : Coord P S),
+            (∀ (d : LocNG.Datum P) (t : Term V M r),
+                LocNG.IsTermOver P d t
+                  → S.IsTerm (c.dat d) (c.lat t.abelian₂)
+                    ∧ LocNG.om P t = S.om (c.dat d) (c.lat t.abelian₂)
+                    ∧ (LocNG.BBne (H := H) t ↔ ¬ S.BBzero (c.dat d) (c.lat t.abelian₂)))
+              ∧ (∀ (d : LocNG.Datum P) Λ,
+                S.IsTerm (c.dat d) Λ → ∃ t, LocNG.IsTermOver P d t ∧ c.lat t.abelian₂ = Λ)
+              ∧ ∀ δ Λ, S.IsTerm δ Λ → ∃ d : LocNG.Datum P, δ = c.dat d := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P S c
   letI := hM.loc
   haveI := hM.char0
   obtain ⟨hth, hN, hN', -, hpsi, -⟩ := GlobalTheory.HL.CoordUnip.transport M hM H r k P S c
-  obtain ⟨-, iA, oA, sA⟩ := GlobalTheory.T.hermitianFrameCoordinates_transport_innerLattices M hM H r k P S c
-  obtain ⟨-, iB, oB, sB⟩ := GlobalTheory.T.framePairCoordinates_transport_innerLattices M hM H r k P S c
+  obtain ⟨-, iA, oA, sA⟩ :=
+    GlobalTheory.T.hermitianFrameCoordinates_transport_innerLattices M hM H r k P S c
+  obtain ⟨-, iB, oB, sB⟩ :=
+    GlobalTheory.T.framePairCoordinates_transport_innerLattices M hM H r k P S c
   have T1 := isTermW_iff M hM H r k P S c
   have hsurj : ∀ Λ : Submodule M.L.O S.V, ∃ Λ₀, c.lat Λ₀ = Λ := by
     intro B
     refine ⟨B.comap ((c.e : V →ₗ[E] S.V).restrictScalars M.L.O), ?_⟩
     ext v
     obtain ⟨v, rfl⟩ := c.e.surjective v
-    rw [mem_lat]; rfl
+    rw [mem_lat]
+    rfl
   refine ⟨?_, ?_, ?_⟩
   · rintro d ⟨Λ, f, f', T, T'⟩ ht
     obtain ⟨hT, hT', ⟨n, hn, hf, h1⟩, ⟨n', hn', hf', h2⟩, -⟩ := id ht
@@ -146,8 +163,9 @@ theorem terms_correspond : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologica
           have : y = v := c.e.injective h
           exact this ▸ hy
         · intro h; exact ⟨v, h, rfl⟩
-      have hsat : ∀ v, c.e v ∈ S.sat (c.lat Λ) ↔
-          v ∈ Λ ∧ v ∈ Submodule.span E (Set.range (H.MMfam t)) := by
+      have hsat
+          : ∀ v,
+            c.e v ∈ S.sat (c.lat Λ) ↔ v ∈ Λ ∧ v ∈ Submodule.span E (Set.range (H.MMfam t)) := by
         intro v
         rw [← hE', ← mem_lat c]
         rfl
@@ -185,12 +203,17 @@ theorem terms_correspond : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologica
     rw [hL', ← sB, ← lat_img, lat_inj] at h2
     rw [← hN] at hn
     rw [← hN'] at hn'
-    let d : LocNG.Datum P :=
-      { L := L, L' := L', hL := hA, hL' := hB
-        io := {q | ∃ g, M.split = some g ∧ q ∈ H.iotaGraph g ⟨Λ, P.A.f, P.B.f, P.A.T, P.B.T⟩}
-        io_L := fun h => by simp [h] }
-    have hW := (T1 d n n' Λ).1 ⟨⟨rfl, rfl, ⟨n, hn, rfl, h1⟩, ⟨n', hn', rfl, h2⟩, fun g hg => ⟨?_, ?_⟩⟩,
-      hn, hn', h1, h2⟩
+    let d : LocNG.Datum P := {
+      L := L
+      L' := L'
+      hL := hA
+      hL' := hB
+      io := {q | ∃ g, M.split = some g ∧ q ∈ H.iotaGraph g ⟨Λ, P.A.f, P.B.f, P.A.T, P.B.T⟩}
+      io_L := fun h => by simp [h]
+    }
+    have hW :=
+      (T1 d n n' Λ).1
+        ⟨⟨rfl, rfl, ⟨n, hn, rfl, h1⟩, ⟨n', hn', rfl, h2⟩, fun g hg => ⟨?_, ?_⟩⟩, hn, hn', h1, h2⟩
     · obtain ⟨-, -, -, -, -, -, -, hu⟩ := GlobalTheory.HL.TermBasic.term_basic M.L r k S _ _ hI
       exact ⟨d, (hu _ ⟨(c.grp n, c.grp n'), hW⟩).symm⟩
     · intro b

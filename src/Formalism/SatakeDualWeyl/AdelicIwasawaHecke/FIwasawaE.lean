@@ -12,29 +12,32 @@ section FIwasawaStepB
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] (σ : L →+* L) {n : ℕ}
 
-private theorem fin_rev_between_of_between (ρ t : Fin n) (h1 : ρ < t) (h2 : t < Fin.rev ρ) :
-    ρ < Fin.rev t ∧ Fin.rev t < Fin.rev ρ := by
+private theorem fin_rev_between_of_between (ρ t : Fin n) (h1 : ρ < t) (h2 : t < Fin.rev ρ)
+    : ρ < Fin.rev t ∧ Fin.rev t < Fin.rev ρ := by
   have ht := t.isLt
   simp only [Fin.lt_iff_val_lt_val, Fin.val_rev] at h1 h2 ⊢
   omega
 
 private theorem neg_mul_neg_div_self (a p : L) (hp : p ≠ 0) : -p * (-a / p) = a := by
   first
-    | (rw [neg_mul_neg, mul_div_assoc']; exact mul_div_cancel_left₀ a hp)
-    | (field_simp; done)
-    | (field_simp; ring)
+  | (rw [neg_mul_neg, mul_div_assoc']; exact mul_div_cancel_left₀ a hp)
+  | (field_simp; done)
+  | (field_simp; ring)
 
-theorem fIwasawa_tri_succ_of_max_pivot (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
-    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (r : ℕ) (hT : fIwasawaTri r M)
+theorem fIwasawa_tri_succ_of_max_pivot
+    (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M)
+    (r : ℕ) (hT : fIwasawaTri r M)
     (ρ : Fin n) (hρr : ρ.val = r) (hρ : ρ < Fin.rev ρ) (hp : M ρ ρ ≠ 0)
-    (hmax : ∀ i, ρ ≤ i → i ≤ Fin.rev ρ → Valued.v (M i ρ) ≤ Valued.v (M ρ ρ)) :
-    ∃ k, fIwasawaKm σ k ∧ fIwasawaTri (r + 1) (k * M) := by
+    (hmax : ∀ i, ρ ≤ i → i ≤ Fin.rev ρ → Valued.v (M i ρ) ≤ Valued.v (M ρ ρ))
+    : ∃ k, fIwasawaKm σ k ∧ fIwasawaTri (r + 1) (k * M) := by
   have hne : ρ ≠ Fin.rev ρ := ne_of_lt hρ
   have hσp : σ (M ρ ρ) ≠ 0 := (map_ne_zero σ).mpr hp
   have hvp : Valued.v (M ρ ρ) ≠ 0 := (Valuation.ne_zero_iff _).mpr hp
   have hcz : ∀ i, Fin.rev ρ < i → M i ρ = 0 := fIwasawa_col_zero (σ := σ) M hM r hT ρ hρr hρ
-  obtain ⟨z, hzeq⟩ : ∃ z : Fin n → L,
-      z = fun t => if ρ < t ∧ t < Fin.rev ρ then -(M t ρ) / M ρ ρ else 0 := ⟨_, rfl⟩
+  obtain ⟨z, hzeq⟩
+      : ∃ z : Fin n → L, z = fun t => if ρ < t ∧ t < Fin.rev ρ then -(M t ρ) / M ρ ρ else 0 :=
+    ⟨_, rfl⟩
   have hzout : ∀ t, ¬(ρ < t ∧ t < Fin.rev ρ) → z t = 0 := by
     intro t ht
     rw [hzeq]
@@ -70,10 +73,12 @@ theorem fIwasawa_tri_succ_of_max_pivot (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ 
     exact Fintype.sum_equiv Fin.revPerm _ _ (fun j => by
       simp only [Fin.revPerm_apply, Fin.rev_rev]
       ring)
-  have key : ∀ j, σ (M (Fin.rev j) ρ) * M j ρ =
-      ((if j = ρ then σ (M (Fin.rev ρ) ρ) * M ρ ρ else 0) +
-        (if j = Fin.rev ρ then σ (M ρ ρ) * M (Fin.rev ρ) ρ else 0)) +
-        σ (M ρ ρ) * M ρ ρ * (σ (z (Fin.rev j)) * z j) := by
+  have key
+      : ∀ j,
+        σ (M (Fin.rev j) ρ) * M j ρ
+          = ((if j = ρ then σ (M (Fin.rev ρ) ρ) * M ρ ρ else 0)
+              + (if j = Fin.rev ρ then σ (M ρ ρ) * M (Fin.rev ρ) ρ else 0))
+            + σ (M ρ ρ) * M ρ ρ * (σ (z (Fin.rev j)) * z j) := by
     intro j
     rcases lt_trichotomy j ρ with h1 | h1 | h1
     · rw [hcz (Fin.rev j) (Fin.rev_lt_rev.mpr h1), map_zero σ, hzout j (fun h => lt_asymm h1 h.1),
@@ -92,29 +97,28 @@ theorem fIwasawa_tri_succ_of_max_pivot (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ 
       · rw [hcz j h2, hzout j (fun h => lt_asymm h2 h.2), if_neg (ne_of_gt h1),
           if_neg (ne_of_gt h2)]
         ring
-  have hA : σ (M (Fin.rev ρ) ρ) * M ρ ρ + σ (M ρ ρ) * M (Fin.rev ρ) ρ +
-      σ (M ρ ρ) * M ρ ρ * S = 0 := by
+  have hA
+      : σ (M (Fin.rev ρ) ρ) * M ρ ρ + σ (M ρ ρ) * M (Fin.rev ρ) ρ + σ (M ρ ρ) * M ρ ρ * S = 0 := by
     have hiso := fIwasawa_iso (σ := σ) M hM ρ hρ
     rw [Fintype.sum_congr _ _ key] at hiso
     simp only [Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ,
-      ↓reduceIte, ← Finset.mul_sum] at hiso
+        ↓ reduceIte, ← Finset.mul_sum]
+      at hiso
     rw [hSeq]
     simpa only [fIwasawaH] using hiso
   obtain ⟨c, hceq⟩ : ∃ c : L, c = -S - M (Fin.rev ρ) ρ / M ρ ρ := ⟨_, rfl⟩
   have hc0 : c + σ c + fIwasawaH σ z z = 0 := by
     rw [← hSeq, hceq, map_sub σ, map_neg σ, map_div₀ σ, hS]
     field_simp
-    first
-      | linear_combination hA
-      | linear_combination -hA
-      | linear_combination (-1 : L) * hA
+    first | linear_combination hA | linear_combination -hA | linear_combination (-1 : L) * hA
   have hzv : ∀ i, Valued.v (z i) ≤ 1 := by
     intro i
     by_cases h : ρ < i ∧ i < Fin.rev ρ
     · have h1 := hmax i (le_of_lt h.1) (le_of_lt h.2)
       rw [hMz i h.1 h.2, Valuation.map_mul, Valuation.map_neg] at h1
-      calc Valued.v (z i) = (Valued.v (M ρ ρ))⁻¹ * (Valued.v (M ρ ρ) * Valued.v (z i)) :=
-            (inv_mul_cancel_left₀ hvp _).symm
+      calc
+        Valued.v (z i) = (Valued.v (M ρ ρ))⁻¹ * (Valued.v (M ρ ρ) * Valued.v (z i)) :=
+          (inv_mul_cancel_left₀ hvp _).symm
         _ ≤ (Valued.v (M ρ ρ))⁻¹ * Valued.v (M ρ ρ) := by gcongr
         _ = 1 := inv_mul_cancel₀ hvp
     · rw [hzout i h, Valuation.map_zero]
@@ -124,14 +128,16 @@ theorem fIwasawa_tri_succ_of_max_pivot (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ 
     simp only [fIwasawaH]
     refine Valuation.map_sum_le _ (fun j _ => ?_)
     rw [Valuation.map_mul, hσv]
-    calc Valued.v (z (Fin.rev j)) * Valued.v (z j) ≤ 1 * 1 := by
-          first | exact mul_le_one' (hzv _) (hzv _) | (gcongr <;> exact hzv _)
+    calc
+      Valued.v (z (Fin.rev j)) * Valued.v (z j)
+        ≤ 1 * 1 := by first | exact mul_le_one' (hzv _) (hzv _) | (gcongr <;> exact hzv _)
       _ = 1 := mul_one 1
   have hcv : Valued.v c ≤ 1 := by
     have hb := hmax (Fin.rev ρ) (le_of_lt hρ) le_rfl
     have hbp : Valued.v (M (Fin.rev ρ) ρ / M ρ ρ) ≤ 1 := by
       rw [map_div₀, div_eq_mul_inv]
-      calc Valued.v (M (Fin.rev ρ) ρ) * (Valued.v (M ρ ρ))⁻¹
+      calc
+        Valued.v (M (Fin.rev ρ) ρ) * (Valued.v (M ρ ρ))⁻¹
           ≤ Valued.v (M ρ ρ) * (Valued.v (M ρ ρ))⁻¹ := by gcongr
         _ = 1 := mul_inv_cancel₀ hvp
     have h1 : Valued.v (-S) ≤ 1 := by
@@ -139,8 +145,8 @@ theorem fIwasawa_tri_succ_of_max_pivot (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ 
       exact hSv
     rw [hceq]
     first
-      | exact Valuation.map_sub_le _ h1 hbp
-      | exact le_trans (Valuation.map_sub _ _ _) (max_le h1 hbp)
+    | exact Valuation.map_sub_le _ h1 hbp
+    | exact le_trans (Valuation.map_sub _ _ _) (max_le h1 hbp)
   have he : ∀ i, Valued.v ((Pi.single (Fin.rev ρ) (1 : L) : Fin n → L) i) ≤ 1 := by
     intro i
     by_cases h : i = Fin.rev ρ
@@ -152,23 +158,28 @@ theorem fIwasawa_tri_succ_of_max_pivot (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ 
   have hez : fIwasawaH σ (Pi.single (Fin.rev ρ) (1 : L)) z = 0 := by
     rw [fIwasawa_H_single_left (σ := σ), Fin.rev_rev]
     exact hzout ρ (fun h => lt_irrefl ρ h.1)
-  have hcol : ∀ (A : Matrix (Fin n) (Fin n) L) (i j : Fin n),
-      (A * M) i j = (A *ᵥ fun k => M k j) i := by
+  have hcol
+      : ∀ (A : Matrix (Fin n) (Fin n) L) (i j : Fin n), (A * M) i j = (A *ᵥ fun k => M k j) i := by
     intro A i j
     first
-      | rfl
-      | simp [Matrix.mul_apply, Matrix.mulVec, dotProduct]
-      | simp [Matrix.mul_apply, Matrix.mulVec, Matrix.dotProduct]
-  refine ⟨fIwasawaE σ (Pi.single (Fin.rev ρ) 1) z c,
+    | rfl
+    | simp [Matrix.mul_apply, Matrix.mulVec, dotProduct]
+    | simp [Matrix.mul_apply, Matrix.mulVec, Matrix.dotProduct]
+  refine ⟨
+    fIwasawaE σ (Pi.single (Fin.rev ρ) 1) z c,
     And.intro (fIwasawa_E_un (σ := σ) hσ _ z c hee hez hc0)
-      (fIwasawa_int_E (σ := σ) hσv _ z c he hzv hcv), ?_⟩
+      (fIwasawa_int_E (σ := σ) hσv _ z c he hzv hcv),
+    ?_
+  ⟩
   intro i j hj hji
   rw [hcol]
   by_cases hj' : j.val < r
   · have hjρ : j < ρ := by
       rw [Fin.lt_iff_val_lt_val, hρr]
       exact hj'
-    rw [fIwasawa_E_fix (σ := σ) ρ z c hzsupp (fun k => M k j) (hT ρ j hj' hjρ)
+    rw [fIwasawa_E_fix (σ := σ) ρ z c hzsupp
+      (fun k => M k j)
+      (hT ρ j hj' hjρ)
       (fun t h1 _ => hT t j hj' (lt_trans hjρ h1))]
     exact hT i j hj' hji
   · have hjρ : j = ρ := Fin.ext (by omega)
@@ -180,15 +191,16 @@ theorem fIwasawa_tri_succ_of_max_pivot (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ 
       ring
     · rw [h, Pi.single_eq_same, hzout (Fin.rev ρ) (fun h' => lt_irrefl (Fin.rev ρ) h'.2), hceq]
       first
-        | (field_simp; ring)
-        | (field_simp; done)
-        | (simp only [mul_zero, mul_one, add_zero]; field_simp; ring)
+      | (field_simp; ring)
+      | (field_simp; done)
+      | (simp only [mul_zero, mul_one, add_zero]; field_simp; ring)
     · rw [Pi.single_eq_of_ne (ne_of_gt h), hcz i h, hzout i (fun h' => lt_asymm h h'.2)]
       ring
 
-theorem fIwasawa_reduce (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
-    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) :
-    ∀ r : ℕ, 2 * r ≤ n → ∃ k, fIwasawaKm σ k ∧ fIwasawaTri r (k * M) := by
+theorem fIwasawa_reduce
+    (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M)
+    : ∀ r : ℕ, 2 * r ≤ n → ∃ k, fIwasawaKm σ k ∧ fIwasawaTri r (k * M) := by
   intro r
   induction r with
   | zero =>
@@ -210,13 +222,15 @@ theorem fIwasawa_reduce (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ
     have hk1M : fIwasawaUn σ (k1 * (k * M)) :=
       fIwasawa_un_mul (σ := σ) k1 (k * M) (And.left hk1) hkM
     obtain ⟨k2, hk2, hT2⟩ :=
-      fIwasawa_tri_succ_of_max_pivot (σ := σ) hσ hσv (k1 * (k * M)) hk1M r hT1 ⟨r, hrn⟩ rfl hρ hp1 hmax1
+      fIwasawa_tri_succ_of_max_pivot (σ := σ) hσ hσv (k1 * (k * M)) hk1M r hT1 ⟨r, hrn⟩ rfl hρ hp1
+        hmax1
     refine ⟨k2 * (k1 * k), fIwasawa_Km_mul (σ := σ) hk2 (fIwasawa_Km_mul (σ := σ) hk1 hk), ?_⟩
     simpa only [Matrix.mul_assoc] using hT2
 
-theorem fIwasawa_upper (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
-    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) :
-    ∃ k, fIwasawaKm σ k ∧ (k * M).BlockTriangular id := by
+theorem fIwasawa_upper
+    (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M)
+    : ∃ k, fIwasawaKm σ k ∧ (k * M).BlockTriangular id := by
   obtain ⟨k, hk, hT⟩ := fIwasawa_reduce (σ := σ) hσ hσv M hM (n / 2) (by omega)
   refine ⟨k, hk, ?_⟩
   have hkM : fIwasawaUn σ (k * M) := fIwasawa_un_mul (σ := σ) k M (And.left hk) hM
@@ -229,8 +243,9 @@ theorem fIwasawa_upper (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ 
     have hs : (Fin.rev i).val < n / 2 := by
       rw [Fin.val_rev]
       omega
-    have h0 := (fIwasawa_rows (σ := σ) (k * M) hkM (n / 2) hT (Fin.rev i) hs).2 j
-      (by rw [Fin.rev_rev]; exact hij')
+    have h0 :=
+      (fIwasawa_rows (σ := σ) (k * M) hkM (n / 2) hT (Fin.rev i) hs).2 j
+        (by rw [Fin.rev_rev]; exact hij')
     rwa [Fin.rev_rev] at h0
 
 end FIwasawaStepB

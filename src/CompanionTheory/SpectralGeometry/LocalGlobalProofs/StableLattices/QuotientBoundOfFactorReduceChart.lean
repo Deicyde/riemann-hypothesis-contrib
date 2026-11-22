@@ -17,11 +17,14 @@ namespace GlobalTheory.CompanionTheory.BmuQBound
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem factor_prod {n : ℕ} {H V ι : Type*} [NormedAddCommGroup H] [NormedSpace ℂ H]
-    [NormedAddCommGroup V] [NormedSpace ℂ V] {G : Set (Mat n)} {σ : Mat n → (H →L[ℂ] H)}
-    (h : RepOn G σ) (B : H → V) (g : ι → Mat n) (c : ι → (V →L[ℂ] V)) (hg : ∀ j, g j ∈ G)
-    (hc : ∀ j v, IsSm G σ v → B (σ (g j) v) = c j (B v)) (v : H) (hv : IsSm G σ v) :
-    ∀ l : List ι, (l.map g).prod ∈ G ∧ B (σ (l.map g).prod v) = (l.map c).prod (B v) := by
+theorem factor_prod
+    {n : ℕ} {H V ι : Type*}
+    [NormedAddCommGroup H] [NormedSpace ℂ H] [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {G : Set (Mat n)} {σ : Mat n → (H →L[ℂ] H)} (h : RepOn G σ)
+    (B : H → V) (g : ι → Mat n) (c : ι → (V →L[ℂ] V))
+    (hg : ∀ j, g j ∈ G) (hc : ∀ j v, IsSm G σ v → B (σ (g j) v) = c j (B v))
+    (v : H) (hv : IsSm G σ v)
+    : ∀ l : List ι, (l.map g).prod ∈ G ∧ B (σ (l.map g).prod v) = (l.map c).prod (B v) := by
   intro l
   induction l with
   | nil =>
@@ -33,10 +36,13 @@ theorem factor_prod {n : ℕ} {H V ι : Type*} [NormedAddCommGroup H] [NormedSpa
     refine ⟨h.mul_mem _ (hg a) _ hP, ?_⟩
     rw [h.apply_mul (hg a) hP, hc a _ (IsSm.apply h hv hP), hBP, ContinuousLinearMap.mul_apply]
 
-theorem norm_le_avg {d : ℕ} {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V]
-    (φ : (Fin d → ℝ) → ℝ) (hφ : Continuous φ) (hc : HasCompactSupport φ) (h0 : ∀ t, 0 ≤ φ t)
-    (h1 : ∫ t, φ t = 1) (f : (Fin d → ℝ) → V) (hf : Continuous f) (b : V)
-    (hb : ∀ t, φ t ≠ 0 → ‖f t - b‖ ≤ ‖b‖ / 2) : ‖b‖ ≤ 2 * ‖∫ t, (φ t : ℂ) • f t‖ := by
+theorem norm_le_avg
+    {d : ℕ} {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V]
+    (φ : (Fin d → ℝ) → ℝ)
+    (hφ : Continuous φ) (hc : HasCompactSupport φ) (h0 : ∀ t, 0 ≤ φ t) (h1 : ∫ t, φ t = 1)
+    (f : (Fin d → ℝ) → V) (hf : Continuous f)
+    (b : V) (hb : ∀ t, φ t ≠ 0 → ‖f t - b‖ ≤ ‖b‖ / 2)
+    : ‖b‖ ≤ 2 * ‖∫ t, (φ t : ℂ) • f t‖ := by
   have hφi : Integrable φ := hφ.integrable_of_hasCompactSupport hc
   have hcC : HasCompactSupport (fun t => (φ t : ℂ)) := hc.comp_left Complex.ofReal_zero
   have hφf : Integrable (fun t => (φ t : ℂ) • f t) :=
@@ -75,8 +81,12 @@ theorem qBound (hF : Factor) (hR : Reduce) (hC : ChartExists) : QBound := by
     intro v hv t
     show B (σ ((List.ofFn fun j => ex (X j) (t j)).prod) v) = _
     rw [List.ofFn_eq_map]
-    exact (factor_prod hrep B (fun j => ex (X j) (t j)) (fun j => χ j (t j))
-      (fun j => ex_mem_of_lie (hX j) (t j)) (fun j w hw => hχB j (t j) w hw) v hv (List.finRange d)).2
+    exact (factor_prod hrep B
+      (fun j => ex (X j) (t j))
+      (fun j => χ j (t j))
+      (fun j => ex_mem_of_lie (hX j) (t j))
+      (fun j w hw => hχB j (t j) w hw)
+      v hv (List.finRange d)).2
   obtain ⟨r, hr, hrΦ⟩ : ∃ r > 0, ∀ t : Fin d → ℝ, dist t 0 < r → dist (Φ t) (Φ 0) < 1 / 2 :=
     Metric.continuous_iff.1 hΦc 0 (1 / 2) (by norm_num)
   obtain ⟨r', hr', hr'U⟩ := Metric.isOpen_iff.1 hCh.isOpen 0 hCh.zero
@@ -109,7 +119,8 @@ theorem qBound (hF : Factor) (hR : Reduce) (hC : ChartExists) : QBound := by
   have hRi := fun i => hR n Hm H σ hU d e Q (prodEx X) U hCh (W i) (hW i) φ hφs hφcs hφU
   choose Cr hCr0 hCr using hRi
   refine ⟨2 * ∑ i, ‖β i‖ * Cr i, Finset.univ.sup fun i => (W i).length, ?_, ?_⟩
-  · exact mul_nonneg (by norm_num) (Finset.sum_nonneg fun i _ => mul_nonneg (norm_nonneg _) (hCr0 i))
+  · exact mul_nonneg (by norm_num)
+      (Finset.sum_nonneg fun i _ => mul_nonneg (norm_nonneg _) (hCr0 i))
   intro v hv R hRb
   have hlie : ∀ i, LieW (UH Hm) (W i) := fun i X' hX' t => ex_mem_of_lie (hW i X' hX') t
   have hgc : ∀ i, Continuous fun t => dsW σ (W i) (σ (prodEx X t) v) := fun i =>
@@ -117,32 +128,40 @@ theorem qBound (hF : Factor) (hR : Reduce) (hC : ChartExists) : QBound := by
   have hint : ∀ i, Integrable fun t => (φ t : ℂ) • dsW σ (W i) (σ (prodEx X t) v) := fun i =>
     ((Complex.continuous_ofReal.comp hφs.continuous).smul (hgc i)).integrable_of_hasCompactSupport
       (hφcs.comp_left Complex.ofReal_zero).smul_right
-  have hsum : ∫ t, (φ t : ℂ) • Φ t (B v) =
-      ∑ i, β i (∫ t, (φ t : ℂ) • dsW σ (W i) (σ (prodEx X t) v)) := by
-    have e1 : ∀ t, (φ t : ℂ) • Φ t (B v) =
-        ∑ i, β i ((φ t : ℂ) • dsW σ (W i) (σ (prodEx X t) v)) := by
+  have hsum
+      : ∫ t, (φ t : ℂ) • Φ t (B v)
+        = ∑ i, β i (∫ t, (φ t : ℂ) • dsW σ (W i) (σ (prodEx X t) v)) := by
+    have e1
+        : ∀ t, (φ t : ℂ) • Φ t (B v) = ∑ i, β i ((φ t : ℂ) • dsW σ (W i) (σ (prodEx X t) v)) := by
       intro t
       rw [← hfac v hv t, hBW _ (IsSm.apply hrep hv (hmem t)), Finset.smul_sum]
       simp only [ContinuousLinearMap.map_smul]
     simp_rw [e1]
     rw [integral_finsetSum _ fun i _ => (β i).integrable_comp (hint i)]
     exact Finset.sum_congr rfl fun i _ => (β i).integral_comp_comm (hint i)
-  have havg := norm_le_avg φ hφs.continuous hφcs hφ0 hφ1 (fun t => Φ t (B v))
-    (hΦc.clm_apply continuous_const) (B v) (fun t ht => ?_)
+  have havg :=
+    norm_le_avg φ hφs.continuous hφcs hφ0 hφ1
+      (fun t => Φ t (B v))
+      (hΦc.clm_apply continuous_const) (B v)
+      (fun t ht => ?_)
   · rw [hsum] at havg
-    have hb2 : ‖∑ i, β i (∫ t, (φ t : ℂ) • dsW σ (W i) (σ (prodEx X t) v))‖ ≤
-        ∑ i, ‖β i‖ * Cr i * R := by
+    have hb2
+        : ‖∑ i, β i (∫ t, (φ t : ℂ) • dsW σ (W i) (σ (prodEx X t) v))‖ ≤ ∑ i, ‖β i‖ * Cr i * R := by
       refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => ?_)
       refine ((β i).le_opNorm _).trans ?_
       rw [mul_assoc]
-      exact mul_le_mul_of_nonneg_left (hCr i v hv R fun P hP => hRb P
-        (hP.trans (Finset.le_sup (f := fun i => (W i).length) (Finset.mem_univ i)))) (norm_nonneg _)
+      exact mul_le_mul_of_nonneg_left
+        (hCr i v hv R fun P hP =>
+          hRb P (hP.trans (Finset.le_sup (f := fun i => (W i).length) (Finset.mem_univ i))))
+        (norm_nonneg _)
     rw [← Finset.sum_mul] at hb2
     nlinarith
   · have hsub : Φ t (B v) - B v = (Φ t - 1) (B v) := by
       rw [ContinuousLinearMap.sub_apply, ContinuousLinearMap.one_apply]
     rw [hsub]
-    calc ‖(Φ t - 1) (B v)‖ ≤ ‖Φ t - 1‖ * ‖B v‖ := (Φ t - 1).le_opNorm _
+    calc
+      ‖(Φ t - 1) (B v)‖
+        ≤ ‖Φ t - 1‖ * ‖B v‖ := (Φ t - 1).le_opNorm _
       _ ≤ 1 / 2 * ‖B v‖ := mul_le_mul_of_nonneg_right (hnear t ht) (norm_nonneg _)
       _ = ‖B v‖ / 2 := by ring
 

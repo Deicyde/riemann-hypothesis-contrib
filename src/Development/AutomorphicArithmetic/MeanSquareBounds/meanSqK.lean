@@ -10,7 +10,8 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.MeanSqAbs
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
@@ -52,10 +53,15 @@ private lemma sizes (y w : ℝ) (hy : 1 ≤ y) (hw0 : 0 ≤ w) (hw : w ≤ y ^ (
       _ ≤ 4 * Real.sqrt y := by linarith
 
 set_option maxHeartbeats 800000 in
-theorem meanSqK :
-    ∃ C : ℝ, 0 < C ∧ ∀ ε K : ℝ, 0 < ε → ε ≤ 1 → 1 ≤ K → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀, ∀ (U : ℝ) (m₀ a₀ : ℕ),
-      admitted ε Y U m₀ a₀ → (∀ p : ℕ, p.Prime → p ∣ m₀ → (p : ℝ) ≤ Y ^ (ε / 5) ∨ (Y ^ K) ^ 400 < (p : ℝ)) →
-      MeanSq C ((Y ^ K) ^ 400) (PPset m₀ a₀ U) (Set.Icc Y (Y ^ K)) := by
+theorem meanSqK
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ ε K : ℝ,
+          0 < ε → ε ≤ 1 → 1 ≤ K
+            → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀, ∀ (U : ℝ) (m₀ a₀ : ℕ),
+              admitted ε Y U m₀ a₀
+                → (∀ p : ℕ, p.Prime → p ∣ m₀ → (p : ℝ) ≤ Y ^ (ε / 5) ∨ (Y ^ K) ^ 400 < (p : ℝ))
+                → MeanSq C ((Y ^ K) ^ 400) (PPset m₀ a₀ U) (Set.Icc Y (Y ^ K)) := by
   obtain ⟨C1, hC1, hRR⟩ := RR_le
   obtain ⟨C2, hC2, hsP⟩ := exists_primePowerSum_le_mul_log
   obtain ⟨C3, hC3, hsPsq⟩ := sPsq_le
@@ -76,25 +82,26 @@ theorem meanSqK :
   obtain ⟨nstar, hn⟩ := hY3 Y hYc U m₀ a₀ hA
   set Z := (Y ^ K) ^ 400 with hZ
   have hYK1 : 1 ≤ Y ^ K := Real.one_le_rpow hY1' (by linarith)
-  have hYK : Y ≤ Y ^ K := by
-    simpa using Real.rpow_le_rpow_of_exponent_le hY1' hK
+  have hYK : Y ≤ Y ^ K := by simpa using Real.rpow_le_rpow_of_exponent_le hY1' hK
   have hZY : Y ^ K ≤ Z := le_self_pow₀ hYK1 (by norm_num)
   have hZpos : 0 < Z := by linarith
   have hlogZ : Real.log Z = 400 * K * Real.log Y := by
     rw [hZ, Real.log_pow, Real.log_rpow hY0]; push_cast; ring
   have hZ2 : Z ^ 2 = Real.exp (800 * K * Real.log Y) := by
-    have h : Real.log (Z ^ 2) = 800 * K * Real.log Y := by
-      rw [Real.log_pow, hlogZ]; push_cast; ring
+    have h : Real.log (Z ^ 2) = 800 * K * Real.log Y := by rw [Real.log_pow, hlogZ]; push_cast; ring
     rw [← h, Real.exp_log (pow_pos hZpos 2)]
-  have hZ2' : Z ^ 2 = Y ^ (800 * K) := by
-    rw [hZ2, Real.rpow_def_of_pos hY0]; ring_nf
+  have hZ2' : Z ^ 2 = Y ^ (800 * K) := by rw [hZ2, Real.rpow_def_of_pos hY0]; ring_nf
   have hN : ((⌊Z⌋₊ : ℕ) : ℝ) ≤ Z := Nat.floor_le hZpos.le
   have hN2 : (((⌊Z⌋₊ ^ 2 : ℕ)) : ℝ) ≤ Z ^ 2 := by
     push_cast
     exact pow_le_pow_left₀ (Nat.cast_nonneg _) hN 2
-  have hq : ∀ q ∈ Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset m₀ a₀ U, Nat.Prime q ∧ q % m₀ = a₀ % m₀ ∧ ⌊Z⌋₊ ^ 2 < q := by
+  have hq
+      : ∀ q ∈ Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset m₀ a₀ U,
+        Nat.Prime q ∧ q % m₀ = a₀ % m₀ ∧ ⌊Z⌋₊ ^ 2 < q := by
     intro q hqP
-    simp only [Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset, Finset.mem_filter, Finset.mem_Icc] at hqP
+    simp only [Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset, Finset.mem_filter,
+        Finset.mem_Icc]
+      at hqP
     obtain ⟨⟨hq1, hqU⟩, hqp, hqm, hqs⟩ := hqP
     refine ⟨hqp, hqm, ?_⟩
     have hUf : 0 < ⌊U⌋₊ := by omega
@@ -108,9 +115,12 @@ theorem meanSqK :
       linarith
     have h2 : (((⌊Z⌋₊ ^ 2 : ℕ)) : ℝ) < (q : ℝ) := by linarith
     exact_mod_cast h2
-  have hs : ∀ s : ℕ, 1 < s → Odd s → Squarefree s → s.Coprime m₀ → s ≤ ⌊Z⌋₊ ^ 2 → s ≠ nstar →
-      |∑ q ∈ Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset m₀ a₀ U, ((jacobiSym (q : ℤ) s : ℤ) : ℝ)| ≤
-        Y ^ (-(K + 1)) * ((Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset m₀ a₀ U).card : ℝ) := by
+  have hs
+      : ∀ s : ℕ,
+        1 < s → Odd s → Squarefree s → s.Coprime m₀ → s ≤ ⌊Z⌋₊ ^ 2 → s ≠ nstar
+          → |∑ q ∈ Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset m₀ a₀ U, ((jacobiSym (q : ℤ) s : ℤ) : ℝ)|
+            ≤ Y ^ (-(K + 1))
+              * ((Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset m₀ a₀ U).card : ℝ) := by
     intro s h1 h2 h3 h4 h5 h6
     apply hn s h1 h2 h3 h4 _ h6
     have : ((s : ℕ) : ℝ) ≤ (((⌊Z⌋₊ ^ 2 : ℕ)) : ℝ) := by exact_mod_cast h5
@@ -137,11 +147,15 @@ theorem meanSqK :
     rw [Real.le_log_iff_exp_le (by linarith)]
     linarith [Real.exp_one_lt_d9]
   have hwy : w ≤ y ^ (1 / 5 : ℝ) := by
-    calc w ≤ Y ^ (1 / 5 : ℝ) := Real.rpow_le_rpow_of_exponent_le hY1' (by linarith)
+    calc
+      w ≤ Y ^ (1 / 5 : ℝ) := Real.rpow_le_rpow_of_exponent_le hY1' (by linarith)
       _ ≤ y ^ (1 / 5 : ℝ) := Real.rpow_le_rpow hY0.le hYy (by norm_num)
   obtain ⟨hsz1, hsz2⟩ := sizes y w (by linarith) (by linarith) hwy
-  have hmain := meanSq_abs (Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset m₀ a₀ U) m₀ a₀ nstar Z y (Y ^ (-(K + 1)))
-    (C2 * Real.log y) κ hA.eight hA.coprime hy0 hη0 hq hκ (fun p => hsP y hy3 _ p) hs
+  have hmain :=
+    meanSq_abs (Formalism.HermitianLattices.ZeroFreeRegionGL2.PPset m₀ a₀ U) m₀ a₀ nstar Z y
+      (Y ^ (-(K + 1))) (C2 * Real.log y) κ hA.eight hA.coprime hy0 hη0 hq hκ
+      (fun p => hsP y hy3 _ p)
+      hs
   refine le_trans hmain ?_
   apply mul_le_mul_of_nonneg_right _ (Nat.cast_nonneg _)
   set L := Real.log y with hLdef
@@ -152,7 +166,9 @@ theorem meanSqK :
   have hsq2 : sq * sq = y := Real.mul_self_sqrt hy0
   have hsq1 : 1 ≤ sq := Real.one_le_sqrt.2 (by linarith)
   have hsqy : sq ≤ y := by
-    calc sq = sq * 1 := (mul_one sq).symm
+    calc
+      sq
+        = sq * 1 := (mul_one sq).symm
       _ ≤ sq * sq := mul_le_mul_of_nonneg_left hsq1 hsq0
       _ = y := hsq2
   have hR0 : 0 ≤ R := by
@@ -160,7 +176,8 @@ theorem meanSqK :
     exact Finset.sum_nonneg (fun n _ => cN_nonneg y hy0 n)
   have hRle : R ≤ 5 * C1 * sq := by
     have := hRR y hy3 ⌊Z⌋₊ m₀ w hw1 hpw
-    calc R ≤ C1 * (sq + w * L) := this
+    calc
+      R ≤ C1 * (sq + w * L) := this
       _ ≤ C1 * (5 * sq) := mul_le_mul_of_nonneg_left (by linarith) hC1.le
       _ = 5 * C1 * sq := by ring
   have hyL : y ≤ y * L := le_mul_of_one_le_right hy0 hL1
@@ -192,8 +209,7 @@ theorem meanSqK :
     have h6 : C1 * C2 * (2 * y) = 2 * (C1 * C2 * y) := by ring
     have h7 : 20 * C1 * C2 * (y * L) = 20 * (C1 * C2 * (y * L)) := by ring
     linarith
-  have hS0 : 0 ≤ ∑ n ∈ Finset.Icc 1 ⌊Z⌋₊, cN y n :=
-    Finset.sum_nonneg (fun n _ => cN_nonneg y hy0 n)
+  have hS0 : 0 ≤ ∑ n ∈ Finset.Icc 1 ⌊Z⌋₊, cN y n := Finset.sum_nonneg (fun n _ => cN_nonneg y hy0 n)
   have hS : ∑ n ∈ Finset.Icc 1 ⌊Z⌋₊, cN y n ≤ C4 * y * (400 * K * Real.log Y) := by
     rw [← hlogZ]; exact hcN y Z hy0 (by linarith)
   have hKL : (400 * K * Real.log Y) ^ 2 ≤ Y := by
@@ -205,14 +221,19 @@ theorem meanSqK :
   have hS2 : (∑ n ∈ Finset.Icc 1 ⌊Z⌋₊, cN y n) ^ 2 ≤ C4 ^ 2 * y ^ 2 * Y := by
     have h := pow_le_pow_left₀ hS0 hS 2
     have h2 : (C4 * y * (400 * K * Real.log Y)) ^ 2 ≤ C4 ^ 2 * y ^ 2 * Y := by
-      rw [show (C4 * y * (400 * K * Real.log Y)) ^ 2 = C4 ^ 2 * y ^ 2 * (400 * K * Real.log Y) ^ 2 by ring]
+      rw [show (C4 * y * (400 * K * Real.log Y)) ^ 2
+          = C4 ^ 2 * y ^ 2 * (400 * K * Real.log Y) ^ 2 by
+        ring]
       exact mul_le_mul_of_nonneg_left hKL (by positivity)
     linarith
   have hη1 : y * Y * Y ^ (-(K + 1)) ≤ 1 := by
-    calc y * Y * Y ^ (-(K + 1)) ≤ Y ^ K * Y * Y ^ (-(K + 1)) := by gcongr
+    calc
+      y * Y * Y ^ (-(K + 1))
+        ≤ Y ^ K * Y * Y ^ (-(K + 1)) := by gcongr
       _ = 1 := hprod
   have hηt : Y ^ (-(K + 1)) * (∑ n ∈ Finset.Icc 1 ⌊Z⌋₊, cN y n) ^ 2 ≤ C4 ^ 2 * (y * L) := by
-    calc Y ^ (-(K + 1)) * (∑ n ∈ Finset.Icc 1 ⌊Z⌋₊, cN y n) ^ 2
+    calc
+      Y ^ (-(K + 1)) * (∑ n ∈ Finset.Icc 1 ⌊Z⌋₊, cN y n) ^ 2
         ≤ Y ^ (-(K + 1)) * (C4 ^ 2 * y ^ 2 * Y) := mul_le_mul_of_nonneg_left hS2 hη0
       _ = C4 ^ 2 * y * (y * Y * Y ^ (-(K + 1))) := by ring
       _ ≤ C4 ^ 2 * y * 1 := mul_le_mul_of_nonneg_left hη1 (by positivity)
@@ -220,8 +241,10 @@ theorem meanSqK :
   have hA1' : ∑ p ∈ Finset.Icc 1 ⌊Z⌋₊ with Nat.Prime p, sP (cN y) ⌊Z⌋₊ p ^ 2 ≤ C3 * (y * L) := by
     have : C3 * y * L = C3 * (y * L) := by ring
     linarith
-  calc _ ≤ C3 * (y * L) + 25 * C1 ^ 2 * (y * L) + 4 * C2 ^ 2 * (y * L) + 20 * C1 * C2 * (y * L)
-        + C4 ^ 2 * (y * L) := by linarith
+  calc
+    _ ≤ C3 * (y * L) + 25 * C1 ^ 2 * (y * L) + 4 * C2 ^ 2 * (y * L) + 20 * C1 * C2 * (y * L)
+        + C4 ^ 2 * (y * L) := by
+      linarith
     _ = (C3 + 25 * C1 ^ 2 + 4 * C2 ^ 2 + 20 * C1 * C2 + C4 ^ 2) * y * L := by ring
 
 end QH

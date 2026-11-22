@@ -8,13 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Orthogo
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun
-  GlobalTheory.Published GlobalTheory.ResSel GlobalTheory.StepTwo GlobalTheory.TwistDet GlobalTheory.NewPrime GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.SelFun
+  GlobalTheory.Published GlobalTheory.ResSel GlobalTheory.StepTwo GlobalTheory.TwistDet
+  GlobalTheory.NewPrime GlobalTheory.Published.PoitouTate
 
 namespace GlobalTheory.NewPrime.CharDual
 
-theorem exists_char_ne_zero (n : ℕ) (hn : n ≠ 0) {G : Type} [AddCommGroup G]
-    (hG : ∀ g : G, n • g = 0) {g : G} (hg : g ≠ 0) : ∃ φ : G →+ ZMod n, φ g ≠ 0 := by
+theorem exists_char_ne_zero
+    (n : ℕ) (hn : n ≠ 0) {G : Type} [AddCommGroup G] (hG : ∀ g : G, n • g = 0) {g : G} (hg : g ≠ 0)
+    : ∃ φ : G →+ ZMod n, φ g ≠ 0 := by
   haveI : NeZero n := ⟨hn⟩
   letI : Module (ZMod n) G := AddCommGroup.zmodModule hG
   obtain ⟨f, hf⟩ := GlobalTheory.ZModPerp.exists_dual_ne_zero (n := n) hg
@@ -47,18 +51,21 @@ end GlobalTheory.NewPrime.CharDual
 
 namespace GlobalTheory.NewPrime
 
-
 open GlobalTheory.NewPrime.CharDual in
-theorem charDual_cogenerator : ∀ (A : Type) [CommRing A] [Finite A] (n : ℕ), n ≠ 0 → (n : A) = 0 →
-    ∃ (Y : Type) (_ : AddCommGroup Y) (_ : Module A Y) (_ : Finite Y) (β : Y →+ A →+ ZMod n),
-      Perf A β ∧ ∀ (a : ℕ) (Φ : Matrix (Fin a) (Fin a) A) (v : Fin a → A),
-        (∀ x : Fin a → Y, matAct Φ x = 0 → ∑ j, v j • x j = 0) → v ∈ what₂ Φ := by
+theorem charDual_cogenerator
+    : ∀ (A : Type) [CommRing A] [Finite A] (n : ℕ),
+      n ≠ 0 → (n : A) = 0
+        → ∃ (Y : Type) (_ : AddCommGroup Y) (_ : Module A Y) (_ : Finite Y) (β : Y →+ A →+ ZMod n),
+          Perf A β
+            ∧ ∀ (a : ℕ) (Φ : Matrix (Fin a) (Fin a) A) (v : Fin a → A),
+              (∀ x : Fin a → Y, matAct Φ x = 0 → ∑ j, v j • x j = 0) → v ∈ what₂ Φ := by
   intro A _ _ n hn hnA
   haveI : NeZero n := ⟨hn⟩
   letI : Module A (A →+ ZMod n) := charModule A n
   haveI : Finite (A →+ ZMod n) :=
     Finite.of_injective (fun φ : A →+ ZMod n => (φ : A → ZMod n)) DFunLike.coe_injective
-  refine ⟨A →+ ZMod n, inferInstance, inferInstance, inferInstance, AddMonoidHom.id _, ⟨?_, ?_, ?_⟩, ?_⟩
+  refine
+    ⟨A →+ ZMod n, inferInstance, inferInstance, inferInstance, AddMonoidHom.id _, ⟨?_, ?_, ?_⟩, ?_⟩
   · intro a y y'
     rfl
   · intro y hy
@@ -66,8 +73,8 @@ theorem charDual_cogenerator : ∀ (A : Type) [CommRing A] [Finite A] (n : ℕ),
     exact hy b
   · intro y' hy'
     by_contra h
-    obtain ⟨φ, hφ⟩ := exists_char_ne_zero n hn (G := A) (fun g => by
-      rw [nsmul_eq_mul, hnA, zero_mul]) h
+    obtain ⟨φ, hφ⟩ :=
+      exists_char_ne_zero n hn (G := A) (fun g => by rw [nsmul_eq_mul, hnA, zero_mul]) h
     exact hφ (hy' φ)
   · intro a Φ v hv
     by_contra hvr
@@ -79,8 +86,7 @@ theorem charDual_cogenerator : ∀ (A : Type) [CommRing A] [Finite A] (n : ℕ),
         show n • (Submodule.Quotient.mk w : Q) = 0
         rw [← Nat.cast_smul_eq_nsmul A, ← Submodule.Quotient.mk_smul, hnA, zero_smul,
           Submodule.Quotient.mk_zero]
-    have hmk : (Submodule.Quotient.mk v : Q) ≠ 0 := by
-      rwa [Ne, Submodule.Quotient.mk_eq_zero]
+    have hmk : (Submodule.Quotient.mk v : Q) ≠ 0 := by rwa [Ne, Submodule.Quotient.mk_eq_zero]
     obtain ⟨ψ, hψ⟩ := exists_char_ne_zero n hn hQ hmk
     let L : (Fin a → A) →+ ZMod n := ψ.comp (what₂ Φ).mkQ.toAddMonoidHom
     let x : Fin a → (A →+ ZMod n) := fun j => L.comp (AddMonoidHom.single (fun _ => A) j)

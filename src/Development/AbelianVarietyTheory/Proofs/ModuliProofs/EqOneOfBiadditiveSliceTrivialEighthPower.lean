@@ -13,19 +13,41 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Loc
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.FormBundleKer
 
-
 open GlobalTheory.CechPic in
-theorem eq_one_of_slice_trivial : ∀ (W : Matrix (Fin 8) (Fin 8) ℤ) (S : Scheme.{0}) (G A : Over S) [GrpObj G] [IsCommMonObj G] [GrpObj A] [IsCommMonObj A] (pr : Fin 8 → (G ⟶ A)) (L : LB G.left) (P : LB (G2 A).left), (∀ u, IsMonHom (pr u)) → (∀ (T : Over S) (y : Fin 8 → (T ⟶ A)), ∃! x : T ⟶ G, ∀ u, x ≫ pr u = y u) → L.IsLB → P.IsLB → LBIso P (P.pull (lift (snd A A) (fst A A)).left) → (∀ (T : Over S) (x x' y : T ⟶ A), (∃ t : (LB.LinComb P (K := Fin 3) ![(lift (x * x') y).left, (lift x y).left, (lift x' y).left] ![1, -1, -1]).Gen, t.IsGen) ∧ ∃ t : (LB.LinComb P (K := Fin 3) ![(lift y (x * x')).left, (lift y x).left, (lift y x').left] ![1, -1, -1]).Gen, t.IsGen) → LBIso L (LB.LinComb P (K := Fin 8 × Fin 8) (fun uv => (lift (pr uv.1) (pr uv.2)).left) (fun uv => W uv.1 uv.2)) → Out.KTriv G L → ∀ (T : Over S) (x : T ⟶ A), (∃ t : (P.pull (lift (snd A T ≫ x) (fst A T)).left).Gen, t.IsGen) → x = 1 := by
+theorem eq_one_of_slice_trivial
+    : ∀ (W : Matrix (Fin 8) (Fin 8) ℤ) (S : Scheme.{0}) (G A : Over S) [GrpObj G] [IsCommMonObj G]
+        [GrpObj A] [IsCommMonObj A] (pr : Fin 8 → (G ⟶ A)) (L : LB G.left) (P : LB (G2 A).left),
+      (∀ u, IsMonHom (pr u))
+        → (∀ (T : Over S) (y : Fin 8 → (T ⟶ A)), ∃! x : T ⟶ G, ∀ u, x ≫ pr u = y u) → L.IsLB
+        → P.IsLB → LBIso P (P.pull (lift (snd A A) (fst A A)).left)
+        → (∀ (T : Over S) (x x' y : T ⟶ A),
+          (∃ t : (LB.LinComb P (K := Fin 3)
+                ![(lift (x * x') y).left, (lift x y).left, (lift x' y).left] ![1, -1, -1]).Gen,
+              t.IsGen)
+            ∧ ∃ t : (LB.LinComb P (K := Fin 3)
+                ![(lift y (x * x')).left, (lift y x).left, (lift y x').left] ![1, -1, -1]).Gen,
+              t.IsGen)
+        → LBIso L
+          (LB.LinComb P (K := Fin 8 × Fin 8)
+            (fun uv => (lift (pr uv.1) (pr uv.2)).left)
+            (fun uv => W uv.1 uv.2))
+        → Out.KTriv G L
+        → ∀ (T : Over S) (x : T ⟶ A),
+          (∃ t : (P.pull (lift (snd A T ≫ x) (fst A T)).left).Gen, t.IsGen) → x = 1 := by
   intro W S G A _ _ _ _ pr L P hpr huniv hL hP hsym hbi hLP hK T x hx
-  let p : ∀ {T' : Over S}, (T' ⟶ A) → (T' ⟶ A) → Pic T'.left := fun a b => pull (lift a b).left (cls P hP)
-  have padd : ∀ {T' : Over S} (a a' b : T' ⟶ A), p (a * a') b = p a b + p a' b := fun {T'} a a' b => by
+  let p : ∀ {T' : Over S}, (T' ⟶ A) → (T' ⟶ A) → Pic T'.left := fun a b =>
+    pull (lift a b).left (cls P hP)
+  have padd
+      : ∀ {T' : Over S} (a a' b : T' ⟶ A), p (a * a') b = p a b + p a' b := fun {T'} a a' b => by
     have e := (cls_eq_zero_iff (LB.isLB_linComb hP _ _)).2 (hbi T' a a' b).1
     rw [cls_linComb hP, Fin.sum_univ_three] at e
     simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val, one_smul, neg_smul] at e
@@ -50,8 +72,10 @@ theorem eq_one_of_slice_trivial : ∀ (W : Matrix (Fin 8) (Fin 8) ℤ) (S : Sche
       rw [← Over.comp_left, comp_lift, lift_fst, lift_snd_assoc]
     show pull (lift (τ ≫ x) y).left (cls P hP) = 0
     rw [← k, pull_comp, e, map_zero]
-  have hl : ∀ {T' : Over S} (z : T' ⟶ G), pull z.left (cls L hL) =
-      ∑ uv : Fin 8 × Fin 8, W uv.1 uv.2 • p (z ≫ pr uv.1) (z ≫ pr uv.2) := fun z => by
+  have hl
+      : ∀ {T' : Over S} (z : T' ⟶ G),
+        pull z.left (cls L hL)
+          = ∑ uv : Fin 8 × Fin 8, W uv.1 uv.2 • p (z ≫ pr uv.1) (z ≫ pr uv.2) := fun z => by
     have e := (cls_eq_iff hL (LB.isLB_linComb hP _ _)).2 hLP
     rw [cls_linComb hP] at e
     set_option synthInstance.maxHeartbeats 100000 in

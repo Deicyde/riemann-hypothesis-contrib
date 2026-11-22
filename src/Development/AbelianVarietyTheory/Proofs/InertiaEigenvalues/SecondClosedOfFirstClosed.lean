@@ -11,17 +11,23 @@ public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.BlockJ
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 
 namespace GlobalTheory.BlockJumpsCompare
 
 section Continuity
 
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
-  [IsTopologicalRing O] {X : Type} [TopologicalSpace X]
+variable
+  {O : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O] [IsTopologicalRing O]
+  {X : Type} [TopologicalSpace X]
 
-theorem continuous_of_mul (had : IsAdic (IsLocalRing.maximalIdeal O)) {d : O} (hd : d ≠ 0) {f : X → O}
-    (h : Continuous fun x => d * f x) : Continuous f := by
+theorem continuous_of_mul
+    (had : IsAdic (IsLocalRing.maximalIdeal O))
+    {d : O} (hd : d ≠ 0)
+    {f : X → O} (h : Continuous fun x => d * f x)
+    : Continuous f := by
   obtain ⟨p, hp⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨k, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hd hp
   have hm : ∀ (n : ℕ) (y : O), y ∈ (IsLocalRing.maximalIdeal O) ^ n ↔ p ^ n ∣ y := by
@@ -42,10 +48,15 @@ theorem continuous_of_mul (had : IsAdic (IsLocalRing.maximalIdeal O)) {d : O} (h
     exact (mul_dvd_mul_iff_left (pow_ne_zero k hp.ne_zero)).1 hx'
   simpa [ContinuousAt] using h1.add_const (f x₀)
 
-theorem continuous_of_comb (had : IsAdic (IsLocalRing.maximalIdeal O)) {ι : Type} [Fintype ι]
-    (c : ι → FractionRing O) {h : ι → X → O} (hh : ∀ j, Continuous (h j)) {f : X → O}
-    (hf : ∀ x, algebraMap O (FractionRing O) (f x) =
-      ∑ j, c j * algebraMap O (FractionRing O) (h j x)) : Continuous f := by
+theorem continuous_of_comb
+    (had : IsAdic (IsLocalRing.maximalIdeal O))
+    {ι : Type} [Fintype ι]
+    (c : ι → FractionRing O)
+    {h : ι → X → O} (hh : ∀ j, Continuous (h j))
+    {f : X → O}
+    (hf
+      : ∀ x, algebraMap O (FractionRing O) (f x) = ∑ j, c j * algebraMap O (FractionRing O) (h j x))
+    : Continuous f := by
   obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) c
   choose a ha using hd
   refine continuous_of_mul had (nonZeroDivisors.ne_zero d.2) ?_
@@ -53,28 +64,33 @@ theorem continuous_of_comb (had : IsAdic (IsLocalRing.maximalIdeal O)) {ι : Typ
     funext x
     apply IsFractionRing.injective O (FractionRing O)
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_mul, map_sum, hf, ha, Finset.mul_sum, Algebra.smul_def, mul_assoc]
+    simp only [map_mul, map_sum, hf, ha, Finset.mul_sum, Algebra.smul_def, mul_assoc]
   rw [this]
   exact continuous_finsetSum _ fun j _ => continuous_const.mul (hh j)
 
-theorem continuous_of_splitsAs (had : IsAdic (IsLocalRing.maximalIdeal O)) {Γ : Type} [Group Γ]
-    [TopologicalSpace Γ] {n r t : ℕ} {M : Γ →* Matrix (Fin n) (Fin n) O}
-    {P : Γ →* Matrix (Fin r) (Fin r) O} {χ : Fin t → Γ → FractionRing O}
-    (hs : GlobalTheory.IndefiniteRowSideFullHecke.BlockHodgeTateJumps.SplitsAs (mapM (algebraMap O (FractionRing O)) M)
-      (mapM (algebraMap O (FractionRing O)) P) χ)
-    (hM : Continuous fun g => M g) : Continuous fun g => P g := by
+theorem continuous_of_splitsAs
+    (had : IsAdic (IsLocalRing.maximalIdeal O))
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    {n r t : ℕ} {M : Γ →* Matrix (Fin n) (Fin n) O} {P : Γ →* Matrix (Fin r) (Fin r) O}
+    {χ : Fin t → Γ → FractionRing O}
+    (hs : GlobalTheory.IndefiniteRowSideFullHecke.BlockHodgeTateJumps.SplitsAs
+      (mapM (algebraMap O (FractionRing O)) M) (mapM (algebraMap O (FractionRing O)) P) χ)
+    (hM : Continuous fun g => M g)
+    : Continuous fun g => P g := by
   obtain ⟨e, he⟩ := hs
   refine continuous_matrix fun a b => ?_
   set u : Fin n → FractionRing O := e.symm (Pi.single b 1, 0) with hu
   refine continuous_of_comb had
     (fun jk : Fin n × Fin n => (e (Pi.single jk.1 1)).1 a * u jk.2)
-    (h := fun jk g => M g jk.1 jk.2) (fun jk => hM.matrix_elem jk.1 jk.2) fun g => ?_
+    (h := fun jk g => M g jk.1 jk.2)
+    (fun jk => hM.matrix_elem jk.1 jk.2)
+    fun g => ?_
   have h1 := congrFun (congrArg Prod.fst (he g u)) a
   have h2 : ∀ v : Fin n → FractionRing O, (e v).1 a = ∑ j, (e (Pi.single j 1)).1 a * v j := by
     intro v
     conv_lhs => rw [pi_eq_sum_univ' v]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Prod.fst_sum, Finset.sum_apply, mul_comm]
+    simp [map_sum, Prod.fst_sum, Finset.sum_apply, mul_comm]
   rw [h2] at h1
   simp only [hu, LinearEquiv.apply_symm_apply, Matrix.mulVec_single_one] at h1
   rw [← hu] at h1
@@ -91,15 +107,19 @@ end Continuity
 
 section Glob
 
-variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (i : N.Loc)
+variable
+  {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (i : N.Loc)
   (r : N.X i → (GE N →* GL (Fin R.nV) (N.O i))) (ρ : N.X i → (GE N →* GL (Fin R.r) (N.O i)))
 
-theorem blockSum_iff (π : N.X i) :
-    GlobalTheory.IndefiniteRowSideFullHecke.BlockJumpCount.IsBlockSum N i r ρ π ↔ GlobalTheory.IndefiniteRowSideFullHecke.BlockHodgeTateJumps.BlockSplit N i r ρ π := Iff.rfl
+theorem blockSum_iff (π : N.X i)
+    : GlobalTheory.IndefiniteRowSideFullHecke.BlockJumpCount.IsBlockSum N i r ρ π
+      ↔ GlobalTheory.IndefiniteRowSideFullHecke.BlockHodgeTateJumps.BlockSplit N i r ρ π :=
+  Iff.rfl
 
-theorem continuous_rho (π : N.X i) (hr : IsHeckeGalois N i π (r π))
-    (hs : GlobalTheory.IndefiniteRowSideFullHecke.BlockJumpCount.IsBlockSum N i r ρ π) :
-    Continuous (fun g => ((ρ π g : GL (Fin R.r) (N.O i)) : Matrix (Fin R.r) (Fin R.r) (N.O i))) :=
+theorem continuous_rho
+    (π : N.X i) (hr : IsHeckeGalois N i π (r π))
+    (hs : GlobalTheory.IndefiniteRowSideFullHecke.BlockJumpCount.IsBlockSum N i r ρ π)
+    : Continuous (fun g => ((ρ π g : GL (Fin R.r) (N.O i)) : Matrix (Fin R.r) (Fin R.r) (N.O i))) :=
   continuous_of_splitsAs (M := rO N i r π) (P := rhoO N i ρ π) (N.O_adic i)
     ((blockSum_iff N i r ρ π).1 hs) hr.1
 

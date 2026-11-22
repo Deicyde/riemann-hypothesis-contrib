@@ -10,23 +10,30 @@ open MvPolynomial Filter Topology PositivityTheory.Rg.Fx
 
 namespace UpperTheory.ConvolutionTheory.FX
 
-private theorem kill_lift_single {ι A : Type} [CommRing A] [Algebra ℂ A] (x : ι → A)
-    (τ : Multiplicative (ι → ℝ) →* A) (v : ι → ℝ) (p : MvPolynomial ι ℂ) :
-    PositivityTheory.Rg.Fx.lift x τ (AddMonoidAlgebra.single v p) = aeval x p * τ (Multiplicative.ofAdd v) := by
+private theorem kill_lift_single
+    {ι A : Type} [CommRing A] [Algebra ℂ A]
+    (x : ι → A) (τ : Multiplicative (ι → ℝ) →* A) (v : ι → ℝ) (p : MvPolynomial ι ℂ)
+    : PositivityTheory.Rg.Fx.lift x τ (AddMonoidAlgebra.single v p)
+      = aeval x p * τ (Multiplicative.ofAdd v) := by
   simp [PositivityTheory.Rg.Fx.lift]
 
-private theorem kill_ev_X {ι : Type} [Fintype ι] (Λ : ι → ℂ) (i : ι) :
-    ev Λ (AddMonoidAlgebra.single 0 (X i)) = Λ i := by
+private theorem kill_ev_X {ι : Type} [Fintype ι] (Λ : ι → ℂ) (i : ι)
+    : ev Λ (AddMonoidAlgebra.single 0 (X i)) = Λ i := by
   rw [ev, kill_lift_single]
   simp
 
-private theorem kill_aff_id {ι : Type} [Fintype ι] [DecidableEq ι] (f : EP ι) :
-    aff (0 : ι → ℂ) (1 : Matrix ι ι ℝ) f = f := by
-  have hx : ∀ p : MvPolynomial ι ℂ,
-      aeval (fun i : ι => (AddMonoidAlgebra.single 0
-        (C ((0 : ι → ℂ) i) + lin ((1 : Matrix ι ι ℝ) i)) : EP ι)) p = AddMonoidAlgebra.single 0 p := by
+private theorem kill_aff_id {ι : Type} [Fintype ι] [DecidableEq ι] (f : EP ι)
+    : aff (0 : ι → ℂ) (1 : Matrix ι ι ℝ) f = f := by
+  have hx
+      : ∀ p : MvPolynomial ι ℂ,
+        aeval
+            (fun i : ι =>
+              (AddMonoidAlgebra.single 0 (C ((0 : ι → ℂ) i) + lin ((1 : Matrix ι ι ℝ) i)) : EP ι))
+            p
+          = AddMonoidAlgebra.single 0 p := by
     intro p
-    have h1 : ∀ i : ι, C ((0 : ι → ℂ) i) + lin ((1 : Matrix ι ι ℝ) i) = (X i : MvPolynomial ι ℂ) := by
+    have h1
+        : ∀ i : ι, C ((0 : ι → ℂ) i) + lin ((1 : Matrix ι ι ℝ) i) = (X i : MvPolynomial ι ℂ) := by
       intro i
       simp [lin, Matrix.one_apply, apply_ite]
     simp only [h1]
@@ -41,15 +48,15 @@ private theorem kill_aff_id {ι : Type} [Fintype ι] [DecidableEq ι] (f : EP ι
     rw [aff, kill_lift_single, hx]
     simp [affChar, expChar, AddMonoidAlgebra.single_mul_single]
 
-private theorem kill_ren_id {ι : Type} [Fintype ι] [DecidableEq ι] (f : EP ι) :
-    ren (id : ι → ι) f = f := by
+private theorem kill_ren_id {ι : Type} [Fintype ι] [DecidableEq ι] (f : EP ι)
+    : ren (id : ι → ι) f = f := by
   have : (Matrix.of fun i j : ι => if id i = j then (1 : ℝ) else 0) = 1 := by
     ext i j
     simp [Matrix.one_apply]
   rw [ren, this, kill_aff_id]
 
-private theorem kill_ren_ren {ι : Type} [Fintype ι] [DecidableEq ι] (δ δ' : ι → ι) (f : EP ι) :
-    ren δ' (ren δ f) = ren (δ' ∘ δ) f := by
+private theorem kill_ren_ren {ι : Type} [Fintype ι] [DecidableEq ι] (δ δ' : ι → ι) (f : EP ι)
+    : ren δ' (ren δ f) = ren (δ' ∘ δ) f := by
   rw [ren, ren, ren, (subst ι ι _ _ f).2]
   congr 2
   · funext i
@@ -61,20 +68,24 @@ private theorem kill_ren_ren {ι : Type} [Fintype ι] [DecidableEq ι] (δ δ' :
       simp [Ne.symm hl]
     · simp
 
-private theorem kill_ev_ren {ι : Type} [Fintype ι] [DecidableEq ι] (δ : ι → ι) (Λ : ι → ℂ) (f : EP ι) :
-    ev Λ (ren δ f) = ev (Λ ∘ δ) f := by
+private theorem kill_ev_ren
+    {ι : Type} [Fintype ι] [DecidableEq ι] (δ : ι → ι) (Λ : ι → ℂ) (f : EP ι)
+    : ev Λ (ren δ f) = ev (Λ ∘ δ) f := by
   rw [ren, (subst ι ι _ _ f).1]
   congr 2
   funext i
   simp [apply_ite]
 
-private theorem kill_evK_ren {ι κ : Type} [Fintype ι] [DecidableEq ι] (δ : ι → ι) (Λ : ι → ℂ) (h : κ → ℂ)
-    (G : KF ι κ) : evK Λ h (map (ren δ) G) = evK (Λ ∘ δ) h G := by
+private theorem kill_evK_ren
+    {ι κ : Type} [Fintype ι] [DecidableEq ι] (δ : ι → ι) (Λ : ι → ℂ) (h : κ → ℂ) (G : KF ι κ)
+    : evK Λ h (map (ren δ) G) = evK (Λ ∘ δ) h G := by
   have : (ev Λ).comp (ren δ) = ev (Λ ∘ δ) := RingHom.ext (kill_ev_ren δ Λ)
   rw [evK, evK, coe_eval₂Hom, coe_eval₂Hom, eval₂_map, this]
 
-private theorem kill_mem_of_ker {ι κ : Type} [Fintype ι] (b : Fam ι κ) (Λ : ι → ℂ) (h : κ → ℂ)
-    (H : RingHom.ker b.sub ≤ RingHom.ker (evK Λ h)) : b.Mem Λ h := by
+private theorem kill_mem_of_ker
+    {ι κ : Type} [Fintype ι]
+    (b : Fam ι κ) (Λ : ι → ℂ) (h : κ → ℂ) (H : RingHom.ker b.sub ≤ RingHom.ker (evK Λ h))
+    : b.Mem Λ h := by
   classical
   let Λ₁ : Fin b.r → ℂ := fun j => - ∑ i, (b.pr j i : ℂ) * b.Λ i
   let lam : Fin b.r → ℂ := fun j => Λ₁ j + ∑ i, (b.pr j i : ℂ) * Λ i
@@ -105,23 +116,30 @@ private theorem kill_mem_of_ker {ι κ : Type} [Fintype ι] (b : Fam ι κ) (Λ 
 end UpperTheory.ConvolutionTheory.FX
 
 open UpperTheory.ConvolutionTheory.FX in
-theorem UpperTheory.ConvolutionTheory.FX.killing0 :
-    ∀ (ι κ B : Type) [Fintype ι] [DecidableEq ι] [Fintype B] (W : Subgroup (Equiv.Perm ι)) (b : B → Fam ι κ) (Λ₀ : ι → ℂ) (h₀ : κ → ℂ), (∀ w ∈ W, ∀ i, ¬ (b i).Mem (Λ₀ ∘ w) h₀) → ∃ F : KF ι κ, (∀ w ∈ W, map (ren (w : ι → ι)) F = F) ∧ (∀ i, (b i).sub F = 0) ∧ evK Λ₀ h₀ F ≠ 0 := by
+theorem UpperTheory.ConvolutionTheory.FX.killing0
+    : ∀ (ι κ B : Type) [Fintype ι] [DecidableEq ι] [Fintype B] (W : Subgroup (Equiv.Perm ι))
+        (b : B → Fam ι κ) (Λ₀ : ι → ℂ) (h₀ : κ → ℂ),
+      (∀ w ∈ W, ∀ i, ¬ (b i).Mem (Λ₀ ∘ w) h₀)
+        → ∃ F : KF ι κ,
+          (∀ w ∈ W, map (ren (w : ι → ι)) F = F) ∧ (∀ i, (b i).sub F = 0) ∧ evK Λ₀ h₀ F ≠ 0 := by
   intro ι κ B _ _ _ W b Λ₀ h₀ hW
   classical
   haveI : Fintype W := Fintype.ofFinite W
-  have hG : ∀ i, ∃ G : KF ι κ, (b i).sub G = 0 ∧ ∀ w : W, evK (Λ₀ ∘ (w : Equiv.Perm ι)) h₀ G ≠ 0 := by
+  have hG
+      : ∀ i, ∃ G : KF ι κ, (b i).sub G = 0 ∧ ∀ w : W, evK (Λ₀ ∘ (w : Equiv.Perm ι)) h₀ G ≠ 0 := by
     intro i
     by_contra hc
     push Not at hc
-    have hsub : ((RingHom.ker (b i).sub : Ideal (KF ι κ)) : Set (KF ι κ)) ⊆
-        ⋃ w ∈ (↑(Finset.univ : Finset W) : Set W),
-          ((RingHom.ker (evK (Λ₀ ∘ (w : Equiv.Perm ι)) h₀) : Ideal (KF ι κ)) : Set (KF ι κ)) := by
-      intro G hG
-      obtain ⟨w, hw⟩ := hc G hG
-      exact Set.mem_biUnion (Finset.mem_coe.2 (Finset.mem_univ w)) hw
-    obtain ⟨w, -, hw⟩ := (Ideal.subset_union_prime (1 : W) 1
-      (fun w _ _ _ => RingHom.ker_isPrime _)).1 hsub
+    have hsub
+        : ((RingHom.ker (b i).sub : Ideal (KF ι κ)) : Set (KF ι κ))
+          ⊆ ⋃ w ∈ (↑(Finset.univ : Finset W) : Set W),
+              ((RingHom.ker (evK (Λ₀ ∘ (w : Equiv.Perm ι)) h₀) : Ideal (KF ι κ)) : Set (KF ι κ)) :=
+      by
+        intro G hG
+        obtain ⟨w, hw⟩ := hc G hG
+        exact Set.mem_biUnion (Finset.mem_coe.2 (Finset.mem_univ w)) hw
+    obtain ⟨w, -, hw⟩ :=
+      (Ideal.subset_union_prime (1 : W) 1 (fun w _ _ _ => RingHom.ker_isPrime _)).1 hsub
     exact hW w w.2 i (kill_mem_of_ker _ _ _ hw)
   choose G hG0 hG1 using hG
   refine ⟨∏ i, ∏ w : W, map (ren ((w : Equiv.Perm ι) : ι → ι)) (G i), ?_, ?_, ?_⟩
@@ -130,8 +148,9 @@ theorem UpperTheory.ConvolutionTheory.FX.killing0 :
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [map_prod]
     refine Fintype.prod_equiv (Equiv.mulLeft (⟨w', hw'⟩ : W)) _ _ fun w => ?_
-    have hc : (ren (w' : ι → ι)).comp (ren ((w : Equiv.Perm ι) : ι → ι)) =
-        ren (((w' * (w : Equiv.Perm ι) : Equiv.Perm ι)) : ι → ι) := by
+    have hc
+        : (ren (w' : ι → ι)).comp (ren ((w : Equiv.Perm ι) : ι → ι))
+          = ren (((w' * (w : Equiv.Perm ι) : Equiv.Perm ι)) : ι → ι) := by
       rw [Equiv.Perm.coe_mul]
       exact RingHom.ext fun f => by rw [RingHom.comp_apply, kill_ren_ren]
     rw [MvPolynomial.map_map, hc, Equiv.coe_mulLeft, Subgroup.coe_mul]

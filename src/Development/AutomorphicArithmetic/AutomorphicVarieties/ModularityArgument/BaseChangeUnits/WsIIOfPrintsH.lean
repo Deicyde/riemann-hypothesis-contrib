@@ -12,6 +12,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 namespace UpperTheory.V.Z.Bc
 
-theorem indCs : Z.InvariantSubmoduleMonicPolynomial.E.IndCs := Z.InvariantSubmoduleMonicPolynomial.E.indCs_of_bcfl PositivityTheory.Rg.Tf.Loc.bcflUnit
+theorem indCs : Z.InvariantSubmoduleMonicPolynomial.E.IndCs :=
+  Z.InvariantSubmoduleMonicPolynomial.E.indCs_of_bcfl PositivityTheory.Rg.Tf.Loc.bcflUnit
 
 end UpperTheory.V.Z.Bc

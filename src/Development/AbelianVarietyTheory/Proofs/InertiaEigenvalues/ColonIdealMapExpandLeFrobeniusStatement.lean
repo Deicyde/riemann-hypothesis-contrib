@@ -10,11 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PowerSe
 
 open PowerSeries GlobalTheory.BK Matrix GlobalTheory.LiftCoker
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.colonIdeal_map_expand_le_frobenius : ∀ (O K : Type)
-    [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
-    (l : ℕ) [Fact l.Prime] (ι κ : Type) [Fintype ι] [Fintype κ] (G : Matrix κ ι K⟦X⟧),
-    (colon (O := O) (K := K) G).map (PowerSeries.expand l (Fact.out : l.Prime).ne_zero) ≤
-      colon (O := O) (K := K) (G.map (frob K l)) := by
+theorem _root_.GlobalTheory.T.colonIdeal_map_expand_le_frobenius
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
+        [IsUnitBall O K] (l : ℕ) [Fact l.Prime] (ι κ : Type) [Fintype ι] [Fintype κ]
+        (G : Matrix κ ι K⟦X⟧),
+      (colon (O := O) (K := K) G).map (PowerSeries.expand l (Fact.out : l.Prime).ne_zero)
+        ≤ colon (O := O) (K := K) (G.map (frob K l)) := by
   intro O K _ _ _ _ _ l _ ι κ _ _ G
   rw [Ideal.map_le_iff_le_comap]
   intro α hα
@@ -25,11 +26,14 @@ theorem _root_.GlobalTheory.T.colonIdeal_map_expand_le_frobenius : ∀ (O K : Ty
     obtain ⟨f, hf⟩ := (equivA O K).surjective ⟨w i, hw i⟩
     exact ⟨f, by rw [← coe_equivA, hf]⟩
   choose f hf using hf
-  have hdec := fun i => (GlobalTheory.T.powerSeries_existsUnique_decomp_over_frobeniusLike_endo l hl2 (PowerSeries.expand l (Fact.out : l.Prime).ne_zero)
-    (fun g m => PowerSeries.coeff_expand _ _ g) (f i)).exists
+  have hdec := fun i =>
+    (GlobalTheory.T.powerSeries_existsUnique_decomp_over_frobeniusLike_endo l hl2
+      (PowerSeries.expand l (Fact.out : l.Prime).ne_zero)
+      (fun g m => PowerSeries.coeff_expand _ _ g)
+      (f i)).exists
   choose g hg using hdec
-  have hα' := fun j : Fin l => hα (fun i => PowerSeries.map (algebraMap O K) (g i j))
-    (fun i => map_mem_A _)
+  have hα' := fun j : Fin l =>
+    hα (fun i => PowerSeries.map (algebraMap O K) (g i j)) (fun i => map_mem_A _)
   choose m hm hmeq using hα'
   have hX : (X : K⟦X⟧) ∈ A O K := by simpa using map_mem_A (O := O) (K := K) X
   refine ⟨∑ j : Fin l, (X : K⟦X⟧) ^ j.val • frobV l (m j), fun i => ?_, ?_⟩
@@ -38,19 +42,26 @@ theorem _root_.GlobalTheory.T.colonIdeal_map_expand_le_frobenius : ∀ (O K : Ty
     rw [Pi.smul_apply, smul_eq_mul, frobV_apply]
     exact mul_mem (pow_mem hX _) (frob_mem_A l (hm j i))
   · funext i
-    have hwi : w i = ∑ j : Fin l, (X : K⟦X⟧) ^ j.val * frob K l (PowerSeries.map (algebraMap O K) (g i j)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hf i, hg i, map_sum]
-      simp [map_mul, map_pow, map_X, map_expand, frob]
-    have key : ∀ j : Fin l, frob K l (PowerSeries.map (algebraMap O K) α) *
-        frob K l (PowerSeries.map (algebraMap O K) (g i j)) = (G.map (frob K l) *ᵥ frobV l (m j)) i := by
+    have hwi
+        : w i
+          = ∑ j : Fin l, (X : K⟦X⟧) ^ j.val * frob K l (PowerSeries.map (algebraMap O K) (g i j)) :=
+      by
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [← hf i, hg i, map_sum]
+        simp [map_mul, map_pow, map_X, map_expand, frob]
+    have key
+        : ∀ j : Fin l,
+          frob K l (PowerSeries.map (algebraMap O K) α)
+              * frob K l (PowerSeries.map (algebraMap O K) (g i j))
+            = (G.map (frob K l) *ᵥ frobV l (m j)) i := by
       intro j
       rw [← map_mul]
       have := congrFun (hmeq j) i
       rw [Pi.smul_apply, smul_eq_mul] at this
       rw [this]
       exact RingHom.map_mulVec (frob K l).toRingHom G (m j) i
-    rw [Pi.smul_apply, smul_eq_mul, map_expand, hwi, Finset.mul_sum, Matrix.mulVec_sum, Finset.sum_apply]
+    rw [Pi.smul_apply, smul_eq_mul, map_expand, hwi, Finset.mul_sum, Matrix.mulVec_sum,
+      Finset.sum_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Matrix.mulVec_smul, Pi.smul_apply, smul_eq_mul, ← key j]
     simp only [frob]

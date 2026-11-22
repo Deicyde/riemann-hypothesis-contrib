@@ -9,17 +9,22 @@ open scoped Classical
 
 namespace GlobalTheory.Shin
 
-theorem semilinear_pow_smul {F F' V : Type} [Field F] [Field F'] [Algebra F F'] [AddCommGroup V]
-    [Module F' V] [Module F V] (s : F' ≃ₐ[F] F') (T : Module.End F V)
-    (hT : ∀ (c : F') (v : V), T (c • v) = s c • T v) (m : ℕ) (c : F') (v : V) :
-    (T ^ m) (c • v) = (s ^ m) c • (T ^ m) v := by
+theorem semilinear_pow_smul
+    {F F' V : Type} [Field F] [Field F'] [Algebra F F'] [AddCommGroup V] [Module F' V] [Module F V]
+    (s : F' ≃ₐ[F] F') (T : Module.End F V) (hT : ∀ (c : F') (v : V), T (c • v) = s c • T v)
+    (m : ℕ) (c : F') (v : V)
+    : (T ^ m) (c • v) = (s ^ m) c • (T ^ m) v := by
   induction m with
   | zero => simp
   | succ m ih =>
-    rw [pow_succ', pow_succ', Module.End.mul_apply, ih, hT, AlgEquiv.mul_apply, Module.End.mul_apply]
+    rw [pow_succ', pow_succ', Module.End.mul_apply, ih, hT, AlgEquiv.mul_apply,
+      Module.End.mul_apply]
 
-theorem pow_apply_of_mem_ker_sub_one {F V : Type} [Field F] [AddCommGroup V] [Module F V]
-    (T : Module.End F V) (u : V) (hu : u ∈ LinearMap.ker (T - 1)) (m : ℕ) : (T ^ m) u = u := by
+theorem pow_apply_of_mem_ker_sub_one
+    {F V : Type} [Field F] [AddCommGroup V] [Module F V]
+    (T : Module.End F V) (u : V) (hu : u ∈ LinearMap.ker (T - 1))
+    (m : ℕ)
+    : (T ^ m) u = u := by
   have h1 : T u = u := by
     have h := LinearMap.mem_ker.mp hu
     rwa [LinearMap.sub_apply, Module.End.one_apply, sub_eq_zero] at h
@@ -27,9 +32,12 @@ theorem pow_apply_of_mem_ker_sub_one {F V : Type} [Field F] [AddCommGroup V] [Mo
   | zero => simp
   | succ m ih => rw [pow_succ, Module.End.mul_apply, h1, ih]
 
-theorem algebraMap_trace_eq_sum_pow {F F' : Type} [Field F] [Field F'] [Algebra F F'] [Finite F']
-    (s : F' ≃ₐ[F] F') (hs : ∀ t : F' ≃ₐ[F] F', t ∈ Subgroup.zpowers s) (x : F') :
-    algebraMap F F' (Algebra.trace F F' x) = ∑ j : Fin (Module.finrank F F'), (s ^ (j : ℕ)) x := by
+theorem algebraMap_trace_eq_sum_pow
+    {F F' : Type} [Field F] [Field F'] [Algebra F F'] [Finite F']
+    (s : F' ≃ₐ[F] F') (hs : ∀ t : F' ≃ₐ[F] F', t ∈ Subgroup.zpowers s)
+    (x : F')
+    : algebraMap F F' (Algebra.trace F F' x)
+      = ∑ j : Fin (Module.finrank F F'), (s ^ (j : ℕ)) x := by
   classical
   have : Finite F := Finite.of_injective _ (algebraMap F F').injective
   have : FiniteDimensional F F' := Module.Finite.of_finite
@@ -50,7 +58,14 @@ end GlobalTheory.Shin
 
 namespace GlobalTheory.Shin
 
-theorem galoisDescent_semilinear_bijective : ∀ (F F' : Type) [Field F] [Field F'] [Algebra F F'] [Finite F'] (s : F' ≃ₐ[F] F'), (∀ t : F' ≃ₐ[F] F', t ∈ Subgroup.zpowers s) → ∀ (V : Type) [AddCommGroup V] [Module F' V] [Module F V] [IsScalarTower F F' V] (T : Module.End F V), (∀ (c : F') (v : V), T (c • v) = s c • T v) → T ^ Module.finrank F F' = 1 → ∀ (ι : Type) [Fintype ι] (b : Module.Basis ι F F'), Function.Bijective (fun v : ι → LinearMap.ker (T - 1) => ∑ i, b i • (v i : V)) := by
+theorem galoisDescent_semilinear_bijective
+    : ∀ (F F' : Type) [Field F] [Field F'] [Algebra F F'] [Finite F'] (s : F' ≃ₐ[F] F'),
+      (∀ t : F' ≃ₐ[F] F', t ∈ Subgroup.zpowers s)
+        → ∀ (V : Type) [AddCommGroup V] [Module F' V] [Module F V] [IsScalarTower F F' V]
+            (T : Module.End F V),
+          (∀ (c : F') (v : V), T (c • v) = s c • T v) → T ^ Module.finrank F F' = 1
+            → ∀ (ι : Type) [Fintype ι] (b : Module.Basis ι F F'),
+              Function.Bijective (fun v : ι → LinearMap.ker (T - 1) => ∑ i, b i • (v i : V)) := by
   intro F F' _ _ _ _ s hs V _ _ _ _ T hT hTn ι _ b
   classical
   have : Finite F := Finite.of_injective _ (algebraMap F F').injective
@@ -61,8 +76,8 @@ theorem galoisDescent_semilinear_bijective : ∀ (F F' : Type) [Field F] [Field 
   have hdb : ∀ i j, Algebra.trace F F' (d i * b j) = if j = i then 1 else 0 := fun i j => by
     have h := LinearMap.BilinForm.apply_dualBasis_left hnd b i j
     simpa [Algebra.traceForm_apply] using h
-  have key1 : ∀ i j, ∑ k : Fin n, (s ^ (k : ℕ)) (d i) * (s ^ (k : ℕ)) (b j) =
-      if i = j then 1 else 0 := by
+  have key1
+      : ∀ i j, ∑ k : Fin n, (s ^ (k : ℕ)) (d i) * (s ^ (k : ℕ)) (b j) = if i = j then 1 else 0 := by
     intro i j
     have h := algebraMap_trace_eq_sum_pow s hs (d i * b j)
     simp only [map_mul] at h
@@ -72,8 +87,8 @@ theorem galoisDescent_semilinear_bijective : ∀ (F F' : Type) [Field F] [Field 
     · simp [hij, Ne.symm hij]
   have hTk : ∀ (k : ℕ) (c : F') (v : V), (T ^ k) (c • v) = (s ^ k) c • (T ^ k) v :=
     semilinear_pow_smul s T hT
-  have hfix : ∀ (u : LinearMap.ker (T - 1)) (k : ℕ), (T ^ k) (u : V) = u :=
-    fun u k => pow_apply_of_mem_ker_sub_one T u u.2 k
+  have hfix : ∀ (u : LinearMap.ker (T - 1)) (k : ℕ), (T ^ k) (u : V) = u := fun u k =>
+    pow_apply_of_mem_ker_sub_one T u u.2 k
   have hn0 : 0 < n := Module.finrank_pos
   have hcard : Fintype.card ι = n := (Module.finrank_eq_card_basis b).symm
   let e : ι ≃ Fin n := Fintype.equivFinOfCardEq hcard
@@ -97,9 +112,10 @@ theorem galoisDescent_semilinear_bijective : ∀ (F F' : Type) [Field F] [Field 
       intro k
       have h := congrArg (T ^ k) hvw
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_sum, hTk, hfix] using h
-    have expand : ∀ (u : ι → LinearMap.ker (T - 1)) (j : ι), (u j : V) =
-        ∑ k : Fin n, (s ^ (k : ℕ)) (d j) • ∑ i, (s ^ (k : ℕ)) (b i) • (u i : V) := by
+      simpa only [map_sum, hTk, hfix] using h
+    have expand
+        : ∀ (u : ι → LinearMap.ker (T - 1)) (j : ι),
+          (u j : V) = ∑ k : Fin n, (s ^ (k : ℕ)) (d j) • ∑ i, (s ^ (k : ℕ)) (b i) • (u i : V) := by
       intro u j
       simp_rw [Finset.smul_sum, smul_smul]
       rw [Finset.sum_comm]

@@ -6,21 +6,28 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsoPartStable
 
 @[expose] public section
 
-open Matrix MeasureTheory Filter Topology Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.SphJet
+open Matrix MeasureTheory Filter Topology Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.SphJet
 open scoped InnerProductSpace ComplexOrder Matrix.Norms.L2Operator
 
 noncomputable section
 
 namespace GlobalTheory.SphJet
 
-theorem vminus_coef : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (Λ : Fin n → ℝ) (u : V), GlRel E → IsUnitary ε E → KHighest ε E Λ u → ∀ F ∈ Vminus ε E Λ u, ∀ a b : Fin n, a ≤ b → ⟪u, arrOf V n 1 F (fun _ => (a, b))⟫_ℂ = 0 := by
+theorem vminus_coef
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (n : ℕ) (ε : Fin n → Bool)
+        (E : Fin n → Fin n → Module.End ℂ V) (Λ : Fin n → ℝ) (u : V),
+      GlRel E → IsUnitary ε E → KHighest ε E Λ u
+        → ∀ F ∈ Vminus ε E Λ u, ∀ a b : Fin n,
+          a ≤ b → ⟪u, arrOf V n 1 F (fun _ => (a, b))⟫_ℂ = 0 := by
   intro V _ _ n ε E Λ u hg hu hΛ F hF a b hab
   have hkr : KRel ε (arrE E 1) := glRel_kRel ε _ ((arrModule V n ε E 1).1 hg).1
   have hku : KUnit ε E := isUnitary_kUnit ε E hu
 
   let φ : Arr V n 1 →ₗ[ℂ] ℂ :=
-    (innerₛₗ ℂ u).comp ((LinearMap.proj (R := ℂ) (φ := fun _ : Fin 1 → Fin n × Fin n => V)
-      (fun _ => (a, b))).comp (arrOf V n 1))
+    (innerₛₗ ℂ u).comp
+      ((LinearMap.proj (R := ℂ) (φ := fun _ : Fin 1 → Fin n × Fin n => V) (fun _ => (a, b))).comp
+        (arrOf V n 1))
   suffices hle : Vminus ε E Λ u ≤ LinearMap.ker φ by
     have h0 : φ F = 0 := hle hF
     simpa [φ] using h0

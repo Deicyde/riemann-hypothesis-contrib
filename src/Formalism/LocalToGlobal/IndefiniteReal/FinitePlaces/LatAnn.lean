@@ -6,7 +6,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.PairingRankOne
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
 open scoped TensorProduct
 
 set_option synthInstance.maxHeartbeats 160000
@@ -19,18 +21,27 @@ open Formalism.IndefR.Datum
 
 variable {D : D7} {ψ : AddChar (AF D.host.F) ℂ}
 
-
 set_option maxHeartbeats 800000 in
-theorem lat_ann (hψ : IsStdChar D ψ (-1)) (S T : HSp D) {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
-    {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)} (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT) {x : WO S T}
-    (hx : x ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) (fun _ => True))
+theorem lat_ann
+    (hψ : IsStdChar D ψ (-1))
+    (S T : HSp D)
+    {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
+    {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)}
+    (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT)
+    {x : WO S T}
+    (hx : x ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E))
+      (fun _ => True))
     {u : WO S T}
-    (hu : u ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) (fun _ => True)) :
-    ψ (symplO S T x u) = 1 := by
-  have inner : ∀ {α : Af D.host.F} {c : D.host.E} {s : Fin S.rank → D.host.E} {t : Fin T.rank → D.host.E},
-      α ∈ intAf D.host.F → c ∈ D.host.AA → s ∈ ΛS → t ∈ ΛT →
-      ∀ u ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) (fun _ => True),
-        ψ (symplO S T (pairA D.host.F 0 α • ratW T S (rk1 S T c s t)) u) = 1 := by
+    (hu : u ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E))
+      (fun _ => True))
+    : ψ (symplO S T x u) = 1 := by
+  have inner
+      : ∀ {α : Af D.host.F} {c : D.host.E} {s : Fin S.rank → D.host.E} {t : Fin T.rank → D.host.E},
+        α ∈ intAf D.host.F → c ∈ D.host.AA → s ∈ ΛS → t ∈ ΛT
+          → ∀ u
+              ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E))
+                (fun _ => True),
+            ψ (symplO S T (pairA D.host.F 0 α • ratW T S (rk1 S T c s t)) u) = 1 := by
     intro α c s t hα hc hs ht u hu
     induction hu using AddSubgroup.closure_induction with
     | mem u' hu' =>

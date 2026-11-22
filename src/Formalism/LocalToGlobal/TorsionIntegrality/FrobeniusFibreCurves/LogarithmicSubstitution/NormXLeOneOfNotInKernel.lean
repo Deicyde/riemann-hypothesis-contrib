@@ -18,10 +18,10 @@ open Formalism.L2.Th1.E (Unif ptW px IntCurve)
 open Formalism.L2.Th1.C (wpShift HasSecondLogDeriv)
 open Formalism.ELL (InFormalGroupPoints)
 
-theorem exists_transversal (M : Submodule ℤ ℂ) (A : Finset ℂ) :
-    ∃ Sq : Finset ℂ, Sq ⊆ A ∧
-      (∀ Q ∈ Sq, ∀ Q' ∈ Sq, (Q - Q' ∈ M ∨ Q + Q' ∈ M) → Q = Q') ∧
-      (∀ c ∈ A, ∃ Q ∈ Sq, c - Q ∈ M ∨ c + Q ∈ M) := by
+theorem exists_transversal (M : Submodule ℤ ℂ) (A : Finset ℂ)
+    : ∃ Sq : Finset ℂ,
+      Sq ⊆ A ∧ (∀ Q ∈ Sq, ∀ Q' ∈ Sq, (Q - Q' ∈ M ∨ Q + Q' ∈ M) → Q = Q')
+        ∧ (∀ c ∈ A, ∃ Q ∈ Sq, c - Q ∈ M ∨ c + Q ∈ M) := by
   classical
   induction A using Finset.induction_on with
   | empty => exact ⟨∅, by simp, by simp, by simp⟩
@@ -60,62 +60,66 @@ theorem half_fibre_exists_holds : HalfFibreExists := by
   obtain ⟨S, hS1, _, hS3⟩ := Formalism.L2.Th1.F.kerRepsExist L α hα hst
   set Q0 : ℂ := (ω₀ / 2) / α with hQ0
   have hαQ0 : α * Q0 = ω₀ / 2 := by rw [hQ0]; field_simp
-  obtain ⟨Sq, h0, h1, h2⟩ :=
-    exists_transversal L.lattice (insert Q0 (S.image (fun P => Q0 + P)))
+  obtain ⟨Sq, h0, h1, h2⟩ := exists_transversal L.lattice (insert Q0 (S.image (fun P => Q0 + P)))
   have hfib : ∀ c ∈ insert Q0 (S.image (fun P => Q0 + P)), α * c - ω₀ / 2 ∈ L.lattice := by
     intro c hc
     rcases Finset.mem_insert.1 hc with rfl | hc
     · rw [hαQ0, sub_self]; exact L.lattice.zero_mem
     · obtain ⟨P, hP, rfl⟩ := Finset.mem_image.1 hc
       have : α * (Q0 + P) - ω₀ / 2 = α * P := by rw [mul_add, hαQ0]; ring
-      rw [this]; exact (hS1 P hP).1
+      rw [this]
+      exact (hS1 P hP).1
   refine ⟨Sq, ?_, h1, ?_⟩
   · intro Q hQ
     exact ⟨hfib Q (h0 hQ), hno Q (hfib Q (h0 hQ))⟩
   · intro z hz
     have hker : α * (z - Q0) ∈ L.lattice := by
       have : α * (z - Q0) = α * z - ω₀ / 2 := by rw [mul_sub, hαQ0]
-      rw [this]; exact hz
+      rw [this]
+      exact hz
     obtain ⟨c, hc, hzc⟩ : ∃ c ∈ insert Q0 (S.image (fun P => Q0 + P)), z - c ∈ L.lattice := by
       by_cases hz0 : z - Q0 ∈ L.lattice
       · exact ⟨Q0, Finset.mem_insert_self _ _, hz0⟩
       · obtain ⟨P, hP, h⟩ := hS3 (z - Q0) hker hz0
         refine ⟨Q0 + P, Finset.mem_insert_of_mem (Finset.mem_image.2 ⟨P, hP, rfl⟩), ?_⟩
         have : z - (Q0 + P) = z - Q0 - P := by ring
-        rw [this]; exact h
+        rw [this]
+        exact h
     obtain ⟨Q, hQ, h⟩ := h2 c hc
     refine ⟨Q, hQ, ?_⟩
     rcases h with h | h
     · left
       have : z - Q = (z - c) + (c - Q) := by ring
-      rw [this]; exact L.lattice.add_mem hzc h
+      rw [this]
+      exact L.lattice.add_mem hzc h
     · right
       have : z + Q = (z - c) + (c + Q) := by ring
-      rw [this]; exact L.lattice.add_mem hzc h
+      rw [this]
+      exact L.lattice.add_mem hzc h
 
 section Alg
 
 variable {K K' : Type} [Field K] [Field K'] (φ : K →+* K')
 
-theorem map_derivative (f : PowerSeries K) :
-    PowerSeries.map φ (PowerSeries.derivative (R := K) f) =
-      PowerSeries.derivative (R := K') (PowerSeries.map φ f) := by
+theorem map_derivative (f : PowerSeries K)
+    : PowerSeries.map φ (PowerSeries.derivative (R := K) f)
+      = PowerSeries.derivative (R := K') (PowerSeries.map φ f) := by
   ext n
   simp [PowerSeries.coeff_derivative]
 
-theorem map_rescale (a : K) (f : PowerSeries K) :
-    PowerSeries.map φ (PowerSeries.rescale a f) =
-      PowerSeries.rescale (φ a) (PowerSeries.map φ f) := by
+theorem map_rescale (a : K) (f : PowerSeries K)
+    : PowerSeries.map φ (PowerSeries.rescale a f)
+      = PowerSeries.rescale (φ a) (PowerSeries.map φ f) := by
   ext n
   simp [PowerSeries.coeff_rescale]
 
-theorem map_wpShift (e : PowerSeries K) (c : K) :
-    PowerSeries.map φ (wpShift e c) = wpShift (PowerSeries.map φ e) (φ c) := by
+theorem map_wpShift (e : PowerSeries K) (c : K)
+    : PowerSeries.map φ (wpShift e c) = wpShift (PowerSeries.map φ e) (φ c) := by
   unfold wpShift
   simp
 
-theorem second_log_derivative_map {f g : PowerSeries K} (h : HasSecondLogDeriv f g) :
-    HasSecondLogDeriv (PowerSeries.map φ f) (PowerSeries.map φ g) := by
+theorem second_log_derivative_map {f g : PowerSeries K} (h : HasSecondLogDeriv f g)
+    : HasSecondLogDeriv (PowerSeries.map φ f) (PowerSeries.map φ g) := by
   unfold HasSecondLogDeriv at h ⊢
   have := congrArg (PowerSeries.map φ) h
   simpa [map_derivative] using this
@@ -134,11 +138,12 @@ theorem fibre_map_holds : FibreMap := by
   · have := congrArg (PowerSeries.map j) h2
     simpa [map_rescale] using this
 
-theorem norm_x_le_one_of_not_in_kernel {K : Type} [NormedField K] {W : WeierstrassCurve K}
-    (P : W.toAffine.Point) (h : ¬ InFormalGroupPoints P) : ‖px W P‖ ≤ 1 := by
+theorem norm_x_le_one_of_not_in_kernel
+    {K : Type} [NormedField K]
+    {W : WeierstrassCurve K} (P : W.toAffine.Point) (h : ¬ InFormalGroupPoints P)
+    : ‖px W P‖ ≤ 1 := by
   cases P with
   | zero => exact absurd trivial h
   | some x y hxy => exact not_lt.1 h
-
 
 end Formalism.L2.Th1.B.Half

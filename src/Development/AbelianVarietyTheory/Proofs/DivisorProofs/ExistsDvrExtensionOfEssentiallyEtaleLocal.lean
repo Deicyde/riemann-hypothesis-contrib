@@ -9,12 +9,14 @@ open TensorProduct IsLocalRing
 
 namespace GlobalTheory
 
-theorem tensorLift_injective_of_flat {R S A K L : Type} [CommRing R] [CommRing S] [IsDomain S]
-    [CommRing A] [Field K] [Field L] [Algebra R S] [Module.Flat R S] [Algebra R A] [Algebra R K]
-    [IsFractionRing R K] [Algebra S L] [IsFractionRing S L] (i : A →ₐ[R] K)
-    (hi : Function.Injective i) (f : K →+* L)
-    (hf : ∀ r, f (algebraMap R K r) = algebraMap S L (algebraMap R S r)) (g : A ⊗[R] S →+* L)
-    (hg : ∀ a s, g (a ⊗ₜ s) = f (i a) * algebraMap S L s) : Function.Injective g := by
+theorem tensorLift_injective_of_flat
+    {R S A K L : Type} [CommRing R] [CommRing S] [IsDomain S] [CommRing A] [Field K] [Field L]
+    [Algebra R S] [Module.Flat R S] [Algebra R A] [Algebra R K] [IsFractionRing R K] [Algebra S L]
+    [IsFractionRing S L]
+    (i : A →ₐ[R] K) (hi : Function.Injective i)
+    (f : K →+* L) (hf : ∀ r, f (algebraMap R K r) = algebraMap S L (algebraMap R S r))
+    (g : A ⊗[R] S →+* L) (hg : ∀ a s, g (a ⊗ₜ s) = f (i a) * algebraMap S L s)
+    : Function.Injective g := by
   letI : Algebra R L := ((algebraMap S L).comp (algebraMap R S)).toAlgebra
   haveI : IsScalarTower R S L := .of_algebraMap_eq fun _ => rfl
   let fK : K →ₐ[R] L := { toRingHom := f, commutes' := hf }
@@ -28,28 +30,33 @@ theorem tensorLift_injective_of_flat {R S A K L : Type} [CommRing R] [CommRing S
     | tmul a s => rw [hg, LinearMap.rTensor_tmul, AlgHom.toLinearMap_apply, hH]
     | add x y hx hy => rw [map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]
   have hloc : IsLocalizedModule (nonZeroDivisors R) (TensorProduct.mk R K S 1) :=
-    (isLocalizedModule_iff_isBaseChange (nonZeroDivisors R) K _).mpr (TensorProduct.isBaseChange R S K)
+    (isLocalizedModule_iff_isBaseChange (nonZeroDivisors R) K _).mpr
+      (TensorProduct.isBaseChange R S K)
   haveI : Nontrivial R := (algebraMap R K).domain_nontrivial
   have hHinj : Function.Injective H := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro y hy
     obtain ⟨⟨s, r⟩, hr⟩ := IsLocalizedModule.surj (nonZeroDivisors R) (TensorProduct.mk R K S 1) y
     have hs : s = 0 := by
       have h1 : H (r • y) = 0 := by
-        rw [Submonoid.smul_def, show H (r.1 • y) = r.1 • H y from H.toLinearMap.map_smul r.1 y, hy, smul_zero]
+        rw [Submonoid.smul_def, show H (r.1 • y) = r.1 • H y from H.toLinearMap.map_smul r.1 y, hy,
+          smul_zero]
       rw [hr, TensorProduct.mk_apply, hH, map_one, one_mul] at h1
       exact IsFractionRing.injective S L (h1.trans (map_zero _).symm)
-    have ha : algebraMap R K r.1 ≠ 0 :=
-      IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors r.2
+    have ha : algebraMap R K r.1 ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors r.2
     have h2 : algebraMap R K r.1 • y = 0 := by
-      rw [algebraMap_smul, ← Submonoid.smul_def, hr, hs, TensorProduct.mk_apply, TensorProduct.tmul_zero]
+      rw [algebraMap_smul, ← Submonoid.smul_def, hr, hs, TensorProduct.mk_apply,
+        TensorProduct.tmul_zero]
     rw [← one_smul K y, ← inv_mul_cancel₀ ha, mul_smul, h2, smul_zero]
   intro x y hxy
   rw [hgH, hgH] at hxy
   exact Module.Flat.rTensor_preserves_injective_linearMap (M := S) i.toLinearMap hi (hHinj hxy)
 
-def rangeValuationSubring {B L : Type} [CommRing B] [IsDomain B] [ValuationRing B] [Field L]
-    (j : B →+* L) (hj : ∀ x : L, ∃ a b : B, j b ≠ 0 ∧ x = j a / j b) : ValuationSubring L where
+def rangeValuationSubring
+    {B L : Type} [CommRing B] [IsDomain B] [ValuationRing B] [Field L]
+    (j : B →+* L) (hj : ∀ x : L, ∃ a b : B, j b ≠ 0 ∧ x = j a / j b)
+    : ValuationSubring L where
   toSubring := j.range
   mem_or_inv_mem' x := by
     obtain ⟨a, b, hb, rfl⟩ := hj x
@@ -60,15 +67,17 @@ def rangeValuationSubring {B L : Type} [CommRing B] [IsDomain B] [ValuationRing 
     · left
       exact ⟨c, by rw [← hc, map_mul, mul_div_cancel_left₀ _ hb]⟩
 
-theorem exists_valuationSubring_extend_of_formallyEtale : ∀ {K K' R S : Type} [Field K] [Field K']
-    [CommRing R] [CommRing S] [IsDomain R] [IsDomain S] [IsLocalRing R] [IsLocalRing S] [Algebra R K]
-    [Algebra S K'] [IsFractionRing R K] [IsFractionRing S K'] (φ : K →+* K') (σ : R →+* S)
-    [IsLocalHom σ], σ.Flat → σ.FormallyEtale → σ.EssFiniteType →
-    φ.comp (algebraMap R K) = (algebraMap S K').comp σ → ∀ V : ValuationSubring K,
-    IsDiscreteValuationRing V → (∀ a, algebraMap R K a ∈ V) →
-    ∃ (V' : ValuationSubring K') (h : ∀ x ∈ V, φ x ∈ V'), IsDiscreteValuationRing V' ∧
-      (∀ b, algebraMap S K' b ∈ V') ∧ (∀ x, φ x ∈ V' → x ∈ V) ∧
-      (φ.restrict V V' h).FormallyEtale ∧ (φ.restrict V V' h).EssFiniteType := by
+theorem exists_valuationSubring_extend_of_formallyEtale
+    : ∀ {K K' R S : Type} [Field K] [Field K'] [CommRing R] [CommRing S] [IsDomain R] [IsDomain S]
+        [IsLocalRing R] [IsLocalRing S] [Algebra R K] [Algebra S K'] [IsFractionRing R K]
+        [IsFractionRing S K'] (φ : K →+* K') (σ : R →+* S) [IsLocalHom σ],
+      σ.Flat → σ.FormallyEtale → σ.EssFiniteType
+        → φ.comp (algebraMap R K) = (algebraMap S K').comp σ
+        → ∀ V : ValuationSubring K,
+          IsDiscreteValuationRing V → (∀ a, algebraMap R K a ∈ V)
+            → ∃ (V' : ValuationSubring K') (h : ∀ x ∈ V, φ x ∈ V'),
+              IsDiscreteValuationRing V' ∧ (∀ b, algebraMap S K' b ∈ V') ∧ (∀ x, φ x ∈ V' → x ∈ V)
+                ∧ (φ.restrict V V' h).FormallyEtale ∧ (φ.restrict V V' h).EssFiniteType := by
   intro K K' R S _ _ _ _ _ _ _ _ _ _ _ _ φ σ _ hfl het hef hc V hV hRV
   letI : Algebra R S := σ.toAlgebra
   haveI : Module.Flat R S := hfl
@@ -79,20 +88,24 @@ theorem exists_valuationSubring_extend_of_formallyEtale : ∀ {K K' R S : Type} 
   letI : Algebra R V := ((algebraMap R K).codRestrict V hRV).toAlgebra
   letI : Algebra R K' := ((algebraMap S K').comp σ).toAlgebra
   haveI : IsScalarTower R S K' := .of_algebraMap_eq fun _ => rfl
-  let fV : V →ₐ[R] K' := { toRingHom := φ.comp V.subtype, commutes' := fun r => RingHom.congr_fun hc r }
+  let fV : V →ₐ[R] K' := {
+    toRingHom := φ.comp V.subtype
+    commutes' := fun r => RingHom.congr_fun hc r
+  }
   let iV : V →ₐ[R] K := { toRingHom := V.subtype, commutes' := fun _ => rfl }
   let g : V ⊗[R] S →ₐ[R] K' :=
     Algebra.TensorProduct.lift fV (IsScalarTower.toAlgHom R S K') (fun _ _ => Commute.all _ _)
   have hg' : ∀ (a : V) (s : S), g (a ⊗ₜ s) = φ a * algebraMap S K' s := fun a s => by
     rw [Algebra.TensorProduct.lift_tmul]; rfl
-  have hg1 : ∀ s : S, g (1 ⊗ₜ s) = algebraMap S K' s := fun s => by
-    rw [hg']; simp
+  have hg1 : ∀ s : S, g (1 ⊗ₜ s) = algebraMap S K' s := fun s => by rw [hg']; simp
   have hg : Function.Injective g :=
-    tensorLift_injective_of_flat (S := S) (L := K') iV Subtype.val_injective φ (RingHom.congr_fun hc) g.toRingHom hg'
+    tensorLift_injective_of_flat (S := S) (L := K') iV Subtype.val_injective φ
+      (RingHom.congr_fun hc) g.toRingHom hg'
   let C := V ⊗[R] S
   haveI : IsDomain C := Function.Injective.isDomain g.toRingHom hg
-  obtain ⟨⟨Q, hQ⟩, hQm⟩ := PrimeSpectrum.comap_surjective_of_faithfullyFlat (A := V) (B := C)
-    ⟨maximalIdeal V, inferInstance⟩
+  obtain ⟨⟨Q, hQ⟩, hQm⟩ :=
+    PrimeSpectrum.comap_surjective_of_faithfullyFlat (A := V) (B := C)
+      ⟨maximalIdeal V, inferInstance⟩
   have hQm' : Q.comap (algebraMap V C) = maximalIdeal V := congrArg PrimeSpectrum.asIdeal hQm
   let B := Localization.AtPrime Q
   haveI : Module.Flat V B := Module.Flat.trans V C B
@@ -111,10 +124,12 @@ theorem exists_valuationSubring_extend_of_formallyEtale : ∀ {K K' R S : Type} 
     rw [hg (h0.trans (map_zero g).symm)]
     exact Q.zero_mem
   let j : B →+* K' := IsLocalization.lift (M := Q.primeCompl) (S := B) hunit
-  have hjC : ∀ c, j (algebraMap C B c) = g c := IsLocalization.lift_eq (M := Q.primeCompl) (S := B) hunit
-  have hj : Function.Injective j := IsLocalization.injective_of_map_algebraMap_zero (M := Q.primeCompl) B j fun x hx => by
-    rw [hjC] at hx
-    rw [hg (hx.trans (map_zero g).symm), map_zero]
+  have hjC : ∀ c, j (algebraMap C B c) = g c :=
+    IsLocalization.lift_eq (M := Q.primeCompl) (S := B) hunit
+  have hj : Function.Injective j :=
+    IsLocalization.injective_of_map_algebraMap_zero (M := Q.primeCompl) B j fun x hx => by
+      rw [hjC] at hx
+      rw [hg (hx.trans (map_zero g).symm), map_zero]
   have hgen : ∀ x : K', ∃ a b : B, j b ≠ 0 ∧ x = j a / j b := fun x => by
     obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := S) x
     refine ⟨algebraMap C B (1 ⊗ₜ a), algebraMap C B (1 ⊗ₜ b), ?_, ?_⟩
@@ -125,10 +140,12 @@ theorem exists_valuationSubring_extend_of_formallyEtale : ∀ {K K' R S : Type} 
   have hVV' : ∀ x ∈ V, φ x ∈ V' := fun x hx =>
     ⟨algebraMap C B (⟨x, hx⟩ ⊗ₜ 1), by rw [hjC, hg', map_one, mul_one]⟩
   let e₀ : B →+* V' := j.codRestrict V' fun b => ⟨b, rfl⟩
-  have he₀ : Function.Bijective e₀ :=
-    ⟨fun a b h => hj (congrArg Subtype.val h), fun y => by
+  have he₀ : Function.Bijective e₀ := ⟨
+    fun a b h => hj (congrArg Subtype.val h),
+    fun y => by
       obtain ⟨b, hb⟩ := y.2
-      exact ⟨b, Subtype.ext hb⟩⟩
+      exact ⟨b, Subtype.ext hb⟩
+  ⟩
   let e : B ≃+* V' := RingEquiv.ofBijective e₀ he₀
   have he : ∀ b, (e b : K') = j b := fun _ => rfl
   obtain ⟨t, ht⟩ := IsDiscreteValuationRing.exists_irreducible V
@@ -147,21 +164,24 @@ theorem exists_valuationSubring_extend_of_formallyEtale : ∀ {K K' R S : Type} 
     refine htB (IsUnit.of_mul_eq_one b (hj ?_))
     rw [map_mul, hb, map_one, hjt, mul_inv_cancel₀ hφt]
   refine ⟨V', hVV', ?_, fun b => ⟨algebraMap C B (1 ⊗ₜ b), by rw [hjC, hg1]⟩, ?_, ?_⟩
-  · obtain ⟨b, hbm, hb0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot
-      (IsDiscreteValuationRing.not_a_field B)
-    exact
-      { toIsPrincipalIdealRing := IsPrincipalIdealRing.of_surjective e.toRingHom e.surjective
-        toIsLocalRing := inferInstance
-        not_a_field' := fun h => by
-          have h1 : e b ∈ maximalIdeal V' := fun hu => hbm (by simpa using hu.map e.symm.toRingHom)
-          rw [h] at h1
-          exact hb0 (e.injective (by simpa using h1)) }
+  · obtain ⟨b, hbm, hb0⟩ :=
+      Submodule.exists_mem_ne_zero_of_ne_bot (IsDiscreteValuationRing.not_a_field B)
+    exact {
+      toIsPrincipalIdealRing := IsPrincipalIdealRing.of_surjective e.toRingHom e.surjective
+      toIsLocalRing := inferInstance
+      not_a_field' := fun h => by
+        have h1 : e b ∈ maximalIdeal V' := fun hu => hbm (by simpa using hu.map e.symm.toRingHom)
+        rw [h] at h1
+        exact hb0 (e.injective (by simpa using h1))
+    }
   · intro x hx
     by_contra hxV
     have hinv : x⁻¹ ∈ V := (V.mem_or_inv_mem x).resolve_left hxV
     have hx0 : x ≠ 0 := fun h => hxV (h ▸ V.zero_mem)
-    obtain ⟨n, u, hn⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible
-      (x := (⟨x⁻¹, hinv⟩ : V)) (fun h => inv_ne_zero hx0 (congrArg Subtype.val h)) ht
+    obtain ⟨n, u, hn⟩ :=
+      IsDiscreteValuationRing.eq_unit_mul_pow_irreducible (x := (⟨x⁻¹, hinv⟩ : V))
+        (fun h => inv_ne_zero hx0 (congrArg Subtype.val h))
+        ht
     have hn' : x⁻¹ = (u : K) * (t : K) ^ n := congrArg Subtype.val hn
     obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := by
       refine Nat.exists_eq_add_one.mpr (Nat.pos_of_ne_zero fun h0 => hxV ?_)
@@ -186,11 +206,16 @@ theorem exists_valuationSubring_extend_of_formallyEtale : ∀ {K K' R S : Type} 
     rw [this]
     exact mul_mem (hVV' _ (t ^ m * u : V).2) hx
   · letI : Algebra V V' := (φ.restrict V V' hVV').toAlgebra
-    let eA : B ≃ₐ[V] V' := AlgEquiv.ofRingEquiv (f := e) fun v => Subtype.ext (by
-      rw [he, IsScalarTower.algebraMap_apply V C B, hjC, Algebra.TensorProduct.algebraMap_apply,
-        hg']
-      simp
-      rfl)
-    exact ⟨Algebra.FormallyEtale.of_equiv eA, Algebra.EssFiniteType.of_surjective eA.toAlgHom eA.surjective⟩
+    let eA : B ≃ₐ[V] V' :=
+      AlgEquiv.ofRingEquiv (f := e) fun v =>
+        Subtype.ext (by
+          rw [he, IsScalarTower.algebraMap_apply V C B, hjC, Algebra.TensorProduct.algebraMap_apply,
+            hg']
+          simp
+          rfl)
+    exact ⟨
+      Algebra.FormallyEtale.of_equiv eA,
+      Algebra.EssFiniteType.of_surjective eA.toAlgHom eA.surjective
+    ⟩
 
 end GlobalTheory

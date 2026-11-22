@@ -15,10 +15,12 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem exists_isKum_of_finrank_prime (p : ℕ) (F E : Type) [Field F] [Field E] [Algebra F E]
-    [IsGalois F E] (ζ : F) (hp : p.Prime) (hζ : IsPrimitiveRoot ζ p)
-    (hr : Module.finrank F E = p) :
-    ∃ (δ : F) (θ : E) (σ : E ≃ₐ[F] E), IsKum p ζ δ θ σ := by
+theorem exists_isKum_of_finrank_prime
+    (p : ℕ)
+    (F E : Type) [Field F] [Field E] [Algebra F E] [IsGalois F E]
+    (ζ : F)
+    (hp : p.Prime) (hζ : IsPrimitiveRoot ζ p) (hr : Module.finrank F E = p)
+    : ∃ (δ : F) (θ : E) (σ : E ≃ₐ[F] E), IsKum p ζ δ θ σ := by
   haveI : FiniteDimensional F E := Module.finite_of_finrank_pos (hr ▸ hp.pos)
   haveI : Fact p.Prime := ⟨hp⟩
   haveI : IsCyclic (E ≃ₐ[F] E) :=
@@ -30,16 +32,22 @@ theorem exists_isKum_of_finrank_prime (p : ℕ) (F E : Type) [Field F] [Field E]
   rw [hr] at hirr hδ
   have hmin : (X ^ p - C δ : F[X]) = minpoly F θ :=
     minpoly.eq_of_irreducible_of_monic hirr (by simp [hδ]) (monic_X_pow_sub_C _ hp.ne_zero)
-  obtain ⟨σ, hσ⟩ := minpoly.exists_algEquiv_of_root' (K := F) (L := E) (x := algebraMap F E ζ * θ)
-    (y := θ) (Algebra.IsAlgebraic.isAlgebraic θ) (by
-      rw [← hmin]
-      rw [map_sub, map_pow, aeval_X, aeval_C, mul_pow, ← map_pow, hζ.pow_eq_one, map_one, one_mul,
-        hδ, sub_self])
+  obtain ⟨σ, hσ⟩ :=
+    minpoly.exists_algEquiv_of_root' (K := F) (L := E) (x := algebraMap F E ζ * θ) (y := θ)
+      (Algebra.IsAlgebraic.isAlgebraic θ)
+      (by
+        rw [← hmin]
+        rw [map_sub, map_pow, aeval_X, aeval_C, mul_pow, ← map_pow, hζ.pow_eq_one, map_one, one_mul,
+          hδ, sub_self])
   refine ⟨δ, θ, σ, hp, hζ, (X_pow_sub_C_irreducible_iff_of_prime hp).1 hirr, hδ.symm, hσ, ?_⟩
-  rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
-    (Algebra.IsAlgebraic.isAlgebraic θ), hθ, IntermediateField.top_toSubalgebra]
+  rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (Algebra.IsAlgebraic.isAlgebraic
+      θ),
+    hθ, IntermediateField.top_toSubalgebra]
 
-theorem np_of_finrank_prime_of_isPrimitiveRoot : ∀ (p : ℕ) (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [_root_.NumberField.IsTotallyComplex F] [IsGalois F E] (ζ : F), p.Prime → IsPrimitiveRoot ζ p → Module.finrank F E = p → NP F E := by
+theorem np_of_finrank_prime_of_isPrimitiveRoot
+    : ∀ (p : ℕ) (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [_root_.NumberField.IsTotallyComplex F] [IsGalois F E] (ζ : F),
+      p.Prime → IsPrimitiveRoot ζ p → Module.finrank F E = p → NP F E := by
   intro p F E _ _ _ _ _ _ _ ζ hp hζ hr x hx hloc
   classical
   obtain ⟨δ, θ, σ, hk⟩ := exists_isKum_of_finrank_prime p F E ζ hp hζ hr
@@ -49,9 +57,11 @@ theorem np_of_finrank_prime_of_isPrimitiveRoot : ∀ (p : ℕ) (F E : Type) [Fie
   have hfin : Units.mk0 x hx ∈ finNorm p F δ S := by
     simp only [finNorm, Subgroup.mem_iInf]
     intro v _
-    exact GlobalTheory.T.mem_unitsLocalKummerNorms_of_baseChange_norm p F E (v.adicCompletion F) ζ δ θ σ hk (Units.mk0 x hx) (hloc.1 v)
-  have hx' := GlobalTheory.T.sUnit_mem_kummerNorms_of_local_norms p F ζ (Units.mk0 δ hδ0) S hp hζ hadm (hS₁ S hS _ (by simp))
-    hk.nonpow (Units.mk0 x hx) (hS₁ S hS _ (by simp)) hfin
+    exact GlobalTheory.T.mem_unitsLocalKummerNorms_of_baseChange_norm p F E (v.adicCompletion F) ζ δ
+      θ σ hk (Units.mk0 x hx) (hloc.1 v)
+  have hx' :=
+    GlobalTheory.T.sUnit_mem_kummerNorms_of_local_norms p F ζ (Units.mk0 δ hδ0) S hp hζ hadm
+      (hS₁ S hS _ (by simp)) hk.nonpow (Units.mk0 x hx) (hS₁ S hS _ (by simp)) hfin
   obtain ⟨y, hy⟩ := (mem_kNorm p (RingHom.id F) δ _).1 hx'
   obtain ⟨-, -, -, -, -, ⟨e⟩, -⟩ := kummer_galois p F E ζ δ θ σ hk
   refine ⟨e.symm y, ?_⟩

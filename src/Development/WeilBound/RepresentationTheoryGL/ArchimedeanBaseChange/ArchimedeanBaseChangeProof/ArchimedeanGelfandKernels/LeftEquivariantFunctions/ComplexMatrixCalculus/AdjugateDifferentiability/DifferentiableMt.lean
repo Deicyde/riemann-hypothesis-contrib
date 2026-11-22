@@ -18,15 +18,21 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {κ μ : Type} [Fintype κ] [Fintype μ]
 
-def kronLin (κ μ : Type) [Fintype κ] [Fintype μ] :
-    Matrix κ κ ℂ →ₗ[ℝ] Matrix μ μ ℂ →ₗ[ℝ] Matrix (κ × μ) (κ × μ) ℂ :=
-  LinearMap.mk₂ ℝ (fun A B => A ⊗ₖ B) (fun A A' B => Matrix.add_kronecker A A' B)
-    (fun c A B => by rw [Matrix.smul_kronecker]) (fun A B B' => Matrix.kronecker_add A B B')
+def kronLin (κ μ : Type) [Fintype κ] [Fintype μ]
+    : Matrix κ κ ℂ →ₗ[ℝ] Matrix μ μ ℂ →ₗ[ℝ] Matrix (κ × μ) (κ × μ) ℂ :=
+  LinearMap.mk₂ ℝ
+    (fun A B => A ⊗ₖ B)
+    (fun A A' B => Matrix.add_kronecker A A' B)
+    (fun c A B => by rw [Matrix.smul_kronecker])
+    (fun A B B' => Matrix.kronecker_add A B B')
     (fun c A B => by rw [Matrix.kronecker_smul])
 
-def kronC (κ μ : Type) [Fintype κ] [Fintype μ] :
-    Matrix κ κ ℂ →L[ℝ] Matrix μ μ ℂ →L[ℝ] Matrix (κ × μ) (κ × μ) ℂ :=
-  LinearMap.toContinuousLinearMap ((LinearMap.toContinuousLinearMap : (Matrix μ μ ℂ →ₗ[ℝ] Matrix (κ × μ) (κ × μ) ℂ) ≃ₗ[ℝ] _).toLinearMap ∘ₗ kronLin κ μ)
+def kronC (κ μ : Type) [Fintype κ] [Fintype μ]
+    : Matrix κ κ ℂ →L[ℝ] Matrix μ μ ℂ →L[ℝ] Matrix (κ × μ) (κ × μ) ℂ :=
+  LinearMap.toContinuousLinearMap
+    ((LinearMap.toContinuousLinearMap
+        : (Matrix μ μ ℂ →ₗ[ℝ] Matrix (κ × μ) (κ × μ) ℂ) ≃ₗ[ℝ] _).toLinearMap
+      ∘ₗ kronLin κ μ)
 
 variable {n : ℕ}
 
@@ -48,19 +54,22 @@ open Cxf
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem fr0Der_of (hG : GamDer) (hGm : GamMul) (hM : MtLaws) (hR : RmLaws) : MatrixFrechetDerivativeAtZero := by
+theorem fr0Der_of (hG : GamDer) (hGm : GamMul) (hM : MtLaws) (hR : RmLaws)
+    : MatrixFrechetDerivativeAtZero := by
   intro n lam
   have hdet1 : (1 : PositivityTheory.RgTw.Mat n).det ≠ 0 := by simp
   have hopen : IsOpen (GLs n) :=
     isOpen_ne_fun (differentiable_det (ι := Fin n)).continuous continuous_const
-  have hRm : ∀ y : PositivityTheory.RgTw.Mat n, y.det ≠ 0 → DifferentiableAt ℝ (Rm lam) y := fun y hy =>
+  have hRm
+      : ∀ y : PositivityTheory.RgTw.Mat n, y.det ≠ 0 → DifferentiableAt ℝ (Rm lam) y := fun y hy =>
     ((hR n lam).2.2.contDiffAt (hopen.mem_nhds (show y ∈ GLs n from hy))).differentiableAt (by simp)
   have hdetR : (Rm lam (1 : PositivityTheory.RgTw.Mat n)).det ≠ 0 := by rw [(hR n lam).1]; simp
   have hgam : ∀ B : Matrix (Md n) (Md n) ℂ, DifferentiableAt ℝ (gamM (n := n)) B := fun B =>
     (((hG n).1.differentiable (by simp)) B).restrictScalars ℝ
   have hFd : DifferentiableAt ℝ (fun x : PositivityTheory.RgTw.Mat n => gamM (Mt x⁻¹)ᵀ) 1 :=
     (hgam _).comp (1 : PositivityTheory.RgTw.Mat n)
-      (dT ((differentiable_Mt _).comp (1 : PositivityTheory.RgTw.Mat n) (differentiableAt_inv 1 hdet1)))
+      (dT ((differentiable_Mt _).comp (1 : PositivityTheory.RgTw.Mat n)
+        (differentiableAt_inv 1 hdet1)))
   have hA : DifferentiableAt ℝ (fun x : PositivityTheory.RgTw.Mat n => (Rm lam x)⁻¹ᵀ) 1 :=
     dT ((differentiableAt_inv _ hdetR).comp (1 : PositivityTheory.RgTw.Mat n) (hRm 1 hdet1))
   have hB : DifferentiableAt ℝ (fun x : PositivityTheory.RgTw.Mat n => (Rm lam xᴴ)ᵀ) 1 :=
@@ -79,7 +88,8 @@ theorem fr0Der_of (hG : GamDer) (hGm : GamMul) (hM : MtLaws) (hR : RmLaws) : Mat
     exact ((kronC _ _).hasFDerivAt_of_bilinear hFd.hasFDerivAt hGd.hasFDerivAt).differentiableAt
   · have h := congrArg (fun L => L X) ((kronC _ _).fderiv_of_bilinear hFd hGd)
     simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.precompR_apply,
-      ContinuousLinearMap.precompL_apply, hF1, hG1] at h
+        ContinuousLinearMap.precompL_apply, hF1, hG1]
+      at h
     rw [key]
     refine h.trans ?_
     rw [add_comm]

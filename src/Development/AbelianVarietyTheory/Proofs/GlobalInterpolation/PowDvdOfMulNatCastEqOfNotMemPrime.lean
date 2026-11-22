@@ -9,9 +9,12 @@ open NumberField IsDedekindDomain Formalism.L2.Col
 
 namespace GlobalTheory
 
-theorem pow_dvd_of_mul_natCast_eq_of_notMem_prime {R : Type} [CommRing R] [IsDomain R] [CharZero R] (I : Ideal R)
-    (hI : I.IsPrime) {q : ℕ} (hq : q.Prime) (hqI : (q : R) ∈ I) {s : R} (hs : s ∉ I) :
-    ∀ (d i : ℕ) (r : R), s * (i : R) = (q : R) ^ d * r → q ^ d ∣ i := by
+theorem pow_dvd_of_mul_natCast_eq_of_notMem_prime
+    {R : Type} [CommRing R] [IsDomain R] [CharZero R]
+    (I : Ideal R) (hI : I.IsPrime)
+    {q : ℕ} (hq : q.Prime) (hqI : (q : R) ∈ I)
+    {s : R} (hs : s ∉ I)
+    : ∀ (d i : ℕ) (r : R), s * (i : R) = (q : R) ^ d * r → q ^ d ∣ i := by
   intro d
   induction d with
   | zero => intro i r _; simp
@@ -25,7 +28,9 @@ theorem pow_dvd_of_mul_natCast_eq_of_notMem_prime {R : Type} [CommRing R] [IsDom
     have hdvd : q ∣ i := by
       by_contra hn
       have hc : IsCoprime (q : R) (i : R) := by
-        have := (Nat.isCoprime_iff_coprime.2 ((Nat.Prime.coprime_iff_not_dvd hq).2 hn)).map (Int.castRingHom R)
+        have :=
+          (Nat.isCoprime_iff_coprime.2 ((Nat.Prime.coprime_iff_not_dvd hq).2 hn)).map
+            (Int.castRingHom R)
         simpa using this
       obtain ⟨a, b, hab⟩ := hc
       exact hI.one_notMem (hab ▸ I.add_mem (I.mul_mem_left a hqI) (I.mul_mem_left b hiI))
@@ -38,7 +43,14 @@ theorem pow_dvd_of_mul_natCast_eq_of_notMem_prime {R : Type} [CommRing R] [IsDom
     rw [pow_succ']
     exact Nat.mul_dvd_mul_left q (ih j r h')
 
-theorem sum_valsQ_eq_of_support_intAt : ∀ (E : Type) [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)), (qOf P).Prime → ∀ (K : Type) [Field K] (f : E → K) (A₀ : ℕ), (∀ a, f a ≠ 0 → IntAt P ((qOf P : E) ^ A₀ * a)) → ∀ A B : ℕ, A₀ ≤ A → ∑ a ∈ LocE.valsQ E (qOf P) A B, f a = ∑ a ∈ LocE.valsQ E (qOf P) A₀ B, f a := by
+theorem sum_valsQ_eq_of_support_intAt
+    : ∀ (E : Type) [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)),
+      (qOf P).Prime
+        → ∀ (K : Type) [Field K] (f : E → K) (A₀ : ℕ),
+          (∀ a, f a ≠ 0 → IntAt P ((qOf P : E) ^ A₀ * a))
+            → ∀ A B : ℕ,
+              A₀ ≤ A
+                → ∑ a ∈ LocE.valsQ E (qOf P) A B, f a = ∑ a ∈ LocE.valsQ E (qOf P) A₀ B, f a := by
   intro E _ _ P hq K _ f A₀ hf A B hA
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hA
   have hqP : ((qOf P : ℕ) : 𝓞 E) ∈ P.asIdeal := Ideal.absNorm_mem _
@@ -69,7 +81,8 @@ theorem sum_valsQ_eq_of_support_intAt : ∀ (E : Type) [Field E] [NumberField E]
       rw [← hrs]
       field_simp
       ring
-    obtain ⟨j, rfl⟩ := pow_dvd_of_mul_natCast_eq_of_notMem_prime P.asIdeal P.isPrime hq hqP hs d i r h1
+    obtain ⟨j, rfl⟩ :=
+      pow_dvd_of_mul_natCast_eq_of_notMem_prime P.asIdeal P.isPrime hq hqP hs d i r h1
     refine ⟨j, ?_, ?_⟩
     · have : q ^ (A₀ + d + B) = q ^ d * q ^ (A₀ + B) := by ring
       rw [this] at hi

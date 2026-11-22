@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.Twist
 
-theorem addChar_eq_mulShift_unit_of_isField :
-    ∀ {κf : Type} [CommRing κf] [Finite κf], IsField κf → ∀ ψ φ : AddChar κf ℂ, ψ ≠ 1 → φ ≠ 1 →
-      ∃ c : κfˣ, ∀ t, φ t = ψ ((c : κf) * t) := by
+theorem addChar_eq_mulShift_unit_of_isField
+    : ∀ {κf : Type} [CommRing κf] [Finite κf],
+      IsField κf
+        → ∀ ψ φ : AddChar κf ℂ, ψ ≠ 1 → φ ≠ 1 → ∃ c : κfˣ, ∀ t, φ t = ψ ((c : κf) * t) := by
   intro κf _ _ hF ψ φ hψ _
   classical
   let _ : Field κf := hF.toField

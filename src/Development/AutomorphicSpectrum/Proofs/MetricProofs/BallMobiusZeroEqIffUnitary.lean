@@ -9,7 +9,10 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IntEmbInjectiv
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+  GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
 open scoped ENNReal InnerProductSpace
 open scoped ComplexOrder
 
@@ -19,10 +22,10 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp.Dict.Stab
 
 variable {j j' : ℕ}
 
-theorem sg_fb {a : Matrix (Fin j) (Fin j) ℂ} {b : Matrix (Fin j) (Fin j') ℂ}
-    {c : Matrix (Fin j') (Fin j) ℂ} {d : Matrix (Fin j') (Fin j') ℂ}
-    (h : IsSgU (fromBlocks a b c d)) :
-    aᴴ * a - cᴴ * c = 1 ∧ aᴴ * b - cᴴ * d = 0 ∧ bᴴ * b - dᴴ * d = -1 := by
+theorem sg_fb
+    {a : Matrix (Fin j) (Fin j) ℂ} {b : Matrix (Fin j) (Fin j') ℂ} {c : Matrix (Fin j') (Fin j) ℂ}
+    {d : Matrix (Fin j') (Fin j') ℂ} (h : IsSgU (fromBlocks a b c d))
+    : aᴴ * a - cᴴ * c = 1 ∧ aᴴ * b - cᴴ * d = 0 ∧ bᴴ * b - dᴴ * d = -1 := by
   unfold IsSgU sgI at h
   rw [fromBlocks_conjTranspose, fromBlocks_multiply, fromBlocks_multiply] at h
   obtain ⟨h1, h2, -, h4⟩ := fromBlocks_inj.1 h
@@ -32,8 +35,9 @@ theorem sg_fb {a : Matrix (Fin j) (Fin j) ℂ} {b : Matrix (Fin j) (Fin j') ℂ}
   · simpa [sub_eq_add_neg] using h2
   · simpa [sub_eq_add_neg] using h4
 
-theorem unit_of_rel {a : Matrix (Fin j) (Fin j) ℂ} {c : Matrix (Fin j') (Fin j) ℂ}
-    (h : aᴴ * a - cᴴ * c = 1) : IsUnit a.det := by
+theorem unit_of_rel
+    {a : Matrix (Fin j) (Fin j) ℂ} {c : Matrix (Fin j') (Fin j) ℂ} (h : aᴴ * a - cᴴ * c = 1)
+    : IsUnit a.det := by
   have e : aᴴ * a = 1 + cᴴ * c := by rw [← h]; abel
   have pd : (aᴴ * a).PosDef := by
     rw [e]
@@ -47,11 +51,13 @@ theorem sgI_mul_self : sgI j j' * sgI j j' = 1 := by
   rw [fromBlocks_multiply]
   simp
 
-theorem IsSgU.mul {u v : Matrix (Sg j j') (Sg j j') ℂ} (hu : IsSgU u) (hv : IsSgU v) : IsSgU (u * v) := by
+theorem IsSgU.mul {u v : Matrix (Sg j j') (Sg j j') ℂ} (hu : IsSgU u) (hv : IsSgU v)
+    : IsSgU (u * v) := by
   unfold IsSgU at *
   rw [conjTranspose_mul]
-  calc vᴴ * uᴴ * sgI j j' * (u * v) = vᴴ * (uᴴ * sgI j j' * u) * v := by
-        simp only [Matrix.mul_assoc]
+  calc
+    vᴴ * uᴴ * sgI j j' * (u * v)
+      = vᴴ * (uᴴ * sgI j j' * u) * v := by simp only [Matrix.mul_assoc]
     _ = sgI j j' := by rw [hu, hv]
 
 theorem IsSgU.det_unit {u : Matrix (Sg j j') (Sg j j') ℂ} (hu : IsSgU u) : IsUnit u.det := by
@@ -61,10 +67,10 @@ theorem IsSgU.det_unit {u : Matrix (Sg j j') (Sg j j') ℂ} (hu : IsSgU u) : IsU
     rw [e, show uᴴ * sgI j j' * u = sgI j j' from hu, sgI_mul_self]
   exact Matrix.isUnit_det_of_left_inverse this
 
-theorem unitary_iff_fb {p : Matrix (Fin j) (Fin j) ℂ} {b : Matrix (Fin j) (Fin j') ℂ}
-    {r : Matrix (Fin j') (Fin j) ℂ} {s : Matrix (Fin j') (Fin j') ℂ}
-    (h : IsSgU (fromBlocks p b r s)) :
-    (fromBlocks p b r s)ᴴ * fromBlocks p b r s = 1 ↔ r = 0 := by
+theorem unitary_iff_fb
+    {p : Matrix (Fin j) (Fin j) ℂ} {b : Matrix (Fin j) (Fin j') ℂ} {r : Matrix (Fin j') (Fin j) ℂ}
+    {s : Matrix (Fin j') (Fin j') ℂ} (h : IsSgU (fromBlocks p b r s))
+    : (fromBlocks p b r s)ᴴ * fromBlocks p b r s = 1 ↔ r = 0 := by
   obtain ⟨h1, h2, h3⟩ := sg_fb h
   rw [fromBlocks_conjTranspose, fromBlocks_multiply, ← fromBlocks_one]
   constructor
@@ -73,8 +79,10 @@ theorem unitary_iff_fb {p : Matrix (Fin j) (Fin j) ℂ} {b : Matrix (Fin j) (Fin
     have hz : (2 : ℂ) • (rᴴ * r) = 0 := by
       have : rᴴ * r + rᴴ * r = 0 := by
         have := sub_eq_zero.2 (e1.trans h1.symm)
-        rw [← this]; abel
-      rw [two_smul]; exact this
+        rw [← this]
+        abel
+      rw [two_smul]
+      exact this
     have hz' : rᴴ * r = 0 := (smul_eq_zero.1 hz).resolve_left two_ne_zero
     exact conjTranspose_mul_self_eq_zero.1 hz'
   · rintro rfl
@@ -87,10 +95,11 @@ theorem unitary_iff_fb {p : Matrix (Fin j) (Fin j) ℂ} {b : Matrix (Fin j) (Fin
     simp only [conjTranspose_zero, Matrix.zero_mul, zero_sub, neg_inj] at h3
     simp [h1, h3]
 
-theorem single_fb {a p : Matrix (Fin j) (Fin j) ℂ} {b e : Matrix (Fin j) (Fin j') ℂ}
+theorem single_fb
+    {a p : Matrix (Fin j) (Fin j) ℂ} {b e : Matrix (Fin j) (Fin j') ℂ}
     {c r : Matrix (Fin j') (Fin j) ℂ} {d s : Matrix (Fin j') (Fin j') ℂ}
-    (hu : IsSgU (fromBlocks a b c d)) (hv : IsSgU (fromBlocks p e r s)) :
-    c * a⁻¹ = (c * p + d * r) * (a * p + b * r)⁻¹ ↔ r = 0 := by
+    (hu : IsSgU (fromBlocks a b c d)) (hv : IsSgU (fromBlocks p e r s))
+    : c * a⁻¹ = (c * p + d * r) * (a * p + b * r)⁻¹ ↔ r = 0 := by
   have ha : IsUnit a.det := unit_of_rel (sg_fb hu).1
   have hp : IsUnit p.det := unit_of_rel (sg_fb hv).1
   have hw : IsUnit (a * p + b * r).det := by
@@ -103,7 +112,8 @@ theorem single_fb {a p : Matrix (Fin j) (Fin j) ℂ} {b e : Matrix (Fin j) (Fin 
       rw [h, Matrix.nonsing_inv_mul_cancel_right _ _ hw]
     have hs : (d - c * a⁻¹ * b) * r = 0 := by
       have e1 : c * a⁻¹ * (a * p + b * r) = c * p + c * a⁻¹ * b * r := by
-        rw [Matrix.mul_add, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_right _ _ ha, Matrix.mul_assoc (c * a⁻¹) b r]
+        rw [Matrix.mul_add, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul_cancel_right _ _ ha,
+          Matrix.mul_assoc (c * a⁻¹) b r]
       rw [e1] at h'
       have : c * a⁻¹ * b * r = d * r := add_left_cancel h'
       rw [Matrix.sub_mul, this, sub_self]
@@ -119,8 +129,8 @@ theorem single_fb {a p : Matrix (Fin j) (Fin j) ℂ} {b e : Matrix (Fin j) (Fin 
     simp only [Matrix.mul_zero, add_zero]
     rw [Matrix.mul_inv_rev, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv_cancel_right _ _ hp]
 
-theorem single {u v : Matrix (Sg j j') (Sg j j') ℂ} (hu : IsSgU u) (hv : IsSgU v) :
-    u.toBlocks₂₁ * u.toBlocks₁₁⁻¹ = (u * v).toBlocks₂₁ * (u * v).toBlocks₁₁⁻¹ ↔ vᴴ * v = 1 := by
+theorem single {u v : Matrix (Sg j j') (Sg j j') ℂ} (hu : IsSgU u) (hv : IsSgU v)
+    : u.toBlocks₂₁ * u.toBlocks₁₁⁻¹ = (u * v).toBlocks₂₁ * (u * v).toBlocks₁₁⁻¹ ↔ vᴴ * v = 1 := by
   obtain ⟨a, b, c, d, rfl⟩ : ∃ a b c d, u = fromBlocks a b c d :=
     ⟨_, _, _, _, (fromBlocks_toBlocks u).symm⟩
   obtain ⟨p, e, r, s, rfl⟩ : ∃ a b c d, v = fromBlocks a b c d :=
@@ -128,16 +138,20 @@ theorem single {u v : Matrix (Sg j j') (Sg j j') ℂ} (hu : IsSgU u) (hv : IsSgU
   rw [unitary_iff_fb hv, ← single_fb hu hv, fromBlocks_multiply]
   simp only [toBlocks_fromBlocks₂₁, toBlocks_fromBlocks₁₁]
 
-theorem ballPt_inj {Ψ : Type} {n : ℕ} (q : Ψ × Fin j × Fin j' ≃ Fin n)
-    {W W' : Ψ → Matrix (Fin j') (Fin j) ℂ} (h : ballPt q W = ballPt q W') : W = W' := by
+theorem ballPt_inj
+    {Ψ : Type} {n : ℕ} (q : Ψ × Fin j × Fin j' ≃ Fin n)
+    {W W' : Ψ → Matrix (Fin j') (Fin j) ℂ} (h : ballPt q W = ballPt q W')
+    : W = W' := by
   funext τ
   ext i' i
   have := congrFun h (q (τ, i, i'))
   simpa [ballPt] using this
 
-theorem moebBall_zero {Ψ : Type} [Fintype Ψ] {n : ℕ} (q : Ψ × Fin j × Fin j' ≃ Fin n)
-    (w : Ψ → Matrix (Sg j j') (Sg j j') ℂ) :
-    moebBall q w 0 = ballPt q fun τ => (w τ).toBlocks₂₁ * (w τ).toBlocks₁₁⁻¹ := by
+theorem moebBall_zero
+    {Ψ : Type} [Fintype Ψ]
+    {n : ℕ} (q : Ψ × Fin j × Fin j' ≃ Fin n)
+    (w : Ψ → Matrix (Sg j j') (Sg j j') ℂ)
+    : moebBall q w 0 = ballPt q fun τ => (w τ).toBlocks₂₁ * (w τ).toBlocks₁₁⁻¹ := by
   have hb : ∀ τ, (ballMat q (0 : Fin n → ℂ) τ)ᵀ = 0 := by
     intro τ
     ext a b
@@ -148,7 +162,11 @@ theorem moebBall_zero {Ψ : Type} [Fintype Ψ] {n : ℕ} (q : Ψ × Fin j × Fin
   rw [hb τ]
   simp [moebW]
 
-theorem moebBall_zero_iff : ∀ (Ψ : Type) [Fintype Ψ] (j j' n : ℕ) (q : Ψ × Fin j × Fin j' ≃ Fin n) (u v : Ψ → Matrix (Sg j j') (Sg j j') ℂ), (∀ τ, IsSgU (u τ)) → (∀ τ, IsSgU (v τ)) → (moebBall q u 0 = moebBall q (fun τ => u τ * v τ) 0 ↔ ∀ τ, (v τ)ᴴ * v τ = 1) := by
+theorem moebBall_zero_iff
+    : ∀ (Ψ : Type) [Fintype Ψ] (j j' n : ℕ) (q : Ψ × Fin j × Fin j' ≃ Fin n)
+        (u v : Ψ → Matrix (Sg j j') (Sg j j') ℂ),
+      (∀ τ, IsSgU (u τ)) → (∀ τ, IsSgU (v τ))
+        → (moebBall q u 0 = moebBall q (fun τ => u τ * v τ) 0 ↔ ∀ τ, (v τ)ᴴ * v τ = 1) := by
   intro Ψ _ j j' n q u v hu hv
   rw [moebBall_zero, moebBall_zero]
   constructor

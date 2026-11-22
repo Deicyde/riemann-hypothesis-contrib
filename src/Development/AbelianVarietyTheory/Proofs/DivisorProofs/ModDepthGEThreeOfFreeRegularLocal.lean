@@ -10,9 +10,12 @@ open IsLocalRing RingTheory.Sequence
 
 namespace GlobalTheory
 
-theorem modDepthGE_three_of_free_of_isRegularLocalRing : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R],
-    3 ≤ ringKrullDim R → ∀ (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M]
-    [Module.Free R M] [Nontrivial M], ReciprocityTheory.CA.ModDepthGE R M 3 := by
+theorem modDepthGE_three_of_free_of_isRegularLocalRing
+    : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R],
+      3 ≤ ringKrullDim R
+        → ∀ (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M] [Module.Free R M]
+            [Nontrivial M],
+          ReciprocityTheory.CA.ModDepthGE R M 3 := by
   intro R _ _ hd M _ _ _ _ _
   obtain ⟨xs, h, hl⟩ := exists_ofList_eq_maximalIdeal_length_eq R
   have hreg : IsRegular R xs := isRegular_of_ofList_eq_maximalIdeal h hl.le

@@ -9,16 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemOfAs
 noncomputable section
 namespace GlobalTheory.DeltaInv
 open scoped LaurentSeries PowerSeries
-open GlobalTheory.PhiGam GlobalTheory.PsiShiftProof GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters
+open GlobalTheory.PhiGam GlobalTheory.PsiShiftProof
+  GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters
 
-theorem root_eq {l : ℕ} [hl : Fact l.Prime] {z w : ℤ_[l]} (hz : z ^ (l - 1) = 1) (hw : w ^ (l - 1) = 1)
-    (h : PadicInt.toZMod z = PadicInt.toZMod w) : z = w :=
-  by
+theorem root_eq
+    {l : ℕ} [hl : Fact l.Prime]
+    {z w : ℤ_[l]}
+    (hz : z ^ (l - 1) = 1) (hw : w ^ (l - 1) = 1) (h : PadicInt.toZMod z = PadicInt.toZMod w)
+    : z = w := by
   have hn : 0 < l - 1 := Nat.sub_pos_of_lt hl.out.one_lt
   have key : (∑ i ∈ Finset.range (l - 1), z ^ i * w ^ (l - 1 - 1 - i)) * (z - w) = 0 := by
     rw [geom_sum₂_mul, hz, hw, sub_self]
-  have hres : PadicInt.toZMod (∑ i ∈ Finset.range (l - 1), z ^ i * w ^ (l - 1 - 1 - i)) =
-      ((l - 1 : ℕ) : ZMod l) * PadicInt.toZMod z ^ (l - 1 - 1) := by
+  have hres
+      : PadicInt.toZMod (∑ i ∈ Finset.range (l - 1), z ^ i * w ^ (l - 1 - 1 - i))
+        = ((l - 1 : ℕ) : ZMod l) * PadicInt.toZMod z ^ (l - 1 - 1) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finset.sum_congr rfl (g := fun _ => PadicInt.toZMod z ^ (l - 1 - 1))]
     · simp
@@ -42,10 +46,10 @@ theorem root_eq {l : ℕ} [hl : Fact l.Prime] {z w : ℤ_[l]} (hz : z ^ (l - 1) 
     rw [← hres, h0, map_zero]
   exact sub_eq_zero.mp ((mul_eq_zero.mp key).resolve_left hs)
 
-theorem exists_mul_pow {k : Type} [Field k] (c : k⸨X⸩) (t : k⟦X⟧) :
-    ∃ (N : ℕ) (b : k⟦X⟧), (vv k * (t : k⸨X⸩)) ^ N * c = (b : k⸨X⸩) :=
-  by
-  refine ⟨(-c.order).toNat, PowerSeries.X ^ c.order.toNat * t ^ (-c.order).toNat * c.powerSeriesPart, ?_⟩
+theorem exists_mul_pow {k : Type} [Field k] (c : k⸨X⸩) (t : k⟦X⟧)
+    : ∃ (N : ℕ) (b : k⟦X⟧), (vv k * (t : k⸨X⸩)) ^ N * c = (b : k⸨X⸩) := by
+  refine
+    ⟨(-c.order).toNat, PowerSeries.X ^ c.order.toNat * t ^ (-c.order).toNat * c.powerSeriesPart, ?_⟩
   have hc := LaurentSeries.single_order_mul_powerSeriesPart c
   have hN : ((-c.order).toNat : ℤ) + c.order = (c.order.toNat : ℤ) := by omega
   have hs : ∀ n : ℕ, (HahnSeries.single (1 : ℤ) (1 : k)) ^ n = HahnSeries.single (n : ℤ) 1 := by
@@ -54,29 +58,42 @@ theorem exists_mul_pow {k : Type} [Field k] (c : k⸨X⸩) (t : k⟦X⟧) :
     simp
   conv_lhs => arg 2; rw [← hc]
   rw [vv_eq_coe_X, map_mul, map_mul, map_pow, map_pow, HahnSeries.ofPowerSeries_X, mul_pow, hs, hs]
-  calc (HahnSeries.single ((-c.order).toNat : ℤ) (1 : k) * (t : k⸨X⸩) ^ (-c.order).toNat) *
-        (HahnSeries.single c.order 1 * (c.powerSeriesPart : k⸨X⸩))
-      = (HahnSeries.single ((-c.order).toNat : ℤ) (1 : k) * HahnSeries.single c.order 1) *
-          (t : k⸨X⸩) ^ (-c.order).toNat * (c.powerSeriesPart : k⸨X⸩) := by ring
+  calc
+    (HahnSeries.single ((-c.order).toNat : ℤ) (1 : k) * (t : k⸨X⸩) ^ (-c.order).toNat)
+          * (HahnSeries.single c.order 1 * (c.powerSeriesPart : k⸨X⸩))
+        = (HahnSeries.single ((-c.order).toNat : ℤ) (1 : k) * HahnSeries.single c.order 1)
+          * (t : k⸨X⸩) ^ (-c.order).toNat * (c.powerSeriesPart : k⸨X⸩) := by
+      ring
     _ = _ := by rw [HahnSeries.single_mul_single, hN, one_mul]
 
-theorem coeff_one_opp (k : Type) [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] (z : ℤ_[l]) :
-    PowerSeries.coeff 1 (onePlusPow k l z) = ZMod.castHom (dvd_refl l) k (PadicInt.toZMod z) :=
-  by
+theorem coeff_one_opp (k : Type) [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] (z : ℤ_[l])
+    : PowerSeries.coeff 1 (onePlusPow k l z) = ZMod.castHom (dvd_refl l) k (PadicInt.toZMod z) := by
   unfold onePlusPow
-  rw [PowerSeries.coeff_map, PowerSeries.binomialSeries_coeff, Ring.choose_one_right, smul_eq_mul, mul_one]
+  rw [PowerSeries.coeff_map, PowerSeries.binomialSeries_coeff, Ring.choose_one_right, smul_eq_mul,
+    mul_one]
   rfl
 
-theorem main (l : ℕ) [hl : Fact l.Prime] (k : Type) [Field k] [CharP k l] (R : RingPG k l)
-    (ι : k⸨X⸩ →ₐ[k] k⸨X⸩) (H : GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.IsCyclotomic R ι) :
-    ∃ σ : {z : ℤ_[l] // z ^ (l - 1) = 1} → (k⸨X⸩ →+* k⸨X⸩),
-      (∀ z (b : k⟦X⟧), σ z (b : k⸨X⸩) = ((GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l z.1 b : k⟦X⟧) : k⸨X⸩)) ∧
-      Function.Injective σ ∧ ∀ c, (∀ z, σ z c = c) ↔ ∃ c₀, ι c₀ = c :=
-  by
+theorem main
+    (l : ℕ) [hl : Fact l.Prime]
+    (k : Type) [Field k] [CharP k l]
+    (R : RingPG k l) (ι : k⸨X⸩ →ₐ[k] k⸨X⸩)
+    (H : GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.IsCyclotomic R ι)
+    : ∃ σ : {z : ℤ_[l] // z ^ (l - 1) = 1} → (k⸨X⸩ →+* k⸨X⸩),
+      (∀ z (b : k⟦X⟧),
+          σ z (b : k⸨X⸩)
+            = ((GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l z.1 b
+                : k⟦X⟧)
+              : k⸨X⸩))
+        ∧ Function.Injective σ ∧ ∀ c, (∀ z, σ z c = c) ↔ ∃ c₀, ι c₀ = c := by
   have hne : l - 1 ≠ 0 := (Nat.sub_pos_of_lt hl.out.one_lt).ne'
   set σ : {z : ℤ_[l] // z ^ (l - 1) = 1} → (k⸨X⸩ →+* k⸨X⸩) :=
     fun z => GlobalTheory.PsiShiftProof.delPi k (Units.ofPowEqOne z.1 (l - 1) z.2 hne) with hσ
-  have hσc : ∀ z (b : k⟦X⟧), σ z (b : k⸨X⸩) = ((GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l z.1 b : k⟦X⟧) : k⸨X⸩) := by
+  have hσc
+      : ∀ z (b : k⟦X⟧),
+        σ z (b : k⸨X⸩)
+          = ((GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l z.1 b
+              : k⟦X⟧)
+            : k⸨X⸩) := by
     intro z b
     rw [hσ, GlobalTheory.PsiShiftProof.delPi_coe]
     rfl
@@ -88,8 +105,7 @@ theorem main (l : ℕ) [hl : Fact l.Prime] (k : Type) [Field k] [CharP k l] (R :
   have hιv : ∀ z, σ z (ι (vv k)) = ι (vv k) := by
     intro z
     rw [vv_eq_coe_X, hfix]
-  have hv0 : ι (vv k) ≠ 0 := by
-    exact (map_ne_zero ι).mpr (vv_ne_zero k)
+  have hv0 : ι (vv k) ≠ 0 := by exact (map_ne_zero ι).mpr (vv_ne_zero k)
   refine ⟨σ, hσc, ?_, ?_⟩
   · intro z w hzw
     have h1 := congrArg (fun f : k⸨X⸩ →+* k⸨X⸩ => f (1 + vv k)) hzw
@@ -108,7 +124,11 @@ theorem main (l : ℕ) [hl : Fact l.Prime] (k : Type) [Field k] [CharP k l] (R :
         rw [this, pow_succ]
         ring
       rw [hv] at hb
-      have hbinv : ∀ z : ℤ_[l], z ^ (l - 1) = 1 → GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l z b = b := by
+      have hbinv
+          : ∀ z : ℤ_[l],
+            z ^ (l - 1) = 1
+              → GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l z b
+                = b := by
         intro z hz
         apply hinj
         show ((GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l z b : k⟦X⟧) : k⸨X⸩) = (b : k⸨X⸩)

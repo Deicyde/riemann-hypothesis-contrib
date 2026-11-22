@@ -13,8 +13,7 @@ namespace UpperTheory.Esk.AutomorphyFactorLemmas
 
 open UpperTheory.Esk
 
-theorem b_cv : Continuous (fun z : P => z.1) := by
-  exact continuous_subtype_val
+theorem b_cv : Continuous (fun z : P => z.1) := by exact continuous_subtype_val
 
 theorem b_ne (z w : ℂ) (h : 0 < z.im * w.im) : z - conj w ≠ 0 := by
   intro h0
@@ -41,8 +40,10 @@ theorem p8 (k : ℕ) : Continuous fun p : P × P => q1 k p.1 p.2 := by
   intro p
   by_cases hp : 0 < p.1.1.im * p.2.1.im
   · have hU : ∀ᶠ q in nhds p, 0 < q.1.1.im * q.2.1.im := (hf.tendsto p).eventually (lt_mem_nhds hp)
-    have hg : ContinuousAt (fun q : P × P =>
-        ((k : ℂ) - 1) / (4 * Real.pi) * ((q.2.1 - conj q.2.1) / (q.1.1 - conj q.2.1)) ^ k) p := by
+    have hg : ContinuousAt
+        (fun q : P × P =>
+          ((k : ℂ) - 1) / (4 * Real.pi) * ((q.2.1 - conj q.2.1) / (q.1.1 - conj q.2.1)) ^ k)
+        p := by
       apply ContinuousAt.mul continuousAt_const
       apply ContinuousAt.pow
       apply ContinuousAt.div
@@ -66,11 +67,13 @@ theorem p9 (k : ℕ) (w : P) : Hol1 fun z => q1 k z w := by
   have hcont : Continuous fun s : ℂ => s.im * w.1.im := Complex.continuous_im.mul continuous_const
   by_cases hp : 0 < t.im * w.1.im
   · have hU : ∀ᶠ s in nhds t, 0 < s.im * w.1.im := (hcont.tendsto t).eventually (lt_mem_nhds hp)
-    have hd : DifferentiableAt ℂ (fun s : ℂ =>
-        ((k : ℂ) - 1) / (4 * Real.pi) * ((w.1 - conj w.1) / (s - conj w.1)) ^ k) t := by
+    have hd : DifferentiableAt ℂ
+        (fun s : ℂ => ((k : ℂ) - 1) / (4 * Real.pi) * ((w.1 - conj w.1) / (s - conj w.1)) ^ k)
+        t := by
       apply DifferentiableAt.mul (differentiableAt_const _)
       apply DifferentiableAt.pow
-      apply DifferentiableAt.div (differentiableAt_const _) (differentiableAt_id.sub (differentiableAt_const _))
+      apply DifferentiableAt.div (differentiableAt_const _)
+        (differentiableAt_id.sub (differentiableAt_const _))
       exact b_ne _ _ hp
     apply hd.congr_of_eventuallyEq
     filter_upwards [hU] with s hs

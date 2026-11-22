@@ -17,8 +17,9 @@ open GlobalTheory.CMVal (latDisc)
 
 namespace GlobalTheory.QFam
 
-theorem sz_of_forall_rat_gt : ∀ (l : ℕ) [Fact l.Prime] (lam : algebraicClosure ℚ ℂ →+* ℂ_[l]),
-    ∀ (r : ℝ) (x : ℂ), (∀ q : ℚ, r < q → Sz l lam q x) → Sz l lam r x := by
+theorem sz_of_forall_rat_gt
+    : ∀ (l : ℕ) [Fact l.Prime] (lam : algebraicClosure ℚ ℂ →+* ℂ_[l]), ∀ (r : ℝ) (x : ℂ),
+      (∀ q : ℚ, r < q → Sz l lam q x) → Sz l lam r x := by
   intro l hl lam r x h
   obtain ⟨q₀, hq₀⟩ := exists_rat_gt r
   obtain ⟨hx, -⟩ := h q₀ hq₀

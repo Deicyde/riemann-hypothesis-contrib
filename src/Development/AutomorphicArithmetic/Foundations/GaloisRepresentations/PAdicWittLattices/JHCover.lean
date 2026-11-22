@@ -18,9 +18,11 @@ theorem jHCover : PositivityTheory.AutomorphicGaloisHodgeTate.G8.HBC.P_cover := 
   · rw [e.symm.surjective.iSup_comp (fun j => (C.f j).opensRange)]
     exact C.iSup_opensRange
   · intro S hS
-    have h := IsAffineOpen.biInf (X := X) (S : Set (Fin (Fintype.card C.I₀))) S.finite_toSet
-      (Finset.coe_nonempty.mpr hS) (U := fun i => (C.f (e.symm i)).opensRange)
-      (fun i _ => isAffineOpen_opensRange _)
+    have h :=
+      IsAffineOpen.biInf (X := X) (S : Set (Fin (Fintype.card C.I₀))) S.finite_toSet
+        (Finset.coe_nonempty.mpr hS)
+        (U := fun i => (C.f (e.symm i)).opensRange)
+        (fun i _ => isAffineOpen_opensRange _)
     simpa only [Finset.mem_coe] using h
 
 end UpperTheory.Gal.G3

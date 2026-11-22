@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Cus
 
 namespace GlobalTheory.Published
 
-theorem cuspTraceClass_of_factorisation : DixmierMalliavinFactorisation → CuspTraceClass :=
-  fun h => cuspTraceClass_of_decay GlobalTheory.T.cuspidal_moderateGrowth_rapidDecay h
+theorem cuspTraceClass_of_factorisation : DixmierMalliavinFactorisation → CuspTraceClass := fun h =>
+  cuspTraceClass_of_decay GlobalTheory.T.cuspidal_moderateGrowth_rapidDecay h
 
 end GlobalTheory.Published

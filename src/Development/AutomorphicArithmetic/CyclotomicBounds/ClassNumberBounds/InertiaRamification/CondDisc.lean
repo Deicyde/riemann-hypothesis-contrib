@@ -15,8 +15,9 @@ open scoped Pointwise
 
 variable {N : ℕ} [NeZero N] {K : Type*} [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K]
 
-private theorem isPrimitiveRoot_pow_val {R : Type*} [CommRing R] {z : R}
-    (hz : IsPrimitiveRoot z N) (a : ZMod N) : IsPrimitiveRoot (z ^ a.val) (addOrderOf a) := by
+private theorem isPrimitiveRoot_pow_val
+    {R : Type*} [CommRing R] {z : R} (hz : IsPrimitiveRoot z N) (a : ZMod N)
+    : IsPrimitiveRoot (z ^ a.val) (addOrderOf a) := by
   have h1 : addOrderOf a = orderOf (z ^ a.val) := by
     have hfin : IsOfFinOrder z := isOfFinOrder_iff_pow_eq_one.2 ⟨N, NeZero.pos N, hz.pow_eq_one⟩
     rw [hfin.orderOf_pow, ← hz.eq_orderOf, ← ZMod.addOrderOf_coe _ (NeZero.ne N),
@@ -24,42 +25,45 @@ private theorem isPrimitiveRoot_pow_val {R : Type*} [CommRing R] {z : R}
   rw [h1]
   exact IsPrimitiveRoot.orderOf _
 
-private theorem span_sub_smul {z : 𝓞 K} (hz : IsPrimitiveRoot z N) (σ : Gal(K/ℚ)) :
-    Ideal.span {z - σ • z} =
-      Ideal.span {1 - z ^ ((galEquivZMod N K σ : ZMod N) - 1).val} := by
+private theorem span_sub_smul {z : 𝓞 K} (hz : IsPrimitiveRoot z N) (σ : Gal(K/ℚ))
+    : Ideal.span {z - σ • z} = Ideal.span {1 - z ^ ((galEquivZMod N K σ : ZMod N) - 1).val} := by
   rw [galEquivZMod_smul_of_pow_eq N K σ hz.pow_eq_one]
-  have h : z ^ (galEquivZMod N K σ).val.val =
-      z ^ (1 + ((galEquivZMod N K σ : ZMod N) - 1).val) := by
+  have h
+      : z ^ (galEquivZMod N K σ).val.val = z ^ (1 + ((galEquivZMod N K σ : ZMod N) - 1).val) := by
     refine pow_eq_pow_of_modEq ?_ hz.pow_eq_one
     rw [← ZMod.natCast_eq_natCast_iff]
     simp
   rw [h, pow_add, pow_one, ← mul_one_sub]
   exact Ideal.span_singleton_mul_left_unit (hz.isUnit (NeZero.ne N)) _
 
-private theorem padicValNat_prod {ι : Type*} (l : ℕ) [Fact l.Prime] (s : Finset ι) (f : ι → ℕ)
-    (hf : ∀ i ∈ s, f i ≠ 0) : padicValNat l (∏ i ∈ s, f i) = ∑ i ∈ s, padicValNat l (f i) := by
+private theorem padicValNat_prod
+    {ι : Type*} (l : ℕ) [Fact l.Prime] (s : Finset ι) (f : ι → ℕ) (hf : ∀ i ∈ s, f i ≠ 0)
+    : padicValNat l (∏ i ∈ s, f i) = ∑ i ∈ s, padicValNat l (f i) := by
   have hl : l.Prime := Fact.out
   simp only [Nat.padicValNat_def, ← Nat.factorization_def _ hl]
   rw [Nat.factorization_prod hf, Finsupp.finsetSum_apply]
 
-private theorem vdField_eq_avg (E : IntermediateField ℚ K) (l : ℕ) [Fact l.Prime] :
-    vdField E l = avgCondExp l (fieldChars N E) := by
+private theorem vdField_eq_avg (E : IntermediateField ℚ K) (l : ℕ) [Fact l.Prime]
+    : vdField E l = avgCondExp l (fieldChars N E) := by
   classical
   have hζ := IsCyclotomicExtension.zeta_spec N ℚ K
   have hz := hζ.toInteger_isPrimitiveRoot
   have h := congrArg Ideal.absNorm (map_differentIdeal_eq_span_prod E hζ)
   rw [Ideal.absNorm_algebraMap, absNorm_differentIdeal E,
-    ← IsFractionRing.finrank_eq (𝓞 E) E (𝓞 K) K, ← Ideal.prod_span_singleton, map_prod] at h
+      ← IsFractionRing.finrank_eq (𝓞 E) E (𝓞 K) K, ← Ideal.prod_span_singleton, map_prod]
+    at h
   have hne : (discr E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (discr_ne_zero E)
   have hne' := h ▸ pow_ne_zero (Module.finrank E K) hne
   have h2 := congrArg (padicValNat l) h
   rw [Nat.padicValNat_def, Nat.multiplicity_pow, ← Nat.padicValNat_def,
-    padicValNat_prod l _ _ (Finset.prod_ne_zero_iff.1 hne')] at h2
+      padicValNat_prod l _ _ (Finset.prod_ne_zero_iff.1 hne')]
+    at h2
   have h3 := congrArg (Nat.cast : ℕ → ℚ) h2
   push_cast at h3
-  have h4 : ∀ σ ∈ Finset.univ.filter (fun σ : Gal(K/ℚ) => σ ∉ E.fixingSubgroup),
-      (padicValNat l (Ideal.absNorm (Ideal.span {hζ.toInteger - σ • hζ.toInteger})) : ℚ) =
-        Module.finrank ℚ K * rootWeight l (addOrderOf ((galEquivZMod N K σ : ZMod N) - 1)) := by
+  have h4
+      : ∀ σ ∈ Finset.univ.filter (fun σ : Gal(K/ℚ) => σ ∉ E.fixingSubgroup),
+        (padicValNat l (Ideal.absNorm (Ideal.span {hζ.toInteger - σ • hζ.toInteger})) : ℚ)
+          = Module.finrank ℚ K * rootWeight l (addOrderOf ((galEquivZMod N K σ : ZMod N) - 1)) := by
     intro σ hσ
     rw [span_sub_smul hz σ]
     refine padicValNat_absNorm_one_sub l ?_ (isPrimitiveRoot_pow_val hz _)
@@ -73,9 +77,10 @@ private theorem vdField_eq_avg (E : IntermediateField ℚ K) (l : ℕ) [Fact l.P
       exact hσ1
     omega
   rw [Finset.sum_congr rfl h4, ← Finset.mul_sum] at h3
-  have h5 : ∑ σ ∈ Finset.univ.filter (fun σ : Gal(K/ℚ) => σ ∉ E.fixingSubgroup),
-      rootWeight l (addOrderOf ((galEquivZMod N K σ : ZMod N) - 1)) =
-      avgCondExp l (fieldChars N E) := by
+  have h5
+      : ∑ σ ∈ Finset.univ.filter (fun σ : Gal(K/ℚ) => σ ∉ E.fixingSubgroup),
+          rootWeight l (addOrderOf ((galEquivZMod N K σ : ZMod N) - 1))
+        = avgCondExp l (fieldChars N E) := by
     rw [fieldChars, ← sum_rootWeight_eq_avgCondExp]
     refine Finset.sum_equiv (galEquivZMod N K).toEquiv ?_ (fun _ _ => rfl)
     intro σ
@@ -88,12 +93,13 @@ private theorem vdField_eq_avg (E : IntermediateField ℚ K) (l : ℕ) [Fact l.P
   rw [vdField, padicValInt, div_eq_iff p1]
   push_cast at h3
   apply mul_left_cancel₀ p2
-  rw [← Nat.padicValNat_def, h3]; ring
+  rw [← Nat.padicValNat_def, h3]
+  ring
 
-theorem natAbs_discr_eq_finprod_conductor (E : IntermediateField ℚ K) :
-    (discr E).natAbs = ∏ᶠ ψ : fieldChars N E, (ψ : DirichletCharacter ℂ N).conductor ∧
-      Real.log (rootDiscr E) = logRootDiscChar (fieldChars N E) ∧
-      (discr E).natAbs.primeFactors = (fieldCond (fieldChars N E)).primeFactors := by
+theorem natAbs_discr_eq_finprod_conductor (E : IntermediateField ℚ K)
+    : (discr E).natAbs = ∏ᶠ ψ : fieldChars N E, (ψ : DirichletCharacter ℂ N).conductor
+      ∧ Real.log (rootDiscr E) = logRootDiscChar (fieldChars N E)
+      ∧ (discr E).natAbs.primeFactors = (fieldCond (fieldChars N E)).primeFactors := by
   classical
   have := Fintype.ofFinite (fieldChars N E)
   have hne : (discr E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (discr_ne_zero E)

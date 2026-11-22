@@ -6,10 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem eq_zero_of_sum_eq_zero_of_unit_mul_pow {R : Type*} [CommRing R] [IsDomain R] {ϖ : R}
-    (hϖ : Irreducible ϖ) {e : ℕ} (c : Fin e → R)
+theorem eq_zero_of_sum_eq_zero_of_unit_mul_pow
+    {R : Type*} [CommRing R] [IsDomain R]
+    {ϖ : R} (hϖ : Irreducible ϖ)
+    {e : ℕ} (c : Fin e → R)
     (hc : ∀ i, c i ≠ 0 → ∃ (n : ℕ) (w : R), IsUnit w ∧ c i = w * ϖ ^ (i.val + e * n))
-    (hsum : ∑ i, c i = 0) : ∀ i, c i = 0 := by
+    (hsum : ∑ i, c i = 0)
+    : ∀ i, c i = 0 := by
   classical
   by_contra hne
   push_neg at hne
@@ -41,18 +44,23 @@ theorem eq_zero_of_sum_eq_zero_of_unit_mul_pow {R : Type*} [CommRing R] [IsDomai
   obtain ⟨X, hX⟩ := Finset.dvd_sum hdvd
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i0), hX, hcw i0 hi0] at hsum
   have h0 : ϖ ^ (i0.val + e * n i0) * (w i0 + ϖ * X) = 0 := by rw [← hsum]; ring
-  have h1 : w i0 + ϖ * X = 0 :=
-    (mul_eq_zero.1 h0).resolve_left (pow_ne_zero _ hϖ.ne_zero)
+  have h1 : w i0 + ϖ * X = 0 := (mul_eq_zero.1 h0).resolve_left (pow_ne_zero _ hϖ.ne_zero)
   have h2 : ϖ ∣ w i0 := ⟨-X, by linear_combination h1⟩
   exact hϖ.not_isUnit (isUnit_of_dvd_unit h2 (hw i0 hi0))
 
-theorem ramification_le_card_of_span :
-    ∀ (F : Type) [Field F] (T' T'' : Subring F), IsDiscreteValuationRing T' →
-      IsDiscreteValuationRing T'' → ∀ (h : T' ≤ T''),
-      (∀ x ∈ T', (∃ y ∈ T'', x * y = 1) → ∃ y ∈ T', x * y = 1) → ∀ (s : Finset F),
-      (∀ y ∈ T'', ∃ d ∈ T', d ≠ 0 ∧ d * y ∈ Submodule.span T' (s : Set F)) →
-      ∀ π : T', Irreducible π → ∃ ϖ : T'', Irreducible ϖ ∧ ∃ e : ℕ, 1 ≤ e ∧ e ≤ s.card ∧
-        Associated (Subring.inclusion h π) (ϖ ^ e) := by
+theorem ramification_le_card_of_span
+    : ∀ (F : Type) [Field F] (T' T'' : Subring F),
+      IsDiscreteValuationRing T' → IsDiscreteValuationRing T''
+        → ∀ (h : T' ≤ T''),
+          (∀ x ∈ T', (∃ y ∈ T'', x * y = 1) → ∃ y ∈ T', x * y = 1)
+            → ∀ (s : Finset F),
+              (∀ y ∈ T'', ∃ d ∈ T', d ≠ 0 ∧ d * y ∈ Submodule.span T' (s : Set F))
+                → ∀ π : T',
+                  Irreducible π
+                    → ∃ ϖ : T'',
+                      Irreducible ϖ
+                        ∧ ∃ e : ℕ,
+                          1 ≤ e ∧ e ≤ s.card ∧ Associated (Subring.inclusion h π) (ϖ ^ e) := by
   intro F _ T' T'' h1 h2 h hdom s hspan π hπ
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible T''
   have hπ0 : Subring.inclusion h π ≠ 0 := by
@@ -68,12 +76,11 @@ theorem ramification_le_card_of_span :
       rw [pow_zero] at he
       have hu : IsUnit (Subring.inclusion h π) := he.isUnit_iff.2 isUnit_one
       obtain ⟨y, hy⟩ := hu.exists_right_inv
-      obtain ⟨z, hzT', hz⟩ := hdom (π : F) π.2
-        ⟨(y : F), y.2, by simpa using congrArg Subtype.val hy⟩
+      obtain ⟨z, hzT', hz⟩ :=
+        hdom (π : F) π.2 ⟨(y : F), y.2, by simpa using congrArg Subtype.val hy⟩
       exact hπ.not_isUnit (isUnit_iff_exists_inv.2 ⟨⟨z, hzT'⟩, Subtype.ext hz⟩)
     · exact hpos
-  ·
-    choose d hdT hd0 hdspan using
+  · choose d hdT hd0 hdspan using
       fun i : Fin e => hspan ((ϖ ^ (i : ℕ) : T'') : F) (ϖ ^ (i : ℕ)).2
     set D : F := ∏ i, d i with hDdef
     have hDT : D ∈ T' := Subring.prod_mem _ (fun i _ => hdT i)
@@ -81,10 +88,10 @@ theorem ramification_le_card_of_span :
     let f : Fin e → F := fun i => D * ((ϖ ^ (i : ℕ) : T'') : F)
     have hfspan : ∀ i, f i ∈ Submodule.span T' (s : Set F) := by
       intro i
-      have hmem : (∏ j ∈ Finset.univ.erase i, d j) ∈ T' :=
-        Subring.prod_mem _ (fun j _ => hdT j)
-      have := Submodule.smul_mem (Submodule.span T' (s : Set F))
-        (⟨∏ j ∈ Finset.univ.erase i, d j, hmem⟩ : T') (hdspan i)
+      have hmem : (∏ j ∈ Finset.univ.erase i, d j) ∈ T' := Subring.prod_mem _ (fun j _ => hdT j)
+      have :=
+        Submodule.smul_mem (Submodule.span T' (s : Set F))
+          (⟨∏ j ∈ Finset.univ.erase i, d j, hmem⟩ : T') (hdspan i)
       rw [Subring.smul_def] at this
       have heq : f i = (∏ j ∈ Finset.univ.erase i, d j) * (d i * ((ϖ ^ (i : ℕ) : T'') : F)) := by
         simp only [f, hDdef]
@@ -96,8 +103,7 @@ theorem ramification_le_card_of_span :
       rw [Fintype.linearIndependent_iff]
       intro g hg
       obtain ⟨v, hv⟩ := he.symm
-      let c : Fin e → T'' := fun i =>
-        Subring.inclusion h (g i * ⟨D, hDT⟩) * ϖ ^ (i : ℕ)
+      let c : Fin e → T'' := fun i => Subring.inclusion h (g i * ⟨D, hDT⟩) * ϖ ^ (i : ℕ)
       have hcsum : ∑ i, c i = 0 := by
         apply Subtype.ext
         have hcs : ((∑ i, c i : T'') : F) = ∑ i, g i • f i := by
@@ -109,8 +115,12 @@ theorem ramification_le_card_of_span :
         have ha : g i * ⟨D, hDT⟩ ≠ 0 := by
           intro h0; apply hci; simp only [c, h0, map_zero, zero_mul]
         obtain ⟨m, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha hπ
-        refine ⟨m, Subring.inclusion h (u : T') * (v : T'') ^ m,
-          (u.isUnit.map (Subring.inclusion h)).mul (v.isUnit.pow m), ?_⟩
+        refine ⟨
+          m,
+          Subring.inclusion h (u : T') * (v : T'') ^ m,
+          (u.isUnit.map (Subring.inclusion h)).mul (v.isUnit.pow m),
+          ?_
+        ⟩
         simp only [c]
         rw [hu, map_mul, map_pow, ← hv]
         ring

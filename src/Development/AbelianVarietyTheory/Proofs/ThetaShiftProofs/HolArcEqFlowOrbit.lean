@@ -19,7 +19,9 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PeriodsEqFram
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames
 open scoped LaurentSeries Matrix
 
 namespace GlobalTheory.ArcFlow
@@ -123,8 +125,9 @@ lemma exists_comb_single {T : Type} {m : T → ℕ} {g : ℕ} (e : Fin g ≃ Σ 
     · subst h; simp
     · rw [Pi.single_eq_of_ne h, Pi.single_eq_of_ne fun hh => h (by simpa using hh)]
 
-variable {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
-  {σ : c.F →+* ℂ} {r : ℕ} {U : Unf Xo c σ r} (Uw : UnfWit U)
+variable
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ} {U : Unf Xo c σ r} (Uw : UnfWit U)
 
 lemma exists_comp (hL : Out.Laws) (hU : IsUnf U) (i : Fin Uw.F.n) (P : (Uw.F.Di i).La →+ (Fin Uw.g → ℂ))
     (hP : IsPeriod (Uw.F.Di i) (fun j => relab c σ (Uw.e j).1) P) :
@@ -315,12 +318,52 @@ lemma orbit (hL : Out.Laws) (hσ : GoodEmb c σ) (hU : IsUnf U) {Y : Type} [AddC
   rw [Matrix.mulVecLin_apply, hVz]
   exact hlie.2 τ i
 
-theorem holArc_eq_flow_orbit : Out.Laws → Out.Laws2 → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r) (Uw : UnfWit U) [Algebra (FractionRing ℂ) ℂ] [IsScalarTower ℂ (FractionRing ℂ) ℂ] (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (a : ArcIn Dw l β ℂ (σ.comp β)) (χ : Sp (PowerSeries ℂ) ⟶ Y.X) (W : Wit Y a χ) (Ha : HolArc Y σ a χ W Uw.F), GoodEmb c σ → IsUnf U → Module.finrank (𝓞 E) a.D₀.X = 1 → ∀ ξ : Module.Dual ℤ a.D₀.X, ξ ≠ 0 → ∀ w₁ : ℂ, Ha.T < w₁.im → ∃ (k : U.Comp) (ξ' : Fin r → E) (sE : E), (U.X k).IsIso ξ' ∧ IsBePar ξ a.be sE ∧ (∀ τ : (U.X k).Ψ, 0 < (τ.1 sE).re) ∧ (∀ (N : ℕ) (s : E), LevelPar ξ N s → ∀ v ∈ (U.X k).Λ, ∃ u ∈ (U.X k).Λ, (transvMat (U.X k).Gm ξ' (s * (U.X k).κ0)).mulVec v - v = (N : E) • u) ∧ ∀ (z : ∀ τ : E →+* ℂ, Fin (Dw.mult τ) → (Fin Uw.g → ℂ)), (∀ τ, LinearIndependent ℂ (z τ) ∧ ∀ i jj, z τ i jj ≠ 0 → (Uw.e jj).1 = τ) → ∃ x ∈ (U.X k).dom, ∃ (L : (Fin Uw.g → ℂ) ≃ₗ[ℂ] (Fin Uw.g → ℂ)) (γ : (Uw.F.Di Ha.i).La ≃ₗ[𝓞 E] (Uw.F.Di (Uw.ik k)).La), (∀ v v', (Uw.F.Di (Uw.ik k)).EF (γ v) (γ v') = (Uw.F.Di Ha.i).EF v v') ∧ (∀ τ i, L (z τ i) = Pi.single (Uw.e.symm ⟨τ, i⟩) 1) ∧ (∃ t, (∀ v', -(Uw.F.Di Ha.i).EF t v' = ξ (Ha.y v')) ∧ (Uw.φ k (γ t) : Fin r → E) = ξ') ∧ ∀ w : ℂ, Ha.T < w.im → ∃ hx : (U.X k).flow ξ' (fun τ => (w - w₁) * ((τ.1 sE).re : ℂ)) x ∈ (U.X k).dom, (∀ v, Uw.Pm k ⟨_, hx⟩ (γ v) = L (Ha.Pw w v)) ∧ AnLie Uw.F Ha.i (Ha.Pw w) (U.un k ⟨_, hx⟩) z := by
+theorem holArc_eq_flow_orbit
+    : Out.Laws → Out.Laws2
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+          (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+          (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r)
+          (Uw : UnfWit U) [Algebra (FractionRing ℂ) ℂ] [IsScalarTower ℂ (FractionRing ℂ) ℂ]
+          (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (a : ArcIn Dw l β ℂ (σ.comp β))
+          (χ : Sp (PowerSeries ℂ) ⟶ Y.X) (W : Wit Y a χ) (Ha : HolArc Y σ a χ W Uw.F),
+        GoodEmb c σ → IsUnf U → Module.finrank (𝓞 E) a.D₀.X = 1
+          → ∀ ξ : Module.Dual ℤ a.D₀.X,
+            ξ ≠ 0
+              → ∀ w₁ : ℂ,
+                Ha.T < w₁.im
+                  → ∃ (k : U.Comp) (ξ' : Fin r → E) (sE : E),
+                    (U.X k).IsIso ξ' ∧ IsBePar ξ a.be sE ∧ (∀ τ : (U.X k).Ψ, 0 < (τ.1 sE).re)
+                      ∧ (∀ (N : ℕ) (s : E),
+                        LevelPar ξ N s
+                          → ∀ v ∈ (U.X k).Λ, ∃ u ∈ (U.X k).Λ,
+                            (transvMat (U.X k).Gm ξ' (s * (U.X k).κ0)).mulVec v - v = (N : E) • u)
+                      ∧ ∀ (z : ∀ τ : E →+* ℂ, Fin (Dw.mult τ) → (Fin Uw.g → ℂ)),
+                        (∀ τ, LinearIndependent ℂ (z τ) ∧ ∀ i jj, z τ i jj ≠ 0 → (Uw.e jj).1 = τ)
+                          → ∃ x ∈ (U.X k).dom,
+                            ∃ (L : (Fin Uw.g → ℂ) ≃ₗ[ℂ] (Fin Uw.g → ℂ))
+                                (γ : (Uw.F.Di Ha.i).La ≃ₗ[𝓞 E] (Uw.F.Di (Uw.ik k)).La),
+                              (∀ v v', (Uw.F.Di (Uw.ik k)).EF (γ v) (γ v') = (Uw.F.Di Ha.i).EF v v')
+                                ∧ (∀ τ i, L (z τ i) = Pi.single (Uw.e.symm ⟨τ, i⟩) 1)
+                                ∧ (∃ t,
+                                  (∀ v', - (Uw.F.Di Ha.i).EF t v' = ξ (Ha.y v'))
+                                    ∧ (Uw.φ k (γ t) : Fin r → E) = ξ')
+                                ∧ ∀ w : ℂ,
+                                  Ha.T < w.im
+                                    → ∃ hx
+                                        : (U.X k).flow ξ' (fun τ => (w - w₁) * ((τ.1 sE).re : ℂ)) x
+                                          ∈ (U.X k).dom,
+                                      (∀ v, Uw.Pm k ⟨_, hx⟩ (γ v) = L (Ha.Pw w v))
+                                        ∧ AnLie Uw.F Ha.i (Ha.Pw w) (U.un k ⟨_, hx⟩) z := by
   intro hL _ E _ _ _ H Dw l Xo c σ r U Uw _ _ O _ β Y a χ W Ha hσ hU hY ξ hξ w₁ hw₁
-  obtain ⟨nn, h1, h2, h3, h4, h5, h6⟩ := GlobalTheory.ArcQ.holArc_nilpotent E H Dw l Xo c σ O β Y a χ W _ _ Uw.F Ha
+  obtain ⟨nn, h1, h2, h3, h4, h5, h6⟩ :=
+    GlobalTheory.ArcQ.holArc_nilpotent E H Dw l Xo c σ O β Y a χ W _ _ Uw.F Ha
   refine orbit Uw hL hσ hU hY a.be a.be_symm a.be_pos Ha.i Ha.T Ha.Pw Ha.y Ha.y_onto Ha.period nn
-    (fun w w₁ v => ?_) h2 h5 (fun η => (h6 η).exists) ξ hξ w₁ hw₁
-  rw [Ha.Pw_eq, Ha.Pw_eq, Ha.Pw_eq, h1 (nn v), h4 _ (h3 v), map_zero, smul_zero, add_zero, ← h1, sub_smul]
+    (fun w w₁ v => ?_)
+    h2 h5
+    (fun η => (h6 η).exists)
+    ξ hξ w₁ hw₁
+  rw [Ha.Pw_eq, Ha.Pw_eq, Ha.Pw_eq, h1 (nn v), h4 _ (h3 v), map_zero, smul_zero, add_zero, ← h1,
+    sub_smul]
   abel
 
 end GlobalTheory.ArcFlow

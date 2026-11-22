@@ -8,10 +8,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
-private theorem mem_baseChange_iInf_ker_sub_id_of_baseChange_eq {F L X ι : Type} [Field F] [Field L] [Algebra F L]
-    [AddCommGroup X] [Module F X] (A : ι → X →ₗ[F] X) (z : L ⊗[F] X)
-    (hz : ∀ k, (A k).baseChange L z = z) :
-    z ∈ (⨅ k, LinearMap.ker (A k - LinearMap.id)).baseChange L := by
+private theorem mem_baseChange_iInf_ker_sub_id_of_baseChange_eq
+    {F L X ι : Type} [Field F] [Field L] [Algebra F L] [AddCommGroup X] [Module F X]
+    (A : ι → X →ₗ[F] X) (z : L ⊗[F] X) (hz : ∀ k, (A k).baseChange L z = z)
+    : z ∈ (⨅ k, LinearMap.ker (A k - LinearMap.id)).baseChange L := by
   let b := Module.Free.chooseBasis F L
   let e : L ⊗[F] X ≃ₗ[F] (Module.Free.ChooseBasisIndex F L →₀ X) :=
     (TensorProduct.congr b.repr (LinearEquiv.refl F X)).trans (finsuppScalarLeft F X _)
@@ -39,15 +39,15 @@ private theorem mem_baseChange_iInf_ker_sub_id_of_baseChange_eq {F L X ι : Type
   rw [hz']
   exact Submodule.sum_mem _ fun j _ => Submodule.tmul_mem_baseChange_of_mem _ (hmem j)
 
-theorem UpperTheory.Gal.crystallineComparison.dinvExt_of :
-    DinvExt := by
+theorem UpperTheory.Gal.crystallineComparison.dinvExt_of : DinvExt := by
   unfold DinvExt
   intro F G B _ _ _ _ σ L _ _ V _ _ ρ
   let T : G → (V ⊗[F] B) →ₗ[F] (V ⊗[F] B) := fun g => AlgebraTensorModule.map (ρ g) (σ g)
   have hD : Dinv σ ρ = ⨅ g, LinearMap.ker (T g - LinearMap.id) := rfl
-  have comm : ∀ g (w : (L ⊗[F] V) ⊗[F] B),
-      AlgebraTensorModule.assoc F F L L V B (AlgebraTensorModule.map (extRep L ρ g) (σ g) w) =
-        (T g).baseChange L (AlgebraTensorModule.assoc F F L L V B w) := by
+  have comm
+      : ∀ g (w : (L ⊗[F] V) ⊗[F] B),
+        AlgebraTensorModule.assoc F F L L V B (AlgebraTensorModule.map (extRep L ρ g) (σ g) w)
+          = (T g).baseChange L (AlgebraTensorModule.assoc F F L L V B w) := by
     intro g w
     induction w using TensorProduct.induction_on with
     | zero => simp
@@ -64,17 +64,19 @@ theorem UpperTheory.Gal.crystallineComparison.dinvExt_of :
     rw [hD]
     apply mem_baseChange_iInf_ker_sub_id_of_baseChange_eq
     intro g
-    have h : AlgebraTensorModule.map (extRep L ρ g) (σ g)
-        ((AlgebraTensorModule.assoc F F L L V B).symm z) =
-          (AlgebraTensorModule.assoc F F L L V B).symm z := by
+    have h
+        : AlgebraTensorModule.map (extRep L ρ g) (σ g)
+            ((AlgebraTensorModule.assoc F F L L V B).symm z)
+          = (AlgebraTensorModule.assoc F F L L V B).symm z := by
       simp only [Dinv, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-        LinearMap.id_apply, sub_eq_zero] at hz
+          LinearMap.id_apply, sub_eq_zero]
+        at hz
       exact hz g
     have h2 := congrArg (AlgebraTensorModule.assoc F F L L V B) h
     rwa [comm, LinearEquiv.apply_symm_apply] at h2
   · intro hz
-    simp only [Dinv, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-      LinearMap.id_apply, sub_eq_zero]
+    simp only [Dinv, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply,
+      sub_eq_zero]
     intro g
     apply (AlgebraTensorModule.assoc F F L L V B).injective
     rw [comm, LinearEquiv.apply_symm_apply]
@@ -83,6 +85,7 @@ theorem UpperTheory.Gal.crystallineComparison.dinvExt_of :
       refine LinearMap.ext fun s => ?_
       have hs := s.2
       simp only [Dinv, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-        LinearMap.id_apply, sub_eq_zero] at hs
+          LinearMap.id_apply, sub_eq_zero]
+        at hs
       exact hs g
     rw [← LinearMap.comp_apply, ← LinearMap.baseChange_comp, hfix]

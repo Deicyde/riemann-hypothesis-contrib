@@ -9,22 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsReduce
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES GlobalTheory.UPel.HT.EtLev
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES GlobalTheory.UPel.HT.EtLev
 
-private theorem eq_zero_or_of_mul_eq_zero_of_add_reg {A : Type} [CommRing A] [IsLocalRing A] [IsIntegrallyClosed A]
-    {a b : A} (hab : a * b = 0) (hreg : a + b ∈ nonZeroDivisors A) : a = 0 ∨ b = 0 := by
+private theorem eq_zero_or_of_mul_eq_zero_of_add_reg
+    {A : Type} [CommRing A] [IsLocalRing A] [IsIntegrallyClosed A]
+    {a b : A} (hab : a * b = 0) (hreg : a + b ∈ nonZeroDivisors A)
+    : a = 0 ∨ b = 0 := by
   let F := FractionRing A
   have hinj : Function.Injective (algebraMap A F) := IsLocalization.injective F le_rfl
   let e : F := IsLocalization.mk' F a (⟨a + b, hreg⟩ : nonZeroDivisors A)
-  have hu : IsUnit (algebraMap A F (a + b)) := IsLocalization.map_units F (⟨a + b, hreg⟩ : nonZeroDivisors A)
-  have he : e * algebraMap A F (a + b) = algebraMap A F a := IsLocalization.mk'_spec F a ⟨a + b, hreg⟩
+  have hu : IsUnit (algebraMap A F (a + b)) :=
+    IsLocalization.map_units F (⟨a + b, hreg⟩ : nonZeroDivisors A)
+  have he : e * algebraMap A F (a + b) = algebraMap A F a :=
+    IsLocalization.mk'_spec F a ⟨a + b, hreg⟩
   have hidem : e * e = e := by
     apply hu.mul_right_cancel
     apply hu.mul_right_cancel
     have h2 : algebraMap A F a * algebraMap A F (a + b) = algebraMap A F a * algebraMap A F a := by
       rw [← map_mul, ← map_mul, mul_add, hab, add_zero]
-    calc e * e * algebraMap A F (a + b) * algebraMap A F (a + b)
+    calc
+      e * e * algebraMap A F (a + b) * algebraMap A F (a + b)
         = (e * algebraMap A F (a + b)) * (e * algebraMap A F (a + b)) := by ring
       _ = algebraMap A F a * algebraMap A F a := by rw [he]
       _ = algebraMap A F a * algebraMap A F (a + b) := h2.symm
@@ -49,11 +57,13 @@ private theorem eq_zero_or_of_mul_eq_zero_of_add_reg {A : Type} [CommRing A] [Is
   · right
     simpa using hca
 
-private theorem isDomain_of_isReduced_of_isIntegrallyClosed (A : Type) [CommRing A] [IsLocalRing A]
-    [IsNoetherianRing A] [IsReduced A] [IsIntegrallyClosed A] : IsDomain A := by
+private theorem isDomain_of_isReduced_of_isIntegrallyClosed
+    (A : Type)
+    [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [IsReduced A] [IsIntegrallyClosed A]
+    : IsDomain A := by
   classical
   by_contra hdom
-  have hbot : ¬ (⊥ : Ideal A).IsPrime := fun h => hdom (IsDomain.of_bot_isPrime A)
+  have hbot : ¬(⊥ : Ideal A).IsPrime := fun h => hdom (IsDomain.of_bot_isPrime A)
   have hfin : (minimalPrimes A).Finite := minimalPrimes.finite_of_isNoetherianRing A
   have hzero : ∀ x : A, (∀ Q ∈ minimalPrimes A, x ∈ Q) → x = 0 := fun x hx => by
     have : x ∈ (⊥ : Ideal A).radical := by
@@ -61,7 +71,8 @@ private theorem isDomain_of_isReduced_of_isIntegrallyClosed (A : Type) [CommRing
       exact (Submodule.mem_sInf).2 hx
     obtain ⟨n, hn⟩ := this
     exact (IsNilpotent.eq_zero ⟨n, by simpa using hn⟩)
-  obtain ⟨P, hP, -⟩ := Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal A)) (J := IsLocalRing.maximalIdeal A) bot_le
+  obtain ⟨P, hP, -⟩ :=
+    Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal A)) (J := IsLocalRing.maximalIdeal A) bot_le
   have hPp : P.IsPrime := Ideal.minimalPrimes_isPrime hP
   have hprime : ∀ Q ∈ minimalPrimes A, Q.IsPrime := fun Q hQ => Ideal.minimalPrimes_isPrime hQ
   have hle : ∀ Q ∈ minimalPrimes A, ∀ Q' ∈ minimalPrimes A, Q ≤ Q' → Q = Q' := fun Q hQ Q' hQ' h =>
@@ -76,18 +87,22 @@ private theorem isDomain_of_isReduced_of_isIntegrallyClosed (A : Type) [CommRing
   obtain ⟨a, haP, ha⟩ : ∃ a ∈ P, a ∉ ⋃ i ∈ (↑(insert ⊥ T) : Set (Ideal A)), (i : Set A) := by
     by_contra hcon
     push_neg at hcon
-    have hsub : (P : Set A) ⊆ ⋃ i ∈ (↑(insert ⊥ T) : Set (Ideal A)), ((id i : Ideal A) : Set A) := hcon
-    obtain ⟨Q, hQ, hPQ⟩ := (Ideal.subset_union_prime (⊥ : Ideal A) (⊥ : Ideal A)
-      (fun i hi h1 _ => (hT i ((Finset.mem_insert.1 hi).resolve_left h1)).1 |> hprime i)).1 hsub
+    have hsub : (P : Set A) ⊆ ⋃ i ∈ (↑(insert ⊥ T) : Set (Ideal A)), ((id i : Ideal A) : Set A) :=
+      hcon
+    obtain ⟨Q, hQ, hPQ⟩ :=
+      (Ideal.subset_union_prime (⊥ : Ideal A) (⊥ : Ideal A)
+        (fun i hi h1 _ => (hT i ((Finset.mem_insert.1 hi).resolve_left h1)).1 |> hprime i)).1 hsub
     rcases Finset.mem_insert.1 hQ with rfl | hQ
     · exact hbot ((le_bot_iff.1 hPQ) ▸ hPp)
     · exact (hT Q hQ).2 (hle P hP Q (hT Q hQ).1 hPQ).symm
-  have ha0 : a ≠ 0 := fun h => ha (by
-    simp only [Set.mem_iUnion]
-    exact ⟨⊥, by simp, by simp [h]⟩)
-  have haT : ∀ Q ∈ T, a ∉ Q := fun Q hQ h => ha (by
-    simp only [Set.mem_iUnion]
-    exact ⟨Q, by simp [hQ], h⟩)
+  have ha0 : a ≠ 0 := fun h =>
+    ha (by
+      simp only [Set.mem_iUnion]
+      exact ⟨⊥, by simp, by simp [h]⟩)
+  have haT : ∀ Q ∈ T, a ∉ Q := fun Q hQ h =>
+    ha (by
+      simp only [Set.mem_iUnion]
+      exact ⟨Q, by simp [hQ], h⟩)
 
   obtain ⟨b, hbT, hbP⟩ : ∃ b ∈ T.inf id, b ∉ P := by
     by_contra hcon
@@ -97,10 +112,11 @@ private theorem isDomain_of_isReduced_of_isIntegrallyClosed (A : Type) [CommRing
   have hbT' : ∀ Q ∈ T, b ∈ Q := fun Q hQ => by
     have := Finset.inf_le (f := id) hQ
     exact this hbT
-  have hab : a * b = 0 := hzero _ fun Q hQ => by
-    by_cases h : Q = P
-    · exact h ▸ Ideal.mul_mem_right _ _ haP
-    · exact Ideal.mul_mem_left _ _ (hbT' Q (hTm Q hQ h))
+  have hab : a * b = 0 :=
+    hzero _ fun Q hQ => by
+      by_cases h : Q = P
+      · exact h ▸ Ideal.mul_mem_right _ _ haP
+      · exact Ideal.mul_mem_left _ _ (hbT' Q (hTm Q hQ h))
   have hreg : a + b ∈ nonZeroDivisors A := by
     rw [mem_nonZeroDivisors_iff_right]
     intro x hx

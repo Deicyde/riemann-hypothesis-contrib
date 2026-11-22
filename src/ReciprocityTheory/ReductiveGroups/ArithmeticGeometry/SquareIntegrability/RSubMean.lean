@@ -207,8 +207,8 @@ lemma rsm_mean (N : ℕ) (F : EuclideanSpace ℂ (Fin N) → ℂ) (hF : Differen
       rw [hnorm]
       exact mul_le_mul_of_nonneg_left hle (by positivity)
 
-noncomputable def rsmRot (N : ℕ) (u : ℂ) (hu : ‖u‖ = 1) :
-    EuclideanSpace ℂ (Fin N) ≃ₗᵢ[ℝ] EuclideanSpace ℂ (Fin N) where
+noncomputable def rsmRot (N : ℕ) (u : ℂ) (hu : ‖u‖ = 1)
+    : EuclideanSpace ℂ (Fin N) ≃ₗᵢ[ℝ] EuclideanSpace ℂ (Fin N) where
   toFun z := u • z
   invFun z := u⁻¹ • z
   map_add' x y := smul_add u x y
@@ -260,59 +260,72 @@ lemma rsm_prod_int (N : ℕ) (F : EuclideanSpace ℂ (Fin N) → ℂ) (hF : Cont
   exact (hg.continuousOn.integrableOn_compact ((isCompact_closedBall 0 r).prod isCompact_Icc)).mono_set
     (Set.prod_mono subset_rfl Set.Ioc_subset_Icc_self)
 
-theorem sq_norm_zero_le_gauss_ball {N : ℕ} (F : EuclideanSpace ℂ (Fin N) → ℂ)
-    (hF : Differentiable ℂ F) :
-    ‖F 0‖ ^ 2 ≤ 2 / Real.pi ^ N *
-      ∫ z in Metric.closedBall 0 (Real.sqrt (2 * N)), ‖F z‖ ^ 2 * Real.exp (-‖z‖ ^ 2) := by
+theorem sq_norm_zero_le_gauss_ball
+    {N : ℕ} (F : EuclideanSpace ℂ (Fin N) → ℂ) (hF : Differentiable ℂ F)
+    : ‖F 0‖ ^ 2
+      ≤ 2 / Real.pi ^ N
+        * ∫ z in Metric.closedBall 0 (Real.sqrt (2 * N)), ‖F z‖ ^ 2 * Real.exp (-‖z‖ ^ 2) := by
   have hFc : Continuous F := hF.continuous
   have hpi : (0 : ℝ) < 2 * Real.pi := by positivity
   have hprod := rsm_prod_int N F hFc (Real.sqrt (2 * N))
-  have hpt : ∀ z : EuclideanSpace ℂ (Fin N), ‖F 0‖ ^ 2 * Real.exp (-‖z‖ ^ 2) ≤
-      (2 * Real.pi)⁻¹ * ∫ θ in Ioc (0 : ℝ) (2 * Real.pi),
-        Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2 := by
+  have hpt
+      : ∀ z : EuclideanSpace ℂ (Fin N),
+        ‖F 0‖ ^ 2 * Real.exp (- ‖z‖ ^ 2)
+          ≤ (2 * Real.pi)⁻¹
+            * ∫ θ in Ioc (0 : ℝ) (2 * Real.pi),
+              Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2 := by
     intro z
     have hm := rsm_mean N F hF z
     rw [← intervalIntegral.integral_of_le hpi.le, intervalIntegral.integral_const_mul]
-    have he : 0 ≤ Real.exp (-‖z‖ ^ 2) := (Real.exp_pos _).le
-    calc ‖F 0‖ ^ 2 * Real.exp (-‖z‖ ^ 2)
-        ≤ ((2 * Real.pi)⁻¹ * ∫ θ in (0 : ℝ)..2 * Real.pi, ‖F (circleMap 0 1 θ • z)‖ ^ 2)
-            * Real.exp (-‖z‖ ^ 2) := mul_le_mul_of_nonneg_right hm he
+    have he : 0 ≤ Real.exp (- ‖z‖ ^ 2) := (Real.exp_pos _).le
+    calc
+      ‖F 0‖ ^ 2 * Real.exp (- ‖z‖ ^ 2)
+          ≤ ((2 * Real.pi)⁻¹ * ∫ θ in (0 : ℝ)..2 * Real.pi, ‖F (circleMap 0 1 θ • z)‖ ^ 2)
+            * Real.exp (- ‖z‖ ^ 2) :=
+        mul_le_mul_of_nonneg_right hm he
       _ = _ := by ring
-  have hJθ : ∀ θ : ℝ, ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-      Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2 =
-      ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-      Real.exp (-‖z‖ ^ 2) * ‖F z‖ ^ 2 := by
+  have hJθ
+      : ∀ θ : ℝ,
+        ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+            Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2
+          = ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+            Real.exp (-‖z‖ ^ 2) * ‖F z‖ ^ 2 := by
     intro θ
     refine rsm_rot_int N F _ ?_ _
     first | simp | simp [norm_circleMap_zero] | simp [abs_circleMap_zero]
-  have hswap : ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-        ∫ θ in Ioc (0 : ℝ) (2 * Real.pi), Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2
-      = ∫ θ in Ioc (0 : ℝ) (2 * Real.pi), ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-        Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2 :=
+  have hswap
+      : ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+          ∫ θ in Ioc (0 : ℝ) (2 * Real.pi), Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2
+        = ∫ θ in Ioc (0 : ℝ) (2 * Real.pi), ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+          Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2 :=
     integral_integral_swap hprod
-  have hRHS : ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-        (2 * Real.pi)⁻¹ * ∫ θ in Ioc (0 : ℝ) (2 * Real.pi),
-          Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2
-      = ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-          ‖F z‖ ^ 2 * Real.exp (-‖z‖ ^ 2) := by
+  have hRHS
+      : ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+          (2 * Real.pi)⁻¹ * ∫ θ in Ioc (0 : ℝ) (2 * Real.pi),
+            Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2
+        = ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+            ‖F z‖ ^ 2 * Real.exp (-‖z‖ ^ 2) := by
     first | rw [integral_const_mul] | rw [integral_mul_left]
     rw [hswap]
     simp only [hJθ]
-    rw [← intervalIntegral.integral_of_le hpi.le, intervalIntegral.integral_const, smul_eq_mul, sub_zero,
-      ← mul_assoc, inv_mul_cancel₀ hpi.ne', one_mul]
+    rw [← intervalIntegral.integral_of_le hpi.le, intervalIntegral.integral_const, smul_eq_mul,
+      sub_zero, ← mul_assoc, inv_mul_cancel₀ hpi.ne', one_mul]
     congr 1
     ext z
     ring
-  have hLHS : ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-        ‖F 0‖ ^ 2 * Real.exp (-‖z‖ ^ 2)
-      = ‖F 0‖ ^ 2 * ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-        Real.exp (-‖z‖ ^ 2) := by
+  have hLHS
+      : ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+          ‖F 0‖ ^ 2 * Real.exp (-‖z‖ ^ 2)
+        = ‖F 0‖ ^ 2
+          * ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+            Real.exp (-‖z‖ ^ 2) := by
     first | rw [integral_const_mul] | rw [integral_mul_left]
-  have hmono : ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-        ‖F 0‖ ^ 2 * Real.exp (-‖z‖ ^ 2)
-      ≤ ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-        (2 * Real.pi)⁻¹ * ∫ θ in Ioc (0 : ℝ) (2 * Real.pi),
-          Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2 := by
+  have hmono
+      : ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+          ‖F 0‖ ^ 2 * Real.exp (-‖z‖ ^ 2)
+        ≤ ∫ z in closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+          (2 * Real.pi)⁻¹ * ∫ θ in Ioc (0 : ℝ) (2 * Real.pi),
+            Real.exp (-‖z‖ ^ 2) * ‖F (circleMap 0 1 θ • z)‖ ^ 2 := by
     refine integral_mono_of_nonneg ?_ ?_ ?_
     · exact ae_of_all _ (fun z => mul_nonneg (by positivity) (Real.exp_pos _).le)
     · exact (hprod.integral_prod_left).const_mul _
@@ -323,9 +336,12 @@ theorem sq_norm_zero_le_gauss_ball {N : ℕ} (F : EuclideanSpace ℂ (Fin N) →
   have ha : (0 : ℝ) ≤ ‖F 0‖ ^ 2 := by positivity
   have h1 := mul_le_mul_of_nonneg_left hmass ha
   have h2 : ‖F 0‖ ^ 2 * Real.pi ^ N = 2 * (‖F 0‖ ^ 2 * (Real.pi ^ N / 2)) := by ring
-  have h3 : ‖F 0‖ ^ 2 * Real.pi ^ N ≤
-      2 * ∫ z in Metric.closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
-        ‖F z‖ ^ 2 * Real.exp (-‖z‖ ^ 2) := by linarith
+  have h3
+      : ‖F 0‖ ^ 2 * Real.pi ^ N
+        ≤ 2
+          * ∫ z in Metric.closedBall (0 : EuclideanSpace ℂ (Fin N)) (Real.sqrt (2 * N)),
+            ‖F z‖ ^ 2 * Real.exp (-‖z‖ ^ 2) := by
+    linarith
   rw [div_mul_eq_mul_div]
   first | exact (le_div_iff₀ hp).mpr h3 | exact (le_div_iff hp).mpr h3
 

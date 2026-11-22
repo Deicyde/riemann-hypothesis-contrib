@@ -10,18 +10,26 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo
 open scoped TensorProduct
 
-private theorem sec_eq_of_points {X : Scheme.{0}} (A : Over X) [GrpObj A] [IsCommMonObj A] (hA : IsAbelianScheme A)
-    (n : ℕ) (hn : IsUnit (n : Γ(X, ⊤))) (σ σ' : 𝟙_ (Over X) ⟶ A) (h₁ : σ ^ n = 1) (h₂ : σ' ^ n = 1)
-    (hpt : ∀ q : X, ∃ (k : Type) (_ : Field k) (y : Sp k ⟶ X), q ∈ Set.range y ∧
-      toUnit (Over.mk y) ≫ σ = toUnit (Over.mk y) ≫ σ') : σ = σ' := by
+private theorem sec_eq_of_points
+    {X : Scheme.{0}} (A : Over X) [GrpObj A] [IsCommMonObj A]
+    (hA : IsAbelianScheme A)
+    (n : ℕ) (hn : IsUnit (n : Γ(X, ⊤)))
+    (σ σ' : 𝟙_ (Over X) ⟶ A) (h₁ : σ ^ n = 1) (h₂ : σ' ^ n = 1)
+    (hpt : ∀ q : X, ∃ (k : Type) (_ : Field k) (y : Sp k ⟶ X),
+      q ∈ Set.range y ∧ toUnit (Over.mk y) ≫ σ = toUnit (Over.mk y) ≫ σ')
+    : σ = σ' := by
   have key : ∀ q : X, ∃ V : X.Opens, q ∈ V ∧ V.ι ≫ σ.left = V.ι ≫ σ'.left := by
     intro q
     obtain ⟨k, hk, y, ⟨z, hz⟩, he⟩ := hpt q
-    obtain ⟨V, hV, hVe⟩ := GlobalTheory.UPel.LocSim.exists_open_eq_of_torsion_point X A hA n hn σ σ' h₁ h₂ k y he
+    obtain ⟨V, hV, hVe⟩ :=
+      GlobalTheory.UPel.LocSim.exists_open_eq_of_torsion_point X A hA n hn σ σ' h₁ h₂ k y he
     exact ⟨V, hV ⟨z, hz⟩, hVe⟩
   choose V hV hVe using key
   have hcov : TopologicalSpace.IsOpenCover V := by
@@ -30,23 +38,34 @@ private theorem sec_eq_of_points {X : Scheme.{0}} (A : Over X) [GrpObj A] [IsCom
   apply Over.OverMorphism.ext
   exact Scheme.Cover.hom_ext (X.openCoverOfIsOpenCover V hcov) _ _ fun q => hVe q
 
-private theorem map_nsmul_pow {M Q : Type} [AddCommGroup M] [Group Q] (f : M → Q) (hf : ∀ a b, f (a + b) = f a * f b)
-    (m : ℕ) (a : M) : f (m • a) = f a ^ m := by
+private theorem map_nsmul_pow
+    {M Q : Type} [AddCommGroup M] [Group Q]
+    (f : M → Q) (hf : ∀ a b, f (a + b) = f a * f b)
+    (m : ℕ) (a : M)
+    : f (m • a) = f a ^ m := by
   induction m with
   | zero =>
     rw [zero_nsmul, pow_zero]
     have h := hf 0 0
     rw [add_zero] at h
     exact mul_left_cancel (a := f 0) (by rw [_root_.mul_one]; exact h.symm)
-  | succ m ih =>
-    rw [succ_nsmul, hf, ih, pow_succ]
+  | succ m ih => rw [succ_nsmul, hf, ih, pow_succ]
 
-private theorem pow_comp_hom {C : Type*} [Category C] [CartesianMonoidalCategory C] {T A B : C} [GrpObj A] [GrpObj B]
-    (a : T ⟶ A) (ψ : A ⟶ B) [IsMonHom ψ] (m : ℕ) : (a ≫ ψ) ^ m = (a ^ m) ≫ ψ := (map_pow (IsMonHom.monoidHom ψ T) a m).symm
+private theorem pow_comp_hom
+    {C : Type*} [Category C] [CartesianMonoidalCategory C]
+    {T A B : C} [GrpObj A] [GrpObj B]
+    (a : T ⟶ A)
+    (ψ : A ⟶ B) [IsMonHom ψ]
+    (m : ℕ)
+    : (a ≫ ψ) ^ m = (a ^ m) ≫ ψ :=
+  (map_pow (IsMonHom.monoidHom ψ T) a m).symm
 
-private theorem ev_tower {G : GDatum} {k Q : Type} [Field k] [Group Q] {act : G.O → Q → Q} {e : ℕ → Q → Q → kˣ → Prop}
-    (I : GTateIso G k Q act e) {M n c : ℕ} (hM : M = n * c) (hn : 0 < n) (hc : 0 < c) (z : G.La) :
-    I.ev M (c • z) = I.ev n z := by
+private theorem ev_tower
+    {G : GDatum} {k Q : Type} [Field k] [Group Q]
+    {act : G.O → Q → Q} {e : ℕ → Q → Q → kˣ → Prop} (I : GTateIso G k Q act e)
+    {M n c : ℕ} (hM : M = n * c) (hn : 0 < n) (hc : 0 < c)
+    (z : G.La)
+    : I.ev M (c • z) = I.ev n z := by
   subst hM
   rw [map_nsmul_pow (I.ev _) (I.add _)]
   exact I.tower n c hn hc z
@@ -69,7 +88,8 @@ theorem UpperTheory.trace_eta_identity : UpperTheory.Gal.Int.Geo.TrEta := by
   have ex' : (n • c' • x : D.La) = (↑N' : ℕ) • x := by rw [smul_smul, ← hN']
   have ex : (n • c • y : D.La) = (↑N : ℕ) • y := by rw [smul_smul, ← hN]
   have e1 : (o'.eta (c' • x)) ^ n = 1 :=
-    (map_nsmul_pow o'.eta o'.eta_add n (c' • x)).symm.trans ((congrArg o'.eta ex').trans (o'.eta_ker x))
+    (map_nsmul_pow o'.eta o'.eta_add n (c' • x)).symm.trans
+      ((congrArg o'.eta ex').trans (o'.eta_ker x))
   have hpow1 : (o'.eta (c' • x) ≫ ψ) ^ n = 1 :=
     (pow_comp_hom _ _ _).trans ((congrArg (· ≫ ψ) e1).trans (map_one (IsMonHom.monoidHom ψ _)))
   have hpow2 : (o.eta (c • y)) ^ n = 1 :=
@@ -83,8 +103,10 @@ theorem UpperTheory.trace_eta_identity : UpperTheory.Gal.Int.Geo.TrEta := by
     show _ = Spec.map (CommRingCat.ofHom (Spec.preimage (y0 ≫ s)).hom)
     rw [CommRingCat.ofHom_hom, Spec.map_preimage]
   obtain ⟨I', I'', hI', hI'', hiff⟩ := hT.2.2.2.2 k y0 β hβ
-  refine ⟨k, inferInstance, y0, ⟨IsLocalRing.closedPoint k, Scheme.fromSpecResidueField_apply q _⟩, ?_⟩
-  calc toUnit (Over.mk y0) ≫ (o'.eta (c' • x) ≫ ψ)
+  refine
+    ⟨k, inferInstance, y0, ⟨IsLocalRing.closedPoint k, Scheme.fromSpecResidueField_apply q _⟩, ?_⟩
+  calc
+    toUnit (Over.mk y0) ≫ (o'.eta (c' • x) ≫ ψ)
       = (toUnit (Over.mk y0) ≫ o'.eta (c' • x)) ≫ ψ := (Category.assoc _ _ _).symm
     _ = I'.ev (↑N') (c' • x) ≫ ψ := congrArg (· ≫ ψ) (hI' _)
     _ = I'.ev n x ≫ ψ := congrArg (· ≫ ψ) (ev_tower I' hN' hn hc' x)

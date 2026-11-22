@@ -19,28 +19,36 @@ section Place
 
 variable {C : Type} [Field C] {d : ℕ} {I : Fin 2 → Type} {N K : ℕ} {what₂ : Fin K → ℕ}
 
-def kindAll (pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N) (kind : ∀ i, Fin (what₂ i) → Knd d) (ρ : Fin N) : Knd d :=
+def kindAll
+    (pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N) (kind : ∀ i, Fin (what₂ i) → Knd d) (ρ : Fin N)
+    : Knd d :=
   if h : ∃ s, pl s = ρ then kind h.choose.1 h.choose.2 else none
 
-def grAll (pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N) (gr : ∀ i, Fin (what₂ i) → MvPowerSeries (WV I) C) (ρ : Fin N) :
-    MvPowerSeries (WV I) C :=
+def grAll
+    (pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N) (gr : ∀ i, Fin (what₂ i) → MvPowerSeries (WV I) C)
+    (ρ : Fin N)
+    : MvPowerSeries (WV I) C :=
   if h : ∃ s, pl s = ρ then gr h.choose.1 h.choose.2 else 1
 
-def prodAll (pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N) (P : ∀ i, MvPolynomial (Fin (what₂ i) × WV I) C) :
-    MvPolynomial (Fin N × WV I) C :=
+def prodAll
+    (pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N) (P : ∀ i, MvPolynomial (Fin (what₂ i) × WV I) C)
+    : MvPolynomial (Fin N × WV I) C :=
   ∏ i, MvPolynomial.rename (fun x : Fin (what₂ i) × WV I => (pl ⟨i, x.1⟩, x.2)) (P i)
 
-theorem kindAll_pl {pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N} (hpl : Function.Injective pl)
-    (kind : ∀ i, Fin (what₂ i) → Knd d) (s : Σ i : Fin K, Fin (what₂ i)) : kindAll pl kind (pl s) = kind s.1 s.2 := by
+theorem kindAll_pl
+    {pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N} (hpl : Function.Injective pl)
+    (kind : ∀ i, Fin (what₂ i) → Knd d) (s : Σ i : Fin K, Fin (what₂ i))
+    : kindAll pl kind (pl s) = kind s.1 s.2 := by
   unfold kindAll
   have hex : ∃ s', pl s' = pl s := ⟨s, rfl⟩
   rw [dite_eq_left hex]
   have hc : hex.choose = s := hpl hex.choose_spec
   rw [hc]
 
-theorem mem_vars_prodAll {pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N} {P : ∀ i, MvPolynomial (Fin (what₂ i) × WV I) C}
-    {ρ : Fin N} {w : WV I} (h : (ρ, w) ∈ (prodAll pl P).vars) :
-    ∃ s : Σ i : Fin K, Fin (what₂ i), pl s = ρ ∧ (s.2, w) ∈ (P s.1).vars := by
+theorem mem_vars_prodAll
+    {pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N} {P : ∀ i, MvPolynomial (Fin (what₂ i) × WV I) C}
+    {ρ : Fin N} {w : WV I} (h : (ρ, w) ∈ (prodAll pl P).vars)
+    : ∃ s : Σ i : Fin K, Fin (what₂ i), pl s = ρ ∧ (s.2, w) ∈ (P s.1).vars := by
   unfold prodAll at h
   have h1 := MvPolynomial.vars_prod _ h
   rw [Finset.mem_biUnion] at h1
@@ -56,7 +64,9 @@ end Place
 
 section Rows
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
+variable
+  {C : Type} [Field C]
+  {V : VF C} {d : ℕ} {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
   {N K : ℕ} {what₂ : Fin K → ℕ}
 
 private lemma forall_support_ne_zero_iff_forall_mem_vars {R0 : Type} [Field R0] {α β : Type} (Q : MvPolynomial (α × β) R0)
@@ -69,11 +79,14 @@ private lemma forall_support_ne_zero_iff_forall_mem_vars {R0 : Type} [Field R0] 
   · intro H μ hμ w hx
     exact H w ((MvPolynomial.mem_vars_iff_mem_support _).2 ⟨μ, hμ, Finsupp.mem_support_iff.2 hx⟩)
 
-theorem rowsOK_iff (G : ∀ g, Cart V d (I g) (J g)) (alt : Prop) {N : ℕ} (P : MvPolynomial (Fin N × WV I) C)
-    (kind : Fin N → Knd d) : RowsOK G alt P kind ↔
-      (∀ ρ g a a', kind ρ = some (g, a, a') → alt ∧ Odd (a' - a).val ∧
-        ∀ w, (ρ, w) ∈ P.vars → OnLeafV G g a a' w) ∧
-      (∀ ρ, kind ρ = none → ∃ g : Fin 2, ∀ w : WV I, (ρ, w) ∈ P.vars → w.1 = g) := by
+theorem rowsOK_iff
+    (G : ∀ g, Cart V d (I g) (J g)) (alt : Prop)
+    {N : ℕ} (P : MvPolynomial (Fin N × WV I) C) (kind : Fin N → Knd d)
+    : RowsOK G alt P kind
+      ↔ (∀ ρ g a a',
+          kind ρ = some (g, a, a')
+            → alt ∧ Odd (a' - a).val ∧ ∀ w, (ρ, w) ∈ P.vars → OnLeafV G g a a' w)
+        ∧ (∀ ρ, kind ρ = none → ∃ g : Fin 2, ∀ w : WV I, (ρ, w) ∈ P.vars → w.1 = g) := by
   unfold RowsOK
   constructor
   · rintro ⟨h1, h2⟩
@@ -89,10 +102,12 @@ theorem rowsOK_iff (G : ∀ g, Cart V d (I g) (J g)) (alt : Prop) {N : ℕ} (P :
     · obtain ⟨g, hg⟩ := h2 ρ hk
       exact ⟨g, (forall_support_ne_zero_iff_forall_mem_vars P ρ (fun w => w.1 = g)).2 hg⟩
 
-theorem rowsOK_prodAll (G : ∀ g, Cart V d (I g) (J g)) (alt : Prop)
+theorem rowsOK_prodAll
+    (G : ∀ g, Cart V d (I g) (J g)) (alt : Prop)
     {pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N} (hpl : Function.Injective pl)
     (P : ∀ i, MvPolynomial (Fin (what₂ i) × WV I) C) (kind : ∀ i, Fin (what₂ i) → Knd d)
-    (h : ∀ i, RowsOK G alt (P i) (kind i)) : RowsOK G alt (prodAll pl P) (kindAll pl kind) := by
+    (h : ∀ i, RowsOK G alt (P i) (kind i))
+    : RowsOK G alt (prodAll pl P) (kindAll pl kind) := by
   rw [rowsOK_iff]
   have h' := fun i => (rowsOK_iff G alt (P i) (kind i)).1 (h i)
   refine ⟨fun ρ g a a' hk => ?_, fun ρ hk => ?_⟩
@@ -126,10 +141,12 @@ end Rows
 
 def JetProdSt : Prop :=
   ∀ (C : Type) [Field C] (d : ℕ) (I : Fin 2 → Type) [∀ g, Fintype (I g)]
-    (hL : Fin 2 → ZMod d → ZMod d → MvPowerSeries (WV I) C) (N K : ℕ) (what₂ : Fin K → ℕ)
-    (pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N), Function.Injective pl →
-    ∀ (P : ∀ i, MvPolynomial (Fin (what₂ i) × WV I) C) (kind : ∀ i, Fin (what₂ i) → Knd d)
-      (gr : ∀ i, Fin (what₂ i) → MvPowerSeries (WV I) C),
-      ValOf hL (prodAll pl P) (kindAll pl kind) (grAll pl gr) = ∏ i, ValOf hL (P i) (kind i) (gr i)
+      (hL : Fin 2 → ZMod d → ZMod d → MvPowerSeries (WV I) C) (N K : ℕ) (what₂ : Fin K → ℕ)
+      (pl : (Σ i : Fin K, Fin (what₂ i)) → Fin N),
+    Function.Injective pl
+      → ∀ (P : ∀ i, MvPolynomial (Fin (what₂ i) × WV I) C) (kind : ∀ i, Fin (what₂ i) → Knd d)
+          (gr : ∀ i, Fin (what₂ i) → MvPowerSeries (WV I) C),
+        ValOf hL (prodAll pl P) (kindAll pl kind) (grAll pl gr)
+          = ∏ i, ValOf hL (P i) (kind i) (gr i)
 
 end Formalism.L2.FormalSeriesBounds

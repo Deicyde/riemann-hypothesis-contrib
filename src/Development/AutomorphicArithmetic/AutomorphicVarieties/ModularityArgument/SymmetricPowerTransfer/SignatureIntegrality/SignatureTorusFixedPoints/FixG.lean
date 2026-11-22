@@ -11,10 +11,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
-private theorem sDom_of_valuation_lt_one {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (a : kˣ) (h1 : valuation k (a : k) < 1) : SDom ![a, 1, a⁻¹] := by
+private theorem sDom_of_valuation_lt_one
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (a : kˣ) (h1 : valuation k (a : k) < 1)
+    : SDom ![a, 1, a⁻¹] := by
   have hne : valuation k (a : k) ≠ 0 := ((valuation k).ne_zero_iff).mpr a.ne_zero
   have h2 : 1 < (valuation k (a : k))⁻¹ :=
     (one_lt_inv₀ (((valuation k).pos_iff).mpr a.ne_zero)).mpr h1
@@ -34,35 +38,44 @@ theorem UpperTheory.V.Z.Sym.Sig.fixG : UpperTheory.V.Z.Sym.Sig.FixG := by
     rcases hij.lt_or_eq with h | h
     · exact (hd i j h).le
     · rw [h]
-  have hmul : ∀ {a b g : GL (Fin 3) k}, a ∈ V.J 3 → b ∈ V.J 3 → g ∈ V.DC d → a * g * b ∈ V.DC d := by
+  have hmul
+      : ∀ {a b g : GL (Fin 3) k}, a ∈ V.J 3 → b ∈ V.J 3 → g ∈ V.DC d → a * g * b ∈ V.DC d := by
     intro a b g ha hb hg
     obtain ⟨p, hp, q, hq, rfl⟩ := hg
     exact ⟨a * p, (V.J 3).mul_mem ha hp, q * b, (V.J 3).mul_mem hq hb, by group⟩
-  have hDC : ∀ {a b g : GL (Fin 3) k}, a ∈ V.J 3 → b ∈ V.J 3 → (a * g * b ∈ V.DC d ↔ g ∈ V.DC d) := by
+  have hDC
+      : ∀ {a b g : GL (Fin 3) k}, a ∈ V.J 3 → b ∈ V.J 3 → (a * g * b ∈ V.DC d ↔ g ∈ V.DC d) := by
     intro a b g ha hb
     refine ⟨fun h => ?_, hmul ha hb⟩
     have h2 := hmul ((V.J 3).inv_mem ha) ((V.J 3).inv_mem hb) h
     simpa [mul_assoc] using h2
-  have hL : y⁻¹ * (dg ![x₁, y₁, z₁] * Phi k) * th k 3 y * (Phi k)⁻¹ = y⁻¹ * dg ![x₁, y₁, z₁] * th' k y := by
+  have hL
+      : y⁻¹ * (dg ![x₁, y₁, z₁] * Phi k) * th k 3 y * (Phi k)⁻¹
+        = y⁻¹ * dg ![x₁, y₁, z₁] * th' k y := by
     rw [hth]
     group
   rw [hL]
-  have key : ∀ (u : Fin 3 → kˣ) (j : GL (Fin 3) k), j ∈ V.J 3 → y = dg u * j →
-      (y⁻¹ * dg ![x₁, y₁, z₁] * th' k y ∈ V.DC d ↔
-        (x₁ / (u 0 * u 2) / d 0 ∈ V.H ∧ y₁ / u 1 ^ 2 / d 1 ∈ V.H ∧ z₁ / (u 0 * u 2) / d 2 ∈ V.H)) := by
+  have key
+      : ∀ (u : Fin 3 → kˣ) (j : GL (Fin 3) k),
+        j ∈ V.J 3 → y = dg u * j
+          → (y⁻¹ * dg ![x₁, y₁, z₁] * th' k y ∈ V.DC d
+            ↔ (x₁ / (u 0 * u 2) / d 0 ∈ V.H ∧ y₁ / u 1 ^ 2 / d 1 ∈ V.H
+              ∧ z₁ / (u 0 * u 2) / d 2 ∈ V.H)) := by
     intro u j hj hy
     have hu3 : dg u = dg ![u 0, u 1, u 2] := by
       congr 1
       funext i
       fin_cases i <;> rfl
-    have hc : (dg ![u 0, u 1, u 2])⁻¹ * dg ![x₁, y₁, z₁] * dg ![(u 2)⁻¹, (u 1)⁻¹, (u 0)⁻¹] =
-        dg ![x₁ / (u 0 * u 2), y₁ / u 1 ^ 2, z₁ / (u 0 * u 2)] := by
+    have hc
+        : (dg ![u 0, u 1, u 2])⁻¹ * dg ![x₁, y₁, z₁] * dg ![(u 2)⁻¹, (u 1)⁻¹, (u 0)⁻¹]
+          = dg ![x₁ / (u 0 * u 2), y₁ / u 1 ^ 2, z₁ / (u 0 * u 2)] := by
       simp only [dg, ← map_inv, ← map_mul]
       congr 1
       funext i
       fin_cases i <;> simp [div_eq_mul_inv, sq, mul_comm, mul_left_comm, mul_assoc]
-    have e1 : y⁻¹ * dg ![x₁, y₁, z₁] * th' k y =
-        j⁻¹ * dg ![x₁ / (u 0 * u 2), y₁ / u 1 ^ 2, z₁ / (u 0 * u 2)] * th' k j := by
+    have e1
+        : y⁻¹ * dg ![x₁, y₁, z₁] * th' k y
+          = j⁻¹ * dg ![x₁ / (u 0 * u 2), y₁ / u 1 ^ 2, z₁ / (u 0 * u 2)] * th' k j := by
       rw [hy, map_mul, hu3, hF.2.2.1, ← hc]
       group
     rw [e1, hDC ((V.J 3).inv_mem hj) (hF.2.1 j hj), diagDC k V 3 d _ hdom]
@@ -110,12 +123,13 @@ theorem UpperTheory.V.Z.Sym.Sig.fixG : UpperTheory.V.Z.Sym.Sig.FixG := by
       rw [B]
       group
     have hp1 : valuation k (p : k) < 1 := by
-      have e2 : p = h 0 / h 2 * (d 0 / d 2) := by
-        rw [hp, div_mul_div_comm]
+      have e2 : p = h 0 / h 2 * (d 0 / d 2) := by rw [hp, div_mul_div_comm]
       have hv1 : valuation k ((h 0 / h 2 : kˣ) : k) = 1 := V.H_le (V.H.div_mem (hhH 0) (hhH 2))
       rw [e2, Units.val_mul, map_mul, hv1, one_mul, Units.val_div_eq_div_val, map_div₀]
       exact (div_lt_one₀ (((valuation k).pos_iff).mpr (d 2).ne_zero)).mpr (hd 0 2 (by decide))
-    obtain ⟨-, u, hu⟩ := conjDiag k 3 _ _ (sDom_of_valuation_lt_one _ hxz) (sDom_of_valuation_lt_one _ hp1) (y * j) hconj
+    obtain ⟨-, u, hu⟩ :=
+      conjDiag k 3 _ _ (sDom_of_valuation_lt_one _ hxz) (sDom_of_valuation_lt_one _ hp1) (y * j)
+        hconj
     have hy : y = dg u * j⁻¹ := by
       rw [← hu]
       group

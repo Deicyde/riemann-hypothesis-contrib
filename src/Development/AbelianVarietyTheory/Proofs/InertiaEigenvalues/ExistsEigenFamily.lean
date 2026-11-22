@@ -6,8 +6,12 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsTy
 
 namespace GlobalTheory.EigenFamilyStabilizer
 
-def stab {G V ι : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (K : Subgroup G) (θ : G → ℂ)
-    (h1 : θ 1 = 1) (hm : ∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b) (y : ι → V) : Subgroup K where
+def stab
+    {G V ι : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    (K : Subgroup G) (θ : G → ℂ) (h1 : θ 1 = 1) (hm : ∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b)
+    (y : ι → V)
+    : Subgroup K where
   carrier := {k | θ k = 1 ∧ ∀ i, ρ k (y i) = y i}
   one_mem' := ⟨by simpa using h1, fun i => by simp⟩
   mul_mem' := by
@@ -25,7 +29,24 @@ def stab {G V ι : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Represe
       rw [← Module.End.mul_apply, ← map_mul, ← Subgroup.coe_mul, inv_mul_cancel]
       simp
 
-theorem exists_eigen_family : ∀ {G V W ι : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G] [inst_3 : AddCommGroup V] [inst_4 : Module ℂ V] [inst_5 : AddCommGroup W] [inst_6 : Module ℂ W] [inst_7 : Fintype ι] {ρ : Representation ℂ G V}, GlobalTheory.PRep.IsSmooth ρ → ∀ {K : Subgroup G}, IsCompact (↑K : Set G) → ∀ {U : Set G}, IsOpen U → (1 : G) ∈ U → ∀ (θ : G → ℂ), (∀ g ∈ U, g ∈ K → θ g = (1 : ℂ)) → (∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b) → ∀ (T : ι → V →ₗ[ℂ] W) (y : ι → V), (∀ k ∈ K, ∑ i : ι, (T i : V → W) (((ρ : G → V →ₗ[ℂ] V) k : V → V) (y i)) = θ k • ∑ i : ι, (T i : V → W) (y i)) → ∃ (u : ι → V), (∀ (j : ι), ∀ h ∈ K, ((ρ : G → V →ₗ[ℂ] V) h : V → V) (u j) = θ h • u j) ∧ ∑ i : ι, (T i : V → W) (u i) = ∑ i : ι, (T i : V → W) (y i) := by
+theorem exists_eigen_family
+    : ∀ {G V W ι : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
+        [inst_3 : AddCommGroup V] [inst_4 : Module ℂ V] [inst_5 : AddCommGroup W]
+        [inst_6 : Module ℂ W] [inst_7 : Fintype ι] {ρ : Representation ℂ G V},
+      GlobalTheory.PRep.IsSmooth ρ
+        → ∀ {K : Subgroup G},
+          IsCompact (↑K : Set G)
+            → ∀ {U : Set G},
+              IsOpen U → (1 : G) ∈ U
+                → ∀ (θ : G → ℂ),
+                  (∀ g ∈ U, g ∈ K → θ g = (1 : ℂ)) → (∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b)
+                    → ∀ (T : ι → V →ₗ[ℂ] W) (y : ι → V),
+                      (∀ k ∈ K,
+                          ∑ i : ι, (T i : V → W) (((ρ : G → V →ₗ[ℂ] V) k : V → V) (y i))
+                            = θ k • ∑ i : ι, (T i : V → W) (y i))
+                        → ∃ (u : ι → V),
+                          (∀ (j : ι), ∀ h ∈ K, ((ρ : G → V →ₗ[ℂ] V) h : V → V) (u j) = θ h • u j)
+                            ∧ ∑ i : ι, (T i : V → W) (u i) = ∑ i : ι, (T i : V → W) (y i) := by
   intro G V W ι _ _ _ _ _ _ _ _ ρ hρ K hK U hU hU1 θ hθ hm T y hy
   classical
   have h1 : θ 1 = 1 := hθ 1 hU1 K.one_mem
@@ -49,8 +70,8 @@ theorem exists_eigen_family : ∀ {G V W ι : Type} [inst : Group G] [inst_1 : T
     intro j k s hs
     have hs' : θ (s⁻¹ : K) = 1 := (H.inv_mem hs).1
     simp only [f]
-    rw [mul_inv_rev, Subgroup.coe_mul, hm _ (s⁻¹).2 _ (k⁻¹).2, hs', one_mul, Subgroup.coe_mul, map_mul,
-      Module.End.mul_apply, hs.2 j]
+    rw [mul_inv_rev, Subgroup.coe_mul, hm _ (s⁻¹).2 _ (k⁻¹).2, hs', one_mul, Subgroup.coe_mul,
+      map_mul, Module.End.mul_apply, hs.2 j]
   let F : ι → K ⧸ H → V := fun j q => f j q.out
   have hF : ∀ j (k : K), F j (k : K ⧸ H) = f j k := by
     intro j k
@@ -77,8 +98,8 @@ theorem exists_eigen_family : ∀ {G V W ι : Type} [inst : Group G] [inst_1 : T
   · have hq : ∀ q, ∑ i, T i (F i q) = ∑ i, T i (y i) := by
       intro q
       simp only [F, f, map_smul]
-      rw [← Finset.smul_sum, hy _ q.out.2, smul_smul, ← hm _ (q.out⁻¹).2 _ q.out.2, ← Subgroup.coe_mul,
-        inv_mul_cancel, Subgroup.coe_one, h1, one_smul]
+      rw [← Finset.smul_sum, hy _ q.out.2, smul_smul, ← hm _ (q.out⁻¹).2 _ q.out.2,
+        ← Subgroup.coe_mul, inv_mul_cancel, Subgroup.coe_one, h1, one_smul]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_smul, map_sum, Finset.sum_apply]
     rw [← Finset.smul_sum, Finset.sum_comm, Finset.sum_congr rfl fun q _ => hq q, Finset.sum_const,

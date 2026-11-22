@@ -10,10 +10,11 @@ open UpperTheory.Gal.TranscendenceTraces (gp pt Wt fib IsWt nwt LocNml)
 open UpperTheory.Gal.crystallineComparison (resPt twist PtId)
 open UpperTheory.Gal UpperTheory.Gal.Mod
 
-private theorem split_monic (V : Type) [CommRing V] [IsDomain V] [ValuationRing V]
-    [IsAlgClosed (FractionRing V)] :
-    ∀ (n : ℕ) (F : Polynomial V), F.Monic → F.natDegree = n →
-      ∃ s : Multiset V, F = (s.map fun α => Polynomial.X - Polynomial.C α).prod := by
+private theorem split_monic
+    (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)]
+    : ∀ (n : ℕ) (F : Polynomial V),
+      F.Monic → F.natDegree = n
+        → ∃ s : Multiset V, F = (s.map fun α => Polynomial.X - Polynomial.C α).prod := by
   intro n
   induction n with
   | zero =>
@@ -49,18 +50,23 @@ private theorem split_monic (V : Type) [CommRing V] [IsDomain V] [ValuationRing 
     refine ⟨α ::ₘ s, ?_⟩
     rw [Multiset.map_cons, Multiset.prod_cons, ← hs, hmul]
 
-private theorem coprime_left {R ι : Type} [CommRing R] (s : Multiset ι) (f : ι → R) (x : R)
-    (h : ∀ a ∈ s, IsCoprime (f a) x) : IsCoprime (s.map f).prod x := by
+private theorem coprime_left
+    {R ι : Type} [CommRing R] (s : Multiset ι) (f : ι → R) (x : R) (h : ∀ a ∈ s, IsCoprime (f a) x)
+    : IsCoprime (s.map f).prod x := by
   induction s using Multiset.induction_on with
   | empty =>
     simp only [Multiset.map_zero, Multiset.prod_zero]
     exact isCoprime_one_left
   | cons a t ih =>
     rw [Multiset.map_cons, Multiset.prod_cons]
-    exact (h a (Multiset.mem_cons_self a t)).mul_left (ih fun b hb => h b (Multiset.mem_cons_of_mem hb))
+    exact (h a (Multiset.mem_cons_self a t)).mul_left
+      (ih fun b hb => h b (Multiset.mem_cons_of_mem hb))
 
-private theorem prod_notMem {R ι : Type} [CommRing R] (P : Ideal R) [hP : P.IsPrime]
-    (s : Multiset ι) (f : ι → R) (h : ∀ a ∈ s, f a ∉ P) : (s.map f).prod ∉ P := by
+private theorem prod_notMem
+    {R ι : Type} [CommRing R]
+    (P : Ideal R) [hP : P.IsPrime]
+    (s : Multiset ι) (f : ι → R) (h : ∀ a ∈ s, f a ∉ P)
+    : (s.map f).prod ∉ P := by
   induction s using Multiset.induction_on with
   | empty =>
     intro h1
@@ -72,19 +78,27 @@ private theorem prod_notMem {R ι : Type} [CommRing R] (P : Ideal R) [hP : P.IsP
     · exact h a (Multiset.mem_cons_self a t) h1
     · exact ih (fun b hb => h b (Multiset.mem_cons_of_mem hb)) h1
 
-private theorem algebraMap_mem_maximal_of_mem_maximalIdeal (V : Type) [CommRing V] [IsLocalRing V] {A : Type} [CommRing A]
-    [Algebra V A] [Algebra.IsIntegral V A] (m' : Ideal A) [m'.IsMaximal] {v : V}
-    (hv : v ∈ IsLocalRing.maximalIdeal V) : algebraMap V A v ∈ m' := by
+private theorem algebraMap_mem_maximal_of_mem_maximalIdeal
+    (V : Type) [CommRing V] [IsLocalRing V]
+    {A : Type} [CommRing A] [Algebra V A] [Algebra.IsIntegral V A]
+    (m' : Ideal A) [m'.IsMaximal]
+    {v : V} (hv : v ∈ IsLocalRing.maximalIdeal V)
+    : algebraMap V A v ∈ m' := by
   have hc : (m'.comap (algebraMap V A)).IsMaximal :=
     Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := V) m'
   rw [← IsLocalRing.eq_maximalIdeal hc] at hv
   exact hv
 
-private theorem exists_idempotent_approx_at_maximal (V : Type) [CommRing V] [IsDomain V] [ValuationRing V]
-    [IsAlgClosed (FractionRing V)] {A : Type} [CommRing A] [Algebra V A] [Algebra.IsIntegral V A]
-    (m : Ideal A) [hm : m.IsMaximal] (a : A) :
-    ∃ e : A, IsIdempotentElem e ∧ e ∉ m ∧ ∀ m' : Ideal A, m'.IsMaximal → e ∉ m' →
-      ∃ β : V, a - algebraMap V A β ∈ m ∧ a - algebraMap V A β ∈ m' := by
+private theorem exists_idempotent_approx_at_maximal
+    (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)]
+    {A : Type} [CommRing A] [Algebra V A] [Algebra.IsIntegral V A]
+    (m : Ideal A) [hm : m.IsMaximal]
+    (a : A)
+    : ∃ e : A,
+      IsIdempotentElem e ∧ e ∉ m
+        ∧ ∀ m' : Ideal A,
+          m'.IsMaximal → e ∉ m'
+            → ∃ β : V, a - algebraMap V A β ∈ m ∧ a - algebraMap V A β ∈ m' := by
   classical
   obtain ⟨F, hF, hFa⟩ := Algebra.IsIntegral.isIntegral (R := V) a
   obtain ⟨s, hs⟩ := split_monic V F.natDegree F hF rfl
@@ -125,7 +139,7 @@ private theorem exists_idempotent_approx_at_maximal (V : Type) [CommRing V] [IsD
       rw [hfe]
       exact m.add_mem hPα hmem
     obtain ⟨w, hw⟩ := hu
-    refine ⟨-algebraMap V A (↑w⁻¹ : V), algebraMap V A (↑w⁻¹ : V), ?_⟩
+    refine ⟨- algebraMap V A (↑w⁻¹ : V), algebraMap V A (↑w⁻¹ : V), ?_⟩
     have hw1 : algebraMap V A (↑w⁻¹ : V) * algebraMap V A (α - β) = 1 := by
       rw [← map_mul, ← hw, Units.inv_mul, map_one]
     simp only [f, map_sub] at hw1 ⊢
@@ -156,8 +170,7 @@ private theorem exists_idempotent_approx_at_maximal (V : Type) [CommRing V] [IsD
       rw [hh, hc]
       exact m'.mul_mem_right c hαm'
 
-theorem UpperTheory.Gal.Mod.hensSplit :
-    HensSplit := by
+theorem UpperTheory.Gal.Mod.hensSplit : HensSplit := by
   intro V _ _ _ _ A _ _ _ m hm
   classical
   obtain ⟨T, hT⟩ := Module.Finite.fg_top (R := V) (M := A)
@@ -192,8 +205,8 @@ theorem UpperTheory.Gal.Mod.hensSplit :
         obtain ⟨β, hβ⟩ := hy
         obtain ⟨γ, hγ⟩ := hz
         refine ⟨β + γ, ?_⟩
-        have hyz : y + z - algebraMap V A (β + γ) =
-            (y - algebraMap V A β) + (z - algebraMap V A γ) := by
+        have hyz
+            : y + z - algebraMap V A (β + γ) = (y - algebraMap V A β) + (z - algebraMap V A γ) := by
           rw [map_add (f := _)]
           ring
         rw [hyz]

@@ -4,8 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.ConjEqNegOfSqEqNegNat₂.main :
-    ∀ {d : ℕ}, (0 : ℕ) < d → ∀ {z : ℂ}, z ^ (2 : ℕ) = -(↑d : ℂ) → (starRingEnd ℂ : ℂ → ℂ) z = -z := by
+theorem UpperTheory.Reformulated.B.ConjEqNegOfSqEqNegNat₂.main
+    : ∀ {d : ℕ},
+      (0 : ℕ) < d → ∀ {z : ℂ}, z ^ (2 : ℕ) = -(↑d : ℂ) → (starRingEnd ℂ : ℂ → ℂ) z = -z := by
   intro d hd z hz
   have hd' : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
   have hre : z.re * z.re - z.im * z.im = -(d : ℝ) := by

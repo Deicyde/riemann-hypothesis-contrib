@@ -98,8 +98,15 @@ private lemma commuting_idempotent_trace {X : Type} [AddCommGroup X] [Module ℂ
     rw [← mul_assoc, ← hτv, key, hτv, ← hEdef, hN']
     ring
 
-theorem UpperTheory.trace_pairing_separates_endomorphisms :
-    ∀ (r : ℕ) (X : Type) [AddCommGroup X] [Module ℂ X] [FiniteDimensional ℂ X] (S : Fin r → Type) [∀ i, AddCommGroup (S i)] [∀ i, Module ℂ (S i)] [∀ i, FiniteDimensional ℂ (S i)] [∀ i, Nontrivial (S i)] (c : ∀ i, Module.End ℂ (S i) →ₐ[ℂ] Module.End ℂ X), (∀ i j, i ≠ j → ∀ s t, Commute (c i s) (c j t)) → ∃ N : ℕ, ∀ t : ∀ i, Module.End ℂ (S i), LinearMap.trace ℂ X (List.ofFn fun i => c i (t i)).prod = N * ∏ i, LinearMap.trace ℂ (S i) (t i) := by
+theorem UpperTheory.trace_pairing_separates_endomorphisms
+    : ∀ (r : ℕ) (X : Type) [AddCommGroup X] [Module ℂ X] [FiniteDimensional ℂ X] (S : Fin r → Type)
+        [∀ i, AddCommGroup (S i)] [∀ i, Module ℂ (S i)] [∀ i, FiniteDimensional ℂ (S i)]
+        [∀ i, Nontrivial (S i)] (c : ∀ i, Module.End ℂ (S i) →ₐ[ℂ] Module.End ℂ X),
+      (∀ i j, i ≠ j → ∀ s t, Commute (c i s) (c j t))
+        → ∃ N : ℕ, ∀ t : ∀ i, Module.End ℂ (S i),
+          LinearMap.trace ℂ X (List.ofFn fun i => c i (t i)).prod
+            = N * ∏ i, LinearMap.trace ℂ (S i) (t i) := by
   intro r X _ _ _ S _ _ _ _ c hc
-  obtain ⟨N, hN⟩ := commuting_idempotent_trace r S c hc 1 IsIdempotentElem.one (fun _ _ => Commute.one_left _)
+  obtain ⟨N, hN⟩ :=
+    commuting_idempotent_trace r S c hc 1 IsIdempotentElem.one (fun _ _ => Commute.one_left _)
   exact ⟨N, fun t => by simpa using hN t⟩

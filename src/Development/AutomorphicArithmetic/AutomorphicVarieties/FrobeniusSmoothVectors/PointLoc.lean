@@ -9,10 +9,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem cont_sub {Γ S C : Type} [TopologicalSpace Γ] [CommRing S] [IsNoetherianRing S] [CommRing C]
-    [Algebra S C] [Module.Finite S C] (I : Ideal S) (J : Ideal C)
-    (h : ∀ N, ∀ c ∈ J ^ N, c ∈ (I ^ N • ⊤ : Submodule S C)) (a : Γ → C) (ha : AdicCont J a) (N : ℕ) :
-    IsLocallyConstant fun g => (I ^ N • Submodule.span S (Set.range a)).mkQ (a g) := by
+private theorem cont_sub
+    {Γ S C : Type} [TopologicalSpace Γ] [CommRing S] [IsNoetherianRing S] [CommRing C] [Algebra S C]
+    [Module.Finite S C]
+    (I : Ideal S) (J : Ideal C) (h : ∀ N, ∀ c ∈ J ^ N, c ∈ (I ^ N • ⊤ : Submodule S C))
+    (a : Γ → C) (ha : AdicCont J a)
+    (N : ℕ)
+    : IsLocallyConstant fun g => (I ^ N • Submodule.span S (Set.range a)).mkQ (a g) := by
   classical
   obtain ⟨k, hk⟩ := Ideal.exists_pow_inf_eq_pow_smul I (Submodule.span S (Set.range a))
   set M := Submodule.span S (Set.range a)
@@ -35,8 +38,9 @@ private theorem cont_sub {Γ S C : Type} [TopologicalSpace Γ] [CommRing S] [IsN
   rw [hf]
   exact (ha (N + k)).comp _
 
-private theorem two_zero {K : Type} [Field K] {x y s t : K} (h : s ≠ t) (h1 : x + y = 0) (h2 : s * x + t * y = 0) :
-    x = 0 ∧ y = 0 := by
+private theorem two_zero
+    {K : Type} [Field K] {x y s t : K} (h : s ≠ t) (h1 : x + y = 0) (h2 : s * x + t * y = 0)
+    : x = 0 ∧ y = 0 := by
   have hy : y = -x := by linear_combination h1
   subst hy
   have hx : (s - t) * x = 0 := by linear_combination h2
@@ -44,16 +48,20 @@ private theorem two_zero {K : Type} [Field K] {x y s t : K} (h : s ≠ t) (h1 : 
   · exact absurd (sub_eq_zero.1 h3) h
   · exact ⟨h3, by simp [h3]⟩
 
-private theorem or_zero {G K : Type} [Field K] {a b : G → K} (h : ∀ g g', a g * b g' = 0) :
-    (∀ g, a g = 0) ∨ ∀ g, b g = 0 := by
+private theorem or_zero {G K : Type} [Field K] {a b : G → K} (h : ∀ g g', a g * b g' = 0)
+    : (∀ g, a g = 0) ∨ ∀ g, b g = 0 := by
   by_contra hc
   push_neg at hc
   obtain ⟨⟨g, hg⟩, ⟨g', hg'⟩⟩ := hc
   exact mul_ne_zero hg hg' (h g g')
 
-private theorem tri_of_bar {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ}
-    (hF : F.Ok C₀) (hn : n = 2 ∨ n = 3) {K : Type} [Field K] (f : k →+* K) (ρ : NRep F n K) (hρ : ρ.IsBar f) :
-    (∀ g i j, j < i → ρ.r g i j = 0) ∨ ∀ g i j, i < j → ρ.r g i j = 0 := by
+private theorem tri_of_bar
+    {l : ℕ} [Fact l.Prime]
+    {k : Type} [Field k] [CharP k l]
+    {F : Frame l k} {C₀ n : ℕ} (hF : F.Ok C₀) (hn : n = 2 ∨ n = 3)
+    {K : Type} [Field K]
+    (f : k →+* K) (ρ : NRep F n K) (hρ : ρ.IsBar f)
+    : (∀ g i j, j < i → ρ.r g i j = 0) ∨ ∀ g i j, i < j → ρ.r g i j = 0 := by
   have hst := UpperTheory.V.Fr.star hF
   have hd : ∀ g h : F.G0, ∀ i, ρ.r (g * h) i i = ρ.r g i i * ρ.r h i i := by
     intro g h i
@@ -76,10 +84,12 @@ private theorem tri_of_bar {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP 
       exact h10 g
   · set X := ρ.r F.g0 - ρ.r (F.star F.g0) with hXdef
     have hX : ∀ a b : Fin 3, a ≠ b → X a b = 0 := fun a b hab => ρ.diag a b hab
-    have hXm : ∀ g h : F.G0, ρ.r (g * F.g0 * h) - ρ.r (g * F.star F.g0 * h) = ρ.r g * X * ρ.r h := by
+    have hXm
+        : ∀ g h : F.G0, ρ.r (g * F.g0 * h) - ρ.r (g * F.star F.g0 * h) = ρ.r g * X * ρ.r h := by
       intro g h
       simp only [map_mul, hXdef, Matrix.mul_sub, Matrix.sub_mul]
-    have hT : ∀ g h : F.G0, ∀ i : Fin 3, (ρ.r g * X * ρ.r h) i i = ρ.r g i i * X i i * ρ.r h i i := by
+    have hT
+        : ∀ g h : F.G0, ∀ i : Fin 3, (ρ.r g * X * ρ.r h) i i = ρ.r g i i * X i i * ρ.r h i i := by
       intro g h i
       rw [← hXm, Matrix.sub_apply, hd, hd, hd, hd, hXdef, Matrix.sub_apply]
       ring
@@ -104,8 +114,7 @@ private theorem tri_of_bar {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP 
     have hq : f ↑p - f ↑p⁻¹ ≠ 0 := by
       intro e
       apply hp
-      have e2 : f ((p : k) * p) = f ((p : k) * ↑p⁻¹) := by
-        rw [map_mul, map_mul, sub_eq_zero.1 e]
+      have e2 : f ((p : k) * p) = f ((p : k) * ↑p⁻¹) := by rw [map_mul, map_mul, sub_eq_zero.1 e]
       rw [Units.mul_inv] at e2
       have e3 : (p : k) * p = 1 := f.injective (by rw [e2, map_one])
       ext
@@ -130,7 +139,8 @@ private theorem tri_of_bar {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP 
       have e1 := hE g h 0
       have e2 := hT g h 0
       simp only [Matrix.mul_apply, Fin.sum_univ_three, hX 0 1 (by decide), hX 0 2 (by decide),
-        hX 1 0 (by decide), hX 1 2 (by decide), hX 2 0 (by decide), hX 2 1 (by decide)] at e1 e2
+          hX 1 0 (by decide), hX 1 2 (by decide), hX 2 0 (by decide), hX 2 1 (by decide)]
+        at e1 e2
       refine two_zero (s := X 1 1) (t := X 2 2) ?_ ?_ ?_
       · rw [hX1, hX2]
         intro e
@@ -142,7 +152,8 @@ private theorem tri_of_bar {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP 
       have e1 := hE g h 1
       have e2 := hT g h 1
       simp only [Matrix.mul_apply, Fin.sum_univ_three, hX 0 1 (by decide), hX 0 2 (by decide),
-        hX 1 0 (by decide), hX 1 2 (by decide), hX 2 0 (by decide), hX 2 1 (by decide)] at e1 e2
+          hX 1 0 (by decide), hX 1 2 (by decide), hX 2 0 (by decide), hX 2 1 (by decide)]
+        at e1 e2
       refine two_zero (s := X 0 0) (t := X 2 2) ?_ ?_ ?_
       · rw [hX0, hX2]
         intro e
@@ -160,15 +171,17 @@ private theorem tri_of_bar {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP 
     have t10 : (∀ g : F.G0, ρ.r g 2 1 = 0) → ∀ g : F.G0, ρ.r g 1 0 = 0 := fun h g => by
       rw [← hst.1 g, s10]; exact h _
     have hP : ∀ g h : F.G0, (ρ.r g * ρ.r h) = ρ.r (g * h) := fun g h => (map_mul _ _ _).symm
-    have hL : (∀ g : F.G0, ρ.r g 1 0 = 0) → (∀ g : F.G0, ρ.r g 2 0 = 0) → (∀ g : F.G0, ρ.r g 2 1 = 0) →
-        (∀ (g : F.G0) (i j : Fin 3), j < i → ρ.r g i j = 0) := by
+    have hL
+        : (∀ g : F.G0, ρ.r g 1 0 = 0) → (∀ g : F.G0, ρ.r g 2 0 = 0) → (∀ g : F.G0, ρ.r g 2 1 = 0)
+          → (∀ (g : F.G0) (i j : Fin 3), j < i → ρ.r g i j = 0) := by
       intro a b c g i j hij
       fin_cases i <;> fin_cases j <;> simp at hij
       · exact a g
       · exact b g
       · exact c g
-    have hR : (∀ g : F.G0, ρ.r g 0 1 = 0) → (∀ g : F.G0, ρ.r g 0 2 = 0) → (∀ g : F.G0, ρ.r g 1 2 = 0) →
-        (∀ (g : F.G0) (i j : Fin 3), i < j → ρ.r g i j = 0) := by
+    have hR
+        : (∀ g : F.G0, ρ.r g 0 1 = 0) → (∀ g : F.G0, ρ.r g 0 2 = 0) → (∀ g : F.G0, ρ.r g 1 2 = 0)
+          → (∀ (g : F.G0) (i j : Fin 3), i < j → ρ.r g i j = 0) := by
       intro a b c g i j hij
       fin_cases i <;> fin_cases j <;> simp at hij
       · exact a g
@@ -198,8 +211,10 @@ private theorem tri_of_bar {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP 
         · exact Or.inr (hR a01 a02 (t12 a01))
       · exact Or.inl (hL a10 a20 a21)
 
-private theorem wsum {G : Type} {n : ℕ} (hn : n = 2 ∨ n = 3) (L : List (G × Fin n × Fin n))
-    (h : ∀ s ∈ L, s.2.1 ≤ s.2.2) (h0 : (L.map fun s => w n s.2.1 - w n s.2.2).sum = 0) : ∀ s ∈ L, s.2.1 = s.2.2 := by
+private theorem wsum
+    {G : Type} {n : ℕ} (hn : n = 2 ∨ n = 3) (L : List (G × Fin n × Fin n))
+    (h : ∀ s ∈ L, s.2.1 ≤ s.2.2) (h0 : (L.map fun s => w n s.2.1 - w n s.2.2).sum = 0)
+    : ∀ s ∈ L, s.2.1 = s.2.2 := by
   have hw : ∀ i j : Fin n, i ≤ j → 0 ≤ w n i - w n j ∧ (w n i - w n j = 0 → i = j) := by
     intro i j hij
     have hij' : (i : ℕ) ≤ j := hij
@@ -230,11 +245,15 @@ private theorem wsum {G : Type} {n : ℕ} (hn : n = 2 ∨ n = 3) (L : List (G ×
     · exact hs.2 e1
     · exact ih hL e2 s' hs'
 
-private theorem cyc_mem {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ}
-    (hF : F.Ok C₀) (hn : n = 2 ∨ n = 3) {C : Type} [CommRing C] [IsLocalRing C] (f : k →+* ResidueField C)
-    (ρ : NRep F n C) (hρ : (ρ.map (residue C)).IsBar f) (L : List (F.G0 × Fin n × Fin n))
-    (h0 : (L.map fun s => w n s.2.1 - w n s.2.2).sum = 0) (h1 : ∃ s ∈ L, s.2.1 ≠ s.2.2) :
-    (L.map fun s => ρ.r s.1 s.2.1 s.2.2).prod ∈ maximalIdeal C := by
+private theorem cyc_mem
+    {l : ℕ} [Fact l.Prime]
+    {k : Type} [Field k] [CharP k l]
+    {F : Frame l k} {C₀ n : ℕ} (hF : F.Ok C₀) (hn : n = 2 ∨ n = 3)
+    {C : Type} [CommRing C] [IsLocalRing C]
+    (f : k →+* ResidueField C) (ρ : NRep F n C) (hρ : (ρ.map (residue C)).IsBar f)
+    (L : List (F.G0 × Fin n × Fin n))
+    (h0 : (L.map fun s => w n s.2.1 - w n s.2.2).sum = 0) (h1 : ∃ s ∈ L, s.2.1 ≠ s.2.2)
+    : (L.map fun s => ρ.r s.1 s.2.1 s.2.2).prod ∈ maximalIdeal C := by
   have hr : ∀ g i j, (ρ.map (residue C)).r g i j = residue C (ρ.r g i j) := fun _ _ _ => rfl
   rw [← IsLocalRing.residue_eq_zero_iff, map_list_prod, List.map_map]
   apply List.prod_eq_zero
@@ -262,9 +281,12 @@ private theorem cyc_mem {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l
         intro t ht
         obtain ⟨s, hs, rfl⟩ := List.mem_map.1 ht
         exact hex s hs
-      have h0' : ((L.map (fun s => (s.1, s.2.2, s.2.1))).map fun s => w n s.2.1 - w n s.2.2).sum = 0 := by
-        have e : ((L.map (fun s => (s.1, s.2.2, s.2.1))).map fun s => w n s.2.1 - w n s.2.2) =
-            (L.map fun s => w n s.2.1 - w n s.2.2).map Neg.neg := by
+      have h0'
+          : ((L.map (fun s => (s.1, s.2.2, s.2.1))).map fun s => w n s.2.1 - w n s.2.2).sum
+            = 0 := by
+        have e
+            : ((L.map (fun s => (s.1, s.2.2, s.2.1))).map fun s => w n s.2.1 - w n s.2.2)
+              = (L.map fun s => w n s.2.1 - w n s.2.2).map Neg.neg := by
           simp [List.map_map, Function.comp_def]
         have hneg : ∀ m : List ℤ, (m.map Neg.neg).sum = -m.sum := by
           intro m
@@ -274,8 +296,10 @@ private theorem cyc_mem {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l
         rw [e, hneg, h0, neg_zero]
       exact hne (wsum hn _ hL' h0' (s.1, s.2.2, s.2.1) (List.mem_map.2 ⟨s, hs, rfl⟩)).symm
 
-private theorem lc_lemma {X A B : Type} [TopologicalSpace X] (φ : X → A) (g : X → B)
-    (hφ : IsLocallyConstant φ) (h : ∀ x y, φ x = φ y → g x = g y) : IsLocallyConstant g := by
+private theorem lc_lemma
+    {X A B : Type} [TopologicalSpace X]
+    (φ : X → A) (g : X → B) (hφ : IsLocallyConstant φ) (h : ∀ x y, φ x = φ y → g x = g y)
+    : IsLocallyConstant g := by
   classical
   rcases isEmpty_or_nonempty X with hX | ⟨⟨x₀⟩⟩
   · exact IsLocallyConstant.of_constant _ (fun x => (hX.false x).elim)
@@ -287,8 +311,19 @@ private theorem lc_lemma {X A B : Type} [TopologicalSpace X] (φ : X → A) (g :
   rw [e]
   exact hφ.comp _
 
-theorem UpperTheory.V.Fr.point_loc :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (C : Type) [CommRing C] [IsLocalRing C] [Algebra O C], UpperTheory.V.CA.IsCL O C → ∀ (f : ResidueField O →+* ResidueField C), IsResMap O C f → ∀ ρ : NRep F n C, ρ.Cont (maximalIdeal C) → (ρ.map (residue C)).IsBar f → ∃ ξ : S.A →ₐ[O] C, S.u.map (ξ : S.A →+* C) = ρ ∧ S.x0 ≤ (maximalIdeal C).comap (ξ : S.A →+* C) := by
+theorem UpperTheory.V.Fr.point_loc
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ S : Space O F n, ∀ (C : Type) [CommRing C] [IsLocalRing C] [Algebra O C],
+          UpperTheory.V.CA.IsCL O C
+            → ∀ (f : ResidueField O →+* ResidueField C),
+              IsResMap O C f
+                → ∀ ρ : NRep F n C,
+                  ρ.Cont (maximalIdeal C) → (ρ.map (residue C)).IsBar f
+                    → ∃ ξ : S.A →ₐ[O] C,
+                      S.u.map (ξ : S.A →+* C) = ρ
+                        ∧ S.x0 ≤ (maximalIdeal C).comap (ξ : S.A →+* C) := by
   intro l _ O _ _ _ _ F C₀ n hF hn S C _ _ _ hCL f hf ρ hρc hρ
   obtain ⟨S', hmem, hfin, hCO, hpow⟩ := UpperTheory.V.CA.cl_sub O C hCL
   obtain ⟨hBco, hmB⟩ := co_B hF hn S
@@ -323,7 +358,8 @@ theorem UpperTheory.V.Fr.point_loc :
   have cone : Cone O S' ρ := by
     refine ⟨?_, ?_, ?_, ?_, ?_⟩
     · intro g i
-      exact ⟨⟨ρ.r g i i, hin _ _ (hρ.1 g i)⟩, rfl, hres ⟨ρ.r g i i, hin _ _ (hρ.1 g i)⟩ _ (hρ.1 g i)⟩
+      exact
+        ⟨⟨ρ.r g i i, hin _ _ (hρ.1 g i)⟩, rfl, hres ⟨ρ.r g i i, hin _ _ (hρ.1 g i)⟩ _ (hρ.1 g i)⟩
     · intro L h0 h1
       have hp := cyc_mem hF hn f ρ hρ L h0 h1
       exact ⟨⟨_, hJ _ hp⟩, (hmax _).2 hp, rfl⟩

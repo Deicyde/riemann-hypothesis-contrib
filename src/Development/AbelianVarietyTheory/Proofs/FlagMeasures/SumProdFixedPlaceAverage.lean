@@ -8,11 +8,13 @@ open Finset
 
 namespace GlobalTheory
 
-theorem sum_prod_fixed_place_average {ι : Type} [Fintype ι] [DecidableEq ι] {G : ι → Type}
-    [∀ i, Group (G i)] [∀ i, Fintype (G i)] [∀ i, DecidableEq (G i)] {V : Type}
-    [AddCommGroup V] [Module ℂ V] (a : ∀ i, G i → ℂ) (f : (∀ i, G i) → V)
-    (hf : ∀ i (γ : ∀ i, G i), γ i = 1 → ∑ β : G i, a i β • f (Function.update γ i β) = f γ) :
-    ∑ γ : (∀ i, G i), (∏ i, a i (γ i)) • f γ = f 1 := by
+theorem sum_prod_fixed_place_average
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {G : ι → Type} [∀ i, Group (G i)] [∀ i, Fintype (G i)] [∀ i, DecidableEq (G i)]
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (a : ∀ i, G i → ℂ) (f : (∀ i, G i) → V)
+    (hf : ∀ i (γ : ∀ i, G i), γ i = 1 → ∑ β : G i, a i β • f (Function.update γ i β) = f γ)
+    : ∑ γ : (∀ i, G i), (∏ i, a i (γ i)) • f γ = f 1 := by
   classical
   let c : Finset ι → (∀ i, G i) → ℂ := fun S γ =>
     ∏ i, (if i ∈ S then a i (γ i) else if γ i = 1 then 1 else 0)
@@ -32,9 +34,16 @@ theorem sum_prod_fixed_place_average {ι : Type} [Fintype ι] [DecidableEq ι] {
       · intro h; exact absurd (mem_univ _) h
     | insert j S hj ih =>
       rw [← ih]
-      let h : ∀ i, G i → ℂ := fun i x => if i ∈ S then a i x else if x = 1 then 1 else 0
-      have cU : ∀ (γ : ∀ i, G i) (β : G j),
-          c S (Function.update γ j β) = h j β * ∏ i ∈ univ.erase j, h i (γ i) := by
+      let h : ∀ i, G i → ℂ := fun i x =>
+        if i ∈ S then
+          a i x
+        else if x = 1 then
+          1
+        else
+          0
+      have cU
+          : ∀ (γ : ∀ i, G i) (β : G j),
+            c S (Function.update γ j β) = h j β * ∏ i ∈ univ.erase j, h i (γ i) := by
         intro γ β
         show ∏ i, h i (Function.update γ j β i) = _
         rw [← Finset.mul_prod_erase univ _ (mem_univ j)]
@@ -53,8 +62,8 @@ theorem sum_prod_fixed_place_average {ι : Type} [Fintype ι] [DecidableEq ι] {
           intro i hi
           have : i ≠ j := Finset.ne_of_mem_erase hi
           simp [h, this]
-      have step1 : ∑ γ, c S γ • f γ
-          = ∑ γ, ∑ β : G j, (c S γ * a j β) • f (Function.update γ j β) := by
+      have step1
+          : ∑ γ, c S γ • f γ = ∑ γ, ∑ β : G j, (c S γ * a j β) • f (Function.update γ j β) := by
         apply Finset.sum_congr rfl
         intro γ _
         by_cases hγ : γ j = 1
@@ -64,14 +73,17 @@ theorem sum_prod_fixed_place_average {ι : Type} [Fintype ι] [DecidableEq ι] {
           rw [mul_smul]
         · have : c S γ = 0 := Finset.prod_eq_zero (mem_univ j) (by simp [hj, hγ])
           simp [this]
-      let e : (∀ i, G i) × G j ≃ (∀ i, G i) × G j :=
-        { toFun := fun p => (Function.update p.1 j p.2, p.1 j)
-          invFun := fun p => (Function.update p.1 j p.2, p.1 j)
-          left_inv := by intro p; simp
-          right_inv := by intro p; simp }
+      let e : (∀ i, G i) × G j ≃ (∀ i, G i) × G j := {
+        toFun := fun p => (Function.update p.1 j p.2, p.1 j)
+        invFun := fun p => (Function.update p.1 j p.2, p.1 j)
+        left_inv := by intro p; simp
+        right_inv := by intro p; simp
+      }
       rw [step1, ← Fintype.sum_prod_type']
       rw [← Fintype.sum_equiv e
-        (fun p => (c S (Function.update p.1 j p.2) * a j (p.1 j)) • f p.1) _ (by
+        (fun p => (c S (Function.update p.1 j p.2) * a j (p.1 j)) • f p.1)
+        _
+        (by
           intro p
           simp [e])]
       rw [Fintype.sum_prod_type]

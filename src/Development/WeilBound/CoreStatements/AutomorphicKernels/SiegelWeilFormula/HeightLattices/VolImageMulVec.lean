@@ -10,22 +10,23 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 namespace PositivityTheory.SiegelWeilFormula.HeightDict
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-private theorem secondCountable_Fv' (v : HeightOneSpectrum (𝓞 F)) :
-    SecondCountableTopology (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v) := by
+private theorem secondCountable_Fv' (v : HeightOneSpectrum (𝓞 F))
+    : SecondCountableTopology (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v) := by
   haveI : Countable F := (Module.finBasis ℚ F).equivFun.toEquiv.injective.countable
   haveI : TopologicalSpace.SeparableSpace (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v) :=
     ⟨⟨Set.range (algebraMap F (v.adicCompletion F)), Set.countable_range _,
       HeightOneSpectrum.denseRange_algebraMap F v⟩⟩
   infer_instance
 
-private theorem secondCountable_Fv_tensor (v : HeightOneSpectrum (𝓞 F)) :
-    SecondCountableTopology (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E) := by
+private theorem secondCountable_Fv_tensor (v : HeightOneSpectrum (𝓞 F))
+    : SecondCountableTopology (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E) := by
   classical
   haveI := secondCountable_Fv' (F := F) v
   let K := HeckeCharacterZeroLocus.SiegelWeilU.Fv F v
@@ -36,10 +37,15 @@ private theorem secondCountable_Fv_tensor (v : HeightOneSpectrum (𝓞 F)) :
   let h : (K ⊗[F] E) ≃ₜ (Module.Free.ChooseBasisIndex K (K ⊗[F] E) → K) := ⟨e.toEquiv, h1, h2⟩
   exact h.secondCountableTopology
 
-theorem vol_image_mulVec (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (μ : Measure (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E))
-    [μ.IsAddHaarMeasure] (M : GL (Fin n) (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E)) (L : Set (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E)) :
-    μ ((fun y => M.1 *ᵥ y) '' L) =
-      ((GlobalTheory.Doubling.absEv F E v (Matrix.GeneralLinearGroup.det M) : ℝ≥0) : ℝ≥0∞) * μ L := by
+theorem vol_image_mulVec
+    (v : HeightOneSpectrum (𝓞 F))
+    {n : ℕ} (μ : Measure (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E))
+    [μ.IsAddHaarMeasure]
+    (M : GL (Fin n) (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E))
+    (L : Set (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E))
+    : μ ((fun y => M.1 *ᵥ y) '' L)
+      = ((GlobalTheory.Doubling.absEv F E v (Matrix.GeneralLinearGroup.det M) : ℝ≥0) : ℝ≥0∞)
+        * μ L := by
   classical
   let K := HeckeCharacterZeroLocus.SiegelWeilU.Fv F v
   let B := K ⊗[F] E
@@ -66,8 +72,11 @@ theorem vol_image_mulVec (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (μ : Measur
   let e0 := b.equivFun
   have c1 : Continuous e0 := IsModuleTopology.continuous_of_linearMap e0.toLinearMap
   have c2 : Continuous e0.symm := IsModuleTopology.continuous_of_linearMap e0.symm.toLinearMap
-  let e : (Module.Free.ChooseBasisIndex K V → K) ≃ₜ+ V :=
-    { e0.symm.toAddEquiv with continuous_toFun := c2, continuous_invFun := c1 }
+  let e : (Module.Free.ChooseBasisIndex K V → K) ≃ₜ+ V := {
+    e0.symm.toAddEquiv with
+    continuous_toFun := c2
+    continuous_invFun := c1
+  }
   let ψ : V ≃ₜ+ V := (e.symm.trans (GlobalTheory.ModuLR.mulVecCE N hu)).trans e
   have hψ : ∀ y, ψ y = M.1 *ᵥ y := by
     intro y
@@ -77,10 +86,12 @@ theorem vol_image_mulVec (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (μ : Measur
     exact LinearMap.toMatrix_mulVec_repr b b f y
   have hchar : addEquivAddHaarChar ψ = ‖Algebra.norm K M.1.det‖₊ := by
     rw [GlobalTheory.ModuLR.addEquivAddHaarChar_transport,
-      GlobalTheory.ModuArtin.addEquivAddHaarChar_mulVecCE K inferInstance inferInstance _ N hu, ← hdet]
+      GlobalTheory.ModuArtin.addEquivAddHaarChar_mulVecCE K inferInstance inferInstance _ N hu,
+      ← hdet]
     have h1 := GlobalTheory.GaugeEx.modu_units K hu.unit
     rw [IsUnit.unit_spec] at h1
-    rw [h1, ← GlobalTheory.CompanionTheory.SW.ProdFormula.distribHaarChar_eq_nnnorm v N.det hu.ne_zero]
+    rw [h1,
+      ← GlobalTheory.CompanionTheory.SW.ProdFormula.distribHaarChar_eq_nnnorm v N.det hu.ne_zero]
     congr 1
     exact Units.ext rfl
   have key := MeasureTheory.addEquivAddHaarChar_smul_map μ ψ
@@ -95,16 +106,23 @@ theorem vol_image_mulVec (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (μ : Measur
   conv_lhs => rw [← key]
   rw [Measure.smul_apply, hmap, ENNReal.smul_def, smul_eq_mul]
 
-theorem vol_image_mulVec' (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (μ : Measure (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E))
-    [μ.IsAddHaarMeasure] (M : Matrix (Fin n) (Fin n) (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E)) (hM : IsUnit M.det)
-    (L : Set (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E)) :
-    μ ((fun y => M *ᵥ y) '' L) = ((‖Algebra.norm (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v) M.det‖₊ : ℝ≥0) : ℝ≥0∞) * μ L := by
+theorem vol_image_mulVec'
+    (v : HeightOneSpectrum (𝓞 F))
+    {n : ℕ} (μ : Measure (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E))
+    [μ.IsAddHaarMeasure]
+    (M : Matrix (Fin n) (Fin n) (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E))
+    (hM : IsUnit M.det)
+    (L : Set (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E))
+    : μ ((fun y => M *ᵥ y) '' L)
+      = ((‖Algebra.norm (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v) M.det‖₊ : ℝ≥0) : ℝ≥0∞)
+        * μ L := by
   have h := vol_image_mulVec v μ (Matrix.nonsingInvUnit M hM) L
   rw [GlobalTheory.Doubling.absEv_apply] at h
   exact h
 
-theorem exists_haar_tup (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) :
-    ∃ lv : Measure (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E), lv.IsAddHaarMeasure := by
+theorem exists_haar_tup (v : HeightOneSpectrum (𝓞 F)) (n : ℕ)
+    : ∃ lv : Measure (Fin n → HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E),
+      lv.IsAddHaarMeasure := by
   haveI : SecondCountableTopology (HeckeCharacterZeroLocus.SiegelWeilU.Fv F v ⊗[F] E) := secondCountable_Fv_tensor (E := E) v
   exact ⟨Measure.addHaar, inferInstance⟩
 

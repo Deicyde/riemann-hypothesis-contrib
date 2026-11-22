@@ -9,16 +9,20 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcVal
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
-  Formalism.L2.SG.LocVol Formalism.L2.SG.MassDataConc Formalism.L2.SG.TypedSets Formalism.L2.SG.Sub Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory
-  NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.AdBridge Formalism.L2.SG.LocVol Formalism.L2.SG.MassDataConc
+  Formalism.L2.SG.TypedSets Formalism.L2.SG.Sub
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain
 open scoped ENNReal TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Gen
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (σ : E →ₐ[F] E) (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
 
 def VolTO (ι : Type) : Set (ι → Fv F v ⊗[F] E) := {x | ∀ i, x i ∈ OEv (E := E) v}
@@ -27,16 +31,16 @@ def VolTOne (ι : Type) [Fintype ι] : Prop := sdE (E := E) ψ v ι (VolTO (E :=
 
 def VolTAff (g : ℕ) (ι : Type) [Fintype ι] : Prop :=
   ∀ (b : ι → Fv F v ⊗[F] E) (S : Set (ι → Fv F v ⊗[F] E)),
-    sdE (E := E) ψ v ι {w | (fun i => (w i - b i) * sc (E := E) v (g : Fv F v)⁻¹) ∈ S} =
-      ((g : ℝ≥0∞) ^ (2 * Fintype.card ι))⁻¹ * sdE (E := E) ψ v ι S
+    sdE (E := E) ψ v ι {w | (fun i => (w i - b i) * sc (E := E) v (g : Fv F v)⁻¹) ∈ S}
+      = ((g : ℝ≥0∞) ^ (2 * Fintype.card ι))⁻¹ * sdE (E := E) ψ v ι S
 
 def VolTLocPres (r : ℕ) : Prop :=
   ∀ S : Set (Fin (r + 1) × Fin (r + 1) → Fv F v ⊗[F] E),
-    sdE (E := E) ψ v (Fin (r + 1) × Fin (r + 1)) {z | (fun p => locZ (E := E) v z p.1 p.2) ∈ S} =
-      sdE (E := E) ψ v (Fin (r + 1) × Fin (r + 1)) S
+    sdE (E := E) ψ v (Fin (r + 1) × Fin (r + 1)) {z | (fun p => locZ (E := E) v z p.1 p.2) ∈ S}
+      = sdE (E := E) ψ v (Fin (r + 1) × Fin (r + 1)) S
 
-def VolTW (g r : ℕ) (c : Matrix (Fin (r + 1)) (Fin (r + 1)) (Fv F v ⊗[F] E)) :
-    Set (Fin (r + 1) × Fin (r + 1) → Fv F v ⊗[F] E) :=
+def VolTW (g r : ℕ) (c : Matrix (Fin (r + 1)) (Fin (r + 1)) (Fv F v ⊗[F] E))
+    : Set (Fin (r + 1) × Fin (r + 1) → Fv F v ⊗[F] E) :=
   {Y | ∀ i j, Y (i, j) ∈ OEv (E := E) v ∧
     (Y (i, j) + sigR (Fv F v) σ (Y (j, i)) - c i j) * sc (E := E) v (g : Fv F v)⁻¹ ∈ OEv (E := E) v}
 
@@ -44,8 +48,10 @@ def VolTHermInt (r : ℕ) (c : Matrix (Fin (r + 1)) (Fin (r + 1)) (Fv F v ⊗[F]
   (∀ i j, c j i = sigR (Fv F v) σ (c i j)) ∧ ∀ i j, c i j ∈ OEv (E := E) v
 
 def VolTHermCnt (g r : ℕ) : Prop :=
-  ∀ c, VolTHermInt σ v r c →
-    sdE (E := E) ψ v (Fin (r + 1) × Fin (r + 1)) (VolTW σ v g r c) = ((g : ℝ≥0∞) ^ ((r + 1) ^ 2))⁻¹
+  ∀ c,
+    VolTHermInt σ v r c
+      → sdE (E := E) ψ v (Fin (r + 1) × Fin (r + 1)) (VolTW σ v g r c)
+        = ((g : ℝ≥0∞) ^ ((r + 1) ^ 2))⁻¹
 
 def VolTUSet (g r : ℕ) : Set ((UIdx r → Fv F v ⊗[F] E) × (UIdx r → Fv F v ⊗[F] E)) :=
   {p | (∀ q, p.1 q ∈ OEv (E := E) v) ∧ ∀ q, (p.2 q - p.1 q) * sc (E := E) v (g : Fv F v)⁻¹ ∈ OEv (E := E) v}
@@ -53,8 +59,9 @@ def VolTUSet (g r : ℕ) : Set ((UIdx r → Fv F v ⊗[F] E) × (UIdx r → Fv F
 def VolTUOEq (g r : ℕ) : Prop := deepCongruenceVolume (E := E) v g r = VolTUSet (E := E) v g r
 
 def VolTProdU (g r : ℕ) : Prop :=
-  ((sdE (E := E) ψ v (UIdx r)).prod (sdE (E := E) ψ v (UIdx r))) (VolTUSet (E := E) v g r) =
-    sdE (E := E) ψ v (UIdx r) (VolTO (E := E) v (UIdx r)) * ((g : ℝ≥0∞) ^ (2 * Fintype.card (UIdx r)))⁻¹
+  ((sdE (E := E) ψ v (UIdx r)).prod (sdE (E := E) ψ v (UIdx r))) (VolTUSet (E := E) v g r)
+    = sdE (E := E) ψ v (UIdx r) (VolTO (E := E) v (UIdx r))
+      * ((g : ℝ≥0∞) ^ (2 * Fintype.card (UIdx r)))⁻¹
 
 end Gen
 

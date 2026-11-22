@@ -9,16 +9,21 @@ open Module
 
 namespace UpperTheory.Gal.Gen
 
-private theorem exists_invariant_flag_mod_l (hF : FixVec) (l : ℕ) [Fact l.Prime] (H : Type) [Group H] (hH : IsPGroup l H)
-    (V : Type) [AddCommGroup V] [Module (ZMod l) V] [Finite V] (ρ : Representation (ZMod l) H V)
-    (m : ℕ) (hm : m ≤ finrank (ZMod l) V) :
-    ∃ v : Fin m → V, LinearIndependent (ZMod l) v ∧
-      ∀ h j, ρ h (v j) - v j ∈ Submodule.span (ZMod l) (v '' {i | i < j}) := by
+private theorem exists_invariant_flag_mod_l
+    (hF : FixVec)
+    (l : ℕ) [Fact l.Prime]
+    (H : Type) [Group H]
+    (hH : IsPGroup l H)
+    (V : Type) [AddCommGroup V] [Module (ZMod l) V] [Finite V]
+    (ρ : Representation (ZMod l) H V)
+    (m : ℕ) (hm : m ≤ finrank (ZMod l) V)
+    : ∃ v : Fin m → V,
+      LinearIndependent (ZMod l) v
+        ∧ ∀ h j, ρ h (v j) - v j ∈ Submodule.span (ZMod l) (v '' {i | i < j}) := by
   classical
   haveI : Module.Finite (ZMod l) V := Module.Finite.of_finite
   induction m with
-  | zero =>
-    exact ⟨Fin.elim0, linearIndependent_empty_type, fun _ j => j.elim0⟩
+  | zero => exact ⟨Fin.elim0, linearIndependent_empty_type, fun _ j => j.elim0⟩
   | succ m ih =>
     obtain ⟨v, hv, hs⟩ := ih (Nat.le_of_succ_le hm)
     set U := Submodule.span (ZMod l) (Set.range v) with hU
@@ -36,8 +41,7 @@ private theorem exists_invariant_flag_mod_l (hF : FixVec) (l : ℕ) [Fact l.Prim
       exact hle hu
     have hne : U ≠ ⊤ := by
       intro htop
-      have h1 : finrank (ZMod l) U = m := by
-        rw [hU, finrank_span_eq_card hv]; simp
+      have h1 : finrank (ZMod l) U = m := by rw [hU, finrank_span_eq_card hv]; simp
       rw [htop, finrank_top] at h1
       omega
     obtain ⟨x, hx, hxs⟩ := hF l H hH V ρ U hst hne
@@ -45,7 +49,7 @@ private theorem exists_invariant_flag_mod_l (hF : FixVec) (l : ℕ) [Fact l.Prim
     · exact (linearIndependent_finSnoc).2 ⟨hv, hx⟩
     · intro h j
       refine Fin.lastCases ?_ (fun j => ?_) j
-      · have himg : (Fin.snoc v x : Fin (m+1) → V) '' {i | i < Fin.last m} = Set.range v := by
+      · have himg : (Fin.snoc v x : Fin (m + 1) → V) '' {i | i < Fin.last m} = Set.range v := by
           ext y
           constructor
           · rintro ⟨i, hi, rfl⟩
@@ -57,7 +61,8 @@ private theorem exists_invariant_flag_mod_l (hF : FixVec) (l : ℕ) [Fact l.Prim
         simp only [Fin.snoc_last]
         rw [himg]
         exact hxs h
-      · have himg : v '' {i | i < j} ⊆ (Fin.snoc v x : Fin (m+1) → V) '' {i | i < j.castSucc} := by
+      · have himg
+            : v '' {i | i < j} ⊆ (Fin.snoc v x : Fin (m + 1) → V) '' {i | i < j.castSucc} := by
           rintro _ ⟨i, hi, rfl⟩
           exact ⟨i.castSucc, by simpa using hi, by simp⟩
         simp only [Fin.snoc_castSucc]
@@ -75,14 +80,12 @@ theorem flag_pf : FixVec → Flag := by
   intro h i j hji
   have hb : ∀ j, b j = v j := fun j => Basis.mk_apply hv hsp j
   have hmem : ρ h (b j) - b j ∈ Submodule.span (ZMod l) (b '' {i | i < j}) := by
-    have : (b : _ → V) '' {i | i < j} = v '' {i | i < j} := by
-      ext y; simp [hb]
+    have : (b : _ → V) '' {i | i < j} = v '' {i | i < j} := by ext y; simp [hb]
     rw [this, hb]
     exact hs h j
   have hsupp := (Basis.mem_span_image b).1 hmem
   by_contra hne
-  have hi : i ∈ ((b.repr (ρ h (b j) - b j)).support : Set _) := by
-    simpa using hne
+  have hi : i ∈ ((b.repr (ρ h (b j) - b j)).support : Set _) := by simpa using hne
   have := hsupp hi
   exact absurd this (not_lt.2 hji)
 

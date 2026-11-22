@@ -20,13 +20,16 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.For
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Frames
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Frames
 
 namespace GlobalTheory.Exist
 
 theorem extendGen : extendGenSt.{0} :=
-  (GlobalTheory.cubical_extends_and_extendGen GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected
+  (GlobalTheory.cubical_extends_and_extendGen
+    GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected
     GlobalTheory.GenExtend.existsUnique_gen_extend).2
 
 end GlobalTheory.Exist

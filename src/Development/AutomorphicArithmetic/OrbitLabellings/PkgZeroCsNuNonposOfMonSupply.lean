@@ -8,11 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ExistsCutInto
 
 open Formalism.L2.FormalSeriesBounds UpperTheory.G2
 
-
 open Formalism.IncomingBounds in
-private theorem cut (K s B : ℕ) (e : ℕ → ℕ) : ∃ pc : Fin s → ℕ → ℕ,
-    (∀ u, ∑ k ∈ Finset.Icc 1 K, pc u k ≤ B) ∧
-    (∑ k ∈ Finset.Icc 1 K, e k ≤ s * B → (∀ k, e k ≠ 0 → 1 ≤ k ∧ k ≤ K) → ∀ k, ∑ u, pc u k = e k) := by
+private theorem cut (K s B : ℕ) (e : ℕ → ℕ)
+    : ∃ pc : Fin s → ℕ → ℕ,
+      (∀ u, ∑ k ∈ Finset.Icc 1 K, pc u k ≤ B)
+        ∧ (∑ k ∈ Finset.Icc 1 K, e k ≤ s * B → (∀ k, e k ≠ 0 → 1 ≤ k ∧ k ≤ K)
+          → ∀ k, ∑ u, pc u k = e k) := by
   by_cases h : ∑ k ∈ Finset.Icc 1 K, e k ≤ s * B
   · obtain ⟨pc, h1, h2, h3⟩ := GlobalTheory.exists_cut_columns_bounded_width K s B e h
     refine ⟨pc, h2, fun _ hs k => ?_⟩
@@ -25,18 +26,17 @@ private theorem cut (K s B : ℕ) (e : ℕ → ℕ) : ∃ pc : Fin s → ℕ →
       exact Finset.sum_eq_zero fun u _ => h3 u k hk
   · exact ⟨fun _ _ => 0, by simp, fun h' => absurd h' h⟩
 
-
 open Formalism.IncomingBounds in
-private theorem monAl_le_first (K rk : ℕ) (e : ℕ → ℕ) (ρ : ℕ) :
-    monAl K rk e ρ ≤ ∑ k ∈ Finset.Icc 1 K, e k := by
+private theorem monAl_le_first (K rk : ℕ) (e : ℕ → ℕ) (ρ : ℕ)
+    : monAl K rk e ρ ≤ ∑ k ∈ Finset.Icc 1 K, e k := by
   unfold monAl
   apply Finset.sum_le_sum_of_subset
   intro k hk
   rw [Finset.mem_Icc] at hk ⊢
   exact ⟨le_trans (Nat.le_add_left 1 ρ) hk.1, le_trans hk.2 (min_le_left _ _)⟩
 
-theorem UpperTheory.pkgZeroCs_nu_nonpos_of_monSupply :
-    RF.MONSupply → ∀ (P : RF.Par) (l : ℕ) (Pk : PkgZeroCs P l), Pk.ν ≤ 0 := by
+theorem UpperTheory.pkgZeroCs_nu_nonpos_of_monSupply
+    : RF.MONSupply → ∀ (P : RF.Par) (l : ℕ) (Pk : PkgZeroCs P l), Pk.ν ≤ 0 := by
   intro hM P l Pk
   have hl : Pk.R.V.l = l := Pk.R.hVl
   have hl2 : 2 ≤ l := hl ▸ Pk.R.V.l_prime.two_le
@@ -47,7 +47,8 @@ theorem UpperTheory.pkgZeroCs_nu_nonpos_of_monSupply :
   let blk : ↥Pk.Z → ZMod (2 * P.d) → Fin Pk.s → RF.GlobalTheory (2 * P.d) := fun o σ u =>
     RF.GlobalTheory.mon 0 (fun a k => if a = σ then pc o σ u k else 0) Pk.K
   let L : ↥Pk.Z → List (RF.GlobalTheory (2 * P.d) × ℝ) := fun o =>
-    (Finset.univ : Finset (ZMod (2 * P.d) × Fin Pk.s)).toList.map (fun p => (blk o p.1 p.2, (0 : ℝ)))
+    (Finset.univ : Finset (ZMod (2 * P.d) × Fin Pk.s)).toList.map
+      (fun p => (blk o p.1 p.2, (0 : ℝ)))
   have hmem : ∀ o, ∀ q ∈ L o, ∃ σ u, q = (blk o σ u, (0 : ℝ)) := by
     intro o q hq
     obtain ⟨p, -, rfl⟩ := List.mem_map.1 hq
@@ -63,8 +64,10 @@ theorem UpperTheory.pkgZeroCs_nu_nonpos_of_monSupply :
     apply (hM _ _ _ _ _ (Pk.R.X o) (Pk.R.F o) 0 _ Pk.K).2
     intro a ρ
     rw [hl]
-    calc monAl Pk.K ((Pk.R.X o).rkF 0 a) (fun k => if a = σ then pc o σ u k else 0) ρ
-        ≤ ∑ k ∈ Finset.Icc 1 Pk.K, (fun k => if a = σ then pc o σ u k else 0) k := monAl_le_first _ _ _ _
+    calc
+      monAl Pk.K ((Pk.R.X o).rkF 0 a) (fun k => if a = σ then pc o σ u k else 0) ρ
+          ≤ ∑ k ∈ Finset.Icc 1 Pk.K, (fun k => if a = σ then pc o σ u k else 0) k :=
+        monAl_le_first _ _ _ _
       _ ≤ l - 1 := by
         by_cases ha : a = σ
         · simp only [ha, if_true]
@@ -75,12 +78,17 @@ theorem UpperTheory.pkgZeroCs_nu_nonpos_of_monSupply :
     obtain ⟨σ, u, rfl⟩ := hmem o q hq
     obtain ⟨-, rfl, -⟩ := RF.GlobalTheory.mon.inj hqe
     exact ⟨σ, fun a k ha => if_neg ha⟩
-  · have hrow : ∀ o, (List.map (fun q => RF.GlobalTheory.what₂ (Pk.R.X o).n q.1) (L o)).sum = 2 * P.d * Pk.s * Pk.K := by
+  · have hrow
+        : ∀ o,
+          (List.map (fun q => RF.GlobalTheory.what₂ (Pk.R.X o).n q.1) (L o)).sum
+            = 2 * P.d * Pk.s * Pk.K := by
       intro o
       simp [L, blk, RF.GlobalTheory.what₂]
     simp only [hrow]
     rw [Finset.sum_const, Finset.card_univ, Fintype.card_coe, smul_eq_mul]
-    calc 2 * (Pk.Z.card * (2 * P.d * Pk.s * Pk.K)) = 4 * Pk.K * Pk.s * (Pk.Z.card * P.d) := by ring
+    calc
+      2 * (Pk.Z.card * (2 * P.d * Pk.s * Pk.K))
+        = 4 * Pk.K * Pk.s * (Pk.Z.card * P.d) := by ring
       _ ≤ Pk.nW := Pk.what₂
   · intro o s k
     simp [L, blk, RF.GlobalTheory.wt]

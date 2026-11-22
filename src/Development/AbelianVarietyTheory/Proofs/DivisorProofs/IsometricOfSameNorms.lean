@@ -26,8 +26,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open Formalism.BasicNotions GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.Mean4O GlobalTheory.CoverNorm
+open CategoryTheory AlgebraicGeometry NumberField IsDedekindDomain
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Formalism.BasicNotions GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts
+  GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.Mean4O GlobalTheory.CoverNorm
 
 namespace GlobalTheory.CoverNorm.Isom
 
@@ -41,9 +44,8 @@ theorem asIdeal_p_j (V : Cover Y) (y : V.G) : (V.p (V.j y)).asIdeal = ⊥ := by
   exact Ideal.comap_bot_of_injective _ (IsFractionRing.injective (𝓞 F) F)
 
 theorem mem_range_j (V : Cover Y) {x : V.X} (hx : (V.p x).asIdeal = ⊥) : x ∈ Set.range V.j := by
-  rw [← V.pb.isoPullback_hom_fst, Scheme.Hom.comp_base, TopCat.coe_comp,
-    Set.range_comp, V.pb.isoPullback.hom.surjective.range_eq, Set.image_univ,
-    Scheme.Pullback.range_fst]
+  rw [← V.pb.isoPullback_hom_fst, Scheme.Hom.comp_base, TopCat.coe_comp, Set.range_comp,
+    V.pb.isoPullback.hom.surjective.range_eq, Set.image_univ, Scheme.Pullback.range_fst]
   refine ⟨IsLocalRing.closedPoint F, PrimeSpectrum.ext (Eq.trans ?_ hx.symm)⟩
   change Ideal.comap (algebraMap (𝓞 F) F) (IsLocalRing.maximalIdeal F) = ⊥
   rw [IsLocalRing.maximalIdeal_eq_bot]
@@ -51,17 +53,21 @@ theorem mem_range_j (V : Cover Y) {x : V.X} (hx : (V.p x).asIdeal = ⊥) : x ∈
 
 theorem j_gen_specializes (V : Cover Y) : V.j (genericPoint V.G) ⤳ genericPoint V.X := by
   have h0 : (V.p (genericPoint V.X)).asIdeal = ⊥ :=
-    eq_bot_iff.2 (((PrimeSpectrum.asIdeal_le_asIdeal _ _).2 ((PrimeSpectrum.le_iff_specializes _ _).2
-      ((genericPoint_specializes (V.j (genericPoint V.G))).map V.p.continuous))).trans
-        (asIdeal_p_j V _).le)
+    eq_bot_iff.2 (((PrimeSpectrum.asIdeal_le_asIdeal _ _).2
+        ((PrimeSpectrum.le_iff_specializes _ _).2
+          ((genericPoint_specializes (V.j (genericPoint V.G))).map V.p.continuous))).trans
+      (asIdeal_p_j V _).le)
   obtain ⟨y, hy⟩ := mem_range_j V h0
   exact hy ▸ (genericPoint_specializes y).map V.j.continuous
 
-theorem cxPts_from_generic_fibre (V : Cover Y) (τ : 𝓞 F →+* ℂ) (y' : CxPts V.p τ) :
-    ∃ σ : F →+* ℂ, σ.comp (algebraMap (𝓞 F) F) = τ ∧ ∃ z : CxPts (V.π ≫ Y.str) σ, y'.1 = z.1 ≫ V.j := by
+theorem cxPts_from_generic_fibre (V : Cover Y) (τ : 𝓞 F →+* ℂ) (y' : CxPts V.p τ)
+    : ∃ σ : F →+* ℂ,
+      σ.comp (algebraMap (𝓞 F) F) = τ ∧ ∃ z : CxPts (V.π ≫ Y.str) σ, y'.1 = z.1 ≫ V.j := by
   have hτ := ringOfIntegers_hom_complex_injective F τ
-  obtain ⟨σ, hσ⟩ : ∃ σ : F →+* ℂ, σ.comp (algebraMap (𝓞 F) F) = τ :=
-    ⟨IsFractionRing.lift (K := F) hτ, RingHom.ext fun x => IsFractionRing.lift_algebraMap (K := F) hτ x⟩
+  obtain ⟨σ, hσ⟩ : ∃ σ : F →+* ℂ, σ.comp (algebraMap (𝓞 F) F) = τ := ⟨
+    IsFractionRing.lift (K := F) hτ,
+    RingHom.ext fun x => IsFractionRing.lift_algebraMap (K := F) hτ x
+  ⟩
   refine ⟨σ, hσ, ?_⟩
   have hw : y'.1 ≫ V.p = spMap σ ≫ spMap (algebraMap (𝓞 F) F) :=
     y'.2.trans ((congrArg spMap hσ.symm).trans (spMap_comp _ _))

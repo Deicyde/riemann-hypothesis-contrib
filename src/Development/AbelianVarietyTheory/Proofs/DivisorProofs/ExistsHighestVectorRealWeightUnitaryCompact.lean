@@ -10,20 +10,30 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DualInfin
 open Matrix GlobalTheory.HolDS
 open Formalism.REAL (GlRel IsUnitary IsWeight KHighest root Jm inG)
 open Formalism.QuantumDeterminants (lowK IsHCParam)
-open Formalism.MainNotions.S (IsURepOn IsIrredOn UJset IsKFin IsKTypeOf IsKStableOn IsDS lowKSub vNormSq)
+open Formalism.MainNotions.S
+  (IsURepOn IsIrredOn UJset IsKFin IsKTypeOf IsKStableOn IsDS lowKSub vNormSq)
 open CompanionTheory.D.DSIC (KRel KUnit KStab IsSmMod)
 open CompanionTheory.D.LK (IsKMod IsMin)
 open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem exists_kHighest_real_of_finiteDimensional : ∀ (n : ℕ) (ε : Fin n → Bool) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (E : Fin n → Fin n → Module.End ℂ V), KRel ε E → KUnit ε E → ∀ N : Submodule ℂ V, FiniteDimensional ℂ N → KStab ε E N → N ≠ ⊥ → ∃ (μ : Fin n → ℝ) (w : V), w ∈ N ∧ w ≠ 0 ∧ KHighest ε E μ w := by
+theorem exists_kHighest_real_of_finiteDimensional
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+        (E : Fin n → Fin n → Module.End ℂ V),
+      KRel ε E → KUnit ε E
+        → ∀ N : Submodule ℂ V,
+          FiniteDimensional ℂ N → KStab ε E N → N ≠ ⊥
+            → ∃ (μ : Fin n → ℝ) (w : V), w ∈ N ∧ w ≠ 0 ∧ KHighest ε E μ w := by
   intro n ε V _ _ E hR hU N hfd hS hN
   classical
   haveI : FiniteDimensional ℂ N := hfd
   haveI : Nontrivial N := Submodule.nontrivial_iff_ne_bot.2 hN
-  have hcomm : ∀ k i j, ε i = ε j → E k k * E i j - E i j * E k k =
-      ((if k = i then (1 : ℂ) else 0) - (if j = k then 1 else 0)) • E i j := by
+  have hcomm
+      : ∀ k i j,
+        ε i = ε j
+          → E k k * E i j - E i j * E k k
+            = ((if k = i then (1 : ℂ) else 0) - (if j = k then 1 else 0)) • E i j := by
     intro k i j h
     rw [hR k k i j rfl h]
     by_cases h1 : k = i <;> by_cases h2 : j = k
@@ -35,7 +45,8 @@ theorem exists_kHighest_real_of_finiteDimensional : ∀ (n : ℕ) (ε : Fin n �
   have hH : ∀ i j, ε i = ε j → H * E i j = E i j * H + (((i : ℕ) : ℂ) - (j : ℕ)) • E i j := by
     intro i j hij
     rw [← sub_eq_iff_eq_add', Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
-    simp only [smul_mul_assoc, mul_smul_comm, ← smul_sub, hcomm _ _ _ hij, smul_smul, ← Finset.sum_smul]
+    simp only [smul_mul_assoc, mul_smul_comm, ← smul_sub, hcomm _ _ _ hij, smul_smul,
+      ← Finset.sum_smul]
     simp [mul_sub]
   have hHN : ∀ v ∈ N, H v ∈ N := by
     intro v hv
@@ -43,8 +54,9 @@ theorem exists_kHighest_real_of_finiteDimensional : ∀ (n : ℕ) (ε : Fin n �
     exact N.sum_mem fun k _ => N.smul_mem _ (hS k k rfl v hv)
   let HN : Module.End ℂ N := H.restrict hHN
   let D : Fin n → Module.End ℂ N := fun k => (E k k).restrict (fun v hv => hS k k rfl v hv)
-  obtain ⟨l, hl, hmin⟩ := Set.exists_min_image {c | HN.HasEigenvalue c} Complex.re
-    (Module.End.finite_hasEigenvalue HN) (Module.End.exists_eigenvalue HN)
+  obtain ⟨l, hl, hmin⟩ :=
+    Set.exists_min_image {c | HN.HasEigenvalue c} Complex.re (Module.End.finite_hasEigenvalue HN)
+      (Module.End.exists_eigenvalue HN)
   have hDc : ∀ i j, D i * D j = D j * D i := by
     intro i j
     apply LinearMap.ext
@@ -57,8 +69,8 @@ theorem exists_kHighest_real_of_finiteDimensional : ∀ (n : ℕ) (ε : Fin n �
       · simp [h1, Ne.symm h1]
     rw [h', zero_smul, LinearMap.zero_apply, LinearMap.sub_apply, sub_eq_zero] at h
     simpa [D, LinearMap.restrict_apply] using h
-  obtain ⟨v, hv, hv0, ν, hν⟩ := GlobalTheory.AlgInfChar.exists_joint_eigenvector D hDc (HN.eigenspace l) hl
-    (fun k u hu => by
+  obtain ⟨v, hv, hv0, ν, hν⟩ :=
+    GlobalTheory.AlgInfChar.exists_joint_eigenvector D hDc (HN.eigenspace l) hl (fun k u hu => by
       rw [Module.End.mem_eigenspace_iff] at hu ⊢
       apply Subtype.ext
       have h1 := LinearMap.congr_fun (hH k k rfl) (u : V)
@@ -86,7 +98,8 @@ theorem exists_kHighest_real_of_finiteDimensional : ∀ (n : ℕ) (ε : Fin n �
     simp only [Module.End.mul_apply, LinearMap.add_apply, LinearMap.smul_apply] at h1
     simp only [HN, u, LinearMap.restrict_apply, SetLike.val_smul]
     rw [h1, hHv, map_smul, add_smul]
-  have h2 := hmin _ (Module.End.hasEigenvalue_of_hasEigenvector ⟨Module.End.mem_eigenspace_iff.2 hHu, hu0⟩)
+  have h2 :=
+    hmin _ (Module.End.hasEigenvalue_of_hasEigenvector ⟨Module.End.mem_eigenspace_iff.2 hHu, hu0⟩)
   have hab' : (a : ℕ) < b := hab
   simp at h2
   exact absurd hab' (not_lt.2 (by exact_mod_cast h2))

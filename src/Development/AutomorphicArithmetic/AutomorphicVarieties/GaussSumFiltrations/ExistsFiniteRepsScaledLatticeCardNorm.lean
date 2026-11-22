@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaussSumFil
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 
 noncomputable section
@@ -14,8 +16,8 @@ namespace GlobalTheory.HilbertThetaSeries.RepsLat
 
 variable {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
 
-theorem mem_aL_iff (a : F) (x : κ → F) :
-    x ∈ aL κ a ↔ ∃ m : κ → 𝓞 F, x = fun i => a * (m i : F) := by
+theorem mem_aL_iff (a : F) (x : κ → F)
+    : x ∈ aL κ a ↔ ∃ m : κ → 𝓞 F, x = fun i => a * (m i : F) := by
   constructor
   · rintro ⟨l, hl, rfl⟩
     refine ⟨fun i => ⟨l i, (AddSubgroup.mem_pi _).1 hl i (Set.mem_univ _)⟩, ?_⟩
@@ -31,11 +33,13 @@ end GlobalTheory.HilbertThetaSeries.RepsLat
 
 namespace GlobalTheory.HilbertThetaSeries
 
-
 open GlobalTheory.HilbertThetaSeries.RepsLat in
-theorem exists_isReps_aL : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [DecidableEq κ] (a b : F),
-    a ≠ 0 → b ≠ 0 → IsIntegral ℤ (a / b) → ∃ T : Finset (κ → F), IsReps (aL κ a) (aL κ b) T ∧ 0 ∈ T ∧
-      aL κ a ≤ aL κ b ∧ (T.card : ℚ) = |Algebra.norm ℚ (a / b)| ^ Fintype.card κ := by
+theorem exists_isReps_aL
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [DecidableEq κ] (a b : F),
+      a ≠ 0 → b ≠ 0 → IsIntegral ℤ (a / b)
+        → ∃ T : Finset (κ → F),
+          IsReps (aL κ a) (aL κ b) T ∧ 0 ∈ T ∧ aL κ a ≤ aL κ b
+            ∧ (T.card : ℚ) = |Algebra.norm ℚ (a / b)| ^ Fintype.card κ := by
   intro F _ _ κ _ _ a b ha hb hc
   obtain ⟨c, hcF⟩ : ∃ c : 𝓞 F, (c : F) = a / b := ⟨⟨a / b, hc⟩, rfl⟩
   have hab : a = b * (c : F) := by rw [hcF]; field_simp
@@ -54,7 +58,8 @@ theorem exists_isReps_aL : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) 
   haveI : Finite (𝓞 F ⧸ I) := Nat.finite_of_card_ne_zero (hcard ▸ hne)
   letI : Fintype (𝓞 F ⧸ I) := Fintype.ofFinite _
   classical
-  let s : 𝓞 F ⧸ I → 𝓞 F := fun q => if q = 0 then 0 else Classical.choose (Ideal.Quotient.mk_surjective q)
+  let s : 𝓞 F ⧸ I → 𝓞 F := fun q =>
+    if q = 0 then 0 else Classical.choose (Ideal.Quotient.mk_surjective q)
   have hs : ∀ q, Ideal.Quotient.mk I (s q) = q := by
     intro q
     by_cases h : q = 0
@@ -75,7 +80,11 @@ theorem exists_isReps_aL : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) 
     exact (mem_aL_iff b _).2 ⟨fun i => s (q i), rfl⟩
   · intro x hx
     obtain ⟨m, rfl⟩ := (mem_aL_iff b x).1 hx
-    refine ⟨e (fun i => Ideal.Quotient.mk I (m i)), ⟨Finset.mem_image_of_mem _ (Finset.mem_univ _), ?_⟩, ?_⟩
+    refine ⟨
+      e (fun i => Ideal.Quotient.mk I (m i)),
+      ⟨Finset.mem_image_of_mem _ (Finset.mem_univ _), ?_⟩,
+      ?_
+    ⟩
     · have hI : ∀ i, m i - s (Ideal.Quotient.mk I (m i)) ∈ I := fun i => by
         rw [← Ideal.Quotient.eq, hs]
       choose r hr using fun i => Ideal.mem_span_singleton'.1 (hI i)
@@ -98,7 +107,8 @@ theorem exists_isReps_aL : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) 
           apply mul_left_cancel₀ hb
           rw [hab] at h1
           linear_combination h1
-        have h3 : m i - s (q i) ∈ I := Ideal.mem_span_singleton'.2 ⟨r i, (RingOfIntegers.ext h2).symm⟩
+        have h3 : m i - s (q i) ∈ I :=
+          Ideal.mem_span_singleton'.2 ⟨r i, (RingOfIntegers.ext h2).symm⟩
         rw [← hs (q i)]
         exact (Ideal.Quotient.eq.2 h3).symm
       rw [hq]
@@ -112,13 +122,24 @@ theorem exists_isReps_aL : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) 
     simp only [map_mul]
     rw [hab]
     ring
-  · rw [Finset.card_image_of_injective _ he, Finset.card_univ, Fintype.card_fun, ← Nat.card_eq_fintype_card,
-      hcard, ← hcF, Nat.cast_pow, Nat.cast_natAbs, ← Algebra.coe_norm_int, Int.cast_abs]
+  · rw [Finset.card_image_of_injective _ he, Finset.card_univ, Fintype.card_fun,
+      ← Nat.card_eq_fintype_card, hcard, ← hcF, Nat.cast_pow, Nat.cast_natAbs,
+      ← Algebra.coe_norm_int, Int.cast_abs]
 
 end GlobalTheory.HilbertThetaSeries
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_finite_reps_scaled_lattice_card_norm : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [DecidableEq κ] (a b : F), a ≠ 0 → b ≠ 0 → IsIntegral ℤ (a / b) → ∃ T : Finset (κ → F), IsReps (aL κ a) (aL κ b) T ∧ 0 ∈ T ∧ aL κ a ≤ aL κ b ∧ (T.card : ℚ) = |Algebra.norm ℚ (a / b)| ^ Fintype.card κ := by
-  first | exact @GlobalTheory.HilbertThetaSeries.exists_isReps_aL | exact GlobalTheory.HilbertThetaSeries.exists_isReps_aL | (intros; apply GlobalTheory.HilbertThetaSeries.exists_isReps_aL <;> assumption)
+theorem _root_.GlobalTheory.T.exists_finite_reps_scaled_lattice_card_norm
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] [DecidableEq κ] (a b : F),
+      a ≠ 0 → b ≠ 0 → IsIntegral ℤ (a / b)
+        → ∃ T : Finset (κ → F),
+          IsReps (aL κ a) (aL κ b) T ∧ 0 ∈ T ∧ aL κ a ≤ aL κ b
+            ∧ (T.card : ℚ) = |Algebra.norm ℚ (a / b)| ^ Fintype.card κ := by
+  first
+  | exact @GlobalTheory.HilbertThetaSeries.exists_isReps_aL
+  | exact GlobalTheory.HilbertThetaSeries.exists_isReps_aL
+  | (intros; apply GlobalTheory.HilbertThetaSeries.exists_isReps_aL <;> assumption)

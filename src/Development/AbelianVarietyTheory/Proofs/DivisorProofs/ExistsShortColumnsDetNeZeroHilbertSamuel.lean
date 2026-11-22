@@ -15,15 +15,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DetColumnsNe
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 set_option autoImplicit false
 
 namespace GlobalTheory.HSShort.ChooseCols
 
-theorem avoid : ∀ (E : Type) [Field E] [Infinite E] (N δ : ℕ) (y : Fin δ → Fin N → E), (∀ p, y p ≠ 0) →
-    ∃ l : Fin N → E, ∀ p, ∑ k, l k * y p k ≠ 0 := by
+theorem avoid
+    : ∀ (E : Type) [Field E] [Infinite E] (N δ : ℕ) (y : Fin δ → Fin N → E),
+      (∀ p, y p ≠ 0) → ∃ l : Fin N → E, ∀ p, ∑ k, l k * y p k ≠ 0 := by
   intro E _ _ N δ y hy
   classical
   let P : MvPolynomial (Fin N) E := ∏ p, ∑ k, X k * C (y p k)
@@ -44,9 +47,11 @@ theorem avoid : ∀ (E : Type) [Field E] [Infinite E] (N δ : ℕ) (y : Fin δ �
   rw [h2, Finset.prod_ne_zero_iff] at hx
   exact hx p (Finset.mem_univ _)
 
-theorem span_basis : ∀ (F E A A' : Type) [Field F] [Field E] [Algebra F E] [AddCommGroup A] [Module F A] [AddCommGroup A']
-    [Module E A'] (ι : A →ₛₗ[algebraMap F E] A') (V : Submodule F A) (r : ℕ) (bb : Module.Basis (Fin r) F V),
-    Submodule.span E (ι '' (V : Set A)) = Submodule.span E (Set.range fun i => ι (bb i)) := by
+theorem span_basis
+    : ∀ (F E A A' : Type) [Field F] [Field E] [Algebra F E] [AddCommGroup A] [Module F A]
+        [AddCommGroup A'] [Module E A'] (ι : A →ₛₗ[algebraMap F E] A') (V : Submodule F A) (r : ℕ)
+        (bb : Module.Basis (Fin r) F V),
+      Submodule.span E (ι '' (V : Set A)) = Submodule.span E (Set.range fun i => ι (bb i)) := by
   intro F E A A' _ _ _ _ _ _ _ ι V r bb
   apply le_antisymm
   · rw [Submodule.span_le]
@@ -64,9 +69,11 @@ theorem span_basis : ∀ (F E A A' : Type) [Field F] [Field E] [Algebra F E] [Ad
     rintro _ ⟨i, rfl⟩
     exact Submodule.subset_span ⟨bb i, (bb i).2, rfl⟩
 
-theorem pick_indep : ∀ (E M X : Type) [Field E] [AddCommGroup M] [Module E M] (g : X → M) (U : Submodule E M),
-    Submodule.span E (Set.range g) = U → FiniteDimensional E U →
-    ∃ (n : ℕ) (σ : Fin n → X), n = Module.finrank E U ∧ LinearIndependent E fun k => g (σ k) := by
+theorem pick_indep
+    : ∀ (E M X : Type) [Field E] [AddCommGroup M] [Module E M] (g : X → M) (U : Submodule E M),
+      Submodule.span E (Set.range g) = U → FiniteDimensional E U
+        → ∃ (n : ℕ) (σ : Fin n → X),
+          n = Module.finrank E U ∧ LinearIndependent E fun k => g (σ k) := by
   intro E M X _ _ _ g U hU hfin
   classical
   obtain ⟨B, hBsub, hBspan, hBind⟩ := exists_linearIndependent E (Set.range g)
@@ -89,11 +96,15 @@ theorem pick_indep : ∀ (E M X : Type) [Field E] [AddCommGroup M] [Module E M] 
     funext k
     exact hτ (e k)
 
-theorem deep_span : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A]
-    [IsScalarTower (𝓞 F) F A] (S : Sys F A) (E A' : Type) [Field E] [Algebra F E] [AddCommGroup A'] [Module E A']
-    (s : Fin S.D → Fin S.N → E) (δ : ℕ) (Φ : S.Flat E A' s δ) (r : ℕ) (bD : Module.Basis (Fin r) F (S.V S.D)),
-    Φ.U (S.T - S.D) = Submodule.span E
-      (Set.range fun p : MonoDeg (Fin S.D) (S.T - S.D) × Fin r => pw Φ.mul s p.1.1 (Φ.ι (bD p.2))) := by
+theorem deep_span
+    : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A]
+        [IsScalarTower (𝓞 F) F A] (S : Sys F A) (E A' : Type) [Field E] [Algebra F E]
+        [AddCommGroup A'] [Module E A'] (s : Fin S.D → Fin S.N → E) (δ : ℕ) (Φ : S.Flat E A' s δ)
+        (r : ℕ) (bD : Module.Basis (Fin r) F (S.V S.D)),
+      Φ.U (S.T - S.D)
+        = Submodule.span E
+          (Set.range fun p : MonoDeg (Fin S.D) (S.T - S.D) × Fin r =>
+            pw Φ.mul s p.1.1 (Φ.ι (bD p.2))) := by
   intro F A _ _ _ _ _ _ S E A' _ _ _ _ s δ Φ r bD
   rw [Φ.div, span_basis F E A A' Φ.ι (S.V S.D) r bD]
   simp_rw [Submodule.map_span]
@@ -102,7 +113,20 @@ theorem deep_span : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] 
   ext x
   simp
 
-theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A] [IsScalarTower (𝓞 F) F A] (S : Sys F A), S.Hyp → ∀ (E A' : Type) [Field E] [Algebra F E] [AddCommGroup A'] [Module E A'] (s : Fin S.D → Fin S.N → F) (δ : ℕ) (Φ : S.Flat E A' (fun i k => algebraMap F E (s i k)) δ) (d : ℕ) (b : Module.Basis (Fin d) F (S.V S.T)) (c : Fin d → A →ₗ[F] F), S.IsCo b c → ∃ (col : Fin d → S.Col) (m : Fin δ → S.V 0) (ix : (Σ a : Fin (S.T - S.D), MonoDeg (Fin S.D) a) × Fin δ ↪ Fin d), S.Shape δ col m ix ∧ S.ShortCols col ∧ (Finset.univ.filter fun k => (col k).j = S.D).card = S.deepRank s ∧ S.det c col ≠ 0 := by
+theorem exists_cols
+    : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A]
+        [IsScalarTower (𝓞 F) F A] (S : Sys F A),
+      S.Hyp
+        → ∀ (E A' : Type) [Field E] [Algebra F E] [AddCommGroup A'] [Module E A']
+            (s : Fin S.D → Fin S.N → F) (δ : ℕ)
+            (Φ : S.Flat E A' (fun i k => algebraMap F E (s i k)) δ) (d : ℕ)
+            (b : Module.Basis (Fin d) F (S.V S.T)) (c : Fin d → A →ₗ[F] F),
+          S.IsCo b c
+            → ∃ (col : Fin d → S.Col) (m : Fin δ → S.V 0)
+                (ix : (Σ a : Fin (S.T - S.D), MonoDeg (Fin S.D) a) × Fin δ ↪ Fin d),
+              S.Shape δ col m ix ∧ S.ShortCols col
+                ∧ (Finset.univ.filter fun k => (col k).j = S.D).card = S.deepRank s
+                ∧ S.det c col ≠ 0 := by
   intro F A _ _ _ _ _ _ S hS E A' _ _ _ _ s δ Φ d b c hc
   classical
   have hD1 := hS.one_le
@@ -112,40 +136,54 @@ theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A
   obtain ⟨r0, b0, hb0⟩ := hS.short0
   obtain ⟨rD, bD, hbD⟩ := hS.shortD
   obtain ⟨rT, bT, hbT⟩ := hS.shortT
-  obtain ⟨σ0, hσ0⟩ := GlobalTheory.T.exists_basis_choice_det_ne_zero' F E A A' Φ.ι (S.V 0) r0 δ b0 Φ.res Φ.onto
+  obtain ⟨σ0, hσ0⟩ :=
+    GlobalTheory.T.exists_basis_choice_det_ne_zero' F E A A' Φ.ι (S.V 0) r0 δ b0 Φ.res Φ.onto
   obtain ⟨l, hl⟩ := avoid E S.N δ Φ.y Φ.y_ne
-  have hwX : ∀ q : (Σ a : Fin (S.T - S.D), MonoDeg (Fin S.D) a), ∃ β : Fin S.T → Fin (S.D + 1),
-      (∀ i : Fin S.D, (Finset.univ.filter fun r => β r = i.castSucc).card = q.2.1 i) ∧
-      (q.2.1.degree = S.T → ∀ r, β r ≠ Fin.last S.D) ∧
-      ∀ (M : Type) [Monoid M] (f : Fin (S.D + 1) → M), (List.ofFn fun r => f (β r)).prod =
-        (List.ofFn fun i : Fin S.D => f i.castSucc ^ q.2.1 i).prod * f (Fin.last S.D) ^ (S.T - q.2.1.degree) :=
-    fun q => GlobalTheory.T.exists_block_word_of_type_prod S.D S.T q.2.1 (by have h1 := q.2.2; have h2 := q.1.2; omega)
+  have hwX
+      : ∀ q : (Σ a : Fin (S.T - S.D), MonoDeg (Fin S.D) a), ∃ β : Fin S.T → Fin (S.D + 1),
+        (∀ i : Fin S.D, (Finset.univ.filter fun r => β r = i.castSucc).card = q.2.1 i)
+          ∧ (q.2.1.degree = S.T → ∀ r, β r ≠ Fin.last S.D)
+          ∧ ∀ (M : Type) [Monoid M] (f : Fin (S.D + 1) → M),
+            (List.ofFn fun r => f (β r)).prod
+              = (List.ofFn fun i : Fin S.D => f i.castSucc ^ q.2.1 i).prod
+                * f (Fin.last S.D) ^ (S.T - q.2.1.degree) := fun q =>
+    GlobalTheory.T.exists_block_word_of_type_prod S.D S.T q.2.1
+      (by have h1 := q.2.2; have h2 := q.1.2; omega)
   choose βX hβX1 hβX2 hβX3 using hwX
-  have hwD : ∀ α : MonoDeg (Fin S.D) (S.T - S.D), ∃ β : Fin (S.T - S.D) → Fin (S.D + 1),
-      (∀ i : Fin S.D, (Finset.univ.filter fun r => β r = i.castSucc).card = α.1 i) ∧
-      (α.1.degree = S.T - S.D → ∀ r, β r ≠ Fin.last S.D) ∧
-      ∀ (M : Type) [Monoid M] (f : Fin (S.D + 1) → M), (List.ofFn fun r => f (β r)).prod =
-        (List.ofFn fun i : Fin S.D => f i.castSucc ^ α.1 i).prod * f (Fin.last S.D) ^ (S.T - S.D - α.1.degree) :=
-    fun α => GlobalTheory.T.exists_block_word_of_type_prod S.D (S.T - S.D) α.1 (le_of_eq α.2)
+  have hwD
+      : ∀ α : MonoDeg (Fin S.D) (S.T - S.D), ∃ β : Fin (S.T - S.D) → Fin (S.D + 1),
+        (∀ i : Fin S.D, (Finset.univ.filter fun r => β r = i.castSucc).card = α.1 i)
+          ∧ (α.1.degree = S.T - S.D → ∀ r, β r ≠ Fin.last S.D)
+          ∧ ∀ (M : Type) [Monoid M] (f : Fin (S.D + 1) → M),
+            (List.ofFn fun r => f (β r)).prod
+              = (List.ofFn fun i : Fin S.D => f i.castSucc ^ α.1 i).prod
+                * f (Fin.last S.D) ^ (S.T - S.D - α.1.degree) := fun α =>
+    GlobalTheory.T.exists_block_word_of_type_prod S.D (S.T - S.D) α.1 (le_of_eq α.2)
   choose βD hβD1 hβD2 hβD3 using hwD
   let s' : Fin S.D → Fin S.N → E := fun i k => algebraMap F E (s i k)
   let g : MonoDeg (Fin S.D) (S.T - S.D) × Fin rD → A' := fun p => pw Φ.mul s' p.1.1 (Φ.ι (bD p.2))
-  obtain ⟨hfin, hrank, -⟩ := GlobalTheory.T.finrank_deepestFiltrationStep_eq_rational F A S hS E A' s δ Φ
-  obtain ⟨n, σD, hn, hindD⟩ := pick_indep E A' _ g (Φ.U (S.T - S.D)) (deep_span F A S E A' s' δ Φ rD bD).symm hfin
+  obtain ⟨hfin, hrank, -⟩ :=
+    GlobalTheory.T.finrank_deepestFiltrationStep_eq_rational F A S hS E A' s δ Φ
+  obtain ⟨n, σD, hn, hindD⟩ :=
+    pick_indep E A' _ g (Φ.U (S.T - S.D)) (deep_span F A S E A' s' δ Φ rD bD).symm hfin
   let X := (Σ a : Fin (S.T - S.D), MonoDeg (Fin S.D) a) × Fin δ
   let m : Fin δ → S.V 0 := fun p => b0 (σ0 p)
   let colX : X → S.Col := fun q => ⟨0, S.T, Nat.zero_add _, βX q.1, m q.2⟩
   let colD : Fin n → S.Col := fun k => ⟨S.D, S.T - S.D, by omega, βD (σD k).1, bD (σD k).2⟩
   let d' := Fintype.card X + n
-  let e1 : X ⊕ Fin n ≃ Fin d' := (Equiv.sumCongr (Fintype.equivFin X) (Equiv.refl _)).trans finSumFinEquiv
+  let e1 : X ⊕ Fin n ≃ Fin d' :=
+    (Equiv.sumCongr (Fintype.equivFin X) (Equiv.refl _)).trans finSumFinEquiv
   let col' : Fin d' → S.Col := fun k => Sum.elim colX colD (e1.symm k)
-  let ix' : X ↪ Fin d' := ⟨fun q => e1 (Sum.inl q), fun a a' h => Sum.inl_injective (e1.injective h)⟩
+  let ix' : X ↪ Fin d' :=
+    ⟨fun q => e1 (Sum.inl q), fun a a' h => Sum.inl_injective (e1.injective h)⟩
   have hcolX : ∀ q, col' (ix' q) = colX q := fun q => by
     show Sum.elim colX colD (e1.symm (e1 (Sum.inl q))) = colX q
-    rw [Equiv.symm_apply_apply]; rfl
+    rw [Equiv.symm_apply_apply]
+    rfl
   have hcolD : ∀ k, col' (e1 (Sum.inr k)) = colD k := fun k => by
     show Sum.elim colX colD (e1.symm (e1 (Sum.inr k))) = colD k
-    rw [Equiv.symm_apply_apply]; rfl
+    rw [Equiv.symm_apply_apply]
+    rfl
   have hrange : ∀ k, k ∉ Set.range ix' → ∃ k', e1 (Sum.inr k') = k := by
     intro k hk
     rcases h : e1.symm k with q | k'
@@ -158,9 +196,13 @@ theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A
       left
       rw [hcolD]
       exact ⟨rfl, hβD2 _ (σD k').1.2⟩
-  let v : Fin d' → A' := fun k => word Φ.mul (fun q j => join s' l ((col' k).β q, j)) (Φ.ι (col' k).x)
-  obtain ⟨hsym, hdeepU⟩ := GlobalTheory.T.symbols_of_evaluated_columns_hermitianMultSystem F A S hS E A' s' δ Φ d' col' m ix' hshape' l
-  have hj : ∀ (i : Fin S.D) (j : Fin S.N), join s' l (Fin.castSucc i, j) = s' i j := fun i j => by simp [join]
+  let v : Fin d' → A' := fun k =>
+    word Φ.mul (fun q j => join s' l ((col' k).β q, j)) (Φ.ι (col' k).x)
+  obtain ⟨hsym, hdeepU⟩ :=
+    GlobalTheory.T.symbols_of_evaluated_columns_hermitianMultSystem F A S hS E A' s' δ Φ d' col' m
+      ix' hshape' l
+  have hj : ∀ (i : Fin S.D) (j : Fin S.N), join s' l (Fin.castSucc i, j) = s' i j := fun i j => by
+    simp [join]
   have hvD : ∀ k', v (e1 (Sum.inr k')) = g (σD k') := by
     intro k'
     show word Φ.mul (fun q j => join s' l ((col' (e1 (Sum.inr k'))).β q, j)) (Φ.ι (col' (e1 (Sum.inr k'))).x) = _
@@ -176,7 +218,9 @@ theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A
     funext j
     exact hj i j
   let ix'' : (Σ a : Fin (S.T - S.D), MonoDeg (Fin S.D) a × Fin δ) ↪ Fin d' :=
-    (Equiv.sigmaProdDistrib (fun a : Fin (S.T - S.D) => MonoDeg (Fin S.D) a) (Fin δ)).symm.toEmbedding.trans ix'
+    (Equiv.sigmaProdDistrib
+      (fun a : Fin (S.T - S.D) => MonoDeg (Fin S.D) a)
+      (Fin δ)).symm.toEmbedding.trans ix'
   have hv : ∀ q, v (ix'' q) ∈ Φ.U q.1 := fun q => (hsym q.1 q.2.1 q.2.2).choose
   let J : Finset (Fin d') := Finset.univ.filter fun k => k ∉ Set.range ix'
   have hJ : ∀ k ∈ J, k ∉ Set.range ix'' ∧ v k ∈ Φ.U (S.T - S.D) := by
@@ -185,12 +229,21 @@ theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A
     refine ⟨fun ⟨q, hq⟩ => hk' ⟨_, hq⟩, hdeepU k hk' ?_⟩
     obtain ⟨k', rfl⟩ := hrange k hk'
     rw [hcolD]
-  have hdet : ∀ a : Fin (S.T - S.D), (Matrix.of fun i i' : MonoDeg (Fin S.D) a × Fin δ =>
-      Φ.sym a ⟨v (ix'' ⟨a, i'⟩), hv ⟨a, i'⟩⟩ i).det ≠ 0 := by
+  have hdet
+      : ∀ a : Fin (S.T - S.D),
+        (Matrix.of fun i i' : MonoDeg (Fin S.D) a × Fin δ =>
+            Φ.sym a ⟨v (ix'' ⟨a, i'⟩), hv ⟨a, i'⟩⟩ i).det
+          ≠ 0 := by
     intro a
-    have heq : (Matrix.of fun i i' : MonoDeg (Fin S.D) a × Fin δ => Φ.sym a ⟨v (ix'' ⟨a, i'⟩), hv ⟨a, i'⟩⟩ i) =
-        Matrix.of fun i i' : MonoDeg (Fin S.D) a × Fin δ => if i.1 = i'.1 then
-          (∑ k, l k * Φ.y i.2 k) ^ (S.T - a) * (Matrix.of fun p' p => Φ.res (Φ.ι (b0 (σ0 p))) p') i.2 i'.2 else 0 := by
+    have heq
+        : (Matrix.of fun i i' : MonoDeg (Fin S.D) a × Fin δ =>
+            Φ.sym a ⟨v (ix'' ⟨a, i'⟩), hv ⟨a, i'⟩⟩ i)
+          = Matrix.of fun i i' : MonoDeg (Fin S.D) a × Fin δ =>
+            if i.1 = i'.1 then
+              (∑ k, l k * Φ.y i.2 k) ^ (S.T - a)
+                * (Matrix.of fun p' p => Φ.res (Φ.ι (b0 (σ0 p))) p') i.2 i'.2
+            else
+              0 := by
       ext i i'
       rw [Matrix.of_apply, Matrix.of_apply]
       refine ((hsym a i'.1 i'.2).choose_spec i.1 i.2).trans ?_
@@ -199,7 +252,8 @@ theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A
       · rw [if_neg (fun h' => h (Subtype.ext h')), if_neg h]
     rw [heq]
     exact GlobalTheory.T.det_blockSymbolMatrix_ne_zero' E _ δ _ _ _ hl hσ0
-  have hrspec : ∀ k : J, ∃ k', e1 (Sum.inr k') = k.1 := fun k => hrange k.1 (Finset.mem_filter.1 k.2).2
+  have hrspec : ∀ k : J, ∃ k', e1 (Sum.inr k') = k.1 := fun k =>
+    hrange k.1 (Finset.mem_filter.1 k.2).2
   choose f hf using hrspec
   have hfinj : Function.Injective f := fun k1 k2 h => Subtype.ext (by rw [← hf k1, ← hf k2, h])
   have hJind : LinearIndependent E (fun k : J => v k) := by
@@ -208,8 +262,14 @@ theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A
     funext k
     change v k.1 = g (σD (f k))
     rw [← hvD, hf k]
-  have hall := GlobalTheory.T.linearIndependent_of_filtration_symbol_det_ne_zero E A' (S.T - S.D) d' (fun a => MonoDeg (Fin S.D) a × Fin δ) Φ.U (fun a => Φ.sym a)
-    (fun a ha => Φ.le a ha) (fun a x => Φ.ker a a.2 x) ix'' J v hv hJ hdet hJind
+  have hall :=
+    GlobalTheory.T.linearIndependent_of_filtration_symbol_det_ne_zero E A' (S.T - S.D) d'
+      (fun a => MonoDeg (Fin S.D) a × Fin δ)
+      Φ.U
+      (fun a => Φ.sym a)
+      (fun a ha => Φ.le a ha)
+      (fun a x => Φ.ker a a.2 x)
+      ix'' J v hv hJ hdet hJind
   have hcover : ∀ k, k ∈ Set.range ix'' ∨ k ∈ J := by
     intro k
     by_cases hk : k ∈ Set.range ix'
@@ -220,34 +280,44 @@ theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A
       exact Finset.mem_filter.2 ⟨Finset.mem_univ _, hk⟩
   have hind' : LinearIndependent E v :=
     hall.comp (fun k => ⟨k, hcover k⟩) (fun a a' h => congrArg Subtype.val h)
-  have hw : LinearIndependent E (fun k : Fin rT => Φ.ι (bT k : A)) := Φ.indep rT (fun k => bT k) bT.linearIndependent
+  have hw : LinearIndependent E (fun k : Fin rT => Φ.ι (bT k : A)) :=
+    Φ.indep rT (fun k => bT k) bT.linearIndependent
   have hmemT : ∀ k, v k ∈ Submodule.span E (Set.range fun k : Fin rT => Φ.ι (bT k : A)) := by
-    obtain ⟨c', -, hc'⟩ := GlobalTheory.T.hermitianMultiplicationFlat_columns_eval F A S hS E A' s' δ Φ d b c hc
+    obtain ⟨c', -, hc'⟩ :=
+      GlobalTheory.T.hermitianMultiplicationFlat_columns_eval F A S hS E A' s' δ Φ d b c hc
     intro k
     rw [← span_basis F E A A' Φ.ι (S.V S.T) rT bT]
     exact (hc' (col' k) (join s' l)).1
-  obtain ⟨K, hK, hindK⟩ := GlobalTheory.T.exists_independent_completion E A' d' rT v _ hind' hw hmemT
+  obtain ⟨K, hK, hindK⟩ :=
+    GlobalTheory.T.exists_independent_completion E A' d' rT v _ hind' hw hmemT
   have hrT : rT = d := by simpa using Fintype.card_congr (bT.indexEquiv b)
   have hZ : Fintype.card (Fin d' ⊕ K) = d := by
     rw [Fintype.card_sum, Fintype.card_fin, Fintype.card_coe, hK, hrT]
   let e2 : (Fin d' ⊕ K) ≃ Fin d := Fintype.equivFinOfCardEq hZ
   let colT : K → S.Col := fun k => ⟨S.T, 0, Nat.add_zero _, Fin.elim0, bT k⟩
   let col : Fin d → S.Col := fun k => Sum.elim col' colT (e2.symm k)
-  let ix : X ↪ Fin d := (ix'.trans (⟨Sum.inl, Sum.inl_injective⟩ : Fin d' ↪ (Fin d' ⊕ K))).trans e2.toEmbedding
+  let ix : X ↪ Fin d :=
+    (ix'.trans (⟨Sum.inl, Sum.inl_injective⟩ : Fin d' ↪ (Fin d' ⊕ K))).trans e2.toEmbedding
   have hcol1 : ∀ k', col (e2 (Sum.inl k')) = col' k' := fun k' => by
     show Sum.elim col' colT (e2.symm (e2 (Sum.inl k'))) = _
-    rw [Equiv.symm_apply_apply]; rfl
+    rw [Equiv.symm_apply_apply]
+    rfl
   have hcol2 : ∀ k', col (e2 (Sum.inr k')) = colT k' := fun k' => by
     show Sum.elim col' colT (e2.symm (e2 (Sum.inr k'))) = _
-    rw [Equiv.symm_apply_apply]; rfl
+    rw [Equiv.symm_apply_apply]
+    rfl
   have hcolX' : ∀ q, col' (e1 (Sum.inl q)) = colX q := hcolX
   have hixe : ∀ q, ix q = e2 (Sum.inl (ix' q)) := fun q => rfl
   have hTD : S.T ≠ S.D := by omega
   have hT0 : S.T ≠ 0 := by omega
   have hD0 : S.D ≠ 0 := by omega
   refine ⟨col, m, ix, ?_, ?_, ?_, ?_⟩
-  · refine ⟨fun q => by rw [hixe, hcol1]; exact hshape'.x_j q, fun q => by rw [hixe, hcol1]; exact hshape'.x_vec q,
-      fun q => by rw [hixe, hcol1]; exact hshape'.x_type q, fun k hk => ?_⟩
+  · refine ⟨
+      fun q => by rw [hixe, hcol1]; exact hshape'.x_j q,
+      fun q => by rw [hixe, hcol1]; exact hshape'.x_vec q,
+      fun q => by rw [hixe, hcol1]; exact hshape'.x_type q,
+      fun k hk => ?_
+    ⟩
     obtain ⟨z, rfl⟩ := e2.surjective k
     rcases z with k' | k'
     · rw [hcol1]
@@ -279,9 +349,11 @@ theorem exists_cols : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A
     rw [← e1.sum_comp, Fintype.sum_sum_type]
     simp only [hcolX', hcolD]
     simp [colX, colD, colT, hTD, hD0.symm]
-  · apply GlobalTheory.T.det_columns_ne_zero_of_pointValues_independent F A S hS E A' s' δ Φ d b c hc col (join s' l)
-    have heq : (fun k => word Φ.mul (fun q j => join s' l ((col k).β q, j)) (Φ.ι (col k).x)) =
-        (Sum.elim v fun k : K => Φ.ι (bT k : A)) ∘ e2.symm := by
+  · apply GlobalTheory.T.det_columns_ne_zero_of_pointValues_independent F A S hS E A' s' δ Φ d b c
+      hc col (join s' l)
+    have heq
+        : (fun k => word Φ.mul (fun q j => join s' l ((col k).β q, j)) (Φ.ι (col k).x))
+          = (Sum.elim v fun k : K => Φ.ι (bT k : A)) ∘ e2.symm := by
       funext k
       obtain ⟨z, rfl⟩ := e2.surjective k
       rcases z with k' | k'

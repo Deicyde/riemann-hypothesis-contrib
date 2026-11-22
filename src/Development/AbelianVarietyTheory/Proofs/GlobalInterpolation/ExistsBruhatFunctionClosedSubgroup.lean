@@ -14,12 +14,17 @@ open MeasureTheory Topology in
 open scoped ENNReal Pointwise in
 private theorem exists_normalized_weight_of_closedEmbedding
     {T T' : Type} [Group T] [TopologicalSpace T] [IsTopologicalGroup T] [LocallyCompactSpace T]
-    [SecondCountableTopology T] [T2Space T] [MeasurableSpace T] [BorelSpace T]
-    [Group T'] [TopologicalSpace T'] [IsTopologicalGroup T'] [MeasurableSpace T'] [BorelSpace T']
-    (j : T' →* T) (hj : IsClosedEmbedding j) (ν : Measure T') [ν.IsHaarMeasure] :
-    ∃ φ : T → ℝ≥0∞, Measurable φ ∧ (∀ g, ∫⁻ s, φ (g * j s) ∂ν = 1) ∧
-      ∀ K : Set T, IsCompact K → ∃ (K' : Set T) (C : ℝ≥0∞), IsCompact K' ∧ C < ⊤ ∧
-        ∀ k ∈ K, ∀ s : T', φ (k * j s) ≤ C ∧ (φ (k * j s) ≠ 0 → k * j s ∈ K') := by
+    [SecondCountableTopology T] [T2Space T] [MeasurableSpace T] [BorelSpace T] [Group T']
+    [TopologicalSpace T'] [IsTopologicalGroup T'] [MeasurableSpace T'] [BorelSpace T']
+    (j : T' →* T) (hj : IsClosedEmbedding j)
+    (ν : Measure T') [ν.IsHaarMeasure]
+    : ∃ φ : T → ℝ≥0∞,
+      Measurable φ ∧ (∀ g, ∫⁻ s, φ (g * j s) ∂ν = 1)
+        ∧ ∀ K : Set T,
+          IsCompact K
+            → ∃ (K' : Set T) (C : ℝ≥0∞),
+              IsCompact K' ∧ C < ⊤
+                ∧ ∀ k ∈ K, ∀ s : T', φ (k * j s) ≤ C ∧ (φ (k * j s) ≠ 0 → k * j s ∈ K') := by
   classical
   haveI : LocallyCompactSpace T' := hj.locallyCompactSpace
   haveI : SecondCountableTopology T' := hj.isEmbedding.secondCountableTopology
@@ -72,17 +77,24 @@ private theorem exists_normalized_weight_of_closedEmbedding
     rw [hSU]
     exact MeasurableSet.iUnion fun n =>
       (hNm (measurableSet_singleton n)).inter (E.isCompact _).isClosed.measurableSet
-  obtain ⟨ψ, hψm, hψle, hψS, hψ1⟩ : ∃ ψ : T → ℝ≥0∞, Measurable ψ ∧ (∀ x, ψ x ≤ 1) ∧
-      (∀ x, ψ x ≠ 0 → x ∈ S) ∧ (∀ x, x ∈ S → ψ x = 1) := by
-    refine ⟨S.indicator fun _ => 1, measurable_const.indicator hS_meas, fun x => ?_,
-      fun x hx => ?_, fun x hx => Set.indicator_of_mem hx _⟩
+  obtain ⟨ψ, hψm, hψle, hψS, hψ1⟩
+      : ∃ ψ : T → ℝ≥0∞,
+        Measurable ψ ∧ (∀ x, ψ x ≤ 1) ∧ (∀ x, ψ x ≠ 0 → x ∈ S) ∧ (∀ x, x ∈ S → ψ x = 1) := by
+    refine ⟨
+      S.indicator fun _ => 1,
+      measurable_const.indicator hS_meas,
+      fun x => ?_,
+      fun x hx => ?_,
+      fun x hx => Set.indicator_of_mem hx _
+    ⟩
     · by_cases hx : x ∈ S <;> simp [hx]
     · by_contra hxS
       exact hx (by simp [hxS])
-  obtain ⟨F, hFm, hF⟩ : ∃ F : T → ℝ≥0∞, Measurable F ∧ ∀ x, F x = ∫⁻ s, ψ (x * j s) ∂ν :=
-    ⟨fun x => ∫⁻ s, ψ (x * j s) ∂ν,
-      (hψm.comp (measurable_fst.mul (hjm.comp measurable_snd))).lintegral_prod_right',
-      fun _ => rfl⟩
+  obtain ⟨F, hFm, hF⟩ : ∃ F : T → ℝ≥0∞, Measurable F ∧ ∀ x, F x = ∫⁻ s, ψ (x * j s) ∂ν := ⟨
+    fun x => ∫⁻ s, ψ (x * j s) ∂ν,
+    (hψm.comp (measurable_fst.mul (hjm.comp measurable_snd))).lintegral_prod_right',
+    fun _ => rfl
+  ⟩
   have hF_mul : ∀ x (s : T'), F (x * j s) = F x := by
     intro x s
     rw [hF, hF]
@@ -92,19 +104,19 @@ private theorem exists_normalized_weight_of_closedEmbedding
     obtain ⟨V, hV, hKV⟩ :=
       compact_open_separated_mul_right (E.isCompact n) isOpen_interior (E.subset_interior_succ n)
     have hVo : IsOpen (j ⁻¹' interior V) := isOpen_interior.preimage hj.continuous
-    have hV1 : (1 : T') ∈ j ⁻¹' interior V := by
-      simpa using mem_interior_iff_mem_nhds.2 hV
+    have hV1 : (1 : T') ∈ j ⁻¹' interior V := by simpa using mem_interior_iff_mem_nhds.2 hV
     refine ⟨ν (j ⁻¹' interior V), hVo.measure_pos ν ⟨1, hV1⟩, fun x hx => ?_⟩
     obtain ⟨s₀, hs₀⟩ := (hA n x).1 (hx ▸ hN_mem x)
-    calc ν (j ⁻¹' interior V) = ∫⁻ s, (j ⁻¹' interior V).indicator 1 s ∂ν :=
-          (lintegral_indicator_one hVo.measurableSet).symm
+    calc
+      ν (j ⁻¹' interior V) = ∫⁻ s, (j ⁻¹' interior V).indicator 1 s ∂ν :=
+        (lintegral_indicator_one hVo.measurableSet).symm
       _ ≤ ∫⁻ s, ψ (x * j s₀ * j s) ∂ν := by
-          refine lintegral_mono fun s => ?_
-          by_cases hs : s ∈ j ⁻¹' interior V
-          · rw [Set.indicator_of_mem hs, Pi.one_apply, hψ1]
-            rw [hS, hN_mul, hN_mul, hx]
-            exact interior_subset (hKV (Set.mul_mem_mul hs₀ (interior_subset hs)))
-          · simp [hs]
+        refine lintegral_mono fun s => ?_
+        by_cases hs : s ∈ j ⁻¹' interior V
+        · rw [Set.indicator_of_mem hs, Pi.one_apply, hψ1]
+          rw [hS, hN_mul, hN_mul, hx]
+          exact interior_subset (hKV (Set.mul_mem_mul hs₀ (interior_subset hs)))
+        · simp [hs]
       _ = F x := by rw [← hF, hF_mul]
   choose c hc_pos hc using hF_pos
   have hF_ne : ∀ x, F x ≠ 0 := fun x => ((hc_pos (N x)).trans_le (hc _ x rfl)).ne'
@@ -113,51 +125,65 @@ private theorem exists_normalized_weight_of_closedEmbedding
     have hK : IsCompact ((fun s : T' => x * j s) ⁻¹' E (N x + 1)) :=
       ((Homeomorph.mulLeft x).isClosedEmbedding.comp hj).isCompact_preimage (E.isCompact _)
     refine (lt_of_le_of_lt ?_ (hK.measure_lt_top (μ := ν))).ne
-    calc F x = ∫⁻ s, ψ (x * j s) ∂ν := hF x
+    calc
+      F x
+        = ∫⁻ s, ψ (x * j s) ∂ν := hF x
       _ ≤ ∫⁻ s, ((fun s : T' => x * j s) ⁻¹' E (N x + 1)).indicator 1 s ∂ν := by
-          refine lintegral_mono fun s => ?_
-          by_cases hs : s ∈ (fun s : T' => x * j s) ⁻¹' E (N x + 1)
-          · rw [Set.indicator_of_mem hs]
-            exact hψle _
-          · rw [Set.indicator_of_notMem hs]
-            refine le_of_eq (by_contra fun hψs => ?_)
-            have hmem := (hS _).1 (hψS _ hψs)
-            rw [hN_mul] at hmem
-            exact hs hmem
+        refine lintegral_mono fun s => ?_
+        by_cases hs : s ∈ (fun s : T' => x * j s) ⁻¹' E (N x + 1)
+        · rw [Set.indicator_of_mem hs]
+          exact hψle _
+        · rw [Set.indicator_of_notMem hs]
+          refine le_of_eq (by_contra fun hψs => ?_)
+          have hmem := (hS _).1 (hψS _ hψs)
+          rw [hN_mul] at hmem
+          exact hs hmem
       _ = ν ((fun s : T' => x * j s) ⁻¹' E (N x + 1)) :=
-          lintegral_indicator_one hK.isClosed.measurableSet
+        lintegral_indicator_one hK.isClosed.measurableSet
   refine ⟨fun x => ψ x * (F x)⁻¹, hψm.mul hFm.inv, fun g => ?_, fun K hK => ?_⟩
-  · calc ∫⁻ s, ψ (g * j s) * (F (g * j s))⁻¹ ∂ν = ∫⁻ s, ψ (g * j s) * (F g)⁻¹ ∂ν := by
-          simp_rw [hF_mul]
+  · calc
+      ∫⁻ s, ψ (g * j s) * (F (g * j s))⁻¹ ∂ν
+        = ∫⁻ s, ψ (g * j s) * (F g)⁻¹ ∂ν := by simp_rw [hF_mul]
       _ = (∫⁻ s, ψ (g * j s) ∂ν) * (F g)⁻¹ :=
-          lintegral_mul_const' _ _ (ENNReal.inv_ne_top.2 (hF_ne g))
+        lintegral_mul_const' _ _ (ENNReal.inv_ne_top.2 (hF_ne g))
       _ = 1 := by rw [← hF, ENNReal.mul_inv_cancel (hF_ne g) (hF_fin g)]
   · obtain ⟨M, hM⟩ := E.exists_superset_of_isCompact hK
-    refine ⟨E (M + 1), ∑ n ∈ Finset.range (M + 1), (c n)⁻¹, E.isCompact _,
-      ENNReal.sum_lt_top.2 fun n _ => ENNReal.inv_lt_top.2 (hc_pos n), fun k hk s => ⟨?_, ?_⟩⟩
+    refine ⟨
+      E (M + 1),
+      ∑ n ∈ Finset.range (M + 1), (c n)⁻¹,
+      E.isCompact _,
+      ENNReal.sum_lt_top.2 fun n _ => ENNReal.inv_lt_top.2 (hc_pos n),
+      fun k hk s => ⟨?_, ?_⟩
+    ⟩
     · have hNk : N k ≤ M := (hN k M).2 (hE_A M (hM hk))
-      calc ψ (k * j s) * (F (k * j s))⁻¹ ≤ 1 * (c (N k))⁻¹ :=
-            mul_le_mul' (hψle _) (ENNReal.inv_le_inv.2 (hc _ _ (hN_mul k s)))
+      calc
+        ψ (k * j s) * (F (k * j s))⁻¹
+          ≤ 1 * (c (N k))⁻¹ := mul_le_mul' (hψle _) (ENNReal.inv_le_inv.2 (hc _ _ (hN_mul k s)))
         _ = (c (N k))⁻¹ := one_mul _
         _ ≤ ∑ n ∈ Finset.range (M + 1), (c n)⁻¹ :=
-            Finset.single_le_sum (f := fun n => (c n)⁻¹) (fun _ _ => bot_le)
-              (Finset.mem_range.2 (Nat.lt_succ_of_le hNk))
+          Finset.single_le_sum
+            (f := fun n => (c n)⁻¹)
+            (fun _ _ => bot_le)
+            (Finset.mem_range.2 (Nat.lt_succ_of_le hNk))
     · intro hne
       have hNk : N k ≤ M := (hN k M).2 (hE_A M (hM hk))
       have hmem := (hS _).1 (hψS _ (left_ne_zero_of_mul hne))
       rw [hN_mul] at hmem
       exact E.subset (Nat.succ_le_succ hNk) hmem
 
-
 open MeasureTheory in
 open scoped ENNReal in
 theorem _root_.GlobalTheory.exists_bruhat_function_closed_subgroup
     (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
-    [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (H : Subgroup G)
-    (hH : IsClosed (H : Set G)) (ν : Measure H) [ν.IsHaarMeasure] :
-    ∃ φ : G → ℝ≥0∞, Measurable φ ∧ (∀ g : G, ∫⁻ h : H, φ (g * h) ∂ν = 1) ∧
-      ∀ K : Set G, IsCompact K → ∃ (K' : Set G) (C : ℝ≥0∞), IsCompact K' ∧ C < ⊤ ∧
-        ∀ k ∈ K, ∀ h : H, φ (k * h) ≤ C ∧ (φ (k * h) ≠ 0 → k * h ∈ K') := by
+    [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
+    (H : Subgroup G) (hH : IsClosed (H : Set G)) (ν : Measure H) [ν.IsHaarMeasure]
+    : ∃ φ : G → ℝ≥0∞,
+      Measurable φ ∧ (∀ g : G, ∫⁻ h : H, φ (g * h) ∂ν = 1)
+        ∧ ∀ K : Set G,
+          IsCompact K
+            → ∃ (K' : Set G) (C : ℝ≥0∞),
+              IsCompact K' ∧ C < ⊤
+                ∧ ∀ k ∈ K, ∀ h : H, φ (k * h) ≤ C ∧ (φ (k * h) ≠ 0 → k * h ∈ K') := by
   obtain ⟨φ, hφm, hφ, hφK⟩ :=
     exists_normalized_weight_of_closedEmbedding H.subtype hH.isClosedEmbedding_subtypeVal ν
   exact ⟨φ, hφm, hφ, hφK⟩

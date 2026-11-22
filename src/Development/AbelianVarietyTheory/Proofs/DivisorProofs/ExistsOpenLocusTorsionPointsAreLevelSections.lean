@@ -13,17 +13,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUniver
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor GlobalTheory.EndLoc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor
+  GlobalTheory.EndLoc
 open scoped CategoryTheory.Obj
 
 noncomputable section
 
 namespace GlobalTheory.LevSurjOpen
 
-theorem lev_nsmul {S : Scheme.{0}} {G : Over S} [GrpObj G] {L : Type} [AddCommGroup L]
-    (lev : L → (𝟙_ (Over S) ⟶ G)) (hadd : ∀ a b, lev (a + b) = lev a * lev b) (a : L) :
-    ∀ n : ℕ, lev (n • a) = lev a ^ n
+theorem lev_nsmul
+    {S : Scheme.{0}} {G : Over S} [GrpObj G]
+    {L : Type} [AddCommGroup L]
+    (lev : L → (𝟙_ (Over S) ⟶ G)) (hadd : ∀ a b, lev (a + b) = lev a * lev b)
+    (a : L)
+    : ∀ n : ℕ, lev (n • a) = lev a ^ n
   | 0 => by
     have h := hadd 0 0
     rw [add_zero] at h
@@ -31,8 +37,8 @@ theorem lev_nsmul {S : Scheme.{0}} {G : Over S} [GrpObj G] {L : Type} [AddCommGr
     exact mul_eq_left.mp h.symm
   | n + 1 => by rw [succ_nsmul, hadd, lev_nsmul lev hadd a n, pow_succ]
 
-theorem range_subset_iff_pt {k : Type} [Field k] {X : Scheme.{0}} (y : Sp k ⟶ X) (O : Set X) :
-    Set.range y.base ⊆ O ↔ y.base (⊥ : PrimeSpectrum k) ∈ O := by
+theorem range_subset_iff_pt {k : Type} [Field k] {X : Scheme.{0}} (y : Sp k ⟶ X) (O : Set X)
+    : Set.range y.base ⊆ O ↔ y.base (⊥ : PrimeSpectrum k) ∈ O := by
   haveI : Subsingleton (Sp k) := inferInstanceAs (Subsingleton (PrimeSpectrum k))
   rw [Set.range_subset_iff]
   refine ⟨fun H => H _, fun H p => ?_⟩
@@ -40,29 +46,46 @@ theorem range_subset_iff_pt {k : Type} [Field k] {X : Scheme.{0}} (y : Sp k ⟶ 
   rw [this]
   exact H
 
-theorem torsion_hom_ext {S : Scheme.{0}} {G : Over S} [GrpObj G] {M : ℕ} {X : Over S} (u v : X ⟶ torsion G M)
-    (h : u ≫ torsion.ι G M = v ≫ torsion.ι G M) : u = v :=
+theorem torsion_hom_ext
+    {S : Scheme.{0}} {G : Over S} [GrpObj G]
+    {M : ℕ} {X : Over S} (u v : X ⟶ torsion G M) (h : u ≫ torsion.ι G M = v ≫ torsion.ι G M)
+    : u = v :=
   pullback.hom_ext h (toUnit_unique _ _)
 
-theorem exists_open_levSurj : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (M : ℕ) (t : S ⟶ Sp (cycAway M)) (G : Over S) [GrpObj G] [IsCommMonObj G] (h : ℕ) (lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ G)), IsAbelianScheme G → 3 ≤ M → (∀ a b, lev (a + b) = lev a * lev b) → (∀ a, lev a ^ M = 1) → ∀ (k : Type) [Field k] [IsAlgClosed k] (x₀ : Sp k ⟶ S), (∀ g : Over.mk x₀ ⟶ G, g ^ M = 1 → ∃ a, toUnit _ ≫ lev a = g) → ∃ W : S.Opens, Set.range x₀.base ⊆ W ∧ ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (x : Sp k' ⟶ S), Set.range x.base ⊆ W → ∀ g : Over.mk x ⟶ G, g ^ M = 1 → ∃ a, toUnit _ ≫ lev a = g := by
+theorem exists_open_levSurj
+    : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (M : ℕ) (t : S ⟶ Sp (cycAway M)) (G : Over S)
+        [GrpObj G] [IsCommMonObj G] (h : ℕ) (lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ G)),
+      IsAbelianScheme G → 3 ≤ M → (∀ a b, lev (a + b) = lev a * lev b) → (∀ a, lev a ^ M = 1)
+        → ∀ (k : Type) [Field k] [IsAlgClosed k] (x₀ : Sp k ⟶ S),
+          (∀ g : Over.mk x₀ ⟶ G, g ^ M = 1 → ∃ a, toUnit _ ≫ lev a = g)
+            → ∃ W : S.Opens,
+              Set.range x₀.base ⊆ W
+                ∧ ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (x : Sp k' ⟶ S),
+                  Set.range x.base ⊆ W
+                    → ∀ g : Over.mk x ⟶ G, g ^ M = 1 → ∃ a, toUnit _ ≫ lev a = g := by
   intro S _ M t G _ _ h lev hab hM hadd htors k _ _ x₀ hx₀
   haveI := hab
   have hM0 : M ≠ 0 := by omega
   have hu : IsUnit (M : Γ(S, ⊤)) := by
-    simpa using (GlobalTheory.SiegelTor.isUnit_natCast hM0).map
-      ((Scheme.ΓSpecIso (CommRingCat.of (cycAway M))).inv ≫ t.appTop).hom
+    simpa using
+      (GlobalTheory.SiegelTor.isUnit_natCast hM0).map
+        ((Scheme.ΓSpecIso (CommRingCat.of (cycAway M))).inv ≫ t.appTop).hom
   obtain ⟨-, hfin, het⟩ := GlobalTheory.GrpTangent.finiteEtale_mulN_torsion G hu
   haveI := hfin
   haveI := het
   let ℓ : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ torsion G M) := fun a =>
     GlobalTheory.TorsionFamily.torsionLift G (lev a) M (htors a)
-  have hℓ : ∀ a, ℓ a ≫ torsion.ι G M = lev a := fun a => GlobalTheory.TorsionFamily.torsionLift_ι _ _ _ _
+  have hℓ : ∀ a, ℓ a ≫ torsion.ι G M = lev a := fun a =>
+    GlobalTheory.TorsionFamily.torsionLift_ι _ _ _ _
 
-  have hcl : ∀ a, GlobalTheory.LevCover.ClopenCond (torsion G M)
-      fun _ y => y ≫ 𝟙 (torsion G M) = y ≫ (toUnit (torsion G M) ≫ ℓ a) :=
-    fun a => GlobalTheory.LevCover.clopenCond_eq _ _
+  have hcl
+      : ∀ a,
+        GlobalTheory.LevCover.ClopenCond (torsion G M) fun _ y =>
+          y ≫ 𝟙 (torsion G M) = y ≫ (toUnit (torsion G M) ≫ ℓ a) := fun a =>
+    GlobalTheory.LevCover.clopenCond_eq _ _
   choose U hUc hU using hcl
-  obtain ⟨κ, _, q, hq⟩ := GlobalTheory.LevCover.exists_finite_mod (Fin h ⊕ Fin h → ℤ) (n := M) (by omega)
+  obtain ⟨κ, _, q, hq⟩ :=
+    GlobalTheory.LevCover.exists_finite_mod (Fin h ⊕ Fin h → ℤ) (n := M) (by omega)
   let rep : Set.range q → (Fin h ⊕ Fin h → ℤ) := fun c => c.2.choose
   have hrep : ∀ a, lev (rep ⟨q a, a, rfl⟩) = lev a := by
     intro a
@@ -84,8 +107,9 @@ theorem exists_open_levSurj : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (M : 
   obtain ⟨U₀, hU₀c, hU₀⟩ := GlobalTheory.LevCover.exists_image (toUnit V)
   let U₁ : Set S := (U₀ : Set (𝟙_ (Over S)).left)
   have hU₁c : IsClosed U₁ := hU₀c
-  have key : ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (x : Sp k' ⟶ S),
-      Set.range x.base ⊆ U₁ ↔ Nonempty (Over.mk x ⟶ V) := by
+  have key
+      : ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (x : Sp k' ⟶ S),
+        Set.range x.base ⊆ U₁ ↔ Nonempty (Over.mk x ⟶ V) := by
     intro k' _ _ x
     have H := hU₀ k' x (toUnit _)
     have hz : (toUnit (Over.mk x) : Over.mk x ⟶ 𝟙_ (Over S)).left = x := by
@@ -98,7 +122,8 @@ theorem exists_open_levSurj : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (M : 
     have hr : Set.range x₀.base ⊆ U₁ := by
       rw [range_subset_iff_pt]
       have : p = (⊥ : PrimeSpectrum k) :=
-        @Subsingleton.elim (Sp k) (inferInstanceAs (Subsingleton (PrimeSpectrum k))) p (⊥ : PrimeSpectrum k)
+        @Subsingleton.elim (Sp k) (inferInstanceAs (Subsingleton (PrimeSpectrum k))) p
+          (⊥ : PrimeSpectrum k)
       rw [← this]
       exact hpU
     obtain ⟨w⟩ := (key k x₀).1 hr

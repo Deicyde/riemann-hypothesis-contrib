@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cry
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
 
 set_option autoImplicit false
 
@@ -14,11 +15,15 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem finrank_HdR_Fil_of_field (HF : GlobalTheory.Published.AbelianDeRham.Free)
-    (HH : GlobalTheory.Published.AbelianDeRham.Hodge) (k : Type) [Field k] (A : Over (Sp k)) [GrpObj A] (g : ℕ)
-    (hA : IsAbelianScheme A) (hg : SmoothOfRelativeDimension g A.hom) :
-    FiniteDimensional k (HdR A) ∧ Module.finrank k (HdR A) = 2 * g ∧
-      Module.finrank k (Fil A) = g := by
+theorem finrank_HdR_Fil_of_field
+    (HF : GlobalTheory.Published.AbelianDeRham.Free)
+    (HH : GlobalTheory.Published.AbelianDeRham.Hodge)
+    (k : Type) [Field k]
+    (A : Over (Sp k)) [GrpObj A]
+    (g : ℕ)
+    (hA : IsAbelianScheme A) (hg : SmoothOfRelativeDimension g A.hom)
+    : FiniteDimensional k (HdR A) ∧ Module.finrank k (HdR A) = 2 * g
+      ∧ Module.finrank k (Fil A) = g := by
   obtain ⟨hfin, -, hrk⟩ := GlobalTheory.Published.AbelianDeRham.Free.prim HF hA hg
   obtain ⟨-, -, hfin1, -, hrk1⟩ := HH k A g hA hg
   have p : PrimeSpectrum k := IsLocalRing.closedPoint k

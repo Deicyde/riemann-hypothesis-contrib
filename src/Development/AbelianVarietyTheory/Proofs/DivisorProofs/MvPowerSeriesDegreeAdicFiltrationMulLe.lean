@@ -10,8 +10,8 @@ open IsLocalRing GlobalTheory.FormalOrigin GlobalTheory.FormalOrigin.Extend
 
 namespace GlobalTheory.FormalOrigin.Extend
 
-theorem filt_mul_filt_le (σ R : Type) [CommRing R] (I : Ideal R) (j k : ℕ) :
-    filt (σ := σ) I j * filt I k ≤ filt I (j + k) := by
+theorem filt_mul_filt_le (σ R : Type) [CommRing R] (I : Ideal R) (j k : ℕ)
+    : filt (σ := σ) I j * filt I k ≤ filt I (j + k) := by
   classical
   refine Ideal.mul_le.2 fun F hF G hG => ?_
   rw [mem_filt] at hF hG ⊢

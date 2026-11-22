@@ -15,28 +15,42 @@ namespace UpperTheory.Kd.K4.Ns
 
 section core
 
-variable {A B : Type*} (K L : Type*) [CommRing A] [CommRing B] [IsDedekindDomain A] [IsDedekindDomain B]
+variable
+  {A B : Type*} (K L : Type*) [CommRing A] [CommRing B] [IsDedekindDomain A] [IsDedekindDomain B]
   [Field K] [Field L] [Algebra A B] [Algebra A K] [IsFractionRing A K] [Algebra K L] [Algebra A L]
   [IsScalarTower A K L] [Algebra B L] [IsScalarTower A B L] [IsIntegralClosure B A L]
   [FiniteDimensional K L] [IsGalois K L]
 
 private def Rel (m : ℕ) (I J : Ideal B) : Prop :=
-  ∃ (x y : B) (E F : Ideal B), x ≠ 0 ∧ y ≠ 0 ∧ E ≠ 0 ∧ F ≠ 0 ∧
-    Algebra.norm K (algebraMap B L x) = Algebra.norm K (algebraMap B L y) ∧
-    Ideal.span {x} * I * E ^ m = Ideal.span {y} * J * F ^ m
+  ∃ (x y : B) (E F : Ideal B),
+    x ≠ 0 ∧ y ≠ 0 ∧ E ≠ 0 ∧ F ≠ 0
+      ∧ Algebra.norm K (algebraMap B L x) = Algebra.norm K (algebraMap B L y)
+      ∧ Ideal.span {x} * I * E ^ m = Ideal.span {y} * J * F ^ m
 
-private theorem rel_mul {m : ℕ} {I J I' J' : Ideal B} (h : Rel K L m I J) (h' : Rel K L m I' J') :
-    Rel K L m (I * I') (J * J') := by
+private theorem rel_mul {m : ℕ} {I J I' J' : Ideal B} (h : Rel K L m I J) (h' : Rel K L m I' J')
+    : Rel K L m (I * I') (J * J') := by
   obtain ⟨x, y, E, F, hx, hy, hE, hF, hn, he⟩ := h
   obtain ⟨x', y', E', F', hx', hy', hE', hF', hn', he'⟩ := h'
-  refine ⟨x * x', y * y', E * E', F * F', mul_ne_zero hx hx', mul_ne_zero hy hy',
-    mul_ne_zero hE hE', mul_ne_zero hF hF', by simp only [map_mul, hn, hn'], ?_⟩
+  refine ⟨
+    x * x',
+    y * y',
+    E * E',
+    F * F',
+    mul_ne_zero hx hx',
+    mul_ne_zero hy hy',
+    mul_ne_zero hE hE',
+    mul_ne_zero hF hF',
+    by simp only [map_mul, hn, hn'],
+    ?_
+  ⟩
   rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_mul_span_singleton]
-  calc _ = (Ideal.span {x} * I * E ^ m) * (Ideal.span {x'} * I' * E' ^ m) := by ring
+  calc
+    _ = (Ideal.span {x} * I * E ^ m) * (Ideal.span {x'} * I' * E' ^ m) := by ring
     _ = _ := by rw [he, he']; ring
 
-private theorem rel_prod {m : ℕ} (φ : Ideal B → Ideal B) (s : Multiset (Ideal B))
-    (h : ∀ P ∈ s, Rel K L m P (φ P)) : Rel K L m s.prod (s.map φ).prod := by
+private theorem rel_prod
+    {m : ℕ} (φ : Ideal B → Ideal B) (s : Multiset (Ideal B)) (h : ∀ P ∈ s, Rel K L m P (φ P))
+    : Rel K L m s.prod (s.map φ).prod := by
   induction s using Multiset.induction_on with
   | empty => exact ⟨1, 1, 1, 1, one_ne_zero, one_ne_zero, one_ne_zero, one_ne_zero, rfl, rfl⟩
   | cons a s ih =>
@@ -44,9 +58,11 @@ private theorem rel_prod {m : ℕ} (φ : Ideal B → Ideal B) (s : Multiset (Ide
     exact rel_mul K L (h a (Multiset.mem_cons_self a s))
       (ih fun P hP => h P (Multiset.mem_cons_of_mem hP))
 
-private theorem rel_of_comap {m : ℕ} (hC : ∀ c : ClassGroup B, ∃ d, c = d ^ m) {P Q : Ideal B}
-    (hP : P ≠ 0) (σ : Gal(L/K)) (h : Ideal.comap (galRestrict A K L B σ) P = Q) :
-    Rel K L m P Q := by
+private theorem rel_of_comap
+    {m : ℕ} (hC : ∀ c : ClassGroup B, ∃ d, c = d ^ m)
+    {P Q : Ideal B} (hP : P ≠ 0)
+    (σ : Gal(L/K)) (h : Ideal.comap (galRestrict A K L B σ) P = Q)
+    : Rel K L m P Q := by
   classical
   set τ := galRestrict A K L B σ with hτ
   let e : B ≃+* B := τ.symm.toRingEquiv
@@ -80,26 +96,40 @@ private theorem rel_of_comap {m : ℕ} (hC : ∀ c : ClassGroup B, ∃ d, c = d 
     intro h0
     apply hE
     exact (Ideal.map_eq_bot_iff_of_injective e.injective).1 h0
-  refine ⟨x * e y, y * e x, (E0 : Ideal B).map e, E0, mul_ne_zero hx (hne y hy),
-    mul_ne_zero hy (hne x hx), heE, hE, by simp only [map_mul, hnm, mul_comm], ?_⟩
+  refine ⟨
+    x * e y,
+    y * e x,
+    (E0 : Ideal B).map e,
+    E0,
+    mul_ne_zero hx (hne y hy),
+    mul_ne_zero hy (hne x hx),
+    heE,
+    hE,
+    by simp only [map_mul, hnm, mul_comm],
+    ?_
+  ⟩
   rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_mul_span_singleton]
-  calc _ = Ideal.span {e y} * (Ideal.span {x} * P) * ((E0 : Ideal B).map e) ^ m := by ring
+  calc
+    _ = Ideal.span {e y} * (Ideal.span {x} * P) * ((E0 : Ideal B).map e) ^ m := by ring
     _ = Ideal.span {y} * (Ideal.span {e y} * ((E0 : Ideal B).map e) ^ m) * (E0 : Ideal B) ^ m := by
-        rw [hxy]; ring
+      rw [hxy]; ring
     _ = _ := by rw [← h2]; ring
 
 end core
 
 section core2
 
-variable {A B : Type*} (K L : Type*) [CommRing A] [CommRing B] [IsDedekindDomain A] [IsDedekindDomain B]
-  [Field K] [Field L] [Algebra A B] [Algebra A K] [IsFractionRing A K] [Algebra K L] [Algebra A L]
-  [IsScalarTower A K L] [Algebra B L] [IsScalarTower A B L] [IsIntegralClosure B A L]
-  [FiniteDimensional K L] [IsGalois K L] [Module.Finite A B] [Module.IsTorsionFree A B]
-  [PerfectField (FractionRing A)]
+variable
+  {A B : Type*} (K L : Type*)
+  [CommRing A] [CommRing B] [IsDedekindDomain A] [IsDedekindDomain B] [Field K] [Field L]
+  [Algebra A B] [Algebra A K] [IsFractionRing A K] [Algebra K L] [Algebra A L] [IsScalarTower A K L]
+  [Algebra B L] [IsScalarTower A B L] [IsIntegralClosure B A L] [FiniteDimensional K L]
+  [IsGalois K L] [Module.Finite A B] [Module.IsTorsionFree A B] [PerfectField (FractionRing A)]
 
-private theorem inertia_one (hres : ∀ P : Ideal B, P.IsMaximal → ∀ b : B, ∃ a : A, b - algebraMap A B a ∈ P)
-    (P : Ideal B) [hP : P.IsMaximal] [(P.under A).IsMaximal] : P.inertiaDeg A = 1 := by
+private theorem inertia_one
+    (hres : ∀ P : Ideal B, P.IsMaximal → ∀ b : B, ∃ a : A, b - algebraMap A B a ∈ P)
+    (P : Ideal B) [hP : P.IsMaximal] [(P.under A).IsMaximal]
+    : P.inertiaDeg A = 1 := by
   letI : Field (A ⧸ P.under A) := Ideal.Quotient.field _
   have h1 : Module.finrank (A ⧸ P.under A) (B ⧸ P) = 1 := by
     refine (finrank_eq_one_iff_of_nonzero' (1 : B ⧸ P) one_ne_zero).2 fun w => ?_
@@ -113,18 +143,20 @@ private theorem inertia_one (hres : ∀ P : Ideal B, P.IsMaximal → ∀ b : B, 
   rw [Ideal.inertiaDeg_eq_of_isMaximal (P.under A) P]
 
 open Classical in
-private theorem core {m : ℕ} (hC : ∀ c : ClassGroup B, ∃ d, c = d ^ m)
+private theorem core
+    {m : ℕ} (hC : ∀ c : ClassGroup B, ∃ d, c = d ^ m)
     (hres : ∀ P : Ideal B, P.IsMaximal → ∀ b : B, ∃ a : A, b - algebraMap A B a ∈ P)
     (g : B) (hg : g ≠ 0)
-    (hdiv : ∀ p : Ideal A, m ∣ Multiset.count p (normalizedFactors (Ideal.span {Algebra.intNorm A B g}))) :
-    ∃ D : Ideal B, Rel K L m (Ideal.span {g}) (D ^ m) := by
+    (hdiv : ∀ p : Ideal A,
+      m ∣ Multiset.count p (normalizedFactors (Ideal.span {Algebra.intNorm A B g})))
+    : ∃ D : Ideal B, Rel K L m (Ideal.span {g}) (D ^ m) := by
   have hI : Ideal.span {g} ≠ ⊥ := by simpa using hg
   set s := normalizedFactors (Ideal.span {g}) with hs
-  have hsP : ∀ P ∈ s, P.IsPrime ∧ P ≠ 0 := fun P hP =>
-    ⟨Ideal.isPrime_of_prime (prime_of_normalized_factor P hP),
-      (prime_of_normalized_factor P hP).ne_zero⟩
-  have hsM : ∀ P ∈ s, P.IsMaximal := fun P hP =>
-    (hsP P hP).1.isMaximal (hsP P hP).2
+  have hsP : ∀ P ∈ s, P.IsPrime ∧ P ≠ 0 := fun P hP => ⟨
+    Ideal.isPrime_of_prime (prime_of_normalized_factor P hP),
+    (prime_of_normalized_factor P hP).ne_zero
+  ⟩
+  have hsM : ∀ P ∈ s, P.IsMaximal := fun P hP => (hsP P hP).1.isMaximal (hsP P hP).2
   let un : Ideal B → Ideal A := fun P => P.under A
   let S : Set (Ideal B) := {P | P.IsPrime ∧ P ≠ 0}
   let ch : Ideal A → Ideal B := Function.invFunOn un S
@@ -158,9 +190,10 @@ private theorem core {m : ℕ} (hC : ∀ c : ClassGroup B, ∃ d, c = d ^ m)
     refine normalizedFactors_prod_of_prime fun p hp => ?_
     obtain ⟨P, hP, rfl⟩ := Multiset.mem_map.1 hp
     exact Ideal.prime_of_isPrime (hunM P hP).2 (hunM P hP).1.isPrime
-  obtain ⟨T, hT⟩ := Multiset.exists_smul_of_dvd_count t (k := m) fun p _ => by
-    have := hdiv p
-    rwa [hnorm, hfac] at this
+  obtain ⟨T, hT⟩ :=
+    Multiset.exists_smul_of_dvd_count t (k := m) fun p _ => by
+      have := hdiv p
+      rwa [hnorm, hfac] at this
   refine ⟨(T.map ch).prod, ?_⟩
   have hm : s.map (fun P => ch (un P)) = m • T.map ch := by
     rw [← Multiset.map_nsmul, ← hT, ht, Multiset.map_map]
@@ -173,8 +206,9 @@ section fin
 
 variable {B L : Type*} [CommRing B] [IsDedekindDomain B] [Field L] [Algebra B L]
 
-private theorem principal_in (W : ValuationSubring L) (φ : B →+* W) (hφ : Function.Injective φ)
-    (E : Ideal B) (hE : E ≠ 0) : ∃ w : W, w ≠ 0 ∧ E.map φ = Ideal.span {w} := by
+private theorem principal_in
+    (W : ValuationSubring L) (φ : B →+* W) (hφ : Function.Injective φ) (E : Ideal B) (hE : E ≠ 0)
+    : ∃ w : W, w ≠ 0 ∧ E.map φ = Ideal.span {w} := by
   have hfg : (E.map φ).FG := Ideal.FG.map (IsNoetherian.noetherian E) φ
   obtain ⟨w, hw⟩ := (IsBezout.isPrincipal_of_FG _ hfg).principal
   refine ⟨w, ?_, by simpa using hw⟩
@@ -185,11 +219,13 @@ private theorem principal_in (W : ValuationSubring L) (φ : B →+* W) (hφ : Fu
   simp only [Submodule.span_zero_singleton, Submodule.mem_bot] at h1
   exact hb0 (hφ (h1.trans (map_zero φ).symm))
 
-private theorem val_of {m : ℕ} (hm : 0 < m) (hinj : Function.Injective (algebraMap B L))
-    (W : ValuationSubring L) (hW : ∀ b : B, algebraMap B L b ∈ W) {a y : B} {D E F : Ideal B}
-    (ha : a ≠ 0) (hy : y ≠ 0) (hE : E ≠ 0) (hF : F ≠ 0)
-    (h : Ideal.span {a} * E ^ m = Ideal.span {y} * D ^ m * F ^ m) :
-    ∃ c : L, c ≠ 0 ∧ W.valuation (algebraMap B L a / algebraMap B L y / c ^ m) = 1 := by
+private theorem val_of
+    {m : ℕ} (hm : 0 < m)
+    (hinj : Function.Injective (algebraMap B L))
+    (W : ValuationSubring L) (hW : ∀ b : B, algebraMap B L b ∈ W)
+    {a y : B} {D E F : Ideal B} (ha : a ≠ 0) (hy : y ≠ 0) (hE : E ≠ 0) (hF : F ≠ 0)
+    (h : Ideal.span {a} * E ^ m = Ideal.span {y} * D ^ m * F ^ m)
+    : ∃ c : L, c ≠ 0 ∧ W.valuation (algebraMap B L a / algebraMap B L y / c ^ m) = 1 := by
   let φ : B →+* W := (algebraMap B L).codRestrict W.toSubring hW
   have hcoe : ∀ b, ((φ b : W) : L) = algebraMap B L b := fun _ => rfl
   have hφ : Function.Injective φ := fun x y hxy => hinj (by rw [← hcoe, ← hcoe, hxy])
@@ -202,7 +238,8 @@ private theorem val_of {m : ℕ} (hm : 0 < m) (hinj : Function.Injective (algebr
   obtain ⟨f, hf0, hf⟩ := principal_in W φ hφ F hF
   have h2 := congrArg (Ideal.map φ) h
   simp only [Ideal.map_mul, Ideal.map_pow, Ideal.map_span, Set.image_singleton, he, hd, hf,
-    Ideal.span_singleton_pow, Ideal.span_singleton_mul_span_singleton] at h2
+      Ideal.span_singleton_pow, Ideal.span_singleton_mul_span_singleton]
+    at h2
   rw [Ideal.span_singleton_eq_span_singleton] at h2
   obtain ⟨u, hu⟩ := h2
   have hL := congrArg (fun w : W => (w : L)) hu
@@ -226,39 +263,51 @@ section abs
 
 open IsDedekindDomain
 
-variable {A B : Type*} (K L : Type*) [CommRing A] [CommRing B] [IsDedekindDomain A] [IsDedekindDomain B]
+variable
+  {A B : Type*} (K L : Type*) [CommRing A] [CommRing B] [IsDedekindDomain A] [IsDedekindDomain B]
   [Field K] [Field L] [Algebra A B] [Algebra A K] [IsFractionRing A K] [Algebra K L] [Algebra A L]
   [IsScalarTower A K L] [Algebra B L] [IsScalarTower A B L] [IsIntegralClosure B A L]
   [FiniteDimensional K L] [IsGalois K L] [Module.Finite A B] [Module.IsTorsionFree A B]
   [PerfectField (FractionRing A)] [IsFractionRing B L]
 
 open Classical in
-private theorem dvd_count {m : ℕ} (n : A) (hn : n ≠ 0) (h : ∀ v : HeightOneSpectrum A, ∃ z : K, z ≠ 0 ∧
-      v.valuation K (algebraMap A K n) = (v.valuation K z) ^ m) (p : Ideal A) :
-    m ∣ Multiset.count p (normalizedFactors (Ideal.span {n})) := by
+private theorem dvd_count
+    {m : ℕ} (n : A) (hn : n ≠ 0)
+    (h : ∀ v : HeightOneSpectrum A, ∃ z : K,
+      z ≠ 0 ∧ v.valuation K (algebraMap A K n) = (v.valuation K z) ^ m)
+    (p : Ideal A)
+    : m ∣ Multiset.count p (normalizedFactors (Ideal.span {n})) := by
   by_cases hp : p ∈ normalizedFactors (Ideal.span {n})
   · have hpr := prime_of_normalized_factor p hp
     let v : HeightOneSpectrum A := ⟨p, Ideal.isPrime_of_prime hpr, hpr.ne_zero⟩
     obtain ⟨z, hz0, hz⟩ := h v
     rw [HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.intValuation_if_neg _ hn,
-      Ideal.count_associates_factors_eq (by simpa using hn) v.isPrime v.ne_bot] at hz
+        Ideal.count_associates_factors_eq (by simpa using hn) v.isPrime v.ne_bot]
+      at hz
     have h2 := congrArg WithZero.log hz
     rw [WithZero.log_exp, WithZero.log_pow] at h2
-    have h3 : (m : ℤ) ∣ (Multiset.count p (normalizedFactors (Ideal.span {n})) : ℤ) :=
-      ⟨-(v.valuation K z).log, by
-        have : -(Multiset.count p (normalizedFactors (Ideal.span {n})) : ℤ) = m * (v.valuation K z).log := by
+    have h3 : (m : ℤ) ∣ (Multiset.count p (normalizedFactors (Ideal.span {n})) : ℤ) := ⟨
+      -(v.valuation K z).log,
+      by
+        have : -(Multiset.count p (normalizedFactors (Ideal.span {n})) : ℤ)
+            = m * (v.valuation K z).log := by
           simpa using h2
-        linarith⟩
+        linarith
+    ⟩
     exact Int.natCast_dvd_natCast.1 h3
   · rw [Multiset.count_eq_zero_of_notMem hp]
     exact dvd_zero m
 
-private theorem abs_fin {m : ℕ} (hm : 0 < m) (hC : ∀ c : ClassGroup B, ∃ d, c = d ^ m)
+private theorem abs_fin
+    {m : ℕ} (hm : 0 < m) (hC : ∀ c : ClassGroup B, ∃ d, c = d ^ m)
     (hres : ∀ P : Ideal B, P.IsMaximal → ∀ b : B, ∃ a : A, b - algebraMap A B a ∈ P)
-    (f : K) (hf0 : f ≠ 0) (g0 : L) (hg0 : Algebra.norm K g0 = f)
-    (hf : ∀ v : HeightOneSpectrum A, ∃ c : K, c ≠ 0 ∧ v.valuation K (f / c ^ m) = 1) :
-    ∃ f' : L, f' ≠ 0 ∧ Algebra.norm K f' = f ∧ ∀ W : ValuationSubring L,
-      (∀ b : B, algebraMap B L b ∈ W) → ∃ c : L, c ≠ 0 ∧ W.valuation (f' / c ^ m) = 1 := by
+    (f : K) (hf0 : f ≠ 0)
+    (g0 : L) (hg0 : Algebra.norm K g0 = f)
+    (hf : ∀ v : HeightOneSpectrum A, ∃ c : K, c ≠ 0 ∧ v.valuation K (f / c ^ m) = 1)
+    : ∃ f' : L,
+      f' ≠ 0 ∧ Algebra.norm K f' = f
+        ∧ ∀ W : ValuationSubring L,
+          (∀ b : B, algebraMap B L b ∈ W) → ∃ c : L, c ≠ 0 ∧ W.valuation (f' / c ^ m) = 1 := by
   classical
   have hinj : Function.Injective (algebraMap B L) := IsFractionRing.injective B L
   have hg00 : g0 ≠ 0 := Algebra.norm_ne_zero_iff.1 (hg0 ▸ hf0)
@@ -283,13 +332,14 @@ private theorem abs_fin {m : ℕ} (hm : 0 < m) (hC : ∀ c : ClassGroup B, ∃ d
     rintro h0
     rw [h0, map_zero] at hnK
     exact mul_ne_zero hf0 (pow_ne_zero m hNb) hnK.symm
-  have hdiv := dvd_count K (m := m) n hn0 (fun v => by
-    obtain ⟨c, hc0, hc⟩ := hf v
-    refine ⟨c * Algebra.norm K (algebraMap B L b), mul_ne_zero hc0 hNb, ?_⟩
-    have hc' : v.valuation K f = v.valuation K c ^ m := by
-      rw [map_div₀, map_pow] at hc
-      exact (div_eq_one_iff_eq (pow_ne_zero m ((Valuation.ne_zero_iff _).2 hc0))).1 hc
-    rw [hnK, map_mul, map_mul, map_pow, hc', mul_pow])
+  have hdiv :=
+    dvd_count K (m := m) n hn0 (fun v => by
+      obtain ⟨c, hc0, hc⟩ := hf v
+      refine ⟨c * Algebra.norm K (algebraMap B L b), mul_ne_zero hc0 hNb, ?_⟩
+      have hc' : v.valuation K f = v.valuation K c ^ m := by
+        rw [map_div₀, map_pow] at hc
+        exact (div_eq_one_iff_eq (pow_ne_zero m ((Valuation.ne_zero_iff _).2 hc0))).1 hc
+      rw [hnK, map_mul, map_mul, map_pow, hc', mul_pow])
   obtain ⟨D, x, y, E, F, hx, hy, hE, hF, hxy, hR⟩ := core K L hC hres g hg_ne hdiv
   have hxL : algebraMap B L x ≠ 0 := fun h0 => hx (hinj (h0.trans (map_zero _).symm))
   have hyL : algebraMap B L y ≠ 0 := fun h0 => hy (hinj (h0.trans (map_zero _).symm))
@@ -307,31 +357,44 @@ private theorem abs_fin {m : ℕ} (hm : 0 < m) (hC : ∀ c : ClassGroup B, ∃ d
 
 end abs
 
-private theorem mem_of_int {R L : Type*} [CommRing R] [Field L] [Algebra R L] (W : ValuationSubring L)
-    (hW : ∀ p : R, algebraMap R L p ∈ W) {x : L} (hx : IsIntegral R x) : x ∈ W := by
+private theorem mem_of_int
+    {R L : Type*} [CommRing R] [Field L] [Algebra R L]
+    (W : ValuationSubring L) (hW : ∀ p : R, algebraMap R L p ∈ W)
+    {x : L} (hx : IsIntegral R x)
+    : x ∈ W := by
   let ψ : R →+* W := (algebraMap R L).codRestrict W.toSubring hW
   obtain ⟨P, hP, h0⟩ := hx
   have h1 : IsIntegral W x := ⟨P.map ψ, hP.map ψ, by rw [eval₂_map]; exact h0⟩
   obtain ⟨y, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.1 h1
   exact y.2
 
-private theorem res_of (k B : Type*) [Field k] [IsAlgClosed k] [CommRing B] [Algebra k B]
-    [Algebra.FiniteType k B] (P : Ideal B) (hP : P.IsMaximal) (b : B) :
-    ∃ c : k, b - algebraMap k B c ∈ P := by
+private theorem res_of
+    (k B : Type*) [Field k] [IsAlgClosed k] [CommRing B] [Algebra k B] [Algebra.FiniteType k B]
+    (P : Ideal B) (hP : P.IsMaximal)
+    (b : B)
+    : ∃ c : k, b - algebraMap k B c ∈ P := by
   letI := Ideal.Quotient.field P
   haveI : Module.Finite k (B ⧸ P) := finite_of_finite_type_of_isJacobsonRing k (B ⧸ P)
-  obtain ⟨c, hc⟩ := (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := k) (K := B ⧸ P)).2
-    (Ideal.Quotient.mk P b)
+  obtain ⟨c, hc⟩ :=
+    (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := k) (K := B ⧸ P)).2 (Ideal.Quotient.mk P b)
   exact ⟨c, Ideal.Quotient.eq.1 hc.symm⟩
 
 end UpperTheory.Kd.K4.Ns
 
 open UpperTheory.Kd.K4.Ns in
-theorem UpperTheory.Kd.K4.nsAbs :
-    ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k[X] K] [Algebra (RatFunc k) K] [IsScalarTower k[X] (RatFunc k) K] [FiniteDimensional (RatFunc k) K] (K' : Type) [Field K'] [Algebra K K'] [Algebra k[X] K'] [IsScalarTower k[X] K K'] [FiniteDimensional K K'] [IsGalois K K'] (m : ℕ) (f : K), 0 < m → f ≠ 0 →
-      (∀ B : ValuationSubring K, (∀ p : k[X], algebraMap k[X] K p ∈ B) → ∃ c : K, c ≠ 0 ∧ B.valuation (f / c ^ m) = 1) →
-      ∃ f' : K', f' ≠ 0 ∧ Algebra.norm K f' = f ∧
-        ∀ B : ValuationSubring K', (∀ p : k[X], algebraMap k[X] K' p ∈ B) → ∃ c : K', c ≠ 0 ∧ B.valuation (f' / c ^ m) = 1 := by
+theorem UpperTheory.Kd.K4.nsAbs
+    : ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k[X] K]
+        [Algebra (RatFunc k) K] [IsScalarTower k[X] (RatFunc k) K] [FiniteDimensional (RatFunc k) K]
+        (K' : Type) [Field K'] [Algebra K K'] [Algebra k[X] K'] [IsScalarTower k[X] K K']
+        [FiniteDimensional K K'] [IsGalois K K'] (m : ℕ) (f : K),
+      0 < m → f ≠ 0
+        → (∀ B : ValuationSubring K,
+          (∀ p : k[X], algebraMap k[X] K p ∈ B) → ∃ c : K, c ≠ 0 ∧ B.valuation (f / c ^ m) = 1)
+        → ∃ f' : K',
+          f' ≠ 0 ∧ Algebra.norm K f' = f
+            ∧ ∀ B : ValuationSubring K',
+              (∀ p : k[X], algebraMap k[X] K' p ∈ B)
+                → ∃ c : K', c ≠ 0 ∧ B.valuation (f' / c ^ m) = 1 := by
   intro k K _ _ _ _ _ _ _ _ K' _ _ _ _ _ _ m f hm hf0 hf
   letI : Algebra (RatFunc k) K' := ((algebraMap K K').comp (algebraMap (RatFunc k) K)).toAlgebra
   haveI : IsScalarTower (RatFunc k) K K' := .of_algebraMap_eq fun _ => rfl
@@ -382,12 +445,19 @@ theorem UpperTheory.Kd.K4.nsAbs :
     refine ⟨algebraMap k[X] A (algebraMap k k[X] c), ?_⟩
     convert hc using 2
     exact Subtype.ext (IsScalarTower.algebraMap_apply k[X] K K' _).symm
-  have hfv : ∀ v : IsDedekindDomain.HeightOneSpectrum A, ∃ c : K, c ≠ 0 ∧ v.valuation K (f / c ^ m) = 1 := by
+  have hfv
+      : ∀ v : IsDedekindDomain.HeightOneSpectrum A, ∃ c : K,
+        c ≠ 0 ∧ v.valuation K (f / c ^ m) = 1 := by
     intro v
-    obtain ⟨c, hc0, hc⟩ := hf (v.valuation K).valuationSubring fun p =>
-      (Valuation.mem_valuationSubring_iff _ _).2 (v.valuation_le_one (algebraMap k[X] A p))
+    obtain ⟨c, hc0, hc⟩ :=
+      hf (v.valuation K).valuationSubring fun p =>
+        (Valuation.mem_valuationSubring_iff _ _).2 (v.valuation_le_one (algebraMap k[X] A p))
     exact ⟨c, hc0, ((v.valuation K).isEquiv_valuation_valuationSubring.eq_one_iff_eq_one).2 hc⟩
-  obtain ⟨g0, hg0⟩ := GlobalTheory.T.exists_algebra_norm_eq_of_isFirstChernClass K K' (GlobalTheory.T.tsen_theorem k K) f hf0
-  obtain ⟨f', h0, h1, h2⟩ := abs_fin (A := A) (B := B) K K' hm (fun c => GlobalTheory.T.classGroup_affineCurve_divisible_charZero k K' m hm c)
-    hres f hf0 g0 hg0 hfv
+  obtain ⟨g0, hg0⟩ :=
+    GlobalTheory.T.exists_algebra_norm_eq_of_isFirstChernClass K K'
+      (GlobalTheory.T.tsen_theorem k K) f hf0
+  obtain ⟨f', h0, h1, h2⟩ :=
+    abs_fin (A := A) (B := B) K K' hm
+      (fun c => GlobalTheory.T.classGroup_affineCurve_divisible_charZero k K' m hm c)
+      hres f hf0 g0 hg0 hfv
   exact ⟨f', h0, h1, fun W hW => h2 W fun b => mem_of_int W hW b.2⟩

@@ -7,14 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Theta
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 noncomputable section
 
 namespace GlobalTheory.GalStep
 
-theorem teich_pow_sub_one_eq_ED_mul : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O] [Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K] [CompleteSpace K] (t : Wq l a →ₐ[ℤ_[l]] O) (ϖ : PiSys l e) (ε : OCb l) (c : ℕ), IsEps ε → c ≠ 0 → ∃ u : OD l O, IsUnit u ∧ toOD l O (1 ⊗ₜ WittVector.teichmuller l ε) ^ c - 1 = GlobalTheory.GalStep.ED K t ϖ * u := by
+theorem teich_pow_sub_one_eq_ED_mul
+    : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O]
+        [Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O] [NormedField K]
+        [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K]
+        [CompleteSpace K] (t : Wq l a →ₐ[ℤ_[l]] O) (ϖ : PiSys l e) (ε : OCb l) (c : ℕ),
+      IsEps ε → c ≠ 0
+        → ∃ u : OD l O,
+          IsUnit u
+            ∧ toOD l O (1 ⊗ₜ WittVector.teichmuller l ε) ^ c - 1
+              = GlobalTheory.GalStep.ED K t ϖ * u := by
   intro l _ a e _ _ O K _ _ _ _ _ _ _ _ _ _ t ϖ ε c hε hc
   have hd : ED K t ϖ = toOD l O ((1 : O) ⊗ₜ[ℤ_[l]] ϖ.ev a (eis l a e) : OA l O) := by
     rw [ED, PiSys.iD, glue_const, Ehat, PiSys.iHat_ofAl]
@@ -40,29 +51,35 @@ theorem teich_pow_sub_one_eq_ED_mul : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [
   have hθw : ((Per.θ l w : Per.OC l) : ℂ_[l]) ≠ 0 := by
     have h1 : ((Per.θ l (v : Ainf l) : Per.OC l) : ℂ_[l]) ≠ 0 := fun h =>
       (v.isUnit.map (Per.θ l)).ne_zero (Subtype.ext (h.trans rfl))
-    have h2 : ((Per.θ l (muOf δ) : Per.OC l) : ℂ_[l]) ≠ 0 := fun h => hθδ (Subtype.ext (h.trans rfl))
+    have h2 : ((Per.θ l (muOf δ) : Per.OC l) : ℂ_[l]) ≠ 0 := fun h =>
+      hθδ (Subtype.ext (h.trans rfl))
     have h3 : (c : ℂ_[l]) ≠ 0 := Nat.cast_ne_zero.2 hc
-    have h4 : ((Per.θ l w : Per.OC l) : ℂ_[l]) =
-        ((Per.θ l (v : Ainf l) : Per.OC l) : ℂ_[l]) * (((Per.θ l (muOf δ) : Per.OC l) : ℂ_[l]) *
-          ((Per.θ l G : Per.OC l) : ℂ_[l])) := by
+    have h4
+        : ((Per.θ l w : Per.OC l) : ℂ_[l])
+          = ((Per.θ l (v : Ainf l) : Per.OC l) : ℂ_[l])
+            * (((Per.θ l (muOf δ) : Per.OC l) : ℂ_[l]) * ((Per.θ l G : Per.OC l) : ℂ_[l])) := by
       rw [hwdef, map_mul, map_mul]
       rfl
     rw [h4, hθG]
     exact mul_ne_zero h1 (mul_ne_zero h2 h3)
-  have hwu : IsUnit (ainfToBdRp l w) := (GlobalTheory.MemLoc.thetaD_props l).2.2.1 _ (by
-    change Per.θD l (GlobalTheory.MemLoc.aDp l w) ≠ 0
-    rw [(GlobalTheory.MemLoc.thetaD_props l).2.2.2.1]
-    exact hθw)
+  have hwu : IsUnit (ainfToBdRp l w) :=
+    (GlobalTheory.MemLoc.thetaD_props l).2.2.1 _ (by
+      change Per.θD l (GlobalTheory.MemLoc.aDp l w) ≠ 0
+      rw [(GlobalTheory.MemLoc.thetaD_props l).2.2.2.1]
+      exact hθw)
   refine ⟨toOD l O ((1 : O) ⊗ₜ[ℤ_[l]] w : OA l O), ?_, ?_⟩
-  · have h2 : toOD l O ((1 : O) ⊗ₜ[ℤ_[l]] w : OA l O) =
-        (Algebra.TensorProduct.includeRight : Per.BdRp l →ₐ[ℤ_[l]] OD l O) (ainfToBdRp l w) := by
+  · have h2
+        : toOD l O ((1 : O) ⊗ₜ[ℤ_[l]] w : OA l O)
+          = (Algebra.TensorProduct.includeRight : Per.BdRp l →ₐ[ℤ_[l]] OD l O) (ainfToBdRp l
+            w) := by
       simp [toOD]
     rw [h2]
     exact hwu.map _
-  · have h3 : ((1 : O) ⊗ₜ[ℤ_[l]] WittVector.teichmuller l ε : OA l O) ^ c - 1 =
-        ((1 : O) ⊗ₜ[ℤ_[l]] ϖ.ev a (eis l a e) : OA l O) * ((1 : O) ⊗ₜ[ℤ_[l]] w) := by
-      rw [Algebra.TensorProduct.tmul_pow, one_pow, Algebra.TensorProduct.tmul_mul_tmul, one_mul, ← hkey,
-        Algebra.TensorProduct.one_def, TensorProduct.tmul_sub]
+  · have h3
+        : ((1 : O) ⊗ₜ[ℤ_[l]] WittVector.teichmuller l ε : OA l O) ^ c - 1
+          = ((1 : O) ⊗ₜ[ℤ_[l]] ϖ.ev a (eis l a e) : OA l O) * ((1 : O) ⊗ₜ[ℤ_[l]] w) := by
+      rw [Algebra.TensorProduct.tmul_pow, one_pow, Algebra.TensorProduct.tmul_mul_tmul, one_mul,
+        ← hkey, Algebra.TensorProduct.one_def, TensorProduct.tmul_sub]
     rw [hd, ← map_mul, ← h3, map_sub, map_pow, map_one]
 
 end GlobalTheory.GalStep

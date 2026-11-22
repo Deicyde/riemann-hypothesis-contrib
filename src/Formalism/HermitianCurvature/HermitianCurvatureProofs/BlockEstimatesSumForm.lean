@@ -12,11 +12,12 @@ namespace Formalism.FourierDecayAlt.P.BaseGramNonnegativity
 
 open Formalism.FourierDecayAlt.crystallineComparison Formalism.FourierDecayAlt.TB
 
-theorem sum_re_nonneg {α : Type} (Y : Finset α) (κ G : α → α → ℂ) (hκ : PSDOn Y κ) (hG : PSDOn Y G) :
-    0 ≤ (∑ h ∈ Y, ∑ h' ∈ Y, κ h h' * G h h').re := by
+theorem sum_re_nonneg {α : Type} (Y : Finset α) (κ G : α → α → ℂ) (hκ : PSDOn Y κ) (hG : PSDOn Y G)
+    : 0 ≤ (∑ h ∈ Y, ∑ h' ∈ Y, κ h h' * G h h').re := by
   have H := (Matrix.PosSemidef.hadamard hκ hG).re_dotProduct_nonneg (fun _ => (1 : ℂ))
   simp only [dotProduct, Matrix.mulVec, Matrix.hadamard_apply, Matrix.of_apply, Pi.star_apply,
-    star_one, one_mul, mul_one, RCLike.re_to_complex] at H
+      star_one, one_mul, mul_one, RCLike.re_to_complex]
+    at H
   convert H using 2
   rw [← Finset.sum_coe_sort Y]
   refine Finset.sum_congr rfl (fun h _ => ?_)
@@ -24,8 +25,12 @@ theorem sum_re_nonneg {α : Type} (Y : Finset α) (κ G : α → α → ℂ) (h�
 
 variable {E W : Type} [Field E] (D : Data E W)
 
-theorem baseGram_nonneg (hG : D.GramPSD) (hW : D.WordsPos) {ε : ℝ} (hε : 0 < ε) (k : ℕ) (w : W)
-    (Y : Finset (Pt E)) (κ : Pt E → Pt E → ℂ) (hκ : PSDOn Y κ) : 0 ≤ D.N0 ε k w Y κ :=
+theorem baseGram_nonneg
+    (hG : D.GramPSD) (hW : D.WordsPos)
+    {ε : ℝ} (hε : 0 < ε)
+    (k : ℕ) (w : W)
+    (Y : Finset (Pt E)) (κ : Pt E → Pt E → ℂ) (hκ : PSDOn Y κ)
+    : 0 ≤ D.N0 ε k w Y κ :=
   div_nonneg (sum_re_nonneg Y κ _ hκ (hG ε hε k w Y)) (hW w).le
 
 theorem Wb_mono {n m : ℕ} (h : n ≤ m) : D.Wb n ⊆ D.Wb m := by
@@ -36,10 +41,11 @@ theorem Wb_mono {n m : ℕ} (h : n ≤ m) : D.Wb n ⊆ D.Wb m := by
 theorem estBlockOfSumForm_ok : EstBlockOfSumForm := by
   intro E W _ D C₄ hG hW hSF ε hε i s hs hsi hir w hw hcnt hvol
   obtain ⟨Mv, hMv, θ, hθ, hb⟩ := hSF ε hε i s hs hsi hir w hw hcnt hvol
-  have hsub : D.Wb (D.cnt w + s * D.K) ⊆ D.Wb (D.cnt w + (s + 1) * D.K) :=
-    Wb_mono D (by nlinarith)
-  have hext : ∀ g : W → ℝ, ∑ w' ∈ D.Wb (D.cnt w + (s + 1) * D.K), θ w' * g w' =
-      ∑ w' ∈ D.Wb (D.cnt w + s * D.K), θ w' * g w' := by
+  have hsub : D.Wb (D.cnt w + s * D.K) ⊆ D.Wb (D.cnt w + (s + 1) * D.K) := Wb_mono D (by nlinarith)
+  have hext
+      : ∀ g : W → ℝ,
+        ∑ w' ∈ D.Wb (D.cnt w + (s + 1) * D.K), θ w' * g w'
+          = ∑ w' ∈ D.Wb (D.cnt w + s * D.K), θ w' * g w' := by
     intro g
     symm
     refine Finset.sum_subset hsub (fun x _ hx => ?_)
@@ -57,5 +63,6 @@ theorem estBlockOfSumForm_ok : EstBlockOfSumForm := by
 
 end Formalism.FourierDecayAlt.P.BaseGramNonnegativity
 
-theorem Formalism.FourierDecayAlt.P.blockEstimateOfCosetSum : Formalism.FourierDecayAlt.crystallineComparison.EstBlockOfSumForm :=
+theorem Formalism.FourierDecayAlt.P.blockEstimateOfCosetSum
+    : Formalism.FourierDecayAlt.crystallineComparison.EstBlockOfSumForm :=
   Formalism.FourierDecayAlt.P.BaseGramNonnegativity.estBlockOfSumForm_ok

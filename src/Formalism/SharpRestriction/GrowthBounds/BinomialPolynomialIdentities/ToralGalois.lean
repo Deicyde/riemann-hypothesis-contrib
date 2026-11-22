@@ -12,11 +12,17 @@ namespace Formalism.MainNotions.G.ColumnFamilies
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-theorem weight_projector_mem_weight_space {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V] (E : GLOps n K V)
-    (htop : (⨆ mu : Fin n → ℤ, weightSp E mu) = ⊤) (mu : Fin n → ℤ) (e : Module.End K V) (he : IsWtProj E mu e)
-    (x : V) : e x ∈ weightSp E mu := by
+theorem weight_projector_mem_weight_space
+    {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (E : GLOps n K V) (htop : (⨆ mu : Fin n → ℤ, weightSp E mu) = ⊤)
+    (mu : Fin n → ℤ) (e : Module.End K V) (he : IsWtProj E mu e)
+    (x : V)
+    : e x ∈ weightSp E mu := by
   have hx : x ∈ ⨆ mu : Fin n → ℤ, weightSp E mu := by rw [htop]; trivial
-  refine Submodule.iSup_induction (fun nu => weightSp E nu) (motive := fun y => e y ∈ weightSp E mu) hx ?_ ?_ ?_
+  refine Submodule.iSup_induction
+    (fun nu => weightSp E nu)
+    (motive := fun y => e y ∈ weightSp E mu)
+    hx ?_ ?_ ?_
   · intro nu y hy
     by_cases h : nu = mu
     · subst h
@@ -44,6 +50,7 @@ theorem adm_eleven (D : Formalism.BasicNotions.D7) : GradedLatticeStable D := by
     rintro x ⟨u, hu, y, hy, -, rfl⟩
     exact hstab u hu y hy
   · intro y hy u hu e he
-    exact ⟨hproj _ (hstab u hu y hy) mu e he, weight_projector_mem_weight_space E hrep.2.2 mu e he _⟩
+    exact
+      ⟨hproj _ (hstab u hu y hy) mu e he, weight_projector_mem_weight_space E hrep.2.2 mu e he _⟩
 
 end Formalism.MainNotions.G.ColumnFamilies

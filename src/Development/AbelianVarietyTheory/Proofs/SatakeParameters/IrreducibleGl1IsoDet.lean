@@ -13,7 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Algebra
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -22,9 +25,15 @@ namespace GlobalTheory.GLOneChar
 
 open GlobalTheory.SmGL
 
-theorem equiv_detRep_of_isIrreducible : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (d : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (σ : Representation ℂ (GL (Fin d) k) V) (ω : kˣ →* ℂˣ), d = 1 → σ.IsIrreducible → GlobalTheory.SmGL.HasCentralChar σ ω → Nonempty (σ.Equiv (GlobalTheory.SmGL.detRep (Fin d) ω)) := by
+theorem equiv_detRep_of_isIrreducible
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (d : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (σ : Representation ℂ (GL (Fin d) k) V)
+        (ω : kˣ →* ℂˣ),
+      d = 1 → σ.IsIrreducible → GlobalTheory.SmGL.HasCentralChar σ ω
+        → Nonempty (σ.Equiv (GlobalTheory.SmGL.detRep (Fin d) ω)) := by
   intro k _ _ _ _ d V _ _ σ ω hd hirr hω
-  have hact : ∀ (g : GL (Fin d) k) (v : V), σ g v = (ω (Matrix.GeneralLinearGroup.det g) : ℂ) • v := by
+  have hact
+      : ∀ (g : GL (Fin d) k) (v : V), σ g v = (ω (Matrix.GeneralLinearGroup.det g) : ℂ) • v := by
     intro g v
     conv_lhs => rw [GlobalTheory.ProdSupport.eq_scalar_det hd g]
     exact hω _ v
@@ -35,10 +44,13 @@ theorem equiv_detRep_of_isIrreducible : ∀ (k : Type) [Field k] [ValuativeRel k
       Subrepresentation.toSubmodule_injective (Subsingleton.elim _ _)
     exact bot_ne_top this
   obtain ⟨v, hv⟩ := exists_ne (0 : V)
-  let S : Subrepresentation σ := ⟨ℂ ∙ v, fun g w hw => by
-    obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hw
-    rw [hact, smul_smul]
-    exact Submodule.mem_span_singleton.2 ⟨_, rfl⟩⟩
+  let S : Subrepresentation σ := ⟨
+    ℂ ∙ v,
+    fun g w hw => by
+      obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hw
+      rw [hact, smul_smul]
+      exact Submodule.mem_span_singleton.2 ⟨_, rfl⟩
+  ⟩
   have hS : S = ⊤ := by
     rcases eq_bot_or_eq_top S with h | h
     · exfalso

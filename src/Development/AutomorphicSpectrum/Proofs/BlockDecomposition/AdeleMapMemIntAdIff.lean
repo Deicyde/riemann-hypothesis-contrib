@@ -7,18 +7,19 @@ public import Development.WeilBound.RepresentationTheoryGL.EisensteinSeries.Sieg
 
 open NumberField IsDedekindDomain
 open scoped NumberField.AdeleRing TensorProduct
-open PositivityTheory.RgEis PositivityTheory.RgEis.So GroundTheory.Global GroundTheory.Global.AdeleBaseChange GroundTheory.Automorphic.Reduction
+open PositivityTheory.RgEis PositivityTheory.RgEis.So GroundTheory.Global
+  GroundTheory.Global.AdeleBaseChange GroundTheory.Automorphic.Reduction
 
 namespace GlobalTheory.CompanionTheory.RgEisBInt
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem exists_below_eq (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ w : HeightOneSpectrum (𝓞 E), below F w = v := by
+theorem exists_below_eq (v : HeightOneSpectrum (𝓞 F))
+    : ∃ w : HeightOneSpectrum (𝓞 E), below F w = v := by
   have hker : RingHom.ker (algebraMap (𝓞 F) (𝓞 E)) = ⊥ :=
     (RingHom.injective_iff_ker_eq_bot _).mp (FaithfulSMul.algebraMap_injective (𝓞 F) (𝓞 E))
-  obtain ⟨Q, -, hQ, hQv⟩ := Ideal.exists_ideal_over_prime_of_isIntegral v.asIdeal (⊥ : Ideal (𝓞 E))
-    (hker.le.trans bot_le)
+  obtain ⟨Q, -, hQ, hQv⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral v.asIdeal (⊥ : Ideal (𝓞 E)) (hker.le.trans bot_le)
   have hne : Q ≠ ⊥ := by
     rintro rfl
     apply v.ne_bot
@@ -27,17 +28,19 @@ theorem exists_below_eq (v : HeightOneSpectrum (𝓞 F)) :
   exact ⟨⟨Q, hQ, hne⟩, HeightOneSpectrum.ext hQv⟩
 
 theorem adeleMap_mem_intAd_iff (x : 𝔸[F]) : adeleMap F E x ∈ intAd E ↔ x ∈ intAd F := by
-  have key : ∀ w : HeightOneSpectrum (𝓞 E),
-      finEval w (adeleMap F E x) ∈ w.adicCompletionIntegers E ↔
-        finEval (below F w) x ∈ (below F w).adicCompletionIntegers F := by
+  have key
+      : ∀ w : HeightOneSpectrum (𝓞 E),
+        finEval w (adeleMap F E x) ∈ w.adicCompletionIntegers E
+          ↔ finEval (below F w) x ∈ (below F w).adicCompletionIntegers F := by
     intro w
     haveI := liesOver_below (K := F) w
     haveI := w.isPrime
-    have h1 : finEval w (adeleMap F E x) =
-        SemiLocal.completionMap (below F w) w (finEval (below F w) x) :=
+    have h1
+        : finEval w (adeleMap F E x)
+          = SemiLocal.completionMap (below F w) w (finEval (below F w) x) :=
       finiteAdeleMap_apply x.2 w
-    rw [h1, HeightOneSpectrum.mem_adicCompletionIntegers, HeightOneSpectrum.mem_adicCompletionIntegers,
-      SemiLocal.valued_completionMap]
+    rw [h1, HeightOneSpectrum.mem_adicCompletionIntegers,
+      HeightOneSpectrum.mem_adicCompletionIntegers, SemiLocal.valued_completionMap]
     exact pow_le_one_iff (Ideal.ramificationIdx_pos (R := 𝓞 F) w.asIdeal).ne'
   simp only [intAd, Subring.mem_iInf, Subring.mem_comap]
   constructor

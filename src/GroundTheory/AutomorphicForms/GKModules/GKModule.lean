@@ -31,8 +31,11 @@ def kHom (τ : Representation ℂ K W) (σ : Representation ℂ K V) : Submodule
 
 end KHom
 
-def Representation.HasContinuousCoeff {K : Type*} [Monoid K] [TopologicalSpace K]
-    {W : Type*} [AddCommGroup W] [Module ℂ W] (τ : Representation ℂ K W) : Prop :=
+def Representation.HasContinuousCoeff
+    {K : Type*} [Monoid K] [TopologicalSpace K]
+    {W : Type*} [AddCommGroup W] [Module ℂ W]
+    (τ : Representation ℂ K W)
+    : Prop :=
   ∀ (φ : Module.Dual ℂ W) (w : W), Continuous fun k => φ (τ k w)
 
 variable {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸]
@@ -43,22 +46,18 @@ namespace IsExpLieAlgebra
 variable (h : IsExpLieAlgebra G 𝔤)
 
 structure GKModule (K : Subgroup G) (V : Type*) [AddCommGroup V] [Module ℂ V] where
-
   ρ : h.lieSubalgebra →ₗ⁅ℝ⁆ Module.End ℂ V
-
   σ : Representation ℂ K V
-
   locallyFinite : ∀ v : V, FiniteDimensional ℂ (Submodule.span ℂ (range fun k : K => σ k v))
-
   hasContinuousCoeff : Representation.HasContinuousCoeff σ
-
-  hasDerivAt_coeff : ∀ (X : 𝔤) (hX : ∀ t : ℝ, h.expG (t • X) ∈ K) (φ : Module.Dual ℂ V) (v : V),
-    HasDerivAt (fun t : ℝ => φ (σ ⟨h.expG (t • X), hX t⟩ v)) (φ (ρ (h.toLie X) v)) 0
-
+  hasDerivAt_coeff
+    : ∀ (X : 𝔤) (hX : ∀ t : ℝ, h.expG (t • X) ∈ K) (φ : Module.Dual ℂ V) (v : V),
+      HasDerivAt (fun t : ℝ => φ (σ ⟨h.expG (t • X), hX t⟩ v)) (φ (ρ (h.toLie X) v)) 0
   map_ρ : ∀ (k : K) (X : 𝔤) (v : V), σ k (ρ (h.toLie X) v) = ρ (h.toLie (h.Ad k X)) (σ k v)
 
-def GKModule.IsAdmissible {K : Subgroup G} {V : Type*} [AddCommGroup V] [Module ℂ V]
-    (M : h.GKModule K V) : Prop :=
+def GKModule.IsAdmissible
+    {K : Subgroup G} {V : Type*} [AddCommGroup V] [Module ℂ V] (M : h.GKModule K V)
+    : Prop :=
   ∀ (W : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] (τ : Representation ℂ K W),
     τ.IsIrreducible → Representation.HasContinuousCoeff τ → FiniteDimensional ℂ (kHom τ M.σ)
 
@@ -84,11 +83,9 @@ def kSpan (v : E) : Submodule ℂ E := Submodule.span ℂ (range fun k : K => π
 
 def IsKFinite (v : E) : Prop := FiniteDimensional ℂ (π.kSpan K v)
 
-theorem mem_kSpan_self (v : E) : v ∈ π.kSpan K v :=
-  Submodule.subset_span ⟨1, by simp⟩
+theorem mem_kSpan_self (v : E) : v ∈ π.kSpan K v := Submodule.subset_span ⟨1, by simp⟩
 
-theorem map_mem_kSpan (v : E) (k : K) : π k v ∈ π.kSpan K v :=
-  Submodule.subset_span ⟨k, rfl⟩
+theorem map_mem_kSpan (v : E) (k : K) : π k v ∈ π.kSpan K v := Submodule.subset_span ⟨k, rfl⟩
 
 theorem map_mem_kSpan_of_mem {v w : E} (hw : w ∈ π.kSpan K v) (k : K) : π k w ∈ π.kSpan K v := by
   induction hw using Submodule.span_induction with
@@ -105,8 +102,8 @@ theorem kSpan_le_of_mem {v w : E} (hw : w ∈ π.kSpan K v) : π.kSpan K w ≤ �
   rintro _ ⟨k, rfl⟩
   exact π.map_mem_kSpan_of_mem K hw k
 
-theorem isKFinite_of_mem {v w : E} (hv : π.IsKFinite K v) (hw : w ∈ π.kSpan K v) :
-    π.IsKFinite K w :=
+theorem isKFinite_of_mem {v w : E} (hv : π.IsKFinite K v) (hw : w ∈ π.kSpan K v)
+    : π.IsKFinite K w :=
   haveI : FiniteDimensional ℂ (π.kSpan K v) := hv
   Submodule.finiteDimensional_of_le (π.kSpan_le_of_mem K hw)
 
@@ -119,13 +116,16 @@ def kFiniteVectors : Submodule ℂ E where
     show FiniteDimensional ℂ (π.kSpan K 0)
     have : π.kSpan K 0 = ⊥ := by
       rw [kSpan, Submodule.span_eq_bot]
-      rintro _ ⟨k, rfl⟩; simp
-    rw [this]; infer_instance
+      rintro _ ⟨k, rfl⟩
+      simp
+    rw [this]
+    infer_instance
   add_mem' {v w} hv hw := by
     change FiniteDimensional ℂ (π.kSpan K v) at hv
     change FiniteDimensional ℂ (π.kSpan K w) at hw
     show FiniteDimensional ℂ (π.kSpan K (v + w))
-    haveI := hv; haveI := hw
+    haveI := hv
+    haveI := hw
     refine Submodule.finiteDimensional_of_le (S₂ := π.kSpan K v ⊔ π.kSpan K w) ?_
     rw [kSpan, Submodule.span_le]
     rintro _ ⟨k, rfl⟩
@@ -155,8 +155,8 @@ noncomputable def derivEndL : 𝔤 →ₗ[ℝ] Module.End ℂ (h.smoothVectors �
   map_add' X Y := by ext v; exact h.derivOp_add_left π _ _ _
   map_smul' r X := by ext v; exact h.derivOp_smul_left π r _ _
 
-theorem isKFinite_derivOp {v : E} (hv : h.IsSmoothVector π v) (hK : π.IsKFinite K v) (X : 𝔤) :
-    π.IsKFinite K (h.derivOp π X v) := by
+theorem isKFinite_derivOp {v : E} (hv : h.IsSmoothVector π v) (hK : π.IsKFinite K v) (X : 𝔤)
+    : π.IsKFinite K (h.derivOp π X v) := by
   set M := h.smoothVectors π
   set v' : M := ⟨v, hv⟩
   set S : Submodule ℂ M := Submodule.span ℂ (range fun k : K => h.smoothOp π k v')
@@ -194,16 +194,14 @@ theorem isKFinite_derivOp {v : E} (hv : h.IsSmoothVector π v) (hK : π.IsKFinit
 
 def gkVectors : Submodule ℂ E := h.smoothVectors π ⊓ π.kFiniteVectors K
 
-theorem map_mem_gkVectors {v : E} (hv : v ∈ h.gkVectors π K) (k : K) :
-    π k v ∈ h.gkVectors π K :=
+theorem map_mem_gkVectors {v : E} (hv : v ∈ h.gkVectors π K) (k : K) : π k v ∈ h.gkVectors π K :=
   ⟨h.isSmoothVector_map π hv.1 k, π.isKFinite_map K hv.2 k⟩
 
-theorem derivOp_mem_gkVectors {v : E} (hv : v ∈ h.gkVectors π K) (X : 𝔤) :
-    h.derivOp π X v ∈ h.gkVectors π K :=
+theorem derivOp_mem_gkVectors {v : E} (hv : v ∈ h.gkVectors π K) (X : 𝔤)
+    : h.derivOp π X v ∈ h.gkVectors π K :=
   ⟨h.isSmoothVector_derivOp π hv.1 X, h.isKFinite_derivOp π K hv.1 hv.2 X⟩
 
-theorem kSpan_le_gkVectors {v : E} (hv : v ∈ h.gkVectors π K) :
-    π.kSpan K v ≤ h.gkVectors π K := by
+theorem kSpan_le_gkVectors {v : E} (hv : v ∈ h.gkVectors π K) : π.kSpan K v ≤ h.gkVectors π K := by
   rw [BanachRep.kSpan, Submodule.span_le]
   rintro _ ⟨k, rfl⟩
   exact h.map_mem_gkVectors π K hv k
@@ -214,16 +212,17 @@ noncomputable def derivGK (X : 𝔤) : Module.End ℂ (h.gkVectors π K) where
   map_smul' c v := by ext; exact h.derivOp_smul π v.2.1 c X
 
 noncomputable def kRepGK : Representation ℂ K (h.gkVectors π K) where
-  toFun k :=
-    { toFun := fun v => ⟨π k v, h.map_mem_gkVectors π K v.2 k⟩
-      map_add' := fun v w => by ext; simp
-      map_smul' := fun c v => by ext; simp }
+  toFun k := {
+    toFun := fun v => ⟨π k v, h.map_mem_gkVectors π K v.2 k⟩
+    map_add' := fun v w => by ext; simp
+    map_smul' := fun c v => by ext; simp
+  }
   map_one' := by ext v; simp
   map_mul' k k' := by ext v; simp [BanachRep.map_mul_apply]
 
-theorem exists_strongDual_eq [CompleteSpace E] (φ : Module.Dual ℂ (h.gkVectors π K))
-    (v : h.gkVectors π K) :
-    ∃ Φ : E →L[ℂ] ℂ, ∀ (w : E) (hw : w ∈ π.kSpan K v),
+theorem exists_strongDual_eq
+    [CompleteSpace E] (φ : Module.Dual ℂ (h.gkVectors π K)) (v : h.gkVectors π K)
+    : ∃ Φ : E →L[ℂ] ℂ, ∀ (w : E) (hw : w ∈ π.kSpan K v),
       Φ w = φ ⟨w, h.kSpan_le_gkVectors π K v.2 hw⟩ := by
   set W := π.kSpan K (v : E)
   haveI : FiniteDimensional ℂ W := v.2.2
@@ -232,9 +231,11 @@ theorem exists_strongDual_eq [CompleteSpace E] (φ : Module.Dual ℂ (h.gkVector
   obtain ⟨Φ, hΦ, -⟩ := exists_extension_norm_eq W ψc
   exact ⟨Φ, fun w hw => hΦ ⟨w, hw⟩⟩
 
-theorem derivOp_mem_kSpan [CompleteSpace E] {v : E} (hv : h.IsSmoothVector π v)
-    (hK : π.IsKFinite K v) (X : 𝔤) (hX : ∀ t : ℝ, h.expG (t • X) ∈ K) :
-    h.derivOp π X v ∈ π.kSpan K v := by
+theorem derivOp_mem_kSpan
+    [CompleteSpace E]
+    {v : E} (hv : h.IsSmoothVector π v) (hK : π.IsKFinite K v)
+    (X : 𝔤) (hX : ∀ t : ℝ, h.expG (t • X) ∈ K)
+    : h.derivOp π X v ∈ π.kSpan K v := by
   haveI : FiniteDimensional ℂ (π.kSpan K v) := hK
   have hcl : IsClosed (π.kSpan K v : Set E) := Submodule.closed_of_finiteDimensional _
   have hlim := hasDerivAt_iff_tendsto_slope.1 (h.hasDerivAt_derivOp π hv X)
@@ -246,14 +247,15 @@ theorem derivOp_mem_kSpan [CompleteSpace E] {v : E} (hv : h.IsSmoothVector π v)
     exact π.mem_kSpan_self K v
 
 noncomputable def gkModule [CompleteSpace E] : h.GKModule K (h.gkVectors π K) where
-  ρ :=
-    { toFun := fun X => h.derivGK π K (h.ofLie X)
-      map_add' := fun X Y => by ext v; exact h.derivOp_add_left π _ _ _
-      map_smul' := fun r X => by ext v; exact h.derivOp_smul_left π r _ _
-      map_lie' := fun {X Y} => by
-        ext v
-        rw [h.ofLie_lie, Ring.lie_def]
-        exact h.derivOp_bracket π v.2.1 _ _ }
+  ρ := {
+    toFun := fun X => h.derivGK π K (h.ofLie X)
+    map_add' := fun X Y => by ext v; exact h.derivOp_add_left π _ _ _
+    map_smul' := fun r X => by ext v; exact h.derivOp_smul_left π r _ _
+    map_lie' := fun {X Y} => by
+      ext v
+      rw [h.ofLie_lie, Ring.lie_def]
+      exact h.derivOp_bracket π v.2.1 _ _
+  }
   σ := h.kRepGK π K
   locallyFinite v := by
     set S := Submodule.span ℂ (range fun k : K => h.kRepGK π K k v)
@@ -262,7 +264,8 @@ noncomputable def gkModule [CompleteSpace E] : h.GKModule K (h.gkVectors π K) w
       rfl
     haveI : FiniteDimensional ℂ (π.kSpan K v) := v.2.2
     haveI : FiniteDimensional ℂ (S.map (h.gkVectors π K).subtype) := by rw [hS]; infer_instance
-    exact (Submodule.equivMapOfInjective _ (h.gkVectors π K).injective_subtype S).symm.finiteDimensional
+    exact (Submodule.equivMapOfInjective _ (h.gkVectors π K).injective_subtype
+      S).symm.finiteDimensional
   hasContinuousCoeff φ v := by
     obtain ⟨Φ, hΦ⟩ := h.exists_strongDual_eq π K φ v
     have e : (fun k : K => φ (h.kRepGK π K k v)) = fun k : K => Φ (π k v) := by
@@ -273,10 +276,11 @@ noncomputable def gkModule [CompleteSpace E] : h.GKModule K (h.gkVectors π K) w
     exact Φ.continuous.comp ((π.continuous_orbit v).comp (continuous_subtype_val))
   hasDerivAt_coeff X hX φ v := by
     obtain ⟨Φ, hΦ⟩ := h.exists_strongDual_eq π K φ v
-    have hd := (Φ.restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ)
-      (h.hasDerivAt_derivOp π v.2.1 X)
+    have hd :=
+      (Φ.restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ) (h.hasDerivAt_derivOp π v.2.1 X)
     have hmem := h.derivOp_mem_kSpan π K v.2.1 v.2.2 X hX
-    have e1 : (Φ.restrictScalars ℝ) (h.derivOp π X v) = φ (h.derivGK π K (h.ofLie (h.toLie X)) v) := by
+    have e1
+        : (Φ.restrictScalars ℝ) (h.derivOp π X v) = φ (h.derivGK π K (h.ofLie (h.toLie X)) v) := by
       rw [ContinuousLinearMap.coe_restrictScalars', hΦ _ hmem]
       rfl
     rw [e1] at hd

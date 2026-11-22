@@ -25,14 +25,18 @@ end Cauchy
 
 section Param
 
-variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F] [FiniteDimensional ℂ F]
-  [MeasurableSpace F] [BorelSpace F] {n : ℕ}
+variable
+  {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F] [FiniteDimensional ℂ F] [MeasurableSpace F]
+  [BorelSpace F]
+  {n : ℕ}
 
-theorem diffOn_param {K : Set (Fin n → ℝ)} (hK : IsCompact K) (hKm : MeasurableSet K)
-    (A : (Fin n → ℝ) → F →L[ℂ] F) (hA : Continuous A) {U : Set F} (hU : IsOpen U)
-    (hAU : ∀ t ∈ K, ∀ x ∈ U, A t x ∈ U) (G : F → ℂ) (hG : DifferentiableOn ℂ G U)
-    (e : (Fin n → ℝ) → ℂ) (he : Continuous e) :
-    DifferentiableOn ℂ (fun x => ∫ t in K, G (A t x) * e t) U := by
+theorem diffOn_param
+    {K : Set (Fin n → ℝ)} (hK : IsCompact K) (hKm : MeasurableSet K)
+    (A : (Fin n → ℝ) → F →L[ℂ] F) (hA : Continuous A)
+    {U : Set F} (hU : IsOpen U) (hAU : ∀ t ∈ K, ∀ x ∈ U, A t x ∈ U)
+    (G : F → ℂ) (hG : DifferentiableOn ℂ G U)
+    (e : (Fin n → ℝ) → ℂ) (he : Continuous e)
+    : DifferentiableOn ℂ (fun x => ∫ t in K, G (A t x) * e t) U := by
   intro x0 hx0
   have hcA : ∀ x, Continuous fun t => A t x := fun x => hA.clm_apply continuous_const
   set K0 := (fun t => A t x0) '' K with hK0def
@@ -52,8 +56,11 @@ theorem diffOn_param {K : Set (Fin n → ℝ)} (hK : IsCompact K) (hKm : Measura
     have hx' : ‖x - x0‖ < ε := by rw [← dist_eq_norm]; exact hx
     have h1 : dist (A t x) (A t x0) ≤ δ / 2 := by
       rw [dist_eq_norm, ← map_sub]
-      calc ‖A t (x - x0)‖ ≤ ‖A t‖ * ‖x - x0‖ := (A t).le_opNorm _
-        _ ≤ A1 * ε := mul_le_mul (le_trans (hAm t ht) (le_max_left _ _)) hx'.le (norm_nonneg _) hA1.le
+      calc
+        ‖A t (x - x0)‖
+          ≤ ‖A t‖ * ‖x - x0‖ := (A t).le_opNorm _
+        _ ≤ A1 * ε :=
+          mul_le_mul (le_trans (hAm t ht) (le_max_left _ _)) hx'.le (norm_nonneg _) hA1.le
         _ = δ / 2 := by rw [hεdef]; field_simp
     have h2 : dist z (A t x0) ≤ δ := by
       linarith [dist_triangle z (A t x) (A t x0), mem_closedBall.1 hz]
@@ -68,37 +75,42 @@ theorem diffOn_param {K : Set (Fin n → ℝ)} (hK : IsCompact K) (hKm : Measura
     (hG.continuousOn.comp (hcA x).continuousOn (fun t ht => hin t ht x hx)).mul he.continuousOn
   have hfin : IsFiniteMeasure (volume.restrict K) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact hK.measure_lt_top⟩
-  have m1 : Measurable fun t => fderiv ℂ G (A t x0) := (measurable_fderiv ℂ G).comp (hcA x0).measurable
+  have m1 : Measurable fun t => fderiv ℂ G (A t x0) :=
+    (measurable_fderiv ℂ G).comp (hcA x0).measurable
   have m2 : Measurable fun t => (fderiv ℂ G (A t x0)).comp (A t) :=
     (isBoundedBilinearMap_comp.continuous.measurable).comp (m1.prodMk hA.measurable)
-  have key := hasFDerivAt_integral_of_dominated_of_fderiv_le (μ := volume.restrict K)
-    (F := fun x t => G (A t x) * e t)
-    (F' := fun x t => e t • (fderiv ℂ G (A t x)).comp (A t))
-    (bound := fun _ => Me * (C / (δ / 2) * A1)) hball
-    (by filter_upwards [hball] with x hx; exact (hcont x hx).aestronglyMeasurable hKm)
-    ((hcont x0 (mem_ball_self hε)).integrableOn_compact hK)
-    ((he.measurable.smul m2).aestronglyMeasurable)
-    ((ae_restrict_iff' hKm).2 (Eventually.of_forall fun t ht x hx => by
-      calc ‖e t • (fderiv ℂ G (A t x)).comp (A t)‖
-          = ‖e t‖ * ‖(fderiv ℂ G (A t x)).comp (A t)‖ := norm_smul _ _
-        _ ≤ Me * (C / (δ / 2) * A1) := by
-          refine mul_le_mul (hMe t ht) ?_ (norm_nonneg _) (le_trans (norm_nonneg _) (hMe t ht))
-          exact (ContinuousLinearMap.opNorm_comp_le _ _).trans (mul_le_mul (hfd t ht x hx)
-            (le_trans (hAm t ht) (le_max_left _ _)) (norm_nonneg _)
-            (le_trans (norm_nonneg _) (hfd t ht x hx)))))
-    (integrable_const _)
-    ((ae_restrict_iff' hKm).2 (Eventually.of_forall fun t ht x hx => by
-      have h1 : HasFDerivAt G (fderiv ℂ G (A t x)) (A t x) :=
-        (hG.differentiableAt (hU.mem_nhds (hin t ht x hx))).hasFDerivAt
-      exact (h1.comp x (A t).hasFDerivAt).mul_const (e t)))
+  have key :=
+    hasFDerivAt_integral_of_dominated_of_fderiv_le (μ := volume.restrict K)
+      (F := fun x t => G (A t x) * e t)
+      (F' := fun x t => e t • (fderiv ℂ G (A t x)).comp (A t))
+      (bound := fun _ => Me * (C / (δ / 2) * A1))
+      hball (by filter_upwards [hball] with x hx; exact (hcont x hx).aestronglyMeasurable hKm)
+      ((hcont x0 (mem_ball_self hε)).integrableOn_compact hK)
+      ((he.measurable.smul m2).aestronglyMeasurable)
+      ((ae_restrict_iff' hKm).2
+        (Eventually.of_forall fun t ht x hx => by
+          calc
+            ‖e t • (fderiv ℂ G (A t x)).comp (A t)‖
+              = ‖e t‖ * ‖(fderiv ℂ G (A t x)).comp (A t)‖ := norm_smul _ _
+            _ ≤ Me * (C / (δ / 2) * A1) := by
+              refine mul_le_mul (hMe t ht) ?_ (norm_nonneg _) (le_trans (norm_nonneg _) (hMe t ht))
+              exact (ContinuousLinearMap.opNorm_comp_le _ _).trans
+                (mul_le_mul (hfd t ht x hx) (le_trans (hAm t ht) (le_max_left _ _)) (norm_nonneg _)
+                  (le_trans (norm_nonneg _) (hfd t ht x hx)))))
+      (integrable_const _)
+      ((ae_restrict_iff' hKm).2
+        (Eventually.of_forall fun t ht x hx => by
+          have h1 : HasFDerivAt G (fderiv ℂ G (A t x)) (A t x) :=
+            (hG.differentiableAt (hU.mem_nhds (hin t ht x hx))).hasFDerivAt
+          exact (h1.comp x (A t).hasFDerivAt).mul_const (e t)))
   exact key.differentiableAt.differentiableWithinAt
 
 end Param
 
 section Dom
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
-  (u : Fin 2 → Fin r → E)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r) (u : Fin 2 → Fin r → E)
 
 lemma cont_gram (τ : X.Ψ) : Continuous fun x : Frame X.Ψ r => gram τ.1 X.Gm (mat x τ) := by
   refine continuous_pi fun a => continuous_pi fun b => ?_
@@ -117,16 +129,19 @@ lemma isOpen_dom : IsOpen X.dom := by
       ((cont_gram X τ).matrix_submatrix _ _).matrix_det))
 
 def ZbL (b : X.Ψ → Fin 2 → Fin 2 → ℂ) : Frame X.Ψ r →L[ℂ] Frame X.Ψ r :=
-  LinearMap.toContinuousLinearMap
-    { toFun := X.Zb u b
-      map_add' x y := by
-        funext τ
-        show X.zmat u b τ * (mat x τ + mat y τ) = _
-        rw [Matrix.mul_add]; rfl
-      map_smul' c x := by
-        funext τ
-        show X.zmat u b τ * (c • mat x τ) = _
-        rw [Matrix.mul_smul]; rfl }
+  LinearMap.toContinuousLinearMap {
+    toFun := X.Zb u b
+    map_add' x y := by
+      funext τ
+      show X.zmat u b τ * (mat x τ + mat y τ) = _
+      rw [Matrix.mul_add]
+      rfl
+    map_smul' c x := by
+      funext τ
+      show X.zmat u b τ * (c • mat x τ) = _
+      rw [Matrix.mul_smul]
+      rfl
+  }
 
 lemma cont_Zb {n : ℕ} {B : (Fin n → ℝ) → X.Ψ → Fin 2 → Fin 2 → ℂ}
     (hB : Continuous B) (y : Frame X.Ψ r) : Continuous fun t => X.Zb u (B t) y := by

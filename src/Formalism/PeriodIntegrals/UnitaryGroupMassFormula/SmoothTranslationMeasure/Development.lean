@@ -13,8 +13,10 @@ namespace PI.PhMeasCore.UnitaryGroupMassFormula
 
 open PI.PhMeasCore
 
-def MulOnUH {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (Hm : Matrix (Fin n) (Fin n) ℂ) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : Prop :=
+def MulOnUH
+    {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (Hm : Matrix (Fin n) (Fin n) ℂ) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    : Prop :=
   σ 1 = 1 ∧ ∀ a ∈ UH Hm, ∀ b ∈ UH Hm, σ (a * b) = (σ a).comp (σ b)
 
 section Deriv

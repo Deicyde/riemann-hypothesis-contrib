@@ -18,8 +18,9 @@ theorem lefSum_of : LefSum := by
   intro d A y
   set p : ℂ[X] := (1 + (X : ℂ[X]) • A.map (C : ℂ →+* ℂ[X])).det with hp
   have hdeg : p.natDegree < d + 1 := by
-    have h1 : (1 + (X : ℂ[X]) • A.map (C : ℂ →+* ℂ[X]) : Matrix (Fin d) (Fin d) ℂ[X]) =
-        (X : ℂ[X]) • A.map C + (1 : Matrix (Fin d) (Fin d) ℂ).map C := by
+    have h1
+        : (1 + (X : ℂ[X]) • A.map (C : ℂ →+* ℂ[X]) : Matrix (Fin d) (Fin d) ℂ[X])
+          = (X : ℂ[X]) • A.map C + (1 : Matrix (Fin d) (Fin d) ℂ).map C := by
       rw [Matrix.map_one C (map_zero _) (map_one _), add_comm]
     have hle := natDegree_det_X_add_C_le A 1
     rw [← h1, Fintype.card_fin] at hle

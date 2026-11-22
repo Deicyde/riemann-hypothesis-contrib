@@ -52,7 +52,6 @@ def Ainf' : Subring (B l) := Subring.closure (Set.range (aB l) ∪ {qB l ((l : �
 
 def Plus : Subring (BdR l) := (algebraMap (BdRp l) (BdR l)).range
 
-
 open Classical in
 def th (x : BdR l) : ℂ_[l] := if h : x ∈ Plus l then θD l (RingHom.mem_range.1 h).choose else 0
 
@@ -100,7 +99,9 @@ structure Base (l : ℕ) [Fact l.Prime] : Prop where
   th_q : ∀ q, qQ l q ∈ Plus l ∧ th l (qQ l q) = algebraMap ℚ_[l] ℂ_[l] q
   th_zero : ∀ x ∈ Plus l, (th l x = 0 ↔ ∃ y ∈ Plus l, x = tQ l * y)
   t_plus : tQ l ∈ Plus l
-  val : ∀ x : BdR l, x ≠ 0 → ∃ (i : ℤ) (u v : BdR l), u ∈ Plus l ∧ v ∈ Plus l ∧ u * v = 1 ∧ x = tQ l ^ i * u
+  val
+    : ∀ x : BdR l,
+      x ≠ 0 → ∃ (i : ℤ) (u v : BdR l), u ∈ Plus l ∧ v ∈ Plus l ∧ u * v = 1 ∧ x = tQ l ^ i * u
   orbit : ∀ x : ℂ_[l], Continuous fun g : GQ l => σC g x
   fs_ker : ∀ x, φ l x = x → ι l x ∈ Plus l → ∃ q, x = qB l q
   fs_surj : ∀ z : BdR l, ∃ x, φ l x = x ∧ ι l x - z ∈ Plus l
@@ -108,11 +109,16 @@ structure Base (l : ℕ) [Fact l.Prime] : Prop where
   ainf_σ : ∀ (g : GQ l), ∀ x ∈ Ainf' l, σB g x ∈ Ainf' l
   ainf_plus : ∀ x ∈ Ainf' l, ι l x ∈ Plus l
   ainf_eig : ∀ (h : ℕ) (m : ℤ), m ≠ 0 → ∀ x ∈ Ainf' l, Eig h m x → x = 0
-  fixed : ∀ L : Fld l, FiniteDimensional ℚ_[l] L → ∃ (f : ℕ) (b : Fin f → B l),
-    (∀ i, b i ∈ Ainf' l ∧ ∀ σ ∈ L.fixingSubgroup, σB σ (b i) = b i) ∧
-    ∀ x, (∀ σ ∈ L.fixingSubgroup, σB σ x = x) → ∃ q : Fin f → ℚ_[l], x = ∑ i, qB l (q i) * b i
-  no_kummer : ∀ L : Fld l, FiniteDimensional ℚ_[l] L → ∀ x : B l,
-    ¬ ∀ σ ∈ L.fixingSubgroup, σB σ x - x = qB l (κ σ) * t l
+  fixed
+    : ∀ L : Fld l,
+      FiniteDimensional ℚ_[l] L
+        → ∃ (f : ℕ) (b : Fin f → B l),
+          (∀ i, b i ∈ Ainf' l ∧ ∀ σ ∈ L.fixingSubgroup, σB σ (b i) = b i)
+            ∧ ∀ x,
+              (∀ σ ∈ L.fixingSubgroup, σB σ x = x) → ∃ q : Fin f → ℚ_[l], x = ∑ i, qB l (q i) * b i
+  no_kummer
+    : ∀ L : Fld l,
+      FiniteDimensional ℚ_[l] L → ∀ x : B l, ¬ ∀ σ ∈ L.fixingSubgroup, σB σ x - x = qB l (κ σ) * t l
 
 def PeriodRingBase : Prop := ∀ (l : ℕ) [Fact l.Prime], Base l
 

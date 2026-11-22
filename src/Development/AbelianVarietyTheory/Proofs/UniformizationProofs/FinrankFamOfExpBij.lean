@@ -10,14 +10,24 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.HasBa
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem finrank_fam_of_expBij : SecBaseChangeSt → ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R), AdmBase R I → ∀ (D : DegData R I) (A : PolAV (Spec (CommRingCat.of (FractionRing R)))) (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G] [GeometricallyConnected G.hom] (U : UnifPre I D A G) (k : ℕ), 1 ≤ k → U.ExpBij k → Module.finrank (FractionRing R) (Fam D.toPre (FractionRing R) k) = k ^ A.g := by
+theorem finrank_fam_of_expBij
+    : SecBaseChangeSt
+      → ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R),
+        AdmBase R I
+          → ∀ (D : DegData R I) (A : PolAV (Spec (CommRingCat.of (FractionRing R))))
+              (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G]
+              [GeometricallyConnected G.hom] (U : UnifPre I D A G) (k : ℕ),
+            1 ≤ k → U.ExpBij k
+              → Module.finrank (FractionRing R) (Fam D.toPre (FractionRing R) k) = k ^ A.g := by
   intro hBC R _ _ I hadm D A G _ _ _ U k hk hbij
   obtain ⟨b, hex, huniq⟩ := GlobalTheory.GenericSectionBasis.exists_secK_basis hBC R I D A G U k hk
   choose F hF using fun i => (hbij.1 (b i)).exists

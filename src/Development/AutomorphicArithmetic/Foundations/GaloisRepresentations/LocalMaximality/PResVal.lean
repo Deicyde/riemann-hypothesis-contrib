@@ -5,13 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section ResValAux
-variable {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K] {d : ℕ}
+variable
+  {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+  {d : ℕ}
 
-private noncomputable def mono (x : Fin (d + 1) → F) (a : Fin d → ℕ) : F := ∏ l, (x l.succ / x 0) ^ a l
+private noncomputable def mono (x : Fin (d + 1) → F) (a : Fin d → ℕ) : F :=
+  ∏ l, (x l.succ / x 0) ^ a l
 
 private lemma mono_zero (x : Fin (d + 1) → F) : mono x 0 = 1 := by simp [mono]
 
@@ -65,21 +69,26 @@ private lemma rho_mono (x : Fin (d + 1) → F) (hx : x 0 ≠ 0) (ρ : F →ₗ[�
 
 end ResValAux
 
-theorem UpperTheory.Gal.productCup_of_system.resVal_of :
-    ValBasic → ResVal := by
+theorem UpperTheory.Gal.productCup_of_system.resVal_of : ValBasic → ResVal := by
   intro hval F K _ _ _ _ _ _ d x hfc ρ hρ e f hf
   obtain ⟨_, _, hBval, _⟩ := hval K (rB ℂ K (xv x) {0}) e.1
   have hx0 : xv x 0 ≠ 0 := (x 0).ne_zero
   have hmemB : ∀ g ∈ rA ℂ (xv x) {0}, algebraMap F K g ∈ rB ℂ K (xv x) {0} := by
     intro g hg
-    exact (isIntegral_algebraMap : IsIntegral (rA ℂ (xv x) {0}) (algebraMap (rA ℂ (xv x) {0}) K ⟨g, hg⟩))
-  have hspan : ∀ g, g ∈ rA ℂ (xv x) {0} ↔ g ∈ Submodule.span ℂ
-      (Submonoid.closure {y | ∃ i ∈ ({0} : Finset (Fin (d + 1))), ∃ j, y = xv x j / xv x i} : Set F) := by
+    exact (isIntegral_algebraMap
+      : IsIntegral (rA ℂ (xv x) {0}) (algebraMap (rA ℂ (xv x) {0}) K ⟨g, hg⟩))
+  have hspan
+      : ∀ g,
+        g ∈ rA ℂ (xv x) {0}
+          ↔ g ∈ Submodule.span ℂ
+            (Submonoid.closure {y | ∃ i ∈ ({0} : Finset (Fin (d + 1))), ∃ j, y = xv x j / xv x i}
+              : Set F) := by
     intro g
     rw [← Algebra.adjoin_eq_span]
     rfl
-  have hmono : ∀ (a : Fin d → ℕ) (h : algebraMap F K (mono (xv x) a) ∈ rB ℂ K (xv x) {0}),
-      e.1 ⟨_, h⟩ = ρ (mono (xv x) a) := by
+  have hmono
+      : ∀ (a : Fin d → ℕ) (h : algebraMap F K (mono (xv x) a) ∈ rB ℂ K (xv x) {0}),
+        e.1 ⟨_, h⟩ = ρ (mono (xv x) a) := by
     intro a h
     by_cases ha : a = 0
     · subst ha
@@ -87,8 +96,9 @@ theorem UpperTheory.Gal.productCup_of_system.resVal_of :
         Subtype.ext (by simp [mono_zero])
       rw [h1, map_one, mono_zero, hρ.1]
     · rw [rho_mono (xv x) hx0 ρ hρ a ha]
-      have h1 : (⟨algebraMap F K (mono (xv x) a), h⟩ : rB ℂ K (xv x) {0}) =
-          ∏ l, (⟨algebraMap F K (xv x l.succ / xv x 0), tco_mem ℂ K (xv x) l⟩ : rB ℂ K (xv x) {0}) ^ a l :=
+      have h1
+          : (⟨algebraMap F K (mono (xv x) a), h⟩ : rB ℂ K (xv x) {0})
+            = ∏ l, (⟨algebraMap F K (xv x l.succ / xv x 0), tco_mem ℂ K (xv x) l⟩ : rB ℂ K (xv x) {0}) ^ a l :=
         Subtype.ext (by simp [mono, map_prod, map_pow])
       rw [h1, map_prod]
       obtain ⟨l, hl⟩ : ∃ l, a l ≠ 0 := by
@@ -96,9 +106,13 @@ theorem UpperTheory.Gal.productCup_of_system.resVal_of :
         push_neg at hc
         exact ha (funext hc)
       exact Finset.prod_eq_zero (Finset.mem_univ l) (by rw [map_pow, e.2 l, zero_pow hl])
-  have key : ∀ g (hg : g ∈ Submodule.span ℂ
-      (Submonoid.closure {y | ∃ i ∈ ({0} : Finset (Fin (d + 1))), ∃ j, y = xv x j / xv x i} : Set F))
-      (h : algebraMap F K g ∈ rB ℂ K (xv x) {0}), e.1 ⟨_, h⟩ = ρ g := by
+  have key
+      : ∀ g
+          (hg : g ∈ Submodule.span ℂ
+            (Submonoid.closure {y | ∃ i ∈ ({0} : Finset (Fin (d + 1))), ∃ j, y = xv x j / xv x i}
+              : Set F))
+          (h : algebraMap F K g ∈ rB ℂ K (xv x) {0}),
+        e.1 ⟨_, h⟩ = ρ g := by
     intro g hg
     induction hg using Submodule.span_induction with
     | mem y hy =>

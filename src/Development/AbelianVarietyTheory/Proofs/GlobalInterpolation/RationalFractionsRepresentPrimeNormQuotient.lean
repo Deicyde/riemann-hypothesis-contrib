@@ -23,8 +23,9 @@ variable {E : Type} [Field E] [NumberField E]
 theorem intAt_int (P : HeightOneSpectrum (𝓞 E)) (n : ℤ) : IntAt P (n : E) := by
   simpa using IntAt.coe P (n : 𝓞 E)
 
-theorem q_dvd_of_intAt {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) {n : ℤ}
-    (h : IntAt P ((qOf P : E)⁻¹ * n)) : (qOf P : ℤ) ∣ n := by
+theorem q_dvd_of_intAt
+    {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) {n : ℤ} (h : IntAt P ((qOf P : E)⁻¹ * n))
+    : (qOf P : ℤ) ∣ n := by
   by_contra hn
   have hpr : Prime (qOf P : ℤ) := Nat.prime_iff_prime_int.1 hP.1
   obtain ⟨x, y, hxy⟩ := (hpr.coprime_iff_not_dvd).2 hn
@@ -37,17 +38,23 @@ theorem q_dvd_of_intAt {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) {n 
       linear_combination -this
     rw [e]
     exact (intAt_int P x).add ((intAt_int P y).mul h)
-  rw [intAt_iff_val, map_inv₀, val_q hP, ← WithZero.exp_neg, ← WithZero.exp_zero, WithZero.exp_le_exp] at h1
+  rw [intAt_iff_val, map_inv₀, val_q hP, ← WithZero.exp_neg, ← WithZero.exp_zero,
+      WithZero.exp_le_exp]
+    at h1
   omega
 
-theorem q_pow_dvd_of_intAt {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) (k : ℕ) {n : ℤ}
-    (h : IntAt P (((qOf P : E) ^ k)⁻¹ * n)) : (qOf P : ℤ) ^ k ∣ n := by
+theorem q_pow_dvd_of_intAt
+    {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P)
+    (k : ℕ)
+    {n : ℤ} (h : IntAt P (((qOf P : E) ^ k)⁻¹ * n))
+    : (qOf P : ℤ) ^ k ∣ n := by
   have hq := q_ne_zero hP
   induction k generalizing n with
   | zero => simp
   | succ k ih =>
     have h1 : IntAt P ((qOf P : E)⁻¹ * n) := by
-      have e : (qOf P : E)⁻¹ * n = (((qOf P : ℤ) ^ k : ℤ) : E) * (((qOf P : E) ^ (k + 1))⁻¹ * n) := by
+      have e
+          : (qOf P : E)⁻¹ * n = (((qOf P : ℤ) ^ k : ℤ) : E) * (((qOf P : E) ^ (k + 1))⁻¹ * n) := by
         push_cast
         field_simp
         ring
@@ -62,12 +69,15 @@ theorem q_pow_dvd_of_intAt {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P)
     rw [pow_succ']
     exact mul_dvd_mul_left _ (ih h)
 
-theorem valsQ_reps : ∀ (E : Type) [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)),
-    GlobalTheory.IndefiniteRowSideFullHecke.SourceLatticeInvariance.DegOneUnram P → ∀ A B : ℕ,
-    (∀ a ∈ LocE.valsQ E (qOf P) A B, ∀ b ∈ LocE.valsQ E (qOf P) A B,
-      IntAt P (((qOf P : E) ^ B)⁻¹ * (a - b)) → a = b) ∧
-    ∀ a : E, IntAt P ((qOf P : E) ^ A * a) →
-      ∃ s ∈ LocE.valsQ E (qOf P) A B, IntAt P (((qOf P : E) ^ B)⁻¹ * (a - s)) := by
+theorem valsQ_reps
+    : ∀ (E : Type) [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)),
+      GlobalTheory.IndefiniteRowSideFullHecke.SourceLatticeInvariance.DegOneUnram P
+        → ∀ A B : ℕ,
+          (∀ a ∈ LocE.valsQ E (qOf P) A B, ∀ b ∈ LocE.valsQ E (qOf P) A B,
+              IntAt P (((qOf P : E) ^ B)⁻¹ * (a - b)) → a = b)
+            ∧ ∀ a : E,
+              IntAt P ((qOf P : E) ^ A * a)
+                → ∃ s ∈ LocE.valsQ E (qOf P) A B, IntAt P (((qOf P : E) ^ B)⁻¹ * (a - s)) := by
   intro E _ _ P hP A B
   classical
   have hq := q_ne_zero hP
@@ -85,7 +95,8 @@ theorem valsQ_reps : ∀ (E : Type) [Field E] [NumberField E] (P : HeightOneSpec
     have h2 := q_pow_dvd_of_intAt hP _ h1
     have hi' : (i : ℤ) < (qOf P : ℤ) ^ (A + B) := by exact_mod_cast hi
     have hj' : (j : ℤ) < (qOf P : ℤ) ^ (A + B) := by exact_mod_cast hj
-    have h3 : (i : ℤ) - j = 0 := Int.eq_zero_of_abs_lt_dvd h2 (by rw [abs_lt]; constructor <;> omega)
+    have h3 : (i : ℤ) - j = 0 :=
+      Int.eq_zero_of_abs_lt_dvd h2 (by rw [abs_lt]; constructor <;> omega)
     have h4 : i = j := by omega
     rw [h4]
   · intro a ha

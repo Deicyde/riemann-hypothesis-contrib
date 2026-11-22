@@ -13,8 +13,11 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 namespace GlobalTheory.UnipotentUpperMul
 
-theorem isUniUp_mul : ∀ {R : Type} [inst : CommRing R] {N : ℕ} {M M' : Matrix (Fin N) (Fin N) R},
-    Formalism.MainNotions.ArithmeticCylinders.IsUniUp M → Formalism.MainNotions.ArithmeticCylinders.IsUniUp M' → Formalism.MainNotions.ArithmeticCylinders.IsUniUp (M * M') := by
+theorem isUniUp_mul
+    : ∀ {R : Type} [inst : CommRing R] {N : ℕ} {M M' : Matrix (Fin N) (Fin N) R},
+      Formalism.MainNotions.ArithmeticCylinders.IsUniUp M
+        → Formalism.MainNotions.ArithmeticCylinders.IsUniUp M'
+        → Formalism.MainNotions.ArithmeticCylinders.IsUniUp (M * M') := by
   intro R _ N M M' hM hM' a b
   constructor
   · intro hba

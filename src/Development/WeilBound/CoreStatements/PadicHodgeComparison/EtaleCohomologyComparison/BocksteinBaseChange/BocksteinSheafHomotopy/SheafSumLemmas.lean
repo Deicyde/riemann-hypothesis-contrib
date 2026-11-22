@@ -18,17 +18,22 @@ open GlobalTheory.EtC
 variable {R : Type} [CommRing R]
 
 theorem isSheaf_types (G : Shv R) : Presieve.IsSheaf Scheme.etaleTopology (G.obj ⋙ forget _) :=
-  (isSheaf_iff_isSheaf_of_type _ _).1 ((Presheaf.isSheaf_iff_isSheaf_forget _ _ (forget _)).1 G.property)
+  (isSheaf_iff_isSheaf_of_type _ _).1
+    ((Presheaf.isSheaf_iff_isSheaf_forget _ _ (forget _)).1 G.property)
 
 theorem sec_empty (G : Shv R) (Z : Scheme.{0}) [IsEmpty Z] (a b : Sec G Z) : a = b :=
-  ((isSheaf_types G).isSheafFor (⊥ : Presieve Z) (by rw [Sieve.generate_bot]; exact Scheme.bot_mem_grothendieckTopology Z)).isSeparatedFor.ext
+  ((isSheaf_types G).isSheafFor (⊥ : Presieve Z)
+      (by rw [Sieve.generate_bot]; exact Scheme.bot_mem_grothendieckTopology Z)).isSeparatedFor.ext
     (fun _ _ h => h.elim)
 
-theorem sec_sum (G : Shv R) {X : Scheme.{0}} {r : ℕ} {Y : Fin r → Scheme.{0}} (j : ∀ s, Y s ⟶ X) (hj : IsSum j) :
-    Function.Bijective (fun (y : Sec G X) (s : Fin r) => Sec.res (j s) y) := by
+theorem sec_sum
+    (G : Shv R) {X : Scheme.{0}} {r : ℕ} {Y : Fin r → Scheme.{0}} (j : ∀ s, Y s ⟶ X) (hj : IsSum j)
+    : Function.Bijective (fun (y : Sec G X) (s : Fin r) => Sec.res (j s) y) := by
   obtain ⟨hopen, hcov, hdisj⟩ := hj
-  let U : X.Cover (Scheme.precoverage @Etale) := Scheme.Cover.mkOfCovers (Fin r) Y j
-    (fun x => by obtain ⟨s, y, hy⟩ := hcov x; exact ⟨s, y, hy⟩) (fun s => by have := hopen s; infer_instance)
+  let U : X.Cover (Scheme.precoverage @Etale) :=
+    Scheme.Cover.mkOfCovers (Fin r) Y j
+      (fun x => by obtain ⟨s, y, hy⟩ := hcov x; exact ⟨s, y, hy⟩)
+      (fun s => by have := hopen s; infer_instance)
   have hmem : Sieve.ofArrows Y j ∈ Scheme.etaleTopology X := U.mem_grothendieckTopology
   have hsf := (isSheaf_types G).isSheafFor _ hmem
   rw [Presieve.isSheafFor_arrows_iff] at hsf

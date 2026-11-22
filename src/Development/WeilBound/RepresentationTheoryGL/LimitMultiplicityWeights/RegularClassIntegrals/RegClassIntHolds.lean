@@ -37,7 +37,8 @@ public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.Iwahori
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
 open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData NoFixed)
 open GlobalTheory.TrMult GlobalTheory.TruncKer
@@ -45,6 +46,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace MainStatements.WeightKernel
 
-theorem regClassInt_holds : MainStatements.RegularCuspidalTrace.RegClassInt := MainStatements.WeightKernel.RegInt.regClassInt PositivityTheory.Prw.siegelCore_holds
+theorem regClassInt_holds : MainStatements.RegularCuspidalTrace.RegClassInt :=
+  MainStatements.WeightKernel.RegInt.regClassInt PositivityTheory.Prw.siegelCore_holds
 
 end MainStatements.WeightKernel

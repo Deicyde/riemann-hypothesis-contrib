@@ -14,8 +14,8 @@ namespace PI.Tr
 
 variable {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
 
-theorem dualLat_eq (Λ : Submodule ℤ E) :
-    dualLat Λ = LinearMap.BilinForm.dualSubmodule (innerₗ E) Λ := by
+theorem dualLat_eq (Λ : Submodule ℤ E)
+    : dualLat Λ = LinearMap.BilinForm.dualSubmodule (innerₗ E) Λ := by
   ext y
   rw [LinearMap.BilinForm.mem_dualSubmodule]
   show (∀ x ∈ Λ, ∃ n : ℤ, inner ℝ x y = (n : ℝ)) ↔ _

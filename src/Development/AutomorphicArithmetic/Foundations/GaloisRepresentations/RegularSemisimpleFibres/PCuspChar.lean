@@ -16,8 +16,9 @@ open GlobalTheory.SmGL GlobalTheory.Shin GlobalTheory.SplitWeil
 
 namespace UpperTheory.Gal.InertialTypesAlt
 
-private theorem blk_two {m a : ℕ} (ha : a < m) (hd : ∑ b, (![a, m - a] : Fin 2 → ℕ) b = m) (i : Fin m) :
-    (blk (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd) i = 0 ↔ (i : ℕ) < a) := by
+private theorem blk_two
+    {m a : ℕ} (ha : a < m) (hd : ∑ b, (![a, m - a] : Fin 2 → ℕ) b = m) (i : Fin m)
+    : (blk (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd) i = 0 ↔ (i : ℕ) < a) := by
   obtain ⟨⟨b, j⟩, hbj⟩ : ∃ p, (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd).symm i = p := ⟨_, rfl⟩
   have hi := stdBlocks_val (![a, m - a] : Fin 2 → ℕ) hd b j
   rw [← hbj, Equiv.apply_symm_apply] at hi
@@ -30,9 +31,11 @@ private theorem blk_two {m a : ℕ} (ha : a < m) (hd : ∑ b, (![a, m - a] : Fin
   · simp at hi hj ⊢
     omega
 
-private theorem blk_lt_iff {m a : ℕ} (ha : a < m) (hd : ∑ b, (![a, m - a] : Fin 2 → ℕ) b = m) (i j : Fin m) :
-    blk (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd) i < blk (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd) j ↔
-      (i : ℕ) < a ∧ a ≤ (j : ℕ) := by
+private theorem blk_lt_iff
+    {m a : ℕ} (ha : a < m) (hd : ∑ b, (![a, m - a] : Fin 2 → ℕ) b = m) (i j : Fin m)
+    : blk (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd) i
+        < blk (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd) j
+      ↔ (i : ℕ) < a ∧ a ≤ (j : ℕ) := by
   have hi := blk_two ha hd i
   have hj := blk_two ha hd j
   have h1 := (blk (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd) i).isLt
@@ -41,10 +44,14 @@ private theorem blk_lt_iff {m a : ℕ} (ha : a < m) (hd : ∑ b, (![a, m - a] : 
   rw [Fin.ext_iff, Fin.val_zero] at hi hj
   omega
 
-private theorem rad_le {F : Type} [Field F] {m a : ℕ} (h0 : 0 < a) (ha : a < m) (H : Subgroup (GL (Fin m) F))
-    (hH : (H : Set (GL (Fin m) F)) = {u : GL (Fin m) F | ∀ i j : Fin m, (u : Matrix (Fin m) (Fin m) F) i j = (if i = j then 1 else 0) ∨ (i.val < a ∧ a ≤ j.val)})
+private theorem rad_le
+    {F : Type} [Field F]
+    {m a : ℕ} (h0 : 0 < a) (ha : a < m) (H : Subgroup (GL (Fin m) F))
+    (hH : (H : Set (GL (Fin m) F))
+      = {u : GL (Fin m) F | ∀ i j : Fin m, (u : Matrix (Fin m) (Fin m) F) i j = (if i = j then 1 else 0) ∨ (i.val < a ∧ a ≤ j.val)})
     (hd : ∑ b, (![a, m - a] : Fin 2 → ℕ) b = m) (u : GL (Fin m) F)
-    (hu : u ∈ unipRad F (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd)) : u ∈ H := by
+    (hu : u ∈ unipRad F (stdBlocks (![a, m - a] : Fin 2 → ℕ) hd))
+    : u ∈ H := by
   have hu' := GlobalTheory.SmGL.CuspMax.mem_unipRad_iff_entries.mp hu
   have hmem : u ∈ (H : Set (GL (Fin m) F)) := by
     rw [hH]
@@ -61,10 +68,12 @@ theorem cuspChar : CuspChar := by
   classical
   haveI : Fintype F := Fintype.ofFinite F
   have hc := GlobalTheory.T.isCharacterOverSubfield_of_representation ℂ ℂ (GL (Fin m) F) W κ
-  have hprim : GlobalTheory.CuspGL.IsPrimitive
-      (GlobalTheory.CuspGL.extZero (fun g : GL (Fin m) F => algebraMap ℂ ℂ (κ.character g))) := by
-    refine GlobalTheory.T.isPrimitive_extendZero_of_sum_unipotentRadical F m _ hc.1 fun a h0 ham => ?_
-    obtain ⟨A, H, -, hH, -⟩ := GlobalTheory.T.exists_standardUnipotentRadical_bijOn_nilradical F m a ham.le
+  have hprim : GlobalTheory.CuspGL.IsPrimitive (GlobalTheory.CuspGL.extZero (fun g : GL (Fin m) F =>
+      algebraMap ℂ ℂ (κ.character g))) := by
+    refine GlobalTheory.T.isPrimitive_extendZero_of_sum_unipotentRadical F m _ hc.1 fun a h0 ham =>
+      ?_
+    obtain ⟨A, H, -, hH, -⟩ :=
+      GlobalTheory.T.exists_standardUnipotentRadical_bijOn_nilradical F m a ham.le
     have hd : ∑ b, (![a, m - a] : Fin 2 → ℕ) b = m := by
       simp [Fin.sum_univ_two]
       omega

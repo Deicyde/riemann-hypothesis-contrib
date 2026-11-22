@@ -19,7 +19,23 @@ open CategoryTheory AlgebraicGeometry KaehlerDifferential GlobalTheory.CatCoh Gl
 
 namespace GlobalTheory.CatCoh.Desc.Basis
 
-theorem oneCocycle_upwardFamily_isCoboundary : ∀ {R : Type} [CommRing R] {C : Type} [Category.{0} C] {C' : Type} [Category.{0} C'] (F : C ⥤ CommAlgCat.{0} R) (G : C' ⥤ C), [Quiver.IsThin C] → [Quiver.IsThin C'] → Desc.HasLoc F → (∀ (t₁ t₂ : C') (S : C), (G.obj t₁ ⟶ S) → (G.obj t₂ ⟶ S) → ∃ (n : ℕ) (b : Fin n → F.obj S), Ideal.span (Set.range b) = ⊤ ∧ ∀ (i : Fin n) (S' : C) (u : S ⟶ S'), IsUnit (mp F u (b i)) → ∃ t₃, Nonempty (t₁ ⟶ t₃) ∧ Nonempty (t₂ ⟶ t₃) ∧ Nonempty (G.obj t₃ ⟶ S')) → ∀ (t : C') (Sg : ∀ t', (t ⟶ t') → Prop), (∀ t' t'' (a : t ⟶ t') (b : t' ⟶ t''), Sg t' a → Sg t'' (a ≫ b)) → Desc.VandermondeTwoBasis.CovBy F (fun S ↦ ∃ (t' : C') (a : t ⟶ t'), Sg t' a ∧ Nonempty (G.obj t' ⟶ S)) (G.obj t) → Desc.Van1 (G ⋙ F) Sg := by
+theorem oneCocycle_upwardFamily_isCoboundary
+    : ∀ {R : Type} [CommRing R] {C : Type} [Category.{0} C] {C' : Type} [Category.{0} C']
+        (F : C ⥤ CommAlgCat.{0} R) (G : C' ⥤ C),
+      [Quiver.IsThin C] → [Quiver.IsThin C'] → Desc.HasLoc F
+        → (∀ (t₁ t₂ : C') (S : C),
+          (G.obj t₁ ⟶ S) → (G.obj t₂ ⟶ S)
+            → ∃ (n : ℕ) (b : Fin n → F.obj S),
+              Ideal.span (Set.range b) = ⊤
+                ∧ ∀ (i : Fin n) (S' : C) (u : S ⟶ S'),
+                  IsUnit (mp F u (b i))
+                    → ∃ t₃, Nonempty (t₁ ⟶ t₃) ∧ Nonempty (t₂ ⟶ t₃) ∧ Nonempty (G.obj t₃ ⟶ S'))
+        → ∀ (t : C') (Sg : ∀ t', (t ⟶ t') → Prop),
+          (∀ t' t'' (a : t ⟶ t') (b : t' ⟶ t''), Sg t' a → Sg t'' (a ≫ b))
+            → Desc.VandermondeTwoBasis.CovBy F
+              (fun S ↦ ∃ (t' : C') (a : t ⟶ t'), Sg t' a ∧ Nonempty (G.obj t' ⟶ S))
+              (G.obj t)
+            → Desc.Van1 (G ⋙ F) Sg := by
   intro R _ C _ C' _ F G _ _ H hdir t₀ Sg hSg hcovT
   classical
   intro y hy
@@ -34,36 +50,47 @@ theorem oneCocycle_upwardFamily_isCoboundary : ∀ {R : Type} [CommRing R] {C : 
     have h : Q t ∧ Nonempty (t ⟶ t') := ⟨⟨u, hu⟩, ⟨a⟩⟩
     simp only [yb, dif_pos h]
     exact congrArg₂ (y t t') (Subsingleton.elim _ _) (Subsingleton.elim _ _)
-  have hyc : ∀ t t' t'', Q t → ∀ (a : t ⟶ t') (b : t' ⟶ t''),
-      yb t t'' = mp F (G.map b) (yb t t') + yb t' t'' := by
+  have hyc
+      : ∀ t t' t'',
+        Q t → ∀ (a : t ⟶ t') (b : t' ⟶ t''), yb t t'' = mp F (G.map b) (yb t t') + yb t' t'' := by
     rintro t t' t'' ⟨u, hu⟩ a b
     rw [← hyb t t'' u (a ≫ b) hu, ← hyb t t' u a hu, ← hyb t' t'' (u ≫ a) b (hSg t t' u a hu)]
     exact hy t t' t'' u a b hu
 
   obtain ⟨n, b, hb, hcT⟩ := hcovT
-  have hpt : ∀ i : Fin n, ∃ p : C', Q p ∧ ∀ S (u : G.obj t₀ ⟶ S),
-      IsUnit (mp F u (b i)) → Nonempty (G.obj p ⟶ S) := by
+  have hpt
+      : ∀ i : Fin n, ∃ p : C',
+        Q p ∧ ∀ S (u : G.obj t₀ ⟶ S), IsUnit (mp F u (b i)) → Nonempty (G.obj p ⟶ S) := by
     intro i
     obtain ⟨T', l, hl, -, -, huniv⟩ := H (G.obj t₀) (b i)
     obtain ⟨p, a, ha, ⟨w⟩⟩ := hcT i T' l hl
     exact ⟨p, ⟨a, ha⟩, fun S u hu ↦ by obtain ⟨m, -⟩ := huniv S u hu; exact ⟨w ≫ m⟩⟩
   choose p hpQ hp using hpt
 
-  have hc0 : ∀ i j : Fin n, ∃ x : ∀ S, F.obj S, (∀ S, Nonempty (G.obj (p i) ⟶ S) →
-      Nonempty (G.obj (p j) ⟶ S) → ∀ t S' (ψ : S ⟶ S') (w : G.obj t ⟶ S'), Nonempty (p i ⟶ t) →
-        Nonempty (p j ⟶ t) → mp F ψ (x S) = mp F w (yb (p j) t - yb (p i) t)) ∧
-      (∀ S S' (ψ : S ⟶ S'), Nonempty (G.obj (p i) ⟶ S) → Nonempty (G.obj (p j) ⟶ S) →
-        x S' = mp F ψ (x S)) := by
+  have hc0
+      : ∀ i j : Fin n, ∃ x : ∀ S, F.obj S,
+        (∀ S,
+            Nonempty (G.obj (p i) ⟶ S) → Nonempty (G.obj (p j) ⟶ S)
+              → ∀ t S' (ψ : S ⟶ S') (w : G.obj t ⟶ S'),
+                Nonempty (p i ⟶ t) → Nonempty (p j ⟶ t)
+                  → mp F ψ (x S) = mp F w (yb (p j) t - yb (p i) t))
+          ∧ (∀ S S' (ψ : S ⟶ S'),
+            Nonempty (G.obj (p i) ⟶ S) → Nonempty (G.obj (p j) ⟶ S) → x S' = mp F ψ (x S)) := by
     intro i j
     refine exists_glue_points F G H hdir (p i) (p j) _ fun t t' a ⟨ai⟩ ⟨aj⟩ ↦ ?_
     rw [map_sub, hyc (p j) t t' (hpQ j) aj a, hyc (p i) t t' (hpQ i) ai a]
     ring
   choose c hc hc' using hc0
-  have hs : ∀ i j, IsSec F (fun S u ↦ IsUnit (mp F u (b i)) ∧ IsUnit (mp F u (b j)))
-      (fun S (_ : G.obj t₀ ⟶ S) ↦ c i j S) := fun i j S S' u ψ h ↦
+  have hs
+      : ∀ i j,
+        IsSec F
+          (fun S u ↦ IsUnit (mp F u (b i)) ∧ IsUnit (mp F u (b j)))
+          (fun S (_ : G.obj t₀ ⟶ S) ↦ c i j S) := fun i j S S' u ψ h ↦
     hc' i j S S' ψ (hp i S u h.1) (hp j S u h.2)
-  have hcc : ∀ i j k S (u : G.obj t₀ ⟶ S), IsUnit (mp F u (b i)) → IsUnit (mp F u (b j)) →
-      IsUnit (mp F u (b k)) → c j k S - c i k S + c i j S = 0 := by
+  have hcc
+      : ∀ i j k S (u : G.obj t₀ ⟶ S),
+        IsUnit (mp F u (b i)) → IsUnit (mp F u (b j)) → IsUnit (mp F u (b k))
+          → c j k S - c i k S + c i j S = 0 := by
     intro i j k S u hi hj hk
     refine eq_zero_of_local₃ F G H hdir (hp i S u hi) (hp j S u hj) (hp k S u hk) _
       fun t S' ψ ai aj ak ⟨w⟩ ↦ ?_
@@ -73,23 +100,30 @@ theorem oneCocycle_upwardFamily_isCoboundary : ∀ {R : Type} [CommRing R] {C : 
     simp only [map_sub]
     ring
   obtain ⟨e, he, he'⟩ := Desc.cech1 H hb (fun i j S (_ : G.obj t₀ ⟶ S) ↦ c i j S) hs hcc
-  have he'' : ∀ i j S (u : G.obj t₀ ⟶ S), IsUnit (mp F u (b i)) → IsUnit (mp F u (b j)) →
-      c i j S = e j S u - e i S u := he'
+  have he''
+      : ∀ i j S (u : G.obj t₀ ⟶ S),
+        IsUnit (mp F u (b i)) → IsUnit (mp F u (b j)) → c i j S = e j S u - e i S u :=
+    he'
 
-  have hX0 : ∀ i (t : C') (_ : Q t), ∃ x : ∀ S, F.obj S, (∀ S, Nonempty (G.obj t ⟶ S) →
-      Nonempty (G.obj (p i) ⟶ S) → ∀ t' S' (ψ : S ⟶ S') (w : G.obj t' ⟶ S'), Nonempty (t ⟶ t') →
-        Nonempty (p i ⟶ t') → mp F ψ (x S) = mp F w (yb (p i) t' - yb t t')) ∧
-      (∀ S S' (ψ : S ⟶ S'), Nonempty (G.obj t ⟶ S) → Nonempty (G.obj (p i) ⟶ S) →
-        x S' = mp F ψ (x S)) := by
+  have hX0
+      : ∀ i (t : C') (_ : Q t), ∃ x : ∀ S, F.obj S,
+        (∀ S,
+            Nonempty (G.obj t ⟶ S) → Nonempty (G.obj (p i) ⟶ S)
+              → ∀ t' S' (ψ : S ⟶ S') (w : G.obj t' ⟶ S'),
+                Nonempty (t ⟶ t') → Nonempty (p i ⟶ t')
+                  → mp F ψ (x S) = mp F w (yb (p i) t' - yb t t'))
+          ∧ (∀ S S' (ψ : S ⟶ S'),
+            Nonempty (G.obj t ⟶ S) → Nonempty (G.obj (p i) ⟶ S) → x S' = mp F ψ (x S)) := by
     intro i t ht
     refine exists_glue_points F G H hdir t (p i) _ fun t' t'' a ⟨a0⟩ ⟨ai⟩ ↦ ?_
     rw [map_sub, hyc (p i) t' t'' (hpQ i) ai a, hyc t t' t'' ht a0 a]
     ring
   choose X hX hX' using hX0
 
-  have indep : ∀ t (ht : Q t) (u : G.obj t₀ ⟶ G.obj t) S (ψ : G.obj t ⟶ S) i j,
-      IsUnit (mp F (u ≫ ψ) (b i)) → IsUnit (mp F (u ≫ ψ) (b j)) →
-      X i t ht S - e i S (u ≫ ψ) = X j t ht S - e j S (u ≫ ψ) := by
+  have indep
+      : ∀ t (ht : Q t) (u : G.obj t₀ ⟶ G.obj t) S (ψ : G.obj t ⟶ S) i j,
+        IsUnit (mp F (u ≫ ψ) (b i)) → IsUnit (mp F (u ≫ ψ) (b j))
+          → X i t ht S - e i S (u ≫ ψ) = X j t ht S - e j S (u ≫ ψ) := by
     intro t ht u S ψ i j hi hj
     have key : X i t ht S - X j t ht S + c i j S = 0 :=
       eq_zero_of_local₃ F G H hdir ⟨ψ⟩ (hp i S _ hi) (hp j S _ hj) _ fun t' S' χ a0 ai aj ⟨w⟩ ↦ by
@@ -100,8 +134,9 @@ theorem oneCocycle_upwardFamily_isCoboundary : ∀ {R : Type} [CommRing R] {C : 
         ring
     linear_combination key - he'' i j S (u ≫ ψ) hi hj
 
-  have hg0 : ∀ t (ht : Q t) (u : G.obj t₀ ⟶ G.obj t), ∃ x : F.obj (G.obj t), ∀ S (ψ : G.obj t ⟶ S) i,
-      IsUnit (mp F (u ≫ ψ) (b i)) → mp F ψ x = X i t ht S - e i S (u ≫ ψ) := by
+  have hg0
+      : ∀ t (ht : Q t) (u : G.obj t₀ ⟶ G.obj t), ∃ x : F.obj (G.obj t), ∀ S (ψ : G.obj t ⟶ S) i,
+        IsUnit (mp F (u ≫ ψ) (b i)) → mp F ψ x = X i t ht S - e i S (u ≫ ψ) := by
     intro t ht u
     let σ : ∀ S, (G.obj t ⟶ S) → F.obj S := fun S ψ ↦
       if h : ∃ i, IsUnit (mp F (u ≫ ψ) (b i)) then X h.choose t ht S - e h.choose S (u ≫ ψ) else 0
@@ -110,14 +145,14 @@ theorem oneCocycle_upwardFamily_isCoboundary : ∀ {R : Type} [CommRing R] {C : 
       have h : ∃ i, IsUnit (mp F (u ≫ ψ) (b i)) := ⟨i, hi⟩
       simp only [σ, dif_pos h]
       exact indep t ht u S ψ _ i h.choose_spec hi
-    obtain ⟨x, hx⟩ := glue_std H (span_map_eq_top F u hb) σ fun S S' ψ χ ⟨i, hi⟩ ↦ by
-      have hi' : IsUnit (mp F (u ≫ ψ) (b i)) := by rw [mp_comp]; exact hi
-      have hi'' : IsUnit (mp F (u ≫ ψ ≫ χ) (b i)) := by
-        rw [← Category.assoc, mp_comp]; exact hi'.map _
-      rw [hσ S' (ψ ≫ χ) i hi'', hσ S ψ i hi', map_sub, ← hX' i t ht S S' χ ⟨ψ⟩ (hp i S _ hi'),
-        ← he i S S' (u ≫ ψ) χ hi', Category.assoc]
-    exact ⟨x, fun S ψ i hi ↦ by
-      rw [hx S ψ ⟨i, by rw [mp_comp] at hi; exact hi⟩, hσ S ψ i hi]⟩
+    obtain ⟨x, hx⟩ :=
+      glue_std H (span_map_eq_top F u hb) σ fun S S' ψ χ ⟨i, hi⟩ ↦ by
+        have hi' : IsUnit (mp F (u ≫ ψ) (b i)) := by rw [mp_comp]; exact hi
+        have hi'' : IsUnit (mp F (u ≫ ψ ≫ χ) (b i)) := by
+          rw [← Category.assoc, mp_comp]; exact hi'.map _
+        rw [hσ S' (ψ ≫ χ) i hi'', hσ S ψ i hi', map_sub, ← hX' i t ht S S' χ ⟨ψ⟩ (hp i S _ hi'),
+          ← he i S S' (u ≫ ψ) χ hi', Category.assoc]
+    exact ⟨x, fun S ψ i hi ↦ by rw [hx S ψ ⟨i, by rw [mp_comp] at hi; exact hi⟩, hσ S ψ i hi]⟩
   choose g hg using hg0
   refine ⟨fun t' a ↦ if h : Sg t' a then g t' ⟨a, h⟩ (G.map a) else 0, fun t t' u a hu ↦ ?_⟩
   have hu' : Sg t' (u ≫ a) := hSg t t' u a hu

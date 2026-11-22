@@ -16,17 +16,19 @@ section Ode
 
 variable {R : Type*} [CommRing R]
 
-theorem coeff_one_add_X_mul_derivative (H : R⟦X⟧) (n : ℕ) :
-    coeff n ((1 + X) * PowerSeries.derivative H) =
-      coeff (n + 1) H * ((n : R) + 1) + coeff n H * (n : R) := by
+theorem coeff_one_add_X_mul_derivative (H : R⟦X⟧) (n : ℕ)
+    : coeff n ((1 + X) * PowerSeries.derivative H)
+      = coeff (n + 1) H * ((n : R) + 1) + coeff n H * (n : R) := by
   rcases n with _ | m
   · simp [add_mul]
     rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_derivative]
     simp
   · simp [add_mul, PowerSeries.coeff_derivative, PowerSeries.coeff_succ_X_mul]
 
-theorem eq_zero_of_binomial_ode [IsAddTorsionFree R] (c : R) (H : R⟦X⟧)
-    (h : (1 + X) * PowerSeries.derivative H = C c * H) (h0 : constantCoeff H = 0) : H = 0 := by
+theorem eq_zero_of_binomial_ode
+    [IsAddTorsionFree R]
+    (c : R) (H : R⟦X⟧) (h : (1 + X) * PowerSeries.derivative H = C c * H) (h0 : constantCoeff H = 0)
+    : H = 0 := by
   ext n
   simp only [map_zero]
   induction n with
@@ -39,39 +41,42 @@ theorem eq_zero_of_binomial_ode [IsAddTorsionFree R] (c : R) (H : R⟦X⟧)
       rw [nsmul_eq_mul, mul_comm]
       push_cast
       exact e
-    exact eq_of_nsmul_eq_nsmul_of_addCommute (Nat.succ_ne_zero n)
-      (AddCommute.zero_right _) (by simpa using e2)
+    exact eq_of_nsmul_eq_nsmul_of_addCommute (Nat.succ_ne_zero n) (AddCommute.zero_right _)
+      (by simpa using e2)
 
-theorem eq_of_binomial_ode_of_constantCoeff_eq [IsAddTorsionFree R] (c : R) (F G : R⟦X⟧)
-    (hF : (1 + X) * PowerSeries.derivative F = C c * F)
-    (hG : (1 + X) * PowerSeries.derivative G = C c * G)
-    (h0 : constantCoeff F = constantCoeff G) : F = G := by
-  have := eq_zero_of_binomial_ode c (F - G) (by rw [map_sub, mul_sub, hF, hG, mul_sub])
-    (by rw [map_sub, h0, sub_self])
+theorem eq_of_binomial_ode_of_constantCoeff_eq
+    [IsAddTorsionFree R]
+    (c : R) (F G : R⟦X⟧) (hF : (1 + X) * PowerSeries.derivative F = C c * F)
+    (hG : (1 + X) * PowerSeries.derivative G = C c * G) (h0 : constantCoeff F = constantCoeff G)
+    : F = G := by
+  have :=
+    eq_zero_of_binomial_ode c (F - G) (by rw [map_sub, mul_sub, hF, hG, mul_sub])
+      (by rw [map_sub, h0, sub_self])
   exact sub_eq_zero.mp this
 
 variable [BinomialRing R]
 
-theorem binomialSeries_one_add_X_mul_derivative (c : R) :
-    (1 + X) * PowerSeries.derivative (binomialSeries R c) = C c * binomialSeries R c := by
+theorem binomialSeries_one_add_X_mul_derivative (c : R)
+    : (1 + X) * PowerSeries.derivative (binomialSeries R c) = C c * binomialSeries R c := by
   ext n
   rw [coeff_one_add_X_mul_derivative, coeff_C_mul]
   simp only [binomialSeries_coeff, smul_eq_mul, mul_one]
   have h := Ring.choose_smul_choose c (Nat.le_succ n)
   rw [Nat.choose_succ_self_right, Nat.succ_sub (le_refl n), Nat.sub_self, Ring.choose_one_right,
-    nsmul_eq_mul] at h
+      nsmul_eq_mul]
+    at h
   push_cast at h
   linear_combination h
 
-theorem hasSubst_binomialSeries_sub_one {A : Type*} [CommRing A] [Algebra R A] (e : R) :
-    HasSubst (binomialSeries A e - 1 : A⟦X⟧) := by
+theorem hasSubst_binomialSeries_sub_one {A : Type*} [CommRing A] [Algebra R A] (e : R)
+    : HasSubst (binomialSeries A e - 1 : A⟦X⟧) := by
   apply PowerSeries.HasSubst.of_constantCoeff_zero
   change PowerSeries.constantCoeff (binomialSeries A e - 1 : A⟦X⟧) = 0
   simp
 
 attribute [local instance] BinomialRing.toHasUniqueDiv in
-theorem binomialSeries_subst_comp (d e : R) :
-    (binomialSeries R d).subst (binomialSeries R e - 1 : R⟦X⟧) = binomialSeries R (d * e) := by
+theorem binomialSeries_subst_comp (d e : R)
+    : (binomialSeries R d).subst (binomialSeries R e - 1 : R⟦X⟧) = binomialSeries R (d * e) := by
   have ha := hasSubst_binomialSeries_sub_one (A := R) e
   set a : R⟦X⟧ := binomialSeries R e - 1 with hadef
   have hFe : (1 + X : R⟦X⟧).subst a = binomialSeries R e := by
@@ -81,57 +86,63 @@ theorem binomialSeries_subst_comp (d e : R) :
     rw [hadef, map_sub, derivative_one, sub_zero]
   apply eq_of_binomial_ode_of_constantCoeff_eq (d * e)
   · rw [derivative_subst ha, hda]
-    calc (1 + X) * ((PowerSeries.derivative (binomialSeries R d)).subst a *
-          PowerSeries.derivative (binomialSeries R e))
-        = (PowerSeries.derivative (binomialSeries R d)).subst a *
-            ((1 + X) * PowerSeries.derivative (binomialSeries R e)) := by ring
-      _ = (PowerSeries.derivative (binomialSeries R d)).subst a *
-            (C e * (1 + X : R⟦X⟧).subst a) := by
-          rw [binomialSeries_one_add_X_mul_derivative, hFe]
+    calc
+      (1 + X)
+            * ((PowerSeries.derivative (binomialSeries R d)).subst a
+              * PowerSeries.derivative (binomialSeries R e))
+          = (PowerSeries.derivative (binomialSeries R d)).subst a
+            * ((1 + X) * PowerSeries.derivative (binomialSeries R e)) := by
+        ring
+      _ = (PowerSeries.derivative (binomialSeries R d)).subst a
+          * (C e * (1 + X : R⟦X⟧).subst a) := by
+        rw [binomialSeries_one_add_X_mul_derivative, hFe]
       _ = C e * ((1 + X) * PowerSeries.derivative (binomialSeries R d)).subst a := by
-          rw [subst_mul ha]; ring
+        rw [subst_mul ha]; ring
       _ = C e * (C d * (binomialSeries R d).subst a) := by
-          rw [binomialSeries_one_add_X_mul_derivative, subst_mul ha, subst_C]; rfl
-      _ = C (d * e) * (binomialSeries R d).subst a := by
-          rw [map_mul]; ring
+        rw [binomialSeries_one_add_X_mul_derivative, subst_mul ha, subst_C]; rfl
+      _ = C (d * e) * (binomialSeries R d).subst a := by rw [map_mul]; ring
   · exact binomialSeries_one_add_X_mul_derivative _
   · have h1 : binomialSeries R d = 1 + (binomialSeries R d - 1) := by ring
     rw [h1, subst_add ha, ← map_one (C (R := R)), subst_C, map_add (f := _)]
     have h2 : constantCoeff ((binomialSeries R d - C 1 : R⟦X⟧).subst a) = 0 :=
-      constantCoeff_subst_eq_zero
-        (show constantCoeff a = 0 by rw [hadef]; simp) _ (by simp)
+      constantCoeff_subst_eq_zero (show constantCoeff a = 0 by rw [hadef]; simp) _ (by simp)
     rw [h2]
     simp
 
-theorem map_binomialSeries_alt {A : Type*} [CommRing A] [Algebra R A] (c : R) :
-    PowerSeries.map (algebraMap R A) (binomialSeries R c) = binomialSeries A c := by
+theorem map_binomialSeries_alt {A : Type*} [CommRing A] [Algebra R A] (c : R)
+    : PowerSeries.map (algebraMap R A) (binomialSeries R c) = binomialSeries A c := by
   ext n
   first
-    | simp [PowerSeries.binomialSeries_coeff, Algebra.smul_def]
-    | simp [PowerSeries.binomialSeries, Algebra.smul_def]
-    | simp [PowerSeries.binomialSeries]
+  | simp [PowerSeries.binomialSeries_coeff, Algebra.smul_def]
+  | simp [PowerSeries.binomialSeries, Algebra.smul_def]
+  | simp [PowerSeries.binomialSeries]
 
-theorem binomialSeries_subst_sub_one_eq_mul {A : Type*} [CommRing A] [Algebra R A] (d e : R) :
-    (binomialSeries A d).subst (binomialSeries A e - 1 : A⟦X⟧) = binomialSeries A (d * e) := by
+theorem binomialSeries_subst_sub_one_eq_mul {A : Type*} [CommRing A] [Algebra R A] (d e : R)
+    : (binomialSeries A d).subst (binomialSeries A e - 1 : A⟦X⟧) = binomialSeries A (d * e) := by
   have hs := hasSubst_binomialSeries_sub_one (R := R) (A := R) e
-  have hm : PowerSeries.map (algebraMap R A) ((binomialSeries R d).subst (binomialSeries R e - 1 : R⟦X⟧)) =
-      (PowerSeries.map (algebraMap R A) (binomialSeries R d)).subst
-        (PowerSeries.map (algebraMap R A) (binomialSeries R e - 1 : R⟦X⟧)) := by
+  have hm
+      : PowerSeries.map (algebraMap R A)
+          ((binomialSeries R d).subst (binomialSeries R e - 1 : R⟦X⟧))
+        = (PowerSeries.map (algebraMap R A) (binomialSeries R d)).subst
+          (PowerSeries.map (algebraMap R A) (binomialSeries R e - 1 : R⟦X⟧)) := by
     first
-      | exact PowerSeries.map_subst hs _
-      | exact PowerSeries.map_subst hs (algebraMap R A) _
-      | exact PowerSeries.map_subst (h := algebraMap R A) hs _
-  rw [map_sub, map_one, map_binomialSeries_alt, map_binomialSeries_alt, binomialSeries_subst_comp, map_binomialSeries_alt] at hm
+    | exact PowerSeries.map_subst hs _
+    | exact PowerSeries.map_subst hs (algebraMap R A) _
+    | exact PowerSeries.map_subst (h := algebraMap R A) hs _
+  rw [map_sub, map_one, map_binomialSeries_alt, map_binomialSeries_alt, binomialSeries_subst_comp,
+      map_binomialSeries_alt]
+    at hm
   exact hm.symm
 
 end Ode
 
 section Act
 
-theorem subst_X_eq_self {R : Type*} [CommRing R] (f : R⟦X⟧) : f.subst (X : R⟦X⟧) = f := PowerSeries.X_subst f
+theorem subst_X_eq_self {R : Type*} [CommRing R] (f : R⟦X⟧) : f.subst (X : R⟦X⟧) = f :=
+  PowerSeries.X_subst f
 
-theorem coeff_one_add_X_pow_alt (R : Type*) [CommRing R] (d n : ℕ) :
-    coeff n ((1 + X : R⟦X⟧) ^ d) = (d.choose n : R) := by
+theorem coeff_one_add_X_pow_alt (R : Type*) [CommRing R] (d n : ℕ)
+    : coeff n ((1 + X : R⟦X⟧) ^ d) = (d.choose n : R) := by
   have e : ((1 + X : R⟦X⟧)) ^ d = (((1 + Polynomial.X) ^ d : Polynomial R) : R⟦X⟧) := by
     simp [Polynomial.coe_pow, Polynomial.coe_add, Polynomial.coe_one, Polynomial.coe_X]
   rw [e, Polynomial.coeff_coe, Polynomial.coeff_one_add_X_pow]
@@ -140,9 +151,11 @@ variable (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Algebra ℤ_[l] O]
 
 theorem constantCoeff_binomialSeriesSubOne (c : ℤ_[l]) : constantCoeff (br l O c) = 0 := by
   first
-    | simp [br]
-    | (simp only [br, map_sub, map_one, sub_eq_zero, ← PowerSeries.coeff_zero_eq_constantCoeff_apply]
-       simp [PowerSeries.binomialSeries])
+  | simp [br]
+  | (
+      simp only [br, map_sub, map_one, sub_eq_zero, ← PowerSeries.coeff_zero_eq_constantCoeff_apply]
+      simp [PowerSeries.binomialSeries]
+    )
 
 theorem hasSubst_br_padic (c : ℤ_[l]) : HasSubst (br l O c) := by
   apply PowerSeries.HasSubst.of_constantCoeff_zero
@@ -156,27 +169,39 @@ theorem binomialSeriesSubOne_one : br l O 1 = X := by
   have := binomialSeriesSubOne_natCast l O 1
   simpa using this
 
-theorem binomialAction_binomialSeriesSubOne (c d : ℤ_[l]) : act l O c (br l O d) = br l O (d * c) := by
+theorem binomialAction_binomialSeriesSubOne (c d : ℤ_[l])
+    : act l O c (br l O d) = br l O (d * c) := by
   have hs := hasSubst_binomialSeries_sub_one (R := ℤ_[l]) (A := O) c
   simp only [act, br]
-  rw [← PowerSeries.coe_substAlgHom hs, map_sub, map_one, PowerSeries.coe_substAlgHom, binomialSeries_subst_sub_one_eq_mul]
+  rw [← PowerSeries.coe_substAlgHom hs, map_sub, map_one, PowerSeries.coe_substAlgHom,
+    binomialSeries_subst_sub_one_eq_mul]
 
-theorem binomialAction_comp_eq_mul (c d : ℤ_[l]) (f : O⟦X⟧) :
-    act l O c (act l O d f) = act l O (d * c) f := by
+theorem binomialAction_comp_eq_mul (c d : ℤ_[l]) (f : O⟦X⟧)
+    : act l O c (act l O d f) = act l O (d * c) f := by
   have e := binomialAction_binomialSeriesSubOne l O c d
   rw [act] at e
-  rw [act, act, act, PowerSeries.subst_comp_subst_apply (hasSubst_br_padic l O d) (hasSubst_br_padic l O c), e]
+  rw [act, act, act,
+    PowerSeries.subst_comp_subst_apply (hasSubst_br_padic l O d) (hasSubst_br_padic l O c), e]
 
 theorem phi_eq_act_l (f : O⟦X⟧) : phi l O f = act l O (l : ℤ_[l]) f := by
   rw [phi, act, binomialSeriesSubOne_natCast]
 
 theorem action_laws_holds : ActLaws := by
   intro l _ O _ _
-  refine ⟨binomialAction_binomialSeriesSubOne l O, binomialAction_comp_eq_mul l O, ?_, phi_eq_act_l l O, ?_, ?_, ?_⟩
+  refine ⟨
+    binomialAction_binomialSeriesSubOne l O,
+    binomialAction_comp_eq_mul l O,
+    ?_,
+    phi_eq_act_l l O,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro f
     rw [act, binomialSeriesSubOne_one, subst_X_eq_self]
   · intro c f
-    rw [phi_eq_act_l, phi_eq_act_l, binomialAction_comp_eq_mul, binomialAction_comp_eq_mul, mul_comm]
+    rw [phi_eq_act_l, phi_eq_act_l, binomialAction_comp_eq_mul, binomialAction_comp_eq_mul,
+      mul_comm]
   · intro c f g
     have hs := hasSubst_br_padic l O c
     refine ⟨?_, ?_⟩
@@ -185,8 +210,9 @@ theorem action_laws_holds : ActLaws := by
   · intro c a
     have hs := hasSubst_br_padic l O c
     rw [act, ← PowerSeries.coe_substAlgHom hs]
-    calc PowerSeries.substAlgHom hs (C a) = PowerSeries.substAlgHom hs (a • 1) := by
-          rw [PowerSeries.smul_eq_C_mul, mul_one]
+    calc
+      PowerSeries.substAlgHom hs (C a)
+        = PowerSeries.substAlgHom hs (a • 1) := by rw [PowerSeries.smul_eq_C_mul, mul_one]
       _ = a • PowerSeries.substAlgHom hs 1 := map_smul _ _ _
       _ = C a := by rw [map_one, PowerSeries.smul_eq_C_mul, mul_one]
 
@@ -202,10 +228,13 @@ theorem q_multiplicative_holds : QMul := by
     apply PowerSeries.HasSubst.of_constantCoeff_zero
     change PowerSeries.constantCoeff ((1 + X) ^ l - 1 : O⟦X⟧) = 0
     simp
-  exact ⟨X_mul_q_eq_one_add_X_pow_sub_one l O, by rw [phi, PowerSeries.subst_X hs, X_mul_q_eq_one_add_X_pow_sub_one]⟩
+  exact ⟨
+    X_mul_q_eq_one_add_X_pow_sub_one l O,
+    by rw [phi, PowerSeries.subst_X hs, X_mul_q_eq_one_add_X_pow_sub_one]
+  ⟩
 
-theorem map_algebraMap_binomialSeriesSubOne (c : ℤ_[l]) :
-    PowerSeries.map (algebraMap ℤ_[l] O) (br l ℤ_[l] c) = br l O c := by
+theorem map_algebraMap_binomialSeriesSubOne (c : ℤ_[l])
+    : PowerSeries.map (algebraMap ℤ_[l] O) (br l ℤ_[l] c) = br l O c := by
   simp only [br, map_sub, map_one, map_binomialSeries_alt]
 
 theorem map_pi0_padic : PowerSeries.map (algebraMap ℤ_[l] O) (pi0 l ℤ_[l]) = pi0 l O := by
@@ -234,13 +263,14 @@ theorem mem_mu_iff_pow_eq_one {d : ℤ_[l]} : d ∈ mu l ↔ d ^ (l - 1) = 1 := 
 theorem toZMod_eq_zero_iff_norm_lt_one (y : ℤ_[l]) : PadicInt.toZMod y = 0 ↔ ‖y‖ < 1 := by
   rw [← RingHom.mem_ker, PadicInt.ker_toZMod, IsLocalRing.mem_maximalIdeal, PadicInt.mem_nonunits]
 
-theorem existsUnique_teichmuller_lift (x : ZMod l) (hx : x ≠ 0) : ∃! d, d ∈ mu l ∧ PadicInt.toZMod d = x := by
+theorem existsUnique_teichmuller_lift (x : ZMod l) (hx : x ≠ 0)
+    : ∃! d, d ∈ mu l ∧ PadicInt.toZMod d = x := by
   obtain ⟨a, ha⟩ := ZMod.ringHom_surjective (PadicInt.toZMod (p := l)) x
   set F : Polynomial ℤ_[l] := Polynomial.X ^ (l - 1) - 1 with hFdef
-  have hF : ∀ z : ℤ_[l], Polynomial.aeval z F = z ^ (l - 1) - 1 := by
-    intro z; simp [hFdef]
-  have hF' : ∀ z : ℤ_[l], Polynomial.aeval z (Polynomial.derivative F) =
-      ((l - 1 : ℕ) : ℤ_[l]) * z ^ (l - 1 - 1) := by
+  have hF : ∀ z : ℤ_[l], Polynomial.aeval z F = z ^ (l - 1) - 1 := by intro z; simp [hFdef]
+  have hF'
+      : ∀ z : ℤ_[l],
+        Polynomial.aeval z (Polynomial.derivative F) = ((l - 1 : ℕ) : ℤ_[l]) * z ^ (l - 1 - 1) := by
     intro z; simp [hFdef, Polynomial.derivative_X_pow]
   have h1 : ‖Polynomial.aeval a F‖ < 1 := by
     rw [← toZMod_eq_zero_iff_norm_lt_one, hF, map_sub, map_pow, ha, ZMod.pow_card_sub_one_eq_one hx,
@@ -273,21 +303,25 @@ theorem toZMod_ne_zero_of_mem_mu {d : ℤ_[l]} (hd : d ∈ mu l) : PadicInt.toZM
   rw [← norm_pow, (mem_mu_iff_pow_eq_one l).mp hd, norm_one] at hlt
   exact lt_irrefl _ hlt
 
-theorem toZMod_mem_units_of_mem_mu : ∀ d ∈ mu l, PadicInt.toZMod d ∈ (univ.erase (0 : ZMod l)) := fun d hd => Finset.mem_erase.mpr ⟨toZMod_ne_zero_of_mem_mu l hd, Finset.mem_univ _⟩
+theorem toZMod_mem_units_of_mem_mu : ∀ d ∈ mu l, PadicInt.toZMod d ∈ (univ.erase (0 : ZMod l)) :=
+  fun d hd => Finset.mem_erase.mpr ⟨toZMod_ne_zero_of_mem_mu l hd, Finset.mem_univ _⟩
 
 theorem toZMod_injOn_mu : Set.InjOn (PadicInt.toZMod (p := l)) (mu l : Set ℤ_[l]) := by
   intro x hx y hy hxy
-  exact (existsUnique_teichmuller_lift l _ (toZMod_ne_zero_of_mem_mu l hx)).unique ⟨hx, rfl⟩ ⟨hy, hxy.symm⟩
+  exact (existsUnique_teichmuller_lift l _ (toZMod_ne_zero_of_mem_mu l hx)).unique ⟨hx, rfl⟩
+    ⟨hy, hxy.symm⟩
 
-theorem toZMod_surjOn_mu_nonzero : Set.SurjOn (PadicInt.toZMod (p := l)) (mu l : Set ℤ_[l])
-    ((univ.erase (0 : ZMod l) : Finset (ZMod l)) : Set (ZMod l)) := by
+theorem toZMod_surjOn_mu_nonzero
+    : Set.SurjOn (PadicInt.toZMod (p := l)) (mu l : Set ℤ_[l])
+      ((univ.erase (0 : ZMod l) : Finset (ZMod l)) : Set (ZMod l)) := by
   intro x hx
   have hx0 : x ≠ 0 := (Finset.mem_erase.mp hx).1
   obtain ⟨d, ⟨hd, hdx⟩, _⟩ := existsUnique_teichmuller_lift l x hx0
   exact ⟨d, hd, hdx⟩
 
 theorem card_mu_eq_sub_one : (mu l).card = l - 1 := by
-  rw [Finset.card_nbij _ (toZMod_mem_units_of_mem_mu l) (toZMod_injOn_mu l) (toZMod_surjOn_mu_nonzero l),
+  rw [Finset.card_nbij _ (toZMod_mem_units_of_mem_mu l) (toZMod_injOn_mu l)
+      (toZMod_surjOn_mu_nonzero l),
     Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, ZMod.card]
 
 theorem wilson_zmod_prod_units : ∏ x ∈ (univ.erase (0 : ZMod l)), x = -1 := by
@@ -316,14 +350,16 @@ theorem wilson_zmod_prod_units : ∏ x ∈ (univ.erase (0 : ZMod l)), x = -1 := 
     exact hx0 ((ZMod.val_eq_zero x).mp h0)
 
 theorem prod_roots_unity_eq_neg_one (hl : l ≠ 2) : ∏ d ∈ mu l, d = -1 := by
-  have hp : ∏ d ∈ mu l, d ∈ mu l := (mem_mu_iff_pow_eq_one l).mpr (by
-    rw [← Finset.prod_pow]
-    exact Finset.prod_eq_one fun d hd => (mem_mu_iff_pow_eq_one l).mp hd)
+  have hp : ∏ d ∈ mu l, d ∈ mu l :=
+    (mem_mu_iff_pow_eq_one l).mpr (by
+      rw [← Finset.prod_pow]
+      exact Finset.prod_eq_one fun d hd => (mem_mu_iff_pow_eq_one l).mp hd)
   have hm1 : (-1 : ℤ_[l]) ∈ mu l :=
     (mem_mu_iff_pow_eq_one l).mpr ((Fact.out : l.Prime).even_sub_one hl).neg_one_pow
   apply toZMod_injOn_mu l hp hm1
   rw [map_prod, map_neg, map_one, ← wilson_zmod_prod_units l]
-  exact Finset.prod_nbij _ (toZMod_mem_units_of_mem_mu l) (toZMod_injOn_mu l) (toZMod_surjOn_mu_nonzero l) (fun _ _ => rfl)
+  exact Finset.prod_nbij _ (toZMod_mem_units_of_mem_mu l) (toZMod_injOn_mu l)
+    (toZMod_surjOn_mu_nonzero l) (fun _ _ => rfl)
 
 theorem mu_facts_hold : MuFacts := by
   intro l _
@@ -331,8 +367,8 @@ theorem mu_facts_hold : MuFacts := by
 
 variable (O : Type) [CommRing O] [Algebra ℤ_[l] O]
 
-theorem br_eq_X_mul_shift (d : ℤ_[l]) :
-    br l O d = X * PowerSeries.mk (fun n => coeff (n + 1) (br l O d)) := by
+theorem br_eq_X_mul_shift (d : ℤ_[l])
+    : br l O d = X * PowerSeries.mk (fun n => coeff (n + 1) (br l O d)) := by
   ext n
   rcases n with _ | n
   · simpa using constantCoeff_binomialSeriesSubOne l O d
@@ -340,17 +376,18 @@ theorem br_eq_X_mul_shift (d : ℤ_[l]) :
 
 theorem coeff_one_br (d : ℤ_[l]) : coeff 1 (br l O d) = algebraMap ℤ_[l] O d := by
   first
-    | simp [br, PowerSeries.binomialSeries_coeff, Ring.choose_one_right, Algebra.smul_def]
-    | simp [br, PowerSeries.binomialSeries, Ring.choose_one_right, Algebra.smul_def]
-    | simp [br, PowerSeries.binomialSeries, Ring.choose_one_right]
+  | simp [br, PowerSeries.binomialSeries_coeff, Ring.choose_one_right, Algebra.smul_def]
+  | simp [br, PowerSeries.binomialSeries, Ring.choose_one_right, Algebra.smul_def]
+  | simp [br, PowerSeries.binomialSeries, Ring.choose_one_right]
 
 theorem r1_holds : R1 := by
   intro l _ O _ _ hl
   set w : O⟦X⟧ := ∏ d ∈ mu l, PowerSeries.mk (fun n => coeff (n + 1) (br l O d)) with hw
   have hcc : constantCoeff w = -1 := by
     rw [hw, map_prod]
-    have : ∀ d ∈ mu l, constantCoeff (PowerSeries.mk (fun n => coeff (n + 1) (br l O d))) =
-        algebraMap ℤ_[l] O d := by
+    have : ∀ d ∈ mu l,
+        constantCoeff (PowerSeries.mk (fun n => coeff (n + 1) (br l O d)))
+          = algebraMap ℤ_[l] O d := by
       intro d _
       rw [← coeff_zero_eq_constantCoeff_apply, coeff_mk, zero_add, coeff_one_br]
     rw [Finset.prod_congr rfl this, ← map_prod, prod_roots_unity_eq_neg_one l hl, map_neg, map_one]
@@ -362,8 +399,8 @@ theorem r1_holds : R1 := by
   rw [hw', pi0, Finset.prod_congr rfl (fun d _ => br_eq_X_mul_shift l O d), Finset.prod_mul_distrib,
     Finset.prod_const, card_mu_eq_sub_one, mul_comm]
 
-theorem act_finset_prod {ι : Type*} (c : ℤ_[l]) (s : Finset ι) (f : ι → O⟦X⟧) :
-    act l O c (∏ i ∈ s, f i) = ∏ i ∈ s, act l O c (f i) := by
+theorem act_finset_prod {ι : Type*} (c : ℤ_[l]) (s : Finset ι) (f : ι → O⟦X⟧)
+    : act l O c (∏ i ∈ s, f i) = ∏ i ∈ s, act l O c (f i) := by
   have ha := hasSubst_br_padic l O c
   simp only [act, ← coe_substAlgHom ha, map_prod]
 
@@ -374,7 +411,8 @@ theorem r2_inverse_holds : DivisibilityInvariant := by
     intro h
     rw [h, zero_pow (prime_sub_one_pos l).ne'] at hd1
     exact zero_ne_one hd1
-  rw [pi0, act_finset_prod, Finset.prod_congr rfl (fun e _ => binomialAction_binomialSeriesSubOne l O d e)]
+  rw [pi0, act_finset_prod,
+    Finset.prod_congr rfl (fun e _ => binomialAction_binomialSeriesSubOne l O d e)]
   apply Finset.prod_nbij (fun e => e * d)
   · intro e he
     rw [mem_mu_iff_pow_eq_one, mul_pow, (mem_mu_iff_pow_eq_one l).mp he, hd1, one_mul]
@@ -384,7 +422,8 @@ theorem r2_inverse_holds : DivisibilityInvariant := by
     refine ⟨e * d ^ (l - 1 - 1), ?_, ?_⟩
     · have he1 := (mem_mu_iff_pow_eq_one l).mp he
       show e * d ^ (l - 1 - 1) ∈ mu l
-      rw [mem_mu_iff_pow_eq_one, mul_pow, he1, one_mul, ← pow_mul, Nat.mul_comm, pow_mul, hd1, one_pow]
+      rw [mem_mu_iff_pow_eq_one, mul_pow, he1, one_mul, ← pow_mul, Nat.mul_comm, pow_mul, hd1,
+        one_pow]
     · show e * d ^ (l - 1 - 1) * d = e
       rw [mul_assoc, ← pow_succ, Nat.sub_add_cancel (prime_sub_one_pos l), hd1, mul_one]
   · intro e _; rfl
@@ -395,8 +434,9 @@ theorem q_roots_holds : QRoots := by
   intro l _ O _ _ _ ζ hζ
   have : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
   have hlpos : 0 < l := (Fact.out : l.Prime).pos
-  have h1 : (Polynomial.X ^ l - 1 : Polynomial O) =
-      ∏ b ∈ Finset.range l, (Polynomial.X - Polynomial.C (ζ ^ b)) := by
+  have h1
+      : (Polynomial.X ^ l - 1 : Polynomial O)
+        = ∏ b ∈ Finset.range l, (Polynomial.X - Polynomial.C (ζ ^ b)) := by
     rw [Polynomial.X_pow_sub_one_eq_prod hlpos hζ]
     symm
     apply Finset.prod_nbij (fun b => ζ ^ b)
@@ -405,17 +445,18 @@ theorem q_roots_holds : QRoots := by
     · intro b hb b' hb' h
       exact hζ.pow_inj (Finset.mem_range.mp hb) (Finset.mem_range.mp hb') h
     · intro ξ hξ
-      obtain ⟨i, hi, hiξ⟩ := hζ.eq_pow_of_pow_eq_one
-        ((Polynomial.mem_nthRootsFinset hlpos _).mp hξ)
+      obtain ⟨i, hi, hiξ⟩ := hζ.eq_pow_of_pow_eq_one ((Polynomial.mem_nthRootsFinset hlpos _).mp hξ)
       exact ⟨i, Finset.mem_coe.mpr (Finset.mem_range.mpr hi), hiξ⟩
     · intro b _; rfl
   have h2 := congrArg (Polynomial.eval₂RingHom (C : O →+* O⟦X⟧) (1 + X)) h1
-  simp only [map_sub, map_pow, map_one, map_prod, Polynomial.coe_eval₂RingHom,
-    Polynomial.eval₂_X, Polynomial.eval₂_C] at h2
+  simp only [map_sub, map_pow, map_one, map_prod, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_X,
+      Polynomial.eval₂_C]
+    at h2
   have h3 : (Finset.range l).erase 0 = Finset.Ioo 0 l := by
     ext b; simp only [Finset.mem_erase, Finset.mem_range, Finset.mem_Ioo]; omega
   rw [← Finset.mul_prod_erase (Finset.range l) _ (Finset.mem_range.mpr hlpos), h3,
-    ← X_mul_q_eq_one_add_X_pow_sub_one l O] at h2
+      ← X_mul_q_eq_one_add_X_pow_sub_one l O]
+    at h2
   have h4 : (1 + X - (C ζ) ^ 0 : O⟦X⟧) = X := by simp
   rw [h4] at h2
   have h5 := mul_left_cancel₀ (X_ne_zero (R := O)) h2
@@ -541,8 +582,8 @@ theorem r5_frobenius_holds : FrobeniusCongruence := by
       PowerSeries.substAlgHom_X]
     ring
   have key : PowerSeries.map (PadicInt.toZMod (p := l)) (phi l ℤ_[l] f - f ^ l) = 0 := by
-    rw [map_sub, map_pow, phi, map_subst_powerSeries _ (hasSubst_one_add_X_pow_sub_one_alt l), pow_prime_eq_subst_X_pow, h1,
-      sub_self]
+    rw [map_sub, map_pow, phi, map_subst_powerSeries _ (hasSubst_one_add_X_pow_sub_one_alt l),
+      pow_prime_eq_subst_X_pow, h1, sub_self]
   obtain ⟨r, hr⟩ := exists_eq_C_prime_mul_of_map_toZMod_zero l _ key
   exact ⟨r, by rw [← hr]; ring⟩
 
@@ -732,21 +773,24 @@ section General
 
 variable {R : Type} [CommRing R]
 
-theorem subst_eq_sum_range_add_pow_mul {a : R⟦X⟧} (ha : HasSubst a) (K : ℕ) (g : R⟦X⟧) :
-    ∃ h : R⟦X⟧, g.subst a = ∑ k ∈ range K, C (coeff k g) * a ^ k + a ^ K * h := by
+theorem subst_eq_sum_range_add_pow_mul {a : R⟦X⟧} (ha : HasSubst a) (K : ℕ) (g : R⟦X⟧)
+    : ∃ h : R⟦X⟧, g.subst a = ∑ k ∈ range K, C (coeff k g) * a ^ k + a ^ K * h := by
   induction K generalizing g with
   | zero => exact ⟨g.subst a, by simp⟩
   | succ K ih =>
     obtain ⟨h, hh⟩ := ih (PowerSeries.mk fun p => coeff (p + 1) g)
     refine ⟨h, ?_⟩
-    have e : g.subst a = a * (PowerSeries.mk fun p => coeff (p + 1) g).subst a + C (constantCoeff g) := by
+    have e
+        : g.subst a
+          = a * (PowerSeries.mk fun p => coeff (p + 1) g).subst a + C (constantCoeff g) := by
       conv_lhs => rw [eq_X_mul_shift_add_const g]
       rw [subst_add ha, subst_mul ha, subst_X ha, subst_C]
       rfl
     rw [e, hh, Finset.sum_range_succ']
     simp only [coeff_mk, coeff_zero_eq_constantCoeff_apply, pow_zero, mul_one]
-    have e2 : a * ∑ k ∈ range K, C (coeff (k + 1) g) * a ^ k =
-        ∑ k ∈ range K, C (coeff (k + 1) g) * a ^ (k + 1) := by
+    have e2
+        : a * ∑ k ∈ range K, C (coeff (k + 1) g) * a ^ k
+          = ∑ k ∈ range K, C (coeff (k + 1) g) * a ^ (k + 1) := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl fun k _ => by ring
     rw [mul_add, e2]
@@ -755,13 +799,15 @@ theorem subst_eq_sum_range_add_pow_mul {a : R⟦X⟧} (ha : HasSubst a) (K : ℕ
 theorem subst_zero_eq_zero {a : R⟦X⟧} (ha : HasSubst a) : (0 : R⟦X⟧).subst a = 0 := by
   rw [← PowerSeries.coe_substAlgHom ha, map_zero]
 
-theorem hasSubst_unit_mul_X_pow (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) : HasSubst ((w : R⟦X⟧) * X ^ n) := by
+theorem hasSubst_unit_mul_X_pow (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ)
+    : HasSubst ((w : R⟦X⟧) * X ^ n) := by
   apply PowerSeries.HasSubst.of_constantCoeff_zero
   change PowerSeries.constantCoeff ((w : R⟦X⟧) * X ^ n) = 0
   simp [zero_pow hn.ne']
 
-theorem cancel_unit_mul_X_pow (n : ℕ) (w : (R⟦X⟧)ˣ) {a b : R⟦X⟧}
-    (h : (w : R⟦X⟧) * X ^ n * a = (w : R⟦X⟧) * X ^ n * b) : a = b := by
+theorem cancel_unit_mul_X_pow
+    (n : ℕ) (w : (R⟦X⟧)ˣ) {a b : R⟦X⟧} (h : (w : R⟦X⟧) * X ^ n * a = (w : R⟦X⟧) * X ^ n * b)
+    : a = b := by
   have h' : X ^ n * a = X ^ n * b := by
     have := congrArg (fun t => ((w⁻¹ : (R⟦X⟧)ˣ) : R⟦X⟧) * t) h
     simp only [← mul_assoc, Units.inv_mul, one_mul] at this
@@ -773,13 +819,19 @@ theorem cancel_unit_mul_X_pow (n : ℕ) (w : (R⟦X⟧)ˣ) {a b : R⟦X⟧}
 def divQuotient (n : ℕ) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧) : R⟦X⟧ :=
   ((w⁻¹ : (R⟦X⟧)ˣ) : R⟦X⟧) * PowerSeries.mk fun i => coeff (i + n) f
 
-theorem eq_sum_coeff_add_division (n : ℕ) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧) :
-    f = ∑ j : Fin n, C (coeff (j : ℕ) f) * X ^ (j : ℕ) + (w : R⟦X⟧) * X ^ n * divQuotient n w f := by
-  have e : (w : R⟦X⟧) * X ^ n * divQuotient n w f = X ^ n * PowerSeries.mk fun i => coeff (i + n) f := by
+theorem eq_sum_coeff_add_division (n : ℕ) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧)
+    : f
+      = ∑ j : Fin n, C (coeff (j : ℕ) f) * X ^ (j : ℕ)
+        + (w : R⟦X⟧) * X ^ n * divQuotient n w f := by
+  have e
+      : (w : R⟦X⟧) * X ^ n * divQuotient n w f
+        = X ^ n * PowerSeries.mk fun i => coeff (i + n) f := by
     unfold divQuotient
-    calc (w : R⟦X⟧) * X ^ n * (((w⁻¹ : (R⟦X⟧)ˣ) : R⟦X⟧) * PowerSeries.mk fun i => coeff (i + n) f)
-        = ((w : R⟦X⟧) * ((w⁻¹ : (R⟦X⟧)ˣ) : R⟦X⟧)) * (X ^ n * PowerSeries.mk fun i => coeff (i + n) f) := by
-          ring
+    calc
+      (w : R⟦X⟧) * X ^ n * (((w⁻¹ : (R⟦X⟧)ˣ) : R⟦X⟧) * PowerSeries.mk fun i => coeff (i + n) f)
+          = ((w : R⟦X⟧) * ((w⁻¹ : (R⟦X⟧)ˣ) : R⟦X⟧))
+            * (X ^ n * PowerSeries.mk fun i => coeff (i + n) f) := by
+        ring
       _ = X ^ n * PowerSeries.mk fun i => coeff (i + n) f := by rw [Units.mul_inv, one_mul]
   rw [e]
   ext m
@@ -801,10 +853,11 @@ theorem eq_sum_coeff_add_division (n : ℕ) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧) :
       have := b.2
       omega
 
-theorem eq_sum_iterated_division (n : ℕ) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧) (K : ℕ) :
-    f = ∑ k ∈ range K, ((w : R⟦X⟧) * X ^ n) ^ k *
-          (∑ j : Fin n, C (coeff (j : ℕ) ((divQuotient n w)^[k] f)) * X ^ (j : ℕ)) +
-        ((w : R⟦X⟧) * X ^ n) ^ K * (divQuotient n w)^[K] f := by
+theorem eq_sum_iterated_division (n : ℕ) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧) (K : ℕ)
+    : f
+      = ∑ k ∈ range K, ((w : R⟦X⟧) * X ^ n) ^ k *
+          (∑ j : Fin n, C (coeff (j : ℕ) ((divQuotient n w)^[k] f)) * X ^ (j : ℕ))
+        + ((w : R⟦X⟧) * X ^ n) ^ K * (divQuotient n w)^[K] f := by
   induction K with
   | zero => simp
   | succ K ih =>
@@ -812,8 +865,9 @@ theorem eq_sum_iterated_division (n : ℕ) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧) (K 
     have h := eq_sum_coeff_add_division n w ((divQuotient n w)^[K] f)
     linear_combination ih + ((w : R⟦X⟧) * X ^ n) ^ K * h
 
-theorem eq_sum_subst_unit_mul_X_pow (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧) :
-    f = ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
+theorem eq_sum_subst_unit_mul_X_pow (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (f : R⟦X⟧)
+    : f
+      = ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
           ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) := by
   have hP := hasSubst_unit_mul_X_pow n hn w
   rw [← sub_eq_zero]
@@ -823,37 +877,43 @@ theorem eq_sum_subst_unit_mul_X_pow (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (f
   choose h hh using fun j : Fin n =>
     subst_eq_sum_range_add_pow_mul hP (N + 1) (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f))
   simp only [coeff_mk] at hh
-  have e2 : ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
-          ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) =
-      ∑ k ∈ range (N + 1), ((w : R⟦X⟧) * X ^ n) ^ k *
-          (∑ j : Fin n, C (coeff (j : ℕ) ((divQuotient n w)^[k] f)) * X ^ (j : ℕ)) +
-        ((w : R⟦X⟧) * X ^ n) ^ (N + 1) * ∑ j : Fin n, h j * X ^ (j : ℕ) := by
+  have e2
+      : ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
+          ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ)
+        = ∑ k ∈ range (N + 1), ((w : R⟦X⟧) * X ^ n) ^ k *
+              (∑ j : Fin n, C (coeff (j : ℕ) ((divQuotient n w)^[k] f)) * X ^ (j : ℕ))
+          + ((w : R⟦X⟧) * X ^ n) ^ (N + 1) * ∑ j : Fin n, h j * X ^ (j : ℕ) := by
     rw [Finset.sum_congr rfl fun j _ => by rw [hh j]]
     simp only [add_mul, Finset.sum_add_distrib, Finset.sum_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     congr 1
     · exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
     · exact Finset.sum_congr rfl fun j _ => by ring
-  have e3 : f - ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
-          ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) =
-      ((w : R⟦X⟧) * X ^ n) ^ (N + 1) *
-        ((divQuotient n w)^[N + 1] f - ∑ j : Fin n, h j * X ^ (j : ℕ)) := by
+  have e3
+      : f - ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
+          ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ)
+        = ((w : R⟦X⟧) * X ^ n) ^ (N + 1)
+          * ((divQuotient n w)^[N + 1] f - ∑ j : Fin n, h j * X ^ (j : ℕ)) := by
     rw [e2]
     linear_combination eq_sum_iterated_division n w f (N + 1)
   rw [e3, mul_pow, ← pow_mul]
   refine Dvd.dvd.mul_right (Dvd.dvd.mul_left (pow_dvd_pow _ ?_) _) _
   exact Nat.le_mul_of_pos_left _ hn
 
-theorem constantCoeff_eq_zero_of_sum_subst (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (d : Fin n → R⟦X⟧)
-    (h0 : ∑ j : Fin n, (d j).subst ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) = 0) (i : Fin n) :
-    constantCoeff (d i) = 0 := by
+theorem constantCoeff_eq_zero_of_sum_subst
+    (n : ℕ) (hn : 0 < n)
+    (w : (R⟦X⟧)ˣ) (d : Fin n → R⟦X⟧)
+    (h0 : ∑ j : Fin n, (d j).subst ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) = 0)
+    (i : Fin n)
+    : constantCoeff (d i) = 0 := by
   have hP := hasSubst_unit_mul_X_pow n hn w
   choose h hh using fun j : Fin n => subst_eq_sum_range_add_pow_mul hP 1 (d j)
-  simp only [Finset.sum_range_one, pow_zero, mul_one, pow_one,
-    coeff_zero_eq_constantCoeff_apply] at hh
-  have e : ∑ j : Fin n, (d j).subst ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) =
-      ∑ j : Fin n, C (constantCoeff (d j)) * X ^ (j : ℕ) +
-        X ^ n * ((w : R⟦X⟧) * ∑ j : Fin n, h j * X ^ (j : ℕ)) := by
+  simp only [Finset.sum_range_one, pow_zero, mul_one, pow_one, coeff_zero_eq_constantCoeff_apply]
+    at hh
+  have e
+      : ∑ j : Fin n, (d j).subst ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ)
+        = ∑ j : Fin n, C (constantCoeff (d j)) * X ^ (j : ℕ)
+          + X ^ n * ((w : R⟦X⟧) * ∑ j : Fin n, h j * X ^ (j : ℕ)) := by
     rw [Finset.sum_congr rfl fun j _ => by rw [hh j]]
     simp only [add_mul, Finset.sum_add_distrib, Finset.mul_sum]
     congr 1
@@ -861,7 +921,9 @@ theorem constantCoeff_eq_zero_of_sum_subst (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧
   rw [e] at h0
   have h1 := congrArg (coeff (i : ℕ)) h0
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, coeff_X_pow_mul', if_neg (by have := i.2; omega), add_zero, map_zero] at h1
+    rw [map_add (f := _), map_sum, coeff_X_pow_mul', if_neg (by have := i.2; omega), add_zero,
+        map_zero]
+      at h1
   simp only [coeff_C_mul_X_pow] at h1
   rw [Finset.sum_eq_single i] at h1
   · simpa using h1
@@ -871,9 +933,9 @@ theorem constantCoeff_eq_zero_of_sum_subst (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧
     exact hb (Fin.ext h.symm)
   · simp
 
-theorem coeff_eq_zero_of_subst_sum_eq_zero (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (k : ℕ) :
-    ∀ d : Fin n → R⟦X⟧, ∑ j : Fin n, (d j).subst ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) = 0 →
-      ∀ j, coeff k (d j) = 0 := by
+theorem coeff_eq_zero_of_subst_sum_eq_zero (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (k : ℕ)
+    : ∀ d : Fin n → R⟦X⟧,
+      ∑ j : Fin n, (d j).subst ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) = 0 → ∀ j, coeff k (d j) = 0 := by
   have hP := hasSubst_unit_mul_X_pow n hn w
   induction k with
   | zero =>
@@ -886,13 +948,17 @@ theorem coeff_eq_zero_of_subst_sum_eq_zero (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧
     have hd : ∀ j, d j = X * PowerSeries.mk fun p => coeff (p + 1) (d j) := by
       intro j
       conv_lhs => rw [eq_X_mul_shift_add_const (d j), hc j, map_zero, add_zero]
-    have h1 : (w : R⟦X⟧) * X ^ n * ∑ j : Fin n, (PowerSeries.mk fun p => coeff (p + 1) (d j)).subst
-        ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) = (w : R⟦X⟧) * X ^ n * 0 := by
+    have h1
+        : (w : R⟦X⟧) * X ^ n
+            * ∑ j : Fin n, (PowerSeries.mk fun p => coeff (p + 1) (d j)).subst
+              ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ)
+          = (w : R⟦X⟧) * X ^ n * 0 := by
       rw [mul_zero, ← h0, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       conv_rhs => rw [hd j, subst_mul hP, subst_X hP]
       ring
-    have h2 := ih (fun j => PowerSeries.mk fun p => coeff (p + 1) (d j)) (cancel_unit_mul_X_pow n w h1) j
+    have h2 :=
+      ih (fun j => PowerSeries.mk fun p => coeff (p + 1) (d j)) (cancel_unit_mul_X_pow n w h1) j
     simpa using h2
 
 end General
@@ -900,13 +966,19 @@ end General
 theorem general_basis_holds : BasisGeneral := by
   intro R _ n w hn f
   have hP := hasSubst_unit_mul_X_pow n hn w
-  refine ⟨fun j => PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f), eq_sum_subst_unit_mul_X_pow n hn w f, ?_⟩
+  refine ⟨
+    fun j => PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f),
+    eq_sum_subst_unit_mul_X_pow n hn w f,
+    ?_
+  ⟩
   intro g' hg'
   have hg : f = ∑ j : Fin n, (g' j).subst ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) := hg'
   funext j
   ext k
-  have h0 : ∑ j : Fin n, (g' j - PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
-      ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) = 0 := by
+  have h0
+      : ∑ j : Fin n, (g' j - PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
+          ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ)
+        = 0 := by
     simp only [subst_sub hP, sub_mul, Finset.sum_sub_distrib]
     rw [← hg, ← eq_sum_subst_unit_mul_X_pow n hn w f, sub_self]
   have h1 := coeff_eq_zero_of_subst_sum_eq_zero n hn w k _ h0 j
@@ -917,9 +989,9 @@ section General2
 
 variable {R : Type} [CommRing R]
 
-theorem coeff_subst_X_mul_of_low_zero (s f : R⟦X⟧) (j : ℕ) (hj : 0 < j)
-    (h0 : ∀ i, 0 < i → i < j → coeff i f = 0) :
-    coeff j (f.subst (X * s)) = coeff j f * constantCoeff s ^ j := by
+theorem coeff_subst_X_mul_of_low_zero
+    (s f : R⟦X⟧) (j : ℕ) (hj : 0 < j) (h0 : ∀ i, 0 < i → i < j → coeff i f = 0)
+    : coeff j (f.subst (X * s)) = coeff j f * constantCoeff s ^ j := by
   have ha : HasSubst (X * s) := HasSubst.of_constantCoeff_zero' (by simp)
   obtain ⟨h, hh⟩ := subst_eq_sum_range_add_pow_mul ha (j + 1) f
   set_option synthInstance.maxHeartbeats 100000 in
@@ -937,9 +1009,10 @@ theorem coeff_subst_X_mul_of_low_zero (s f : R⟦X⟧) (j : ℕ) (hj : 0 < j)
   · intro h
     exact absurd (Finset.mem_range.mpr (Nat.lt_succ_self j)) h
 
-theorem coeff_eq_zero_of_subst_invariant (s f : R⟦X⟧) (n : ℕ) (hinv : f.subst (X * s) = f)
-    (hu : ∀ j, 0 < j → j < n → IsUnit (constantCoeff s ^ j - 1)) :
-    ∀ j, 0 < j → j < n → coeff j f = 0 := by
+theorem coeff_eq_zero_of_subst_invariant
+    (s f : R⟦X⟧) (n : ℕ)
+    (hinv : f.subst (X * s) = f) (hu : ∀ j, 0 < j → j < n → IsUnit (constantCoeff s ^ j - 1))
+    : ∀ j, 0 < j → j < n → coeff j f = 0 := by
   intro j
   induction j using Nat.strong_induction_on with
   | _ j ih =>
@@ -949,11 +1022,11 @@ theorem coeff_eq_zero_of_subst_invariant (s f : R⟦X⟧) (n : ℕ) (hinv : f.su
     have h2 : coeff j f * (constantCoeff s ^ j - 1) = 0 := by linear_combination -h1
     exact (hu j h0 hn).mul_left_eq_zero.mp h2
 
-theorem averagedSeries_subst_invariant (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (s f : R⟦X⟧)
-    (hP : ((w : R⟦X⟧) * X ^ n).subst (X * s) = (w : R⟦X⟧) * X ^ n)
-    (hinv : f.subst (X * s) = f)
-    (hu : ∀ j, 0 < j → j < n → IsUnit (constantCoeff s ^ j - 1)) :
-    (divQuotient n w f).subst (X * s) = divQuotient n w f := by
+theorem averagedSeries_subst_invariant
+    (n : ℕ) (hn : 0 < n)
+    (w : (R⟦X⟧)ˣ) (s f : R⟦X⟧) (hP : ((w : R⟦X⟧) * X ^ n).subst (X * s) = (w : R⟦X⟧) * X ^ n)
+    (hinv : f.subst (X * s) = f) (hu : ∀ j, 0 < j → j < n → IsUnit (constantCoeff s ^ j - 1))
+    : (divQuotient n w f).subst (X * s) = divQuotient n w f := by
   have ha : HasSubst (X * s) := HasSubst.of_constantCoeff_zero' (by simp)
   have hc := coeff_eq_zero_of_subst_invariant s f n hinv hu
   have hdiv := eq_sum_coeff_add_division n w f
@@ -965,8 +1038,9 @@ theorem averagedSeries_subst_invariant (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ)
       simp
     · simp
   rw [hT] at hdiv
-  have h1 : f.subst (X * s) =
-      C (constantCoeff f) + (w : R⟦X⟧) * X ^ n * (divQuotient n w f).subst (X * s) := by
+  have h1
+      : f.subst (X * s)
+        = C (constantCoeff f) + (w : R⟦X⟧) * X ^ n * (divQuotient n w f).subst (X * s) := by
     conv_lhs => rw [hdiv]
     rw [subst_add ha, subst_mul ha, hP, subst_C]
     rfl
@@ -974,11 +1048,11 @@ theorem averagedSeries_subst_invariant (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ)
   apply cancel_unit_mul_X_pow n w
   linear_combination hdiv - h1
 
-theorem exists_subst_of_invariant (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (s f : R⟦X⟧)
-    (hP : ((w : R⟦X⟧) * X ^ n).subst (X * s) = (w : R⟦X⟧) * X ^ n)
-    (hinv : f.subst (X * s) = f)
-    (hu : ∀ j, 0 < j → j < n → IsUnit (constantCoeff s ^ j - 1)) :
-    ∃ g : R⟦X⟧, f = g.subst ((w : R⟦X⟧) * X ^ n) := by
+theorem exists_subst_of_invariant
+    (n : ℕ) (hn : 0 < n)
+    (w : (R⟦X⟧)ˣ) (s f : R⟦X⟧) (hP : ((w : R⟦X⟧) * X ^ n).subst (X * s) = (w : R⟦X⟧) * X ^ n)
+    (hinv : f.subst (X * s) = f) (hu : ∀ j, 0 < j → j < n → IsUnit (constantCoeff s ^ j - 1))
+    : ∃ g : R⟦X⟧, f = g.subst ((w : R⟦X⟧) * X ^ n) := by
   have hit : ∀ k, ((divQuotient n w)^[k] f).subst (X * s) = (divQuotient n w)^[k] f := by
     intro k
     induction k with
@@ -988,9 +1062,11 @@ theorem exists_subst_of_invariant (n : ℕ) (hn : 0 < n) (w : (R⟦X⟧)ˣ) (s f
       exact averagedSeries_subst_invariant n hn w s _ hP ih hu
   refine ⟨PowerSeries.mk fun k => coeff 0 ((divQuotient n w)^[k] f), ?_⟩
   have h := eq_sum_subst_unit_mul_X_pow n hn w f
-  have h' : ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
-          ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ) =
-      (PowerSeries.mk fun k => coeff 0 ((divQuotient n w)^[k] f)).subst ((w : R⟦X⟧) * X ^ n) := by
+  have h'
+      : ∑ j : Fin n, (PowerSeries.mk fun k => coeff (j : ℕ) ((divQuotient n w)^[k] f)).subst
+          ((w : R⟦X⟧) * X ^ n) * X ^ (j : ℕ)
+        = (PowerSeries.mk fun k => coeff 0 ((divQuotient n w)^[k] f)).subst
+          ((w : R⟦X⟧) * X ^ n) := by
     rw [Finset.sum_eq_single (⟨0, hn⟩ : Fin n)]
     · rw [pow_zero, mul_one]
     · intro b _ hb
@@ -1038,17 +1114,19 @@ theorem inc_X_sub_l_eq_q0 : inc l O (X - C (l : O)) = q0 l O := by
   rw [inc, ← PowerSeries.coe_substAlgHom hs, map_sub, q0]
   congr 1
   · rw [PowerSeries.coe_substAlgHom, PowerSeries.subst_X hs]
-  calc PowerSeries.substAlgHom hs (C (l : O)) = PowerSeries.substAlgHom hs ((l : O) • 1) := by
-        rw [PowerSeries.smul_eq_C_mul, mul_one]
+  calc
+    PowerSeries.substAlgHom hs (C (l : O))
+      = PowerSeries.substAlgHom hs ((l : O) • 1) := by rw [PowerSeries.smul_eq_C_mul, mul_one]
     _ = (l : O) • PowerSeries.substAlgHom hs 1 := map_smul _ _ _
     _ = C (l : O) := by rw [map_one, PowerSeries.smul_eq_C_mul, mul_one]
 
-theorem br_eq_X_mul_const (c : ℤ_[l]) :
-    ∃ s : O⟦X⟧, br l O c = X * s ∧ constantCoeff s = algebraMap ℤ_[l] O c := by
+theorem br_eq_X_mul_const (c : ℤ_[l])
+    : ∃ s : O⟦X⟧, br l O c = X * s ∧ constantCoeff s = algebraMap ℤ_[l] O c := by
   refine ⟨_, br_eq_X_mul_shift l O c, ?_⟩
   simp [coeff_one_br]
 
-theorem exists_mu_generator_pow_sub_one_isUnit (hm : MuFacts) : ∃ d ∈ mu l, ∀ j, 0 < j → j < l - 1 → IsUnit (d ^ j - 1) := by
+theorem exists_mu_generator_pow_sub_one_isUnit (hm : MuFacts)
+    : ∃ d ∈ mu l, ∀ j, 0 < j → j < l - 1 → IsUnit (d ^ j - 1) := by
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := (ZMod l)ˣ)
   have ho : orderOf g = l - 1 := by
     rw [orderOf_eq_card_of_forall_mem_zpowers hg, Nat.card_eq_fintype_card, ZMod.card_units]
@@ -1068,7 +1146,8 @@ theorem r2_basis_of_r1 (h1 : R1) (hb : BasisGeneral) : PowerSeriesFreeBasis := b
   have h := hb O (l - 1) w (prime_sub_one_pos_alt l) f
   simpa only [inc, hw] using h
 
-theorem fixed_relation_of_mu_and_inverse (hm : MuFacts) (h1 : R1) (hi : DivisibilityInvariant) : RootsOfUnityInvariants := by
+theorem fixed_relation_of_mu_and_inverse (hm : MuFacts) (h1 : R1) (hi : DivisibilityInvariant)
+    : RootsOfUnityInvariants := by
   intro l _ O _ _ h2 f
   constructor
   · intro hf
@@ -1101,23 +1180,22 @@ theorem fourth_relation_of_unit_and_basis (h3 : UnitFactorQ) (hb : PowerSeriesFr
   intro l _ O _ _ h2 S m y hm
   obtain ⟨g, hg, -⟩ := h3 l O h2
   have hpos := prime_sub_one_pos_alt l
-  have hq : q l O = ((g⁻¹ : (O⟦X⟧)ˣ) : O⟦X⟧) * q0 l O := by
-    rw [hg, Units.inv_mul_cancel_left]
+  have hq : q l O = ((g⁻¹ : (O⟦X⟧)ˣ) : O⟦X⟧) * q0 l O := by rw [hg, Units.inv_mul_cancel_left]
   obtain ⟨a, ha, -⟩ := hb l O h2 (((g⁻¹ : (O⟦X⟧)ˣ) : O⟦X⟧) ^ S * y)
-  have ha' : ((g⁻¹ : (O⟦X⟧)ˣ) : O⟦X⟧) ^ S * y =
-      ∑ j : Fin (l - 1), inc l O (a j) * X ^ (j : ℕ) := ha
+  have ha' : ((g⁻¹ : (O⟦X⟧)ˣ) : O⟦X⟧) ^ S * y = ∑ j : Fin (l - 1), inc l O (a j) * X ^ (j : ℕ) := ha
   obtain ⟨a0, -, huniq⟩ := hb l O h2 (inc l O m)
-  have e1 : inc l O m =
-      ∑ j : Fin (l - 1), inc l O ((X - C (l : O)) ^ S * a j) * X ^ (j : ℕ) := by
-    have hj : ∀ j : Fin (l - 1), inc l O ((X - C (l : O)) ^ S * a j) * X ^ (j : ℕ) =
-        q0 l O ^ S * (inc l O (a j) * X ^ (j : ℕ)) := by
+  have e1 : inc l O m = ∑ j : Fin (l - 1), inc l O ((X - C (l : O)) ^ S * a j) * X ^ (j : ℕ) := by
+    have hj
+        : ∀ j : Fin (l - 1),
+          inc l O ((X - C (l : O)) ^ S * a j) * X ^ (j : ℕ)
+            = q0 l O ^ S * (inc l O (a j) * X ^ (j : ℕ)) := by
       intro j
       rw [pi0Subst_mul, inc_pow, inc_X_sub_l_eq_q0]
       ring
     rw [Finset.sum_congr rfl fun j _ => hj j, ← Finset.mul_sum, ← ha', hm, hq]
     ring
-  have e2 : inc l O m =
-      ∑ j : Fin (l - 1), inc l O (if (j : ℕ) = 0 then m else 0) * X ^ (j : ℕ) := by
+  have e2
+      : inc l O m = ∑ j : Fin (l - 1), inc l O (if (j : ℕ) = 0 then m else 0) * X ^ (j : ℕ) := by
     rw [Finset.sum_eq_single (⟨0, hpos⟩ : Fin (l - 1))]
     · simp
     · intro b _ hb'
@@ -1227,11 +1305,15 @@ lemma map_algebraMap_pi0Subst (hm : MuFacts) (f : ℤ_[l]⟦X⟧) :
 
 end
 
-theorem act_unit_pi0_eq_mul_padic (ha : ActLaws) (hm : MuFacts) (hq : QMul) (hi : DivisibilityInvariant) (hf : RootsOfUnityInvariants) (h4 : R4)
-    (l : ℕ) [Fact l.Prime] (hl : l ≠ 2) (u c : ℤ_[l]) (hu : u = 1 + (l : ℤ_[l]) * c) :
-    ∃ un : ℤ_[l]⟦X⟧,
-      act l ℤ_[l] u (pi0 l ℤ_[l]) = pi0 l ℤ_[l] * (1 + inc l ℤ_[l] un * q0 l ℤ_[l]) ∧
-      ∃ e : ℤ_[l], constantCoeff un = c + (l : ℤ_[l]) * e := by
+theorem act_unit_pi0_eq_mul_padic
+    (ha : ActLaws) (hm : MuFacts) (hq : QMul) (hi : DivisibilityInvariant)
+    (hf : RootsOfUnityInvariants) (h4 : R4)
+    (l : ℕ) [Fact l.Prime]
+    (hl : l ≠ 2)
+    (u c : ℤ_[l]) (hu : u = 1 + (l : ℤ_[l]) * c)
+    : ∃ un : ℤ_[l]⟦X⟧,
+      act l ℤ_[l] u (pi0 l ℤ_[l]) = pi0 l ℤ_[l] * (1 + inc l ℤ_[l] un * q0 l ℤ_[l])
+        ∧ ∃ e : ℤ_[l], constantCoeff un = c + (l : ℤ_[l]) * e := by
   classical
   obtain ⟨hcard, -, hprod⟩ := hm l
   have hprod := hprod hl
@@ -1255,7 +1337,7 @@ theorem act_unit_pi0_eq_mul_padic (ha : ActLaws) (hm : MuFacts) (hq : QMul) (hi 
   have hB0 : constantCoeff B = -1 := by
     rw [hB, map_prod, ← hprod]
     exact prod_congr rfl fun d _ => by rw [hβ0]; rfl
-  have hB'0 : constantCoeff B' = -u ^ (l - 1) := by
+  have hB'0 : constantCoeff B' = - u ^ (l - 1) := by
     rw [hB', map_prod]
     have h0 : ∀ d ∈ mu l, constantCoeff (β (d * u)) = d * u := fun d _ => by rw [hβ0]; rfl
     rw [prod_congr rfl h0, prod_mul_distrib, prod_const, hprod, hcard]
@@ -1290,8 +1372,8 @@ theorem act_unit_pi0_eq_mul_padic (ha : ActLaws) (hm : MuFacts) (hq : QMul) (hi 
   obtain ⟨ρ, hρ⟩ := (hf l ℤ_[l] hl r).mp hinv
   obtain ⟨Φ, hΦ, hΦX⟩ := exists_algHom_inc_pi0 l ℤ_[l] hm
   obtain ⟨y, hy⟩ := hQr
-  obtain ⟨un, hun⟩ := h4 l ℤ_[l] hl 1 (ρ - 1) y (by
-    rw [hΦ, map_sub, map_one, ← hΦ, ← hρ, hy, pow_one])
+  obtain ⟨un, hun⟩ :=
+    h4 l ℤ_[l] hl 1 (ρ - 1) y (by rw [hΦ, map_sub, map_one, ← hΦ, ← hρ, hy, pow_one])
   have hrr : r = 1 + inc l ℤ_[l] un * q0 l ℤ_[l] := by
     have h0 : ρ = 1 + (X - C (l : ℤ_[l])) * un := by
       rw [pow_one] at hun
@@ -1314,24 +1396,28 @@ theorem act_unit_pi0_eq_mul_padic (ha : ActLaws) (hm : MuFacts) (hq : QMul) (hi 
     rw [hr0, map_add (f := _), map_one, map_mul, constantCoeff_inc l ℤ_[l] hm, hq00] at h0
     exact h0
   obtain ⟨e, he⟩ := one_add_pow_eq_linear_add_sq_mul ((l : ℤ_[l]) * c) (l - 1)
-  have hn : ((l - 1 : ℕ) : ℤ_[l]) = (l : ℤ_[l]) - 1 := by
-    rw [Nat.cast_sub (by omega), Nat.cast_one]
+  have hn : ((l - 1 : ℕ) : ℤ_[l]) = (l : ℤ_[l]) - 1 := by rw [Nat.cast_sub (by omega), Nat.cast_one]
   rw [hu, he, hn] at hmain
   have hl0 : (l : ℤ_[l]) ≠ 0 := Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero
   refine ⟨-c - c ^ 2 * e, ?_⟩
-  have h0 : (l : ℤ_[l]) * constantCoeff un = (l : ℤ_[l]) * (c + (l : ℤ_[l]) * (-c - c ^ 2 * e)) := by
+  have h0
+      : (l : ℤ_[l]) * constantCoeff un = (l : ℤ_[l]) * (c + (l : ℤ_[l]) * (-c - c ^ 2 * e)) := by
     linear_combination hmain
   exact mul_left_cancel₀ hl0 h0
 
-theorem sixth_relation_of_action_and_mu_laws (ha : ActLaws) (hm : MuFacts) (hq : QMul) (hi : DivisibilityInvariant) (hf : RootsOfUnityInvariants)
-    (h4 : R4) : R6 := by
+theorem sixth_relation_of_action_and_mu_laws
+    (ha : ActLaws) (hm : MuFacts) (hq : QMul) (hi : DivisibilityInvariant)
+    (hf : RootsOfUnityInvariants) (h4 : R4)
+    : R6 := by
   intro l _ O _ _ hl u c hu
   obtain ⟨unZ, hA, e, he⟩ := act_unit_pi0_eq_mul_padic ha hm hq hi hf h4 l hl u c hu
-  have H1 : act l O u (pi0 l O) =
-      pi0 l O * (1 + inc l O (PowerSeries.map (algebraMap ℤ_[l] O) unZ) * q0 l O) := by
+  have H1
+      : act l O u (pi0 l O)
+        = pi0 l O * (1 + inc l O (PowerSeries.map (algebraMap ℤ_[l] O) unZ) * q0 l O) := by
     have h0 := congrArg (PowerSeries.map (algebraMap ℤ_[l] O)) hA
     rw [map_act_padic, map_mul, map_add (f := _), map_one, map_mul, map_algebraMap_pi0Subst l O hm,
-      map_q0_padic_alt, map_pi0_padicInt_algebraMap] at h0
+        map_q0_padic_alt, map_pi0_padicInt_algebraMap]
+      at h0
     exact h0
   refine ⟨PowerSeries.map (algebraMap ℤ_[l] O) unZ, H1, ⟨algebraMap ℤ_[l] O e, ?_⟩, ?_, ?_⟩
   · rw [← coeff_zero_eq_constantCoeff_apply, coeff_map, coeff_zero_eq_constantCoeff_apply, he,
@@ -1358,8 +1444,8 @@ end PartC
 
 section PartD
 
-theorem sq_dvd_one_add_pow_sub_linear (R : Type) [CommRing R] (x v : R) (n : ℕ) :
-    x ^ 2 ∣ (1 + x * v) ^ n - (1 + (n : R) * (x * v)) := by
+theorem sq_dvd_one_add_pow_sub_linear (R : Type) [CommRing R] (x v : R) (n : ℕ)
+    : x ^ 2 ∣ (1 + x * v) ^ n - (1 + (n : R) * (x * v)) := by
   obtain ⟨e, he⟩ := one_add_pow_eq_linear_add_sq_mul (x * v) n
   rw [he]
   exact ⟨v ^ 2 * e, by ring⟩
@@ -1370,28 +1456,35 @@ theorem zpow_congruence_general : ZpowCongGen := by
   · have := sq_dvd_one_add_pow_sub_linear R x v n
     simpa [zpow_natCast, hU] using this
   · obtain ⟨s, hs⟩ := sq_dvd_one_add_pow_sub_linear R x v n
-    have h1 : ((U ^ n : Rˣ) : R) * ((U ^ (-(n : ℤ)) : Rˣ) : R) = 1 := by
-      rw [← Units.val_mul]; simp
+    have h1 : ((U ^ n : Rˣ) : R) * ((U ^ (-(n : ℤ)) : Rˣ) : R) = 1 := by rw [← Units.val_mul]; simp
     have h2 : ((U ^ n : Rˣ) : R) = 1 + (n : R) * (x * v) + x ^ 2 * s := by
       rw [Units.val_pow_eq_pow_val, hU]; linear_combination hs
-    have h3 : x ^ 2 ∣ ((U ^ n : Rˣ) : R) *
-        (((U ^ (-(n : ℤ)) : Rˣ) : R) - (1 + ((-(n : ℤ) : ℤ) : R) * (x * v))) := by
+    have h3
+        : x ^ 2
+          ∣ ((U ^ n : Rˣ) : R)
+            * (((U ^ (-(n : ℤ)) : Rˣ) : R) - (1 + ((-(n : ℤ) : ℤ) : R) * (x * v))) := by
       refine ⟨(n : R) ^ 2 * v ^ 2 - s * (1 - n * (x * v)), ?_⟩
-      rw [mul_sub, h1, h2]; push_cast; ring
+      rw [mul_sub, h1, h2]
+      push_cast
+      ring
     exact Units.dvd_mul_left.mp h3
 
 theorem theta_congruence_padic : ThetaCongPadic := by
   intro l _ u c m hu
   obtain ⟨e, he⟩ := zpow_congruence_general ℤ_[l] (l : ℤ_[l]) c u (-m) hu
   refine ⟨e, ?_⟩
-  have : ((u ^ (-m) : ℤ_[l]ˣ) : ℤ_[l]) = (1 + ((-m : ℤ) : ℤ_[l]) * ((l : ℤ_[l]) * c)) + (l : ℤ_[l]) ^ 2 * e := by
+  have : ((u ^ (-m) : ℤ_[l]ˣ) : ℤ_[l])
+      = (1 + ((-m : ℤ) : ℤ_[l]) * ((l : ℤ_[l]) * c)) + (l : ℤ_[l]) ^ 2 * e := by
     linear_combination he
-  rw [this]; push_cast; ring
+  rw [this]
+  push_cast
+  ring
 
 theorem minor_reduction_holds : MinorRed := by
   intro O k _ _ red lam n t S P f g hl
-  have h1 : ((P.map (PowerSeries.map red)).submatrix f g).det =
-      PowerSeries.map red (P.submatrix f g).det := by
+  have h1
+      : ((P.map (PowerSeries.map red)).submatrix f g).det
+        = PowerSeries.map red (P.submatrix f g).det := by
     rw [RingHom.map_det]; rfl
   refine ⟨h1, fun h => ?_⟩
   rw [h1]
@@ -1402,23 +1495,28 @@ theorem charpoly_diagonal_holds : CharpolyDiag := by
   intro O L _ _ ι n Θ Γ lam r G hι hlam hΓ hG
   have ha : ι lam ≠ 0 := fun h => hlam (hι (by simpa using h))
   have h1 : Γ.map ι = 1 + ι lam • Θ.map ι := by
-    rw [hΓ]; ext i j
+    rw [hΓ]
+    ext i j
     by_cases hij : i = j <;> simp [Matrix.map_apply, hij]
-  have h2 : Matrix.diagonal (fun j => ι (1 + lam * r j)) =
-      1 + ι lam • Matrix.diagonal (fun j => ι (r j)) := by
+  have h2
+      : Matrix.diagonal (fun j => ι (1 + lam * r j))
+        = 1 + ι lam • Matrix.diagonal (fun j => ι (r j)) := by
     ext i j
     by_cases hij : i = j <;> simp [hij]
-  rw [h1, h2, add_mul, mul_add, one_mul, mul_one, add_right_inj, Matrix.smul_mul,
-    Matrix.mul_smul] at hG
-  have h3 : Θ.map ι * (G : Matrix (Fin n) (Fin n) L) =
-      (G : Matrix (Fin n) (Fin n) L) * Matrix.diagonal (fun j => ι (r j)) :=
+  rw [h1, h2, add_mul, mul_add, one_mul, mul_one, add_right_inj, Matrix.smul_mul, Matrix.mul_smul]
+    at hG
+  have h3
+      : Θ.map ι * (G : Matrix (Fin n) (Fin n) L)
+        = (G : Matrix (Fin n) (Fin n) L) * Matrix.diagonal (fun j => ι (r j)) :=
     smul_right_injective _ ha hG
-  have h4 : Θ.map ι = (G : Matrix (Fin n) (Fin n) L) * Matrix.diagonal (fun j => ι (r j)) *
-      ((G⁻¹ : (Matrix (Fin n) (Fin n) L)ˣ) : Matrix (Fin n) (Fin n) L) := by
+  have h4
+      : Θ.map ι
+        = (G : Matrix (Fin n) (Fin n) L) * Matrix.diagonal (fun j => ι (r j))
+          * ((G⁻¹ : (Matrix (Fin n) (Fin n) L)ˣ) : Matrix (Fin n) (Fin n) L) := by
     rw [← h3, mul_assoc, Units.mul_inv, mul_one]
   apply Polynomial.map_injective ι hι
-  rw [← Matrix.charpoly_map, h4, Matrix.coe_units_inv, Matrix.charpoly_units_conj, Matrix.charpoly_diagonal,
-    Polynomial.map_prod]
+  rw [← Matrix.charpoly_map, h4, Matrix.coe_units_inv, Matrix.charpoly_units_conj,
+    Matrix.charpoly_diagonal, Polynomial.map_prod]
   simp
 
 end PartD
@@ -1429,41 +1527,50 @@ section PartE
 
 variable {R : Type} [CommRing R]
 
-theorem det_submatrix_mul_eq_sum {α β γ τ : Type} [Fintype β] [Fintype τ] [DecidableEq τ]
-    (G : Matrix α β R) (P : Matrix β γ R) (f : τ → α) (g : τ → γ) :
-    ((G * P).submatrix f g).det =
-      ∑ r : τ → β, (∏ i, G (f i) (r i)) * (P.submatrix r g).det := by
+theorem det_submatrix_mul_eq_sum
+    {α β γ τ : Type} [Fintype β] [Fintype τ] [DecidableEq τ]
+    (G : Matrix α β R) (P : Matrix β γ R) (f : τ → α) (g : τ → γ)
+    : ((G * P).submatrix f g).det = ∑ r : τ → β, (∏ i, G (f i) (r i)) * (P.submatrix r g).det := by
   classical
   have h : (G * P).submatrix f g = fun i => ∑ k, G (f i) k • (fun j => P k (g j)) := by
     funext i j
     simp [Matrix.mul_apply, Finset.sum_apply]
   rw [h]
-  have h2 := (Matrix.detRowAlternating : (τ → R) [⋀^τ]→ₗ[R] R).toMultilinearMap.map_sum
-    (fun i k => G (f i) k • (fun j => P k (g j)))
+  have h2 :=
+    (Matrix.detRowAlternating : (τ → R) [⋀^τ]→ₗ[R] R).toMultilinearMap.map_sum
+      (fun i k => G (f i) k • (fun j => P k (g j)))
   show (Matrix.detRowAlternating : (τ → R) [⋀^τ]→ₗ[R] R).toMultilinearMap _ = _
   rw [h2]
   refine Finset.sum_congr rfl fun r _ => ?_
   rw [MultilinearMap.map_smul_univ]
   rfl
 
-theorem dvd_det_submatrix_mul_left {α β γ τ : Type} [Fintype β] [Fintype τ] [DecidableEq τ] (x : R)
-    (G : Matrix α β R) (P : Matrix β γ R)
-    (h : ∀ (f : τ → β) (g : τ → γ), x ∣ (P.submatrix f g).det) (f : τ → α) (g : τ → γ) :
-    x ∣ ((G * P).submatrix f g).det := by
+theorem dvd_det_submatrix_mul_left
+    {α β γ τ : Type} [Fintype β] [Fintype τ] [DecidableEq τ]
+    (x : R)
+    (G : Matrix α β R)
+    (P : Matrix β γ R) (h : ∀ (f : τ → β) (g : τ → γ), x ∣ (P.submatrix f g).det)
+    (f : τ → α) (g : τ → γ)
+    : x ∣ ((G * P).submatrix f g).det := by
   rw [det_submatrix_mul_eq_sum]
   exact Finset.dvd_sum fun r _ => dvd_mul_of_dvd_right (h r g) _
 
-theorem dvd_det_submatrix_mul_right {α β γ τ : Type} [Fintype β] [Fintype τ] [DecidableEq τ] (x : R)
-    (P : Matrix α β R) (H : Matrix β γ R)
-    (h : ∀ (f : τ → α) (g : τ → β), x ∣ (P.submatrix f g).det) (f : τ → α) (g : τ → γ) :
-    x ∣ ((P * H).submatrix f g).det := by
-  rw [← Matrix.det_transpose, Matrix.transpose_submatrix, Matrix.transpose_mul, det_submatrix_mul_eq_sum]
+theorem dvd_det_submatrix_mul_right
+    {α β γ τ : Type} [Fintype β] [Fintype τ] [DecidableEq τ]
+    (x : R) (P : Matrix α β R)
+    (H : Matrix β γ R) (h : ∀ (f : τ → α) (g : τ → β), x ∣ (P.submatrix f g).det) (f : τ → α)
+    (g : τ → γ)
+    : x ∣ ((P * H).submatrix f g).det := by
+  rw [← Matrix.det_transpose, Matrix.transpose_submatrix, Matrix.transpose_mul,
+    det_submatrix_mul_eq_sum]
   refine Finset.dvd_sum fun r _ => dvd_mul_of_dvd_right ?_ _
   rw [← Matrix.transpose_submatrix, Matrix.det_transpose]
   exact h f r
 
-theorem dvd_det_submatrix_of_minorsDvd {m p t : ℕ} (x : R) (P : Matrix (Fin m) (Fin p) R) (h : MinorsDvd x t P)
-    (f : Fin t → Fin m) (g : Fin t → Fin p) : x ∣ (P.submatrix f g).det := by
+theorem dvd_det_submatrix_of_minorsDvd
+    {m p t : ℕ} (x : R) (P : Matrix (Fin m) (Fin p) R) (h : MinorsDvd x t P)
+    (f : Fin t → Fin m) (g : Fin t → Fin p)
+    : x ∣ (P.submatrix f g).det := by
   by_cases hf : Function.Injective f
   swap
   · simp only [Function.Injective, not_forall] at hf
@@ -1481,13 +1588,14 @@ theorem dvd_det_submatrix_of_minorsDvd {m p t : ℕ} (x : R) (P : Matrix (Fin m)
   have hg' : StrictMono (g ∘ Tuple.sort g) :=
     (Tuple.monotone_sort g).strictMono_of_injective (hg.comp (Tuple.sort g).injective)
   have h1 := h _ _ hf' hg'
-  have h2 : P.submatrix (f ∘ Tuple.sort f) (g ∘ Tuple.sort g) =
-      ((P.submatrix f g).submatrix (Tuple.sort f) id).submatrix id (Tuple.sort g) := by
+  have h2
+      : P.submatrix (f ∘ Tuple.sort f) (g ∘ Tuple.sort g)
+        = ((P.submatrix f g).submatrix (Tuple.sort f) id).submatrix id (Tuple.sort g) := by
     ext i j; rfl
   rw [h2, Matrix.det_permute', Matrix.det_permute] at h1
-  rcases Int.units_eq_one_or (Equiv.Perm.sign (Tuple.sort f)) with e1 | e1 <;>
-  rcases Int.units_eq_one_or (Equiv.Perm.sign (Tuple.sort g)) with e2 | e2 <;>
-  simpa [e1, e2] using h1
+  rcases Int.units_eq_one_or (Equiv.Perm.sign (Tuple.sort f)) with e1 | e1
+    <;> rcases Int.units_eq_one_or (Equiv.Perm.sign (Tuple.sort g)) with e2 | e2
+    <;> simpa [e1, e2] using h1
 
 end PartE
 
@@ -1497,14 +1605,17 @@ theorem minors_divide_all_holds : MinorsDvdAll := by
 
 theorem minors_dvd_mul_holds : MinorsDvdMul := by
   intro R _ m n p r t x G P H h f g _ _
-  exact dvd_det_submatrix_mul_right x (G * P) H (dvd_det_submatrix_mul_left x G P (dvd_det_submatrix_of_minorsDvd x P h)) f g
+  exact dvd_det_submatrix_mul_right x (G * P) H
+    (dvd_det_submatrix_mul_left x G P (dvd_det_submatrix_of_minorsDvd x P h)) f g
 
 theorem diagonal_minors_holds : DiagMinors := by
   intro R _ n t S x a G H hS
   refine minors_dvd_mul_holds R n n n n t (x ^ S) G _ H ?_
   intro f g hf hg
-  have h1 : (Matrix.diagonal (fun j => x ^ a j)).submatrix f g =
-      Matrix.of fun i j => (x ^ a (f i)) * ((1 : Matrix (Fin n) (Fin n) R).submatrix f g) i j := by
+  have h1
+      : (Matrix.diagonal (fun j => x ^ a j)).submatrix f g
+        = Matrix.of fun i j =>
+          (x ^ a (f i)) * ((1 : Matrix (Fin n) (Fin n) R).submatrix f g) i j := by
     ext i j
     simp [Matrix.diagonal_apply, Matrix.one_apply]
   rw [h1, Matrix.det_mul_column (fun i => x ^ a (f i)), Finset.prod_pow_eq_pow_sum]
@@ -1520,14 +1631,15 @@ section Lin
 
 variable {O : Type} [CommRing O] [IsDomain O] (I : Ideal O) [IsAdicComplete I O] (c : O)
 
-theorem X_sub_C_isDistinguished (hc : c ∈ I) :
-    (Polynomial.X - Polynomial.C c : Polynomial O).IsDistinguishedAt I := by
+theorem X_sub_C_isDistinguished (hc : c ∈ I)
+    : (Polynomial.X - Polynomial.C c : Polynomial O).IsDistinguishedAt I := by
   refine ⟨⟨fun {n} hn => ?_⟩, Polynomial.monic_X_sub_C c⟩
   rw [Polynomial.natDegree_X_sub_C] at hn
   obtain rfl : n = 0 := by omega
   simpa using hc
 
-theorem coe_X_sub_C_polynomial_powerSeries : ((Polynomial.X - Polynomial.C c : Polynomial O) : O⟦X⟧) = X - C c := by
+theorem coe_X_sub_C_polynomial_powerSeries
+    : ((Polynomial.X - Polynomial.C c : Polynomial O) : O⟦X⟧) = X - C c := by
   simp
 
 theorem ideal_ne_top_alt : I ≠ ⊤ := by
@@ -1536,9 +1648,10 @@ theorem ideal_ne_top_alt : I ≠ ⊤ := by
   rw [h, top_le_iff, Ideal.jacobson_eq_top_iff] at this
   exact bot_ne_top this
 
-theorem order_X_sub_C_mod_eq_one (hc : c ∈ I) :
-    ((((Polynomial.X - Polynomial.C c : Polynomial O) : O⟦X⟧).map
-      (Ideal.Quotient.mk I)).order.toNat) = 1 := by
+theorem order_X_sub_C_mod_eq_one (hc : c ∈ I)
+    : ((((Polynomial.X - Polynomial.C c : Polynomial O) : O⟦X⟧).map
+        (Ideal.Quotient.mk I)).order.toNat)
+      = 1 := by
   have : Nontrivial (O ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr (ideal_ne_top_alt I)
   rw [coe_X_sub_C_polynomial_powerSeries, map_sub, PowerSeries.map_X, PowerSeries.map_C,
     Ideal.Quotient.eq_zero_iff_mem.mpr hc, map_zero, sub_zero, order_X]
@@ -1561,17 +1674,25 @@ theorem linear_division_holds : LinDivision := by
     rw [coe_X_sub_C_polynomial_powerSeries, hC, Polynomial.coe_C] at he
     simpa using he
   · intro f₁ f₂ a₁ a₂ h
-    have hdeg : ∀ a : O, (Polynomial.C a : Polynomial O).degree <
-        ((((Polynomial.X - Polynomial.C c : Polynomial O) : O⟦X⟧).map
-          (Ideal.Quotient.mk I)).order.toNat : WithBot ℕ) := fun a => by
+    have hdeg
+        : ∀ a : O,
+          (Polynomial.C a : Polynomial O).degree
+            < ((((Polynomial.X - Polynomial.C c : Polynomial O) : O⟦X⟧).map
+                (Ideal.Quotient.mk I)).order.toNat
+              : WithBot ℕ) := fun a => by
       rw [order_X_sub_C_mod_eq_one I c hc]
       exact lt_of_le_of_lt Polynomial.degree_C_le (by simp)
-    have := H.eq_of_mul_add_eq_mul_add (q := f₁) (q' := f₂) (hdeg a₁) (hdeg a₂)
-      (by rw [coe_X_sub_C_polynomial_powerSeries, Polynomial.coe_C, Polynomial.coe_C]; exact h)
+    have :=
+      H.eq_of_mul_add_eq_mul_add (q := f₁) (q' := f₂) (hdeg a₁) (hdeg a₂)
+        (by rw [coe_X_sub_C_polynomial_powerSeries, Polynomial.coe_C, Polynomial.coe_C]; exact h)
     exact ⟨this.1, Polynomial.C_injective this.2⟩
 
-theorem eq_zero_of_X_sub_C_dvd_C {O : Type} [CommRing O] [IsDomain O] (I : Ideal O) [IsAdicComplete I O] (c : O)
-    (hc : c ∈ I) (b : O) (h : (X - C c : O⟦X⟧) ∣ C b) : b = 0 := by
+theorem eq_zero_of_X_sub_C_dvd_C
+    {O : Type} [CommRing O] [IsDomain O]
+    (I : Ideal O) [IsAdicComplete I O]
+    (c : O) (hc : c ∈ I)
+    (b : O) (h : (X - C c : O⟦X⟧) ∣ C b)
+    : b = 0 := by
   obtain ⟨y, hy⟩ := h
   have := (linear_division_holds O I c hc).2 y 0 0 b (by rw [← hy]; simp)
   exact this.2.symm
@@ -1606,9 +1727,11 @@ theorem roots_product_holds : RootsProduct := by
   induction s using Finset.induction_on with
   | empty => simp
   | insert a s ha ih =>
-    have hs := ih (fun b hb => hI b (Finset.mem_insert_of_mem hb))
-      (hinj.mono (by intro x hx; exact Finset.mem_insert_of_mem hx))
-      (fun b hb => hdvd b (Finset.mem_insert_of_mem hb))
+    have hs :=
+      ih
+        (fun b hb => hI b (Finset.mem_insert_of_mem hb))
+        (hinj.mono (by intro x hx; exact Finset.mem_insert_of_mem hx))
+        (fun b hb => hdvd b (Finset.mem_insert_of_mem hb))
     obtain ⟨m', hm'⟩ := hs
     have hp := linear_prime_holds O I (c a) (hI a (Finset.mem_insert_self a s))
     have hnd : ¬ (X - C (c a) : O⟦X⟧) ∣ (∏ b ∈ s, (X - C (c b))) ^ S := by
@@ -1617,29 +1740,35 @@ theorem roots_product_holds : RootsProduct := by
       obtain ⟨b, hb, hb2⟩ := (Prime.dvd_finsetProd_iff hp _).mp h1
       have h3 : (X - C (c a) : O⟦X⟧) ∣ C (c a - c b) := by
         have : (C (c a - c b) : O⟦X⟧) = (X - C (c b)) - (X - C (c a)) := by rw [map_sub]; ring
-        rw [this]; exact dvd_sub hb2 dvd_rfl
+        rw [this]
+        exact dvd_sub hb2 dvd_rfl
       have h4 := eq_zero_of_X_sub_C_dvd_C I (c a) (hI a (Finset.mem_insert_self a s)) _ h3
-      have h5 : a = b := hinj (Finset.mem_insert_self a s) (Finset.mem_insert_of_mem hb)
-        (sub_eq_zero.mp h4)
+      have h5 : a = b :=
+        hinj (Finset.mem_insert_self a s) (Finset.mem_insert_of_mem hb) (sub_eq_zero.mp h4)
       exact ha (h5 ▸ hb)
     have h6 : (X - C (c a) : O⟦X⟧) ^ S ∣ m' :=
       hp.pow_dvd_of_dvd_mul_left S hnd (hm' ▸ hdvd a (Finset.mem_insert_self a s))
     obtain ⟨m'', hm''⟩ := h6
     refine ⟨m'', ?_⟩
-    rw [Finset.prod_insert ha, hm', hm'', mul_pow]; ring
+    rw [Finset.prod_insert ha, hm', hm'', mul_pow]
+    ring
 
 theorem rootsDescent_of_roots_and_fourth_relation (hr : QRoots) (h4 : R4) : RootsDescent := by
   intro l _ O _ _ _ I _ ζ hl hζ hI S m hdvd
-  have h1 := roots_product_holds O I (Finset.Ioo 0 l) (fun b => ζ ^ b - 1) S (inc l O m)
-    (fun b _ => by
-      obtain ⟨y, hy⟩ := sub_dvd_pow_sub_pow ζ 1 b
-      rw [one_pow] at hy
-      rw [hy]; exact I.mul_mem_right _ hI)
-    (by
-      intro a ha b hb hab
-      simp only [Finset.coe_Ioo, Set.mem_Ioo] at ha hb
-      exact hζ.pow_inj ha.2 hb.2 (by simpa using hab))
-    hdvd
+  have h1 :=
+    roots_product_holds O I (Finset.Ioo 0 l)
+      (fun b => ζ ^ b - 1)
+      S (inc l O m)
+      (fun b _ => by
+        obtain ⟨y, hy⟩ := sub_dvd_pow_sub_pow ζ 1 b
+        rw [one_pow] at hy
+        rw [hy]
+        exact I.mul_mem_right _ hI)
+      (by
+        intro a ha b hb hab
+        simp only [Finset.coe_Ioo, Set.mem_Ioo] at ha hb
+        exact hζ.pow_inj ha.2 hb.2 (by simpa using hab))
+      hdvd
   rw [← hr l O ζ hζ] at h1
   obtain ⟨y, hy⟩ := h1
   exact h4 l O hl S m y hy
@@ -1660,25 +1789,33 @@ theorem height_descent_of_r3_r2 (h3 : UnitFactorQ) (hb : PowerSeriesFreeBasis) :
     have hC : (C (l : O) : O⟦X⟧) = ((l : ℕ) : O⟦X⟧) := by simp
     rw [map_pow, map_sub, hΦX, hC, map_natCast, q0, hC]
   choose G hG using fun a b => (hb l O hl ((g : O⟦X⟧) ^ h * Q a b)).exists
-  have key : ∀ a b, (fun j : Fin (l - 1) => ∑ c, P a c * G c b j) =
-      (fun j : Fin (l - 1) => if j = ⟨0, hl1⟩ then
-        (X - C (l : O)) ^ h * (1 : Matrix (Fin n) (Fin n) O⟦X⟧) a b else 0) := by
+  have key
+      : ∀ a b,
+        (fun j : Fin (l - 1) => ∑ c, P a c * G c b j)
+          = (fun j : Fin (l - 1) =>
+            if j = ⟨0, hl1⟩ then
+              (X - C (l : O)) ^ h * (1 : Matrix (Fin n) (Fin n) O⟦X⟧) a b
+            else
+              0) := by
     intro a b
     apply (hb l O hl (q0 l O ^ h * (1 : Matrix (Fin n) (Fin n) O⟦X⟧) a b)).unique
-    · have e1 : q0 l O ^ h * (1 : Matrix (Fin n) (Fin n) O⟦X⟧) a b =
-          (g : O⟦X⟧) ^ h * (P.map (inc l O) * Q) a b := by
+    · have e1
+          : q0 l O ^ h * (1 : Matrix (Fin n) (Fin n) O⟦X⟧) a b
+            = (g : O⟦X⟧) ^ h * (P.map (inc l O) * Q) a b := by
         rw [hPQ, Matrix.smul_apply, smul_eq_mul, hg, mul_pow]; ring
       rw [e1, Matrix.mul_apply, Finset.mul_sum]
       simp only [Matrix.map_apply]
-      calc ∑ c, (g : O⟦X⟧) ^ h * (inc l O (P a c) * Q c b)
-          = ∑ c, inc l O (P a c) * ∑ j, inc l O (G c b j) * X ^ (j : ℕ) := by
-            refine Finset.sum_congr rfl fun c _ => ?_
-            rw [← hG c b]; ring
+      calc
+        ∑ c, (g : O⟦X⟧) ^ h * (inc l O (P a c) * Q c b)
+            = ∑ c, inc l O (P a c) * ∑ j, inc l O (G c b j) * X ^ (j : ℕ) := by
+          refine Finset.sum_congr rfl fun c _ => ?_
+          rw [← hG c b]
+          ring
         _ = ∑ j, inc l O (∑ c, P a c * G c b j) * X ^ (j : ℕ) := by
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp only [hinc, map_sum, map_mul, Finset.mul_sum, Finset.sum_mul]
-            rw [Finset.sum_comm]
-            exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun c _ => by ring
+          set_option synthInstance.maxHeartbeats 100000 in
+            simp only [hinc, map_sum, map_mul, Finset.mul_sum, Finset.sum_mul]
+          rw [Finset.sum_comm]
+          exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun c _ => by ring
     · rw [Finset.sum_eq_single (⟨0, hl1⟩ : Fin (l - 1))]
       · rw [if_pos rfl, hinc, map_mul, hΦq]
         by_cases hab : a = b
@@ -1700,11 +1837,14 @@ section PartC2
 
 section HW
 
-variable {k : Type} [CommRing k] {𝒰 : Type} [Ring 𝒰] [Algebra k 𝒰] {V : Type} [AddCommGroup V]
-  [Module k V] [Module 𝒰 V] [IsScalarTower k 𝒰 V]
+variable
+  {k : Type} [CommRing k]
+  {𝒰 : Type} [Ring 𝒰] [Algebra k 𝒰]
+  {V : Type} [AddCommGroup V] [Module k V] [Module 𝒰 V] [IsScalarTower k 𝒰 V]
 
-theorem orderedProd_smul_of_scalar_actions (v : V) : ∀ (N : ℕ) (f : Fin N → 𝒰) (c : Fin N → k),
-    (∀ j, f j • v = c j • v) → (List.ofFn f).prod • v = (∏ j, c j) • v := by
+theorem orderedProd_smul_of_scalar_actions (v : V)
+    : ∀ (N : ℕ) (f : Fin N → 𝒰) (c : Fin N → k),
+      (∀ j, f j • v = c j • v) → (List.ofFn f).prod • v = (∏ j, c j) • v := by
   intro N
   induction N with
   | zero =>
@@ -1714,11 +1854,12 @@ theorem orderedProd_smul_of_scalar_actions (v : V) : ∀ (N : ℕ) (f : Fin N �
     intro f c h
     rw [List.ofFn_succ, List.prod_cons, mul_smul,
       ih (fun j => f j.succ) (fun j => c j.succ) (fun j => h j.succ), Fin.prod_univ_succ]
-    rw [← algebraMap_smul 𝒰 (∏ j : Fin N, c j.succ) v, ← mul_smul, ← Algebra.commutes, mul_smul, h 0,
-      algebraMap_smul, smul_smul, mul_comm]
+    rw [← algebraMap_smul 𝒰 (∏ j : Fin N, c j.succ) v, ← mul_smul, ← Algebra.commutes, mul_smul,
+      h 0, algebraMap_smul, smul_smul, mul_comm]
 
-theorem orderedProd_smul_eq_zero (v : V) : ∀ (N : ℕ) (f : Fin N → 𝒰) (c : Fin N → k) (j0 : Fin N),
-    f j0 • v = 0 → (∀ j, j0 < j → f j • v = c j • v) → (List.ofFn f).prod • v = 0 := by
+theorem orderedProd_smul_eq_zero (v : V)
+    : ∀ (N : ℕ) (f : Fin N → 𝒰) (c : Fin N → k) (j0 : Fin N),
+      f j0 • v = 0 → (∀ j, j0 < j → f j • v = c j • v) → (List.ofFn f).prod • v = 0 := by
   intro N
   induction N with
   | zero =>
@@ -1728,16 +1869,22 @@ theorem orderedProd_smul_eq_zero (v : V) : ∀ (N : ℕ) (f : Fin N → 𝒰) (c
     intro f c j0 h0 hlater
     rw [List.ofFn_succ, List.prod_cons, mul_smul]
     rcases Fin.eq_zero_or_eq_succ j0 with rfl | ⟨j', rfl⟩
-    · rw [orderedProd_smul_of_scalar_actions v N (fun j => f j.succ) (fun j => c j.succ)
+    · rw [orderedProd_smul_of_scalar_actions v N
+        (fun j => f j.succ)
+        (fun j => c j.succ)
         (fun j => hlater j.succ (Fin.succ_pos j))]
       rw [← algebraMap_smul 𝒰 _ v, ← mul_smul, ← Algebra.commutes, mul_smul, h0, smul_zero]
-    · rw [ih (fun j => f j.succ) (fun j => c j.succ) j' h0
-        (fun j hj => hlater j.succ (Fin.succ_lt_succ_iff.mpr hj)), smul_zero]
+    · rw [ih
+          (fun j => f j.succ)
+          (fun j => c j.succ)
+          j' h0
+          (fun j hj => hlater j.succ (Fin.succ_lt_succ_iff.mpr hj)),
+        smul_zero]
 
 end HW
 
-theorem exists_largest_moved_point {N : ℕ} (σ : Equiv.Perm (Fin N)) (hσ : σ ≠ 1) :
-    ∃ j0, σ j0 < j0 ∧ ∀ j, j0 < j → σ j = j := by
+theorem exists_largest_moved_point {N : ℕ} (σ : Equiv.Perm (Fin N)) (hσ : σ ≠ 1)
+    : ∃ j0, σ j0 < j0 ∧ ∀ j, j0 < j → σ j = j := by
   classical
   obtain ⟨j1, hj1⟩ : ∃ j, σ j ≠ j := by
     by_contra h
@@ -1762,8 +1909,9 @@ theorem exists_largest_moved_point {N : ℕ} (σ : Equiv.Perm (Fin N)) (hσ : σ
 
 theorem c2_holds_alt : C2 := by
   intro k _ 𝒰 _ _ V _ _ _ _ N E u lam v hup hdiag
-  have hscal : ∀ j : Fin N, capA E (algebraMap k 𝒰 u - ((j : ℕ) : 𝒰)) j j • v =
-      (u + lam j - ((j : ℕ) : k)) • v := by
+  have hscal
+      : ∀ j : Fin N,
+        capA E (algebraMap k 𝒰 u - ((j : ℕ) : 𝒰)) j j • v = (u + lam j - ((j : ℕ) : k)) • v := by
     intro j
     have hc : algebraMap k 𝒰 u - ((j : ℕ) : 𝒰) = algebraMap k 𝒰 (u - ((j : ℕ) : k)) := by
       rw [map_sub, map_natCast]
@@ -1776,7 +1924,8 @@ theorem c2_holds_alt : C2 := by
     exact orderedProd_smul_of_scalar_actions v N _ _ (fun j => by simpa using hscal j)
   · intro σ _ hσ
     obtain ⟨j0, hlt, hfix⟩ := exists_largest_moved_point σ hσ
-    rw [smul_assoc, orderedProd_smul_eq_zero v N _ (fun j => u + lam j - ((j : ℕ) : k)) j0 ?_ ?_, smul_zero]
+    rw [smul_assoc, orderedProd_smul_eq_zero v N _ (fun j => u + lam j - ((j : ℕ) : k)) j0 ?_ ?_,
+      smul_zero]
     · show capA E (algebraMap k 𝒰 u - ((j0 : ℕ) : 𝒰)) (σ j0) j0 • v = 0
       rw [capA, if_neg (ne_of_lt hlt), add_zero]
       exact hup _ _ hlt
@@ -1793,17 +1942,23 @@ end PartC2
 
 theorem r2_basis_holds : PowerSeriesFreeBasis := r2_basis_of_r1 r1_holds general_basis_holds
 
-theorem fixed_relation_holds : RootsOfUnityInvariants := fixed_relation_of_mu_and_inverse mu_facts_hold r1_holds r2_inverse_holds
+theorem fixed_relation_holds : RootsOfUnityInvariants :=
+  fixed_relation_of_mu_and_inverse mu_facts_hold r1_holds r2_inverse_holds
 
-theorem r3_unit_holds : UnitFactorQ := r3_unit_of_laws action_laws_holds mu_facts_hold q_multiplicative_holds
+theorem r3_unit_holds : UnitFactorQ :=
+  r3_unit_of_laws action_laws_holds mu_facts_hold q_multiplicative_holds
 
-theorem r3_divisibility_holds : RootOfUnityRemainder := r3_divisibility_of_unit_roots r3_unit_holds q_roots_holds
+theorem r3_divisibility_holds : RootOfUnityRemainder :=
+  r3_divisibility_of_unit_roots r3_unit_holds q_roots_holds
 
 theorem fourth_relation_holds : R4 := fourth_relation_of_unit_and_basis r3_unit_holds r2_basis_holds
 
-theorem r6_holds : R6 := sixth_relation_of_action_and_mu_laws action_laws_holds mu_facts_hold q_multiplicative_holds r2_inverse_holds fixed_relation_holds fourth_relation_holds
+theorem r6_holds : R6 :=
+  sixth_relation_of_action_and_mu_laws action_laws_holds mu_facts_hold q_multiplicative_holds
+    r2_inverse_holds fixed_relation_holds fourth_relation_holds
 
-theorem roots_descent_holds : RootsDescent := rootsDescent_of_roots_and_fourth_relation q_roots_holds fourth_relation_holds
+theorem roots_descent_holds : RootsDescent :=
+  rootsDescent_of_roots_and_fourth_relation q_roots_holds fourth_relation_holds
 
 theorem height_descent_holds : HeightDescent := height_descent_of_r3_r2 r3_unit_holds r2_basis_holds
 

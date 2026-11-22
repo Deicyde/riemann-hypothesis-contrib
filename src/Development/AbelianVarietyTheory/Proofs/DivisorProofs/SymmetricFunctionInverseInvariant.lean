@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_perm_of_univ_map_eq {ι β : Type} [Fintype ι] (g g' : ι → β)
-    (h : Finset.univ.val.map g = Finset.univ.val.map g') :
-    ∃ π : Equiv.Perm ι, ∀ i, g (π i) = g' i := by
+theorem exists_perm_of_univ_map_eq
+    {ι β : Type} [Fintype ι] (g g' : ι → β) (h : Finset.univ.val.map g = Finset.univ.val.map g')
+    : ∃ π : Equiv.Perm ι, ∀ i, g (π i) = g' i := by
   classical
   have hc : ∀ c, Fintype.card {i // g' i = c} = Fintype.card {i // g i = c} := by
     intro c
@@ -17,11 +17,22 @@ theorem exists_perm_of_univ_map_eq {ι β : Type} [Fintype ι] (g g' : ι → β
     rw [Fintype.card_subtype, Fintype.card_subtype]
     simp only [Finset.card, Finset.filter_val]
     simpa only [eq_comm] using this.symm
-  exact ⟨Equiv.ofFiberEquiv (fun c => Fintype.equivOfCardEq (hc c)),
-    fun i => Equiv.ofFiberEquiv_map _ i⟩
+  exact ⟨
+    Equiv.ofFiberEquiv (fun c => Fintype.equivOfCardEq (hc c)),
+    fun i => Equiv.ofFiberEquiv_map _ i
+  ⟩
 
-theorem eq_of_perm_inv_invariant_of_multiset_eq :
-    ∀ (m : ℕ) (f : (Fin m → ℂ) → ℂ), (∀ α : Fin m → ℂ, (∀ i, α i ≠ 0) → (∀ π : Equiv.Perm (Fin m), f (α ∘ π) = f α) ∧ ∀ i, f (Function.update α i (α i)⁻¹) = f α) → ∀ α α' : Fin m → ℂ, (∀ i, α i ≠ 0) → Finset.univ.val.map α + Finset.univ.val.map (fun i => (α i)⁻¹) = Finset.univ.val.map α' + Finset.univ.val.map (fun i => (α' i)⁻¹) → f α = f α' := by
+theorem eq_of_perm_inv_invariant_of_multiset_eq
+    : ∀ (m : ℕ) (f : (Fin m → ℂ) → ℂ),
+      (∀ α : Fin m → ℂ,
+          (∀ i, α i ≠ 0)
+            → (∀ π : Equiv.Perm (Fin m), f (α ∘ π) = f α)
+              ∧ ∀ i, f (Function.update α i (α i)⁻¹) = f α)
+        → ∀ α α' : Fin m → ℂ,
+          (∀ i, α i ≠ 0)
+            → Finset.univ.val.map α + Finset.univ.val.map (fun i => (α i)⁻¹)
+              = Finset.univ.val.map α' + Finset.univ.val.map (fun i => (α' i)⁻¹)
+            → f α = f α' := by
   classical
   intro m f hf α α' hα h
   have hα' : ∀ i, α' i ≠ 0 := by
@@ -36,11 +47,12 @@ theorem eq_of_perm_inv_invariant_of_multiset_eq :
       exact hα j (inv_eq_zero.1 hj)
   have h2 := congrArg (Multiset.map (fun x : ℂ => x + x⁻¹)) h
   simp only [Multiset.map_add (f := _), Multiset.map_map, Function.comp_def, inv_inv] at h2
-  have e1 : ∀ γ : Fin m → ℂ, (fun i => (γ i)⁻¹ + γ i) = fun i => γ i + (γ i)⁻¹ :=
-    fun γ => funext fun i => add_comm _ _
+  have e1 : ∀ γ : Fin m → ℂ, (fun i => (γ i)⁻¹ + γ i) = fun i => γ i + (γ i)⁻¹ := fun γ =>
+    funext fun i => add_comm _ _
   rw [e1 α, e1 α'] at h2
-  have h3 : Finset.univ.val.map (fun i => α i + (α i)⁻¹)
-      = Finset.univ.val.map (fun i => α' i + (α' i)⁻¹) := by
+  have h3
+      : Finset.univ.val.map (fun i => α i + (α i)⁻¹)
+        = Finset.univ.val.map (fun i => α' i + (α' i)⁻¹) := by
     ext c
     have := congrArg (Multiset.count c) h2
     simp only [Multiset.count_add] at this
@@ -58,8 +70,7 @@ theorem eq_of_perm_inv_invariant_of_multiset_eq :
     · exact Or.inl (sub_eq_zero.1 h6)
     · exact Or.inr (eq_inv_of_mul_eq_one_left (sub_eq_zero.1 h6))
   have hβ : ∀ i, (α ∘ π) i ≠ 0 := fun i => hα _
-  have key : ∀ s : Finset (Fin m),
-      f (fun i => if i ∈ s then α' i else (α ∘ π) i) = f (α ∘ π) := by
+  have key : ∀ s : Finset (Fin m), f (fun i => if i ∈ s then α' i else (α ∘ π) i) = f (α ∘ π) := by
     intro s
     induction s using Finset.induction_on with
     | empty => simp [Function.comp_def]

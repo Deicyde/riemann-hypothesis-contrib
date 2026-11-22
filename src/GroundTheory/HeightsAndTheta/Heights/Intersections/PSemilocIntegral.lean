@@ -13,10 +13,12 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4 IndefiniteRowSideFullHecke.Inter
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+  IndefiniteRowSideFullHecke.Inter
 
-theorem SemilocIntegral.proof (h₁ : ValCentreZ.Statement) (h₂ : CentreOverW.Statement) :
-    SemilocIntegral.Statement := by
+theorem SemilocIntegral.proof (h₁ : ValCentreZ.Statement) (h₂ : CentreOverW.Statement)
+    : SemilocIntegral.Statement := by
   intro K _ ι _ K' _ ι' _ κ v P' n s α W hv hP' hP hs hsP hW
   have := hP'.2.1.1
   letI := (locToSemiloc hv P' W).toAlgebra
@@ -25,13 +27,15 @@ theorem SemilocIntegral.proof (h₁ : ValCentreZ.Statement) (h₂ : CentreOverW.
   refine ⟨fun b => ?_⟩
   refine RingHom.IsIntegralElem.of_map (g := (semiLocRing P' (fibreOver v P' W)).subtype)
     Subtype.val_injective ?_
-  have hmem : (b : FractionRing (MRing ι' ⧸ P')) ∈ ⨅ V : {V : ValuationSubring
-      (FractionRing (MRing ι' ⧸ P')) // Set.range f ⊆ V.toSubring}, V.1.toSubring := by
+  have hmem
+      : (b : FractionRing (MRing ι' ⧸ P'))
+        ∈ ⨅ V : {V : ValuationSubring
+          (FractionRing (MRing ι' ⧸ P')) // Set.range f ⊆ V.toSubring}, V.1.toSubring := by
     rw [Subring.mem_iInf]
     rintro ⟨V, hV⟩
     obtain ⟨y, hy⟩ := h₁ K' ι' P' hP'.2.1 V
-    have hcase := h₂ K ι K' ι' κ v P' n s α W hv hP' hP hs hsP hW V
-      (fun a ha => hV ⟨⟨a, ha⟩, rfl⟩) y hy
+    have hcase :=
+      h₂ K ι K' ι' κ v P' n s α W hv hP' hP hs hsP hW V (fun a ha => hV ⟨⟨a, ha⟩, rfl⟩) y hy
     have hle : semiLocRing P' (fibreOver v P' W) ≤ V.toSubring := by
       rw [semiLocRing, Subring.closure_le]
       rintro _ ⟨u, w, a, hw, hwW, hu, hwa, rfl⟩
@@ -44,9 +48,11 @@ theorem SemilocIntegral.proof (h₁ : ValCentreZ.Statement) (h₂ : CentreOverW.
     exact hle b.2
   rw [iInf_valuationSubring_superset, ← RingHom.coe_range, Subring.closure_eq] at hmem
   obtain ⟨p, hp, hpx⟩ := (hmem : IsIntegral f.range (b : FractionRing (MRing ι' ⧸ P')))
-  obtain ⟨q, hq, -, hqm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic
-    ((Polynomial.mem_lifts p).mpr
-      (Polynomial.map_surjective f.rangeRestrict (fun ⟨_, a, ha⟩ => ⟨a, Subtype.ext ha⟩) p)) hp
+  obtain ⟨q, hq, -, hqm⟩ :=
+    Polynomial.lifts_and_natDegree_eq_and_monic
+      ((Polynomial.mem_lifts p).mpr
+        (Polynomial.map_surjective f.rangeRestrict (fun ⟨_, a, ha⟩ => ⟨a, Subtype.ext ha⟩) p))
+      hp
   refine ⟨q, hqm, ?_⟩
   change Polynomial.eval₂ (f.range.subtype.comp f.rangeRestrict) (b : FractionRing _) q = 0
   rw [← Polynomial.eval₂_map, hq]

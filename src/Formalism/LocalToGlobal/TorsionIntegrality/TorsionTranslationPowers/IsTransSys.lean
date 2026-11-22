@@ -49,24 +49,26 @@ def x2 : W.toAffine.Point → K⟦X⟧
 
 def psi2 (P : W.toAffine.Point) : K := 2 * py W P + W.a₁ * px W P + W.a₃
 
-def kapP (P : W.toAffine.Point) : K :=
-  3 * px W P ^ 2 + 2 * W.a₂ * px W P + W.a₄ - W.a₁ * py W P
+def kapP (P : W.toAffine.Point) : K := 3 * px W P ^ 2 + 2 * W.a₂ * px W P + W.a₄ - W.a₁ * py W P
 
 end Points
 
 section Sys
 
-variable {K : Type} [NormedField K] [DecidableEq K] (W : WeierstrassCurve K)
-  {T : Type} [AddCommGroup T] (π : T →+ W.toAffine.Point)
+variable
+  {K : Type} [NormedField K] [DecidableEq K]
+  (W : WeierstrassCurve K)
+  {T : Type} [AddCommGroup T]
+  (π : T →+ W.toAffine.Point)
 
 def IntPts : Prop := ∀ t, π t ≠ 0 → ‖px W (π t)‖ ≤ 1 ∧ ‖py W (π t)‖ ≤ 1
 
 def IsTransSys (G : T → K⟦X⟧) : Prop :=
-  (∀ t, π t = 0 → ∃ ε : K, ‖ε‖ = 1 ∧ G t = C ε * X) ∧
-  (∀ t, π t ≠ 0 → constantCoeff (G t) ≠ 0) ∧
-  ∀ P Q, π Q ≠ 0 →
-    X ^ 2 * (G (P + Q) * G (P - Q)) =
-      C (constantCoeff (G Q) ^ 2) * (C (px W (π Q)) * X ^ 2 - x2 W (π P)) * G P ^ 2
+  (∀ t, π t = 0 → ∃ ε : K, ‖ε‖ = 1 ∧ G t = C ε * X) ∧ (∀ t, π t ≠ 0 → constantCoeff (G t) ≠ 0)
+    ∧ ∀ P Q,
+      π Q ≠ 0
+        → X ^ 2 * (G (P + Q) * G (P - Q))
+          = C (constantCoeff (G Q) ^ 2) * (C (px W (π Q)) * X ^ 2 - x2 W (π P)) * G P ^ 2
 
 end Sys
 

@@ -5,12 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.T2Spa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
 open scoped TensorProduct NNReal ENNReal
 
 namespace GlobalTheory.GaugeEx
 
-theorem selfDual_comp_selfAdjoint : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V) (χ : V → V → ℂ) (T : V ≃ₜ V) (δ : ℝ≥0), δ ≠ 0 → μ = δ • μ.map T → (∀ x y, χ x (T y) = χ (T x) y) → SelfDual μ χ → SelfDual (NNReal.sqrt δ • μ) (fun x y => χ x (T y)) := by
+theorem selfDual_comp_selfAdjoint
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+        [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+        (μ : Measure V) (χ : V → V → ℂ) (T : V ≃ₜ V) (δ : ℝ≥0),
+      δ ≠ 0 → μ = δ • μ.map T → (∀ x y, χ x (T y) = χ (T x) y) → SelfDual μ χ
+        → SelfDual (NNReal.sqrt δ • μ) (fun x y => χ x (T y)) := by
   intro V _ _ _ _ _ _ _ _ μ χ T δ hδ hμ hχ hsd
   have hH := hsd.1
   have hs0 : NNReal.sqrt δ ≠ 0 := by simpa using hδ
@@ -43,7 +49,9 @@ theorem selfDual_comp_selfAdjoint : ∀ (V : Type) [AddCommGroup V] [Topological
     rfl
   have hss : (s : ℂ) * (s : ℂ) = (δ : ℂ) := by
     have : s * s = δ := NNReal.mul_self_sqrt δ
-    rw [← this]; push_cast; rfl
+    rw [← this]
+    push_cast
+    rfl
   change _ = ∫ y, F y * χ y z ∂μ
   rw [h5, integral_smul_nnreal_measure, NNReal.smul_def, Complex.real_smul, ← hss, mul_assoc]
   congr 1

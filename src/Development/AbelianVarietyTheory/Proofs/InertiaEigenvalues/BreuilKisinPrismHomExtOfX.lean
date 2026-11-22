@@ -7,15 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WittVec
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
 
 namespace GlobalTheory.BSP.BK
 
-theorem hom_ext_of_hf_X : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (C : Obj l ↥(OL K))
-    (g g' : Hom bk.prism C), BK.hf g X = BK.hf g' X → g = g' := by
+theorem hom_ext_of_hf_X
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (C : Obj l ↥(OL K))
+        (g g' : Hom bk.prism C),
+      BK.hf g X = BK.hf g' X → g = g' := by
   intro l _ K bk C g g' hX
 
   have hI : ∀ x : bk.S, BK.hf g x - BK.hf g' x ∈ C.I := by
@@ -28,16 +32,22 @@ theorem hom_ext_of_hf_X : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
   have hH : IsHausdorff (JJ C) C.A := C.complete.toIsHausdorff
 
   have hCC : (BK.hf g).comp (PowerSeries.C (R := Wq l bk.a)) = (BK.hf g').comp PowerSeries.C :=
-    GlobalTheory.T.wittVector_ringHom_eq_of_sub_mem' l (Fq l bk.a) C.A (JJ C) (Ideal.mem_sup_left (Ideal.mem_span_singleton_self _)) hH _ _
+    GlobalTheory.T.wittVector_ringHom_eq_of_sub_mem' l (Fq l bk.a) C.A (JJ C)
+      (Ideal.mem_sup_left (Ideal.mem_span_singleton_self _)) hH _ _
       (fun w => Ideal.mem_sup_right (hI _))
 
   have hP : ∀ p : Polynomial (Wq l bk.a), BK.hf g (p : bk.S) = BK.hf g' (p : bk.S) := by
-    have h := Polynomial.ringHom_ext (f := (BK.hf g).comp (Polynomial.coeToPowerSeries.ringHom))
-      (g := (BK.hf g').comp Polynomial.coeToPowerSeries.ringHom)
-      (fun a => by
-        simp only [RingHom.comp_apply, Polynomial.coeToPowerSeries.ringHom_apply, Polynomial.coe_C]
-        exact RingHom.congr_fun hCC a)
-      (by simp only [RingHom.comp_apply, Polynomial.coeToPowerSeries.ringHom_apply, Polynomial.coe_X]; exact hX)
+    have h :=
+      Polynomial.ringHom_ext (f := (BK.hf g).comp (Polynomial.coeToPowerSeries.ringHom))
+        (g := (BK.hf g').comp Polynomial.coeToPowerSeries.ringHom)
+        (fun a => by
+          simp only [RingHom.comp_apply, Polynomial.coeToPowerSeries.ringHom_apply,
+            Polynomial.coe_C]
+          exact RingHom.congr_fun hCC a)
+        (by
+          simp only [RingHom.comp_apply, Polynomial.coeToPowerSeries.ringHom_apply,
+            Polynomial.coe_X]
+          exact hX)
     intro p
     exact RingHom.congr_fun h p
 
@@ -54,7 +64,8 @@ theorem hom_ext_of_hf_X : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
     refine ⟨(q : bk.S), ?_⟩
     have h := congrArg (fun p : Polynomial (Wq l bk.a) => (p : bk.S)) hq
     rw [Polynomial.coe_sub, Polynomial.coe_pow, Polynomial.coe_X, Polynomial.coe_mul,
-      Polynomial.coe_C, map_natCast] at h
+        Polynomial.coe_C, map_natCast]
+      at h
     show _ = (bk.Ep : bk.S) - _
     linear_combination -h
   obtain ⟨q, hq⟩ := hXe
@@ -63,11 +74,14 @@ theorem hom_ext_of_hf_X : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
     refine Ideal.sub_mem _ (Ideal.mem_sup_right (g.f_I _ (Ideal.mem_span_singleton_self _)))
       (Ideal.mem_sup_left (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)))
 
-  have hsplit : ∀ (N : ℕ) (f : bk.S), ∃ (p : Polynomial (Wq l bk.a)) (h : bk.S), f = (p : bk.S) + X ^ N * h := by
+  have hsplit
+      : ∀ (N : ℕ) (f : bk.S), ∃ (p : Polynomial (Wq l bk.a)) (h : bk.S),
+        f = (p : bk.S) + X ^ N * h := by
     intro N f
-    obtain ⟨h, hh⟩ := (PowerSeries.X_pow_dvd_iff (n := N)
-      (φ := f - ((trunc N f : Polynomial (Wq l bk.a)) : bk.S))).2 (fun m hm => by
-        rw [map_sub, Polynomial.coeff_coe, coeff_trunc, if_pos hm, sub_self])
+    obtain ⟨h, hh⟩ :=
+      (PowerSeries.X_pow_dvd_iff (n := N)
+          (φ := f - ((trunc N f : Polynomial (Wq l bk.a)) : bk.S))).2
+        (fun m hm => by rw [map_sub, Polynomial.coeff_coe, coeff_trunc, if_pos hm, sub_self])
     exact ⟨_, h, by rw [← hh]; ring⟩
   apply Hom.ext'
   refine RingHom.ext fun f => ?_
@@ -75,13 +89,17 @@ theorem hom_ext_of_hf_X : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K
   have key : ∀ n : ℕ, BK.hf g f - BK.hf g' f ∈ JJ C ^ n := by
     intro n
     obtain ⟨p, h, hh⟩ := hsplit (bk.Ep.natDegree * n) f
-    have e : ∀ φ : bk.S →+* C.A, φ f = φ (p : bk.S) + φ X ^ (bk.Ep.natDegree * n) * φ h := fun φ => by
+    have e
+        : ∀ φ : bk.S →+* C.A, φ f = φ (p : bk.S) + φ X ^ (bk.Ep.natDegree * n) * φ h := fun φ => by
       have := congrArg φ hh
       rwa [map_add, map_mul, map_pow] at this
     have hm : BK.hf g X ^ (bk.Ep.natDegree * n) ∈ JJ C ^ n := by
       rw [pow_mul]; exact Ideal.pow_mem_pow hgXe n
-    have e2 : BK.hf g f - BK.hf g' f = BK.hf g X ^ (bk.Ep.natDegree * n) * (BK.hf g h - BK.hf g' h) := by
-      have hXN : BK.hf g' X ^ (bk.Ep.natDegree * n) = BK.hf g X ^ (bk.Ep.natDegree * n) := by rw [hX]
+    have e2
+        : BK.hf g f - BK.hf g' f
+          = BK.hf g X ^ (bk.Ep.natDegree * n) * (BK.hf g h - BK.hf g' h) := by
+      have hXN : BK.hf g' X ^ (bk.Ep.natDegree * n) = BK.hf g X ^ (bk.Ep.natDegree * n) := by
+        rw [hX]
       linear_combination e (BK.hf g) - e (BK.hf g') + hP p - BK.hf g' h * hXN
     rw [e2]
     exact Ideal.mul_mem_right _ _ hm

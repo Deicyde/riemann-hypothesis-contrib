@@ -8,19 +8,26 @@ namespace LateralTheory.E.E4
 
 open Polynomial
 
-theorem finInf_comm {k B L : Type} [Field k] [CommRing B] [Field L] [Algebra k B] [Algebra k L]
-    [Algebra B L] [IsScalarTower k B L] (g : Polynomial k →ₐ[k] B) (p : Polynomial k) :
-    aeval (algebraMap B L (g X)) p = algebraMap B L (g p) := by
-  have h : (aeval (algebraMap B L (g X)) : Polynomial k →ₐ[k] L) =
-      (IsScalarTower.toAlgHom k B L).comp g := by
+theorem finInf_comm
+    {k B L : Type}
+    [Field k] [CommRing B] [Field L] [Algebra k B] [Algebra k L] [Algebra B L] [IsScalarTower k B L]
+    (g : Polynomial k →ₐ[k] B) (p : Polynomial k)
+    : aeval (algebraMap B L (g X)) p = algebraMap B L (g p) := by
+  have h
+      : (aeval (algebraMap B L (g X)) : Polynomial k →ₐ[k] L)
+        = (IsScalarTower.toAlgHom k B L).comp g := by
     apply Polynomial.algHom_ext
     simp
-  rw [h]; rfl
+  rw [h]
+  rfl
 
-theorem finInf_integral {k B L : Type} [Field k] [CommRing B] [Field L] [Algebra k B] [Algebra k L]
-    [Algebra B L] [IsScalarTower k B L] (g : Polynomial k →ₐ[k] B) (hf : g.Finite)
-    (K : IntermediateField k L) (hT : algebraMap B L (g X) ∈ K) (b : B) :
-    IsIntegral K (algebraMap B L b) := by
+theorem finInf_integral
+    {k B L : Type}
+    [Field k] [CommRing B] [Field L] [Algebra k B] [Algebra k L] [Algebra B L] [IsScalarTower k B L]
+    (g : Polynomial k →ₐ[k] B) (hf : g.Finite)
+    (K : IntermediateField k L) (hT : algebraMap B L (g X) ∈ K)
+    (b : B)
+    : IsIntegral K (algebraMap B L b) := by
   have hi : g.toRingHom.IsIntegral := RingHom.IsIntegral.of_finite hf
   obtain ⟨p, hp, hpb⟩ := hi b
   let φ : Polynomial k →ₐ[k] K := aeval (⟨_, hT⟩ : K)

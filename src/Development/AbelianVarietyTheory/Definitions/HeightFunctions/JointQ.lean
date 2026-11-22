@@ -13,7 +13,8 @@ noncomputable section
 
 namespace GlobalTheory.FieldSize
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Mem GlobalTheory.FinalJoin GlobalTheory.FinalJoin2
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Mem
+  GlobalTheory.FinalJoin GlobalTheory.FinalJoin2
 
 structure HostSz {R : Ranks} (H : Formalism.BasicNotions.Host R) (L : ℝ) : Prop where
   rank : 62 ≤ R.r
@@ -29,7 +30,7 @@ def xiOrd {R : Ranks} (H : Formalism.BasicNotions.Host R) (N : ℕ) : ℕ :=
   2 * classNumber H.E * Nat.card (𝓞 H.E ⧸ Ideal.span {(N : 𝓞 H.E)})ˣ
 
 def JointQ (D : D7) : Prop :=
-  FieldOK0 D D.host.pde ∧ FieldOK0 D D.host.pde' ∧ (∃ xi, XiOK D D.host.pde xi) ∧ (∃ xi, XiOK D D.host.pde' xi) ∧
-    ∀ L : ℝ, HostSz D.host L → Sz (FO D) (poR D.R L) (poR D.R L)
+  FieldOK0 D D.host.pde ∧ FieldOK0 D D.host.pde' ∧ (∃ xi, XiOK D D.host.pde xi)
+    ∧ (∃ xi, XiOK D D.host.pde' xi) ∧ ∀ L : ℝ, HostSz D.host L → Sz (FO D) (poR D.R L) (poR D.R L)
 
 end GlobalTheory.FieldSize

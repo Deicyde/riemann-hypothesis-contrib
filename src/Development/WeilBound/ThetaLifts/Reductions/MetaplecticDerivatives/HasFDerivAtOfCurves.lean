@@ -6,28 +6,33 @@ public import Development.WeilBound.ThetaLifts.Reductions.MetaplecticDerivatives
 
 noncomputable section
 
-open MeasureTheory Complex SchwartzMap Matrix GlobalTheory.RealWeil PositivityTheory.ThKF.E Filter Topology PositivityTheory.ThKR.LL
+open MeasureTheory Complex SchwartzMap Matrix GlobalTheory.RealWeil PositivityTheory.ThKF.E Filter
+  Topology PositivityTheory.ThKR.LL
 open scoped Real ContDiff
 
 namespace PositivityTheory.ThKR.Mp.MpG
 
-theorem hasFDerivAt_of_curves {E F : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [ProperSpace E] [NormedAddCommGroup F]
-    [NormedSpace ℝ F] {Φ : E → F} {L : E →L[ℝ] F} {x₀ : E}
-    (h : ∀ (c : ℝ → E) (v : E), c 0 = x₀ → HasDerivAt c v 0 → HasDerivAt (fun t => Φ (c t)) (L v) 0) :
-    HasFDerivAt Φ L x₀ := by
+theorem hasFDerivAt_of_curves
+    {E F : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [ProperSpace E] [NormedAddCommGroup F]
+    [NormedSpace ℝ F]
+    {Φ : E → F} {L : E →L[ℝ] F} {x₀ : E}
+    (h : ∀ (c : ℝ → E) (v : E), c 0 = x₀ → HasDerivAt c v 0 → HasDerivAt (fun t => Φ (c t)) (L v) 0)
+    : HasFDerivAt Φ L x₀ := by
   classical
   rw [hasFDerivAt_iff_isLittleO_nhds_zero, Asymptotics.isLittleO_iff]
   intro ε hε
   by_contra hf
   obtain ⟨y0, hy0, hb0⟩ := exists_seq_forall_of_frequently (not_eventually.1 hf)
   have hne0 : ∀ n, y0 n ≠ 0 := fun n e => hb0 n (by simp [e])
-  obtain ⟨v, -, φ, hφ, hv⟩ := (isCompact_sphere (0 : E) 1).tendsto_subseq (x := fun n => ‖y0 n‖⁻¹ • y0 n)
-    (fun n => by simp [norm_smul, hne0 n])
+  obtain ⟨v, -, φ, hφ, hv⟩ :=
+    (isCompact_sphere (0 : E) 1).tendsto_subseq
+      (x := fun n => ‖y0 n‖⁻¹ • y0 n)
+      (fun n => by simp [norm_smul, hne0 n])
   let y : ℕ → E := fun n => y0 (φ n)
   have hne : ∀ n, ‖y n‖ ≠ 0 := fun n => norm_ne_zero_iff.2 (hne0 _)
   let w : ℝ → E := fun t => if e : ∃ n, ‖y n‖ = t then y e.choose else t • v
   have w0 : w 0 = 0 := by
-    have : ¬∃ n, ‖y n‖ = 0 := fun ⟨n, e⟩ => hne n e
+    have : ¬ ∃ n, ‖y n‖ = 0 := fun ⟨n, e⟩ => hne n e
     simp only [w, dif_neg this, zero_smul]
   have hw : HasDerivAt w v 0 := by
     rw [hasDerivAt_iff_isLittleO, Asymptotics.isLittleO_iff]
@@ -49,7 +54,9 @@ theorem hasFDerivAt_of_curves {E F : Type} [NormedAddCommGroup E] [NormedSpace �
       exact mul_le_mul_of_nonneg_right h1 (norm_nonneg _)
     · simp only [w, dif_neg e, sub_self, norm_zero]
       positivity
-  have h1 := (h (fun t => x₀ + w t) v (by simp [w0]) (hw.const_add x₀)).fun_sub (L.hasFDerivAt.comp_hasDerivAt 0 hw)
+  have h1 :=
+    (h (fun t => x₀ + w t) v (by simp [w0]) (hw.const_add x₀)).fun_sub
+      (L.hasFDerivAt.comp_hasDerivAt 0 hw)
   rw [sub_self, hasDerivAt_iff_isLittleO, Asymptotics.isLittleO_iff] at h1
   have h2 : Tendsto (fun n => ‖y n‖) atTop (𝓝 0) := by simpa using (hy0.comp hφ.tendsto_atTop).norm
   obtain ⟨n, hn⟩ := (h2.eventually (h1 hε)).exists
@@ -62,41 +69,56 @@ theorem hasFDerivAt_of_curves {E F : Type} [NormedAddCommGroup E] [NormedSpace �
 
 variable {l : Type} [Fintype l] [DecidableEq l]
 
-theorem hasDerivAt_det_one {M : ℝ → l → l → ℝ} {X : l → l → ℝ} (h : HasDerivAt M X 0) (h0 : Matrix.of (M 0) = 1) :
-    HasDerivAt (fun t => (Matrix.of (M t)).det) (Matrix.of X).trace 0 := by
+theorem hasDerivAt_det_one
+    {M : ℝ → l → l → ℝ} {X : l → l → ℝ} (h : HasDerivAt M X 0) (h0 : Matrix.of (M 0) = 1)
+    : HasDerivAt (fun t => (Matrix.of (M t)).det) (Matrix.of X).trace 0 := by
   have hd : DifferentiableAt ℝ (fun N : l → l → ℝ => (Matrix.of N).det) (M 0) := by
     simp only [Matrix.det_apply', Matrix.of_apply]
-    exact DifferentiableAt.fun_sum fun σ _ => (((contDiff_prod (n := 1) (f := fun i (N : l → l → ℝ) => N (σ i) i)
-      fun i _ => contDiff_apply_apply (𝕜 := ℝ) (E := ℝ) (σ i) i).differentiable one_ne_zero) _).const_mul _
+    exact DifferentiableAt.fun_sum fun σ _ =>
+      (((contDiff_prod (n := 1)
+          (f := fun i (N : l → l → ℝ) => N (σ i) i)
+          fun i _ => contDiff_apply_apply (𝕜 := ℝ) (E := ℝ) (σ i) i).differentiable one_ne_zero)
+        _).const_mul _
   have h1 := hd.hasFDerivAt.comp_hasDerivAt 0 h
   have h2 : HasDerivAt (fun t : ℝ => M 0 + t • X) X 0 := by
     simpa using ((hasDerivAt_id (0 : ℝ)).smul_const X).const_add (M 0)
   have h3 := hd.hasFDerivAt.comp_hasDerivAt_of_eq 0 h2 (by simp)
-  let p := (Matrix.det (1 + (Polynomial.X : Polynomial ℝ) • (Matrix.of X).map Polynomial.C)).divX.divX
-  have h4 : HasDerivAt (fun t : ℝ => 1 + (Matrix.of X).trace * t + p.eval t * t ^ 2) (Matrix.of X).trace 0 :=
+  let p :=
+    (Matrix.det (1 + (Polynomial.X : Polynomial ℝ) • (Matrix.of X).map Polynomial.C)).divX.divX
+  have h4 : HasDerivAt
+      (fun t : ℝ => 1 + (Matrix.of X).trace * t + p.eval t * t ^ 2)
+      (Matrix.of X).trace 0 :=
     ((((hasDerivAt_id (0 : ℝ)).const_mul _).const_add 1).fun_add
       ((p.hasDerivAt 0).fun_mul (hasDerivAt_pow 2 0))).congr_deriv (by simp)
-  have h5 := h3.unique (h4.congr_of_eventuallyEq (.of_forall fun t => by
-    refine Eq.trans ?_ (Matrix.det_one_add_smul t (Matrix.of X))
-    rw [← h0]
-    rfl))
+  have h5 :=
+    h3.unique (h4.congr_of_eventuallyEq (.of_forall fun t => by
+      refine Eq.trans ?_ (Matrix.det_one_add_smul t (Matrix.of X))
+      rw [← h0]
+      rfl))
   exact h5 ▸ h1
 
-theorem curve {g : ℝ → (l ⊕ l) → (l ⊕ l) → ℝ} {X : (l ⊕ l) → (l ⊕ l) → ℝ} (g0 : Matrix.of (g 0) = 1)
-    (hg : HasDerivAt g X 0) (f : Sch l) :
-    HasDerivAt (fun t => schwartzToL2 l (sec (Matrix.of (g t)) f)) (schwartzToL2 l (Qd (Matrix.of X) f)) 0 := by
-  have hd : ∀ i j : l → l ⊕ l, HasDerivAt (fun t => bl i j (Matrix.of (g t))) (bl i j (Matrix.of X)) 0 := fun i j =>
-    (LinearMap.toContinuousLinearMap
-      ((bl i j).comp (Matrix.ofLinearEquiv ℝ).toLinearMap)).hasFDerivAt.comp_hasDerivAt 0 hg
+theorem curve
+    {g : ℝ → (l ⊕ l) → (l ⊕ l) → ℝ} {X : (l ⊕ l) → (l ⊕ l) → ℝ}
+    (g0 : Matrix.of (g 0) = 1) (hg : HasDerivAt g X 0)
+    (f : Sch l)
+    : HasDerivAt
+      (fun t => schwartzToL2 l (sec (Matrix.of (g t)) f))
+      (schwartzToL2 l (Qd (Matrix.of X) f)) 0 := by
+  have hd
+      : ∀ i j : l → l ⊕ l,
+        HasDerivAt (fun t => bl i j (Matrix.of (g t))) (bl i j (Matrix.of X)) 0 := fun i j =>
+    (LinearMap.toContinuousLinearMap ((bl i j).comp
+      (Matrix.ofLinearEquiv ℝ).toLinearMap)).hasFDerivAt.comp_hasDerivAt 0 hg
   let A : ℝ → Eu l →L[ℝ] Eu l := fun t => bl Sum.inl Sum.inl (Matrix.of (g t))
-  let c : ℝ → ℝ := fun t => (√|(Matrix.of (g t)).toBlocks₁₁.det|)⁻¹
+  let c : ℝ → ℝ := fun t => (√ |(Matrix.of (g t)).toBlocks₁₁.det|)⁻¹
   have eA : ∀ t, (A t).det = (Matrix.of (g t)).toBlocks₁₁.det := fun t => det_bl _ _ _
   have A0 : A 0 = 1 := by simp only [A, g0, block_inl_inl_one]
   letI : HasSummableGeomSeries (Eu l →L[ℝ] Eu l) := by
     set_option synthInstance.maxHeartbeats 200000 in
       exact inferInstance
   have h0 : IsUnit (A 0) := A0 ▸ isUnit_one
-  have hopen : ∀ᶠ u in 𝓝 0, IsUnit (A u) := (hd _ _).continuousAt.eventually (Units.isOpen.mem_nhds h0)
+  have hopen : ∀ᶠ u in 𝓝 0, IsUnit (A u) :=
+    (hd _ _).continuousAt.eventually (Units.isOpen.mem_nhds h0)
   have hdet : ∀ t, IsUnit (A t) → (Ring.inverse (A t)).det * (A t).det = 1 := fun t ht => by
     have := congrArg ContinuousLinearMap.det (Ring.inverse_mul_cancel _ ht)
     simpa [ContinuousLinearMap.det] using this
@@ -106,8 +128,11 @@ theorem curve {g : ℝ → (l ⊕ l) → (l ⊕ l) → ℝ} {X : (l ⊕ l) → (
     rw [← eA, A0]
     simp [ContinuousLinearMap.det]
   have c0 : c 0 = 1 := by simp only [c, d0]; simp
-  have hD : HasDerivAt (fun t => (Matrix.of (g t)).toBlocks₁₁.det) (Matrix.of X).toBlocks₁₁.trace 0 :=
-    hasDerivAt_det_one (M := fun t a b => g t (.inl a) (.inl b)) (X := fun a b => X (.inl a) (.inl b))
+  have hD
+      : HasDerivAt (fun t => (Matrix.of (g t)).toBlocks₁₁.det) (Matrix.of X).toBlocks₁₁.trace 0 :=
+    hasDerivAt_det_one
+      (M := fun t a b => g t (.inl a) (.inl b))
+      (X := fun a b => X (.inl a) (.inl b))
       (hasDerivAt_pi.2 fun a => hasDerivAt_pi.2 fun b => hasDerivAt_pi.1 (hasDerivAt_pi.1 hg _) _)
       (by
         ext a b
@@ -120,15 +145,19 @@ theorem curve {g : ℝ → (l ⊕ l) → (l ⊕ l) → ℝ} {X : (l ⊕ l) → (
     filter_upwards [hD.continuousAt.eventually (lt_mem_nhds hp)] with t ht
     simp only [c, abs_of_pos ht]
     rfl
-  have h1 : HasDerivAt (fun t => Ring.inverse (A t)) (-bl Sum.inl Sum.inl (Matrix.of X)) 0 := by
-    have h2 := (hasFDerivAt_ringInverse (𝕜 := ℝ) (1 : (Eu l →L[ℝ] Eu l)ˣ)).comp_hasDerivAt_of_eq 0
-      (hd Sum.inl Sum.inl) A0.symm
+  have h1 : HasDerivAt (fun t => Ring.inverse (A t)) (- bl Sum.inl Sum.inl (Matrix.of X)) 0 := by
+    have h2 :=
+      (hasFDerivAt_ringInverse (𝕜 := ℝ) (1 : (Eu l →L[ℝ] Eu l)ˣ)).comp_hasDerivAt_of_eq 0
+        (hd Sum.inl Sum.inl) A0.symm
     exact h2.congr_deriv (by
-      simp only [ContinuousLinearMap.neg_apply, ContinuousLinearMap.mulLeftRight_apply, inv_one, Units.val_one,
-        one_mul, mul_one])
-  obtain ⟨Q, hQ, hQ'⟩ := ld_big h1 (hd Sum.inl Sum.inr) (hd Sum.inr Sum.inl) hcd
-    (hopen.mono fun u hu => ⟨hu.ringInverse, hc u hu⟩)
-  have h3 := hQ' (by rw [A0, Ring.inverse_one]) (by rw [g0, block_inl_inr_one]) (by rw [g0, block_inr_inl_one]) c0 f
+      simp only [ContinuousLinearMap.neg_apply, ContinuousLinearMap.mulLeftRight_apply, inv_one,
+        Units.val_one, one_mul, mul_one])
+  obtain ⟨Q, hQ, hQ'⟩ :=
+    ld_big h1 (hd Sum.inl Sum.inr) (hd Sum.inr Sum.inl) hcd
+      (hopen.mono fun u hu => ⟨hu.ringInverse, hc u hu⟩)
+  have h3 :=
+    hQ' (by rw [A0, Ring.inverse_one]) (by rw [g0, block_inl_inr_one])
+      (by rw [g0, block_inr_inl_one]) c0 f
   refine (hQ f).congr_deriv (congrArg _ ?_)
   rw [h3, Qd, ofReal_neg, neg_smul, sub_eq_add_neg]
 
@@ -140,12 +169,18 @@ variable {l : Type} [Fintype l] [DecidableEq l]
 
 theorem secDer : SecDer l := by
   intro E _ _ m m' x₀ h0 hm f
-  let L : ((l ⊕ l) → (l ⊕ l) → ℝ) →L[ℝ] L2 l := LinearMap.toContinuousLinearMap
-    ((((schwartzToL2 l).restrictScalars ℝ).toLinearMap.comp (qdLin f)).comp (Matrix.ofLinearEquiv ℝ).toLinearMap)
+  let L : ((l ⊕ l) → (l ⊕ l) → ℝ) →L[ℝ] L2 l :=
+    LinearMap.toContinuousLinearMap
+      ((((schwartzToL2 l).restrictScalars ℝ).toLinearMap.comp (qdLin f)).comp
+        (Matrix.ofLinearEquiv ℝ).toLinearMap)
   have hL : ∀ X, L X = schwartzToL2 l (Qd (Matrix.of X) f) := fun X => rfl
-  have h1 : HasFDerivAt (fun g : (l ⊕ l) → (l ⊕ l) → ℝ => schwartzToL2 l (sec (Matrix.of g) f)) L (fun a b => m x₀ a b) :=
+  have h1 : HasFDerivAt
+      (fun g : (l ⊕ l) → (l ⊕ l) → ℝ => schwartzToL2 l (sec (Matrix.of g) f))
+      L
+      (fun a b => m x₀ a b) :=
     MpG.hasFDerivAt_of_curves fun c v c0 hc => MpG.curve (by rw [c0, h0]; rfl) hc f
-  have h2 : HasFDerivAt (fun x => fun a b => m x a b)
+  have h2 : HasFDerivAt
+      (fun x => fun a b => m x a b)
       (ContinuousLinearMap.pi fun a => ContinuousLinearMap.pi fun b => m' a b) x₀ :=
     hasFDerivAt_pi.2 fun a => hasFDerivAt_pi.2 fun b => hm a b
   refine (h1.comp x₀ h2).congr_fderiv ?_

@@ -11,15 +11,19 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace CoordRatioDeg
 
-def ratioField {S M : Type*} [Field M] [CharZero M] (R : S → S → Prop) (z : S → M) : IntermediateField ℚ M :=
+def ratioField {S M : Type*} [Field M] [CharZero M] (R : S → S → Prop) (z : S → M)
+    : IntermediateField ℚ M :=
   IntermediateField.adjoin ℚ {t | ∃ p q, R p q ∧ t = z p / z q}
 
-theorem ratioField_map {S M N : Type*} [Field M] [CharZero M] [Field N] [CharZero N] (R : S → S → Prop)
-    (z : S → M) (f : M →ₐ[ℚ] N) : (ratioField R z).map f = ratioField R (f ∘ z) := by
+theorem ratioField_map
+    {S M N : Type*} [Field M] [CharZero M] [Field N] [CharZero N]
+    (R : S → S → Prop) (z : S → M) (f : M →ₐ[ℚ] N)
+    : (ratioField R z).map f = ratioField R (f ∘ z) := by
   rw [ratioField, IntermediateField.adjoin_map, ratioField]
   congr 1
   ext t
@@ -29,8 +33,10 @@ theorem ratioField_map {S M N : Type*} [Field M] [CharZero M] [Field N] [CharZer
   · rintro ⟨p, q, h, rfl⟩
     exact ⟨_, ⟨p, q, h, rfl⟩, by simp⟩
 
-theorem ratioField_congr {S M : Type*} [Field M] [CharZero M] {R : S → S → Prop} {z w : S → M}
-    (h : ∀ p q, R p q → z p / z q = w p / w q) : ratioField R z = ratioField R w := by
+theorem ratioField_congr
+    {S M : Type*} [Field M] [CharZero M]
+    {R : S → S → Prop} {z w : S → M} (h : ∀ p q, R p q → z p / z q = w p / w q)
+    : ratioField R z = ratioField R w := by
   unfold ratioField
   congr 1
   ext t
@@ -44,7 +50,8 @@ theorem proof : CoordRatioDeg.Statement := by
   intro K _ ι _ K' _ ι' _ κ v Ω _ _ y Φ' _ _ x' hv hker
   let I : Ideal (MRing ι') := mCoordIdeal y
   let L := FractionRing (MvPolynomial K' Ω)
-  have : CharZero L := charZero_of_injective_algebraMap (IsFractionRing.injective (MvPolynomial K' Ω) L)
+  have : CharZero L :=
+    charZero_of_injective_algebraMap (IsFractionRing.injective (MvPolynomial K' Ω) L)
   have h₁ : ∀ a ∈ I, (aeval x' : MRing ι' →ₐ[ℤ] Φ').toRingHom a = 0 := fun a ha => by
     rw [show I = _ from hker.symm] at ha
     exact RingHom.mem_ker.mp ha
@@ -61,14 +68,15 @@ theorem proof : CoordRatioDeg.Statement := by
   have : IsDomain (MRing ι' ⧸ I) := hg₁.isDomain g₁
   let F := FractionRing (MRing ι' ⧸ I)
   let f₁ : F →+* Φ' := IsFractionRing.lift hg₁
-  have : CharZero F := ⟨fun m n h => by
-    have h' := congrArg f₁ h
-    rw [map_natCast, map_natCast] at h'
-    exact_mod_cast h'⟩
+  have : CharZero F :=
+    ⟨fun m n h => by
+      have h' := congrArg f₁ h
+      rw [map_natCast, map_natCast] at h'
+      exact_mod_cast h'⟩
   let f₂ : F →+* L := IsFractionRing.lift hg₂
   let xb : (Σ k', ι' k') → F := fun p => algebraMap _ F (Ideal.Quotient.mk I (X p))
-  have e₁ : f₁.toRatAlgHom ∘ xb = x' := funext fun p => by
-    simp [xb, f₁, g₁, IsFractionRing.lift_algebraMap]
+  have e₁ : f₁.toRatAlgHom ∘ xb = x' :=
+    funext fun p => by simp [xb, f₁, g₁, IsFractionRing.lift_algebraMap]
   have e₂ : ∀ p, f₂ (xb p) = algebraMap _ L (C (y p) * X p.1) := fun p => by
     simp [xb, f₂, g₂, IsFractionRing.lift_algebraMap, mConeMap]
   let c : Ω →ₐ[ℚ] L := ((algebraMap (MvPolynomial K' Ω) L).comp C).toRatAlgHom
@@ -79,12 +87,11 @@ theorem proof : CoordRatioDeg.Statement := by
     rw [e₂, e₂, h, map_mul, map_mul, mul_div_mul_right _ _ (hT _)]
     rfl
   change IntermediateField.relfinrank (ratioField (fun p q : Σ k, ι k => p.1 = q.1) (x' ∘ v))
-      (ratioField (fun p q : Σ k', ι' k' => p.1 = q.1) x') =
-    IntermediateField.relfinrank (ratioField (fun p q : Σ k, ι k => p.1 = q.1) (y ∘ v))
+      (ratioField (fun p q : Σ k', ι' k' => p.1 = q.1) x')
+    = IntermediateField.relfinrank (ratioField (fun p q : Σ k, ι k => p.1 = q.1) (y ∘ v))
       (ratioField (fun p q : Σ k', ι' k' => p.1 = q.1) y)
   rw [← IntermediateField.relfinrank_map_map _ _ c, ratioField_map, ratioField_map, ← e₁,
-    Function.comp_assoc, ← ratioField_map, ← ratioField_map,
-    IntermediateField.relfinrank_map_map,
+    Function.comp_assoc, ← ratioField_map, ← ratioField_map, IntermediateField.relfinrank_map_map,
     ← IntermediateField.relfinrank_map_map _ _ f₂.toRatAlgHom, ratioField_map, ratioField_map]
   congr 1
   · refine ratioField_congr fun p q h => ?_

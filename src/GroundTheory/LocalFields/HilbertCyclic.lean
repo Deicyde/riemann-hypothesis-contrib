@@ -15,12 +15,11 @@ section Partial
 
 variable (σ : L ≃ₐ[K] L) (x : Lˣ)
 
-noncomputable def partialNorm (m : ℕ) : Lˣ :=
-  ∏ j ∈ range m, (σ ^ j) • x
+noncomputable def partialNorm (m : ℕ) : Lˣ := ∏ j ∈ range m, (σ ^ j) • x
 
 omit [FiniteDimensional K L] in
-theorem partialNorm_add (a b : ℕ) :
-    partialNorm σ x (a + b) = partialNorm σ x a * (σ ^ a) • partialNorm σ x b := by
+theorem partialNorm_add (a b : ℕ)
+    : partialNorm σ x (a + b) = partialNorm σ x a * (σ ^ a) • partialNorm σ x b := by
   rw [partialNorm, prod_range_add, partialNorm, partialNorm, smul_prod']
   simp_rw [pow_add, mul_smul]
 
@@ -30,11 +29,10 @@ theorem partialNorm_one : partialNorm σ x 1 = x := by
 
 variable {σ}
 
-theorem partialNorm_orderOf (hσ : ∀ g, g ∈ Subgroup.zpowers σ) :
-    partialNorm σ x (orderOf σ) = tateNorm (L ≃ₐ[K] L) Lˣ x := by
+theorem partialNorm_orderOf (hσ : ∀ g, g ∈ Subgroup.zpowers σ)
+    : partialNorm σ x (orderOf σ) = tateNorm (L ≃ₐ[K] L) Lˣ x := by
   rw [partialNorm, ← Fin.prod_univ_eq_prod_range, tateNorm_apply]
-  refine Fintype.prod_bijective (fun j : Fin (orderOf σ) => σ ^ (j : ℕ)) ⟨?_, ?_⟩ _ _
-    (fun _ => rfl)
+  refine Fintype.prod_bijective (fun j : Fin (orderOf σ) => σ ^ (j : ℕ)) ⟨?_, ?_⟩ _ _ (fun _ => rfl)
   · intro i j hij
     exact Fin.ext (pow_injOn_Iio_orderOf i.2 j.2 hij)
   · intro g
@@ -47,9 +45,9 @@ theorem partialNorm_orderOf (hσ : ∀ g, g ∈ Subgroup.zpowers σ) :
 variable (hσ : ∀ g, g ∈ Subgroup.zpowers σ) {x} (hx : tateNorm (L ≃ₐ[K] L) Lˣ x = 1)
 include hσ hx
 
-theorem partialNorm_add_orderOf (m : ℕ) :
-    partialNorm σ x (m + orderOf σ) = partialNorm σ x m := by
-  rw [add_comm, partialNorm_add, partialNorm_orderOf x hσ, hx, pow_orderOf_eq_one, one_smul, one_mul]
+theorem partialNorm_add_orderOf (m : ℕ) : partialNorm σ x (m + orderOf σ) = partialNorm σ x m := by
+  rw [add_comm, partialNorm_add, partialNorm_orderOf x hσ, hx, pow_orderOf_eq_one, one_smul,
+    one_mul]
 
 theorem partialNorm_mod (m : ℕ) : partialNorm σ x (m % orderOf σ) = partialNorm σ x m := by
   conv_rhs => rw [← Nat.mod_add_div m (orderOf σ)]
@@ -57,15 +55,15 @@ theorem partialNorm_mod (m : ℕ) : partialNorm σ x (m % orderOf σ) = partialN
   | zero => simp
   | succ q ih => rw [mul_add, mul_one, ← add_assoc, partialNorm_add_orderOf hσ hx, ih]
 
-theorem partialNorm_eq_of_pow_eq {a b : ℕ} (h : σ ^ a = σ ^ b) :
-    partialNorm σ x a = partialNorm σ x b := by
+theorem partialNorm_eq_of_pow_eq {a b : ℕ} (h : σ ^ a = σ ^ b)
+    : partialNorm σ x a = partialNorm σ x b := by
   rw [← partialNorm_mod hσ hx a, ← partialNorm_mod hσ hx b, (pow_eq_pow_iff_modEq.mp h)]
 
 end Partial
 
-theorem exists_smul_div_eq_of_tateNorm_eq_one {σ : L ≃ₐ[K] L}
-    (hσ : ∀ g, g ∈ Subgroup.zpowers σ) {x : Lˣ} (hx : tateNorm (L ≃ₐ[K] L) Lˣ x = 1) :
-    ∃ y : Lˣ, σ • y / y = x := by
+theorem exists_smul_div_eq_of_tateNorm_eq_one
+    {σ : L ≃ₐ[K] L} (hσ : ∀ g, g ∈ Subgroup.zpowers σ) {x : Lˣ} (hx : tateNorm (L ≃ₐ[K] L) Lˣ x = 1)
+    : ∃ y : Lˣ, σ • y / y = x := by
   have hk : ∀ g : L ≃ₐ[K] L, ∃ k : ℕ, σ ^ k = g := fun g => by
     obtain ⟨k, hk⟩ := (mem_powers_iff_mem_zpowers (x := σ) (y := g)).mpr (hσ g)
     exact ⟨k, hk⟩
@@ -82,8 +80,8 @@ theorem exists_smul_div_eq_of_tateNorm_eq_one {σ : L ≃ₐ[K] L}
   change partialNorm σ x (k σ) = x
   rw [partialNorm_eq_of_pow_eq hσ hx (show σ ^ k σ = σ ^ 1 by rw [hk, pow_one]), partialNorm_one]
 
-theorem subsingleton_tateNegOne_units [IsCyclic (L ≃ₐ[K] L)] :
-    Subsingleton (TateNegOne (L ≃ₐ[K] L) Lˣ) := by
+theorem subsingleton_tateNegOne_units [IsCyclic (L ≃ₐ[K] L)]
+    : Subsingleton (TateNegOne (L ≃ₐ[K] L) Lˣ) := by
   obtain ⟨σ, hσ⟩ := IsCyclic.exists_generator (α := L ≃ₐ[K] L)
   rw [subsingleton_tateNegOne_iff]
   intro x hx

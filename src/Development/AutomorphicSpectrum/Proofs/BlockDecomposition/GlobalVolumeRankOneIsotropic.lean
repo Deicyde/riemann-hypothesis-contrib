@@ -11,7 +11,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RankOneF
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
 
@@ -19,10 +20,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.FreeFact
 
-theorem free_act {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
-    [TopologicalSpace R] (σ : E →ₐ[F] E) {M n : ℕ} (J : Matrix (Fin M) (Fin M) E) (h : HA R σ J)
-    (X : Fin n → Fin M → R ⊗[F] E) (hX : LinearIndependent (R ⊗[F] E) X) :
-    LinearIndependent (R ⊗[F] E) (actW R σ J h X) := by
+theorem free_act
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
+    (σ : E →ₐ[F] E)
+    {M n : ℕ} (J : Matrix (Fin M) (Fin M) E) (h : HA R σ J) (X : Fin n → Fin M → R ⊗[F] E)
+    (hX : LinearIndependent (R ⊗[F] E) X)
+    : LinearIndependent (R ⊗[F] E) (actW R σ J h X) := by
   let g : GL (Fin M) (R ⊗[F] E) := HA.mat R σ J h
   let e : (Fin M → R ⊗[F] E) ≃ₗ[R ⊗[F] E] (Fin M → R ⊗[F] E) :=
     Matrix.toLin'OfInv (M := ((g⁻¹ : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E)))
@@ -33,43 +37,59 @@ theorem free_act {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [Comm
   rw [he]
   exact hX.map' e.toLinearMap (LinearEquiv.ker e)
 
-theorem fib_compact_lt_top {V X Y : Type} [TopologicalSpace V] [LocallyCompactSpace V] [T2Space V]
-    [MeasurableSpace V] [BorelSpace V] [TopologicalSpace X] [MeasurableSpace X] {μ : Measure V}
-    {f : V → Y} {ι : X → Y} {U : Set V} {ν : Measure X} {fib : X → Measure V}
-    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν Set.univ fib) (hU : IsOpen U) (b : X)
-    {K : Set V} (hK : IsCompact K) (hKU : K ⊆ U) : fib b K < ⊤ := by
-  obtain ⟨φ, hc, hcs, hs, h0, -, h1⟩ := GlobalTheory.CompanionTheory.SW.FibreFam.exists_bump hK hU hKU
+theorem fib_compact_lt_top
+    {V X Y : Type} [TopologicalSpace V] [LocallyCompactSpace V] [T2Space V] [MeasurableSpace V]
+    [BorelSpace V] [TopologicalSpace X] [MeasurableSpace X]
+    {μ : Measure V} {f : V → Y} {ι : X → Y} {U : Set V} {ν : Measure X} {fib : X → Measure V}
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν Set.univ
+      fib)
+    (hU : IsOpen U)
+    (b : X)
+    {K : Set V} (hK : IsCompact K) (hKU : K ⊆ U)
+    : fib b K < ⊤ := by
+  obtain ⟨φ, hc, hcs, hs, h0, -, h1⟩ :=
+    GlobalTheory.CompanionTheory.SW.FibreFam.exists_bump hK hU hKU
   have hi := (h.2.2 φ hc hcs hs).1 b (Set.mem_univ b)
   refine lt_of_le_of_lt (GlobalTheory.CompanionTheory.SW.FibreFam.le_lintegral_bump _ hK h0 h1) ?_
   exact hi.lintegral_lt_top
 
-theorem local_pack_free {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
-    (hJ : IsHermND σ J) (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
-    [MeasurableSpace R] [BorelSpace R] (hR : IsLocR R)
-    (h₀ : ∀ a b : Fin 1, σ ((0 : Matrix (Fin 1) (Fin 1) E) b a) = (0 : Matrix (Fin 1) (Fin 1) E) a b)
+theorem local_pack_free
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
+    (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R] [BorelSpace R]
+    (hR : IsLocR R)
+    (h₀
+      : ∀ a b : Fin 1, σ ((0 : Matrix (Fin 1) (Fin 1) E) b a) = (0 : Matrix (Fin 1) (Fin 1) E) a b)
     {d : ℕ} (b : Module.Basis (Fin d) F E)
     (lam : Measure R) (hlam : lam.IsAddHaarMeasure)
     (m : HermR R σ 1 → Measure (Fin 1 → Fin M → R ⊗[F] E))
-    (hm : IsGramFibFree R σ J 1 (coordW R b lam 1 M) (coordHerm R σ b lam 1) m) :
-    (∀ K : Set (Fin 1 → Fin M → R ⊗[F] E), IsCompact K →
-      K ⊆ {Y | LinearIndependent (R ⊗[F] E) Y} → m (hermOf R σ 0 h₀) K < ⊤) ∧
-    (∀ h : HA R σ J, (m (hermOf R σ 0 h₀)).map (actW R σ J h) = m (hermOf R σ 0 h₀)) ∧
-    m (hermOf R σ 0 h₀) ({Y | gramR R σ J Y = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR R)} ∩
-      {Y | LinearIndependent (R ⊗[F] E) Y})ᶜ = 0 ∧
-    (({Y : Fin 1 → Fin M → R ⊗[F] E | gramR R σ J Y = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR R)} ∩
-      {Y | LinearIndependent (R ⊗[F] E) Y}).Nonempty → m (hermOf R σ 0 h₀) ≠ 0) ∧
-    (∀ X ∈ {Y : Fin 1 → Fin M → R ⊗[F] E | gramR R σ J Y = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR R)} ∩
-        {Y | LinearIndependent (R ⊗[F] E) Y},
-      ∀ Y ∈ {Y : Fin 1 → Fin M → R ⊗[F] E | gramR R σ J Y = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR R)} ∩
-        {Y | LinearIndependent (R ⊗[F] E) Y},
-      ∃ h : HA R σ J, actW R σ J h X = Y) := by
+    (hm : IsGramFibFree R σ J 1 (coordW R b lam 1 M) (coordHerm R σ b lam 1) m)
+    : (∀ K : Set (Fin 1 → Fin M → R ⊗[F] E),
+        IsCompact K → K ⊆ {Y | LinearIndependent (R ⊗[F] E) Y} → m (hermOf R σ 0 h₀) K < ⊤)
+      ∧ (∀ h : HA R σ J, (m (hermOf R σ 0 h₀)).map (actW R σ J h) = m (hermOf R σ 0 h₀))
+      ∧ m (hermOf R σ 0 h₀)
+          ({Y | gramR R σ J Y = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR R)}
+            ∩ {Y | LinearIndependent (R ⊗[F] E) Y})ᶜ
+        = 0
+      ∧ (({Y : Fin 1 → Fin M → R ⊗[F] E | gramR R σ J Y = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR R)}
+          ∩ {Y | LinearIndependent (R ⊗[F] E) Y}).Nonempty
+        → m (hermOf R σ 0 h₀) ≠ 0)
+      ∧ (∀ X
+          ∈ {Y : Fin 1 → Fin M → R ⊗[F] E | gramR R σ J Y = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR R)}
+            ∩ {Y | LinearIndependent (R ⊗[F] E) Y},
+        ∀ Y
+            ∈ {Y : Fin 1 → Fin M → R ⊗[F] E | gramR R σ J Y = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR R)}
+              ∩ {Y | LinearIndependent (R ⊗[F] E) Y},
+          ∃ h : HA R σ J,
+            actW R σ J h X = Y) := by
   obtain ⟨tr, lc, sc, t2, art, red, -⟩ := id hR
   haveI := tr
   haveI := lc
   haveI := sc
   haveI := t2
-  obtain ⟨tK1, tK2, tK3, tK4, -, -, -, tK8, -, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ R
+  obtain ⟨tK1, tK2, tK3, tK4, -, -, -, tK8, -, -⟩ :=
+    GlobalTheory.T.tensor_locally_compact_ring F E σ hσ R
   haveI := tK1
   haveI := tK2
   haveI := tK3
@@ -82,13 +102,22 @@ theorem local_pack_free {F E : Type} [Field F] [NumberField F] [Field E] [Number
   have hz : (0 : Matrix (Fin 1) (Fin 1) E).map (inclR (F := F) R) = 0 := by
     ext a c
     simp
-  refine ⟨fun K hK hKU => fib_compact_lt_top hm hU _ hK hKU,
-    fun h => GlobalTheory.T.local_gram_fibration_disintegration F E σ hσ M J hJ R hR 1 _ _ m (hW 1 M) (hH 1) hm h _, ?_, ?_, ?_⟩
+  refine ⟨
+    fun K hK hKU => fib_compact_lt_top hm hU _ hK hKU,
+    fun h =>
+      GlobalTheory.T.local_gram_fibration_disintegration F E σ hσ M J hJ R hR 1 _ _ m (hW 1 M)
+        (hH 1) hm h _,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact hm.1 (hermOf R σ 0 h₀)
   · rintro ⟨X, hX, hXf⟩
-    exact GlobalTheory.T.rank_one_fibre_measure_local F E σ hσ M J hJ R hR _ _ m (hW 1 M) (hH 1) hm X hXf (hX.trans hz) _
+    exact GlobalTheory.T.rank_one_fibre_measure_local F E σ hσ M J hJ R hR _ _ m (hW 1 M) (hH 1) hm
+      X hXf (hX.trans hz) _
   · rintro X ⟨hX, hXf⟩ Y ⟨hY, hYf⟩
-    exact GlobalTheory.T.isotropic_free_vectors_same_gram F E σ hσ M J hJ R hR X Y hXf hYf (hX.trans hz) (hY.trans hz)
+    exact GlobalTheory.T.isotropic_free_vectors_same_gram F E σ hσ M J hJ R hR X Y hXf hYf
+      (hX.trans hz) (hY.trans hz)
 
 theorem fact_free : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → 3 ≤ M → ∀ (h₀ : ∀ a b : Fin 1, σ ((0 : Matrix (Fin 1) (Fin 1) E) b a) = (0 : Matrix (Fin 1) (Fin 1) E) a b), ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (laminf : Measure (Ainf F)) (lam : ∀ v : HeightOneSpectrum (𝓞 F), Measure (Fv F v)), IsStdInf laminf → (∀ v, IsStdV v (lam v)) → ∀ (minf : HermR (Ainf F) σ 1 → Measure (Fin 1 → Fin M → Ainf F ⊗[F] E)), IsGramFibFree (Ainf F) σ J 1 (coordW (Ainf F) b laminf 1 M) (coordHerm (Ainf F) σ b laminf 1) minf → ∀ (m : ∀ v : HeightOneSpectrum (𝓞 F), HermR (Fv F v) σ 1 → Measure (Fin 1 → Fin M → Fv F v ⊗[F] E)), (∀ v, IsGramFibFree (Fv F v) σ J 1 (coordW (Fv F v) b (lam v) 1 M) (coordHerm (Fv F v) σ b (lam v) 1) (m v)) → ∀ I : Measure (Fin 1 → Fin M → AF F ⊗[F] E), IsLocallyFiniteMeasure I → (∀ h : HA (AF F) σ J, I.map (actW (AF F) σ J h) = I) → I {X : Fin 1 → Fin M → AF F ⊗[F] E | gramR (AF F) σ J X = (0 : Matrix (Fin 1) (Fin 1) E).map (inclR (AF F)) ∧ LinearIndependent (Ainf F ⊗[F] E) (projInf X) ∧ ∀ v, LinearIndependent (Fv F v ⊗[F] E) (projV v (projFin X))}ᶜ = 0 → ∀ S : Finset (HeightOneSpectrum (𝓞 F)), ∃ c : ℝ≥0, ∀ (φinf : (Fin 1 → Fin M → Ainf F ⊗[F] E) → ℝ≥0∞) (φ : ∀ v : HeightOneSpectrum (𝓞 F), (Fin 1 → Fin M → Fv F v ⊗[F] E) → ℝ≥0∞), Measurable φinf → (∀ v, Measurable (φ v)) → ∫⁻ X, pureL b S φinf φ X ∂I = (c : ℝ≥0∞) * ((∫⁻ X, φinf X ∂(minf (hermOf (Ainf F) σ (0 : Matrix (Fin 1) (Fin 1) E) h₀))) * ∏ v ∈ S, ∫⁻ X, φ v X ∂(m v (hermOf (Fv F v) σ (0 : Matrix (Fin 1) (Fin 1) E) h₀))) := by
   intro F E _ _ _ _ _ σ hσ M J hJ hM h₀ d b laminf lam hinf hlam minf hminf m hm I hIl hIinv hIT S

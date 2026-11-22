@@ -38,7 +38,9 @@ set_option maxHeartbeats 4000000
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.HeightDefinite
 
@@ -46,23 +48,27 @@ section Weights
 
 variable {D : D7} {j : ℕ}
 
-theorem wtZ_wsmul (k : ℕ) (w : WeightFamilies.Wt D j) : wtZ (wtA (wsmul k w)) (wsmul k w).n = k • wtZ (wtA w) w.n := by
+theorem wtZ_wsmul (k : ℕ) (w : WeightFamilies.Wt D j)
+    : wtZ (wtA (wsmul k w)) (wsmul k w).n = k • wtZ (wtA w) w.n := by
   rw [GlobalTheory.Reg.wtA_wsmul_eq]
   ext <;> simp [wtZ, wsmul]
 
-theorem weightSumVector_secondGeneratorWeight_definite {wL wF w2 : WeightFamilies.Wt D j} (hG : IsG2 wL wF w2) :
-    wtZ (wtA w2) w2.n = (WeightFamilies.dimY D j + 4 : ℕ) • wtZ (wtA wL) wL.n - wtZ (wtA wF) wF.n := by
+theorem weightSumVector_secondGeneratorWeight_definite
+    {wL wF w2 : WeightFamilies.Wt D j} (hG : IsG2 wL wF w2)
+    : wtZ (wtA w2) w2.n
+      = (WeightFamilies.dimY D j + 4 : ℕ) • wtZ (wtA wL) wL.n - wtZ (wtA wF) wF.n := by
   have e : wadd w2 wF = wsmul (WeightFamilies.dimY D j + 4) wL := by
     apply deg_inj
     simp only [deg, wadd, wsmul, Prod.mk.injEq]
-    exact ⟨funext fun τ => funext fun i => hG.2.1 τ i, funext fun τ => funext fun i => hG.2.2 τ i, hG.1⟩
+    exact
+      ⟨funext fun τ => funext fun i => hG.2.1 τ i, funext fun τ => funext fun i => hG.2.2 τ i, hG.1⟩
   rw [eq_sub_iff_add_eq, ← wtZ_add, ← wtA_wadd, ← n_wadd, e, wtZ_wsmul]
 
 theorem tauEmb_inj {t t' : D.what₂.Tau} (h : DV.tauEmb D t = DV.tauEmb D t') : t = t' :=
   D.eTau.injective (Subtype.ext ((factEmb D.R D.host).1.1 h))
 
-theorem tauEmb_ne_conj {Q : Par D} (hp : Q.PinHost) (t t' : D.what₂.Tau) :
-    DV.tauEmb D t ≠ conjEmb (DV.tauEmb D t') := by
+theorem tauEmb_ne_conj {Q : Par D} (hp : Q.PinHost) (t t' : D.what₂.Tau)
+    : DV.tauEmb D t ≠ conjEmb (DV.tauEmb D t') := by
   intro h
   have h1 := hp.2.2.2 t
   rw [h] at h1
@@ -75,8 +81,8 @@ theorem tauEmb_ne_conj {Q : Par D} (hp : Q.PinHost) (t t' : D.what₂.Tau) :
   have h8 : (0 : ℝ) < Q.H.d := by exact_mod_cast Q.H.d_prime.pos
   nlinarith [sq_nonneg x]
 
-theorem wtA_tau {Q : Par D} (hp : Q.PinHost) (w : WeightFamilies.Wt D j) (t : D.what₂.Tau) (i : ℕ) :
-    wtA w (DV.tauEmb D t, i) = ext0 (w.aP t) i := by
+theorem wtA_tau {Q : Par D} (hp : Q.PinHost) (w : WeightFamilies.Wt D j) (t : D.what₂.Tau) (i : ℕ)
+    : wtA w (DV.tauEmb D t, i) = ext0 (w.aP t) i := by
   classical
   unfold wtA
   rw [Finset.sum_eq_single t]
@@ -86,13 +92,15 @@ theorem wtA_tau {Q : Par D} (hp : Q.PinHost) (w : WeightFamilies.Wt D j) (t : D.
     simp [tauEmb_ne_conj hp, this]
   · simp
 
-theorem wtA_conj_tau {Q : Par D} (hp : Q.PinHost) (w : WeightFamilies.Wt D j) (t : D.what₂.Tau) (i : ℕ) :
-    wtA w (conjEmb (DV.tauEmb D t), i) = ext0 (w.aM t) i := by
+theorem wtA_conj_tau
+    {Q : Par D} (hp : Q.PinHost) (w : WeightFamilies.Wt D j) (t : D.what₂.Tau) (i : ℕ)
+    : wtA w (conjEmb (DV.tauEmb D t), i) = ext0 (w.aM t) i := by
   classical
   have h0 : ∀ τ : D.host.E →+* ℂ, conjEmb (conjEmb τ) = τ := fun τ => by
     ext x
     simp [conjEmb]
-  have h1 : ∀ t', conjEmb (DV.tauEmb D t) ≠ DV.tauEmb D t' := fun t' h => tauEmb_ne_conj hp t' t h.symm
+  have h1 : ∀ t', conjEmb (DV.tauEmb D t) ≠ DV.tauEmb D t' := fun t' h =>
+    tauEmb_ne_conj hp t' t h.symm
   unfold wtA
   rw [Finset.sum_eq_single t]
   · simp [h1]
@@ -102,8 +110,10 @@ theorem wtA_conj_tau {Q : Par D} (hp : Q.PinHost) (w : WeightFamilies.Wt D j) (t
     simp [h1, this]
   · simp
 
-theorem eq_of_wtZ_eq {Q : Par D} (hp : Q.PinHost) {w w' : WeightFamilies.Wt D j}
-    (e : wtZ (wtA w) w.n = wtZ (wtA w') w'.n) : w = w' := by
+theorem eq_of_wtZ_eq
+    {Q : Par D} (hp : Q.PinHost)
+    {w w' : WeightFamilies.Wt D j} (e : wtZ (wtA w) w.n = wtZ (wtA w') w'.n)
+    : w = w' := by
   have e1 : ∀ x, wtA w x = wtA w' x := fun x => by
     have := congrFun (congrArg Prod.fst e) x
     simpa [wtZ] using this
@@ -120,8 +130,8 @@ theorem eq_of_wtZ_eq {Q : Par D} (hp : Q.PinHost) {w w' : WeightFamilies.Wt D j}
     rw [wtA_conj_tau hp, wtA_conj_tau hp] at this
     simpa [ext0, i.isLt] using this
 
-theorem exists_wsize {Q : Par D} (hp : Q.PinHost) (w w' : WeightFamilies.Wt D j) :
-    ∃ s : WTZ D.host.E → ℝ, s (wtZ (wtA w) w.n) = w.size ∧ s (wtZ (wtA w') w'.n) = w'.size := by
+theorem exists_wsize {Q : Par D} (hp : Q.PinHost) (w w' : WeightFamilies.Wt D j)
+    : ∃ s : WTZ D.host.E → ℝ, s (wtZ (wtA w) w.n) = w.size ∧ s (wtZ (wtA w') w'.n) = w'.size := by
   classical
   refine ⟨fun u => if u = wtZ (wtA w) w.n then w.size else w'.size, if_pos rfl, ?_⟩
   by_cases e : wtZ (wtA w') w'.n = wtZ (wtA w) w.n
@@ -130,11 +140,16 @@ theorem exists_wsize {Q : Par D} (hp : Q.PinHost) (w w' : WeightFamilies.Wt D j)
 
 end Weights
 
-theorem ev_ne_zero_of_nonZeroComp {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : PJ D B P j) {ι : Type}
-    (Ω : ι → Type) [∀ Z, Field (Ω Z)] [∀ Z, Algebra B.KO (Ω Z)] (gF : ∀ Z, X.Forms →ₐ[B.KO] Ω Z)
+theorem ev_ne_zero_of_nonZeroComp
+    {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : PJ D B P j)
+    {ι : Type} (Ω : ι → Type) [∀ Z, Field (Ω Z)] [∀ Z, Algebra B.KO (Ω Z)]
+    (gF : ∀ Z, X.Forms →ₐ[B.KO] Ω Z)
     (hinj : ∀ (w : WeightFamilies.Wt D j) (g : B.Cusp j w), (∀ Z, gF Z (X.inc w g) = 0) → g = 0)
-    {u : WeightFamilies.Wt D j} {F : B.Cusp j u} (hF : X.NonZeroComp u F) (Z : ι) {w : WeightFamilies.Wt D j} (g : B.Cusp j w)
-    (hg : gF Z (X.inc w g) ≠ 0) (hg' : ∀ Z', Z' ≠ Z → gF Z' (X.inc w g) = 0) : gF Z (X.inc u F) ≠ 0 := by
+    {u : WeightFamilies.Wt D j} {F : B.Cusp j u} (hF : X.NonZeroComp u F)
+    (Z : ι)
+    {w : WeightFamilies.Wt D j}
+    (g : B.Cusp j w) (hg : gF Z (X.inc w g) ≠ 0) (hg' : ∀ Z', Z' ≠ Z → gF Z' (X.inc w g) = 0)
+    : gF Z (X.inc u F) ≠ 0 := by
   intro h0
   obtain ⟨H, hH⟩ := X.inc_mul u w F g
   have hH0 : H = 0 := by
@@ -153,31 +168,41 @@ section Forms
 
 variable {D : D7} {T : Top D} (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
 
-theorem nzAt_of_nonZeroComp (hT : GenFromTest (T.Q.Xo j) T.Q.c hG) (hV : GenValInjSt h j hG)
-    (hC : CompSplitSt h j hG) {ka wL wF : WeightFamilies.Wt D j}
-    (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (hB : BigAt h j hj hG G) {u : WeightFamilies.Wt D j}
-    (F : (recB h.toLawsCore).Cusp j u) (hF : (recPlus h j hj).NonZeroComp u F) : NZAt hG (F : T.R j) := by
+theorem nzAt_of_nonZeroComp
+    (hT : GenFromTest (T.Q.Xo j) T.Q.c hG) (hV : GenValInjSt h j hG) (hC : CompSplitSt h j hG)
+    {ka wL wF : WeightFamilies.Wt D j}
+    (G : GlobalFamilyData (recPlus h j hj) ka wL wF) (hB : BigAt h j hj hG G)
+    {u : WeightFamilies.Wt D j}
+    (F : (recB h.toLawsCore).Cusp j u) (hF : (recPlus h j hj).NonZeroComp u F)
+    : NZAt hG (F : T.R j) := by
   intro Z
   obtain ⟨k, hk, -⟩ := hB.2 Z
   obtain ⟨g, e1, e2⟩ := hC Z wL (G.w k)
-  have := ev_ne_zero_of_nonZeroComp (recPlus h j hj) (fun Z => Om Z) (fun Z => formsEvR j hG hT Z)
-    (fun w g hg => hV w g fun Z => (formsEvR_inc h j hj hG hT Z w g).symm.trans (hg Z)) hF Z g
-    (fun h0 => hk (e1.symm.trans ((formsEvR_inc h j hj hG hT Z wL g).symm.trans h0)))
-    (fun Z' hZ' => (formsEvR_inc h j hj hG hT Z' wL g).trans (e2 Z' hZ'))
+  have :=
+    ev_ne_zero_of_nonZeroComp (recPlus h j hj)
+      (fun Z => Om Z)
+      (fun Z => formsEvR j hG hT Z)
+      (fun w g hg => hV w g fun Z => (formsEvR_inc h j hj hG hT Z w g).symm.trans (hg Z))
+      hF Z g
+      (fun h0 => hk (e1.symm.trans ((formsEvR_inc h j hj hG hT Z wL g).symm.trans h0)))
+      (fun Z' hZ' => (formsEvR_inc h j hj hG hT Z' wL g).trans (e2 Z' hZ'))
   exact fun h0 => this ((formsEvR_inc h j hj hG hT Z u F).trans h0)
 
-theorem exists_comb [Fintype (Comp (T.Q.Xo j) T.Q.c)] {w : WeightFamilies.Wt D j} {n : ℕ}
-    (f : Fin n → (recB h.toLawsCore).Cusp j w) (hf : ∀ k, f k ∈ (recB h.toLawsCore).Mlat j w)
-    (hne : ∀ Z, ∃ k, evC hG Z (f k).1 ≠ 0) :
-    ∃ F : (recB h.toLawsCore).Cusp j w, F ∈ (recB h.toLawsCore).Mlat j w ∧ NZAt hG F.1 := by
+theorem exists_comb
+    [Fintype (Comp (T.Q.Xo j) T.Q.c)]
+    {w : WeightFamilies.Wt D j} {n : ℕ} (f : Fin n → (recB h.toLawsCore).Cusp j w)
+    (hf : ∀ k, f k ∈ (recB h.toLawsCore).Mlat j w) (hne : ∀ Z, ∃ k, evC hG Z (f k).1 ≠ 0)
+    : ∃ F : (recB h.toLawsCore).Cusp j w, F ∈ (recB h.toLawsCore).Mlat j w ∧ NZAt hG F.1 := by
   have : ∀ Z : Comp (T.Q.Xo j) T.Q.c, CharZero (Om Z) := fun Z =>
     charZero_of_injective_algebraMap (algebraMap T.Q.c.F (Om Z)).injective
-  obtain ⟨m, hm⟩ := exists_nat_comb (Ω := fun Z : Comp (T.Q.Xo j) T.Q.c => Om Z) (fun Z k => evC hG Z (f k).1) hne
+  obtain ⟨m, hm⟩ :=
+    exists_nat_comb (Ω := fun Z : Comp (T.Q.Xo j) T.Q.c => Om Z) (fun Z k => evC hG Z (f k).1) hne
   refine ⟨∑ k, m k • f k, Submodule.sum_mem _ fun k _ => nsmul_mem (hf k) _, fun Z h0 => hm Z ?_⟩
-  let φ : (recB h.toLawsCore).Cusp j w →+ Om Z :=
-    { toFun := fun F => evC hG Z F.1
-      map_zero' := evC_zero hG Z
-      map_add' := fun F F' => evC_add hG Z F.1 F'.1 }
+  let φ : (recB h.toLawsCore).Cusp j w →+ Om Z := {
+    toFun := fun F => evC hG Z F.1
+    map_zero' := evC_zero hG Z
+    map_add' := fun F F' => evC_add hG Z F.1 F'.1
+  }
   have h1 : φ (∑ k, m k • f k) = 0 := h0
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum] at h1
@@ -186,10 +211,17 @@ theorem exists_comb [Fintype (Comp (T.Q.Xo j) T.Q.c)] {w : WeightFamilies.Wt D j
 
 end Forms
 
-theorem one_le_del {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
-    {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} [Fintype (Comp Xo c)] (hne : CompNe Xo c)
-    (d : ReciprocityTheory.ChartRestriction.G.T0.Data c.F (Comp Xo c) (fun Z => Om Z) (WTZ E) (fun Z => AC Z))
-    (sel : Fin d.del → Fin d.np) (ha : A4Selection d sel) : 1 ≤ d.del := by
+theorem one_le_del
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+    {Xo : Moduli Dw l} {c : Coeff l} [Fintype (Comp Xo c)]
+    (hne : CompNe Xo c)
+    (d : ReciprocityTheory.ChartRestriction.G.T0.Data c.F (Comp Xo c)
+      (fun Z => Om Z)
+      (WTZ E)
+      (fun Z => AC Z))
+    (sel : Fin d.del → Fin d.np) (ha : A4Selection d sel)
+    : 1 ≤ d.del := by
   obtain ⟨e, -, -, h3⟩ := ha
   obtain ⟨q, hq, p, hp⟩ := h3 fun _ => 1
   obtain ⟨Z⟩ := hne
@@ -203,16 +235,21 @@ section Orders
 
 open ReciprocityTheory.ChartRestriction.G.T0
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} [Fintype (Comp Xo c)]
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} [Fintype (Comp Xo c)]
   (h : GenFrEx Xo c) (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ)
 
-theorem ord_nonneg_of_regP {rU : ℕ} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ rU} (hreg : regular₂ Xo c U)
-    (hT : OrdTie h δ (trivialClassCondition Xo c) (fun _ => Unit) (fun _ _ _ _ _ => True)) (hTQ : OrdTieQ h δ)
-    {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} (hdom : Dom a n) {F : Rul Xo c} (hFC : F ∈ cusp Xo c U a n) (hF : IntAlg F)
+theorem ord_nonneg_of_regP
+    {rU : ℕ} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ rU} (hreg : regular₂ Xo c U)
+    (hT : OrdTie h δ (trivialClassCondition Xo c) (fun _ => Unit) (fun _ _ _ _ _ => True))
+    (hTQ : OrdTieQ h δ)
+    {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} (hdom : Dom a n)
+    {F : Rul Xo c} (hFC : F ∈ cusp Xo c U a n) (hF : IntAlg F)
     {Z : Comp Xo c} {v : AddValuation (Om Z) (WithTop ℤ)} (hd : IsNormDiscrete v)
-    (hv : (∃ la, IsOver (K := c.F) v la) ∨ IsTrivOn c.F v) (hne : evC h Z F ≠ 0) :
-    0 ≤ ordC (δ Z v) v (wtZ a n) (valC h a n F Z) := by
+    (hv : (∃ la, IsOver (K := c.F) v la) ∨ IsTrivOn c.F v) (hne : evC h Z F ≠ 0)
+    : 0 ≤ ordC (δ Z v) v (wtZ a n) (valC h a n F Z) := by
   have hFs := cusp_le_sec Xo c U a n hFC
   have hR := hreg.1.1 ⟨(a, n), hdom⟩ ⟨F, hFC⟩ fun la y => hF la y.1 y.2
   have key : (0 : EReal) ≤ (((ordC (δ Z v) v (wtZ a n) (valC h a n F Z) : ℤ) : ℝ) : EReal) := by
@@ -230,39 +267,51 @@ theorem ord_nonneg_of_regP {rU : ℕ} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r
       exact hR.2 ⟨_, hqT⟩
   exact_mod_cast key
 
-variable (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ)
-    (yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P)))
-    (Dd N : ℕ) (uL uF uta2 : WtR E)
-    (wR : Fin (N + 1) → Rul Xo c) (jc : Comp Xo c → Fin (N + 1))
-    (np : ℕ) (thpR : Fin np → Rul Xo c) (etR ta2R : Rul Xo c)
-    (nu : HeightOneSpectrum (𝓞 c.F) → ℝ)
-    (wsize : WTZ E → ℝ) (DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO : ℝ)
+variable
+  (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ)
+  (yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P)))
+  (Dd N : ℕ)
+  (uL uF uta2 : WtR E) (wR : Fin (N + 1) → Rul Xo c) (jc : Comp Xo c → Fin (N + 1))
+  (np : ℕ) (thpR : Fin np → Rul Xo c)
+  (etR ta2R : Rul Xo c) (nu : HeightOneSpectrum (𝓞 c.F) → ℝ) (wsize : WTZ E → ℝ)
+  (DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO : ℝ)
 
-theorem secondHeightLaw_of_regularUniformisation {rU : ℕ} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ rU} (hreg : regular₂ Xo c U)
+theorem secondHeightLaw_of_regularUniformisation
+    {rU : ℕ} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ rU} (hreg : regular₂ Xo c U)
     (hgt : GenFromTest Xo c h)
-    (hT : OrdTie h δ (trivialClassCondition Xo c) (fun _ => Unit) (fun _ _ _ _ _ => True)) (hTQ : OrdTieQ h δ)
-    (hdL : Dom uL.1 uL.2) (hdF : Dom uF.1 uF.2) (hd2 : Dom uta2.1 uta2.2)
+    (hT : OrdTie h δ (trivialClassCondition Xo c) (fun _ => Unit) (fun _ _ _ _ _ => True))
+    (hTQ : OrdTieQ h δ) (hdL : Dom uL.1 uL.2) (hdF : Dom uF.1 uF.2) (hd2 : Dom uta2.1 uta2.2)
     (hwC : ∀ k, wR k ∈ cusp Xo c U uL.1 uL.2) (hwI : ∀ k, IntAlg (wR k))
     (hpC : ∀ k, thpR k ∈ cusp Xo c U uF.1 uF.2) (hpI : ∀ k, IntAlg (thpR k))
     (heC : etR ∈ cusp Xo c U uL.1 uL.2) (heI : IntAlg etR) (heN : NZAt h etR)
     (h2C : ta2R ∈ cusp Xo c U uta2.1 uta2.2) (h2I : IntAlg ta2R) (h2N : NZAt h ta2R)
-    (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2) :
-    A2RegularityOrders (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO) := by
-  have cases' : ∀ {Z : Comp Xo c} {v : AddValuation (Om Z) (WithTop ℤ)},
-      (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).admitted Z v →
-      IsNormDiscrete v ∧ ((∃ la, IsOver (K := c.F) v la) ∨ IsTrivOn c.F v) := by
+    (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2)
+    : A2RegularityOrders (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0'
+      Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO) := by
+  have cases'
+      : ∀ {Z : Comp Xo c} {v : AddValuation (Om Z) (WithTop ℤ)},
+        (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+            tableLineDegreeFive tableLineDegreeTwo Prw PO).admitted Z v
+          → IsNormDiscrete v ∧ ((∃ la, IsOver (K := c.F) v la) ∨ IsTrivOn c.F v) := by
     intro Z v hA
     obtain ⟨hd, hc⟩ := hA
     exact ⟨hd, hc.imp (fun h' => let ⟨la, ho, _⟩ := h'; ⟨la, ho⟩) (fun h' => h'.1)⟩
-  refine ⟨fun Z v hA x hx hx0 => ?_, fun Z v hA x hx hx0 => ?_, fun Z v hA => ?_, fun Z v hA => ?_,
-    fun Z v hA => ?_⟩
+  refine ⟨
+    fun Z v hA x hx hx0 => ?_,
+    fun Z v hA x hx hx0 => ?_,
+    fun Z v hA => ?_,
+    fun Z v hA => ?_,
+    fun Z v hA => ?_
+  ⟩
   · obtain ⟨hd, hc⟩ := cases' hA
     obtain ⟨F, hF, rfl⟩ := exists_of_mem_span_valG h hx
-    exact ord_nonneg_of_regP h δ hreg hT hTQ hdL (mem_of_mem_span_int _ (Set.range_subset_iff.2 hwC) hF)
+    exact ord_nonneg_of_regP h δ hreg hT hTQ hdL
+      (mem_of_mem_span_int _ (Set.range_subset_iff.2 hwC) hF)
       (intAlg_span (Set.forall_mem_range.2 hwI) hF) hd hc (evC_ne_zero_of_valC hx0)
   · obtain ⟨hd, hc⟩ := cases' hA
     obtain ⟨F, hF, rfl⟩ := exists_of_mem_span_valG h hx
-    exact ord_nonneg_of_regP h δ hreg hT hTQ hdF (mem_of_mem_span_int _ (Set.range_subset_iff.2 hpC) hF)
+    exact ord_nonneg_of_regP h δ hreg hT hTQ hdF
+      (mem_of_mem_span_int _ (Set.range_subset_iff.2 hpC) hF)
       (intAlg_span (Set.forall_mem_range.2 hpI) hF) hd hc (evC_ne_zero_of_valC hx0)
   · obtain ⟨hd, hc⟩ := cases' hA
     have h0 := ord_nonneg_of_regP h δ hreg hT hTQ hdL heC heI hd hc (heN Z)
@@ -274,19 +323,27 @@ theorem secondHeightLaw_of_regularUniformisation {rU : ℕ} {U : ∀ σ : c.F �
       simp only [frW]
       exact Finset.sum_eq_zero fun i _ => by cases i <;> simp [exZ]
     rw [sub_self, smul_zero]
-    simp only [valC, wtZ_zero, evC_one hgt, ordC, AddMonoidAlgebra.coeff_single, Finsupp.single_eq_same, hz,
-      AddValuation.map_one, add_zero]
+    simp only [valC, wtZ_zero, evC_one hgt, ordC, AddMonoidAlgebra.coeff_single,
+      Finsupp.single_eq_same, hz, AddValuation.map_one, add_zero]
     exact le_rfl
   · obtain ⟨hd, hc⟩ := cases' hA
     have h0 := ord_nonneg_of_regP h δ hreg hT hTQ hd2 h2C h2I hd hc (h2N Z)
     rw [huta2] at h0
     exact h0
 
-theorem exists_htI2et : ∃ Pet : ℝ, 1 ≤ Pet ∧
-    (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).HeightIntegralEstimateTrivialPlace :=
-  ⟨max 1 _, le_max_left _ _, le_max_right 1 (meanK (fun σ => Real.log
-      (⨆ p : (Σ Z : Comp Xo c, PT (Ω := Om Z) σ),
-        nrmC fn (yP p.1) ((1 * 1 : ℕ) • wtZ uL.1 uL.2) (valC h uL.1 uL.2 etR p.1) p.2)) / ((1 : ℕ) : ℝ))⟩
+theorem exists_htI2et
+    : ∃ Pet : ℝ,
+      1 ≤ Pet ∧ (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+        tableLineDegreeFive tableLineDegreeTwo Prw PO).HeightIntegralEstimateTrivialPlace := ⟨
+  max 1 _,
+  le_max_left _ _,
+  le_max_right 1
+    (meanK (fun σ =>
+        Real.log
+          (⨆ p : (Σ Z : Comp Xo c, PT (Ω := Om Z) σ),
+            nrmC fn (yP p.1) ((1 * 1 : ℕ) • wtZ uL.1 uL.2) (valC h uL.1 uL.2 etR p.1) p.2))
+      / ((1 : ℕ) : ℝ))
+⟩
 
 end Orders
 

@@ -18,8 +18,10 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
-theorem LocRingDimOne.proof (hF : LocRingFrac.Statement) (hN : LocRingNoeth.Statement)
-    (hL : LocRingLocal.Statement) (hPow : LocRingPow.Statement) : LocRingDimOne.Statement := by
+theorem LocRingDimOne.proof
+    (hF : LocRingFrac.Statement) (hN : LocRingNoeth.Statement) (hL : LocRingLocal.Statement)
+    (hPow : LocRingPow.Statement)
+    : LocRingDimOne.Statement := by
   classical
   intro K _ ι _ P s a W hP hs hsP hW
   obtain ⟨hPp, hPh, -⟩ := hP
@@ -38,15 +40,17 @@ theorem LocRingDimOne.proof (hF : LocRingFrac.Statement) (hN : LocRingNoeth.Stat
     mem_nonZeroDivisors_of_ne_zero fun h => htW (hPW (Ideal.Quotient.eq_zero_iff_mem.mp h))
   set x : FractionRing (MRing ι ⧸ P) := IsLocalization.mk' _ (Ideal.Quotient.mk P s) ⟨_, htP⟩
   have hxA : x ∈ locRing P W := Subring.subset_closure ⟨s, t, a, htP, htW, hs, ht, rfl⟩
-  have hx : x * algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P t) =
-      algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P s) :=
+  have hx
+      : x * algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P t)
+        = algebraMap (MRing ι ⧸ P) (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P s) :=
     IsLocalization.mk'_spec _ _ _
   set x' : locRing P W := ⟨x, hxA⟩
   have hxu : ¬ IsUnit x' := fun h => (hunit x' s t a hs ht htW hx).mp h hsW
   have hx0 : x' ≠ 0 := by
     intro h
     have h0 : x = 0 := congrArg Subtype.val h
-    rw [h0, zero_mul, eq_comm, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem] at hx
+    rw [h0, zero_mul, eq_comm, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem]
+      at hx
     exact hsP hx
 
   have hmin : IsLocalRing.maximalIdeal (locRing P W) ∈ (Ideal.span {x'}).minimalPrimes := by
@@ -65,7 +69,8 @@ theorem LocRingDimOne.proof (hF : LocRingFrac.Statement) (hN : LocRingNoeth.Stat
   have hne : IsLocalRing.maximalIdeal (locRing P W) ≠ ⊥ := fun h =>
     hx0 (by simpa [h] using (IsLocalRing.mem_maximalIdeal x').mpr hxu)
   have h1 : (IsLocalRing.maximalIdeal (locRing P W)).height = 1 :=
-    le_antisymm hle (Order.one_le_iff_ne_zero.mpr (fun h => hne (Ideal.height_eq_zero_iff_eq_bot.mp h)))
+    le_antisymm hle
+      (Order.one_le_iff_ne_zero.mpr (fun h => hne (Ideal.height_eq_zero_iff_eq_bot.mp h)))
   rw [← IsLocalRing.maximalIdeal_height_eq_ringKrullDim, h1]
   rfl
 

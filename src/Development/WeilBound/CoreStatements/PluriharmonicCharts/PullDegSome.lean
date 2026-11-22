@@ -5,7 +5,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogPeriodState
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq
 
@@ -23,15 +27,11 @@ theorem κ₁_ne {k₀ k : K} (h : k ≠ k₀) : κ₁ k₀ k = some k := if_neg
 theorem κ₁_inj (k₀ : K) : Function.Injective (κ₁ k₀) := by
   intro a b h
   unfold κ₁ at h
-  split_ifs at h with ha hb hb <;>
-    first
-    | exact ha.trans hb.symm
-    | (cases h; rfl)
-    | cases h
-    | exact Option.some_injective _ h
+  split_ifs at h with ha hb hb
+    <;> first | exact ha.trans hb.symm | (cases h; rfl) | cases h | exact Option.some_injective _ h
 
-theorem isBlockMap_v₁ (k₀ : K) :
-    IsBlockMap (ι := ι) (ι' := fun o : Option K => ι (o.getD k₀)) (κ₁ k₀) (v₁ k₀) := by
+theorem isBlockMap_v₁ (k₀ : K)
+    : IsBlockMap (ι := ι) (ι' := fun o : Option K => ι (o.getD k₀)) (κ₁ k₀) (v₁ k₀) := by
   have h3 : ∀ p : (k : K) × ι k, (v₁ k₀ p).fst = κ₁ k₀ p.fst := fun p => by
     unfold v₁ κ₁
     split_ifs <;> rfl
@@ -61,8 +61,7 @@ theorem isBlockMap_v₁ (k₀ : K) :
       have hk : k ≠ k₀ := by
         intro hk
         unfold κ₁ at hj
-        split_ifs at hj with h1 <;>
-          first
+        split_ifs at hj with h1 <;> first
           | (cases hj; exact h1 hk)
           | cases hj
           | exact h1 ((Option.some_injective _ hj).trans hk)
@@ -70,20 +69,20 @@ theorem isBlockMap_v₁ (k₀ : K) :
       unfold v₁
       rw [dite_eq_right hk]
 
-theorem pullDeg_some (xi : K → ℤ) (o : Option K) : pullDeg (some : K → Option K) xi o = o.elim 0 xi := by
+theorem pullDeg_some (xi : K → ℤ) (o : Option K)
+    : pullDeg (some : K → Option K) xi o = o.elim 0 xi := by
   unfold pullDeg
   cases o with
   | none =>
-    have hn : ¬∃ a : K, some a = (none : Option K) := by
+    have hn : ¬ ∃ a : K, some a = (none : Option K) := by
       rintro ⟨a, ha⟩
       cases ha
     rw [Function.extend_apply' _ _ _ hn]
     rfl
-  | some k =>
-    exact (Option.some_injective K).extend_apply xi 0 k
+  | some k => exact (Option.some_injective K).extend_apply xi 0 k
 
-theorem pullDeg_κ₁ (k₀ : K) (xi : K → ℤ) (o : Option K) :
-    pullDeg (κ₁ k₀) xi o = o.elim (xi k₀) fun k => if k = k₀ then 0 else xi k := by
+theorem pullDeg_κ₁ (k₀ : K) (xi : K → ℤ) (o : Option K)
+    : pullDeg (κ₁ k₀) xi o = o.elim (xi k₀) fun k => if k = k₀ then 0 else xi k := by
   unfold pullDeg
   cases o with
   | none =>
@@ -92,11 +91,10 @@ theorem pullDeg_κ₁ (k₀ : K) (xi : K → ℤ) (o : Option K) :
     exact e
   | some k =>
     by_cases hk : k = k₀
-    · have hn : ¬∃ j : K, κ₁ k₀ j = some k := by
+    · have hn : ¬ ∃ j : K, κ₁ k₀ j = some k := by
         rintro ⟨j, hj⟩
         unfold κ₁ at hj
-        split_ifs at hj with h1 <;>
-          first
+        split_ifs at hj with h1 <;> first
           | (cases hj; exact h1 hk)
           | cases hj
           | exact h1 ((Option.some_injective _ hj).trans hk)

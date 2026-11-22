@@ -5,29 +5,40 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
 
-theorem envExt_sub_mem {S A C : Type} [CommRing S] [CommRing A] [CommRing C] (G G' : A →+* C) (s : S →+* A)
-    (J : Ideal S) (x a : A) (hs : G.comp s = G'.comp s) (ha : G a = G' a) (hx : x - a ∈ J.map s) :
-    G x - G' x ∈ J.map (G.comp s) := by
+theorem envExt_sub_mem
+    {S A C : Type} [CommRing S] [CommRing A] [CommRing C]
+    (G G' : A →+* C) (s : S →+* A) (J : Ideal S) (x a : A)
+    (hs : G.comp s = G'.comp s) (ha : G a = G' a) (hx : x - a ∈ J.map s)
+    : G x - G' x ∈ J.map (G.comp s) := by
   have e : G x - G' x = G (x - a) - G' (x - a) := by rw [map_sub, map_sub, ha]; ring
   rw [e]
   refine Ideal.sub_mem _ ?_ ?_
   · rw [← Ideal.map_map]; exact Ideal.mem_map_of_mem G hx
   · rw [hs, ← Ideal.map_map]; exact Ideal.mem_map_of_mem G' hx
 
-theorem envExt_haus {C : Type} [CommRing C] (I : Ideal C) (h : IsHausdorff I C) (z : C) (hz : ∀ n : ℕ, z ∈ I ^ n) :
-    z = 0 :=
+theorem envExt_haus
+    {C : Type} [CommRing C] (I : Ideal C) (h : IsHausdorff I C) (z : C) (hz : ∀ n : ℕ, z ∈ I ^ n)
+    : z = 0 :=
   h.haus z fun n => by
     rw [SModEq.sub_mem, sub_zero, smul_eq_mul, Ideal.mul_top]
     exact hz n
 
-
 set_option maxHeartbeats 1600000 in
-theorem envExt_agree : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (B : Obj l ↥(OL K)) (d p : B.A) (En : Env bk B d p) (C : Type) [CommRing C] (φ : C →+* C) (F F' : En.Q.A →+* C), (∀ c : C, ((l : ℕ) : C) * c = 0 → c = 0) → (∀ a, F (En.Q.D.φ a) = φ (F a)) → (∀ a, F' (En.Q.D.φ a) = φ (F' a)) → (∀ b, F (En.inl.f b) = F' (En.inl.f b)) → F (BK.hf En.inr X) = F' (BK.hf En.inr X) → F (En.inl.f d) ∈ nonZeroDivisors C → IsHausdorff ((Ideal.span {((l : ℕ) : B.A)} ⊔ B.I).map (F.comp En.inl.f)) C → F = F' := by
+theorem envExt_agree
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (B : Obj l ↥(OL K)) (d p : B.A)
+        (En : Env bk B d p) (C : Type) [CommRing C] (φ : C →+* C) (F F' : En.Q.A →+* C),
+      (∀ c : C, ((l : ℕ) : C) * c = 0 → c = 0) → (∀ a, F (En.Q.D.φ a) = φ (F a))
+        → (∀ a, F' (En.Q.D.φ a) = φ (F' a)) → (∀ b, F (En.inl.f b) = F' (En.inl.f b))
+        → F (BK.hf En.inr X) = F' (BK.hf En.inr X) → F (En.inl.f d) ∈ nonZeroDivisors C
+        → IsHausdorff ((Ideal.span {((l : ℕ) : B.A)} ⊔ B.I).map (F.comp En.inl.f)) C
+        → F = F' := by
   intro l _ K bk B d p En C _ φ F F' hl hF hF' hb hX hd hH
 
   have hw : F En.w = F' En.w := by
@@ -48,8 +59,7 @@ theorem envExt_agree : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (
     have e2 := hF' a
     rw [En.Q.D.φ_eq, map_add (f := _), map_mul, map_pow, map_natCast] at e1 e2
     rw [← ha] at e2
-    have : ((l : ℕ) : C) * (F (En.Q.D.δ a) - F' (En.Q.D.δ a)) = 0 := by
-      linear_combination e1 - e2
+    have : ((l : ℕ) : C) * (F (En.Q.D.δ a) - F' (En.Q.D.δ a)) = 0 := by linear_combination e1 - e2
     exact sub_eq_zero.1 (hl _ this)
   have hit : ∀ i : ℕ, F (En.Q.D.δ^[i] En.w) = F' (En.Q.D.δ^[i] En.w) := by
     intro i
@@ -64,14 +74,18 @@ theorem envExt_agree : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (
     refine Finsupp.prod_congr fun i _ => ?_
     rw [map_pow, map_pow, hit i]
   have hcomp : F.comp En.inl.f = F'.comp En.inl.f := RingHom.ext hb
-  have key : ∀ x (n : ℕ), F x - F' x ∈ ((Ideal.span {((l : ℕ) : B.A)} ⊔ B.I) ^ n).map (F.comp En.inl.f) := by
+  have key
+      : ∀ x (n : ℕ),
+        F x - F' x ∈ ((Ideal.span {((l : ℕ) : B.A)} ⊔ B.I) ^ n).map (F.comp En.inl.f) := by
     intro x n
     have hfin := En.tb.fin x n
-    have happ := En.tb.approx x n hfin.toFinset (fun i hi => by
-      by_contra h
-      exact hi (hfin.mem_toFinset.2 h))
-    have hsum : F (∑ i ∈ hfin.toFinset, En.inl.f (En.tb.c i x) * En.tb.b i) =
-        F' (∑ i ∈ hfin.toFinset, En.inl.f (En.tb.c i x) * En.tb.b i) := by
+    have happ :=
+      En.tb.approx x n hfin.toFinset (fun i hi => by
+        by_contra h
+        exact hi (hfin.mem_toFinset.2 h))
+    have hsum
+        : F (∑ i ∈ hfin.toFinset, En.inl.f (En.tb.c i x) * En.tb.b i)
+          = F' (∑ i ∈ hfin.toFinset, En.inl.f (En.tb.c i x) * En.tb.b i) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_

@@ -6,13 +6,17 @@ public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Stat
 
 @[expose] public section
 
-open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num NumberField
+open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num
+  NumberField
 
 namespace PositivityTheory.HtPt.Teich
 
-theorem eq_of_pow_eq_self {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O] (q : ℕ)
-    (hq : (q : IsLocalRing.ResidueField O) = 0) {x y : O} (hx : x ^ q = x) (hy : y ^ q = y)
-    (h : IsLocalRing.residue O x = IsLocalRing.residue O y) : x = y := by
+theorem eq_of_pow_eq_self
+    {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O]
+    (q : ℕ) (hq : (q : IsLocalRing.ResidueField O) = 0)
+    {x y : O}
+    (hx : x ^ q = x) (hy : y ^ q = y) (h : IsLocalRing.residue O x = IsLocalRing.residue O y)
+    : x = y := by
   by_contra hne
   have hsub : x - y ≠ 0 := sub_ne_zero.mpr hne
   have hgeom := geom_sum₂_mul x y q
@@ -28,15 +32,19 @@ theorem eq_of_pow_eq_self {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O] (
   rw [geom_sum₂_self, hq, zero_mul] at hres
   exact zero_ne_one hres
 
-theorem card_eq_zero {O : Type} [CommRing O] [IsLocalRing O] {F : Type} [Field F] [Fintype F]
-    (σ : F →+* IsLocalRing.ResidueField O) :
-    ((Fintype.card F : ℕ) : IsLocalRing.ResidueField O) = 0 := by
+theorem card_eq_zero
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {F : Type} [Field F] [Fintype F]
+    (σ : F →+* IsLocalRing.ResidueField O)
+    : ((Fintype.card F : ℕ) : IsLocalRing.ResidueField O) = 0 := by
   rw [← map_natCast σ, FiniteField.cast_card_eq_zero, map_zero]
 
-theorem exists_lift {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O] {F : Type} [Field F]
-    [Fintype F] (ζ : O) (hζ : IsPrimitiveRoot ζ (Fintype.card F - 1))
-    (σ : F →+* IsLocalRing.ResidueField O) (a : F) :
-    ∃ x : O, x ^ Fintype.card F = x ∧ IsLocalRing.residue O x = σ a := by
+theorem exists_lift
+    {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O]
+    {F : Type} [Field F] [Fintype F]
+    (ζ : O) (hζ : IsPrimitiveRoot ζ (Fintype.card F - 1))
+    (σ : F →+* IsLocalRing.ResidueField O) (a : F)
+    : ∃ x : O, x ^ Fintype.card F = x ∧ IsLocalRing.residue O x = σ a := by
   have hQ1 : 1 < Fintype.card F := Fintype.one_lt_card
   obtain ⟨m, hm⟩ : ∃ m, Fintype.card F = m + 1 := ⟨Fintype.card F - 1, by omega⟩
   rw [hm, Nat.add_sub_cancel] at hζ
@@ -61,23 +69,37 @@ theorem exists_lift {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O] {F : Ty
     obtain ⟨i, -, hi⟩ := hprim.eq_pow_of_pow_eq_one h1
     exact ⟨ζ ^ i, hfix i, by rw [map_pow, hi]⟩
 
-theorem glue_teich : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] (F : Type) [Field F] [Fintype F] (p : ℕ) [Fact p.Prime] [CharP F p] (ζ : O), IsPrimitiveRoot ζ (Fintype.card F - 1) → ∀ σ : F →+* IsLocalRing.ResidueField O, (∃! χ : F →*₀ O, ∀ a, IsLocalRing.residue O (χ a) = σ a) ∧ ∀ (σ' : F →+* IsLocalRing.ResidueField O) (χ χ' : F →*₀ O), (∀ a, σ' a = σ a ^ p) → (∀ a, IsLocalRing.residue O (χ a) = σ a) → (∀ a, IsLocalRing.residue O (χ' a) = σ' a) → ∀ a, χ' a = χ a ^ p := by
+theorem glue_teich
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] (F : Type) [Field F] [Fintype F]
+        (p : ℕ) [Fact p.Prime] [CharP F p] (ζ : O),
+      IsPrimitiveRoot ζ (Fintype.card F - 1)
+        → ∀ σ : F →+* IsLocalRing.ResidueField O,
+          (∃! χ : F →*₀ O, ∀ a, IsLocalRing.residue O (χ a) = σ a)
+            ∧ ∀ (σ' : F →+* IsLocalRing.ResidueField O) (χ χ' : F →*₀ O),
+              (∀ a, σ' a = σ a ^ p) → (∀ a, IsLocalRing.residue O (χ a) = σ a)
+                → (∀ a, IsLocalRing.residue O (χ' a) = σ' a)
+                → ∀ a, χ' a = χ a ^ p := by
   intro O _ _ _ F _ _ p _ _ ζ hζ σ
   have hQ : ((Fintype.card F : ℕ) : IsLocalRing.ResidueField O) = 0 :=
     PositivityTheory.HtPt.Teich.card_eq_zero σ
-  have huniq : ∀ {x y : O}, x ^ Fintype.card F = x → y ^ Fintype.card F = y →
-      IsLocalRing.residue O x = IsLocalRing.residue O y → x = y :=
-    fun hx hy h => PositivityTheory.HtPt.Teich.eq_of_pow_eq_self _ hQ hx hy h
+  have huniq
+      : ∀ {x y : O},
+        x ^ Fintype.card F = x → y ^ Fintype.card F = y
+          → IsLocalRing.residue O x = IsLocalRing.residue O y
+          → x = y := fun hx hy h =>
+    PositivityTheory.HtPt.Teich.eq_of_pow_eq_self _ hQ hx hy h
   have hfixχ : ∀ (χ : F →*₀ O) (a : F), χ a ^ Fintype.card F = χ a := fun χ a => by
     rw [← map_pow, FiniteField.pow_card]
   refine ⟨?_, ?_⟩
   · choose L hL hLres using PositivityTheory.HtPt.Teich.exists_lift ζ hζ σ
-    let χ : F →*₀ O :=
-      { toFun := L
-        map_zero' := huniq (hL 0) (zero_pow Fintype.card_ne_zero) (by rw [hLres, map_zero, map_zero])
-        map_one' := huniq (hL 1) (one_pow _) (by rw [hLres, map_one, map_one])
-        map_mul' := fun a b => huniq (hL (a * b)) (by rw [mul_pow, hL a, hL b])
-          (by rw [hLres, map_mul, map_mul, hLres, hLres]) }
+    let χ : F →*₀ O := {
+      toFun := L
+      map_zero' := huniq (hL 0) (zero_pow Fintype.card_ne_zero) (by rw [hLres, map_zero, map_zero])
+      map_one' := huniq (hL 1) (one_pow _) (by rw [hLres, map_one, map_one])
+      map_mul' := fun a b =>
+        huniq (hL (a * b)) (by rw [mul_pow, hL a, hL b])
+          (by rw [hLres, map_mul, map_mul, hLres, hLres])
+    }
     refine ⟨χ, hLres, fun χ' hχ' => ?_⟩
     exact MonoidWithZeroHom.ext fun a => huniq (hfixχ χ' a) (hL a) ((hχ' a).trans (hLres a).symm)
   · intro σ' χ χ' hσ' hχ hχ' a

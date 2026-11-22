@@ -4,11 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-private theorem modSum (q b c : ℕ) (hq : q.Prime) (hb0 : b ≠ 0) (hb : b < q) :
-    ∑ i ∈ Finset.range q, (c + i * b) % q = ∑ i ∈ Finset.range q, i := by
+private theorem modSum (q b c : ℕ) (hq : q.Prime) (hb0 : b ≠ 0) (hb : b < q)
+    : ∑ i ∈ Finset.range q, (c + i * b) % q = ∑ i ∈ Finset.range q, i := by
   have hinj : Set.InjOn (fun i => (c + i * b) % q) (Finset.range q : Set ℕ) := by
     intro i hi j hj h
     have h1 : c + i * b ≡ c + j * b [MOD q] := h
@@ -26,10 +28,12 @@ private theorem modSum (q b c : ℕ) (hq : q.Prime) (hb0 : b ≠ 0) (hb : b < q)
   rw [him] at this
   exact this.symm
 
-private theorem divSum (q b c : ℕ) (hq : q.Prime) (hb0 : b ≠ 0) (hb : b < q) :
-    ∑ i ∈ Finset.range q, (c + i * b) / q = c + ∑ i ∈ Finset.range q, (i * b) / q := by
-  have key : ∀ c : ℕ, q * ∑ i ∈ Finset.range q, (c + i * b) / q + ∑ i ∈ Finset.range q, i
-      = q * c + ∑ i ∈ Finset.range q, i * b := by
+private theorem divSum (q b c : ℕ) (hq : q.Prime) (hb0 : b ≠ 0) (hb : b < q)
+    : ∑ i ∈ Finset.range q, (c + i * b) / q = c + ∑ i ∈ Finset.range q, (i * b) / q := by
+  have key
+      : ∀ c : ℕ,
+        q * ∑ i ∈ Finset.range q, (c + i * b) / q + ∑ i ∈ Finset.range q, i
+          = q * c + ∑ i ∈ Finset.range q, i * b := by
     intro c
     rw [← modSum q b c hq hb0 hb, Finset.mul_sum, ← Finset.sum_add_distrib]
     simp only [Nat.div_add_mod]
@@ -42,8 +46,9 @@ private theorem divSum (q b c : ℕ) (hq : q.Prime) (hb0 : b ≠ 0) (hb : b < q)
   rw [mul_add]
   omega
 
-private theorem divSum' (M q b a : ℕ) (hM : 0 < M) (hq : q.Prime) (hb : b < q) :
-    ∑ i ∈ Finset.range q, (a + i * M) * b / (q * M) = a * b / M + ∑ i ∈ Finset.range q, (i * b) / q := by
+private theorem divSum' (M q b a : ℕ) (hM : 0 < M) (hq : q.Prime) (hb : b < q)
+    : ∑ i ∈ Finset.range q, (a + i * M) * b / (q * M)
+      = a * b / M + ∑ i ∈ Finset.range q, (i * b) / q := by
   rcases eq_or_ne b 0 with rfl | hb0
   · simp
   rw [← divSum q b _ hq hb0 hb]
@@ -52,8 +57,9 @@ private theorem divSum' (M q b a : ℕ) (hM : 0 < M) (hq : q.Prime) (hb : b < q)
   congr 1
   rw [show (a + i * M) * b = a * b + i * b * M by ring, Nat.add_mul_div_right _ _ hM]
 
-private theorem classSum (M q a : ℕ) (ha : a < M) (g : ℕ → ℕ) :
-    ∑ n ∈ (Finset.range (q * M)).filter (fun n => n % M = a), g n = ∑ i ∈ Finset.range q, g (a + i * M) := by
+private theorem classSum (M q a : ℕ) (ha : a < M) (g : ℕ → ℕ)
+    : ∑ n ∈ (Finset.range (q * M)).filter (fun n => n % M = a), g n
+      = ∑ i ∈ Finset.range q, g (a + i * M) := by
   have hM : 0 < M := by omega
   symm
   refine Finset.sum_nbij' (fun i => a + i * M) (fun n => n / M) ?_ ?_ ?_ ?_ ?_
@@ -72,20 +78,25 @@ private theorem classSum (M q a : ℕ) (ha : a < M) (g : ℕ → ℕ) :
   · intro i _
     rfl
 
-private theorem unitSum (M q : ℕ) [NeZero M] [NeZero (q * M)] (hq : q.Prime) (u : (ZMod M)ˣ) (hu : (u : ZMod M) = q)
-    (t : (ZMod M)ˣ) (g : ℕ → ℕ) :
-    ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = t),
-      g (t' : ZMod (q * M)).val + g (q * ((u⁻¹ * t : (ZMod M)ˣ) : ZMod M).val)
+private theorem unitSum
+    (M q : ℕ) [NeZero M] [NeZero (q * M)]
+    (hq : q.Prime)
+    (u : (ZMod M)ˣ) (hu : (u : ZMod M) = q)
+    (t : (ZMod M)ˣ) (g : ℕ → ℕ)
+    : ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = t),
+        g (t' : ZMod (q * M)).val
+        + g (q * ((u⁻¹ * t : (ZMod M)ˣ) : ZMod M).val)
       = ∑ i ∈ Finset.range q, g ((t : ZMod M).val + i * M) := by
   rw [← classSum M q _ (ZMod.val_lt _) g]
   set s : (ZMod M)ˣ := u⁻¹ * t with hs
-  have hst : (q : ZMod M) * s = t := by
-    rw [← hu, hs, ← Units.val_mul, mul_inv_cancel_left]
+  have hst : (q : ZMod M) * s = t := by rw [← hu, hs, ← Units.val_mul, mul_inv_cancel_left]
   have hmod : ∀ n : ℕ, n % M = (t : ZMod M).val ↔ (n : ZMod M) = t := by
     intro n
     rw [← ZMod.val_natCast]
     exact (ZMod.val_injective M).eq_iff
-  have hmem : q * (s : ZMod M).val ∈ (Finset.range (q * M)).filter (fun n => n % M = (t : ZMod M).val) := by
+  have hmem
+      : q * (s : ZMod M).val
+        ∈ (Finset.range (q * M)).filter (fun n => n % M = (t : ZMod M).val) := by
     simp only [Finset.mem_range, Finset.mem_filter]
     refine ⟨Nat.mul_lt_mul_of_pos_left (ZMod.val_lt _) hq.pos, ?_⟩
     rw [hmod]
@@ -95,12 +106,14 @@ private theorem unitSum (M q : ℕ) [NeZero M] [NeZero (q * M)] (hq : q.Prime) (
   congr 1
   refine Finset.sum_bij (fun t' _ => (t' : ZMod (q * M)).val) ?_ ?_ ?_ ?_
   · intro t' ht'
-    simp only [Finset.mem_range, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase] at ht' ⊢
+    simp only [Finset.mem_range, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase]
+      at ht' ⊢
     refine ⟨?_, ZMod.val_lt _, ?_⟩
     · intro h
       have hc := ZMod.val_coe_unit_coprime t'
       rw [h] at hc
-      exact hq.one_lt.ne' (Nat.Coprime.eq_one_of_dvd (Nat.Coprime.coprime_dvd_left (Dvd.intro _ rfl) hc) (Dvd.intro _ rfl))
+      exact hq.one_lt.ne' (Nat.Coprime.eq_one_of_dvd
+        (Nat.Coprime.coprime_dvd_left (Dvd.intro _ rfl) hc) (Dvd.intro _ rfl))
     · rw [hmod, ← ht', ZMod.unitsMap_val, ZMod.natCast_val]
   · intro x _ y _ h
     exact Units.ext (ZMod.val_injective _ h)
@@ -123,7 +136,10 @@ private theorem unitSum (M q : ℕ) [NeZero M] [NeZero (q * M)] (hq : q.Prime) (
         push_cast
         rfl
       rw [← this, ZMod.val_natCast, Nat.mod_eq_of_lt hk]
-    have hv : ((ZMod.unitOfCoprime n (Nat.Coprime.mul_right hcq hcM) : (ZMod (q * M))ˣ) : ZMod (q * M)).val = n := by
+    have hv
+        : ((ZMod.unitOfCoprime n (Nat.Coprime.mul_right hcq hcM) : (ZMod (q * M))ˣ)
+            : ZMod (q * M)).val
+          = n := by
       rw [ZMod.coe_unitOfCoprime, ZMod.val_natCast, Nat.mod_eq_of_lt h2]
     refine ⟨ZMod.unitOfCoprime n (Nat.Coprime.mul_right hcq hcM), ?_, hv⟩
     simp only [Finset.mem_filter, Finset.mem_univ, true_and]
@@ -132,29 +148,44 @@ private theorem unitSum (M q : ℕ) [NeZero M] [NeZero (q * M)] (hq : q.Prime) (
   · intro _ _
     rfl
 
-private theorem halfSum (M q b : ℕ) [NeZero M] [NeZero (q * M)] (hq : q.Prime) (hb : b < q) (u : (ZMod M)ˣ)
-    (hu : (u : ZMod M) = q) (t : (ZMod M)ˣ) :
-    ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = t),
-      (((t' : ZMod (q * M)).val * b / (q * M) : ℕ) : ℤ) + ((((u⁻¹ * t : (ZMod M)ˣ) : ZMod M).val * b / M : ℕ) : ℤ)
+private theorem halfSum
+    (M q b : ℕ) [NeZero M] [NeZero (q * M)]
+    (hq : q.Prime) (hb : b < q)
+    (u : (ZMod M)ˣ) (hu : (u : ZMod M) = q)
+    (t : (ZMod M)ˣ)
+    : ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = t),
+        (((t' : ZMod (q * M)).val * b / (q * M) : ℕ) : ℤ)
+        + ((((u⁻¹ * t : (ZMod M)ˣ) : ZMod M).val * b / M : ℕ) : ℤ)
       = (((t : ZMod M).val * b / M : ℕ) : ℤ) + ((∑ i ∈ Finset.range q, (i * b) / q : ℕ) : ℤ) := by
   have h := unitSum M q hq u hu t (fun n => n * b / (q * M))
-  rw [divSum' M q b _ (Nat.pos_of_ne_zero (NeZero.ne M)) hq hb, mul_assoc, Nat.mul_div_mul_left _ _ hq.pos] at h
+  rw [divSum' M q b _ (Nat.pos_of_ne_zero (NeZero.ne M)) hq hb, mul_assoc,
+      Nat.mul_div_mul_left _ _ hq.pos]
+    at h
   rw [← Nat.cast_sum, ← Nat.cast_add, h, Nat.cast_add]
 
-theorem UpperTheory.V.ML.thDist :
-    ∀ (M q b : ℕ) [NeZero M] [NeZero (q * M)], q.Prime → b < q → ∀ u : (ZMod M)ˣ, (u : ZMod M) = q → ∀ t : (ZMod M)ˣ,
-    ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = t), th (q * M) b t' = th M b t - th M b (u⁻¹ * t : (ZMod M)ˣ) := by
+theorem UpperTheory.V.ML.thDist
+    : ∀ (M q b : ℕ) [NeZero M] [NeZero (q * M)],
+      q.Prime → b < q
+        → ∀ u : (ZMod M)ˣ,
+          (u : ZMod M) = q
+            → ∀ t : (ZMod M)ˣ,
+              ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = t), th (q * M) b t'
+                = th M b t - th M b (u⁻¹ * t : (ZMod M)ˣ) := by
   intro M q b _ _ hq hb u hu t
   have h1 := halfSum M q b hq hb u hu t
   have h2 := halfSum M q b hq hb u hu (-t)
-  have hneg : ∀ x : (ZMod (q * M))ˣ, ZMod.unitsMap (Dvd.intro_left q rfl) (-x) = -ZMod.unitsMap (Dvd.intro_left q rfl) x := by
+  have hneg
+      : ∀ x : (ZMod (q * M))ˣ,
+        ZMod.unitsMap (Dvd.intro_left q rfl) (-x) = - ZMod.unitsMap (Dvd.intro_left q rfl) x := by
     intro x
     apply Units.ext
-    rw [Units.val_neg, ZMod.unitsMap_val, ZMod.unitsMap_val, Units.val_neg, ZMod.cast_neg (Dvd.intro_left q rfl)]
-  have h3 : ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = t),
-      (((-(t' : ZMod (q * M))).val * b / (q * M) : ℕ) : ℤ) =
-      ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = -t),
-      (((t' : ZMod (q * M)).val * b / (q * M) : ℕ) : ℤ) := by
+    rw [Units.val_neg, ZMod.unitsMap_val, ZMod.unitsMap_val, Units.val_neg,
+      ZMod.cast_neg (Dvd.intro_left q rfl)]
+  have h3
+      : ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = t),
+          (((-(t' : ZMod (q * M))).val * b / (q * M) : ℕ) : ℤ)
+        = ∑ t' ∈ Finset.univ.filter (fun t' : (ZMod (q * M))ˣ => ZMod.unitsMap (Dvd.intro_left q rfl) t' = -t),
+          (((t' : ZMod (q * M)).val * b / (q * M) : ℕ) : ℤ) := by
     refine Finset.sum_equiv (Equiv.neg _) ?_ ?_
     · intro x
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Equiv.neg_apply, hneg, neg_inj]

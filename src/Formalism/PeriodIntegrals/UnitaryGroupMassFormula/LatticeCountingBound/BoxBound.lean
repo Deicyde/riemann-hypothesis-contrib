@@ -19,8 +19,9 @@ variable {n : ℕ}
 
 section Frob
 
-attribute [local instance] Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedRing
-  Matrix.frobeniusNormedAlgebra Matrix.frobeniusNormedSpace
+attribute [local instance]
+  Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedRing Matrix.frobeniusNormedAlgebra
+  Matrix.frobeniusNormedSpace
 
 lemma frob_sq (A : Matrix (Fin n) (Fin n) ℂ) : ‖A‖ ^ 2 = Formalism.REAL.hs A := by
   rw [Matrix.frobenius_norm_def, ← Real.rpow_natCast, ← Real.rpow_mul (by positivity)]
@@ -102,7 +103,9 @@ theorem box_lattice_point_bound : BoxBound := by
     simp only [Formalism.REAL.Kset, Set.mem_setOf_eq] at hk
     exact Matrix.mem_unitaryGroup_iff'.mp hk.1
   have hP : Formalism.REAL.Polar := Formalism.REAL.polar_decomposition_holds
-  have hgi : Formalism.REAL.inUJ ε (((g : (Matrix (Fin n) (Fin n) ℂ)ˣ)) : Matrix (Fin n) (Fin n) ℂ) := g.2
+  have hgi
+      : Formalism.REAL.inUJ ε (((g : (Matrix (Fin n) (Fin n) ℂ)ˣ)) : Matrix (Fin n) (Fin n) ℂ) :=
+    g.2
   obtain ⟨k0, X0, hk0, hX0, hg0⟩ := (hP n ε).1 _ hgi
   set S := {t | ∃ k X : Matrix (Fin n) (Fin n) ℂ, k ∈ Formalism.REAL.Kset ε ∧ Formalism.REAL.inP ε X ∧
       ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ) = k * NormedSpace.exp X ∧
@@ -112,9 +115,10 @@ theorem box_lattice_point_bound : BoxBound := by
     rintro t ⟨k, X, hk, _, hgk, rfl⟩
     unfold hsN Formalism.MainNotions.S.uMat
     rw [hgk, hs_unitary_mul (hK k hk)]
-    calc Real.sqrt (Formalism.REAL.hs (NormedSpace.exp X))
-        ≤ Real.sqrt ((Real.sqrt n * Real.exp (Real.sqrt (Formalism.REAL.hs X))) ^ 2) :=
-          Real.sqrt_le_sqrt (hs_exp_le X)
+    calc
+      Real.sqrt (Formalism.REAL.hs (NormedSpace.exp X))
+          ≤ Real.sqrt ((Real.sqrt n * Real.exp (Real.sqrt (Formalism.REAL.hs X))) ^ 2) :=
+        Real.sqrt_le_sqrt (hs_exp_le X)
       _ = Real.sqrt n * Real.exp (Real.sqrt (Formalism.REAL.hs X)) := Real.sqrt_sq (by positivity)
   show hsN (Formalism.MainNotions.S.uMat g) ≤ Real.sqrt n * Real.exp (sInf S)
   by_contra hlt

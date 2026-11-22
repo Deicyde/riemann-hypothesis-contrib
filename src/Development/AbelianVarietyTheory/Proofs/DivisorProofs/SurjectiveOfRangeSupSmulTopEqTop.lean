@@ -8,19 +8,24 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Abe
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem surjective_of_range_sup_smul_top_eq_top (R : Type) [CommRing R] (M : Type 1)
-    [AddCommGroup M] [Module R M] (N : Type) [AddCommGroup N] [Module R N] [Module.Finite R N]
+theorem surjective_of_range_sup_smul_top_eq_top
+    (R : Type) [CommRing R]
+    (M : Type 1) [AddCommGroup M] [Module R M]
+    (N : Type) [AddCommGroup N] [Module R N] [Module.Finite R N]
     (f : M →ₗ[R] N)
-    (h : ∀ I : Ideal R, I.IsMaximal → LinearMap.range f ⊔ I • (⊤ : Submodule R N) = ⊤) :
-    Function.Surjective f := by
+    (h : ∀ I : Ideal R, I.IsMaximal → LinearMap.range f ⊔ I • (⊤ : Submodule R N) = ⊤)
+    : Function.Surjective f := by
   set S := LinearMap.range f
 
   have key : ∀ I : Ideal R, I.IsMaximal → ¬ Module.annihilator R (N ⧸ S) ≤ I := by
@@ -34,10 +39,9 @@ theorem surjective_of_range_sup_smul_top_eq_top (R : Type) [CommRing R] (M : Typ
         simpa [Submodule.mem_bot] using (Submodule.Quotient.mk_eq_zero S).mpr hx
       rw [h2, bot_sup_eq] at h1
       rw [h1]
-    obtain ⟨r, hr1, hr⟩ := Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul I ⊤
-      (Module.Finite.fg_top) hle'
-    have hrA : r ∈ Module.annihilator R (N ⧸ S) :=
-      Module.mem_annihilator.mpr fun m => hr m trivial
+    obtain ⟨r, hr1, hr⟩ :=
+      Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul I ⊤ (Module.Finite.fg_top) hle'
+    have hrA : r ∈ Module.annihilator R (N ⧸ S) := Module.mem_annihilator.mpr fun m => hr m trivial
     have hrI : r ∈ I := hle hrA
     have h1I : (1 : R) ∈ I := by
       have := I.sub_mem hrI hr1

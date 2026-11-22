@@ -10,7 +10,8 @@ noncomputable section
 
 namespace MassDataVolumesW
 
-open Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open Formalism.BasicNotions Formalism.L2.SG.HidaSetting
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 theorem stepCM : StepCM := by
   intro D X

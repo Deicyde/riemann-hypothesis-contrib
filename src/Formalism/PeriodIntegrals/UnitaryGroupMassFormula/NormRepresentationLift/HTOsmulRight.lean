@@ -28,14 +28,19 @@ theorem hT_cj_left (a : 𝓞 E) (y w : S.V) : S.hT (cj a • y) w = (a : E) * S.
 
 section Prime
 
-variable (Λ : Submodule (𝓞 E) S.V) (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) (hint : IntLat Λ)
-  (e : Fin r → S.V) (hind : LinearIndependent E e) (he : ∀ i, e i ∈ Λ) (P : HeightOneSpectrum (𝓞 E))
-  (hloc : ∀ x ∈ Λ, x ∈ Submodule.span E (Set.range e) →
-    ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ Submodule.span (𝓞 E) (Set.range e))
+variable
+  (Λ : Submodule (𝓞 E) S.V)
+  (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) (hint : IntLat Λ)
+  (e : Fin r → S.V) (hind : LinearIndependent E e) (he : ∀ i, e i ∈ Λ)
+  (P : HeightOneSpectrum (𝓞 E))
+  (hloc : ∀ x ∈ Λ,
+    x ∈ Submodule.span E (Set.range e)
+      → ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ Submodule.span (𝓞 E) (Set.range e))
 
 include hU hind hloc in
-theorem coeff_mem_P (α : Fin r → 𝓞 E)
-    (hα : ∀ y ∈ Λ, ∃ o ∈ P.asIdeal, S.hT y (∑ i, α i • e i) = (o : E)) : ∀ i, α i ∈ P.asIdeal := by
+theorem coeff_mem_P
+    (α : Fin r → 𝓞 E) (hα : ∀ y ∈ Λ, ∃ o ∈ P.asIdeal, S.hT y (∑ i, α i • e i) = (o : E))
+    : ∀ i, α i ∈ P.asIdeal := by
   obtain ⟨β, hβ1, hβ2⟩ := exists_beta P
   set x := ∑ i, α i • e i with hx
   have hxE : x = ∑ i, (α i : E) • e i := by simp only [hx, smul_coe]
@@ -62,8 +67,10 @@ theorem coeff_mem_P (α : Fin r → 𝓞 E)
       rw [← this, ← hc]
       simp only [smul_coe]
     intro i
-    have := (Fintype.linearIndependent_iff.mp hind) (fun i => (c i : E) - (s : E) * β * (α i : E))
-      (by simp only [sub_smul, Finset.sum_sub_distrib, h1, sub_self]) i
+    have :=
+      (Fintype.linearIndependent_iff.mp hind)
+        (fun i => (c i : E) - (s : E) * β * (α i : E))
+        (by simp only [sub_smul, Finset.sum_sub_distrib, h1, sub_self]) i
     exact sub_eq_zero.mp this
   intro i
   by_contra hi

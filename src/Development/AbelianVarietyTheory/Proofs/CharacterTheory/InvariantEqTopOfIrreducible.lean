@@ -12,16 +12,27 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.BI
 
-theorem invariant_eq_top_of_irreducible {k : Type} [Field k] {G : Type} [Group G] {V : Type}
-    [AddCommGroup V] [Module k V] (ρ : Representation k G V) (h : ρ.IsIrreducible)
-    (U : Submodule k V) (hU : ∀ g, ∀ v ∈ U, ρ g v ∈ U) (v : V) (hv : v ∈ U) (hv0 : v ≠ 0) :
-    U = ⊤ := by
+theorem invariant_eq_top_of_irreducible
+    {k : Type} [Field k]
+    {G : Type} [Group G]
+    {V : Type} [AddCommGroup V] [Module k V]
+    (ρ : Representation k G V) (h : ρ.IsIrreducible)
+    (U : Submodule k V) (hU : ∀ g, ∀ v ∈ U, ρ g v ∈ U)
+    (v : V) (hv : v ∈ U) (hv0 : v ≠ 0)
+    : U = ⊤ := by
   rcases h.eq_bot_or_eq_top (⟨U, fun g v hv => hU g v hv⟩ : Subrepresentation ρ) with H | H
   · have H' : U = ⊥ := congrArg Subrepresentation.toSubmodule H
     exact absurd (by simpa [H'] using hv) hv0
   · exact congrArg Subrepresentation.toSubmodule H
 
-theorem finrank_eq_one_or_imprimitive : ∀ (k : Type) [Field k] (G : Type) [Group G] [Finite G] (V : Type) [AddCommGroup V] [Module k V] [FiniteDimensional k V] (ρ : Representation k G V) [IsAlgClosed k], AbByP G → ρ.IsIrreducible → Module.finrank k V = 1 ∨ ∃ (T : Subgroup G) (W : Submodule k V), T ≠ ⊤ ∧ (∀ t ∈ T, ∀ w ∈ W, ρ t w ∈ W) ∧ iSupIndep (fun q : G ⧸ T => W.map (ρ q.out)) ∧ ⨆ q : G ⧸ T, W.map (ρ q.out) = ⊤ := by
+theorem finrank_eq_one_or_imprimitive
+    : ∀ (k : Type) [Field k] (G : Type) [Group G] [Finite G] (V : Type) [AddCommGroup V]
+        [Module k V] [FiniteDimensional k V] (ρ : Representation k G V) [IsAlgClosed k],
+      AbByP G → ρ.IsIrreducible
+        → Module.finrank k V = 1
+          ∨ ∃ (T : Subgroup G) (W : Submodule k V),
+            T ≠ ⊤ ∧ (∀ t ∈ T, ∀ w ∈ W, ρ t w ∈ W) ∧ iSupIndep (fun q : G ⧸ T => W.map (ρ q.out))
+              ∧ ⨆ q : G ⧸ T, W.map (ρ q.out) = ⊤ := by
   intro k _ G _ _ V _ _ _ ρ _ hG hirr
   haveI : Nontrivial V := by
     have h1 : (⊥ : Subrepresentation ρ) ≠ ⊤ := bot_ne_top
@@ -30,24 +41,30 @@ theorem finrank_eq_one_or_imprimitive : ∀ (k : Type) [Field k] (G : Type) [Gro
   by_cases hc : ∀ a b : G, ρ a * ρ b = ρ b * ρ a
   · left
     obtain ⟨v, hv0, hv⟩ := GlobalTheory.exists_common_eigenvector_of_commute (fun g : G => ρ g) hc
-    have htop := invariant_eq_top_of_irreducible ρ hirr (Submodule.span k {v}) (by
-      intro g w hw
-      obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hw
-      obtain ⟨m, hm⟩ := hv g
-      rw [map_smul]
-      refine Submodule.smul_mem _ _ ?_
-      have hm' : ρ g v = m • v := hm
-      rw [hm']
-      exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self v))
-      v (Submodule.mem_span_singleton_self v) hv0
+    have htop :=
+      invariant_eq_top_of_irreducible ρ hirr (Submodule.span k {v})
+        (by
+          intro g w hw
+          obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hw
+          obtain ⟨m, hm⟩ := hv g
+          rw [map_smul]
+          refine Submodule.smul_mem _ _ ?_
+          have hm' : ρ g v = m • v := hm
+          rw [hm']
+          exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self v))
+        v (Submodule.mem_span_singleton_self v) hv0
     rw [← finrank_top, ← htop, finrank_span_singleton hv0]
   right
-  have hB : ¬ ∀ B : Subgroup G, B.Normal → (∀ a ∈ B, ∀ b ∈ B, ρ a * ρ b = ρ b * ρ a) →
-      ∀ b ∈ B, ∀ g : G, ρ b * ρ g = ρ g * ρ b := fun H => hc (commute_all G _ ρ hG H)
+  have hB : ¬ ∀ B : Subgroup G,
+      B.Normal → (∀ a ∈ B, ∀ b ∈ B, ρ a * ρ b = ρ b * ρ a)
+        → ∀ b ∈ B, ∀ g : G, ρ b * ρ g = ρ g * ρ b := fun H =>
+    hc (commute_all G _ ρ hG H)
   push Not at hB
   obtain ⟨B, hBn, hBc, b₀, hb₀, g₀, hne⟩ := hB
-  obtain ⟨v, hv0, hv⟩ := GlobalTheory.exists_common_eigenvector_of_commute (fun b : B => ρ b)
-    (fun a b => hBc a a.2 b b.2)
+  obtain ⟨v, hv0, hv⟩ :=
+    GlobalTheory.exists_common_eigenvector_of_commute
+      (fun b : B => ρ b)
+      (fun a b => hBc a a.2 b b.2)
   choose μ hμ using hv
   let c : G →* MulAut B := MulAut.conjNormal
   have hcv : ∀ (g : G) (b : B), ((c g b : B) : G) = g * b * g⁻¹ := fun g b => rfl
@@ -56,24 +73,24 @@ theorem finrank_eq_one_or_imprimitive : ∀ (k : Type) [Field k] (G : Type) [Gro
     intro χ w
     simp only [E, Submodule.mem_iInf, Module.End.mem_eigenspace_iff]
   have hind : iSupIndep E :=
-    (Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo (fun b : B => ρ b)
-      fun i j φ => Module.End.mapsTo_maxGenEigenspace_of_comm (hBc j j.2 i i.2) φ).mono fun _ =>
-        iInf_mono fun i => (Module.End.genEigenspace (ρ i) _).monotone le_top
+    (Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo
+        (fun b : B => ρ b)
+        fun i j φ => Module.End.mapsTo_maxGenEigenspace_of_comm (hBc j j.2 i i.2) φ).mono fun _ =>
+      iInf_mono fun i => (Module.End.genEigenspace (ρ i) _).monotone le_top
   have hmap : ∀ (g : G) (w : V), w ∈ E μ → ρ g w ∈ E (fun b => μ (c g⁻¹ b)) := by
     intro g w hw
     rw [hE] at hw ⊢
     intro b
-    rw [← map_smul, ← hw, hcv, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul,
-      ← map_mul]
+    rw [← map_smul, ← hw, hcv, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul]
     congr 2
     group
-  let T : Subgroup G :=
-    { carrier := {g | ∀ b, μ (c g b) = μ b}
-      one_mem' := fun b => by simp
-      mul_mem' := fun {x y} hx hy b => by
-        rw [map_mul, MulAut.mul_apply, hx, hy]
-      inv_mem' := fun {x} hx b => by
-        rw [← hx, ← MulAut.mul_apply, ← map_mul, mul_inv_cancel, map_one, MulAut.one_apply] }
+  let T : Subgroup G := {
+    carrier := {g | ∀ b, μ (c g b) = μ b}
+    one_mem' := fun b => by simp
+    mul_mem' := fun {x y} hx hy b => by rw [map_mul, MulAut.mul_apply, hx, hy]
+    inv_mem' := fun {x} hx b => by
+      rw [← hx, ← MulAut.mul_apply, ← map_mul, mul_inv_cancel, map_one, MulAut.one_apply]
+  }
   have hT : ∀ g, g ∈ T ↔ ∀ b, μ (c g b) = μ b := fun g => Iff.rfl
   have hstab : ∀ t ∈ T, ∀ w ∈ E μ, ρ t w ∈ E μ := by
     intro t ht w hw
@@ -83,8 +100,10 @@ theorem finrank_eq_one_or_imprimitive : ∀ (k : Type) [Field k] (G : Type) [Gro
   have hvE : v ∈ E μ := (hE _ _).2 hμ
   refine ⟨T, E μ, ?_, hstab, ?_, ?_⟩
   · intro hTop
-    have htop := invariant_eq_top_of_irreducible ρ hirr (E μ)
-      (fun g w hw => hstab g (hTop ▸ Subgroup.mem_top g) w hw) v hvE hv0
+    have htop :=
+      invariant_eq_top_of_irreducible ρ hirr (E μ)
+        (fun g w hw => hstab g (hTop ▸ Subgroup.mem_top g) w hw)
+        v hvE hv0
     have hs : ∀ w, ρ b₀ w = μ ⟨b₀, hb₀⟩ • w := fun w =>
       (hE μ w).1 (htop ▸ Submodule.mem_top) ⟨b₀, hb₀⟩
     apply hne
@@ -107,8 +126,8 @@ theorem finrank_eq_one_or_imprimitive : ∀ (k : Type) [Field k] (G : Type) [Gro
       rw [ht, ← Module.End.mul_apply, ← map_mul, mul_inv_cancel_right]
     refine invariant_eq_top_of_irreducible ρ hirr _ ?_ v (by simpa using hmem 1 v hvE) hv0
     intro g w hw
-    have hle : (⨆ q : G ⧸ T, (E μ).map (ρ q.out)) ≤
-        (⨆ q : G ⧸ T, (E μ).map (ρ q.out)).comap (ρ g) := by
+    have hle
+        : (⨆ q : G ⧸ T, (E μ).map (ρ q.out)) ≤ (⨆ q : G ⧸ T, (E μ).map (ρ q.out)).comap (ρ g) := by
       refine iSup_le fun q => ?_
       rintro _ ⟨u, hu, rfl⟩
       rw [Submodule.mem_comap, ← Module.End.mul_apply, ← map_mul]

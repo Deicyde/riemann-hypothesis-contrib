@@ -57,12 +57,14 @@ private lemma norm_add_inv_mul_mul_norm_pow_succ_le_one {L : Type*} [NormedField
 theorem coeffBound : Formalism.LT.CoeffBound.{u} := by
   unfold Formalism.LT.CoeffBound
   intro K _ _ _ p q σ hset f hf0 hfe n
-  have hset' : Nat.Prime p ∧ (∃ e, 0 < e ∧ q = p ^ e) ∧ ‖(p : K)‖ < 1 ∧ Formalism.G.IsFrobLift p q σ :=
+  have hset'
+      : Nat.Prime p ∧ (∃ e, 0 < e ∧ q = p ^ e) ∧ ‖(p : K)‖ < 1 ∧ Formalism.G.IsFrobLift p q σ :=
     hset
   obtain ⟨hp, ⟨e, he, hqe⟩, hp1, hσ⟩ := hset'
   have hq2 : 2 ≤ q := by
     rw [hqe]
-    calc 2 ≤ p := hp.two_le
+    calc
+      2 ≤ p := hp.two_le
       _ = p ^ 1 := (pow_one p).symm
       _ ≤ p ^ e := Nat.pow_le_pow_right hp.pos (Nat.succ_le_of_lt he)
   have hq0 : q ≠ 0 := by omega
@@ -82,8 +84,11 @@ theorem coeffBound : Formalism.LT.CoeffBound.{u} := by
     have h0 : PowerSeries.coeff 0 f = 0 := by simpa using hf0
     rw [h0, norm_zero, zero_mul]
     exact zero_le_one
-  · have hg : ‖PowerSeries.coeff n (f - (p : K)⁻¹ •
-        (PowerSeries.map σ f).subst ((PowerSeries.X : PowerSeries K) ^ q))‖ ≤ 1 := hfe n
+  · have hg
+        : ‖PowerSeries.coeff n (f - (p : K)⁻¹ •
+            (PowerSeries.map σ f).subst ((PowerSeries.X : PowerSeries K) ^ q))‖
+          ≤ 1 :=
+      hfe n
     rw [coeff_split p q hq0 σ f n]
     by_cases hdiv : q ∣ n
     · have hlt : n / q < n := Nat.div_lt_self hn (by omega)
@@ -238,6 +243,7 @@ theorem powCongr : Formalism.LT.PowCongr.{u, v} := by
 
 end Formalism.LT.CoeffP
 
-theorem Formalism.LT.CoeffBound_valid : Formalism.LT.CoeffBound.{u} := Formalism.LT.CoeffP.coeffBound
+theorem Formalism.LT.CoeffBound_valid : Formalism.LT.CoeffBound.{u} :=
+  Formalism.LT.CoeffP.coeffBound
 
 theorem Formalism.LT.PowCongr_valid : Formalism.LT.PowCongr.{u, v} := Formalism.LT.CoeffP.powCongr

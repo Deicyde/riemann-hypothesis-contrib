@@ -12,8 +12,8 @@ namespace GlobalTheory.CompanionTheory.Ar.PB
 
 open MvPolynomial
 
-theorem killNone_formPoly {σ : Type} [Fintype σ] (n : ℕ) (a : (Fin n → Option σ) → ℝ) :
-    aeval (fun o : Option σ => o.elim (0 : MvPolynomial σ ℝ) X) (formPoly n a)
+theorem killNone_formPoly {σ : Type} [Fintype σ] (n : ℕ) (a : (Fin n → Option σ) → ℝ)
+    : aeval (fun o : Option σ => o.elim (0 : MvPolynomial σ ℝ) X) (formPoly n a)
       = formPoly n fun w => a fun j => some (w j) := by
   classical
   unfold formPoly
@@ -40,30 +40,36 @@ theorem killNone_formPoly {σ : Type} [Fintype σ] (n : ℕ) (a : (Fin n → Opt
   · intro w _
     simp [map_prod]
 
-theorem killNone_toWtS {Ψ : Type} {N : ℕ} (Q : MvPolynomial (Option (Ψ × Fin N)) ℝ) :
-    aeval (fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X) (toWtS Q)
-      = toWt (aeval (fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X) Q) := by
-  have h : (aeval (fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X)).comp toWtS
-      = toWt.comp (aeval (fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X)) := by
+theorem killNone_toWtS {Ψ : Type} {N : ℕ} (Q : MvPolynomial (Option (Ψ × Fin N)) ℝ)
+    : aeval (fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X) (toWtS Q)
+      = toWt
+        (aeval (fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X) Q) := by
+  have h
+      : (aeval (fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X)).comp toWtS
+        = toWt.comp (aeval (fun o : Option (Ψ × Fin N) =>
+          o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X)) := by
     apply MvPolynomial.algHom_ext
     intro o
     cases o with
     | none => simp [toWtS, toWt]
     | some p =>
       simp only [toWtS, toWt, AlgHom.comp_apply, aeval_X, Option.elim_some, aeval_rename]
-      have : ((fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X) ∘ some) = X := rfl
+      have : ((fun o : Option (Ψ × Fin N) => o.elim (0 : MvPolynomial (Ψ × Fin N) ℝ) X) ∘ some)
+          = X :=
+        rfl
       rw [this, aeval_X_left_apply]
   exact DFunLike.congr_fun h Q
 
-theorem eval_toWt_gap {Ψ : Type} {N : ℕ} (Q : MvPolynomial (Ψ × Fin N) ℝ) (lam : Ψ × Fin N → ℝ) :
-    eval lam (toWt Q) = eval (gap lam) Q := by
+theorem eval_toWt_gap {Ψ : Type} {N : ℕ} (Q : MvPolynomial (Ψ × Fin N) ℝ) (lam : Ψ × Fin N → ℝ)
+    : eval lam (toWt Q) = eval (gap lam) Q := by
   induction Q using MvPolynomial.induction_on with
   | C r => simp [toWt]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | mul_X p i hp => rw [map_mul, map_mul, map_mul, hp]; simp [toWt, gap]
 
-theorem eval_toWtS_gapS {Ψ : Type} {N : ℕ} (Q : MvPolynomial (Option (Ψ × Fin N)) ℝ) (lam : Ψ × Fin N → ℝ)
-    (s : ℝ) : eval (fun o => o.elim s lam) (toWtS Q) = eval (gapS lam s) Q := by
+theorem eval_toWtS_gapS
+    {Ψ : Type} {N : ℕ} (Q : MvPolynomial (Option (Ψ × Fin N)) ℝ) (lam : Ψ × Fin N → ℝ) (s : ℝ)
+    : eval (fun o => o.elim s lam) (toWtS Q) = eval (gapS lam s) Q := by
   induction Q using MvPolynomial.induction_on with
   | C r => simp [toWtS]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
@@ -76,13 +82,15 @@ theorem eval_toWtS_gapS {Ψ : Type} {N : ℕ} (Q : MvPolynomial (Option (Ψ × F
       simp only [toWtS, gapS, gap, aeval_X, eval_X, Option.elim_some, eval_rename]
       rfl
 
-theorem poly_s_zero : ∀ (Ψ : Type) [Fintype Ψ] (N n : ℕ),
-    (∀ (a : (Fin n → Option (Ψ × Fin N)) → ℝ),
-      aeval (fun o : Option (Ψ × Fin N) => o.elim 0 X) (toWtS (formPoly n a))
-        = toWt (formPoly n fun w => a fun j => some (w j))) ∧
-    (∀ (Q : MvPolynomial (Ψ × Fin N) ℝ) (lam : Ψ × Fin N → ℝ), eval lam (toWt Q) = eval (gap lam) Q) ∧
-    ∀ (Q : MvPolynomial (Option (Ψ × Fin N)) ℝ) (lam : Ψ × Fin N → ℝ) (s : ℝ),
-      eval (fun o => o.elim s lam) (toWtS Q) = eval (gapS lam s) Q := by
+theorem poly_s_zero
+    : ∀ (Ψ : Type) [Fintype Ψ] (N n : ℕ),
+      (∀ (a : (Fin n → Option (Ψ × Fin N)) → ℝ),
+          aeval (fun o : Option (Ψ × Fin N) => o.elim 0 X) (toWtS (formPoly n a))
+            = toWt (formPoly n fun w => a fun j => some (w j)))
+        ∧ (∀ (Q : MvPolynomial (Ψ × Fin N) ℝ) (lam : Ψ × Fin N → ℝ),
+          eval lam (toWt Q) = eval (gap lam) Q)
+        ∧ ∀ (Q : MvPolynomial (Option (Ψ × Fin N)) ℝ) (lam : Ψ × Fin N → ℝ) (s : ℝ),
+          eval (fun o => o.elim s lam) (toWtS Q) = eval (gapS lam s) Q := by
   intro Ψ _ N n
   refine ⟨fun a => ?_, eval_toWt_gap, eval_toWtS_gapS⟩
   rw [killNone_toWtS, killNone_formPoly]

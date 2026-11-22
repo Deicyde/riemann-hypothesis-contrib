@@ -27,7 +27,9 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Ind
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet
+open NumberField MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+  GlobalTheory.SiegelSet
 open GlobalTheory.Doubling (absE)
 
 noncomputable section
@@ -35,22 +37,28 @@ namespace GlobalTheory.LaurentAut
 
 open scoped ContDiff
 
-theorem hasDerivAt_integral_cpt {𝕜 : Type} [RCLike 𝕜] [NormedSpace 𝕜 ℂ] [ProperSpace 𝕜] {H : Type} [TopologicalSpace H] [T2Space H]
-    [MeasurableSpace H] [OpensMeasurableSpace H] (μ : Measure H) [IsFiniteMeasureOnCompacts μ] {Φ Φ' : 𝕜 → H → ℂ} {x₀ : 𝕜}
-    {C : Set H} (hC : IsCompact C) (hc : ∀ t, Continuous (Φ t)) (hc' : Continuous fun p : 𝕜 × H => Φ' p.1 p.2)
+theorem hasDerivAt_integral_cpt
+    {𝕜 : Type} [RCLike 𝕜] [NormedSpace 𝕜 ℂ] [ProperSpace 𝕜]
+    {H : Type} [TopologicalSpace H] [T2Space H] [MeasurableSpace H] [OpensMeasurableSpace H]
+    (μ : Measure H) [IsFiniteMeasureOnCompacts μ]
+    {Φ Φ' : 𝕜 → H → ℂ} {x₀ : 𝕜} {C : Set H}
+    (hC : IsCompact C) (hc : ∀ t, Continuous (Φ t)) (hc' : Continuous fun p : 𝕜 × H => Φ' p.1 p.2)
     (h0 : ∀ t ∈ Metric.closedBall x₀ 1, ∀ y ∉ C, Φ t y = 0 ∧ Φ' t y = 0)
-    (hd : ∀ t y, HasDerivAt (Φ · y) (Φ' t y) t) :
-    HasDerivAt (fun t => ∫ y, Φ t y ∂μ) (∫ y, Φ' x₀ y ∂μ) x₀ := by
-  obtain ⟨B, hB⟩ := ((isCompact_closedBall x₀ 1).prod hC).exists_bound_of_continuousOn hc'.continuousOn
+    (hd : ∀ t y, HasDerivAt (Φ · y) (Φ' t y) t)
+    : HasDerivAt (fun t => ∫ y, Φ t y ∂μ) (∫ y, Φ' x₀ y ∂μ) x₀ := by
+  obtain ⟨B, hB⟩ :=
+    ((isCompact_closedBall x₀ 1).prod hC).exists_bound_of_continuousOn hc'.continuousOn
   have hx : x₀ ∈ Metric.closedBall x₀ 1 := Metric.mem_closedBall_self zero_le_one
   have hc0 : Continuous (Φ' x₀) := hc'.comp (continuous_const.prodMk continuous_id)
   refine (hasDerivAt_integral_of_dominated_loc_of_deriv_le (bound := C.indicator fun _ => B)
     (Metric.closedBall_mem_nhds x₀ one_pos) ?_
     ((hc x₀).integrable_of_hasCompactSupport (.intro hC fun y hy => (h0 x₀ hx y hy).1))
-    (hc0.integrable_of_hasCompactSupport (.intro hC fun y hy => (h0 x₀ hx y hy).2)).aestronglyMeasurable
+    (hc0.integrable_of_hasCompactSupport (.intro hC fun y hy =>
+      (h0 x₀ hx y hy).2)).aestronglyMeasurable
     (.of_forall fun y t ht => ?_) ?_ (.of_forall fun y t _ => hd t y)).2
   · filter_upwards [Metric.closedBall_mem_nhds x₀ one_pos] with t ht
-    exact ((hc t).integrable_of_hasCompactSupport (.intro hC fun y hy => (h0 t ht y hy).1)).aestronglyMeasurable
+    exact ((hc t).integrable_of_hasCompactSupport
+      (.intro hC fun y hy => (h0 t ht y hy).1)).aestronglyMeasurable
   · by_cases hy : y ∈ C
     · rw [Set.indicator_of_mem hy]; exact hB (t, y) ⟨ht, hy⟩
     · rw [Set.indicator_of_notMem hy, (h0 t ht y hy).2, norm_zero]
@@ -60,31 +68,35 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section Abstract
 
-variable {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H] {N : ℕ}
-  {j : H →* G} {ι : H →* Matrix (Fin N) (Fin N) ℂ}
+variable
+  {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
+  {N : ℕ} {j : H →* G} {ι : H →* Matrix (Fin N) (Fin N) ℂ}
 
-variable [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
+variable
+  [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
   (hι : IsEmbedding ι) (h1 : ∀ y, ‖(ι y).det‖ = 1)
 include hι h1
 
-variable [T2Space H] [SecondCountableTopology H] [MeasurableSpace H] [BorelSpace H] (μ : Measure H) [μ.IsHaarMeasure]
-
+variable
+  [T2Space H] [SecondCountableTopology H] [MeasurableSpace H] [BorelSpace H]
+  (μ : Measure H) [μ.IsHaarMeasure]
 
 end Abstract
 
 section Unitary
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {N : ℕ} {ι : GInf σ J →* Matrix (Fin N) (Fin N) ℂ}
-  (hι : IsEmbedding ι) (h1 : ∀ y, ‖(ι y).det‖ = 1) {f : Matrix (Fin N) (Fin N) ℂ → ℝ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {N : ℕ}
+  {ι : GInf σ J →* Matrix (Fin N) (Fin N) ℂ} (hι : IsEmbedding ι) (h1 : ∀ y, ‖(ι y).det‖ = 1)
+  {f : Matrix (Fin N) (Fin N) ℂ → ℝ}
 include hι h1
 
-variable {x : Matrix (Fin n) (Fin 1) E} {L : Submodule (𝓞 E) (Fin n → E)} {a : GL (Fin n) (AF F ⊗[F] E)}
+variable
+  {x : Matrix (Fin n) (Fin 1) E} {L : Submodule (𝓞 E) (Fin n → E)} {a : GL (Fin n) (AF F ⊗[F] E)}
   {h : GAd σ J → ℝ}
 
 end Unitary
-
-
 
 end GlobalTheory.LaurentAut
 end

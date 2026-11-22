@@ -8,15 +8,20 @@ noncomputable section
 
 namespace PositivityTheory.SiegelWeilFormula.GReal
 
-open HeckeCharacterZeroLocus.SiegelWeilU NumberField MeasureTheory PositivityTheory.PfSWUS.Loc PositivityTheory.Rg.Sw PositivityTheory.SiegelWeilFormula.Gen
+open HeckeCharacterZeroLocus.SiegelWeilU NumberField MeasureTheory PositivityTheory.PfSWUS.Loc
+  PositivityTheory.Rg.Sw PositivityTheory.SiegelWeilFormula.Gen
 open scoped TensorProduct Matrix NNReal
 
 open Topology in
-theorem eq_of_box {X : Type} [TopologicalSpace X] [T2Space X] [MeasurableSpace X] [BorelSpace X] (ν : Measure X)
-    [ν.IsOpenPosMeasure] [IsFiniteMeasureOnCompacts ν] (B : Set X) (hB : IsOpen B) (g1 g2 : X → ℂ)
-    (h1 : ContinuousOn g1 B) (h2 : ContinuousOn g2 B) (t : X) (ht : t ∈ B)
-    (hbox : ∀ U ∈ 𝓝 t, ∃ S, IsCompact S ∧ S ⊆ U ∧ S ⊆ B ∧ S ∈ 𝓝 t ∧ ∫ x in S, g1 x ∂ν = ∫ x in S, g2 x ∂ν) :
-    g1 t = g2 t := by
+theorem eq_of_box
+    {X : Type} [TopologicalSpace X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
+    (ν : Measure X) [ν.IsOpenPosMeasure] [IsFiniteMeasureOnCompacts ν]
+    (B : Set X) (hB : IsOpen B)
+    (g1 g2 : X → ℂ) (h1 : ContinuousOn g1 B) (h2 : ContinuousOn g2 B)
+    (t : X) (ht : t ∈ B)
+    (hbox : ∀ U ∈ 𝓝 t, ∃ S,
+      IsCompact S ∧ S ⊆ U ∧ S ⊆ B ∧ S ∈ 𝓝 t ∧ ∫ x in S, g1 x ∂ν = ∫ x in S, g2 x ∂ν)
+    : g1 t = g2 t := by
   by_contra hne
   set c := g1 t - g2 t with hc
   have hc0 : c ≠ 0 := sub_ne_zero.mpr hne

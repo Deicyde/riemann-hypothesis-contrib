@@ -8,28 +8,34 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsSquareInte
 
 noncomputable section
 
-open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
+open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
 open Formalism.UG (cT)
 open GlobalTheory.Orb (archMat)
 open scoped TensorProduct NNReal ENNReal
 
 namespace GlobalTheory.CompanionTheory.RapidDecay
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) {r : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  {r : ℕ}
 
 structure Good (U : Subgroup (GAd σ J)) (A : ℕ) (φ : GAd σ J → ℂ) : Prop where
   left : ∀ γ ∈ ratPts σ J, ∀ g, φ (γ * g) = φ g
   level : ∀ k ∈ U, k ∈ finPts σ J → ∀ g, φ (g * k) = φ g
   cont : Continuous φ
   smooth : GlobalTheory.UAut.IsSm σ J φ
-  growth : ∀ l : List (ℝ → GAd σ J), (∀ γ ∈ l, IsRealLine σ J γ) →
-    ∃ C : ℝ, ∀ g, ‖l.foldr lineDer φ g‖ ≤ C * (height σ J g : ℝ) ^ A
+  growth
+    : ∀ l : List (ℝ → GAd σ J),
+      (∀ γ ∈ l, IsRealLine σ J γ) → ∃ C : ℝ, ∀ g, ‖l.foldr lineDer φ g‖ ≤ C * (height σ J g : ℝ) ^ A
   cusp : IsCuspidal σ J φ
 
 def CloseInf (u : GAd σ J) (δ : ℝ) : Prop :=
-  u ∈ infPts σ J ∧ ∀ (w : InfinitePlace F) (τ : EmbOver E w) (i j : Fin n),
-    ‖(archMat σ J τ (projArch σ J w u) - 1) i j‖ ≤ δ
+  u ∈ infPts σ J
+    ∧ ∀ (w : InfinitePlace F) (τ : EmbOver E w) (i j : Fin n),
+      ‖(archMat σ J τ (projArch σ J w u) - 1) i j‖ ≤ δ
 
 variable {σ J}
 
@@ -47,7 +53,9 @@ theorem ratio_le_rbar (t : Fin r → ℝ) (s : Fin r) : ratio t s ≤ rbar t :=
   (Finset.le_fold_max _).2 (Or.inr ⟨s, Finset.mem_univ s, le_rfl⟩)
 
 theorem rbar_eq (t : Fin r → ℝ) : rbar t = 1 ∨ ∃ s, rbar t = ratio t s := by
-  have key : ∀ S : Finset (Fin r), S.fold max 1 (ratio t) = 1 ∨ ∃ s, S.fold max 1 (ratio t) = ratio t s := fun S => by
+  have key
+      : ∀ S : Finset (Fin r),
+        S.fold max 1 (ratio t) = 1 ∨ ∃ s, S.fold max 1 (ratio t) = ratio t s := fun S => by
     induction S using Finset.induction_on with
     | empty => exact Or.inl (by simp)
     | insert a S ha ih =>

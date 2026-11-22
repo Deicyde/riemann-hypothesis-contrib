@@ -10,36 +10,43 @@ noncomputable section
 
 namespace PI.LocMassTypW
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix
 open scoped TensorProduct
 
 section FieldW
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def fA {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v) {n m : ℕ}
-    (Z : Fin m → Fin n → Fv F v ⊗[F] E) : Matrix (Fin n) (Fin m) (Fv F v) :=
+def fA
+    {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v)
+    {n m : ℕ} (Z : Fin m → Fin n → Fv F v ⊗[F] E)
+    : Matrix (Fin n) (Fin m) (Fv F v) :=
   Matrix.of fun i a => D.π₁ (Z a i)
 
-def fB {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v) {n m : ℕ}
-    (Z : Fin m → Fin n → Fv F v ⊗[F] E) : Matrix (Fin n) (Fin m) (Fv F v) :=
+def fB
+    {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v)
+    {n m : ℕ} (Z : Fin m → Fin n → Fv F v ⊗[F] E)
+    : Matrix (Fin n) (Fin m) (Fv F v) :=
   Matrix.of fun i a => D.π₂ (Z a i)
 
-theorem witt_genF {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
-    {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v) (Q : GL (Fin n) (Fv F v ⊗[F] E))
+theorem witt_genF
+    {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {v : HeightOneSpectrum (𝓞 F)}
+    (D : SD σ v) (Q : GL (Fin n) (Fv F v ⊗[F] E))
     (hQh : ∀ x y : Fin n → Fv F v ⊗[F] E,
       hR (Fv F v) σ J ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ x)
-        ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ y) = ∑ i, sigR (Fv F v) σ (x i) * y i)
+          ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ y)
+        = ∑ i, sigR (Fv F v) σ (x i) * y i)
     {m : ℕ} (Z0 Z : Fin m → Fin n → Fv F v ⊗[F] E)
     (hA0 : ∃ L : Matrix (Fin m) (Fin n) (Fv F v), L * fA D Z0 = 1)
     (hB0 : ∃ L : Matrix (Fin m) (Fin n) (Fv F v), L * fB D Z0 = 1)
     (hA1 : ∃ L : Matrix (Fin m) (Fin n) (Fv F v), L * fA D Z = 1)
     (hB1 : ∃ L : Matrix (Fin m) (Fin n) (Fv F v), L * fB D Z = 1)
-    (hstd : ∀ a b, stdH σ (Z a) (Z b) = stdH σ (Z0 a) (Z0 b)) :
-    ∃ k : HA (Fv F v) σ J, ∀ a,
-      (HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ
-          ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ Z0 a) =
-        (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ Z a := by
+    (hstd : ∀ a b, stdH σ (Z a) (Z b) = stdH σ (Z0 a) (Z0 b))
+    : ∃ k : HA (Fv F v) σ J, ∀ a,
+      (HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
+          *ᵥ ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ Z0 a)
+        = (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ Z a := by
   classical
   set Qm : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E) := (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) with hQm
   set Qi : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E) :=
@@ -54,7 +61,8 @@ theorem witt_genF {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
     simp only [dotProduct] at this
     exact this.symm
   obtain ⟨k1, hk1u, hk1A, hk1B⟩ :=
-    transitiveOverLocalRings (Fv F v) n m (fA D Z0) (fA D Z) (fB D Z0) (fB D Z) hA0 hA1 hB0 hB1 hgram
+    transitiveOverLocalRings (Fv F v) n m (fA D Z0) (fA D Z) (fB D Z0) (fB D Z) hA0 hA1 hB0 hB1
+      hgram
   have hdet : IsUnit k1.det := (Matrix.isUnit_iff_isUnit_det k1).1 hk1u
   have hki : k1 * k1⁻¹ = 1 := Matrix.mul_nonsing_inv k1 hdet
   have hik : k1⁻¹ * k1 = 1 := Matrix.nonsing_inv_mul k1 hdet
@@ -63,8 +71,7 @@ theorem witt_genF {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
   have e3 : (k1⁻¹)ᵀ * k1ᵀ = 1 := by rw [← transpose_mul, hki, transpose_one]
   set kstd := D.kS k1 (k1⁻¹)ᵀ with hkstd
   set kstd' := D.kS k1⁻¹ k1ᵀ with hkstd'
-  have hkk : kstd * kstd' = 1 := by
-    rw [hkstd, hkstd', SD.kS_mul, hki, e3, SD.kS_one]
+  have hkk : kstd * kstd' = 1 := by rw [hkstd, hkstd', SD.kS_mul, hki, e3, SD.kS_one]
   have hk'k : kstd' * kstd = 1 := mul_eq_one_comm.mp hkk
   have hkU : ∀ x y, stdH σ (kstd *ᵥ x) (kstd *ᵥ y) = stdH σ x y := fun x y =>
     D.stdH_kS _ _ e1 e2 x y
@@ -78,8 +85,7 @@ theorem witt_genF {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
       simp only [mulVec, dotProduct]
       exact this
     · intro i
-      have hB : (k1⁻¹)ᵀ * fB D Z0 = fB D Z := by
-        rw [← hk1B, ← Matrix.mul_assoc, e3, Matrix.one_mul]
+      have hB : (k1⁻¹)ᵀ * fB D Z0 = fB D Z := by rw [← hk1B, ← Matrix.mul_assoc, e3, Matrix.one_mul]
       rw [hkstd, SD.snd_proj_split_matrix_mulVec]
       have := congrArg (fun M => M i a) hB
       simp only [Matrix.mul_apply, fB, Matrix.of_apply] at this
@@ -89,8 +95,9 @@ theorem witt_genF {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
   set kMi := Qm * kstd' * Qi with hkMi
   have hkMM : kM * kMi = 1 := by
     rw [hkM, hkMi]
-    calc Qm * kstd * Qi * (Qm * kstd' * Qi) = Qm * (kstd * (Qi * Qm) * kstd') * Qi := by
-          simp only [Matrix.mul_assoc]
+    calc
+      Qm * kstd * Qi * (Qm * kstd' * Qi)
+        = Qm * (kstd * (Qi * Qm) * kstd') * Qi := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hQiQ, Matrix.mul_one, hkk, Matrix.mul_one, hQQi]
   have hkMM' : kMi * kM = 1 := mul_eq_one_comm.mp hkMM
   let kG : GL (Fin n) (Fv F v ⊗[F] E) := ⟨kM, kMi, hkMM, hkMM'⟩
@@ -109,11 +116,11 @@ theorem witt_genF {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
   show kM *ᵥ (Qm *ᵥ Z0 a) = Qm *ᵥ Z a
   rw [hkx, mulVec_mulVec (Z0 a) Qi Qm, hQiQ, one_mulVec, hkZ a]
 
-theorem leftInv_mul_uMat {v : HeightOneSpectrum (𝓞 F)} {n r : ℕ}
-    (π : Fv F v ⊗[F] E →+* Fv F v) (x : UIdx r → Fv F v ⊗[F] E)
-    (A : Matrix (Fin n) (Fin (r + 1)) (Fv F v))
-    (hA : ∃ L : Matrix (Fin (r + 1)) (Fin n) (Fv F v), L * A = 1) :
-    ∃ L : Matrix (Fin (r + 1)) (Fin n) (Fv F v), L * (A * (uMat v x).map π) = 1 := by
+theorem leftInv_mul_uMat
+    {v : HeightOneSpectrum (𝓞 F)} {n r : ℕ} (π : Fv F v ⊗[F] E →+* Fv F v)
+    (x : UIdx r → Fv F v ⊗[F] E) (A : Matrix (Fin n) (Fin (r + 1)) (Fv F v))
+    (hA : ∃ L : Matrix (Fin (r + 1)) (Fin n) (Fv F v), L * A = 1)
+    : ∃ L : Matrix (Fin (r + 1)) (Fin n) (Fv F v), L * (A * (uMat v x).map π) = 1 := by
   obtain ⟨L, hL⟩ := hA
   set U := (uMat v x).map π with hU
   have hdet : U.det = 1 := by
@@ -130,24 +137,24 @@ theorem leftInv_mul_uMat {v : HeightOneSpectrum (𝓞 F)} {n r : ℕ}
 end FieldW
 
 def GramU : Prop :=
-  ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-    (v : HeightOneSpectrum (𝓞 F)) {r : ℕ} (P : Frame E n r) (T : F),
-    StdHyp σ J ψ → P.IsStd σ J T → ∀ (x : UIdx r → Fv F v ⊗[F] E) (a b : Fin (r + 1)),
-      hR (Fv F v) σ J (∑ c, uMat v x c a • ratV (F := F) (Fv F v) (F0 P c))
-        (∑ c, uMat v x c b • ratV (F := F) (Fv F v) (F0 P c)) =
-      hR (Fv F v) σ J (ratV (F := F) (Fv F v) (F0 P a)) (ratV (F := F) (Fv F v) (F0 P b))
+  ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
+      {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
+      {r : ℕ} (P : Frame E n r) (T : F),
+    StdHyp σ J ψ → P.IsStd σ J T
+      → ∀ (x : UIdx r → Fv F v ⊗[F] E) (a b : Fin (r + 1)),
+        hR (Fv F v) σ J (∑ c, uMat v x c a • ratV (F := F) (Fv F v) (F0 P c))
+            (∑ c, uMat v x c b • ratV (F := F) (Fv F v) (F0 P c))
+          = hR (Fv F v) σ J (ratV (F := F) (Fv F v) (F0 P a)) (ratV (F := F) (Fv F v) (F0 P b))
 
 def UnipSplitF : Prop :=
-  ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
-    (v : HeightOneSpectrum (𝓞 F)) {r : ℕ} (P : Frame E n r) (Λ : Set (Fin n → E)) (T : F),
-    StdHyp σ J ψ → P.IsStd σ J T → IsSDLoc σ J v Λ → UnramAt (E := E) v →
-    etaV (E := E) v = 1 → LocMassOrdW.IsLatLoc v Λ →
-    IsPrim v Λ (locF v (ratTup (F := F) (Fv F v) (F0 P))) →
-    ∀ x : UIdx r → Fv F v ⊗[F] E, ∃ g : HA (Fv F v) σ J, ∀ b,
-      lin (Fv F v) σ J g (ratV (F := F) (Fv F v) (F0 P b)) =
-        ∑ a, uMat v x a b • ratV (F := F) (Fv F v) (F0 P a)
+  ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
+      {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
+      {r : ℕ} (P : Frame E n r) (Λ : Set (Fin n → E)) (T : F),
+    StdHyp σ J ψ → P.IsStd σ J T → IsSDLoc σ J v Λ → UnramAt (E := E) v → etaV (E := E) v = 1
+      → LocMassOrdW.IsLatLoc v Λ → IsPrim v Λ (locF v (ratTup (F := F) (Fv F v) (F0 P)))
+      → ∀ x : UIdx r → Fv F v ⊗[F] E, ∃ g : HA (Fv F v) σ J, ∀ b,
+        lin (Fv F v) σ J g (ratV (F := F) (Fv F v) (F0 P b))
+          = ∑ a, uMat v x a b • ratV (F := F) (Fv F v) (F0 P a)
 
 theorem unipSplitF_of (hG : GramU) (hS : SplitR) (hLs : LatStd) : UnipSplitF := by
   classical
@@ -168,16 +175,19 @@ theorem unipSplitF_of (hG : GramU) (hS : SplitR) (hLs : LatStd) : UnipSplitF := 
       rwa [mulVec_mulVec, hQiQ, one_mulVec]
     · intro hy
       exact ⟨Qi *ᵥ y, hy, by rw [mulVec_mulVec, hQQi, one_mulVec]⟩
-  have linQ : ∀ {m : ℕ} (c : Fin m → Fv F v ⊗[F] E) (W : Fin m → Fin n → Fv F v ⊗[F] E),
-      Qi *ᵥ (∑ a, c a • W a) = ∑ a, c a • (Qi *ᵥ W a) := by
+  have linQ
+      : ∀ {m : ℕ} (c : Fin m → Fv F v ⊗[F] E) (W : Fin m → Fin n → Fv F v ⊗[F] E),
+        Qi *ᵥ (∑ a, c a • W a) = ∑ a, c a • (Qi *ᵥ W a) := by
     intro m c W
     show Matrix.mulVecLin Qi (∑ a, c a • W a) = _
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp only [map_smul, Matrix.mulVecLin_apply]
-  have primT : ∀ W : Fin (r + 1) → Fin n → Fv F v ⊗[F] E, IsPrim v Λ W →
-      ∀ c : Fin (r + 1) → Fv F v ⊗[F] E, IntV v (∑ a, c a • (Qi *ᵥ W a)) →
-        ∀ a, c a ∈ OEv (E := E) v := by
+  have primT
+      : ∀ W : Fin (r + 1) → Fin n → Fv F v ⊗[F] E,
+        IsPrim v Λ W
+          → ∀ c : Fin (r + 1) → Fv F v ⊗[F] E,
+            IntV v (∑ a, c a • (Qi *ᵥ W a)) → ∀ a, c a ∈ OEv (E := E) v := by
     intro W hW c hc
     apply hW.2 c
     rw [memΛ, linQ]
@@ -216,11 +226,12 @@ theorem unipSplitF_of (hG : GramU) (hS : SplitR) (hLs : LatStd) : UnipSplitF := 
     rw [Matrix.mul_diagonal]
     show D.π₂ (Zl a i) = D.π₂ (Z0 a i) * alp v r a
     rw [hZlZ0, map_mul, (D.hsc _).2, mul_comm]
-  have lift : ∀ (M0 : Matrix (Fin n) (Fin (r + 1)) (Fv F v))
-      (Mo : Matrix (Fin n) (Fin (r + 1)) (v.adicCompletionIntegers F))
-      (Lo : Matrix (Fin (r + 1)) (Fin n) (v.adicCompletionIntegers F)),
-      Lo * Mo = 1 → Mo.map f = M0 * Matrix.diagonal (alp v r) →
-      ∃ L : Matrix (Fin (r + 1)) (Fin n) (Fv F v), L * M0 = 1 := by
+  have lift
+      : ∀ (M0 : Matrix (Fin n) (Fin (r + 1)) (Fv F v))
+          (Mo : Matrix (Fin n) (Fin (r + 1)) (v.adicCompletionIntegers F))
+          (Lo : Matrix (Fin (r + 1)) (Fin n) (v.adicCompletionIntegers F)),
+        Lo * Mo = 1 → Mo.map f = M0 * Matrix.diagonal (alp v r)
+          → ∃ L : Matrix (Fin (r + 1)) (Fin n) (Fv F v), L * M0 = 1 := by
     intro M0 Mo Lo hLo hMo
     have h0 : (Lo.map f * M0) * Matrix.diagonal (alp v r) = 1 := by
       rw [Matrix.mul_assoc, ← hMo, ← Matrix.map_mul, hLo, Matrix.map_one f (map_zero f) (map_one f)]
@@ -243,7 +254,8 @@ theorem unipSplitF_of (hG : GramU) (hS : SplitR) (hLs : LatStd) : UnipSplitF := 
     rw [hAZ]; exact leftInv_mul_uMat D.π₁ x _ hA0
   have hB1 : ∃ L : Matrix (Fin (r + 1)) (Fin n) (Fv F v), L * fB D Z = 1 := by
     rw [hBZ]; exact leftInv_mul_uMat D.π₂ x _ hB0
-  have hstdR : ∀ y y' : Fin n → Fv F v ⊗[F] E, stdH σ (Qi *ᵥ y) (Qi *ᵥ y') = hR (Fv F v) σ J y y' := by
+  have hstdR
+      : ∀ y y' : Fin n → Fv F v ⊗[F] E, stdH σ (Qi *ᵥ y) (Qi *ᵥ y') = hR (Fv F v) σ J y y' := by
     intro y y'
     rw [stdH, ← hQh, mulVec_mulVec, mulVec_mulVec, hQQi, one_mulVec, one_mulVec]
   have hstd : ∀ a b, stdH σ (Z a) (Z b) = stdH σ (Z0 a) (Z0 b) := by
@@ -255,8 +267,9 @@ theorem unipSplitF_of (hG : GramU) (hS : SplitR) (hLs : LatStd) : UnipSplitF := 
   obtain ⟨k, hk⟩ := witt_genF (J := J) D Q hQh Z0 Z hA0 hB0 hA1 hB1 hstd
   refine ⟨k, fun b => ?_⟩
   have := hk b
-  change (HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ (Qm *ᵥ (Qi *ᵥ Y0 b)) =
-    Qm *ᵥ (Qi *ᵥ Yu b) at this
+  change (HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ (Qm *ᵥ (Qi *ᵥ Y0 b))
+      = Qm *ᵥ (Qi *ᵥ Yu b)
+    at this
   rw [mulVec_mulVec (Y0 b) Qm Qi, mulVec_mulVec (Yu b) Qm Qi, hQQi, one_mulVec, one_mulVec] at this
   show (HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ Y0 b = Yu b
   exact this

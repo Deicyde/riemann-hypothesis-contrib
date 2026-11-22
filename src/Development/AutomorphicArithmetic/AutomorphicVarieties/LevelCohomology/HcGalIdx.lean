@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module UpperTheory.V UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module
+  UpperTheory.V UpperTheory.V.X
 
 namespace UpperTheory.V.X.GaloisIndexPlaces
 
@@ -22,8 +23,9 @@ private noncomputable def vQ (l : ℕ) (hl : l.Prime) : HeightOneSpectrum (𝓞 
 private theorem mem_vQ (l : ℕ) (hl : l.Prime) : ((l : ℕ) : 𝓞 ℚ) ∈ (vQ l hl).asIdeal :=
   Ideal.mem_span_singleton_self _
 
-private theorem eq_vQ (l : ℕ) (hl : l.Prime) (v : HeightOneSpectrum (𝓞 ℚ)) (h : ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal) :
-    vQ l hl = v := by
+private theorem eq_vQ
+    (l : ℕ) (hl : l.Prime) (v : HeightOneSpectrum (𝓞 ℚ)) (h : ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal)
+    : vQ l hl = v := by
   apply HeightOneSpectrum.ext
   have hle : (vQ l hl).asIdeal ≤ v.asIdeal := by
     show Ideal.span {((l : ℕ) : 𝓞 ℚ)} ≤ v.asIdeal
@@ -38,8 +40,11 @@ private theorem vQ_inj {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (h : vQ p hp = 
   simp only [map_natCast] at h3
   exact ((Nat.prime_dvd_prime_iff_eq hq hp).1 (Int.natCast_dvd_natCast.1 h3)).symm
 
-private theorem isPlaceOver_vQ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) (hl : l.Prime)
-    (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1) : IsPlaceOver (F := ℚ) A (vQ l hl) := by
+private theorem isPlaceOver_vQ
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) (hl : l.Prime)
+    (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1)
+    : IsPlaceOver (F := ℚ) A (vQ l hl) := by
   haveI : Fact l.Prime := ⟨hl⟩
   obtain ⟨hne, htop, hab, -⟩ := UpperTheory.V.Base.places ℚ Ω l A
   have hAT : A ≠ ⊤ := by
@@ -53,8 +58,15 @@ private theorem isPlaceOver_vQ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
 end UpperTheory.V.X.GaloisIndexPlaces
 
 open UpperTheory.V.X.GaloisIndexPlaces in
-theorem UpperTheory.V.X.galIdx :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) {SP : Set (HeightOneSpectrum (𝓞 ℚ))} {T Q : Finset ℕ} (v0 : T) {pl : ℕ → ValuationSubring Ω} {K : Subgroup (G ℚ Ω)}, GalData l SP T Q pl K → ∃ (S : Finset (HeightOneSpectrum (𝓞 ℚ))) (e : T ⊕ Q ≃ S), SP = S ∧ (∀ v : HeightOneSpectrum (𝓞 ℚ), ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal → v ∈ S) ∧ (∀ v : T, IsPlaceOver (pl v) (e (.inl v)).1) ∧ ∀ q : Q, IsPlaceOver (pl q) (e (.inr q)).1 := by
+theorem UpperTheory.V.X.galIdx
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ)
+        {SP : Set (HeightOneSpectrum (𝓞 ℚ))} {T Q : Finset ℕ} (v0 : T) {pl : ℕ → ValuationSubring Ω}
+        {K : Subgroup (G ℚ Ω)},
+      GalData l SP T Q pl K
+        → ∃ (S : Finset (HeightOneSpectrum (𝓞 ℚ))) (e : T ⊕ Q ≃ S),
+          SP = S ∧ (∀ v : HeightOneSpectrum (𝓞 ℚ), ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal → v ∈ S)
+            ∧ (∀ v : T, IsPlaceOver (pl v) (e (.inl v)).1)
+            ∧ ∀ q : Q, IsPlaceOver (pl q) (e (.inr q)).1 := by
   classical
   intro Ω _ _ _ l SP T Q v0 pl K hD
   have hex : ∃ f : ℕ → HeightOneSpectrum (𝓞 ℚ), ∀ (p : ℕ) (hp : Nat.Prime p), f p = vQ p hp :=
@@ -68,7 +80,8 @@ theorem UpperTheory.V.X.galIdx :
     intro p q hp hq he
     rw [hf p (hpr p hp), hf q (hpr q hq)] at he
     exact vQ_inj _ _ he
-  let g : T ⊕ Q → (T ∪ Q).image f := fun x => match x with
+  let g : T ⊕ Q → (T ∪ Q).image f := fun x =>
+    match x with
     | .inl p => ⟨f p, hmemS p (Or.inl p.2)⟩
     | .inr q => ⟨f q, hmemS q (Or.inr q.2)⟩
   have hg : Function.Bijective g := by

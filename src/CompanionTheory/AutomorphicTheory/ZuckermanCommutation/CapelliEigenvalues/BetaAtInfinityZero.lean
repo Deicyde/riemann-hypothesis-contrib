@@ -7,16 +7,19 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularisedP
 
 @[expose] public section
 
-open Matrix PI.UpqRep Formalism.FourierDecayAlt MeasureTheory CompanionTheory.LimBd.Main CompanionTheory.LimBd.SchurHpk
+open Matrix PI.UpqRep Formalism.FourierDecayAlt MeasureTheory CompanionTheory.LimBd.Main
+  CompanionTheory.LimBd.SchurHpk
 open scoped InnerProductSpace
 
 noncomputable section
 
 namespace CompanionTheory.CapEig
 
-theorem kfin_iff (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (P : B.Mat k r) (H : Type) [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] (σ : B.Mat k r → (H →L[ℂ] H)) (v : H) (hP : IsCayleyU k r ε P) :
-    IsKFinHpk (k := k) (r := r) σ v ↔ IsKFin ε (fun g => σ (P⁻¹ * g * P)) v := by
+theorem kfin_iff
+    (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (P : B.Mat k r)
+    (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : B.Mat k r → (H →L[ℂ] H)) (v : H) (hP : IsCayleyU k r ε P)
+    : IsKFinHpk (k := k) (r := r) σ v ↔ IsKFin ε (fun g => σ (P⁻¹ * g * P)) v := by
   have hinv : P⁻¹ = star P := Matrix.inv_eq_left_inv (Unitary.star_mul_self_of_mem hP.2)
   have hPi : P⁻¹ ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ := hinv ▸ Unitary.star_mem hP.2
   constructor
@@ -35,16 +38,26 @@ theorem kfin_iff (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (P : B.Mat k r)
     have hK : P * x * P⁻¹ ∈ Kset ε := by
       refine ⟨hu, ?_⟩
       generalize P * x * P⁻¹ = g at hJ h1
-      calc g * Jm ε = g * (gᴴ * Jm ε * g) := by rw [hJ]
+      calc
+        g * Jm ε
+          = g * (gᴴ * Jm ε * g) := by rw [hJ]
         _ = (g * gᴴ) * Jm ε * g := by simp only [Matrix.mul_assoc]
         _ = Jm ε * g := by rw [h1, Matrix.one_mul]
     have := hst _ hK y hy
     simpa only [back_forth hP.1] using this
 
-theorem eq_of_capelliPolynomial_eq {n : ℕ} {μ μ' : Fin n → ℝ} (hμ : StrictAnti μ) (hμ' : StrictAnti μ')
-    (h : ∀ Y : ℂ, Formalism.QuantumDeterminants.capP (fun s => (μ s : ℂ)) Y = Formalism.QuantumDeterminants.capP (fun s => (μ' s : ℂ)) Y) : μ = μ' := by
-  have key : ∀ {a b : Fin n → ℝ}, (∀ Y : ℂ, Formalism.QuantumDeterminants.capP (fun s => (a s : ℂ)) Y =
-      Formalism.QuantumDeterminants.capP (fun s => (b s : ℂ)) Y) → Set.range a ⊆ Set.range b := by
+theorem eq_of_capelliPolynomial_eq
+    {n : ℕ} {μ μ' : Fin n → ℝ} (hμ : StrictAnti μ) (hμ' : StrictAnti μ')
+    (h : ∀ Y : ℂ,
+      Formalism.QuantumDeterminants.capP (fun s => (μ s : ℂ)) Y
+        = Formalism.QuantumDeterminants.capP (fun s => (μ' s : ℂ)) Y)
+    : μ = μ' := by
+  have key
+      : ∀ {a b : Fin n → ℝ},
+        (∀ Y : ℂ,
+            Formalism.QuantumDeterminants.capP (fun s => (a s : ℂ)) Y
+              = Formalism.QuantumDeterminants.capP (fun s => (b s : ℂ)) Y)
+          → Set.range a ⊆ Set.range b := by
     rintro a b hab _ ⟨s, rfl⟩
     have h0 : Formalism.QuantumDeterminants.capP (fun s => (a s : ℂ)) (-(a s : ℂ)) = 0 :=
       Finset.prod_eq_zero (Finset.mem_univ s) (by simp)
@@ -67,10 +80,22 @@ theorem capelli_inequivalence : Inequiv := by
     refine ⟨S₁.map (U.toLinearEquiv : H →ₗ[ℂ] H'), inferInstance, Submodule.mem_map_of_mem h2, ?_⟩
     rintro g hg _ ⟨x, hx, rfl⟩
     exact ⟨σ g x, h3 g hg x hx, hU g hg.1 x⟩
-  have c1 : IsCoef k r ε μ (fun g => ⟪v, σ g v⟫_ℂ) := ⟨H, _, _, inferInstance, σ, v, v, hμ, hσ, hv, hv, fun _ _ => rfl⟩
-  have c2 : IsCoef k r ε' μ' (fun g => ⟪v, σ g v⟫_ℂ) :=
-    ⟨H', _, _, inferInstance, σ', U v, U v, hμ', hσ', hv', hv', fun g hg => by
-      rw [← hU g hg v, U.inner_map_map]⟩
+  have c1 : IsCoef k r ε μ (fun g => ⟪v, σ g v⟫_ℂ) :=
+    ⟨H, _, _, inferInstance, σ, v, v, hμ, hσ, hv, hv, fun _ _ => rfl⟩
+  have c2 : IsCoef k r ε' μ' (fun g => ⟪v, σ g v⟫_ℂ) := ⟨
+    H',
+    _,
+    _,
+    inferInstance,
+    σ',
+    U v,
+    U v,
+    hμ',
+    hσ',
+    hv',
+    hv',
+    fun g hg => by rw [← hU g hg v, U.inner_map_map]
+  ⟩
   have h1G : (1 : B.Mat k r) ∈ B.GV k r := by
     show (1 : B.Mat k r)ᴴ * _ * 1 = _
     simp
@@ -80,7 +105,9 @@ theorem capelli_inequivalence : Inequiv := by
   have e2 := hE k r ε' μ' _ ℂ ℂ 1 c2 Y 1 h1G
   rw [e1] at e2
   have e3 := congrArg (fun T : ℂ →L[ℂ] ℂ => T 1) e2
-  simp only [hσ1, ContinuousLinearMap.smul_apply, ContinuousLinearMap.one_apply, smul_eq_mul, mul_one] at e3
+  simp only [hσ1, ContinuousLinearMap.smul_apply, ContinuousLinearMap.one_apply, smul_eq_mul,
+      mul_one]
+    at e3
   exact mul_right_cancel₀ (inner_self_ne_zero.2 hv0) e3
 
 end CompanionTheory.CapEig

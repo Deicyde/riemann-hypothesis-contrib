@@ -7,16 +7,19 @@ public import Formalism.PadicSubsetSums.StableGradedCounts.PadicDigits
 
 namespace Formalism.IrreducibleCountingLemmas.WindowSums
 
-private theorem sum_le_of_unique {ι : Type} (s : Finset ι) (g : ι → ℕ) (r : ℕ)
-    (hle : ∀ i ∈ s, g i ≤ r) (huniq : ∀ i ∈ s, ∀ j ∈ s, g i ≠ 0 → g j ≠ 0 → i = j) :
-    ∑ i ∈ s, g i ≤ r := by
+private theorem sum_le_of_unique
+    {ι : Type} (s : Finset ι) (g : ι → ℕ)
+    (r : ℕ) (hle : ∀ i ∈ s, g i ≤ r)
+    (huniq : ∀ i ∈ s, ∀ j ∈ s, g i ≠ 0 → g j ≠ 0 → i = j)
+    : ∑ i ∈ s, g i ≤ r := by
   classical
   by_cases h : ∃ i ∈ s, g i ≠ 0
   · obtain ⟨i, hi, hgi⟩ := h
     rw [← Finset.add_sum_erase s g hi]
-    have h0 : ∑ j ∈ s.erase i, g j = 0 := Finset.sum_eq_zero fun j hj => by
-      by_contra hne
-      exact (Finset.ne_of_mem_erase hj) (huniq j (Finset.mem_of_mem_erase hj) i hi hne hgi)
+    have h0 : ∑ j ∈ s.erase i, g j = 0 :=
+      Finset.sum_eq_zero fun j hj => by
+        by_contra hne
+        exact (Finset.ne_of_mem_erase hj) (huniq j (Finset.mem_of_mem_erase hj) i hi hne hgi)
     rw [h0, add_zero]
     exact hle i hi
   · push Not at h
@@ -34,12 +37,16 @@ theorem sumPadicValDifferencesLe : LagrangeBoundT := by
       have h3 := dvd_sub h1 h
       rwa [sub_sub_cancel] at h3
     exact hlZ.not_isUnit (isUnit_of_dvd_one h2)
-  have hsep : ∀ x m1 m2 : ℤ, |m1 - m2| < l → (l : ℤ) ∣ x + m1 * ((l : ℤ) ^ a - 1) →
-      (l : ℤ) ∣ x + m2 * ((l : ℤ) ^ a - 1) → m1 = m2 := by
+  have hsep
+      : ∀ x m1 m2 : ℤ,
+        |m1 - m2| < l → (l : ℤ) ∣ x + m1 * ((l : ℤ) ^ a - 1) → (l : ℤ) ∣ x + m2 * ((l : ℤ) ^ a - 1)
+          → m1 = m2 := by
     intro x m1 m2 hm h1 h2
     have h3 : (l : ℤ) ∣ (m1 - m2) * ((l : ℤ) ^ a - 1) := by
-      have e : (m1 - m2) * ((l : ℤ) ^ a - 1) =
-          (x + m1 * ((l : ℤ) ^ a - 1)) - (x + m2 * ((l : ℤ) ^ a - 1)) := by ring
+      have e
+          : (m1 - m2) * ((l : ℤ) ^ a - 1)
+            = (x + m1 * ((l : ℤ) ^ a - 1)) - (x + m2 * ((l : ℤ) ^ a - 1)) := by
+        ring
       rw [e]
       exact dvd_sub h1 h2
     rcases hlZ.dvd_or_dvd h3 with h | h
@@ -55,10 +62,12 @@ theorem sumPadicValDifferencesLe : LagrangeBoundT := by
     rw [Nat.cast_sub (Nat.one_le_pow _ _ hl.pos)]
     push_cast
     ring
-  have hper : ∀ c' ∈ Cc, (∑ n' ∈ Finset.range (2 * A'),
-      if c' = c ∧ n' = n then 0
-      else padicValInt l (((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1)))) ≤
-      if c' = c then 0 else r' := by
+  have hper
+      : ∀ c' ∈ Cc,
+        (∑ n' ∈ Finset.range (2 * A'),
+          if c' = c ∧ n' = n then 0
+          else padicValInt l (((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1))))
+          ≤ if c' = c then 0 else r' := by
     intro c' hc'
     by_cases hcc : c' = c
     · subst hcc
@@ -71,10 +80,13 @@ theorem sumPadicValDifferencesLe : LagrangeBoundT := by
       · rfl
       · by_contra hne
         have h1 := hdv _ hne
-        have hz : ((c' : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1)) =
-            0 + ((n : ℤ) - n') * ((l : ℤ) ^ a - 1) := by ring
+        have hz
+            : ((c' : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1))
+              = 0 + ((n : ℤ) - n') * ((l : ℤ) ^ a - 1) := by
+          ring
         rw [hz] at h1
-        have h2 := hsep 0 ((n : ℤ) - n') 0 (by rw [sub_zero, abs_lt]; constructor <;> omega) h1 (by simp)
+        have h2 :=
+          hsep 0 ((n : ℤ) - n') 0 (by rw [sub_zero, abs_lt]; constructor <;> omega) h1 (by simp)
         exact h ⟨rfl, by omega⟩
     · rw [if_neg hcc]
       obtain ⟨ρ, hρ1, hρr, hρd⟩ := hdiv c hc c' hc' (Ne.symm hcc)
@@ -87,25 +99,31 @@ theorem sumPadicValDifferencesLe : LagrangeBoundT := by
         · have hdN : (l ^ a - 1) ∣ (c - c') * (l ^ ρ - 1) := by
             rw [← Int.natCast_dvd_natCast, Nat.cast_mul, hpow, hpow, Nat.cast_sub hlt'.le]
             exact hρd
-          have hD := padicValIntShiftLe l a (c - c') ρ ((n : ℤ) - n') hl ha (by omega)
-            (lt_of_le_of_lt (Nat.sub_le _ _) (hlt c hc)) hρ1 hdN
-            (by rw [abs_lt]; constructor <;> omega)
-          have hz : ((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1)) =
-              ((c - c' : ℕ) : ℤ) + ((n : ℤ) - n') * ((l : ℤ) ^ a - 1) := by
+          have hD :=
+            padicValIntShiftLe l a (c - c') ρ ((n : ℤ) - n') hl ha (by omega)
+              (lt_of_le_of_lt (Nat.sub_le _ _) (hlt c hc)) hρ1 hdN
+              (by rw [abs_lt]; constructor <;> omega)
+          have hz
+              : ((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1))
+                = ((c - c' : ℕ) : ℤ) + ((n : ℤ) - n') * ((l : ℤ) ^ a - 1) := by
             rw [Nat.cast_sub hlt'.le]
             ring
           rw [hz]
           exact hD
         · have hdN : (l ^ a - 1) ∣ (c' - c) * (l ^ ρ - 1) := by
             rw [← Int.natCast_dvd_natCast, Nat.cast_mul, hpow, hpow, Nat.cast_sub hgt.le]
-            have e : ((c' : ℤ) - c) * ((l : ℤ) ^ ρ - 1) = -(((c : ℤ) - c') * ((l : ℤ) ^ ρ - 1)) := by ring
+            have e
+                : ((c' : ℤ) - c) * ((l : ℤ) ^ ρ - 1) = -(((c : ℤ) - c') * ((l : ℤ) ^ ρ - 1)) := by
+              ring
             rw [e]
             exact dvd_neg.mpr hρd
-          have hD := padicValIntShiftLe l a (c' - c) ρ ((n' : ℤ) - n) hl ha (by omega)
-            (lt_of_le_of_lt (Nat.sub_le _ _) (hlt c' hc')) hρ1 hdN
-            (by rw [abs_lt]; constructor <;> omega)
-          have hz : ((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1)) =
-              -(((c' - c : ℕ) : ℤ) + ((n' : ℤ) - n) * ((l : ℤ) ^ a - 1)) := by
+          have hD :=
+            padicValIntShiftLe l a (c' - c) ρ ((n' : ℤ) - n) hl ha (by omega)
+              (lt_of_le_of_lt (Nat.sub_le _ _) (hlt c' hc')) hρ1 hdN
+              (by rw [abs_lt]; constructor <;> omega)
+          have hz
+              : ((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1))
+                = -(((c' - c : ℕ) : ℤ) + ((n' : ℤ) - n) * ((l : ℤ) ^ a - 1)) := by
             rw [Nat.cast_sub hgt.le]
             ring
           rw [hz, hneg]
@@ -115,14 +133,18 @@ theorem sumPadicValDifferencesLe : LagrangeBoundT := by
         rw [if_neg (fun h => hcc h.1)] at hgi hgj
         have h1 := hdv _ hgi
         have h2 := hdv _ hgj
-        have ez : ∀ k : ℕ, ((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + k * ((l : ℤ) ^ a - 1)) =
-            ((c : ℤ) - c') + ((n : ℤ) - k) * ((l : ℤ) ^ a - 1) := fun k => by ring
+        have ez
+            : ∀ k : ℕ,
+              ((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + k * ((l : ℤ) ^ a - 1))
+                = ((c : ℤ) - c') + ((n : ℤ) - k) * ((l : ℤ) ^ a - 1) := fun k => by
+          ring
         rw [ez] at h1 h2
         have := hsep _ _ _ (by rw [abs_lt]; constructor <;> omega) h1 h2
         omega
-  calc (∑ c' ∈ Cc, ∑ n' ∈ Finset.range (2 * A'),
-        if c' = c ∧ n' = n then 0
-        else padicValInt l (((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1))))
+  calc
+    (∑ c' ∈ Cc, ∑ n' ∈ Finset.range (2 * A'),
+     if c' = c ∧ n' = n then 0
+     else padicValInt l (((c : ℤ) + n * ((l : ℤ) ^ a - 1)) - ((c' : ℤ) + n' * ((l : ℤ) ^ a - 1))))
       ≤ ∑ c' ∈ Cc, (if c' = c then 0 else r') := Finset.sum_le_sum hper
     _ = (Cc.card - 1) * r' := by
       rw [← Finset.add_sum_erase Cc _ hc, if_pos rfl, zero_add,

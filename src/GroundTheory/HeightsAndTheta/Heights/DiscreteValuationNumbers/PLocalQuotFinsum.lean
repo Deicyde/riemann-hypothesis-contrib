@@ -13,7 +13,8 @@ noncomputable section
 
 universe u
 
-theorem LocalQuotFinsum.proof (h : LocalQuotPrimes.Statement.{u}) : LocalQuotFinsum.Statement.{u} := by
+theorem LocalQuotFinsum.proof (h : LocalQuotPrimes.Statement.{u})
+    : LocalQuotFinsum.Statement.{u} := by
   intro R _ P U _ hPU F F' hF hF' hFF'
   have hP := h R P U hPU
   set S : Set (Ideal R) := {G | G.IsPrime ∧ P ≤ G ∧ G ≤ U} with hS
@@ -37,7 +38,11 @@ theorem LocalQuotFinsum.proof (h : LocalQuotPrimes.Statement.{u}) : LocalQuotFin
       rw [← e₁, ← e₂, he]
     · intro p hp
       obtain ⟨hle, hleU, hmap⟩ := hP.2 p hp
-      exact ⟨p.comap (localQuotMap P U), ⟨by have : p.IsPrime := hp; exact Ideal.comap_isPrime _ p, hle, hleU⟩, hmap⟩
+      exact ⟨
+        p.comap (localQuotMap P U),
+        ⟨by have : p.IsPrime := hp; exact Ideal.comap_isPrime _ p, hle, hleU⟩,
+        hmap
+      ⟩
   rw [h1, h2]
   exact finsum_mem_eq_of_bijOn _ hbij fun G hG => hFF' G hG.1 hG.2.1 hG.2.2
 

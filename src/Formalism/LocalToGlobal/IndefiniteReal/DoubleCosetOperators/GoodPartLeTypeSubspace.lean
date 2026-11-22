@@ -18,14 +18,11 @@ structure RatCore where
   [fKs : Field Ks]
   [nfKs : NumberField Ks]
   [algKs : Algebra Ks L0]
-
   Tw : Type
   O : Tw → Type
   [crO : ∀ i, CommRing (O i)]
   [domO : ∀ i, IsDomain (O i)]
-
   fractionRingMaps : ∀ (i : Tw) (_b : Bool), L0 →+* FractionRing (O i)
-
   G : Type
   [grpG : Group G]
   [finG : Fintype G]
@@ -41,12 +38,12 @@ structure RatCore where
   W : ℕ → (L0 →+* ℂ) → Type
   [nW : ∀ j σ, NormedAddCommGroup (W j σ)]
   [ipW : ∀ j σ, InnerProductSpace ℂ (W j σ)]
-
   A : ∀ j, Arith.FormsL L0 Ks (WL j) (W j) G
 
-attribute [instance] RatCore.fieldBase RatCore.numberFieldBase RatCore.fKs RatCore.nfKs RatCore.algKs RatCore.crO RatCore.domO
-  RatCore.grpG RatCore.finG RatCore.acgWL RatCore.modWL RatCore.modKsWL RatCore.towWL RatCore.modOLWL
-  RatCore.towOLWL RatCore.modOKsWL RatCore.towOKsWL RatCore.nW RatCore.ipW
+attribute [instance]
+  RatCore.fieldBase RatCore.numberFieldBase RatCore.fKs RatCore.nfKs RatCore.algKs RatCore.crO
+  RatCore.domO RatCore.grpG RatCore.finG RatCore.acgWL RatCore.modWL RatCore.modKsWL RatCore.towWL
+  RatCore.modOLWL RatCore.towOLWL RatCore.modOKsWL RatCore.towOKsWL RatCore.nW RatCore.ipW
 
 variable (C : RatCore)
 

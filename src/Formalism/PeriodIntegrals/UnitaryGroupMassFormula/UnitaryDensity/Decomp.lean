@@ -32,27 +32,32 @@ lemma det_ne_zero_of_unitary {n : ℕ} {U : Matrix (Fin n) (Fin n) ℂ} (hU : U�
   rw [det_mul, det_one] at h
   exact left_ne_zero_of_mul_eq_one h
 
-private theorem exists_diagonal_unitary_gram_of_posDef {n : ℕ} {G : Matrix (Fin n) (Fin n) ℂ}
-    (hG : G.PosDef) :
-    ∃ (s : Fin n → ℂ) (V : Matrix (Fin n) (Fin n) ℂ), (∀ i, s i ≠ 0) ∧ Vᴴ * V = 1 ∧
-      V * Vᴴ = 1 ∧ G = (diagonal s * Vᴴ)ᴴ * (diagonal s * Vᴴ) := by
+private theorem exists_diagonal_unitary_gram_of_posDef
+    {n : ℕ} {G : Matrix (Fin n) (Fin n) ℂ} (hG : G.PosDef)
+    : ∃ (s : Fin n → ℂ) (V : Matrix (Fin n) (Fin n) ℂ),
+      (∀ i, s i ≠ 0) ∧ Vᴴ * V = 1 ∧ V * Vᴴ = 1 ∧ G = (diagonal s * Vᴴ)ᴴ * (diagonal s * Vᴴ) := by
   obtain ⟨V, h1, h2, hV⟩ := herm_decomp hG.1
   refine ⟨fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ), V, ?_, h1, h2, ?_⟩
   · intro i
     exact Complex.ofReal_ne_zero.2 (Real.sqrt_pos.2 (hG.eigenvalues_pos i)).ne'
-  · have hd : (diagonal (fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ)))ᴴ *
-        diagonal (fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ)) =
-        diagonal (fun i => ((hG.1.eigenvalues i : ℝ) : ℂ)) := by
+  · have hd
+        : (diagonal (fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ)))ᴴ
+            * diagonal (fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ))
+          = diagonal (fun i => ((hG.1.eigenvalues i : ℝ) : ℂ)) := by
       rw [diagonal_conjTranspose, diagonal_mul_diagonal]
       refine congrArg diagonal (funext fun i => ?_)
-      change star (↑(Real.sqrt (hG.1.eigenvalues i)) : ℂ) *
-        ↑(Real.sqrt (hG.1.eigenvalues i)) = ↑(hG.1.eigenvalues i)
+      change star (↑(Real.sqrt (hG.1.eigenvalues i)) : ℂ) * ↑(Real.sqrt (hG.1.eigenvalues i))
+        = ↑(hG.1.eigenvalues i)
       simp only [Complex.star_def, Complex.conj_ofReal, ← Complex.ofReal_mul,
         Real.mul_self_sqrt (hG.eigenvalues_pos i).le]
     rw [conjTranspose_mul, conjTranspose_conjTranspose]
-    calc G = V * diagonal (fun i => ((hG.1.eigenvalues i : ℝ) : ℂ)) * Vᴴ := hV
-      _ = V * ((diagonal (fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ)))ᴴ *
-          diagonal (fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ))) * Vᴴ := by rw [hd]
+    calc
+      G = V * diagonal (fun i => ((hG.1.eigenvalues i : ℝ) : ℂ)) * Vᴴ := hV
+      _ = V
+          * ((diagonal (fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ)))ᴴ
+            * diagonal (fun i => ((Real.sqrt (hG.1.eigenvalues i) : ℝ) : ℂ)))
+          * Vᴴ := by
+        rw [hd]
       _ = _ := by simp only [Matrix.mul_assoc]
 
 theorem gramStep : GramStep := by
@@ -60,8 +65,7 @@ theorem gramStep : GramStep := by
   obtain ⟨s, V, hs, hV1, -, hGe⟩ := exists_diagonal_unitary_gram_of_posDef hG
   refine ⟨diagonal s * Vᴴ, hGe.symm, ?_⟩
   rw [det_mul, det_diagonal]
-  exact mul_ne_zero (Finset.prod_ne_zero_iff.2 fun i _ => hs i)
-    (det_ne_zero_of_unitary hV1)
+  exact mul_ne_zero (Finset.prod_ne_zero_iff.2 fun i _ => hs i) (det_ne_zero_of_unitary hV1)
 
 theorem svdStep : SVDStep := by
   intro n g hg
@@ -73,15 +77,15 @@ theorem svdStep : SVDStep := by
   have hCdet : IsUnit C.det := by
     refine isUnit_iff_ne_zero.2 ?_
     rw [hC, det_mul, det_diagonal]
-    exact mul_ne_zero (Finset.prod_ne_zero_iff.2 fun i _ => hs i)
-      (det_ne_zero_of_unitary hV1)
+    exact mul_ne_zero (Finset.prod_ne_zero_iff.2 fun i _ => hs i) (det_ne_zero_of_unitary hV1)
   have hCH : IsUnit Cᴴ.det := by
     rw [det_conjTranspose]
     exact hCdet.star
   refine ⟨g * C⁻¹, Vᴴ, s, ?_, ?_, ?_⟩
   · rw [conjTranspose_mul, conjTranspose_nonsing_inv]
-    calc (Cᴴ)⁻¹ * gᴴ * (g * C⁻¹) = (Cᴴ)⁻¹ * (gᴴ * g) * C⁻¹ := by
-          simp only [Matrix.mul_assoc]
+    calc
+      (Cᴴ)⁻¹ * gᴴ * (g * C⁻¹)
+        = (Cᴴ)⁻¹ * (gᴴ * g) * C⁻¹ := by simp only [Matrix.mul_assoc]
       _ = (Cᴴ)⁻¹ * (Cᴴ * C) * C⁻¹ := by rw [hG]
       _ = ((Cᴴ)⁻¹ * Cᴴ) * (C * C⁻¹) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [nonsing_inv_mul _ hCH, mul_nonsing_inv _ hCdet, Matrix.one_mul]

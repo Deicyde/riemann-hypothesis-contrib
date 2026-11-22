@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChosenInject
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC TensorProduct
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC TensorProduct
 
 private lemma exists_local (A : Type) [CommRing A]
     (P : ∀ V : Scheme.{0}, (V ⟶ Spec (CommRingCat.of A)) → Prop)
@@ -44,13 +45,15 @@ private lemma exists_local (A : Type) [CommRing A]
   · rw [hmap, hinv]
     exact hP V _ g V.isoSpec.inv hPV
 
-theorem UpperTheory.exists_finite_etale_faithfullyFlat_cover_of_etaleLocal_affine :
-    ∀ (A : Type) [CommRing A] (P : ∀ V : Scheme.{0}, (V ⟶ Spec (CommRingCat.of A)) → Prop),
-        (∀ (V W : Scheme.{0}) (g : V ⟶ Spec (CommRingCat.of A)) (k : W ⟶ V), P V g → P W (k ≫ g)) →
-        Loc (Spec (CommRingCat.of A)) P →
-        ∃ (n : ℕ) (C : Fin n → Type) (_ : ∀ i, CommRing (C i)) (_ : ∀ i, Algebra A (C i)),
-          Algebra.Etale A (∀ i, C i) ∧ Module.FaithfullyFlat A (∀ i, C i) ∧
-          ∀ i, P (Spec (CommRingCat.of (C i))) (Spec.map (CommRingCat.ofHom (algebraMap A (C i)))) := by
+theorem UpperTheory.exists_finite_etale_faithfullyFlat_cover_of_etaleLocal_affine
+    : ∀ (A : Type) [CommRing A] (P : ∀ V : Scheme.{0}, (V ⟶ Spec (CommRingCat.of A)) → Prop),
+      (∀ (V W : Scheme.{0}) (g : V ⟶ Spec (CommRingCat.of A)) (k : W ⟶ V), P V g → P W (k ≫ g))
+        → Loc (Spec (CommRingCat.of A)) P
+        → ∃ (n : ℕ) (C : Fin n → Type) (_ : ∀ i, CommRing (C i)) (_ : ∀ i, Algebra A (C i)),
+          Algebra.Etale A (∀ i, C i) ∧ Module.FaithfullyFlat A (∀ i, C i)
+            ∧ ∀ i,
+              P (Spec (CommRingCat.of (C i)))
+                (Spec.map (CommRingCat.ofHom (algebraMap A (C i)))) := by
   intro A _ P hP hL
   have hx := (GlobalTheory.T.etaleLocally_iff_affine_etale_point_cover _ P hP).1 hL
   choose V g hVa hge hxm hPx using hx
@@ -61,12 +64,22 @@ theorem UpperTheory.exists_finite_etale_faithfullyFlat_cover_of_etaleLocal_affin
   have hopen : ∀ x, IsOpen (Set.range (g x)) := fun x => by
     haveI := hge x
     exact IsOpenMap.isOpen_range (g x).isOpenMap
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (fun x => Set.range (g x)) hopen
-    (fun x _ => Set.mem_iUnion.mpr ⟨x, hxm x⟩)
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun x => Set.range (g x))
+      hopen
+      (fun x _ => Set.mem_iUnion.mpr ⟨x, hxm x⟩)
   let e : Fin t.card ≃ t := t.equivFin.symm
   haveI : ∀ i, Algebra.Etale A (B (e i)) := fun i => hBe _
-  refine ⟨t.card, fun i => B (e i), fun i => inferInstance, fun i => inferInstance,
-    inferInstance, ?_, fun i => hBP _⟩
+  refine ⟨
+    t.card,
+    fun i => B (e i),
+    fun i => inferInstance,
+    fun i => inferInstance,
+    inferInstance,
+    ?_,
+    fun i => hBP _
+  ⟩
   refine Module.FaithfullyFlat.of_comap_surjective fun p => ?_
   obtain ⟨x, hxt, hpx⟩ := Set.mem_iUnion₂.mp (ht (Set.mem_univ p))
   obtain ⟨i, hi⟩ := e.surjective ⟨x, hxt⟩

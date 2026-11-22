@@ -16,10 +16,10 @@ noncomputable section
 
 def VarIntAdd.Statement : Prop :=
   ∀ (n k : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (f g : (Fin n → ℂ) → ℝ)
-    (φ : Fin k → (Fin n → ℂ) → ℝ),
-    J.IsPrime → Continuous f → HasCompactSupport f → Continuous g → HasCompactSupport g →
-    (∀ i, SmoothNear (zeroSet J) (φ i)) →
-      varInt J k (f + g) φ = varInt J k f φ + varInt J k g φ
+      (φ : Fin k → (Fin n → ℂ) → ℝ),
+    J.IsPrime → Continuous f → HasCompactSupport f → Continuous g → HasCompactSupport g
+      → (∀ i, SmoothNear (zeroSet J) (φ i))
+      → varInt J k (f + g) φ = varInt J k f φ + varInt J k g φ
 
 end
 

@@ -23,12 +23,16 @@ noncomputable section
 namespace GlobalTheory.Frames
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj
 
 namespace GeometricValues
 
-theorem eq_zero_of_forall_algClosed {K R : Type} [Field K] [CommRing R] [Algebra K R] [IsReduced R] (x : R)
-    (h : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] [Algebra K Ω] (φ : R →ₐ[K] Ω), φ x = 0) : x = 0 := by
+theorem eq_zero_of_forall_algClosed
+    {K R : Type} [Field K] [CommRing R] [Algebra K R] [IsReduced R]
+    (x : R) (h : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] [Algebra K Ω] (φ : R →ₐ[K] Ω), φ x = 0)
+    : x = 0 := by
   apply IsNilpotent.eq_zero
   rw [nilpotent_iff_mem_prime]
   intro J hJ
@@ -46,15 +50,20 @@ theorem eq_zero_of_forall_algClosed {K R : Type} [Field K] [CommRing R] [Algebra
     exact h1
   exact Ideal.Quotient.eq_zero_iff_mem.mp h2
 
-theorem ptsDetect_of {K : Type} [Field K] {ι : Type} [Fintype ι]
+theorem ptsDetect_of
+    {K : Type} [Field K]
+    {ι : Type} [Fintype ι]
     (pts : ∀ (S : Type) [CommRing S] [Algebra K S], Type)
     (mapR : ∀ {S T : Type} [CommRing S] [Algebra K S] [CommRing T] [Algebra K T],
       (S →ₐ[K] T) → pts S → pts T → Prop)
     (borR : ∀ {S : Type} [CommRing S] [Algebra K S], (ι → Sˣ) → pts S → pts S → Prop)
     (hW : EvalWD pts mapR)
-    (hB : ∀ (S : Type) [CommRing S] [Algebra K S] (T : Type) [CommRing T] [Algebra K T] (φ : S →ₐ[K] T)
-      (y : pts S), ∃ z : pts T, mapR φ y z)
-    (e : ι → ℕ) : PtsDetect pts mapR borR e := by
+    (hB : ∀ (S : Type) [CommRing S] [Algebra K S] (T : Type) [CommRing T] [Algebra K T]
+        (φ : S →ₐ[K] T) (y : pts S),
+      ∃ z : pts T,
+        mapR φ y z)
+    (e : ι → ℕ)
+    : PtsDetect pts mapR borR e := by
   intro g hg h
   funext p y
   have : IsReduced p.R := (Ideal.isRadical_iff_quotient_reduced p.I).mp p.rad
@@ -70,11 +79,25 @@ theorem ptsDetect_of {K : Type} [Field K] {ι : Type} [Fintype ι]
 
 end GeometricValues
 
-theorem ptsDetect_framed : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), PtsDetect (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) (fun t y y' => FrBor t y y') (ex Dw a n) := by
+theorem ptsDetect_framed
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ),
+        PtsDetect (K := c.F)
+          (fun S _ _ => FrPt Xo c S)
+          (fun φ y z => FrMap φ y z)
+          (fun t y y' => FrBor t y y')
+          (ex Dw a n) := by
   intro E _ _ _ H Dw l Xo c a n
   have hS : Out.SecBaseChangeSt := GlobalTheory.firstFiveLaws.1.secBaseChange
-  exact GeometricValues.ptsDetect_of (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z)
-    (fun t y y' => FrBor t y y') (GlobalTheory.T.framedModuli_algebraicLaws_chart_weight_integrality hS E H Dw l Xo c).2.2.1
-    (fun S _ _ T _ _ φ y => GlobalTheory.Frames.FramedBaseChange.exists_frMap hS E H Dw l Xo c S T φ y) (ex Dw a n)
+  exact GeometricValues.ptsDetect_of (K := c.F)
+    (fun S _ _ => FrPt Xo c S)
+    (fun φ y z => FrMap φ y z)
+    (fun t y y' => FrBor t y y')
+    (GlobalTheory.T.framedModuli_algebraicLaws_chart_weight_integrality hS E H Dw l Xo c).2.2.1
+    (fun S _ _ T _ _ φ y =>
+      GlobalTheory.Frames.FramedBaseChange.exists_frMap hS E H Dw l Xo c S T φ y)
+    (ex Dw a n)
 
 end GlobalTheory.Frames

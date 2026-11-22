@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 theorem beta_ratio_bound : BetaRatioBound 1088 := by
   intro p n' r K _ _ _ X hX hLa hk j b hA
@@ -57,17 +58,21 @@ theorem beta_ratio_bound : BetaRatioBound 1088 := by
     have hne : s.Nonempty := ⟨x, hx⟩
     have hmax := Finset.max'_mem s hne
     obtain ⟨hm1, hm2⟩ := Finset.mem_filter.mp hmax
-    have hgap := hV.2.2.2.2.2.2.1 j |>.2.2 (s.max' hne) hm1 hm2 (fun z hz hzlt =>
-      Finset.le_max' s z (Finset.mem_filter.mpr ⟨hz, hzlt⟩))
+    have hgap :=
+      hV.2.2.2.2.2.2.1 j |>.2.2 (s.max' hne) hm1 hm2
+        (fun z hz hzlt => Finset.le_max' s z (Finset.mem_filter.mpr ⟨hz, hzlt⟩))
     have hle := Finset.le_max' s x hx
     have hxc := TE.dist_cast (Finset.mem_filter.mp hx).1
     omega
 
-  have hA1 : (X.beS p K j (X.restr j b) : ℝ) ≤ 4 * X.a / (p : ℝ) ^ (X.Rj p K j + D1 + X.L₁ + 1) := by
+  have hA1
+      : (X.beS p K j (X.restr j b) : ℝ) ≤ 4 * X.a / (p : ℝ) ^ (X.Rj p K j + D1 + X.L₁ + 1) := by
     unfold Dat.beS
     push_cast
-    have h1 : ∀ x ∈ s, (X.Bdeg p K j (X.restr j b) x : ℝ) ≤
-        2 * X.a / (p : ℝ) ^ X.Rj p K j * (1 / (p : ℝ) ^ X.F.dist j x) := by
+    have h1
+        : ∀ x ∈ s,
+          (X.Bdeg p K j (X.restr j b) x : ℝ)
+            ≤ 2 * X.a / (p : ℝ) ^ X.Rj p K j * (1 / (p : ℝ) ^ X.F.dist j x) := by
       intro x hx
       obtain ⟨hx1, hx2⟩ := Finset.mem_filter.mp hx
       have b1 := (TE.Bdeg_bounds hX hk h41 j b hA x hx1 hx2).2
@@ -86,12 +91,16 @@ theorem beta_ratio_bound : BetaRatioBound 1088 := by
       have c2 := TE.dist_cast (Finset.mem_filter.mp (Finset.mem_coe.mp hy)).1
       have : (X.F.dist j x : ℤ) = (X.F.dist j y : ℤ) := by exact_mod_cast hxy
       omega
-    have h2 : ∑ x ∈ s, (1 / (p : ℝ) ^ X.F.dist j x) = ∑ D ∈ s.image (X.F.dist j), (1 / (p : ℝ) ^ D) :=
+    have h2
+        : ∑ x ∈ s, (1 / (p : ℝ) ^ X.F.dist j x) = ∑ D ∈ s.image (X.F.dist j), (1 / (p : ℝ) ^ D) :=
       (Finset.sum_image (f := fun D : ℕ => 1 / (p : ℝ) ^ D) hinj).symm
-    have h3 := Formalism.InvariantFactorPaths.BranchingDimensions.geometricSumDistinct p (D1 + X.L₁ + 1) (s.image (X.F.dist j)) hp2 (by
-      intro D hD
-      obtain ⟨x, hx, rfl⟩ := Finset.mem_image.mp hD
-      exact hU1 x hx)
+    have h3 :=
+      Formalism.InvariantFactorPaths.BranchingDimensions.geometricSumDistinct p (D1 + X.L₁ + 1)
+        (s.image (X.F.dist j)) hp2
+        (by
+          intro D hD
+          obtain ⟨x, hx, rfl⟩ := Finset.mem_image.mp hD
+          exact hU1 x hx)
     rw [h2]
     have hc : 0 ≤ 2 * X.a / (p : ℝ) ^ X.Rj p K j := by positivity
     refine le_trans (mul_le_mul_of_nonneg_left h3 hc) ?_
@@ -109,46 +118,62 @@ theorem beta_ratio_bound : BetaRatioBound 1088 := by
       unfold Frames.dist
       exact Int.toNat_of_nonneg (by omega)
     omega
-  have hB1 : X.a / (8 * p * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns * ((p : ℝ) ^ D1 * (p : ℝ) ^ d)) <
-      (p : ℝ) ^ X.Rj p K (j + 1) := by
+  have hB1
+      : X.a / (8 * p * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns * ((p : ℝ) ^ D1 * (p : ℝ) ^ d))
+        < (p : ℝ) ^ X.Rj p K (j + 1) := by
     have h := lt_pow_Rj hX (j + 1)
     unfold Tj at h
-    rw [add_sub_cancel_right, hdist, pow_add ((p : ℝ)) D1 d, pow_succ ((p : ℝ)) (X.Rj p K (j + 1))] at h
+    rw [add_sub_cancel_right, hdist, pow_add ((p : ℝ)) D1 d, pow_succ ((p : ℝ)) (X.Rj p K (j + 1))]
+      at h
     unfold Dat.k at h
-    have hden : 0 < 8 * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ D1 * (p : ℝ) ^ d) := by
+    have hden
+        : 0 < 8 * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ D1 * (p : ℝ) ^ d) := by
       have k5 := B.k5
       unfold Dat.k at k5
       have := B.Ns1
       have := B.Y1
       positivity
     rw [div_lt_iff₀ hden] at h
-    have hden2 : 0 < 8 * (p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns * ((p : ℝ) ^ D1 * (p : ℝ) ^ d) := by
-      have e : 8 * (p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns * ((p : ℝ) ^ D1 * (p : ℝ) ^ d) =
-          (p : ℝ) * (8 * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ D1 * (p : ℝ) ^ d)) := by ring
-      rw [e]; exact mul_pos hp0 hden
+    have hden2
+        : 0 < 8 * (p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns * ((p : ℝ) ^ D1 * (p : ℝ) ^ d) := by
+      have e
+          : 8 * (p : ℝ) * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * X.Ns * ((p : ℝ) ^ D1 * (p : ℝ) ^ d)
+            = (p : ℝ)
+              * (8 * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ D1 * (p : ℝ) ^ d)) := by
+        ring
+      rw [e]
+      exact mul_pos hp0 hden
     rw [div_lt_iff₀ hden2]
-    calc X.a < (p : ℝ) ^ X.Rj p K (j + 1) * (p : ℝ) *
-          (8 * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ D1 * (p : ℝ) ^ d)) := h
+    calc
+      X.a < (p : ℝ) ^ X.Rj p K (j + 1) * (p : ℝ)
+          * (8 * X.Y * ((r + K : ℕ) : ℝ) ^ 2 * (X.Ns : ℝ) * ((p : ℝ) ^ D1 * (p : ℝ) ^ d)) :=
+        h
       _ = _ := by ring
-  have hcore := (Formalism.InvariantFactorPaths.BranchingDimensions.admissibleSmallRatio p (r + K) X.Ns D1 X.L₁ (X.Rj p K j) (X.Rj p K (j + 1)) X.a X.Y
-    ((p : ℝ) ^ d) (X.beS p K j (X.restr j b) : ℝ) hp2 (by omega)
-    (by have := B.Ns1; exact_mod_cast this) B.Y1 ha0 (by positivity) hL1 hA1 hB1 hP2).2.2
+  have hcore :=
+    (Formalism.InvariantFactorPaths.BranchingDimensions.admissibleSmallRatio p (r + K) X.Ns D1 X.L₁
+      (X.Rj p K j) (X.Rj p K (j + 1)) X.a X.Y ((p : ℝ) ^ d) (X.beS p K j (X.restr j b) : ℝ) hp2
+      (by omega) (by have := B.Ns1; exact_mod_cast this) B.Y1 ha0 (by positivity) hL1 hA1 hB1
+      hP2).2.2
 
   have hexp := Rj_add_first_frame_gap_le_last_frame_gap_add_Rj_succ hX j
   have hmono : X.F.fr (j - 1) 0 ≤ X.F.fr j 0 := (mem_letters_bounds hfr0).1
-  have hQ : ((X.Qc p K j : ℕ) : ℝ) = (p : ℝ) ^ d * (p : ℝ) ^ X.Rj p K (j + 1) / (p : ℝ) ^ X.Rj p K j := by
+  have hQ
+      : ((X.Qc p K j : ℕ) : ℝ)
+        = (p : ℝ) ^ d * (p : ℝ) ^ X.Rj p K (j + 1) / (p : ℝ) ^ X.Rj p K j := by
     unfold Dat.Qc
     rw [eq_div_iff (by positivity)]
     push_cast
     rw [← pow_add, ← pow_add]
     congr 1
-    have : (((X.F.fr (j + 1) (r - 1) - X.F.fr j (r - 1) + (X.Rj p K (j + 1) : ℤ) - (X.Rj p K j : ℤ)).toNat : ℕ) : ℤ) =
-        X.F.fr (j + 1) (r - 1) - X.F.fr j (r - 1) + (X.Rj p K (j + 1) : ℤ) - (X.Rj p K j : ℤ) :=
+    have : (((X.F.fr (j + 1) (r - 1) - X.F.fr j (r - 1) + (X.Rj p K (j + 1) : ℤ)
+              - (X.Rj p K j : ℤ)).toNat
+            : ℕ)
+          : ℤ)
+        = X.F.fr (j + 1) (r - 1) - X.F.fr j (r - 1) + (X.Rj p K (j + 1) : ℤ) - (X.Rj p K j : ℤ) :=
       Int.toNat_of_nonneg (by omega)
     omega
   rw [← hQ] at hcore
-  have hQpos : (0 : ℝ) < ((X.Qc p K j : ℕ) : ℝ) := by
-    rw [hQ]; positivity
+  have hQpos : (0 : ℝ) < ((X.Qc p K j : ℕ) : ℝ) := by rw [hQ]; positivity
   rw [div_le_div_iff₀ hQpos (by have := B.Y1; positivity)] at hcore
   linarith
 

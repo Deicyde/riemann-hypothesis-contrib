@@ -8,9 +8,11 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem kap_unit {K : Type} [NormedField K] [IsUltrametricDist K] (g2 g3 e : K) (h2 : ‖g2‖ ≤ 1)
-    (h3 : ‖g3‖ ≤ 1) (hΔ : ‖g2 ^ 3 - 27 * g3 ^ 2‖ = 1) (h22 : ‖(2 : K)‖ = 1)
-    (he : 4 * e ^ 3 - g2 * e - g3 = 0) : ‖e‖ ≤ 1 ∧ ‖3 * e ^ 2 - g2 / 4‖ = 1 := by
+theorem kap_unit
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    (g2 g3 e : K) (h2 : ‖g2‖ ≤ 1) (h3 : ‖g3‖ ≤ 1) (hΔ : ‖g2 ^ 3 - 27 * g3 ^ 2‖ = 1)
+    (h22 : ‖(2 : K)‖ = 1) (he : 4 * e ^ 3 - g2 * e - g3 = 0)
+    : ‖e‖ ≤ 1 ∧ ‖3 * e ^ 2 - g2 / 4‖ = 1 := by
   have hn1 : ∀ n : ℕ, ‖(n : K)‖ ≤ 1 := by
     intro n
     induction n with
@@ -18,8 +20,7 @@ theorem kap_unit {K : Type} [NormedField K] [IsUltrametricDist K] (g2 g3 e : K) 
     | succ n ih =>
       push_cast
       exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ih (by simp))
-  have h4 : ‖(4 : K)‖ = 1 := by
-    rw [show (4 : K) = 2 * 2 by norm_num, norm_mul, h22, one_mul]
+  have h4 : ‖(4 : K)‖ = 1 := by rw [show (4 : K) = 2 * 2 by norm_num, norm_mul, h22, one_mul]
   have h4ne : (4 : K) ≠ 0 := by
     intro h
     rw [h, norm_zero] at h4
@@ -43,7 +44,8 @@ theorem kap_unit {K : Type} [NormedField K] [IsUltrametricDist K] (g2 g3 e : K) 
     nlinarith [mul_lt_mul_of_pos_left hsq (by linarith : (0 : ℝ) < ‖e‖)]
   refine ⟨he1, ?_⟩
   have hg3 : g3 = 4 * e ^ 3 - g2 * e := by linear_combination -he
-  have hid : g2 ^ 3 - 27 * g3 ^ 2 = (g2 - 12 * e ^ 2) * (g2 ^ 2 - 15 * e ^ 2 * g2 + 36 * e ^ 4) := by
+  have hid
+      : g2 ^ 3 - 27 * g3 ^ 2 = (g2 - 12 * e ^ 2) * (g2 ^ 2 - 15 * e ^ 2 * g2 + 36 * e ^ 4) := by
     rw [hg3]
     ring
   have hk : 3 * e ^ 2 - g2 / 4 = -(g2 - 12 * e ^ 2) / 4 := by

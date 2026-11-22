@@ -7,8 +7,11 @@ public import Mathlib.LinearAlgebra.LinearIndependent.Basic
 
 open Polynomial
 
-private theorem charPerm_dvd {G k : Type} [Group G] [Field k] (f : (G →* k) →₀ ℤ)
-    (h : ∀ g, Finsupp.mapDomain (fun ψ : G →* k => ψ g) f = 0) (ψ : G →* k) : ((ringChar k : ℕ) : ℤ) ∣ f ψ := by
+private theorem charPerm_dvd
+    {G k : Type} [Group G] [Field k]
+    (f : (G →* k) →₀ ℤ) (h : ∀ g, Finsupp.mapDomain (fun ψ : G →* k => ψ g) f = 0)
+    (ψ : G →* k)
+    : ((ringChar k : ℕ) : ℤ) ∣ f ψ := by
   classical
   have hli := linearIndependent_monoidHom G k
   rw [linearIndependent_iff'] at hli
@@ -25,8 +28,10 @@ private theorem charPerm_dvd {G k : Type} [Group G] [Field k] (f : (G →* k) �
     rw [this]
     exact dvd_zero _
 
-private theorem charPerm_zero {G k : Type} [Group G] [Field k] (f : (G →* k) →₀ ℤ)
-    (h : ∀ g, Finsupp.mapDomain (fun ψ : G →* k => ψ g) f = 0) : f = 0 := by
+private theorem charPerm_zero
+    {G k : Type} [Group G] [Field k]
+    (f : (G →* k) →₀ ℤ) (h : ∀ g, Finsupp.mapDomain (fun ψ : G →* k => ψ g) f = 0)
+    : f = 0 := by
   classical
   by_cases hp : ringChar k = 0
   · ext ψ
@@ -35,14 +40,17 @@ private theorem charPerm_zero {G k : Type} [Group G] [Field k] (f : (G →* k) �
     simpa using this
   · have hp1 : 1 < ringChar k :=
       ((CharP.char_is_prime_or_zero k (ringChar k)).resolve_right hp).one_lt
-    have key : ∀ n : ℕ, ∀ f : (G →* k) →₀ ℤ, (∀ g, Finsupp.mapDomain (fun ψ : G →* k => ψ g) f = 0) →
-        ∀ ψ, ((ringChar k : ℕ) : ℤ) ^ n ∣ f ψ := by
+    have key
+        : ∀ n : ℕ, ∀ f : (G →* k) →₀ ℤ,
+          (∀ g, Finsupp.mapDomain (fun ψ : G →* k => ψ g) f = 0)
+            → ∀ ψ, ((ringChar k : ℕ) : ℤ) ^ n ∣ f ψ := by
       intro n
       induction n with
       | zero => intro f _ ψ; simp
       | succ n ih =>
         intro f hf ψ
-        let f1 : (G →* k) →₀ ℤ := Finsupp.mapRange (fun z : ℤ => z / ((ringChar k : ℕ) : ℤ)) (by simp) f
+        let f1 : (G →* k) →₀ ℤ :=
+          Finsupp.mapRange (fun z : ℤ => z / ((ringChar k : ℕ) : ℤ)) (by simp) f
         have hf1 : f = ((ringChar k : ℕ) : ℤ) • f1 := by
           ext φ
           simp only [Finsupp.smul_apply, Finsupp.mapRange_apply, smul_eq_mul, f1]
@@ -60,12 +68,13 @@ private theorem charPerm_zero {G k : Type} [Group G] [Field k] (f : (G →* k) �
     apply Int.eq_zero_of_dvd_of_natAbs_lt_natAbs hd
     simpa [Int.natAbs_pow] using Nat.lt_pow_self (n := (f ψ).natAbs) hp1
 
-private theorem charPerm_single {α ι : Type} [Fintype ι] (a b : ι → α) :
-    Finset.univ.val.map a = Finset.univ.val.map b ↔
-      (∑ i, Finsupp.single (a i) (1 : ℤ)) = ∑ i, Finsupp.single (b i) (1 : ℤ) := by
+private theorem charPerm_single {α ι : Type} [Fintype ι] (a b : ι → α)
+    : Finset.univ.val.map a = Finset.univ.val.map b
+      ↔ (∑ i, Finsupp.single (a i) (1 : ℤ)) = ∑ i, Finsupp.single (b i) (1 : ℤ) := by
   classical
-  have key : ∀ (s : Multiset α) (x : α),
-      (s.map (fun y => Finsupp.single y (1 : ℤ))).sum x = (s.count x : ℤ) := by
+  have key
+      : ∀ (s : Multiset α) (x : α),
+        (s.map (fun y => Finsupp.single y (1 : ℤ))).sum x = (s.count x : ℤ) := by
     intro s x
     induction s using Multiset.induction_on with
     | empty => simp
@@ -75,8 +84,10 @@ private theorem charPerm_single {α ι : Type} [Fintype ι] (a b : ι → α) :
         simp [Multiset.count_cons, ih]
         try ring
       · simp [Multiset.count_cons, ih, Finsupp.single_apply, hxy, Ne.symm hxy]
-  have hsum : ∀ c : ι → α, (∑ i, Finsupp.single (c i) (1 : ℤ)) =
-      ((Finset.univ.val.map c).map (fun y => Finsupp.single y (1 : ℤ))).sum := by
+  have hsum
+      : ∀ c : ι → α,
+        (∑ i, Finsupp.single (c i) (1 : ℤ))
+          = ((Finset.univ.val.map c).map (fun y => Finsupp.single y (1 : ℤ))).sum := by
     intro c
     rw [Finset.sum_eq_multiset_sum, Multiset.map_map]
     rfl
@@ -89,8 +100,9 @@ private theorem charPerm_single {α ι : Type} [Fintype ι] (a b : ι → α) :
     rw [hsum, hsum, key, key] at this
     exact_mod_cast this
 
-private theorem charPerm_perm {α ι : Type} [Fintype ι] (a b : ι → α)
-    (h : Finset.univ.val.map a = Finset.univ.val.map b) : ∃ σ : Equiv.Perm ι, ∀ i, b i = a (σ i) := by
+private theorem charPerm_perm
+    {α ι : Type} [Fintype ι] (a b : ι → α) (h : Finset.univ.val.map a = Finset.univ.val.map b)
+    : ∃ σ : Equiv.Perm ι, ∀ i, b i = a (σ i) := by
   classical
   have hc : ∀ c, Fintype.card {i // b i = c} = Fintype.card {i // a i = c} := by
     intro c
@@ -98,16 +110,17 @@ private theorem charPerm_perm {α ι : Type} [Fintype ι] (a b : ι → α)
     simp only [Multiset.count_map] at this
     rw [Fintype.card_subtype, Fintype.card_subtype, Finset.card_def, Finset.card_def,
       Finset.filter_val, Finset.filter_val]
-    have e : ∀ d : ι → α, Multiset.filter (fun x => d x = c) Finset.univ.val =
-        Multiset.filter (fun x => c = d x) Finset.univ.val :=
-      fun d => Multiset.filter_congr (fun x _ => eq_comm)
+    have e
+        : ∀ d : ι → α,
+          Multiset.filter (fun x => d x = c) Finset.univ.val
+            = Multiset.filter (fun x => c = d x) Finset.univ.val := fun d =>
+      Multiset.filter_congr (fun x _ => eq_comm)
     rw [e, e]
     convert this.symm
   refine ⟨Equiv.ofFiberEquiv (fun c => Fintype.equivOfCardEq (hc c)), fun i => ?_⟩
   exact (Equiv.ofFiberEquiv_map _ i).symm
 
-theorem UpperTheory.V.Pr.charPerm :
-    UpperTheory.V.Pr.CharPerm := by
+theorem UpperTheory.V.Pr.charPerm : UpperTheory.V.Pr.CharPerm := by
   intro G k _ _ n χ χ' hχ
   classical
   let ψ : Fin n → (G →* k) := fun i => (Units.coeHom k).comp (χ i)
@@ -115,11 +128,13 @@ theorem UpperTheory.V.Pr.charPerm :
   have hr : ∀ a : Fin n → k, (∏ i, (X - C (a i))).roots = Finset.univ.val.map a := by
     intro a
     rw [Finset.prod_eq_multiset_prod]
-    have : Finset.univ.val.map (fun i => X - C (a i)) = (Finset.univ.val.map a).map (fun x => X - C x) := by
+    have : Finset.univ.val.map (fun i => X - C (a i))
+        = (Finset.univ.val.map a).map (fun x => X - C x) := by
       rw [Multiset.map_map]
       rfl
     rw [this, Polynomial.roots_multiset_prod_X_sub_C]
-  have hroots : ∀ g, Finset.univ.val.map (fun i => ψ i g) = Finset.univ.val.map (fun i => ψ' i g) := by
+  have hroots
+      : ∀ g, Finset.univ.val.map (fun i => ψ i g) = Finset.univ.val.map (fun i => ψ' i g) := by
     intro g
     have h1 := congrArg Polynomial.roots (hχ g)
     unfold UpperTheory.V.Pr.chPoly at h1

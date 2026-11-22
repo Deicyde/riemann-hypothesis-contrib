@@ -15,15 +15,15 @@ open ReciprocityTheory.AnForm.A
 
 noncomputable section
 
-theorem volume_real_closedBall_polydisc {D : ℕ} (x : Fin D → ℂ) {r : ℝ} (hr : 0 ≤ r) :
-    volume.real (closedBall x r) = (Real.pi * r ^ 2) ^ D := by
+theorem volume_real_closedBall_polydisc {D : ℕ} (x : Fin D → ℂ) {r : ℝ} (hr : 0 ≤ r)
+    : volume.real (closedBall x r) = (Real.pi * r ^ 2) ^ D := by
   rw [Measure.real, volume_pi_closedBall x hr]
   simp only [Complex.volume_closedBall, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
   rw [ENNReal.toReal_pow, ENNReal.toReal_mul, ENNReal.toReal_pow, ENNReal.toReal_ofReal hr]
   simp [mul_comm]
 
-theorem MollifiedLowerBound.proof (h0 : SubMeanPolydiscStatement)
-    (h1 : PolyMaxLogConvexStatement) : MollifiedLowerBound.Statement := by
+theorem MollifiedLowerBound.proof (h0 : SubMeanPolydiscStatement) (h1 : PolyMaxLogConvexStatement)
+    : MollifiedLowerBound.Statement := by
   intro D ρ b U u z t hU hu ht hzU hb
   set M2 := polyMax u z (2 * t)
   set M4 := polyMax u z (t / 4)
@@ -31,10 +31,8 @@ theorem MollifiedLowerBound.proof (h0 : SubMeanPolydiscStatement)
   obtain ⟨x, hx, hux⟩ := hatt (t / 4) (by positivity) (by linarith)
   rw [mem_closedBall] at hx
   set B := closedBall x (3 / 2 * t) with hBdef
-  have hBz : B ⊆ closedBall z (2 * t) :=
-    closedBall_subset_closedBall' (by linarith)
-  have hzB : closedBall z t ⊆ B :=
-    closedBall_subset_closedBall' (by rw [dist_comm]; linarith)
+  have hBz : B ⊆ closedBall z (2 * t) := closedBall_subset_closedBall' (by linarith)
+  have hzB : closedBall z t ⊆ B := closedBall_subset_closedBall' (by rw [dist_comm]; linarith)
   obtain ⟨hint, hmean⟩ := h0 D U u x (3 / 2 * t) hU hu (by positivity) (hBz.trans hzU)
   rw [← hBdef] at hint hmean
   have hle2 : ∀ p ∈ B, u p ≤ M2 := fun p hp => le_polyMax hu.1 hzU (hBz hp)
@@ -64,12 +62,11 @@ theorem MollifiedLowerBound.proof (h0 : SubMeanPolydiscStatement)
     (integrable_indicator_iff measurableSet_closedBall).2 hint
   set c : ℝ := (t ^ (2 * D))⁻¹ * b with hcdef
   have hc0 : 0 ≤ c := by positivity
-  have hsc : ∀ y, ρ.scaled t y ≤ c := fun y =>
-    mul_le_mul_of_nonneg_left (hb _) (by positivity)
-  have key : ∫ y, (ρ.scaled t y * M2 - ρ.scaled t y * B.indicator u (z - y)) ≤
-      ∫ y, c * g (z - y) := by
-    refine integral_mono (((integrable_scaled ρ ht).mul_const M2).sub
-      (integrable_kC ρ ht hBind z)) ((hgint.comp_sub_left z).const_mul c) fun y => ?_
+  have hsc : ∀ y, ρ.scaled t y ≤ c := fun y => mul_le_mul_of_nonneg_left (hb _) (by positivity)
+  have key
+      : ∫ y, (ρ.scaled t y * M2 - ρ.scaled t y * B.indicator u (z - y)) ≤ ∫ y, c * g (z - y) := by
+    refine integral_mono (((integrable_scaled ρ ht).mul_const M2).sub (integrable_kC ρ ht hBind z))
+      ((hgint.comp_sub_left z).const_mul c) fun y => ?_
     by_cases hy : ρ.scaled t y = 0
     · simp only [hy, zero_mul, sub_zero]
       exact mul_nonneg hc0 (hg0 _)
@@ -77,15 +74,16 @@ theorem MollifiedLowerBound.proof (h0 : SubMeanPolydiscStatement)
       simp only [hgdef, indicator_of_mem hm]
       rw [← mul_sub]
       exact mul_le_mul_of_nonneg_right (hsc y) (sub_nonneg.2 (hle2 _ hm))
-  have hLHS : ∫ y, (ρ.scaled t y * M2 - ρ.scaled t y * B.indicator u (z - y)) =
-      M2 - molli ρ t u z := by
+  have hLHS
+      : ∫ y, (ρ.scaled t y * M2 - ρ.scaled t y * B.indicator u (z - y)) = M2 - molli ρ t u z := by
     rw [integral_sub ((integrable_scaled ρ ht).mul_const M2) (integrable_kC ρ ht hBind z),
       integral_mul_const, integral_scaled ρ ht, one_mul, molli_eq_C ρ ht hzB (φ := u)]
   have hRHS : ∫ y, c * g (z - y) = c * ∫ p in B, (M2 - u p) := by
     rw [integral_const_mul]
     congr 1
-    have := (Measure.measurePreserving_sub_left volume z).integral_comp
-      (Homeomorph.subLeft z).measurableEmbedding g
+    have :=
+      (Measure.measurePreserving_sub_left volume z).integral_comp
+        (Homeomorph.subLeft z).measurableEmbedding g
     rw [this, hgdef, integral_indicator measurableSet_closedBall]
   have hcV : c * volume.real B = Real.pi ^ D * (3 / 2 : ℝ) ^ (2 * D) * b := by
     rw [hV, hcdef]
@@ -93,8 +91,8 @@ theorem MollifiedLowerBound.proof (h0 : SubMeanPolydiscStatement)
     rw [mul_pow, ← pow_mul, mul_pow, pow_mul (3 / 2 : ℝ) 2 D]
     field_simp
   have hfin := mul_le_mul_of_nonneg_left hIB hc0
-  have e : c * (volume.real B * (M2 - M4)) =
-      Real.pi ^ D * (3 / 2 : ℝ) ^ (2 * D) * b * (M2 - M4) := by
+  have e
+      : c * (volume.real B * (M2 - M4)) = Real.pi ^ D * (3 / 2 : ℝ) ^ (2 * D) * b * (M2 - M4) := by
     rw [← hcV]; ring
   linarith
 

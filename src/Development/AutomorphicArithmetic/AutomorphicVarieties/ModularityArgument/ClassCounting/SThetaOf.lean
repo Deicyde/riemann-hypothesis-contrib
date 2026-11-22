@@ -8,9 +8,14 @@ noncomputable section
 
 namespace UpperTheory.V.ZK
 
-private theorem gl_hom_transvection_eq_one_of_ne_zero_of_ne_one {k M : Type} [Field k] [CommGroup M] {n : ℕ} (a : k) (ha0 : a ≠ 0) (ha1 : a ≠ 1)
-    (Φ : GL (Fin n) k →* M) (t : Matrix.TransvectionStruct (Fin n) k) (u : GL (Fin n) k)
-    (hu : (u : Matrix (Fin n) (Fin n) k) = t.toMatrix) : Φ u = 1 := by
+private theorem gl_hom_transvection_eq_one_of_ne_zero_of_ne_one
+    {k M : Type} [Field k] [CommGroup M]
+    {n : ℕ}
+    (a : k) (ha0 : a ≠ 0) (ha1 : a ≠ 1)
+    (Φ : GL (Fin n) k →* M)
+    (t : Matrix.TransvectionStruct (Fin n) k) (u : GL (Fin n) k)
+    (hu : (u : Matrix (Fin n) (Fin n) k) = t.toMatrix)
+    : Φ u = 1 := by
   obtain ⟨i, j, hij, c⟩ := t
   change (u : Matrix (Fin n) (Fin n) k) = Matrix.transvection i j c at hu
   have hD : IsUnit (Matrix.diagonal (Function.update (fun _ => (1 : k)) i a)).det := by
@@ -24,12 +29,15 @@ private theorem gl_hom_transvection_eq_one_of_ne_zero_of_ne_one {k M : Type} [Fi
     intro x
     rw [Matrix.det_transvection_of_ne i j hij]
     exact isUnit_one
-  have hcomm : ∀ x : k, Matrix.diagonal (Function.update (fun _ => (1 : k)) i a) * Matrix.transvection i j x =
-      Matrix.transvection i j (a * x) * Matrix.diagonal (Function.update (fun _ => (1 : k)) i a) := by
+  have hcomm
+      : ∀ x : k,
+        Matrix.diagonal (Function.update (fun _ => (1 : k)) i a) * Matrix.transvection i j x
+          = Matrix.transvection i j (a * x)
+            * Matrix.diagonal (Function.update (fun _ => (1 : k)) i a) := by
     intro x
     ext r s
-    simp only [Matrix.transvection, Matrix.diagonal_mul, Matrix.mul_diagonal, Matrix.add_apply, Matrix.one_apply,
-      Matrix.single_apply, Function.update_apply]
+    simp only [Matrix.transvection, Matrix.diagonal_mul, Matrix.mul_diagonal, Matrix.add_apply,
+      Matrix.one_apply, Matrix.single_apply, Function.update_apply]
     rcases eq_or_ne r i with rfl | hr <;> rcases eq_or_ne s j with rfl | hs
     · simp [hij, Ne.symm hij]
     · by_cases hrs : r = s
@@ -202,8 +210,8 @@ theorem sThetaOf : SThetaOf := by
       exact orderOf_dvd_natCard ζ
     rw [Nat.card_units] at hd
     have hpos : 0 < Nat.card k := Nat.card_pos
-    rw [← Nat.sub_add_cancel hpos, Nat.cast_add, (ZMod.natCast_eq_zero_iff _ _).2 hd,
-      Nat.cast_one, zero_add]
+    rw [← Nat.sub_add_cancel hpos, Nat.cast_add, (ZMod.natCast_eq_zero_iff _ _).2 hd, Nat.cast_one,
+      zero_add]
   obtain ⟨θ, hθ, hθk⟩ := h5 k (ZMod q) hcard (2 * e + 1 + 1) t ht0
   refine ⟨θ, hθ, ?_⟩
   unfold HasVal
@@ -218,54 +226,74 @@ theorem sThetaOf : SThetaOf := by
   have ha1 : (ζ : k) ≠ 1 := by
     intro h
     exact hζ.ne_one hq1 (Units.val_eq_one.mp h)
-  let w : kˣ →* Multiplicative (ZMod q) := MonoidHom.mk'
-    (fun u => Multiplicative.ofAdd ((x : ZMod q) ^ (e + 1) * Multiplicative.toAdd (v u)))
-    (by
-      intro a b
-      simp only [map_mul, toAdd_mul, mul_add, ofAdd_add])
-  have hP : ∀ (W : Type) [AddCommGroup W] [Module k W] (g' : W ≃ₗ[k] W),
-      Cyc (prism (ZMod q) g' (2 * e + 1 + 1)
-        (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e))) := by
+  let w : kˣ →* Multiplicative (ZMod q) :=
+    MonoidHom.mk'
+      (fun u => Multiplicative.ofAdd ((x : ZMod q) ^ (e + 1) * Multiplicative.toAdd (v u)))
+      (by
+        intro a b
+        simp only [map_mul, toAdd_mul, mul_add, ofAdd_add])
+  have hP
+      : ∀ (W : Type) [AddCommGroup W] [Module k W] (g' : W ≃ₗ[k] W),
+        Cyc (prism (ZMod q) g' (2 * e + 1 + 1)
+          (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e))) := by
     intro W _ _ g'
     exact cyc_prism (A := ZMod q) (m := 2 * e + 1) (z := zc q e) h1 h2
-      ((scal W).comp (chi q ζ hζ.pow_eq_one x)) g' (fun c => scal_comm (chi q ζ hζ.pow_eq_one x c) g') (h4 q e)
-  have hmul : ∀ (W : Type) [AddCommGroup W] [Module k W] [Finite W] (g₁ g₂ : W ≃ₗ[k] W),
-      θ W (prism (ZMod q) (g₁ * g₂) (2 * e + 1 + 1)
-        (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e))) =
-      θ W (prism (ZMod q) g₁ (2 * e + 1 + 1)
-        (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e))) +
-      θ W (prism (ZMod q) g₂ (2 * e + 1 + 1)
-        (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e))) := by
+      ((scal W).comp (chi q ζ hζ.pow_eq_one x)) g'
+      (fun c => scal_comm (chi q ζ hζ.pow_eq_one x c) g')
+      (h4 q e)
+  have hmul
+      : ∀ (W : Type) [AddCommGroup W] [Module k W] [Finite W] (g₁ g₂ : W ≃ₗ[k] W),
+        θ W
+            (prism (ZMod q) (g₁ * g₂) (2 * e + 1 + 1)
+              (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e)))
+          = θ W
+              (prism (ZMod q) g₁ (2 * e + 1 + 1)
+                (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e)))
+            + θ W
+              (prism (ZMod q) g₂ (2 * e + 1 + 1)
+                (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1)
+                  (zc q e))) := by
     intro W _ _ _ g₁ g₂
-    have hz : Cyc (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e)) :=
+    have hz
+        : Cyc (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e)) :=
       cyc_cm h1 _ (h4 q e)
     have hb := hθ.bdry W _ (h3 (ZMod q) (W ≃ₗ[k] W) g₁ g₂ (2 * e + 1) _ hz)
     rw [conj_fix h1 ((scal W).comp (chi q ζ hζ.pow_eq_one x)) g₁
-      (fun c => scal_comm (chi q ζ hζ.pow_eq_one x c) g₁) (2 * e + 1 + 1) (zc q e), map_sub, map_sub,
-      sub_eq_zero, sub_eq_iff_eq_add] at hb
+          (fun c => scal_comm (chi q ζ hζ.pow_eq_one x c) g₁)
+          (2 * e + 1 + 1) (zc q e),
+        map_sub, map_sub, sub_eq_zero, sub_eq_iff_eq_add]
+      at hb
     rw [hb, add_comm]
-  let F : ∀ (W : Type) [AddCommGroup W] [Module k W] [Finite W], (W ≃ₗ[k] W) →* Multiplicative (ZMod q) :=
-    fun W _ _ _ => MonoidHom.mk'
-      (fun g₁ => Multiplicative.ofAdd (θ W (prism (ZMod q) g₁ (2 * e + 1 + 1)
-        (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e)))))
+  let F
+      : ∀ (W : Type) [AddCommGroup W] [Module k W] [Finite W],
+        (W ≃ₗ[k] W) →* Multiplicative (ZMod q) := fun W _ _ _ =>
+    MonoidHom.mk'
+      (fun g₁ =>
+        Multiplicative.ofAdd (θ W
+          (prism (ZMod q) g₁ (2 * e + 1 + 1)
+            (cm (ZMod q) ((scal W).comp (chi q ζ hζ.pow_eq_one x)) (2 * e + 1 + 1) (zc q e)))))
       (fun g₁ g₂ => by simp only [hmul W g₁ g₂, ofAdd_add])
   have key := fam_det (ζ : k) ha0 ha1 F w ?_ ?_ ?_ V g
   · exact Multiplicative.ofAdd.injective key
   · intro V' W' _ _ _ _ _ _ φ g'
     show Multiplicative.ofAdd _ = Multiplicative.ofAdd _
     congr 1
-    have hc : (cj φ).comp ((scal V').comp (chi q ζ hζ.pow_eq_one x)) =
-        (scal W').comp (chi q ζ hζ.pow_eq_one x) := by
+    have hc
+        : (cj φ).comp ((scal V').comp (chi q ζ hζ.pow_eq_one x))
+          = (scal W').comp (chi q ζ hζ.pow_eq_one x) := by
       ext u y
       simp [cj, scal, Units.smul_def]
     rw [← hθ.iso V' W' φ _ (hP V' g'), (h1 _).2.2.2.1, ← (h1 _).2.2.1, hc]
   · intro V' W' _ _ _ _ _ _ g₁ g₂
     let f : Cq q →* (V' ≃ₗ[k] V') × (W' ≃ₗ[k] W') :=
-      MonoidHom.prod ((scal V').comp (chi q ζ hζ.pow_eq_one x)) ((scal W').comp (chi q ζ hζ.pow_eq_one x))
-    have hy := cyc_prism h1 h2 f (g₁, g₂) (fun c => Prod.ext (scal_comm _ g₁) (scal_comm _ g₂)) (h4 q e)
+      MonoidHom.prod ((scal V').comp (chi q ζ hζ.pow_eq_one x))
+        ((scal W').comp (chi q ζ hζ.pow_eq_one x))
+    have hy :=
+      cyc_prism h1 h2 f (g₁, g₂) (fun c => Prod.ext (scal_comm _ g₁) (scal_comm _ g₂)) (h4 q e)
     have ha := hθ.add _ V' W' (MonoidHom.fst _ _) (MonoidHom.snd _ _) _ hy
     rw [(h1 _).2.2.2.1, (h1 _).2.2.2.1, (h1 _).2.2.2.1, ← (h1 _).2.2.1, ← (h1 _).2.2.1,
-      ← (h1 _).2.2.1] at ha
+        ← (h1 _).2.2.1]
+      at ha
     show Multiplicative.ofAdd _ = Multiplicative.ofAdd _ * Multiplicative.ofAdd _
     rw [← ofAdd_add]
     congr 1

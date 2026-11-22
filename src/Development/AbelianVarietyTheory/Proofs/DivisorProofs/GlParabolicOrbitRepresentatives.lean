@@ -15,6 +15,4 @@ variable {k : Type} [Field k]
 
 variable {n m : ℕ}
 
-
-
 end GlobalTheory.OrbitsGLParab

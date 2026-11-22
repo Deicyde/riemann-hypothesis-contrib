@@ -18,27 +18,28 @@ section
 
 variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} {F : Type} [Field F]
 
-
 omit [Fintype K] in
-theorem segre_weight_mapDomain (e : (Σ k, ι k) →₀ ℕ) :
-    Finsupp.weight (NumbersDVR.blockWeight (segreIdx ι))
-        (Finsupp.mapDomain (fun v : Σ k, ι k => (⟨Sum.inr v.1, v.2⟩ : Σ c, segreIdx ι c)) e) =
-      Sum.elim (fun _ => 0) (Finsupp.weight (NumbersDVR.blockWeight ι) e) := by
+theorem segre_weight_mapDomain (e : (Σ k, ι k) →₀ ℕ)
+    : Finsupp.weight (NumbersDVR.blockWeight (segreIdx ι))
+        (Finsupp.mapDomain (fun v : Σ k, ι k => (⟨Sum.inr v.1, v.2⟩ : Σ c, segreIdx ι c)) e)
+      = Sum.elim (fun _ => 0) (Finsupp.weight (NumbersDVR.blockWeight ι) e) := by
   rw [Finsupp.weight_apply, Finsupp.weight_apply,
     Finsupp.sum_mapDomain_index
       (h := fun (v : Σ c, segreIdx ι c) (n : ℕ) => n • NumbersDVR.blockWeight (segreIdx ι) v)
-      (fun _ => zero_smul _ _) (fun _ _ _ => add_smul _ _ _)]
+      (fun _ => zero_smul _ _)
+      (fun _ _ _ => add_smul _ _ _)]
   funext c
   rcases c with ⟨⟨⟩⟩ | k
   · simp [Finsupp.sum, Finset.sum_apply, NumbersDVR.blockWeight]
   · simp [Finsupp.sum, Finset.sum_apply, NumbersDVR.blockWeight, Pi.single_apply]
 
-theorem segreIncl_weightedHomogeneousComponent (b : K → ℕ) (f : MRing ι F) :
-    segreIncl ι F (weightedHomogeneousComponent (NumbersDVR.blockWeight ι) b f) =
-      weightedHomogeneousComponent (NumbersDVR.blockWeight (segreIdx ι)) (Sum.elim (fun _ => 0) b)
+theorem segreIncl_weightedHomogeneousComponent (b : K → ℕ) (f : MRing ι F)
+    : segreIncl ι F (weightedHomogeneousComponent (NumbersDVR.blockWeight ι) b f)
+      = weightedHomogeneousComponent (NumbersDVR.blockWeight (segreIdx ι)) (Sum.elim (fun _ => 0) b)
         (segreIncl ι F f) := by
   classical
-  have hinj : Function.Injective (fun v : Σ k, ι k => (⟨Sum.inr v.1, v.2⟩ : Σ c, segreIdx ι c)) := by
+  have hinj
+      : Function.Injective (fun v : Σ k, ι k => (⟨Sum.inr v.1, v.2⟩ : Σ c, segreIdx ι c)) := by
     rintro ⟨k, i⟩ ⟨k', i'⟩ h
     have h1 := Sigma.mk.inj h
     obtain rfl := Sum.inr_injective h1.1
@@ -46,8 +47,8 @@ theorem segreIncl_weightedHomogeneousComponent (b : K → ℕ) (f : MRing ι F) 
     rfl
   ext e'
   rw [coeff_weightedHomogeneousComponent]
-  by_cases he : ∃ e, Finsupp.mapDomain
-      (fun v : Σ k, ι k => (⟨Sum.inr v.1, v.2⟩ : Σ c, segreIdx ι c)) e = e'
+  by_cases he
+    : ∃ e, Finsupp.mapDomain (fun v : Σ k, ι k => (⟨Sum.inr v.1, v.2⟩ : Σ c, segreIdx ι c)) e = e'
   · obtain ⟨e, rfl⟩ := he
     rw [segreIncl, coeff_rename_mapDomain _ hinj, coeff_rename_mapDomain _ hinj,
       coeff_weightedHomogeneousComponent, segre_weight_mapDomain]
@@ -60,18 +61,19 @@ theorem segreIncl_weightedHomogeneousComponent (b : K → ℕ) (f : MRing ι F) 
     · rw [coeff_rename_eq_zero _ _ _ fun u hu => absurd hu (he u)]
     · rfl
 
-theorem segreLiftVal_eq (W : Ideal (MRing ι F)) (v : Σ c, segreIdx ι c) :
-    ∃ β, segreLiftVal ι F W v =
-      Polynomial.X ^ (NumbersDVR.blockWeight (segreIdx ι) v (Sum.inl ())) * Polynomial.C β := by
+theorem segreLiftVal_eq (W : Ideal (MRing ι F)) (v : Σ c, segreIdx ι c)
+    : ∃ β,
+      segreLiftVal ι F W v
+        = Polynomial.X ^ (NumbersDVR.blockWeight (segreIdx ι) v (Sum.inl ())) * Polynomial.C β := by
   rcases v with ⟨⟨⟨⟩⟩ | k, i⟩
-  · exact ⟨Ideal.Quotient.mk W (∏ k, X ⟨k, i k⟩), by
-      simp [segreLiftVal, NumbersDVR.blockWeight]⟩
+  · exact ⟨Ideal.Quotient.mk W (∏ k, X ⟨k, i k⟩), by simp [segreLiftVal, NumbersDVR.blockWeight]⟩
   · exact ⟨Ideal.Quotient.mk W (X ⟨k, i⟩), by simp [segreLiftVal, NumbersDVR.blockWeight]⟩
 
-theorem segreLiftMap_monomial (W : Ideal (MRing ι F)) (s : (Σ c, segreIdx ι c) →₀ ℕ) :
-    ∀ r : F, ∃ a, segreLiftMap ι F W (monomial s r) =
-      Polynomial.X ^ (Finsupp.weight (NumbersDVR.blockWeight (segreIdx ι)) s (Sum.inl ())) *
-        Polynomial.C a := by
+theorem segreLiftMap_monomial (W : Ideal (MRing ι F)) (s : (Σ c, segreIdx ι c) →₀ ℕ)
+    : ∀ r : F, ∃ a,
+      segreLiftMap ι F W (monomial s r)
+        = Polynomial.X ^ (Finsupp.weight (NumbersDVR.blockWeight (segreIdx ι)) s (Sum.inl ()))
+          * Polynomial.C a := by
   refine Finsupp.induction s ?_ ?_
   · intro r
     refine ⟨algebraMap F _ r, ?_⟩
@@ -80,16 +82,19 @@ theorem segreLiftMap_monomial (W : Ideal (MRing ι F)) (s : (Σ c, segreIdx ι c
     obtain ⟨a, ha⟩ := ih r
     obtain ⟨β, hβ⟩ := segreLiftVal_eq W v
     refine ⟨β ^ n * a, ?_⟩
-    have hm : (monomial (Finsupp.single v n + s) r : MRing (segreIdx ι) F) =
-        X v ^ n * monomial s r := by
+    have hm
+        : (monomial (Finsupp.single v n + s) r : MRing (segreIdx ι) F)
+          = X v ^ n * monomial s r := by
       rw [X_pow_eq_monomial, monomial_mul, one_mul]
     rw [hm, map_mul, map_pow, ha, segreLiftMap, aeval_X, hβ, map_add (f := _), Pi.add_apply,
       Finsupp.weight_single, Pi.smul_apply, smul_eq_mul, map_mul, map_pow]
     ring
 
-theorem segreLiftMap_of_isWeightedHomogeneous (W : Ideal (MRing ι F)) {f : MRing (segreIdx ι) F}
-    {e : Unit ⊕ K → ℕ} (hf : IsWeightedHomogeneous (NumbersDVR.blockWeight (segreIdx ι)) f e) :
-    ∃ a, segreLiftMap ι F W f = Polynomial.X ^ e (Sum.inl ()) * Polynomial.C a := by
+theorem segreLiftMap_of_isWeightedHomogeneous
+    (W : Ideal (MRing ι F))
+    {f : MRing (segreIdx ι) F} {e : Unit ⊕ K → ℕ}
+    (hf : IsWeightedHomogeneous (NumbersDVR.blockWeight (segreIdx ι)) f e)
+    : ∃ a, segreLiftMap ι F W f = Polynomial.X ^ e (Sum.inl ()) * Polynomial.C a := by
   classical
   choose a ha using fun s => segreLiftMap_monomial W s (AddMonoidAlgebra.coeff f s)
   refine ⟨∑ s ∈ f.support, a s, ?_⟩
@@ -143,13 +148,13 @@ theorem SegreLiftComap.proof : SegreLiftComap.Statement := by
   let j : MRing ι F ⧸ W →+* D :=
     Ideal.quotientMap W' (segreIncl ι F : MRing ι F →+* MRing (segreIdx ι) F) le_rfl
   have hj : Function.Injective j := Ideal.quotientMap_injective' le_rfl
-  have hjmk : ∀ x, j (Ideal.Quotient.mk W x) = Ideal.Quotient.mk W' (segreIncl ι F x) :=
-    fun x => Ideal.quotientMap_mk
+  have hjmk : ∀ x, j (Ideal.Quotient.mk W x) = Ideal.Quotient.mk W' (segreIncl ι F x) := fun x =>
+    Ideal.quotientMap_mk
   let Φ : Polynomial (MRing ι F ⧸ W) →+* L := Polynomial.eval₂RingHom ((algebraMap D L).comp j) u
-  have hΦ : ∀ a, Φ (Polynomial.C a) = algebraMap D L (j a) := fun a => by
-    simp [Φ]
+  have hΦ : ∀ a, Φ (Polynomial.C a) = algebraMap D L (j a) := fun a => by simp [Φ]
   have hkey : ∀ f, Φ (segreLiftMap ι F W f) = π f := by
-    have : Φ.comp (segreLiftMap ι F W : MRing (segreIdx ι) F →+* Polynomial (MRing ι F ⧸ W)) = π := by
+    have : Φ.comp (segreLiftMap ι F W : MRing (segreIdx ι) F →+* Polynomial (MRing ι F ⧸ W))
+        = π := by
       refine MvPolynomial.ringHom_ext (fun r => ?_) (fun v => ?_)
       · simp only [RingHom.comp_apply, RingHom.coe_coe, segreLiftMap, aeval_C,
           Polynomial.algebraMap_apply, hΦ]
@@ -178,11 +183,12 @@ theorem SegreLiftComap.proof : SegreLiftComap.Statement := by
   · intro hf
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← sum_weightedHomogeneousComponent (NumbersDVR.blockWeight (segreIdx ι)) f,
-      finsum_eq_sum _ (weightedHomogeneousComponent_finsupp f), map_sum]
+        finsum_eq_sum _ (weightedHomogeneousComponent_finsupp f), map_sum]
     refine Finset.sum_eq_zero fun e _ => ?_
-    obtain ⟨a, ha⟩ := segreLiftMap_of_isWeightedHomogeneous W
-      (weightedHomogeneousComponent_isWeightedHomogeneous
-        (w := NumbersDVR.blockWeight (segreIdx ι)) e f)
+    obtain ⟨a, ha⟩ :=
+      segreLiftMap_of_isWeightedHomogeneous W
+        (weightedHomogeneousComponent_isWeightedHomogeneous
+          (w := NumbersDVR.blockWeight (segreIdx ι)) e f)
     have h0 : Φ (Polynomial.X ^ e (Sum.inl ()) * Polynomial.C a) = 0 := by
       rw [← ha, hkey]
       exact (hπ _).mpr (hW'.multiHomog f hf e)

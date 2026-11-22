@@ -32,14 +32,11 @@ theorem mem_allL (a : Fin n × Fin n) : a ∈ allL n := by
   simp only [allL, List.mem_flatMap, List.mem_map, List.mem_finRange, true_and]
   exact ⟨a.1, a.2, rfl⟩
 
-theorem mem_lowL {a : Fin n × Fin n} : a ∈ lowL n ↔ IsLower a := by
-  simp [lowL, mem_allL, IsLower]
+theorem mem_lowL {a : Fin n × Fin n} : a ∈ lowL n ↔ IsLower a := by simp [lowL, mem_allL, IsLower]
 
-theorem mem_diagL {a : Fin n × Fin n} : a ∈ diagL n ↔ IsDiag a := by
-  simp [diagL, mem_allL, IsDiag]
+theorem mem_diagL {a : Fin n × Fin n} : a ∈ diagL n ↔ IsDiag a := by simp [diagL, mem_allL, IsDiag]
 
-theorem mem_upL {a : Fin n × Fin n} : a ∈ upL n ↔ IsUpper a := by
-  simp [upL, mem_allL, IsUpper]
+theorem mem_upL {a : Fin n × Fin n} : a ∈ upL n ↔ IsUpper a := by simp [upL, mem_allL, IsUpper]
 
 theorem nodup_allL : (allL n).Nodup := by
   have := nodup_letters (n := n)
@@ -55,12 +52,13 @@ theorem nodup_allL : (allL n).Nodup := by
 def blockW (l : List (Fin n × Fin n)) (m : Fin n × Fin n →₀ ℕ) : List (Fin n × Fin n) :=
   l.flatMap fun a => List.replicate (m a) a
 
-theorem expand_eq_blocks (m : Fin n × Fin n →₀ ℕ) :
-    expand m = blockW (lowL n) m ++ blockW (diagL n) m ++ blockW (upL n) m := by
+theorem expand_eq_blocks (m : Fin n × Fin n →₀ ℕ)
+    : expand m = blockW (lowL n) m ++ blockW (diagL n) m ++ blockW (upL n) m := by
   simp [expand, letters_eq_blocks, blockW, List.flatMap_append]
 
-theorem blockW_congr {l : List (Fin n × Fin n)} {m m' : Fin n × Fin n →₀ ℕ}
-    (h : ∀ a ∈ l, m a = m' a) : blockW l m = blockW l m' := by
+theorem blockW_congr
+    {l : List (Fin n × Fin n)} {m m' : Fin n × Fin n →₀ ℕ} (h : ∀ a ∈ l, m a = m' a)
+    : blockW l m = blockW l m' := by
   unfold blockW
   induction l with
   | nil => rfl
@@ -68,19 +66,22 @@ theorem blockW_congr {l : List (Fin n × Fin n)} {m m' : Fin n × Fin n →₀ �
     rw [List.flatMap_cons, List.flatMap_cons, h a (List.mem_cons_self ..),
       ih fun b hb => h b (List.mem_cons_of_mem _ hb)]
 
-theorem blockW_eq_nil {l : List (Fin n × Fin n)} {m : Fin n × Fin n →₀ ℕ}
-    (h : ∀ a ∈ l, m a = 0) : blockW l m = [] := by
+theorem blockW_eq_nil {l : List (Fin n × Fin n)} {m : Fin n × Fin n →₀ ℕ} (h : ∀ a ∈ l, m a = 0)
+    : blockW l m = [] := by
   rw [blockW_congr (m' := 0) (by simpa using h)]
   simp [blockW]
 
-theorem mem_of_mem_blockW {l : List (Fin n × Fin n)} {m : Fin n × Fin n →₀ ℕ}
-    {a : Fin n × Fin n} (ha : a ∈ blockW l m) : a ∈ l ∧ m a ≠ 0 := by
+theorem mem_of_mem_blockW
+    {l : List (Fin n × Fin n)} {m : Fin n × Fin n →₀ ℕ} {a : Fin n × Fin n} (ha : a ∈ blockW l m)
+    : a ∈ l ∧ m a ≠ 0 := by
   simp only [blockW, List.mem_flatMap, List.mem_replicate] at ha
   obtain ⟨b, hb, hne, rfl⟩ := ha
   exact ⟨hb, hne⟩
 
-theorem blockW_ne_nil {l : List (Fin n × Fin n)} {m : Fin n × Fin n →₀ ℕ} {a : Fin n × Fin n}
-    (ha : a ∈ l) (hm : m a ≠ 0) : blockW l m ≠ [] := by
+theorem blockW_ne_nil
+    {l : List (Fin n × Fin n)} {m : Fin n × Fin n →₀ ℕ} {a : Fin n × Fin n}
+    (ha : a ∈ l) (hm : m a ≠ 0)
+    : blockW l m ≠ [] := by
   intro h
   have : a ∈ blockW l m := by
     simp only [blockW, List.mem_flatMap, List.mem_replicate]
@@ -88,8 +89,8 @@ theorem blockW_ne_nil {l : List (Fin n × Fin n)} {m : Fin n × Fin n →₀ ℕ
   rw [h] at this
   simp at this
 
-theorem canon_eq_blocks (m : Fin n × Fin n →₀ ℕ) :
-    canon m = word (blockW (lowL n) m) * word (blockW (diagL n) m) * word (blockW (upL n) m) := by
+theorem canon_eq_blocks (m : Fin n × Fin n →₀ ℕ)
+    : canon m = word (blockW (lowL n) m) * word (blockW (diagL n) m) * word (blockW (upL n) m) := by
   rw [canon, expand_eq_blocks, word_append, word_append]
 
 def HasUpper (m : Fin n × Fin n →₀ ℕ) : Prop := ∃ a, IsUpper a ∧ m a ≠ 0
@@ -112,7 +113,8 @@ theorem not_isDiagExp_of_hasUpper {m : Fin n × Fin n →₀ ℕ} (h : HasUpper 
   intro hd
   have := hd a hm
   simp only [IsUpper, IsDiag] at ha this
-  rw [this] at ha; exact lt_irrefl _ ha
+  rw [this] at ha
+  exact lt_irrefl _ ha
 
 noncomputable def cartanSet (n : ℕ) : Set (U n) := Set.range fun i : Fin n => e (i, i)
 
@@ -137,10 +139,12 @@ instance cartanSub.instIsMulCommutative : IsMulCommutative (cartanSub n) :=
 open scoped IsMulCommutative
 
 noncomputable def hcEmb : MvPolynomial (Fin n) ℂ →ₐ[ℂ] U n :=
-  (cartanSub n).val.comp (aeval fun i => (⟨e (i, i), Algebra.subset_adjoin (s := cartanSet n) (Set.mem_range_self i)⟩ : cartanSub n))
+  (cartanSub n).val.comp
+    (aeval fun i =>
+      (⟨e (i, i), Algebra.subset_adjoin (s := cartanSet n) (Set.mem_range_self i)⟩ : cartanSub n))
 
-@[simp] theorem hcEmb_X (i : Fin n) : hcEmb (X i) = e (n := n) (i, i) := by
-  simp [hcEmb]
+@[simp]
+theorem hcEmb_X (i : Fin n) : hcEmb (X i) = e (n := n) (i, i) := by simp [hcEmb]
 
 theorem hcEmb_mem_cartanSub (p : MvPolynomial (Fin n) ℂ) : hcEmb p ∈ cartanSub n := by
   simp only [hcEmb, AlgHom.comp_apply]
@@ -149,13 +153,17 @@ theorem hcEmb_mem_cartanSub (p : MvPolynomial (Fin n) ℂ) : hcEmb p ∈ cartanS
 noncomputable def diagExp (m : Fin n × Fin n →₀ ℕ) : Fin n →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm fun i => m (i, i)
 
-@[simp] theorem diagExp_apply (m : Fin n × Fin n →₀ ℕ) (i : Fin n) : diagExp m i = m (i, i) := rfl
+@[simp]
+theorem diagExp_apply (m : Fin n × Fin n →₀ ℕ) (i : Fin n) : diagExp m i = m (i, i) := rfl
 
-theorem word_blockW_diagL (m : Fin n × Fin n →₀ ℕ) :
-    word (blockW (diagL n) m) = hcEmb (monomial (diagExp m) 1) := by
+theorem word_blockW_diagL (m : Fin n × Fin n →₀ ℕ)
+    : word (blockW (diagL n) m) = hcEmb (monomial (diagExp m) 1) := by
   classical
   let g : Fin n × Fin n → cartanSub n := fun a =>
-    if h : a.1 = a.2 then ⟨e (a.1, a.1), Algebra.subset_adjoin (s := cartanSet n) (Set.mem_range_self a.1)⟩ ^ m a else 1
+    if h : a.1 = a.2 then
+      ⟨e (a.1, a.1), Algebra.subset_adjoin (s := cartanSet n) (Set.mem_range_self a.1)⟩ ^ m a
+    else
+      1
   have hg : ∀ a ∈ diagL n, ((g a : cartanSub n) : U n) = e a ^ m a := by
     intro a ha
     have h : a.1 = a.2 := mem_diagL.1 ha
@@ -179,9 +187,9 @@ theorem word_blockW_diagL (m : Fin n × Fin n →₀ ℕ) :
   simp only [Subalgebra.coe_val, diagExp_apply, g]
   rfl
 
-theorem canon_eq_triangular (m : Fin n × Fin n →₀ ℕ) :
-    canon m = word (blockW (lowL n) m) * hcEmb (monomial (diagExp m) 1) *
-      word (blockW (upL n) m) := by
+theorem canon_eq_triangular (m : Fin n × Fin n →₀ ℕ)
+    : canon m
+      = word (blockW (lowL n) m) * hcEmb (monomial (diagExp m) 1) * word (blockW (upL n) m) := by
   rw [canon_eq_blocks, word_blockW_diagL]
 
 def nPlusU (n : ℕ) : Submodule ℂ (U n) :=
@@ -206,8 +214,10 @@ theorem canon_mem_nPlusU {m : Fin n × Fin n →₀ ℕ} (h : HasUpper m) : cano
 noncomputable def notUpper (m : Fin n × Fin n →₀ ℕ) : Fin n × Fin n →₀ ℕ :=
   m.filter fun a => ¬ IsUpper a
 
-theorem isUpper_of_mem_support {P : Fin n × Fin n → Prop} {m : Fin n × Fin n →₀ ℕ}
-    (hm : ∀ a ∈ m.support, P a) {a : Fin n × Fin n} (ha : ¬ P a) : m a = 0 := by
+theorem isUpper_of_mem_support
+    {P : Fin n × Fin n → Prop} {m : Fin n × Fin n →₀ ℕ} (hm : ∀ a ∈ m.support, P a)
+    {a : Fin n × Fin n} (ha : ¬ P a)
+    : m a = 0 := by
   by_contra h
   exact ha (hm a (Finsupp.mem_support_iff.2 h))
 
@@ -223,13 +233,15 @@ theorem not_lower_of_upper {a : Fin n × Fin n} (h : IsUpper a) : ¬ IsLower a :
 theorem not_lower_of_diag {a : Fin n × Fin n} (h : IsDiag a) : ¬ IsLower a := by
   simp only [IsDiag, IsLower] at *; rw [h]; exact lt_irrefl _
 
-theorem canon_notUpper_add {m m' : Fin n × Fin n →₀ ℕ} (hm' : ∀ a ∈ m'.support, IsUpper a) :
-    word (blockW (lowL n) m) * word (blockW (diagL n) m) * canon m' = canon (notUpper m + m') := by
+theorem canon_notUpper_add {m m' : Fin n × Fin n →₀ ℕ} (hm' : ∀ a ∈ m'.support, IsUpper a)
+    : word (blockW (lowL n) m) * word (blockW (diagL n) m) * canon m'
+      = canon (notUpper m + m') := by
   have hlow : ∀ a ∈ lowL n, m' a = 0 := fun a ha =>
     isUpper_of_mem_support hm' (not_upper_of_lower (mem_lowL.1 ha))
   have hdiag : ∀ a ∈ diagL n, m' a = 0 := fun a ha =>
     isUpper_of_mem_support hm' (not_upper_of_diag (mem_diagL.1 ha))
-  rw [canon_eq_blocks m', blockW_eq_nil hlow, blockW_eq_nil hdiag, canon_eq_blocks (notUpper m + m')]
+  rw [canon_eq_blocks m', blockW_eq_nil hlow, blockW_eq_nil hdiag,
+    canon_eq_blocks (notUpper m + m')]
   simp only [word_nil, one_mul]
   congr 2
   · refine congrArg word (blockW_congr fun a ha => ?_)
@@ -242,8 +254,9 @@ theorem canon_notUpper_add {m m' : Fin n × Fin n →₀ ℕ} (hm' : ∀ a ∈ m
     have h := mem_upL.1 ha
     simp [notUpper, h]
 
-theorem hasUpper_notUpper_add {m m' : Fin n × Fin n →₀ ℕ} (hm' : ∀ a ∈ m'.support, IsUpper a)
-    (hdeg : 1 ≤ m'.degree) : HasUpper (notUpper m + m') := by
+theorem hasUpper_notUpper_add
+    {m m' : Fin n × Fin n →₀ ℕ} (hm' : ∀ a ∈ m'.support, IsUpper a) (hdeg : 1 ≤ m'.degree)
+    : HasUpper (notUpper m + m') := by
   have : m' ≠ 0 := by rintro rfl; simp at hdeg
   obtain ⟨a, ha⟩ := Finsupp.ne_iff.1 this
   refine ⟨a, hm' a (Finsupp.mem_support_iff.2 ha), ?_⟩
@@ -253,18 +266,21 @@ theorem hasUpper_notUpper_add {m m' : Fin n × Fin n →₀ ℕ} (hm' : ∀ a �
 def spanUpper (n : ℕ) : Submodule ℂ (U n) :=
   Submodule.span ℂ {x | ∃ m : Fin n × Fin n →₀ ℕ, HasUpper m ∧ canon m = x}
 
-theorem canon_mul_e_mem_spanUpper (m : Fin n × Fin n →₀ ℕ) {a : Fin n × Fin n} (ha : IsUpper a) :
-    canon m * e a ∈ spanUpper n := by
+theorem canon_mul_e_mem_spanUpper (m : Fin n × Fin n →₀ ℕ) {a : Fin n × Fin n} (ha : IsUpper a)
+    : canon m * e a ∈ spanUpper n := by
   have hw : ∀ b ∈ blockW (upL n) m ++ [a], IsUpper b := by
     intro b hb
     rcases List.mem_append.1 hb with hb | hb
     · exact mem_upL.1 (mem_of_mem_blockW hb).1
     · rw [List.mem_singleton.1 hb]; exact ha
   have hspan := word_mem_canonSpan closed_upper _ hw
-  rw [List.length_append, List.length_singleton, show min 1 ((blockW (upL n) m).length + 1) = 1 by
-    omega] at hspan
-  have heq : canon m * e a = word (blockW (lowL n) m) * word (blockW (diagL n) m) *
-      word (blockW (upL n) m ++ [a]) := by
+  rw [List.length_append, List.length_singleton,
+      show min 1 ((blockW (upL n) m).length + 1) = 1 by omega]
+    at hspan
+  have heq
+      : canon m * e a
+        = word (blockW (lowL n) m) * word (blockW (diagL n) m)
+          * word (blockW (upL n) m ++ [a]) := by
     rw [canon_eq_blocks, word_append, word_singleton, mul_assoc]
   rw [heq]
   have : ∀ y ∈ canonSpan IsUpper 1 ((blockW (upL n) m).length + 1),
@@ -283,8 +299,7 @@ theorem canon_mul_e_mem_spanUpper (m : Fin n × Fin n →₀ ℕ) {a : Fin n × 
 theorem nPlusU_le_spanUpper : nPlusU n ≤ spanUpper n := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨u, a, ha, rfl⟩
-  have hu : u ∈ Submodule.span ℂ (Set.range (canon (n := n))) := by
-    rw [span_canon_eq_top]; trivial
+  have hu : u ∈ Submodule.span ℂ (Set.range (canon (n := n))) := by rw [span_canon_eq_top]; trivial
   induction hu using Submodule.span_induction with
   | mem x hx => obtain ⟨m, rfl⟩ := hx; exact canon_mul_e_mem_spanUpper m ha
   | zero => simp

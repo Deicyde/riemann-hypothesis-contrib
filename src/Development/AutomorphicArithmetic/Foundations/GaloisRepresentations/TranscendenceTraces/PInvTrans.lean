@@ -6,42 +6,52 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
 namespace UpperTheory.Gal.TranscendenceTraces
 
-private theorem root_orbit {A B G Ω : Type} [CommRing A] [CommRing B] [Algebra A B] [Group G] [Finite G]
-    [MulSemiringAction G B] [SMulCommClass G A B] [Algebra.IsInvariant A B G] [Field Ω] (φ ψ : B →+* Ω)
-    (h : φ.comp (algebraMap A B) = ψ.comp (algebraMap A B)) (b : B) : ∃ g : G, ψ b = φ (g • b) :=
+private theorem root_orbit
+    {A B G Ω : Type} [CommRing A] [CommRing B] [Algebra A B] [Group G] [Finite G]
+    [MulSemiringAction G B] [SMulCommClass G A B] [Algebra.IsInvariant A B G] [Field Ω]
+    (φ ψ : B →+* Ω) (h : φ.comp (algebraMap A B) = ψ.comp (algebraMap A B))
+    (b : B)
+    : ∃ g : G, ψ b = φ (g • b) :=
   _root_.UpperTheory.Reformulated.B.Qi49.root_orbit φ ψ h b
 
-private theorem same_ker {A B G Ω : Type} [CommRing A] [CommRing B] [Algebra A B] [Group G] [Finite G]
-    [MulSemiringAction G B] [SMulCommClass G A B] [Algebra.IsInvariant A B G] [Field Ω] (φ ψ : B →+* Ω)
-    (h : φ.comp (algebraMap A B) = ψ.comp (algebraMap A B)) (hk : RingHom.ker φ = RingHom.ker ψ) :
-    ∃ g : G, ∀ b, ψ b = φ (g • b) := by
+private theorem same_ker
+    {A B G Ω : Type} [CommRing A] [CommRing B] [Algebra A B] [Group G] [Finite G]
+    [MulSemiringAction G B] [SMulCommClass G A B] [Algebra.IsInvariant A B G] [Field Ω]
+    (φ ψ : B →+* Ω)
+    (h : φ.comp (algebraMap A B) = ψ.comp (algebraMap A B)) (hk : RingHom.ker φ = RingHom.ker ψ)
+    : ∃ g : G, ∀ b, ψ b = φ (g • b) := by
   let Q : Ideal B := RingHom.ker φ
   haveI : Q.IsPrime := RingHom.ker_isPrime φ
   let P : Ideal A := Q.under A
   haveI : Q.LiesOver P := ⟨rfl⟩
   let φb : B ⧸ Q →+* Ω := Ideal.Quotient.lift Q φ (fun a ha => ha)
-  let ψb : B ⧸ Q →+* Ω := Ideal.Quotient.lift Q ψ (fun a ha => by
-    have : a ∈ RingHom.ker ψ := hk ▸ ha
-    exact this)
+  let ψb : B ⧸ Q →+* Ω :=
+    Ideal.Quotient.lift Q ψ (fun a ha => by
+      have : a ∈ RingHom.ker ψ := hk ▸ ha
+      exact this)
   have φm : ∀ b, φb (Ideal.Quotient.mk Q b) = φ b := fun b => Ideal.Quotient.lift_mk _ _ _
   have ψm : ∀ b, ψb (Ideal.Quotient.mk Q b) = ψ b := fun b => Ideal.Quotient.lift_mk _ _ _
-  have inj : ∀ f : B ⧸ Q →+* Ω, (∀ b, f (Ideal.Quotient.mk Q b) = 0 → b ∈ Q) → Function.Injective f := by
+  have inj
+      : ∀ f : B ⧸ Q →+* Ω, (∀ b, f (Ideal.Quotient.mk Q b) = 0 → b ∈ Q) → Function.Injective f := by
     intro f hf
     refine (injective_iff_map_eq_zero f).2 fun x hx => ?_
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective x
     exact Ideal.Quotient.eq_zero_iff_mem.2 (hf b hx)
-  have φi : Function.Injective φb := inj φb fun b hb => by
-    rw [φm] at hb
-    exact hb
-  have ψi : Function.Injective ψb := inj ψb fun b hb => by
-    rw [ψm] at hb
-    have h' : b ∈ RingHom.ker ψ := hb
-    rw [← hk] at h'
-    exact h'
+  have φi : Function.Injective φb :=
+    inj φb fun b hb => by
+      rw [φm] at hb
+      exact hb
+  have ψi : Function.Injective ψb :=
+    inj ψb fun b hb => by
+      rw [ψm] at hb
+      have h' : b ∈ RingHom.ker ψ := hb
+      rw [← hk] at h'
+      exact h'
   have hr : ψb.range = φb.range := by
     ext y
     constructor
@@ -53,25 +63,31 @@ private theorem same_ker {A B G Ω : Type} [CommRing A] [CommRing B] [Algebra A 
       obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective x
       obtain ⟨g, hg⟩ := root_orbit (G := G) ψ φ h.symm b
       exact ⟨Ideal.Quotient.mk Q (g • b), by rw [φm, ψm, hg]⟩
-  let eφ : B ⧸ Q ≃+* φb.range := RingEquiv.ofBijective φb.rangeRestrict
-    ⟨fun x y e => φi (congrArg Subtype.val e), φb.rangeRestrict_surjective⟩
-  let eψ : B ⧸ Q ≃+* ψb.range := RingEquiv.ofBijective ψb.rangeRestrict
-    ⟨fun x y e => ψi (congrArg Subtype.val e), ψb.rangeRestrict_surjective⟩
+  let eφ : B ⧸ Q ≃+* φb.range :=
+    RingEquiv.ofBijective φb.rangeRestrict
+      ⟨fun x y e => φi (congrArg Subtype.val e), φb.rangeRestrict_surjective⟩
+  let eψ : B ⧸ Q ≃+* ψb.range :=
+    RingEquiv.ofBijective ψb.rangeRestrict
+      ⟨fun x y e => ψi (congrArg Subtype.val e), ψb.rangeRestrict_surjective⟩
   let τ0 : B ⧸ Q ≃+* B ⧸ Q := (eψ.trans (RingEquiv.subringCongr hr)).trans eφ.symm
   have hτ : ∀ x, φb (τ0 x) = ψb x := by
     intro x
     have e : eφ (τ0 x) = RingEquiv.subringCongr hr (eψ x) := eφ.apply_symm_apply _
     exact congrArg Subtype.val e
-  let τ : (B ⧸ Q) ≃ₐ[A ⧸ P] (B ⧸ Q) := AlgEquiv.ofRingEquiv (f := τ0) (fun a => by
-    obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
-    apply φi
-    rw [hτ]
-    change ψb (Ideal.Quotient.mk Q (algebraMap A B a)) = φb (Ideal.Quotient.mk Q (algebraMap A B a))
-    rw [φm, ψm]
-    exact (congrArg (fun f => f a) h).symm)
+  let τ : (B ⧸ Q) ≃ₐ[A ⧸ P] (B ⧸ Q) :=
+    AlgEquiv.ofRingEquiv (f := τ0) (fun a => by
+      obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
+      apply φi
+      rw [hτ]
+      change ψb (Ideal.Quotient.mk Q (algebraMap A B a))
+        = φb (Ideal.Quotient.mk Q (algebraMap A B a))
+      rw [φm, ψm]
+      exact (congrArg (fun f => f a) h).symm)
   obtain ⟨g, hg⟩ := Ideal.Quotient.stabilizerHom_surjective G P Q τ
   refine ⟨g.1, fun b => ?_⟩
-  have e1 : Ideal.Quotient.stabilizerHom Q P G g (Ideal.Quotient.mk Q b) = Ideal.Quotient.mk Q (g.1 • b) :=
+  have e1
+      : Ideal.Quotient.stabilizerHom Q P G g (Ideal.Quotient.mk Q b)
+        = Ideal.Quotient.mk Q (g.1 • b) :=
     Ideal.Quotient.stabilizerHom_apply Q P G g b
   rw [hg] at e1
   have e2 := hτ (Ideal.Quotient.mk Q b)
@@ -81,8 +97,7 @@ private theorem same_ker {A B G Ω : Type} [CommRing A] [CommRing B] [Algebra A 
 
 end UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.invTrans_of :
-    InvTrans := by
+theorem UpperTheory.Gal.TranscendenceTraces.invTrans_of : InvTrans := by
   intro A B G Ω _ _ _ _ _ _ _ _ _ φ φ' h
   haveI : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime φ
   haveI : (RingHom.ker φ').IsPrime := RingHom.ker_isPrime φ'

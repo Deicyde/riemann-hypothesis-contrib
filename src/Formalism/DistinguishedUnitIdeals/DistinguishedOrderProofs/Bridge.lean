@@ -17,8 +17,9 @@ open TensorProduct SlopeTestRemainingChoices PT
 namespace BR
 
 section den
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}
-  {LL : Type} [Field LL] [Algebra O LL] [IsFractionRing O LL]
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {ϖ : O} {LL : Type} [Field LL] [Algebra O LL] [IsFractionRing O LL]
 
 lemma alg_ne (hϖ : Irreducible ϖ) (N : ℕ) : algebraMap O LL (ϖ ^ N) ≠ 0 := by
   rw [Ne, map_eq_zero_iff _ (IsFractionRing.injective O LL)]
@@ -67,7 +68,12 @@ section lin
 variable {LL Ks D : Type} [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
 
 def St (m m' : ℤ) (W : Submodule LL D) (i : ℤ) : Submodule LL D :=
-  if i < m then ⊥ else if i < m' then W else ⊤
+  if i < m then
+    ⊥
+  else if i < m' then
+    W
+  else
+    ⊤
 
 def Wp (W : Submodule LL D) (i : ℤ) : Submodule LL D := if i < 0 then ⊥ else W
 
@@ -103,8 +109,11 @@ lemma isUnit_C_alg {x : LL} (hx : x ≠ 0) :
 
 variable {r : ℕ} (lam : Fin r → D)
 
-def Fy (LL : Type) {Ks D : Type} [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D]
-    [Module LL D] {r : ℕ} (lam : Fin r → D) (x : Fin r → PowerSeries Ks) : Amb LL Ks D :=
+def Fy
+    (LL : Type)
+    {Ks D : Type} [Field LL] [CommRing Ks] [Algebra LL Ks] [AddCommGroup D] [Module LL D]
+    {r : ℕ} (lam : Fin r → D) (x : Fin r → PowerSeries Ks)
+    : Amb LL Ks D :=
   ∑ k, HahnSeries.ofPowerSeries ℤ Ks (x k) • cstD Ks (lam k)
 
 lemma cf_Fy (x : Fin r → PowerSeries Ks) (i : ℤ) :
@@ -247,9 +256,11 @@ lemma ex_split (π : (Fin r → O) →ₗ[O] (Fin r → O)) (z : Fin r → Power
 end split
 
 section theta
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}
-  {LL : Type} [Field LL] [Algebra O LL] [IsFractionRing O LL] {D : Type} [AddCommGroup D]
-  [Module LL D] {r : ℕ}
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {ϖ : O} {LL : Type} [Field LL] [Algebra O LL] [IsFractionRing O LL]
+  {D : Type} [AddCommGroup D] [Module LL D]
+  {r : ℕ}
 
 lemma sat_of_uIs (hϖ : Irreducible ϖ) (lam : Fin r → D) (W : Submodule LL D)
     (U : Submodule O (Fin r → O))
@@ -308,13 +319,19 @@ end BR
 namespace BR
 
 section core
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}
-  {LL : Type} [Field LL] [Algebra O LL] [IsFractionRing O LL] {Ks : Type} [CommRing Ks]
-  [Algebra LL Ks] {D : Type} [AddCommGroup D] [Module LL D] {r : ℕ}
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {ϖ : O} {LL : Type} [Field LL] [Algebra O LL] [IsFractionRing O LL]
+  {Ks : Type} [CommRing Ks] [Algebra LL Ks]
+  {D : Type} [AddCommGroup D] [Module LL D]
+  {r : ℕ}
 
-def FA (LL : Type) [Field LL] {Ks : Type} [CommRing Ks] [Algebra LL Ks] {D : Type} [AddCommGroup D]
-    [Module LL D] (lam : Fin r → D) (ρ : PowerSeries O →+* PowerSeries Ks)
-    (y : Fin r → PowerSeries O) : Amb LL Ks D :=
+def FA
+    (LL : Type) [Field LL]
+    {Ks : Type} [CommRing Ks] [Algebra LL Ks]
+    {D : Type} [AddCommGroup D] [Module LL D]
+    (lam : Fin r → D) (ρ : PowerSeries O →+* PowerSeries Ks) (y : Fin r → PowerSeries O)
+    : Amb LL Ks D :=
   Fy LL lam fun k => ρ (y k)
 
 variable (lam : Fin r → D) (ρ : PowerSeries O →+* PowerSeries Ks)
@@ -366,17 +383,19 @@ lemma compl_vec {ρ : PowerSeries O →+* PowerSeries Ks} {p : PowerSeries O}
 
 variable {lam} {ρ}
 
-theorem core_mp (hϖ : Irreducible ϖ) (hI : LinearIndependent LL lam)
-    (hS : Submodule.span LL (Set.range lam) = ⊤) {W : Submodule LL D}
-    {U : Submodule O (Fin r → O)}
+theorem core_mp
+    (hϖ : Irreducible ϖ) (hI : LinearIndependent LL lam)
+    (hS : Submodule.span LL (Set.range lam) = ⊤)
+    {W : Submodule LL D} {U : Submodule O (Fin r → O)}
     (hU : ∀ v : Fin r → O, v ∈ U ↔ ∑ k, algebraMap O LL (v k) • lam k ∈ W)
     (hρ : ∀ a : O, ρ (PowerSeries.C a) = PowerSeries.C (algebraMap LL Ks (algebraMap O LL a)))
     {p : PowerSeries O}
-    (hC : ∀ (k : ℕ) (a : PowerSeries O), PowerSeries.X ^ k ∣ ρ a →
-      ∃ (N : ℕ) (z : PowerSeries O), PowerSeries.C (ϖ ^ N) * a = p ^ k * z)
-    (m m' : ℕ) (y : Fin r → PowerSeries O) (h : FA LL lam ρ y ∈ Xi Ks (St m m' W)) :
-    ∃ (N : ℕ) (c z : Fin r → PowerSeries O), c ∈ ext U ∧
-      PowerSeries.C (ϖ ^ N) • y = p ^ m • c + p ^ m' • z := by
+    (hC : ∀ (k : ℕ) (a : PowerSeries O),
+      PowerSeries.X ^ k ∣ ρ a
+        → ∃ (N : ℕ) (z : PowerSeries O), PowerSeries.C (ϖ ^ N) * a = p ^ k * z)
+    (m m' : ℕ) (y : Fin r → PowerSeries O) (h : FA LL lam ρ y ∈ Xi Ks (St m m' W))
+    : ∃ (N : ℕ) (c z : Fin r → PowerSeries O),
+      c ∈ ext U ∧ PowerSeries.C (ϖ ^ N) • y = p ^ m • c + p ^ m' • z := by
   obtain ⟨π, hπ1, hπ2⟩ := exists_retr hϖ U (sat_of_uIs (LL := LL) hϖ lam W U hU)
   have h1 : ∀ k, PowerSeries.X ^ m ∣ ρ (y k) := by
     intro k
@@ -391,8 +410,10 @@ theorem core_mp (hϖ : Irreducible ϖ) (hI : LinearIndependent LL lam)
     intro l
     rw [PowerSeries.X_pow_dvd_iff]
     intro i hi
-    obtain ⟨f, hf1, hf2⟩ := exists_theta (LL := LL) hϖ lam hI hS W U hU (LinearMap.id - π)
-      (fun v hv => by rw [LinearMap.sub_apply, LinearMap.id_apply, hπ2 v hv, sub_self]) l
+    obtain ⟨f, hf1, hf2⟩ :=
+      exists_theta (LL := LL) hϖ lam hI hS W U hU (LinearMap.id - π)
+        (fun v hv => by rw [LinearMap.sub_apply, LinearMap.id_apply, hπ2 v hv, sub_self])
+        l
     have h4 : cf (FA LL lam ρ y) (i : ℤ) ∈ W.baseChange Ks := by
       have h5 := h (i : ℤ)
       simp only [St] at h5
@@ -412,27 +433,35 @@ theorem core_mp (hϖ : Irreducible ϖ) (hI : LinearIndependent LL lam)
     exact h5
   obtain ⟨N1, z1, hz1⟩ := compl_vec hC m y h1
   obtain ⟨N2, z2, hz2⟩ := compl_vec hC m' _ h2
-  refine ⟨N1 + N2, PowerSeries.C (ϖ ^ N2) • ex π z1, PowerSeries.C (ϖ ^ N1) • z2,
-    Submodule.smul_mem _ _ (ex_mem π U hπ1 z1), ?_⟩
-  calc PowerSeries.C (ϖ ^ (N1 + N2)) • y
-      = PowerSeries.C (ϖ ^ (N1 + N2)) • (ex π y + ex (LinearMap.id - π) y) := by
-        rw [← ex_split π y]
-    _ = PowerSeries.C (ϖ ^ N2) • ex π (PowerSeries.C (ϖ ^ N1) • y) +
-          PowerSeries.C (ϖ ^ N1) • (PowerSeries.C (ϖ ^ N2) • ex (LinearMap.id - π) y) := by
-        rw [ex_smul, smul_add, pow_add, map_mul, mul_smul, mul_smul,
-          smul_comm (PowerSeries.C (ϖ ^ N1)) (PowerSeries.C (ϖ ^ N2)) (ex π y)]
+  refine ⟨
+    N1 + N2,
+    PowerSeries.C (ϖ ^ N2) • ex π z1,
+    PowerSeries.C (ϖ ^ N1) • z2,
+    Submodule.smul_mem _ _ (ex_mem π U hπ1 z1),
+    ?_
+  ⟩
+  calc
+    PowerSeries.C (ϖ ^ (N1 + N2)) • y
+      = PowerSeries.C (ϖ ^ (N1 + N2)) • (ex π y + ex (LinearMap.id - π) y) := by rw [← ex_split π y]
+    _ = PowerSeries.C (ϖ ^ N2) • ex π (PowerSeries.C (ϖ ^ N1) • y)
+        + PowerSeries.C (ϖ ^ N1) • (PowerSeries.C (ϖ ^ N2) • ex (LinearMap.id - π) y) := by
+      rw [ex_smul, smul_add, pow_add, map_mul, mul_smul, mul_smul,
+        smul_comm (PowerSeries.C (ϖ ^ N1)) (PowerSeries.C (ϖ ^ N2)) (ex π y)]
     _ = _ := by
-        rw [hz1, hz2, ex_smul, smul_comm (PowerSeries.C (ϖ ^ N2)) (p ^ m),
-          smul_comm (PowerSeries.C (ϖ ^ N1)) (p ^ m')]
+      rw [hz1, hz2, ex_smul, smul_comm (PowerSeries.C (ϖ ^ N2)) (p ^ m),
+        smul_comm (PowerSeries.C (ϖ ^ N1)) (p ^ m')]
 
-theorem core_mpr (hϖ : Irreducible ϖ) {W : Submodule LL D} {U : Submodule O (Fin r → O)}
+theorem core_mpr
+    (hϖ : Irreducible ϖ)
+    {W : Submodule LL D} {U : Submodule O (Fin r → O)}
     (hU : ∀ v : Fin r → O, v ∈ U ↔ ∑ k, algebraMap O LL (v k) • lam k ∈ W)
     (hρ : ∀ a : O, ρ (PowerSeries.C a) = PowerSeries.C (algebraMap LL Ks (algebraMap O LL a)))
     {p : PowerSeries O} (ε : (PowerSeries Ks)ˣ) (hp : ρ p = (ε : PowerSeries Ks) * PowerSeries.X)
-    (m m' : ℕ) (hm : m ≤ m') (y : Fin r → PowerSeries O)
-    (h : ∃ (N : ℕ) (c z : Fin r → PowerSeries O), c ∈ ext U ∧
-      PowerSeries.C (ϖ ^ N) • y = p ^ m • c + p ^ m' • z) :
-    FA LL lam ρ y ∈ Xi Ks (St m m' W) := by
+    (m m' : ℕ) (hm : m ≤ m')
+    (y : Fin r → PowerSeries O)
+    (h : ∃ (N : ℕ) (c z : Fin r → PowerSeries O),
+      c ∈ ext U ∧ PowerSeries.C (ϖ ^ N) • y = p ^ m • c + p ^ m' • z)
+    : FA LL lam ρ y ∈ Xi Ks (St m m' W) := by
   obtain ⟨N, c, z, hc, he⟩ := h
   have hcW : FA LL lam ρ c ∈ Xi Ks (Wp W) := by
     clear he
@@ -451,8 +480,9 @@ theorem core_mpr (hϖ : Irreducible ϖ) {W : Submodule LL D} {U : Submodule O (F
     | smul a x _ hx =>
       rw [FA_smul]
       exact xi_module_structure LL Ks D _ (wp_mono W) _ _ hx
-  have hρp : ∀ a : ℕ, ρ (p ^ a) =
-      ((ε ^ a : (PowerSeries Ks)ˣ) : PowerSeries Ks) * PowerSeries.X ^ a := by
+  have hρp
+      : ∀ a : ℕ,
+        ρ (p ^ a) = ((ε ^ a : (PowerSeries Ks)ˣ) : PowerSeries Ks) * PowerSeries.X ^ a := by
     intro a
     rw [map_pow, hp, mul_pow, Units.val_pow_eq_pow_val]
   have h1 : HahnSeries.ofPowerSeries ℤ Ks (ρ (p ^ m)) • FA LL lam ρ c ∈ Xi Ks (St m m' W) := by
@@ -465,8 +495,9 @@ theorem core_mpr (hϖ : Irreducible ϖ) {W : Submodule LL D} {U : Submodule O (F
     refine xi_mono (fun i => ?_) ((shift_iff (tw_mono 0) (ε ^ m') m' _).2 (Fy_mem_tw lam _))
     simp only [Tw, St]
     split_ifs <;> first | exact le_rfl | exact bot_le | exact le_top | omega
-  have h3 : HahnSeries.ofPowerSeries ℤ Ks (ρ (PowerSeries.C (ϖ ^ N))) • FA LL lam ρ y ∈
-      Xi Ks (St m m' W) := by
+  have h3
+      : HahnSeries.ofPowerSeries ℤ Ks (ρ (PowerSeries.C (ϖ ^ N))) • FA LL lam ρ y
+        ∈ Xi Ks (St m m' W) := by
     rw [← FA_smul, he, FA_add, FA_smul, FA_smul]
     exact AddSubgroup.add_mem _ h1 h2
   refine unit_smul_mem (st_mono _ _ W) ?_ h3
@@ -480,13 +511,15 @@ end BR
 namespace BR
 
 section model
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O} {B : E.Base O}
-  {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V] {L : E.Lat B n V} {c : ZMod n}
-  {ell : ℕ} {H : ℕ → ℕ} {r : ℕ} {S : E.LevelData L c ell (abelian₂ B.p H ell) r} {LL : Type} [Field LL]
-  [Algebra O LL] {Ks : ℕ → Type} [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)] {Δ D : Type}
-  [AddCommGroup D] [Module LL D] {R : LevelModel S LL Ks Δ D} {η : ℕ} {kind : ℕ → Kind}
-  {b : ℕ → ℕ} {lam : Fin r → D} {U : ℕ → Submodule O (Fin r → O)}
-
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {ϖ : O} {B : E.Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
+  {L : E.Lat B n V} {c : ZMod n} {ell : ℕ} {H : ℕ → ℕ} {r : ℕ}
+  {S : E.LevelData L c ell (abelian₂ B.p H ell) r} {LL : Type} [Field LL] [Algebra O LL]
+  {Ks : ℕ → Type} [∀ s, CommRing (Ks s)] [∀ s, Algebra LL (Ks s)]
+  {Δ D : Type} [AddCommGroup D] [Module LL D]
+  {R : LevelModel S LL Ks Δ D} {η : ℕ} {kind : ℕ → Kind} {b : ℕ → ℕ} {lam : Fin r → D}
+  {U : ℕ → Submodule O (Fin r → O)}
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
 lemma nb_iff (h : BridgeItems R ϖ η kind b lam U) {s : ℕ} (hs : s < ell)
@@ -517,22 +550,29 @@ lemma nb_iff (h : BridgeItems R ϖ η kind b lam U) {s : ℕ} (hs : s < ell)
     · rw [FA, cf_Fy_neg lam _ (by omega)]
       exact Submodule.zero_mem _
 
-theorem level_iff (hϖ : Irreducible ϖ) (h : BridgeItems R ϖ η kind b lam U) {s : ℕ} (hs : s < ell)
-    (y : Fin r → PowerSeries O) :
-    S.locL s y ∈ S.Nb s ↔ LevelCond ϖ (B.p s) (H s) (b s) (kind s) (U s) y := by
+theorem level_iff
+    (hϖ : Irreducible ϖ) (h : BridgeItems R ϖ η kind b lam U)
+    {s : ℕ} (hs : s < ell)
+    (y : Fin r → PowerSeries O)
+    : S.locL s y ∈ S.Nb s ↔ LevelCond ϖ (B.p s) (H s) (b s) (kind s) (U s) y := by
   have := h.frac
   obtain ⟨ε, hε⟩ := h.k1b s hs
-  have core : ∀ m m' : ℕ, m ≤ m' →
-      (FA LL lam (R.ρ s) y ∈ Xi (Ks s) (St m m' (UOf (kind s) (b s) η (R.Fil s))) ↔
-        ∃ (N : ℕ) (c z : Fin r → PowerSeries O), c ∈ ext (U s) ∧
-          PowerSeries.C (ϖ ^ N) • y = B.p s ^ m • c + B.p s ^ m' • z) := fun m m' hm =>
-    ⟨core_mp hϖ h.lamInd h.lamSpan (h.uIs s hs) (R.ρ_C s) (h.compl s hs) m m' y,
-      core_mpr hϖ (h.uIs s hs) (R.ρ_C s) ε hε m m' hm y⟩
+  have core
+      : ∀ m m' : ℕ,
+        m ≤ m'
+          → (FA LL lam (R.ρ s) y ∈ Xi (Ks s) (St m m' (UOf (kind s) (b s) η (R.Fil s)))
+            ↔ ∃ (N : ℕ) (c z : Fin r → PowerSeries O),
+              c ∈ ext (U s)
+                ∧ PowerSeries.C (ϖ ^ N) • y = B.p s ^ m • c + B.p s ^ m' • z) := fun m m' hm => ⟨
+    core_mp hϖ h.lamInd h.lamSpan (h.uIs s hs) (R.ρ_C s) (h.compl s hs) m m' y,
+    core_mpr hϖ (h.uIs s hs) (R.ρ_C s) ε hε m m' hm y
+  ⟩
   cases hk : kind s with
   | thin =>
     rw [nb_iff h hs y (H s) (H s) (fun i hi => by
-      simp only [hk, NbK, NbThin, St]
-      split_ifs <;> first | rfl | omega), core _ _ le_rfl]
+        simp only [hk, NbK, NbThin, St]
+        split_ifs <;> first | rfl | omega),
+      core _ _ le_rfl]
     constructor
     · rintro ⟨N, c, z, -, he⟩
       exact ⟨N, c + z, by rw [he, smul_add]⟩
@@ -540,15 +580,16 @@ theorem level_iff (hϖ : Irreducible ϖ) (h : BridgeItems R ϖ η kind b lam U) 
       exact ⟨N, 0, z, Submodule.zero_mem _, by rw [he, smul_zero, zero_add]⟩
   | up =>
     rw [nb_iff h hs y (H s - b s) (H s) (fun i hi => by
-      simp only [hk, NbK, NbUp, St]
-      split_ifs <;> first | rfl | omega), core _ _ (Nat.sub_le _ _)]
+        simp only [hk, NbK, NbUp, St]
+        split_ifs <;> first | rfl | omega),
+      core _ _ (Nat.sub_le _ _)]
     rfl
   | down =>
     rw [nb_iff h hs y (H s) (H s + b s) (fun i hi => by
-      simp only [hk, NbK, NbDown, St]
-      split_ifs <;> first | rfl | omega), core _ _ (Nat.le_add_right _ _)]
+        simp only [hk, NbK, NbDown, St]
+        split_ifs <;> first | rfl | omega),
+      core _ _ (Nat.le_add_right _ _)]
     rfl
-
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
 lemma pr_key (h : BridgeItems R ϖ η kind b lam U) {s : ℕ} (hs : s < ell)
@@ -566,11 +607,11 @@ lemma pr_key (h : BridgeItems R ϖ η kind b lam U) {s : ℕ} (hs : s < ell)
     exact h3.symm
   rw [map_sub, map_smul, map_smul, map_sub, smul_sub, map_sub, h1]
 
-theorem bridge (hϖ : Irreducible ϖ) (h : BridgeItems R ϖ η kind b lam U) :
-    S.Bridge ϖ H b kind U := by
+theorem bridge (hϖ : Irreducible ϖ) (h : BridgeItems R ϖ η kind b lam U)
+    : S.Bridge ϖ H b kind U := by
   have := h.frac
-  refine ⟨fun y => forall₂_congr fun s hs => level_iff hϖ h hs y,
-    fun y => forall₂_congr fun s hs => ?_⟩
+  refine
+    ⟨fun y => forall₂_congr fun s hs => level_iff hϖ h hs y, fun y => forall₂_congr fun s hs => ?_⟩
   have hmono := nbK_mono (kind s) (b s) (Int.natCast_nonneg _) (UOf (kind s) (b s) η (R.Fil s))
   constructor
   · rintro ⟨e, he, hy⟩
@@ -582,11 +623,12 @@ theorem bridge (hϖ : Irreducible ϖ) (h : BridgeItems R ϖ η kind b lam U) :
   · rintro ⟨o, N, hc⟩
     have h1 := (level_iff hϖ h hs _).2 hc
     have hne := alg_ne (LL := LL) hϖ N
-    obtain ⟨e, he, hpe⟩ := exists_Dc R s hs
-      ((algebraMap O LL (ϖ ^ N))⁻¹ • ∑ k, algebraMap O LL (o k) • lam k)
+    obtain ⟨e, he, hpe⟩ :=
+      exists_Dc R s hs ((algebraMap O LL (ϖ ^ N))⁻¹ • ∑ k, algebraMap O LL (o k) • lam k)
     refine ⟨e, he, ?_⟩
     rw [R.mem_Nb s hs, pr_key h hs y N o _ e (by rw [smul_smul, mul_inv_cancel₀ hne, one_smul]) hpe,
-      R.pr_smul, R.ρ_C, h.kind_eq s hs, h.b_eq s hs, h.η_eq] at h1
+        R.pr_smul, R.ρ_C, h.kind_eq s hs, h.b_eq s hs, h.η_eq]
+      at h1
     rw [R.mem_Nb s hs, h.kind_eq s hs, h.b_eq s hs, h.η_eq]
     exact unit_smul_mem hmono (isUnit_C_alg hne) h1
 

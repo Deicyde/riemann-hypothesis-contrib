@@ -16,8 +16,9 @@ open scoped ComplexConjugate BigOperators Topology
 namespace GlobalTheory.MomOne.ThetaQuot
 
 def fac (d : ℕ) (y z : ℂ) : ℂ :=
-  Complex.exp ((Real.pi : ℂ) * Complex.I * ((Complex.normSq y : ℝ) : ℂ) +
-    (-(Real.pi : ℂ) * h1 d z y - (Real.pi : ℂ) / 2 * h1 d y y))
+  Complex.exp
+    ((Real.pi : ℂ) * Complex.I * ((Complex.normSq y : ℝ) : ℂ)
+      + (-(Real.pi : ℂ) * h1 d z y - (Real.pi : ℂ) / 2 * h1 d y y))
 
 lemma fac_ne (d : ℕ) (y z : ℂ) : fac d y z ≠ 0 := Complex.exp_ne_zero _
 
@@ -72,14 +73,23 @@ lemma zero_of_pole {F G : ℂ → ℂ} (hF : Differentiable ℂ F) (hG : Differe
   have ha : AnalyticAt ℂ (fun z => F z / G z) p := (hF.analyticAt p).div (hG.analyticAt p) hp
   exact absurd ha.meromorphicOrderAt_nonneg (not_le.mpr h)
 
-theorem theta_quot : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ : ℂ → ℂ), d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → IsTh d θ → ∀ (α : ℂ) (m : ℕ), InOK d α → α ≠ 0 → (m : ℂ) = α * conj α → ∃ ε : ℂ → ℂ, Ell M.L ε ∧ AnalyticAt ℂ ε 0 ∧ ε 0 = 1 ∧ Bd 1 (hat M.ι (C ω * logS) ε) ∧ (∀ z, θ z ≠ 0 → θ (α * z) = θ z ^ m * ε z) ∧ ∀ y z, θ (z + y) ≠ 0 → W1 d (α * y) θ (α * z) = W1 d y θ z ^ m * ε (z + y) := by
+theorem theta_quot
+    : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (θ : ℂ → ℂ),
+      d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → IsTh d θ
+        → ∀ (α : ℂ) (m : ℕ),
+          InOK d α → α ≠ 0 → (m : ℂ) = α * conj α
+            → ∃ ε : ℂ → ℂ,
+              Ell M.L ε ∧ AnalyticAt ℂ ε 0 ∧ ε 0 = 1 ∧ Bd 1 (hat M.ι (C ω * logS) ε)
+                ∧ (∀ z, θ z ≠ 0 → θ (α * z) = θ z ^ m * ε z)
+                ∧ ∀ y z, θ (z + y) ≠ 0 → W1 d (α * y) θ (α * z) = W1 d y θ z ^ m * ε (z + y) := by
   intro d q _ M ω θ hd hd16 hsp hL hch hθ α m hα hα0 hm
   obtain ⟨hdiff, h0, -, hW, hz⟩ := hθ
   have hd4 : d % 4 = 3 := by omega
   have hA : Differentiable ℂ (fun z => θ (α * z)) := hdiff.comp (differentiable_id.const_mul α)
   have hB : Differentiable ℂ (fun z => θ z ^ m) := hdiff.pow m
-  have hper : ∀ l ∈ M.L.lattice, ∀ z, θ (α * z) = fac d l z ^ m * θ (α * (z + l)) ∧
-      θ z ^ m = fac d l z ^ m * θ (z + l) ^ m := by
+  have hper
+      : ∀ l ∈ M.L.lattice, ∀ z,
+        θ (α * z) = fac d l z ^ m * θ (α * (z + l)) ∧ θ z ^ m = fac d l z ^ m * θ (z + l) ^ m := by
     intro l hl z
     have hl' := (hL l).1 hl
     constructor
@@ -110,37 +120,47 @@ theorem theta_quot : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]) (
   have hns : ∀ β p : ℂ, InOK d β → β ≠ 0 → θ (β * p) = 0 → ¬ M.Small p := by
     intro β p hβ hβ0 hp hs
     have hp0 : PrimeTo d q 0 := ⟨1, one_pos, Nat.coprime_one_left q, 0, 0, by simp⟩
-    have := (GlobalTheory.T.smallTorsion_killed_by_prime_powers d q M ω hd hd16 hsp hL hch).2.2.2 p β 0 hβ hβ0 hp0
-      (by simpa using hz _ hp) hs
+    have :=
+      (GlobalTheory.T.smallTorsion_killed_by_prime_powers d q M ω hd hd16 hsp hL hch).2.2.2 p β 0 hβ
+        hβ0 hp0 (by simpa using hz _ hp) hs
     exact not_half d hd.pos this.2
   have hbε : Bdd (hat M.ι (C ω * logS) (fun z => θ (α * z) / θ z ^ m)) := by
-    refine GlobalTheory.T.cpSeriesCoeffBounded_taylor_elliptic_of_poles q M _ _ hch hEε haε fun p hp => ?_
+    refine GlobalTheory.T.cpSeriesCoeffBounded_taylor_elliptic_of_poles q M _ _ hch hEε haε
+      fun p hp => ?_
     have := zero_of_pole hA hB p hp
     exact hns 1 p ⟨1, 0, by simp⟩ one_ne_zero (by simpa using (pow_eq_zero_iff'.1 this).1)
   have hbη : Bdd (hat M.ι (C ω * logS) (fun z => θ z ^ m / θ (α * z))) := by
-    refine GlobalTheory.T.cpSeriesCoeffBounded_taylor_elliptic_of_poles q M _ _ hch hEη haη fun p hp => ?_
+    refine GlobalTheory.T.cpSeriesCoeffBounded_taylor_elliptic_of_poles q M _ _ hch hEη haη
+      fun p hp => ?_
     exact hns α p hα hα0 (zero_of_pole hB hA p hp)
-  obtain ⟨hh1, hh2, -, hh4, -⟩ := GlobalTheory.T.cpTransportedTaylorSeriesInChart_ringHom_laws q M.ι (C ω * logS) hch.2.1
-  have hprod : hat M.ι (C ω * logS) (fun z => θ (α * z) / θ z ^ m) *
-      hat M.ι (C ω * logS) (fun z => θ z ^ m / θ (α * z)) = 1 := by
+  obtain ⟨hh1, hh2, -, hh4, -⟩ :=
+    GlobalTheory.T.cpTransportedTaylorSeriesInChart_ringHom_laws q M.ι (C ω * logS) hch.2.1
+  have hprod
+      : hat M.ι (C ω * logS) (fun z => θ (α * z) / θ z ^ m)
+          * hat M.ι (C ω * logS) (fun z => θ z ^ m / θ (α * z))
+        = 1 := by
     rw [← (hh1 _ _ haε haη).2.1]
     have e1 : ∀ᶠ z in 𝓝 (0 : ℂ), θ (α * z) ≠ 0 := hA.continuous.continuousAt.eventually_ne hA0
     have e2 : ∀ᶠ z in 𝓝 (0 : ℂ), θ z ^ m ≠ 0 := hB.continuous.continuousAt.eventually_ne hB0
-    have := (hh1 _ (fun _ => (1 : ℂ)) (haε.mul haη) analyticAt_const).2.2.1 (by
-      filter_upwards [nhdsWithin_le_nhds e1, nhdsWithin_le_nhds e2] with z h1' h2'
-      show θ (α * z) / θ z ^ m * (θ z ^ m / θ (α * z)) = 1
-      field_simp)
+    have :=
+      (hh1 _ (fun _ => (1 : ℂ)) (haε.mul haη) analyticAt_const).2.2.1 (by
+        filter_upwards [nhdsWithin_le_nhds e1, nhdsWithin_le_nhds e2] with z h1' h2'
+        show θ (α * z) / θ z ^ m * (θ z ^ m / θ (α * z)) = 1
+        field_simp)
     refine Eq.trans this ?_
-    rw [hh2]; simp
+    rw [hh2]
+    simp
   have hε0 : θ (α * 0) / θ 0 ^ m = 1 := by simp [h0]
   have hmain : ∀ z, θ z ≠ 0 → θ (α * z) = θ z ^ m * (θ (α * z) / θ z ^ m) := by
     intro z hz'
     field_simp
   refine ⟨fun z => θ (α * z) / θ z ^ m, hEε, haε, hε0, ?_, hmain, ?_⟩
   · refine ((GlobalTheory.T.cpSeriesCoeffNormBounded_ring_laws q).2.2.2.2.1 _ _ hbε hbη hprod ?_).1
-    rw [hh4]; simp [h0]
+    rw [hh4]
+    simp [h0]
   · intro y z hyz
-    rw [nonzeroIndexPlaces_adelicDataResized_eq, nonzeroIndexPlaces_adelicDataResized_eq, fac_mul d α m hm, ← mul_add, mul_pow, mul_assoc]
+    rw [nonzeroIndexPlaces_adelicDataResized_eq, nonzeroIndexPlaces_adelicDataResized_eq,
+      fac_mul d α m hm, ← mul_add, mul_pow, mul_assoc]
     exact congrArg _ (hmain _ hyz)
 
 end GlobalTheory.MomOne.ThetaQuot

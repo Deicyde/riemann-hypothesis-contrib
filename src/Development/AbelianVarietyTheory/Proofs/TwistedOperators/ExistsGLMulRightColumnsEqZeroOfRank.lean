@@ -9,12 +9,12 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL Matrix Topology
 
 namespace GlobalTheory
 
-theorem exists_gl_mul_cols_eq_zero_of_rank (k m a b n : Type) [Field k] [Fintype m] [Fintype a]
-    [Fintype b] [Fintype n] [DecidableEq n] (e : a ⊕ b ≃ n) (x : Matrix m n k)
-    (hx : x.rank = Fintype.card a) :
-    ∃ g : GL n k, ∀ i j, (x * g.val) i (e (Sum.inr j)) = 0 := by
+theorem exists_gl_mul_cols_eq_zero_of_rank
+    (k m a b n : Type) [Field k] [Fintype m] [Fintype a] [Fintype b] [Fintype n] [DecidableEq n]
+    (e : a ⊕ b ≃ n)
+    (x : Matrix m n k) (hx : x.rank = Fintype.card a)
+    : ∃ g : GL n k, ∀ i j, (x * g.val) i (e (Sum.inr j)) = 0 := by
   classical
-
   let f := x.mulVecLin
   obtain ⟨C, hKC⟩ := Submodule.exists_isCompl (LinearMap.ker f)
   have hcard : Fintype.card n = Fintype.card a + Fintype.card b := by
@@ -28,7 +28,8 @@ theorem exists_gl_mul_cols_eq_zero_of_rank (k m a b n : Type) [Field k] [Fintype
   have hC : Module.finrank k C = Fintype.card a := by omega
   let bK : Module.Basis b k (LinearMap.ker f) :=
     (Module.finBasisOfFinrankEq k (LinearMap.ker f) hK).reindex (Fintype.equivFin b).symm
-  let bC : Module.Basis a k C := (Module.finBasisOfFinrankEq k C hC).reindex (Fintype.equivFin a).symm
+  let bC : Module.Basis a k C :=
+    (Module.finBasisOfFinrankEq k C hC).reindex (Fintype.equivFin a).symm
   let B : Module.Basis n k (n → k) :=
     ((bC.prod bK).map (Submodule.prodEquivOfIsCompl C (LinearMap.ker f) hKC.symm)).reindex e
   have hB : ∀ j, f (B (e (Sum.inr j))) = 0 := by

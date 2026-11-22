@@ -8,9 +8,11 @@ noncomputable section
 
 namespace Formalism.MainNotions.G.GramWindowAlt
 
-open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.MainNotions.G.CountingStatementReduction Formalism.MainNotions.G.SymmetricFormBlocks
+open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
+  Formalism.MainNotions.G.CountingStatementReduction Formalism.MainNotions.G.SymmetricFormBlocks
 
-theorem clog_le_lg (p : ℕ) (hp : 1 < p) (x : ℕ) (hx : 2 ≤ x) : (Nat.clog p x : ℝ) ≤ Real.logb p x + 1 := by
+theorem clog_le_lg (p : ℕ) (hp : 1 < p) (x : ℕ) (hx : 2 ≤ x)
+    : (Nat.clog p x : ℝ) ≤ Real.logb p x + 1 := by
   have hpos : 0 < Nat.clog p x := Nat.clog_pos hp (by omega)
   have hk := Nat.pow_pred_clog_lt_self p (by omega : 1 < x)
   have hpR : (1 : ℝ) < p := by exact_mod_cast hp
@@ -30,7 +32,8 @@ private theorem twentyfive_le_p_of_segFacts (hS : SegFacts C0 CE1 CE2 X) : (25 :
   have hm4 : (4 : ℝ) ≤ X.L.m := by exact_mod_cast hS.hF.m4
   nlinarith [hS.hF.p_ge]
 
-theorem lgN_le (hS : SegFacts C0 CE1 CE2 X) : (lgN X.p (aBig X) X.r : ℝ) ≤ lgA X.p X.L.a X.r + 1 := by
+theorem lgN_le (hS : SegFacts C0 CE1 CE2 X)
+    : (lgN X.p (aBig X) X.r : ℝ) ≤ lgA X.p X.L.a X.r + 1 := by
   have hF := hS.hF
   have hp25 := twentyfive_le_p_of_segFacts hS
   have hp1 : (1 : ℝ) < X.p := by
@@ -47,7 +50,9 @@ theorem lgN_le (hS : SegFacts C0 CE1 CE2 X) : (lgN X.p (aBig X) X.r : ℝ) ≤ l
     omega
   have hpow := Nat.pow_log_le_self X.p hyN
   have hyR : (0 : ℝ) < ((8 * aBig X + X.r : ℕ) : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero hyN
-  have hlog : ((Nat.log X.p (8 * aBig X + X.r) : ℕ) : ℝ) ≤ Real.logb X.p ((8 * aBig X + X.r : ℕ) : ℝ) := by
+  have hlog
+      : ((Nat.log X.p (8 * aBig X + X.r) : ℕ) : ℝ)
+        ≤ Real.logb X.p ((8 * aBig X + X.r : ℕ) : ℝ) := by
     rw [Real.le_logb_iff_rpow_le hp1 hyR, Real.rpow_natCast]
     exact_mod_cast hpow
   have hs0 : (0 : ℝ) ≤ X.s := Nat.cast_nonneg _
@@ -58,8 +63,9 @@ theorem lgN_le (hS : SegFacts C0 CE1 CE2 X) : (lgN X.p (aBig X) X.r : ℝ) ≤ l
     nlinarith
   have hA : (0 : ℝ) < 8 * X.L.a + X.r := by linarith
   have hB : (0 : ℝ) < 3 * (X.s : ℝ) + 2 := by linarith
-  have h2 : Real.logb X.p ((8 * aBig X + X.r : ℕ) : ℝ)
-      ≤ Real.logb X.p ((3 * (X.s : ℝ) + 2) * (8 * X.L.a + X.r)) :=
+  have h2
+      : Real.logb X.p ((8 * aBig X + X.r : ℕ) : ℝ)
+        ≤ Real.logb X.p ((3 * (X.s : ℝ) + 2) * (8 * X.L.a + X.r)) :=
     Real.logb_le_logb_of_le hp1 hyR hyle
   rw [Real.logb_mul hB.ne' hA.ne'] at h2
   have h3 : Real.logb X.p (3 * (X.s : ℝ) + 2) ≤ 1 := by
@@ -70,18 +76,24 @@ theorem lgN_le (hS : SegFacts C0 CE1 CE2 X) : (lgN X.p (aBig X) X.r : ℝ) ≤ l
   push_cast
   linarith
 
-theorem initial_point_numeric_bound (t s r L lam : ℝ) (ht0 : 0 ≤ t) (hts : t ≤ s) (hr4 : 4 ≤ r) (hL : L ≤ 2 * lam)
-    (hlam : 0 ≤ lam) : ((t + 1) * (r + 1) + ((2 * s + 1 + 1) * r + (t + 1) * 2)) * L + L ≤ 3 * (s + 2) * r ^ 2 * lam := by
+theorem initial_point_numeric_bound
+    (t s r L lam : ℝ) (ht0 : 0 ≤ t) (hts : t ≤ s) (hr4 : 4 ≤ r) (hL : L ≤ 2 * lam) (hlam : 0 ≤ lam)
+    : ((t + 1) * (r + 1) + ((2 * s + 1 + 1) * r + (t + 1) * 2)) * L + L
+      ≤ 3 * (s + 2) * r ^ 2 * lam := by
   have hs0 : 0 ≤ s := le_trans ht0 hts
   have hC0 : 0 ≤ (t + 1) * (r + 1) + ((2 * s + 1 + 1) * r + (t + 1) * 2) + 1 := by nlinarith
   have key := mul_le_mul_of_nonneg_left hL hC0
-  have hcoef : 2 * ((t + 1) * (r + 1) + ((2 * s + 1 + 1) * r + (t + 1) * 2) + 1) ≤ 3 * (s + 2) * r ^ 2 := by
+  have hcoef
+      : 2 * ((t + 1) * (r + 1) + ((2 * s + 1 + 1) * r + (t + 1) * 2) + 1)
+        ≤ 3 * (s + 2) * r ^ 2 := by
     nlinarith [mul_le_mul_of_nonneg_right hts (by linarith : (0 : ℝ) ≤ r),
       mul_le_mul_of_nonneg_left hr4 (by nlinarith : (0 : ℝ) ≤ (s + 2) * r)]
   nlinarith [mul_le_mul_of_nonneg_right hcoef hlam]
 
-theorem initial_point_nat_cast (p A r N t : ℕ) : (x0N p A r N t : ℝ) =
-    (((t : ℝ) + 1) * ((r : ℝ) + 1) + (((N : ℝ) + 1) * (r : ℝ) + ((t : ℝ) + 1) * 2)) * (lgN p A r : ℝ) := by
+theorem initial_point_nat_cast (p A r N t : ℕ)
+    : (x0N p A r N t : ℝ)
+      = (((t : ℝ) + 1) * ((r : ℝ) + 1) + (((N : ℝ) + 1) * (r : ℝ) + ((t : ℝ) + 1) * 2))
+        * (lgN p A r : ℝ) := by
   unfold x0N; push_cast; ring
 
 private theorem one_le_lgA_of_segFacts (hS : SegFacts C0 CE1 CE2 X) : 1 ≤ lgA X.p X.L.a X.r := by
@@ -95,8 +107,9 @@ private theorem one_le_lgA_of_segFacts (hS : SegFacts C0 CE1 CE2 X) : 1 ≤ lgA 
   have : 0 ≤ Real.logb X.p (8 * X.L.a + X.r) := Real.logb_nonneg hp1 (by linarith)
   linarith
 
-theorem hx_inst (hS : SegFacts C0 CE1 CE2 X) :
-    (x0N X.p (aBig X) X.r (2 * X.s + 1) (X.S C0 CE1 CE2).t : ℝ) + lgN X.p (aBig X) X.r ≤ kapS X := by
+theorem hx_inst (hS : SegFacts C0 CE1 CE2 X)
+    : (x0N X.p (aBig X) X.r (2 * X.s + 1) (X.S C0 CE1 CE2).t : ℝ) + lgN X.p (aBig X) X.r
+      ≤ kapS X := by
   have hF := hS.hF
   rw [initial_point_nat_cast]
   push_cast
@@ -105,13 +118,14 @@ theorem hx_inst (hS : SegFacts C0 CE1 CE2 X) :
   have htN : (X.S C0 CE1 CE2).t ≤ X.s := Nat.sub_le _ _
   have ht : ((X.S C0 CE1 CE2).t : ℝ) ≤ X.s := by exact_mod_cast htN
   have hr4 : (4 : ℝ) ≤ X.r := by exact_mod_cast hF.m4
-  have key := initial_point_numeric_bound ((X.S C0 CE1 CE2).t : ℝ) X.s X.r (lgN X.p (aBig X) X.r) (lgA X.p X.L.a X.r)
-    (Nat.cast_nonneg _) ht hr4 (by linarith) (by linarith)
+  have key :=
+    initial_point_numeric_bound ((X.S C0 CE1 CE2).t : ℝ) X.s X.r (lgN X.p (aBig X) X.r)
+      (lgA X.p X.L.a X.r) (Nat.cast_nonneg _) ht hr4 (by linarith) (by linarith)
   unfold kapS
   linarith
 
-theorem win_facts (hS : SegFacts C0 CE1 CE2 X) :
-    (X.L.a : ℝ) / (X.L.k * X.L.Y) ≤ (X.winA.card : ℝ) ∧ X.winA.card ≤ X.L.a + 1 := by
+theorem win_facts (hS : SegFacts C0 CE1 CE2 X)
+    : (X.L.a : ℝ) / (X.L.k * X.L.Y) ≤ (X.winA.card : ℝ) ∧ X.winA.card ≤ X.L.a + 1 := by
   have hF := hS.hF
   have hmem := a_mem_win hS
   unfold flipOneThree.Inst.winA at hmem ⊢
@@ -127,8 +141,10 @@ theorem win_facts (hS : SegFacts C0 CE1 CE2 X) :
     linarith [hS.xa0]
   · omega
 
-theorem q_num (J W a k Y b' p : ℝ) (hY : 1 ≤ Y) (hk : 5 ≤ k) (hb : 0 < b') (hpk : k ^ 2 * Y ^ 2 ≤ p) (hpb : p * b' < a)
-    (hJ : J ≤ 5 / 2 * b') (hW : a / (k * Y) ≤ W) : 0 < W ∧ J / W ≤ 1 / (2 * Y) := by
+theorem q_num
+    (J W a k Y b' p : ℝ) (hY : 1 ≤ Y) (hk : 5 ≤ k) (hb : 0 < b') (hpk : k ^ 2 * Y ^ 2 ≤ p)
+    (hpb : p * b' < a) (hJ : J ≤ 5 / 2 * b') (hW : a / (k * Y) ≤ W)
+    : 0 < W ∧ J / W ≤ 1 / (2 * Y) := by
   have hY0 : 0 < Y := by linarith
   have hk0 : 0 < k := by linarith
   have hkY : 0 < k * Y := mul_pos hk0 hY0
@@ -154,8 +170,8 @@ theorem q_num (J W a k Y b' p : ℝ) (hY : 1 ≤ Y) (hk : 5 ≤ k) (hb : 0 < b')
     nlinarith [mul_le_mul_of_nonneg_right hk (by positivity : (0 : ℝ) ≤ Y * b')]
   linarith
 
-theorem kap_facts (hS : SegFacts C0 CE1 CE2 X) (CM : ℝ) (hCM : 1 ≤ CM) :
-    lgA X.p X.L.a X.r ≤ kapS X ∧ 0 < kapS X ∧ kapS X ≤ D1r C0 CE1 CE2 X CM := by
+theorem kap_facts (hS : SegFacts C0 CE1 CE2 X) (CM : ℝ) (hCM : 1 ≤ CM)
+    : lgA X.p X.L.a X.r ≤ kapS X ∧ 0 < kapS X ∧ kapS X ≤ D1r C0 CE1 CE2 X CM := by
   have hF := hS.hF
   have hlam1 := one_le_lgA_of_segFacts hS
   have hr4 : (4 : ℝ) ≤ X.r := by exact_mod_cast hF.m4
@@ -173,8 +189,8 @@ theorem kap_facts (hS : SegFacts C0 CE1 CE2 X) (CM : ℝ) (hCM : 1 ≤ CM) :
     nlinarith [mul_pos (by linarith : (0 : ℝ) < X.L.Y) hk0, mul_pos (by linarith : (0 : ℝ) < CM) hk0]
   nlinarith [mul_nonneg ht0 h1, mul_le_mul_of_nonneg_right hCM hk0.le]
 
-private theorem bPlus_le_five_halves_mul_b' (hS : SegFacts C0 CE1 CE2 X) :
-    ((X.S C0 CE1 CE2).bPlus : ℝ) ≤ 5 / 2 * X.L.b' := by
+private theorem bPlus_le_five_halves_mul_b' (hS : SegFacts C0 CE1 CE2 X)
+    : ((X.S C0 CE1 CE2).bPlus : ℝ) ≤ 5 / 2 * X.L.b' := by
   have hmemT : ∀ x ∈ evenTops X.L.TT, x ∈ X.L.TT := fun x hx => by
     unfold evenTops at hx
     rw [Finset.mem_sort] at hx
@@ -184,8 +200,9 @@ private theorem bPlus_le_five_halves_mul_b' (hS : SegFacts C0 CE1 CE2 X) :
     exact hmemT _ (List.get_mem _ _)
   exact hS.hF.bT_le _ hmem
 
-theorem restWinNum_proved (hS : SegFacts C0 CE1 CE2 X) (hpk : X.L.k ^ 2 * X.L.Y ^ 2 ≤ (X.L.p : ℝ)) (CM : ℝ)
-    (hCM : 1 ≤ CM) : RestWinNum C0 CE1 CE2 X CM := by
+theorem restWinNum_proved
+    (hS : SegFacts C0 CE1 CE2 X) (hpk : X.L.k ^ 2 * X.L.Y ^ 2 ≤ (X.L.p : ℝ)) (CM : ℝ) (hCM : 1 ≤ CM)
+    : RestWinNum C0 CE1 CE2 X CM := by
   intro aTop haTop b hK J hJ
   have hF := hS.hF
   have hY1 := hS.Y1
@@ -211,9 +228,14 @@ theorem restWinNum_proved (hS : SegFacts C0 CE1 CE2 X) (hpk : X.L.k ^ 2 * X.L.Y 
   have hJaN : J + 1 ≤ X.L.a + 1 := by
     have : J ≤ X.L.a := by exact_mod_cast hJa
     omega
-  refine ⟨Nat.clog X.p (X.L.a + 1), hWup.trans (Nat.le_pow_clog hp1N _),
-    hJaN.trans (Nat.le_pow_clog hp1N _), ?_⟩
-  obtain ⟨hW0, hqY⟩ := q_num (J : ℝ) (X.winA.card : ℝ) X.L.a X.L.k X.L.Y X.L.b' X.L.p hY1 hk5 hb0 hpk hblt hJR hWlow
+  refine ⟨
+    Nat.clog X.p (X.L.a + 1),
+    hWup.trans (Nat.le_pow_clog hp1N _),
+    hJaN.trans (Nat.le_pow_clog hp1N _),
+    ?_
+  ⟩
+  obtain ⟨hW0, hqY⟩ :=
+    q_num (J : ℝ) (X.winA.card : ℝ) X.L.a X.L.k X.L.Y X.L.b' X.L.p hY1 hk5 hb0 hpk hblt hJR hWlow
   have hq0 : 0 ≤ (J : ℝ) / (X.winA.card : ℝ) := div_nonneg (Nat.cast_nonneg _) hW0.le
   have hh0 : (0 : ℝ) ≤ (Nat.clog X.p (X.L.a + 1) : ℝ) := Nat.cast_nonneg _
   have hhk : (Nat.clog X.p (X.L.a + 1) : ℝ) ≤ kapS X := by
@@ -227,15 +249,19 @@ theorem restWinNum_proved (hS : SegFacts C0 CE1 CE2 X) (hpk : X.L.k ^ 2 * X.L.Y 
   have hfl : ((⌊D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) ≤ D1r C0 CE1 CE2 X CM := Int.floor_le _
   have hE : X.L.Y * D1r C0 CE1 CE2 X CM ≤ ((⌊X.L.Y * D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) + 1 :=
     (Int.lt_floor_add_one _).le
-  have key := eps_num X.L.Y (D1r C0 CE1 CE2 X CM) (kapS X) ((J : ℝ) / (X.winA.card : ℝ))
-    (Nat.clog X.p (X.L.a + 1) : ℝ)
-    ((x0N X.p (aBig X) X.r (2 * X.s + 1) (X.S C0 CE1 CE2).t : ℝ) + (lgN X.p (aBig X) X.r : ℝ))
-    ((⌊D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) (((⌊X.L.Y * D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) + 1)
-    hY1 hk0 hkD hq0 hqY hh0 hhk hx hfl hE
-  calc _ = (J : ℝ) / (X.winA.card : ℝ)
+  have key :=
+    eps_num X.L.Y (D1r C0 CE1 CE2 X CM) (kapS X) ((J : ℝ) / (X.winA.card : ℝ))
+      (Nat.clog X.p (X.L.a + 1) : ℝ)
+      ((x0N X.p (aBig X) X.r (2 * X.s + 1) (X.S C0 CE1 CE2).t : ℝ) + (lgN X.p (aBig X) X.r : ℝ))
+      ((⌊D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) (((⌊X.L.Y * D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) + 1) hY1 hk0 hkD
+      hq0 hqY hh0 hhk hx hfl hE
+  calc
+    _ = (J : ℝ) / (X.winA.card : ℝ)
         + ((x0N X.p (aBig X) X.r (2 * X.s + 1) (X.S C0 CE1 CE2).t : ℝ) + (lgN X.p (aBig X) X.r : ℝ)
-          + ((⌊D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) + (J : ℝ) / (X.winA.card : ℝ) * (Nat.clog X.p (X.L.a + 1) : ℝ))
-          / (((⌊X.L.Y * D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) + 1) := by ring
+            + ((⌊D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ)
+            + (J : ℝ) / (X.winA.card : ℝ) * (Nat.clog X.p (X.L.a + 1) : ℝ))
+          / (((⌊X.L.Y * D1r C0 CE1 CE2 X CM⌋ : ℤ) : ℝ) + 1) := by
+      ring
     _ ≤ 5 / X.L.Y := key
 
 end Formalism.MainNotions.G.GramWindowAlt

@@ -6,11 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_basis_over_embedding (K : Type) [Field K] (σ₀ : K →+* ℂ) (m : ℕ)
-    (a : Fin m → ℂ) :
-    ∃ (n : ℕ) (e : Fin n → ℂ) (c : Fin m → Fin n → K),
-      (∀ t : Fin n → K, ∑ b, σ₀ (t b) * e b = 0 → t = 0) ∧
-        ∀ i, a i = ∑ b, σ₀ (c i b) * e b := by
+theorem exists_basis_over_embedding (K : Type) [Field K] (σ₀ : K →+* ℂ) (m : ℕ) (a : Fin m → ℂ)
+    : ∃ (n : ℕ) (e : Fin n → ℂ) (c : Fin m → Fin n → K),
+      (∀ t : Fin n → K, ∑ b, σ₀ (t b) * e b = 0 → t = 0) ∧ ∀ i, a i = ∑ b, σ₀ (c i b) * e b := by
   letI : Algebra K ℂ := σ₀.toAlgebra
   have hs : ∀ (k : K) (z : ℂ), k • z = σ₀ k * z := fun k z => rfl
   let V : Submodule K ℂ := Submodule.span K (Set.range a)

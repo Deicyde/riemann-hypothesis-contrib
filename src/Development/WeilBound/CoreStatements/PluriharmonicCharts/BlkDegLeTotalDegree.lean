@@ -20,8 +20,8 @@ def blkDeg (m : (Σ k, ι k) →₀ ℕ) (k : K) : ℕ := ∑ i, m ⟨k, i⟩
 def padExp (p : (k : K) → ι k) (T : ℕ) (m : (Σ k, ι k) →₀ ℕ) : (Σ k, ι k) →₀ ℕ :=
   ∑ k, Finsupp.single ⟨k, p k⟩ (T - blkDeg m k)
 
-theorem padExp_apply (p : (k : K) → ι k) (T : ℕ) (m : (Σ k, ι k) →₀ ℕ) (k : K) (i : ι k) :
-    padExp p T m ⟨k, i⟩ = if i = p k then T - blkDeg m k else 0 := by
+theorem padExp_apply (p : (k : K) → ι k) (T : ℕ) (m : (Σ k, ι k) →₀ ℕ) (k : K) (i : ι k)
+    : padExp p T m ⟨k, i⟩ = if i = p k then T - blkDeg m k else 0 := by
   classical
   simp only [padExp, Finsupp.coe_finsetSum, Finset.sum_apply]
   rw [Finset.sum_eq_single k]
@@ -37,8 +37,8 @@ theorem padExp_apply (p : (k : K) → ι k) (T : ℕ) (m : (Σ k, ι k) →₀ �
     exact hb (Sigma.mk.inj_iff.1 e).1
   · simp
 
-theorem blkDeg_padExp (p : (k : K) → ι k) (T : ℕ) (m : (Σ k, ι k) →₀ ℕ) (k : K) :
-    blkDeg (padExp p T m) k = T - blkDeg m k := by
+theorem blkDeg_padExp (p : (k : K) → ι k) (T : ℕ) (m : (Σ k, ι k) →₀ ℕ) (k : K)
+    : blkDeg (padExp p T m) k = T - blkDeg m k := by
   classical
   unfold blkDeg
   simp only [padExp_apply]
@@ -47,26 +47,36 @@ theorem blkDeg_padExp (p : (k : K) → ι k) (T : ℕ) (m : (Σ k, ι k) →₀ 
   · intro b _ hb; rw [if_neg hb]
   · simp
 
-theorem blkDeg_le_totalDegree {Q : MvPolynomial (Σ k, ι k) ℂ} {m : (Σ k, ι k) →₀ ℕ} (hm : m ∈ Q.support)
-    (k : K) : blkDeg m k ≤ Q.totalDegree := by
+theorem blkDeg_le_totalDegree
+    {Q : MvPolynomial (Σ k, ι k) ℂ} {m : (Σ k, ι k) →₀ ℕ} (hm : m ∈ Q.support) (k : K)
+    : blkDeg m k ≤ Q.totalDegree := by
   classical
   refine le_trans ?_ (le_totalDegree hm)
   rw [Finsupp.sum_fintype _ _ (fun _ => rfl), Fintype.sum_sigma]
-  exact Finset.single_le_sum (f := fun k => ∑ i, m ⟨k, i⟩) (fun _ _ => Nat.zero_le _) (Finset.mem_univ k)
+  exact Finset.single_le_sum
+    (f := fun k => ∑ i, m ⟨k, i⟩)
+    (fun _ _ => Nat.zero_le _)
+    (Finset.mem_univ k)
 
-theorem exists_homogenize (p : (k : K) → ι k) (Q : MvPolynomial (Fin (Fintype.card (Σ k, ι k))) ℂ) :
-    ∃ (G : MvPolynomial (Σ k, ι k) ℂ) (T : ℕ), ReciprocityTheory.ChartRestriction.G.Geo.IsMultiHomog G (fun _ => T) ∧
-      (∀ z : (Σ k, ι k) → ℂ, (∀ k, z ⟨k, p k⟩ ≠ 0) →
-        eval z G = (∏ k, z ⟨k, p k⟩ ^ T) * eval (ReciprocityTheory.AnForm.R.renPt (ReciprocityTheory.AnForm.R.affCoord p z)) Q) ∧
-      ∀ z : (Σ k, ι k) → ℂ, (∃ k, z ⟨k, p k⟩ = 0) → eval z G = 0 := by
+theorem exists_homogenize (p : (k : K) → ι k) (Q : MvPolynomial (Fin (Fintype.card (Σ k, ι k))) ℂ)
+    : ∃ (G : MvPolynomial (Σ k, ι k) ℂ) (T : ℕ),
+      ReciprocityTheory.ChartRestriction.G.Geo.IsMultiHomog G (fun _ => T)
+        ∧ (∀ z : (Σ k, ι k) → ℂ,
+          (∀ k, z ⟨k, p k⟩ ≠ 0)
+            → eval z G
+              = (∏ k, z ⟨k, p k⟩ ^ T) * eval
+                (ReciprocityTheory.AnForm.R.renPt (ReciprocityTheory.AnForm.R.affCoord p z)) Q)
+        ∧ ∀ z : (Σ k, ι k) → ℂ, (∃ k, z ⟨k, p k⟩ = 0) → eval z G = 0 := by
   classical
   set Q' : MvPolynomial (Σ k, ι k) ℂ := rename (Fintype.equivFin (Σ k, ι k)).symm Q with hQ'
-  have hren : ∀ v : (Σ k, ι k) → ℂ, eval (ReciprocityTheory.AnForm.R.renPt v) Q = eval v Q' := fun v => by
+  have hren
+      : ∀ v : (Σ k, ι k) → ℂ, eval (ReciprocityTheory.AnForm.R.renPt v) Q = eval v Q' := fun v => by
     rw [hQ', eval_rename]
   set T := Q'.totalDegree + 1 with hT
   have hlt : ∀ m ∈ Q'.support, ∀ k, blkDeg m k < T := fun m hm k =>
     Nat.lt_succ_of_le (blkDeg_le_totalDegree hm k)
-  refine ⟨∑ m ∈ Q'.support, monomial (m + padExp p T m) (AddMonoidAlgebra.coeff Q' m), T, ?_, ?_, ?_⟩
+  refine
+    ⟨∑ m ∈ Q'.support, monomial (m + padExp p T m) (AddMonoidAlgebra.coeff Q' m), T, ?_, ?_, ?_⟩
   · intro n hn k
     obtain ⟨m, hm, hn'⟩ := Finset.mem_biUnion.1 (MvPolynomial.support_sum hn)
     have hn'' := support_monomial_subset hn'
@@ -92,7 +102,8 @@ theorem exists_homogenize (p : (k : K) → ι k) (Q : MvPolynomial (Fin (Fintype
       Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
     simp only [Finsupp.coe_add, Pi.add_apply, pow_add, Finset.prod_mul_distrib]
     rw [Fintype.prod_sigma, Fintype.prod_sigma, Fintype.prod_sigma]
-    have hpad : ∀ k, ∏ i, z ⟨k, i⟩ ^ padExp p T m ⟨k, i⟩ = z ⟨k, p k⟩ ^ (T - blkDeg m k) := fun k => by
+    have hpad
+        : ∀ k, ∏ i, z ⟨k, i⟩ ^ padExp p T m ⟨k, i⟩ = z ⟨k, p k⟩ ^ (T - blkDeg m k) := fun k => by
       rw [Finset.prod_eq_single (p k)]
       · rw [padExp_apply, if_pos rfl]
       · intro b _ hb; rw [padExp_apply, if_neg hb, pow_zero]
@@ -100,13 +111,13 @@ theorem exists_homogenize (p : (k : K) → ι k) (Q : MvPolynomial (Fin (Fintype
     simp only [hpad, ReciprocityTheory.AnForm.R.affCoord, div_pow]
     have hden : ∀ k, ∏ i, z ⟨k, p k⟩ ^ m ⟨k, i⟩ = z ⟨k, p k⟩ ^ blkDeg m k := fun k => by
       rw [Finset.prod_pow_eq_pow_sum]; rfl
-    rw [show (∏ k, ∏ i, z ⟨k, i⟩ ^ m ⟨k, i⟩ / z ⟨k, p k⟩ ^ m ⟨k, i⟩) =
-        (∏ k, ∏ i, z ⟨k, i⟩ ^ m ⟨k, i⟩) / ∏ k, z ⟨k, p k⟩ ^ blkDeg m k by
+    rw [show (∏ k, ∏ i, z ⟨k, i⟩ ^ m ⟨k, i⟩ / z ⟨k, p k⟩ ^ m ⟨k, i⟩)
+        = (∏ k, ∏ i, z ⟨k, i⟩ ^ m ⟨k, i⟩) / ∏ k, z ⟨k, p k⟩ ^ blkDeg m k by
       rw [← Finset.prod_div_distrib]
       refine Finset.prod_congr rfl fun k _ => ?_
       rw [Finset.prod_div_distrib, hden]]
-    have hsub : ∀ k, z ⟨k, p k⟩ ^ (T - blkDeg m k) = z ⟨k, p k⟩ ^ T / z ⟨k, p k⟩ ^ blkDeg m k := fun k =>
-      pow_sub₀ _ (hz k) (hlt m hm k).le
+    have hsub : ∀ k, z ⟨k, p k⟩ ^ (T - blkDeg m k) = z ⟨k, p k⟩ ^ T / z ⟨k, p k⟩ ^ blkDeg m k :=
+      fun k => pow_sub₀ _ (hz k) (hlt m hm k).le
     simp only [hsub, Finset.prod_div_distrib]
     have h0 : (∏ k, z ⟨k, p k⟩ ^ blkDeg m k) ≠ 0 :=
       Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (hz k)

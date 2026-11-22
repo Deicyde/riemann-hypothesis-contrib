@@ -43,8 +43,8 @@ lemma windowSum_count (a : ℤ) (L : ℕ) (r : ℤ) (hr : 0 < r) :
     exact_mod_cast Int.ediv_mul_le (L : ℤ) hr.ne'
   linarith
 
-private theorem sum_range_one_div_pow_succ_eq (x : ℝ) (hx : 1 < x) (K : ℕ) :
-    ∑ k ∈ Finset.range K, 1 / x ^ (k + 1) = (1 - 1 / x ^ K) / (x - 1) := by
+private theorem sum_range_one_div_pow_succ_eq (x : ℝ) (hx : 1 < x) (K : ℕ)
+    : ∑ k ∈ Finset.range K, 1 / x ^ (k + 1) = (1 - 1 / x ^ K) / (x - 1) := by
   have hx0 : x - 1 ≠ 0 := by linarith
   have hxp : x ≠ 0 := by linarith
   induction K with
@@ -60,12 +60,14 @@ theorem sum_padicValInt_le : WindowSum := by
   have hℓ1 : (1 : ℝ) < ℓ := by exact_mod_cast hℓ.one_lt
   have hL0 : (0 : ℝ) ≤ (L : ℝ) / ((ℓ : ℝ) - 1) := div_nonneg (Nat.cast_nonneg _) (by linarith)
   rcases Nat.eq_zero_or_pos D with rfl | hDpos
-  · have hzero : ∑ i ∈ S, padicValInt ℓ i = 0 := Finset.sum_eq_zero fun i hi =>
-      (h0 ((abs_nonpos_iff.1 (by exact_mod_cast hD i hi)) ▸ hi)).elim
+  · have hzero : ∑ i ∈ S, padicValInt ℓ i = 0 :=
+      Finset.sum_eq_zero fun i hi => (h0 ((abs_nonpos_iff.1 (by exact_mod_cast hD i hi)) ▸ hi)).elim
     rw [hzero]
     simpa [Real.logb_zero] using hL0
-  have hv : ∀ i ∈ S, padicValInt ℓ i =
-      ((Finset.range (Nat.log ℓ D)).filter (fun k => (ℓ : ℤ) ^ (k + 1) ∣ i)).card := by
+  have hv
+      : ∀ i ∈ S,
+        padicValInt ℓ i
+          = ((Finset.range (Nat.log ℓ D)).filter (fun k => (ℓ : ℤ) ^ (k + 1) ∣ i)).card := by
     intro i hi
     have hi0 : i ≠ 0 := fun h => h0 (h ▸ hi)
 
@@ -80,21 +82,26 @@ theorem sum_padicValInt_le : WindowSum := by
         rw [← Int.natCast_natAbs] at h4
         exact_mod_cast h4
       exact Nat.le_log_of_pow_le hℓ.one_lt (h2.trans h3)
-    have hf : (Finset.range (Nat.log ℓ D)).filter (fun k => (ℓ : ℤ) ^ (k + 1) ∣ i) =
-        Finset.range (padicValInt ℓ i) := by
+    have hf
+        : (Finset.range (Nat.log ℓ D)).filter (fun k => (ℓ : ℤ) ^ (k + 1) ∣ i)
+          = Finset.range (padicValInt ℓ i) := by
       ext k
       simp only [Finset.mem_filter, Finset.mem_range, padicValInt_dvd_iff, hi0, false_or]
       omega
     rw [hf, Finset.card_range]
-  have hcount : ∀ k, ((S.filter (fun i => (ℓ : ℤ) ^ (k + 1) ∣ i)).card : ℝ) ≤
-      (L : ℝ) / (ℓ : ℝ) ^ (k + 1) + 1 := by
+  have hcount
+      : ∀ k,
+        ((S.filter (fun i => (ℓ : ℤ) ^ (k + 1) ∣ i)).card : ℝ)
+          ≤ (L : ℝ) / (ℓ : ℝ) ^ (k + 1) + 1 := by
     intro k
     have h1 := windowSum_count a L ((ℓ : ℤ) ^ (k + 1)) (pow_pos (by exact_mod_cast hℓ.pos) _)
     push_cast at h1
     refine le_trans ?_ h1
     exact_mod_cast Finset.card_le_card (Finset.filter_subset_filter _ hS)
-  have hsum : ∑ i ∈ S, padicValInt ℓ i = ∑ k ∈ Finset.range (Nat.log ℓ D),
-      (S.filter (fun i => (ℓ : ℤ) ^ (k + 1) ∣ i)).card := by
+  have hsum
+      : ∑ i ∈ S, padicValInt ℓ i
+        = ∑ k ∈ Finset.range (Nat.log ℓ D),
+          (S.filter (fun i => (ℓ : ℤ) ^ (k + 1) ∣ i)).card := by
     rw [Finset.sum_congr rfl hv]
     simp only [Finset.card_filter]
     exact Finset.sum_comm
@@ -103,22 +110,23 @@ theorem sum_padicValInt_le : WindowSum := by
     exact_mod_cast Nat.pow_log_le_self ℓ hDpos.ne'
   have h1 : (0 : ℝ) < (ℓ : ℝ) - 1 := by linarith
   have hy : 0 ≤ 1 / (ℓ : ℝ) ^ Nat.log ℓ D := by positivity
-  have hgeo : (L : ℝ) * ((1 - 1 / (ℓ : ℝ) ^ Nat.log ℓ D) / ((ℓ : ℝ) - 1)) ≤
-      (L : ℝ) / ((ℓ : ℝ) - 1) := by
+  have hgeo
+      : (L : ℝ) * ((1 - 1 / (ℓ : ℝ) ^ Nat.log ℓ D) / ((ℓ : ℝ) - 1)) ≤ (L : ℝ) / ((ℓ : ℝ) - 1) := by
     rw [← mul_div_assoc, div_le_div_iff₀ h1 h1]
     nlinarith [Nat.cast_nonneg (α := ℝ) L, mul_nonneg (Nat.cast_nonneg (α := ℝ) L) hy]
   rw [hsum]
   push_cast
-  calc ∑ k ∈ Finset.range (Nat.log ℓ D), ((S.filter (fun i => (ℓ : ℤ) ^ (k + 1) ∣ i)).card : ℝ)
-      ≤ ∑ k ∈ Finset.range (Nat.log ℓ D), ((L : ℝ) / (ℓ : ℝ) ^ (k + 1) + 1) :=
-        Finset.sum_le_sum fun k _ => hcount k
+  calc
+    ∑ k ∈ Finset.range (Nat.log ℓ D), ((S.filter (fun i => (ℓ : ℤ) ^ (k + 1) ∣ i)).card : ℝ)
+        ≤ ∑ k ∈ Finset.range (Nat.log ℓ D), ((L : ℝ) / (ℓ : ℝ) ^ (k + 1) + 1) :=
+      Finset.sum_le_sum fun k _ => hcount k
     _ = (L : ℝ) * ∑ k ∈ Finset.range (Nat.log ℓ D), 1 / (ℓ : ℝ) ^ (k + 1) + (Nat.log ℓ D : ℝ) := by
-        rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_const, Finset.card_range,
-          nsmul_eq_mul, mul_one]
-        congr 1
-        exact Finset.sum_congr rfl fun k _ => by ring
+      rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
+        mul_one]
+      congr 1
+      exact Finset.sum_congr rfl fun k _ => by ring
     _ ≤ (L : ℝ) / ((ℓ : ℝ) - 1) + Real.logb ℓ D := by
-        rw [sum_range_one_div_pow_succ_eq _ hℓ1]
-        linarith
+      rw [sum_range_one_div_pow_succ_eq _ hℓ1]
+      linarith
 
 end Formalism.WindowSums

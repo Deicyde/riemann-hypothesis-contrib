@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso)
@@ -30,32 +33,35 @@ private lemma sumRep_val (r : Γ →* GL (Fin a) k) (s : Γ →* GL (Fin b) k) (
       (Matrix.fromBlocks (r g : Matrix (Fin a) (Fin a) k) 0 0
         (s g : Matrix (Fin b) (Fin b) k)).submatrix finSumFinEquiv.symm finSumFinEquiv.symm := rfl
 
-private def resHom (ρ : Γ →* GL (Fin n) k) {W' : Submodule k (Fin n → k)}
-    (hinv : IsInv ρ W') : Γ →* Module.End k W' where
+private def resHom (ρ : Γ →* GL (Fin n) k) {W' : Submodule k (Fin n → k)} (hinv : IsInv ρ W')
+    : Γ →* Module.End k W' where
   toFun g := (Matrix.mulVecLin (ρ g : Matrix (Fin n) (Fin n) k)).restrict (hinv g)
   map_one' := by ext x; simp
   map_mul' g h := by
     refine LinearMap.ext fun x => Subtype.ext ?_
-    change (ρ (g * h) : Matrix (Fin n) (Fin n) k).mulVec (x : Fin n → k) =
-      (ρ g : Matrix (Fin n) (Fin n) k).mulVec
+    change (ρ (g * h) : Matrix (Fin n) (Fin n) k).mulVec (x : Fin n → k)
+      = (ρ g : Matrix (Fin n) (Fin n) k).mulVec
         ((ρ h : Matrix (Fin n) (Fin n) k).mulVec (x : Fin n → k))
     simp [Matrix.mulVec_mulVec]
 
-private def subRep (ρ : Γ →* GL (Fin n) k) {W' : Submodule k (Fin n → k)}
-    (hinv : IsInv ρ W') (c : Module.Basis (Fin b) k W') : Γ →* GL (Fin b) k :=
-  MonoidHom.toHomUnits
-    { toFun := fun g => LinearMap.toMatrix c c (resHom ρ hinv g)
-      map_one' := by simp [LinearMap.toMatrix_one]
-      map_mul' := fun g h => by
-        rw [map_mul, Module.End.mul_eq_comp, LinearMap.toMatrix_comp c c c] }
+private def subRep
+    (ρ : Γ →* GL (Fin n) k)
+    {W' : Submodule k (Fin n → k)} (hinv : IsInv ρ W') (c : Module.Basis (Fin b) k W')
+    : Γ →* GL (Fin b) k :=
+  MonoidHom.toHomUnits {
+    toFun := fun g => LinearMap.toMatrix c c (resHom ρ hinv g)
+    map_one' := by simp [LinearMap.toMatrix_one]
+    map_mul' := fun g h => by rw [map_mul, Module.End.mul_eq_comp, LinearMap.toMatrix_comp c c c]
+  }
 
 private lemma subRep_val (ρ : Γ →* GL (Fin n) k) {W' : Submodule k (Fin n → k)}
     (hinv : IsInv ρ W') (c : Module.Basis (Fin b) k W') (g : Γ) :
     ((subRep ρ hinv c g : GL (Fin b) k) : Matrix (Fin b) (Fin b) k) =
       LinearMap.toMatrix c c (resHom ρ hinv g) := rfl
 
-private def colM (A : Matrix (Fin n) (Fin a) k) {W' : Submodule k (Fin n → k)}
-    (c : Module.Basis (Fin b) k W') : Matrix (Fin n) (Fin a ⊕ Fin b) k :=
+private def colM
+    (A : Matrix (Fin n) (Fin a) k) {W' : Submodule k (Fin n → k)} (c : Module.Basis (Fin b) k W')
+    : Matrix (Fin n) (Fin a ⊕ Fin b) k :=
   Matrix.of fun i => Sum.elim (fun j => A i j) (fun j => (c j : Fin n → k) i)
 
 private lemma intertw (ρ : Γ →* GL (Fin n) k) {W' : Submodule k (Fin n → k)}
@@ -121,8 +127,10 @@ theorem subSplit_of : SubSplit := by
     have h := hP.unit.inv_mul
     rwa [hP.unit_spec] at h
   refine ⟨subRep ρ hinv c, hP.unit⁻¹, fun x => ?_⟩
-  have hx : (ρ x : Matrix _ _ k) * P = P * (Matrix.fromBlocks (r x : Matrix (Fin a) (Fin a) k) 0 0
-      (subRep ρ hinv c x : Matrix (Fin b) (Fin b) k)).submatrix e.symm e.symm := by
+  have hx
+      : (ρ x : Matrix _ _ k) * P
+        = P * (Matrix.fromBlocks (r x : Matrix (Fin a) (Fin a) k) 0 0
+          (subRep ρ hinv c x : Matrix (Fin b) (Fin b) k)).submatrix e.symm e.symm := by
     rw [Matrix.submatrix_mul_equiv, ← intertw ρ hinv c A (r x) x (hAg x)]
     ext i j
     simp [P, Matrix.mul_apply]

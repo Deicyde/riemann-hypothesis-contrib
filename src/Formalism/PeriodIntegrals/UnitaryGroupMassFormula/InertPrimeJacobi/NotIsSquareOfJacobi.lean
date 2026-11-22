@@ -9,15 +9,17 @@ open NumberField
 
 namespace PI.InertPrimeWork
 
-theorem not_isSquare_of_jacobi {d p : ℕ} (hp : p.Prime) (h : jacobiSym (-(d : ℤ)) p = -1) :
-    ¬ IsSquare (((-(d : ℤ) : ℤ)) : ZMod p) := by
+theorem not_isSquare_of_jacobi {d p : ℕ} (hp : p.Prime) (h : jacobiSym (-(d : ℤ)) p = -1)
+    : ¬ IsSquare (((-(d : ℤ) : ℤ)) : ZMod p) := by
   haveI := Fact.mk hp
   rw [← jacobiSym.legendreSym.to_jacobiSym] at h
   exact (legendreSym.eq_neg_one_iff p).1 h
 
-theorem inert (K : Type) [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2) (b : K) (d p : ℕ)
-    (hb : b ^ 2 = -(d : K)) (hp : p.Prime) (hj : jacobiSym (-(d : ℤ)) p = -1) :
-    (Ideal.span {(p : 𝓞 K)}).IsPrime := by
+theorem inert
+    (K : Type) [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    (b : K) (d p : ℕ) (hb : b ^ 2 = -(d : K)) (hp : p.Prime) (hj : jacobiSym (-(d : ℤ)) p = -1)
+    : (Ideal.span {(p : 𝓞 K)}).IsPrime := by
   haveI := Fact.mk hp
   have hsq := not_isSquare_of_jacobi hp hj
   have hnormI : Ideal.absNorm (Ideal.span {(p : 𝓞 K)}) = p ^ 2 := by

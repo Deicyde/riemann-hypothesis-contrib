@@ -170,7 +170,8 @@ def LamL (m : Matrix (Fin k) (Fin k) A) : Module.End A (Finset (Fin k) → A) :=
 lemma LamL_apply (m : Matrix (Fin k) (Fin k) A) (K : Finset (Fin k) → A) : LamL m K = ∑ I, K I • img m I := by
   simp [LamL]
 
-def abelian₂ (m : Matrix (Fin k) (Fin k) A) : Matrix (Finset (Fin k)) (Finset (Fin k)) A := fun I J => img m I J
+def abelian₂ (m : Matrix (Fin k) (Fin k) A) : Matrix (Finset (Fin k)) (Finset (Fin k)) A :=
+  fun I J => img m I J
 
 lemma vecMul_Lam (K : Finset (Fin k) → A) (m : Matrix (Fin k) (Fin k) A) : Matrix.vecMul K (abelian₂ m) = LamL m K := by
   funext J
@@ -227,8 +228,9 @@ lemma LamL_Wop_apply (m : Matrix (Fin k) (Fin k) A) (x : Fin k → A) (v : Finse
   have h := congrArg (fun f => f v) (LamL_Wop m x)
   simpa only [Module.End.mul_apply] using h
 
-theorem Lam_wedge (m : Matrix (Fin k) (Fin k) A) (x : Fin k → A) (K : Finset (Fin k) → A) :
-    Matrix.vecMul (wedgeR x K) (abelian₂ m) = wedgeR (Matrix.vecMul x m) (Matrix.vecMul K (abelian₂ m)) := by
+theorem Lam_wedge (m : Matrix (Fin k) (Fin k) A) (x : Fin k → A) (K : Finset (Fin k) → A)
+    : Matrix.vecMul (wedgeR x K) (abelian₂ m)
+      = wedgeR (Matrix.vecMul x m) (Matrix.vecMul K (abelian₂ m)) := by
   rw [vecMul_Lam, vecMul_Lam, ← Wop_apply, ← Wop_apply, LamL_Wop_apply]
 
 lemma extOne_eq : (extOne : Finset (Fin k) → A) = Pi.single ∅ 1 := by
@@ -265,7 +267,8 @@ lemma img_mul (m m' : Matrix (Fin k) (Fin k) A) (I : Finset (Fin k)) : img (m * 
     rw [img_insert_max (m * m') b s hb, ih, img_insert_max m b s hb, ← Wop_apply, ← Wop_apply,
       LamL_Wop_apply, hrow]
 
-theorem Lam_mul (m m' : Matrix (Fin k) (Fin k) A) : abelian₂ (m * m') = abelian₂ m * abelian₂ m' := by
+theorem Lam_mul (m m' : Matrix (Fin k) (Fin k) A)
+    : abelian₂ (m * m') = abelian₂ m * abelian₂ m' := by
   ext I J
   rw [Matrix.mul_apply]
   show img (m * m') I J = _
@@ -300,8 +303,10 @@ lemma LamL_Iop_single (m m' : Matrix (Fin k) (Fin k) A) (h : m * m' = 1) (y : Fi
     rw [single_insert_max b s hb c, IW_apply, hyb, map_sub, map_smul, LamL_Wop_apply, hrow, ih c,
       LamL_Wop_apply, hrow, IW_apply, hmy]
 
-theorem Lam_contr (m m' : Matrix (Fin k) (Fin k) A) (h : m * m' = 1) (y : Fin k → A) (K : Finset (Fin k) → A) :
-    Matrix.vecMul (contrR y K) (abelian₂ m) = contrR (Matrix.mulVec m' y) (Matrix.vecMul K (abelian₂ m)) := by
+theorem Lam_contr
+    (m m' : Matrix (Fin k) (Fin k) A) (h : m * m' = 1) (y : Fin k → A) (K : Finset (Fin k) → A)
+    : Matrix.vecMul (contrR y K) (abelian₂ m)
+      = contrR (Matrix.mulVec m' y) (Matrix.vecMul K (abelian₂ m)) := by
   rw [vecMul_Lam, vecMul_Lam, ← Iop_apply, ← Iop_apply]
   have hK : K = ∑ I, Pi.single I (K I) := (Finset.univ_sum_single K).symm
   rw [hK]
@@ -309,11 +314,12 @@ theorem Lam_contr (m m' : Matrix (Fin k) (Fin k) A) (h : m * m' = 1) (y : Fin k 
     simp only [map_sum]
   exact Finset.sum_congr rfl fun I _ => LamL_Iop_single m m' h y I (K I)
 
-theorem Lam_empty (m : Matrix (Fin k) (Fin k) A) (J : Finset (Fin k)) (hJ : J ≠ ∅) : abelian₂ m ∅ J = 0 := by
+theorem Lam_empty (m : Matrix (Fin k) (Fin k) A) (J : Finset (Fin k)) (hJ : J ≠ ∅)
+    : abelian₂ m ∅ J = 0 := by
   simp [abelian₂, img_empty, extOne, hJ]
 
-theorem Lam_map {A' : Type*} [CommRing A'] (φ : A →+* A') (m : Matrix (Fin k) (Fin k) A) :
-    (abelian₂ m).map φ = abelian₂ (m.map φ) := by
+theorem Lam_map {A' : Type*} [CommRing A'] (φ : A →+* A') (m : Matrix (Fin k) (Fin k) A)
+    : (abelian₂ m).map φ = abelian₂ (m.map φ) := by
   have key : ∀ (I J : Finset (Fin k)), φ (img m I J) = img (m.map φ) I J := by
     intro I
     induction I using Finset.induction_on_max with
@@ -324,7 +330,7 @@ theorem Lam_map {A' : Type*} [CommRing A'] (φ : A →+* A') (m : Matrix (Fin k)
     | insert b s hb ih =>
       intro J
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [img_insert_max m b s hb, img_insert_max (m.map φ) b s hb, wedgeR, map_sum, map_mul,
+      simp only [img_insert_max m b s hb, img_insert_max (m.map φ) b s hb, wedgeR, map_sum, map_mul,
         map_pow, map_neg, map_one, ih, Matrix.map_apply]
   ext I J
   simp [Matrix.map_apply, abelian₂, key]

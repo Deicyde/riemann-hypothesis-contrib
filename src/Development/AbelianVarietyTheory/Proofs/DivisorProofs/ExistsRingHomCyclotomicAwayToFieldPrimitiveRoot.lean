@@ -10,8 +10,11 @@ open GlobalTheory.SiegelTor
 
 namespace GlobalTheory.CycLift
 
-theorem exists_hom_to_field : ∀ (M : ℕ), M ≠ 0 → ∀ (K : Type) [Field K] (y : K), IsPrimitiveRoot y M → IsUnit (M : K) →
-    ∃ β : cycAway M →+* K, β (zetaAway M) = y := by
+theorem exists_hom_to_field
+    : ∀ (M : ℕ),
+      M ≠ 0
+        → ∀ (K : Type) [Field K] (y : K),
+          IsPrimitiveRoot y M → IsUnit (M : K) → ∃ β : cycAway M →+* K, β (zetaAway M) = y := by
   intro M hM K _ y hy hMK
   obtain ⟨p, hcp⟩ := CharP.exists K
   rcases CharP.char_is_prime_or_zero K p with hp | rfl
@@ -30,10 +33,13 @@ theorem exists_hom_to_field : ∀ (M : ℕ), M ≠ 0 → ∀ (K : Type) [Field K
         exact CharP.charP_to_charZero _
     let π : WittVector p K →+* K := WittVector.constantCoeff
     have hcc : ∀ x : K, π (WittVector.teichmuller p x) = x := fun x => by simp [π]
-    have hu : IsPrimitiveRoot (WittVector.teichmuller p y) M :=
-      ⟨by rw [← map_pow, hy.pow_eq_one, map_one], fun l hl => hy.dvd_of_pow_eq_one l (by
-        have := congrArg π hl
-        rwa [map_pow, hcc, map_one] at this)⟩
+    have hu : IsPrimitiveRoot (WittVector.teichmuller p y) M := ⟨
+      by rw [← map_pow, hy.pow_eq_one, map_one],
+      fun l hl =>
+        hy.dvd_of_pow_eq_one l (by
+          have := congrArg π hl
+          rwa [map_pow, hcc, map_one] at this)
+    ⟩
     have hnV : IsUnit (M : WittVector p K) := by
       refine WittVector.isUnit_of_coeff_zero_ne_zero _ ?_
       have : π (M : WittVector p K) ≠ 0 := by rw [map_natCast]; exact hMK.ne_zero

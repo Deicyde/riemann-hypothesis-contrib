@@ -9,18 +9,21 @@ public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValue
 
 set_option autoImplicit false
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.HostModel
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.HostModel
 
 namespace GlobalTheory.HostRamif
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem intCast_mem_iff {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal) (hlw : (l : 𝓞 E) ∈ w) (n : ℤ) :
-    (n : 𝓞 E) ∈ w ↔ (l : ℤ) ∣ n := by
+theorem intCast_mem_iff
+    {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal) (hlw : (l : 𝓞 E) ∈ w) (n : ℤ)
+    : (n : 𝓞 E) ∈ w ↔ (l : ℤ) ∣ n := by
   constructor
   · intro hn
     by_contra hnd
-    have hc : IsCoprime (l : ℤ) n := ((Nat.prime_iff_prime_int.mp hl).irreducible.coprime_iff_not_dvd).2 hnd
+    have hc : IsCoprime (l : ℤ) n :=
+      ((Nat.prime_iff_prime_int.mp hl).irreducible.coprime_iff_not_dvd).2 hnd
     obtain ⟨a, b, hab⟩ := hc
     apply hw.ne_top
     rw [Ideal.eq_top_iff_one]
@@ -34,8 +37,9 @@ theorem intCast_mem_iff {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.Is
     push_cast
     exact w.mul_mem_right _ hlw
 
-theorem dvd_different_iff [IsGalois ℚ E] {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal)
-    (hlw : (l : 𝓞 E) ∈ w) : w ∣ differentIdeal ℤ (𝓞 E) ↔ (l : ℤ) ∣ discr E := by
+theorem dvd_different_iff
+    [IsGalois ℚ E] {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal) (hlw : (l : 𝓞 E) ∈ w)
+    : w ∣ differentIdeal ℤ (𝓞 E) ↔ (l : ℤ) ∣ discr E := by
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl
   have hwp := hw.isPrime
   haveI : w.LiesOver (Ideal.span {(l : ℤ)}) := (Ideal.liesOver_span_iff hw.ne_top hp).mpr (by simpa using hlw)
@@ -48,8 +52,8 @@ theorem dvd_different_iff [IsGalois ℚ E] {l : ℕ} (hl : l.Prime) {w : Ideal (
 
 variable [IsCMField E]
 
-theorem exists_coords (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0}) :
-    ∃ x y : ℤ, a = x + y * H.w0 := by
+theorem exists_coords (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0})
+    : ∃ x y : ℤ, a = x + y * H.w0 := by
   obtain ⟨k, hk⟩ : ∃ k : ℕ, H.d = 4 * k + 3 := ⟨H.d / 4, by have := H.d_mod; omega⟩
   have hsq : H.w0 ^ 2 = H.w0 - (k + 1) := by
     have h := H.rt_sq
@@ -67,12 +71,18 @@ theorem exists_coords (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {
   | mul a b _ _ ha hb =>
     obtain ⟨x, y, rfl⟩ := ha
     obtain ⟨x', y', rfl⟩ := hb
-    exact ⟨x * x' - y * y' * (k + 1), x * y' + y * x' + y * y', by
-      push_cast; linear_combination (y : 𝓞 E) * y' * hsq⟩
+    exact ⟨
+      x * x' - y * y' * (k + 1),
+      x * y' + y * x' + y * y',
+      by push_cast; linear_combination (y : 𝓞 E) * y' * hsq
+    ⟩
 
-theorem isSquare_iff (H : Host E) {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal)
-    (hlw : (l : 𝓞 E) ∈ w) (hd : l ≠ H.d) :
-    IsSquare (-(H.d : ZMod l)) ↔ ∃ a ∈ Algebra.adjoin ℤ {H.w0}, a ∈ w ∧ H.bar a ∉ w := by
+theorem isSquare_iff
+    (H : Host E)
+    {l : ℕ} (hl : l.Prime)
+    {w : Ideal (𝓞 E)} (hw : w.IsMaximal) (hlw : (l : 𝓞 E) ∈ w)
+    (hd : l ≠ H.d)
+    : IsSquare (-(H.d : ZMod l)) ↔ ∃ a ∈ Algebra.adjoin ℤ {H.w0}, a ∈ w ∧ H.bar a ∉ w := by
   have hwp := hw.isPrime
   haveI := Fact.mk hl
   have h1 : (1 : 𝓞 E) ∉ w := fun h => hw.ne_top ((Ideal.eq_top_iff_one _).2 h)
@@ -98,7 +108,8 @@ theorem isSquare_iff (H : Host E) {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} 
     · generalize (-(H.d : ZMod 2)) = z
       revert z
       decide
-  · have hl2 : ¬ (l : ℤ) ∣ 2 := fun h => h2 ((Nat.prime_dvd_prime_iff_eq hl Nat.prime_two).1 (by exact_mod_cast h))
+  · have hl2 : ¬ (l : ℤ) ∣ 2 := fun h =>
+      h2 ((Nat.prime_dvd_prime_iff_eq hl Nat.prime_two).1 (by exact_mod_cast h))
     have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl
     constructor
     · rintro ⟨s, hs⟩
@@ -114,7 +125,7 @@ theorem isSquare_iff (H : Host E) {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} 
           linear_combination -H.rt_sq
         rw [e]
         exact neg_mem this
-      have hnb : ¬ (H.rt - s ∈ w ∧ -H.rt - s ∈ w) := by
+      have hnb : ¬(H.rt - s ∈ w ∧ -H.rt - s ∈ w) := by
         rintro ⟨ha, hb⟩
         have : ((2 * s : ℤ) : 𝓞 E) ∈ w := by
           have e : ((2 * s : ℤ) : 𝓞 E) = -((H.rt - s) + (-H.rt - s)) := by push_cast; ring
@@ -144,8 +155,9 @@ theorem isSquare_iff (H : Host E) {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} 
         exact add_mem haw (w.mul_mem_right _ hyw)
       have hn : (l : ℤ) ∣ (2 * x + y) ^ 2 + H.d * y ^ 2 := by
         rw [← intCast_mem_iff hl hw hlw]
-        have e : (((2 * x + y) ^ 2 + H.d * y ^ 2 : ℤ) : 𝓞 E) =
-            (x + y * H.w0) * (4 * (x + y * (1 - H.w0))) := by
+        have e
+            : (((2 * x + y) ^ 2 + H.d * y ^ 2 : ℤ) : 𝓞 E)
+              = (x + y * H.w0) * (4 * (x + y * (1 - H.w0))) := by
           have h := H.rt_sq
           rw [rt_eq] at h
           push_cast
@@ -158,8 +170,10 @@ theorem isSquare_iff (H : Host E) {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} 
       field_simp
       linear_combination -hn
 
-theorem isHostField_iff : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
-    EigenvectorLieDegree.IsHostField H ↔ IsAbelianGalois ℚ E ∧ AdelicDegreeTameRamification.TameAtRamified H := by
+theorem isHostField_iff
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
+      EigenvectorLieDegree.IsHostField H
+        ↔ IsAbelianGalois ℚ E ∧ AdelicDegreeTameRamification.TameAtRamified H := by
   intro E _ _ _ H
   unfold EigenvectorLieDegree.IsHostField AdelicDegreeTameRamification.TameAtRamified
   refine and_congr_right fun hab => ⟨fun h l w hl hld hw hlw => ?_, fun h w hwd => ?_⟩

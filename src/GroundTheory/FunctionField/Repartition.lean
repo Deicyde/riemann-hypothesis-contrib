@@ -20,10 +20,11 @@ section Abstract
 
 variable {R M : Type*} [Field R] [AddCommGroup M] [Module R M]
 
-theorem finiteDimensional_map_mkQ_trans {S T U : Submodule R M} (hST : S ≤ T) (hTU : T ≤ U)
-    [FiniteDimensional R (T.map S.mkQ)] [FiniteDimensional R (U.map T.mkQ)] :
-    FiniteDimensional R (U.map S.mkQ) ∧
-      finrank R (U.map S.mkQ) = finrank R (T.map S.mkQ) + finrank R (U.map T.mkQ) := by
+theorem finiteDimensional_map_mkQ_trans
+    {S T U : Submodule R M} (hST : S ≤ T) (hTU : T ≤ U)
+    [FiniteDimensional R (T.map S.mkQ)] [FiniteDimensional R (U.map T.mkQ)]
+    : FiniteDimensional R (U.map S.mkQ)
+      ∧ finrank R (U.map S.mkQ) = finrank R (T.map S.mkQ) + finrank R (U.map T.mkQ) := by
   let f : U.map S.mkQ →ₗ[R] M ⧸ T := (Submodule.factor hST).comp (U.map S.mkQ).subtype
   have hrange : LinearMap.range f = U.map T.mkQ := by
     rw [LinearMap.range_comp, Submodule.range_subtype, ← Submodule.map_comp,
@@ -73,21 +74,21 @@ theorem Place.finite_not_mem_ring (x : K) : {v : Place k K | x ∉ v.ring}.Finit
     intro h
     exact hv ((v.ord_nonneg_iff hx0).1 (by rw [h]))
 
-
 variable (k K) in
 def repartitions : Submodule k (Place k K → K) where
   carrier := {a | {v : Place k K | a v ∉ v.ring}.Finite}
-  add_mem' {a b} ha hb := (ha.union hb).subset fun v (hv : a v + b v ∉ v.ring) => by
-    by_contra h
-    simp only [Set.mem_union, Set.mem_ofPred_eq, not_or, not_not] at h
-    exact hv (add_mem h.1 h.2)
+  add_mem' {a b} ha hb :=
+    (ha.union hb).subset fun v (hv : a v + b v ∉ v.ring) => by
+      by_contra h
+      simp only [Set.mem_union, Set.mem_ofPred_eq, not_or, not_not] at h
+      exact hv (add_mem h.1 h.2)
   zero_mem' := Set.finite_empty.subset fun v (hv : (0 : K) ∉ v.ring) => hv v.ring.zero_mem
-  smul_mem' c a ha := ha.subset fun v (hv : c • a v ∉ v.ring) => by
-    by_contra h
-    rw [Set.mem_ofPred_eq, not_not] at h
-    rw [Algebra.smul_def] at hv
-    exact hv (mul_mem (v.algebraMap_mem c) h)
-
+  smul_mem' c a ha :=
+    ha.subset fun v (hv : c • a v ∉ v.ring) => by
+      by_contra h
+      rw [Set.mem_ofPred_eq, not_not] at h
+      rw [Algebra.smul_def] at hv
+      exact hv (mul_mem (v.algebraMap_mem c) h)
 
 variable (k K) in
 def Repartition : Type _ := repartitions k K
@@ -105,36 +106,30 @@ instance : FunLike (Repartition k K) (Place k K) K where
 def mk (f : Place k K → K) (hf : {v : Place k K | f v ∉ v.ring}.Finite) : Repartition k K :=
   (⟨f, hf⟩ : repartitions k K)
 
-
 omit [IsFunctionField k K] in
 theorem finite_not_mem (a : Repartition k K) : {v : Place k K | a v ∉ v.ring}.Finite :=
   (show repartitions k K from a).2
 
 omit [IsFunctionField k K] in
 @[ext]
-theorem ext {a b : Repartition k K} (h : ∀ v, a v = b v) : a = b :=
-  DFunLike.ext _ _ h
+theorem ext {a b : Repartition k K} (h : ∀ v, a v = b v) : a = b := DFunLike.ext _ _ h
 
 omit [IsFunctionField k K] in
 @[simp]
-theorem add_apply (a b : Repartition k K) (v : Place k K) : (a + b) v = a v + b v :=
-  rfl
+theorem add_apply (a b : Repartition k K) (v : Place k K) : (a + b) v = a v + b v := rfl
 
 omit [IsFunctionField k K] in
 @[simp]
-theorem sub_apply (a b : Repartition k K) (v : Place k K) : (a - b) v = a v - b v :=
-  rfl
-
+theorem sub_apply (a b : Repartition k K) (v : Place k K) : (a - b) v = a v - b v := rfl
 
 omit [IsFunctionField k K] in
 @[simp]
-theorem zero_apply (v : Place k K) : (0 : Repartition k K) v = 0 :=
-  rfl
+theorem zero_apply (v : Place k K) : (0 : Repartition k K) v = 0 := rfl
 
 omit [IsFunctionField k K] in
 @[simp]
-theorem smul_apply (c : k) (a : Repartition k K) (v : Place k K) :
-    (c • a) v = algebraMap k K c * a v := by
+theorem smul_apply (c : k) (a : Repartition k K) (v : Place k K)
+    : (c • a) v = algebraMap k K c * a v := by
   change c • a v = _
   rw [Algebra.smul_def]
 
@@ -143,13 +138,11 @@ noncomputable def diag : K →ₗ[k] Repartition k K where
   map_add' _ _ := rfl
   map_smul' c x := by ext v; rfl
 
-
 variable (k K) in
 noncomputable def principal : Submodule k (Repartition k K) :=
   LinearMap.range (diag (k := k) (K := K))
 
-theorem diag_mem_principal (x : K) : diag x ∈ principal k K :=
-  ⟨x, rfl⟩
+theorem diag_mem_principal (x : K) : diag x ∈ principal k K := ⟨x, rfl⟩
 
 end Repartition
 
@@ -172,58 +165,67 @@ def A (D : Divisor k K) : Submodule k (Repartition k K) where
 theorem A_mono {D E : Divisor k K} (h : D ≤ E) : A D ≤ A E := fun _a ha v =>
   (ha v).trans (WithZero.exp_le_exp.2 (Finsupp.le_def.1 h v))
 
-theorem diag_mem_A_iff {D : Divisor k K} {x : K} : diag x ∈ A D ↔ x ∈ L D :=
-  Iff.rfl
-
+theorem diag_mem_A_iff {D : Divisor k K} {x : K} : diag x ∈ A D ↔ x ∈ L D := Iff.rfl
 
 omit [IsFunctionField k K] in
-theorem add_single_apply_self (D : Divisor k K) (P : Place k K) :
-    (D + Finsupp.single P 1 : Divisor k K) P = D P + 1 := by
+theorem add_single_apply_self (D : Divisor k K) (P : Place k K)
+    : (D + Finsupp.single P 1 : Divisor k K) P = D P + 1 := by
   simp
 
 omit [IsFunctionField k K] in
-theorem add_single_apply_of_ne (D : Divisor k K) {P w : Place k K} (h : w ≠ P) :
-    (D + Finsupp.single P 1 : Divisor k K) w = D w := by
+theorem add_single_apply_of_ne (D : Divisor k K) {P w : Place k K} (h : w ≠ P)
+    : (D + Finsupp.single P 1 : Divisor k K) w = D w := by
   simp [Ne.symm h]
 
-theorem mul_mem_ring_of_valuation {P : Place k K} {t z : K} {n : ℤ}
-    (ht : P.valuation t = WithZero.exp (-n)) (hz : P.valuation z ≤ WithZero.exp n) :
-    t * z ∈ P.ring := by
+theorem mul_mem_ring_of_valuation
+    {P : Place k K} {t z : K} {n : ℤ}
+    (ht : P.valuation t = WithZero.exp (-n)) (hz : P.valuation z ≤ WithZero.exp n)
+    : t * z ∈ P.ring := by
   rw [← P.valuation_le_one_iff, map_mul, ht]
-  calc WithZero.exp (-n) * P.valuation z ≤ WithZero.exp (-n) * WithZero.exp n :=
-        mul_le_mul' le_rfl hz
+  calc
+    WithZero.exp (-n) * P.valuation z
+      ≤ WithZero.exp (-n) * WithZero.exp n := mul_le_mul' le_rfl hz
     _ = 1 := by rw [← WithZero.exp_add]; simp
 
-noncomputable def residueMap (D : Divisor k K) (P : Place k K) {t : K}
-    (ht : P.valuation t = WithZero.exp (-(D P + 1))) :
-    A (D + Finsupp.single P 1) →ₗ[k] P.ResidueField where
-  toFun a := IsLocalRing.residue P.ring ⟨t * (a : Repartition k K) P,
-    mul_mem_ring_of_valuation ht (by rw [← add_single_apply_self D P]; exact a.2 P)⟩
+noncomputable def residueMap
+    (D : Divisor k K) (P : Place k K) {t : K} (ht : P.valuation t = WithZero.exp (-(D P + 1)))
+    : A (D + Finsupp.single P 1) →ₗ[k] P.ResidueField where
+  toFun a :=
+    IsLocalRing.residue P.ring ⟨
+      t * (a : Repartition k K) P,
+      mul_mem_ring_of_valuation ht (by rw [← add_single_apply_self D P]; exact a.2 P)
+    ⟩
   map_add' a b := by
     rw [← map_add (f := _)]
     congr 1
     ext
     simp [mul_add]
   map_smul' c a := by
-    rw [RingHom.id_apply, Algebra.smul_def,
-      IsScalarTower.algebraMap_apply k P.ring P.ResidueField,
+    rw [RingHom.id_apply, Algebra.smul_def, IsScalarTower.algebraMap_apply k P.ring P.ResidueField,
       IsLocalRing.ResidueField.algebraMap_eq, ← map_mul]
     congr 1
     ext
-    change t * (c • (a : Repartition k K)) P =
-      (algebraMap k P.ring c : K) * (t * (a : Repartition k K) P)
+    change t * (c • (a : Repartition k K)) P
+      = (algebraMap k P.ring c : K) * (t * (a : Repartition k K) P)
     rw [Repartition.smul_apply, Place.coe_algebraMap_apply]
     ring
 
-theorem residueMap_apply (D : Divisor k K) (P : Place k K) {t : K}
-    (ht : P.valuation t = WithZero.exp (-(D P + 1))) (a : A (D + Finsupp.single P 1)) :
-    residueMap D P ht a = IsLocalRing.residue P.ring ⟨t * (a : Repartition k K) P,
-      mul_mem_ring_of_valuation ht (by rw [← add_single_apply_self D P]; exact a.2 P)⟩ :=
+theorem residueMap_apply
+    (D : Divisor k K) (P : Place k K)
+    {t : K} (ht : P.valuation t = WithZero.exp (-(D P + 1)))
+    (a : A (D + Finsupp.single P 1))
+    : residueMap D P ht a
+      = IsLocalRing.residue P.ring ⟨
+        t * (a : Repartition k K) P,
+        mul_mem_ring_of_valuation ht (by rw [← add_single_apply_self D P]; exact a.2 P)
+      ⟩ :=
   rfl
 
-theorem residueMap_eq_zero_iff (D : Divisor k K) (P : Place k K) {t : K}
-    (ht : P.valuation t = WithZero.exp (-(D P + 1))) (a : A (D + Finsupp.single P 1)) :
-    residueMap D P ht a = 0 ↔ (a : Repartition k K) ∈ A D := by
+theorem residueMap_eq_zero_iff
+    (D : Divisor k K) (P : Place k K)
+    {t : K} (ht : P.valuation t = WithZero.exp (-(D P + 1)))
+    (a : A (D + Finsupp.single P 1))
+    : residueMap D P ht a = 0 ↔ (a : Repartition k K) ∈ A D := by
   rw [residueMap_apply, IsLocalRing.residue_eq_zero_iff, ValuationSubring.valuation_lt_one_iff]
   change P.ring.valuation (t * (a : Repartition k K) P) < 1 ↔ _
   rw [← P.valuation_lt_one_iff, map_mul, ht]
@@ -234,23 +236,24 @@ theorem residueMap_eq_zero_iff (D : Divisor k K) (P : Place k K) {t : K}
       by_cases hz : (a : Repartition k K) w = 0
       · rw [hz, map_zero]; exact zero_le
       · rw [w.valuation_eq_exp_neg_ord hz, ← WithZero.exp_add, ← WithZero.exp_zero,
-          WithZero.exp_lt_exp] at h
+            WithZero.exp_lt_exp]
+          at h
         rw [w.valuation_eq_exp_neg_ord hz, WithZero.exp_le_exp]
         omega
     · rw [← add_single_apply_of_ne D hw]; exact a.2 w
   · intro h
-    calc WithZero.exp (-(D P + 1)) * P.valuation ((a : Repartition k K) P)
+    calc
+      WithZero.exp (-(D P + 1)) * P.valuation ((a : Repartition k K) P)
         ≤ WithZero.exp (-(D P + 1)) * WithZero.exp (D P) := mul_le_mul' le_rfl (h P)
       _ < 1 := by rw [← WithZero.exp_add, ← WithZero.exp_zero, WithZero.exp_lt_exp]; omega
 
-theorem residueMap_surjective (D : Divisor k K) (P : Place k K) {t : K}
-    (ht : P.valuation t = WithZero.exp (-(D P + 1))) :
-    Function.Surjective (residueMap D P ht) := by
+theorem residueMap_surjective
+    (D : Divisor k K) (P : Place k K) {t : K} (ht : P.valuation t = WithZero.exp (-(D P + 1)))
+    : Function.Surjective (residueMap D P ht) := by
   classical
   intro r
   obtain ⟨y, rfl⟩ := IsLocalRing.residue_surjective r
-  have ht0 : t ≠ 0 := by
-    intro h; rw [h, map_zero] at ht; exact WithZero.exp_ne_zero ht.symm
+  have ht0 : t ≠ 0 := by intro h; rw [h, map_zero] at ht; exact WithZero.exp_ne_zero ht.symm
   let f : Place k K → K := Pi.single P (t⁻¹ * y)
   have hf : {v : Place k K | f v ∉ v.ring}.Finite := by
     refine (Set.finite_singleton P).subset fun v (hv : f v ∉ v.ring) => ?_
@@ -279,18 +282,19 @@ theorem residueMap_surjective (D : Divisor k K) (P : Place k K) {t : K}
   simp only [f, Pi.single_eq_same]
   field_simp
 
-noncomputable def relSpace (D E : Divisor k K) :
-    Submodule k (Repartition k K ⧸ (A D ⊔ principal k K)) :=
+noncomputable def relSpace (D E : Divisor k K)
+    : Submodule k (Repartition k K ⧸ (A D ⊔ principal k K)) :=
   (A E ⊔ principal k K).map (A D ⊔ principal k K).mkQ
 
 omit [IsFunctionField k K] in
 theorem le_add_single (D : Divisor k K) (P : Place k K) : D ≤ D + Finsupp.single P 1 :=
   le_add_of_nonneg_right (Finsupp.single_nonneg.2 zero_le_one)
 
-theorem relSpace_add_single (D : Divisor k K) (P : Place k K) :
-    FiniteDimensional k (relSpace D (D + Finsupp.single P 1)) ∧
-      (finrank k (relSpace D (D + Finsupp.single P 1)) : ℤ) +
-        finrank k (L (D + Finsupp.single P 1)) = P.deg + finrank k (L D) := by
+theorem relSpace_add_single (D : Divisor k K) (P : Place k K)
+    : FiniteDimensional k (relSpace D (D + Finsupp.single P 1))
+      ∧ (finrank k (relSpace D (D + Finsupp.single P 1)) : ℤ)
+          + finrank k (L (D + Finsupp.single P 1))
+        = P.deg + finrank k (L D) := by
   classical
   set E : Divisor k K := D + Finsupp.single P 1 with hE
   obtain ⟨t, ht⟩ := P.valuation_surjective (WithZero.exp (-(D P + 1)))
@@ -329,8 +333,7 @@ theorem relSpace_add_single (D : Divisor k K) (P : Place k K) :
       exact ⟨a, (hG a).symm⟩
     · rintro ⟨a, rfl⟩
       exact ⟨ρ a, hG a⟩
-  let ψ : L E →ₗ[k] A E :=
-    (diag ∘ₗ (L E).subtype).codRestrict (A E) fun x => diag_mem_A_iff.2 x.2
+  let ψ : L E →ₗ[k] A E := (diag ∘ₗ (L E).subtype).codRestrict (A E) fun x => diag_mem_A_iff.2 x.2
   have hGker : LinearMap.ker G = LinearMap.range (ρ ∘ₗ ψ) := by
     ext r
     constructor
@@ -373,10 +376,11 @@ theorem relSpace_add_single (D : Divisor k K) (P : Place k K) :
   · rw [hrange, ← hGrange]
     omega
 
-theorem relSpace_finrank_of_le_of_deg_lt (n : ℕ) :
-    ∀ {D E : Divisor k K}, D ≤ E → deg (E - D) < n →
-      FiniteDimensional k (relSpace D E) ∧
-        (finrank k (relSpace D E) : ℤ) + finrank k (L E) = deg E - deg D + finrank k (L D) := by
+theorem relSpace_finrank_of_le_of_deg_lt (n : ℕ)
+    : ∀ {D E : Divisor k K},
+      D ≤ E → deg (E - D) < n
+        → FiniteDimensional k (relSpace D E)
+          ∧ (finrank k (relSpace D E) : ℤ) + finrank k (L E) = deg E - deg D + finrank k (L D) := by
   classical
   induction n with
   | zero =>
@@ -396,11 +400,12 @@ theorem relSpace_finrank_of_le_of_deg_lt (n : ℕ) :
       push Not at h
       exact hED (le_antisymm (Finsupp.le_def.2 h) hDE)
     set E' := E - Finsupp.single v 1 with hE'
-    have hDE' : D ≤ E' := Finsupp.le_def.2 fun w => by
-      rw [hE', Finsupp.coe_sub, Pi.sub_apply, Finsupp.single_apply]
-      split_ifs with h
-      · subst h; omega
-      · have := Finsupp.le_def.1 hDE w; omega
+    have hDE' : D ≤ E' :=
+      Finsupp.le_def.2 fun w => by
+        rw [hE', Finsupp.coe_sub, Pi.sub_apply, Finsupp.single_apply]
+        split_ifs with h
+        · subst h; omega
+        · have := Finsupp.le_def.1 hDE w; omega
     have hn' : deg (E' - D) < n := by
       have h1 : deg (E' - D) = deg (E - D) - v.deg := by
         rw [hE', map_sub, map_sub, map_sub, deg_single]; ring
@@ -428,17 +433,17 @@ theorem relSpace_finrank_of_le_of_deg_lt (n : ℕ) :
     push_cast
     omega
 
-instance finiteDimensional_relSpace {D E : Divisor k K} [Fact (D ≤ E)] :
-    FiniteDimensional k (relSpace D E) :=
+instance finiteDimensional_relSpace {D E : Divisor k K} [Fact (D ≤ E)]
+    : FiniteDimensional k (relSpace D E) :=
   (relSpace_finrank_of_le_of_deg_lt ((deg (E - D)).toNat + 1) (Fact.out : D ≤ E) (by omega)).1
 
-theorem finiteDimensional_relSpace_of_le {D E : Divisor k K} (h : D ≤ E) :
-    FiniteDimensional k (relSpace D E) :=
+theorem finiteDimensional_relSpace_of_le {D E : Divisor k K} (h : D ≤ E)
+    : FiniteDimensional k (relSpace D E) :=
   (relSpace_finrank_of_le_of_deg_lt ((deg (E - D)).toNat + 1) h (by omega)).1
 
-theorem finrank_relSpace {D E : Divisor k K} (h : D ≤ E) :
-    (finrank k (relSpace D E) : ℤ) =
-      (deg E - deg D) - ((finrank k (L E) : ℤ) - finrank k (L D)) := by
+theorem finrank_relSpace {D E : Divisor k K} (h : D ≤ E)
+    : (finrank k (relSpace D E) : ℤ)
+      = (deg E - deg D) - ((finrank k (L E) : ℤ) - finrank k (L D)) := by
   have := (relSpace_finrank_of_le_of_deg_lt ((deg (E - D)).toNat + 1) h (by omega)).2
   omega
 

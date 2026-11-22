@@ -14,10 +14,12 @@ noncomputable section
 
 open NumberField
 
-theorem finsum_quotient_of_le {A : Type} [AddCommGroup A] {s t : AddSubgroup A} (h : s ≤ t)
-    (hn : s.relIndex t ≠ 0) (φ : A → ℂ) (hφ : ∀ x, ∀ y ∈ t, φ (x + y) = φ x)
-    (hf : (Function.support fun q : A ⧸ t => φ q.out).Finite) :
-    ∑ᶠ q : A ⧸ s, φ q.out = (s.relIndex t : ℂ) * ∑ᶠ q : A ⧸ t, φ q.out := by
+theorem finsum_quotient_of_le
+    {A : Type} [AddCommGroup A]
+    {s t : AddSubgroup A} (h : s ≤ t) (hn : s.relIndex t ≠ 0)
+    (φ : A → ℂ)
+    (hφ : ∀ x, ∀ y ∈ t, φ (x + y) = φ x) (hf : (Function.support fun q : A ⧸ t => φ q.out).Finite)
+    : ∑ᶠ q : A ⧸ s, φ q.out = (s.relIndex t : ℂ) * ∑ᶠ q : A ⧸ t, φ q.out := by
   classical
   set e := AddSubgroup.quotientEquivProdOfLE h
   haveI : Finite (t ⧸ s.addSubgroupOf t) := Nat.finite_of_card_ne_zero hn
@@ -27,10 +29,11 @@ theorem finsum_quotient_of_le {A : Type} [AddCommGroup A] {s t : AddSubgroup A} 
     have h2 : (e q).1 = (q.out : A ⧸ t) := by
       conv_lhs => rw [← QuotientAddGroup.out_eq' q]
       rfl
-    have h3 : ((e q).1.out : A ⧸ t) = (q.out : A ⧸ t) := by
-      rw [QuotientAddGroup.out_eq', h2]
+    have h3 : ((e q).1.out : A ⧸ t) = (q.out : A ⧸ t) := by rw [QuotientAddGroup.out_eq', h2]
     have := hφ (e q).1.out _ (QuotientAddGroup.eq.1 h3)
-    rw [← this]; congr 1; abel
+    rw [← this]
+    congr 1
+    abel
   simp_rw [h1]
   rw [finsum_comp_equiv e (f := fun p => φ p.1.out),
     finsum_eq_sum_of_support_subset (s := hf.toFinset ×ˢ Finset.univ), finsum_eq_sum _ hf,
@@ -60,10 +63,10 @@ theorem incl_inj : Function.Injective (incl K κ ι) := fun a b h => by
   exact congrFun (congrFun h k) i
 
 omit [NumberField K] [Fintype κ] [Fintype ι] in
-theorem perSub_eq_range (R : ℕ) :
-    perSub K κ ι R = ((incl K κ ι).comp (nsmulAddMonoidHom R)).range := by
-  have : {x | ∃ y : Matrix κ ι K, IntM y ∧ x = (R : K) • y} =
-      (((incl K κ ι).comp (nsmulAddMonoidHom R)).range : Set (Matrix κ ι K)) := by
+theorem perSub_eq_range (R : ℕ)
+    : perSub K κ ι R = ((incl K κ ι).comp (nsmulAddMonoidHom R)).range := by
+  have : {x | ∃ y : Matrix κ ι K, IntM y ∧ x = (R : K) • y}
+      = (((incl K κ ι).comp (nsmulAddMonoidHom R)).range : Set (Matrix κ ι K)) := by
     ext z
     simp only [Set.mem_setOf_eq, SetLike.mem_coe, AddMonoidHom.mem_range, AddMonoidHom.comp_apply,
       nsmulAddMonoidHom_apply, map_nsmul, intM_iff, Nat.cast_smul_eq_nsmul]
@@ -73,13 +76,13 @@ theorem perSub_eq_range (R : ℕ) :
   rw [perSub, this, AddSubgroup.closure_eq]
 
 omit [NumberField K] [Fintype κ] [Fintype ι] in
-theorem mem_perSub (R : ℕ) (x : Matrix κ ι K) :
-    x ∈ perSub K κ ι R ↔ ∃ y, R • incl K κ ι y = x := by
+theorem mem_perSub (R : ℕ) (x : Matrix κ ι K) : x ∈ perSub K κ ι R ↔ ∃ y, R • incl K κ ι y = x := by
   rw [perSub_eq_range]
   simp only [AddMonoidHom.mem_range, AddMonoidHom.comp_apply, nsmulAddMonoidHom_apply, map_nsmul]
 
-theorem index_nsmul (R : ℕ) : (nsmulAddMonoidHom R : Matrix κ ι (𝓞 K) →+ _).range.index =
-    R ^ (Module.finrank ℚ K * (Fintype.card κ * Fintype.card ι)) := by
+theorem index_nsmul (R : ℕ)
+    : (nsmulAddMonoidHom R : Matrix κ ι (𝓞 K) →+ _).range.index
+      = R ^ (Module.finrank ℚ K * (Fintype.card κ * Fintype.card ι)) := by
   rw [AddSubgroup.index_range_nsmul, Module.finrank_matrix, RingOfIntegers.rank]
   ring
 
@@ -88,9 +91,9 @@ theorem nsmul_cancel {R : ℕ} (hR : 0 < R) {x y : Matrix κ ι K} : R • x = R
   rw [← Nat.cast_smul_eq_nsmul K, ← Nat.cast_smul_eq_nsmul K]
   exact (smul_right_injective _ (by exact_mod_cast hR.ne')).eq_iff
 
-theorem relIndex_perSub (R S : ℕ) (hR : 0 < R) :
-    (perSub K κ ι (R * S)).relIndex (perSub K κ ι R) =
-      S ^ (Module.finrank ℚ K * (Fintype.card κ * Fintype.card ι)) := by
+theorem relIndex_perSub (R S : ℕ) (hR : 0 < R)
+    : (perSub K κ ι (R * S)).relIndex (perSub K κ ι R)
+      = S ^ (Module.finrank ℚ K * (Fintype.card κ * Fintype.card ι)) := by
   rw [perSub_eq_range R, ← AddSubgroup.index_comap, ← index_nsmul]
   congr 1
   ext y
@@ -106,21 +109,22 @@ theorem perSub_le (R S : ℕ) : perSub K κ ι (R * S) ≤ perSub K κ ι R := b
   exact (mem_perSub _ _).2 ⟨S • y, by rw [map_nsmul, mul_smul]⟩
 
 omit [NumberField K] [Fintype κ] [Fintype ι] in
-theorem periodic {R : ℕ} {φ : Matrix κ ι K → ℂ} (h : HasLevel R φ) (x : Matrix κ ι K) :
-    ∀ y ∈ perSub K κ ι R, φ (x + y) = φ x := by
+theorem periodic {R : ℕ} {φ : Matrix κ ι K → ℂ} (h : HasLevel R φ) (x : Matrix κ ι K)
+    : ∀ y ∈ perSub K κ ι R, φ (x + y) = φ x := by
   intro y hy
   obtain ⟨z, rfl⟩ := (mem_perSub _ _).1 hy
   rw [← Nat.cast_smul_eq_nsmul K]
   exact h.2 x _ ((intM_iff _).2 ⟨z, rfl⟩)
 
-theorem finite_support {R : ℕ} {φ : Matrix κ ι K → ℂ} (hR : 0 < R) (h : HasLevel R φ) :
-    (Function.support fun q : Matrix κ ι K ⧸ perSub K κ ι R => φ q.out).Finite := by
+theorem finite_support {R : ℕ} {φ : Matrix κ ι K → ℂ} (hR : 0 < R) (h : HasLevel R φ)
+    : (Function.support fun q : Matrix κ ι K ⧸ perSub K κ ι R => φ q.out).Finite := by
   have hK : (R : K) ≠ 0 := by exact_mod_cast hR.ne'
   set f : Matrix κ ι (𝓞 K) →+ Matrix κ ι K ⧸ perSub K κ ι R :=
     (QuotientAddGroup.mk' (perSub K κ ι R)).comp
       ((DistribSMul.toAddMonoidHom (Matrix κ ι K) (R : K)⁻¹).comp (incl K κ ι)) with hf
-  have hfa : ∀ y, f y = (((R : K)⁻¹ • incl K κ ι y : Matrix κ ι K) :
-    Matrix κ ι K ⧸ perSub K κ ι R) := fun _ => rfl
+  have hfa
+      : ∀ y, f y = (((R : K)⁻¹ • incl K κ ι y : Matrix κ ι K) : Matrix κ ι K ⧸ perSub K κ ι R) :=
+    fun _ => rfl
   have hker : (nsmulAddMonoidHom (R * R) : Matrix κ ι (𝓞 K) →+ _).range ≤ f.ker := by
     rintro _ ⟨y, rfl⟩
     rw [AddMonoidHom.mem_ker, hfa, QuotientAddGroup.eq_zero_iff, mem_perSub]
@@ -138,12 +142,14 @@ theorem finite_support {R : ℕ} {φ : Matrix κ ι K → ℂ} (hR : 0 < R) (h :
   refine ⟨y, ?_⟩
   rw [hfa, hy, smul_smul, inv_mul_cancel₀ hK, one_smul, QuotientAddGroup.out_eq']
 
-theorem haarAt_mul {R : ℕ} {φ : Matrix κ ι K → ℂ} (hR : 0 < R) (h : HasLevel R φ) {S : ℕ}
-    (hS : 0 < S) : haarAt (R * S) φ = haarAt R φ := by
+theorem haarAt_mul
+    {R : ℕ} {φ : Matrix κ ι K → ℂ} (hR : 0 < R) (h : HasLevel R φ) {S : ℕ} (hS : 0 < S)
+    : haarAt (R * S) φ = haarAt R φ := by
   have hS' : (S : ℂ) ≠ 0 := by exact_mod_cast hS.ne'
   have hR' : (R : ℂ) ≠ 0 := by exact_mod_cast hR.ne'
-  rw [haarAt, haarAt, finsum_quotient_of_le (perSub_le R S)
-    (by rw [relIndex_perSub R S hR]; positivity) φ (periodic h) (finite_support hR h),
+  rw [haarAt, haarAt,
+    finsum_quotient_of_le (perSub_le R S) (by rw [relIndex_perSub R S hR]; positivity) φ
+      (periodic h) (finite_support hR h),
     relIndex_perSub R S hR]
   push_cast
   rw [mul_pow]
@@ -155,7 +161,12 @@ end GlobalTheory.SW.HaarLevel
 
 namespace GlobalTheory.SW
 
-theorem haar_eq_haarAt : ∀ (K κ ι : Type) [Field K] [NumberField K] [Fintype κ] [Fintype ι] (R : ℕ) (φ : Matrix κ ι K → ℂ), 0 < R → HasLevel R φ → haar φ = haarAt R φ ∧ (Function.support fun q : Matrix κ ι K ⧸ perSub K κ ι R => φ q.out).Finite := by
+theorem haar_eq_haarAt
+    : ∀ (K κ ι : Type) [Field K] [NumberField K] [Fintype κ] [Fintype ι] (R : ℕ)
+        (φ : Matrix κ ι K → ℂ),
+      0 < R → HasLevel R φ
+        → haar φ = haarAt R φ
+          ∧ (Function.support fun q : Matrix κ ι K ⧸ perSub K κ ι R => φ q.out).Finite := by
   intro K κ ι _ _ _ _ R φ hR h
   refine ⟨?_, HaarLevel.finite_support hR h⟩
   have hs : IsSB φ := ⟨R, hR, h⟩

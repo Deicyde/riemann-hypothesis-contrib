@@ -12,7 +12,10 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -20,7 +23,8 @@ namespace GlobalTheory.RowLatTransport
 
 variable {D : D7}
 
-theorem mem_gmap_inv (g : GV D) (Λ : LV D) (x : (VS D).V) : x ∈ Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ ↔ g x ∈ Λ := by
+theorem mem_gmap_inv (g : GV D) (Λ : LV D) (x : (VS D).V)
+    : x ∈ Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ ↔ g x ∈ Λ := by
   unfold Formalism.HermitianLatticesTheory.gmap
   constructor
   · rintro ⟨y, hy, rfl⟩
@@ -38,8 +42,8 @@ theorem z_eq (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) : g F0.z = G'.z := by
   have h := hfr (Fin.last _)
   simpa [FlagG.fvec, Fin.snoc_last] using h
 
-theorem map_X (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) :
-    F0.X.map (g : (VS D).V →ₗ[D.host.E] (VS D).V) = G'.X := by
+theorem map_X (hfr : ∀ a, g (F0.fvec a) = G'.fvec a)
+    : F0.X.map (g : (VS D).V →ₗ[D.host.E] (VS D).V) = G'.X := by
   unfold FlagG.X
   rw [Submodule.map_span, ← Set.range_comp]
   congr 2
@@ -55,8 +59,10 @@ theorem mem_X (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) (v : (VS D).V) : v ∈ F0
     have : w = v := g.injective hwv
     exact this ▸ hw
 
-theorem mem_orth (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT) (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) (v : (VS D).V) :
-    v ∈ orth (VS D) F0.X ↔ g v ∈ orth (VS D) G'.X := by
+theorem mem_orth
+    (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
+    (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) (v : (VS D).V)
+    : v ∈ orth (VS D) F0.X ↔ g v ∈ orth (VS D) G'.X := by
   have hiso : ∀ x y, (VS D).hT (g x) (g y) = (VS D).hT x y := hg
   simp only [orth, Submodule.mem_iInf, LinearMap.mem_ker]
   constructor
@@ -71,8 +77,11 @@ theorem mem_orth (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT) (
     rw [← hiso]
     exact h _ ((mem_X hfr x).1 hx)
 
-theorem mem_XS (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) (v : (VS D).V) : v ∈ XS D F0 ↔ g v ∈ XS D G' := by
-  have hmap : (XS D F0).map ((g : (VS D).V →ₗ[D.host.E] (VS D).V).restrictScalars (𝓞 D.host.E)) = XS D G' := by
+theorem mem_XS (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) (v : (VS D).V)
+    : v ∈ XS D F0 ↔ g v ∈ XS D G' := by
+  have hmap
+      : (XS D F0).map ((g : (VS D).V →ₗ[D.host.E] (VS D).V).restrictScalars (𝓞 D.host.E))
+        = XS D G' := by
     unfold XS
     rw [Submodule.map_span]
     congr 1
@@ -92,11 +101,14 @@ theorem mem_XS (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) (v : (VS D).V) : v ∈ X
     have : w = v := g.injective hwv
     exact this ▸ hw
 
-theorem mem_dual (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT) (Λ : LV D) (x : (VS D).V) :
-    x ∈ Formalism.HermitianLatticesTheory.dual (VS D).hT (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) ↔ g x ∈ Formalism.HermitianLatticesTheory.dual (VS D).hT Λ := by
+theorem mem_dual
+    (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT) (Λ : LV D) (x : (VS D).V)
+    : x ∈ Formalism.HermitianLatticesTheory.dual (VS D).hT
+        (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ)
+      ↔ g x ∈ Formalism.HermitianLatticesTheory.dual (VS D).hT Λ := by
   have hiso : ∀ x y, (VS D).hT (g x) (g y) = (VS D).hT x y := hg
-  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-    LinearMap.restrictScalars_apply]
+  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+    Submodule.mem_comap, LinearMap.restrictScalars_apply]
   constructor
   · intro h y hy
     have hy' : g.symm y ∈ Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ := by
@@ -109,12 +121,16 @@ theorem mem_dual (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT) (
     rw [← hiso]
     exact h _ ((mem_gmap_inv g Λ y).1 hy)
 
-theorem isLattice_inv (g : GV D) {Λ : LV D} (hL : Submodule.IsLattice D.host.E Λ) :
-    Submodule.IsLattice D.host.E (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) := by
+theorem isLattice_inv (g : GV D) {Λ : LV D} (hL : Submodule.IsLattice D.host.E Λ)
+    : Submodule.IsLattice D.host.E (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) := by
   exact Submodule.IsLattice.of_fg D.host.E (hL.fg.map _)
 
-theorem mem_Lsub (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT) (hfr : ∀ a, g (F0.fvec a) = G'.fvec a) (Λ : LV D)
-    (v : (VS D).V) (hv : v ∈ Lsub (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) (lf D F0)) : g v ∈ Lsub Λ (lf D G') := by
+theorem mem_Lsub
+    (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
+    (hfr : ∀ a, g (F0.fvec a) = G'.fvec a)
+    (Λ : LV D) (v : (VS D).V)
+    (hv : v ∈ Lsub (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) (lf D F0))
+    : g v ∈ Lsub Λ (lf D G') := by
   obtain ⟨hs, ho⟩ := hv
   refine ⟨?_, (mem_orth hg hfr v).1 ho⟩
   obtain ⟨y, hy, w, hw, rfl⟩ := Submodule.mem_sup.1 hs
@@ -127,17 +143,42 @@ end GlobalTheory.RowLatTransport
 
 namespace GlobalTheory.RowLatTransport
 
-theorem rowLat_transport : ∀ (D : D7) (T : D.host.E) (F0 G' : FlagG (VS D) D.R.rS T) (g : GV D), g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT → (∀ a, g (F0.fvec a) = G'.fvec a) → ∀ Λ : LV D, Submodule.IsLattice D.host.E Λ → Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ → G'.z ∈ Λ → XLam Λ (lf D G') = XS D G' → (∀ c : D.host.E, c • G'.z ∈ Lsub Λ (lf D G') → ∃ o : 𝓞 D.host.E, (o : D.host.E) = c) → Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ ∈ Formalism.HermitianLatticesTheory.genus (VS D).hT (VS D).L0 ∧ Submodule.IsLattice D.host.E (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) ∧ Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) ∧ F0.z ∈ Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ ∧ XLam (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) (lf D F0) = XS D F0 ∧ (∀ c : D.host.E, c • F0.z ∈ Lsub (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) (lf D F0) → ∃ o : 𝓞 D.host.E, (o : D.host.E) = c) := by
+theorem rowLat_transport
+    : ∀ (D : D7) (T : D.host.E) (F0 G' : FlagG (VS D) D.R.rS T) (g : GV D),
+      g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT → (∀ a, g (F0.fvec a) = G'.fvec a)
+        → ∀ Λ : LV D,
+          Submodule.IsLattice D.host.E Λ
+            → Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ → G'.z ∈ Λ
+            → XLam Λ (lf D G') = XS D G'
+            → (∀ c : D.host.E, c • G'.z ∈ Lsub Λ (lf D G') → ∃ o : 𝓞 D.host.E, (o : D.host.E) = c)
+            → Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ
+                ∈ Formalism.HermitianLatticesTheory.genus (VS D).hT (VS D).L0
+              ∧ Submodule.IsLattice D.host.E (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ)
+              ∧ Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT
+                (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ)
+              ∧ F0.z ∈ Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ
+              ∧ XLam (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) (lf D F0) = XS D F0
+              ∧ (∀ c : D.host.E,
+                c • F0.z ∈ Lsub (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) (lf D F0)
+                  → ∃ o : 𝓞 D.host.E, (o : D.host.E) = c) := by
   intro D T F0 G' g hg hfr Λ hL hU hz hX hprim
   have hL' := isLattice_inv g hL
-  have hU' : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) := by
+  have hU' : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT
+      (Formalism.HermitianLatticesTheory.gmap g⁻¹ Λ) := by
     unfold Formalism.HermitianLatticesTheory.IsUnimodular
     ext x
     rw [mem_dual hg, mem_gmap_inv]
     have hU0 : Formalism.HermitianLatticesTheory.dual (VS D).hT Λ = Λ := hU
     rw [hU0]
-  refine ⟨Formalism.MainNotions.BridgeRowsGenus.unimodular_mem_genus Formalism.L2.SG.Pf.Cnt.local_unimodular_holds D.sp.cm (VS D) _ hL' hU',
-    hL', hU', ?_, ?_, ?_⟩
+  refine ⟨
+    Formalism.MainNotions.BridgeRowsGenus.unimodular_mem_genus
+      Formalism.L2.SG.Pf.Cnt.local_unimodular_holds D.sp.cm (VS D) _ hL' hU',
+    hL',
+    hU',
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [mem_gmap_inv, z_eq hfr]
     exact hz
   · ext v

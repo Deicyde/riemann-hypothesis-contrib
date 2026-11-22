@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Nonempt
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.JHMult
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.LocLanglands GlobalTheory.JHMult
 
 noncomputable section
 
@@ -23,16 +24,23 @@ open ProjLine
 
 section General
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
   {π : Representation ℂ G V}
 
-theorem isIrreducible_quot {S : Subrepresentation π} (hS : IsCoatom S) : (quot S).IsIrreducible := by
+theorem isIrreducible_quot {S : Subrepresentation π} (hS : IsCoatom S)
+    : (quot S).IsIrreducible := by
   have h1 : S.toSubmodule ≠ ⊤ := fun e => hS.1 (Subrepresentation.toSubmodule_injective e)
   have := Submodule.Quotient.nontrivial_iff.2 h1
-  have : Nontrivial (Subrepresentation (quot S)) := ⟨⊥, ⊤, fun e =>
-    bot_ne_top (α := Submodule ℂ (V ⧸ S.toSubmodule)) (congrArg Subrepresentation.toSubmodule e)⟩
+  have : Nontrivial (Subrepresentation (quot S)) := ⟨
+    ⊥,
+    ⊤,
+    fun e =>
+      bot_ne_top (α := Submodule ℂ (V ⧸ S.toSubmodule)) (congrArg Subrepresentation.toSubmodule e)
+  ⟩
   refine ⟨fun T => ?_⟩
-  let T' : Subrepresentation π := ⟨T.toSubmodule.comap S.toSubmodule.mkQ, fun g v hv => T.apply_mem_toSubmodule g hv⟩
+  let T' : Subrepresentation π :=
+    ⟨T.toSubmodule.comap S.toSubmodule.mkQ, fun g v hv => T.apply_mem_toSubmodule g hv⟩
   have hle : S ≤ T' := fun v hv => by
     show S.toSubmodule.mkQ v ∈ T.toSubmodule
     rw [Submodule.mkQ_apply, (Submodule.Quotient.mk_eq_zero _).2 hv]
@@ -54,8 +62,10 @@ end General
 
 section GeneralLinearIntegers
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {N : ℕ}
-  {V : Type} [AddCommGroup V] [Module ℂ V] {π : Representation ℂ (GL (Fin N) k) V}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {N : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+  {π : Representation ℂ (GL (Fin N) k) V}
 
 theorem isSmooth_quot (hπ : IsSmooth π) (S : Subrepresentation π) : IsSmooth (quot S) :=
   (IsSubquotient.of_surjective (quotMk S) S.toSubmodule.mkQ_surjective).isSmooth hπ

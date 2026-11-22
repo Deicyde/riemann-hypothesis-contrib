@@ -20,10 +20,14 @@ open TensorProduct MvPolynomial
 
 namespace Formalism.CohomologicalDescent.DepthNonnegative
 
-open Formalism.UG Formalism.RankGapBounds.FormsTensorLocalization Formalism.GradedWeylDivisibility Formalism.CohomologicalDescent.LD Formalism.CohomologicalDescent.UnitNormBounds
+open Formalism.UG Formalism.RankGapBounds.FormsTensorLocalization Formalism.GradedWeylDivisibility
+  Formalism.CohomologicalDescent.LD Formalism.CohomologicalDescent.UnitNormBounds
 
-theorem isUnit_intCast_of_not_dvd' (R : Type) [CommRing R] (l : ℕ) (hu : ∀ m : ℕ, ¬ l ∣ m → IsUnit (m : R))
-    (m : ℤ) (hm : ¬ (l : ℤ) ∣ m) : IsUnit (m : R) := by
+theorem isUnit_intCast_of_not_dvd'
+    (R : Type) [CommRing R]
+    (l : ℕ) (hu : ∀ m : ℕ, ¬ l ∣ m → IsUnit (m : R))
+    (m : ℤ) (hm : ¬ (l : ℤ) ∣ m)
+    : IsUnit (m : R) := by
   have h1 : ¬ l ∣ m.natAbs := fun h => hm (Int.natCast_dvd.mpr h)
   have h2 := hu _ h1
   rcases Int.natAbs_eq m with h | h
@@ -38,10 +42,13 @@ theorem isUnit_intCast_of_not_dvd' (R : Type) [CommRing R] (l : ℕ) (hu : ∀ m
     rw [e]
     exact h2.neg
 
-theorem pow_smul_weighted_component_mem_weyl (R : Type) [CommRing R] [IsDomain R] (l r : ℕ) (ν μ : Fin r → ℕ) (e : ℕ)
+theorem pow_smul_weighted_component_mem_weyl
+    (R : Type) [CommRing R] [IsDomain R]
+    (l r : ℕ) (ν μ : Fin r → ℕ)
+    (e : ℕ)
     (hu : ∀ m : ℕ, ¬ l ∣ m → IsUnit (m : R)) (hE : ExpLe l r ν μ e)
-    (x : MvPolynomial (Fin r × Fin r) R) (hx : x ∈ dualWeyl R r r ν) :
-    (l : R) ^ e • weightedHomogeneousComponent (rowW r r) μ x ∈ weyl R r r le_rfl ν := by
+    (x : MvPolynomial (Fin r × Fin r) R) (hx : x ∈ dualWeyl R r r ν)
+    : (l : R) ^ e • weightedHomogeneousComponent (rowW r r) μ x ∈ weyl R r r le_rfl ν := by
   classical
   rw [standardMonomialSpanDomain R r r ν] at hx
   induction hx using Submodule.span_induction with
@@ -65,7 +72,8 @@ theorem pow_smul_weighted_component_mem_weyl (R : Type) [CommRing R] [IsDomain R
       rw [← hu', ← mul_assoc, Units.inv_mul, one_mul]
     · rw [smul_zero]
       exact Submodule.zero_mem _
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     rw [map_add (f := _), smul_add]
     exact Submodule.add_mem _ hx hy
@@ -74,15 +82,19 @@ theorem pow_smul_weighted_component_mem_weyl (R : Type) [CommRing R] [IsDomain R
     exact Submodule.smul_mem _ _ hx
 
 theorem application_window : ApplicationWindow := by
-  intro hD l k j t q h lam xm xp hl ht hanti hconst hspread hh hcloud hlows habove hle htop ecl hecl I μ hμ
+  intro hD l k j t q h lam xm xp hl ht hanti hconst hspread hh hcloud hlows habove hle htop ecl hecl
+    I μ hμ
   refine expLeMono l _ _ μ _ _ ?_
     (applicationSteps hD l k j t q h lam hl ht hanti hconst hspread ecl hecl I μ hμ)
   refine Nat.le_floor ?_
-  have hb : ∀ a : Fin (k + j), lam (k + j) ≤ res (k + j) lam a ∧ res (k + j) lam a ≤ lam 0 := fun a =>
-    ⟨hanti a.val (k + j) (by have := a.isLt; omega) (by omega),
-      hanti 0 a.val (Nat.zero_le _) (by have := a.isLt; omega)⟩
-  have eU : ∀ a : Fin (k + j),
-      UN (k + j + t + q) lam a.val = U k j t (res (k + j) lam) a + (q : ℤ) := by
+  have hb
+      : ∀ a : Fin (k + j), lam (k + j) ≤ res (k + j) lam a ∧ res (k + j) lam a ≤ lam 0 := fun a => ⟨
+    hanti a.val (k + j) (by have := a.isLt; omega) (by omega),
+    hanti 0 a.val (Nat.zero_le _) (by have := a.isLt; omega)
+  ⟩
+  have eU
+      : ∀ a : Fin (k + j),
+        UN (k + j + t + q) lam a.val = U k j t (res (k + j) lam) a + (q : ℤ) := by
     intro a
     unfold UN U res
     push_cast
@@ -108,15 +120,18 @@ theorem application_window : ApplicationWindow := by
     rw [e3] at htop
     omega
   have hh1 : 1 ≤ h := by omega
-  have hcost : (blockCost l (k + j) t I lam : ℝ) ≤ (j : ℝ) * (((h : ℝ) - 1) / ((l : ℝ) - 1)) +
-      labelSumBoundPos l k t h (I : ℝ) (xm - q) (xp - q) (maxB t (lam (k + j))) := by
+  have hcost
+      : (blockCost l (k + j) t I lam : ℝ)
+        ≤ (j : ℝ) * (((h : ℝ) - 1) / ((l : ℝ) - 1))
+          + labelSumBoundPos l k t h (I : ℝ) (xm - q) (xp - q) (maxB t (lam (k + j))) := by
     unfold blockCost
-    obtain ⟨i, hi, heq⟩ := Finset.exists_mem_eq_sup (Finset.range (I + 1)) ⟨0, by simp⟩
-      (fun i => padicValInt l (Dn t (lam 0 - lam (k + j)) i fun b : Fin (k + j) =>
-        lam 0 - res (k + j) lam (Fin.rev b)))
+    obtain ⟨i, hi, heq⟩ :=
+      Finset.exists_mem_eq_sup (Finset.range (I + 1)) ⟨0, by simp⟩ (fun i =>
+        padicValInt l
+          (Dn t (lam 0 - lam (k + j)) i fun b : Fin (k + j) => lam 0 - res (k + j) lam (Fin.rev b)))
     rw [heq]
-    exact second_valuation_up_to_holds l k j t (lam (k + j)) (lam 0) h i (I : ℝ) (res (k + j) lam) _ _ hl hR hxp hh
-      (by exact_mod_cast Nat.lt_succ_iff.mp (Finset.mem_range.mp hi))
+    exact second_valuation_up_to_holds l k j t (lam (k + j)) (lam 0) h i (I : ℝ) (res (k + j) lam) _
+      _ hl hR hxp hh (by exact_mod_cast Nat.lt_succ_iff.mp (Finset.mem_range.mp hi))
   have hP : (((h - 1) / (l - 1) : ℕ) : ℝ) ≤ ((h : ℝ) - 1) / ((l : ℝ) - 1) := by
     have h1 := Nat.cast_div_le (α := ℝ) (m := h - 1) (n := l - 1)
     have hl2 := hl.two_le
@@ -145,8 +160,12 @@ theorem subquotient_iso_holds : SubquotIso := by
   intro A _ V G G' _ _ _ _ _ _ ⟨e⟩ ⟨E, ψ, hψ⟩
   exact ⟨E, e.toLinearMap ∘ₗ ψ, e.surjective.comp hψ⟩
 
-def mulOntoScaledSubmodule {O : Type} [CommRing O] (A : Type) [Ring A] [Algebra O A] (V : Type) [AddCommGroup V]
-    [Module O V] [Module A V] [IsScalarTower O A V] (c : O) : V →ₗ[A] scaleSub A V c where
+def mulOntoScaledSubmodule
+    {O : Type} [CommRing O]
+    (A : Type) [Ring A] [Algebra O A]
+    (V : Type) [AddCommGroup V] [Module O V] [Module A V] [IsScalarTower O A V]
+    (c : O)
+    : V →ₗ[A] scaleSub A V c where
   toFun v := ⟨c • v, v, rfl⟩
   map_add' x y := by ext; simp [smul_add]
   map_smul' b x := Subtype.ext (smul_comm c b x)
@@ -211,8 +230,11 @@ theorem simple_subquotient_of_power_holds : SimpleSubquotOfPower := by
     rw [← haF]
     refine Submodule.mem_sup_right ⟨hx, y, ?_⟩
     rw [pow_succ, mul_smul]
-  refine ⟨E0.map (scaleSub A V ϖ).mkQ,
-    (LinearMap.ker π).liftQ ψ0 hker ∘ₗ (LinearMap.quotKerEquivOfSurjective π hπ).symm.toLinearMap, ?_⟩
+  refine ⟨
+    E0.map (scaleSub A V ϖ).mkQ,
+    (LinearMap.ker π).liftQ ψ0 hker ∘ₗ (LinearMap.quotKerEquivOfSurjective π hπ).symm.toLinearMap,
+    ?_
+  ⟩
   intro z
   obtain ⟨x, rfl⟩ := hψ0 z
   refine ⟨LinearMap.quotKerEquivOfSurjective π hπ (Submodule.Quotient.mk x), ?_⟩
@@ -232,17 +254,23 @@ theorem factor_action_on_tensor_product_holds : AtFactorTprod := by
     simp
   · simp [Function.update_of_ne h]
 
-theorem tprod_mem_tensorSubmodule {O : Type} [CommRing O] {ι : Type} [Fintype ι] {Nb : ι → Type}
-    [∀ τ, AddCommGroup (Nb τ)] [∀ τ, Module O (Nb τ)] (B : ∀ τ, Submodule O (Nb τ)) (x : ∀ τ, Nb τ)
-    (hx : ∀ τ, x τ ∈ B τ) : PiTensorProduct.tprod O x ∈ tensSub B := by
+theorem tprod_mem_tensorSubmodule
+    {O : Type} [CommRing O]
+    {ι : Type} [Fintype ι]
+    {Nb : ι → Type} [∀ τ, AddCommGroup (Nb τ)] [∀ τ, Module O (Nb τ)]
+    (B : ∀ τ, Submodule O (Nb τ)) (x : ∀ τ, Nb τ) (hx : ∀ τ, x τ ∈ B τ)
+    : PiTensorProduct.tprod O x ∈ tensSub B := by
   refine ⟨PiTensorProduct.tprod O (fun τ => (⟨x τ, hx τ⟩ : B τ)), ?_⟩
   rw [PiTensorProduct.map_tprod]
   rfl
 
-theorem tensorSubmodule_le_of_tprod_mem {O : Type} [CommRing O] {ι : Type} [Fintype ι] {Nb : ι → Type}
-    [∀ τ, AddCommGroup (Nb τ)] [∀ τ, Module O (Nb τ)] (B : ∀ τ, Submodule O (Nb τ))
-    (U : Submodule O (⨂[O] τ, Nb τ))
-    (h : ∀ x : ∀ τ, Nb τ, (∀ τ, x τ ∈ B τ) → PiTensorProduct.tprod O x ∈ U) : tensSub B ≤ U := by
+theorem tensorSubmodule_le_of_tprod_mem
+    {O : Type} [CommRing O]
+    {ι : Type} [Fintype ι]
+    {Nb : ι → Type} [∀ τ, AddCommGroup (Nb τ)] [∀ τ, Module O (Nb τ)]
+    (B : ∀ τ, Submodule O (Nb τ)) (U : Submodule O (⨂[O] τ, Nb τ))
+    (h : ∀ x : ∀ τ, Nb τ, (∀ τ, x τ ∈ B τ) → PiTensorProduct.tprod O x ∈ U)
+    : tensSub B ≤ U := by
   rintro _ ⟨z, rfl⟩
   induction z using PiTensorProduct.induction_on with
   | smul_tprod r u =>
@@ -254,13 +282,15 @@ theorem tensorSubmodule_le_of_tprod_mem {O : Type} [CommRing O] {ι : Type} [Fin
 
 theorem tensor_weight_kill_holds : TensorWeightKill := by
   intro O _ ι _ _ Nb _ _ B s a p l c ha hp
-  have key : tensSub (chainB B (insert a s)) ≤
-      (tensSub (chainB B s)).comap ((l ^ c) • atFactor a p) := by
+  have key
+      : tensSub (chainB B (insert a s))
+        ≤ (tensSub (chainB B s)).comap ((l ^ c) • atFactor a p) := by
     apply tensorSubmodule_le_of_tprod_mem
     intro x hx
     rw [Submodule.mem_comap, LinearMap.smul_apply, factor_action_on_tensor_product_holds]
-    have hsmul : l ^ c • (PiTensorProduct.tprod O) (Function.update x a (p (x a))) =
-        (PiTensorProduct.tprod O) (Function.update x a (l ^ c • p (x a))) := by
+    have hsmul
+        : l ^ c • (PiTensorProduct.tprod O) (Function.update x a (p (x a)))
+          = (PiTensorProduct.tprod O) (Function.update x a (l ^ c • p (x a))) := by
       simpa only [RingHom.id_apply] using
         ((PiTensorProduct.tprod O).map_update_smul x a (l ^ c) (p (x a))).symm
     rw [hsmul]
@@ -307,9 +337,12 @@ theorem chain_ends_holds : ChainEnds := by
     intro τ
     simp [chainB]
 
-theorem factorAction_id {O : Type} [CommRing O] {ι : Type} [Fintype ι] [DecidableEq ι] {Nb : ι → Type}
-    [∀ τ, AddCommGroup (Nb τ)] [∀ τ, Module O (Nb τ)] (a : ι) (y : ⨂[O] τ, Nb τ) :
-    atFactor a (LinearMap.id : Nb a →ₗ[O] Nb a) y = y := by
+theorem factorAction_id
+    {O : Type} [CommRing O]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {Nb : ι → Type} [∀ τ, AddCommGroup (Nb τ)] [∀ τ, Module O (Nb τ)]
+    (a : ι) (y : ⨂[O] τ, Nb τ)
+    : atFactor a (LinearMap.id : Nb a →ₗ[O] Nb a) y = y := by
   unfold atFactor
   rw [Function.update_eq_self a (fun τ => (LinearMap.id : Nb τ →ₗ[O] Nb τ)), PiTensorProduct.map_id]
   rfl
@@ -325,8 +358,7 @@ theorem forms_induction_holds : FormsStep := by
   let φ : Forms O Γ jK W := ⟨_, hmem⟩
   have h0 : LocalizedModule.mk φ (1 : S) = LocalizedModule.mk 0 (1 : S) := Subsingleton.elim _ _
   obtain ⟨u, hu⟩ := LocalizedModule.mk_eq.mp h0
-  have hu' : (u : T) • φ = 0 := by
-    simpa [Submonoid.smul_def] using hu
+  have hu' : (u : T) • φ = 0 := by simpa [Submonoid.smul_def] using hu
   refine ⟨u, u.2, fun g => ?_⟩
   apply hker ⟨_, hst F' u f hf g⟩
   rw [← hnat F' ψ u f φ hf (hst F' u f hf) (fun _ => rfl) g, hu']
@@ -339,7 +371,8 @@ theorem forms_devissage_holds : FormsDevissage := by
     Submodule.map_mono (fun x hx => h hx)
   have hΦ : ∀ F1 F2 : Submodule A V, D ≤ F1 → Φ F2 ≤ Φ F1 → F2 ≤ F1 := by
     intro F1 F2 h1 h x hx
-    obtain ⟨y, hy, hxy⟩ := h (Submodule.mem_map_of_mem (f := D₀.mkQ) (show x ∈ F2.restrictScalars O from hx))
+    obtain ⟨y, hy, hxy⟩ :=
+      h (Submodule.mem_map_of_mem (f := D₀.mkQ) (show x ∈ F2.restrictScalars O from hx))
     have h2 : y - x ∈ D₀ := by
       rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_sub]
       exact sub_eq_zero.mpr hxy
@@ -347,8 +380,9 @@ theorem forms_devissage_holds : FormsDevissage := by
     have h4 : x = y - (y - x) := by abel
     rw [h4]
     exact F1.sub_mem hy h3
-  let PP : Set (Submodule A V) := {F | D ≤ F ∧ F ≤ E ∧
-    ∃ s ∈ S, ∀ g, ((s • f : Forms O Γ jK V) : G → V) g ∈ F}
+  let PP : Set (Submodule A V) :=
+    {F | D ≤ F ∧ F ≤ E ∧
+      ∃ s ∈ S, ∀ g, ((s • f : Forms O Γ jK V) : G → V) g ∈ F}
   have hE : E ∈ PP := ⟨hDE, le_rfl, 1, S.one_mem, by simpa using hf⟩
   obtain ⟨_, ⟨F, hF, rfl⟩, hmin⟩ := IsArtinian.set_has_minimal (Φ '' PP) ⟨_, E, hE, rfl⟩
   obtain ⟨hDF, hFE, s, hs, hsf⟩ := hF
@@ -357,31 +391,40 @@ theorem forms_devissage_holds : FormsDevissage := by
   · exfalso
     have hlt : D < F := lt_of_le_not_ge hDF hEq
     have hNA : IsNoetherian A V := isNoetherian_of_tower O hN
-    obtain ⟨F0, ⟨hDF0, hF0F⟩, hmax⟩ := set_has_maximal_iff_noetherian.mpr hNA
-      {F0 : Submodule A V | D ≤ F0 ∧ F0 < F} ⟨D, le_rfl, hlt⟩
+    obtain ⟨F0, ⟨hDF0, hF0F⟩, hmax⟩ :=
+      set_has_maximal_iff_noetherian.mpr hNA {F0 : Submodule A V | D ≤ F0 ∧ F0 < F} ⟨D, le_rfl, hlt⟩
     have hcov : F0 ⋖ F := ⟨hF0F, fun c h1 h2 => hmax c ⟨hDF0.trans h1.le, h2⟩ h1⟩
     obtain ⟨s', hs', hs'f⟩ := hstep F0 F hDF0 hcov hFE (s • f) hsf
-    have hF0 : F0 ∈ PP := ⟨hDF0, hF0F.le.trans hFE, s' * s, S.mul_mem hs' hs, by
-      intro g
-      rw [mul_smul]
-      exact hs'f g⟩
+    have hF0 : F0 ∈ PP := ⟨
+      hDF0,
+      hF0F.le.trans hFE,
+      s' * s,
+      S.mul_mem hs' hs,
+      by
+        intro g
+        rw [mul_smul]
+        exact hs'f g
+    ⟩
     apply hmin (Φ F0) ⟨F0, hF0, rfl⟩
     refine lt_of_le_not_ge (hΦmono _ _ hF0F.le) fun h => ?_
     exact absurd (hΦ F0 F hDF0 h) (not_le_of_gt hF0F)
 
-theorem theorem_w_central_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso : SubquotIso) : TheoremWCore := by
-  intro O _ A _ _ G _ Γ K jK ι _ _ Nb _ _ B _ _ T _ _ _ _ S l ϖ n₀ ω pr e Λ L _ _ _ _ _ hwt depth i T2
-    ex c' hNoe hArt hdvd hstab he hHS hHN hclass hhw hIN1 hex hIN2
-  let DA : Finset ι → Submodule A (⨂[O] τ, Nb τ) := fun s =>
-    { toAddSubmonoid := (tensSub (chainB B s)).toAddSubmonoid
-      smul_mem' := fun a x hx => hstab s a x hx }
+theorem theorem_w_central_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso : SubquotIso)
+    : TheoremWCore := by
+  intro O _ A _ _ G _ Γ K jK ι _ _ Nb _ _ B _ _ T _ _ _ _ S l ϖ n₀ ω pr e Λ L _ _ _ _ _ hwt depth i
+    T2 ex c' hNoe hArt hdvd hstab he hHS hHN hclass hhw hIN1 hex hIN2
+  let DA : Finset ι → Submodule A (⨂[O] τ, Nb τ) := fun s => {
+    toAddSubmonoid := (tensSub (chainB B s)).toAddSubmonoid
+    smul_mem' := fun a x hx => hstab s a x hx
+  }
   have hDA : ∀ s x, x ∈ DA s ↔ x ∈ tensSub (chainB B s) := fun s x => Iff.rfl
   have hends := chain_ends_holds O ι Nb B
   have hmono : ∀ s s' : Finset ι, s ⊆ s' → DA s ≤ DA s' := fun s s' h x hx =>
     chain_monotone_holds O ι Nb B s s' h hx
-  have hval : ∀ (c : ℕ) (f : Forms O Γ jK (⨂[O] τ, Nb τ)) (g : G),
-      (((algebraMap O T l) ^ c • f : Forms O Γ jK (⨂[O] τ, Nb τ)) : G → ⨂[O] τ, Nb τ) g =
-        l ^ c • (f : G → ⨂[O] τ, Nb τ) g := by
+  have hval
+      : ∀ (c : ℕ) (f : Forms O Γ jK (⨂[O] τ, Nb τ)) (g : G),
+        (((algebraMap O T l) ^ c • f : Forms O Γ jK (⨂[O] τ, Nb τ)) : G → ⨂[O] τ, Nb τ) g
+          = l ^ c • (f : G → ⨂[O] τ, Nb τ) g := by
     intro c f g
     rw [← map_pow, algebraMap_smul]
     rfl
@@ -390,14 +433,24 @@ theorem theorem_w_central_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso
     obtain ⟨u, hu⟩ := hdvd
     rw [hDA, hends.1, pow_mul, hu, mul_pow, mul_comm, mul_smul]
     exact Submodule.smul_mem _ _ (tensor_reduction_holds O ι Nb B l ex hex y)
-  have hstep : ∀ (s : Finset ι) (a : ι), a ∉ s → ∀ f : Forms O Γ jK (⨂[O] τ, Nb τ),
-      (∀ g, (f : G → ⨂[O] τ, Nb τ) g ∈ DA (insert a s)) →
-      ∃ σ ∈ S, ∀ g, ((σ • ((algebraMap O T l) ^ cTau T2 ex c' a • f) :
-        Forms O Γ jK (⨂[O] τ, Nb τ)) : G → ⨂[O] τ, Nb τ) g ∈ DA s := by
+  have hstep
+      : ∀ (s : Finset ι) (a : ι),
+        a ∉ s
+          → ∀ f : Forms O Γ jK (⨂[O] τ, Nb τ),
+            (∀ g, (f : G → ⨂[O] τ, Nb τ) g ∈ DA (insert a s))
+              → ∃ σ ∈ S, ∀ g,
+                ((σ • ((algebraMap O T l) ^ cTau T2 ex c' a • f) : Forms O Γ jK (⨂[O] τ, Nb τ))
+                      : G → ⨂[O] τ, Nb τ)
+                    g
+                  ∈ DA s := by
     intro s a ha f hf
-    have hkill : ∀ c : ℕ, (∀ x : Nb a, l ^ c • x ∈ B a) →
-        ∃ σ ∈ S, ∀ g, ((σ • ((algebraMap O T l) ^ c • f) :
-          Forms O Γ jK (⨂[O] τ, Nb τ)) : G → ⨂[O] τ, Nb τ) g ∈ DA s := by
+    have hkill
+        : ∀ c : ℕ,
+          (∀ x : Nb a, l ^ c • x ∈ B a)
+            → ∃ σ ∈ S, ∀ g,
+              ((σ • ((algebraMap O T l) ^ c • f) : Forms O Γ jK (⨂[O] τ, Nb τ)) : G → ⨂[O] τ, Nb τ)
+                  g
+                ∈ DA s := by
       intro c hc
       refine ⟨1, S.one_mem, fun g => ?_⟩
       rw [one_smul, hval]
@@ -416,29 +469,30 @@ theorem theorem_w_central_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso
       simp only [cTau, haT, if_true]
       omega
     rw [hc]
-    let E : Submodule A (⨂[O] τ, Nb τ) :=
-      { carrier := {x | ∃ d ∈ DA s, ∃ n ∈ DA (insert a s), x = d + l ^ c' a • n}
-        zero_mem' := ⟨0, (DA s).zero_mem, 0, (DA _).zero_mem, by simp⟩
-        add_mem' := by
-          rintro _ _ ⟨d, hd, n, hn, rfl⟩ ⟨d', hd', n', hn', rfl⟩
-          exact ⟨d + d', (DA s).add_mem hd hd', n + n', (DA _).add_mem hn hn', by
-            rw [smul_add]; abel⟩
-        smul_mem' := by
-          rintro b _ ⟨d, hd, n, hn, rfl⟩
-          exact ⟨b • d, (DA s).smul_mem b hd, b • n, (DA _).smul_mem b hn, by
-            rw [smul_add, smul_comm]⟩ }
+    let E : Submodule A (⨂[O] τ, Nb τ) := {
+      carrier := {x | ∃ d ∈ DA s, ∃ n ∈ DA (insert a s), x = d + l ^ c' a • n}
+      zero_mem' := ⟨0, (DA s).zero_mem, 0, (DA _).zero_mem, by simp⟩
+      add_mem' := by
+        rintro _ _ ⟨d, hd, n, hn, rfl⟩ ⟨d', hd', n', hn', rfl⟩
+        exact ⟨d + d', (DA s).add_mem hd hd', n + n', (DA _).add_mem hn hn', by rw [smul_add]; abel⟩
+      smul_mem' := by
+        rintro b _ ⟨d, hd, n, hn, rfl⟩
+        exact
+          ⟨b • d, (DA s).smul_mem b hd, b • n, (DA _).smul_mem b hn, by rw [smul_add, smul_comm]⟩
+    }
     have hDE : DA s ≤ E := fun d hd => ⟨d, hd, 0, (DA _).zero_mem, by simp⟩
     have hD0 : tensSub B ≤ (DA s).restrictScalars O := by
       intro x hx
       rw [← hends.1] at hx
       exact hmono ∅ s (Finset.empty_subset _) hx
-    refine forms_devissage_holds O A G Γ K jK T (⨂[O] τ, Nb τ) S (tensSub B) (DA s) E hNoe hArt hD0 hDE
-      ?_ _ (fun g => ⟨0, (DA s).zero_mem, _, hf g, by rw [hval, zero_add]⟩)
+    refine forms_devissage_holds O A G Γ K jK T (⨂[O] τ, Nb τ) S (tensSub B) (DA s) E hNoe hArt hD0
+      hDE ?_ _ (fun g => ⟨0, (DA s).zero_mem, _, hf g, by rw [hval, zero_add]⟩)
     intro F F' hDF hcov hF'E
     have hsimple : IsSimpleModule A (F' ⧸ F.comap F'.subtype) :=
       (covBy_iff_quot_is_simple hcov.le).mp hcov
-    have hsq := hSS O A (⨂[O] τ, Nb τ) ϖ _ F F' hcov.le
-      (hpow.trans ((hmono ∅ s (Finset.empty_subset _)).trans hDF)) hsimple
+    have hsq :=
+      hSS O A (⨂[O] τ, Nb τ) ϖ _ F F' hcov.le
+        (hpow.trans ((hmono ∅ s (Finset.empty_subset _)).trans hDF)) hsimple
     obtain ⟨μ, ⟨iso⟩⟩ := hclass _ hsimple hsq
     have hcf := hIso A _ _ (L μ) ⟨iso⟩ hsq
     let ψ : F' →ₗ[A] L μ := iso.toLinearMap.comp (F.comap F'.subtype).mkQ
@@ -458,8 +512,7 @@ theorem theorem_w_central_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso
       by_contra hnot
       have hle' : depth a (hwt μ a) ≤ i a := not_lt.mp hnot
       obtain ⟨z, hz⟩ := hhw μ a
-      obtain ⟨x, rfl⟩ : ∃ x, ψ x = z :=
-        (iso.surjective.comp (Submodule.mkQ_surjective _)) z
+      obtain ⟨x, rfl⟩ : ∃ x, ψ x = z := (iso.surjective.comp (Submodule.mkQ_surjective _)) z
       apply hz
       rw [← map_smul]
       apply hψ0
@@ -467,16 +520,21 @@ theorem theorem_w_central_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso
       rw [Submodule.coe_smul, hxe, smul_add, smul_comm]
       refine F.add_mem (hDF ((DA s).smul_mem _ hd)) (hDF ?_)
       rw [he]
-      exact tensor_weight_kill_holds O ι Nb B s a (pr a (hwt μ a)) l (c' a) ha
-        (hIN2 a haT _ hle') n hn
+      exact tensor_weight_kill_holds O ι Nb B s a (pr a (hwt μ a)) l (c' a) ha (hIN2 a haT _ hle') n
+        hn
     have hvan : Subsingleton (LocalizedModule S (Forms O Γ jK (L μ))) := by
       by_contra hns
       exact absurd (hIN1 μ hcf hns a haT) (not_le.mpr hdeep)
     exact forms_induction_holds O A G Γ K jK T (⨂[O] τ, Nb τ) (L μ) S F F' ψ hHS (hHN μ) hker hvan
-  have hall : ∀ s : Finset ι, ∀ f : Forms O Γ jK (⨂[O] τ, Nb τ),
-      (∀ g, (f : G → ⨂[O] τ, Nb τ) g ∈ DA s) →
-      ∃ σ ∈ S, ∀ g, ((σ • ((algebraMap O T l) ^ (∑ τ ∈ s, cTau T2 ex c' τ) • f) :
-        Forms O Γ jK (⨂[O] τ, Nb τ)) : G → ⨂[O] τ, Nb τ) g ∈ DA ∅ := by
+  have hall
+      : ∀ s : Finset ι, ∀ f : Forms O Γ jK (⨂[O] τ, Nb τ),
+        (∀ g, (f : G → ⨂[O] τ, Nb τ) g ∈ DA s)
+          → ∃ σ ∈ S, ∀ g,
+            ((σ • ((algebraMap O T l) ^ (∑ τ ∈ s, cTau T2 ex c' τ) • f)
+                    : Forms O Γ jK (⨂[O] τ, Nb τ))
+                  : G → ⨂[O] τ, Nb τ)
+                g
+              ∈ DA ∅ := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -487,9 +545,11 @@ theorem theorem_w_central_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso
       obtain ⟨σ1, hσ1, h1⟩ := hstep s a ha f hf
       obtain ⟨σ2, hσ2, h2⟩ := ih _ h1
       refine ⟨σ2 * σ1, S.mul_mem hσ2 hσ1, fun g => ?_⟩
-      have e1 : (σ2 * σ1) • ((algebraMap O T l) ^ (∑ τ ∈ insert a s, cTau T2 ex c' τ) • f) =
-          σ2 • ((algebraMap O T l) ^ (∑ τ ∈ s, cTau T2 ex c' τ) •
-            (σ1 • ((algebraMap O T l) ^ cTau T2 ex c' a • f))) := by
+      have e1
+          : (σ2 * σ1) • ((algebraMap O T l) ^ (∑ τ ∈ insert a s, cTau T2 ex c' τ) • f)
+            = σ2
+              • ((algebraMap O T l) ^ (∑ τ ∈ s, cTau T2 ex c' τ)
+                • (σ1 • ((algebraMap O T l) ^ cTau T2 ex c' a • f))) := by
         rw [Finset.sum_insert ha]
         simp only [smul_smul]
         congr 1
@@ -507,8 +567,9 @@ theorem theorem_w_central_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso
     · rw [LocalizedModule.smul'_mk]
       exact LocalizedModule.mk_cancel_common_left ⟨σ, hσ⟩ σ0 _
 
-theorem dualWeyl_module_finite (O : Type) [CommRing O] [IsNoetherianRing O] (r n : ℕ) (ν : Fin n → ℕ) :
-    Module.Finite O (dualWeyl O r n ν) := by
+theorem dualWeyl_module_finite
+    (O : Type) [CommRing O] [IsNoetherianRing O] (r n : ℕ) (ν : Fin n → ℕ)
+    : Module.Finite O (dualWeyl O r n ν) := by
   have h : dualWeyl O r n ν ≤ homogeneousSubmodule (Fin r × Fin n) O (∑ s, ν s) := by
     intro f hf
     have h1 := (mem_dualWeyl_iff.1 hf).1
@@ -517,9 +578,12 @@ theorem dualWeyl_module_finite (O : Type) [CommRing O] [IsNoetherianRing O] (r n
     rw [← lclosedeq_weight_sum, h1 hm]
   exact Module.Finite.iff_fg.mpr (Submodule.FG.of_le (homogeneousSubmodule_fg _ _ _) h)
 
-theorem finite_quotient_of_pow_smul_mem (O : Type) [CommRing O] [IsNoetherianRing O] (V : Type) [AddCommGroup V]
-    [Module O V] [Module.Finite O V] (l : O) (J : ℕ) (U : Submodule O V)
-    (hfin : Finite (O ⧸ Ideal.span {l})) (hU : ∀ x : V, l ^ J • x ∈ U) : Finite (V ⧸ U) := by
+theorem finite_quotient_of_pow_smul_mem
+    (O : Type) [CommRing O] [IsNoetherianRing O]
+    (V : Type) [AddCommGroup V] [Module O V] [Module.Finite O V]
+    (l : O) (J : ℕ) (U : Submodule O V)
+    (hfin : Finite (O ⧸ Ideal.span {l})) (hU : ∀ x : V, l ^ J • x ∈ U)
+    : Finite (V ⧸ U) := by
   haveI : Finite (O ⧸ (Ideal.span {l}) ^ J) :=
     Ideal.finite_quotient_pow (IsNoetherian.noetherian (Ideal.span {l})) J
   haveI : Finite (V ⧸ ((Ideal.span {l}) ^ J • ⊤ : Submodule O V)) :=
@@ -533,14 +597,18 @@ theorem finite_quotient_of_pow_smul_mem (O : Type) [CommRing O] [IsNoetherianRin
     exact U.smul_mem _ (hU n)
   exact Finite.of_surjective (Submodule.factor hle) (Submodule.factor_surjective hle)
 
-theorem theorem_w_top_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso : SubquotIso) : TheoremWTop := by
-  intro hD O _ _ _ A _ _ G _ Γ K jK ι _ _ l N k t h lam T2 j q xm xp ecl ex i _ _ T _ _ _ _ S ϖ n₀ e Λ L
-    _ _ _ _ _ hwt hT
-  obtain ⟨hl, hu, hfin, hdvd, hh, ht, hshape, hecl, hex, hstab, he, hHS, hHN, hclass, hhw, hIN1⟩ := hT
+theorem theorem_w_top_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso : SubquotIso)
+    : TheoremWTop := by
+  intro hD O _ _ _ A _ _ G _ Γ K jK ι _ _ l N k t h lam T2 j q xm xp ecl ex i _ _ T _ _ _ _ S ϖ n₀ e
+    Λ L _ _ _ _ _ hwt hT
+  obtain ⟨hl, hu, hfin, hdvd, hh, ht, hshape, hecl, hex, hstab, he, hHS, hHN, hclass, hhw, hIN1⟩ :=
+    hT
   haveI : ∀ τ : ι, Module.Finite O (dualWeyl O N N (res N (lam τ))) :=
     fun τ => dualWeyl_module_finite O N N _
-  let pr : ∀ τ : ι, (Fin N → ℕ) →
-      dualWeyl O N N (res N (lam τ)) →ₗ[O] dualWeyl O N N (res N (lam τ)) := fun τ w =>
+  let pr
+      : ∀ τ : ι,
+        (Fin N → ℕ)
+          → dualWeyl O N N (res N (lam τ)) →ₗ[O] dualWeyl O N N (res N (lam τ)) := fun τ w =>
     (weightedHomogeneousComponent (rowW N N) w).restrict
       (fun x hx => dualWeylRowGraded O N N (res N (lam τ)) w x hx)
   have hexO : ∀ τ, LatIncl (l : O) (deltaIn O N lam τ) (ex τ) := fun τ x =>
@@ -556,23 +624,29 @@ theorem theorem_w_top_of_simple_quotients (hSS : SimpleSubquotOfPower) (hIso : S
     | smul_tprod r u =>
       rw [smul_comm, map_smul, he τ w u (pr τ w (u τ)) rfl, factor_action_on_tensor_product_holds]
     | add a b ha hb => rw [smul_add, map_add (f := _), ha, hb]
-  have hIN2 : ∀ τ ∈ T2, ∀ w, depthAt N k j lam τ w ≤ ((i τ : ℕ) : ℤ) →
-      ∀ x : dualWeyl O N N (res N (lam τ)),
-        (l : O) ^ cFloor l N k t h lam j q xm xp ecl i τ • pr τ w x ∈ deltaIn O N lam τ := by
+  have hIN2
+      : ∀ τ ∈ T2, ∀ w,
+        depthAt N k j lam τ w ≤ ((i τ : ℕ) : ℤ)
+          → ∀ x : dualWeyl O N N (res N (lam τ)),
+            (l : O) ^ cFloor l N k t h lam j q xm xp ecl i τ • pr τ w x ∈ deltaIn O N lam τ := by
     intro τ hτ w hw x
     obtain ⟨hrows, hanti, hblock, hspread, hcloud, hlows, habove, hle, htop⟩ := hshape τ hτ
     have hA := application_window hD l k (j τ) t (q τ) h (lam τ) (xm τ) (xp τ) hl ht
     rw [hrows] at hA
-    have hE := hA hanti hblock hspread hh hcloud hlows habove hle htop (ecl τ) (hecl τ hτ) (i τ) w hw
+    have hE :=
+      hA hanti hblock hspread hh hcloud hlows habove hle htop (ecl τ) (hecl τ hτ) (i τ) w hw
     exact pow_smul_weighted_component_mem_weyl O l N (res N (lam τ)) w _ hu hE x x.2
-  have hmain := theorem_w_central_of_simple_quotients hSS hIso O A G Γ K jK ι (fun τ => dualWeyl O N N (res N (lam τ)))
-    (deltaIn O N lam) T S (l : O) ϖ n₀ (Fin N → ℕ) pr e Λ L hwt (depthAt N k j lam)
-    (fun τ => (i τ : ℤ)) T2 ex (cFloor l N k t h lam j q xm xp ecl i) hNoe hArt hdvd hstab he' hHS hHN
-    hclass hhw hIN1 hexO hIN2
+  have hmain :=
+    theorem_w_central_of_simple_quotients hSS hIso O A G Γ K jK ι
+      (fun τ => dualWeyl O N N (res N (lam τ)))
+      (deltaIn O N lam) T S (l : O) ϖ n₀ (Fin N → ℕ) pr e Λ L hwt (depthAt N k j lam)
+      (fun τ => (i τ : ℤ))
+      T2 ex (cFloor l N k t h lam j q xm xp ecl i) hNoe hArt hdvd hstab he' hHS hHN hclass hhw hIN1
+      hexO hIN2
   exact ⟨hmain, Nat.sInf_le hmain⟩
 
-
-theorem weight_theorem_top : TheoremWTop := theorem_w_top_of_simple_quotients simple_subquotient_of_power_holds subquotient_iso_holds
+theorem weight_theorem_top : TheoremWTop :=
+  theorem_w_top_of_simple_quotients simple_subquotient_of_power_holds subquotient_iso_holds
 
 theorem exponent_le_of_integral_inclusion_holds : ExpLeOfInclZ := by
   intro r ν μ l e ⟨m, hm, h⟩ x hx
@@ -583,8 +657,12 @@ theorem exponent_le_of_integral_inclusion_holds : ExpLeOfInclZ := by
 
 theorem exact_exponents_fit_holds : ExactExponentsFit := by
   intro l N k lam hl hN hk
-  exact ⟨LA.exact_z_specialization N N le_rfl _ hN l hl,
-    fun μ => exponent_le_of_integral_inclusion_holds k _ μ l _ (LA.exact_z_specialization k k le_rfl _ hk l hl)⟩
+  exact ⟨
+    LA.exact_z_specialization N N le_rfl _ hN l hl,
+    fun μ =>
+      exponent_le_of_integral_inclusion_holds k _ μ l _
+        (LA.exact_z_specialization k k le_rfl _ hk l hl)
+  ⟩
 
 theorem top_inclusion_monotone_holds : TopInclMono := by
   intro O _ A _ _ G _ Γ K jK ι l N lam _ _ T _ _ _ _ S J J' hJ h y
@@ -596,7 +674,6 @@ theorem top_inclusion_monotone_holds : TopInclMono := by
     rw [← map_pow, algebraMap_smul]
     exact Submodule.smul_mem _ _ hx
   · rw [← LocalizedModule.smul'_mk, hxs, smul_smul, ← pow_add, add_comm]
-
 
 theorem depth_as_weight_sum_holds : DepthAsU := by
   intro N c lam w

@@ -17,16 +17,19 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.FixApprox
 
-theorem val_lt_map {K : Type} [Field K] (B : ValuationSubring K) (τ : K ≃+* K)
-    (hB : ∀ z, τ z ∈ B ↔ z ∈ B) (a b : K) (h : B.valuation a < B.valuation b) :
-    B.valuation (τ a) < B.valuation (τ b) := by
-  have hb : b ≠ 0 := by
-    rintro rfl; simp at h
+theorem val_lt_map
+    {K : Type} [Field K]
+    (B : ValuationSubring K) (τ : K ≃+* K) (hB : ∀ z, τ z ∈ B ↔ z ∈ B)
+    (a b : K) (h : B.valuation a < B.valuation b)
+    : B.valuation (τ a) < B.valuation (τ b) := by
+  have hb : b ≠ 0 := by rintro rfl; simp at h
   by_cases ha : a = 0
   · subst ha
     simp only [map_zero]
@@ -38,10 +41,17 @@ theorem val_lt_map {K : Type} [Field K] (B : ValuationSubring K) (τ : K ≃+* K
     have h1 : B.valuation (τ b / τ a) ≤ 1 := by
       rw [map_div₀, div_le_one₀ ((Valuation.pos_iff _).2 hta)]; exact h'
     rw [ValuationSubring.valuation_le_one_iff, ← map_div₀, hB] at h1
-    rw [← ValuationSubring.valuation_le_one_iff, map_div₀, div_le_one₀ ((Valuation.pos_iff _).2 ha)] at h1
+    rw [← ValuationSubring.valuation_le_one_iff, map_div₀, div_le_one₀ ((Valuation.pos_iff _).2 ha)]
+      at h1
     exact h1
 
-theorem fix_of_approx : ∀ (K : Type) [Field K] [CharZero K] (B : ValuationSubring K) (τ : K ≃+* K), (∀ z, τ z ∈ B ↔ z ∈ B) → ∀ y : K, IsAlgebraic ℚ y → (∀ δ : K, δ ≠ 0 → ∃ u : K, τ u = u ∧ B.valuation (y - u) < B.valuation δ) → τ y = y := by
+theorem fix_of_approx
+    : ∀ (K : Type) [Field K] [CharZero K] (B : ValuationSubring K) (τ : K ≃+* K),
+      (∀ z, τ z ∈ B ↔ z ∈ B)
+        → ∀ y : K,
+          IsAlgebraic ℚ y
+            → (∀ δ : K, δ ≠ 0 → ∃ u : K, τ u = u ∧ B.valuation (y - u) < B.valuation δ)
+            → τ y = y := by
   intro K _ _ B τ hB y _ happ
   by_contra hne
   set m := τ y with hm
@@ -53,8 +63,9 @@ theorem fix_of_approx : ∀ (K : Type) [Field K] [CharZero K] (B : ValuationSubr
     have h' := congrArg τ (sub_eq_zero.1 h)
     rw [hs, RingEquiv.apply_symm_apply] at h'
     exact h'
-  obtain ⟨u, hu, hlt⟩ := happ (if B.valuation (y - m) ≤ B.valuation (y - s) then y - m else y - s)
-    (by split_ifs <;> assumption)
+  obtain ⟨u, hu, hlt⟩ :=
+    happ (if B.valuation (y - m) ≤ B.valuation (y - s) then y - m else y - s)
+      (by split_ifs <;> assumption)
   have h1 : B.valuation (y - u) < B.valuation (y - m) := by
     split_ifs at hlt with hc
     · exact hlt
@@ -70,7 +81,9 @@ theorem fix_of_approx : ∀ (K : Type) [Field K] [CharZero K] (B : ValuationSubr
   have h4 : B.valuation (m - y) = B.valuation (y - m) := Valuation.map_sub_swap _ _ _
   have h5 : m - y = (m - u) - (y - u) := by ring
   have h6 : B.valuation (m - y) < B.valuation (m - y) := by
-    calc B.valuation (m - y) = B.valuation ((m - u) - (y - u)) := by rw [← h5]
+    calc
+      B.valuation (m - y)
+        = B.valuation ((m - u) - (y - u)) := by rw [← h5]
       _ < B.valuation (m - y) := Valuation.map_sub_lt _ h3 (h4 ▸ h1)
   exact lt_irrefl _ h6
 

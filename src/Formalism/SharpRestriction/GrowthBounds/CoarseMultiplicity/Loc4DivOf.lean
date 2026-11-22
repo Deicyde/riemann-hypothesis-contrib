@@ -10,24 +10,32 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G MvPolynomial Formalism.MainNotions.LemmaBAlt
 
-def psiRes (X : Loc) [Fact X.p.Prime] (O : Type) [CommRing O] [IsDomain O] [Algebra (WF X.p X.n') O] (w : O)
-    (g : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')) (j : Fin (numSeg X.TT)) (a : Fin (X.m + 1)) :
-    O ⧸ Ideal.span {w} :=
+def psiRes
+    (X : Loc) [Fact X.p.Prime]
+    (O : Type) [CommRing O] [IsDomain O] [Algebra (WF X.p X.n') O]
+    (w : O) (g : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')) (j : Fin (numSeg X.TT))
+    (a : Fin (X.m + 1))
+    : O ⧸ Ideal.span {w} :=
   Ideal.Quotient.mk (Ideal.span {w}) (psiO X.p X.n' O ((topStart X j : X.TT).val.val : ℤ) (g⁻¹ 0 a))
 
 def LocalResidueBound : Prop :=
   ∀ (X : Loc) [Fact X.p.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Algebra (WF X.p X.n') O] (S : UniformizedDVR X.p O), S.SqP → D1num X → 2 ≤ numSeg X.TT →
-    ∀ (j0 : Fin (numSeg X.TT)) (g : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')), IsGLW g →
-      ratPlane X.p X.n' 1 g ≠ ratPlane X.p X.n' 1 1 →
-      psiRes X O S.w g j0 0 = 0 ∨ ∃ c : Fin X.m,
-        ∏ j : Fin (numSeg X.TT), psiRes X O S.w g j 0 ^ (X.p ^ segG X.TT j - 1) =
-          ∏ j : Fin (numSeg X.TT), psiRes X O S.w g j c.succ ^ (X.p ^ segG X.TT j - 1)
+      [Algebra (WF X.p X.n') O] (S : UniformizedDVR X.p O),
+    S.SqP → D1num X → 2 ≤ numSeg X.TT
+      → ∀ (j0 : Fin (numSeg X.TT)) (g : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')),
+        IsGLW g → ratPlane X.p X.n' 1 g ≠ ratPlane X.p X.n' 1 1
+          → psiRes X O S.w g j0 0 = 0
+            ∨ ∃ c : Fin X.m,
+              ∏ j : Fin (numSeg X.TT), psiRes X O S.w g j 0 ^ (X.p ^ segG X.TT j - 1)
+                = ∏ j : Fin (numSeg X.TT), psiRes X O S.w g j c.succ ^ (X.p ^ segG X.TT j - 1)
 
-theorem map_xvL (X : Loc) [Fact X.p.Prime] (O : Type) [CommRing O] [IsDomain O] [Algebra (WF X.p X.n') O] (w : O)
-    (g : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')) (j : Fin (numSeg X.TT)) (a : Fin (X.m + 1)) :
-    map (Ideal.Quotient.mk (Ideal.span {w})) (xvL X O w g j a) =
-      C (psiRes X O w g j a) * MvPolynomial.X ((topStart X j, true), 0) := by
+theorem map_xvL
+    (X : Loc) [Fact X.p.Prime]
+    (O : Type) [CommRing O] [IsDomain O] [Algebra (WF X.p X.n') O]
+    (w : O) (g : Matrix (Fin (X.m + 1)) (Fin (X.m + 1)) (WF X.p X.n')) (j : Fin (numSeg X.TT))
+    (a : Fin (X.m + 1))
+    : map (Ideal.Quotient.mk (Ideal.span {w})) (xvL X O w g j a)
+      = C (psiRes X O w g j a) * MvPolynomial.X ((topStart X j, true), 0) := by
   have hw0 : Ideal.Quotient.mk (Ideal.span {w}) w = 0 :=
     Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self w)
   unfold xvL psiRes
@@ -37,7 +45,8 @@ theorem map_xvL (X : Loc) [Fact X.p.Prime] (O : Type) [CommRing O] [IsDomain O] 
     try ring
   · intro b _ hb
     have hb1 : 1 ≤ b.val := Nat.one_le_iff_ne_zero.mpr (fun h => hb (Fin.ext h))
-    simp [Formalism.MainNotions.LemmaBAlt.dW, Formalism.MainNotions.ColumnSystems.hhLetters, hb1, hw0]
+    simp [Formalism.MainNotions.LemmaBAlt.dW, Formalism.MainNotions.ColumnSystems.hhLetters, hb1,
+      hw0]
   · intro h
     exact absurd (Finset.mem_univ 0) h
 

@@ -16,18 +16,28 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
-theorem divSupp_disjoint_of_not_mem {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    {P : Ideal (MRing ι)} {u a : MRing ι} (h : ∀ W ∈ divSupp P u, a ∉ W) :
-    ∀ W, W ∈ divSupp P u → W ∉ divSupp P a :=
-  fun W hW hW' => h W hW (hW'.1.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
+theorem divSupp_disjoint_of_not_mem
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} {u a : MRing ι} (h : ∀ W ∈ divSupp P u, a ∉ W)
+    : ∀ W, W ∈ divSupp P u → W ∉ divSupp P a := fun W hW hW' =>
+  h W hW (hW'.1.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
 
-theorem isMultiProjPrime_of_mem_divSupp {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    {P : Ideal (MRing ι)} (hP : IsMultiProjPrime P) {u : MRing ι} {b : K → ℕ} (hu : IsMultiHomog u b)
-    {W : Ideal (MRing ι)} (hW : W ∈ divSupp P u) : IsMultiProjPrime W :=
-  ⟨hW.1.isPrime, ReciprocityTheory.ChartRestriction.G.AI.I1.cyc_isMultiHomogIdeal_of_mem_minimalPrimes hP.2.1 hu hW.1, hW.2⟩
+theorem isMultiProjPrime_of_mem_divSupp
+    {K : Type*} [Fintype K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} (hP : IsMultiProjPrime P)
+    {u : MRing ι} {b : K → ℕ} (hu : IsMultiHomog u b)
+    {W : Ideal (MRing ι)} (hW : W ∈ divSupp P u)
+    : IsMultiProjPrime W := ⟨
+  hW.1.isPrime,
+  ReciprocityTheory.ChartRestriction.G.AI.I1.cyc_isMultiHomogIdeal_of_mem_minimalPrimes hP.2.1 hu
+    hW.1,
+  hW.2
+⟩
 
-theorem WellDefined.proof (h₁ : Swap.Statement) (h₂ : RPositionAdd.Statement) :
-    WellDefined.Statement := by
+theorem WellDefined.proof (h₁ : Swap.Statement) (h₂ : RPositionAdd.Statement)
+    : WellDefined.Statement := by
   intro K _ ι _ I P n L B s t hR hA hP hL hB hs ht
   classical
   obtain ⟨bs, hbs, hsH, hsP⟩ := hs
@@ -46,11 +56,12 @@ theorem WellDefined.proof (h₁ : Swap.Statement) (h₂ : RPositionAdd.Statement
   set M := L (Fin.last n) with hM
   set k : ℕ := ∑ l, (d₀ l + (M.a l).natAbs) with hkdef
   have hk1 : ∀ l, d₀ l + (M.a l).natAbs ≤ k := fun l =>
-    Finset.single_le_sum (f := fun l => d₀ l + (M.a l).natAbs) (fun _ _ => Nat.zero_le _)
+    Finset.single_le_sum
+      (f := fun l => d₀ l + (M.a l).natAbs)
+      (fun _ _ => Nat.zero_le _)
       (Finset.mem_univ l)
   set b : K → ℕ := fun l => (M.a l + k).toNat with hbdef
-  have hb : ∀ l, (b l : ℤ) = M.a l + k := fun l =>
-    Int.toNat_of_nonneg (by have := hk1 l; omega)
+  have hb : ∀ l, (b l : ℤ) = M.a l + k := fun l => Int.toNat_of_nonneg (by have := hk1 l; omega)
   have hbd : d₀ ≤ b := fun l => by
     have h1 := hk1 l
     have h2 := hb l
@@ -68,8 +79,7 @@ theorem WellDefined.proof (h₁ : Swap.Statement) (h₂ : RPositionAdd.Statement
   have hA1s : IsSmoothHerm (M.tensor H) := isSmoothHerm_tensor hMs hHs
   have hL' : ∀ j, IsSmoothHerm (Fin.init L j) := fun j => hL _
   have hPS : P ∈ S := Or.inr rfl
-  have hsec1 : IsSectionOn P (M.tensor H) a1 :=
-    ⟨b, fun l => by rw [hb l]; rfl, ha1H, ha1S P hPS⟩
+  have hsec1 : IsSectionOn P (M.tensor H) a1 := ⟨b, fun l => by rw [hb l]; rfl, ha1H, ha1S P hPS⟩
   have hsec2 : IsSectionOn P H a2 := ⟨fun _ => k, fun l => rfl, ha2H, ha2S P hPS⟩
   have hsecs : IsSectionOn P B s := ⟨bs, hbs, hsH, hsP⟩
   have hsect : IsSectionOn P B t := ⟨bt, hbt, htH, htP⟩

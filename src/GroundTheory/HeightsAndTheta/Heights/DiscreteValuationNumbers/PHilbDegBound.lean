@@ -23,11 +23,12 @@ variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} {F : Type u} [
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem isHomogeneous_of_isMultiHomogIdeal {I : Ideal (MRing ι F)} (hI : IsMultiHomogIdeal I) :
-    I.IsHomogeneous (weightedHomogeneousSubmodule F (blockWeight ι)) := by
+theorem isHomogeneous_of_isMultiHomogIdeal {I : Ideal (MRing ι F)} (hI : IsMultiHomogIdeal I)
+    : I.IsHomogeneous (weightedHomogeneousSubmodule F (blockWeight ι)) := by
   classical
-  have e : I = Ideal.span
-      {g | ∃ f ∈ I, ∃ b, g = weightedHomogeneousComponent (blockWeight ι) b f} := by
+  have e
+      : I
+        = Ideal.span {g | ∃ f ∈ I, ∃ b, g = weightedHomogeneousComponent (blockWeight ι) b f} := by
     apply le_antisymm
     · intro f hf
       rw [← sum_weightedHomogeneousComponent (blockWeight ι) f,
@@ -41,9 +42,10 @@ theorem isHomogeneous_of_isMultiHomogIdeal {I : Ideal (MRing ι F)} (hI : IsMult
   obtain ⟨f, -, b, rfl⟩ := hx
   exact ⟨b, weightedHomogeneousComponent_isWeightedHomogeneous b f⟩
 
-theorem isMultiHomogIdeal_sup_span {I : Ideal (MRing ι F)} (hI : IsMultiHomogIdeal I)
-    {s : MRing ι F} {c : K → ℕ} (hs : IsMultiHomog s c) :
-    IsMultiHomogIdeal (I ⊔ Ideal.span {s}) := by
+theorem isMultiHomogIdeal_sup_span
+    {I : Ideal (MRing ι F)} (hI : IsMultiHomogIdeal I)
+    {s : MRing ι F} {c : K → ℕ} (hs : IsMultiHomog s c)
+    : IsMultiHomogIdeal (I ⊔ Ideal.span {s}) := by
   classical
   have h2 : (Ideal.span {s}).IsHomogeneous (weightedHomogeneousSubmodule F (blockWeight ι)) :=
     Ideal.homogeneous_span _ _ fun x hx => ⟨c, (Set.mem_singleton_iff.mp hx) ▸ hs⟩
@@ -66,8 +68,8 @@ theorem lt_of_add_one_le_natCast {x : WithBot ℕ∞} {N : ℕ} (h : x + 1 ≤ N
       have : a + 1 ≤ N := by exact_mod_cast h
       exact_mod_cast (show a < N by omega)
 
-theorem le_natCast_of_lt_natCast_succ {x : WithBot ℕ∞} {N : ℕ}
-    (h : x < ((N + 1 : ℕ) : WithBot ℕ∞)) : x ≤ N := by
+theorem le_natCast_of_lt_natCast_succ {x : WithBot ℕ∞} {N : ℕ} (h : x < ((N + 1 : ℕ) : WithBot ℕ∞))
+    : x ≤ N := by
   induction x using WithBot.recBotCoe with
   | bot => exact bot_le
   | coe a =>
@@ -80,18 +82,19 @@ theorem le_natCast_of_lt_natCast_succ {x : WithBot ℕ∞} {N : ℕ}
       have : a < N + 1 := by exact_mod_cast h
       exact_mod_cast (show a ≤ N by omega)
 
-
 omit [Fintype K] [DecidableEq K] in
-theorem degLT_listSum (h6 : DegLTClosure.Statement) {α : Type*} (n : ℕ)
-    (g : α → (K → ℤ) → ℤ) (l : List α) (hl : ∀ a ∈ l, DegLT (g a) n) :
-    DegLT (fun m => (l.map fun a => g a m).sum) n := by
+theorem degLT_listSum
+    (h6 : DegLTClosure.Statement)
+    {α : Type*} (n : ℕ) (g : α → (K → ℤ) → ℤ) (l : List α) (hl : ∀ a ∈ l, DegLT (g a) n)
+    : DegLT (fun m => (l.map fun a => g a m).sum) n := by
   induction l with
   | nil =>
     simp only [List.map_nil, List.sum_nil]
     exact degLT_zero n
   | cons a l ih =>
-    have e : (fun m => ((a :: l).map fun a => g a m).sum) =
-        g a + fun m => (l.map fun a => g a m).sum := by
+    have e
+        : (fun m => ((a :: l).map fun a => g a m).sum)
+          = g a + fun m => (l.map fun a => g a m).sum := by
       funext m
       simp
     rw [e]
@@ -101,12 +104,13 @@ end Lemmas
 
 end HilbDegBound
 
-
 open HilbDegBound in
-theorem HilbDegBound.proof (h1 : HilbFnVanishBlock.Statement.{u}) (h2 : HilbFnCut.Statement.{u})
+theorem HilbDegBound.proof
+    (h1 : HilbFnVanishBlock.Statement.{u}) (h2 : HilbFnCut.Statement.{u})
     (h3 : PrimeFiltration.Statement.{u}) (h4 : DimStrictDrop.Statement.{u})
     (h5 : RelevantDimGe.Statement.{u}) (h6 : DegLTClosure.Statement)
-    (h7 : DegLTOfUnitSteps.Statement) : HilbDegBound.Statement.{u} := by
+    (h7 : DegLTOfUnitSteps.Statement)
+    : HilbDegBound.Statement.{u} := by
   intro F _ K _ _ ι _ n
 
   have irr : ∀ (n : ℕ) (Q : Ideal (MRing ι F)), ¬ IsRelevant Q → DegLT (hilbFn Q) n := by
@@ -140,25 +144,29 @@ theorem HilbDegBound.proof (h1 : HilbFnVanishBlock.Statement.{u}) (h2 : HilbFnCu
     intro k
     obtain ⟨i, hi⟩ := hrel k
     have hx : IsMultiHomog (X ⟨k, i⟩ : MRing ι F) (Pi.single k 1) := isWeightedHomogeneous_X _ _ _
-    have hnzd : ∀ y, (X ⟨k, i⟩ : MRing ι F) * y ∈ Q → y ∈ Q :=
-      fun y hy => (hQ.mem_or_mem hy).resolve_left hi
+    have hnzd : ∀ y, (X ⟨k, i⟩ : MRing ι F) * y ∈ Q → y ∈ Q := fun y hy =>
+      (hQ.mem_or_mem hy).resolve_left hi
     have hcut := h2 F K ι Q (X ⟨k, i⟩) (Pi.single k 1) hQh hx hnzd
     have hJ : IsMultiHomogIdeal (Q ⊔ Ideal.span {(X ⟨k, i⟩ : MRing ι F)}) :=
       isMultiHomogIdeal_sup_span hQh hx
     have hs : (fun j => ((Pi.single k 1 : K → ℕ) j : ℤ)) = (Pi.single k 1 : K → ℤ) := by
       funext j
       by_cases h : j = k <;> simp [h]
-    have heq : diffStep (Pi.single k 1) (hilbFn Q) =
-        hilbFn (Q ⊔ Ideal.span {(X ⟨k, i⟩ : MRing ι F)}) := by
+    have heq
+        : diffStep (Pi.single k 1) (hilbFn Q)
+          = hilbFn (Q ⊔ Ideal.span {(X ⟨k, i⟩ : MRing ι F)}) := by
       funext m
       rw [hcut m, hs]
       rfl
     rw [heq]
     obtain ⟨l, hl1, hl2, -⟩ := h3 F K ι _ hJ
-    obtain ⟨G, hG⟩ : ∃ G : Ideal (MRing ι F) × (K → ℕ) → (K → ℤ) → ℤ,
-        G = fun p => shiftFn (fun j => (p.2 j : ℤ)) (hilbFn p.1) := ⟨_, rfl⟩
-    have hfun : hilbFn (Q ⊔ Ideal.span {(X ⟨k, i⟩ : MRing ι F)}) = fun m =>
-        (l.map fun p => G p m).sum := by
+    obtain ⟨G, hG⟩
+        : ∃ G : Ideal (MRing ι F) × (K → ℕ) → (K → ℤ) → ℤ,
+          G = fun p => shiftFn (fun j => (p.2 j : ℤ)) (hilbFn p.1) :=
+      ⟨_, rfl⟩
+    have hfun
+        : hilbFn (Q ⊔ Ideal.span {(X ⟨k, i⟩ : MRing ι F)})
+          = fun m => (l.map fun p => G p m).sum := by
       funext m
       rw [hl2 m, hG]
       rfl

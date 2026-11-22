@@ -14,18 +14,17 @@ open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism
 namespace PI.UnitaryGroupMassFormula.BetaLUniq
 
 def LineReduce' : Prop :=
-  ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (S : HSpace E) (Λ : Submodule (𝓞 E) S.V) {r : ℕ} {T T' : E} (F : LFlag S r T) (F' F'' : LFlag S r T')
-    (β₁ β₂ : S.V ≃ₗ[E] S.V) (k : ℕ), finrank E S.V = k + 2 * r + 1 →
-    Submodule.IsFullLattice E Λ → IsLift Λ F' →
-    (finrank E (UUE Λ F F') = 2 * r + 2 ∧ UUE Λ F F' ⊓ orth S (UUE Λ F F') = ⊥) →
-    (∀ w ∈ orth S (Xplus F'), S.hT w w = 0 → w ∈ Xsp F') →
-    β₁ ∈ Formalism.HermitianLatticesTheory.isom S.hT → β₂ ∈ Formalism.HermitianLatticesTheory.isom S.hT →
-    (∀ j, (Xflag F' j).map (β₁ : S.V →ₗ[E] S.V) = Xflag F'' j) →
-    (∀ j, (Xflag F' j).map (β₂ : S.V →ₗ[E] S.V) = Xflag F'' j) →
-    β₁ F'.fl.z = F''.fl.z → β₂ F'.fl.z = F''.fl.z →
-    (∀ x ∈ Hp Λ F F', β₂ x - β₁ x ∈ Xsp F'') →
-    EigenOne Λ F F' β₁ β₂ →
-      ∀ x ∈ orth S (Xsp F'), β₂ x - β₁ x ∈ Xsp F''
+  ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (S : HSpace E) (Λ : Submodule (𝓞 E) S.V)
+      {r : ℕ} {T T' : E} (F : LFlag S r T) (F' F'' : LFlag S r T') (β₁ β₂ : S.V ≃ₗ[E] S.V) (k : ℕ),
+    finrank E S.V = k + 2 * r + 1 → Submodule.IsFullLattice E Λ → IsLift Λ F'
+      → (finrank E (UUE Λ F F') = 2 * r + 2 ∧ UUE Λ F F' ⊓ orth S (UUE Λ F F') = ⊥)
+      → (∀ w ∈ orth S (Xplus F'), S.hT w w = 0 → w ∈ Xsp F')
+      → β₁ ∈ Formalism.HermitianLatticesTheory.isom S.hT
+      → β₂ ∈ Formalism.HermitianLatticesTheory.isom S.hT
+      → (∀ j, (Xflag F' j).map (β₁ : S.V →ₗ[E] S.V) = Xflag F'' j)
+      → (∀ j, (Xflag F' j).map (β₂ : S.V →ₗ[E] S.V) = Xflag F'' j) → β₁ F'.fl.z = F''.fl.z
+      → β₂ F'.fl.z = F''.fl.z → (∀ x ∈ Hp Λ F F', β₂ x - β₁ x ∈ Xsp F'') → EigenOne Λ F F' β₁ β₂
+      → ∀ x ∈ orth S (Xsp F'), β₂ x - β₁ x ∈ Xsp F''
 
 namespace LR
 
@@ -38,8 +37,8 @@ theorem orth_anti {U U' : Submodule E S.V} (h : U ≤ U') : orth S U' ≤ orth S
   rw [mem_orth] at hv ⊢
   exact fun x hx => hv x (h hx)
 
-theorem mem_orth_sup {U U' : Submodule E S.V} {v : S.V} :
-    v ∈ orth S (U ⊔ U') ↔ v ∈ orth S U ∧ v ∈ orth S U' := by
+theorem mem_orth_sup {U U' : Submodule E S.V} {v : S.V}
+    : v ∈ orth S (U ⊔ U') ↔ v ∈ orth S U ∧ v ∈ orth S U' := by
   constructor
   · intro h; exact ⟨orth_anti le_sup_left h, orth_anti le_sup_right h⟩
   · rintro ⟨h1, h2⟩
@@ -48,8 +47,8 @@ theorem mem_orth_sup {U U' : Submodule E S.V} {v : S.V} :
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hx
     rw [map_add (f := _), LinearMap.add_apply, h1 a ha, h2 b hb, add_zero]
 
-theorem mem_orth_span {s : Set S.V} {v : S.V} :
-    v ∈ orth S (Submodule.span E s) ↔ ∀ x ∈ s, S.hT x v = 0 := by
+theorem mem_orth_span {s : Set S.V} {v : S.V}
+    : v ∈ orth S (Submodule.span E s) ↔ ∀ x ∈ s, S.hT x v = 0 := by
   rw [mem_orth]
   refine ⟨fun h x hx => h x (Submodule.subset_span hx), fun h x hx => ?_⟩
   induction hx using Submodule.span_induction with
@@ -58,8 +57,7 @@ theorem mem_orth_span {s : Set S.V} {v : S.V} :
   | add x y _ _ hx hy => rw [map_add (f := _), LinearMap.add_apply, hx, hy, add_zero]
   | smul c x _ hx => rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hx, smul_zero]
 
-theorem mem_orth_span_singleton {z v : S.V} :
-    v ∈ orth S (Submodule.span E {z}) ↔ S.hT z v = 0 := by
+theorem mem_orth_span_singleton {z v : S.V} : v ∈ orth S (Submodule.span E {z}) ↔ S.hT z v = 0 := by
   rw [mem_orth_span]; simp
 
 theorem Xsp_le_orth {r : ℕ} {T : E} (F : LFlag S r T) : Xsp F ≤ orth S (Xsp F) := by
@@ -78,7 +76,8 @@ theorem z_mem_orth {r : ℕ} {T : E} (F : LFlag S r T) : F.fl.z ∈ orth S (Xsp 
 
 theorem finrank_Xsp {r : ℕ} {T : E} (F : LFlag S r T) : finrank E (Xsp F) = r := by
   show finrank E (Submodule.span E (Set.range F.fl.e)) = r
-  rw [finrank_span_eq_card F.fl.e_indep]; simp
+  rw [finrank_span_eq_card F.fl.e_indep]
+  simp
 
 theorem Xflag_r {r : ℕ} {T : E} (F : LFlag S r T) : Xflag F r = Xsp F := by
   show Submodule.span E (F.fl.e '' {i | i.1 < r}) = Submodule.span E (Set.range F.fl.e)
@@ -88,29 +87,33 @@ theorem Xflag_r {r : ℕ} {T : E} (F : LFlag S r T) : Xflag F r = Xsp F := by
   ext i
   simp
 
-theorem inf_span_eq_bot {P : Submodule E S.V} {v : S.V} (hv : v ∉ P) :
-    P ⊓ Submodule.span E {v} = ⊥ := by
+theorem inf_span_eq_bot {P : Submodule E S.V} {v : S.V} (hv : v ∉ P)
+    : P ⊓ Submodule.span E {v} = ⊥ := by
   rw [Submodule.eq_bot_iff]
   intro y hy
   obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp hy.2
   by_cases hc : c = 0
   · simp [hc]
-  · exfalso; apply hv
+  · exfalso
+    apply hv
     have := P.smul_mem c⁻¹ hy.1
     rwa [smul_smul, inv_mul_cancel₀ hc, one_smul] at this
 
-theorem finrank_sup_span {P : Submodule E S.V} {v : S.V} (hv : v ∉ P) :
-    finrank E (P ⊔ Submodule.span E {v} : Submodule E S.V) = finrank E P + 1 := by
+theorem finrank_sup_span {P : Submodule E S.V} {v : S.V} (hv : v ∉ P)
+    : finrank E (P ⊔ Submodule.span E {v} : Submodule E S.V) = finrank E P + 1 := by
   have hv0 : v ≠ 0 := fun h => hv (h ▸ P.zero_mem)
   have := Submodule.finrank_sup_add_finrank_inf_eq P (Submodule.span E {v})
   rw [inf_span_eq_bot hv, finrank_bot, finrank_span_singleton hv0] at this
   omega
 
-theorem isom_apply {β : S.V ≃ₗ[E] S.V} (h : β ∈ Formalism.HermitianLatticesTheory.isom S.hT) (x y : S.V) :
-    S.hT (β x) (β y) = S.hT x y := h x y
+theorem isom_apply
+    {β : S.V ≃ₗ[E] S.V} (h : β ∈ Formalism.HermitianLatticesTheory.isom S.hT) (x y : S.V)
+    : S.hT (β x) (β y) = S.hT x y :=
+  h x y
 
-theorem isom_symm_apply {β : S.V ≃ₗ[E] S.V} (h : β ∈ Formalism.HermitianLatticesTheory.isom S.hT) (x y : S.V) :
-    S.hT (β.symm x) (β.symm y) = S.hT x y := by
+theorem isom_symm_apply
+    {β : S.V ≃ₗ[E] S.V} (h : β ∈ Formalism.HermitianLatticesTheory.isom S.hT) (x y : S.V)
+    : S.hT (β.symm x) (β.symm y) = S.hT x y := by
   rw [← isom_apply h, LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply]
 
 end LR
@@ -144,7 +147,9 @@ theorem line_reduction_holds : LineReduce' := by
         rw [XLam, Submodule.mem_inf] at hx
         exact (Submodule.mem_sup_left (Submodule.mem_sup_left hx.2) : x ∈ B)
       · rw [Submodule.span_le, Set.singleton_subset_iff]
-        exact (Submodule.mem_sup_left (Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)) : F.zt ∈ B)
+        exact (Submodule.mem_sup_left (Submodule.mem_sup_right (Submodule.mem_span_singleton_self
+            _))
+          : F.zt ∈ B)
       · intro x hx
         rw [XLam, Submodule.mem_inf] at hx
         exact (Submodule.mem_sup_right hx.2 : x ∈ B)
@@ -155,7 +160,9 @@ theorem line_reduction_holds : LineReduce' := by
       rw [Submodule.span_le]
       intro x hx
       exact hUU hx
-    have hB1 : finrank E B ≤ finrank E (Xsp F ⊔ Submodule.span E {F.zt} : Submodule E S.V) + finrank E X' :=
+    have hB1
+        : finrank E B
+          ≤ finrank E (Xsp F ⊔ Submodule.span E {F.zt} : Submodule E S.V) + finrank E X' :=
       Submodule.finrank_add_le_finrank_add_finrank _ _
     have hB2 := Submodule.finrank_add_le_finrank_add_finrank (Xsp F) (Submodule.span E {F.zt})
     have hB3 : finrank E (Submodule.span E {F.zt}) ≤ 1 :=
@@ -221,22 +228,22 @@ theorem line_reduction_holds : LineReduce' := by
     · rw [finrank_sup_span hvX]
       omega
 
-  have hX'' : Xsp F'' = X'.map (β₁ : S.V →ₗ[E] S.V) := by
-    rw [← Xflag_r F'', ← hf1 r, Xflag_r F']
-  have hX''2 : Xsp F'' = X'.map (β₂ : S.V →ₗ[E] S.V) := by
-    rw [← Xflag_r F'', ← hf2 r, Xflag_r F']
+  have hX'' : Xsp F'' = X'.map (β₁ : S.V →ₗ[E] S.V) := by rw [← Xflag_r F'', ← hf1 r, Xflag_r F']
+  have hX''2 : Xsp F'' = X'.map (β₂ : S.V →ₗ[E] S.V) := by rw [← Xflag_r F'', ← hf2 r, Xflag_r F']
   have hγX : ∀ x ∈ X', β₁.symm (β₂ x) ∈ X' := by
     intro x hx
     have : β₂ x ∈ Xsp F'' := by rw [hX''2]; exact Submodule.mem_map_of_mem hx
     rw [hX''] at this
     obtain ⟨y, hy, hyx⟩ := Submodule.mem_map.mp this
-    rw [← hyx]; simpa using hy
+    rw [← hyx]
+    simpa using hy
   have hγiX : ∀ x ∈ X', β₂.symm (β₁ x) ∈ X' := by
     intro x hx
     have : β₁ x ∈ Xsp F'' := by rw [hX'']; exact Submodule.mem_map_of_mem hx
     rw [hX''2] at this
     obtain ⟨y, hy, hyx⟩ := Submodule.mem_map.mp this
-    rw [← hyx]; simpa using hy
+    rw [← hyx]
+    simpa using hy
   have hγ : ∀ x y, S.hT (β₁.symm (β₂ x)) (β₁.symm (β₂ y)) = S.hT x y := by
     intro x y; rw [isom_symm_apply h1, isom_apply h2]
   have hinv : ∀ x, β₁.symm (β₂ (β₂.symm (β₁ x))) = x := by intro x; simp
@@ -248,7 +255,8 @@ theorem line_reduction_holds : LineReduce' := by
     have : y = β₁.symm (β₂ h) - h := by
       have := congrArg β₁.symm hyx
       simpa [map_sub] using this
-    rw [← this]; exact hy
+    rw [← this]
+    exact hy
 
   set w := β₁.symm (β₂ v) with hwdef
   have hw : w ∈ orth S A := by
@@ -256,15 +264,13 @@ theorem line_reduction_holds : LineReduce' := by
     refine ⟨?_, ?_, ?_⟩
     · intro h hh
       rw [← hinv h, hγ]
-      have key : β₂.symm (β₁ h) = h - β₂.symm (β₁ (β₁.symm (β₂ h) - h)) := by
-        simp [map_sub]
+      have key : β₂.symm (β₁ h) = h - β₂.symm (β₁ (β₁.symm (β₂ h) - h)) := by simp [map_sub]
       rw [key, map_sub, LinearMap.sub_apply, (mem_orth S).mp hvH h hh,
         (mem_orth S).mp hvX' _ (hγiX _ (hHW h hh)), sub_zero]
     · intro x hx
       rw [← hinv x, hγ]
       exact (mem_orth S).mp hvX' _ (hγiX x hx)
-    · have hγz : β₁.symm (β₂ z') = z' := by
-        rw [hz2, ← hz1, LinearEquiv.symm_apply_apply]
+    · have hγz : β₁.symm (β₂ z') = z' := by rw [hz2, ← hz1, LinearEquiv.symm_apply_apply]
       rw [← hγz, hγ]
       rw [hXp, mem_orth_sup, mem_orth_span_singleton] at hvXp
       exact hvXp.2
@@ -273,20 +279,21 @@ theorem line_reduction_holds : LineReduce' := by
   obtain ⟨μ, rfl⟩ := Submodule.mem_span_singleton.mp hb
   have hμ : μ = 1 := by
     refine hE v hvXp hvX (fun h hh => (mem_orth S).mp hvH h hh) μ ?_
-    rw [← hwdef, ← hab, add_sub_cancel_right]; exact ha
+    rw [← hwdef, ← hab, add_sub_cancel_right]
+    exact ha
   have hvW : β₁.symm (β₂ v) - v ∈ X' := by
     rw [← hwdef, ← hab, hμ, one_smul, add_sub_cancel_right]; exact ha
 
-  let Wd : Submodule E S.V := X'.comap
-    (((β₁.symm : S.V →ₗ[E] S.V) ∘ₗ (β₂ : S.V →ₗ[E] S.V)) - LinearMap.id)
-  have hWmem : ∀ x, x ∈ Wd ↔ β₁.symm (β₂ x) - x ∈ X' := by
-    intro x; simp [Wd]
+  let Wd : Submodule E S.V :=
+    X'.comap (((β₁.symm : S.V →ₗ[E] S.V) ∘ₗ (β₂ : S.V →ₗ[E] S.V)) - LinearMap.id)
+  have hWmem : ∀ x, x ∈ Wd ↔ β₁.symm (β₂ x) - x ∈ X' := by intro x; simp [Wd]
   have hle : orth S X' ≤ Wd := by
     rw [hAv]
     refine sup_le (sup_le ?_ (sup_le ?_ ?_)) ?_
     · intro h hh; rw [hWmem]; exact hHW h hh
     · intro x hx; rw [hWmem]; exact X'.sub_mem (hγX x hx) hx
-    · rw [Submodule.span_singleton_le_iff_mem, hWmem, hz2, ← hz1, LinearEquiv.symm_apply_apply, sub_self]
+    · rw [Submodule.span_singleton_le_iff_mem, hWmem, hz2, ← hz1, LinearEquiv.symm_apply_apply,
+        sub_self]
       exact X'.zero_mem
     · rw [Submodule.span_singleton_le_iff_mem, hWmem]; exact hvW
   intro x hx
@@ -301,22 +308,26 @@ open PI.BetaLUniq
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem betaLUniq_of' (h1 : GramNondeg) (h2 : AgreeOnH) (h3 : WAniso) (h4 : LineReduce')
-    (h5 : EigenvalueLastLineOne) : PI.BetaLUniq := by
+theorem betaLUniq_of'
+    (h1 : GramNondeg) (h2 : AgreeOnH) (h3 : WAniso) (h4 : LineReduce') (h5 : EigenvalueLastLineOne)
+    : PI.BetaLUniq := by
   intro D u u' Λ F F' F'' β₁ β₂ hF hT' hT'' hG' hG'' hP1 hP2 hs1 hs2
   have hdim := finrank_hS D
-  have hfull : Submodule.IsFullLattice D.host.E Λ :=
-    { toIsLattice := hF.1
-      span_eq_top := GlobalTheory.LoopC.Base.span_eq_top_of_unimodular
-        (hS D).hT (hS D).herm (hS D).nondeg hF.1 hF.2.1 }
+  have hfull : Submodule.IsFullLattice D.host.E Λ := {
+    toIsLattice := hF.1
+    span_eq_top :=
+      GlobalTheory.LoopC.Base.span_eq_top_of_unimodular (hS D).hT (hS D).herm (hS D).nondeg hF.1
+        hF.2.1
+  }
   have n' := h1 (hS D) Λ F F' hfull hF.2.2.1 hT'.1 hT'.2.2
   have n'' := h1 (hS D) Λ F F'' hfull hF.2.2.1 hT''.1 hT''.2.2
   have hH := h2 (hS D) Λ F F' F'' β₁ β₂ D.R.k hfull hF.2.2.1 hT''.1 hdim n' n'' hs1 hs2
   exact h4 (hS D) Λ F F' F'' β₁ β₂ D.R.k hdim hfull hT'.1 n' (h3 D u' F') hP1.1.1 hP2.1.1 hP1.2.1
     hP2.2.1 hP1.2.2.1 hP2.2.2.1 hH (h5 D u u' Λ F F' F'' β₁ β₂ hF hT' hT'' hG' hG'' hP1 hP2 hs1 hs2)
 
-theorem betaLUniq_of'' (h1 : GramNondeg) (h2 : AgreeOnH) (h3 : WAniso) (h5 : EigenvalueLastLineOne) :
-    PI.BetaLUniq := betaLUniq_of' h1 h2 h3 line_reduction_holds h5
+theorem betaLUniq_of'' (h1 : GramNondeg) (h2 : AgreeOnH) (h3 : WAniso) (h5 : EigenvalueLastLineOne)
+    : PI.BetaLUniq :=
+  betaLUniq_of' h1 h2 h3 line_reduction_holds h5
 
 end D7
 

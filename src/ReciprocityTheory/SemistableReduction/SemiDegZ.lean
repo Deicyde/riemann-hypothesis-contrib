@@ -17,7 +17,7 @@ theorem half_not_integral {K : Type} [Field K] [NumberField K] : ¬ IsIntegralEl
     rw [← hz]
     exact NumberField.RingOfIntegers.isIntegral_coe z
   have e : ((2 : K)⁻¹) = algebraMap ℚ K ((2 : ℚ)⁻¹) := by simp
-  rw [e, isIntegral_algebraMap_iff ] at hint
+  rw [e, isIntegral_algebraMap_iff] at hint
   obtain ⟨m, hm⟩ := IsIntegrallyClosed.isIntegral_iff.mp hint
   have hm' : (m : ℚ) = 2⁻¹ := by simpa using hm
   have h2 : ((m * 2 : ℤ) : ℚ) = 1 := by
@@ -27,23 +27,28 @@ theorem half_not_integral {K : Type} [Field K] [NumberField K] : ¬ IsIntegralEl
   have h3 : m * 2 = 1 := by exact_mod_cast h2
   omega
 
-theorem no_line {K : Type} [Field K] [NumberField K] {r : ℕ} (L : Submodule (𝓞 K) (Fin r → K))
-    (hL : L.FG) (x : Fin r → K) (hx : x ≠ 0) (hline : ∀ t : K, t • x ∈ L) : False := by
+theorem no_line
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ} (L : Submodule (𝓞 K) (Fin r → K)) (hL : L.FG) (x : Fin r → K) (hx : x ≠ 0)
+    (hline : ∀ t : K, t • x ∈ L)
+    : False := by
   classical
   obtain ⟨S, hS⟩ := hL
   obtain ⟨i, hi⟩ : ∃ i, x i ≠ 0 := by
     by_contra h
     push_neg at h
     exact hx (funext h)
-  obtain ⟨⟨b, hb⟩, hbint⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
-    (S.biUnion fun v => Finset.univ.image v)
+  obtain ⟨⟨b, hb⟩, hbint⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K))
+      (S.biUnion fun v => Finset.univ.image v)
   have hb0 : (b : K) ≠ 0 := by
     intro h0
     have : b = 0 := by exact_mod_cast h0
     exact nonZeroDivisors.ne_zero hb this
   have hgen : ∀ v ∈ S, ∀ j, IsIntegralElt ((b : K) * v j) := by
     intro v hv j
-    obtain ⟨z, hz⟩ := hbint (v j) (Finset.mem_biUnion.mpr ⟨v, hv, Finset.mem_image_of_mem _ (Finset.mem_univ j)⟩)
+    obtain ⟨z, hz⟩ :=
+      hbint (v j) (Finset.mem_biUnion.mpr ⟨v, hv, Finset.mem_image_of_mem _ (Finset.mem_univ j)⟩)
     refine ⟨z, ?_⟩
     show algebraMap (𝓞 K) K z = _
     rw [hz, Algebra.smul_def]
@@ -67,7 +72,9 @@ theorem no_line {K : Type} [Field K] [NumberField K] {r : ℕ} (L : Submodule (�
       refine ⟨a * z, ?_⟩
       push_cast
       rw [Pi.smul_apply, Algebra.smul_def]
-      calc (a : K) * (z : K) = (a : K) * ((b : K) * v j) := congrArg (fun q => (a : K) * q) hz
+      calc
+        (a : K) * (z : K)
+          = (a : K) * ((b : K) * v j) := congrArg (fun q => (a : K) * q) hz
         _ = (b : K) * (algebraMap (𝓞 K) K a * v j) := by
           show (a : K) * ((b : K) * v j) = (b : K) * ((a : K) * v j)
           ring
@@ -77,8 +84,9 @@ theorem no_line {K : Type} [Field K] [NumberField K] {r : ℕ} (L : Submodule (�
   simp only [Pi.smul_apply, smul_eq_mul]
   field_simp
 
-theorem hermForm_smul_left {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
-    (t : K) (x y : Fin r → K) : S.h (t • x) y = S.c t * S.h x y := by
+theorem hermForm_smul_left
+    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (t : K) (x y : Fin r → K)
+    : S.h (t • x) y = S.c t * S.h x y := by
   rw [HermForm.h, HermForm.h, Finset.mul_sum]
   refine Finset.sum_congr rfl (fun a _ => ?_)
   rw [Finset.mul_sum]
@@ -86,9 +94,11 @@ theorem hermForm_smul_left {K : Type} [Field K] [NumberField K] {r : ℕ} (S : H
   simp only [Pi.smul_apply, smul_eq_mul, map_mul]
   ring
 
-theorem detG_ne_zero {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
-    (L : Submodule (𝓞 K) (Fin r → K)) (hL : IsLattice L) (hSD : IsSelfDual S L) :
-    S.G.det ≠ 0 := by
+theorem detG_ne_zero
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ}
+    (S : HermForm K r) (L : Submodule (𝓞 K) (Fin r → K)) (hL : IsLattice L) (hSD : IsSelfDual S L)
+    : S.G.det ≠ 0 := by
   intro hdet
   have hdetT : S.Gᵀ.det = 0 := by rw [Matrix.det_transpose]; exact hdet
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hdetT

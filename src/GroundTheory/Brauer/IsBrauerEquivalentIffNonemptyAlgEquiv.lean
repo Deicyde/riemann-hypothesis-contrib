@@ -15,31 +15,30 @@ universe u v w
 
 section Azumaya
 
-variable {K : Type u} [Field K] {A : Type v} [Ring A] [Algebra K A]
-  [Algebra.IsCentral K A] [IsSimpleRing A] [FiniteDimensional K A]
-
+variable
+  {K : Type u} [Field K]
+  {A : Type v}
+  [Ring A] [Algebra K A] [Algebra.IsCentral K A] [IsSimpleRing A] [FiniteDimensional K A]
 
 omit [FiniteDimensional K A] in
 variable (K A) in
 theorem mulLeftRight_injective : Function.Injective (AlgHom.mulLeftRight K A) :=
   RingHom.injective (AlgHom.mulLeftRight K A).toRingHom
 
-
 variable (K A) in
 theorem mulLeftRight_bijective : Function.Bijective (AlgHom.mulLeftRight K A) := by
   refine ⟨mulLeftRight_injective K A, ?_⟩
-  have h := LinearMap.injective_iff_surjective_of_finrank_eq_finrank
-    (f := (AlgHom.mulLeftRight K A).toLinearMap)
-    (by rw [Module.finrank_tensorProduct, MulOpposite.finrank, Module.finrank_linearMap])
+  have h :=
+    LinearMap.injective_iff_surjective_of_finrank_eq_finrank
+      (f := (AlgHom.mulLeftRight K A).toLinearMap)
+      (by rw [Module.finrank_tensorProduct, MulOpposite.finrank, Module.finrank_linearMap])
   exact h.mp (mulLeftRight_injective K A)
-
 
 end Azumaya
 
 section Equivalence
 
 variable {K : Type u} [Field K]
-
 
 end Equivalence
 
@@ -57,7 +56,9 @@ variable {K : Type u} [Field K]
 
 section ColumnIdeal
 
-variable {R : Type v} [Ring R] [Algebra K R] {D : Type w} [DivisionRing D] [Algebra K D]
+variable
+  {R : Type v} [Ring R] [Algebra K R]
+  {D : Type w} [DivisionRing D] [Algebra K D]
   {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 variable (e : R ≃ₐ[K] Matrix ι ι D) (i₀ : ι)

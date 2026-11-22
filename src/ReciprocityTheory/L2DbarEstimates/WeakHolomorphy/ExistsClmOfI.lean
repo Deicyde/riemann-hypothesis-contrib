@@ -9,9 +9,10 @@ namespace ReciprocityTheory.L2DbarEstimates.C
 open Metric Set Filter Topology Complex
 open scoped ContDiff
 
-theorem exists_clm_of_I {n : ℕ} (A : V n →L[ℝ] ℂ) (hA : ∀ w : V n, A (I • w) = I * A w) :
-    ∃ g' : V n →L[ℂ] ℂ, g'.restrictScalars ℝ = A := by
-  refine ⟨{ toFun := A, map_add' := A.map_add, map_smul' := fun c w => ?_, cont := A.continuous }, ?_⟩
+theorem exists_clm_of_I {n : ℕ} (A : V n →L[ℝ] ℂ) (hA : ∀ w : V n, A (I • w) = I * A w)
+    : ∃ g' : V n →L[ℂ] ℂ, g'.restrictScalars ℝ = A := by
+  refine
+    ⟨{ toFun := A, map_add' := A.map_add, map_smul' := fun c w => ?_, cont := A.continuous }, ?_⟩
   · simp only [RingHom.id_apply, smul_eq_mul]
     conv_lhs => rw [← Complex.re_add_im c, add_smul, mul_smul, Complex.coe_smul, Complex.coe_smul,
       A.map_add, A.map_smul, A.map_smul, hA]
@@ -33,7 +34,8 @@ theorem holoDeriv : HoloDerivStatement := by
   have hDd : DifferentiableAt ℝ (fderiv ℝ f) x := hD2.differentiableAt (by simp)
   have hsymm : IsSymmSndFDerivAt ℝ f x :=
     ((contDiffOn_infty.1 hs 2).contDiffAt hxn).isSymmSndFDerivAt (by simp)
-  have hder : ∀ u : V n, HasFDerivAt (fun y => fderiv ℝ f y u) ((fderiv ℝ (fderiv ℝ f) x).flip u) x := by
+  have hder
+      : ∀ u : V n, HasFDerivAt (fun y => fderiv ℝ f y u) ((fderiv ℝ (fderiv ℝ f) x).flip u) x := by
     intro u
     simpa using hDd.hasFDerivAt.clm_apply (hasFDerivAt_const u x)
   have hI : ∀ w : V n, fderiv ℝ (fderiv ℝ f) x v (I • w) = I * fderiv ℝ (fderiv ℝ f) x v w := by
@@ -46,8 +48,9 @@ theorem holoDeriv : HoloDerivStatement := by
     have h3 := ((hder (I • w)).congr_of_eventuallyEq hev.symm).unique h2
     have h4 := congrArg (fun L : V n →L[ℝ] ℂ => L v) h3
     simpa using h4
-  have hA : ∀ w : V n, (fderiv ℝ (fderiv ℝ f) x).flip v (I • w) =
-      I * (fderiv ℝ (fderiv ℝ f) x).flip v w := by
+  have hA
+      : ∀ w : V n,
+        (fderiv ℝ (fderiv ℝ f) x).flip v (I • w) = I * (fderiv ℝ (fderiv ℝ f) x).flip v w := by
     intro w
     simp only [ContinuousLinearMap.flip_apply]
     rw [hsymm (I • w) v, hI w, hsymm w v]
@@ -55,6 +58,7 @@ theorem holoDeriv : HoloDerivStatement := by
   have hev2 : (fun y => fderiv ℂ f y v) =ᶠ[𝓝 x] fun y => fderiv ℝ f y v := by
     filter_upwards [hloc] with y hy
     exact (hy v).symm
-  exact ((hasFDerivAt_of_restrictScalars ℝ (hder v) hgC).congr_of_eventuallyEq hev2).differentiableAt.differentiableWithinAt
+  exact ((hasFDerivAt_of_restrictScalars ℝ (hder v) hgC).congr_of_eventuallyEq
+    hev2).differentiableAt.differentiableWithinAt
 
 end ReciprocityTheory.L2DbarEstimates.C

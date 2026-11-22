@@ -16,7 +16,8 @@ theorem ut_conjT {m : ℕ} {u : Matrix (Fin m) (Fin m) ℂ} (hu : u ∈ UTset m)
   · rw [conjTranspose_apply, hu.1 j i hij, star_zero]
   · rw [conjTranspose_apply, hu.2 i, star_one]
 
-theorem isMonomial_conjT {m : ℕ} {P : Matrix (Fin m) (Fin m) ℂ} (h : IsMonomial P) : IsMonomial Pᴴ := by
+theorem isMonomial_conjT {m : ℕ} {P : Matrix (Fin m) (Fin m) ℂ} (h : IsMonomial P)
+    : IsMonomial Pᴴ := by
   obtain ⟨w, d, hd, rfl⟩ := h
   refine ⟨w.symm, fun a => star (d (w.symm a)), fun a => by simpa using hd (w.symm a), ?_⟩
   ext i a
@@ -24,30 +25,30 @@ theorem isMonomial_conjT {m : ℕ} {P : Matrix (Fin m) (Fin m) ℂ} (h : IsMonom
   by_cases h : a = w i
   · have h' : i = w.symm a := by rw [h, Equiv.symm_apply_apply]
     rw [if_pos h, if_pos h', h']
-  · have h' : ¬ i = w.symm a := by
-      intro h'; apply h; rw [h', Equiv.apply_symm_apply]
+  · have h' : ¬ i = w.symm a := by intro h'; apply h; rw [h', Equiv.apply_symm_apply]
     rw [if_neg h, if_neg h', star_zero]
 
 theorem mx_inv_conjT {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) : mx (Mᴴ)⁻¹ = mx M⁻¹ := by
   rw [← conjTranspose_nonsing_inv, GN.mx_conjTranspose]
 
-theorem finish_bound {M C0 X A G : ℝ} (e : ℕ) (hm : M ≤ C0 * X ^ e) (hX : 0 ≤ X) (hXY : X ≤ A * G) :
-    M ≤ max C0 0 * A ^ e * G ^ e := by
-  calc M ≤ C0 * X ^ e := hm
+theorem finish_bound {M C0 X A G : ℝ} (e : ℕ) (hm : M ≤ C0 * X ^ e) (hX : 0 ≤ X) (hXY : X ≤ A * G)
+    : M ≤ max C0 0 * A ^ e * G ^ e := by
+  calc
+    M ≤ C0 * X ^ e := hm
     _ ≤ max C0 0 * X ^ e := mul_le_mul_of_nonneg_right (le_max_left _ _) (pow_nonneg hX e)
     _ ≤ max C0 0 * (A * G) ^ e :=
-        mul_le_mul_of_nonneg_left (pow_le_pow_left₀ hX hXY e) (le_max_right _ _)
+      mul_le_mul_of_nonneg_left (pow_le_pow_left₀ hX hXY e) (le_max_right _ _)
     _ = max C0 0 * A ^ e * G ^ e := by rw [mul_pow]; ring
 
-theorem exp_eq (r : ℕ) : (r + 1 - 1) * (r + 1) = r * (r + 1) := by
-  rw [Nat.add_sub_cancel]
+theorem exp_eq (r : ℕ) : (r + 1 - 1) * (r + 1) = r * (r + 1) := by rw [Nat.add_sub_cancel]
 
 end PI.PolynomialProperness.CA
 
 namespace PI.PolynomialProperness
 
 open CA in
-theorem unitriangular_inverse_bound_of (h : MonomialFactorizationBound) (hZ : ZhatBound) : UnitriangularInversePolynomialBound := by
+theorem unitriangular_inverse_bound_of (h : MonomialFactorizationBound) (hZ : ZhatBound)
+    : UnitriangularInversePolynomialBound := by
   intro k r z z' γ hmono
   obtain ⟨C1, h1⟩ := h (r + 1) (Zhat k r z z' γ) hmono
   obtain ⟨C2, h2⟩ := h (r + 1) (Zhat k r z z' γ)ᴴ (isMonomial_conjT hmono)
@@ -59,7 +60,8 @@ theorem unitriangular_inverse_bound_of (h : MonomialFactorizationBound) (hZ : Zh
     have h3 := hCZ g
     have h4 : CZ * B.gN g ≤ max CZ 0 * B.gN g :=
       mul_le_mul_of_nonneg_right (le_max_left _ _) (by linarith)
-    rw [hA]; nlinarith
+    rw [hA]
+    nlinarith
   have hX : ∀ g : B.Mat k r, 0 ≤ 1 + mx (Zhat k r z z' g) := fun g => by
     have := GN.mx_nonneg (Zhat k r z z' g); linarith
   have hApos : 0 ≤ A ^ e := pow_nonneg (by rw [hA]; have := le_max_right CZ 0; linarith) e
@@ -77,8 +79,9 @@ theorem unitriangular_inverse_bound_of (h : MonomialFactorizationBound) (hZ : Zh
   · intro u hu v' hv' hPv g hg hZg
     have hl : v'ᴴ ∈ LPg (Zhat k r z z' γ)ᴴ := by
       refine ⟨ut_conjT hv', ?_⟩
-      have e1 : ((Zhat k r z z' γ)ᴴ)⁻¹ * v'ᴴ * (Zhat k r z z' γ)ᴴ =
-          (Zhat k r z z' γ * v' * (Zhat k r z z' γ)⁻¹)ᴴ := by
+      have e1
+          : ((Zhat k r z z' γ)ᴴ)⁻¹ * v'ᴴ * (Zhat k r z z' γ)ᴴ
+            = (Zhat k r z z' γ * v' * (Zhat k r z z' γ)⁻¹)ᴴ := by
         rw [conjTranspose_mul, conjTranspose_mul, conjTranspose_nonsing_inv, Matrix.mul_assoc]
       rw [e1]
       exact ut_conjT hPv
@@ -94,6 +97,8 @@ theorem unitriangular_inverse_bound_of (h : MonomialFactorizationBound) (hZ : Zh
     · rw [← mx_inv_conjT]
       exact (finish_bound e hb.2.2.1 (hX g) (hzg g hg)).trans (mul_le_mul_of_nonneg_right hmax hG)
 
-theorem unitriangular_inverse_bound (h : MonomialFactorizationBound) : UnitriangularInversePolynomialBound := unitriangular_inverse_bound_of h zhatBound
+theorem unitriangular_inverse_bound (h : MonomialFactorizationBound)
+    : UnitriangularInversePolynomialBound :=
+  unitriangular_inverse_bound_of h zhatBound
 
 end PI.PolynomialProperness

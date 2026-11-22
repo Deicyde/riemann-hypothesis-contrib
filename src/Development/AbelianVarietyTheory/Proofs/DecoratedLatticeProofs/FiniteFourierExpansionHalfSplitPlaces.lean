@@ -25,25 +25,41 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Car
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2
+  GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.AdForm.DatumFour
 
-theorem nsmul_mem_perO_of_halfB {E : Type} [Field E] [NumberField E] [StarRing E] {a b : ℕ}
-    {SS : Finset (HeightOneSpectrum (𝓞 E))} {M : Submodule (𝓞 E) (Formalism.L2.Col.HomE E a b)} {c : ℕ} (hc : 0 < c)
-    {y : Formalism.L2.Col.HomE E a b} (hy : y ∈ halfBO SS M c) : c • y ∈ M := by
-  have h := Formalism.L2.Ker.mem_of_forall_locP M fun Q => GlobalTheory.AdForm.HalfPairing.smul_mem_locP hc hy Q
+theorem nsmul_mem_perO_of_halfB
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {a b : ℕ} {SS : Finset (HeightOneSpectrum (𝓞 E))}
+    {M : Submodule (𝓞 E) (Formalism.L2.Col.HomE E a b)} {c : ℕ} (hc : 0 < c)
+    {y : Formalism.L2.Col.HomE E a b} (hy : y ∈ halfBO SS M c)
+    : c • y ∈ M := by
+  have h :=
+    Formalism.L2.Ker.mem_of_forall_locP M fun Q =>
+      GlobalTheory.AdForm.HalfPairing.smul_mem_locP hc hy Q
   rwa [Nat.cast_smul_eq_nsmul] at h
 
-theorem xi_add_halfB {E : Type} [Field E] [NumberField E] [StarRing E] {a b : ℕ}
-    {SS : Finset (HeightOneSpectrum (𝓞 E))} {N : Submodule (𝓞 E) (Formalism.L2.Col.Sp E a)} {N' : Submodule (𝓞 E) (Formalism.L2.Col.Sp E b)}
-    {M : Submodule (𝓞 E) (Formalism.L2.Col.HomE E a b)} {c : ℕ} (hc : 0 < c) (Ξ : Formalism.L2.Col.HomE E a b → ℂ)
+theorem xi_add_halfB
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {a b : ℕ} {SS : Finset (HeightOneSpectrum (𝓞 E))}
+    {N : Submodule (𝓞 E) (Formalism.L2.Col.Sp E a)} {N' : Submodule (𝓞 E) (Formalism.L2.Col.Sp E b)}
+    {M : Submodule (𝓞 E) (Formalism.L2.Col.HomE E a b)} {c : ℕ}
+    (hc : 0 < c) (Ξ : Formalism.L2.Col.HomE E a b → ℂ)
     (hΞ2 : ∀ x, ∀ y ∈ Formalism.L2.Col.homAt SS N N', Ξ (x + (c : E) • y) = Ξ x)
-    (hH : ∀ z, (∀ P ∈ SS, z ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal M) → z ∈ Formalism.L2.Col.homAt SS N N')
-    {β : Formalism.L2.Col.HomE E a b} (hβ : β ∈ halfBO SS M c) (x : Formalism.L2.Col.HomE E a b) : Ξ (x + β) = Ξ x := by
+    (hH : ∀ z,
+      (∀ P ∈ SS, z ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal M)
+        → z ∈ Formalism.L2.Col.homAt SS N N')
+    {β : Formalism.L2.Col.HomE E a b} (hβ : β ∈ halfBO SS M c)
+    (x : Formalism.L2.Col.HomE E a b)
+    : Ξ (x + β) = Ξ x := by
   have hcE : (c : E) ≠ 0 := Nat.cast_ne_zero.2 hc.ne'
   have h1 : (c : E)⁻¹ • β ∈ Formalism.L2.Col.homAt SS N N' := by
     refine hH _ fun P hP => ?_
@@ -53,83 +69,131 @@ theorem xi_add_halfB {E : Type} [Field E] [NumberField E] [StarRing E] {a b : �
   have h4 := hΞ2 x _ h1
   rwa [smul_smul, mul_inv_cancel₀ hcE, one_smul] at h4
 
-noncomputable def eXm {D : D7} (S T : HSp D) (e : AE D) (x : Formalism.L2.Col.HomE D.host.E S.rank T.rank) : WO S T :=
+noncomputable def eXm
+    {D : D7} (S T : HSp D) (e : AE D) (x : Formalism.L2.Col.HomE D.host.E S.rank T.rank)
+    : WO S T :=
   (LinearMap.toMatrix' x).map fun r => e * incA D r
 
-theorem nsmul_toMatrix_mem_latRat {D : D7} {S T : HSp D} (hcc : D.host.ccK = ⊤) {N : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
-    {N' : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)} (dS : IsSelfDualC S N) (k c : ℕ) {y : Formalism.L2.Col.HomE D.host.E S.rank T.rank}
-    (hy : c • y ∈ perO (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N') :
-    (k * c) • LinearMap.toMatrix' y ∈ GlobalTheory.LatVac.latRat S T (N : Set (Fin S.rank → D.host.E)) (N' : Set (Fin T.rank → D.host.E)) := by
+theorem nsmul_toMatrix_mem_latRat
+    {D : D7} {S T : HSp D} (hcc : D.host.ccK = ⊤)
+    {N : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
+    {N' : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)} (dS : IsSelfDualC S N)
+    (k c : ℕ)
+    {y : Formalism.L2.Col.HomE D.host.E S.rank T.rank}
+    (hy : c • y ∈ perO (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) N N')
+    : (k * c) • LinearMap.toMatrix' y ∈ GlobalTheory.LatVac.latRat S T
+      (N : Set (Fin S.rank → D.host.E)) (N' : Set (Fin T.rank → D.host.E)) := by
   have h1 := GlobalTheory.AdForm.HalfPairing.toMatrix_mem_latRat hcc dS hy
   rw [map_nsmul] at h1
   rw [mul_smul]
   exact nsmul_mem h1 k
 
-theorem char_brk {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} {S T : HSp D} {δ : ℂ} {sc : ℝ} (hP : StdPair θ S T δ sc ψ)
-    {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)} {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)}
-    (dS : IsSelfDualC S ΛS) (dT : IsSelfDualC T ΛT) {e : AE D} (he0 : infPart D e = 0) {k : ℕ} {t u : WO S T}
-    (ht : IsHalf e t) (hu : u ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True)
-    {M : Matrix (Fin T.rank) (Fin S.rank) D.host.E} (htM : t = GlobalTheory.LatVac.finTens 1 M + k • u)
+theorem char_brk
+    {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} {S T : HSp D} {δ : ℂ} {sc : ℝ}
+    (hP : StdPair θ S T δ sc ψ)
+    {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
+    {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)}
+    (dS : IsSelfDualC S ΛS) (dT : IsSelfDualC T ΛT)
+    {e : AE D} (he0 : infPart D e = 0)
+    {k : ℕ} {t u : WO S T} (ht : IsHalf e t)
+    (hu : u ∈ latO S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E))
+      fun _ => True)
+    {M : Matrix (Fin T.rank) (Fin S.rank) D.host.E}
+    (htM : t = GlobalTheory.LatVac.finTens 1 M + k • u)
     (y' : Formalism.L2.Col.HomE D.host.E S.rank T.rank)
-    (hY : k • LinearMap.toMatrix' y' ∈ GlobalTheory.LatVac.latRat S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E))) :
-    ψ (symplO S T t (eXm S T (cA D e) y')) = brk (HV sc) (embH (tauE D) δ y') (embH (tauE D) δ (Matrix.toLin' M)) := by
+    (hY : k • LinearMap.toMatrix' y' ∈ GlobalTheory.LatVac.latRat S T
+      (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)))
+    : ψ (symplO S T t (eXm S T (cA D e) y'))
+      = brk (HV sc) (embH (tauE D) δ y') (embH (tauE D) δ (Matrix.toLin' M)) := by
   have hht : IsHalf (cA D (cA D e)) t := by rw [GlobalTheory.LatVac.cA_cA]; exact ht
-  have h4 := GlobalTheory.DatumFourier.char_eq hP.std dS dT (GlobalTheory.PlaceVec.infPart_cA he0) hht hu htM hY
+  have h4 :=
+    GlobalTheory.DatumFourier.char_eq hP.std dS dT (GlobalTheory.PlaceVec.infPart_cA he0) hht hu htM
+      hY
   have h6 := GlobalTheory.TraceBrk.exp_trace_eq_brk D ψ θ S T δ sc hP M (LinearMap.toMatrix' y')
   rw [Matrix.toLin'_toMatrix'] at h6
   exact h4.trans h6
 
-theorem fin_sum {V : Type} [AddCommGroup V] [Module ℂ V] (H : Formalism.L2.Th1.H.Sesq V) {A B Λ : AddSubgroup V} {SA SB : Finset V}
-    (f g : V → ℂ) {v : V} (hv : v ∈ Λ ⊓ A) (hRA : Formalism.L2.Th1.H.IsReps B (Λ ⊓ A) SA)
+theorem fin_sum
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (H : Formalism.L2.Th1.H.Sesq V)
+    {A B Λ : AddSubgroup V} {SA SB : Finset V}
+    (f g : V → ℂ)
+    {v : V} (hv : v ∈ Λ ⊓ A)
+    (hRA : Formalism.L2.Th1.H.IsReps B (Λ ⊓ A) SA)
     (horth : ∀ w ∈ Λ ⊓ A, ∑ y ∈ SB, brk H y w = if w ∈ B then (SB.card : ℂ) else 0)
-    (hcard : SA.card = SB.card) (hne : SB.card ≠ 0) (hg : ∀ y ∈ SB, g y = brk H y v) :
-    ∃ s0 ∈ SA, v - s0 ∈ B ∧
-      ∑ y ∈ SB, (((SA.card : ℂ))⁻¹ * ∑ s ∈ SA, f s * (brk H y s)⁻¹) * g y = f s0 := by
+    (hcard : SA.card = SB.card) (hne : SB.card ≠ 0) (hg : ∀ y ∈ SB, g y = brk H y v)
+    : ∃ s0 ∈ SA,
+      v - s0 ∈ B ∧ ∑ y ∈ SB, (((SA.card : ℂ))⁻¹ * ∑ s ∈ SA, f s * (brk H y s)⁻¹) * g y = f s0 := by
   obtain ⟨s0, hs0, hvs0⟩ := hRA.2.2 v hv
   refine ⟨s0, hs0, hvs0, ?_⟩
-  have h1 : ∑ y ∈ SB, (((SA.card : ℂ))⁻¹ * ∑ s ∈ SA, f s * (brk H y s)⁻¹) * g y
-      = ((SA.card : ℂ))⁻¹ * ∑ s ∈ SA, f s * ∑ y ∈ SB, brk H y (v - s) := by
+  have h1
+      : ∑ y ∈ SB, (((SA.card : ℂ))⁻¹ * ∑ s ∈ SA, f s * (brk H y s)⁻¹) * g y
+        = ((SA.card : ℂ))⁻¹ * ∑ s ∈ SA, f s * ∑ y ∈ SB, brk H y (v - s) := by
     rw [Finset.sum_congr rfl fun y hy => by rw [hg y hy]]
     simp only [Formalism.L2.Ker.brk_sub_right, Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun s _ => Finset.sum_congr rfl fun y _ => by ring
   rw [h1, Finset.sum_congr rfl fun s hs => by rw [horth (v - s) (sub_mem hv (hRA.1 s hs))]]
-  rw [Finset.sum_eq_single s0 (fun s hs hne' => by
-      rw [if_neg (fun h => hne' (hRA.2.1 s hs s0 hs0 (by
-        have h2 : s - s0 = (v - s0) - (v - s) := by abel
-        rw [h2]; exact sub_mem hvs0 h))), mul_zero]) (fun h => absurd hs0 h), if_pos hvs0, hcard]
+  rw [Finset.sum_eq_single s0
+      (fun s hs hne' => by
+        rw [if_neg (fun h =>
+            hne' (hRA.2.1 s hs s0 hs0 (by
+              have h2 : s - s0 = (v - s0) - (v - s) := by abel
+              rw [h2]
+              exact sub_mem hvs0 h))),
+          mul_zero])
+      (fun h => absurd hs0 h),
+    if_pos hvs0, hcard]
   have : (SB.card : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hne
   field_simp
 
-theorem onV_embH {E : Type} [Field E] [NumberField E] [StarRing E] {ι : Type} [Fintype ι] [Nonempty ι] {a b : ℕ}
-    (emb : ι → E →+* ℂ) {δ : ℂ} (hδ : δ ≠ 0) (Ξ : Formalism.L2.Col.HomE E a b → ℂ) (z : Formalism.L2.Col.HomE E a b) :
-    onV emb δ Ξ (embH emb δ z) = Ξ z := by
+theorem onV_embH
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {ι : Type} [Fintype ι] [Nonempty ι]
+    {a b : ℕ}
+    (emb : ι → E →+* ℂ)
+    {δ : ℂ} (hδ : δ ≠ 0)
+    (Ξ : Formalism.L2.Col.HomE E a b → ℂ) (z : Formalism.L2.Col.HomE E a b)
+    : onV emb δ Ξ (embH emb δ z) = Ξ z := by
   have h : ∃ x, embH emb δ x = embH emb δ z := ⟨z, rfl⟩
   unfold onV
   rw [dite_eq_left h]
   exact congrArg Ξ (Formalism.L2.Ker.embH_inj emb hδ h.choose_spec)
 
-theorem mem_BC {E : Type} [Field E] [NumberField E] [StarRing E] {ι : Type} [Fintype ι] {a b : ℕ}
-    {emb : ι → E →+* ℂ} {δ : ℂ} {AA0 : Submodule (𝓞 E) E} {SS : Finset (HeightOneSpectrum (𝓞 E))}
-    {N : Submodule (𝓞 E) (Formalism.L2.Col.Sp E a)} {N' : Submodule (𝓞 E) (Formalism.L2.Col.Sp E b)} {c : ℕ} {w : VV ι a b}
-    (h : w ∈ BC emb δ AA0 SS N N' c) : ∃ β ∈ halfBO SS (perO AA0 N N') c, embH emb δ β = w :=
+theorem mem_BC
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {ι : Type} [Fintype ι]
+    {a b : ℕ} {emb : ι → E →+* ℂ} {δ : ℂ} {AA0 : Submodule (𝓞 E) E}
+    {SS : Finset (HeightOneSpectrum (𝓞 E))} {N : Submodule (𝓞 E) (Formalism.L2.Col.Sp E a)}
+    {N' : Submodule (𝓞 E) (Formalism.L2.Col.Sp E b)} {c : ℕ} {w : VV ι a b}
+    (h : w ∈ BC emb δ AA0 SS N N' c)
+    : ∃ β ∈ halfBO SS (perO AA0 N N') c, embH emb δ β = w :=
   AddSubgroup.mem_map.1 h
 
-theorem embH_sub_eq {E : Type} [Field E] [NumberField E] {ι : Type} {a b : ℕ} (emb : ι → E →+* ℂ) (δ : ℂ)
-    (m p β : Formalism.L2.Col.HomE E a b) (x0 s0 : VV ι a b) (hp : embH emb δ p = x0)
-    (hβ : embH emb δ β = embH emb δ m - s0) : s0 - x0 = embH emb δ (m - p - β) := by
+theorem embH_sub_eq
+    {E : Type} [Field E] [NumberField E]
+    {ι : Type} {a b : ℕ} (emb : ι → E →+* ℂ)
+    (δ : ℂ) (m p β : Formalism.L2.Col.HomE E a b) (x0 s0 : VV ι a b)
+    (hp : embH emb δ p = x0) (hβ : embH emb δ β = embH emb δ m - s0)
+    : s0 - x0 = embH emb δ (m - p - β) := by
   rw [map_sub, map_sub, hp, hβ]; abel
 
-theorem xi_sub_halfB {E : Type} [Field E] [NumberField E] [StarRing E] {a b : ℕ}
-    {SS : Finset (HeightOneSpectrum (𝓞 E))} {N : Submodule (𝓞 E) (Formalism.L2.Col.Sp E a)} {N' : Submodule (𝓞 E) (Formalism.L2.Col.Sp E b)}
-    {M : Submodule (𝓞 E) (Formalism.L2.Col.HomE E a b)} {c : ℕ} (hc : 0 < c) (Ξ : Formalism.L2.Col.HomE E a b → ℂ)
+theorem xi_sub_halfB
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {a b : ℕ} {SS : Finset (HeightOneSpectrum (𝓞 E))}
+    {N : Submodule (𝓞 E) (Formalism.L2.Col.Sp E a)} {N' : Submodule (𝓞 E) (Formalism.L2.Col.Sp E b)}
+    {M : Submodule (𝓞 E) (Formalism.L2.Col.HomE E a b)} {c : ℕ}
+    (hc : 0 < c) (Ξ : Formalism.L2.Col.HomE E a b → ℂ)
     (hΞ2 : ∀ x, ∀ y ∈ Formalism.L2.Col.homAt SS N N', Ξ (x + (c : E) • y) = Ξ x)
-    (hH : ∀ z, (∀ P ∈ SS, z ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal M) → z ∈ Formalism.L2.Col.homAt SS N N')
-    {β : Formalism.L2.Col.HomE E a b} (hβ : β ∈ halfBO SS M c) (x : Formalism.L2.Col.HomE E a b) : Ξ (x - β) = Ξ x := by
+    (hH : ∀ z,
+      (∀ P ∈ SS, z ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal M)
+        → z ∈ Formalism.L2.Col.homAt SS N N')
+    {β : Formalism.L2.Col.HomE E a b} (hβ : β ∈ halfBO SS M c)
+    (x : Formalism.L2.Col.HomE E a b)
+    : Ξ (x - β) = Ξ x := by
   have h1 := xi_add_halfB hc Ξ hΞ2 hH hβ (x - β)
   rw [sub_add_cancel] at h1
   exact h1.symm
-
 
 set_option maxHeartbeats 4000000 in
 set_option synthInstance.maxHeartbeats 200000 in

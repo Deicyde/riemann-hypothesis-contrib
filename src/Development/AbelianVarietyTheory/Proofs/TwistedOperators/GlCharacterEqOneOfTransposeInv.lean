@@ -5,14 +5,17 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 
 namespace GlobalTheory
 
-theorem gl_character_eq_one_of_transpose_inv (k : Type) [Field k] [Infinite k] (n : Type)
-    [Fintype n] [DecidableEq n] (χ : GL n k →* NNReal)
-    (h : ∀ g g' : GL n k, g'.val = (g⁻¹ : GL n k).valᵀ → χ g' = χ g) (g : GL n k) :
-    χ g = 1 := by
+theorem gl_character_eq_one_of_transpose_inv
+    (k : Type) [Field k] [Infinite k]
+    (n : Type) [Fintype n] [DecidableEq n]
+    (χ : GL n k →* NNReal) (h : ∀ g g' : GL n k, g'.val = (g⁻¹ : GL n k).valᵀ → χ g' = χ g)
+    (g : GL n k)
+    : χ g = 1 := by
   classical
   have hne : ∀ g : GL n k, χ g ≠ 0 := by
     intro g h0
@@ -25,25 +28,30 @@ theorem gl_character_eq_one_of_transpose_inv (k : Type) [Field k] [Infinite k] (
       apply h
       rw [Matrix.coe_units_inv, Matrix.transpose_nonsing_inv, hg, diagonal_transpose]
     have h2 : χ g * χ g = 1 := by
-      calc χ g * χ g = χ g * χ g⁻¹ := by rw [h1]
+      calc
+        χ g * χ g
+          = χ g * χ g⁻¹ := by rw [h1]
         _ = 1 := by rw [← map_mul]; simp
     have h3 : χ g ^ 2 = 1 := by rw [sq, h2]
     exact (pow_eq_one_iff_of_nonneg (zero_le) two_ne_zero).1 h3
   obtain ⟨a, ha⟩ := Infinite.exists_notMem_finset ({0, 1} : Finset k)
   have ha0 : a ≠ 0 := by intro h0; apply ha; simp [h0]
   have ha1 : 1 - a ≠ 0 := by
-    intro h0; apply ha; have : a = 1 := by linear_combination -h0
+    intro h0
+    apply ha
+    have : a = 1 := by linear_combination -h0
     simp [this]
   have htr : ∀ (t : TransvectionStruct n k) (g : GL n k), g.val = t.toMatrix → χ g = 1 := by
     rintro ⟨i, j, hij, x⟩ g hg
-    let T : k → GL n k := fun y => GeneralLinearGroup.mkOfDetNeZero (transvection i j y)
-      (by rw [det_transvection_of_ne i j hij]; exact one_ne_zero)
+    let T : k → GL n k := fun y =>
+      GeneralLinearGroup.mkOfDetNeZero (transvection i j y)
+        (by rw [det_transvection_of_ne i j hij]; exact one_ne_zero)
     have hT : ∀ y, (T y).val = transvection i j y := fun y => rfl
     have hgT : g = T x := Units.ext (by rw [hg, hT]; rfl)
     have hconj : ∀ b : k, b ≠ 0 → χ (T (b * x)) = χ (T x) := by
       intro b hb
-      let D : GL n k := GeneralLinearGroup.mkOfDetNeZero (diagonal (Function.update 1 i b))
-        (by
+      let D : GL n k :=
+        GeneralLinearGroup.mkOfDetNeZero (diagonal (Function.update 1 i b)) (by
           rw [det_diagonal]
           refine Finset.prod_ne_zero_iff.2 fun l _ => ?_
           by_cases hl : l = i
@@ -80,8 +88,10 @@ theorem gl_character_eq_one_of_transpose_inv (k : Type) [Field k] [Infinite k] (
     rw [hgT]
     exact (mul_eq_left₀ (hne _)).1 e2.symm
   refine Matrix.diagonal_transvection_induction_of_det_ne_zero
-    (fun M => ∀ g : GL n k, g.val = M → χ g = 1) g.val g.det_ne_zero
-    (fun D _ => hdiag D) htr ?_ g rfl
+    (fun M => ∀ g : GL n k, g.val = M → χ g = 1)
+    g.val g.det_ne_zero
+    (fun D _ => hdiag D)
+    htr ?_ g rfl
   intro A B hA hB pA pB u hu
   have : u = GeneralLinearGroup.mkOfDetNeZero A hA * GeneralLinearGroup.mkOfDetNeZero B hB :=
     Units.ext hu

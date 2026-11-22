@@ -6,7 +6,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.EtaleChernClass
 
@@ -18,8 +19,10 @@ section Cochains
 
 variable {R : Type} [CommRing R] {C : Type 1} [Category.{0} C] (F : C ⥤ ModuleCat.{w} R)
 
-theorem d_zero_apply (f : Cn F 0) (s : ComposableArrows C 1) :
-    d F 0 f s = (show F.obj (s.obj (Fin.last 1)) from f (face 0 s)) - (show F.obj (s.obj (Fin.last 1)) from (F.map (s.map' 0 1)).hom (f (face 1 s))) := by
+theorem d_zero_apply (f : Cn F 0) (s : ComposableArrows C 1)
+    : d F 0 f s
+      = (show F.obj (s.obj (Fin.last 1)) from f (face 0 s))
+        - (show F.obj (s.obj (Fin.last 1)) from (F.map (s.map' 0 1)).hom (f (face 1 s))) := by
   change ∑ i : Fin 2, (-1 : ℤ) ^ (i : ℕ) • (F.map (toLast i s)).hom (f (face i s)) = _
   rw [Fin.sum_univ_two]
   have e0 : toLast (0 : Fin 2) s = 𝟙 _ := s.map_id _
@@ -28,9 +31,11 @@ theorem d_zero_apply (f : Cn F 0) (s : ComposableArrows C 1) :
   simp [sub_eq_add_neg]
   rfl
 
-theorem d_one_apply (f : Cn F 1) (s : ComposableArrows C 2) :
-    d F 1 f s = (show F.obj (s.obj (Fin.last 2)) from f (face 0 s)) - (show F.obj (s.obj (Fin.last 2)) from f (face 1 s)) +
-      (show F.obj (s.obj (Fin.last 2)) from (F.map (s.map' 1 2)).hom (f (face 2 s))) := by
+theorem d_one_apply (f : Cn F 1) (s : ComposableArrows C 2)
+    : d F 1 f s
+      = (show F.obj (s.obj (Fin.last 2)) from f (face 0 s))
+        - (show F.obj (s.obj (Fin.last 2)) from f (face 1 s))
+        + (show F.obj (s.obj (Fin.last 2)) from (F.map (s.map' 1 2)).hom (f (face 2 s))) := by
   change ∑ i : Fin 3, (-1 : ℤ) ^ (i : ℕ) • (F.map (toLast i s)).hom (f (face i s)) = _
   rw [Fin.sum_univ_three]
   have e0 : toLast (0 : Fin 3) s = 𝟙 _ := s.map_id _
@@ -42,25 +47,33 @@ theorem d_one_apply (f : Cn F 1) (s : ComposableArrows C 2) :
 
 end Cochains
 
-theorem close_sum {M : Type*} [AddCommGroup M] (tce tbe tbc kv kw ku kvw i : M)
-    (h₁ : tce - tbe + tbc = kv + kw - kvw) (h₂ : kvw = ku + i) :
-    (-1 : ℤ) ^ 1 • ((tce - kw) - (tbe - ku) + (tbc - kv)) = i := by
+theorem close_sum
+    {M : Type*} [AddCommGroup M]
+    (tce tbe tbc kv kw ku kvw i : M) (h₁ : tce - tbe + tbc = kv + kw - kvw) (h₂ : kvw = ku + i)
+    : (-1 : ℤ) ^ 1 • ((tce - kw) - (tbe - ku) + (tbc - kv)) = i := by
   have e : tce = kv + kw - kvw + tbe - tbc := by rw [← h₁]; abel
   rw [e, h₂]
   simp only [pow_one, neg_smul, one_smul]
   abel
 
-theorem u_congr {X : Scheme.{0}} (D : LineData X) {V : Scheme.{0}} {a a' b b' : V ⟶ D.Y}
-    (h : a ≫ D.f = b ≫ D.f) (h' : a' ≫ D.f = b' ≫ D.f) (ha : a = a') (hb : b = b') :
-    D.u a b h = D.u a' b' h' := by
+theorem u_congr
+    {X : Scheme.{0}} (D : LineData X)
+    {V : Scheme.{0}} {a a' b b' : V ⟶ D.Y}
+    (h : a ≫ D.f = b ≫ D.f) (h' : a' ≫ D.f = b' ≫ D.f) (ha : a = a') (hb : b = b')
+    : D.u a b h = D.u a' b' h' := by
   subst ha hb; rfl
 
-theorem etale_chern_class_eq_kummer_class : CrystallineSemistableComparison.E.EtSpec → CrystallineSemistableComparison.E.ResGood → CrystallineSemistableComparison.E.StCol → CrystallineSemistableComparison.E.FirstChernCoboundary → CrystallineSemistableComparison.E.KumPow →
-    CrystallineSemistableComparison.E.EtaleFirstChernKummer := by
+theorem etale_chern_class_eq_kummer_class
+    : CrystallineSemistableComparison.E.EtSpec → CrystallineSemistableComparison.E.ResGood
+      → CrystallineSemistableComparison.E.StCol
+      → CrystallineSemistableComparison.E.FirstChernCoboundary
+      → CrystallineSemistableComparison.E.KumPow
+      → CrystallineSemistableComparison.E.EtaleFirstChernKummer := by
   intro hES hRG hSC hCP hKP hGen hKum hC1 q _ C _ P X Y D L hL hInv x hx z Λ
   obtain ⟨a, η, θ, hRep, hηn, hθn, hdη, hdiff, hcoc⟩ := hCP hC1 q X D L hL hInv x hx
-  have hθc : ∀ (V : Scheme.{0}) (b b' c : V ⟶ D.Y) (h : b ≫ D.f = c ≫ D.f) (h' : b' ≫ D.f = c ≫ D.f),
-      b = b' → θ V b c h = θ V b' c h' := by
+  have hθc
+      : ∀ (V : Scheme.{0}) (b b' c : V ⟶ D.Y) (h : b ≫ D.f = c ≫ D.f) (h' : b' ≫ D.f = c ≫ D.f),
+        b = b' → θ V b c h = θ V b' c h' := by
     intro V b b' c h h' e
     subst e
     rfl
@@ -81,7 +94,9 @@ theorem etale_chern_class_eq_kummer_class : CrystallineSemistableComparison.E.Et
   have h2 : (-1 : ℤ) ^ 0 • d ((P.res 1).K 1) 0 a₁ = (P.res 1).dvC 0 1 a₀ := by
     funext s
     rw [pow_zero, one_smul, d_zero_apply]
-    have e := hdiff _ ((P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)) (Λ.p (s.obj 1)) (hpp (s.map' 0 1)) _ (Λ.hr _)
+    have e :=
+      hdiff _ ((P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)) (Λ.p (s.obj 1)) (hpp (s.map' 0 1)) _
+        (Λ.hr _)
     rw [← hηn] at e
     exact e
   have h3 : (-1 : ℤ) ^ 1 • d ((P.res 1).K 0) 1 a₀ = (P.res 1).ιC 2 z := by
@@ -91,11 +106,14 @@ theorem etale_chern_class_eq_kummer_class : CrystallineSemistableComparison.E.Et
     have hg : g ≫ (P.S.map (s.map' 0 1)).unop = (P.S.map (s.map' 0 2)).unop := by
       have e : s.map' 0 2 = s.map' 0 1 ≫ s.map' 1 2 := s.map_comp _ _
       rw [e, P.S.map_comp, unop_comp]
-    have hb : g ≫ (P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0) =
-        (P.S.map (s.map' 0 2)).unop ≫ Λ.p (s.obj 0) := by
+    have hb
+        : g ≫ (P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)
+          = (P.S.map (s.map' 0 2)).unop ≫ Λ.p (s.obj 0) := by
       rw [← Category.assoc, hg]
-    have hbc' : (g ≫ (P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)) ≫ D.f = (g ≫ Λ.p (s.obj 1)) ≫ D.f := by
-      have e : ((P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)) ≫ D.f = Λ.p (s.obj 1) ≫ D.f := hpp (s.map' 0 1)
+    have hbc'
+        : (g ≫ (P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)) ≫ D.f = (g ≫ Λ.p (s.obj 1)) ≫ D.f := by
+      have e : ((P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)) ≫ D.f = Λ.p (s.obj 1) ≫ D.f :=
+        hpp (s.map' 0 1)
       rw [Category.assoc g, e, Category.assoc]
     have hbc : ((P.S.map (s.map' 0 2)).unop ≫ Λ.p (s.obj 0)) ≫ D.f = (g ≫ Λ.p (s.obj 1)) ≫ D.f := by
       rw [← hb]
@@ -111,12 +129,17 @@ theorem etale_chern_class_eq_kummer_class : CrystallineSemistableComparison.E.Et
     have hc := hcoc _ _ _ _ hbc (hpp (s.map' 1 2)) v w hv hw
     have hk := hKP hKum q _ (P.ζ (s.obj (Fin.last 2))) (z s) (v * w * u⁻¹) u (Λ.hz s)
     rw [inv_mul_cancel_right] at hk
-    have hn : ((((P.res 1).K 0).map (s.map' 1 2)).hom (a₀ (face 2 s))) =
-        θ _ ((P.S.map (s.map' 0 2)).unop ≫ Λ.p (s.obj 0)) (g ≫ Λ.p (s.obj 1)) hbc - kumT q _ v := by
-      have t₁ : Sec.res g (θ _ ((P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)) (Λ.p (s.obj 1)) (hpp (s.map' 0 1))) =
-          θ _ ((P.S.map (s.map' 0 2)).unop ≫ Λ.p (s.obj 0)) (g ≫ Λ.p (s.obj 1)) hbc :=
+    have hn
+        : ((((P.res 1).K 0).map (s.map' 1 2)).hom (a₀ (face 2 s)))
+          = θ _ ((P.S.map (s.map' 0 2)).unop ≫ Λ.p (s.obj 0)) (g ≫ Λ.p (s.obj 1)) hbc
+            - kumT q _ v := by
+      have t₁
+          : Sec.res g
+              (θ _ ((P.S.map (s.map' 0 1)).unop ≫ Λ.p (s.obj 0)) (Λ.p (s.obj 1)) (hpp (s.map' 0 1)))
+            = θ _ ((P.S.map (s.map' 0 2)).unop ≫ Λ.p (s.obj 0)) (g ≫ Λ.p (s.obj 1)) hbc :=
         (hθn _ _ g _ _ _ hbc').trans (hθc _ _ _ _ _ _ hb)
-      have t₂ : Sec.res g (kumT q _ (Λ.r (s.map' 0 1))) = kumT q _ v := (hKum q).1 _ _ g _ (P.ζ _).2.1
+      have t₂ : Sec.res g (kumT q _ (Λ.r (s.map' 0 1))) = kumT q _ v :=
+        (hKum q).1 _ _ g _ (P.ζ _).2.1
       exact (map_sub _ _ _).trans (congrArg₂ (· - ·) t₁ t₂)
     rw [hn]
     exact close_sum _ _ _ _ _ _ _ _ hc hk

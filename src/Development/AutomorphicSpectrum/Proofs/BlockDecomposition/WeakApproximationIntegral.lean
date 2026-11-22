@@ -11,15 +11,17 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 noncomputable section
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes IsDedekindDomain NumberField GlobalTheory.Published GlobalTheory.CompanionTheory.PlaneSA Topology NumberField.mixedEmbedding
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes IsDedekindDomain NumberField
+  GlobalTheory.Published GlobalTheory.CompanionTheory.PlaneSA Topology NumberField.mixedEmbedding
 open scoped NNReal
 
 namespace GlobalTheory.CompanionTheory.PlaneSA.Additive
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem exists_bound : ∃ B : ℝ≥0, ∀ f : InfinitePlace F → ℝ≥0, B ≤ ∏ w, f w ^ w.mult →
-    ∃ a : 𝓞 F, a ≠ 0 ∧ ∀ w : InfinitePlace F, w (a : F) < f w := by
+theorem exists_bound
+    : ∃ B : ℝ≥0, ∀ f : InfinitePlace F → ℝ≥0,
+      B ≤ ∏ w, f w ^ w.mult → ∃ a : 𝓞 F, a ≠ 0 ∧ ∀ w : InfinitePlace F, w (a : F) < f w := by
   have hc : convexBodyLTFactor F ≠ 0 := convexBodyLTFactor_ne_zero F
   have hm := (minkowskiBound_lt_top F 1).ne
   obtain ⟨m, hm'⟩ : ∃ m : ℝ≥0, minkowskiBound F 1 = m := ⟨_, (ENNReal.coe_toNNReal hm).symm⟩
@@ -27,21 +29,22 @@ theorem exists_bound : ∃ B : ℝ≥0, ∀ f : InfinitePlace F → ℝ≥0, B �
   apply exists_ne_zero_mem_ringOfIntegers_lt F
   rw [convexBodyLT_volume, hm', ← ENNReal.coe_mul, ENNReal.coe_lt_coe]
   have hpos : 0 < convexBodyLTFactor F := pos_iff_ne_zero.2 hc
-  calc m < m + convexBodyLTFactor F := lt_add_of_pos_right _ hpos
+  calc
+    m < m + convexBodyLTFactor F := lt_add_of_pos_right _ hpos
     _ = convexBodyLTFactor F * (m / convexBodyLTFactor F + 1) := by
-        generalize convexBodyLTFactor F = c at hc
-        field_simp
+      generalize convexBodyLTFactor F = c at hc
+      field_simp
     _ ≤ _ := mul_le_mul_right hf _
 
-theorem exists_supported (p : HeightOneSpectrum (𝓞 F)) :
-    ∃ π : 𝓞 F, π ≠ 0 ∧ π ∈ p.asIdeal ∧ ∀ v : HeightOneSpectrum (𝓞 F), v ≠ p → π ∉ v.asIdeal :=
+theorem exists_supported (p : HeightOneSpectrum (𝓞 F))
+    : ∃ π : 𝓞 F, π ≠ 0 ∧ π ∈ p.asIdeal ∧ ∀ v : HeightOneSpectrum (𝓞 F), v ≠ p → π ∉ v.asIdeal :=
   _root_.UpperTheory.Reformulated.B.Qo8.exists_supported p
 
-theorem one_lt_abs_norm {p : HeightOneSpectrum (𝓞 F)} {π : 𝓞 F} (h0 : π ≠ 0) (hp : π ∈ p.asIdeal) :
-    (1 : ℝ) < ∏ w : InfinitePlace F, w (π : F) ^ w.mult := by
+theorem one_lt_abs_norm {p : HeightOneSpectrum (𝓞 F)} {π : 𝓞 F} (h0 : π ≠ 0) (hp : π ∈ p.asIdeal)
+    : (1 : ℝ) < ∏ w : InfinitePlace F, w (π : F) ^ w.mult := by
   rw [InfinitePlace.prod_eq_abs_norm]
-  have hne : Ideal.span {π} ≠ ⊤ := fun h => p.isPrime.ne_top
-    (top_le_iff.1 (h ▸ (Ideal.span_singleton_le_iff_mem _).2 hp))
+  have hne : Ideal.span {π} ≠ ⊤ := fun h =>
+    p.isPrime.ne_top (top_le_iff.1 (h ▸ (Ideal.span_singleton_le_iff_mem _).2 hp))
   have h1 : Ideal.absNorm (Ideal.span {π}) ≠ 1 := fun h => hne (Ideal.absNorm_eq_one_iff.1 h)
   have h2 : Ideal.absNorm (Ideal.span {π}) ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff]; simpa using h0
@@ -50,15 +53,15 @@ theorem one_lt_abs_norm {p : HeightOneSpectrum (𝓞 F)} {π : 𝓞 F} (h0 : π 
   have h4 : ((Algebra.norm ℚ (π : F)) : ℚ) = ((Algebra.norm ℤ π : ℤ) : ℚ) :=
     (Algebra.coe_norm_int π).symm
   rw [h4]
-  have h5 : (2 : ℤ) ≤ |Algebra.norm ℤ π| := by
-    rw [Int.abs_eq_natAbs]; exact_mod_cast h3
+  have h5 : (2 : ℤ) ≤ |Algebra.norm ℤ π| := by rw [Int.abs_eq_natAbs]; exact_mod_cast h3
   have h6 : (2 : ℝ) ≤ ((|Algebra.norm ℤ π| : ℤ) : ℝ) := by exact_mod_cast h5
   push_cast at h6 ⊢
   linarith
 
-theorem exists_small (s : Pl F) {d : 𝓞 F} (hd : d ≠ 0) {ε : ℝ} (hε : 0 < ε) :
-    ∃ y : F, y ≠ 0 ∧ (∀ w : InfinitePlace F, (Sum.inl w : Pl F) ≠ s → w ((d : F) * y) < ε) ∧
-      ∀ v : HeightOneSpectrum (𝓞 F), (Sum.inr v : Pl F) ≠ s → v.valuation F y ≤ 1 := by
+theorem exists_small (s : Pl F) {d : 𝓞 F} (hd : d ≠ 0) {ε : ℝ} (hε : 0 < ε)
+    : ∃ y : F,
+      y ≠ 0 ∧ (∀ w : InfinitePlace F, (Sum.inl w : Pl F) ≠ s → w ((d : F) * y) < ε)
+        ∧ ∀ v : HeightOneSpectrum (𝓞 F), (Sum.inr v : Pl F) ≠ s → v.valuation F y ≤ 1 := by
   obtain ⟨B, hB⟩ := exists_bound (F := F)
   have hdF : (d : F) ≠ 0 := by simpa using hd
   have hwd : ∀ w : InfinitePlace F, 0 < w (d : F) := fun w => w.pos_iff.2 hdF
@@ -75,8 +78,9 @@ theorem exists_small (s : Pl F) {d : 𝓞 F} (hd : d ≠ 0) {ε : ℝ} (hε : 0 
       rw [hg w hne] at h1
       have h2 : w (b : F) < ε / w (d : F) := h1
       rw [map_mul]
-      calc w (d : F) * w (b : F) < w (d : F) * (ε / w (d : F)) :=
-            mul_lt_mul_of_pos_left h2 (hwd w)
+      calc
+        w (d : F) * w (b : F)
+          < w (d : F) * (ε / w (d : F)) := mul_lt_mul_of_pos_left h2 (hwd w)
         _ = ε := by field_simp [(hwd w).ne']
     · rw [HeightOneSpectrum.valuation_of_algebraMap]
       exact v.intValuation_le_one b
@@ -103,13 +107,15 @@ theorem exists_small (s : Pl F) {d : 𝓞 F} (hd : d ≠ 0) {ε : ℝ} (hε : 0 
       exact this.le
     obtain ⟨b, hb0, hb⟩ := hB f hle
     have hbF : (b : F) ≠ 0 := by simpa using hb0
-    refine ⟨(b : F) / (π : F) ^ k, div_ne_zero hbF (pow_ne_zero _ hπF), fun w _ => ?_, fun v hv => ?_⟩
+    refine
+      ⟨(b : F) / (π : F) ^ k, div_ne_zero hbF (pow_ne_zero _ hπF), fun w _ => ?_, fun v hv => ?_⟩
     · have h2 : w (b : F) < ε / w (d : F) * w (π : F) ^ k := hb w
       have hpk := pow_pos (hwπ w) k
       rw [map_mul, map_div₀, map_pow]
-      calc w (d : F) * (w (b : F) / w (π : F) ^ k)
-          < w (d : F) * (ε / w (d : F) * w (π : F) ^ k / w (π : F) ^ k) := by
-            exact mul_lt_mul_of_pos_left (div_lt_div_of_pos_right h2 hpk) (hwd w)
+      calc
+        w (d : F) * (w (b : F) / w (π : F) ^ k)
+            < w (d : F) * (ε / w (d : F) * w (π : F) ^ k / w (π : F) ^ k) := by
+          exact mul_lt_mul_of_pos_left (div_lt_div_of_pos_right h2 hpk) (hwd w)
         _ = ε := by field_simp [(hwd w).ne', hpk.ne']
     · have hne : v ≠ p := fun h => hv (by rw [h])
       have h1 : v.valuation F (π : F) = 1 := by
@@ -119,43 +125,54 @@ theorem exists_small (s : Pl F) {d : 𝓞 F} (hd : d ≠ 0) {ε : ℝ} (hε : 0 
       rw [map_div₀, map_pow, h1, one_pow, div_one, HeightOneSpectrum.valuation_of_algebraMap]
       exact v.intValuation_le_one b
 
-theorem norm_algebraMap_inf (w : InfinitePlace F) (a : F) :
-    ‖algebraMap F w.Completion a‖ = w a := by
+theorem norm_algebraMap_inf (w : InfinitePlace F) (a : F)
+    : ‖algebraMap F w.Completion a‖ = w a := by
   rw [AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply,
     Algebra.algebraMap_self_apply, AbsoluteValue.Completion.norm_coe, WithAbs.ofAbs_toAbs,
     InfinitePlace.coe_apply]
 
-theorem exists_radius (c : ∀ w : InfinitePlace F, w.Completion) (U : ∀ w : InfinitePlace F, Set w.Completion)
-    (hU : ∀ w, U w ∈ 𝓝 (c w)) :
-    ∃ r : ℝ, 0 < r ∧ ∀ w, ∀ z : w.Completion, ‖z‖ < r → c w - z ∈ U w := by
+theorem exists_radius
+    (c : ∀ w : InfinitePlace F, w.Completion) (U : ∀ w : InfinitePlace F, Set w.Completion)
+    (hU : ∀ w, U w ∈ 𝓝 (c w))
+    : ∃ r : ℝ, 0 < r ∧ ∀ w, ∀ z : w.Completion, ‖z‖ < r → c w - z ∈ U w := by
   have h : ∀ w, ∃ r : ℝ, 0 < r ∧ ∀ z : w.Completion, ‖z‖ < r → c w - z ∈ U w := by
     intro w
     obtain ⟨r, hr, hb⟩ := Metric.mem_nhds_iff.1 (hU w)
     refine ⟨r, hr, fun z hz => hb ?_⟩
     simpa [dist_eq_norm] using hz
   choose r hr hb using h
-  refine ⟨Finset.univ.inf' Finset.univ_nonempty r, (Finset.lt_inf'_iff _).2 fun w _ => hr w,
-    fun w z hz => hb w z (hz.trans_le (Finset.inf'_le _ (Finset.mem_univ w)))⟩
+  refine ⟨
+    Finset.univ.inf' Finset.univ_nonempty r,
+    (Finset.lt_inf'_iff _).2 fun w _ => hr w,
+    fun w z hz => hb w z (hz.trans_le (Finset.inf'_le _ (Finset.mem_univ w)))
+  ⟩
 
-theorem exists_norm_bound {C : Set (InfiniteAdeleRing F)} (hC : IsCompact C) :
-    ∃ R : ℝ, 0 < R ∧ ∀ c ∈ C, ∀ w : InfinitePlace F, ‖c w‖ ≤ R := by
+theorem exists_norm_bound {C : Set (InfiniteAdeleRing F)} (hC : IsCompact C)
+    : ∃ R : ℝ, 0 < R ∧ ∀ c ∈ C, ∀ w : InfinitePlace F, ‖c w‖ ≤ R := by
   have h : ∀ w : InfinitePlace F, ∃ R : ℝ, ∀ c ∈ C, ‖c w‖ ≤ R := by
     intro w
     obtain ⟨R, hR⟩ := (hC.image (continuous_apply w)).isBounded.exists_norm_le
     exact ⟨R, fun c hc => hR _ ⟨c, hc, rfl⟩⟩
   choose R hR using h
   refine ⟨∑ w, |R w| + 1, by positivity, fun c hc w => ?_⟩
-  calc ‖c w‖ ≤ R w := hR w c hc
+  calc
+    ‖c w‖
+      ≤ R w := hR w c hc
     _ ≤ |R w| := le_abs_self _
-    _ ≤ ∑ w, |R w| := Finset.single_le_sum (f := fun w => |R w|) (fun _ _ => abs_nonneg _) (Finset.mem_univ w)
+    _ ≤ ∑ w, |R w| :=
+      Finset.single_le_sum (f := fun w => |R w|) (fun _ _ => abs_nonneg _) (Finset.mem_univ w)
     _ ≤ _ := by linarith
 
-theorem exists_scale (S : Finset (HeightOneSpectrum (𝓞 F)))
+theorem exists_scale
+    (S : Finset (HeightOneSpectrum (𝓞 F)))
     (U : ∀ v : HeightOneSpectrum (𝓞 F), Set (v.adicCompletion F))
-    (hU : ∀ v ∈ S, IsOpen (U v) ∧ (0 : v.adicCompletion F) ∈ U v) :
-    ∃ d : 𝓞 F, d ≠ 0 ∧ ∀ v : HeightOneSpectrum (𝓞 F), ∀ o ∈ v.adicCompletionIntegers F,
-      (v ∈ S → algebraMap F (v.adicCompletion F) (d : F) * o ∈ U v) ∧
-      (v ∉ S → algebraMap F (v.adicCompletion F) (d : F) * o ∈ v.adicCompletionIntegers F) := by
+    (hU : ∀ v ∈ S, IsOpen (U v) ∧ (0 : v.adicCompletion F) ∈ U v)
+    : ∃ d : 𝓞 F,
+      d ≠ 0
+        ∧ ∀ v : HeightOneSpectrum (𝓞 F), ∀ o ∈ v.adicCompletionIntegers F,
+          (v ∈ S → algebraMap F (v.adicCompletion F) (d : F) * o ∈ U v)
+            ∧ (v ∉ S
+              → algebraMap F (v.adicCompletion F) (d : F) * o ∈ v.adicCompletionIntegers F) := by
   classical
   let W : Set (FiniteAdeleRing (𝓞 F) F) :=
     {a | ∀ v, v ∉ S → a v ∈ v.adicCompletionIntegers F} ∩ ⋂ v ∈ S, {a | a v ∈ U v}
@@ -172,58 +189,74 @@ theorem exists_scale (S : Finset (HeightOneSpectrum (𝓞 F)))
     by_cases h : v' = v
     · subst h
       have : (singleV F v' o) v' = o := StrongApprox.evalV_single_same v' o
-      rw [this]; exact ho
+      rw [this]
+      exact ho
     · have : (singleV F v o) v' = 0 := StrongApprox.evalV_single_ne h o
-      rw [this]; exact zero_mem _
-  have hval : (algebraMap F (FiniteAdeleRing (𝓞 F) F) (d : F) * singleV F v o) v =
-      algebraMap F (v.adicCompletion F) (d : F) * o := by
+      rw [this]
+      exact zero_mem _
+  have hval
+      : (algebraMap F (FiniteAdeleRing (𝓞 F) F) (d : F) * singleV F v o) v
+        = algebraMap F (v.adicCompletion F) (d : F) * o := by
     have h2 : (singleV F v o) v = o := StrongApprox.evalV_single_same v o
-    have h1 : (algebraMap F (FiniteAdeleRing (𝓞 F) F) (d : F) * singleV F v o) v =
-        algebraMap F (v.adicCompletion F) (d : F) * (singleV F v o) v := rfl
+    have h1
+        : (algebraMap F (FiniteAdeleRing (𝓞 F) F) (d : F) * singleV F v o) v
+          = algebraMap F (v.adicCompletion F) (d : F) * (singleV F v o) v :=
+      rfl
     rw [h1, h2]
   have hWd := hd _ hmem
   rw [← hval]
   exact ⟨fun hv => Set.mem_iInter₂.1 hWd.2 v hv, fun hv => hWd.1 v hv⟩
 
-theorem exists_approx_core (s : Pl F) (T₁ : Finset (InfinitePlace F))
-    (T₂ : Finset (HeightOneSpectrum (𝓞 F))) (h₁ : ∀ w ∈ T₁, (Sum.inl w : Pl F) ≠ s)
-    (h₂ : ∀ v ∈ T₂, (Sum.inr v : Pl F) ≠ s)
+theorem exists_approx_core
+    (s : Pl F)
+    (T₁ : Finset (InfinitePlace F))
+    (T₂ : Finset (HeightOneSpectrum (𝓞 F)))
+    (h₁ : ∀ w ∈ T₁, (Sum.inl w : Pl F) ≠ s) (h₂ : ∀ v ∈ T₂, (Sum.inr v : Pl F) ≠ s)
     (cI : ∀ w : InfinitePlace F, w.Completion) (OI : ∀ w : InfinitePlace F, Set w.Completion)
     (hOI : ∀ w ∈ T₁, OI w ∈ 𝓝 (cI w))
     (cF : ∀ v : HeightOneSpectrum (𝓞 F), v.adicCompletion F)
     (OF : ∀ v : HeightOneSpectrum (𝓞 F), Set (v.adicCompletion F))
-    (hOF : ∀ v ∈ T₂, IsOpen (OF v) ∧ cF v ∈ OF v) :
-    ∃ t : F, (∀ w ∈ T₁, algebraMap F w.Completion t ∈ OI w) ∧
-      (∀ v ∈ T₂, algebraMap F (v.adicCompletion F) t ∈ OF v) ∧
-      ∀ v : HeightOneSpectrum (𝓞 F), v ∉ T₂ → (Sum.inr v : Pl F) ≠ s →
-        algebraMap F (v.adicCompletion F) t ∈ v.adicCompletionIntegers F := by
+    (hOF : ∀ v ∈ T₂, IsOpen (OF v) ∧ cF v ∈ OF v)
+    : ∃ t : F,
+      (∀ w ∈ T₁, algebraMap F w.Completion t ∈ OI w)
+        ∧ (∀ v ∈ T₂, algebraMap F (v.adicCompletion F) t ∈ OF v)
+        ∧ ∀ v : HeightOneSpectrum (𝓞 F),
+          v ∉ T₂ → (Sum.inr v : Pl F) ≠ s
+            → algebraMap F (v.adicCompletion F) t ∈ v.adicCompletionIntegers F := by
   classical
   let xF : Af F := ∑ v ∈ T₂, singleV F v (cF v)
   have hev : ∀ v, evalV F v xF = ∑ v' ∈ T₂, evalV F v (singleV F v' (cF v')) := fun v => by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [xF, map_sum]
+    simp only [xF, map_sum]
   have hxT : ∀ v ∈ T₂, evalV F v xF = cF v := fun v hv => by
-    rw [hev, Finset.sum_eq_single v (fun v' _ hne => StrongApprox.evalV_single_ne hne.symm _)
-      (fun h => absurd hv h), StrongApprox.evalV_single_same]
+    rw [hev,
+      Finset.sum_eq_single v
+        (fun v' _ hne => StrongApprox.evalV_single_ne hne.symm _)
+        (fun h => absurd hv h),
+      StrongApprox.evalV_single_same]
   have hxN : ∀ v, v ∉ T₂ → evalV F v xF = 0 := fun v hv => by
     rw [hev]
     exact Finset.sum_eq_zero fun v' hv' =>
       StrongApprox.evalV_single_ne (fun e : v = v' => hv (by rw [e]; exact hv')) _
   let x : AF F := pairA F cI xF
 
-  obtain ⟨r, hr, hball⟩ := exists_radius (F := F) cI
-    (fun w => if w ∈ T₁ then OI w else Set.univ) (fun w => by
-      by_cases h : w ∈ T₁
-      · simpa only [if_pos h] using hOI w h
-      · simp only [if_neg h]
-        exact Filter.univ_mem)
+  obtain ⟨r, hr, hball⟩ :=
+    exists_radius (F := F) cI
+      (fun w => if w ∈ T₁ then OI w else Set.univ)
+      (fun w => by
+        by_cases h : w ∈ T₁
+        · simpa only [if_pos h] using hOI w h
+        · simp only [if_neg h]
+          exact Filter.univ_mem)
 
-  obtain ⟨d, hd0, hd⟩ := exists_scale (F := F) T₂
-    (fun v => (fun z : v.adicCompletion F => cF v - z) ⁻¹' OF v) (fun v hv => by
-      refine ⟨(hOF v hv).1.preimage (continuous_const.sub continuous_id), ?_⟩
-      show cF v - 0 ∈ OF v
-      rw [sub_zero]
-      exact (hOF v hv).2)
+  obtain ⟨d, hd0, hd⟩ :=
+    exists_scale (F := F) T₂
+      (fun v => (fun z : v.adicCompletion F => cF v - z) ⁻¹' OF v)
+      (fun v hv => by
+        refine ⟨(hOF v hv).1.preimage (continuous_const.sub continuous_id), ?_⟩
+        show cF v - 0 ∈ OF v
+        rw [sub_zero]
+        exact (hOF v hv).2)
   obtain ⟨C, hC, hcov⟩ := GroundTheory.Global.exists_isCompact_forall_exists_sub_mem F
   obtain ⟨R, hR, hbd⟩ := exists_norm_bound hC
   obtain ⟨y, hy0, hyw, hyv⟩ := exists_small s hd0 (div_pos hr hR)
@@ -237,20 +270,31 @@ theorem exists_approx_core (s : Pl F) (T₁ : Finset (InfinitePlace F))
       rw [← map_mul, mul_inv_cancel₀ hy₀0, map_one]
     rw [he, map_mul]
     linear_combination (-x) * h1
-  have hcompI : ∀ w : InfinitePlace F, algebraMap F w.Completion (y₀ * k) =
-      cI w - algebraMap F w.Completion y₀ * e.1 w := fun w => by
+  have hcompI
+      : ∀ w : InfinitePlace F,
+        algebraMap F w.Completion (y₀ * k)
+          = cI w - algebraMap F w.Completion y₀ * e.1 w := fun w => by
     have h : cI w = algebraMap F w.Completion (y₀ * k) + algebraMap F w.Completion y₀ * e.1 w :=
       congrArg (fun a : AF F => a.1 w) hxe
-    rw [h]; ring
-  have hcompF : ∀ v : HeightOneSpectrum (𝓞 F), algebraMap F (v.adicCompletion F) (y₀ * k) =
-      evalV F v xF - algebraMap F (v.adicCompletion F) y₀ * e.2 v := fun v => by
-    have h : evalV F v xF = algebraMap F (v.adicCompletion F) (y₀ * k) +
-        algebraMap F (v.adicCompletion F) y₀ * e.2 v :=
+    rw [h]
+    ring
+  have hcompF
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        algebraMap F (v.adicCompletion F) (y₀ * k)
+          = evalV F v xF - algebraMap F (v.adicCompletion F) y₀ * e.2 v := fun v => by
+    have h
+        : evalV F v xF
+          = algebraMap F (v.adicCompletion F) (y₀ * k)
+            + algebraMap F (v.adicCompletion F) y₀ * e.2 v :=
       congrArg (fun a : AF F => evalV F v a.2) hxe
-    rw [h]; ring
-  have hOv : ∀ v : HeightOneSpectrum (𝓞 F), (Sum.inr v : Pl F) ≠ s →
-      ∃ o ∈ v.adicCompletionIntegers F, algebraMap F (v.adicCompletion F) y₀ * e.2 v =
-        algebraMap F (v.adicCompletion F) (d : F) * o := fun v hv => by
+    rw [h]
+    ring
+  have hOv
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        (Sum.inr v : Pl F) ≠ s
+          → ∃ o ∈ v.adicCompletionIntegers F,
+            algebraMap F (v.adicCompletion F) y₀ * e.2 v
+              = algebraMap F (v.adicCompletion F) (d : F) * o := fun v hv => by
     have h1 : algebraMap F (v.adicCompletion F) y ∈ v.adicCompletionIntegers F :=
       (GroundTheory.Global.coe_mem_adicCompletionIntegers_iff v y).2 (hyv v hv)
     have h2 : e.2 v ∈ v.adicCompletionIntegers F := hk.2 v
@@ -261,7 +305,9 @@ theorem exists_approx_core (s : Pl F) (T₁ : Finset (InfinitePlace F))
       rw [norm_mul, norm_algebraMap_inf]
       have h1 : w y₀ < r / R := hyw w (h₁ w hw)
       have h2 : ‖e.1 w‖ ≤ R := hbd _ hk.1 w
-      calc w y₀ * ‖e.1 w‖ ≤ w y₀ * R := mul_le_mul_of_nonneg_left h2 (apply_nonneg _ _)
+      calc
+        w y₀ * ‖e.1 w‖
+          ≤ w y₀ * R := mul_le_mul_of_nonneg_left h2 (apply_nonneg _ _)
         _ < r / R * R := mul_lt_mul_of_pos_right h1 hR
         _ = r := by field_simp
     have := hball w _ hlt

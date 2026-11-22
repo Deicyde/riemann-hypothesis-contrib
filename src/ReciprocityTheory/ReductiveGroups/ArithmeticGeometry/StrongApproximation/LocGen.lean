@@ -8,16 +8,20 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.StrongApproxi
 
 namespace ReciprocityTheory.ChartRestriction.G.SA
 
-theorem max_ideals_le_two {k K : Type*} [Field k] [CommRing K] [Algebra k K]
-    (hrank : Module.finrank k K = 2) (m₀ m₁ m₂ : Ideal K) (h₀ : m₀.IsMaximal) (h₁ : m₁.IsMaximal)
-    (h₂ : m₂.IsMaximal) : m₀ = m₁ ∨ m₀ = m₂ ∨ m₁ = m₂ := by
+theorem max_ideals_le_two
+    {k K : Type*} [Field k] [CommRing K] [Algebra k K]
+    (hrank : Module.finrank k K = 2)
+    (m₀ m₁ m₂ : Ideal K) (h₀ : m₀.IsMaximal) (h₁ : m₁.IsMaximal) (h₂ : m₂.IsMaximal)
+    : m₀ = m₁ ∨ m₀ = m₂ ∨ m₁ = m₂ := by
   classical
   haveI : FiniteDimensional k K := Module.finite_of_finrank_pos (by omega)
   by_contra hcon
   push_neg at hcon
   obtain ⟨h01, h02, h12⟩ := hcon
-  have hS : ∀ I J : Ideal K, I < J →
-      Module.finrank k (I.restrictScalars k) < Module.finrank k (J.restrictScalars k) := by
+  have hS
+      : ∀ I J : Ideal K,
+        I < J
+          → Module.finrank k (I.restrictScalars k) < Module.finrank k (J.restrictScalars k) := by
     intro I J hIJ
     apply Submodule.finrank_lt_finrank_of_lt
     refine lt_of_le_of_ne (fun x hx => hIJ.le hx) ?_

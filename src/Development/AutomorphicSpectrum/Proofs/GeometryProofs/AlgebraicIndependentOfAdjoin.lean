@@ -5,14 +5,16 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsUnitOf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.FlagBun GlobalTheory.CompanionTheory.Ar.FlagBun.Sm GlobalTheory.CompanionTheory.Ar.FlagBun.Sm.Cell
+open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.FlagBun GlobalTheory.CompanionTheory.Ar.FlagBun.Sm
+  GlobalTheory.CompanionTheory.Ar.FlagBun.Sm.Cell
 
 namespace GlobalTheory.CompanionTheory.Ar.FlagBun.Sm.Cell
 
-theorem algebraicIndependent_of_mem_adjoin_range :
-    ∀ {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} [Finite ι] (u v : ι → K),
-      AlgebraicIndependent Ω u → (∀ a, u a ∈ IntermediateField.adjoin Ω (Set.range v)) →
-      AlgebraicIndependent Ω v := by
+theorem algebraicIndependent_of_mem_adjoin_range
+    : ∀ {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} [Finite ι] (u v : ι → K),
+      AlgebraicIndependent Ω u → (∀ a, u a ∈ IntermediateField.adjoin Ω (Set.range v))
+        → AlgebraicIndependent Ω v := by
   intro Ω K _ _ _ ι _ u v hu hmem
   set L := IntermediateField.adjoin Ω (Set.range v) with hL
   let v' : ι → L := fun a => ⟨v a, IntermediateField.subset_adjoin Ω _ ⟨a, rfl⟩⟩

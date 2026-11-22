@@ -67,8 +67,8 @@ theorem LocalMultOrd.proof : LocalMultOrd.Statement := by
     Ideal.krullDimLE_zero_quotient_iff_forall_minimalPrimes_isMaximal.mpr hmax
   have : IsArtinianRing C := IsNoetherianRing.isArtinianRing_of_krullDimLE_zero (R := C)
   have hfin : Module.length C C ≠ ⊤ :=
-    Module.length_ne_top_iff.mpr
-      (isFiniteLength_iff_isNoetherian_isArtinian.mpr ⟨inferInstance, inferInstance⟩)
+    Module.length_ne_top_iff.mpr (isFiniteLength_iff_isNoetherian_isArtinian.mpr
+      ⟨inferInstance, inferInstance⟩)
 
   let : Algebra AW C := RingHom.toAlgebra (R := AW) (S := C) π
   have hJπ : ∀ y ∈ J.map (algebraMap A AW), (Algebra.ofId AW C) y = 0 := by
@@ -91,18 +91,21 @@ theorem LocalMultOrd.proof : LocalMultOrd.Statement := by
     rw [← ht]
     exact (IsLocalization.map_units AW (⟨t, htW⟩ : W.primeCompl)).map (Ideal.Quotient.mk _)
   let ψ1 : BP →+* AW ⧸ J.map (algebraMap A AW) := IsLocalization.lift hunit
-  have hψ1 : ∀ a : A, ψ1 (algebraMap (A ⧸ I) BP (Ideal.Quotient.mk I a)) =
-      Ideal.Quotient.mk _ (algebraMap A AW a) := fun a => by
+  have hψ1
+      : ∀ a : A,
+        ψ1 (algebraMap (A ⧸ I) BP (Ideal.Quotient.mk I a))
+          = Ideal.Quotient.mk _ (algebraMap A AW a) := fun a => by
     simp [ψ1, ψ0, IsLocalization.lift_eq]
-  let ψ : C →+* AW ⧸ J.map (algebraMap A AW) := Ideal.Quotient.lift _ ψ1 (by
-    intro z hz
-    obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hz
-    rw [map_mul, hx', hψ1, Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_map_of_mem _ hxJ), mul_zero])
+  let ψ : C →+* AW ⧸ J.map (algebraMap A AW) :=
+    Ideal.Quotient.lift _ ψ1 (by
+      intro z hz
+      obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hz
+      rw [map_mul, hx', hψ1, Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_map_of_mem _ hxJ),
+        mul_zero])
   have hψπ : ψ.comp π = Ideal.Quotient.mk _ := by
     apply IsLocalization.ringHom_ext W.primeCompl
     ext a
-    change ψ (Ideal.Quotient.mk _ (φ (algebraMap A AW a))) =
-      Ideal.Quotient.mk _ (algebraMap A AW a)
+    change ψ (Ideal.Quotient.mk _ (φ (algebraMap A AW a))) = Ideal.Quotient.mk _ (algebraMap A AW a)
     rw [hφ]
     exact hψ1 a
   have hinj : Function.Injective f := by

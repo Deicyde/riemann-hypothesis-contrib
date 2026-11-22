@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Hermit
 @[expose] public section
 
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum WithZero Polynomial
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex
 
 namespace GlobalTheory.LocalDifferentProduct
 
@@ -18,9 +19,11 @@ variable {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
 
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum WithZero Polynomial in
 variable {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) in
-theorem _root_.GlobalTheory.LocalDifferentProduct.valued_coe_algebraMap (x : 𝓞 K) :
-    Valued.v ((algebraMap (𝓞 K) (v.adicCompletionIntegers K) x : v.adicCompletionIntegers K) :
-      v.adicCompletion K) = v.intValuation x := by
+theorem _root_.GlobalTheory.LocalDifferentProduct.valued_coe_algebraMap (x : 𝓞 K)
+    : Valued.v
+        ((algebraMap (𝓞 K) (v.adicCompletionIntegers K) x : v.adicCompletionIntegers K)
+          : v.adicCompletion K)
+      = v.intValuation x := by
   simp [valuation_of_algebraMap]
 
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum WithZero Polynomial in
@@ -218,13 +221,13 @@ private lemma exists_integer_valued_sub_le_exp_neg (x : v.adicCompletionIntegers
   rw [e2, valuedAdicCompletion_eq_valuation']
   exact ha
 
-
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum WithZero Polynomial in
 variable {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) in
-theorem _root_.GlobalTheory.LocalDifferentProduct.card_quot_map {I : Ideal (𝓞 K)} (hI : I ≠ 0) :
-    Nat.card (v.adicCompletionIntegers K ⧸
-      I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K))) =
-      Ideal.absNorm (v.maxPowDividing I) := by
+theorem _root_.GlobalTheory.LocalDifferentProduct.card_quot_map {I : Ideal (𝓞 K)} (hI : I ≠ 0)
+    : Nat.card
+        (v.adicCompletionIntegers K ⧸
+          I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K)))
+      = Ideal.absNorm (v.maxPowDividing I) := by
   set n := (Associates.mk v.asIdeal).count (Associates.mk I).factors
   have hIn : I ≤ v.asIdeal ^ n := by
     rw [← Ideal.dvd_iff_le]
@@ -232,8 +235,10 @@ theorem _root_.GlobalTheory.LocalDifferentProduct.card_quot_map {I : Ideal (𝓞
       rw [Associates.mk_pow]
       exact (Associates.prime_pow_dvd_iff_le (Associates.mk_ne_zero.mpr hI)
         v.associates_irreducible).mpr le_rfl)
-  let f : 𝓞 K →+* v.adicCompletionIntegers K ⧸
-      I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K)) :=
+  let f
+      : 𝓞 K
+        →+* v.adicCompletionIntegers K ⧸
+          I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K)) :=
     (Ideal.Quotient.mk _).comp (algebraMap (𝓞 K) (v.adicCompletionIntegers K))
   have hker : RingHom.ker f = v.asIdeal ^ n := by
     ext a
@@ -262,42 +267,61 @@ theorem _root_.GlobalTheory.LocalDifferentProduct.card_quot_map {I : Ideal (𝓞
 
 end Local
 
-
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum WithZero Polynomial in
-theorem _root_.GlobalTheory.LocalDifferentProduct.finprod_card_quot_map {K : Type} [Field K] [NumberField K] {I : Ideal (𝓞 K)} (hI : I ≠ 0) :
-    (Function.mulSupport fun v : HeightOneSpectrum (𝓞 K) => Nat.card (v.adicCompletionIntegers K ⧸
-      I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K)))).Finite ∧
-    ∏ᶠ v : HeightOneSpectrum (𝓞 K), Nat.card (v.adicCompletionIntegers K ⧸
-      I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K))) = Ideal.absNorm I := by
-  have hcard : ∀ v : HeightOneSpectrum (𝓞 K), Nat.card (v.adicCompletionIntegers K ⧸
-      I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K))) = Ideal.absNorm (v.maxPowDividing I) :=
-    fun v => _root_.GlobalTheory.LocalDifferentProduct.card_quot_map v hI
+theorem _root_.GlobalTheory.LocalDifferentProduct.finprod_card_quot_map
+    {K : Type} [Field K] [NumberField K] {I : Ideal (𝓞 K)} (hI : I ≠ 0)
+    : (Function.mulSupport fun v : HeightOneSpectrum (𝓞 K) =>
+        Nat.card
+          (v.adicCompletionIntegers K ⧸
+            I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K)))).Finite
+      ∧ ∏ᶠ v : HeightOneSpectrum (𝓞 K), Nat.card (v.adicCompletionIntegers K ⧸
+          I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K)))
+        = Ideal.absNorm I := by
+  have hcard
+      : ∀ v : HeightOneSpectrum (𝓞 K),
+        Nat.card
+            (v.adicCompletionIntegers K ⧸
+              I.map (algebraMap (𝓞 K) (v.adicCompletionIntegers K)))
+          = Ideal.absNorm (v.maxPowDividing I) := fun v =>
+    _root_.GlobalTheory.LocalDifferentProduct.card_quot_map v hI
   simp_rw [hcard]
   have hfin : (Function.mulSupport fun v : HeightOneSpectrum (𝓞 K) => v.maxPowDividing I).Finite :=
     Ideal.hasFiniteMulSupport hI
   refine ⟨hfin.subset (Function.mulSupport_comp_subset (map_one _) _), ?_⟩
   have h := MonoidHom.map_finprod (Ideal.absNorm : Ideal (𝓞 K) →*₀ ℕ).toMonoidHom hfin
-  simp only [MonoidWithZeroHom.toMonoidHom_coe, Ideal.finprod_heightOneSpectrum_factorization hI] at h
+  simp only [MonoidWithZeroHom.toMonoidHom_coe, Ideal.finprod_heightOneSpectrum_factorization hI]
+    at h
   exact h.symm
 
 section Relative
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 end Relative
 
-
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum WithZero Polynomial in
-theorem _root_.GlobalTheory.LocalDifferentProduct.prod_normDifferentV : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] [StarRing E] (σ : E →ₐ[F] E), _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ → (∀ x : E, star x = σ x) →
-    _root_.Formalism.HermitianLatticesTheory.IsCMUnram E → (Function.mulSupport (_root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.normDifferentV F)).Finite ∧
-      ((∏ᶠ v, _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.normDifferentV F v : ℕ) : ℝ) = _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.absDiscr F ∧
-      _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.absDiscr F = (2 * _root_.Formalism.HermitianLatticesTheory.vInv E) ^ _root_.Formalism.HermitianLatticesTheory.fDeg E := by
+theorem _root_.GlobalTheory.LocalDifferentProduct.prod_normDifferentV
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
+        (σ : E →ₐ[F] E),
+      _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ
+        → (∀ x : E, star x = σ x) → _root_.Formalism.HermitianLatticesTheory.IsCMUnram E
+        → (Function.mulSupport
+            (_root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.normDifferentV F)).Finite
+          ∧ ((∏ᶠ v, _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.normDifferentV F v
+                : ℕ)
+              : ℝ)
+            = _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.absDiscr F
+          ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.absDiscr F
+            = (2 * _root_.Formalism.HermitianLatticesTheory.vInv E)
+              ^ _root_.Formalism.HermitianLatticesTheory.fDeg E := by
   intro F E _ _ _ _ _ _ σ hcm hstar hun
   have hD : differentIdeal ℤ (𝓞 F) ≠ 0 := differentIdeal_ne_bot
   have h := _root_.GlobalTheory.LocalDifferentProduct.finprod_card_quot_map hD
-  have h2 : ∏ᶠ v, _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.normDifferentV F v = Ideal.absNorm (differentIdeal ℤ (𝓞 F)) := h.2
+  have h2
+      : ∏ᶠ v, _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.normDifferentV F v
+        = Ideal.absNorm (differentIdeal ℤ (𝓞 F)) :=
+    h.2
   refine ⟨h.1, ?_, ?_⟩
   · rw [h2, NumberField.absNorm_differentIdeal F (𝓞 F)]
     simp [_root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.absDiscr, Nat.cast_natAbs]
@@ -335,14 +359,14 @@ theorem _root_.GlobalTheory.LocalDifferentProduct.prod_normDifferentV : ∀ (F E
       have hmem := aeval_derivative_mem_differentIdeal (𝓞 F) F E θ htop
       have hfac : (minpoly F x).map (algebraMap F E) = (X - C x) * (X - C (σ x)) := by
         set q := (minpoly F x).map (algebraMap F E) with hqdef
-        have hq : q.IsRoot x := by
-          rw [IsRoot, hqdef, eval_map_algebraMap, minpoly.aeval]
+        have hq : q.IsRoot x := by rw [IsRoot, hqdef, eval_map_algebraMap, minpoly.aeval]
         have hqσ : q.IsRoot (σ x) := by
           rw [IsRoot, hqdef, eval_map_algebraMap, aeval_algHom_apply, minpoly.aeval, map_zero]
         set r := q /ₘ (X - C x) with hrdef
         have hqr : (X - C x) * r = q := mul_divByMonic_eq_iff_isRoot.mpr hq
         have hqmonic : q.Monic := (minpoly.monic hint).map _
-        have hrmonic : r.Monic := Polynomial.Monic.of_mul_monic_left (monic_X_sub_C x) (hqr ▸ hqmonic)
+        have hrmonic : r.Monic :=
+          Polynomial.Monic.of_mul_monic_left (monic_X_sub_C x) (hqr ▸ hqmonic)
         have hrdeg : r.natDegree = 1 := by
           rw [hrdef, natDegree_divByMonic _ (monic_X_sub_C x), natDegree_X_sub_C, hqdef,
             natDegree_map, hdeg]
@@ -354,7 +378,7 @@ theorem _root_.GlobalTheory.LocalDifferentProduct.prod_normDifferentV : ∀ (F E
             intro h'
             apply hxσ0
             rw [← neg_sub, h', neg_zero])
-        have hc0 : r.coeff 0 = -σ x := by
+        have hc0 : r.coeff 0 = - σ x := by
           rw [hr, eval_add, eval_X, eval_C] at hrσ
           linear_combination hrσ
         rw [← hqr, hr, hc0, C_neg, ← sub_eq_add_neg]
@@ -377,14 +401,16 @@ theorem _root_.GlobalTheory.LocalDifferentProduct.prod_normDifferentV : ∀ (F E
       have h' : ((discr E).natAbs : ℝ) = ((discr F).natAbs : ℝ) ^ 2 := by exact_mod_cast hnat
       rw [Nat.cast_natAbs, Nat.cast_natAbs, Int.cast_abs, Int.cast_abs] at h'
       exact h'
-    have hN : (0 : ℝ) < Fintype.card (InfinitePlace E) := by
-      exact_mod_cast Fintype.card_pos
-    unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.absDiscr _root_.Formalism.HermitianLatticesTheory.vInv _root_.Formalism.HermitianLatticesTheory.fDeg
-    rw [hE, mul_div_cancel₀ _ (two_ne_zero' ℝ), ← Real.rpow_natCast _ (Fintype.card (InfinitePlace E)),
-      ← Real.rpow_natCast |(discr F : ℝ)| 2, ← Real.rpow_mul (abs_nonneg _),
-      ← Real.rpow_mul (abs_nonneg _)]
-    have hexp : ((2 : ℕ) : ℝ) * (1 / (2 * (Fintype.card (InfinitePlace E) : ℝ))) *
-        (Fintype.card (InfinitePlace E) : ℝ) = 1 := by
+    have hN : (0 : ℝ) < Fintype.card (InfinitePlace E) := by exact_mod_cast Fintype.card_pos
+    unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex.absDiscr
+      _root_.Formalism.HermitianLatticesTheory.vInv _root_.Formalism.HermitianLatticesTheory.fDeg
+    rw [hE, mul_div_cancel₀ _ (two_ne_zero' ℝ),
+      ← Real.rpow_natCast _ (Fintype.card (InfinitePlace E)), ← Real.rpow_natCast |(discr F : ℝ)| 2,
+      ← Real.rpow_mul (abs_nonneg _), ← Real.rpow_mul (abs_nonneg _)]
+    have hexp
+        : ((2 : ℕ) : ℝ) * (1 / (2 * (Fintype.card (InfinitePlace E) : ℝ)))
+            * (Fintype.card (InfinitePlace E) : ℝ)
+          = 1 := by
       push_cast
       field_simp
     rw [hexp, Real.rpow_one]

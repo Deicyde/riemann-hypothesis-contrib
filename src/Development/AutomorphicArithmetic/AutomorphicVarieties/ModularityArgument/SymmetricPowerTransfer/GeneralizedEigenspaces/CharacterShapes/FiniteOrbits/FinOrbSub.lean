@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -29,9 +31,10 @@ private theorem dc_right {b w z : G} (hw : w ∈ U) (hz : z ∈ DC U b) : z * w 
   obtain ⟨u, hu, u', hu', rfl⟩ := hz
   exact ⟨u, hu, u' * w, U.mul_mem hu' hw, by simp only [mul_assoc]⟩
 
-private theorem dc_rep {x : S} (hx : ∀ u ∈ U, ∃ c ∈ U, c * (x : G) = x * c ∧ u * c⁻¹ ∈ S)
-    {y : G} (hy : y ∈ DC U (x : G)) :
-    ∃ t : S, t ∈ U.subgroupOf S ∧ ((t * x : S) : G)⁻¹ * y ∈ U := by
+private theorem dc_rep
+    {x : S} (hx : ∀ u ∈ U, ∃ c ∈ U, c * (x : G) = x * c ∧ u * c⁻¹ ∈ S)
+    {y : G} (hy : y ∈ DC U (x : G))
+    : ∃ t : S, t ∈ U.subgroupOf S ∧ ((t * x : S) : G)⁻¹ * y ∈ U := by
   obtain ⟨u, hu, u', hu', rfl⟩ := hy
   obtain ⟨c, hc, hcx, hcS⟩ := hx u hu
   refine ⟨⟨u * c⁻¹, hcS⟩, Subgroup.mem_subgroupOf.mpr (U.mul_mem hu (U.inv_mem hc)), ?_⟩
@@ -42,25 +45,28 @@ private theorem dc_rep {x : S} (hx : ∀ u ∈ U, ∃ c ∈ U, c * (x : G) = x *
   rw [e]
   exact U.mul_mem hc hu'
 
-private theorem dc_down {x g : S} (hx : ∀ u ∈ U, ∃ c ∈ U, c * (x : G) = x * c ∧ u * c⁻¹ ∈ S)
-    (hg : (g : G) ∈ DC U (x : G)) : g ∈ DC (U.subgroupOf S) x := by
+private theorem dc_down
+    {x g : S}
+    (hx : ∀ u ∈ U, ∃ c ∈ U, c * (x : G) = x * c ∧ u * c⁻¹ ∈ S) (hg : (g : G) ∈ DC U (x : G))
+    : g ∈ DC (U.subgroupOf S) x := by
   obtain ⟨t, ht, hw⟩ := dc_rep hx hg
   refine ⟨t, ht, (t * x)⁻¹ * g, Subgroup.mem_subgroupOf.2 (by simpa using hw), ?_⟩
   group
 
-private theorem mk_eq_of {r r' : S} (h : (r : G)⁻¹ * r' ∈ U) :
-    (r : S ⧸ U.subgroupOf S) = r' := by
+private theorem mk_eq_of {r r' : S} (h : (r : G)⁻¹ * r' ∈ U) : (r : S ⧸ U.subgroupOf S) = r' := by
   rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
   simpa using h
 
-private theorem finOrb_sub {a : S} (h : AlgebraTools.FinOrb U U (a : G)) :
-    AlgebraTools.FinOrb (U.subgroupOf S) (U.subgroupOf S) a := by
-  have inj : Function.Injective
-      (fun q : S ⧸ U.subgroupOf S => (((Quotient.out q : S) : G) : G ⧸ U)) := by
+private theorem finOrb_sub {a : S} (h : AlgebraTools.FinOrb U U (a : G))
+    : AlgebraTools.FinOrb (U.subgroupOf S) (U.subgroupOf S) a := by
+  have inj : Function.Injective (fun q : S ⧸ U.subgroupOf S =>
+      (((Quotient.out q : S) : G) : G ⧸ U)) := by
     intro q1 q2 e
     dsimp only at e
     have e' := QuotientGroup.eq.mp e
-    calc q1 = ((Quotient.out q1 : S) : S ⧸ U.subgroupOf S) := (QuotientGroup.out_eq' q1).symm
+    calc
+      q1
+        = ((Quotient.out q1 : S) : S ⧸ U.subgroupOf S) := (QuotientGroup.out_eq' q1).symm
       _ = ((Quotient.out q2 : S) : S ⧸ U.subgroupOf S) := mk_eq_of e'
       _ = q2 := QuotientGroup.out_eq' q2
   apply Set.Finite.of_finite_image _ inj.injOn
@@ -77,21 +83,24 @@ private theorem finOrb_sub {a : S} (h : AlgebraTools.FinOrb U U (a : G)) :
   simp only [Subgroup.coe_mul]
   group
 
-private theorem uf_sub {a b : S}
+private theorem uf_sub
+    {a b : S}
     (hab : ∀ u ∈ U, ∃ c ∈ U, c * (a : G) = a * c ∧ c * (b : G) = b * c ∧ u * c⁻¹ ∈ S ∧ c⁻¹ * u ∈ S)
-    (hUF : UF U (a : G) (b : G)) : UF (U.subgroupOf S) a b := by
+    (hUF : UF U (a : G) (b : G))
+    : UF (U.subgroupOf S) a b := by
   have ha : ∀ u ∈ U, ∃ c ∈ U, c * (a : G) = a * c ∧ u * c⁻¹ ∈ S := fun u hu => by
     obtain ⟨c, hc, h1, -, h3, -⟩ := hab u hu
     exact ⟨c, hc, h1, h3⟩
   have hb : ∀ u ∈ U, ∃ c ∈ U, c * (b : G) = b * c ∧ u * c⁻¹ ∈ S := fun u hu => by
     obtain ⟨c, hc, -, h2, h3, -⟩ := hab u hu
     exact ⟨c, hc, h2, h3⟩
-  have hab' : ∀ u ∈ U, ∃ c ∈ U, c * ((a * b : S) : G) = ((a * b : S) : G) * c ∧ u * c⁻¹ ∈ S :=
-    fun u hu => by
-      obtain ⟨c, hc, h1, h2, h3, -⟩ := hab u hu
-      refine ⟨c, hc, ?_, h3⟩
-      simp only [Subgroup.coe_mul]
-      rw [← mul_assoc, h1, mul_assoc, h2, mul_assoc]
+  have hab'
+      : ∀ u ∈ U, ∃ c ∈ U,
+        c * ((a * b : S) : G) = ((a * b : S) : G) * c ∧ u * c⁻¹ ∈ S := fun u hu => by
+    obtain ⟨c, hc, h1, h2, h3, -⟩ := hab u hu
+    refine ⟨c, hc, ?_, h3⟩
+    simp only [Subgroup.coe_mul]
+    rw [← mul_assoc, h1, mul_assoc, h2, mul_assoc]
   intro g
   refine ⟨fun hg => ?_, fun y hy hyg => ?_⟩
   · have hg' : (g : G) ∈ DC U ((a : G) * b) := by
@@ -101,8 +110,9 @@ private theorem uf_sub {a b : S}
     obtain ⟨t, ht, htY⟩ := dc_rep ha hY1
     have hrg : (t * a)⁻¹ * g ∈ DC (U.subgroupOf S) b := by
       apply dc_down hb
-      have e : (((t * a)⁻¹ * g : S) : G)
-          = (((t * a : S) : G)⁻¹ * Quotient.out Y) * ((Quotient.out Y)⁻¹ * g) := by
+      have e
+          : (((t * a)⁻¹ * g : S) : G)
+            = (((t * a : S) : G)⁻¹ * Quotient.out Y) * ((Quotient.out Y)⁻¹ * g) := by
         push_cast
         group
       rw [e]
@@ -127,23 +137,28 @@ private theorem uf_sub {a b : S}
     · rintro z ⟨hz1, hz2⟩
       have hz : (((Quotient.out z : S) : G) : G ⧸ U) = Y :=
         key _ (dc_up hz1) (by simpa using dc_up hz2)
-      calc z = ((Quotient.out z : S) : S ⧸ U.subgroupOf S) := (QuotientGroup.out_eq' z).symm
+      calc
+        z = ((Quotient.out z : S) : S ⧸ U.subgroupOf S) := (QuotientGroup.out_eq' z).symm
         _ = _ := mk_eq_of (QuotientGroup.eq.mp (hz.trans hrY.symm))
   · have h1 := (hUF g).2 y (dc_up hy) (by simpa using dc_up hyg)
     apply dc_down hab'
     rw [Subgroup.coe_mul]
     exact h1
 
-private theorem reps_sub {a : S} (ha : ∀ u ∈ U, ∃ c ∈ U, c * (a : G) = a * c ∧ u * c⁻¹ ∈ S)
-    (hfin : AlgebraTools.FinOrb (U.subgroupOf S) (U.subgroupOf S) a) :
-    ∃ R : Finset S, (∀ y ∈ R, y ∈ DC (U.subgroupOf S) a) ∧
-      (∀ y ∈ DC (U.subgroupOf S) a, ∃! r, r ∈ R ∧ r⁻¹ * y ∈ U.subgroupOf S) ∧
-      ∀ y ∈ DC U (a : G), ∃! r : S, r ∈ R ∧ (r : G)⁻¹ * y ∈ U := by
+private theorem reps_sub
+    {a : S} (ha : ∀ u ∈ U, ∃ c ∈ U, c * (a : G) = a * c ∧ u * c⁻¹ ∈ S)
+    (hfin : AlgebraTools.FinOrb (U.subgroupOf S) (U.subgroupOf S) a)
+    : ∃ R : Finset S,
+      (∀ y ∈ R, y ∈ DC (U.subgroupOf S) a)
+        ∧ (∀ y ∈ DC (U.subgroupOf S) a, ∃! r, r ∈ R ∧ r⁻¹ * y ∈ U.subgroupOf S)
+        ∧ ∀ y ∈ DC U (a : G), ∃! r : S, r ∈ R ∧ (r : G)⁻¹ * y ∈ U := by
   classical
-  have orb : ∀ k : S, k ∈ U.subgroupOf S →
-      ((k * a : S) : S ⧸ U.subgroupOf S) ∈
-        MulAction.orbit (U.subgroupOf S) (a : S ⧸ U.subgroupOf S) :=
-    fun k hk => ⟨⟨k, hk⟩, rfl⟩
+  have orb
+      : ∀ k : S,
+        k ∈ U.subgroupOf S
+          → ((k * a : S) : S ⧸ U.subgroupOf S)
+            ∈ MulAction.orbit (U.subgroupOf S) (a : S ⧸ U.subgroupOf S) := fun k hk =>
+    ⟨⟨k, hk⟩, rfl⟩
   refine ⟨hfin.toFinset.image (fun q => Quotient.out q), ?_, ?_, ?_⟩
   · intro y hy
     obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hy
@@ -165,11 +180,13 @@ private theorem reps_sub {a : S} (ha : ∀ u ∈ U, ∃ c ∈ U, c * (a : G) = a
     · rintro r ⟨hr, hry⟩
       obtain ⟨q, -, rfl⟩ := Finset.mem_image.mp hr
       have e : q = ((u * a : S) : S ⧸ U.subgroupOf S) :=
-        calc q = ((Quotient.out q : S) : S ⧸ U.subgroupOf S) := (QuotientGroup.out_eq' q).symm
+        calc
+          q = ((Quotient.out q : S) : S ⧸ U.subgroupOf S) := (QuotientGroup.out_eq' q).symm
           _ = ((u * a * u' : S) : S ⧸ U.subgroupOf S) := QuotientGroup.eq.mpr hry
-          _ = _ := QuotientGroup.eq.mpr (by
-            rw [show (u * a * u')⁻¹ * (u * a) = u'⁻¹ by group]
-            exact inv_mem hu')
+          _ = _ :=
+            QuotientGroup.eq.mpr (by
+              rw [show (u * a * u')⁻¹ * (u * a) = u'⁻¹ by group]
+              exact inv_mem hu')
       rw [e]
   · intro y hy
     obtain ⟨t, ht, hty⟩ := dc_rep ha hy
@@ -177,8 +194,7 @@ private theorem reps_sub {a : S} (ha : ∀ u ∈ U, ∃ c ∈ U, c * (a : G) = a
     refine ⟨Quotient.out ((t * a : S) : S ⧸ U.subgroupOf S), ⟨?_, ?_⟩, ?_⟩
     · exact Finset.mem_image.mpr ⟨_, hfin.mem_toFinset.mpr (orb t ht), rfl⟩
     · rw [hh]
-      have e : ((t * a * (h : S) : S) : G)⁻¹ * y
-          = ((h : S) : G)⁻¹ * (((t * a : S) : G)⁻¹ * y) := by
+      have e : ((t * a * (h : S) : S) : G)⁻¹ * y = ((h : S) : G)⁻¹ * (((t * a : S) : G)⁻¹ * y) := by
         push_cast
         group
       rw [e]
@@ -186,19 +202,20 @@ private theorem reps_sub {a : S} (ha : ∀ u ∈ U, ∃ c ∈ U, c * (a : G) = a
     · rintro r ⟨hr, hry⟩
       obtain ⟨q, -, rfl⟩ := Finset.mem_image.mp hr
       have e : q = ((t * a : S) : S ⧸ U.subgroupOf S) :=
-        calc q = ((Quotient.out q : S) : S ⧸ U.subgroupOf S) := (QuotientGroup.out_eq' q).symm
-          _ = _ := mk_eq_of (by
-            have m := U.mul_mem hry (U.inv_mem hty)
-            convert m using 1
-            group)
+        calc
+          q = ((Quotient.out q : S) : S ⧸ U.subgroupOf S) := (QuotientGroup.out_eq' q).symm
+          _ = _ :=
+            mk_eq_of (by
+              have m := U.mul_mem hry (U.inv_mem hty)
+              convert m using 1
+              group)
       rw [e]
 
 end SlopeTestRemainingChoices
 
 end UpperTheory.V.Z.Sym.So
 
-theorem UpperTheory.V.Z.Sym.So.dcSub :
-    UpperTheory.V.Z.Sym.So.DcSub := by
+theorem UpperTheory.V.Z.Sym.So.dcSub : UpperTheory.V.Z.Sym.So.DcSub := by
   intro G V _ _ _ S U a hfin ha _
   have ha' : ∀ u ∈ U, ∃ c ∈ U, c * (a : G) = a * c ∧ u * c⁻¹ ∈ S := fun u hu => by
     obtain ⟨c, hc, h1, h2, _⟩ := ha u hu

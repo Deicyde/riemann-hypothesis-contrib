@@ -6,8 +6,10 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.JacquetLanglands
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V
+  UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
 open scoped Matrix NNReal
 
 namespace UpperTheory.Esk
@@ -18,8 +20,8 @@ theorem aTrans : ATrans := by
   let b := mixedEmbedding.latticeBasis F
   refine ⟨(∑ i, ‖b i‖) + 1, by positivity, fun x => ?_⟩
   let p : mixedEmbedding.mixedSpace F := (fun w => x w.1, 0)
-  have hm : (ZSpan.floor b p : mixedEmbedding.mixedSpace F) ∈
-      Submodule.span ℤ (Set.range b) := (ZSpan.floor b p).2
+  have hm : (ZSpan.floor b p : mixedEmbedding.mixedSpace F) ∈ Submodule.span ℤ (Set.range b) :=
+    (ZSpan.floor b p).2
   rw [mixedEmbedding.mem_span_latticeBasis] at hm
   obtain ⟨s, hs⟩ := hm
   refine ⟨-(s : F), (RingOfIntegers.isIntegral_coe s).neg, fun v => ?_⟩

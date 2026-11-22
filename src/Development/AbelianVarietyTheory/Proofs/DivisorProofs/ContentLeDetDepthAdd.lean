@@ -19,7 +19,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OrdGeExpOfLo
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh GlobalTheory.FGDepth
+open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh
+  GlobalTheory.FGDepth
 
 namespace GlobalTheory.FGDepth.InertBound
 
@@ -27,18 +28,18 @@ noncomputable section
 
 variable {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)}
 
-theorem exists_chart_coords {d M : ℕ} (G : LogFGL v d) (Φ Ψ : Fin d → MvPowerSeries (Fin d) C)
-    (hΦ0 : ∀ a, constantCoeff (Φ a) = 0) (hΨ0 : ∀ a, constantCoeff (Ψ a) = 0)
-    (hΨΦ : ∀ a, subst Ψ (Φ a) = X a) (L : Fin d → MvPowerSeries (Fin M) C)
-    (hL : ∀ k, constantCoeff (L k) = 0) :
-    ∃ t : Fin d → MvPowerSeries (Fin M) C, (∀ a, constantCoeff (t a) = 0) ∧
-      ∀ e, subst t (subst Φ (G.lg e)) = L e := by
+theorem exists_chart_coords
+    {d M : ℕ}
+    (G : LogFGL v d) (Φ Ψ : Fin d → MvPowerSeries (Fin d) C) (hΦ0 : ∀ a, constantCoeff (Φ a) = 0)
+    (hΨ0 : ∀ a, constantCoeff (Ψ a) = 0) (hΨΦ : ∀ a, subst Ψ (Φ a) = X a)
+    (L : Fin d → MvPowerSeries (Fin M) C) (hL : ∀ k, constantCoeff (L k) = 0)
+    : ∃ t : Fin d → MvPowerSeries (Fin M) C,
+      (∀ a, constantCoeff (t a) = 0) ∧ ∀ e, subst t (subst Φ (G.lg e)) = L e := by
   have hex := isExp_expOf G
   have hL' : HasSubst L := hasSubst_of_constantCoeff_zero hL
   have hexs : HasSubst (expOf G) := hasSubst_of_constantCoeff_zero hex.1
   set E : Fin d → MvPowerSeries (Fin M) C := fun k => subst L (expOf G k) with hE
-  have hE0 : ∀ k, constantCoeff (E k) = 0 := fun k =>
-    constantCoeff_subst_eq_zero hL' hL (hex.1 k)
+  have hE0 : ∀ k, constantCoeff (E k) = 0 := fun k => constantCoeff_subst_eq_zero hL' hL (hex.1 k)
   have hEs : HasSubst E := hasSubst_of_constantCoeff_zero hE0
   refine ⟨fun a => subst E (Ψ a), fun a => constantCoeff_subst_eq_zero hEs hE0 (hΨ0 a), ?_⟩
   intro e
@@ -47,14 +48,16 @@ theorem exists_chart_coords {d M : ℕ} (G : LogFGL v d) (Φ Ψ : Fin d → MvPo
   have h1 : ∀ k, subst (fun a => subst E (Ψ a)) (Φ k) = E k := by
     intro k
     rw [← subst_comp_subst_apply hΨs hEs, hΨΦ, subst_X hEs]
-  rw [subst_comp_subst_apply hΦs (hasSubst_of_constantCoeff_zero
-    (fun a => constantCoeff_subst_eq_zero hEs hE0 (hΨ0 a)))]
+  rw [subst_comp_subst_apply hΦs
+    (hasSubst_of_constantCoeff_zero (fun a => constantCoeff_subst_eq_zero hEs hE0 (hΨ0 a)))]
   simp only [h1]
   rw [hE, ← subst_comp_subst_apply hexs hL', hex.2 e, subst_X hL']
 
-theorem lgSum_mulMatrix {d M : ℕ} (p : ℕ) (c : Fin d → ℕ → Fin d → C)
-    (t : Fin d → MvPowerSeries (Fin M) C) (N : Matrix (Fin d) (Fin d) C) (b : Fin d) :
-    lgSum p (fun a n b => ∑ e, c a n e * N e b) t b = ∑ e, N e b • lgSum p c t e := by
+theorem lgSum_mulMatrix
+    {d M : ℕ}
+    (p : ℕ) (c : Fin d → ℕ → Fin d → C) (t : Fin d → MvPowerSeries (Fin M) C)
+    (N : Matrix (Fin d) (Fin d) C) (b : Fin d)
+    : lgSum p (fun a n b => ∑ e, c a n e * N e b) t b = ∑ e, N e b • lgSum p c t e := by
   ext α
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [lgSum, map_sum, coeff_smul, smul_eq_mul]
@@ -76,11 +79,14 @@ noncomputable section
 
 variable {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)}
 
-theorem coeff_subst_typical {M p : ℕ} (hp : 2 ≤ p) (f : PowerSeries C)
-    (hf : ∀ m, (∀ n, m ≠ p ^ n) → PowerSeries.coeff m f = 0)
-    (s : MvPowerSeries (Fin M) C) (hs : constantCoeff s = 0) (α : Fin M →₀ ℕ) :
-    coeff α (PowerSeries.subst s f) = ∑ n ∈ Finset.range (Finsupp.degree α + 1),
-      PowerSeries.coeff (p ^ n) f * coeff α (s ^ (p ^ n)) := by
+theorem coeff_subst_typical
+    {M p : ℕ} (hp : 2 ≤ p)
+    (f : PowerSeries C) (hf : ∀ m, (∀ n, m ≠ p ^ n) → PowerSeries.coeff m f = 0)
+    (s : MvPowerSeries (Fin M) C) (hs : constantCoeff s = 0)
+    (α : Fin M →₀ ℕ)
+    : coeff α (PowerSeries.subst s f)
+      = ∑ n ∈ Finset.range (Finsupp.degree α + 1),
+        PowerSeries.coeff (p ^ n) f * coeff α (s ^ (p ^ n)) := by
   classical
   rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero hs),
     finsum_eq_sum_of_support_subset
@@ -98,14 +104,19 @@ theorem coeff_subst_typical {M p : ℕ} (hp : 2 ≤ p) (f : PowerSeries C)
     have hn : n < p ^ n := Nat.lt_pow_self hp
     exact Finset.mem_coe.2 (Finset.mem_image.2 ⟨n, Finset.mem_range.2 (by omega), rfl⟩)
 
-theorem subst_sum_lgCurve {d M : ℕ} (G : LogFGL v d) {p : ℕ} (hp : 2 ≤ p)
+theorem subst_sum_lgCurve
+    {d M : ℕ} (G : LogFGL v d)
+    {p : ℕ} (hp : 2 ≤ p)
     (γ : Fin d → Fin d → PowerSeries C) (hγ : ∀ a, G.IsPTypical p (γ a))
-    (t : Fin d → MvPowerSeries (Fin M) C) (ht : ∀ a, constantCoeff (t a) = 0) (b : Fin d) :
-    subst t (∑ a, PowerSeries.subst (X a : MvPowerSeries (Fin d) C) (G.lgCurve (γ a) b)) =
-      lgSum p (fun a n e => G.lc p (γ a) n e) t b := by
+    (t : Fin d → MvPowerSeries (Fin M) C) (ht : ∀ a, constantCoeff (t a) = 0)
+    (b : Fin d)
+    : subst t (∑ a, PowerSeries.subst (X a : MvPowerSeries (Fin d) C) (G.lgCurve (γ a) b))
+      = lgSum p (fun a n e => G.lc p (γ a) n e) t b := by
   have hts : HasSubst t := hasSubst_of_constantCoeff_zero ht
-  have h1 : ∀ a (f : PowerSeries C),
-      subst t (PowerSeries.subst (X a : MvPowerSeries (Fin d) C) f) = PowerSeries.subst (t a) f := by
+  have h1
+      : ∀ a (f : PowerSeries C),
+        subst t (PowerSeries.subst (X a : MvPowerSeries (Fin d) C) f)
+          = PowerSeries.subst (t a) f := by
     intro a f
     rw [PowerSeries.subst_def, PowerSeries.subst_def, subst_comp_subst_apply (ptOn_hs a) hts]
     simp only [subst_X hts]
@@ -120,10 +131,14 @@ theorem subst_sum_lgCurve {d M : ℕ} (G : LogFGL v d) {p : ℕ} (hp : 2 ≤ p)
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun a _ => coeff_subst_typical hp _ (hγ a b) (t a) (ht a) α
 
-theorem sum_radii_le {i d j : ℕ} (p : ℕ) (hp : 2 ≤ p) (r : Fin i → Fin d) (good : Fin d → Prop)
-    [DecidablePred good] (hgood : ∀ a : Fin i, j ≤ a.val → good (r a)) :
-    (∑ a, (if good (r a) then 2 / ((p : ℝ) * (p - 1)) else 2 / ((p : ℝ) - 1))) ≤
-      i * (2 / ((p : ℝ) * (p - 1))) + j * (2 / ((p : ℝ) - 1)) := by
+theorem sum_radii_le
+    {i d j : ℕ}
+    (p : ℕ) (hp : 2 ≤ p)
+    (r : Fin i → Fin d)
+    (good : Fin d → Prop) [DecidablePred good]
+    (hgood : ∀ a : Fin i, j ≤ a.val → good (r a))
+    : (∑ a, (if good (r a) then 2 / ((p : ℝ) * (p - 1)) else 2 / ((p : ℝ) - 1)))
+      ≤ i * (2 / ((p : ℝ) * (p - 1))) + j * (2 / ((p : ℝ) - 1)) := by
   have hp1 : (2 : ℝ) ≤ p := by exact_mod_cast hp
   have hA : 0 ≤ 2 / ((p : ℝ) * (p - 1)) :=
     div_nonneg zero_le_two (mul_nonneg (by linarith) (by linarith))
@@ -131,24 +146,28 @@ theorem sum_radii_le {i d j : ℕ} (p : ℕ) (hp : 2 ≤ p) (r : Fin i → Fin d
   generalize 2 / ((p : ℝ) * (p - 1)) = A at hA ⊢
   generalize 2 / ((p : ℝ) - 1) = B at hB ⊢
   have hcard : (Finset.univ.filter fun a : Fin i => a.val < j).card ≤ j := by
-    calc _ = ((Finset.univ.filter fun a : Fin i => a.val < j).map Fin.valEmbedding).card :=
-          (Finset.card_map _).symm
-      _ ≤ (Finset.range j).card := Finset.card_le_card fun x hx => by
+    calc
+      _ = ((Finset.univ.filter fun a : Fin i => a.val < j).map Fin.valEmbedding).card :=
+        (Finset.card_map _).symm
+      _ ≤ (Finset.range j).card :=
+        Finset.card_le_card fun x hx => by
           obtain ⟨a, ha, rfl⟩ := Finset.mem_map.1 hx
           exact Finset.mem_range.2 (Finset.mem_filter.1 ha).2
       _ = j := Finset.card_range j
-  calc _ ≤ ∑ a : Fin i, (A + if a.val < j then B else 0) := Finset.sum_le_sum fun a _ => by
+  calc
+    _ ≤ ∑ a : Fin i, (A + if a.val < j then B else 0) :=
+      Finset.sum_le_sum fun a _ => by
         by_cases hj : a.val < j
         · rw [if_pos hj]
           split_ifs <;> linarith
         · rw [if_neg hj, if_pos (hgood a (not_lt.1 hj)), add_zero]
     _ = i * A + (Finset.univ.filter fun a : Fin i => a.val < j).card * B := by
-        rw [Finset.sum_add_distrib, ← Finset.sum_filter]
-        simp
+      rw [Finset.sum_add_distrib, ← Finset.sum_filter]
+      simp
     _ ≤ _ := by
-        have : ((Finset.univ.filter fun a : Fin i => a.val < j).card : ℝ) ≤ j := by
-          exact_mod_cast hcard
-        nlinarith [mul_le_mul_of_nonneg_right this hB]
+      have : ((Finset.univ.filter fun a : Fin i => a.val < j).card : ℝ) ≤ j := by
+        exact_mod_cast hcard
+      nlinarith [mul_le_mul_of_nonneg_right this hB]
 
 end
 
@@ -156,23 +175,31 @@ end GlobalTheory.FGDepth.InertBound
 
 namespace GlobalTheory.FGDepth.InertBound
 
-
 open GlobalTheory.ChainCoord in
-theorem content_le_detDepth_add :
-    ∀ (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (p : ℕ),
-      p.Prime → v (p : C) = 1 → ∀ (d h : ℕ), 0 < h → ∀ (ty : Fin d → ZMod h) (G : LogFGL v d),
-        MuAction G p h ty → ∀ (τ : ZMod h) (j i c : ℕ),
-          (Finset.univ.filter fun a => ty a = τ + 1).card ≤ j →
-          ∀ u : Fin i → Fin d → C, IsSatFrame v u → (∀ a e, ty e ≠ τ → u a e = 0) →
-            content v (detPow C i c) ≤ detDepth G u c +
-              ((2 * i * c / ((p : ℝ) * (p - 1)) + 2 * j * c / ((p : ℝ) - 1) : ℝ) : EReal) := by
+theorem content_le_detDepth_add
+    : ∀ (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (p : ℕ),
+      p.Prime → v (p : C) = 1
+        → ∀ (d h : ℕ),
+          0 < h
+            → ∀ (ty : Fin d → ZMod h) (G : LogFGL v d),
+              MuAction G p h ty
+                → ∀ (τ : ZMod h) (j i c : ℕ),
+                  (Finset.univ.filter fun a => ty a = τ + 1).card ≤ j
+                    → ∀ u : Fin i → Fin d → C,
+                      IsSatFrame v u → (∀ a e, ty e ≠ τ → u a e = 0)
+                        → content v (detPow C i c)
+                          ≤ detDepth G u c
+                            + ((2 * i * c / ((p : ℝ) * (p - 1)) + 2 * j * c / ((p : ℝ) - 1) : ℝ)
+                              : EReal) := by
   intro C _ _ _ v p hp hv d h hh ty G μ τ j i c hcard u hu hsupp
   classical
   obtain ⟨γ, r, g, hB, -, hgdet, htan, hgood⟩ :=
-    GlobalTheory.T.exists_typicalCurve_basis_adapted_to_saturated_frame C v p hp hv d h hh ty G μ τ j i hcard u hu hsupp
+    GlobalTheory.T.exists_typicalCurve_basis_adapted_to_saturated_frame C v p hp hv d h hh ty G μ τ
+      j i hcard u hu hsupp
   obtain ⟨hγ, hγty, hdet⟩ := hB
   have e1 : detDepth G u c = detDepth G (fun a => tangent (γ (r a))) c := by
-    rw [← GlobalTheory.T.formalGroupDeterminantPowDepth_basis_change_invariant C v i d c G u g hgdet]
+    rw [← GlobalTheory.T.formalGroupDeterminantPowDepth_basis_change_invariant C v i d c G u g
+      hgdet]
     congr 1
     funext a
     exact (htan a).symm
@@ -187,8 +214,7 @@ theorem content_le_detDepth_add :
   have hp2 : 2 ≤ p := hp.two_le
   have hlg : ∀ b, lgSum p (fun a n e => G.lc p (γ a) n e) t b = L b := by
     intro b
-    rw [← htL b, ptBasisMap_lg G hγ b,
-      subst_sum_lgCurve G hp2 γ (fun a => (hγty a).1) t ht0 b]
+    rw [← htL b, ptBasisMap_lg G hγ b, subst_sum_lgCurve G hp2 γ (fun a => (hγty a).1) t ht0 b]
   set c' : Fin d → ℕ → Fin d → C := fun a n b => ∑ e, G.lc p (γ a) n e * T⁻¹ e b with hc'
   set z' : Fin d → MvPowerSeries (Fin i) C := fun b => ∑ e, T⁻¹ e b • L e with hz'
   have hlg' : ∀ b, lgSum p c' t b = z' b := by
@@ -212,7 +238,9 @@ theorem content_le_detDepth_add :
     funext b
     have hte : ∀ e, G.lc p (γ a) 0 e = T a e := fun e => by
       simp only [hT, Matrix.of_apply]
-      exact (congrFun (ReciprocityTheory.ChartRestriction.G.Sh.PTb.tangent_eq_lc_zero G p (fun e => (hγ a e).1)) e).symm
+      exact (congrFun
+        (ReciprocityTheory.ChartRestriction.G.Sh.PTb.tangent_eq_lc_zero G p (fun e => (hγ a e).1))
+        e).symm
     simp only [hc', hte]
     rw [← Matrix.mul_apply, hTT, Matrix.one_apply, Pi.single_apply]
     by_cases hab : b = a
@@ -224,14 +252,15 @@ theorem content_le_detDepth_add :
     rw [v.map_mul]
     exact le_add_of_le_of_nonneg ((pt5v' C v p hp hv d h ty G γ ⟨hγ, hγty, hdet⟩ a).1 n e)
       (hTinv e b)
-  have hcg : ∀ a, good a → ∀ (n : ℕ) b, 1 ≤ n →
-      ((1 - (n : ℝ) : ℝ) : WithTop ℝ) ≤ v (c' a n b) := by
+  have hcg : ∀ a, good a → ∀ (n : ℕ) b, 1 ≤ n → ((1 - (n : ℝ) : ℝ) : WithTop ℝ) ≤ v (c' a n b) := by
     intro a ha n b hn
     refine v.map_le_sum fun e _ => ?_
     rw [v.map_mul]
-    exact le_add_of_le_of_nonneg
-      ((pt5v' C v p hp hv d h ty G γ ⟨hγ, hγty, hdet⟩ a).2 ha n e hn) (hTinv e b)
-  have hzeq : ∀ b, z' b = ∑ a, ((1 : Matrix (Fin d) (Fin d) C) (r a) b) • (X a : MvPowerSeries (Fin i) C) := by
+    exact le_add_of_le_of_nonneg ((pt5v' C v p hp hv d h ty G γ ⟨hγ, hγty, hdet⟩ a).2 ha n e hn)
+      (hTinv e b)
+  have hzeq
+      : ∀ b,
+        z' b = ∑ a, ((1 : Matrix (Fin d) (Fin d) C) (r a) b) • (X a : MvPowerSeries (Fin i) C) := by
     intro b
     rw [← hTT]
     simp only [hz', hLdef, Finset.smul_sum, smul_smul, Matrix.mul_apply, Finset.sum_smul]
@@ -258,44 +287,58 @@ theorem content_le_detDepth_add :
       · simp
     · rw [zero_smul]
       exact ord_zero _
-  have hD := GlobalTheory.T.ordGe_exp_of_logSum_two_radii C v p hp hv d i good c' hc0 hcn hcg ρ z' t hz ht0 hlg'
+  have hD :=
+    GlobalTheory.T.ordGe_exp_of_logSum_two_radii C v p hp hv d i good c' hc0 hcn hcg ρ z' t hz ht0
+      hlg'
   have htord : ∀ b, OrdGe v ρ (t b) 0 := fun b => ord_mono (hD b) (hrad0 b)
-  have e2 := GlobalTheory.T.differentialOperatorDepth_integral_coordinates C v i d c G (fun a => tangent (γ (r a))) (basisMap G γ) Ψ
-    (fun a => by
-      rw [basisMap_eq_ptBasisMap]
-      exact ⟨(hΦg a).2, (hΦg a).1, hΨi a, hΨ0 a⟩)
-    (fun a => by rw [basisMap_eq_ptBasisMap]; exact ⟨hΨΦ a, hΦΨ a⟩) t ht0
-    (fun e => by rw [basisMap_eq_ptBasisMap]; exact htL e)
+  have e2 :=
+    GlobalTheory.T.differentialOperatorDepth_integral_coordinates C v i d c G
+      (fun a => tangent (γ (r a)))
+      (basisMap G γ) Ψ
+      (fun a => by
+        rw [basisMap_eq_ptBasisMap]
+        exact ⟨(hΦg a).2, (hΦg a).1, hΨi a, hΨ0 a⟩)
+      (fun a => by rw [basisMap_eq_ptBasisMap]; exact ⟨hΨΦ a, hΦΨ a⟩)
+      t ht0
+      (fun e => by rw [basisMap_eq_ptBasisMap]; exact htL e)
   rw [e1]
   have hS : (c : ℝ) * ∑ a, ρ a ≤ 2 * i * c / ((p : ℝ) * (p - 1)) + 2 * j * c / ((p : ℝ) - 1) := by
     have := sum_radii_le (d := d) p hp2 r good hgood
     have hc : (0 : ℝ) ≤ c := Nat.cast_nonneg c
-    calc (c : ℝ) * ∑ a, ρ a ≤ c * (i * (2 / ((p : ℝ) * (p - 1))) + j * (2 / ((p : ℝ) - 1))) :=
-          mul_le_mul_of_nonneg_left this hc
+    calc
+      (c : ℝ) * ∑ a, ρ a ≤ c * (i * (2 / ((p : ℝ) * (p - 1))) + j * (2 / ((p : ℝ) - 1))) :=
+        mul_le_mul_of_nonneg_left this hc
       _ = _ := by ring
-  have hlowAll : ∀ B : ℝ, (∀ α ∈ (detPow C i c).support, ((B + (c : ℝ) * ∑ a, ρ a : ℝ) : WithTop ℝ) ≤
-      v ((detPow C i c).coeff α * mfact α)) →
-      (B : EReal) ≤ detDepth G (fun a => tangent (γ (r a))) c := by
+  have hlowAll
+      : ∀ B : ℝ,
+        (∀ α ∈ (detPow C i c).support,
+            ((B + (c : ℝ) * ∑ a, ρ a : ℝ) : WithTop ℝ) ≤ v ((detPow C i c).coeff α * mfact α))
+          → (B : EReal) ≤ detDepth G (fun a => tangent (γ (r a))) c := by
     intro B hB
     rw [e2]
     refine le_iInf fun f => ?_
-    have := GlobalTheory.T.le_formalGroupDeterminantPowDepth_of_radii C v i d c ρ t B ht0 htord hB f.1 f.2
+    have :=
+      GlobalTheory.T.le_formalGroupDeterminantPowDepth_of_radii C v i d c ρ t B ht0 htord hB f.1 f.2
     exact WithBot.coe_le_coe.2 this
   by_cases hfin : ∃ α ∈ (detPow C i c).support, v ((detPow C i c).coeff α * mfact α) ≠ ⊤
   · obtain ⟨α1, hα1, hne⟩ := hfin
-    obtain ⟨α0, hα0, hmin⟩ := (detPow C i c).support.exists_min_image
-      (fun α => v ((detPow C i c).coeff α * mfact α)) ⟨α1, hα1⟩
+    obtain ⟨α0, hα0, hmin⟩ :=
+      (detPow C i c).support.exists_min_image
+        (fun α => v ((detPow C i c).coeff α * mfact α))
+        ⟨α1, hα1⟩
     have hne0 : v ((detPow C i c).coeff α0 * mfact α0) ≠ ⊤ := ne_top_of_le_ne_top hne (hmin α1 hα1)
     obtain ⟨κ, hκ⟩ := WithTop.ne_top_iff_exists.1 hne0
-    have hlow := hlowAll (κ - (c : ℝ) * ∑ a, ρ a) (fun α hα => by
-      rw [sub_add_cancel, hκ]; exact hmin α hα)
+    have hlow :=
+      hlowAll (κ - (c : ℝ) * ∑ a, ρ a) (fun α hα => by rw [sub_add_cancel, hκ]; exact hmin α hα)
     have hcont : content v (detPow C i c) ≤ (κ : EReal) := by
       unfold content
       refine (iInf₂_le α0 hα0).trans (le_of_eq ?_)
       rw [← hκ]
       rfl
     refine hcont.trans ?_
-    have e3 : (κ : EReal) = ((κ - (c : ℝ) * ∑ a, ρ a : ℝ) : EReal) + (((c : ℝ) * ∑ a, ρ a : ℝ) : EReal) := by
+    have e3
+        : (κ : EReal)
+          = ((κ - (c : ℝ) * ∑ a, ρ a : ℝ) : EReal) + (((c : ℝ) * ∑ a, ρ a : ℝ) : EReal) := by
       rw [← EReal.coe_add]; congr 1; ring
     rw [e3]
     exact add_le_add hlow (EReal.coe_le_coe_iff.2 hS)

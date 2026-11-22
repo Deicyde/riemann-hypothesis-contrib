@@ -8,17 +8,20 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.LanglandsE
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.LocLanglands
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.LocLanglands
 
-theorem UpperTheory.Zero.LLC.goodSeg :
-    UpperTheory.Zero.LLC.GoodSeg := by
+theorem UpperTheory.Zero.LLC.goodSeg : UpperTheory.Zero.LLC.GoodSeg := by
   intro k _ _ _ _ _
-  have huniq : ∀ (x : IrrGL (k := k)) (s s' : Multiset (IrrGL (k := k))),
-      HasSupport x.rep s → HasSupport x.rep s' → s = s' :=
-    fun x s s' hs hs' =>
-      GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_unique PositivityTheory.Exh.geometricLemmaGL UpperTheory.Zero.LLC.Pr.bz hs hs'
-  have hgood : ∀ (x : IrrGL (k := k)) (s : Multiset (IrrGL (k := k))), HasSupport x.rep s →
-      (UpperTheory.Zero.LLC.Good x ↔ ∀ y ∈ s, UpperTheory.Zero.LLC.GoodCusp y) := by
+  have huniq
+      : ∀ (x : IrrGL (k := k)) (s s' : Multiset (IrrGL (k := k))),
+        HasSupport x.rep s → HasSupport x.rep s' → s = s' := fun x s s' hs hs' =>
+    GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_unique
+      PositivityTheory.Exh.geometricLemmaGL UpperTheory.Zero.LLC.Pr.bz hs hs'
+  have hgood
+      : ∀ (x : IrrGL (k := k)) (s : Multiset (IrrGL (k := k))),
+        HasSupport x.rep s
+          → (UpperTheory.Zero.LLC.Good x ↔ ∀ y ∈ s, UpperTheory.Zero.LLC.GoodCusp y) := by
     intro x s hs
     unfold UpperTheory.Zero.LLC.Good
     constructor
@@ -27,8 +30,9 @@ theorem UpperTheory.Zero.LLC.goodSeg :
       exact hy
     · intro hy
       exact ⟨s, hs, hy⟩
-  have htw : ∀ (y : IrrGL (k := k)) (a : ℂ),
-      UpperTheory.Zero.LLC.GoodCusp (y.nu a) ↔ UpperTheory.Zero.LLC.GoodCusp y := by
+  have htw
+      : ∀ (y : IrrGL (k := k)) (a : ℂ),
+        UpperTheory.Zero.LLC.GoodCusp (y.nu a) ↔ UpperTheory.Zero.LLC.GoodCusp y := by
     intro y a
     unfold IrrGL.nu
     exact ((UpperTheory.Zero.LLC.clBasic k y).2.1 _ _).2.2.1

@@ -10,20 +10,22 @@ open scoped ContDiff
 
 namespace GlobalTheory.LocRep
 
-
 open MeasureTheory Filter Topology in
 open scoped ContDiff in
-theorem _root_.GlobalTheory.LocRep.exists_eval_closure (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
-    (μ : Measure G) [μ.IsHaarMeasure] (K : Type) [NormedAddCommGroup K] [InnerProductSpace ℂ K]
-    [CompleteSpace K] (ι : K → G → ℂ)
-    (hloc : ∀ C, IsCompact C → ∃ M : ℝ, ∀ v, IntegrableOn (ι v) C μ ∧ ∫ x in C, ‖ι v x‖ ∂μ ≤ M * ‖v‖)
+theorem _root_.GlobalTheory.LocRep.exists_eval_closure
+    (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsHaarMeasure]
+    (K : Type) [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K]
+    (ι : K → G → ℂ)
+    (hloc
+      : ∀ C, IsCompact C → ∃ M : ℝ, ∀ v, IntegrableOn (ι v) C μ ∧ ∫ x in C, ‖ι v x‖ ∂μ ≤ M * ‖v‖)
     (hlin : ∀ (a : ℂ) v w, ι (a • v + w) =ᵐ[μ] fun x => a * ι v x + ι w x)
-    (A : K →L[ℂ] K) (E : Submodule ℂ K)
-    (hE : ∀ v ∈ E, ∃ φ : G → ℂ, Continuous φ ∧ ι (A v) =ᵐ[μ] φ)
-    (hB : ∀ B, IsCompact B → ∃ C : ℝ, ∀ v ∈ E, ∀ φ : G → ℂ, Continuous φ → ι (A v) =ᵐ[μ] φ →
-      ∀ x ∈ B, ‖φ x‖ ≤ C * ‖v‖) :
-    ∃ Λ : G → (K →L[ℂ] ℂ), ∀ v ∈ closure (E : Set K),
+    (A : K →L[ℂ] K) (E : Submodule ℂ K) (hE : ∀ v ∈ E, ∃ φ : G → ℂ, Continuous φ ∧ ι (A v) =ᵐ[μ] φ)
+    (hB : ∀ B,
+      IsCompact B
+        → ∃ C : ℝ, ∀ v ∈ E, ∀ φ : G → ℂ, Continuous φ → ι (A v) =ᵐ[μ] φ → ∀ x ∈ B, ‖φ x‖ ≤ C * ‖v‖)
+    : ∃ Λ : G → (K →L[ℂ] ℂ), ∀ v ∈ closure (E : Set K),
       (Continuous fun x => Λ x v) ∧ ι (A v) =ᵐ[μ] fun x => Λ x v := by
   have hE' : ∀ w : E, ∃ φ : G → ℂ, Continuous φ ∧ ι (A w) =ᵐ[μ] φ := fun w => hE w w.2
   choose ψ hψc hψae using hE'
@@ -40,14 +42,18 @@ theorem _root_.GlobalTheory.LocRep.exists_eval_closure (G : Type) [Group G] [Top
       show ψ (a • w) x = a * ψ w x
       rw [← h0, ← h2, ← h1]
       simp)
-  let L : G → E →L[ℂ] ℂ := fun x => LinearMap.mkContinuousOfExistsBound
-    { toFun := fun w => ψ w x
-      map_add' := fun w w' => congrFun (hadd w w') x
-      map_smul' := fun a w => by simpa using congrFun (hsmul a w) x } (by
-      obtain ⟨c, hc⟩ := hB {x} isCompact_singleton
-      exact ⟨c, fun w => hc w w.2 _ (hψc w) (hψae w) x rfl⟩)
-  have hext : ∀ x, ∃ g : K →L[ℂ] ℂ, (∀ w : E, g w = L x w) ∧ ‖g‖ = ‖L x‖ :=
-    fun x => exists_extension_norm_eq E (L x)
+  let L : G → E →L[ℂ] ℂ := fun x =>
+    LinearMap.mkContinuousOfExistsBound
+      {
+        toFun := fun w => ψ w x
+        map_add' := fun w w' => congrFun (hadd w w') x
+        map_smul' := fun a w => by simpa using congrFun (hsmul a w) x
+      }
+      (by
+        obtain ⟨c, hc⟩ := hB {x} isCompact_singleton
+        exact ⟨c, fun w => hc w w.2 _ (hψc w) (hψae w) x rfl⟩)
+  have hext : ∀ x, ∃ g : K →L[ℂ] ℂ, (∀ w : E, g w = L x w) ∧ ‖g‖ = ‖L x‖ := fun x =>
+    exists_extension_norm_eq E (L x)
   choose Λ hΛext hΛnorm using hext
   have hbound : ∀ B, IsCompact B → ∃ c : ℝ, 0 ≤ c ∧ ∀ x ∈ B, ‖Λ x‖ ≤ c := by
     intro B hBc
@@ -63,8 +69,8 @@ theorem _root_.GlobalTheory.LocRep.exists_eval_closure (G : Type) [Group G] [Top
     have h : (fun x => Λ x (u n)) = ψ ⟨u n, hun n⟩ := funext fun x => hΛext x ⟨u n, hun n⟩
     rw [h]
     exact hψc _
-  have hunif : ∀ B, IsCompact B →
-      TendstoUniformlyOn (fun n x => Λ x (u n)) (fun x => Λ x v) atTop B := by
+  have hunif
+      : ∀ B, IsCompact B → TendstoUniformlyOn (fun n x => Λ x (u n)) (fun x => Λ x v) atTop B := by
     intro B hBc
     obtain ⟨c, hc0, hc⟩ := hbound B hBc
     rw [Metric.tendstoUniformlyOn_iff]
@@ -72,14 +78,16 @@ theorem _root_.GlobalTheory.LocRep.exists_eval_closure (G : Type) [Group G] [Top
     have hu' := (Metric.tendsto_nhds.1 hu) (ε / (c + 1)) (by positivity)
     filter_upwards [hu'] with n hn x hx
     rw [dist_eq_norm, ← map_sub]
-    calc ‖Λ x (v - u n)‖ ≤ ‖Λ x‖ * ‖v - u n‖ := (Λ x).le_opNorm _
+    calc
+      ‖Λ x (v - u n)‖
+        ≤ ‖Λ x‖ * ‖v - u n‖ := (Λ x).le_opNorm _
       _ ≤ c * (ε / (c + 1)) := by
-          refine mul_le_mul (hc x hx) ?_ (norm_nonneg _) hc0
-          rw [← dist_eq_norm, dist_comm]
-          exact hn.le
+        refine mul_le_mul (hc x hx) ?_ (norm_nonneg _) hc0
+        rw [← dist_eq_norm, dist_comm]
+        exact hn.le
       _ < ε := by
-          rw [mul_div_assoc', div_lt_iff₀ (by positivity)]
-          nlinarith
+        rw [mul_div_assoc', div_lt_iff₀ (by positivity)]
+        nlinarith
   have hcontv : Continuous fun x => Λ x v :=
     (tendstoLocallyUniformly_iff_forall_isCompact.2 hunif).continuous
       (Eventually.of_forall hcont).frequently
@@ -97,15 +105,17 @@ theorem _root_.GlobalTheory.LocRep.exists_eval_closure (G : Type) [Group G] [Top
       exact (hΛext x ⟨u n, hun n⟩).symm
     have h3 : Tendsto (fun n => ∫ x in C, Λ x (u n) ∂μ) atTop (𝓝 (∫ x in C, Λ x v ∂μ)) := by
       rw [tendsto_iff_norm_sub_tendsto_zero]
-      refine squeeze_zero (fun n => norm_nonneg _) (g := fun n => c * ‖u n - v‖ * (μ C).toReal)
-        (fun n => ?_) ?_
+      refine squeeze_zero
+        (fun n => norm_nonneg _)
+        (g := fun n => c * ‖u n - v‖ * (μ C).toReal)
+        (fun n => ?_)
+        ?_
       · rw [← integral_sub ((hcont n).locallyIntegrable.integrableOn_isCompact hC)
           (hcontv.locallyIntegrable.integrableOn_isCompact hC)]
         refine norm_setIntegral_le_of_norm_le_const hC.measure_lt_top fun x hx => ?_
         rw [← map_sub]
         exact ((Λ x).le_opNorm _).trans (mul_le_mul_of_nonneg_right (hc x hx) (norm_nonneg _))
-      · have h4 : Tendsto (fun n => ‖u n - v‖) atTop (𝓝 0) :=
-          tendsto_iff_norm_sub_tendsto_zero.1 hu
+      · have h4 : Tendsto (fun n => ‖u n - v‖) atTop (𝓝 0) := tendsto_iff_norm_sub_tendsto_zero.1 hu
         simpa using (h4.const_mul c).mul_const (μ C).toReal
     rw [← hPr]
     exact tendsto_nhds_unique (h1.congr h2) h3

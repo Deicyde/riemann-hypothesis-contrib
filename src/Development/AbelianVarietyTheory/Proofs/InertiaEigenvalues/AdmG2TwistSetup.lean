@@ -18,15 +18,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SignsAn
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 namespace GlobalTheory.JumpShapeAt
 
 open Classical
 
-theorem toLLK_val (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hw : w ∈ placesOver D.host.E (D.nd.l i)) (z : FractionRing (D.nd.O i)) :
-    ((Br.toLLK (D.nbr i w hw) z : ↥(D.nbr i w hw).LL.1) : Om (D.nd.l i)) = D.naut.iotaQ i z := by
+theorem toLLK_val
+    (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
+    (hw : w ∈ placesOver D.host.E (D.nd.l i)) (z : FractionRing (D.nd.O i))
+    : ((Br.toLLK (D.nbr i w hw) z : ↥(D.nbr i w hw).LL.1) : Om (D.nd.l i)) = D.naut.iotaQ i z := by
   have h : ((D.nbr i w hw).LL.1.val.toRingHom.comp (Br.toLLK (D.nbr i w hw))) = D.naut.iotaQ i := by
     refine IsLocalization.ringHom_ext (nonZeroDivisors (D.nd.O i)) (RingHom.ext fun c => ?_)
     simp only [RingHom.comp_apply]
@@ -34,11 +37,15 @@ theorem toLLK_val (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)
     exact ((D.loc_tie i w hw).1 c).symm
   exact RingHom.congr_fun h z
 
-theorem embU_iff (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hw : w ∈ placesOver D.host.E (D.nd.l i)) (C : TruncatedSeriesCountingIdentities.CoefExt D i w hw)
-    (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] ↥C.LL.1) (ep : Bool) (g : D.R.GG)
-    (ρ : D.what₂.Tau) (h : AdmissibleParameterJ.ReadAt D i (AdmissibleParameterJ.gEmb C τ) g ρ) :
-    EmbeddingTypes.EmbU C ep τ ↔ AdmissibleParameterJ.TypeU D ep g := by
+theorem embU_iff
+    (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
+    (hw : w ∈ placesOver D.host.E (D.nd.l i))
+    (C : TruncatedSeriesCountingIdentities.CoefExt D i w hw)
+    (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] ↥C.LL.1)
+    (ep : Bool)
+    (g : D.R.GG) (ρ : D.what₂.Tau)
+    (h : AdmissibleParameterJ.ReadAt D i (AdmissibleParameterJ.gEmb C τ) g ρ)
+    : EmbeddingTypes.EmbU C ep τ ↔ AdmissibleParameterJ.TypeU D ep g := by
   have := D.nd.lPrime i
 
   have hsplit : ∀ y, (C.LL.1.val.comp τ) y ∈ (D.nbr i w hw).LL.1.toSubalgebra := fun y =>
@@ -68,8 +75,7 @@ theorem embU_iff (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
     simp only [AdmissibleParameterJ.TypeU, Bool.false_eq_true, iff_false]
     constructor
     · rintro ⟨-, φ, hφ, h3⟩
-      have hφe : φ = D.host.emb g' := RingHom.ext fun x => by
-        rw [← h3 x _ (key x).symm, hemb]
+      have hφe : φ = D.host.emb g' := RingHom.ext fun x => by rw [← h3 x _ (key x).symm, hemb]
       have h4 : D.host.emb (g' * D.R.cc) ∈ D.host.cmType := by
         rw [Formalism.L2.Geo.emb_mul_cc_comp, ← hφe]; exact hφ
       have h5 := ((factEmb D.R D.host).2 _).1 h4
@@ -87,9 +93,11 @@ theorem embU_iff (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
   · simp only [EmbeddingTypes.EmbTypeUe, if_true, AdmissibleParameterJ.TypeU, iff_true]
     exact hU
 
-theorem ppm_int (D : D7) (hd : AdmissibleParameterJ.AdmDict D) (i : D.nd.Loc)
+theorem ppm_int
+    (D : D7) (hd : AdmissibleParameterJ.AdmDict D) (i : D.nd.Loc)
     (τ₀ : D.host.E →+* Qbar (D.nd.l i)) (g : D.R.GG) (ρ : D.what₂.Tau)
-    (h : AdmissibleParameterJ.ReadAt D i τ₀ g ρ) : ∀ p ∈ AdmissibleParameterJ.PPm D (D.nd.j i) ρ, ∃ n : ℤ, p = n := by
+    (h : AdmissibleParameterJ.ReadAt D i τ₀ g ρ)
+    : ∀ p ∈ AdmissibleParameterJ.PPm D (D.nd.j i) ρ, ∃ n : ℤ, p = n := by
   obtain ⟨ep', hd⟩ := hd
   obtain ⟨sg, cτ, hs1, hs2, hmap, -⟩ := hd i τ₀ g ρ h
   have hsg : sg * sg = 1 := by
@@ -97,7 +105,8 @@ theorem ppm_int (D : D7) (hd : AdmissibleParameterJ.AdmDict D) (i : D.nd.Loc)
     · rw [hs1 hT]; norm_num
     · rw [hs2 hT]; norm_num
   intro p hp
-  have hm : sg * p + cτ ∈ (D.naut.locAutHodgeTateWeightsLevelZero i τ₀).map (fun n : ℤ => (n : ℚ)) := by
+  have hm
+      : sg * p + cτ ∈ (D.naut.locAutHodgeTateWeightsLevelZero i τ₀).map (fun n : ℤ => (n : ℚ)) := by
     rw [hmap]; exact Multiset.mem_map_of_mem _ hp
   obtain ⟨n, -, hn⟩ := Multiset.mem_map.1 hm
   refine ⟨sg.num * (n - cτ), ?_⟩
@@ -107,19 +116,24 @@ theorem ppm_int (D : D7) (hd : AdmissibleParameterJ.AdmDict D) (i : D.nd.Loc)
     · rw [hs2 hT]; rfl
   push_cast
   rw [← hden, hn]
-  calc p = (sg * sg) * p := by rw [hsg, one_mul]
+  calc
+    p = (sg * sg) * p := by rw [hsg, one_mul]
     _ = sg * (sg * p + cτ - cτ) := by ring
 
-theorem jj_int (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L) (hd : AdmissibleParameterJ.AdmDict D) (i : D.nd.Loc)
-    (τ₀ : D.host.E →+* Qbar (D.nd.l i)) (g : D.R.GG) (ρ : D.what₂.Tau)
-    (h : AdmissibleParameterJ.ReadAt D i τ₀ g ρ) (up : Bool) :
-    ∀ q ∈ AdmissibleParameterJ.JJ D up (D.nd.j i) ρ, ∃ n : ℤ, q = n := by
+theorem jj_int
+    (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L)
+    (hd : AdmissibleParameterJ.AdmDict D) (i : D.nd.Loc) (τ₀ : D.host.E →+* Qbar (D.nd.l i))
+    (g : D.R.GG) (ρ : D.what₂.Tau) (h : AdmissibleParameterJ.ReadAt D i τ₀ g ρ)
+    (up : Bool)
+    : ∀ q ∈ AdmissibleParameterJ.JJ D up (D.nd.j i) ρ, ∃ n : ℤ, q = n := by
   have hj := D.nd.j_range i
   have hF := GlobalTheory.JumpSets.jFacts_of hP _ hj.1 hj.2 ρ
   have hI := ppm_int D hd i τ₀ g ρ h
 
   have hsh : ∃ m : ℤ, AdmissibleParameterJ.sz D (D.nd.j i) ρ + AdmissibleParameterJ.c0 D = m := by
-    have hmem : -AdmissibleParameterJ.sz D (D.nd.j i) ρ + ((D.R.t : ℚ) + 1) / 2 - (((0 : ℕ) : ℚ) + 1) ∈ AdmissibleParameterJ.PPm D (D.nd.j i) ρ := by
+    have hmem
+        : - AdmissibleParameterJ.sz D (D.nd.j i) ρ + ((D.R.t : ℚ) + 1) / 2 - (((0 : ℕ) : ℚ) + 1)
+          ∈ AdmissibleParameterJ.PPm D (D.nd.j i) ρ := by
       unfold AdmissibleParameterJ.PPm
       refine Multiset.mem_add.2 (Or.inr (Multiset.mem_map.2 ⟨0, ?_, rfl⟩))
       simp only [Finset.mem_val, Finset.mem_range]
@@ -149,19 +163,20 @@ theorem jj_int (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L)
     ring
   · exact hJp q hq
 
-theorem mem_floorImg (S : Set ℚ) (hS : S.Finite) (hint : ∀ q ∈ S, ∃ n : ℤ, q = n) (a : ℤ) :
-    a ∈ hS.toFinset.image (fun q : ℚ => ⌊q⌋) ↔ (a : ℚ) ∈ S := by
+theorem mem_floorImg (S : Set ℚ) (hS : S.Finite) (hint : ∀ q ∈ S, ∃ n : ℤ, q = n) (a : ℤ)
+    : a ∈ hS.toFinset.image (fun q : ℚ => ⌊q⌋) ↔ (a : ℚ) ∈ S := by
   rw [Finset.mem_image]
   constructor
   · rintro ⟨q, hq, rfl⟩
     rw [Set.Finite.mem_toFinset] at hq
     obtain ⟨n, rfl⟩ := hint q hq
-    rw [Int.floor_intCast]; exact hq
+    rw [Int.floor_intCast]
+    exact hq
   · intro ha
     exact ⟨a, (Set.Finite.mem_toFinset hS).2 ha, Int.floor_intCast a⟩
 
-theorem card_floorImg (S : Set ℚ) (hS : S.Finite) (hint : ∀ q ∈ S, ∃ n : ℤ, q = n) :
-    (hS.toFinset.image (fun q : ℚ => ⌊q⌋)).card = S.ncard := by
+theorem card_floorImg (S : Set ℚ) (hS : S.Finite) (hint : ∀ q ∈ S, ∃ n : ℤ, q = n)
+    : (hS.toFinset.image (fun q : ℚ => ⌊q⌋)).card = S.ncard := by
   rw [Finset.card_image_of_injOn, Set.ncard_eq_toFinset_card S hS]
   intro q hq q' hq' he
   rw [Finset.mem_coe, Set.Finite.mem_toFinset] at hq hq'
@@ -174,19 +189,24 @@ theorem reflS_ncard (D : D7) (S : Set ℚ) : (AdmissibleParameterJ.reflS D S).nc
   Set.ncard_preimage_of_injective_subset_range GlobalTheory.HostJumpSets.refl_injective
     (fun q _ => GlobalTheory.HostJumpSets.refl_surjective q)
 
-theorem cloud_not_low {D : D7} {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : GlobalTheory.JumpSets.JFacts L j ρ)
-    (q : ℚ) (h1 : q ∈ AdmissibleParameterJ.cloudJ D j ρ) (h2 : q ∈ AdmissibleParameterJ.lowJ D j ρ) : False := by
+theorem cloud_not_low
+    {D : D7} {L : SizeData₂ D} {j : ℕ} {ρ : D.what₂.Tau} (hF : GlobalTheory.JumpSets.JFacts L j ρ)
+    (q : ℚ) (h1 : q ∈ AdmissibleParameterJ.cloudJ D j ρ) (h2 : q ∈ AdmissibleParameterJ.lowJ D j ρ)
+    : False := by
   obtain ⟨a, ha⟩ := h1
   obtain ⟨b, hb⟩ := h2
   have h3 := hF.v_nonneg a
   have h4 := GlobalTheory.JumpSets.jp_b_pos hF b
   linarith
 
-theorem shape (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L) (hb : AdmissibleParameterJ.CloudCentreDistance L) (hc : AdmissibleParameterJ.jcCondition L)
-    (j : ℕ) (hj1 : 1 ≤ j) (hjm : j ≤ D.R.m) (ρ : D.what₂.Tau) (up : Bool)
-    (hint : ∀ q ∈ AdmissibleParameterJ.JJ D up j ρ, ∃ n : ℤ, q = n) :
-    ∃ Cl Lo : Finset ℤ, EmbeddingTypes.ShapeJumps D.R.k D.R.m D.R.t (if up then 1 else -1) Cl Lo
-      (fun a => if (a : ℚ) ∈ AdmissibleParameterJ.JJ D up j ρ then 1 else 0) := by
+theorem shape
+    (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L)
+    (hb : AdmissibleParameterJ.CloudCentreDistance L) (hc : AdmissibleParameterJ.jcCondition L)
+    (j : ℕ) (hj1 : 1 ≤ j) (hjm : j ≤ D.R.m)
+    (ρ : D.what₂.Tau) (up : Bool) (hint : ∀ q ∈ AdmissibleParameterJ.JJ D up j ρ, ∃ n : ℤ, q = n)
+    : ∃ Cl Lo : Finset ℤ,
+      EmbeddingTypes.ShapeJumps D.R.k D.R.m D.R.t (if up then 1 else -1) Cl Lo
+        (fun a => if (a : ℚ) ∈ AdmissibleParameterJ.JJ D up j ρ then 1 else 0) := by
   have hF := GlobalTheory.JumpSets.jFacts_of hP j hj1 hjm ρ
   have hfin := GlobalTheory.HostJumpSets.JJ_finite (D := D) up j ρ
   have hcl : AdmissibleParameterJ.cloudT D up j ρ ⊆ AdmissibleParameterJ.JJ D up j ρ := by
@@ -201,7 +221,8 @@ theorem shape (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L) 
     · exact Or.inl (Or.inr hq)
   have hfC := hfin.subset hcl
   have hfL := hfin.subset hlo
-  have hiC : ∀ q ∈ AdmissibleParameterJ.cloudT D up j ρ, ∃ n : ℤ, q = n := fun q hq => hint q (hcl hq)
+  have hiC : ∀ q ∈ AdmissibleParameterJ.cloudT D up j ρ, ∃ n : ℤ, q = n := fun q hq =>
+    hint q (hcl hq)
   have hiL : ∀ q ∈ AdmissibleParameterJ.lowT D up j ρ, ∃ n : ℤ, q = n := fun q hq => hint q (hlo hq)
   set Cl := hfC.toFinset.image (fun q : ℚ => ⌊q⌋) with hCl
   set Lo := hfL.toFinset.image (fun q : ℚ => ⌊q⌋) with hLo
@@ -209,32 +230,54 @@ theorem shape (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L) 
   have mL : ∀ a, a ∈ Lo ↔ (a : ℚ) ∈ AdmissibleParameterJ.lowT D up j ρ := mem_floorImg _ hfL hiL
   have hJW : ∀ a : ℤ, (a ∈ Cl ∨ a ∈ Lo) ↔ (a : ℚ) ∈ AdmissibleParameterJ.JW D up j ρ := by
     intro a
-    rw [mC, mL]; rfl
+    rw [mC, mL]
+    rfl
   obtain ⟨-, -, -, hncC, hncL, -⟩ := hb j hj1 hjm ρ
   have ht0 : (0 : ℚ) ≤ D.R.t := Nat.cast_nonneg _
-  refine ⟨Cl, Lo, ⟨⟨1, ∑ a ∈ Cl, |(a : ℚ)| + 1, ∑ a ∈ Lo, |(a : ℚ)| + 1, one_pos, by positivity,
-    by positivity, fun a ha => ⟨?_, ?_⟩, fun a ha => ?_⟩, ?_, ?_, ?_, ?_, ?_, ?_, ?_, fun a => ?_⟩⟩
-  ·
-    have h := (mC a).1 ha
+  refine ⟨
+    Cl,
+    Lo,
+    ⟨
+      ⟨
+        1,
+        ∑ a ∈ Cl, |(a : ℚ)| + 1,
+        ∑ a ∈ Lo, |(a : ℚ)| + 1,
+        one_pos,
+        by positivity,
+        by positivity,
+        fun a ha => ⟨?_, ?_⟩,
+        fun a ha => ?_
+      ⟩,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      fun a => ?_
+    ⟩
+  ⟩
+  · have h := (mC a).1 ha
     cases up
     · have h2 := (hc j hj1 hjm ρ).2.2.1 _ h
       simp only [AdmissibleParameterJ.refl] at h2
       have h3 : a < -2 := by
         have : (a : ℚ) < -2 := by linarith
         exact_mod_cast this
-      simp only [Bool.false_eq_true, ↓reduceIte]
+      simp only [Bool.false_eq_true, ↓ reduceIte]
       push_cast
       have : (a : ℚ) ≤ -3 := by exact_mod_cast (show a ≤ -3 by omega)
       linarith
     · have h2 := (hc j hj1 hjm ρ).2.2.1 _ h
       have h3 : (1 : ℚ) < a := by linarith
-      simp only [↓reduceIte]
+      simp only [↓ reduceIte]
       push_cast
       linarith
   · have h1 : ((((if up then 1 else -1) * a : ℤ)) : ℚ) ≤ |(a : ℚ)| := by
       cases up
-      · simp only [Bool.false_eq_true, ↓reduceIte]; push_cast; linarith [neg_abs_le (a : ℚ)]
-      · simp only [↓reduceIte]; push_cast; linarith [le_abs_self (a : ℚ)]
+      · simp only [Bool.false_eq_true, ↓ reduceIte]; push_cast; linarith [neg_abs_le (a : ℚ)]
+      · simp only [↓ reduceIte]; push_cast; linarith [le_abs_self (a : ℚ)]
     have h2 : |(a : ℚ)| ≤ ∑ a ∈ Cl, |(a : ℚ)| :=
       Finset.single_le_sum (f := fun a : ℤ => |(a : ℚ)|) (fun _ _ => abs_nonneg _) ha
     linarith
@@ -259,13 +302,13 @@ theorem shape (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L) 
   · rw [Finset.disjoint_left]
     intro a ha1 ha2
     rw [Finset.mem_Ico] at ha2
-    exact GlobalTheory.JumpSets.block_not_mem_JW hF up _ ((GlobalTheory.JumpSets.block_mem_iff a).2 ha2)
-      ((hJW a).1 (Or.inl ha1))
+    exact GlobalTheory.JumpSets.block_not_mem_JW hF up _
+      ((GlobalTheory.JumpSets.block_mem_iff a).2 ha2) ((hJW a).1 (Or.inl ha1))
   · rw [Finset.disjoint_left]
     intro a ha1 ha2
     rw [Finset.mem_Ico] at ha2
-    exact GlobalTheory.JumpSets.block_not_mem_JW hF up _ ((GlobalTheory.JumpSets.block_mem_iff a).2 ha2)
-      ((hJW a).1 (Or.inr ha1))
+    exact GlobalTheory.JumpSets.block_not_mem_JW hF up _
+      ((GlobalTheory.JumpSets.block_mem_iff a).2 ha2) ((hJW a).1 (Or.inr ha1))
   · intro h
     have hJ : (((-1 : ℤ)) : ℚ) ∈ AdmissibleParameterJ.JJ D up j ρ := by
       rcases Finset.mem_union.1 h with h | h
@@ -280,13 +323,15 @@ theorem shape (D : D7) (L : SizeData₂ D) (hP : AdmissibleParameterJ.AdmPar L) 
       · exact hlo ((mL _).1 h)
     push_cast at hJ
     exact ((hc j hj1 hjm ρ).2.1 up).2 hJ
-  · have hiff : (a : ℚ) ∈ AdmissibleParameterJ.JJ D up j ρ ↔ a ∈ Cl ∪ Lo ∪ Finset.Ico 0 (D.R.t : ℤ) := by
+  · have hiff
+        : (a : ℚ) ∈ AdmissibleParameterJ.JJ D up j ρ ↔ a ∈ Cl ∪ Lo ∪ Finset.Ico 0 (D.R.t : ℤ) := by
       rw [Finset.mem_union, Finset.mem_union, Finset.mem_Ico]
       by_cases hbk : (a : ℚ) ∈ AdmissibleParameterJ.blockJ D
       · have := (GlobalTheory.JumpSets.block_mem_iff a).1 hbk
         exact ⟨fun _ => Or.inr this, fun _ => GlobalTheory.JumpSets.block_sub_JJ up j ρ _ hbk⟩
       · rw [GlobalTheory.JumpSets.JJ_iff_JW hF up _ hbk, ← hJW]
-        have : ¬ (0 ≤ a ∧ a < (D.R.t : ℤ)) := fun h => hbk ((GlobalTheory.JumpSets.block_mem_iff a).2 h)
+        have : ¬(0 ≤ a ∧ a < (D.R.t : ℤ)) := fun h =>
+          hbk ((GlobalTheory.JumpSets.block_mem_iff a).2 h)
         tauto
     show (if (a : ℚ) ∈ AdmissibleParameterJ.JJ D up j ρ then (1 : ℤ) else 0) = _
     by_cases h : (a : ℚ) ∈ AdmissibleParameterJ.JJ D up j ρ

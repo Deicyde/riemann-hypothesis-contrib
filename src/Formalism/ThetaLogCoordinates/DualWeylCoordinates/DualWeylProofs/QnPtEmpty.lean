@@ -20,13 +20,16 @@ def qn_pt (n : ℕ) (D : Finset (Fin n × Fin n)) : Fin n × Fin n → MvPolynom
 def qn_IntS (n : ℕ) : Subring (MvPolynomial (Fin n × Fin n) ℚ) :=
   (MvPolynomial.map (σ := Fin n × Fin n) (Int.castRingHom ℚ)).range
 
-theorem qn_pt_step (n : ℕ) (D : Finset (Fin n × Fin n)) (a s : Fin n) (hw : (a, s) ∉ D)
-    (hs : ∀ c, (s, c) ∉ D) (F : MvPolynomial (Fin n × Fin n) ℚ) :
-    aeval (qn_pt n (insert (a, s) D)) F =
-      Polynomial.eval₂ (aeval (qn_pt n D)).toRingHom (X (a, s)) (rowGen ℚ s a F) := by
+theorem qn_pt_step
+    (n : ℕ) (D : Finset (Fin n × Fin n)) (a s : Fin n)
+    (hw : (a, s) ∉ D) (hs : ∀ c, (s, c) ∉ D) (F : MvPolynomial (Fin n × Fin n) ℚ)
+    : aeval (qn_pt n (insert (a, s) D)) F
+      = Polynomial.eval₂ (aeval (qn_pt n D)).toRingHom (X (a, s)) (rowGen ℚ s a F) := by
   classical
-  have h : (aeval (qn_pt n (insert (a, s) D))).toRingHom =
-      (Polynomial.eval₂RingHom (aeval (qn_pt n D)).toRingHom (X (a, s))).comp (rowGen ℚ s a).toRingHom := by
+  have h
+      : (aeval (qn_pt n (insert (a, s) D))).toRingHom
+        = (Polynomial.eval₂RingHom (aeval (qn_pt n D)).toRingHom (X (a, s))).comp
+          (rowGen ℚ s a).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro c
       simp [rowGen, algebraMap_eq, Polynomial.algebraMap_apply]
@@ -45,9 +48,11 @@ theorem qn_pt_step (n : ℕ) (D : Finset (Fin n × Fin n)) (a s : Fin n) (hw : (
         simp [qn_pt, h1, hb]
   exact congrArg (fun φ => φ F) h
 
-theorem qn_pt_empty (n : ℕ) (F : MvPolynomial (Fin n × Fin n) ℚ) :
-    aeval (qn_pt n ∅) F = C (eval (idFrame ℚ n n) F) := by
-  have h : (aeval (qn_pt n ∅)).toRingHom = (C : ℚ →+* MvPolynomial (Fin n × Fin n) ℚ).comp (eval (idFrame ℚ n n)) := by
+theorem qn_pt_empty (n : ℕ) (F : MvPolynomial (Fin n × Fin n) ℚ)
+    : aeval (qn_pt n ∅) F = C (eval (idFrame ℚ n n) F) := by
+  have h
+      : (aeval (qn_pt n ∅)).toRingHom
+        = (C : ℚ →+* MvPolynomial (Fin n × Fin n) ℚ).comp (eval (idFrame ℚ n n)) := by
     apply MvPolynomial.ringHom_ext
     · intro c
       simp [algebraMap_eq]
@@ -61,10 +66,11 @@ theorem qn_pt_empty (n : ℕ) (F : MvPolynomial (Fin n × Fin n) ℚ) :
 theorem qn_X_mem (n : ℕ) (v : Fin n × Fin n) : (X v : MvPolynomial (Fin n × Fin n) ℚ) ∈ qn_IntS n :=
   ⟨X v, by simp⟩
 
-theorem qn_int_pt (n : ℕ) (W : Set (MvPolynomial (Fin n × Fin n) ℚ))
+theorem qn_int_pt
+    (n : ℕ) (W : Set (MvPolynomial (Fin n × Fin n) ℚ))
     (hW : ∀ F ∈ W, ∀ (a b : Fin n) (k : ℕ), a ≠ b → rowDiv ℚ a b k F ∈ W)
-    (hev : ∀ F ∈ W, ∃ z : ℤ, eval (idFrame ℚ n n) F = z) (D : Finset (Fin n × Fin n)) :
-    (∀ x ∈ D, x.2 < x.1) → ∀ F ∈ W, aeval (qn_pt n D) F ∈ qn_IntS n := by
+    (hev : ∀ F ∈ W, ∃ z : ℤ, eval (idFrame ℚ n n) F = z) (D : Finset (Fin n × Fin n))
+    : (∀ x ∈ D, x.2 < x.1) → ∀ F ∈ W, aeval (qn_pt n D) F ∈ qn_IntS n := by
   classical
   induction D using Finset.induction_on_min_value (fun x : Fin n × Fin n => x.1) with
   | empty =>
@@ -83,14 +89,17 @@ theorem qn_int_pt (n : ℕ) (W : Set (MvPolynomial (Fin n × Fin n) ℚ))
     have ih' := ih (fun x hx => hD x (Finset.mem_insert_of_mem hx))
     rw [qn_pt_step n D a s hw hs, Polynomial.eval₂_eq_sum, Polynomial.sum_def]
     refine Subring.sum_mem _ fun k _ => ?_
-    exact Subring.mul_mem _ (ih' _ (hW F hF s a k (ne_of_lt hsa))) (Subring.pow_mem _ (qn_X_mem n _) _)
+    exact Subring.mul_mem _ (ih' _ (hW F hF s a k (ne_of_lt hsa)))
+      (Subring.pow_mem _ (qn_X_mem n _) _)
 
 def qn_low (n : ℕ) : Finset (Fin n × Fin n) := Finset.univ.filter fun v => v.2 < v.1
 
 def qn_off {n : ℕ} (m : Fin n × Fin n →₀ ℕ) : Fin n × Fin n →₀ ℕ := m.filter fun v => v.2 < v.1
 
-theorem qn_prod_pt (n : ℕ) (m : Fin n × Fin n →₀ ℕ) :
-    (∏ i, qn_pt n (qn_low n) i ^ m i) = open Classical in if LowerTri m then monomial (qn_off m) 1 else 0 := by
+theorem qn_prod_pt (n : ℕ) (m : Fin n × Fin n →₀ ℕ)
+    : (∏ i, qn_pt n (qn_low n) i ^ m i)
+      = open Classical in
+        if LowerTri m then monomial (qn_off m) 1 else 0 := by
   classical
   split_ifs with h
   · rw [monomial_eq, C_1, one_mul, Finsupp.prod_fintype _ _ (by simp)]
@@ -113,9 +122,11 @@ theorem qn_prod_pt (n : ℕ) (m : Fin n × Fin n →₀ ℕ) :
     have h2 : a ≠ c := ne_of_lt hac'
     simp [qn_pt, qn_low, h1, h2, hne]
 
-theorem qn_off_inj {n : ℕ} (ν : Fin n → ℕ) (m e : Fin n × Fin n →₀ ℕ) (hm : LowerTri m) (he : LowerTri e)
-    (hmc : ∀ t : Fin n, ∑ a : Fin n, m (a, t) = ν t) (hec : ∀ t : Fin n, ∑ a : Fin n, e (a, t) = ν t)
-    (h : qn_off m = qn_off e) : m = e := by
+theorem qn_off_inj
+    {n : ℕ} (ν : Fin n → ℕ) (m e : Fin n × Fin n →₀ ℕ) (hm : LowerTri m) (he : LowerTri e)
+    (hmc : ∀ t : Fin n, ∑ a : Fin n, m (a, t) = ν t)
+    (hec : ∀ t : Fin n, ∑ a : Fin n, e (a, t) = ν t) (h : qn_off m = qn_off e)
+    : m = e := by
   classical
   have hoff : ∀ a c : Fin n, a ≠ c → m (a, c) = e (a, c) := by
     intro a c hac
@@ -134,10 +145,12 @@ theorem qn_off_inj {n : ℕ} (ν : Fin n → ℕ) (m e : Fin n × Fin n →₀ �
     omega
   · exact hoff a c hac
 
-theorem qn_coeff_pt (n : ℕ) (ν : Fin n → ℕ) (F : MvPolynomial (Fin n × Fin n) ℚ)
-    (hF : IsWeightedHomogeneous (colW n n) F ν) (e : Fin n × Fin n →₀ ℕ) (he : LowerTri e)
-    (hec : ∀ t : Fin n, ∑ a : Fin n, e (a, t) = ν t) :
-    AddMonoidAlgebra.coeff (aeval (qn_pt n (qn_low n)) F) (qn_off e) = AddMonoidAlgebra.coeff F e := by
+theorem qn_coeff_pt
+    (n : ℕ) (ν : Fin n → ℕ) (F : MvPolynomial (Fin n × Fin n) ℚ)
+    (hF : IsWeightedHomogeneous (colW n n) F ν) (e : Fin n × Fin n →₀ ℕ)
+    (he : LowerTri e) (hec : ∀ t : Fin n, ∑ a : Fin n, e (a, t) = ν t)
+    : AddMonoidAlgebra.coeff (aeval (qn_pt n (qn_low n)) F) (qn_off e)
+      = AddMonoidAlgebra.coeff F e := by
   classical
   rw [aeval_def, eval₂_eq', coeff_sum]
   simp only [algebraMap_eq, coeff_C_mul, qn_prod_pt]
@@ -155,11 +168,12 @@ theorem qn_coeff_pt (n : ℕ) (ν : Fin n → ℕ) (F : MvPolynomial (Fin n × F
   · intro h
     rw [notMem_support_iff.mp h, zero_mul]
 
-theorem qn_tri (n : ℕ) (ν : Fin n → ℕ) (W : Set (MvPolynomial (Fin n × Fin n) ℚ))
+theorem qn_tri
+    (n : ℕ) (ν : Fin n → ℕ) (W : Set (MvPolynomial (Fin n × Fin n) ℚ))
     (hW : ∀ F ∈ W, ∀ (a b : Fin n) (k : ℕ), a ≠ b → rowDiv ℚ a b k F ∈ W)
     (hev : ∀ F ∈ W, ∃ z : ℤ, eval (idFrame ℚ n n) F = z)
-    (hcol : ∀ F ∈ W, IsWeightedHomogeneous (colW n n) F ν) :
-    ∀ F ∈ W, ∀ e : Fin n × Fin n →₀ ℕ, LowerTri e → ∃ z : ℤ, AddMonoidAlgebra.coeff F e = z := by
+    (hcol : ∀ F ∈ W, IsWeightedHomogeneous (colW n n) F ν)
+    : ∀ F ∈ W, ∀ e : Fin n × Fin n →₀ ℕ, LowerTri e → ∃ z : ℤ, AddMonoidAlgebra.coeff F e = z := by
   classical
   intro F hF e he
   by_cases hec : ∀ t : Fin n, ∑ a : Fin n, e (a, t) = ν t

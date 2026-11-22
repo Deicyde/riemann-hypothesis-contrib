@@ -7,7 +7,11 @@ public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.C
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj GlobalTheory.CoverRead GlobalTheory.Member GlobalTheory.CompRat GlobalTheory.FinalJoin
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj GlobalTheory.CoverRead
+  GlobalTheory.Member GlobalTheory.CompRat GlobalTheory.FinalJoin
 open scoped TensorProduct Matrix
 
 namespace GlobalTheory.FrameDom
@@ -59,10 +63,23 @@ lemma gram_mul {r : ℕ} (G G' : Matrix (Fin r) (Fin r) E) (γ : Matrix (Fin r) 
   rw [gram_eq, gram_eq, gm_eq G G' γ h, h2, h1, Matrix.transpose_mul]
   simp only [Matrix.mul_assoc]
 
-theorem mem_dom_of_isometry :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X X' : ReciprocityTheory.ChartRestriction.G.FD.Data E r) (γ : GL (Fin r) E), X.p0 = X'.p0 → (∀ τ, τ ∈ X.Ψ ↔ τ ∈ X'.Ψ) → (∀ v w, herm X.Gm ((γ : Matrix (Fin r) (Fin r) E).mulVec v) ((γ : Matrix (Fin r) (Fin r) E).mulVec w) = herm X'.Gm v w) → ∀ (x : Frame X'.Ψ r) (x' : Frame X.Ψ r), x ∈ X'.dom → (∀ (τ : E →+* ℂ) (h₂ : τ ∈ X'.Ψ) (h₁ : τ ∈ X.Ψ), mat x' ⟨τ, h₁⟩ = (γ : Matrix (Fin r) (Fin r) E).map τ * mat x ⟨τ, h₂⟩) → x' ∈ X.dom := by
+theorem mem_dom_of_isometry
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
+        (X X' : ReciprocityTheory.ChartRestriction.G.FD.Data E r) (γ : GL (Fin r) E),
+      X.p0 = X'.p0 → (∀ τ, τ ∈ X.Ψ ↔ τ ∈ X'.Ψ)
+        → (∀ v w,
+          herm X.Gm ((γ : Matrix (Fin r) (Fin r) E).mulVec v)
+              ((γ : Matrix (Fin r) (Fin r) E).mulVec w)
+            = herm X'.Gm v w)
+        → ∀ (x : Frame X'.Ψ r) (x' : Frame X.Ψ r),
+          x ∈ X'.dom
+            → (∀ (τ : E →+* ℂ) (h₂ : τ ∈ X'.Ψ) (h₁ : τ ∈ X.Ψ),
+              mat x' ⟨τ, h₁⟩ = (γ : Matrix (Fin r) (Fin r) E).map τ * mat x ⟨τ, h₂⟩)
+            → x' ∈ X.dom := by
   intro E _ _ _ r X X' γ hp hΨ hh x x' hx hmat
-  simp only [ReciprocityTheory.ChartRestriction.G.FD.Data.dom, ReciprocityTheory.ChartRestriction.G.FD.GG, Set.mem_ofPred_eq] at hx ⊢
+  simp only [ReciprocityTheory.ChartRestriction.G.FD.Data.dom,
+      ReciprocityTheory.ChartRestriction.G.FD.GG, Set.mem_ofPred_eq]
+    at hx ⊢
   intro τ
   have h₂ : τ.1 ∈ X'.Ψ := (hΨ τ.1).1 τ.2
   obtain ⟨hdet, hpos⟩ := hx ⟨τ.1, h₂⟩

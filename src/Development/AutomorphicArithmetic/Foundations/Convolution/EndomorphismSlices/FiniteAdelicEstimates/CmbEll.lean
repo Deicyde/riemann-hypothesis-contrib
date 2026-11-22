@@ -10,5 +10,6 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Endomorp
 @[expose] public section
 
 open UpperTheory.Zero.ConvolutionTheory.EB in
-theorem UpperTheory.Zero.ConvolutionTheory.EB.cmbEll :
-    UpperTheory.Zero.ConvolutionTheory.EB.CmbEll := cmbEll_of cmbTest seenFam positionTest lefL ffAlg
+theorem UpperTheory.Zero.ConvolutionTheory.EB.cmbEll
+    : UpperTheory.Zero.ConvolutionTheory.EB.CmbEll :=
+  cmbEll_of cmbTest seenFam positionTest lefL ffAlg

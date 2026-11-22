@@ -4,14 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open UpperTheory.V.Z.GSp4Splitting PositivityTheory.RgBcC PositivityTheory.RgBcC.RealD PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.GSp4Splitting PositivityTheory.RgBcC PositivityTheory.RgBcC.RealD
+  PositivityTheory.Rg.BcB.Desc
 open scoped InnerProductSpace
 
 namespace UpperTheory.V.Z.GSp4Splitting
 
 section SlopeTestRemainingChoices
 
-variable {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {σ : Un n →* (V →ₗ[ℂ] V)} {E : KMod n}
 
 private theorem sig_inv (k : Un n) (y : V) : σ k (σ k⁻¹ y) = y := by
@@ -31,8 +33,9 @@ private theorem iso_le {W : Submodule ℂ V} (h : ∀ (t : invA σ E) ξ, t.1 ξ
   rintro _ ⟨ξ, rfl⟩
   exact h t ξ
 
-private theorem map_iso (B : V →ₗ[ℂ] V) (hB : ∀ k x, B (σ k x) = σ k (B x)) {x : V}
-    (hx : x ∈ isoSp σ E) : B x ∈ isoSp σ E := by
+private theorem map_iso
+    (B : V →ₗ[ℂ] V) (hB : ∀ k x, B (σ k x) = σ k (B x)) {x : V} (hx : x ∈ isoSp σ E)
+    : B x ∈ isoSp σ E := by
   have h : isoSp σ E ≤ (isoSp σ E).comap B := by
     refine iso_le fun t ξ => ?_
     have ht : B.comp t.1 ∈ invA σ E := fun k ξ => by
@@ -49,23 +52,29 @@ private theorem iso_stable (k : Un n) {x : V} (hx : x ∈ isoSp σ E) : σ k x �
     exact range_mem t _
   exact h hx
 
-private theorem orth_stable (hσ : IsK σ) {K : Submodule ℂ V} (hK : ∀ k, ∀ x ∈ K, σ k x ∈ K)
-    (k : Un n) {y : V} (hy : y ∈ Kᗮ) : σ k y ∈ Kᗮ := by
+private theorem orth_stable
+    (hσ : IsK σ) {K : Submodule ℂ V} (hK : ∀ k, ∀ x ∈ K, σ k x ∈ K) (k : Un n) {y : V} (hy : y ∈ Kᗮ)
+    : σ k y ∈ Kᗮ := by
   rw [Submodule.mem_orthogonal] at hy ⊢
   intro c hc
   rw [inner_sig hσ]
   exact hy _ (hK _ _ hc)
 
-private theorem proj_comm (hσ : IsK σ) (K : Submodule ℂ V) [K.HasOrthogonalProjection]
-    (hK : ∀ k, ∀ x ∈ K, σ k x ∈ K) (k : Un n) (x : V) :
-    K.starProjection (σ k x) = σ k (K.starProjection x) := by
+private theorem proj_comm
+    (hσ : IsK σ)
+    (K : Submodule ℂ V) [K.HasOrthogonalProjection]
+    (hK : ∀ k, ∀ x ∈ K, σ k x ∈ K) (k : Un n) (x : V)
+    : K.starProjection (σ k x) = σ k (K.starProjection x) := by
   refine Submodule.eq_starProjection_of_mem_orthogonal (hK _ _ (K.starProjection_apply_mem x)) ?_
   rw [← map_sub]
   exact orth_stable hσ hK k (K.sub_starProjection_mem_orthogonal x)
 
-private theorem core (hσ : IsK σ) (S : Submodule ℂ V) [FiniteDimensional ℂ S]
-    (hS : ∀ k, ∀ x ∈ S, σ k x ∈ S) {x : V} (hx : x ∈ S) :
-    ∃ u ∈ S ⊓ isoSp σ E, x - u ∈ (isoSp σ E)ᗮ := by
+private theorem core
+    (hσ : IsK σ)
+    (S : Submodule ℂ V) [FiniteDimensional ℂ S]
+    (hS : ∀ k, ∀ x ∈ S, σ k x ∈ S)
+    {x : V} (hx : x ∈ S)
+    : ∃ u ∈ S ⊓ isoSp σ E, x - u ∈ (isoSp σ E)ᗮ := by
   let D : Submodule ℂ V := S ⊓ isoSp σ E
   haveI : FiniteDimensional ℂ D := Submodule.finiteDimensional_inf_left S _
   haveI : CompleteSpace D := FiniteDimensional.complete ℂ D
@@ -97,8 +106,7 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.V.Z.GSp4Splitting
 
-theorem UpperTheory.V.Z.GSp4Splitting.projEx :
-    ProjEx := by
+theorem UpperTheory.V.Z.GSp4Splitting.projEx : ProjEx := by
   intro n V _ _ σ hσ E
   haveI : (isoSp σ E).HasOrthogonalProjection := ⟨fun v => by
     obtain ⟨S, hfd, hx, hS⟩ := hσ.fin v
@@ -123,17 +131,22 @@ theorem UpperTheory.V.Z.GSp4Splitting.projEx :
       map_iso B' (fun k z => LinearMap.congr_fun (hcomm k).2 z) hx
     ext x
     show (isoSp σ E).starProjection (B x) = B ((isoSp σ E).starProjection x)
-    refine Submodule.eq_starProjection_of_mem_orthogonal (hB _ ((isoSp σ E).starProjection_apply_mem x)) ?_
+    refine Submodule.eq_starProjection_of_mem_orthogonal
+      (hB _ ((isoSp σ E).starProjection_apply_mem x)) ?_
     rw [← map_sub, Submodule.mem_orthogonal]
     intro c hc
-    have h := (Submodule.mem_orthogonal _ _).1 ((isoSp σ E).sub_starProjection_mem_orthogonal x) (B' c) (hB' c hc)
+    have h :=
+      (Submodule.mem_orthogonal _ _).1 ((isoSp σ E).sub_starProjection_mem_orthogonal x) (B' c)
+        (hB' c hc)
     rw [← inner_conj_symm, hadj, ← inner_conj_symm, h, map_zero, map_zero]
   · intro N hN x hx
     obtain ⟨S, hfd, hxS, hS⟩ := hσ.fin x
     haveI := hfd
     haveI : FiniteDimensional ℂ (S ⊓ N : Submodule ℂ V) := Submodule.finiteDimensional_inf_left S N
-    obtain ⟨u, hu, hv⟩ := core (E := E) hσ (S ⊓ N) (fun k y hy => ⟨hS k y hy.1, hN k y hy.2⟩) ⟨hxS, hx⟩
-    have he : (isoSp σ E).starProjection x = u := Submodule.eq_starProjection_of_mem_orthogonal hu.2 hv
+    obtain ⟨u, hu, hv⟩ :=
+      core (E := E) hσ (S ⊓ N) (fun k y hy => ⟨hS k y hy.1, hN k y hy.2⟩) ⟨hxS, hx⟩
+    have he : (isoSp σ E).starProjection x = u :=
+      Submodule.eq_starProjection_of_mem_orthogonal hu.2 hv
     show (isoSp σ E).starProjection x ∈ N
     rw [he]
     exact hu.1.2

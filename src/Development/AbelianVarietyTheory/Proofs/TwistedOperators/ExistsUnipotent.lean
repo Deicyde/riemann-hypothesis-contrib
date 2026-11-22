@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ScaledBas
 
 open MeasureTheory ValuativeRel Matrix
 open scoped Pointwise
-open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms GlobalTheory.RootEx.UnfoldShape
+open GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms GlobalTheory.RootEx.UnfoldShape
 
 noncomputable section
 namespace GlobalTheory.RootEx.UnfoldFlag
@@ -18,8 +19,8 @@ def flagMat (y : Fin c → (n ⊕ Fin c → k)) : Matrix (n ⊕ Fin c) (n ⊕ Fi
   Matrix.of fun r s =>
     Sum.elim (fun s => (1 : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k) r (Sum.inl s)) (fun i => y i r) s
 
-theorem flagMat_mulVec (y : Fin c → (n ⊕ Fin c → k)) (v : n ⊕ Fin c → k) :
-    flagMat y *ᵥ v = inX k n c (fun r => v (Sum.inl r)) + ∑ i, v (Sum.inr i) • y i := by
+theorem flagMat_mulVec (y : Fin c → (n ⊕ Fin c → k)) (v : n ⊕ Fin c → k)
+    : flagMat y *ᵥ v = inX k n c (fun r => v (Sum.inl r)) + ∑ i, v (Sum.inr i) • y i := by
   funext r
   rw [inX_apply]
   simp only [mulVec, dotProduct, flagMat, of_apply, Fintype.sum_sum_type, Sum.elim_inl,
@@ -30,9 +31,10 @@ theorem flagMat_mulVec (y : Fin c → (n ⊕ Fin c → k)) (v : n ⊕ Fin c → 
     · simp [one_apply]
   · exact Finset.sum_congr rfl fun i _ => mul_comm _ _
 
-theorem flagMat_uni {y : Fin c → (n ⊕ Fin c → k)} (hY : ∀ i, y i ∈ Yle k n c (i.val + 1))
-    (h1 : ∀ i, y i (Sum.inr i) = 1) (h0 : ∀ i : Fin c, i.val = 0 → ∀ r, y i (Sum.inl r) = 0) :
-    Radical.Uni (lev 1) (flagMat y) := by
+theorem flagMat_uni
+    {y : Fin c → (n ⊕ Fin c → k)} (hY : ∀ i, y i ∈ Yle k n c (i.val + 1))
+    (h1 : ∀ i, y i (Sum.inr i) = 1) (h0 : ∀ i : Fin c, i.val = 0 → ∀ r, y i (Sum.inl r) = 0)
+    : Radical.Uni (lev 1) (flagMat y) := by
   intro r s hrs
   rcases s with s | i
   · simp [flagMat]
@@ -50,12 +52,23 @@ theorem flagMat_uni {y : Fin c → (n ⊕ Fin c → k)} (hY : ∀ i, y i ∈ Yle
         subst e
         rw [h1, one_apply_eq]
 
-theorem exists_unipotent : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] [DecidableEq n] (c : ℕ) (hc : 1 ≤ c) (ϖ : 𝒪[k]), (ϖ : k) ≠ 0 → ∀ Λ : Submodule 𝒪[k] (n ⊕ Fin c → k), (∀ i : Fin c, (Λ ⊓ Yle k n c (i.val + 1)).map (LinearMap.proj (Sum.inr i)) = Submodule.span 𝒪[k] {(ϖ : k) ^ (i.val + 1)}) → (ϖ : k) • aux k n (⟨0, hc⟩ : Fin c) ∈ Λ → ∃ u ∈ N k n c 1, act u Λ = chainLat ϖ c (Λ.comap (inX k n c)) := by
+theorem exists_unipotent
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : Type) [Fintype n] [DecidableEq n] (c : ℕ) (hc : 1 ≤ c) (ϖ : 𝒪[k]),
+      (ϖ : k) ≠ 0
+        → ∀ Λ : Submodule 𝒪[k] (n ⊕ Fin c → k),
+          (∀ i : Fin c,
+              (Λ ⊓ Yle k n c (i.val + 1)).map (LinearMap.proj (Sum.inr i))
+                = Submodule.span 𝒪[k] {(ϖ : k) ^ (i.val + 1)})
+            → (ϖ : k) • aux k n (⟨0, hc⟩ : Fin c) ∈ Λ
+            → ∃ u ∈ N k n c 1, act u Λ = chainLat ϖ c (Λ.comap (inX k n c)) := by
   intro k _ _ _ _ n _ _ c hc ϖ hϖ Λ hΛ hfirst
   have hpow : ∀ i : Fin c, (ϖ : k) ^ (i.val + 1) ≠ 0 := fun i => pow_ne_zero _ hϖ
 
-  have hpick : ∀ i : Fin c, ∃ w : n ⊕ Fin c → k, w ∈ Λ ∧ w ∈ Yle k n c (i.val + 1) ∧
-      w (Sum.inr i) = (ϖ : k) ^ (i.val + 1) ∧ (i.val = 0 → ∀ r, w (Sum.inl r) = 0) := by
+  have hpick
+      : ∀ i : Fin c, ∃ w : n ⊕ Fin c → k,
+        w ∈ Λ ∧ w ∈ Yle k n c (i.val + 1) ∧ w (Sum.inr i) = (ϖ : k) ^ (i.val + 1)
+          ∧ (i.val = 0 → ∀ r, w (Sum.inl r) = 0) := by
     intro i
     by_cases hi : i.val = 0
     · have e : i = ⟨0, hc⟩ := Fin.ext hi
@@ -67,8 +80,9 @@ theorem exists_unipotent : ∀ (k : Type) [Field k] [ValuativeRel k] [Topologica
         simp [aux, hl0]
       · simp [aux]
       · simp [aux]
-    · have hmem : (ϖ : k) ^ (i.val + 1) ∈
-          (Λ ⊓ Yle k n c (i.val + 1)).map (LinearMap.proj (R := 𝒪[k]) (Sum.inr i)) := by
+    · have hmem
+          : (ϖ : k) ^ (i.val + 1)
+            ∈ (Λ ⊓ Yle k n c (i.val + 1)).map (LinearMap.proj (R := 𝒪[k]) (Sum.inr i)) := by
         rw [hΛ i]
         exact Submodule.mem_span_singleton_self _
       obtain ⟨w, hw, hwi⟩ := Submodule.mem_map.1 hmem
@@ -107,22 +121,25 @@ theorem exists_unipotent : ∀ (k : Type) [Field k] [ValuativeRel k] [Topologica
       obtain ⟨a, ha⟩ := hua i
       rw [ha, mul_smul, hyw i]
       exact Λ.smul_mem a (hwΛ i)
-    · have hX : ∀ x ∈ Λ.comap (inX k n c),
-          inX k n c x ∈ act g (chainLat ϖ c (Λ.comap (inX k n c))) := by
+    · have hX
+          : ∀ x ∈ Λ.comap (inX k n c),
+            inX k n c x ∈ act g (chainLat ϖ c (Λ.comap (inX k n c))) := by
         intro x hx
         refine mem_act.2 ⟨inX k n c x, inX_mem_chainLat.2 hx, ?_⟩
         rw [hg, flagMat_mulVec]
         simp [inX_apply]
       have hW : ∀ i, w i ∈ act g (chainLat ϖ c (Λ.comap (inX k n c))) := by
         intro i
-        refine mem_act.2 ⟨(ϖ : k) ^ (i.val + 1) • aux k n i, scaled_basis_mem_chainLattice ϖ _ i, ?_⟩
+        refine mem_act.2
+          ⟨(ϖ : k) ^ (i.val + 1) • aux k n i, scaled_basis_mem_chainLattice ϖ _ i, ?_⟩
         rw [hg, mulVec_smul, ← hyw i]
         congr 1
         rw [aux, mulVec_single_one]
         rfl
 
-      have key : ∀ j, j ≤ c → ∀ v ∈ Λ, v ∈ Yle k n c j →
-          v ∈ act g (chainLat ϖ c (Λ.comap (inX k n c))) := by
+      have key
+          : ∀ j,
+            j ≤ c → ∀ v ∈ Λ, v ∈ Yle k n c j → v ∈ act g (chainLat ϖ c (Λ.comap (inX k n c))) := by
         intro j
         induction j with
         | zero =>

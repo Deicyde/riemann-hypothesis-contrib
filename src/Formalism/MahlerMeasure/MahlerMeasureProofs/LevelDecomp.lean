@@ -12,14 +12,18 @@ open MvPolynomial Finset
 section
 variable {k σ : Type} [Field k] {r : ℕ} {w e : Fin r → σ}
 
-theorem ld_biHom_of_euler [CharZero k] {a b : ℕ} {g : MvPolynomial σ k}
-    (hW : ∑ c, X (w c) * pderiv (w c) g = (a : k) • g)
-    (hE : ∑ c, X (e c) * pderiv (e c) g = (b : k) • g) : BiHom w e a b g := by
+theorem ld_biHom_of_euler
+    [CharZero k]
+    {a b : ℕ} {g : MvPolynomial σ k} (hW : ∑ c, X (w c) * pderiv (w c) g = (a : k) • g)
+    (hE : ∑ c, X (e c) * pderiv (e c) g = (b : k) • g)
+    : BiHom w e a b g := by
   classical
   unfold BiHom
   intro m hm
   rw [MvPolynomial.mem_support_iff] at hm
-  have hterm : ∀ i : σ, AddMonoidAlgebra.coeff (X i * pderiv i g) m = (m i : k) * AddMonoidAlgebra.coeff g m := by
+  have hterm
+      : ∀ i : σ,
+        AddMonoidAlgebra.coeff (X i * pderiv i g) m = (m i : k) * AddMonoidAlgebra.coeff g m := by
     intro i
     rw [MvPolynomial.coeff_X_mul']
     split_ifs with hs
@@ -31,7 +35,9 @@ theorem ld_biHom_of_euler [CharZero k] {a b : ℕ} {g : MvPolynomial σ k}
       rw [MvPolynomial.coeff_pderiv, e1, e2, mul_comm]
     · simp at hs
       simp [hs]
-  have key : ∀ (v : Fin r → σ) (n : ℕ), ∑ c, X (v c) * pderiv (v c) g = (n : k) • g → ∑ c, m (v c) = n := by
+  have key
+      : ∀ (v : Fin r → σ) (n : ℕ),
+        ∑ c, X (v c) * pderiv (v c) g = (n : k) • g → ∑ c, m (v c) = n := by
     intro v n hv
     have hcoef := congrArg (AddMonoidAlgebra.coeff · m) hv
     rw [MvPolynomial.coeff_sum, MvPolynomial.coeff_smul, smul_eq_mul] at hcoef

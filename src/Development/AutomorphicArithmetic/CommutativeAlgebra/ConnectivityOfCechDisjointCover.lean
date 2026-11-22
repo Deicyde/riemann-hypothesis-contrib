@@ -8,10 +8,14 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafChartRing
 noncomputable section
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.t_E6Cut
 
-private theorem conn_square {R : Type} [CommRing R] {F : Shv R} {c : ℤ} {E₁ E₂ E₃ E₄ : Spc} {u : E₁ ⟶ E₂}
-    {v : E₃ ⟶ E₄} {a : E₁ ⟶ E₃} {b : E₂ ⟶ E₄} (w : u ≫ b = a ≫ v) (ha : Eqv R a F) (hb : Eqv R b F)
-    (hu : Conn R F c u) : Conn R F c v := by
-  have key : ∀ (n : ℤ) (x : H R E₄ F n), pull R a F n (pull R v F n x) = pull R u F n (pull R b F n x) := by
+private theorem conn_square
+    {R : Type} [CommRing R]
+    {F : Shv R} {c : ℤ} {E₁ E₂ E₃ E₄ : Spc} {u : E₁ ⟶ E₂} {v : E₃ ⟶ E₄} {a : E₁ ⟶ E₃} {b : E₂ ⟶ E₄}
+    (w : u ≫ b = a ≫ v) (ha : Eqv R a F) (hb : Eqv R b F) (hu : Conn R F c u)
+    : Conn R F c v := by
+  have key
+      : ∀ (n : ℤ) (x : H R E₄ F n),
+        pull R a F n (pull R v F n x) = pull R u F n (pull R b F n x) := by
     intro n x
     rw [← pull_comp, ← pull_comp, w]
   have inj : ∀ n : ℤ, Function.Injective (pull R u F n) → Function.Injective (pull R v F n) := by
@@ -25,22 +29,26 @@ private theorem conn_square {R : Type} [CommRing R] {F : Shv R} {c : ℤ} {E₁ 
   intro n
   exact ⟨fun hn => ⟨inj n ((hu n).1 hn).1, sur n ((hu n).1 hn).2⟩, fun hn => inj n ((hu n).2 hn)⟩
 
-private theorem eqv_of_iso {R : Type} [CommRing R] {F : Shv R} {E E' : Spc} (e : E ≅ E') : Eqv R e.hom F := by
+private theorem eqv_of_iso {R : Type} [CommRing R] {F : Shv R} {E E' : Spc} (e : E ≅ E')
+    : Eqv R e.hom F := by
   intro n
   refine Function.bijective_iff_has_inverse.2 ⟨pull R e.inv F n, fun x => ?_, fun x => ?_⟩
   · rw [← pull_comp, e.inv_hom_id, pull_id]
   · rw [← pull_comp, e.hom_inv_id, pull_id]
 
-private theorem conn_level {R : Type} [CommRing R] {F : Shv R} {c : ℤ} {P Q : PSh} (ψ : P ⟶ Q) {Z Z' : Scheme.{0}}
-    (k : Z' ⟶ Z) (e : yoneda.obj Z ≅ Q) (e' : yoneda.obj Z' ≅ P) (h : e'.hom ≫ ψ = yoneda.map k ≫ e.hom)
-    (hk : Conn R F c (sch.map k)) : Conn R F c (disc.map ψ) := by
+private theorem conn_level
+    {R : Type} [CommRing R]
+    {F : Shv R} {c : ℤ} {P Q : PSh} (ψ : P ⟶ Q)
+    {Z Z' : Scheme.{0}} (k : Z' ⟶ Z) (e : yoneda.obj Z ≅ Q) (e' : yoneda.obj Z' ≅ P)
+    (h : e'.hom ≫ ψ = yoneda.map k ≫ e.hom) (hk : Conn R F c (sch.map k))
+    : Conn R F c (disc.map ψ) := by
   refine conn_square (u := sch.map k) (a := (disc.mapIso e').hom) (b := (disc.mapIso e).hom) ?_
     (eqv_of_iso _) (eqv_of_iso _) hk
   change disc.map (yoneda.map k) ≫ disc.map e.hom = disc.map e'.hom ≫ disc.map ψ
   rw [← Functor.map_comp, ← Functor.map_comp, h]
 
-private theorem cech_zero {V Y : Scheme.{0}} (f : V ⟶ Y) :
-    ∃ e : yoneda.obj V ≅ (cech f).obj (op (SimplexCategory.mk 0)),
+private theorem cech_zero {V Y : Scheme.{0}} (f : V ⟶ Y)
+    : ∃ e : yoneda.obj V ≅ (cech f).obj (op (SimplexCategory.mk 0)),
       e.hom ≫ (cechAug f).app (op (SimplexCategory.mk 0)) = yoneda.map f := by
   let π₀ : Fin 1 → (yoneda.obj V ⟶ yoneda.obj Y) := fun _ => yoneda.map f
   let h : yoneda.obj V ⟶ widePullback (yoneda.obj Y) (fun _ : Fin 1 => yoneda.obj V) π₀ :=
@@ -61,13 +69,17 @@ private theorem cech_zero {V Y : Scheme.{0}} (f : V ⟶ Y) :
   exact ⟨⟨h, k, hk, kh⟩, hb⟩
 
 set_option backward.isDefEq.respectTransparency false in
-private theorem smooth_of_cover {V Y : Scheme.{0}} (f : V ⟶ Y)
-    (hcov : ∃ (ι : Type) (O : ι → Scheme.{0}) (j : ∀ a, O a ⟶ V), (∀ a, IsOpenImmersion (j a)) ∧ (∀ a b, a ≠ b → Disjoint (Set.range (j a)) (Set.range (j b))) ∧ (∀ y : V, ∃ a, y ∈ Set.range (j a)) ∧ ∀ a, IsOpenImmersion (j a ≫ f)) :
-    Smooth f := by
+private theorem smooth_of_cover
+    {V Y : Scheme.{0}} (f : V ⟶ Y)
+    (hcov : ∃ (ι : Type) (O : ι → Scheme.{0}) (j : ∀ a, O a ⟶ V),
+      (∀ a, IsOpenImmersion (j a)) ∧ (∀ a b, a ≠ b → Disjoint (Set.range (j a)) (Set.range (j b)))
+        ∧ (∀ y : V, ∃ a, y ∈ Set.range (j a)) ∧ ∀ a, IsOpenImmersion (j a ≫ f))
+    : Smooth f := by
   obtain ⟨ι, O, j, hj, -, hc, hf⟩ := hcov
-  let 𝒰 : V.OpenCover := Scheme.Cover.mkOfCovers ι O j (fun y => by
-    obtain ⟨a, x, hx⟩ := hc y
-    exact ⟨a, x, hx⟩)
+  let 𝒰 : V.OpenCover :=
+    Scheme.Cover.mkOfCovers ι O j (fun y => by
+      obtain ⟨a, x, hx⟩ := hc y
+      exact ⟨a, x, hx⟩)
   refine IsZariskiLocalAtSource.of_openCover (P := @Smooth) 𝒰 fun a => ?_
   have := hf a
   change Smooth (j a ≫ f)

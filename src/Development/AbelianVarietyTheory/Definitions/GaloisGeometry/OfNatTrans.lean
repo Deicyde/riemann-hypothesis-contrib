@@ -21,8 +21,8 @@ abbrev Cn (n : ℕ) : Type (max u v) := ∀ s : ComposableArrows C n, F.obj (s.o
 def face {n : ℕ} (i : Fin (n + 2)) (s : ComposableArrows C (n + 1)) : ComposableArrows C n :=
   (Fin.succAboveOrderEmb i).monotone.functor ⋙ s
 
-def toLast {n : ℕ} (i : Fin (n + 2)) (s : ComposableArrows C (n + 1)) :
-    (face i s).obj (Fin.last n) ⟶ s.obj (Fin.last (n + 1)) :=
+def toLast {n : ℕ} (i : Fin (n + 2)) (s : ComposableArrows C (n + 1))
+    : (face i s).obj (Fin.last n) ⟶ s.obj (Fin.last (n + 1)) :=
   s.map (homOfLE (Fin.le_last (i.succAbove (Fin.last n))))
 
 def d (n : ℕ) : Cn F n →ₗ[R] Cn F (n + 1) where
@@ -39,16 +39,20 @@ def Bn : ∀ n : ℕ, Submodule R (Cn F n)
   | 0 => ⊥
   | n + 1 => LinearMap.range (d F n)
 
-abbrev H (n : ℕ) : Type (max u v) := LinearMap.ker (d F n) ⧸ (Bn F n).submoduleOf (LinearMap.ker (d F n))
+abbrev H (n : ℕ) : Type (max u v) :=
+  LinearMap.ker (d F n) ⧸ (Bn F n).submoduleOf (LinearMap.ker (d F n))
 
-variable {F} {R' : Type} [CommRing R'] {C' : Type u'} [Category.{v'} C'] {F' : C' ⥤ ModuleCat.{0} R'} {σ : R →+* R'}
+variable
+  {F} {R' : Type} [CommRing R']
+  {C' : Type u'} [Category.{v'} C']
+  {F' : C' ⥤ ModuleCat.{0} R'} {σ : R →+* R'}
 
 structure Mor (F : C ⥤ ModuleCat.{0} R) (F' : C' ⥤ ModuleCat.{0} R') (σ : R →+* R') where
-
   G : C' ⥤ C
-
   τ : ∀ T : C', F.obj (G.obj T) →ₛₗ[σ] F'.obj T
-  nat : ∀ {T T' : C'} (φ : T ⟶ T') (x : F.obj (G.obj T)), τ T' ((F.map (G.map φ)).hom x) = (F'.map φ).hom (τ T x)
+  nat
+    : ∀ {T T' : C'} (φ : T ⟶ T') (x : F.obj (G.obj T)),
+      τ T' ((F.map (G.map φ)).hom x) = (F'.map φ).hom (τ T x)
 
 namespace Mor
 
@@ -78,8 +82,9 @@ def pullC (n : ℕ) : Cn F n →ₛₗ[σ] Cn F' n where
 
 theorem d_pullC (n : ℕ) (f : Cn F n) : d F' n (m.pullC n f) = m.pullC (n + 1) (d F n f) := by
   funext s
-  change ∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • (F'.map (toLast i s)).hom (m.τ _ (f (face i s ⋙ m.G))) =
-    m.τ _ (∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • (F.map (m.G.map (toLast i s))).hom (f (face i s ⋙ m.G)))
+  change ∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • (F'.map (toLast i s)).hom (m.τ _ (f (face i s ⋙ m.G)))
+    = m.τ _
+      (∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • (F.map (m.G.map (toLast i s))).hom (f (face i s ⋙ m.G)))
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   exact Finset.sum_congr rfl fun i _ => by rw [map_zsmul, m.nat]

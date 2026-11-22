@@ -8,4 +8,11 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.CuspidalContinui
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.fundamental_domain_description : Ad3.R.D0 := by
-  first | exact @GlobalTheory.CompanionTheory.RankinSelberg.IdeleDomain.exists_idele_fundamentalDomain | exact GlobalTheory.CompanionTheory.RankinSelberg.IdeleDomain.exists_idele_fundamentalDomain | (intros; apply GlobalTheory.CompanionTheory.RankinSelberg.IdeleDomain.exists_idele_fundamentalDomain <;> assumption)
+  first
+  | exact @GlobalTheory.CompanionTheory.RankinSelberg.IdeleDomain.exists_idele_fundamentalDomain
+  | exact GlobalTheory.CompanionTheory.RankinSelberg.IdeleDomain.exists_idele_fundamentalDomain
+  | (
+      intros
+      apply GlobalTheory.CompanionTheory.RankinSelberg.IdeleDomain.exists_idele_fundamentalDomain
+        <;> assumption
+    )

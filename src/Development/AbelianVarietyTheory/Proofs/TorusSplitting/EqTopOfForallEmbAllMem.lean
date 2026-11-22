@@ -75,10 +75,11 @@ lemma exists_real_combination (Ψ : Finset (E →+* ℂ))
   rw [Complex.re_eq_add_conj]; ring
 
 def embAll (Ψ : Finset (E →+* ℂ)) (r : ℕ) : (Fin r → E) →ₗ[ℤ] (Ψ → Fin r → ℂ) :=
-  AddMonoidHom.toIntLinearMap
-    { toFun := fun v τ a => τ.1 (v a)
-      map_zero' := by ext; simp
-      map_add' := by intros; ext; simp }
+  AddMonoidHom.toIntLinearMap {
+    toFun := fun v τ a => τ.1 (v a)
+    map_zero' := by ext; simp
+    map_add' := by intros; ext; simp
+  }
 
 @[simp] lemma embAll_apply (Ψ : Finset (E →+* ℂ)) (r : ℕ) (v : Fin r → E) (τ : Ψ) (a : Fin r) :
     embAll Ψ r v τ a = τ.1 (v a) := rfl
@@ -124,12 +125,12 @@ lemma embAll_mem_of_span (Ψ : Finset (E →+* ℂ)) (r : ℕ) (Λ : Submodule (
     | smul a x _ hx => intro e; rw [smul_smul]; exact hx _
   simpa using key 1
 
-theorem exists_basis_of_cmType (Ψ : Finset (E →+* ℂ))
-    (h : ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ) (r : ℕ)
-    (Λ : Submodule (𝓞 E) (Fin r → E)) (hfg : Λ.FG)
-    (hΛ : Submodule.span E (Λ : Set (Fin r → E)) = ⊤) :
-    ∃ b : Module.Basis (Fin (2 * (Ψ.card * r))) ℝ (Ψ → Fin r → ℂ),
-      ∀ y, y ∈ Submodule.span ℤ (Set.range b) ↔ ∃ v ∈ Λ, embAll Ψ r v = y := by
+theorem exists_basis_of_cmType
+    (Ψ : Finset (E →+* ℂ)) (h : ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ)
+    (r : ℕ) (Λ : Submodule (𝓞 E) (Fin r → E))
+    (hfg : Λ.FG) (hΛ : Submodule.span E (Λ : Set (Fin r → E)) = ⊤)
+    : ∃ b : Module.Basis (Fin (2 * (Ψ.card * r))) ℝ (Ψ → Fin r → ℂ), ∀ y,
+      y ∈ Submodule.span ℤ (Set.range b) ↔ ∃ v ∈ Λ, embAll Ψ r v = y := by
   classical
   let L : Submodule ℤ (Fin r → E) := Λ.restrictScalars ℤ
   haveI : Module.Finite (𝓞 E) Λ := Module.Finite.iff_fg.2 hfg
@@ -139,8 +140,7 @@ theorem exists_basis_of_cmType (Ψ : Finset (E →+* ℂ))
   let c := Module.Free.chooseBasis ℤ L
   let w : Module.Free.ChooseBasisIndex ℤ L → (Fin r → E) := fun i => (c i : Fin r → E)
   have hw : Submodule.span ℤ (Set.range w) = L := by
-    have : Set.range w = L.subtype '' Set.range c := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range w = L.subtype '' Set.range c := by rw [← Set.range_comp]; rfl
     rw [this, ← Submodule.map_span, c.span_eq, Submodule.map_subtype_top]
   have hli : LinearIndependent ℤ w := c.linearIndependent.map' L.subtype L.ker_subtype
   have hliQ : LinearIndependent ℚ w := (LinearIndependent.iff_fractionRing ℤ ℚ).1 hli
@@ -148,13 +148,15 @@ theorem exists_basis_of_cmType (Ψ : Finset (E →+* ℂ))
     have := hliQ.fintype_card_le_finrank
     rw [Module.finrank_pi_fintype, Finset.sum_const, finrank_eq_two_mul_card Ψ h] at this
     simp only [Finset.card_univ, Fintype.card_fin, smul_eq_mul] at this
-    calc _ ≤ _ := this
+    calc
+      _ ≤ _ := this
       _ = _ := by ring
   have hZ : Submodule.span ℤ (Set.range (embAll Ψ r ∘ w)) = L.map (embAll Ψ r) := by
     rw [Set.range_comp, ← Submodule.map_span, hw]
   have htop : Submodule.span ℝ (Set.range (embAll Ψ r ∘ w)) = ⊤ := by
-    refine eq_top_of_forall_embAll_mem Ψ (fun τ => (h τ).1) r _
-      (embAll_mem_of_span Ψ r Λ hΛ _ fun v hv => ?_)
+    refine eq_top_of_forall_embAll_mem Ψ
+      (fun τ => (h τ).1)
+      r _ (embAll_mem_of_span Ψ r Λ hΛ _ fun v hv => ?_)
     have : embAll Ψ r v ∈ Submodule.span ℤ (Set.range (embAll Ψ r ∘ w)) := by
       rw [hZ]; exact Submodule.mem_map_of_mem hv
     exact Submodule.span_subset_span ℤ ℝ _ this
@@ -169,11 +171,10 @@ theorem exists_basis_of_cmType (Ψ : Finset (E →+* ℂ))
   rw [Module.Basis.range_reindex, coe_basisOfTopLeSpanOfCardEqFinrank, hZ]
   rfl
 
-theorem exists_basis_lattice (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
-    (X : Data E r) :
-    ∃ b : Module.Basis (Fin (2 * (X.Ψ.card * r))) ℝ (X.Ψ → Fin r → ℂ),
-      ∀ y, y ∈ Submodule.span ℤ (Set.range b) ↔
-        ∃ v ∈ X.Λ, (fun τ : X.Ψ => Data.emb τ.1 v) = y :=
+theorem exists_basis_lattice
+    (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r)
+    : ∃ b : Module.Basis (Fin (2 * (X.Ψ.card * r))) ℝ (X.Ψ → Fin r → ℂ), ∀ y,
+      y ∈ Submodule.span ℤ (Set.range b) ↔ ∃ v ∈ X.Λ, (fun τ : X.Ψ => Data.emb τ.1 v) = y :=
   exists_basis_of_cmType X.Ψ X.cmType r X.Λ X.Λ_fg X.Λ_span
 
 end

@@ -12,8 +12,8 @@ open scoped Classical
 
 namespace GlobalTheory.GLm.IndChar
 
-theorem isChar_iff_coord {G : Type} [Group G] (χ : G → ℂ) :
-    GlobalTheory.GLq.IsChar χ ↔ GlobalTheory.BI.IsChar ℂ ℂ χ := by
+theorem isChar_iff_coord {G : Type} [Group G] (χ : G → ℂ)
+    : GlobalTheory.GLq.IsChar χ ↔ GlobalTheory.BI.IsChar ℂ ℂ χ := by
   constructor
   · rintro ⟨V, hV⟩
 
@@ -26,13 +26,21 @@ theorem isChar_iff_coord {G : Type} [Group G] (χ : G → ℂ) :
     rw [hρ g]
     rfl
 
-theorem isChar_induced : ∀ (G : Type) [Group G] [Fintype G] (H : Subgroup G) (φ : H → ℂ), IsChar φ → IsChar (fun x : G => (Nat.card H : ℂ)⁻¹ * ∑ y : G, if h : y⁻¹ * x * y ∈ H then φ ⟨_, h⟩ else 0) := by
+theorem isChar_induced
+    : ∀ (G : Type) [Group G] [Fintype G] (H : Subgroup G) (φ : H → ℂ),
+      IsChar φ
+        → IsChar (fun x : G =>
+          (Nat.card H : ℂ)⁻¹ * ∑ y : G, if h : y⁻¹ * x * y ∈ H then φ ⟨_, h⟩ else 0) := by
   intro G _ _ H φ hφ
 
   have hind : GlobalTheory.BI.IsChar ℂ ℂ (GlobalTheory.BI.ind H φ) :=
     GlobalTheory.BI.isChar_ind ℂ ℂ G H φ ((isChar_iff_coord φ).mp hφ)
-  have heq : (fun x : G => (Nat.card H : ℂ)⁻¹ * ∑ y : G,
-      if h : y⁻¹ * x * y ∈ H then φ ⟨_, h⟩ else 0) = GlobalTheory.BI.ind H φ := by
+  have heq
+      : (fun x : G =>
+          (Nat.card H : ℂ)⁻¹
+            * ∑ y : G,
+              if h : y⁻¹ * x * y ∈ H then φ ⟨_, h⟩ else 0)
+        = GlobalTheory.BI.ind H φ := by
     funext x
     unfold GlobalTheory.BI.ind
     rw [finsum_eq_sum_of_fintype]

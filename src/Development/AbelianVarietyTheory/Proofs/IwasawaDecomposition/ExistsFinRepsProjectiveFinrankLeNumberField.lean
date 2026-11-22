@@ -24,37 +24,40 @@ instance ideal_projective (I : Ideal R) : Module.Projective R I := by
   have : Module.FinitePresentation R I := Module.finitePresentation_of_finite _ _
   exact Module.Flat.projective_of_finitePresentation
 
-theorem map_mulLeft_eq (x : R) (I : Ideal R) :
-    Submodule.map (LinearMap.mulLeft R x) I = Ideal.span {x} * I := by
+theorem map_mulLeft_eq (x : R) (I : Ideal R)
+    : Submodule.map (LinearMap.mulLeft R x) I = Ideal.span {x} * I := by
   ext z
   rw [Ideal.mem_span_singleton_mul, Submodule.mem_map]
   simp [LinearMap.mulLeft_apply]
 
-noncomputable def mulEquiv {x : R} (hx : x ≠ 0) (I : Ideal R) :
-    I ≃ₗ[R] (Ideal.span {x} * I : Ideal R) :=
+noncomputable def mulEquiv {x : R} (hx : x ≠ 0) (I : Ideal R)
+    : I ≃ₗ[R] (Ideal.span {x} * I : Ideal R) :=
   (Submodule.equivMapOfInjective (LinearMap.mulLeft R x) (mul_right_injective₀ hx) I).trans
     (LinearEquiv.ofEq _ _ (map_mulLeft_eq x I))
 
-theorem nonempty_equiv_of_mk0_eq {I J : nonZeroDivisors (Ideal R)}
-    (h : ClassGroup.mk0 I = ClassGroup.mk0 J) : Nonempty ((I : Ideal R) ≃ₗ[R] (J : Ideal R)) := by
+theorem nonempty_equiv_of_mk0_eq
+    {I J : nonZeroDivisors (Ideal R)} (h : ClassGroup.mk0 I = ClassGroup.mk0 J)
+    : Nonempty ((I : Ideal R) ≃ₗ[R] (J : Ideal R)) := by
   obtain ⟨x, y, hx, hy, hxy⟩ := ClassGroup.mk0_eq_mk0_iff.1 h
   exact ⟨(mulEquiv hx I).trans ((LinearEquiv.ofEq _ _ hxy).trans (mulEquiv hy J).symm)⟩
 
 abbrev Model {r : ℕ} (c : Fin r → ClassGroup R) : Type := ∀ j, (rep (c j) : Ideal R)
 
-noncomputable def consLin {r : ℕ} (d : ClassGroup R) (c : Fin r → ClassGroup R) :
-    (↥(rep d) × Model c) ≃ₗ[R] Model (Fin.cons d c : Fin (r + 1) → ClassGroup R) :=
-  { Fin.consEquiv (fun j => ↥(rep ((Fin.cons d c : Fin (r + 1) → ClassGroup R) j))) with
-    map_add' := fun a b => by
-      funext j
-      refine Fin.cases ?_ (fun i => ?_) j <;> rfl
-    map_smul' := fun s a => by
-      funext j
-      refine Fin.cases ?_ (fun i => ?_) j <;> rfl }
+noncomputable def consLin {r : ℕ} (d : ClassGroup R) (c : Fin r → ClassGroup R)
+    : (↥(rep d) × Model c) ≃ₗ[R] Model (Fin.cons d c : Fin (r + 1) → ClassGroup R) := {
+  Fin.consEquiv (fun j => ↥(rep ((Fin.cons d c : Fin (r + 1) → ClassGroup R) j))) with
+  map_add' := fun a b => by
+    funext j
+    refine Fin.cases ?_ (fun i => ?_) j <;> rfl
+  map_smul' := fun s a => by
+    funext j
+    refine Fin.cases ?_ (fun i => ?_) j <;> rfl
+}
 
-theorem exists_equiv_model : ∀ (r : ℕ) (X : Type) [AddCommGroup X] [Module R X] [Module.Finite R X]
-    [Module.Projective R X], Module.finrank R X = r →
-    ∃ c : Fin r → ClassGroup R, Nonempty (X ≃ₗ[R] Model c) := by
+theorem exists_equiv_model
+    : ∀ (r : ℕ) (X : Type) [AddCommGroup X] [Module R X] [Module.Finite R X]
+        [Module.Projective R X],
+      Module.finrank R X = r → ∃ c : Fin r → ClassGroup R, Nonempty (X ≃ₗ[R] Model c) := by
   intro r
   induction r with
   | zero =>
@@ -71,10 +74,11 @@ theorem exists_equiv_model : ∀ (r : ℕ) (X : Type) [AddCommGroup X] [Module R
     obtain ⟨x, hx⟩ := exists_ne (0 : X)
     obtain ⟨f, hf⟩ := Module.Projective.exists_dual_ne_zero R hx
     set I : Ideal R := LinearMap.range f with hIdef
-    have hI : I ≠ ⊥ := fun h0 => hf (by
-      have : f x ∈ I := LinearMap.mem_range_self f x
-      rw [h0] at this
-      simpa using this)
+    have hI : I ≠ ⊥ := fun h0 =>
+      hf (by
+        have : f x ∈ I := LinearMap.mem_range_self f x
+        rw [h0] at this
+        simpa using this)
     let g : X →ₗ[R] I := f.rangeRestrict
     have hg : Function.Surjective g := LinearMap.surjective_rangeRestrict f
     obtain ⟨s, hs⟩ := Module.projective_lifting_property g LinearMap.id hg
@@ -105,24 +109,30 @@ theorem exists_equiv_model : ∀ (r : ℕ) (X : Type) [AddCommGroup X] [Module R
       omega
     obtain ⟨c, ⟨eK⟩⟩ := ih K hK
     have hmem : I ∈ nonZeroDivisors (Ideal R) := mem_nonZeroDivisors_of_ne_zero hI
-    obtain ⟨eI⟩ := nonempty_equiv_of_mk0_eq (I := ⟨I, hmem⟩)
-      (J := ⟨rep (ClassGroup.mk0 ⟨I, hmem⟩), rep_mem _⟩) (mk0_rep _).symm
-    exact ⟨Fin.cons (ClassGroup.mk0 ⟨I, hmem⟩) c,
-      ⟨e.trans ((LinearEquiv.prodComm R K I).trans ((eI.prodCongr eK).trans (consLin _ c)))⟩⟩
+    obtain ⟨eI⟩ :=
+      nonempty_equiv_of_mk0_eq (I := ⟨I, hmem⟩) (J := ⟨rep (ClassGroup.mk0 ⟨I, hmem⟩), rep_mem _⟩)
+        (mk0_rep _).symm
+    exact ⟨
+      Fin.cons (ClassGroup.mk0 ⟨I, hmem⟩) c,
+      ⟨e.trans ((LinearEquiv.prodComm R K I).trans ((eI.prodCongr eK).trans (consLin _ c)))⟩
+    ⟩
 
 end ProjModClasses
 
 open ProjModClasses in
-theorem exists_fin_reps_projective_finrank_le :
-    ∀ (E : Type) [Field E] [NumberField E] (q : ℕ), ∃ (n : ℕ) (R : Fin n → ModuleCat.{0} (𝓞 E)),
-    (∀ k, Module.Finite (𝓞 E) (R k) ∧ Module.Projective (𝓞 E) (R k) ∧ Module.finrank (𝓞 E) (R k) ≤ q) ∧
-    ∀ (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X] [Module.Projective (𝓞 E) X],
-      Module.finrank (𝓞 E) X ≤ q → ∃ k, Nonempty (X ≃ₗ[𝓞 E] R k) := by
+theorem exists_fin_reps_projective_finrank_le
+    : ∀ (E : Type) [Field E] [NumberField E] (q : ℕ), ∃ (n : ℕ) (R : Fin n → ModuleCat.{0} (𝓞 E)),
+      (∀ k,
+          Module.Finite (𝓞 E) (R k) ∧ Module.Projective (𝓞 E) (R k)
+            ∧ Module.finrank (𝓞 E) (R k) ≤ q)
+        ∧ ∀ (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+            [Module.Projective (𝓞 E) X],
+          Module.finrank (𝓞 E) X ≤ q → ∃ k, Nonempty (X ≃ₗ[𝓞 E] R k) := by
   intro E _ _ q
   let T := Σ r : Fin (q + 1), (Fin r → ClassGroup (𝓞 E))
   let g : T → ModuleCat.{0} (𝓞 E) := fun t => ModuleCat.of (𝓞 E) (Model t.2)
-  let P : T → Prop := fun t => Module.Finite (𝓞 E) (g t) ∧ Module.Projective (𝓞 E) (g t) ∧
-    Module.finrank (𝓞 E) (g t) ≤ q
+  let P : T → Prop := fun t =>
+    Module.Finite (𝓞 E) (g t) ∧ Module.Projective (𝓞 E) (g t) ∧ Module.finrank (𝓞 E) (g t) ≤ q
   let S := {t : T // P t}
   haveI : Finite S := inferInstance
   let eS := Finite.equivFin S

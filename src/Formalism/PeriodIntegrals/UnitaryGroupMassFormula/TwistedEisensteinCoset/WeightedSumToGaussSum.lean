@@ -19,13 +19,13 @@ section QTdef
 variable (P : HeightOneSpectrum (𝓞 E)) {ι : Type} [Fintype ι] [DecidableEq ι]
 
 def QT (T : (ι → E) → (ι → E)) (c : K) : Prop :=
-  ∀ a b : ℕ, ∃ a' b' : ℕ, ∀ H : (ι → E) → K, Good P a b H →
-    Good P a' b' (fun t => H (T t)) ∧ RS P a' b' (fun t => H (T t)) = c * RS P a b H
+  ∀ a b : ℕ, ∃ a' b' : ℕ, ∀ H : (ι → E) → K,
+    Good P a b H → Good P a' b' (fun t => H (T t)) ∧ RS P a' b' (fun t => H (T t)) = c * RS P a b H
 
 variable {P}
 
-theorem qt_comp {T1 T2 : (ι → E) → (ι → E)} {c1 c2 : K} (h1 : QT P T1 c1) (h2 : QT P T2 c2) :
-    QT P (fun t => T1 (T2 t)) (c2 * c1) := by
+theorem qt_comp {T1 T2 : (ι → E) → (ι → E)} {c1 c2 : K} (h1 : QT P T1 c1) (h2 : QT P T2 c2)
+    : QT P (fun t => T1 (T2 t)) (c2 * c1) := by
   intro a b
   obtain ⟨a1, b1, h1'⟩ := h1 a b
   obtain ⟨a2, b2, h2'⟩ := h2 a1 b1
@@ -34,8 +34,9 @@ theorem qt_comp {T1 T2 : (ι → E) → (ι → E)} {c1 c2 : K} (h1 : QT P T1 c1
   obtain ⟨g2, r2⟩ := h2' (fun t => H (T1 t)) g1
   exact ⟨g2, r2.trans (by rw [r1]; ring)⟩
 
-theorem qt_congr {T T' : (ι → E) → (ι → E)} {c c' : K} (h : QT P T c) (hT : ∀ t, T' t = T t) (hc : c' = c) :
-    QT P T' c' := by
+theorem qt_congr
+    {T T' : (ι → E) → (ι → E)} {c c' : K} (h : QT P T c) (hT : ∀ t, T' t = T t) (hc : c' = c)
+    : QT P T' c' := by
   have hTT : T' = T := funext hT
   subst hTT
   subst hc
@@ -47,20 +48,26 @@ end QTdef
 
 section Em
 
-variable {P : HeightOneSpectrum (𝓞 E)} (hN : NTAll) (hp : (Ideal.absNorm P.asIdeal).Prime)
-    (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) (hK : ((qOf P : ℕ) : K) ≠ 0)
+variable
+  {P : HeightOneSpectrum (𝓞 E)}
+  (hN : NTAll) (hp : (Ideal.absNorm P.asIdeal).Prime)
+  (hq : ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) (hK : ((qOf P : ℕ) : K) ≠ 0)
 include hN hp hq hK
 
-theorem weighted_sum_to_gauss_sum {N : ℕ} {f g : E → K} {c : K} (h : W1 P N N f = c * W1 P N N g) :
-    Sg P N N f = c * Sg P N N g := by
+theorem weighted_sum_to_gauss_sum {N : ℕ} {f g : E → K} {c : K} (h : W1 P N N f = c * W1 P N N g)
+    : Sg P N N f = c * Sg P N N g := by
   have hq0 : ((qOf P : K) ^ N)⁻¹ ≠ 0 := inv_ne_zero (pow_ne_zero _ hK)
   unfold W1 at h
   apply mul_left_cancel₀ hq0
   rw [h]
   ring
 
-theorem qt_em {ι : Type} [Fintype ι] [DecidableEq ι] (k l : ι) {d : E} (hd : d ≠ 0) (c β : E)
-    (hkl : l ≠ k ∨ c = 0) : QT P (em k l d c β) ((qOf P : K) ^ vq P d) := by
+theorem qt_em
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (k l : ι)
+    {d : E} (hd : d ≠ 0)
+    (c β : E) (hkl : l ≠ k ∨ c = 0)
+    : QT P (em k l d c β) ((qOf P : K) ^ vq P d) := by
   have hq0 := qE_ne P hp
   intro a b
   obtain ⟨gc, hgc⟩ := ia_bound P hN hp hq c
@@ -69,28 +76,36 @@ theorem qt_em {ι : Type} [Fintype ι] [DecidableEq ι] (k l : ι) {d : E} (hd :
   obtain ⟨gi, hgi⟩ := ia_bound P hN hp hq d⁻¹
   obtain ⟨a2, b2, hsc⟩ := weighted_sum_scaling (K := K) hN hp hq hK hd (a + gc + gβ) b
 
-  have hcl : ∀ t : ι → E, (∀ j, IntAt P ((qOf P : E) ^ a * t j)) →
-      IntAt P ((qOf P : E) ^ (a + gc + gβ) * (c * t l + β)) := by
+  have hcl
+      : ∀ t : ι → E,
+        (∀ j, IntAt P ((qOf P : E) ^ a * t j))
+          → IntAt P ((qOf P : E) ^ (a + gc + gβ) * (c * t l + β)) := by
     intro t ht
-    have e : (qOf P : E) ^ (a + gc + gβ) * (c * t l + β) =
-        (qOf P : E) ^ gβ * (((qOf P : E) ^ gc * c) * ((qOf P : E) ^ a * t l)) +
-          (qOf P : E) ^ (a + gc) * ((qOf P : E) ^ gβ * β) := by
+    have e
+        : (qOf P : E) ^ (a + gc + gβ) * (c * t l + β)
+          = (qOf P : E) ^ gβ * (((qOf P : E) ^ gc * c) * ((qOf P : E) ^ a * t l))
+            + (qOf P : E) ^ (a + gc) * ((qOf P : E) ^ gβ * β) := by
       rw [pow_add, pow_add]
       ring
     rw [e]
     exact ia_add P (ia_mul P (ia_qpow P _) (ia_mul P hgc (ht l))) (ia_mul P (ia_qpow P _) hgβ)
-  have hcl' : ∀ t : ι → E, (∀ j, j ≠ k → IntAt P ((qOf P : E) ^ a * t j)) →
-      IntAt P ((qOf P : E) ^ (a + gc + gβ) * (c * t l + β)) := by
+  have hcl'
+      : ∀ t : ι → E,
+        (∀ j, j ≠ k → IntAt P ((qOf P : E) ^ a * t j))
+          → IntAt P ((qOf P : E) ^ (a + gc + gβ) * (c * t l + β)) := by
     intro t ht
     rcases hkl with hlk | hc0
-    · have e : (qOf P : E) ^ (a + gc + gβ) * (c * t l + β) =
-          (qOf P : E) ^ gβ * (((qOf P : E) ^ gc * c) * ((qOf P : E) ^ a * t l)) +
-            (qOf P : E) ^ (a + gc) * ((qOf P : E) ^ gβ * β) := by
+    · have e
+          : (qOf P : E) ^ (a + gc + gβ) * (c * t l + β)
+            = (qOf P : E) ^ gβ * (((qOf P : E) ^ gc * c) * ((qOf P : E) ^ a * t l))
+              + (qOf P : E) ^ (a + gc) * ((qOf P : E) ^ gβ * β) := by
         rw [pow_add, pow_add]
         ring
       rw [e]
       exact ia_add P (ia_mul P (ia_qpow P _) (ia_mul P hgc (ht l hlk))) (ia_mul P (ia_qpow P _) hgβ)
-    · have e : (qOf P : E) ^ (a + gc + gβ) * (c * t l + β) = (qOf P : E) ^ (a + gc) * ((qOf P : E) ^ gβ * β) := by
+    · have e
+          : (qOf P : E) ^ (a + gc + gβ) * (c * t l + β)
+            = (qOf P : E) ^ (a + gc) * ((qOf P : E) ^ gβ * β) := by
         rw [hc0, pow_add]
         ring
       rw [e]
@@ -112,9 +127,11 @@ theorem qt_em {ι : Type} [Fintype ι] [DecidableEq ι] (k l : ι) {d : E} (hd :
       · subst hj
         have hx := hs j
         rw [em, update_self] at hx
-        have e : (qOf P : E) ^ (a + gc + gβ + gi) * t j = ((qOf P : E) ^ gi * d⁻¹) *
-            ((qOf P : E) ^ (gc + gβ) * ((qOf P : E) ^ a * (d * t j + c * t l + β)) -
-              (qOf P : E) ^ (a + gc + gβ) * (c * t l + β)) := by
+        have e
+            : (qOf P : E) ^ (a + gc + gβ + gi) * t j
+              = ((qOf P : E) ^ gi * d⁻¹)
+                * ((qOf P : E) ^ (gc + gβ) * ((qOf P : E) ^ a * (d * t j + c * t l + β))
+                  - (qOf P : E) ^ (a + gc + gβ) * (c * t l + β)) := by
           rw [pow_add, pow_add, pow_add, pow_add]
           field_simp
           ring
@@ -135,8 +152,10 @@ theorem qt_em {ι : Type} [Fintype ι] [DecidableEq ι] (k l : ι) {d : E} (hd :
       by_cases hj : j = k
       · subst hj
         rw [update_self]
-        have e2 : (d * δ j + c * δ l) / (qOf P : E) ^ b = ((qOf P : E) ^ gd * d) * (δ j / (qOf P : E) ^ (b + gd)) +
-            ((qOf P : E) ^ gc * c) * (δ l / (qOf P : E) ^ (b + gc)) := by
+        have e2
+            : (d * δ j + c * δ l) / (qOf P : E) ^ b
+              = ((qOf P : E) ^ gd * d) * (δ j / (qOf P : E) ^ (b + gd))
+                + ((qOf P : E) ^ gc * c) * (δ l / (qOf P : E) ^ (b + gc)) := by
           rw [pow_add, pow_add]
           field_simp
         rw [e2]
@@ -148,10 +167,16 @@ theorem qt_em {ι : Type} [Fintype ι] [DecidableEq ι] (k l : ι) {d : E} (hd :
   set N := max (max (a + gc + gβ + gi) (b + gd + gc)) (max (max a2 b2) (a + gc + gβ + b)) with hNdef
   rw [← rs_stab hN hp hq hK (A := N) (B := N) (by omega) (by omega) hgood,
     ← rs_stab hN hp hq hK (A := N) (B := N) (by omega) (by omega) hH]
-  have key : ∑ t ∈ Fintype.piFinset (fun _ : ι => valsQ E (qOf P) N N), H (em k l d c β t) =
-      (qOf P : K) ^ vq P d * ∑ t ∈ Fintype.piFinset (fun _ : ι => valsQ E (qOf P) N N), H t := by
-    have h0 := sum_slice_eq k (fun _ : ι => valsQ E (qOf P) N N) (valsQ E (qOf P) N N) (valsQ E (qOf P) N N)
-      (fun t => H (em k l d c β t)) H ((qOf P : K) ^ vq P d) ?_
+  have key
+      : ∑ t ∈ Fintype.piFinset (fun _ : ι => valsQ E (qOf P) N N), H (em k l d c β t)
+        = (qOf P : K) ^ vq P d
+          * ∑ t ∈ Fintype.piFinset (fun _ : ι => valsQ E (qOf P) N N), H t := by
+    have h0 :=
+      sum_slice_eq k
+        (fun _ : ι => valsQ E (qOf P) N N)
+        (valsQ E (qOf P) N N) (valsQ E (qOf P) N N)
+        (fun t => H (em k l d c β t))
+        H ((qOf P : K) ^ vq P d) ?_
     · rwa [update_eq_self k (fun _ : ι => valsQ E (qOf P) N N)] at h0
     intro t
     have e1 : ∀ u, em k l d c β (update t k u) = update t k (d * u + (c * t l + β)) := by
@@ -170,17 +195,22 @@ theorem qt_em {ι : Type} [Fintype ι] [DecidableEq ι] (k l : ι) {d : E} (hd :
       rwa [update_of_ne hj] at this
     obtain ⟨gψ, eψ⟩ := sg_transl hN hp hq (good_function_mono (by omega) (good_slice hH t k)) hβ'
     obtain ⟨gs, es⟩ := hsc _ gψ
-    have s1 : ∑ u ∈ valsQ E (qOf P) N N, H (update t k (d * u + (c * t l + β))) =
-        Sg P N N (fun u => H (update t k (d * u + (c * t l + β)))) := sum_vals hp N N _
+    have s1
+        : ∑ u ∈ valsQ E (qOf P) N N, H (update t k (d * u + (c * t l + β)))
+          = Sg P N N (fun u => H (update t k (d * u + (c * t l + β)))) :=
+      sum_vals hp N N _
     have s2 : ∑ u ∈ valsQ E (qOf P) N N, H (update t k u) = Sg P N N (fun u => H (update t k u)) :=
       sum_vals hp N N _
     rw [s1, s2]
     apply weighted_sum_to_gauss_sum hN hp hq hK
-    have w1 : W1 P N N (fun u => H (update t k (d * u + (c * t l + β)))) =
-        W1 P a2 b2 (fun u => H (update t k (d * u + (c * t l + β)))) :=
+    have w1
+        : W1 P N N (fun u => H (update t k (d * u + (c * t l + β))))
+          = W1 P a2 b2 (fun u => H (update t k (d * u + (c * t l + β)))) :=
       weighted_sum_stable hN hp hq hK (by omega) (by omega) gs
-    have w2 : W1 P N N (fun u => H (update t k u)) = W1 P (a + gc + gβ) b (fun u => H (update t k u)) :=
-      weighted_sum_stable hN hp hq hK (by omega) (by omega) (good_function_mono (by omega) (good_slice hH t k))
+    have w2
+        : W1 P N N (fun u => H (update t k u)) = W1 P (a + gc + gβ) b (fun u => H (update t k u)) :=
+      weighted_sum_stable hN hp hq hK (by omega) (by omega)
+        (good_function_mono (by omega) (good_slice hH t k))
     rw [w1, es, w2]
     unfold W1
     rw [eψ]

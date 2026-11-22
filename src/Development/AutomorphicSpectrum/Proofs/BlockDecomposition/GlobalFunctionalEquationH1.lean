@@ -15,7 +15,8 @@ noncomputable section
 open NumberField IsDedekindDomain Filter Topology
 open NumberField.InfinitePlace NumberField.InfinitePlace.Completion
 open GroundTheory.Global GroundTheory.LocalField GroundTheory.Global.IdeleGroup
-open GroundTheory.Automorphic.GodementSection (localChar partialLFunction coe_localChar continuous_localChar)
+open GroundTheory.Automorphic.GodementSection
+  (localChar partialLFunction coe_localChar continuous_localChar)
 open Ad3 Ad3.R
 
 namespace GlobalTheory.CompanionTheory.HeckePartial

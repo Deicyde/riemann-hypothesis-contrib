@@ -18,8 +18,10 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.Fourier
 section grp
 variable (k r' : ℕ)
 
-theorem mat_ext_lev {A B : Mat k (1 + r')} (h0 : A *ᵥ e0 k r' = B *ᵥ e0 k r')
-    (h1 : A *ᵥ es0 k r' = B *ᵥ es0 k r') (h2 : ∀ v, A *ᵥ liftVec k 1 r' v = B *ᵥ liftVec k 1 r' v) : A = B := by
+theorem mat_ext_lev
+    {A B : Mat k (1 + r')} (h0 : A *ᵥ e0 k r' = B *ᵥ e0 k r') (h1 : A *ᵥ es0 k r' = B *ᵥ es0 k r')
+    (h2 : ∀ v, A *ᵥ liftVec k 1 r' v = B *ᵥ liftVec k 1 r' v)
+    : A = B := by
   have key : ∀ q : Fin (2 * (1 + r') + k + 1), A *ᵥ Pi.single q 1 = B *ᵥ Pi.single q 1 := by
     intro q
     by_cases hq0 : q.val = 0
@@ -34,8 +36,9 @@ theorem mat_ext_lev {A B : Mat k (1 + r')} (h0 : A *ᵥ e0 k r' = B *ᵥ e0 k r'
         rw [hq]
         rfl
       rw [he, h1]
-    · have he : (Pi.single q (1 : ℂ) : Fin (2 * (1 + r') + k + 1) → ℂ) =
-          liftVec k 1 r' (Pi.single ⟨q.val - 1, by omega⟩ 1) := by
+    · have he
+          : (Pi.single q (1 : ℂ) : Fin (2 * (1 + r') + k + 1) → ℂ)
+            = liftVec k 1 r' (Pi.single ⟨q.val - 1, by omega⟩ 1) := by
         funext p
         simp only [liftVec, Pi.single_apply, Fin.ext_iff]
         split_ifs <;> first | rfl | (exfalso; omega)
@@ -69,15 +72,19 @@ theorem lev_mem {g : Mat k r'} (hg : g ∈ GV k r') : ιLev k 1 r' g ∈ GV k (1
   rw [lev_conjT]
   apply mat_ext_lev
   · simp only [← Matrix.mulVec_mulVec, levi_fixes_base_vector, Hpk_mulVec_e0, levi_fixes_last_basis]
-  · simp only [← Matrix.mulVec_mulVec, levi_fixes_last_basis, hermMatrix_last_basis, levi_fixes_base_vector]
+  · simp only [← Matrix.mulVec_mulVec, levi_fixes_last_basis, hermMatrix_last_basis,
+      levi_fixes_base_vector]
   · intro v
     simp only [← Matrix.mulVec_mulVec, lev_lift, Hpk_lift]
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hg']
 
-theorem rankOne_levi_comm (c : ℂ) (g : Mat k r') : w0 k r' c * ιLev k 1 r' g = ιLev k 1 r' g * w0 k r' c := by
+theorem rankOne_levi_comm (c : ℂ) (g : Mat k r')
+    : w0 k r' c * ιLev k 1 r' g = ιLev k 1 r' g * w0 k r' c := by
   apply mat_ext_lev
-  · simp only [← Matrix.mulVec_mulVec, levi_fixes_base_vector, long_weyl_sends_base_to_dual, Matrix.mulVec_smul, levi_fixes_last_basis]
-  · simp only [← Matrix.mulVec_mulVec, levi_fixes_last_basis, rankOneMatrix_last_basis, Matrix.mulVec_smul, levi_fixes_base_vector]
+  · simp only [← Matrix.mulVec_mulVec, levi_fixes_base_vector, long_weyl_sends_base_to_dual,
+      Matrix.mulVec_smul, levi_fixes_last_basis]
+  · simp only [← Matrix.mulVec_mulVec, levi_fixes_last_basis, rankOneMatrix_last_basis,
+      Matrix.mulVec_smul, levi_fixes_base_vector]
   · intro v
     simp only [← Matrix.mulVec_mulVec, lev_lift, rankOneMatrix_lift]
 
@@ -90,8 +97,8 @@ end grp
 section gn
 variable {n : ℕ}
 
-theorem normSq_sum_eq_trace (Y : Matrix (Fin n) (Fin n) ℂ) :
-    ((∑ i, ∑ j, Complex.normSq (Y i j) : ℝ) : ℂ) = (Yᴴ * Y).trace := by
+theorem normSq_sum_eq_trace (Y : Matrix (Fin n) (Fin n) ℂ)
+    : ((∑ i, ∑ j, Complex.normSq (Y i j) : ℝ) : ℂ) = (Yᴴ * Y).trace := by
   rw [Matrix.trace]
   simp only [Matrix.diag_apply, Matrix.mul_apply, Matrix.conjTranspose_apply]
   push_cast
@@ -110,8 +117,9 @@ theorem gN_unitary (k r : ℕ) {κ : Mat k r} (hκ : κᴴ * κ = 1) (X : Mat k 
 
 theorem gN_cont (k r : ℕ) : Continuous (fun g : Mat k r => gN g) := by
   unfold gN
-  exact Real.continuous_sqrt.comp (continuous_finsetSum _ fun i _ => continuous_finsetSum _
-    fun j _ => Complex.continuous_normSq.comp (continuous_id.matrix_elem i j))
+  exact Real.continuous_sqrt.comp (continuous_finsetSum _ fun i _ =>
+    continuous_finsetSum _ fun j _ =>
+      Complex.continuous_normSq.comp (continuous_id.matrix_elem i j))
 
 end gn
 

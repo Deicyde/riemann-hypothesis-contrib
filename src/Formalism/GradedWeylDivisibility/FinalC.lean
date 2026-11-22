@@ -25,7 +25,8 @@ namespace Formalism.GradedWeylDivisibility
 
 theorem minorExpLt : MinorExpLt := minorExponentLt
 theorem colLexInitMinor : ColLexInitMinor := colLexInitMinor_of minorExpLt
-theorem column_lex_bideterminant : ColumnLexBideterminant := columnLexBideterminant_of_initialMinor colLexInitMinor
+theorem column_lex_bideterminant : ColumnLexBideterminant :=
+  columnLexBideterminant_of_initialMinor colLexInitMinor
 theorem colSums : ColSums := columnSums_holds
 theorem sSYTPeel : SSYTPeel := semistandardPeel
 theorem sSYTExists : SSYTExists := sSYTExists_of sSYTPeel
@@ -44,9 +45,9 @@ theorem standardMonomialSpanDomain : StandardMonomialSpanDomain :=
 theorem standardMonomialSpan : StandardMonomialSpan :=
   standardMonomialSpanOf standardMonomialSpanDomain
 
-private theorem bidet_rowPart_lemma {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n)
-    (I : ∀ k, Fin (sz k) → Fin r) (k : ℕ) :
-    ∀ (s : Finset (Fin K)) (m : Fin r × Fin n →₀ ℕ),
+private theorem bidet_rowPart_lemma
+    {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin r) (k : ℕ)
+    : ∀ (s : Finset (Fin K)) (m : Fin r × Fin n →₀ ℕ),
       m ∈ (∏ j ∈ s, initMinor ℤ (I j) (hsz j)).support → rowPart k m ≤ ∑ j ∈ s, min k (sz j) := by
   classical
   intro s
@@ -67,12 +68,14 @@ private theorem bidet_rowPart_lemma {r n K : ℕ} (sz : Fin K → ℕ) (hsz : �
     rw [rowPart_add, Finset.sum_insert hj]
     exact Nat.add_le_add ((initMinor_support (I j) (hsz j) m1 hm1).1 k) (ih m2 hm2)
 
-private theorem sum_rowNu_lemma_2 {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ j, sz j ≤ n) (hnr : n ≤ r)
-    (k : ℕ) :
-    ∑ j : Fin K, min k (sz j) ≤ ∑ a : Fin r with a.val < k, rowNu (r := r) (shapeDeg (n := n) sz) a := by
+private theorem sum_rowNu_lemma_2
+    {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ j, sz j ≤ n) (hnr : n ≤ r) (k : ℕ)
+    : ∑ j : Fin K, min k (sz j)
+      ≤ ∑ a : Fin r with a.val < k, rowNu (r := r) (shapeDeg (n := n) sz) a := by
   classical
-  have h1 : ∀ a : Fin r, rowNu (r := r) (shapeDeg (n := n) sz) a =
-      ∑ j : Fin K, if a.val < sz j then 1 else 0 := by
+  have h1
+      : ∀ a : Fin r,
+        rowNu (r := r) (shapeDeg (n := n) sz) a = ∑ j : Fin K, if a.val < sz j then 1 else 0 := by
     intro a
     unfold rowNu
     split_ifs with h
@@ -83,12 +86,14 @@ private theorem sum_rowNu_lemma_2 {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ 
       intro j _
       have := hsz j
       exact if_neg (by omega)
-  have h2 : ∀ j : Fin K, min k (sz j) = ∑ a : Fin r with a.val < k, if a.val < sz j then 1 else 0 := by
+  have h2
+      : ∀ j : Fin K, min k (sz j) = ∑ a : Fin r with a.val < k, if a.val < sz j then 1 else 0 := by
     intro j
     have hj : sz j ≤ r := (hsz j).trans hnr
     rw [← Finset.card_filter, Finset.filter_filter]
-    have hset : (Finset.univ.filter fun a : Fin r => a.val < k ∧ a.val < sz j).map Fin.valEmbedding =
-        Finset.range (min k (sz j)) := by
+    have hset
+        : (Finset.univ.filter fun a : Fin r => a.val < k ∧ a.val < sz j).map Fin.valEmbedding
+          = Finset.range (min k (sz j)) := by
       ext x
       simp only [Finset.mem_map, Finset.mem_filter, Finset.mem_univ, true_and,
         Fin.valEmbedding_apply, Finset.mem_range]
@@ -101,10 +106,14 @@ private theorem sum_rowNu_lemma_2 {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ 
   rw [Finset.sum_congr rfl (fun a _ => h1 a), Finset.sum_comm]
   exact le_of_eq (Finset.sum_congr rfl (fun j _ => h2 j))
 
-theorem dualWeylDominanceZ :
-    ∀ (r n : ℕ) (ν : Fin n → ℕ), n ≤ r → Antitone ν → ∀ f ∈ dualWeyl ℤ r n ν, ∀ m ∈ f.support,
-      (∀ k : ℕ, (∑ a : Fin r with a.val < k, rowDeg m a) ≤ ∑ a : Fin r with a.val < k, rowNu (r := r) ν a) ∧
-      ∑ a : Fin r, rowDeg m a = ∑ a : Fin r, rowNu (r := r) ν a := by
+theorem dualWeylDominanceZ
+    : ∀ (r n : ℕ) (ν : Fin n → ℕ),
+      n ≤ r → Antitone ν
+        → ∀ f ∈ dualWeyl ℤ r n ν, ∀ m ∈ f.support,
+          (∀ k : ℕ,
+              (∑ a : Fin r with a.val < k, rowDeg m a)
+                ≤ ∑ a : Fin r with a.val < k, rowNu (r := r) ν a)
+            ∧ ∑ a : Fin r, rowDeg m a = ∑ a : Fin r, rowNu (r := r) ν a := by
   intro r n ν hnr hν f hf m hm
   have hcol := colSums ℤ r n ν f hf m hm
   refine ⟨fun k => ?_, ?_⟩
@@ -116,13 +125,13 @@ theorem dualWeylDominanceZ :
       obtain ⟨K, sz, hsz, I, hν', rfl⟩ := hx
       subst hν'
       exact (bidet_rowPart_lemma sz hsz I k Finset.univ m hm).trans (sum_rowNu_lemma_2 sz hsz hnr k)
-    | zero => simp at hm
+    | zero =>
+      simp at hm
     | add x y _ _ ihx ihy =>
       rcases Finset.mem_union.mp (MvPolynomial.support_add hm) with h | h
       · exact ihx m h
       · exact ihy m h
-    | smul a x _ ihx =>
-      exact ihx m (MvPolynomial.support_smul hm)
+    | smul a x _ ihx => exact ihx m (MvPolynomial.support_smul hm)
   · obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hnr
     have hL : ∑ a : Fin (n + d), rowDeg m a = ∑ s : Fin n, ν s := by
       unfold rowDeg

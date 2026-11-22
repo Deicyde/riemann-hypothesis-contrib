@@ -12,8 +12,13 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.M.fromGL :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], ∀ (g : G1 F), ∀ b ∈ Reduction.adelicBorel (K := F) (n := 2), ∀ k ∈ Reduction.maxCompact (K := F) (n := 2), gl g = b * k → ∃ (x : A F) (a : (A F)ˣ), ∃ k' ∈ KK F, g = nU x * mD a * k' ∧ (a : A F) = (b : Matrix (Fin 2) (Fin 2) (A F)) 0 0 ∧ Reduction.adeleAbs ((b : Matrix (Fin 2) (Fin 2) (A F)) 1 1) = (ab a)⁻¹ := by
+theorem UpperTheory.ConvolutionTheory.R2.M.fromGL
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], ∀ (g : G1 F),
+      ∀ b ∈ Reduction.adelicBorel (K := F) (n := 2), ∀ k ∈ Reduction.maxCompact (K := F) (n := 2),
+        gl g = b * k
+          → ∃ (x : A F) (a : (A F)ˣ), ∃ k' ∈ KK F,
+            g = nU x * mD a * k' ∧ (a : A F) = (b : Matrix (Fin 2) (Fin 2) (A F)) 0 0
+              ∧ Reduction.adeleAbs ((b : Matrix (Fin 2) (Fin 2) (A F)) 1 1) = (ab a)⁻¹ := by
   intro F _ _ _ g b hb k hk hg
   obtain ⟨hdk, hab⟩ := M.detK F k hk
   set t := Matrix.GeneralLinearGroup.det k with ht
@@ -23,9 +28,12 @@ theorem UpperTheory.ConvolutionTheory.R2.M.fromGL :
     simp [dM, Matrix.GeneralLinearGroup.val_det_apply, Matrix.det_fin_two]
   have hdet : Matrix.GeneralLinearGroup.det ((dM t)⁻¹ * k) = 1 := by
     rw [map_mul, map_inv, hd, ← ht, inv_mul_cancel]
-  let s : G1 F := ⟨((dM t)⁻¹ * k).val, by
-    have h1 := congrArg Units.val hdet
-    simpa [Matrix.GeneralLinearGroup.val_det_apply] using h1⟩
+  let s : G1 F := ⟨
+    ((dM t)⁻¹ * k).val,
+    by
+      have h1 := congrArg Units.val hdet
+      simpa [Matrix.GeneralLinearGroup.val_det_apply] using h1
+  ⟩
   have hs : gl s = (dM t)⁻¹ * k := Units.ext rfl
   have hsK : s ∈ KK F := by
     rw [(M.kkCpt F).1]
@@ -35,22 +43,25 @@ theorem UpperTheory.ConvolutionTheory.R2.M.fromGL :
   have hc : gl (g * s⁻¹) = b * dM t := by
     have hm : ∀ x y : G1 F, gl (x * y) = gl x * gl y := fun x y => map_mul _ x y
     have h1 : gl (g * s⁻¹) = gl g * (gl s)⁻¹ := by
-      rw [hm, eq_inv_of_mul_eq_one_left (a := gl s⁻¹) (b := gl s) (by rw [← hm, inv_mul_cancel]; exact map_one _)]
+      rw [hm,
+        eq_inv_of_mul_eq_one_left (a := gl s⁻¹) (b := gl s)
+          (by rw [← hm, inv_mul_cancel]; exact map_one _)]
     rw [h1, hs, hg]
     group
-  have hv : (g * s⁻¹).1 = (b : Matrix (Fin 2) (Fin 2) (A F)) * (dM t).val :=
-    congrArg Units.val hc
+  have hv : (g * s⁻¹).1 = (b : Matrix (Fin 2) (Fin 2) (A F)) * (dM t).val := congrArg Units.val hc
   have hlow : (b : Matrix (Fin 2) (Fin 2) (A F)) 1 0 = 0 :=
     (Reduction.mem_adelicBorel.1 hb) (show (0 : Fin 2) < 1 by decide)
   have e00 : (g * s⁻¹).1 0 0 = (b : Matrix (Fin 2) (Fin 2) (A F)) 0 0 := by
     rw [hv]; simp [dM, Matrix.mul_apply, Fin.sum_univ_two]
   have e01 : (g * s⁻¹).1 0 1 = (b : Matrix (Fin 2) (Fin 2) (A F)) 0 1 * (t : A F) := by
     rw [hv]; simp [dM, Matrix.mul_apply, Fin.sum_univ_two]
-  have e10 : (g * s⁻¹).1 1 0 = 0 := by
-    rw [hv]; simp [dM, Matrix.mul_apply, Fin.sum_univ_two, hlow]
+  have e10 : (g * s⁻¹).1 1 0 = 0 := by rw [hv]; simp [dM, Matrix.mul_apply, Fin.sum_univ_two, hlow]
   have e11 : (g * s⁻¹).1 1 1 = (b : Matrix (Fin 2) (Fin 2) (A F)) 1 1 * (t : A F) := by
     rw [hv]; simp [dM, Matrix.mul_apply, Fin.sum_univ_two]
-  have hdet2 : (b : Matrix (Fin 2) (Fin 2) (A F)) 0 0 * ((b : Matrix (Fin 2) (Fin 2) (A F)) 1 1 * (t : A F)) = 1 := by
+  have hdet2
+      : (b : Matrix (Fin 2) (Fin 2) (A F)) 0 0
+          * ((b : Matrix (Fin 2) (Fin 2) (A F)) 1 1 * (t : A F))
+        = 1 := by
     have h1 := (g * s⁻¹).det_coe
     rw [Matrix.det_fin_two, e00, e01, e10, e11, mul_zero, sub_zero] at h1
     exact h1
@@ -58,7 +69,8 @@ theorem UpperTheory.ConvolutionTheory.R2.M.fromGL :
   have ha : (a : A F) = (b : Matrix (Fin 2) (Fin 2) (A F)) 0 0 := IsUnit.unit_spec _
   have hinv : ((a⁻¹ : (A F)ˣ) : A F) = (b : Matrix (Fin 2) (Fin 2) (A F)) 1 1 * (t : A F) :=
     Units.inv_eq_of_mul_eq_one_right (by rw [ha]; exact hdet2)
-  have hh : g * s⁻¹ = nU ((b : Matrix (Fin 2) (Fin 2) (A F)) 0 1 * (t : A F) * (a : A F)) * mD a := by
+  have hh
+      : g * s⁻¹ = nU ((b : Matrix (Fin 2) (Fin 2) (A F)) 0 1 * (t : A F) * (a : A F)) * mD a := by
     refine Subtype.ext ?_
     rw [M.val_mul (nU _) (mD a)]
     ext i j

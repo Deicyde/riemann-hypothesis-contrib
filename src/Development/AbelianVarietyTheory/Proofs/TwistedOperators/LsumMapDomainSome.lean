@@ -8,10 +8,13 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.How
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,9 +24,11 @@ namespace GlobalTheory.ProductForm
 
 variable {ι Pr Pi κ : Type} [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pi] [Module ℂ Pi]
 
-theorem lsum_mapRange (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi)
-    (b : κ → Pr →ₗ[ℂ] Pi) (hb : ∀ k i, b k ∘ₗ ρ i = σ i ∘ₗ b k) (i : ι) (d : κ →₀ Pr) :
-    Finsupp.lsum ℂ b (Finsupp.mapRange (ρ i) (map_zero _) d) = σ i (Finsupp.lsum ℂ b d) := by
+theorem lsum_mapRange
+    (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi) (b : κ → Pr →ₗ[ℂ] Pi)
+    (hb : ∀ k i, b k ∘ₗ ρ i = σ i ∘ₗ b k)
+    (i : ι) (d : κ →₀ Pr)
+    : Finsupp.lsum ℂ b (Finsupp.mapRange (ρ i) (map_zero _) d) = σ i (Finsupp.lsum ℂ b d) := by
   have : (Finsupp.lsum ℂ b) ∘ₗ (Finsupp.mapRange.linearMap (ρ i)) = σ i ∘ₗ Finsupp.lsum ℂ b := by
     refine Finsupp.lhom_ext fun k x => ?_
     simp only [LinearMap.comp_apply, Finsupp.mapRange.linearMap_apply, Finsupp.mapRange_single,
@@ -31,11 +36,13 @@ theorem lsum_mapRange (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End �
     exact LinearMap.congr_fun (hb k i) x
   exact LinearMap.congr_fun this d
 
-theorem eval_injective (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi)
+theorem eval_injective
+    (ρ : ι → Module.End ℂ Pr)
+    (σ : ι → Module.End ℂ Pi)
     (hirr : ∀ N : Submodule ℂ Pr, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤)
     (hschur : ∀ T : Module.End ℂ Pr, (∀ i, T * ρ i = ρ i * T) → ∃ c : ℂ, T = c • 1)
-    (b : κ → Pr →ₗ[ℂ] Pi) (hli : LinearIndependent ℂ b) (hb : ∀ k i, b k ∘ₗ ρ i = σ i ∘ₗ b k) :
-    ∀ c : κ →₀ Pr, Finsupp.lsum ℂ b c = 0 → c = 0 := by
+    (b : κ → Pr →ₗ[ℂ] Pi) (hli : LinearIndependent ℂ b) (hb : ∀ k i, b k ∘ₗ ρ i = σ i ∘ₗ b k)
+    : ∀ c : κ →₀ Pr, Finsupp.lsum ℂ b c = 0 → c = 0 := by
   classical
   suffices h : ∀ n, ∀ c : κ →₀ Pr, c.support.card = n → Finsupp.lsum ℂ b c = 0 → c = 0 from
     fun c hc => h _ c rfl hc
@@ -55,7 +62,8 @@ theorem eval_injective (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End �
     have hsub : d.support ⊆ s.erase k₀ := by
       intro k hk
       refine Finset.mem_erase.mpr ⟨?_, hd.1 hk⟩
-      rintro rfl; exact (Finsupp.mem_support_iff.mp hk) h0
+      rintro rfl
+      exact (Finsupp.mem_support_iff.mp hk) h0
     have hlt : d.support.card < n := by
       rw [← hcard]
       exact lt_of_le_of_lt (Finset.card_le_card hsub) (Finset.card_erase_lt_of_mem hk₀)
@@ -125,8 +133,10 @@ namespace GlobalTheory.ProductForm
 variable {ι Pr Pi κ : Type} [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pi] [Module ℂ Pi]
 variable {Q V : Type} [AddCommGroup Q] [Module ℂ Q] [AddCommGroup V] [Module ℂ V]
 
-def factorSpace (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi) (q : Q →ₗ[ℂ] Pr)
-    (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi) (S : Submodule ℂ V) : Submodule ℂ (Pr →ₗ[ℂ] Pi) where
+def factorSpace
+    (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi) (q : Q →ₗ[ℂ] Pr) (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi)
+    (S : Submodule ℂ V)
+    : Submodule ℂ (Pr →ₗ[ℂ] Pi) where
   carrier := {φ | ∃ f ∈ S, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β f = φ ∘ₗ q}
   zero_mem' := ⟨0, S.zero_mem, fun i => by simp, by simp⟩
   add_mem' := by
@@ -140,36 +150,44 @@ def factorSpace (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi) 
     · rw [LinearMap.smul_comp, LinearMap.comp_smul, hφ]
     · rw [map_smul, hβ, LinearMap.smul_comp]
 
-theorem mem_factorSpace {ρ : ι → Module.End ℂ Pr} {σ : ι → Module.End ℂ Pi} {q : Q →ₗ[ℂ] Pr}
-    {β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi} {S : Submodule ℂ V} {φ : Pr →ₗ[ℂ] Pi} :
-    φ ∈ factorSpace ρ σ q β S ↔ ∃ f ∈ S, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β f = φ ∘ₗ q := Iff.rfl
+theorem mem_factorSpace
+    {ρ : ι → Module.End ℂ Pr} {σ : ι → Module.End ℂ Pi} {q : Q →ₗ[ℂ] Pr} {β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi}
+    {S : Submodule ℂ V} {φ : Pr →ₗ[ℂ] Pi}
+    : φ ∈ factorSpace ρ σ q β S ↔ ∃ f ∈ S, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β f = φ ∘ₗ q :=
+  Iff.rfl
 
-theorem comp_cancel {q : Q →ₗ[ℂ] Pr} (hq : Function.Surjective q) {φ ψ : Pr →ₗ[ℂ] Pi}
-    (h : φ ∘ₗ q = ψ ∘ₗ q) : φ = ψ := by
+theorem comp_cancel
+    {q : Q →ₗ[ℂ] Pr} (hq : Function.Surjective q) {φ ψ : Pr →ₗ[ℂ] Pi} (h : φ ∘ₗ q = ψ ∘ₗ q)
+    : φ = ψ := by
   ext x
   obtain ⟨y, rfl⟩ := hq x
   exact LinearMap.congr_fun h y
 
 def ev (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) : Pr ⊗[ℂ] F →ₗ[ℂ] Pi :=
-  TensorProduct.lift (LinearMap.mk₂ ℂ (fun x (φ : F) => (φ : Pr →ₗ[ℂ] Pi) x)
-    (fun _ _ _ => by simp) (fun _ _ _ => by simp) (fun _ _ _ => by simp) (fun _ _ _ => by simp))
+  TensorProduct.lift (LinearMap.mk₂ ℂ
+    (fun x (φ : F) => (φ : Pr →ₗ[ℂ] Pi) x)
+    (fun _ _ _ => by simp)
+    (fun _ _ _ => by simp)
+    (fun _ _ _ => by simp)
+    (fun _ _ _ => by simp))
 
-@[simp] theorem ev_tmul (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) (x : Pr) (φ : F) :
-    ev F (x ⊗ₜ φ) = (φ : Pr →ₗ[ℂ] Pi) x := by
+@[simp]
+theorem ev_tmul (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) (x : Pr) (φ : F)
+    : ev F (x ⊗ₜ φ) = (φ : Pr →ₗ[ℂ] Pi) x := by
   simp [ev]
 
-theorem ev_comp_symm (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) [DecidableEq κ] (b : Module.Basis κ ℂ F) :
-    ev F ∘ₗ (TensorProduct.equivFinsuppOfBasisRight (M := Pr) b).symm.toLinearMap =
-      Finsupp.lsum ℂ (fun k => ((b k : F) : Pr →ₗ[ℂ] Pi)) := by
+theorem ev_comp_symm (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) [DecidableEq κ] (b : Module.Basis κ ℂ F)
+    : ev F ∘ₗ (TensorProduct.equivFinsuppOfBasisRight (M := Pr) b).symm.toLinearMap
+      = Finsupp.lsum ℂ (fun k => ((b k : F) : Pr →ₗ[ℂ] Pi)) := by
   refine Finsupp.lhom_ext fun k x => ?_
   simp [TensorProduct.equivFinsuppOfBasisRight_symm_apply]
 
-theorem ev_surjective (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi) (q : Q →ₗ[ℂ] Pr)
-    (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi) (S : Submodule ℂ V) (F : Submodule ℂ (Pr →ₗ[ℂ] Pi))
-    (hF : factorSpace ρ σ q β S ≤ F)
+theorem ev_surjective
+    (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi) (q : Q →ₗ[ℂ] Pr) (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi)
+    (S : Submodule ℂ V) (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) (hF : factorSpace ρ σ q β S ≤ F)
     (hS : ∀ f ∈ S, ∃ φ : Pr →ₗ[ℂ] Pi, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β f = φ ∘ₗ q)
-    (hspan : Submodule.span ℂ {y | ∃ f ∈ S, ∃ P, y = β f P} = ⊤) :
-    Function.Surjective (ev F) := by
+    (hspan : Submodule.span ℂ {y | ∃ f ∈ S, ∃ P, y = β f P} = ⊤)
+    : Function.Surjective (ev F) := by
   rw [← LinearMap.range_eq_top, eq_top_iff, ← hspan, Submodule.span_le]
   rintro y ⟨f, hf, P, rfl⟩
   obtain ⟨φ, h1, h2⟩ := hS f hf
@@ -177,11 +195,13 @@ theorem ev_surjective (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End �
   rw [ev_tmul]
   exact (LinearMap.congr_fun h2 P).symm
 
-theorem ev_injective (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi)
+theorem ev_injective
+    (ρ : ι → Module.End ℂ Pr)
+    (σ : ι → Module.End ℂ Pi)
     (hirr : ∀ N : Submodule ℂ Pr, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤)
     (hschur : ∀ T : Module.End ℂ Pr, (∀ i, T * ρ i = ρ i * T) → ∃ c : ℂ, T = c • 1)
-    (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) (hF : ∀ φ ∈ F, ∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) :
-    Function.Injective (ev F) := by
+    (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) (hF : ∀ φ ∈ F, ∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ)
+    : Function.Injective (ev F) := by
   classical
   let b := Module.Basis.ofVectorSpace ℂ F
   let E := TensorProduct.equivFinsuppOfBasisRight (M := Pr) b
@@ -199,23 +219,26 @@ end GlobalTheory.ProductForm
 namespace GlobalTheory.ProductForm
 
 variable {ι Pr Pi κ : Type} [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pi] [Module ℂ Pi]
-variable {Q V Q' V' : Type} [AddCommGroup Q] [Module ℂ Q] [AddCommGroup V] [Module ℂ V]
-  [AddCommGroup Q'] [Module ℂ Q'] [AddCommGroup V'] [Module ℂ V']
+variable
+  {Q V Q' V' : Type} [AddCommGroup Q] [Module ℂ Q] [AddCommGroup V] [Module ℂ V] [AddCommGroup Q']
+  [Module ℂ Q'] [AddCommGroup V'] [Module ℂ V']
 
-theorem lsum_mapDomain_some (v : Option κ → Pr →ₗ[ℂ] Pi) (c : κ →₀ Pr) :
-    Finsupp.lsum ℂ v (c.mapDomain some) = Finsupp.lsum ℂ (fun k => v (some k)) c := by
+theorem lsum_mapDomain_some (v : Option κ → Pr →ₗ[ℂ] Pi) (c : κ →₀ Pr)
+    : Finsupp.lsum ℂ v (c.mapDomain some) = Finsupp.lsum ℂ (fun k => v (some k)) c := by
   have : Finsupp.lsum ℂ v ∘ₗ Finsupp.lmapDomain Pr ℂ some = Finsupp.lsum ℂ (fun k => v (some k)) :=
     Finsupp.lhom_ext fun k x => by simp
   exact LinearMap.congr_fun this c
 
-theorem factorSpace_le (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi)
+theorem factorSpace_le
+    (ρ : ι → Module.End ℂ Pr)
+    (σ : ι → Module.End ℂ Pi)
     (hirr : ∀ N : Submodule ℂ Pr, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤)
-    (hschur : ∀ T : Module.End ℂ Pr, (∀ i, T * ρ i = ρ i * T) → ∃ c : ℂ, T = c • 1)
-    (q : Q →ₗ[ℂ] Pr) (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi) (S : Submodule ℂ V)
+    (hschur : ∀ T : Module.End ℂ Pr, (∀ i, T * ρ i = ρ i * T) → ∃ c : ℂ, T = c • 1) (q : Q →ₗ[ℂ] Pr)
+    (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi) (S : Submodule ℂ V)
     (q' : Q' →ₗ[ℂ] Pr) (β' : V' →ₗ[ℂ] Q' →ₗ[ℂ] Pi) (S' : Submodule ℂ V')
     (hS' : ∀ f ∈ S', ∃ φ : Pr →ₗ[ℂ] Pi, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β' f = φ ∘ₗ q')
-    (hspan' : Submodule.span ℂ {y | ∃ f ∈ S', ∃ P, y = β' f P} = ⊤) :
-    factorSpace ρ σ q β S ≤ factorSpace ρ σ q' β' S' := by
+    (hspan' : Submodule.span ℂ {y | ∃ f ∈ S', ∃ P, y = β' f P} = ⊤)
+    : factorSpace ρ σ q β S ≤ factorSpace ρ σ q' β' S' := by
   classical
   intro φ hφ
   by_contra hφ'
@@ -250,35 +273,39 @@ theorem factorSpace_le (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End �
     rw [map_sub, Finsupp.lsum_single, lsum_mapDomain_some]
     change φ x - Finsupp.lsum ℂ b' (E t) = 0
     rw [hc', sub_self]
-  have h0 := congrArg (fun c : Option _ →₀ Pr => c none)
-    (eval_injective ρ σ hirr hschur v hli hv _ hrel)
+  have h0 :=
+    congrArg (fun c : Option _ →₀ Pr => c none) (eval_injective ρ σ hirr hschur v hli hv _ hrel)
   simp only [Finsupp.coe_sub, _root_.Pi.sub_apply, Finsupp.single_eq_same, Finsupp.coe_zero,
-    _root_.Pi.zero_apply] at h0
+      _root_.Pi.zero_apply]
+    at h0
   rw [Finsupp.mapDomain_notin_range _ _ (by simp), sub_zero] at h0
   exact hx (by rw [h0, map_zero])
 
-theorem exists_lift (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi) (q : Q →ₗ[ℂ] Pr)
-    (hq : Function.Surjective q) (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi) (S : Submodule ℂ V)
-    (F : Submodule ℂ (Pr →ₗ[ℂ] Pi)) (hF : factorSpace ρ σ q β S ≤ F)
-    (hS : ∀ f ∈ S, ∃ φ : Pr →ₗ[ℂ] Pi, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β f = φ ∘ₗ q) :
-    ∃ r : V →ₗ[ℂ] F, ∀ f ∈ S, ((r f : F) : Pr →ₗ[ℂ] Pi) ∘ₗ q = β f := by
+theorem exists_lift
+    (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi)
+    (q : Q →ₗ[ℂ] Pr) (hq : Function.Surjective q)
+    (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi) (S : Submodule ℂ V) (F : Submodule ℂ (Pr →ₗ[ℂ] Pi))
+    (hF : factorSpace ρ σ q β S ≤ F)
+    (hS : ∀ f ∈ S, ∃ φ : Pr →ₗ[ℂ] Pi, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β f = φ ∘ₗ q)
+    : ∃ r : V →ₗ[ℂ] F, ∀ f ∈ S, ((r f : F) : Pr →ₗ[ℂ] Pi) ∘ₗ q = β f := by
   classical
   have hmem : ∀ f : S, ∃ φ ∈ factorSpace ρ σ q β S, β f = φ ∘ₗ q := fun f =>
     let ⟨φ, h1, h2⟩ := hS f f.2
     ⟨φ, ⟨f, f.2, h1, h2⟩, h2⟩
   choose g hg hgβ using hmem
-  let r₀ : S →ₗ[ℂ] F :=
-    { toFun := fun f => ⟨g f, hF (hg f)⟩
-      map_add' := fun f f' => by
-        ext1
-        change g (f + f') = g f + g f'
-        apply comp_cancel hq
-        rw [LinearMap.add_comp, ← hgβ, ← hgβ, ← hgβ, Submodule.coe_add, map_add (f := _)]
-      map_smul' := fun a f => by
-        ext1
-        change g (a • f) = a • g f
-        apply comp_cancel hq
-        rw [LinearMap.smul_comp, ← hgβ, ← hgβ, Submodule.coe_smul, map_smul] }
+  let r₀ : S →ₗ[ℂ] F := {
+    toFun := fun f => ⟨g f, hF (hg f)⟩
+    map_add' := fun f f' => by
+      ext1
+      change g (f + f') = g f + g f'
+      apply comp_cancel hq
+      rw [LinearMap.add_comp, ← hgβ, ← hgβ, ← hgβ, Submodule.coe_add, map_add (f := _)]
+    map_smul' := fun a f => by
+      ext1
+      change g (a • f) = a • g f
+      apply comp_cancel hq
+      rw [LinearMap.smul_comp, ← hgβ, ← hgβ, Submodule.coe_smul, map_smul]
+  }
   obtain ⟨r, hr⟩ := LinearMap.exists_extend r₀
   refine ⟨r, fun f hf => ?_⟩
   have : r f = r₀ ⟨f, hf⟩ := LinearMap.congr_fun hr ⟨f, hf⟩
@@ -287,21 +314,25 @@ theorem exists_lift (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ 
 
 end GlobalTheory.ProductForm
 
-theorem GlobalTheory.SquareLM.productForm : ∀ (ι Pr Pi Q Q' V V' : Type) [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pi] [Module ℂ Pi] [AddCommGroup Q] [Module ℂ Q]
-  [AddCommGroup Q'] [Module ℂ Q'] [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
-  (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi) (q : Q →ₗ[ℂ] Pr) (q' : Q' →ₗ[ℂ] Pr)
-  (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi) (β' : V' →ₗ[ℂ] Q' →ₗ[ℂ] Pi) (S : Submodule ℂ V) (S' : Submodule ℂ V'),
-  Function.Surjective q → Function.Surjective q' →
-  (∀ N : Submodule ℂ Pr, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤) →
-  (∀ T : Module.End ℂ Pr, (∀ i, T * ρ i = ρ i * T) → ∃ c : ℂ, T = c • 1) →
-  (∀ f ∈ S, ∃ φ : Pr →ₗ[ℂ] Pi, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β f = φ ∘ₗ q) →
-  (∀ f ∈ S', ∃ φ : Pr →ₗ[ℂ] Pi, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β' f = φ ∘ₗ q') →
-  Submodule.span ℂ {y | ∃ f ∈ S, ∃ P, y = β f P} = ⊤ → Submodule.span ℂ {y | ∃ f ∈ S', ∃ P, y = β' f P} = ⊤ →
-  ∃ (Pf : ModuleCat.{0} ℂ) (r : V →ₗ[ℂ] Pf) (r' : V' →ₗ[ℂ] Pf) (e : Pr ⊗[ℂ] Pf ≃ₗ[ℂ] Pi),
-    (∀ x, ∃ f ∈ S, r f = x) ∧ (∀ x, ∃ f ∈ S', r' f = x) ∧
-    (∀ f ∈ S, ∀ P, β f P = e (q P ⊗ₜ r f)) ∧ ∀ f ∈ S', ∀ P, β' f P = e (q' P ⊗ₜ r' f) := by
-  intro ι Pr Pi Q Q' V V' _ _ _ _ _ _ _ _ _ _ _ _ ρ σ q q' β β' S S' hq hq' hirr hschur hS hS'
-    hspan hspan'
+theorem GlobalTheory.SquareLM.productForm
+    : ∀ (ι Pr Pi Q Q' V V' : Type) [AddCommGroup Pr] [Module ℂ Pr] [AddCommGroup Pi] [Module ℂ Pi]
+        [AddCommGroup Q] [Module ℂ Q] [AddCommGroup Q'] [Module ℂ Q'] [AddCommGroup V] [Module ℂ V]
+        [AddCommGroup V'] [Module ℂ V'] (ρ : ι → Module.End ℂ Pr) (σ : ι → Module.End ℂ Pi)
+        (q : Q →ₗ[ℂ] Pr) (q' : Q' →ₗ[ℂ] Pr) (β : V →ₗ[ℂ] Q →ₗ[ℂ] Pi) (β' : V' →ₗ[ℂ] Q' →ₗ[ℂ] Pi)
+        (S : Submodule ℂ V) (S' : Submodule ℂ V'),
+      Function.Surjective q → Function.Surjective q'
+        → (∀ N : Submodule ℂ Pr, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤)
+        → (∀ T : Module.End ℂ Pr, (∀ i, T * ρ i = ρ i * T) → ∃ c : ℂ, T = c • 1)
+        → (∀ f ∈ S, ∃ φ : Pr →ₗ[ℂ] Pi, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β f = φ ∘ₗ q)
+        → (∀ f ∈ S', ∃ φ : Pr →ₗ[ℂ] Pi, (∀ i, φ ∘ₗ ρ i = σ i ∘ₗ φ) ∧ β' f = φ ∘ₗ q')
+        → Submodule.span ℂ {y | ∃ f ∈ S, ∃ P, y = β f P} = ⊤
+        → Submodule.span ℂ {y | ∃ f ∈ S', ∃ P, y = β' f P} = ⊤
+        → ∃ (Pf : ModuleCat.{0} ℂ) (r : V →ₗ[ℂ] Pf) (r' : V' →ₗ[ℂ] Pf) (e : Pr ⊗[ℂ] Pf ≃ₗ[ℂ] Pi),
+          (∀ x, ∃ f ∈ S, r f = x) ∧ (∀ x, ∃ f ∈ S', r' f = x)
+            ∧ (∀ f ∈ S, ∀ P, β f P = e (q P ⊗ₜ r f))
+            ∧ ∀ f ∈ S', ∀ P, β' f P = e (q' P ⊗ₜ r' f) := by
+  intro ι Pr Pi Q Q' V V' _ _ _ _ _ _ _ _ _ _ _ _ ρ σ q q' β β' S S' hq hq' hirr hschur hS hS' hspan
+    hspan'
   classical
   let F := GlobalTheory.ProductForm.factorSpace ρ σ q β S
   have hle : GlobalTheory.ProductForm.factorSpace ρ σ q' β' S' ≤ F :=
@@ -313,9 +344,11 @@ theorem GlobalTheory.SquareLM.productForm : ∀ (ι Pr Pi Q Q' V V' : Type) [Add
     exact h1 i
   obtain ⟨r, hr⟩ := GlobalTheory.ProductForm.exists_lift ρ σ q hq β S F le_rfl hS
   obtain ⟨r', hr'⟩ := GlobalTheory.ProductForm.exists_lift ρ σ q' hq' β' S' F hle hS'
-  let e : Pr ⊗[ℂ] F ≃ₗ[ℂ] Pi := LinearEquiv.ofBijective (GlobalTheory.ProductForm.ev F)
-    ⟨GlobalTheory.ProductForm.ev_injective ρ σ hirr hschur F hFeq,
-      GlobalTheory.ProductForm.ev_surjective ρ σ q β S F le_rfl hS hspan⟩
+  let e : Pr ⊗[ℂ] F ≃ₗ[ℂ] Pi :=
+    LinearEquiv.ofBijective (GlobalTheory.ProductForm.ev F) ⟨
+      GlobalTheory.ProductForm.ev_injective ρ σ hirr hschur F hFeq,
+      GlobalTheory.ProductForm.ev_surjective ρ σ q β S F le_rfl hS hspan
+    ⟩
   refine ⟨ModuleCat.of ℂ F, r, r', e, ?_, ?_, ?_, ?_⟩
   · intro x
     obtain ⟨f, hf, -, hβ⟩ := GlobalTheory.ProductForm.mem_factorSpace.mp (x : F).2

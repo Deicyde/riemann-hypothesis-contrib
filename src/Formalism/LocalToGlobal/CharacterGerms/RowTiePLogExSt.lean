@@ -17,8 +17,10 @@ namespace LogEx
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ MvPowerSeries
 
 def LinN {C : Type} [CommRing C] {dd : ℕ} (f : Pt C 1 dd) : Prop :=
-  ∀ i (μ : Fin 1 × Fin dd →₀ ℕ), μ.degree ≤ 1 →
-    MvPowerSeries.coeff μ (f i) = MvPowerSeries.coeff μ (MvPowerSeries.X ((0 : Fin 1), i) : PS C 1 dd)
+  ∀ i (μ : Fin 1 × Fin dd →₀ ℕ),
+    μ.degree ≤ 1
+      → MvPowerSeries.coeff μ (f i)
+        = MvPowerSeries.coeff μ (MvPowerSeries.X ((0 : Fin 1), i) : PS C 1 dd)
 
 section Gen
 

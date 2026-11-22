@@ -4,15 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open scoped TensorProduct
 
-theorem UpperTheory.V.Lit.Bor.indepAbs :
-    UpperTheory.V.Lit.Bor.IndepAbs := by
+theorem UpperTheory.V.Lit.Bor.indepAbs : UpperTheory.V.Lit.Bor.IndepAbs := by
   classical
   intro O W _ _ A s V h hs hn
-  have hsup : ∀ P Q : Submodule ℂ W, (∀ o, ∀ x ∈ P, A o x ∈ P) → (∀ o, ∀ x ∈ Q, A o x ∈ Q) →
-      ∀ o, ∀ x ∈ P ⊔ Q, A o x ∈ P ⊔ Q := by
+  have hsup
+      : ∀ P Q : Submodule ℂ W,
+        (∀ o, ∀ x ∈ P, A o x ∈ P) → (∀ o, ∀ x ∈ Q, A o x ∈ Q)
+          → ∀ o, ∀ x ∈ P ⊔ Q, A o x ∈ P ⊔ Q := by
     intro P Q hP hQ o x hx
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
     rw [map_add (f := _)]
@@ -42,8 +44,8 @@ theorem UpperTheory.V.Lit.Bor.indepAbs :
       set S := t.sup V with hSdef
       by_cases hVi : V i = ⊥
       · rw [hVi, bot_inf_eq]
-      have hM : ∀ o, ∀ x ∈ V i ⊓ (V j ⊔ S), A o x ∈ V i ⊓ (V j ⊔ S) :=
-        fun o x hx => ⟨h i o x hx.1, hsup _ _ (h j) hSinv o x hx.2⟩
+      have hM : ∀ o, ∀ x ∈ V i ⊓ (V j ⊔ S), A o x ∈ V i ⊓ (V j ⊔ S) := fun o x hx =>
+        ⟨h i o x hx.1, hsup _ _ (h j) hSinv o x hx.2⟩
       rcases hs i _ inf_le_left hM with hbot | htop
       · exact hbot
       exfalso
@@ -64,8 +66,8 @@ theorem UpperTheory.V.Lit.Bor.indepAbs :
         obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.mp (hle x.2)
         refine ⟨⟨y, hy⟩, ?_⟩
         show S.mkQ y = S.mkQ x
-        rw [← hyz, map_add (f := _), Submodule.mkQ_apply S z, (Submodule.Quotient.mk_eq_zero S).mpr hz,
-          add_zero]
+        rw [← hyz, map_add (f := _), Submodule.mkQ_apply S z,
+          (Submodule.Quotient.mk_eq_zero S).mpr hz, add_zero]
       let T : V i →ₗ[ℂ] V j := ej.symm.toLinearMap ∘ₗ (fi.codRestrict (LinearMap.range fj) hrange)
       have hT : ∀ x : V i, ((T x : W) - x) ∈ S := by
         intro x
@@ -78,9 +80,10 @@ theorem UpperTheory.V.Lit.Bor.indepAbs :
         apply huniq
         have e1 := hT ((A o).restrict (h i o) x)
         have e2 : A o ((T x : W) - x) ∈ S := hSinv o _ (hT x)
-        have e3 : ((T ((A o).restrict (h i o) x) : W) - ((A o).restrict (h j o) (T x) : W))
-            = ((T ((A o).restrict (h i o) x) : W) - ((A o).restrict (h i o) x : W))
-              - A o ((T x : W) - x) := by
+        have e3
+            : ((T ((A o).restrict (h i o) x) : W) - ((A o).restrict (h j o) (T x) : W))
+              = ((T ((A o).restrict (h i o) x) : W) - ((A o).restrict (h i o) x : W))
+                - A o ((T x : W) - x) := by
           simp only [LinearMap.restrict_coe_apply, map_sub]
           abel
         rw [e3]

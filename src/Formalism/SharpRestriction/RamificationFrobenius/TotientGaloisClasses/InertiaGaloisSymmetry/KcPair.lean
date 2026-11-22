@@ -9,15 +9,21 @@ namespace Formalism.HC.Der
 section
 open Ideal UniqueFactorizationMonoid
 
-private theorem mulEquiv_ideal_bot_eq_bot {S : Type*} [CommRing S] [IsDedekindDomain S]
-    (f : Ideal S ≃* Ideal S) : f ⊥ = ⊥ := by
+private theorem mulEquiv_ideal_bot_eq_bot
+    {S : Type*} [CommRing S] [IsDedekindDomain S] (f : Ideal S ≃* Ideal S)
+    : f ⊥ = ⊥ := by
   obtain ⟨J, hJ⟩ := f.surjective ⊥
-  calc f ⊥ = f (⊥ * J) := by rw [Ideal.bot_mul]
+  calc
+    f ⊥
+      = f (⊥ * J) := by rw [Ideal.bot_mul]
     _ = f ⊥ * f J := map_mul f _ _
     _ = ⊥ := by rw [hJ, Ideal.mul_bot]
 
-private theorem prime_mulEquiv_ideal_apply {S : Type*} [CommRing S] [IsDedekindDomain S]
-    (f : Ideal S ≃* Ideal S) {P : Ideal S} (hP : Prime P) : Prime (f P) := by
+private theorem prime_mulEquiv_ideal_apply
+    {S : Type*} [CommRing S] [IsDedekindDomain S]
+    (f : Ideal S ≃* Ideal S)
+    {P : Ideal S} (hP : Prime P)
+    : Prime (f P) := by
   refine ⟨?_, ?_, ?_⟩
   · intro h
     apply hP.ne_zero
@@ -41,33 +47,44 @@ private theorem prime_mulEquiv_ideal_apply {S : Type*} [CommRing S] [IsDedekindD
       have := map_dvd f h1
       rwa [MulEquiv.apply_symm_apply] at this
 
-private theorem prod_normalizedFactors_ideal_eq_self {S : Type*} [CommRing S] [IsDedekindDomain S]
-    {I : Ideal S} (hI : I ≠ ⊥) : (normalizedFactors I).prod = I := by
+private theorem prod_normalizedFactors_ideal_eq_self
+    {S : Type*} [CommRing S] [IsDedekindDomain S] {I : Ideal S} (hI : I ≠ ⊥)
+    : (normalizedFactors I).prod = I := by
   have hI0 : I ≠ 0 := by rw [Ideal.zero_eq_bot]; exact hI
   exact associated_iff_eq.mp (prod_normalizedFactors hI0)
 
-theorem kc_nf_map {S : Type*} [CommRing S] [IsDedekindDomain S] (I : Ideal S) (hI : I ≠ ⊥)
-    (f : Ideal S ≃* Ideal S) : normalizedFactors (f I) = (normalizedFactors I).map f := by
-  calc normalizedFactors (f I) = normalizedFactors ((normalizedFactors I).map f).prod := by
-        rw [← map_multiset_prod f, prod_normalizedFactors_ideal_eq_self hI]
+theorem kc_nf_map
+    {S : Type*} [CommRing S] [IsDedekindDomain S]
+    (I : Ideal S) (hI : I ≠ ⊥)
+    (f : Ideal S ≃* Ideal S)
+    : normalizedFactors (f I) = (normalizedFactors I).map f := by
+  calc
+    normalizedFactors (f I) = normalizedFactors ((normalizedFactors I).map f).prod := by
+      rw [← map_multiset_prod f, prod_normalizedFactors_ideal_eq_self hI]
     _ = (normalizedFactors I).map f := by
-        apply normalizedFactors_prod_of_prime
-        intro Q hQ
-        obtain ⟨R, hR, rfl⟩ := Multiset.mem_map.mp hQ
-        exact prime_mulEquiv_ideal_apply f (prime_of_normalized_factor R hR)
+      apply normalizedFactors_prod_of_prime
+      intro Q hQ
+      obtain ⟨R, hR, rfl⟩ := Multiset.mem_map.mp hQ
+      exact prime_mulEquiv_ideal_apply f (prime_of_normalized_factor R hR)
 
-private theorem mem_of_prime_dvd_multiset_prod {S : Type*} [CommRing S] [IsDedekindDomain S]
-    {s : Multiset (Ideal S)} (hs : ∀ Q ∈ s, Prime Q) {P : Ideal S} (hP : Prime P)
-    (h : P ∣ s.prod) : P ∈ s := by
+private theorem mem_of_prime_dvd_multiset_prod
+    {S : Type*} [CommRing S] [IsDedekindDomain S]
+    {s : Multiset (Ideal S)} (hs : ∀ Q ∈ s, Prime Q)
+    {P : Ideal S} (hP : Prime P) (h : P ∣ s.prod)
+    : P ∈ s := by
   obtain ⟨Q, hQ, hPQ⟩ := hP.exists_mem_multiset_dvd h
   rwa [(prime_dvd_prime_iff_eq hP (hs Q hQ)).mp hPQ]
 
-theorem kc_pairing {S : Type*} [CommRing S] [IsDedekindDomain S] (D : Ideal S) (hD0 : D ≠ ⊥)
-    (f : Ideal S ≃* Ideal S) (hfD : f D = D) (p : Ideal S → Prop)
-    (hp : ∀ P ∈ normalizedFactors D, (p (f P) ↔ ¬ p P)) :
-    ∃ B : Ideal S, D = B * f B ∧ (∀ P : Ideal S, P.IsPrime → P ∣ B → p P) ∧ B ⊔ f B = ⊤ ∧
-      (∀ g : Ideal S ≃* Ideal S, g D = D → (∀ P ∈ normalizedFactors D, (p (g P) ↔ p P)) → g B = B) ∧
-      ∀ B' : Ideal S, D = B' * f B' → (∀ P : Ideal S, P.IsPrime → P ∣ B' → p P) → B' = B := by
+theorem kc_pairing
+    {S : Type*} [CommRing S] [IsDedekindDomain S]
+    (D : Ideal S) (hD0 : D ≠ ⊥)
+    (f : Ideal S ≃* Ideal S) (hfD : f D = D)
+    (p : Ideal S → Prop) (hp : ∀ P ∈ normalizedFactors D, (p (f P) ↔ ¬ p P))
+    : ∃ B : Ideal S,
+      D = B * f B ∧ (∀ P : Ideal S, P.IsPrime → P ∣ B → p P) ∧ B ⊔ f B = ⊤
+        ∧ (∀ g : Ideal S ≃* Ideal S,
+          g D = D → (∀ P ∈ normalizedFactors D, (p (g P) ↔ p P)) → g B = B)
+        ∧ ∀ B' : Ideal S, D = B' * f B' → (∀ P : Ideal S, P.IsPrime → P ∣ B' → p P) → B' = B := by
   classical
   obtain ⟨F, hFdef⟩ : ∃ F, F = normalizedFactors D := ⟨_, rfl⟩
   have hFp : ∀ Q ∈ F, Prime Q := fun Q hQ => prime_of_normalized_factor Q (hFdef ▸ hQ)
@@ -80,8 +97,7 @@ theorem kc_pairing {S : Type*} [CommRing S] [IsDedekindDomain S] (D : Ideal S) (
     exact this.symm
   have hFprod : F.prod = D := by rw [hFdef]; exact prod_normalizedFactors_ideal_eq_self hD0
   have hmap : (F.filter p).map f = F.filter (fun P => ¬ p P) := by
-    have e1 : F.filter (fun P => ¬ p P) = (F.map f).filter (fun P => ¬ p P) := by
-      rw [hinv f hfD]
+    have e1 : F.filter (fun P => ¬ p P) = (F.map f).filter (fun P => ¬ p P) := by rw [hinv f hfD]
     have e2 : (F.map f).filter (fun P => ¬ p P) = (F.filter (fun P => ¬ p (f P))).map f := by
       rw [Multiset.filter_map]
       rfl
@@ -101,8 +117,10 @@ theorem kc_pairing {S : Type*} [CommRing S] [IsDedekindDomain S] (D : Ideal S) (
     exact hJ (zero_dvd_iff.mp hPJ)
   have hsupp : ∀ P : Ideal S, P.IsPrime → P ∣ (F.filter p).prod → p P := by
     intro P hP hdvd
-    have hm := mem_of_prime_dvd_multiset_prod (fun Q hQ => hFp Q (Multiset.mem_of_mem_filter hQ))
-      (hprime_ne hB0 hP hdvd) hdvd
+    have hm :=
+      mem_of_prime_dvd_multiset_prod
+        (fun Q hQ => hFp Q (Multiset.mem_of_mem_filter hQ))
+        (hprime_ne hB0 hP hdvd) hdvd
     exact (Multiset.mem_filter.mp hm).2
   refine ⟨(F.filter p).prod, hsplit, hsupp, ?_, ?_, ?_⟩
   · by_contra hne
@@ -111,8 +129,10 @@ theorem kc_pairing {S : Type*} [CommRing S] [IsDedekindDomain S] (D : Ideal S) (
     have hM2 : M ∣ f (F.filter p).prod := Ideal.dvd_iff_le.mpr (le_sup_right.trans hle)
     have hpM := hsupp M hM.isPrime hM1
     rw [map_multiset_prod, hmap] at hM2
-    have hm := mem_of_prime_dvd_multiset_prod (fun Q hQ => hFp Q (Multiset.mem_of_mem_filter hQ))
-      (hprime_ne hB0 hM.isPrime hM1) hM2
+    have hm :=
+      mem_of_prime_dvd_multiset_prod
+        (fun Q hQ => hFp Q (Multiset.mem_of_mem_filter hQ))
+        (hprime_ne hB0 hM.isPrime hM1) hM2
     exact (Multiset.mem_filter.mp hm).2 hpM
   · intro g hgD hgp
     have e1 : (F.map g).filter p = (F.filter (fun P => p (g P))).map g := by
@@ -122,10 +142,8 @@ theorem kc_pairing {S : Type*} [CommRing S] [IsDedekindDomain S] (D : Ideal S) (
       Multiset.filter_congr (fun P hP => hgp P (hFdef ▸ hP))
     rw [map_multiset_prod, ← e2, ← e1, hinv g hgD, e2]
   · intro B' hB' hsupp'
-    have hB'0 : B' ≠ ⊥ := by
-      intro h; apply hD0; rw [hB', h, Ideal.bot_mul]
-    have hfB'0 : f B' ≠ ⊥ := by
-      intro h; apply hD0; rw [hB', h, Ideal.mul_bot]
+    have hB'0 : B' ≠ ⊥ := by intro h; apply hD0; rw [hB', h, Ideal.bot_mul]
+    have hfB'0 : f B' ≠ ⊥ := by intro h; apply hD0; rw [hB', h, Ideal.mul_bot]
     have hB'0' : B' ≠ 0 := by rw [Ideal.zero_eq_bot]; exact hB'0
     have hfB'0' : f B' ≠ 0 := by rw [Ideal.zero_eq_bot]; exact hfB'0
     have hF' : F = normalizedFactors B' + (normalizedFactors B').map f := by
@@ -135,8 +153,8 @@ theorem kc_pairing {S : Type*} [CommRing S] [IsDedekindDomain S] (D : Ideal S) (
       exact hsupp' Q (Ideal.isPrime_of_prime (prime_of_normalized_factor Q hQ))
         (dvd_of_mem_normalizedFactors hQ)
     have hfilt : F.filter p = normalizedFactors B' := by
-      rw [hF', Multiset.filter_add, Multiset.filter_eq_self.mpr hpB',
-        Multiset.filter_eq_nil.mpr, add_zero]
+      rw [hF', Multiset.filter_add, Multiset.filter_eq_self.mpr hpB', Multiset.filter_eq_nil.mpr,
+        add_zero]
       intro Q hQ
       obtain ⟨R, hR, rfl⟩ := Multiset.mem_map.mp hQ
       have hRF : R ∈ F := by rw [hF']; exact Multiset.mem_add.mpr (Or.inl hR)
@@ -149,9 +167,11 @@ open NumberField Ideal
 
 attribute [local instance] FractionRing.liftAlgebra FractionRing.isScalarTower_liftAlgebra
 
-theorem kc_not_dvd_different (M E : Type) [Field M] [NumberField M] [Field E] [NumberField E] [Algebra M E] [IsGalois M E]
+theorem kc_not_dvd_different
+    (M E : Type) [Field M] [NumberField M] [Field E] [NumberField E] [Algebra M E] [IsGalois M E]
     (P : Ideal (𝓞 E)) [P.IsPrime]
-    (h : P ≠ ⊥ → ∀ σ : E ≃ₐ[M] E, (∀ x : 𝓞 E, σ • x - x ∈ P) → σ = 1) : ¬ P ∣ differentIdeal (𝓞 M) (𝓞 E) := by
+    (h : P ≠ ⊥ → ∀ σ : E ≃ₐ[M] E, (∀ x : 𝓞 E, σ • x - x ∈ P) → σ = 1)
+    : ¬ P ∣ differentIdeal (𝓞 M) (𝓞 E) := by
   by_cases hP : P = ⊥
   · subst hP
     intro hdvd

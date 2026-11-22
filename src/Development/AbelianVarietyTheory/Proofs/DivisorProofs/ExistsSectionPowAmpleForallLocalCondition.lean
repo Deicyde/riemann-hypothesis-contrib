@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsAmpleL
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier
 
 noncomputable section
@@ -25,10 +26,11 @@ open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 
 variable {W : Scheme.{0}} [IsIntegral W] {H : LB W}
 
-theorem gen_mem_nonzeroLocus_iff {n : ℕ} (s : (lbPow H n).Sec) {J : PUnit → H.ι}
-    (hJ : genericPoint W ∈ powChart H J) :
-    genericPoint W ∈ nonzeroLocus s ↔ fnOf _ hJ (powFn s J) ≠ 0 := by
-  refine (mem_nonzeroLocus_iff_powFn s hJ).trans ((LBGerm.isUnit_gs_iff (𝟙 W) (genericPoint W) (powChart H J) hJ (powFn s J)).trans ?_)
+theorem gen_mem_nonzeroLocus_iff
+    {n : ℕ} (s : (lbPow H n).Sec) {J : PUnit → H.ι} (hJ : genericPoint W ∈ powChart H J)
+    : genericPoint W ∈ nonzeroLocus s ↔ fnOf _ hJ (powFn s J) ≠ 0 := by
+  refine (mem_nonzeroLocus_iff_powFn s hJ).trans
+    ((LBGerm.isUnit_gs_iff (𝟙 W) (genericPoint W) (powChart H J) hJ (powFn s J)).trans ?_)
   change genericPoint W ∈ W.basicOpen (powFn s J) ↔ _
   rw [← unitAt_fnOf_iff hJ hJ]
   exact ⟨UnitAt.ne_zero, unitAt_genericPoint⟩
@@ -38,23 +40,33 @@ theorem regAt_pow {x : W} {f : W.functionField} (h : RegAt x f) (k : ℕ) : RegA
   | zero => rw [pow_zero]; exact (unitAt_one x).regAt
   | succ k ih => rw [pow_succ]; exact ih.mul h
 
-theorem exists_local (hA : IsAmpleLB H) (P : W → W.functionField → Prop)
-    (hP : ∀ y c c', P y c → RegAt y c' → P y (c' * c)) {y : W} {V : W.Opens} (hy : y ∈ V) (d : Γ(W, V))
-    (hd : fnOf V (gen_mem hy) d ≠ 0) (hPd : ∀ y' ∈ V, P y' (fnOf V (gen_mem hy) d)) :
-    ∃ m, 1 ≤ m ∧ ∃ u : (lbPow H m).Sec, ∃ O : W.Opens, y ∈ O ∧ genericPoint W ∈ nonzeroLocus u ∧
-      ∀ y' ∈ O, ∀ (i : (lbPow H m).ι) (hi : y' ∈ (lbPow H m).U i), P y' (fnOf _ (gen_mem hi) (u.f i)) := by
+theorem exists_local
+    (hA : IsAmpleLB H)
+    (P : W → W.functionField → Prop) (hP : ∀ y c c', P y c → RegAt y c' → P y (c' * c))
+    {y : W} {V : W.Opens} (hy : y ∈ V) (d : Γ(W, V)) (hd : fnOf V (gen_mem hy) d ≠ 0)
+    (hPd : ∀ y' ∈ V, P y' (fnOf V (gen_mem hy) d))
+    : ∃ m,
+      1 ≤ m
+        ∧ ∃ u : (lbPow H m).Sec, ∃ O : W.Opens,
+          y ∈ O ∧ genericPoint W ∈ nonzeroLocus u
+            ∧ ∀ y' ∈ O, ∀ (i : (lbPow H m).ι) (hi : y' ∈ (lbPow H m).U i),
+              P y' (fnOf _ (gen_mem hi) (u.f i)) := by
   have := hA.compactSpace
   have := hA.quasiSeparatedSpace
   obtain ⟨q, hq, s, hys, hle, -⟩ := hA.exists_affine_le hy
-  obtain ⟨N, hN⟩ := exists_sec_eq_pow_mul (m := 0) hA.isLB s
-    (fun J => resG W (inf_le_left.trans hle : nonzeroLocus s ⊓ powChart H J ≤ V) d)
-    (LBGerm.mem_secOn_of_germ (M := lbPow H 0) _ fun z J J' hs hJ hJ' => by
-      rw [gm_lbPow_g 0 (𝟙 W) z J J' hJ hJ', pow_zero, Units.val_one, one_mul]
-      exact (gs_res (𝟙 W) z (inf_le_left.trans hle : nonzeroLocus s ⊓ powChart H J ≤ V) ⟨hs, hJ⟩ d).trans
-        (gs_res (𝟙 W) z (inf_le_left.trans hle : nonzeroLocus s ⊓ powChart H J' ≤ V) ⟨hs, hJ'⟩ d).symm)
+  obtain ⟨N, hN⟩ :=
+    exists_sec_eq_pow_mul (m := 0) hA.isLB s
+      (fun J => resG W (inf_le_left.trans hle : nonzeroLocus s ⊓ powChart H J ≤ V) d)
+      (LBGerm.mem_secOn_of_germ (M := lbPow H 0) _ fun z J J' hs hJ hJ' => by
+        rw [gm_lbPow_g 0 (𝟙 W) z J J' hJ hJ', pow_zero, Units.val_one, one_mul]
+        exact (gs_res (𝟙 W) z (inf_le_left.trans hle : nonzeroLocus s ⊓ powChart H J ≤ V) ⟨hs, hJ⟩
+            d).trans
+          (gs_res (𝟙 W) z (inf_le_left.trans hle : nonzeroLocus s ⊓ powChart H J' ≤ V) ⟨hs, hJ'⟩
+            d).symm)
   obtain ⟨u, hu⟩ := hN (N + 1) (Nat.le_succ N)
-  have key : ∀ (J : PUnit → H.ι) (hJ : genericPoint W ∈ powChart H J),
-      fnOf _ hJ (powFn u J) = fnOf _ hJ (powFn s J) ^ (N + 1) * fnOf V (gen_mem hy) d := by
+  have key
+      : ∀ (J : PUnit → H.ι) (hJ : genericPoint W ∈ powChart H J),
+        fnOf _ hJ (powFn u J) = fnOf _ hJ (powFn s J) ^ (N + 1) * fnOf V (gen_mem hy) d := by
     intro J hJ
     have hη : genericPoint W ∈ nonzeroLocus s ⊓ powChart H J := ⟨gen_mem hys, hJ⟩
     have e := congrArg (fnOf _ hη) (hu J)
@@ -69,26 +81,48 @@ theorem exists_local (hA : IsAmpleLB H) (P : W → W.functionField → Prop)
     rw [e]
     exact hP y' _ _ (hPd y' (hle hy')) hr
 
-theorem exists_prod (hL : H.IsLB) (P : W → W.functionField → Prop)
-    (hP : ∀ y c c', P y c → RegAt y c' → P y (c' * c)) {ι : Type} (m : ι → ℕ) (hm : ∀ a, 1 ≤ m a)
-    (u : ∀ a, (lbPow H (m a)).Sec) (hu : ∀ a, genericPoint W ∈ nonzeroLocus (u a)) (Q : ι → W → Prop)
-    (hQ : ∀ a y', Q a y' → ∀ (i : (lbPow H (m a)).ι) (hi : y' ∈ (lbPow H (m a)).U i),
-      P y' (fnOf _ (gen_mem hi) ((u a).f i))) (T : Finset ι) :
-    ∃ n, (T.Nonempty → 1 ≤ n) ∧ ∃ t : (lbPow H n).Sec, genericPoint W ∈ nonzeroLocus t ∧
-      ∀ a ∈ T, ∀ y', Q a y' → ∀ (i : (lbPow H n).ι) (hi : y' ∈ (lbPow H n).U i),
-        P y' (fnOf _ (gen_mem hi) (t.f i)) := by
+theorem exists_prod
+    (hL : H.IsLB)
+    (P : W → W.functionField → Prop) (hP : ∀ y c c', P y c → RegAt y c' → P y (c' * c))
+    {ι : Type} (m : ι → ℕ) (hm : ∀ a, 1 ≤ m a) (u : ∀ a, (lbPow H (m a)).Sec)
+    (hu : ∀ a, genericPoint W ∈ nonzeroLocus (u a)) (Q : ι → W → Prop)
+    (hQ : ∀ a y',
+      Q a y'
+        → ∀ (i : (lbPow H (m a)).ι) (hi : y' ∈ (lbPow H (m a)).U i),
+          P y' (fnOf _ (gen_mem hi) ((u a).f i)))
+    (T : Finset ι)
+    : ∃ n,
+      (T.Nonempty → 1 ≤ n)
+        ∧ ∃ t : (lbPow H n).Sec,
+          genericPoint W ∈ nonzeroLocus t
+            ∧ ∀ a ∈ T, ∀ y',
+              Q a y'
+                → ∀ (i : (lbPow H n).ι) (hi : y' ∈ (lbPow H n).U i),
+                  P y' (fnOf _ (gen_mem hi) (t.f i)) := by
   classical
   induction T using Finset.induction_on with
   | empty =>
-    refine ⟨0, fun h => absurd h Finset.not_nonempty_empty, secOfFn H 1, ?_, fun a ha => absurd ha (Finset.notMem_empty a)⟩
+    refine ⟨
+      0,
+      fun h => absurd h Finset.not_nonempty_empty,
+      secOfFn H 1,
+      ?_,
+      fun a ha => absurd ha (Finset.notMem_empty a)
+    ⟩
     rw [nonzeroLocus_secOfFn hL, Scheme.basicOpen_one]
     trivial
   | insert b T hb ih =>
     obtain ⟨n, -, t, ht, htP⟩ := ih
-    refine ⟨m b + n, fun _ => le_add_right (hm b), secMul (u b) t,
-      (nonzeroLocus_secMul (u b) t).ge ⟨hu b, ht⟩, fun a ha y' hy' i hi => ?_⟩
-    have e : fnOf _ (gen_mem hi) ((secMul (u b) t).f i) =
-        fnOf _ (gen_mem hi) ((u b).f i) * fnOf _ (gen_mem hi) (t.f i) :=
+    refine ⟨
+      m b + n,
+      fun _ => le_add_right (hm b),
+      secMul (u b) t,
+      (nonzeroLocus_secMul (u b) t).ge ⟨hu b, ht⟩,
+      fun a ha y' hy' i hi => ?_
+    ⟩
+    have e
+        : fnOf _ (gen_mem hi) ((secMul (u b) t).f i)
+          = fnOf _ (gen_mem hi) ((u b).f i) * fnOf _ (gen_mem hi) (t.f i) :=
       map_mul (fnOf _ (gen_mem hi)) ((u b).f i) (t.f i)
     rw [e]
     rcases Finset.mem_insert.1 ha with rfl | ha
@@ -98,14 +132,20 @@ theorem exists_prod (hL : H.IsLB) (P : W → W.functionField → Prop)
 
 end SecLocalCondition
 
-
 open SecLocalCondition in
-theorem exists_sec_forall_local_condition : ∀ (W : Scheme.{0}) [IsIntegral W] (H : LB W), IsAmpleLB H →
-    ∀ (P : W → W.functionField → Prop), (∀ y c c', P y c → RegAt y c' → P y (c' * c)) →
-    (∀ y, ∃ (V : W.Opens) (hy : y ∈ V) (d : Γ(W, V)), fnOf V (gen_mem hy) d ≠ 0 ∧
-      ∀ y' ∈ V, P y' (fnOf V (gen_mem hy) d)) →
-    ∃ n, 1 ≤ n ∧ ∃ t : (lbPow H n).Sec, t ≠ 0 ∧
-      ∀ (y : W) (i : (lbPow H n).ι) (hi : y ∈ (lbPow H n).U i), P y (fnOf _ (gen_mem hi) (t.f i)) := by
+theorem exists_sec_forall_local_condition
+    : ∀ (W : Scheme.{0}) [IsIntegral W] (H : LB W),
+      IsAmpleLB H
+        → ∀ (P : W → W.functionField → Prop),
+          (∀ y c c', P y c → RegAt y c' → P y (c' * c))
+            → (∀ y, ∃ (V : W.Opens) (hy : y ∈ V) (d : Γ(W, V)),
+              fnOf V (gen_mem hy) d ≠ 0 ∧ ∀ y' ∈ V, P y' (fnOf V (gen_mem hy) d))
+            → ∃ n,
+              1 ≤ n
+                ∧ ∃ t : (lbPow H n).Sec,
+                  t ≠ 0
+                    ∧ ∀ (y : W) (i : (lbPow H n).ι) (hi : y ∈ (lbPow H n).U i),
+                      P y (fnOf _ (gen_mem hi) (t.f i)) := by
   intro W _ H hA P hP hloc
   have := hA.compactSpace
   choose V hy d hd hPd using hloc

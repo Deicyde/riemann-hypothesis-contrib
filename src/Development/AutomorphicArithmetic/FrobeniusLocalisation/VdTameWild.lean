@@ -25,18 +25,21 @@ private theorem term_nonneg {c : ℕ} (h : 0 < c) : (0 : ℝ) ≤ 1 - 1 / (c : �
     exact hc
   linarith
 
-theorem UpperTheory.HF.vd_tame_wild :
-    ∀ {φ : Frame} (H : HostAx φ) {l : ℕ}, l.Prime → (¬ l ∣ H.el l → H.vdH l = 1 - 1 / (H.el l : ℝ)) ∧ (l ∣ H.el l → 1 ≤ H.vdH l) ∧ (¬ l ∣ H.el l → H.sl l = 1) := by
+theorem UpperTheory.HF.vd_tame_wild
+    : ∀ {φ : Frame} (H : HostAx φ) {l : ℕ},
+      l.Prime
+        → (¬ l ∣ H.el l → H.vdH l = 1 - 1 / (H.el l : ℝ)) ∧ (l ∣ H.el l → 1 ≤ H.vdH l)
+          ∧ (¬ l ∣ H.el l → H.sl l = 1) := by
   intro φ H l hl
   set v := H.condN.factorization l with hv
   set e := (HostRaw.condE H.toHostRaw).factorization l with he
   let G : ℕ → Subgroup φ.GG := fun j => HostRaw.imgOne H.toHostRaw (H.condN / l ^ v * l ^ j)
   have hev : e ≤ v := (layer_bot H.toHostRaw (j := 0) hl (Nat.zero_le _)).2.2
   have hbot : ∀ j, j ≤ v → (G j = ⊥ ↔ e ≤ j) := fun j hj => (layer_bot H.toHostRaw hl hj).1
-  have hdvd : ∀ j, j ≤ e → Nat.card (G j) ∣ (l ^ e).totient / (l ^ j).totient :=
-    fun j hj => (layer_bot H.toHostRaw hl (hj.trans hev)).2.1 hj
-  have hcard_one : ∀ j, j ≤ v → (Nat.card (G j) = 1 ↔ e ≤ j) :=
-    fun j hj => Subgroup.card_eq_one.trans (hbot j hj)
+  have hdvd : ∀ j, j ≤ e → Nat.card (G j) ∣ (l ^ e).totient / (l ^ j).totient := fun j hj =>
+    (layer_bot H.toHostRaw hl (hj.trans hev)).2.1 hj
+  have hcard_one : ∀ j, j ≤ v → (Nat.card (G j) = 1 ↔ e ≤ j) := fun j hj =>
+    Subgroup.card_eq_one.trans (hbot j hj)
   have hpos : ∀ j, j ≤ v → 0 < Nat.card (G j) := by
     intro j hjv
     by_cases hje : j ≤ e
@@ -59,7 +62,9 @@ theorem UpperTheory.HF.vd_tame_wild :
     intro h1v
     apply Subgroup.card_dvd_of_le
     apply HostRaw.imgOne_anti _ (mul_dvd_mul_left _ (pow_dvd_pow l (by norm_num)))
-    calc H.condN / l ^ v * l ^ 1 ∣ H.condN / l ^ v * l ^ v := mul_dvd_mul_left _ (pow_dvd_pow l h1v)
+    calc
+      H.condN / l ^ v * l ^ 1
+        ∣ H.condN / l ^ v * l ^ v := mul_dvd_mul_left _ (pow_dvd_pow l h1v)
       _ = H.condN := Nat.div_mul_cancel (Nat.ordProj_dvd _ _)
   have hel : H.el l = Nat.card (G 0) := by
     show Nat.card (HostRaw.imgOne H.toHostRaw (H.condN / l ^ v)) =
@@ -74,7 +79,8 @@ theorem UpperTheory.HF.vd_tame_wild :
     have h1v : 1 ≤ v := by omega
     have hd := hdvd 1 hlt.le
     rw [Nat.totient_prime_pow hl (by omega), pow_one, Nat.totient_prime hl,
-      Nat.mul_div_cancel _ (Nat.sub_pos_of_lt hl.one_lt)] at hd
+        Nat.mul_div_cancel _ (Nat.sub_pos_of_lt hl.one_lt)]
+      at hd
     obtain ⟨k, hk, hk'⟩ := (Nat.dvd_prime_pow hl).1 hd
     have hne : Nat.card (G 1) ≠ 1 := fun h => by
       have := (hcard_one 1 h1v).1 h
@@ -119,13 +125,15 @@ theorem UpperTheory.HF.vd_tame_wild :
       simp only [Finset.mem_range]
       omega
     have h01 : (0 : ℕ) ≠ 1 := by norm_num
-    calc (1 : ℝ) = 1 / 2 + 1 / 2 := by norm_num
+    calc
+      (1 : ℝ)
+        = 1 / 2 + 1 / 2 := by norm_num
       _ ≤ (1 - 1 / (Nat.card (G 0) : ℝ)) + (1 - 1 / (Nat.card (G 1) : ℝ)) :=
-          add_le_add (half_le (hge 0 (by omega))) (half_le (hge 1 (by omega)))
+        add_le_add (half_le (hge 0 (by omega))) (half_le (hge 1 (by omega)))
       _ = ∑ j ∈ ({0, 1} : Finset ℕ), (1 - 1 / (Nat.card (G j) : ℝ)) :=
-          (Finset.sum_pair (f := fun j => (1 - 1 / (Nat.card (G j) : ℝ))) h01).symm
+        (Finset.sum_pair (f := fun j => (1 - 1 / (Nat.card (G j) : ℝ))) h01).symm
       _ ≤ ∑ j ∈ Finset.range v, (1 - 1 / (Nat.card (G j) : ℝ)) :=
-          Finset.sum_le_sum_of_subset_of_nonneg hsub
-            (fun j hj _ => term_nonneg (hpos j (Finset.mem_range.1 hj).le))
+        Finset.sum_le_sum_of_subset_of_nonneg hsub
+          (fun j hj _ => term_nonneg (hpos j (Finset.mem_range.1 hj).le))
   · rw [hsl]
     exact max_eq_left (key1 hnd)

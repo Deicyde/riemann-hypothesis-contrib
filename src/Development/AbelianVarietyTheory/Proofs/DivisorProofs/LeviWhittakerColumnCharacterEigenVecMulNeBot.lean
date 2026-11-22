@@ -15,8 +15,12 @@ section Mat
 
 variable {F : Type} [Field F] {r : ℕ} {k : Fin r} {H U : Matrix (Fin r) (Fin r) F}
 
-theorem corner_row (hH : ∀ i j, H i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j → i < k ∧ j < k)
-    (N : Matrix (Fin r) (Fin r) F) {i : Fin r} (hi : ¬ i < k) (j : Fin r) : (H * N) i j = N i j := by
+theorem corner_row
+    (hH : ∀ i j, H i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j → i < k ∧ j < k)
+    (N : Matrix (Fin r) (Fin r) F)
+    {i : Fin r} (hi : ¬ i < k)
+    (j : Fin r)
+    : (H * N) i j = N i j := by
   have : (H * N) i j = ((1 : Matrix (Fin r) (Fin r) F) * N) i j := by
     rw [Matrix.mul_apply, Matrix.mul_apply]
     refine Finset.sum_congr rfl fun m _ => ?_
@@ -26,9 +30,10 @@ theorem corner_row (hH : ∀ i j, H i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j �
     rw [this]
   rw [this, one_mul]
 
-theorem corner_nil_mul (hH : ∀ i j, H i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j → i < k ∧ j < k)
-    (hU : ∀ i j : Fin r, j.val < k.val → U i j = (1 : Matrix (Fin r) (Fin r) F) i j) :
-    (U - 1) * H = U - 1 := by
+theorem corner_nil_mul
+    (hH : ∀ i j, H i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j → i < k ∧ j < k)
+    (hU : ∀ i j : Fin r, j.val < k.val → U i j = (1 : Matrix (Fin r) (Fin r) F) i j)
+    : (U - 1) * H = U - 1 := by
   conv_rhs => rw [← mul_one (U - 1)]
   ext i j
   rw [Matrix.mul_apply, Matrix.mul_apply]
@@ -44,23 +49,34 @@ end Mat
 
 variable {F : Type} [Field F] {r : ℕ}
 
-theorem corner_conj_val {k : Fin r} (h u : GL (Fin r) F)
-    (hH : ∀ i j, (h : Matrix (Fin r) (Fin r) F) i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j → i < k ∧ j < k)
-    (hU : ∀ i j : Fin r, j.val < k.val → (u : Matrix (Fin r) (Fin r) F) i j = (1 : Matrix (Fin r) (Fin r) F) i j) :
-    ((h * u * h⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) =
-      1 + (h : Matrix (Fin r) (Fin r) F) * ((u : Matrix (Fin r) (Fin r) F) - 1) := by
-  rw [Units.val_mul, Units.mul_inv_eq_iff_eq_mul, add_mul, mul_assoc, corner_nil_mul hH hU, Units.val_mul,
-    mul_sub, one_mul, mul_one, add_sub_cancel]
+theorem corner_conj_val
+    {k : Fin r} (h u : GL (Fin r) F)
+    (hH : ∀ i j,
+      (h : Matrix (Fin r) (Fin r) F) i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j → i < k ∧ j < k)
+    (hU : ∀ i j : Fin r,
+      j.val < k.val → (u : Matrix (Fin r) (Fin r) F) i j = (1 : Matrix (Fin r) (Fin r) F) i j)
+    : ((h * u * h⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
+      = 1 + (h : Matrix (Fin r) (Fin r) F) * ((u : Matrix (Fin r) (Fin r) F) - 1) := by
+  rw [Units.val_mul, Units.mul_inv_eq_iff_eq_mul, add_mul, mul_assoc, corner_nil_mul hH hU,
+    Units.val_mul, mul_sub, one_mul, mul_one, add_sub_cancel]
 
-theorem corner_conj {k : Fin r} (h u : GL (Fin r) F)
-    (hH : ∀ i j, (h : Matrix (Fin r) (Fin r) F) i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j → i < k ∧ j < k)
-    (hU : ∀ i j : Fin r, j.val < k.val → (u : Matrix (Fin r) (Fin r) F) i j = (1 : Matrix (Fin r) (Fin r) F) i j) :
-    (∀ i j : Fin r, ¬ i < k → ((h * u * h⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) i j =
-      (u : Matrix (Fin r) (Fin r) F) i j) ∧
-    (∀ i j : Fin r, j.val < k.val → ((h * u * h⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) i j =
-      (1 : Matrix (Fin r) (Fin r) F) i j) ∧
-    (∀ i : Fin r, ((h * u * h⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) i k =
-      ((h : Matrix (Fin r) (Fin r) F) * (u : Matrix (Fin r) (Fin r) F)) i k) := by
+theorem corner_conj
+    {k : Fin r} (h u : GL (Fin r) F)
+    (hH : ∀ i j,
+      (h : Matrix (Fin r) (Fin r) F) i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j → i < k ∧ j < k)
+    (hU : ∀ i j : Fin r,
+      j.val < k.val → (u : Matrix (Fin r) (Fin r) F) i j = (1 : Matrix (Fin r) (Fin r) F) i j)
+    : (∀ i j : Fin r,
+        ¬ i < k
+          → ((h * u * h⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) i j
+            = (u : Matrix (Fin r) (Fin r) F) i j)
+      ∧ (∀ i j : Fin r,
+        j.val < k.val
+          → ((h * u * h⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) i j
+            = (1 : Matrix (Fin r) (Fin r) F) i j)
+      ∧ (∀ i : Fin r,
+        ((h * u * h⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) i k
+          = ((h : Matrix (Fin r) (Fin r) F) * (u : Matrix (Fin r) (Fin r) F)) i k) := by
   rw [corner_conj_val h u hH hU]
   refine ⟨fun i j hi => ?_, fun i j hj => ?_, fun i => ?_⟩
   · rw [Matrix.add_apply, corner_row hH _ hi, Matrix.sub_apply, add_sub_cancel]
@@ -72,14 +88,22 @@ theorem corner_conj {k : Fin r} (h u : GL (Fin r) F)
       exact lt_irrefl _ (hH i k hne).2
     rw [mul_sub, mul_one, Matrix.add_apply, Matrix.sub_apply, this, add_sub_cancel]
 
-theorem eig_colChar_vecMul_ne_bot (F : Type) [Field F] (ψ : AddChar F ℂ) (r : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (b : Fin r → ℕ) (σ : Representation ℂ (blockTri (κ := F) b) V) (k : Fin r) (l : Fin r → F)
+theorem eig_colChar_vecMul_ne_bot
+    (F : Type) [Field F]
+    (ψ : AddChar F ℂ)
+    (r : ℕ)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (b : Fin r → ℕ) (σ : Representation ℂ (blockTri (κ := F) b) V)
+    (k : Fin r)
+    (l : Fin r → F)
     (h : blockTri (κ := F) b)
-    (hH : ∀ i j, ((h : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j →
-      i < k ∧ j < k)
-    (hne : eig σ (colSet F b k.val) (colChar ψ b k l) ≠ ⊥) :
-    eig σ (colSet F b k.val)
-      (colChar ψ b k (Matrix.vecMul l ((h : GL (Fin r) F) : Matrix (Fin r) (Fin r) F))) ≠ ⊥ := by
+    (hH : ∀ i j,
+      ((h : GL (Fin r) F) : Matrix (Fin r) (Fin r) F) i j ≠ (1 : Matrix (Fin r) (Fin r) F) i j
+        → i < k ∧ j < k)
+    (hne : eig σ (colSet F b k.val) (colChar ψ b k l) ≠ ⊥)
+    : eig σ (colSet F b k.val)
+        (colChar ψ b k (Matrix.vecMul l ((h : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)))
+      ≠ ⊥ := by
   rw [Submodule.ne_bot_iff] at hne ⊢
   obtain ⟨v, hv, hv0⟩ := hne
   rw [mem_eig] at hv
@@ -87,8 +111,10 @@ theorem eig_colChar_vecMul_ne_bot (F : Type) [Field F] (ψ : AddChar F ℂ) (r :
   · rw [mem_eig]
     rintro u ⟨hu, hU⟩
     obtain ⟨c1, c2, c3⟩ := corner_conj (h : GL (Fin r) F) (u : GL (Fin r) F) hH hU
-    have hc : ((h * u * h⁻¹ : blockTri (κ := F) b) : GL (Fin r) F) =
-        (h : GL (Fin r) F) * (u : GL (Fin r) F) * (h : GL (Fin r) F)⁻¹ := rfl
+    have hc
+        : ((h * u * h⁻¹ : blockTri (κ := F) b) : GL (Fin r) F)
+          = (h : GL (Fin r) F) * (u : GL (Fin r) F) * (h : GL (Fin r) F)⁻¹ :=
+      rfl
     have hmem : h * u * h⁻¹ ∈ colSet F b k.val := by
       refine ⟨?_, ?_⟩
       · rw [hc]
@@ -101,14 +127,18 @@ theorem eig_colChar_vecMul_ne_bot (F : Type) [Field F] (ψ : AddChar F ℂ) (r :
           · rw [c2 i i hi, Matrix.one_apply_eq]
           · rw [c1 i i hi, unip_diag hu]
       · rw [hc]; exact c2
-    have hχ : colChar ψ b k l (h * u * h⁻¹) =
-        colChar ψ b k (Matrix.vecMul l ((h : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)) u := by
+    have hχ
+        : colChar ψ b k l (h * u * h⁻¹)
+          = colChar ψ b k (Matrix.vecMul l ((h : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)) u := by
       unfold colChar
       rw [hc]
       congr 2
       · simp only [c3]
-        have := congrFun (Matrix.vecMul_vecMul l ((h : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
-          ((u : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)) k
+        have :=
+          congrFun
+            (Matrix.vecMul_vecMul l ((h : GL (Fin r) F) : Matrix (Fin r) (Fin r) F)
+              ((u : GL (Fin r) F) : Matrix (Fin r) (Fin r) F))
+            k
         exact this.symm
       · unfold edgeSum
         refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_

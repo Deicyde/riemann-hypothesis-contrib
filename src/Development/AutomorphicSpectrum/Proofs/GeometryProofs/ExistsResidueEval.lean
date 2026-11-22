@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NoCommonZero
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 set_option autoImplicit false
 
 noncomputable section
@@ -15,20 +16,33 @@ namespace GlobalTheory.CompanionTheory.Ar.ClosedPt
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
 open GlobalTheory.CxPts TopologicalSpace
 
-theorem exists_residue_eval : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (p : Y ⟶ Sp F) (σ : F →+* ℂ),
-    LocallyOfFiniteType p → ∀ (B : LB Y), B.IsLB → ∀ z : Y, IsClosed ({z} : Set Y) →
-    ∃ (K : Type) (_ : Field K) (_ : Algebra F K) (_ : FiniteDimensional F K) (e : B.Sec →+ K),
-      (∀ (a : F) (s : B.Sec), e (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a • s) = algebraMap F K a * e s) ∧
-      (∀ s : B.Sec, z ∈ ReciprocityTheory.ChartRestriction.G.Out.nonzeroLocus s → e s ≠ 0) ∧
-      ∀ τ : K →+* ℂ, τ.comp (algebraMap F K) = σ → ∃ (y : GlobalTheory.CxPts p σ) (i : B.ι),
-        y.1 (IsLocalRing.closedPoint ℂ) = z ∧ ∀ s : B.Sec, GlobalTheory.CxPts.secVal p σ s i y = τ (e s) := by
+theorem exists_residue_eval
+    : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (p : Y ⟶ Sp F) (σ : F →+* ℂ),
+      LocallyOfFiniteType p
+        → ∀ (B : LB Y),
+          B.IsLB
+            → ∀ z : Y,
+              IsClosed ({z} : Set Y)
+                → ∃ (K : Type) (_ : Field K) (_ : Algebra F K) (_ : FiniteDimensional F K)
+                    (e : B.Sec →+ K),
+                  (∀ (a : F) (s : B.Sec),
+                      e (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p ⊤ a • s)
+                        = algebraMap F K a * e s)
+                    ∧ (∀ s : B.Sec,
+                      z ∈ ReciprocityTheory.ChartRestriction.G.Out.nonzeroLocus s → e s ≠ 0)
+                    ∧ ∀ τ : K →+* ℂ,
+                      τ.comp (algebraMap F K) = σ
+                        → ∃ (y : GlobalTheory.CxPts p σ) (i : B.ι),
+                          y.1 (IsLocalRing.closedPoint ℂ) = z
+                            ∧ ∀ s : B.Sec, GlobalTheory.CxPts.secVal p σ s i y = τ (e s) := by
   intro F _ Y p σ hp B hB z hz
   obtain ⟨i, hzi⟩ : ∃ i, z ∈ B.U i := Opens.mem_iSup.1 (by rw [hB.cover]; trivial)
   obtain ⟨U, hU, hzU, hUi⟩ := Opens.isBasis_iff_nbhd.1 Y.isBasis_affineOpens hzi
   replace hU : IsAffineOpen U := hU
   letI : Algebra F Γ(Y, U) := (algX p U).toAlgebra
   have hft : (algX p U).FiniteType :=
-    (HasRingHomProperty.appLE @LocallyOfFiniteType p ‹_› ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩ le_top).comp
+    (HasRingHomProperty.appLE @LocallyOfFiniteType p ‹_› ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩
+        le_top).comp
       (RingHom.FiniteType.of_surjective _
         (Scheme.ΓSpecIso (CommRingCat.of F)).symm.commRingCatIsoToRingEquiv.surjective)
   have hftA : Algebra.FiniteType F Γ(Y, U) := hft
@@ -56,10 +70,11 @@ theorem exists_residue_eval : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (p : Y �
     have h1 : x0 ∈ hU.fromSpec ⁻¹ᵁ Y.basicOpen f ↔ hU.fromSpec x0 ∈ Y.basicOpen f := Iff.rfl
     rw [hfx, hU.fromSpec_preimage_basicOpen] at h1
     exact h1.symm.trans (PrimeSpectrum.mem_basicOpen _ _)
-  let e : B.Sec →+ Γ(Y, U) ⧸ P :=
-    { toFun := fun s => Ideal.Quotient.mk P (resG Y hUi (s.f i))
-      map_zero' := by simp
-      map_add' := fun s t => by simp only [GlobalTheory.LB.add_f, map_add (f := _)] }
+  let e : B.Sec →+ Γ(Y, U) ⧸ P := {
+    toFun := fun s => Ideal.Quotient.mk P (resG Y hUi (s.f i))
+    map_zero' := by simp
+    map_add' := fun s t => by simp only [GlobalTheory.LB.add_f, map_add (f := _)]
+  }
   refine ⟨Γ(Y, U) ⧸ P, inferInstance, inferInstance, hfin, e, ?_, ?_, ?_⟩
   · intro a s
     change Ideal.Quotient.mk P (resG Y hUi ((algX p ⊤ a • s).f i)) = _ * Ideal.Quotient.mk P _
@@ -70,18 +85,20 @@ theorem exists_residue_eval : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (p : Y �
   · intro s hs
     obtain ⟨k, hk⟩ := Opens.mem_iSup.1 hs
     have hki : z ∈ B.U i ⊓ B.U k := ⟨hzi, Y.basicOpen_le _ hk⟩
-    have hrel := GlobalTheory.LB.sec_rel s i k (inf_le_left : B.U i ⊓ B.U k ≤ B.U i) inf_le_right le_rfl
+    have hrel :=
+      GlobalTheory.LB.sec_rel s i k (inf_le_left : B.U i ⊓ B.U k ≤ B.U i) inf_le_right le_rfl
     have h1 : z ∈ Y.basicOpen (resG Y (inf_le_left : B.U i ⊓ B.U k ≤ B.U i) (s.f i)) := by
-      rw [hrel, Scheme.basicOpen_mul, Y.basicOpen_of_isUnit
-        ((B.g i k).isUnit.map (resG Y le_rfl))]
+      rw [hrel, Scheme.basicOpen_mul, Y.basicOpen_of_isUnit ((B.g i k).isUnit.map (resG Y le_rfl))]
       refine ⟨hki, ?_⟩
-      have : resG Y (inf_le_right : B.U i ⊓ B.U k ≤ B.U k) (s.f k) =
-          Y.presheaf.map (homOfLE (inf_le_right : B.U i ⊓ B.U k ≤ B.U k)).op (s.f k) := rfl
+      have : resG Y (inf_le_right : B.U i ⊓ B.U k ≤ B.U k) (s.f k)
+          = Y.presheaf.map (homOfLE (inf_le_right : B.U i ⊓ B.U k ≤ B.U k)).op (s.f k) :=
+        rfl
       rw [this, Scheme.basicOpen_res]
       exact ⟨hki, hk⟩
     have h2 : z ∈ Y.basicOpen (s.f i) := by
-      have : resG Y (inf_le_left : B.U i ⊓ B.U k ≤ B.U i) (s.f i) =
-          Y.presheaf.map (homOfLE (inf_le_left : B.U i ⊓ B.U k ≤ B.U i)).op (s.f i) := rfl
+      have : resG Y (inf_le_left : B.U i ⊓ B.U k ≤ B.U i) (s.f i)
+          = Y.presheaf.map (homOfLE (inf_le_left : B.U i ⊓ B.U k ≤ B.U i)).op (s.f i) :=
+        rfl
       rw [this, Scheme.basicOpen_res] at h1
       exact h1.2
     have h3 : z ∈ Y.basicOpen (resG Y hUi (s.f i)) := by
@@ -93,8 +110,7 @@ theorem exists_residue_eval : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (p : Y �
     exact (hmem _).1 h3
   · intro τ hτ
     let φ : Γ(Y, U) →+* ℂ := τ.comp (Ideal.Quotient.mk P)
-    have hφ : ∀ a, φ (algX p U a) = σ a := fun a => by
-      rw [← hτ]; rfl
+    have hφ : ∀ a, φ (algX p U a) = σ a := fun a => by rw [← hτ]; rfl
     refine ⟨ofHom hU φ hφ, i, ?_, fun s => ?_⟩
     · have hker : RingHom.ker φ = P := by
         rw [RingHom.ker_comp_of_injective _ τ.injective]

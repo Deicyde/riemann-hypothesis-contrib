@@ -10,21 +10,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnique
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PtExt
 
-theorem exists_isSecAdd : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] [IsCommMonObj A] (n : ℕ),
-    HasRoots (A := A) n → ∀ b : Fn0 A, IsTorsChar n b → ∀ S : SecFam A,
-    (∀ (D : Type) [CommRing D] [Algebra R D] (x : Pt A D), IsSec n b x (S D x)) → ∃ g : Fn2 A, IsSecAdd n S g := by
+theorem exists_isSecAdd
+    : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] [IsCommMonObj A] (n : ℕ),
+      HasRoots (A := A) n
+        → ∀ b : Fn0 A,
+          IsTorsChar n b
+            → ∀ S : SecFam A,
+              (∀ (D : Type) [CommRing D] [Algebra R D] (x : Pt A D), IsSec n b x (S D x))
+                → ∃ g : Fn2 A, IsSecAdd n S g := by
   intro R _ A _ _ n hr b hb S hS
   have difference (D : Type) [CommRing D] [Algebra R D] (x y : Pt A D) :=
-    (GlobalTheory.sec_mul_diff R A n hr b hb D x y (S D x) (S D y) (S D (x * y))
-      (hS D x) (hS D y) (hS D (x * y))).exists
+    (GlobalTheory.sec_mul_diff R A n hr b hb D x y (S D x) (S D y) (S D (x * y)) (hS D x) (hS D y)
+      (hS D (x * y))).exists
   refine ⟨fun D _ _ x y ↦ (difference D x y).choose, ?_⟩
   intro D _ _ x y E _ _ ψ z w hz hw
   exact ((difference D x y).choose_spec E ψ z w hz hw).symm

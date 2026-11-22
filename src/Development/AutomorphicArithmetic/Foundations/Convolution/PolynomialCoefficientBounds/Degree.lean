@@ -6,13 +6,12 @@ public import Mathlib
 
 open MvPolynomial Filter Topology
 
-private theorem UpperTheory.ConvolutionTheory.FX.exp_le_factorial_eventually (k : ℕ) (hk : k ≠ 0) :
-    ∀ᶠ j : ℕ in atTop, Real.exp ((k : ℝ) * j) ≤ ((j / k).factorial : ℝ) := by
+private theorem UpperTheory.ConvolutionTheory.FX.exp_le_factorial_eventually (k : ℕ) (hk : k ≠ 0)
+    : ∀ᶠ j : ℕ in atTop, Real.exp ((k : ℝ) * j) ≤ ((j / k).factorial : ℝ) := by
   set C : ℝ := Real.exp ((k : ℝ) * k) with hC
   have hCpos : 0 < C := Real.exp_pos _
   have h1 : ∀ᶠ n : ℕ in atTop, C ^ n / (n.factorial : ℝ) ≤ 1 / C :=
-    (FloorSemiring.tendsto_pow_div_factorial_atTop C).eventually
-      (ge_mem_nhds (by positivity))
+    (FloorSemiring.tendsto_pow_div_factorial_atTop C).eventually (ge_mem_nhds (by positivity))
   have h2 : ∀ᶠ n : ℕ in atTop, C ^ (n + 1) ≤ (n.factorial : ℝ) := by
     filter_upwards [h1] with n hn
     have hf : (0 : ℝ) < n.factorial := by exact_mod_cast n.factorial_pos
@@ -26,11 +25,15 @@ private theorem UpperTheory.ConvolutionTheory.FX.exp_le_factorial_eventually (k 
   have h3 : j ≤ k * (j / k + 1) := (Nat.lt_mul_div_succ j (Nat.pos_of_ne_zero hk)).le
   have h4 : (j : ℝ) ≤ k * ((j / k + 1 : ℕ) : ℝ) := by exact_mod_cast h3
   have h5 : (0 : ℝ) ≤ k := Nat.cast_nonneg k
-  calc (k : ℝ) * j ≤ k * (k * ((j / k + 1 : ℕ) : ℝ)) := mul_le_mul_of_nonneg_left h4 h5
+  calc
+    (k : ℝ) * j
+      ≤ k * (k * ((j / k + 1 : ℕ) : ℝ)) := mul_le_mul_of_nonneg_left h4 h5
     _ = _ := by ring
 
-theorem UpperTheory.ConvolutionTheory.FX.degree :
-    ∃ d : ℕ → ℕ, Tendsto (fun j : ℕ => (d j : ℝ) / j) atTop (𝓝 0) ∧ ∀ B : ℝ, ∀ᶠ j : ℕ in atTop, Real.exp (B * j) ≤ (d j).factorial := by
+theorem UpperTheory.ConvolutionTheory.FX.degree
+    : ∃ d : ℕ → ℕ,
+      Tendsto (fun j : ℕ => (d j : ℝ) / j) atTop (𝓝 0)
+        ∧ ∀ B : ℝ, ∀ᶠ j : ℕ in atTop, Real.exp (B * j) ≤ (d j).factorial := by
   classical
   let P : ℕ → ℕ → Prop := fun j k => Real.exp ((k : ℝ) * j) ≤ ((j / k).factorial : ℝ)
   let κ : ℕ → ℕ := fun j => Nat.findGreatest (P j) j

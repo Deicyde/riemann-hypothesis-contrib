@@ -16,19 +16,28 @@ section SlopeTestRemainingChoices
 
 variable {L : Type} [NontriviallyNormedField L] [IsUltrametricDist L] {n : ℕ}
 
-theorem norm_prod_sub_prod_le {ι : Type} (s : Finset ι) (f g : ι → L) {r : ℝ} (h0 : 0 ≤ r)
-    (hf : ∀ i, ‖f i‖ ≤ 1) (hg : ∀ i, ‖g i‖ ≤ 1) (hfg : ∀ i, ‖f i - g i‖ ≤ r) :
-    ‖∏ i ∈ s, f i - ∏ i ∈ s, g i‖ ≤ r :=
+theorem norm_prod_sub_prod_le
+    {ι : Type} (s : Finset ι) (f g : ι → L)
+    {r : ℝ} (h0 : 0 ≤ r)
+    (hf : ∀ i, ‖f i‖ ≤ 1) (hg : ∀ i, ‖g i‖ ≤ 1) (hfg : ∀ i, ‖f i - g i‖ ≤ r)
+    : ‖∏ i ∈ s, f i - ∏ i ∈ s, g i‖ ≤ r :=
   _root_.Bl.FirstLemmaE.goal1 s f g h0 hf hg hfg
 
-theorem norm_det_sub_det_le {A B : Matrix (Fin n) (Fin n) L} {r : ℝ} (h0 : 0 ≤ r)
-    (hA : ∀ i j, ‖A i j‖ ≤ 1) (hB : ∀ i j, ‖B i j‖ ≤ 1) (hAB : ∀ i j, ‖(A - B) i j‖ ≤ r) :
-    ‖A.det - B.det‖ ≤ r := by
+theorem norm_det_sub_det_le
+    {A B : Matrix (Fin n) (Fin n) L} {r : ℝ} (h0 : 0 ≤ r) (hA : ∀ i j, ‖A i j‖ ≤ 1)
+    (hB : ∀ i j, ‖B i j‖ ≤ 1) (hAB : ∀ i j, ‖(A - B) i j‖ ≤ r)
+    : ‖A.det - B.det‖ ≤ r := by
   rw [Matrix.det_apply, Matrix.det_apply, ← Finset.sum_sub_distrib]
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg h0 fun σ _ => ?_
   rw [← smul_sub]
-  have h := norm_prod_sub_prod_le Finset.univ (fun i => A (σ i) i) (fun i => B (σ i) i) h0
-    (fun i => hA _ _) (fun i => hB _ _) (fun i => by simpa using hAB (σ i) i)
+  have h :=
+    norm_prod_sub_prod_le Finset.univ
+      (fun i => A (σ i) i)
+      (fun i => B (σ i) i)
+      h0
+      (fun i => hA _ _)
+      (fun i => hB _ _)
+      (fun i => by simpa using hAB (σ i) i)
   have h' : ‖∏ i, B (σ i) i - ∏ i, A (σ i) i‖ ≤ r := by
     rw [norm_sub_rev]
     exact h
@@ -51,8 +60,9 @@ theorem norm_one_entry_le (i j : Fin n) : ‖(1 : Matrix (Fin n) (Fin n) L) i j�
   · rw [Matrix.one_apply_ne h, norm_zero]
     exact zero_le_one
 
-theorem norm_adjugate_entry_le {A : Matrix (Fin n) (Fin n) L} (hA : ∀ i j, ‖A i j‖ ≤ 1) (i j : Fin n) :
-    ‖A.adjugate i j‖ ≤ 1 := by
+theorem norm_adjugate_entry_le
+    {A : Matrix (Fin n) (Fin n) L} (hA : ∀ i j, ‖A i j‖ ≤ 1) (i j : Fin n)
+    : ‖A.adjugate i j‖ ≤ 1 := by
   rw [Matrix.adjugate_apply]
   refine norm_det_le_one fun a b => ?_
   by_cases h : a = j
@@ -66,10 +76,14 @@ theorem norm_adjugate_entry_le {A : Matrix (Fin n) (Fin n) L} (hA : ∀ i j, ‖
 
 end SlopeTestRemainingChoices
 
-theorem exists_mem_congK_of_entries : ∀ (L : Type) [NontriviallyNormedField L] [IsUltrametricDist L]
-    (n : ℕ) (r : ℝ) (h0 : 0 ≤ r) (h1 : r ≤ 1), r < 1 → ∀ A : Matrix (Fin n) (Fin n) L,
-    (∀ i j, ‖(A - 1) i j‖ ≤ r) →
-    ∃ k ∈ GlobalTheory.CompanionTheory.CartGL.congK L n r h0 h1, (k : Matrix (Fin n) (Fin n) L) = A := by
+theorem exists_mem_congK_of_entries
+    : ∀ (L : Type) [NontriviallyNormedField L] [IsUltrametricDist L] (n : ℕ) (r : ℝ) (h0 : 0 ≤ r)
+        (h1 : r ≤ 1),
+      r < 1
+        → ∀ A : Matrix (Fin n) (Fin n) L,
+          (∀ i j, ‖(A - 1) i j‖ ≤ r)
+            → ∃ k ∈ GlobalTheory.CompanionTheory.CartGL.congK L n r h0 h1,
+              (k : Matrix (Fin n) (Fin n) L) = A := by
   intro L _ _ n r h0 h1 hr A hA
   have hA1 : ∀ i j, ‖A i j‖ ≤ 1 := by
     intro i j
@@ -99,8 +113,10 @@ theorem exists_mem_congK_of_entries : ∀ (L : Type) [NontriviallyNormedField L]
     rw [Matrix.inv_def, Ring.inverse_eq_inv', Matrix.smul_apply, smul_eq_mul, norm_mul, norm_inv]
     exact mul_le_one₀ (inv_le_one_of_one_le₀ hd1) (norm_nonneg _) (norm_adjugate_entry_le hA1 i j)
   have hu : IsUnit A.det := isUnit_iff_ne_zero.mpr hne
-  have hk : ((Matrix.GeneralLinearGroup.mkOfDetNeZero A hne : GL (Fin n) L) :
-      Matrix (Fin n) (Fin n) L) = A := rfl
+  have hk
+      : ((Matrix.GeneralLinearGroup.mkOfDetNeZero A hne : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+        = A :=
+    rfl
   refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero A hne, ?_, hk⟩
   rw [mem_congK]
   intro i j

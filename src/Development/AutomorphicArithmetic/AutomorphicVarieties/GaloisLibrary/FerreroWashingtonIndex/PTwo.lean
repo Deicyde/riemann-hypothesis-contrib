@@ -6,14 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-theorem UpperTheory.V.FW.pTwo :
-    ∀ (C : Type) [CommGroup C] [Finite C] (J : C →* C), (∀ x, J (J x) = x) →
-      (powR (C := C) 2).index ≤
-        ((difR J).relIndex (minK J) * Nat.card (difR J ⊓ torK (C := C) 2 : Subgroup C)) ^ 2 := by
+theorem UpperTheory.V.FW.pTwo
+    : ∀ (C : Type) [CommGroup C] [Finite C] (J : C →* C),
+      (∀ x, J (J x) = x)
+        → (powR (C := C) 2).index
+          ≤ ((difR J).relIndex (minK J) * Nat.card (difR J ⊓ torK (C := C) 2 : Subgroup C))
+            ^ 2 := by
   intro C _ _ J hJ
   classical
-  have hcard : ∀ {G H : Type} [Group G] [Group H] (f : G →* H),
-      Nat.card G = Nat.card f.ker * Nat.card f.range := by
+  have hcard
+      : ∀ {G H : Type} [Group G] [Group H] (f : G →* H),
+        Nat.card G = Nat.card f.ker * Nat.card f.range := by
     intro G H _ _ f
     rw [← f.ker.card_mul_index, Subgroup.index_ker]
   set T := torK (C := C) 2 with hT
@@ -30,8 +33,9 @@ theorem UpperTheory.V.FW.pTwo :
     have e1 := hcard (powMonoidHom 2 : C →* C)
     have e2 := (powR (C := C) 2).card_mul_index
     have hpos : 0 < Nat.card (powR (C := C) 2) := Nat.card_pos
-    have e3 : Nat.card (powR (C := C) 2) * (powR (C := C) 2).index =
-        Nat.card (powR (C := C) 2) * Nat.card T := by
+    have e3
+        : Nat.card (powR (C := C) 2) * (powR (C := C) 2).index
+          = Nat.card (powR (C := C) 2) * Nat.card T := by
       rw [e2, mul_comm]
       exact e1
     exact Nat.eq_of_mul_eq_mul_left hpos e3
@@ -59,10 +63,10 @@ theorem UpperTheory.V.FW.pTwo :
     simp only at hab'
     exact Subtype.ext (Subtype.ext hab')
   let incl : (K ⊓ T : Subgroup C) →* K := Subgroup.inclusion inf_le_left
-  let h : (K ⊓ T : Subgroup C) →* K ⧸ D.subgroupOf K := (QuotientGroup.mk' (D.subgroupOf K)).comp incl
+  let h : (K ⊓ T : Subgroup C) →* K ⧸ D.subgroupOf K :=
+    (QuotientGroup.mk' (D.subgroupOf K)).comp incl
   have e5 := hcard h
-  have r3 : Nat.card h.range ≤ D.relIndex K :=
-    le_of_le_of_eq (Subgroup.card_le_card_group _) rfl
+  have r3 : Nat.card h.range ≤ D.relIndex K := le_of_le_of_eq (Subgroup.card_le_card_group _) rfl
   have r4 : Nat.card h.ker ≤ Nat.card (D ⊓ T : Subgroup C) := by
     have hm : ∀ x : h.ker, (x.1.1 : C) ∈ D ⊓ T := by
       intro x
@@ -80,7 +84,9 @@ theorem UpperTheory.V.FW.pTwo :
   have s1 : Nat.card T ≤ (r * d) * d := by
     rw [e4]
     apply Nat.mul_le_mul _ r1
-    calc Nat.card g.ker ≤ Nat.card (K ⊓ T : Subgroup C) := r2
+    calc
+      Nat.card g.ker
+        ≤ Nat.card (K ⊓ T : Subgroup C) := r2
       _ = Nat.card h.ker * Nat.card h.range := e5
       _ ≤ d * r := Nat.mul_le_mul r4 r3
       _ = r * d := mul_comm _ _

@@ -10,7 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PPartRealSmul
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+  GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
 open scoped ENNReal InnerProductSpace
 open scoped ComplexOrder
 
@@ -19,9 +22,12 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.Dict.Chart
 
 section
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Ψ : Type} [Fintype Ψ] {j j' n g : ℕ} {Λ : Type}
-  [AddCommGroup Λ] [Module (𝓞 E) Λ] {F : UnivFam E Ψ j j' n g Λ} (C : LatEmb F) (R : RiemLat E g Λ)
-
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Ψ : Type} [Fintype Ψ]
+  {j j' n g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+  {F : UnivFam E Ψ j j' n g Λ} (C : LatEmb F)
+  (R : RiemLat E g Λ)
 
 omit [IsCMField E] in
 theorem embOf_coe (s : 𝓞 E →+* ℂ) (a : 𝓞 E) : embOf s (a : E) = s a :=
@@ -64,17 +70,18 @@ theorem perExt_vec (x : Λ) : C.perExt R (C.vec x) = R.P x := by
     rw [vec_lam, perExt_bas]
   exact congrArg (fun f : Λ →ₗ[ℤ] (Fin g → ℂ) => f x) h
 
-theorem perExt_mulPt (a : 𝓞 E) (y : Ψ → Fin (j + j') → ℂ) :
-    C.perExt R (mulPt (F := F) a y) = R.B a (C.perExt R y) := by
-  have h : (C.perExt R).comp (mulPt (F := F) a) = ((R.B a).restrictScalars ℝ).comp (C.perExt R) := by
+theorem perExt_mulPt (a : 𝓞 E) (y : Ψ → Fin (j + j') → ℂ)
+    : C.perExt R (mulPt (F := F) a y) = R.B a (C.perExt R y) := by
+  have h
+      : (C.perExt R).comp (mulPt (F := F) a) = ((R.B a).restrictScalars ℝ).comp (C.perExt R) := by
     refine C.bas.ext fun k => ?_
     change C.perExt R (mulPt (F := F) a (C.bas k)) = R.B a (C.perExt R (C.bas k))
     rw [← vec_lam, ← vec_smul, perExt_vec, perExt_vec, R.act]
   exact congrArg (fun f : (Ψ → Fin (j + j') → ℂ) →ₗ[ℝ] (Fin g → ℂ) => f y) h
 
 open Classical in
-theorem perExt_single_smul (a : 𝓞 E) (τ : Ψ) (y : Fin (j + j') → ℂ) :
-    C.perExt R (Pi.single τ (F.σ τ a • y)) = R.B a (C.perExt R (Pi.single τ y)) := by
+theorem perExt_single_smul (a : 𝓞 E) (τ : Ψ) (y : Fin (j + j') → ℂ)
+    : C.perExt R (Pi.single τ (F.σ τ a • y)) = R.B a (C.perExt R (Pi.single τ y)) := by
   rw [← perExt_mulPt]
   congr 1
   ext τ' i
@@ -83,8 +90,8 @@ theorem perExt_single_smul (a : 𝓞 E) (τ : Ψ) (y : Fin (j + j') → ℂ) :
     simp [mulPt]
   · simp [mulPt, Pi.single_eq_of_ne h]
 
-theorem B_pPart (a : 𝓞 E) (τ : Ψ) (y : Fin (j + j') → ℂ) :
-    R.B a (C.pPart R τ y) = F.σ τ a • C.pPart R τ y := by
+theorem B_pPart (a : 𝓞 E) (τ : Ψ) (y : Fin (j + j') → ℂ)
+    : R.B a (C.pPart R τ y) = F.σ τ a • C.pPart R τ y := by
   classical
   have h : C.pPart R τ (F.σ τ a • y) = F.σ τ a • C.pPart R τ y := (pPartL C R τ).map_smul _ _
   rw [← h]
@@ -98,7 +105,11 @@ theorem pPart_mem_eigSp (τ : Ψ) (y : Fin (j + j') → ℂ) : C.pPart R τ y �
 
 end
 
-theorem pPart_mem_eigSp_all : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Type) [Fintype Ψ] (j j' n g : ℕ) (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (F : UnivFam E Ψ j j' n g Λ) (C : LatEmb F) (R : RiemLat E g Λ) (τ : Ψ) (y : Fin (j + j') → ℂ), C.pPart R τ y ∈ eigSp R.B (F.σ τ) := by
+theorem pPart_mem_eigSp_all
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Type) [Fintype Ψ] (j j' n g : ℕ)
+        (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (F : UnivFam E Ψ j j' n g Λ) (C : LatEmb F)
+        (R : RiemLat E g Λ) (τ : Ψ) (y : Fin (j + j') → ℂ),
+      C.pPart R τ y ∈ eigSp R.B (F.σ τ) := by
   intro E _ _ _ Ψ _ j j' n g Λ _ _ F C R τ y
   exact pPart_mem_eigSp C R τ y
 

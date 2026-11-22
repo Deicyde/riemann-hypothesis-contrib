@@ -15,10 +15,12 @@ noncomputable section
 
 def SecMRankBound.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
-    (y : (Σ k, ι k) → Ω) (D : ℕ) (b : K → ℕ),
-    IsArithVar (mCoordIdeal y) (D + 1) → (∀ k, 1 ≤ b k) →
-    (∀ m : ℕ, Module.Finite ℤ (secM y (fun k => m * b k))) ∧
-      ∃ C : ℝ, 0 ≤ C ∧ ∀ m : ℕ, (Module.finrank ℤ (secM y (fun k => m * b k)) : ℝ) ≤ C * ((m : ℝ) + 1) ^ D
+      (y : (Σ k, ι k) → Ω) (D : ℕ) (b : K → ℕ),
+    IsArithVar (mCoordIdeal y) (D + 1) → (∀ k, 1 ≤ b k)
+      → (∀ m : ℕ, Module.Finite ℤ (secM y (fun k => m * b k)))
+        ∧ ∃ C : ℝ,
+          0 ≤ C
+            ∧ ∀ m : ℕ, (Module.finrank ℤ (secM y (fun k => m * b k)) : ℝ) ≤ C * ((m : ℝ) + 1) ^ D
 
 end
 

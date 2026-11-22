@@ -17,8 +17,8 @@ namespace GlobalTheory.HeckeTwo.Regroup
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem unit_mul_mem {I : FractionalIdeal (𝓞 F)⁰ F} (ε : (𝓞 F)ˣ) {a : F} (ha : a ∈ I) :
-    ((ε : 𝓞 F) : F) * a ∈ I := by
+theorem unit_mul_mem {I : FractionalIdeal (𝓞 F)⁰ F} (ε : (𝓞 F)ˣ) {a : F} (ha : a ∈ I)
+    : ((ε : 𝓞 F) : F) * a ∈ I := by
   have : (ε : 𝓞 F) • a ∈ (I : Submodule (𝓞 F) F) := Submodule.smul_mem _ _ ha
   rwa [Algebra.smul_def] at this
 
@@ -30,22 +30,32 @@ theorem unit_eq_one {ε : (𝓞 F)ˣ} {b : F} (hb : b ≠ 0) (h : ((ε : 𝓞 F)
 
 variable (𝔞 𝔟 : Frac F)
 
-theorem mk_eq {p q : LatPair 𝔞 𝔟} (ε : (𝓞 F)ˣ) (h1 : q.1.1 = ((ε : 𝓞 F) : F) * p.1.1)
-    (h2 : q.1.2 = ((ε : 𝓞 F) : F) * p.1.2) : Quotient.mk (latRel 𝔞 𝔟) p = Quotient.mk _ q :=
+theorem mk_eq
+    {p q : LatPair 𝔞 𝔟}
+    (ε : (𝓞 F)ˣ) (h1 : q.1.1 = ((ε : 𝓞 F) : F) * p.1.1) (h2 : q.1.2 = ((ε : 𝓞 F) : F) * p.1.2)
+    : Quotient.mk (latRel 𝔞 𝔟) p = Quotient.mk _ q :=
   Quotient.sound (Exists.intro ε ⟨h1, h2⟩)
 
-theorem mkU_eq {I : FractionalIdeal (𝓞 F)⁰ F} {x y : NZ I} (ε : (𝓞 F)ˣ) (h : y.1 = ((ε : 𝓞 F) : F) * x.1) :
-    Quotient.mk (unitRel I) x = Quotient.mk _ y :=
+theorem mkU_eq
+    {I : FractionalIdeal (𝓞 F)⁰ F} {x y : NZ I} (ε : (𝓞 F)ˣ) (h : y.1 = ((ε : 𝓞 F) : F) * x.1)
+    : Quotient.mk (unitRel I) x = Quotient.mk _ y :=
   Quotient.sound (Exists.intro ε h)
 
-def leftPt (c : Quotient (unitRel (latM 𝔞))) : LatPair 𝔞 𝔟 :=
-  ⟨(c.out.1, 0), c.out.2.1, ((𝔟 : FractionalIdeal (𝓞 F)⁰ F) : Submodule (𝓞 F) F).zero_mem, fun h => c.out.2.2 (congrArg Prod.fst h)⟩
+def leftPt (c : Quotient (unitRel (latM 𝔞))) : LatPair 𝔞 𝔟 := ⟨
+  (c.out.1, 0),
+  c.out.2.1,
+  ((𝔟 : FractionalIdeal (𝓞 F)⁰ F) : Submodule (𝓞 F) F).zero_mem,
+  fun h => c.out.2.2 (congrArg Prod.fst h)
+⟩
 
-def rightPt (c : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F))) (a : {a : F // a ∈ latM 𝔞}) : LatPair 𝔞 𝔟 :=
+def rightPt (c : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F))) (a : {a : F // a ∈ latM 𝔞})
+    : LatPair 𝔞 𝔟 :=
   ⟨(a.1, c.out.1), a.2, c.out.2.1, fun h => c.out.2.2 (congrArg Prod.snd h)⟩
 
-def regroupMap : Quotient (unitRel (latM 𝔞)) ⊕
-    (Σ _ : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)), {a : F // a ∈ latM 𝔞}) → Quotient (latRel 𝔞 𝔟)
+def regroupMap
+    : Quotient (unitRel (latM 𝔞))
+        ⊕ (Σ _ : Quotient (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)), {a : F // a ∈ latM 𝔞})
+      → Quotient (latRel 𝔞 𝔟)
   | Sum.inl c => Quotient.mk _ (leftPt 𝔞 𝔟 c)
   | Sum.inr s => Quotient.mk _ (rightPt 𝔞 𝔟 s.1 s.2)
 
@@ -77,24 +87,33 @@ theorem regroupMap_surjective : Function.Surjective (regroupMap 𝔞 𝔟) := by
   intro q
   induction q using Quotient.inductionOn with
   | h p =>
-  obtain ⟨⟨a, b⟩, ha, hb, hne⟩ := p
-  by_cases hb0 : b = 0
-  · subst hb0
-    have ha0 : a ≠ 0 := fun h => hne (by simp [h])
-    obtain ⟨ε, hε⟩ : (unitRel (latM 𝔞)).r ⟨a, ha, ha0⟩ (Quotient.mk (unitRel (latM 𝔞)) ⟨a, ha, ha0⟩).out :=
-      Quotient.exact (Quotient.out_eq _).symm
-    exact ⟨Sum.inl (Quotient.mk _ ⟨a, ha, ha0⟩), (mk_eq 𝔞 𝔟 ε hε (mul_zero _).symm).symm⟩
-  · obtain ⟨ε, hε⟩ : (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)).r ⟨b, hb, hb0⟩
-        (Quotient.mk (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)) ⟨b, hb, hb0⟩).out :=
-      Quotient.exact (Quotient.out_eq _).symm
-    exact ⟨Sum.inr ⟨Quotient.mk _ ⟨b, hb, hb0⟩, ⟨_, unit_mul_mem ε ha⟩⟩, (mk_eq 𝔞 𝔟 ε rfl hε).symm⟩
+    obtain ⟨⟨a, b⟩, ha, hb, hne⟩ := p
+    by_cases hb0 : b = 0
+    · subst hb0
+      have ha0 : a ≠ 0 := fun h => hne (by simp [h])
+      obtain ⟨ε, hε⟩
+          : (unitRel (latM 𝔞)).r ⟨a, ha, ha0⟩ (Quotient.mk (unitRel (latM 𝔞)) ⟨a, ha, ha0⟩).out :=
+        Quotient.exact (Quotient.out_eq _).symm
+      exact ⟨Sum.inl (Quotient.mk _ ⟨a, ha, ha0⟩), (mk_eq 𝔞 𝔟 ε hε (mul_zero _).symm).symm⟩
+    · obtain ⟨ε, hε⟩ : (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)).r ⟨b, hb, hb0⟩
+          (Quotient.mk (unitRel (𝔟 : FractionalIdeal (𝓞 F)⁰ F)) ⟨b, hb, hb0⟩).out :=
+        Quotient.exact (Quotient.out_eq _).symm
+      exact
+        ⟨Sum.inr ⟨Quotient.mk _ ⟨b, hb, hb0⟩, ⟨_, unit_mul_mem ε ha⟩⟩, (mk_eq 𝔞 𝔟 ε rfl hε).symm⟩
 
-theorem g_out {g : F × F → ℂ}
+theorem g_out
+    {g : F × F → ℂ}
     (hg : ∀ (ε : (𝓞 F)ˣ) (a b : F), g (((ε : 𝓞 F) : F) * a, ((ε : 𝓞 F) : F) * b) = g (a, b))
-    (p : LatPair 𝔞 𝔟) : g (Quotient.mk (latRel 𝔞 𝔟) p).out.1 = g p.1 := by
-  obtain ⟨ε, h1, h2⟩ : (latRel 𝔞 𝔟).r (Quotient.mk (latRel 𝔞 𝔟) p).out p := Quotient.exact (Quotient.out_eq _)
-  have : p.1 = (((ε : 𝓞 F) : F) * (Quotient.mk (latRel 𝔞 𝔟) p).out.1.1,
-      ((ε : 𝓞 F) : F) * (Quotient.mk (latRel 𝔞 𝔟) p).out.1.2) := Prod.ext h1 h2
+    (p : LatPair 𝔞 𝔟)
+    : g (Quotient.mk (latRel 𝔞 𝔟) p).out.1 = g p.1 := by
+  obtain ⟨ε, h1, h2⟩ : (latRel 𝔞 𝔟).r (Quotient.mk (latRel 𝔞 𝔟) p).out p :=
+    Quotient.exact (Quotient.out_eq _)
+  have : p.1
+      = (
+        ((ε : 𝓞 F) : F) * (Quotient.mk (latRel 𝔞 𝔟) p).out.1.1,
+        ((ε : 𝓞 F) : F) * (Quotient.mk (latRel 𝔞 𝔟) p).out.1.2
+      ) :=
+    Prod.ext h1 h2
   rw [this, hg]
 
 end GlobalTheory.HeckeTwo.Regroup

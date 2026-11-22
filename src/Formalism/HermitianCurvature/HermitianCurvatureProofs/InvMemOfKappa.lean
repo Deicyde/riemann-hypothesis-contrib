@@ -15,22 +15,24 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5.HerA
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Fr
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.R
+  Formalism.FourierDecayAlt.Fr
 
 section Inv
 
 variable {A T : Type} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A] [Fintype T]
 
-theorem aeval_mem' (𝒜 : StarSubalgebra ℂ A) {x : A} (hx : x ∈ 𝒜) (p : Polynomial ℂ) :
-    Polynomial.aeval x p ∈ 𝒜 := by
+theorem aeval_mem' (𝒜 : StarSubalgebra ℂ A) {x : A} (hx : x ∈ 𝒜) (p : Polynomial ℂ)
+    : Polynomial.aeval x p ∈ 𝒜 := by
   refine Polynomial.induction_on p (fun a => ?_) (fun p q hp hq => ?_) (fun n a _ => ?_)
   · rw [Polynomial.aeval_C]; exact 𝒜.algebraMap_mem a
   · rw [map_add (f := _)]; exact 𝒜.add_mem hp hq
   · rw [map_mul, map_pow, Polynomial.aeval_C, Polynomial.aeval_X]
     exact 𝒜.mul_mem (𝒜.algebraMap_mem a) (𝒜.pow_mem hx _)
 
-theorem inv_mem_of_kappa (κ : (T → ℂ) →ₐ[ℂ] A) (𝒜 : StarSubalgebra ℂ A) (f : T → ℂ) (hf : κ f ∈ 𝒜) :
-    κ (fun ρ => (f ρ)⁻¹) ∈ 𝒜 := by
+theorem inv_mem_of_kappa (κ : (T → ℂ) →ₐ[ℂ] A) (𝒜 : StarSubalgebra ℂ A) (f : T → ℂ) (hf : κ f ∈ 𝒜)
+    : κ (fun ρ => (f ρ)⁻¹) ∈ 𝒜 := by
   classical
   set N : Finset ℂ := Finset.univ.image f
   set p : Polynomial ℂ := Lagrange.interpolate N id (fun v => v⁻¹)
@@ -51,14 +53,17 @@ theorem inv_mem_of_kappa (κ : (T → ℂ) →ₐ[ℂ] A) (𝒜 : StarSubalgebra
 
 variable {r : ℕ}
 
-theorem x_eq_of_start (L : LevelData A r) (st : Start A) (hst : IsLevelStart L st) (Y : ℂ) :
-    st.x Y = L.GGi * st.QQ Y 1 1 := by
+theorem x_eq_of_start (L : LevelData A r) (st : Start A) (hst : IsLevelStart L st) (Y : ℂ)
+    : st.x Y = L.GGi * st.QQ Y 1 1 := by
   rw [hst.tau, ← mul_assoc, L.GGi_GG, one_mul]
 
-theorem gens_of (𝒜 : StarSubalgebra ℂ A) (L : LevelData A r) (st : Start A) (hst : IsLevelStart L st)
-    (κ : (T → ℂ) →ₐ[ℂ] A) (x0 : T → ℂ → ℂ) (hx : ∀ Y, st.x Y = κ fun ρ => x0 ρ Y)
-    (hxi : ∀ Y ∈ st.inv, st.xi Y = κ fun ρ => (x0 ρ Y)⁻¹)
-    (hz : ∀ g ∈ zfns L, g ∈ 𝒜) (hQ : ∀ Y : ℂ, star Y = Y → ∀ i j, st.QQ Y i j ∈ 𝒜) : Gens 𝒜 L st := by
+theorem gens_of
+    (𝒜 : StarSubalgebra ℂ A)
+    (L : LevelData A r) (st : Start A) (hst : IsLevelStart L st)
+    (κ : (T → ℂ) →ₐ[ℂ] A) (x0 : T → ℂ → ℂ)
+    (hx : ∀ Y, st.x Y = κ fun ρ => x0 ρ Y) (hxi : ∀ Y ∈ st.inv, st.xi Y = κ fun ρ => (x0 ρ Y)⁻¹)
+    (hz : ∀ g ∈ zfns L, g ∈ 𝒜) (hQ : ∀ Y : ℂ, star Y = Y → ∀ i j, st.QQ Y i j ∈ 𝒜)
+    : Gens 𝒜 L st := by
   have hxm : ∀ Y : ℂ, star Y = Y → st.x Y ∈ 𝒜 := fun Y hY => by
     rw [x_eq_of_start L st hst Y]
     exact 𝒜.mul_mem (hz _ (by simp [zfns])) (hQ Y hY 1 1)
@@ -70,16 +75,21 @@ end Inv
 
 section Fn
 
-variable {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {Wp Wq : Type} [NormedAddCommGroup Wp]
-  [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp]
-  [FiniteDimensional ℂ Wq] {π : Mx k r → (Wp →L[ℂ] Wp)} {π' : Mx k r → (Wq →L[ℂ] Wq)}
+variable
+  {k r : ℕ} {z z' : Fin (2 * r + k + 1) → ℂ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+  [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+  {π : Mx k r → (Wp →L[ℂ] Wp)} {π' : Mx k r → (Wq →L[ℂ] Wq)}
 
-theorem fnVal_conj (j : Fin 6) (g : Mx k r) : conj (fnVal k r z z' (fnConj j) g) = fnVal k r z z' j g := by
+theorem fnVal_conj (j : Fin 6) (g : Mx k r)
+    : conj (fnVal k r z z' (fnConj j) g) = fnVal k r z z' j g := by
   fin_cases j <;> simp [fnVal, fnConj, map_inv₀]
 
-theorem fn_adj (X : ActualOps k r z z' π π') (μ : Measure (Mt k r)) (U : Submodule ℂ (RadSp k r z z' π π'))
-    (hU : IntOn μ U) (hfn : ∀ j, ∀ Φ ∈ U, X.fn j Φ ∈ U) (j : Fin 6) :
-    mkP (X.fn j) (X.fn (fnConj j)) ∈ adjAlg μ U hU := by
+theorem fn_adj
+    (X : ActualOps k r z z' π π') (μ : Measure (Mt k r)) (U : Submodule ℂ (RadSp k r z z' π π'))
+    (hU : IntOn μ U) (hfn : ∀ j, ∀ Φ ∈ U, X.fn j Φ ∈ U)
+    (j : Fin 6)
+    : mkP (X.fn j) (X.fn (fnConj j)) ∈ adjAlg μ U hU := by
   refine ⟨fun Φ hΦ => hfn j Φ hΦ, fun Φ hΦ => hfn _ Φ hΦ, fun c _ Φ _ Ψ _ => ?_⟩
   show pairAt μ (X.fn j Φ) Ψ c = pairAt μ Φ (X.fn (fnConj j) Ψ) c
   unfold pairAt
@@ -98,21 +108,26 @@ end Fn
 
 section Top
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] {S : Type} [Fintype S] [DecidableEq S]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+  {S : Type} [Fintype S] [DecidableEq S]
 
-theorem adjTop_of_tAdj (P : M.Par) (z z' : Fin (2 * P.r + P.k + 1) → ℂ) (π : Mx P.k P.r → (Wp →L[ℂ] Wp))
+theorem adjTop_of_tAdj
+    (P : M.Par) (z z' : Fin (2 * P.r + P.k + 1) → ℂ) (π : Mx P.k P.r → (Wp →L[ℂ] Wp))
     (π' : Mx P.k P.r → (Wq →L[ℂ] Wq)) (X : ActualOps P.k P.r z z' π π') (μ : Measure (Mt P.k P.r))
-    (L : R.LevelData (Pr (RadSp P.k P.r z z' π π')) P.r) (st : Fr.Start (Pr (RadSp P.k P.r z z' π π')))
-    (K : Fin (P.r + 1) → Submodule ℂ (RadSp P.k P.r z z' π π')) (l0 : ℕ)
-    (hD : IsData P z z' π π' X μ L st l0)
-    (U : Submodule ℂ (RadSp P.k P.r z z' π π')) (hU : IntOn μ U) (hK : K (Fin.last P.r) ≤ U)
-    (hfn : ∀ j, ∀ Φ ∈ U, X.fn j Φ ∈ U)
-    (hT : ∀ Y : ℂ, star Y = Y → ∀ a b, X.QQ Y a b ∈ adjAlg μ U hU) :
-    AdjTop (S := S) P z z' π π' μ L st K l0 := by
+    (L : R.LevelData (Pr (RadSp P.k P.r z z' π π')) P.r)
+    (st : Fr.Start (Pr (RadSp P.k P.r z z' π π')))
+    (K : Fin (P.r + 1) → Submodule ℂ (RadSp P.k P.r z z' π π'))
+    (l0 : ℕ) (hD : IsData P z z' π π' X μ L st l0)
+    (U : Submodule ℂ (RadSp P.k P.r z z' π π')) (hU : IntOn μ U)
+    (hK : K (Fin.last P.r) ≤ U) (hfn : ∀ j, ∀ Φ ∈ U, X.fn j Φ ∈ U)
+    (hT : ∀ Y : ℂ, star Y = Y → ∀ a b, X.QQ Y a b ∈ adjAlg μ U hU)
+    : AdjTop (S := S) P z z' π π' μ L st K l0 := by
   have hD' := hD
   obtain ⟨κ, hx, hxi, -⟩ :=
-    xKappaOfNF Formalism.FourierDecayAlt.P.normal_form_actual kappaFibrePos Wp Wq P z z' π π' X μ L st l0 hD
+    xKappaOfNF Formalism.FourierDecayAlt.P.normal_form_actual kappaFibrePos Wp Wq P z z' π π' X μ L
+      st l0 hD
   obtain ⟨-, -, hAL, hQQ, -, -, -, hst⟩ := hD
   obtain ⟨-, -, -, -, -, -, hζ, hζi, hζb, hζbi, hGG, hGGi, -⟩ := hAL
   have hz : ∀ g ∈ zfns L, g ∈ adjAlg μ U hU := by
@@ -129,8 +144,7 @@ theorem adjTop_of_tAdj (P : M.Par) (z z' : Fin (2 * P.r + P.k + 1) → ℂ) (π 
     intro Y hY i j
     rw [hQQ Y, Matrix.smul_apply]
     exact (adjAlg μ U hU).smul_mem (hT Y hY i j) _
-  exact adjTop_of_gens P z z' π π' X μ L st K l0 hD' U hU hK
-    (gens_of _ L st hst κ _ hx hxi hz hQ)
+  exact adjTop_of_gens P z z' π π' X μ L st K l0 hD' U hU hK (gens_of _ L st hst κ _ hx hxi hz hQ)
 
 end Top
 

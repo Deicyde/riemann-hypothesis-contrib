@@ -11,26 +11,27 @@ namespace ReciprocityTheory.Neutral.Bridge
 
 open ReciprocityTheory.Gal
 
-variable {R : Type} [CommRing R] [TopologicalSpace R] [DiscreteTopology R] {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G']
+variable
+  {R : Type} [CommRing R] [TopologicalSpace R] [DiscreteTopology R]
+  {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G']
   {M : Type} [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M]
 
 def FinCd2 (rho : Representation R G M) : Prop :=
   Finite (H0 rho) ∧ Finite (H1 rho) ∧ Finite (H2 rho) ∧ ∀ n, 3 ≤ n → Subsingleton (Hn rho n)
 
 def DualityFor (χ : G →* Rˣ) (rho : Representation R G M) (hrho : ContAction rho) : Prop :=
-  Nonempty (H2 (charRep χ) ≃ₗ[R] R) ∧
-    Function.Bijective (cupH0H2TwistedDual χ rho (MonoidHom.id _)) ∧
-    Function.Bijective (cupH1H1TwistedDual χ rho (MonoidHom.id _) (hrho.comp' continuous_id)) ∧
-    Function.Bijective (cupH1H1TwistedDual χ rho (MonoidHom.id _) (hrho.comp' continuous_id)).flip ∧
-    Function.Bijective (cup20 χ rho (MonoidHom.id _))
+  Nonempty (H2 (charRep χ) ≃ₗ[R] R) ∧ Function.Bijective (cupH0H2TwistedDual χ rho (MonoidHom.id _))
+    ∧ Function.Bijective (cupH1H1TwistedDual χ rho (MonoidHom.id _) (hrho.comp' continuous_id))
+    ∧ Function.Bijective (cupH1H1TwistedDual χ rho (MonoidHom.id _) (hrho.comp' continuous_id)).flip
+    ∧ Function.Bijective (cup20 χ rho (MonoidHom.id _))
 
-theorem contAction_comp (e : G ≃ₜ* G') {rho : Representation R G' M} (h : ContAction rho) :
-    ContAction (rho.comp (e : G →* G')) := by
+theorem contAction_comp (e : G ≃ₜ* G') {rho : Representation R G' M} (h : ContAction rho)
+    : ContAction (rho.comp (e : G →* G')) := by
   unfold ReciprocityTheory.Gal.ContAction at h ⊢
   exact h.comp ((map_continuous e).prodMap continuous_id)
 
-theorem card_H0_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) :
-    Nat.card (H0 (rho.comp (e : G →* G'))) = Nat.card (H0 rho) := by
+theorem card_H0_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M)
+    : Nat.card (H0 (rho.comp (e : G →* G'))) = Nat.card (H0 rho) := by
   have hinv : Representation.invariants (rho.comp (e : G →* G')) = rho.invariants := by
     ext v
     simp only [Representation.mem_invariants, MonoidHom.comp_apply]
@@ -42,8 +43,8 @@ theorem card_H0_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) :
   unfold H0
   rw [hinv]
 
-theorem card_H1_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) :
-    Nat.card (H1 (rho.comp (e : G →* G'))) = Nat.card (H1 rho) := by
+theorem card_H1_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M)
+    : Nat.card (H1 (rho.comp (e : G →* G'))) = Nat.card (H1 rho) := by
   let φ : (G' → M) ≃ₗ[R] (G → M) := LinearEquiv.funCongrLeft R M e.toMulEquiv.toEquiv
   have hd : ∀ m, d0 (rho.comp (e : G →* G')) m = φ (d0 rho m) := fun m => rfl
   have hZ : (Z1 rho).map φ.toLinearMap = Z1 (rho.comp (e : G →* G')) := by
@@ -88,8 +89,8 @@ theorem card_H1_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) :
     rw [h3]
     exact hy
 
-theorem card_H2_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) :
-    Nat.card (H2 (rho.comp (e : G →* G'))) = Nat.card (H2 rho) := by
+theorem card_H2_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M)
+    : Nat.card (H2 (rho.comp (e : G →* G'))) = Nat.card (H2 rho) := by
   let φ1 : (G' → M) ≃ₗ[R] (G → M) := LinearEquiv.funCongrLeft R M e.toMulEquiv.toEquiv
   let φ : (G' × G' → M) ≃ₗ[R] (G × G → M) :=
     LinearEquiv.funCongrLeft R M (e.toMulEquiv.toEquiv.prodCongr e.toMulEquiv.toEquiv)
@@ -103,9 +104,15 @@ theorem card_H2_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) :
       rw [map_mul, map_mul]
       exact hy (e g) (e h) (e k)
     · rintro ⟨hfc, hf⟩
-      refine ⟨fun q => f (e.symm q.1, e.symm q.2),
-        ⟨hfc.comp (((map_continuous e.symm).comp continuous_fst).prodMk
-          ((map_continuous e.symm).comp continuous_snd)), fun g h k => ?_⟩, ?_⟩
+      refine ⟨
+        fun q => f (e.symm q.1, e.symm q.2),
+        ⟨
+          hfc.comp (((map_continuous e.symm).comp continuous_fst).prodMk
+            ((map_continuous e.symm).comp continuous_snd)),
+          fun g h k => ?_
+        ⟩,
+        ?_
+      ⟩
       · have h2 := hf (e.symm g) (e.symm h) (e.symm k)
         simp only [map_mul]
         simpa [MonoidHom.comp_apply] using h2
@@ -152,8 +159,8 @@ theorem card_H2_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) :
     rw [h3]
     exact hy
 
-private theorem nonempty_Hn_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) (m : ℕ) :
-    Nonempty (Hn (rho.comp (e : G →* G')) (m + 1) ≃ Hn rho (m + 1)) := by
+private theorem nonempty_Hn_comp_equiv (e : G ≃ₜ* G') (rho : Representation R G' M) (m : ℕ)
+    : Nonempty (Hn (rho.comp (e : G →* G')) (m + 1) ≃ Hn rho (m + 1)) := by
   let φk : ∀ k : ℕ, ((Fin k → G') → M) ≃ₗ[R] ((Fin k → G) → M) := fun k =>
     LinearEquiv.funCongrLeft R M (Equiv.piCongrRight fun _ => e.toMulEquiv.toEquiv)
   have hC : ∀ k, (Cn rho k).map (φk k).toLinearMap = Cn (rho.comp (e : G →* G')) k := by
@@ -166,13 +173,19 @@ private theorem nonempty_Hn_comp_equiv (e : G ≃ₜ* G') (rho : Representation 
       exact (show Continuous y from hy).comp
         (continuous_pi fun i => (map_continuous e).comp (continuous_apply i))
     · intro hf
-      refine ⟨fun x => f (fun i => e.symm (x i)), (show Continuous f from hf).comp
-        (continuous_pi fun i => (map_continuous e.symm).comp (continuous_apply i)), ?_⟩
+      refine ⟨
+        fun x => f (fun i => e.symm (x i)),
+        (show Continuous f from hf).comp
+          (continuous_pi fun i => (map_continuous e.symm).comp (continuous_apply i)),
+        ?_
+      ⟩
       funext g
       show f (fun i => e.symm (e (g i))) = f g
       simp
-  have hd : ∀ k, (φk (k + 1)).toLinearMap ∘ₗ dn rho k =
-      dn (rho.comp (e : G →* G')) k ∘ₗ (φk k).toLinearMap := by
+  have hd
+      : ∀ k,
+        (φk (k + 1)).toLinearMap ∘ₗ dn rho k
+          = dn (rho.comp (e : G →* G')) k ∘ₗ (φk k).toLinearMap := by
     intro k
     refine LinearMap.ext fun f => funext fun g => ?_
     show dn rho k f (fun i => e (g i)) =
@@ -185,7 +198,8 @@ private theorem nonempty_Hn_comp_equiv (e : G ≃ₜ* G') (rho : Representation 
     funext i
     simp only [Fin.contractNth]
     split_ifs <;> simp [map_mul]
-  have hZ : (Zn rho (m + 1)).map (φk (m + 1)).toLinearMap = Zn (rho.comp (e : G →* G')) (m + 1) := by
+  have hZ
+      : (Zn rho (m + 1)).map (φk (m + 1)).toLinearMap = Zn (rho.comp (e : G →* G')) (m + 1) := by
     unfold Zn
     ext f
     simp only [Submodule.mem_map, Submodule.mem_inf, LinearMap.mem_ker, LinearEquiv.coe_coe]
@@ -194,7 +208,8 @@ private theorem nonempty_Hn_comp_equiv (e : G ≃ₜ* G') (rho : Representation 
       refine ⟨?_, ?_⟩
       · rw [← hC]
         exact ⟨y, hyC, rfl⟩
-      · calc dn (rho.comp (e : G →* G')) (m + 1) (φk (m + 1) y)
+      · calc
+          dn (rho.comp (e : G →* G')) (m + 1) (φk (m + 1) y)
             = φk (m + 1 + 1) (dn rho (m + 1) y) := (LinearMap.congr_fun (hd (m + 1)) y).symm
           _ = 0 := by rw [hyK, map_zero]
     · rintro ⟨hfC, hfK⟩
@@ -205,11 +220,13 @@ private theorem nonempty_Hn_comp_equiv (e : G ≃ₜ* G') (rho : Representation 
         simpa using hy
       · apply (φk (m + 1 + 1)).injective
         rw [map_zero]
-        calc φk (m + 1 + 1) (dn rho (m + 1) ((φk (m + 1)).symm f))
-            = dn (rho.comp (e : G →* G')) (m + 1) (φk (m + 1) ((φk (m + 1)).symm f)) :=
-              LinearMap.congr_fun (hd (m + 1)) _
+        calc
+          φk (m + 1 + 1) (dn rho (m + 1) ((φk (m + 1)).symm f))
+              = dn (rho.comp (e : G →* G')) (m + 1) (φk (m + 1) ((φk (m + 1)).symm f)) :=
+            LinearMap.congr_fun (hd (m + 1)) _
           _ = 0 := by rw [LinearEquiv.apply_symm_apply]; exact hfK
-  have hB : (Bn rho (m + 1)).map (φk (m + 1)).toLinearMap = Bn (rho.comp (e : G →* G')) (m + 1) := by
+  have hB
+      : (Bn rho (m + 1)).map (φk (m + 1)).toLinearMap = Bn (rho.comp (e : G →* G')) (m + 1) := by
     show (Submodule.map (dn rho m) (Cn rho m)).map (φk (m + 1)).toLinearMap =
       Submodule.map (dn (rho.comp (e : G →* G')) m) (Cn (rho.comp (e : G →* G')) m)
     rw [← Submodule.map_comp, hd m, Submodule.map_comp, hC m]
@@ -234,8 +251,9 @@ private theorem nonempty_Hn_comp_equiv (e : G ≃ₜ* G') (rho : Representation 
     rw [h3]
     exact hy
 
-theorem FinCd2.of_comp (e : G ≃ₜ* G') {rho : Representation R G' M} (h : FinCd2 (rho.comp (e : G →* G'))) :
-    FinCd2 rho := by
+theorem FinCd2.of_comp
+    (e : G ≃ₜ* G') {rho : Representation R G' M} (h : FinCd2 (rho.comp (e : G →* G')))
+    : FinCd2 rho := by
   obtain ⟨h0, h1, h2, h3⟩ := h
   refine ⟨?_, ?_, ?_, fun n hn => ?_⟩
   · haveI := h0
@@ -249,12 +267,19 @@ theorem FinCd2.of_comp (e : G ≃ₜ* G') {rho : Representation R G' M} (h : Fin
     haveI := h3 (m + 1) hn
     exact f.symm.subsingleton
 
-theorem DualityFor.of_comp (e : G ≃ₜ* G') (χ : G' →* Rˣ) {rho : Representation R G' M} (hrho : ContAction rho)
-    (h : DualityFor (χ.comp (e : G →* G')) (rho.comp (e : G →* G')) (contAction_comp e hrho)) :
-    DualityFor χ rho hrho := by
+theorem DualityFor.of_comp
+    (e : G ≃ₜ* G') (χ : G' →* Rˣ)
+    {rho : Representation R G' M} (hrho : ContAction rho)
+    (h : DualityFor (χ.comp (e : G →* G')) (rho.comp (e : G →* G')) (contAction_comp e hrho))
+    : DualityFor χ rho hrho := by
   obtain ⟨⟨h0⟩, h1, h2, h3, h4⟩ := h
-  refine ⟨⟨(equivH2OfIso e (charRep χ) (charRep (χ.comp (e : G →* G'))) (fun _ _ => rfl)).trans h0⟩,
-    ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    ⟨(equivH2OfIso e (charRep χ) (charRep (χ.comp (e : G →* G'))) (fun _ _ => rfl)).trans h0⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact bijective_of_iso
       (equivH0OfIso e (rho.comp (MonoidHom.id G')) ((rho.comp (e : G →* G')).comp (MonoidHom.id G))
         (fun _ _ => rfl))
@@ -262,15 +287,13 @@ theorem DualityFor.of_comp (e : G ≃ₜ* G') (χ : G' →* Rˣ) {rho : Represen
       (equivH2OfIso e ((charRep χ).comp (MonoidHom.id G'))
         ((charRep (χ.comp (e : G →* G'))).comp (MonoidHom.id G)) (fun _ _ => rfl))
       _ _ (cupZeroTwo_equiv e χ rho) h1
-  · exact bijective_of_iso
-      (equivH1OfIso e _ _ (twDual_compat e χ rho))
+  · exact bijective_of_iso (equivH1OfIso e _ _ (twDual_compat e χ rho))
       (equivH1OfIso e (rho.comp (MonoidHom.id G')) ((rho.comp (e : G →* G')).comp (MonoidHom.id G))
         (fun _ _ => rfl))
       (equivH2OfIso e ((charRep χ).comp (MonoidHom.id G'))
         ((charRep (χ.comp (e : G →* G'))).comp (MonoidHom.id G)) (fun _ _ => rfl))
       _ _ (cupOneOne_equivH1 e χ rho _ _) h2
-  · exact bijective_flip_of_iso
-      (equivH1OfIso e _ _ (twDual_compat e χ rho))
+  · exact bijective_flip_of_iso (equivH1OfIso e _ _ (twDual_compat e χ rho))
       (equivH1OfIso e (rho.comp (MonoidHom.id G')) ((rho.comp (e : G →* G')).comp (MonoidHom.id G))
         (fun _ _ => rfl))
       (equivH2OfIso e ((charRep χ).comp (MonoidHom.id G'))

@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Topol
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechPic GlobalTheory.ProjVar GlobalTheory.TrueGeo
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechPic
+  GlobalTheory.ProjVar GlobalTheory.TrueGeo
 open GlobalTheory.LB (toMod)
 open GlobalTheory.VB (degOfRank)
 
@@ -19,7 +21,10 @@ namespace GlobalTheory.CurveClosure
 
 open TensorProduct
 
-theorem isReduced_pullback_localization : ∀ (R S : Type) [CommRing R] [CommRing S] [Algebra R S] (M : Submonoid R) [IsLocalization M S] (V : Scheme.{0}) [IsReduced V] (f : V ⟶ Sp R), IsReduced (pullback f (spMap (algebraMap R S))) := by
+theorem isReduced_pullback_localization
+    : ∀ (R S : Type) [CommRing R] [CommRing S] [Algebra R S] (M : Submonoid R) [IsLocalization M S]
+        (V : Scheme.{0}) [IsReduced V] (f : V ⟶ Sp R),
+      IsReduced (pullback f (spMap (algebraMap R S))) := by
   intro R S _ _ _ M _ V _ f
   let 𝒰 := Scheme.Pullback.openCoverOfLeft V.affineOpenCover.openCover f (spMap (algebraMap R S))
   have : ∀ i, IsReduced (𝒰.X i) := fun i => by
@@ -37,7 +42,10 @@ theorem isReduced_pullback_localization : ∀ (R S : Type) [CommRing R] [CommRin
     exact isReduced_of_isOpenImmersion (pullbackSpecIso R (V.affineOpenCover.X i) S).hom
   exact IsReduced.of_openCover _ 𝒰
 
-theorem exists_iso_red_of_range : ∀ (X G : Scheme.{0}) (g : G ⟶ X) [IsClosedImmersion g] [IsReduced G] (Z : Closeds X), Set.range g = (Z : Set X) → ∃ e : (Scheme.IdealSheafData.vanishingIdeal Z).subscheme ≅ G, e.hom ≫ g = redι Z := by
+theorem exists_iso_red_of_range
+    : ∀ (X G : Scheme.{0}) (g : G ⟶ X) [IsClosedImmersion g] [IsReduced G] (Z : Closeds X),
+      Set.range g = (Z : Set X)
+        → ∃ e : (Scheme.IdealSheafData.vanishingIdeal Z).subscheme ≅ G, e.hom ≫ g = redι Z := by
   intro X G g _ _ Z h
   have hker : Scheme.IdealSheafData.vanishingIdeal Z = g.ker := by
     rw [← InterModel.radical_ker g, ← Scheme.IdealSheafData.vanishingIdeal_support]

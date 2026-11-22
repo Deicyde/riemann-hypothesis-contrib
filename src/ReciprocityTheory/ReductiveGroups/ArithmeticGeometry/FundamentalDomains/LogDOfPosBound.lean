@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.OrthonormalChartBounds
 
-open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData
+open NumberField Complex Matrix ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData
 open scoped ComplexConjugate
 
 noncomputable section
@@ -117,9 +118,12 @@ lemma spread_nonneg (la : Wt X.Ψ r) (τ : X.Ψ) : 0 ≤ X.spread la τ := by
   · simp [Real.iSup_of_isEmpty, Real.iInf_of_isEmpty]
   · exact sub_nonneg.mpr (ciInf_le_ciSup (Set.finite_range _).bddBelow (Set.finite_range _).bddAbove)
 
-theorem nfac_xZ {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : ℝ} (hρ0 : 0 < ρ) (hρ : ρ ≤ 1 / 10)
-    {Z : X.Coord} (hZ : X.zN Z ≤ ρ) (la : Wt X.Ψ r) (w : ℝ) (hw : (∑ τ, X.spread la τ) ≤ w) :
-    |Real.log (X.nfac la (X.xZ x Z)) - Real.log (X.nfac la x)| ≤ 4 * w * r * X.zN Z ^ 2 := by
+theorem nfac_xZ
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x)
+    {ρ : ℝ} (hρ0 : 0 < ρ) (hρ : ρ ≤ 1 / 10)
+    {Z : X.Coord} (hZ : X.zN Z ≤ ρ)
+    (la : Wt X.Ψ r) (w : ℝ) (hw : (∑ τ, X.spread la τ) ≤ w)
+    : |Real.log (X.nfac la (X.xZ x Z)) - Real.log (X.nfac la x)| ≤ 4 * w * r * X.zN Z ^ 2 := by
   have hZ1 : X.zN Z < 1 := by linarith
   have hy := xZ_mem_dom X hx ho hZ1
 
@@ -132,8 +136,9 @@ theorem nfac_xZ {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
       unfold sgn
       split_ifs <;> simp
     unfold Data.nfac
-    rw [Finset.prod_eq_one fun τ _ => Finset.prod_eq_one fun k _ => by rw [norm_div, hn, hn, div_one,
-      Real.one_rpow], Real.log_one]
+    rw [Finset.prod_eq_one fun τ _ =>
+        Finset.prod_eq_one fun k _ => by rw [norm_div, hn, hn, div_one, Real.one_rpow],
+      Real.log_one]
   rw [hx1, sub_zero, nfac_log X hy la]
   set s := X.zN Z with hs
   have hs0 : 0 ≤ s := by
@@ -145,16 +150,19 @@ theorem nfac_xZ {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
     rw [div_le_iff₀ (by linarith)]
     nlinarith
 
-  have hτ : ∀ τ : X.Ψ, |∑ k : Fin r, (la τ k : ℝ) * Real.log ‖dOf X (X.xZ x Z) τ k‖| ≤
-      X.spread la τ * (4 * r * s ^ 2) := by
+  have hτ
+      : ∀ τ : X.Ψ,
+        |∑ k : Fin r, (la τ k : ℝ) * Real.log ‖dOf X (X.xZ x Z) τ k‖|
+          ≤ X.spread la τ * (4 * r * s ^ 2) := by
     intro τ
     refine (spread_bound _ _ (sum_log_dOf X hx ho hZ1 τ)).trans ?_
     have hsp := spread_nonneg X la τ
     refine mul_le_mul_of_nonneg_left ?_ hsp
 
-    have hsplit : ∑ k : Fin r, |Real.log ‖dOf X (X.xZ x Z) τ k‖| =
-        ∑ k : Fin r, (if (k : ℕ) < X.p0 then -2 * Real.log ‖dOf X (X.xZ x Z) τ k‖ else 0) +
-          ∑ k : Fin r, Real.log ‖dOf X (X.xZ x Z) τ k‖ := by
+    have hsplit
+        : ∑ k : Fin r, |Real.log ‖dOf X (X.xZ x Z) τ k‖|
+          = ∑ k : Fin r, (if (k : ℕ) < X.p0 then -2 * Real.log ‖dOf X (X.xZ x Z) τ k‖ else 0)
+            + ∑ k : Fin r, Real.log ‖dOf X (X.xZ x Z) τ k‖ := by
       rw [← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
       by_cases hk : (k : ℕ) < X.p0
@@ -162,19 +170,23 @@ theorem nfac_xZ {x : Frame X.Ψ r} (hx : x ∈ X.dom) (ho : X.IsOrtho x) {ρ : �
         ring
       · rw [if_neg hk, abs_of_nonneg (log_dOf_neg X hx ho hZ1 τ k (not_lt.1 hk)), zero_add]
     rw [hsplit, sum_log_dOf X hx ho hZ1 τ, add_zero]
-    calc ∑ k : Fin r, (if (k : ℕ) < X.p0 then -2 * Real.log ‖dOf X (X.xZ x Z) τ k‖ else 0)
-        ≤ ∑ _k : Fin r, 2 * (2 * s ^ 2) := Finset.sum_le_sum fun k _ => by
+    calc
+      ∑ k : Fin r, (if (k : ℕ) < X.p0 then -2 * Real.log ‖dOf X (X.xZ x Z) τ k‖ else 0)
+          ≤ ∑ _k : Fin r, 2 * (2 * s ^ 2) :=
+        Finset.sum_le_sum fun k _ => by
           by_cases hk : (k : ℕ) < X.p0
           · rw [if_pos hk]
             have := (log_dOf_pos_bound X hx ho hZ1 τ k hk).2
             nlinarith
           · rw [if_neg hk]; positivity
       _ = 4 * r * s ^ 2 := by simp [Finset.card_univ]; ring
-  have hsum : |∑ τ, ∑ k : Fin r, (-(la τ k : ℝ) / 2) * Real.log ‖dOf X (X.xZ x Z) τ k‖| ≤
-      ∑ τ, X.spread la τ * (4 * r * s ^ 2) / 2 := by
+  have hsum
+      : |∑ τ, ∑ k : Fin r, (-(la τ k : ℝ) / 2) * Real.log ‖dOf X (X.xZ x Z) τ k‖|
+        ≤ ∑ τ, X.spread la τ * (4 * r * s ^ 2) / 2 := by
     refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun τ _ => ?_)
-    have e : ∑ k : Fin r, (-(la τ k : ℝ) / 2) * Real.log ‖dOf X (X.xZ x Z) τ k‖ =
-        -(1 / 2) * ∑ k : Fin r, (la τ k : ℝ) * Real.log ‖dOf X (X.xZ x Z) τ k‖ := by
+    have e
+        : ∑ k : Fin r, (-(la τ k : ℝ) / 2) * Real.log ‖dOf X (X.xZ x Z) τ k‖
+          = -(1 / 2) * ∑ k : Fin r, (la τ k : ℝ) * Real.log ‖dOf X (X.xZ x Z) τ k‖ := by
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       ring

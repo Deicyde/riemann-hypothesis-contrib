@@ -13,8 +13,10 @@ open MeasureTheory Real Function
 
 theorem torusMean_holds : TorusMeanBasicStatement ∧ TorusCoeffStatement := by
   classical
-  refine ⟨fun ι _ => ⟨fun f _ => tm_int f, fun f g hf hg => ?_, fun s c => ?_⟩,
-    fun ι _ f i k hk hext => ?_⟩
+  refine ⟨
+    fun ι _ => ⟨fun f _ => tm_int f, fun f g hf hg => ?_, fun s c => ?_⟩,
+    fun ι _ f i k hk hext => ?_
+  ⟩
   · show ∫ θ, tmLog (f * g) θ ∂(torusProb ι) =
       ∫ θ, tmLog f θ ∂(torusProb ι) + ∫ θ, tmLog g θ ∂(torusProb ι)
     rw [← integral_add (tm_int f) (tm_int g)]
@@ -24,8 +26,7 @@ theorem torusMean_holds : TorusMeanBasicStatement ∧ TorusCoeffStatement := by
     exact Real.log_mul (norm_ne_zero_iff.mpr h1) (norm_ne_zero_iff.mpr h2)
   · have hm : ∀ θ, tmLog (MvPolynomial.monomial s c) θ = Real.log ‖c‖ := by
       intro θ
-      simp [tmLog, MvPolynomial.eval_monomial, Finsupp.prod, norm_prod, norm_pow,
-        norm_torusPoint]
+      simp [tmLog, MvPolynomial.eval_monomial, Finsupp.prod, norm_prod, norm_pow, norm_torusPoint]
     show ∫ θ, tmLog (MvPolynomial.monomial s c) θ ∂(torusProb ι) = Real.log ‖c‖
     simp_rw [hm]
     simp
@@ -39,7 +40,8 @@ theorem torusMean_holds : TorusMeanBasicStatement ∧ TorusCoeffStatement := by
     show tmLog (coeffIn i k f) θ ≤ ∫ t, tmLog f (update θ i t) ∂unitIntervalMeasure
     simp_rw [tmLog_update]
     rw [integral_log_circ]
-    have hc : (tmSlice i (torusPoint θ) f).coeff k = MvPolynomial.eval (torusPoint θ) (coeffIn i k f) :=
+    have hc
+        : (tmSlice i (torusPoint θ) f).coeff k = MvPolynomial.eval (torusPoint θ) (coeffIn i k f) :=
       tmSlice_coeff i _ f k
     have hk' : (tmSlice i (torusPoint θ) f).coeff k ≠ 0 := hc ▸ hθ
     show Real.log ‖MvPolynomial.eval (torusPoint θ) (coeffIn i k f)‖ ≤ _

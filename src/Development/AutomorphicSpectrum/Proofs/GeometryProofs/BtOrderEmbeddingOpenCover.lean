@@ -13,7 +13,8 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HopfOrderTran
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 namespace GlobalTheory.CompanionTheory.Ar.BT.EmbSub
@@ -22,17 +23,18 @@ section alg
 
 variable {R : Type} [CommRing R] {T : Type} [CommGroup T]
 
-
 open Classical in
 noncomputable def ind (H : Subgroup T) : T → R := fun x => if x ∈ H then 1 else 0
 
-
 open Classical in
-noncomputable def extZero (H : Subgroup T) (a : H → R) : T → R := fun x => if h : x ∈ H then a ⟨x, h⟩ else 0
+noncomputable def extZero (H : Subgroup T) (a : H → R) : T → R := fun x =>
+  if h : x ∈ H then a ⟨x, h⟩ else 0
 
-theorem ind_translate_mem {H : Subgroup T} {A : Subalgebra R (H → R)} {B : Subalgebra R (T → R)}
-    (hB : ∀ f : T → R, f ∈ B ↔ ∀ t, (fun h : H => f (t * h)) ∈ A) (c : T) :
-    (fun x => ind (R := R) H (c * x)) ∈ B := by
+theorem ind_translate_mem
+    {H : Subgroup T} {A : Subalgebra R (H → R)} {B : Subalgebra R (T → R)}
+    (hB : ∀ f : T → R, f ∈ B ↔ ∀ t, (fun h : H => f (t * h)) ∈ A)
+    (c : T)
+    : (fun x => ind (R := R) H (c * x)) ∈ B := by
   refine (hB _).2 fun t => ?_
   by_cases h : c * t ∈ H
   · have : (fun x : H => ind (R := R) H (c * (t * x))) = 1 := by
@@ -52,9 +54,12 @@ theorem ind_translate_mem {H : Subgroup T} {A : Subalgebra R (H → R)} {B : Sub
     rw [this]
     exact A.zero_mem
 
-theorem extZero_mem {H : Subgroup T} {A : Subalgebra R (H → R)} {B : Subalgebra R (T → R)}
+theorem extZero_mem
+    {H : Subgroup T} {A : Subalgebra R (H → R)} {B : Subalgebra R (T → R)}
     (hB : ∀ f : T → R, f ∈ B ↔ ∀ t, (fun h : H => f (t * h)) ∈ A)
-    (hA : ∀ f ∈ A, ∀ t, (fun h => f (t * h)) ∈ A) {a : H → R} (ha : a ∈ A) : extZero H a ∈ B := by
+    (hA : ∀ f ∈ A, ∀ t, (fun h => f (t * h)) ∈ A)
+    {a : H → R} (ha : a ∈ A)
+    : extZero H a ∈ B := by
   refine (hB _).2 fun t => ?_
   by_cases h : t ∈ H
   · have : (fun x : H => extZero H a (t * x)) = fun x => a (⟨t, h⟩ * x) := by
@@ -71,29 +76,36 @@ theorem extZero_mem {H : Subgroup T} {A : Subalgebra R (H → R)} {B : Subalgebr
     rw [this]
     exact A.zero_mem
 
-theorem translate_mem {H : Subgroup T} {A : Subalgebra R (H → R)} {B : Subalgebra R (T → R)}
-    (hB : ∀ f : T → R, f ∈ B ↔ ∀ t, (fun h : H => f (t * h)) ∈ A) {f : T → R} (hf : f ∈ B) (c : T) :
-    (fun x => f (c * x)) ∈ B := by
+theorem translate_mem
+    {H : Subgroup T} {A : Subalgebra R (H → R)} {B : Subalgebra R (T → R)}
+    (hB : ∀ f : T → R, f ∈ B ↔ ∀ t, (fun h : H => f (t * h)) ∈ A)
+    {f : T → R} (hf : f ∈ B)
+    (c : T)
+    : (fun x => f (c * x)) ∈ B := by
   refine (hB _).2 fun t => ?_
   simpa only [_root_.mul_assoc] using (hB f).1 hf (c * t)
 
-def transl {B : Subalgebra R (T → R)} (hB : ∀ f ∈ B, ∀ c : T, (fun x => f (c * x)) ∈ B) (c : T) : B →+* B where
+def transl {B : Subalgebra R (T → R)} (hB : ∀ f ∈ B, ∀ c : T, (fun x => f (c * x)) ∈ B) (c : T)
+    : B →+* B where
   toFun f := ⟨fun x => (f : T → R) (c * x), hB _ f.2 c⟩
   map_one' := rfl
   map_mul' _ _ := rfl
   map_zero' := rfl
   map_add' _ _ := rfl
 
-theorem exists_translate_notMem [Finite T] {H : Subgroup T} {B : Subalgebra R (T → R)}
-    (he : ∀ c : T, (fun x => ind (R := R) H (c * x)) ∈ B) (P : Ideal B) [P.IsPrime] :
-    ∃ t : T, (⟨_, he t⁻¹⟩ : B) ∉ P := by
+theorem exists_translate_notMem
+    [Finite T]
+    {H : Subgroup T} {B : Subalgebra R (T → R)}
+    (he : ∀ c : T, (fun x => ind (R := R) H (c * x)) ∈ B) (P : Ideal B) [P.IsPrime]
+    : ∃ t : T, (⟨_, he t⁻¹⟩ : B) ∉ P := by
   classical
   have := Fintype.ofFinite T
   have h0 : (∏ t : T, (1 - (⟨_, he t⁻¹⟩ : B))) = 0 := by
     apply Subtype.ext
     funext x
-    have hx : ((∏ t : T, (1 - (⟨_, he t⁻¹⟩ : B)) : B) : T → R) x
-        = ∏ t : T, (1 - ind (R := R) H (t⁻¹ * x)) := by
+    have hx
+        : ((∏ t : T, (1 - (⟨_, he t⁻¹⟩ : B)) : B) : T → R) x
+          = ∏ t : T, (1 - ind (R := R) H (t⁻¹ * x)) := by
       rw [← Subalgebra.coe_val, map_prod, Finset.prod_apply]
       rfl
     rw [hx]
@@ -110,38 +122,56 @@ end alg
 
 section geom
 
-theorem isAffineOpen_of_fin {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T] (Γ : QFGroup R T)
-    {U : Γ.G.left.Opens} (hF : Γ.IsFinOpenSub U) : IsAffineOpen U := by
+theorem isAffineOpen_of_fin
+    {R : Type} [CommRing R] [IsDomain R]
+    {T : Type} [CommGroup T]
+    (Γ : QFGroup R T)
+    {U : Γ.G.left.Opens} (hF : Γ.IsFinOpenSub U)
+    : IsAffineOpen U := by
   have := hF.finite
   have : IsAffineHom (U.ι ≫ Γ.G.hom) := inferInstance
   exact isAffine_of_isAffineHom (U.ι ≫ Γ.G.hom)
 
-noncomputable def valRing {B : Type} [CommRing B] {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) (U : X.Opens)
-    (h : ⊤ ≤ x ⁻¹ᵁ U) : Γ(X, U) →+* B :=
+noncomputable def valRing
+    {B : Type} [CommRing B]
+    {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) (U : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U)
+    : Γ(X, U) →+* B :=
   (Scheme.ΓSpecIso (CommRingCat.of B)).hom.hom.comp (x.appLE U ⊤ h).hom
 
-theorem valRing_apply {B : Type} [CommRing B] {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) (U : X.Opens)
-    (h : ⊤ ≤ x ⁻¹ᵁ U) (s : Γ(X, U)) : valRing x U h s = valAt x U h s := rfl
+theorem valRing_apply
+    {B : Type} [CommRing B]
+    {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) (U : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U) (s : Γ(X, U))
+    : valRing x U h s = valAt x U h s :=
+  rfl
 
-theorem spec_valRing_fromSpec {B : Type} [CommRing B] {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X) {U : X.Opens}
-    (hU : IsAffineOpen U) (h : ⊤ ≤ x ⁻¹ᵁ U) :
-    Spec.map (CommRingCat.ofHom (valRing x U h)) ≫ hU.fromSpec = x := by
+theorem spec_valRing_fromSpec
+    {B : Type} [CommRing B]
+    {X : Scheme.{0}} (x : Spec (CommRingCat.of B) ⟶ X)
+    {U : X.Opens} (hU : IsAffineOpen U) (h : ⊤ ≤ x ⁻¹ᵁ U)
+    : Spec.map (CommRingCat.ofHom (valRing x U h)) ≫ hU.fromSpec = x := by
   have e := IsAffineOpen.SpecMap_appLE_fromSpec x hU (isAffineOpen_top _) h
   rw [IsAffineOpen.fromSpec_top, Scheme.isoSpec_Spec_inv] at e
-  have : CommRingCat.ofHom (valRing x U h) = x.appLE U ⊤ h ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom := rfl
+  have : CommRingCat.ofHom (valRing x U h)
+      = x.appLE U ⊤ h ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom :=
+    rfl
   rw [this, Spec.map_comp, Category.assoc, e, ← Category.assoc, ← Spec.map_comp]
   simp
 
-theorem fromSpec_mem' {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (z) : hU.fromSpec z ∈ U := by
+theorem fromSpec_mem' {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (z)
+    : hU.fromSpec z ∈ U := by
   rw [← SetLike.mem_coe, ← hU.range_fromSpec]
   exact ⟨z, rfl⟩
 
 variable {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T]
 
-theorem val_pullback (Γ : QFGroup R T) {U : Γ.G.left.Opens} (hU : IsAffineOpen U) {A : Subalgebra R (T → R)}
-    {j : Γ.G.left ⟶ Spec (CommRingCat.of A)} (hj : Γ.IsEmb A j) (ψ : CommRingCat.of A ⟶ Γ(Γ.G.left, U))
-    (hψ : Spec.map ψ = hU.fromSpec ≫ j) (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U) (f : A) :
-    valAt (Γ.pt t).left U h (ψ.hom f) = algebraMap R (FractionRing R) ((f : T → R) t) := by
+theorem val_pullback
+    (Γ : QFGroup R T)
+    {U : Γ.G.left.Opens} (hU : IsAffineOpen U)
+    {A : Subalgebra R (T → R)} {j : Γ.G.left ⟶ Spec (CommRingCat.of A)}
+    (hj : Γ.IsEmb A j) (ψ : CommRingCat.of A ⟶ Γ(Γ.G.left, U)) (hψ : Spec.map ψ = hU.fromSpec ≫ j)
+    (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U)
+    (f : A)
+    : valAt (Γ.pt t).left U h (ψ.hom f) = algebraMap R (FractionRing R) ((f : T → R) t) := by
   have e1 := spec_valRing_fromSpec (Γ.pt t).left hU h
   have e2 := hj.pt t
   rw [← e1, Category.assoc, ← hψ, ← Spec.map_comp] at e2
@@ -149,25 +179,34 @@ theorem val_pullback (Γ : QFGroup R T) {U : Γ.G.left.Opens} (hU : IsAffineOpen
   simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_ofHom] at this
   exact this
 
-theorem val_mem_range [IsIntegrallyClosed R] (Γ : QFGroup R T) {U : Γ.G.left.Opens} (hF : Γ.IsFinOpenSub U)
-    (hU : IsAffineOpen U) {A : Subalgebra R (T → R)}
-    {j : Γ.G.left ⟶ Spec (CommRingCat.of A)} (hj : Γ.IsEmb A j) (ψ : CommRingCat.of A ⟶ Γ(Γ.G.left, U))
-    (hψ : Spec.map ψ = hU.fromSpec ≫ j) (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U) (s : Γ(Γ.G.left, U)) :
-    ∃ r : R, algebraMap R (FractionRing R) r = valAt (Γ.pt t).left U h s := by
+theorem val_mem_range
+    [IsIntegrallyClosed R]
+    (Γ : QFGroup R T)
+    {U : Γ.G.left.Opens} (hF : Γ.IsFinOpenSub U) (hU : IsAffineOpen U)
+    {A : Subalgebra R (T → R)} {j : Γ.G.left ⟶ Spec (CommRingCat.of A)}
+    (hj : Γ.IsEmb A j) (ψ : CommRingCat.of A ⟶ Γ(Γ.G.left, U)) (hψ : Spec.map ψ = hU.fromSpec ≫ j)
+    (t : T) (h : ⊤ ≤ (Γ.pt t).left ⁻¹ᵁ U)
+    (s : Γ(Γ.G.left, U))
+    : ∃ r : R, algebraMap R (FractionRing R) r = valAt (Γ.pt t).left U h s := by
   let ρ : R →+* Γ(Γ.G.left, U) := ψ.hom.comp (algebraMap R A)
   letI : Algebra R Γ(Γ.G.left, U) := ρ.toAlgebra
   have hρ : hU.fromSpec ≫ Γ.G.hom = Spec.map (CommRingCat.ofHom (algebraMap R Γ(Γ.G.left, U))) := by
-    have e : CommRingCat.ofHom (algebraMap R Γ(Γ.G.left, U)) = CommRingCat.ofHom (algebraMap R A) ≫ ψ := rfl
+    have e
+        : CommRingCat.ofHom (algebraMap R Γ(Γ.G.left, U))
+          = CommRingCat.ofHom (algebraMap R A) ≫ ψ :=
+      rfl
     rw [e, Spec.map_comp, hψ, Category.assoc, hj.isOver]
   have := hF.finite
   have hfin : IsFinite (hU.fromSpec ≫ Γ.G.hom) := by
     rw [← hU.isoSpec_inv_ι, Category.assoc]
     infer_instance
   rw [hρ] at hfin
-  have hfin' : Module.Finite R Γ(Γ.G.left, U) := RingHom.finite_algebraMap.1 ((IsFinite.SpecMap_iff _).1 hfin)
+  have hfin' : Module.Finite R Γ(Γ.G.left, U) :=
+    RingHom.finite_algebraMap.1 ((IsFinite.SpecMap_iff _).1 hfin)
   have h1 : IsIntegral R s := Algebra.IsIntegral.isIntegral s
-  have h2 : (algebraMap R (FractionRing R)).comp (RingHom.id R) =
-      (valRing (Γ.pt t).left U h).comp (algebraMap R Γ(Γ.G.left, U)) := by
+  have h2
+      : (algebraMap R (FractionRing R)).comp (RingHom.id R)
+        = (valRing (Γ.pt t).left U h).comp (algebraMap R Γ(Γ.G.left, U)) := by
     ext r
     have := val_pullback Γ hU hj ψ hψ t h (algebraMap R A r)
     exact this.symm
@@ -180,11 +219,18 @@ end GlobalTheory.CompanionTheory.Ar.BT.EmbSub
 
 namespace GlobalTheory.CompanionTheory.Ar.BT.EmbSub
 
-theorem openImmersion_translatesCover : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens), Γ.IsFinOpenSub U → ∀ (j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤))), Γ.IsEmb (Γ.btOrder ⊤) j → IsOpenImmersion (U.ι ≫ j) ∧ Γ.TranslatesCover (Γ.btOrder ⊤) j U := by
+theorem openImmersion_translatesCover
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T]
+        [Finite T] (Γ : QFGroup R T) (U : Γ.G.left.Opens),
+      Γ.IsFinOpenSub U
+        → ∀ (j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤))),
+          Γ.IsEmb (Γ.btOrder ⊤) j
+            → IsOpenImmersion (U.ι ≫ j) ∧ Γ.TranslatesCover (Γ.btOrder ⊤) j U := by
   intro R _ _ _ T _ _ Γ U hF j hj
   obtain ⟨H, A, hH, hA, hAs⟩ := GlobalTheory.T.finite_open_hopf_order R T Γ U hF
   have hU := isAffineOpen_of_fin Γ hF
-  have hTr : ∀ f ∈ A, ∀ t, (fun h => f (t * h)) ∈ A := GlobalTheory.T.hopf_order_translation_invariant R H A hA
+  have hTr : ∀ f ∈ A, ∀ t, (fun h => f (t * h)) ∈ A :=
+    GlobalTheory.T.hopf_order_translation_invariant R H A hA
   have hB : ∀ f : T → R, f ∈ Γ.btOrder ⊤ ↔ ∀ t, (fun h : H => f (t * h)) ∈ A := by
     intro f
     have hOrder : Γ.btOrder U = Γ.btOrder ⊤ :=
@@ -196,7 +242,8 @@ theorem openImmersion_translatesCover : ∀ (R : Type) [CommRing R] [IsDomain R]
       exact (hAs _).2 ⟨s, fun x h => hs x h⟩
     · intro hf t
       obtain ⟨s, hs⟩ := (hAs _).1 (hf t)
-      exact (GlobalTheory.T.regular_function_iff_section R T Γ U _).2 ⟨s, fun x h => hs ⟨x, (hH x).2 h⟩ h⟩
+      exact (GlobalTheory.T.regular_function_iff_section R T Γ U _).2
+        ⟨s, fun x h => hs ⟨x, (hH x).2 h⟩ h⟩
   let ψ : CommRingCat.of (Γ.btOrder ⊤) ⟶ Γ(Γ.G.left, U) := Spec.preimage (hU.fromSpec ≫ j)
   have hψ : Spec.map ψ = hU.fromSpec ≫ j := Spec.map_preimage _
   have hv := val_pullback Γ hU hj ψ hψ
@@ -254,9 +301,10 @@ theorem openImmersion_translatesCover : ∀ (R : Type) [CommRing R] [IsDomain R]
     rw [this]
     infer_instance
   · intro P
-    have hBt : ∀ f ∈ Γ.btOrder ⊤, ∀ c : T, (fun x => f (c * x)) ∈ Γ.btOrder ⊤ :=
-      fun f hf c => translate_mem hB hf c
-    obtain ⟨t, ht⟩ := exists_translate_notMem (B := Γ.btOrder ⊤) (H := H) (ind_translate_mem hB) P.asIdeal
+    have hBt : ∀ f ∈ Γ.btOrder ⊤, ∀ c : T, (fun x => f (c * x)) ∈ Γ.btOrder ⊤ := fun f hf c =>
+      translate_mem hB hf c
+    obtain ⟨t, ht⟩ :=
+      exists_translate_notMem (B := Γ.btOrder ⊤) (H := H) (ind_translate_mem hB) P.asIdeal
     let Q : Ideal (Γ.btOrder ⊤) := P.asIdeal.comap (transl hBt t⁻¹)
     have hQ : Q.IsPrime := Ideal.comap_isPrime _ _
     have heQ : e ∉ Q := by
@@ -274,7 +322,8 @@ theorem openImmersion_translatesCover : ∀ (R : Type) [CommRing R] [IsDomain R]
     have hk : RingHom.ker ψ.hom ≤ Q := by
       rw [hker, Ideal.span_singleton_le_iff_mem]
       exact h1e
-    obtain ⟨Q', hQ'⟩ : (⟨Q, hQ⟩ : PrimeSpectrum (Γ.btOrder ⊤)) ∈ Set.range (PrimeSpectrum.comap ψ.hom) := by
+    obtain ⟨Q', hQ'⟩
+        : (⟨Q, hQ⟩ : PrimeSpectrum (Γ.btOrder ⊤)) ∈ Set.range (PrimeSpectrum.comap ψ.hom) := by
       rw [range_comap_of_surjective _ _ hsurj]
       exact hk
     refine ⟨t, hU.fromSpec Q', fromSpec_mem' hU _, fun f f' hff => ?_⟩

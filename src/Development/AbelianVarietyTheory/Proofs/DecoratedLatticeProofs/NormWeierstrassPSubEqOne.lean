@@ -131,16 +131,15 @@ private lemma padicComplex_norm_two_eq_one_of_ne_two (h : p ≠ 2) : ‖(2 : ℂ
   have : p ∣ 2 := by exact_mod_cast hlt
   exact (Nat.prime_dvd_prime_iff_eq Fact.out Nat.prime_two).1 this
 
-
 open scoped ComplexConjugate BigOperators in
 variable {p : ℕ} [Fact p.Prime] in
-theorem _root_.GlobalTheory.Klein.norm_weierstrassP_sub_eq_one (p : ℕ) [Fact p.Prime] (ι : ℂ ≃+* ℂ_[p])
-    (L : PeriodPair) (r : ℂ)
-    (hG : _root_.GlobalTheory.Klein.Good ι L r) (u v : ℂ) (hu : _root_.GlobalTheory.Klein.Red ι L r u)
-    (hv : _root_.GlobalTheory.Klein.Red ι L r v)
-    (h₁ : _root_.GlobalTheory.Klein.Red ι L r (u + v))
-    (h₂ : _root_.GlobalTheory.Klein.Red ι L r (u - v)) :
-    ‖ι (L.weierstrassP u - L.weierstrassP v)‖ = 1 := by
+theorem _root_.GlobalTheory.Klein.norm_weierstrassP_sub_eq_one
+    (p : ℕ) [Fact p.Prime]
+    (ι : ℂ ≃+* ℂ_[p]) (L : PeriodPair) (r : ℂ) (hG : _root_.GlobalTheory.Klein.Good ι L r)
+    (u v : ℂ) (hu : _root_.GlobalTheory.Klein.Red ι L r u)
+    (hv : _root_.GlobalTheory.Klein.Red ι L r v) (h₁ : _root_.GlobalTheory.Klein.Red ι L r (u + v))
+    (h₂ : _root_.GlobalTheory.Klein.Red ι L r (u - v))
+    : ‖ι (L.weierstrassP u - L.weierstrassP v)‖ = 1 := by
   obtain ⟨hp, h12r, hc, -, hΔ⟩ := hG
   obtain ⟨hu, hXu⟩ := hu
   obtain ⟨hv, hXv⟩ := hv
@@ -156,7 +155,8 @@ theorem _root_.GlobalTheory.Klein.norm_weierstrassP_sub_eq_one (p : ℕ) [Fact p
   have hne' : L.weierstrassP u ≠ L.weierstrassP (-v) := by rwa [PeriodPair.weierstrassP_neg]
   have hB := (_root_.GlobalTheory.weierstrassP_add L hu hnv hne').1
   rw [PeriodPair.weierstrassP_neg, PeriodPair.derivWeierstrassP_neg, ← sub_eq_add_neg,
-    sub_neg_eq_add] at hB
+      sub_neg_eq_add]
+    at hB
   have hsym := _root_.GlobalTheory.weierstrassP_add_add_sub L hu hv hne
   have hY := L.derivWeierstrassP_sq v hv
   set x₁ := L.weierstrassP u
@@ -165,33 +165,49 @@ theorem _root_.GlobalTheory.Klein.norm_weierstrassP_sub_eq_one (p : ℕ) [Fact p
   set t := L.weierstrassP (u - v)
   set y₁ := L.derivWeierstrassP u
   set y₂ := L.derivWeierstrassP v
-  have cA : (y₁ - y₂) ^ 2 = ((x₁ - r) - (x₂ - r)) ^ 2 *
-      (4 * ((s - r) + (x₁ - r) + (x₂ - r)) + 12 * r) := by
+  have cA
+      : (y₁ - y₂) ^ 2
+        = ((x₁ - r) - (x₂ - r)) ^ 2 * (4 * ((s - r) + (x₁ - r) + (x₂ - r)) + 12 * r) := by
     rw [hA]; field_simp; ring
-  have cB : (y₁ + y₂) ^ 2 = ((x₁ - r) - (x₂ - r)) ^ 2 *
-      (4 * ((t - r) + (x₁ - r) + (x₂ - r)) + 12 * r) := by
+  have cB
+      : (y₁ + y₂) ^ 2
+        = ((x₁ - r) - (x₂ - r)) ^ 2 * (4 * ((t - r) + (x₁ - r) + (x₂ - r)) + 12 * r) := by
     rw [hB]; field_simp; ring
-  have cS : ((x₁ - r) - (x₂ - r)) ^ 2 * ((s - r) + (t - r) - 2 * (x₂ - r)) =
-      (6 * (x₂ - r) ^ 2 + 12 * r * (x₂ - r) + (12 * r ^ 2 - L.g₂) / 2) * ((x₁ - r) - (x₂ - r)) +
-        y₂ ^ 2 := by
+  have cS
+      : ((x₁ - r) - (x₂ - r)) ^ 2 * ((s - r) + (t - r) - 2 * (x₂ - r))
+        = (6 * (x₂ - r) ^ 2 + 12 * r * (x₂ - r) + (12 * r ^ 2 - L.g₂) / 2) * ((x₁ - r) - (x₂ - r))
+          + y₂ ^ 2 := by
     have e : s = (6 * x₂ ^ 2 - L.g₂ / 2) / (x₁ - x₂) + y₂ ^ 2 / (x₁ - x₂) ^ 2 - t + 2 * x₂ := by
       linear_combination hsym
-    rw [e]; field_simp; ring
-  have cD : 4 * (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) =
-      y₂ ^ 2 * (36 * (12 * (x₂ - r) + 12 * r) *
-          (6 * (x₂ - r) ^ 2 + 12 * r * (x₂ - r) + (12 * r ^ 2 - L.g₂) / 2)
-        - 108 * y₂ ^ 2 - (12 * (x₂ - r) + 12 * r) ^ 3) +
-      (6 * (x₂ - r) ^ 2 + 12 * r * (x₂ - r) + (12 * r ^ 2 - L.g₂) / 2) ^ 2 *
-        ((12 * (x₂ - r) + 12 * r) ^ 2 -
-          32 * (6 * (x₂ - r) ^ 2 + 12 * r * (x₂ - r) + (12 * r ^ 2 - L.g₂) / 2)) := by
+    rw [e]
+    field_simp
+    ring
+  have cD
+      : 4 * (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)
+        = y₂ ^ 2
+            * (36 * (12 * (x₂ - r) + 12 * r)
+                * (6 * (x₂ - r) ^ 2 + 12 * r * (x₂ - r) + (12 * r ^ 2 - L.g₂) / 2)
+              - 108 * y₂ ^ 2 - (12 * (x₂ - r) + 12 * r) ^ 3)
+          + (6 * (x₂ - r) ^ 2 + 12 * r * (x₂ - r) + (12 * r ^ 2 - L.g₂) / 2) ^ 2
+            * ((12 * (x₂ - r) + 12 * r) ^ 2
+              - 32 * (6 * (x₂ - r) ^ 2 + 12 * r * (x₂ - r) + (12 * r ^ 2 - L.g₂) / 2)) := by
     rw [hY]; ring
-  have key := norm_sub_eq_one_of_discriminant_relations (padicComplex_norm_two_eq_one_of_ne_two hp) hXu hXv hS hT h12r hc
-    hΔ (Y₁ := ι y₁) (Y₂ := ι y₂)
-    (by rw [← map_sub]; exact (map_ne_zero ι).2 (by rwa [sub_sub_sub_cancel_right]))
-    (by simpa only [map_sub, map_mul, map_add (f := _), map_pow, map_ofNat, map_div₀] using congrArg ι cA)
-    (by simpa only [map_sub, map_mul, map_add (f := _), map_pow, map_ofNat, map_div₀] using congrArg ι cB)
-    (by simpa only [map_sub, map_mul, map_add (f := _), map_pow, map_ofNat, map_div₀] using congrArg ι cS)
-    (by simpa only [map_sub, map_mul, map_add (f := _), map_pow, map_ofNat, map_div₀] using congrArg ι cD)
+  have key :=
+    norm_sub_eq_one_of_discriminant_relations (padicComplex_norm_two_eq_one_of_ne_two hp) hXu hXv hS
+      hT h12r hc hΔ (Y₁ := ι y₁) (Y₂ := ι y₂)
+      (by rw [← map_sub]; exact (map_ne_zero ι).2 (by rwa [sub_sub_sub_cancel_right]))
+      (by
+        simpa only [map_sub, map_mul, map_add (f := _), map_pow, map_ofNat, map_div₀] using
+          congrArg ι cA)
+      (by
+        simpa only [map_sub, map_mul, map_add (f := _), map_pow, map_ofNat, map_div₀] using
+          congrArg ι cB)
+      (by
+        simpa only [map_sub, map_mul, map_add (f := _), map_pow, map_ofNat, map_div₀] using
+          congrArg ι cS)
+      (by
+        simpa only [map_sub, map_mul, map_add (f := _), map_pow, map_ofNat, map_div₀] using
+          congrArg ι cD)
   rwa [← map_sub, sub_sub_sub_cancel_right] at key
 
 end GlobalTheory.Klein

@@ -8,10 +8,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.IsCplAt.exists_prime_over :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (p : Ideal R) (B : Type) [CommRing B] [IsLocalRing B] [Algebra R B], IsCplAt R p B →
-      (∀ q : Ideal R, q.IsPrime → q ≤ p → ∃ Q : Ideal B, Q.IsPrime ∧ Q.comap (algebraMap R B) = q) ∧
-      (∀ a : R, algebraMap R B a = 0 → ∃ s : R, s ∉ p ∧ s * a = 0) := by
+theorem UpperTheory.V.AlgebraTools.IsCplAt.exists_prime_over
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (p : Ideal R) (B : Type) [CommRing B]
+        [IsLocalRing B] [Algebra R B],
+      IsCplAt R p B
+        → (∀ q : Ideal R,
+            q.IsPrime → q ≤ p → ∃ Q : Ideal B, Q.IsPrime ∧ Q.comap (algebraMap R B) = q)
+          ∧ (∀ a : R, algebraMap R B a = 0 → ∃ s : R, s ∉ p ∧ s * a = 0) := by
   intro R _ _ p B _ _ _ h
   haveI := h.isPrime
   haveI := IsCplAt.flat R p B h
@@ -30,7 +33,9 @@ theorem UpperTheory.V.AlgebraTools.IsCplAt.exists_prime_over :
       have := Ideal.mem_map_of_mem (algebraMap R Rp) hsa
       rw [map_mul] at this
       exact (Ideal.unit_mul_mem_iff_mem _ hu).mp this
-    have hbot := Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal Rp) (IsLocalRing.maximalIdeal.isMaximal Rp).ne_top
+    have hbot :=
+      Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal Rp)
+        (IsLocalRing.maximalIdeal.isMaximal Rp).ne_top
     have h0 : algebraMap R Rp a = 0 := by
       have : algebraMap R Rp a ∈ ⨅ i, (maximalIdeal Rp) ^ i := Ideal.mem_iInf.mpr hmem
       rw [hbot] at this

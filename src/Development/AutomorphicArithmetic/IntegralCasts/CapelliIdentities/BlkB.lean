@@ -4,18 +4,17 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.Yha8.blkA :
-    {n : ℕ} → ℕ → Finset (Fin n) :=
-    fun {n : ℕ} (j : ℕ) ↦ {i : Fin n | (↑i : ℕ) < j}
+noncomputable def UpperTheory.Reformulated.B.Yha8.blkA : {n : ℕ} → ℕ → Finset (Fin n) :=
+  fun {n : ℕ} (j : ℕ) ↦ {i : Fin n | (↑i : ℕ) < j}
 
-noncomputable def UpperTheory.Reformulated.B.Yha8.blkB :
-    {n : ℕ} → ℕ → Finset (Fin n) :=
-    fun {n : ℕ} (j : ℕ) ↦ (UpperTheory.Reformulated.B.Yha8.blkA j)ᶜ
+noncomputable def UpperTheory.Reformulated.B.Yha8.blkB : {n : ℕ} → ℕ → Finset (Fin n) :=
+  fun {n : ℕ} (j : ℕ) ↦ (UpperTheory.Reformulated.B.Yha8.blkA j)ᶜ
 
-theorem UpperTheory.Reformulated.B.Yha8.main :
-    ∀ {n : ℕ} (j : ℕ) (Q S : Matrix (Fin n) (Fin n) ℂ),
-      (∀ (a b : Fin n), Q a b ≠ (0 : ℂ) → b ∈ UpperTheory.Reformulated.B.Yha8.blkA j) →
-        (∀ (a b : Fin n), S a b ≠ (0 : ℂ) → a ∈ UpperTheory.Reformulated.B.Yha8.blkB j) → Q * S = (0 : Matrix (Fin n) (Fin n) ℂ) := by
+theorem UpperTheory.Reformulated.B.Yha8.main
+    : ∀ {n : ℕ} (j : ℕ) (Q S : Matrix (Fin n) (Fin n) ℂ),
+      (∀ (a b : Fin n), Q a b ≠ (0 : ℂ) → b ∈ UpperTheory.Reformulated.B.Yha8.blkA j)
+        → (∀ (a b : Fin n), S a b ≠ (0 : ℂ) → a ∈ UpperTheory.Reformulated.B.Yha8.blkB j)
+        → Q * S = (0 : Matrix (Fin n) (Fin n) ℂ) := by
   intro n j Q S hQ hS
   ext a c
   rw [Matrix.mul_apply, Matrix.zero_apply]

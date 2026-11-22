@@ -11,13 +11,15 @@ namespace UpperTheory.V.Z.Mult.Pi
 theorem minIdem_pf : MinIdem := by
   intro J M Y _ _ _ _ _ _ α a hs hk
   have surj : Function.Surjective (FreeAlgebra.lift ℂ α) :=
-    DiscreteGroups.T1.Desc.Swap3.burnside (FreeAlgebra.lift ℂ α) fun W hW => hs W fun f x hx => by
-      simpa using hW (FreeAlgebra.ι ℂ f) x hx
+    DiscreteGroups.T1.Desc.Swap3.burnside (FreeAlgebra.lift ℂ α) fun W hW =>
+      hs W fun f x hx => by simpa using hW (FreeAlgebra.ι ℂ f) x hx
   obtain ⟨v, hv⟩ := exists_ne (0 : M)
   obtain ⟨l, hl⟩ := Module.Projective.exists_dual_eq_one ℂ hv
   obtain ⟨p, hp⟩ := surj (LinearMap.smulRight l v)
-  have same : ∀ r r', FreeAlgebra.lift ℂ α r = FreeAlgebra.lift ℂ α r' →
-      FreeAlgebra.lift ℂ a r = FreeAlgebra.lift ℂ a r' := by
+  have same
+      : ∀ r r',
+        FreeAlgebra.lift ℂ α r = FreeAlgebra.lift ℂ α r'
+          → FreeAlgebra.lift ℂ a r = FreeAlgebra.lift ℂ a r' := by
     intro r r' h
     have h0 : FreeAlgebra.lift ℂ a (r - r') = 0 := hk _ (by rw [map_sub, h, sub_self])
     rw [map_sub] at h0

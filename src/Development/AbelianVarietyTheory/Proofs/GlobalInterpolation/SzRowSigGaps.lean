@@ -7,12 +7,13 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.LogAdd
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem rankVal_crude (s : Scale) (R : Ranks) (hx : 2 ≤ s.x) (h : RankVal s R) :
-    (0 < (R.n : ℝ) ∧ (R.n : ℝ) ≤ s.x ^ 4) ∧ (R.m : ℝ) ≤ s.x ^ 2 ∧ (R.k : ℝ) ≤ s.x ^ 6 := by
+theorem rankVal_crude (s : Scale) (R : Ranks) (hx : 2 ≤ s.x) (h : RankVal s R)
+    : (0 < (R.n : ℝ) ∧ (R.n : ℝ) ≤ s.x ^ 4) ∧ (R.m : ℝ) ≤ s.x ^ 2 ∧ (R.k : ℝ) ≤ s.x ^ 6 := by
   have hn1 := h.n_lo
   have hn2 := h.n_le'
   obtain ⟨-, ⟨-, hm⟩, ⟨-, hk⟩, -⟩ := h
@@ -40,9 +41,10 @@ theorem rankVal_crude (s : Scale) (R : Ranks) (hx : 2 ≤ s.x) (h : RankVal s R)
     have h3 : s.x ^ 6 = s.x * s.x ^ 5 := by ring
     nlinarith
 
-theorem gap_crude (x C k m t : ℝ) (hx : 2 ≤ x) (hC : C ≤ x) (hk0 : 0 ≤ k) (hm0 : 0 ≤ m) (ht0 : 0 ≤ t)
-    (hm : m ≤ x ^ 2) (hk : k ≤ x ^ 6) (ht : t ≤ x ^ 401) :
-    C * k * m ^ 4 + (k + m * (t + 1)) * m ^ 10 < x ^ 430 := by
+theorem gap_crude
+    (x C k m t : ℝ) (hx : 2 ≤ x) (hC : C ≤ x) (hk0 : 0 ≤ k) (hm0 : 0 ≤ m) (ht0 : 0 ≤ t)
+    (hm : m ≤ x ^ 2) (hk : k ≤ x ^ 6) (ht : t ≤ x ^ 401)
+    : C * k * m ^ 4 + (k + m * (t + 1)) * m ^ 10 < x ^ 430 := by
   have hx1 : 1 ≤ x := by linarith
   have hx0 : 0 < x := by linarith
   have a1 : C * k * m ^ 4 ≤ x * x ^ 6 * (x ^ 2) ^ 4 := by
@@ -50,7 +52,8 @@ theorem gap_crude (x C k m t : ℝ) (hx : 2 ≤ x) (hC : C ≤ x) (hk0 : 0 ≤ k
     refine this.trans ?_
     gcongr
   have a2 : (1 : ℝ) ≤ x ^ 401 := one_le_pow₀ hx1
-  have a3 : (k + m * (t + 1)) * m ^ 10 ≤ (x ^ 6 + x ^ 2 * (x ^ 401 + x ^ 401)) * (x ^ 2) ^ 10 := by gcongr
+  have a3 : (k + m * (t + 1)) * m ^ 10 ≤ (x ^ 6 + x ^ 2 * (x ^ 401 + x ^ 401)) * (x ^ 2) ^ 10 := by
+    gcongr
   have a4 : x * x ^ 6 * (x ^ 2) ^ 4 = x ^ 15 := by ring
   have a5 : (x ^ 6 + x ^ 2 * (x ^ 401 + x ^ 401)) * (x ^ 2) ^ 10 = x ^ 26 + 2 * x ^ 423 := by ring
   have a6 : x ^ 15 ≤ x ^ 423 := pow_le_pow_right₀ hx1 (by norm_num)
@@ -65,10 +68,13 @@ theorem gap_crude (x C k m t : ℝ) (hx : 2 ≤ x) (hC : C ≤ x) (hk0 : 0 ≤ k
   generalize x ^ 423 = y at *
   linarith
 
-theorem base_sizes_ge (eps : ℝ) (he : 0 < eps) : ∃ x0 : ℝ, ∀ (s : Scale) (n : ℕ), s.eps = eps → x0 ≤ s.x →
-    0 < (n : ℝ) → (n : ℝ) ≤ s.x ^ 4 → s.x ^ 430 ≤ s.b ∧ s.x ^ 430 ≤ s.b' ∧ s.x ^ 430 ≤ s.w'' n := by
-  obtain ⟨x0, h0⟩ := GlobalTheory.log_add_rpow_mul_log_pow_le_rpow (eps / 3) eps 434 1 1 0 (by positivity)
-    (by linarith) one_pos
+theorem base_sizes_ge (eps : ℝ) (he : 0 < eps)
+    : ∃ x0 : ℝ, ∀ (s : Scale) (n : ℕ),
+      s.eps = eps → x0 ≤ s.x → 0 < (n : ℝ) → (n : ℝ) ≤ s.x ^ 4
+        → s.x ^ 430 ≤ s.b ∧ s.x ^ 430 ≤ s.b' ∧ s.x ^ 430 ≤ s.w'' n := by
+  obtain ⟨x0, h0⟩ :=
+    GlobalTheory.log_add_rpow_mul_log_pow_le_rpow (eps / 3) eps 434 1 1 0 (by positivity)
+      (by linarith) one_pos
   refine ⟨x0, fun s n hs hx hn0 hn => ?_⟩
   have hx1 : 1 ≤ s.x := s.one_lt_alt.le
   have hx0 : 0 < s.x := by linarith
@@ -90,14 +96,23 @@ theorem base_sizes_ge (eps : ℝ) (he : 0 < eps) : ∃ x0 : ℝ, ∀ (s : Scale)
   · have e : s.b' = s.x * (s.b / s.X') := by rw [Scale.b', Scale.a]; ring
     rw [e]
     exact h3.trans (h4.trans (le_mul_of_one_le_left (h5.le.trans h4) hx1))
-  · have e : s.w'' n = (s.b / s.X') / n := by
-      rw [Scale.w'', Scale.b', Scale.a]; field_simp
+  · have e : s.w'' n = (s.b / s.X') / n := by rw [Scale.w'', Scale.b', Scale.a]; field_simp
     rw [e, le_div_iff₀ hn0]
     refine le_trans ?_ h4
-    calc s.x ^ 430 * n ≤ s.x ^ 430 * s.x ^ 4 := by gcongr
+    calc
+      s.x ^ 430 * n
+        ≤ s.x ^ 430 * s.x ^ 4 := by gcongr
       _ = s.x ^ 434 := by ring
 
-theorem szRow_sig_gaps : SzRow (fun C D L => (∀ τ, (∀ (i : ℕ) (h : i + 1 < D.R.k - 1), gapS D C.P.Cgap < (((D.hc τ).v ⟨i, by omega⟩ - (D.hc τ).v ⟨i + 1, h⟩ : ℚ) : ℝ)) ∧ (∀ (hk : 2 ≤ D.R.k) (hm : 0 < D.R.m), gapS D C.P.Cgap < (((D.hc τ).v ⟨D.R.k - 2, by omega⟩ + (D.hc τ).b ⟨0, hm⟩ : ℚ) : ℝ)) ∧ (∀ (j : ℕ) (h : j + 1 < D.R.m), gapS D C.P.Cgap < (((D.hc τ).b ⟨j + 1, h⟩ - (D.hc τ).b ⟨j, by omega⟩ : ℚ) : ℝ)))) := by
+theorem szRow_sig_gaps
+    : SzRow (fun C D L =>
+      (∀ τ,
+        (∀ (i : ℕ) (h : i + 1 < D.R.k - 1),
+            gapS D C.P.Cgap < (((D.hc τ).v ⟨i, by omega⟩ - (D.hc τ).v ⟨i + 1, h⟩ : ℚ) : ℝ))
+          ∧ (∀ (hk : 2 ≤ D.R.k) (hm : 0 < D.R.m),
+            gapS D C.P.Cgap < (((D.hc τ).v ⟨D.R.k - 2, by omega⟩ + (D.hc τ).b ⟨0, hm⟩ : ℚ) : ℝ))
+          ∧ (∀ (j : ℕ) (h : j + 1 < D.R.m),
+            gapS D C.P.Cgap < (((D.hc τ).b ⟨j + 1, h⟩ - (D.hc τ).b ⟨j, by omega⟩ : ℚ) : ℝ)))) := by
   intro eps he _ C hC
   obtain ⟨x0, hx0⟩ := base_sizes_ge eps he
   refine ⟨430, fun cD hcD => ⟨430, fun ch hch => ⟨max x0 (max 2 C.P.Cgap), fun D L hs hx hV => ?_⟩⟩⟩
@@ -109,11 +124,14 @@ theorem szRow_sig_gaps : SzRow (fun C D L => (∀ τ, (∀ (i : ℕ) (h : i + 1 
   obtain ⟨hb, hb', hw⟩ := hx0 L.sc D.R.n hs hxa hn0 hn
   have ht : (D.R.t : ℝ) ≤ L.sc.x ^ 401 := by
     have h1 := L.t_win.2
-    rw [hV.Ct_eq, hC.1.2.2.2.2.2.2.2.2.2, show (401 : ℝ) = ((401 : ℕ) : ℝ) by norm_num, Real.rpow_natCast] at h1
+    rw [hV.Ct_eq, hC.1.2.2.2.2.2.2.2.2.2, show (401 : ℝ) = ((401 : ℕ) : ℝ) by norm_num,
+        Real.rpow_natCast]
+      at h1
     exact h1
   have hg : gapS D C.P.Cgap < L.sc.x ^ 430 := by
-    have := gap_crude L.sc.x C.P.Cgap D.R.k D.R.m D.R.t hx2 hxC (Nat.cast_nonneg _) (Nat.cast_nonneg _)
-      (Nat.cast_nonneg _) hm hk ht
+    have :=
+      gap_crude L.sc.x C.P.Cgap D.R.k D.R.m D.R.t hx2 hxC (Nat.cast_nonneg _) (Nat.cast_nonneg _)
+        (Nat.cast_nonneg _) hm hk ht
     unfold gapS Ranks.N
     push_cast
     exact this

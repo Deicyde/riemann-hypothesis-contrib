@@ -20,7 +20,6 @@ namespace Elliptic
 
 variable {L : PeriodPair}
 
-
 variable (L) in
 def torusOrder (L : PeriodPair) (f : ℂ → ℂ) (x : Torus L) : ℤ :=
   (meromorphicOrderAt f x.out).untopD 0
@@ -78,8 +77,8 @@ lemma finite_support_torusOrder {f : ℂ → ℂ} (hf : IsEllipticFunction L f) 
   simp only [Function.mem_support, torusResidue_logDeriv hf] at hx ⊢
   exact_mod_cast hx
 
-theorem finsum_torusOrder_eq_zero {f : ℂ → ℂ} (hf : IsEllipticFunction L f) :
-    ∑ᶠ x : Torus L, torusOrder L f x = 0 := by
+theorem finsum_torusOrder_eq_zero {f : ℂ → ℂ} (hf : IsEllipticFunction L f)
+    : ∑ᶠ x : Torus L, torusOrder L f x = 0 := by
   have h := finsum_torusResidue_eq_zero (isEllipticFunction_logDeriv hf)
   simp_rw [torusResidue_logDeriv hf] at h
   have hc := (Int.castAddHom ℂ).map_finsum (finite_support_torusOrder hf)
@@ -87,10 +86,8 @@ theorem finsum_torusOrder_eq_zero {f : ℂ → ℂ} (hf : IsEllipticFunction L f
   rw [← hc] at h
   exact_mod_cast h
 
-
 variable (L) in
-def degree (L : PeriodPair) (f : ℂ → ℂ) : ℕ :=
-  ∑ᶠ x : Torus L, (-torusOrder L f x).toNat
+def degree (L : PeriodPair) (f : ℂ → ℂ) : ℕ := ∑ᶠ x : Torus L, (-torusOrder L f x).toNat
 
 lemma toNat_neg_untopD_sub_const {f : ℂ → ℂ} {z : ℂ} (hf : MeromorphicAt f z) (c : ℂ) :
     (-(meromorphicOrderAt (fun w ↦ f w - c) z).untopD 0).toNat =
@@ -155,8 +152,8 @@ lemma finite_support_toNat_neg_torusOrder {f : ℂ → ℂ} (hf : IsEllipticFunc
     simp only [Function.mem_support] at hx ⊢
     omega
 
-theorem finsum_toNat_torusOrder_sub_const {f : ℂ → ℂ} (hf : IsEllipticFunction L f) (c : ℂ) :
-    ∑ᶠ x : Torus L, (torusOrder L (fun z ↦ f z - c) x).toNat = degree L f := by
+theorem finsum_toNat_torusOrder_sub_const {f : ℂ → ℂ} (hf : IsEllipticFunction L f) (c : ℂ)
+    : ∑ᶠ x : Torus L, (torusOrder L (fun z ↦ f z - c) x).toNat = degree L f := by
   classical
   have hg : IsEllipticFunction L (fun z ↦ f z - c) := by
     refine ⟨fun z ↦ ?_, fun z l hl ↦ by simp only [hf.2 z l hl]⟩
@@ -169,22 +166,25 @@ theorem finsum_toNat_torusOrder_sub_const {f : ℂ → ℂ} (hf : IsEllipticFunc
   have hsum := finsum_torusOrder_eq_zero hg
   rw [finsum_eq_sum_of_support_subset _ hsupp] at hsum
   have h1 : ∑ᶠ x, (torusOrder L g x).toNat = ∑ x ∈ s, (torusOrder L g x).toNat :=
-    finsum_eq_sum_of_support_subset _ fun x hx ↦ hsupp (by
-      simp only [Function.mem_support] at hx ⊢
-      omega)
-  have hpt : ∀ x, (-torusOrder L f x).toNat = (-torusOrder L g x).toNat := fun x ↦
+    finsum_eq_sum_of_support_subset _ fun x hx ↦
+      hsupp (by
+        simp only [Function.mem_support] at hx ⊢
+        omega)
+  have hpt : ∀ x, (- torusOrder L f x).toNat = (- torusOrder L g x).toNat := fun x ↦
     (toNat_neg_untopD_sub_const (hf.1 _) c).symm
   have h2 : degree L f = ∑ x ∈ s, (-torusOrder L g x).toNat := by
     rw [degree]
     simp_rw [hpt]
-    exact finsum_eq_sum_of_support_subset _ fun x hx ↦ hsupp (by
-      simp only [Function.mem_support] at hx ⊢
-      omega)
+    exact finsum_eq_sum_of_support_subset _ fun x hx ↦
+      hsupp (by
+        simp only [Function.mem_support] at hx ⊢
+        omega)
   rw [h1, h2]
-  have key : ∀ x, ((torusOrder L g x).toNat : ℤ) - ((-torusOrder L g x).toNat : ℤ) =
-      torusOrder L g x := fun x ↦ Int.toNat_sub_toNat_neg _
-  have : ((∑ x ∈ s, (torusOrder L g x).toNat : ℕ) : ℤ) =
-      ((∑ x ∈ s, (-torusOrder L g x).toNat : ℕ) : ℤ) := by
+  have key
+      : ∀ x, ((torusOrder L g x).toNat : ℤ) - ((- torusOrder L g x).toNat : ℤ) = torusOrder L g x :=
+    fun x ↦ Int.toNat_sub_toNat_neg _
+  have : ((∑ x ∈ s, (torusOrder L g x).toNat : ℕ) : ℤ)
+      = ((∑ x ∈ s, (-torusOrder L g x).toNat : ℕ) : ℤ) := by
     push_cast
     rw [← sub_eq_zero, ← Finset.sum_sub_distrib]
     simp only [key]
@@ -240,12 +240,13 @@ theorem degree_weierstrassP : degree L ℘[L] = 2 := by
     rfl
   · intro x hx
     obtain ⟨z, rfl⟩ := Torus.mk_surjective L x
-    have hz : z ∉ L.lattice := fun h ↦ hx (by
-      rw [h0]
-      exact (Torus.mk_eq_mk_iff L).2 (by simpa using h))
+    have hz : z ∉ L.lattice := fun h ↦
+      hx (by
+        rw [h0]
+        exact (Torus.mk_eq_mk_iff L).2 (by simpa using h))
     rw [torusOrder_mk hP]
-    exact toNat_neg_untopD_eq_zero_of_nonneg
-      (L.analyticOnNhd_weierstrassP z hz).meromorphicOrderAt_nonneg
+    exact toNat_neg_untopD_eq_zero_of_nonneg (L.analyticOnNhd_weierstrassP z
+      hz).meromorphicOrderAt_nonneg
 
 end Elliptic
 end GroundTheory.Global

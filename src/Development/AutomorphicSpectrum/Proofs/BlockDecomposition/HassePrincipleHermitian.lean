@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.HasseN
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology PositivityTheory.Rg.Base1
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology PositivityTheory.Rg.Base1
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
@@ -16,7 +17,8 @@ namespace GlobalTheory.CompanionTheory.SW.BaseHasse
 
 section
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem invol (hCM : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
@@ -40,15 +42,17 @@ theorem exists_pure (hCM : IsCMExt F E σ) : ∃ e : E, e ≠ 0 ∧ σ e = -e :=
   have hc : (InfinitePlace.mk τ).IsComplex := IsTotallyComplex.isComplex _
   exact (InfinitePlace.not_isReal_iff_isComplex.2 hc) (InfinitePlace.isReal_mk_iff.2 hreal)
 
-theorem coord_E (hCM : IsCMExt F E σ) {e : E} (he : e ≠ 0) (hσ : σ e = -e) (z : E) :
-    ∃ c d : F, z = algebraMap F E c + algebraMap F E d * e := by
-  obtain ⟨c, hc⟩ := GoodMass.fixed_mem hCM ((z + σ z) / 2) (by
-    rw [map_div₀, map_add (f := _), invol hCM, map_ofNat]
-    ring)
-  obtain ⟨d, hd⟩ := GoodMass.fixed_mem hCM ((z - σ z) / (2 * e)) (by
-    rw [map_div₀, map_sub, invol hCM, map_mul, map_ofNat, hσ]
-    field_simp
-    ring)
+theorem coord_E (hCM : IsCMExt F E σ) {e : E} (he : e ≠ 0) (hσ : σ e = -e) (z : E)
+    : ∃ c d : F, z = algebraMap F E c + algebraMap F E d * e := by
+  obtain ⟨c, hc⟩ :=
+    GoodMass.fixed_mem hCM ((z + σ z) / 2) (by
+      rw [map_div₀, map_add (f := _), invol hCM, map_ofNat]
+      ring)
+  obtain ⟨d, hd⟩ :=
+    GoodMass.fixed_mem hCM ((z - σ z) / (2 * e)) (by
+      rw [map_div₀, map_sub, invol hCM, map_mul, map_ofNat, hσ]
+      field_simp
+      ring)
   refine ⟨c, d, ?_⟩
   rw [hc, hd]
   field_simp
@@ -56,14 +60,15 @@ theorem coord_E (hCM : IsCMExt F E σ) {e : E} (he : e ≠ 0) (hσ : σ e = -e) 
 
 variable (R : Type) [CommRing R] [Algebra F R]
 
-theorem coord_R (hCM : IsCMExt F E σ) {e : E} (he : e ≠ 0) (hσ : σ e = -e) (y : R ⊗[F] E) :
-    ∃ a b : R, y = a ⊗ₜ[F] (1 : E) + b ⊗ₜ[F] e := by
+theorem coord_R (hCM : IsCMExt F E σ) {e : E} (he : e ≠ 0) (hσ : σ e = -e) (y : R ⊗[F] E)
+    : ∃ a b : R, y = a ⊗ₜ[F] (1 : E) + b ⊗ₜ[F] e := by
   induction y using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, by simp⟩
   | tmul r z =>
     obtain ⟨c, d, rfl⟩ := coord_E hCM he hσ z
     refine ⟨algebraMap F R c * r, algebraMap F R d * r, ?_⟩
-    have key : ∀ (c : F) (w : E), r ⊗ₜ[F] (algebraMap F E c * w) = (algebraMap F R c * r) ⊗ₜ[F] w := by
+    have key
+        : ∀ (c : F) (w : E), r ⊗ₜ[F] (algebraMap F E c * w) = (algebraMap F R c * r) ⊗ₜ[F] w := by
       intro c w
       rw [← Algebra.smul_def, ← Algebra.smul_def, TensorProduct.tmul_smul, TensorProduct.smul_tmul']
     rw [TensorProduct.tmul_add, ← key, ← key, mul_one]
@@ -76,10 +81,14 @@ theorem tmul_one_injective {r s : R} (h : r ⊗ₜ[F] (1 : E) = s ⊗ₜ[F] (1 :
   Algebra.TensorProduct.includeLeft_injective (S := F) (R := F) (A := R) (B := E)
     (FaithfulSMul.algebraMap_injective F E) h
 
-theorem local_form (hCM : IsCMExt F E σ) {J : Matrix (Fin 1) (Fin 1) E} {j : F} (hj : J 0 0 = algebraMap F E j)
-    (hj0 : j ≠ 0) {e : E} (he : e ≠ 0) (hσ : σ e = -e) {δ : F} (hδ : e * e = algebraMap F E δ) (β : F)
-    (Y : Fin 1 → Fin 1 → R ⊗[F] E) (hY : gramR R σ J Y = (hermScal R σ (algebraMap F R β)).1) :
-    ∃ a b : R, algebraMap F R (β / j) = a ^ 2 - algebraMap F R δ * b ^ 2 := by
+theorem local_form
+    (hCM : IsCMExt F E σ)
+    {J : Matrix (Fin 1) (Fin 1) E} {j : F} (hj : J 0 0 = algebraMap F E j) (hj0 : j ≠ 0)
+    {e : E} (he : e ≠ 0) (hσ : σ e = -e)
+    {δ : F} (hδ : e * e = algebraMap F E δ)
+    (β : F) (Y : Fin 1 → Fin 1 → R ⊗[F] E)
+    (hY : gramR R σ J Y = (hermScal R σ (algebraMap F R β)).1)
+    : ∃ a b : R, algebraMap F R (β / j) = a ^ 2 - algebraMap F R δ * b ^ 2 := by
   obtain ⟨a, b, hab⟩ := coord_R R hCM he hσ (Y 0 0)
   refine ⟨a, b, ?_⟩
   have h00 : hR R σ J (Y 0) (Y 0) = algebraMap F R β ⊗ₜ[F] (1 : E) := congrFun (congrFun hY 0) 0
@@ -90,12 +99,16 @@ theorem local_form (hCM : IsCMExt F E σ) {J : Matrix (Fin 1) (Fin 1) E} {j : F}
     rw [hj]
     simp [inclR, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
   have hee : (b ⊗ₜ[F] e) * (b ⊗ₜ[F] e) = (algebraMap F R δ * b ^ 2) ⊗ₜ[F] (1 : E) := by
-    rw [Algebra.TensorProduct.tmul_mul_tmul, hδ, Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one,
-      TensorProduct.tmul_smul, TensorProduct.smul_tmul', smul_mul_assoc, one_mul, sq]
+    rw [Algebra.TensorProduct.tmul_mul_tmul, hδ, Algebra.algebraMap_eq_smul_one,
+      Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul, TensorProduct.smul_tmul',
+      smul_mul_assoc, one_mul, sq]
   have hn : sigR R σ (Y 0 0) * Y 0 0 = (a ^ 2 - algebraMap F R δ * b ^ 2) ⊗ₜ[F] (1 : E) := by
-    rw [hsig, hab, TensorProduct.sub_tmul, ← hee, sq, ← mul_one (1 : E), ← Algebra.TensorProduct.tmul_mul_tmul, mul_one]
+    rw [hsig, hab, TensorProduct.sub_tmul, ← hee, sq, ← mul_one (1 : E),
+      ← Algebra.TensorProduct.tmul_mul_tmul, mul_one]
     ring
-  have h1 : (algebraMap F R j * (a ^ 2 - algebraMap F R δ * b ^ 2)) ⊗ₜ[F] (1 : E) = algebraMap F R β ⊗ₜ[F] (1 : E) := by
+  have h1
+      : (algebraMap F R j * (a ^ 2 - algebraMap F R δ * b ^ 2)) ⊗ₜ[F] (1 : E)
+        = algebraMap F R β ⊗ₜ[F] (1 : E) := by
     rw [← h00]
     simp only [hR, hform, JR, Fin.sum_univ_one, Matrix.map_apply, hJ]
     rw [mul_comm (sigR R σ (Y 0 0)), mul_assoc, hn, Algebra.TensorProduct.tmul_mul_tmul, mul_one]
@@ -111,24 +124,28 @@ section
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem exists_real_hom (τ : F →+* ℝ) : ∃ ψ : Ainf F →+* ℝ, ∀ x, ψ (algebraMap F (Ainf F) x) = τ x := by
+theorem exists_real_hom (τ : F →+* ℝ)
+    : ∃ ψ : Ainf F →+* ℝ, ∀ x, ψ (algebraMap F (Ainf F) x) = τ x := by
   let φ : F →+* ℂ := Complex.ofRealHom.comp τ
   have hφ : ComplexEmbedding.IsReal φ := by
     ext x
     simp [φ, ComplexEmbedding.conjugate]
   let v : InfinitePlace F := InfinitePlace.mk φ
   have hv : v.IsReal := InfinitePlace.isReal_mk_iff.2 hφ
-  refine ⟨(InfinitePlace.Completion.extensionEmbeddingOfIsReal hv).comp
-    (Pi.evalRingHom (fun w : InfinitePlace F => w.Completion) v), fun x => ?_⟩
-  have h1 : (InfinitePlace.Completion.extensionEmbeddingOfIsReal hv).comp
-      (Pi.evalRingHom (fun w : InfinitePlace F => w.Completion) v) (algebraMap F (Ainf F) x) =
-        InfinitePlace.embedding_of_isReal hv x :=
-    by
-      simpa only [RingHom.comp_apply, Pi.evalRingHom_apply,
-        NumberField.InfiniteAdeleRing.algebraMap_apply,
-        InfinitePlace.Completion.algebraMap_apply, RingEquiv.apply_symm_apply,
-        WithAbs.equiv_symm_apply, WithAbs.equiv_apply, WithAbs.ofAbs_toAbs] using
-        InfinitePlace.Completion.extensionEmbeddingOfIsReal_coe hv ((WithAbs.equiv v.1).symm x)
+  refine ⟨
+    (InfinitePlace.Completion.extensionEmbeddingOfIsReal hv).comp
+      (Pi.evalRingHom (fun w : InfinitePlace F => w.Completion) v),
+    fun x => ?_
+  ⟩
+  have h1
+      : (InfinitePlace.Completion.extensionEmbeddingOfIsReal hv).comp
+          (Pi.evalRingHom (fun w : InfinitePlace F => w.Completion) v) (algebraMap F (Ainf F) x)
+        = InfinitePlace.embedding_of_isReal hv x := by
+    simpa only [RingHom.comp_apply, Pi.evalRingHom_apply,
+        NumberField.InfiniteAdeleRing.algebraMap_apply, InfinitePlace.Completion.algebraMap_apply,
+        RingEquiv.apply_symm_apply, WithAbs.equiv_symm_apply, WithAbs.equiv_apply,
+        WithAbs.ofAbs_toAbs]
+      using InfinitePlace.Completion.extensionEmbeddingOfIsReal_coe hv ((WithAbs.equiv v.1).symm x)
   refine h1.trans ?_
   apply Complex.ofReal_injective
   rw [InfinitePlace.embedding_of_isReal_apply, InfinitePlace.embedding_mk_eq_of_isReal hφ]
@@ -148,32 +165,35 @@ theorem hasse : Hasse := by
   have hδ0 : δ ≠ 0 := by
     rintro rfl
     exact mul_ne_zero he he (by rw [hδ', map_zero])
-  have hfib : ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
-      (μ' : Measure (Fin 1 → Fin 1 → R ⊗[F] E)) (ν : Measure (HermR R σ 1))
-      (m' : HermR R σ 1 → Measure (Fin 1 → Fin 1 → R ⊗[F] E)), IsGramFib R σ J 1 μ' ν m' →
-      m' (hermScal R σ (algebraMap F R β)) ≠ 0 →
-      ∃ a b : R, algebraMap F R (β / j) = a ^ 2 - algebraMap F R δ * b ^ 2 := by
+  have hfib
+      : ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R]
+          (μ' : Measure (Fin 1 → Fin 1 → R ⊗[F] E)) (ν : Measure (HermR R σ 1))
+          (m' : HermR R σ 1 → Measure (Fin 1 → Fin 1 → R ⊗[F] E)),
+        IsGramFib R σ J 1 μ' ν m' → m' (hermScal R σ (algebraMap F R β)) ≠ 0
+          → ∃ a b : R, algebraMap F R (β / j) = a ^ 2 - algebraMap F R δ * b ^ 2 := by
     intro R _ _ _ μ' ν m' hG hne
     by_contra hcon
-    have hempty : (gramR R σ J ⁻¹' {(hermScal R σ (algebraMap F R β)).1} ∩
-        {X | IsUnit (gramR R σ J X).det}) = ∅ := by
+    have hempty
+        : (gramR R σ J ⁻¹' {(hermScal R σ (algebraMap F R β)).1} ∩ {X | IsUnit (gramR R σ J X).det})
+          = ∅ := by
       ext Y
-      simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_singleton_iff, Set.mem_empty_iff_false, iff_false,
-        not_and]
+      simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_singleton_iff,
+        Set.mem_empty_iff_false, iff_false, not_and]
       intro hY _
       exact hcon (local_form R hCM hj.symm hj0 he hσ hδ' β Y hY)
     apply hne
     have h1 := hG.1 (hermScal R σ (algebraMap F R β))
     rw [hempty, Set.compl_empty] at h1
     exact Measure.measure_univ_eq_zero.1 h1
-  obtain ⟨a, c, hac⟩ := GlobalTheory.QNorm.hasseNormSt F δ (β / j) hδ0 (div_ne_zero hβ hj0)
-    (fun τ => by
-      obtain ⟨ψ, hψ⟩ := exists_real_hom τ
-      obtain ⟨a, c, h⟩ := hfib (Ainf F) _ _ mi hmi hinf
-      refine ⟨ψ a, ψ c, ?_⟩
-      have := congrArg ψ h
-      simpa [hψ] using this)
-    (fun v => hfib (Fv F v) _ _ (m v) (hm v) (hfin v))
+  obtain ⟨a, c, hac⟩ :=
+    GlobalTheory.QNorm.hasseNormSt F δ (β / j) hδ0 (div_ne_zero hβ hj0)
+      (fun τ => by
+        obtain ⟨ψ, hψ⟩ := exists_real_hom τ
+        obtain ⟨a, c, h⟩ := hfib (Ainf F) _ _ mi hmi hinf
+        refine ⟨ψ a, ψ c, ?_⟩
+        have := congrArg ψ h
+        simpa [hψ] using this)
+      (fun v => hfib (Fv F v) _ _ (m v) (hm v) (hfin v))
   refine ⟨fun _ _ => algebraMap F E a + algebraMap F E c * e, ?_⟩
   funext p q
   have hp : p = 0 := Subsingleton.elim _ _
@@ -182,7 +202,8 @@ theorem hasse : Hasse := by
   have hb : β = j * (a ^ 2 - δ * c ^ 2) := by
     rw [← hac]
     field_simp
-  simp only [gramE, hE, hform, Fin.sum_univ_one, ← hj, RingHom.coe_coe, map_add (f := _), map_mul, hσ, AlgHom.commutes]
+  simp only [gramE, hE, hform, Fin.sum_univ_one, ← hj, RingHom.coe_coe, map_add (f := _), map_mul,
+    hσ, AlgHom.commutes]
   rw [hb, map_mul, map_sub, map_mul, map_pow, map_pow, ← hδ']
   ring
 

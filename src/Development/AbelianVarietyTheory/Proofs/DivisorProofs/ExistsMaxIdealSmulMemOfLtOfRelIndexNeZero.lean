@@ -5,16 +5,18 @@ public import ReciprocityTheory.SemistableReduction.TorusL2CauchyInequality
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 namespace GlobalTheory
 
-theorem exists_maxIdeal_smul_mem_of_lt_of_relIndex_ne_zero (F V : Type) [Field F] [NumberField F]
-    [AddCommGroup V] [Module F V] [Module (𝓞 F) V] [IsScalarTower (𝓞 F) F V]
-    (N₀ N : Submodule (𝓞 F) V) (hlt : N₀ < N)
-    (hidx : N₀.toAddSubgroup.relIndex N.toAddSubgroup ≠ 0) :
-    ∃ (u : V) (p : Ideal (𝓞 F)), p.IsMaximal ∧ u ∈ N ∧ u ∉ N₀ ∧ ∀ π ∈ p, π • u ∈ N₀ := by
+theorem exists_maxIdeal_smul_mem_of_lt_of_relIndex_ne_zero
+    (F V : Type) [Field F] [NumberField F] [AddCommGroup V] [Module F V] [Module (𝓞 F) V]
+    [IsScalarTower (𝓞 F) F V]
+    (N₀ N : Submodule (𝓞 F) V) (hlt : N₀ < N) (hidx : N₀.toAddSubgroup.relIndex N.toAddSubgroup ≠ 0)
+    : ∃ (u : V) (p : Ideal (𝓞 F)), p.IsMaximal ∧ u ∈ N ∧ u ∉ N₀ ∧ ∀ π ∈ p, π • u ∈ N₀ := by
   classical
   set P : Submodule (𝓞 F) N := N₀.comap N.subtype with hP
   have hPne : P ≠ ⊤ := by
@@ -33,8 +35,9 @@ theorem exists_maxIdeal_smul_mem_of_lt_of_relIndex_ne_zero (F V : Type) [Field F
     rfl
   set n := N₀.toAddSubgroup.relIndex N.toAddSubgroup with hn
   have hkill : n • (y : V) ∈ N₀ := by
-    have h := AddSubgroup.nsmul_index_mem (N₀.toAddSubgroup.addSubgroupOf N.toAddSubgroup)
-      (⟨y.1, y.2⟩ : N.toAddSubgroup)
+    have h :=
+      AddSubgroup.nsmul_index_mem (N₀.toAddSubgroup.addSubgroupOf N.toAddSubgroup)
+        (⟨y.1, y.2⟩ : N.toAddSubgroup)
     exact AddSubgroup.mem_addSubgroupOf.1 h
   have hnp : ((n : ℕ) : 𝓞 F) ∈ p := by
     rw [hmem, Nat.cast_smul_eq_nsmul]

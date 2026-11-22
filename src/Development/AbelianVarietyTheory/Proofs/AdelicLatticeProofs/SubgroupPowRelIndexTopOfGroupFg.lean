@@ -12,24 +12,26 @@ namespace GlobalTheory.CNorm
 
 open NumberField IsDedekindDomain Polynomial in
 open scoped WithZero TensorProduct in
-private theorem card_quot_range_nsmul_eq_pow_finrank_mul_card_ker (M : Type) [AddCommGroup M]
-    [AddGroup.FG M] (p : ℕ) (hp : 0 < p) :
-    Nat.card (nsmulAddMonoidHom (α := M) p).ker ≠ 0 ∧
-      (nsmulAddMonoidHom (α := M) p).range.index =
-        p ^ Module.finrank ℤ M * Nat.card (nsmulAddMonoidHom (α := M) p).ker := by
+private theorem card_quot_range_nsmul_eq_pow_finrank_mul_card_ker
+    (M : Type) [AddCommGroup M] [AddGroup.FG M] (p : ℕ) (hp : 0 < p)
+    : Nat.card (nsmulAddMonoidHom (α := M) p).ker ≠ 0
+      ∧ (nsmulAddMonoidHom (α := M) p).range.index
+        = p ^ Module.finrank ℤ M * Nat.card (nsmulAddMonoidHom (α := M) p).ker := by
   obtain ⟨n, ι, _, q, hq, e, ⟨φ⟩⟩ := AddCommGroup.equiv_free_prod_directSum_zmod M
   haveI : ∀ i, NeZero (q i ^ e i) := fun i => ⟨pow_ne_zero _ (hq i).ne_zero⟩
   haveI : Finite (DirectSum ι fun i => ZMod (q i ^ e i)) :=
     Finite.of_equiv _ (DirectSum.linearEquivFunOnFintype ℤ ι _).toEquiv.symm
   set D := DirectSum ι fun i => ZMod (q i ^ e i)
   set P := Fin n →₀ ℤ
-  have hker : Nat.card (nsmulAddMonoidHom (α := M) p).ker =
-      Nat.card (nsmulAddMonoidHom (α := D) p).ker := by
-    refine Nat.card_congr
-      { toFun := fun x => ⟨(φ x).2, ?_⟩
-        invFun := fun y => ⟨φ.symm (0, y), ?_⟩
-        left_inv := ?_
-        right_inv := ?_ }
+  have hker
+      : Nat.card (nsmulAddMonoidHom (α := M) p).ker
+        = Nat.card (nsmulAddMonoidHom (α := D) p).ker := by
+    refine Nat.card_congr {
+      toFun := fun x => ⟨(φ x).2, ?_⟩
+      invFun := fun y => ⟨φ.symm (0, y), ?_⟩
+      left_inv := ?_
+      right_inv := ?_
+    }
     · have h := congrArg φ x.2
       rw [nsmulAddMonoidHom_apply, map_nsmul, map_zero] at h
       rw [AddMonoidHom.mem_ker, nsmulAddMonoidHom_apply]
@@ -49,9 +51,10 @@ private theorem card_quot_range_nsmul_eq_pow_finrank_mul_card_ker (M : Type) [Ad
     · intro y
       apply Subtype.ext
       simp
-  have hrange : (nsmulAddMonoidHom (α := M) p).range =
-      AddSubgroup.comap φ.toAddMonoidHom
-        ((nsmulAddMonoidHom (α := P) p).range.prod (nsmulAddMonoidHom (α := D) p).range) := by
+  have hrange
+      : (nsmulAddMonoidHom (α := M) p).range
+        = AddSubgroup.comap φ.toAddMonoidHom
+          ((nsmulAddMonoidHom (α := P) p).range.prod (nsmulAddMonoidHom (α := D) p).range) := by
     ext x
     simp only [AddMonoidHom.mem_range, nsmulAddMonoidHom_apply, AddSubgroup.mem_comap,
       AddSubgroup.mem_prod, AddEquiv.coe_toAddMonoidHom]
@@ -61,8 +64,9 @@ private theorem card_quot_range_nsmul_eq_pow_finrank_mul_card_ker (M : Type) [Ad
     · rintro ⟨⟨a, ha⟩, ⟨b, hb⟩⟩
       refine ⟨φ.symm (a, b), φ.injective ?_⟩
       rw [map_nsmul, AddEquiv.apply_symm_apply, Prod.smul_mk, ha, hb]
-  have hindexD : (nsmulAddMonoidHom (α := D) p).range.index =
-      Nat.card (nsmulAddMonoidHom (α := D) p).ker := by
+  have hindexD
+      : (nsmulAddMonoidHom (α := D) p).range.index
+        = Nat.card (nsmulAddMonoidHom (α := D) p).ker := by
     haveI : (nsmulAddMonoidHom (α := D) p).ker.FiniteIndex := AddSubgroup.finiteIndex_of_finite
     exact AddSubgroup.index_range
   have hrank : Module.finrank ℤ M = n := by
@@ -86,33 +90,37 @@ private theorem card_quot_range_nsmul_eq_pow_finrank_mul_card_ker (M : Type) [Ad
   · rw [hker]
     exact Nat.card_pos.ne'
   · rw [hrange, AddSubgroup.index_comap_of_surjective _ φ.surjective, AddSubgroup.index_prod,
-      AddSubgroup.index_range_nsmul, Module.finrank_finsupp_self, Fintype.card_fin, hrank,
-      hindexD, hker]
-
+      AddSubgroup.index_range_nsmul, Module.finrank_finsupp_self, Fintype.card_fin, hrank, hindexD,
+      hker]
 
 open NumberField IsDedekindDomain Polynomial in
 open scoped WithZero TensorProduct in
-theorem _root_.GlobalTheory.CNorm.pIdx_top_of_fg : ∀ (p : ℕ) (G : Type) [CommGroup G] [Group.FG G],
-    0 < p →
-    _root_.GlobalTheory.CNorm.pTor p (⊤ : Subgroup G) ≠ 0 ∧
-      _root_.GlobalTheory.CNorm.pIdx p (⊤ : Subgroup G) =
-        p ^ Module.finrank ℤ (Additive G) * _root_.GlobalTheory.CNorm.pTor p (⊤ : Subgroup G) := by
+theorem _root_.GlobalTheory.CNorm.pIdx_top_of_fg
+    : ∀ (p : ℕ) (G : Type) [CommGroup G] [Group.FG G],
+      0 < p
+        → _root_.GlobalTheory.CNorm.pTor p (⊤ : Subgroup G) ≠ 0
+          ∧ _root_.GlobalTheory.CNorm.pIdx p (⊤ : Subgroup G)
+            = p ^ Module.finrank ℤ (Additive G)
+              * _root_.GlobalTheory.CNorm.pTor p (⊤ : Subgroup G) := by
   intro p G _ _ hp
   obtain ⟨h1, h2⟩ := card_quot_range_nsmul_eq_pow_finrank_mul_card_ker (Additive G) p hp
-  have htor : _root_.GlobalTheory.CNorm.pTor p (⊤ : Subgroup G) =
-      Nat.card (nsmulAddMonoidHom (α := Additive G) p).ker := by
+  have htor
+      : _root_.GlobalTheory.CNorm.pTor p (⊤ : Subgroup G)
+        = Nat.card (nsmulAddMonoidHom (α := Additive G) p).ker := by
     unfold _root_.GlobalTheory.CNorm.pTor
-    refine Nat.card_congr
-      { toFun := fun x => ⟨Additive.ofMul x.1, ?_⟩
-        invFun := fun y => ⟨y.1.toMul, Subgroup.mem_top _, ?_⟩
-        left_inv := fun _ => rfl
-        right_inv := fun _ => rfl }
+    refine Nat.card_congr {
+      toFun := fun x => ⟨Additive.ofMul x.1, ?_⟩
+      invFun := fun y => ⟨y.1.toMul, Subgroup.mem_top _, ?_⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl
+    }
     · rw [AddMonoidHom.mem_ker, nsmulAddMonoidHom_apply, ← ofMul_pow, x.2.2, ofMul_one]
     · have h := y.2
       rw [AddMonoidHom.mem_ker, nsmulAddMonoidHom_apply] at h
       rw [← toMul_nsmul, h, toMul_zero]
-  have hidx : _root_.GlobalTheory.CNorm.pIdx p (⊤ : Subgroup G) =
-      (nsmulAddMonoidHom (α := Additive G) p).range.index := by
+  have hidx
+      : _root_.GlobalTheory.CNorm.pIdx p (⊤ : Subgroup G)
+        = (nsmulAddMonoidHom (α := Additive G) p).range.index := by
     unfold _root_.GlobalTheory.CNorm.pIdx _root_.GlobalTheory.CNorm.pows
     rw [Subgroup.relIndex_top_right, ← Subgroup.index_toAddSubgroup]
     congr 1
@@ -121,11 +129,16 @@ theorem _root_.GlobalTheory.CNorm.pIdx_top_of_fg : ∀ (p : ℕ) (G : Type) [Com
     rw [Subgroup.mem_map, AddMonoidHom.mem_range]
     constructor
     · rintro ⟨y, -, hy⟩
-      exact ⟨Additive.ofMul y, by
-        rw [nsmulAddMonoidHom_apply, ← ofMul_pow, ← powMonoidHom_apply, hy, ofMul_toMul]⟩
+      exact ⟨
+        Additive.ofMul y,
+        by rw [nsmulAddMonoidHom_apply, ← ofMul_pow, ← powMonoidHom_apply, hy, ofMul_toMul]
+      ⟩
     · rintro ⟨y, hy⟩
-      exact ⟨Additive.toMul y, Subgroup.mem_top _, by
-        rw [powMonoidHom_apply, ← toMul_nsmul, ← nsmulAddMonoidHom_apply, hy]⟩
+      exact ⟨
+        Additive.toMul y,
+        Subgroup.mem_top _,
+        by rw [powMonoidHom_apply, ← toMul_nsmul, ← nsmulAddMonoidHom_apply, hy]
+      ⟩
   exact ⟨htor ▸ h1, by rw [hidx, htor]; exact h2⟩
 
 end GlobalTheory.CNorm

@@ -8,14 +8,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-def Fixes {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (K : Type) [Field K] [Algebra K Ω] (g : G F Ω) : Prop :=
+def Fixes
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (K : Type) [Field K] [Algebra K Ω] (g : G F Ω)
+    : Prop :=
   ∀ x : K, g (algebraMap K Ω x) = algebraMap K Ω x
 
-def fixGrp (F Ω : Type) [Field F] [Field Ω] [Algebra F Ω] (K : Type) [Field K] [Algebra K Ω] : Subgroup (G F Ω) where
+def fixGrp (F Ω : Type) [Field F] [Field Ω] [Algebra F Ω] (K : Type) [Field K] [Algebra K Ω]
+    : Subgroup (G F Ω) where
   carrier := {g | Fixes K g}
   one_mem' := fun _ => rfl
   mul_mem' := fun {a b} ha hb x => by rw [AlgEquiv.mul_apply, hb x, ha x]
@@ -24,8 +28,10 @@ def fixGrp (F Ω : Type) [Field F] [Field Ω] [Algebra F Ω] (K : Type) [Field K
     rw [← AlgEquiv.mul_apply, inv_mul_cancel, AlgEquiv.one_apply] at this
     exact this.symm
 
-theorem mem_fixGrp {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {K : Type} [Field K] [Algebra K Ω] {g : G F Ω} :
-    g ∈ fixGrp F Ω K ↔ Fixes K g := Iff.rfl
+theorem mem_fixGrp
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {K : Type} [Field K] [Algebra K Ω] {g : G F Ω}
+    : g ∈ fixGrp F Ω K ↔ Fixes K g :=
+  Iff.rfl
 
 structure Good {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (H : Subgroup (G F Ω)) : Prop where
   isOpen : IsOpen (H : Set (G F Ω))
@@ -35,12 +41,16 @@ structure Good {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] (H : Subgroup (
 theorem Good.top {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] : Good (⊤ : Subgroup (G F Ω)) :=
   ⟨isOpen_univ, le_top, fun _ _ _ => trivial⟩
 
-theorem Good.inf {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {H H' : Subgroup (G F Ω)} (h : Good H) (h' : Good H') :
-    Good (H ⊓ H') :=
+theorem Good.inf
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    {H H' : Subgroup (G F Ω)} (h : Good H) (h' : Good H')
+    : Good (H ⊓ H') :=
   ⟨h.isOpen.inter h'.isOpen, le_inf h.comm h'.comm, fun j c hc => ⟨h.real j c hc, h'.real j c hc⟩⟩
 
-theorem Good.mono {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω] {H H' : Subgroup (G F Ω)} (hle : H ≤ H') (h : Good H) :
-    Good H' :=
+theorem Good.mono
+    {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
+    {H H' : Subgroup (G F Ω)} (hle : H ≤ H') (h : Good H)
+    : Good H' :=
   ⟨Subgroup.isOpen_mono hle h.isOpen, h.comm.trans hle, fun j c hc => hle (h.real j c hc)⟩
 
 structure Fld (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] where
@@ -54,34 +64,48 @@ structure Fld (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] where
   [closure : IsAlgClosure K Ω]
   [abelian : IsAbelianGalois E K]
 
-attribute [instance] Fld.field Fld.numberField Fld.isCM Fld.algE Fld.algΩ Fld.tower Fld.closure Fld.abelian
+attribute [instance]
+  Fld.field Fld.numberField Fld.isCM Fld.algE Fld.algΩ Fld.tower Fld.closure Fld.abelian
 
 section
 
-variable {E Ω : Type} [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-
+variable
+  {E Ω : Type} [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
 
 variable (E Ω) in
 def Fld.base : Fld E Ω := { K := E }
 
-def SplitsIn (Ω : Type) [Field Ω] [Algebra E Ω] (K : Type) [Field K] [Algebra K Ω] (u : HeightOneSpectrum (𝓞 E)) : Prop :=
-  ∀ A : ValuationSubring Ω, IsPlaceOver A u → ∀ g ∈ Dec (F := maximalRealSubfield E) A, Fixes E g ∧ Fixes K g
+def SplitsIn
+    (Ω : Type) [Field Ω] [Algebra E Ω]
+    (K : Type) [Field K] [Algebra K Ω]
+    (u : HeightOneSpectrum (𝓞 E))
+    : Prop :=
+  ∀ A : ValuationSubring Ω,
+    IsPlaceOver A u → ∀ g ∈ Dec (F := maximalRealSubfield E) A, Fixes E g ∧ Fixes K g
 
 def Layer (S : Set (HeightOneSpectrum (𝓞 E))) (X Y : Fld E Ω) : Prop :=
-  ∃ (_ : Algebra X.K Y.K) (_ : IsScalarTower E X.K Y.K) (_ : IsScalarTower X.K Y.K Ω), IsGalois X.K Y.K ∧
-    (Module.finrank X.K Y.K).Prime ∧ ∃ u ∉ S, SplitsIn Ω X.K u ∧
-      ∃ A : ValuationSubring Ω, IsPlaceOver A u ∧ ∃ τ ∈ Ine (F := X.K) A, ¬ Fixes Y.K τ
+  ∃ (_ : Algebra X.K Y.K) (_ : IsScalarTower E X.K Y.K) (_ : IsScalarTower X.K Y.K Ω),
+    IsGalois X.K Y.K ∧ (Module.finrank X.K Y.K).Prime
+      ∧ ∃ u ∉ S,
+        SplitsIn Ω X.K u
+          ∧ ∃ A : ValuationSubring Ω, IsPlaceOver A u ∧ ∃ τ ∈ Ine (F := X.K) A, ¬ Fixes Y.K τ
 
 def Tower (S : Set (HeightOneSpectrum (𝓞 E))) (X : Fld E Ω) : Prop :=
   Relation.ReflTransGen (Layer S) (Fld.base E Ω) X
 
-theorem Tower.base (S : Set (HeightOneSpectrum (𝓞 E))) : Tower S (Fld.base E Ω) := Relation.ReflTransGen.refl
+theorem Tower.base (S : Set (HeightOneSpectrum (𝓞 E))) : Tower S (Fld.base E Ω) :=
+  Relation.ReflTransGen.refl
 
-theorem Tower.step {S : Set (HeightOneSpectrum (𝓞 E))} {X Y : Fld E Ω} (h : Tower S X) (h' : Layer S X Y) : Tower S Y :=
+theorem Tower.step
+    {S : Set (HeightOneSpectrum (𝓞 E))} {X Y : Fld E Ω} (h : Tower S X) (h' : Layer S X Y)
+    : Tower S Y :=
   Relation.ReflTransGen.tail h h'
 
-theorem Tower.induction {S : Set (HeightOneSpectrum (𝓞 E))} {P : Fld E Ω → Prop} (h0 : P (Fld.base E Ω))
-    (hs : ∀ X Y, Tower S X → Layer S X Y → P X → P Y) {X : Fld E Ω} (h : Tower S X) : P X := by
+theorem Tower.induction
+    {S : Set (HeightOneSpectrum (𝓞 E))} {P : Fld E Ω → Prop}
+    (h0 : P (Fld.base E Ω)) (hs : ∀ X Y, Tower S X → Layer S X Y → P X → P Y)
+    {X : Fld E Ω} (h : Tower S X)
+    : P X := by
   induction h with
   | refl => exact h0
   | tail h1 h2 ih => exact hs _ _ h1 h2 ih
@@ -92,37 +116,60 @@ def Cuts (X : Fld E Ω) (H : Subgroup (G (maximalRealSubfield E) Ω)) : Prop :=
 end
 
 def FreshChar : Prop :=
-  ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (U : Subgroup (G F Ω)),
-    IsOpen (U : Set (G F Ω)) → ∀ T : Set (HeightOneSpectrum (𝓞 F)), T.Finite → ∀ n : ℕ, 0 < n →
-    ∃ ψ : G F Ω →* ℂˣ, Good ψ.ker ∧ ψ ^ n = 1 ∧
-      (∀ t ∈ T, ∀ A : ValuationSubring Ω, IsPlaceOver A t → ∀ g ∈ Dec (F := F) A, ψ g = 1) ∧
-      ∃ u ∉ T, (normV u).Prime ∧ (∀ A : ValuationSubring Ω, IsPlaceOver A u → Dec (F := F) A ≤ U ∧
-          ∃ τ ∈ Ine (F := F) A, orderOf (ψ τ) = n) ∧
-        ∀ (t : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω), IsPlaceOver A t → ((normV u : ℕ) : 𝓞 F) ∉ t.asIdeal →
-          ∀ τ ∈ Ine (F := F) A, ψ τ = 1
+  ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+      (U : Subgroup (G F Ω)),
+    IsOpen (U : Set (G F Ω))
+      → ∀ T : Set (HeightOneSpectrum (𝓞 F)),
+        T.Finite
+          → ∀ n : ℕ,
+            0 < n
+              → ∃ ψ : G F Ω →* ℂˣ,
+                Good ψ.ker ∧ ψ ^ n = 1
+                  ∧ (∀ t ∈ T, ∀ A : ValuationSubring Ω,
+                    IsPlaceOver A t → ∀ g ∈ Dec (F := F) A, ψ g = 1)
+                  ∧ ∃ u ∉ T,
+                    (normV u).Prime
+                      ∧ (∀ A : ValuationSubring Ω,
+                        IsPlaceOver A u
+                          → Dec (F := F) A ≤ U ∧ ∃ τ ∈ Ine (F := F) A, orderOf (ψ τ) = n)
+                      ∧ ∀ (t : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω),
+                        IsPlaceOver A t → ((normV u : ℕ) : 𝓞 F) ∉ t.asIdeal
+                          → ∀ τ ∈ Ine (F := F) A, ψ τ = 1
 
 def RealSpan : Prop :=
-  ∀ (E M Ω F : Type) [Field E] [NumberField E] [IsCMField E] [Field M] [NumberField M] [IsCMField M] [Field Ω] [Field F]
-    [Algebra E M] [Algebra E Ω] [Algebra M Ω] [IsScalarTower E M Ω] [Algebra F Ω] (g : G F Ω),
+  ∀ (E M Ω F : Type) [Field E] [NumberField E] [IsCMField E] [Field M] [NumberField M] [IsCMField M]
+      [Field Ω] [Field F] [Algebra E M] [Algebra E Ω] [Algebra M Ω] [IsScalarTower E M Ω]
+      [Algebra F Ω] (g : G F Ω),
     Fixes E g → Fixes (maximalRealSubfield M) g → Fixes M g
 
 def NormRam : Prop :=
-  ∀ (K M Ω : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Field Ω] [Algebra K M] [Algebra K Ω] [Algebra M Ω]
-    [IsScalarTower K M Ω] [IsAlgClosure K Ω] [IsGalois K M], (Module.finrank K M).Prime →
-    ∀ η : HChar K, IsNormChar M η → ∀ (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)), IsPlaceOver A v →
-    (∃ τ ∈ Ine (F := K) A, ¬ Fixes M τ) → ¬ η.UnrAt v
+  ∀ (K M Ω : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Field Ω] [Algebra K M]
+      [Algebra K Ω] [Algebra M Ω] [IsScalarTower K M Ω] [IsAlgClosure K Ω] [IsGalois K M],
+    (Module.finrank K M).Prime
+      → ∀ η : HChar K,
+        IsNormChar M η
+          → ∀ (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)),
+            IsPlaceOver A v → (∃ τ ∈ Ine (F := K) A, ¬ Fixes M τ) → ¬ η.UnrAt v
 
 def NoSelfTwist : Prop :=
-  ∀ (K M Ω : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] [Field M] [NumberField M] [Field Ω] [Algebra K M]
-    [Algebra K Ω] [Algebra M Ω] [IsScalarTower K M Ω] [IsAlgClosure K Ω] [IsGalois K M], (Module.finrank K M).Prime →
-    ∀ (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)), IsPlaceOver A v → (∃ τ ∈ Ine (F := K) A, ¬ Fixes M τ) →
-    ∀ a : ℕ, 1 ≤ a → ∀ (π : CG K a) (B : Multiset ℂˣ), π.HasSat v B → ∀ η : HChar K, IsNormChar M η → π.twist η ≠ π
+  ∀ (K M Ω : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] [Field M]
+      [NumberField M] [Field Ω] [Algebra K M] [Algebra K Ω] [Algebra M Ω] [IsScalarTower K M Ω]
+      [IsAlgClosure K Ω] [IsGalois K M],
+    (Module.finrank K M).Prime
+      → ∀ (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)),
+        IsPlaceOver A v → (∃ τ ∈ Ine (F := K) A, ¬ Fixes M τ)
+          → ∀ a : ℕ,
+            1 ≤ a
+              → ∀ (π : CG K a) (B : Multiset ℂˣ),
+                π.HasSat v B → ∀ η : HChar K, IsNormChar M η → π.twist η ≠ π
 
 def SplitIso : Prop :=
-  ∀ (K M Ω : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Field Ω] [Algebra K M] [Algebra K Ω] [Algebra M Ω]
-    [IsScalarTower K M Ω] [IsAlgClosure K Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K))
-    (w : HeightOneSpectrum (𝓞 M)), IsPlaceOver A v → IsPlaceOver A w → (∀ g ∈ Dec (F := K) A, Fixes M g) →
-    ∃ i : v.adicCompletion K ≃+* w.adicCompletion M, Continuous i ∧
-      (∀ x : K, i (algebraMap K _ x) = algebraMap M _ (algebraMap K M x)) ∧ ∀ x, Valued.v (i x) = Valued.v x
+  ∀ (K M Ω : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Field Ω] [Algebra K M]
+      [Algebra K Ω] [Algebra M Ω] [IsScalarTower K M Ω] [IsAlgClosure K Ω] (A : ValuationSubring Ω)
+      (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 M)),
+    IsPlaceOver A v → IsPlaceOver A w → (∀ g ∈ Dec (F := K) A, Fixes M g)
+      → ∃ i : v.adicCompletion K ≃+* w.adicCompletion M,
+        Continuous i ∧ (∀ x : K, i (algebraMap K _ x) = algebraMap M _ (algebraMap K M x))
+          ∧ ∀ x, Valued.v (i x) = Valued.v x
 
 end UpperTheory.Gal.UnramifiedFromSplittingCriterion

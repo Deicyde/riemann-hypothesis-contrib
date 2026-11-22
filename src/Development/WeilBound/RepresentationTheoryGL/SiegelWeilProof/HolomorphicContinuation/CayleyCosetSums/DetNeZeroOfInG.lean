@@ -22,7 +22,9 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 theorem inG_mul {x y : M2 n} (hx : InG x) (hy : InG y) : InG (x * y) := by
   unfold InG at *
   rw [Matrix.conjTranspose_mul]
-  calc yᴴ * xᴴ * JJ n * (x * y) = yᴴ * (xᴴ * JJ n * x) * y := by simp only [Matrix.mul_assoc]
+  calc
+    yᴴ * xᴴ * JJ n * (x * y)
+      = yᴴ * (xᴴ * JJ n * x) * y := by simp only [Matrix.mul_assoc]
     _ = JJ n := by rw [hx, hy]
 
 theorem det_ne_zero_of_inG {x : M2 n} (hx : InG x) : x.det ≠ 0 := by
@@ -37,8 +39,8 @@ theorem det_ne_zero_of_inG {x : M2 n} (hx : InG x) : x.det ≠ 0 := by
     simp at this
   exact h2 h1.symm
 
-def toGR (x : M2 n) (hx : InG x) : GR n := ⟨(Matrix.isUnit_iff_isUnit_det _ |>.2 (isUnit_iff_ne_zero.2
-  (det_ne_zero_of_inG hx))).unit, hx⟩
+def toGR (x : M2 n) (hx : InG x) : GR n :=
+  ⟨(Matrix.isUnit_iff_isUnit_det _ |>.2 (isUnit_iff_ne_zero.2 (det_ne_zero_of_inG hx))).unit, hx⟩
 
 theorem mR_toGR (x : M2 n) (hx : InG x) : mR (toGR x hx) = x := rfl
 

@@ -8,13 +8,12 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.KWhit
 
-theorem norm_det_bottom_block_sq :
-    ∀ {n : Type} [Fintype n] [DecidableEq n] (t u D K₁ K₂ β h g : Matrix n n ℂ) (e η : ℂ),
-      ‖e‖ = 1 → η ≠ 0 → K₁ * K₁ᴴ + K₂ * K₂ᴴ = 1 → e • t = D * K₁ → e • (β * u) = D * K₂ →
-      tᴴ * u = 1 → hᴴ = h → β = -(η • hᵀ) →
-      g * uᴴ = ((‖η‖ ^ (-(1 / 2 : ℝ)) : ℝ) : ℂ) • 1 → IsUnit g.det →
-      ‖D.det‖ ^ 2 = ‖t.det‖ ^ 2 *
-        (1 + (g⁻¹ * h.map star * g⁻¹ᴴ) * (g⁻¹ * h.map star * g⁻¹ᴴ)).det.re := by
+theorem norm_det_bottom_block_sq
+    : ∀ {n : Type} [Fintype n] [DecidableEq n] (t u D K₁ K₂ β h g : Matrix n n ℂ) (e η : ℂ),
+      ‖e‖ = 1 → η ≠ 0 → K₁ * K₁ᴴ + K₂ * K₂ᴴ = 1 → e • t = D * K₁ → e • (β * u) = D * K₂ → tᴴ * u = 1
+        → hᴴ = h → β = -(η • hᵀ) → g * uᴴ = ((‖η‖ ^ (-(1 / 2 : ℝ)) : ℝ) : ℂ) • 1 → IsUnit g.det
+        → ‖D.det‖ ^ 2
+          = ‖t.det‖ ^ 2 * (1 + (g⁻¹ * h.map star * g⁻¹ᴴ) * (g⁻¹ * h.map star * g⁻¹ᴴ)).det.re := by
   intro n _ _ t u D K₁ K₂ β h g e η he hη hK h1 h2 htu hh hβ hg hgdet
   obtain ⟨s, hsdef⟩ : ∃ s : ℝ, s = ‖η‖ ^ (-(1 / 2 : ℝ)) := ⟨_, rfl⟩
   rw [← hsdef] at hg
@@ -24,8 +23,7 @@ theorem norm_det_bottom_block_sq :
   have hss : s * s = ‖η‖ ^ (-1 : ℝ) := by
     rw [hsdef, ← Real.rpow_add hn]
     norm_num
-  have hs : s * s * ‖η‖ = 1 := by
-    rw [hss, Real.rpow_neg_one, inv_mul_cancel₀ hn.ne']
+  have hs : s * s * ‖η‖ = 1 := by rw [hss, Real.rpow_neg_one, inv_mul_cancel₀ hn.ne']
   have hs0 : s ≠ 0 := by
     intro h0
     rw [h0] at hs
@@ -35,21 +33,17 @@ theorem norm_det_bottom_block_sq :
     intro z
     rw [← Complex.normSq_eq_norm_sq]
     exact (Complex.mul_conj z).symm
-  have hsstar : star (s : ℂ) = s := by
-    exact Complex.conj_ofReal s
-  have hsinvstar : star ((s : ℂ)⁻¹) = (s : ℂ)⁻¹ := by
-    rw [star_inv₀, hsstar]
+  have hsstar : star (s : ℂ) = s := by exact Complex.conj_ofReal s
+  have hsinvstar : star ((s : ℂ)⁻¹) = (s : ℂ)⁻¹ := by rw [star_inv₀, hsstar]
   have hee : e * star e = 1 := by
     rw [← nsq e, he]
     norm_num
   have hee' : star e * e = 1 := by rw [mul_comm]; exact hee
   have hsC : (s : ℂ) ≠ 0 := by exact_mod_cast hs0
-  have hsa : star (-(η * (s : ℂ))) = -(star η * (s : ℂ)) := by
-    rw [star_neg, star_mul', hsstar]
+  have hsa : star (-(η * (s : ℂ))) = -(star η * (s : ℂ)) := by rw [star_neg, star_mul', hsstar]
   have ha : -(η * (s : ℂ)) * star (-(η * (s : ℂ))) = (s : ℂ)⁻¹ * (s : ℂ)⁻¹ := by
     rw [hsa]
-    have e1 : -(η * (s : ℂ)) * -(star η * (s : ℂ)) = (η * star η) * ((s : ℂ) * (s : ℂ)) := by
-      ring
+    have e1 : -(η * (s : ℂ)) * -(star η * (s : ℂ)) = (η * star η) * ((s : ℂ) * (s : ℂ)) := by ring
     rw [e1, ← nsq η]
     have e2 : ‖η‖ ^ 2 * (s * s) = s⁻¹ * s⁻¹ := by
       rw [hinv]
@@ -78,21 +72,25 @@ theorem norm_det_bottom_block_sq :
   have hMH : Mᴴ = M := by
     rw [hM, hT, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
       Matrix.conjTranspose_conjTranspose, hTH, mul_assoc]
-  have hgM : g * M = hᵀ * g⁻¹ᴴ := by
-    rw [hM, hT, ← mul_assoc, ← mul_assoc, hgg, one_mul]
+  have hgM : g * M = hᵀ * g⁻¹ᴴ := by rw [hM, hT, ← mul_assoc, ← mul_assoc, hgg, one_mul]
   have hut : uᴴ * t = 1 := by
     have hx := congrArg Matrix.conjTranspose htu
-    rwa [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
-      Matrix.conjTranspose_one] at hx
+    rwa [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.conjTranspose_one] at
+      hx
   have huH : uᴴ = (s : ℂ) • g⁻¹ := by
-    calc uᴴ = g⁻¹ * (g * uᴴ) := by rw [← mul_assoc, hgg', one_mul]
+    calc
+      uᴴ
+        = g⁻¹ * (g * uᴴ) := by rw [← mul_assoc, hgg', one_mul]
       _ = (s : ℂ) • g⁻¹ := by rw [hg, mul_smul_comm, mul_one]
   have hu : u = (s : ℂ) • g⁻¹ᴴ := by
-    calc u = uᴴᴴ := (Matrix.conjTranspose_conjTranspose u).symm
+    calc
+      u = uᴴᴴ := (Matrix.conjTranspose_conjTranspose u).symm
       _ = (s : ℂ) • g⁻¹ᴴ := by rw [huH, Matrix.conjTranspose_smul, hsstar]
   have ht : t = (s : ℂ)⁻¹ • g := by
     have h3 : (s : ℂ) • t = g := by
-      calc (s : ℂ) • t = ((s : ℂ) • (1 : Matrix n n ℂ)) * t := by rw [smul_mul_assoc, one_mul]
+      calc
+        (s : ℂ) • t
+          = ((s : ℂ) • (1 : Matrix n n ℂ)) * t := by rw [smul_mul_assoc, one_mul]
         _ = g * uᴴ * t := by rw [hg]
         _ = g := by rw [mul_assoc, hut, mul_one]
     rw [← h3, smul_smul, inv_mul_cancel₀ hsC, one_smul]
@@ -100,7 +98,9 @@ theorem norm_det_bottom_block_sq :
     rw [hβ, hu, hgM, neg_mul, smul_mul_assoc, mul_smul_comm, smul_smul, neg_smul]
   have hDD : D * Dᴴ = t * tᴴ + (β * u) * (β * u)ᴴ := by
     have step1 : D * Dᴴ = (D * K₁) * (D * K₁)ᴴ + (D * K₂) * (D * K₂)ᴴ := by
-      calc D * Dᴴ = D * (K₁ * K₁ᴴ + K₂ * K₂ᴴ) * Dᴴ := by rw [hK, mul_one]
+      calc
+        D * Dᴴ
+          = D * (K₁ * K₁ᴴ + K₂ * K₂ᴴ) * Dᴴ := by rw [hK, mul_one]
         _ = (D * K₁) * (D * K₁)ᴴ + (D * K₂) * (D * K₂)ᴴ := by
           simp only [Matrix.conjTranspose_mul, mul_add, add_mul, mul_assoc]
     rw [step1, ← h1, ← h2]
@@ -112,15 +112,14 @@ theorem norm_det_bottom_block_sq :
     congr 1
     simp only [Matrix.conjTranspose_mul, hMH, mul_add, add_mul, mul_one, mul_assoc]
   have hdet : D.det * star D.det = t.det * star t.det * (1 + M * M).det := by
-    have lhs : D.det * star D.det = (D * Dᴴ).det := by
-      rw [Matrix.det_mul, Matrix.det_conjTranspose]
-    rw [lhs, hmain, Matrix.det_smul, Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose,
-      ht, Matrix.det_smul, star_mul', star_pow, hsinvstar]
+    have lhs : D.det * star D.det = (D * Dᴴ).det := by rw [Matrix.det_mul, Matrix.det_conjTranspose]
+    rw [lhs, hmain, Matrix.det_smul, Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, ht,
+      Matrix.det_smul, star_mul', star_pow, hsinvstar]
     ring
   rw [← nsq, ← nsq] at hdet
   have hre := congrArg Complex.re hdet
   first
-    | (rw [Complex.ofReal_re, Complex.re_ofReal_mul] at hre; exact hre)
-    | (simpa [Complex.mul_re] using hre)
+  | (rw [Complex.ofReal_re, Complex.re_ofReal_mul] at hre; exact hre)
+  | (simpa [Complex.mul_re] using hre)
 
 end GlobalTheory.CompanionTheory.KWhit

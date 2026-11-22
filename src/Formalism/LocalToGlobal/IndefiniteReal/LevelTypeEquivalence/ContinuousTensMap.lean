@@ -21,14 +21,19 @@ instance tensIsModTop : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
 
 def tensCoordH : R ⊗[F] E ≃ₜ (Fin d → R) :=
   haveI : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R _
-  { toEquiv := (Algebra.TensorProduct.basis R b).equivFun.toEquiv
+  {
+    toEquiv := (Algebra.TensorProduct.basis R b).equivFun.toEquiv
     continuous_toFun :=
-      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.toLinearMap
+      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
+        b).equivFun.toLinearMap
     continuous_invFun :=
-      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.symm.toLinearMap }
+      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
+        b).equivFun.symm.toLinearMap
+  }
 
-theorem tensCoordH_apply (y : R ⊗[F] E) (k : Fin d) :
-    tensCoordH b R y k = (Algebra.TensorProduct.basis R b).repr y k := rfl
+theorem tensCoordH_apply (y : R ⊗[F] E) (k : Fin d)
+    : tensCoordH b R y k = (Algebra.TensorProduct.basis R b).repr y k :=
+  rfl
 
 end Coord
 

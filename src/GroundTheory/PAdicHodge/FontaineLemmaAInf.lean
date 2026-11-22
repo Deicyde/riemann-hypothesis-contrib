@@ -22,29 +22,31 @@ local notation "𝒪♭" => PreTilt 𝒪 p
 local notation "φ" => WittVector.frobeniusEquiv p 𝒪♭
 local notation "θ" => fontaineTheta 𝒪 p
 
-theorem fontaineTheta_frobenius_pow_succ_xi {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (n : ℕ) :
-    θ ((φ ^ (n + 1)) (xi ε)) = p := by
+theorem fontaineTheta_frobenius_pow_succ_xi {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (n : ℕ)
+    : θ ((φ ^ (n + 1)) (xi ε)) = p := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [pow_succ, RingAut.mul_apply, frobeniusEquiv_xi, map_sum, map_sum]
   simp only [map_pow, WittVector.frobeniusEquiv_pow_teichmuller, fontaineTheta_teichmuller, hε,
     one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
 
-theorem fontaineTheta_frobenius_pow_mu {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (n : ℕ) :
-    θ ((φ ^ n) (mu ε)) = 0 := by
+theorem fontaineTheta_frobenius_pow_mu {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (n : ℕ)
+    : θ ((φ ^ n) (mu ε)) = 0 := by
   rw [mu, map_sub, map_one, WittVector.frobeniusEquiv_pow_teichmuller, map_sub, map_one,
     fontaineTheta_teichmuller, map_pow, hε, one_pow, sub_self]
 
-theorem fontaineTheta_frobenius_pow_mul_mu {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (b : AInf K p)
-    (n : ℕ) : θ ((φ ^ n) (mu ε * b)) = 0 := by
+theorem fontaineTheta_frobenius_pow_mul_mu
+    {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (b : AInf K p) (n : ℕ)
+    : θ ((φ ^ n) (mu ε * b)) = 0 := by
   rw [map_mul, map_mul, fontaineTheta_frobenius_pow_mu hε, zero_mul]
 
-theorem natCast_ne_zero {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
-    (hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) ≠ 1) : (p : 𝒪) ≠ 0 := by
+theorem natCast_ne_zero
+    {ε : 𝒪♭}
+    (hε : PreTilt.untilt ε = 1) (hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) ≠ 1)
+    : (p : 𝒪) ≠ 0 := by
   intro h
   apply norm_natCast_ne_zero hε hζ
   have h2 : ((p : 𝒪) : K) = (p : K) := by simp
   rw [← h2, h, ZeroMemClass.coe_zero, norm_zero]
-
 
 variable (K p) in
 noncomputable def kerThetaFrob : Ideal (AInf K p) :=
@@ -54,10 +56,12 @@ theorem mem_kerThetaFrob {a : AInf K p} : a ∈ kerThetaFrob K p ↔ ∀ n : ℕ
   simp only [kerThetaFrob, Ideal.mem_iInf, RingHom.mem_ker, RingHom.coe_comp, RingHom.coe_coe,
     Function.comp_apply]
 
-theorem exists_mul_frobeniusEquiv_symm_pow_mu_eq {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
-    (hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) ≠ 1) (N : ℕ) :
-    ∀ a : AInf K p, (∀ n : ℕ, θ ((φ ^ n) a) = 0) →
-      ∃ c : AInf K p, a * ((φ).symm ^ N) (mu ε) = mu ε * c := by
+theorem exists_mul_frobeniusEquiv_symm_pow_mu_eq
+    {ε : 𝒪♭}
+    (hε : PreTilt.untilt ε = 1) (hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) ≠ 1)
+    (N : ℕ)
+    : ∀ a : AInf K p,
+      (∀ n : ℕ, θ ((φ ^ n) a) = 0) → ∃ c : AInf K p, a * ((φ).symm ^ N) (mu ε) = mu ε * c := by
   induction N with
   | zero => exact fun a _ => ⟨a, by rw [pow_zero, RingAut.one_apply, mul_comm]⟩
   | succ N ih =>
@@ -78,31 +82,33 @@ theorem exists_mul_frobeniusEquiv_symm_pow_mu_eq {ε : 𝒪♭} (hε : PreTilt.u
     refine ⟨(φ).symm c, ?_⟩
     have h2 := congrArg (φ).symm hc
     rw [map_mul, map_mul, RingEquiv.symm_apply_apply] at h2
-    calc a₁ * xi ε * ((φ).symm ^ (N + 1)) (mu ε)
-        = xi ε * (a₁ * (φ).symm (((φ).symm ^ N) (mu ε))) := by
-          rw [pow_succ', RingAut.mul_apply]; ring
+    calc
+      a₁ * xi ε * ((φ).symm ^ (N + 1)) (mu ε) = xi ε * (a₁ * (φ).symm (((φ).symm ^ N) (mu ε))) := by
+        rw [pow_succ', RingAut.mul_apply]; ring
       _ = xi ε * ((φ).symm (mu ε) * (φ).symm c) := by rw [h2]
       _ = mu ε * (φ).symm c := by
-          conv_rhs => rw [mu_eq_xi_mul ε]
-          ring
+        conv_rhs => rw [mu_eq_xi_mul ε]
+        ring
 
 theorem constantCoeff_mu (ε : 𝒪♭) : WittVector.constantCoeff (mu ε : AInf K p) = ε - 1 := by
   rw [mu, map_sub, map_one]
   exact congrArg (· - 1) (teichmuller_coeff_zero p ε)
 
-theorem constantCoeff_frobeniusEquiv_symm_pow_mu (ε : 𝒪♭) (N : ℕ) :
-    WittVector.constantCoeff (((φ).symm ^ N) (mu ε) : AInf K p) =
-      ((_root_.frobeniusEquiv 𝒪♭ p).symm ^ N) ε - 1 := by
+theorem constantCoeff_frobeniusEquiv_symm_pow_mu (ε : 𝒪♭) (N : ℕ)
+    : WittVector.constantCoeff (((φ).symm ^ N) (mu ε) : AInf K p)
+      = ((_root_.frobeniusEquiv 𝒪♭ p).symm ^ N) ε - 1 := by
   rw [frobeniusEquiv_symm_pow_mu, map_sub, map_one]
   exact congrArg (· - 1) (teichmuller_coeff_zero p _)
 
-theorem norm_frobeniusEquiv_symm_pow_sub_one_pow (ε : 𝒪♭) (N : ℕ) :
-    ‖((_root_.frobeniusEquiv 𝒪♭ p).symm ^ N) ε - 1‖ ^ p ^ N = ‖ε - 1‖ := by
+theorem norm_frobeniusEquiv_symm_pow_sub_one_pow (ε : 𝒪♭) (N : ℕ)
+    : ‖((_root_.frobeniusEquiv 𝒪♭ p).symm ^ N) ε - 1‖ ^ p ^ N = ‖ε - 1‖ := by
   rw [← norm_pow, sub_pow_char_pow, one_pow, frobeniusEquiv_symm_pow_apply_pow]
 
-theorem sub_one_dvd_coeff_zero {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
-    (hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) ≠ 1) {a : AInf K p}
-    (ha : ∀ n : ℕ, θ ((φ ^ n) a) = 0) : ε - 1 ∣ WittVector.constantCoeff a := by
+theorem sub_one_dvd_coeff_zero
+    {ε : 𝒪♭}
+    (hε : PreTilt.untilt ε = 1) (hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) ≠ 1)
+    {a : AInf K p} (ha : ∀ n : ℕ, θ ((φ ^ n) a) = 0)
+    : ε - 1 ∣ WittVector.constantCoeff a := by
   rw [preTilt_dvd_iff_norm_le]
   set r := ‖ε - 1‖ with hr
   set x := ‖WittVector.constantCoeff a‖ with hx
@@ -112,11 +118,13 @@ theorem sub_one_dvd_coeff_zero {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
     obtain ⟨c, hc⟩ := exists_mul_frobeniusEquiv_symm_pow_mu_eq hε hζ N a ha
     have h := congrArg (fun y : AInf K p => ‖WittVector.constantCoeff y‖ ^ p ^ N) hc
     simp only [map_mul, norm_mul, mul_pow, constantCoeff_mu,
-      constantCoeff_frobeniusEquiv_symm_pow_mu, norm_frobeniusEquiv_symm_pow_sub_one_pow] at h
+        constantCoeff_frobeniusEquiv_symm_pow_mu, norm_frobeniusEquiv_symm_pow_sub_one_pow]
+      at h
     rw [h]
-    calc r ^ p ^ N * ‖WittVector.constantCoeff c‖ ^ p ^ N ≤ r ^ p ^ N * 1 := by
-          gcongr
-          exact pow_le_one₀ (norm_nonneg _) (preTilt_norm_le_one _)
+    calc
+      r ^ p ^ N * ‖WittVector.constantCoeff c‖ ^ p ^ N ≤ r ^ p ^ N * 1 := by
+        gcongr
+        exact pow_le_one₀ (norm_nonneg _) (preTilt_norm_le_one _)
       _ = r ^ p ^ N := mul_one _
   by_contra hlt
   push_neg at hlt
@@ -140,9 +148,11 @@ theorem sub_one_dvd_coeff_zero {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
   push_cast at h4 hB
   nlinarith
 
-theorem mem_span_mu_of_forall {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
-    (hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) ≠ 1) {a : AInf K p}
-    (ha : ∀ n : ℕ, θ ((φ ^ n) a) = 0) : a ∈ Ideal.span {mu ε} := by
+theorem mem_span_mu_of_forall
+    {ε : 𝒪♭}
+    (hε : PreTilt.untilt ε = 1) (hζ : PreTilt.untilt ((_root_.frobeniusEquiv 𝒪♭ p).symm ε) ≠ 1)
+    {a : AInf K p} (ha : ∀ n : ℕ, θ ((φ ^ n) a) = 0)
+    : a ∈ Ideal.span {mu ε} := by
   have hp0 := natCast_ne_zero hε hζ
   have hJ : kerThetaFrob K p ≤ Ideal.span {mu ε} := by
     refine le_span_singleton_of_forall_mem_eq (π := (p : AInf K p)) fun x hx => ?_
@@ -161,8 +171,9 @@ theorem mem_span_mu_of_forall {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
     intro n
     have h := hx n
     rw [hxv, map_add (f := _), map_add (f := _), map_mul, map_mul, map_mul, map_mul,
-      fontaineTheta_frobenius_pow_mu hε, mul_zero, zero_add, map_natCast, map_natCast,
-      mul_eq_zero] at h
+        fontaineTheta_frobenius_pow_mu hε, mul_zero, zero_add, map_natCast, map_natCast,
+        mul_eq_zero]
+      at h
     exact h.resolve_right hp0
   exact hJ (mem_kerThetaFrob.2 ha)
 

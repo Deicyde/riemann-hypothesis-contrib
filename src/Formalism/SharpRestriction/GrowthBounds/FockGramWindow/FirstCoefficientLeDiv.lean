@@ -8,7 +8,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.G.GramWindowAlt
 
-open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.MainNotions.G.CountingStatementReduction Formalism.MainNotions.G.SymmetricFormBlocks
+open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
+  Formalism.MainNotions.G.CountingStatementReduction Formalism.MainNotions.G.SymmetricFormBlocks
 
 theorem segG_pos {n' : ℕ} (TT : Finset (Fin n')) (j : Fin (numSeg TT)) : 1 ≤ segG TT j := by
   unfold segG
@@ -16,8 +17,9 @@ theorem segG_pos {n' : ℕ} (TT : Finset (Fin n')) (j : Fin (numSeg TT)) : 1 ≤
   · exact (segStart TT j).pos
   · exact Nat.one_le_iff_ne_zero.mpr h
 
-theorem cap_le' {s r p : ℕ} (S : SegData s) (b : SegBlock s r) (B : ℝ) (hB : ∀ i, (S.bTop i : ℝ) ≤ B) (l : ℕ) :
-    (cap p S b l : ℝ) ≤ S.A0 p + s * B := by
+theorem cap_le'
+    {s r p : ℕ} (S : SegData s) (b : SegBlock s r) (B : ℝ) (hB : ∀ i, (S.bTop i : ℝ) ≤ B) (l : ℕ)
+    : (cap p S b l : ℝ) ≤ S.A0 p + s * B := by
   unfold cap
   push_cast
   refine add_le_add le_rfl ((Finset.sum_le_card_nsmul _ _ B ?_).trans ?_)
@@ -55,8 +57,12 @@ theorem first_coefficient_le_div : (((X.S C0 CE1 CE2).A0 X.p : ℤ) : ℝ) ≤ X
   rw [ha, div_le_div_iff₀ (by linarith) (by norm_num)]
   nlinarith
 
-private theorem geo_lemma (n : ℕ) (p : ℝ) (hp : 1 < p) (f : Fin n → ℝ) (h0 : ∀ i, 0 ≤ f i)
-    (h1 : ∀ i, f i ≤ 1) (hs : ∀ i j : Fin n, i < j → p * f i ≤ f j) : ∑ i, f i ≤ p / (p - 1) := by
+private theorem geo_lemma
+    (n : ℕ)
+    (p : ℝ) (hp : 1 < p)
+    (f : Fin n → ℝ)
+    (h0 : ∀ i, 0 ≤ f i) (h1 : ∀ i, f i ≤ 1) (hs : ∀ i j : Fin n, i < j → p * f i ≤ f j)
+    : ∑ i, f i ≤ p / (p - 1) := by
   cases n with
   | zero =>
     simp only [Finset.univ_eq_empty, Finset.sum_empty]
@@ -72,8 +78,8 @@ private theorem geo_lemma (n : ℕ) (p : ℝ) (hp : 1 < p) (f : Fin n → ℝ) (
     rw [le_div_iff₀ (by linarith)]
     nlinarith
 
-theorem oplus_le_a (b : SegBlock X.s X.r) (a : Fin X.s → ℕ) (hK : Kept X.p X.r (X.S C0 CE1 CE2) a b) :
-    b.oPlus ≤ X.L.a := by
+theorem oplus_le_a (b : SegBlock X.s X.r) (a : Fin X.s → ℕ) (hK : Kept X.p X.r (X.S C0 CE1 CE2) a b)
+    : b.oPlus ≤ X.L.a := by
   have hF := hS.hF
   have hK4 := hK.2.2.2
   unfold Oplus at hK4
@@ -97,29 +103,35 @@ theorem oplus_le_a (b : SegBlock X.s X.r) (a : Fin X.s → ℕ) (hK : Kept X.p X
   have hq0 : 0 ≤ 4 / (X.L.p : ℝ) ^ 2 := by positivity
   have hPpos : ∀ i, (0 : ℝ) < (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) := fun i => by
     exact_mod_cast twoPow_pos C0 CE1 CE2 X i
-  have hg := geo_lemma hS X.s (X.L.p : ℝ) (by linarith)
-    (fun i => 1 / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ)) (fun i => (one_div_pos.mpr (hPpos i)).le)
-    (fun i => by
-      have := hS.P1 i
-      rw [div_le_one (hPpos i)]
-      exact_mod_cast this)
-    (fun i j hij => by
-      have h1 := P_step (C0 := C0) (CE1 := CE1) (CE2 := CE2) i j hij
-      have h1' : (X.L.p : ℝ) * (SegData.P X.p (X.S C0 CE1 CE2) j : ℝ) ≤ (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) := by
-        exact_mod_cast h1
-      rw [mul_one_div, div_le_div_iff₀ (hPpos i) (hPpos j)]
-      linarith)
+  have hg :=
+    geo_lemma hS X.s (X.L.p : ℝ) (by linarith)
+      (fun i => 1 / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ))
+      (fun i => (one_div_pos.mpr (hPpos i)).le)
+      (fun i => by
+        have := hS.P1 i
+        rw [div_le_one (hPpos i)]
+        exact_mod_cast this)
+      (fun i j hij => by
+        have h1 := P_step (C0 := C0) (CE1 := CE1) (CE2 := CE2) i j hij
+        have h1'
+            : (X.L.p : ℝ) * (SegData.P X.p (X.S C0 CE1 CE2) j : ℝ)
+              ≤ (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) := by
+          exact_mod_cast h1
+        rw [mul_one_div, div_le_div_iff₀ (hPpos i) (hPpos j)]
+        linarith)
   have hgeo : (X.L.p : ℝ) / ((X.L.p : ℝ) - 1) ≤ 25 / 24 := by
     rw [div_le_div_iff₀ (by linarith) (by norm_num)]
     linarith
-  have hTe : ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ)
-      = 2 * (X.L.a : ℝ) * ∑ i, 1 / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) := by
+  have hTe
+      : ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ)
+        = 2 * (X.L.a : ℝ) * ∑ i, 1 / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) := by
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl (fun i _ => by ring)
   have hT0 : 0 ≤ ∑ i, 1 / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) :=
     Finset.sum_nonneg (fun i _ => (one_div_pos.mpr (hPpos i)).le)
   have ha0 : (0 : ℝ) ≤ X.L.a := Nat.cast_nonneg _
-  have hT : ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) ≤ 2 * X.L.a * (25 / 24) := by
+  have hT
+      : ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) ≤ 2 * X.L.a * (25 / 24) := by
     rw [hTe]
     exact mul_le_mul_of_nonneg_left (hg.trans hgeo) (by positivity)
   have hT0' : 0 ≤ ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ) := by
@@ -134,18 +146,23 @@ theorem oplus_le_a (b : SegBlock X.s X.r) (a : Fin X.s → ℕ) (hK : Kept X.p X
     exact hmemT _ (List.get_mem _ _)
   have hbP : ((X.S C0 CE1 CE2).bPlus : ℝ) ≤ 5 / 2 * X.L.b' := hF.bT_le _ hmem
   have hbP0 : (0 : ℝ) ≤ ((X.S C0 CE1 CE2).bPlus : ℝ) := Nat.cast_nonneg _
-  have hLb : X.L.La C0 * ((X.S C0 CE1 CE2).bPlus : ℝ) / ((X.L.m : ℝ) + 1)
-      ≤ 1 / 4 * ((X.S C0 CE1 CE2).bPlus : ℝ) := by
+  have hLb
+      : X.L.La C0 * ((X.S C0 CE1 CE2).bPlus : ℝ) / ((X.L.m : ℝ) + 1)
+        ≤ 1 / 4 * ((X.S C0 CE1 CE2).bPlus : ℝ) := by
     rw [mul_div_right_comm]
     exact mul_le_mul_of_nonneg_right hc1 hbP0
-  have hcT : (X.L.La C0 / ((X.L.m : ℝ) + 1) + 4 / (X.L.p : ℝ) ^ 2)
-      * ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ)
-      ≤ (1 / 4 + 4 / 625) * (2 * X.L.a * (25 / 24)) :=
+  have hcT
+      : (X.L.La C0 / ((X.L.m : ℝ) + 1) + 4 / (X.L.p : ℝ) ^ 2)
+          * ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ)
+        ≤ (1 / 4 + 4 / 625) * (2 * X.L.a * (25 / 24)) :=
     mul_le_mul (by linarith) hT hT0' (by norm_num)
-  have hK5 : (b.oPlus : ℝ) ≤ ((cap X.p (X.S C0 CE1 CE2) b X.s : ℤ) : ℝ)
-      + (X.L.La C0 / ((X.L.m : ℝ) + 1) + 4 / (X.L.p : ℝ) ^ 2)
-        * ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ)
-      + X.L.La C0 * ((X.S C0 CE1 CE2).bPlus : ℝ) / ((X.L.m : ℝ) + 1) := hK4
+  have hK5
+      : (b.oPlus : ℝ)
+        ≤ ((cap X.p (X.S C0 CE1 CE2) b X.s : ℤ) : ℝ)
+          + (X.L.La C0 / ((X.L.m : ℝ) + 1) + 4 / (X.L.p : ℝ) ^ 2)
+            * ∑ i, 2 * (X.L.a : ℝ) / (SegData.P X.p (X.S C0 CE1 CE2) i : ℝ)
+          + X.L.La C0 * ((X.S C0 CE1 CE2).bPlus : ℝ) / ((X.L.m : ℝ) + 1) :=
+    hK4
   have hfin : (b.oPlus : ℝ) ≤ X.L.a := by nlinarith
   exact_mod_cast hfin
 
@@ -163,9 +180,11 @@ theorem a_mem_win : X.L.a ∈ X.winA := by
 
 end Deg
 
-theorem eps_num (Y D1 κ q h x0l fl E : ℝ) (hY : 1 ≤ Y) (hκ : 0 < κ) (hD : κ ≤ D1) (hq0 : 0 ≤ q) (hq : q ≤ 1 / (2 * Y))
-    (hh0 : 0 ≤ h) (hh : h ≤ κ) (hx : x0l ≤ κ) (hfl : fl ≤ D1) (hE : Y * D1 ≤ E) :
-    q + (x0l + fl + q * h) / E ≤ 5 / Y := by
+theorem eps_num
+    (Y D1 κ q h x0l fl E : ℝ)
+    (hY : 1 ≤ Y) (hκ : 0 < κ) (hD : κ ≤ D1) (hq0 : 0 ≤ q) (hq : q ≤ 1 / (2 * Y)) (hh0 : 0 ≤ h)
+    (hh : h ≤ κ) (hx : x0l ≤ κ) (hfl : fl ≤ D1) (hE : Y * D1 ≤ E)
+    : q + (x0l + fl + q * h) / E ≤ 5 / Y := by
   have hD1 : 0 < D1 := lt_of_lt_of_le hκ hD
   have hY0 : 0 < Y := by linarith
   have hYD : 0 < Y * D1 := mul_pos hY0 hD1

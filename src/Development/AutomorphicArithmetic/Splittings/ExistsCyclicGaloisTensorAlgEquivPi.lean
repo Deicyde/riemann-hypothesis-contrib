@@ -69,8 +69,12 @@ private lemma cyclic {F E K L : Type} [Field F] [Field E] [Algebra F E] [Normal 
   obtain ⟨t, rfl⟩ := hf y
   exact DFunLike.congr_fun hcomp t
 
-theorem UpperTheory.exists_cyclic_galois_tensor_algEquiv_pi :
-    ∀ (F E K : Type) [Field F] [Field E] [Algebra F E] [FiniteDimensional F E] [IsGalois F E] [IsCyclic (E ≃ₐ[F] E)] [Field K] [Algebra F K], ∃ (L : Type) (_ : Field L) (_ : Algebra K L) (_ : FiniteDimensional K L) (_ : IsGalois K L) (I : Type) (_ : Fintype I) (_ : DecidableEq I) (_ : Nonempty I), IsCyclic (L ≃ₐ[K] L) ∧ Nonempty (K ⊗[F] E ≃ₐ[K] (I → L)) := by
+theorem UpperTheory.exists_cyclic_galois_tensor_algEquiv_pi
+    : ∀ (F E K : Type) [Field F] [Field E] [Algebra F E] [FiniteDimensional F E] [IsGalois F E]
+        [IsCyclic (E ≃ₐ[F] E)] [Field K] [Algebra F K],
+      ∃ (L : Type) (_ : Field L) (_ : Algebra K L) (_ : FiniteDimensional K L) (_ : IsGalois K L)
+          (I : Type) (_ : Fintype I) (_ : DecidableEq I) (_ : Nonempty I),
+        IsCyclic (L ≃ₐ[K] L) ∧ Nonempty (K ⊗[F] E ≃ₐ[K] (I → L)) := by
   intro F E K _ _ _ _ _ _ _ _
   obtain ⟨p, hp⟩ := Normal.exists_isSplittingField F E
   haveI : Algebra.FormallyEtale F E := Algebra.FormallyEtale.of_isSeparable F E
@@ -94,5 +98,16 @@ theorem UpperTheory.exists_cyclic_galois_tensor_algEquiv_pi :
   haveI hfd : FiniteDimensional K (Ai i0) := IsSplittingField.finiteDimensional _ (p.map (algebraMap F K))
   haveI hgal : IsGalois K (Ai i0) :=
     { to_isSeparable := hs i0, to_normal := Normal.of_isSplittingField (p.map (algebraMap F K)) }
-  exact ⟨Ai i0, inferInstance, inferInstance, hfd, hgal, I, Fintype.ofFinite I, Classical.decEq I,
-    ⟨i0⟩, cyclic (fi i0) (hfi i0), ⟨e.trans (AlgEquiv.piCongrRight eqv)⟩⟩
+  exact ⟨
+    Ai i0,
+    inferInstance,
+    inferInstance,
+    hfd,
+    hgal,
+    I,
+    Fintype.ofFinite I,
+    Classical.decEq I,
+    ⟨i0⟩,
+    cyclic (fi i0) (hfi i0),
+    ⟨e.trans (AlgEquiv.piCongrRight eqv)⟩
+  ⟩

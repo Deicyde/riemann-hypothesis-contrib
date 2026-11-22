@@ -9,8 +9,9 @@ open GlobalTheory.CompanionTheory.Ar.BT TensorProduct
 
 namespace GlobalTheory.CompanionTheory.Ar.BT.HopfTranslate
 
-theorem translate_mem_of_isHopfOrder : ∀ (R : Type) [CommRing R] (T : Type) [CommGroup T] (A : Subalgebra R (T → R)),
-    IsHopfOrder A → ∀ f ∈ A, ∀ t, (fun h => f (t * h)) ∈ A := by
+theorem translate_mem_of_isHopfOrder
+    : ∀ (R : Type) [CommRing R] (T : Type) [CommGroup T] (A : Subalgebra R (T → R)),
+      IsHopfOrder A → ∀ f ∈ A, ∀ t, (fun h => f (t * h)) ∈ A := by
   intro R _ T _ A hA f hf t
   have key : ∀ g ∈ prodSpan A, (fun h => g (t, h)) ∈ A := by
     intro g hg

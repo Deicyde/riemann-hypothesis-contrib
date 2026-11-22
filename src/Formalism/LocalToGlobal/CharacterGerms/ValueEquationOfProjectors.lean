@@ -15,14 +15,19 @@ open Formalism.IncomingBounds ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ 
 
 namespace VP
 
-variable {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ} {τ τ' : Type}
+variable
+  {C : Type} [Field C] [CharZero C]
+  {V : VF C} {O : Type} [CommRing O] [StarRing O]
+  {dd : ℕ} {τ τ' : Type}
 
 variable (Y : FBChart C V O dd)
 
-def exAt (a : Fin dd → MvPowerSeries τ C) : Fin dd → MvPowerSeries τ C := fun i => MvPowerSeries.subst a (e Y i)
+def exAt (a : Fin dd → MvPowerSeries τ C) : Fin dd → MvPowerSeries τ C := fun i =>
+  MvPowerSeries.subst a (e Y i)
 
-theorem cc_exAt {a : Fin dd → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (i : Fin dd) :
-    MvPowerSeries.constantCoeff (exAt Y a i) = 0 := by
+theorem cc_exAt
+    {a : Fin dd → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (i : Fin dd)
+    : MvPowerSeries.constantCoeff (exAt Y a i) = 0 := by
   unfold exAt
   rw [MvPowerSeries.constantCoeff_subst (MvPowerSeries.hasSubst_of_constantCoeff_zero ha)]
   apply finsum_eq_zero_of_forall_eq_zero
@@ -38,33 +43,52 @@ theorem cc_exAt {a : Fin dd → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.c
       rw [map_pow, ha s, zero_pow hs]
     rw [h0, smul_zero]
 
-theorem l_add_at {u v : Fin dd → MvPowerSeries τ C} (hu : ∀ i, MvPowerSeries.constantCoeff (u i) = 0)
-    (hv : ∀ i, MvPowerSeries.constantCoeff (v i) = 0) (m : Fin dd) :
-    MvPowerSeries.subst (addAt Y u v) (l Y m) = MvPowerSeries.subst u (l Y m) + MvPowerSeries.subst v (l Y m) := by
+theorem l_add_at
+    {u v : Fin dd → MvPowerSeries τ C} (hu : ∀ i, MvPowerSeries.constantCoeff (u i) = 0)
+    (hv : ∀ i, MvPowerSeries.constantCoeff (v i) = 0)
+    (m : Fin dd)
+    : MvPowerSeries.subst (addAt Y u v) (l Y m)
+      = MvPowerSeries.subst u (l Y m) + MvPowerSeries.subst v (l Y m) := by
   have h := congrArg (MvPowerSeries.subst (P2 u v)) (l_add Y m)
   have hP := constantCoeff_pair_substitution hu hv
   rw [subst_add' hP, subst_subst (cc_F Y) hP,
-    subst_subst (a := fun k : Fin dd => (MvPowerSeries.X ((0 : Fin 2), k) : PS C 2 dd)) (fun _ => cc_X _) hP,
-    subst_subst (a := fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd)) (fun _ => cc_X _) hP] at h
-  have e0 : (fun s : Fin dd => MvPowerSeries.subst (P2 u v) (MvPowerSeries.X ((0 : Fin 2), s) : PS C 2 dd)) = u :=
+      subst_subst
+        (a := fun k : Fin dd => (MvPowerSeries.X ((0 : Fin 2), k) : PS C 2 dd))
+        (fun _ => cc_X _)
+        hP,
+      subst_subst
+        (a := fun k : Fin dd => (MvPowerSeries.X ((1 : Fin 2), k) : PS C 2 dd))
+        (fun _ => cc_X _)
+        hP]
+    at h
+  have e0
+      : (fun s : Fin dd =>
+          MvPowerSeries.subst (P2 u v) (MvPowerSeries.X ((0 : Fin 2), s) : PS C 2 dd))
+        = u :=
     funext fun i => subst_X hP _
-  have e1 : (fun s : Fin dd => MvPowerSeries.subst (P2 u v) (MvPowerSeries.X ((1 : Fin 2), s) : PS C 2 dd)) = v :=
+  have e1
+      : (fun s : Fin dd =>
+          MvPowerSeries.subst (P2 u v) (MvPowerSeries.X ((1 : Fin 2), s) : PS C 2 dd))
+        = v :=
     funext fun i => subst_X hP _
   rw [e0, e1] at h
   exact h
 
-theorem l_exAt {a : Fin dd → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (m : Fin dd) :
-    MvPowerSeries.subst (exAt Y a) (l Y m) = a m := by
+theorem l_exAt
+    {a : Fin dd → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (m : Fin dd)
+    : MvPowerSeries.subst (exAt Y a) (l Y m) = a m := by
   unfold exAt
   rw [← subst_subst (cc_e Y) ha, lgex, subst_X ha]
 
-theorem e_lAt {P : Fin dd → MvPowerSeries τ C} (hP : ∀ i, MvPowerSeries.constantCoeff (P i) = 0) (i : Fin dd) :
-    MvPowerSeries.subst (fun m => MvPowerSeries.subst P (l Y m)) (e Y i) = P i := by
+theorem e_lAt
+    {P : Fin dd → MvPowerSeries τ C} (hP : ∀ i, MvPowerSeries.constantCoeff (P i) = 0) (i : Fin dd)
+    : MvPowerSeries.subst (fun m => MvPowerSeries.subst P (l Y m)) (e Y i) = P i := by
   rw [← subst_subst (cc_l Y) hP, exlg, subst_X hP]
 
-theorem ex_add {a b : Fin dd → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0)
-    (hb : ∀ i, MvPowerSeries.constantCoeff (b i) = 0) :
-    exAt Y (fun m => a m + b m) = addAt Y (exAt Y a) (exAt Y b) := by
+theorem ex_add
+    {a b : Fin dd → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0)
+    (hb : ∀ i, MvPowerSeries.constantCoeff (b i) = 0)
+    : exAt Y (fun m => a m + b m) = addAt Y (exAt Y a) (exAt Y b) := by
   funext i
   have hP := cc_addAt Y (cc_exAt Y ha) (cc_exAt Y hb)
   rw [← e_lAt Y hP i]
@@ -78,7 +102,8 @@ theorem exAt_zero : exAt Y (fun _ : Fin dd => (0 : MvPowerSeries τ C)) = fun _ 
   funext i
   ext e'
   simp only [exAt]
-  rw [MvPowerSeries.coeff_subst (MvPowerSeries.hasSubst_of_constantCoeff_zero (fun _ => map_zero _)),
+  rw [MvPowerSeries.coeff_subst (MvPowerSeries.hasSubst_of_constantCoeff_zero (fun _ =>
+      map_zero _)),
     finsum_eq_zero_of_forall_eq_zero]
   · simp
   · intro d
@@ -92,7 +117,11 @@ theorem exAt_zero : exAt Y (fun _ : Fin dd => (0 : MvPowerSeries τ C)) = fun _ 
 
 end VP
 
-variable {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ} {d : ℕ} [NeZero d]
-  {Orb : Type} [Fintype Orb] {I : Orb → Fin 2 → Type} [∀ o g, Fintype (I o g)]
+variable
+  {C : Type} [Field C] [CharZero C]
+  {V : VF C} {O : Type} [CommRing O] [StarRing O]
+  {dd : ℕ} {d : ℕ} [NeZero d]
+  {Orb : Type} [Fintype Orb]
+  {I : Orb → Fin 2 → Type} [∀ o g, Fintype (I o g)]
 
 end Formalism.L2.FormalSeriesBounds

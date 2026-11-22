@@ -10,8 +10,12 @@ public import Formalism.LocalToGlobal.BesselHermitianTheta.LemmasWeil
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -19,15 +23,20 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.Deg
 
-theorem measurePreserving_of_covol {G : Type*} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+theorem measurePreserving_of_covol
+    {G : Type*} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
     [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    (Γ : AddSubgroup G) [Countable Γ] (μ : Measure G) [μ.IsAddHaarMeasure] (𝓕 : Set G)
-    (hF : IsAddFundamentalDomain Γ 𝓕 μ) (h1 : μ 𝓕 = 1) (T : G ≃+ G) (hc : Continuous T) (hc' : Continuous T.symm)
-    (hT : ∀ γ ∈ Γ, T γ ∈ Γ) (hT' : ∀ γ ∈ Γ, T.symm γ ∈ Γ) : MeasurePreserving T μ μ := by
+    (Γ : AddSubgroup G) [Countable Γ]
+    (μ : Measure G) [μ.IsAddHaarMeasure]
+    (𝓕 : Set G) (hF : IsAddFundamentalDomain Γ 𝓕 μ) (h1 : μ 𝓕 = 1)
+    (T : G ≃+ G) (hc : Continuous T) (hc' : Continuous T.symm) (hT : ∀ γ ∈ Γ, T γ ∈ Γ)
+    (hT' : ∀ γ ∈ Γ, T.symm γ ∈ Γ)
+    : MeasurePreserving T μ μ := by
   let e : G ≃ᵐ G := (Homeomorph.mk T.toEquiv hc hc').toMeasurableEquiv
   have he : ∀ x, e x = T x := fun _ => rfl
   haveI hH : (μ.map e).IsAddHaarMeasure := T.isAddHaarMeasure_map μ hc hc'
-  have hs : μ.map e = Measure.addHaarScalarFactor (μ.map e) μ • μ := Measure.isAddLeftInvariant_eq_smul _ _
+  have hs : μ.map e = Measure.addHaarScalarFactor (μ.map e) μ • μ :=
+    Measure.isAddLeftInvariant_eq_smul _ _
   have hpos := Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure (μ.map e) μ
   set c := Measure.addHaarScalarFactor (μ.map e) μ with hcdef
   have hq : Measure.QuasiMeasurePreserving e μ μ := by
@@ -56,18 +65,23 @@ theorem measurePreserving_of_covol {G : Type*} [AddCommGroup G] [TopologicalSpac
   have : μ.map e = μ := by rw [hs, hc1, one_smul]
   exact ⟨e.measurable, this⟩
 
-theorem integral_comp_of_covol {G : Type*} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+theorem integral_comp_of_covol
+    {G : Type*} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
     [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    (Γ : AddSubgroup G) [Countable Γ] (μ : Measure G) [μ.IsAddHaarMeasure] (𝓕 : Set G)
-    (hF : IsAddFundamentalDomain Γ 𝓕 μ) (h1 : μ 𝓕 = 1) (T : G ≃+ G) (hc : Continuous T) (hc' : Continuous T.symm)
-    (hT : ∀ γ ∈ Γ, T γ ∈ Γ) (hT' : ∀ γ ∈ Γ, T.symm γ ∈ Γ) (g : G → ℂ) :
-    ∫ x, g (T x) ∂μ = ∫ x, g x ∂μ :=
+    (Γ : AddSubgroup G) [Countable Γ]
+    (μ : Measure G) [μ.IsAddHaarMeasure]
+    (𝓕 : Set G) (hF : IsAddFundamentalDomain Γ 𝓕 μ) (h1 : μ 𝓕 = 1)
+    (T : G ≃+ G) (hc : Continuous T) (hc' : Continuous T.symm) (hT : ∀ γ ∈ Γ, T γ ∈ Γ)
+    (hT' : ∀ γ ∈ Γ, T.symm γ ∈ Γ)
+    (g : G → ℂ)
+    : ∫ x, g (T x) ∂μ = ∫ x, g x ∂μ :=
   (measurePreserving_of_covol Γ μ 𝓕 hF h1 T hc hc' hT hT').integral_comp
     (Homeomorph.mk T.toEquiv hc hc').toMeasurableEquiv.measurableEmbedding g
 
 variable {D : D7}
 
-def mulRightE {m r : ℕ} (A B : Mx D r r) (h1 : A * B = 1) (h2 : B * A = 1) : Mx D m r ≃+ Mx D m r where
+def mulRightE {m r : ℕ} (A B : Mx D r r) (h1 : A * B = 1) (h2 : B * A = 1)
+    : Mx D m r ≃+ Mx D m r where
   toFun y := y ⬝ A
   invFun y := y ⬝ B
   left_inv y := by
@@ -83,36 +97,39 @@ theorem adj_cong_mem {r : ℕ} (A : Mx D r r) (b : hermA D r) : A ⬝ b.1 ⬝ ad
   show adj (A ⬝ b.1 ⬝ adj A) = A ⬝ b.1 ⬝ adj A
   rw [adj_mul, adj_mul, adj_adj, hb, Matrix.mul_assoc]
 
-theorem cong_cancel {r : ℕ} (A B : Mx D r r) (h2 : B * A = 1) (b : Mx D r r) :
-    B ⬝ (A ⬝ b ⬝ adj A) ⬝ adj B = b := by
+theorem cong_cancel {r : ℕ} (A B : Mx D r r) (h2 : B * A = 1) (b : Mx D r r)
+    : B ⬝ (A ⬝ b ⬝ adj A) ⬝ adj B = b := by
   have h3 : adj A ⬝ adj B = 1 := by rw [← adj_mul, h2, adj_one]
-  calc B ⬝ (A ⬝ b ⬝ adj A) ⬝ adj B = (B * A) * b * (adj A * adj B) := by
-        simp only [Matrix.mul_assoc]
+  calc
+    B ⬝ (A ⬝ b ⬝ adj A) ⬝ adj B
+      = (B * A) * b * (adj A * adj B) := by simp only [Matrix.mul_assoc]
     _ = b := by
-        rw [h2]
-        erw [h3]
-        simp
+      rw [h2]
+      erw [h3]
+      simp
 
 def congA {r : ℕ} (A B : Mx D r r) (h1 : A * B = 1) (h2 : B * A = 1) : hermA D r ≃+ hermA D r where
   toFun b := ⟨A ⬝ b.1 ⬝ adj A, adj_cong_mem A b⟩
   invFun b := ⟨B ⬝ b.1 ⬝ adj B, adj_cong_mem B b⟩
   left_inv b := Subtype.ext (cong_cancel A B h2 b.1)
   right_inv b := Subtype.ext (cong_cancel B A h1 b.1)
-  map_add' x y := Subtype.ext (by
-    show A ⬝ (x.1 + y.1) ⬝ adj A = A ⬝ x.1 ⬝ adj A + A ⬝ y.1 ⬝ adj A
-    rw [Matrix.mul_add, Matrix.add_mul])
+  map_add' x y :=
+    Subtype.ext (by
+      show A ⬝ (x.1 + y.1) ⬝ adj A = A ⬝ x.1 ⬝ adj A + A ⬝ y.1 ⬝ adj A
+      rw [Matrix.mul_add, Matrix.add_mul])
 
-theorem rat_mul_inv {r : ℕ} (a : Matrix (Fin r) (Fin r) D.host.E) (ha : a.det ≠ 0) :
-    rat a * rat a⁻¹ = (1 : Mx D r r) := by
+theorem rat_mul_inv {r : ℕ} (a : Matrix (Fin r) (Fin r) D.host.E) (ha : a.det ≠ 0)
+    : rat a * rat a⁻¹ = (1 : Mx D r r) := by
   rw [← rat_mul, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.2 ha), rat_one]
 
-theorem rat_inv_mul {r : ℕ} (a : Matrix (Fin r) (Fin r) D.host.E) (ha : a.det ≠ 0) :
-    rat a⁻¹ * rat a = (1 : Mx D r r) := by
+theorem rat_inv_mul {r : ℕ} (a : Matrix (Fin r) (Fin r) D.host.E) (ha : a.det ≠ 0)
+    : rat a⁻¹ * rat a = (1 : Mx D r r) := by
   rw [← rat_mul, Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.2 ha), rat_one]
 
-theorem integral_mulRight {m r : ℕ} {μ : Measure (Mx D m r)} {𝓕 : Set (Mx D m r)}
-    (hμ : IsCovolOne (ratMx D m r) μ 𝓕) (a : Matrix (Fin r) (Fin r) D.host.E) (ha : a.det ≠ 0)
-    (g : Mx D m r → ℂ) : ∫ y, g (y ⬝ rat a) ∂μ = ∫ y, g y ∂μ := by
+theorem integral_mulRight
+    {m r : ℕ} {μ : Measure (Mx D m r)} {𝓕 : Set (Mx D m r)} (hμ : IsCovolOne (ratMx D m r) μ 𝓕)
+    (a : Matrix (Fin r) (Fin r) D.host.E) (ha : a.det ≠ 0) (g : Mx D m r → ℂ)
+    : ∫ y, g (y ⬝ rat a) ∂μ = ∫ y, g y ∂μ := by
   obtain ⟨i1, i2, i3, i4, i5, -⟩ := GlobalTheory.TowerRestrict.lattice_Mx D m r
   haveI : BorelSpace (Mx D m r) := ⟨rfl⟩
   haveI : IsTopologicalRing (AE D) := (Formalism.IndefR.Eqv.ae_facts D).1
@@ -127,10 +144,11 @@ theorem integral_mulRight {m r : ℕ} {μ : Measure (Mx D m r)} {𝓕 : Set (Mx 
     (by rintro _ ⟨γ, rfl⟩; exact ⟨γ * a, rat_mul γ a⟩)
     (by rintro _ ⟨γ, rfl⟩; exact ⟨γ * a⁻¹, rat_mul γ a⁻¹⟩) g
 
-theorem integral_congA {r : ℕ} {lam : Measure (hermA D r)} {𝓖 : Set (hermA D r)}
-    (hl : IsCovolOneH lam 𝓖) (a : Matrix (Fin r) (Fin r) D.host.E) (ha : a.det ≠ 0)
-    (g : hermA D r → ℂ) :
-    ∫ b, g (congA (rat a) (rat a⁻¹) (rat_mul_inv a ha) (rat_inv_mul a ha) b) ∂lam = ∫ b, g b ∂lam := by
+theorem integral_congA
+    {r : ℕ} {lam : Measure (hermA D r)} {𝓖 : Set (hermA D r)} (hl : IsCovolOneH lam 𝓖)
+    (a : Matrix (Fin r) (Fin r) D.host.E) (ha : a.det ≠ 0) (g : hermA D r → ℂ)
+    : ∫ b, g (congA (rat a) (rat a⁻¹) (rat_mul_inv a ha) (rat_inv_mul a ha) b) ∂lam
+      = ∫ b, g b ∂lam := by
   obtain ⟨i1, i2, i3, i4, i5, -⟩ := GlobalTheory.TowerRestrict.lattice_Mx D r r
   haveI : BorelSpace (Mx D r r) := ⟨rfl⟩
   haveI : IsTopologicalRing (AE D) := (Formalism.IndefR.Eqv.ae_facts D).1
@@ -151,52 +169,64 @@ theorem integral_congA {r : ℕ} {lam : Measure (hermA D r)} {𝓖 : Set (hermA 
   obtain ⟨hH, hF, h1⟩ := hl
   have hcont : ∀ A : Mx D r r, Continuous (fun b : hermA D r => A ⬝ b.1 ⬝ adj A) := fun A =>
     (continuous_const.matrix_mul continuous_subtype_val).matrix_mul continuous_const
-  have hrat : ∀ (c : Matrix (Fin r) (Fin r) D.host.E) (γ : hermA D r), γ ∈ ratHerm D r →
-      rat c ⬝ γ.1 ⬝ adj (rat c) ∈ ratMx D r r := by
+  have hrat
+      : ∀ (c : Matrix (Fin r) (Fin r) D.host.E) (γ : hermA D r),
+        γ ∈ ratHerm D r → rat c ⬝ γ.1 ⬝ adj (rat c) ∈ ratMx D r r := by
     rintro c ⟨_, _⟩ ⟨γ, rfl⟩
     refine ⟨c * γ * cᴴ, ?_⟩
     show rat (c * γ * cᴴ) = _
     rw [rat_mul, rat_mul, rat_conjTranspose]
     rfl
   exact integral_comp_of_covol (ratHerm D r) lam 𝓖 hF h1
-    (congA (rat a) (rat a⁻¹) (rat_mul_inv a ha) (rat_inv_mul a ha))
-    ((hcont _).subtype_mk _) ((hcont _).subtype_mk _)
-    (fun γ hγ => hrat a γ hγ) (fun γ hγ => hrat a⁻¹ γ hγ) g
+    (congA (rat a) (rat a⁻¹) (rat_mul_inv a ha) (rat_inv_mul a ha)) ((hcont _).subtype_mk _)
+    ((hcont _).subtype_mk _)
+    (fun γ hγ => hrat a γ hγ)
+    (fun γ hγ => hrat a⁻¹ γ hγ)
+    g
 
-theorem inner_mul_right (V : HSp D) {r : ℕ} (y : Mx D V.rank r) (A : Mx D r r) :
-    GlobalTheory.StdUnn.inner V (y ⬝ A) (y ⬝ A) = adj A ⬝ GlobalTheory.StdUnn.inner V y y ⬝ A := by
+theorem inner_mul_right (V : HSp D) {r : ℕ} (y : Mx D V.rank r) (A : Mx D r r)
+    : GlobalTheory.StdUnn.inner V (y ⬝ A) (y ⬝ A)
+      = adj A ⬝ GlobalTheory.StdUnn.inner V y y ⬝ A := by
   simp only [GlobalTheory.StdUnn.inner, adj_mul, Matrix.mul_assoc]
 
-theorem trace_cong_left {r : ℕ} (P A b Q : Mx D r r) :
-    Matrix.trace (P ⬝ (A ⬝ b ⬝ Q)) = Matrix.trace (Q ⬝ P ⬝ A ⬝ b) := by
-  calc Matrix.trace (P ⬝ (A ⬝ b ⬝ Q)) = Matrix.trace ((P ⬝ A ⬝ b) ⬝ Q) := by
-        simp only [Matrix.mul_assoc]
+theorem trace_cong_left {r : ℕ} (P A b Q : Mx D r r)
+    : Matrix.trace (P ⬝ (A ⬝ b ⬝ Q)) = Matrix.trace (Q ⬝ P ⬝ A ⬝ b) := by
+  calc
+    Matrix.trace (P ⬝ (A ⬝ b ⬝ Q))
+      = Matrix.trace ((P ⬝ A ⬝ b) ⬝ Q) := by simp only [Matrix.mul_assoc]
     _ = Matrix.trace (Q ⬝ (P ⬝ A ⬝ b)) := Matrix.trace_mul_comm _ _
     _ = Matrix.trace (Q ⬝ P ⬝ A ⬝ b) := by simp only [Matrix.mul_assoc]
 
-theorem trace_cong_inner {r : ℕ} (A B b I : Mx D r r) (h1 : A * B = 1) (h2 : B * A = 1) :
-    Matrix.trace ((B ⬝ b ⬝ adj B) ⬝ (adj A ⬝ I ⬝ A)) = Matrix.trace (b ⬝ I) := by
+theorem trace_cong_inner {r : ℕ} (A B b I : Mx D r r) (h1 : A * B = 1) (h2 : B * A = 1)
+    : Matrix.trace ((B ⬝ b ⬝ adj B) ⬝ (adj A ⬝ I ⬝ A)) = Matrix.trace (b ⬝ I) := by
   have h3 : adj B ⬝ adj A = 1 := by rw [← adj_mul, h1, adj_one]
-  calc Matrix.trace ((B ⬝ b ⬝ adj B) ⬝ (adj A ⬝ I ⬝ A))
+  calc
+    Matrix.trace ((B ⬝ b ⬝ adj B) ⬝ (adj A ⬝ I ⬝ A))
       = Matrix.trace (B ⬝ (b ⬝ ((adj B ⬝ adj A) ⬝ (I ⬝ A)))) := by simp only [Matrix.mul_assoc]
     _ = Matrix.trace (B ⬝ (b ⬝ (I ⬝ A))) := by
-        rw [h3]
-        simp
+      rw [h3]
+      simp
     _ = Matrix.trace ((b ⬝ (I ⬝ A)) ⬝ B) := Matrix.trace_mul_comm _ _
     _ = Matrix.trace (b ⬝ I ⬝ (A ⬝ B)) := by simp only [Matrix.mul_assoc]
     _ = Matrix.trace (b ⬝ I) := by
-        rw [h1]
-        simp
+      rw [h1]
+      simp
 
-theorem rat_congrH {r : ℕ} (a : Matrix (Fin r) (Fin r) D.host.E) (β : HermE D r) :
-    (congrH a β).1.map (incA D) = adj (rat a) ⬝ β.1.map (incA D) ⬝ rat a := by
+theorem rat_congrH {r : ℕ} (a : Matrix (Fin r) (Fin r) D.host.E) (β : HermE D r)
+    : (congrH a β).1.map (incA D) = adj (rat a) ⬝ β.1.map (incA D) ⬝ rat a := by
   have h : (congrH a β).1 = aᴴ * β.1 * a := rfl
   rw [h]
   show rat (aᴴ * β.1 * a) = _
   rw [rat_mul, rat_mul, rat_conjTranspose]
   rfl
 
-theorem W_congr : ∀ (D : D7) (r : ℕ) (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (Mx D V.rank r)) (lam : Measure (hermA D r)) (φ : Mx D V.rank r → ℂ) (β : HermE D r) (a : Matrix (Fin r) (Fin r) D.host.E), a.det ≠ 0 → (∃ 𝓕, IsCovolOne (ratMx D V.rank r) μ 𝓕) → (∃ 𝓖, IsCovolOneH lam 𝓖) → W ψ V μ lam (pull a φ) β = W ψ V μ lam φ (GlobalTheory.CompanionTheory.WeilSiegel.Deg.congrH a β) := by
+theorem W_congr
+    : ∀ (D : D7) (r : ℕ) (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (Mx D V.rank r))
+        (lam : Measure (hermA D r)) (φ : Mx D V.rank r → ℂ) (β : HermE D r)
+        (a : Matrix (Fin r) (Fin r) D.host.E),
+      a.det ≠ 0 → (∃ 𝓕, IsCovolOne (ratMx D V.rank r) μ 𝓕) → (∃ 𝓖, IsCovolOneH lam 𝓖)
+        → W ψ V μ lam (pull a φ) β
+          = W ψ V μ lam φ (GlobalTheory.CompanionTheory.WeilSiegel.Deg.congrH a β) := by
   intro D r V ψ μ lam φ β a ha ⟨𝓕, hμ⟩ ⟨𝓖, hl⟩
   set S := congA (rat a) (rat a⁻¹) (rat_mul_inv a ha) (rat_inv_mul a ha) with hS
   have hJ : ∀ b, Jt ψ V μ (pull a φ) b = Jt ψ V μ φ (S.symm b) := by

@@ -19,16 +19,18 @@ open AlgebraicGeometry CategoryTheory TopologicalSpace
 
 universe c236Ext c236Scheme
 
-private noncomputable def H.linearMapV436 {X : Scheme.{c236Scheme}}
+private noncomputable def H.linearMapV436
+    {X : Scheme.{c236Scheme}}
     [HasExt.{c236Ext} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{c236Scheme})]
     (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
-    {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) :
-    Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n where
+    {F G : X.Modules} (φ : F ⟶ G)
+    (n : ℕ)
+    : Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n where
   toFun := Sheaf.H.map.{c236Ext} (modulesAbMap φ) n
   map_add' := map_add _
   map_smul' a x := by
-    change Sheaf.H.map.{c236Ext} (modulesAbMap φ) n (a • x) =
-      a • Sheaf.H.map.{c236Ext} (modulesAbMap φ) n x
+    change Sheaf.H.map.{c236Ext} (modulesAbMap φ) n (a • x)
+      = a • Sheaf.H.map.{c236Ext} (modulesAbMap φ) n x
     rw [H.smul_def, H.smul_def, ← Sheaf.H.map_comp_apply, ← Sheaf.H.map_comp_apply,
       ← modulesAbMap_comp, ← modulesAbMap_comp, smulHom_comp]
 
@@ -40,8 +42,7 @@ private lemma H.linearMapV436_apply {X : Scheme.{c236Scheme}}
 
 end
 
-open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits MonoidalCategory
-  MvPolynomial
+open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits MonoidalCategory MvPolynomial
 
 universe w' u
 
@@ -58,7 +59,8 @@ lemma modulesAbMap_add {F G : X.Modules} (φ ψ : F ⟶ G) :
   ext U x
   rfl
 
-variable [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
+variable
+  [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
   (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
 
 lemma H.linearMap_add {F G : X.Modules} (φ ψ : F ⟶ G) (p : ℕ) :
@@ -89,8 +91,8 @@ lemma H.linearMap_sum {F G : X.Modules} {ι : Type*} (s : Finset ι) (φ : ι �
   | empty => simp [H.linearMap_zero]
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, H.linearMap_add, ih]
 
-def H.linearEquivOfIso {F G : X.Modules} (e : F ≅ G) (p : ℕ) :
-    Sheaf.H.{w'} (modulesAb F) p ≃ₗ[A] Sheaf.H.{w'} (modulesAb G) p :=
+def H.linearEquivOfIso {F G : X.Modules} (e : F ≅ G) (p : ℕ)
+    : Sheaf.H.{w'} (modulesAb F) p ≃ₗ[A] Sheaf.H.{w'} (modulesAb G) p :=
   ((H.moduleFunctor.{w'} A p).mapIso e).toLinearEquiv
 
 end Additive
@@ -99,8 +101,8 @@ section Delta
 
 variable {X : Scheme.{u}}
 
-def abSC (S : ShortComplex X.Modules) :
-    ShortComplex (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u}) :=
+def abSC (S : ShortComplex X.Modules)
+    : ShortComplex (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u}) :=
   ShortComplex.mk (modulesAbMap S.f) (modulesAbMap S.g) (by
     rw [← modulesAbMap_comp, S.zero]
     exact (SheafOfModules.toSheaf X.ringCatSheaf).map_zero _ _)
@@ -108,7 +110,8 @@ def abSC (S : ShortComplex X.Modules) :
 lemma shortExact_abSC {S : ShortComplex X.Modules} (hS : S.ShortExact) : (abSC S).ShortExact :=
   shortExact_abShortComplex hS
 
-variable [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
+variable
+  [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
   (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
   {S : ShortComplex X.Modules} (hS : (abSC S).ShortExact)
 
@@ -119,12 +122,11 @@ def abSmulEnd (S : ShortComplex X.Modules) (r : Γ(X, ⊤)) : abSC S ⟶ abSC S 
   comm₁₂ := smulAbRingHom_comp S.f r
   comm₂₃ := smulAbRingHom_comp S.g r
 
-def H.δLinear (p : ℕ) :
-    Sheaf.H.{w'} (modulesAb S.X₃) p →ₗ[A] Sheaf.H.{w'} (modulesAb S.X₁) (p + 1) where
+def H.δLinear (p : ℕ)
+    : Sheaf.H.{w'} (modulesAb S.X₃) p →ₗ[A] Sheaf.H.{w'} (modulesAb S.X₁) (p + 1) where
   toFun := H.δ hS p (p + 1) rfl
   map_add' := map_add _
-  map_smul' a x :=
-    H.δ_naturality hS hS (abSmulEnd S (algebraMap A Γ(X, ⊤) a)) p (p + 1) rfl x
+  map_smul' a x := H.δ_naturality hS hS (abSmulEnd S (algebraMap A Γ(X, ⊤) a)) p (p + 1) rfl x
 
 lemma H.δLinear_apply (p : ℕ) (x : Sheaf.H.{w'} (modulesAb S.X₃) p) :
     H.δLinear A hS p x = H.δ hS p (p + 1) rfl x := rfl
@@ -133,10 +135,12 @@ end Delta
 
 section Finite
 
-theorem finite_of_exact_noetherian {R M₁ M₂ M₃ : Type*} [CommRing R] [IsNoetherianRing R]
-    [AddCommGroup M₁] [AddCommGroup M₂] [AddCommGroup M₃] [Module R M₁] [Module R M₂] [Module R M₃]
-    [Module.Finite R M₁] [Module.Finite R M₃] (f : M₁ →ₗ[R] M₂) (g : M₂ →ₗ[R] M₃)
-    (hfg : ∀ y, g y = 0 → ∃ x, f x = y) : Module.Finite R M₂ := by
+theorem finite_of_exact_noetherian
+    {R M₁ M₂ M₃ : Type*}
+    [CommRing R] [IsNoetherianRing R] [AddCommGroup M₁] [AddCommGroup M₂] [AddCommGroup M₃]
+    [Module R M₁] [Module R M₂] [Module R M₃] [Module.Finite R M₁] [Module.Finite R M₃]
+    (f : M₁ →ₗ[R] M₂) (g : M₂ →ₗ[R] M₃) (hfg : ∀ y, g y = 0 → ∃ x, f x = y)
+    : Module.Finite R M₂ := by
   have hker : LinearMap.ker g ≤ LinearMap.range f := fun y hy => hfg y hy
   have hN3 : IsNoetherian R M₃ := isNoetherian_of_isNoetherianRing_of_finite R M₃
   have hrg : (LinearMap.range g).FG := IsNoetherian.noetherian _
@@ -155,30 +159,31 @@ end Finite
 
 section Sandwich
 
-variable {X : Scheme.{u}}
-  [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
+variable
+  {X : Scheme.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
   (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
   {S : ShortComplex X.Modules} (hS : S.ShortExact)
 
+include hS in
+theorem finite_H_X₃
+    [IsNoetherianRing A]
+    (p : ℕ) [Module.Finite A (Sheaf.H.{w'} (modulesAb S.X₂) p)]
+    [Module.Finite A (Sheaf.H.{w'} (modulesAb S.X₁) (p + 1))]
+    : Module.Finite A (Sheaf.H.{w'} (modulesAb S.X₃) p) :=
+  finite_of_exact_noetherian (H.linearMap A S.g p) (H.δLinear A (shortExact_abSC hS) p) fun y hy =>
+    H.exact₃ (shortExact_abSC hS) rfl y hy
 
 include hS in
-theorem finite_H_X₃ [IsNoetherianRing A] (p : ℕ)
-    [Module.Finite A (Sheaf.H.{w'} (modulesAb S.X₂) p)]
-    [Module.Finite A (Sheaf.H.{w'} (modulesAb S.X₁) (p + 1))] :
-    Module.Finite A (Sheaf.H.{w'} (modulesAb S.X₃) p) :=
-  finite_of_exact_noetherian (H.linearMap A S.g p) (H.δLinear A (shortExact_abSC hS) p)
-    fun y hy => H.exact₃ (shortExact_abSC hS) rfl y hy
-
-
-include hS in
-theorem subsingleton_H_X₃ (p : ℕ) [Subsingleton (Sheaf.H.{w'} (modulesAb S.X₂) p)]
-    [Subsingleton (Sheaf.H.{w'} (modulesAb S.X₁) (p + 1))] :
-    Subsingleton (Sheaf.H.{w'} (modulesAb S.X₃) p) := by
+theorem subsingleton_H_X₃
+    (p : ℕ) [Subsingleton (Sheaf.H.{w'} (modulesAb S.X₂) p)]
+    [Subsingleton (Sheaf.H.{w'} (modulesAb S.X₁) (p + 1))]
+    : Subsingleton (Sheaf.H.{w'} (modulesAb S.X₃) p) := by
   have key : ∀ y : Sheaf.H.{w'} (modulesAb S.X₃) p, y = 0 := fun y => by
     have : Subsingleton (Sheaf.H.{w'} (abSC S).X₁ (p + 1)) :=
       ‹Subsingleton (Sheaf.H.{w'} (modulesAb S.X₁) (p + 1))›
     obtain ⟨x, hx⟩ := H.exact₃ (shortExact_abSC hS) rfl y (Subsingleton.elim _ _)
-    have : Subsingleton (Sheaf.H.{w'} (abSC S).X₂ p) := ‹Subsingleton (Sheaf.H.{w'} (modulesAb S.X₂) p)›
+    have : Subsingleton (Sheaf.H.{w'} (abSC S).X₂ p) :=
+      ‹Subsingleton (Sheaf.H.{w'} (modulesAb S.X₂) p)›
     rw [← hx, Subsingleton.elim x 0, map_zero]
     rfl
   exact ⟨fun y z => (key y).trans (key z).symm⟩
@@ -199,7 +204,6 @@ lemma twistEquiv_obj (k : ℤ) (M : (projectiveSpace A n).Modules) :
 
 lemma twistEquiv_additive (k : ℤ) : (twistEquiv (A := A) (n := n) k).functor.Additive :=
   Functor.additive_of_preserves_binary_products _
-
 
 variable (A n) in
 abbrev freeP (I : Type u) : (projectiveSpace A n).Modules :=
@@ -269,23 +273,30 @@ theorem isCoherent_freeP (I : Type u) [Finite I] : IsCoherent (freeP A n I) := b
   have := Fintype.ofFinite I
   refine ⟨inferInstanceAs (SheafOfModules.free I).IsQuasicoherent, fun U _ => ?_⟩
   have := finite_sections_unit (A := A) (n := n) U
-  let ιL : I → Γ(𝟙_ (projectiveSpace A n).Modules, U)
-      →ₗ[Γ(projectiveSpace A n, U)] Γ(freeP A n I, U) := fun i =>
-    { toFun := (ιP i).app U
-      map_add' := map_add _
-      map_smul' := fun r x => Scheme.Modules.Hom.app_smul _ r x }
-  let Φ : (I → Γ(𝟙_ (projectiveSpace A n).Modules, U))
-      →ₗ[Γ(projectiveSpace A n, U)] Γ(freeP A n I, U) := ∑ i, (ιL i).comp (LinearMap.proj i)
+  let ιL
+      : I
+        → Γ(𝟙_ (projectiveSpace A n).Modules, U)
+          →ₗ[Γ(projectiveSpace A n, U)] Γ(freeP A n I, U) := fun i => {
+    toFun := (ιP i).app U
+    map_add' := map_add _
+    map_smul' := fun r x => Scheme.Modules.Hom.app_smul _ r x
+  }
+  let Φ
+      : (I → Γ(𝟙_ (projectiveSpace A n).Modules, U))
+        →ₗ[Γ(projectiveSpace A n, U)] Γ(freeP A n I, U) :=
+    ∑ i, (ιL i).comp (LinearMap.proj i)
   refine Module.Finite.of_surjective Φ fun x => ⟨fun i => (πP i).app U x, ?_⟩
-  have h := congrArg (fun φ => Scheme.Modules.Hom.app φ U x)
-    (free_total (A := A) (n := n) (I := I))
+  have h := congrArg (fun φ => Scheme.Modules.Hom.app φ U x) (free_total (A := A) (n := n) (I := I))
   simp only [sum_app_apply, Scheme.Modules.Hom.comp_app, Scheme.Modules.Hom.id_app,
-    ConcreteCategory.comp_apply, ConcreteCategory.id_apply] at h
+      ConcreteCategory.comp_apply, ConcreteCategory.id_apply]
+    at h
   simp only [Φ, ιL, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply,
     LinearMap.coe_mk, AddHom.coe_mk]
   exact h
 
-variable [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (projectiveSpace A n).toTopCat) AddCommGrpCat.{u})]
+variable
+  [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (projectiveSpace A n).toTopCat)
+    AddCommGrpCat.{u})]
 
 attribute [local instance] algebraOfOver
 
@@ -298,10 +309,10 @@ lemma H_twist_free_eq {I : Type u} [Fintype I] [DecidableEq I] (k : ℤ) (p : �
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [H.linearMap_comp, LinearMap.comp_apply]
 
-def H_twistUnitEquiv (k : ℤ) (p : ℕ) :
-    Sheaf.H.{w'} (modulesAb ((twistEquiv (A := A) (n := n) k).functor.obj
-      (𝟙_ (projectiveSpace A n).Modules))) p ≃ₗ[A]
-      Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p :=
+def H_twistUnitEquiv (k : ℤ) (p : ℕ)
+    : Sheaf.H.{w'} (modulesAb ((twistEquiv (A := A) (n := n) k).functor.obj
+        (𝟙_ (projectiveSpace A n).Modules))) p ≃ₗ[A]
+        Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p :=
   H.linearEquivOfIso A (eqToIso (twistEquiv_obj k _) ≪≫ λ_ _) p
 
 lemma finite_H_twist_free (I : Type u) [Finite I] (k : ℤ) (p : ℕ) :

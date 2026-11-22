@@ -7,25 +7,28 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EGPgTrue
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZRes Topology
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZRes Topology
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.BZRes.ClosedOrbit
 
-theorem eLast_vecMul {k : Type} [Field k] (n : ℕ) (M : Matrix (Fin (n + 1)) (Fin (n + 1)) k) :
-    vecMul (eLast k n) M = M (Fin.last n) := by
+theorem eLast_vecMul {k : Type} [Field k] (n : ℕ) (M : Matrix (Fin (n + 1)) (Fin (n + 1)) k)
+    : vecMul (eLast k n) M = M (Fin.last n) := by
   ext j
   simp [eLast, vecMul, dotProduct, Pi.single_apply]
 
-theorem mem_two_iff {k : Type} [Field k] {r t N : ℕ} (h : r + t = N) (g : GL (Fin N) k) :
-    g ∈ parab k (two (stdSum h)) ↔
-      ∀ a b : Fin N, r ≤ (a : ℕ) → (b : ℕ) < r → (g : Matrix (Fin N) (Fin N) k) a b = 0 := by
+theorem mem_two_iff {k : Type} [Field k] {r t N : ℕ} (h : r + t = N) (g : GL (Fin N) k)
+    : g ∈ parab k (two (stdSum h))
+      ↔ ∀ a b : Fin N, r ≤ (a : ℕ) → (b : ℕ) < r → (g : Matrix (Fin N) (Fin N) k) a b = 0 := by
   constructor
   · intro hg a b ha hb
     have hlt : (a : ℕ) - r < t := by have := a.isLt; omega
-    have ea : stdSum h (Sum.inr ⟨(a : ℕ) - r, hlt⟩) = a := Fin.ext (by rw [stdSum_inr]; simp only []; omega)
+    have ea : stdSum h (Sum.inr ⟨(a : ℕ) - r, hlt⟩) = a :=
+      Fin.ext (by rw [stdSum_inr]; simp only []; omega)
     have eb : stdSum h (Sum.inl ⟨(b : ℕ), hb⟩) = b := Fin.ext (by rw [stdSum_inl])
-    have := mem_parab_iff.1 hg true false (⟨(a : ℕ) - r, hlt⟩ : Fin t) (⟨(b : ℕ), hb⟩ : Fin r) (by decide)
+    have :=
+      mem_parab_iff.1 hg true false (⟨(a : ℕ) - r, hlt⟩ : Fin t) (⟨(b : ℕ), hb⟩ : Fin r) (by decide)
     rw [two_true, two_false, ea, eb] at this
     exact this
   · intro hg
@@ -34,38 +37,54 @@ theorem mem_two_iff {k : Type} [Field k] {r t N : ℕ} (h : r + t = N) (g : GL (
     cases x <;> cases y <;> first | exact absurd hxy (by decide) | skip
     refine hg _ _ ?_ ?_
     · show r ≤ ((stdSum h (Sum.inr u) : Fin N) : ℕ)
-      rw [stdSum_inr]; omega
+      rw [stdSum_inr]
+      omega
     · show ((stdSum h (Sum.inl v) : Fin N) : ℕ) < r
-      rw [stdSum_inl]; exact v.isLt
+      rw [stdSum_inl]
+      exact v.isLt
 
-theorem mem_dcos_iff : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {i t : ℕ}
-    (h : (i + 1) + t = i + t + 1), 0 < t → ∀ g : GL (Fin (i + t + 1)) k,
-    g ∈ dcos (parab k (two (stdSum h))) (Mir k (i + t)) 1 ↔
-      ∀ a : Fin (i + 1), ((g⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k)
-        (Fin.last (i + t)) (stdSum h (Sum.inl a)) = 0 := by
+theorem mem_dcos_iff
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {i t : ℕ} (h : (i + 1) + t = i + t + 1),
+      0 < t
+        → ∀ g : GL (Fin (i + t + 1)) k,
+          g ∈ dcos (parab k (two (stdSum h))) (Mir k (i + t)) 1
+            ↔ ∀ a : Fin (i + 1),
+              ((g⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k)
+                  (Fin.last (i + t)) (stdSum h (Sum.inl a))
+                = 0 := by
   intro k _ _ _ _ i t h ht g
-  have hlast : i + 1 ≤ ((Fin.last (i + t) : Fin (i + t + 1)) : ℕ) := by
-    rw [Fin.val_last]; omega
+  have hlast : i + 1 ≤ ((Fin.last (i + t) : Fin (i + t + 1)) : ℕ) := by rw [Fin.val_last]; omega
   constructor
   · rintro ⟨q, hq, p, hp, rfl⟩ a
     have hpi : p⁻¹ ∈ Mir k (i + t) := inv_mem hp
-    have hpi' : vecMul (eLast k (i + t)) ((p⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) =
-        eLast k (i + t) := hpi
+    have hpi'
+        : vecMul (eLast k (i + t))
+            ((p⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k)
+          = eLast k (i + t) :=
+      hpi
     have e : (q * 1 * p)⁻¹ = p⁻¹ * q⁻¹ := by simp
-    have h1 : vecMul (eLast k (i + t)) ((p⁻¹ * q⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) =
-        vecMul (eLast k (i + t)) ((q⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) := by
+    have h1
+        : vecMul (eLast k (i + t))
+            ((p⁻¹ * q⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k)
+          = vecMul (eLast k (i + t))
+            ((q⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) := by
       rw [Units.val_mul, ← vecMul_vecMul, hpi']
     have hrow := (eLast_vecMul (i + t) _).symm.trans (h1.trans (eLast_vecMul (i + t) _))
     rw [e]
     refine (congrFun hrow _).trans ((mem_two_iff h _).1 (inv_mem hq) _ _ hlast ?_)
-    rw [stdSum_inl]; exact a.isLt
+    rw [stdSum_inl]
+    exact a.isLt
   · intro hy
     classical
     let y : Fin (i + t + 1) → k :=
-      ((g⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t))
+      ((g⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last
+        (i + t))
     have hyg : vecMul y (g : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) = eLast k (i + t) := by
-      have : y = vecMul (eLast k (i + t))
-          ((g⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) := (eLast_vecMul _ _).symm
+      have : y
+          = vecMul (eLast k (i + t))
+            ((g⁻¹ : GL (Fin (i + t + 1)) k) : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) :=
+        (eLast_vecMul _ _).symm
       rw [this, vecMul_vecMul, ← Units.val_mul, inv_mul_cancel, Units.val_one, vecMul_one]
     have hfirst : ∀ c : Fin (i + t + 1), (c : ℕ) < i + 1 → y c = 0 := by
       intro c hc

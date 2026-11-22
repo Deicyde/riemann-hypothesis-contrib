@@ -7,7 +7,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
+open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
 open Classical ValuativeRel
 
 noncomputable section
@@ -18,11 +19,11 @@ open Formalism.HermitianLattices.Ext.L3
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem absNorm_small_finite (D : Formalism.BasicNotions.D7) :
-    {p : PlF D | (Ideal.absNorm p.asIdeal : ℝ) < 3}.Finite := by
+theorem absNorm_small_finite (D : Formalism.BasicNotions.D7)
+    : {p : PlF D | (Ideal.absNorm p.asIdeal : ℝ) < 3}.Finite := by
   have h : {I : Ideal (𝓞 D.host.F) | Ideal.absNorm I < 3}.Finite := by
-    have : {I : Ideal (𝓞 D.host.F) | Ideal.absNorm I < 3} =
-        ⋃ n ∈ Finset.range 3, {I : Ideal (𝓞 D.host.F) | Ideal.absNorm I = n} := by
+    have : {I : Ideal (𝓞 D.host.F) | Ideal.absNorm I < 3}
+        = ⋃ n ∈ Finset.range 3, {I : Ideal (𝓞 D.host.F) | Ideal.absNorm I = n} := by
       ext I; simp [Finset.mem_range]
     rw [this]
     exact Set.Finite.biUnion (Finset.finite_toSet _) (fun n _ => Ideal.finite_setOf_absNorm_eq n)

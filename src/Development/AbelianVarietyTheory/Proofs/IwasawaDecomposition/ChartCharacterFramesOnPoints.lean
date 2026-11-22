@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemCu
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.MemChart Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.MemChart
+  Matrix
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
@@ -13,7 +16,22 @@ noncomputable section
 
 namespace GlobalTheory.Mem.Col2.ChEx
 
-theorem chr_frames : ∀ {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 X.E))} {y : Ys X n} [NeZero n] (hc : Formalism.BasicNotions.CMData X.F X.E) (σ : X.K →+* ℂ) (Λ : LevFam X.E X.K n SG) (Θ : LevQFam X.E X.K n Q) (r : PtY ST SG Q y) (C : ∀ w : SG, Set (Fin n → 𝓞 X.E ⧸ w.1.asIdeal)) (D : ∀ P : Q, Set (Sp X.E n)) (q : QLoc hc n Q (GlobalTheory.Mem.Col2.ChEx.cutQ Θ D)) {g : GL (Fin n) (AfE X.F X.E)} (z : levUQ hc n ST SG Q (chG Λ C) q), g ∈ UAd hc n → ∀ (κ : FrmG Λ Θ), ufGL X.E n κ.1 = 1 → FrExact q g r.1.1 → FrExact q (g * z.1) (ya Λ Θ κ r).1.1 → ((((levTyp (chLam σ Λ C)).comp (Subgroup.inclusion (levUQ_le q _)) * (chiQ q _ σ)⁻¹ : levUQ hc n ST SG Q (chG Λ C) q →* ℂˣ) z : ℂˣ) : ℂ) = σ ((Λ.chr κ.2.1 * Θ.chr κ.2.2 : X.Kˣ) : X.K) := by
+theorem chr_frames
+    : ∀ {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 X.E))} {y : Ys X n} [NeZero n]
+        (hc : Formalism.BasicNotions.CMData X.F X.E) (σ : X.K →+* ℂ) (Λ : LevFam X.E X.K n SG)
+        (Θ : LevQFam X.E X.K n Q) (r : PtY ST SG Q y)
+        (C : ∀ w : SG, Set (Fin n → 𝓞 X.E ⧸ w.1.asIdeal)) (D : ∀ P : Q, Set (Sp X.E n))
+        (q : QLoc hc n Q (GlobalTheory.Mem.Col2.ChEx.cutQ Θ D)) {g : GL (Fin n) (AfE X.F X.E)}
+        (z : levUQ hc n ST SG Q (chG Λ C) q),
+      g ∈ UAd hc n
+        → ∀ (κ : FrmG Λ Θ),
+          ufGL X.E n κ.1 = 1 → FrExact q g r.1.1 → FrExact q (g * z.1) (ya Λ Θ κ r).1.1
+            → ((((levTyp (chLam σ Λ C)).comp (Subgroup.inclusion (levUQ_le q _)) * (chiQ q _ σ)⁻¹
+                      : levUQ hc n ST SG Q (chG Λ C) q →* ℂˣ)
+                    z
+                  : ℂˣ)
+                : ℂ)
+              = σ ((Λ.chr κ.2.1 * Θ.chr κ.2.2 : X.Kˣ) : X.K) := by
   intro X n ST SG Q y _ hc σ Λ Θ r C D q g z hg κ h1 hE hE'
   obtain ⟨γ, h, θ⟩ := κ
   have hγ : γ = 1 := ufGL_inj hc n (h1.trans (map_one _).symm)
@@ -21,7 +39,9 @@ theorem chr_frames : ∀ {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpec
 
   have hzU : z.1 ∈ levU hc n ST SG (chG Λ C) := levUQ_le q _ z.2
   have hx : g * z.1 ∈ UAd hc n := mul_mem hg (levU_le_UAd hc n ST SG _ hzU)
-  have hdeco : decoOf ST SG (g * z.1) = ((1, h.1) : UF X.E n × GLG (E := X.E) (n := n) (SG := SG)) • decoOf ST SG g := by
+  have hdeco
+      : decoOf ST SG (g * z.1)
+        = ((1, h.1) : UF X.E n × GLG (E := X.E) (n := n) (SG := SG)) • decoOf ST SG g := by
     rw [hE'.1, hE.1]
     rfl
   have e2 : decoRaw ST SG (g * z.1) = (decoRaw ST SG g).act 1 h.1 := by
@@ -33,8 +53,13 @@ theorem chr_frames : ∀ {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpec
   have hr' : redG hc n ST SG ⟨z.1, hJ'⟩ = h.1⁻¹ := by
     rw [← hr, ← map_inv]
     exact congrArg _ (Subtype.ext e3)
-  have hA : levTyp (chLam σ Λ C) (Subgroup.inclusion (levUQ_le q _) z) = (Units.map σ.toMonoidHom (Λ.chr h)) := by
-    have h2 : Subgroup.inclusion (chG_le Λ C) (Formalism.L2.Col.levRed hc n ST SG _ (Subgroup.inclusion (levUQ_le q _) z)) = h⁻¹ :=
+  have hA
+      : levTyp (chLam σ Λ C) (Subgroup.inclusion (levUQ_le q _) z)
+        = (Units.map σ.toMonoidHom (Λ.chr h)) := by
+    have h2
+        : Subgroup.inclusion (chG_le Λ C)
+            (Formalism.L2.Col.levRed hc n ST SG _ (Subgroup.inclusion (levUQ_le q _) z))
+          = h⁻¹ :=
       Subtype.ext hr'
     show (Units.map σ.toMonoidHom (Λ.chr (Subgroup.inclusion (chG_le Λ C) (Formalism.L2.Col.levRed hc n ST SG _ (Subgroup.inclusion (levUQ_le q _) z)))))⁻¹ = _
     rw [h2, map_inv, map_inv, inv_inv]
@@ -45,13 +70,15 @@ theorem chr_frames : ∀ {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpec
     have efr : (ya Λ Θ ((1 : UF X.E n), h, θ) r).1.1.fr P = r.1.1.fr P * ((θ.1 P)⁻¹).1 := by
       show (1 : Sp X.E n ≃ₗ[X.E] Sp X.E n) * r.1.1.fr P * ((θ.1 P)⁻¹).1 = _
       rw [one_mul]
-    have a3 : q.at P (g * z.1) = q.at P g * q.at P z.1 := by
-      simp only [QLoc.at, map_mul]
+    have a3 : q.at P (g * z.1) = q.at P g * q.at P z.1 := by simp only [QLoc.at, map_mul]
     rw [a3, a1, efr] at a2
     simp only [qGL, map_mul] at a2
     exact mul_left_cancel a2
-  have hB : ∀ P : Q, q.chr P (lqRes q (chG Λ C) P z) = ((Θ P).lam ⟨θ.1 P, θ.2 P trivial⟩)⁻¹ := fun P => by
-    have hmem : Formalism.UG.bc (q.phi P) (qGL n ((θ.1 P)⁻¹).1) ∈ q.U P := hP P ▸ (lqRes q (chG Λ C) P z).2
+  have hB
+      : ∀ P : Q,
+        q.chr P (lqRes q (chG Λ C) P z) = ((Θ P).lam ⟨θ.1 P, θ.2 P trivial⟩)⁻¹ := fun P => by
+    have hmem : Formalism.UG.bc (q.phi P) (qGL n ((θ.1 P)⁻¹).1) ∈ q.U P :=
+      hP P ▸ (lqRes q (chG Λ C) P z).2
     have hcut : (θ.1 P)⁻¹ ∈ (cutQ Θ D P).H := (q.U_rat P _).1 hmem
     have e4 : lqRes q (chG Λ C) P z = ⟨_, hmem⟩ := Subtype.ext (hP P)
     rw [e4, q.chr_rat P _ hcut hmem, ← map_inv]

@@ -4,11 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.IrreducibleOfSpanningMatrices.irreducible_of_span_eq_top :
-    ∀ {K G ι : Type} [inst : Field K] [inst_1 : Fintype ι]
-    [DecidableEq ι] (f : G → Matrix ι ι K),
-    Submodule.span K (Set.range f) = ⊤ →
-      ∀ (N : Submodule K (ι → K)), (∀ (g : G), ∀ v ∈ N, (f g).mulVec v ∈ N) → N = ⊥ ∨ N = ⊤ := by
+theorem UpperTheory.Reformulated.B.IrreducibleOfSpanningMatrices.irreducible_of_span_eq_top
+    : ∀ {K G ι : Type} [inst : Field K] [inst_1 : Fintype ι] [DecidableEq ι] (f : G → Matrix ι ι K),
+      Submodule.span K (Set.range f) = ⊤
+        → ∀ (N : Submodule K (ι → K)),
+          (∀ (g : G), ∀ v ∈ N, (f g).mulVec v ∈ N) → N = ⊥ ∨ N = ⊤ := by
   intro K G ι _ _ _ f hf N hN
   have key : ∀ A : Matrix ι ι K, ∀ v ∈ N, A.mulVec v ∈ N := by
     intro A v hv

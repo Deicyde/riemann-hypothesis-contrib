@@ -10,7 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -21,10 +22,12 @@ section Filtration
 attribute [local instance 2000] lexDecEq
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem exists_rel_colon_prime (J₁ J : Ideal (MRing ι)) (hJ₁ : IsMultiHomogIdeal J₁)
-    (hJ : IsMultiHomogIdeal J) (hle : J ≤ J₁) (hne : J ≠ J₁) :
-    ∃ (f : MRing ι) (c : K → ℕ), IsMultiHomog f c ∧ f ∈ J₁ ∧ f ∉ J ∧
-      (J.colon {f}).IsPrime ∧ IsMultiHomogIdeal (J.colon {f}) := by
+theorem exists_rel_colon_prime
+    (J₁ J : Ideal (MRing ι))
+    (hJ₁ : IsMultiHomogIdeal J₁) (hJ : IsMultiHomogIdeal J) (hle : J ≤ J₁) (hne : J ≠ J₁)
+    : ∃ (f : MRing ι) (c : K → ℕ),
+      IsMultiHomog f c ∧ f ∈ J₁ ∧ f ∉ J ∧ (J.colon {f}).IsPrime
+        ∧ IsMultiHomogIdeal (J.colon {f}) := by
   classical
   set e := Fintype.equivFin K
   let 𝒜 := weightedHomogeneousSubmodule ℤ (lexW (ι := ι) e)
@@ -67,8 +70,7 @@ theorem exists_rel_colon_prime (J₁ J : Ideal (MRing ι)) (hJ₁ : IsMultiHomog
     have hle' : J.colon {f} ≤ J.colon {x * f} := by
       intro g hg
       rw [hmem] at hg
-      rw [Submodule.mem_colon_singleton, smul_eq_mul,
-        show g * (x * f) = x * (g * f) by ring]
+      rw [Submodule.mem_colon_singleton, smul_eq_mul, show g * (x * f) = x * (g * f) by ring]
       exact J.mul_mem_left _ hg
     have hin : J.colon {x * f} ∈ S :=
       ⟨x * f, ⟨_, isMultiHomog_of_mem_lex e hxf⟩, J₁.mul_mem_left x hfJ₁, hxfJ, rfl⟩
@@ -80,35 +82,38 @@ theorem exists_rel_colon_prime (J₁ J : Ideal (MRing ι)) (hJ₁ : IsMultiHomog
     exact hxy
   exact ⟨f, c, hfc, hfJ₁, hfJ, hprime, (isHomogeneous_lex_iff e _).mp hIh⟩
 
-theorem exists_relFiltration (J₁ : Ideal (MRing ι)) (hJ₁ : IsMultiHomogIdeal J₁) (J : Ideal (MRing ι))
-    (hJ : IsMultiHomogIdeal J) (hle : J ≤ J₁) :
-    ∃ (N : ℕ) (F : Fin (N + 1) → Ideal (MRing ι)) (f : Fin N → MRing ι) (c : Fin N → K → ℕ)
-      (q : Fin N → Ideal (MRing ι)),
-      F 0 = J ∧ F (Fin.last N) = J₁ ∧ ∀ j : Fin N,
-        IsMultiHomog (f j) (c j) ∧ f j ∈ J₁ ∧ F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧
-        (q j).IsPrime ∧ IsMultiHomogIdeal (q j) ∧
-        ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc := by
+theorem exists_relFiltration
+    (J₁ : Ideal (MRing ι)) (hJ₁ : IsMultiHomogIdeal J₁)
+    (J : Ideal (MRing ι)) (hJ : IsMultiHomogIdeal J) (hle : J ≤ J₁)
+    : ∃ (N : ℕ) (F : Fin (N + 1) → Ideal (MRing ι)) (f : Fin N → MRing ι) (c : Fin N → K → ℕ)
+        (q : Fin N → Ideal (MRing ι)),
+      F 0 = J ∧ F (Fin.last N) = J₁
+        ∧ ∀ j : Fin N,
+          IsMultiHomog (f j) (c j) ∧ f j ∈ J₁ ∧ F j.succ = F j.castSucc ⊔ Ideal.span {f j}
+            ∧ (q j).IsPrime ∧ IsMultiHomogIdeal (q j) ∧ ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc := by
   induction J using IsNoetherian.induction with
   | hgt J ih =>
-  by_cases hJt : J = J₁
-  · exact ⟨0, fun _ => J, Fin.elim0, Fin.elim0, Fin.elim0, rfl, hJt, fun j => Fin.elim0 j⟩
-  obtain ⟨f, c, hfc, hfJ₁, hfJ, hq, hqh⟩ := exists_rel_colon_prime J₁ J hJ₁ hJ hle hJt
-  have hlt : J < J ⊔ Ideal.span {f} :=
-    lt_of_le_of_ne le_sup_left fun h =>
-      hfJ (h ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
-  obtain ⟨N, F, f', c', q', h0, hlast, hj⟩ := ih _ hlt (isMultiHomogIdeal_sup_span hJ hfc)
-    (sup_le hle ((Ideal.span_singleton_le_iff_mem _).mpr hfJ₁))
-  refine ⟨N + 1, Fin.cons J F, Fin.cons f f', Fin.cons c c', Fin.cons (J.colon {f}) q', rfl, ?_, ?_⟩
-  · rw [← Fin.succ_last, Fin.cons_succ, hlast]
-  · intro j
-    induction j using Fin.cases with
-    | zero =>
-      simp only [Fin.cons_zero, Fin.cons_succ, Fin.castSucc_zero]
-      refine ⟨hfc, hfJ₁, h0, hq, hqh, fun g => ?_⟩
-      rw [Submodule.mem_colon_singleton, smul_eq_mul]
-    | succ j =>
-      simp only [Fin.cons_succ, ← Fin.succ_castSucc]
-      exact hj j
+    by_cases hJt : J = J₁
+    · exact ⟨0, fun _ => J, Fin.elim0, Fin.elim0, Fin.elim0, rfl, hJt, fun j => Fin.elim0 j⟩
+    obtain ⟨f, c, hfc, hfJ₁, hfJ, hq, hqh⟩ := exists_rel_colon_prime J₁ J hJ₁ hJ hle hJt
+    have hlt : J < J ⊔ Ideal.span {f} :=
+      lt_of_le_of_ne le_sup_left fun h =>
+        hfJ (h ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
+    obtain ⟨N, F, f', c', q', h0, hlast, hj⟩ :=
+      ih _ hlt (isMultiHomogIdeal_sup_span hJ hfc)
+        (sup_le hle ((Ideal.span_singleton_le_iff_mem _).mpr hfJ₁))
+    refine
+      ⟨N + 1, Fin.cons J F, Fin.cons f f', Fin.cons c c', Fin.cons (J.colon {f}) q', rfl, ?_, ?_⟩
+    · rw [← Fin.succ_last, Fin.cons_succ, hlast]
+    · intro j
+      induction j using Fin.cases with
+      | zero =>
+        simp only [Fin.cons_zero, Fin.cons_succ, Fin.castSucc_zero]
+        refine ⟨hfc, hfJ₁, h0, hq, hqh, fun g => ?_⟩
+        rw [Submodule.mem_colon_singleton, smul_eq_mul]
+      | succ j =>
+        simp only [Fin.cons_succ, ← Fin.succ_castSucc]
+        exact hj j
 
 end Filtration
 
@@ -117,15 +122,17 @@ section Pieces
 attribute [local instance 2000] lexDecEq
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem relIndex_toAddSubgroup {V : Type*} [AddCommGroup V] (A B : Submodule ℤ V) :
-    A.toAddSubgroup.relIndex B.toAddSubgroup = Nat.card (B ⧸ A.comap B.subtype) := rfl
+theorem relIndex_toAddSubgroup {V : Type*} [AddCommGroup V] (A B : Submodule ℤ V)
+    : A.toAddSubgroup.relIndex B.toAddSubgroup = Nat.card (B ⧸ A.comap B.subtype) :=
+  rfl
 
-theorem relIndex_piece_step {F q : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F) {f : MRing ι}
-    {c : K → ℕ} (hf : IsMultiHomog f c) (hq : ∀ g, g ∈ q ↔ g * f ∈ F) {a : K → ℕ}
-    (hca : ∀ k, c k ≤ a k) :
-    (F.restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup.relIndex
-      ((F ⊔ Ideal.span {f}).restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup =
-      Nat.card (mPiece q (a - c)) := by
+theorem relIndex_piece_step
+    {F q : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F)
+    {f : MRing ι} {c : K → ℕ} (hf : IsMultiHomog f c) (hq : ∀ g, g ∈ q ↔ g * f ∈ F)
+    {a : K → ℕ} (hca : ∀ k, c k ≤ a k)
+    : (F.restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup.relIndex
+        ((F ⊔ Ideal.span {f}).restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup
+      = Nat.card (mPiece q (a - c)) := by
   classical
   set B := (F ⊔ Ideal.span {f}).restrictScalars ℤ ⊓ mHom ι a with hBdef
   set A := F.restrictScalars ℤ ⊓ mHom ι a with hAdef
@@ -138,10 +145,11 @@ theorem relIndex_piece_step {F q : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F) 
     · rw [mem_mHom_iff]
       have := isMultiHomog_mul ((mem_mHom_iff _ _).mp g.2) hf
       rwa [hac] at this
-  let χ' : mHom ι (a - c) →ₗ[ℤ] B :=
-    { toFun := fun g => ⟨(g : MRing ι) * f, hmul g⟩
-      map_add' := fun g h => by ext; simp [add_mul]
-      map_smul' := fun r g => by ext; simp [mul_assoc] }
+  let χ' : mHom ι (a - c) →ₗ[ℤ] B := {
+    toFun := fun g => ⟨(g : MRing ι) * f, hmul g⟩
+    map_add' := fun g h => by ext; simp [add_mul]
+    map_smul' := fun r g => by ext; simp [mul_assoc]
+  }
   let χ := (A.comap B.subtype).mkQ ∘ₗ χ'
   have hsurj : Function.Surjective χ := by
     intro z
@@ -168,32 +176,38 @@ theorem relIndex_piece_step {F q : Ideal (MRing ι)} (hF : IsMultiHomogIdeal F) 
       Submodule.coe_subtype]
     have : ((χ' ⟨g, hg⟩ - ⟨x, hxB⟩ : B) : MRing ι) = g * f - x := rfl
     rw [this]
-    refine Submodule.mem_inf.mpr ⟨?_, Submodule.sub_mem _ (Submodule.mem_inf.mp (hmul ⟨g, hg⟩)).2 hxa⟩
+    refine Submodule.mem_inf.mpr
+      ⟨?_, Submodule.sub_mem _ (Submodule.mem_inf.mp (hmul ⟨g, hg⟩)).2 hxa⟩
     rw [Submodule.restrictScalars_mem]
-    rw [hx, show g * f - ((DirectSum.decompose (grL ι) j (lexDeg a) : MRing ι) + g * f) =
-      -(DirectSum.decompose (grL ι) j (lexDeg a) : MRing ι) by ring]
+    rw [hx,
+      show g * f - ((DirectSum.decompose (grL ι) j (lexDeg a) : MRing ι) + g * f)
+          = -(DirectSum.decompose (grL ι) j (lexDeg a) : MRing ι) by
+        ring]
     exact F.neg_mem hjc
   have hker : LinearMap.ker χ = LinearMap.ker (pieceMap q (a - c)) := by
     ext g
     rw [LinearMap.mem_ker, mem_ker_pieceMap, hq]
     show (A.comap B.subtype).mkQ (χ' g) = 0 ↔ _
-    rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap, Submodule.coe_subtype]
+    rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap,
+      Submodule.coe_subtype]
     constructor
     · intro h
       exact (Submodule.restrictScalars_mem ℤ _ _).mp (Submodule.mem_inf.mp h).1
     · intro h
-      exact Submodule.mem_inf.mpr ⟨(Submodule.restrictScalars_mem ℤ _ _).mpr h,
-        (Submodule.mem_inf.mp (hmul g)).2⟩
+      exact Submodule.mem_inf.mpr
+        ⟨(Submodule.restrictScalars_mem ℤ _ _).mpr h, (Submodule.mem_inf.mp (hmul g)).2⟩
   rw [← hker]
   exact Nat.card_congr (LinearMap.quotKerEquivOfSurjective χ hsurj).toEquiv.symm
 
-theorem modPieceCard_chain (a : K → ℕ) (J₁ : Ideal (MRing ι)) :
-    ∀ (N : ℕ) (F : Fin (N + 1) → Ideal (MRing ι)) (f : Fin N → MRing ι) (c : Fin N → K → ℕ)
-      (q : Fin N → Ideal (MRing ι)), IsMultiHomogIdeal (F 0) → F (Fin.last N) = J₁ →
-      (∀ j, IsMultiHomog (f j) (c j) ∧ F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧
-        ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc) →
-      (∀ j k, c j k ≤ a k) →
-      modPieceCard J₁ (F 0) a = ∏ j, Nat.card (mPiece (q j) (a - c j)) := by
+theorem modPieceCard_chain (a : K → ℕ) (J₁ : Ideal (MRing ι))
+    : ∀ (N : ℕ) (F : Fin (N + 1) → Ideal (MRing ι)) (f : Fin N → MRing ι) (c : Fin N → K → ℕ)
+        (q : Fin N → Ideal (MRing ι)),
+      IsMultiHomogIdeal (F 0) → F (Fin.last N) = J₁
+        → (∀ j,
+          IsMultiHomog (f j) (c j) ∧ F j.succ = F j.castSucc ⊔ Ideal.span {f j}
+            ∧ ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc)
+        → (∀ j k, c j k ≤ a k)
+        → modPieceCard J₁ (F 0) a = ∏ j, Nat.card (mPiece (q j) (a - c j)) := by
   intro N
   induction N with
   | zero =>
@@ -207,27 +221,41 @@ theorem modPieceCard_chain (a : K → ℕ) (J₁ : Ideal (MRing ι)) :
     have h0' : IsMultiHomogIdeal (F (Fin.succ 0)) := by
       rw [hF1]
       exact isMultiHomogIdeal_sup_span h0 hf0
-    have hs' : ∀ j : Fin N, IsMultiHomog (f j.succ) (c j.succ) ∧
-        F j.succ.succ = F j.succ.castSucc ⊔ Ideal.span {f j.succ} ∧
-        ∀ g, g ∈ q j.succ ↔ g * f j.succ ∈ F j.succ.castSucc := fun j => hs j.succ
-    have htail := ih (fun i => F i.succ) (fun j => f j.succ) (fun j => c j.succ)
-      (fun j => q j.succ) h0' (by simp only [Fin.succ_last]; exact hl)
-      (fun j => by
-        obtain ⟨x1, x2, x3⟩ := hs' j
-        refine ⟨x1, ?_, ?_⟩
-        · simpa only [Fin.succ_castSucc] using x2
-        · simpa only [Fin.succ_castSucc] using x3)
-      (fun j => ha j.succ)
+    have hs'
+        : ∀ j : Fin N,
+          IsMultiHomog (f j.succ) (c j.succ)
+            ∧ F j.succ.succ = F j.succ.castSucc ⊔ Ideal.span {f j.succ}
+            ∧ ∀ g, g ∈ q j.succ ↔ g * f j.succ ∈ F j.succ.castSucc := fun j =>
+      hs j.succ
+    have htail :=
+      ih
+        (fun i => F i.succ)
+        (fun j => f j.succ)
+        (fun j => c j.succ)
+        (fun j => q j.succ)
+        h0' (by simp only [Fin.succ_last]; exact hl)
+        (fun j => by
+          obtain ⟨x1, x2, x3⟩ := hs' j
+          refine ⟨x1, ?_, ?_⟩
+          · simpa only [Fin.succ_castSucc] using x2
+          · simpa only [Fin.succ_castSucc] using x3)
+        (fun j => ha j.succ)
     have hle1 : F (Fin.succ 0) ≤ J₁ := by
-      have := le_chain (N := N) (F := fun i => F i.succ) (f := fun j => f j.succ)
-        (fun j => by simpa only [Fin.succ_castSucc] using (hs' j).2.1) (Fin.last N)
+      have :=
+        le_chain (N := N)
+          (F := fun i => F i.succ)
+          (f := fun j => f j.succ)
+          (fun j => by simpa only [Fin.succ_castSucc] using (hs' j).2.1)
+          (Fin.last N)
       simpa only [Fin.succ_last, hl] using this
     have hle0 : F 0 ≤ F (Fin.succ 0) := by rw [hF1]; exact le_sup_left
-    have hA : ((F 0).restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup ≤
-        ((F (Fin.succ 0)).restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup := fun x hx =>
+    have hA
+        : ((F 0).restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup
+          ≤ ((F (Fin.succ 0)).restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup := fun x hx =>
       Submodule.mem_inf.mpr ⟨hle0 (Submodule.mem_inf.mp hx).1, (Submodule.mem_inf.mp hx).2⟩
-    have hB : ((F (Fin.succ 0)).restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup ≤
-        (J₁.restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup := fun x hx =>
+    have hB
+        : ((F (Fin.succ 0)).restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup
+          ≤ (J₁.restrictScalars ℤ ⊓ mHom ι a).toAddSubgroup := fun x hx =>
       Submodule.mem_inf.mpr ⟨hle1 (Submodule.mem_inf.mp hx).1, (Submodule.mem_inf.mp hx).2⟩
     have key := AddSubgroup.relIndex_mul_relIndex _ _ _ hA hB
     have step := relIndex_piece_step h0 hf0 hq0 (ha 0)
@@ -241,14 +269,16 @@ section Lengths
 
 variable {R : Type*} [CommRing R]
 
-theorem length_loc_rel (P : Ideal R) [P.IsPrime] : ∀ (N : ℕ) (F : Fin (N + 1) → Ideal R)
-    (f : Fin N → R) (q : Fin N → Ideal R),
-    (∀ j : Fin N, F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧ (q j).IsPrime ∧
-      ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc) →
-    (∀ j, q j ≤ P → q j = P) →
-    Module.length (Localization.AtPrime P) (LocalizedModule P.primeCompl (R ⧸ F 0)) =
-      Module.length (Localization.AtPrime P) (LocalizedModule P.primeCompl (R ⧸ F (Fin.last N))) +
-        ((∑ j : Fin N, if q j = P then 1 else 0 : ℕ) : ℕ∞) := by
+theorem length_loc_rel (P : Ideal R) [P.IsPrime]
+    : ∀ (N : ℕ) (F : Fin (N + 1) → Ideal R) (f : Fin N → R) (q : Fin N → Ideal R),
+      (∀ j : Fin N,
+          F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧ (q j).IsPrime
+            ∧ ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc)
+        → (∀ j, q j ≤ P → q j = P)
+        → Module.length (Localization.AtPrime P) (LocalizedModule P.primeCompl (R ⧸ F 0))
+          = Module.length (Localization.AtPrime P)
+              (LocalizedModule P.primeCompl (R ⧸ F (Fin.last N)))
+            + ((∑ j : Fin N, if q j = P then 1 else 0 : ℕ) : ℕ∞) := by
   intro N
   induction N with
   | zero =>
@@ -256,9 +286,13 @@ theorem length_loc_rel (P : Ideal R) [P.IsPrime] : ∀ (N : ℕ) (F : Fin (N + 1
     simp
   | succ N ih =>
     intro F f q hj hmin
-    have htail := ih (fun j => F j.succ) (fun j => f j.succ) (fun j => q j.succ)
-      (fun j => by simpa only [Fin.castSucc_succ] using hj j.succ)
-      (fun j => hmin j.succ)
+    have htail :=
+      ih
+        (fun j => F j.succ)
+        (fun j => f j.succ)
+        (fun j => q j.succ)
+        (fun j => by simpa only [Fin.castSucc_succ] using hj j.succ)
+        (fun j => hmin j.succ)
     obtain ⟨h1, _, h3⟩ := hj 0
     rw [Fin.castSucc_zero] at h1 h3
     rw [length_loc_step (F 0) (q 0) (f 0) h3 P, ← h1, htail, Fin.sum_univ_succ]
@@ -272,28 +306,32 @@ theorem length_loc_rel (P : Ideal R) [P.IsPrime] : ∀ (N : ℕ) (F : Fin (N + 1
 
 end Lengths
 
-theorem multAt_sub_eq_count {J₁ J₂ : Ideal (MRing ι)} (hJ₁ : IsMultiHomogIdeal J₁) (hle : J₂ ≤ J₁)
+theorem multAt_sub_eq_count
+    {J₁ J₂ : Ideal (MRing ι)} (hJ₁ : IsMultiHomogIdeal J₁) (hle : J₂ ≤ J₁)
     {N : ℕ} {F : Fin (N + 1) → Ideal (MRing ι)} {f : Fin N → MRing ι} {q : Fin N → Ideal (MRing ι)}
     (h0 : F 0 = J₂) (hlast : F (Fin.last N) = J₁)
-    (hj : ∀ j : Fin N, F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧ (q j).IsPrime ∧
-      ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc)
-    {W : Ideal (MRing ι)} (hW : W ∈ J₂.minimalPrimes) :
-    ((multAt J₂ W : ℕ) : ℤ) - (multAt J₁ W : ℕ) = ∑ j, if q j = W then 1 else 0 := by
+    (hj : ∀ j : Fin N,
+      F j.succ = F j.castSucc ⊔ Ideal.span {f j} ∧ (q j).IsPrime
+        ∧ ∀ g, g ∈ q j ↔ g * f j ∈ F j.castSucc)
+    {W : Ideal (MRing ι)} (hW : W ∈ J₂.minimalPrimes)
+    : ((multAt J₂ W : ℕ) : ℤ) - (multAt J₁ W : ℕ) = ∑ j, if q j = W then 1 else 0 := by
   classical
   have hWp : W.IsPrime := hW.1.1
-  have hmin : ∀ (I : Ideal (MRing ι)), I.IsPrime → J₂ ≤ I → I ≤ W → I = W :=
-    fun I hI hJI hIW => le_antisymm hIW (hW.2 ⟨hI, hJI⟩ hIW)
+  have hmin : ∀ (I : Ideal (MRing ι)), I.IsPrime → J₂ ≤ I → I ≤ W → I = W := fun I hI hJI hIW =>
+    le_antisymm hIW (hW.2 ⟨hI, hJI⟩ hIW)
   obtain ⟨N', F', f', c', q', h0', hlast', hj'⟩ := exists_mPrimeFiltration J₁ hJ₁
   have hq' : ∀ j, J₁ ≤ q' j := le_colon_chain h0' fun j => ⟨(hj' j).2.1, (hj' j).2.2.2.2⟩
   have hq : ∀ j, J₂ ≤ q j := le_colon_chain h0 fun j => ⟨(hj j).1, (hj j).2.2⟩
-  have e1 := length_loc_chain W N' F' f' q' hlast'
-    (fun j => ⟨(hj' j).2.1, (hj' j).2.2.1, (hj' j).2.2.2.2⟩)
-    (fun j h => hmin _ (hj' j).2.2.1 (hle.trans (hq' j)) h)
+  have e1 :=
+    length_loc_chain W N' F' f' q' hlast'
+      (fun j => ⟨(hj' j).2.1, (hj' j).2.2.1, (hj' j).2.2.2.2⟩)
+      (fun j h => hmin _ (hj' j).2.2.1 (hle.trans (hq' j)) h)
   have e2 := length_loc_rel W N F f q hj (fun j h => hmin _ (hj j).2.1 (hq j) h)
   rw [h0', ← hlast] at e1
   rw [e1, h0] at e2
   unfold multAt
-  rw [dite_eq_left hWp, dite_eq_left hWp, e2, ← hlast, e1, ← Nat.cast_add, ENat.toNat_natCast, ENat.toNat_natCast]
+  rw [dite_eq_left hWp, dite_eq_left hWp, e2, ← hlast, e1, ← Nat.cast_add, ENat.toNat_natCast,
+    ENat.toNat_natCast]
   push_cast
   ring
 

@@ -9,8 +9,10 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Model
 
-theorem isFractionRing_of_subalgebra {A K : Type*} [CommRing A] [IsDomain A] [Field K]
-    [Algebra A K] [IsFractionRing A K] (B : Subalgebra A K) : IsFractionRing B K := by
+theorem isFractionRing_of_subalgebra
+    {A K : Type*} [CommRing A] [IsDomain A] [Field K] [Algebra A K] [IsFractionRing A K]
+    (B : Subalgebra A K)
+    : IsFractionRing B K := by
   rw [IsFractionRing, isLocalization_iff]
   refine ⟨fun y => ?_, fun z => ?_, fun {u v} h => ⟨1, ?_⟩⟩
   · have hy : (y : B) ≠ 0 := nonZeroDivisors.coe_ne_zero y
@@ -21,14 +23,14 @@ theorem isFractionRing_of_subalgebra {A K : Type*} [CommRing A] [IsDomain A] [Fi
     exact ⟨⟨algebraMap A B a, ⟨_, mem_nonZeroDivisors_of_ne_zero hs⟩⟩, h⟩
   · simpa using Subtype.ext h
 
-
 set_option maxHeartbeats 400000 in
-theorem DominatingDVR.proof (hKA : KrullAkizuki.Statement) (hBU : BlowUpChart.Statement) :
-    DominatingDVR.Statement := by
+theorem DominatingDVR.proof (hKA : KrullAkizuki.Statement) (hBU : BlowUpChart.Statement)
+    : DominatingDVR.Statement := by
   intro A _ _ _ _ hAf K _ _ _
 
-  obtain ⟨n, x, hx⟩ := Submodule.fg_iff_exists_fin_generating_family.mp
-    (IsNoetherian.noetherian (IsLocalRing.maximalIdeal A))
+  obtain ⟨n, x, hx⟩ :=
+    Submodule.fg_iff_exists_fin_generating_family.mp (IsNoetherian.noetherian
+      (IsLocalRing.maximalIdeal A))
   have hx' : Ideal.span (Set.range x) = IsLocalRing.maximalIdeal A := hx
   have hx0 : ∃ j, x j ≠ 0 := by
     by_contra h
@@ -48,19 +50,21 @@ theorem DominatingDVR.proof (hKA : KrullAkizuki.Statement) (hBU : BlowUpChart.St
   obtain ⟨q, hq⟩ := Ideal.nonempty_minimalPrimes hspan
   have : q.IsPrime := hq.1.1
   have hxiq : xi ∈ q := hq.1.2 (Ideal.mem_span_singleton_self _)
-  have hxi0 : xi ≠ 0 := fun h => hxi (IsFractionRing.injective A K (by
-    simpa [xi] using congrArg Subtype.val h))
-  have hq1 : q.height = 1 := le_antisymm
-    (Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ q hq)
-    ((Ideal.one_le_height_span_singleton_of_mem_nonZeroDivisors
-      (mem_nonZeroDivisors_of_ne_zero hxi0)).trans (Ideal.height_mono hq.1.2))
+  have hxi0 : xi ≠ 0 := fun h =>
+    hxi (IsFractionRing.injective A K (by simpa [xi] using congrArg Subtype.val h))
+  have hq1 : q.height = 1 :=
+    le_antisymm (Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ q hq)
+      ((Ideal.one_le_height_span_singleton_of_mem_nonZeroDivisors (mem_nonZeroDivisors_of_ne_zero
+        hxi0)).trans (Ideal.height_mono hq.1.2))
   have hmq : (IsLocalRing.maximalIdeal A).map (algebraMap A B) ≤ q := by
     rw [← hx', Ideal.map_span, Ideal.span_le]
     rintro _ ⟨_, ⟨j, rfl⟩, rfl⟩
-    have e : algebraMap A B (x j) =
-        ⟨algebraMap A K (x j) / algebraMap A K (x i), Algebra.subset_adjoin ⟨j, rfl⟩⟩ * xi := by
+    have e
+        : algebraMap A B (x j)
+          = ⟨algebraMap A K (x j) / algebraMap A K (x i), Algebra.subset_adjoin ⟨j, rfl⟩⟩ * xi := by
       apply Subtype.ext
-      have : algebraMap A K (x i) ≠ 0 := fun h => hxi (IsFractionRing.injective A K (by simpa using h))
+      have : algebraMap A K (x i) ≠ 0 := fun h =>
+        hxi (IsFractionRing.injective A K (by simpa using h))
       simp [xi, div_mul_cancel₀ _ this]
     exact e ▸ q.mul_mem_left _ hxiq
 
@@ -75,17 +79,18 @@ theorem DominatingDVR.proof (hKA : KrullAkizuki.Statement) (hBU : BlowUpChart.St
   set C := integralClosure R K
   have : IsDedekindDomain C := hKA.2 R hdimR K
   have : IsFractionRing C K := isFractionRing_of_subalgebra C
-  have hinj : Function.Injective (algebraMap R C) := fun a b h =>
-    by
+  have hinj : Function.Injective (algebraMap R C) := fun a b h => by
     have h' : ((algebraMap R C a : C) : K) = ((algebraMap R C b : C) : K) := congrArg _ h
     exact IsFractionRing.injective R K h'
-  obtain ⟨P, hPmax, hPc⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral (S := C)
-    (IsLocalRing.maximalIdeal R) (by rw [(RingHom.injective_iff_ker_eq_bot _).mp hinj]; exact bot_le)
+  obtain ⟨P, hPmax, hPc⟩ :=
+    Ideal.exists_ideal_over_maximal_of_isIntegral (S := C) (IsLocalRing.maximalIdeal R)
+      (by rw [(RingHom.injective_iff_ker_eq_bot _).mp hinj]; exact bot_le)
   have : P.IsPrime := hPmax.isPrime
   have hPbot : P ≠ ⊥ := by
     rintro rfl
     have hF : IsField R := by
-      rw [IsLocalRing.isField_iff_maximalIdeal_eq, ← hPc, Ideal.under_def, Ideal.comap_bot_of_injective _ hinj]
+      rw [IsLocalRing.isField_iff_maximalIdeal_eq, ← hPc, Ideal.under_def,
+        Ideal.comap_bot_of_injective _ hinj]
     have h0 := ringKrullDim_eq_zero_of_isField hF
     rw [hdimR] at h0
     exact one_ne_zero h0
@@ -105,8 +110,8 @@ theorem DominatingDVR.proof (hKA : KrullAkizuki.Statement) (hBU : BlowUpChart.St
   show ¬ IsUnit (φ a) ↔ _
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   refine ⟨fun h ha => h (ha.map φ), fun ha hu => ?_⟩
-  have hb : algebraMap A B a ∈ q := hmq (Ideal.mem_map_of_mem _ (by
-    rwa [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]))
+  have hb : algebraMap A B a ∈ q :=
+    hmq (Ideal.mem_map_of_mem _ (by rwa [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]))
   have hr : algebraMap B R (algebraMap A B a) ∈ IsLocalRing.maximalIdeal R :=
     (IsLocalization.AtPrime.to_map_mem_maximal_iff R q _).mpr hb
   rw [← hPc, Ideal.mem_comap] at hr

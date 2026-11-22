@@ -21,9 +21,12 @@ noncomputable section
 
 namespace GlobalTheory.TypeTwo.PowIrrProof
 
-theorem equiv_of_isSubquotient {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-    [Module ℂ W] {σ : Representation ℂ G W} {ρ : Representation ℂ G V} (h : IsSubquotient σ ρ) [Nontrivial W]
-    (hρ : ρ.IsIrreducible) : Nonempty (ρ.Equiv σ) := by
+theorem equiv_of_isSubquotient
+    {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {σ : Representation ℂ G W} {ρ : Representation ℂ G V} (h : IsSubquotient σ ρ)
+    [Nontrivial W]
+    (hρ : ρ.IsIrreducible)
+    : Nonempty (ρ.Equiv σ) := by
   obtain ⟨S, f, hf⟩ := h
   obtain ⟨y, hy⟩ := exists_ne (0 : W)
   letI : ρ.IsIrreducible := hρ
@@ -40,9 +43,11 @@ theorem equiv_of_isSubquotient {G V W : Type} [Group G] [AddCommGroup V] [Module
         exact hy (by simpa [hF] using hx.symm)
     exact ⟨F.ofBijective ⟨hi, hs⟩⟩
 
-theorem nontrivial_of_isSubquotient {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-    [Module ℂ W] {σ : Representation ℂ G W} {ρ : Representation ℂ G V} (h : IsSubquotient σ ρ) [Nontrivial W] :
-    Nontrivial V := by
+theorem nontrivial_of_isSubquotient
+    {G V W : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    {σ : Representation ℂ G W} {ρ : Representation ℂ G V} (h : IsSubquotient σ ρ)
+    [Nontrivial W]
+    : Nontrivial V := by
   obtain ⟨S, f, hf⟩ := h
   letI : Nontrivial S.toSubmodule := hf.nontrivial
   exact Subtype.val_injective.nontrivial (α := S.toSubmodule)

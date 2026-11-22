@@ -20,12 +20,17 @@ def stab (ρ : Representation ℂ H W) (v : W) : Subgroup H where
   inv_mem' := by
     intro a ha
     simp only [Set.mem_setOf_eq] at *
-    calc ρ a⁻¹ v = ρ a⁻¹ (ρ a v) := by rw [ha]
+    calc
+      ρ a⁻¹ v
+        = ρ a⁻¹ (ρ a v) := by rw [ha]
       _ = v := rho_inv_rho ρ a v
 
-theorem orbit_finite [TopologicalSpace H] [IsTopologicalGroup H] (ρ : Representation ℂ H W)
-    (hsm : ∀ w, IsOpen {k : H | ρ k w = w}) (K : Subgroup H) (hK : IsCompact (K : Set H))
-    (w : W) : (Set.range fun k : K => ρ k w).Finite := by
+theorem orbit_finite
+    [TopologicalSpace H] [IsTopologicalGroup H]
+    (ρ : Representation ℂ H W) (hsm : ∀ w, IsOpen {k : H | ρ k w = w})
+    (K : Subgroup H) (hK : IsCompact (K : Set H))
+    (w : W)
+    : (Set.range fun k : K => ρ k w).Finite := by
   have hopen : ∀ i : K, IsOpen {h : H | ρ h w = ρ (i : H) w} := by
     intro i
     have e : {h : H | ρ h w = ρ (i : H) w} = (fun h => (i : H)⁻¹ * h) ⁻¹' {h | ρ h w = w} := by
@@ -34,23 +39,31 @@ theorem orbit_finite [TopologicalSpace H] [IsTopologicalGroup H] (ρ : Represent
       constructor
       · intro e; rw [e, rho_inv_rho]
       · intro e
-        calc ρ h w = ρ (i : H) (ρ (i : H)⁻¹ (ρ h w)) := (rho_rho_inv ρ _ _).symm
+        calc
+          ρ h w
+            = ρ (i : H) (ρ (i : H)⁻¹ (ρ h w)) := (rho_rho_inv ρ _ _).symm
           _ = ρ (i : H) w := by rw [e]
     rw [e]
     exact (hsm w).preimage (continuous_const_mul _)
-  obtain ⟨t, ht⟩ := hK.elim_finite_subcover (fun i : K => {h : H | ρ h w = ρ (i : H) w}) hopen
-    (fun h hh => Set.mem_iUnion.2 ⟨⟨h, hh⟩, rfl⟩)
+  obtain ⟨t, ht⟩ :=
+    hK.elim_finite_subcover
+      (fun i : K => {h : H | ρ h w = ρ (i : H) w})
+      hopen
+      (fun h hh => Set.mem_iUnion.2 ⟨⟨h, hh⟩, rfl⟩)
   refine (t.finite_toSet.image (fun i : K => ρ (i : H) w)).subset ?_
   rintro _ ⟨k, rfl⟩
   obtain ⟨i, hi, hki⟩ := Set.mem_iUnion₂.1 (ht k.2)
   exact ⟨i, hi, hki.symm⟩
 
-theorem hadm_of [TopologicalSpace H] [IsTopologicalGroup H] (ρ : Representation ℂ H W)
+theorem hadm_of
+    [TopologicalSpace H] [IsTopologicalGroup H]
+    (ρ : Representation ℂ H W)
     (hK0 : ∃ K : Subgroup H, IsOpen (K : Set H) ∧ IsCompact (K : Set H))
     (hsm : ∀ w, IsOpen {k : H | ρ k w = w})
-    (hfd : ∀ K : Subgroup H, IsOpen (K : Set H) → FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K)) :
-    ∀ v, ∃ K : Subgroup H, (∀ k ∈ K, ρ k v = v) ∧ FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K) ∧
-      ∀ w, (Set.range fun k : K => ρ k w).Finite := by
+    (hfd : ∀ K : Subgroup H, IsOpen (K : Set H) → FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K))
+    : ∀ v, ∃ K : Subgroup H,
+      (∀ k ∈ K, ρ k v = v) ∧ FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K)
+        ∧ ∀ w, (Set.range fun k : K => ρ k w).Finite := by
   obtain ⟨K₀, hop, hco⟩ := hK0
   intro v
   refine ⟨K₀ ⊓ stab ρ v, fun k hk => hk.2, hfd _ ?_, fun w => ?_⟩
@@ -59,40 +72,60 @@ theorem hadm_of [TopologicalSpace H] [IsTopologicalGroup H] (ρ : Representation
     rintro _ ⟨k, rfl⟩
     exact ⟨⟨k, k.2.1⟩, rfl⟩
 
-theorem exists_proj (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ)
+theorem exists_proj
+    (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ)
     (hdef : ∀ v, B v v = 0 → v = 0) (hinv : ∀ g u v, B (ρ g u) (ρ g v) = B u v)
-    (hadm : ∀ v, ∃ K : Subgroup H, (∀ k ∈ K, ρ k v = v) ∧ FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K) ∧
-      ∀ w, (Set.range fun k : K => ρ k w).Finite)
-    (Z : Subrepresentation ρ) :
-    ∃ P : W →ₗ[ℂ] W, (∀ w, P w ∈ Z.toSubmodule) ∧ (∀ w, ∀ z ∈ Z.toSubmodule, B z (w - P w) = 0) ∧
-      ∀ g w, P (ρ g w) = ρ g (P w) := by
+    (hadm : ∀ v, ∃ K : Subgroup H,
+      (∀ k ∈ K, ρ k v = v) ∧ FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K)
+        ∧ ∀ w, (Set.range fun k : K => ρ k w).Finite)
+    (Z : Subrepresentation ρ)
+    : ∃ P : W →ₗ[ℂ] W,
+      (∀ w, P w ∈ Z.toSubmodule) ∧ (∀ w, ∀ z ∈ Z.toSubmodule, B z (w - P w) = 0)
+        ∧ ∀ g w, P (ρ g w) = ρ g (P w) := by
   classical
   have hex := fun w => exists_compl_proj ρ B hdef hinv hadm Z w
   let f : W → W := fun w => Classical.choose (hex w)
   have hf1 : ∀ w, f w ∈ Z.toSubmodule := fun w => (Classical.choose_spec (hex w)).1
-  have hf2 : ∀ w, ∀ z ∈ Z.toSubmodule, B z (w - f w) = 0 :=
-    fun w => (Classical.choose_spec (hex w)).2
+  have hf2 : ∀ w, ∀ z ∈ Z.toSubmodule, B z (w - f w) = 0 := fun w =>
+    (Classical.choose_spec (hex w)).2
   have huniq : ∀ w t, t ∈ Z.toSubmodule → (∀ z ∈ Z.toSubmodule, B z (w - t) = 0) → f w = t := by
     intro w t ht htw
     have hd : f w - t ∈ Z.toSubmodule := sub_mem (hf1 w) ht
     have h0 : B (f w - t) (f w - t) = 0 := by
-      calc B (f w - t) (f w - t) = B (f w - t) ((w - t) - (w - f w)) := by congr 1; abel
+      calc
+        B (f w - t) (f w - t)
+          = B (f w - t) ((w - t) - (w - f w)) := by congr 1; abel
         _ = 0 := by rw [map_sub, htw _ hd, hf2 w _ hd, sub_zero]
     exact sub_eq_zero.1 (hdef _ h0)
-  let P : W →ₗ[ℂ] W :=
-    { toFun := f
-      map_add' := fun a b => huniq _ _ (add_mem (hf1 a) (hf1 b)) (fun z hz => by
+  let P : W →ₗ[ℂ] W := {
+    toFun := f
+    map_add' := fun a b =>
+      huniq _ _ (add_mem (hf1 a) (hf1 b)) (fun z hz => by
         rw [show a + b - (f a + f b) = (a - f a) + (b - f b) by abel, map_add (f := _), hf2 a z hz,
           hf2 b z hz, add_zero])
-      map_smul' := fun c a => by
-        simp only [RingHom.id_apply]
-        exact huniq _ _ (Z.toSubmodule.smul_mem c (hf1 a)) (fun z hz => by
-          rw [← smul_sub, map_smul, hf2 a z hz, smul_zero]) }
+    map_smul' := fun c a => by
+      simp only [RingHom.id_apply]
+      exact huniq _ _ (Z.toSubmodule.smul_mem c (hf1 a))
+        (fun z hz => by rw [← smul_sub, map_smul, hf2 a z hz, smul_zero])
+  }
   refine ⟨P, hf1, hf2, fun g w => ?_⟩
-  exact huniq _ _ (Z.apply_mem_toSubmodule g (hf1 w)) (fun z hz => by
-    rw [← map_sub]; exact orth_stable ρ B hinv Z (w - f w) (hf2 w) g z hz)
+  exact huniq _ _ (Z.apply_mem_toSubmodule g (hf1 w))
+    (fun z hz => by rw [← map_sub]; exact orth_stable ρ B hinv Z (w - f w) (hf2 w) g z hz)
 
-theorem exists_irreducible_equivariant_projection : ∀ (H W : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ), (∀ u v, star (B u v) = B v u) → (∀ v, 0 ≤ (B v v).re) → (∀ v, B v v = 0 → v = 0) → (∀ g u v, B (ρ g u) (ρ g v) = B u v) → (∃ K : Subgroup H, IsOpen (K : Set H) ∧ IsCompact (K : Set H)) → (∀ w, IsOpen {k : H | ρ k w = w}) → (∀ K : Subgroup H, IsOpen (K : Set H) → FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K)) → ∀ x : W, x ≠ 0 → ∃ (U : Submodule ℂ W) (P : W →ₗ[ℂ] W), U ≠ ⊥ ∧ (∀ g, ∀ u ∈ U, ρ g u ∈ U) ∧ (∀ N ≤ U, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U) ∧ (∀ w, P w ∈ U) ∧ (∀ g w, P (ρ g w) = ρ g (P w)) ∧ P x ≠ 0 := by
+theorem exists_irreducible_equivariant_projection
+    : ∀ (H W : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup W]
+        [Module ℂ W] (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ),
+      (∀ u v, star (B u v) = B v u) → (∀ v, 0 ≤ (B v v).re) → (∀ v, B v v = 0 → v = 0)
+        → (∀ g u v, B (ρ g u) (ρ g v) = B u v)
+        → (∃ K : Subgroup H, IsOpen (K : Set H) ∧ IsCompact (K : Set H))
+        → (∀ w, IsOpen {k : H | ρ k w = w})
+        → (∀ K : Subgroup H, IsOpen (K : Set H) → FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K))
+        → ∀ x : W,
+          x ≠ 0
+            → ∃ (U : Submodule ℂ W) (P : W →ₗ[ℂ] W),
+              U ≠ ⊥ ∧ (∀ g, ∀ u ∈ U, ρ g u ∈ U)
+                ∧ (∀ N ≤ U, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U) ∧ (∀ w, P w ∈ U)
+                ∧ (∀ g w, P (ρ g w) = ρ g (P w)) ∧ P x ≠ 0 := by
   intro H W _ _ _ _ _ ρ B hherm hpos hdef hinv hK0 hsm hfd x hx
   classical
   have hadm := hadm_of ρ hK0 hsm hfd
@@ -109,12 +142,15 @@ theorem exists_irreducible_equivariant_projection : ∀ (H W : Type) [Group H] [
     simp [hu k k.2]
   set O := (orbSpan ρ x).toSubmodule with hO
   let Q : W → Prop := fun y => y ≠ 0 ∧ y ∈ F ∧ y ∈ O
-  have hex : ∃ n : ℕ, ∃ y, Q y ∧
-      Module.finrank ℂ ((orbSpan ρ y).toSubmodule ⊓ F : Submodule ℂ W) = n :=
+  have hex
+      : ∃ n : ℕ, ∃ y, Q y ∧ Module.finrank ℂ ((orbSpan ρ y).toSubmodule ⊓ F : Submodule ℂ W) = n :=
     ⟨_, x, ⟨hx, memF x hxK, mem_orbSpan ρ x⟩, rfl⟩
   obtain ⟨y, ⟨hy0, hyF, hyO⟩, hn⟩ := Nat.find_spec hex
-  have hmin : ∀ t, Q t → Module.finrank ℂ ((orbSpan ρ y).toSubmodule ⊓ F : Submodule ℂ W) ≤
-      Module.finrank ℂ ((orbSpan ρ t).toSubmodule ⊓ F : Submodule ℂ W) := by
+  have hmin
+      : ∀ t,
+        Q t
+          → Module.finrank ℂ ((orbSpan ρ y).toSubmodule ⊓ F : Submodule ℂ W)
+            ≤ Module.finrank ℂ ((orbSpan ρ t).toSubmodule ⊓ F : Submodule ℂ W) := by
     intro t ht
     rw [hn]
     exact Nat.find_min' hex ⟨t, ht, rfl⟩
@@ -165,8 +201,9 @@ theorem exists_irreducible_equivariant_projection : ∀ (H W : Type) [Group H] [
       have hle1 : ((orbSpan ρ t).toSubmodule ⊓ F : Submodule ℂ W) ≤ N ⊓ F :=
         inf_le_inf_right _ (orbSpan_le ρ t N' htN)
       have hle2 : (N ⊓ F : Submodule ℂ W) ≤ U.toSubmodule ⊓ F := inf_le_inf_right _ hNU
-      have h2 := LinearMap.finrank_le_finrank_of_injective (f := Submodule.inclusion hle1)
-        (Submodule.inclusion_injective hle1)
+      have h2 :=
+        LinearMap.finrank_le_finrank_of_injective (f := Submodule.inclusion hle1)
+          (Submodule.inclusion_injective hle1)
       have heq := Submodule.eq_of_le_of_finrank_le hle2 (h1.trans h2)
       have hyN : y ∈ N := by
         have : y ∈ (N ⊓ F : Submodule ℂ W) := heq ▸ ⟨hyU, hyF⟩

@@ -27,8 +27,9 @@ theorem exists_rep (H : HermSpace K V) (f : V →ₗ[K] K) : ∃ y, ∀ x, H.B x
   obtain ⟨y, hy⟩ := h3
   exact ⟨y, fun x => by rw [← hy]; rfl⟩
 
-theorem mem_of_perp_perp (H : HermSpace K V) (I : Submodule K V) {v : V}
-    (hv : ∀ x ∈ perp H I, H.B x v = 0) : v ∈ I := by
+theorem mem_of_perp_perp
+    (H : HermSpace K V) (I : Submodule K V) {v : V} (hv : ∀ x ∈ perp H I, H.B x v = 0)
+    : v ∈ I := by
   by_contra h
   obtain ⟨f, hf, hf0⟩ := Submodule.exists_dual_map_eq_bot_of_notMem h inferInstance
   obtain ⟨w, hw⟩ := exists_rep H f
@@ -51,23 +52,25 @@ theorem mem_one_iff (x : K) : x ∈ (1 : Submodule (𝓞 K) K) ↔ IsIntegral �
   · intro h
     exact ⟨⟨x, h⟩, rfl⟩
 
-theorem star_mem_one {x : K} (h : x ∈ (1 : Submodule (𝓞 K) K)) : star x ∈ (1 : Submodule (𝓞 K) K) := by
+theorem star_mem_one {x : K} (h : x ∈ (1 : Submodule (𝓞 K) K))
+    : star x ∈ (1 : Submodule (𝓞 K) K) := by
   rw [mem_one_iff] at h ⊢
   exact map_isIntegral_int (starRingEnd K) h
 
 variable [NumberField K] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 omit [StarRing K] [FiniteDimensional K V] in
-theorem exists_smul_mem {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L) (y : V) :
-    ∃ s : nonZeroDivisors (𝓞 K), s • y ∈ L := by
+theorem exists_smul_mem {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L) (y : V)
+    : ∃ s : nonZeroDivisors (𝓞 K), s • y ∈ L := by
   have hy : y ∈ Submodule.span K (L : Set V) := by rw [hL.span_eq_top]; trivial
-  obtain ⟨s, hs⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K (L : Set V) y hy
+  obtain ⟨s, hs⟩ :=
+    multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K (L : Set V) y hy
   rw [Submodule.span_eq] at hs
   exact ⟨s, hs⟩
 
 omit [StarRing K] [FiniteDimensional K V] in
-theorem isLocalizedModule_subtype {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L) :
-    IsLocalizedModule (nonZeroDivisors (𝓞 K)) L.subtype := by
+theorem isLocalizedModule_subtype {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L)
+    : IsLocalizedModule (nonZeroDivisors (𝓞 K)) L.subtype := by
   refine { map_units := ?_, surj := ?_, exists_of_eq := ?_ }
   · intro s
     have := isLocalizedModule_id (nonZeroDivisors (𝓞 K)) V K
@@ -78,11 +81,11 @@ theorem isLocalizedModule_subtype {L : Submodule (𝓞 K) V} (hL : Submodule.IsF
   · intro x₁ x₂ h
     exact ⟨1, by rw [Subtype.ext h]⟩
 
-
 omit [StarRing K] [FiniteDimensional K V] in
-theorem exists_extension {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L) (S : Submodule K V)
-    (φ : ↥(L ⊓ rs (𝓞 K) S) →ₗ[𝓞 K] 𝓞 K) :
-    ∃ ψ : L →ₗ[𝓞 K] 𝓞 K, ∀ x : ↥(L ⊓ rs (𝓞 K) S), ψ ⟨x, x.2.1⟩ = φ x := by
+theorem exists_extension
+    {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattice K L)
+    (S : Submodule K V) (φ : ↥(L ⊓ rs (𝓞 K) S) →ₗ[𝓞 K] 𝓞 K)
+    : ∃ ψ : L →ₗ[𝓞 K] 𝓞 K, ∀ x : ↥(L ⊓ rs (𝓞 K) S), ψ ⟨x, x.2.1⟩ = φ x := by
   let N : Submodule (𝓞 K) L := (rs (𝓞 K) S).comap L.subtype
   have hflat : Module.Flat (𝓞 K) (L ⧸ N) := by
     rw [IsDedekindDomain.flat_iff_torsion_eq_bot, eq_bot_iff]
@@ -91,8 +94,7 @@ theorem exists_extension {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattic
     have h1 : N.mkQ ((a : 𝓞 K) • x) = 0 := by rw [map_smul]; exact ha
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at h1
     rw [Submodule.mem_bot, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-    have h2 : (algebraMap (𝓞 K) K a) • (x : V) ∈ S := by
-      rw [algebraMap_smul]; exact h1
+    have h2 : (algebraMap (𝓞 K) K a) • (x : V) ∈ S := by rw [algebraMap_smul]; exact h1
     have h3 : algebraMap (𝓞 K) K a ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors a.2
     exact (S.smul_mem_iff h3).1 h2
   have : Module.Finite (𝓞 K) L := Submodule.IsLattice.finite K L
@@ -119,9 +121,11 @@ theorem exists_extension {L : Submodule (𝓞 K) V} (hL : Submodule.IsFullLattic
   show ((⟨x, x.2.1⟩ - s (N.mkQ ⟨x, x.2.1⟩) : L) : V) = x
   rw [h0, map_zero, sub_zero]
 
-theorem exists_lattice_rep (H : HermSpace K V) {L : Submodule (𝓞 K) V} (hU : IsUnimod H L) (S : Submodule K V)
-    (φ : ↥(L ⊓ rs (𝓞 K) S) →ₗ[𝓞 K] 𝓞 K) :
-    ∃ y ∈ L, ∀ x : ↥(L ⊓ rs (𝓞 K) S), H.B x y = (φ x : K) := by
+theorem exists_lattice_rep
+    (H : HermSpace K V)
+    {L : Submodule (𝓞 K) V} (hU : IsUnimod H L)
+    (S : Submodule K V) (φ : ↥(L ⊓ rs (𝓞 K) S) →ₗ[𝓞 K] 𝓞 K)
+    : ∃ y ∈ L, ∀ x : ↥(L ⊓ rs (𝓞 K) S), H.B x y = (φ x : K) := by
   have hL : Submodule.IsFullLattice K L := by
     obtain ⟨⟨N, hN, hLN⟩, hspan⟩ := hU.1
     have h : L = N := by simpa only [rs, Submodule.restrictScalars_bot, sup_bot_eq] using hLN
@@ -130,7 +134,8 @@ theorem exists_lattice_rep (H : HermSpace K V) {L : Submodule (𝓞 K) V} (hU : 
   have := isLocalizedModule_subtype hL
   have hu : ∀ x : nonZeroDivisors (𝓞 K), IsUnit (algebraMap (𝓞 K) (Module.End (𝓞 K) K) x) :=
     fun x => IsLocalizedModule.map_units (S := nonZeroDivisors (𝓞 K)) (Algebra.linearMap (𝓞 K) K) x
-  let f : V →ₗ[K] K := LinearMap.extendScalarsOfIsLocalization (nonZeroDivisors (𝓞 K)) K
+  let f : V →ₗ[K] K :=
+    LinearMap.extendScalarsOfIsLocalization (nonZeroDivisors (𝓞 K)) K
       (IsLocalizedModule.lift (nonZeroDivisors (𝓞 K)) L.subtype (Algebra.linearMap (𝓞 K) K ∘ₗ ψ) hu)
   have hf : ∀ y : L, f y = algebraMap (𝓞 K) K (ψ y) := fun y =>
     IsLocalizedModule.lift_apply (nonZeroDivisors (𝓞 K)) L.subtype _ hu y
@@ -145,9 +150,11 @@ theorem exists_lattice_rep (H : HermSpace K V) {L : Submodule (𝓞 K) V} (hU : 
   · rw [hy, ← hψ]
     exact hf ⟨x, x.2.1⟩
 
-theorem isUnimodMod_quot (H : HermSpace K V) {L : Submodule (𝓞 K) V} (hU : IsUnimod H L) {I : Submodule K V}
-    (hI : ∀ x ∈ I, ∀ y ∈ I, H.B x y = 0) :
-    IsUnimodMod H ((L ⊓ rs (𝓞 K) (perp H I)) ⊔ rs (𝓞 K) I) (perp H I) I := by
+theorem isUnimodMod_quot
+    (H : HermSpace K V)
+    {L : Submodule (𝓞 K) V} (hU : IsUnimod H L)
+    {I : Submodule K V} (hI : ∀ x ∈ I, ∀ y ∈ I, H.B x y = 0)
+    : IsUnimodMod H ((L ⊓ rs (𝓞 K) (perp H I)) ⊔ rs (𝓞 K) I) (perp H I) I := by
   have hL : Submodule.IsFullLattice K L := by
     obtain ⟨⟨N, hN, hLN⟩, hspan⟩ := hU.1
     have h : L = N := by simpa only [rs, Submodule.restrictScalars_bot, sup_bot_eq] using hLN
@@ -160,12 +167,17 @@ theorem isUnimodMod_quot (H : HermSpace K V) {L : Submodule (𝓞 K) V} (hU : Is
   have hsat : ∀ v ∈ perp H I, ∃ c : K, c ≠ 0 ∧ c • v ∈ L ⊓ rs (𝓞 K) (perp H I) := by
     intro v hv
     obtain ⟨s, hs⟩ := exists_smul_mem hL v
-    refine ⟨algebraMap (𝓞 K) K s, IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors s.2, ?_,
-      (perp H I).smul_mem _ hv⟩
+    refine ⟨
+      algebraMap (𝓞 K) K s,
+      IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors s.2,
+      ?_,
+      (perp H I).smul_mem _ hv
+    ⟩
     rw [algebraMap_smul]
     exact hs
-  have hspan : Submodule.span K (((L ⊓ rs (𝓞 K) (perp H I)) ⊔ rs (𝓞 K) I : Submodule (𝓞 K) V) : Set V)
-      = perp H I := by
+  have hspan
+      : Submodule.span K (((L ⊓ rs (𝓞 K) (perp H I)) ⊔ rs (𝓞 K) I : Submodule (𝓞 K) V) : Set V)
+        = perp H I := by
     apply le_antisymm
     · rw [Submodule.span_le]
       have : (L ⊓ rs (𝓞 K) (perp H I)) ⊔ rs (𝓞 K) I ≤ rs (𝓞 K) (perp H I) := sup_le inf_le_right hIp
@@ -188,17 +200,18 @@ theorem isUnimodMod_quot (H : HermSpace K V) {L : Submodule (𝓞 K) V} (hU : Is
       intro x
       rw [← mem_one_iff, ← H.herm]
       exact star_mem_one (hyM x (Submodule.mem_sup_left x.2))
-    let φ : ↥(L ⊓ rs (𝓞 K) (perp H I)) →ₗ[𝓞 K] 𝓞 K :=
-      { toFun := fun x => ⟨H.B x y, hx x⟩
-        map_add' := fun a b => by
-          apply RingOfIntegers.ext
-          show H.B ((a : V) + b) y = H.B a y + H.B b y
-          simp
-        map_smul' := fun a b => by
-          apply RingOfIntegers.ext
-          show H.B (a • (b : V)) y = algebraMap (𝓞 K) K a * H.B b y
-          rw [← algebraMap_smul K a, map_smul]
-          rfl }
+    let φ : ↥(L ⊓ rs (𝓞 K) (perp H I)) →ₗ[𝓞 K] 𝓞 K := {
+      toFun := fun x => ⟨H.B x y, hx x⟩
+      map_add' := fun a b => by
+        apply RingOfIntegers.ext
+        show H.B ((a : V) + b) y = H.B a y + H.B b y
+        simp
+      map_smul' := fun a b => by
+        apply RingOfIntegers.ext
+        show H.B (a • (b : V)) y = algebraMap (𝓞 K) K a * H.B b y
+        rw [← algebraMap_smul K a, map_smul]
+        rfl
+    }
     obtain ⟨y', hy', h'⟩ := exists_lattice_rep H hU (perp H I) φ
     have hd : y - y' ∈ I := by
       apply mem_of_perp_perp H I

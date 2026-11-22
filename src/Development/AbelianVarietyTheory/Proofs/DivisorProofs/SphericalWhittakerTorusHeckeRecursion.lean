@@ -16,11 +16,12 @@ noncomputable section
 
 namespace GlobalTheory.WhittakerRecursion
 
-open GroundTheory.Automorphic GroundTheory.Automorphic.Spherical GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa
+open GroundTheory.Automorphic GroundTheory.Automorphic.Spherical GroundTheory.Automorphic.GLnLocal
+  GroundTheory.Automorphic.Iwasawa
 open scoped ValuativeRel
 
-theorem lamS_perm {n : ℕ} (S T : Finset (Fin n)) (h : S.card = T.card) :
-    ∃ σ : Equiv.Perm (Fin n), Spherical.lamS T ∘ σ = Spherical.lamS S := by
+theorem lamS_perm {n : ℕ} (S T : Finset (Fin n)) (h : S.card = T.card)
+    : ∃ σ : Equiv.Perm (Fin n), Spherical.lamS T ∘ σ = Spherical.lamS S := by
   classical
   let e : {x // x ∈ S} ≃ {x // x ∈ T} := Finset.equivOfCardEq h
   refine ⟨e.extendSubtype, funext fun i => ?_⟩
@@ -30,17 +31,20 @@ theorem lamS_perm {n : ℕ} (S T : Finset (Fin n)) (h : S.card = T.card) :
   · have := Equiv.extendSubtype_not_mem e i hi
     simp [Spherical.lamS, hi, this]
 
-theorem mem_minusculeSet_iff {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] {n r : ℕ} (hr : r ≤ n) (g : GL (Fin n) F) :
-    g ∈ Spherical.minusculeSet F n r ↔ ∃ a ∈ GLnLocal.integralGL F n, ∃ b ∈ GLnLocal.integralGL F n,
-      (g : Matrix (Fin n) (Fin n) F) = (a : Matrix (Fin n) (Fin n) F) *
-        Formalism.UG.diagJ n (GLnLocal.uniformizer F : F) r * (b : Matrix (Fin n) (Fin n) F) := by
+theorem mem_minusculeSet_iff
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {n r : ℕ} (hr : r ≤ n) (g : GL (Fin n) F)
+    : g ∈ Spherical.minusculeSet F n r
+      ↔ ∃ a ∈ GLnLocal.integralGL F n, ∃ b ∈ GLnLocal.integralGL F n,
+        (g : Matrix (Fin n) (Fin n) F)
+          = (a : Matrix (Fin n) (Fin n) F) * Formalism.UG.diagJ n (GLnLocal.uniformizer F : F) r
+            * (b : Matrix (Fin n) (Fin n) F) := by
   classical
   let T : Finset (Fin n) := Finset.univ.filter fun i => i.val < r
-  have hT : T.card = r := by
-    simp [T, Fin.card_filter_val_lt, hr]
-  have hD : ((Iwasawa.torusPow F n (Spherical.lamS T) : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) =
-      Formalism.UG.diagJ n (GLnLocal.uniformizer F : F) r := by
+  have hT : T.card = r := by simp [T, Fin.card_filter_val_lt, hr]
+  have hD
+      : ((Iwasawa.torusPow F n (Spherical.lamS T) : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
+        = Formalism.UG.diagJ n (GLnLocal.uniformizer F : F) r := by
     rw [Iwasawa.coe_torusPow, Formalism.UG.diagJ]
     congr 1
     funext i
@@ -77,46 +81,54 @@ theorem mem_minusculeSet_iff {F : Type} [Field F] [ValuativeRel F] [TopologicalS
 
 section Local
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
-theorem finsum_minuscule {f : GL (Fin n) F → ℂ} (hf : ∀ g, ∀ k ∈ integralGL F n, f (g * k) = f g)
-    (hN : ∀ u ∈ unipotent F n ⊓ integralGL F n, ∀ g, f (u * g) = f g) {l : Fin n → ℤ} (hl : Antitone l) (r : ℕ) :
-    ∑ᶠ x : GL (Fin n) F ⧸ integralGL F n,
-        (minusculeSet F n r).indicator (fun _ => (1 : ℂ)) x.out • f (torusPow F n l * x.out) =
-      ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, (kappa F S : ℂ) * f (torusPow F n (l + lamS S)) := by
-  letI : Fintype 𝓀[F] := Fintype.ofFinite _
-  letI : MeasurableSpace (GL (Fin n) F) := borel _
-  haveI : BorelSpace (GL (Fin n) F) := ⟨rfl⟩
-  set Cs : Finset (GL (Fin n) F ⧸ integralGL F n) := (Finset.univ.powersetCard r).biUnion
-    fun S => Finset.univ.image fun c : Pairs S → 𝓀[F] => (QuotientGroup.mk (gMat S c) : _)
-  rw [finsum_eq_sum_of_support_subset (s := Cs)]
-  · rw [Finset.sum_biUnion]
-    · refine Finset.sum_congr rfl fun S hS => ?_
-      have hSr := (Finset.mem_powersetCard.1 hS).2
-      rw [Finset.sum_image fun c _ c' _ h => gMat_injective S h]
-      refine Eq.trans (Finset.sum_congr rfl fun c _ => ?_) (sum_gMat_torusPow hN hl S)
-      obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul (integralGL F n) (gMat S c)
-      have hm := mul_mem_minusculeSet (hSr ▸ gMat_mem_minusculeSet (F := F) S c) (one_mem _) k.2
-      rw [one_mul] at hm
-      rw [hk, Set.indicator_of_mem hm, one_smul, ← mul_assoc, hf _ k k.2]
-    · intro S _ S' _ hne
-      simp only [Function.onFun]
-      rw [Finset.disjoint_left]
-      intro x hx hx'
-      obtain ⟨c, -, rfl⟩ := Finset.mem_image.1 hx
-      obtain ⟨c', -, hc'⟩ := Finset.mem_image.1 hx'
-      have := congrArg (fun x : GL (Fin n) F ⧸ integralGL F n => iwasawaExponent F n x.out) hc'
-      simp only [iwasawaExponent_out, iwasawaExponent_gMat] at this
-      exact hne (lamS_injective this).symm
-  · intro x hx
-    have hm : x.out ∈ minusculeSet F n r := by
-      by_contra hm
-      apply hx
-      simp only [Set.indicator_of_notMem hm, zero_smul]
-    obtain ⟨S, hS, c, hc⟩ := exists_gMat hm
-    rw [QuotientGroup.out_eq'] at hc
-    exact Finset.mem_biUnion.2 ⟨S, Finset.mem_powersetCard.2 ⟨Finset.subset_univ _, hS⟩,
-      Finset.mem_image.2 ⟨c, Finset.mem_univ _, hc⟩⟩
+theorem finsum_minuscule
+    {f : GL (Fin n) F → ℂ} (hf : ∀ g, ∀ k ∈ integralGL F n, f (g * k) = f g)
+    (hN : ∀ u ∈ unipotent F n ⊓ integralGL F n, ∀ g, f (u * g) = f g)
+    {l : Fin n → ℤ} (hl : Antitone l)
+    (r : ℕ)
+    : ∑ᶠ x : GL (Fin n) F ⧸ integralGL F n,
+          (minusculeSet F n r).indicator (fun _ => (1 : ℂ)) x.out • f (torusPow F n l * x.out)
+      = ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, (kappa F S : ℂ) * f (torusPow F n (l + lamS S)) :=
+  by
+    letI : Fintype 𝓀[F] := Fintype.ofFinite _
+    letI : MeasurableSpace (GL (Fin n) F) := borel _
+    haveI : BorelSpace (GL (Fin n) F) := ⟨rfl⟩
+    set Cs : Finset (GL (Fin n) F ⧸ integralGL F n) := (Finset.univ.powersetCard r).biUnion
+      fun S => Finset.univ.image fun c : Pairs S → 𝓀[F] => (QuotientGroup.mk (gMat S c) : _)
+    rw [finsum_eq_sum_of_support_subset (s := Cs)]
+    · rw [Finset.sum_biUnion]
+      · refine Finset.sum_congr rfl fun S hS => ?_
+        have hSr := (Finset.mem_powersetCard.1 hS).2
+        rw [Finset.sum_image fun c _ c' _ h => gMat_injective S h]
+        refine Eq.trans (Finset.sum_congr rfl fun c _ => ?_) (sum_gMat_torusPow hN hl S)
+        obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul (integralGL F n) (gMat S c)
+        have hm := mul_mem_minusculeSet (hSr ▸ gMat_mem_minusculeSet (F := F) S c) (one_mem _) k.2
+        rw [one_mul] at hm
+        rw [hk, Set.indicator_of_mem hm, one_smul, ← mul_assoc, hf _ k k.2]
+      · intro S _ S' _ hne
+        simp only [Function.onFun]
+        rw [Finset.disjoint_left]
+        intro x hx hx'
+        obtain ⟨c, -, rfl⟩ := Finset.mem_image.1 hx
+        obtain ⟨c', -, hc'⟩ := Finset.mem_image.1 hx'
+        have := congrArg (fun x : GL (Fin n) F ⧸ integralGL F n => iwasawaExponent F n x.out) hc'
+        simp only [iwasawaExponent_out, iwasawaExponent_gMat] at this
+        exact hne (lamS_injective this).symm
+    · intro x hx
+      have hm : x.out ∈ minusculeSet F n r := by
+        by_contra hm
+        apply hx
+        simp only [Set.indicator_of_notMem hm, zero_smul]
+      obtain ⟨S, hS, c, hc⟩ := exists_gMat hm
+      rw [QuotientGroup.out_eq'] at hc
+      exact Finset.mem_biUnion.2 ⟨
+        S,
+        Finset.mem_powersetCard.2 ⟨Finset.subset_univ _, hS⟩,
+        Finset.mem_image.2 ⟨c, Finset.mem_univ _, hc⟩
+      ⟩
 
 theorem sqrtQ_zpow (m : ℤ) : sqrtQ F ^ m = (qF F : ℂ) ^ ((m : ℂ) / 2) := by
   rw [div_eq_inv_mul, Complex.cpow_mul_int]
@@ -124,9 +136,9 @@ theorem sqrtQ_zpow (m : ℤ) : sqrtQ F ^ m = (qF F : ℂ) ^ ((m : ℂ) / 2) := b
   rw [sqrtQ, Real.coe_sqrt, Real.sqrt_eq_rpow, Complex.ofReal_cpow (by positivity)]
   simp
 
-theorem cpow_eq_sqrtQ (m : Fin n → ℕ) :
-    (qF F : ℂ) ^ ((∑ k : Fin n, (((n : ℂ) - 1 - 2 * (k : ℕ)) * ((m k : ℕ) : ℂ))) / 2) =
-      sqrtQ F ^ rhoPair (fun i => (m i : ℤ)) := by
+theorem cpow_eq_sqrtQ (m : Fin n → ℕ)
+    : (qF F : ℂ) ^ ((∑ k : Fin n, (((n : ℂ) - 1 - 2 * (k : ℕ)) * ((m k : ℕ) : ℂ))) / 2)
+      = sqrtQ F ^ rhoPair (fun i => (m i : ℤ)) := by
   rw [sqrtQ_zpow, rhoPair]
   push_cast
   rfl
@@ -135,7 +147,6 @@ end Local
 
 variable {E : Type} [Field E] [NumberField E] {w : HeightOneSpectrum (𝓞 E)} {n : ℕ}
 
-
 variable (w n) in
 theorem integralGL_eq : integralGL (w.adicCompletion E) n = GLint (Fin n) (Ov E w) := by
   have hO : Ov E w = (ValuativeRel.valuation (w.adicCompletion E)).integer :=
@@ -143,32 +154,34 @@ theorem integralGL_eq : integralGL (w.adicCompletion E) n = GLint (Fin n) (Ov E 
   rw [hO]
   rfl
 
-
 variable (w) in
-theorem isUnifV_uniformizer : IsUnifV E w (GLnLocal.uniformizer (w.adicCompletion E) : w.adicCompletion E) :=
+theorem isUnifV_uniformizer
+    : IsUnifV E w (GLnLocal.uniformizer (w.adicCompletion E) : w.adicCompletion E) :=
   GroundTheory.Global.valued_of_irreducible_integer w (GLnLocal.irreducible_uniformizer _)
 
-
 variable (w) in
-theorem Tj_eq_indicator {r : ℕ} (hr : r ≤ n) :
-    Tj ℂ n (Ov E w) (GLnLocal.uniformizer (w.adicCompletion E) : w.adicCompletion E) r =
-      (minusculeSet (w.adicCompletion E) n r).indicator fun _ => (1 : ℂ) := by
+theorem Tj_eq_indicator {r : ℕ} (hr : r ≤ n)
+    : Tj ℂ n (Ov E w) (GLnLocal.uniformizer (w.adicCompletion E) : w.adicCompletion E) r
+      = (minusculeSet (w.adicCompletion E) n r).indicator fun _ => (1 : ℂ) := by
   unfold Tj
   rw [← integralGL_eq]
   congr 1
   ext g
   exact (mem_minusculeSet_iff hr g).symm
 
-theorem apply_diag_eq {W : GL (Fin n) (w.adicCompletion E) → ℂ}
+theorem apply_diag_eq
+    {W : GL (Fin n) (w.adicCompletion E) → ℂ}
     (hK : ∀ g, ∀ k ∈ integralGL (w.adicCompletion E) n, W (g * k) = W g)
-    {ϖ : (w.adicCompletion E)ˣ} (hϖ : IsUnifV E w (ϖ : w.adicCompletion E)) (m : Fin n → ℕ) :
-    W (Units.map (Matrix.diagonalRingHom (Fin n) (w.adicCompletion E)).toMonoidHom
-      (MulEquiv.piUnits.symm fun i => ϖ ^ m i)) = W (torusPow (w.adicCompletion E) n fun i => (m i : ℤ)) := by
+    {ϖ : (w.adicCompletion E)ˣ} (hϖ : IsUnifV E w (ϖ : w.adicCompletion E))
+    (m : Fin n → ℕ)
+    : W (Units.map (Matrix.diagonalRingHom (Fin n) (w.adicCompletion E)).toMonoidHom
+        (MulEquiv.piUnits.symm fun i => ϖ ^ m i))
+      = W (torusPow (w.adicCompletion E) n fun i => (m i : ℤ)) := by
   have hπ := isUnifV_uniformizer w
   set d : Fin n → (w.adicCompletion E)ˣ := fun i => ((uniformizerUnit (w.adicCompletion E))⁻¹ * ϖ) ^ m i
   have hv : ∀ i, Valued.v (d i : w.adicCompletion E) = 1 := fun i => by
-    simp only [d, Units.val_pow_eq_pow_val, Units.val_mul, Units.val_inv_eq_inv_val, coe_uniformizerUnit, map_pow,
-      map_mul, map_inv₀]
+    simp only [d, Units.val_pow_eq_pow_val, Units.val_mul, Units.val_inv_eq_inv_val,
+      coe_uniformizerUnit, map_pow, map_mul, map_inv₀]
     rw [hπ, hϖ, inv_mul_cancel₀ WithZero.coe_ne_zero, one_pow]
   have hd : diagGL (w.adicCompletion E) n d ∈ integralGL (w.adicCompletion E) n := by
     rw [mem_integralGL_iff, ← map_inv]
@@ -176,7 +189,8 @@ theorem apply_diag_eq {W : GL (Fin n) (w.adicCompletion E) → ℂ}
     · exact (GroundTheory.Global.mem_valuationInteger_iff w _).2 (hv i).le
     · exact zero_mem _
     · refine (GroundTheory.Global.mem_valuationInteger_iff w _).2 ?_
-      rw [HeightOneSpectrum.mem_adicCompletionIntegers, Pi.inv_apply, Units.val_inv_eq_inv_val, map_inv₀, hv, inv_one]
+      rw [HeightOneSpectrum.mem_adicCompletionIntegers, Pi.inv_apply, Units.val_inv_eq_inv_val,
+        map_inv₀, hv, inv_one]
     · exact zero_mem _
   rw [← hK (torusPow _ _ _) _ hd, torusPow, ← map_mul]
   congr 1

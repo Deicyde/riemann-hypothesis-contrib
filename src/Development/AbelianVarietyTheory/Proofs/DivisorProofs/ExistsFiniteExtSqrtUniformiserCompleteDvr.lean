@@ -7,18 +7,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIntegr
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.UPoinc GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+  GlobalTheory.UPoinc GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.USep
 
 namespace GlobalTheory.USep
 
-
 open Polynomial in
-theorem exists_finite_ext_sq_eq_uniformiser : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], IsCN V → IsPrincipalIdealRing V → ∀ ϖ : V, Irreducible ϖ → ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsLocalRing V') (f : V →+* V') (t : V'), IsCN V' ∧ IsPrincipalIdealRing V' ∧ Function.Injective f ∧ IsLocalHom f ∧ f.Finite ∧ t ^ 2 = f ϖ := by
+theorem exists_finite_ext_sq_eq_uniformiser
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
+      IsCN V → IsPrincipalIdealRing V
+        → ∀ ϖ : V,
+          Irreducible ϖ
+            → ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsLocalRing V') (f : V →+* V')
+                (t : V'),
+              IsCN V' ∧ IsPrincipalIdealRing V' ∧ Function.Injective f ∧ IsLocalHom f ∧ f.Finite
+                ∧ t ^ 2 = f ϖ := by
   intro V _ _ _ hV hP ϖ hϖ
   let K₀ := FractionRing V
   let p : K₀[X] := X ^ 2 - C (algebraMap V K₀ ϖ)
@@ -27,14 +38,12 @@ theorem exists_finite_ext_sq_eq_uniformiser : ∀ (V : Type) [CommRing V] [IsDom
     rw [Polynomial.degree_map, Polynomial.degree_X_pow_sub_C (by norm_num)]
     norm_num
   obtain ⟨s, hs⟩ := (Polynomial.SplittingField.splits p).exists_eval_eq_zero hdeg
-  have hs2 : s ^ 2 = algebraMap K₀ L (algebraMap V K₀ ϖ) := by
-    simpa [p, sub_eq_zero] using hs
+  have hs2 : s ^ 2 = algebraMap K₀ L (algebraMap V K₀ ϖ) := by simpa [p, sub_eq_zero] using hs
   obtain ⟨V₁, _, _, _, ρ, σ, hCN, hinj, hfin, hloc, hcomp⟩ :=
     GlobalTheory.Poinc.exists_integralClosure_isCN_finite_local V hV L
   obtain ⟨hN₁, hIC₁, _, _⟩ := hCN
 
-  have hy2 : (σ s) ^ 2 = algebraMap V₁ (FractionRing V₁) (ρ ϖ) := by
-    rw [← map_pow, hs2, hcomp]
+  have hy2 : (σ s) ^ 2 = algebraMap V₁ (FractionRing V₁) (ρ ϖ) := by rw [← map_pow, hs2, hcomp]
   have hint : IsIntegral V₁ (σ s) := by
     refine ⟨X ^ 2 - C (ρ ϖ), monic_X_pow_sub_C _ two_ne_zero, ?_⟩
     simp [eval₂_sub, hy2, Algebra.algebraMap_eq_smul_one]
@@ -46,8 +55,7 @@ theorem exists_finite_ext_sq_eq_uniformiser : ∀ (V : Type) [CommRing V] [IsDom
   letI : Algebra V V₁ := ρ.toAlgebra
   haveI : Module.Finite V V₁ := hfin
   haveI : Algebra.IsIntegral V V₁ := Algebra.IsIntegral.of_finite V V₁
-  have hϖ0 : ρ ϖ ≠ 0 := by
-    intro h; apply hϖ.ne_zero; apply hinj; simpa using h
+  have hϖ0 : ρ ϖ ≠ 0 := by intro h; apply hϖ.ne_zero; apply hinj; simpa using h
   have hϖnu : ¬ IsUnit (ρ ϖ) := fun h => hϖ.not_isUnit ((isUnit_map_iff ρ ϖ).mp h)
   have hnf : ¬ IsField V₁ := by
     intro hF
@@ -70,7 +78,19 @@ theorem exists_finite_ext_sq_eq_uniformiser : ∀ (V : Type) [CommRing V] [IsDom
       have hm : (P.comap (algebraMap V V₁)).IsMaximal := IsPrime.to_maximal_ideal hc
       have hPm : P.IsMaximal := Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := V) P hm
       exact IsLocalRing.eq_maximalIdeal hPm
-  exact ⟨V₁, inferInstance, inferInstance, inferInstance, ρ, t, ⟨hN₁, hIC₁, by assumption, by assumption⟩,
-    inferInstance, hinj, hloc, hfin, ht2⟩
+  exact ⟨
+    V₁,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    ρ,
+    t,
+    ⟨hN₁, hIC₁, by assumption, by assumption⟩,
+    inferInstance,
+    hinj,
+    hloc,
+    hfin,
+    ht2
+  ⟩
 
 end GlobalTheory.USep

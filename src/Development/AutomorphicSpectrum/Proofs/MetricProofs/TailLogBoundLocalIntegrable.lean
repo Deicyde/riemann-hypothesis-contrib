@@ -14,18 +14,25 @@ open MeasureTheory Filter Topology ReciprocityTheory.AnForm.M
 
 namespace GlobalTheory.CompanionTheory.Metric.LocTail
 
-theorem tailLog_on_compact_of_chart {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X]
-    [T2Space X] (A : FinHolAtlas e X) (Yo : Set X) (r : X → ℝ) (Φ : Fin e → LocPot X) (CE : ℝ)
+theorem tailLog_on_compact_of_chart
+    {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X]
+    (A : FinHolAtlas e X)
+    (Yo : Set X) (r : X → ℝ) (Φ : Fin e → LocPot X) (CE : ℝ)
     (hΦ : ∀ i, IsPotential A (Φ i)) (hr : ∀ x ∈ Yo, 1 ≤ r x)
     (hdens : ∀ j, ∀ y ∈ (A.chart j).target, (A.chart j).symm y ∈ Yo → 0 ≤ locDens A Φ j y)
     (hT : GroundTheory.Heights₂.Heights.AnalyticLimit.TailLogBound A Yo r Φ CE)
     (j : Fin A.n) (S : Set (Fin e → ℂ)) (hSt : S ⊆ (A.chart j).target) (hSc : IsCompact S)
-    (R₀ : ℝ) (hR₀ : Real.exp 1 ≤ R₀) :
-    IntegrableOn (fun y => (GroundTheory.Heights₂.Heights.AnalyticLimit.tail Yo r R₀).indicator
-      (fun x => Real.log (r x)) ((A.chart j).symm y) * locDens A Φ j y) S ∧
-    ∫ y in S, (GroundTheory.Heights₂.Heights.AnalyticLimit.tail Yo r R₀).indicator
-      (fun x => Real.log (r x)) ((A.chart j).symm y) * locDens A Φ j y ≤
-      CE * Real.log R₀ ^ (e + 1) / R₀ := by
+    (R₀ : ℝ) (hR₀ : Real.exp 1 ≤ R₀)
+    : IntegrableOn
+        (fun y =>
+          (GroundTheory.Heights₂.Heights.AnalyticLimit.tail Yo r R₀).indicator
+              (fun x => Real.log (r x))
+              ((A.chart j).symm y)
+            * locDens A Φ j y)
+        S
+      ∧ ∫ y in S, (GroundTheory.Heights₂.Heights.AnalyticLimit.tail Yo r R₀).indicator
+          (fun x => Real.log (r x)) ((A.chart j).symm y) * locDens A Φ j y
+        ≤ CE * Real.log R₀ ^ (e + 1) / R₀ := by
   classical
   obtain ⟨hI, hB⟩ := hT R₀ hR₀
   set h : X → ℝ := (GroundTheory.Heights₂.Heights.AnalyticLimit.tail Yo r R₀).indicator
@@ -64,8 +71,8 @@ theorem tailLog_on_compact_of_chart {e : ℕ} {X : Type} [TopologicalSpace X] [C
   have hne : Nonempty (ChartPartition A) := existsPartition A
   obtain ⟨hgt, hgI⟩ := integralWith_localize_support A hne.some Φ hΦ j g hg0 hint
   have hSint : ∫ z in ch.target, g (ch.symm z) * locDens A Φ j z = ∫ y in S, F y := by
-    rw [setIntegral_congr_fun ch.open_target.measurableSet hgF,
-      setIntegral_indicator hSm, Set.inter_eq_right.2 hSt]
+    rw [setIntegral_congr_fun ch.open_target.measurableSet hgF, setIntegral_indicator hSm,
+      Set.inter_eq_right.2 hSt]
   have hle : integralWith A hne.some Φ g ≤ integralWith A hne.some Φ h := by
     unfold integralWith
     refine Finset.sum_le_sum fun k _ => ?_
@@ -84,7 +91,9 @@ theorem tailLog_on_compact_of_chart {e : ℕ} {X : Type} [TopologicalSpace X] [C
         · rw [Set.indicator_of_mem hz, h1]
         · rw [Set.indicator_of_notMem hz]
       rw [h1, h2]
-  calc ∫ y in S, F y = integralWith A hne.some Φ g := by rw [hgI, hSint]
+  calc
+    ∫ y in S, F y
+      = integralWith A hne.some Φ g := by rw [hgI, hSint]
     _ ≤ integralWith A hne.some Φ h := hle
     _ = mInt A Φ h := by
       unfold mInt

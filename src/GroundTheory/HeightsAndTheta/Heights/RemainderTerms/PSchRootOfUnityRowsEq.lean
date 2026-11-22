@@ -15,8 +15,8 @@ open Complex
 theorem rootOfUnity_pow_self (k : ℕ) (hk : k ≠ 0) : rootOfUnity k ^ k = 1 :=
   (Complex.isPrimitiveRoot_exp k hk).pow_eq_one
 
-theorem rootOfUnity_pow_mod (k : ℕ) (hk : k ≠ 0) (a : ℕ) :
-    rootOfUnity k ^ a = rootOfUnity k ^ (a % k) := by
+theorem rootOfUnity_pow_mod (k : ℕ) (hk : k ≠ 0) (a : ℕ)
+    : rootOfUnity k ^ a = rootOfUnity k ^ (a % k) := by
   conv_lhs => rw [← Nat.mod_add_div a k, pow_add, pow_mul, rootOfUnity_pow_self k hk, one_pow,
     mul_one]
 

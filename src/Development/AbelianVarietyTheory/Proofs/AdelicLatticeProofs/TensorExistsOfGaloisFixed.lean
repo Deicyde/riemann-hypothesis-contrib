@@ -10,14 +10,23 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem tensor_exists_of_galois_fixed :
-    ∀ (F M E K : Type) [Field F] [CharZero F] [Field M] [Field E] [Algebra F M] [Algebra M E] [Algebra F E] [IsScalarTower F M E] [FiniteDimensional M E] [IsGalois M E] [CommRing K] [Algebra F K] (y : K ⊗[F] E), (∀ h : E ≃ₐ[M] E, Algebra.TensorProduct.map (AlgHom.id K K) ((h.restrictScalars F : E ≃ₐ[F] E) : E →ₐ[F] E) y = y) → ∃ z : K ⊗[F] M, Algebra.TensorProduct.map (AlgHom.id K K) (IsScalarTower.toAlgHom F M E) z = y := by
+theorem tensor_exists_of_galois_fixed
+    : ∀ (F M E K : Type) [Field F] [CharZero F] [Field M] [Field E] [Algebra F M] [Algebra M E]
+        [Algebra F E] [IsScalarTower F M E] [FiniteDimensional M E] [IsGalois M E] [CommRing K]
+        [Algebra F K] (y : K ⊗[F] E),
+      (∀ h : E ≃ₐ[M] E,
+          Algebra.TensorProduct.map (AlgHom.id K K) ((h.restrictScalars F : E ≃ₐ[F] E) : E →ₐ[F] E)
+              y
+            = y)
+        → ∃ z : K ⊗[F] M,
+          Algebra.TensorProduct.map (AlgHom.id K K) (IsScalarTower.toAlgHom F M E) z = y := by
   intro F M E K _ _ _ _ _ _ _ _ _ _ _ _ y hy
   classical
-  have key : ∀ x : K ⊗[F] E, ∃ z : K ⊗[F] M,
-      Algebra.TensorProduct.map (AlgHom.id K K) (IsScalarTower.toAlgHom F M E) z =
-      ∑ h : E ≃ₐ[M] E, Algebra.TensorProduct.map (AlgHom.id K K)
-        ((h.restrictScalars F : E ≃ₐ[F] E) : E →ₐ[F] E) x := by
+  have key
+      : ∀ x : K ⊗[F] E, ∃ z : K ⊗[F] M,
+        Algebra.TensorProduct.map (AlgHom.id K K) (IsScalarTower.toAlgHom F M E) z
+          = ∑ h : E ≃ₐ[M] E, Algebra.TensorProduct.map (AlgHom.id K K)
+              ((h.restrictScalars F : E ≃ₐ[F] E) : E →ₐ[F] E) x := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => exact ⟨0, by simp⟩

@@ -14,9 +14,13 @@ open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
 attribute [local instance 100] LieRing.ofAssociativeRing
 
-theorem highest_weight_dominant_pair {n : ℕ} {K V : Type*} [Field K] [CharZero K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] {E : GLOps n K V} (hE : IsGLRep E) {lam : Fin n → ℤ} {v : V}
-    (hv : IsHWV E lam v) {a b : Fin n} (hab : a < b) : lam b ≤ lam a := by
+theorem highest_weight_dominant_pair
+    {n : ℕ} {K V : Type*}
+    [Field K] [CharZero K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    {E : GLOps n K V} (hE : IsGLRep E)
+    {lam : Fin n → ℤ} {v : V} (hv : IsHWV E lam v)
+    {a b : Fin n} (hab : a < b)
+    : lam b ≤ lam a := by
   have hne : a ≠ b := ne_of_lt hab
   have hw := (mem_weightSpace_iff_diagonal_rep E lam v).1 hv.2.1
   have hhv : (E a a - E b b) v = ((lam a - lam b : ℤ) : K) • v := by
@@ -34,8 +38,7 @@ theorem highest_weight_dominant_pair {n : ℕ} {K V : Type*} [Field K] [CharZero
     · rw [sub_lie, Ring.lie_def, Ring.lie_def, hE.1 a a b a, hE.1 b b b a]
       simp [hne, hne.symm, two_smul]
       abel
-  have P : t.HasPrimitiveVectorWith v (((lam a - lam b : ℤ) : K)) :=
-    ⟨hv.1, hhv, hv.2.2 a b hab⟩
+  have P : t.HasPrimitiveVectorWith v (((lam a - lam b : ℤ) : K)) := ⟨hv.1, hhv, hv.2.2 a b hab⟩
   obtain ⟨m, hm⟩ := P.exists_nat
   have : lam a - lam b = (m : ℤ) := by exact_mod_cast hm
   omega

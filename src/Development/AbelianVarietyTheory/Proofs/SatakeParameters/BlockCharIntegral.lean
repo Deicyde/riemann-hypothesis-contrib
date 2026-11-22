@@ -8,7 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Continuou
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie GlobalTheory.SplitRead
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie
+  GlobalTheory.SplitRead
 
 noncomputable section
 
@@ -16,16 +19,18 @@ namespace GlobalTheory.SplitRead
 
 open Formalism.MainNotions.SumRepresentations.At
 
-theorem charpoly_fin_one {k : Type} [CommRing k] (M : Matrix (Fin 1) (Fin 1) k) :
-    M.charpoly = X - C (M 0 0) := by
+theorem charpoly_fin_one {k : Type} [CommRing k] (M : Matrix (Fin 1) (Fin 1) k)
+    : M.charpoly = X - C (M 0 0) := by
   simp [Matrix.charpoly, Matrix.det_fin_one, Matrix.charmatrix_apply]
 
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N)
 
 def blockShift (R : Ranks) : ℝ := ((R.t : ℝ) - 1) / 2 + (1 - (R.nV : ℝ)) / 2
 
-theorem blockChar_integral (hAut : TieAut N A) (hMu : MuInt N A) (i : N.Loc) (τ : H.E →+* ℂ) (z : ℂ)
-    (hz : z ∈ A.infG (A.tw (A.muC i) A.etaTinv) τ) : ∃ k : ℤ, z + ((blockShift R : ℝ) : ℂ) = (k : ℂ) := by
+theorem blockChar_integral
+    (hAut : TieAut N A) (hMu : MuInt N A)
+    (i : N.Loc) (τ : H.E →+* ℂ) (z : ℂ) (hz : z ∈ A.infG (A.tw (A.muC i) A.etaTinv) τ)
+    : ∃ k : ℤ, z + ((blockShift R : ℝ) : ℂ) = (k : ℂ) := by
   obtain ⟨a, ha⟩ := R.k_even
   obtain ⟨b, hb⟩ := R.m_even
   have h2 := R.two_le_m
@@ -52,17 +57,18 @@ theorem blockChar_integral (hAut : TieAut N A) (hMu : MuInt N A) (i : N.Loc) (τ
     exact ⟨m - c, by rw [hs]; push_cast; ring⟩
 
 theorem finite_placesOver (l : ℕ) (hl : l ≠ 0) : (placesOver H.E l).Finite := by
-  have h0 : Ideal.span {((l : ℕ) : 𝓞 H.E)} ≠ 0 := by
-    simpa using hl
+  have h0 : Ideal.span {((l : ℕ) : 𝓞 H.E)} ≠ 0 := by simpa using hl
   exact (Ideal.finite_factors h0).subset fun v hv => Ideal.dvd_span_singleton.2 hv
 
-theorem blockChar_eq (h5 : JacquetShalikaStrongMultOne N A) (i : N.Loc) (ρ : G H.E N.Om →* GL (Fin 1) (Qbar (N.l i)))
-    (hρ : ContQ N i ρ)
-    (hwd : ∀ w, w ∉ placesOver H.E (N.l i) →
-      A.wdOf i ρ w = A.lpTw (A.locG (A.tw (A.muC i) A.etaTinv) w) (blockShift R))
-    (g : G H.E N.Om) :
-    ((ρ g : GL (Fin 1) (Qbar (N.l i))) : Matrix (Fin 1) (Fin 1) (Qbar (N.l i))) 0 0 =
-      iotaOQ N A i (chi1 N i g) := by
+theorem blockChar_eq
+    (h5 : JacquetShalikaStrongMultOne N A)
+    (i : N.Loc) (ρ : G H.E N.Om →* GL (Fin 1) (Qbar (N.l i))) (hρ : ContQ N i ρ)
+    (hwd : ∀ w,
+      w ∉ placesOver H.E (N.l i)
+        → A.wdOf i ρ w = A.lpTw (A.locG (A.tw (A.muC i) A.etaTinv) w) (blockShift R))
+    (g : G H.E N.Om)
+    : ((ρ g : GL (Fin 1) (Qbar (N.l i))) : Matrix (Fin 1) (Fin 1) (Qbar (N.l i))) 0 0
+      = iotaOQ N A i (chi1 N i g) := by
   have hl : N.l i ≠ 0 := (Fact.out : (N.l i).Prime).ne_zero
   have hfin : (placesOver H.E (N.l i) ∪ ((N.S i : Set _) ∪ (N.Q i : Set _))).Finite :=
     (finite_placesOver (H := H) _ hl).union ((N.S i).finite_toSet.union (N.Q i).finite_toSet)
@@ -78,13 +84,14 @@ theorem blockChar_eq (h5 : JacquetShalikaStrongMultOne N A) (i : N.Loc) (ρ : G 
   obtain ⟨hwl, hwS, hwQ⟩ := hw
   have hso : SplitOut N i w := ⟨hsp, hwl, hwS, hwQ⟩
   obtain ⟨hu, hf⟩ := A.chi_mu i w hso
-  have hun : A.unr (A.wdOf i ρ w) := by
-    rw [hwd w hwl]; exact (A.unr_tw _ _).2 hu
+  have hun : A.unr (A.wdOf i ρ w) := by rw [hwd w hwl]; exact (A.unr_tw _ _).2 hu
   have e := A.wdOf_frob i ρ w hwl hρ hun B σ hB hσ
-  rw [hwd w hwl, show blockShift R = ((R.t : ℝ) - 1) / 2 + (1 - (R.nV : ℝ)) / 2 from rfl, hf B σ hB hσ,
-    charpoly_fin_one] at e
+  rw [hwd w hwl, show blockShift R = ((R.t : ℝ) - 1) / 2 + (1 - (R.nV : ℝ)) / 2 from rfl,
+      hf B σ hB hσ, charpoly_fin_one]
+    at e
   simp only [Multiset.map_singleton, Multiset.prod_singleton, Polynomial.map_sub, Polynomial.map_X,
-    Polynomial.map_C] at e
+      Polynomial.map_C]
+    at e
   have e2 := C_injective (sub_right_injective e)
   exact (A.iotaQC i).injective e2
 

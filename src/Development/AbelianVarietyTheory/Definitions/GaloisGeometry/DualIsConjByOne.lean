@@ -14,29 +14,30 @@ namespace GlobalTheory.ContraPair
 section
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-
 omit [NumberField E] [_root_.NumberField.IsTotallyComplex E] in
-def barK (k : Kinf E a) : Kinf E a :=
-  ⟨(star k.1)ᵀ, Matrix.mem_unitaryGroup_iff.2 (by
+def barK (k : Kinf E a) : Kinf E a := ⟨
+  (star k.1)ᵀ,
+  Matrix.mem_unitaryGroup_iff.2 (by
     have h : star k.1 * k.1 = 1 := Matrix.mem_unitaryGroup_iff'.1 k.2
     have e : star ((star k.1)ᵀ) = k.1ᵀ := by
       ext i j : 1
       simp [Matrix.star_apply]
     have h' : k.1 * star k.1 = 1 := Matrix.mem_unitaryGroup_iff.1 k.2
-    rw [e, ← Matrix.transpose_mul, h', Matrix.transpose_one])⟩
-
+    rw [e, ← Matrix.transpose_mul, h', Matrix.transpose_one])
+⟩
 
 omit [_root_.NumberField.IsTotallyComplex E] in
 def invTOp : Op E a → Op E a
   | .fin k => .fin (invT a (Af E) k)
   | .cpt k => .cpt (barK k)
-  | .lie X => .lie (toL (-(Matrix.of X)ᵀ))
+  | .lie X => .lie (toL (- (Matrix.of X)ᵀ))
 
 def Paired (π π' : CuspSub E a) (s : Op E a → Op E a) : Prop :=
-  ∃ B : π.V →ₗ[ℂ] π'.V →ₗ[ℂ] ℂ, (∀ φ, (∀ ψ, B φ ψ = 0) → φ = 0) ∧ (∀ ψ, (∀ φ, B φ ψ = 0) → ψ = 0) ∧
-    (∀ k φ ψ, B (π.op (.fin k) φ) (π'.op (s (.fin k)) ψ) = B φ ψ) ∧
-    (∀ k φ ψ, B (π.op (.cpt k) φ) (π'.op (s (.cpt k)) ψ) = B φ ψ) ∧
-    ∀ X φ ψ, B (π.op (.lie X) φ) ψ + B φ (π'.op (s (.lie X)) ψ) = 0
+  ∃ B : π.V →ₗ[ℂ] π'.V →ₗ[ℂ] ℂ,
+    (∀ φ, (∀ ψ, B φ ψ = 0) → φ = 0) ∧ (∀ ψ, (∀ φ, B φ ψ = 0) → ψ = 0)
+      ∧ (∀ k φ ψ, B (π.op (.fin k) φ) (π'.op (s (.fin k)) ψ) = B φ ψ)
+      ∧ (∀ k φ ψ, B (π.op (.cpt k) φ) (π'.op (s (.cpt k)) ψ) = B φ ψ)
+      ∧ ∀ X φ ψ, B (π.op (.lie X) φ) ψ + B φ (π'.op (s (.lie X)) ψ) = 0
 
 end
 

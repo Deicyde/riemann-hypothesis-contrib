@@ -14,40 +14,47 @@ section Minors
 
 variable {R : Type*} [CommRing R]
 
-def lenCoker (v : AddValuation R (WithTop ℝ)) {m h : ℕ} (B : Matrix (Fin m) (Fin h) R) :
-    WithTop ℝ :=
+def lenCoker (v : AddValuation R (WithTop ℝ)) {m h : ℕ} (B : Matrix (Fin m) (Fin h) R)
+    : WithTop ℝ :=
   Finset.univ.inf fun g : Fin m → Fin h => v (B.submatrix id g).det
 
 def fitt0 {m h : ℕ} (B : Matrix (Fin m) (Fin h) R) : Ideal R :=
   Ideal.span (Set.range fun g : Fin m → Fin h => (B.submatrix id g).det)
 
-theorem le_v_sum (v : AddValuation R (WithTop ℝ)) {ι : Type*} [DecidableEq ι] (s : Finset ι)
-    (f : ι → R) (g : WithTop ℝ) (hg : ∀ i ∈ s, g ≤ v (f i)) : g ≤ v (∑ i ∈ s, f i) := by
+theorem le_v_sum
+    (v : AddValuation R (WithTop ℝ))
+    {ι : Type*} [DecidableEq ι]
+    (s : Finset ι) (f : ι → R) (g : WithTop ℝ) (hg : ∀ i ∈ s, g ≤ v (f i))
+    : g ≤ v (∑ i ∈ s, f i) := by
   revert hg
   refine Finset.induction_on s (fun _ => by simp) ?_
   intro i s hi ih hg
   rw [Finset.sum_insert hi]
-  exact le_trans (le_min (hg i (Finset.mem_insert_self i s))
-    (ih fun j hj => hg j (Finset.mem_insert_of_mem hj))) (v.map_add _ _)
+  exact le_trans
+    (le_min (hg i (Finset.mem_insert_self i s)) (ih fun j hj => hg j (Finset.mem_insert_of_mem hj)))
+    (v.map_add _ _)
 
-theorem lenCoker_le_of_mem (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x)
-    {m h : ℕ} (B : Matrix (Fin m) (Fin h) R) {x : R} (hx : x ∈ fitt0 B) :
-    lenCoker v B ≤ v x := by
+theorem lenCoker_le_of_mem
+    (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x)
+    {m h : ℕ} (B : Matrix (Fin m) (Fin h) R)
+    {x : R} (hx : x ∈ fitt0 B)
+    : lenCoker v B ≤ v x := by
   unfold fitt0 at hx
   induction hx using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨g, rfl⟩ := hy
     exact Finset.inf_le (Finset.mem_univ g)
-  | zero => simp
-  | add a b _ _ ha hb => exact le_trans (le_min ha hb) (v.map_add a b)
+  | zero =>
+    simp
+  | add a b _ _ ha hb =>
+    exact le_trans (le_min ha hb) (v.map_add a b)
   | smul c a _ ha =>
     rw [smul_eq_mul, v.map_mul]
     exact le_trans ha (le_add_of_nonneg_left (hv c))
 
-theorem exists_topMinor_le (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x) (n : ℕ) :
-    ∀ (k : ℕ) (Y : Matrix (Fin (n + k)) (Fin (n + k)) R),
-      ∃ f : Fin n → Fin (n + k), StrictMono f ∧
-        v (Y.submatrix (Fin.castAdd k) f).det ≤ v Y.det := by
+theorem exists_topMinor_le (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x) (n : ℕ)
+    : ∀ (k : ℕ) (Y : Matrix (Fin (n + k)) (Fin (n + k)) R), ∃ f : Fin n → Fin (n + k),
+      StrictMono f ∧ v (Y.submatrix (Fin.castAdd k) f).det ≤ v Y.det := by
   intro k
   induction k with
   | zero =>
@@ -56,9 +63,10 @@ theorem exists_topMinor_le (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤
   | succ k ih =>
     intro Y
     have hexp := Matrix.det_succ_row Y (Fin.last (n + k))
-    obtain ⟨j, -, hj⟩ := Finset.exists_min_image Finset.univ
-      (fun j : Fin (n + k + 1) => v (Y.submatrix (Fin.last (n + k)).succAbove j.succAbove).det)
-      Finset.univ_nonempty
+    obtain ⟨j, -, hj⟩ :=
+      Finset.exists_min_image Finset.univ
+        (fun j : Fin (n + k + 1) => v (Y.submatrix (Fin.last (n + k)).succAbove j.succAbove).det)
+        Finset.univ_nonempty
     have hle : v (Y.submatrix (Fin.last (n + k)).succAbove j.succAbove).det ≤ v Y.det := by
       rw [hexp]
       apply le_v_sum
@@ -66,15 +74,20 @@ theorem exists_topMinor_le (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤
       rw [v.map_mul]
       exact le_trans (hj i (Finset.mem_univ _)) (le_add_of_nonneg_left (hv _))
     obtain ⟨f', hf', hle'⟩ := ih (Y.submatrix (Fin.last (n + k)).succAbove j.succAbove)
-    refine ⟨j.succAbove ∘ f', (Fin.strictMono_succAbove j).comp hf', le_trans (le_of_eq ?_) (le_trans hle' hle)⟩
+    refine ⟨
+      j.succAbove ∘ f',
+      (Fin.strictMono_succAbove j).comp hf',
+      le_trans (le_of_eq ?_) (le_trans hle' hle)
+    ⟩
     congr 2
     ext a b
     simp only [Matrix.submatrix_apply, Function.comp_apply, Fin.succAbove_last]
     congr 1
 
-theorem exists_strictMono_minor (v : AddValuation R (WithTop ℝ)) {n h : ℕ}
-    (B : Matrix (Fin n) (Fin h) R) (g : Fin n → Fin h) (hg : (B.submatrix id g).det ≠ 0) :
-    ∃ f : Fin n → Fin h, StrictMono f ∧ v (B.submatrix id f).det = v (B.submatrix id g).det := by
+theorem exists_strictMono_minor
+    (v : AddValuation R (WithTop ℝ))
+    {n h : ℕ} (B : Matrix (Fin n) (Fin h) R) (g : Fin n → Fin h) (hg : (B.submatrix id g).det ≠ 0)
+    : ∃ f : Fin n → Fin h, StrictMono f ∧ v (B.submatrix id f).det = v (B.submatrix id g).det := by
   have hinj : Function.Injective g := by
     by_contra hni
     apply hg
@@ -96,9 +109,11 @@ theorem exists_strictMono_minor (v : AddValuation R (WithTop ℝ)) {n h : ℕ}
   rw [hfe, Matrix.det_permute']
   rcases Int.units_eq_one_or (Equiv.Perm.sign τ) with h1 | h1 <;> simp [h1]
 
-theorem lenCoker_mul_le (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x) {n p h : ℕ}
-    (S : Matrix (Fin n) (Fin p) R) (W : Matrix (Fin p) (Fin n) R) (hSW : S * W = 1)
-    (α : Matrix (Fin p) (Fin h) R) : lenCoker v (S * α) ≤ lenCoker v α := by
+theorem lenCoker_mul_le
+    (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x)
+    {n p h : ℕ} (S : Matrix (Fin n) (Fin p) R) (W : Matrix (Fin p) (Fin n) R) (hSW : S * W = 1)
+    (α : Matrix (Fin p) (Fin h) R)
+    : lenCoker v (S * α) ≤ lenCoker v α := by
   unfold lenCoker
   refine Finset.le_inf fun g _ => ?_
   change (Finset.univ.inf fun g' : Fin n → Fin h => v ((S * α).submatrix id g').det) ≤ _
@@ -110,7 +125,8 @@ theorem lenCoker_mul_le (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v 
   have hWS : W * S * (W * S) = W * S := by
     rw [Matrix.mul_assoc, ← Matrix.mul_assoc S, hSW, Matrix.one_mul]
   have hQQ : Q * Q + W * S = 1 := by
-    rw [hQ, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one, Matrix.one_mul, hWS]
+    rw [hQ, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one,
+      Matrix.one_mul, hWS]
     abel
   let M := α.submatrix id g
   let Z' : Matrix (Fin n ⊕ Fin p) (Fin p ⊕ Fin n) R := Matrix.fromBlocks S 0 Q W
@@ -119,7 +135,8 @@ theorem lenCoker_mul_le (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v 
   let er : Fin n ⊕ Fin p ≃ Fin (n + p) := finSumFinEquiv
   let ec : Fin p ⊕ Fin n ≃ Fin (n + p) := (Equiv.sumComm (Fin p) (Fin n)).trans finSumFinEquiv
   have hZ : Z' * Zi = 1 := by
-    simp only [Z', Zi, Matrix.fromBlocks_multiply, Matrix.zero_mul, Matrix.mul_zero, add_zero, zero_add]
+    simp only [Z', Zi, Matrix.fromBlocks_multiply, Matrix.zero_mul, Matrix.mul_zero, add_zero,
+      zero_add]
     rw [hSW, hSQ, hQW, hQQ, Matrix.fromBlocks_one]
   have hZZ : Matrix.reindex er ec Z' * Matrix.reindex ec er Zi = 1 := by
     simp only [Matrix.reindex_apply]
@@ -128,16 +145,17 @@ theorem lenCoker_mul_le (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v 
     have h2 := congrArg v (congrArg Matrix.det hZZ)
     rw [Matrix.det_mul, Matrix.det_one, v.map_mul, v.map_one] at h2
     refine le_antisymm ?_ (hv _)
-    calc v (Matrix.reindex er ec Z').det
-        ≤ v (Matrix.reindex er ec Z').det + v (Matrix.reindex ec er Zi).det := le_add_of_nonneg_right (hv _)
+    calc
+      v (Matrix.reindex er ec Z').det
+          ≤ v (Matrix.reindex er ec Z').det + v (Matrix.reindex ec er Zi).det :=
+        le_add_of_nonneg_right (hv _)
       _ = 0 := h2
   let Y := Matrix.reindex er ec (Z' * Dm)
   have hdetY : Y.det = (Matrix.reindex er ec Z').det * M.det := by
     simp only [Y, Matrix.reindex_apply]
     rw [← Matrix.submatrix_mul_equiv Z' Dm er.symm ec.symm ec.symm, Matrix.det_mul,
       Matrix.det_submatrix_equiv_self, Matrix.det_fromBlocks_zero₂₁, Matrix.det_one, mul_one]
-  have hvY : v Y.det = v M.det := by
-    rw [hdetY, v.map_mul, hv0, zero_add]
+  have hvY : v Y.det = v M.det := by rw [hdetY, v.map_mul, hv0, zero_add]
   obtain ⟨f, -, hf⟩ := exists_topMinor_le v hv n p Y
   refine le_trans ?_ (hvY ▸ hf)
   by_cases hz : ∃ b c, ec.symm (f b) = Sum.inr c
@@ -171,8 +189,7 @@ def rho (l : ℕ) : ℝ := 1 / ((l : ℝ) ^ 2 - 1)
 def frobSum {d : ℕ} (l : ℕ) (p : ZMod d → ℕ) (τ : ZMod d) : ℝ :=
   ∑' k : ℕ, ((l : ℝ) ^ (k + 1))⁻¹ * (p (τ + ((k + 1 : ℕ) : ZMod d)) : ℝ)
 
-theorem one_div_eq_gam_add_rho {l : ℕ} (hl : 1 < l) :
-    1 / ((l : ℝ) - 1) = gam l + rho l := by
+theorem one_div_eq_gam_add_rho {l : ℕ} (hl : 1 < l) : 1 / ((l : ℝ) - 1) = gam l + rho l := by
   have h1 : (1 : ℝ) < l := by exact_mod_cast hl
   have h2 : (l : ℝ) - 1 ≠ 0 := by
     intro h
@@ -184,27 +201,33 @@ theorem one_div_eq_gam_add_rho {l : ℕ} (hl : 1 < l) :
   field_simp
   ring
 
-theorem parity_of_alt {d : ℕ} (big : ZMod d → Prop) (halt : ∀ b, big (b + 1) ↔ ¬ big b)
-    (a : ZMod d) (ha : big a) : ∀ k : ℕ, big (a + (k : ZMod d)) ↔ Even k := by
+theorem parity_of_alt
+    {d : ℕ} (big : ZMod d → Prop) (halt : ∀ b, big (b + 1) ↔ ¬ big b) (a : ZMod d) (ha : big a)
+    : ∀ k : ℕ, big (a + (k : ZMod d)) ↔ Even k := by
   intro k
   induction k with
   | zero => simp [ha]
   | succ k ih => rw [Nat.cast_succ, ← add_assoc, halt, ih, Nat.even_add_one]
 
-theorem frobSum_alt {d : ℕ} {l : ℕ} (hl : 1 < l) (n j j' : ℕ) (big : ZMod d → Prop)
-    (halt : ∀ b, big (b + 1) ↔ ¬ big b) (p : ZMod d → ℕ)
-    (hpb : ∀ b, big b → p b = n + j) (hps : ∀ b, ¬ big b → p b = j')
-    (a : ZMod d) (ha : big a) :
-    frobSum l p a = (j' : ℝ) * gam l + ((n : ℝ) + j) * rho l := by
+theorem frobSum_alt
+    {d : ℕ} {l : ℕ} (hl : 1 < l)
+    (n j j' : ℕ)
+    (big : ZMod d → Prop) (halt : ∀ b, big (b + 1) ↔ ¬ big b)
+    (p : ZMod d → ℕ) (hpb : ∀ b, big b → p b = n + j) (hps : ∀ b, ¬ big b → p b = j')
+    (a : ZMod d) (ha : big a)
+    : frobSum l p a = (j' : ℝ) * gam l + ((n : ℝ) + j) * rho l := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl
   have hlne : (l : ℝ) ≠ 0 := by positivity
   have h3 : (l : ℝ) ^ 2 - 1 ≠ 0 := by
     intro h
     nlinarith
   have hq0 : (0 : ℝ) ≤ ((l : ℝ)⁻¹) ^ 2 := by positivity
-  have hq1 : ((l : ℝ)⁻¹) ^ 2 < 1 := pow_lt_one₀ (by positivity) (inv_lt_one_of_one_lt₀ hl1) two_ne_zero
+  have hq1 : ((l : ℝ)⁻¹) ^ 2 < 1 :=
+    pow_lt_one₀ (by positivity) (inv_lt_one_of_one_lt₀ hl1) two_ne_zero
   have hpar := parity_of_alt big halt a ha
-  have hval : ∀ k : ℕ, (p (a + ((k + 1 : ℕ) : ZMod d)) : ℝ) = if Even k then (j' : ℝ) else (n : ℝ) + j := by
+  have hval
+      : ∀ k : ℕ,
+        (p (a + ((k + 1 : ℕ) : ZMod d)) : ℝ) = if Even k then (j' : ℝ) else (n : ℝ) + j := by
     intro k
     by_cases hk : Even k
     · have hb : ¬ big (a + ((k + 1 : ℕ) : ZMod d)) := by
@@ -217,30 +240,38 @@ theorem frobSum_alt {d : ℕ} {l : ℕ} (hl : 1 < l) (n j j' : ℕ) (big : ZMod 
       rw [hpb _ hb, if_neg hk]
       push_cast
       ring
-  have hF : (fun k : ℕ => ((l : ℝ) ^ (k + 1))⁻¹ * (p (a + ((k + 1 : ℕ) : ZMod d)) : ℝ)) =
-      fun k => ((l : ℝ) ^ (k + 1))⁻¹ * (if Even k then (j' : ℝ) else (n : ℝ) + j) :=
+  have hF
+      : (fun k : ℕ => ((l : ℝ) ^ (k + 1))⁻¹ * (p (a + ((k + 1 : ℕ) : ZMod d)) : ℝ))
+        = fun k => ((l : ℝ) ^ (k + 1))⁻¹ * (if Even k then (j' : ℝ) else (n : ℝ) + j) :=
     funext fun k => by rw [hval]
-  have hev : ∀ m : ℕ, ((l : ℝ) ^ (2 * m + 1))⁻¹ * (if Even (2 * m) then (j' : ℝ) else (n : ℝ) + j) =
-      ((j' : ℝ) * (l : ℝ)⁻¹) * (((l : ℝ)⁻¹) ^ 2) ^ m := by
+  have hev
+      : ∀ m : ℕ,
+        ((l : ℝ) ^ (2 * m + 1))⁻¹ * (if Even (2 * m) then (j' : ℝ) else (n : ℝ) + j)
+          = ((j' : ℝ) * (l : ℝ)⁻¹) * (((l : ℝ)⁻¹) ^ 2) ^ m := by
     intro m
     rw [if_pos (even_two_mul m), ← inv_pow, pow_succ, pow_mul]
     ring
-  have hod : ∀ m : ℕ, ((l : ℝ) ^ (2 * m + 1 + 1))⁻¹ * (if Even (2 * m + 1) then (j' : ℝ) else (n : ℝ) + j) =
-      (((n : ℝ) + j) * ((l : ℝ)⁻¹) ^ 2) * (((l : ℝ)⁻¹) ^ 2) ^ m := by
+  have hod
+      : ∀ m : ℕ,
+        ((l : ℝ) ^ (2 * m + 1 + 1))⁻¹ * (if Even (2 * m + 1) then (j' : ℝ) else (n : ℝ) + j)
+          = (((n : ℝ) + j) * ((l : ℝ)⁻¹) ^ 2) * (((l : ℝ)⁻¹) ^ 2) ^ m := by
     intro m
     rw [if_neg (Nat.not_even_two_mul_add_one m), ← inv_pow, pow_succ, pow_succ, pow_mul]
     ring
   have hs := summable_geometric_of_lt_one hq0 hq1
   unfold frobSum
-  rw [hF, ← tsum_even_add_odd (f := fun k : ℕ => ((l : ℝ) ^ (k + 1))⁻¹ * (if Even k then (j' : ℝ) else (n : ℝ) + j))
-    (by simp only [hev]; exact hs.mul_left _) (by simp only [hod]; exact hs.mul_left _)]
+  rw [hF,
+    ← tsum_even_add_odd
+      (f := fun k : ℕ => ((l : ℝ) ^ (k + 1))⁻¹ * (if Even k then (j' : ℝ) else (n : ℝ) + j))
+      (by simp only [hev]; exact hs.mul_left _) (by simp only [hod]; exact hs.mul_left _)]
   simp only [hev, hod, tsum_mul_left, tsum_geometric_of_lt_one hq0 hq1]
   unfold gam rho
   field_simp
   try ring
 
-theorem frobSum_const {d : ℕ} {l : ℕ} (hl : 1 < l) (P : ℕ) (p : ZMod d → ℕ) (hp : ∀ τ, p τ = P)
-    (a : ZMod d) : frobSum l p a = (P : ℝ) / ((l : ℝ) - 1) := by
+theorem frobSum_const
+    {d : ℕ} {l : ℕ} (hl : 1 < l) (P : ℕ) (p : ZMod d → ℕ) (hp : ∀ τ, p τ = P) (a : ZMod d)
+    : frobSum l p a = (P : ℝ) / ((l : ℝ) - 1) := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl
   have h0 : (0 : ℝ) ≤ (l : ℝ)⁻¹ := by positivity
   have h1 : (l : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ hl1
@@ -249,8 +280,10 @@ theorem frobSum_const {d : ℕ} {l : ℕ} (hl : 1 < l) (P : ℕ) (p : ZMod d →
     linarith
   have hlne : (l : ℝ) ≠ 0 := by positivity
   unfold frobSum
-  have hk : ∀ k : ℕ, ((l : ℝ) ^ (k + 1))⁻¹ * (p (a + ((k + 1 : ℕ) : ZMod d)) : ℝ) =
-      ((P : ℝ) * (l : ℝ)⁻¹) * ((l : ℝ)⁻¹) ^ k := by
+  have hk
+      : ∀ k : ℕ,
+        ((l : ℝ) ^ (k + 1))⁻¹ * (p (a + ((k + 1 : ℕ) : ZMod d)) : ℝ)
+          = ((P : ℝ) * (l : ℝ)⁻¹) * ((l : ℝ)⁻¹) ^ k := by
     intro k
     rw [hp, ← inv_pow, pow_succ]
     ring
@@ -264,13 +297,13 @@ section Derivatives
 
 variable {R : Type*} [CommRing R]
 
-def detOp {F : Type*} [AddCommGroup F] [Module R F] {n : ℕ}
-    (D : Fin n → Fin n → Module.End R F) : Module.End R F :=
+def detOp {F : Type*} [AddCommGroup F] [Module R F] {n : ℕ} (D : Fin n → Fin n → Module.End R F)
+    : Module.End R F :=
   ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : R) • (List.ofFn fun ρ => D ρ (σ ρ)).prod
 
-theorem ofFn_prod_apply {F : Type*} [AddCommGroup F] [Module R F] (g : F) :
-    ∀ {m : ℕ} (E : Fin m → Module.End R F) (s : Fin m → R), (∀ i, E i g = s i • g) →
-      (List.ofFn E).prod g = (∏ i, s i) • g := by
+theorem ofFn_prod_apply {F : Type*} [AddCommGroup F] [Module R F] (g : F)
+    : ∀ {m : ℕ} (E : Fin m → Module.End R F) (s : Fin m → R),
+      (∀ i, E i g = s i • g) → (List.ofFn E).prod g = (∏ i, s i) • g := by
   intro m
   induction m with
   | zero =>
@@ -284,33 +317,42 @@ theorem ofFn_prod_apply {F : Type*} [AddCommGroup F] [Module R F] (g : F) :
     congr 1
     ring
 
-theorem detOp_apply_eigen {F : Type*} [AddCommGroup F] [Module R F] {n : ℕ}
-    (D : Fin n → Fin n → Module.End R F) (a : Matrix (Fin n) (Fin n) R) (g : F)
-    (hD : ∀ ρ c, D ρ c g = a ρ c • g) : detOp D g = a.det • g := by
+theorem detOp_apply_eigen
+    {F : Type*} [AddCommGroup F] [Module R F]
+    {n : ℕ} (D : Fin n → Fin n → Module.End R F) (a : Matrix (Fin n) (Fin n) R)
+    (g : F) (hD : ∀ ρ c, D ρ c g = a ρ c • g)
+    : detOp D g = a.det • g := by
   unfold detOp
   rw [LinearMap.sum_apply, ← Matrix.det_transpose, Matrix.det_apply, Finset.sum_smul]
   refine Finset.sum_congr rfl fun σ _ => ?_
-  rw [LinearMap.smul_apply, ofFn_prod_apply g (fun ρ => D ρ (σ ρ)) (fun ρ => a ρ (σ ρ)) (fun ρ => hD ρ (σ ρ)),
-    smul_smul]
+  rw [LinearMap.smul_apply,
+    ofFn_prod_apply g (fun ρ => D ρ (σ ρ)) (fun ρ => a ρ (σ ρ)) (fun ρ => hD ρ (σ ρ)), smul_smul]
   simp [Matrix.transpose_apply, Units.smul_def]
 
-theorem detOp_pow_apply_eigen {F : Type*} [AddCommGroup F] [Module R F] {n : ℕ}
-    (D : Fin n → Fin n → Module.End R F) (a : Matrix (Fin n) (Fin n) R) (g : F)
-    (hD : ∀ ρ c, D ρ c g = a ρ c • g) (y : ℕ) : ((detOp D) ^ y) g = a.det ^ y • g := by
+theorem detOp_pow_apply_eigen
+    {F : Type*} [AddCommGroup F] [Module R F]
+    {n : ℕ} (D : Fin n → Fin n → Module.End R F) (a : Matrix (Fin n) (Fin n) R)
+    (g : F) (hD : ∀ ρ c, D ρ c g = a ρ c • g)
+    (y : ℕ)
+    : ((detOp D) ^ y) g = a.det ^ y • g := by
   induction y with
   | zero => simp
   | succ y ih =>
-    rw [pow_succ, Module.End.mul_apply, detOp_apply_eigen D a g hD, map_smul, ih, smul_smul, pow_succ]
+    rw [pow_succ, Module.End.mul_apply, detOp_apply_eigen D a g hD, map_smul, ih, smul_smul,
+      pow_succ]
     congr 1
     ring
 
-theorem derivation_prod {F : Type*} [CommRing F] [Algebra R F] {n : ℕ} (D : Derivation R F F)
-    (χ : Fin n → F) (b : Fin n → R) (hD : ∀ σ, D (χ σ) = b σ • χ σ) (s : Finset (Fin n)) :
-    D (∏ σ ∈ s, χ σ) = (∑ σ ∈ s, b σ) • ∏ σ ∈ s, χ σ := by
+theorem derivation_prod
+    {F : Type*} [CommRing F] [Algebra R F]
+    {n : ℕ} (D : Derivation R F F) (χ : Fin n → F) (b : Fin n → R) (hD : ∀ σ, D (χ σ) = b σ • χ σ)
+    (s : Finset (Fin n))
+    : D (∏ σ ∈ s, χ σ) = (∑ σ ∈ s, b σ) • ∏ σ ∈ s, χ σ := by
   refine Finset.induction_on s (by simp) ?_
   intro i s hi ih
   rw [Finset.prod_insert hi, Finset.sum_insert hi, Derivation.leibniz, ih, hD]
-  simp only [Algebra.smul_def, smul_eq_mul, map_add (f := _), Algebra.algebraMap_self, RingHom.id_apply]
+  simp only [Algebra.smul_def, smul_eq_mul, map_add (f := _), Algebra.algebraMap_self,
+    RingHom.id_apply]
   ring
 
 end Derivatives
@@ -319,27 +361,30 @@ section Main
 
 variable {R : Type*} [CommRing R]
 
-theorem ch_minor (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x) {n p h : ℕ}
-    (S : Matrix (Fin n) (Fin p) R) (W : Matrix (Fin p) (Fin n) R) (hSW : S * W = 1)
-    (α : Matrix (Fin p) (Fin h) R) (x : ℝ) (hx : lenCoker v α ≤ (x : WithTop ℝ)) :
-    ∃ f : Fin n → Fin h, StrictMono f ∧
-      v (Matrix.of fun k c => (S * α) c (f k)).det ≤ lenCoker v α ∧
-      ∀ (F : Type) [CommRing F] [Algebra R F] (D : Fin n → Fin n → Derivation R F F)
-        (χ : Fin n → F) (ev : F →ₐ[R] R),
-        (∀ ρ c σ, D ρ c (χ σ) = (if σ = ρ then (S * α) c (f ρ) else 0) • χ σ) →
-        (∀ σ, ev (χ σ) = 1) →
-        ∀ y : ℕ,
-          ev (((detOp fun ρ c => (D ρ c : F →ₗ[R] F)) ^ y) (∏ σ, χ σ)) =
-              (Matrix.of fun k c => (S * α) c (f k)).det ^ y ∧
-            v ((Matrix.of fun k c => (S * α) c (f k)).det ^ y) ≤
-              (((y : ℝ) * x : ℝ) : WithTop ℝ) := by
+theorem ch_minor
+    (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x)
+    {n p h : ℕ} (S : Matrix (Fin n) (Fin p) R) (W : Matrix (Fin p) (Fin n) R) (hSW : S * W = 1)
+    (α : Matrix (Fin p) (Fin h) R)
+    (x : ℝ) (hx : lenCoker v α ≤ (x : WithTop ℝ))
+    : ∃ f : Fin n → Fin h,
+      StrictMono f ∧ v (Matrix.of fun k c => (S * α) c (f k)).det ≤ lenCoker v α
+        ∧ ∀ (F : Type) [CommRing F] [Algebra R F] (D : Fin n → Fin n → Derivation R F F)
+            (χ : Fin n → F) (ev : F →ₐ[R] R),
+          (∀ ρ c σ, D ρ c (χ σ) = (if σ = ρ then (S * α) c (f ρ) else 0) • χ σ)
+            → (∀ σ, ev (χ σ) = 1)
+            → ∀ y : ℕ,
+              ev (((detOp fun ρ c => (D ρ c : F →ₗ[R] F)) ^ y) (∏ σ, χ σ))
+                  = (Matrix.of fun k c => (S * α) c (f k)).det ^ y
+                ∧ v ((Matrix.of fun k c => (S * α) c (f k)).det ^ y)
+                  ≤ (((y : ℝ) * x : ℝ) : WithTop ℝ) := by
   have h1 := lenCoker_mul_le v hv S W hSW α
   have hxt : lenCoker v α ≠ ⊤ := ne_top_of_le_ne_top WithTop.coe_ne_top hx
   have hSt : lenCoker v (S * α) ≠ ⊤ := ne_top_of_le_ne_top hxt h1
   rcases isEmpty_or_nonempty (Fin n → Fin h) with hE | hE
   · exact absurd (by simp [lenCoker, Finset.univ_eq_empty]) hSt
-  obtain ⟨g, -, hg⟩ := Finset.exists_mem_eq_inf Finset.univ Finset.univ_nonempty
-    (fun g : Fin n → Fin h => v ((S * α).submatrix id g).det)
+  obtain ⟨g, -, hg⟩ :=
+    Finset.exists_mem_eq_inf Finset.univ Finset.univ_nonempty
+      (fun g : Fin n → Fin h => v ((S * α).submatrix id g).det)
   have hgv : v ((S * α).submatrix id g).det = lenCoker v (S * α) := hg.symm
   have hdet : ((S * α).submatrix id g).det ≠ 0 := by
     intro h0
@@ -357,8 +402,11 @@ theorem ch_minor (v : AddValuation R (WithTop ℝ)) (hv : ∀ x, 0 ≤ v x) {n p
   set a : Matrix (Fin n) (Fin n) R := Matrix.of fun k c => (S * α) c (f k) with ha
   have hDa : ∀ ρ c, (D ρ c : F →ₗ[R] F) (∏ σ, χ σ) = a ρ c • ∏ σ, χ σ := by
     intro ρ c
-    have := derivation_prod (D ρ c) χ (fun σ => if σ = ρ then (S * α) c (f ρ) else 0)
-      (fun σ => hD ρ c σ) Finset.univ
+    have :=
+      derivation_prod (D ρ c) χ
+        (fun σ => if σ = ρ then (S * α) c (f ρ) else 0)
+        (fun σ => hD ρ c σ)
+        Finset.univ
     rw [Finset.sum_ite_eq'] at this
     simpa [ha] using this
   refine ⟨?_, ?_⟩

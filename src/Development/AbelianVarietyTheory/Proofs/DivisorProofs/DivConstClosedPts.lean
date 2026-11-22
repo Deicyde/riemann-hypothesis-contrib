@@ -11,24 +11,28 @@ open IsLocalRing Polynomial
 namespace GlobalTheory.VertUnits
 
 def DivConst (T O : Type) [CommRing T] [CommRing O] [Algebra T O] : Prop :=
-  ∀ (b c : O) (s : T), s ≠ 0 → b * c = algebraMap T O s →
-    ∃ (a : T) (w : Oˣ), b = algebraMap T O a * (w : O)
+  ∀ (b c : O) (s : T),
+    s ≠ 0 → b * c = algebraMap T O s → ∃ (a : T) (w : Oˣ), b = algebraMap T O a * (w : O)
 
 def DivConstAll : Prop :=
-  ∀ (T O : Type) [CommRing T] [IsDomain T] [IsLocalRing T] [CommRing O] [IsLocalRing O] [Algebra T O]
-    [Algebra (Polynomial T) O] [IsScalarTower T (Polynomial T) O], GlobalTheory.LocAcyc.AbsIntClosed T →
-    ∀ (P : Ideal (Polynomial T)) [P.IsPrime] (φ : Localization.AtPrime P →+* O),
-    φ.comp (algebraMap (Polynomial T) _) = algebraMap (Polynomial T) O →
-    GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation φ → DivConst T O
+  ∀ (T O : Type) [CommRing T] [IsDomain T] [IsLocalRing T] [CommRing O] [IsLocalRing O]
+      [Algebra T O] [Algebra (Polynomial T) O] [IsScalarTower T (Polynomial T) O],
+    GlobalTheory.LocAcyc.AbsIntClosed T
+      → ∀ (P : Ideal (Polynomial T)) [P.IsPrime] (φ : Localization.AtPrime P →+* O),
+        φ.comp (algebraMap (Polynomial T) _) = algebraMap (Polynomial T) O
+          → GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation φ
+          → DivConst T O
 
-def DivConstWith (S : ∀ (T : Type) [CommRing T] [IsLocalRing T], Ideal (Polynomial T) → Prop) :
-    Prop :=
-  ∀ (T O : Type) [CommRing T] [IsDomain T] [IsLocalRing T] [CommRing O] [IsLocalRing O] [Algebra T O]
-    [Algebra (Polynomial T) O] [IsScalarTower T (Polynomial T) O], GlobalTheory.LocAcyc.AbsIntClosed T →
-    ∀ (P : Ideal (Polynomial T)) [P.IsPrime] (φ : Localization.AtPrime P →+* O),
-    φ.comp (algebraMap (Polynomial T) _) = algebraMap (Polynomial T) O →
-    GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation φ →
-    P.comap (Polynomial.C : T →+* Polynomial T) = maximalIdeal T → S T P → DivConst T O
+def DivConstWith (S : ∀ (T : Type) [CommRing T] [IsLocalRing T], Ideal (Polynomial T) → Prop)
+    : Prop :=
+  ∀ (T O : Type) [CommRing T] [IsDomain T] [IsLocalRing T] [CommRing O] [IsLocalRing O]
+      [Algebra T O] [Algebra (Polynomial T) O] [IsScalarTower T (Polynomial T) O],
+    GlobalTheory.LocAcyc.AbsIntClosed T
+      → ∀ (P : Ideal (Polynomial T)) [P.IsPrime] (φ : Localization.AtPrime P →+* O),
+        φ.comp (algebraMap (Polynomial T) _) = algebraMap (Polynomial T) O
+          → GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsStrictHenselisation φ
+          → P.comap (Polynomial.C : T →+* Polynomial T) = maximalIdeal T → S T P
+          → DivConst T O
 
 def DivConstLocal : Prop := DivConstWith (fun _ _ _ _ => True)
 

@@ -10,16 +10,20 @@ open GlobalTheory.MomN
 
 namespace GlobalTheory
 
-theorem mahler_mul_of_disjoint_support :
-    ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] (ι' : Type) [Fintype ι'] [DecidableEq ι']
-      (u : ι' → V) (F H : V → ℂ), ContDiff ℂ ⊤ F → ContDiff ℂ ⊤ H → ∀ (S T : Finset ι'), Disjoint S T →
-      (∀ k : ι' → ℕ, (∃ p, p ∉ S ∧ k p ≠ 0) → GlobalTheory.MomN.mahler u F k = 0) →
-      (∀ k : ι' → ℕ, (∃ p, p ∉ T ∧ k p ≠ 0) → GlobalTheory.MomN.mahler u H k = 0) →
-      (∀ N : ι' → ℕ, (∃ p, p ∉ S ∪ T ∧ N p ≠ 0) → GlobalTheory.MomN.mahler u (fun z => F z * H z) N = 0) ∧
-      (∀ N : ι' → ℕ, (∀ p, p ∉ S ∪ T → N p = 0) →
-        GlobalTheory.MomN.mahler u (fun z => F z * H z) N =
-          GlobalTheory.MomN.mahler u F (fun p => if p ∈ S then N p else 0) *
-            GlobalTheory.MomN.mahler u H (fun p => if p ∈ T then N p else 0)) := by
+theorem mahler_mul_of_disjoint_support
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] (ι' : Type) [Fintype ι']
+        [DecidableEq ι'] (u : ι' → V) (F H : V → ℂ),
+      ContDiff ℂ ⊤ F → ContDiff ℂ ⊤ H
+        → ∀ (S T : Finset ι'),
+          Disjoint S T → (∀ k : ι' → ℕ, (∃ p, p ∉ S ∧ k p ≠ 0) → GlobalTheory.MomN.mahler u F k = 0)
+            → (∀ k : ι' → ℕ, (∃ p, p ∉ T ∧ k p ≠ 0) → GlobalTheory.MomN.mahler u H k = 0)
+            → (∀ N : ι' → ℕ,
+                (∃ p, p ∉ S ∪ T ∧ N p ≠ 0) → GlobalTheory.MomN.mahler u (fun z => F z * H z) N = 0)
+              ∧ (∀ N : ι' → ℕ,
+                (∀ p, p ∉ S ∪ T → N p = 0)
+                  → GlobalTheory.MomN.mahler u (fun z => F z * H z) N
+                    = GlobalTheory.MomN.mahler u F (fun p => if p ∈ S then N p else 0)
+                      * GlobalTheory.MomN.mahler u H (fun p => if p ∈ T then N p else 0)) := by
   intro V _ _ ι' _ _ u F H hF hH S T hST hFS hHT
   constructor
   · intro N ⟨p, hp, hNp⟩
@@ -34,8 +38,9 @@ theorem mahler_mul_of_disjoint_support :
   · intro N hN
     rw [GlobalTheory.T.mahlerJetCoefficient_mul V ι' u F H hF hH N]
     rw [Finset.sum_eq_single (fun p => if p ∈ S then N p else 0)]
-    · have hfun : (fun i => N i - (fun p => if p ∈ S then N p else 0) i) =
-          (fun p => if p ∈ T then N p else 0) := by
+    · have hfun
+          : (fun i => N i - (fun p => if p ∈ S then N p else 0) i)
+            = (fun p => if p ∈ T then N p else 0) := by
         funext p
         by_cases hS : p ∈ S
         · have hT : p ∉ T := Finset.disjoint_left.mp hST hS
@@ -44,8 +49,11 @@ theorem mahler_mul_of_disjoint_support :
           · simp only [hS, hT, if_true, if_false, Nat.sub_zero]
           · have h0 : N p = 0 := hN p (by simp [hS, hT])
             simp only [hS, hT, if_false, h0, Nat.sub_zero]
-      exact congrArg (fun g => GlobalTheory.MomN.mahler u F (fun p => if p ∈ S then N p else 0) *
-        GlobalTheory.MomN.mahler u H g) hfun
+      exact congrArg
+        (fun g =>
+          GlobalTheory.MomN.mahler u F (fun p => if p ∈ S then N p else 0)
+            * GlobalTheory.MomN.mahler u H g)
+        hfun
     · intro k hk hne
       by_contra hprod
       have h1 : GlobalTheory.MomN.mahler u F k ≠ 0 := left_ne_zero_of_mul hprod

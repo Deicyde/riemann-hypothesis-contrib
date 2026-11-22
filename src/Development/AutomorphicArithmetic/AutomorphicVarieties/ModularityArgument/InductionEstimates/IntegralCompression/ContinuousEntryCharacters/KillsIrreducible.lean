@@ -6,9 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Filter Topology Matrix
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
-open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.ArchWhittakerC
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1
+  PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA
 open scoped ComplexConjugate Classical InnerProductSpace
 
 private lemma fixed_integral {α E : Type*} [MeasurableSpace α] [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
@@ -87,19 +92,35 @@ private lemma occ_abs {G H A ι α : Type*} [Group G] [TopologicalSpace G] [Norm
       obtain ⟨c, hc⟩ := hun i m
       rw [map_smul, hc, hsw j _ (fun b => hcomm i j hne c b), hw]
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.occ :
-    ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (ι : Type) [Fintype ι] (C : Co K ι) (μ : Measure (G1 K 2)) [μ.IsHaarMeasure] (τ : Submodule ℂ (LL μ)), CuspIrr μ τ → ∀ (Z : Submodule ℂ (LL μ)) (s : Finset ι) (n : ι → ℕ) (q : ι → ℤ), Z ≤ τ → Z ≠ ⊥ → (∀ i a, ∀ v ∈ Z, rightRegularRep (Gam K 2) μ (C.gl i a) v ∈ Z) →
-      (∀ i n q, ∀ v ∈ Z, C.Pi μ i n q v ∈ Z) → (∀ i, ∃ v ∈ τ, C.Pi μ i (n i) (q i) v ≠ 0) → ∃ v ∈ Z, v ≠ 0 ∧ ∀ i ∈ s, C.Pi μ i (n i) (q i) v = v := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.EA.occ
+    : ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (ι : Type)
+        [Fintype ι] (C : Co K ι) (μ : Measure (G1 K 2)) [μ.IsHaarMeasure] (τ : Submodule ℂ (LL μ)),
+      CuspIrr μ τ
+        → ∀ (Z : Submodule ℂ (LL μ)) (s : Finset ι) (n : ι → ℕ) (q : ι → ℤ),
+          Z ≤ τ → Z ≠ ⊥ → (∀ i a, ∀ v ∈ Z, rightRegularRep (Gam K 2) μ (C.gl i a) v ∈ Z)
+            → (∀ i n q, ∀ v ∈ Z, C.Pi μ i n q v ∈ Z) → (∀ i, ∃ v ∈ τ, C.Pi μ i (n i) (q i) v ≠ 0)
+            → ∃ v ∈ Z, v ≠ 0 ∧ ∀ i ∈ s, C.Pi μ i (n i) (q i) v = v := by
   intro K _ _ _ ι _ C μ _ τ hτ Z s n q hZτ hZ hgl hPi hocc
   obtain ⟨-, -, hun, -, -, hcomm, -, hdec, -⟩ := coLaws K ι C
-  have hP' : ∀ i, ∃ P : LL μ →L[ℂ] LL μ, (∀ v, P v = C.Pi μ i (n i) (q i) v) ∧ P ∘L P = P ∧
-      ∀ h : G1 K 2, (∀ b, Commute h (C.gl i b)) → Commute P (rightRegularRep (Gam K 2) μ h) := fun i => by
+  have hP'
+      : ∀ i, ∃ P : LL μ →L[ℂ] LL μ,
+        (∀ v, P v = C.Pi μ i (n i) (q i) v) ∧ P ∘L P = P
+          ∧ ∀ h : G1 K 2,
+            (∀ b, Commute h (C.gl i b)) → Commute P (rightRegularRep (Gam K 2) μ h) := fun i => by
     obtain ⟨P, h₁, -, h₂, -, h₃, -⟩ := (piLaws K ι C μ).1 i (n i) (q i)
     exact ⟨P, h₁, h₂, h₃⟩
   choose P hPv hPP hPc using hP'
-  obtain ⟨v, hv, hv0, hvs⟩ := occ_abs (rightRegularRep (Gam K 2) μ) μK C.gl C.un (fun i => T (n i) (q i)) P τ Z hτ.closed hτ.inv hτ.irr
-    (fun i m => ⟨_, hun i m⟩) hcomm hdec hPP hPc (fun i v => hPv i v) hZτ hZ hgl
-    (fun i v hv => by rw [hPv]; exact hPi _ _ _ _ hv) (fun i => by
-      obtain ⟨v, hv, h⟩ := hocc i
-      exact ⟨v, hv, by rwa [hPv]⟩) s
+  obtain ⟨v, hv, hv0, hvs⟩ :=
+    occ_abs (rightRegularRep (Gam K 2) μ) μK C.gl C.un
+      (fun i => T (n i) (q i))
+      P τ Z hτ.closed hτ.inv hτ.irr
+      (fun i m => ⟨_, hun i m⟩)
+      hcomm hdec hPP hPc
+      (fun i v => hPv i v)
+      hZτ hZ hgl
+      (fun i v hv => by rw [hPv]; exact hPi _ _ _ _ hv)
+      (fun i => by
+        obtain ⟨v, hv, h⟩ := hocc i
+        exact ⟨v, hv, by rwa [hPv]⟩)
+      s
   exact ⟨v, hv, hv0, fun i hi => by rw [← hPv]; exact hvs i hi⟩

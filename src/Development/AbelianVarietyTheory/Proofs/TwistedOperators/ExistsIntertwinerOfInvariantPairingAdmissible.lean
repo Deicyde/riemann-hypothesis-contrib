@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -23,7 +26,8 @@ namespace GlobalTheory.InvPairing
 variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 variable {W : Type} [AddCommGroup W] [Module ℂ W]
 
-def stab {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (v : V) : Subgroup G where
+def stab {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (v : V)
+    : Subgroup G where
   carrier := {g | ρ g v = v}
   mul_mem' := by
     intro a b ha hb
@@ -36,8 +40,8 @@ def stab {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V
     conv_lhs => rw [← ha]
     rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
 
-theorem mem_fixed_iff (σ : Representation ℂ G W) (H : Subgroup G) (v : W) :
-    v ∈ GlobalTheory.PRep.fixed σ H ↔ ∀ h ∈ H, σ h v = v := by
+theorem mem_fixed_iff (σ : Representation ℂ G W) (H : Subgroup G) (v : W)
+    : v ∈ GlobalTheory.PRep.fixed σ H ↔ ∀ h ∈ H, σ h v = v := by
   constructor
   · intro hv h hh
     have := hv ⟨h, hh⟩
@@ -45,20 +49,26 @@ theorem mem_fixed_iff (σ : Representation ℂ G W) (H : Subgroup G) (v : W) :
   · intro hv h
     simpa using hv h h.2
 
-theorem exists_fixed_avg (σ : Representation ℂ G W) (hs : GlobalTheory.PRep.IsSmooth σ) (K : Subgroup G)
-    (hK : IsCompact (K : Set G)) (x : W) :
-    ∃ x₀ ∈ GlobalTheory.PRep.fixed σ K, ∀ ℓ : W →ₗ[ℂ] ℂ, (∀ k ∈ K, ∀ v, ℓ (σ k v) = ℓ v) → ℓ x = ℓ x₀ := by
+theorem exists_fixed_avg
+    (σ : Representation ℂ G W) (hs : GlobalTheory.PRep.IsSmooth σ)
+    (K : Subgroup G) (hK : IsCompact (K : Set G))
+    (x : W)
+    : ∃ x₀ ∈ GlobalTheory.PRep.fixed σ K, ∀ ℓ : W →ₗ[ℂ] ℂ,
+      (∀ k ∈ K, ∀ v, ℓ (σ k v) = ℓ v) → ℓ x = ℓ x₀ := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.mp hK
   have hSo : IsOpen ((stab σ x : Subgroup G) : Set G) := hs x
   haveI : Finite (K ⧸ (stab σ x).subgroupOf K) :=
     Subgroup.quotient_finite_of_isOpen _ (hSo.preimage continuous_subtype_val)
-  let f : K ⧸ (stab σ x).subgroupOf K → W := fun q => Quotient.liftOn' q (fun k : K => σ k x) (by
-    intro a b hab
-    rw [QuotientGroup.leftRel_apply, Subgroup.mem_subgroupOf] at hab
-    change σ ((a : G)⁻¹ * b) x = x at hab
-    show σ a x = σ b x
-    calc σ a x = σ a (σ ((a : G)⁻¹ * b) x) := by rw [hab]
-      _ = σ b x := by rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel_left])
+  let f : K ⧸ (stab σ x).subgroupOf K → W := fun q =>
+    Quotient.liftOn' q (fun k : K => σ k x) (by
+      intro a b hab
+      rw [QuotientGroup.leftRel_apply, Subgroup.mem_subgroupOf] at hab
+      change σ ((a : G)⁻¹ * b) x = x at hab
+      show σ a x = σ b x
+      calc
+        σ a x
+          = σ a (σ ((a : G)⁻¹ * b) x) := by rw [hab]
+        _ = σ b x := by rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel_left])
   have hrange : Set.range f = Set.range (fun k : K => σ k x) := by
     ext w
     constructor
@@ -93,7 +103,7 @@ theorem exists_fixed_avg (σ : Representation ℂ G W) (hs : GlobalTheory.PRep.I
   · rw [mem_fixed_iff]
     intro k hk
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_smul, map_sum, hperm k hk]
+    rw [map_smul, map_sum, hperm k hk]
   · intro ℓ hℓ
     have hconst : ∀ v ∈ O, ℓ v = ℓ x := by
       intro v hv
@@ -104,23 +114,26 @@ theorem exists_fixed_avg (σ : Representation ℂ G W) (hs : GlobalTheory.PRep.I
       have : 0 < O.card := Finset.card_pos.mpr ⟨x, hxO⟩
       exact_mod_cast this.ne'
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_smul, map_sum, Finset.sum_congr rfl hconst, Finset.sum_const, smul_eq_mul, nsmul_eq_mul,
+    rw [map_smul, map_sum, Finset.sum_congr rfl hconst, Finset.sum_const, smul_eq_mul, nsmul_eq_mul,
       ← mul_assoc, inv_mul_cancel₀ hcard, one_mul]
 
-theorem exists_rep (U : Submodule ℂ W) [FiniteDimensional ℂ U]
-    (B : W →ₗ[ℂ] W →ₛₗ[starRingEnd ℂ] ℂ) (hB : ∀ x, x ≠ 0 → 0 < (B x x).re) (f : U →ₗ[ℂ] ℂ) :
-    ∃ z : U, ∀ x : U, f x = B x z := by
-  let T : U →ₗ[ℝ] Module.Dual ℂ U :=
-    { toFun := fun z => (B.flip (z : W)).comp U.subtype
-      map_add' := by intro a b; ext x; simp
-      map_smul' := by
-        intro r z
-        ext x
-        simp only [RingHom.id_apply, LinearMap.smul_apply, LinearMap.comp_apply, LinearMap.flip_apply,
-          Submodule.coe_smul]
-        rw [RCLike.real_smul_eq_coe_smul (K := ℂ) r z, Submodule.coe_smul, LinearMap.map_smulₛₗ, Complex.real_smul,
-          RCLike.conj_ofReal, smul_eq_mul]
-        rfl }
+theorem exists_rep
+    (U : Submodule ℂ W) [FiniteDimensional ℂ U]
+    (B : W →ₗ[ℂ] W →ₛₗ[starRingEnd ℂ] ℂ) (hB : ∀ x, x ≠ 0 → 0 < (B x x).re)
+    (f : U →ₗ[ℂ] ℂ)
+    : ∃ z : U, ∀ x : U, f x = B x z := by
+  let T : U →ₗ[ℝ] Module.Dual ℂ U := {
+    toFun := fun z => (B.flip (z : W)).comp U.subtype
+    map_add' := by intro a b; ext x; simp
+    map_smul' := by
+      intro r z
+      ext x
+      simp only [RingHom.id_apply, LinearMap.smul_apply, LinearMap.comp_apply, LinearMap.flip_apply,
+        Submodule.coe_smul]
+      rw [RCLike.real_smul_eq_coe_smul (K := ℂ) r z, Submodule.coe_smul, LinearMap.map_smulₛₗ,
+        Complex.real_smul, RCLike.conj_ofReal, smul_eq_mul]
+      rfl
+  }
   have hinj : Function.Injective T := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro z hz
@@ -142,7 +155,16 @@ end GlobalTheory.InvPairing
 
 namespace GlobalTheory.InvPairing
 
-theorem exists_intertwiner : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (K : Subgroup G), IsOpen (K : Set G) → IsCompact (K : Set G) → ∀ (W W' : Type) [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W'] (σ : Representation ℂ G W) (σ' : Representation ℂ G W'), IsAdmissible σ → GlobalTheory.PRep.IsSmooth σ' → ∀ (B : W →ₗ[ℂ] W →ₛₗ[starRingEnd ℂ] ℂ) (C : W →ₗ[ℂ] W' →ₛₗ[starRingEnd ℂ] ℂ), (∀ x, x ≠ 0 → 0 < (B x x).re) → (∀ g x y, B (σ g x) (σ g y) = B x y) → (∀ g x y, C (σ g x) (σ' g y) = C x y) → ∃ φ : W' →ₗ[ℂ] W, (∀ g y, φ (σ' g y) = σ g (φ y)) ∧ ∀ x y, C x y = B x (φ y) := by
+theorem exists_intertwiner
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (K : Subgroup G),
+      IsOpen (K : Set G) → IsCompact (K : Set G)
+        → ∀ (W W' : Type) [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
+            (σ : Representation ℂ G W) (σ' : Representation ℂ G W'),
+          IsAdmissible σ → GlobalTheory.PRep.IsSmooth σ'
+            → ∀ (B : W →ₗ[ℂ] W →ₛₗ[starRingEnd ℂ] ℂ) (C : W →ₗ[ℂ] W' →ₛₗ[starRingEnd ℂ] ℂ),
+              (∀ x, x ≠ 0 → 0 < (B x x).re) → (∀ g x y, B (σ g x) (σ g y) = B x y)
+                → (∀ g x y, C (σ g x) (σ' g y) = C x y)
+                → ∃ φ : W' →ₗ[ℂ] W, (∀ g y, φ (σ' g y) = σ g (φ y)) ∧ ∀ x y, C x y = B x (φ y) := by
   intro G _ _ _ K hKo hKc W W' _ _ _ _ σ σ' hσ hσ' B C hB hBinv hCinv
   have huniq : ∀ z z' : W, (∀ x, B x z = B x z') → z = z' := by
     intro z z' h
@@ -159,19 +181,23 @@ theorem exists_intertwiner : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTo
     have hKo' : IsOpen (K' : Set G) := hKo.inter hSo
     have hKc' : IsCompact (K' : Set G) := hKc.inter_right (Subgroup.isClosed_of_isOpen _ hSo)
     haveI := hσ.2 K' hKo' hKc'
-    obtain ⟨z, hz⟩ := exists_rep (GlobalTheory.PRep.fixed σ K') B hB ((C.flip y).comp (GlobalTheory.PRep.fixed σ K').subtype)
+    obtain ⟨z, hz⟩ :=
+      exists_rep (GlobalTheory.PRep.fixed σ K') B hB
+        ((C.flip y).comp (GlobalTheory.PRep.fixed σ K').subtype)
     refine ⟨z, fun x => ?_⟩
     obtain ⟨x₀, hx₀, hℓ⟩ := exists_fixed_avg σ hσ.1 K' hKc' x
-    have e1 := hℓ (C.flip y) (fun k hk v => by
-      have hy : σ' k y = y := (Subgroup.mem_inf.mp hk).2
-      simp only [LinearMap.flip_apply]
-      conv_lhs => rw [← hy]
-      exact hCinv k v y)
-    have e2 := hℓ (B.flip z) (fun k hk v => by
-      have hz' : σ k z = z := (mem_fixed_iff σ K' z).mp z.2 k hk
-      simp only [LinearMap.flip_apply]
-      conv_lhs => rw [← hz']
-      exact hBinv k v z)
+    have e1 :=
+      hℓ (C.flip y) (fun k hk v => by
+        have hy : σ' k y = y := (Subgroup.mem_inf.mp hk).2
+        simp only [LinearMap.flip_apply]
+        conv_lhs => rw [← hy]
+        exact hCinv k v y)
+    have e2 :=
+      hℓ (B.flip z) (fun k hk v => by
+        have hz' : σ k z = z := (mem_fixed_iff σ K' z).mp z.2 k hk
+        simp only [LinearMap.flip_apply]
+        conv_lhs => rw [← hz']
+        exact hBinv k v z)
     simp only [LinearMap.flip_apply] at e1 e2
     rw [e1, e2]
     exact hz ⟨x₀, hx₀⟩

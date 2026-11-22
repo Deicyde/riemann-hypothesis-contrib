@@ -15,9 +15,11 @@ open Matrix
 
 namespace Formalism.L2.SG.RealObj.HermitianSumRootCoordinateFrames
 
-open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj.HermitianBlockSpans Formalism.L2.SG.RealObj.RootCoordinateFrames
+open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj.HermitianBlockSpans
+  Formalism.L2.SG.RealObj.RootCoordinateFrames
 
-theorem nxt_eq {n r : ℕ} (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (a : Fin r) : nxt e z a = fam e z a.succ := by
+theorem nxt_eq {n r : ℕ} (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (a : Fin r)
+    : nxt e z a = fam e z a.succ := by
   unfold nxt fam
   split_ifs with h
   · have hs : a.succ = Fin.castSucc ⟨a.1 + 1, h⟩ := Fin.ext (by simp)
@@ -25,16 +27,18 @@ theorem nxt_eq {n r : ℕ} (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (a 
   · have hs : a.succ = Fin.last r := Fin.ext (by simp; omega)
     rw [hs, Fin.snoc_last]
 
-theorem hJ_sum_left {n m : ℕ} (ε : Fin n → Bool) (c : Fin m → ℂ) (v : Fin m → Fin n → ℂ) (w : Fin n → ℂ) :
-    hJ ε (∑ i, c i • v i) w = ∑ i, star (c i) * hJ ε (v i) w := by
+theorem hJ_sum_left
+    {n m : ℕ} (ε : Fin n → Bool) (c : Fin m → ℂ) (v : Fin m → Fin n → ℂ) (w : Fin n → ℂ)
+    : hJ ε (∑ i, c i • v i) w = ∑ i, star (c i) * hJ ε (v i) w := by
   unfold hJ
   rw [star_sum, sum_dotProduct]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [star_smul, smul_dotProduct, smul_eq_mul]
 
-private theorem hJ_fintype_sum_smul_right {n : ℕ} {ι : Type} [Fintype ι] (ε : Fin n → Bool) (x : Fin n → ℂ)
-    (Q : ι → ℂ) (y : ι → Fin n → ℂ) :
-    hJ ε x (∑ c, Q c • y c) = ∑ c, Q c * hJ ε x (y c) := by
+private theorem hJ_fintype_sum_smul_right
+    {n : ℕ} {ι : Type} [Fintype ι]
+    (ε : Fin n → Bool) (x : Fin n → ℂ) (Q : ι → ℂ) (y : ι → Fin n → ℂ)
+    : hJ ε x (∑ c, Q c • y c) = ∑ c, Q c * hJ ε x (y c) := by
   unfold hJ
   rw [Matrix.mulVec_sum, dotProduct_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
@@ -45,7 +49,8 @@ theorem RootCoordFrame_holds : RootCoordFrame := by
   unfold rootCoord
   rw [nxt_eq, hP, hJ_fintype_sum_smul_right]
   rw [Finset.sum_eq_single a.castSucc]
-  · rw [show fam e z a.castSucc = e a from by unfold fam; exact Fin.snoc_castSucc _ _ _, hfe, if_pos rfl, mul_one]
+  · rw [show fam e z a.castSucc = e a from by unfold fam; exact Fin.snoc_castSucc _ _ _, hfe,
+      if_pos rfl, mul_one]
   · intro c _ hc
     refine Fin.lastCases ?_ (fun b hb => ?_) c hc
     · intro _
@@ -76,17 +81,24 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 theorem FrameAtV_holds : FrameAtV := by
   intro D X u v
-  have hc : ∀ p q : (VS D).V, hJ (X.B.I.ε v) (rv X.B.I v (X.crd p)) (rv X.B.I v (X.crd q)) =
-      embS D (X.pl v) ((VS D).hT p q) := fun p q => Formalism.L2.SG.PoincareInHH.Cut.hJ_crd (X := X) v p q
+  have hc
+      : ∀ p q : (VS D).V,
+        hJ (X.B.I.ε v) (rv X.B.I v (X.crd p)) (rv X.B.I v (X.crd q))
+          = embS D (X.pl v) ((VS D).hT p q) := fun p q =>
+    Formalism.L2.SG.PoincareInHH.Cut.hJ_crd (X := X) v p q
   have hs : ∀ p q : (VS D).V, (VS D).hT q p = starRingEnd D.host.E ((VS D).hT p q) := by
     intro p q
-    first
-    | exact ((VS D).herm.eq p q).symm
-    | exact ((VS D).herm p q).symm
+    first | exact ((VS D).herm.eq p q).symm | exact ((VS D).herm p q).symm
   simp only [HidaSetting.eR, HidaSetting.fR, HidaSetting.zR, hc]
-  refine ⟨fun a b => by rw [X.ee a b, map_zero], fun a b => by rw [X.ff a b, map_zero],
-    fun a b => ?_, fun a b => ?_,
-    fun a => ⟨by rw [(X.zu_orth u a).1, map_zero], by rw [(X.zu_orth u a).2, map_zero]⟩, ?_, ?_⟩
+  refine ⟨
+    fun a b => by rw [X.ee a b, map_zero],
+    fun a b => by rw [X.ff a b, map_zero],
+    fun a b => ?_,
+    fun a b => ?_,
+    fun a => ⟨by rw [(X.zu_orth u a).1, map_zero], by rw [(X.zu_orth u a).2, map_zero]⟩,
+    ?_,
+    ?_
+  ⟩
   · rw [X.ef a b]
     split_ifs <;> simp
   · rw [hs, X.ef b a]

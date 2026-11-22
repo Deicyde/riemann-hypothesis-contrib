@@ -7,17 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Coeffic
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 noncomputable section
 namespace GlobalTheory.IntDual
 
-theorem lattice_basis (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL]
-    [FiniteDimensional ℚ_[l] LL] :
-    ∃ (n : ℕ) (b : Basis (Fin n) ℚ_[l] LL),
-      (∀ i, ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem (b i)) ∧
-      ∀ x : LL, ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem x →
-        ∀ i, ∃ z : ℤ_[l], b.repr x i = (z : ℚ_[l]) := by
+theorem lattice_basis
+    (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [FiniteDimensional ℚ_[l] LL]
+    : ∃ (n : ℕ) (b : Basis (Fin n) ℚ_[l] LL),
+      (∀ i, ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem (b i))
+        ∧ ∀ x : LL,
+          ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem x
+            → ∀ i, ∃ z : ℤ_[l], b.repr x i = (z : ℚ_[l]) := by
   letI : Algebra ℤ_[l] LL := ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).toAlgebra
   haveI : IsScalarTower ℤ_[l] ℚ_[l] LL := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   let S := integralClosure ℤ_[l] LL
@@ -44,12 +46,14 @@ theorem lattice_basis (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra �
   · have := bO.localizationLocalization_repr_algebraMap ℚ_[l] (nonZeroDivisors ℤ_[l]) LL ⟨x, hx⟩ i
     exact ⟨bO.repr ⟨x, hx⟩ i, this⟩
 
-theorem intDual_coef : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
-    (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O →
-    ∃ (lam : LL →ₗ[ℚ_[l]] ℚ_[l]) (n : ℕ) (e f : Fin n → O),
-      (∀ z : ℤ_[l], ∃ o : O, algebraMap O LL o = algebraMap ℚ_[l] LL (z : ℚ_[l])) ∧
-      (∀ o : O, ∃ z : ℤ_[l], lam (algebraMap O LL o) = (z : ℚ_[l])) ∧
-      (∀ x : LL, x = ∑ i, lam (algebraMap O LL (f i) * x) • algebraMap O LL (e i)) := by
+theorem intDual_coef
+    : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+        (O : Type) [CommRing O] [Algebra O LL],
+      GoodO (Qp := ℚ_[l]) LL O
+        → ∃ (lam : LL →ₗ[ℚ_[l]] ℚ_[l]) (n : ℕ) (e f : Fin n → O),
+          (∀ z : ℤ_[l], ∃ o : O, algebraMap O LL o = algebraMap ℚ_[l] LL (z : ℚ_[l]))
+            ∧ (∀ o : O, ∃ z : ℤ_[l], lam (algebraMap O LL o) = (z : ℚ_[l]))
+            ∧ (∀ x : LL, x = ∑ i, lam (algebraMap O LL (f i) * x) • algebraMap O LL (e i)) := by
   intro l _ LL _ _ _ O _ _ hO
   have H := GlobalTheory.T.coefficient_ring_integers_compact_adic_properties l LL O hO
   obtain ⟨⟨hdom, hdvr, hfrac⟩, hfd, -, -, -⟩ := hO
@@ -79,17 +83,20 @@ theorem intDual_coef : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Alge
 
   let Zs : Subring ℚ_[l] := (algebraMap ℤ_[l] ℚ_[l]).range
   have hZ : ∀ q : ℚ_[l], q ∈ Zs ↔ ∃ z : ℤ_[l], q = (z : ℚ_[l]) := by
-    intro q; constructor
+    intro q
+    constructor
     · rintro ⟨z, hz⟩; exact ⟨z, hz.symm⟩
     · rintro ⟨z, hz⟩; exact ⟨z, hz.symm⟩
-  have hintO : ∀ o : O, ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem (ι o) :=
+  have hintO
+      : ∀ o : O, ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem (ι o) :=
     fun o => (hmem (ι o)).1 ⟨o, rfl⟩
   have hf'M : ∀ i (s : O), Tr (f' i * ι s) ∈ Zs := by
     intro i s
     obtain ⟨z, hz⟩ := hcoord (ι s) (hintO s) i
-    rw [hcoef, hZ]; exact ⟨z, hz⟩
-  obtain ⟨⟨c, hc⟩, hcint⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors O)
-    (Finset.univ : Finset (Fin n)) f'
+    rw [hcoef, hZ]
+    exact ⟨z, hz⟩
+  obtain ⟨⟨c, hc⟩, hcint⟩ :=
+    IsLocalization.exist_integer_multiples (nonZeroDivisors O) (Finset.univ : Finset (Fin n)) f'
   let D := ι c
   have hD : D ≠ 0 := by
     intro h0
@@ -99,20 +106,22 @@ theorem intDual_coef : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Alge
     obtain ⟨o, ho⟩ := hcint i (Finset.mem_univ i)
     exact ⟨o, by rw [ho, Algebra.smul_def]⟩
   choose o hoD using ho
-  let I : Ideal O :=
-    { carrier := {a | ∀ s : O, Tr (D⁻¹ * ι a * ι s) ∈ Zs}
-      add_mem' := by
-        intro a a' ha ha' s
-        have e : D⁻¹ * ι (a + a') * ι s = D⁻¹ * ι a * ι s + D⁻¹ * ι a' * ι s := by
-          rw [map_add (f := _)]; ring
-        rw [e, map_add (f := _)]; exact Zs.add_mem (ha s) (ha' s)
-      zero_mem' := by
-        intro s; simp only [map_zero, mul_zero, zero_mul]; exact Zs.zero_mem
-      smul_mem' := by
-        intro r a ha s
-        have e : D⁻¹ * ι (r • a) * ι s = D⁻¹ * ι a * ι (r * s) := by
-          rw [smul_eq_mul, map_mul, map_mul]; ring
-        rw [e]; exact ha (r * s) }
+  let I : Ideal O := {
+    carrier := {a | ∀ s : O, Tr (D⁻¹ * ι a * ι s) ∈ Zs}
+    add_mem' := by
+      intro a a' ha ha' s
+      have e : D⁻¹ * ι (a + a') * ι s = D⁻¹ * ι a * ι s + D⁻¹ * ι a' * ι s := by
+        rw [map_add (f := _)]; ring
+      rw [e, map_add (f := _)]
+      exact Zs.add_mem (ha s) (ha' s)
+    zero_mem' := by intro s; simp only [map_zero, mul_zero, zero_mul]; exact Zs.zero_mem
+    smul_mem' := by
+      intro r a ha s
+      have e : D⁻¹ * ι (r • a) * ι s = D⁻¹ * ι a * ι (r * s) := by
+        rw [smul_eq_mul, map_mul, map_mul]; ring
+      rw [e]
+      exact ha (r * s)
+  }
   have hoI : ∀ i, o i ∈ I := by
     intro i s
     show Tr (D⁻¹ * ι (o i) * ι s) ∈ Zs
@@ -137,7 +146,8 @@ theorem intDual_coef : ∀ (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Alge
   choose e he using he
   refine ⟨lam, n, e, a, fun z => ?_, fun y => ?_, fun x => ?_⟩
   · have hz : ((algebraMap ℚ_[l] LL).comp (algebraMap ℤ_[l] ℚ_[l])).IsIntegralElem
-        (algebraMap ℚ_[l] LL (z : ℚ_[l])) := RingHom.isIntegralElem_map _
+        (algebraMap ℚ_[l] LL (z : ℚ_[l])) :=
+      RingHom.isIntegralElem_map _
     exact (hmem _).2 hz
   · have h := hgI y
     rw [hZ] at h

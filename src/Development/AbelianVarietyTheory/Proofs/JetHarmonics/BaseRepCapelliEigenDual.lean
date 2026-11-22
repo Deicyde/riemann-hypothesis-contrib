@@ -17,17 +17,19 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NumericalFami
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.CoefZero
 
-
 open Matrix MeasureTheory Finset in
 open scoped InnerProductSpace ENNReal Matrix.Norms.Elementwise in
-theorem _root_.GlobalTheory.CoefZero.continuousOn_of_ckOn {k r : ℕ} {E : Type} [NormedAddCommGroup E]
-    [NormedSpace ℂ E] {m : ℕ∞}
-    {f : _root_.Formalism.FourierDecayAlt.B.Mat k r → E} (h : _root_.Formalism.FourierDecayAlt.B.CkOn m (_root_.Formalism.FourierDecayAlt.B.GV k r) f) : ContinuousOn f (_root_.Formalism.FourierDecayAlt.B.GV k r) := by
+theorem _root_.GlobalTheory.CoefZero.continuousOn_of_ckOn
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {m : ℕ∞} {f : _root_.Formalism.FourierDecayAlt.B.Mat k r → E}
+    (h : _root_.Formalism.FourierDecayAlt.B.CkOn m (_root_.Formalism.FourierDecayAlt.B.GV k r) f)
+    : ContinuousOn f (_root_.Formalism.FourierDecayAlt.B.GV k r) := by
   intro g₀ hg₀
   obtain ⟨U, f', hU, hgU, hf', hfeq⟩ := h g₀ hg₀
   have hc : ContinuousOn f' U := hf'.continuousOn

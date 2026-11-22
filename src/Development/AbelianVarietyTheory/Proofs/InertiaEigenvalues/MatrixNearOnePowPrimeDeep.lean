@@ -7,24 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MatrixO
 
 namespace GlobalTheory
 
-theorem matrix_near_one_pow_prime_deep : ∀ (l : ℕ) [Fact l.Prime] (n : Type) [Fintype n] [DecidableEq n]
-    (X : Matrix n n ℚ_[l]) (k : ℕ), (∀ i j, ‖(X - 1) i j‖ ≤ (l : ℝ) ^ (-2 : ℤ)) →
-    (∀ i j, ‖(X ^ l - 1) i j‖ ≤ (l : ℝ) ^ (-(((k + 1 : ℕ) : ℤ) + 2))) →
-    ∀ i j, ‖(X - 1) i j‖ ≤ (l : ℝ) ^ (-((k : ℤ) + 2)) := by
+theorem matrix_near_one_pow_prime_deep
+    : ∀ (l : ℕ) [Fact l.Prime] (n : Type) [Fintype n] [DecidableEq n] (X : Matrix n n ℚ_[l])
+        (k : ℕ),
+      (∀ i j, ‖(X - 1) i j‖ ≤ (l : ℝ) ^ (-2 : ℤ))
+        → (∀ i j, ‖(X ^ l - 1) i j‖ ≤ (l : ℝ) ^ (-(((k + 1 : ℕ) : ℤ) + 2)))
+        → ∀ i j, ‖(X - 1) i j‖ ≤ (l : ℝ) ^ (-((k : ℤ) + 2)) := by
   intro l hl n _ _ X k h1 h2 i j
-  have hL : (2:ℝ) ≤ l := by exact_mod_cast hl.out.two_le
-  have hLpos : (0:ℝ) < l := by linarith
+  have hL : (2 : ℝ) ≤ l := by exact_mod_cast hl.out.two_le
+  have hLpos : (0 : ℝ) < l := by linarith
   set u : ℝ := (l:ℝ)⁻¹ with hu
   have u0 : 0 < u := inv_pos.mpr hLpos
-  have uhalf : u ≤ 1 / 2 := by
-    rw [hu, one_div]; exact inv_anti₀ (by norm_num) hL
-  have hz : ∀ m : ℕ, (l:ℝ) ^ (-(m:ℤ)) = u ^ m := fun m => by
+  have uhalf : u ≤ 1 / 2 := by rw [hu, one_div]; exact inv_anti₀ (by norm_num) hL
+  have hz : ∀ m : ℕ, (l : ℝ) ^ (-(m : ℤ)) = u ^ m := fun m => by
     rw [zpow_neg, zpow_natCast, inv_pow]
-  have e2 : (l:ℝ) ^ (-2:ℤ) = u ^ 2 := hz 2
-  have e3 : (l:ℝ) ^ (-(((k + 1 : ℕ) : ℤ) + 2)) = u ^ (k + 3) := by
-    rw [← hz]; congr 1
-  have e4 : (l:ℝ) ^ (-((k : ℤ) + 2)) = u ^ (k + 2) := by
-    rw [← hz]; congr 1
+  have e2 : (l : ℝ) ^ (-2 : ℤ) = u ^ 2 := hz 2
+  have e3 : (l : ℝ) ^ (-(((k + 1 : ℕ) : ℤ) + 2)) = u ^ (k + 3) := by rw [← hz]; congr 1
+  have e4 : (l : ℝ) ^ (-((k : ℤ) + 2)) = u ^ (k + 2) := by rw [← hz]; congr 1
   rw [e4]
   set Y := X - 1 with hY
   haveI : Nonempty (n × n) := ⟨(i, j)⟩
@@ -40,7 +39,7 @@ theorem matrix_near_one_pow_prime_deep : ∀ (l : ℕ) [Fact l.Prime] (n : Type)
   have hX : (1 + Y) = X := by rw [hY]; abel
   rw [hX] at hR
   have key : ‖((l:ℚ_[l]) • Y) i0 j0‖ ≤ max (‖(X ^ l - 1) i0 j0‖) (t ^ 2) := by
-    have : ((l:ℚ_[l]) • Y) i0 j0 = (X ^ l - 1) i0 j0 - (X ^ l - 1 - (l:ℚ_[l]) • Y) i0 j0 := by
+    have : ((l : ℚ_[l]) • Y) i0 j0 = (X ^ l - 1) i0 j0 - (X ^ l - 1 - (l : ℚ_[l]) • Y) i0 j0 := by
       simp [Matrix.sub_apply]
     rw [this]
     have hu' : ∀ a b : ℚ_[l], ‖a - b‖ ≤ max ‖a‖ ‖b‖ := fun a b => by
@@ -50,8 +49,7 @@ theorem matrix_near_one_pow_prime_deep : ∀ (l : ℕ) [Fact l.Prime] (n : Type)
     rw [Matrix.smul_apply, smul_eq_mul, norm_mul, Padic.norm_p]
   rw [hnorm] at key
   rcases le_max_iff.mp key with h | h
-  · have h' : u * t ≤ u * u ^ (k + 2) := by
-      rw [← pow_succ', ← e3]; exact h.trans (h2 i0 j0)
+  · have h' : u * t ≤ u * u ^ (k + 2) := by rw [← pow_succ', ← e3]; exact h.trans (h2 i0 j0)
     exact le_of_mul_le_mul_left h' u0
   · rcases t0.eq_or_lt with h0 | h0
     · rw [← h0]; positivity

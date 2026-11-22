@@ -9,11 +9,10 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Kleiman
 
-theorem CechTop.idx_isEmpty (N i : ℕ) (hi : N < i) :
-    IsEmpty (Cech.Idx (Finset.univ : Finset (Fin (N + 1))) i) := by
+theorem CechTop.idx_isEmpty (N i : ℕ) (hi : N < i)
+    : IsEmpty (Cech.Idx (Finset.univ : Finset (Fin (N + 1))) i) := by
   refine ⟨fun I => ?_⟩
-  have h1 : I.1.1.card ≤ N + 1 := by
-    simpa using Finset.card_le_univ I.1.1
+  have h1 : I.1.1.card ≤ N + 1 := by simpa using Finset.card_le_univ I.1.1
   have h2 := I.2
   omega
 

@@ -7,14 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConstOn
 
 open GlobalTheory.UseLoc.Cases
 
-theorem _root_.UpperTheory.KN.exists_cyclic_generator_lam_power_quotient :
-    ∀ {O : Type} (LL : Type) [CommRing O] [Field LL] [Algebra O LL], Function.Injective (algebraMap O LL) →
-      ∀ (lam : O) (a : ℕ), algebraMap O LL lam ≠ 0 → ∃ x₀ : ↥(Xq LL lam a), ∀ x : ↥(Xq LL lam a), ∃ c : O, x = c • x₀ := by
+theorem _root_.UpperTheory.KN.exists_cyclic_generator_lam_power_quotient
+    : ∀ {O : Type} (LL : Type) [CommRing O] [Field LL] [Algebra O LL],
+      Function.Injective (algebraMap O LL)
+        → ∀ (lam : O) (a : ℕ),
+          algebraMap O LL lam ≠ 0
+            → ∃ x₀ : ↥(Xq LL lam a), ∀ x : ↥(Xq LL lam a), ∃ c : O, x = c • x₀ := by
   intro O LL _ _ _ _ lam a hlam
-  have hK : algebraMap O LL (lam ^ a) ≠ 0 := by
-    rw [map_pow]; exact pow_ne_zero _ hlam
-  have hmem : ∀ s : LL, Submodule.Quotient.mk (p := intO (O := O) LL) s ∈ Xq LL lam a ↔
-      ∃ c : O, algebraMap O LL c = lam ^ a • s := by
+  have hK : algebraMap O LL (lam ^ a) ≠ 0 := by rw [map_pow]; exact pow_ne_zero _ hlam
+  have hmem
+      : ∀ s : LL,
+        Submodule.Quotient.mk (p := intO (O := O) LL) s ∈ Xq LL lam a
+          ↔ ∃ c : O, algebraMap O LL c = lam ^ a • s := by
     intro s
     simp only [Xq, LinearMap.mem_ker, LinearMap.smul_apply, LinearMap.id_apply]
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
@@ -28,5 +32,6 @@ theorem _root_.UpperTheory.KN.exists_cyclic_generator_lam_power_quotient :
     have hs : s = c • (algebraMap O LL (lam ^ a))⁻¹ := by
       rw [Algebra.smul_def, hc, Algebra.smul_def, mul_comm (algebraMap O LL (lam ^ a)) s, mul_assoc,
         mul_inv_cancel₀ hK, mul_one]
-    change Submodule.Quotient.mk s = c • Submodule.Quotient.mk (p := intO (O := O) LL) (algebraMap O LL (lam ^ a))⁻¹
+    change Submodule.Quotient.mk s
+      = c • Submodule.Quotient.mk (p := intO (O := O) LL) (algebraMap O LL (lam ^ a))⁻¹
     rw [← Submodule.Quotient.mk_smul, ← hs]

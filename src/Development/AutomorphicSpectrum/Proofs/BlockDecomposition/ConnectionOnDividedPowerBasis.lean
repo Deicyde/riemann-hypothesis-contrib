@@ -7,7 +7,9 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 
 namespace GlobalTheory.CompanionTheory.QDerivative
 
@@ -41,8 +43,7 @@ lemma smul_mem_grade (e : Module.Basis ℕ B M) (I : ℕ → Ideal B) (r j : ℕ
     simpa using ha
   · simp [Finsupp.single_apply, h]
 
-noncomputable def shift (e : Module.Basis ℕ B M) : Module.End B M :=
-  e.constr B (fun k => e (k + 1))
+noncomputable def shift (e : Module.Basis ℕ B M) : Module.End B M := e.constr B (fun k => e (k + 1))
 
 @[simp] lemma shift_e (e : Module.Basis ℕ B M) (k : ℕ) : shift e (e k) = e (k + 1) := by
   simp [shift, Module.Basis.constr_basis]
@@ -207,7 +208,19 @@ lemma exists_eq_add_shift (e : Module.Basis ℕ B M) (z : M) :
   obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp ha
   exact ⟨c, z', hab.symm⟩
 
-theorem ker_and_surjective : ∀ {B M : Type} [CommRing B] [AddCommGroup M] [Module B M] (e : Module.Basis ℕ B M) (I : ℕ → Ideal B) (p : ℕ) (q : B) (ν : ℕ → B) (D : M →ₗ[B] M), p ≠ 0 → IsNilpotent (p : B) → IsNilpotent (q - 1) → (∀ a c, I a * I c ≤ I (a + c)) → (∀ a c, a ≤ c → I c ≤ I a) → ν 1 = 1 → (∀ m, ν (m + 1) ∈ I m) → (∀ m, 2 ≤ m → IsNilpotent (ν m)) → (∃ N, ∀ m, N ≤ m → ν m = 0) → (∀ k, D (e k) = (∑ i ∈ Finset.range k, q ^ i) • e k + ∑ m ∈ Finset.range k, (ν (m + 1) * q ^ (k - (m + 1))) • e (k - (m + 1))) → (∀ z, D z = 0 → ∃ c : B, z = c • e 0) ∧ ∀ (r : ℕ) (z : M), (∀ k, e.repr z k ∈ I (r - k)) → ∃ y, (∀ k, e.repr y k ∈ I (r + 1 - k)) ∧ D y = z := by
+theorem ker_and_surjective
+    : ∀ {B M : Type} [CommRing B] [AddCommGroup M] [Module B M] (e : Module.Basis ℕ B M)
+        (I : ℕ → Ideal B) (p : ℕ) (q : B) (ν : ℕ → B) (D : M →ₗ[B] M),
+      p ≠ 0 → IsNilpotent (p : B) → IsNilpotent (q - 1) → (∀ a c, I a * I c ≤ I (a + c))
+        → (∀ a c, a ≤ c → I c ≤ I a) → ν 1 = 1 → (∀ m, ν (m + 1) ∈ I m)
+        → (∀ m, 2 ≤ m → IsNilpotent (ν m)) → (∃ N, ∀ m, N ≤ m → ν m = 0)
+        → (∀ k,
+          D (e k)
+            = (∑ i ∈ Finset.range k, q ^ i) • e k
+              + ∑ m ∈ Finset.range k, (ν (m + 1) * q ^ (k - (m + 1))) • e (k - (m + 1)))
+        → (∀ z, D z = 0 → ∃ c : B, z = c • e 0)
+          ∧ ∀ (r : ℕ) (z : M),
+            (∀ k, e.repr z k ∈ I (r - k)) → ∃ y, (∀ k, e.repr y k ∈ I (r + 1 - k)) ∧ D y = z := by
   intro B M _ _ _ e I p q ν D hp0 hpn hqn hmul hanti hν1 hνI hνn hνN hD
   obtain ⟨J, hJ, hpJ, hqJ, hνJ⟩ := exists_nilpotent_ideal (p : B) q ν hpn hqn hνn hνN
   have hstable : ∀ y ∈ J • (⊤ : Submodule B M), (D * shift e - 1) y ∈ J • (⊤ : Submodule B M) := by
@@ -221,8 +234,8 @@ theorem ker_and_surjective : ∀ {B M : Type} [CommRing B] [AddCommGroup M] [Mod
       exact Submodule.add_mem _ hx hy
   have hVp : ∀ z, ((D * shift e - 1) ^ p) z ∈ J • (⊤ : Submodule B M) := by
     intro z
-    have h1 := pow_sub_mem _ (D * shift e - 1) (raise e) hstable
-      (sub_raise_mem e J q ν D hqJ hνJ hν1 hD) p z
+    have h1 :=
+      pow_sub_mem _ (D * shift e - 1) (raise e) hstable (sub_raise_mem e J q ν D hqJ hνJ hν1 hD) p z
     have h2 := raise_pow_mem e J p hp0 hpJ z
     have h3 := Submodule.add_mem _ h1 h2
     simpa using h3
@@ -247,8 +260,7 @@ theorem ker_and_surjective : ∀ {B M : Type} [CommRing B] [AddCommGroup M] [Mod
     obtain ⟨c, z', rfl⟩ := exists_eq_add_shift e z
     have hD0 : D (e 0) = 0 := by simpa using hD 0
     have hTz : T z' = 0 := by
-      have : D (c • e 0 + shift e z') = T z' := by
-        simp [hTdef, Module.End.mul_apply, hD0]
+      have : D (c • e 0 + shift e z') = T z' := by simp [hTdef, Module.End.mul_apply, hD0]
       rwa [this] at hz
     have hz' : z' = 0 := by
       have : (R * T) z' = z' := by rw [hRT]; rfl

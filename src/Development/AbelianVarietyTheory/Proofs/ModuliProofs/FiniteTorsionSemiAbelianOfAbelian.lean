@@ -9,18 +9,23 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.SemiAbe
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.TorsionFinite
 
-theorem finite_torsion_semiAbelian_of_abelian :
-    (∀ (K : Type) [Field K] [IsAlgClosed K] (B : Over (Sp K)) [GrpObj B], IsAbelianScheme B → ∀ n : ℕ, 1 ≤ n → Finite {x : 𝟙_ (Over (Sp K)) ⟶ B // x ^ n = 1}) → ∀ (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [GrpObj G], IsSemiAbelian G → ∀ n : ℕ, 0 < n → Finite {x : 𝟙_ (Over (Sp k)) ⟶ G // x ^ n = 1} := by
+theorem finite_torsion_semiAbelian_of_abelian
+    : (∀ (K : Type) [Field K] [IsAlgClosed K] (B : Over (Sp K)) [GrpObj B],
+        IsAbelianScheme B → ∀ n : ℕ, 1 ≤ n → Finite {x : 𝟙_ (Over (Sp K)) ⟶ B // x ^ n = 1})
+      → ∀ (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [GrpObj G],
+        IsSemiAbelian G → ∀ n : ℕ, 0 < n → Finite {x : 𝟙_ (Over (Sp k)) ⟶ G // x ^ n = 1} := by
   intro hB k _ _ G _ hG n hn
   haveI := hG.comm
   let t : Sp k ⟶ Sp k := 𝟙 _
-  have h := (semiAbelian_torsion_finite_and_closedPoint_finiteOrder hB).1 k
-    ((Over.pullback t).obj G) (hG.fibres k t) n hn
+  have h :=
+    (semiAbelian_torsion_finite_and_closedPoint_finiteOrder hB).1 k ((Over.pullback t).obj G)
+      (hG.fibres k t) n hn
   have hp := isGrpPullback_pullback G t
   have hbij : Function.Bijective (pushHom hp (𝟙_ (Over (Sp k)))) := by
     constructor
@@ -29,8 +34,8 @@ theorem finite_torsion_semiAbelian_of_abelian :
         congrArg (fun z => z.left) hxy
       exact Over.OverMorphism.ext (hp.1.hom_ext e ((Over.w x).trans (Over.w y).symm))
     · intro y
-      refine ⟨Over.homMk (hp.1.lift y.left (𝟙_ (Over (Sp k))).hom (Over.w y))
-        (hp.1.lift_snd _ _ _), ?_⟩
+      refine
+        ⟨Over.homMk (hp.1.lift y.left (𝟙_ (Over (Sp k))).hom (Over.w y)) (hp.1.lift_snd _ _ _), ?_⟩
       exact Over.OverMorphism.ext (hp.1.lift_fst _ _ _)
   let e := MulEquiv.ofBijective _ hbij
   have h2 : Finite {x : Over.mk ((𝟙_ (Over (Sp k))).hom ≫ t) ⟶ G // x ^ n = 1} := by

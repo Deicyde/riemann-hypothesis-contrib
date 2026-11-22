@@ -15,16 +15,29 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteAlg
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.Poinc
 
-theorem exists_integralClosure_isCN_finite_local : ∀ (V₀ : Type) [CommRing V₀] [IsDomain V₀] [IsLocalRing V₀], IsCN V₀ → ∀ (L : Type) [Field L] [Algebra (FractionRing V₀) L] [FiniteDimensional (FractionRing V₀) L], ∃ (V₁ : Type) (_ : CommRing V₁) (_ : IsDomain V₁) (_ : IsLocalRing V₁) (ρ : V₀ →+* V₁) (σ : L →+* FractionRing V₁), IsCN V₁ ∧ Function.Injective ρ ∧ ρ.Finite ∧ IsLocalHom ρ ∧ ∀ x : V₀, σ (algebraMap (FractionRing V₀) L (algebraMap V₀ (FractionRing V₀) x)) = algebraMap V₁ (FractionRing V₁) (ρ x) := by
+theorem exists_integralClosure_isCN_finite_local
+    : ∀ (V₀ : Type) [CommRing V₀] [IsDomain V₀] [IsLocalRing V₀],
+      IsCN V₀
+        → ∀ (L : Type) [Field L] [Algebra (FractionRing V₀) L]
+            [FiniteDimensional (FractionRing V₀) L],
+          ∃ (V₁ : Type) (_ : CommRing V₁) (_ : IsDomain V₁) (_ : IsLocalRing V₁) (ρ : V₀ →+* V₁)
+              (σ : L →+* FractionRing V₁),
+            IsCN V₁ ∧ Function.Injective ρ ∧ ρ.Finite ∧ IsLocalHom ρ
+              ∧ ∀ x : V₀,
+                σ (algebraMap (FractionRing V₀) L (algebraMap V₀ (FractionRing V₀) x))
+                  = algebraMap V₁ (FractionRing V₁) (ρ x) := by
   intro V₀ _ _ _ hV L _ _ _
   obtain ⟨hN, hIC, hC, hCZ⟩ := hV
   haveI := hN
@@ -48,7 +61,8 @@ theorem exists_integralClosure_isCN_finite_local : ∀ (V₀ : Type) [CommRing V
     intro a b h
     have h' := congrArg (algebraMap V₁ L) h
     rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply,
-      IsScalarTower.algebraMap_apply V₀ K₀ L, IsScalarTower.algebraMap_apply V₀ K₀ L b] at h'
+        IsScalarTower.algebraMap_apply V₀ K₀ L, IsScalarTower.algebraMap_apply V₀ K₀ L b]
+      at h'
     exact IsFractionRing.injective V₀ K₀ ((algebraMap K₀ L).injective h')
   haveI : CharZero V₁ := charZero_of_injective_algebraMap hinj
   haveI : IsLocalHom (algebraMap V₀ V₁) := by
@@ -61,10 +75,21 @@ theorem exists_integralClosure_isCN_finite_local : ∀ (V₀ : Type) [CommRing V
     exact hmem ha
   have hcompl : IsAdicComplete (maximalIdeal V₁) V₁ :=
     GlobalTheory.CompleteFiniteExtension.isAdicComplete_of_finite_local V₀ V₁
-  let e : L ≃ₐ[V₁] FractionRing V₁ := IsLocalization.algEquiv (nonZeroDivisors V₁) L (FractionRing V₁)
-  refine ⟨V₁, inferInstance, inferInstance, inferInstance, algebraMap V₀ V₁, e.toRingEquiv.toRingHom,
-    ⟨hN₁, inferInstance, hcompl, inferInstance⟩, hinj, RingHom.finite_algebraMap.mpr inferInstance,
-    inferInstance, fun x => ?_⟩
+  let e : L ≃ₐ[V₁] FractionRing V₁ :=
+    IsLocalization.algEquiv (nonZeroDivisors V₁) L (FractionRing V₁)
+  refine ⟨
+    V₁,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    algebraMap V₀ V₁,
+    e.toRingEquiv.toRingHom,
+    ⟨hN₁, inferInstance, hcompl, inferInstance⟩,
+    hinj,
+    RingHom.finite_algebraMap.mpr inferInstance,
+    inferInstance,
+    fun x => ?_
+  ⟩
   have hx : algebraMap K₀ L (algebraMap V₀ K₀ x) = algebraMap V₁ L (algebraMap V₀ V₁ x) := by
     rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
   simp only [RingEquiv.toRingHom_eq_coe, RingHom.coe_coe, AlgEquiv.coe_ringEquiv]

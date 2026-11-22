@@ -8,9 +8,10 @@ public import Development.AutomorphicArithmetic.CMTraceForms.CmDatumDiscriminant
 
 open NumberField Formalism.HC
 
-theorem UpperTheory.KR.small_vd_sum :
-    ∀ {φ : Frame} (H : HostAx φ), (∑ p ∈ H.small, (1 + H.vdH p / 2) * Real.log p ≤ 3 / 2 * Real.logb 2 H.QS) ∧ 2 ∈ H.small ∧
-      ∀ r : ℕ, r.Prime → r ∉ H.small → r ≠ H.q → r ≠ H.d → ¬ (r : ℤ) ∣ discr H.E := by
+theorem UpperTheory.KR.small_vd_sum
+    : ∀ {φ : Frame} (H : HostAx φ),
+      (∑ p ∈ H.small, (1 + H.vdH p / 2) * Real.log p ≤ 3 / 2 * Real.logb 2 H.QS) ∧ 2 ∈ H.small
+        ∧ ∀ r : ℕ, r.Prime → r ∉ H.small → r ≠ H.q → r ≠ H.d → ¬ (r : ℤ) ∣ discr H.E := by
   intro φ H
   obtain ⟨hsm, -, -, -, -⟩ := UpperTheory.cmDatum_discriminantDepth_bounds H
   refine ⟨?_, H.two_mem_small, ?_⟩
@@ -38,17 +39,19 @@ theorem UpperTheory.KR.small_vd_sum :
         linarith
       rw [le_div_iff₀ h2]
       nlinarith
-    calc ∑ p ∈ H.small, (1 + H.vdH p / 2) * Real.log p
-        ≤ ∑ p ∈ H.small, 3 / 2 * ((padicValNat p H.QS : ℝ) * Real.log p) := by
-          apply Finset.sum_le_sum
-          intro p hp
-          obtain ⟨hpp, hpd⟩ := (H.mem_small_iff).mp hp
-          haveI := Fact.mk hpp
-          have hv1 : (1 : ℝ) ≤ padicValNat p H.QS := by
-            exact_mod_cast (by simpa only [Nat.padicValNat_def] using one_le_padicValNat_of_dvd hQ0 hpd)
-          have hvd := (hsm p hp).1
-          have hlp : 0 ≤ Real.log p := Real.log_natCast_nonneg p
-          nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ 3 / 2 * padicValNat p H.QS - 1 - H.vdH p / 2) hlp]
+    calc
+      ∑ p ∈ H.small, (1 + H.vdH p / 2) * Real.log p
+          ≤ ∑ p ∈ H.small, 3 / 2 * ((padicValNat p H.QS : ℝ) * Real.log p) := by
+        apply Finset.sum_le_sum
+        intro p hp
+        obtain ⟨hpp, hpd⟩ := (H.mem_small_iff).mp hp
+        haveI := Fact.mk hpp
+        have hv1 : (1 : ℝ) ≤ padicValNat p H.QS := by
+          exact_mod_cast (by
+            simpa only [Nat.padicValNat_def] using one_le_padicValNat_of_dvd hQ0 hpd)
+        have hvd := (hsm p hp).1
+        have hlp : 0 ≤ Real.log p := Real.log_natCast_nonneg p
+        nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ 3 / 2 * padicValNat p H.QS - 1 - H.vdH p / 2) hlp]
       _ = 3 / 2 * Real.log H.QS := by rw [hlogQ, Finset.mul_sum]
       _ ≤ 3 / 2 * Real.logb 2 H.QS := by linarith
   · intro r hr hrs hrq hrd hdvd

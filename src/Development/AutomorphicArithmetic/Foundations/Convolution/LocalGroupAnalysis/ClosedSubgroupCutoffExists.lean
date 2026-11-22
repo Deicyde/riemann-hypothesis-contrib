@@ -10,12 +10,15 @@ open scoped ENNReal Pointwise
 
 namespace UpperTheory.ConvolutionTheory.G
 
-private theorem exists_bump {X : Type} [Group X] [TopologicalSpace X] [IsTopologicalGroup X]
-    [LocallyCompactSpace X] [T2Space X] [SecondCountableTopology X]
-    (H : Subgroup X) (hH : IsClosed (H : Set X)) :
-    ∃ β : X → ℝ, Continuous β ∧ (∀ x, 0 ≤ β x) ∧ (∀ x, ∃ h ∈ H, β (h * x) ≠ 0) ∧
-      ∀ C : Set X, IsCompact C → ∃ C' : Set X, IsCompact C' ∧
-        ∀ h ∈ H, ∀ x ∈ C, β (h * x) ≠ 0 → h * x ∈ C' := by
+private theorem exists_bump
+    {X : Type} [Group X] [TopologicalSpace X] [IsTopologicalGroup X] [LocallyCompactSpace X]
+    [T2Space X] [SecondCountableTopology X]
+    (H : Subgroup X) (hH : IsClosed (H : Set X))
+    : ∃ β : X → ℝ,
+      Continuous β ∧ (∀ x, 0 ≤ β x) ∧ (∀ x, ∃ h ∈ H, β (h * x) ≠ 0)
+        ∧ ∀ C : Set X,
+          IsCompact C
+            → ∃ C' : Set X, IsCompact C' ∧ ∀ h ∈ H, ∀ x ∈ C, β (h * x) ≠ 0 → h * x ∈ C' := by
   classical
   let K : CompactExhaustion X := (CompactExhaustion.choice X).shiftr.shiftr
   have hK0 : K 0 = ∅ := rfl
@@ -31,15 +34,17 @@ private theorem exists_bump {X : Type} [Group X] [TopologicalSpace X] [IsTopolog
   choose f hf1 hf0 hfc hfI using fun m =>
     exists_continuous_one_zero_of_isCompact (hQ m) (hSc m) (hd m)
   have hself : ∀ m, K m ⊆ S m := fun m x hx => ⟨1, H.one_mem, x, hx, one_mul x⟩
-  have hSmono : ∀ {a b : ℕ}, a ≤ b → S a ⊆ S b := fun hab =>
-    Set.mul_subset_mul_left (K.subset hab)
+  have hSmono : ∀ {a b : ℕ}, a ≤ b → S a ⊆ S b := fun hab => Set.mul_subset_mul_left (K.subset hab)
   have hvan : ∀ {N m : ℕ}, N ≤ m → ∀ x ∈ S N, f m x = 0 := fun hNm x hx => hf0 _ (hSmono hNm hx)
   have hnn : ∀ m x, 0 ≤ f m x := fun m x => (hfI m x).1
   have hlf : LocallyFinite fun m => Function.support (f m) := by
     intro x
     obtain ⟨n, hn⟩ := K.exists_mem x
-    refine ⟨interior (K (n + 1)), isOpen_interior.mem_nhds (K.subset_interior_succ n hn),
-      (Set.finite_lt_nat (n + 1)).subset ?_⟩
+    refine ⟨
+      interior (K (n + 1)),
+      isOpen_interior.mem_nhds (K.subset_interior_succ n hn),
+      (Set.finite_lt_nat (n + 1)).subset ?_
+    ⟩
     rintro m ⟨y, hy, hyU⟩
     by_contra hm
     exact hy (hvan (not_lt.1 hm) y (hself _ (interior_subset hyU)))
@@ -50,8 +55,13 @@ private theorem exists_bump {X : Type} [Group X] [TopologicalSpace X] [IsTopolog
     intro m hm
     by_contra hmn
     exact hm (hvan (not_lt.1 hmn) x (hself _ hn))
-  refine ⟨fun x => ∑ᶠ m, f m x, continuous_finsum (fun m => (f m).continuous) hlf,
-    fun x => finsum_nonneg fun m => hnn m x, ?_, ?_⟩
+  refine ⟨
+    fun x => ∑ᶠ m, f m x,
+    continuous_finsum (fun m => (f m).continuous) hlf,
+    fun x => finsum_nonneg fun m => hnn m x,
+    ?_,
+    ?_
+  ⟩
   · intro x
     have hex : ∃ n, x ∈ O n := by
       obtain ⟨n, hn⟩ := K.exists_mem x
@@ -82,8 +92,11 @@ private theorem exists_bump {X : Type} [Group X] [TopologicalSpace X] [IsTopolog
     linarith
   · intro C hC
     obtain ⟨N, hN⟩ := K.exists_superset_of_isCompact hC
-    refine ⟨⋃ m ∈ Finset.range N, tsupport (f m),
-      (Finset.range N).isCompact_biUnion fun m _ => hfc m, ?_⟩
+    refine ⟨
+      ⋃ m ∈ Finset.range N, tsupport (f m),
+      (Finset.range N).isCompact_biUnion fun m _ => hfc m,
+      ?_
+    ⟩
     intro h hh x hx hne
     obtain ⟨m, hm⟩ : ∃ m, f m (h * x) ≠ 0 := by
       by_contra hall
@@ -96,14 +109,14 @@ private theorem exists_bump {X : Type} [Group X] [TopologicalSpace X] [IsTopolog
 
 end UpperTheory.ConvolutionTheory.G
 
-theorem UpperTheory.ConvolutionTheory.G.closedSubgroup_cutoff_exists :
-    Q2 := by
+theorem UpperTheory.ConvolutionTheory.G.closedSubgroup_cutoff_exists : Q2 := by
   intro X T _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ν _ _ i hi
   have hH : IsClosed ((i.range : Subgroup X) : Set X) := by
     rw [MonoidHom.coe_range]; exact hi.isClosed_range
   obtain ⟨β, hβ, hβ0, hcov, hsupp⟩ := UpperTheory.ConvolutionTheory.G.exists_bump i.range hH
-  have hB : ∀ C : Set X, IsCompact C → ∃ B : Set T, IsCompact B ∧
-      ∀ t, ∀ x ∈ C, β (i t * x) ≠ 0 → t ∈ B := by
+  have hB
+      : ∀ C : Set X,
+        IsCompact C → ∃ B : Set T, IsCompact B ∧ ∀ t, ∀ x ∈ C, β (i t * x) ≠ 0 → t ∈ B := by
     intro C hC
     obtain ⟨C', hC', h⟩ := hsupp C hC
     refine ⟨i ⁻¹' (C' * C⁻¹), hi.isCompact_preimage (hC'.mul hC.inv), fun t x hx hne => ?_⟩
@@ -134,26 +147,32 @@ theorem UpperTheory.ConvolutionTheory.G.closedSubgroup_cutoff_exists :
   have hDpos : ∀ x, 0 < D x := by
     intro x
     obtain ⟨h, ⟨t₀, rfl⟩, hne⟩ := hcov x
-    exact (hcx x).integral_pos_of_hasCompactSupport_nonneg_nonzero (hcs x)
-      (fun t => hβ0 _) hne
+    exact (hcx x).integral_pos_of_hasCompactSupport_nonneg_nonzero (hcs x) (fun t => hβ0 _) hne
   have hDinv : ∀ s x, D (i s * x) = D x := by
     intro s x
     have := integral_mul_right_eq_self (μ := ν) (fun t => β (i t * x)) s
     simpa [D, mul_assoc] using this
-  refine ⟨fun x => Real.toNNReal (β x / D x),
-    continuous_real_toNNReal.comp (hβ.div hDc fun x => (hDpos x).ne'), ⟨?_, ?_⟩, ?_⟩
-  · exact (ENNReal.continuous_coe.comp
-      (continuous_real_toNNReal.comp (hβ.div hDc fun x => (hDpos x).ne'))).measurable
+  refine ⟨
+    fun x => Real.toNNReal (β x / D x),
+    continuous_real_toNNReal.comp (hβ.div hDc fun x => (hDpos x).ne'),
+    ⟨?_, ?_⟩,
+    ?_
+  ⟩
+  · exact (ENNReal.continuous_coe.comp (continuous_real_toNNReal.comp (hβ.div hDc fun x =>
+      (hDpos x).ne'))).measurable
   · intro x
     have hint : Integrable (fun t => β (i t * x) / D x) ν :=
       ((hcx x).integrable_of_hasCompactSupport (hcs x)).div_const _
-    have h1 : ∫⁻ t, ((Real.toNNReal (β (i t * id x) / D (i t * id x)) : NNReal) : ℝ≥0∞) ∂ν =
-        ∫⁻ t, ENNReal.ofReal (β (i t * x) / D x) ∂ν := by
+    have h1
+        : ∫⁻ t, ((Real.toNNReal (β (i t * id x) / D (i t * id x)) : NNReal) : ℝ≥0∞) ∂ν
+          = ∫⁻ t, ENNReal.ofReal (β (i t * x) / D x) ∂ν := by
       refine lintegral_congr fun t => ?_
       simp only [id, hDinv]
       rfl
-    rw [h1, ← ofReal_integral_eq_lintegral_ofReal hint
-      (Filter.Eventually.of_forall fun t => div_nonneg (hβ0 _) (hDpos x).le), integral_div]
+    rw [h1,
+      ← ofReal_integral_eq_lintegral_ofReal hint
+        (Filter.Eventually.of_forall fun t => div_nonneg (hβ0 _) (hDpos x).le),
+      integral_div]
     change ENNReal.ofReal (D x / D x) = 1
     rw [div_self (hDpos x).ne', ENNReal.ofReal_one]
   · intro C hC

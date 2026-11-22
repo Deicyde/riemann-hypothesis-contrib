@@ -18,7 +18,6 @@ instance (n : ℕ) : DecidableEq (Idx n) := inferInstanceAs (DecidableEq (Fin n)
 
 structure Frame where
   e : ℕ
-
   ord : ℕ
   grp : AddCommGroup (Idx ord)
   h0 : letI := grp; Idx ord →+ Additive (HGrp e)
@@ -38,27 +37,22 @@ instance : DecidableEq φ.A := inferInstanceAs (DecidableEq (Idx φ.ord))
 
 def A.val {φ : Frame} (t : φ.A) : ℕ := Fin.val (n := φ.ord) t
 
-theorem A.val_lt {φ : Frame} (t : φ.A) : t.val < φ.ord := by
-  exact Fin.is_lt (n := φ.ord) t
+theorem A.val_lt {φ : Frame} (t : φ.A) : t.val < φ.ord := by exact Fin.is_lt (n := φ.ord) t
 
 theorem A.val_injective (φ : Frame) : Function.Injective (A.val : φ.A → ℕ) := by
   exact fun s t h => Fin.ext h
 
 def A.ofVal {φ : Frame} (u : ℕ) (hu : u < φ.ord) : φ.A := (⟨u, hu⟩ : Fin φ.ord)
 
-theorem card_A : Fintype.card φ.A = φ.ord := by
-  exact Fintype.card_fin φ.ord
+theorem card_A : Fintype.card φ.A = φ.ord := by exact Fintype.card_fin φ.ord
 
-theorem natCard_A : Nat.card φ.A = φ.ord := by
-  rw [Nat.card_eq_fintype_card, card_A]
+theorem natCard_A : Nat.card φ.A = φ.ord := by rw [Nat.card_eq_fintype_card, card_A]
 
-theorem ord_pos : 0 < φ.ord := by
-  exact Fin.pos (n := φ.ord) (0 : φ.A)
+theorem ord_pos : 0 < φ.ord := by exact Fin.pos (n := φ.ord) (0 : φ.A)
 
 def h : φ.A →+ Additive (HGrp φ.e) := φ.h0
 
-theorem h_surj : Function.Surjective φ.h := by
-  exact φ.projection_surjective_field
+theorem h_surj : Function.Surjective φ.h := by exact φ.projection_surjective_field
 
 def a0 : φ.A := φ.gen0
 
@@ -77,7 +71,8 @@ theorem val_ofNat (u : ℕ) : (φ.ofNat u).val = u % φ.ord := rfl
 theorem val_ofNat_of_lt {u : ℕ} (hu : u < φ.ord) : (φ.ofNat u).val = u := by
   rw [φ.val_ofNat u, Nat.mod_eq_of_lt hu]
 
-@[simp] theorem ofNat_val (t : φ.A) : φ.ofNat t.val = t := by
+@[simp]
+theorem ofNat_val (t : φ.A) : φ.ofNat t.val = t := by
   apply A.val_injective φ
   rw [φ.val_ofNat, Nat.mod_eq_of_lt (A.val_lt t)]
 
@@ -124,12 +119,13 @@ theorem iota_add (s t : φ.A) : φ.iota (s + t) = φ.iota s * φ.iota t := rfl
 
 theorem iota_zero : φ.iota 0 = 1 := rfl
 
-@[simp] theorem iotaInv_iota (t : φ.A) : φ.iotaInv (φ.iota t) = t := rfl
+@[simp]
+theorem iotaInv_iota (t : φ.A) : φ.iotaInv (φ.iota t) = t := rfl
 
-@[simp] theorem iota_iotaInv (a : φ.MA) : φ.iota (φ.iotaInv a) = a := rfl
+@[simp]
+theorem iota_iotaInv (a : φ.MA) : φ.iota (φ.iotaInv a) = a := rfl
 
-theorem iota_bijective : Function.Bijective φ.iota := by
-  exact Multiplicative.ofAdd.bijective
+theorem iota_bijective : Function.Bijective φ.iota := by exact Multiplicative.ofAdd.bijective
 
 theorem natCard_GG : Nat.card φ.GG = 4 * φ.ord := by
   show Nat.card (G0 × φ.MA) = _

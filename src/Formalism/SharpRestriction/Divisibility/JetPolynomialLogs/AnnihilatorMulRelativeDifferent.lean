@@ -7,7 +7,8 @@ public import Formalism.DirichletDensity.HostDensityArith
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.placeRankTwoOne NumberField Formalism.FrobeniusOrbits
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.placeRankTwoOne NumberField
+  Formalism.FrobeniusOrbits
 open scoped Pointwise
 
 namespace Formalism.MainNotions.DIV.Bridge.LogAbsNormDifferent

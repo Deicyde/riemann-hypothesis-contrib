@@ -30,8 +30,7 @@ theorem smallRank : SmallRank := by
       obtain rfl : j = 0 := Subsingleton.elim _ _
       have h1 : σ (A 0 0) * A 0 0 = 1 := by
         simpa [Matrix.mul_apply, antiJ] using congrFun (congrFun hherm 0) 0
-      have h2 : B 0 0 * A 0 0 = 1 := by
-        simpa [Matrix.mul_apply] using congrFun (congrFun hBA 0) 0
+      have h2 : B 0 0 * A 0 0 = 1 := by simpa [Matrix.mul_apply] using congrFun (congrFun hBA 0) 0
       have hsq : Valued.v (A 0 0) * Valued.v (A 0 0) = 1 := by
         have := congrArg Valued.v h1
         rwa [map_mul, map_one, hU.2.1] at this
@@ -55,10 +54,10 @@ theorem smallRank : SmallRank := by
   let A' : Matrix (Fin n) (Fin n) (intL L) := fun i j => ⟨A i j, hint _ (key i j).1⟩
   let B' : Matrix (Fin n) (Fin n) (intL L) := fun i j => ⟨B i j, hint _ (key i j).2⟩
   have hinj : Function.Injective
-      ((intL L).subtype.mapMatrix : Matrix (Fin n) (Fin n) (intL L) → Matrix (Fin n) (Fin n) L) :=
-    fun X Y h => by
-      ext i j
-      exact congrFun (congrFun h i) j
+      ((intL L).subtype.mapMatrix
+        : Matrix (Fin n) (Fin n) (intL L) → Matrix (Fin n) (Fin n) L) := fun X Y h => by
+    ext i j
+    exact congrFun (congrFun h i) j
   have eA : (intL L).subtype.mapMatrix A' = A := rfl
   have eB : (intL L).subtype.mapMatrix B' = B := rfl
   unfold KU

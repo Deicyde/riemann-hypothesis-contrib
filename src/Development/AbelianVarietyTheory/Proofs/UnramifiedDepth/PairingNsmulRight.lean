@@ -6,7 +6,8 @@ public import ReciprocityTheory.DualLattices.IsPairingValueAddRight
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 noncomputable section
 
@@ -78,9 +79,11 @@ lemma pairing_sum_right {ι : Type} (s : Finset ι) (N : ℕ) (x : B.G R) (y : �
 
 end Pairing
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw}
-  [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe}
-  {cp : (Tw.O : Type)}
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)]
+  {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe]
+  {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
 
 lemma ptMap_spec (D : Dat p g B Tw Dt Oe σ cp) (t : Nb p g) :
     (D.ptMap t).comp (D.fin.sO (D.ptIdx t)) = LHom.id Tw.O ∧
@@ -128,23 +131,26 @@ lemma pairing_ptOf (D : Dat p g B Tw Dt Oe σ cp) (s t : TT p g) :
 
 end SignChar
 
-theorem signChar_mem_evImg :
-  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), EvenTwoEvaluationSign D) := by
+theorem signChar_mem_evImg
+    : (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
+        {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
+        [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp),
+      EvenTwoEvaluationSign D) := by
   intro R₀ _ p _ g B Tw Dt _ Oe _ _ σ cp D C _ _ _ _ hp s
-  have hex : ∀ i, ∃ z, B.IsPairing p (B.map (D.fin.sO i) (ptOf B D.L.τ (red p g s)))
-      (D.fin.y i) z := fun i =>
-    B.pairing_exists p _ _ (by rw [← map_nsmul, D.pt_p, map_zero]) (D.fin.y_p i)
+  have hex
+      : ∀ i, ∃ z, B.IsPairing p (B.map (D.fin.sO i) (ptOf B D.L.τ (red p g s))) (D.fin.y i) z :=
+    fun i => B.pairing_exists p _ _ (by rw [← map_nsmul, D.pt_p, map_zero]) (D.fin.y_p i)
   choose e he using hex
-  refine ⟨D.evAll C fun i => (e i : (D.fin.AAx i : Type)), Submodule.subset_span ⟨_, rfl⟩,
-    fun t => ?_⟩
+  refine
+    ⟨D.evAll C fun i => (e i : (D.fin.AAx i : Type)), Submodule.subset_span ⟨_, rfl⟩, fun t => ?_⟩
   obtain ⟨h1, h2⟩ := SignChar.ptMap_spec D (red p g t)
   have h3 := B.pairing_map (D.ptMap (red p g t)) p _ _ _ (he (D.ptIdx (red p g t)))
   rw [← B.map_comp, h1, B.map_id, h2] at h3
   obtain ⟨n, hn, h4⟩ := SignChar.pairing_ptOf D s t
   have h5 := congrArg Units.val (B.pairing_unique p _ _ _ _ h3 h4)
   rw [Units.val_pow_eq_pow_val, D.zeta0 hp, Units.coe_map] at h5
-  have h6 : (D.ptMap (red p g t)).1 (e (D.ptIdx (red p g t)) : (D.fin.AAx _ : Type)) =
-      (-1) ^ n := h5
+  have h6 : (D.ptMap (red p g t)).1 (e (D.ptIdx (red p g t)) : (D.fin.AAx _ : Type)) = (-1) ^ n :=
+    h5
   have h7 : (PadicInt.toZMod (pair p g D.H.E s t)).val % 2 = n % 2 := by
     rw [← hn, ZMod.val_natCast, ← hp, Nat.mod_mod]
   unfold Dat.evAll

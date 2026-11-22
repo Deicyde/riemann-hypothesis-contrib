@@ -15,19 +15,20 @@ noncomputable section
 
 variable {n d : ℕ}
 
-def sliceIdeal (J : Ideal (MvPolynomial (Fin n) ℂ)) (L : Matrix (Fin d) (Fin n) ℂ) (q : Fin n → ℂ) :
-    Ideal (MvPolynomial (Fin n) ℂ) :=
+def sliceIdeal (J : Ideal (MvPolynomial (Fin n) ℂ)) (L : Matrix (Fin d) (Fin n) ℂ) (q : Fin n → ℂ)
+    : Ideal (MvPolynomial (Fin n) ℂ) :=
   J ⊔ Ideal.span (Set.range fun i => linPoly L i - C ((L *ᵥ q) i))
 
 def IsRadicalAt (I : Ideal (MvPolynomial (Fin n) ℂ)) (q : Fin n → ℂ) : Prop :=
   ∀ f ∈ I.radical, ∃ s : MvPolynomial (Fin n) ℂ, eval q s ≠ 0 ∧ s * f ∈ I
 
-theorem eval_linPoly (L : Matrix (Fin d) (Fin n) ℂ) (i : Fin d) (x : Fin n → ℂ) :
-    eval x (linPoly L i) = (L *ᵥ x) i := by
+theorem eval_linPoly (L : Matrix (Fin d) (Fin n) ℂ) (i : Fin d) (x : Fin n → ℂ)
+    : eval x (linPoly L i) = (L *ᵥ x) i := by
   simp [linPoly, Matrix.mulVec, dotProduct]
 
-theorem zeroSet_sliceIdeal (J : Ideal (MvPolynomial (Fin n) ℂ)) (L : Matrix (Fin d) (Fin n) ℂ)
-    (q : Fin n → ℂ) : zeroSet (sliceIdeal J L q) = zeroSet J ∩ {x | L *ᵥ x = L *ᵥ q} := by
+theorem zeroSet_sliceIdeal
+    (J : Ideal (MvPolynomial (Fin n) ℂ)) (L : Matrix (Fin d) (Fin n) ℂ) (q : Fin n → ℂ)
+    : zeroSet (sliceIdeal J L q) = zeroSet J ∩ {x | L *ᵥ x = L *ᵥ q} := by
   ext x
   simp only [zeroSet, Set.mem_inter_iff, Set.mem_ofPred_eq]
   constructor

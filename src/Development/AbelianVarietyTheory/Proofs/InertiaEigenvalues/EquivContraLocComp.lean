@@ -20,8 +20,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.PairingEq
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.Published GlobalTheory.ContraPair
 
@@ -31,29 +33,49 @@ namespace GlobalTheory.LocDual
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-def Maps (V : Submodule ℂ (Sm E a)) (w : HeightOneSpectrum (𝓞 E)) (σ : SmIrr (GL (Fin a) (w.adicCompletion E))) : Type :=
+def Maps
+    (V : Submodule ℂ (Sm E a))
+    (w : HeightOneSpectrum (𝓞 E)) (σ : SmIrr (GL (Fin a) (w.adicCompletion E)))
+    : Type :=
   {f : σ.V →ₗ[ℂ] Sm E a // (∀ v, f v ∈ V) ∧ ∀ g v, f (σ.ρ g v) = finRep E a (locGL E a w g) (f v)}
 
-theorem iSup_range_eq (V : Submodule ℂ (Sm E a)) (hs : _root_.GlobalTheory.CuspRep.IsStable V) (hi : ∀ W ≤ V, _root_.GlobalTheory.CuspRep.IsStable W → W = ⊥ ∨ W = V)
+theorem iSup_range_eq
+    (V : Submodule ℂ (Sm E a)) (hs : _root_.GlobalTheory.CuspRep.IsStable V)
+    (hi : ∀ W ≤ V, _root_.GlobalTheory.CuspRep.IsStable W → W = ⊥ ∨ W = V)
     (w : HeightOneSpectrum (𝓞 E)) (σ : SmIrr (GL (Fin a) (w.adicCompletion E)))
-    (h : GlobalTheory.UnitaryBC.IsLocCompGL V w σ) : ⨆ f : Maps V w σ, LinearMap.range f.1 = V := by
-  have comm : ∀ o : Op E a, (∀ g, act o * finRep E a (locGL E a w g) = finRep E a (locGL E a w g) * act o) →
-      ∀ (f : Maps V w σ) v, act o (f.1 v) ∈ ⨆ f : Maps V w σ, LinearMap.range f.1 := fun o ho f v =>
-    Submodule.mem_iSup_of_mem (⟨act o ∘ₗ f.1, fun v => hs o _ (f.2.1 v), fun g v => by
-      rw [LinearMap.comp_apply, f.2.2]; exact LinearMap.congr_fun (ho g) _⟩ : Maps V w σ) ⟨v, rfl⟩
+    (h : GlobalTheory.UnitaryBC.IsLocCompGL V w σ)
+    : ⨆ f : Maps V w σ, LinearMap.range f.1 = V := by
+  have comm
+      : ∀ o : Op E a,
+        (∀ g, act o * finRep E a (locGL E a w g) = finRep E a (locGL E a w g) * act o)
+          → ∀ (f : Maps V w σ) v,
+            act o (f.1 v) ∈ ⨆ f : Maps V w σ, LinearMap.range f.1 := fun o ho f v =>
+    Submodule.mem_iSup_of_mem
+      (⟨
+         act o ∘ₗ f.1,
+         fun v => hs o _ (f.2.1 v),
+         fun g v => by rw [LinearMap.comp_apply, f.2.2]; exact LinearMap.congr_fun (ho g) _
+       ⟩
+        : Maps V w σ)
+      ⟨v, rfl⟩
   refine (hi _ (iSup_le fun f => ?_) fun o φ hφ => ?_).resolve_left fun hb => ?_
   · rintro _ ⟨v, rfl⟩; exact f.2.1 v
-  · have : (⨆ f : Maps V w σ, LinearMap.range f.1) ≤ (⨆ f : Maps V w σ, LinearMap.range f.1).comap (act o) := by
+  · have : (⨆ f : Maps V w σ, LinearMap.range f.1)
+        ≤ (⨆ f : Maps V w σ, LinearMap.range f.1).comap (act o) := by
       refine iSup_le fun f => ?_
       rintro _ ⟨v, rfl⟩
       rw [Submodule.mem_comap]
       cases o with
       | fin k =>
         let g := Matrix.GeneralLinearGroup.map (pLoc E w) k
-        have h1 := comm (.fin (k * (locGL E a w g)⁻¹)) (fun g' => by
-          change finRep E a _ * _ = _ * finRep E a _
-          rw [← map_mul, ← map_mul, GlobalTheory.CuspRep.LocUniq.comm_locGL w
-            (by rw [map_mul, map_inv, pLoc_locGL, mul_inv_cancel])]) f (σ.ρ g v)
+        have h1 :=
+          comm (.fin (k * (locGL E a w g)⁻¹))
+            (fun g' => by
+              change finRep E a _ * _ = _ * finRep E a _
+              rw [← map_mul, ← map_mul,
+                GlobalTheory.CuspRep.LocUniq.comm_locGL w
+                  (by rw [map_mul, map_inv, pLoc_locGL, mul_inv_cancel])])
+            f (σ.ρ g v)
         have h2 : act (.fin (k * (locGL E a w g)⁻¹)) (f.1 (σ.ρ g v)) = act (.fin k) (f.1 v) := by
           rw [f.2.2, act, act, ← Module.End.mul_apply, ← map_mul, inv_mul_cancel_right]
         rwa [h2] at h1
@@ -71,10 +93,14 @@ theorem iSup_range_eq (V : Submodule ℂ (Sm E a)) (hs : _root_.GlobalTheory.Cus
     rw [hb] at this
     exact this
 
-theorem exists_comp_ne_zero (V : Submodule ℂ (Sm E a)) (hs : _root_.GlobalTheory.CuspRep.IsStable V) (hi : ∀ W ≤ V, _root_.GlobalTheory.CuspRep.IsStable W → W = ⊥ ∨ W = V)
+theorem exists_comp_ne_zero
+    (V : Submodule ℂ (Sm E a)) (hs : _root_.GlobalTheory.CuspRep.IsStable V)
+    (hi : ∀ W ≤ V, _root_.GlobalTheory.CuspRep.IsStable W → W = ⊥ ∨ W = V)
     (w : HeightOneSpectrum (𝓞 E)) (σ : SmIrr (GL (Fin a) (w.adicCompletion E)))
-    (h : GlobalTheory.UnitaryBC.IsLocCompGL V w σ) {X : Type} [AddCommGroup X] [Module ℂ X] (β : V →ₗ[ℂ] X) (hβ : β ≠ 0) :
-    ∃ f : Maps V w σ, β ∘ₗ f.1.codRestrict V f.2.1 ≠ 0 := by
+    (h : GlobalTheory.UnitaryBC.IsLocCompGL V w σ)
+    {X : Type} [AddCommGroup X] [Module ℂ X]
+    (β : V →ₗ[ℂ] X) (hβ : β ≠ 0)
+    : ∃ f : Maps V w σ, β ∘ₗ f.1.codRestrict V f.2.1 ≠ 0 := by
   by_contra hc
   push Not at hc
   refine hβ (LinearMap.ext fun φ => ?_)

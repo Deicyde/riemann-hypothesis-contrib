@@ -24,9 +24,11 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem isLattice_between {W : Type} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W]
-    (A B : Submodule (𝓞 E) W) (hA : Submodule.IsLattice E A) (hAB : A ≤ B) (T : ℕ) (hT : T ≠ 0)
-    (hTB : ∀ x ∈ B, (T : E) • x ∈ A) : Submodule.IsLattice E B := by
+theorem isLattice_between
+    {W : Type} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W]
+    (A B : Submodule (𝓞 E) W) (hA : Submodule.IsLattice E A) (hAB : A ≤ B)
+    (T : ℕ) (hT : T ≠ 0) (hTB : ∀ x ∈ B, (T : E) • x ∈ A)
+    : Submodule.IsLattice E B := by
   let f : W →ₗ[𝓞 E] W := ((T : ℕ) : 𝓞 E) • LinearMap.id
   have hf : Function.Injective f := by
     intro x y hxy

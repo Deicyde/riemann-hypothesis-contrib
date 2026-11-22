@@ -24,12 +24,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AvgEqOfLeRig
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 namespace GlobalTheory.AvgLin
 
-theorem avg_linear_translate_const : ∀ (H : Type) [Group H] (u v : H → ℂ) (c : ℂ) (g : H), (rStab u).index ≠ 0 → (rStab v).index ≠ 0 → avg (u + v) = avg u + avg v ∧ avg (c • u) = c * avg u ∧ avg (fun x => u (g * x)) = avg u ∧ avg (fun _ : H => c) = c := by
+theorem avg_linear_translate_const
+    : ∀ (H : Type) [Group H] (u v : H → ℂ) (c : ℂ) (g : H),
+      (rStab u).index ≠ 0 → (rStab v).index ≠ 0
+        → avg (u + v) = avg u + avg v ∧ avg (c • u) = c * avg u ∧ avg (fun x => u (g * x)) = avg u
+          ∧ avg (fun _ : H => c) = c := by
   intro H _ u v c g hu hv
   set S : Subgroup H := rStab u ⊓ rStab v with hS
   have hSi : S.index ≠ 0 := Subgroup.index_inf_ne_zero hu hv
@@ -42,8 +47,9 @@ theorem avg_linear_translate_const : ∀ (H : Type) [Group H] (u v : H → ℂ) 
     simp only [Pi.add_apply]
     rw [hSu hk x, hSv hk x]
   refine ⟨?_, ?_, ?_, ?_⟩
-  · rw [GlobalTheory.T.avg_eq_of_le_rightStabiliser H (u + v) S hSuv hSi, GlobalTheory.T.avg_eq_of_le_rightStabiliser H u S hSu hSi, GlobalTheory.T.avg_eq_of_le_rightStabiliser H v S hSv hSi,
-      ← mul_add]
+  · rw [GlobalTheory.T.avg_eq_of_le_rightStabiliser H (u + v) S hSuv hSi,
+      GlobalTheory.T.avg_eq_of_le_rightStabiliser H u S hSu hSi,
+      GlobalTheory.T.avg_eq_of_le_rightStabiliser H v S hSv hSi, ← mul_add]
     congr 1
     simp only [Pi.add_apply]
     exact finsum_add_distrib (Set.toFinite _) (Set.toFinite _)
@@ -51,7 +57,8 @@ theorem avg_linear_translate_const : ∀ (H : Type) [Group H] (u v : H → ℂ) 
       intro k hk x
       simp only [Pi.smul_apply, smul_eq_mul]
       rw [hk x]
-    rw [GlobalTheory.T.avg_eq_of_le_rightStabiliser H (c • u) (rStab u) hc hu, GlobalTheory.T.avg_eq_of_le_rightStabiliser H u (rStab u) le_rfl hu]
+    rw [GlobalTheory.T.avg_eq_of_le_rightStabiliser H (c • u) (rStab u) hc hu,
+      GlobalTheory.T.avg_eq_of_le_rightStabiliser H u (rStab u) le_rfl hu]
     simp only [Pi.smul_apply, smul_eq_mul]
     rw [← mul_finsum]
     ring
@@ -59,7 +66,8 @@ theorem avg_linear_translate_const : ∀ (H : Type) [Group H] (u v : H → ℂ) 
       intro k hk x
       simp only
       rw [← mul_assoc, hk (g * x)]
-    rw [GlobalTheory.T.avg_eq_of_le_rightStabiliser H _ (rStab u) ht hu, GlobalTheory.T.avg_eq_of_le_rightStabiliser H u (rStab u) le_rfl hu]
+    rw [GlobalTheory.T.avg_eq_of_le_rightStabiliser H _ (rStab u) ht hu,
+      GlobalTheory.T.avg_eq_of_le_rightStabiliser H u (rStab u) le_rfl hu]
     congr 1
     have key : ∀ q : H ⧸ rStab u, u (g * q.out) = u (g • q).out := by
       intro q

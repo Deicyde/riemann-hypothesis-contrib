@@ -6,33 +6,43 @@ public import Mathlib
 
 namespace GlobalTheory.FixedVec
 
-theorem exists_irreducible_subrep_fixed : ∀ (G G' W : Type) [Group G] [Finite G] [Fintype G']
-    [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G W) (i : G' → G) (c : G' → ℂ) (x : W),
-    x ≠ 0 → ∑ g, c g • ρ (i g) x = x → ∃ U : Subrepresentation ρ,
-      FiniteDimensional ℂ U.toSubmodule ∧ U.toRepresentation.IsIrreducible ∧
-      ∃ y : U.toSubmodule, y ≠ 0 ∧ ∑ g, c g • U.toRepresentation (i g) y = y := by
+theorem exists_irreducible_subrep_fixed
+    : ∀ (G G' W : Type) [Group G] [Finite G] [Fintype G'] [AddCommGroup W] [Module ℂ W]
+        (ρ : Representation ℂ G W) (i : G' → G) (c : G' → ℂ) (x : W),
+      x ≠ 0 → ∑ g, c g • ρ (i g) x = x
+        → ∃ U : Subrepresentation ρ,
+          FiniteDimensional ℂ U.toSubmodule ∧ U.toRepresentation.IsIrreducible
+            ∧ ∃ y : U.toSubmodule, y ≠ 0 ∧ ∑ g, c g • U.toRepresentation (i g) y = y := by
   intro G G' W _ _ _ _ _ ρ i c x hx hfix
   classical
   let P : Subrepresentation ρ → Prop := fun S =>
     FiniteDimensional ℂ S.toSubmodule ∧ ∃ y ∈ S.toSubmodule, y ≠ 0 ∧ ∑ g, c g • ρ (i g) y = y
-  let S0 : Subrepresentation ρ :=
-    ⟨Submodule.span ℂ (Set.range fun g => ρ g x), by
+  let S0 : Subrepresentation ρ := ⟨
+    Submodule.span ℂ (Set.range fun g => ρ g x),
+    by
       intro g v hv
-      have hle : (Submodule.span ℂ (Set.range fun g => ρ g x)).map (ρ g) ≤
-          Submodule.span ℂ (Set.range fun g => ρ g x) := by
+      have hle
+          : (Submodule.span ℂ (Set.range fun g => ρ g x)).map (ρ g)
+            ≤ Submodule.span ℂ (Set.range fun g => ρ g x) := by
         rw [Submodule.map_span]
         apply Submodule.span_mono
         rintro _ ⟨_, ⟨h, rfl⟩, rfl⟩
         exact ⟨g * h, by simp [map_mul]⟩
-      exact hle (Submodule.mem_map_of_mem hv)⟩
-  have hP0 : P S0 :=
-    ⟨FiniteDimensional.span_of_finite ℂ (Set.finite_range _), x,
-      Submodule.subset_span ⟨1, by simp⟩, hx, hfix⟩
+      exact hle (Submodule.mem_map_of_mem hv)
+  ⟩
+  have hP0 : P S0 := ⟨
+    FiniteDimensional.span_of_finite ℂ (Set.finite_range _),
+    x,
+    Submodule.subset_span ⟨1, by simp⟩,
+    hx,
+    hfix
+  ⟩
   have hex : ∃ m : ℕ, ∃ S : Subrepresentation ρ, P S ∧ Module.finrank ℂ S.toSubmodule = m :=
     ⟨_, S0, hP0, rfl⟩
   obtain ⟨S, ⟨hSfd, y, hyS, hy0, hyfix⟩, hm⟩ := Nat.find_spec hex
-  have hmin : ∀ T : Subrepresentation ρ, P T →
-      Module.finrank ℂ S.toSubmodule ≤ Module.finrank ℂ T.toSubmodule := by
+  have hmin
+      : ∀ T : Subrepresentation ρ,
+        P T → Module.finrank ℂ S.toSubmodule ≤ Module.finrank ℂ T.toSubmodule := by
     intro T hT
     rw [hm]
     exact Nat.find_min' hex ⟨T, hT, rfl⟩
@@ -45,12 +55,16 @@ theorem exists_irreducible_subrep_fixed : ∀ (G G' W : Type) [Group G] [Finite 
     intro z
     rw [hEapp]
     simp [Subrepresentation.toRepresentation]
-  have key : ∀ T : Subrepresentation S.toRepresentation, T.toSubmodule ≠ ⊤ →
-      ∀ a ∈ T.toSubmodule, a ≠ 0 → E a = a → False := by
+  have key
+      : ∀ T : Subrepresentation S.toRepresentation,
+        T.toSubmodule ≠ ⊤ → ∀ a ∈ T.toSubmodule, a ≠ 0 → E a = a → False := by
     intro T hT a ha ha0 hafix
-    let T' : Subrepresentation ρ := ⟨T.toSubmodule.map S.toSubmodule.subtype, by
-      rintro g _ ⟨v, hv, rfl⟩
-      exact ⟨S.toRepresentation g v, T.apply_mem_toSubmodule g hv, rfl⟩⟩
+    let T' : Subrepresentation ρ := ⟨
+      T.toSubmodule.map S.toSubmodule.subtype,
+      by
+        rintro g _ ⟨v, hv, rfl⟩
+        exact ⟨S.toRepresentation g v, T.apply_mem_toSubmodule g hv, rfl⟩
+    ⟩
     have hPT : P T' := by
       refine ⟨?_, (a : W), ⟨a, ha, rfl⟩, ?_, ?_⟩
       · exact Submodule.finiteDimensional_of_le (S₂ := S.toSubmodule) (by
@@ -93,8 +107,8 @@ theorem exists_irreducible_subrep_fixed : ∀ (G G' W : Type) [Group G] [Finite 
     apply Subrepresentation.toSubmodule_injective
     rw [h, inf_top_eq] at hinf
     exact hinf
-  have hmemE : ∀ U : Subrepresentation S.toRepresentation, ∀ z ∈ U.toSubmodule,
-      E z ∈ U.toSubmodule := by
+  have hmemE
+      : ∀ U : Subrepresentation S.toRepresentation, ∀ z ∈ U.toSubmodule, E z ∈ U.toSubmodule := by
     intro U z hz
     rw [hEapp]
     exact Submodule.sum_mem _ (fun g _ => Submodule.smul_mem _ _ (U.apply_mem_toSubmodule _ hz))
@@ -103,8 +117,7 @@ theorem exists_irreducible_subrep_fixed : ∀ (G G' W : Type) [Group G] [Finite 
   have hsum : E a + E b = a + b := by rw [← map_add (f := _), hab, hy'fix]
   have hd : E a - a ∈ T.toSubmodule ⊓ T'.toSubmodule := by
     refine ⟨Submodule.sub_mem _ (hmemE T a ha) ha, ?_⟩
-    have : E a - a = b - E b := by
-      rw [sub_eq_sub_iff_add_eq_add, hsum, add_comm]
+    have : E a - a = b - E b := by rw [sub_eq_sub_iff_add_eq_add, hsum, add_comm]
     rw [this]
     exact Submodule.sub_mem _ hb (hmemE T' b hb)
   rw [hinf, Submodule.mem_bot, sub_eq_zero] at hd

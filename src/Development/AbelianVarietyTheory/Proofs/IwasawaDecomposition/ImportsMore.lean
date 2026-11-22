@@ -6,7 +6,19 @@ public import Mathlib
 
 namespace GlobalTheory.IsolatedTheoremThree
 
-theorem main : (let d1 : (R : Type) → {A : Type} → [inst : CommRing R] → [inst_1 : CommRing A] → [inst_2 : Algebra R A] → (ℕ → A) → ℕ → Submodule R A := @(fun (R : Type) {A : Type} [CommRing R] [CommRing A] [Algebra R A] (γ : ℕ → A) (N : ℕ) ↦ Submodule.span R (γ '' {m : ℕ | m < N})); ∀ {R A : Type} [inst : CommRing R] [inst_1 : CommRing A] [inst_2 : Algebra R A], (∀ (n : ℕ), IsUnit (↑(Nat.factorial n) : A)) → ∀ (ξ : R) (γ : ℕ → A), (∀ (n : ℕ), (↑(Nat.factorial n) : A) * γ n = (Algebra.algebraMap R A : R → A) ξ ^ n) → ∀ (N : ℕ), ∀ w ∈ Submodule.span R (Set.range γ), ∃ w₁ ∈ d1 R γ N, (Algebra.algebraMap R A : R → A) ξ ^ N ∣ w - w₁) := by
+theorem main
+    : (let d1
+           : (R : Type) → {A : Type} → [inst : CommRing R] → [inst_1 : CommRing A]
+             → [inst_2 : Algebra R A] → (ℕ → A) → ℕ
+             → Submodule R A :=
+         @(fun (R : Type) {A : Type} [CommRing R] [CommRing A] [Algebra R A] (γ : ℕ → A) (N : ℕ) ↦
+           Submodule.span R (γ '' {m : ℕ | m < N}))
+       ∀ {R A : Type} [inst : CommRing R] [inst_1 : CommRing A] [inst_2 : Algebra R A],
+         (∀ (n : ℕ), IsUnit (↑(Nat.factorial n) : A))
+           → ∀ (ξ : R) (γ : ℕ → A),
+             (∀ (n : ℕ), (↑(Nat.factorial n) : A) * γ n = (Algebra.algebraMap R A : R → A) ξ ^ n)
+               → ∀ (N : ℕ), ∀ w ∈ Submodule.span R (Set.range γ), ∃ w₁ ∈ d1 R γ N,
+                 (Algebra.algebraMap R A : R → A) ξ ^ N ∣ w - w₁) := by
   intro d1 R A _ _ _ hfac ξ γ hγ N w hw
   induction hw using Submodule.span_induction with
   | mem w hw =>
@@ -24,7 +36,8 @@ theorem main : (let d1 : (R : Type) → {A : Type} → [inst : CommRing R] → [
         omega
       rw [hg, hp]
       exact Dvd.intro (↑u⁻¹ * algebraMap R A ξ ^ (n - N)) (by ring)
-  | zero => exact ⟨0, Submodule.zero_mem _, by simp⟩
+  | zero =>
+    exact ⟨0, Submodule.zero_mem _, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, ha, hda⟩ := hx
     obtain ⟨b, hb, hdb⟩ := hy

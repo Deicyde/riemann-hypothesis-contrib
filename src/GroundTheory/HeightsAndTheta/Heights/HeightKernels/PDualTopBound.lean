@@ -15,21 +15,20 @@ open ReciprocityTheory.ChartRestriction.G.Geo
 namespace TopDualBound
 
 theorem grassConst_lines {i : ℕ} (hi : 1 ≤ i) : grassConst 1 1 (i - 1) = 1 / 2 * Real.log i := by
-  have h : (1 : ℝ) + ((i - 1 : ℕ) : ℝ) = i := by
-    rw [Nat.cast_sub hi]; push_cast; ring
+  have h : (1 : ℝ) + ((i - 1 : ℕ) : ℝ) = i := by rw [Nat.cast_sub hi]; push_cast; ring
   simp only [grassConst, h]
   norm_num
 
-theorem dim_lines {i : ℕ} (hi : 1 ≤ i) : ((1 * 1 * (i - 1) + 1 : ℕ) : ℝ) = i := by
-  congr 1; omega
+theorem dim_lines {i : ℕ} (hi : 1 ≤ i) : ((1 * 1 * (i - 1) + 1 : ℕ) : ℝ) = i := by congr 1; omega
 
 end TopDualBound
 
-theorem DualTopBound.proof (hBasis : DualLatticeBasisExists.Statement)
-    (hBij : DualEmbBijective.Statement) (hMetric : DualTopMetricChange.Statement)
-    (hLattice : DualTopLatticeChange.Statement) (hStd : DualTopStandard.Statement)
-    (hDeg : DualGeomDegStandard.Statement) (hGrass : GrassHeightBound.Statement) :
-    DualTopBound.Statement := by
+theorem DualTopBound.proof
+    (hBasis : DualLatticeBasisExists.Statement) (hBij : DualEmbBijective.Statement)
+    (hMetric : DualTopMetricChange.Statement) (hLattice : DualTopLatticeChange.Statement)
+    (hStd : DualTopStandard.Statement) (hDeg : DualGeomDegStandard.Statement)
+    (hGrass : GrassHeightBound.Statement)
+    : DualTopBound.Statement := by
   intro hZ2 K _ _ i F T _ _ b hb II hi hII
   obtain ⟨T', _, _, ⟨b'⟩⟩ := hBasis K i (HermLattice.standard K i)
   have hb' := hBij K i (HermLattice.standard K i) T' b'
@@ -44,8 +43,9 @@ theorem DualTopBound.proof (hBasis : DualLatticeBasisExists.Statement)
   rw [hA, hB, hC, hG]
   have hd0 : 0 < d := by rw [hd]; exact_mod_cast Module.finrank_pos
   have hi0 : (0 : ℝ) < i := by exact_mod_cast hi
-  have hslope : (i : ℝ) * (-F.slope + 1 / 2 * Real.log i) * (d * g) =
-      -F.degree * g + d * ((i : ℝ) * (1 / 2 * Real.log i) * g) := by
+  have hslope
+      : (i : ℝ) * (-F.slope + 1 / 2 * Real.log i) * (d * g)
+        = -F.degree * g + d * ((i : ℝ) * (1 / 2 * Real.log i) * g) := by
     simp only [HermLattice.slope, normalise]
     rw [← hd]
     field_simp

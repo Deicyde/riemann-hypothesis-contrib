@@ -25,8 +25,8 @@ def ANum : Prop := 0.92129 ≤ chA ∧ chA ≤ 0.9213
 
 def DUpper : Prop := ∀ x : ℝ, 30 ≤ x → chD x ≤ chA * x + 5 / 2 * log x - 4
 
-def Sandwich : Prop := ∀ x : ℝ, 0 ≤ x →
-  Chebyshev.psi x - Chebyshev.psi (x / 6) ≤ chD x ∧ chD x ≤ Chebyshev.psi x
+def Sandwich : Prop :=
+  ∀ x : ℝ, 0 ≤ x → Chebyshev.psi x - Chebyshev.psi (x / 6) ≤ chD x ∧ chD x ≤ Chebyshev.psi x
 
 def CHUpper : Prop := ∀ x : ℝ, 1 ≤ x → Chebyshev.psi x ≤ 1.1056 * x + 0.7 * (log x) ^ 2
 

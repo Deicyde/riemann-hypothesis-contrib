@@ -13,13 +13,15 @@ namespace NearUnitaryExp
 
 open scoped Matrix.Norms.Frobenius
 
-theorem norm_exp_sub_one_le_exp_norm {A : Type*} [NormedRing A] [NormedAlgebra ℂ A]
-    [CompleteSpace A] (x : A) : ‖NormedSpace.exp x - 1‖ ≤ Real.exp ‖x‖ - 1 := by
+theorem norm_exp_sub_one_le_exp_norm
+    {A : Type*} [NormedRing A] [NormedAlgebra ℂ A] [CompleteSpace A] (x : A)
+    : ‖NormedSpace.exp x - 1‖ ≤ Real.exp ‖x‖ - 1 := by
   have hx := (hasSum_nat_add_iff' 1).mpr (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℂ) x)
   have hr := (hasSum_nat_add_iff' 1).mpr (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) ‖x‖)
   rw [← Real.exp_eq_exp_ℝ] at hr
   simp only [Finset.range_one, Finset.sum_singleton, Nat.factorial_zero, Nat.cast_one, inv_one,
-    pow_zero, one_smul] at hx hr
+      pow_zero, one_smul]
+    at hx hr
   refine hx.norm_le_of_bounded hr fun m => ?_
   rw [norm_smul, smul_eq_mul, norm_inv, Complex.norm_natCast]
   exact mul_le_mul_of_nonneg_left (norm_pow_le' x (Nat.succ_pos m)) (by positivity)
@@ -46,8 +48,10 @@ theorem hs_eq_re_trace (g : Matrix (Fin n) (Fin n) ℂ) : hs g = (trace (gᴴ * 
     re_star_mul_self_eq_norm_sq]
   exact Finset.sum_comm
 
-theorem norm_unitary_mul {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
-    (A : Matrix (Fin n) (Fin n) ℂ) : ‖k * A‖ = ‖A‖ := by
+theorem norm_unitary_mul
+    {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
+    (A : Matrix (Fin n) (Fin n) ℂ)
+    : ‖k * A‖ = ‖A‖ := by
   have hk' : kᴴ * k = 1 := Matrix.mem_unitaryGroup_iff'.mp hk
   rw [← sqrt_hs_eq_norm, ← sqrt_hs_eq_norm, hs_eq_re_trace, hs_eq_re_trace, conjTranspose_mul,
     Matrix.mul_assoc, ← Matrix.mul_assoc kᴴ k A, hk', Matrix.one_mul]
@@ -62,18 +66,19 @@ theorem norm_trace_le (A : Matrix (Fin n) (Fin n) ℂ) : ‖A.trace‖ ≤ Real.
       Finset.single_le_sum (f := fun j => ‖A i j‖ ^ 2) (fun _ _ => sq_nonneg _) (Finset.mem_univ i)
   have hsq : (∑ i, ‖A i i‖) ^ 2 ≤ (Real.sqrt n * ‖A‖) ^ 2 := by
     rw [mul_pow, Real.sq_sqrt (Nat.cast_nonneg n), norm_sq_eq_hs]
-    calc (∑ i, ‖A i i‖) ^ 2 ≤ (Finset.univ.card : ℝ) * ∑ i, ‖A i i‖ ^ 2 :=
-          sq_sum_le_card_mul_sum_sq
+    calc
+      (∑ i, ‖A i i‖) ^ 2
+        ≤ (Finset.univ.card : ℝ) * ∑ i, ‖A i i‖ ^ 2 := sq_sum_le_card_mul_sum_sq
       _ ≤ n * hs A := by
-          rw [Finset.card_univ, Fintype.card_fin]
-          exact mul_le_mul_of_nonneg_left hdiag (Nat.cast_nonneg n)
+        rw [Finset.card_univ, Fintype.card_fin]
+        exact mul_le_mul_of_nonneg_left hdiag (Nat.cast_nonneg n)
   have h1 : ‖A.trace‖ ≤ ∑ i, ‖A i i‖ := norm_sum_le _ _
   have h2 : 0 ≤ ∑ i, ‖A i i‖ := Finset.sum_nonneg fun _ _ => norm_nonneg _
   have h3 : 0 ≤ Real.sqrt n * ‖A‖ := mul_nonneg (Real.sqrt_nonneg _) (norm_nonneg _)
   nlinarith
 
-theorem hs_unitary_sub_one {k : Matrix (Fin n) (Fin n) ℂ}
-    (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ) : hs (k - 1) = 2 * n - 2 * k.trace.re := by
+theorem hs_unitary_sub_one {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
+    : hs (k - 1) = 2 * n - 2 * k.trace.re := by
   have hk' : kᴴ * k = 1 := Matrix.mem_unitaryGroup_iff'.mp hk
   have hprod : (k - 1)ᴴ * (k - 1) = 1 + 1 - kᴴ - k := by
     rw [conjTranspose_sub, conjTranspose_one, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub, hk',
@@ -84,9 +89,12 @@ theorem hs_unitary_sub_one {k : Matrix (Fin n) (Fin n) ℂ}
     Fintype.card_fin, Complex.natCast_re]
   ring
 
-theorem norm_pow_le_of_unitary {k : Matrix (Fin n) (Fin n) ℂ}
-    (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ) (E : Matrix (Fin n) (Fin n) ℂ) {c : ℝ}
-    (hE : ‖E - 1‖ ≤ c - 1) (j : ℕ) : ‖(k * E) ^ j‖ ≤ c ^ j * Real.sqrt n := by
+theorem norm_pow_le_of_unitary
+    {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
+    (E : Matrix (Fin n) (Fin n) ℂ)
+    {c : ℝ} (hE : ‖E - 1‖ ≤ c - 1)
+    (j : ℕ)
+    : ‖(k * E) ^ j‖ ≤ c ^ j * Real.sqrt n := by
   induction j with
   | zero => rw [pow_zero, pow_zero, one_mul, norm_one_eq]
   | succ j ih =>
@@ -97,14 +105,20 @@ theorem norm_pow_le_of_unitary {k : Matrix (Fin n) (Fin n) ℂ}
     have hm := frobenius_norm_mul (E - 1) ((k * E) ^ j)
     have hn0 := norm_nonneg ((k * E) ^ j)
     have hE0 := norm_nonneg (E - 1)
-    calc ‖(k * E) ^ j + (E - 1) * (k * E) ^ j‖
+    calc
+      ‖(k * E) ^ j + (E - 1) * (k * E) ^ j‖
         ≤ ‖(k * E) ^ j‖ + ‖(E - 1) * (k * E) ^ j‖ := norm_add_le _ _
       _ ≤ (1 + ‖E - 1‖) * ‖(k * E) ^ j‖ := by linarith
-      _ ≤ c * (c ^ j * Real.sqrt n) := by
-          apply mul_le_mul (by linarith) ih hn0 (by linarith)
+      _ ≤ c * (c ^ j * Real.sqrt n) := by apply mul_le_mul (by linarith) ih hn0 (by linarith)
       _ = c ^ (j + 1) * Real.sqrt n := by ring
 
-theorem near_arch : ∀ (n : ℕ) (k X : Matrix (Fin n) (Fin n) ℂ) (ep : ℝ), k ∈ Matrix.unitaryGroup (Fin n) ℂ → X.IsHermitian → 0 ≤ ep → Real.sqrt (hs X) ≤ ep → n * ep ≤ 1 / 4 → (∀ j : ℕ, j ≤ n → ‖((k * NormedSpace.exp X) ^ j).trace - n‖ ≤ 3 * n) ∧ ((k * NormedSpace.exp X).trace = n → Real.sqrt (hs (k * NormedSpace.exp X - 1)) ≤ 3 * Real.sqrt (n * ep)) := by
+theorem near_arch
+    : ∀ (n : ℕ) (k X : Matrix (Fin n) (Fin n) ℂ) (ep : ℝ),
+      k ∈ Matrix.unitaryGroup (Fin n) ℂ → X.IsHermitian → 0 ≤ ep → Real.sqrt (hs X) ≤ ep
+        → n * ep ≤ 1 / 4
+        → (∀ j : ℕ, j ≤ n → ‖((k * NormedSpace.exp X) ^ j).trace - n‖ ≤ 3 * n)
+          ∧ ((k * NormedSpace.exp X).trace = n
+            → Real.sqrt (hs (k * NormedSpace.exp X - 1)) ≤ 3 * Real.sqrt (n * ep)) := by
   intro n k X ep hk _ hep hXe hne
   have hXn : ‖X‖ ≤ ep := by rwa [sqrt_hs_eq_norm] at hXe
   have hE1 : ‖NormedSpace.exp X - 1‖ ≤ Real.exp ep - 1 := by
@@ -129,12 +143,16 @@ theorem near_arch : ∀ (n : ℕ) (k X : Matrix (Fin n) (Fin n) ℂ) (ep : ℝ),
     have hb := hpow j
     have hs0 := Real.sqrt_nonneg (n : ℝ)
     have hbound : ‖((k * E) ^ j).trace‖ ≤ n * (3 / 2) := by
-      calc ‖((k * E) ^ j).trace‖ ≤ Real.sqrt n * ‖(k * E) ^ j‖ := htr
+      calc
+        ‖((k * E) ^ j).trace‖
+          ≤ Real.sqrt n * ‖(k * E) ^ j‖ := htr
         _ ≤ Real.sqrt n * (Real.exp ep ^ j * Real.sqrt n) := mul_le_mul_of_nonneg_left hb hs0
         _ = (Real.sqrt n * Real.sqrt n) * Real.exp ep ^ j := by ring
         _ = n * Real.exp ep ^ j := by rw [hsn]
         _ ≤ n * (3 / 2) := mul_le_mul_of_nonneg_left hcj (Nat.cast_nonneg n)
-    calc ‖((k * E) ^ j).trace - n‖ ≤ ‖((k * E) ^ j).trace‖ + ‖(n : ℂ)‖ := norm_sub_le _ _
+    calc
+      ‖((k * E) ^ j).trace - n‖
+        ≤ ‖((k * E) ^ j).trace‖ + ‖(n : ℂ)‖ := norm_sub_le _ _
       _ ≤ 3 * n := by rw [Complex.norm_natCast]; linarith
   · rcases Nat.eq_zero_or_pos n with rfl | hn
     · simp [hs]
@@ -146,7 +164,9 @@ theorem near_arch : ∀ (n : ℕ) (k X : Matrix (Fin n) (Fin n) ℂ) (ep : ℝ),
     have htt : t * t = ep := Real.mul_self_sqrt hep
     have hst : s * t ≤ 1 / 2 := by
       have : (s * t) * (s * t) ≤ 1 / 4 := by
-        calc (s * t) * (s * t) = (s * s) * (t * t) := by ring
+        calc
+          (s * t) * (s * t)
+            = (s * s) * (t * t) := by ring
           _ = n * ep := by rw [hsn, htt]
           _ ≤ 1 / 4 := hne
       nlinarith
@@ -181,7 +201,9 @@ theorem near_arch : ∀ (n : ℕ) (k X : Matrix (Fin n) (Fin n) ℂ) (ep : ℝ),
       rw [hsplit]
       abel
     rw [sqrt_hs_eq_norm, Real.sqrt_mul (Nat.cast_nonneg n), hsum]
-    calc ‖(k - 1) + k * (E - 1)‖ ≤ ‖k - 1‖ + ‖k * (E - 1)‖ := norm_add_le _ _
+    calc
+      ‖(k - 1) + k * (E - 1)‖
+        ≤ ‖k - 1‖ + ‖k * (E - 1)‖ := norm_add_le _ _
       _ ≤ 2 * (s * t) + 2 * (t * t) := by rw [norm_unitary_mul hk, htt]; linarith
       _ ≤ 3 * (s * t) := by nlinarith
 

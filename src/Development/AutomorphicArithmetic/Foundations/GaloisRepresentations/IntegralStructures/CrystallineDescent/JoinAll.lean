@@ -7,10 +7,14 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsSplitAt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RealGal
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL
+  GlobalTheory.RealGal
 open UpperTheory.V.Af (FrobEig algSat RepIso)
 open UpperTheory.V.Af.Bc (res)
 open UpperTheory.Gal.Int.Core
@@ -18,11 +22,19 @@ open UpperTheory.Gal.TP
 
 namespace UpperTheory.Gal.Int.Core
 
-theorem goodGuard_usPl (h1 : OneUs) (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (d : ℕ) (hd : ImQ E d) : GoodGuard Ω l (UsPl (E := E) d) := by
+theorem goodGuard_usPl
+    (h1 : OneUs)
+    (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (l : ℕ) [Fact l.Prime]
+    (d : ℕ) (hd : ImQ E d)
+    : GoodGuard Ω l (UsPl (E := E) d) := by
   refine ⟨fun _ h => h.1, fun S hS => ?_⟩
-  have hT := hS.union (Filter.eventually_cofinite.1 ((h1 E d hd).and (GlobalTheory.CongEx.eventually_not_mem_l E l)))
-  have hD := GlobalTheory.Published.ChebotarevDegreeOne.dense (F := E) (Ω := Ω) GlobalTheory.Published.chebotarevDegreeOne' hT
+  have hT :=
+    hS.union (Filter.eventually_cofinite.1 ((h1 E d hd).and
+      (GlobalTheory.CongEx.eventually_not_mem_l E l)))
+  have hD :=
+    GlobalTheory.Published.ChebotarevDegreeOne.dense (F := E) (Ω := Ω)
+      GlobalTheory.Published.chebotarevDegreeOne' hT
   refine (hD.preimage (Homeomorph.inv (G E Ω)).isOpenMap).mono ?_
   rintro g ⟨v, hv, hdeg, A, hA, hσ⟩
   simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hv
@@ -33,6 +45,8 @@ theorem goodGuard_usPl (h1 : OneUs) (E Ω : Type) [Field E] [NumberField E] [IsC
 
 theorem joinAll_of (h1 : OneUs) (hS : SubtractQ) : JoinAll := by
   intro hT hU E Ω _ _ _ _ _ _ l _ ι hF hI d hd hsq n hn
-  exact allCoreQ_of hS hT E Ω l ι hF hI _ (goodGuard_usPl h1 E Ω l d hd) (fun m hm => hU m hm E Ω l ι hF d hd hsq) n hn
+  exact allCoreQ_of hS hT E Ω l ι hF hI _ (goodGuard_usPl h1 E Ω l d hd)
+    (fun m hm => hU m hm E Ω l ι hF d hd hsq)
+    n hn
 
 end UpperTheory.Gal.Int.Core

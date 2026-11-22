@@ -8,17 +8,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DvdOfEqZero
 
 set_option autoImplicit false
 noncomputable section
-open Polynomial WittVector GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+open Polynomial WittVector GlobalTheory.Sandwich
+  GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
 
 namespace GlobalTheory.BRing
 
-variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (Ideal.span {(p : O)}) O]
-  {C : Type} [Field C] [IsAlgClosed C] [CharZero C] {v : Valuation C NNReal} [Algebra O C]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal} [Algebra O C]
   {ε : PreTilt O p}
 
-theorem tau_mul (hv : v.Integers O) (hε : IsPrimitiveSystem ε) (y : Ainf p O) :
-    τ ε * a ε y = 0 ↔ mu ε ∣ y := by
+theorem tau_mul (hv : v.Integers O) (hε : IsPrimitiveSystem ε) (y : Ainf p O)
+    : τ ε * a ε y = 0 ↔ mu ε ∣ y := by
   haveI := GlobalTheory.AinfXi.isDomain_ainf (p := p) hv
   constructor
   · intro h
@@ -29,13 +32,13 @@ theorem tau_mul (hv : v.Integers O) (hε : IsPrimitiveSystem ε) (y : Ainf p O) 
     rw [map_mul, ← p_τ]
     linear_combination (↑p * a ε z) * τ_sq ε
 
-theorem tau_dvd (hv : v.Integers O) (hε : IsPrimitiveSystem ε) (x : Ainf p O) :
-    τ ε ∣ a ε x ↔ mu ε ∣ x := by
+theorem tau_dvd (hv : v.Integers O) (hε : IsPrimitiveSystem ε) (x : Ainf p O)
+    : τ ε ∣ a ε x ↔ mu ε ∣ x := by
   constructor
   · rintro ⟨b, hb⟩
     obtain ⟨u, w, rfl⟩ := gen ε b
-    have h := dvd_of_eq_zero (ε := ε) x (-u) (by
-      rw [hb, map_neg]; linear_combination (a ε w) * τ_sq ε)
+    have h :=
+      dvd_of_eq_zero (ε := ε) x (-u) (by rw [hb, map_neg]; linear_combination (a ε w) * τ_sq ε)
     exact mu_dvd hv hε x (by
       have h2 : mu ε ∣ mu ε * -u := dvd_mul_right _ _
       have h3 := (dvd_pow_self (mu ε) two_ne_zero).trans h
@@ -52,50 +55,55 @@ theorem sat (hv : v.Integers O) (b : O) (h : (p : O) * b = 0) : b = 0 := by
     Function.Injective.isDomain (algebraMap O C) hv.hom_inj
   exact (mul_eq_zero.1 h).resolve_left hp
 
-theorem smod_iff {R : Type} [CommRing R] (q : R) (n : ℕ) (x y : R) :
-    x ≡ y [SMOD (Ideal.span {q}) ^ n • (⊤ : Submodule R R)] ↔ q ^ n ∣ x - y := by
+theorem smod_iff {R : Type} [CommRing R] (q : R) (n : ℕ) (x y : R)
+    : x ≡ y [SMOD (Ideal.span {q}) ^ n • (⊤ : Submodule R R)] ↔ q ^ n ∣ x - y := by
   rw [SModEq.sub_mem, Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top,
     Ideal.mem_span_singleton]
 
-theorem lim_series (u0 : Ainf p O) (u : ℕ → Ainf p O) : ∃ L : Ainf p O, ∀ n,
-    (p : Ainf p O) ^ n ∣ (u0 + ∑ k ∈ Finset.range n, (p : Ainf p O) ^ k * u k) - L := by
+theorem lim_series (u0 : Ainf p O) (u : ℕ → Ainf p O)
+    : ∃ L : Ainf p O, ∀ n,
+      (p : Ainf p O) ^ n ∣ (u0 + ∑ k ∈ Finset.range n, (p : Ainf p O) ^ k * u k) - L := by
   haveI : IsAdicComplete (Ideal.span {(p : Ainf p O)}) (Ainf p O) :=
     WittVector.isAdicCompleteIdealSpanP
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := Ideal.span {(p : Ainf p O)})
-    (fun N => u0 + ∑ k ∈ Finset.range N, (p : Ainf p O) ^ k * u k) (by
-      intro m n hmn
-      rw [smod_iff, ← dvd_neg, neg_sub]
-      induction n, hmn using Nat.le_induction with
-      | base => simp
-      | succ n hmn ih =>
-        rw [Finset.sum_range_succ, show ∀ s t w : Ainf p O, u0 + (s + t) - w = (u0 + s - w) + t
-          from fun _ _ _ => by ring]
-        exact dvd_add ih (Dvd.dvd.mul_right (pow_dvd_pow _ hmn) _))
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec' (I := Ideal.span {(p : Ainf p O)})
+      (fun N => u0 + ∑ k ∈ Finset.range N, (p : Ainf p O) ^ k * u k)
+      (by
+        intro m n hmn
+        rw [smod_iff, ← dvd_neg, neg_sub]
+        induction n, hmn using Nat.le_induction with
+        | base => simp
+        | succ n hmn ih =>
+          rw [Finset.sum_range_succ,
+            show ∀ s t w : Ainf p O, u0 + (s + t) - w = (u0 + s - w) + t from fun _ _ _ => by ring]
+          exact dvd_add ih (Dvd.dvd.mul_right (pow_dvd_pow _ hmn) _))
   exact ⟨L, fun n => (smod_iff _ _ _ _).1 (hL n)⟩
 
-theorem complete (hv : v.Integers O) (hε : IsPrimitiveSystem ε) :
-    IsAdicComplete (Ideal.span {(p : BR ε)}) (BR ε) := by
+theorem complete (hv : v.Integers O) (hε : IsPrimitiveSystem ε)
+    : IsAdicComplete (Ideal.span {(p : BR ε)}) (BR ε) := by
   haveI : IsAdicComplete (Ideal.span {(p : Ainf p O)}) (Ainf p O) :=
     WittVector.isAdicCompleteIdealSpanP
   refine { haus' := ?_, prec' := ?_ }
   · intro x hx
     have hx' : ∀ n, (p : BR ε) ^ n ∣ x := fun n => by simpa using (smod_iff _ n x 0).1 (hx n)
     obtain ⟨u, w, rfl⟩ := gen ε x
-    refine eq_zero_of_dvd hv hε u w (GlobalTheory.MuDivides.dvd_of_step (p : Ainf p O) (mu ε ^ 2)
-      (fun z => ∀ n, ∃ s t, z = (p : Ainf p O) ^ n * s + mu ε ^ 2 * t) ?_ _ ?_)
+    refine eq_zero_of_dvd hv hε u w
+      (GlobalTheory.MuDivides.dvd_of_step (p : Ainf p O) (mu ε ^ 2)
+        (fun z => ∀ n, ∃ s t, z = (p : Ainf p O) ^ n * s + mu ε ^ 2 * t)
+        ?_ _ ?_)
     · intro z hz
       obtain ⟨s, t, hst⟩ := hz 1
       refine ⟨t, s, by rw [hst]; ring, fun n => ?_⟩
       obtain ⟨s', t', hst'⟩ := hz (n + 1)
-      obtain ⟨e, he⟩ := mu_sq_dvd hv hε (s - p ^ n * s') ⟨t' - t, by
-        linear_combination hst' - hst⟩
+      obtain ⟨e, he⟩ := mu_sq_dvd hv hε (s - p ^ n * s') ⟨t' - t, by linear_combination hst' - hst⟩
       exact ⟨s', e, by linear_combination he⟩
     · intro n
       obtain ⟨c, hc⟩ := hx' n
       obtain ⟨s', t', rfl⟩ := gen ε c
-      obtain ⟨e, he⟩ := dvd_of_eq_zero (ε := ε) (u - p ^ n * s') (w - p ^ n * t') (by
-        simp only [map_sub, map_mul, map_pow, map_natCast]
-        linear_combination hc)
+      obtain ⟨e, he⟩ :=
+        dvd_of_eq_zero (ε := ε) (u - p ^ n * s') (w - p ^ n * t') (by
+          simp only [map_sub, map_mul, map_pow, map_natCast]
+          linear_combination hc)
       exact ⟨p * s' + mu ε * t', e, by linear_combination he⟩
   · intro f hf
     have hstep : ∀ n, ∃ c, f (n + 1) - f n = (p : BR ε) ^ n * c := fun n => by
@@ -106,8 +114,11 @@ theorem complete (hv : v.Integers O) (hε : IsPrimitiveSystem ε) :
     obtain ⟨u0, w0, h0⟩ := gen ε (f 0)
     obtain ⟨LX, hX⟩ := lim_series u0 u
     obtain ⟨LY, hY⟩ := lim_series w0 w
-    have hf' : ∀ N, f N = a ε (u0 + ∑ k ∈ Finset.range N, (p : Ainf p O) ^ k * u k) +
-        τ ε * a ε (w0 + ∑ k ∈ Finset.range N, (p : Ainf p O) ^ k * w k) := by
+    have hf'
+        : ∀ N,
+          f N
+            = a ε (u0 + ∑ k ∈ Finset.range N, (p : Ainf p O) ^ k * u k)
+              + τ ε * a ε (w0 + ∑ k ∈ Finset.range N, (p : Ainf p O) ^ k * w k) := by
       intro N
       induction N with
       | zero => simpa using h0
@@ -126,18 +137,18 @@ theorem complete (hv : v.Integers O) (hε : IsPrimitiveSystem ε) :
     simp only [map_sub, map_mul, map_pow, map_natCast, map_add (f := _)] at h1 h2 ⊢
     linear_combination h1 + τ ε * h2
 
-theorem sqz_pow {R : Type} [CommRing R] (s t : R) (ht : t * t = 0) (n : ℕ) :
-    (s + t) ^ (n + 1) = s ^ (n + 1) + (n + 1) * s ^ n * t := by
+theorem sqz_pow {R : Type} [CommRing R] (s t : R) (ht : t * t = 0) (n : ℕ)
+    : (s + t) ^ (n + 1) = s ^ (n + 1) + (n + 1) * s ^ n * t := by
   induction n with
   | zero => simp
   | succ n ih =>
-    rw [pow_succ, ih]; push_cast
+    rw [pow_succ, ih]
+    push_cast
     linear_combination ((n + 1 : R) * s ^ n) * ht
 
-theorem pow_gen (x y : Ainf p O) : (a ε x + τ ε * a ε y) ^ p =
-    a ε x ^ p + p * a ε x ^ (p - 1) * (τ ε * a ε y) := by
-  have hsq : (τ ε * a ε y) * (τ ε * a ε y) = 0 := by
-    linear_combination (a ε y * a ε y) * τ_sq ε
+theorem pow_gen (x y : Ainf p O)
+    : (a ε x + τ ε * a ε y) ^ p = a ε x ^ p + p * a ε x ^ (p - 1) * (τ ε * a ε y) := by
+  have hsq : (τ ε * a ε y) * (τ ε * a ε y) = 0 := by linear_combination (a ε y * a ε y) * τ_sq ε
   have h := sqz_pow (a ε x) (τ ε * a ε y) hsq (p - 1)
   have h1 : p - 1 + 1 = p := Nat.sub_add_cancel (Fact.out : p.Prime).one_le
   have h2 : ((p - 1 : ℕ) : BR ε) + 1 = p := by rw [← Nat.cast_add_one, h1]
@@ -153,8 +164,8 @@ theorem σ_pow (b : BR ε) : (p : BR ε) ∣ σ ε b - b ^ p := by
   linear_combination (-(τ ε * a ε d * a ε (frobenius y))) * p_τ ε +
     ((p : BR ε) * a ε d * a ε (frobenius y)) * τ_sq ε
 
-theorem pd (hv : v.Integers O) (hε : IsPrimitiveSystem ε) (x : BR ε) (hx : θ hε x = 0) :
-    ∃ y, θ hε y = 0 ∧ x ^ p = p * y := by
+theorem pd (hv : v.Integers O) (hε : IsPrimitiveSystem ε) (x : BR ε) (hx : θ hε x = 0)
+    : ∃ y, θ hε y = 0 ∧ x ^ p = p * y := by
   suffices h : (p : BR ε) ∣ x ^ p by
     obtain ⟨y, hy⟩ := h
     refine ⟨y, sat (p := p) hv _ ?_, hy⟩
@@ -164,8 +175,8 @@ theorem pd (hv : v.Integers O) (hε : IsPrimitiveSystem ε) (x : BR ε) (hx : θ
   obtain ⟨u, w, rfl⟩ := gen ε x
   have hu : fontaineTheta O p u = 0 := by
     rw [map_add (f := _), map_mul, θ_a, θ_a, θ_τ, zero_mul, add_zero] at hx; exact hx
-  obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1
-    (by rw [← GlobalTheory.AinfXi.ker_theta hv ε (prim hε)]; exact hu)
+  obtain ⟨c, rfl⟩ :=
+    Ideal.mem_span_singleton'.1 (by rw [← GlobalTheory.AinfXi.ker_theta hv ε (prim hε)]; exact hu)
   obtain ⟨z, hz⟩ := frob_congr (xi ε)
   obtain ⟨d, hd⟩ := frob_xi ε
   have hxi : a ε (xi ε) ^ p = p + p * τ ε * a ε d - p * a ε z := by
@@ -195,24 +206,27 @@ theorem isFrame (hv : v.Integers O) (hε : IsPrimitiveSystem ε) : QLog.IsFrame 
     unit_coprime := unit_coprime
     pd := pd hv hε
     sat := sat hv
-    complete := complete hv hε }
+    complete := complete hv hε
+  }
   · intro y
     obtain ⟨x, rfl⟩ := (GlobalTheory.AinfXi.ainf_local_xi_order p C v O hv ε (prim hε)).2.2.2.1 y
     exact ⟨a ε x, θ_a hε x⟩
-  · exact IsLocalization.injective (M := Submonoid.powers (p : BR ε)) _ (Submonoid.powers_le.2
-      (mem_nonZeroDivisors_iff.2 ⟨fun x hx => torsion_free hv hε x hx,
-        fun x hx => torsion_free hv hε x (by rw [mul_comm]; exact hx)⟩))
+  · exact IsLocalization.injective (M := Submonoid.powers (p : BR ε)) _
+      (Submonoid.powers_le.2 (mem_nonZeroDivisors_iff.2 ⟨
+        fun x hx => torsion_free hv hε x hx,
+        fun x hx => torsion_free hv hε x (by rw [mul_comm]; exact hx)
+      ⟩))
   · intro q
     obtain ⟨⟨b, ⟨_, k, rfl⟩⟩, hq⟩ := IsLocalization.surj (Submonoid.powers (p : BR ε)) q
     exact ⟨k, b, by rw [← hq, map_pow, map_natCast, mul_comm]⟩
-  ·
-    have := IsLocalization.Away.algebraMap_isUnit (S := BQ ε) (p : BR ε)
+  · have := IsLocalization.Away.algebraMap_isUnit (S := BQ ε) (p : BR ε)
     rwa [map_natCast] at this
 
-theorem exists_bFrame : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
-    (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)]
-    [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O →
-    ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), Nonempty (QLog.BFrame ε) := by
+theorem exists_bFrame
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), Nonempty (QLog.BFrame ε) := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε
   exact ⟨QLog.BFrame.mk (BR ε) (BQ ε) (a ε) (θ hε) (σ ε) (s ε) (τ ε) (isFrame hv hε) (θ_a hε)
     (σ_a ε) (s_alg ε) σ_pow (p_τ ε) (τ_sq ε) (gen ε) (tau_mul hv hε) (tau_dvd hv hε)⟩

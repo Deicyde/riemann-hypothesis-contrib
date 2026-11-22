@@ -14,8 +14,10 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry Limits TopologicalSpace Set MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.Points GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.TwistTop
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.Points
+  GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.TwistTop
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 
 namespace GlobalTheory.ArithmeticHeightTower.Read1
@@ -25,16 +27,16 @@ open GlobalTheory.Amb GlobalTheory.AmbMetric GlobalTheory.Published GlobalTheory
 theorem isArithVar_mpZ (m : ℕ) (n : Fin (m + 1) → ℕ) : IsArithVar (mpStr ℤ m n) (∑ a, n a) :=
   isArithVar_mp ℤ inferInstance m n
 
-theorem isArithVar_qp (n' m : ℕ) (n : Fin (m + 1) → ℕ) :
-    IsArithVar (qpStr n' m n) (∑ a, (Fin.cons n' n : Fin (m + 2) → ℕ) a) := by
+theorem isArithVar_qp (n' m : ℕ) (n : Fin (m + 1) → ℕ)
+    : IsArithVar (qpStr n' m n) (∑ a, (Fin.cons n' n : Fin (m + 2) → ℕ) a) := by
   have hA := isArithVar_mpZ m n
   have h1 : ringKrullDim ℤ = 1 := GlobalTheory.Amb.ringKrullDim_eq_one (Module.Finite.self ℤ)
   have hP := GlobalTheory.ProjModel.isArithVar_pspace ℤ h1 n'
   have hsum : ∑ a, (Fin.cons n' n : Fin (m + 2) → ℕ) a = n' + ∑ a, n a := Fin.sum_cons _ _
   rw [hsum]
   have hpc : GlobalTheory.Amb.PolyCovered (qpStr n' m n) (n' + ∑ a, n a) :=
-    GlobalTheory.Amb.polyCovered_pullback (PSpace.str ℤ n') (mpStr ℤ m n) _ _ (GlobalTheory.Amb.polyCovered_pSpace n')
-      (GlobalTheory.Amb.polyCovered_mp ℤ m n)
+    GlobalTheory.Amb.polyCovered_pullback (PSpace.str ℤ n') (mpStr ℤ m n) _ _
+      (GlobalTheory.Amb.polyCovered_pSpace n') (GlobalTheory.Amb.polyCovered_mp ℤ m n)
   have e : spMap (Int.castRingHom ℤ) = 𝟙 (Sp ℤ) := by simp
   have f1 : Flat (toSpecBase ℤ n') := by
     have := hP.flat
@@ -42,16 +44,26 @@ theorem isArithVar_qp (n' m : ℕ) (n : Fin (m + 1) → ℕ) :
   have f2 : Flat (mpStr ℤ m n) := by
     have := hA.flat
     rwa [e, Category.comp_id] at this
-  refine ⟨inferInstance, inferInstance, GlobalTheory.Amb.isIntegral_of_polyCovered _ _ hpc,
-    GlobalTheory.ProjSpace.isProjOver_pullback hP.isProjOver hA.isProjOver, ?_,
-    GlobalTheory.Amb.topologicalKrullDim_of_polyCovered h1 _ _ hpc⟩
+  refine ⟨
+    inferInstance,
+    inferInstance,
+    GlobalTheory.Amb.isIntegral_of_polyCovered _ _ hpc,
+    GlobalTheory.ProjSpace.isProjOver_pullback hP.isProjOver hA.isProjOver,
+    ?_,
+    GlobalTheory.Amb.topologicalKrullDim_of_polyCovered h1 _ _ hpc
+  ⟩
   rw [e, Category.comp_id]
   infer_instance
 
-theorem exists_lb_twB (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp ℤ) (D : ℕ) (hX : IsArithVar p D)
-    (ι : Type) [Fintype ι] (B : ι → LB X) (hB : ∀ j, (B j).IsLB) :
-    ∃ (m : ℕ) (n : Fin (m + 1) → ℕ) (i : X ⟶ MP ℤ m n) (_ : IsClosedImmersion i) (_ : i ≫ mpStr ℤ m n = p)
-      (c : ι → Fin m) (t : ι → ℤ), ∀ j, LBIso ((twB m n (c j) (t j)).pull i) (B j) := by
+theorem exists_lb_twB
+    (X : Scheme.{0}) [IsIntegral X]
+    (p : X ⟶ Sp ℤ) (D : ℕ) (hX : IsArithVar p D)
+    (ι : Type) [Fintype ι]
+    (B : ι → LB X) (hB : ∀ j, (B j).IsLB)
+    : ∃ (m : ℕ) (n : Fin (m + 1) → ℕ) (i : X ⟶ MP ℤ m n) (_ : IsClosedImmersion i)
+        (_ : i ≫ mpStr ℤ m n = p) (c : ι → Fin m) (t : ι → ℤ),
+      ∀ j,
+        LBIso ((twB m n (c j) (t j)).pull i) (B j) := by
   obtain ⟨N, e, he, hep⟩ := hX.isProjOver
   haveI := he
   choose tt r g hg hcls using fun (j : ι) => GlobalTheory.Amb.exists_twist_map e (B j) (hB j)
@@ -65,30 +77,48 @@ theorem exists_lb_twB (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp ℤ) (D : �
     · exact hep
     · exact (hg (eq.symm k)).trans hep
   let i := GroundTheory.Arith.SchemeCoh.ProjSpace.lift (Fintype.card ι) n p a ha
-  have hi0 : i ≫ pr ℤ (Fintype.card ι) n 0 = e := GroundTheory.Arith.SchemeCoh.ProjSpace.lift_pr _ n p a ha 0
+  have hi0 : i ≫ pr ℤ (Fintype.card ι) n 0 = e :=
+    GroundTheory.Arith.SchemeCoh.ProjSpace.lift_pr _ n p a ha 0
   haveI := GlobalTheory.Amb.isSeparated_pr_zero ℤ (Fintype.card ι) n
   haveI : IsClosedImmersion (i ≫ pr ℤ (Fintype.card ι) n 0) := by rw [hi0]; exact he
   have hci : IsClosedImmersion i := IsClosedImmersion.of_comp i (pr ℤ (Fintype.card ι) n 0)
-  have key : ∀ k : Fin (Fintype.card ι),
-      LBIso ((twB (Fintype.card ι) n k (-(tt (eq.symm k) : ℤ))).pull i) (B (eq.symm k)) := by
+  have key
+      : ∀ k : Fin (Fintype.card ι),
+        LBIso ((twB (Fintype.card ι) n k (-(tt (eq.symm k) : ℤ))).pull i) (B (eq.symm k)) := by
     intro k
-    exact GlobalTheory.Amb.lbIso_pull_tw i (pr ℤ (Fintype.card ι) n k.succ) (pr ℤ (Fintype.card ι) n 0) (a k.succ) e
-      (GroundTheory.Arith.SchemeCoh.ProjSpace.lift_pr _ n p a ha k.succ) hi0 (tt (eq.symm k)) (B (eq.symm k)) (hB _)
-      (hcls (eq.symm k))
-  refine ⟨Fintype.card ι, n, i, hci, GroundTheory.Arith.SchemeCoh.ProjSpace.lift_mpStr _ n p a ha, fun j => eq j,
-    fun j => -(tt j : ℤ), fun j => ?_⟩
+    exact GlobalTheory.Amb.lbIso_pull_tw i (pr ℤ (Fintype.card ι) n k.succ)
+      (pr ℤ (Fintype.card ι) n 0) (a k.succ) e
+      (GroundTheory.Arith.SchemeCoh.ProjSpace.lift_pr _ n p a ha k.succ) hi0 (tt (eq.symm k))
+      (B (eq.symm k)) (hB _) (hcls (eq.symm k))
+  refine ⟨
+    Fintype.card ι,
+    n,
+    i,
+    hci,
+    GroundTheory.Arith.SchemeCoh.ProjSpace.lift_mpStr _ n p a ha,
+    fun j => eq j,
+    fun j => -(tt j : ℤ),
+    fun j => ?_
+  ⟩
   have := key (eq j)
   rwa [Equiv.symm_apply_apply] at this
 
 theorem isLB_twB (m : ℕ) (n : Fin (m + 1) → ℕ) (c : Fin m) (t : ℤ) : (twB m n c t).IsLB :=
   isLB_tw (LB.isLB_pull (O1_isLB ℤ _) _) (LB.isLB_pull (O1_isLB ℤ _) _) _
 
-theorem exists_metric_ext_B (k : Type) [CommRing k] (P : Scheme.{0}) [IsIntegral P] (q : P ⟶ Sp k) (N : ℕ)
-    (hP : IsArithVar q N) (hs : GenSmooth q N) (X : Scheme.{0}) [IsIntegral X] (i : X ⟶ P) [IsClosedImmersion i]
-    (p : X ⟶ Sp k) (hi : i ≫ q = p) (B' : LB P) (hB' : B'.IsLB) (L : HermLB p) (hL : LBIso (B'.pull i) L.B) :
-    ∃ M : HermLB q, M.B = B' ∧ (M.pull i hi).Isometric L := by
-  obtain ⟨χ, hc, hj, hT⟩ := GlobalTheory.AmbMetric.exists_transport (B'.pull i)
-    (ReciprocityTheory.ChartRestriction.G.Semi.LB.isLB_pull hB' i) L hL
+theorem exists_metric_ext_B
+    (k : Type) [CommRing k]
+    (P : Scheme.{0}) [IsIntegral P]
+    (q : P ⟶ Sp k) (N : ℕ) (hP : IsArithVar q N) (hs : GenSmooth q N)
+    (X : Scheme.{0}) [IsIntegral X]
+    (i : X ⟶ P) [IsClosedImmersion i]
+    (p : X ⟶ Sp k) (hi : i ≫ q = p)
+    (B' : LB P) (hB' : B'.IsLB)
+    (L : HermLB p) (hL : LBIso (B'.pull i) L.B)
+    : ∃ M : HermLB q, M.B = B' ∧ (M.pull i hi).Isometric L := by
+  obtain ⟨χ, hc, hj, hT⟩ :=
+    GlobalTheory.AmbMetric.exists_transport (B'.pull i)
+      (ReciprocityTheory.ChartRestriction.G.Semi.LB.isLB_pull hB' i) L hL
   obtain ⟨ψ, hψc, hψj, hext⟩ := GlobalTheory.AmbMetric.exists_weight_ext i hi hP hs B' hB' χ hc hj
   refine ⟨⟨B', hB', ψ, hψc, hψj⟩, rfl, ?_⟩
   refine GlobalTheory.HermLB.Isometric.trans ?_ hT
@@ -101,14 +131,20 @@ theorem exists_metric_ext_B (k : Type) [CommRing k] (P : Scheme.{0}) [IsIntegral
   rw [hext σ (a PUnit.unit) y hm] at e1
   exact e1.symm
 
-theorem isTwB_of_eq {m : ℕ} {n : Fin (m + 1) → ℕ} (M : HermLB (mpStr ℤ m n)) (c : Fin m) (t : ℤ)
-    (h : M.B = twB m n c t) : IsTwB M := by
+theorem isTwB_of_eq
+    {m : ℕ} {n : Fin (m + 1) → ℕ} (M : HermLB (mpStr ℤ m n)) (c : Fin m)
+    (t : ℤ) (h : M.B = twB m n c t)
+    : IsTwB M := by
   exact ⟨c, t, ⟨by rw [h]; exact GlobalTheory.lbIso_self (isLB_twB m n c t)⟩⟩
 
-theorem exists_ambientZ {X : Scheme.{0}} [IsIntegral X] {p : X ⟶ Sp ℤ} {D : ℕ}
-    (hX : IsArithVar p D) {ι : Type} [Fintype ι] (L : ι → HermLB p) :
-    ∃ (m : ℕ) (n : Fin (m + 1) → ℕ) (i : X ⟶ MP ℤ m n) (_ : IsClosedImmersion i) (hi : i ≫ mpStr ℤ m n = p)
-      (M : ι → HermLB (mpStr ℤ m n)), (∀ j, IsTwB (M j)) ∧ ∀ j, ((M j).pull i hi).Isometric (L j) := by
+theorem exists_ambientZ
+    {X : Scheme.{0}} [IsIntegral X]
+    {p : X ⟶ Sp ℤ} {D : ℕ} (hX : IsArithVar p D)
+    {ι : Type} [Fintype ι]
+    (L : ι → HermLB p)
+    : ∃ (m : ℕ) (n : Fin (m + 1) → ℕ) (i : X ⟶ MP ℤ m n) (_ : IsClosedImmersion i)
+        (hi : i ≫ mpStr ℤ m n = p) (M : ι → HermLB (mpStr ℤ m n)),
+      (∀ j, IsTwB (M j)) ∧ ∀ j, ((M j).pull i hi).Isometric (L j) := by
   obtain ⟨m, n, i, hci, hi, c, t, hiso⟩ :=
     exists_lb_twB X p D hX ι (fun j => (L j).B) (fun j => (L j).isLB)
   haveI := hci
@@ -159,27 +195,35 @@ theorem proj (HH : HeightsZ) (HQ : HeightsQ) (HP : ProjQ) : HeightProjection := 
   have hAM := isArithVar_mpZ m n
   obtain ⟨hM0, hhM⟩ := HH m n (M ()) (hM ())
   obtain ⟨h', hh'⟩ := HQ n' m n (M ()) (hM ())
-  have hXh : L.IsArithHeight (fun x => hM0 (i x)) := (hI ()).isArithHeight hX (hhM.restrict hAM i hi)
+  have hXh : L.IsArithHeight (fun x => hM0 (i x)) :=
+    (hI ()).isArithHeight hX (hhM.restrict hAM i hi)
   have heq : h = fun x => hM0 (i x) := GlobalTheory.HermLB.IsArithHeight.unique hX hh hXh
   have hY1 := hh'.restrict hAQ j hjq
-  have iso_of_refines {Z : Scheme.{0}} {r : Z ⟶ Sp ℤ} {A B : HermLB r} {v : A.B.ι → B.B.ι}
-      (hv : Refines A B v 0) : A.Isometric B :=
-    GlobalTheory.HermLB.isometric_of_chart v hv.le (fun x j j' hj hj' => hv.g Z (𝟙 Z) x j j' hj hj')
+  have iso_of_refines
+      {Z : Scheme.{0}} {r : Z ⟶ Sp ℤ} {A B : HermLB r} {v : A.B.ι → B.B.ι} (hv : Refines A B v 0)
+      : A.Isometric B :=
+    GlobalTheory.HermLB.isometric_of_chart v hv.le
+      (fun x j j' hj hj' => hv.g Z (𝟙 Z) x j j' hj hj')
       (fun σ j y hy => ((hv.φ σ j y hy).trans (add_zero _)).symm)
-  have hY2 := (iso_of_refines (GlobalTheory.HermLB.refines_pull_pull (M ()) (qpSnd n' m n) (qpSnd_str n' m n) j hjq
-    (by rw [Category.assoc, qpSnd_str, hjq]))).isArithHeight hY hY1
+  have hY2 :=
+    (iso_of_refines (GlobalTheory.HermLB.refines_pull_pull (M ()) (qpSnd n' m n) (qpSnd_str n' m n)
+      j hjq (by rw [Category.assoc, qpSnd_str, hjq]))).isArithHeight hY hY1
   rw [GlobalTheory.Published.Amb.pull_congr (M ()) hjs _ hπi] at hY2
-  have hY3 := (iso_of_refines (GlobalTheory.HermLB.refines_pull_comp (M ()) i hi π hπ hπi)).isArithHeight hY hY2
+  have hY3 :=
+    (iso_of_refines (GlobalTheory.HermLB.refines_pull_comp (M ()) i hi π hπ hπi)).isArithHeight hY
+      hY2
   have hY4 := ((hI ()).pull π hπ).isArithHeight hY hY3
   refine ⟨fun y => h' (j y), hY4, ?_⟩
   have hpt : qpSnd n' m n (j (genericPoint Y)) = i (π (genericPoint Y)) := by
     rw [← Scheme.Hom.comp_apply, hjs, Scheme.Hom.comp_apply]
-  have hrd : Scheme.Hom.residueDegree (qpSnd n' m n) (j (genericPoint Y)) =
-      Scheme.Hom.residueDegree π (genericPoint Y) := by
+  have hrd
+      : Scheme.Hom.residueDegree (qpSnd n' m n) (j (genericPoint Y))
+        = Scheme.Hom.residueDegree π (genericPoint Y) := by
     have e1 := GlobalTheory.CurveDegreesCompare.residueDegree_comp j (qpSnd n' m n) (genericPoint Y)
     have e2 := GlobalTheory.CurveDegreesCompare.residueDegree_comp π i (genericPoint Y)
     rw [hjs, e2, GlobalTheory.Published.residueDegree_of_isClosedImmersion i,
-      GlobalTheory.Published.residueDegree_of_isClosedImmersion j] at e1
+        GlobalTheory.Published.residueDegree_of_isClosedImmersion j]
+      at e1
     simpa using e1.symm
   have hdimQ := hdim
   rw [← GlobalTheory.Published.Amb.dim_closure_image i, ← hpt] at hdimQ

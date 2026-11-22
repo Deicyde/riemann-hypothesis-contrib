@@ -12,26 +12,30 @@ noncomputable section
 
 namespace Formalism.HermitianLattices.Ext.PrimesInProgressions.T2
 
-theorem prodLower (n : ℕ) (z : Fin n → ℂ) (ρ : ℝ) (hρ : 0 < ρ) (ξ : ℂ) (hξ : ‖ξ‖ = ρ⁻¹) :
-    ρ⁻¹ ^ n * ∏ i, |ρ - ‖z i‖| ≤ ‖∏ i, (1 - z i * ξ)‖ := by
+theorem prodLower (n : ℕ) (z : Fin n → ℂ) (ρ : ℝ) (hρ : 0 < ρ) (ξ : ℂ) (hξ : ‖ξ‖ = ρ⁻¹)
+    : ρ⁻¹ ^ n * ∏ i, |ρ - ‖z i‖| ≤ ‖∏ i, (1 - z i * ξ)‖ := by
   have hfac : ∀ i, ρ⁻¹ * |ρ - ‖z i‖| ≤ ‖1 - z i * ξ‖ := by
     intro i
-    have h1 : ρ⁻¹ * (ρ - ‖z i‖) = 1 - ‖z i‖ * ρ⁻¹ := by
-      rw [mul_sub, inv_mul_cancel₀ hρ.ne']; ring
+    have h1 : ρ⁻¹ * (ρ - ‖z i‖) = 1 - ‖z i‖ * ρ⁻¹ := by rw [mul_sub, inv_mul_cancel₀ hρ.ne']; ring
     have h2 : ρ⁻¹ * |ρ - ‖z i‖| = |1 - ‖z i‖ * ρ⁻¹| := by
       rw [← h1, abs_mul, abs_of_pos (inv_pos.mpr hρ)]
     rw [h2]
-    calc |1 - ‖z i‖ * ρ⁻¹| = |‖(1 : ℂ)‖ - ‖z i * ξ‖| := by rw [norm_one, norm_mul, hξ]
+    calc
+      |1 - ‖z i‖ * ρ⁻¹|
+        = |‖(1 : ℂ)‖ - ‖z i * ξ‖| := by rw [norm_one, norm_mul, hξ]
       _ ≤ ‖1 - z i * ξ‖ := abs_norm_sub_norm_le _ _
-  calc ρ⁻¹ ^ n * ∏ i, |ρ - ‖z i‖| = ∏ i, (ρ⁻¹ * |ρ - ‖z i‖|) := by
-        rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+  calc
+    ρ⁻¹ ^ n * ∏ i, |ρ - ‖z i‖| = ∏ i, (ρ⁻¹ * |ρ - ‖z i‖|) := by
+      rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
     _ ≤ ∏ i, ‖1 - z i * ξ‖ :=
-        Finset.prod_le_prod₀ (fun i _ => mul_nonneg (inv_nonneg.mpr hρ.le) (abs_nonneg _))
-          (fun i _ => hfac i)
+      Finset.prod_le_prod₀
+        (fun i _ => mul_nonneg (inv_nonneg.mpr hρ.le) (abs_nonneg _))
+        (fun i _ => hfac i)
     _ = ‖∏ i, (1 - z i * ξ)‖ := (norm_prod Finset.univ _).symm
 
-theorem turan2Main (n m : ℕ) (z : Fin n → ℂ) (hn : 1 ≤ n) (hz : ∀ i, ‖z i‖ ≤ 1) (hz1 : ∃ i, ‖z i‖ = 1) :
-    ∃ k : ℕ, m + 1 ≤ k ∧ k ≤ m + n ∧ ((n : ℝ) / (1600 * ((m : ℝ) + n))) ^ n ≤ ‖∑ i, z i ^ k‖ := by
+theorem turan2Main
+    (n m : ℕ) (z : Fin n → ℂ) (hn : 1 ≤ n) (hz : ∀ i, ‖z i‖ ≤ 1) (hz1 : ∃ i, ‖z i‖ = 1)
+    : ∃ k : ℕ, m + 1 ≤ k ∧ k ≤ m + n ∧ ((n : ℝ) / (1600 * ((m : ℝ) + n))) ^ n ≤ ‖∑ i, z i ^ k‖ := by
   by_contra hcon
   push_neg at hcon
   obtain ⟨i0, hi0⟩ := hz1
@@ -53,8 +57,7 @@ theorem turan2Main (n m : ℕ) (z : Fin n → ℂ) (hn : 1 ≤ n) (hz : ∀ i, �
   set M : ℝ := (m : ℝ) + n with hMdef
   set r : ℝ := (n : ℝ) / (6 * M) with hr
   have hr0 : 0 < r := div_pos (by linarith) (by linarith)
-  have hr6 : r ≤ 1 / 6 := by
-    rw [hr, div_le_iff₀ (by linarith)]; linarith
+  have hr6 : r ≤ 1 / 6 := by rw [hr, div_le_iff₀ (by linarith)]; linarith
   obtain ⟨ρ, hρc, hP⟩ := prodDist (fun i : Fin n => ‖z i‖) Finset.univ (1 - 2 * r) r hr0
   have hP' : (r / 25) ^ n ≤ ∏ j : Fin n, |ρ - ‖z j‖| := by
     have h := hP
@@ -72,19 +75,23 @@ theorem turan2Main (n m : ℕ) (z : Fin n → ℂ) (hn : 1 ≤ n) (hz : ∀ i, �
     rw [he] at hb
     have h3 : (q : ℝ) * (3 * r) ≤ 1 / 2 := by
       have he2 : (q : ℝ) * (3 * r) = ((q : ℝ) * n) / (2 * M) := by rw [hr]; ring_nf
-      rw [he2, div_le_iff₀ (by linarith)]; linarith
+      rw [he2, div_le_iff₀ (by linarith)]
+      linarith
     have hq0 : (0 : ℝ) ≤ q := Nat.cast_nonneg q
     nlinarith [mul_le_mul_of_nonneg_left (show 1 - ρ ≤ 3 * r by linarith) hq0]
   have hρm : (1 / 2 : ℝ) ^ n ≤ ρ ^ (m + 1) := by
-    calc (1 / 2 : ℝ) ^ n ≤ (ρ ^ q) ^ n := pow_le_pow_left₀ (by norm_num) hρq n
+    calc
+      (1 / 2 : ℝ) ^ n
+        ≤ (ρ ^ q) ^ n := pow_le_pow_left₀ (by norm_num) hρq n
       _ = ρ ^ (q * n) := (pow_mul ρ q n).symm
       _ ≤ ρ ^ (m + 1) := pow_le_pow_of_le_one hρ0.le hρ1.le hq1
   have hkey : (n : ℝ) * (2 ^ n * B) < ρ ^ (m + 1) * P := by
     have hlow : ((n : ℝ) / (300 * M)) ^ n ≤ ρ ^ (m + 1) * P := by
-      calc ((n : ℝ) / (300 * M)) ^ n = (1 / 2 : ℝ) ^ n * (r / 25) ^ n := by
-            rw [← mul_pow]; congr 1; rw [hr]; ring_nf
+      calc
+        ((n : ℝ) / (300 * M)) ^ n
+          = (1 / 2 : ℝ) ^ n * (r / 25) ^ n := by rw [← mul_pow]; congr 1; rw [hr]; ring_nf
         _ ≤ ρ ^ (m + 1) * P :=
-            mul_le_mul hρm hP' (pow_pos (div_pos hr0 (by norm_num)) n).le (pow_pos hρ0 _).le
+          mul_le_mul hρm hP' (pow_pos (div_pos hr0 (by norm_num)) n).le (pow_pos hρ0 _).le
     have hB : (n : ℝ) * (2 ^ n * B) = n * ((3 / 8 : ℝ) ^ n * ((n : ℝ) / (300 * M)) ^ n) := by
       rw [hBdef, ← mul_pow, ← mul_pow]; congr 2; ring_nf
     have hY : 0 < ((n : ℝ) / (300 * M)) ^ n := pow_pos (div_pos (by linarith) (by linarith)) n
@@ -95,7 +102,9 @@ theorem turan2Main (n m : ℕ) (z : Fin n → ℂ) (hn : 1 ≤ n) (hz : ∀ i, �
       have hone : (3 / 8 : ℝ) ^ n * (8 / 3) ^ n = 1 := by rw [← mul_pow]; norm_num
       have hpos : (0 : ℝ) < (3 / 8) ^ n := pow_pos (by norm_num) n
       nlinarith [mul_le_mul_of_nonneg_left hb hpos.le]
-    calc (n : ℝ) * (2 ^ n * B) = n * ((3 / 8 : ℝ) ^ n * ((n : ℝ) / (300 * M)) ^ n) := hB
+    calc
+      (n : ℝ) * (2 ^ n * B)
+        = n * ((3 / 8 : ℝ) ^ n * ((n : ℝ) / (300 * M)) ^ n) := hB
       _ = (n * (3 / 8 : ℝ) ^ n) * ((n : ℝ) / (300 * M)) ^ n := by ring
       _ < 1 * ((n : ℝ) / (300 * M)) ^ n := mul_lt_mul_of_pos_right hsmall hY
       _ = ((n : ℝ) / (300 * M)) ^ n := one_mul _
@@ -127,8 +136,9 @@ theorem turan2Main (n m : ℕ) (z : Fin n → ℂ) (hn : 1 ≤ n) (hz : ∀ i, �
   have hbound : ∀ ζ : ℂ, ‖ζ‖ = 1 → ‖∑ i, (y i * ζ) ^ (m + 1) / (1 - y i * ζ)‖ ≤ K := by
     intro ζ hζ
     have hnζ' : ‖ξ * ζ‖ = ρ⁻¹ := by rw [norm_mul, hξ, hζ, mul_one]
-    have hsum : ∑ i, (y i * ζ) ^ (m + 1) / (1 - y i * ζ)
-        = ∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ)) := by
+    have hsum
+        : ∑ i, (y i * ζ) ^ (m + 1) / (1 - y i * ζ)
+          = ∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ)) := by
       refine Finset.sum_congr rfl (fun i _ => ?_)
       have hyz : y i * ζ = z i * (ξ * ζ) := by
         show z i * ξ * ζ = z i * (ξ * ζ)
@@ -145,27 +155,33 @@ theorem turan2Main (n m : ℕ) (z : Fin n → ℂ) (hn : 1 ≤ n) (hz : ∀ i, �
     have hmain := Tbound n m hn z hz B hβ (ξ * ζ) (by rw [hnζ']; exact hρinv1.le) hne
     rw [hnζ'] at hmain
     have hS0 : 0 ≤ ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖ := norm_nonneg _
-    have h1 : ρ⁻¹ ^ n * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖)
-        ≤ ρ⁻¹ ^ n * (ρ⁻¹ ^ (m + 1) * (n * (2 ^ n * B))) := by
-      calc ρ⁻¹ ^ n * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖)
-            = (ρ⁻¹ ^ n * P) * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖ := by ring
+    have h1
+        : ρ⁻¹ ^ n * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖)
+          ≤ ρ⁻¹ ^ n * (ρ⁻¹ ^ (m + 1) * (n * (2 ^ n * B))) := by
+      calc
+        ρ⁻¹ ^ n * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖)
+          = (ρ⁻¹ ^ n * P) * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖ := by ring
         _ ≤ ‖∏ i, (1 - z i * (ξ * ζ))‖ * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖ :=
-            mul_le_mul_of_nonneg_right hA hS0
+          mul_le_mul_of_nonneg_right hA hS0
         _ ≤ ρ⁻¹ ^ (m + 1) * (n * (ρ⁻¹ ^ n * (2 ^ n * B))) := hmain
         _ = ρ⁻¹ ^ n * (ρ⁻¹ ^ (m + 1) * (n * (2 ^ n * B))) := by ring
-    have h2 : P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖
-        ≤ ρ⁻¹ ^ (m + 1) * (n * (2 ^ n * B)) :=
+    have h2
+        : P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖
+          ≤ ρ⁻¹ ^ (m + 1) * (n * (2 ^ n * B)) :=
       le_of_mul_le_mul_left h1 (pow_pos (inv_pos.mpr hρ0) n)
-    have h3 : ρ ^ (m + 1) * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖)
-        ≤ n * (2 ^ n * B) := by
-      calc ρ ^ (m + 1) * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖)
+    have h3
+        : ρ ^ (m + 1) * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖)
+          ≤ n * (2 ^ n * B) := by
+      calc
+        ρ ^ (m + 1) * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖)
             ≤ ρ ^ (m + 1) * (ρ⁻¹ ^ (m + 1) * (n * (2 ^ n * B))) :=
-            mul_le_mul_of_nonneg_left h2 (pow_pos hρ0 _).le
+          mul_le_mul_of_nonneg_left h2 (pow_pos hρ0 _).le
         _ = (ρ * ρ⁻¹) ^ (m + 1) * (n * (2 ^ n * B)) := by rw [mul_pow]; ring
         _ = n * (2 ^ n * B) := by rw [mul_inv_cancel₀ hρ0.ne', one_pow, one_mul]
     rw [hK, le_div_iff₀ hRP]
-    calc ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖ * (ρ ^ (m + 1) * P)
-          = ρ ^ (m + 1) * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖) := by ring
+    calc
+      ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖ * (ρ ^ (m + 1) * P)
+        = ρ ^ (m + 1) * (P * ‖∑ i, (z i * (ξ * ζ)) ^ (m + 1) / (1 - z i * (ξ * ζ))‖) := by ring
       _ ≤ n * (2 ^ n * B) := h3
   have hcard := avgLimit y hy (m + 1) (by omega) K hbound
   have hmem : i0 ∈ Finset.univ.filter (fun i => 1 < ‖y i‖) := by
@@ -174,7 +190,8 @@ theorem turan2Main (n m : ℕ) (z : Fin n → ℂ) (hn : 1 ≤ n) (hz : ∀ i, �
     rw [hyn, hi0, one_mul]
     exact hρinv1
   have hpos : 0 < (Finset.univ.filter (fun i => 1 < ‖y i‖)).card := Finset.card_pos.mpr ⟨i0, hmem⟩
-  have hone : (1 : ℝ) ≤ ((Finset.univ.filter (fun i => 1 < ‖y i‖)).card : ℝ) := by exact_mod_cast hpos
+  have hone : (1 : ℝ) ≤ ((Finset.univ.filter (fun i => 1 < ‖y i‖)).card : ℝ) := by
+    exact_mod_cast hpos
   linarith
 
 end Formalism.HermitianLattices.Ext.PrimesInProgressions.T2

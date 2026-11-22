@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Chr
 open scoped Pointwise
 
 namespace UpperTheory.V.Chr.RationalPlaces
@@ -26,14 +27,14 @@ private noncomputable def vQ : HeightOneSpectrum (𝓞 ℚ) where
 
 variable {l} {Ω : Type} [Field Ω]
 
-private theorem isPlaceOver_vQ [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω)
-    (hA : A.valuation ((l : ℕ) : Ω) < 1) : IsPlaceOver (F := ℚ) A (vQ l) := by
+private theorem isPlaceOver_vQ
+    [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation ((l : ℕ) : Ω) < 1)
+    : IsPlaceOver (F := ℚ) A (vQ l) := by
   unfold IsPlaceOver
   intro x
   set m : ℤ := Rat.ringOfIntegersEquiv x with hmdef
   have hx : algebraMap ℚ Ω (x : ℚ) = (m : Ω) := by
-    have e : ((m : ℤ) : ℚ) = (x : ℚ) := by
-      rw [hmdef, Rat.ringOfIntegersEquiv_apply_coe]
+    have e : ((m : ℤ) : ℚ) = (x : ℚ) := by rw [hmdef, Rat.ringOfIntegersEquiv_apply_coe]
     rw [← e, map_intCast]
   have hmem : x ∈ (vQ l).asIdeal ↔ (l : ℤ) ∣ m := by
     change x ∈ Ideal.span {((l : ℕ) : 𝓞 ℚ)} ↔ _
@@ -69,8 +70,8 @@ private theorem isPlaceOver_vQ [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : Valua
 private theorem val_natCast_le_one (A : ValuationSubring Ω) (n : ℕ) : A.valuation (n : Ω) ≤ 1 :=
   (A.valuation_le_one_iff _).mpr (natCast_mem A n)
 
-private theorem val_lt_one_iff (A : ValuationSubring Ω) (n : ℕ) (hn : n ≠ 0) :
-    A.valuation (n : Ω) < 1 ↔ ∃ p ∈ n.primeFactors, A.valuation (p : Ω) < 1 := by
+private theorem val_lt_one_iff (A : ValuationSubring Ω) (n : ℕ) (hn : n ≠ 0)
+    : A.valuation (n : Ω) < 1 ↔ ∃ p ∈ n.primeFactors, A.valuation (p : Ω) < 1 := by
   revert hn
   induction n using Nat.recOnMul with
   | zero => intro h; exact absurd rfl h
@@ -83,8 +84,9 @@ private theorem val_lt_one_iff (A : ValuationSubring Ω) (n : ℕ) (hn : n ≠ 0
     intro hab
     have ha : a ≠ 0 := left_ne_zero_of_mul hab
     have hb : b ≠ 0 := right_ne_zero_of_mul hab
-    have key : A.valuation (a : Ω) * A.valuation (b : Ω) < 1 ↔
-        A.valuation (a : Ω) < 1 ∨ A.valuation (b : Ω) < 1 := by
+    have key
+        : A.valuation (a : Ω) * A.valuation (b : Ω) < 1
+          ↔ A.valuation (a : Ω) < 1 ∨ A.valuation (b : Ω) < 1 := by
       constructor
       · intro h
         by_contra hc
@@ -104,8 +106,8 @@ private theorem val_lt_one_iff (A : ValuationSubring Ω) (n : ℕ) (hn : n ≠ 0
     · rintro ⟨p, hp | hp, h⟩
       exacts [Or.inl ⟨p, hp, h⟩, Or.inr ⟨p, hp, h⟩]
 
-private theorem exists_place [CharZero Ω] (p : ℕ) (hp : p.Prime) :
-    ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1 := by
+private theorem exists_place [CharZero Ω] (p : ℕ) (hp : p.Prime)
+    : ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1 := by
   let x : (⊥ : Subring Ω) := ⟨(p : Ω), natCast_mem _ p⟩
   have hI : Ideal.span {x} ≠ ⊤ := by
     rw [Ne, Ideal.span_singleton_eq_top]
@@ -127,18 +129,22 @@ private theorem exists_place [CharZero Ω] (p : ℕ) (hp : p.Prime) :
 end UpperTheory.V.Chr.RationalPlaces
 
 open UpperTheory.V.Chr.RationalPlaces in
-theorem UpperTheory.V.Chr.placesQ :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω], (∀ p : ℕ, p.Prime → ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1) ∧
-          (∀ (A : ValuationSubring Ω) (n : ℕ), n ≠ 0 → (A.valuation (n : Ω) < 1 ↔ ∃ p ∈ n.primeFactors, A.valuation (p : Ω) < 1)) ∧
-          ∀ (p : ℕ) (A A' : ValuationSubring Ω), p.Prime → A.valuation (p : Ω) < 1 → A'.valuation (p : Ω) < 1 →
-            ∃ u : G ℚ Ω, (∀ x ∈ Dec (F := ℚ) A, u⁻¹ * x * u ∈ Dec (F := ℚ) A') ∧ ∀ x ∈ Ine (F := ℚ) A, u⁻¹ * x * u ∈ Ine (F := ℚ) A' := by
+theorem UpperTheory.V.Chr.placesQ
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω],
+      (∀ p : ℕ, p.Prime → ∃ A : ValuationSubring Ω, A.valuation (p : Ω) < 1)
+        ∧ (∀ (A : ValuationSubring Ω) (n : ℕ),
+          n ≠ 0 → (A.valuation (n : Ω) < 1 ↔ ∃ p ∈ n.primeFactors, A.valuation (p : Ω) < 1))
+        ∧ ∀ (p : ℕ) (A A' : ValuationSubring Ω),
+          p.Prime → A.valuation (p : Ω) < 1 → A'.valuation (p : Ω) < 1
+            → ∃ u : G ℚ Ω,
+              (∀ x ∈ Dec (F := ℚ) A, u⁻¹ * x * u ∈ Dec (F := ℚ) A')
+                ∧ ∀ x ∈ Ine (F := ℚ) A, u⁻¹ * x * u ∈ Ine (F := ℚ) A' := by
   intro Ω _ _ _
   refine ⟨fun p hp => exists_place p hp, fun A n hn => val_lt_one_iff A n hn, ?_⟩
   intro p A A' hp hA hA'
   haveI : Fact p.Prime := ⟨hp⟩
   obtain ⟨σ, hσ⟩ := exists_smul_eq_of_isPlaceOver (isPlaceOver_vQ A hA) (isPlaceOver_vQ A' hA')
-  have hL : IsLift (RingEquiv.refl ℚ) (σ⁻¹ : G ℚ Ω).toRingEquiv := fun x =>
-    AlgEquiv.commutes _ x
+  have hL : IsLift (RingEquiv.refl ℚ) (σ⁻¹ : G ℚ Ω).toRingEquiv := fun x => AlgEquiv.commutes _ x
   have hmem : ∀ x : Ω, (σ⁻¹ : G ℚ Ω).toRingEquiv x ∈ A ↔ x ∈ A' := by
     intro x
     rw [← hσ, ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem]

@@ -5,14 +5,25 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PullbackPullba
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.Factor
 
-theorem exists_upper_transvection_upper : ∀ (N j : ℕ) (ca cb : Fin N) (C : Matrix (Fin N) (Fin N) ℂ), (cb : ℕ) = ca + 1 → ((ca : ℕ) < N - j ↔ (cb : ℕ) < N - j) → IsBlockDiag j C → C.det ≠ 0 → (∀ r c, c < r → ¬ (r = cb ∧ c = ca) → C r c = 0) → ∃ (B U : Matrix (Fin N) (Fin N) ℂ) (t : ℂ), IsBlockDiag j B ∧ B.BlockTriangular id ∧ B.det ≠ 0 ∧ IsBlockDiag j U ∧ U.BlockTriangular id ∧ (∀ c, U c c ≠ 0) ∧ C = B * (1 + Matrix.single cb ca t) * U := by
+theorem exists_upper_transvection_upper
+    : ∀ (N j : ℕ) (ca cb : Fin N) (C : Matrix (Fin N) (Fin N) ℂ),
+      (cb : ℕ) = ca + 1 → ((ca : ℕ) < N - j ↔ (cb : ℕ) < N - j) → IsBlockDiag j C → C.det ≠ 0
+        → (∀ r c, c < r → ¬(r = cb ∧ c = ca) → C r c = 0)
+        → ∃ (B U : Matrix (Fin N) (Fin N) ℂ) (t : ℂ),
+          IsBlockDiag j B ∧ B.BlockTriangular id ∧ B.det ≠ 0 ∧ IsBlockDiag j U
+            ∧ U.BlockTriangular id ∧ (∀ c, U c c ≠ 0)
+            ∧ C = B * (1 + Matrix.single cb ca t) * U := by
   intro N j ca cb C hcb hblk hC hdet hlow
   have hlt : ca < cb := by rw [Fin.lt_def]; omega
   have hne : ca ≠ cb := ne_of_lt hlt
@@ -41,13 +52,12 @@ theorem exists_upper_transvection_upper : ∀ (N j : ℕ) (ca cb : Fin N) (C : M
       rw [hC'a, hC a b hab, hC cb b (by rw [← hblk]; exact hab)]
       ring
     · rw [hC'o a b ha, hC a b hab]
-  have hC'low : ∀ r c, c < r → ¬ (r = cb ∧ c = ca) → C' r c = 0 := by
+  have hC'low : ∀ r c, c < r → ¬(r = cb ∧ c = ca) → C' r c = 0 := by
     intro r c hrc h
     by_cases hr : r = ca
     · subst hr
       have hcb' : c < cb := lt_trans hrc hlt
-      rw [hC'a, hlow _ c hrc (fun h' => hne h'.1),
-        hlow cb c hcb' (fun h' => (ne_of_lt hrc) h'.2)]
+      rw [hC'a, hlow _ c hrc (fun h' => hne h'.1), hlow cb c hcb' (fun h' => (ne_of_lt hrc) h'.2)]
       ring
     · rw [hC'o r c hr]
       exact hlow r c hrc h
@@ -100,7 +110,7 @@ theorem exists_upper_transvection_upper : ∀ (N j : ℕ) (ca cb : Fin N) (C : M
     change c < r at hrc
     rw [Matrix.transvection, Matrix.add_apply, Matrix.one_apply, Matrix.single_apply,
       if_neg (ne_of_gt hrc)]
-    have h : ¬ (ca = r ∧ cb = c) := by
+    have h : ¬(ca = r ∧ cb = c) := by
       rintro ⟨rfl, rfl⟩
       exact absurd (lt_trans hrc hlt) (lt_irrefl _)
     rw [if_neg h]
@@ -119,9 +129,11 @@ theorem exists_upper_transvection_upper : ∀ (N j : ℕ) (ca cb : Fin N) (C : M
       exact hdet
     exact Finset.prod_ne_zero_iff.mp hp c (Finset.mem_univ c)
   · change C = Matrix.transvection ca cb s * Matrix.transvection cb ca t * U
-    rw [hU, hC', Matrix.mul_assoc (Matrix.transvection ca cb s), ← Matrix.mul_assoc (Matrix.transvection cb ca t),
-      Matrix.transvection_mul_transvection_same cb ca hne' t (-t), add_neg_cancel, Matrix.transvection_zero, Matrix.one_mul,
-      ← Matrix.mul_assoc, Matrix.transvection_mul_transvection_same ca cb hne s (-s), add_neg_cancel,
+    rw [hU, hC', Matrix.mul_assoc (Matrix.transvection ca cb s),
+      ← Matrix.mul_assoc (Matrix.transvection cb ca t),
+      Matrix.transvection_mul_transvection_same cb ca hne' t (-t), add_neg_cancel,
+      Matrix.transvection_zero, Matrix.one_mul, ← Matrix.mul_assoc,
+      Matrix.transvection_mul_transvection_same ca cb hne s (-s), add_neg_cancel,
       Matrix.transvection_zero, Matrix.one_mul]
 
 end GlobalTheory.CompanionTheory.Ar.PB.Factor

@@ -43,13 +43,12 @@ def coordinate (j : {j // j ≠ i}) : Chart A i :=
   Away.mk (grading A n) (X_mem i) 1 (X j.1) (by simpa using X_mem (A := A) j.1)
 
 def polyToChart : MvPolynomial {j // j ≠ i} A →+* Chart A i :=
-  eval₂Hom ((fromZeroRingHom (grading A n) _).comp (algebraMap A (grading A n 0)))
-    (coordinate A i)
+  eval₂Hom ((fromZeroRingHom (grading A n) _).comp (algebraMap A (grading A n 0))) (coordinate A i)
 
 def scaleMap : MvPolynomial (Fin (n + 1)) A →+* ChartLoc A i :=
-  eval₂Hom ((algebraMap (MvPolynomial (Fin (n + 1)) A) (ChartLoc A i)).comp C)
-    (fun j => algebraMap (MvPolynomial (Fin (n + 1)) A) (ChartLoc A i) (X j) *
-      IsLocalization.Away.invSelf (S := ChartLoc A i) (X i : MvPolynomial (Fin (n + 1)) A))
+  eval₂Hom ((algebraMap (MvPolynomial (Fin (n + 1)) A) (ChartLoc A i)).comp C) (fun j =>
+    algebraMap (MvPolynomial (Fin (n + 1)) A) (ChartLoc A i) (X j)
+      * IsLocalization.Away.invSelf (S := ChartLoc A i) (X i : MvPolynomial (Fin (n + 1)) A))
 
 end ProjSpace
 
@@ -58,8 +57,9 @@ namespace ProjSpace
 variable (A : Type u) [CommRing A] {n : ℕ} (i : Fin (n + 1))
 
 local notation "Pn" => MvPolynomial (Fin (n + 1)) A
-local notation "xinv" => IsLocalization.Away.invSelf (S := ChartLoc A i)
-  (X i : MvPolynomial (Fin (n + 1)) A)
+local notation "xinv" =>
+  IsLocalization.Away.invSelf (S := ChartLoc A i)
+    (X i : MvPolynomial (Fin (n + 1)) A)
 
 lemma algebraMap_X_mul_invSelf :
     algebraMap (MvPolynomial (Fin (n + 1)) A) (ChartLoc A i) (X i) * xinv = 1 :=

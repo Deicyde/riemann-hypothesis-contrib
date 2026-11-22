@@ -8,8 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Princ
 
 namespace GlobalTheory.Published
 
-theorem GlobalArtinReciprocity.heckeLAdicCharacter_and_principalIdealSt :
-    GlobalArtinReciprocity → HeckeLAdicCharacter ∧ PrincipalIdealSt :=
-  fun h => ⟨h.heckeLAdicCharacter, h.principalIdealSt⟩
+theorem GlobalArtinReciprocity.heckeLAdicCharacter_and_principalIdealSt
+    : GlobalArtinReciprocity → HeckeLAdicCharacter ∧ PrincipalIdealSt := fun h =>
+  ⟨h.heckeLAdicCharacter, h.principalIdealSt⟩
 
 end GlobalTheory.Published

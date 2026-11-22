@@ -10,14 +10,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff UpperTheory.ConvolutionTheory.RankTwoDescent
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
+  UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 
 namespace UpperTheory.ConvolutionTheory.RankTwoDescent.UnitaryMatrixFamily
 
-private theorem char_int (r : ℚ) (hr : r ≠ 0) :
-    ∫ b in fundamentalSet ℚ, ψ (b * rt r) ∂(adeleMeasure ℚ) = 0 := by
+private theorem char_int (r : ℚ) (hr : r ≠ 0)
+    : ∫ b in fundamentalSet ℚ, ψ (b * rt r) ∂(adeleMeasure ℚ) = 0 := by
   obtain ⟨x, hx⟩ : ∃ x : A ℚ, adelicChar ℚ x ≠ 1 := by
     by_contra h
     push_neg at h
@@ -40,10 +43,11 @@ private theorem char_int (r : ℚ) (hr : r ≠ 0) :
 private theorem vol_one : (adeleMeasure ℚ).real (fundamentalSet ℚ) = 1 := by
   rw [measureReal_def, adeleMeasure_fundamentalSet, ENNReal.toReal_one]
 
-private theorem fourier (S T : Set (Fin 4 → ℚ)) (q : (Fin 4 → ℚ) → ℚ) (t : ℚ) (c : (Fin 4 → ℚ) → ℂ)
-    (hT : ∀ ξ, ξ ∈ T ↔ ξ ∈ S ∧ q ξ = t) (hc : Summable fun ξ : S => ‖c ξ‖) :
-    ∫ b in fundamentalSet ℚ, (∑' ξ : S, ψ (b * rt (q ξ)) * c ξ) * ψ (-(b * rt t)) ∂(adeleMeasure ℚ) =
-      ∑' ξ : T, c ξ := by
+private theorem fourier
+    (S T : Set (Fin 4 → ℚ)) (q : (Fin 4 → ℚ) → ℚ) (t : ℚ) (c : (Fin 4 → ℚ) → ℂ)
+    (hT : ∀ ξ, ξ ∈ T ↔ ξ ∈ S ∧ q ξ = t) (hc : Summable fun ξ : S => ‖c ξ‖)
+    : ∫ b in fundamentalSet ℚ, (∑' ξ : S, ψ (b * rt (q ξ)) * c ξ) * ψ (-(b * rt t)) ∂(adeleMeasure ℚ)
+      = ∑' ξ : T, c ξ := by
   have hvol : ((adeleMeasure ℚ).restrict (fundamentalSet ℚ)) Set.univ = 1 := by
     rw [Measure.restrict_apply_univ, adeleMeasure_fundamentalSet]
   haveI : IsProbabilityMeasure ((adeleMeasure ℚ).restrict (fundamentalSet ℚ)) := ⟨hvol⟩
@@ -56,15 +60,17 @@ private theorem fourier (S T : Set (Fin 4 → ℚ)) (q : (Fin 4 → ℚ) → ℚ
     rw [← tsum_mul_right]
     refine tsum_congr fun ξ => ?_
     have h0 : rt (q ξ - t) = rt (q ξ) - rt t := map_sub (algebraMap ℚ (A ℚ)) _ _
-    have : b * rt (q ξ - t) = b * rt (q ξ) + -(b * rt t) := by
-      rw [h0, mul_sub, sub_eq_add_neg]
+    have : b * rt (q ξ - t) = b * rt (q ξ) + -(b * rt t) := by rw [h0, mul_sub, sub_eq_add_neg]
     simp only [hG, this, Pp.ψ_add]
     ring
   simp only [e]
-  have hS := hasSum_integral_of_summable_integral_norm (μ := (adeleMeasure ℚ).restrict (fundamentalSet ℚ))
-    (F := G) (fun ξ => Pp.intOn (hGc ξ)) (by
-      simp only [hGn, integral_const, probReal_univ, one_smul]
-      exact hc)
+  have hS :=
+    hasSum_integral_of_summable_integral_norm (μ := (adeleMeasure ℚ).restrict (fundamentalSet ℚ))
+      (F := G)
+      (fun ξ => Pp.intOn (hGc ξ))
+      (by
+        simp only [hGn, integral_const, probReal_univ, one_smul]
+        exact hc)
   rw [← hS.tsum_eq]
   have term : ∀ ξ : S, ∫ b in fundamentalSet ℚ, G ξ b ∂(adeleMeasure ℚ) = T.indicator c ξ := by
     intro ξ
@@ -82,21 +88,27 @@ private theorem fourier (S T : Set (Fin 4 → ℚ)) (q : (Fin 4 → ℚ) → ℚ
   · simp [h, ((hT _).1 h).1]
   · by_cases h' : ξ ∈ S <;> simp [h, h']
 
-private theorem swap3 {B Z H : Type} [MeasurableSpace B] [MeasurableSpace Z] [MeasurableSpace H]
-    (m : Measure B) (μ₁ : Measure Z) (μ₂ : Measure H) [IsFiniteMeasure m] [IsFiniteMeasure μ₁] [IsFiniteMeasure μ₂]
-    (f : B → Z → H → ℂ) (hf : AEStronglyMeasurable (fun p : B × Z × H => f p.1 p.2.1 p.2.2) (m.prod (μ₁.prod μ₂)))
-    (C : ℝ) (hb : ∀ᵐ z ∂μ₁, ∀ b h, ‖f b z h‖ ≤ C) :
-    ∫ b, ∫ z, ∫ h, f b z h ∂μ₂ ∂μ₁ ∂m = ∫ z, ∫ h, ∫ b, f b z h ∂m ∂μ₂ ∂μ₁ := by
+private theorem swap3
+    {B Z H : Type} [MeasurableSpace B] [MeasurableSpace Z] [MeasurableSpace H]
+    (m : Measure B) (μ₁ : Measure Z) (μ₂ : Measure H)
+    [IsFiniteMeasure m] [IsFiniteMeasure μ₁] [IsFiniteMeasure μ₂]
+    (f : B → Z → H → ℂ)
+    (hf : AEStronglyMeasurable (fun p : B × Z × H => f p.1 p.2.1 p.2.2) (m.prod (μ₁.prod μ₂)))
+    (C : ℝ) (hb : ∀ᵐ z ∂μ₁, ∀ b h, ‖f b z h‖ ≤ C)
+    : ∫ b, ∫ z, ∫ h, f b z h ∂μ₂ ∂μ₁ ∂m = ∫ z, ∫ h, ∫ b, f b z h ∂m ∂μ₂ ∂μ₁ := by
   have hae : ∀ᵐ p ∂(m.prod (μ₁.prod μ₂)), ‖f p.1 p.2.1 p.2.2‖ ≤ C := by
     have h1 : ∀ᵐ p ∂(μ₁.prod μ₂), ∀ b h, ‖f b p.1 h‖ ≤ C := Measure.quasiMeasurePreserving_fst.ae hb
-    have h2 : ∀ᵐ p ∂(m.prod (μ₁.prod μ₂)), ∀ b h, ‖f b p.2.1 h‖ ≤ C := Measure.quasiMeasurePreserving_snd.ae h1
+    have h2 : ∀ᵐ p ∂(m.prod (μ₁.prod μ₂)), ∀ b h, ‖f b p.2.1 h‖ ≤ C :=
+      Measure.quasiMeasurePreserving_snd.ae h1
     exact h2.mono fun p hp => hp _ _
   have hF : Integrable (fun p : B × Z × H => f p.1 p.2.1 p.2.2) (m.prod (μ₁.prod μ₂)) :=
     Integrable.of_bound hf C hae
   have s1 : ∫ b, ∫ z, ∫ h, f b z h ∂μ₂ ∂μ₁ ∂m = ∫ b, ∫ p : Z × H, f b p.1 p.2 ∂(μ₁.prod μ₂) ∂m := by
     refine integral_congr_ae (hF.prod_right_ae.mono fun b hb' => ?_)
     exact (integral_prod _ hb').symm
-  have s2 : ∫ b, ∫ p : Z × H, f b p.1 p.2 ∂(μ₁.prod μ₂) ∂m = ∫ p : Z × H, ∫ b, f b p.1 p.2 ∂m ∂(μ₁.prod μ₂) :=
+  have s2
+      : ∫ b, ∫ p : Z × H, f b p.1 p.2 ∂(μ₁.prod μ₂) ∂m
+        = ∫ p : Z × H, ∫ b, f b p.1 p.2 ∂m ∂(μ₁.prod μ₂) :=
     integral_integral_swap (f := fun b (p : Z × H) => f b p.1 p.2) hF
   rw [s1, s2]
   exact integral_prod (fun p : Z × H => ∫ b, f b p.1 p.2 ∂m) hF.integral_prod_right
@@ -104,8 +116,7 @@ private theorem swap3 {B Z H : Type} [MeasurableSpace B] [MeasurableSpace Z] [Me
 end UpperTheory.ConvolutionTheory.RankTwoDescent.UnitaryMatrixFamily
 
 open UpperTheory.ConvolutionTheory.RankTwoDescent.UnitaryMatrixFamily in
-private theorem coefOf (hV : VolE) :
-    Maj → ThCont → Coef := by
+private theorem coefOf (hV : VolE) : Maj → ThCont → Coef := by
   intro hMaj hTh E _ _ _ D W M N P ph hph φ hφ t g
   obtain ⟨hs1, hsc, hnz, hng, -, -, -, -, -, -, hq⟩ := szLaws E D
   obtain ⟨b₀, a₀, k₀, hk₀, rfl⟩ := UpperTheory.ConvolutionTheory.R2.M.iwa ℚ g
@@ -116,8 +127,11 @@ private theorem coefOf (hV : VolE) :
   have hzc : Continuous fun u : IdeleGroup.normOneSubgroup E => sZ D (u : IdeleGroup E) :=
     hsc.comp continuous_subtype_val
   have hCc := (isCompact_closure_normOneFundamentalDomain E).image hzc
-  have hCn : ∀ k ∈ (fun u : IdeleGroup.normOneSubgroup E => sZ D (u : IdeleGroup E)) '' closure (normOneFundamentalDomain E),
-      nu ℚ k = 1 := by
+  have hCn
+      : ∀ k
+          ∈ (fun u : IdeleGroup.normOneSubgroup E => sZ D (u : IdeleGroup E))
+            '' closure (normOneFundamentalDomain E),
+        nu ℚ k = 1 := by
     rintro _ ⟨u, -, rfl⟩
     exact hnz _
   have hapos : 0 < ab a₀ := (IdeleGroup.ideleModule ℚ a₀).2
@@ -125,21 +139,27 @@ private theorem coefOf (hV : VolE) :
   set S : Set (Fin 4 → ℚ) := {ξ | qr D.δ ξ ≠ 0} with hS
   set T : Set (Fin 4 → ℚ) := {ξ | qr D.δ ξ ≠ 0 ∧ qr D.δ ξ = t} with hTd
   set g₀ : G1 ℚ := nU b₀ * mD a₀ * k₀ with hg₀
-  let x : IdeleGroup.normOneSubgroup E → G1 E → GL (Fin 2) (A E) := fun z h => gl h * sZ D (z : IdeleGroup E)
+  let x : IdeleGroup.normOneSubgroup E → G1 E → GL (Fin 2) (A E) := fun z h =>
+    gl h * sZ D (z : IdeleGroup E)
   have hxc : Continuous fun p : IdeleGroup.normOneSubgroup E × G1 E => x p.1 p.2 := by
     have h1 : Continuous (gl : G1 E → GL (Fin 2) (A E)) := by fun_prop
     exact (h1.comp continuous_snd).mul (hzc.comp continuous_fst)
   have hnux : ∀ z h, nu ℚ (x z h) = 1 := fun z h => by
     have : nu ℚ (x z h) = nu ℚ (gl h) * nu ℚ (sZ D (z : IdeleGroup E)) := by simp [x, nu, map_mul]
     rw [this, hng, hnz, one_mul]
-  let c : IdeleGroup.normOneSubgroup E → G1 E → (Fin 4 → ℚ) → ℂ := fun z h ξ => (W.Om g₀ (W.L (x z h) ph)).1 (rp ξ)
-  have hterm : ∀ b z h ξ, (W.Om (nU b * g₀) (W.L (x z h) ph)).1 (rp ξ) = ψ (b * rt (qr D.δ ξ)) * c z h ξ := by
+  let c : IdeleGroup.normOneSubgroup E → G1 E → (Fin 4 → ℚ) → ℂ := fun z h ξ =>
+    (W.Om g₀ (W.L (x z h) ph)).1 (rp ξ)
+  have hterm
+      : ∀ b z h ξ,
+        (W.Om (nU b * g₀) (W.L (x z h) ph)).1 (rp ξ) = ψ (b * rt (qr D.δ ξ)) * c z h ξ := by
     intro b z h ξ
     rw [map_mul, Module.End.mul_apply, W.Om_n, hq]
-  have hmaj := fun (b : A ℚ) (z : IdeleGroup.normOneSubgroup E) (hz : z ∈ normOneFundamentalDomain E) (h : G1 E) =>
-    hB b a₀ k₀ hk₀ le_rfl h (sZ D (z : IdeleGroup E)) ⟨z, subset_closure hz, rfl⟩
-  have hsum : ∀ z ∈ normOneFundamentalDomain E, ∀ h, Summable fun ξ : S => ‖c z h ξ‖ := fun z hz h =>
-    (hmaj b₀ z hz h).1.subtype (fun ξ => ξ ∈ S)
+  have hmaj :=
+    fun (b : A ℚ) (z : IdeleGroup.normOneSubgroup E) (hz : z ∈ normOneFundamentalDomain E)
+        (h : G1 E) =>
+      hB b a₀ k₀ hk₀ le_rfl h (sZ D (z : IdeleGroup E)) ⟨z, subset_closure hz, rfl⟩
+  have hsum : ∀ z ∈ normOneFundamentalDomain E, ∀ h, Summable fun ξ : S => ‖c z h ξ‖ :=
+    fun z hz h => (hmaj b₀ z hz h).1.subtype (fun ξ => ξ ∈ S)
   have hnU : ∀ b, nU (b + b₀) * mD a₀ * k₀ = nU b * g₀ := by
     intro b
     rw [UpperTheory.ConvolutionTheory.R2.M.nU_add]
@@ -152,18 +172,22 @@ private theorem coefOf (hV : VolE) :
     have h1 := (hmaj (b + b₀) z hz h).1
     have h3 := (hmaj (b + b₀) z hz h).2.2
     simp only [hnU, pow_zero, mul_one] at h1 h3
-    have h2 : ‖ThOn S (W.Om (nU b * g₀) (W.L (x z h) ph)).1‖ ≤
-        ∑' ξ : {ξ : Fin 4 → ℚ // qr D.δ ξ ≠ 0}, ‖(W.Om (nU b * g₀) (W.L (gl h * sZ D (z : IdeleGroup E)) ph)).1 (rp ξ.1)‖ :=
+    have h2
+        : ‖ThOn S (W.Om (nU b * g₀) (W.L (x z h) ph)).1‖
+          ≤ ∑' ξ : {ξ : Fin 4 → ℚ // qr D.δ ξ ≠ 0}, ‖(W.Om (nU b * g₀) (W.L (gl h * sZ D (z : IdeleGroup E)) ph)).1 (rp ξ.1)‖ :=
       norm_tsum_le_tsum_norm (h1.subtype (fun ξ => ξ ∈ S))
-    calc ‖f b z h‖ = ‖ThOn S (W.Om (nU b * g₀) (W.L (x z h) ph)).1‖ * ‖φ.1 (x z h)‖ := by
-          simp only [f, T', norm_mul, Pp.norm_ψ, mul_one]
+    calc
+      ‖f b z h‖ = ‖ThOn S (W.Om (nU b * g₀) (W.L (x z h) ph)).1‖ * ‖φ.1 (x z h)‖ := by
+        simp only [f, T', norm_mul, Pp.norm_ψ, mul_one]
       _ ≤ _ := mul_le_mul_of_nonneg_right h2 (norm_nonneg _)
       _ ≤ B := h3
   have hNc : Continuous fun b : A ℚ => nU b := by
     refine Continuous.subtype_mk (continuous_matrix fun i j => ?_) _
     fin_cases i <;> fin_cases j <;> simp [nU] <;> fun_prop
-  have hcont : Continuous fun p : A ℚ × IdeleGroup.normOneSubgroup E × G1 E => f p.1 p.2.1 p.2.2 := by
-    have hp : Continuous fun p : A ℚ × IdeleGroup.normOneSubgroup E × G1 E => (nU p.1 * g₀, x p.2.1 p.2.2) :=
+  have hcont
+      : Continuous fun p : A ℚ × IdeleGroup.normOneSubgroup E × G1 E => f p.1 p.2.1 p.2.2 := by
+    have hp : Continuous fun p : A ℚ × IdeleGroup.normOneSubgroup E × G1 E =>
+        (nU p.1 * g₀, x p.2.1 p.2.2) :=
       ((hNc.comp continuous_fst).mul continuous_const).prodMk (hxc.comp continuous_snd)
     have h1 := (hTh E D W M N P ph hph S).comp_continuous hp (fun p => hnux _ _)
     exact (h1.mul (hφc.comp (hxc.comp continuous_snd))).mul
@@ -174,8 +198,10 @@ private theorem coefOf (hV : VolE) :
     ⟨by rw [Measure.restrict_apply_univ]; exact normOneMeasure_normOneFundamentalDomain_lt_top E⟩
   haveI : IsFiniteMeasure (N.μ.restrict N.D) :=
     ⟨by rw [Measure.restrict_apply_univ]; exact hV E N⟩
-  have step : ∀ b, fOn W N S ph φ.1 (nU b * g₀) * ψ (-(b * rt t)) =
-      ∫ z in normOneFundamentalDomain E, ∫ h in N.D, f b z h ∂N.μ ∂normOneMeasure E := by
+  have step
+      : ∀ b,
+        fOn W N S ph φ.1 (nU b * g₀) * ψ (-(b * rt t))
+          = ∫ z in normOneFundamentalDomain E, ∫ h in N.D, f b z h ∂N.μ ∂normOneMeasure E := by
     intro b
     change (∫ z in normOneFundamentalDomain E, ∫ h in N.D, T' b z h ∂N.μ ∂normOneMeasure E) * _ = _
     rw [← integral_mul_const]
@@ -183,11 +209,16 @@ private theorem coefOf (hV : VolE) :
     exact (integral_mul_const _ _).symm
   simp only [step]
   rw [swap3 _ _ _ f hcont.aestronglyMeasurable B
-    (ae_restrict_of_forall_mem (measurableSet_normOneFundamentalDomain E) hbd), vol_one, Complex.ofReal_one, one_mul]
-  change _ = ∫ z in normOneFundamentalDomain E, ∫ h in N.D, ThOn T (W.Om g₀ (W.L (x z h) ph)).1 * φ.1 (x z h) ∂N.μ ∂normOneMeasure E
+      (ae_restrict_of_forall_mem (measurableSet_normOneFundamentalDomain E) hbd),
+    vol_one, Complex.ofReal_one, one_mul]
+  change _
+    = ∫ z in normOneFundamentalDomain E, ∫ h in N.D, ThOn T (W.Om g₀ (W.L (x z h) ph)).1 * φ.1 (x z h) ∂N.μ ∂normOneMeasure E
   refine setIntegral_congr_fun (measurableSet_normOneFundamentalDomain E) fun z hz => ?_
   refine integral_congr_ae (ae_of_all _ fun h => ?_)
-  have e : ∀ b, f b z h = ((∑' ξ : S, ψ (b * rt (qr D.δ ξ)) * c z h ξ) * ψ (-(b * rt t))) * φ.1 (x z h) := by
+  have e
+      : ∀ b,
+        f b z h
+          = ((∑' ξ : S, ψ (b * rt (qr D.δ ξ)) * c z h ξ) * ψ (-(b * rt t))) * φ.1 (x z h) := by
     intro b
     simp only [f, T', ThOn, hterm]
     ring
@@ -195,6 +226,4 @@ private theorem coefOf (hV : VolE) :
   rw [integral_mul_const, fourier S T (qr D.δ) t (c z h) (fun ξ => Iff.rfl) (hsum z hz h)]
   rfl
 
-theorem UpperTheory.ConvolutionTheory.RankTwoDescent.coef :
-    Maj → ThCont → Coef :=
-  coefOf volE
+theorem UpperTheory.ConvolutionTheory.RankTwoDescent.coef : Maj → ThCont → Coef := coefOf volE

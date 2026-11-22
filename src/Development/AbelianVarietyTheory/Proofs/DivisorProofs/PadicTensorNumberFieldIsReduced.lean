@@ -9,8 +9,8 @@ open GlobalTheory.LKTrip
 
 namespace GlobalTheory
 
-theorem padic_tensor_numberField_isReduced :
-    ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F],
+theorem padic_tensor_numberField_isReduced
+    : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F],
       IsReduced (TensorProduct ℚ ℚ_[p] F) := by
   intro p _ F _ _
   haveI : Algebra.FormallyUnramified ℚ F := Algebra.FormallyUnramified.of_isSeparable ℚ F

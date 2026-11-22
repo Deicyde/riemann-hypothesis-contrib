@@ -16,16 +16,22 @@ public import Development.AbelianVarietyTheory.Definitions.Uniformization.AllDV
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT
 namespace GlobalTheory.UT
 
-theorem sumV_tail {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) {Ix : Type} {x : Ix → F} {s : F}
-    (h : SumV v x s) (q : ℚ) (S : Finset Ix) (hS : ∀ i, i ∉ S → (q : WithTop ℚ) ≤ v (x i)) :
-    (q : WithTop ℚ) ≤ v (s - ∑ i ∈ S, x i) := by
+theorem sumV_tail
+    {F : Type} [Field F]
+    (v : AddValuation F (WithTop ℚ))
+    {Ix : Type} {x : Ix → F} {s : F} (h : SumV v x s)
+    (q : ℚ) (S : Finset Ix) (hS : ∀ i, i ∉ S → (q : WithTop ℚ) ≤ v (x i))
+    : (q : WithTop ℚ) ≤ v (s - ∑ i ∈ S, x i) := by
   classical
   obtain ⟨S', hS'⟩ := h q
   have h1 := hS' (S ∪ S') Finset.subset_union_right
@@ -37,8 +43,9 @@ theorem sumV_tail {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) {Ix : 
   rw [h4]
   exact v.map_le_add h1 h2
 
-theorem nullV_bdd {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) {Ix : Type} {x : Ix → F}
-    (h : NullV v x) : ∃ m : ℚ, ∀ i, (m : WithTop ℚ) ≤ v (x i) := by
+theorem nullV_bdd
+    {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) {Ix : Type} {x : Ix → F} (h : NullV v x)
+    : ∃ m : ℚ, ∀ i, (m : WithTop ℚ) ≤ v (x i) := by
   have hf := (h 0).image (fun i => (v (x i)).untopD 0)
   obtain ⟨m, hm⟩ := hf.bddBelow
   refine ⟨min m 0, fun i => ?_⟩
@@ -50,12 +57,19 @@ theorem nullV_bdd {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) {Ix : 
     exact WithTop.coe_le_coe.2 ((min_le_left _ _).trans h1)
   · exact (WithTop.coe_le_coe.2 (min_le_right _ _)).trans (not_lt.1 hi)
 
-theorem le_v_mul {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) {x y : F} {p r q : ℚ}
-    (hx : (p : WithTop ℚ) ≤ v x) (hy : (r : WithTop ℚ) ≤ v y) (h : q = p + r) : (q : WithTop ℚ) ≤ v (x * y) := by
+theorem le_v_mul
+    {F : Type} [Field F]
+    (v : AddValuation F (WithTop ℚ))
+    {x y : F} {p r q : ℚ} (hx : (p : WithTop ℚ) ≤ v x) (hy : (r : WithTop ℚ) ≤ v y) (h : q = p + r)
+    : (q : WithTop ℚ) ≤ v (x * y) := by
   rw [v.map_mul, h, WithTop.coe_add]
   exact add_le_add hx hy
 
-theorem sumV_of_convolution : ∀ (F : Type) [Field F] (v : AddValuation F (WithTop ℚ)) (X : Type) [AddCommGroup X] (a b c : X → F), NullV v a → NullV v b → (∀ α, SumV v (fun χ => a χ * b (α - χ)) (c α)) → ∀ sb sc : F, SumV v b sb → SumV v c sc → sb ≠ 0 → SumV v a (sc / sb) := by
+theorem sumV_of_convolution
+    : ∀ (F : Type) [Field F] (v : AddValuation F (WithTop ℚ)) (X : Type) [AddCommGroup X]
+        (a b c : X → F),
+      NullV v a → NullV v b → (∀ α, SumV v (fun χ => a χ * b (α - χ)) (c α))
+        → ∀ sb sc : F, SumV v b sb → SumV v c sc → sb ≠ 0 → SumV v a (sc / sb) := by
   classical
   intro F _ v X _ a b c ha hb hc sb sc hsb hsc h0 q
   obtain ⟨ma, hma⟩ := nullV_bdd v ha
@@ -92,9 +106,11 @@ theorem sumV_of_convolution : ∀ (F : Type) [Field F] (v : AddValuation F (With
   have h6 : (q' : WithTop ℚ) ≤ v (∑ χ ∈ T, a χ * (sb - ∑ α ∈ U, b (α - χ))) :=
     v.map_le_sum fun χ hχ => le_v_mul v (hma χ) (h5 χ hχ) (by ring)
   have h7 := v.map_le_sub (v.map_le_add h3 h4) h6
-  have e : sc / sb - ∑ i ∈ T, a i =
-      (sc - ∑ i ∈ U, c i + ∑ α ∈ U, (c α - ∑ χ ∈ T, a χ * b (α - χ)) -
-        ∑ χ ∈ T, a χ * (sb - ∑ α ∈ U, b (α - χ))) * sb⁻¹ := by
+  have e
+      : sc / sb - ∑ i ∈ T, a i
+        = (sc - ∑ i ∈ U, c i + ∑ α ∈ U, (c α - ∑ χ ∈ T, a χ * b (α - χ))
+            - ∑ χ ∈ T, a χ * (sb - ∑ α ∈ U, b (α - χ)))
+          * sb⁻¹ := by
     simp only [Finset.sum_sub_distrib, mul_sub, Finset.mul_sum, ← Finset.sum_mul]
     rw [Finset.sum_comm (s := U) (t := T)]
     field_simp

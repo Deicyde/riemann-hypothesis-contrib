@@ -9,10 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open Matrix
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.grampd :
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (G : Matrix ι ι ℝ), G.IsHermitian →
-    (∀ c : ι → ℤ, c ≠ 0 → 1 ≤ (fun i => (c i : ℝ)) ⬝ᵥ (G *ᵥ fun i => (c i : ℝ))) →
-    G.PosDef ∧ 1 ≤ (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * G.det := by
+theorem UpperTheory.V.KT.grampd
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (G : Matrix ι ι ℝ),
+      G.IsHermitian → (∀ c : ι → ℤ, c ≠ 0 → 1 ≤ (fun i => (c i : ℝ)) ⬝ᵥ (G *ᵥ fun i => (c i : ℝ)))
+        → G.PosDef ∧ 1 ≤ (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * G.det := by
   intro ι _ _ G hG hint
   have hpsd : G.PosSemidef := by
     refine UpperTheory.V.KT.grampsd ι G hG (fun c => ?_)
@@ -20,8 +20,10 @@ theorem UpperTheory.V.KT.grampd :
     · subst hc
       simp
     · exact le_trans zero_le_one (hint c hc)
-  have hpert : ∀ ε : ℝ, 0 < ε →
-      1 ≤ (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * (G + ε • (1 : Matrix ι ι ℝ)).det := by
+  have hpert
+      : ∀ ε : ℝ,
+        0 < ε
+          → 1 ≤ (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * (G + ε • (1 : Matrix ι ι ℝ)).det := by
     intro ε hε
     have hpd : (G + ε • (1 : Matrix ι ι ℝ)).PosDef :=
       Matrix.PosDef.posSemidef_add hpsd (Matrix.PosDef.smul Matrix.PosDef.one hε)
@@ -38,10 +40,12 @@ theorem UpperTheory.V.KT.grampd :
     refine continuous_const.mul (Continuous.matrix_det ?_)
     exact continuous_const.add (continuous_id.smul continuous_const)
   have hdet : 1 ≤ (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * G.det := by
-    have ht : Filter.Tendsto (fun ε : ℝ =>
-        (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * (G + ε • (1 : Matrix ι ι ℝ)).det)
+    have ht : Filter.Tendsto
+        (fun ε : ℝ =>
+          (4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * (G + ε • (1 : Matrix ι ι ℝ)).det)
         (nhdsWithin 0 (Set.Ioi 0))
-        (nhds ((4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * (G + (0 : ℝ) • (1 : Matrix ι ι ℝ)).det)) :=
+        (nhds
+          ((4 * (Fintype.card ι : ℝ)) ^ Fintype.card ι * (G + (0 : ℝ) • (1 : Matrix ι ι ℝ)).det)) :=
       (hcont.tendsto 0).mono_left nhdsWithin_le_nhds
     rw [zero_smul, add_zero] at ht
     refine ge_of_tendsto ht ?_

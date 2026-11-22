@@ -17,18 +17,20 @@ variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {e :
 
 theorem PtsSumMeasurableWeight.aestronglyMeasurable_fibreSum_of_lifts
     {P : Ideal (MRing ι)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
-    (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (g : ((Σ k, ι k) → ℂ) → ℝ) (F : ℝ → ℝ)
-    (hF : Measurable F) (hF0 : F 0 = 0) (hfin : ∀ y, (fibre P Ψ y).Finite)
+    (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (g : ((Σ k, ι k) → ℂ) → ℝ)
+    (F : ℝ → ℝ) (hF : Measurable F) (hF0 : F 0 = 0)
+    (hfin : ∀ y, (fibre P Ψ y).Finite)
     (B : ℕ → Set (Fin e → ℂ)) (γ : ℕ → (Fin e → ℂ) → (Σ k, ι k) → ℂ) (hBo : ∀ m, IsOpen (B m))
-    (hlift : ∀ m, ∀ y ∈ B m, DifferentiableAt ℂ (γ m) y ∧ γ m y ∈ mcPts P ∧
-      Ψ (segre (γ m y)) = Fin.cons 1 y)
+    (hlift : ∀ m, ∀ y ∈ B m,
+      DifferentiableAt ℂ (γ m) y ∧ γ m y ∈ mcPts P ∧ Ψ (segre (γ m y)) = Fin.cons 1 y)
     (hcov : ∀ y w γ', IsSheet P Ψ y w γ' → ∃ m, y ∈ B m ∧ segre (γ m y) = w)
     (dens : ℕ → (Fin e → ℂ) → ℝ) (hdm : ∀ m, Measurable (dens m))
     (hdens : ∀ m, ∀ y ∈ B m, dens m y = g (γ m y) * maDensity (fun j y' => φ j (γ m y')) y)
-    (hind : ∀ᵐ y, ∀ w γ₁ γ₂, IsSheet P Ψ y w γ₁ → IsSheet P Ψ y w γ₂ →
-      g (γ₁ y) * maDensity (fun j y' => φ j (γ₁ y')) y =
-        g (γ₂ y) * maDensity (fun j y' => φ j (γ₂ y')) y) :
-    AEStronglyMeasurable (fun y => ∑ᶠ w ∈ fibre P Ψ y, F (sheetDensity P Ψ φ g y w)) volume := by
+    (hind
+      : ∀ᵐ y, ∀ w γ₁ γ₂, IsSheet P Ψ y w γ₁ → IsSheet P Ψ y w γ₂ →
+        g (γ₁ y) * maDensity (fun j y' => φ j (γ₁ y')) y =
+          g (γ₂ y) * maDensity (fun j y' => φ j (γ₂ y')) y)
+    : AEStronglyMeasurable (fun y => ∑ᶠ w ∈ fibre P Ψ y, F (sheetDensity P Ψ φ g y w)) volume := by
   classical
   have hsheet : ∀ m, ∀ y ∈ B m, IsSheet P Ψ y (segre (γ m y)) (γ m) := fun m y hy =>
     ⟨rfl, Filter.eventually_of_mem ((hBo m).mem_nhds hy) fun y' hy' => hlift m y' hy'⟩
@@ -39,8 +41,7 @@ theorem PtsSumMeasurableWeight.aestronglyMeasurable_fibreSum_of_lifts
 
   set σ : ℕ → (Fin e → ℂ) → ((k : K) → ι k) → ℂ := fun m =>
     (B m).piecewise (fun y => segre (γ m y)) 0 with hσdef
-  have hσB : ∀ m, ∀ y ∈ B m, σ m y = segre (γ m y) := fun m y hy =>
-    Set.piecewise_eq_of_mem _ _ _ hy
+  have hσB : ∀ m, ∀ y ∈ B m, σ m y = segre (γ m y) := fun m y hy => Set.piecewise_eq_of_mem _ _ _ hy
   have hσm : ∀ m, Measurable (σ m) := fun m =>
     (hseg.comp_continuousOn (hγc m)).measurable_piecewise continuousOn_const (hBo m).measurableSet
 
@@ -52,15 +53,18 @@ theorem PtsSumMeasurableWeight.aestronglyMeasurable_fibreSum_of_lifts
       ext y
       simp [hSdef, imp_iff_not_or]
     rw [this]
-    exact (hBo m).measurableSet.inter (Finset.measurableSet_biInter _ fun m' _ =>
-      ((hBo m').measurableSet.inter (measurableSet_eq_fun (hσm m') (hσm m))).compl)
+    exact (hBo m).measurableSet.inter
+      (Finset.measurableSet_biInter _ fun m' _ =>
+        ((hBo m').measurableSet.inter (measurableSet_eq_fun (hσm m') (hσm m))).compl)
   set f : ℕ → (Fin e → ℂ) → ℝ := fun m => (S m).indicator (fun y => F (dens m y)) with hfdef
   have hfm : ∀ m, Measurable (f m) := fun m => (hF.comp (hdm m)).indicator (hSm m)
   have hf0 : ∀ m y, y ∉ S m → f m y = 0 := fun m y hm => by
     simp only [hfdef]
     exact Set.indicator_of_notMem hm _
-  refine aestronglyMeasurable_of_tendsto_ae atTop (f := fun N y => ∑ m ∈ Finset.range N, f m y)
-    (fun N => (Finset.measurable_sum _ fun m _ => hfm m).aestronglyMeasurable) ?_
+  refine aestronglyMeasurable_of_tendsto_ae atTop
+    (f := fun N y => ∑ m ∈ Finset.range N, f m y)
+    (fun N => (Finset.measurable_sum _ fun m _ => hfm m).aestronglyMeasurable)
+    ?_
   filter_upwards [hind] with y hy
 
   have hterm : ∀ m, y ∈ S m → f m y = F (sheetDensity P Ψ φ g y (σ m y)) := by
@@ -87,8 +91,10 @@ theorem PtsSumMeasurableWeight.aestronglyMeasurable_fibreSum_of_lifts
     · split_ifs
       · rfl
       · rw [hf0 m y hm]
-  have hev : ∀ w ∈ (hfin y).toFinset, ∀ᶠ N in atTop,
-      F (sheetDensity P Ψ φ g y w) = ∑ m ∈ Finset.range N, if σ m y = w then f m y else 0 := by
+  have hev
+      : ∀ w ∈ (hfin y).toFinset,
+        ∀ᶠ N in atTop,
+          F (sheetDensity P Ψ φ g y w) = ∑ m ∈ Finset.range N, if σ m y = w then f m y else 0 := by
     intro w _
     by_cases hex : ∃ γ', IsSheet P Ψ y w γ'
     · obtain ⟨γ', hγ'⟩ := hex
@@ -122,8 +128,9 @@ theorem PtsSumMeasurableWeight.aestronglyMeasurable_fibreSum_of_lifts
           exact absurd ⟨_, hsh⟩ hex
         · exact hf0 m y hmS
       · rfl
-  have hsum : ∑ᶠ w ∈ fibre P Ψ y, F (sheetDensity P Ψ φ g y w) =
-      ∑ w ∈ (hfin y).toFinset, F (sheetDensity P Ψ φ g y w) :=
+  have hsum
+      : ∑ᶠ w ∈ fibre P Ψ y, F (sheetDensity P Ψ φ g y w)
+        = ∑ w ∈ (hfin y).toFinset, F (sheetDensity P Ψ φ g y w) :=
     finsum_mem_eq_finite_toFinset_sum _ (hfin y)
   refine tendsto_const_nhds.congr' ?_
   filter_upwards [(eventually_all_finset _).2 hev] with N hN

@@ -14,12 +14,16 @@ open Module
 variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 variable {ι κ : Type*} {ρ : ι → H →L[ℂ] H} {ρ' : κ → H →L[ℂ] H}
 
-theorem count (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j v) = ρ' j (ρ i v))
-    {S X : Submodule ℂ H} [FiniteDimensional ℂ S] (hSρ' : Stab ρ' S)
-    (hSirr : ∀ S' : Submodule ℂ H, S' ≤ S → Stab ρ S' → Stab ρ' S' → S' = ⊥ ∨ S' = S)
-    (hXS : X ≤ S) (hXs : Stab ρ X) (hXi : Irr ρ X) {x₀ : H} (hx₀ : x₀ ∈ X) (h0 : x₀ ≠ 0) :
-    ∀ n, ∀ W : Submodule ℂ H, W ≤ S → Stab ρ W → finrank ℂ W = n →
-      finrank ℂ W = finrank ℂ X * finrank ℂ ↥(slice ρ x₀ ⊓ W) := by
+theorem count
+    (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j v) = ρ' j (ρ i v))
+    {S X : Submodule ℂ H} [FiniteDimensional ℂ S]
+    (hSρ' : Stab ρ' S)
+    (hSirr : ∀ S' : Submodule ℂ H, S' ≤ S → Stab ρ S' → Stab ρ' S' → S' = ⊥ ∨ S' = S) (hXS : X ≤ S)
+    (hXs : Stab ρ X) (hXi : Irr ρ X)
+    {x₀ : H} (hx₀ : x₀ ∈ X) (h0 : x₀ ≠ 0)
+    : ∀ n, ∀ W : Submodule ℂ H,
+      W ≤ S → Stab ρ W → finrank ℂ W = n
+        → finrank ℂ W = finrank ℂ X * finrank ℂ ↥(slice ρ x₀ ⊓ W) := by
   haveI : FiniteDimensional ℂ X := Submodule.finiteDimensional_of_le hXS
   intro n
   refine Nat.strong_induction_on n fun n ih => ?_
@@ -46,10 +50,11 @@ theorem count (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j 
     rw [← LinearMap.range_domRestrict, LinearMap.finrank_range_of_inj hinj]
   have hYi : Irr ρ (X.map c) := by
     intro Y' hY'Y hY's
-    have hst : Stab ρ (X ⊓ Y'.comap c) := stab_inf hXs (fun i v hv => by
-      show c (ρ i v) ∈ Y'
-      rw [hc i v]
-      exact hY's i _ hv)
+    have hst : Stab ρ (X ⊓ Y'.comap c) :=
+      stab_inf hXs (fun i v hv => by
+        show c (ρ i v) ∈ Y'
+        rw [hc i v]
+        exact hY's i _ hv)
     rcases hXi _ inf_le_left hst with h | h
     · left
       rw [eq_bot_iff]
@@ -80,8 +85,13 @@ theorem count (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j 
         simp only [LinearMap.comp_apply, hP, ContinuousLinearMap.coe_coe]
         exact ((X.map c).orthogonalProjection _).2
       obtain ⟨μ, hμ⟩ := (schur2 hρ hXs hXi hYs hYi hx₀ h0 hc hPd ⟨x₀, hx₀, rfl⟩ hc0 hPdY).2
-      refine Submodule.mem_sup.2 ⟨μ • c x₀, Submodule.smul_mem _ μ (Submodule.mem_span_singleton_self _),
-        d x₀ - μ • c x₀, ⟨?_, ?_, ?_⟩, by abel⟩
+      refine Submodule.mem_sup.2 ⟨
+        μ • c x₀,
+        Submodule.smul_mem _ μ (Submodule.mem_span_singleton_self _),
+        d x₀ - μ • c x₀,
+        ⟨?_, ?_, ?_⟩,
+        by abel
+      ⟩
       · exact ⟨d - μ • c, (commSub ρ).sub_mem hd ((commSub ρ).smul_mem μ hc), rfl⟩
       · rw [← hμ]
         simp only [LinearMap.comp_apply, hP, ContinuousLinearMap.coe_coe]
@@ -108,12 +118,14 @@ theorem count (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j 
   rw [hsup, ← hsum, hYrank, hih]
   ring
 
-theorem main (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j v) = ρ' j (ρ i v))
-    {S X Y : Submodule ℂ H} [FiniteDimensional ℂ S] (hSρ : Stab ρ S) (hSρ' : Stab ρ' S)
-    (hSirr : ∀ S' : Submodule ℂ H, S' ≤ S → Stab ρ S' → Stab ρ' S' → S' = ⊥ ∨ S' = S)
-    (hXS : X ≤ S) (hX0 : X ≠ ⊥) (hXs : Stab ρ X) (hXi : Irr ρ X)
-    (hYS : Y ≤ S) (hY0 : Y ≠ ⊥) (hYs : Stab ρ' Y) (hYi : Irr ρ' Y) :
-    finrank ℂ S = finrank ℂ X * finrank ℂ Y := by
+theorem main
+    (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j v) = ρ' j (ρ i v))
+    {S X Y : Submodule ℂ H} [FiniteDimensional ℂ S]
+    (hSρ : Stab ρ S) (hSρ' : Stab ρ' S)
+    (hSirr : ∀ S' : Submodule ℂ H, S' ≤ S → Stab ρ S' → Stab ρ' S' → S' = ⊥ ∨ S' = S) (hXS : X ≤ S)
+    (hX0 : X ≠ ⊥) (hXs : Stab ρ X) (hXi : Irr ρ X) (hYS : Y ≤ S) (hY0 : Y ≠ ⊥) (hYs : Stab ρ' Y)
+    (hYi : Irr ρ' Y)
+    : finrank ℂ S = finrank ℂ X * finrank ℂ Y := by
   haveI : FiniteDimensional ℂ X := Submodule.finiteDimensional_of_le hXS
   haveI : FiniteDimensional ℂ Y := Submodule.finiteDimensional_of_le hYS
   obtain ⟨x₀, hx₀, h0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hX0
@@ -148,8 +160,9 @@ theorem main (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j v
     have hwS : w ∈ S := hUS (hU''le hwU'')
     have hTρ : Stab ρ (⨆ i, U'.map (ρ i : H →ₗ[ℂ] H)) := by
       intro i v hv
-      have hle : (⨆ k, U'.map (ρ k : H →ₗ[ℂ] H)) ≤
-          (⨆ k, U'.map (ρ k : H →ₗ[ℂ] H)).comap (ρ i : H →ₗ[ℂ] H) := by
+      have hle
+          : (⨆ k, U'.map (ρ k : H →ₗ[ℂ] H))
+            ≤ (⨆ k, U'.map (ρ k : H →ₗ[ℂ] H)).comap (ρ i : H →ₗ[ℂ] H) := by
         refine iSup_le fun k => ?_
         rintro _ ⟨z, hz, rfl⟩
         obtain ⟨m, hm⟩ := hρ.mul i k
@@ -180,10 +193,11 @@ theorem main (hρ : Good ρ) (hρ' : Good ρ') (hcomm : ∀ i j v, ρ i (ρ' j v
       have hKs : Stab ρ (X.map d') := stab_map hd' hXs
       have hKi : Irr ρ (X.map d') := by
         intro Y' hY'Y hY's
-        have hst : Stab ρ (X ⊓ Y'.comap d') := stab_inf hXs (fun i v hv => by
-          show d' (ρ i v) ∈ Y'
-          rw [hd' i v]
-          exact hY's i _ hv)
+        have hst : Stab ρ (X ⊓ Y'.comap d') :=
+          stab_inf hXs (fun i v hv => by
+            show d' (ρ i v) ∈ Y'
+            rw [hd' i v]
+            exact hY's i _ hv)
         rcases hXi _ inf_le_left hst with h | h
         · left
           rw [eq_bot_iff]

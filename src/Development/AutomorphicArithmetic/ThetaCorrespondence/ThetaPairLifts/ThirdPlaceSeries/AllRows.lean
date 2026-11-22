@@ -11,10 +11,14 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 noncomputable section
-open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top
+open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.EX.OB
+  GlobalTheory.Mem GlobalTheory.Mem.Top
 namespace GlobalTheory.Fc
-structure AllRowsAlt (KP : ∀ B : GlobalTheory.Mem.Base, Fr B.toPre → Prop) (Q Q' : V4.Slot) (Lk : LkT _root_.GlobalTheory.Fc.BundleCondition) (N : FamClass → Prop)
-    (DR : _root_.GlobalTheory.Fc.R1.DefiniteSideType) : Prop where
+structure AllRowsAlt
+    (KP : ∀ B : GlobalTheory.Mem.Base, Fr B.toPre → Prop) (Q Q' : V4.Slot)
+    (Lk : LkT _root_.GlobalTheory.Fc.BundleCondition) (N : FamClass → Prop)
+    (DR : _root_.GlobalTheory.Fc.R1.DefiniteSideType)
+    : Prop where
   hn4 : Lg1 KP Q Q' fun S => R0.ClassCountBoundAtConstructedPoints S Lk
   jOn : Lg1 KP Q Q' fun S => R0.JInvariantConditionAtConstructedPoints S Lk
   hInstR : Lg1 KP Q Q' fun S => ClassTwoEntries.InstanceRankAtConstructedPoints S Lk

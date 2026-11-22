@@ -70,8 +70,9 @@ theorem frobenius_unit_spec : FrobUnitSpec := by
   have : NeZero N := ⟨hN⟩
   have hcop : (ordProj[p] N).Coprime (ordCompl[p] N) := (Nat.coprime_ordCompl hp hN).pow_left _
   have hex : ∃ w, IsFrobUnit N p w := by
-    obtain ⟨u, hu1, hu2⟩ := exists_unit_crt (Nat.ordProj_mul_ordCompl_eq_self N p).symm hcop
-      (Nat.ordProj_dvd N p) (Nat.ordCompl_dvd N p) 1 (ZMod.unitOfCoprime p (Nat.coprime_ordCompl hp hN))
+    obtain ⟨u, hu1, hu2⟩ :=
+      exists_unit_crt (Nat.ordProj_mul_ordCompl_eq_self N p).symm hcop (Nat.ordProj_dvd N p)
+        (Nat.ordCompl_dvd N p) 1 (ZMod.unitOfCoprime p (Nat.coprime_ordCompl hp hN))
     refine ⟨u, (isFrobUnit_iff p u).2 ⟨?_, ?_⟩⟩
     · exact (unitsMap_eq_unitOfCoprime_iff _ _ u).1 hu2
     · exact (unitsMap_eq_one_iff _ u).1 hu1
@@ -103,8 +104,7 @@ theorem unramified_spec : UnramSpec := by
     rw [Subgroup.mem_bot]
     apply units_ext_modEq
     refine hu.trans ?_
-    have : ((1 : (ZMod N)ˣ) : ZMod N).val ≡ 1 [MOD N] := by
-      rw [← cast_eq_one_iff]; simp
+    have : ((1 : (ZMod N)ˣ) : ZMod N).val ≡ 1 [MOD N] := by rw [← cast_eq_one_iff]; simp
     exact this.symm
   · have h := (frobUnit_modEq (N := N) hp).1
     rw [hM] at h
@@ -286,16 +286,16 @@ end
 section Field
 
 open NumberField Ideal
-open Formalism.FrobeniusOrbits (hostE galE aE bE hostGalois hostGalSpec hostInertia hostDecomp hostFrob_of)
-open Formalism.TwoAdicCyclotomicDecomposition (IsLayer galMap layerGalois odd_cyc_frob odd_frob_sgn odd_card_under odd_intCast_mem_iff)
+open Formalism.FrobeniusOrbits
+  (hostE galE aE bE hostGalois hostGalSpec hostInertia hostDecomp hostFrob_of)
+open Formalism.TwoAdicCyclotomicDecomposition
+  (IsLayer galMap layerGalois odd_cyc_frob odd_frob_sgn odd_card_under odd_intCast_mem_iff)
 
 variable {e q d : ℕ} {L : Type} [Field L] [NumberField L] {ζ a b : L}
 
 lemma sgn2_toAdd_eq_zero_iff : ∀ s : ℤˣ, Multiplicative.toAdd (sgn2 s) = 0 ↔ s = 1 := by decide
 
 variable [Fact q.Prime] [Fact d.Prime]
-
-
 
 end Field
 

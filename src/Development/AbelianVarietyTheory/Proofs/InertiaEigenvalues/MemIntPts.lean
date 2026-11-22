@@ -41,8 +41,8 @@ def hS (up : Bool) (t : ℕ) (Fl Fc : Finset ℤ) : ℕ :=
 def US (up : Bool) (Fl Fc : Finset ℤ) : Multiset ℤ :=
   (Fl ∪ Fc).val.map (fun z => z + (wS up Fl Fc : ℤ))
 
-theorem count_US (up : Bool) (Fl Fc : Finset ℤ) (b : ℤ) :
-    (US up Fl Fc).count (b + wS up Fl Fc) = if b ∈ Fl ∪ Fc then 1 else 0 := by
+theorem count_US (up : Bool) (Fl Fc : Finset ℤ) (b : ℤ)
+    : (US up Fl Fc).count (b + wS up Fl Fc) = if b ∈ Fl ∪ Fc then 1 else 0 := by
   unfold US
   rw [Multiset.count_map_eq_count' _ _ (add_left_injective _)]
   split_ifs with h

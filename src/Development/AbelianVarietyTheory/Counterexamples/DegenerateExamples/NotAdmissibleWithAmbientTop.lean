@@ -12,29 +12,37 @@ noncomputable section
 
 namespace GlobalTheory.SeriesSupportTest
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders
+  Polynomial
 
-def plHom (D : D7) (k : Fin 2) (v : D.nd.PlG k) :
-    MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k))) →+* MonoidAlgebra ℂ (G0g D.nd) := by
+def plHom (D : D7) (k : Fin 2) (v : D.nd.PlG k)
+    : MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k))) →+* MonoidAlgebra ℂ (G0g D.nd) := by
   classical
   exact MonoidAlgebra.mapDomainRingHom ℂ
-    (MonoidHom.mulSingle (fun kv : (Σ k : Fin 2, D.nd.PlG k) => GL (Fin D.R.r) (ZMod (D.host.g kv.1))) ⟨k, v⟩)
+    (MonoidHom.mulSingle
+      (fun kv : (Σ k : Fin 2, D.nd.PlG k) => GL (Fin D.R.r) (ZMod (D.host.g kv.1)))
+      ⟨k, v⟩)
 
-theorem atPlace_eq (D : D7) (k : Fin 2) (v : D.nd.PlG k) (a) : atPlace D k v a = plHom D k v a := rfl
+theorem atPlace_eq (D : D7) (k : Fin 2) (v : D.nd.PlG k) (a) : atPlace D k v a = plHom D k v a :=
+  rfl
 
-theorem atPlace_central (D : D7) (k : Fin 2) (v : D.nd.PlG k)
-    (a : MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k)))) (ha : ∀ b, a * b = b * a) :
-    atPlace D k v a ∈ Subalgebra.center ℂ (MonoidAlgebra ℂ (G0g D.nd)) := by
+theorem atPlace_central
+    (D : D7) (k : Fin 2) (v : D.nd.PlG k) (a : MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k))))
+    (ha : ∀ b, a * b = b * a)
+    : atPlace D k v a ∈ Subalgebra.center ℂ (MonoidAlgebra ℂ (G0g D.nd)) := by
   classical
   rw [Subalgebra.mem_center_iff, atPlace_eq]
   intro b
   set kv : (Σ k : Fin 2, D.nd.PlG k) := ⟨k, v⟩ with hkv
-  have hof : ∀ h, plHom D k v (MonoidAlgebra.of ℂ _ h) =
-      MonoidAlgebra.of ℂ (G0g D.nd) (Pi.mulSingle kv h) := by
+  have hof
+      : ∀ h,
+        plHom D k v (MonoidAlgebra.of ℂ _ h)
+          = MonoidAlgebra.of ℂ (G0g D.nd) (Pi.mulSingle kv h) := by
     intro h
     simp [plHom, kv]
-  have hcomm : ∀ g' : G0g D.nd, g' kv = 1 → ∀ y,
-      Commute (MonoidAlgebra.of ℂ (G0g D.nd) g') (plHom D k v y) := by
+  have hcomm
+      : ∀ g' : G0g D.nd,
+        g' kv = 1 → ∀ y, Commute (MonoidAlgebra.of ℂ (G0g D.nd) g') (plHom D k v y) := by
     intro g' hg' y
     induction y using MonoidAlgebra.induction_on with
     | of h =>
@@ -57,7 +65,8 @@ theorem atPlace_central (D : D7) (k : Fin 2) (v : D.nd.PlG k)
       exact hx.smul_right r
   induction b using MonoidAlgebra.induction_on with
   | of g =>
-    have hg : g = (Pi.mulSingle kv (g kv) : G0g D.nd) * ((Pi.mulSingle kv (g kv) : G0g D.nd)⁻¹ * g) :=
+    have hg
+        : g = (Pi.mulSingle kv (g kv) : G0g D.nd) * ((Pi.mulSingle kv (g kv) : G0g D.nd)⁻¹ * g) :=
       (mul_inv_cancel_left _ _).symm
     have h1 : ((Pi.mulSingle kv (g kv) : G0g D.nd)⁻¹ * g : G0g D.nd) kv = 1 := by simp
     have hc : Commute (MonoidAlgebra.of ℂ (G0g D.nd) g) (plHom D k v a) := by
@@ -91,15 +100,16 @@ theorem rev_dvd {q f : K[X]} (h : q ∣ f) : q.reverse ∣ f.reverse := by
   exact dvd_mul_right _ _
 
 theorem unit_of_rev {q : K[X]} (h : q.coeff 0 ≠ 0) (hu : IsUnit q.reverse) : IsUnit q := by
-  have hd : q.reverse.natDegree = 0 := natDegree_eq_of_degree_eq_some (isUnit_iff_degree_eq_zero.mp hu)
+  have hd : q.reverse.natDegree = 0 :=
+    natDegree_eq_of_degree_eq_some (isUnit_iff_degree_eq_zero.mp hu)
   rw [deg_rev h] at hd
   rw [eq_C_of_natDegree_eq_zero hd]
   exact isUnit_C.mpr (Ne.isUnit h)
 
 def dl (f : K[X]) : K[X] := C (f.coeff 0)⁻¹ * f.reverse
 
-theorem dl_lab {N : ℕ} {f : K[X]} (h : f.Monic ∧ f.natDegree = N ∧ f.coeff 0 ≠ 0) :
-    (dl f).Monic ∧ (dl f).natDegree = N ∧ (dl f).coeff 0 = (f.coeff 0)⁻¹ := by
+theorem dl_lab {N : ℕ} {f : K[X]} (h : f.Monic ∧ f.natDegree = N ∧ f.coeff 0 ≠ 0)
+    : (dl f).Monic ∧ (dl f).natDegree = N ∧ (dl f).coeff 0 = (f.coeff 0)⁻¹ := by
   obtain ⟨hm, hd, h0⟩ := h
   have hrd : f.reverse.natDegree = N := by rw [deg_rev h0, hd]
   have hlc : f.reverse.leadingCoeff = f.coeff 0 := by
@@ -113,7 +123,8 @@ theorem dl_lab {N : ℕ} {f : K[X]} (h : f.Monic ∧ f.natDegree = N ∧ f.coeff
   · show (C (f.coeff 0)⁻¹ * f.reverse).coeff 0 = _
     rw [coeff_C_mul, hc0, mul_one]
 
-theorem dl_dl {N : ℕ} {f : K[X]} (h : f.Monic ∧ f.natDegree = N ∧ f.coeff 0 ≠ 0) : dl (dl f) = f := by
+theorem dl_dl {N : ℕ} {f : K[X]} (h : f.Monic ∧ f.natDegree = N ∧ f.coeff 0 ≠ 0)
+    : dl (dl f) = f := by
   have h3 := (dl_lab h).2.2
   rw [show dl (dl f) = C ((dl f).coeff 0)⁻¹ * (dl f).reverse from rfl, h3, inv_inv,
     show dl f = C (f.coeff 0)⁻¹ * f.reverse from rfl, reverse_mul_of_domain, reverse_C,
@@ -123,25 +134,29 @@ theorem dvd_dl {q f : K[X]} (h : q ∣ f) : q.reverse ∣ dl f := by
   show q.reverse ∣ C (f.coeff 0)⁻¹ * f.reverse
   exact dvd_mul_of_dvd_right (rev_dvd h) _
 
-theorem ptp_inv (l : ℕ) {L : Type} [Field L] (x : L) :
-    Formalism.CyclotomicNorms.primeToPart l x⁻¹ = (Formalism.CyclotomicNorms.primeToPart l x)⁻¹ := by
+theorem ptp_inv (l : ℕ) {L : Type} [Field L] (x : L)
+    : Formalism.CyclotomicNorms.primeToPart l x⁻¹
+      = (Formalism.CyclotomicNorms.primeToPart l x)⁻¹ := by
   by_cases hx : x = 0
   · subst hx
-    have key : ∀ n : ℕ, (0 : L) ^ n = ((0 : L) ^ n)⁻¹ := fun n => by
-      rcases n with _ | n <;> simp
+    have key : ∀ n : ℕ, (0 : L) ^ n = ((0 : L) ^ n)⁻¹ := fun n => by rcases n with _ | n <;> simp
     unfold Formalism.CyclotomicNorms.primeToPart
     rw [inv_zero]
     exact key _
   · have ho : orderOf x⁻¹ = orderOf x := by
-      calc orderOf x⁻¹ = orderOf ((Units.mk0 x hx)⁻¹ : Lˣ) := by
-            rw [← orderOf_units, Units.val_inv_eq_inv_val, Units.val_mk0]
+      calc
+        orderOf x⁻¹ = orderOf ((Units.mk0 x hx)⁻¹ : Lˣ) := by
+          rw [← orderOf_units, Units.val_inv_eq_inv_val, Units.val_mk0]
         _ = orderOf (Units.mk0 x hx) := orderOf_inv _
         _ = orderOf x := by rw [← orderOf_units, Units.val_mk0]
     unfold Formalism.CyclotomicNorms.primeToPart
     rw [ho, inv_pow]
 
-theorem root_dl {g : ℕ} [Fact g.Prime] {N : ℕ} {f : (ZMod g)[X]} (h : f.Monic ∧ f.natDegree = N ∧ f.coeff 0 ≠ 0)
-    {x : Formalism.CyclotomicNorms.Fbar g} (hx : x ∈ Formalism.CyclotomicNorms.rootsBar (dl f)) : x⁻¹ ∈ Formalism.CyclotomicNorms.rootsBar f := by
+theorem root_dl
+    {g : ℕ} [Fact g.Prime]
+    {N : ℕ} {f : (ZMod g)[X]} (h : f.Monic ∧ f.natDegree = N ∧ f.coeff 0 ≠ 0)
+    {x : Formalism.CyclotomicNorms.Fbar g} (hx : x ∈ Formalism.CyclotomicNorms.rootsBar (dl f))
+    : x⁻¹ ∈ Formalism.CyclotomicNorms.rootsBar f := by
   obtain ⟨hm, hd, h0⟩ := h
   have hdl := dl_lab ⟨hm, hd, h0⟩
   unfold Formalism.CyclotomicNorms.rootsBar at hx ⊢
@@ -162,8 +177,9 @@ theorem root_dl {g : ℕ} [Fact g.Prime] {N : ℕ} {f : (ZMod g)[X]} (h : f.Moni
   rw [← eval₂_reverse_eq_zero_iff, invOf_eq_inv, inv_inv]
   exact hx'
 
-private theorem irreducible_reverse_of_coeff_zero_ne_zero {q : K[X]} (h0 : q.coeff 0 ≠ 0) (hq : Irreducible q) :
-    Irreducible q.reverse := by
+private theorem irreducible_reverse_of_coeff_zero_ne_zero
+    {q : K[X]} (h0 : q.coeff 0 ≠ 0) (hq : Irreducible q)
+    : Irreducible q.reverse := by
   have hr0 : q.reverse.coeff 0 ≠ 0 := by
     rw [coeff_zero_reverse]
     exact leadingCoeff_ne_zero.mpr hq.ne_zero
@@ -175,8 +191,11 @@ private theorem irreducible_reverse_of_coeff_zero_ne_zero {q : K[X]} (h0 : q.coe
   · right
     exact unit_of_rev (coeff_of_dvd (by rw [hab]; exact dvd_mul_left b a) hr0) hu
 
-theorem good_dl {N g : ℕ} [Fact g.Prime] {PP J : Type} (f : PP → (ZMod g)[X]) (χ : PP → J → (ZMod g)ˣ)
-    (h : Formalism.CyclotomicNorms.IsGood N g f χ) : Formalism.CyclotomicNorms.IsGood N g (fun v => dl (f v)) (fun v j => (χ v j)⁻¹) := by
+theorem good_dl
+    {N g : ℕ} [Fact g.Prime]
+    {PP J : Type}
+    (f : PP → (ZMod g)[X]) (χ : PP → J → (ZMod g)ˣ) (h : Formalism.CyclotomicNorms.IsGood N g f χ)
+    : Formalism.CyclotomicNorms.IsGood N g (fun v => dl (f v)) (fun v j => (χ v j)⁻¹) := by
   obtain ⟨ha, hb, hc, hd, he, hf⟩ := h
   have hdl0 : ∀ v, (dl (f v)).coeff 0 ≠ 0 := fun v => by
     rw [(dl_lab (ha v)).2.2]
@@ -210,7 +229,8 @@ theorem good_dl {N g : ℕ} [Fact g.Prime] {PP J : Type} (f : PP → (ZMod g)[X]
 end Dual
 
 def dualFun (D : D7) (k : Fin 2) (f : (ZMod (D.host.g k))[X]) : (ZMod (D.host.g k))[X] :=
-  open Classical in if IsLabel D k f then dualLab D k f else f
+  open Classical in
+  if IsLabel D k f then dualLab D k f else f
 
 theorem label_dual (D : D7) (k : Fin 2) {f} (h : IsLabel D k f) : IsLabel D k (dualLab D k f) := by
   have : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
@@ -218,8 +238,8 @@ theorem label_dual (D : D7) (k : Fin 2) {f} (h : IsLabel D k f) : IsLabel D k (d
   show (dl f).Monic ∧ (dl f).natDegree = D.R.r ∧ (dl f).coeff 0 ≠ 0
   exact ⟨h'.1, h'.2.1, by rw [h'.2.2]; exact inv_ne_zero h.2.2⟩
 
-theorem good_dualFun (D : D7) (t : Tup2 D) (h : D.ntypes.goodTuple t) :
-    D.ntypes.goodTuple (fun k v => dualFun D k (t k v)) := by
+theorem good_dualFun (D : D7) (t : Tup2 D) (h : D.ntypes.goodTuple t)
+    : D.ntypes.goodTuple (fun k v => dualFun D k (t k v)) := by
   unfold NTypes.goodTuple at h ⊢
   intro k
   have : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩

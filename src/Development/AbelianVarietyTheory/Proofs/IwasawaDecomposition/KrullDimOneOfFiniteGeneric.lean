@@ -15,44 +15,54 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechPic
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory GlobalTheory.CechPic
 
 namespace GlobalTheory.ProperCover
 
-theorem isFractionRing_evaluation (X : Scheme.{0}) [IsIntegral X] {U : X.Opens}
-    (hU : IsAffineOpen U) {x : X} (hx : x = genericPoint X) (hxU : x ∈ U) :
-    letI := (X.evaluation U x hxU).hom.toAlgebra
-    IsFractionRing Γ(X, U) (X.residueField x) := by
+theorem isFractionRing_evaluation
+    (X : Scheme.{0}) [IsIntegral X]
+    {U : X.Opens} (hU : IsAffineOpen U)
+    {x : X} (hx : x = genericPoint X) (hxU : x ∈ U)
+    : letI := (X.evaluation U x hxU).hom.toAlgebra
+      IsFractionRing Γ(X, U) (X.residueField x) := by
   subst hx
   letI := (X.evaluation U _ hxU).hom.toAlgebra
   haveI : Nonempty U := ⟨⟨_, hxU⟩⟩
   have := functionField_isFractionRing_of_isAffineOpen X U hU
   let φ : X.functionField →+* X.residueField (genericPoint X) := (X.residue _).hom
-  let e : X.functionField ≃ₐ[Γ(X, U)] X.residueField (genericPoint X) :=
-    { RingEquiv.ofBijective φ ⟨φ.injective, X.residue_surjective _⟩ with
-      commutes' := fun _ => rfl }
+  let e : X.functionField ≃ₐ[Γ(X, U)] X.residueField (genericPoint X) := {
+    RingEquiv.ofBijective φ ⟨φ.injective, X.residue_surjective _⟩ with
+    commutes' := fun _ => rfl
+  }
   exact IsLocalization.isLocalization_of_algEquiv _ e
 
-theorem evaluation_genericPoint_injective (X : Scheme.{0}) [IsIntegral X] (V : X.Opens)
-    (hV : genericPoint X ∈ V) : Function.Injective (X.evaluation V (genericPoint X) hV) := by
+theorem evaluation_genericPoint_injective
+    (X : Scheme.{0}) [IsIntegral X] (V : X.Opens) (hV : genericPoint X ∈ V)
+    : Function.Injective (X.evaluation V (genericPoint X) hV) := by
   intro a b h
   apply germ_injective_of_isIntegral X _ hV
   let φ : X.functionField →+* X.residueField (genericPoint X) := (X.residue _).hom
   apply φ.injective
   exact h
 
-theorem dim_le_of_residueDegree_pos {Z' Z : Scheme.{0}} [IsIntegral Z'] [IsIntegral Z]
-    [IsLocallyNoetherian Z] (f : Z' ⟶ Z) [LocallyOfFiniteType f]
-    (hg : f (genericPoint Z') = genericPoint Z) (hdeg : 0 < f.residueDegree (genericPoint Z')) :
-    topologicalKrullDim Z' ≤ topologicalKrullDim Z := by
-  have hd : ∀ {X : Scheme.{0}} (U : X.Opens), IsAffineOpen U →
-      topologicalKrullDim (U : Set X) = ringKrullDim Γ(X, U) := fun {X} U hU => by
-    rw [topologicalKrullDim_eq_of_isEmbedding hU.fromSpec.isOpenEmbedding.isEmbedding hU.range_fromSpec]
+theorem dim_le_of_residueDegree_pos
+    {Z' Z : Scheme.{0}} [IsIntegral Z'] [IsIntegral Z] [IsLocallyNoetherian Z]
+    (f : Z' ⟶ Z) [LocallyOfFiniteType f]
+    (hg : f (genericPoint Z') = genericPoint Z) (hdeg : 0 < f.residueDegree (genericPoint Z'))
+    : topologicalKrullDim Z' ≤ topologicalKrullDim Z := by
+  have hd
+      : ∀ {X : Scheme.{0}} (U : X.Opens),
+        IsAffineOpen U
+          → topologicalKrullDim (U : Set X) = ringKrullDim Γ(X, U) := fun {X} U hU => by
+    rw [topologicalKrullDim_eq_of_isEmbedding hU.fromSpec.isOpenEmbedding.isEmbedding
+      hU.range_fromSpec]
     exact PrimeSpectrum.topologicalKrullDim_eq_ringKrullDim (R := Γ(X, U))
   refine topologicalKrullDim_le_of_forall_exists_isOpen fun x => ?_
   obtain ⟨U, hU, hxU, -⟩ := Opens.isBasis_iff_nbhd.1 Z.isBasis_affineOpens (Opens.mem_top (f x))
-  obtain ⟨V, hV, hxV, hVU⟩ := Opens.isBasis_iff_nbhd.1 Z'.isBasis_affineOpens (show x ∈ f ⁻¹ᵁ U from hxU)
+  obtain ⟨V, hV, hxV, hVU⟩ :=
+    Opens.isBasis_iff_nbhd.1 Z'.isBasis_affineOpens (show x ∈ f ⁻¹ᵁ U from hxU)
   refine ⟨V, V.isOpen, hxV, ?_⟩
   refine le_trans ?_ (topologicalKrullDim_subspace_le Z (U : Set Z))
   rw [hd U hU, hd V hV]
@@ -77,20 +87,23 @@ theorem dim_le_of_residueDegree_pos {Z' Z : Scheme.{0}} [IsIntegral Z'] [IsInteg
     Module.finite_of_finrank_pos hdeg
   have : Algebra.IsAlgebraic Γ(Z, U) (Z'.residueField (genericPoint Z')) :=
     Algebra.IsAlgebraic.trans Γ(Z, U) (Z.residueField (f (genericPoint Z'))) _
-  have hnat : f.appLE U V hVU ≫ Z'.evaluation V _ hηV =
-      Z.evaluation U _ hyU ≫ f.residueFieldMap (genericPoint Z') := by
+  have hnat
+      : f.appLE U V hVU ≫ Z'.evaluation V _ hηV
+        = Z.evaluation U _ hyU ≫ f.residueFieldMap (genericPoint Z') := by
     rw [Scheme.evaluation_naturality, Scheme.Hom.appLE, Category.assoc]
     congr 1
     simp [Scheme.evaluation]
-  let ψ : Γ(Z', V) →ₐ[Γ(Z, U)] Z'.residueField (genericPoint Z') :=
-    { (Z'.evaluation V _ hηV).hom with
-      commutes' := fun a => RingHom.congr_fun congr($(hnat).hom) a }
+  let ψ : Γ(Z', V) →ₐ[Γ(Z, U)] Z'.residueField (genericPoint Z') := {
+    (Z'.evaluation V _ hηV).hom with
+    commutes' := fun a => RingHom.congr_fun congr($(hnat).hom) a
+  }
   have hψ : Function.Injective ψ := evaluation_genericPoint_injective Z' V hηV
   have hinj : Function.Injective (algebraMap Γ(Z, U) Γ(Z', V)) := by
     have h1 : Function.Injective (algebraMap Γ(Z, U) (Z'.residueField (genericPoint Z'))) := by
       rw [IsScalarTower.algebraMap_eq Γ(Z, U) (Z.residueField (f (genericPoint Z')))
         (Z'.residueField (genericPoint Z'))]
-      exact (f.residueFieldMap (genericPoint Z')).hom.injective.comp (IsFractionRing.injective Γ(Z, U) _)
+      exact (f.residueFieldMap (genericPoint Z')).hom.injective.comp
+        (IsFractionRing.injective Γ(Z, U) _)
     intro a b h
     apply h1
     rw [← ψ.commutes, ← ψ.commutes, h]

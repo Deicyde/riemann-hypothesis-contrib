@@ -11,6 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TypePOfLargeG
 namespace GlobalTheory
 
 theorem rowsPos_typeP : Formalism.L2.SG.RowsPos.TypeP :=
-  GlobalTheory.T.typeBound_of_largeGap_discreteSeries_bessel (GlobalTheory.GapIn.hyp_of_uniqGap GlobalTheory.T.bessel_multiplicity_one_large_gap_and_whittaker_bessel.1) GlobalTheory.T.bessel_multiplicity_one_large_gap_and_whittaker_bessel.2
+  GlobalTheory.T.typeBound_of_largeGap_discreteSeries_bessel
+    (GlobalTheory.GapIn.hyp_of_uniqGap
+      GlobalTheory.T.bessel_multiplicity_one_large_gap_and_whittaker_bessel.1)
+    GlobalTheory.T.bessel_multiplicity_one_large_gap_and_whittaker_bessel.2
 
 end GlobalTheory

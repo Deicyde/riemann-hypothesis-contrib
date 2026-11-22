@@ -17,13 +17,14 @@ theorem length_self_eq_top : Module.length R R = ⊤ := by
     have h := Ring.ord_eq_addVal (0 : R)
     rw [addVal_zero] at h
     exact h
-  have hle := Module.length_le_of_surjective (Submodule.mkQ (Ideal.span {(0 : R)}))
-    (Submodule.mkQ_surjective _)
+  have hle :=
+    Module.length_le_of_surjective (Submodule.mkQ (Ideal.span {(0 : R)}))
+      (Submodule.mkQ_surjective _)
   rw [h0] at hle
   exact top_le_iff.mp hle
 
-theorem addVal_prod {ι : Type*} (s : Finset ι) (a : ι → R) :
-    addVal R (∏ i ∈ s, a i) = ∑ i ∈ s, addVal R (a i) := by
+theorem addVal_prod {ι : Type*} (s : Finset ι) (a : ι → R)
+    : addVal R (∏ i ∈ s, a i) = ∑ i ∈ s, addVal R (a i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -31,8 +32,8 @@ theorem addVal_prod {ι : Type*} (s : Finset ι) (a : ι → R) :
 
 variable {M : Type u_2} [AddCommGroup M] [Module R M]
 
-theorem length_eq_top_of_finrank_ne_zero [Module.Finite R M] (h : finrank R M ≠ 0) :
-    Module.length R M = ⊤ := by
+theorem length_eq_top_of_finrank_ne_zero [Module.Finite R M] (h : finrank R M ≠ 0)
+    : Module.length R M = ⊤ := by
   have hnt : ¬ Module.IsTorsion R M := fun ht => h (Module.finrank_eq_zero_iff_isTorsion.mpr ht)
   have hx : ∃ x : M, ∀ a : R, a • x = 0 → a = 0 := by
     by_contra hc
@@ -43,15 +44,16 @@ theorem length_eq_top_of_finrank_ne_zero [Module.Finite R M] (h : finrank R M �
     exact ⟨⟨a, mem_nonZeroDivisors_of_ne_zero ha0⟩, ha⟩
   obtain ⟨x, hx⟩ := hx
   have hinj : Function.Injective (LinearMap.toSpanSingleton R M x) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     exact hx a (by simpa using ha)
   have hle := Module.length_le_of_injective _ hinj
   rw [length_self_eq_top] at hle
   exact top_le_iff.mp hle
 
-theorem length_coker_eq_addVal_det [Module.Free R M] [Module.Finite R M] (f : M →ₗ[R] M) :
-    Module.length R (M ⧸ LinearMap.range f) = addVal R (LinearMap.det f) := by
+theorem length_coker_eq_addVal_det [Module.Free R M] [Module.Finite R M] (f : M →ₗ[R] M)
+    : Module.length R (M ⧸ LinearMap.range f) = addVal R (LinearMap.det f) := by
   classical
   by_cases hk : LinearMap.ker f = ⊥
   · have hinj : Function.Injective f := LinearMap.ker_eq_bot.mp hk
@@ -78,8 +80,8 @@ theorem length_coker_eq_addVal_det [Module.Free R M] [Module.Finite R M] (f : M 
       exact smithNormalFormBotBasis_def b h i
     have hmat : LinearMap.toMatrix b' b' g = Matrix.diagonal a := by
       ext i j
-      rw [LinearMap.toMatrix_apply, hg, map_smul, Basis.repr_self, Finsupp.smul_single,
-        smul_eq_mul, mul_one, Matrix.diagonal_apply, Finsupp.single_apply]
+      rw [LinearMap.toMatrix_apply, hg, map_smul, Basis.repr_self, Finsupp.smul_single, smul_eq_mul,
+        mul_one, Matrix.diagonal_apply, Finsupp.single_apply]
       by_cases hij : i = j
       · simp [hij]
       · simp [hij, Ne.symm hij]

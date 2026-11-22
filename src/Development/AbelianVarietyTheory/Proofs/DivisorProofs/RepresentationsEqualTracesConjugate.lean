@@ -9,8 +9,8 @@ open Matrix
 
 namespace GlobalTheory
 
-def piMatUnit {I : Type} [DecidableEq I] (m : ℕ) (τ : I) (i j : Fin m) :
-    I → Matrix (Fin m) (Fin m) ℂ :=
+def piMatUnit {I : Type} [DecidableEq I] (m : ℕ) (τ : I) (i j : Fin m)
+    : I → Matrix (Fin m) (Fin m) ℂ :=
   Pi.single τ (Matrix.single i j 1)
 
 lemma piMatUnit_mul {I : Type} [DecidableEq I] (m : ℕ) (τ τ' : I) (i j k l : Fin m) :
@@ -70,16 +70,18 @@ lemma exists_mul_idem_mul_eq_of_trace_eq {g : ℕ} (P P' : Matrix (Fin g) (Fin g
   | (intros; apply @_root_.GlobalTheory.TraceEqualFinrank.exists_mul_mul_eq_of_trace_eq <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.TraceEqualFinrank.exists_mul_mul_eq_of_trace_eq ..)
 
-theorem conj_of_trace_central_idem_eq :
-    ∀ (I : Type) [Fintype I] [DecidableEq I] (m g : ℕ), 0 < m →
-      ∀ (σ σ' : (I → Matrix (Fin m) (Fin m) ℂ) →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ),
-        (∀ τ, (σ (Pi.single τ 1)).trace = (σ' (Pi.single τ 1)).trace) →
-          ∃ h : Matrix (Fin g) (Fin g) ℂ, IsUnit h ∧ ∀ x, σ' x * h = h * σ x := by
+theorem conj_of_trace_central_idem_eq
+    : ∀ (I : Type) [Fintype I] [DecidableEq I] (m g : ℕ),
+      0 < m
+        → ∀ (σ σ' : (I → Matrix (Fin m) (Fin m) ℂ) →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ),
+          (∀ τ, (σ (Pi.single τ 1)).trace = (σ' (Pi.single τ 1)).trace)
+            → ∃ h : Matrix (Fin g) (Fin g) ℂ, IsUnit h ∧ ∀ x, σ' x * h = h * σ x := by
   intro I _ _ m g hm σ σ' htr
   set z : Fin m := ⟨0, hm⟩
 
-  have hdiag : ∀ (ρ : (I → Matrix (Fin m) (Fin m) ℂ) →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ) (τ : I),
-      (ρ (Pi.single τ 1)).trace = (m : ℂ) * (ρ (piMatUnit m τ z z)).trace := by
+  have hdiag
+      : ∀ (ρ : (I → Matrix (Fin m) (Fin m) ℂ) →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ) (τ : I),
+        (ρ (Pi.single τ 1)).trace = (m : ℂ) * (ρ (piMatUnit m τ z z)).trace := by
     intro ρ τ
     have hi : ∀ i, (ρ (piMatUnit m τ i i)).trace = (ρ (piMatUnit m τ z z)).trace := by
       intro i
@@ -89,13 +91,15 @@ theorem conj_of_trace_central_idem_eq :
         rw [piMatUnit_mul]; simp
       rw [e1, e2, map_mul, map_mul, Matrix.trace_mul_comm]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [← sum_piMatUnit_diag, map_sum, Matrix.trace_sum, Finset.sum_congr rfl (fun i _ => hi i),
+    rw [← sum_piMatUnit_diag, map_sum, Matrix.trace_sum, Finset.sum_congr rfl (fun i _ => hi i),
       Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-  have hidem : ∀ (ρ : (I → Matrix (Fin m) (Fin m) ℂ) →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ) (τ : I),
-      IsIdempotentElem (ρ (piMatUnit m τ z z)) := by
+  have hidem
+      : ∀ (ρ : (I → Matrix (Fin m) (Fin m) ℂ) →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ) (τ : I),
+        IsIdempotentElem (ρ (piMatUnit m τ z z)) := by
     intro ρ τ
     unfold IsIdempotentElem
-    rw [← map_mul, piMatUnit_mul]; simp
+    rw [← map_mul, piMatUnit_mul]
+    simp
   have hm' : (m : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hm.ne'
   have htr' : ∀ τ, (σ (piMatUnit m τ z z)).trace = (σ' (piMatUnit m τ z z)).trace := by
     intro τ
@@ -110,20 +114,30 @@ theorem conj_of_trace_central_idem_eq :
 
   have hE : ∀ τ k l, σ' (piMatUnit m τ k l) * h = h * σ (piMatUnit m τ k l) := by
     intro τ k l
-    have hL : ∀ τ' i, σ' (piMatUnit m τ k l) * (σ' (piMatUnit m τ' i z) * X τ' * σ (piMatUnit m τ' z i))
-        = if τ = τ' ∧ l = i then σ' (piMatUnit m τ k z) * X τ * σ (piMatUnit m τ z l) else 0 := by
+    have hL
+        : ∀ τ' i,
+          σ' (piMatUnit m τ k l) * (σ' (piMatUnit m τ' i z) * X τ' * σ (piMatUnit m τ' z i))
+            = if τ = τ' ∧ l = i then
+                σ' (piMatUnit m τ k z) * X τ * σ (piMatUnit m τ z l)
+              else
+                0 := by
       intro τ' i
       rw [← mul_assoc, ← mul_assoc, ← map_mul, piMatUnit_mul]
       split_ifs with hc
       · obtain ⟨rfl, rfl⟩ := hc; rfl
       · simp
-    have hR : ∀ τ' i, σ' (piMatUnit m τ' i z) * X τ' * σ (piMatUnit m τ' z i) * σ (piMatUnit m τ k l)
-        = if τ = τ' ∧ k = i then σ' (piMatUnit m τ k z) * X τ * σ (piMatUnit m τ z l) else 0 := by
+    have hR
+        : ∀ τ' i,
+          σ' (piMatUnit m τ' i z) * X τ' * σ (piMatUnit m τ' z i) * σ (piMatUnit m τ k l)
+            = if τ = τ' ∧ k = i then
+                σ' (piMatUnit m τ k z) * X τ * σ (piMatUnit m τ z l)
+              else
+                0 := by
       intro τ' i
       rw [mul_assoc _ (σ _), ← map_mul, piMatUnit_mul]
       by_cases hc : τ' = τ ∧ i = k
       · obtain ⟨rfl, rfl⟩ := hc; simp
-      · have hc' : ¬ (τ = τ' ∧ k = i) := fun h => hc ⟨h.1.symm, h.2.symm⟩
+      · have hc' : ¬(τ = τ' ∧ k = i) := fun h => hc ⟨h.1.symm, h.2.symm⟩
         simp [hc, hc']
     rw [hh, Finset.mul_sum, Finset.sum_mul]
     simp only [Finset.mul_sum, Finset.sum_mul, hL, hR]
@@ -132,27 +146,33 @@ theorem conj_of_trace_central_idem_eq :
     intro x
     rw [piMatUnit_decomp m x]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finset.sum_mul, Finset.mul_sum, smul_mul_assoc, mul_smul_comm, hE]
+    simp only [map_sum, map_smul, Finset.sum_mul, Finset.mul_sum, smul_mul_assoc, mul_smul_comm, hE]
 
-  have hprod : ∀ τ i τ' j, σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z i) *
-      (σ' (piMatUnit m τ' j z) * X τ' * σ (piMatUnit m τ' z j))
-        = if τ = τ' ∧ i = j then σ (piMatUnit m τ i i) else 0 := by
+  have hprod
+      : ∀ τ i τ' j,
+        σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z i)
+            * (σ' (piMatUnit m τ' j z) * X τ' * σ (piMatUnit m τ' z j))
+          = if τ = τ' ∧ i = j then σ (piMatUnit m τ i i) else 0 := by
     intro τ i τ' j
-    have e : σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z i) *
-        (σ' (piMatUnit m τ' j z) * X τ' * σ (piMatUnit m τ' z j)) =
-        σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z i * piMatUnit m τ' j z) * X τ' *
-          σ (piMatUnit m τ' z j) := by
+    have e
+        : σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z i)
+            * (σ' (piMatUnit m τ' j z) * X τ' * σ (piMatUnit m τ' z j))
+          = σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z i * piMatUnit m τ' j z) * X τ'
+            * σ (piMatUnit m τ' z j) := by
       rw [map_mul]; simp only [mul_assoc]
     rw [e, piMatUnit_mul]
     split_ifs with hc
     · obtain ⟨rfl, rfl⟩ := hc
-      rw [show σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z z) * X τ * σ (piMatUnit m τ z i) =
-          σ (piMatUnit m τ i z) * (Y τ * σ' (piMatUnit m τ z z) * X τ) * σ (piMatUnit m τ z i) by
-            simp only [mul_assoc], hYX τ, ← map_mul, ← map_mul]
+      rw [show σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z z) * X τ * σ (piMatUnit m τ z i)
+            = σ (piMatUnit m τ i z) * (Y τ * σ' (piMatUnit m τ z z) * X τ)
+              * σ (piMatUnit m τ z i) by
+          simp only [mul_assoc],
+        hYX τ, ← map_mul, ← map_mul]
       simp [piMatUnit_mul]
     · simp
-  have hrow : ∀ τ i, σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z i) * h =
-      σ (piMatUnit m τ i i) := by
+  have hrow
+      : ∀ τ i,
+        σ (piMatUnit m τ i z) * Y τ * σ' (piMatUnit m τ z i) * h = σ (piMatUnit m τ i i) := by
     intro τ i
     rw [hh]
     simp only [Finset.mul_sum, hprod]
@@ -164,7 +184,7 @@ theorem conj_of_trace_central_idem_eq :
       rw [← map_one σ, ← Finset.univ_sum_single (1 : I → Matrix (Fin m) (Fin m) ℂ), map_sum]
     refine Finset.sum_congr rfl fun τ _ => ?_
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [Pi.one_apply, ← sum_piMatUnit_diag, map_sum]
+    rw [Pi.one_apply, ← sum_piMatUnit_diag, map_sum]
   exact ⟨h, (Matrix.isUnit_iff_isUnit_det h).mpr (Matrix.isUnit_det_of_left_inverse hinv), hint⟩
 
 end GlobalTheory

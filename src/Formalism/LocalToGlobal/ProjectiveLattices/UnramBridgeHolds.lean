@@ -10,15 +10,17 @@ namespace Formalism.L2.Pj
 
 attribute [local instance] FractionRing.liftAlgebra
 
-theorem unramBridge_holds : ∀ (K : Type) [Field K] [NumberField K] [IsCMField K],
-    (∀ P : Ideal (𝓞 K), P.IsMaximal → ∃ θ : 𝓞 K,
-      θ - RingOfIntegers.mapRingEquiv (IsCMField.complexConj K : K ≃+* K) θ ∉ P) →
-    Algebra.Unramified (𝓞 (maximalRealSubfield K)) (𝓞 K) := by
+theorem unramBridge_holds
+    : ∀ (K : Type) [Field K] [NumberField K] [IsCMField K],
+      (∀ P : Ideal (𝓞 K),
+          P.IsMaximal
+            → ∃ θ : 𝓞 K, θ - RingOfIntegers.mapRingEquiv (IsCMField.complexConj K : K ≃+* K) θ ∉ P)
+        → Algebra.Unramified (𝓞 (maximalRealSubfield K)) (𝓞 K) := by
   intro K _ _ _ hθ
   set F := maximalRealSubfield K with hF
   have hsep : Algebra.IsSeparable (FractionRing (𝓞 F)) (FractionRing (𝓞 K)) := by
     refine Algebra.IsSeparable.of_equiv_equiv (FractionRing.algEquiv (𝓞 F) F).symm.toRingEquiv
-          (FractionRing.algEquiv (𝓞 K) K).symm.toRingEquiv ?_
+      (FractionRing.algEquiv (𝓞 K) K).symm.toRingEquiv ?_
     ext _
     exact IsFractionRing.algEquiv_commutes (FractionRing.algEquiv (𝓞 F) F).symm
       (FractionRing.algEquiv (𝓞 K) K).symm _
@@ -62,21 +64,22 @@ theorem unramBridge_holds : ∀ (K : Type) [Field K] [NumberField K] [IsCMField 
   have hdeg : f.natDegree ≤ 2 := by
     have h1 : f = minpoly (𝓞 F) (algebraMap (𝓞 K) K θ) :=
       (minpoly.algebraMap_eq (FaithfulSMul.algebraMap_injective (𝓞 K) K) θ).symm
-    have h2 := minpoly.isIntegrallyClosed_eq_field_fractions' F
-      (IsIntegral.algebraMap hθint : IsIntegral (𝓞 F) (algebraMap (𝓞 K) K θ))
-    have h3 : (minpoly F (algebraMap (𝓞 K) K θ)).natDegree ≤ 2 :=
-      hfin ▸ minpoly.natDegree_le _
+    have h2 :=
+      minpoly.isIntegrallyClosed_eq_field_fractions' F
+        (IsIntegral.algebraMap hθint : IsIntegral (𝓞 F) (algebraMap (𝓞 K) K θ))
+    have h3 : (minpoly F (algebraMap (𝓞 K) K θ)).natDegree ≤ 2 := hfin ▸ minpoly.natDegree_le _
     rw [h2, Polynomial.natDegree_map_eq_of_injective (FaithfulSMul.algebraMap_injective _ _)] at h3
-    rw [h1]; exact h3
+    rw [h1]
+    exact h3
   set fK := f.map (algebraMap (𝓞 F) (𝓞 K)) with hfK
   have hKmonic : fK.Monic := hmonic.map _
-  have hKdeg : fK.natDegree ≤ 2 := by
-    rw [hfK, hmonic.natDegree_map]; exact hdeg
-  have hr1 : fK.IsRoot θ := by
-    rw [IsRoot, hfK, eval_map, ← aeval_def]; exact minpoly.aeval _ _
+  have hKdeg : fK.natDegree ≤ 2 := by rw [hfK, hmonic.natDegree_map]; exact hdeg
+  have hr1 : fK.IsRoot θ := by rw [IsRoot, hfK, eval_map, ← aeval_def]; exact minpoly.aeval _ _
   have hr2 : fK.IsRoot θ' := by
     rw [IsRoot, hfK, eval_map, ← aeval_def, hσ]
-    rw [show IsCMField.ringOfIntegersComplexConj K θ = (IsCMField.ringOfIntegersComplexConj K).toAlgHom θ from rfl,
+    rw [show IsCMField.ringOfIntegersComplexConj K θ
+          = (IsCMField.ringOfIntegersComplexConj K).toAlgHom θ from
+        rfl,
       Polynomial.aeval_algHom_apply, minpoly.aeval, map_zero]
   set g := fK /ₘ (X - C θ) with hg
   have hfg : (X - C θ) * g = fK := (mul_divByMonic_eq_iff_isRoot).mpr hr1
@@ -97,7 +100,8 @@ theorem unramBridge_holds : ∀ (K : Type) [Field K] [NumberField K] [IsCMField 
     rw [← hhmonic.natDegree_eq_zero]
     have := hKdeg
     rw [hfac, natDegree_mul (X_sub_C_ne_zero θ) (mul_ne_zero (X_sub_C_ne_zero θ') hhmonic.ne_zero),
-      natDegree_mul (X_sub_C_ne_zero θ') hhmonic.ne_zero, natDegree_X_sub_C, natDegree_X_sub_C] at this
+        natDegree_mul (X_sub_C_ne_zero θ') hhmonic.ne_zero, natDegree_X_sub_C, natDegree_X_sub_C]
+      at this
     omega
   have hval : aeval θ (derivative f) = θ - θ' := by
     rw [aeval_def, ← eval_map, ← derivative_map, ← hfK, hfac, hh1]

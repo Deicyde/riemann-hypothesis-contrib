@@ -5,10 +5,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
-private theorem conn_of_idem (R : Type) [CommRing R] [Nontrivial R]
-    (h : ∀ e : R, IsIdempotentElem e → e = 0 ∨ e = 1) : ConnectedSpace (PrimeSpectrum R) := by
+private theorem conn_of_idem
+    (R : Type) [CommRing R] [Nontrivial R] (h : ∀ e : R, IsIdempotentElem e → e = 0 ∨ e = 1)
+    : ConnectedSpace (PrimeSpectrum R) := by
   rw [connectedSpace_iff_clopen]
   refine ⟨inferInstance, fun s hs => ?_⟩
   obtain ⟨e, he, rfl⟩ := PrimeSpectrum.isClopen_iff.mp hs
@@ -18,8 +20,8 @@ private theorem conn_of_idem (R : Type) [CommRing R] [Nontrivial R]
   · right
     simp
 
-private theorem idem_local (O : Type) [CommRing O] [IsLocalRing O] (e : O)
-    (he : IsIdempotentElem e) : e = 0 ∨ e = 1 := by
+private theorem idem_local (O : Type) [CommRing O] [IsLocalRing O] (e : O) (he : IsIdempotentElem e)
+    : e = 0 ∨ e = 1 := by
   rcases IsLocalRing.isUnit_or_isUnit_one_sub_self e with h | h
   · right
     have h1 : e * e = e * 1 := by rw [he.eq, mul_one]
@@ -28,8 +30,11 @@ private theorem idem_local (O : Type) [CommRing O] [IsLocalRing O] (e : O)
     have h1 : (1 - e) * e = (1 - e) * 0 := by rw [mul_zero, sub_mul, one_mul, he.eq, sub_self]
     exact h.mul_left_cancel h1
 
-private theorem idem_zero (O : Type) [CommRing O] [IsLocalRing O] (e : LaurentPolynomial O)
-    (he : IsIdempotentElem e) (hm : ∀ n, e.coeff n ∈ IsLocalRing.maximalIdeal O) : e = 0 := by
+private theorem idem_zero
+    (O : Type) [CommRing O] [IsLocalRing O]
+    (e : LaurentPolynomial O)
+    (he : IsIdempotentElem e) (hm : ∀ n, e.coeff n ∈ IsLocalRing.maximalIdeal O)
+    : e = 0 := by
   classical
   set I : Ideal O := Ideal.span ((e.coeff.support.image e.coeff : Finset O) : Set O) with hI
   have hfg : I.FG := ⟨_, rfl⟩
@@ -73,8 +78,9 @@ private theorem idem_zero (O : Type) [CommRing O] [IsLocalRing O] (e : LaurentPo
   rw [← ha, smul_zero]
   rfl
 
-private theorem idem_laurent (O : Type) [CommRing O] [IsLocalRing O] (e : LaurentPolynomial O)
-    (he : IsIdempotentElem e) : e = 0 ∨ e = 1 := by
+private theorem idem_laurent
+    (O : Type) [CommRing O] [IsLocalRing O] (e : LaurentPolynomial O) (he : IsIdempotentElem e)
+    : e = 0 ∨ e = 1 := by
   set φ := AddMonoidAlgebra.mapRingHom ℤ (IsLocalRing.residue O) with hφ
   have key : ∀ x : LaurentPolynomial O, φ x = 0 → ∀ n, x.coeff n ∈ IsLocalRing.maximalIdeal O := by
     intro x hx n
@@ -86,10 +92,13 @@ private theorem idem_laurent (O : Type) [CommRing O] [IsLocalRing O] (e : Lauren
   · left
     exact idem_zero O e he (key e h)
   · right
-    have h1 : 1 - e = 0 := idem_zero O (1 - e) he.one_sub (key _ (by rw [map_sub, map_one, h, sub_self]))
+    have h1 : 1 - e = 0 :=
+      idem_zero O (1 - e) he.one_sub (key _ (by rw [map_sub, map_one, h, sub_self]))
     exact (sub_eq_zero.1 h1).symm
 
-theorem UpperTheory.connectedSpace_spec_local_and_laurent :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O], ConnectedSpace (Spec (CommRingCat.of O)) ∧ ConnectedSpace (Spec (CommRingCat.of (LaurentPolynomial O))) := by
+theorem UpperTheory.connectedSpace_spec_local_and_laurent
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O],
+      ConnectedSpace (Spec (CommRingCat.of O))
+        ∧ ConnectedSpace (Spec (CommRingCat.of (LaurentPolynomial O))) := by
   intro O _ _
   exact ⟨conn_of_idem O (idem_local O), conn_of_idem _ (idem_laurent O)⟩

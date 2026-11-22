@@ -6,7 +6,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogResolutionM
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq
 
@@ -28,13 +32,13 @@ theorem inclChart_target (hV : IsOpen V) [Nonempty V] : (inclChart hV).target = 
 theorem inclChart_apply (hV : IsOpen V) [Nonempty V] (y : V) : inclChart hV y = y := by
   simp [inclChart]
 
-theorem val_inclChart_symm (hV : IsOpen V) [Nonempty V] {w : Fin e → ℂ} (hw : w ∈ V) :
-    (((inclChart hV).symm w : V) : Fin e → ℂ) = w := by
+theorem val_inclChart_symm (hV : IsOpen V) [Nonempty V] {w : Fin e → ℂ} (hw : w ∈ V)
+    : (((inclChart hV).symm w : V) : Fin e → ℂ) = w := by
   have h := (inclChart hV).right_inv (x := w) (by rw [inclChart_target]; exact hw)
   rwa [inclChart_apply] at h
 
-theorem eventually_val_inclChart_symm (hV : IsOpen V) [Nonempty V] {w : Fin e → ℂ} (hw : w ∈ V) :
-    ∀ᶠ w' in 𝓝 w, (((inclChart hV).symm w' : V) : Fin e → ℂ) = w' := by
+theorem eventually_val_inclChart_symm (hV : IsOpen V) [Nonempty V] {w : Fin e → ℂ} (hw : w ∈ V)
+    : ∀ᶠ w' in 𝓝 w, (((inclChart hV).symm w' : V) : Fin e → ℂ) = w' := by
   filter_upwards [hV.mem_nhds hw] with w' hw' using val_inclChart_symm hV hw'
 
 def inclAtlas (hV : IsOpen V) [Nonempty V] : FinHolAtlas e V where
@@ -50,9 +54,16 @@ def inclAtlas (hV : IsOpen V) [Nonempty V] : FinHolAtlas e V where
 
 end GlobalTheory.CompanionTheory.Ar.PB.HoloLift
 
-
 open GlobalTheory.CompanionTheory.Ar.PB.HoloLift in
-theorem GlobalTheory.CompanionTheory.Ar.PB.HoloLift.holo_of_analytic_lift : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P J : Ideal (MRing ι)) (D e : ℕ) (R : AnLogRes P J D), J = ⊤ → ∀ (V : Set (Fin e → ℂ)) (μ : (Fin e → ℂ) → (Σ k, ι k) → ℂ) (g : (Fin e → ℂ) → R.X), IsOpen V → (∀ q, AnalyticOnNhd ℂ (fun u => μ u q) V) → (∀ u ∈ V, SameOrbit (R.lift (g u) (g u)) (μ u)) → ContinuousOn g V ∧ ∀ k, AnalyticOnNhd ℂ (R.A.chart k ∘ g) (V ∩ g ⁻¹' (R.A.chart k).source) := by
+theorem GlobalTheory.CompanionTheory.Ar.PB.HoloLift.holo_of_analytic_lift
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P J : Ideal (MRing ι)) (D e : ℕ)
+        (R : AnLogRes P J D),
+      J = ⊤
+        → ∀ (V : Set (Fin e → ℂ)) (μ : (Fin e → ℂ) → (Σ k, ι k) → ℂ) (g : (Fin e → ℂ) → R.X),
+          IsOpen V → (∀ q, AnalyticOnNhd ℂ (fun u => μ u q) V)
+            → (∀ u ∈ V, SameOrbit (R.lift (g u) (g u)) (μ u))
+            → ContinuousOn g V
+              ∧ ∀ k, AnalyticOnNhd ℂ (R.A.chart k ∘ g) (V ∩ g ⁻¹' (R.A.chart k).source) := by
   intro K _ ι _ P J D e R hJ V μ g hV hμ hg
   subst hJ
   rcases V.eq_empty_or_nonempty with rfl | hne
@@ -80,8 +91,10 @@ theorem GlobalTheory.CompanionTheory.Ar.PB.HoloLift.holo_of_analytic_lift : ∀ 
   have hcont : Continuous h := CovMap.continuous_of_orbit_of_ne R B hVo hVm hμf hnz hc hh
   refine ⟨continuousOn_iff_continuous_restrict.2 hcont, fun k w hw => ?_⟩
   have hA := Proj.analytic_of_orbit R B hVo hVm hμf hc hh hcont (0 : Fin 1) k
-  have hmem : w ∈ (B.chart (0 : Fin 1)).target ∩
-      (B.chart (0 : Fin 1)).symm ⁻¹' (h ⁻¹' (R.A.chart k).source) := by
+  have hmem
+      : w
+        ∈ (B.chart (0 : Fin 1)).target
+          ∩ (B.chart (0 : Fin 1)).symm ⁻¹' (h ⁻¹' (R.A.chart k).source) := by
     refine ⟨by simpa [B, inclAtlas, inclChart_target] using hw.1, ?_⟩
     have e1 := val_inclChart_symm hV hw.1
     show g (((inclChart hV).symm w : V) : Fin e → ℂ) ∈ (R.A.chart k).source

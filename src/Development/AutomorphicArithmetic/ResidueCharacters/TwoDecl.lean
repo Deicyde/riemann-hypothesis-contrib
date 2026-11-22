@@ -12,14 +12,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Conjuga
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
 open GlobalTheory.SplitRowProbe GlobalTheory.SplitType GlobalTheory.SplitDecl
 
 namespace UpperTheory.N.Two
 
-theorem columns_xor (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i = 2) (s : Bool) :
-    ∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ w', IsConjPl D.host w w' →
-      Xor (w ∈ columns (N := D.nd) D.nbr i s) (w' ∈ columns (N := D.nd) D.nbr i s) := by
+theorem columns_xor (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i = 2) (s : Bool)
+    : ∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ w',
+      IsConjPl D.host w w'
+        → Xor (w ∈ columns (N := D.nd) D.nbr i s) (w' ∈ columns (N := D.nd) D.nbr i s) := by
   intro w hw w' h
   have hw' := GlobalTheory.SplitCount.mem_placesOver_of_conj D.host hw h
   have n1 := GlobalTheory.SplitRowProbe.not_both_columns D i w hw
@@ -30,8 +33,9 @@ theorem columns_xor (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i = 2) (s : Bool) :
   · exact Or.inl ⟨⟨hw, h1⟩, fun ⟨_, h3⟩ => n2 ⟨h2, h3⟩⟩
   · exact Or.inr ⟨⟨hw', h2⟩, fun ⟨_, h3⟩ => n1 ⟨h3, h1⟩⟩
 
-theorem decl_split (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i = 2) (ep : Bool) :
-    (∃ dc : TruncatedSeriesCountingIdentities.Decl D i, EmbeddingTypes.hypDecl i dc ep) ∧ EmbeddingTypes.ambTypeD (D := D) i ep := by
+theorem decl_split (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i = 2) (ep : Bool)
+    : (∃ dc : TruncatedSeriesCountingIdentities.Decl D i, EmbeddingTypes.hypDecl i dc ep)
+      ∧ EmbeddingTypes.ambTypeD (D := D) i ep := by
   have hl : D.nd.l i ≠ 0 := (D.nd.lPrime i).out.ne_zero
   have hx := columns_xor D i h2 ep
   refine ⟨⟨decl D i hl ep, ?_, ?_⟩, ?_⟩
@@ -47,7 +51,11 @@ theorem decl_split (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i = 2) (ep : Bool) :
         rcases hx v hv v' hc with h | h
         · exact absurd h.1 hnc
         · exact h.1
-      exact ⟨v', (mem_col D i hl ep v').2 ⟨hv', hv'c⟩, GlobalTheory.Proof.ConjugatePlaces.isConjPl_symm hc⟩
+      exact ⟨
+        v',
+        (mem_col D i hl ep v').2 ⟨hv', hv'c⟩,
+        GlobalTheory.Proof.ConjugatePlaces.isConjPl_symm hc
+      ⟩
     · rintro ⟨u, hu, hc⟩
       obtain ⟨hu, huc⟩ := (mem_col D i hl ep u).1 hu
       refine ⟨GlobalTheory.SplitCount.mem_placesOver_of_conj D.host hu hc, fun hvc => ?_⟩
@@ -55,7 +63,9 @@ theorem decl_split (D : D7) (i : D.nd.Loc) (h2 : D.nd.l i = 2) (ep : Bool) :
       · exact h.2 hvc
       · exact h.2 huc
   · intro u hu hU w hw hc τ₀ hτ
-    have hnb : ∀ v hv τ, ¬ (EmbIn (N := D.nd) D.nbr i true v hv τ ∧ EmbIn (N := D.nd) D.nbr i false v hv τ) := by
+    have hnb
+        : ∀ v hv τ,
+          ¬(EmbIn (N := D.nd) D.nbr i true v hv τ ∧ EmbIn (N := D.nd) D.nbr i false v hv τ) := by
       rintro v hv τ ⟨a, b⟩
       rcases embIn_xor D i v hv τ with h | h
       · exact h.2 b

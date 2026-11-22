@@ -11,8 +11,10 @@ public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.GlintPrincRelIndexNeZe
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V
+  UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
 open scoped Matrix NNReal
 
 namespace UpperTheory.Esk.DeterminantRepresentatives
@@ -24,7 +26,8 @@ theorem norm_one' {w : Pl F} {x : w.adicCompletion F} (h : Valued.v x = 1) : ‖
   have h2 := (Valued.toNormedField.one_le_norm_iff (x := x)).2 h.ge
   exact le_antisymm this h2
 
-theorem fin_supp (y : (Af F)ˣ) : Function.HasFiniteMulSupport fun w : Pl F => ‖pLoc F w (y : Af F)‖ := by
+theorem fin_supp (y : (Af F)ˣ)
+    : Function.HasFiniteMulSupport fun w : Pl F => ‖pLoc F w (y : Af F)‖ := by
   have h1 := Filter.eventually_cofinite.1 (y : Af F).2
   have h2 := Filter.eventually_cofinite.1 ((y⁻¹ : (Af F)ˣ) : Af F).2
   refine (h1.union h2).subset fun w hw => ?_
@@ -35,7 +38,8 @@ theorem fin_supp (y : (Af F)ˣ) : Function.HasFiniteMulSupport fun w : Pl F => �
   have a3 : Valued.v (pLoc F w (y : Af F)) * Valued.v (pLoc F w ((y⁻¹ : (Af F)ˣ) : Af F)) = 1 := by
     rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
   refine hw (norm_one' (le_antisymm a1 ?_))
-  calc 1 = _ := a3.symm
+  calc
+    1 = _ := a3.symm
     _ ≤ Valued.v (pLoc F w (y : Af F)) * 1 := mul_le_mul_right a2 _
     _ = _ := mul_one _
 
@@ -44,50 +48,66 @@ theorem absF_mul (y z : (Af F)ˣ) : absF (y * z) = absF y * absF z := by
   rw [← finprod_mul_distrib (fin_supp y) (fin_supp z)]
   simp
 
-theorem aff_mul {R : Type} [CommRing R] (y z : Rˣ) (x t : R) : aff y x * aff z t = aff (y * z) (x + y * t) := by
+theorem aff_mul {R : Type} [CommRing R] (y z : Rˣ) (x t : R)
+    : aff y x * aff z t = aff (y * z) (x + y * t) := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [aff, Matrix.mul_apply, Fin.sum_univ_succ, add_comm]
 
-@[simp] theorem aff_one {R : Type} [CommRing R] : aff (1 : Rˣ) (0 : R) = 1 := by
+@[simp]
+theorem aff_one {R : Type} [CommRing R] : aff (1 : Rˣ) (0 : R) = 1 := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [aff]
 
-theorem det_aff {R : Type} [CommRing R] (y : Rˣ) (x : R) : Matrix.GeneralLinearGroup.det (aff y x) = y := by
+theorem det_aff {R : Type} [CommRing R] (y : Rˣ) (x : R)
+    : Matrix.GeneralLinearGroup.det (aff y x) = y := by
   ext
   simp [Matrix.GeneralLinearGroup.val_det_apply, aff, Matrix.det_fin_two_of]
 
-theorem det_centralSection {R : Type} [CommRing R] (y : Rˣ) :
-    Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.scalar (Fin 2) y * (aff y 0)⁻¹) = y := by
+theorem det_centralSection {R : Type} [CommRing R] (y : Rˣ)
+    : Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.scalar (Fin 2) y * (aff y 0)⁻¹)
+      = y := by
   rw [map_mul, map_inv, det_aff]
   ext
   simp [pow_two]
 
-theorem pLoc_det (v : Pl F) (g : GF F) : pLoc F v ((Matrix.GeneralLinearGroup.det g : (Af F)ˣ) : Af F) =
-    ((Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.map (pLoc F v) g) : (v.adicCompletion F)ˣ) : v.adicCompletion F) := by
+theorem pLoc_det (v : Pl F) (g : GF F)
+    : pLoc F v ((Matrix.GeneralLinearGroup.det g : (Af F)ˣ) : Af F)
+      = ((Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.map (pLoc F v) g)
+          : (v.adicCompletion F)ˣ)
+        : v.adicCompletion F) := by
   simp [Matrix.GeneralLinearGroup.val_det_apply, RingHom.map_det]
 
-theorem absF_loc (w : Pl F) (g : GL (Fin 2) (w.adicCompletion F))
-    (hg : Matrix.GeneralLinearGroup.det g = atFin w (unif w)) :
-    absF (Matrix.GeneralLinearGroup.det (locGL F 2 w g)) = (normV w : ℝ)⁻¹ := by
-  rw [absF, finprod_eq_single _ w fun v hv => by rw [pLoc_det, pLoc_locGL_of_ne hv]; simp, pLoc_det, pLoc_locGL, hg,
-    FinitePlace.norm_def, unif_spec, WithZeroMulInt.toNNReal_neg_apply _ WithZero.exp_ne_zero]
+theorem absF_loc
+    (w : Pl F) (g : GL (Fin 2) (w.adicCompletion F))
+    (hg : Matrix.GeneralLinearGroup.det g = atFin w (unif w))
+    : absF (Matrix.GeneralLinearGroup.det (locGL F 2 w g)) = (normV w : ℝ)⁻¹ := by
+  rw [absF, finprod_eq_single _ w fun v hv => by rw [pLoc_det, pLoc_locGL_of_ne hv]; simp, pLoc_det,
+    pLoc_locGL, hg, FinitePlace.norm_def, unif_spec,
+    WithZeroMulInt.toNNReal_neg_apply _ WithZero.exp_ne_zero]
 
   simp [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]
 
-theorem step {c : Pl F → ℕ} {w : Pl F} {W : List (Pl F)} {ι κ : Type} [Fintype ι] [Fintype κ] {b : ι → GF F}
-    (hb : IsReps c W b) (r : κ → GL (Fin 2) (w.adicCompletion F))
-    (hr1 : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL (Fin 2) (w.adicCompletion F)) V),
-      ∀ x ∈ Hi.fixd ρ (K1 w (c w)), Uop w ρ (c w) x = ∑ j, ρ (r j) x)
+theorem step
+    {c : Pl F → ℕ} {w : Pl F} {W : List (Pl F)} {ι κ : Type} [Fintype ι] [Fintype κ]
+    {b : ι → GF F} (hb : IsReps c W b)
+    (r : κ → GL (Fin 2) (w.adicCompletion F))
+    (hr1 : ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
+        (ρ : Representation ℂ (GL (Fin 2) (w.adicCompletion F)) V),
+      ∀ x ∈ Hi.fixd ρ (K1 w (c w)),
+        Uop w ρ (c w) x = ∑ j, ρ (r j) x)
     (hr2 : ∀ j, Matrix.GeneralLinearGroup.det (r j) = atFin w (unif w))
-    (hr3 : c w ≠ 0 → ∀ j, ∃ u : w.adicCompletionIntegers F, r j = aff (atFin w (unif w)) (u : w.adicCompletion F)) :
-    IsReps c (w :: W) (fun p : κ × ι => locGL F 2 w (r p.1) * b p.2) := by
+    (hr3 : c w ≠ 0
+      → ∀ j, ∃ u : w.adicCompletionIntegers F,
+        r j = aff (atFin w (unif w)) (u : w.adicCompletion F))
+    : IsReps c (w :: W) (fun p : κ × ι => locGL F 2 w (r p.1) * b p.2) := by
   refine ⟨?_, ?_, ?_⟩
   · intro V _ _ ρ x hx
     obtain ⟨hy, he⟩ := hb.act V ρ x hx
-    have hy' : (∑ i, ρ (b i) x) ∈ Hi.fixd (ρ.comp (locGL F 2 w)) (K1 w (c w)) :=
-      fun k hk => hy _ ((kcTop F).2.2.2.2.2 c w k hk)
-    have hs : ∑ p : κ × ι, ρ (locGL F 2 w (r p.1) * b p.2) x =
-        Uop w (ρ.comp (locGL F 2 w)) (c w) (∑ i, ρ (b i) x) := by
+    have hy' : (∑ i, ρ (b i) x) ∈ Hi.fixd (ρ.comp (locGL F 2 w)) (K1 w (c w)) := fun k hk =>
+      hy _ ((kcTop F).2.2.2.2.2 c w k hk)
+    have hs
+        : ∑ p : κ × ι, ρ (locGL F 2 w (r p.1) * b p.2) x
+          = Uop w (ρ.comp (locGL F 2 w)) (c w) (∑ i, ρ (b i) x) := by
       rw [hr1 V (ρ.comp (locGL F 2 w)) _ hy', Fintype.sum_prod_type]
       refine Finset.sum_congr rfl fun j _ => ?_
       set_option synthInstance.maxHeartbeats 100000 in
@@ -107,8 +127,11 @@ theorem step {c : Pl F → ℕ} {w : Pl F} {W : List (Pl F)} {ι κ : Type} [Fin
     by_cases h : w' = w
     · subst h
       obtain ⟨u, hu⟩ := hr3 hw' p.1
-      have hm : ((atFin w' (unif w') : (w'.adicCompletion F)ˣ) : w'.adicCompletion F) ∈ w'.adicCompletionIntegers F := by
-        rw [HeightOneSpectrum.mem_adicCompletionIntegers, unif_spec, ← WithZero.exp_zero, WithZero.exp_le_exp]
+      have hm
+          : ((atFin w' (unif w') : (w'.adicCompletion F)ˣ) : w'.adicCompletion F)
+            ∈ w'.adicCompletionIntegers F := by
+        rw [HeightOneSpectrum.mem_adicCompletionIntegers, unif_spec, ← WithZero.exp_zero,
+          WithZero.exp_le_exp]
         omega
       refine ⟨u + ⟨_, hm⟩ * u', ?_⟩
       rw [pLoc_locGL, hu, hu', aff_mul, List.count_cons_self, pow_succ']
@@ -127,14 +150,18 @@ theorem base (c : Pl F → ℕ) : IsReps c ([] : List (Pl F)) (fun _ : Unit => (
   · intro i w hw
     exact ⟨0, by simp⟩
 
-theorem reindex {c : Pl F → ℕ} {W : List (Pl F)} {ι κ : Type} [Fintype ι] [Fintype κ] (e : κ ≃ ι) {a : ι → GF F}
-    (h : IsReps c W a) : IsReps c W (a ∘ e) := by
+theorem reindex
+    {c : Pl F → ℕ} {W : List (Pl F)} {ι κ : Type} [Fintype ι] [Fintype κ]
+    (e : κ ≃ ι)
+    {a : ι → GF F} (h : IsReps c W a)
+    : IsReps c W (a ∘ e) := by
   refine ⟨?_, fun i => h.det (e i), fun i => h.loc (e i)⟩
   intro V _ _ ρ x hx
   rw [show ∑ i, ρ ((a ∘ e) i) x = ∑ i, ρ (a i) x from Equiv.sum_comp e (fun i => ρ (a i) x)]
   exact h.act V ρ x hx
 
-theorem ex (c : Pl F → ℕ) (W : List (Pl F)) : ∃ (ι : Type) (_ : Fintype ι) (a : ι → GF F), IsReps c W a := by
+theorem ex (c : Pl F → ℕ) (W : List (Pl F))
+    : ∃ (ι : Type) (_ : Fintype ι) (a : ι → GF F), IsReps c W a := by
   induction W with
   | nil => exact ⟨Unit, inferInstance, _, base c⟩
   | cons w W ih =>
@@ -144,7 +171,9 @@ theorem ex (c : Pl F → ℕ) (W : List (Pl F)) : ∃ (ι : Type) (_ : Fintype �
     letI := Fintype.ofFinite (IsLocalRing.ResidueField (w.adicCompletionIntegers F))
     choose s hs using (IsLocalRing.residue_surjective (R := w.adicCompletionIntegers F))
     have hS : Set.BijOn (IsLocalRing.residue (w.adicCompletionIntegers F))
-        ((Finset.univ.image s : Finset (w.adicCompletionIntegers F)) : Set (w.adicCompletionIntegers F)) Set.univ := by
+        ((Finset.univ.image s : Finset (w.adicCompletionIntegers F))
+          : Set (w.adicCompletionIntegers F))
+        Set.univ := by
       refine ⟨fun _ _ => Set.mem_univ _, ?_, fun r _ => ⟨s r, by simp, hs r⟩⟩
       intro x hx y hy h
       obtain ⟨r, -, rfl⟩ := Finset.mem_image.1 (Finset.mem_coe.1 hx)
@@ -153,19 +182,39 @@ theorem ex (c : Pl F → ℕ) (W : List (Pl F)) : ∃ (ι : Type) (_ : Fintype �
       rw [h]
     generalize Finset.univ.image s = S at hS
     by_cases hc : c w = 0
-    · refine ⟨Option S × ι, inferInstance, _, step hb (fun o => o.elim
-        (Matrix.GeneralLinearGroup.scalar (Fin 2) (atFin w (unif w)) * (aff (atFin w (unif w)) 0)⁻¹)
-        (fun u => aff (atFin w (unif w)) ((u : w.adicCompletionIntegers F) : w.adicCompletion F))) ?_ ?_ ?_⟩
+    · refine ⟨
+        Option S × ι,
+        inferInstance,
+        _,
+        step hb
+          (fun o =>
+            o.elim
+              (Matrix.GeneralLinearGroup.scalar (Fin 2) (atFin w (unif w))
+                * (aff (atFin w (unif w)) 0)⁻¹)
+              (fun u =>
+                aff (atFin w (unif w)) ((u : w.adicCompletionIntegers F) : w.adicCompletion F)))
+          ?_ ?_ ?_
+      ⟩
       · intro V _ _ ρ x hx
-        rw [(uopSum F w V ρ (c w) x hx).2 S hS, if_pos hc, Fintype.sum_option, add_comm, ← Finset.sum_coe_sort S]
+        rw [(uopSum F w V ρ (c w) x hx).2 S hS, if_pos hc, Fintype.sum_option, add_comm,
+          ← Finset.sum_coe_sort S]
         rfl
       · intro j
         cases j with
         | none => exact det_centralSection _
         | some u => exact det_aff _ _
       · exact fun h => absurd hc h
-    · refine ⟨S × ι, inferInstance, _, step hb (fun u : S => aff (atFin w (unif w))
-        ((u : w.adicCompletionIntegers F) : w.adicCompletion F)) ?_ (fun _ => det_aff _ _) (fun _ u => ⟨u, rfl⟩)⟩
+    · refine ⟨
+        S × ι,
+        inferInstance,
+        _,
+        step hb
+          (fun u : S =>
+            aff (atFin w (unif w)) ((u : w.adicCompletionIntegers F) : w.adicCompletion F))
+          ?_
+          (fun _ => det_aff _ _)
+          (fun _ u => ⟨u, rfl⟩)
+      ⟩
       intro V _ _ ρ x hx
       rw [(uopSum F w V ρ (c w) x hx).2 S hS, if_neg hc, add_zero, ← Finset.sum_coe_sort S]
 

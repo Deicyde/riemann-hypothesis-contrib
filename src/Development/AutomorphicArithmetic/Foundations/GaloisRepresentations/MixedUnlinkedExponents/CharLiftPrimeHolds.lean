@@ -32,7 +32,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TraceSpl
 
 namespace UpperTheory.Gal.GamX
 
-open UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.T
+open UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.T
 
 theorem gamSum_holds : GamSum :=
   gamSumOf matchBCX normCnt normVal (lpPowOf lpInj) chsFacts fdegEq (twValsOf normVal)
@@ -44,7 +45,8 @@ theorem splitSupp_holds : SplitSupp :=
     (splitStrong (descStep (coreDesc ci Sph.gm) (liftAll (liftStep (coreLift ci Sph.gm)))))
 
 theorem gamMixed_holds : GamMixed :=
-  gamMixed_of gamOne_holds splitSupp_holds chsTr rkSupp (rkLiftOf UpperTheory.V.Z.Gam.normLoc) (upThruOf chsFacts)
+  gamMixed_of gamOne_holds splitSupp_holds chsTr rkSupp (rkLiftOf UpperTheory.V.Z.Gam.normLoc)
+    (upThruOf chsFacts)
 
 theorem charSupp_holds : CharSupp := charSupp_of gamMixed_holds nmEq suppFacts
 

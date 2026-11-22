@@ -22,18 +22,19 @@ def EventuallyPolyUnique.Statement : Prop :=
 
 def EventuallyPolyShift.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (h : (K → ℤ) → ℤ) (p : MvPolynomial K ℚ) (c : K → ℤ),
-    EventuallyPoly h p → ∃ q : MvPolynomial K ℚ,
-      EventuallyPoly (fun m => h (m - c)) q ∧ q.totalDegree ≤ p.totalDegree ∧ (p = 0 → q = 0)
+    EventuallyPoly h p
+      → ∃ q : MvPolynomial K ℚ,
+        EventuallyPoly (fun m => h (m - c)) q ∧ q.totalDegree ≤ p.totalDegree ∧ (p = 0 → q = 0)
 
 def HilbIrrelevantZero.Statement : Prop :=
   ∀ (F : Type u) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (I : Ideal (MRing ι F)), ¬ IsRelevant I →
-    ∀ᶠ m in Filter.atTop, hilbFn I m = 0
+      [∀ k, Fintype (ι k)] (I : Ideal (MRing ι F)),
+    ¬ IsRelevant I → ∀ᶠ m in Filter.atTop, hilbFn I m = 0
 
 def RelevantPrimeDimGe.Statement : Prop :=
   ∀ (F : Type u) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (P : Ideal (MRing ι F)), IsMultiProjPrime P →
-    ((Fintype.card K : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MRing ι F ⧸ P)
+      [∀ k, Fintype (ι k)] (P : Ideal (MRing ι F)),
+    IsMultiProjPrime P → ((Fintype.card K : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MRing ι F ⧸ P)
 
 end
 

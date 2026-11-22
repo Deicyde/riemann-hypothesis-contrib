@@ -23,7 +23,8 @@ theorem tWeyl_of (hP : TW.Poisson) : TWeyl :=
 theorem siegelWeilStd_pre (hP : TW.Poisson) (hCT : CTSplit) : SiegelWeilStd :=
   have hT := tAll_of (tWeyl_of hP)
   siegelWeilStd_mid (tWeyl_of hP)
-    (KFP.kFinPoly_of hT Tunit.tUnit Tunit.tHeis kfour.auxEx KFock.fockMem (locOpEx_of_tAll hT) (locInst_of hT))
+    (KFP.kFinPoly_of hT Tunit.tUnit Tunit.tHeis kfour.auxEx KFock.fockMem (locOpEx_of_tAll hT)
+      (locInst_of hT))
     (Ald.ldEx_of hT kfour.auxEx) hCT
 
 end PositivityTheory.SiegelWeilFormula.Fin

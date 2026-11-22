@@ -11,26 +11,30 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Coboundar
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions Formalism.MainNotions.N TensorProduct
+  Module
 
 noncomputable section
 namespace GlobalTheory.FiltrationJumpMultiplicity
 
 section Gen
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
 
 theorem fil_anti {a b : ℤ} (h : a ≤ b) : PD.Fil b ≤ PD.Fil a :=
   antitone_int_of_succ_le PD.Fil_anti h
 
-theorem filV_anti {a b : ℤ} (h : a ≤ b) :
-    FilV PD (LL := LL) (V := V) b ≤ FilV PD (LL := LL) (V := V) a := by
+theorem filV_anti {a b : ℤ} (h : a ≤ b)
+    : FilV PD (LL := LL) (V := V) b ≤ FilV PD (LL := LL) (V := V) a := by
   rintro x ⟨y, rfl⟩
   induction y using TensorProduct.induction_on with
   | zero => simp
@@ -48,12 +52,14 @@ theorem exists_mem_filV (x : V ⊗[Qp] BdR) : ∃ a, x ∈ FilV PD (LL := LL) (V
   | add y z hy hz =>
     obtain ⟨a, ha⟩ := hy
     obtain ⟨b, hb⟩ := hz
-    exact ⟨min a b, Submodule.add_mem _ (filV_anti PD (min_le_left a b) ha)
-      (filV_anti PD (min_le_right a b) hb)⟩
+    exact ⟨
+      min a b,
+      Submodule.add_mem _ (filV_anti PD (min_le_left a b) ha) (filV_anti PD (min_le_right a b) hb)
+    ⟩
 
-theorem exists_DdRE_le_filV (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL)
-    [FiniteDimensional LL ↥(DdRE PD ρ τ)] :
-    ∃ a, DdRE PD ρ τ ≤ FilV PD (LL := LL) (V := V) a := by
+theorem exists_DdRE_le_filV
+    (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL) [FiniteDimensional LL ↥(DdRE PD ρ τ)]
+    : ∃ a, DdRE PD ρ τ ≤ FilV PD (LL := LL) (V := V) a := by
   have key : ∀ s : Finset (V ⊗[Qp] BdR), ∃ a, ∀ x ∈ s, x ∈ FilV PD (LL := LL) (V := V) a := by
     classical
     intro s
@@ -70,10 +76,10 @@ theorem exists_DdRE_le_filV (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL)
   obtain ⟨a, ha⟩ := key s
   exact ⟨a, hs ▸ Submodule.span_le.mpr ha⟩
 
-theorem finsum_multV_neg (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL)
-    [FiniteDimensional LL ↥(DdRE PD ρ τ)] :
-    ∑ᶠ (a : ℤ) (_ : a < 0), multV PD ρ τ a =
-      (finrank LL ↥(DdRE PD ρ τ) : ℤ) - finrank LL ↥(FildR PD ρ τ 0) := by
+theorem finsum_multV_neg
+    (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL) [FiniteDimensional LL ↥(DdRE PD ρ τ)]
+    : ∑ᶠ (a : ℤ) (_ : a < 0), multV PD ρ τ a
+      = (finrank LL ↥(DdRE PD ρ τ) : ℤ) - finrank LL ↥(FildR PD ρ τ 0) := by
   obtain ⟨a₀, ha₀⟩ := exists_DdRE_le_filV PD ρ τ
   have hF : ∀ b ≤ a₀, FildR PD ρ τ b = DdRE PD ρ τ := fun b hb =>
     inf_eq_left.mpr (ha₀.trans (filV_anti PD hb))
@@ -86,16 +92,19 @@ theorem finsum_multV_neg (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL)
     have h1 := hF a (by omega)
     have h2 := hF (a + 1) (by omega)
     rw [multV, h1, h2, sub_self]
-  let e : ℕ ↪ ℤ := ⟨fun i => -((i : ℤ) + 1), fun i j h => by
-    have : -((i : ℤ) + 1) = -((j : ℤ) + 1) := h
-    omega⟩
+  let e : ℕ ↪ ℤ := ⟨
+    fun i => -((i : ℤ) + 1),
+    fun i j h => by
+      have : -((i : ℤ) + 1) = -((j : ℤ) + 1) := h
+      omega
+  ⟩
   have he : ∀ i, e i = -((i : ℤ) + 1) := fun _ => rfl
-  have hsum : ∑ᶠ (a : ℤ) (_ : a < 0), multV PD ρ τ a =
-      ∑ a ∈ (Finset.range N).map e, multV PD ρ τ a := by
+  have hsum
+      : ∑ᶠ (a : ℤ) (_ : a < 0), multV PD ρ τ a = ∑ a ∈ (Finset.range N).map e, multV PD ρ τ a := by
     apply finsum_mem_eq_sum_of_inter_support_eq (s := Set.Iio (0 : ℤ))
     ext a
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Finset.coe_map, Finset.coe_range,
-      Set.mem_image, Set.mem_Iio, Function.mem_support, he]
+    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Finset.coe_map, Finset.coe_range, Set.mem_image,
+      Set.mem_Iio, Function.mem_support, he]
     constructor
     · rintro ⟨ha, hs⟩
       refine ⟨⟨(-a - 1).toNat, ?_, ?_⟩, hs⟩
@@ -120,20 +129,23 @@ noncomputable section
 namespace GlobalTheory.FiltrationJumpMultiplicity
 
 section Sat
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [Module O V] [IsScalarTower O LL V]
-    [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [Module O V]
+  [IsScalarTower O LL V] [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V]
+  [ContinuousConstSMul LL V]
 
-theorem coboundary_mem_blochKatoCocycles (ρ : Representation LL G V) (hc : ∀ x, Continuous fun g => ρ g x) (x : V) :
-    cob ρ x ∈ finiteCocycles PD ρ := by
+theorem coboundary_mem_blochKatoCocycles
+    (ρ : Representation LL G V) (hc : ∀ x, Continuous fun g => ρ g x) (x : V)
+    : cob ρ x ∈ finiteCocycles PD ρ := by
   have hcob : ∀ g, cob ρ x g = ρ g x - x := fun g => rfl
   refine ⟨⟨?_, fun g h => ?_⟩, x ⊗ₜ[Qp] (1 : B), fun g => ?_⟩
   · have : (cob ρ x : G → V) = fun g => ρ g x + (-x) := funext fun g => by rw [hcob, sub_eq_add_neg]
@@ -144,17 +156,22 @@ theorem coboundary_mem_blochKatoCocycles (ρ : Representation LL G V) (hc : ∀ 
   · rw [hcob, sub_tmul]
     simp [actVB]
 
-theorem mem_H1fT_of_smul (ρ : Representation LL G V) (L : Lattice (O := O) ρ)
-    (hc : ∀ x, Continuous fun g => ρ g x) (κ : LatticeCohomology L) (a : O) (ha : algebraMap O LL a ≠ 0)
-    (h : a • κ ∈ latticeFiniteCohomology PD L) : κ ∈ latticeFiniteCohomology PD L := by
+theorem mem_H1fT_of_smul
+    (ρ : Representation LL G V) (L : Lattice (O := O) ρ)
+    (hc : ∀ x, Continuous fun g => ρ g x) (κ : LatticeCohomology L)
+    (a : O) (ha : algebraMap O LL a ≠ 0) (h : a • κ ∈ latticeFiniteCohomology PD L)
+    : κ ∈ latticeFiniteCohomology PD L := by
   obtain ⟨c, rfl⟩ := Submodule.Quotient.mk_surjective _ κ
   obtain ⟨c', hc', hq⟩ := h
   rw [← Submodule.Quotient.mk_smul] at hq
   have hq' := (Submodule.Quotient.eq _).mp hq
   obtain ⟨x, -, hx⟩ := hq'
   have hx' : (c' : G → V) - a • (c : G → V) = cob ρ x := by
-    have h3 : ((latticeCocycles L).subtype (c' - a • c) : G → V) = (c' : G → V) - a • (c : G → V) := by simp
-    rw [← h3, ← hx]; rfl
+    have h3
+        : ((latticeCocycles L).subtype (c' - a • c) : G → V) = (c' : G → V) - a • (c : G → V) := by
+      simp
+    rw [← h3, ← hx]
+    rfl
   have h1 : a • (c : G → V) ∈ finiteCocycles PD ρ := by
     have : a • (c : G → V) = (c' : G → V) - cob ρ x := by rw [← hx']; abel
     rw [this]
@@ -168,15 +185,17 @@ theorem mem_H1fT_of_smul (ρ : Representation LL G V) (L : Lattice (O := O) ρ)
 
 end Sat
 
-theorem blochKato_dimension_saturation_unramified : ∀ D : D7, Formalism.MainNotions.tableLineDegreeTwo.adm19 D := by
+theorem blochKato_dimension_saturation_unramified
+    : ∀ D : D7, Formalism.MainNotions.tableLineDegreeTwo.adm19 D := by
   intro D l _ K LL hA
   haveI := K.2
   haveI := LL.2
   refine ⟨?_, ?_, ?_⟩
   · intro V _ _ _ _ _ _ _ _ _ ρ hc hcrys
     letI : Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) := Fintype.ofFinite _
-    have hBK := GlobalTheory.BlochKatoTied.blochKatoDim_of_tied l (D.loc l) (D.locA l) (D.locT l) K LL
-      (GlobalTheory.H1fGeneratorBoundAlt.splits_of_good hA.2.2) V ρ hc hcrys
+    have hBK :=
+      GlobalTheory.BlochKatoTied.blochKatoDim_of_tied l (D.loc l) (D.locA l) (D.locT l) K LL
+        (GlobalTheory.H1fGeneratorBoundAlt.splits_of_good hA.2.2) V ρ hc hcrys
     rw [hBK, finsum_eq_sum_of_fintype]
     congr 1
     refine Finset.sum_congr rfl fun τ _ => ?_

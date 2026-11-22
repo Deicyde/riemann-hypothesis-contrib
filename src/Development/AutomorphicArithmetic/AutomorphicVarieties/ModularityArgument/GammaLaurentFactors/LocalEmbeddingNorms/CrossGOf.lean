@@ -122,7 +122,8 @@ theorem crossGOf : CrossGOf := by
     mul_ne (dZ₀.mul dZ₁) (dsh dZ₁) (mul_ne dZ₀ dZ₁ Z₀0 Z₁0) (shift_ne Z₁0)
   have hF : (fun s => β'.eval s * U s - β.eval s * V s) = 0 := by
     by_contra F0
-    refine mul_ne (dG.mul dE) dF (mul_ne dG dE G0 E0) F0 (zero_of_left ((dG.mul dE).mul dF) c fun s hs => ?_)
+    refine mul_ne (dG.mul dE) dF (mul_ne dG dE G0 E0) F0
+      (zero_of_left ((dG.mul dE).mul dF) c fun s hs => ?_)
     obtain ⟨s1, s3, s4⟩ := l0 s hs
     obtain ⟨a3, a4⟩ := hl₀ s s1
     obtain ⟨b3, b4⟩ := hl₁ s s3
@@ -151,7 +152,9 @@ theorem crossGOf : CrossGOf := by
     generalize P'.eval ((q : ℂ) * x) = p4 at *
     generalize P.eval ((q : ℂ)⁻¹ * x) = p5 at *
     generalize P'.eval ((q : ℂ)⁻¹ * x) = p6 at *
-    have y : L' (s + 1) * L' s * B₀ s * B₁ s * m₀ * m₁ * Complex.exp (t₀ * s) * Complex.exp (t₁ * s) ≠ 0 := by
+    have y
+        : L' (s + 1) * L' s * B₀ s * B₁ s * m₀ * m₁ * Complex.exp (t₀ * s) * Complex.exp (t₁ * s)
+          ≠ 0 := by
       simp [y1, y2, y3, y4, y5, y6]
     refine mul_left_cancel₀ y ?_
     have h2 := congrArg (· * (p1 * p2 * p3 * p4)) h
@@ -175,7 +178,8 @@ theorem crossGOf : CrossGOf := by
   change R = C _ * R'
   clear_value R R' U V a b
   refine mul_left_cancel₀ hva ?_
-  rw [← mul_assoc (C (v * a)), ← C_mul, mul_div_cancel₀ _ (mul_ne_zero v0 a0), C_mul (a := v), C_mul (a := u)]
+  rw [← mul_assoc (C (v * a)), ← C_mul, mul_div_cancel₀ _ (mul_ne_zero v0 a0), C_mul (a := v),
+    C_mul (a := u)]
   linear_combination hK'
 
 end UpperTheory.V.Z.Gam

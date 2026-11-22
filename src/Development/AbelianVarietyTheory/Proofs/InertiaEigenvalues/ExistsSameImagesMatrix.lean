@@ -10,29 +10,41 @@ namespace GlobalTheory.DownLift.SplitGen
 
 section Matrices
 
-variable (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Finite (IsLocalRing.ResidueField O)]
-  [Field K] [Algebra O K] [IsFractionRing O K] (n r : ℕ)
+variable
+  (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K]
+  (n r : ℕ)
 
 def invFun (d : O) : Submodule ℂ (Matrix (Fin n) (Fin r) K → ℂ) where
-  carrier := {Φ | (∀ x (z : Matrix (Fin n) (Fin r) O), Φ (x + (d • z).map (algebraMap O K)) = Φ x) ∧
-    (∀ x, Φ x ≠ 0 → ∃ z : Matrix (Fin n) (Fin r) O, algebraMap O K d • x = z.map (algebraMap O K)) ∧
-    ∀ (h : GL (Fin n) O) x, Φ ((h : Matrix _ _ O).map (algebraMap O K) * x) = Φ x}
+  carrier :=
+    {Φ | (∀ x (z : Matrix (Fin n) (Fin r) O), Φ (x + (d • z).map (algebraMap O K)) = Φ x) ∧
+      (∀ x, Φ x ≠ 0 → ∃ z : Matrix (Fin n) (Fin r) O, algebraMap O K d • x = z.map (algebraMap O K)) ∧
+      ∀ (h : GL (Fin n) O) x, Φ ((h : Matrix _ _ O).map (algebraMap O K) * x) = Φ x}
   zero_mem' := ⟨fun _ _ => rfl, fun _ h => absurd rfl h, fun _ _ => rfl⟩
   add_mem' := by
     rintro a b ⟨a1, a2, a3⟩ ⟨b1, b2, b3⟩
-    refine ⟨fun x z => by simp only [Pi.add_apply, a1, b1], fun x hx => ?_, fun h x => by simp only [Pi.add_apply, a3, b3]⟩
+    refine ⟨
+      fun x z => by simp only [Pi.add_apply, a1, b1],
+      fun x hx => ?_,
+      fun h x => by simp only [Pi.add_apply, a3, b3]
+    ⟩
     by_cases h : a x = 0
     · exact b2 x fun h' => hx (by simp [h, h'])
     · exact a2 x h
   smul_mem' := by
     rintro c a ⟨a1, a2, a3⟩
-    exact ⟨fun x z => by simp only [Pi.smul_apply, a1], fun x hx => a2 x fun h => hx (by simp [h]),
-      fun h x => by simp only [Pi.smul_apply, a3]⟩
+    exact ⟨
+      fun x z => by simp only [Pi.smul_apply, a1],
+      fun x hx => a2 x fun h => hx (by simp [h]),
+      fun h x => by simp only [Pi.smul_apply, a3]
+    ⟩
 
 variable {O K n r}
 
-variable (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K] (n r : ℕ) in
+variable
+  (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K]
+  (n r : ℕ) in
 variable {O K n r} in
 private lemma finite_quotient_span_sq {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     [Finite (IsLocalRing.ResidueField O)] {d : O} (hd : d ≠ 0) :
@@ -43,8 +55,10 @@ private lemma finite_quotient_span_sq {O : Type} [CommRing O] [IsDomain O] [IsDi
   refine IsLocalRing.finite_quotient_iff.mpr ⟨k, ?_⟩
   rw [hk, hϖ.maximalIdeal_eq, Ideal.span_singleton_pow]
 
-variable (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K] (n r : ℕ) in
+variable
+  (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K]
+  (n r : ℕ) in
 variable {O K n r} in
 private lemma exists_matrix_vecMul_span_eq_of_smul_mem {R : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R]
     {m : ℕ} (N : Submodule R (Fin m → R)) {c : R} (hc : c ≠ 0) (hN : ∀ v, c • v ∈ N) :
@@ -94,39 +108,49 @@ private lemma exists_matrix_vecMul_span_eq_of_smul_mem {R : Type} [CommRing R] [
   rw [Matrix.det_mul, h0, mul_zero, Matrix.det_smul, Matrix.det_one, mul_one] at this
   exact pow_ne_zero _ hc this.symm
 
-
-variable (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K] (n r : ℕ) in
+variable
+  (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K]
+  (n r : ℕ) in
 variable {O K n r} in
-theorem _root_.GlobalTheory.DownLift.SplitGen.exists_same_images_matrix (hr : r ≤ n) {d : O} (hd : d ≠ 0) {V I : Type}
-    [AddCommGroup V] [Module ℂ V]
+theorem _root_.GlobalTheory.DownLift.SplitGen.exists_same_images_matrix
+    (hr : r ≤ n)
+    {d : O} (hd : d ≠ 0)
+    {V I : Type} [AddCommGroup V] [Module ℂ V]
     (M : I → V →ₗ[ℂ] (Matrix (Fin n) (Fin r) K → ℂ)) (f : V) (G : Submodule ℂ V)
     (hP : ∀ i, M i f ∈ _root_.GlobalTheory.DownLift.SplitGen.invFun O K n r d)
-    (hG : ∀ z (g : GL (Fin r) K), ∃ F ∈ G, ∀ i, M i F = M i f z • Set.indicator
-      {x : Matrix (Fin n) (Fin r) K | ∃ z : Matrix (Fin n) (Fin r) O, x * (g : Matrix _ _ K) = z.map (algebraMap O K)}
-      (fun _ => (1 : ℂ))) :
-    ∃ F ∈ G, ∀ i, M i F = M i f := by
-
+    (hG : ∀ z (g : GL (Fin r) K), ∃ F ∈ G, ∀ i,
+      M i F
+        = M i f z • Set.indicator
+          {x : Matrix (Fin n) (Fin r) K | ∃ z : Matrix (Fin n) (Fin r) O, x * (g : Matrix _ _ K) = z.map (algebraMap O K)}
+          (fun _ => (1 : ℂ)))
+    : ∃ F ∈ G, ∀ i, M i F = M i f := by
   classical
   set ι := algebraMap O K with hι
   have hιinj : Function.Injective ι := IsFractionRing.injective O K
   have hιd : ι d ≠ 0 := fun h => hd (hιinj (by rw [h, map_zero]))
-  have hPer : ∀ i x (z : Matrix (Fin n) (Fin r) O), M i f (x + (d • z).map ι) = M i f x :=
-    fun i => by obtain ⟨a, -, -⟩ := hP i; exact a
-  have hSupp : ∀ i x, M i f x ≠ 0 → ∃ z : Matrix (Fin n) (Fin r) O, ι d • x = z.map ι :=
-    fun i => by obtain ⟨-, a, -⟩ := hP i; exact a
-  have hInv : ∀ i (h : GL (Fin n) O) x, M i f ((h : Matrix (Fin n) (Fin n) O).map ι * x) = M i f x :=
-    fun i => by obtain ⟨-, -, a⟩ := hP i; exact a
+  have hPer
+      : ∀ i x (z : Matrix (Fin n) (Fin r) O), M i f (x + (d • z).map ι) = M i f x := fun i => by
+    obtain ⟨a, -, -⟩ := hP i; exact a
+  have hSupp : ∀ i x, M i f x ≠ 0 → ∃ z : Matrix (Fin n) (Fin r) O, ι d • x = z.map ι := fun i => by
+    obtain ⟨-, a, -⟩ := hP i; exact a
+  have hInv
+      : ∀ i (h : GL (Fin n) O) x,
+        M i f ((h : Matrix (Fin n) (Fin n) O).map ι * x) = M i f x := fun i => by
+    obtain ⟨-, -, a⟩ := hP i; exact a
   haveI := finite_quotient_span_sq (O := O) hd
   haveI : Finite (Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2})) :=
     Finite.of_injective (fun N : Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2}) =>
       (N : Set (Fin r → O ⧸ Ideal.span {d ^ 2}))) SetLike.coe_injective
   letI : Fintype (Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2})) := Fintype.ofFinite _
-  let red : Matrix (Fin n) (Fin r) O → Fin n → Fin r → O ⧸ Ideal.span {d ^ 2} :=
-    fun y a b => Ideal.Quotient.mk _ (y a b)
-  let ρ : Matrix (Fin n) (Fin r) K → Option (Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2})) := fun x =>
+  let red : Matrix (Fin n) (Fin r) O → Fin n → Fin r → O ⧸ Ideal.span {d ^ 2} := fun y a b =>
+    Ideal.Quotient.mk _ (y a b)
+  let ρ
+      : Matrix (Fin n) (Fin r) K → Option (Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2})) := fun x =>
     if h : ∃ y : Matrix (Fin n) (Fin r) O, ι d • x = y.map ι then
-      some (Submodule.span O (Set.range (red h.choose))) else none
+      some (Submodule.span O (Set.range (red h.choose)))
+    else
+      none
   have hnone : ∀ i x, ρ x = none → M i f x = 0 := by
     intro i x hx
     by_contra h0
@@ -142,32 +166,38 @@ theorem _root_.GlobalTheory.DownLift.SplitGen.exists_same_images_matrix (hr : r 
       obtain ⟨h, hh⟩ := _root_.GlobalTheory.exists_GL_of_span_range_eq O _ n _ _ hxx
       have hy := hx.choose_spec
       have hy' := hx'.choose_spec
-      have hdiff : ∀ a b, ∃ c, hx'.choose a b = ((h : Matrix (Fin n) (Fin n) O) * hx.choose) a b + c * d ^ 2 := by
+      have hdiff
+          : ∀ a b, ∃ c,
+            hx'.choose a b = ((h : Matrix (Fin n) (Fin n) O) * hx.choose) a b + c * d ^ 2 := by
         intro a b
-        have hs : ∀ c a : O, c • (Ideal.Quotient.mk (Ideal.span {d ^ 2}) a) =
-            Ideal.Quotient.mk (Ideal.span {d ^ 2}) (c * a) := fun c a => by
+        have hs
+            : ∀ c a : O,
+              c • (Ideal.Quotient.mk (Ideal.span {d ^ 2}) a)
+                = Ideal.Quotient.mk (Ideal.span {d ^ 2}) (c * a) := fun c a => by
           rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul]
         have e := congrFun (hh a) b
         set_option synthInstance.maxHeartbeats 100000 in
           simp only [red, Finset.sum_apply, Pi.smul_apply, hs, ← map_sum, Ideal.Quotient.eq,
-          Ideal.mem_span_singleton'] at e
+              Ideal.mem_span_singleton']
+            at e
         obtain ⟨c, hc⟩ := e
         exact ⟨c, by rw [Matrix.mul_apply]; linear_combination -hc⟩
       choose z hz using hdiff
       have hx'eq : x' = (h : Matrix (Fin n) (Fin n) O).map ι * x + (d • Matrix.of z).map ι := by
         apply smul_right_injective _ hιd
         ext a b
-        have e1 : ι d * x' a b = ι (hx'.choose a b) := by
-          simpa using congrFun (congrFun hy' a) b
+        have e1 : ι d * x' a b = ι (hx'.choose a b) := by simpa using congrFun (congrFun hy' a) b
         have e2 : ∀ k, ι d * x k b = ι (hx.choose k b) := fun k => by
           simpa using congrFun (congrFun hy k) b
-        simp only [smul_eq_mul, Matrix.smul_apply, Matrix.add_apply, Matrix.mul_apply, Matrix.map_apply,
-          Matrix.of_apply, mul_add, Finset.mul_sum]
+        simp only [smul_eq_mul, Matrix.smul_apply, Matrix.add_apply, Matrix.mul_apply,
+          Matrix.map_apply, Matrix.of_apply, mul_add, Finset.mul_sum]
         rw [e1, hz a b]
         set_option synthInstance.maxHeartbeats 100000 in
           simp only [Matrix.mul_apply, map_add (f := _), map_sum, map_mul, map_pow, smul_eq_mul]
-        have : ∀ k, ι d * (ι ((h : Matrix (Fin n) (Fin n) O) a k) * x k b) = ι ((h : Matrix (Fin n) (Fin n) O) a k) * ι (hx.choose k b) :=
-          fun k => by rw [← e2 k]; ring
+        have : ∀ k,
+            ι d * (ι ((h : Matrix (Fin n) (Fin n) O) a k) * x k b)
+              = ι ((h : Matrix (Fin n) (Fin n) O) a k) * ι (hx.choose k b) := fun k => by
+          rw [← e2 k]; ring
         simp only [this]
         ring
       rw [hx'eq, hPer, hInv]
@@ -176,9 +206,10 @@ theorem _root_.GlobalTheory.DownLift.SplitGen.exists_same_images_matrix (hr : r 
         simp [ρ, hx, hx'] at hxx
       rw [hnone i x (by simp [ρ, hx]), hnone i x' (by simp [ρ, hx'])]
 
-  have hlow : ∀ l : Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2}), ∃ g : GL (Fin r) K,
-      {x : Matrix (Fin n) (Fin r) K | ∃ z : Matrix (Fin n) (Fin r) O, x * (g : Matrix _ _ K) = z.map ι} =
-      {x | ∃ l', ρ x = some l' ∧ l' ≤ l} := by
+  have hlow
+      : ∀ l : Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2}), ∃ g : GL (Fin r) K,
+        {x : Matrix (Fin n) (Fin r) K | ∃ z : Matrix (Fin n) (Fin r) O, x * (g : Matrix _ _ K) = z.map ι}
+          = {x | ∃ l', ρ x = some l' ∧ l' ≤ l} := by
     intro l
     let N₀ : Submodule O (Fin r → O) :=
       l.comap ((Ideal.Quotient.mkₐ O (Ideal.span {d ^ 2})).toLinearMap.compLeft (Fin r))
@@ -196,7 +227,8 @@ theorem _root_.GlobalTheory.DownLift.SplitGen.exists_same_images_matrix (hr : r 
       rw [isUnit_iff_ne_zero, Matrix.det_smul, ← RingHom.mapMatrix_apply, ← RingHom.map_det]
       exact mul_ne_zero (pow_ne_zero _ (inv_ne_zero hιd)) fun h => hB (hιinj (by rw [h, map_zero]))
     refine ⟨(Matrix.nonsingInvUnit A hA)⁻¹, ?_⟩
-    have hgA : (((Matrix.nonsingInvUnit A hA)⁻¹ : GL (Fin r) K) : Matrix (Fin r) (Fin r) K) = A⁻¹ := by
+    have hgA
+        : (((Matrix.nonsingInvUnit A hA)⁻¹ : GL (Fin r) K) : Matrix (Fin r) (Fin r) K) = A⁻¹ := by
       rw [Matrix.coe_units_inv]; rfl
     have key : ∀ x (z : Matrix (Fin n) (Fin r) O), x * A⁻¹ = z.map ι ↔ ι d • x = (z * B).map ι := by
       intro x z
@@ -225,8 +257,8 @@ theorem _root_.GlobalTheory.DownLift.SplitGen.exists_same_images_matrix (hr : r 
       have hy : hx.choose = z * B := Matrix.map_injective hιinj (hx.choose_spec.symm.trans hz)
       rw [Submodule.span_le]
       rintro _ ⟨a, rfl⟩
-      have : hx.choose a ∈ N₀ := (hBmem _).2 ⟨z a, by
-        rw [hy]; ext j; simp [Matrix.mul_apply, Matrix.vecMul, dotProduct]⟩
+      have : hx.choose a ∈ N₀ :=
+        (hBmem _).2 ⟨z a, by rw [hy]; ext j; simp [Matrix.mul_apply, Matrix.vecMul, dotProduct]⟩
       exact this
     · rintro ⟨l', hl', hle⟩
       have hx : ∃ y : Matrix (Fin n) (Fin r) O, ι d • x = y.map ι := by
@@ -245,16 +277,20 @@ theorem _root_.GlobalTheory.DownLift.SplitGen.exists_same_images_matrix (hr : r 
   suffices hS : (fun i => M i f) ∈ G.map (LinearMap.pi M) by
     obtain ⟨F, hF, hFe⟩ := hS
     exact ⟨F, hF, fun i => by simpa using congrFun hFe i⟩
-  let E : Matrix (Fin n) (Fin r) K →
-      (Matrix (Fin n) (Fin r) K → ℂ) →ₗ[ℂ] (I → Matrix (Fin n) (Fin r) K → ℂ) :=
-    fun x₀ => LinearMap.pi fun i => M i f x₀ • LinearMap.id
-  have hE : ∀ x₀ φ, φ ∈ Submodule.span ℂ
-      {Ψ | ∃ l, Ψ = {x | ∃ l', ρ x = some l' ∧ l' ≤ l}.indicator fun _ => (1 : ℂ)} →
-      E x₀ φ ∈ G.map (LinearMap.pi M) := by
+  let E
+      : Matrix (Fin n) (Fin r) K
+        → (Matrix (Fin n) (Fin r) K → ℂ) →ₗ[ℂ] (I → Matrix (Fin n) (Fin r) K → ℂ) := fun x₀ =>
+    LinearMap.pi fun i => M i f x₀ • LinearMap.id
+  have hE
+      : ∀ x₀ φ,
+        φ ∈ Submodule.span ℂ
+            {Ψ | ∃ l, Ψ = {x | ∃ l', ρ x = some l' ∧ l' ≤ l}.indicator fun _ => (1 : ℂ)}
+          → E x₀ φ ∈ G.map (LinearMap.pi M) := by
     intro x₀ φ hφ
-    have hle : Submodule.span ℂ
-        {Ψ | ∃ l, Ψ = {x | ∃ l', ρ x = some l' ∧ l' ≤ l}.indicator fun _ => (1 : ℂ)} ≤
-        (G.map (LinearMap.pi M)).comap (E x₀) := by
+    have hle
+        : Submodule.span ℂ
+            {Ψ | ∃ l, Ψ = {x | ∃ l', ρ x = some l' ∧ l' ≤ l}.indicator fun _ => (1 : ℂ)}
+          ≤ (G.map (LinearMap.pi M)).comap (E x₀) := by
       rw [Submodule.span_le]
       rintro _ ⟨l, rfl⟩
       obtain ⟨F, hF, hFe⟩ := hG x₀ (g l)
@@ -262,10 +298,10 @@ theorem _root_.GlobalTheory.DownLift.SplitGen.exists_same_images_matrix (hr : r 
       simp only [LinearMap.pi_apply, E, LinearMap.smul_apply, LinearMap.id_apply]
       rw [hFe i, hg l]
     exact hle hφ
-  let rep : Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2}) → Matrix (Fin n) (Fin r) K :=
-    fun l => if h : ∃ x, ρ x = some l then h.choose else 0
-  have hdecomp : (fun i => M i f) =
-      ∑ l, E (rep l) ({x | ρ x = some l}.indicator fun _ => (1 : ℂ)) := by
+  let rep : Submodule O (Fin r → O ⧸ Ideal.span {d ^ 2}) → Matrix (Fin n) (Fin r) K := fun l =>
+    if h : ∃ x, ρ x = some l then h.choose else 0
+  have hdecomp
+      : (fun i => M i f) = ∑ l, E (rep l) ({x | ρ x = some l}.indicator fun _ => (1 : ℂ)) := by
     funext i x
     simp only [Finset.sum_apply, E, LinearMap.pi_apply, LinearMap.smul_apply, LinearMap.id_apply,
       Pi.smul_apply, Set.indicator_apply, Set.mem_setOf_eq, smul_eq_mul, mul_ite, mul_one, mul_zero]

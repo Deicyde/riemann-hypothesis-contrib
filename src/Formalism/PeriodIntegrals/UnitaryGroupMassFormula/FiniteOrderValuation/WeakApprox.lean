@@ -90,17 +90,20 @@ lemma exists_near (v : HeightOneSpectrum (𝓞 L)) (x : v.adicCompletion L) {δ 
   obtain ⟨_, hy, ⟨b, rfl⟩⟩ := mem_closure_iff_nhds.mp (hd x) _ hs
   exact ⟨b, hy⟩
 
-theorem weakApprox (T : Finset (HeightOneSpectrum (𝓞 L)))
+theorem weakApprox
+    (T : Finset (HeightOneSpectrum (𝓞 L)))
     (x : (v : HeightOneSpectrum (𝓞 L)) → v.adicCompletion L)
-    (γ : HeightOneSpectrum (𝓞 L) → ℤᵐ⁰) (hγ : ∀ v ∈ T, γ v ≠ 0) :
-    ∃ a : L, a ≠ 0 ∧ (∀ v ∈ T, Valued.v (algebraMap L (v.adicCompletion L) a - x v) < γ v) ∧
-      ∀ σ : L →+* ℝ, 0 < σ a := by
+    (γ : HeightOneSpectrum (𝓞 L) → ℤᵐ⁰) (hγ : ∀ v ∈ T, γ v ≠ 0)
+    : ∃ a : L,
+      a ≠ 0 ∧ (∀ v ∈ T, Valued.v (algebraMap L (v.adicCompletion L) a - x v) < γ v)
+        ∧ ∀ σ : L →+* ℝ, 0 < σ a := by
   classical
   have hnear : ∀ w : T, ∃ b : L, Valued.v (algebraMap L (w.1.adicCompletion L) b - x w.1) < γ w.1 :=
     fun w => exists_near w.1 (x w.1) (hγ w.1 w.2)
   choose b hb using hnear
-  obtain ⟨⟨d, hd⟩, hdint⟩ := IsLocalization.exist_integer_multiples (M := nonZeroDivisors (𝓞 L))
-    (S := L) (s := (Finset.univ : Finset T)) (f := b)
+  obtain ⟨⟨d, hd⟩, hdint⟩ :=
+    IsLocalization.exist_integer_multiples (M := nonZeroDivisors (𝓞 L)) (S := L)
+      (s := (Finset.univ : Finset T)) (f := b)
   have hr : ∀ w : T, ∃ r : 𝓞 L, algebraMap (𝓞 L) L r = algebraMap (𝓞 L) L d * b w := by
     intro w
     obtain ⟨r, hr⟩ := hdint w (Finset.mem_univ _)
@@ -116,10 +119,13 @@ theorem weakApprox (T : Finset (HeightOneSpectrum (𝓞 L)))
     intro w h
     simp only [e, dif_pos h]
     exact Classical.choose_spec (exists_pow_lt (mul_ne_zero (hγ w h) (hvd w)))
-  obtain ⟨y, hy⟩ := IsDedekindDomain.exists_forall_sub_mem_ideal (s := T)
-    (fun w : HeightOneSpectrum (𝓞 L) => w.asIdeal) e
-    (fun w _ => Ideal.prime_of_isPrime w.ne_bot w.isPrime)
-    (fun w _ u _ hne h => hne (HeightOneSpectrum.ext h)) r
+  obtain ⟨y, hy⟩ :=
+    IsDedekindDomain.exists_forall_sub_mem_ideal (s := T)
+      (fun w : HeightOneSpectrum (𝓞 L) => w.asIdeal)
+      e
+      (fun w _ => Ideal.prime_of_isPrime w.ne_bot w.isPrime)
+      (fun w _ u _ hne h => hne (HeightOneSpectrum.ext h))
+      r
   set a0 : L := algebraMap (𝓞 L) L y / dL with ha0
   have hclose : ∀ w ∈ T, Valued.v (algebraMap L (w.adicCompletion L) a0 - x w) < γ w := by
     intro w hw
@@ -135,10 +141,12 @@ theorem weakApprox (T : Finset (HeightOneSpectrum (𝓞 L)))
     have h1 : w.valuation L (a0 - b ⟨w, hw⟩) < γ w := by
       by_contra hle
       push_neg at hle
-      exact absurd (lt_of_le_of_lt hval (he w hw)) (not_lt.mpr (mul_le_mul_of_nonneg_right hle zero_le'))
-    have hsplit : algebraMap L (w.adicCompletion L) a0 - x w =
-        algebraMap L (w.adicCompletion L) (a0 - b ⟨w, hw⟩) +
-          (algebraMap L (w.adicCompletion L) (b ⟨w, hw⟩) - x w) := by
+      exact absurd (lt_of_le_of_lt hval (he w hw))
+        (not_lt.mpr (mul_le_mul_of_nonneg_right hle zero_le'))
+    have hsplit
+        : algebraMap L (w.adicCompletion L) a0 - x w
+          = algebraMap L (w.adicCompletion L) (a0 - b ⟨w, hw⟩)
+            + (algebraMap L (w.adicCompletion L) (b ⟨w, hw⟩) - x w) := by
       rw [map_sub]; ring
     rw [hsplit]
     exact Valuation.map_add_lt _ (by rw [val_alg]; exact h1) (hb ⟨w, hw⟩)
@@ -147,19 +155,25 @@ theorem weakApprox (T : Finset (HeightOneSpectrum (𝓞 L)))
     (fun σ τ h => RingHom.ext fun z => Complex.ofReal_injective (RingHom.congr_fun h z))
   obtain ⟨B, hB⟩ := (Set.finite_range (fun σ : L →+* ℝ => |σ a0|)).bddAbove
   obtain ⟨t, ht⟩ := exists_nat_gt B
-  have good : ∀ s : ℕ, B < s → (∀ w ∈ T, Valued.v (algebraMap L (w.adicCompletion L)
-      (a0 + (N : L) * (s : L)) - x w) < γ w) ∧ ∀ σ : L →+* ℝ, 0 < σ (a0 + (N : L) * (s : L)) := by
+  have good
+      : ∀ s : ℕ,
+        B < s
+          → (∀ w ∈ T,
+              Valued.v (algebraMap L (w.adicCompletion L) (a0 + (N : L) * (s : L)) - x w) < γ w)
+            ∧ ∀ σ : L →+* ℝ, 0 < σ (a0 + (N : L) * (s : L)) := by
     intro s hs
     refine ⟨fun w hw => ?_, fun σ => ?_⟩
-    · have hsplit : algebraMap L (w.adicCompletion L) (a0 + (N : L) * (s : L)) - x w =
-          (algebraMap L (w.adicCompletion L) a0 - x w) +
-            algebraMap L (w.adicCompletion L) ((N : L) * (s : L)) := by
+    · have hsplit
+          : algebraMap L (w.adicCompletion L) (a0 + (N : L) * (s : L)) - x w
+            = (algebraMap L (w.adicCompletion L) a0 - x w)
+              + algebraMap L (w.adicCompletion L) ((N : L) * (s : L)) := by
         rw [map_add (f := _)]; ring
       rw [hsplit]
       refine Valuation.map_add_lt _ (hclose w hw) ?_
       rw [val_alg, Valuation.map_mul]
-      calc w.valuation L (N : L) * w.valuation L (s : L) ≤ w.valuation L (N : L) * 1 :=
-            mul_le_mul_of_nonneg_left (val_nat_le_one w s) zero_le'
+      calc
+        w.valuation L (N : L) * w.valuation L (s : L)
+          ≤ w.valuation L (N : L) * 1 := mul_le_mul_of_nonneg_left (val_nat_le_one w s) zero_le'
         _ = w.valuation L (N : L) := mul_one _
         _ < γ w := hNs w hw
     · have h1 : |σ a0| ≤ B := hB ⟨σ, rfl⟩
@@ -175,23 +189,36 @@ theorem weakApprox (T : Finset (HeightOneSpectrum (𝓞 L)))
     exact hN.ne' (by exact_mod_cast hN0)
   · exact ⟨a0 + (N : L) * (t : L), h0, (good t ht).1, (good t ht).2⟩
 
-theorem weakApprox_units (T : Finset (HeightOneSpectrum (𝓞 L)))
-    (x : (v : HeightOneSpectrum (𝓞 L)) → (v.adicCompletion L)ˣ) (e : HeightOneSpectrum (𝓞 L) → ℤ) :
-    ∃ a : Lˣ, (∀ v ∈ T, Valued.v (algebraMap L (v.adicCompletion L) (a : L) * ((x v)⁻¹ : (v.adicCompletion L)ˣ) - 1) <
-        exp (-e v)) ∧ ∀ σ : L →+* ℝ, 0 < σ (a : L) := by
+theorem weakApprox_units
+    (T : Finset (HeightOneSpectrum (𝓞 L)))
+    (x : (v : HeightOneSpectrum (𝓞 L)) → (v.adicCompletion L)ˣ) (e : HeightOneSpectrum (𝓞 L) → ℤ)
+    : ∃ a : Lˣ,
+      (∀ v ∈ T,
+          Valued.v
+              (algebraMap L (v.adicCompletion L) (a : L) * ((x v)⁻¹ : (v.adicCompletion L)ˣ) - 1)
+            < exp (- e v))
+        ∧ ∀ σ : L →+* ℝ, 0 < σ (a : L) := by
   classical
   have hx0 : ∀ w : HeightOneSpectrum (𝓞 L), Valued.v (x w : w.adicCompletion L) ≠ 0 := fun w =>
     (Valuation.ne_zero_iff _).mpr (x w).ne_zero
-  obtain ⟨a, ha0, hT, hpos⟩ := weakApprox T (fun w => (x w : w.adicCompletion L))
-    (fun w => exp (-e w) * Valued.v (x w : w.adicCompletion L))
-    (fun w _ => mul_ne_zero (exp_ne_zero) (hx0 w))
+  obtain ⟨a, ha0, hT, hpos⟩ :=
+    weakApprox T
+      (fun w => (x w : w.adicCompletion L))
+      (fun w => exp (- e w) * Valued.v (x w : w.adicCompletion L))
+      (fun w _ => mul_ne_zero (exp_ne_zero) (hx0 w))
   refine ⟨Units.mk0 a ha0, fun w hw => ?_, fun σ => hpos σ⟩
   have h := hT w hw
-  have key : algebraMap L (w.adicCompletion L) a * (((x w)⁻¹ : (w.adicCompletion L)ˣ) : w.adicCompletion L) - 1 =
-      (algebraMap L (w.adicCompletion L) a - x w) * (((x w)⁻¹ : (w.adicCompletion L)ˣ) : w.adicCompletion L) := by
+  have key
+      : algebraMap L (w.adicCompletion L) a
+            * (((x w)⁻¹ : (w.adicCompletion L)ˣ) : w.adicCompletion L)
+          - 1
+        = (algebraMap L (w.adicCompletion L) a - x w)
+          * (((x w)⁻¹ : (w.adicCompletion L)ˣ) : w.adicCompletion L) := by
     rw [sub_mul, Units.mul_inv]
-  have hinv : Valued.v (((x w)⁻¹ : (w.adicCompletion L)ˣ) : w.adicCompletion L) *
-      Valued.v (x w : w.adicCompletion L) = 1 := by
+  have hinv
+      : Valued.v (((x w)⁻¹ : (w.adicCompletion L)ˣ) : w.adicCompletion L)
+          * Valued.v (x w : w.adicCompletion L)
+        = 1 := by
     rw [← Valuation.map_mul, Units.inv_mul, Valuation.map_one]
   rw [Units.val_mk0, key, Valuation.map_mul]
   by_contra hle

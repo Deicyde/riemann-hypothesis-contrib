@@ -10,17 +10,17 @@ open Formalism.REAL Finset
 
 namespace GlobalTheory
 
-theorem capelli_left_comatrix :
-    ∀ (A : Type) [Ring A] [Algebra ℂ A] (m : ℕ) (E : Fin (m + 1) → Fin (m + 1) → A), GlRel E →
-      ∀ (u : ℂ) (j l : Fin (m + 1)),
-        ∑ a : Fin (m + 1), ((-1 : ℂ) ^ ((a : ℕ) + (j : ℕ))) •
-            (Tm E u a l * qminor E (Fin.succAbove a) (Fin.succAbove j) (u - 1)) =
-          if l = j then qdet E u else 0 := by
+theorem capelli_left_comatrix
+    : ∀ (A : Type) [Ring A] [Algebra ℂ A] (m : ℕ) (E : Fin (m + 1) → Fin (m + 1) → A),
+      GlRel E
+        → ∀ (u : ℂ) (j l : Fin (m + 1)),
+          ∑ a : Fin (m + 1), ((-1 : ℂ) ^ ((a : ℕ) + (j : ℕ))) •
+              (Tm E u a l * qminor E (Fin.succAbove a) (Fin.succAbove j) (u - 1))
+            = if l = j then qdet E u else 0 := by
   intro A _ _ m E hE u j l
   set b : Fin (m + 1) → Fin (m + 1) := Fin.cons l (Fin.succAbove j) with hb
   have hexp := PI.QmColExpWork.expFirst E id b u
-  have hbc : b ∘ Fin.succ = Fin.succAbove j := by
-    funext k; simp [hb]
+  have hbc : b ∘ Fin.succ = Fin.succAbove j := by funext k; simp [hb]
   have hb0 : b 0 = l := by simp [hb]
   rw [hbc, hb0] at hexp
   have hcast : ∀ (k : ℕ) (x : A), (((-1 : ℤ) ^ k : ℤ) : A) * x = ((-1 : ℂ) ^ k) • x := by
@@ -28,9 +28,10 @@ theorem capelli_left_comatrix :
     rw [Algebra.smul_def]
     push_cast
     simp
-  have hL : ∑ a : Fin (m + 1), ((-1 : ℂ) ^ ((a : ℕ) + (j : ℕ))) •
-      (Tm E u a l * qminor E (Fin.succAbove a) (Fin.succAbove j) (u - 1)) =
-      ((-1 : ℂ) ^ (j : ℕ)) • qminor E id b u := by
+  have hL
+      : ∑ a : Fin (m + 1), ((-1 : ℂ) ^ ((a : ℕ) + (j : ℕ))) •
+          (Tm E u a l * qminor E (Fin.succAbove a) (Fin.succAbove j) (u - 1))
+        = ((-1 : ℂ) ^ (j : ℕ)) • qminor E id b u := by
     rw [hexp, Finset.smul_sum]
     refine Finset.sum_congr rfl (fun a _ => ?_)
     rw [hcast, smul_smul, ← pow_add, add_comm (j : ℕ) (a : ℕ)]
@@ -43,8 +44,9 @@ theorem capelli_left_comatrix :
       refine Fin.cases ?_ (fun k => ?_) k
       · simp [hb, PI.QmColExpWork.cycle_perm_zero]
       · simp [hb, PI.QmColExpWork.cycle_perm_succ]
-    rw [if_pos rfl, hbcyc, qSkewCol A (m + 1) (m + 1) E hE id id _ u, PI.QmColExpWork.sign_cycle_perm,
-      Units.val_pow_eq_pow_val, Units.val_neg, Units.val_one, hcast, smul_smul, ← mul_pow]
+    rw [if_pos rfl, hbcyc, qSkewCol A (m + 1) (m + 1) E hE id id _ u,
+      PI.QmColExpWork.sign_cycle_perm, Units.val_pow_eq_pow_val, Units.val_neg, Units.val_one,
+      hcast, smul_smul, ← mul_pow]
     simp [qdet]
   · rw [if_neg hlj]
     obtain ⟨k0, hk0⟩ := Fin.exists_succAbove_eq hlj

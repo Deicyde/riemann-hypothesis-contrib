@@ -6,7 +6,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscrim
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 set_option autoImplicit false
 
@@ -24,27 +26,33 @@ theorem yZero_const : ∀ s, constantCoeff (yZero (O := O) (d := d) s) = 0 := by
 theorem hasSubst_yZero : HasSubst (yZero (O := O) (d := d)) :=
   hasSubst_of_constantCoeff_zero yZero_const
 
-theorem constantCoeff_subst_of {σ τ : Type} [Finite σ] {a : σ → MvPowerSeries τ O}
-    (ha : ∀ i, constantCoeff (a i) = 0) (f : MvPowerSeries σ O) :
-    constantCoeff (subst a f) = constantCoeff f := by
+theorem constantCoeff_subst_of
+    {σ τ : Type} [Finite σ]
+    {a : σ → MvPowerSeries τ O} (ha : ∀ i, constantCoeff (a i) = 0)
+    (f : MvPowerSeries σ O)
+    : constantCoeff (subst a f) = constantCoeff f := by
   have hs : HasSubst a := hasSubst_of_constantCoeff_zero ha
   have h1 : f = (f - C (constantCoeff f)) + C (constantCoeff f) := by ring
   conv_lhs => rw [h1]
-  rw [subst_add hs, map_add (f := _), constantCoeff_subst_eq_zero hs ha (by simp), subst_C, zero_add]
+  rw [subst_add hs, map_add (f := _), constantCoeff_subst_eq_zero hs ha (by simp), subst_C,
+    zero_add]
   simp
 
-theorem constantCoeff_pderiv {σ : Type} (i : σ) (f : MvPowerSeries σ O) :
-    constantCoeff (MvPowerSeries.pderiv i f) = coeff (Finsupp.single i 1) f := by
+theorem constantCoeff_pderiv {σ : Type} (i : σ) (f : MvPowerSeries σ O)
+    : constantCoeff (MvPowerSeries.pderiv i f) = coeff (Finsupp.single i 1) f := by
   rw [← coeff_zero_eq_constantCoeff_apply, coeff_pderiv]; simp
 
-theorem subst_X_self {σ : Type} (f : MvPowerSeries σ O) : subst (fun i => (X i : MvPowerSeries σ O)) f = f := by
+theorem subst_X_self {σ : Type} (f : MvPowerSeries σ O)
+    : subst (fun i => (X i : MvPowerSeries σ O)) f = f := by
   rw [← map_algebraMap_eq_subst_X]
   simp [Algebra.algebraMap_self, map_id]
 
-theorem pderiv_right_formalGroupLawCoboundaryOne (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (hμ : ∀ i, constantCoeff (μ i) = 0)
-    (t : MvPowerSeries (Fin d) O) (j : Fin d) :
-    MvPowerSeries.pderiv (Sum.inr j) (cob1 μ t) =
-      (∑ s, subst μ (MvPowerSeries.pderiv s t) * MvPowerSeries.pderiv (Sum.inr j) (μ s)) - inR (MvPowerSeries.pderiv j t) := by
+theorem pderiv_right_formalGroupLawCoboundaryOne
+    (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (hμ : ∀ i, constantCoeff (μ i) = 0)
+    (t : MvPowerSeries (Fin d) O) (j : Fin d)
+    : MvPowerSeries.pderiv (Sum.inr j) (cob1 μ t)
+      = (∑ s, subst μ (MvPowerSeries.pderiv s t) * MvPowerSeries.pderiv (Sum.inr j) (μ s))
+        - inR (MvPowerSeries.pderiv j t) := by
   classical
   have hl : ∀ s : Fin d, constantCoeff (X (Sum.inl s) : MvPowerSeries (Fin d ⊕ Fin d) O) = 0 :=
     fun s => constantCoeff_X _
@@ -52,13 +60,19 @@ theorem pderiv_right_formalGroupLawCoboundaryOne (μ : Fin d → MvPowerSeries (
     fun s => constantCoeff_X _
   unfold cob1 inL inR
   rw [map_sub, map_sub, ReciprocityTheory.ChartRestriction.G.TB.ChartChgPfTP.pderiv_subst μ hμ,
-    ReciprocityTheory.ChartRestriction.G.TB.ChartChgPfTP.pderiv_subst _ hl, ReciprocityTheory.ChartRestriction.G.TB.ChartChgPfTP.pderiv_subst _ hr]
-  have e1 : ∑ s : Fin d, subst (fun i => (X (Sum.inl i) : MvPowerSeries (Fin d ⊕ Fin d) O)) (MvPowerSeries.pderiv s t) *
-      MvPowerSeries.pderiv (Sum.inr j) (X (Sum.inl s)) = 0 :=
+    ReciprocityTheory.ChartRestriction.G.TB.ChartChgPfTP.pderiv_subst _ hl,
+    ReciprocityTheory.ChartRestriction.G.TB.ChartChgPfTP.pderiv_subst _ hr]
+  have e1
+      : ∑ s : Fin d, subst (fun i => (X (Sum.inl i) : MvPowerSeries (Fin d ⊕ Fin d) O)) (MvPowerSeries.pderiv s t) *
+          MvPowerSeries.pderiv (Sum.inr j) (X (Sum.inl s))
+        = 0 :=
     Finset.sum_eq_zero fun s _ => by rw [pderiv_X_of_ne (by simp), mul_zero]
-  have e2 : ∑ s : Fin d, subst (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O)) (MvPowerSeries.pderiv s t) *
-      MvPowerSeries.pderiv (Sum.inr j) (X (Sum.inr s)) =
-      subst (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O)) (MvPowerSeries.pderiv j t) := by
+  have e2
+      : ∑ s : Fin d, subst (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O)) (MvPowerSeries.pderiv s t) *
+          MvPowerSeries.pderiv (Sum.inr j) (X (Sum.inr s))
+        = subst
+          (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O))
+          (MvPowerSeries.pderiv j t) := by
     rw [Finset.sum_eq_single j]
     · rw [pderiv_X_self, mul_one]
     · intro s _ hs; rw [pderiv_X_of_ne (by simpa using hs), mul_zero]
@@ -71,8 +85,9 @@ namespace GlobalTheory.Katz.SmallDeriv
 
 variable {O : Type} [CommRing O] {d : ℕ}
 
-theorem yZero_subst (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (hμ : IsLaw μ) (g : MvPowerSeries (Fin d) O) :
-    subst yZero (subst μ g) = g := by
+theorem yZero_subst
+    (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (hμ : IsLaw μ) (g : MvPowerSeries (Fin d) O)
+    : subst yZero (subst μ g) = g := by
   rw [subst_comp_subst_apply (hasSubst_of_constantCoeff_zero hμ.const) hasSubst_yZero]
   have : (fun s => subst (yZero (O := O) (d := d)) (μ s)) = fun i => X i := by
     have h := hμ.unit
@@ -81,36 +96,44 @@ theorem yZero_subst (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (hμ : Is
     simpa [op, at2, yZero] using hi
   rw [this, subst_X_self]
 
-theorem yZero_inR (g : MvPowerSeries (Fin d) O) :
-    subst yZero (inR g) = C (constantCoeff g) := by
+theorem yZero_inR (g : MvPowerSeries (Fin d) O) : subst yZero (inR g) = C (constantCoeff g) := by
   have hr : HasSubst (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O)) :=
     hasSubst_of_constantCoeff_zero fun s => constantCoeff_X _
   unfold inR
   rw [subst_comp_subst_apply hr hasSubst_yZero]
-  have : (fun s => subst (yZero (O := O) (d := d)) (X (Sum.inr s) : MvPowerSeries (Fin d ⊕ Fin d) O)) = 0 := by
+  have : (fun s =>
+        subst (yZero (O := O) (d := d)) (X (Sum.inr s) : MvPowerSeries (Fin d ⊕ Fin d) O))
+      = 0 := by
     funext s; rw [subst_X hasSubst_yZero]; rfl
   rw [this, subst_zero_eq_C_constantCoeff]
   simp [Algebra.algebraMap_self, map_id]
 
-theorem linear_coeff_law (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (hμ : IsLaw μ) (s j : Fin d) :
-    constantCoeff (MvPowerSeries.pderiv (Sum.inr j) (μ s)) = if s = j then 1 else 0 := by
+theorem linear_coeff_law (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (hμ : IsLaw μ) (s j : Fin d)
+    : constantCoeff (MvPowerSeries.pderiv (Sum.inr j) (μ s)) = if s = j then 1 else 0 := by
   classical
-
   have hx : constantCoeff (MvPowerSeries.pderiv (Sum.inl j) (μ s)) = if s = j then 1 else 0 := by
     have h := congrFun hμ.unit s
     change subst yZero (μ s) = X s at h
     have h2 := congrArg (fun f => constantCoeff (MvPowerSeries.pderiv j f)) h
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [ReciprocityTheory.ChartRestriction.G.TB.ChartChgPfTP.pderiv_subst _ yZero_const, map_sum] at h2
+      rw [ReciprocityTheory.ChartRestriction.G.TB.ChartChgPfTP.pderiv_subst _ yZero_const, map_sum]
+        at h2
     simp only [map_mul, constantCoeff_subst_of yZero_const] at h2
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Fintype.sum_sum_type, yZero,
-      Sum.elim_inl, Sum.elim_inr, map_zero, mul_zero, Finset.sum_const_zero, add_zero, pderiv_X, map_sum, map_mul] at h2
+      simp only [Fintype.sum_sum_type, yZero, Sum.elim_inl, Sum.elim_inr, map_zero, mul_zero,
+          Finset.sum_const_zero, add_zero, pderiv_X, map_sum, map_mul]
+        at h2
     simp only [Pi.single_apply, apply_ite, map_one, map_zero, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true] at h2
+        Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      at h2
     split_ifs at h2 ⊢ <;> exact h2
-  have hsw : ∀ k : Fin d ⊕ Fin d, constantCoeff ((Sum.elim (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O))
-      (fun i => X (Sum.inl i))) k) = 0 := by
+  have hsw
+      : ∀ k : Fin d ⊕ Fin d,
+        constantCoeff ((Sum.elim
+              (fun i => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O))
+              (fun i => X (Sum.inl i)))
+            k)
+          = 0 := by
     intro k; cases k <;> simp
   have h := hμ.comm s
   unfold swap at2 at h
@@ -118,17 +141,22 @@ theorem linear_coeff_law (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O) (hμ
   set_option synthInstance.maxHeartbeats 100000 in
     rw [ReciprocityTheory.ChartRestriction.G.TB.ChartChgPfTP.pderiv_subst _ hsw, map_sum] at h2
   simp only [map_mul, constantCoeff_subst_of hsw] at h2
-  simp only [Fintype.sum_sum_type, Sum.elim_inl, Sum.elim_inr, pderiv_X, Pi.single_apply, Sum.inr.injEq,
-    reduceCtorEq, if_false, map_zero, mul_zero, Finset.sum_const_zero, add_zero, apply_ite, map_one, mul_ite,
-    mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true] at h2
+  simp only [Fintype.sum_sum_type, Sum.elim_inl, Sum.elim_inr, pderiv_X, Pi.single_apply,
+      Sum.inr.injEq, reduceCtorEq, if_false, map_zero, mul_zero, Finset.sum_const_zero, add_zero,
+      apply_ite, map_one, mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    at h2
   rw [← h2, hx]
 
 end GlobalTheory.Katz.SmallDeriv
 
 namespace GlobalTheory.Katz.SmallDeriv
 
-theorem isLocalRing_of_integers {C : Type} [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O]
-    [Algebra O C] (hv : v.Integers O) : IsLocalRing O := by
+theorem isLocalRing_of_integers
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    (O : Type) [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    : IsLocalRing O := by
   haveI : Nontrivial O := (algebraMap O C).domain_nontrivial
   refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun a => ?_
   by_contra h
@@ -144,21 +172,30 @@ theorem isLocalRing_of_integers {C : Type} [Field C] (v : Valuation C NNReal) (O
 
 end GlobalTheory.Katz.SmallDeriv
 
-
 open GlobalTheory.Katz.SmallDeriv in
-theorem GlobalTheory.Katz.not_isUnit_coeff_of_coboundary_small : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O), IsLaw μ → ∀ t : MvPowerSeries (Fin d) O, (∀ i, ¬IsUnit (lin t i)) → (∀ α : Fin d ⊕ Fin d →₀ ℕ, (∃ i, ¬ p ∣ α i) → ¬IsUnit (coeff α (cob1 μ t))) → ∀ α : Fin d →₀ ℕ, (∃ i, ¬ p ∣ α i) → ¬IsUnit (coeff α t) := by
+theorem GlobalTheory.Katz.not_isUnit_coeff_of_coboundary_small
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O
+        → ∀ (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O),
+          IsLaw μ
+            → ∀ t : MvPowerSeries (Fin d) O,
+              (∀ i, ¬ IsUnit (lin t i))
+                → (∀ α : Fin d ⊕ Fin d →₀ ℕ, (∃ i, ¬ p ∣ α i) → ¬ IsUnit (coeff α (cob1 μ t)))
+                → ∀ α : Fin d →₀ ℕ, (∃ i, ¬ p ∣ α i) → ¬ IsUnit (coeff α t) := by
   intro p hpr C _ _ _ v O _ _ hpO _ _ hv d μ hμ t hlin hcob α ⟨i, hi⟩
   classical
   haveI : IsLocalRing O := isLocalRing_of_integers v O hv
   let π := IsLocalRing.residue O
-  have hmem : ∀ a : O, π a = 0 ↔ ¬IsUnit a := by
+  have hmem : ∀ a : O, π a = 0 ↔ ¬ IsUnit a := by
     intro a
     rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
-  have hp0 : (p : IsLocalRing.ResidueField O) = 0 := by
-    rw [← map_natCast π, hmem]; exact hpO.out
+  have hp0 : (p : IsLocalRing.ResidueField O) = 0 := by rw [← map_natCast π, hmem]; exact hpO.out
 
   have hG : ∀ j, map π (MvPowerSeries.pderiv (Sum.inr j) (cob1 μ t)) = 0 := by
-    intro j; ext n
+    intro j
+    ext n
     rw [coeff_map, coeff_pderiv, map_mul, coeff_zero]
     by_cases hn : p ∣ n (Sum.inr j) + 1
     · obtain ⟨m, hm⟩ := hn
@@ -170,21 +207,29 @@ theorem GlobalTheory.Katz.not_isUnit_coeff_of_coboundary_small : ∀ (p : ℕ) [
       rw [(hmem _).2 this, zero_mul]
   let N : Matrix (Fin d) (Fin d) (MvPowerSeries (Fin d) (IsLocalRing.ResidueField O)) :=
     Matrix.of fun s j => map π (subst yZero (MvPowerSeries.pderiv (Sum.inr j) (μ s)))
-  let w : Fin d → MvPowerSeries (Fin d) (IsLocalRing.ResidueField O) := fun s => map π (MvPowerSeries.pderiv s t)
+  let w : Fin d → MvPowerSeries (Fin d) (IsLocalRing.ResidueField O) := fun s =>
+    map π (MvPowerSeries.pderiv s t)
   have hvec : Matrix.vecMul w N = 0 := by
     funext j
-    have e := congrArg (fun F => map π (subst yZero F)) (pderiv_right_formalGroupLawCoboundaryOne μ hμ.const t j)
+    have e :=
+      congrArg
+        (fun F => map π (subst yZero F))
+        (pderiv_right_formalGroupLawCoboundaryOne μ hμ.const t j)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_subst hasSubst_yZero, hG j, ← coe_substAlgHom (hasSubst_yZero.map π), map_zero,
-      ← coe_substAlgHom hasSubst_yZero, map_sub, map_sum] at e
+          ← coe_substAlgHom hasSubst_yZero, map_sub, map_sum]
+        at e
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_mul, coe_substAlgHom, yZero_subst μ hμ, yZero_inR, constantCoeff_pderiv, map_sub, map_sum,
-      map_C] at e
+      simp only [map_mul, coe_substAlgHom, yZero_subst μ hμ, yZero_inR, constantCoeff_pderiv,
+          map_sub, map_sum, map_C]
+        at e
     have hl : π (coeff (Finsupp.single j 1) t) = 0 := (hmem _).2 (hlin j)
     rw [hl, map_zero, sub_zero] at e
     simp only [Matrix.vecMul, dotProduct, Pi.zero_apply, N, w, Matrix.of_apply]
     exact e.symm
-  have hN0 : (constantCoeff : MvPowerSeries (Fin d) (IsLocalRing.ResidueField O) →+* _).mapMatrix N = 1 := by
+  have hN0
+      : (constantCoeff : MvPowerSeries (Fin d) (IsLocalRing.ResidueField O) →+* _).mapMatrix N
+        = 1 := by
     ext s j
     simp only [RingHom.mapMatrix_apply, Matrix.map_apply, N, Matrix.of_apply, constantCoeff_map,
       constantCoeff_subst_of yZero_const, linear_coeff_law μ hμ, Matrix.one_apply]
@@ -196,8 +241,9 @@ theorem GlobalTheory.Katz.not_isUnit_coeff_of_coboundary_small : ∀ (p : ℕ) [
     have h1 := congrArg (fun u => Matrix.vecMul u N.adjugate) hvec
     simp only [Matrix.vecMul_vecMul, Matrix.mul_adjugate, Matrix.zero_vecMul] at h1
     have h2 := congrFun h1 i
-    simp only [Matrix.vecMul, dotProduct, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul, mul_ite, mul_one,
-      mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true, Pi.zero_apply] at h2
+    simp only [Matrix.vecMul, dotProduct, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul, mul_ite,
+        mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true, Pi.zero_apply]
+      at h2
     exact (hdet.mul_right_eq_zero).1 (by rw [mul_comm]; exact h2)
   have hαi : 1 ≤ α i := Nat.pos_of_ne_zero (fun h => hi (h ▸ dvd_zero p))
   have hsub : α - Finsupp.single i 1 + Finsupp.single i 1 = α :=
@@ -214,5 +260,7 @@ theorem GlobalTheory.Katz.not_isUnit_coeff_of_coboundary_small : ∀ (p : ℕ) [
     have h' := congrArg (Int.cast : ℤ → IsLocalRing.ResidueField O) h
     push_cast at h'
     rw [hp0] at h'
-    intro h0; rw [h0] at h'; simp at h'
+    intro h0
+    rw [h0] at h'
+    simp at h'
   exact (hmem _).1 ((mul_eq_zero.1 hc).resolve_right hne)

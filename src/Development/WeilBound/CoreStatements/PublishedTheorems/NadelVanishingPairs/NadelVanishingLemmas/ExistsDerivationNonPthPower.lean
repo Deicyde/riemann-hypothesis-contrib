@@ -14,16 +14,16 @@ open TrivSqZeroExt
 variable {K : Type} [Field K]
 
 def Good (p : ℕ) (f : K) (R : Subring (TrivSqZeroExt K K)) : Prop :=
-  (∀ r ∈ R, r.fst = 0 → r = 0) ∧ (∀ g : K, inl (g ^ p) ∈ R) ∧
-    (∀ r ∈ R, r.fst ≠ 0 → ∃ t ∈ R, r * t = 1) ∧ (inl f + inr 1 : TrivSqZeroExt K K) ∈ R
+  (∀ r ∈ R, r.fst = 0 → r = 0) ∧ (∀ g : K, inl (g ^ p) ∈ R)
+    ∧ (∀ r ∈ R, r.fst ≠ 0 → ∃ t ∈ R, r * t = 1) ∧ (inl f + inr 1 : TrivSqZeroExt K K) ∈ R
 
 lemma inj_of {R : Subring (TrivSqZeroExt K K)} (h0 : ∀ r ∈ R, r.fst = 0 → r = 0)
     {r t : TrivSqZeroExt K K} (hr : r ∈ R) (ht : t ∈ R) (h : r.fst = t.fst) : r = t := by
   have := h0 (r - t) (R.sub_mem hr ht) (by simp [h])
   exact sub_eq_zero.mp this
 
-def fieldOf (R : Subring (TrivSqZeroExt K K))
-    (hinv : ∀ r ∈ R, r.fst ≠ 0 → ∃ t ∈ R, r * t = 1) : Subfield K where
+def fieldOf (R : Subring (TrivSqZeroExt K K)) (hinv : ∀ r ∈ R, r.fst ≠ 0 → ∃ t ∈ R, r * t = 1)
+    : Subfield K where
   carrier := {x | ∃ r ∈ R, r.fst = x}
   mul_mem' := by
     rintro _ _ ⟨r, hr, rfl⟩ ⟨t, ht, rfl⟩
@@ -46,13 +46,15 @@ def fieldOf (R : Subring (TrivSqZeroExt K K))
       simp only [fst_mul, fst_one] at this
       exact (eq_inv_of_mul_eq_one_right this)
 
-noncomputable def sec (R : Subring (TrivSqZeroExt K K)) (h0 : ∀ r ∈ R, r.fst = 0 → r = 0)
-    (hinv : ∀ r ∈ R, r.fst ≠ 0 → ∃ t ∈ R, r * t = 1) :
-    fieldOf R hinv →+* TrivSqZeroExt K K where
+noncomputable def sec
+    (R : Subring (TrivSqZeroExt K K))
+    (h0 : ∀ r ∈ R, r.fst = 0 → r = 0) (hinv : ∀ r ∈ R, r.fst ≠ 0 → ∃ t ∈ R, r * t = 1)
+    : fieldOf R hinv →+* TrivSqZeroExt K K where
   toFun a := Classical.choose a.2
   map_one' := by
-    have h := Classical.choose_spec (show ((1 : fieldOf R hinv) : K) ∈ fieldOf R hinv from
-      (1 : fieldOf R hinv).2)
+    have h :=
+      Classical.choose_spec (show ((1 : fieldOf R hinv) : K) ∈ fieldOf R hinv from
+        (1 : fieldOf R hinv).2)
     exact inj_of h0 h.1 R.one_mem (by simpa using h.2)
   map_mul' a b := by
     have ha := Classical.choose_spec a.2
@@ -60,8 +62,9 @@ noncomputable def sec (R : Subring (TrivSqZeroExt K K)) (h0 : ∀ r ∈ R, r.fst
     have hab := Classical.choose_spec (a * b).2
     exact inj_of h0 hab.1 (R.mul_mem ha.1 hb.1) (by rw [hab.2, fst_mul, ha.2, hb.2]; rfl)
   map_zero' := by
-    have h := Classical.choose_spec (show ((0 : fieldOf R hinv) : K) ∈ fieldOf R hinv from
-      (0 : fieldOf R hinv).2)
+    have h :=
+      Classical.choose_spec (show ((0 : fieldOf R hinv) : K) ∈ fieldOf R hinv from
+        (0 : fieldOf R hinv).2)
     exact inj_of h0 h.1 R.zero_mem (by simpa using h.2)
   map_add' a b := by
     have ha := Classical.choose_spec a.2
@@ -93,12 +96,13 @@ lemma good_sSup (p : ℕ) (f : K) (c : Set (Subring (TrivSqZeroExt K K)))
     exact ⟨t, le s hs ht, hrt⟩
   · exact le y hy (show Good p f y from hc hy).2.2.2
 
-private theorem exists_inclusion_mul_eq_mul_inclusion_of_normal (p : ℕ) [Fact p.Prime] [CharP K p] (L : Subfield K)
-    (s : L →+* TrivSqZeroExt K K) (hfst : ∀ a : L, (s a).fst = a) (x v : K) (hx : x ∉ L)
-    (hxp : x ^ p ∈ L) (hs : s ⟨x ^ p, hxp⟩ = inl (x ^ p)) :
-    ∃ R : Subring (TrivSqZeroExt K K), (∀ r ∈ R, r.fst = 0 → r = 0) ∧
-      (∀ r ∈ R, r.fst ≠ 0 → ∃ t ∈ R, r * t = 1) ∧ (∀ a : L, s a ∈ R) ∧
-      (inl x + inr v : TrivSqZeroExt K K) ∈ R := by
+private theorem exists_inclusion_mul_eq_mul_inclusion_of_normal
+    (p : ℕ) [Fact p.Prime] [CharP K p]
+    (L : Subfield K) (s : L →+* TrivSqZeroExt K K) (hfst : ∀ a : L, (s a).fst = a)
+    (x v : K) (hx : x ∉ L) (hxp : x ^ p ∈ L) (hs : s ⟨x ^ p, hxp⟩ = inl (x ^ p))
+    : ∃ R : Subring (TrivSqZeroExt K K),
+      (∀ r ∈ R, r.fst = 0 → r = 0) ∧ (∀ r ∈ R, r.fst ≠ 0 → ∃ t ∈ R, r * t = 1) ∧ (∀ a : L, s a ∈ R)
+        ∧ (inl x + inr v : TrivSqZeroExt K K) ∈ R := by
   classical
   have hp : p.Prime := Fact.out
   let c : L := ⟨x ^ p, hxp⟩
@@ -109,8 +113,7 @@ private theorem exists_inclusion_mul_eq_mul_inclusion_of_normal (p : ℕ) [Fact 
     induction P using Polynomial.induction_on with
     | C a => simp [φ, ev, hfst]
     | add P Q hP hQ => simp only [map_add (f := _), fst_add, hP, hQ]
-    | monomial n a _ =>
-      simp [φ, ev, hfst, fst_pow]
+    | monomial n a _ => simp [φ, ev, hfst, fst_pow]
   have hpow : (inl x + inr v : TrivSqZeroExt K K) ^ p = inl (x ^ p) := by
     ext
     · simp [fst_pow]
@@ -121,8 +124,7 @@ private theorem exists_inclusion_mul_eq_mul_inclusion_of_normal (p : ℕ) [Fact 
       Polynomial.eval₂_C]
     rw [hpow]
     simp only [c, hs, sub_self]
-  have hevm : ev m = 0 := by
-    simp [m, ev, c]
+  have hevm : ev m = 0 := by simp [m, ev, c]
   have hirr : Irreducible m := by
     refine X_pow_sub_C_irreducible_of_prime hp (fun b hb => hx ?_)
     have hb' : (b : K) ^ p = x ^ p := by
@@ -148,7 +150,8 @@ private theorem exists_inclusion_mul_eq_mul_inclusion_of_normal (p : ℕ) [Fact 
     refine ⟨φ b, ⟨b, rfl⟩, ?_⟩
     have := congrArg φ hab
     rw [map_add (f := _), map_mul, map_mul, hφm, mul_zero, zero_add, map_one] at this
-    rw [mul_comm]; exact this
+    rw [mul_comm]
+    exact this
   · intro a
     exact ⟨Polynomial.C a, by simp [φ]⟩
   · exact ⟨Polynomial.X, by simp [φ]⟩
@@ -166,12 +169,14 @@ lemma exists_good (p : ℕ) [Fact p.Prime] [CharP K p] (f : K) (hf : ∀ g : K, 
   refine ⟨R, h0, fun g => ?_, hinv, hfR⟩
   exact hsR ⟨g ^ p, ⟨g, by simp [frobenius_def]⟩⟩
 
-theorem exists_derivation (p : ℕ) [Fact p.Prime] [CharP K p] (f : K)
-    (hf : ∀ g : K, f ≠ g ^ p) : ∃ D : Derivation ℤ K K, D f = 1 := by
+theorem exists_derivation (p : ℕ) [Fact p.Prime] [CharP K p] (f : K) (hf : ∀ g : K, f ≠ g ^ p)
+    : ∃ D : Derivation ℤ K K, D f = 1 := by
   obtain ⟨R0, hR0⟩ := exists_good p f hf
-  obtain ⟨M, -, hM⟩ := zorn_le_nonempty₀ {R | Good p f R}
-    (fun c hc hch y hy => ⟨sSup c, (good_sSup p f c hc hch y hy).1, (good_sSup p f c hc hch y hy).2⟩)
-    R0 hR0
+  obtain ⟨M, -, hM⟩ :=
+    zorn_le_nonempty₀ {R | Good p f R}
+      (fun c hc hch y hy =>
+        ⟨sSup c, (good_sSup p f c hc hch y hy).1, (good_sSup p f c hc hch y hy).2⟩)
+      R0 hR0
   obtain ⟨h0, hpw, hinv, hf1⟩ := (show Good p f M from hM.1)
   have hall : ∀ a : K, a ∈ fieldOf M hinv := by
     intro x
@@ -179,31 +184,34 @@ theorem exists_derivation (p : ℕ) [Fact p.Prime] [CharP K p] (f : K)
     have hxp : x ^ p ∈ fieldOf M hinv := ⟨inl (x ^ p), hpw x, by simp⟩
     have hs : sec M h0 hinv ⟨x ^ p, hxp⟩ = inl (x ^ p) :=
       inj_of h0 (sec_spec M h0 hinv _).1 (hpw x) (by rw [(sec_spec M h0 hinv _).2]; simp)
-    obtain ⟨R', h0', hinv', hsR', hxR'⟩ := exists_inclusion_mul_eq_mul_inclusion_of_normal p (fieldOf M hinv) (sec M h0 hinv)
-      (fun a => (sec_spec M h0 hinv a).2) x 0 hx hxp hs
+    obtain ⟨R', h0', hinv', hsR', hxR'⟩ :=
+      exists_inclusion_mul_eq_mul_inclusion_of_normal p (fieldOf M hinv) (sec M h0 hinv)
+        (fun a => (sec_spec M h0 hinv a).2)
+        x 0 hx hxp hs
     have hle : M ≤ R' := by
       intro r hr
       have hmem : r.fst ∈ fieldOf M hinv := ⟨r, hr, rfl⟩
-      have := inj_of h0 hr (sec_spec M h0 hinv ⟨r.fst, hmem⟩).1
-        (by rw [(sec_spec M h0 hinv _).2])
+      have := inj_of h0 hr (sec_spec M h0 hinv ⟨r.fst, hmem⟩).1 (by rw [(sec_spec M h0 hinv _).2])
       rw [this]
       exact hsR' _
     have hgood : Good p f R' := ⟨h0', fun g => hle (hpw g), hinv', hle hf1⟩
     have hR'M := hM.2 hgood hle
     exact hx ⟨_, hR'M hxR', by simp⟩
-  let e : K →+* fieldOf M hinv :=
-    { toFun := fun a => ⟨a, hall a⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let e : K →+* fieldOf M hinv := {
+    toFun := fun a => ⟨a, hall a⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   let s' : K →+* TrivSqZeroExt K K := (sec M h0 hinv).comp e
   have hs'fst : ∀ a, (s' a).fst = a := fun a => (sec_spec M h0 hinv (e a)).2
   have hs'mem : ∀ a, s' a ∈ M := fun a => (sec_spec M h0 hinv (e a)).1
-  let Dl : K →ₗ[ℤ] K :=
-    { toFun := fun a => (s' a).snd
-      map_add' := fun a b => by simp
-      map_smul' := fun n a => by simp }
+  let Dl : K →ₗ[ℤ] K := {
+    toFun := fun a => (s' a).snd
+    map_add' := fun a b => by simp
+    map_smul' := fun n a => by simp
+  }
   refine ⟨Derivation.mk' Dl (fun a b => ?_), ?_⟩
   · simp [Dl, snd_mul, hs'fst, smul_eq_mul]
     ring

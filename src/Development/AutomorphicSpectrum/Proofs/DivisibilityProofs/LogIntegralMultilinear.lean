@@ -12,7 +12,8 @@ public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.ArithInt
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 noncomputable section
 
@@ -34,14 +35,18 @@ theorem smooth_oneLine : IsSmoothHerm (oneLine ι) := by
   show ContDiffOn ℝ _ (fun _ => Real.exp (-(-1 : ℝ))) _
   exact contDiffOn_const
 
-theorem smooth_comb {J : Type} [Fintype J] {ℓ : J → HermLine ι} (hℓ : ∀ j, IsSmoothHerm (ℓ j))
-    (n : J → ℤ) : IsSmoothHerm (combLine ℓ n) := by
+theorem smooth_comb
+    {J : Type} [Fintype J] {ℓ : J → HermLine ι} (hℓ : ∀ j, IsSmoothHerm (ℓ j)) (n : J → ℤ)
+    : IsSmoothHerm (combLine ℓ n) := by
   refine contDiffOn_prod fun a _ => ?_
   intro z hz
   have h0 : (ℓ a).h z ≠ 0 := ((ℓ a).pos z hz).ne'
   have hf := hℓ a z hz
-  have key : ∀ m : ℤ, ContDiffWithinAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun z => (ℓ a).h z ^ m)
-      {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} z := by
+  have key
+      : ∀ m : ℤ,
+        ContDiffWithinAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
+          (fun z => (ℓ a).h z ^ m)
+          {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} z := by
     intro m
     cases m with
     | ofNat k => simpa only [Int.ofNat_eq_natCast, zpow_natCast] using hf.pow k
@@ -62,36 +67,43 @@ def lastExp {J : Type} : Option J → ℤ
   | none => 1
   | some _ => 0
 
-theorem comb_extExp {J : Type} [Fintype J] (ℓ : J → HermLine ι) (m : J → ℤ) :
-    combLine (extLine ℓ) (extExp m) = combLine ℓ m := by
+theorem comb_extExp {J : Type} [Fintype J] (ℓ : J → HermLine ι) (m : J → ℤ)
+    : combLine (extLine ℓ) (extExp m) = combLine ℓ m := by
   apply line_ext
   · simp [combLine, Fintype.sum_option, extLine, extExp]
   · funext z
     simp [combLine, Fintype.prod_option, extLine, extExp]
 
-theorem comb_lastExp {J : Type} [Fintype J] (ℓ : J → HermLine ι) :
-    combLine (extLine ℓ) lastExp = oneLine ι := by
+theorem comb_lastExp {J : Type} [Fintype J] (ℓ : J → HermLine ι)
+    : combLine (extLine ℓ) lastExp = oneLine ι := by
   apply line_ext
   · simp [combLine, Fintype.sum_option, extLine, lastExp]
   · funext z
     simp [combLine, Fintype.prod_option, extLine, lastExp]
 
-theorem pts_eq_II (II : IntersectionSystem) (hII : IsFullIntersectionSystem II) (P : Ideal (MRing ι))
-    {e : ℕ} (L : Fin e → HermLine ι) (hP : IsArithVar P (e + 1)) (hL : ∀ j, IsSmoothHerm (L j)) :
-    ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1) =
-      II K ι P (e + 1) (Fin.snoc L (oneLine ι)) := by
+theorem pts_eq_II
+    (II : IntersectionSystem) (hII : IsFullIntersectionSystem II)
+    (P : Ideal (MRing ι))
+    {e : ℕ} (L : Fin e → HermLine ι) (hP : IsArithVar P (e + 1)) (hL : ∀ j, IsSmoothHerm (L j))
+    : ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1)
+      = II K ι P (e + 1) (Fin.snoc L (oneLine ι)) := by
   have h := GlobalTheory.T.arith_intersection_constant_metric II hII.1 K ι P e L (-1) hP hL
-  have h' : II K ι P (e + 1) (Fin.snoc L (oneLine ι)) =
-      - -1 * ptsIntegral P (fun j z => Real.log ((L j).h z)) (fun _ => 1) := h
+  have h'
+      : II K ι P (e + 1) (Fin.snoc L (oneLine ι))
+        = - -1 * ptsIntegral P (fun j z => Real.log ((L j).h z)) (fun _ => 1) :=
+    h
   rw [h']
   ring
 
-theorem pts_comb (II : IntersectionSystem) (hII : IsFullIntersectionSystem II) (P : Ideal (MRing ι))
-    {e : ℕ} {J : Type} [Fintype J] [DecidableEq J] (ℓ : J → HermLine ι) (n : Fin e → J → ℤ)
-    (hP : IsArithVar P (e + 1)) (hℓ : ∀ j, IsSmoothHerm (ℓ j)) :
-    ptsIntegral P (fun k z => Real.log ((combLine ℓ (n k)).h z)) (fun _ => 1) =
-      ∑ w : Fin e → J, (∏ k, (n k (w k) : ℝ)) *
-        ptsIntegral P (fun k z => Real.log ((ℓ (w k)).h z)) (fun _ => 1) := by
+theorem pts_comb
+    (II : IntersectionSystem) (hII : IsFullIntersectionSystem II)
+    (P : Ideal (MRing ι))
+    {e : ℕ} {J : Type} [Fintype J] [DecidableEq J]
+    (ℓ : J → HermLine ι)
+    (n : Fin e → J → ℤ) (hP : IsArithVar P (e + 1)) (hℓ : ∀ j, IsSmoothHerm (ℓ j))
+    : ptsIntegral P (fun k z => Real.log ((combLine ℓ (n k)).h z)) (fun _ => 1)
+      = ∑ w : Fin e → J, (∏ k, (n k (w k) : ℝ)) *
+          ptsIntegral P (fun k z => Real.log ((ℓ (w k)).h z)) (fun _ => 1) := by
   have hext : ∀ o, IsSmoothHerm (extLine ℓ o) := by
     intro o
     cases o with
@@ -101,14 +113,16 @@ theorem pts_comb (II : IntersectionSystem) (hII : IsFullIntersectionSystem II) (
     Fin.snoc (α := fun _ => Option J → ℤ) (fun k => extExp (n k)) lastExp
   have hn'c : ∀ k : Fin e, n' k.castSucc = extExp (n k) := fun k => by simp [n']
   have hn'l : n' (Fin.last e) = lastExp := by simp [n']
-  have hcomb : (Fin.snoc (fun k => combLine ℓ (n k)) (oneLine ι) : Fin (e + 1) → HermLine ι) =
-      fun k => combLine (extLine ℓ) (n' k) := by
+  have hcomb
+      : (Fin.snoc (fun k => combLine ℓ (n k)) (oneLine ι) : Fin (e + 1) → HermLine ι)
+        = fun k => combLine (extLine ℓ) (n' k) := by
     funext k
     refine Fin.lastCases ?_ (fun k => ?_) k
     · simp [hn'l, comb_lastExp]
     · simp [hn'c, comb_extExp]
   rw [pts_eq_II II hII P _ hP (fun k => smooth_comb hℓ _), hcomb,
-    GlobalTheory.T.arith_intersection_multilinear_all II hII K ι P (e + 1) (Option J) (extLine ℓ) n' hP hext]
+    GlobalTheory.T.arith_intersection_multilinear_all II hII K ι P (e + 1) (Option J) (extLine ℓ) n'
+      hP hext]
   symm
   let E : (Fin e → J) → (Fin (e + 1) → Option J) := fun w =>
     Fin.snoc (α := fun _ => Option J) (fun k => some (w k)) none
@@ -146,8 +160,9 @@ theorem pts_comb (II : IntersectionSystem) (hII : IsFullIntersectionSystem II) (
         simp [lastExp]
     rw [hzero, zero_mul]
   · intro w _
-    have hlines : (fun k => extLine ℓ (E w k)) =
-        (Fin.snoc (fun k => ℓ (w k)) (oneLine ι) : Fin (e + 1) → HermLine ι) := by
+    have hlines
+        : (fun k => extLine ℓ (E w k))
+          = (Fin.snoc (fun k => ℓ (w k)) (oneLine ι) : Fin (e + 1) → HermLine ι) := by
       funext k
       refine Fin.lastCases ?_ (fun k => ?_) k
       · simp [hEl, extLine]
@@ -155,17 +170,20 @@ theorem pts_comb (II : IntersectionSystem) (hII : IsFullIntersectionSystem II) (
     rw [hlines, ← pts_eq_II II hII P _ hP (fun k => hℓ _), Fin.prod_univ_castSucc]
     simp [hn'c, hn'l, hEc, hEl, extExp, lastExp]
 
-theorem pts_perm (II : IntersectionSystem) (hII : IsFullIntersectionSystem II) (P : Ideal (MRing ι))
+theorem pts_perm
+    (II : IntersectionSystem) (hII : IsFullIntersectionSystem II)
+    (P : Ideal (MRing ι))
     {e : ℕ} (L : Fin e → HermLine ι) (σ : Equiv.Perm (Fin e)) (hP : IsArithVar P (e + 1))
-    (hL : ∀ j, IsSmoothHerm (L j)) :
-    ptsIntegral P (fun k z => Real.log ((L (σ k)).h z)) (fun _ => 1) =
-      ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1) := by
+    (hL : ∀ j, IsSmoothHerm (L j))
+    : ptsIntegral P (fun k z => Real.log ((L (σ k)).h z)) (fun _ => 1)
+      = ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1) := by
   let τ : Equiv.Perm (Fin (e + 1)) :=
     (finSuccEquivLast.trans (Equiv.optionCongr σ)).trans finSuccEquivLast.symm
   have hτc : ∀ k : Fin e, τ k.castSucc = (σ k).castSucc := fun k => by simp [τ]
   have hτl : τ (Fin.last e) = Fin.last e := by simp [τ]
-  have hcomp : (Fin.snoc (fun k => L (σ k)) (oneLine ι) : Fin (e + 1) → HermLine ι) =
-      (Fin.snoc L (oneLine ι) : Fin (e + 1) → HermLine ι) ∘ τ := by
+  have hcomp
+      : (Fin.snoc (fun k => L (σ k)) (oneLine ι) : Fin (e + 1) → HermLine ι)
+        = (Fin.snoc L (oneLine ι) : Fin (e + 1) → HermLine ι) ∘ τ := by
     funext k
     refine Fin.lastCases ?_ (fun k => ?_) k
     · simp [hτl]
@@ -178,11 +196,13 @@ theorem pts_perm (II : IntersectionSystem) (hII : IsFullIntersectionSystem II) (
   rw [pts_eq_II II hII P _ hP (fun k => hL _), pts_eq_II II hII P _ hP hL, hcomp]
   exact (hII.1 K ι).1 P (e + 1) _ τ hP hsm
 
-theorem pts_deg (II : IntersectionSystem) (hII : IsFullIntersectionSystem II) (P : Ideal (MRing ι))
+theorem pts_deg
+    (II : IntersectionSystem) (hII : IsFullIntersectionSystem II)
+    (P : Ideal (MRing ι))
     {e : ℕ} (L L' : Fin e → HermLine ι) (hP : IsArithVar P (e + 1)) (hL : ∀ j, IsSmoothHerm (L j))
-    (hL' : ∀ j, IsSmoothHerm (L' j)) (ha : ∀ k, (L' k).a = (L k).a) :
-    ptsIntegral P (fun k z => Real.log ((L' k).h z)) (fun _ => 1) =
-      ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1) := by
+    (hL' : ∀ j, IsSmoothHerm (L' j)) (ha : ∀ k, (L' k).a = (L k).a)
+    : ptsIntegral P (fun k z => Real.log ((L' k).h z)) (fun _ => 1)
+      = ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1) := by
   have hD := GlobalTheory.T.intersection_system_degree II hII.1
   have h1 : ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1) = _ :=
     hD K ι P e L 2 hP hL Nat.prime_two
@@ -195,7 +215,19 @@ end GlobalTheory.CompanionTheory.Ar.Top.GeoMix
 
 namespace GlobalTheory.CompanionTheory.Ar.Top
 
-theorem geo_multilin : ∀ II : IntersectionSystem, IsFullIntersectionSystem II → ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ) (J : Type) [Fintype J] [DecidableEq J] (ℓ : J → HermLine ι) (n : Fin e → J → ℤ), IsArithVar P (e + 1) → (∀ j, IsSmoothHerm (ℓ j)) → (ptsIntegral P (fun k z => Real.log ((combLine ℓ (n k)).h z)) (fun _ => 1) = ∑ w : Fin e → J, (∏ k, (n k (w k) : ℝ)) * ptsIntegral P (fun k z => Real.log ((ℓ (w k)).h z)) (fun _ => 1)) ∧ (∀ (L L' : Fin e → HermLine ι) (σ : Equiv.Perm (Fin e)), (∀ k, IsSmoothHerm (L k)) → (∀ k, IsSmoothHerm (L' k)) → (∀ k, (L' k).a = (L (σ k)).a) → ptsIntegral P (fun k z => Real.log ((L' k).h z)) (fun _ => 1) = ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1)) := by
+theorem geo_multilin
+    : ∀ II : IntersectionSystem,
+      IsFullIntersectionSystem II
+        → ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ)
+            (J : Type) [Fintype J] [DecidableEq J] (ℓ : J → HermLine ι) (n : Fin e → J → ℤ),
+          IsArithVar P (e + 1) → (∀ j, IsSmoothHerm (ℓ j))
+            → (ptsIntegral P (fun k z => Real.log ((combLine ℓ (n k)).h z)) (fun _ => 1)
+                = ∑ w : Fin e → J, (∏ k, (n k (w k) : ℝ)) * ptsIntegral P (fun k z => Real.log ((ℓ (w k)).h z)) (fun _ => 1))
+              ∧ (∀ (L L' : Fin e → HermLine ι) (σ : Equiv.Perm (Fin e)),
+                (∀ k, IsSmoothHerm (L k)) → (∀ k, IsSmoothHerm (L' k))
+                  → (∀ k, (L' k).a = (L (σ k)).a)
+                  → ptsIntegral P (fun k z => Real.log ((L' k).h z)) (fun _ => 1)
+                    = ptsIntegral P (fun k z => Real.log ((L k).h z)) (fun _ => 1)) := by
   intro II hII K _ ι _ P e J _ _ ℓ n hP hℓ
   refine ⟨GeoMix.pts_comb II hII P ℓ n hP hℓ, ?_⟩
   intro L L' σ hL hL' ha

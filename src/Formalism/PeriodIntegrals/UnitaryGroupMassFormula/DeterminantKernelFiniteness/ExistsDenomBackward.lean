@@ -89,8 +89,10 @@ theorem detOrdFin : DetOrdFin := by
   have hg₀ : ∀ p, p.Prime → ¬ p ∣ N₁ * N₂ → AtP {x : E | x ∈ I} g₀ p := by
     intro p hp hdvd
     have hcop : Nat.Coprime (N₁ * N₂) p := ((Nat.Prime.coprime_iff_not_dvd hp).2 hdvd).symm
-    exact ⟨fun x hx => ⟨N₁, Nat.Coprime.coprime_dvd_left (dvd_mul_right N₁ N₂) hcop, h1 x hx⟩,
-      fun v hv => ⟨N₂, Nat.Coprime.coprime_dvd_left (dvd_mul_left N₂ N₁) hcop, h2 v hv⟩⟩
+    exact ⟨
+      fun x hx => ⟨N₁, Nat.Coprime.coprime_dvd_left (dvd_mul_right N₁ N₂) hcop, h1 x hx⟩,
+      fun v hv => ⟨N₂, Nat.Coprime.coprime_dvd_left (dvd_mul_left N₂ N₁) hcop, h2 v hv⟩
+    ⟩
   refine (Nat.divisors (N₁ * N₂)).finite_toSet.subset ?_
   rintro p ⟨hp, hS, hne⟩
   rw [Finset.mem_coe, Nat.mem_divisors]

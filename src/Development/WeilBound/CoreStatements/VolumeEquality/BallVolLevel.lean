@@ -10,46 +10,57 @@ noncomputable section
 
 namespace SheetDecomposition
 
-open NumberField Matrix ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.CompanionTheory.Ar.Cmp PositivityTheory.EqVol
+open NumberField Matrix ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.CompanionTheory.Ar.Cmp PositivityTheory.EqVol
 open scoped nonZeroDivisors
 
 section
 
-variable {E : Type} [Field E] [NumberField E] {N : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+variable
+  {E : Type} [Field E] [NumberField E]
+  {N : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
   {e : Λ →ₗ[𝓞 E] (Fin N → E)}
 
-theorem lat_multiple (hL : IsLat (LinearMap.range e)) (v : Fin N → E) : ∃ (s : (𝓞 E)⁰) (x : Λ), s • v = e x := by
-  obtain ⟨s, hs⟩ := multiple_mem_span_of_mem_localization_span (𝓞 E)⁰ E
-    (LinearMap.range e : Set (Fin N → E)) v (hL.2 ▸ Submodule.mem_top)
+theorem lat_multiple (hL : IsLat (LinearMap.range e)) (v : Fin N → E)
+    : ∃ (s : (𝓞 E)⁰) (x : Λ), s • v = e x := by
+  obtain ⟨s, hs⟩ :=
+    multiple_mem_span_of_mem_localization_span (𝓞 E)⁰ E (LinearMap.range e : Set (Fin N → E)) v
+      (hL.2 ▸ Submodule.mem_top)
   rw [Submodule.span_eq] at hs
   obtain ⟨x, hx⟩ := hs
   exact ⟨s, x, hx.symm⟩
 
-theorem lat_extend (hi : Function.Injective e) (hL : IsLat (LinearMap.range e)) (f : Λ →ₗ[𝓞 E] (Fin N → E)) :
-    ∃ g : (Fin N → E) →ₗ[E] (Fin N → E), ∀ x, g (e x) = f x := by
+theorem lat_extend
+    (hi : Function.Injective e) (hL : IsLat (LinearMap.range e)) (f : Λ →ₗ[𝓞 E] (Fin N → E))
+    : ∃ g : (Fin N → E) →ₗ[E] (Fin N → E), ∀ x, g (e x) = f x := by
   have hu : ∀ s : (𝓞 E)⁰, IsUnit (algebraMap (𝓞 E) (Module.End (𝓞 E) (Fin N → E)) s) := by
     have := isLocalizedModule_id (𝓞 E)⁰ (Fin N → E) E
     exact IsLocalizedModule.map_units (LinearMap.id : (Fin N → E) →ₗ[𝓞 E] (Fin N → E))
-  have : IsLocalizedModule (𝓞 E)⁰ e :=
-    { map_units := hu
-      surj := fun v => by
-        obtain ⟨s, x, h⟩ := lat_multiple hL v
-        exact ⟨(x, s), h⟩
-      exists_of_eq := fun h => ⟨1, by rw [hi h]⟩ }
-  exact ⟨(IsLocalizedModule.lift (𝓞 E)⁰ e f hu).extendScalarsOfIsLocalization (𝓞 E)⁰ E,
-    fun x => IsLocalizedModule.lift_apply (𝓞 E)⁰ e f hu x⟩
+  have : IsLocalizedModule (𝓞 E)⁰ e := {
+    map_units := hu
+    surj := fun v => by
+      obtain ⟨s, x, h⟩ := lat_multiple hL v
+      exact ⟨(x, s), h⟩
+    exists_of_eq := fun h => ⟨1, by rw [hi h]⟩
+  }
+  exact ⟨
+    (IsLocalizedModule.lift (𝓞 E)⁰ e f hu).extendScalarsOfIsLocalization (𝓞 E)⁰ E,
+    fun x => IsLocalizedModule.lift_apply (𝓞 E)⁰ e f hu x
+  ⟩
 
-theorem lat_matrix (hi : Function.Injective e) (hL : IsLat (LinearMap.range e)) (δ : Λ ≃ₗ[𝓞 E] Λ) :
-    ∃ γ : GL (Fin N) E, ∀ x, e (δ x) = (γ : Matrix (Fin N) (Fin N) E) *ᵥ e x := by
+theorem lat_matrix (hi : Function.Injective e) (hL : IsLat (LinearMap.range e)) (δ : Λ ≃ₗ[𝓞 E] Λ)
+    : ∃ γ : GL (Fin N) E, ∀ x, e (δ x) = (γ : Matrix (Fin N) (Fin N) E) *ᵥ e x := by
   obtain ⟨g, hg⟩ := lat_extend hi hL (e ∘ₗ δ.toLinearMap)
   obtain ⟨g', hg'⟩ := lat_extend hi hL (e ∘ₗ δ.symm.toLinearMap)
   simp only [LinearMap.comp_apply, LinearEquiv.coe_coe] at hg hg'
-  have h1 : g ∘ₗ g' = LinearMap.id := LinearMap.ext_on hL.2 (by
-    rintro _ ⟨x, rfl⟩
-    simp [hg, hg'])
-  have h2 : g' ∘ₗ g = LinearMap.id := LinearMap.ext_on hL.2 (by
-    rintro _ ⟨x, rfl⟩
-    simp [hg, hg'])
+  have h1 : g ∘ₗ g' = LinearMap.id :=
+    LinearMap.ext_on hL.2 (by
+      rintro _ ⟨x, rfl⟩
+      simp [hg, hg'])
+  have h2 : g' ∘ₗ g = LinearMap.id :=
+    LinearMap.ext_on hL.2 (by
+      rintro _ ⟨x, rfl⟩
+      simp [hg, hg'])
   refine ⟨⟨LinearMap.toMatrix' g, LinearMap.toMatrix' g', ?_, ?_⟩, fun x => ?_⟩
   · rw [← LinearMap.toMatrix'_comp, h1, LinearMap.toMatrix'_id]
   · rw [← LinearMap.toMatrix'_comp, h2, LinearMap.toMatrix'_id]
@@ -57,15 +68,17 @@ theorem lat_matrix (hi : Function.Injective e) (hL : IsLat (LinearMap.range e)) 
     rw [LinearMap.toMatrix'_mulVec, hg]
 
 omit [NumberField E] in
-theorem mem_smul_range (hi : Function.Injective e) (I : Ideal (𝓞 E)) (x : Λ) :
-    e x ∈ I • LinearMap.range e ↔ x ∈ I • (⊤ : Submodule (𝓞 E) Λ) := by
+theorem mem_smul_range (hi : Function.Injective e) (I : Ideal (𝓞 E)) (x : Λ)
+    : e x ∈ I • LinearMap.range e ↔ x ∈ I • (⊤ : Submodule (𝓞 E) Λ) := by
   rw [← Submodule.map_top, ← Submodule.map_smul'']
   exact ⟨fun ⟨y, hy, h⟩ => hi h ▸ hy, fun h => ⟨x, h, rfl⟩⟩
 
 omit [NumberField E] in
-theorem congr_iff (hi : Function.Injective e) {δ : Λ ≃ₗ[𝓞 E] Λ} {γ : Matrix (Fin N) (Fin N) E}
-    (h : ∀ x, e (δ x) = γ *ᵥ e x) (M : ℕ) (x : Λ) :
-    (∃ y ∈ LinearMap.range e, γ *ᵥ e x = e x + M • y) ↔ ∃ y, δ x = x + M • y := by
+theorem congr_iff
+    (hi : Function.Injective e)
+    {δ : Λ ≃ₗ[𝓞 E] Λ} {γ : Matrix (Fin N) (Fin N) E} (h : ∀ x, e (δ x) = γ *ᵥ e x)
+    (M : ℕ) (x : Λ)
+    : (∃ y ∈ LinearMap.range e, γ *ᵥ e x = e x + M • y) ↔ ∃ y, δ x = x + M • y := by
   constructor
   · rintro ⟨_, ⟨y, rfl⟩, hy⟩
     exact ⟨y, hi (by rw [h, hy, map_add (f := _), map_nsmul])⟩
@@ -74,13 +87,15 @@ theorem congr_iff (hi : Function.Injective e) {δ : Λ ≃ₗ[𝓞 E] Λ} {γ : 
 
 variable [IsCMField E]
 
-theorem herm_smul_smul (G : Matrix (Fin N) (Fin N) E) (a b : E) (x y : Fin N → E) :
-    herm G (a • x) (b • y) = a * cc b * herm G x y := by
+theorem herm_smul_smul (G : Matrix (Fin N) (Fin N) E) (a b : E) (x y : Fin N → E)
+    : herm G (a • x) (b • y) = a * cc b * herm G x y := by
   simp only [herm, cc, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => by ring
 
-theorem eq_of_herm_lat (hL : IsLat (LinearMap.range e)) {G G' : Matrix (Fin N) (Fin N) E}
-    (h : ∀ x y, herm G (e x) (e y) = herm G' (e x) (e y)) : G = G' := by
+theorem eq_of_herm_lat
+    (hL : IsLat (LinearMap.range e))
+    {G G' : Matrix (Fin N) (Fin N) E} (h : ∀ x y, herm G (e x) (e y) = herm G' (e x) (e y))
+    : G = G' := by
   have h1 : ∀ u v, herm G u v = herm G' u v := fun u v => by
     obtain ⟨s, x, hx⟩ := lat_multiple hL u
     obtain ⟨t, y, hy⟩ := lat_multiple hL v
@@ -93,17 +108,24 @@ theorem eq_of_herm_lat (hL : IsLat (LinearMap.range e)) {G G' : Matrix (Fin N) (
     rw [e1, e2, herm_smul_smul, herm_smul_smul] at this
     exact mul_left_cancel₀ (mul_ne_zero hs ht') this
   ext c d
-  have e0 : ∀ G : Matrix (Fin N) (Fin N) E, herm G (Pi.single c 1) (Pi.single d 1) = G c d := fun G => by
+  have e0
+      : ∀ G : Matrix (Fin N) (Fin N) E,
+        herm G (Pi.single c 1) (Pi.single d 1) = G c d := fun G => by
     simp [herm, cc, Pi.single_apply, apply_ite (IsCMField.complexConj E)]
   rw [← e0 G, ← e0 G', h1]
 
-theorem herm_eq_of_trace {ξ : E} (hξ : ξ ≠ 0) {G G' : Matrix (Fin N) (Fin N) E}
-    (h : ∀ x y, EFf ξ G (e x) (e y) = EFf ξ G' (e x) (e y)) (x y : Λ) : herm G (e x) (e y) = herm G' (e x) (e y) := by
+theorem herm_eq_of_trace
+    {ξ : E} (hξ : ξ ≠ 0)
+    {G G' : Matrix (Fin N) (Fin N) E} (h : ∀ x y, EFf ξ G (e x) (e y) = EFf ξ G' (e x) (e y))
+    (x y : Λ)
+    : herm G (e x) (e y) = herm G' (e x) (e y) := by
   have h0 : -ξ * (herm G (e x) (e y) - herm G' (e x) (e y)) = 0 := by
     refine GlobalTheory.CompanionTheory.Ar.Cusp.Dict.LatEmbEx.trace_zero_of_int _ fun a => ?_
     have h1 := h (a • x) y
     have e1 : e (a • x) = (a : E) • e x := by rw [map_smul]; rfl
-    have e2 : ∀ G : Matrix (Fin N) (Fin N) E, herm G ((a : E) • e x) (e y) = a * herm G (e x) (e y) := fun G => by
+    have e2
+        : ∀ G : Matrix (Fin N) (Fin N) E,
+          herm G ((a : E) • e x) (e y) = a * herm G (e x) (e y) := fun G => by
       have := herm_smul_smul G (a : E) 1 (e x) (e y)
       rwa [one_smul, cc, map_one, mul_one] at this
     rw [EFf, EFf, e1, e2, e2, ← sub_eq_zero, ← map_sub] at h1
@@ -120,19 +142,25 @@ theorem levelDict : LevelDict := by
     rcases hF with rfl | rfl
     · exact D.unimod
     · exact neg_involutive.bijective.comp D.unimod
-  have hpres : ∀ δ : D.La ≃ₗ[𝓞 E] D.La,
-      (∀ a b, D.EF (δ a) (δ b) = D.EF a b) ↔ ∀ a b, form (δ a) (δ b) = form a b := fun δ => by
+  have hpres
+      : ∀ δ : D.La ≃ₗ[𝓞 E] D.La,
+        (∀ a b, D.EF (δ a) (δ b) = D.EF a b) ↔ ∀ a b, form (δ a) (δ b) = form a b := fun δ => by
     rcases hF with rfl | rfl
     · rfl
     · simp
   have hM : 0 < l.M := by have := l.three_le; omega
-  have hcong : ∀ (δ : D.La ≃ₗ[𝓞 E] D.La) (γ : Matrix (Fin N) (Fin N) E), (∀ x, e (δ x) = γ *ᵥ e x) →
-      (((∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), ∃ y, δ a = a + l.M • y) ∧
-        ∀ a, ∃ y, δ a = a + l.A • y) ↔
-        ∀ x ∈ LinearMap.range e, γ *ᵥ x - x ∈ levIdeal l • LinearMap.range e) := fun δ γ h => by
-    refine Iff.trans ?_ (levelIdeal E N (LinearMap.range e) _ l.Mb l.M l.A γ hL hM l.prod (by
-      rintro _ ⟨x, rfl⟩
-      exact ⟨δ x, h x⟩))
+  have hcong
+      : ∀ (δ : D.La ≃ₗ[𝓞 E] D.La) (γ : Matrix (Fin N) (Fin N) E),
+        (∀ x, e (δ x) = γ *ᵥ e x)
+          → (((∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), ∃ y,
+                δ a = a + l.M • y)
+              ∧ ∀ a, ∃ y, δ a = a + l.A • y)
+            ↔ ∀ x ∈ LinearMap.range e,
+              γ *ᵥ x - x ∈ levIdeal l • LinearMap.range e) := fun δ γ h => by
+    refine Iff.trans ?_
+      (levelIdeal E N (LinearMap.range e) _ l.Mb l.M l.A γ hL hM l.prod (by
+        rintro _ ⟨x, rfl⟩
+        exact ⟨δ x, h x⟩))
     refine and_congr ⟨fun h1 x hx => ?_, fun h1 a ha => ?_⟩ ⟨?_, fun h1 a => ?_⟩
     · obtain ⟨a, rfl⟩ := Submodule.smul_le_right hx
       exact (congr_iff hi h _ _).2 (h1 a ((mem_smul_range hi _ _).1 hx))

@@ -8,12 +8,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.exists_lim_hom_out :
-    ∀ (G Z ι : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G] [Group Z] [TopologicalSpace Z] [IsTopologicalGroup Z] [CompactSpace Z] [TotallyDisconnectedSpace Z], TopFG G → ∀ (U : Ultrafilter ι) (K : ι → Subgroup G) [∀ i, (K i).Normal] (f : ι → G →* Z),
-      (∀ i, Continuous (f i)) → (∀ i, K i ≤ (f i).ker) →
-      ∃ F : G →* Z, Continuous F ∧ limKer (U : Filter ι) K ≤ F.ker ∧
-        (∀ V : OpenNormalSubgroup Z, ∀ᶠ i in (U : Filter ι), ∀ g, (F g)⁻¹ * f i g ∈ V.toSubgroup) ∧
-        ((∀ i, Function.Surjective (f i)) → Function.Surjective F) := by
+theorem UpperTheory.V.AlgebraTools.exists_lim_hom_out
+    : ∀ (G Z ι : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+        [TotallyDisconnectedSpace G] [Group Z] [TopologicalSpace Z] [IsTopologicalGroup Z]
+        [CompactSpace Z] [TotallyDisconnectedSpace Z],
+      TopFG G
+        → ∀ (U : Ultrafilter ι) (K : ι → Subgroup G) [∀ i, (K i).Normal] (f : ι → G →* Z),
+          (∀ i, Continuous (f i)) → (∀ i, K i ≤ (f i).ker)
+            → ∃ F : G →* Z,
+              Continuous F ∧ limKer (U : Filter ι) K ≤ F.ker
+                ∧ (∀ V : OpenNormalSubgroup Z,
+                  ∀ᶠ i in (U : Filter ι), ∀ g, (F g)⁻¹ * f i g ∈ V.toSubgroup)
+                ∧ ((∀ i, Function.Surjective (f i)) → Function.Surjective F) := by
   intro G Z ι _ _ _ _ _ _ _ _ _ _ hG U K _ f hf hK
   obtain ⟨s, hsfin, hsgen⟩ := hG
   obtain ⟨F0, hF0⟩ : ∃ F0 : G → Z, ∀ g, Tendsto (fun i => f i g) (U : Filter ι) (nhds (F0 g)) := by
@@ -27,27 +33,28 @@ theorem UpperTheory.V.AlgebraTools.exists_lim_hom_out :
     tendsto_nhds_unique (hF0 (a * b)) (by simp only [map_mul]; exact (hF0 a).mul (hF0 b))
   obtain ⟨F, hF⟩ : ∃ F : G →* Z, ∀ g, Tendsto (fun i => f i g) (U : Filter ι) (nhds (F g)) :=
     ⟨{ toFun := F0, map_one' := hone, map_mul' := hmul }, hF0⟩
-  have agree : ∀ (V : OpenNormalSubgroup Z) (i j : ι),
-      (∀ x ∈ s, (F x)⁻¹ * f i x ∈ V.toSubgroup) → (∀ x ∈ s, (F x)⁻¹ * f j x ∈ V.toSubgroup) →
-      ∀ g, (f j g)⁻¹ * f i g ∈ V.toSubgroup := by
+  have agree
+      : ∀ (V : OpenNormalSubgroup Z) (i j : ι),
+        (∀ x ∈ s, (F x)⁻¹ * f i x ∈ V.toSubgroup) → (∀ x ∈ s, (F x)⁻¹ * f j x ∈ V.toSubgroup)
+          → ∀ g, (f j g)⁻¹ * f i g ∈ V.toSubgroup := by
     intro V i j hi hj g
-    let H : Subgroup G :=
-      { carrier := {g | (f j g)⁻¹ * f i g ∈ V.toSubgroup}
-        mul_mem' := by
-          intro a b ha hb
-          simp only [Set.mem_setOf_eq, map_mul] at *
-          have := V.toSubgroup.mul_mem (V.isNormal'.conj_mem _ ha (f j b)⁻¹) hb
-          convert this using 1
-          group
-        one_mem' := by simp
-        inv_mem' := by
-          intro a ha
-          simp only [Set.mem_setOf_eq, map_inv] at *
-          have := V.isNormal'.conj_mem _ (V.toSubgroup.inv_mem ha) (f j a)
-          convert this using 1
-          group }
-    have hHc : IsClosed (H : Set G) :=
-      V.toOpenSubgroup.isClosed.preimage (((hf j).inv).mul (hf i))
+    let H : Subgroup G := {
+      carrier := {g | (f j g)⁻¹ * f i g ∈ V.toSubgroup}
+      mul_mem' := by
+        intro a b ha hb
+        simp only [Set.mem_setOf_eq, map_mul] at *
+        have := V.toSubgroup.mul_mem (V.isNormal'.conj_mem _ ha (f j b)⁻¹) hb
+        convert this using 1
+        group
+      one_mem' := by simp
+      inv_mem' := by
+        intro a ha
+        simp only [Set.mem_setOf_eq, map_inv] at *
+        have := V.isNormal'.conj_mem _ (V.toSubgroup.inv_mem ha) (f j a)
+        convert this using 1
+        group
+    }
+    have hHc : IsClosed (H : Set G) := V.toOpenSubgroup.isClosed.preimage (((hf j).inv).mul (hf i))
     have hsH : Subgroup.closure s ≤ H := by
       rw [Subgroup.closure_le]
       intro x hx
@@ -59,7 +66,9 @@ theorem UpperTheory.V.AlgebraTools.exists_lim_hom_out :
       rw [← SetLike.mem_coe, Subgroup.topologicalClosure_coe, hsgen.closure_eq]
       trivial
     exact Subgroup.topologicalClosure_minimal _ hsH hHc hg
-  have key : ∀ V : OpenNormalSubgroup Z, ∀ᶠ i in (U : Filter ι), ∀ g, (F g)⁻¹ * f i g ∈ V.toSubgroup := by
+  have key
+      : ∀ V : OpenNormalSubgroup Z,
+        ∀ᶠ i in (U : Filter ι), ∀ g, (F g)⁻¹ * f i g ∈ V.toSubgroup := by
     intro V
     have hs : ∀ᶠ i in (U : Filter ι), ∀ x ∈ s, (F x)⁻¹ * f i x ∈ V.toSubgroup := by
       refine (Filter.eventually_all_finite hsfin).2 (fun x _ => ?_)
@@ -97,10 +106,11 @@ theorem UpperTheory.V.AlgebraTools.exists_lim_hom_out :
     rw [MonoidHom.mem_ker]
     have hall : ∀ V : OpenNormalSubgroup Z, F g ∈ V.toSubgroup := by
       intro V
-      let O : OpenNormalSubgroup G :=
-        { toSubgroup := V.toSubgroup.comap F
-          isOpen' := V.toOpenSubgroup.isOpen.preimage hFc
-          isNormal' := V.isNormal'.comap F }
+      let O : OpenNormalSubgroup G := {
+        toSubgroup := V.toSubgroup.comap F
+        isOpen' := V.toOpenSubgroup.isOpen.preimage hFc
+        isNormal' := V.isNormal'.comap F
+      }
       rw [mem_limKer] at hg
       obtain ⟨i, hi1, hi2⟩ := ((hg O).and (key V)).exists
       have hle : K i ⊔ (O.toOpenSubgroup : Subgroup G) ≤ V.toSubgroup.comap (f i) := by
@@ -122,8 +132,9 @@ theorem UpperTheory.V.AlgebraTools.exists_lim_hom_out :
       convert this using 1
       group
     by_contra hne
-    obtain ⟨V, hV⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
-      (isOpen_compl_singleton (x := F g)) (Set.mem_compl_singleton_iff.2 (Ne.symm hne))
+    obtain ⟨V, hV⟩ :=
+      ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one (isOpen_compl_singleton (x := F g))
+        (Set.mem_compl_singleton_iff.2 (Ne.symm hne))
     exact hV (hall V) rfl
   · intro hsurj z
     have hcl : IsClosed (Set.range F) := (isCompact_range hFc).isClosed

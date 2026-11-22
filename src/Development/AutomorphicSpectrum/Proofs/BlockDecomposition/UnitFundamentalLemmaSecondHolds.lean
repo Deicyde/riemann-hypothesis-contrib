@@ -10,7 +10,9 @@ open scoped ENNReal
 
 namespace GlobalTheory.CompanionTheory.UnitFL
 
-theorem unit_fundamental_lemma_second : PositivityTheory.Rg.Tf.Loc.L2 → PositivityTheory.Rg.Tf.Loc.N4 → PositivityTheory.Rg.Tf.Loc.Z2 := by
+theorem unit_fundamental_lemma_second
+    : PositivityTheory.Rg.Tf.Loc.L2 → PositivityTheory.Rg.Tf.Loc.N4
+      → PositivityTheory.Rg.Tf.Loc.Z2 := by
   intro hL2 hN4
   unfold PositivityTheory.Rg.Tf.Loc.Z2
   intro k E _ _ _ _ _ _ _ _ _ _ _ _ hun σ hgen n _ _ _ _ μE μk _ _ _ _ γ μγ _ hnot _

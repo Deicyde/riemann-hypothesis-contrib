@@ -8,24 +8,26 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-private theorem form_map' {A A' ι : Type} [CommRing A] [CommRing A'] [Fintype ι] (ρ : A →+* A') (c : ι → A) :
-    (form c).map (MvPolynomial.map ρ) = form (fun k => ρ (c k)) := by
+private theorem form_map'
+    {A A' ι : Type} [CommRing A] [CommRing A'] [Fintype ι] (ρ : A →+* A') (c : ι → A)
+    : (form c).map (MvPolynomial.map ρ) = form (fun k => ρ (c k)) := by
   unfold form
   rw [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C]
   congr 2
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, MvPolynomial.map_C, MvPolynomial.map_X]
+  simp [map_sum, MvPolynomial.map_C, MvPolynomial.map_X]
 
-private theorem form_eval' {A ι : Type} [CommRing A] [Fintype ι] (x y : ι → A) :
-    Polynomial.evalRingHom (∑ k, MvPolynomial.C (x k) * MvPolynomial.X k) (form y) =
-      ∑ k, MvPolynomial.C (x k - y k) * MvPolynomial.X k := by
+private theorem form_eval' {A ι : Type} [CommRing A] [Fintype ι] (x y : ι → A)
+    : Polynomial.evalRingHom (∑ k, MvPolynomial.C (x k) * MvPolynomial.X k) (form y)
+      = ∑ k, MvPolynomial.C (x k - y k) * MvPolynomial.X k := by
   unfold form
   show Polynomial.eval _ _ = _
   rw [Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C, ← Finset.sum_sub_distrib]
   exact Finset.sum_congr rfl fun k _ => by rw [map_sub, sub_mul]
 
-private theorem form_natDegree' {A ι : Type} [CommRing A] [Fintype ι] [Nontrivial A] (v : Multiset (ι → A)) :
-    ((v.map form).prod).natDegree = v.card := by
+private theorem form_natDegree'
+    {A ι : Type} [CommRing A] [Fintype ι] [Nontrivial A] (v : Multiset (ι → A))
+    : ((v.map form).prod).natDegree = v.card := by
   rw [Polynomial.natDegree_multiset_prod_of_monic]
   · simp only [Multiset.map_map, Function.comp_def, form, Polynomial.natDegree_X_sub_C]
     simp
@@ -33,8 +35,7 @@ private theorem form_natDegree' {A ι : Type} [CommRing A] [Fintype ι] [Nontriv
     obtain ⟨c, -, rfl⟩ := Multiset.mem_map.1 hf
     exact Polynomial.monic_X_sub_C _
 
-theorem UpperTheory.Gal.crystallineComparison.snBasic_of :
-    SameNormBasic := by
+theorem UpperTheory.Gal.crystallineComparison.snBasic_of : SameNormBasic := by
   intro A ι _ _
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro A' _ ρ u u' h

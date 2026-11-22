@@ -32,10 +32,7 @@ theorem hT_X_X (F : FlagG S r T) {x x' : S.V} (hx : x ∈ F.X) (hx' : x' ∈ F.X
   | smul c y _ h => simp [LinearMap.map_smulₛₗ, LinearMap.smul_apply, h]
 
 private theorem hT_swap_eq_star (x y : S.V) : S.hT y x = star (S.hT x y) := by
-  first
-  | exact (S.herm x y).symm
-  | exact (S.herm.eq x y).symm
-  | simpa using (S.herm x y).symm
+  first | exact (S.herm x y).symm | exact (S.herm.eq x y).symm | simpa using (S.herm x y).symm
 
 theorem hT_z_X (F : FlagG S r T) {x : S.V} (hx : x ∈ F.X) : S.hT F.z x = 0 := by
   induction hx using Submodule.span_induction with
@@ -49,8 +46,8 @@ theorem hT_z_X (F : FlagG S r T) {x : S.V} (hx : x ∈ F.X) : S.hT F.z x = 0 := 
 def Qsp (F : FlagG S r T) (H : Submodule E S.V) : Submodule E S.V :=
   Lat.orth S (F.X ⊔ Submodule.span E {F.z} ⊔ H)
 
-theorem mem_Qsp (F : FlagG S r T) (H : Submodule E S.V) {v : S.V} :
-    v ∈ Qsp F H ↔ (∀ x ∈ F.X, S.hT x v = 0) ∧ S.hT F.z v = 0 ∧ ∀ h ∈ H, S.hT h v = 0 := by
+theorem mem_Qsp (F : FlagG S r T) (H : Submodule E S.V) {v : S.V}
+    : v ∈ Qsp F H ↔ (∀ x ∈ F.X, S.hT x v = 0) ∧ S.hT F.z v = 0 ∧ ∀ h ∈ H, S.hT h v = 0 := by
   simp only [Qsp, Lat.orth, Submodule.mem_iInf, LinearMap.mem_ker]
   constructor
   · intro h
@@ -66,8 +63,8 @@ theorem mem_Qsp (F : FlagG S r T) (H : Submodule E S.V) {v : S.V} :
       · intro y hy; simpa using h3 y hy
     simpa using hle hx
 
-private theorem finrank_add_finrank_orth_le (U : Submodule E S.V) :
-    finrank E U + finrank E (Lat.orth S U) ≤ finrank E S.V := by
+private theorem finrank_add_finrank_orth_le (U : Submodule E S.V)
+    : finrank E U + finrank E (Lat.orth S U) ≤ finrank E S.V := by
   classical
   let b := Module.finBasis E U
   let ψ : S.V →ₗ[E] (Fin (finrank E U) → E) := LinearMap.pi (fun i => S.hT ((b i : U) : S.V))
@@ -76,8 +73,7 @@ private theorem finrank_add_finrank_orth_le (U : Submodule E S.V) :
     simp only [LinearMap.mem_ker, Lat.orth, Submodule.mem_iInf]
     constructor
     · intro hy x hx
-      have hyi : ∀ i, S.hT ((b i : U) : S.V) y = 0 := fun i => by
-        simpa [ψ] using congrFun hy i
+      have hyi : ∀ i, S.hT ((b i : U) : S.V) y = 0 := fun i => by simpa [ψ] using congrFun hy i
       have hxs : x = ∑ i, b.repr ⟨x, hx⟩ i • ((b i : U) : S.V) := by
         have := congrArg Subtype.val (b.sum_repr ⟨x, hx⟩)
         rw [Submodule.coe_sum] at this
@@ -102,7 +98,8 @@ private theorem finrank_add_finrank_orth_le (U : Submodule E S.V) :
       rw [hfw] at h1
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum, LinearMap.sum_apply]
-      simp only [LinearMap.map_smulₛₗ, starRingEnd_apply, star_star, LinearMap.smul_apply, smul_eq_mul]
+      simp only [LinearMap.map_smulₛₗ, starRingEnd_apply, star_star, LinearMap.smul_apply,
+        smul_eq_mul]
       rw [← h1]
       refine Finset.sum_congr rfl fun i _ => ?_
       simp [ψ, mul_comm]
@@ -118,8 +115,8 @@ private theorem finrank_add_finrank_orth_le (U : Submodule E S.V) :
   rw [hrange, finrank_top, Module.finrank_fin_fun, hker] at this
   omega
 
-private theorem finrank_sup_span_singleton_of_not_mem' (A : Submodule E S.V) {w : S.V} (hw : w ∉ A) :
-    finrank E ↥(A ⊔ Submodule.span E {w}) = finrank E A + 1 := by
+private theorem finrank_sup_span_singleton_of_not_mem' (A : Submodule E S.V) {w : S.V} (hw : w ∉ A)
+    : finrank E ↥(A ⊔ Submodule.span E {w}) = finrank E A + 1 := by
   have hw0 : w ≠ 0 := fun h => hw (h ▸ A.zero_mem)
   have := Submodule.finrank_sup_add_finrank_inf_eq A (Submodule.span E {w})
   have hinf : A ⊓ Submodule.span E {w} = ⊥ := by
@@ -135,10 +132,14 @@ private theorem finrank_sup_span_singleton_of_not_mem' (A : Submodule E S.V) {w 
   rw [hinf, finrank_bot, add_zero, finrank_span_singleton hw0] at this
   exact this
 
-theorem line (F : FlagG S r T) (hT : T ≠ 0) (H : Submodule E S.V) (hXH : ∀ x ∈ F.X, ∀ h ∈ H, S.hT x h = 0)
-    (hzH : ∀ h ∈ H, S.hT F.z h = 0) (hdisj : ∀ x ∈ F.X, x ∈ H → x = 0)
-    (hdim : finrank E H + 2 * r + 2 = finrank E S.V) {y0 v : S.V} (hy0 : y0 ∈ Qsp F H)
-    (hy00 : brS S y0 y0 ≠ 0) (hv : v ∈ Qsp F H) (hvy : brS S v y0 = 0) : v ∈ F.X := by
+theorem line
+    (F : FlagG S r T)
+    (hT : T ≠ 0)
+    (H : Submodule E S.V) (hXH : ∀ x ∈ F.X, ∀ h ∈ H, S.hT x h = 0) (hzH : ∀ h ∈ H, S.hT F.z h = 0)
+    (hdisj : ∀ x ∈ F.X, x ∈ H → x = 0) (hdim : finrank E H + 2 * r + 2 = finrank E S.V)
+    {y0 v : S.V}
+    (hy0 : y0 ∈ Qsp F H) (hy00 : brS S y0 y0 ≠ 0) (hv : v ∈ Qsp F H) (hvy : brS S v y0 = 0)
+    : v ∈ F.X := by
   classical
   have hXQ : F.X ≤ Qsp F H := by
     intro x hx
@@ -152,7 +153,9 @@ theorem line (F : FlagG S r T) (hT : T ≠ 0) (H : Submodule E S.V) (hXH : ∀ x
     intro hz
     obtain ⟨x, hx, h, hh, hxh⟩ := Submodule.mem_sup.1 hz
     have h1 : S.hT F.z F.z = 0 := by
-      calc S.hT F.z F.z = S.hT F.z (x + h) := by rw [hxh]
+      calc
+        S.hT F.z F.z
+          = S.hT F.z (x + h) := by rw [hxh]
         _ = 0 := by rw [map_add (f := _), hT_z_X F hx, hzH h hh, add_zero]
     have := F.z_norm
     rw [h1] at this
@@ -181,8 +184,7 @@ theorem line (F : FlagG S r T) (hT : T ≠ 0) (H : Submodule E S.V) (hXH : ∀ x
   rw [← heq] at hv
   obtain ⟨x, hx, w, hw, rfl⟩ := Submodule.mem_sup.1 hv
   obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hw
-  have h1 : S.hT y0 x = 0 := by
-    rw [hT_swap_eq_star, ((mem_Qsp F H).1 hy0).1 x hx, star_zero]
+  have h1 : S.hT y0 x = 0 := by rw [hT_swap_eq_star, ((mem_Qsp F H).1 hy0).1 x hx, star_zero]
   have h2 : c * S.hT y0 y0 = 0 := by
     have := hvy
     simp only [brS, map_add (f := _), map_smul, smul_eq_mul, h1, zero_add] at this

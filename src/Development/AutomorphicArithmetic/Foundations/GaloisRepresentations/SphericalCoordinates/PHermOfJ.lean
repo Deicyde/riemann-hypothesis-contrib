@@ -4,14 +4,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.hermOfJ_of :
-    UpperTheory.Gal.W2.HermOfJ := by
+theorem UpperTheory.Gal.W2.hermOfJ_of : UpperTheory.Gal.W2.HermOfJ := by
   intro g E halt hI hpos
   have hskew : ∀ x y, E x y = - E y x := by
     intro x y
@@ -60,10 +62,11 @@ theorem UpperTheory.Gal.W2.hermOfJ_of :
   let e : Fin g → Fin g → ℂ := fun i j => if i = j then 1 else 0
   have hexp : ∀ x y, H x y = ∑ i, x i * H (e i) y := by
     intro x y
-    let f : (Fin g → ℂ) →ₗ[ℂ] ℂ :=
-      { toFun := fun x => H x y
-        map_add' := fun a b => hadd a b y
-        map_smul' := fun c a => by simpa using hsmul c a y }
+    let f : (Fin g → ℂ) →ₗ[ℂ] ℂ := {
+      toFun := fun x => H x y
+      map_add' := fun a b => hadd a b y
+      map_smul' := fun c a => by simpa using hsmul c a y
+    }
     simpa [f, e] using LinearMap.pi_apply_eq_sum_univ f x
   have hform : ∀ x y, hermForm (Matrix.of fun i j => H (e i) (e j)) x y = H x y := by
     intro x y

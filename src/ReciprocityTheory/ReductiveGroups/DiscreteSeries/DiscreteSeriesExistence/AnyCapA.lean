@@ -14,23 +14,34 @@ namespace ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem anyCap_word_mem {M : Type*} [AddCommGroup M] [Module ℂ M] {E : Fin n → Fin n → Module.End ℂ M}
-    {V : Submodule ℂ M} (w : List (Fin n × Fin n)) {x : M} (hx : x ∈ genSub E V) :
-    (w.map fun p => E p.1 p.2).prod x ∈ genSub E V := by
+theorem anyCap_word_mem
+    {M : Type*} [AddCommGroup M] [Module ℂ M]
+    {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M}
+    (w : List (Fin n × Fin n))
+    {x : M} (hx : x ∈ genSub E V)
+    : (w.map fun p => E p.1 p.2).prod x ∈ genSub E V := by
   induction w with
   | nil => simpa using hx
   | cons p w ih =>
     simp only [List.map_cons, List.prod_cons, Module.End.mul_apply]
     exact ICD.gen_stable ih p.1 p.2
 
-theorem anyCap_adj {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-    {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E) (V : Submodule ℂ M) (u : ℂ) :
-    ∃ C : Module.End ℂ M, (∀ x ∈ genSub E V, C x ∈ genSub E V) ∧
-      ∀ x y : M, inner ℂ x (Formalism.REAL.qdet E u y) = inner ℂ (C x) y := by
+theorem anyCap_adj
+    {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E)
+    (V : Submodule ℂ M) (u : ℂ)
+    : ∃ C : Module.End ℂ M,
+      (∀ x ∈ genSub E V, C x ∈ genSub E V)
+        ∧ ∀ x y : M, inner ℂ x (Formalism.REAL.qdet E u y) = inner ℂ (C x) y := by
   classical
   obtain ⟨l, hl⟩ := qdet_eq_sum_words E u
-  refine ⟨(l.map fun c => (starRingEnd ℂ c.1 * (c.2.map fun p => adjSign ε p.1 p.2).prod) •
-      ((c.2.reverse.map Prod.swap).map fun p => E p.1 p.2).prod).sum, ?_, ?_⟩
+  refine ⟨
+    (l.map fun c =>
+      (starRingEnd ℂ c.1 * (c.2.map fun p => adjSign ε p.1 p.2).prod)
+        • ((c.2.reverse.map Prod.swap).map fun p => E p.1 p.2).prod).sum,
+    ?_,
+    ?_
+  ⟩
   · intro x hx
     clear hl
     induction l with
@@ -49,9 +60,10 @@ theorem anyCap_adj {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] 
       rw [ih]
       congr 1
       have h := eword_adjoint hU c.2 y x
-      have h' : inner ℂ x ((c.2.map fun p => E p.1 p.2).prod y) =
-          starRingEnd ℂ (c.2.map fun p => adjSign ε p.1 p.2).prod *
-            inner ℂ (((c.2.reverse.map Prod.swap).map fun p => E p.1 p.2).prod x) y := by
+      have h'
+          : inner ℂ x ((c.2.map fun p => E p.1 p.2).prod y)
+            = starRingEnd ℂ (c.2.map fun p => adjSign ε p.1 p.2).prod
+              * inner ℂ (((c.2.reverse.map Prod.swap).map fun p => E p.1 p.2).prod x) y := by
         rw [← inner_conj_symm, h, map_mul, inner_conj_symm]
       rw [h', map_mul, starRingEnd_self_apply]
       ring

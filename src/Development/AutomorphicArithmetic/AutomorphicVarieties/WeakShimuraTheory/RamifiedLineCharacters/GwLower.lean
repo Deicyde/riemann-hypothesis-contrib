@@ -6,16 +6,30 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.Gys.gwLower :
-    GlobalFiniteness → GreenbergWiles → ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M] [TopologicalSpace M] [DiscreteTopology M], l ≠ 2 → ∀ (S : Finset (HeightOneSpectrum (𝓞 F))) (ρ : Representation (ZMod (l ^ 1)) (GS Ω (S : Set (HeightOneSpectrum (𝓞 F)))) M), ContainsAbove S l → ContAction ρ →
-      ∀ Av : S → ValuationSubring Ω, (∀ v, IsPlaceOver (Av v) v.1) → ∀ L : LocCond ρ (locFam S Av),
-        ∏ v : S, Nat.card (L v) ≤ Nat.card (Sel ρ (locFam S Av) (continuous_locFam S Av) L) * (Nat.card (TDual (ZMod (l ^ 1)) M) * Nat.card M ^ Module.finrank ℚ F) *
-          ∏ v : S, Nat.card (H0 (ρ.comp (locFam S Av v))) := by
+theorem UpperTheory.V.Ws.Gys.gwLower
+    : GlobalFiniteness → GreenbergWiles
+      → ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+          [Fact l.Prime] (M : Type) [AddCommGroup M] [Module (ZMod (l ^ 1)) M] [Finite M]
+          [TopologicalSpace M] [DiscreteTopology M],
+        l ≠ 2
+          → ∀ (S : Finset (HeightOneSpectrum (𝓞 F)))
+              (ρ : Representation (ZMod (l ^ 1)) (GS Ω (S : Set (HeightOneSpectrum (𝓞 F)))) M),
+            ContainsAbove S l → ContAction ρ
+              → ∀ Av : S → ValuationSubring Ω,
+                (∀ v, IsPlaceOver (Av v) v.1)
+                  → ∀ L : LocCond ρ (locFam S Av),
+                    ∏ v : S, Nat.card (L v)
+                      ≤ Nat.card (Sel ρ (locFam S Av) (continuous_locFam S Av) L)
+                        * (Nat.card (TDual (ZMod (l ^ 1)) M) * Nat.card M ^ Module.finrank ℚ F)
+                        * ∏ v : S, Nat.card (H0 (ρ.comp (locFam S Av v))) := by
   classical
   intro hGF hGW F Ω _ _ _ _ _ l _ M _ _ _ _ _ hl S ρ hS hρ Av hA L
-  obtain ⟨μ, hμ⟩ := GlobalTheory.Published.PoitouTate.exists_lift_cycMod (F := F) (Ω := Ω) (l := l) (r := 1) (S := S) hS
+  obtain ⟨μ, hμ⟩ :=
+    GlobalTheory.Published.PoitouTate.exists_lift_cycMod (F := F) (Ω := Ω) (l := l) (r := 1)
+      (S := S) hS
   obtain ⟨c, hc⟩ := UpperTheory.V.Ws.Gys.ccEx F Ω
   have e := hGW F Ω l 1 M S ρ one_pos hl hS hρ μ hμ Av hA c hc L
   haveI : NeZero (l ^ 1) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
@@ -35,12 +49,18 @@ theorem UpperTheory.V.Ws.Gys.gwLower :
     Nat.card_le_card_of_injective _ Subtype.val_injective
   have b4 : archH0Card S ρ c ≤ Nat.card M ^ Module.finrank ℚ F := by
     unfold archH0Card
-    have h1 : (∏ w ∈ Finset.univ.filter (fun w : InfinitePlace F => w.IsReal),
-        Nat.card {m : M // ρ (toGS Ω _ (c w)) m = m}) ≤ Nat.card M ^ InfinitePlace.nrRealPlaces F := by
-      have h2 := Finset.prod_le_pow_card (Finset.univ.filter (fun w : InfinitePlace F => w.IsReal))
-        (fun w => Nat.card {m : M // ρ (toGS Ω _ (c w)) m = m}) (Nat.card M)
-        (fun w _ => Nat.card_le_card_of_injective _ Subtype.val_injective)
-      have h3 : (Finset.univ.filter (fun w : InfinitePlace F => w.IsReal)).card = InfinitePlace.nrRealPlaces F := by
+    have h1
+        : (∏ w ∈ Finset.univ.filter (fun w : InfinitePlace F => w.IsReal),
+            Nat.card {m : M // ρ (toGS Ω _ (c w)) m = m})
+          ≤ Nat.card M ^ InfinitePlace.nrRealPlaces F := by
+      have h2 :=
+        Finset.prod_le_pow_card (Finset.univ.filter (fun w : InfinitePlace F => w.IsReal))
+          (fun w => Nat.card {m : M // ρ (toGS Ω _ (c w)) m = m})
+          (Nat.card M)
+          (fun w _ => Nat.card_le_card_of_injective _ Subtype.val_injective)
+      have h3
+          : (Finset.univ.filter (fun w : InfinitePlace F => w.IsReal)).card
+            = InfinitePlace.nrRealPlaces F := by
         rw [InfinitePlace.nrRealPlaces, Fintype.card_subtype]
       rwa [h3] at h2
     refine (Nat.mul_le_mul_right _ h1).trans ?_
@@ -50,6 +70,9 @@ theorem UpperTheory.V.Ws.Gys.gwLower :
     omega
   have hpos := Nat.mul_pos (Nat.mul_pos (Nat.mul_pos p1 p2) p3) p4
   refine (Nat.le_of_dvd hpos (Dvd.intro_left _ e.symm)).trans ?_
-  calc _ = Nat.card (Sel ρ (locFam S Av) (continuous_locFam S Av) L) * (Nat.card (H0 (twDual μ ρ)) * archH0Card S ρ c) *
-          ∏ v : S, Nat.card (H0 (ρ.comp (locFam S Av v))) := by ring
+  calc
+    _ = Nat.card (Sel ρ (locFam S Av) (continuous_locFam S Av) L)
+        * (Nat.card (H0 (twDual μ ρ)) * archH0Card S ρ c)
+        * ∏ v : S, Nat.card (H0 (ρ.comp (locFam S Av v))) := by
+      ring
     _ ≤ _ := Nat.mul_le_mul_right _ (Nat.mul_le_mul_left _ (Nat.mul_le_mul b2 b4))

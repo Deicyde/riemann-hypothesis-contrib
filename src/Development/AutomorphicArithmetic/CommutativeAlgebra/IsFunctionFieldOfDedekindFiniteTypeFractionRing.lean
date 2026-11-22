@@ -7,11 +7,14 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.IsFunctionFie
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField UpperTheory.Et.Sel LateralTheory.E.E4
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC GroundTheory.FunctionField
+  UpperTheory.Et.Sel LateralTheory.E.E4
 open scoped TensorProduct
 
-theorem UpperTheory.isFunctionField_of_dedekind_finiteType_fractionRing :
-    ∀ (k K : Type) [Field k] [Field K] [Algebra k K] (B : Subalgebra k K), IsDedekindDomain B → Algebra.FiniteType k B → ¬ IsField B → IsFractionRing B K → IsFunctionField k K := by
+theorem UpperTheory.isFunctionField_of_dedekind_finiteType_fractionRing
+    : ∀ (k K : Type) [Field k] [Field K] [Algebra k K] (B : Subalgebra k K),
+      IsDedekindDomain B → Algebra.FiniteType k B → ¬ IsField B → IsFractionRing B K
+        → IsFunctionField k K := by
   intro k K _ _ _ B hD hF hB hFr
   have hdim : ringKrullDim B = 1 := by
     apply eq_of_le_of_not_lt ?_ fun h' ↦ hB ?_

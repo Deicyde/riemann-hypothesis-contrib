@@ -6,29 +6,40 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem UpperTheory.V.Pa.Core.freeN_quot {R S M : Type} [CommRing R] [CommRing S] [AddCommGroup M] [Module R M]
-    (s : S →+* R) (I K : Ideal S) (hIK : I ≤ K) (c : ℕ) (e : M ≃+ (Fin c → S ⧸ I))
-    (he : ∀ z x, e (s z • x) = z • e x) :
-    ∃ e' : (M ⧸ (K.map s • ⊤ : Submodule R M)) ≃+ (Fin c → S ⧸ K), ∀ a x, e' (s a • x) = a • e' x :=
+private theorem UpperTheory.V.Pa.Core.freeN_quot
+    {R S M : Type} [CommRing R] [CommRing S] [AddCommGroup M] [Module R M]
+    (s : S →+* R)
+    (I K : Ideal S) (hIK : I ≤ K)
+    (c : ℕ) (e : M ≃+ (Fin c → S ⧸ I)) (he : ∀ z x, e (s z • x) = z • e x)
+    : ∃ e' : (M ⧸ (K.map s • ⊤ : Submodule R M)) ≃+ (Fin c → S ⧸ K), ∀ a x,
+      e' (s a • x) = a • e' x :=
   _root_.UpperTheory.Reformulated.B.FreeModuleQuotient.freeN_quot s I K hIK c e he
 
-private theorem UpperTheory.V.Pa.Core.freeN_le (l : ℕ) (hl : l.Prime) (R : Type) [CommRing R] [IsLocalRing R]
-    (hR : (l : R) ∈ maximalIdeal R) (q n : ℕ) (a : Fin q → ℕ) (k j : ℕ) (ha : ∀ i, j + k ≤ a i) :
-    delIdeal l R n a ≤ kjIdeal R (Fin q × Fin n) k j := by
+private theorem UpperTheory.V.Pa.Core.freeN_le
+    (l : ℕ) (hl : l.Prime)
+    (R : Type) [CommRing R] [IsLocalRing R]
+    (hR : (l : R) ∈ maximalIdeal R)
+    (q n : ℕ) (a : Fin q → ℕ)
+    (k j : ℕ) (ha : ∀ i, j + k ≤ a i)
+    : delIdeal l R n a ≤ kjIdeal R (Fin q × Fin n) k j := by
   refine Ideal.span_le.2 ?_
   rintro _ ⟨p, rfl⟩
   have h1 := ha p.1
   have h2 : a p.1 - j < l ^ (a p.1 - j) := Nat.lt_pow_self hl.one_lt
-  have h := one_add_pow_sub_one_mem (MvPowerSeries (Fin q × Fin n) R) l hl (MvPowerSeries.X p) (a p.1) j k
-    (by omega) (by omega)
+  have h :=
+    one_add_pow_sub_one_mem (MvPowerSeries (Fin q × Fin n) R) l hl (MvPowerSeries.X p) (a p.1) j k
+      (by omega) (by omega)
   refine (sup_le_sup ?_ ?_ : _ ≤ kjIdeal R (Fin q × Fin n) k j) h
   · rw [Ideal.span_singleton_le_iff_mem]
     exact Ideal.pow_mem_pow (Ideal.subset_span (Set.mem_range_self p)) k
   · rw [Ideal.span_singleton_le_iff_mem]
-    have := Ideal.mem_map_of_mem (MvPowerSeries.C : R →+* MvPowerSeries (Fin q × Fin n) R) (Ideal.pow_mem_pow hR j)
+    have :=
+      Ideal.mem_map_of_mem (MvPowerSeries.C : R →+* MvPowerSeries (Fin q × Fin n) R)
+        (Ideal.pow_mem_pow hR j)
     rwa [map_pow, map_natCast] at this
 
 theorem UpperTheory.V.Pa.Core.freeN :

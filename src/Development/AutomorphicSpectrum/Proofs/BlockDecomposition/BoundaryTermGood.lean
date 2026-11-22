@@ -93,18 +93,21 @@ lemma leftGood_of {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {A : ℂ
     have : ‖z‖ ≤ 1 + ‖z‖ := by simp
     gcongr
 
-theorem differentiableOn_integral {T E : Type} [TopologicalSpace T] [CompactSpace T] [MeasurableSpace T]
-    [BorelSpace T] [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
-    [SecondCountableTopology E] (μ : Measure T) [IsFiniteMeasure μ] {r : T → E} (hr : Continuous r)
-    {ζ : ℂ → T → ℂ} (hζ : LeftFam ζ) :
-    DifferentiableOn ℂ (fun z => ∫ κ, ζ z κ • r κ ∂μ) {z | z.re < 1 / 2} := by
+theorem differentiableOn_integral
+    {T E : Type} [TopologicalSpace T] [CompactSpace T] [MeasurableSpace T] [BorelSpace T]
+    [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E] [SecondCountableTopology E]
+    (μ : Measure T) [IsFiniteMeasure μ]
+    {r : T → E} (hr : Continuous r)
+    {ζ : ℂ → T → ℂ} (hζ : LeftFam ζ)
+    : DifferentiableOn ℂ (fun z => ∫ κ, ζ z κ • r κ ∂μ) {z | z.re < 1 / 2} := by
   have hopen : IsOpen {z : ℂ | z.re < 1 / 2} := isOpen_lt Complex.continuous_re continuous_const
   intro z₀ hz₀
   have hz₀' : z₀.re < 1 / 2 := hz₀
   obtain ⟨ε, hε⟩ : ∃ ε, ε = (1 / 2 - z₀.re) / 4 := ⟨_, rfl⟩
   have hε0 : 0 < ε := by rw [hε]; linarith
-  have hball : ∀ w ∈ closedBall z₀ (2 * ε), w.re < 1 / 2 ∧ z₀.re - 2 * ε ≤ w.re ∧ w.re ≤ z₀.re + 2 * ε ∧
-      ‖w‖ ≤ ‖z₀‖ + 2 * ε := by
+  have hball
+      : ∀ w ∈ closedBall z₀ (2 * ε),
+        w.re < 1 / 2 ∧ z₀.re - 2 * ε ≤ w.re ∧ w.re ≤ z₀.re + 2 * ε ∧ ‖w‖ ≤ ‖z₀‖ + 2 * ε := by
     intro w hw
     have h1 : ‖w - z₀‖ ≤ 2 * ε := by simpa [dist_eq_norm] using hw
     have h2 : |(w - z₀).re| ≤ ‖w - z₀‖ := Complex.abs_re_le_norm _
@@ -128,13 +131,16 @@ theorem differentiableOn_integral {T E : Type} [TopologicalSpace T] [CompactSpac
   have hR' : ∀ t, ‖r t‖ ≤ R := fun t => hR t (Set.mem_univ t)
   have hcont : ∀ z : ℂ, z.re < 1 / 2 → Continuous (ζ z) := by
     intro z hz
-    have h := hζ.cont.comp_continuous (f := fun t : T => (z, t)) (by fun_prop)
-      (fun t => ⟨hz, Set.mem_univ t⟩)
+    have h :=
+      hζ.cont.comp_continuous
+        (f := fun t : T => (z, t))
+        (by fun_prop)
+        (fun t => ⟨hz, Set.mem_univ t⟩)
     exact h
   have hmeasF : ∀ z : ℂ, z.re < 1 / 2 → AEStronglyMeasurable (fun κ => ζ z κ • r κ) μ := fun z hz =>
     ((hcont z hz).measurable.aestronglyMeasurable).smul hr.aestronglyMeasurable
-  have hdiff : ∀ (t : T) (z : ℂ), z.re < 1 / 2 → HasDerivAt (ζ · t) (deriv (ζ · t) z) z := fun t z hz =>
-    (((hζ.hol t) z hz).differentiableAt (hopen.mem_nhds hz)).hasDerivAt
+  have hdiff : ∀ (t : T) (z : ℂ), z.re < 1 / 2 → HasDerivAt (ζ · t) (deriv (ζ · t) z) z :=
+    fun t z hz => (((hζ.hol t) z hz).differentiableAt (hopen.mem_nhds hz)).hasDerivAt
   have hd0 : Measurable fun t => deriv (ζ · t) z₀ := by
     let h : ℕ → ℂ := fun n => ((ε / (n + 1) : ℝ) : ℂ)
     have hh0 : ∀ n, h n ≠ 0 := fun n => by
@@ -155,7 +161,9 @@ theorem differentiableOn_integral {T E : Type} [TopologicalSpace T] [CompactSpac
       have h2 := (Complex.continuous_ofReal.tendsto 0).comp h1
       simpa [h, Function.comp_def] using h2
     refine measurable_of_tendsto_metrizable
-      (f := fun (n : ℕ) t => (h n)⁻¹ • (ζ (z₀ + h n) t - ζ z₀ t)) (fun n => ?_) ?_
+      (f := fun (n : ℕ) t => (h n)⁻¹ • (ζ (z₀ + h n) t - ζ z₀ t))
+      (fun n => ?_)
+      ?_
     · have hc : Continuous fun t => (h n)⁻¹ • (ζ (z₀ + h n) t - ζ z₀ t) :=
         (continuous_const_smul (h n)⁻¹).comp
           (show Continuous fun t => ζ (z₀ + h n) t - ζ z₀ t from
@@ -164,40 +172,41 @@ theorem differentiableOn_integral {T E : Type} [TopologicalSpace T] [CompactSpac
     · rw [tendsto_pi_nhds]
       intro t
       exact (hasDerivAt_iff_tendsto_slope_zero.mp (hdiff t z₀ hz₀')).comp hlim
-  have hmain := hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := μ) (𝕜 := ℂ)
-    (F := fun z κ => ζ z κ • r κ) (F' := fun z κ => deriv (ζ · κ) z • r κ) (x₀ := z₀)
-    (s := ball z₀ ε) (bound := fun _ => B / ε * R)
-    (ball_mem_nhds z₀ hε0)
-    (by
-      filter_upwards [hopen.mem_nhds hz₀] with z hz using hmeasF z hz)
-    (by
-      refine Integrable.of_bound (hmeasF z₀ hz₀') (B * R) (Eventually.of_forall fun t => ?_)
-      rw [norm_smul]
-      have h1 := hbd z₀ (mem_closedBall_self (by positivity)) t
-      have h0 : 0 ≤ B := (norm_nonneg _).trans h1
-      exact mul_le_mul h1 (hR' t) (norm_nonneg _) h0)
-    (hd0.aestronglyMeasurable.smul hr.aestronglyMeasurable)
-    (Eventually.of_forall fun t z hz => by
-      have hz' : dist z z₀ < ε := hz
-      have hsph : closedBall z ε ⊆ closedBall z₀ (2 * ε) := by
-        intro w hw
-        have h1 : dist w z ≤ ε := hw
-        have h2 := dist_triangle w z z₀
-        show dist w z₀ ≤ 2 * ε
-        linarith
-      have hder : ‖deriv (ζ · t) z‖ ≤ B / ε :=
-        Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hε0
-          (((hζ.hol t).mono hsub).mono hsph |>.diffContOnCl_ball subset_rfl)
-          (fun w hw => hbd w (hsph (sphere_subset_closedBall hw)) t)
-      rw [norm_smul]
-      exact mul_le_mul hder (hR' t) (norm_nonneg _) ((norm_nonneg _).trans hder))
-    (integrable_const _)
-    (Eventually.of_forall fun t z hz => by
-      have hz' : z ∈ closedBall z₀ (2 * ε) := by
-        have : dist z z₀ < ε := hz
-        show dist z z₀ ≤ 2 * ε
-        linarith
-      exact (hdiff t z (hsub hz')).smul_const (r t))
+  have hmain :=
+    hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := μ) (𝕜 := ℂ)
+      (F := fun z κ => ζ z κ • r κ)
+      (F' := fun z κ => deriv (ζ · κ) z • r κ)
+      (x₀ := z₀) (s := ball z₀ ε)
+      (bound := fun _ => B / ε * R)
+      (ball_mem_nhds z₀ hε0) (by filter_upwards [hopen.mem_nhds hz₀] with z hz using hmeasF z hz)
+      (by
+        refine Integrable.of_bound (hmeasF z₀ hz₀') (B * R) (Eventually.of_forall fun t => ?_)
+        rw [norm_smul]
+        have h1 := hbd z₀ (mem_closedBall_self (by positivity)) t
+        have h0 : 0 ≤ B := (norm_nonneg _).trans h1
+        exact mul_le_mul h1 (hR' t) (norm_nonneg _) h0)
+      (hd0.aestronglyMeasurable.smul hr.aestronglyMeasurable)
+      (Eventually.of_forall fun t z hz => by
+        have hz' : dist z z₀ < ε := hz
+        have hsph : closedBall z ε ⊆ closedBall z₀ (2 * ε) := by
+          intro w hw
+          have h1 : dist w z ≤ ε := hw
+          have h2 := dist_triangle w z z₀
+          show dist w z₀ ≤ 2 * ε
+          linarith
+        have hder : ‖deriv (ζ · t) z‖ ≤ B / ε :=
+          Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hε0
+            (((hζ.hol t).mono hsub).mono hsph |>.diffContOnCl_ball subset_rfl)
+            (fun w hw => hbd w (hsph (sphere_subset_closedBall hw)) t)
+        rw [norm_smul]
+        exact mul_le_mul hder (hR' t) (norm_nonneg _) ((norm_nonneg _).trans hder))
+      (integrable_const _)
+      (Eventually.of_forall fun t z hz => by
+        have hz' : z ∈ closedBall z₀ (2 * ε) := by
+          have : dist z z₀ < ε := hz
+          show dist z z₀ ≤ 2 * ε
+          linarith
+        exact (hdiff t z (hsub hz')).smul_const (r t))
   exact hmain.2.differentiableAt.differentiableWithinAt
 
 theorem bGood : BGood := by
@@ -214,11 +223,11 @@ theorem bGood : BGood := by
   have hpt : ∀ κ : K, ‖ζ z κ • ρ κ‖ ≤ |M| * |R| * (1 + ‖z‖) ^ 2 := by
     intro κ
     rw [norm_smul]
-    have h3 : ‖ζ z κ‖ ≤ |M| * (1 + ‖z‖) ^ 2 :=
-      (hM z h1 h2 κ).trans (by gcongr; exact le_abs_self M)
+    have h3 : ‖ζ z κ‖ ≤ |M| * (1 + ‖z‖) ^ 2 := (hM z h1 h2 κ).trans (by gcongr; exact le_abs_self M)
     have h4 : ‖ρ κ‖ ≤ |R| := (hR κ (Set.mem_univ κ)).trans (le_abs_self R)
-    calc ‖ζ z κ‖ * ‖ρ κ‖ ≤ (|M| * (1 + ‖z‖) ^ 2) * |R| :=
-          mul_le_mul h3 h4 (norm_nonneg _) (by positivity)
+    calc
+      ‖ζ z κ‖ * ‖ρ κ‖
+        ≤ (|M| * (1 + ‖z‖) ^ 2) * |R| := mul_le_mul h3 h4 (norm_nonneg _) (by positivity)
       _ = |M| * |R| * (1 + ‖z‖) ^ 2 := by ring
   have := norm_integral_le_of_norm_le_const (μ := μ) (Eventually.of_forall hpt)
   simpa [avg] using this

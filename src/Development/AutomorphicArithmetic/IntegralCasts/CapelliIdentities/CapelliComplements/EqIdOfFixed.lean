@@ -49,13 +49,14 @@ private lemma eq_id_of_fix {F E : Type} [Field F] [Field E] [Algebra F E]
     · simp [b, hx]
   exact LinearMap.congr_fun heq y
 
-theorem goal1 :
-  ∀ {F E : Type} [inst : Field.{0} F] [inst_1 : NumberField.{0} F] [inst_2 : Field.{0} E] [inst_3 : NumberField.{0} E]
-  [inst_4 : Algebra.{0, 0} F E] {σ : AlgHom.{0, 0, 0} F E E},
-  HeckeCharacterZeroLocus.SiegelWeilU.IsCMExt F E σ →
-    ∀ {x : E},
-      Eq.{1} (DFunLike.coe.{1, 1, 1} σ x) x →
-        Exists.{1} fun (t : F) ↦ Eq.{1} (DFunLike.coe.{1, 1, 1} (Algebra.algebraMap.{0, 0} F E) t) x := by
+theorem goal1
+    : ∀ {F E : Type} [inst : Field.{0} F] [inst_1 : NumberField.{0} F] [inst_2 : Field.{0} E]
+        [inst_3 : NumberField.{0} E] [inst_4 : Algebra.{0, 0} F E] {σ : AlgHom.{0, 0, 0} F E E},
+      HeckeCharacterZeroLocus.SiegelWeilU.IsCMExt F E σ
+        → ∀ {x : E},
+          Eq.{1} (DFunLike.coe.{1, 1, 1} σ x) x
+            → Exists.{1} fun (t : F) ↦
+              Eq.{1} (DFunLike.coe.{1, 1, 1} (Algebra.algebraMap.{0, 0} F E) t) x := by
   intro F E _ _ _ _ _ σ h x hx
   by_contra hno0
   have hno : ∀ t : F, algebraMap F E t ≠ x := fun t ht => hno0 ⟨t, ht⟩

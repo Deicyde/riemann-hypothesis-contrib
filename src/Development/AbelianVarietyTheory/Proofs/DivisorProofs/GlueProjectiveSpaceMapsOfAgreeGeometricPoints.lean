@@ -8,20 +8,27 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ThetaGlue
 
-theorem hom_ext_of_geometric {Z P S : Scheme.{0}} [IsReduced Z] (q : P ⟶ S) [IsSeparated q] (a b : Z ⟶ P)
-    (hq : a ≫ q = b ≫ q)
-    (h : ∀ (K : Type) [Field K] [IsAlgClosed K] (y : Sp K ⟶ Z), y ≫ a = y ≫ b) : a = b := by
+theorem hom_ext_of_geometric
+    {Z P S : Scheme.{0}} [IsReduced Z]
+    (q : P ⟶ S) [IsSeparated q]
+    (a b : Z ⟶ P)
+    (hq : a ≫ q = b ≫ q) (h : ∀ (K : Type) [Field K] [IsAlgClosed K] (y : Sp K ⟶ Z), y ≫ a = y ≫ b)
+    : a = b := by
   let T : Z → Scheme.{0} := fun z => Sp (AlgebraicClosure (Z.residueField z))
   let pt : ∀ z, T z ⟶ Z := fun z =>
-    spMap (algebraMap (Z.residueField z) (AlgebraicClosure (Z.residueField z))) ≫ Z.fromSpecResidueField z
+    spMap (algebraMap (Z.residueField z) (AlgebraicClosure (Z.residueField z)))
+      ≫ Z.fromSpecResidueField z
   let m : (∐ T) ⟶ Z := Sigma.desc pt
   have hs : Function.Surjective m.base := by
     intro z
@@ -35,12 +42,14 @@ theorem hom_ext_of_geometric {Z P S : Scheme.{0}} [IsReduced Z] (q : P ⟶ S) [I
   simp only [m, Sigma.ι_desc_assoc]
   exact h _ (pt z)
 
-theorem glue_geom : ∀ (o : Type) [CommRing o] (n : ℕ) (X : Scheme.{0}) [IsReduced X] (s : X ⟶ Sp o) (I : Type)
-    (W : I → X.Opens) (f : ∀ i, (W i).toScheme ⟶ PSpace o n), (⨆ i, W i) = ⊤ →
-    (∀ i, f i ≫ PSpace.str o n = (W i).ι ≫ s) →
-    (∀ i j (K : Type) [Field K] [IsAlgClosed K] (y : Sp K ⟶ (W i).toScheme) (y' : Sp K ⟶ (W j).toScheme),
-      y ≫ (W i).ι = y' ≫ (W j).ι → y ≫ f i = y' ≫ f j) →
-    ∃ g : X ⟶ PSpace o n, g ≫ PSpace.str o n = s ∧ ∀ i, (W i).ι ≫ g = f i := by
+theorem glue_geom
+    : ∀ (o : Type) [CommRing o] (n : ℕ) (X : Scheme.{0}) [IsReduced X] (s : X ⟶ Sp o) (I : Type)
+        (W : I → X.Opens) (f : ∀ i, (W i).toScheme ⟶ PSpace o n),
+      (⨆ i, W i) = ⊤ → (∀ i, f i ≫ PSpace.str o n = (W i).ι ≫ s)
+        → (∀ i j (K : Type) [Field K] [IsAlgClosed K] (y : Sp K ⟶ (W i).toScheme)
+            (y' : Sp K ⟶ (W j).toScheme),
+          y ≫ (W i).ι = y' ≫ (W j).ι → y ≫ f i = y' ≫ f j)
+        → ∃ g : X ⟶ PSpace o n, g ≫ PSpace.str o n = s ∧ ∀ i, (W i).ι ≫ g = f i := by
   intro o _ n X _ s I W f hW hf hg
   have : IsSeparated (PSpace.str o n) := by
     have := isProper_str o n

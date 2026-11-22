@@ -34,10 +34,12 @@ theorem codimOne_holds : CodimOne := by
     have h1 := (genericPoint_spec I.subscheme).image I.subschemeι.continuous
     rw [Set.image_univ, hrange, closure_closure] at h1
     exact h1.eq isGenericPoint_closure
-  have key := GlobalTheory.PrimeDivDim.dim_eq_of_coheight_eq_one ℤ X p D hD I.subscheme I.subschemeι
-    (by rw [hgen]; exact hz)
-  calc topologicalKrullDim (closure ({z} : Set X))
-      = topologicalKrullDim I.subscheme := GlobalTheory.topologicalKrullDim_eq_of_isEmbedding hemb hrange
+  have key :=
+    GlobalTheory.PrimeDivDim.dim_eq_of_coheight_eq_one ℤ X p D hD I.subscheme I.subschemeι
+      (by rw [hgen]; exact hz)
+  calc
+    topologicalKrullDim (closure ({z} : Set X)) = topologicalKrullDim I.subscheme :=
+      GlobalTheory.topologicalKrullDim_eq_of_isEmbedding hemb hrange
     _ = D := key
 
 end GlobalTheory.CompanionTheory.MixZ

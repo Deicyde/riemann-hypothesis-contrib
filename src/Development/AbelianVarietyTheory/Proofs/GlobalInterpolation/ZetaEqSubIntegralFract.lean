@@ -41,30 +41,35 @@ lemma integrableOn_fract_mul {s : ℂ} (hs : 1 < s.re) :
         mul_le_mul_of_nonneg_right this (norm_nonneg _)
     _ = ‖(t : ℂ) ^ (-(s + 1))‖ := one_mul _
 
-theorem zeta_eq_sub_integral_fract :
-    (let d1 : ℂ → ℂ := @(fun (s : ℂ) ↦ ∫ (t : ℝ) in Set.Ioi (1 : ℝ), (↑(Int.fract t) : ℂ) * (↑t : ℂ) ^ (-(s + (1 : ℂ)))); ∀ {s : ℂ}, (1 : ℝ) < Complex.re s → riemannZeta s = s / (s - (1 : ℂ)) - s * d1 s) := by
+theorem zeta_eq_sub_integral_fract
+    : (let d1 : ℂ → ℂ :=
+         @(fun (s : ℂ) ↦
+           ∫ (t : ℝ) in Set.Ioi (1 : ℝ), (↑(Int.fract t) : ℂ) * (↑t : ℂ) ^ (-(s + (1 : ℂ))))
+       ∀ {s : ℂ}, (1 : ℝ) < Complex.re s → riemannZeta s = s / (s - (1 : ℂ)) - s * d1 s) := by
   intro d1 s hs
   simp only [d1]
   have hA := integrableOn_cpow_neg hs
   have hB := integrableOn_fract_mul hs
-  have hsplit : ∫ t in Set.Ioi (1 : ℝ), ((⌊t⌋₊ : ℕ) : ℂ) * (t : ℂ) ^ (-(s + 1)) =
-      (∫ t in Set.Ioi (1 : ℝ), (t : ℂ) ^ (-s)) -
-        ∫ t in Set.Ioi (1 : ℝ), ((Int.fract t : ℝ) : ℂ) * (t : ℂ) ^ (-(s + 1)) := by
+  have hsplit
+      : ∫ t in Set.Ioi (1 : ℝ), ((⌊t⌋₊ : ℕ) : ℂ) * (t : ℂ) ^ (-(s + 1))
+        = (∫ t in Set.Ioi (1 : ℝ), (t : ℂ) ^ (-s))
+          - ∫ t in Set.Ioi (1 : ℝ), ((Int.fract t : ℝ) : ℂ) * (t : ℂ) ^ (-(s + 1)) := by
     rw [← integral_sub hA hB]
     refine setIntegral_congr_fun measurableSet_Ioi fun t ht => ?_
     have ht0 : (0 : ℝ) < t := lt_trans one_pos ht
     have hfl : ((⌊t⌋₊ : ℕ) : ℝ) = t - Int.fract t := by
       rw [Int.self_sub_fract, natCast_floor_eq_intCast_floor ht0.le]
     have hpow : (t : ℂ) ^ (-s) = (t : ℂ) * (t : ℂ) ^ (-(s + 1)) := by
-      rw [show -s = -(s + 1) + 1 by ring, Complex.cpow_add _ _ (by exact_mod_cast ht0.ne'), Complex.cpow_one,
-        mul_comm]
+      rw [show -s = -(s + 1) + 1 by ring, Complex.cpow_add _ _ (by exact_mod_cast ht0.ne'),
+        Complex.cpow_one, mul_comm]
     have hfl' : ((⌊t⌋₊ : ℕ) : ℂ) = (t : ℂ) - ((Int.fract t : ℝ) : ℂ) := by
       rw [← Complex.ofReal_natCast, hfl, Complex.ofReal_sub]
     rw [hpow, hfl']
     ring
   have hI : ∫ t in Set.Ioi (1 : ℝ), (t : ℂ) ^ (-s) = 1 / (s - 1) := by
-    rw [integral_Ioi_cpow_of_lt (by simp only [Complex.neg_re]; linarith) one_pos, Complex.ofReal_one,
-      Complex.one_cpow, show -s + 1 = -(s - 1) by ring, div_neg, neg_div, neg_neg]
+    rw [integral_Ioi_cpow_of_lt (by simp only [Complex.neg_re]; linarith) one_pos,
+      Complex.ofReal_one, Complex.one_cpow, show -s + 1 = -(s - 1) by ring, div_neg, neg_div,
+      neg_neg]
   rw [zeta_eq_mul_integral_floor hs, hsplit, hI]
   ring
 

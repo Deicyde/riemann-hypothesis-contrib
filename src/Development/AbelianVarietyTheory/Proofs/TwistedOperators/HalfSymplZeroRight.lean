@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.T2SpaceHa
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum MeasureTheory
+  GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,8 +24,8 @@ def halfPair (W : HSp D) {r : ℕ} (a t : Mx D W.rank r) : AE D :=
 def halfSympl (W : HSp D) {r : ℕ} (a t : Mx D W.rank r) : AF D.host.F :=
   Algebra.trace (AF D.host.F) (AE D) (incA D D.host.xi0 * halfPair W a t)
 
-theorem halfSympl_add_right (W : HSp D) {r : ℕ} (a t t' : Mx D W.rank r) :
-    halfSympl W a (t + t') = halfSympl W a t + halfSympl W a t' := by
+theorem halfSympl_add_right (W : HSp D) {r : ℕ} (a t t' : Mx D W.rank r)
+    : halfSympl W a (t + t') = halfSympl W a t + halfSympl W a t' := by
   simp only [halfSympl, halfPair]
   rw [← map_add (f := _), ← mul_add, ← Finset.sum_add_distrib]
   congr 2
@@ -33,8 +36,8 @@ theorem halfSympl_add_right (W : HSp D) {r : ℕ} (a t t' : Mx D W.rank r) :
   refine Finset.sum_congr rfl fun k _ => ?_
   simp [mul_add]
 
-theorem halfSympl_add_left (W : HSp D) {r : ℕ} (a a' t : Mx D W.rank r) :
-    halfSympl W (a + a') t = halfSympl W a t + halfSympl W a' t := by
+theorem halfSympl_add_left (W : HSp D) {r : ℕ} (a a' t : Mx D W.rank r)
+    : halfSympl W (a + a') t = halfSympl W a t + halfSympl W a' t := by
   simp only [halfSympl, halfPair]
   rw [← map_add (f := _), ← mul_add, ← Finset.sum_add_distrib]
   congr 2

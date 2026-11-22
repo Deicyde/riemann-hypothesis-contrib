@@ -35,16 +35,22 @@ theorem kernel_operator_exists_of (h : F.OpEx) : SmoothSeminormGrowth := by
   obtain ⟨T, hT, -⟩ := h1 Φ hΦ
   exact ⟨T, hT, (h2 Φ Φ T T hΦ hΦ hT hT).2.2, fun Φ' T' a1 a2 => (h2 Φ Φ' T T' hΦ a1 hT a2).2.1⟩
 
-def GrowthJ : Prop := ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [Nontrivial (InfinitePlace E)] (a b : ℕ)
-  [MeasurableSpace (GA E a)] [BorelSpace (GA E a)] [MeasurableSpace (GA E b)] [BorelSpace (GA E b)]
-  (μ₁ : Measure (GA E a)) [μ₁.IsHaarMeasure] (μ₂ : Measure (GA E b)) [μ₂.IsHaarMeasure],
-  ∃ D : Dom E a b, ∀ (ι : Type) [Fintype ι] (Φ₁ Φ₂ : Matrix ι ι (H E a b → ℂ))
-    (T₁ T₂ : Hs (ι := ι) D →L[ℂ] Hs (ι := ι) D) (M : Matrix ι ι ℂ) (r₀ r₁ : ℝ), IsTestM Φ₁ → IsTestM Φ₂ →
-    IsROp D Φ₁ T₁ → IsROp D Φ₂ T₂ → 0 ≤ r₀ → 0 ≤ r₁ → ∃ (C : ℝ) (N : ℕ), ∀ (k : ℕ)
-      (U : Hs (ι := ι) D →L[ℂ] Hs (ι := ι) D) (Φ : Matrix ι ι (H E a b → ℂ)), IsTestM Φ → IsROp D Φ (T₁ * U * T₂) →
-      D4.IsTest2J (F.trM Φ M) (r₀ + k * r₁) → ‖ellSum2 μ₁ μ₂ (F.trM Φ M)‖ ≤ C * (1 + k) ^ N * ‖U‖
+def GrowthJ : Prop :=
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [Nontrivial (InfinitePlace E)] (a b : ℕ)
+      [MeasurableSpace (GA E a)] [BorelSpace (GA E a)] [MeasurableSpace (GA E b)]
+      [BorelSpace (GA E b)] (μ₁ : Measure (GA E a)) [μ₁.IsHaarMeasure] (μ₂ : Measure (GA E b))
+      [μ₂.IsHaarMeasure],
+    ∃ D : Dom E a b,
+      ∀ (ι : Type) [Fintype ι] (Φ₁ Φ₂ : Matrix ι ι (H E a b → ℂ))
+          (T₁ T₂ : Hs (ι := ι) D →L[ℂ] Hs (ι := ι) D) (M : Matrix ι ι ℂ) (r₀ r₁ : ℝ),
+        IsTestM Φ₁ → IsTestM Φ₂ → IsROp D Φ₁ T₁ → IsROp D Φ₂ T₂ → 0 ≤ r₀ → 0 ≤ r₁
+          → ∃ (C : ℝ) (N : ℕ),
+            ∀ (k : ℕ) (U : Hs (ι := ι) D →L[ℂ] Hs (ι := ι) D) (Φ : Matrix ι ι (H E a b → ℂ)),
+              IsTestM Φ → IsROp D Φ (T₁ * U * T₂) → D4.IsTest2J (F.trM Φ M) (r₀ + k * r₁)
+                → ‖ellSum2 μ₁ μ₂ (F.trM Φ M)‖ ≤ C * (1 + k) ^ N * ‖U‖
 
-theorem growthJ_of (hE : D4.EllFormula2J) (hS : F.SBound) (hB : F.Bridge) (hD : DomEx) : GrowthJ := by
+theorem growthJ_of (hE : D4.EllFormula2J) (hS : F.SBound) (hB : F.Bridge) (hD : DomEx)
+    : GrowthJ := by
   intro E _ _ _ _ a b _ _ _ _ μ₁ _ μ₂ _
   obtain ⟨F₁, h₁⟩ := hD E a μ₁
   obtain ⟨F₂, h₂⟩ := hD E b μ₂
@@ -60,7 +66,8 @@ theorem growthJ_of (hE : D4.EllFormula2J) (hS : F.SBound) (hB : F.Bridge) (hD : 
   refine (hb _ U Φ hτ c1 c2).trans ?_
   refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
   rw [mul_assoc, ← mul_pow]
-  refine mul_le_mul (le_abs_self C) (pow_le_pow_left₀ (by positivity) ?_ N) (by positivity) (abs_nonneg C)
+  refine mul_le_mul (le_abs_self C) (pow_le_pow_left₀ (by positivity) ?_ N) (by positivity)
+    (abs_nonneg C)
   have e1 : 0 ≤ C₀ * (1 + r₀) * k := by positivity
   have e2 : 0 ≤ C₀ * r₁ := by positivity
   nlinarith

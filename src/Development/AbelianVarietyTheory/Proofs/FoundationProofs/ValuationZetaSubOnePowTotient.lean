@@ -8,21 +8,24 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem valuationSubring_pow_sub_one_le {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {x : Ω}
-    (hx : A.valuation x ≤ 1) (k : ℕ) :
-    A.valuation (x ^ k - 1) ≤ A.valuation (x - 1) := by
+theorem valuationSubring_pow_sub_one_le
+    {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {x : Ω} (hx : A.valuation x ≤ 1) (k : ℕ)
+    : A.valuation (x ^ k - 1) ≤ A.valuation (x - 1) := by
   have h : x ^ k - 1 = (∑ i ∈ Finset.range k, x ^ i) * (x - 1) := (geom_sum_mul x k).symm
   rw [h, map_mul]
   have hs : A.valuation (∑ i ∈ Finset.range k, x ^ i) ≤ 1 := by
     apply Valuation.map_sum_le
     intro i _
-    rw [map_pow]; exact pow_le_one' hx i
+    rw [map_pow]
+    exact pow_le_one' hx i
   exact mul_le_of_le_one_left' hs
 
-theorem valuation_zeta_sub_one_pow_totient (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω]
-    [Algebra ℚ Ω] (A : ValuationSubring Ω) (n : ℕ) (ζ : Ω) (hn : 1 ≤ n)
-    (hζ : IsPrimitiveRoot ζ (l ^ n)) :
-    A.valuation (ζ - 1) ^ (l ^ n).totient = A.valuation (l : Ω) := by
+theorem valuation_zeta_sub_one_pow_totient
+    (l : ℕ) [Fact l.Prime]
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω)
+    (n : ℕ) (ζ : Ω) (hn : 1 ≤ n) (hζ : IsPrimitiveRoot ζ (l ^ n))
+    : A.valuation (ζ - 1) ^ (l ^ n).totient = A.valuation (l : Ω) := by
   have hN : 0 < l ^ n := pow_pos (Fact.out : l.Prime).pos n
   have hv1 : ∀ {μ : Ω}, IsPrimitiveRoot μ (l ^ n) → A.valuation μ ≤ 1 := by
     intro μ hμ

@@ -81,7 +81,8 @@ lemma exists_strictHenselian_absolutely_closed_local_ring [FiniteDimensional ℝ
   rw [map_zero, dist_zero_right, dist_zero_right] at this
   exact this
 
-variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
+variable
+  [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
   {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X]
 
 omit [FiniteDimensional ℝ V] in
@@ -128,23 +129,26 @@ theorem valuation_bound_of_three : S4 := by
     have hA' : ‖FT μ β F y‖ ≤ A := by simpa using hA 0 y
     have hy := pi_pow_le (fun i => β (b i) y) N
     have h1 : ‖y‖ ^ N ≤ K ^ N * (1 + ∑ i, |β (b i) y| ^ N) := by
-      calc ‖y‖ ^ N ≤ (K * ‖(fun i => β (b i) y : Fin d → ℝ)‖) ^ N :=
-            pow_le_pow_left₀ (norm_nonneg _) (hK y) N
+      calc
+        ‖y‖ ^ N ≤ (K * ‖(fun i => β (b i) y : Fin d → ℝ)‖) ^ N :=
+          pow_le_pow_left₀ (norm_nonneg _) (hK y) N
         _ = K ^ N * ‖(fun i => β (b i) y : Fin d → ℝ)‖ ^ N := mul_pow _ _ _
         _ ≤ _ := by gcongr
     have h3 : (1 + ∑ i, |β (b i) y| ^ N) * ‖FT μ β F y‖ ≤ A + ∑ i, ‖b i‖ ^ N * B := by
       rw [add_mul, Finset.sum_mul, one_mul]
       exact add_le_add hA' (Finset.sum_le_sum fun i _ => hB (b i) y)
     have hFn := norm_nonneg (FT μ β F y)
-    calc (1 + ‖y‖) ^ N * ‖FT μ β F y‖ ≤ 2 ^ N * (1 + ‖y‖ ^ N) * ‖FT μ β F y‖ := by
-          gcongr; exact one_add_pow_le _ (norm_nonneg _) N
+    calc
+      (1 + ‖y‖) ^ N * ‖FT μ β F y‖ ≤ 2 ^ N * (1 + ‖y‖ ^ N) * ‖FT μ β F y‖ := by
+        gcongr; exact one_add_pow_le _ (norm_nonneg _) N
       _ = 2 ^ N * (‖FT μ β F y‖ + ‖y‖ ^ N * ‖FT μ β F y‖) := by ring
       _ ≤ 2 ^ N * (A + K ^ N * (A + ∑ i, ‖b i‖ ^ N * B)) := by
-          refine mul_le_mul_of_nonneg_left (add_le_add hA' ?_) (by positivity)
-          calc ‖y‖ ^ N * ‖FT μ β F y‖
-              ≤ K ^ N * (1 + ∑ i, |β (b i) y| ^ N) * ‖FT μ β F y‖ := by gcongr
-            _ = K ^ N * ((1 + ∑ i, |β (b i) y| ^ N) * ‖FT μ β F y‖) := by ring
-            _ ≤ _ := by gcongr
+        refine mul_le_mul_of_nonneg_left (add_le_add hA' ?_) (by positivity)
+        calc
+          ‖y‖ ^ N * ‖FT μ β F y‖
+            ≤ K ^ N * (1 + ∑ i, |β (b i) y| ^ N) * ‖FT μ β F y‖ := by gcongr
+          _ = K ^ N * ((1 + ∑ i, |β (b i) y| ^ N) * ‖FT μ β F y‖) := by ring
+          _ ≤ _ := by gcongr
 
 end PositivityTheory.jumpWindows
 

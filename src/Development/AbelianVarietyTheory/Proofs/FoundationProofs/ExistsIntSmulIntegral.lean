@@ -10,16 +10,17 @@ namespace GlobalTheory.IntegerScalarIntegral
 
 open NumberField
 
-theorem exists_int_smul_integral {K : Type u_1} [Field K] [NumberField K] (c : K) :
-    ∃ d : ℤ, d ≠ 0 ∧ IsIntegral ℤ (d • c) := by
-  have hc : IsAlgebraic ℤ c :=
-    (IsFractionRing.isAlgebraic_iff ℤ ℚ K).mpr (.of_finite ℚ c)
+theorem exists_int_smul_integral {K : Type u_1} [Field K] [NumberField K] (c : K)
+    : ∃ d : ℤ, d ≠ 0 ∧ IsIntegral ℤ (d • c) := by
+  have hc : IsAlgebraic ℤ c := (IsFractionRing.isAlgebraic_iff ℤ ℚ K).mpr (.of_finite ℚ c)
   exact hc.exists_integral_multiple
 
-theorem exists_int_smul_mem {K : Type u_1} {V : Type u_2} [Field K] [NumberField K]
-    [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-    (L : Submodule (𝓞 K) V) (hL : Submodule.span K (L : Set V) = ⊤) (y : V) :
-    ∃ m : ℤ, m ≠ 0 ∧ m • y ∈ L := by
+theorem exists_int_smul_mem
+    {K : Type u_1} {V : Type u_2} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
+    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    (L : Submodule (𝓞 K) V) (hL : Submodule.span K (L : Set V) = ⊤)
+    (y : V)
+    : ∃ m : ℤ, m ≠ 0 ∧ m • y ∈ L := by
   have hy : y ∈ Submodule.span K (L : Set V) := hL ▸ Submodule.mem_top
   induction hy using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
@@ -43,10 +44,12 @@ theorem exists_int_smul_mem {K : Type u_1} {V : Type u_2} [Field K] [NumberField
     rw [key]
     exact L.smul_mem r hmx
 
-theorem main : ∀ {K : Type u_1} {V : Type u_2} [inst : Field K] [NumberField K] [inst_2 : AddCommGroup V]
-    [inst_3 : Module K V] [inst_4 : Module (NumberField.RingOfIntegers K) V]
-    [IsScalarTower (NumberField.RingOfIntegers K) K V] (L : Submodule (NumberField.RingOfIntegers K) V),
-    Submodule.span K (↑L : Set V) = ⊤ → ∀ (y : V), ∃ (m : ℤ), m ≠ (0 : ℤ) ∧ m • y ∈ L :=
+theorem main
+    : ∀ {K : Type u_1} {V : Type u_2} [inst : Field K] [NumberField K] [inst_2 : AddCommGroup V]
+        [inst_3 : Module K V] [inst_4 : Module (NumberField.RingOfIntegers K) V]
+        [IsScalarTower (NumberField.RingOfIntegers K) K V]
+        (L : Submodule (NumberField.RingOfIntegers K) V),
+      Submodule.span K (↑L : Set V) = ⊤ → ∀ (y : V), ∃ (m : ℤ), m ≠ (0 : ℤ) ∧ m • y ∈ L :=
   fun L hL y => exists_int_smul_mem L hL y
 
 end GlobalTheory.IntegerScalarIntegral

@@ -7,15 +7,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisCocha
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
 namespace UpperTheory.V.Ws.X1.MuBock
 
-private theorem sep {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-    [TotallyDisconnectedSpace G] (K : Subgroup G) (hK : IsClosed (K : Set G)) (hc : commutator G ≤ K)
-    (g : G) (hg : g ∉ K) :
-    ∃ χ : G → AddCircle (1 : ℚ), IsLocallyConstant χ ∧ (∀ x y, χ (x * y) = χ x + χ y) ∧
-      (∀ x ∈ K, χ x = 0) ∧ χ g ≠ 0 := by
+private theorem sep
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+    [TotallyDisconnectedSpace G]
+    (K : Subgroup G) (hK : IsClosed (K : Set G)) (hc : commutator G ≤ K)
+    (g : G) (hg : g ∉ K)
+    : ∃ χ : G → AddCircle (1 : ℚ),
+      IsLocallyConstant χ ∧ (∀ x y, χ (x * y) = χ x + χ y) ∧ (∀ x ∈ K, χ x = 0) ∧ χ g ≠ 0 := by
   have h := ProfiniteGrp.closedSubgroup_eq_sInf_open (⟨K, hK⟩ : ClosedSubgroup G)
   have h' : K = sInf {N : Subgroup G | IsOpen (N : Set G) ∧ K ≤ N} := h
   rw [h', Subgroup.mem_sInf] at hg
@@ -41,14 +45,24 @@ private theorem sep {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGrou
     have : (x : G ⧸ N) = 1 := (QuotientGroup.eq_one_iff x).2 (hKN hx)
     simp only [this, ofMul_one, map_zero]
 
-private theorem lift {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (χ : G → AddCircle (1 : ℚ)) (h1 : IsLocallyConstant χ) (h2 : ∀ x y, χ (x * y) = χ x + χ y) :
-    ∃ (a : G → ℚ) (c : G × G → ℤ), IsLocallyConstant a ∧ IsLocallyConstant c ∧
-      (∀ g, (a g : AddCircle (1 : ℚ)) = χ g) ∧ ∀ g h, (c (g, h) : ℚ) = a g + a h - a (g * h) := by
-  have hs : Function.Surjective (fun x : ℚ => (x : AddCircle (1 : ℚ))) := QuotientAddGroup.mk_surjective
+private theorem lift
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (χ : G → AddCircle (1 : ℚ)) (h1 : IsLocallyConstant χ) (h2 : ∀ x y, χ (x * y) = χ x + χ y)
+    : ∃ (a : G → ℚ) (c : G × G → ℤ),
+      IsLocallyConstant a ∧ IsLocallyConstant c ∧ (∀ g, (a g : AddCircle (1 : ℚ)) = χ g)
+        ∧ ∀ g h, (c (g, h) : ℚ) = a g + a h - a (g * h) := by
+  have hs : Function.Surjective (fun x : ℚ => (x : AddCircle (1 : ℚ))) :=
+    QuotientAddGroup.mk_surjective
   choose σ hσ using hs
   have ha : IsLocallyConstant (fun g => σ (χ g)) := h1.comp σ
-  refine ⟨fun g => σ (χ g), fun p => ⌊σ (χ p.1) + σ (χ p.2) - σ (χ (p.1 * p.2))⌋, ha, ?_, fun g => hσ _, ?_⟩
+  refine ⟨
+    fun g => σ (χ g),
+    fun p => ⌊σ (χ p.1) + σ (χ p.2) - σ (χ (p.1 * p.2))⌋,
+    ha,
+    ?_,
+    fun g => hσ _,
+    ?_
+  ⟩
   · have a1 := ha.comp_continuous (continuous_fst : Continuous (Prod.fst : G × G → G))
     have a2 := ha.comp_continuous (continuous_snd : Continuous (Prod.snd : G × G → G))
     have a3 := ha.comp_continuous (continuous_mul : Continuous (fun p : G × G => p.1 * p.2))
@@ -60,16 +74,24 @@ private theorem lift {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGro
     obtain ⟨n, hn⟩ := (AddCircle.coe_eq_zero_iff _).1 e
     simp only [← hn, zsmul_eq_mul, mul_one, Int.floor_intCast]
 
-private theorem divide {G : Type} [Group G] [TopologicalSpace G] (l : ℕ) [Fact l.Prime]
-    (a : G → ℚ) (c : G × G → ℤ) (ha : IsLocallyConstant a)
-    (hc : ∀ g h, (c (g, h) : ℚ) = a g + a h - a (g * h)) (f : G → ZMod l) (hf : Continuous f)
-    (hfc : ∀ g h, f h - f (g * h) + f g = (c (g, h) : ZMod l)) :
-    ∃ ψ : G → AddCircle (1 : ℚ), IsLocallyConstant ψ ∧ (∀ x y, ψ (x * y) = ψ x + ψ y) ∧
-      ∀ g, l • ψ g = (a g : AddCircle (1 : ℚ)) := by
+private theorem divide
+    {G : Type} [Group G] [TopologicalSpace G]
+    (l : ℕ) [Fact l.Prime]
+    (a : G → ℚ)
+    (c : G × G → ℤ)
+    (ha : IsLocallyConstant a) (hc : ∀ g h, (c (g, h) : ℚ) = a g + a h - a (g * h))
+    (f : G → ZMod l) (hf : Continuous f) (hfc : ∀ g h, f h - f (g * h) + f g = (c (g, h) : ZMod l))
+    : ∃ ψ : G → AddCircle (1 : ℚ),
+      IsLocallyConstant ψ ∧ (∀ x y, ψ (x * y) = ψ x + ψ y)
+        ∧ ∀ g, l • ψ g = (a g : AddCircle (1 : ℚ)) := by
   have hl : (l : ℚ) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
   have hf' : IsLocallyConstant f := (IsLocallyConstant.iff_continuous _).2 hf
-  refine ⟨fun g => (((a g - ((f g).val : ℚ)) / l : ℚ) : AddCircle (1 : ℚ)),
-    ha.comp₂ hf' (fun x y => (((x - (y.val : ℚ)) / l : ℚ) : AddCircle (1 : ℚ))), ?_, ?_⟩
+  refine ⟨
+    fun g => (((a g - ((f g).val : ℚ)) / l : ℚ) : AddCircle (1 : ℚ)),
+    ha.comp₂ hf' (fun x y => (((x - (y.val : ℚ)) / l : ℚ) : AddCircle (1 : ℚ))),
+    ?_,
+    ?_
+  ⟩
   · intro g h
     have e : ((c (g, h) - ((f h).val - (f (g * h)).val + (f g).val : ℤ) : ℤ) : ZMod l) = 0 := by
       push_cast
@@ -92,10 +114,12 @@ private theorem divide {G : Type} [Group G] [TopologicalSpace G] (l : ℕ) [Fact
     field_simp
     ring
 
-private theorem cocycle {G : Type} [Group G] [TopologicalSpace G] (l : ℕ) [Fact l.Prime]
-    (a : G → ℚ) (c : G × G → ℤ) (hcl : IsLocallyConstant c)
-    (hc : ∀ g h, (c (g, h) : ℚ) = a g + a h - a (g * h)) :
-    (fun p => (c p : ZMod l)) ∈ Z2 (charRep (1 : G →* (ZMod l)ˣ)) := by
+private theorem cocycle
+    {G : Type} [Group G] [TopologicalSpace G]
+    (l : ℕ) [Fact l.Prime]
+    (a : G → ℚ) (c : G × G → ℤ)
+    (hcl : IsLocallyConstant c) (hc : ∀ g h, (c (g, h) : ℚ) = a g + a h - a (g * h))
+    : (fun p => (c p : ZMod l)) ∈ Z2 (charRep (1 : G →* (ZMod l)ˣ)) := by
   refine (mem_cocycles2 _ _).2 ⟨(hcl.comp (Int.cast : ℤ → ZMod l)).continuous, fun g h k => ?_⟩
   have e : c (h, k) - c (g * h, k) + c (g, h * k) - c (g, h) = 0 := by
     have : ((c (h, k) - c (g * h, k) + c (g, h * k) - c (g, h) : ℤ) : ℚ) = 0 := by
@@ -107,8 +131,11 @@ private theorem cocycle {G : Type} [Group G] [TopologicalSpace G] (l : ℕ) [Fac
   push_cast at e'
   simpa [charRep_apply] using e'
 
-private theorem add_pow' {G : Type} [Group G] (ψ : G → AddCircle (1 : ℚ))
-    (h : ∀ x y, ψ (x * y) = ψ x + ψ y) (x : G) (n : ℕ) : ψ (x ^ n) = n • ψ x := by
+private theorem add_pow'
+    {G : Type} [Group G]
+    (ψ : G → AddCircle (1 : ℚ)) (h : ∀ x y, ψ (x * y) = ψ x + ψ y)
+    (x : G) (n : ℕ)
+    : ψ (x ^ n) = n • ψ x := by
   induction n with
   | zero =>
     have := h 1 1
@@ -116,18 +143,26 @@ private theorem add_pow' {G : Type} [Group G] (ψ : G → AddCircle (1 : ℚ))
     simpa using this
   | succ n ih => rw [pow_succ, h, ih, succ_nsmul]
 
-private theorem dvd_of_smul (l : ℕ) [Fact l.Prime] (x : AddCircle (1 : ℚ)) (hx : x ≠ 0) (hl : l • x = 0)
-    (i : ℤ) (hi : i • x = 0) : (i : ZMod l) = 0 := by
+private theorem dvd_of_smul
+    (l : ℕ) [Fact l.Prime]
+    (x : AddCircle (1 : ℚ)) (hx : x ≠ 0) (hl : l • x = 0)
+    (i : ℤ) (hi : i • x = 0)
+    : (i : ZMod l) = 0 := by
   have e : addOrderOf x = l := addOrderOf_eq_prime hl hx
   rw [ZMod.intCast_zmod_eq_zero_iff_dvd, ← e]
   exact addOrderOf_dvd_iff_zsmul_eq_zero.2 hi
 
-private theorem core {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-    [TotallyDisconnectedSpace G] (l : ℕ) [Fact l.Prime] (C : Subgroup G) (hC : IsClosed (C : Set G))
-    (hcC : commutator G ≤ C)
-    (hk : ∀ ψ : G → AddCircle (1 : ℚ), IsLocallyConstant ψ → (∀ x y, ψ (x * y) = ψ x + ψ y) → ∀ x ∈ C, ψ x = 0)
-    [Finite (H2 (charRep (1 : G →* (ZMod l)ˣ)))] (hcard : Nat.card (H2 (charRep (1 : G →* (ZMod l)ˣ))) ≤ l)
-    (s t : G) (hs : s ^ l ∈ C) (ht : t ^ l ∈ C) (hsC : s ∉ C) : ∃ n : ℕ, t * (s ^ n)⁻¹ ∈ C := by
+private theorem core
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+    [TotallyDisconnectedSpace G]
+    (l : ℕ) [Fact l.Prime]
+    (C : Subgroup G) (hC : IsClosed (C : Set G)) (hcC : commutator G ≤ C)
+    (hk : ∀ ψ : G → AddCircle (1 : ℚ),
+      IsLocallyConstant ψ → (∀ x y, ψ (x * y) = ψ x + ψ y) → ∀ x ∈ C, ψ x = 0)
+    [Finite (H2 (charRep (1 : G →* (ZMod l)ˣ)))]
+    (hcard : Nat.card (H2 (charRep (1 : G →* (ZMod l)ˣ))) ≤ l)
+    (s t : G) (hs : s ^ l ∈ C) (ht : t ^ l ∈ C) (hsC : s ∉ C)
+    : ∃ n : ℕ, t * (s ^ n)⁻¹ ∈ C := by
   by_contra hcon
   have hp : l.Prime := Fact.out
   haveI hCn : C.Normal := Subgroup.Normal.of_commutator_le G hcC
@@ -168,17 +203,24 @@ private theorem core {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGro
     obtain ⟨j, hj⟩ := ZMod.intCast_surjective (p₂ - q₂)
     have hla : IsLocallyConstant (fun g => (i : ℚ) * a₁ g + (j : ℚ) * a₂ g) :=
       la1.comp₂ la2 (fun x y => (i : ℚ) * x + (j : ℚ) * y)
-    obtain ⟨ψ, lψ, mψ, eψ⟩ := divide l (fun g => (i : ℚ) * a₁ g + (j : ℚ) * a₂ g)
-      (fun p => i * c₁ p + j * c₂ p) hla (fun g h => by push_cast; rw [r1, r2]; ring) f hf (fun g h => by
-        have := congrFun hd (g, h)
-        simp [charRep_apply, z₁, z₂] at this
-        push_cast
-        rw [hi, hj, this]
-        ring)
+    obtain ⟨ψ, lψ, mψ, eψ⟩ :=
+      divide l
+        (fun g => (i : ℚ) * a₁ g + (j : ℚ) * a₂ g)
+        (fun p => i * c₁ p + j * c₂ p)
+        hla
+        (fun g h => by push_cast; rw [r1, r2]; ring)
+        f hf
+        (fun g h => by
+          have := congrFun hd (g, h)
+          simp [charRep_apply, z₁, z₂] at this
+          push_cast
+          rw [hi, hj, this]
+          ring)
     have key : ∀ x, x ^ l ∈ C → i • χ₁ x + j • χ₂ x = 0 := fun x hx => by
       have h1 := hk ψ lψ mψ _ hx
       rw [add_pow' ψ mψ, eψ, AddCircle.coe_add, ← zsmul_eq_mul, ← zsmul_eq_mul, AddCircle.coe_zsmul,
-        AddCircle.coe_zsmul, e1, e2] at h1
+          AddCircle.coe_zsmul, e1, e2]
+        at h1
       exact h1
     have hi0 : (i : ZMod l) = 0 := by
       have h1 := key s hs
@@ -200,8 +242,16 @@ private theorem core {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGro
 
 end UpperTheory.V.Ws.X1.MuBock
 
-theorem UpperTheory.V.Ws.X1.muBock :
-    ∀ {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [T2Space Γ] [TotallyDisconnectedSpace Γ] (l : ℕ) [Fact l.Prime] (H : Subgroup Γ), IsClosed (H : Set Γ) → Finite (H2 (charRep (1 : H →* (ZMod l)ˣ))) → Nat.card (H2 (charRep (1 : H →* (ZMod l)ˣ))) ≤ l → (∀ s ∈ H, ∀ t ∈ H, s ^ l ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure → t ^ l ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure → s ∉ (⁅H, H⁆ : Subgroup Γ).topologicalClosure → ∃ n : ℕ, t * (s ^ n)⁻¹ ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure) := by
+theorem UpperTheory.V.Ws.X1.muBock
+    : ∀ {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+        [T2Space Γ] [TotallyDisconnectedSpace Γ] (l : ℕ) [Fact l.Prime] (H : Subgroup Γ),
+      IsClosed (H : Set Γ) → Finite (H2 (charRep (1 : H →* (ZMod l)ˣ)))
+        → Nat.card (H2 (charRep (1 : H →* (ZMod l)ˣ))) ≤ l
+        → (∀ s ∈ H, ∀ t ∈ H,
+          s ^ l ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure
+            → t ^ l ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure
+            → s ∉ (⁅H, H⁆ : Subgroup Γ).topologicalClosure
+            → ∃ n : ℕ, t * (s ^ n)⁻¹ ∈ (⁅H, H⁆ : Subgroup Γ).topologicalClosure) := by
   intro Γ _ _ _ _ _ _ l _ H hH hfin hcard s hs t ht hsl htl hsC
   haveI : CompactSpace H := isCompact_iff_compactSpace.1 hH.isCompact
   have hmap : (commutator H).map H.subtype = ⁅H, H⁆ := Subgroup.map_subtype_commutator H
@@ -211,16 +261,19 @@ theorem UpperTheory.V.Ws.X1.muBock :
   have hcC : commutator H ≤ C := by
     rw [← Subgroup.map_le_iff_le_comap, hmap]
     exact Subgroup.le_topologicalClosure _
-  obtain ⟨n, hn⟩ := UpperTheory.V.Ws.X1.MuBock.core l C hC hcC (fun ψ h1 h2 x hx => by
-    let φ : H →* Multiplicative (AddCircle (1 : ℚ)) :=
-      MonoidHom.mk' (fun x => Multiplicative.ofAdd (ψ x)) (fun x y => by rw [h2, ofAdd_add])
-    have hkc : IsClosed (φ.ker : Set H) := (h1.isClopen_fiber 0).isClosed
-    have hkc' : IsClosed (φ.ker.map H.subtype : Set Γ) := hH.isClosedMap_subtype_val _ hkc
-    have hle : (⁅H, H⁆ : Subgroup Γ) ≤ φ.ker.map H.subtype := by
-      rw [← hmap]
-      exact Subgroup.map_mono (Abelianization.commutator_subset_ker φ)
-    obtain ⟨y, hy, e⟩ := Subgroup.topologicalClosure_minimal _ hle hkc' hx
-    have e' : y = x := Subtype.ext e
-    rw [← e']
-    exact hy) hcard ⟨s, hs⟩ ⟨t, ht⟩ hsl htl hsC
+  obtain ⟨n, hn⟩ :=
+    UpperTheory.V.Ws.X1.MuBock.core l C hC hcC
+      (fun ψ h1 h2 x hx => by
+        let φ : H →* Multiplicative (AddCircle (1 : ℚ)) :=
+          MonoidHom.mk' (fun x => Multiplicative.ofAdd (ψ x)) (fun x y => by rw [h2, ofAdd_add])
+        have hkc : IsClosed (φ.ker : Set H) := (h1.isClopen_fiber 0).isClosed
+        have hkc' : IsClosed (φ.ker.map H.subtype : Set Γ) := hH.isClosedMap_subtype_val _ hkc
+        have hle : (⁅H, H⁆ : Subgroup Γ) ≤ φ.ker.map H.subtype := by
+          rw [← hmap]
+          exact Subgroup.map_mono (Abelianization.commutator_subset_ker φ)
+        obtain ⟨y, hy, e⟩ := Subgroup.topologicalClosure_minimal _ hle hkc' hx
+        have e' : y = x := Subtype.ext e
+        rw [← e']
+        exact hy)
+      hcard ⟨s, hs⟩ ⟨t, ht⟩ hsl htl hsC
   exact ⟨n, hn⟩

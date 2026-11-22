@@ -9,8 +9,9 @@ open IsLocalRing GlobalTheory.Henselisation
 
 namespace GlobalTheory.Henselisation
 
-theorem EtNbhd.trans_isLocalHom_injective (R : Type) [CommRing R] [IsLocalRing R] (i j : EtNbhd R)
-    (h : i ≤ j) : IsLocalHom (EtNbhd.trans h) ∧ Function.Injective (EtNbhd.trans h) := by
+theorem EtNbhd.trans_isLocalHom_injective
+    (R : Type) [CommRing R] [IsLocalRing R] (i j : EtNbhd R) (h : i ≤ j)
+    : IsLocalHom (EtNbhd.trans h) ∧ Function.Injective (EtNbhd.trans h) := by
   have hloc : IsLocalHom (EtNbhd.trans h) := by
     unfold EtNbhd.trans
     exact Localization.isLocalHom_localRingHom _ _ _ _

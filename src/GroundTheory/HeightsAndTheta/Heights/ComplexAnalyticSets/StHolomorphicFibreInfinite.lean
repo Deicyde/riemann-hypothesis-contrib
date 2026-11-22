@@ -12,8 +12,8 @@ noncomputable section
 
 def HolomorphicFibreInfinite.Statement : Prop :=
   ∀ (k d : ℕ) (U : Set (Fin k → ℂ)) (f : (Fin k → ℂ) → Fin d → ℂ),
-    d < k → IsOpen U → U.Nonempty → DifferentiableOn ℂ f U →
-      ∃ y : Fin d → ℂ, {t | t ∈ U ∧ f t = y}.Infinite
+    d < k → IsOpen U → U.Nonempty → DifferentiableOn ℂ f U
+      → ∃ y : Fin d → ℂ, {t | t ∈ U ∧ f t = y}.Infinite
 
 end
 

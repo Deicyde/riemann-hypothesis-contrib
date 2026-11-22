@@ -516,8 +516,8 @@ lemma parameterRange_bounds (C : ℝ) (hC : 1 ≤ C) (k m f : ℕ) (b g v NT Gam
     hKk, hg0, hb0, hv0, Real.log_le_log hv0 hvb, hNT0, hlNT, hGam0, Real.log_nonneg hG1, hlG⟩
 
 noncomputable def commonLatticeBound (C : ℝ) (k m f s : ℕ) (b v Gam : ℝ) (Xi : ℕ → ℝ) : ℝ :=
-  ((k : ℝ) * v) ^ (k * f) * Xi s * C ^ (k * f) *
-    bigH C m f b ^ (C * ((s : ℝ) + m) * (m : ℝ) ^ 2) * (C * s * f) ^ (6 * s * f) * Gam
+  ((k : ℝ) * v) ^ (k * f) * Xi s * C ^ (k * f) * bigH C m f b ^ (C * ((s : ℝ) + m) * (m : ℝ) ^ 2)
+    * (C * s * f) ^ (6 * s * f) * Gam
 
 lemma commonFactor_nonneg_and_le (C : ℝ) (hC : 1 ≤ C) (k m f s : ℕ) (b v Gam : ℝ) (Xi : ℕ → ℝ) (A : ℝ)
     (hb : 0 < b) (hv : 0 < v) (hGam : 0 < Gam) (hs1 : 1 ≤ s) (hsk : s ≤ k) (hf1 : 1 ≤ f)
@@ -615,8 +615,29 @@ theorem sumNondegenerateRowsLe : NonDegSum := by
   intro C hC
   refine ⟨16 * C ^ 32, ?_⟩
   intro k m f b g v NT Gam Xi hPar hXi
-  obtain ⟨hm4, hmf, hfk, hlb, hlk, hlC0, hlC, hlg, hl20, hl2, hX, hg0, hb0, hv0, hlv, hNT0, hlNT,
-    hGam0, hlG0, hlG⟩ := parameterRange_bounds C hC k m f b g v NT Gam hPar
+  obtain ⟨
+      hm4,
+      hmf,
+      hfk,
+      hlb,
+      hlk,
+      hlC0,
+      hlC,
+      hlg,
+      hl20,
+      hl2,
+      hX,
+      hg0,
+      hb0,
+      hv0,
+      hlv,
+      hNT0,
+      hlNT,
+      hGam0,
+      hlG0,
+      hlG
+    ⟩ :=
+    parameterRange_bounds C hC k m f b g v NT Gam hPar
   have hk0 : (0 : ℝ) < k := by linarith
   have hk0' : (k : ℝ) ≠ 0 := hk0.ne'
   have hC0 : 0 < C := by linarith
@@ -626,12 +647,15 @@ theorem sumNondegenerateRowsLe : NonDegSum := by
   have hkexp : ∀ X : ℝ, (k : ℝ) * Real.exp (X - Real.log k) = Real.exp X := fun X => by
     rw [Real.exp_sub, Real.exp_log hk0]
     field_simp
-  have hrow : ∀ s ∈ Finset.Icc 2 k, ndRow C k m f s b g v Gam Xi ≤ Real.exp (-((k : ℝ) * f * Real.log g) / 2 - Real.log k) := by
+  have hrow
+      : ∀ s ∈ Finset.Icc 2 k,
+        ndRow C k m f s b g v Gam Xi ≤ Real.exp (-((k : ℝ) * f * Real.log g) / 2 - Real.log k) := by
     intro s hs
     rw [Finset.mem_Icc] at hs
     obtain ⟨hs2, hsk⟩ := hs
-    have hrowEq : ndRow C k m f s b g v Gam Xi =
-        (2 / g) ^ ((s - 1) * k * f) * commonLatticeBound C k m f s b v Gam Xi := by
+    have hrowEq
+        : ndRow C k m f s b g v Gam Xi
+          = (2 / g) ^ ((s - 1) * k * f) * commonLatticeBound C k m f s b v Gam Xi := by
       unfold ndRow commonLatticeBound
       ring
     have hcast : (((s - 1) * k * f : ℕ) : ℝ) = ((s : ℝ) - 1) * k * f := by
@@ -641,9 +665,13 @@ theorem sumNondegenerateRowsLe : NonDegSum := by
     rw [hrowEq, two_div_pow_eq_exp g hg0, hcast]
     rcases (show s + 2 ≤ k ∨ (s + 1 = k ∨ s = k) by omega) with hmid | htop
     · obtain ⟨hXi0, hA⟩ := massRatio_bound_of_mid C hC k m f s b v NT Xi hb0 hXi hs2 hmid
-      obtain ⟨-, hc⟩ := commonFactor_nonneg_and_le C hC k m f s b v Gam Xi _ hb0 hv0 hGam0 (by omega) hsk hf1 hfkN hXi0 hA
-      have hcore := exponent_inequality_nondegenerate_mid C k f m (Real.log b) (Real.log k) (Real.log g) (Real.log C) (Real.log 2) hC hm4 hmf
-        hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX s (Real.log Gam) hs2R hskR hlG
+      obtain ⟨-, hc⟩ :=
+        commonFactor_nonneg_and_le C hC k m f s b v Gam Xi _ hb0 hv0 hGam0 (by omega) hsk hf1 hfkN
+          hXi0 hA
+      have hcore :=
+        exponent_inequality_nondegenerate_mid C k f m (Real.log b) (Real.log k) (Real.log g)
+          (Real.log C) (Real.log 2) hC hm4 hmf hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX s (Real.log Gam)
+          hs2R hskR hlG
       refine le_trans (mul_le_mul_of_nonneg_left hc (Real.exp_pos _).le) ?_
       rw [← Real.exp_add]
       exact Real.exp_le_exp.2 (by linarith)
@@ -651,34 +679,62 @@ theorem sumNondegenerateRowsLe : NonDegSum := by
         have h1 : k ≤ s + 1 := by omega
         have h2 : (k : ℝ) ≤ s + 1 := by exact_mod_cast h1
         linarith
-      obtain ⟨hXi0, hA⟩ := massRatio_bound_of_top C hC k m f s b v NT Xi hb0 hv0 hNT0 hk1 hlv hlNT hXi htop
-      obtain ⟨-, hc⟩ := commonFactor_nonneg_and_le C hC k m f s b v Gam Xi _ hb0 hv0 hGam0 (by omega) hsk hf1 hfkN hXi0 hA
-      have hcore := exponent_inequality_nondegenerate_top C k f m (Real.log b) (Real.log k) (Real.log g) (Real.log C) (Real.log 2) hC hm4 hmf
-        hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX s (Real.log Gam) hs2R hskR hKS hlG
+      obtain ⟨hXi0, hA⟩ :=
+        massRatio_bound_of_top C hC k m f s b v NT Xi hb0 hv0 hNT0 hk1 hlv hlNT hXi htop
+      obtain ⟨-, hc⟩ :=
+        commonFactor_nonneg_and_le C hC k m f s b v Gam Xi _ hb0 hv0 hGam0 (by omega) hsk hf1 hfkN
+          hXi0 hA
+      have hcore :=
+        exponent_inequality_nondegenerate_top C k f m (Real.log b) (Real.log k) (Real.log g)
+          (Real.log C) (Real.log 2) hC hm4 hmf hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX s (Real.log Gam)
+          hs2R hskR hKS hlG
       refine le_trans (mul_le_mul_of_nonneg_left hc (Real.exp_pos _).le) ?_
       rw [← Real.exp_add]
       exact Real.exp_le_exp.2 (by linarith)
-  calc _ ≤ ∑ s ∈ Finset.Icc 2 k, Real.exp (-((k : ℝ) * f * Real.log g) / 2 - Real.log k) := Finset.sum_le_sum hrow
+  calc
+    _ ≤ ∑ s ∈ Finset.Icc 2 k, Real.exp (-((k : ℝ) * f * Real.log g) / 2 - Real.log k) :=
+      Finset.sum_le_sum hrow
     _ = ((Finset.Icc 2 k).card : ℝ) * Real.exp (-((k : ℝ) * f * Real.log g) / 2 - Real.log k) := by
-        rw [Finset.sum_const, nsmul_eq_mul]
+      rw [Finset.sum_const, nsmul_eq_mul]
     _ ≤ (k : ℝ) * Real.exp (-((k : ℝ) * f * Real.log g) / 2 - Real.log k) := by
-        apply mul_le_mul_of_nonneg_right _ (Real.exp_pos _).le
-        rw [Nat.card_Icc]
-        exact_mod_cast (by omega : k + 1 - 2 ≤ k)
+      apply mul_le_mul_of_nonneg_right _ (Real.exp_pos _).le
+      rw [Nat.card_Icc]
+      exact_mod_cast (by omega : k + 1 - 2 ≤ k)
     _ = Real.exp (-((k : ℝ) * f * Real.log g) / 2) := hkexp _
     _ = (Real.sqrt g)⁻¹ ^ (k * f) := by
-        rw [pow_eq_exp_mul_log _ (inv_pos.2 (Real.sqrt_pos.2 hg0)) (k * f), Real.log_inv, Real.log_sqrt hg0.le,
-          Nat.cast_mul]
-        congr 1
-        ring
+      rw [pow_eq_exp_mul_log _ (inv_pos.2 (Real.sqrt_pos.2 hg0)) (k * f), Real.log_inv,
+        Real.log_sqrt hg0.le, Nat.cast_mul]
+      congr 1
+      ring
 
 theorem sumDegenerateRowsLe : DegSum := by
   unfold DegSum
   intro C hC
   refine ⟨16 * C ^ 32, ?_⟩
   intro k m f b g v NT Gam Xi hPar hXi
-  obtain ⟨hm4, hmf, hfk, hlb, hlk, hlC0, hlC, hlg, hl20, hl2, hX, hg0, hb0, hv0, hlv, hNT0, hlNT,
-    hGam0, hlG0, hlG⟩ := parameterRange_bounds C hC k m f b g v NT Gam hPar
+  obtain ⟨
+      hm4,
+      hmf,
+      hfk,
+      hlb,
+      hlk,
+      hlC0,
+      hlC,
+      hlg,
+      hl20,
+      hl2,
+      hX,
+      hg0,
+      hb0,
+      hv0,
+      hlv,
+      hNT0,
+      hlNT,
+      hGam0,
+      hlG0,
+      hlG
+    ⟩ :=
+    parameterRange_bounds C hC k m f b g v NT Gam hPar
   have hk0 : (0 : ℝ) < k := by linarith
   have hk0' : (k : ℝ) ≠ 0 := hk0.ne'
   have hC0 : 0 < C := by linarith
@@ -688,13 +744,17 @@ theorem sumDegenerateRowsLe : DegSum := by
   have hkexp : ∀ X : ℝ, (k : ℝ) * Real.exp (X - Real.log k) = Real.exp X := fun X => by
     rw [Real.exp_sub, Real.exp_log hk0]
     field_simp
-  have hrow : ∀ s ∈ Finset.Icc 2 k, degRow C k m f s b g v Gam Xi ≤ Real.exp (-((k : ℝ) * f * Real.log k) / 2 - 2 * Real.log Gam - Real.log k) := by
+  have hrow
+      : ∀ s ∈ Finset.Icc 2 k,
+        degRow C k m f s b g v Gam Xi
+          ≤ Real.exp (-((k : ℝ) * f * Real.log k) / 2 - 2 * Real.log Gam - Real.log k) := by
     intro s hs
     rw [Finset.mem_Icc] at hs
     obtain ⟨hs2, hsk⟩ := hs
-    have hrowEq : degRow C k m f s b g v Gam Xi =
-        (2 / g) ^ ((s - 2) * k * f) * commonLatticeBound C k m f s b v Gam Xi *
-          Real.exp (C * (m : ℝ) ^ 6 * f * Real.log b) * (C / k) ^ (k * f) := by
+    have hrowEq
+        : degRow C k m f s b g v Gam Xi
+          = (2 / g) ^ ((s - 2) * k * f) * commonLatticeBound C k m f s b v Gam Xi
+            * Real.exp (C * (m : ℝ) ^ 6 * f * Real.log b) * (C / k) ^ (k * f) := by
       unfold degRow commonLatticeBound
       ring
     have hcast : (((s - 2) * k * f : ℕ) : ℝ) = ((s : ℝ) - 2) * k * f := by
@@ -706,43 +766,84 @@ theorem sumDegenerateRowsLe : DegSum := by
     rw [hrowEq, two_div_pow_eq_exp g hg0, hcast, hCk]
     rcases (show s + 2 ≤ k ∨ (s + 1 = k ∨ s = k) by omega) with hmid | htop
     · obtain ⟨hXi0, hA⟩ := massRatio_bound_of_mid C hC k m f s b v NT Xi hb0 hXi hs2 hmid
-      obtain ⟨-, hc⟩ := commonFactor_nonneg_and_le C hC k m f s b v Gam Xi _ hb0 hv0 hGam0 (by omega) hsk hf1 hfkN hXi0 hA
-      have hcore := exponent_inequality_degenerate_mid C k f m (Real.log b) (Real.log k) (Real.log g) (Real.log C) (Real.log 2) hC hm4 hmf
-        hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX s (Real.log Gam) hs2R hskR hlG0 hlG
-      refine le_trans (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
-        (mul_le_mul_of_nonneg_left hc (Real.exp_pos _).le) (Real.exp_pos _).le) (Real.exp_pos _).le) ?_
+      obtain ⟨-, hc⟩ :=
+        commonFactor_nonneg_and_le C hC k m f s b v Gam Xi _ hb0 hv0 hGam0 (by omega) hsk hf1 hfkN
+          hXi0 hA
+      have hcore :=
+        exponent_inequality_degenerate_mid C k f m (Real.log b) (Real.log k) (Real.log g)
+          (Real.log C) (Real.log 2) hC hm4 hmf hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX s (Real.log Gam)
+          hs2R hskR hlG0 hlG
+      refine le_trans
+        (mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hc (Real.exp_pos _).le)
+            (Real.exp_pos _).le)
+          (Real.exp_pos _).le)
+        ?_
       rw [← Real.exp_add, ← Real.exp_add, ← Real.exp_add]
       exact Real.exp_le_exp.2 (by linarith)
     · have hKS : (k : ℝ) - 1 ≤ s := by
         have h1 : k ≤ s + 1 := by omega
         have h2 : (k : ℝ) ≤ s + 1 := by exact_mod_cast h1
         linarith
-      obtain ⟨hXi0, hA⟩ := massRatio_bound_of_top C hC k m f s b v NT Xi hb0 hv0 hNT0 hk1 hlv hlNT hXi htop
-      obtain ⟨-, hc⟩ := commonFactor_nonneg_and_le C hC k m f s b v Gam Xi _ hb0 hv0 hGam0 (by omega) hsk hf1 hfkN hXi0 hA
-      have hcore := exponent_inequality_degenerate_top C k f m (Real.log b) (Real.log k) (Real.log g) (Real.log C) (Real.log 2) hC hm4 hmf
-        hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX s (Real.log Gam) hs2R hskR hKS hlG0 hlG
-      refine le_trans (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
-        (mul_le_mul_of_nonneg_left hc (Real.exp_pos _).le) (Real.exp_pos _).le) (Real.exp_pos _).le) ?_
+      obtain ⟨hXi0, hA⟩ :=
+        massRatio_bound_of_top C hC k m f s b v NT Xi hb0 hv0 hNT0 hk1 hlv hlNT hXi htop
+      obtain ⟨-, hc⟩ :=
+        commonFactor_nonneg_and_le C hC k m f s b v Gam Xi _ hb0 hv0 hGam0 (by omega) hsk hf1 hfkN
+          hXi0 hA
+      have hcore :=
+        exponent_inequality_degenerate_top C k f m (Real.log b) (Real.log k) (Real.log g)
+          (Real.log C) (Real.log 2) hC hm4 hmf hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX s (Real.log Gam)
+          hs2R hskR hKS hlG0 hlG
+      refine le_trans
+        (mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hc (Real.exp_pos _).le)
+            (Real.exp_pos _).le)
+          (Real.exp_pos _).le)
+        ?_
       rw [← Real.exp_add, ← Real.exp_add, ← Real.exp_add]
       exact Real.exp_le_exp.2 (by linarith)
-  calc _ ≤ ∑ s ∈ Finset.Icc 2 k, Real.exp (-((k : ℝ) * f * Real.log k) / 2 - 2 * Real.log Gam - Real.log k) := Finset.sum_le_sum hrow
-    _ = ((Finset.Icc 2 k).card : ℝ) * Real.exp (-((k : ℝ) * f * Real.log k) / 2 - 2 * Real.log Gam - Real.log k) := by
-        rw [Finset.sum_const, nsmul_eq_mul]
+  calc
+    _ ≤ ∑ s ∈ Finset.Icc 2 k, Real.exp (-((k : ℝ) * f * Real.log k) / 2 - 2 * Real.log Gam - Real.log k) :=
+      Finset.sum_le_sum hrow
+    _ = ((Finset.Icc 2 k).card : ℝ)
+        * Real.exp (-((k : ℝ) * f * Real.log k) / 2 - 2 * Real.log Gam - Real.log k) := by
+      rw [Finset.sum_const, nsmul_eq_mul]
     _ ≤ (k : ℝ) * Real.exp (-((k : ℝ) * f * Real.log k) / 2 - 2 * Real.log Gam - Real.log k) := by
-        apply mul_le_mul_of_nonneg_right _ (Real.exp_pos _).le
-        rw [Nat.card_Icc]
-        exact_mod_cast (by omega : k + 1 - 2 ≤ k)
+      apply mul_le_mul_of_nonneg_right _ (Real.exp_pos _).le
+      rw [Nat.card_Icc]
+      exact_mod_cast (by omega : k + 1 - 2 ≤ k)
     _ = Real.exp (-((k : ℝ) * f * Real.log k) / 2 - 2 * Real.log Gam) := hkexp _
     _ = Real.exp (-((k : ℝ) * f * Real.log k) / 2) * (Gam ^ 2)⁻¹ := by
-        rw [Real.exp_sub, pow_eq_exp_mul_log Gam hGam0 2, div_eq_mul_inv, Nat.cast_ofNat]
+      rw [Real.exp_sub, pow_eq_exp_mul_log Gam hGam0 2, div_eq_mul_inv, Nat.cast_ofNat]
 
 theorem singleRowBound : SingleRowBound := by
   unfold SingleRowBound
   intro C hC
   refine ⟨16 * C ^ 32, ?_⟩
   intro k r f b g v NT Gam hPar
-  obtain ⟨hm4, hmf, hfk, hlb, hlk, hlC0, hlC, hlg, hl20, hl2, hX, hg0, hb0, hv0, hlv, hNT0, hlNT,
-    hGam0, hlG0, hlG⟩ := parameterRange_bounds C hC k (2 * r + 2) f b g v NT Gam hPar
+  obtain ⟨
+      hm4,
+      hmf,
+      hfk,
+      hlb,
+      hlk,
+      hlC0,
+      hlC,
+      hlg,
+      hl20,
+      hl2,
+      hX,
+      hg0,
+      hb0,
+      hv0,
+      hlv,
+      hNT0,
+      hlNT,
+      hGam0,
+      hlG0,
+      hlG
+    ⟩ :=
+    parameterRange_bounds C hC k (2 * r + 2) f b g v NT Gam hPar
   have hC0 : 0 < C := by linarith
   have hk0 : (0 : ℝ) < k := by linarith
   have hR : (1 : ℝ) ≤ r := by
@@ -750,20 +851,25 @@ theorem singleRowBound : SingleRowBound := by
     push_cast at h
     linarith
   have hMR : ((2 * r + 2 : ℕ) : ℝ) = 2 * (r : ℝ) + 2 := by push_cast; ring
-  have hcore := exponent_inequality_single C k f ((2 * r + 2 : ℕ) : ℝ) (Real.log b) (Real.log k) (Real.log g) (Real.log C)
-    (Real.log 2) hC hm4 hmf hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX r (Real.log Gam) hR hMR hlG
+  have hcore :=
+    exponent_inequality_single C k f ((2 * r + 2 : ℕ) : ℝ) (Real.log b) (Real.log k) (Real.log g)
+      (Real.log C) (Real.log 2) hC hm4 hmf hfk hlb hlk hlC0 hlC hlg hl20 hl2 hX r (Real.log Gam) hR
+      hMR hlG
   have hg1 : 0 < g⁻¹ ^ (2 * r + 1) := pow_pos (inv_pos.2 hg0) _
   have hk1 : 0 < ((k : ℝ) ^ r)⁻¹ := inv_pos.2 (pow_pos hk0 _)
   have hin : 0 < C * g⁻¹ ^ (2 * r + 1) * ((k : ℝ) ^ r)⁻¹ := mul_pos (mul_pos hC0 hg1) hk1
-  have e4 : Real.sqrt ((C * g⁻¹ ^ (2 * r + 1) * ((k : ℝ) ^ r)⁻¹) ^ (k * f)) =
-      Real.exp (((k : ℝ) * f) * (Real.log C - (2 * r + 1) * Real.log g - r * Real.log k) / 2) := by
+  have e4
+      : Real.sqrt ((C * g⁻¹ ^ (2 * r + 1) * ((k : ℝ) ^ r)⁻¹) ^ (k * f))
+        = Real.exp
+          (((k : ℝ) * f) * (Real.log C - (2 * r + 1) * Real.log g - r * Real.log k) / 2) := by
     rw [Real.sqrt_eq_rpow, Real.rpow_def_of_pos (pow_pos hin _), Real.log_pow,
-      Real.log_mul (mul_pos hC0 hg1).ne' hk1.ne', Real.log_mul hC0.ne' hg1.ne', Real.log_pow, Real.log_inv,
-      Real.log_inv, Real.log_pow]
+      Real.log_mul (mul_pos hC0 hg1).ne' hk1.ne', Real.log_mul hC0.ne' hg1.ne', Real.log_pow,
+      Real.log_inv, Real.log_inv, Real.log_pow]
     congr 1
     push_cast
     ring
-  rw [pow_eq_exp_mul_log C hC0 f, heightParameter_rpow C (2 * r + 2) f b _ hb0, ← Real.exp_log hGam0, e4]
+  rw [pow_eq_exp_mul_log C hC0 f, heightParameter_rpow C (2 * r + 2) f b _ hb0,
+    ← Real.exp_log hGam0, e4]
   simp only [← Real.exp_add]
   exact Real.exp_le_exp.2 (by linarith)
 

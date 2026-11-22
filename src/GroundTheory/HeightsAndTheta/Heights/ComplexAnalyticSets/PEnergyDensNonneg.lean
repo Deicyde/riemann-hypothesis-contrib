@@ -22,8 +22,11 @@ theorem EnergyDensNonneg.proof : EnergyDensNonneg.Statement := by
   have hC : ∀ z ∈ {z | AnalyticAt ℂ s z}, ContDiffAt ℝ 2 (euclPot ∘ s) z := fun z hz =>
     ((contDiff_euclPot n).of_le (WithTop.coe_le_coe.mpr le_top)).contDiffAt.comp z
       (hz.restrictScalars (𝕜 := ℝ)).contDiffAt
-  refine gradDensNonneg_thm d (fun _ => euclPot ∘ s) v _ hV
-    (fun _ => fun z hz => (hC z hz).contDiffWithinAt) ?_ y hs
+  refine gradDensNonneg_thm d
+    (fun _ => euclPot ∘ s)
+    v _ hV
+    (fun _ => fun z hz => (hC z hz).contDiffWithinAt)
+    ?_ y hs
   intro _ z hz ξ
   rw [levi_comp ξ hz ((contDiff_euclPot n).of_le (WithTop.coe_le_coe.mpr le_top)).contDiffAt,
     TubeFormComparison.levi_euclPot]

@@ -21,34 +21,44 @@ noncomputable section
 
 namespace GlobalTheory.JetBlock
 
-abbrev incl {a b : ℕ} (h : a ≤ b) : Fin a × Fin a → Fin b × Fin b := Prod.map (Fin.castLE h) (Fin.castLE h)
+abbrev incl {a b : ℕ} (h : a ≤ b) : Fin a × Fin a → Fin b × Fin b :=
+  Prod.map (Fin.castLE h) (Fin.castLE h)
 
 theorem incl_injective {a b : ℕ} (h : a ≤ b) : Function.Injective (incl h) :=
   (Fin.castLE_injective h).prodMap (Fin.castLE_injective h)
 
-theorem fockF_rename {σ τ : Type} {e : σ → τ} (he : Function.Injective e) (f g : MvPolynomial σ ℂ) :
-    fockF (rename e f) (rename e g) = fockF f g := by
-  rw [GlobalTheory.LvT.PtNorm.fockF_eq, GlobalTheory.LvT.PtNorm.fockF_eq, fockL_apply, fockL_apply, GlobalTheory.Proof.ColumnInclusionRenaming.fockS_rename he]
+theorem fockF_rename {σ τ : Type} {e : σ → τ} (he : Function.Injective e) (f g : MvPolynomial σ ℂ)
+    : fockF (rename e f) (rename e g) = fockF f g := by
+  rw [GlobalTheory.LvT.PtNorm.fockF_eq, GlobalTheory.LvT.PtNorm.fockF_eq, fockL_apply, fockL_apply,
+    GlobalTheory.Proof.ColumnInclusionRenaming.fockS_rename he]
 
-theorem fockF_rowAct {r n : ℕ} (g : Matrix (Fin r) (Fin r) ℂ) (f : MvPolynomial (Fin r × Fin n) ℂ) :
-    fockF (rowAct ℂ g f) (rowAct ℂ g f) = fockF f (rowAct ℂ (g * gᴴ) f) := by
+theorem fockF_rowAct {r n : ℕ} (g : Matrix (Fin r) (Fin r) ℂ) (f : MvPolynomial (Fin r × Fin n) ℂ)
+    : fockF (rowAct ℂ g f) (rowAct ℂ g f) = fockF f (rowAct ℂ (g * gᴴ) f) := by
   rw [fockRowAdj, ← rowActMul ℂ r n]
   rfl
 
-theorem sum_castLE {M : Type} [AddCommMonoid M] {a b : ℕ} (h : a ≤ b) (F : Fin b → M)
-    (hF : ∀ t : Fin b, a ≤ t.val → F t = 0) : ∑ t, F t = ∑ q : Fin a, F (Fin.castLE h q) := by
+theorem sum_castLE
+    {M : Type} [AddCommMonoid M]
+    {a b : ℕ} (h : a ≤ b) (F : Fin b → M) (hF : ∀ t : Fin b, a ≤ t.val → F t = 0)
+    : ∑ t, F t = ∑ q : Fin a, F (Fin.castLE h q) := by
   symm
-  refine Finset.sum_of_injOn (Fin.castLE h) (fun _ _ _ _ e => Fin.castLE_injective h e)
-    (fun _ _ => Finset.mem_univ _) ?_ (fun _ _ => rfl)
+  refine Finset.sum_of_injOn (Fin.castLE h)
+    (fun _ _ _ _ e => Fin.castLE_injective h e)
+    (fun _ _ => Finset.mem_univ _)
+    ?_
+    (fun _ _ => rfl)
   intro t _ ht
   refine hF t ?_
   by_contra h'
   exact ht ⟨⟨t.val, by omega⟩, by simp, by ext; simp⟩
 
-theorem rowAct_pad {a b : ℕ} (h : a ≤ b) (A : Matrix (Fin a) (Fin b) ℂ) (f : MvPolynomial (Fin a × Fin a) ℂ) :
-    rowAct ℂ (padRows A * (padRows A)ᴴ) (rename (incl h) f) = rename (incl h) (rowAct ℂ (A * Aᴴ) f) := by
-  have e : (rowAct ℂ (padRows A * (padRows A)ᴴ)).comp (rename (incl h)) =
-      (rename (incl h)).comp (rowAct ℂ (A * Aᴴ)) := by
+theorem rowAct_pad
+    {a b : ℕ} (h : a ≤ b) (A : Matrix (Fin a) (Fin b) ℂ) (f : MvPolynomial (Fin a × Fin a) ℂ)
+    : rowAct ℂ (padRows A * (padRows A)ᴴ) (rename (incl h) f)
+      = rename (incl h) (rowAct ℂ (A * Aᴴ) f) := by
+  have e
+      : (rowAct ℂ (padRows A * (padRows A)ᴴ)).comp (rename (incl h))
+        = (rename (incl h)).comp (rowAct ℂ (A * Aᴴ)) := by
     apply MvPolynomial.algHom_ext
     rintro ⟨p, q⟩
     set_option synthInstance.maxHeartbeats 100000 in
@@ -60,16 +70,18 @@ theorem rowAct_pad {a b : ℕ} (h : a ≤ b) (A : Matrix (Fin a) (Fin b) ℂ) (f
       simp [Matrix.mul_apply, padRows, not_lt.mpr ht]
   exact DFunLike.congr_fun e f
 
-theorem exists_sing {a b : ℕ} (A : Matrix (Fin a) (Fin b) ℂ) :
-    ∃ (U : Matrix (Fin a) (Fin a) ℂ) (t : Fin a → ℝ), U * Uᴴ = 1 ∧ Antitone t ∧ (∀ i, 0 ≤ t i) ∧
-      A * Aᴴ = (U * Matrix.diagonal fun i => (t i : ℂ)) * (U * Matrix.diagonal fun i => (t i : ℂ))ᴴ ∧
-      ∑ i, t i ^ 2 = ∑ β, ∑ α, ‖A α β‖ ^ 2 := by
+theorem exists_sing {a b : ℕ} (A : Matrix (Fin a) (Fin b) ℂ)
+    : ∃ (U : Matrix (Fin a) (Fin a) ℂ) (t : Fin a → ℝ),
+      U * Uᴴ = 1 ∧ Antitone t ∧ (∀ i, 0 ≤ t i)
+        ∧ A * Aᴴ
+          = (U * Matrix.diagonal fun i => (t i : ℂ)) * (U * Matrix.diagonal fun i => (t i : ℂ))ᴴ
+        ∧ ∑ i, t i ^ 2 = ∑ β, ∑ α, ‖A α β‖ ^ 2 := by
   have hP : (A * Aᴴ).PosSemidef := Matrix.posSemidef_self_mul_conjTranspose A
   have hH := hP.isHermitian
   set ev := hH.eigenvalues with hev
   have h0 : ∀ i, 0 ≤ ev i := hP.eigenvalues_nonneg
   set σ := Tuple.sort (fun i => -ev i) with hσ
-  have hm : Monotone ((fun i => -ev i) ∘ σ) := Tuple.monotone_sort _
+  have hm : Monotone ((fun i => - ev i) ∘ σ) := Tuple.monotone_sort _
   set V : Matrix (Fin a) (Fin a) ℂ := hH.eigenvectorUnitary.1 with hV
   have hVV : V * Vᴴ = 1 := Matrix.mem_unitaryGroup_iff.mp hH.eigenvectorUnitary.2
   have hs : A * Aᴴ = V * Matrix.diagonal (fun i => (ev i : ℂ)) * Vᴴ := by
@@ -84,7 +96,8 @@ theorem exists_sing {a b : ℕ} (A : Matrix (Fin a) (Fin b) ℂ) :
     exact Real.sqrt_le_sqrt (by linarith)
   · rw [hs]
     ext i j
-    simp only [Matrix.mul_apply (M := _ * _), Matrix.mul_diagonal, Matrix.conjTranspose_apply, Matrix.submatrix_apply, id]
+    simp only [Matrix.mul_apply (M := _ * _), Matrix.mul_diagonal, Matrix.conjTranspose_apply,
+      Matrix.submatrix_apply, id]
     rw [← Equiv.sum_comp σ]
     refine Finset.sum_congr rfl fun k _ => ?_
     have : ((ev (σ k) : ℝ) : ℂ) = (√(ev (σ k)) : ℝ) * (√(ev (σ k)) : ℝ) := by
@@ -101,19 +114,22 @@ theorem exists_sing {a b : ℕ} (A : Matrix (Fin a) (Fin b) ℂ) :
     rw [hev]
     erw [← h1]
     rw [Finset.sum_comm]
-    simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply, Complex.star_def,
-      Complex.mul_conj']
+    simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply,
+      Complex.star_def, Complex.mul_conj']
 
-theorem dominance {n : ℕ} (ν : Fin n → ℕ) {f : MvPolynomial (Fin n × Fin n) ℂ} (hf : f ∈ dualWeyl ℂ n n ν) :
-    ∀ m ∈ f.support, (∀ k : ℕ, (∑ a : Fin n with a.val < k, rowDeg m a) ≤ ∑ t : Fin n with t.val < k, ν t) ∧
-      ∑ a : Fin n, rowDeg m a = ∑ t : Fin n, ν t := by
+theorem dominance
+    {n : ℕ} (ν : Fin n → ℕ) {f : MvPolynomial (Fin n × Fin n) ℂ} (hf : f ∈ dualWeyl ℂ n n ν)
+    : ∀ m ∈ f.support,
+      (∀ k : ℕ, (∑ a : Fin n with a.val < k, rowDeg m a) ≤ ∑ t : Fin n with t.val < k, ν t)
+        ∧ ∑ a : Fin n, rowDeg m a = ∑ t : Fin n, ν t := by
   classical
   rw [standardMonomialSpanDomain ℂ n n ν] at hf
   induction hf using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨K, sz, hsz, I, rfl, rfl⟩ := hx
     exact fun m hm => bidetDominance ℂ n n K sz hsz I m hm
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     intro m hm
     rcases Finset.mem_union.mp (support_add hm) with h | h
@@ -121,21 +137,25 @@ theorem dominance {n : ℕ} (ν : Fin n → ℕ) {f : MvPolynomial (Fin n × Fin
     · exact hy m h
   | smul c x _ hx => exact fun m hm => hx m (support_smul hm)
 
-theorem fock_subst_le {a b : ℕ} (h : a ≤ b) (A : Matrix (Fin a) (Fin b) ℂ) :
-    ∃ t : Fin a → ℝ, (∀ i, 0 ≤ t i) ∧ ∑ i, t i ^ 2 = ∑ β, ∑ α, ‖A α β‖ ^ 2 ∧
-      ∀ (ν : Fin a → ℕ), ∀ f ∈ dualWeyl ℂ a a ν,
-        (fockF (rowAct ℂ (padRows A) (rename (incl h) f)) (rowAct ℂ (padRows A) (rename (incl h) f))).re ≤
-          (∏ i, t i ^ (2 * ν i)) * (fockF f f).re := by
+theorem fock_subst_le {a b : ℕ} (h : a ≤ b) (A : Matrix (Fin a) (Fin b) ℂ)
+    : ∃ t : Fin a → ℝ,
+      (∀ i, 0 ≤ t i) ∧ ∑ i, t i ^ 2 = ∑ β, ∑ α, ‖A α β‖ ^ 2
+        ∧ ∀ (ν : Fin a → ℕ), ∀ f ∈ dualWeyl ℂ a a ν,
+          (fockF (rowAct ℂ (padRows A) (rename (incl h) f))
+              (rowAct ℂ (padRows A) (rename (incl h) f))).re
+            ≤ (∏ i, t i ^ (2 * ν i)) * (fockF f f).re := by
   obtain ⟨U, t, hU, ht, h0, hA, hs⟩ := exists_sing A
   refine ⟨t, h0, hs, fun ν f hf => ?_⟩
   have hd := dominance ν (dualWeylRowStable ℂ a a ν U f hf)
-  have h1 := fockDiagBound a a t ν h0 ht (rowAct ℂ U f) (fun m hm => (hd m hm).1) (fun m hm => (hd m hm).2)
-  rw [fockF_rowAct U, hU, ldlat_rowAct_one, ← AlgHom.comp_apply, rowActMul, fockF_rowAct, ← hA] at h1
+  have h1 :=
+    fockDiagBound a a t ν h0 ht (rowAct ℂ U f) (fun m hm => (hd m hm).1) (fun m hm => (hd m hm).2)
+  rw [fockF_rowAct U, hU, ldlat_rowAct_one, ← AlgHom.comp_apply, rowActMul, fockF_rowAct, ← hA]
+    at h1
   rw [fockF_rowAct, rowAct_pad, fockF_rename (incl_injective h)]
   exact h1
 
-theorem rename_hw {a b : ℕ} (h : a ≤ b) (ν : Fin a → ℕ) :
-    rename (incl h) (hw ℂ (le_refl a) ν) = hw ℂ (le_refl b) (rowNu (r := b) ν) := by
+theorem rename_hw {a b : ℕ} (h : a ≤ b) (ν : Fin a → ℕ)
+    : rename (incl h) (hw ℂ (le_refl a) ν) = hw ℂ (le_refl b) (rowNu (r := b) ν) := by
   rw [← GlobalTheory.Proof.ColumnInclusionRenaming.rename_hw h]
   unfold hw
   rw [map_prod, map_prod]
@@ -148,13 +168,14 @@ theorem rename_hw {a b : ℕ} (h : a ≤ b) (ν : Fin a → ℕ) :
   ext p q : 2
   simp [GlobalTheory.Proof.ColumnInclusionRenaming.colIncl]
 
-
 open GlobalTheory.DualWeyl GlobalTheory.WeylMinorDual in
-theorem fock_mul_det {n : ℕ} (μ : Fin n → ℕ) (hμ : Antitone μ) (e : ℕ) {f : MvPolynomial (Fin n × Fin n) ℂ}
-    (hf : f ∈ dualWeyl ℂ n n μ) :
-    fockF (f * gdet ℂ n ^ e) (f * gdet ℂ n ^ e) /
-        fockF (hw ℂ (le_refl n) fun i => μ i + e) (hw ℂ (le_refl n) fun i => μ i + e) =
-      fockF f f / fockF (hw ℂ (le_refl n) μ) (hw ℂ (le_refl n) μ) := by
+theorem fock_mul_det
+    {n : ℕ} (μ : Fin n → ℕ) (hμ : Antitone μ)
+    (e : ℕ)
+    {f : MvPolynomial (Fin n × Fin n) ℂ} (hf : f ∈ dualWeyl ℂ n n μ)
+    : fockF (f * gdet ℂ n ^ e) (f * gdet ℂ n ^ e)
+        / fockF (hw ℂ (le_refl n) fun i => μ i + e) (hw ℂ (le_refl n) fun i => μ i + e)
+      = fockF f f / fockF (hw ℂ (le_refl n) μ) (hw ℂ (le_refl n) μ) := by
   have hν : Antitone fun i => μ i + e := fun i j hij => Nat.add_le_add_right (hμ hij) e
   have hm : f * gdet ℂ n ^ e ∈ dualWeyl ℂ n n fun i => μ i + e :=
     (dualWeylMul ℂ n n _ _ _ _).1 hf (GlobalTheory.SubstMem.det_pow_mem n e)

@@ -11,8 +11,10 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.MinfMeasure
 
-theorem exists_isMinf_of_density {p q : ℕ} (μ : Measure (UpqT p q)) (hμ : μ.IsHaarMeasure) (c : ℝ≥0∞)
-    (h0 : c ≠ 0) (ht : c ≠ ⊤) (hc : OmegaDensity μ c) : ∃ m : Measure (UpqT p q), Lev.IsMinf m := by
+theorem exists_isMinf_of_density
+    {p q : ℕ} (μ : Measure (UpqT p q)) (hμ : μ.IsHaarMeasure)
+    (c : ℝ≥0∞) (h0 : c ≠ 0) (ht : c ≠ ⊤) (hc : OmegaDensity μ c)
+    : ∃ m : Measure (UpqT p q), Lev.IsMinf m := by
   haveI : IsTopologicalGroup (UpqT p q) := inferInstanceAs (IsTopologicalGroup (Formalism.UG.Upq p q))
   haveI : BorelSpace (UpqT p q) := ⟨rfl⟩
   have hm0 : minfDensity (p + q) ≠ 0 := ENNReal.inv_ne_zero.2 (ENNReal.pow_ne_top (by simp))
@@ -24,7 +26,8 @@ theorem exists_isMinf_of_density {p q : ℕ} (μ : Measure (UpqT p q)) (hμ : μ
   have h := GlobalTheory.CompactDualUnique.omegaDensity_smul t hc
   rwa [htc, ENNReal.div_mul_cancel h0 ht] at h
 
-theorem exists_isMinf_of_cd (h : Nonempty CDHaar) (p q : ℕ) : ∃ m : Measure (UpqT p q), Lev.IsMinf m := by
+theorem exists_isMinf_of_cd (h : Nonempty CDHaar) (p q : ℕ)
+    : ∃ m : Measure (UpqT p q), Lev.IsMinf m := by
   obtain ⟨cd⟩ := h
   obtain ⟨c, h0, ht, hc, -⟩ := cd.trick p q
   exact exists_isMinf_of_density _ (cd.haar p q) c h0 ht hc

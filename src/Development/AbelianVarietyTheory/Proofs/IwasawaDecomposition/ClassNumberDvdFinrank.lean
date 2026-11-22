@@ -14,15 +14,17 @@ open scoped nonZeroDivisors
 
 namespace GlobalTheory.Mem.ClassDvd
 
-theorem classGroup_exists_integral_ideal_coprime {R : Type} [CommRing R] [IsDedekindDomain R] {m : Ideal R} (hm : m ≠ ⊥)
-    (c : ClassGroup R) : ∃ I : (Ideal R)⁰, IsCoprime (I : Ideal R) m ∧ ClassGroup.mk0 I = c := by
+theorem classGroup_exists_integral_ideal_coprime
+    {R : Type} [CommRing R] [IsDedekindDomain R] {m : Ideal R} (hm : m ≠ ⊥) (c : ClassGroup R)
+    : ∃ I : (Ideal R)⁰, IsCoprime (I : Ideal R) m ∧ ClassGroup.mk0 I = c := by
   by_cases ht : m = ⊤
   · obtain ⟨I, hI⟩ := ClassGroup.mk0_surjective c
     exact ⟨I, by rw [ht, ← Ideal.one_eq_top]; exact isCoprime_one_right, hI⟩
   obtain ⟨J, hJ⟩ := ClassGroup.mk0_surjective c⁻¹
   have hJ0 : (J : Ideal R) ≠ 0 := nonZeroDivisors.coe_ne_zero J
-  obtain ⟨a, ha⟩ := IsDedekindDomain.exists_sup_span_eq (I := (J : Ideal R) * m) (J := J) Ideal.mul_le_left
-    (mul_ne_zero hJ0 hm)
+  obtain ⟨a, ha⟩ :=
+    IsDedekindDomain.exists_sup_span_eq (I := (J : Ideal R) * m) (J := J) Ideal.mul_le_left
+      (mul_ne_zero hJ0 hm)
   obtain ⟨M, hM⟩ : (J : Ideal R) ∣ Ideal.span {a} := Ideal.dvd_iff_le.2 (ha ▸ le_sup_right)
   have h1 : m ⊔ M = ⊤ := by
     apply mul_left_cancel₀ hJ0
@@ -38,10 +40,12 @@ theorem classGroup_exists_integral_ideal_coprime {R : Type} [CommRing R] [IsDede
     rw [← inv_inv c, ← hJ, ClassGroup.mk0_eq_mk0_inv_iff]
     exact ⟨a, ha0, by rw [hM, mul_comm]⟩
 
-variable {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] {𝔮 : Ideal (𝓞 K)}
+variable
+  {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] {𝔮 : Ideal (𝓞 K)}
 
-theorem exists_symbol [IsGalois K L] (hR : IsRay L 𝔮) (I : Ideal (𝓞 K)) :
-    I ≠ ⊥ → IsCoprime I 𝔮 → ∃ σ : L ≃ₐ[K] L, ∀ χ : (L ≃ₐ[K] L) →* ℂˣ, heckeIdeal L χ I = (χ σ : ℂˣ) := by
+theorem exists_symbol [IsGalois K L] (hR : IsRay L 𝔮) (I : Ideal (𝓞 K))
+    : I ≠ ⊥ → IsCoprime I 𝔮
+      → ∃ σ : L ≃ₐ[K] L, ∀ χ : (L ≃ₐ[K] L) →* ℂˣ, heckeIdeal L χ I = (χ σ : ℂˣ) := by
   induction I using UniqueFactorizationMonoid.induction_on_prime with
   | h₁ => exact fun h => absurd rfl h
   | h₂ I hI =>
@@ -59,36 +63,51 @@ theorem exists_symbol [IsGalois K L] (hR : IsRay L 𝔮) (I : Ideal (𝓞 K)) :
     rw [heckeVal_of_unramIn L χ (hR.1 v hv) hτ] at h1
     rw [GlobalTheory.NT.Model.heckeIdeal_mul L χ hp.ne_zero hI0, hσ]
     change heckeIdeal L χ v.asIdeal * _ = _
-    rw [h1]; simp
+    rw [h1]
+    simp
 
-theorem classNumber_dvd_finrank : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-    (𝔮 : Ideal (𝓞 K)), 𝔮 ≠ ⊥ → IsRayField K L 𝔮 → classNumber K ∣ Module.finrank K L := by
+theorem classNumber_dvd_finrank
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+        (𝔮 : Ideal (𝓞 K)),
+      𝔮 ≠ ⊥ → IsRayField K L 𝔮 → classNumber K ∣ Module.finrank K L := by
   intro K L _ _ _ _ _ 𝔮 h𝔮 h
   have := h.1
   have hR : IsRay L 𝔮 := h.2
-  let S : Submonoid ((L ≃ₐ[K] L) × ClassGroup (𝓞 K)) :=
-    { carrier := {x | ∃ I : (Ideal (𝓞 K))⁰, IsCoprime (I : Ideal (𝓞 K)) 𝔮 ∧ ClassGroup.mk0 I = x.2 ∧
+  let S : Submonoid ((L ≃ₐ[K] L) × ClassGroup (𝓞 K)) := {
+    carrier :=
+      {x | ∃ I : (Ideal (𝓞 K))⁰, IsCoprime (I : Ideal (𝓞 K)) 𝔮 ∧ ClassGroup.mk0 I = x.2 ∧
         ∀ χ : (L ≃ₐ[K] L) →* ℂˣ, heckeIdeal L χ I = (χ x.1 : ℂˣ)}
-      one_mem' := ⟨1, isCoprime_one_left, map_one _, fun χ => by
-        rw [OneMemClass.coe_one, GlobalTheory.NT.Model.heckeIdeal_top]; simp⟩
-      mul_mem' := by
-        rintro x y ⟨I, hI, hIc, hx⟩ ⟨J, hJ, hJc, hy⟩
-        refine ⟨I * J, hI.mul_left hJ, by rw [map_mul, hIc, hJc]; rfl, fun χ => ?_⟩
-        rw [Submonoid.coe_mul, GlobalTheory.NT.Model.heckeIdeal_mul L χ (nonZeroDivisors.coe_ne_zero I)
-          (nonZeroDivisors.coe_ne_zero J), hx, hy]; simp }
-  let H : Subgroup ((L ≃ₐ[K] L) × ClassGroup (𝓞 K)) :=
-    { S with
-      inv_mem' := by
-        intro x hx
-        have : x⁻¹ = x ^ (orderOf x - 1) := by
-          rw [inv_eq_iff_mul_eq_one, ← pow_succ', Nat.sub_add_cancel (orderOf_pos x), pow_orderOf_eq_one]
-        rw [this]
-        exact S.pow_mem hx _ }
+    one_mem' := ⟨
+      1,
+      isCoprime_one_left,
+      map_one _,
+      fun χ => by rw [OneMemClass.coe_one, GlobalTheory.NT.Model.heckeIdeal_top]; simp
+    ⟩
+    mul_mem' := by
+      rintro x y ⟨I, hI, hIc, hx⟩ ⟨J, hJ, hJc, hy⟩
+      refine ⟨I * J, hI.mul_left hJ, by rw [map_mul, hIc, hJc]; rfl, fun χ => ?_⟩
+      rw [Submonoid.coe_mul,
+        GlobalTheory.NT.Model.heckeIdeal_mul L χ (nonZeroDivisors.coe_ne_zero I)
+          (nonZeroDivisors.coe_ne_zero J),
+        hx, hy]
+      simp
+  }
+  let H : Subgroup ((L ≃ₐ[K] L) × ClassGroup (𝓞 K)) := {
+    S with
+    inv_mem' := by
+      intro x hx
+      have : x⁻¹ = x ^ (orderOf x - 1) := by
+        rw [inv_eq_iff_mul_eq_one, ← pow_succ', Nat.sub_add_cancel (orderOf_pos x),
+          pow_orderOf_eq_one]
+      rw [this]
+      exact S.pow_mem hx _
+  }
   have h1 : Function.Bijective ((MonoidHom.fst _ _).comp H.subtype) := by
     refine ⟨(injective_iff_map_eq_one _).2 ?_, fun σ => ?_⟩
     · rintro ⟨⟨σ, c⟩, I, hI, hIc, hx⟩ hσ
       obtain rfl : σ = 1 := hσ
-      obtain ⟨α, β, hp, he⟩ := (hR.2.2 I (nonZeroDivisors.coe_ne_zero I) hI).1 fun χ => by simpa using hx χ
+      obtain ⟨α, β, hp, he⟩ :=
+        (hR.2.2 I (nonZeroDivisors.coe_ne_zero I) hI).1 fun χ => by simpa using hx χ
       have hc : ClassGroup.mk0 I = ClassGroup.mk0 1 :=
         ClassGroup.mk0_eq_mk0_iff.2 ⟨β, α, hp.2.1, hp.1, by simpa [mul_comm] using he⟩
       rw [map_one] at hc
@@ -101,7 +120,8 @@ theorem classNumber_dvd_finrank : ∀ (K L : Type) [Field K] [NumberField K] [Fi
     obtain ⟨I, hI, hc⟩ := classGroup_exists_integral_ideal_coprime h𝔮 c
     obtain ⟨σ, hσ⟩ := exists_symbol hR I (nonZeroDivisors.coe_ne_zero I) hI
     exact ⟨⟨(σ, c), I, hI, hc, hσ⟩, rfl⟩
-  rw [← IsGalois.card_aut_eq_finrank, ← Nat.card_eq_of_bijective _ h1, classNumber, ← Nat.card_eq_fintype_card]
+  rw [← IsGalois.card_aut_eq_finrank, ← Nat.card_eq_of_bijective _ h1, classNumber,
+    ← Nat.card_eq_fintype_card]
   exact Subgroup.card_dvd_of_surjective h2
 
 end GlobalTheory.Mem.ClassDvd

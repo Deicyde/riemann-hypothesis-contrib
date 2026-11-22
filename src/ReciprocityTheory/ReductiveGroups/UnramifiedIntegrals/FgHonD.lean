@@ -15,8 +15,8 @@ section Tools
 
 variable {R : Type} [CommRing R]
 
-theorem coeffOne_subst_zero {f s : PowerSeries R} (hs : constantCoeff s = 0) :
-    coeff 1 (f.subst s) = coeff 1 f * coeff 1 s := by
+theorem coeffOne_subst_zero {f s : PowerSeries R} (hs : constantCoeff s = 0)
+    : coeff 1 (f.subst s) = coeff 1 f * coeff 1 s := by
   have ha : HasSubst s := HasSubst.of_constantCoeff_zero hs
   have hX : X ∣ s := X_dvd_iff.mpr hs
   rw [PowerSeries.coeff_subst' ha, finsum_eq_single _ 1]
@@ -30,12 +30,13 @@ theorem coeffOne_subst_zero {f s : PowerSeries R} (hs : constantCoeff s = 0) :
       have h3 := X_pow_dvd_iff.mp h2 1 h
       simp [h3]
 
-theorem subst_C_mul_mv {ι : Type} {P : MvPowerSeries ι R} (hP : HasSubst P) (c : R)
-    (f : PowerSeries R) : (C c * f).subst P = MvPowerSeries.C c * f.subst P := by
+theorem subst_C_mul_mv
+    {ι : Type} {P : MvPowerSeries ι R} (hP : HasSubst P) (c : R) (f : PowerSeries R)
+    : (C c * f).subst P = MvPowerSeries.C c * f.subst P := by
   rw [← smul_eq_C_mul, ← MvPowerSeries.smul_eq_C_mul, ← coe_substAlgHom hP, map_smul]
 
-theorem subst_C_mul_ps {P : PowerSeries R} (hP : HasSubst P) (c : R)
-    (f : PowerSeries R) : (C c * f).subst P = C c * f.subst P := by
+theorem subst_C_mul_ps {P : PowerSeries R} (hP : HasSubst P) (c : R) (f : PowerSeries R)
+    : (C c * f).subst P = C c * f.subst P := by
   rw [← smul_eq_C_mul, ← smul_eq_C_mul, ← coe_substAlgHom hP, map_smul]
 
 end Tools
@@ -44,8 +45,8 @@ variable {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K] {l : ℕ}
 
 variable {lam : PowerSeries K} {Φ : MvPowerSeries (Fin 2) K} {A : PowerSeries K} {a : K}
 
-theorem LawD.map (hF : FrobField K l σ) (h : LawD lam Φ) :
-    LawD (PowerSeries.map σ lam) (MvPowerSeries.map σ Φ) := by
+theorem LawD.map (hF : FrobField K l σ) (h : LawD lam Φ)
+    : LawD (PowerSeries.map σ lam) (MvPowerSeries.map σ Φ) := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rw [← coeff_zero_eq_constantCoeff_apply, coeff_map, coeff_zero_eq_constantCoeff_apply, h.lam0,
       map_zero]
@@ -61,13 +62,14 @@ theorem LawD.map (hF : FrobField K l σ) (h : LawD lam Φ) :
     unfold atX atY at h1 ⊢
     rw [map_add (f := _)] at h1
     erw [PowerSeries.map_subst (HasSubst.of_constantCoeff_zero h.Φ0),
-      PowerSeries.map_subst (HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X 0)),
-      PowerSeries.map_subst (HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X 1)),
-      MvPowerSeries.map_X, MvPowerSeries.map_X] at h1
+        PowerSeries.map_subst (HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X 0)),
+        PowerSeries.map_subst (HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X 1)),
+        MvPowerSeries.map_X, MvPowerSeries.map_X]
+      at h1
     exact h1
 
-theorem HD.map (hF : FrobField K l σ) (h : HD σ lam Φ A a) :
-    HD σ (PowerSeries.map σ lam) (MvPowerSeries.map σ Φ) (PowerSeries.map σ A) (σ a) := by
+theorem HD.map (hF : FrobField K l σ) (h : HD σ lam Φ A a)
+    : HD σ (PowerSeries.map σ lam) (MvPowerSeries.map σ Φ) (PowerSeries.map σ A) (σ a) := by
   refine ⟨h.toLawD.map hF, ?_, ?_, ?_, ?_, ?_⟩
   · rw [← coeff_zero_eq_constantCoeff_apply, coeff_map, coeff_zero_eq_constantCoeff_apply, h.A0,
       map_zero]
@@ -95,9 +97,11 @@ theorem HD.norm_a (h : HD σ lam Φ A a) : ‖a‖ ≤ 1 := by
   rw [← h.coeff_one_A]
   exact h1 1
 
-theorem eigen_trick {A : PowerSeries K} {b : K} (hA0 : constantCoeff A = 0) (D : PowerSeries K)
-    (hD0 : constantCoeff D = 0) (h : DivBy (l : K) (D.subst A - C b * D))
-    (hb : ‖coeff 1 A - b‖ = 1) : ‖coeff 1 D‖ ≤ ‖(l : K)‖ := by
+theorem eigen_trick
+    {A : PowerSeries K} {b : K} (hA0 : constantCoeff A = 0)
+    (D : PowerSeries K) (hD0 : constantCoeff D = 0) (h : DivBy (l : K) (D.subst A - C b * D))
+    (hb : ‖coeff 1 A - b‖ = 1)
+    : ‖coeff 1 D‖ ≤ ‖(l : K)‖ := by
   have h0 := h
   unfold DivBy at h0
   have h1 := h0 1
@@ -105,28 +109,30 @@ theorem eigen_trick {A : PowerSeries K} {b : K} (hA0 : constantCoeff A = 0) (D :
   rw [map_sub, coeffOne_subst_zero hA0, coeff_C_mul, e, norm_mul, hb, mul_one] at h1
   exact h1
 
-theorem divBy_C_mul' {x c : K} (hc : ‖c‖ ≤ ‖x‖) {f : PowerSeries K} (hf : IntegralPS f) :
-    DivBy x (C c * f) := by
+theorem divBy_C_mul' {x c : K} (hc : ‖c‖ ≤ ‖x‖) {f : PowerSeries K} (hf : IntegralPS f)
+    : DivBy x (C c * f) := by
   unfold DivBy IntegralPS at *
   intro n
   rw [coeff_C_mul, norm_mul]
-  calc ‖c‖ * ‖coeff n f‖ ≤ ‖x‖ * 1 := mul_le_mul hc (hf n) (norm_nonneg _) (norm_nonneg _)
+  calc
+    ‖c‖ * ‖coeff n f‖
+      ≤ ‖x‖ * 1 := mul_le_mul hc (hf n) (norm_nonneg _) (norm_nonneg _)
     _ = ‖x‖ := mul_one _
 
-theorem derivative_C_mul' (c : K) (f : PowerSeries K) :
-    PowerSeries.derivative (C c * f) = C c * PowerSeries.derivative f := by
+theorem derivative_C_mul' (c : K) (f : PowerSeries K)
+    : PowerSeries.derivative (C c * f) = C c * PowerSeries.derivative f := by
   rw [← smul_eq_C_mul, ← smul_eq_C_mul, Derivation.map_smul]
 
-theorem QCls.norm_coeff_one {b : K} {D : PowerSeries K} (hD : QCls l Φ A b D) :
-    ‖coeff 1 D‖ ≤ 1 := by
+theorem QCls.norm_coeff_one {b : K} {D : PowerSeries K} (hD : QCls l Φ A b D)
+    : ‖coeff 1 D‖ ≤ 1 := by
   have h0 := hD.dInt
   unfold IntegralPS at h0
   have h1 := h0 0
   rw [coeff_derivative] at h1
   simpa using h1
 
-theorem HD.qcls_sub (h : HD σ lam Φ A a) {D : PowerSeries K} (hD : QCls l Φ A a D) :
-    QCls l Φ A a (D - C (coeff 1 D) * lam) := by
+theorem HD.qcls_sub (h : HD σ lam Φ A a) {D : PowerSeries K} (hD : QCls l Φ A a D)
+    : QCls l Φ A a (D - C (coeff 1 D) * lam) := by
   set c := coeff 1 D with hc
   have hc1 : ‖c‖ ≤ 1 := hD.norm_coeff_one
   have hΦ : HasSubst Φ := HasSubst.of_constantCoeff_zero h.Φ0
@@ -135,8 +141,9 @@ theorem HD.qcls_sub (h : HD σ lam Φ A a) {D : PowerSeries K} (hD : QCls l Φ A
     HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X 0)
   have hX1 : HasSubst (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) K) :=
     HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X 1)
-  have sub_subst : ∀ {P : MvPowerSeries (Fin 2) K} (_ : HasSubst P) (f g : PowerSeries K),
-      (f - g).subst P = f.subst P - g.subst P := fun hP f g => by
+  have sub_subst
+      : ∀ {P : MvPowerSeries (Fin 2) K} (_ : HasSubst P) (f g : PowerSeries K),
+        (f - g).subst P = f.subst P - g.subst P := fun hP f g => by
     rw [← coe_substAlgHom hP, map_sub]
   have sub_substA : (D - C c * lam).subst A = D.subst A - C c * lam.subst A := by
     rw [← coe_substAlgHom hA, map_sub, coe_substAlgHom hA, subst_C_mul_ps hA]
@@ -149,11 +156,14 @@ theorem HD.qcls_sub (h : HD σ lam Φ A a) {D : PowerSeries K} (hD : QCls l Φ A
     rw [map_sub, derivative_C_mul', map_sub, coeff_C_mul, sub_eq_add_neg]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (hd n) ?_)
     rw [norm_neg, norm_mul]
-    calc ‖c‖ * ‖coeff n (PowerSeries.derivative lam)‖ ≤ 1 * 1 :=
-          mul_le_mul hc1 (hl n) (norm_nonneg _) zero_le_one
+    calc
+      ‖c‖ * ‖coeff n (PowerSeries.derivative lam)‖
+        ≤ 1 * 1 := mul_le_mul hc1 (hl n) (norm_nonneg _) zero_le_one
       _ = 1 := one_mul 1
-  · have e : (D - C c * lam).subst Φ - atX (D - C c * lam) - atY (D - C c * lam) =
-        (D.subst Φ - atX D - atY D) - MvPowerSeries.C c * (lam.subst Φ - atX lam - atY lam) := by
+  · have e
+        : (D - C c * lam).subst Φ - atX (D - C c * lam) - atY (D - C c * lam)
+          = (D.subst Φ - atX D - atY D)
+            - MvPowerSeries.C c * (lam.subst Φ - atX lam - atY lam) := by
       unfold atX atY
       rw [sub_subst hΦ, sub_subst hX0, sub_subst hX1, subst_C_mul_mv hΦ, subst_C_mul_mv hX0,
         subst_C_mul_mv hX1]
@@ -167,11 +177,10 @@ theorem HD.qcls_sub (h : HD σ lam Φ A a) {D : PowerSeries K} (hD : QCls l Φ A
     rw [e]
     exact hD.eig
 
-theorem lemmaQ (hF : FrobField K l σ) (h : HD σ lam Φ A a) {D : PowerSeries K}
-    (hD : QCls l Φ A a D) :
-    ∃ Dp : PowerSeries K,
-      QCls l (MvPowerSeries.map (σ.comp σ) Φ) (PowerSeries.map (σ.comp σ) A) a Dp ∧
-      DivBy (l : K) (D - C (coeff 1 D) * lam - Dp.subst ((X : PowerSeries K) ^ (l ^ 2))) := by
+theorem lemmaQ (hF : FrobField K l σ) (h : HD σ lam Φ A a) {D : PowerSeries K} (hD : QCls l Φ A a D)
+    : ∃ Dp : PowerSeries K,
+      QCls l (MvPowerSeries.map (σ.comp σ) Φ) (PowerSeries.map (σ.comp σ) A) a Dp
+        ∧ DivBy (l : K) (D - C (coeff 1 D) * lam - Dp.subst ((X : PowerSeries K) ^ (l ^ 2))) := by
   have hl0 : l ≠ 0 := hF.prime.ne_zero
   set E : PowerSeries K := D - C (coeff 1 D) * lam with hE
   have hEq : QCls l Φ A a E := h.qcls_sub hD
@@ -197,12 +206,12 @@ theorem lemmaQ (hF : FrobField K l σ) (h : HD σ lam Φ A a) {D : PowerSeries K
       ext d; simp
     have e2 : PowerSeries.map (σ.comp σ) A = PowerSeries.map σ (PowerSeries.map σ A) := by
       ext d; simp
-    rw [e1, e2]; exact h2
-  · have hXl : HasSubst ((X : PowerSeries K) ^ l) :=
-      HasSubst.of_constantCoeff_zero' (by simp [hl0])
+    rw [e1, e2]
+    exact h2
+  · have hXl : HasSubst ((X : PowerSeries K) ^ l) := HasSubst.of_constantCoeff_zero' (by simp [hl0])
     have c3 := (divBy_expand_iff (l : K) l hl0 _).2 c2
-    rw [subst_sub hXl, subst_comp_subst_apply hXl hXl, subst_pow hXl, subst_X hXl, ← pow_mul,
-      ← sq] at c3
+    rw [subst_sub hXl, subst_comp_subst_apply hXl hXl, subst_pow hXl, subst_X hXl, ← pow_mul, ← sq]
+      at c3
     have c4 := divBy_add c1 c3
     rwa [sub_add_sub_cancel] at c4
 

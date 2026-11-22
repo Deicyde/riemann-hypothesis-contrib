@@ -16,9 +16,11 @@ noncomputable section
 
 attribute [local instance] FractionRing.liftAlgebra
 
-theorem nonempty_normalModel_of_presentation {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) (R : Type)
-    [CommRing R] [IsDomain R] [Algebra ℂ R] (π : MvPolynomial (Fin n) ℂ →ₐ[ℂ] R)
-    (hπ : Function.Surjective π) (hker : RingHom.ker π = J) : Nonempty (NormalModel J) :=
+theorem nonempty_normalModel_of_presentation
+    {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ))
+    (R : Type) [CommRing R] [IsDomain R] [Algebra ℂ R]
+    (π : MvPolynomial (Fin n) ℂ →ₐ[ℂ] R) (hπ : Function.Surjective π) (hker : RingHom.ker π = J)
+    : Nonempty (NormalModel J) :=
   _root_.UpperTheory.Reformulated.B.Gc5.nonempty_normalModel_of_presentation J R π hπ hker
 
 theorem NormalModelExists.proof : NormalModelExists.Statement := by

@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinrankLeCar
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.L2.Theta
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.BasicNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions Formalism.L2.Theta
 open GlobalTheory.AllWt (cuspW latW GoodW rankW)
 open GlobalTheory.LevDesc (levDet secRing pull KeepsCusp)
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
@@ -18,19 +20,25 @@ set_option synthInstance.maxHeartbeats 400000
 
 namespace GlobalTheory
 
-theorem hasGram_norm_sum_le {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-    {N : (K →+* ℂ) → V → ℝ} (hN : GlobalTheory.AllWt.HasGram N) (σ : K →+* ℂ)
-    (hτ : ∀ y, N (InfinitePlace.mk σ).embedding y = N σ y) {ι : Type} (s : Finset ι) (y : ι → V) :
-    N σ (∑ i ∈ s, y i) ≤ ∑ i ∈ s, N σ (y i) ∧ ∀ z, 0 ≤ N σ z := by
+theorem hasGram_norm_sum_le
+    {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
+    {N : (K →+* ℂ) → V → ℝ} (hN : GlobalTheory.AllWt.HasGram N)
+    (σ : K →+* ℂ) (hτ : ∀ y, N (InfinitePlace.mk σ).embedding y = N σ y)
+    {ι : Type} (s : Finset ι) (y : ι → V)
+    : N σ (∑ i ∈ s, y i) ≤ ∑ i ∈ s, N σ (y i) ∧ ∀ z, 0 ≤ N σ z := by
   obtain ⟨⟨n, ⟨b, X⟩, hbX⟩⟩ := hN
   letI : StarRing K := starRingOfComm
-  let Φ : V →+ EuclideanSpace ℂ (Fin n) :=
-    { toFun := fun y => (WithLp.equiv 2 (Fin n → ℂ)).symm (Formalism.HermitianLatticesTheory.fcoord b X (InfinitePlace.mk σ) y)
-      map_zero' := by rw [Formalism.HermitianLatticesTheory.fcoord_zero]; rfl
-      map_add' := fun y z => by rw [Formalism.HermitianLatticesTheory.fcoord_add]; rfl }
+  let Φ : V →+ EuclideanSpace ℂ (Fin n) := {
+    toFun := fun y =>
+      (WithLp.equiv 2 (Fin n → ℂ)).symm
+        (Formalism.HermitianLatticesTheory.fcoord b X (InfinitePlace.mk σ) y)
+    map_zero' := by rw [Formalism.HermitianLatticesTheory.fcoord_zero]; rfl
+    map_add' := fun y z => by rw [Formalism.HermitianLatticesTheory.fcoord_add]; rfl
+  }
   have hΦ : ∀ y, N σ y = ‖Φ y‖ := by
     intro y
-    rw [← hτ, ← (hbX (InfinitePlace.mk σ)).2 y, Formalism.HermitianLatticesTheory.normAt, Formalism.HermitianLatticesTheory.cnorm, EuclideanSpace.norm_eq]
+    rw [← hτ, ← (hbX (InfinitePlace.mk σ)).2 y, Formalism.HermitianLatticesTheory.normAt,
+      Formalism.HermitianLatticesTheory.cnorm, EuclideanSpace.norm_eq]
     rfl
   refine ⟨?_, fun z => (hΦ z).symm ▸ norm_nonneg _⟩
   set_option synthInstance.maxHeartbeats 100000 in

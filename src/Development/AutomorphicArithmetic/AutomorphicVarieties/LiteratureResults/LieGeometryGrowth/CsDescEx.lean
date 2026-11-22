@@ -7,16 +7,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 noncomputable section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.Lit.Dr
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.Lit.Dr
 open UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Geo.Cs
 
 section
 
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 
-private theorem exists_unitary {g h : GL (Fin a) (Cinf E)} (e : sand g (hOne E a) = sand h (hOne E a)) :
-    ∃ k : Kinf E a, h = g * Unitary.toUnits k := by
-  have comp : ∀ (g h : GL (Fin a) (Cinf E)) (v : HV E a), sand g (sand h v) = sand (g * h) v := fun g h v => by
+private theorem exists_unitary
+    {g h : GL (Fin a) (Cinf E)} (e : sand g (hOne E a) = sand h (hOne E a))
+    : ∃ k : Kinf E a, h = g * Unitary.toUnits k := by
+  have comp
+      : ∀ (g h : GL (Fin a) (Cinf E)) (v : HV E a),
+        sand g (sand h v) = sand (g * h) v := fun g h v => by
     rw [map_mul]; rfl
   have h1 : sand (g⁻¹ * h) (hOne E a) = hOne E a := by
     rw [← comp, ← e, comp, inv_mul_cancel, map_one]; rfl
@@ -30,8 +34,7 @@ private theorem exists_unitary {g h : GL (Fin a) (Cinf E)} (e : sand g (hOne E a
 
 end
 
-theorem UpperTheory.V.Lit.Geo.Cs.descEx :
-    DescEx := by
+theorem UpperTheory.V.Lit.Geo.Cs.descEx : DescEx := by
   classical
   intro E _ _ _ a U f Y C c f₀ hf
   refine ⟨fun s p => if h : p ∈ cone E a then f (pt h.choose s.out) else 0, fun g x => ?_⟩
@@ -39,4 +42,5 @@ theorem UpperTheory.V.Lit.Geo.Cs.descEx :
   obtain ⟨k, hk⟩ := exists_unitary hp.choose_spec.symm
   obtain ⟨u, hu⟩ := QuotientGroup.mk_out_eq_mul U x
   beta_reduce
-  rw [dite_eq_left hp, hk, pt_mul, hf.f_cpt, hu, pt, pt, map_mul (finGL E a), ← mul_assoc, hf.f_lev _ u.2]
+  rw [dite_eq_left hp, hk, pt_mul, hf.f_cpt, hu, pt, pt, map_mul (finGL E a), ← mul_assoc,
+    hf.f_lev _ u.2]

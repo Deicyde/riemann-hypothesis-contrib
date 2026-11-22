@@ -10,8 +10,8 @@ variable {l : ℕ} [Fact l.Prime]
 
 variable {E : Type*} [Field E]
 
-private theorem go_finiteDimensional_adjoinRoots {m : ℕ} (hm : 0 < m) :
-    FiniteDimensional E (adjoinRoots E m) := by
+private theorem go_finiteDimensional_adjoinRoots {m : ℕ} (hm : 0 < m)
+    : FiniteDimensional E (adjoinRoots E m) := by
   classical
   have hfin : {ζ : AlgebraicClosure E | ζ ^ m = 1}.Finite := by
     refine (Polynomial.nthRoots m (1 : AlgebraicClosure E)).toFinset.finite_toSet.subset ?_
@@ -20,8 +20,8 @@ private theorem go_finiteDimensional_adjoinRoots {m : ℕ} (hm : 0 < m) :
   have : Finite {ζ : AlgebraicClosure E | ζ ^ m = 1} := hfin.to_subtype
   exact IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
 
-theorem totient_le_finrank_mul [NumberField E] (n : ℕ) :
-    (l ^ n).totient ≤ Module.finrank ℚ E * Module.finrank E (adjoinRoots E (l ^ n)) := by
+theorem totient_le_finrank_mul [NumberField E] (n : ℕ)
+    : (l ^ n).totient ≤ Module.finrank ℚ E * Module.finrank E (adjoinRoots E (l ^ n)) := by
   have hpos : 0 < l ^ n := pow_pos (Fact.out : l.Prime).pos n
   have : NeZero (l ^ n) := ⟨hpos.ne'⟩
   have : NeZero ((l ^ n : ℕ) : AlgebraicClosure E) := ⟨Nat.cast_ne_zero.mpr (NeZero.ne _)⟩
@@ -35,8 +35,10 @@ theorem totient_le_finrank_mul [NumberField E] (n : ℕ) :
     Polynomial.cyclotomic_eq_minpoly_rat hζ' hpos]
   exact minpoly.natDegree_le _
 
-theorem finiteIndex_of_index_map_le {U : Subgroup ℤ_[l]ˣ} (hU : IsClosed (U : Set ℤ_[l]ˣ)) {B : ℕ}
-    (h : ∀ n, (U.map (redPow l n)).index ≤ B) : U.FiniteIndex := by
+theorem finiteIndex_of_index_map_le
+    {U : Subgroup ℤ_[l]ˣ} (hU : IsClosed (U : Set ℤ_[l]ˣ))
+    {B : ℕ} (h : ∀ n, (U.map (redPow l n)).index ≤ B)
+    : U.FiniteIndex := by
   have hl : l.Prime := Fact.out
   have hidx : ∀ n, (U ⊔ princ l n).index = (U.map (redPow l n)).index := by
     intro n
@@ -66,8 +68,9 @@ theorem finiteIndex_of_index_map_le {U : Subgroup ℤ_[l]ˣ} (hU : IsClosed (U :
     have hmul := Subgroup.relIndex_mul_index hle
     have h1 : (U ⊔ princ l n).relIndex (U ⊔ princ l n₀) = 1 := by
       have hpos : 0 < (U ⊔ princ l n₀).index := Nat.pos_of_ne_zero (hne n₀)
-      have hm : (U ⊔ princ l n).relIndex (U ⊔ princ l n₀) * (U ⊔ princ l n₀).index
-          ≤ 1 * (U ⊔ princ l n₀).index := by
+      have hm
+          : (U ⊔ princ l n).relIndex (U ⊔ princ l n₀) * (U ⊔ princ l n₀).index
+            ≤ 1 * (U ⊔ princ l n₀).index := by
         rw [hmul, one_mul]
         exact hmax n
       have h' := Nat.le_of_mul_le_mul_right hm hpos
@@ -93,8 +96,10 @@ theorem finiteIndex_of_index_map_le {U : Subgroup ℤ_[l]ˣ} (hU : IsClosed (U :
 
 theorem isOpen_galImage [NumberField E] : IsOpen (galImage l E : Set ℤ_[l]ˣ) := by
   rw [isOpen_iff_isClosed_finiteIndex]
-  refine ⟨isClosed_galImage,
-    finiteIndex_of_index_map_le isClosed_galImage (B := Module.finrank ℚ E) fun n => ?_⟩
+  refine ⟨
+    isClosed_galImage,
+    finiteIndex_of_index_map_le isClosed_galImage (B := Module.finrank ℚ E) fun n => ?_
+  ⟩
   have hl : l.Prime := Fact.out
   haveI : NeZero (l ^ n) := ⟨pow_ne_zero _ hl.ne_zero⟩
   have hN : 0 < l ^ n := pow_pos hl.pos n

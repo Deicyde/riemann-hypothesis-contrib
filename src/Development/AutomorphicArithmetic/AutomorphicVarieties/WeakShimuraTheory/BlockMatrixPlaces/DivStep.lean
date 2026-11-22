@@ -4,10 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Bl
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Ws.Bl
 
-private theorem mem_lev_iff {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {T : Type} [AddCommGroup T]
-    [Module A T] {t : A} (ht : Irreducible t) (n : ℕ) (x : T) : x ∈ lev A T n ↔ ∃ w, t ^ n • w = x := by
+private theorem mem_lev_iff
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    {T : Type} [AddCommGroup T] [Module A T]
+    {t : A} (ht : Irreducible t)
+    (n : ℕ) (x : T)
+    : x ∈ lev A T n ↔ ∃ w, t ^ n • w = x := by
   have hm : maximalIdeal A = Ideal.span {t} :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer t).1 ht
   show x ∈ maximalIdeal A ^ n • (⊤ : Submodule A T) ↔ _
@@ -15,9 +21,13 @@ private theorem mem_lev_iff {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValu
     Submodule.mem_smul_pointwise_iff_exists]
   simp
 
-private theorem mem_of_bij {A : Type} [CommRing A] {T : Type} [AddCommGroup T] [Module A T] [Module.Finite A T]
-    (f : T →ₗ[A] T) (hf : Function.Surjective f) (Q : Submodule A T) (hQ : Q ≤ Q.comap f) {y : T} (hy : f y ∈ Q) :
-    y ∈ Q := by
+private theorem mem_of_bij
+    {A : Type} [CommRing A]
+    {T : Type} [AddCommGroup T] [Module A T] [Module.Finite A T]
+    (f : T →ₗ[A] T) (hf : Function.Surjective f)
+    (Q : Submodule A T) (hQ : Q ≤ Q.comap f)
+    {y : T} (hy : f y ∈ Q)
+    : y ∈ Q := by
   let g := Q.mapQ Q f hQ
   have hs : Function.Surjective g := by
     intro q
@@ -31,9 +41,17 @@ private theorem mem_of_bij {A : Type} [CommRing A] {T : Type} [AddCommGroup T] [
   have h1 := hi h0
   simpa using h1
 
-theorem UpperTheory.V.Ws.Bl.divStep :
-    ∀ (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] (T : Type) [AddCommGroup T] [Module A T] [Module.Finite A T] [Module.Free A T] (Γ : Type) [Group Γ] [TopologicalSpace Γ] (ρ : Representation A Γ T) (c : Γ) (N : Set Γ) (H : Subgroup Γ) (P : Submodule A T), Lat ρ H P → ∀ t : A, Irreducible t → ∀ n, ∀ z ∈ Zn ρ c N H P (n + 1), ¬ Prim z →
-          ∃ z' ∈ Zn ρ c N H P n, ∀ g x, (lev A T n).mkQ x = z' g → (lev A T (n + 1)).mkQ (t • x) = z g := by
+theorem UpperTheory.V.Ws.Bl.divStep
+    : ∀ (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] (T : Type) [AddCommGroup T]
+        [Module A T] [Module.Finite A T] [Module.Free A T] (Γ : Type) [Group Γ] [TopologicalSpace Γ]
+        (ρ : Representation A Γ T) (c : Γ) (N : Set Γ) (H : Subgroup Γ) (P : Submodule A T),
+      Lat ρ H P
+        → ∀ t : A,
+          Irreducible t
+            → ∀ n, ∀ z ∈ Zn ρ c N H P (n + 1),
+              ¬ Prim z
+                → ∃ z' ∈ Zn ρ c N H P n, ∀ g x,
+                  (lev A T n).mkQ x = z' g → (lev A T (n + 1)).mkQ (t • x) = z g := by
   intro A _ _ _ T _ _ _ _ Γ _ _ ρ c N H P hL t ht n z hz hnp
   obtain ⟨y, hzy⟩ := hz
   have ht0 : t ≠ 0 := ht.ne_zero
@@ -57,8 +75,8 @@ theorem UpperTheory.V.Ws.Bl.divStep :
     refine (hlev n x).2 ⟨w, hinjt ?_⟩
     simp only
     rw [← hw, pow_succ', mul_smul]
-  have hφP : ∀ a, φ a ∈ Submodule.map (lev A T (n + 1)).mkQ P →
-      a ∈ Submodule.map (lev A T n).mkQ P := by
+  have hφP
+      : ∀ a, φ a ∈ Submodule.map (lev A T (n + 1)).mkQ P → a ∈ Submodule.map (lev A T n).mkQ P := by
     intro a ha
     obtain ⟨x, rfl⟩ := (lev A T n).mkQ_surjective a
     obtain ⟨q, hq, hqe⟩ := Submodule.mem_map.1 ha
@@ -106,12 +124,15 @@ theorem UpperTheory.V.Ws.Bl.divStep :
       obtain ⟨w, rfl⟩ := (hlev 1 q).1 hq
       exact (hlev 1 _).2 ⟨ρ s w, (map_smul _ _ _).symm⟩
     · show ρ s y0 - y0 ∈ _
-      have hloc : z s - (modRep ρ (n + 1) s ((lev A T (n + 1)).mkQ y0) - (lev A T (n + 1)).mkQ y0)
-          ∈ Submodule.map (lev A T (n + 1)).mkQ P := hzy.loc s hsH
+      have hloc
+          : z s - (modRep ρ (n + 1) s ((lev A T (n + 1)).mkQ y0) - (lev A T (n + 1)).mkQ y0)
+            ∈ Submodule.map (lev A T (n + 1)).mkQ P :=
+        hzy.loc s hsH
       obtain ⟨p, hp, hpe⟩ := Submodule.mem_map.1 hloc
       obtain ⟨u, hu, hue⟩ := Submodule.mem_map.1 (hz1 s)
       rw [modRep_mk, ← hue, ← map_sub, ← map_sub, Submodule.mkQ_apply, Submodule.mkQ_apply,
-        Submodule.Quotient.eq] at hpe
+          Submodule.Quotient.eq]
+        at hpe
       have e : ρ s y0 - y0 = ((p - (u - (ρ s y0 - y0))) + u) - p := by abel
       rw [e]
       apply Submodule.sub_mem _ _ (Submodule.mem_sup_left hp)
@@ -139,12 +160,20 @@ theorem UpperTheory.V.Ws.Bl.divStep :
         ∈ Submodule.map (lev A T n).mkQ P
       apply hφP
       rw [map_sub, map_sub, hφρ, hz', hφmk]
-      have hloc : z h - (modRep ρ (n + 1) h ((lev A T (n + 1)).mkQ (p0 + t ^ 1 • w0))
-          - (lev A T (n + 1)).mkQ (p0 + t ^ 1 • w0)) ∈ Submodule.map (lev A T (n + 1)).mkQ P :=
+      have hloc
+          : z h
+              - (modRep ρ (n + 1) h ((lev A T (n + 1)).mkQ (p0 + t ^ 1 • w0))
+                - (lev A T (n + 1)).mkQ (p0 + t ^ 1 • w0))
+            ∈ Submodule.map (lev A T (n + 1)).mkQ P :=
         hzy.loc h hh
-      have e : z h - (modRep ρ (n + 1) h ((lev A T (n + 1)).mkQ (t • w0)) - (lev A T (n + 1)).mkQ (t • w0))
-          = (z h - (modRep ρ (n + 1) h ((lev A T (n + 1)).mkQ (p0 + t ^ 1 • w0))
-            - (lev A T (n + 1)).mkQ (p0 + t ^ 1 • w0))) + (lev A T (n + 1)).mkQ (ρ h p0 - p0) := by
+      have e
+          : z h
+              - (modRep ρ (n + 1) h ((lev A T (n + 1)).mkQ (t • w0))
+                - (lev A T (n + 1)).mkQ (t • w0))
+            = (z h
+                - (modRep ρ (n + 1) h ((lev A T (n + 1)).mkQ (p0 + t ^ 1 • w0))
+                  - (lev A T (n + 1)).mkQ (p0 + t ^ 1 • w0)))
+              + (lev A T (n + 1)).mkQ (ρ h p0 - p0) := by
         simp only [pow_one, map_add (f := _), map_sub, modRep_mk]
         abel
       rw [e]

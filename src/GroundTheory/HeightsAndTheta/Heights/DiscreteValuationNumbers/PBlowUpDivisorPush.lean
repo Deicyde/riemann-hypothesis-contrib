@@ -20,8 +20,9 @@ section Pullback
 
 variable {K : Type*} {ι : K → Type} {J : Type} {R : Type*} [CommRing R]
 
-theorem liftForm_mem_blowUpOf_of_mem (P : Ideal (MRing ι R)) (u : J → MRing ι R) {p : MRing ι R}
-    (hp : p ∈ P) : liftForm (J := J) p ∈ blowUpOf P u := by
+theorem liftForm_mem_blowUpOf_of_mem
+    (P : Ideal (MRing ι R)) (u : J → MRing ι R) {p : MRing ι R} (hp : p ∈ P)
+    : liftForm (J := J) p ∈ blowUpOf P u := by
   let φ : MRing ι R →ₐ[R] Polynomial (MRing ι R ⧸ P) :=
     (Polynomial.CAlgHom (R := R) (A := MRing ι R ⧸ P)).comp (Ideal.Quotient.mkₐ R P)
   have hcomp : (aeval (blowUpSubst P u)).comp (liftForm (ι := ι) (J := J) (R := R)) = φ := by
@@ -42,13 +43,15 @@ section Sums
 
 open scoped Classical in
 open Classical in
-theorem finsum_sub_mul_eq_of_support {α : Type*} (Z₁ Z₂ n : α → ℤ) (p : α → Prop)
-    (h₁ : (Function.support Z₁).Finite) (h₂ : (Function.support Z₂).Finite)
-    (hv : ∀ W, Z₁ W - Z₂ W ≠ 0 → p W) :
-    ∑ᶠ W, (Z₁ W - Z₂ W) * n W =
-      ∑ᶠ W, Z₁ W * (if p W then n W else 0) - ∑ᶠ W, Z₂ W * (if p W then n W else 0) := by
-  have e : ∀ W, (Z₁ W - Z₂ W) * n W =
-      Z₁ W * (if p W then n W else 0) - Z₂ W * (if p W then n W else 0) := by
+theorem finsum_sub_mul_eq_of_support
+    {α : Type*} (Z₁ Z₂ n : α → ℤ) (p : α → Prop) (h₁ : (Function.support Z₁).Finite)
+    (h₂ : (Function.support Z₂).Finite) (hv : ∀ W, Z₁ W - Z₂ W ≠ 0 → p W)
+    : ∑ᶠ W, (Z₁ W - Z₂ W) * n W
+      = ∑ᶠ W, Z₁ W * (if p W then n W else 0) - ∑ᶠ W, Z₂ W * (if p W then n W else 0) := by
+  have e
+      : ∀ W,
+        (Z₁ W - Z₂ W) * n W
+          = Z₁ W * (if p W then n W else 0) - Z₂ W * (if p W then n W else 0) := by
     intro W
     by_cases h : Z₁ W - Z₂ W = 0
     · rw [h, zero_mul, sub_eq_zero.mp h, sub_self]
@@ -59,14 +62,18 @@ theorem finsum_sub_mul_eq_of_support {α : Type*} (Z₁ Z₂ n : α → ℤ) (p 
 
 end Sums
 
-theorem BlowUpDivisorPush.proof (hvert : BlowUpVerticalPush.Statement.{u}) :
-    BlowUpDivisorPush.Statement.{u} := by
+theorem BlowUpDivisorPush.proof (hvert : BlowUpVerticalPush.Statement.{u})
+    : BlowUpDivisorPush.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ J _ P n hP b f g hD N u hu hu' a
   have hfin := DivCycleFiniteSupport.proof.{u}
   obtain ⟨bf, bg, hbf, hbg, -⟩ := hD.degrees
 
-  have hvertB : ∀ W, divCycle (blowUpOf P u) (liftForm (J := J) f) W -
-      divCycle (blowUpOf P u) (liftForm (J := J) g) W ≠ 0 → (C ϖ : MRing (extIdx ι J) O) ∈ W := by
+  have hvertB
+      : ∀ W,
+        divCycle (blowUpOf P u) (liftForm (J := J) f) W
+              - divCycle (blowUpOf P u) (liftForm (J := J) g) W
+            ≠ 0
+          → (C ϖ : MRing (extIdx ι J) O) ∈ W := by
     intro W hW
     by_contra hϖW
     have hsupp : W.IsPrime ∧ blowUpOf P u ≤ W ∧ IsRelevant W := by
@@ -102,8 +109,9 @@ theorem BlowUpDivisorPush.proof (hvert : BlowUpVerticalPush.Statement.{u}) :
   unfold cycEval ratDiv
   rw [finsum_sub_mul_eq_of_support (divCycle (blowUpOf P u) (liftForm (J := J) f))
       (divCycle (blowUpOf P u) (liftForm (J := J) g)) _ _ (hfin _ _ _ _ _) (hfin _ _ _ _ _) hvertB,
-    finsum_sub_mul_eq_of_support (divCycle P f) (divCycle P g) _ _ (hfin _ _ _ _ _)
-      (hfin _ _ _ _ _) hD.vertical, e₁, e₂]
+    finsum_sub_mul_eq_of_support (divCycle P f) (divCycle P g) _ _ (hfin _ _ _ _ _) (hfin _ _ _ _ _)
+      hD.vertical,
+    e₁, e₂]
 
 end
 

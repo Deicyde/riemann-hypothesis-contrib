@@ -8,8 +8,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.cone_finite :
-    ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] {q : Y → E →L[ℝ] ℝ} {T : Set E}, Good q T → ∀ s : Set (E →L[ℝ] ℝ), s.Finite → s ⊆ posDual T → {v : Vert q | (convexHull ℝ s ∩ normalCone q v.1).Nonempty}.Finite := by
+theorem UpperTheory.V.ConeExtensionAcyclic.cone_finite
+    : ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+        {q : Y → E →L[ℝ] ℝ} {T : Set E},
+      Good q T
+        → ∀ s : Set (E →L[ℝ] ℝ),
+          s.Finite → s ⊆ posDual T
+            → {v : Vert q | (convexHull ℝ s ∩ normalCone q v.1).Nonempty}.Finite := by
   intro E Y _ _ _ q T hg s hs hsT
   obtain ⟨h0, hh0⟩ := hg.nonempty
   let K : Set E := ⋃ x ∈ s, {h | h ∈ poly q ∧ x h ≤ x h0}

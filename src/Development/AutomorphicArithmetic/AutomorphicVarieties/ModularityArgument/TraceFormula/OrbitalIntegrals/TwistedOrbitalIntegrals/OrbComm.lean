@@ -6,8 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open MeasureTheory Topology PositivityTheory.Rg.Tf.Loc UpperTheory.V.Z.Tf.Orb
 
-theorem UpperTheory.V.Z.Tf.Orb.orbComm :
-    UpperTheory.V.Z.Tf.Orb.TwOrbComm → UpperTheory.V.Z.Tf.Orb.Untwist → UpperTheory.V.Z.Tf.Orb.OrbComm := by
+theorem UpperTheory.V.Z.Tf.Orb.orbComm
+    : UpperTheory.V.Z.Tf.Orb.TwOrbComm → UpperTheory.V.Z.Tf.Orb.Untwist
+      → UpperTheory.V.Z.Tf.Orb.OrbComm := by
   intro hT hU k _ _ _ _ _ n _ _ μk hμk γ hγ μ hμ f f' p1 p2 p3 p4
   haveI : ValuativeExtension k k := ⟨fun {_ _} => Iff.rfl⟩
   obtain ⟨h0, h1, h2, h3⟩ := hU k n μk γ

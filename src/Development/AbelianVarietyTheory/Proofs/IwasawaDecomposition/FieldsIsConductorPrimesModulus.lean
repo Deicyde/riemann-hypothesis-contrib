@@ -14,7 +14,8 @@ open Formalism.L2.Col
 
 namespace GlobalTheory.Mem
 
-theorem Base.fields_isCond : ∀ (B : Base) (X : PreX B.toPre), B.fields.IsCond (B.primes X).cond := by
+theorem Base.fields_isCond
+    : ∀ (B : Base) (X : PreX B.toPre), B.fields.IsCond (B.primes X).cond := by
   intro B X j
   exact UpperTheory.Ram.isCond_condN B.host j
 

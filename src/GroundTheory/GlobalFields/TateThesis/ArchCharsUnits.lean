@@ -9,20 +9,20 @@ namespace GroundTheory.Global
 
 open Complex
 
-theorem ofReal_cpow_eq_exp {r : ℝ} (hr : 0 < r) (u : ℂ) :
-    (r : ℂ) ^ u = Complex.exp (u * (Real.log r : ℝ)) := by
-  rw [Complex.cpow_def_of_ne_zero (by exact_mod_cast hr.ne'), ← Complex.ofReal_log hr.le,
-    mul_comm]
+theorem ofReal_cpow_eq_exp {r : ℝ} (hr : 0 < r) (u : ℂ)
+    : (r : ℂ) ^ u = Complex.exp (u * (Real.log r : ℝ)) := by
+  rw [Complex.cpow_def_of_ne_zero (by exact_mod_cast hr.ne'), ← Complex.ofReal_log hr.le, mul_comm]
 
-theorem existsUnique_cpow_of_pos (χ : {x : ℝ // 0 < x} →ₜ* ℂˣ) :
-    ∃! s : ℂ, ∀ x : {x : ℝ // 0 < x}, (χ x : ℂ) = ((x : ℝ) : ℂ) ^ s := by
+theorem existsUnique_cpow_of_pos (χ : {x : ℝ // 0 < x} →ₜ* ℂˣ)
+    : ∃! s : ℂ, ∀ x : {x : ℝ // 0 < x}, (χ x : ℂ) = ((x : ℝ) : ℂ) ^ s := by
   let e : ℝ → {x : ℝ // 0 < x} := fun t => ⟨Real.exp t, Real.exp_pos t⟩
   have econt : Continuous e := Real.continuous_exp.subtype_mk _
-  have hlog : ∀ x : {x : ℝ // 0 < x}, e (Real.log x) = x :=
-    fun x => Subtype.ext (Real.exp_log x.2)
-  obtain ⟨s, hs, -⟩ := existsUnique_exp_of_continuous (fun t => χ (e t))
-    (χ.continuous.comp econt)
-    (fun a b => by rw [← map_mul]; congr 1; exact Subtype.ext (Real.exp_add a b))
+  have hlog : ∀ x : {x : ℝ // 0 < x}, e (Real.log x) = x := fun x => Subtype.ext (Real.exp_log x.2)
+  obtain ⟨s, hs, -⟩ :=
+    existsUnique_exp_of_continuous
+      (fun t => χ (e t))
+      (χ.continuous.comp econt)
+      (fun a b => by rw [← map_mul]; congr 1; exact Subtype.ext (Real.exp_add a b))
   have hs' : ∀ t : ℝ, (χ (e t) : ℂ) = Complex.exp (s * t) := hs
   refine ⟨s, fun x => ?_, fun s' h' => eq_of_forall_exp_mul_eq fun t => ?_⟩
   · rw [ofReal_cpow_eq_exp x.2, ← hs', hlog]
@@ -30,14 +30,16 @@ theorem existsUnique_cpow_of_pos (χ : {x : ℝ // 0 < x} →ₜ* ℂˣ) :
     rw [ofReal_cpow_eq_exp (Real.exp_pos t), Real.log_exp] at h1
     rw [← h1, hs']
 
-theorem existsUnique_realUnits (χ : ℝˣ →ₜ* ℂˣ) :
-    ∃! p : Fin 2 × ℂ, ∀ x : ℝˣ,
-      (χ x : ℂ) = (Real.sign (x : ℝ) : ℂ) ^ (p.1 : ℕ) * ((|(x : ℝ)| : ℝ) : ℂ) ^ p.2 := by
+theorem existsUnique_realUnits (χ : ℝˣ →ₜ* ℂˣ)
+    : ∃! p : Fin 2 × ℂ, ∀ x : ℝˣ,
+        (χ x : ℂ) = (Real.sign (x : ℝ) : ℂ) ^ (p.1 : ℕ) * ((|(x : ℝ)| : ℝ) : ℂ) ^ p.2 := by
   let e : ℝ → ℝˣ := fun t => Units.mk0 (Real.exp t) (Real.exp_pos t).ne'
   have econt : Continuous e := Units.isEmbedding_val₀.continuous_iff.mpr Real.continuous_exp
-  obtain ⟨s, hs, -⟩ := existsUnique_exp_of_continuous (fun t => χ (e t))
-    (χ.continuous.comp econt)
-    (fun a b => by rw [← map_mul]; congr 1; exact Units.ext (Real.exp_add a b))
+  obtain ⟨s, hs, -⟩ :=
+    existsUnique_exp_of_continuous
+      (fun t => χ (e t))
+      (χ.continuous.comp econt)
+      (fun a b => by rw [← map_mul]; congr 1; exact Units.ext (Real.exp_add a b))
   have hs' : ∀ t : ℝ, (χ (e t) : ℂ) = Complex.exp (s * t) := hs
   have hpos : ∀ (r : ℝ) (hr : 0 < r), (χ (Units.mk0 r hr.ne') : ℂ) = (r : ℂ) ^ s := by
     intro r hr
@@ -61,7 +63,8 @@ theorem existsUnique_realUnits (χ : ℝˣ →ₜ* ℂˣ) :
   refine ⟨(a, s), fun x => ?_, ?_⟩
   · rcases lt_or_gt_of_ne x.ne_zero with hx | hx
     · conv_lhs => rw [hneg1 x]
-      rw [map_mul, Units.val_mul, ← hc, hpos _ (neg_pos.mpr hx), ha, Real.sign_of_neg hx, abs_of_neg hx]
+      rw [map_mul, Units.val_mul, ← hc, hpos _ (neg_pos.mpr hx), ha, Real.sign_of_neg hx,
+        abs_of_neg hx]
       push_cast
       ring
     · have : x = Units.mk0 (x : ℝ) hx.ne' := by ext; simp
@@ -69,17 +72,20 @@ theorem existsUnique_realUnits (χ : ℝˣ →ₜ* ℂˣ) :
       rw [hpos _ hx, Real.sign_of_pos hx, abs_of_pos hx]
       simp
   · rintro ⟨a', s'⟩ h'
-    have hs's : s' = s := eq_of_forall_exp_mul_eq fun t => by
-      have h1 := h' (e t)
-      have he : ((e t : ℝˣ) : ℝ) = Real.exp t := rfl
-      rw [he, Real.sign_of_pos (Real.exp_pos t), abs_of_pos (Real.exp_pos t),
-        ofReal_cpow_eq_exp (Real.exp_pos t), Real.log_exp] at h1
-      simp only [Complex.ofReal_one, one_pow, one_mul] at h1
-      rw [← h1, hs']
+    have hs's : s' = s :=
+      eq_of_forall_exp_mul_eq fun t => by
+        have h1 := h' (e t)
+        have he : ((e t : ℝˣ) : ℝ) = Real.exp t := rfl
+        rw [he, Real.sign_of_pos (Real.exp_pos t), abs_of_pos (Real.exp_pos t),
+            ofReal_cpow_eq_exp (Real.exp_pos t), Real.log_exp]
+          at h1
+        simp only [Complex.ofReal_one, one_pow, one_mul] at h1
+        rw [← h1, hs']
     have ha' : (-1 : ℂ) ^ (a' : ℕ) = (-1 : ℂ) ^ (a : ℕ) := by
       have h1 := h' (-1)
       simp only [Units.val_neg, Units.val_one, abs_neg, abs_one, Complex.ofReal_one,
-        Complex.one_cpow, mul_one, Real.sign_of_neg (show (-1 : ℝ) < 0 by norm_num)] at h1
+          Complex.one_cpow, mul_one, Real.sign_of_neg (show (-1 : ℝ) < 0 by norm_num)]
+        at h1
       rw [← ha, hc, h1]
       push_cast
       ring
@@ -89,11 +95,13 @@ theorem existsUnique_realUnits (χ : ℝˣ →ₜ* ℂˣ) :
       fin_cases a' <;> fin_cases b <;> norm_num
     simp [haa, hs's]
 
-theorem existsUnique_circle_zpow (χ : Circle →ₜ* ℂˣ) :
-    ∃! m : ℤ, ∀ z : Circle, (χ z : ℂ) = (z : ℂ) ^ m := by
-  obtain ⟨s, hs, -⟩ := existsUnique_exp_of_continuous (fun t => χ (Circle.exp t))
-    (χ.continuous.comp Circle.exp.continuous)
-    (fun a b => by simp only [Circle.exp_add, map_mul])
+theorem existsUnique_circle_zpow (χ : Circle →ₜ* ℂˣ)
+    : ∃! m : ℤ, ∀ z : Circle, (χ z : ℂ) = (z : ℂ) ^ m := by
+  obtain ⟨s, hs, -⟩ :=
+    existsUnique_exp_of_continuous
+      (fun t => χ (Circle.exp t))
+      (χ.continuous.comp Circle.exp.continuous)
+      (fun a b => by simp only [Circle.exp_add, map_mul])
   have hs' : ∀ t : ℝ, (χ (Circle.exp t) : ℂ) = Complex.exp (s * t) := hs
 
   obtain ⟨n, hn⟩ : ∃ n : ℤ, s = n * I := by
@@ -112,12 +120,15 @@ theorem existsUnique_circle_zpow (χ : Circle →ₜ* ℂˣ) :
     ring
   refine ⟨n, fun z => ?_, fun m hm => ?_⟩
   · rw [← Circle.exp_arg z, hval]
-  · have hmn : (m : ℂ) * I = n * I := eq_of_forall_exp_mul_eq fun t => by
-      have h1 := hm (Circle.exp t)
-      rw [hval, Circle.coe_exp, ← Complex.exp_int_mul, ← Complex.exp_int_mul] at h1
-      calc Complex.exp (m * I * t) = Complex.exp (m * (t * I)) := by ring_nf
-        _ = Complex.exp (n * (t * I)) := h1.symm
-        _ = Complex.exp (n * I * t) := by ring_nf
+  · have hmn : (m : ℂ) * I = n * I :=
+      eq_of_forall_exp_mul_eq fun t => by
+        have h1 := hm (Circle.exp t)
+        rw [hval, Circle.coe_exp, ← Complex.exp_int_mul, ← Complex.exp_int_mul] at h1
+        calc
+          Complex.exp (m * I * t)
+            = Complex.exp (m * (t * I)) := by ring_nf
+          _ = Complex.exp (n * (t * I)) := h1.symm
+          _ = Complex.exp (n * I * t) := by ring_nf
     exact_mod_cast mul_right_cancel₀ I_ne_zero hmn
 
 noncomputable def circleToUnits : Circle →ₜ* ℂˣ where
@@ -125,18 +136,20 @@ noncomputable def circleToUnits : Circle →ₜ* ℂˣ where
   continuous_toFun :=
     Units.isEmbedding_val₀.continuous_iff.mpr (continuous_subtype_val.congr fun _ => rfl)
 
-@[simp] theorem coe_circleToUnits (z : Circle) : ((circleToUnits z : ℂˣ) : ℂ) = z := rfl
+@[simp]
+theorem coe_circleToUnits (z : Circle) : ((circleToUnits z : ℂˣ) : ℂ) = z := rfl
 
-theorem existsUnique_complexUnits (χ : ℂˣ →ₜ* ℂˣ) :
-    ∃! p : ℤ × ℂ, ∀ z : ℂˣ,
-      (χ z : ℂ) = ((z : ℂ) / (‖(z : ℂ)‖ : ℂ)) ^ p.1 * ((‖(z : ℂ)‖ : ℝ) : ℂ) ^ p.2 := by
-
+theorem existsUnique_complexUnits (χ : ℂˣ →ₜ* ℂˣ)
+    : ∃! p : ℤ × ℂ, ∀ z : ℂˣ,
+        (χ z : ℂ) = ((z : ℂ) / (‖(z : ℂ)‖ : ℂ)) ^ p.1 * ((‖(z : ℂ)‖ : ℝ) : ℂ) ^ p.2 := by
   let e : ℝ → ℂˣ := fun t => Units.mk0 (Real.exp t : ℂ) (by exact_mod_cast (Real.exp_pos t).ne')
   have econt : Continuous e :=
     Units.isEmbedding_val₀.continuous_iff.mpr (Complex.continuous_ofReal.comp Real.continuous_exp)
-  obtain ⟨s, hs, -⟩ := existsUnique_exp_of_continuous (fun t => χ (e t))
-    (χ.continuous.comp econt)
-    (fun a b => by rw [← map_mul]; congr 1; exact Units.ext (by simp [e, Complex.exp_add]))
+  obtain ⟨s, hs, -⟩ :=
+    existsUnique_exp_of_continuous
+      (fun t => χ (e t))
+      (χ.continuous.comp econt)
+      (fun a b => by rw [← map_mul]; congr 1; exact Units.ext (by simp [e, Complex.exp_add]))
   have hs' : ∀ t : ℝ, (χ (e t) : ℂ) = Complex.exp (s * t) := hs
 
   obtain ⟨n, hn, hnu⟩ := existsUnique_circle_zpow (χ.comp circleToUnits)
@@ -154,17 +167,20 @@ theorem existsUnique_complexUnits (χ : ℂˣ →ₜ* ℂˣ) :
     conv_lhs => rw [hz]
     rw [map_mul, Units.val_mul, hs', hn', hw, ofReal_cpow_eq_exp (hnorm z), mul_comm]
   · rintro ⟨m, s'⟩ h'
-    have hs's : s' = s := eq_of_forall_exp_mul_eq fun t => by
-      have h1 := h' (e t)
-      have he : ((e t : ℂˣ) : ℂ) = (Real.exp t : ℂ) := rfl
-      rw [he, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (Real.exp_pos t),
-        div_self (by exact_mod_cast (Real.exp_pos t).ne'), one_zpow, one_mul,
-        ofReal_cpow_eq_exp (Real.exp_pos t), Real.log_exp] at h1
-      rw [← h1, hs']
-    have hmn : m = n := hnu m fun w => by
-      have h1 := h' (circleToUnits w)
-      rw [coe_circleToUnits, Circle.norm_coe] at h1
-      simpa using h1
+    have hs's : s' = s :=
+      eq_of_forall_exp_mul_eq fun t => by
+        have h1 := h' (e t)
+        have he : ((e t : ℂˣ) : ℂ) = (Real.exp t : ℂ) := rfl
+        rw [he, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (Real.exp_pos t),
+            div_self (by exact_mod_cast (Real.exp_pos t).ne'), one_zpow, one_mul,
+            ofReal_cpow_eq_exp (Real.exp_pos t), Real.log_exp]
+          at h1
+        rw [← h1, hs']
+    have hmn : m = n :=
+      hnu m fun w => by
+        have h1 := h' (circleToUnits w)
+        rw [coe_circleToUnits, Circle.norm_coe] at h1
+        simpa using h1
     simp [hmn, hs's]
 
 end GroundTheory.Global

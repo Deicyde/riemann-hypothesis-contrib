@@ -16,7 +16,11 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.QnEabPres
 @[expose] public section
 
 theorem qnHermHaar : Formalism.FourierDecayAlt.Q.HermHaar :=
-  PI.QnHermHaar.qnHermHaar_of_alg PI.QnHermHaar.hermitian_algebra_generation qnRdSkew quantum_minor_star
-    (PI.contractionsCovariant_iff.2
-      ⟨covariant_det_of_lin covariant_linear, covariant_hat_of_lin covariant_linear, covariant_hat_sq_of_lin covariant_linear⟩)
+  PI.QnHermHaar.qnHermHaar_of_alg PI.QnHermHaar.hermitian_algebra_generation qnRdSkew
+    quantum_minor_star
+    (PI.contractionsCovariant_iff.2 ⟨
+      covariant_det_of_lin covariant_linear,
+      covariant_hat_of_lin covariant_linear,
+      covariant_hat_sq_of_lin covariant_linear
+    ⟩)
     quantum_minor_move.1 quantum_minor_move.2 qnYLeibniz qnEabGl qnEabPres

@@ -14,11 +14,13 @@ noncomputable section
 
 namespace Formalism.CohomologicalDescent.SL2BinomialLattices
 
-open Formalism.GradedWeylDivisibility Formalism.RankGapBounds.JumpSetsAlt Formalism.CohomologicalDescent.LA
+open Formalism.GradedWeylDivisibility Formalism.RankGapBounds.JumpSetsAlt
+  Formalism.CohomologicalDescent.LA
 
 universe u v u' v'
 
-theorem maxVal_le_log_alt (l n : ℕ) : Formalism.RankGapBounds.JumpSetsAlt.maxVal l n ≤ Nat.log l n :=
+theorem maxVal_le_log_alt (l n : ℕ)
+    : Formalism.RankGapBounds.JumpSetsAlt.maxVal l n ≤ Nat.log l n :=
   Finset.sup_le fun _ _ => Nat.factorization_choose_le_log
 
 theorem log_le_log_bound : LgLog := by
@@ -37,10 +39,14 @@ theorem log_le_log_bound : LgLog := by
     have h4 := Real.log_le_log h3 h2
     rwa [Real.log_pow] at h4
 
-theorem sum_maxVal_le_card_mul_log {N : ℕ} (U : Fin N → ℤ) (l M : ℕ) (hl : 0 < l) (s : Finset (Fin N × Fin N))
-    (h : ∀ p ∈ s, U p.1 - U p.2 ≤ (M : ℤ)) :
-    ∑ p ∈ s, Formalism.RankGapBounds.JumpSetsAlt.maxVal l (U p.1 - U p.2 - 1).toNat ≤ s.card * Nat.log l M ∧
-      (M ≤ l → ∑ p ∈ s, Formalism.RankGapBounds.JumpSetsAlt.maxVal l (U p.1 - U p.2 - 1).toNat = 0) := by
+theorem sum_maxVal_le_card_mul_log
+    {N : ℕ} (U : Fin N → ℤ)
+    (l M : ℕ) (hl : 0 < l)
+    (s : Finset (Fin N × Fin N)) (h : ∀ p ∈ s, U p.1 - U p.2 ≤ (M : ℤ))
+    : ∑ p ∈ s, Formalism.RankGapBounds.JumpSetsAlt.maxVal l (U p.1 - U p.2 - 1).toNat
+        ≤ s.card * Nat.log l M
+      ∧ (M ≤ l
+        → ∑ p ∈ s, Formalism.RankGapBounds.JumpSetsAlt.maxVal l (U p.1 - U p.2 - 1).toNat = 0) := by
   constructor
   · rw [← smul_eq_mul]
     apply Finset.sum_le_card_nsmul
@@ -68,29 +74,34 @@ theorem card_posPairs (N : ℕ) : (posPairs N).card = N.choose 2 := by
   simp only [Fin.card_Iio]
   rw [Fin.sum_univ_eq_sum_range (fun i => i) N, Finset.sum_range_id, Nat.choose_two_right]
 
-theorem nat_le_mul_log_real (ex c l y : ℕ) (h : ex ≤ c * Nat.log l y) :
-    (ex : ℝ) * Real.log l ≤ (c : ℝ) * Real.log y := by
+theorem nat_le_mul_log_real (ex c l y : ℕ) (h : ex ≤ c * Nat.log l y)
+    : (ex : ℝ) * Real.log l ≤ (c : ℝ) * Real.log y := by
   have h1 : (ex : ℝ) ≤ (c : ℝ) * (Nat.log l y : ℝ) := by exact_mod_cast h
   have h2 : 0 ≤ Real.log l := Real.log_natCast_nonneg l
-  calc (ex : ℝ) * Real.log l ≤ (c : ℝ) * (Nat.log l y : ℝ) * Real.log l :=
-        mul_le_mul_of_nonneg_right h1 h2
+  calc
+    (ex : ℝ) * Real.log l
+      ≤ (c : ℝ) * (Nat.log l y : ℝ) * Real.log l := mul_le_mul_of_nonneg_right h1 h2
     _ = (c : ℝ) * ((Nat.log l y : ℝ) * Real.log l) := by ring
     _ ≤ (c : ℝ) * Real.log y := mul_le_mul_of_nonneg_left (log_le_log_bound l y) (Nat.cast_nonneg c)
 
-theorem sum_posPairs_split {N : ℕ} (k : ℕ) (g : Fin N × Fin N → ℕ) :
-    ∑ p ∈ posPairs N, g p = ∑ p ∈ (posPairs N).filter (fun p => p.2.val < k), g p +
-      ∑ p ∈ (posPairs N).filter (fun p => k ≤ p.1.val), g p +
-      ∑ p ∈ (posPairs N).filter (fun p => p.1.val < k ∧ k ≤ p.2.val), g p := by
+theorem sum_posPairs_split {N : ℕ} (k : ℕ) (g : Fin N × Fin N → ℕ)
+    : ∑ p ∈ posPairs N, g p
+      = ∑ p ∈ (posPairs N).filter (fun p => p.2.val < k), g p
+        + ∑ p ∈ (posPairs N).filter (fun p => k ≤ p.1.val), g p
+        + ∑ p ∈ (posPairs N).filter (fun p => p.1.val < k ∧ k ≤ p.2.val), g p := by
   have hlt : ∀ p ∈ posPairs N, p.1.val < p.2.val := fun p hp => (Finset.mem_filter.1 hp).2
-  have hR : (posPairs N).filter (fun p => ¬ p.2.val < k ∧ k ≤ p.1.val) =
-      (posPairs N).filter (fun p => k ≤ p.1.val) :=
+  have hR
+      : (posPairs N).filter (fun p => ¬ p.2.val < k ∧ k ≤ p.1.val)
+        = (posPairs N).filter (fun p => k ≤ p.1.val) :=
     Finset.filter_congr fun p hp => by have := hlt p hp; omega
-  have hC : (posPairs N).filter (fun p => ¬ p.2.val < k ∧ ¬ k ≤ p.1.val) =
-      (posPairs N).filter (fun p => p.1.val < k ∧ k ≤ p.2.val) :=
+  have hC
+      : (posPairs N).filter (fun p => ¬ p.2.val < k ∧ ¬ k ≤ p.1.val)
+        = (posPairs N).filter (fun p => p.1.val < k ∧ k ≤ p.2.val) :=
     Finset.filter_congr fun p hp => by have := hlt p hp; omega
   rw [← Finset.sum_filter_add_sum_filter_not (posPairs N) (fun p => p.2.val < k),
     ← Finset.sum_filter_add_sum_filter_not ((posPairs N).filter (fun p => ¬ p.2.val < k))
-      (fun p => k ≤ p.1.val), Finset.filter_filter, Finset.filter_filter, hR, hC, add_assoc]
+      (fun p => k ≤ p.1.val),
+    Finset.filter_filter, Finset.filter_filter, hR, hC, add_assoc]
 
 theorem raising_split_three : ESplit3 := by
   intro N k l U
@@ -98,15 +109,17 @@ theorem raising_split_three : ESplit3 := by
 
 def embedFinFirst {N k : ℕ} (hk : k ≤ N) : Fin k ↪ Fin N := ⟨Fin.castLE hk, Fin.castLE_injective hk⟩
 
-def embedFinLast (N k : ℕ) : Fin (N - k) ↪ Fin N :=
-  ⟨fun a => ⟨k + a.val, by have := a.isLt; omega⟩, fun a b h => by
+def embedFinLast (N k : ℕ) : Fin (N - k) ↪ Fin N := ⟨
+  fun a => ⟨k + a.val, by have := a.isLt; omega⟩,
+  fun a b h => by
     have := congrArg Fin.val h
     simp only at this
-    exact Fin.ext (by omega)⟩
+    exact Fin.ext (by omega)
+⟩
 
-theorem posPairs_filter_lt {N k : ℕ} (hk : k ≤ N) :
-    (posPairs N).filter (fun p => p.2.val < k) =
-      (posPairs k).map ((embedFinFirst hk).prodMap (embedFinFirst hk)) := by
+theorem posPairs_filter_lt {N k : ℕ} (hk : k ≤ N)
+    : (posPairs N).filter (fun p => p.2.val < k)
+      = (posPairs k).map ((embedFinFirst hk).prodMap (embedFinFirst hk)) := by
   ext ⟨a, b⟩
   simp only [posPairs, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_map]
   constructor
@@ -117,9 +130,9 @@ theorem posPairs_filter_lt {N k : ℕ} (hk : k ≤ N) :
     obtain ⟨rfl, rfl⟩ := Prod.mk.inj h2
     exact ⟨hab, b'.isLt⟩
 
-theorem posPairs_filter_ge {N k : ℕ} (hk : k ≤ N) :
-    (posPairs N).filter (fun p => k ≤ p.1.val) =
-      (posPairs (N - k)).map ((embedFinLast N k).prodMap (embedFinLast N k)) := by
+theorem posPairs_filter_ge {N k : ℕ} (hk : k ≤ N)
+    : (posPairs N).filter (fun p => k ≤ p.1.val)
+      = (posPairs (N - k)).map ((embedFinLast N k).prodMap (embedFinLast N k)) := by
   ext ⟨a, b⟩
   simp only [posPairs, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_map]
   constructor
@@ -146,10 +159,10 @@ theorem posPairs_filter_ge {N k : ℕ} (hk : k ≤ N) :
     · show k ≤ k + a'.val
       omega
 
-theorem posPairs_filter_cross {N k : ℕ} (hk : k ≤ N) :
-    (posPairs N).filter (fun p => p.1.val < k ∧ k ≤ p.2.val) =
-      ((Finset.univ : Finset (Fin k)).map (embedFinFirst hk)) ×ˢ
-        ((Finset.univ : Finset (Fin (N - k))).map (embedFinLast N k)) := by
+theorem posPairs_filter_cross {N k : ℕ} (hk : k ≤ N)
+    : (posPairs N).filter (fun p => p.1.val < k ∧ k ≤ p.2.val)
+      = ((Finset.univ : Finset (Fin k)).map (embedFinFirst hk))
+        ×ˢ ((Finset.univ : Finset (Fin (N - k))).map (embedFinLast N k)) := by
   ext ⟨a, b⟩
   simp only [posPairs, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_map,
     Finset.mem_product]
@@ -188,33 +201,37 @@ theorem three_bounds : ThreeBounds := by
   intro l N k h S eta xm lo U hl sh
   obtain ⟨-, c1, c2, c3⟩ := choose_split_alt N k sh.k_le
   have hlt : ∀ p ∈ posPairs N, p.1.val < p.2.val := fun p hp => (Finset.mem_filter.1 hp).2
-  have b1 := sum_maxVal_le_card_mul_log U l S hl.pos ((posPairs N).filter (fun p => p.2.val < k)) (by
-    intro p hp
-    rw [Finset.mem_filter] at hp
-    have h0 := hlt p hp.1
-    have h1 := sh.cloudIn p.1 (by omega)
-    have h2 := sh.cloudIn p.2 hp.2
-    omega)
-  have b2 := sum_maxVal_le_card_mul_log U l eta hl.pos ((posPairs N).filter (fun p => k ≤ p.1.val)) (by
-    intro p hp
-    rw [Finset.mem_filter] at hp
-    have h0 := hlt p hp.1
-    have h1 := sh.restIn p.1 hp.2
-    have h2 := sh.restIn p.2 (by omega)
-    omega)
-  have b3 := sum_maxVal_le_card_mul_log U l h hl.pos
-    ((posPairs N).filter (fun p => p.1.val < k ∧ k ≤ p.2.val)) (by
-    intro p _
-    have h1 := sh.inRange p.1
-    have h2 := sh.inRange p.2
-    omega)
+  have b1 :=
+    sum_maxVal_le_card_mul_log U l S hl.pos ((posPairs N).filter (fun p => p.2.val < k)) (by
+      intro p hp
+      rw [Finset.mem_filter] at hp
+      have h0 := hlt p hp.1
+      have h1 := sh.cloudIn p.1 (by omega)
+      have h2 := sh.cloudIn p.2 hp.2
+      omega)
+  have b2 :=
+    sum_maxVal_le_card_mul_log U l eta hl.pos ((posPairs N).filter (fun p => k ≤ p.1.val)) (by
+      intro p hp
+      rw [Finset.mem_filter] at hp
+      have h0 := hlt p hp.1
+      have h1 := sh.restIn p.1 hp.2
+      have h2 := sh.restIn p.2 (by omega)
+      omega)
+  have b3 :=
+    sum_maxVal_le_card_mul_log U l h hl.pos
+      ((posPairs N).filter (fun p => p.1.val < k ∧ k ≤ p.2.val))
+      (by
+        intro p _
+        have h1 := sh.inRange p.1
+        have h2 := sh.inRange p.2
+        omega)
   rw [c1] at b1
   rw [c2] at b2
   rw [c3] at b3
   exact ⟨b1.1, b1.2, b2.1, b2.2, b3.1, Nat.mul_le_mul_left _ (Nat.log_mono_right (by omega))⟩
 
-theorem real_log_mono_of_le (a : ℕ) (b : ℝ) (hab : (a : ℝ) ≤ b) (hb : 0 ≤ Real.log b) :
-    Real.log a ≤ Real.log b := by
+theorem real_log_mono_of_le (a : ℕ) (b : ℝ) (hab : (a : ℝ) ≤ b) (hb : 0 ≤ Real.log b)
+    : Real.log a ≤ Real.log b := by
   by_cases h0 : a = 0
   · rw [h0]
     simpa using hb

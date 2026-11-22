@@ -4,15 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem orderOf_pow_coprime_parts {Γ : Type} [Group Γ] (x : Γ) (P C e : ℕ) (hn : orderOf x = P * C)
-    (hP : 0 < P) (hC : 0 < C) (hco : P.Coprime C) (h1 : C ∣ e) (h2 : e ≡ 1 [MOD P]) :
-    orderOf (x ^ e) = P ∧ orderOf (x * (x ^ e)⁻¹) = C := by
+private theorem orderOf_pow_coprime_parts
+    {Γ : Type} [Group Γ]
+    (x : Γ) (P C e : ℕ) (hn : orderOf x = P * C) (hP : 0 < P) (hC : 0 < C) (hco : P.Coprime C)
+    (h1 : C ∣ e) (h2 : e ≡ 1 [MOD P])
+    : orderOf (x ^ e) = P ∧ orderOf (x * (x ^ e)⁻¹) = C := by
   have hcx : Commute (x ^ e) x := (Commute.refl x).pow_left e
   have hcomm : Commute (x ^ e) (x * (x ^ e)⁻¹) := hcx.mul_right (Commute.refl _).inv_right
-  have hyz : x ^ e * (x * (x ^ e)⁻¹) = x := by
-    rw [← mul_assoc, hcx.eq, mul_inv_cancel_right]
+  have hyz : x ^ e * (x * (x ^ e)⁻¹) = x := by rw [← mul_assoc, hcx.eq, mul_inv_cancel_right]
   have hoy : orderOf (x ^ e) ∣ P := by
     apply orderOf_dvd_of_pow_eq_one
     rw [← pow_mul, orderOf_dvd_iff_pow_eq_one.mp]
@@ -33,7 +35,8 @@ private theorem orderOf_pow_coprime_parts {Γ : Type} [Group Γ] (x : Γ) (P C e
   obtain ⟨b, hb⟩ := hoz
   have hab : a * b = 1 := by
     have : P * C * (a * b) = P * C * 1 := by
-      calc P * C * (a * b)
+      calc
+        P * C * (a * b)
           = (orderOf (x ^ e) * orderOf (x * (x ^ e)⁻¹)) * (a * b) := by rw [hprod]
         _ = (orderOf (x ^ e) * a) * (orderOf (x * (x ^ e)⁻¹) * b) := by ring
         _ = P * C * 1 := by rw [← ha, ← hb, mul_one]
@@ -44,11 +47,18 @@ private theorem orderOf_pow_coprime_parts {Γ : Type} [Group Γ] (x : Γ) (P C e
   · rw [ha, ha1, mul_one]
   · rw [hb, hb1, mul_one]
 
-theorem UpperTheory.V.HV.partOrd :
-    ∀ (Γ : Type) [Group Γ] (l : ℕ), l.Prime → ∀ x : Γ, 0 < orderOf x →
-      orderOf (lPart l x) = ordProj[l] (orderOf x) ∧ orderOf (lPrime l x) = ordCompl[l] (orderOf x) ∧ ¬ l ∣ orderOf (lPrime l x) ∧
-      lPart l x ∈ Subgroup.zpowers x ∧ lPrime l x ∈ Subgroup.zpowers x ∧ (¬ l ∣ orderOf x → lPart l x = 1 ∧ lPrime l x = x) ∧
-      ∀ a b : Γ, Commute a b → a * b = x → ¬ l ∣ orderOf a → (∃ s, b ^ l ^ s = 1) → lPrime l x = a ∧ lPart l x = b := by
+theorem UpperTheory.V.HV.partOrd
+    : ∀ (Γ : Type) [Group Γ] (l : ℕ),
+      l.Prime
+        → ∀ x : Γ,
+          0 < orderOf x
+            → orderOf (lPart l x) = ordProj[l] (orderOf x)
+              ∧ orderOf (lPrime l x) = ordCompl[l] (orderOf x) ∧ ¬ l ∣ orderOf (lPrime l x)
+              ∧ lPart l x ∈ Subgroup.zpowers x ∧ lPrime l x ∈ Subgroup.zpowers x
+              ∧ (¬ l ∣ orderOf x → lPart l x = 1 ∧ lPrime l x = x)
+              ∧ ∀ a b : Γ,
+                Commute a b → a * b = x → ¬ l ∣ orderOf a → (∃ s, b ^ l ^ s = 1)
+                  → lPrime l x = a ∧ lPart l x = b := by
   intro Γ _ l hl x hx
   have hn0 : orderOf x ≠ 0 := hx.ne'
   obtain ⟨P, hPd⟩ : ∃ P, P = ordProj[l] (orderOf x) := ⟨_, rfl⟩
@@ -81,7 +91,8 @@ theorem UpperTheory.V.HV.partOrd :
   · rintro a b hab habx hna ⟨s, hs⟩
     have hcoa : (orderOf a).Coprime l := Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hl).2 hna)
     have hob : orderOf b ∣ l ^ s := orderOf_dvd_of_pow_eq_one hs
-    have hab' : (orderOf a).Coprime (orderOf b) := Nat.Coprime.coprime_dvd_right hob (hcoa.pow_right s)
+    have hab' : (orderOf a).Coprime (orderOf b) :=
+      Nat.Coprime.coprime_dvd_right hob (hcoa.pow_right s)
     have hx' : orderOf x = orderOf a * orderOf b := by
       rw [← habx]; exact hab.orderOf_mul_eq_mul_orderOf_of_coprime hab'
     have hoaC : orderOf a ∣ C := by
@@ -97,7 +108,9 @@ theorem UpperTheory.V.HV.partOrd :
       have := (pow_eq_pow_iff_modEq (x := b) (n := e) (m := 1)).2 (h2.of_dvd hobP)
       simpa using this
     have hpart : lPart l x = b := by
-      calc lPart l x = x ^ e := hlp
+      calc
+        lPart l x
+          = x ^ e := hlp
         _ = (a * b) ^ e := by rw [habx]
         _ = b := by rw [hab.mul_pow, hae, hbe, one_mul]
     refine ⟨?_, hpart⟩

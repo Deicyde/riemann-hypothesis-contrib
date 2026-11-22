@@ -10,35 +10,42 @@ open NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.Fl.LogNorms
 
-theorem norm_integer_le_one (p : ℕ) [Fact p.Prime] {k : Type} [Field k] (ι : k →+* ℂ_[p])
-    (a : 𝓞 k) : ‖ι (a : k)‖ ≤ 1 := by
+theorem norm_integer_le_one (p : ℕ) [Fact p.Prime] {k : Type} [Field k] (ι : k →+* ℂ_[p]) (a : 𝓞 k)
+    : ‖ι (a : k)‖ ≤ 1 := by
   letI : Algebra ℤ ℂ_[p] := Ring.toIntAlgebra _
   exact (Valuation.integer.integers (NormedField.valuation (K := ℂ_[p]))).isIntegral_iff_v_le_one.1
     ((map_isIntegral_int ι (RingOfIntegers.isIntegral_coe a)).tower_top)
 
-theorem norm_intCast_eq_one (p : ℕ) [hp : Fact p.Prime] {z : ℤ} (h : ¬ (p : ℤ) ∣ z) :
-    ‖(z : ℂ_[p])‖ = 1 := by
-  have h1 : ‖(z : ℚ_[p])‖ = 1 := Padic.norm_intCast_eq_one_iff.2
-    ((Prime.coprime_iff_not_dvd (Nat.prime_iff_prime_int.1 hp.out)).2 h).symm
+theorem norm_intCast_eq_one (p : ℕ) [hp : Fact p.Prime] {z : ℤ} (h : ¬ (p : ℤ) ∣ z)
+    : ‖(z : ℂ_[p])‖ = 1 := by
+  have h1 : ‖(z : ℚ_[p])‖ = 1 :=
+    Padic.norm_intCast_eq_one_iff.2
+      ((Prime.coprime_iff_not_dvd (Nat.prime_iff_prime_int.1 hp.out)).2 h).symm
   rw [← map_intCast (algebraMap ℚ_[p] ℂ_[p]) z, norm_algebraMap', h1]
 
-theorem exists_int_mul_eq_integer {k : Type} [Field k] [NumberField k] (x : k) :
-    ∃ n : ℤ, n ≠ 0 ∧ ∃ a : 𝓞 k, (a : k) = n * x := by
+theorem exists_int_mul_eq_integer {k : Type} [Field k] [NumberField k] (x : k)
+    : ∃ n : ℤ, n ≠ 0 ∧ ∃ a : 𝓞 k, (a : k) = n * x := by
   obtain ⟨d, hd, h⟩ := exists_integral_multiples ℤ ℚ (L := k) {x}
   exact ⟨d, hd, ⟨d • x, h x (Finset.mem_singleton_self x)⟩, zsmul_eq_mul x d⟩
 
-theorem norm_le_one_of_mul {k : Type} [Field k] (p : ℕ) [Fact p.Prime] (ι : k →+* ℂ_[p])
-    {x : k} {n : ℤ} {a : 𝓞 k} (ha : (a : k) = n * x) (hp : ¬ (p : ℤ) ∣ n) : ‖ι x‖ ≤ 1 := by
+theorem norm_le_one_of_mul
+    {k : Type} [Field k]
+    (p : ℕ) [Fact p.Prime]
+    (ι : k →+* ℂ_[p])
+    {x : k} {n : ℤ} {a : 𝓞 k} (ha : (a : k) = n * x) (hp : ¬ (p : ℤ) ∣ n)
+    : ‖ι x‖ ≤ 1 := by
   have h := norm_integer_le_one p ι a
   rwa [ha, map_mul, map_intCast, norm_mul, norm_intCast_eq_one p hp, one_mul] at h
 
-theorem isAdelic_ofElt (k : Type) [Field k] [NumberField k] (x : k) (hx : x ≠ 0) :
-    (LogNorms.ofElt x).IsAdelic := by
+theorem isAdelic_ofElt (k : Type) [Field k] [NumberField k] (x : k) (hx : x ≠ 0)
+    : (LogNorms.ofElt x).IsAdelic := by
   obtain ⟨n, hn, a, ha⟩ := exists_int_mul_eq_integer x
   obtain ⟨m, hm, b, hb⟩ := exists_int_mul_eq_integer x⁻¹
   have hfin : {p : Nat.Primes | (p : ℕ) ∣ (n * m).natAbs}.Finite := by
-    refine Set.Finite.of_injOn (f := fun p : Nat.Primes => (p : ℕ))
-      (t := ((n * m).natAbs.primeFactors : Set ℕ)) ?_ (fun _ _ _ _ h => Subtype.ext h)
+    refine Set.Finite.of_injOn
+      (f := fun p : Nat.Primes => (p : ℕ))
+      (t := ((n * m).natAbs.primeFactors : Set ℕ)) ?_
+      (fun _ _ _ _ h => Subtype.ext h)
       (Finset.finite_toSet _)
     intro p hp
     exact Finset.mem_coe.2 (Nat.mem_primeFactors.2

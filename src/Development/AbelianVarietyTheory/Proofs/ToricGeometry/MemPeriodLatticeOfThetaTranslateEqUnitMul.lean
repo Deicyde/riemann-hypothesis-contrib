@@ -18,9 +18,10 @@ section General
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E]
 
-theorem entire_eq_of_mul_eq_mul_right {f₁ f₂ θ : E → ℂ} (h₁ : Differentiable ℂ f₁)
-    (h₂ : Differentiable ℂ f₂) (hθ : Continuous θ) (hθ0 : θ ≠ 0)
-    (h : ∀ z, f₁ z * θ z = f₂ z * θ z) : f₁ = f₂ := by
+theorem entire_eq_of_mul_eq_mul_right
+    {f₁ f₂ θ : E → ℂ} (h₁ : Differentiable ℂ f₁) (h₂ : Differentiable ℂ f₂) (hθ : Continuous θ)
+    (hθ0 : θ ≠ 0) (h : ∀ z, f₁ z * θ z = f₂ z * θ z)
+    : f₁ = f₂ := by
   obtain ⟨z₀, hz₀⟩ : ∃ z₀, θ z₀ ≠ 0 := by
     by_contra hc
     apply hθ0
@@ -29,20 +30,23 @@ theorem entire_eq_of_mul_eq_mul_right {f₁ f₂ θ : E → ℂ} (h₁ : Differe
     exact hc ⟨z, hz⟩
   have hW : IsOpen {z | θ z ≠ 0} := isOpen_ne_fun hθ continuous_const
   have hEq : Set.EqOn f₁ f₂ {z | θ z ≠ 0} := fun z hz => mul_right_cancel₀ hz (h z)
-  have hall := GlobalTheory.SCV.eqOn_of_eqOn_open isOpen_univ isPreconnected_univ h₁.differentiableOn
-    h₂.differentiableOn hW ⟨z₀, hz₀⟩ (Set.subset_univ _) hEq
+  have hall :=
+    GlobalTheory.SCV.eqOn_of_eqOn_open isOpen_univ isPreconnected_univ h₁.differentiableOn
+      h₂.differentiableOn hW ⟨z₀, hz₀⟩ (Set.subset_univ _) hEq
   funext z
   exact hall (Set.mem_univ z)
 
-theorem entire_eq_exp_linear_of_multiplier [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    {h : E → ℂ} (hd : Differentiable ℂ h) (h0 : ∀ z, h z ≠ 0) {S : Set E}
-    (hS : Submodule.span ℝ S = ⊤) (hper : ∀ s ∈ S, ∃ c : ℂ, ∀ z, h (z + s) = c * h z) :
-    ∃ L : E →L[ℂ] ℂ, ∀ z, h z = h 0 * Complex.exp (L z) := by
+theorem entire_eq_exp_linear_of_multiplier
+    [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+    {h : E → ℂ} (hd : Differentiable ℂ h) (h0 : ∀ z, h z ≠ 0)
+    {S : Set E} (hS : Submodule.span ℝ S = ⊤) (hper : ∀ s ∈ S, ∃ c : ℂ, ∀ z, h (z + s) = c * h z)
+    : ∃ L : E →L[ℂ] ℂ, ∀ z, h z = h 0 * Complex.exp (L z) := by
   set F : E → E →L[ℂ] ℂ := fun z => (h z)⁻¹ • fderiv ℂ h z with hFdef
   have hfd : Differentiable ℂ (fderiv ℂ h) := by
     intro z
-    exact (GlobalTheory.SCV.differentiableOn_fderiv isOpen_univ hd.differentiableOn).differentiableAt
-      (isOpen_univ.mem_nhds (Set.mem_univ z))
+    exact
+      (GlobalTheory.SCV.differentiableOn_fderiv isOpen_univ hd.differentiableOn).differentiableAt
+        (isOpen_univ.mem_nhds (Set.mem_univ z))
   have hF : Differentiable ℂ F := (hd.inv h0).smul hfd
   have hFper : ∀ x, ∀ s ∈ S, F (x + s) = F x := by
     intro x s hs
@@ -65,29 +69,52 @@ theorem entire_eq_exp_linear_of_multiplier [NormedSpace ℝ E] [FiniteDimensiona
     simp only
     rw [smul_smul, mul_inv_cancel₀ (h0 z), one_smul]
   refine ⟨F 0, fun z => ?_⟩
-  have hG : ∀ y, HasFDerivAt (fun z => h z * Complex.exp (-(F 0) z)) (0 : E →L[ℂ] ℂ) y := by
+  have hG : ∀ y, HasFDerivAt (fun z => h z * Complex.exp (- (F 0) z)) (0 : E →L[ℂ] ℂ) y := by
     intro y
     have h1 : HasFDerivAt h (h y • F 0) y := by
       rw [← hdh]
       exact (hd y).hasFDerivAt
-    have h2 : HasFDerivAt (fun z => Complex.exp (-(F 0) z)) (Complex.exp (-(F 0) y) • (-(F 0))) y :=
+    have h2
+        : HasFDerivAt (fun z => Complex.exp (- (F 0) z)) (Complex.exp (- (F 0) y) • (-(F 0))) y :=
       ((F 0).hasFDerivAt.neg).cexp
     refine (h1.mul h2).congr_fderiv ?_
     simp only [smul_neg, smul_smul, mul_comm (h y), neg_add_cancel]
-  have hGc := is_const_of_fderiv_eq_zero (f := fun z => h z * Complex.exp (-(F 0) z))
-    (fun y => (hG y).differentiableAt) (fun y => (hG y).fderiv) z 0
+  have hGc :=
+    is_const_of_fderiv_eq_zero
+      (f := fun z => h z * Complex.exp (- (F 0) z))
+      (fun y => (hG y).differentiableAt)
+      (fun y => (hG y).fderiv)
+      z 0
   simp only [map_zero, neg_zero, Complex.exp_zero, mul_one] at hGc
   rw [← hGc, mul_assoc, ← Complex.exp_add, neg_add_cancel, Complex.exp_zero, mul_one]
 
 end General
 
-theorem mem_periodLattice_of_theta_translate_eq_unit_mul :
-    (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ), τ ∈ SiegelH (Fin g) → (Differentiable ℂ (fun z => theta 0 0 z τ) ∧ ∀ (n n' : Fin g → ℤ) z, (fun z => theta 0 0 z τ) (z + τ *ᵥ ofIntVec n + ofIntVec n') = eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z)) * (fun z => theta 0 0 z τ) z) ∧ (fun z => theta 0 0 z τ) ≠ 0) → (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ), τ ∈ SiegelH (Fin g) → DiscreteTopology (periodLattice τ) ∧ Submodule.span ℝ (periodLattice τ : Set (Fin g → ℂ)) = ⊤ ∧ ∀ n n' : Fin g → ℤ, τ *ᵥ ofIntVec n + ofIntVec n' = 0 → n = 0 ∧ n' = 0) → (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ), τ ∈ SiegelH (Fin g) → ∀ (w : Fin g → ℂ) (h : (Fin g → ℂ) → ℂ), Differentiable ℂ h → (∀ z, h z ≠ 0) → (∀ z, theta 0 0 (z + w) τ = h z * theta 0 0 z τ) → w ∈ periodLattice τ) := by
+theorem mem_periodLattice_of_theta_translate_eq_unit_mul
+    : (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ),
+        τ ∈ SiegelH (Fin g)
+          → (Differentiable ℂ (fun z => theta 0 0 z τ)
+              ∧ ∀ (n n' : Fin g → ℤ) z,
+                (fun z => theta 0 0 z τ) (z + τ *ᵥ ofIntVec n + ofIntVec n')
+                  = eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z))
+                    * (fun z => theta 0 0 z τ) z)
+            ∧ (fun z => theta 0 0 z τ) ≠ 0)
+      → (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ),
+        τ ∈ SiegelH (Fin g)
+          → DiscreteTopology (periodLattice τ)
+            ∧ Submodule.span ℝ (periodLattice τ : Set (Fin g → ℂ)) = ⊤
+            ∧ ∀ n n' : Fin g → ℤ, τ *ᵥ ofIntVec n + ofIntVec n' = 0 → n = 0 ∧ n' = 0)
+      → (∀ (g : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ),
+        τ ∈ SiegelH (Fin g)
+          → ∀ (w : Fin g → ℂ) (h : (Fin g → ℂ) → ℂ),
+            Differentiable ℂ h → (∀ z, h z ≠ 0) → (∀ z, theta 0 0 (z + w) τ = h z * theta 0 0 z τ)
+              → w ∈ periodLattice τ) := by
   intro H1 H2 g τ hτ w h hd h0 hrel
   obtain ⟨⟨hθd, hqp⟩, hθ0⟩ := H1 g τ hτ
   obtain ⟨-, hspan, -⟩ := H2 g τ hτ
-  have hmult : ∀ n n' : Fin g → ℤ, ∀ z, h (z + (τ *ᵥ ofIntVec n + ofIntVec n')) =
-      eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) * h z := by
+  have hmult
+      : ∀ n n' : Fin g → ℤ, ∀ z,
+        h (z + (τ *ᵥ ofIntVec n + ofIntVec n')) = eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) * h z := by
     intro n n'
     set A : (Fin g → ℂ) → ℂ := fun z =>
       eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ (τ *ᵥ ofIntVec n) / 2 + ofIntVec n ⬝ᵥ z)) with hA
@@ -111,19 +138,24 @@ theorem mem_periodLattice_of_theta_translate_eq_unit_mul :
       have := congrFun hz z
       simp only [Pi.zero_apply, mul_eq_zero] at this
       exact this.resolve_left (hAne z)
-    have hEq : ∀ z, h (z + (τ *ᵥ ofIntVec n + ofIntVec n')) * (A z * theta 0 0 z τ) =
-        eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) * h z * (A z * theta 0 0 z τ) := by
+    have hEq
+        : ∀ z,
+          h (z + (τ *ᵥ ofIntVec n + ofIntVec n')) * (A z * theta 0 0 z τ)
+            = eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) * h z * (A z * theta 0 0 z τ) := by
       intro z
       have e2 : theta 0 0 (z + (τ *ᵥ ofIntVec n + ofIntVec n')) τ = A z * theta 0 0 z τ := by
         rw [← add_assoc]
         exact hqp n n' z
-      have e3 : theta 0 0 (z + w + (τ *ᵥ ofIntVec n + ofIntVec n')) τ =
-          A (z + w) * theta 0 0 (z + w) τ := by
+      have e3
+          : theta 0 0 (z + w + (τ *ᵥ ofIntVec n + ofIntVec n')) τ
+            = A (z + w) * theta 0 0 (z + w) τ := by
         rw [← add_assoc]
         exact hqp n n' (z + w)
-      calc h (z + (τ *ᵥ ofIntVec n + ofIntVec n')) * (A z * theta 0 0 z τ)
-          = h (z + (τ *ᵥ ofIntVec n + ofIntVec n')) *
-              theta 0 0 (z + (τ *ᵥ ofIntVec n + ofIntVec n')) τ := by rw [e2]
+      calc
+        h (z + (τ *ᵥ ofIntVec n + ofIntVec n')) * (A z * theta 0 0 z τ)
+            = h (z + (τ *ᵥ ofIntVec n + ofIntVec n'))
+              * theta 0 0 (z + (τ *ᵥ ofIntVec n + ofIntVec n')) τ := by
+          rw [e2]
         _ = theta 0 0 (z + (τ *ᵥ ofIntVec n + ofIntVec n') + w) τ := (hrel _).symm
         _ = theta 0 0 (z + w + (τ *ᵥ ofIntVec n + ofIntVec n')) τ := by rw [add_right_comm]
         _ = A (z + w) * theta 0 0 (z + w) τ := e3
@@ -131,22 +163,26 @@ theorem mem_periodLattice_of_theta_translate_eq_unit_mul :
           rw [hAw, hrel]
           ring
     intro z
-    exact congrFun (entire_eq_of_mul_eq_mul_right
-      (f₁ := fun z => h (z + (τ *ᵥ ofIntVec n + ofIntVec n')))
-      (f₂ := fun z => eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) * h z)
-      (hd.comp (differentiable_id.add_const _)) ((differentiable_const _).mul hd)
-      (hAc.mul hθd.continuous) hne hEq) z
+    exact congrFun
+      (entire_eq_of_mul_eq_mul_right
+        (f₁ := fun z => h (z + (τ *ᵥ ofIntVec n + ofIntVec n')))
+        (f₂ := fun z => eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) * h z)
+        (hd.comp (differentiable_id.add_const _)) ((differentiable_const _).mul hd)
+        (hAc.mul hθd.continuous) hne hEq)
+      z
   have hS : ∀ s ∈ (periodLattice τ : Set (Fin g → ℂ)), ∃ c : ℂ, ∀ z, h (z + s) = c * h z := by
     rintro s ⟨n, n', rfl⟩
     exact ⟨_, hmult n n'⟩
   obtain ⟨L, hL⟩ := entire_eq_exp_linear_of_multiplier hd h0 hspan hS
-  have hexp : ∀ n n' : Fin g → ℤ, Complex.exp (L (τ *ᵥ ofIntVec n + ofIntVec n')) =
-      eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) := by
+  have hexp
+      : ∀ n n' : Fin g → ℤ,
+        Complex.exp (L (τ *ᵥ ofIntVec n + ofIntVec n')) = eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) := by
     intro n n'
     have e := hmult n n' 0
     rw [zero_add] at e
-    have e' : h 0 * Complex.exp (L (τ *ᵥ ofIntVec n + ofIntVec n')) =
-        h 0 * eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) := by
+    have e'
+        : h 0 * Complex.exp (L (τ *ᵥ ofIntVec n + ofIntVec n'))
+          = h 0 * eC (-(1 : ℂ) * (ofIntVec n ⬝ᵥ w)) := by
       rw [← hL, e, mul_comm]
     exact mul_left_cancel₀ (h0 0) e'
   have hk : ∀ j : Fin g, ∃ m : ℤ, L (Pi.single j 1) = m * (2 * Real.pi * Complex.I) := by
@@ -164,7 +200,9 @@ theorem mem_periodLattice_of_theta_translate_eq_unit_mul :
   choose k hk using hk
   have hLz : ∀ z, L z = 2 * Real.pi * Complex.I * (ofIntVec k ⬝ᵥ z) := by
     intro z
-    calc L z = L (∑ i, Pi.single i (z i)) := by rw [Finset.univ_sum_single]
+    calc
+      L z
+        = L (∑ i, Pi.single i (z i)) := by rw [Finset.univ_sum_single]
       _ = ∑ i, z i * L (Pi.single i 1) := by
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sum]
@@ -194,7 +232,8 @@ theorem mem_periodLattice_of_theta_translate_eq_unit_mul :
     have e2 : Complex.exp (2 * Real.pi * Complex.I * (w j + (τ *ᵥ ofIntVec k) j)) = 1 := by
       rw [mul_add, Complex.exp_add, e, ← Complex.exp_add,
         show 2 * (Real.pi : ℂ) * Complex.I * w j + 2 * Real.pi * Complex.I * (-(1 : ℂ) * w j) = 0 by
-          ring, Complex.exp_zero]
+          ring,
+        Complex.exp_zero]
     obtain ⟨m, hm⟩ := Complex.exp_eq_one_iff.mp e2
     exact ⟨m, mul_left_cancel₀ Complex.two_pi_I_ne_zero (by rw [hm]; ring)⟩
   choose m hm using hm

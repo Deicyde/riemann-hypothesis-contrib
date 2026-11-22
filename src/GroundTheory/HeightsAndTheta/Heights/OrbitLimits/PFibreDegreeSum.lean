@@ -24,11 +24,16 @@ section Generic
 
 open NumbersDVR
 
-theorem FibreDegreeSum.intNum_eq_cycEval (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (P : Ideal (MRing ι ℤ)) (e : ℕ) (a : Fin e → K → ℤ) (p : ℕ)
-    [Fact p.Prime] (hP : ReciprocityTheory.ChartRestriction.G.Geo.IsArithVar P (e + 1)) :
-    intNum ℚ (P.map (MvPolynomial.map (Int.castRingHom ℚ))) a =
-      NumbersDVR.cycEval (fun W ↦ intNum (ZMod p) (W.map (MvPolynomial.map (Int.castRingHom (ZMod p)))) a)
+theorem FibreDegreeSum.intNum_eq_cycEval
+    (K : Type) [Fintype K] [DecidableEq K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (P : Ideal (MRing ι ℤ))
+    (e : ℕ) (a : Fin e → K → ℤ)
+    (p : ℕ) [Fact p.Prime]
+    (hP : ReciprocityTheory.ChartRestriction.G.Geo.IsArithVar P (e + 1))
+    : intNum ℚ (P.map (MvPolynomial.map (Int.castRingHom ℚ))) a
+      = NumbersDVR.cycEval
+        (fun W ↦ intNum (ZMod p) (W.map (MvPolynomial.map (Int.castRingHom (ZMod p)))) a)
         (NumbersDVR.divCycle P (C (p : ℤ))) := by
   classical
   have hp : p.Prime := Fact.out
@@ -65,22 +70,25 @@ theorem FibreDegreeSum.intNum_eq_cycEval (K : Type) [Fintype K] [DecidableEq K] 
     have h0 := hhor r hrP
     rw [h0] at hr
     exact hr 𝔭.zero_mem
-  have hP'prime : P'.IsPrime := IsLocalization.isPrime_of_isPrime_disjoint M (MRing ι O) P hPprime hPdisj
+  have hP'prime : P'.IsPrime :=
+    IsLocalization.isPrime_of_isPrime_disjoint M (MRing ι O) P hPprime hPdisj
   have hP'comap : P'.comap φ = P :=
     IsLocalization.under_map_of_isPrime_disjoint M (MRing ι O) hPprime hPdisj
-  have hmp : IsMultiProjPrime P' :=
-    { isPrime := hP'prime
-      multiHomog := WeightedDegree.isMultiHomogIdeal_map (M₀ := 𝔭.primeCompl)
+  have hmp : IsMultiProjPrime P' := {
+    isPrime := hP'prime
+    multiHomog :=
+      WeightedDegree.isMultiHomogIdeal_map (M₀ := 𝔭.primeCompl)
         ((Bridge.isMultiHomogIdeal_iff P).mpr hP.2.1.2.1)
-      relevant := fun k ↦ by
-        obtain ⟨i, hi⟩ := hP.2.1.2.2 k
-        refine ⟨i, fun h ↦ hi ?_⟩
-        have h' : φ (X ⟨k, i⟩) ∈ P' := by
-          rw [show φ (X ⟨k, i⟩) = X ⟨k, i⟩ from map_X _ _]
-          exact h
-        have h'' : (X ⟨k, i⟩ : MRing ι ℤ) ∈ P'.comap φ := h'
-        rw [hP'comap] at h''
-        exact h'' }
+    relevant := fun k ↦ by
+      obtain ⟨i, hi⟩ := hP.2.1.2.2 k
+      refine ⟨i, fun h ↦ hi ?_⟩
+      have h' : φ (X ⟨k, i⟩) ∈ P' := by
+        rw [show φ (X ⟨k, i⟩) = X ⟨k, i⟩ from map_X _ _]
+        exact h
+      have h'' : (X ⟨k, i⟩ : MRing ι ℤ) ∈ P'.comap φ := h'
+      rw [hP'comap] at h''
+      exact h''
+  }
   have hnt : P'.comap (C : O →+* MRing ι O) = ⊥ := by
     rw [eq_bot_iff]
     intro x hx
@@ -99,17 +107,19 @@ theorem FibreDegreeSum.intNum_eq_cycEval (K : Type) [Fintype K] [DecidableEq K] 
   have hdimle : ringKrullDim (MRing ι O ⧸ P') ≤ ((e + 1 + Fintype.card K : ℕ) : WithBot ℕ∞) :=
     (WeightedDegree.ringKrullDim_quotient_map_le (M₀ := 𝔭.primeCompl) P).trans_eq hP.2.2.2
 
-  have key := ConservationOfNumberLE.proof.{0} IntNumAssoc.full SpecialCycleEval.full
-    SpecialPieceRank.full GenericPieceRank.full SpecialIdealMultiHomog.full O ϖ hϖ K ι P' e hmp hnt
-    hdimle a
+  have key :=
+    ConservationOfNumberLE.proof.{0} IntNumAssoc.full SpecialCycleEval.full SpecialPieceRank.full
+      GenericPieceRank.full SpecialIdealMultiHomog.full O ϖ hϖ K ι P' e hmp hnt hdimle a
 
   have hinjO : Function.Injective (Int.castRingHom O) := by
     rw [RingHom.ext_int (Int.castRingHom O) (algebraMap ℤ O)]
     exact IsLocalization.injective O 𝔭.primeCompl_le_nonZeroDivisors
   have : CharZero (FractionRing O) := WeightedDegree.charZero_fractionRing O hinjO
   have hgen : gNum P' a = intNum ℚ (P.map (MvPolynomial.map (Int.castRingHom ℚ))) a := by
-    have hcomp : genFib P' = (P.map (MvPolynomial.map (Int.castRingHom ℚ))).map
-        (MvPolynomial.map (algebraMap ℚ (FractionRing O))) := by
+    have hcomp
+        : genFib P'
+          = (P.map (MvPolynomial.map (Int.castRingHom ℚ))).map
+            (MvPolynomial.map (algebraMap ℚ (FractionRing O))) := by
       unfold genFib
       rw [Ideal.map_map, Ideal.map_map]
       congr 1
@@ -119,7 +129,8 @@ theorem FibreDegreeSum.intNum_eq_cycEval (K : Type) [Fintype K] [DecidableEq K] 
       exact congrArg (fun g ↦ MvPolynomial.map g x) (RingHom.ext_int _ _)
     unfold gNum
     rw [hcomp]
-    exact (FieldNumbers.IntNumBaseChange.intersectionNumber_baseChange.1 ℚ (FractionRing O) K ι _).2 e a
+    exact (FieldNumbers.IntNumBaseChange.intersectionNumber_baseChange.1 ℚ (FractionRing O) K ι _).2
+      e a
 
   have : CharP (IsLocalRing.ResidueField O) p :=
     (CharP.charP_iff_prime_eq_zero hp).mpr (by
@@ -128,11 +139,15 @@ theorem FibreDegreeSum.intNum_eq_cycEval (K : Type) [Fintype K] [DecidableEq K] 
       exact Ideal.subset_span rfl)
   let : Algebra (ZMod p) (IsLocalRing.ResidueField O) :=
     (ZMod.castHom (dvd_refl p) (IsLocalRing.ResidueField O)).toAlgebra
-  have hspec : ∀ W : Ideal (MRing ι ℤ), vNum (W.map φ) a =
-      intNum (ZMod p) (W.map (MvPolynomial.map (Int.castRingHom (ZMod p)))) a := by
+  have hspec
+      : ∀ W : Ideal (MRing ι ℤ),
+        vNum (W.map φ) a
+          = intNum (ZMod p) (W.map (MvPolynomial.map (Int.castRingHom (ZMod p)))) a := by
     intro W
-    have hcomp : specialIdeal (W.map φ) = (W.map (MvPolynomial.map (Int.castRingHom (ZMod p)))).map
-        (MvPolynomial.map (algebraMap (ZMod p) (IsLocalRing.ResidueField O))) := by
+    have hcomp
+        : specialIdeal (W.map φ)
+          = (W.map (MvPolynomial.map (Int.castRingHom (ZMod p)))).map
+            (MvPolynomial.map (algebraMap (ZMod p) (IsLocalRing.ResidueField O))) := by
       unfold specialIdeal
       rw [Ideal.map_map, Ideal.map_map]
       congr 1
@@ -142,10 +157,12 @@ theorem FibreDegreeSum.intNum_eq_cycEval (K : Type) [Fintype K] [DecidableEq K] 
       exact congrArg (fun g ↦ MvPolynomial.map g x) (RingHom.ext_int _ _)
     unfold vNum
     rw [hcomp]
-    exact (FieldNumbers.IntNumBaseChange.intersectionNumber_baseChange.1 (ZMod p) (IsLocalRing.ResidueField O) K ι _).2 e a
+    exact (FieldNumbers.IntNumBaseChange.intersectionNumber_baseChange.1 (ZMod p)
+      (IsLocalRing.ResidueField O) K ι _).2 e a
 
-  have hWdisj : ∀ W ∈ (P ⊔ Ideal.span {(C (p : ℤ) : MRing ι ℤ)}).minimalPrimes,
-      Disjoint (M : Set (MRing ι ℤ)) W := by
+  have hWdisj
+      : ∀ W ∈ (P ⊔ Ideal.span {(C (p : ℤ) : MRing ι ℤ)}).minimalPrimes,
+        Disjoint (M : Set (MRing ι ℤ)) W := by
     intro W hW
     have : W.IsPrime := hW.1.1
     rw [Set.disjoint_left]
@@ -157,15 +174,20 @@ theorem FibreDegreeSum.intNum_eq_cycEval (K : Type) [Fintype K] [DecidableEq K] 
     have hr' : r ∈ W.comap (C : ℤ →+* MRing ι ℤ) := hrW
     rw [← heq] at hr'
     exact hr hr'
-  have hmain := WeightedDegree.cycEval_divCycle_map (R' := O) 𝔭.primeCompl P (C (p : ℤ)) hWdisj
-    (fun W' : Ideal (MRing ι O) ↦ vNum W' a)
+  have hmain :=
+    WeightedDegree.cycEval_divCycle_map (R' := O) 𝔭.primeCompl P (C (p : ℤ)) hWdisj
+      (fun W' : Ideal (MRing ι O) ↦ vNum W' a)
   have hCp : (C ϖ : MRing ι O) = φ (C (p : ℤ)) := by
     rw [show φ (C (p : ℤ)) = C (algebraMap ℤ O (p : ℤ)) from map_C _ _]
     simp [ϖ]
-  calc intNum ℚ (P.map (MvPolynomial.map (Int.castRingHom ℚ))) a = gNum P' a := hgen.symm
+  calc
+    intNum ℚ (P.map (MvPolynomial.map (Int.castRingHom ℚ))) a
+      = gNum P' a := hgen.symm
     _ = NumbersDVR.cycEval (fun W ↦ vNum W a) (NumbersDVR.divCycle P' (C ϖ)) := key.symm
-    _ = NumbersDVR.cycEval (fun W ↦ vNum W a) (NumbersDVR.divCycle P' (φ (C (p : ℤ)))) := by rw [hCp]
-    _ = NumbersDVR.cycEval (fun W ↦ vNum (W.map φ) a) (NumbersDVR.divCycle P (C (p : ℤ))) := hmain.symm
+    _ = NumbersDVR.cycEval (fun W ↦ vNum W a) (NumbersDVR.divCycle P' (φ (C (p : ℤ)))) := by
+      rw [hCp]
+    _ = NumbersDVR.cycEval (fun W ↦ vNum (W.map φ) a) (NumbersDVR.divCycle P (C (p : ℤ))) :=
+      hmain.symm
     _ = _ := by
       congr 1
       funext W
@@ -195,16 +217,22 @@ theorem FibreDegreeSum.proof : FibreDegreeSum.Statement := by
       · subst h
         simp
       · exact absurd rfl h0
-    have hMP : Geo.IsMultiProjPrime W :=
-      ⟨hWp, ReciprocityTheory.ChartRestriction.G.AI.I1.cyc_isMultiHomogIdeal_of_mem_minimalPrimes hP.2.1.2.1 hC hW.1, hW.2⟩
+    have hMP : Geo.IsMultiProjPrime W := ⟨
+      hWp,
+      ReciprocityTheory.ChartRestriction.G.AI.I1.cyc_isMultiHomogIdeal_of_mem_minimalPrimes
+        hP.2.1.2.1 hC hW.1,
+      hW.2
+    ⟩
     have hdimW : ringKrullDim (Geo.MRing ι ⧸ W) = ((e + Fintype.card K : ℕ) : WithBot ℕ∞) := by
       refine FibreCompDimZ.full (Σ k, ι k) P hP.2.1.1 hP.2.2.1 (e + Fintype.card K) p hp ?_ W hW.1
       rw [show e + Fintype.card K + 1 = e + 1 + Fintype.card K by omega]
       exact hP.2.2.2
-    have hm : Geo.multAt (P ⊔ Ideal.span {C (p : ℤ)}) W =
-        (NumbersDVR.multAt (P ⊔ Ideal.span {C (p : ℤ)}) W).toNat :=
+    have hm
+        : Geo.multAt (P ⊔ Ideal.span {C (p : ℤ)}) W
+          = (NumbersDVR.multAt (P ⊔ Ideal.span {C (p : ℤ)}) W).toNat :=
       Bridge.multAt_eq_toNat _ _
-    rw [NumbersDVR.divCycle, dite_eq_left hW', hm, Bridge.intNum_map_eq_geoNum p e W hMP hpW hdimW a]
+    rw [NumbersDVR.divCycle, dite_eq_left hW', hm,
+      Bridge.intNum_map_eq_geoNum p e W hMP hpW hdimW a]
   · have hW' : ¬(W ∈ (P ⊔ Ideal.span {C (p : ℤ)}).minimalPrimes ∧ NumbersDVR.IsRelevant W) := hW
     rw [Set.indicator_of_notMem hW, NumbersDVR.divCycle, dite_eq_right hW', zero_mul]
 

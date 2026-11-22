@@ -12,10 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JordanHol
 
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
 
-theorem UpperTheory.jacquet_borel_nontrivial_of_blocks_le_one :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (N : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V)
-    (r : ℕ) (d : Fin r → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin N), (∀ a, d a ≤ 1) → Nontrivial (Jacquet π (unipRad k e)) →
-    Nontrivial (Jacquet π (unipB k (Fin N))) := by
+theorem UpperTheory.jacquet_borel_nontrivial_of_blocks_le_one
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V)
+        (r : ℕ) (d : Fin r → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin N),
+      (∀ a, d a ≤ 1) → Nontrivial (Jacquet π (unipRad k e))
+        → Nontrivial (Jacquet π (unipB k (Fin N))) := by
   intro k _ _ _ _ N V _ _ π r d e hd hR
   have hinj : Function.Injective (blk e) := by
     intro i j hij
@@ -59,11 +61,15 @@ theorem UpperTheory.jacquet_borel_nontrivial_of_blocks_le_one :
     rw [← PEquiv.toMatrix_trans, ← Equiv.toPEquiv_trans, Equiv.symm_trans_self, Equiv.toPEquiv_refl,
       PEquiv.toMatrix_refl]
   let hh : GL (Fin N) k := ⟨σ.toPEquiv.toMatrix, σ.symm.toPEquiv.toMatrix, h1, h2⟩
-  have hent : ∀ (g : GL (Fin N) k) (i j : Fin N),
-      ((hh * g * hh⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j = (g : Matrix (Fin N) (Fin N) k) (σ i) (σ j) := by
+  have hent
+      : ∀ (g : GL (Fin N) k) (i j : Fin N),
+        ((hh * g * hh⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k) i j
+          = (g : Matrix (Fin N) (Fin N) k) (σ i) (σ j) := by
     intro g i j
-    have hv : ((hh * g * hh⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
-        = σ.toPEquiv.toMatrix * (g : Matrix (Fin N) (Fin N) k) * σ.symm.toPEquiv.toMatrix := rfl
+    have hv
+        : ((hh * g * hh⁻¹ : GL (Fin N) k) : Matrix (Fin N) (Fin N) k)
+          = σ.toPEquiv.toMatrix * (g : Matrix (Fin N) (Fin N) k) * σ.symm.toPEquiv.toMatrix :=
+      rfl
     rw [hv, PEquiv.mul_toMatrix_apply, ← Equiv.toPEquiv_symm, Equiv.symm_symm, Equiv.toPEquiv_apply]
     simp only [Matrix.mul_assoc]
     rw [PEquiv.toMatrix_mul_apply, Equiv.toPEquiv_apply]
@@ -90,12 +96,14 @@ theorem UpperTheory.jacquet_borel_nontrivial_of_blocks_le_one :
   change Subsingleton (V ⧸ GlobalTheory.PRep.twKer π _ 1) at hB
   change Subsingleton (V ⧸ GlobalTheory.PRep.twKer π _ 1)
   rw [Submodule.Quotient.subsingleton_iff] at hB ⊢
-  have key : GlobalTheory.PRep.twKer π (unipB k (Fin N)) 1 ≤
-      (GlobalTheory.PRep.twKer π (unipRad k e) 1).comap (π hh) := by
+  have key
+      : GlobalTheory.PRep.twKer π (unipB k (Fin N)) 1
+        ≤ (GlobalTheory.PRep.twKer π (unipRad k e) 1).comap (π hh) := by
     unfold GlobalTheory.PRep.twKer
     rw [Submodule.span_le]
     rintro w ⟨n, v, rfl⟩
-    simp only [SetLike.mem_coe, Submodule.mem_comap, MonoidHom.one_apply, Units.val_one, one_smul, map_sub]
+    simp only [SetLike.mem_coe, Submodule.mem_comap, MonoidHom.one_apply, Units.val_one, one_smul,
+      map_sub]
     apply Submodule.subset_span
     refine ⟨⟨hh * (n : GL (Fin N) k) * hh⁻¹, memR n⟩, π hh v, ?_⟩
     simp only [MonoidHom.one_apply, Units.val_one, one_smul, map_mul, Module.End.mul_apply]

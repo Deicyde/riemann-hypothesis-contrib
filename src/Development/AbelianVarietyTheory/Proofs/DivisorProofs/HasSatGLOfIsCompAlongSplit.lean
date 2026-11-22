@@ -23,17 +23,24 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsE
 @[expose] public section
 
 open NumberField IsDedekindDomain
-open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DefiniteBC
+open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions GlobalTheory.UnitaryBC
+  GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.DefiniteBC
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.SplitSatake
 
-theorem hasSatGL_of_isCompAlong_split : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (π : Submodule ℂ (UA E n → ℂ)), IsAutRepU π →
-    ∀ w : HeightOneSpectrum (𝓞 E), IsSplitAt w → ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    (ρ₁ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V) (ρ₂ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) W),
-    IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) ρ₁ →
-    IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) ρ₂ →
-    ∀ T : Multiset ℂˣ, GlobalTheory.LFun.HasSatGL w ρ₁ T → GlobalTheory.LFun.HasSatGL w ρ₂ T := by
+theorem hasSatGL_of_isCompAlong_split
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (π : Submodule ℂ (UA E n → ℂ)),
+      IsAutRepU π
+        → ∀ w : HeightOneSpectrum (𝓞 E),
+          IsSplitAt w
+            → ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+                (ρ₁ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V)
+                (ρ₂ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) W),
+              IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) ρ₁
+                → IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) ρ₂
+                → ∀ T : Multiset ℂˣ,
+                  GlobalTheory.LFun.HasSatGL w ρ₁ T → GlobalTheory.LFun.HasSatGL w ρ₂ T := by
   intro E _ _ _ n π hπ w hw V W _ _ _ _ ρ₁ ρ₂ h₁ h₂ T hT
   obtain ⟨e, he⟩ := GlobalTheory.T.splitPlace_unitaryLocalPoints_equiv_GL E n w hw
   obtain ⟨r, -, -, hc⟩ := GlobalTheory.T.exists_continuous_retraction_onto_unitaryLocalPoints E n w
@@ -44,9 +51,11 @@ theorem hasSatGL_of_isCompAlong_split : ∀ (E : Type) [Field E] [NumberField E]
     rw [e.apply_symm_apply] at this
     exact this.symm
   let P : GlobalTheory.DefU.AutSub E n := ⟨π, hπ⟩
-  have key : ∀ {X : Type} [AddCommGroup X] [Module ℂ X] (τ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) X),
-      IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) τ →
-      ∃ f : τ.IntertwiningMap (P.rep.comp s), f ≠ 0 := by
+  have key
+      : ∀ {X : Type} [AddCommGroup X] [Module ℂ X]
+          (τ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) X),
+        IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) τ
+          → ∃ f : τ.IntertwiningMap (P.rep.comp s), f ≠ 0 := by
     rintro X _ _ τ ⟨-, f, h0, hf, h2⟩
     refine ⟨⟨f.codRestrict π hf, fun y => LinearMap.ext fun v => Subtype.ext ?_⟩, fun e0 => h0 ?_⟩
     · have h3 := h2 (e.symm y) v
@@ -56,13 +65,18 @@ theorem hasSatGL_of_isCompAlong_split : ∀ (E : Type) [Field E] [NumberField E]
     · exact LinearMap.ext fun v => congrArg Subtype.val (DFunLike.congr_fun e0 v)
   obtain ⟨f, hf⟩ := key ρ₁ h₁
   obtain ⟨f', hf'⟩ := key ρ₂ h₂
-  have hcomm : ∀ g : UA E n, ∃ u, ∀ y, Commute ((s u)⁻¹ * g) (s y) := fun g =>
-    ⟨e (r g), fun y => by
+  have hcomm : ∀ g : UA E n, ∃ u, ∀ y, Commute ((s u)⁻¹ * g) (s y) := fun g => ⟨
+    e (r g),
+    fun y => by
       have : s (e (r g)) = (r g : UA E n) := congrArg Subtype.val (e.symm_apply_apply (r g))
       rw [this]
-      exact hc g (e.symm y)⟩
-  obtain ⟨q⟩ := (GlobalTheory.T.irreducibleRep_isotypic_of_centraliser_factor _ _ _ _ _ P.rep s ρ₁ ρ₂ P.isIrreducible_rep h₁.1 h₂.1 hcomm f hf).2 f' hf'
+      exact hc g (e.symm y)
+  ⟩
+  obtain ⟨q⟩ :=
+    (GlobalTheory.T.irreducibleRep_isotypic_of_centraliser_factor _ _ _ _ _ P.rep s ρ₁ ρ₂
+      P.isIrreducible_rep h₁.1 h₂.1 hcomm f hf).2 f' hf'
   exact GlobalTheory.BaseChangeBridge.hasSatGL_of_equiv q.toLinearEquiv
-    (fun g x => LinearMap.congr_fun (q.toIntertwiningMap.isIntertwining' g) x) hT
+    (fun g x => LinearMap.congr_fun (q.toIntertwiningMap.isIntertwining' g) x)
+    hT
 
 end GlobalTheory.SplitSatake

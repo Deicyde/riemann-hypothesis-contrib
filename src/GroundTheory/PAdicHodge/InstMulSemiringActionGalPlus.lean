@@ -23,20 +23,23 @@ variable (p : ℕ) [hp : Fact p.Prime] [IsPerfectoidField K p]
 
 abbrev BCrisPlus : Type _ := Localization.Away (p : ACris (K := K) (p := p))
 
-theorem phi_natCast_p : phi (K := K) (p := p) (p : ACris (K := K) (p := p)) = (p : ACris (K := K) (p := p)) :=
+theorem phi_natCast_p
+    : phi (K := K) (p := p) (p : ACris (K := K) (p := p)) = (p : ACris (K := K) (p := p)) :=
   map_natCast (phi (K := K) (p := p)) p
 
 def phiPlus : BCrisPlus K p →+* BCrisPlus K p :=
-  Localization.awayLift ((algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p)).comp (phi (K := K) (p := p))) (p : ACris (K := K) (p := p))
+  Localization.awayLift
+    ((algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p)).comp (phi (K := K) (p := p)))
+    (p : ACris (K := K) (p := p))
     (by
       rw [RingHom.comp_apply, phi_natCast_p]
       exact IsLocalization.Away.algebraMap_isUnit (p : ACris (K := K) (p := p)))
 
 variable {K p}
 
-theorem phiPlus_algebraMap (x : ACris (K := K) (p := p)) :
-    phiPlus K p (algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p) x) =
-      algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p) (phi (K := K) (p := p) x) :=
+theorem phiPlus_algebraMap (x : ACris (K := K) (p := p))
+    : phiPlus K p (algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p) x)
+      = algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p) (phi (K := K) (p := p) x) :=
   IsLocalization.lift_eq _ x
 
 variable {ε : PreTilt (normInteger K) p}
@@ -44,14 +47,16 @@ variable {ε : PreTilt (normInteger K) p}
 abbrev BCris (hε : PreTilt.untilt ε = 1) : Type _ :=
   Localization.Away (algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p) (periodT hε))
 
-theorem isUnit_algebraMap_p_plus :
-    IsUnit (algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p)
-      (algebraMap (ACrisZero (K := K) (p := p)) (ACris (K := K) (p := p)) (p : ACrisZero (K := K) (p := p)))) := by
+theorem isUnit_algebraMap_p_plus
+    : IsUnit (algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p)
+      (algebraMap (ACrisZero (K := K) (p := p)) (ACris (K := K) (p := p))
+        (p : ACrisZero (K := K) (p := p)))) := by
   rw [map_natCast, map_natCast]
-  simpa using IsLocalization.Away.algebraMap_isUnit (S := BCrisPlus K p) (p : ACris (K := K) (p := p))
+  simpa using
+    IsLocalization.Away.algebraMap_isUnit (S := BCrisPlus K p) (p : ACris (K := K) (p := p))
 
-theorem isUnit_phiPlus_periodT (hε : PreTilt.untilt ε = 1) :
-    IsUnit ((algebraMap (BCrisPlus K p) (BCris hε)).comp (phiPlus K p)
+theorem isUnit_phiPlus_periodT (hε : PreTilt.untilt ε = 1)
+    : IsUnit ((algebraMap (BCrisPlus K p) (BCris hε)).comp (phiPlus K p)
       (algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p) (periodT hε))) := by
   rw [RingHom.comp_apply, phiPlus_algebraMap, phi_periodT, map_mul, map_mul]
   exact (isUnit_algebraMap_p_plus.map _).mul
@@ -61,9 +66,9 @@ def phiB (hε : PreTilt.untilt ε = 1) : BCris hε →+* BCris hε :=
   Localization.awayLift ((algebraMap (BCrisPlus K p) (BCris hε)).comp (phiPlus K p))
     (algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p) (periodT hε)) (isUnit_phiPlus_periodT hε)
 
-theorem phiB_algebraMap (hε : PreTilt.untilt ε = 1) (x : BCrisPlus K p) :
-    phiB hε (algebraMap (BCrisPlus K p) (BCris hε) x) =
-      algebraMap (BCrisPlus K p) (BCris hε) (phiPlus K p x) :=
+theorem phiB_algebraMap (hε : PreTilt.untilt ε = 1) (x : BCrisPlus K p)
+    : phiB hε (algebraMap (BCrisPlus K p) (BCris hε) x)
+      = algebraMap (BCrisPlus K p) (BCris hε) (phiPlus K p x) :=
   IsLocalization.lift_eq _ x
 
 end Defs
@@ -72,19 +77,21 @@ section Galois
 
 variable {p : ℕ} [hp : Fact p.Prime] {K : IntermediateField ℚ_[p] (PadicAlgCl p)}
 
-theorem galCris_natCast_p (σ : Gal(PadicAlgCl p/K)) : galCris σ (p : ACris (K := ℂ_[p]) (p := p)) = p :=
+theorem galCris_natCast_p (σ : Gal(PadicAlgCl p/K))
+    : galCris σ (p : ACris (K := ℂ_[p]) (p := p)) = p :=
   map_natCast (galCris σ) p
 
 def galPlus (σ : Gal(PadicAlgCl p/K)) : BCrisPlus ℂ_[p] p →+* BCrisPlus ℂ_[p] p :=
-  Localization.awayLift ((algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p)).comp (galCris σ))
+  Localization.awayLift
+    ((algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p)).comp (galCris σ))
     (p : ACris (K := ℂ_[p]) (p := p))
     (by
       rw [RingHom.comp_apply, galCris_natCast_p]
       exact IsLocalization.Away.algebraMap_isUnit (p : ACris (K := ℂ_[p]) (p := p)))
 
-theorem galPlus_algebraMap (σ : Gal(PadicAlgCl p/K)) (x : ACris (K := ℂ_[p]) (p := p)) :
-    galPlus σ (algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p) x) =
-      algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p) (galCris σ x) :=
+theorem galPlus_algebraMap (σ : Gal(PadicAlgCl p/K)) (x : ACris (K := ℂ_[p]) (p := p))
+    : galPlus σ (algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p) x)
+      = algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p) (galCris σ x) :=
   IsLocalization.lift_eq _ x
 
 theorem galPlus_one : galPlus (1 : Gal(PadicAlgCl p/K)) = RingHom.id (BCrisPlus ℂ_[p] p) := by
@@ -93,15 +100,15 @@ theorem galPlus_one : galPlus (1 : Gal(PadicAlgCl p/K)) = RingHom.id (BCrisPlus 
   rw [RingHom.comp_apply, galPlus_algebraMap, galCris_one, RingHom.id_apply, RingHom.comp_apply,
     RingHom.id_apply]
 
-theorem galPlus_mul (σ τ : Gal(PadicAlgCl p/K)) :
-    galPlus (σ * τ) = (galPlus σ).comp (galPlus τ) := by
+theorem galPlus_mul (σ τ : Gal(PadicAlgCl p/K))
+    : galPlus (σ * τ) = (galPlus σ).comp (galPlus τ) := by
   apply IsLocalization.ringHom_ext (Submonoid.powers (p : ACris (K := ℂ_[p]) (p := p)))
   ext x
   rw [RingHom.comp_apply, galPlus_algebraMap, galCris_mul, RingHom.comp_apply, RingHom.comp_apply,
     RingHom.comp_apply, galPlus_algebraMap, galPlus_algebraMap]
 
-instance instMulSemiringActionGalPlus :
-    MulSemiringAction Gal(PadicAlgCl p/K) (BCrisPlus ℂ_[p] p) where
+instance instMulSemiringActionGalPlus
+    : MulSemiringAction Gal(PadicAlgCl p/K) (BCrisPlus ℂ_[p] p) where
   smul σ x := galPlus σ x
   one_smul x := by
     change galPlus 1 x = x
@@ -114,17 +121,16 @@ instance instMulSemiringActionGalPlus :
   smul_one σ := map_one (galPlus σ)
   smul_mul σ := map_mul (galPlus σ)
 
-theorem gal_smul_plus_def (σ : Gal(PadicAlgCl p/K)) (x : BCrisPlus ℂ_[p] p) :
-    σ • x = galPlus σ x :=
+theorem gal_smul_plus_def (σ : Gal(PadicAlgCl p/K)) (x : BCrisPlus ℂ_[p] p) : σ • x = galPlus σ x :=
   rfl
 
-theorem gal_smul_algebraMap_plus (σ : Gal(PadicAlgCl p/K)) (x : ACris (K := ℂ_[p]) (p := p)) :
-    σ • algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p) x =
-      algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p) (σ • x) := by
+theorem gal_smul_algebraMap_plus (σ : Gal(PadicAlgCl p/K)) (x : ACris (K := ℂ_[p]) (p := p))
+    : σ • algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p) x
+      = algebraMap (ACris (K := ℂ_[p]) (p := p)) (BCrisPlus ℂ_[p] p) (σ • x) := by
   rw [gal_smul_plus_def, galPlus_algebraMap, gal_smul_def]
 
-theorem phiPlus_gal_smul (σ : Gal(PadicAlgCl p/K)) (x : BCrisPlus ℂ_[p] p) :
-    phiPlus ℂ_[p] p (σ • x) = σ • phiPlus ℂ_[p] p x := by
+theorem phiPlus_gal_smul (σ : Gal(PadicAlgCl p/K)) (x : BCrisPlus ℂ_[p] p)
+    : phiPlus ℂ_[p] p (σ • x) = σ • phiPlus ℂ_[p] p x := by
   have h : (phiPlus ℂ_[p] p).comp (galPlus σ) = (galPlus σ).comp (phiPlus ℂ_[p] p) := by
     apply IsLocalization.ringHom_ext (Submonoid.powers (p : ACris (K := ℂ_[p]) (p := p)))
     ext y

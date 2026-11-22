@@ -10,9 +10,11 @@ open PowerSeries GlobalTheory.Honda
 
 namespace GlobalTheory.Honda
 
-theorem intLog_shortW (K : Type) [NormedField K] [IsUltrametricDist K] [CharZero K] (g2 g3 : K)
-    (h2 : ‖(2 : K)‖ = 1) (hg2 : ‖g2‖ ≤ 1) (hg3 : ‖g3‖ ≤ 1) :
-    IntLog (Formalism.L2.Th1.A.logSer (Formalism.L2.Th1.A.shortW g2 g3))
+theorem intLog_shortW
+    (K : Type) [NormedField K] [IsUltrametricDist K] [CharZero K]
+    (g2 g3 : K)
+    (h2 : ‖(2 : K)‖ = 1) (hg2 : ‖g2‖ ≤ 1) (hg3 : ‖g3‖ ≤ 1)
+    : IntLog (Formalism.L2.Th1.A.logSer (Formalism.L2.Th1.A.shortW g2 g3))
       (Formalism.L2.Th1.A.expSer (Formalism.L2.Th1.A.shortW g2 g3)) := by
   set W := Formalism.L2.Th1.A.shortW g2 g3 with hW
   have h4 : ‖(4 : K)‖ = 1 := by
@@ -22,11 +24,13 @@ theorem intLog_shortW (K : Type) [NormedField K] [IsUltrametricDist K] [CharZero
   have ha4 : W.a₄ ∈ Formalism.G.unitBall K := by
     apply hmem
     show ‖-g2 / 4‖ ≤ 1
-    rw [norm_div, norm_neg, h4, div_one]; exact hg2
+    rw [norm_div, norm_neg, h4, div_one]
+    exact hg2
   have ha6 : W.a₆ ∈ Formalism.G.unitBall K := by
     apply hmem
     show ‖-g3 / 4‖ ≤ 1
-    rw [norm_div, norm_neg, h4, div_one]; exact hg3
+    rw [norm_div, norm_neg, h4, div_one]
+    exact hg3
   have h0 : (0 : K) ∈ Formalism.G.unitBall K := (Formalism.G.unitBall K).zero_mem
   have hcm := Formalism.L2.Th1.A.coeffMem K W (Formalism.G.unitBall K) h0 h0 h0 ha4 ha6
   obtain ⟨hl0, hl1, hlom, -⟩ := Formalism.L2.Th1.A.logSpec K W

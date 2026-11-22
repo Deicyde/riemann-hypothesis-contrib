@@ -12,9 +12,10 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.RealBands.Op
 open MeasureTheory Filter UpperTheory.Lit.Cusp
 open scoped Topology
 
-theorem UpperTheory.Lit.Cusp.kills_of_idem :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-      [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (N : Set G) (a : ℝ → G) (H : G → ℝ) (e : G → ℂ),
+theorem UpperTheory.Lit.Cusp.kills_of_idem
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G)
+        [μ.IsHaarMeasure] (N : Set G) (a : ℝ → G) (H : G → ℝ) (e : G → ℂ),
       IsRay N a H → Continuous e → Integrable e μ → (∀ x, conv μ e e x = e x) → Kills μ N a e := by
   intro G _ _ _ _ _ _ _ _ μ _ N a H e hR hc hi hid
   have step1 : ∀ s, OpLe μ N a e s (1 / 2) → OpLe μ N a e s 0 := by
@@ -29,7 +30,8 @@ theorem UpperTheory.Lit.Cusp.kills_of_idem :
         have h2 : IsEig N a s (1 / 2 * C) (conv μ e h) := ⟨h1.1, hs C h hh, h1.2.2.1, h1.2.2.2⟩
         have h3 := ih _ _ h2 x
         rw [← conv_assoc G μ e e h C hc hi hc hi hh.1 hh.2.1 hid x] at h3
-        calc _ ≤ _ := h3
+        calc
+          _ ≤ _ := h3
           _ = _ := by ring
     intro C h hh x
     have ht : Tendsto (fun k : ℕ => ((1 / 2 : ℝ) ^ (k + 1)) * C) atTop (𝓝 (0 * C)) :=
@@ -52,7 +54,8 @@ theorem UpperTheory.Lit.Cusp.kills_of_idem :
       have : s = s₀ := by
         have : |s - s₀| ≤ 0 := by simpa using hs
         linarith [abs_nonpos_iff.mp this]
-      rw [this]; exact h0
+      rw [this]
+      exact h0
     | succ n ih =>
       intro s hs
       have hn : (0 : ℝ) ≤ n * (δ / 2) := by positivity
@@ -63,11 +66,13 @@ theorem UpperTheory.Lit.Cusp.kills_of_idem :
       · rcases le_total s s₀ with h2 | h2
         · refine step2 (s₀ - n * (δ / 2)) s ?_ (ih _ ?_)
           · rw [abs_of_nonpos (by linarith), not_le] at h1
-            rw [abs_lt]; constructor <;> nlinarith
+            rw [abs_lt]
+            constructor <;> nlinarith
           · rw [abs_le]; constructor <;> linarith
         · refine step2 (s₀ + n * (δ / 2)) s ?_ (ih _ ?_)
           · rw [abs_of_nonneg (by linarith), not_le] at h1
-            rw [abs_lt]; constructor <;> nlinarith
+            rw [abs_lt]
+            constructor <;> nlinarith
           · rw [abs_le]; constructor <;> linarith
   intro s C h hh x
   obtain ⟨n, hn⟩ := exists_nat_ge (|s - s₀| / (δ / 2))

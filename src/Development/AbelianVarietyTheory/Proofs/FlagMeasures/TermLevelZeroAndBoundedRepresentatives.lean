@@ -19,8 +19,8 @@ variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 variable {L : LocE F E} {r k : ℕ} (S : Frames L r k)
 
 def Good (g g' : Fin (r + 1) → S.V) (j : ℕ) (b : S.V) : Prop :=
-  ∃ al al' : Fin (r + 1) → E, b = ∑ i, al i • g i + ∑ i, al' i • g' i ∧
-    ∀ i : Fin (r + 1), j ≤ (i : ℕ) → S.RR (al i) (al' i)
+  ∃ al al' : Fin (r + 1) → E,
+    b = ∑ i, al i • g i + ∑ i, al' i • g' i ∧ ∀ i : Fin (r + 1), j ≤ (i : ℕ) → S.RR (al i) (al' i)
 
 variable {S} {g g' : Fin (r + 1) → S.V}
 
@@ -30,7 +30,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 variable {S} {g g' : Fin (r + 1) → S.V} in
 private lemma mem_spanTo_of_triangular_of_lt {h : Fin (r + 1) → S.V}
     (hsub : ∀ i : Fin (r + 1), h i - g i ∈ S.spanTo g i)
@@ -43,7 +45,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 variable {S} {g g' : Fin (r + 1) → S.V} in
 private lemma spanTo_le_span_image_of_triangular {h : Fin (r + 1) → S.V}
     (hsub : ∀ i : Fin (r + 1), h i - g i ∈ S.spanTo g i) (j : ℕ) :
@@ -75,7 +79,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 variable {S} {g g' : Fin (r + 1) → S.V} in
 private lemma levelRep_good_add_add_smul (hθ : S.th ≠ 0) {j : ℕ} {u u' m : S.V}
     (hu : u ∈ Submodule.span E (g '' {i | (i : ℕ) < j}))
@@ -113,7 +119,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 variable {S} {g g' : Fin (r + 1) → S.V} in
 private lemma levelRep_good_mono {j j' : ℕ} {b : S.V}
     (h : _root_.GlobalTheory.HL.LevelRep.Good S g g' j b) (hj : j ≤ j') :
@@ -125,7 +133,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 variable {S} {g g' : Fin (r + 1) → S.V} in
 private lemma lev_le_iff_levelRep_good {b : S.V}
     (h : ∃ j₀, _root_.GlobalTheory.HL.LevelRep.Good S g g' j₀ b) (j : ℕ) :
@@ -144,7 +154,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 variable {S} {g g' : Fin (r + 1) → S.V} in
 private lemma exists_decomp_of_levelRep_good (hθ : S.th ≠ 0) {j : ℕ} {v : S.V}
     (h : _root_.GlobalTheory.HL.LevelRep.Good S g g' j v) :
@@ -193,7 +205,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 variable {S} {g g' : Fin (r + 1) → S.V} in
 private lemma eq_and_eq_of_sum_elim_linearIndependent (hli : LinearIndependent E (Sum.elim g g'))
     {a a' b b' : Fin (r + 1) → E}
@@ -209,48 +223,57 @@ private lemma eq_and_eq_of_sum_elim_linearIndependent (hli : LinearIndependent E
   · have := h0 (Sum.inr i)
     simpa [sub_eq_zero] using this
 
-
 open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
-theorem _root_.GlobalTheory.HL.LevelRep.level_rep : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : _root_.Formalism.MainNotions.S.Loc.LocE F E), ∀ (r k : ℕ) (S : _root_.GlobalTheory.HL.Frames L r k), ∀ (d : S.Datum) (Λ : Submodule L.O S.V), S.IsTerm d Λ → (∀ y ∈ S.sat Λ, S.levC d Λ y = 0 ↔ y ∈ S.M d Λ) ∧ (∀ y ∈ S.sat Λ, ∀ j, S.levC d Λ y ≤ j ↔ ∃ y₁ ∈ (S.spanTo S.f j ⊔ S.spanTo S.f' j), y - y₁ ∈ S.M d Λ) ∧ (∀ y ∈ S.sat Λ, ∀ m ∈ S.M d Λ, S.levC d Λ (y + m) = S.levC d Λ y) ∧ ∀ (al al' : Fin (r + 1) → E) (j : ℕ), S.lev (S.fr d Λ) (S.fr' d Λ) (∑ i, al i • S.fr d Λ i + ∑ i, al' i • S.fr' d Λ i) ≤ j ↔ ∀ i : Fin (r + 1), j ≤ (i : ℕ) → S.RR (al i) (al' i) := by
+theorem _root_.GlobalTheory.HL.LevelRep.level_rep
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+        (L : _root_.Formalism.MainNotions.S.Loc.LocE F E),
+      ∀ (r k : ℕ) (S : _root_.GlobalTheory.HL.Frames L r k),
+        ∀ (d : S.Datum) (Λ : Submodule L.O S.V),
+          S.IsTerm d Λ
+            → (∀ y ∈ S.sat Λ, S.levC d Λ y = 0 ↔ y ∈ S.M d Λ)
+              ∧ (∀ y ∈ S.sat Λ, ∀ j,
+                S.levC d Λ y ≤ j ↔ ∃ y₁ ∈ (S.spanTo S.f j ⊔ S.spanTo S.f' j), y - y₁ ∈ S.M d Λ)
+              ∧ (∀ y ∈ S.sat Λ, ∀ m ∈ S.M d Λ, S.levC d Λ (y + m) = S.levC d Λ y)
+              ∧ ∀ (al al' : Fin (r + 1) → E) (j : ℕ),
+                S.lev (S.fr d Λ) (S.fr' d Λ) (∑ i, al i • S.fr d Λ i + ∑ i, al' i • S.fr' d Λ i) ≤ j
+                  ↔ ∀ i : Fin (r + 1), j ≤ (i : ℕ) → S.RR (al i) (al' i) := by
   intro F _ _ _ _ _ E _ _ _ L r k S d Λ hT
   obtain ⟨-, hW, hMsat, -, -, hli, -⟩ := _root_.GlobalTheory.HL.TermBasic.term_basic L r k S d Λ hT
   obtain ⟨-, -, -, -, -, hθ, -⟩ := _root_.GlobalTheory.FrameBasic.main L r k S
   obtain ⟨-, -, hp, hq, -⟩ := hW
-  have hsub : ∀ i : Fin (r + 1), S.fr d Λ i - S.f i ∈
-      S.spanTo S.f i := fun i =>
+  have hsub : ∀ i : Fin (r + 1), S.fr d Λ i - S.f i ∈ S.spanTo S.f i := fun i =>
     _root_.GlobalTheory.HL.TermBasic.sub_mem (S := S) (g := S.f)
-      (fun a j => (S.gram a j.castSucc).trans
-        (if_neg fun h => (Fin.castSucc_lt_last j).ne h.2)) hp i
-  have hsub' : ∀ i : Fin (r + 1), S.fr' d Λ i - S.f' i ∈
-      S.spanTo S.f' i := fun i =>
+      (fun a j => (S.gram a j.castSucc).trans (if_neg fun h => (Fin.castSucc_lt_last j).ne h.2))
+      hp i
+  have hsub' : ∀ i : Fin (r + 1), S.fr' d Λ i - S.f' i ∈ S.spanTo S.f' i := fun i =>
     _root_.GlobalTheory.HL.TermBasic.sub_mem (S := S) (g := S.f')
-      (fun a j => (S.gram' a j.castSucc).trans
-        (if_neg fun h => (Fin.castSucc_lt_last j).ne h.2)) hq i
+      (fun a j => (S.gram' a j.castSucc).trans (if_neg fun h => (Fin.castSucc_lt_last j).ne h.2))
+      hq i
   have hti : algebraMap F E S.th⁻¹ * algebraMap F E S.th = 1 := by
     rw [← map_mul, inv_mul_cancel₀ hθ, map_one]
-  have hspan : ∀ j, Submodule.span E (S.fr d Λ '' {i | (i : ℕ) < j}) ≤
-      S.spanTo S.f j := fun j =>
+  have hspan : ∀ j, Submodule.span E (S.fr d Λ '' {i | (i : ℕ) < j}) ≤ S.spanTo S.f j := fun j =>
     Submodule.span_le.2 (by rintro _ ⟨i, hi, rfl⟩; exact mem_spanTo_of_triangular_of_lt hsub hi)
-  have hspan' : ∀ j, Submodule.span E (S.fr' d Λ '' {i | (i : ℕ) < j}) ≤
-      S.spanTo S.f' j := fun j =>
+  have hspan' : ∀ j, Submodule.span E (S.fr' d Λ '' {i | (i : ℕ) < j}) ≤ S.spanTo S.f' j := fun j =>
     Submodule.span_le.2 (by rintro _ ⟨i, hi, rfl⟩; exact mem_spanTo_of_triangular_of_lt hsub' hi)
   have hbound := spanTo_le_span_image_of_triangular hsub
   have hbound' := spanTo_le_span_image_of_triangular hsub'
-  have hlev : ∀ y ∈ S.sat Λ, ∀ j, S.levC d Λ y ≤ j ↔
-      ∃ y₁ ∈ (S.spanTo S.f j ⊔ S.spanTo S.f' j),
-        y - y₁ ∈ S.M d Λ := by
+  have hlev
+      : ∀ y ∈ S.sat Λ, ∀ j,
+        S.levC d Λ y ≤ j ↔ ∃ y₁ ∈ (S.spanTo S.f j ⊔ S.spanTo S.f' j), y - y₁ ∈ S.M d Λ := by
     intro y hy j
-    have hex : ∃ j₀, _root_.GlobalTheory.HL.LevelRep.Good S (S.fr d Λ)
-        (S.fr' d Λ) j₀ (algebraMap F E S.th • y) := by
+    have hex
+        : ∃ j₀,
+          _root_.GlobalTheory.HL.LevelRep.Good S (S.fr d Λ) (S.fr' d Λ) j₀
+            (algebraMap F E S.th • y) := by
       refine ⟨r + 1, ?_⟩
-      have hy2 : y ∈ Λ ∧ y ∈ S.spanTo S.f (r + 1) ⊔
-          S.spanTo S.f' (r + 1) := hy
+      have hy2 : y ∈ Λ ∧ y ∈ S.spanTo S.f (r + 1) ⊔ S.spanTo S.f' (r + 1) := hy
       obtain ⟨u, hu, u', hu', rfl⟩ := Submodule.mem_sup.1 hy2.2
-      have := levelRep_good_add_add_smul hθ
-        (Submodule.smul_mem _ (algebraMap F E S.th) (hbound (r + 1) hu))
-        (Submodule.smul_mem _ (algebraMap F E S.th) (hbound' (r + 1) hu'))
-        (Submodule.zero_mem _)
+      have :=
+        levelRep_good_add_add_smul hθ
+          (Submodule.smul_mem _ (algebraMap F E S.th) (hbound (r + 1) hu))
+          (Submodule.smul_mem _ (algebraMap F E S.th) (hbound' (r + 1) hu')) (Submodule.zero_mem _)
       simpa [smul_add] using this
     show S.lev _ _ (algebraMap F E S.th • y) ≤ j ↔ _
     rw [lev_le_iff_levelRep_good hex]
@@ -268,11 +291,13 @@ theorem _root_.GlobalTheory.HL.LevelRep.level_rep : ∀ {F : Type} [Field F] [Va
         exact hm
     · rintro ⟨y₁, hy₁, hm⟩
       obtain ⟨u, hu, u', hu', rfl⟩ := Submodule.mem_sup.1 hy₁
-      have := levelRep_good_add_add_smul hθ
-        (Submodule.smul_mem _ (algebraMap F E S.th) (hbound j hu))
-        (Submodule.smul_mem _ (algebraMap F E S.th) (hbound' j hu')) hm
-      have heq : algebraMap F E S.th • u + algebraMap F E S.th • u' +
-          algebraMap F E S.th • (y - (u + u')) = algebraMap F E S.th • y := by
+      have :=
+        levelRep_good_add_add_smul hθ (Submodule.smul_mem _ (algebraMap F E S.th) (hbound j hu))
+          (Submodule.smul_mem _ (algebraMap F E S.th) (hbound' j hu')) hm
+      have heq
+          : algebraMap F E S.th • u + algebraMap F E S.th • u'
+              + algebraMap F E S.th • (y - (u + u'))
+            = algebraMap F E S.th • y := by
         rw [← smul_add, ← smul_add]
         congr 1
         abel
@@ -299,8 +324,8 @@ theorem _root_.GlobalTheory.HL.LevelRep.level_rep : ∀ {F : Type} [Field F] [Va
       refine ⟨y₁, hy₁, ?_⟩
       convert Submodule.sub_mem _ hym hm using 1
       abel
-  · have hv : _root_.GlobalTheory.HL.LevelRep.Good S (S.fr d Λ) (S.fr' d Λ)
-        (r + 1) (∑ i, al i • S.fr d Λ i + ∑ i, al' i • S.fr' d Λ i) :=
+  · have hv : _root_.GlobalTheory.HL.LevelRep.Good S (S.fr d Λ) (S.fr' d Λ) (r + 1)
+        (∑ i, al i • S.fr d Λ i + ∑ i, al' i • S.fr' d Λ i) :=
       ⟨al, al', rfl, fun i hi => absurd hi (not_le.2 i.isLt)⟩
     rw [lev_le_iff_levelRep_good ⟨r + 1, hv⟩]
     constructor

@@ -16,14 +16,17 @@ noncomputable section
 
 namespace GlobalTheory.Proof.SemisimpleRepresentationIntegralConjugate
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField
+  IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 open scoped Pointwise Matrix
 
-theorem exists_conj_integral {O K Γ : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-    [Algebra O K] [IsFractionRing O K] [Group Γ] (n : ℕ) (r : Γ →* GL (Fin n) K) (U : Subgroup Γ)
-    [U.FiniteIndex]
-    (hU : ∀ h ∈ U, ∀ i j, (r h : Matrix (Fin n) (Fin n) K) i j ∈ (algebraMap O K).range) :
-    ∃ P : GL (Fin n) K, ∀ g i j,
+theorem exists_conj_integral
+    {O K Γ : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K] [Group Γ]
+    (n : ℕ) (r : Γ →* GL (Fin n) K)
+    (U : Subgroup Γ) [U.FiniteIndex]
+    (hU : ∀ h ∈ U, ∀ i j, (r h : Matrix (Fin n) (Fin n) K) i j ∈ (algebraMap O K).range)
+    : ∃ P : GL (Fin n) K, ∀ g i j,
       ((P * r g * P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) i j ∈ (algebraMap O K).range := by
   classical
   let col : Γ → Fin n → (Fin n → K) := fun g j i => (r g : Matrix (Fin n) (Fin n) K) i j
@@ -56,7 +59,8 @@ theorem exists_conj_integral {O K Γ : Type} [CommRing O] [IsDomain O] [IsDiscre
           exact Finset.sum_congr rfl fun k _ => by rw [Algebra.smul_def, hc, mul_comm]
         show col g j ∈ _
         rw [this]
-        exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨(_, k), rfl⟩)
+        exact Submodule.sum_mem _ fun k _ =>
+          Submodule.smul_mem _ _ (Submodule.subset_span ⟨(_, k), rfl⟩)
       · exact Submodule.span_mono (by rintro _ ⟨p, rfl⟩; exact ⟨(p.1.out, p.2), rfl⟩)
     rw [this]
     exact Submodule.fg_span (Set.finite_range _)
@@ -73,15 +77,17 @@ theorem exists_conj_integral {O K Γ : Type} [CommRing O] [IsDomain O] [IsDiscre
   haveI : Module.Free O Λ := Submodule.IsLattice.free K Λ
   haveI : Module.Finite O Λ := Module.Finite.iff_fg.2 hfg
   have hrk : Module.finrank O Λ = n := by
-    rw [((Submodule.IsFullLattice.finrank_eq K Λ).trans (Module.finrank_fintype_fun_eq_card K)), Fintype.card_fin]
+    rw [((Submodule.IsFullLattice.finrank_eq K Λ).trans (Module.finrank_fintype_fun_eq_card K)),
+      Fintype.card_fin]
   let b : Module.Basis (Fin n) O Λ := Module.finBasisOfFinrankEq O Λ hrk
   let B := b.extendOfIsFullLattice K
   let e := Pi.basisFun K (Fin n)
   let P : GL (Fin n) K := ⟨B.toMatrix e, e.toMatrix B, by simp, by simp⟩
   refine ⟨P, fun g i j => ?_⟩
   have hB : ∀ j, B j = b j := fun j => b.extendOfIsFullLattice_apply K j
-  have h1 : ((P * r g * P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) =
-      LinearMap.toMatrix B B (Matrix.toLin' (r g : Matrix (Fin n) (Fin n) K)) := by
+  have h1
+      : ((P * r g * P⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)
+        = LinearMap.toMatrix B B (Matrix.toLin' (r g : Matrix (Fin n) (Fin n) K)) := by
     rw [← basis_toMatrix_mul_linearMap_toMatrix_mul_basis_toMatrix B e B e]
     simp [P, e]
   rw [h1, LinearMap.toMatrix_apply, Matrix.toLin'_apply, hB]
@@ -97,49 +103,65 @@ theorem exists_conj_integral {O K Γ : Type} [CommRing O] [IsDomain O] [IsDiscre
   show _ = B.repr (v : Fin n → K) i
   rw [h2, B.repr_sum_self]
 
-theorem isSSRep_conj {Γ k : Type} [Group Γ] [Field k] {n : ℕ} {ρ ρ' : Γ →* GL (Fin n) k} (h : GL (Fin n) k)
-    (hh : ∀ g, ρ' g = h * ρ g * h⁻¹) (hρ : IsSSRep ρ) : IsSSRep ρ' := by
-  let e : (Fin n → k) ≃ₗ[k] (Fin n → k) := Matrix.toLin'OfInv (M := (h : Matrix (Fin n) (Fin n) k))
-    (M' := ((h⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) (by simp) (by simp)
+theorem isSSRep_conj
+    {Γ k : Type} [Group Γ] [Field k]
+    {n : ℕ} {ρ ρ' : Γ →* GL (Fin n) k}
+    (h : GL (Fin n) k) (hh : ∀ g, ρ' g = h * ρ g * h⁻¹) (hρ : IsSSRep ρ)
+    : IsSSRep ρ' := by
+  let e : (Fin n → k) ≃ₗ[k] (Fin n → k) :=
+    Matrix.toLin'OfInv (M := (h : Matrix (Fin n) (Fin n) k))
+      (M' := ((h⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) (by simp) (by simp)
   have he : ∀ v, e v = ((h⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) *ᵥ v := fun v => rfl
-  have key : ∀ g v, e ((ρ' g : Matrix (Fin n) (Fin n) k) *ᵥ v) = (ρ g : Matrix (Fin n) (Fin n) k) *ᵥ e v := by
+  have key
+      : ∀ g v,
+        e ((ρ' g : Matrix (Fin n) (Fin n) k) *ᵥ v) = (ρ g : Matrix (Fin n) (Fin n) k) *ᵥ e v := by
     intro g v
     rw [he, he, hh, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, ← Units.val_mul, ← Units.val_mul]
     congr 2
     group
   intro W hW
-  obtain ⟨W', hW', hc⟩ := hρ (W.map (e : (Fin n → k) →ₗ[k] (Fin n → k))) (by
-    rintro g _ ⟨v, hv, rfl⟩
-    exact ⟨_, hW g v hv, key g v⟩)
+  obtain ⟨W', hW', hc⟩ :=
+    hρ (W.map (e : (Fin n → k) →ₗ[k] (Fin n → k))) (by
+      rintro g _ ⟨v, hv, rfl⟩
+      exact ⟨_, hW g v hv, key g v⟩)
   refine ⟨W'.comap (e : (Fin n → k) →ₗ[k] (Fin n → k)), fun g v hv => ?_, ?_⟩
   · show e _ ∈ W'
     rw [key]
     exact hW' g _ hv
   · have := (Submodule.orderIsoMapComap e).symm.isCompl hc
-    have h2 : IsCompl ((W.map (e : (Fin n → k) →ₗ[k] (Fin n → k))).comap (e : (Fin n → k) →ₗ[k] (Fin n → k)))
-      (W'.comap (e : (Fin n → k) →ₗ[k] (Fin n → k))) := this
+    have h2 : IsCompl
+        ((W.map (e : (Fin n → k) →ₗ[k] (Fin n → k))).comap (e : (Fin n → k) →ₗ[k] (Fin n → k)))
+        (W'.comap (e : (Fin n → k) →ₗ[k] (Fin n → k))) :=
+      this
     rwa [Submodule.comap_map_eq_of_injective e.injective] at h2
 
-theorem isSSRep_of_mapRep {Γ k k' : Type} [Group Γ] [Field k] [Field k'] {n : ℕ} (ι : k →+* k')
-    (ρ : Γ →* GL (Fin n) k) (hρ : IsSSRep (mapRep ι ρ)) : IsSSRep ρ :=
+theorem isSSRep_of_mapRep
+    {Γ k k' : Type} [Group Γ] [Field k] [Field k']
+    {n : ℕ} (ι : k →+* k') (ρ : Γ →* GL (Fin n) k) (hρ : IsSSRep (mapRep ι ρ))
+    : IsSSRep ρ :=
   _root_.GlobalTheory.RetractionComplement.isSSRep_of_mapRep ι ρ hρ
 
 section Topology
 
-variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (φ : O →+* Qbar l)
+variable
+  {l : ℕ} [Fact l.Prime]
+  {O : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+  (φ : O →+* Qbar l)
   (hφ : ∀ z : ℤ_[l], φ (algebraMap ℤ_[l] O z) = algebraMap ℚ_[l] (Qbar l) (z : ℚ_[l]))
 
 include hφ
-
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
 theorem norm_le_one (x : O) : ‖φ x‖ ≤ 1 := by
   obtain ⟨p, hp, hx⟩ : IsIntegral ℤ_[l] x := Algebra.IsIntegral.isIntegral x
   by_contra hlt
   push Not at hlt
-  have h0 : (φ x) ^ p.natDegree + ∑ i ∈ Finset.range p.natDegree,
-      algebraMap ℚ_[l] (Qbar l) (p.coeff i : ℚ_[l]) * φ x ^ i = 0 := by
+  have h0
+      : (φ x) ^ p.natDegree
+          + ∑ i ∈ Finset.range p.natDegree,
+            algebraMap ℚ_[l] (Qbar l) (p.coeff i : ℚ_[l]) * φ x ^ i
+        = 0 := by
     have := congrArg φ hx
     rw [hp.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_finsetSum] at this
     simpa [hφ] using this
@@ -147,11 +169,13 @@ theorem norm_le_one (x : O) : ‖φ x‖ ≤ 1 := by
     by_contra h
     have h' : p.natDegree = 0 := by omega
     simp [h'] at h0
-  have h1 : ‖∑ i ∈ Finset.range p.natDegree, algebraMap ℚ_[l] (Qbar l) (p.coeff i : ℚ_[l]) * φ x ^ i‖ ≤
-      ‖φ x‖ ^ (p.natDegree - 1) := by
+  have h1
+      : ‖∑ i ∈ Finset.range p.natDegree, algebraMap ℚ_[l] (Qbar l) (p.coeff i : ℚ_[l]) * φ x ^ i‖
+        ≤ ‖φ x‖ ^ (p.natDegree - 1) := by
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity) fun i hi => ?_
     rw [norm_mul, norm_pow, norm_algebraMap']
-    calc _ ≤ 1 * ‖φ x‖ ^ i := by gcongr; exact (p.coeff i).2
+    calc
+      _ ≤ 1 * ‖φ x‖ ^ i := by gcongr; exact (p.coeff i).2
       _ ≤ _ := by
         rw [one_mul]
         exact pow_le_pow_right₀ hlt.le (by have := Finset.mem_range.1 hi; omega)
@@ -184,17 +208,24 @@ theorem norm_lt_one {ϖ : O} (hϖ : Irreducible ϖ) : ‖φ ϖ‖ < 1 := by
 
 end Topology
 
-theorem mem_range_iff {l : ℕ} [Fact l.Prime] {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [Field K] [Algebra O K] [IsFractionRing O K] (ι : K →+* Qbar l)
-    (hι : ∀ z : ℤ_[l], ι (algebraMap O K (algebraMap ℤ_[l] O z)) = algebraMap ℚ_[l] (Qbar l) (z : ℚ_[l]))
-    (x : K) : x ∈ (algebraMap O K).range ↔ ‖ι x‖ ≤ 1 := by
+theorem mem_range_iff
+    {l : ℕ} [Fact l.Prime]
+    {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O]
+    [Module.Finite ℤ_[l] O] [Field K] [Algebra O K] [IsFractionRing O K]
+    (ι : K →+* Qbar l)
+    (hι : ∀ z : ℤ_[l],
+      ι (algebraMap O K (algebraMap ℤ_[l] O z)) = algebraMap ℚ_[l] (Qbar l) (z : ℚ_[l]))
+    (x : K)
+    : x ∈ (algebraMap O K).range ↔ ‖ι x‖ ≤ 1 := by
   let φ := ι.comp (algebraMap O K)
   refine ⟨?_, fun h => ?_⟩
   · rintro ⟨y, rfl⟩
     exact norm_le_one φ hι y
-  obtain ⟨y, hy | hy⟩ := ValuationRing.isInteger_or_isInteger O x |>.elim
-    (fun ⟨y, hy⟩ => (⟨y, Or.inl hy⟩ : ∃ y : O, algebraMap O K y = x ∨ algebraMap O K y = x⁻¹))
-    (fun ⟨y, hy⟩ => ⟨y, Or.inr hy⟩)
+  obtain ⟨y, hy | hy⟩ :=
+    ValuationRing.isInteger_or_isInteger O x
+      |>.elim
+        (fun ⟨y, hy⟩ => (⟨y, Or.inl hy⟩ : ∃ y : O, algebraMap O K y = x ∨ algebraMap O K y = x⁻¹))
+        (fun ⟨y, hy⟩ => ⟨y, Or.inr hy⟩)
   · exact ⟨y, hy⟩
   by_cases hx : x = 0
   · exact ⟨0, by simp [hx]⟩
@@ -218,14 +249,17 @@ theorem mem_range_iff {l : ℕ} [Fact l.Prime] {O K : Type} [CommRing O] [IsDoma
   rw [← inv_inv x, ← hy, hu]
   simp
 
-theorem isSplitPl_of_degree_one {R : Ranks} (H : Host R) (v : PlE H) (hf : v.asIdeal.inertiaDeg ℤ = 1)
-    (he : v.asIdeal.ramificationIdx ℤ = 1) : IsSplitPl H v := by
+theorem isSplitPl_of_degree_one
+    {R : Ranks} (H : Host R) (v : PlE H) (hf : v.asIdeal.inertiaDeg ℤ = 1)
+    (he : v.asIdeal.ramificationIdx ℤ = 1)
+    : IsSplitPl H v := by
   have hG : IsGalois ℚ H.E := H.hostE_isGalois
   have := v.isPrime
   have := v.isMaximal
   have h3 := Ideal.card_stabilizer_eq (G := H.E ≃ₐ[ℚ] H.E) (v.asIdeal.under ℤ) v.asIdeal
   rw [Ideal.ramificationIdxIn_eq_ramificationIdx _ v.asIdeal (H.E ≃ₐ[ℚ] H.E),
-    Ideal.inertiaDegIn_eq_inertiaDeg _ v.asIdeal (H.E ≃ₐ[ℚ] H.E), he, hf] at h3
+      Ideal.inertiaDegIn_eq_inertiaDeg _ v.asIdeal (H.E ≃ₐ[ℚ] H.E), he, hf]
+    at h3
   have hbot : MulAction.stabilizer (H.E ≃ₐ[ℚ] H.E) v.asIdeal = ⊥ := Subgroup.card_eq_one.1 h3
   by_contra hn
   unfold IsSplitPl at hn
@@ -251,23 +285,32 @@ theorem isSplitPl_of_degree_one {R : Ranks} (H : Host R) (v : PlE H) (hf : v.asI
   have := H.qd_big.2
   omega
 
-theorem isSSRep_of_prod {Γ k : Type} [Group Γ] [Field k] {n a b : ℕ} {ρ : Γ →* GL (Fin n) k}
-    {ρ₁ : Γ →* GL (Fin a) k} {ρ₂ : Γ →* GL (Fin b) k} (e : (Fin n → k) ≃ₗ[k] (Fin a → k) × (Fin b → k))
-    (he : ∀ g v, e ((ρ g : Matrix (Fin n) (Fin n) k) *ᵥ v) =
-      ((ρ₁ g : Matrix (Fin a) (Fin a) k) *ᵥ (e v).1, (ρ₂ g : Matrix (Fin b) (Fin b) k) *ᵥ (e v).2))
-    (h₁ : IsSSRep ρ₁) (h₂ : IsSSRep ρ₂) : IsSSRep ρ := by
+theorem isSSRep_of_prod
+    {Γ k : Type} [Group Γ] [Field k]
+    {n a b : ℕ} {ρ : Γ →* GL (Fin n) k} {ρ₁ : Γ →* GL (Fin a) k} {ρ₂ : Γ →* GL (Fin b) k}
+    (e : (Fin n → k) ≃ₗ[k] (Fin a → k) × (Fin b → k))
+    (he : ∀ g v,
+      e ((ρ g : Matrix (Fin n) (Fin n) k) *ᵥ v)
+        = (
+          (ρ₁ g : Matrix (Fin a) (Fin a) k) *ᵥ (e v).1,
+          (ρ₂ g : Matrix (Fin b) (Fin b) k) *ᵥ (e v).2
+        ))
+    (h₁ : IsSSRep ρ₁) (h₂ : IsSSRep ρ₂)
+    : IsSSRep ρ := by
   intro W hW
   let W₁ : Submodule k (Fin a → k) := W.comap (e.symm.toLinearMap ∘ₗ LinearMap.inl k _ _)
   let W₂ : Submodule k (Fin b → k) := W.map (LinearMap.snd k _ _ ∘ₗ e.toLinearMap)
-  obtain ⟨C₁, hC₁, hc₁⟩ := h₁ W₁ fun g v hv => by
-    have h := hW g _ hv
-    show e.symm (_, 0) ∈ W
-    convert h using 1
-    rw [LinearEquiv.symm_apply_eq, he]
-    simp
-  obtain ⟨C₂, hC₂, hc₂⟩ := h₂ W₂ (by
-    rintro g _ ⟨v, hv, rfl⟩
-    exact ⟨_, hW g v hv, congrArg Prod.snd (he g v)⟩)
+  obtain ⟨C₁, hC₁, hc₁⟩ :=
+    h₁ W₁ fun g v hv => by
+      have h := hW g _ hv
+      show e.symm (_, 0) ∈ W
+      convert h using 1
+      rw [LinearEquiv.symm_apply_eq, he]
+      simp
+  obtain ⟨C₂, hC₂, hc₂⟩ :=
+    h₂ W₂ (by
+      rintro g _ ⟨v, hv, rfl⟩
+      exact ⟨_, hW g v hv, congrArg Prod.snd (he g v)⟩)
   refine ⟨(C₁.prod C₂).comap e.toLinearMap, fun g v hv => ?_, ?_, ?_⟩
   · show e _ ∈ C₁.prod C₂
     rw [he]
@@ -276,16 +319,16 @@ theorem isSSRep_of_prod {Γ k : Type} [Group Γ] [Field k] {n a b : ℕ} {ρ : �
     intro v hv hv'
     have h2 : (e v).2 = 0 := Submodule.disjoint_def.1 hc₂.disjoint _ ⟨v, hv, rfl⟩ hv'.2
     have h3 : e.symm ((e v).1, 0) = v := by rw [← h2]; simp
-    have h1 : (e v).1 = 0 := Submodule.disjoint_def.1 hc₁.disjoint _
-      (show e.symm ((e v).1, 0) ∈ W by rwa [h3]) hv'.1
+    have h1 : (e v).1 = 0 :=
+      Submodule.disjoint_def.1 hc₁.disjoint _ (show e.symm ((e v).1, 0) ∈ W by rwa [h3]) hv'.1
     rw [← h3, h1]
     exact map_zero e.symm
   · rw [codisjoint_iff, eq_top_iff]
     rintro v -
-    obtain ⟨_, ⟨w, hw, rfl⟩, c₂, hc, h2⟩ := Submodule.mem_sup.1
-      (show (e v).2 ∈ W₂ ⊔ C₂ by rw [hc₂.sup_eq_top]; trivial)
-    obtain ⟨w₁, hw₁, c₁, hc', h1⟩ := Submodule.mem_sup.1
-      (show (e v).1 - (e w).1 ∈ W₁ ⊔ C₁ by rw [hc₁.sup_eq_top]; trivial)
+    obtain ⟨_, ⟨w, hw, rfl⟩, c₂, hc, h2⟩ :=
+      Submodule.mem_sup.1 (show (e v).2 ∈ W₂ ⊔ C₂ by rw [hc₂.sup_eq_top]; trivial)
+    obtain ⟨w₁, hw₁, c₁, hc', h1⟩ :=
+      Submodule.mem_sup.1 (show (e v).1 - (e w).1 ∈ W₁ ⊔ C₁ by rw [hc₁.sup_eq_top]; trivial)
     refine Submodule.mem_sup.2 ⟨w + e.symm (w₁, 0), W.add_mem hw hw₁, e.symm (c₁, c₂), ?_, ?_⟩
     · show e (e.symm _) ∈ C₁.prod C₂
       rw [e.apply_symm_apply]
@@ -294,7 +337,8 @@ theorem isSSRep_of_prod {Γ k : Type} [Group Γ] [Field k] {n a b : ℕ} {ρ : �
       have h2' : (e w).2 + c₂ = (e v).2 := h2
       ext1
       · simp only [map_add (f := _), e.apply_symm_apply, Prod.fst_add]
-        rw [add_assoc, h1]; abel
+        rw [add_assoc, h1]
+        abel
       · simp only [map_add (f := _), e.apply_symm_apply, Prod.snd_add]
         rw [add_zero, h2']
 

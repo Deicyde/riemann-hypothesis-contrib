@@ -9,40 +9,52 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.FlagBun.Sm.Cell
 
-open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.FlagBun GlobalTheory.CompanionTheory.Ar.FlagBun.Sm
+open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.FlagBun GlobalTheory.CompanionTheory.Ar.FlagBun.Sm
 
-theorem smooth_of_away_mvPolynomial {R L ι : Type} [CommRing R] [CommRing L] [Finite ι]
-    (g : R →+* L) (ψ : MvPolynomial ι R →+* L) (hg : ψ.comp MvPolynomial.C = g) (f : MvPolynomial ι R)
-    (hl : @IsLocalization.Away _ _ f L _ ψ.toAlgebra) : g.Smooth := by
+theorem smooth_of_away_mvPolynomial
+    {R L ι : Type} [CommRing R] [CommRing L] [Finite ι]
+    (g : R →+* L) (ψ : MvPolynomial ι R →+* L) (hg : ψ.comp MvPolynomial.C = g)
+    (f : MvPolynomial ι R) (hl : @IsLocalization.Away _ _ f L _ ψ.toAlgebra)
+    : g.Smooth := by
   letI := ψ.toAlgebra
   haveI := hl
-  have h1 : ψ.Smooth := (Algebra.Smooth.of_isLocalization_Away f : Algebra.Smooth (MvPolynomial ι R) L)
+  have h1 : ψ.Smooth :=
+    (Algebra.Smooth.of_isLocalization_Away f : Algebra.Smooth (MvPolynomial ι R) L)
   have h2 : (algebraMap R (MvPolynomial ι R)).Smooth :=
     RingHom.smooth_algebraMap.2 ⟨inferInstance, inferInstance⟩
   rw [MvPolynomial.algebraMap_eq] at h2
   rw [← hg]
   exact RingHom.Smooth.comp h2 h1
 
-def evalSub {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} (R : Subring Ω) (v : ι → K) :
-    MvPolynomial ι R →+* K :=
+def evalSub {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} (R : Subring Ω) (v : ι → K)
+    : MvPolynomial ι R →+* K :=
   MvPolynomial.eval₂Hom ((algebraMap Ω K).comp R.subtype) v
 
-theorem evalSub_injective {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} (R : Subring Ω)
-    (v : ι → K) (hv : AlgebraicIndependent Ω v) : Function.Injective (evalSub R v) := by
-  have e : evalSub R v =
-      (MvPolynomial.aeval v : MvPolynomial ι Ω →ₐ[Ω] K).toRingHom.comp (MvPolynomial.map R.subtype) := by
+theorem evalSub_injective
+    {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K]
+    {ι : Type}
+    (R : Subring Ω)
+    (v : ι → K) (hv : AlgebraicIndependent Ω v)
+    : Function.Injective (evalSub R v) := by
+  have e
+      : evalSub R v
+        = (MvPolynomial.aeval v : MvPolynomial ι Ω →ₐ[Ω] K).toRingHom.comp
+          (MvPolynomial.map R.subtype) := by
     apply MvPolynomial.ringHom_ext
     · intro a
       simp [evalSub]
     · intro i
       simp [evalSub]
   rw [e]
-  exact fun p q hpq => MvPolynomial.map_injective _ R.subtype_injective
-    (algebraicIndependent_iff_injective_aeval.1 hv hpq)
+  exact fun p q hpq =>
+    MvPolynomial.map_injective _ R.subtype_injective
+      (algebraicIndependent_iff_injective_aeval.1 hv hpq)
 
-theorem evalSub_range {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} (R : Subring Ω)
-    (v : ι → K) : (evalSub R v).range =
-      Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v) := by
+theorem evalSub_range
+    {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} (R : Subring Ω) (v : ι → K)
+    : (evalSub R v).range
+      = Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v) := by
   apply le_antisymm
   · rintro _ ⟨a, rfl⟩
     induction a using MvPolynomial.induction_on with
@@ -61,23 +73,41 @@ theorem evalSub_range {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Ty
     · exact ⟨MvPolynomial.C ⟨a, ha⟩, by simp [evalSub]⟩
     · exact ⟨MvPolynomial.X i, by simp [evalSub]⟩
 
-theorem smooth_locSub_closure : ∀ {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} [Finite ι] (R : Subring Ω) (v : ι → K), AlgebraicIndependent Ω v → ∀ ℓ : K, ℓ ∈ Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v) → ℓ ≠ 0 → ∀ h : (∀ a ∈ R, algebraMap Ω K a ∈ locSub (Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v)) ℓ), (((algebraMap Ω K).comp R.subtype).codRestrict (locSub (Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v)) ℓ) (fun a => h a a.2)).Smooth := by
+theorem smooth_locSub_closure
+    : ∀ {Ω K : Type} [Field Ω] [Field K] [Algebra Ω K] {ι : Type} [Finite ι] (R : Subring Ω)
+        (v : ι → K),
+      AlgebraicIndependent Ω v
+        → ∀ ℓ : K,
+          ℓ ∈ Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v) → ℓ ≠ 0
+            → ∀ h
+                : (∀ a ∈ R,
+                  algebraMap Ω K a ∈ locSub
+                    (Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v))
+                    ℓ),
+              (((algebraMap Ω K).comp R.subtype).codRestrict
+                (locSub
+                  (Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v))
+                  ℓ)
+                (fun a => h a a.2)).Smooth := by
   intro Ω K _ _ _ ι _ R v hv ℓ hℓ h0 h
   have hr := evalSub_range R v
   generalize Subring.closure (((R.map (algebraMap Ω K) : Subring K) : Set K) ∪ Set.range v) = B at *
   subst hr
   have hinj := evalSub_injective R v hv
-  have hmem : ∀ a, evalSub R v a ∈ locSub (evalSub R v).range ℓ :=
-    fun a => le_locSub _ _ ⟨a, rfl⟩
+  have hmem : ∀ a, evalSub R v a ∈ locSub (evalSub R v).range ℓ := fun a => le_locSub _ _ ⟨a, rfl⟩
   obtain ⟨f, hf⟩ := hℓ
   refine smooth_of_away_mvPolynomial _ ((evalSub R v).codRestrict _ hmem) ?_ f ?_
   · ext a
     change evalSub R v (MvPolynomial.C a) = algebraMap Ω K a
     simp [evalSub]
   · letI := ((evalSub R v).codRestrict _ hmem).toAlgebra
-    have hval : ∀ a : MvPolynomial ι R,
-        ((algebraMap (MvPolynomial ι R) (locSub (evalSub R v).range ℓ) a : locSub (evalSub R v).range ℓ) : K)
-          = evalSub R v a := fun a => rfl
+    have hval
+        : ∀ a : MvPolynomial ι R,
+          ((algebraMap (MvPolynomial ι R) (locSub (evalSub R v).range ℓ) a
+                : locSub (evalSub R v).range ℓ)
+              : K)
+            = evalSub R v a := fun a =>
+      rfl
     refine { map_units := ?_, surj := ?_, exists_of_eq := ?_ }
     · rintro ⟨_, n, rfl⟩
       have hu : IsUnit (algebraMap (MvPolynomial ι R) (locSub (evalSub R v).range ℓ) f) := by

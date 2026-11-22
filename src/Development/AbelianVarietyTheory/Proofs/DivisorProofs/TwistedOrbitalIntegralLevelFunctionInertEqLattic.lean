@@ -45,7 +45,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNormOf
 
 @[expose] public section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT
 open scoped Classical
 
 namespace GlobalTheory.TwOrbLevel

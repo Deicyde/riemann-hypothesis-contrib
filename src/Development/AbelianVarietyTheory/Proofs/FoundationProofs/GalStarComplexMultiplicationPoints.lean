@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeIn
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 noncomputable section
@@ -20,9 +22,10 @@ namespace GlobalTheory.ConjPoint
 
 open PeriodPair Polynomial WeierstrassCurve
 
-def mapPoint (W : WeierstrassCurve ℂ) (σ : ℂ →+* ℂ) :
-    W.toAffine.Point →+ (W.map σ).toAffine.Point where
-  toFun P := match P with
+def mapPoint (W : WeierstrassCurve ℂ) (σ : ℂ →+* ℂ)
+    : W.toAffine.Point →+ (W.map σ).toAffine.Point where
+  toFun P :=
+    match P with
     | 0 => 0
     | .some _ _ h => .some _ _ <| (W.toAffine.map_nonsingular σ.injective ..).mpr h
   map_zero' := rfl
@@ -33,9 +36,9 @@ def mapPoint (W : WeierstrassCurve ℂ) (σ : ℂ →+* ℂ) :
     · rw [Affine.Point.add_of_Y_eq hxy.left hxy.right,
         Affine.Point.add_of_Y_eq (congr_arg _ hxy.left) <| by rw [hxy.right, Affine.map_negY]]
     · simpa only [Affine.Point.add_some hxy, ← Affine.map_addX, ← Affine.map_addY,
-        ← Affine.map_slope] using!
-        (Affine.Point.add_some fun h ↦ hxy ⟨σ.injective h.1,
-          σ.injective (W.toAffine.map_negY σ .. ▸ h).2⟩).symm
+          ← Affine.map_slope]
+        using! (Affine.Point.add_some fun h ↦
+          hxy ⟨σ.injective h.1, σ.injective (W.toAffine.map_negY σ .. ▸ h).2⟩).symm
 
 lemma exists_pointHom (W W' : WeierstrassCurve ℂ) (σ : ℂ ≃+* ℂ) (hW : W' = W.map (σ : ℂ →+* ℂ)) :
     ∃ s : W.toAffine.Point ≃+ W'.toAffine.Point,
@@ -53,8 +56,8 @@ lemma exists_pointHom (W W' : WeierstrassCurve ℂ) (σ : ℂ ≃+* ℂ) (hW : W
       exact ⟨.some x y ((W.toAffine.map_nonsingular (σ : ℂ →+* ℂ).injective ..).mp h), rfl⟩
 
 def IsConj (L L' : PeriodPair) (σ : ℂ ≃+* ℂ) (t t' : ℂ) : Prop :=
-  (t ∈ L.lattice ∧ t' ∈ L'.lattice) ∨
-  (t ∉ L.lattice ∧ t' ∉ L'.lattice ∧ ℘[L'] t' = σ (℘[L] t) ∧ ℘'[L'] t' = σ (℘'[L] t))
+  (t ∈ L.lattice ∧ t' ∈ L'.lattice)
+    ∨ (t ∉ L.lattice ∧ t' ∉ L'.lattice ∧ ℘[L'] t' = σ (℘[L] t) ∧ ℘'[L'] t' = σ (℘'[L] t))
 
 variable {L L' : PeriodPair} {σ : ℂ ≃+* ℂ}
 
@@ -210,9 +213,9 @@ lemma IsConj.nsmul_mem_iff (h₂ : L'.g₂ = σ L.g₂) (h₃ : L'.g₃ = σ L.g
   · exact iff_of_false h.1 h.2.1
 
 def IsStar (L L' : PeriodPair) (M : IntermediateField ℚ ℂ) (ρ : M →ₐ[ℚ] ℂ) (t t' : ℂ) : Prop :=
-  (t ∈ L.lattice ∧ t' ∈ L'.lattice) ∨
-  (t ∉ L.lattice ∧ t' ∉ L'.lattice ∧ ℘[L] t ∈ M ∧ ℘'[L] t ∈ M ∧
-    ℘[L'] t' = cj M ρ (℘[L] t) ∧ ℘'[L'] t' = cj M ρ (℘'[L] t))
+  (t ∈ L.lattice ∧ t' ∈ L'.lattice)
+    ∨ (t ∉ L.lattice ∧ t' ∉ L'.lattice ∧ ℘[L] t ∈ M ∧ ℘'[L] t ∈ M ∧ ℘[L'] t' = cj M ρ (℘[L] t)
+      ∧ ℘'[L'] t' = cj M ρ (℘'[L] t))
 
 lemma exists_ringEquiv_isStar (m₂ : L.g₂ ∈ M) (m₃ : L.g₃ ∈ M) (h₂ : L'.g₂ = cj M ρ L.g₂)
     (h₃ : L'.g₃ = cj M ρ L.g₃) {α : ℂ} (mα : α ∈ M) {T : Set ℂ} (hT : T.Countable) :
@@ -234,52 +237,65 @@ lemma exists_ringEquiv_isStar (m₂ : L.g₂ ∈ M) (m₃ : L.g₃ ∈ M) (h₂ 
     · obtain ⟨h3, h4⟩ := h0.resolve_left h1
       exact .inr ⟨h1, h2, h3, h4, by rw [← a h3, h5], by rw [← b h4, h6]⟩
 
-theorem isStar_props (m₂ : L.g₂ ∈ M) (m₃ : L.g₃ ∈ M) (h₂ : L'.g₂ = cj M ρ L.g₂)
-    (h₃ : L'.g₃ = cj M ρ L.g₃) :
-    (∀ t, IsRat L M t → ∃ t', IsStar L L' M ρ t t') ∧
-    (∀ t t₁ t₂, IsStar L L' M ρ t t₁ → (IsStar L L' M ρ t t₂ ↔ t₁ - t₂ ∈ L'.lattice)) ∧
-    (∀ t t' u u', IsStar L L' M ρ t t' → IsStar L L' M ρ u u' →
-      IsStar L L' M ρ (t + u) (t' + u')) ∧
-    (∀ α ∈ M, (∀ l ∈ L.lattice, α * l ∈ L.lattice) → ∀ t t', IsStar L L' M ρ t t' →
-      IsStar L L' M ρ (α * t) (cj M ρ α * t')) ∧
-    (∀ (n : ℕ) t t', IsStar L L' M ρ t t' →
-      ((n : ℂ) * t ∈ L.lattice ↔ (n : ℂ) * t' ∈ L'.lattice)) ∧
-    (∀ n : ℕ, 0 < n → (∀ t, (n : ℂ) * t ∈ L.lattice → IsRat L M t) →
-      ∀ t', (n : ℂ) * t' ∈ L'.lattice → ∃ t, (n : ℂ) * t ∈ L.lattice ∧ IsStar L L' M ρ t t') := by
-  refine ⟨fun t ht ↦ ?_, fun t t₁ t₂ h ↦ ?_, fun t t' u u' ht hu ↦ ?_, fun α mα hα t t' ht ↦ ?_,
-    fun n t t' ht ↦ ?_, fun n hn hr t' ht' ↦ ?_⟩
-  · obtain ⟨σ, e₂, e₃, -, hσ⟩ := exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem
-      (Set.countable_singleton t)
+theorem isStar_props
+    (m₂ : L.g₂ ∈ M) (m₃ : L.g₃ ∈ M) (h₂ : L'.g₂ = cj M ρ L.g₂) (h₃ : L'.g₃ = cj M ρ L.g₃)
+    : (∀ t, IsRat L M t → ∃ t', IsStar L L' M ρ t t')
+      ∧ (∀ t t₁ t₂, IsStar L L' M ρ t t₁ → (IsStar L L' M ρ t t₂ ↔ t₁ - t₂ ∈ L'.lattice))
+      ∧ (∀ t t' u u',
+        IsStar L L' M ρ t t' → IsStar L L' M ρ u u' → IsStar L L' M ρ (t + u) (t' + u'))
+      ∧ (∀ α ∈ M,
+        (∀ l ∈ L.lattice, α * l ∈ L.lattice)
+          → ∀ t t', IsStar L L' M ρ t t' → IsStar L L' M ρ (α * t) (cj M ρ α * t'))
+      ∧ (∀ (n : ℕ) t t',
+        IsStar L L' M ρ t t' → ((n : ℂ) * t ∈ L.lattice ↔ (n : ℂ) * t' ∈ L'.lattice))
+      ∧ (∀ n : ℕ,
+        0 < n → (∀ t, (n : ℂ) * t ∈ L.lattice → IsRat L M t)
+          → ∀ t',
+            (n : ℂ) * t' ∈ L'.lattice → ∃ t, (n : ℂ) * t ∈ L.lattice ∧ IsStar L L' M ρ t t') := by
+  refine ⟨
+    fun t ht ↦ ?_,
+    fun t t₁ t₂ h ↦ ?_,
+    fun t t' u u' ht hu ↦ ?_,
+    fun α mα hα t t' ht ↦ ?_,
+    fun n t t' ht ↦ ?_,
+    fun n hn hr t' ht' ↦ ?_
+  ⟩
+  · obtain ⟨σ, e₂, e₃, -, hσ⟩ :=
+      exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem (Set.countable_singleton t)
     obtain ⟨s, -, hc⟩ := exists_conjEquiv e₂ e₃
     obtain ⟨t', ht'⟩ := latticePoint_surjective L' (s (latticePoint L t))
     exact ⟨t', (hσ t rfl t').2 ⟨ht, (hc _ _).2 ht'.symm⟩⟩
-  · obtain ⟨σ, e₂, e₃, -, hσ⟩ := exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem
-      (Set.countable_singleton t)
+  · obtain ⟨σ, e₂, e₃, -, hσ⟩ :=
+      exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem (Set.countable_singleton t)
     obtain ⟨s, -, hc⟩ := exists_conjEquiv e₂ e₃
     rw [hσ t rfl, hc] at h
     rw [hσ t rfl, hc, h.2, latticePoint_eq_iff, and_iff_right h.1]
-  · obtain ⟨σ, e₂, e₃, -, hσ⟩ := exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem
-      (T := {t, u, t + u}) (Set.toFinite _).countable
+  · obtain ⟨σ, e₂, e₃, -, hσ⟩ :=
+      exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem (T := {t, u, t + u}) (Set.toFinite _).countable
     rw [hσ _ (by simp)] at ht hu ⊢
-    exact ⟨isRat_of_forall_isConj fun τ hτ ↦ IsConj.add (hτ _ m₂).symm (hτ _ m₃).symm
-      (ht.1.isConj hτ) (hu.1.isConj hτ), IsConj.add e₂ e₃ ht.2 hu.2⟩
-  · obtain ⟨σ, e₂, e₃, eα, hσ⟩ := exists_ringEquiv_isStar m₂ m₃ h₂ h₃ mα
-      (T := {t, α * t}) (Set.toFinite _).countable
+    exact ⟨
+      isRat_of_forall_isConj fun τ hτ ↦
+        IsConj.add (hτ _ m₂).symm (hτ _ m₃).symm (ht.1.isConj hτ) (hu.1.isConj hτ),
+      IsConj.add e₂ e₃ ht.2 hu.2
+    ⟩
+  · obtain ⟨σ, e₂, e₃, eα, hσ⟩ :=
+      exists_ringEquiv_isStar m₂ m₃ h₂ h₃ mα (T := {t, α * t}) (Set.toFinite _).countable
     rw [hσ _ (by simp)] at ht ⊢
     refine ⟨isRat_of_forall_isConj fun τ hτ ↦ ?_, eα ▸ IsConj.mul e₂ e₃ hα ht.2⟩
     have := IsConj.mul (hτ _ m₂).symm (hτ _ m₃).symm hα (ht.1.isConj hτ)
     rwa [hτ _ mα] at this
-  · obtain ⟨σ, e₂, e₃, -, hσ⟩ := exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem
-      (Set.countable_singleton t)
+  · obtain ⟨σ, e₂, e₃, -, hσ⟩ :=
+      exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem (Set.countable_singleton t)
     exact ((hσ t rfl t').1 ht).2.nsmul_mem_iff e₂ e₃ n
   · have hL : (L.lattice : Set ℂ).Countable := by
       refine (Set.countable_range fun p : ℤ × ℤ ↦ p.1 * L.ω₁ + p.2 * L.ω₂).mono fun x hx ↦ ?_
       obtain ⟨a, b, h⟩ := L.mem_lattice.1 hx
       exact ⟨(a, b), h⟩
     have hn' : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
-    obtain ⟨σ, e₂, e₃, -, hσ⟩ := exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem
-      (T := (fun t ↦ (n : ℂ) * t) ⁻¹' (L.lattice : Set ℂ))
-      (hL.preimage (mul_right_injective₀ hn'))
+    obtain ⟨σ, e₂, e₃, -, hσ⟩ :=
+      exists_ringEquiv_isStar m₂ m₃ h₂ h₃ M.zero_mem
+        (T := (fun t ↦ (n : ℂ) * t) ⁻¹' (L.lattice : Set ℂ))
+        (hL.preimage (mul_right_injective₀ hn'))
     obtain ⟨s, -, hc⟩ := exists_conjEquiv e₂ e₃
     obtain ⟨P, hP⟩ := s.surjective (latticePoint L' t')
     obtain ⟨t, rfl⟩ := latticePoint_surjective L P
@@ -289,27 +305,32 @@ theorem isStar_props (m₂ : L.g₂ ∈ M) (m₃ : L.g₃ ∈ M) (h₂ : L'.g₂
 
 theorem galStar_holds : ∀ D : D7, galStar D := by
   intro D cc δ hc M ρ hK m₂ m₃
-  obtain ⟨⟨w₁, w₂, hw, hΛ⟩, -, -, -, hO⟩ := GlobalTheory.CurveLattice.lattice_of_curve D (GlobalTheory.InducedType.induced_type D).1 cc δ hc
+  obtain ⟨⟨w₁, w₂, hw, hΛ⟩, -, -, -, hO⟩ :=
+    GlobalTheory.CurveLattice.lattice_of_curve D (GlobalTheory.InducedType.induced_type D).1 cc δ hc
   generalize lamOf D cc δ = Λ at *
   let L : PeriodPair := ⟨w₁, w₂, hw⟩
   have hL : ∀ z, z ∈ Λ ↔ z ∈ L.lattice := fun z ↦ by
     rw [hΛ, AddSubgroup.mem_closure_pair, PeriodPair.mem_lattice]
     simp [L]
-  obtain ⟨g₂e, g₃e, hd, -, hwp, -, hex⟩ := GlobalTheory.LatticeInvariants.invariants_dictionary L Λ hL
-  obtain ⟨L', h₂, h₃⟩ := hex (cj M ρ (g2 Λ)) (cj M ρ (g3 Λ)) (by
-    intro h
-    apply hd
-    have h' : ρ (⟨g2 Λ, m₂⟩ ^ 3 - 27 * ⟨g3 Λ, m₃⟩ ^ 2) = 0 := by
-      rw [map_sub, map_mul, map_pow, map_pow, map_ofNat]
-      simpa only [cj, TaylorLogMetric.liftM, dif_pos m₂, dif_pos m₃] using h
-    have h'' := congrArg Subtype.val ((map_eq_zero ρ).1 h')
-    exact h'')
+  obtain ⟨g₂e, g₃e, hd, -, hwp, -, hex⟩ :=
+    GlobalTheory.LatticeInvariants.invariants_dictionary L Λ hL
+  obtain ⟨L', h₂, h₃⟩ :=
+    hex (cj M ρ (g2 Λ)) (cj M ρ (g3 Λ)) (by
+      intro h
+      apply hd
+      have h' : ρ (⟨g2 Λ, m₂⟩ ^ 3 - 27 * ⟨g3 Λ, m₃⟩ ^ 2) = 0 := by
+        rw [map_sub, map_mul, map_pow, map_pow, map_ofNat]
+        simpa only [cj, TaylorLogMetric.liftM, dif_pos m₂, dif_pos m₃] using h
+      have h'' := congrArg Subtype.val ((map_eq_zero ρ).1 h')
+      exact h'')
   obtain ⟨g₂e', g₃e', -, -, hwp', huniq, -⟩ :=
     GlobalTheory.LatticeInvariants.invariants_dictionary L' L'.lattice.toAddSubgroup fun _ ↦ Iff.rfl
   have hΛ' : lamConj M ρ Λ = L'.lattice.toAddSubgroup := by
-    have := Classical.epsilon_spec (p := fun Λ' : AddSubgroup ℂ =>
-      g2 Λ' = ρ (TaylorLogMetric.liftM M (g2 Λ)) ∧ g3 Λ' = ρ (TaylorLogMetric.liftM M (g3 Λ)))
-      ⟨L'.lattice.toAddSubgroup, g₂e'.trans h₂, g₃e'.trans h₃⟩
+    have :=
+      Classical.epsilon_spec
+        (p := fun Λ' : AddSubgroup ℂ =>
+          g2 Λ' = ρ (TaylorLogMetric.liftM M (g2 Λ)) ∧ g3 Λ' = ρ (TaylorLogMetric.liftM M (g3 Λ)))
+        ⟨L'.lattice.toAddSubgroup, g₂e'.trans h₂, g₃e'.trans h₃⟩
     exact huniq _ (this.1.trans (g₂e'.trans h₂).symm) (this.2.trans (g₃e'.trans h₃).symm)
   have hL' : ∀ z, z ∈ lamConj M ρ Λ ↔ z ∈ L'.lattice := fun z ↦ by rw [hΛ']; rfl
   have hS : ∀ t t', StarPt M ρ Λ t t' ↔ IsStar L L' M ρ t t' := fun t t' ↦ by
@@ -326,8 +347,15 @@ theorem galStar_holds : ∀ D : D7, galStar D := by
   rw [g₃e] at m₃ h₃
   obtain ⟨a1, a2, a3, a4, a5, a6⟩ := isStar_props m₂ m₃ h₂ h₃
   simp only [hS, hL']
-  refine ⟨fun t _ ht ↦ a1 t (hR t fun h ↦ ht.resolve_left h), a2, fun t t' ω ht hω ↦ ?_, a3,
-    fun a t t' ht ↦ ?_, fun n t t' ht ↦ ?_, fun n hn hr t' ht' ↦ ?_⟩
+  refine ⟨
+    fun t _ ht ↦ a1 t (hR t fun h ↦ ht.resolve_left h),
+    a2,
+    fun t t' ω ht hω ↦ ?_,
+    a3,
+    fun a t t' ht ↦ ?_,
+    fun n t t' ht ↦ ?_,
+    fun n hn hr t' ht' ↦ ?_
+  ⟩
   · simpa using a3 t t' ω 0 ht (.inl ⟨(hL ω).1 hω, zero_mem _⟩)
   · have := a4 _ (hK (a : D.host.K)).1 (fun l hl ↦ (hL _).1 (hO a l ((hL l).2 hl))) t t' ht
     rwa [(hK (a : D.host.K)).2] at this

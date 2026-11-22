@@ -9,32 +9,34 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.TupFubini
 
 variable {T : Type} [MeasurableSpace T]
 
-theorem measurable_cons_tail {A : Type} [MeasurableSpace A] {n : ℕ} (x : A) :
-    Measurable (fun Y : Fin n → A => (Fin.cons x Y : Fin (n + 1) → A)) := by
+theorem measurable_cons_tail {A : Type} [MeasurableSpace A] {n : ℕ} (x : A)
+    : Measurable (fun Y : Fin n → A => (Fin.cons x Y : Fin (n + 1) → A)) := by
   refine measurable_pi_iff.2 fun i => ?_
   refine Fin.cases ?_ (fun j => ?_) i
   · simp
   · simpa using measurable_pi_apply j
 
-theorem piFinSuccAbove_symm_apply {A : Type} [MeasurableSpace A] {n : ℕ} (x : A) (Y : Fin n → A) :
-    (MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1) => A) 0).symm (x, Y) = Fin.cons x Y := by
+theorem piFinSuccAbove_symm_apply {A : Type} [MeasurableSpace A] {n : ℕ} (x : A) (Y : Fin n → A)
+    : (MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1) => A) 0).symm (x, Y) = Fin.cons x Y := by
   apply (MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1) => A) 0).injective
   rw [MeasurableEquiv.apply_symm_apply]
   simp [MeasurableEquiv.piFinSuccAbove, Fin.insertNthEquiv]
 
-theorem lintegral_tuple_succ (m : Measure T) [SigmaFinite m] (n N : ℕ)
-    (ψ : (Fin (n + 1) → Fin N → T) → ℝ≥0∞) (hψ : Measurable ψ) :
-    ∫⁻ X, ψ X ∂(Measure.pi fun _ : Fin (n + 1) => Measure.pi fun _ : Fin N => m) =
-      ∫⁻ y : Fin 1 → Fin N → T, ∫⁻ Y : Fin n → Fin N → T, ψ (Fin.cons (y 0) Y)
-        ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin N => m)
-        ∂(Measure.pi fun _ : Fin 1 => Measure.pi fun _ : Fin N => m) := by
+theorem lintegral_tuple_succ
+    (m : Measure T) [SigmaFinite m]
+    (n N : ℕ) (ψ : (Fin (n + 1) → Fin N → T) → ℝ≥0∞) (hψ : Measurable ψ)
+    : ∫⁻ X, ψ X ∂(Measure.pi fun _ : Fin (n + 1) => Measure.pi fun _ : Fin N => m)
+      = ∫⁻ y : Fin 1 → Fin N → T, ∫⁻ Y : Fin n → Fin N → T, ψ (Fin.cons (y 0) Y)
+          ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin N => m)
+          ∂(Measure.pi fun _ : Fin 1 => Measure.pi fun _ : Fin N => m) := by
   set P : Measure (Fin N → T) := Measure.pi fun _ : Fin N => m with hP
   have h1 := measurePreserving_piFinSuccAbove (fun _ : Fin (n + 1) => P) 0
   have h2 := measurePreserving_funUnique P (Fin 1)
@@ -47,37 +49,47 @@ theorem lintegral_tuple_succ (m : Measure T) [SigmaFinite m] (n N : ℕ)
   rw [piFinSuccAbove_symm_apply]
   rfl
 
-theorem lintegral_tuple_first_coord (m : Measure T) [SigmaFinite m] (n M : ℕ)
-    (ψ : (Fin n → Fin (M + 1) → T) → ℝ≥0∞) (hψ : Measurable ψ) :
-    ∫⁻ Y, ψ Y ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin (M + 1) => m) =
-      ∫⁻ c : Fin n → T, ∫⁻ X : Fin n → Fin M → T, ψ (fun a => Fin.cons (c a) (X a))
-        ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin M => m)
-        ∂(Measure.pi fun _ : Fin n => m) := by
+theorem lintegral_tuple_first_coord
+    (m : Measure T) [SigmaFinite m]
+    (n M : ℕ) (ψ : (Fin n → Fin (M + 1) → T) → ℝ≥0∞) (hψ : Measurable ψ)
+    : ∫⁻ Y, ψ Y ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin (M + 1) => m)
+      = ∫⁻ c : Fin n → T, ∫⁻ X : Fin n → Fin M → T, ψ (fun a => Fin.cons (c a) (X a))
+          ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin M => m)
+          ∂(Measure.pi fun _ : Fin n => m) := by
   let e₁ := MeasurableEquiv.piFinSuccAbove (fun _ : Fin (M + 1) => T) 0
   have h₁ : MeasurePreserving e₁ (Measure.pi fun _ : Fin (M + 1) => m)
       (m.prod (Measure.pi fun _ : Fin M => m)) :=
     measurePreserving_piFinSuccAbove (fun _ : Fin (M + 1) => m) 0
-  have h₂ := measurePreserving_pi (fun _ : Fin n => Measure.pi fun _ : Fin (M + 1) => m)
-    (fun _ : Fin n => m.prod (Measure.pi fun _ : Fin M => m)) (f := fun _ => e₁) (fun _ => h₁)
-  have h₃ := measurePreserving_arrowProdEquivProdArrow T (Fin M → T) (Fin n) (fun _ => m)
-    (fun _ => Measure.pi fun _ : Fin M => m)
+  have h₂ :=
+    measurePreserving_pi
+      (fun _ : Fin n => Measure.pi fun _ : Fin (M + 1) => m)
+      (fun _ : Fin n => m.prod (Measure.pi fun _ : Fin M => m))
+      (f := fun _ => e₁)
+      (fun _ => h₁)
+  have h₃ :=
+    measurePreserving_arrowProdEquivProdArrow T (Fin M → T) (Fin n)
+      (fun _ => m)
+      (fun _ => Measure.pi fun _ : Fin M => m)
   have h₄ := h₃.comp h₂
-  let g : (Fin n → T) × (Fin n → Fin M → T) → Fin n → Fin (M + 1) → T :=
-    fun p a => e₁.symm (p.1 a, p.2 a)
+  let g : (Fin n → T) × (Fin n → Fin M → T) → Fin n → Fin (M + 1) → T := fun p a =>
+    e₁.symm (p.1 a, p.2 a)
   have hg : Measurable g := by
     refine measurable_pi_iff.2 fun a => e₁.symm.measurable.comp ?_
     exact ((measurable_pi_apply a).comp measurable_fst).prodMk
       ((measurable_pi_apply a).comp measurable_snd)
-  have hgi : ∀ Y, g ((MeasurableEquiv.arrowProdEquivProdArrow T (Fin M → T) (Fin n) ∘
-      fun Y a => e₁ (Y a)) Y) = Y := by
+  have hgi
+      : ∀ Y,
+        g ((MeasurableEquiv.arrowProdEquivProdArrow T (Fin M → T) (Fin n) ∘ fun Y a => e₁ (Y a)) Y)
+          = Y := by
     intro Y
     funext a
     exact e₁.symm_apply_apply (Y a)
   have hψg : Measurable (ψ ∘ g) := hψ.comp hg
-  calc ∫⁻ Y, ψ Y ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin (M + 1) => m)
-      = ∫⁻ Y, (ψ ∘ g) ((MeasurableEquiv.arrowProdEquivProdArrow T (Fin M → T) (Fin n) ∘
-          fun Y a => e₁ (Y a)) Y) ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin (M + 1) => m) :=
-        lintegral_congr fun Y => by simp only [Function.comp_apply (f := ψ), hgi]
+  calc
+    ∫⁻ Y, ψ Y ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin (M + 1) => m)
+        = ∫⁻ Y, (ψ ∘ g) ((MeasurableEquiv.arrowProdEquivProdArrow T (Fin M → T) (Fin n) ∘
+            fun Y a => e₁ (Y a)) Y) ∂(Measure.pi fun _ : Fin n => Measure.pi fun _ : Fin (M + 1) => m) :=
+      lintegral_congr fun Y => by simp only [Function.comp_apply (f := ψ), hgi]
     _ = _ := h₄.lintegral_comp hψg
     _ = _ := lintegral_prod _ hψg.aemeasurable
     _ = _ := by

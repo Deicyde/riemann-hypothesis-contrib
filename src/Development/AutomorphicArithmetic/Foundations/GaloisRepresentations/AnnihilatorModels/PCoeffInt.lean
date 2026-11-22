@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.coeffInt_of :
-    CoeffInt := by
+theorem UpperTheory.Gal.crystallineComparison.coeffInt_of : CoeffInt := by
   intro R T _ _ _ ι I _ _ c hc a m
   let c' : I → ι → integralClosure R T := fun i k => ⟨c i k, hc i k⟩
   let f : MvPolynomial ι (integralClosure R T) →+* MvPolynomial ι T :=

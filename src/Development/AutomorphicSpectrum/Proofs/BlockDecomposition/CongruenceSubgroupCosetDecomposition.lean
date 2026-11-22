@@ -8,7 +8,8 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.CuspidalContinui
 noncomputable section
 
 open Matrix GroundTheory.LocalField GroundTheory.Automorphic
-open GroundTheory.Automorphic.GLnLocal (integralGL mem_integralGL_iff uniformizer irreducible_uniformizer)
+open GroundTheory.Automorphic.GLnLocal
+  (integralGL mem_integralGL_iff uniformizer irreducible_uniformizer)
 open ValuativeRel IsLocalRing
 open scoped ValuativeRel
 open Ad3 Ad3.R
@@ -17,14 +18,13 @@ namespace GlobalTheory.CompanionTheory.RankinStepC
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-
 variable (F) in
 def Pv : ValueGroupWithZero F := valuation F ((uniformizer F : 𝒪[F]) : F)
 
 theorem Pv_lt_one : Pv F < 1 := by
   unfold Pv
-  exact valuation_lt_one_of_mem_maximalIdeal
-    (uniformizer_mem_maximalIdeal (irreducible_uniformizer F))
+  exact valuation_lt_one_of_mem_maximalIdeal (uniformizer_mem_maximalIdeal (irreducible_uniformizer
+    F))
 
 private theorem uniformizer_coe_ne_zero' : ((uniformizer F : 𝒪[F]) : F) ≠ 0 := fun h =>
   (irreducible_uniformizer F).ne_zero (Subtype.ext (by simpa using h))
@@ -39,24 +39,25 @@ theorem val_of_ord {ϖ : Fˣ} (h : ord (ϖ : F) = 1) : valuation F (ϖ : F) = Pv
   rw [normalizedValuation_eq_exp_ord ϖ.ne_zero, h,
     normalizedValuation_uniformizer (irreducible_uniformizer F)]
 
-theorem mem_inv_mul {ϖ : Fˣ} (h : ord (ϖ : F) = 1) (y : F) :
-    ((ϖ⁻¹ : Fˣ) : F) * y ∈ 𝒪[F] ↔ valuation F y ≤ Pv F := by
+theorem mem_inv_mul {ϖ : Fˣ} (h : ord (ϖ : F) = 1) (y : F)
+    : ((ϖ⁻¹ : Fˣ) : F) * y ∈ 𝒪[F] ↔ valuation F y ≤ Pv F := by
   rw [Valuation.mem_integer_iff, map_mul, Units.val_inv_eq_inv_val, map_inv₀, val_of_ord h]
   exact inv_mul_le_one₀ Pv_pos
 
-theorem mem_pow_mul (n : ℕ) (y : F) :
-    (((unifUnit F)⁻¹ ^ n : Fˣ) : F) * y ∈ 𝒪[F] ↔ valuation F y ≤ Pv F ^ n := by
+theorem mem_pow_mul (n : ℕ) (y : F)
+    : (((unifUnit F)⁻¹ ^ n : Fˣ) : F) * y ∈ 𝒪[F] ↔ valuation F y ≤ Pv F ^ n := by
   rw [Valuation.mem_integer_iff, map_mul, Units.val_pow_eq_pow_val, Units.val_inv_eq_inv_val,
     map_pow, map_inv₀, val_of_ord (ϖ := unifUnit F) ord_unifUnit, inv_pow]
   exact inv_mul_le_one₀ (pow_pos Pv_pos n)
 
-private theorem mem_maximalIdeal_iff_valuation_le_Pv (z : 𝒪[F]) :
-    z ∈ maximalIdeal 𝒪[F] ↔ valuation F (z : F) ≤ Pv F := by
+private theorem mem_maximalIdeal_iff_valuation_le_Pv (z : 𝒪[F])
+    : z ∈ maximalIdeal 𝒪[F] ↔ valuation F (z : F) ≤ Pv F := by
   rw [mem_maximalIdeal_iff_dvd (irreducible_uniformizer F)]
   constructor
   · rintro ⟨c, rfl⟩
     unfold Pv
-    rw [show ((GLnLocal.uniformizer F * c : 𝒪[F]) : F) = ((uniformizer F : 𝒪[F]) : F) * c from rfl, map_mul]
+    rw [show ((GLnLocal.uniformizer F * c : 𝒪[F]) : F) = ((uniformizer F : 𝒪[F]) : F) * c from rfl,
+      map_mul]
     exact mul_le_of_le_one_right' ((Valuation.mem_integer_iff _ _).1 c.2)
   · intro h
     refine ⟨⟨((uniformizer F : 𝒪[F]) : F)⁻¹ * z, ?_⟩, ?_⟩
@@ -66,9 +67,10 @@ private theorem mem_maximalIdeal_iff_valuation_le_Pv (z : 𝒪[F]) :
       show (z : F) = ((uniformizer F : 𝒪[F]) : F) * (((uniformizer F : 𝒪[F]) : F)⁻¹ * z)
       rw [mul_inv_cancel_left₀ uniformizer_coe_ne_zero']
 
-theorem residue_eq_iff (x y : 𝒪[F]) :
-    residue 𝒪[F] x = residue 𝒪[F] y ↔ valuation F ((x : F) - y) ≤ Pv F := by
-  rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, mem_maximalIdeal_iff_valuation_le_Pv]
+theorem residue_eq_iff (x y : 𝒪[F])
+    : residue 𝒪[F] x = residue 𝒪[F] y ↔ valuation F ((x : F) - y) ≤ Pv F := by
+  rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff,
+    mem_maximalIdeal_iff_valuation_le_Pv]
   exact Iff.rfl
 
 theorem reps_exists : ∃ (ϖ : Fˣ) (B : Finset F), Reps ϖ B := by
@@ -97,16 +99,18 @@ theorem reps_exists : ∃ (ϖ : Fˣ) (B : Finset F), Reps ϖ B := by
       rw [Function.surjInv_eq hs] at this
       rw [this]
 
-theorem reps_eq {ϖ : Fˣ} {B : Finset F} (h : Reps ϖ B) {b b' : F} (hb : b ∈ B) (hb' : b' ∈ B)
-    (hv : valuation F (b - b') ≤ Pv F) : b = b' := by
+theorem reps_eq
+    {ϖ : Fˣ} {B : Finset F} (h : Reps ϖ B)
+    {b b' : F} (hb : b ∈ B) (hb' : b' ∈ B) (hv : valuation F (b - b') ≤ Pv F)
+    : b = b' := by
   obtain ⟨h1, h2, h3⟩ := h
   obtain ⟨c, -, hc⟩ := h3 b (h2 b hb)
   have e1 := hc b ⟨hb, by simp⟩
   have e2 := hc b' ⟨hb', (mem_inv_mul h1 _).2 hv⟩
   exact e1.trans e2.symm
 
-theorem reps_rep {ϖ : Fˣ} {B : Finset F} (h : Reps ϖ B) {t : F} (ht : t ∈ 𝒪[F]) :
-    ∃ b, b ∈ B ∧ valuation F (t - b) ≤ Pv F := by
+theorem reps_rep {ϖ : Fˣ} {B : Finset F} (h : Reps ϖ B) {t : F} (ht : t ∈ 𝒪[F])
+    : ∃ b, b ∈ B ∧ valuation F (t - b) ≤ Pv F := by
   obtain ⟨h1, -, h3⟩ := h
   obtain ⟨b, ⟨hb, hb'⟩, -⟩ := h3 t ht
   exact ⟨b, hb, (mem_inv_mul h1 _).1 hb'⟩
@@ -118,8 +122,8 @@ theorem reps_card {ϖ : Fˣ} {B : Finset F} (h : Reps ϖ B) : B.card = residueCa
     exact h2
   unfold residueCard
   rw [← Nat.card_eq_finsetCard]
-  refine Nat.card_congr (Equiv.ofBijective
-    (fun b : B => residue 𝒪[F] (⟨b.1, h2 b.1 b.2⟩ : 𝒪[F])) ⟨?_, ?_⟩)
+  refine Nat.card_congr
+    (Equiv.ofBijective (fun b : B => residue 𝒪[F] (⟨b.1, h2 b.1 b.2⟩ : 𝒪[F])) ⟨?_, ?_⟩)
   · rintro ⟨b, hb⟩ ⟨b', hb'⟩ e
     exact Subtype.ext (reps_eq h hb hb' ((residue_eq_iff _ _).1 e))
   · intro r
@@ -127,8 +131,8 @@ theorem reps_card {ϖ : Fˣ} {B : Finset F} (h : Reps ϖ B) : B.card = residueCa
     obtain ⟨b, hb, hv⟩ := reps_rep h t.2
     exact ⟨⟨b, hb⟩, ((residue_eq_iff t ⟨b, h2 b hb⟩).2 hv).symm⟩
 
-theorem mem_int (g : GL (Fin 2) F) (h : ∀ i j, g i j ∈ 𝒪[F])
-    (hd : valuation F (g.val.det) = 1) : g ∈ integralGL F 2 := by
+theorem mem_int (g : GL (Fin 2) F) (h : ∀ i j, g i j ∈ 𝒪[F]) (hd : valuation F (g.val.det) = 1)
+    : g ∈ integralGL F 2 := by
   rw [mem_integralGL_iff]
   refine ⟨h, ?_⟩
   have hadj : ∀ i j, (g.val.adjugate) i j ∈ 𝒪[F] := by
@@ -160,40 +164,39 @@ theorem val_det {x : GL (Fin 2) F} (hx : x ∈ integralGL F 2) : valuation F (x.
 
 section Main
 
-private theorem upm_coe_matrix (ϖ : Fˣ) (b : F) :
-    ((upm ϖ b : GL (Fin 2) F) : Matrix (Fin 2) (Fin 2) F) = !![(ϖ : F), b; 0, 1] := by
+private theorem upm_coe_matrix (ϖ : Fˣ) (b : F)
+    : ((upm ϖ b : GL (Fin 2) F) : Matrix (Fin 2) (Fin 2) F) = !![(ϖ : F), b; 0, 1] := by
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [upm, Ad3.uni2, Ad3.dg2, Matrix.mul_apply, Fin.sum_univ_two]
+  fin_cases i <;> fin_cases j <;> simp [upm, Ad3.uni2, Ad3.dg2, Matrix.mul_apply, Fin.sum_univ_two]
 
-private theorem upm_inv_coe_matrix (ϖ : Fˣ) (b : F) :
-    (((upm ϖ b)⁻¹ : GL (Fin 2) F) : Matrix (Fin 2) (Fin 2) F) =
-      !![((ϖ⁻¹ : Fˣ) : F), -(((ϖ⁻¹ : Fˣ) : F) * b); 0, 1] := by
+private theorem upm_inv_coe_matrix (ϖ : Fˣ) (b : F)
+    : (((upm ϖ b)⁻¹ : GL (Fin 2) F) : Matrix (Fin 2) (Fin 2) F)
+      = !![((ϖ⁻¹ : Fˣ) : F), -(((ϖ⁻¹ : Fˣ) : F) * b); 0, 1] := by
   rw [Matrix.coe_units_inv, upm_coe_matrix]
   apply Matrix.inv_eq_right_inv
   ext i j
   fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
 
-theorem entries (ϖ ϖ' : Fˣ) (β β' : F) (x : GL (Fin 2) F) :
-    (((upm ϖ' β')⁻¹ * x * upm ϖ β : GL (Fin 2) F) : Matrix (Fin 2) (Fin 2) F) =
-      !![((ϖ'⁻¹ : Fˣ) : F) * ((x 0 0 - β' * x 1 0) * ϖ),
-          ((ϖ'⁻¹ : Fˣ) : F) * (x 0 0 * β + x 0 1 - β' * (x 1 0 * β + x 1 1));
-        x 1 0 * ϖ, x 1 0 * β + x 1 1] := by
+theorem entries (ϖ ϖ' : Fˣ) (β β' : F) (x : GL (Fin 2) F)
+    : (((upm ϖ' β')⁻¹ * x * upm ϖ β : GL (Fin 2) F) : Matrix (Fin 2) (Fin 2) F)
+      = !![((ϖ'⁻¹ : Fˣ) : F) * ((x 0 0 - β' * x 1 0) * ϖ),
+            ((ϖ'⁻¹ : Fˣ) : F) * (x 0 0 * β + x 0 1 - β' * (x 1 0 * β + x 1 1));
+          x 1 0 * ϖ, x 1 0 * β + x 1 1] := by
   rw [Units.val_mul, Units.val_mul, upm_inv_coe_matrix, upm_coe_matrix]
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.vecMul, dotProduct] <;> ring
+  fin_cases i <;> fin_cases j
+    <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.vecMul, dotProduct] <;> ring
 
-theorem congruence_subgroup_entry_valuations {n : ℕ} (hn : 1 ≤ n) {x : GL (Fin 2) F} {d : Fˣ} (h : GammaZeroLevelMembership n x d) :
-    valuation F (x 0 0) = 1 ∧ valuation F (x 1 1) = 1 ∧ valuation F (x 0 1) ≤ 1 ∧
-      valuation F (x 1 0) ≤ Pv F ^ n ∧ valuation F (x 1 0) < 1 := by
+theorem congruence_subgroup_entry_valuations
+    {n : ℕ} (hn : 1 ≤ n) {x : GL (Fin 2) F} {d : Fˣ} (h : GammaZeroLevelMembership n x d)
+    : valuation F (x 0 0) = 1 ∧ valuation F (x 1 1) = 1 ∧ valuation F (x 0 1) ≤ 1
+      ∧ valuation F (x 1 0) ≤ Pv F ^ n ∧ valuation F (x 1 0) < 1 := by
   obtain ⟨hint, hlow, -⟩ := h
   have hdet := val_det hint
   have he := ((mem_integralGL_iff F 2).1 hint).1
   have e : ∀ i j, valuation F (x i j) ≤ 1 := fun i j => (Valuation.mem_integer_iff _ _).1 (he i j)
   have h10 : valuation F (x 1 0) ≤ Pv F ^ n := (mem_pow_mul n _).1 hlow
-  have h10' : valuation F (x 1 0) < 1 :=
-    h10.trans_lt (pow_lt_one₀ zero_le Pv_lt_one (by omega))
+  have h10' : valuation F (x 1 0) < 1 := h10.trans_lt (pow_lt_one₀ zero_le Pv_lt_one (by omega))
   have hsm : valuation F (x 0 1 * x 1 0) < 1 := by
     rw [map_mul]
     exact (mul_le_of_le_one_left' (e 0 1)).trans_lt h10'
@@ -209,20 +212,27 @@ theorem congruence_subgroup_entry_valuations {n : ℕ} (hn : 1 ≤ n) {x : GL (F
   · rw [← hprod]
     exact mul_le_of_le_one_left' (e 0 0)
 
-theorem val_den {n : ℕ} (hn : 1 ≤ n) {x : GL (Fin 2) F} {d : Fˣ} (h : GammaZeroLevelMembership n x d) {β : F}
-    (hβ : β ∈ 𝒪[F]) : valuation F (x 1 0 * β + x 1 1) = 1 := by
+theorem val_den
+    {n : ℕ} (hn : 1 ≤ n)
+    {x : GL (Fin 2) F} {d : Fˣ} (h : GammaZeroLevelMembership n x d)
+    {β : F} (hβ : β ∈ 𝒪[F])
+    : valuation F (x 1 0 * β + x 1 1) = 1 := by
   obtain ⟨-, h11, -, -, h10⟩ := congruence_subgroup_entry_valuations hn h
   rw [Valuation.map_add_eq_of_lt_right _ ?_, h11]
   rw [h11, map_mul]
   exact (mul_le_of_le_one_right' ((Valuation.mem_integer_iff _ _).1 hβ)).trans_lt h10
 
-theorem step (ω : Fˣ →* ℂˣ) {n : ℕ} (f : GL (Fin 2) F → ℂ) (hn : 1 ≤ n)
-    (hker : unitFiltrationUnits F n ≤ ω.ker)
+theorem step
+    (ω : Fˣ →* ℂˣ)
+    {n : ℕ}
+    (f : GL (Fin 2) F → ℂ)
+    (hn : 1 ≤ n) (hker : unitFiltrationUnits F n ≤ ω.ker)
     (hf : ∀ x d, GammaZeroLevelMembership n x d → ∀ g, f (g * x) = ((ω d : ℂˣ) : ℂ) * f g)
-    {ϖ ϖ' : Fˣ} (h1 : ord (ϖ : F) = 1) (h2 : ord (ϖ' : F) = 1) {β β' : F} {x : GL (Fin 2) F} {d : Fˣ}
-    (hx : GammaZeroLevelMembership n x d) (hβ : β ∈ 𝒪[F]) (hβ' : β' ∈ 𝒪[F])
-    (hc : valuation F (x 0 0 * β + x 0 1 - β' * (x 1 0 * β + x 1 1)) ≤ Pv F) (g : GL (Fin 2) F) :
-    f (g * x * upm ϖ β) = ((ω d : ℂˣ) : ℂ) * f (g * upm ϖ' β') := by
+    {ϖ ϖ' : Fˣ} (h1 : ord (ϖ : F) = 1) (h2 : ord (ϖ' : F) = 1)
+    {β β' : F} {x : GL (Fin 2) F} {d : Fˣ} (hx : GammaZeroLevelMembership n x d) (hβ : β ∈ 𝒪[F])
+    (hβ' : β' ∈ 𝒪[F]) (hc : valuation F (x 0 0 * β + x 0 1 - β' * (x 1 0 * β + x 1 1)) ≤ Pv F)
+    (g : GL (Fin 2) F)
+    : f (g * x * upm ϖ β) = ((ω d : ℂˣ) : ℂ) * f (g * upm ϖ' β') := by
   obtain ⟨-, h11, -, h10, -⟩ := congruence_subgroup_entry_valuations hn hx
   have hD := val_den hn hx hβ
   obtain ⟨hint, -, hd⟩ := id hx
@@ -263,8 +273,8 @@ theorem step (ω : Fˣ →* ℂˣ) {n : ℕ} (f : GL (Fin 2) F → ℂ) (hn : 1 
     simp only [Fin.forall_fin_two]
     refine ⟨⟨?_, ?_⟩, ?_, ?_⟩
     · rw [y00, mem_inv_mul h2, map_mul, hPv]
-      exact mul_le_of_le_one_left'
-        ((Valuation.mem_integer_iff _ _).1 (sub_mem (he 0 0) (mul_mem hβ' (he 1 0))))
+      exact mul_le_of_le_one_left' ((Valuation.mem_integer_iff _ _).1
+        (sub_mem (he 0 0) (mul_mem hβ' (he 1 0))))
     · rw [y01, mem_inv_mul h2]
       exact hc
     · rw [y10]
@@ -306,12 +316,16 @@ theorem step (ω : Fˣ →* ℂˣ) {n : ℕ} (f : GL (Fin 2) F → ℂ) (hn : 1 
     group
   rw [hmul, hf y d' hyK, hω]
 
-theorem sum_step (ω : Fˣ →* ℂˣ) {n : ℕ} (f : GL (Fin 2) F → ℂ) (hn : 1 ≤ n)
-    (hker : unitFiltrationUnits F n ≤ ω.ker)
+theorem sum_step
+    (ω : Fˣ →* ℂˣ)
+    {n : ℕ}
+    (f : GL (Fin 2) F → ℂ)
+    (hn : 1 ≤ n) (hker : unitFiltrationUnits F n ≤ ω.ker)
     (hf : ∀ x d, GammaZeroLevelMembership n x d → ∀ g, f (g * x) = ((ω d : ℂˣ) : ℂ) * f g)
-    {ϖ ϖ' : Fˣ} {B B' : Finset F} (hB : Reps ϖ B) (hB' : Reps ϖ' B') {x : GL (Fin 2) F} {d : Fˣ}
-    (hx : GammaZeroLevelMembership n x d) (g : GL (Fin 2) F) :
-    ∑ b ∈ B, f (g * x * upm ϖ b) = ((ω d : ℂˣ) : ℂ) * ∑ b ∈ B', f (g * upm ϖ' b) := by
+    {ϖ ϖ' : Fˣ} {B B' : Finset F} (hB : Reps ϖ B) (hB' : Reps ϖ' B')
+    {x : GL (Fin 2) F} {d : Fˣ} (hx : GammaZeroLevelMembership n x d)
+    (g : GL (Fin 2) F)
+    : ∑ b ∈ B, f (g * x * upm ϖ b) = ((ω d : ℂˣ) : ℂ) * ∑ b ∈ B', f (g * upm ϖ' b) := by
   classical
   have hBO : ∀ b ∈ B, b ∈ 𝒪[F] := by
     obtain ⟨-, h2, -⟩ := hB
@@ -339,15 +353,15 @@ theorem sum_step (ω : Fˣ →* ℂˣ) {n : ℕ} (f : GL (Fin 2) F → ℂ) (hn 
     intro b hb
     rw [Valuation.mem_integer_iff, map_mul, map_inv₀, hD b hb, inv_one, mul_one]
     exact (Valuation.mem_integer_iff _ _).1 (add_mem (mul_mem (he 0 0) (hBO b hb)) (he 0 1))
-  let φ : F → F := fun b =>
-    if h : ∃ c, c ∈ B' ∧ valuation F (t b - c) ≤ Pv F then h.choose else 0
+  let φ : F → F := fun b => if h : ∃ c, c ∈ B' ∧ valuation F (t b - c) ≤ Pv F then h.choose else 0
   have hφ : ∀ b ∈ B, φ b ∈ B' ∧ valuation F (t b - φ b) ≤ Pv F := by
     intro b hb
     have hex : ∃ c, c ∈ B' ∧ valuation F (t b - c) ≤ Pv F := reps_rep hB' (ht b hb)
     simp only [φ, dif_pos hex]
     exact hex.choose_spec
-  have hkey : ∀ b ∈ B, ∀ c : F,
-      x 0 0 * b + x 0 1 - c * (x 1 0 * b + x 1 1) = (t b - c) * (x 1 0 * b + x 1 1) := by
+  have hkey
+      : ∀ b ∈ B, ∀ c : F,
+        x 0 0 * b + x 0 1 - c * (x 1 0 * b + x 1 1) = (t b - c) * (x 1 0 * b + x 1 1) := by
     intro b hb c
     simp only [t]
     rw [sub_mul, mul_assoc, inv_mul_cancel₀ (hDne b hb), mul_one]
@@ -365,12 +379,15 @@ theorem sum_step (ω : Fˣ →* ℂˣ) {n : ℕ} (f : GL (Fin 2) F → ℂ) (hn 
       have : t b1 - t b2 = (t b1 - φ b2) - (t b2 - φ b2) := by ring
       rw [this]
       exact Valuation.map_sub_le _ k1 k2
-    have ht12 : t b1 - t b2 =
-        x.val.det * (b1 - b2) * ((x 1 0 * b1 + x 1 1) * (x 1 0 * b2 + x 1 1))⁻¹ := by
+    have ht12
+        : t b1 - t b2
+          = x.val.det * (b1 - b2) * ((x 1 0 * b1 + x 1 1) * (x 1 0 * b2 + x 1 1))⁻¹ := by
       have hD1 := hDne b1 hb1
       have hD2 := hDne b2 hb2
-      have hnum : (x 0 0 * b1 + x 0 1) * (x 1 0 * b2 + x 1 1) -
-          (x 0 0 * b2 + x 0 1) * (x 1 0 * b1 + x 1 1) = x.val.det * (b1 - b2) := by
+      have hnum
+          : (x 0 0 * b1 + x 0 1) * (x 1 0 * b2 + x 1 1)
+              - (x 0 0 * b2 + x 0 1) * (x 1 0 * b1 + x 1 1)
+            = x.val.det * (b1 - b2) := by
         rw [Matrix.det_fin_two]
         ring
       rw [← hnum]
@@ -378,8 +395,9 @@ theorem sum_step (ω : Fˣ →* ℂˣ) {n : ℕ} (f : GL (Fin 2) F → ℂ) (hn 
       generalize x 1 0 * b1 + x 1 1 = D1 at hD1 ⊢
       generalize x 1 0 * b2 + x 1 1 = D2 at hD2 ⊢
       field_simp <;> ring
-    rw [ht12, map_mul, map_mul, hdetx, one_mul, map_inv₀, map_mul, hD b1 hb1, hD b2 hb2,
-      mul_one, inv_one, mul_one] at k
+    rw [ht12, map_mul, map_mul, hdetx, one_mul, map_inv₀, map_mul, hD b1 hb1, hD b2 hb2, mul_one,
+        inv_one, mul_one]
+      at k
     exact reps_eq hB hb1 hb2 k
   have himg : B.image φ = B' := by
     apply Finset.eq_of_subset_of_card_le

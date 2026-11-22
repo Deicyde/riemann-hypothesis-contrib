@@ -8,8 +8,8 @@ open Module
 
 namespace GlobalTheory.IsotypicOrth
 
-variable {K V : Type} [Group K] [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ K V}
-  {σ : K →* K}
+variable
+  {K V : Type} [Group K] [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ K V} {σ : K →* K}
 
 lemma pair_left (B : V →ₗ[ℂ] V →ₗ[ℂ] ℂ) (hB : ∀ k φ ψ, B (ρ k φ) (ρ (σ k) ψ) = B φ ψ)
     (k : K) (x y : V) : B (ρ k x) y = B x (ρ (σ k⁻¹) y) := by
@@ -102,13 +102,14 @@ lemma restr_flip_injective (hσ : Function.Surjective σ) (B : V →ₗ[ℂ] V �
   have := LinearMap.congr_fun ha ⟨x, hx⟩
   simpa [LinearMap.domRestrict₁₂_apply] using this
 
-theorem nonempty_equiv_of_pair (hσ : Function.Surjective σ)
+theorem nonempty_equiv_of_pair
+    (hσ : Function.Surjective σ)
     (hfin : ∀ S : Subrepresentation ρ, IsAtom S → FiniteDimensional ℂ S.toSubmodule)
     (B : V →ₗ[ℂ] V →ₗ[ℂ] ℂ) (hB : ∀ k φ ψ, B (ρ k φ) (ρ (σ k) ψ) = B φ ψ)
     {S₁ S₂ S : Subrepresentation ρ} (h₁ : IsAtom S₁) (h₂ : IsAtom S₂) (h : IsAtom S)
     (hn₁ : ∃ x ∈ S₁.toSubmodule, ∃ y ∈ S.toSubmodule, B x y ≠ 0)
-    (hn₂ : ∃ x ∈ S₂.toSubmodule, ∃ y ∈ S.toSubmodule, B x y ≠ 0) :
-    Nonempty (S₁.toRepresentation.Equiv S₂.toRepresentation) := by
+    (hn₂ : ∃ x ∈ S₂.toSubmodule, ∃ y ∈ S.toSubmodule, B x y ≠ 0)
+    : Nonempty (S₁.toRepresentation.Equiv S₂.toRepresentation) := by
   haveI := hfin S₁ h₁
   haveI := hfin S₂ h₂
   haveI := hfin S h
@@ -128,8 +129,12 @@ theorem nonempty_equiv_of_pair (hσ : Function.Surjective σ)
     refine le_antisymm ?_ ?_
     · exact (LinearMap.finrank_le_finrank_of_injective i₂).trans_eq Subspace.dual_finrank_eq
     · exact (LinearMap.finrank_le_finrank_of_injective j₂).trans_eq Subspace.dual_finrank_eq
-  let e₁ := LinearEquiv.ofBijective f₁ ⟨i₁, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank d₁).mp i₁⟩
-  let e₂ := LinearEquiv.ofBijective f₂ ⟨i₂, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank d₂).mp i₂⟩
+  let e₁ :=
+    LinearEquiv.ofBijective f₁
+      ⟨i₁, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank d₁).mp i₁⟩
+  let e₂ :=
+    LinearEquiv.ofBijective f₂
+      ⟨i₂, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank d₂).mp i₂⟩
   let e := e₁.trans e₂.symm
   have hfe : ∀ x, f₂ (e x) = f₁ x := by
     intro x
@@ -172,7 +177,23 @@ end GlobalTheory.IsotypicOrth
 
 namespace GlobalTheory.IsotypicOrth
 
-theorem orth_isCompl : ∀ (K V : Type) [Group K] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ K V) (σ : K →* K), Function.Surjective σ → (∀ S : Subrepresentation ρ, IsAtom S → FiniteDimensional ℂ S.toSubmodule) → (∀ X : Subrepresentation ρ, X.toSubmodule = ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule) → ∀ B : V →ₗ[ℂ] V →ₗ[ℂ] ℂ, (∀ φ, (∀ ψ, B φ ψ = 0) → φ = 0) → (∀ ψ, (∀ φ, B φ ψ = 0) → ψ = 0) → (∀ k φ ψ, B (ρ k φ) (ρ (σ k) ψ) = B φ ψ) → ∀ X Y : Subrepresentation ρ, IsCompl X.toSubmodule Y.toSubmodule → (∀ S₁ S₂ : Subrepresentation ρ, IsAtom S₁ → IsAtom S₂ → S₁ ≤ Y → S₂ ≤ X → IsEmpty (S₁.toRepresentation.Equiv S₂.toRepresentation)) → IsCompl (⨅ y ∈ Y.toSubmodule, LinearMap.ker (B y)) (⨅ x ∈ X.toSubmodule, LinearMap.ker (B x)) := by
+theorem orth_isCompl
+    : ∀ (K V : Type) [Group K] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ K V)
+        (σ : K →* K),
+      Function.Surjective σ
+        → (∀ S : Subrepresentation ρ, IsAtom S → FiniteDimensional ℂ S.toSubmodule)
+        → (∀ X : Subrepresentation ρ,
+          X.toSubmodule = ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule)
+        → ∀ B : V →ₗ[ℂ] V →ₗ[ℂ] ℂ,
+          (∀ φ, (∀ ψ, B φ ψ = 0) → φ = 0) → (∀ ψ, (∀ φ, B φ ψ = 0) → ψ = 0)
+            → (∀ k φ ψ, B (ρ k φ) (ρ (σ k) ψ) = B φ ψ)
+            → ∀ X Y : Subrepresentation ρ,
+              IsCompl X.toSubmodule Y.toSubmodule
+                → (∀ S₁ S₂ : Subrepresentation ρ,
+                  IsAtom S₁ → IsAtom S₂ → S₁ ≤ Y → S₂ ≤ X
+                    → IsEmpty (S₁.toRepresentation.Equiv S₂.toRepresentation))
+                → IsCompl (⨅ y ∈ Y.toSubmodule, LinearMap.ker (B y))
+                  (⨅ x ∈ X.toSubmodule, LinearMap.ker (B x)) := by
   intro K V _ _ _ ρ σ hσ hfin hsum B _hl hr hB X Y hXY hiso
   constructor
   · rw [Submodule.disjoint_def]
@@ -200,8 +221,8 @@ theorem orth_isCompl : ∀ (K V : Type) [Group K] [AddCommGroup V] [Module ℂ V
     obtain ⟨x, hx, hx'⟩ := hψ₂'
     obtain ⟨S₁, a₁, l₁, x₁, hx₁, n₁⟩ := exists_atom_pair hsum B Y ψ₁ ⟨y, hy, hy'⟩
     obtain ⟨S₂, a₂, l₂, x₂, hx₂, n₂⟩ := exists_atom_pair hsum B X ψ₂ ⟨x, hx, hx'⟩
-    have e := nonempty_equiv_of_pair hσ hfin B hB a₁ a₂ hS.1 ⟨x₁, hx₁, ψ₁, hψ₁, n₁⟩
-      ⟨x₂, hx₂, ψ₂, hψ₂, n₂⟩
+    have e :=
+      nonempty_equiv_of_pair hσ hfin B hB a₁ a₂ hS.1 ⟨x₁, hx₁, ψ₁, hψ₁, n₁⟩ ⟨x₂, hx₂, ψ₂, hψ₂, n₂⟩
     exact (hiso S₁ S₂ a₁ a₂ l₁ l₂).false e.some
 
 end GlobalTheory.IsotypicOrth

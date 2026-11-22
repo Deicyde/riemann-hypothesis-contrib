@@ -7,15 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSabCanc
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.TorRef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+  GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.TorRef
 
 namespace GlobalTheory.TorRef
 
-
 open IsLocalRing in
-theorem isEtaleCompletion_comp_bij {B A R : Type} [CommRing B] [IsLocalRing B] [CommRing A] [IsLocalRing A]
-    [CommRing R] [IsLocalRing R] (e : B →+* A) (he : Function.Bijective e) (φ : A →+* R)
-    (h : Toroidal.IsEtaleCompletion φ) : Toroidal.IsEtaleCompletion (φ.comp e) := by
+theorem isEtaleCompletion_comp_bij
+    {B A R : Type}
+    [CommRing B] [IsLocalRing B] [CommRing A] [IsLocalRing A] [CommRing R] [IsLocalRing R]
+    (e : B →+* A) (he : Function.Bijective e)
+    (φ : A →+* R) (h : Toroidal.IsEtaleCompletion φ)
+    : Toroidal.IsEtaleCompletion (φ.comp e) := by
   obtain ⟨h1, h2, h3⟩ := h
   refine ⟨RingHom.Flat.comp (RingHom.Flat.of_bijective he) h1, ?_, ?_⟩
   · rw [← Ideal.map_map, IsLocalRing.map_maximalIdeal_of_surjective e he.2]

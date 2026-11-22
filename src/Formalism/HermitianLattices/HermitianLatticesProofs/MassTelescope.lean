@@ -17,7 +17,8 @@ section MassTelescopeAux
 variable (K : Type) [Field K] [NumberField K] [StarRing K]
 
 def massTelescope_form (n : ℕ) : (Fin n → K) →ₗ⋆[K] (Fin n → K) →ₗ[K] K :=
-  LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K) (fun x y => ∑ i, star (x i) * y i)
+  LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K)
+    (fun x y => ∑ i, star (x i) * y i)
     (by intro m₁ m₂ y; simp [star_add, add_mul, Finset.sum_add_distrib])
     (by
       intro c m y

@@ -44,9 +44,11 @@ theorem LocallyPrincipalCoprimeField.proof : LocallyPrincipalCoprimeField.Statem
   have hγm : ∀ m ∈ S, ∀ h : γ * a (idx m) ∈ B, (⟨_, h⟩ : B) ∉ m := by
     intro m hmS h hin
     have hmS' := (memS m).mp hmS
-    have hw : (⟨_, h⟩ : B) = s * toB B (g m₀ * a (idx m)) +
-        (e m * toB B (g m * a (idx m)) +
-          ∑ m' ∈ S.erase m, e m' * toB B (g m' * a (idx m))) := by
+    have hw
+        : (⟨_, h⟩ : B)
+          = s * toB B (g m₀ * a (idx m))
+            + (e m * toB B (g m * a (idx m))
+              + ∑ m' ∈ S.erase m, e m' * toB B (g m' * a (idx m))) := by
       rw [Finset.add_sum_erase S (fun m' => e m' * toB B (g m' * a (idx m))) hmS]
       apply Subtype.ext
       push_cast
@@ -72,10 +74,8 @@ theorem LocallyPrincipalCoprimeField.proof : LocallyPrincipalCoprimeField.Statem
     · exact hym m hmS'.1 h4
   have hy0 : (y m₀ : Ω) ≠ 0 := fun h0 =>
     hym m₀ hm₀ (by rw [show y m₀ = 0 from Subtype.ext h0]; exact m₀.zero_mem)
-  have ha0 : a (idx m₀) ≠ 0 := by
-    intro h0; apply hy0; rw [hy m₀ hm₀, h0, mul_zero]
-  have hg0 : g m₀ ≠ 0 := by
-    intro h0; apply hy0; rw [hy m₀ hm₀, h0, zero_mul]
+  have ha0 : a (idx m₀) ≠ 0 := by intro h0; apply hy0; rw [hy m₀ hm₀, h0, mul_zero]
+  have hg0 : g m₀ ≠ 0 := by intro h0; apply hy0; rw [hy m₀ hm₀, h0, zero_mul]
   have hγ : γ ≠ 0 := by
     intro h0
     rcases S.eq_empty_or_nonempty with hE | ⟨m, hmS⟩
@@ -85,18 +85,20 @@ theorem LocallyPrincipalCoprimeField.proof : LocallyPrincipalCoprimeField.Statem
     · have h : γ * a (idx m) ∈ B := by rw [h0, zero_mul]; exact B.zero_mem
       apply hγm m hmS h
       have : (⟨_, h⟩ : B) = 0 := Subtype.ext (by simp [h0])
-      rw [this]; exact m.zero_mem
+      rw [this]
+      exact m.zero_mem
   obtain ⟨c₀, hc₀B, hc₀, hc₀a⟩ := hden (idx m₀)
   set a₀ := a (idx m₀)
-  let I : Ideal B :=
-    { carrier := {w | (w : Ω) * γ⁻¹ ∈ M}
-      add_mem' := fun {u v} hu hv => by
-        simp only [Set.mem_ofPred_eq, Subring.coe_add, add_mul] at hu hv ⊢
-        exact M.add_mem hu hv
-      zero_mem' := by simp [M.zero_mem]
-      smul_mem' := fun c u hu => by
-        simp only [Set.mem_ofPred_eq, smul_eq_mul, Subring.coe_mul, mul_assoc] at hu ⊢
-        exact hBM c c.2 _ hu }
+  let I : Ideal B := {
+    carrier := {w | (w : Ω) * γ⁻¹ ∈ M}
+    add_mem' := fun {u v} hu hv => by
+      simp only [Set.mem_ofPred_eq, Subring.coe_add, add_mul] at hu hv ⊢
+      exact M.add_mem hu hv
+    zero_mem' := by simp [M.zero_mem]
+    smul_mem' := fun c u hu => by
+      simp only [Set.mem_ofPred_eq, smul_eq_mul, Subring.coe_mul, mul_assoc] at hu ⊢
+      exact hBM c c.2 _ hu
+  }
   have memI : ∀ w : B, w ∈ I ↔ (w : Ω) * γ⁻¹ ∈ M := fun w => Iff.rfl
   refine ⟨⟨γ * a₀ * c₀, B.mul_mem (hγM _ (haM _)) hc₀B⟩, ⟨c₀ * a₀, hc₀a⟩, I, ?_, ?_, ?_, ?_⟩
   · intro h
@@ -112,7 +114,8 @@ theorem LocallyPrincipalCoprimeField.proof : LocallyPrincipalCoprimeField.Statem
     have hmem : (⟨_, hγM _ (haM (idx m))⟩ : B) ∈ I := by
       rw [memI]
       have : γ * a (idx m) * γ⁻¹ = a (idx m) := by field_simp
-      rw [this]; exact haM _
+      rw [this]
+      exact haM _
     exact hγm m hmS _ (hle (Ideal.mem_sup_left hmem))
   · intro x
     constructor
@@ -120,7 +123,8 @@ theorem LocallyPrincipalCoprimeField.proof : LocallyPrincipalCoprimeField.Statem
       refine ⟨⟨γ * x, hγM x hx⟩, ?_, ?_⟩
       · rw [memI]
         have : γ * x * γ⁻¹ = x := by field_simp
-        rw [this]; exact hx
+        rw [this]
+        exact hx
       · show γ * a₀ * c₀ * x = c₀ * a₀ * (γ * x)
         ring
     · rintro ⟨w, hwI, hxw⟩

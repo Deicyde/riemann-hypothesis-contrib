@@ -11,17 +11,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.ineFixQ :
-    ∀ (K H : Type) [Field K] [NumberField K] [Field H] [NumberField H] [Algebra K H] [IsGalois ℚ K] [IsGalois ℚ H] (p : ℕ), p.Prime → (UnramAt K p ↔ ∀ w : HeightOneSpectrum (𝓞 H), (p : 𝓞 H) ∈ w.asIdeal → w.asIdeal.inertia Gal(H/ℚ) ≤ (resTo ℚ K H).ker) := by
+theorem UpperTheory.V.CF.ineFixQ
+    : ∀ (K H : Type) [Field K] [NumberField K] [Field H] [NumberField H] [Algebra K H]
+        [IsGalois ℚ K] [IsGalois ℚ H] (p : ℕ),
+      p.Prime
+        → (UnramAt K p
+          ↔ ∀ w : HeightOneSpectrum (𝓞 H),
+            (p : 𝓞 H) ∈ w.asIdeal → w.asIdeal.inertia Gal(H/ℚ) ≤ (resTo ℚ K H).ker) := by
   intro K H _ _ _ _ _ _ _ p hp
   rw [UpperTheory.V.CF.unramIff.1 K p hp]
   constructor
   · intro h w hw
     have hv : (p : 𝓞 K) ∈ w.asIdeal.under (𝓞 K) := by
       simpa [Ideal.under, Ideal.mem_comap, map_natCast] using hw
-    let v : HeightOneSpectrum (𝓞 K) := ⟨w.asIdeal.under (𝓞 K), inferInstance, fun hb => by
-      rw [hb] at hv
-      exact (Nat.cast_ne_zero.mpr hp.ne_zero) ((Ideal.mem_bot).mp hv)⟩
+    let v : HeightOneSpectrum (𝓞 K) := ⟨
+      w.asIdeal.under (𝓞 K),
+      inferInstance,
+      fun hb => by
+        rw [hb] at hv
+        exact (Nat.cast_ne_zero.mpr hp.ne_zero) ((Ideal.mem_bot).mp hv)
+    ⟩
     rw [← Subgroup.map_eq_bot_iff, UpperTheory.V.CF.ineMap ℚ K H w]
     exact h v hv
   · intro h v hv
@@ -38,9 +47,13 @@ theorem UpperTheory.V.CF.ineFixQ :
         rw [hQv]
         exact hv
       simpa [Ideal.mem_comap, map_natCast] using hc
-    let w : HeightOneSpectrum (𝓞 H) := ⟨Q, hQ, fun hb => by
-      rw [hb] at hpQ
-      exact (Nat.cast_ne_zero.mpr hp.ne_zero) ((Ideal.mem_bot).mp hpQ)⟩
+    let w : HeightOneSpectrum (𝓞 H) := ⟨
+      Q,
+      hQ,
+      fun hb => by
+        rw [hb] at hpQ
+        exact (Nat.cast_ne_zero.mpr hp.ne_zero) ((Ideal.mem_bot).mp hpQ)
+    ⟩
     have h1 := h w hpQ
     rw [← Subgroup.map_eq_bot_iff, UpperTheory.V.CF.ineMap ℚ K H w] at h1
     have hw : Ideal.under (𝓞 K) w.asIdeal = v.asIdeal := hQv

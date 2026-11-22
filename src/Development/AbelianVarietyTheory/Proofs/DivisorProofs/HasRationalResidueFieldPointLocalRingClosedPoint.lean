@@ -15,9 +15,9 @@ set_option autoImplicit false
 
 namespace GlobalTheory.FieldPair
 
-theorem ratRes_locRing_of_isClosed : ∀ (Z : Scheme.{0}) [IsIntegral Z] (q : Z ⟶ Sp ℂ)
-    [LocallyOfFiniteType q] (y : Z), IsClosed ({y} : Set Z) →
-    RatRes (GlobalTheory.Cartier.constFn q) (locRing y) := by
+theorem ratRes_locRing_of_isClosed
+    : ∀ (Z : Scheme.{0}) [IsIntegral Z] (q : Z ⟶ Sp ℂ) [LocallyOfFiniteType q] (y : Z),
+      IsClosed ({y} : Set Z) → RatRes (GlobalTheory.Cartier.constFn q) (locRing y) := by
   intro Z _ q _ y hy r hr
   have hyt : y ∈ (⊤ : Z.Opens) := trivial
   obtain ⟨s, rfl⟩ := hr
@@ -28,11 +28,13 @@ theorem ratRes_locRing_of_isClosed : ∀ (Z : Scheme.{0}) [IsIntegral Z] (q : Z 
     exact (residueFieldIsoBase q y hy).commRingCatIsoToRingEquiv.symm.surjective
   obtain ⟨α, hα⟩ := hsurj (Z.residue y s)
   set g := Z.presheaf.germ ⊤ y hyt (algX q ⊤ α) with hgdef
-  have hg : algebraMap (Z.presheaf.stalk y) Z.functionField g = GlobalTheory.Cartier.constFn q α := by
+  have hg
+      : algebraMap (Z.presheaf.stalk y) Z.functionField g = GlobalTheory.Cartier.constFn q α := by
     rw [hgdef, algebraMap_germ]
     exact RingHom.congr_fun (fnOf_comp_algX q ⊤ _) α
   have hres : Z.residue y (s - g) = 0 := by
-    rw [map_sub, sub_eq_zero, ← hα, hgdef, RingHom.comp_apply, ← Scheme.germ_residue, CommRingCat.comp_apply]
+    rw [map_sub, sub_eq_zero, ← hα, hgdef, RingHom.comp_apply, ← Scheme.germ_residue,
+      CommRingCat.comp_apply]
   have hnu : ¬ IsUnit (s - g) := by
     intro hu
     have : Z.residue y (s - g) ≠ 0 := by

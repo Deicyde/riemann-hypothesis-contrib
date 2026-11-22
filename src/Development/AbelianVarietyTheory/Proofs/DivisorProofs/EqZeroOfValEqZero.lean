@@ -9,15 +9,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 set_option autoImplicit false
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.CechDR GlobalTheory.CechPer
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Cris GlobalTheory.DeRham
+  GlobalTheory.CechDR GlobalTheory.CechPer
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ValInj
 
-theorem eq_zero_of_val_eq_zero : ∀ (A : Over (Sp ℂ)) [GrpObj A] (g : ℕ) (L : LB A.left) (u : HolUnif A L g), IsAbelianScheme A →
-    ∀ (U : A.left.Opens) (b : Γ(A.left, U)), (∀ z ∈ pre u.ex U, val u.ex U b z = 0) → b = 0 := by
+theorem eq_zero_of_val_eq_zero
+    : ∀ (A : Over (Sp ℂ)) [GrpObj A] (g : ℕ) (L : LB A.left) (u : HolUnif A L g),
+      IsAbelianScheme A
+        → ∀ (U : A.left.Opens) (b : Γ(A.left, U)),
+          (∀ z ∈ pre u.ex U, val u.ex U b z = 0) → b = 0 := by
   intro A _ g L u hA U b hb
   haveI : Smooth A.hom := hA.smooth
   haveI : IsReduced A.left := isReduced_of_smooth A.hom

@@ -4,20 +4,29 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C Polynomial Topology
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C Polynomial Topology
 
-theorem UpperTheory.exists_approximate_identity_integrated :
-    ∀ (G H : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [MeasurableSpace G] [OpensMeasurableSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H) (μ : Measure G) [IsFiniteMeasureOnCompacts μ] [μ.IsOpenPosMeasure] (N : Set G), N ∈ 𝓝 (1 : G) → ∃ f : CompactlySupportedContinuousMap G ℂ, ∀ (v : H) (r : ℝ), (∀ g ∈ N, ‖π g v - v‖ ≤ r) → ‖π.integrated μ (UnitaryRep.ccToL1 μ f) v - v‖ ≤ r := by
+theorem UpperTheory.exists_approximate_identity_integrated
+    : ∀ (G H : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [MeasurableSpace G] [OpensMeasurableSpace G] [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H) (μ : Measure G)
+        [IsFiniteMeasureOnCompacts μ] [μ.IsOpenPosMeasure] (N : Set G),
+      N ∈ 𝓝 (1 : G)
+        → ∃ f : CompactlySupportedContinuousMap G ℂ, ∀ (v : H) (r : ℝ),
+          (∀ g ∈ N, ‖π g v - v‖ ≤ r) → ‖π.integrated μ (UnitaryRep.ccToL1 μ f) v - v‖ ≤ r := by
   intro G H _ _ _ _ _ _ _ _ _ _ π μ _ _ N hN
   obtain ⟨U, hUsub, hUo, h1U⟩ := mem_nhds_iff.1 hN
-  obtain ⟨h, h1, h0, hcs, hrange⟩ := exists_continuous_one_zero_of_isCompact
-    (isCompact_singleton (x := (1 : G))) hUo.isClosed_compl
-    (Set.disjoint_singleton_left.2 fun h => h h1U)
+  obtain ⟨h, h1, h0, hcs, hrange⟩ :=
+    exists_continuous_one_zero_of_isCompact (isCompact_singleton (x := (1 : G))) hUo.isClosed_compl
+      (Set.disjoint_singleton_left.2 fun h => h h1U)
   have hnn : ∀ g, 0 ≤ h g := fun g => (hrange g).1
   set c : ℝ := ∫ g, h g ∂μ with hc
-  have hcpos : 0 < c := h.continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero hcs hnn
-    (by rw [h1 (Set.mem_singleton 1)]; exact one_ne_zero)
+  have hcpos : 0 < c :=
+    h.continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero hcs hnn
+      (by rw [h1 (Set.mem_singleton 1)]; exact one_ne_zero)
   let k : G → ℝ := fun g => c⁻¹ * h g
   have hkc : Continuous k := continuous_const.mul h.continuous
   have hkcs : HasCompactSupport k := by
@@ -42,8 +51,7 @@ theorem UpperTheory.exists_approximate_identity_integrated :
   have hv : ∫ g, f g • v ∂μ = v := by
     rw [integral_smul_const]
     simp only [hfg]
-    have : ∫ g, (k g : ℂ) ∂μ = ((1 : ℝ) : ℂ) := by
-      rw [← hk1]; exact integral_ofReal
+    have : ∫ g, (k g : ℂ) ∂μ = ((1 : ℝ) : ℂ) := by rw [← hk1]; exact integral_ofReal
     rw [this]
     simp
   have key : π.integrated μ (UnitaryRep.ccToL1 μ f) v - v = ∫ g, f g • (π g v - v) ∂μ := by

@@ -14,9 +14,10 @@ section Gen
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E] [CharZero F]
 
-theorem exists_delta (σ : E →ₐ[F] E) (hinv : ∀ e, σ (σ e) = e)
-    (hfix : ∀ e, σ e = e ↔ e ∈ (algebraMap F E).range) (h2 : Module.finrank F E = 2) :
-    ∃ δ : E, σ δ = -δ ∧ δ ≠ 0 := by
+theorem exists_delta
+    (σ : E →ₐ[F] E) (hinv : ∀ e, σ (σ e) = e) (hfix : ∀ e, σ e = e ↔ e ∈ (algebraMap F E).range)
+    (h2 : Module.finrank F E = 2)
+    : ∃ δ : E, σ δ = -δ ∧ δ ≠ 0 := by
   have hex : ∃ e : E, e ∉ (algebraMap F E).range := by
     by_contra hne
     push_neg at hne
@@ -45,7 +46,9 @@ theorem linIndep_one_delta (hδ : σ δ = -δ) (hδ0 : δ ≠ 0) : LinearIndepen
   rw [map_add (f := _), map_smul, map_smul, map_one, hδ] at h'
   have hs : (2 : F) • (s • (1 : E)) = 0 := by
     rw [two_smul]
-    calc s • (1 : E) + s • 1 = (s • 1 + t • δ) + (s • 1 + t • -δ) := by rw [smul_neg]; abel
+    calc
+      s • (1 : E) + s • 1
+        = (s • 1 + t • δ) + (s • 1 + t • -δ) := by rw [smul_neg]; abel
       _ = 0 := by rw [h, h', add_zero]
   have hs0 : s = 0 := by
     rw [smul_smul, smul_eq_zero] at hs
@@ -72,15 +75,13 @@ def bE : Module.Basis (Fin 2) F E :=
 
 theorem bE_zero : bE σ δ hδ hδ0 h2 0 = 1 := by
   simp [bE, coe_basisOfLinearIndependentOfCardEqFinrank]
-theorem bE_one : bE σ δ hδ hδ0 h2 1 = δ := by
-  simp [bE, coe_basisOfLinearIndependentOfCardEqFinrank]
+theorem bE_one : bE σ δ hδ hδ0 h2 1 = δ := by simp [bE, coe_basisOfLinearIndependentOfCardEqFinrank]
 
 def bR : Module.Basis (Fin 2) R (R ⊗[F] E) := Algebra.TensorProduct.basis R (bE σ δ hδ hδ0 h2)
 
 def mkE (a b : R) : R ⊗[F] E := a ⊗ₜ[F] (1 : E) + b ⊗ₜ[F] δ
 
-theorem mkE_eq (a b : R) :
-    mkE δ R a b = a • bR σ δ hδ hδ0 h2 R 0 + b • bR σ δ hδ hδ0 h2 R 1 := by
+theorem mkE_eq (a b : R) : mkE δ R a b = a • bR σ δ hδ hδ0 h2 R 0 + b • bR σ δ hδ hδ0 h2 R 1 := by
   simp only [mkE, bR, Algebra.TensorProduct.basis_apply, bE_zero, bE_one, TensorProduct.smul_tmul',
     smul_eq_mul, mul_one]
 
@@ -96,15 +97,15 @@ theorem cQ_mkE (a b : R) : cQ σ δ hδ hδ0 h2 R (mkE δ R a b) = b := by
   rw [mkE_eq σ δ hδ hδ0 h2 R]
   simp [cQ, Module.Basis.coord_apply, Finsupp.single_apply]
 
-theorem mkE_cP_cQ (x : R ⊗[F] E) :
-    mkE δ R (cP σ δ hδ hδ0 h2 R x) (cQ σ δ hδ hδ0 h2 R x) = x := by
+theorem mkE_cP_cQ (x : R ⊗[F] E) : mkE δ R (cP σ δ hδ hδ0 h2 R x) (cQ σ δ hδ hδ0 h2 R x) = x := by
   rw [mkE_eq σ δ hδ hδ0 h2 R]
   have hx := (bR σ δ hδ hδ0 h2 R).sum_repr x
   rw [Fin.sum_univ_two] at hx
   simpa [cP, cQ, Module.Basis.coord_apply] using hx
 
 include σ hδ hδ0 h2 in
-theorem mkE_inj {a b a' b' : R} (h : mkE (F := F) δ R a b = mkE (F := F) δ R a' b') : a = a' ∧ b = b' := by
+theorem mkE_inj {a b a' b' : R} (h : mkE (F := F) δ R a b = mkE (F := F) δ R a' b')
+    : a = a' ∧ b = b' := by
   have h1 := congrArg (cP σ δ hδ hδ0 h2 R) h
   have h2' := congrArg (cQ σ δ hδ hδ0 h2 R) h
   rw [re_mk, re_mk] at h1
@@ -120,49 +121,50 @@ variable (σ : E →ₐ[F] E) (δ : E) (hδ : σ δ = -δ) (Δ : F) (hΔ : algeb
 variable (R : Type) [CommRing R] [Algebra F R]
 
 include hΔ in
-theorem mkE_mul (a b a' b' : R) :
-    mkE (F := F) δ R a b * mkE (F := F) δ R a' b' =
-      mkE (F := F) δ R (a * a' + algebraMap F R Δ * (b * b')) (a * b' + b * a') := by
+theorem mkE_mul (a b a' b' : R)
+    : mkE (F := F) δ R a b * mkE (F := F) δ R a' b'
+      = mkE (F := F) δ R (a * a' + algebraMap F R Δ * (b * b')) (a * b' + b * a') := by
   simp only [mkE, add_mul, mul_add, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
-  rw [← hΔ, Algebra.algebraMap_eq_smul_one (A := E) Δ, TensorProduct.tmul_smul, TensorProduct.smul_tmul',
-    Algebra.smul_def Δ (b * b'), TensorProduct.add_tmul, TensorProduct.add_tmul]
+  rw [← hΔ, Algebra.algebraMap_eq_smul_one (A := E) Δ, TensorProduct.tmul_smul,
+    TensorProduct.smul_tmul', Algebra.smul_def Δ (b * b'), TensorProduct.add_tmul,
+    TensorProduct.add_tmul]
   abel
 
-theorem mkE_one : mkE (F := F) δ R 1 0 = 1 := by
-  simp [mkE, Algebra.TensorProduct.one_def]
+theorem mkE_one : mkE (F := F) δ R 1 0 = 1 := by simp [mkE, Algebra.TensorProduct.one_def]
 
-theorem mkE_zero : mkE (F := F) δ R 0 0 = 0 := by
-  simp [mkE]
+theorem mkE_zero : mkE (F := F) δ R 0 0 = 0 := by simp [mkE]
 
-theorem mkE_add (a b a' b' : R) :
-    mkE (F := F) δ R a b + mkE (F := F) δ R a' b' = mkE (F := F) δ R (a + a') (b + b') := by
+theorem mkE_add (a b a' b' : R)
+    : mkE (F := F) δ R a b + mkE (F := F) δ R a' b' = mkE (F := F) δ R (a + a') (b + b') := by
   simp only [mkE, TensorProduct.add_tmul]
   abel
 
-theorem mkE_sub (a b a' b' : R) :
-    mkE (F := F) δ R a b - mkE (F := F) δ R a' b' = mkE (F := F) δ R (a - a') (b - b') := by
+theorem mkE_sub (a b a' b' : R)
+    : mkE (F := F) δ R a b - mkE (F := F) δ R a' b' = mkE (F := F) δ R (a - a') (b - b') := by
   simp only [mkE, TensorProduct.sub_tmul]
   abel
 
 theorem algebraMap_eq_mkE (a : R) : algebraMap R (R ⊗[F] E) a = mkE (F := F) δ R a 0 := by
-  rw [Algebra.algebraMap_eq_smul_one, Algebra.TensorProduct.one_def, TensorProduct.smul_tmul', smul_eq_mul,
-    mul_one]
+  rw [Algebra.algebraMap_eq_smul_one, Algebra.TensorProduct.one_def, TensorProduct.smul_tmul',
+    smul_eq_mul, mul_one]
   simp [mkE]
 
-theorem smul_mkE (r a b : R) : algebraMap R (R ⊗[F] E) r * mkE (F := F) δ R a b = mkE (F := F) δ R (r * a) (r * b) := by
+theorem smul_mkE (r a b : R)
+    : algebraMap R (R ⊗[F] E) r * mkE (F := F) δ R a b = mkE (F := F) δ R (r * a) (r * b) := by
   rw [← Algebra.smul_def]
   simp only [mkE, smul_add, TensorProduct.smul_tmul', smul_eq_mul]
 
 include hδ in
-theorem conj_mkE (a b : R) :
-    (Algebra.TensorProduct.map (AlgHom.id F R) σ) (mkE (F := F) δ R a b) = mkE (F := F) δ R a (-b) := by
+theorem conj_mkE (a b : R)
+    : (Algebra.TensorProduct.map (AlgHom.id F R) σ) (mkE (F := F) δ R a b)
+      = mkE (F := F) δ R a (-b) := by
   simp only [mkE, map_add (f := _), Algebra.TensorProduct.map_tmul, AlgHom.id_apply, map_one, hδ,
     TensorProduct.tmul_neg, TensorProduct.neg_tmul]
 
-
-theorem incl_eq_mkE (α β : F) :
-    (Algebra.TensorProduct.includeRight : E →ₐ[F] R ⊗[F] E) (algebraMap F E α + algebraMap F E β * δ) =
-      mkE (F := F) δ R (algebraMap F R α) (algebraMap F R β) := by
+theorem incl_eq_mkE (α β : F)
+    : (Algebra.TensorProduct.includeRight : E →ₐ[F] R ⊗[F] E)
+        (algebraMap F E α + algebraMap F E β * δ)
+      = mkE (F := F) δ R (algebraMap F R α) (algebraMap F R β) := by
   rw [Algebra.TensorProduct.includeRight_apply, TensorProduct.tmul_add, ← Algebra.smul_def,
     Algebra.algebraMap_eq_smul_one (A := E) α, ← TensorProduct.smul_tmul, ← TensorProduct.smul_tmul,
     ← Algebra.algebraMap_eq_smul_one, ← Algebra.algebraMap_eq_smul_one]

@@ -36,8 +36,8 @@ theorem CoordLatticeFullRank.proof (v : Basis ι E W) : CoordLatticeFullRank.Sta
     have heq : a • f.toAddMonoidHom x = ((d : ℚ)⁻¹) • f ((b : E) • x) := by
       rw [map_smul]
       show a • f x = ((d : ℚ)⁻¹) • ((d • a) • f x)
-      rw [zsmul_eq_mul, mul_smul, Int.cast_smul_eq_zsmul E, ← Int.cast_smul_eq_zsmul ℚ,
-        smul_smul, inv_mul_cancel₀ hd', one_smul]
+      rw [zsmul_eq_mul, mul_smul, Int.cast_smul_eq_zsmul E, ← Int.cast_smul_eq_zsmul ℚ, smul_smul,
+        inv_mul_cancel₀ hd', one_smul]
     rw [heq]
     exact T.smul_mem _ (Submodule.subset_span hfb)
 
@@ -50,14 +50,14 @@ theorem CoordLatticeFullRank.proof (v : Basis ι E W) : CoordLatticeFullRank.Sta
     | smul q y _ hy =>
       rw [smul_comm]
       exact T.smul_mem q hy
-  let T' : Submodule E (ι → E) :=
-    { carrier := T
-      add_mem' := fun hy hz => T.add_mem hy hz
-      zero_mem' := T.zero_mem
-      smul_mem' := fun a y hy => stable a y hy }
+  let T' : Submodule E (ι → E) := {
+    carrier := T
+    add_mem' := fun hy hz => T.add_mem hy hz
+    zero_mem' := T.zero_mem
+    smul_mem' := fun a y hy => stable a y hy
+  }
   have hspan : Submodule.span E S = ⊤ := by
-    have hSim : S = f '' (La : Set W) := by
-      rw [hS, AddSubgroup.coe_map]; rfl
+    have hSim : S = f '' (La : Set W) := by rw [hS, AddSubgroup.coe_map]; rfl
     rw [hSim, Submodule.span_image, hL.span_eq_top, Submodule.map_top, LinearMap.range_eq_top]
     exact v.equivFun.surjective
   have hle : Submodule.span E S ≤ T' := Submodule.span_le.mpr fun s hs => Submodule.subset_span hs

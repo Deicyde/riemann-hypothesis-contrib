@@ -7,7 +7,9 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompa
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
 open scoped Classical
 
@@ -17,18 +19,26 @@ section Local
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem continuous_finiteSingle (v : HeightOneSpectrum (𝓞 L)) : Continuous (Neutral.B1.finiteSingle L v) := by
-  have hle : (Filter.cofinite : Filter (HeightOneSpectrum (𝓞 L))) ≤ Filter.principal ({v}ᶜ : Set _) := by
+theorem continuous_finiteSingle (v : HeightOneSpectrum (𝓞 L))
+    : Continuous (Neutral.B1.finiteSingle L v) := by
+  have hle
+      : (Filter.cofinite : Filter (HeightOneSpectrum (𝓞 L))) ≤ Filter.principal ({v}ᶜ : Set _) := by
     rw [Filter.le_principal_iff]
     exact (Set.finite_singleton v).compl_mem_cofinite
-  let f : v.adicCompletion L → RestrictedProduct (fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L)
-      (fun w => (w.adicCompletionIntegers L : Set (w.adicCompletion L))) (Filter.principal ({v}ᶜ : Set _)) :=
-    fun x => ⟨Function.update (fun _ => 1) v x, by
+  let f
+      : v.adicCompletion L
+        → RestrictedProduct
+          (fun w : HeightOneSpectrum (𝓞 L) => w.adicCompletion L)
+          (fun w => (w.adicCompletionIntegers L : Set (w.adicCompletion L)))
+          (Filter.principal ({v}ᶜ : Set _)) := fun x => ⟨
+    Function.update (fun _ => 1) v x,
+    by
       rw [Filter.eventually_principal]
       intro w hw
       have h' : w ≠ v := hw
       rw [Function.update_of_ne h']
-      exact one_mem _⟩
+      exact one_mem _
+  ⟩
   have hf : Continuous f := by
     rw [RestrictedProduct.continuous_rng_of_principal]
     exact continuous_const.update v continuous_id
@@ -38,16 +48,17 @@ theorem continuous_localIdele' (v : HeightOneSpectrum (𝓞 L)) : Continuous (lo
   apply Continuous.units_map
   exact Continuous.prodMk continuous_const (continuous_finiteSingle v)
 
-theorem isOpen_valued_lt_one (w : HeightOneSpectrum (𝓞 L)) :
-    IsOpen {x : w.adicCompletion L | Valued.v x < 1} := by
+theorem isOpen_valued_lt_one (w : HeightOneSpectrum (𝓞 L))
+    : IsOpen {x : w.adicCompletion L | Valued.v x < 1} := by
   have := Valued.isOpen_ball (w.adicCompletion L) 1
   simpa [Valuation.restrict_lt_one_iff] using this
 
-theorem isCompact_setOf_isUnitAt (w : HeightOneSpectrum (𝓞 L)) :
-    IsCompact {x : (w.adicCompletion L)ˣ | IsUnitAt w x} := by
+theorem isCompact_setOf_isUnitAt (w : HeightOneSpectrum (𝓞 L))
+    : IsCompact {x : (w.adicCompletion L)ˣ | IsUnitAt w x} := by
   rw [Units.isEmbedding_val₀.isCompact_iff]
-  have e : ((↑) : (w.adicCompletion L)ˣ → w.adicCompletion L) '' {x | IsUnitAt w x} =
-      (w.adicCompletionIntegers L : Set (w.adicCompletion L)) \ {x | Valued.v x < 1} := by
+  have e
+      : ((↑) : (w.adicCompletion L)ˣ → w.adicCompletion L) '' {x | IsUnitAt w x}
+        = (w.adicCompletionIntegers L : Set (w.adicCompletion L)) \ {x | Valued.v x < 1} := by
     ext y
     simp only [Set.mem_image, Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe,
       HeightOneSpectrum.mem_adicCompletionIntegers, not_lt, IsUnitAt]
@@ -61,7 +72,8 @@ theorem isCompact_setOf_isUnitAt (w : HeightOneSpectrum (𝓞 L)) :
         simp at hy
       exact ⟨Units.mk0 y h0, hy, rfl⟩
   rw [e]
-  exact (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers L w).diff (isOpen_valued_lt_one w)
+  exact (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers L w).diff
+    (isOpen_valued_lt_one w)
 
 end Local
 
@@ -84,11 +96,18 @@ end GlobalTheory.CompanionTheory.InertOpen
 
 namespace GlobalTheory.CompanionTheory.InertOpen
 
-theorem exists_openSubgroup_ine_art_units : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] {l : ℕ} [Fact l.Prime] (art : Ideles E →* Gab E Ω), IsGlobalArtin art →
-    ∀ (w : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω), IsPlaceOver A w →
-    ∀ (U : Subgroup (w.adicCompletion E)ˣ), IsOpen (U : Set (w.adicCompletion E)ˣ) → (∀ x ∈ U, IsUnitAt w x) →
-    ∃ V : Subgroup (G E Ω), IsOpen (V : Set (G E Ω)) ∧
-      ∀ σ ∈ V, σ ∈ Ine (F := E) A → ∃ x ∈ U, art (localIdele E w x) = toAb E Ω σ := by
+theorem exists_openSubgroup_ine_art_units
+    : ∀ {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] {l : ℕ}
+        [Fact l.Prime] (art : Ideles E →* Gab E Ω),
+      IsGlobalArtin art
+        → ∀ (w : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω),
+          IsPlaceOver A w
+            → ∀ (U : Subgroup (w.adicCompletion E)ˣ),
+              IsOpen (U : Set (w.adicCompletion E)ˣ) → (∀ x ∈ U, IsUnitAt w x)
+                → ∃ V : Subgroup (G E Ω),
+                  IsOpen (V : Set (G E Ω))
+                    ∧ ∀ σ ∈ V,
+                      σ ∈ Ine (F := E) A → ∃ x ∈ U, art (localIdele E w x) = toAb E Ω σ := by
   intro E Ω _ _ _ _ _ l _ art hart w A hA U hUo _
   haveI := hausdorff_absolute_galois_abelianization (E := E) (Ω := Ω)
   let f : (w.adicCompletion E)ˣ →* Gab E Ω := art.comp (localIdele E w)

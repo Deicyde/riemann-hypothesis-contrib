@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.LevelsUsed
 @[expose] public section
 
 open scoped BigOperators TensorProduct
-open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt GlobalTheory.GoodDepth
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds
+  Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt
+  GlobalTheory.GoodDepth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace GlobalTheory.InertLabelling
 
@@ -49,12 +52,19 @@ lemma pos_inj (N : NumDatum) (l : ℕ) (z : RPl N.R) (s t : ZMod (N.ordP l))
 
 def orbSetoid (N : NumDatum) (l : ℕ) : Setoid (RPl N.R) where
   r z z' := ∃ s : ℕ, N.pos l z s = z'
-  iseqv := ⟨fun z => ⟨N.ordP l * 0, pos_mul_period N l z 0⟩, fun {z z'} ⟨s, hs⟩ => ⟨(N.ordP l - 1) * s, by
-      have hp : 0 < N.ordP l := Nat.pos_of_ne_zero (NeZero.ne _)
-      obtain ⟨n, hn⟩ : ∃ n, N.ordP l = n + 1 := ⟨N.ordP l - 1, by omega⟩
-      rw [← hs, pos_add, show s + (N.ordP l - 1) * s = N.ordP l * s by rw [hn, Nat.add_sub_cancel]; ring,
-        pos_mul_period]⟩,
-    fun {a b c} ⟨s, hs⟩ ⟨t, ht⟩ => ⟨s + t, by rw [← pos_add, hs, ht]⟩⟩
+  iseqv := ⟨
+    fun z => ⟨N.ordP l * 0, pos_mul_period N l z 0⟩,
+    fun {z z'} ⟨s, hs⟩ => ⟨
+      (N.ordP l - 1) * s,
+      by
+        have hp : 0 < N.ordP l := Nat.pos_of_ne_zero (NeZero.ne _)
+        obtain ⟨n, hn⟩ : ∃ n, N.ordP l = n + 1 := ⟨N.ordP l - 1, by omega⟩
+        rw [← hs, pos_add,
+          show s + (N.ordP l - 1) * s = N.ordP l * s by rw [hn, Nat.add_sub_cancel]; ring,
+          pos_mul_period]
+    ⟩,
+    fun {a b c} ⟨s, hs⟩ ⟨t, ht⟩ => ⟨s + t, by rw [← pos_add, hs, ht]⟩
+  ⟩
 
 lemma exists_reps (N : NumDatum) (l : ℕ) : ∃ Z : Finset (RPl N.R),
     ∀ z' : RPl N.R, ∃! p : RPl N.R × ZMod (N.ordP l), p.1 ∈ Z ∧ N.pos l p.1 p.2.val = z' := by
@@ -92,7 +102,9 @@ lemma pos_succ (N : NumDatum) (l : ℕ) (z : RPl N.R) (s : ZMod (N.ordP l)) :
   have e : s + 1 = ((s.val + 1 : ℕ) : ZMod (N.ordP l)) := by simp
   rw [e, ZMod.val_natCast, pos_mod, pos_add]
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
 lemma inPsi_conj_iff (τ : E →+* ℂ) : InPsi H (ComplexEmbedding.conjugate τ) ↔ ¬ InPsi H τ := by
   have hd : (H.d : ℂ) ≠ 0 := Nat.cast_ne_zero.2 H.d_prime.ne_zero
@@ -137,7 +149,23 @@ lemma embK_conj_bar {lv : Level H} (c : Coeff lv) (τ : E →+* ℂ) (x : 𝓞 E
 lemma conj_conj (τ : E →+* ℂ) : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) = τ :=
   ComplexEmbedding.involutive_conjugate E τ
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv) (N : NumDatum) (pl : RPl N.R → (E →+* ℂ)), PlaceTie N c pl → ∀ (la : HeightOneSpectrum (𝓞 c.F)) (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι → V.l = resCharOf la → (∀ x ∈ la.asIdeal, V.MM (ι (io ((x : 𝓞 c.F) : c.F)))) → Inert N V.l → ¬ ConjIn N V.l → ∀ j : ℕ, ∃ Z : Finset (RPl N.R), RF.IsReps (parOf N j V.l) Z ∧ Z.Nonempty ∧ Even (N.ordP V.l) ∧ Function.Bijective (fun x : Z × Fin 2 × ZMod (N.ordP V.l) => tauIn N pl V.l x.1.1 x.2.1 x.2.2) ∧ ∀ z g, FrobOrd V io ι (tauIn N pl V.l z g) ∧ ∀ s, tauIn N pl V.l z 1 s = ComplexEmbedding.conjugate (tauIn N pl V.l z 0 s) := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv)
+        (N : NumDatum) (pl : RPl N.R → (E →+* ℂ)),
+      PlaceTie N c pl
+        → ∀ (la : HeightOneSpectrum (𝓞 c.F)) (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C]
+            [CharZero C] (V : VF C) (ι : T.Fr →+* C),
+          EmbOK T V ι → V.l = resCharOf la → (∀ x ∈ la.asIdeal, V.MM (ι (io ((x : 𝓞 c.F) : c.F))))
+            → Inert N V.l → ¬ ConjIn N V.l
+            → ∀ j : ℕ, ∃ Z : Finset (RPl N.R),
+              RF.IsReps (parOf N j V.l) Z ∧ Z.Nonempty ∧ Even (N.ordP V.l)
+                ∧ Function.Bijective (fun x : Z × Fin 2 × ZMod (N.ordP V.l) =>
+                  tauIn N pl V.l x.1.1 x.2.1 x.2.2)
+                ∧ ∀ z g,
+                  FrobOrd V io ι (tauIn N pl V.l z g)
+                    ∧ ∀ s,
+                      tauIn N pl V.l z 1 s = ComplexEmbedding.conjugate (tauIn N pl V.l z 0 s) := by
   intro E _ _ _ H lv c N pl hT la T io C _ _ V ι _ hl hla hI hC j
   obtain ⟨Z, hZ⟩ := exists_reps N V.l
   have hev := even_ordP N V.l hI hC
@@ -150,8 +178,9 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Recip
   · obtain ⟨p, hp, -⟩ := hZ (false, 0)
     exact ⟨p.1, hp.1⟩
   · rintro ⟨z, g, s⟩ ⟨z', g', s'⟩ h
-    have main : N.pos V.l z.1 s.val = N.pos V.l z'.1 s'.val → (g = RF.bg s ↔ g' = RF.bg s') →
-        (z, g, s) = (z', g', s') := by
+    have main
+        : N.pos V.l z.1 s.val = N.pos V.l z'.1 s'.val → (g = RF.bg s ↔ g' = RF.bg s')
+          → (z, g, s) = (z', g', s') := by
       intro h1 h2
       have := (hZ _).unique (y₁ := (z.1, s)) (y₂ := (z'.1, s')) ⟨z.2, h1⟩ ⟨z'.2, rfl⟩
       obtain ⟨a, b⟩ := Prod.mk.inj this
@@ -181,8 +210,11 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Recip
       refine ⟨(⟨p.1, hp.1⟩, RF.bg (p.2 + 1), p.2), ?_⟩
       dsimp only [tauIn]
       rw [if_neg ((bg_succ hev _ _).1 rfl), hp.2, hz', conj_conj]
-  · have hf : ∀ (w : RPl N.R) (x : 𝓞 E), V.MM (emA3 io ι (ComplexEmbedding.conjugate (pl (N.pos V.l w 1))) x -
-        emA3 io ι (pl w) x ^ V.l) := by
+  · have hf
+        : ∀ (w : RPl N.R) (x : 𝓞 E),
+          V.MM
+            (emA3 io ι (ComplexEmbedding.conjugate (pl (N.pos V.l w 1))) x
+              - emA3 io ι (pl w) x ^ V.l) := by
       intro w x
       obtain ⟨y, hy, e⟩ := hT.frob la (hl ▸ hI) w x
       have := hla y hy

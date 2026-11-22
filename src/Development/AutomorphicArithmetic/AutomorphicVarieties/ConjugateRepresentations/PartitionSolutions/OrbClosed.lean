@@ -6,8 +6,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 open UpperTheory.V.Cj.A
 
-theorem UpperTheory.V.Cj.A.orbClosed :
-    OrbClosed := by
+theorem UpperTheory.V.Cj.A.orbClosed : OrbClosed := by
   intro Γ V S _ _ _ _ d G hG K hKY hK s s'
   unfold UpperTheory.V.Lit.Dr.Geo.Proper at hG
   rw [isOpen_iff_mem_nhds]

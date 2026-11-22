@@ -11,8 +11,8 @@ noncomputable section
 
 namespace PI.LowSplitHaarW
 
-def extNe {ι : Type} [DecidableEq ι] (a : ι) (y : {i // i ≠ a} → ℂ) : ι → ℂ :=
-  fun j => if h : j ≠ a then y ⟨j, h⟩ else 0
+def extNe {ι : Type} [DecidableEq ι] (a : ι) (y : {i // i ≠ a} → ℂ) : ι → ℂ := fun j =>
+  if h : j ≠ a then y ⟨j, h⟩ else 0
 
 theorem measurable_extNe {ι : Type} [DecidableEq ι] (a : ι) : Measurable (extNe a) := by
   refine Measurable.of_eval fun j => ?_
@@ -22,10 +22,13 @@ theorem measurable_extNe {ι : Type} [DecidableEq ι] (a : ι) : Measurable (ext
   · simp only [extNe, dif_neg h]
     exact measurable_const
 
-theorem measurePreserving_of_card (n : ℕ) : ∀ (ι : Type) [Fintype ι] [DecidableEq ι], Fintype.card ι = n →
-    ∀ (r : ι → ℕ) (g : ι → (ι → ℂ) → ℂ), (∀ i, Measurable (g i)) →
-    (∀ i (x y : ι → ℂ), (∀ j, r j < r i → x j = y j) → g i x = g i y) →
-    MeasurePreserving (fun x : ι → ℂ => fun i => x i + g i x) volume volume := by
+theorem measurePreserving_of_card (n : ℕ)
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι],
+      Fintype.card ι = n
+        → ∀ (r : ι → ℕ) (g : ι → (ι → ℂ) → ℂ),
+          (∀ i, Measurable (g i))
+            → (∀ i (x y : ι → ℂ), (∀ j, r j < r i → x j = y j) → g i x = g i y)
+            → MeasurePreserving (fun x : ι → ℂ => fun i => x i + g i x) volume volume := by
   induction n with
   | zero =>
     intro ι _ _ hcard r g _ _
@@ -47,32 +50,42 @@ theorem measurePreserving_of_card (n : ℕ) : ∀ (ι : Type) [Fintype ι] [Deci
       intro x i
       refine hdep i _ _ fun j hj => ?_
       simp [extNe, hja i j hj]
-    have hcard' : Fintype.card {j // j ≠ a} = n := by
-      simp [Fintype.card_subtype_compl, hcard]
+    have hcard' : Fintype.card {j // j ≠ a} = n := by simp [Fintype.card_subtype_compl, hcard]
 
-    have hF := ih {j // j ≠ a} hcard' (fun j => r j) (fun j y => g j (extNe a y))
-      (fun j => (hg j).comp (measurable_extNe a)) (by
-        intro j y z hyz
-        refine hdep j _ _ fun l hl => ?_
-        by_cases h : l ≠ a
-        · simp only [extNe, dif_pos h]
-          exact hyz ⟨l, h⟩ hl
-        · simp only [extNe, dif_neg h])
+    have hF :=
+      ih {j // j ≠ a} hcard'
+        (fun j => r j)
+        (fun j y => g j (extNe a y))
+        (fun j => (hg j).comp (measurable_extNe a))
+        (by
+          intro j y z hyz
+          refine hdep j _ _ fun l hl => ?_
+          by_cases h : l ≠ a
+          · simp only [extNe, dif_pos h]
+            exact hyz ⟨l, h⟩ hl
+          · simp only [extNe, dif_neg h])
     let e := MeasurableEquiv.piEquivPiSubtypeProd (fun _ : ι => ℂ) (fun j => j ≠ a)
     have he : MeasurePreserving e volume volume :=
       volume_preserving_piEquivPiSubtypeProd (fun _ : ι => ℂ) (fun j => j ≠ a)
 
-    have hG := hF.skew_product (g := fun y (z : {j // ¬ j ≠ a} → ℂ) => fun q => z q + g a (extNe a y))
-      (by
-        refine Measurable.of_eval fun q => ?_
-        exact ((measurable_pi_apply q).comp measurable_snd).add
-          ((hg a).comp ((measurable_extNe a).comp measurable_fst)))
-      (Filter.Eventually.of_forall fun y =>
-        (measurePreserving_add_right (volume : Measure ({j // ¬ j ≠ a} → ℂ))
-          (fun _ => g a (extNe a y))).map_eq)
-    have key : (fun x : ι → ℂ => fun i => x i + g i x) =
-        e.symm ∘ (fun p => ((fun i : {j // j ≠ a} => p.1 i + g i (extNe a p.1)),
-          fun q : {j // ¬ j ≠ a} => p.2 q + g a (extNe a p.1))) ∘ e := by
+    have hG :=
+      hF.skew_product
+        (g := fun y (z : {j // ¬ j ≠ a} → ℂ) => fun q => z q + g a (extNe a y))
+        (by
+          refine Measurable.of_eval fun q => ?_
+          exact ((measurable_pi_apply q).comp measurable_snd).add
+            ((hg a).comp ((measurable_extNe a).comp measurable_fst)))
+        (Filter.Eventually.of_forall fun y =>
+          (measurePreserving_add_right (volume : Measure ({j // ¬ j ≠ a} → ℂ))
+            (fun _ => g a (extNe a y))).map_eq)
+    have key
+        : (fun x : ι → ℂ => fun i => x i + g i x)
+          = e.symm
+            ∘ (fun p => (
+              (fun i : {j // j ≠ a} => p.1 i + g i (extNe a p.1)),
+              fun q : {j // ¬ j ≠ a} => p.2 q + g a (extNe a p.1)
+            ))
+            ∘ e := by
       funext x i
       by_cases h : i ≠ a
       · simp [e, h, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd, hext x i]

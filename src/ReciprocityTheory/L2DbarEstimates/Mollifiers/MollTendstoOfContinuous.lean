@@ -9,10 +9,13 @@ namespace ReciprocityTheory.L2DbarEstimates.B
 open MeasureTheory Filter Topology Set Metric
 open scoped Convolution ContDiff ENNReal Pointwise
 
-theorem moll_tendsto_of_continuous (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] {ι : Type*} {l : Filter ι} {K : ι → Kernel E μ}
-    (hK : Tendsto (fun i => (K i).r) l (𝓝 0)) {g : E → ℂ} (hgs : HasCompactSupport g)
-    (hgc : Continuous g) : Tendsto (fun i => eLpNorm (moll (K i) g - g) 2 μ) l (𝓝 0) := by
+theorem moll_tendsto_of_continuous
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    {ι : Type*} {l : Filter ι} {K : ι → Kernel E μ} (hK : Tendsto (fun i => (K i).r) l (𝓝 0))
+    {g : E → ℂ} (hgs : HasCompactSupport g) (hgc : Continuous g)
+    : Tendsto (fun i => eLpNorm (moll (K i) g - g) 2 μ) l (𝓝 0) := by
   have hgu : UniformContinuous g := hgs.uniformContinuous_of_continuous hgc
   set S := Metric.cthickening 1 (tsupport g) with hS
   have hSc : IsCompact S := hgs.isCompact.cthickening
@@ -41,7 +44,8 @@ theorem moll_tendsto_of_continuous (E : Type*) [NormedAddCommGroup E] [NormedSpa
         by_contra hy0
         apply hxS
         refine Metric.mem_cthickening_of_dist_le x y 1 _ (subset_tsupport _ hy0) ?_
-        rw [dist_comm]; exact le_of_lt (lt_trans (mem_ball.1 hy) hr1)
+        rw [dist_comm]
+        exact le_of_lt (lt_trans (mem_ball.1 hy) hr1)
       have hgx : g x = 0 := hx0 x (mem_ball_self (K i).r_pos)
       have h0 : dist (moll (K i) g x) (0 : ℂ) ≤ 0 := by
         simp only [moll]
@@ -55,8 +59,7 @@ theorem moll_tendsto_of_continuous (E : Type*) [NormedAddCommGroup E] [NormedSpa
         exact hx (ball_subset_closedBall ((K i).support_subset h)))
     have hKc : Continuous (K i).toFun := (K i).smooth.continuous
     have hgL : LocallyIntegrable g μ := hgc.locallyIntegrable
-    have hc : Continuous (moll (K i) g - g) :=
-      (hKcs.continuous_convolution_left _ hKc hgL).sub hgc
+    have hc : Continuous (moll (K i) g - g) := (hKcs.continuous_convolution_left _ hKc hgL).sub hgc
     rw [← eLpNorm_restrict_eq_of_support_subset hc.aestronglyMeasurable hsupp]
     refine (eLpNorm_le_of_ae_bound (μ := μ.restrict S) hc.aestronglyMeasurable
       (Filter.Eventually.of_forall hbound)).trans ?_
@@ -69,8 +72,12 @@ theorem moll_tendsto_of_continuous (E : Type*) [NormedAddCommGroup E] [NormedSpa
   rw [ENNReal.ofReal_coe_nnreal, mul_comm]
   exact hnε.le
 
-theorem moll_l2Tendsto (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] (ι : Type*) : MollifierL2Tendsto E μ ι := by
+theorem moll_l2Tendsto
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (ι : Type*)
+    : MollifierL2Tendsto E μ ι := by
   intro l K hK u hu
   rw [ENNReal.tendsto_nhds_zero]
   intro ε hε
@@ -90,7 +97,8 @@ theorem moll_l2Tendsto (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [F
   have hlin : moll (K i) u = moll (K i) (u - g) + moll (K i) g := by
     simp only [moll]
     rw [← ConvolutionExists.distrib_add (hcs.convolutionExists_left _ hKc hli)
-      (hcs.convolutionExists_left _ hKc hgli), sub_add_cancel]
+        (hcs.convolutionExists_left _ hKc hgli),
+      sub_add_cancel]
   have hc1 : Continuous (moll (K i) (u - g)) := hcs.continuous_convolution_left _ hKc hli
   have hc2 : Continuous (moll (K i) g) := hcs.continuous_convolution_left _ hKc hgli
   have hdec : moll (K i) u - u = moll (K i) (u - g) + (moll (K i) g - g) + (g - u) := by
@@ -102,16 +110,18 @@ theorem moll_l2Tendsto (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [F
     simp only [hth, Measure.restrict_univ] at h
     exact h
   rw [hdec]
-  calc eLpNorm (moll (K i) (u - g) + (moll (K i) g - g) + (g - u)) 2 μ
-      ≤ eLpNorm (moll (K i) (u - g) + (moll (K i) g - g)) 2 μ + eLpNorm (g - u) 2 μ :=
-        eLpNorm_add_le (by norm_num : 1 ≤ (2 : ℝ≥0∞))
-    _ ≤ eLpNorm (moll (K i) (u - g)) 2 μ + eLpNorm (moll (K i) g - g) 2 μ + eLpNorm (g - u) 2 μ := by
-        gcongr
-        exact eLpNorm_add_le (by norm_num : 1 ≤ (2 : ℝ≥0∞))
+  calc
+    eLpNorm (moll (K i) (u - g) + (moll (K i) g - g) + (g - u)) 2 μ
+        ≤ eLpNorm (moll (K i) (u - g) + (moll (K i) g - g)) 2 μ + eLpNorm (g - u) 2 μ :=
+      eLpNorm_add_le (by norm_num : 1 ≤ (2 : ℝ≥0∞))
+    _ ≤ eLpNorm (moll (K i) (u - g)) 2 μ + eLpNorm (moll (K i) g - g) 2 μ
+        + eLpNorm (g - u) 2 μ := by
+      gcongr
+      exact eLpNorm_add_le (by norm_num : 1 ≤ (2 : ℝ≥0∞))
     _ ≤ ε / 3 + ε / 3 + ε / 3 := by
-        gcongr
-        · exact hY.trans hug
-        · rw [eLpNorm_sub_comm]; exact hug
+      gcongr
+      · exact hY.trans hug
+      · rw [eLpNorm_sub_comm]; exact hug
     _ = ε := ENNReal.add_thirds ε
 
 end ReciprocityTheory.L2DbarEstimates.B

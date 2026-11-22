@@ -6,11 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HasSatake
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal
+  UpperTheory.Gal.CertificateRingHomMap
 open scoped Classical
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pLevCompact_of :
-    UpperTheory.Gal.CertificateRingHomMap.IntCompact → UpperTheory.Gal.CertificateRingHomMap.IntConj → UpperTheory.Gal.CertificateRingHomMap.LocComm → UpperTheory.Gal.CertificateRingHomMap.LevOpen → UpperTheory.Gal.CertificateRingHomMap.LevCompact := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pLevCompact_of
+    : UpperTheory.Gal.CertificateRingHomMap.IntCompact
+      → UpperTheory.Gal.CertificateRingHomMap.IntConj
+      → UpperTheory.Gal.CertificateRingHomMap.LocComm
+      → UpperTheory.Gal.CertificateRingHomMap.LevOpen
+      → UpperTheory.Gal.CertificateRingHomMap.LevCompact := by
   intro hC hI hL hO E _ _ _ n Up w₀ hw₀ S Kw hS
   obtain ⟨-, hAp, -, -, -, -⟩ := hL E n w₀ hw₀
   have hclosed : IsClosed (lev S Kw : Set (GUf E n)) :=
@@ -18,12 +24,15 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pLevCompact_of :
   have hK₁ := hC E n
   have hJ := hS.cpt w₀ hS.mem
   have hKo := (GlobalTheory.LFun.SatCompare.isOpen_isCompact_KGL w₀ n).1
-  obtain ⟨F, -, hF⟩ := hJ.elim_nhds_subcover
-    (fun a => {y : GLw n w₀ | a⁻¹ * y ∈ GlobalTheory.LFun.KGL w₀ (n := n)}) (fun a _ => by
-      refine IsOpen.mem_nhds (hKo.preimage (continuous_const.mul continuous_id)) ?_
-      simp [Subgroup.one_mem])
-  have hcov : IsCompact (⋃ a ∈ F, (fun x : GUf E n => loc hw₀ a * x) ''
-      (lev (E := E) (n := n) ∅ (fun _ => ⊤) : Set (GUf E n))) :=
+  obtain ⟨F, -, hF⟩ :=
+    hJ.elim_nhds_subcover
+      (fun a => {y : GLw n w₀ | a⁻¹ * y ∈ GlobalTheory.LFun.KGL w₀ (n := n)})
+      (fun a _ => by
+        refine IsOpen.mem_nhds (hKo.preimage (continuous_const.mul continuous_id)) ?_
+        simp [Subgroup.one_mem])
+  have hcov : IsCompact
+      (⋃ a ∈ F, (fun x : GUf E n => loc hw₀ a * x) ''
+        (lev (E := E) (n := n) ∅ (fun _ => ⊤) : Set (GUf E n))) :=
     F.isCompact_biUnion fun a _ => hK₁.image (continuous_const.mul continuous_id)
   refine hcov.of_isClosed_subset hclosed fun k hk => ?_
   obtain ⟨hsim, hmem, hoff⟩ := mem_lev.1 hk

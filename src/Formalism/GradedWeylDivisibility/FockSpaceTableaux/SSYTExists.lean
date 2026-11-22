@@ -11,11 +11,11 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-private theorem exists_tableau_of_sum_eq_lemma (hP : SSYTPeel) (r n : ℕ) :
-    ∀ (N : ℕ) (ν : Fin n → ℕ) (m : Fin r × Fin n →₀ ℕ), ∑ t, ν t = N →
-      (∀ t : Fin n, ∑ a : Fin r, m (a, t) = ν t) → Interlaced m →
-      ∃ (K : ℕ) (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin r),
-        shapeDeg sz = ν ∧ (∀ k, StrictMono (I k)) ∧ bidetExp sz hsz I = m := by
+private theorem exists_tableau_of_sum_eq_lemma (hP : SSYTPeel) (r n : ℕ)
+    : ∀ (N : ℕ) (ν : Fin n → ℕ) (m : Fin r × Fin n →₀ ℕ),
+      ∑ t, ν t = N → (∀ t : Fin n, ∑ a : Fin r, m (a, t) = ν t) → Interlaced m
+        → ∃ (K : ℕ) (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin r),
+          shapeDeg sz = ν ∧ (∀ k, StrictMono (I k)) ∧ bidetExp sz hsz I = m := by
   intro N
   refine Nat.strong_induction_on N ?_
   intro N ih ν m hN hcol hint_r
@@ -38,7 +38,10 @@ private theorem exists_tableau_of_sum_eq_lemma (hP : SSYTPeel) (r n : ℕ) :
     have hpos : 0 < ν t0 := by
       rw [← hcol t0]
       exact lt_of_lt_of_le (Nat.pos_of_ne_zero hne)
-        (Finset.single_le_sum (f := fun a => m (a, t0)) (fun _ _ => Nat.zero_le _) (Finset.mem_univ a0))
+        (Finset.single_le_sum
+          (f := fun a => m (a, t0))
+          (fun _ _ => Nat.zero_le _)
+          (Finset.mem_univ a0))
     have hlt : ∑ t, (ν t - if t.val < h then 1 else 0) < N := by
       rw [← hN]
       apply Finset.sum_lt_sum
@@ -49,8 +52,15 @@ private theorem exists_tableau_of_sum_eq_lemma (hP : SSYTPeel) (r n : ℕ) :
         omega
     obtain ⟨K, sz, hsz, I, hshape, hI, hexp⟩ :=
       ih _ hlt (fun t => ν t - if t.val < h then 1 else 0) (m - colExp c hh) rfl hcol' hint'
-    refine ⟨K + 1, Fin.cons h sz, lcssyt_consSz hh sz hsz, lcssyt_consI sz c I, ?_,
-      lcssyt_consI_strictMono sz c I hc hI, ?_⟩
+    refine ⟨
+      K + 1,
+      Fin.cons h sz,
+      lcssyt_consSz hh sz hsz,
+      lcssyt_consI sz c I,
+      ?_,
+      lcssyt_consI_strictMono sz c I hc hI,
+      ?_
+    ⟩
     · funext t
       rw [lcssyt_shapeDeg_cons, congrFun hshape t]
       by_cases ht : t.val < h
@@ -62,7 +72,7 @@ private theorem exists_tableau_of_sum_eq_lemma (hP : SSYTPeel) (r n : ℕ) :
     · rw [lcssyt_bidetExp_cons hh c sz hsz I, hexp]
       exact add_tsub_cancel_of_le hle
 
-theorem sSYTExists_of (hP : SSYTPeel) : SSYTExists :=
-  fun r n ν m hcol hint_r => exists_tableau_of_sum_eq_lemma hP r n _ ν m rfl hcol hint_r
+theorem sSYTExists_of (hP : SSYTPeel) : SSYTExists := fun r n ν m hcol hint_r =>
+  exists_tableau_of_sum_eq_lemma hP r n _ ν m rfl hcol hint_r
 
 end Formalism.GradedWeylDivisibility

@@ -26,10 +26,10 @@ namespace FunctorialResolution.EmbeddedResolution
 
 theorem orderAt_comap_eq_of_notMem_exceptionalIdeal
     (T : MarkedIdealWithBoundary.{u}) (_hT : T.IsAdmissible) (Z : T.scheme.IdealSheafData)
-    (X' : Scheme.{u}) (π : X' ⟶ T.scheme) (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
-    (x' : X') (hx' : x' ∉ (Blowup.exceptionalIdeal π Z).support)
-    (A : T.scheme.IdealSheafData) :
-    orderAt (A.comap π) x' = orderAt A (π.base x') := by
+    (X' : Scheme.{u}) (π : X' ⟶ T.scheme) (hπ : Blowup.IsBlowupAlongIdealSheaf π Z) (x' : X')
+    (hx' : x' ∉ (Blowup.exceptionalIdeal π Z).support)
+    (A : T.scheme.IdealSheafData)
+    : orderAt (A.comap π) x' = orderAt A (π.base x') := by
   have hx : π.base x' ∉ Z.support := by
     intro hc
     apply hx'

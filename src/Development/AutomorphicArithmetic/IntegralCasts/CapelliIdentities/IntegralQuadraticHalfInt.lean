@@ -48,8 +48,15 @@ private lemma even_sub_of_norm (d : ℕ) (hd : d.Prime) (x y n : ℤ)
     omega
   · exact ⟨s - t, by omega⟩
 
-theorem UpperTheory.integral_quadratic_half_int :
-    ∀ (d : ℕ), d.Prime → ∀ (a b : ℚ), IsIntegral ℤ ((a : ℂ) + (b : ℂ) * (Complex.I * ((Real.sqrt (d : ℝ) : ℝ) : ℂ))) → ∃ x y : ℤ, Even (x - y) ∧ (a : ℂ) + (b : ℂ) * (Complex.I * ((Real.sqrt (d : ℝ) : ℝ) : ℂ)) = ((x : ℂ) + (y : ℂ) * (Complex.I * ((Real.sqrt (d : ℝ) : ℝ) : ℂ))) / 2 := by
+theorem UpperTheory.integral_quadratic_half_int
+    : ∀ (d : ℕ),
+      d.Prime
+        → ∀ (a b : ℚ),
+          IsIntegral ℤ ((a : ℂ) + (b : ℂ) * (Complex.I * ((Real.sqrt (d : ℝ) : ℝ) : ℂ)))
+            → ∃ x y : ℤ,
+              Even (x - y)
+                ∧ (a : ℂ) + (b : ℂ) * (Complex.I * ((Real.sqrt (d : ℝ) : ℝ) : ℂ))
+                  = ((x : ℂ) + (y : ℂ) * (Complex.I * ((Real.sqrt (d : ℝ) : ℝ) : ℂ))) / 2 := by
   intro d hd a b h
   have hr : ((Real.sqrt (d : ℝ) : ℝ) : ℂ) ^ 2 = (d : ℂ) := by
     have : Real.sqrt (d : ℝ) ^ 2 = (d : ℝ) := Real.sq_sqrt (Nat.cast_nonneg d)
@@ -57,29 +64,40 @@ theorem UpperTheory.integral_quadratic_half_int :
   generalize Real.sqrt (d : ℝ) = r at h hr ⊢
   have h' : IsIntegral ℤ ((a : ℂ) - (b : ℂ) * (Complex.I * (r : ℂ))) := by
     have h0 := map_isIntegral_int (starRingEnd ℂ) h
-    have e : (starRingEnd ℂ) ((a : ℂ) + (b : ℂ) * (Complex.I * (r : ℂ)))
-        = (a : ℂ) - (b : ℂ) * (Complex.I * (r : ℂ)) := by
+    have e
+        : (starRingEnd ℂ) ((a : ℂ) + (b : ℂ) * (Complex.I * (r : ℂ)))
+          = (a : ℂ) - (b : ℂ) * (Complex.I * (r : ℂ)) := by
       simp only [map_add (f := _), map_mul, map_ratCast, Complex.conj_I, Complex.conj_ofReal]
       ring
     rwa [e] at h0
-  obtain ⟨x, hx⟩ := int_of_isIntegral_cast (2 * a) (by
-    have e : ((2 * a : ℚ) : ℂ) = ((a : ℂ) + (b : ℂ) * (Complex.I * (r : ℂ)))
-        + ((a : ℂ) - (b : ℂ) * (Complex.I * (r : ℂ))) := by
-      push_cast; ring
-    rw [e]; exact h.add h')
-  obtain ⟨n, hn⟩ := int_of_isIntegral_cast (a ^ 2 + b ^ 2 * d) (by
-    have e : ((a ^ 2 + b ^ 2 * d : ℚ) : ℂ) = ((a : ℂ) + (b : ℂ) * (Complex.I * (r : ℂ)))
-        * ((a : ℂ) - (b : ℂ) * (Complex.I * (r : ℂ))) := by
+  obtain ⟨x, hx⟩ :=
+    int_of_isIntegral_cast (2 * a) (by
+      have e
+          : ((2 * a : ℚ) : ℂ)
+            = ((a : ℂ) + (b : ℂ) * (Complex.I * (r : ℂ)))
+              + ((a : ℂ) - (b : ℂ) * (Complex.I * (r : ℂ))) := by
+        push_cast; ring
+      rw [e]
+      exact h.add h')
+  obtain ⟨n, hn⟩ :=
+    int_of_isIntegral_cast (a ^ 2 + b ^ 2 * d) (by
+      have e
+          : ((a ^ 2 + b ^ 2 * d : ℚ) : ℂ)
+            = ((a : ℂ) + (b : ℂ) * (Complex.I * (r : ℂ)))
+              * ((a : ℂ) - (b : ℂ) * (Complex.I * (r : ℂ))) := by
+        push_cast
+        linear_combination (b : ℂ) ^ 2 * (r : ℂ) ^ 2 * Complex.I_sq - (b : ℂ) ^ 2 * hr
+      rw [e]
+      exact h.mul h')
+  obtain ⟨y, hy⟩ :=
+    int_of_sq_mul d hd (2 * b) (4 * n - x ^ 2) (by
       push_cast
-      linear_combination (b : ℂ) ^ 2 * (r : ℂ) ^ 2 * Complex.I_sq - (b : ℂ) ^ 2 * hr
-    rw [e]; exact h.mul h')
-  obtain ⟨y, hy⟩ := int_of_sq_mul d hd (2 * b) (4 * n - x ^ 2) (by
-    push_cast
-    rw [hn, hx]; ring)
+      rw [hn, hx]
+      ring)
   refine ⟨x, y, even_sub_of_norm d hd x y n ?_, ?_⟩
-  · have : (x : ℚ) ^ 2 + (y : ℚ) ^ 2 * (d : ℚ) = 4 * n := by
-      rw [hx, hy, hn]; ring
+  · have : (x : ℚ) ^ 2 + (y : ℚ) ^ 2 * (d : ℚ) = 4 * n := by rw [hx, hy, hn]; ring
     exact_mod_cast this
   · have hx' : (x : ℂ) = 2 * (a : ℂ) := by exact_mod_cast congrArg (Rat.cast : ℚ → ℂ) hx
     have hy' : (y : ℂ) = 2 * (b : ℂ) := by exact_mod_cast congrArg (Rat.cast : ℚ → ℂ) hy
-    rw [hx', hy']; ring
+    rw [hx', hy']
+    ring

@@ -12,9 +12,12 @@ noncomputable section
 
 namespace PI.Tr
 
-private theorem summable_exp_neg_mul_norm_add_sq {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] (L : Submodule ℤ E) [DiscreteTopology L] {a : ℝ} (ha : 0 < a)
-    (w : E) : Summable fun z : L => Real.exp (-a * ‖(z : E) + w‖ ^ 2) := by
+private theorem summable_exp_neg_mul_norm_add_sq
+    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (L : Submodule ℤ E) [DiscreteTopology L]
+    {a : ℝ} (ha : 0 < a)
+    (w : E)
+    : Summable fun z : L => Real.exp (-a * ‖(z : E) + w‖ ^ 2) := by
   classical
   set N : ℕ := finrank ℤ L + 1 with hN
   have hr : (-(N : ℝ)) < -(finrank ℤ L : ℝ) := by
@@ -30,28 +33,34 @@ private theorem summable_exp_neg_mul_norm_add_sq {E : Type} [NormedAddCommGroup 
     rcases le_or_gt u 1 with h1 | h1
     · have h2 : 1 ≤ (u ^ N)⁻¹ := (one_le_inv₀ (pow_pos hu N)).2 (pow_le_one₀ hu.le h1)
       have h3 : Real.exp (-a * u ^ 2) ≤ 1 := Real.exp_le_one_iff.2 (by nlinarith [sq_nonneg u])
-      calc Real.exp (-a * u ^ 2) ≤ 1 := h3
+      calc
+        Real.exp (-a * u ^ 2)
+          ≤ 1 := h3
         _ ≤ 1 * (u ^ N)⁻¹ := by linarith
         _ ≤ C * (u ^ N)⁻¹ := by
           gcongr
           exact le_max_left _ _
     · have h2 : (a * u) ^ N / (N.factorial : ℝ) ≤ Real.exp (a * u) :=
         Real.pow_div_factorial_le_exp _ (by positivity) N
-      have h3 : Real.exp (a * u) ≤ Real.exp (a * u ^ 2) := Real.exp_le_exp.2 (by
-        have hu2 : u ≤ u ^ 2 := by nlinarith
-        exact mul_le_mul_of_nonneg_left hu2 ha.le)
+      have h3 : Real.exp (a * u) ≤ Real.exp (a * u ^ 2) :=
+        Real.exp_le_exp.2 (by
+          have hu2 : u ≤ u ^ 2 := by nlinarith
+          exact mul_le_mul_of_nonneg_left hu2 ha.le)
       rw [show -a * u ^ 2 = -(a * u ^ 2) by ring, Real.exp_neg]
       have hpos : 0 < (a * u) ^ N / (N.factorial : ℝ) := by positivity
-      calc (Real.exp (a * u ^ 2))⁻¹ ≤ ((a * u) ^ N / (N.factorial : ℝ))⁻¹ :=
-            inv_anti₀ hpos (h2.trans h3)
+      calc
+        (Real.exp (a * u ^ 2))⁻¹
+          ≤ ((a * u) ^ N / (N.factorial : ℝ))⁻¹ := inv_anti₀ hpos (h2.trans h3)
         _ = ((N.factorial : ℝ) / a ^ N) * (u ^ N)⁻¹ := by
           rw [mul_pow]
           field_simp
         _ ≤ C * (u ^ N)⁻¹ := by
           gcongr
           exact le_max_right _ _
-  refine Summable.of_nonneg_of_le (fun z => (Real.exp_pos _).le)
-    (f := fun z : L => C * ‖(z : E) - -w‖ ^ (-(N : ℝ)) + (if (z : E) + w = 0 then 1 else 0)) ?_ ?_
+  refine Summable.of_nonneg_of_le
+    (fun z => (Real.exp_pos _).le)
+    (f := fun z : L => C * ‖(z : E) - -w‖ ^ (-(N : ℝ)) + (if (z : E) + w = 0 then 1 else 0))
+    ?_ ?_
   · intro z
     by_cases hz : (z : E) + w = 0
     · have h0 : ‖(z : E) - -w‖ ^ (-(N : ℝ)) = 0 := by
@@ -66,15 +75,16 @@ private theorem summable_exp_neg_mul_norm_add_sq {E : Type} [NormedAddCommGroup 
     apply summable_of_hasFiniteSupport
     apply Set.Subsingleton.finite
     intro z1 h1 z2 h2
-    simp only [Function.mem_support, ne_eq, ite_eq_right_iff, one_ne_zero, imp_false,
-      not_not] at h1 h2
+    simp only [Function.mem_support, ne_eq, ite_eq_right_iff, one_ne_zero, imp_false, not_not]
+      at h1 h2
     apply Subtype.ext
     rw [eq_neg_of_add_eq_zero_left h1, eq_neg_of_add_eq_zero_left h2]
 
-private theorem isQuotientMap_coe_unitAddTorus (ι : Type) [Fintype ι] :
-    Topology.IsQuotientMap (fun (s : ι → ℝ) (i : ι) => ((s i : ℝ) : UnitAddCircle)) := by
+private theorem isQuotientMap_coe_unitAddTorus (ι : Type) [Fintype ι]
+    : Topology.IsQuotientMap (fun (s : ι → ℝ) (i : ι) => ((s i : ℝ) : UnitAddCircle)) := by
   have hopen : IsOpenMap (fun (s : ι → ℝ) (i : ι) => ((s i : ℝ) : UnitAddCircle)) :=
-    IsOpenMap.piMap (fun _ => QuotientAddGroup.isOpenMap_coe)
+    IsOpenMap.piMap
+      (fun _ => QuotientAddGroup.isOpenMap_coe)
       (Filter.Eventually.of_forall fun _ => QuotientAddGroup.mk_surjective)
   refine hopen.isQuotientMap (by fun_prop) ?_
   intro θ
@@ -82,13 +92,16 @@ private theorem isQuotientMap_coe_unitAddTorus (ι : Type) [Fintype ι] :
   funext i
   exact Function.surjInv_eq QuotientAddGroup.mk_surjective (θ i)
 
-private theorem exists_continuous_torus_lift_of_periodic {ι : Type} [Fintype ι] (G : (ι → ℝ) → ℂ) (hG : Continuous G)
-    (hper : ∀ (s : ι → ℝ) (k : ι → ℤ), G (s + fun i => (k i : ℝ)) = G s) :
-    ∃ F : C(UnitAddTorus ι, ℂ), ∀ s : ι → ℝ,
-      F (fun i => ((s i : ℝ) : UnitAddCircle)) = G s := by
+private theorem exists_continuous_torus_lift_of_periodic
+    {ι : Type} [Fintype ι]
+    (G : (ι → ℝ) → ℂ)
+    (hG : Continuous G) (hper : ∀ (s : ι → ℝ) (k : ι → ℤ), G (s + fun i => (k i : ℝ)) = G s)
+    : ∃ F : C(UnitAddTorus ι, ℂ), ∀ s : ι → ℝ, F (fun i => ((s i : ℝ) : UnitAddCircle)) = G s := by
   have hq := isQuotientMap_coe_unitAddTorus ι
-  have hfib : ∀ x y : ι → ℝ, (fun i => ((x i : ℝ) : UnitAddCircle)) =
-      (fun i => ((y i : ℝ) : UnitAddCircle)) → G x = G y := by
+  have hfib
+      : ∀ x y : ι → ℝ,
+        (fun i => ((x i : ℝ) : UnitAddCircle)) = (fun i => ((y i : ℝ) : UnitAddCircle))
+          → G x = G y := by
     intro x y hxy
     have hk : ∀ i, ∃ k : ℤ, y i = x i + k := by
       intro i
@@ -111,22 +124,25 @@ private theorem exists_continuous_torus_lift_of_periodic {ι : Type} [Fintype ι
     exact hG
   exact ⟨⟨F0, hcont⟩, hF0⟩
 
-private theorem mFourierCoeff_periodization_eq_integral {ι : Type} [Fintype ι] (h : (ι → ℝ) → ℂ) (hh : MeasureTheory.Integrable h)
-    (hcont : Continuous h) (F : C(UnitAddTorus ι, ℂ))
-    (hF : ∀ s : ι → ℝ, F (fun i => ((s i : ℝ) : UnitAddCircle)) =
-      ∑' k : ι → ℤ, h (s + fun i => (k i : ℝ)))
-    (m : ι → ℤ) :
-    UnitAddTorus.mFourierCoeff F m =
-      ∫ s, UnitAddTorus.mFourier (-m) (fun i => ((s i : ℝ) : UnitAddCircle)) * h s := by
+private theorem mFourierCoeff_periodization_eq_integral
+    {ι : Type} [Fintype ι]
+    (h : (ι → ℝ) → ℂ) (hh : MeasureTheory.Integrable h) (hcont : Continuous h)
+    (F : C(UnitAddTorus ι, ℂ))
+    (hF : ∀ s : ι → ℝ,
+      F (fun i => ((s i : ℝ) : UnitAddCircle)) = ∑' k : ι → ℤ, h (s + fun i => (k i : ℝ)))
+    (m : ι → ℤ)
+    : UnitAddTorus.mFourierCoeff F m
+      = ∫ s, UnitAddTorus.mFourier (-m) (fun i => ((s i : ℝ) : UnitAddCircle)) * h s := by
   set ψ : (ι → ℝ) → ℂ := fun s => UnitAddTorus.mFourier (-m) (fun i => ((s i : ℝ) : UnitAddCircle))
     with hψ
-  have hqper : ∀ (s : ι → ℝ) (k : ι → ℤ),
-      (fun i => (((s + fun i => (k i : ℝ)) i : ℝ) : UnitAddCircle)) =
-        fun i => ((s i : ℝ) : UnitAddCircle) := by
+  have hqper
+      : ∀ (s : ι → ℝ) (k : ι → ℤ),
+        (fun i => (((s + fun i => (k i : ℝ)) i : ℝ) : UnitAddCircle))
+          = fun i => ((s i : ℝ) : UnitAddCircle) := by
     intro s k
     funext i
     rw [QuotientAddGroup.eq]
-    refine AddSubgroup.mem_zmultiples_iff.2 ⟨-k i, ?_⟩
+    refine AddSubgroup.mem_zmultiples_iff.2 ⟨- k i, ?_⟩
     rw [zsmul_eq_mul, mul_one, Pi.add_apply]
     push_cast
     ring
@@ -183,35 +199,44 @@ private theorem mFourierCoeff_periodization_eq_integral {ι : Type} [Fintype ι]
     · intro hs i
       have := hs i
       constructor <;> linarith [this.1, this.2]
-  have hmp : ∀ k : ι → ℤ, MeasureTheory.MeasurePreserving (fun s : ι → ℝ => s + fun i => (k i : ℝ))
-      MeasureTheory.volume MeasureTheory.volume := fun k =>
-        MeasureTheory.measurePreserving_add_right MeasureTheory.volume _
-  have hme : ∀ k : ι → ℤ, MeasurableEmbedding (fun s : ι → ℝ => s + fun i => (k i : ℝ)) :=
-    fun k => (Homeomorph.addRight _).measurableEmbedding
+  have hmp
+      : ∀ k : ι → ℤ,
+        MeasureTheory.MeasurePreserving
+          (fun s : ι → ℝ => s + fun i => (k i : ℝ))
+          MeasureTheory.volume MeasureTheory.volume := fun k =>
+    MeasureTheory.measurePreserving_add_right MeasureTheory.volume _
+  have hme : ∀ k : ι → ℤ, MeasurableEmbedding (fun s : ι → ℝ => s + fun i => (k i : ℝ)) := fun k =>
+    (Homeomorph.addRight _).measurableEmbedding
   have hfi : MeasureTheory.Integrable (fun s => ψ s * h s) := by
     refine MeasureTheory.Integrable.mono' hh.norm (hψcont.mul hcont).aestronglyMeasurable
       (Filter.Eventually.of_forall fun s => ?_)
     rw [norm_mul]
-    calc ‖ψ s‖ * ‖h s‖ ≤ 1 * ‖h s‖ := by gcongr; exact hψle s
+    calc
+      ‖ψ s‖ * ‖h s‖
+        ≤ 1 * ‖h s‖ := by gcongr; exact hψle s
       _ = ‖h s‖ := one_mul _
   rw [UnitAddTorus.mFourierCoeff_eq_integral F m 0, ← hS0]
-  have hint : ∀ s : ι → ℝ, UnitAddTorus.mFourier (-m) (fun i => ((s i : ℝ) : UnitAddCircle)) •
-      F (fun i => ((s i : ℝ) : UnitAddCircle)) =
-      ∑' k : ι → ℤ, ψ (s + fun i => (k i : ℝ)) * h (s + fun i => (k i : ℝ)) := by
+  have hint
+      : ∀ s : ι → ℝ,
+        UnitAddTorus.mFourier (-m) (fun i => ((s i : ℝ) : UnitAddCircle))
+            • F (fun i => ((s i : ℝ) : UnitAddCircle))
+          = ∑' k : ι → ℤ, ψ (s + fun i => (k i : ℝ)) * h (s + fun i => (k i : ℝ)) := by
     intro s
     rw [hF, smul_eq_mul, ← tsum_mul_left]
     apply tsum_congr
     intro k
-    change ψ s * h (s + fun i => (k i : ℝ)) =
-      ψ (s + fun i => (k i : ℝ)) * h (s + fun i => (k i : ℝ))
+    change ψ s * h (s + fun i => (k i : ℝ))
+      = ψ (s + fun i => (k i : ℝ)) * h (s + fun i => (k i : ℝ))
     have hψk : ψ (s + fun i => (k i : ℝ)) = ψ s := by
       rw [hψ]
       exact congrArg (UnitAddTorus.mFourier (-m)) (hqper s k)
     rw [hψk]
   rw [MeasureTheory.integral_congr_ae (Filter.Eventually.of_forall hint)]
   rw [MeasureTheory.integral_tsum]
-  · have hEach : ∀ k : ι → ℤ, ∫ s in S 0, ψ (s + fun i => (k i : ℝ)) * h (s + fun i => (k i : ℝ)) =
-        ∫ s in S k, ψ s * h s := by
+  · have hEach
+        : ∀ k : ι → ℤ,
+          ∫ s in S 0, ψ (s + fun i => (k i : ℝ)) * h (s + fun i => (k i : ℝ))
+            = ∫ s in S k, ψ s * h s := by
       intro k
       rw [← htrans k]
       exact (hmp k).setIntegral_preimage_emb (hme k) (fun s => ψ s * h s) (S k)
@@ -221,18 +246,22 @@ private theorem mFourierCoeff_periodization_eq_integral {ι : Type} [Fintype ι]
     exact hsum.tsum_eq
   · intro k
     exact ((hψcont.mul hcont).comp (continuous_add_const _)).aestronglyMeasurable
-  · have hEach : ∀ k : ι → ℤ, ∫⁻ s in S 0,
-        ‖ψ (s + fun i => (k i : ℝ)) * h (s + fun i => (k i : ℝ))‖ₑ = ∫⁻ s in S k, ‖ψ s * h s‖ₑ := by
+  · have hEach
+        : ∀ k : ι → ℤ,
+          ∫⁻ s in S 0,
+              ‖ψ (s + fun i => (k i : ℝ)) * h (s + fun i => (k i : ℝ))‖ₑ
+            = ∫⁻ s in S k, ‖ψ s * h s‖ₑ := by
       intro k
       rw [← htrans k]
       exact (hmp k).setLIntegral_comp_preimage_emb (hme k) (fun s => ‖ψ s * h s‖ₑ) (S k)
     simp_rw [hEach]
-    rw [← MeasureTheory.lintegral_iUnion hSmeas hSdisj, hSunion, MeasureTheory.Measure.restrict_univ]
+    rw [← MeasureTheory.lintegral_iUnion hSmeas hSdisj, hSunion,
+      MeasureTheory.Measure.restrict_univ]
     exact hfi.hasFiniteIntegral.ne
 
-private theorem mFourier_coe_eq_exp' {ι : Type} [Fintype ι] (m : ι → ℤ) (s : ι → ℝ) :
-    UnitAddTorus.mFourier m (fun i => ((s i : ℝ) : UnitAddCircle)) =
-      Complex.exp (2 * π * Complex.I * ∑ i, (m i : ℂ) * (s i : ℂ)) := by
+private theorem mFourier_coe_eq_exp' {ι : Type} [Fintype ι] (m : ι → ℤ) (s : ι → ℝ)
+    : UnitAddTorus.mFourier m (fun i => ((s i : ℝ) : UnitAddCircle))
+      = Complex.exp (2 * π * Complex.I * ∑ i, (m i : ℂ) * (s i : ℂ)) := by
   simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, fourier_coe_apply]
   rw [← Complex.exp_sum, Finset.mul_sum]
   congr 1
@@ -240,18 +269,28 @@ private theorem mFourier_coe_eq_exp' {ι : Type} [Fintype ι] (m : ι → ℤ) (
   push_cast
   ring
 
-private theorem integral_fourier_gaussian_eq {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] {ι : Type} [Fintype ι]
-    (φ : E ≃L[ℝ] (ι → ℝ)) :
-    ∃ κ : ℝ, 0 < κ ∧ (∀ t : ℝ, 0 < t → MeasureTheory.Integrable
-      (fun s : ι → ℝ => (Real.exp (-π * t * ‖φ.symm s‖ ^ 2) : ℂ))) ∧ ∀ t : ℝ, 0 < t → ∀ y : E,
-      ∫ s : ι → ℝ, Complex.exp (-2 * π * Complex.I * (inner ℝ y (φ.symm s) : ℂ)) *
-          (Real.exp (-π * t * ‖φ.symm s‖ ^ 2) : ℂ) =
-        ((κ * t ^ (-(finrank ℝ E : ℝ) / 2) * Real.exp (-π * ‖y‖ ^ 2 / t) : ℝ) : ℂ) := by
+private theorem integral_fourier_gaussian_eq
+    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    [MeasurableSpace E] [BorelSpace E]
+    {ι : Type} [Fintype ι]
+    (φ : E ≃L[ℝ] (ι → ℝ))
+    : ∃ κ : ℝ,
+      0 < κ
+        ∧ (∀ t : ℝ,
+          0 < t
+            → MeasureTheory.Integrable (fun s : ι → ℝ => (Real.exp (-π * t * ‖φ.symm s‖ ^ 2) : ℂ)))
+        ∧ ∀ t : ℝ,
+          0 < t
+            → ∀ y : E,
+              ∫ s : ι → ℝ, Complex.exp (-2 * π * Complex.I * (inner ℝ y (φ.symm s) : ℂ)) *
+                  (Real.exp (-π * t * ‖φ.symm s‖ ^ 2) : ℂ)
+                = ((κ * t ^ (-(finrank ℝ E : ℝ) / 2) * Real.exp (-π * ‖y‖ ^ 2 / t) : ℝ) : ℂ) := by
   haveI : (MeasureTheory.Measure.map φ.symm MeasureTheory.volume).IsAddHaarMeasure :=
     φ.symm.isAddHaarMeasure_map _
   set ν : MeasureTheory.Measure E := MeasureTheory.Measure.map φ.symm MeasureTheory.volume with hνdef
-  have hν := MeasureTheory.Measure.isAddLeftInvariant_eq_smul ν (MeasureTheory.volume : MeasureTheory.Measure E)
+  have hν :=
+    MeasureTheory.Measure.isAddLeftInvariant_eq_smul ν
+      (MeasureTheory.volume : MeasureTheory.Measure E)
   set c := ν.addHaarScalarFactor MeasureTheory.volume with hcdef
   have hc : c ≠ 0 := by
     intro h0
@@ -259,8 +298,9 @@ private theorem integral_fourier_gaussian_eq {E : Type} [NormedAddCommGroup E] [
     exact (NeZero.ne ν) hν
   refine ⟨(c : ℝ), NNReal.coe_pos.2 (pos_iff_ne_zero.2 hc), fun t ht => ?_, fun t ht y => ?_⟩
   · have hg : MeasureTheory.Integrable (fun x : E => (Real.exp (-π * t * ‖x‖ ^ 2) : ℂ)) := by
-      have h0 := GaussianFourier.integrable_cexp_neg_mul_sq_norm_add (V := E)
-        (b := ((π * t : ℝ) : ℂ)) (by simp; positivity) 0 (0 : E)
+      have h0 :=
+        GaussianFourier.integrable_cexp_neg_mul_sq_norm_add (V := E) (b := ((π * t : ℝ) : ℂ))
+          (by simp; positivity) 0 (0 : E)
       refine h0.congr (Filter.Eventually.of_forall fun x => ?_)
       simp only [zero_mul, add_zero, Complex.ofReal_exp]
       congr 1
@@ -270,17 +310,20 @@ private theorem integral_fourier_gaussian_eq {E : Type} [NormedAddCommGroup E] [
       rw [hν]
       exact hg.smul_measure_nnreal
     exact (MeasureTheory.integrable_map_equiv φ.symm.toHomeomorph.toMeasurableEquiv _).1 hgν
-  have step1 : ∫ s : ι → ℝ, Complex.exp (-2 * π * Complex.I * (inner ℝ y (φ.symm s) : ℂ)) *
-        (Real.exp (-π * t * ‖φ.symm s‖ ^ 2) : ℂ) =
-      ∫ x, Complex.exp (-2 * π * Complex.I * (inner ℝ y x : ℂ)) *
-        (Real.exp (-π * t * ‖x‖ ^ 2) : ℂ) ∂ν :=
-    (MeasureTheory.integral_map_equiv φ.symm.toHomeomorph.toMeasurableEquiv
-      (fun x => Complex.exp (-2 * π * Complex.I * (inner ℝ y x : ℂ)) *
-        (Real.exp (-π * t * ‖x‖ ^ 2) : ℂ))).symm
+  have step1
+      : ∫ s : ι → ℝ, Complex.exp (-2 * π * Complex.I * (inner ℝ y (φ.symm s) : ℂ)) *
+          (Real.exp (-π * t * ‖φ.symm s‖ ^ 2) : ℂ)
+        = ∫ x, Complex.exp (-2 * π * Complex.I * (inner ℝ y x : ℂ)) *
+            (Real.exp (-π * t * ‖x‖ ^ 2) : ℂ) ∂ν :=
+    (MeasureTheory.integral_map_equiv φ.symm.toHomeomorph.toMeasurableEquiv (fun x =>
+      Complex.exp (-2 * π * Complex.I * (inner ℝ y x : ℂ))
+        * (Real.exp (-π * t * ‖x‖ ^ 2) : ℂ))).symm
   rw [step1, hν, MeasureTheory.integral_smul_nnreal_measure]
-  have step2 : ∀ x : E, Complex.exp (-2 * π * Complex.I * (inner ℝ y x : ℂ)) *
-      (Real.exp (-π * t * ‖x‖ ^ 2) : ℂ) =
-      Complex.exp (-((π * t : ℝ) : ℂ) * (‖x‖ : ℂ) ^ 2 + (-2 * π * Complex.I) * (inner ℝ y x : ℂ)) := by
+  have step2
+      : ∀ x : E,
+        Complex.exp (-2 * π * Complex.I * (inner ℝ y x : ℂ)) * (Real.exp (-π * t * ‖x‖ ^ 2) : ℂ)
+          = Complex.exp
+            (-((π * t : ℝ) : ℂ) * (‖x‖ : ℂ) ^ 2 + (-2 * π * Complex.I) * (inner ℝ y x : ℂ)) := by
     intro x
     rw [Complex.ofReal_exp, ← Complex.exp_add]
     congr 1
@@ -288,8 +331,9 @@ private theorem integral_fourier_gaussian_eq {E : Type} [NormedAddCommGroup E] [
     ring
   simp_rw [step2]
   rw [GaussianFourier.integral_cexp_neg_mul_sq_norm_add (by simp; positivity) _ y]
-  have e1 : ((π : ℂ) / ((π * t : ℝ) : ℂ)) ^ ((finrank ℝ E : ℂ) / 2) =
-      ((t ^ (-(finrank ℝ E : ℝ) / 2) : ℝ) : ℂ) := by
+  have e1
+      : ((π : ℂ) / ((π * t : ℝ) : ℂ)) ^ ((finrank ℝ E : ℂ) / 2)
+        = ((t ^ (-(finrank ℝ E : ℝ) / 2) : ℝ) : ℂ) := by
     rw [show ((π : ℂ) / ((π * t : ℝ) : ℂ)) = ((t⁻¹ : ℝ) : ℂ) by
       push_cast
       field_simp]
@@ -298,8 +342,9 @@ private theorem integral_fourier_gaussian_eq {E : Type} [NormedAddCommGroup E] [
     congr 1
     rw [Real.inv_rpow ht.le, ← Real.rpow_neg ht.le]
     ring_nf
-  have e2 : Complex.exp ((-2 * π * Complex.I) ^ 2 * (‖y‖ : ℂ) ^ 2 / (4 * ((π * t : ℝ) : ℂ))) =
-      ((Real.exp (-π * ‖y‖ ^ 2 / t) : ℝ) : ℂ) := by
+  have e2
+      : Complex.exp ((-2 * π * Complex.I) ^ 2 * (‖y‖ : ℂ) ^ 2 / (4 * ((π * t : ℝ) : ℂ)))
+        = ((Real.exp (-π * ‖y‖ ^ 2 / t) : ℝ) : ℂ) := by
     rw [Complex.ofReal_exp]
     congr 1
     have hpi : (π : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
@@ -313,13 +358,16 @@ private theorem integral_fourier_gaussian_eq {E : Type} [NormedAddCommGroup E] [
   push_cast
   ring
 
-private theorem continuous_tsum_exp_neg_mul_norm_add_sq {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] (L : Submodule ℤ E) [DiscreteTopology L] {a : ℝ} (ha : 0 < a) :
-    Continuous fun v : E => ∑' z : L, Real.exp (-a * ‖(z : E) + v‖ ^ 2) := by
+private theorem continuous_tsum_exp_neg_mul_norm_add_sq
+    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (L : Submodule ℤ E) [DiscreteTopology L]
+    {a : ℝ} (ha : 0 < a)
+    : Continuous fun v : E => ∑' z : L, Real.exp (-a * ‖(z : E) + v‖ ^ 2) := by
   rw [continuous_iff_continuousAt]
   intro v0
   have hs := summable_exp_neg_mul_norm_add_sq L (a := a / 2) (by positivity) v0
-  have hon : ContinuousOn (fun v : E => ∑' z : L, Real.exp (-a * ‖(z : E) + v‖ ^ 2))
+  have hon : ContinuousOn
+      (fun v : E => ∑' z : L, Real.exp (-a * ‖(z : E) + v‖ ^ 2))
       (Metric.ball v0 1) := by
     refine continuousOn_tsum (fun z => by fun_prop) (hs.mul_left (Real.exp a)) ?_
     intro z v hv
@@ -338,19 +386,20 @@ private theorem continuous_tsum_exp_neg_mul_norm_add_sq {E : Type} [NormedAddCom
     nlinarith [mul_le_mul_of_nonneg_left h5 ha.le]
   exact hon.continuousAt (Metric.ball_mem_nhds v0 one_pos)
 
-private theorem exists_coords_zLattice_dual_basis {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E] (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ] :
-    ∃ (ι : Type) (_ : Fintype ι) (φ : E ≃L[ℝ] (ι → ℝ)) (B : (ι → ℤ) ≃ Λ)
-      (D : (ι → ℤ) ≃ dualLat Λ),
-      (∀ k, ((B k : Λ) : E) = φ.symm (fun i => (k i : ℝ))) ∧
-      (∀ m x, inner ℝ ((D m : dualLat Λ) : E) x = ∑ i, (m i : ℝ) * φ x i) := by
+private theorem exists_coords_zLattice_dual_basis
+    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ]
+    : ∃ (ι : Type) (_ : Fintype ι) (φ : E ≃L[ℝ] (ι → ℝ)) (B : (ι → ℤ) ≃ Λ)
+        (D : (ι → ℤ) ≃ dualLat Λ),
+      (∀ k, ((B k : Λ) : E) = φ.symm (fun i => (k i : ℝ)))
+        ∧ (∀ m x, inner ℝ ((D m : dualLat Λ) : E) x = ∑ i, (m i : ℝ) * φ x i) := by
   classical
   let b := Module.Free.chooseBasis ℤ Λ
   let bR := b.ofZLatticeBasis ℝ Λ
   let φ : E ≃L[ℝ] (Module.Free.ChooseBasisIndex ℤ Λ → ℝ) := bR.equivFun.toContinuousLinearEquiv
   have hφ : ∀ x i, φ x i = bR.repr x i := fun x i => rfl
-  let d : Module.Free.ChooseBasisIndex ℤ Λ → E :=
-    fun i => (InnerProductSpace.toDual ℝ E).symm (LinearMap.toContinuousLinearMap (bR.coord i))
+  let d : Module.Free.ChooseBasisIndex ℤ Λ → E := fun i =>
+    (InnerProductSpace.toDual ℝ E).symm (LinearMap.toContinuousLinearMap (bR.coord i))
   have hd : ∀ i x, inner ℝ (d i) x = φ x i := by
     intro i x
     simp [d, hφ, InnerProductSpace.toDual_symm_apply, Basis.coord_apply]
@@ -396,10 +445,12 @@ private theorem exists_coords_zLattice_dual_basis {E : Type} [NormedAddCommGroup
     rw [real_inner_comm, hy, hφb, hn j]
     simp [Pi.single_apply]
   let D : (Module.Free.ChooseBasisIndex ℤ Λ → ℤ) ≃ dualLat Λ :=
-    Equiv.ofBijective (fun m => ⟨y m, hmem m⟩)
-      ⟨fun m m' h => hinj (congrArg Subtype.val h), fun z => by
+    Equiv.ofBijective (fun m => ⟨y m, hmem m⟩) ⟨
+      fun m m' h => hinj (congrArg Subtype.val h),
+      fun z => by
         obtain ⟨m, hm⟩ := hsurj z.1 z.2
-        exact ⟨m, Subtype.ext hm⟩⟩
+        exact ⟨m, Subtype.ext hm⟩
+    ⟩
   refine ⟨Module.Free.ChooseBasisIndex ℤ Λ, inferInstance, φ, b.equivFun.symm.toEquiv, D, ?_, ?_⟩
   · intro k
     apply φ.injective
@@ -418,22 +469,23 @@ theorem poissonGauss : PoissonGauss := by
   haveI : BorelSpace E := ⟨rfl⟩
   obtain ⟨ι, _, φ, B, D, hB, hD⟩ := exists_coords_zLattice_dual_basis Λ
   obtain ⟨κ, hκ, hInt, hG⟩ := integral_fourier_gaussian_eq φ
-  have sum1 : ∀ t : ℝ, 0 < t → ∀ v : E,
-      Summable fun x : Λ => Real.exp (-π * t * ‖(x : E) + v‖ ^ 2) := by
+  have sum1
+      : ∀ t : ℝ, 0 < t → ∀ v : E, Summable fun x : Λ => Real.exp (-π * t * ‖(x : E) + v‖ ^ 2) := by
     intro t ht v
     refine (summable_exp_neg_mul_norm_add_sq Λ (a := π * t) (by positivity) v).congr fun z => ?_
     ring_nf
-  have sum2 : ∀ t : ℝ, 0 < t →
-      Summable fun y : dualLat Λ => Real.exp (-π * ‖(y : E)‖ ^ 2 / t) := by
+  have sum2 : ∀ t : ℝ, 0 < t → Summable fun y : dualLat Λ => Real.exp (-π * ‖(y : E)‖ ^ 2 / t) := by
     letI : DiscreteTopology (dualLat Λ) := instDiscreteDualLat Λ
     intro t ht
-    refine (summable_exp_neg_mul_norm_add_sq (dualLat Λ) (a := π / t) (by positivity) 0).congr fun z => ?_
+    refine (summable_exp_neg_mul_norm_add_sq (dualLat Λ) (a := π / t) (by positivity) 0).congr
+      fun z => ?_
     rw [add_zero]
     ring_nf
   refine ⟨sum1, sum2, κ, hκ, fun t ht v => ?_⟩
   set P : E → ℝ := fun w => ∑' x : Λ, Real.exp (-π * t * ‖(x : E) + w‖ ^ 2) with hP
   have hPcont : Continuous P := by
-    refine (continuous_tsum_exp_neg_mul_norm_add_sq Λ (a := π * t) (by positivity)).congr fun w => ?_
+    refine (continuous_tsum_exp_neg_mul_norm_add_sq Λ (a := π * t) (by positivity)).congr fun w =>
+      ?_
     simp only [hP]
     congr 1
     funext x
@@ -459,26 +511,29 @@ theorem poissonGauss : PoissonGauss := by
   obtain ⟨F, hF⟩ := exists_continuous_torus_lift_of_periodic G hGcont hGper
   set h : (ι → ℝ) → ℂ := fun s => (Real.exp (-π * t * ‖φ.symm s‖ ^ 2) : ℂ) with hhdef
   have hhcont : Continuous h :=
-    Complex.continuous_ofReal.comp (Real.continuous_exp.comp
-      (continuous_const.mul ((continuous_norm.comp φ.symm.continuous).pow 2)))
-  have hFh : ∀ s : ι → ℝ, F (fun i => ((s i : ℝ) : UnitAddCircle)) =
-      ∑' k : ι → ℤ, h (s + fun i => (k i : ℝ)) := by
+    Complex.continuous_ofReal.comp (Real.continuous_exp.comp (continuous_const.mul
+      ((continuous_norm.comp φ.symm.continuous).pow 2)))
+  have hFh
+      : ∀ s : ι → ℝ,
+        F (fun i => ((s i : ℝ) : UnitAddCircle)) = ∑' k : ι → ℤ, h (s + fun i => (k i : ℝ)) := by
     intro s
     rw [hF]
     simp only [hGdef, hP]
     rw [Complex.ofReal_tsum, ← B.tsum_eq]
     apply tsum_congr
     intro c
-    change (Real.exp (-π * t * ‖(B c : E) + φ.symm s‖ ^ 2) : ℂ) =
-      h (s + fun i => (c i : ℝ))
-    change (Real.exp (-π * t * ‖(B c : E) + φ.symm s‖ ^ 2) : ℂ) =
-      (Real.exp (-π * t * ‖φ.symm (s + fun i => (c i : ℝ))‖ ^ 2) : ℂ)
+    change (Real.exp (-π * t * ‖(B c : E) + φ.symm s‖ ^ 2) : ℂ) = h (s + fun i => (c i : ℝ))
+    change (Real.exp (-π * t * ‖(B c : E) + φ.symm s‖ ^ 2) : ℂ)
+      = (Real.exp (-π * t * ‖φ.symm (s + fun i => (c i : ℝ))‖ ^ 2) : ℂ)
     rw [map_add, ← hB c]
     congr 2
     abel
-  have hcoef : ∀ m : ι → ℤ, UnitAddTorus.mFourierCoeff F m =
-      ((κ * t ^ (-(finrank ℝ E : ℝ) / 2) *
-        Real.exp (-π * ‖((D m : dualLat Λ) : E)‖ ^ 2 / t) : ℝ) : ℂ) := by
+  have hcoef
+      : ∀ m : ι → ℤ,
+        UnitAddTorus.mFourierCoeff F m
+          = ((κ * t ^ (-(finrank ℝ E : ℝ) / 2) * Real.exp (-π * ‖((D m : dualLat Λ) : E)‖ ^ 2 / t)
+              : ℝ)
+            : ℂ) := by
     intro m
     rw [mFourierCoeff_periodization_eq_integral h (hInt t ht) hhcont F hFh m, ← hG t ht (D m)]
     congr 1
@@ -489,33 +544,47 @@ theorem poissonGauss : PoissonGauss := by
       Complex.ofReal_mul, Complex.ofReal_intCast]
     ring
   have hsumc : Summable (UnitAddTorus.mFourierCoeff F) := by
-    have e1 : UnitAddTorus.mFourierCoeff F = fun m => ((κ * t ^ (-(finrank ℝ E : ℝ) / 2) *
-        Real.exp (-π * ‖((D m : dualLat Λ) : E)‖ ^ 2 / t) : ℝ) : ℂ) := funext hcoef
+    have e1
+        : UnitAddTorus.mFourierCoeff F
+          = fun m =>
+            ((κ * t ^ (-(finrank ℝ E : ℝ) / 2) * Real.exp (-π * ‖((D m : dualLat Λ) : E)‖ ^ 2 / t)
+                : ℝ)
+              : ℂ) :=
+      funext hcoef
     rw [e1]
     apply Complex.summable_ofReal.2
     apply Summable.mul_left
-    exact (D.summable_iff (f := fun y : dualLat Λ => Real.exp (-π * ‖(y : E)‖ ^ 2 / t))).2 (sum2 t ht)
-  have hs := UnitAddTorus.hasSum_mFourier_series_apply_of_summable hsumc
-    (fun i => ((φ v i : ℝ) : UnitAddCircle))
+    exact (D.summable_iff (f := fun y : dualLat Λ => Real.exp (-π * ‖(y : E)‖ ^ 2 / t))).2
+      (sum2 t ht)
+  have hs :=
+    UnitAddTorus.hasSum_mFourier_series_apply_of_summable hsumc
+      (fun i => ((φ v i : ℝ) : UnitAddCircle))
   rw [hF] at hs
   simp only [hGdef, ContinuousLinearEquiv.symm_apply_apply] at hs
   have hre := Complex.reCLM.hasSum hs
   simp only [Complex.reCLM_apply, Complex.ofReal_re] at hre
-  have hterm : ∀ m : ι → ℤ, (UnitAddTorus.mFourierCoeff F m •
-      UnitAddTorus.mFourier m (fun i => ((φ v i : ℝ) : UnitAddCircle))).re =
-      κ * t ^ (-(finrank ℝ E : ℝ) / 2) * (Real.exp (-π * ‖((D m : dualLat Λ) : E)‖ ^ 2 / t) *
-        Real.cos (2 * π * inner ℝ ((D m : dualLat Λ) : E) v)) := by
+  have hterm
+      : ∀ m : ι → ℤ,
+        (UnitAddTorus.mFourierCoeff F m
+            • UnitAddTorus.mFourier m (fun i => ((φ v i : ℝ) : UnitAddCircle))).re
+          = κ * t ^ (-(finrank ℝ E : ℝ) / 2)
+            * (Real.exp (-π * ‖((D m : dualLat Λ) : E)‖ ^ 2 / t)
+              * Real.cos (2 * π * inner ℝ ((D m : dualLat Λ) : E) v)) := by
     intro m
     rw [hcoef, mFourier_coe_eq_exp', smul_eq_mul, Complex.re_ofReal_mul]
-    have e2 : (2 * π * Complex.I * ∑ i, (m i : ℂ) * (φ v i : ℂ)) =
-        ((2 * π * inner ℝ ((D m : dualLat Λ) : E) v : ℝ) : ℂ) * Complex.I := by
+    have e2
+        : (2 * π * Complex.I * ∑ i, (m i : ℂ) * (φ v i : ℂ))
+          = ((2 * π * inner ℝ ((D m : dualLat Λ) : E) v : ℝ) : ℂ) * Complex.I := by
       rw [hD]
       push_cast
       ring
     rw [e2, Complex.exp_ofReal_mul_I_re]
     ring
-  have hre2 : HasSum (fun y : dualLat Λ => κ * t ^ (-(finrank ℝ E : ℝ) / 2) *
-      (Real.exp (-π * ‖(y : E)‖ ^ 2 / t) * Real.cos (2 * π * inner ℝ (y : E) v))) (P v) := by
+  have hre2 : HasSum
+      (fun y : dualLat Λ =>
+        κ * t ^ (-(finrank ℝ E : ℝ) / 2)
+          * (Real.exp (-π * ‖(y : E)‖ ^ 2 / t) * Real.cos (2 * π * inner ℝ (y : E) v)))
+      (P v) := by
     rw [← D.hasSum_iff]
     refine hre.congr_fun ?_
     intro m

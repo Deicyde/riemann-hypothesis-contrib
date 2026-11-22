@@ -21,9 +21,10 @@ open CategoryTheory Limits
 
 namespace GlobalTheory.TorsionChart
 
-theorem pushout_inl_surjective_and_ker {A B C D : CommRingCat.{0}} {f : A ⟶ B} {g : A ⟶ C}
-    {i : B ⟶ D} {j : C ⟶ D} (po : IsPushout f g i j) (hg : Function.Surjective g.hom) :
-    Function.Surjective i.hom ∧ RingHom.ker i.hom = Ideal.map f.hom (RingHom.ker g.hom) := by
+theorem pushout_inl_surjective_and_ker
+    {A B C D : CommRingCat.{0}} {f : A ⟶ B} {g : A ⟶ C} {i : B ⟶ D} {j : C ⟶ D}
+    (po : IsPushout f g i j) (hg : Function.Surjective g.hom)
+    : Function.Surjective i.hom ∧ RingHom.ker i.hom = Ideal.map f.hom (RingHom.ker g.hom) := by
   set I := Ideal.map f.hom (RingHom.ker g.hom) with hIdef
   have hw : ∀ a, i.hom (f.hom a) = j.hom (g.hom a) := fun a => congr($(po.w).hom a)
   have hI : I ≤ RingHom.ker i.hom := by
@@ -53,7 +54,8 @@ theorem pushout_inl_surjective_and_ker {A B C D : CommRingCat.{0}} {f : A ⟶ B}
       obtain ⟨a, rfl⟩ := hg c
       change lift.hom (ψ.hom (g.hom a)) = j.hom (g.hom a)
       rw [show ψ.hom (g.hom a) = mk.hom (f.hom a) from
-        (RingHom.liftOfSurjective_comp_apply g.hom hg φ a), ← hw]
+          (RingHom.liftOfSurjective_comp_apply g.hom hg φ a),
+        ← hw]
       rfl
   refine ⟨fun d => ?_, le_antisymm (fun b hb => ?_) hI⟩
   · obtain ⟨b, hb⟩ := Ideal.Quotient.mk_surjective ((po.desc mk ψ hψ).hom d)

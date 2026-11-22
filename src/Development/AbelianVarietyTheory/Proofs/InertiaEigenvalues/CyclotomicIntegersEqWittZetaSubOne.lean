@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Finrank
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct GlobalTheory.HWL GlobalTheory.Prism GlobalTheory.PrismS Polynomial
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct GlobalTheory.HWL GlobalTheory.Prism GlobalTheory.PrismS Polynomial
 open scoped IntermediateField
 
 namespace GlobalTheory.PrismS.Poly
@@ -22,19 +23,23 @@ theorem mem_OL_of_norm_le (K : FinExt l) (y : ↥K.1) (h : ‖(y : Om l)‖ ≤ 
     rw [lifts_iff_coeff_lifts]
     exact fun n => ⟨⟨_, h n⟩, rfl⟩
   obtain ⟨q, hq, -, hm⟩ := lifts_and_degree_eq_and_monic hl (minpoly.monic hi)
-  have h1 : IsIntegral ℤ_[l] (y : Om l) := ⟨q, hm, by
-    rw [← aeval_def, ← aeval_map_algebraMap ℚ_[l], hq, minpoly.aeval]⟩
+  have h1 : IsIntegral ℤ_[l] (y : Om l) :=
+    ⟨q, hm, by rw [← aeval_def, ← aeval_map_algebraMap ℚ_[l], hq, minpoly.aeval]⟩
   exact (isIntegral_algHom_iff (K.1.val.restrictScalars ℤ_[l]) K.1.val.toRingHom.injective).1 h1
 
-theorem norm_coeff_le (K : FinExt l) (N : ℕ) (π : Om l)
-    (hπ : ‖π‖ = (l : ℝ) ^ (-(1 : ℝ) / (N : ℝ))) (p : (↥(K0 K))[X])
-    (hd : p.natDegree < N) (h1 : ‖aeval π p‖ ≤ 1) (j : ℕ) :
-    ‖((p.coeff j : ↥(K0 K)) : Om l)‖ ≤ 1 := by
+theorem norm_coeff_le
+    (K : FinExt l)
+    (N : ℕ) (π : Om l) (hπ : ‖π‖ = (l : ℝ) ^ (-(1 : ℝ) / (N : ℝ)))
+    (p : (↥(K0 K))[X]) (hd : p.natDegree < N) (h1 : ‖aeval π p‖ ≤ 1)
+    (j : ℕ)
+    : ‖((p.coeff j : ↥(K0 K)) : Om l)‖ ≤ 1 := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have hl0 : (0 : ℝ) < l := by linarith
   have hN : (0 : ℝ) < N := by exact_mod_cast (Nat.zero_le _).trans_lt hd
-  have key : ∀ i ∈ p.support, ∃ n : ℤ, ‖((p.coeff i : ↥(K0 K)) : Om l)‖ = (l : ℝ) ^ n ∧
-      ‖p.coeff i • π ^ i‖ = (l : ℝ) ^ ((n : ℝ) - (i : ℝ) / N) := by
+  have key
+      : ∀ i ∈ p.support, ∃ n : ℤ,
+        ‖((p.coeff i : ↥(K0 K)) : Om l)‖ = (l : ℝ) ^ n
+          ∧ ‖p.coeff i • π ^ i‖ = (l : ℝ) ^ ((n : ℝ) - (i : ℝ) / N) := by
     intro i hi
     have h0 : ((p.coeff i : ↥(K0 K)) : Om l) ≠ 0 := by
       have := mem_support_iff.1 hi
@@ -62,7 +67,8 @@ theorem norm_coeff_le (K : FinExt l) (N : ℕ) (π : Om l)
     have hk' : k < N := (le_natDegree_of_mem_supp k hk).trans_lt hd
     have h5 : (i : ℤ) - k = 0 := by
       apply Int.eq_zero_of_abs_lt_dvd (m := N) ⟨n - m, by rw [← h4]; ring⟩
-      rw [abs_lt]; constructor <;> omega
+      rw [abs_lt]
+      constructor <;> omega
     omega
   by_cases hj : j ∈ p.support
   swap
@@ -88,9 +94,11 @@ theorem norm_coeff_le (K : FinExt l) (N : ℕ) (π : Om l)
   rw [hn]
   exact zpow_le_one_of_nonpos₀ hl1.le (by omega)
 
-theorem coe_eval₂ (K : FinExt l) (π : Om l) (t : OC l) (ht : (t : ℂ_[l]) = (π : ℂ_[l]))
-    (r : (WK K)[X]) : ((r.eval₂ (intToOC (unr K)) t : OC l) : ℂ_[l]) =
-      algebraMap (Om l) ℂ_[l] (aeval π (r.map ((OL (unr K)).val.toRingHom : WK K →+* ↥(K0 K)))) := by
+theorem coe_eval₂
+    (K : FinExt l) (π : Om l) (t : OC l) (ht : (t : ℂ_[l]) = (π : ℂ_[l])) (r : (WK K)[X])
+    : ((r.eval₂ (intToOC (unr K)) t : OC l) : ℂ_[l])
+      = algebraMap (Om l) ℂ_[l]
+        (aeval π (r.map ((OL (unr K)).val.toRingHom : WK K →+* ↥(K0 K)))) := by
   induction r using Polynomial.induction_on' with
   | add p q hp hq =>
     rw [eval₂_add, Polynomial.map_add (f := _), map_add (f := _), map_add (f := _), ← hp, ← hq]; rfl
@@ -100,30 +108,46 @@ theorem coe_eval₂ (K : FinExt l) (π : Om l) (t : OC l) (ht : (t : ℂ_[l]) = 
     rw [ht]
     rfl
 
-theorem exists_poly (K : FinExt l) (s : ℕ) (hs : 1 ≤ s) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ s))
-    (x : Om l) (hx : x ∈ Ks K s) :
-    ∃ p : (↥(K0 K))[X], p.natDegree < l ^ (s - 1) * (l - 1) ∧ aeval (ζ - 1) p = x := by
+theorem exists_poly
+    (K : FinExt l)
+    (s : ℕ) (hs : 1 ≤ s)
+    (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ s))
+    (x : Om l) (hx : x ∈ Ks K s)
+    : ∃ p : (↥(K0 K))[X], p.natDegree < l ^ (s - 1) * (l - 1) ∧ aeval (ζ - 1) p = x := by
   have hlp : l.Prime := Fact.out
   have hint : IsIntegral ↥(K0 K) ζ := Algebra.IsIntegral.isIntegral ζ
   rw [GlobalTheory.Cyc.Ks_eq_restrictScalars K s ζ hζ] at hx
   have hx' : x ∈ ((↥(K0 K))⟮ζ⟯).toSubalgebra := hx
   rw [IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic,
-    Algebra.adjoin_singleton_eq_range_aeval] at hx'
+      Algebra.adjoin_singleton_eq_range_aeval]
+    at hx'
   obtain ⟨q, rfl⟩ := hx'
   refine ⟨taylor 1 (q %ₘ minpoly ↥(K0 K) ζ), ?_, ?_⟩
-  · rw [natDegree_taylor, ← Nat.totient_prime_pow hlp hs,
-      ← natDegree_cyclotomic (l ^ s) ↥(K0 K), ← GlobalTheory.Cyc.minpoly_unramifiedSubfield_eq_cyclotomic K s hs ζ hζ]
+  · rw [natDegree_taylor, ← Nat.totient_prime_pow hlp hs, ← natDegree_cyclotomic (l ^ s) ↥(K0 K),
+      ← GlobalTheory.Cyc.minpoly_unramifiedSubfield_eq_cyclotomic K s hs ζ hζ]
     exact natDegree_modByMonic_lt _ (minpoly.monic hint) (minpoly.ne_one _ _)
   · rw [taylor_apply, aeval_comp]
     simp only [map_add (f := _), aeval_X, aeval_C, map_one, sub_add_cancel]
     exact aeval_modByMonic_eq_self_of_root (minpoly.aeval _ _)
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ), 1 ≤ s → ∀ ζ : Om l, IsPrimitiveRoot ζ (l ^ s) → ∀ t : OC l, (t : ℂ_[l]) = ((ζ - 1 : Om l) : ℂ_[l]) → (∀ r : Polynomial (WK K), r.natDegree < l ^ (s - 1) * (l - 1) → r.eval₂ (intToOC (unr K)) t = 0 → r = 0) ∧ (K.1 ≤ Ks K s → ∀ x : ↥(OL K), ∃ r : Polynomial (WK K), r.eval₂ (intToOC (unr K)) t = intToOC K x) := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ),
+      1 ≤ s
+        → ∀ ζ : Om l,
+          IsPrimitiveRoot ζ (l ^ s)
+            → ∀ t : OC l,
+              (t : ℂ_[l]) = ((ζ - 1 : Om l) : ℂ_[l])
+                → (∀ r : Polynomial (WK K),
+                    r.natDegree < l ^ (s - 1) * (l - 1) → r.eval₂ (intToOC (unr K)) t = 0 → r = 0)
+                  ∧ (K.1 ≤ Ks K s
+                    → ∀ x : ↥(OL K), ∃ r : Polynomial (WK K),
+                      r.eval₂ (intToOC (unr K)) t = intToOC K x) := by
   intro l _ K s hs ζ hζ t ht
   have hlp : l.Prime := Fact.out
   have hnorm : ‖ζ - 1‖ = (l : ℝ) ^ (-(1 : ℝ) / ((l ^ (s - 1) * (l - 1) : ℕ) : ℝ)) := by
-    have h1 := GlobalTheory.Cyc.norm_primitiveRoot_sub_one l s hs (ζ : PadicComplex l)
-      (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
+    have h1 :=
+      GlobalTheory.Cyc.norm_primitiveRoot_sub_one l s hs (ζ : PadicComplex l)
+        (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
     push_cast [Nat.cast_sub hlp.one_le]
     rw [← h1, ← PadicComplex.norm_extends]
     congr 1

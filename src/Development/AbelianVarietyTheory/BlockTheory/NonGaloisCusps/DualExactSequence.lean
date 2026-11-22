@@ -10,7 +10,8 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.DualExactSequence
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N TensorProduct
 
 variable {l : ℕ} [Fact l.Prime]
 
@@ -31,8 +32,7 @@ abbrev iota (T : Lat K LL) : T.V ⊗[ℚ_[l]] P.R.B →ₗ[↥LL.1] T.V ⊗[ℚ_
 abbrev filV (T : Lat K LL) (a : ℤ) : Submodule ↥LL.1 (T.V ⊗[ℚ_[l]] P.R.BdR) :=
   FilV (P.PD K) (LL := ↥LL.1) (V := T.V) a
 
-abbrev mulK (T : Lat K LL) (c : ↥K.1) :
-    T.V ⊗[ℚ_[l]] P.R.BdR →ₗ[↥LL.1] T.V ⊗[ℚ_[l]] P.R.BdR :=
+abbrev mulK (T : Lat K LL) (c : ↥K.1) : T.V ⊗[ℚ_[l]] P.R.BdR →ₗ[↥LL.1] T.V ⊗[ℚ_[l]] P.R.BdR :=
   mulVdR (Qp := ℚ_[l]) (K := ↥K.1) (BdR := P.R.BdR) (LL := ↥LL.1) (V := T.V) c
 
 def filD (T : Lat K LL) (a : ℤ) : Submodule ↥LL.1 (T.V ⊗[ℚ_[l]] P.R.BdR) :=
@@ -43,8 +43,8 @@ def tdR (K : FinExt l) : P.R.BdRˣ := ((P.PD K).t_unit.map (P.PD K).ι).unit
 def offComp (T : Lat K LL) (τ : Emb K LL) : Submodule ↥LL.1 (T.V ⊗[ℚ_[l]] P.R.BdR) :=
   Submodule.span ↥LL.1 {z | ∃ (c : ↥K.1), ∃ y ∈ DdR (P.PD K) T.ρ, z = mulK P T c y - τ c • y}
 
-def mapdR {T T' : Lat K LL} (f : T.V →ₗ[↥LL.1] T'.V) :
-    T.V ⊗[ℚ_[l]] P.R.BdR →ₗ[↥LL.1] T'.V ⊗[ℚ_[l]] P.R.BdR :=
+def mapdR {T T' : Lat K LL} (f : T.V →ₗ[↥LL.1] T'.V)
+    : T.V ⊗[ℚ_[l]] P.R.BdR →ₗ[↥LL.1] T'.V ⊗[ℚ_[l]] P.R.BdR :=
   AlgebraTensorModule.map f (LinearMap.id : P.R.BdR →ₗ[ℚ_[l]] P.R.BdR)
 
 end Objects
@@ -54,8 +54,8 @@ section Shapes
 variable {K LL : FinExt l}
 
 def IsSES {T₀ T₁ T₂ : Lat K LL} (f : T₀.V →ₗ[↥LL.1] T₁.V) (g : T₁.V →ₗ[↥LL.1] T₂.V) : Prop :=
-  (∀ σ x, f (T₀.ρ σ x) = T₁.ρ σ (f x)) ∧ (∀ σ x, g (T₁.ρ σ x) = T₂.ρ σ (g x)) ∧
-    Function.Injective f ∧ Function.Exact f g ∧ Function.Surjective g
+  (∀ σ x, f (T₀.ρ σ x) = T₁.ρ σ (f x)) ∧ (∀ σ x, g (T₁.ρ σ x) = T₂.ρ σ (g x)) ∧ Function.Injective f
+    ∧ Function.Exact f g ∧ Function.Surjective g
 
 def IsDualRep {T T' : Lat K LL} (β : T.V →ₗ[↥LL.1] T'.V →ₗ[↥LL.1] ↥LL.1) : Prop :=
   (∀ σ x y, β (T.ρ σ x) (T'.ρ σ y) = β x y) ∧ Function.Bijective β.flip
@@ -63,13 +63,15 @@ def IsDualRep {T T' : Lat K LL} (β : T.V →ₗ[↥LL.1] T'.V →ₗ[↥LL.1] �
 def IsTensorRep {T₁ T₂ T₃ : Lat K LL} (e : T₁.V ⊗[↥LL.1] T₂.V ≃ₗ[↥LL.1] T₃.V) : Prop :=
   ∀ σ x y, T₃.ρ σ (e (x ⊗ₜ[↥LL.1] y)) = e (T₁.ρ σ x ⊗ₜ[↥LL.1] T₂.ρ σ y)
 
-def SubSES (P : LocPrime l) {T₀ T₁ T₂ : Lat K LL} (f : T₀.V →ₗ[↥LL.1] T₁.V)
-    (g : T₁.V →ₗ[↥LL.1] T₂.V) (A₀ : Submodule ↥LL.1 (T₀.V ⊗[ℚ_[l]] P.R.BdR))
-    (A₁ : Submodule ↥LL.1 (T₁.V ⊗[ℚ_[l]] P.R.BdR))
-    (A₂ : Submodule ↥LL.1 (T₂.V ⊗[ℚ_[l]] P.R.BdR)) : Prop :=
-  (∀ x ∈ A₀, mapdR P f x = 0 → x = 0) ∧
-    (∀ y, (∃ x ∈ A₀, mapdR P f x = y) ↔ (y ∈ A₁ ∧ mapdR P g y = 0)) ∧
-    (∀ z, (∃ y ∈ A₁, mapdR P g y = z) ↔ z ∈ A₂)
+def SubSES
+    (P : LocPrime l)
+    {T₀ T₁ T₂ : Lat K LL} (f : T₀.V →ₗ[↥LL.1] T₁.V) (g : T₁.V →ₗ[↥LL.1] T₂.V)
+    (A₀ : Submodule ↥LL.1 (T₀.V ⊗[ℚ_[l]] P.R.BdR)) (A₁ : Submodule ↥LL.1 (T₁.V ⊗[ℚ_[l]] P.R.BdR))
+    (A₂ : Submodule ↥LL.1 (T₂.V ⊗[ℚ_[l]] P.R.BdR))
+    : Prop :=
+  (∀ x ∈ A₀, mapdR P f x = 0 → x = 0)
+    ∧ (∀ y, (∃ x ∈ A₀, mapdR P f x = y) ↔ (y ∈ A₁ ∧ mapdR P g y = 0))
+    ∧ (∀ z, (∃ y ∈ A₁, mapdR P g y = z) ↔ z ∈ A₂)
 
 end Shapes
 
@@ -77,57 +79,68 @@ section At
 
 variable (P : LocPrime l) (K LL : FinExt l)
 
-def CrysDeRhamAt : Prop :=
-  ∀ T : Lat K LL, IsCrys (P.PD K) T.ρ → IsDR (P.PD K) T.ρ
+def CrysDeRhamAt : Prop := ∀ T : Lat K LL, IsCrys (P.PD K) T.ρ → IsDR (P.PD K) T.ρ
 
 def DdRSpanAt : Prop :=
-  ∀ T : Lat K LL, IsCrys (P.PD K) T.ρ →
-    DdR (P.PD K) T.ρ = Submodule.span ↥LL.1
-      {z | ∃ (c : ↥K.1), ∃ x ∈ Dcris (P.PD K) T.ρ, z = mulK P T c (iota P T x)}
+  ∀ T : Lat K LL,
+    IsCrys (P.PD K) T.ρ
+      → DdR (P.PD K) T.ρ
+        = Submodule.span ↥LL.1
+          {z | ∃ (c : ↥K.1), ∃ x ∈ Dcris (P.PD K) T.ρ, z = mulK P T c (iota P T x)}
 
 def ComponentIsoAt : Prop :=
-  ∀ T : Lat K LL, IsCrys (P.PD K) T.ρ → ∀ τ : Emb K LL,
-    ∃ e : ↥(DcrisL (P.PD K) T.ρ (embeddingRestrictMaxUnramified τ)) ≃ₗ[↥LL.1] ↥(DdRE (P.PD K) T.ρ τ),
-      ∀ x : ↥(DcrisL (P.PD K) T.ρ (embeddingRestrictMaxUnramified τ)), iota P T (x : T.V ⊗[ℚ_[l]] P.R.B) - (e x : T.V ⊗[ℚ_[l]] P.R.BdR) ∈ offComp P T τ
+  ∀ T : Lat K LL,
+    IsCrys (P.PD K) T.ρ
+      → ∀ τ : Emb K LL,
+        ∃ e : ↥(DcrisL (P.PD K) T.ρ (embeddingRestrictMaxUnramified τ)) ≃ₗ[↥LL.1] ↥(DdRE (P.PD K) T.ρ τ),
+          ∀ x : ↥(DcrisL (P.PD K) T.ρ (embeddingRestrictMaxUnramified τ)),
+            iota P T (x : T.V ⊗[ℚ_[l]] P.R.B) - (e x : T.V ⊗[ℚ_[l]] P.R.BdR) ∈ offComp P T τ
 
 def UnramOntoAt : Prop :=
-  K.1 ≤ MaximalUnramifiedExtension l → ∀ T : Lat K LL, IsCrys (P.PD K) T.ρ →
-    (Dcris (P.PD K) T.ρ).map (iota P T) = DdR (P.PD K) T.ρ
+  K.1 ≤ MaximalUnramifiedExtension l
+    → ∀ T : Lat K LL, IsCrys (P.PD K) T.ρ → (Dcris (P.PD K) T.ρ).map (iota P T) = DdR (P.PD K) T.ρ
 
 def FilZeroAt : Prop :=
-  ∀ T : Lat K LL, IsDR (P.PD K) T.ρ →
-    filV P T 0 = Submodule.span ↥LL.1
-      {z | ∃ (a : ℤ), ∃ b ∈ (P.PD K).Fil 0, ∃ d ∈ filD P T a,
-        z = mulVR T (((tdR P K ^ (-a) : P.R.BdRˣ) : P.R.BdR) * b) d}
+  ∀ T : Lat K LL,
+    IsDR (P.PD K) T.ρ
+      → filV P T 0
+        = Submodule.span ↥LL.1
+          {z | ∃ (a : ℤ), ∃ b ∈ (P.PD K).Fil 0, ∃ d ∈ filD P T a,
+            z = mulVR T (((tdR P K ^ (-a) : P.R.BdRˣ) : P.R.BdR) * b) d}
 
 def StrictAt : Prop :=
-  ∀ (T₀ T₁ T₂ : Lat K LL) (f : T₀.V →ₗ[↥LL.1] T₁.V) (g : T₁.V →ₗ[↥LL.1] T₂.V), IsSES f g →
-    IsDR (P.PD K) T₀.ρ → IsDR (P.PD K) T₁.ρ → IsDR (P.PD K) T₂.ρ →
-    ∀ (τ : Emb K LL) (a : ℤ), SubSES P f g
-      (FildR (P.PD K) T₀.ρ τ a) (FildR (P.PD K) T₁.ρ τ a) (FildR (P.PD K) T₂.ρ τ a)
+  ∀ (T₀ T₁ T₂ : Lat K LL) (f : T₀.V →ₗ[↥LL.1] T₁.V) (g : T₁.V →ₗ[↥LL.1] T₂.V),
+    IsSES f g → IsDR (P.PD K) T₀.ρ → IsDR (P.PD K) T₁.ρ → IsDR (P.PD K) T₂.ρ
+      → ∀ (τ : Emb K LL) (a : ℤ),
+        SubSES P f g (FildR (P.PD K) T₀.ρ τ a) (FildR (P.PD K) T₁.ρ τ a) (FildR (P.PD K) T₂.ρ τ a)
 
 def DualJumpsAt : Prop :=
-  ∀ (T T' : Lat K LL) (β : T.V →ₗ[↥LL.1] T'.V →ₗ[↥LL.1] ↥LL.1), IsDualRep β →
-    IsDR (P.PD K) T.ρ →
-    IsDR (P.PD K) T'.ρ ∧ ∀ (τ : Emb K LL) (a : ℤ),
-      (IsJumpV (P.PD K) T'.ρ τ a ↔ IsJumpV (P.PD K) T.ρ τ (-a)) ∧
-        multV (P.PD K) T'.ρ τ a = multV (P.PD K) T.ρ τ (-a)
+  ∀ (T T' : Lat K LL) (β : T.V →ₗ[↥LL.1] T'.V →ₗ[↥LL.1] ↥LL.1),
+    IsDualRep β → IsDR (P.PD K) T.ρ
+      → IsDR (P.PD K) T'.ρ
+        ∧ ∀ (τ : Emb K LL) (a : ℤ),
+          (IsJumpV (P.PD K) T'.ρ τ a ↔ IsJumpV (P.PD K) T.ρ τ (-a))
+            ∧ multV (P.PD K) T'.ρ τ a = multV (P.PD K) T.ρ τ (-a)
 
 def TensorJumpsAt : Prop :=
-  ∀ (T₁ T₂ T₃ : Lat K LL) (e : T₁.V ⊗[↥LL.1] T₂.V ≃ₗ[↥LL.1] T₃.V), IsTensorRep e →
-    IsDR (P.PD K) T₁.ρ → IsDR (P.PD K) T₂.ρ →
-    IsDR (P.PD K) T₃.ρ ∧ ∀ (τ : Emb K LL) (c : ℤ),
-      (IsJumpV (P.PD K) T₃.ρ τ c ↔
-        ∃ a b : ℤ, IsJumpV (P.PD K) T₁.ρ τ a ∧ IsJumpV (P.PD K) T₂.ρ τ b ∧ a + b = c) ∧
-      ∀ S : Finset ℤ, JumpsInV (P.PD K) T₁.ρ τ (S : Set ℤ) →
-        multV (P.PD K) T₃.ρ τ c =
-          ∑ a ∈ S, multV (P.PD K) T₁.ρ τ a * multV (P.PD K) T₂.ρ τ (c - a)
+  ∀ (T₁ T₂ T₃ : Lat K LL) (e : T₁.V ⊗[↥LL.1] T₂.V ≃ₗ[↥LL.1] T₃.V),
+    IsTensorRep e → IsDR (P.PD K) T₁.ρ → IsDR (P.PD K) T₂.ρ
+      → IsDR (P.PD K) T₃.ρ
+        ∧ ∀ (τ : Emb K LL) (c : ℤ),
+          (IsJumpV (P.PD K) T₃.ρ τ c
+              ↔ ∃ a b : ℤ, IsJumpV (P.PD K) T₁.ρ τ a ∧ IsJumpV (P.PD K) T₂.ρ τ b ∧ a + b = c)
+            ∧ ∀ S : Finset ℤ,
+              JumpsInV (P.PD K) T₁.ρ τ (S : Set ℤ)
+                → multV (P.PD K) T₃.ρ τ c
+                  = ∑ a ∈ S, multV (P.PD K) T₁.ρ τ a * multV (P.PD K) T₂.ρ τ (c - a)
 
 def TwistJumpsAt : Prop :=
-  ∀ T T' : Lat K LL, IsTwistRep (cycLL (P.PD K) ↥LL.1) T.ρ T'.ρ → IsDR (P.PD K) T.ρ →
-    IsDR (P.PD K) T'.ρ ∧ ∀ (τ : Emb K LL) (a : ℤ),
-      (IsJumpV (P.PD K) T'.ρ τ (a - 1) ↔ IsJumpV (P.PD K) T.ρ τ a) ∧
-        multV (P.PD K) T'.ρ τ (a - 1) = multV (P.PD K) T.ρ τ a
+  ∀ T T' : Lat K LL,
+    IsTwistRep (cycLL (P.PD K) ↥LL.1) T.ρ T'.ρ → IsDR (P.PD K) T.ρ
+      → IsDR (P.PD K) T'.ρ
+        ∧ ∀ (τ : Emb K LL) (a : ℤ),
+          (IsJumpV (P.PD K) T'.ρ τ (a - 1) ↔ IsJumpV (P.PD K) T.ρ τ a)
+            ∧ multV (P.PD K) T'.ρ τ (a - 1) = multV (P.PD K) T.ρ τ a
 
 def PotCrysDeRhamAt : Prop :=
   ∀ (T : Lat K LL) (K' : FinExt l) (hK : K.1 ≤ K'.1),
@@ -154,8 +167,8 @@ def TwistJumps : Prop := OverGood (TwistJumpsAt P)
 def PotCrysDeRham : Prop := OverGood (PotCrysDeRhamAt P)
 
 def DeRhamComparison : Prop :=
-  CrysDeRham l P ∧ DdRSpan l P ∧ ComponentIso l P ∧ UnramOnto l P ∧ FilZero l P ∧ Strict l P ∧
-    DualJumps l P ∧ TensorJumps l P ∧ TwistJumps l P ∧ PotCrysDeRham l P
+  CrysDeRham l P ∧ DdRSpan l P ∧ ComponentIso l P ∧ UnramOnto l P ∧ FilZero l P ∧ Strict l P
+    ∧ DualJumps l P ∧ TensorJumps l P ∧ TwistJumps l P ∧ PotCrysDeRham l P
 
 end Good
 

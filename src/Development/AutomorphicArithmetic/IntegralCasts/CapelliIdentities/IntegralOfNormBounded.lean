@@ -59,13 +59,14 @@ private lemma UpperTheory.Reformulated.B.IntegralOfNormBounded.isIntegral_of_nor
   rw [IsScalarTower.algebraMap_eq ℤ_[l] ℚ_[l] K, ← eval₂_map, hq]
   exact minpoly.aeval ℚ_[l] z
 
-theorem UpperTheory.Reformulated.B.IntegralOfNormBounded.ptc_field :
-    ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] {R : Type}
-    [inst_1 : CommRing R] [inst_2 : IsLocalRing R] [inst_3 : Algebra ℤ_[l] R] {K : Type} [inst_4 : Field K]
-    [inst_5 : Algebra ℚ_[l] K] [Module.Finite ℚ_[l] K] [inst_7 : Algebra ℤ_[l] K] [IsScalarTower ℤ_[l] ℚ_[l] K]
-    (x : R →ₐ[ℤ_[l]] K),
-    ∀ a ∈ IsLocalRing.maximalIdeal R,
-      IsIntegral ℤ_[l] ((x : R → K) a) ∧ ∃ (n : ℕ) (b : K), IsIntegral ℤ_[l] b ∧ (x : R → K) a ^ n = (↑l : K) * b := by
+theorem UpperTheory.Reformulated.B.IntegralOfNormBounded.ptc_field
+    : ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] {R : Type} [inst_1 : CommRing R]
+        [inst_2 : IsLocalRing R] [inst_3 : Algebra ℤ_[l] R] {K : Type} [inst_4 : Field K]
+        [inst_5 : Algebra ℚ_[l] K] [Module.Finite ℚ_[l] K] [inst_7 : Algebra ℤ_[l] K]
+        [IsScalarTower ℤ_[l] ℚ_[l] K] (x : R →ₐ[ℤ_[l]] K),
+      ∀ a ∈ IsLocalRing.maximalIdeal R,
+        IsIntegral ℤ_[l] ((x : R → K) a)
+          ∧ ∃ (n : ℕ) (b : K), IsIntegral ℤ_[l] b ∧ (x : R → K) a ^ n = (↑l : K) * b := by
   intro l _ R _ _ _ K _ _ _ _ _ x a ha
   have hA : ∀ t : K, t * x a = 1 → ¬ IsIntegral ℤ_[l] t := by
     intro t hty ht
@@ -80,8 +81,7 @@ theorem UpperTheory.Reformulated.B.IntegralOfNormBounded.ptc_field :
       rw [sub_add_cancel] at h2
       exact (Ideal.ne_top_iff_one _).mp (IsLocalRing.maximalIdeal.isMaximal R).ne_top h2
     have h3 := hu.map x
-    have h4 : x (1 - a * r) = 0 := by
-      rw [map_sub, map_mul, map_one, hr', mul_comm, hty, sub_self]
+    have h4 : x (1 - a * r) = 0 := by rw [map_sub, map_mul, map_one, hr', mul_comm, hty, sub_self]
     rw [h4] at h3
     exact not_isUnit_zero h3
   change IsIntegral ℤ_[l] (x a) ∧ ∃ (n : ℕ) (b : K), IsIntegral ℤ_[l] b ∧ x a ^ n = (↑l : K) * b
@@ -95,7 +95,8 @@ theorem UpperTheory.Reformulated.B.IntegralOfNormBounded.ptc_field :
   have hf1 : f 1 = 1 := map_one f
   have hfy : f y < 1 := by
     have h1 : ¬ f y⁻¹ ≤ 1 := fun h =>
-      hA y⁻¹ (inv_mul_cancel₀ hy) (UpperTheory.Reformulated.B.IntegralOfNormBounded.isIntegral_of_norm_le _ h)
+      hA y⁻¹ (inv_mul_cancel₀ hy)
+        (UpperTheory.Reformulated.B.IntegralOfNormBounded.isIntegral_of_norm_le _ h)
     have h2 : f y * f y⁻¹ = 1 := by rw [← hfmul, mul_inv_cancel₀ hy, hf1]
     have h3 : 0 ≤ f y := (hf y).symm ▸ spectralNorm_nonneg y
     push_neg at h1
@@ -105,23 +106,28 @@ theorem UpperTheory.Reformulated.B.IntegralOfNormBounded.ptc_field :
     induction n with
     | zero => simp [hf1]
     | succ n ih => rw [pow_succ, hfmul, ih, pow_succ]
-  have hlpos : (0 : ℝ) < (l : ℝ) := by
-    exact_mod_cast (Fact.out : Nat.Prime l).pos
+  have hlpos : (0 : ℝ) < (l : ℝ) := by exact_mod_cast (Fact.out : Nat.Prime l).pos
   obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one (inv_pos.mpr hlpos) hfy
   have hlK : (l : K) ≠ 0 := by
     have h1 : (l : K) = algebraMap ℚ_[l] K (l : ℚ_[l]) := by simp
     rw [h1]
-    have h2 : (l : ℚ_[l]) ≠ 0 := by
-      exact_mod_cast (Fact.out : Nat.Prime l).ne_zero
+    have h2 : (l : ℚ_[l]) ≠ 0 := by exact_mod_cast (Fact.out : Nat.Prime l).ne_zero
     exact (map_ne_zero (algebraMap ℚ_[l] K)).mpr h2
-  refine ⟨UpperTheory.Reformulated.B.IntegralOfNormBounded.isIntegral_of_norm_le _ hfy.le, n, y ^ n * (l : K)⁻¹,
-    UpperTheory.Reformulated.B.IntegralOfNormBounded.isIntegral_of_norm_le _ ?_, ?_⟩
+  refine ⟨
+    UpperTheory.Reformulated.B.IntegralOfNormBounded.isIntegral_of_norm_le _ hfy.le,
+    n,
+    y ^ n * (l : K)⁻¹,
+    UpperTheory.Reformulated.B.IntegralOfNormBounded.isIntegral_of_norm_le _ ?_,
+    ?_
+  ⟩
   · have h1 : f ((l : K)⁻¹) = l := by
       have h2 : (l : K)⁻¹ = algebraMap ℚ_[l] K ((l : ℚ_[l])⁻¹) := by simp
       rw [h2, hf, spectralNorm_extends, norm_inv, Padic.norm_p]
       simp
     change f (y ^ n * (l : K)⁻¹) ≤ 1
     rw [hfmul, hfpow, h1]
-    calc f y ^ n * l ≤ (l : ℝ)⁻¹ * l := by gcongr
+    calc
+      f y ^ n * l
+        ≤ (l : ℝ)⁻¹ * l := by gcongr
       _ = 1 := inv_mul_cancel₀ hlpos.ne'
   · field_simp

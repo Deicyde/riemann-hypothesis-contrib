@@ -7,9 +7,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 noncomputable section
 
 open MeasureTheory NumberField Set Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 
 namespace UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
@@ -21,7 +23,8 @@ def Sg {n : ℕ} (ω : Set (AdelicGLn.AdelicGL K n)) (ρ : Fin n → ℝ) (z : G
     (z : AdelicGLn.AdelicGL K n) = b * diagUnits n (fun i => posIdele (K := K) (ρ i) (hρ i)) * k
 
 def Bor {n : ℕ} (ω : Set (AdelicGLn.AdelicGL K n)) : Prop :=
-  IsCompact ω ∧ ω ⊆ ((adelicBorel : Subgroup (AdelicGLn.AdelicGL K n)) : Set (AdelicGLn.AdelicGL K n))
+  IsCompact ω
+    ∧ ω ⊆ ((adelicBorel : Subgroup (AdelicGLn.AdelicGL K n)) : Set (AdelicGLn.AdelicGL K n))
 
 def Full {n : ℕ} (t : ℝ) (ρ : Fin n → ℝ) : Prop := ∀ i j : Fin n, (j : ℕ) = i + 1 → t * ρ j ≤ ρ i
 
@@ -54,7 +57,8 @@ def lam (T : ℝ) (ψ : G1 K (2 + 2) → ℂ) (x : G1 K (2 + 2)) : ℂ := ψ x -
 def secF {d : ℕ} (sec : Eu d →ₗ[ℂ] (G1 K (2 + 2) → ℂ)) (U : ℝ → Eu d) (z : G1 K (2 + 2)) : ℂ :=
   Complex.exp (2 * (HH z : ℂ)) * sec (U (HH z)) z
 
-abbrev rc {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure] (a : CC K n) (φ : L2 μ) : G1 K n → ℂ := rconv (Gam K n) μ a φ
+abbrev rc {n : ℕ} (μ : Measure (G1 K n)) [μ.IsHaarMeasure] (a : CC K n) (φ : L2 μ) : G1 K n → ℂ :=
+  rconv (Gam K n) μ a φ
 
 abbrev Jd {μ : Measure (G1 K (2 + 2))} {d : ℕ} (J : L (Eu d) →ₗᵢ[ℂ] L2 μ) : L2 μ →L[ℂ] L (Eu d) :=
   ContinuousLinearMap.adjoint J.toContinuousLinearMap

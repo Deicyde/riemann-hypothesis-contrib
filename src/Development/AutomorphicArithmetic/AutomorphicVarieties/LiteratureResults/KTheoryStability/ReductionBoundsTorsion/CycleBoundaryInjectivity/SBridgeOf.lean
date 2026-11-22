@@ -16,9 +16,11 @@ namespace PositivityTheory.KB
 open NaturalTheta in
 theorem sBridge_of : SBridge := by
   intro k
-  have h0 : ∀ (G : Type) [Group G] (m : ℕ),
-      bd G m ∘ₗ (eC G (m + 1)).toLinearMap = (eC G m).toLinearMap ∘ₗ (Dz G m).baseChange ℝ :=
-    fun G _ m => by rw [Dz_eq_bdZ]; exact bd_eC G m
+  have h0
+      : ∀ (G : Type) [Group G] (m : ℕ),
+        bd G m ∘ₗ (eC G (m + 1)).toLinearMap
+          = (eC G m).toLinearMap ∘ₗ (Dz G m).baseChange ℝ := fun G _ m => by
+    rw [Dz_eq_bdZ]; exact bd_eC G m
   refine ⟨fun G _ => th (Dz G k) (pz G k) (eC G (k + 1)) (eC G k) (bd G k) (h0 G k), ?_, ?_, ?_⟩
   · intro G _
     exact th_surjective _ _ _ _ _ (pz_surjective G k) _

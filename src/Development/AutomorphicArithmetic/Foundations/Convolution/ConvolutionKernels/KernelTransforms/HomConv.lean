@@ -12,19 +12,25 @@ public import GroundTheory.AutomorphicForms.L2LocalComponents.CenterCommute
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open scoped TensorProduct InnerProductSpace ComplexConjugate Pointwise
 
-theorem UpperTheory.ConvolutionTheory.Tf.homConv :
-    ∀ (G G₂ : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [Group G₂] [TopologicalSpace G₂] [IsTopologicalGroup G₂] [LocallyCompactSpace G₂] [T2Space G₂] [SecondCountableTopology G₂] [MeasurableSpace G₂] [BorelSpace G₂] (p : G₂ →* G) (hp : Continuous p)
-      (μ : Measure G) [μ.IsHaarMeasure] (μ₂ : Measure G₂) [μ₂.IsHaarMeasure]
-      (f : CompactlySupportedContinuousMap G₂ ℂ) (e : CompactlySupportedContinuousMap G ℂ),
-      ∃ g : CompactlySupportedContinuousMap G ℂ, (∀ x, g x = ∫ y, f y * e ((p y)⁻¹ * x) ∂μ₂) ∧
-        tsupport g ⊆ p '' tsupport f * tsupport e ∧
-        ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H),
-          π.integrated μ (UnitaryRep.ccToL1 μ g) =
-            (π.compHom p hp).integrated μ₂ (UnitaryRep.ccToL1 μ₂ f) ∘L π.integrated μ (UnitaryRep.ccToL1 μ e) := by
+theorem UpperTheory.ConvolutionTheory.Tf.homConv
+    : ∀ (G G₂ : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [Group G₂]
+        [TopologicalSpace G₂] [IsTopologicalGroup G₂] [LocallyCompactSpace G₂] [T2Space G₂]
+        [SecondCountableTopology G₂] [MeasurableSpace G₂] [BorelSpace G₂] (p : G₂ →* G)
+        (hp : Continuous p) (μ : Measure G) [μ.IsHaarMeasure] (μ₂ : Measure G₂) [μ₂.IsHaarMeasure]
+        (f : CompactlySupportedContinuousMap G₂ ℂ) (e : CompactlySupportedContinuousMap G ℂ),
+      ∃ g : CompactlySupportedContinuousMap G ℂ,
+        (∀ x, g x = ∫ y, f y * e ((p y)⁻¹ * x) ∂μ₂) ∧ tsupport g ⊆ p '' tsupport f * tsupport e
+          ∧ ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+              (π : UnitaryRep G H),
+            π.integrated μ (UnitaryRep.ccToL1 μ g)
+              = (π.compHom p hp).integrated μ₂ (UnitaryRep.ccToL1 μ₂ f)
+                ∘L π.integrated μ (UnitaryRep.ccToL1 μ e) := by
   intro G G₂ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ p hp μ _ μ₂ _ f e
   have hf : IsCompact (tsupport f) := f.hasCompactSupport.isCompact
   have hS : IsCompact (p '' tsupport f * tsupport e) :=
@@ -35,22 +41,34 @@ theorem UpperTheory.ConvolutionTheory.Tf.homConv :
       (e.continuous.comp ((hp.comp continuous_snd).inv.mul continuous_fst))
   have hz₂ : ∀ (x : G) (y : G₂), y ∉ tsupport f → f y * e ((p y)⁻¹ * x) = 0 := fun x y hy => by
     rw [image_eq_zero_of_notMem_tsupport hy, zero_mul]
-  have hz₁ : ∀ (x : G) (y : G₂), x ∉ p '' tsupport f * tsupport e →
-      f y * e ((p y)⁻¹ * x) = 0 := fun x y hx => by
+  have hz₁
+      : ∀ (x : G) (y : G₂),
+        x ∉ p '' tsupport f * tsupport e → f y * e ((p y)⁻¹ * x) = 0 := fun x y hx => by
     by_contra hne
     obtain ⟨h1, h2⟩ := mul_ne_zero_iff.1 hne
-    exact hx ⟨p y, ⟨y, subset_tsupport _ h1, rfl⟩, (p y)⁻¹ * x, subset_tsupport _ h2,
-      mul_inv_cancel_left _ _⟩
+    exact hx ⟨
+      p y,
+      ⟨y, subset_tsupport _ h1, rfl⟩,
+      (p y)⁻¹ * x,
+      subset_tsupport _ h2,
+      mul_inv_cancel_left _ _
+    ⟩
   have hcont : Continuous fun x : G => ∫ y, f y * e ((p y)⁻¹ * x) ∂μ₂ := by
     rw [← continuousOn_univ]
     exact continuousOn_integral_of_compact_support (μ := μ₂)
-      (f := fun (x : G) (y : G₂) => f y * e ((p y)⁻¹ * x)) hf hker.continuousOn
+      (f := fun (x : G) (y : G₂) => f y * e ((p y)⁻¹ * x))
+      hf hker.continuousOn
       fun x y _ hy => hz₂ x y hy
-  have hzero : ∀ x : G, x ∉ p '' tsupport f * tsupport e →
-      ∫ y, f y * e ((p y)⁻¹ * x) ∂μ₂ = 0 := fun x hx => by
+  have hzero
+      : ∀ x : G,
+        x ∉ p '' tsupport f * tsupport e → ∫ y, f y * e ((p y)⁻¹ * x) ∂μ₂ = 0 := fun x hx => by
     simp only [hz₁ x _ hx, integral_zero]
-  refine ⟨⟨⟨fun x => ∫ y, f y * e ((p y)⁻¹ * x) ∂μ₂, hcont⟩, HasCompactSupport.intro hS hzero⟩,
-    fun _ => rfl, ?_, ?_⟩
+  refine ⟨
+    ⟨⟨fun x => ∫ y, f y * e ((p y)⁻¹ * x) ∂μ₂, hcont⟩, HasCompactSupport.intro hS hzero⟩,
+    fun _ => rfl,
+    ?_,
+    ?_
+  ⟩
   · refine closure_minimal (fun x hx => ?_) hS.isClosed
     by_contra hx'
     exact hx (hzero x hx')

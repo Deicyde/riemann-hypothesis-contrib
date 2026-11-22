@@ -10,14 +10,16 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
 noncomputable section
 
 open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalV GlobalTheory.HTLink GlobalTheory.HodgeCoh GlobalTheory.EtC GlobalTheory.Pst
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalV
+  GlobalTheory.HTLink GlobalTheory.HodgeCoh GlobalTheory.EtC GlobalTheory.Pst
 open UpperTheory.Gal.Int.Geo GlobalTheory.WeilDeligne GlobalTheory.HeckeGal
 open Matrix
 
 namespace PositivityTheory.AutomorphicGaloisHodgeTate.G8
 
-theorem occMove_σC_alg {l : ℕ} [Fact l.Prime] (g : GQ l) (x : Qbar l) :
-    Formalism.Per.σC g (algebraMap (Qbar l) ℂ_[l] x) = algebraMap (Qbar l) ℂ_[l] (g x) := by
+theorem occMove_σC_alg {l : ℕ} [Fact l.Prime] (g : GQ l) (x : Qbar l)
+    : Formalism.Per.σC g (algebraMap (Qbar l) ℂ_[l] x) = algebraMap (Qbar l) ℂ_[l] (g x) := by
   exact GlobalTheory.RingBasics.σC_coe g x
 
 theorem OccMove_holds : OccMove := by
@@ -25,20 +27,28 @@ theorem OccMove_holds : OccMove := by
   refine ⟨?_, ?_⟩
   · intro d₁ d₀ ρ₁ ρ₀ A hA hAρ ⟨S, z, hz, h⟩
     classical
-    refine ⟨S ∪ Finset.univ.image (fun pq : Fin d₀ × Fin d₁ => A pq.1 pq.2),
+    refine ⟨
+      S ∪ Finset.univ.image (fun pq : Fin d₀ × Fin d₁ => A pq.1 pq.2),
       (A.map (algebraMap (Qbar l) ℂ_[l])) *ᵥ z,
-      fun h0 => hz (map_injective (C := ℂ_[l]) A hA (by rw [h0, mulVec_zero])), fun σ hσ => ?_⟩
+      fun h0 => hz (map_injective (C := ℂ_[l]) A hA (by rw [h0, mulVec_zero])),
+      fun σ hσ => ?_
+    ⟩
     have hS : ∀ x ∈ S, (σ : GQ l) x = x := fun x hx => hσ x (Finset.mem_union_left _ hx)
-    have hAσ : (A.map (algebraMap (Qbar l) ℂ_[l])).map (Formalism.Per.σC (σ : GQ l)) = A.map (algebraMap (Qbar l) ℂ_[l]) := by
+    have hAσ
+        : (A.map (algebraMap (Qbar l) ℂ_[l])).map (Formalism.Per.σC (σ : GQ l))
+          = A.map (algebraMap (Qbar l) ℂ_[l]) := by
       ext p q
       simp only [Matrix.map_apply]
-      rw [occMove_σC_alg, hσ _ (Finset.mem_union_right _ (Finset.mem_image.2 ⟨(p, q), Finset.mem_univ _, rfl⟩))]
-    have key : (fun q => Formalism.Per.σC (σ : GQ l) ((A.map (algebraMap (Qbar l) ℂ_[l]) *ᵥ z) q)) =
-        A.map (algebraMap (Qbar l) ℂ_[l]) *ᵥ fun q => Formalism.Per.σC (σ : GQ l) (z q) := by
+      rw [occMove_σC_alg,
+        hσ _ (Finset.mem_union_right _ (Finset.mem_image.2 ⟨(p, q), Finset.mem_univ _, rfl⟩))]
+    have key
+        : (fun q => Formalism.Per.σC (σ : GQ l) ((A.map (algebraMap (Qbar l) ℂ_[l]) *ᵥ z) q))
+          = A.map (algebraMap (Qbar l) ℂ_[l]) *ᵥ fun q => Formalism.Per.σC (σ : GQ l) (z q) := by
       funext p
       rw [RingHom.map_mulVec, hAσ]
       rfl
-    rw [key, mulVec_mulVec, ← Matrix.map_mul, hAρ, Matrix.map_mul, ← mulVec_mulVec, h σ hS, mulVec_smul]
+    rw [key, mulVec_mulVec, ← Matrix.map_mul, hAρ, Matrix.map_mul, ← mulVec_mulVec, h σ hS,
+      mulVec_smul]
   · intro d ρ₀ ρ c hc ⟨S, z, hz, h⟩
     classical
     have hT : (Finset.univ.filter fun q => z q ≠ 0).Nonempty := by

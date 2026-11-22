@@ -11,7 +11,14 @@ open scoped NNReal
 
 namespace GlobalTheory.K5
 
-theorem exists_int_poly_root_mod_p : ∀ (p : ℕ) [Fact p.Prime] (Ωl : Type) [Field Ωl] [Algebra (O0 p) Ωl], IsClo p Ωl → ∀ (v : Valuation Ωl ℝ≥0), (∀ x : Ωl, v x ≤ 1 ↔ IsInt (p := p) x) → v (p : Ωl) < 1 → ∀ (y : Ωl) (b : O0 p), IsAlgebraic ℤ y → v y ≤ 1 → v (y - algebraMap (O0 p) Ωl b) < 1 → ∃ P : ℤ[X], P.map (Int.castRingHom (ZMod p)) ≠ 0 ∧ (p : O0 p) ∣ aeval b P := by
+theorem exists_int_poly_root_mod_p
+    : ∀ (p : ℕ) [Fact p.Prime] (Ωl : Type) [Field Ωl] [Algebra (O0 p) Ωl],
+      IsClo p Ωl
+        → ∀ (v : Valuation Ωl ℝ≥0),
+          (∀ x : Ωl, v x ≤ 1 ↔ IsInt (p := p) x) → v (p : Ωl) < 1
+            → ∀ (y : Ωl) (b : O0 p),
+              IsAlgebraic ℤ y → v y ≤ 1 → v (y - algebraMap (O0 p) Ωl b) < 1
+                → ∃ P : ℤ[X], P.map (Int.castRingHom (ZMod p)) ≠ 0 ∧ (p : O0 p) ∣ aeval b P := by
   intro p hpf Ωl _ _ hC v hv _ y b hy hyv hyb
   haveI : CharZero Ωl := Basic.charZero_of_isClo hC
   obtain ⟨P0, hP0, hP0y⟩ := hy
@@ -40,17 +47,20 @@ theorem exists_int_poly_root_mod_p : ∀ (p : ℕ) [Fact p.Prime] (Ωl : Type) [
     let yi : v.integer := ⟨y, hyv⟩
     let bi : v.integer := ⟨b', hb'⟩
     obtain ⟨d, hd⟩ := Polynomial.sub_dvd_eval_sub yi bi (P.map (Int.castRingHom v.integer))
-    have hev : ∀ z : v.integer, v.integer.subtype ((P.map (Int.castRingHom v.integer)).eval z) = aeval (z : Ωl) P := by
+    have hev
+        : ∀ z : v.integer,
+          v.integer.subtype ((P.map (Int.castRingHom v.integer)).eval z) = aeval (z : Ωl) P := by
       intro z
       rw [Polynomial.eval_map, aeval_def]
       have := Polynomial.hom_eval₂ P (Int.castRingHom v.integer) v.integer.subtype z
-      rw [show v.integer.subtype.comp (Int.castRingHom v.integer) = algebraMap ℤ Ωl from RingHom.ext_int _ _] at this
+      rw [show v.integer.subtype.comp (Int.castRingHom v.integer) = algebraMap ℤ Ωl from
+          RingHom.ext_int _ _]
+        at this
       exact this
     have hd' := congrArg v.integer.subtype hd
     rw [map_sub, map_mul, map_sub, hev, hev] at hd'
     have hd'' : aeval y P - aeval b' P = (y - b') * (d : Ωl) := hd'
-    have hkey : aeval b' P = -((y - b') * (d : Ωl)) := by
-      rw [← hd'', hPy]; ring
+    have hkey : aeval b' P = -((y - b') * (d : Ωl)) := by rw [← hd'', hPy]; ring
     have hmap : algebraMap (O0 p) Ωl (aeval b P) = aeval b' P := by
       rw [aeval_def, aeval_def, Polynomial.hom_eval₂]
       congr 1
@@ -64,9 +74,12 @@ theorem exists_int_poly_root_mod_p : ∀ (p : ℕ) [Fact p.Prime] (Ωl : Type) [
     have hnu : ¬ IsUnit (aeval b P) := by
       rintro ⟨u, hu⟩
       have h1 : v (algebraMap (O0 p) Ωl (u⁻¹ : (O0 p)ˣ)) ≤ 1 := (hv _).2 isIntegral_algebraMap
-      have h2 : v (algebraMap (O0 p) Ωl (aeval b P)) * v (algebraMap (O0 p) Ωl (u⁻¹ : (O0 p)ˣ)) = 1 := by
+      have h2
+          : v (algebraMap (O0 p) Ωl (aeval b P)) * v (algebraMap (O0 p) Ωl (u⁻¹ : (O0 p)ˣ))
+            = 1 := by
         rw [← Valuation.map_mul, ← map_mul, ← hu, Units.mul_inv, map_one, Valuation.map_one]
-      have h3 : v (algebraMap (O0 p) Ωl (aeval b P)) * v (algebraMap (O0 p) Ωl (u⁻¹ : (O0 p)ˣ)) < 1 :=
+      have h3
+          : v (algebraMap (O0 p) Ωl (aeval b P)) * v (algebraMap (O0 p) Ωl (u⁻¹ : (O0 p)ˣ)) < 1 :=
         mul_lt_one_of_nonneg_of_lt_one_left zero_le' hlt h1
       rw [h2] at h3
       exact lt_irrefl _ h3

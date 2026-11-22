@@ -9,32 +9,58 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RowIsometryEn
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN
+open NumberField IsDedekindDomain MeasureTheory Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
+  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
+  GlobalTheory.SnMass.VolN
 open scoped TensorProduct ENNReal nonZeroDivisors
 
 namespace GlobalTheory.SnMass.VolN
 
-theorem exists_lift_antidiag : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E) (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E)) (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E) (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F) (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (s : Fin r → ℝ), IsVolData σ J Λ P f T A s → ∀ (a : Fin r) (l : InfinitePlace E → ℝ), l ∈ skewLat (σ : E →+* E) (dInv E (2 * (r - a.val))) (s a ^ 2) → ∃ γ ∈ GN (σ : E →+* E) J Λ P, (∀ w, cM k r (.inr (.inr (.inr a))) (Matrix.of.symm (gM A γ w)) = l w) ∧ ∀ β : Bk r, β ≠ (.inr (.inr (.inr a))) → degB r β ≤ degB r (.inr (.inr (.inr a))) → ∀ w, cM k r β (Matrix.of.symm (gM A γ w)) = 0 := by
+theorem exists_lift_antidiag
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
+        (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E))
+        (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E)
+        (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F)
+        (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+        (s : Fin r → ℝ),
+      IsVolData σ J Λ P f T A s
+        → ∀ (a : Fin r) (l : InfinitePlace E → ℝ),
+          l ∈ skewLat (σ : E →+* E) (dInv E (2 * (r - a.val))) (s a ^ 2)
+            → ∃ γ ∈ GN (σ : E →+* E) J Λ P,
+              (∀ w, cM k r (.inr (.inr (.inr a))) (Matrix.of.symm (gM A γ w)) = l w)
+                ∧ ∀ β : Bk r,
+                  β ≠ (.inr (.inr (.inr a))) → degB r β ≤ degB r (.inr (.inr (.inr a)))
+                    → ∀ w, cM k r β (Matrix.of.symm (gM A γ w)) = 0 := by
   intro F E _ _ _ _ _ σ k r J Λ P f T A s hV a l hl
   obtain ⟨c, hc, hσ, hlw⟩ := hl
   have hσ' : σ c = -c := hσ
   refine ⟨rowE (σ : E →+* E) J (fun i => P i a.castSucc) 0 c, ?_, ?_⟩
-  · refine GlobalTheory.T.rowE_mem_GN_of_form_add_trace_eq_zero F E σ k r J Λ P f T A s hV a 0 c ?_ ?_ ?_ hc
+  · refine GlobalTheory.T.rowE_mem_GN_of_form_add_trace_eq_zero F E σ k r J Λ P f T A s hV a 0 c ?_
+      ?_ ?_ hc
     · intro b _
       simp [form]
     · simp [form, hσ']
     · intro b _
       simp
-  have hE : ∀ w i j, gM A (rowE (σ : E →+* E) J (fun i => P i a.castSucc) 0 c) w i j =
-      (if i = j then 1 else 0) +
-        (if j = esI k r a then (if i = eI k r a then (s a : ℂ) * ((s a : ℂ) * w.embedding c) else 0) else 0) := by
+  have hE
+      : ∀ w i j,
+        gM A (rowE (σ : E →+* E) J (fun i => P i a.castSucc) 0 c) w i j
+          = (if i = j then 1 else 0)
+            + (if j = esI k r a then
+                 (if i = eI k r a then (s a : ℂ) * ((s a : ℂ) * w.embedding c) else 0)
+               else
+                 0) := by
     intro w i j
     have h0 : (A w *ᵥ fun l => w.embedding ((0 : Fin (2 * r + k + 1) → E) l)) = 0 := by
       have h1 : (fun l => w.embedding ((0 : Fin (2 * r + k + 1) → E) l)) = 0 := by
         funext l
         simp
       rw [h1, mulVec_zero]
-    rw [GlobalTheory.T.rowIsometry_entries_in_modelCoordinates F E σ k r J Λ P f T A s hV a 0 c w i j, h0]
+    rw [GlobalTheory.T.rowIsometry_entries_in_modelCoordinates F E σ k r J Λ P f T A s hV a 0 c w i
+        j,
+      h0]
     simp [herm]
   have hne : ∀ b b' : Fin r, eI k r b ≠ esI k r b' := by
     intro b b' h

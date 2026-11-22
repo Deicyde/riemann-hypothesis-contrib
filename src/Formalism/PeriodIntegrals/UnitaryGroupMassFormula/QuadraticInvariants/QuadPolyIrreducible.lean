@@ -42,7 +42,8 @@ theorem quadPoly_irreducible (hq : QuadData d K b) : Irreducible (quadPoly d) :=
     obtain ⟨hp, -, -, -, -⟩ := hq
     unfold quadPoly at hx
     simp only [Polynomial.IsRoot.def, Polynomial.eval_add, Polynomial.eval_pow, Polynomial.eval_X,
-      Polynomial.eval_C] at hx
+        Polynomial.eval_C]
+      at hx
     have hd : (0 : ℚ) < d := by exact_mod_cast hp.pos
     nlinarith [sq_nonneg x]
 
@@ -52,7 +53,7 @@ theorem minpoly_b (hq : QuadData d K b) : minpoly ℚ b = quadPoly d := by
 
 theorem finrank_two (hq : QuadData d K b) : Module.finrank ℚ K = 2 := by
   have hI : IsIntegral ℚ b := IsIntegral.of_finite ℚ b
-  rw [← IntermediateField.finrank_top', ← hq.2.2.2.2, IntermediateField.adjoin.finrank hI, minpoly_b hq,
-    quadPoly_natDegree]
+  rw [← IntermediateField.finrank_top', ← hq.2.2.2.2, IntermediateField.adjoin.finrank hI,
+    minpoly_b hq, quadPoly_natDegree]
 
 end PI.UnitaryGroupMassFormula.ClassNumImQInv

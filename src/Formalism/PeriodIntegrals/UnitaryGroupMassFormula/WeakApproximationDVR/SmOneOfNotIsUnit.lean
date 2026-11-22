@@ -8,8 +8,9 @@ noncomputable section
 
 namespace PI.WADVR
 
-variable {W Q : Type*} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Q]
-  [Algebra W Q] [IsFractionRing W Q]
+variable
+  {W Q : Type*}
+  [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Q] [Algebra W Q] [IsFractionRing W Q]
 
 def Sm (Q : Type*) [Field Q] [Algebra W Q] (ϖ : W) (k : ℤ) (q : Q) : Prop :=
   ∃ c : W, q = algebraMap W Q ϖ ^ k * algebraMap W Q c

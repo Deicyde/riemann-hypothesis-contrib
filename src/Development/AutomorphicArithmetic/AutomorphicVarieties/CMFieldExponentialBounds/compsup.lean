@@ -8,21 +8,38 @@ public import Development.AutomorphicArithmetic.QuadraticCharacters.GaussRoot
 
 open NumberField Formalism.HC UpperTheory.Top UpperTheory.V
 
-private theorem act_root {K : Type} [Field K] {N : ℕ} [NeZero N] {ζ x : K} (hζ : IsPrimitiveRoot ζ N)
-    (σ : K →+* K) {a : ℕ} (hσ : σ ζ = ζ ^ a) (hx : x ^ N = 1) : σ x = x ^ a := by
+private theorem act_root
+    {K : Type} [Field K]
+    {N : ℕ} [NeZero N]
+    {ζ x : K} (hζ : IsPrimitiveRoot ζ N)
+    (σ : K →+* K)
+    {a : ℕ} (hσ : σ ζ = ζ ^ a)
+    (hx : x ^ N = 1)
+    : σ x = x ^ a := by
   obtain ⟨i, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hx
   rw [map_pow, hσ, pow_right_comm]
 
-private theorem coprime_of {K : Type} [Field K] {N : ℕ} [NeZero N] {ζ : K} (hζ : IsPrimitiveRoot ζ N)
-    (σ : K →+* K) {a : ℕ} (hσ : σ ζ = ζ ^ a) : a.Coprime N := by
+private theorem coprime_of
+    {K : Type} [Field K]
+    {N : ℕ} [NeZero N]
+    {ζ : K} (hζ : IsPrimitiveRoot ζ N)
+    (σ : K →+* K)
+    {a : ℕ} (hσ : σ ζ = ζ ^ a)
+    : a.Coprime N := by
   have h1 : IsPrimitiveRoot (ζ ^ a) N := by
     rw [← hσ]
     exact hζ.map_of_injective σ.injective
   exact (hζ.pow_iff_coprime (NeZero.pos N) a).1 h1
 
-private theorem sqrt_iff {K : Type} [Field K] [CharZero K] {N : ℕ} [NeZero N] {ζ : K} (hζ : IsPrimitiveRoot ζ N)
-    (σ : K →+* K) {a : ℕ} (hσ : σ ζ = ζ ^ a) {q : ℕ} (hq : q.Prime) (h4 : q % 4 = 3) (hd : q ∣ N)
-    {α : K} (hα : α ^ 2 = -(q : K)) : σ α = α ↔ jacobiSym (a : ℤ) q = 1 := by
+private theorem sqrt_iff
+    {K : Type} [Field K] [CharZero K]
+    {N : ℕ} [NeZero N]
+    {ζ : K} (hζ : IsPrimitiveRoot ζ N)
+    (σ : K →+* K)
+    {a : ℕ} (hσ : σ ζ = ζ ^ a)
+    {q : ℕ} (hq : q.Prime) (h4 : q % 4 = 3) (hd : q ∣ N)
+    {α : K} (hα : α ^ 2 = -(q : K))
+    : σ α = α ↔ jacobiSym (a : ℤ) q = 1 := by
   haveI : Fact q.Prime := ⟨hq⟩
   obtain ⟨k, hk⟩ := hd
   have hω : IsPrimitiveRoot (ζ ^ k) q := hζ.pow (NeZero.pos N) (by rw [hk, mul_comm])
@@ -35,15 +52,16 @@ private theorem sqrt_iff {K : Type} [Field K] [CharZero K] {N : ℕ} [NeZero N] 
     · rw [map_neg, h1, mul_neg]
   have h3 : jacobiSym (a : ℤ) q = quadraticChar (ZMod q) (a : ZMod q) := by
     rw [← jacobiSym.legendreSym.to_jacobiSym, legendreSym, Int.cast_natCast]
-  rw [h3, h2, mul_left_eq_self₀, or_iff_left (HostParam.SlopeTestRemainingChoices.GaussRoot.ne_zero hq hα), Int.cast_eq_one]
+  rw [h3, h2, mul_left_eq_self₀,
+    or_iff_left (HostParam.SlopeTestRemainingChoices.GaussRoot.ne_zero hq hα), Int.cast_eq_one]
 
-private theorem trace_iff {K : Type} [Field K] {n : ℕ} (hn : n ≠ 0) {η : K} (hη : IsPrimitiveRoot η n) (a : ℕ) :
-    η ^ a + (η ^ a)⁻¹ = η + η⁻¹ ↔ (a ≡ 1 [MOD n] ∨ a + 1 ≡ 0 [MOD n]) := by
+private theorem trace_iff
+    {K : Type} [Field K] {n : ℕ} (hn : n ≠ 0) {η : K} (hη : IsPrimitiveRoot η n) (a : ℕ)
+    : η ^ a + (η ^ a)⁻¹ = η + η⁻¹ ↔ (a ≡ 1 [MOD n] ∨ a + 1 ≡ 0 [MOD n]) := by
   have h0 : η ≠ 0 := hη.ne_zero hn
   have h1 : η ^ a ≠ 0 := pow_ne_zero _ h0
   have hfin : IsOfFinOrder η := hη.isOfFinOrder hn
-  have e1 : a ≡ 1 [MOD n] ↔ η ^ a = η := by
-    rw [hη.eq_orderOf, ← hfin.pow_eq_pow_iff_modEq, pow_one]
+  have e1 : a ≡ 1 [MOD n] ↔ η ^ a = η := by rw [hη.eq_orderOf, ← hfin.pow_eq_pow_iff_modEq, pow_one]
   have e2 : a + 1 ≡ 0 [MOD n] ↔ η ^ a * η = 1 := by
     rw [hη.eq_orderOf, ← hfin.pow_eq_pow_iff_modEq, pow_zero, pow_succ]
   rw [e1, e2]
@@ -51,16 +69,20 @@ private theorem trace_iff {K : Type} [Field K] {n : ℕ} (hn : n ≠ 0) {η : K}
   have key : y + y⁻¹ - (η + η⁻¹) = (y - η) * (y * η - 1) / (y * η) := by
     field_simp
     ring
-  rw [← sub_eq_zero, key, div_eq_zero_iff, or_iff_left (mul_ne_zero h1 h0), mul_eq_zero, sub_eq_zero,
-    sub_eq_zero]
+  rw [← sub_eq_zero, key, div_eq_zero_iff, or_iff_left (mul_ne_zero h1 h0), mul_eq_zero,
+    sub_eq_zero, sub_eq_zero]
 
-private theorem exists_pow {N : ℕ} [NeZero N] {ζ : CyclotomicField N ℚ} (hζ : IsPrimitiveRoot ζ N)
-    (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) : ∃ a : ℕ, τ ζ = ζ ^ a := by
+private theorem exists_pow
+    {N : ℕ} [NeZero N]
+    {ζ : CyclotomicField N ℚ} (hζ : IsPrimitiveRoot ζ N)
+    (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ)
+    : ∃ a : ℕ, τ ζ = ζ ^ a := by
   obtain ⟨i, -, h⟩ := hζ.eq_pow_of_pow_eq_one (ξ := τ ζ) (by rw [← map_pow, hζ.pow_eq_one, map_one])
   exact ⟨i, h.symm⟩
 
-private theorem mem_fix {E K : Type} [Field E] [Field K] [Algebra ℚ E] [Algebra ℚ K] (j : E →ₐ[ℚ] K)
-    (τ : K ≃ₐ[ℚ] K) : τ ∈ j.fieldRange.fixingSubgroup ↔ ∀ x : E, τ (j x) = j x := by
+private theorem mem_fix
+    {E K : Type} [Field E] [Field K] [Algebra ℚ E] [Algebra ℚ K] (j : E →ₐ[ℚ] K) (τ : K ≃ₐ[ℚ] K)
+    : τ ∈ j.fieldRange.fixingSubgroup ↔ ∀ x : E, τ (j x) = j x := by
   rw [IntermediateField.mem_fixingSubgroup_iff]
   exact ⟨fun h x => h _ ⟨x, rfl⟩, fun h _ ⟨x, hx⟩ => hx ▸ h x⟩
 
@@ -68,28 +90,39 @@ private theorem ker_congr (A : AbF) {a b : ℕ} (h : a ≡ b [MOD A.m]) (hb : A.
   obtain ⟨u, hu, e⟩ := hb
   exact ⟨u, hu, e.trans ((ZMod.natCast_eq_natCast_iff _ _ _).2 h).symm⟩
 
-private theorem range_le {M L : Type} [Field M] [Field L] [Algebra ℚ M] [Algebra ℚ L] [Normal ℚ M]
-    (g₁ g₂ : M →ₐ[ℚ] L) (x : M) : ∃ y : M, g₂ y = g₁ x := by
+private theorem range_le
+    {M L : Type} [Field M] [Field L] [Algebra ℚ M] [Algebra ℚ L] [Normal ℚ M]
+    (g₁ g₂ : M →ₐ[ℚ] L) (x : M)
+    : ∃ y : M, g₂ y = g₁ x := by
   letI : Algebra M L := g₂.toRingHom.toAlgebra
   haveI : IsScalarTower ℚ M L := IsScalarTower.of_algebraMap_eq fun r => (g₂.commutes r).symm
   exact ⟨g₁.restrictNormal M x, g₁.restrictNormal_commutes M x⟩
 
-private theorem exists_lift {K L : Type} [Field K] [Field L] [Algebra ℚ K] [Algebra ℚ L] [Normal ℚ L]
-    (f : K →ₐ[ℚ] L) (τ : K ≃ₐ[ℚ] K) : ∃ σ : L ≃ₐ[ℚ] L, ∀ x : K, σ (f x) = f (τ x) := by
+private theorem exists_lift
+    {K L : Type} [Field K] [Field L] [Algebra ℚ K] [Algebra ℚ L] [Normal ℚ L]
+    (f : K →ₐ[ℚ] L) (τ : K ≃ₐ[ℚ] K)
+    : ∃ σ : L ≃ₐ[ℚ] L, ∀ x : K, σ (f x) = f (τ x) := by
   letI : Algebra K L := f.toRingHom.toAlgebra
   haveI : IsScalarTower ℚ K L := IsScalarTower.of_algebraMap_eq fun r => (f.commutes r).symm
   exact ⟨τ.liftNormal L, fun x => τ.liftNormal_commutes L x⟩
 
-private theorem exists_res {K L : Type} [Field K] [Field L] [Algebra ℚ K] [Algebra ℚ L] [Normal ℚ K]
-    (f : K →ₐ[ℚ] L) (σ : L ≃ₐ[ℚ] L) : ∃ τ : K ≃ₐ[ℚ] K, ∀ x : K, σ (f x) = f (τ x) := by
+private theorem exists_res
+    {K L : Type} [Field K] [Field L] [Algebra ℚ K] [Algebra ℚ L] [Normal ℚ K]
+    (f : K →ₐ[ℚ] L) (σ : L ≃ₐ[ℚ] L)
+    : ∃ τ : K ≃ₐ[ℚ] K, ∀ x : K, σ (f x) = f (τ x) := by
   letI : Algebra K L := f.toRingHom.toAlgebra
   haveI : IsScalarTower ℚ K L := IsScalarTower.of_algebraMap_eq fun r => (f.commutes r).symm
   exact ⟨σ.restrictNormal K, fun x => (σ.restrictNormal_commutes K x).symm⟩
 
-private theorem indep (A : AbF) {M : Type} [Field M] [NumberField M] (hM : IsAbField A M) {N : ℕ} [NeZero N]
-    (hm : A.m ∣ N) (i : M →ₐ[ℚ] CyclotomicField N ℚ) {ζ : CyclotomicField N ℚ} (hζ : IsPrimitiveRoot ζ N)
-    (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) (a : ℕ) (hτ : τ ζ = ζ ^ a) :
-    (∀ x : M, τ (i x) = i x) ↔ A.ker a := by
+private theorem indep
+    (A : AbF)
+    {M : Type} [Field M] [NumberField M]
+    (hM : IsAbField A M)
+    {N : ℕ} [NeZero N]
+    (hm : A.m ∣ N) (i : M →ₐ[ℚ] CyclotomicField N ℚ)
+    {ζ : CyclotomicField N ℚ} (hζ : IsPrimitiveRoot ζ N)
+    (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) (a : ℕ) (hτ : τ ζ = ζ ^ a)
+    : (∀ x : M, τ (i x) = i x) ↔ A.ker a := by
   obtain ⟨N', hN', j, ζ', hm', hζ', H⟩ := hM
   haveI : NeZero A.m := ⟨A.pos.ne'⟩
   haveI : IsCyclotomicExtension {N} ℚ (CyclotomicField N ℚ) := CyclotomicField.isCyclotomicExtension _ ℚ
@@ -103,13 +136,11 @@ private theorem indep (A : AbF) {M : Type} [Field M] [NumberField M] (hM : IsAbF
       | convert @IsAlgClosure.normal ℚ (AlgebraicClosure ℚ) _ _ (AlgebraicClosure.instAlgebra ℚ) _
   let f : CyclotomicField N ℚ →ₐ[ℚ] AlgebraicClosure ℚ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let f' : CyclotomicField N' ℚ →ₐ[ℚ] AlgebraicClosure ℚ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   obtain ⟨σ, hσ⟩ := exists_lift f τ
   obtain ⟨τ', hσ'⟩ := exists_res f' σ
@@ -120,8 +151,7 @@ private theorem indep (A : AbF) {M : Type} [Field M] [NumberField M] (hM : IsAbF
     (hζ.pow (NeZero.pos N) (by rw [hk, mul_comm])).map_of_injective f.injective
   have hω' : IsPrimitiveRoot (f' (ζ' ^ k')) A.m :=
     (hζ'.pow (NeZero.pos N') (by rw [hk', mul_comm])).map_of_injective f'.injective
-  have h1 : σ (f (ζ ^ k)) = f (ζ ^ k) ^ a := by
-    rw [hσ, map_pow τ, hτ, pow_right_comm, map_pow f]
+  have h1 : σ (f (ζ ^ k)) = f (ζ ^ k) ^ a := by rw [hσ, map_pow τ, hτ, pow_right_comm, map_pow f]
   have h2 : σ (f' (ζ' ^ k')) = f' (ζ' ^ k') ^ b := by
     rw [hσ', map_pow τ', hb, pow_right_comm, map_pow f']
   have h3 : σ (f (ζ ^ k)) = f (ζ ^ k) ^ b :=
@@ -145,16 +175,21 @@ private theorem indep (A : AbF) {M : Type} [Field M] [NumberField M] (hM : IsAbF
     show f (τ (i x)) = f (i x)
     rw [← hσ, ← hy', hσ', h]
 
-private theorem core (A : AbF) {M : Type} [Field M] [NumberField M] (hM : IsAbField A M)
+private theorem core
+    (A : AbF)
+    {M : Type} [Field M] [NumberField M]
+    (hM : IsAbField A M)
     {e q d : ℕ} (hq : q.Prime) (hd : d.Prime) (hq4 : q % 4 = 3) (hd4 : d % 4 = 3)
-    {N : ℕ} [NeZero N] (i : M →ₐ[ℚ] CyclotomicField N ℚ)
-    {ζ η α β : CyclotomicField N ℚ} (h2 : 2 ^ (e + 2) ∣ N) (hm : A.m ∣ N) (hqN : q ∣ N)
-    (hdN : d ∣ N) (hζ : IsPrimitiveRoot ζ N) (hη : IsPrimitiveRoot η (2 ^ (e + 2)))
-    (hα : α ^ 2 = -(q : CyclotomicField N ℚ)) (hβ : β ^ 2 = -(d : CyclotomicField N ℚ))
-    (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) (a : ℕ) (hτ : τ ζ = ζ ^ a) :
-    τ ∈ (IntermediateField.adjoin ℚ {α, β, η + η⁻¹} ⊔ i.fieldRange).fixingSubgroup ↔
-      (a ≡ 1 [MOD 2 ^ (e + 2)] ∨ a + 1 ≡ 0 [MOD 2 ^ (e + 2)]) ∧ A.ker a ∧
-          jacobiSym (a : ℤ) q = 1 ∧ jacobiSym (a : ℤ) d = 1 := by
+    {N : ℕ} [NeZero N]
+    (i : M →ₐ[ℚ] CyclotomicField N ℚ)
+    {ζ η α β : CyclotomicField N ℚ}
+    (h2 : 2 ^ (e + 2) ∣ N) (hm : A.m ∣ N) (hqN : q ∣ N) (hdN : d ∣ N) (hζ : IsPrimitiveRoot ζ N)
+    (hη : IsPrimitiveRoot η (2 ^ (e + 2))) (hα : α ^ 2 = -(q : CyclotomicField N ℚ))
+    (hβ : β ^ 2 = -(d : CyclotomicField N ℚ))
+    (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) (a : ℕ) (hτ : τ ζ = ζ ^ a)
+    : τ ∈ (IntermediateField.adjoin ℚ {α, β, η + η⁻¹} ⊔ i.fieldRange).fixingSubgroup
+      ↔ (a ≡ 1 [MOD 2 ^ (e + 2)] ∨ a + 1 ≡ 0 [MOD 2 ^ (e + 2)]) ∧ A.ker a ∧ jacobiSym (a : ℤ) q = 1
+        ∧ jacobiSym (a : ℤ) d = 1 := by
   haveI : IsCyclotomicExtension {N} ℚ (CyclotomicField N ℚ) := CyclotomicField.isCyclotomicExtension _ ℚ
   have hτ' : (τ : CyclotomicField N ℚ →+* CyclotomicField N ℚ) ζ = ζ ^ a := hτ
   have e1 : τ α = α ↔ jacobiSym (a : ℤ) q = 1 := sqrt_iff hζ _ hτ' hq hq4 hqN hα
@@ -163,16 +198,19 @@ private theorem core (A : AbF) {M : Type} [Field M] [NumberField M] (hM : IsAbFi
   have e3 : τ (η + η⁻¹) = η + η⁻¹ ↔ (a ≡ 1 [MOD 2 ^ (e + 2)] ∨ a + 1 ≡ 0 [MOD 2 ^ (e + 2)]) := by
     rw [map_add (f := _), map_inv₀, hηa]
     exact trace_iff (pow_ne_zero _ two_ne_zero) hη a
-  have e4 : τ ∈ (IntermediateField.adjoin ℚ {α, β, η + η⁻¹}).fixingSubgroup ↔
-      τ α = α ∧ τ β = β ∧ τ (η + η⁻¹) = η + η⁻¹ := by
+  have e4
+      : τ ∈ (IntermediateField.adjoin ℚ {α, β, η + η⁻¹}).fixingSubgroup
+        ↔ τ α = α ∧ τ β = β ∧ τ (η + η⁻¹) = η + η⁻¹ := by
     rw [← Subgroup.zpowers_le, ← IntermediateField.le_iff_le, IntermediateField.adjoin_le_iff]
-    have hm : ∀ x : CyclotomicField N ℚ, x ∈ IntermediateField.fixedField (Subgroup.zpowers τ) ↔ τ x = x := by
+    have hm
+        : ∀ x : CyclotomicField N ℚ,
+          x ∈ IntermediateField.fixedField (Subgroup.zpowers τ) ↔ τ x = x := by
       intro x
       rw [IntermediateField.mem_fixedField_iff]
       refine ⟨fun h => h τ (Subgroup.mem_zpowers τ), fun h f hf => ?_⟩
       have : Subgroup.zpowers τ ≤ MulAction.stabilizer _ x := Subgroup.zpowers_le.2 h
       exact this hf
     simp only [Set.insert_subset_iff, Set.singleton_subset_iff, SetLike.mem_coe, hm]
-  rw [IntermediateField.fixingSubgroup_sup, Subgroup.mem_inf, mem_fix,
-    e4, e1, e2, e3, indep A hM hm i hζ τ a hτ]
+  rw [IntermediateField.fixingSubgroup_sup, Subgroup.mem_inf, mem_fix, e4, e1, e2, e3,
+    indep A hM hm i hζ τ a hτ]
   tauto

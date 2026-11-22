@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open Polynomial Formalism.ConjugateSelfDual Formalism.MainNotions.N UpperTheory.V.Af UpperTheory.V.Sd
+open Polynomial Formalism.ConjugateSelfDual Formalism.MainNotions.N UpperTheory.V.Af
+  UpperTheory.V.Sd
 open scoped Matrix
 
 private lemma trace_zero {k : Type} [Field k] (S T : Matrix (Fin 2) (Fin 2) k) (hT : T.det ≠ 0)
@@ -82,17 +83,19 @@ private lemma core {Γ k : Type} [Group Γ] [Field k] (ρ : Γ →* GL (Fin 2) k
     rw [hmul t t] at hc
     exact trace_zero _ _ (Matrix.GeneralLinearGroup.det_ne_zero (ρ t)) hsep v hv ht a b c ha hb hc
 
-theorem UpperTheory.V.Sd.sIabs :
-    UpperTheory.V.Sd.SIabs := by
+theorem UpperTheory.V.Sd.sIabs : UpperTheory.V.Sd.SIabs := by
   intro l _ _ Γ _ ρ Φ hΦ hirr hres H hN hs hred
   obtain ⟨D, hH, ⟨t₀, ht₀⟩, hmul, htr⟩ := core ρ hirr H hN hs hred
   have hneg : ∀ t, ¬ D t → ‖(Φ t : Qbar l) + 1‖ < 1 := by
     intro t ht
     have h := hres t 1
     rw [Matrix.charpoly_fin_two, htr t ht, Fin.prod_univ_two] at h
-    have e : (X - C ((![1, Φ] : Fin 2 → Γ →* (Qbar l)ˣ) 0 t : Qbar l)) * (X - C ((![1, Φ] : Fin 2 → Γ →* (Qbar l)ˣ) 1 t : Qbar l)) =
-        X ^ 2 - C ((Φ t : Qbar l) + 1) * X + C (Φ t : Qbar l) := by
-      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, MonoidHom.one_apply, Units.val_one, map_add (f := _), map_one]
+    have e
+        : (X - C ((![1, Φ] : Fin 2 → Γ →* (Qbar l)ˣ) 0 t : Qbar l))
+            * (X - C ((![1, Φ] : Fin 2 → Γ →* (Qbar l)ˣ) 1 t : Qbar l))
+          = X ^ 2 - C ((Φ t : Qbar l) + 1) * X + C (Φ t : Qbar l) := by
+      simp only [Matrix.cons_val_zero, Matrix.cons_val_one, MonoidHom.one_apply, Units.val_one,
+        map_add (f := _), map_one]
       ring
     rw [e] at h
     simpa [coeff_X_pow, coeff_C, coeff_one] using h
@@ -101,12 +104,18 @@ theorem UpperTheory.V.Sd.sIabs :
     have h1 := hneg _ ht₀
     have h2 := hneg _ (hmul s t₀ hs ht₀)
     rw [map_mul, Units.val_mul] at h2
-    have e : (Φ t₀ : Qbar l) * ((Φ s : Qbar l) - 1) = ((Φ t₀ : Qbar l) * Φ s + 1) + (-((Φ t₀ : Qbar l) + 1)) := by ring
-    have h3 := IsUltrametricDist.norm_add_le_max ((Φ t₀ : Qbar l) * Φ s + 1) (-((Φ t₀ : Qbar l) + 1))
+    have e
+        : (Φ t₀ : Qbar l) * ((Φ s : Qbar l) - 1)
+          = ((Φ t₀ : Qbar l) * Φ s + 1) + (-((Φ t₀ : Qbar l) + 1)) := by
+      ring
+    have h3 :=
+      IsUltrametricDist.norm_add_le_max ((Φ t₀ : Qbar l) * Φ s + 1) (-((Φ t₀ : Qbar l) + 1))
     rw [← e, norm_mul, hΦ, one_mul, norm_neg] at h3
     exact h3.trans_lt (max_lt h2 h1)
   refine ⟨fun s hs => by simpa [Cong] using hpos s (hH s hs), fun s => ?_⟩
-  have e : ((Φ s ^ 2 : (Qbar l)ˣ) : Qbar l) - ((1 : (Qbar l)ˣ) : Qbar l) = ((Φ s : Qbar l) + 1) * ((Φ s : Qbar l) - 1) := by
+  have e
+      : ((Φ s ^ 2 : (Qbar l)ˣ) : Qbar l) - ((1 : (Qbar l)ˣ) : Qbar l)
+        = ((Φ s : Qbar l) + 1) * ((Φ s : Qbar l) - 1) := by
     rw [Units.val_pow_eq_pow_val, Units.val_one]; ring
   have p1 : ‖(Φ s : Qbar l) + 1‖ ≤ 1 := by
     have := IsUltrametricDist.norm_add_le_max (Φ s : Qbar l) 1

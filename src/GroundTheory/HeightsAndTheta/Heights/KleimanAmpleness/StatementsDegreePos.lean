@@ -17,9 +17,10 @@ universe u
 
 def ProjDegreePositive.Statement : Prop :=
   ∀ (F : Type u) [Field F] (ι₀ : Type) [Fintype ι₀] (q : Ideal (MRing (fun _ : Unit => ι₀) F))
-    (D : ℕ), IsMultiProjPrime q →
-    ringKrullDim (MRing (fun _ : Unit => ι₀) F ⧸ q) = ((D + 1 : ℕ) : WithBot ℕ∞) →
-    0 < intNum F q (fun _ : Fin D => fun _ => (1 : ℤ))
+      (D : ℕ),
+    IsMultiProjPrime q
+      → ringKrullDim (MRing (fun _ : Unit => ι₀) F ⧸ q) = ((D + 1 : ℕ) : WithBot ℕ∞)
+      → 0 < intNum F q (fun _ : Fin D => fun _ => (1 : ℤ))
 
 end
 

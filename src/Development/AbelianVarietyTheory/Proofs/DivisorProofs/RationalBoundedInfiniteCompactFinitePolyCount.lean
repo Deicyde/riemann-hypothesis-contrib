@@ -10,21 +10,31 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CardAlgebrai
 
 @[expose] public section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspQuot GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace MeasureTheory
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspQuot
+  GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace MeasureTheory
 
 namespace GlobalTheory
 
-theorem place_le_norm_pInf {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (ξ : E)
-    (w : InfinitePlace E) : w ξ ≤ ‖pInf E (algebraMap E (Ad E) ξ)‖ := by
+theorem place_le_norm_pInf
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    (ξ : E) (w : InfinitePlace E)
+    : w ξ ≤ ‖pInf E (algebraMap E (Ad E) ξ)‖ := by
   have h := norm_le_pi_norm (pInf E (algebraMap E (Ad E) ξ)) w
   rw [pInf_algebraMap, InfinitePlace.norm_embedding_eq] at h
   exact h
 
-theorem rat_bounded_compact_polynomial : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E], ∃ m : ℕ,
-    ∀ Kf : Set (Af E), IsCompact Kf → ∃ C : ℝ, 0 ≤ C ∧ ∀ T : ℝ, 1 ≤ T →
-      {ξ : E | ‖pInf E (algebraMap E (Ad E) ξ)‖ ≤ T ∧ pFin E (algebraMap E (Ad E) ξ) ∈ Kf}.Finite ∧
-      ({ξ : E | ‖pInf E (algebraMap E (Ad E) ξ)‖ ≤ T ∧ pFin E (algebraMap E (Ad E) ξ) ∈ Kf}.ncard : ℝ)
-        ≤ C * T ^ m := by
+theorem rat_bounded_compact_polynomial
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E], ∃ m : ℕ,
+      ∀ Kf : Set (Af E),
+        IsCompact Kf
+          → ∃ C : ℝ,
+            0 ≤ C
+              ∧ ∀ T : ℝ,
+                1 ≤ T
+                  → {ξ : E | ‖pInf E (algebraMap E (Ad E) ξ)‖ ≤ T ∧ pFin E (algebraMap E (Ad E) ξ) ∈ Kf}.Finite
+                    ∧ ({ξ : E | ‖pInf E (algebraMap E (Ad E) ξ)‖ ≤ T ∧ pFin E (algebraMap E (Ad E) ξ) ∈ Kf}.ncard
+                        : ℝ)
+                      ≤ C * T ^ m := by
   intro E _ _ _
   obtain ⟨m, C₀, hC₀, hcount⟩ := GlobalTheory.T.card_algebraic_integers_bounded_archimedean_le E
   refine ⟨m, fun Kf hKf => ?_⟩
@@ -50,7 +60,9 @@ theorem rat_bounded_compact_polynomial : ∀ (E : Type) [Field E] [NumberField E
   refine ⟨hSfin, ?_⟩
   have h1 : S.ncard ≤ A.ncard :=
     (Set.ncard_le_ncard hsub (hAfin.image _)).trans (Set.ncard_image_le hAfin)
-  calc (S.ncard : ℝ) ≤ A.ncard := by exact_mod_cast h1
+  calc
+    (S.ncard : ℝ)
+      ≤ A.ncard := by exact_mod_cast h1
     _ ≤ C₀ * (n * T) ^ m := hAcard
     _ = C₀ * (n : ℝ) ^ m * T ^ m := by rw [mul_pow]; ring
 

@@ -193,29 +193,35 @@ lemma norm_sub_one : ‖(l : ℚ_[l]) - 1‖ = 1 := by
   rw [sub_eq_add_neg, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h.ne, max_eq_right h.le]
   simp
 
-theorem logZl_hom : ∀ (l : ℕ) [Fact l.Prime],
-    (∀ u w : ℚ_[l], ‖u‖ = 1 → ‖w‖ = 1 →
-      Formalism.MainNotions.LocalSituation.logZl l (u * w) = Formalism.MainNotions.LocalSituation.logZl l u + Formalism.MainNotions.LocalSituation.logZl l w) ∧
-    ContinuousOn (Formalism.MainNotions.LocalSituation.logZl l) {u | ‖u‖ = 1} ∧
-    (∀ u : ℚ_[l], ‖u‖ = 1 → ‖Formalism.MainNotions.LocalSituation.logZl l u‖ ≤ 1) ∧
-    ∀ j : ℕ, 1 ≤ j → (l = 2 → 2 ≤ j) → ∀ u : ℚ_[l], ‖u - 1‖ ≤ (l : ℝ) ^ (-(j : ℤ)) →
-      ‖Formalism.MainNotions.LocalSituation.logZl l u‖ = ‖u - 1‖ := by
+theorem logZl_hom
+    : ∀ (l : ℕ) [Fact l.Prime],
+      (∀ u w : ℚ_[l],
+          ‖u‖ = 1 → ‖w‖ = 1
+            → Formalism.MainNotions.LocalSituation.logZl l (u * w)
+              = Formalism.MainNotions.LocalSituation.logZl l u
+                + Formalism.MainNotions.LocalSituation.logZl l w)
+        ∧ ContinuousOn (Formalism.MainNotions.LocalSituation.logZl l) {u | ‖u‖ = 1}
+        ∧ (∀ u : ℚ_[l], ‖u‖ = 1 → ‖Formalism.MainNotions.LocalSituation.logZl l u‖ ≤ 1)
+        ∧ ∀ j : ℕ,
+          1 ≤ j → (l = 2 → 2 ≤ j)
+            → ∀ u : ℚ_[l],
+              ‖u - 1‖ ≤ (l : ℝ) ^ (-(j : ℤ))
+                → ‖Formalism.MainNotions.LocalSituation.logZl l u‖ = ‖u - 1‖ := by
   intro l hl
   refine ⟨fun u w hu hw => ?_, ?_, fun u hu => ?_, fun j h1 h2 u hu => ?_⟩
   · rw [logZl_eq, logZl_eq, logZl_eq, mul_pow,
       lg_mul (norm_unit_pow_sub_one' hu) (norm_unit_pow_sub_one' hw), add_div]
-  · exact (continuousOn_lg.comp (continuous_pow (l * (l - 1))).continuousOn
-      fun u hu => norm_unit_pow_sub_one' hu).div_const _
+  · exact (continuousOn_lg.comp (continuous_pow (l * (l - 1))).continuousOn fun u hu =>
+      norm_unit_pow_sub_one' hu).div_const _
   · have hl1 : (1 : ℝ) ≤ l := by exact_mod_cast hl.out.one_le
-    rw [logZl_eq, norm_div, norm_lg (norm_unit_pow_sub_one' hu), norm_mul, norm_sub_one,
-      mul_one, Padic.norm_p, div_le_one (by positivity)]
+    rw [logZl_eq, norm_div, norm_lg (norm_unit_pow_sub_one' hu), norm_mul, norm_sub_one, mul_one,
+      Padic.norm_p, div_le_one (by positivity)]
     refine (norm_unit_pow_sub_one hu).trans ?_
     rw [← zpow_neg_one]
     exact zpow_le_zpow_right₀ hl1 (by norm_num)
   · have hu' := hu.trans (zpow_le_third h1 h2)
     have h0 : (l : ℚ_[l]) ≠ 0 := by exact_mod_cast hl.out.ne_zero
-    have h3 : (l : ℚ_[l]) - 1 ≠ 0 := by
-      rw [← norm_ne_zero_iff, norm_sub_one]; exact one_ne_zero
+    have h3 : (l : ℚ_[l]) - 1 ≠ 0 := by rw [← norm_ne_zero_iff, norm_sub_one]; exact one_ne_zero
     rw [logZl_eq, (lg_pow hu' _).2, Nat.cast_mul, Nat.cast_sub hl.out.one_le, Nat.cast_one,
       mul_div_cancel_left₀ _ (mul_ne_zero h0 h3), norm_lg hu']
 

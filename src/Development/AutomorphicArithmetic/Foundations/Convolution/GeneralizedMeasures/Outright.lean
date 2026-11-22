@@ -5,4 +5,5 @@ public import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.Integr
 
 @[expose] public section
 
-theorem UpperTheory.ConvolutionTheory.GM.gm : UpperTheory.ConvolutionTheory.GM.GM := UpperTheory.ConvolutionTheory.GM.gm_of_bcfl PositivityTheory.Rg.Tf.Loc.bcflUnit
+theorem UpperTheory.ConvolutionTheory.GM.gm : UpperTheory.ConvolutionTheory.GM.GM :=
+  UpperTheory.ConvolutionTheory.GM.gm_of_bcfl PositivityTheory.Rg.Tf.Loc.bcflUnit

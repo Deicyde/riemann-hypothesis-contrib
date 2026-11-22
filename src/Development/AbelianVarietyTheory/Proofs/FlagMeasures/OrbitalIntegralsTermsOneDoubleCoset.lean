@@ -18,7 +18,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FlagTermInvar
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData
+  Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
 open scoped Pointwise ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -29,15 +32,18 @@ namespace GlobalTheory.CosetOrbital
 
 open Formalism.L2.SG.TermOp.Vanish Formalism.L2.SG.Pf.FormTranspose
 
-theorem sum_norm_sq_basis_indep {Wq Wp : Type} [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
-    [FiniteDimensional ℂ Wq] [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
-    {ι : Type} [Fintype ι] (T : Wq →L[ℂ] Wp) (b e : OrthonormalBasis ι ℂ Wq) :
-    ∑ i, ‖T (b i)‖ ^ 2 = ∑ i, ‖T (e i)‖ ^ 2 := by
+theorem sum_norm_sq_basis_indep
+    {Wq Wp : Type} [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+    [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+    {ι : Type} [Fintype ι]
+    (T : Wq →L[ℂ] Wp) (b e : OrthonormalBasis ι ℂ Wq)
+    : ∑ i, ‖T (b i)‖ ^ 2 = ∑ i, ‖T (e i)‖ ^ 2 := by
   haveI := FiniteDimensional.complete ℂ Wq
   haveI := FiniteDimensional.complete ℂ Wp
   set c := stdOrthonormalBasis ℂ Wp
-  have key : ∀ f : OrthonormalBasis ι ℂ Wq,
-      ∑ i, ‖T (f i)‖ ^ 2 = ∑ k, ‖ContinuousLinearMap.adjoint T (c k)‖ ^ 2 := by
+  have key
+      : ∀ f : OrthonormalBasis ι ℂ Wq,
+        ∑ i, ‖T (f i)‖ ^ 2 = ∑ k, ‖ContinuousLinearMap.adjoint T (c k)‖ ^ 2 := by
     intro f
     have h1 : ∀ i, ‖T (f i)‖ ^ 2 = ∑ k, ‖⟪ContinuousLinearMap.adjoint T (c k), f i⟫_ℂ‖ ^ 2 := by
       intro i
@@ -50,38 +56,49 @@ theorem sum_norm_sq_basis_indep {Wq Wp : Type} [NormedAddCommGroup Wq] [InnerPro
     exact f.sum_sq_norm_inner_left _
   rw [key b, key e]
 
-theorem norm_hsEmb_unitary {Wq Wp : Type} [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
-    [FiniteDimensional ℂ Wq] [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
-    (c : ℂ) (hc : ‖c‖ = 1) (A : Wp ≃ₗᵢ[ℂ] Wp) (B : Wq ≃ₗᵢ[ℂ] Wq) (O : Wq →L[ℂ] Wp) :
-    ‖Formalism.L2.SG.PackageTie.hsEmb (c • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
-      (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq))))‖ =
-      ‖Formalism.L2.SG.PackageTie.hsEmb O‖ := by
-  have hsq : ∀ T : Wq →L[ℂ] Wp, ‖Formalism.L2.SG.PackageTie.hsEmb T‖ ^ 2 =
-      ∑ i, ‖T (stdOrthonormalBasis ℂ Wq i)‖ ^ 2 := by
+theorem norm_hsEmb_unitary
+    {Wq Wp : Type} [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+    [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+    (c : ℂ) (hc : ‖c‖ = 1)
+    (A : Wp ≃ₗᵢ[ℂ] Wp) (B : Wq ≃ₗᵢ[ℂ] Wq) (O : Wq →L[ℂ] Wp)
+    : ‖Formalism.L2.SG.PackageTie.hsEmb (c • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
+        (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq))))‖
+      = ‖Formalism.L2.SG.PackageTie.hsEmb O‖ := by
+  have hsq
+      : ∀ T : Wq →L[ℂ] Wp,
+        ‖Formalism.L2.SG.PackageTie.hsEmb T‖ ^ 2 = ∑ i, ‖T (stdOrthonormalBasis ℂ Wq i)‖ ^ 2 := by
     intro T
     rw [PiLp.norm_sq_eq_of_L2]
     simp [Formalism.L2.SG.PackageTie.hsEmb]
-  have h2 : ‖Formalism.L2.SG.PackageTie.hsEmb (c • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
-      (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq))))‖ ^ 2 =
-      ‖Formalism.L2.SG.PackageTie.hsEmb O‖ ^ 2 := by
+  have h2
+      : ‖Formalism.L2.SG.PackageTie.hsEmb (c • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
+            (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq))))‖
+          ^ 2
+        = ‖Formalism.L2.SG.PackageTie.hsEmb O‖ ^ 2 := by
     rw [hsq, hsq]
-    have e1 : ∀ i, ‖(c • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
-        (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq)))) (stdOrthonormalBasis ℂ Wq i)‖ ^ 2 =
-        ‖O (((stdOrthonormalBasis ℂ Wq).map B.symm) i)‖ ^ 2 := by
+    have e1
+        : ∀ i,
+          ‖(c • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
+                (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq)))) (stdOrthonormalBasis ℂ Wq i)‖
+              ^ 2
+            = ‖O (((stdOrthonormalBasis ℂ Wq).map B.symm) i)‖ ^ 2 := by
       intro i
       simp [norm_smul, hc]
     simp_rw [e1]
     exact sum_norm_sq_basis_indep O _ _
   have h0 : 0 ≤ ‖Formalism.L2.SG.PackageTie.hsEmb O‖ := norm_nonneg _
-  have h0' := norm_nonneg (Formalism.L2.SG.PackageTie.hsEmb (c • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
-      (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq)))))
+  have h0' :=
+    norm_nonneg (Formalism.L2.SG.PackageTie.hsEmb
+      (c
+        • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
+          (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq)))))
   nlinarith [sq_nonneg (‖Formalism.L2.SG.PackageTie.hsEmb O‖ - ‖Formalism.L2.SG.PackageTie.hsEmb (c • ((A.toContinuousLinearEquiv : Wp →L[ℂ] Wp).comp
       (O.comp (B.symm.toContinuousLinearEquiv : Wq →L[ℂ] Wq))))‖)]
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem psi_inv (u : D.what₂.Word) {n : X.B.I.Ginf} (hn : n ∈ X.NinfU u) :
-    X.psiInfU u n⁻¹ = (X.psiInfU u n)⁻¹ := by
+theorem psi_inv (u : D.what₂.Word) {n : X.B.I.Ginf} (hn : n ∈ X.NinfU u)
+    : X.psiInfU u n⁻¹ = (X.psiInfU u n)⁻¹ := by
   have hC := Formalism.L2.SG.Pf.psiInfChar_holds D X u
   have hne : ∀ s, X.psiInfU u s ≠ 0 := by
     intro s h0; have := psiInfU_norm X u s; rw [h0, norm_zero] at this; exact zero_ne_one this
@@ -101,14 +118,17 @@ end GlobalTheory.CosetOrbital
 namespace GlobalTheory.CosetOrbital
 open Formalism.L2.SG.Pf.FormTranspose
 
-theorem wu_move {D : D7} (X : HidaSetting D) (v : D.what₂.Word) (s : X.B.I.Ginf) (hs : s ∈ X.NinfU v) (h : X.B.I.Ginf)
-    (hh : h ∈ X.SinfU v) (x : X.B.I.Ginf) :
-    X.Wu v ((s⁻¹ * h) * x) = (X.psiInfU v s⁻¹ * X.psiInfU v h) •
-      (Formalism.L2.SG.RealObj.InfCut.piIso X v h hh) (X.Wu v x) := by
+theorem wu_move
+    {D : D7} (X : HidaSetting D) (v : D.what₂.Word) (s : X.B.I.Ginf) (hs : s ∈ X.NinfU v)
+    (h : X.B.I.Ginf) (hh : h ∈ X.SinfU v) (x : X.B.I.Ginf)
+    : X.Wu v ((s⁻¹ * h) * x)
+      = (X.psiInfU v s⁻¹ * X.psiInfU v h)
+        • (Formalism.L2.SG.RealObj.InfCut.piIso X v h hh) (X.Wu v x) := by
   have hNS : ∀ {s : X.B.I.Ginf}, s ∈ X.NinfU v → s ∈ X.SinfU v := fun hs p => (hs p).1
   have hsi : s⁻¹ ∈ X.NinfU v := ninf_inv X v hs
   rw [mul_assoc, (X.Wu_spec v).1 s⁻¹ (hNS hsi) (h * x), (X.piU_rep v).2.2.2.1 s⁻¹ hsi,
-    ContinuousLinearMap.one_apply, (X.Wu_spec v).1 h hh x, Formalism.L2.SG.RealObj.InfCut.piIso_apply, smul_smul]
+    ContinuousLinearMap.one_apply, (X.Wu_spec v).1 h hh x,
+    Formalism.L2.SG.RealObj.InfCut.piIso_apply, smul_smul]
   rfl
 
 end GlobalTheory.CosetOrbital
@@ -119,16 +139,21 @@ open Formalism.L2.SG.TermOp.Vanish Formalism.L2.SG.Pf.FormTranspose Set
 
 variable {D : D7} (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word)
 
-theorem pinned_form (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq)
-    (t : TauC Y u u') (hrel : t.relevant) (w : Point D.host.E (D.R.rS + 1))
-    (hreal : ∃ γ, Formalism.L2.SG.RealObj.IsPtRep X u u' w γ)
-    (g : X.B.I.Ginf) (hg : g ∈ X.SinfU u) (g' : X.B.I.Ginf) (hg' : g' ∈ X.SinfU u')
-    (hdec : t.pt.1 = g * Formalism.L2.SG.RealObj.gamW X u u' w * g'⁻¹) :
-    ∃ μR : Measure X.B.I.Ginf, Formalism.L2.SG.VolPin.IsPinnedR t w μR ∧
-      (MeasurableSet (FundOf t) ∧ ∀ y ∈ Rset t, ∃! s, s ∈ ROinf t ∧ s * y ∈ FundOf t) ∧
-      OOt t = (μR (FundOf t)).toReal •
-        (haveI := FiniteDimensional.complete ℂ (X.Vpi u)
-         OO ((νq (Formalism.L2.SG.RealObj.gamW X u u' w)).map (fun x => g * x)) Set.univ (X.Wu u) (X.Wu u') t.pt.1) := by
+theorem pinned_form
+    (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq)
+    (t : TauC Y u u') (hrel : t.relevant)
+    (w : Point D.host.E (D.R.rS + 1)) (hreal : ∃ γ, Formalism.L2.SG.RealObj.IsPtRep X u u' w γ)
+    (g : X.B.I.Ginf) (hg : g ∈ X.SinfU u)
+    (g' : X.B.I.Ginf)
+    (hg' : g' ∈ X.SinfU u') (hdec : t.pt.1 = g * Formalism.L2.SG.RealObj.gamW X u u' w * g'⁻¹)
+    : ∃ μR : Measure X.B.I.Ginf,
+      Formalism.L2.SG.VolPin.IsPinnedR t w μR
+        ∧ (MeasurableSet (FundOf t) ∧ ∀ y ∈ Rset t, ∃! s, s ∈ ROinf t ∧ s * y ∈ FundOf t)
+        ∧ OOt t
+          = (μR (FundOf t)).toReal
+            • (haveI := FiniteDimensional.complete ℂ (X.Vpi u)
+               OO ((νq (Formalism.L2.SG.RealObj.gamW X u u' w)).map (fun x => g * x)) Set.univ
+                 (X.Wu u) (X.Wu u') t.pt.1) := by
   haveI := FiniteDimensional.complete ℂ (X.Vpi u)
   set γw := Formalism.L2.SG.RealObj.gamW X u u' w with hγw
   have hγwP : Formalism.L2.SG.RealObj.IsPtRep X u u' w γw := by
@@ -154,12 +179,14 @@ theorem pinned_form (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (hP : Formalism.L2
       apply h2
       have := congrArg (fun m : Measure X.B.I.Ginf => m univ) h0
       simp only [hμR, Measure.map_apply hcjm MeasurableSet.univ, preimage_univ, Measure.coe_zero,
-        Pi.zero_apply] at this
+          Pi.zero_apply]
+        at this
       exact Measure.measure_univ_eq_zero.1 this
     · have hcje : ⇑((MeasurableEquiv.mulLeft g).trans (MeasurableEquiv.mulRight g⁻¹)) = cj := rfl
       rw [hμR, ← hcje, MeasurableEquiv.map_apply]
       refine measure_mono_null (fun z hz => ?_) h3
-      intro hzS; exact hz ((hRset z).2 hzS)
+      intro hzS
+      exact hz ((hRset z).2 hzS)
     · intro r hr
       set z := g⁻¹ * r * g with hz
       have hcz : cj z = r := by simp only [hcj, hz]; group
@@ -177,7 +204,8 @@ theorem pinned_form (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (hP : Formalism.L2
     rw [hν, lintegral_map hF (measurable_const_mul g)]
     have e1 : ∀ x0, ∫⁻ s, f (s * (g * x0)) ∂μR = ∫⁻ z, (fun y => f (g * y)) (z * x0) ∂μw := by
       intro x0
-      rw [hμR, lintegral_map (f := fun s => f (s * (g * x0))) (hf.comp (measurable_mul_const _)) hcjm]
+      rw [hμR,
+        lintegral_map (f := fun s => f (s * (g * x0))) (hf.comp (measurable_mul_const _)) hcjm]
       refine lintegral_congr fun z => ?_
       simp only [hcj]
       congr 1
@@ -196,8 +224,9 @@ theorem pinned_form (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (hP : Formalism.L2
     have h2 : (s0 * s'⁻¹) * (s' * r) ∈ FundOf t := by simpa [mul_assoc] using hs0F
     have := hFO.2.2 _ hs'F _ (Γ0.mul_mem hs0 (Γ0.inv_mem hs')) h2
     exact (mul_inv_eq_one.1 this).symm
-  have hFA := Formalism.L2.SG.Pf.formAllC_holds D X Y u u' t μR ν (FundOf t)
-    (Formalism.L2.SG.Pf.RelChar.relCharC_holds D X Y u u' t hrel) hHaar hQ' hFO.1 hKu
+  have hFA :=
+    Formalism.L2.SG.Pf.formAllC_holds D X Y u u' t μR ν (FundOf t)
+      (Formalism.L2.SG.Pf.RelChar.relCharC_holds D X Y u u' t hrel) hHaar hQ' hFO.1 hKu
   exact ⟨μR, ⟨γw, g, g', μw, hγwP, hg, hg', hdec, hμwH, hμwS, rfl⟩, ⟨hFO.1, hKu⟩, hFA⟩
 
 end GlobalTheory.CosetOrbital

@@ -7,13 +7,16 @@ public import Development.AutomorphicSpectrum.Statements.GeometryStatements.Prop
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Flat
 
 namespace PositivityTheory.Xgn.CurveInFibre
 
-theorem valAt_inv {X : Scheme.{0}} {Ω K : Type} [Field Ω] [Field K] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-    {η : Spec (CommRingCat.of K) ⟶ X} {a : Ω} {r : K} (h : ValAt ξ η a r) (hr : r ≠ 0) :
-    ValAt ξ η a⁻¹ r⁻¹ := by
+theorem valAt_inv
+    {X : Scheme.{0}} {Ω K : Type} [Field Ω] [Field K]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {η : Spec (CommRingCat.of K) ⟶ X} {a : Ω} {r : K}
+    (h : ValAt ξ η a r) (hr : r ≠ 0)
+    : ValAt ξ η a⁻¹ r⁻¹ := by
   obtain ⟨hz, s, rfl, rfl⟩ := h
   have hl := Scheme.isLocalHom_stalkClosedPointTo η
   have hs : IsUnit s := hl.map_nonunit s (IsUnit.mk0 _ hr)
@@ -22,9 +25,12 @@ theorem valAt_inv {X : Scheme.{0}} {Ω K : Type} [Field Ω] [Field K] {ξ : Spec
   · exact map_units_inv _ u
   · exact map_units_inv _ u
 
-theorem finite_not_integral {K O A : Type} [Field K] [CommRing O] [CommRing A] (C : Crv.ACurve K) (g : O →+* A)
-    (hg : g.FiniteType) (φ : A →+* K) (hO : ∀ i a, φ (g a) ∈ (C.v i).valuationSubring) :
-    {i | ¬ ∀ a, φ a ∈ (C.v i).valuationSubring}.Finite := by
+theorem finite_not_integral
+    {K O A : Type} [Field K] [CommRing O] [CommRing A]
+    (C : Crv.ACurve K)
+    (g : O →+* A) (hg : g.FiniteType)
+    (φ : A →+* K) (hO : ∀ i a, φ (g a) ∈ (C.v i).valuationSubring)
+    : {i | ¬ ∀ a, φ a ∈ (C.v i).valuationSubring}.Finite := by
   let := g.toAlgebra
   obtain ⟨t, ht⟩ := (show Algebra.FiniteType O A from hg).out
   have hfin : ∀ a : A, {i | φ a ∉ (C.v i).valuationSubring}.Finite := by
@@ -43,11 +49,14 @@ theorem finite_not_integral {K O A : Type} [Field K] [CommRing O] [CommRing A] (
   | add y z _ _ hy hz => rw [map_add]; exact add_mem hy hz
   | mul y z _ _ hy hz => rw [map_mul]; exact mul_mem hy hz
 
-theorem ae_centre {X : Scheme.{0}} {K O : Type} [Field K] [CommRing O] (s : X ⟶ Spec (CommRingCat.of O))
-    [IsSeparated s] [LocallyOfFiniteType s] (C : Crv.ACurve K) (η : Spec (CommRingCat.of K) ⟶ X)
+theorem ae_centre
+    {X : Scheme.{0}} {K O : Type} [Field K] [CommRing O]
+    (s : X ⟶ Spec (CommRingCat.of O)) [IsSeparated s] [LocallyOfFiniteType s]
+    (C : Crv.ACurve K) (η : Spec (CommRingCat.of K) ⟶ X)
     (z : ∀ i, Spec (CommRingCat.of (C.v i).valuationSubring) ⟶ X)
     (hz : ∀ i, Spec.map (CommRingCat.ofHom (C.v i).valuationSubring.subtype) ≫ z i = η)
-    (U : X.Opens) (hU : centre η ∈ U) : {i | centre (z i) ∉ U}.Finite := by
+    (U : X.Opens) (hU : centre η ∈ U)
+    : {i | centre (z i) ∉ U}.Finite := by
   obtain ⟨V, hV, hxV, hVU⟩ := exists_isAffineOpen_mem_and_subset hU
   have hV : IsAffineOpen V := hV
   have hr : Set.range η ⊆ Set.range hV.fromSpec := by
@@ -92,19 +101,48 @@ theorem ae_centre {X : Scheme.{0}} {K O : Type} [Field K] [CommRing O] (s : X �
 
 end PositivityTheory.Xgn.CurveInFibre
 
-theorem PositivityTheory.Xgn.exists_curve_in_fibre_degree : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (O : Type) [CommRing O] (s : X ⟶ Spec (CommRingCat.of O)) [IsSeparated s] [LocallyOfFiniteType s] (ϖ : Ω) (Γ : FibreCurve ξ ϖ), IsCptGen ξ → ∃ Y : Crv.CurveIn Γ.C Γ.η, Y.x = Γ.z ∧ ∀ (L : Lat ξ Ω) (n : ℤ), L.IsVB 1 ⊤ → (Γ.HasDeg L n ↔ Y.IsDeg L n) := by
+theorem PositivityTheory.Xgn.exists_curve_in_fibre_degree
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (O : Type)
+        [CommRing O] (s : X ⟶ Spec (CommRingCat.of O)) [IsSeparated s] [LocallyOfFiniteType s]
+        (ϖ : Ω) (Γ : FibreCurve ξ ϖ),
+      IsCptGen ξ
+        → ∃ Y : Crv.CurveIn Γ.C Γ.η,
+          Y.x = Γ.z ∧ ∀ (L : Lat ξ Ω) (n : ℤ), L.IsVB 1 ⊤ → (Γ.HasDeg L n ↔ Y.IsDeg L n) := by
   intro X Ω _ ξ O _ s _ _ ϖ Γ _
-  refine ⟨⟨Γ.z, Γ.z_gen, PositivityTheory.Xgn.CurveInFibre.ae_centre s Γ.C Γ.η Γ.z Γ.z_gen⟩, rfl, fun L n _ => ⟨?_, ?_⟩⟩
+  refine ⟨
+    ⟨Γ.z, Γ.z_gen, PositivityTheory.Xgn.CurveInFibre.ae_centre s Γ.C Γ.η Γ.z Γ.z_gen⟩,
+    rfl,
+    fun L n _ => ⟨?_, ?_⟩
+  ⟩
   · rintro ⟨e, f, r, he, hf, hr, hfin, hd⟩
-    refine ⟨Γ.η_spec, Γ.z_spec, e, f, fun i => (r i)⁻¹, he, fun i => (hf i).2, fun i => ⟨inv_ne_zero (hr i).1, ?_⟩,
-      ?_, ?_⟩
+    refine ⟨
+      Γ.η_spec,
+      Γ.z_spec,
+      e,
+      f,
+      fun i => (r i)⁻¹,
+      he,
+      fun i => (hf i).2,
+      fun i => ⟨inv_ne_zero (hr i).1, ?_⟩,
+      ?_,
+      ?_
+    ⟩
     · rw [← inv_div]
       exact PositivityTheory.Xgn.CurveInFibre.valAt_inv (hr i).2 (hr i).1
     · simpa using hfin
     · rw [← hd]
       simp
   · rintro ⟨h₀, h, e, f, r, he, hf, hr, hfin, hd⟩
-    refine ⟨e, f, fun i => (r i)⁻¹, he, fun i => ⟨h i, hf i⟩, fun i => ⟨inv_ne_zero (hr i).1, ?_⟩, ?_, ?_⟩
+    refine ⟨
+      e,
+      f,
+      fun i => (r i)⁻¹,
+      he,
+      fun i => ⟨h i, hf i⟩,
+      fun i => ⟨inv_ne_zero (hr i).1, ?_⟩,
+      ?_,
+      ?_
+    ⟩
     · rw [← inv_div]
       exact PositivityTheory.Xgn.CurveInFibre.valAt_inv (hr i).2 (hr i).1
     · simpa using hfin

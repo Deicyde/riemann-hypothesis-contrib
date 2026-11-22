@@ -11,8 +11,9 @@ open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
 
 namespace GlobalTheory
 
-theorem card_le_absNorm_of_forall_le : ∀ (F : Type) [Field F] [NumberField F] (I : Ideal (𝓞 F)), I ≠ ⊥ →
-    ∀ s : Finset (Ideal (𝓞 F)), (∀ J ∈ s, I ≤ J) → s.card ≤ Ideal.absNorm I := by
+theorem card_le_absNorm_of_forall_le
+    : ∀ (F : Type) [Field F] [NumberField F] (I : Ideal (𝓞 F)),
+      I ≠ ⊥ → ∀ s : Finset (Ideal (𝓞 F)), (∀ J ∈ s, I ≤ J) → s.card ≤ Ideal.absNorm I := by
   intro F _ _ I hI s hs
   classical
   haveI : Finite (𝓞 F ⧸ I) := Ideal.finiteQuotientOfFreeOfNeBot I hI
@@ -24,8 +25,9 @@ theorem card_le_absNorm_of_forall_le : ∀ (F : Type) [Field F] [NumberField F] 
       exact ⟨a, fun _ => ha⟩
     · exact ⟨0, fun h' => absurd h' h⟩
   choose g hg using hgen
-  have hle : ∀ J K : Ideal (𝓞 F), I ≤ J → I ≤ K →
-      Ideal.Quotient.mk I (g J) = Ideal.Quotient.mk I (g K) → J ≤ K := by
+  have hle
+      : ∀ J K : Ideal (𝓞 F),
+        I ≤ J → I ≤ K → Ideal.Quotient.mk I (g J) = Ideal.Quotient.mk I (g K) → J ≤ K := by
     intro J K hJ hK heq
     rw [← hg J hJ]
     refine sup_le hK ?_
@@ -42,7 +44,9 @@ theorem card_le_absNorm_of_forall_le : ∀ (F : Type) [Field F] [NumberField F] 
     exact le_antisymm (hle J K (hs J hJ) (hs K hK) heq) (hle K J (hs K hK) (hs J hJ) heq.symm)
   have h1 : s.card ≤ (Finset.univ : Finset (𝓞 F ⧸ I)).card :=
     Finset.card_le_card_of_injOn _ (fun _ _ => Finset.mem_coe.mpr (Finset.mem_univ _)) hinj
-  rw [Finset.card_univ, ← Nat.card_eq_fintype_card, ← Submodule.cardQuot_apply, ← Ideal.absNorm_apply] at h1
+  rw [Finset.card_univ, ← Nat.card_eq_fintype_card, ← Submodule.cardQuot_apply,
+      ← Ideal.absNorm_apply]
+    at h1
   exact h1
 
 end GlobalTheory

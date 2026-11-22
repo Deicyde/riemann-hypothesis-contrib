@@ -12,12 +12,16 @@ open scoped ENNReal Pointwise
 
 namespace GlobalTheory.CompanionTheory.HaarPK
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type*}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
 
-theorem exists_eq_smul [LocallyCompactSpace G] [SecondCountableTopology G] (μ ν : Measure G)
-    [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ] [ν.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts ν]
-    (hμ : μ ≠ 0) (hν : ν ≠ 0) : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • ν := by
+theorem exists_eq_smul
+    [LocallyCompactSpace G] [SecondCountableTopology G]
+    (μ ν : Measure G) [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ] [ν.IsMulLeftInvariant]
+    [IsFiniteMeasureOnCompacts ν]
+    (hμ : μ ≠ 0) (hν : ν ≠ 0)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • ν := by
   obtain ⟨K₀⟩ : Nonempty (PositiveCompacts G) := inferInstance
   have h1 := Measure.haarMeasure_unique μ K₀
   have h2 := Measure.haarMeasure_unique ν K₀
@@ -30,9 +34,13 @@ theorem exists_eq_smul [LocallyCompactSpace G] [SecondCountableTopology G] (μ �
   conv_rhs => rw [h2]
   rw [smul_smul, ← h2, ENNReal.div_mul_cancel b0 bt]
 
-theorem map_mul_right_eq [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] (μ : Measure G)
-    [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ] (hμ : μ ≠ 0) (K : Subgroup G)
-    (hK : IsCompact (K : Set G)) {k : G} (hk : k ∈ K) : μ.map (fun x => x * k) = μ := by
+theorem map_mul_right_eq
+    [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G]
+    (μ : Measure G) [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ]
+    (hμ : μ ≠ 0)
+    (K : Subgroup G) (hK : IsCompact (K : Set G))
+    {k : G} (hk : k ∈ K)
+    : μ.map (fun x => x * k) = μ := by
   obtain ⟨K₀⟩ : Nonempty (PositiveCompacts G) := inferInstance
   have h1 := Measure.haarMeasure_unique μ K₀
   have a0 : μ K₀ ≠ 0 := fun h => hμ (by rw [h1, h, zero_smul])
@@ -48,11 +56,15 @@ theorem map_mul_right_eq [LocallyCompactSpace G] [SecondCountableTopology G] [T2
     ext x
     constructor
     · rintro ⟨a, ha, b, hb, hab⟩
-      exact ⟨a, ha, b * k⁻¹, K.mul_mem hb (K.inv_mem hk), by
-        simp only at hab ⊢; rw [← mul_assoc, hab]; simp⟩
+      exact ⟨
+        a,
+        ha,
+        b * k⁻¹,
+        K.mul_mem hb (K.inv_mem hk),
+        by simp only at hab ⊢; rw [← mul_assoc, hab]; simp
+      ⟩
     · rintro ⟨a, ha, b, hb, hab⟩
-      exact ⟨a, ha, b * k, K.mul_mem hb hk, by
-        simp only at hab ⊢; rw [← mul_assoc, hab]⟩
+      exact ⟨a, ha, b * k, K.mul_mem hb hk, by simp only at hab ⊢; rw [← mul_assoc, hab]⟩
   have h0 : μ ((K₀ : Set G) * (K : Set G)) ≠ 0 := fun h =>
     a0 (measure_mono_null (fun x hx => Set.mem_mul.2 ⟨x, hx, 1, K.one_mem, mul_one x⟩) h)
   have h2 := congrArg (fun m : Measure G => m ((K₀ : Set G) * (K : Set G))) hc
@@ -68,8 +80,9 @@ def transl (M : Subgroup G) (η : Measure M) (x : G) : Measure G := η.map (fun 
 theorem measurable_transl_fun (M : Subgroup G) (x : G) : Measurable (fun m : M => x * (m : G)) :=
   measurable_subtype_coe.const_mul x
 
-theorem transl_mul_mem (M : Subgroup G) (η : Measure M) [η.IsMulLeftInvariant] (x : G) {m : G} (hm : m ∈ M) :
-    transl M η (x * m) = transl M η x := by
+theorem transl_mul_mem
+    (M : Subgroup G) (η : Measure M) [η.IsMulLeftInvariant] (x : G) {m : G} (hm : m ∈ M)
+    : transl M η (x * m) = transl M η x := by
   unfold transl
   conv_rhs => rw [← map_mul_left_eq_self η ⟨m, hm⟩]
   rw [Measure.map_map (measurable_transl_fun M x) (measurable_const_mul _)]
@@ -77,16 +90,17 @@ theorem transl_mul_mem (M : Subgroup G) (η : Measure M) [η.IsMulLeftInvariant]
   ext y
   simp [mul_assoc]
 
-theorem transl_mul (M : Subgroup G) (η : Measure M) (q x : G) :
-    transl M η (q * x) = (transl M η x).map (fun y => q * y) := by
+theorem transl_mul (M : Subgroup G) (η : Measure M) (q x : G)
+    : transl M η (q * x) = (transl M η x).map (fun y => q * y) := by
   unfold transl
   rw [Measure.map_map (measurable_const_mul _) (measurable_transl_fun M x)]
   congr 1
   ext y
   simp [mul_assoc]
 
-theorem isClosed_transl_le (M : Subgroup G) (η : Measure M) [η.Regular] {U : Set G} (hU : IsOpen U) (t : ℝ≥0∞) :
-    IsClosed {x | transl M η x U ≤ t} := by
+theorem isClosed_transl_le
+    (M : Subgroup G) (η : Measure M) [η.Regular] {U : Set G} (hU : IsOpen U) (t : ℝ≥0∞)
+    : IsClosed {x | transl M η x U ≤ t} := by
   rw [← isOpen_compl_iff, isOpen_iff_mem_nhds]
   intro x hx
   simp only [mem_compl_iff, mem_setOf_eq, not_le, transl] at hx
@@ -103,12 +117,16 @@ theorem isClosed_transl_le (M : Subgroup G) (η : Measure M) [η.Regular] {U : S
   rw [Measure.map_apply (measurable_transl_fun M y) hU.measurableSet]
   exact ht.trans_le (measure_mono hy)
 
-theorem exists_lift [SecondCountableTopology G] [T2Space G] (μ : Measure G)
-    [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ] (P K : Subgroup G) (hP : IsClosed (P : Set G))
-    (hK : IsCompact (K : Set G)) (hPK : ∀ g, ∃ p ∈ P, ∃ k ∈ K, g = p * k) :
-    ∃ l : Measure G, l (P : Set G)ᶜ = 0 ∧ (∀ p ∈ P, l.map (fun x => p * x) = l) ∧
-      (∀ s : Set G, IsCompact s → l s ≠ ⊤) ∧
-      ∀ φ : G → ℝ≥0∞, Measurable φ → (∀ x, ∀ k ∈ K, φ (x * k) = φ x) → ∫⁻ x, φ x ∂l = ∫⁻ x, φ x ∂μ := by
+theorem exists_lift
+    [SecondCountableTopology G] [T2Space G]
+    (μ : Measure G) [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ]
+    (P K : Subgroup G) (hP : IsClosed (P : Set G)) (hK : IsCompact (K : Set G))
+    (hPK : ∀ g, ∃ p ∈ P, ∃ k ∈ K, g = p * k)
+    : ∃ l : Measure G,
+      l (P : Set G)ᶜ = 0 ∧ (∀ p ∈ P, l.map (fun x => p * x) = l)
+        ∧ (∀ s : Set G, IsCompact s → l s ≠ ⊤)
+        ∧ ∀ φ : G → ℝ≥0∞,
+          Measurable φ → (∀ x, ∀ k ∈ K, φ (x * k) = φ x) → ∫⁻ x, φ x ∂l = ∫⁻ x, φ x ∂μ := by
   set M : Subgroup G := P ⊓ K with hM
   have hMc : IsCompact (M : Set G) := hK.inter_left hP
   haveI : CompactSpace M := isCompact_iff_compactSpace.1 hMc
@@ -137,7 +155,8 @@ theorem exists_lift [SecondCountableTopology G] [T2Space G] (μ : Measure G)
     | isOpen U hU =>
       apply measurable_of_Iic
       intro t
-      have : (fun g => κ g U) ⁻¹' Iic t = ({x | transl M η x U ≤ t} ∩ (P : Set G)) * (K : Set G) := by
+      have : (fun g => κ g U) ⁻¹' Iic t
+          = ({x | transl M η x U ≤ t} ∩ (P : Set G)) * (K : Set G) := by
         ext g
         constructor
         · intro hg
@@ -154,8 +173,8 @@ theorem exists_lift [SecondCountableTopology G] [T2Space G] (μ : Measure G)
     | iUnion f hd hf ih =>
       simp only [measure_iUnion hd hf]
       exact Measurable.tsum ih
-  have happ : ∀ g, ∀ A, MeasurableSet A → κ g A = η ((fun m : M => s g * (m : G)) ⁻¹' A) := fun g A hA =>
-    Measure.map_apply (measurable_transl_fun M _) hA
+  have happ : ∀ g, ∀ A, MeasurableSet A → κ g A = η ((fun m : M => s g * (m : G)) ⁻¹' A) :=
+    fun g A hA => Measure.map_apply (measurable_transl_fun M _) hA
   refine ⟨μ.bind κ, ?_, ?_, ?_, ?_⟩
   · rw [Measure.bind_apply hP.measurableSet.compl hmeas.aemeasurable]
     have : ∀ g, κ g (P : Set G)ᶜ = 0 := by
@@ -202,25 +221,34 @@ theorem exists_lift [SecondCountableTopology G] [T2Space G] (μ : Measure G)
       conv_rhs => rw [hsr g, hinv _ _ (hr g)]
     simp [this]
 
-theorem exists_eq_smul_subgroup [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G]
-    (P : Subgroup G) (hP : IsClosed (P : Set G)) (μ ν : Measure G)
-    (hμ1 : μ (P : Set G)ᶜ = 0) (hμ2 : ∀ p ∈ P, μ.map (fun x => p * x) = μ)
-    (hμ3 : ∀ s : Set G, IsCompact s → μ s ≠ ⊤) (hμ4 : μ ≠ 0)
-    (hν1 : ν (P : Set G)ᶜ = 0) (hν2 : ∀ p ∈ P, ν.map (fun x => p * x) = ν)
-    (hν3 : ∀ s : Set G, IsCompact s → ν s ≠ ⊤) (hν4 : ν ≠ 0) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • ν := by
+theorem exists_eq_smul_subgroup
+    [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G]
+    (P : Subgroup G) (hP : IsClosed (P : Set G))
+    (μ ν : Measure G) (hμ1 : μ (P : Set G)ᶜ = 0) (hμ2 : ∀ p ∈ P, μ.map (fun x => p * x) = μ)
+    (hμ3 : ∀ s : Set G, IsCompact s → μ s ≠ ⊤) (hμ4 : μ ≠ 0) (hν1 : ν (P : Set G)ᶜ = 0)
+    (hν2 : ∀ p ∈ P, ν.map (fun x => p * x) = ν) (hν3 : ∀ s : Set G, IsCompact s → ν s ≠ ⊤)
+    (hν4 : ν ≠ 0)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • ν := by
   have hemb : MeasurableEmbedding ((↑) : P → G) := MeasurableEmbedding.subtype_coe hP.measurableSet
   haveI : LocallyCompactSpace P := hP.locallyCompactSpace
   haveI : SecondCountableTopology P := inferInstanceAs (SecondCountableTopology (P : Set G))
-  have key : ∀ μ : Measure G, μ (P : Set G)ᶜ = 0 → (∀ p ∈ P, μ.map (fun x => p * x) = μ) →
-      (∀ s : Set G, IsCompact s → μ s ≠ ⊤) → μ ≠ 0 →
-      ∃ μ' : Measure P, μ'.IsMulLeftInvariant ∧ IsFiniteMeasureOnCompacts μ' ∧ μ' ≠ 0 ∧
-        μ = μ'.map (↑) := by
+  have key
+      : ∀ μ : Measure G,
+        μ (P : Set G)ᶜ = 0 → (∀ p ∈ P, μ.map (fun x => p * x) = μ)
+          → (∀ s : Set G, IsCompact s → μ s ≠ ⊤) → μ ≠ 0
+          → ∃ μ' : Measure P,
+            μ'.IsMulLeftInvariant ∧ IsFiniteMeasureOnCompacts μ' ∧ μ' ≠ 0 ∧ μ = μ'.map (↑) := by
     intro μ h1 h2 h3 h4
     have hmap : μ = (μ.comap ((↑) : P → G)).map (↑) := by
       rw [hemb.map_comap, Subtype.range_coe_subtype]
       exact (Measure.restrict_eq_self_of_ae_mem h1).symm
-    refine ⟨μ.comap (↑), ⟨fun p => ?_⟩, ⟨fun C hC => ?_⟩, fun h => h4 (by rw [hmap, h, Measure.map_zero]), hmap⟩
+    refine ⟨
+      μ.comap (↑),
+      ⟨fun p => ?_⟩,
+      ⟨fun C hC => ?_⟩,
+      fun h => h4 (by rw [hmap, h, Measure.map_zero]),
+      hmap
+    ⟩
     · ext A hA
       rw [Measure.map_apply (measurable_const_mul p) hA, hemb.comap_apply, hemb.comap_apply]
       conv_rhs => rw [← h2 p p.2]
@@ -258,7 +286,9 @@ theorem haarProductClosedCompact_holds : Formalism.D.haarProductClosedCompact :=
   have hinv : ∀ x, ∀ k ∈ K, ∫⁻ y, Φ (x * k * y) ∂μK = ∫⁻ y, Φ (x * y) ∂μK := by
     intro x k hk
     conv_rhs => rw [← k3 k hk]
-    rw [lintegral_map (f := fun y => Φ (x * y)) (hΦ.comp (measurable_const_mul x)) (measurable_const_mul k)]
+    rw [lintegral_map
+      (f := fun y => Φ (x * y))
+      (hΦ.comp (measurable_const_mul x)) (measurable_const_mul k)]
     simp [mul_assoc]
   have h1 := l4 _ hφ hinv
   rw [hc, lintegral_smul_measure, smul_eq_mul] at h1

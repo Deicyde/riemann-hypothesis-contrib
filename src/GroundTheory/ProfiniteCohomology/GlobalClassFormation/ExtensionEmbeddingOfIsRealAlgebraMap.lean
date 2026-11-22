@@ -12,17 +12,16 @@ open NumberField NumberField.InfinitePlace
 
 variable {K : Type*} [Field K] [NumberField K]
 
-
 omit [NumberField K] in
-theorem apply_eq_abs_embedding_of_isReal {v : InfinitePlace K} (hv : v.IsReal) (x : K) :
-    v x = |embedding_of_isReal hv x| := by
+theorem apply_eq_abs_embedding_of_isReal {v : InfinitePlace K} (hv : v.IsReal) (x : K)
+    : v x = |embedding_of_isReal hv x| := by
   rw [← norm_embedding_of_isReal hv x, Real.norm_eq_abs]
 
-theorem exists_units_neg_iff_mem (S : Set {v : InfinitePlace K // v.IsReal}) :
-    ∃ a : Kˣ, ∀ v : {v : InfinitePlace K // v.IsReal},
-      (embedding_of_isReal v.2 (a : K) < 0 ↔ v ∈ S) ∧ (0 < embedding_of_isReal v.2 (a : K) ↔ v ∉ S) := by
+theorem exists_units_neg_iff_mem (S : Set {v : InfinitePlace K // v.IsReal})
+    : ∃ a : Kˣ, ∀ v : {v : InfinitePlace K // v.IsReal},
+      (embedding_of_isReal v.2 (a : K) < 0 ↔ v ∈ S)
+        ∧ (0 < embedding_of_isReal v.2 (a : K) ↔ v ∉ S) := by
   classical
-
   set c : InfinitePlace K → K := fun v => if h : v.IsReal then
     (if (⟨v, h⟩ : {v : InfinitePlace K // v.IsReal}) ∈ S then -1 else 1) else 1 with hcdef
   let t : (v : InfinitePlace K) → WithAbs v.1 := fun v => WithAbs.toAbs v.1 (c v)
@@ -46,7 +45,7 @@ theorem exists_units_neg_iff_mem (S : Set {v : InfinitePlace K // v.IsReal}) :
     rintro rfl
     obtain ⟨v⟩ : Nonempty (InfinitePlace K) := inferInstance
     have := hclose v
-    rw [zero_sub, show v (-c v) = v (c v) from v.1.map_neg _, hc] at this
+    rw [zero_sub, show v (- c v) = v (c v) from v.1.map_neg _, hc] at this
     exact lt_irrefl _ this
   refine ⟨Units.mk0 x hx0, fun v => ?_⟩
   have h := hclose v.1
@@ -56,17 +55,22 @@ theorem exists_units_neg_iff_mem (S : Set {v : InfinitePlace K // v.IsReal}) :
   rw [Units.val_mk0]
   by_cases hv : v ∈ S
   · rw [if_pos hv, map_neg, map_one, sub_neg_eq_add, abs_lt] at h
-    exact ⟨⟨fun _ => hv, fun _ => by linarith [h.2]⟩, ⟨fun h' => by linarith [h.2], fun h' => absurd hv h'⟩⟩
+    exact ⟨
+      ⟨fun _ => hv, fun _ => by linarith [h.2]⟩,
+      ⟨fun h' => by linarith [h.2], fun h' => absurd hv h'⟩
+    ⟩
   · rw [if_neg hv, map_one, abs_lt] at h
-    exact ⟨⟨fun h' => by linarith [h.1], fun h' => absurd h' hv⟩, ⟨fun _ => hv, fun _ => by linarith [h.1]⟩⟩
-
+    exact ⟨
+      ⟨fun h' => by linarith [h.1], fun h' => absurd h' hv⟩,
+      ⟨fun _ => hv, fun _ => by linarith [h.1]⟩
+    ⟩
 
 omit [NumberField K] in
-theorem extensionEmbeddingOfIsReal_algebraMap {v : InfinitePlace K} (hv : v.IsReal) (x : K) :
-    Completion.extensionEmbeddingOfIsReal hv (algebraMap K v.Completion x) = embedding_of_isReal hv x :=
-  by
-    rw [AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply,
-      Algebra.algebraMap_self_apply]
-    simpa using Completion.extensionEmbeddingOfIsReal_coe hv (WithAbs.toAbs v.1 x)
+theorem extensionEmbeddingOfIsReal_algebraMap {v : InfinitePlace K} (hv : v.IsReal) (x : K)
+    : Completion.extensionEmbeddingOfIsReal hv (algebraMap K v.Completion x)
+      = embedding_of_isReal hv x := by
+  rw [AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply,
+    Algebra.algebraMap_self_apply]
+  simpa using Completion.extensionEmbeddingOfIsReal_coe hv (WithAbs.toAbs v.1 x)
 
 end GroundTheory.ProfCoh

@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.ordCount_of :
-    OrdDecomp → Telescope → OrdCount := by
+theorem UpperTheory.Gal.crystallineComparison.ordCount_of : OrdDecomp → Telescope → OrdCount := by
   intro hD hT q n P F I _ v hR
   obtain ⟨A, hA, h0, hs⟩ := hD q n P F I v hR
   have key := hT q n P F (fun j => Multiset.map (v j) Finset.univ.val) A hA h0 hs

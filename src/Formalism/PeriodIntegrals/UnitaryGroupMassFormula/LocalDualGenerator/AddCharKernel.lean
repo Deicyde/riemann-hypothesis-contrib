@@ -11,8 +11,7 @@ open PI.LocDualGen.W
 
 theorem addCharKernel : PsiKer := by
   rintro l _ t a ⟨n, hn⟩ ht
-  have hI : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by
-    simp [Real.pi_ne_zero, Complex.I_ne_zero]
+  have hI : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by simp [Real.pi_ne_zero, Complex.I_ne_zero]
   have hexp : Complex.exp (2 * Real.pi * Complex.I * (a : ℂ)) = 1 ↔ a.den = 1 := by
     rw [Complex.exp_eq_one_iff]
     constructor

@@ -13,12 +13,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SiegelToroid
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
-theorem GlobalTheory.SiegJoin.siegelToroidalPolCharts : GlobalTheory.Published.SiegelToroidalPolCharts :=
-  GlobalTheory.SiegJoin.siegelToroidalPolCharts_of_steps5 GlobalTheory.T.exists_siegelFamily_cyclotomicAway_odd_level GlobalTheory.T.minimalSiegelCompactification_exists GlobalTheory.T.normalisedBlowup_ampleDivisor_compactification
+theorem GlobalTheory.SiegJoin.siegelToroidalPolCharts
+    : GlobalTheory.Published.SiegelToroidalPolCharts :=
+  GlobalTheory.SiegJoin.siegelToroidalPolCharts_of_steps5
+    GlobalTheory.T.exists_siegelFamily_cyclotomicAway_odd_level
+    GlobalTheory.T.minimalSiegelCompactification_exists
+    GlobalTheory.T.normalisedBlowup_ampleDivisor_compactification
     GlobalTheory.T.minimalBlowup_smooth_with_semiAbelianCharts GlobalTheory.SiegDescent.descSt5

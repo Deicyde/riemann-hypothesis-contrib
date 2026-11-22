@@ -4,20 +4,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV
+  UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
 
-private theorem fix_fix {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (H : Subgroup (Ω ≃ₐ[ℚ] Ω))
-    (h : IsOpen (H : Set (Ω ≃ₐ[ℚ] Ω))) : (IntermediateField.fixedField H).fixingSubgroup = H :=
+private theorem fix_fix
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (H : Subgroup (Ω ≃ₐ[ℚ] Ω)) (h : IsOpen (H : Set (Ω ≃ₐ[ℚ] Ω)))
+    : (IntermediateField.fixedField H).fixingSubgroup = H :=
   InfiniteGalois.fixingSubgroup_fixedField ⟨H, H.isClosed_of_isOpen h⟩
 
-private theorem commutator_le_ker_of_hom_int_units {Γ : Type*} [Group Γ] (η : Γ →* ℤˣ) : commutator Γ ≤ η.ker := by
+private theorem commutator_le_ker_of_hom_int_units {Γ : Type*} [Group Γ] (η : Γ →* ℤˣ)
+    : commutator Γ ≤ η.ker := by
   rw [commutator_def, Subgroup.commutator_le]
   intro a _ b _
   rw [MonoidHom.mem_ker, map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
   exact mul_comm _ _
 
-private theorem conj_ne_self_of_sq_eq_neg_natCast (z : ℂ) (D : ℕ) (hD : 0 < D) (h : z ^ 2 = -(D : ℂ)) :
-    starRingEnd ℂ z ≠ z := by
+private theorem conj_ne_self_of_sq_eq_neg_natCast
+    (z : ℂ) (D : ℕ) (hD : 0 < D) (h : z ^ 2 = -(D : ℂ))
+    : starRingEnd ℂ z ≠ z := by
   intro hc
   have him : z.im = 0 := Complex.conj_eq_iff_im.mp hc
   have h1 := congrArg Complex.re h
@@ -25,8 +30,15 @@ private theorem conj_ne_self_of_sq_eq_neg_natCast (z : ℂ) (D : ℕ) (hD : 0 < 
   have hD' : (0 : ℝ) < D := by exact_mod_cast hD
   nlinarith [mul_self_nonneg z.re]
 
-theorem UpperTheory.V.Fr.field_ex :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [CharP (ResidueField O) l] (η : G ℚ Ω →* ℤˣ) (Ψ : G ℚ Ω →* Oˣ) (σ : G ℚ Ω) (B : ValuationSubring Ω) (M : ℕ) (Hb : Subgroup (G ℚ Ω)), Gen l η Ψ σ B M Hb → ∀ (m : ℕ) (U : Subgroup (G ℚ Ω)), UFacts l η Ψ M m U → ∃ (L : Type) (_ : Field L) (_ : NumberField L) (_ : IsCMField L) (_ : Algebra L Ω), IsAbelianGalois ℚ L ∧ upl Ω L = U ∧ galOf ℚ L Ω = U ⊓ η.ker := by
+theorem UpperTheory.V.Fr.field_ex
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] {O : Type}
+        [CommRing O] [IsLocalRing O] [CharP (ResidueField O) l] (η : G ℚ Ω →* ℤˣ) (Ψ : G ℚ Ω →* Oˣ)
+        (σ : G ℚ Ω) (B : ValuationSubring Ω) (M : ℕ) (Hb : Subgroup (G ℚ Ω)),
+      Gen l η Ψ σ B M Hb
+        → ∀ (m : ℕ) (U : Subgroup (G ℚ Ω)),
+          UFacts l η Ψ M m U
+            → ∃ (L : Type) (_ : Field L) (_ : NumberField L) (_ : IsCMField L) (_ : Algebra L Ω),
+              IsAbelianGalois ℚ L ∧ upl Ω L = U ∧ galOf ℚ L Ω = U ⊓ η.ker := by
   intro Ω _ _ _ l _ O _ _ _ η Ψ σ B M Hb hG m U hU
   obtain ⟨D, δ, hD, -, hδ2, hδ⟩ := hG.quad
   have hδ0 : δ ≠ 0 := by
@@ -53,7 +65,8 @@ theorem UpperTheory.V.Fr.field_ex :
   haveI : FiniteDimensional ℚ (IntermediateField.adjoin ℚ {δ}) :=
     IntermediateField.adjoin.finiteDimensional hint
   have hkerO : IsOpen (η.ker : Set (G ℚ Ω)) := by
-    refine Subgroup.isOpen_mono ?_ (IntermediateField.fixingSubgroup_isOpen (IntermediateField.adjoin ℚ {δ}))
+    refine Subgroup.isOpen_mono ?_
+      (IntermediateField.fixingSubgroup_isOpen (IntermediateField.adjoin ℚ {δ}))
     intro s hs
     rw [MonoidHom.mem_ker, hker]
     exact (IntermediateField.mem_fixingSubgroup_iff _ _).mp hs δ
@@ -71,8 +84,7 @@ theorem UpperTheory.V.Fr.field_ex :
     refine ⟨fun n hn g => ?_⟩
     have hc : g * n * g⁻¹ * n⁻¹ ∈ U ⊓ η.ker :=
       hcomm (Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top n))
-    have he : g * n * g⁻¹ = g * n * g⁻¹ * n⁻¹ * n := by
-      group
+    have he : g * n * g⁻¹ = g * n * g⁻¹ * n⁻¹ * n := by group
     rw [he]
     exact Subgroup.mul_mem _ hc hn
   have hAb : @IsAbelianGalois ℚ L _ _ (IntermediateField.algebra' L) := by
@@ -122,13 +134,15 @@ theorem UpperTheory.V.Fr.field_ex :
     exact (NumberField.IsCMField.complexEmbedding_complexConj L (j.comp (algebraMap L Ω)) z).symm
   refine ⟨L, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, ?_, ?_⟩
   · ext s
-    change (∀ x ∈ NumberField.maximalRealSubfield L, s (algebraMap L Ω x) = algebraMap L Ω x) ↔ s ∈ U
+    change (∀ x ∈ NumberField.maximalRealSubfield L, s (algebraMap L Ω x) = algebraMap L Ω x)
+      ↔ s ∈ U
     constructor
     · intro h
       rw [← fix_fix U hU.isOpen, IntermediateField.mem_fixingSubgroup_iff]
       intro y hy
-      have hyL : y ∈ L := (IntermediateField.mem_fixedField_iff _ _).mpr fun f hf =>
-        (IntermediateField.mem_fixedField_iff _ _).mp hy f (Subgroup.mem_inf.mp hf).1
+      have hyL : y ∈ L :=
+        (IntermediateField.mem_fixedField_iff _ _).mpr fun f hf =>
+          (IntermediateField.mem_fixedField_iff _ _).mp hy f (Subgroup.mem_inf.mp hf).1
       have hre : (⟨y, hyL⟩ : L) ∈ NumberField.maximalRealSubfield L := by
         rw [← NumberField.IsCMField.complexConj_eq_self_iff]
         apply Subtype.ext

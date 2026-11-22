@@ -23,7 +23,6 @@ def uPow (n : ℤ) : LaurentSeries R := HahnSeries.single n 1
 
 def dL : LaurentSeries R →ₗ[R] LaurentSeries R := LaurentSeries.hasseDeriv R 1
 
-
 open Classical in
 def compInv (s : R⟦X⟧) : R⟦X⟧ :=
   if h : ∃ t : R⟦X⟧, constantCoeff t = 0 ∧ s.subst t = X then h.choose else 0
@@ -43,7 +42,7 @@ def wU : R⟦X⟧ := PowerSeries.mk fun n => coeff (n + 3) (wSer W)
 
 def xS : R⟦X⟧ := invOfUnit (wU W) 1
 
-def yS : R⟦X⟧ := -xS W
+def yS : R⟦X⟧ := - xS W
 
 def xL : LaurentSeries R := uPow (-2) * toL (xS W)
 
@@ -53,8 +52,7 @@ def fw : R⟦X⟧ :=
   1 - C W.a₁ * X - C W.a₂ * X ^ 2 - 2 * C W.a₃ * wSer W - 2 * C W.a₄ * X * wSer W
     - 3 * C W.a₆ * wSer W ^ 2
 
-def fu : R⟦X⟧ :=
-  3 * X ^ 2 + C W.a₁ * wSer W + 2 * C W.a₂ * X * wSer W + C W.a₄ * wSer W ^ 2
+def fu : R⟦X⟧ := 3 * X ^ 2 + C W.a₁ * wSer W + 2 * C W.a₂ * X * wSer W + C W.a₄ * wSer W ^ 2
 
 def om : R⟦X⟧ := invOfUnit (fw W) 1
 
@@ -74,8 +72,8 @@ variable {R : Type u} [CommRing R] (W : WeierstrassCurve R)
 
 def lam : MvPowerSeries (Fin 2) R := fun e => coeff (e 0 + e 1 + 1) (wSer W)
 
-def nu : MvPowerSeries (Fin 2) R := (wSer W).subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R)
-  - lam W * MvPowerSeries.X 0
+def nu : MvPowerSeries (Fin 2) R :=
+  (wSer W).subst (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R) - lam W * MvPowerSeries.X 0
 
 def cThree : MvPowerSeries (Fin 2) R :=
   1 + MvPowerSeries.C W.a₂ * lam W + MvPowerSeries.C W.a₄ * lam W ^ 2
@@ -86,7 +84,7 @@ def cTwo : MvPowerSeries (Fin 2) R :=
     + 2 * MvPowerSeries.C W.a₄ * lam W * nu W + 3 * MvPowerSeries.C W.a₆ * lam W ^ 2 * nu W
 
 def uThird : MvPowerSeries (Fin 2) R :=
-  -MvPowerSeries.X 0 - MvPowerSeries.X 1 - cTwo W * MvPowerSeries.invOfUnit (cThree W) 1
+  - MvPowerSeries.X 0 - MvPowerSeries.X 1 - cTwo W * MvPowerSeries.invOfUnit (cThree W) 1
 
 def wThird : MvPowerSeries (Fin 2) R := lam W * uThird W + nu W
 
@@ -138,8 +136,7 @@ def tS : R⟦X⟧ := X ^ 2 * invOfUnit (tDen W xP) 1
 
 def nS : R⟦X⟧ :=
   C (W.a₄ - W.a₁ * yP + 2 * W.a₂ * xP + 3 * xP ^ 2) * X * xS W
-    - C (2 * yP + W.a₁ * xP + W.a₃) * yS W
-    + C (2 * W.a₆ + W.a₄ * xP - W.a₃ * yP - xP ^ 3) * X ^ 3
+    - C (2 * yP + W.a₁ * xP + W.a₃) * yS W + C (2 * W.a₆ + W.a₄ * xP - W.a₃ * yP - xP ^ 3) * X ^ 3
 
 def xPlus : R⟦X⟧ := C xP + X * nS W xP yP * invOfUnit (tDen W xP) 1 ^ 2
 

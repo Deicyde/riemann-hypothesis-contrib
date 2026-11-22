@@ -9,13 +9,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open MeasureTheory NumberField IsDedekindDomain Filter ValuativeRel
 open GroundTheory.Global GroundTheory.Global.SemiLocal
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Loc GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Loc
+  GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open UpperTheory.Gal.LocD UpperTheory.Gal.InertialTypesAlt.G UpperTheory.Gal.Join
 open scoped Classical
 
-private theorem exists_dom {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {n : ℕ} (t : Fin n → kˣ) :
-    ∃ s : Fin n → kˣ, Dom s ∧ Dom (s * t) := by
+private theorem exists_dom
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : ℕ} (t : Fin n → kˣ)
+    : ∃ s : Fin n → kˣ, Dom s ∧ Dom (s * t) := by
   classical
   set c : Fin n → kˣ := fun i => if valuation k ((t i : kˣ) : k) ≤ 1 then (t i)⁻¹ else t i with hc
   have hv : ∀ u : kˣ, valuation k (u : k) ≠ 0 := fun u => by simp
@@ -38,14 +41,16 @@ private theorem exists_dom {k : Type} [Field k] [ValuativeRel k] [TopologicalSpa
     simp only [hc]
     split_ifs with h
     · rw [Units.val_inv_eq_inv_val, map_inv₀]
-    · exact (inv_le_one₀ (zero_lt_iff.mpr (hv _))).mpr (le_of_lt (not_le.mp h)) |>.trans
-        (le_of_lt (not_le.mp h))
+    · exact (inv_le_one₀ (zero_lt_iff.mpr (hv _))).mpr (le_of_lt (not_le.mp h))
+        |>.trans (le_of_lt (not_le.mp h))
   set x : kˣ := ∏ i, c i with hx
   have hx1 : 1 ≤ valuation k (x : k) := by
     rw [hx, Units.coe_prod, map_prod]
     exact Finset.one_le_prod' (fun i _ => hc1 i)
-  have hx2 : ∀ i j, i ≠ j →
-      valuation k ((c i : kˣ) : k) * valuation k ((c j : kˣ) : k) ≤ valuation k (x : k) := by
+  have hx2
+      : ∀ i j,
+        i ≠ j
+          → valuation k ((c i : kˣ) : k) * valuation k ((c j : kˣ) : k) ≤ valuation k (x : k) := by
     intro i j hij
     rw [hx, Units.coe_prod, map_prod,
       ← Finset.prod_pair (f := fun l => valuation k ((c l : kˣ) : k)) hij]
@@ -62,27 +67,30 @@ private theorem exists_dom {k : Type} [Field k] [ValuativeRel k] [TopologicalSpa
     refine mul_le_mul_right ?_ _
     have h1 : valuation k (x : k) ≤ valuation k (x : k) ^ m * valuation k (x : k) :=
       le_mul_of_one_le_left' (one_le_pow₀ hx1)
-    have h2 : valuation k ((t i : kˣ) : k) ≤ valuation k (x : k) * valuation k ((t j : kˣ) : k) := by
+    have h2
+        : valuation k ((t i : kˣ) : k) ≤ valuation k (x : k) * valuation k ((t j : kˣ) : k) := by
       have hne : i ≠ j := ne_of_lt hij
-      calc valuation k ((t i : kˣ) : k)
-          = valuation k ((t i : kˣ) : k) * ((valuation k ((t j : kˣ) : k))⁻¹ *
-              valuation k ((t j : kˣ) : k)) := by rw [inv_mul_cancel₀ (hv _), mul_one]
-        _ = (valuation k ((t i : kˣ) : k) * (valuation k ((t j : kˣ) : k))⁻¹) *
-              valuation k ((t j : kˣ) : k) := by rw [mul_assoc]
-        _ ≤ (valuation k ((c i : kˣ) : k) * valuation k ((c j : kˣ) : k)) *
-              valuation k ((t j : kˣ) : k) :=
-            mul_le_mul_left (mul_le_mul' (hct i) (hct' j)) _
-        _ ≤ valuation k (x : k) * valuation k ((t j : kˣ) : k) :=
-            mul_le_mul_left (hx2 i j hne) _
-    calc valuation k ((t i : kˣ) : k)
+      calc
+        valuation k ((t i : kˣ) : k)
+            = valuation k ((t i : kˣ) : k)
+              * ((valuation k ((t j : kˣ) : k))⁻¹ * valuation k ((t j : kˣ) : k)) := by
+          rw [inv_mul_cancel₀ (hv _), mul_one]
+        _ = (valuation k ((t i : kˣ) : k) * (valuation k ((t j : kˣ) : k))⁻¹)
+            * valuation k ((t j : kˣ) : k) := by
+          rw [mul_assoc]
+        _ ≤ (valuation k ((c i : kˣ) : k) * valuation k ((c j : kˣ) : k))
+            * valuation k ((t j : kˣ) : k) :=
+          mul_le_mul_left (mul_le_mul' (hct i) (hct' j)) _
+        _ ≤ valuation k (x : k) * valuation k ((t j : kˣ) : k) := mul_le_mul_left (hx2 i j hne) _
+    calc
+      valuation k ((t i : kˣ) : k)
         ≤ valuation k (x : k) * valuation k ((t j : kˣ) : k) := h2
       _ ≤ (valuation k (x : k) ^ m * valuation k (x : k)) * valuation k ((t j : kˣ) : k) :=
-          mul_le_mul_left h1 _
+        mul_le_mul_left h1 _
       _ = valuation k (x : k) * (valuation k (x : k) ^ m * valuation k ((t j : kˣ) : k)) := by
-          rw [mul_comm (valuation k (x : k) ^ m), mul_assoc]
+        rw [mul_comm (valuation k (x : k) ^ m), mul_assoc]
 
-theorem UpperTheory.Gal.Join.imStab :
-    UpperTheory.Gal.Join.ImStab := by
+theorem UpperTheory.Gal.Join.imStab : UpperTheory.Gal.Join.ImStab := by
   unfold UpperTheory.Gal.Join.ImStab UpperTheory.Gal.Join.ForRep
   intro k _ _ _ _ n V _ _ π hπ K hK
   have hH0 := heckeMul
@@ -102,17 +110,22 @@ theorem UpperTheory.Gal.Join.imStab :
   haveI hfd : FiniteDimensional ℂ
       (Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ (fixed π K)) :=
     Module.Finite.map _ _
-  have hD : ∀ t : Fin n → kˣ, Dom t → ∀ y ∈ Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ
-      (fixed π K), jacBU π t y ∈ Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ (fixed π K) := by
+  have hD
+      : ∀ t : Fin n → kˣ,
+        Dom t
+          → ∀ y ∈ Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ (fixed π K),
+            jacBU π t y ∈ Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ (fixed π K) := by
     intro t ht y hy
     obtain ⟨v, hv, rfl⟩ := Submodule.mem_map.mp hy
     rw [← (hH K hK e he t ht v hv).2]
     exact Submodule.mem_map_of_mem (he.mem _)
-  have key : ∀ (s : Fin n → kˣ) (z : Jacquet π (unipB k (Fin n))),
-      jacBU π s⁻¹ (jacBU π s z) = z := fun s z => by
+  have key
+      : ∀ (s : Fin n → kˣ) (z : Jacquet π (unipB k (Fin n))),
+        jacBU π s⁻¹ (jacBU π s z) = z := fun s z => by
     rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
-  have hU : ∀ t : Fin n → kˣ, ∀ y ∈ Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ
-      (fixed π K), jacBU π t y ∈ Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ (fixed π K) := by
+  have hU
+      : ∀ t : Fin n → kˣ, ∀ y ∈ Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ (fixed π K),
+        jacBU π t y ∈ Submodule.map (twKer π (unipB k (Fin n)) 1).mkQ (fixed π K) := by
     intro t y hy
     obtain ⟨s, hs, hst⟩ := exists_dom t
     let f := (jacBU π s).restrict (fun z hz => hD s hs z hz)
@@ -126,8 +139,7 @@ theorem UpperTheory.Gal.Join.imStab :
     have hz' : jacBU π s z = jacBU π (s * t) y := by
       have := congrArg Subtype.val hz
       simpa [f, LinearMap.restrict_apply] using this
-    have h2 : jacBU π s (jacBU π t y) = jacBU π s z := by
-      rw [hz', map_mul, Module.End.mul_apply]
+    have h2 : jacBU π s (jacBU π t y) = jacBU π s z := by rw [hz', map_mul, Module.End.mul_apply]
     have h3 : jacBU π t y = z := by
       have := congrArg (fun w => jacBU π s⁻¹ w) h2
       simpa [key] using this

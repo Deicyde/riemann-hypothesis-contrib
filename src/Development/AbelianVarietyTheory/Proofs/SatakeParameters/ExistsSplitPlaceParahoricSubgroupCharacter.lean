@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Finit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -15,34 +18,39 @@ namespace GlobalTheory.ParaLevel
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-theorem trivOutside_one (T : Set (HeightOneSpectrum (𝓞 (maximalRealSubfield L)))) :
-    TrivOutside T (1 : GAf L n) := by
+theorem trivOutside_one (T : Set (HeightOneSpectrum (𝓞 (maximalRealSubfield L))))
+    : TrivOutside T (1 : GAf L n) := by
   intro w _
   exact Matrix.map_one _ (map_zero _) (map_one _)
 
-theorem detDD_one (s : SplitPlace L) (r : ℕ) :
-    NG.detDD s r (1 : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) = 1 := by
+theorem detDD_one (s : SplitPlace L) (r : ℕ)
+    : NG.detDD s r (1 : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) = 1 := by
   unfold NG.detDD
   have : (Matrix.of fun a b : {x : Fin n // r ≤ x.val} =>
-      ((1 : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) :
-        Matrix (Fin n) (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) a.1 b.1) = 1 := by
+        ((1 : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))
+            : Matrix (Fin n) (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))
+          a.1 b.1)
+      = 1 := by
     ext a b
     simp [Matrix.one_apply, Subtype.ext_iff]
   rw [this, Matrix.det_one]
 
-theorem continuous_detDD (s : SplitPlace L) (r : ℕ) :
-    Continuous (NG.detDD (n := n) s r) := by
+theorem continuous_detDD (s : SplitPlace L) (r : ℕ) : Continuous (NG.detDD (n := n) s r) := by
   unfold NG.detDD
   refine Continuous.matrix_det ?_
   refine continuous_pi fun a => continuous_pi fun b => ?_
-  exact (Units.continuous_val (M := Matrix (Fin n) (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))).matrix_elem a.1 b.1
+  exact (Units.continuous_val
+    (M := Matrix (Fin n) (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))).matrix_elem a.1 b.1
 
 section main
-variable (s : SplitPlace L) (r : ℕ) (J : Subgroup (GAf L n)) (χ : J →* ℂˣ)
+variable
+  (s : SplitPlace L)
+  (r : ℕ)
+  (J : Subgroup (GAf L n)) (χ : J →* ℂˣ)
   (ξ : (s.v.adicCompletion (maximalRealSubfield L))ˣ →* ℂˣ)
 
-def paraSub (hP : NG.LevelPara J χ s r ξ) :
-    Subgroup (GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) where
+def paraSub (hP : NG.LevelPara J χ s r ξ)
+    : Subgroup (GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) where
   carrier := {g | NG.ParaRT s r g}
   one_mem' := by
     have h := (hP.mem 1 (trivOutside_one _)).1 J.one_mem
@@ -70,18 +78,20 @@ end GlobalTheory.ParaLevel
 namespace GlobalTheory.ParaLevel
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 section main2
-variable {s : SplitPlace L} {r : ℕ} {J : Subgroup (GAf L n)} {χ : J →* ℂˣ}
-  {ξ : (s.v.adicCompletion (maximalRealSubfield L))ˣ →* ℂˣ}
+variable
+  {s : SplitPlace L} {r : ℕ} {J : Subgroup (GAf L n)}
+  {χ : J →* ℂˣ} {ξ : (s.v.adicCompletion (maximalRealSubfield L))ˣ →* ℂˣ}
 
-def lift (s : SplitPlace L) (g : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) : GAf L n :=
+def lift (s : SplitPlace L) (g : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))
+    : GAf L n :=
   (GlobalTheory.SplitLift.exists_trivOutside_loc_eq n s g).choose
 
-theorem lift_triv (g : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) :
-    TrivOutside {s.v} (lift s g) :=
+theorem lift_triv (g : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))
+    : TrivOutside {s.v} (lift s g) :=
   (GlobalTheory.SplitLift.exists_trivOutside_loc_eq n s g).choose_spec.1
 
-theorem loc_lift (g : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L))) :
-    s.loc n (lift s g) = g :=
+theorem loc_lift (g : GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))
+    : s.loc n (lift s g) = g :=
   (GlobalTheory.SplitLift.exists_trivOutside_loc_eq n s g).choose_spec.2
 
 theorem lift_mem (hP : NG.LevelPara J χ s r ξ) (g : paraSub s r J χ ξ hP) : lift s g.1 ∈ J :=
@@ -90,26 +100,27 @@ theorem lift_mem (hP : NG.LevelPara J χ s r ξ) (g : paraSub s r J χ ξ hP) : 
 def thetaFun (hP : NG.LevelPara J χ s r ξ) (g : paraSub s r J χ ξ hP) : ℂˣ :=
   χ ⟨lift s g.1, lift_mem hP g⟩
 
-theorem chi_eq (hP : NG.LevelPara J χ s r ξ) (κ : GAf L n) (hκ : TrivOutside {s.v} κ) (hJ : κ ∈ J)
-    (h : s.loc n κ ∈ paraSub s r J χ ξ hP) : χ ⟨κ, hJ⟩ = thetaFun hP ⟨s.loc n κ, h⟩ := by
+theorem chi_eq
+    (hP : NG.LevelPara J χ s r ξ) (κ : GAf L n)
+    (hκ : TrivOutside {s.v} κ) (hJ : κ ∈ J) (h : s.loc n κ ∈ paraSub s r J χ ξ hP)
+    : χ ⟨κ, hJ⟩ = thetaFun hP ⟨s.loc n κ, h⟩ := by
   unfold thetaFun
   set κ₀ := lift s (s.loc n κ) with hκ₀
   have h0 : κ₀ ∈ J := lift_mem hP ⟨s.loc n κ, h⟩
   have ht : TrivOutside {s.v} (κ * κ₀⁻¹) :=
-    GlobalTheory.SatInd.CosetFin.trivOutside_mul hκ (GlobalTheory.SatInd.CosetFin.trivOutside_inv (lift_triv _))
-  have hl : s.loc n (κ * κ₀⁻¹) = 1 := by
-    rw [map_mul, map_inv, hκ₀, loc_lift, mul_inv_cancel]
+    GlobalTheory.SatInd.CosetFin.trivOutside_mul hκ
+      (GlobalTheory.SatInd.CosetFin.trivOutside_inv (lift_triv _))
+  have hl : s.loc n (κ * κ₀⁻¹) = 1 := by rw [map_mul, map_inv, hκ₀, loc_lift, mul_inv_cancel]
   have hδ : κ * κ₀⁻¹ ∈ J := J.mul_mem hJ (J.inv_mem h0)
-  have hc : χ ⟨κ * κ₀⁻¹, hδ⟩ = 1 := by
-    rw [hP.chr _ hδ ht 1 (by rw [hl, detDD_one]; rfl), map_one]
-  have hprod : (⟨κ, hJ⟩ : J) = ⟨κ * κ₀⁻¹, hδ⟩ * ⟨κ₀, h0⟩ := by
-    apply Subtype.ext; simp
+  have hc : χ ⟨κ * κ₀⁻¹, hδ⟩ = 1 := by rw [hP.chr _ hδ ht 1 (by rw [hl, detDD_one]; rfl), map_one]
+  have hprod : (⟨κ, hJ⟩ : J) = ⟨κ * κ₀⁻¹, hδ⟩ * ⟨κ₀, h0⟩ := by apply Subtype.ext; simp
   rw [hprod, map_mul, hc, one_mul]
 
 def theta (hP : NG.LevelPara J χ s r ξ) : paraSub s r J χ ξ hP →* ℂˣ where
   toFun := thetaFun hP
   map_one' := by
-    have h1 : s.loc n (1 : GAf L n) ∈ paraSub s r J χ ξ hP := by rw [map_one]; exact (paraSub s r J χ ξ hP).one_mem
+    have h1 : s.loc n (1 : GAf L n) ∈ paraSub s r J χ ξ hP := by
+      rw [map_one]; exact (paraSub s r J χ ξ hP).one_mem
     have := chi_eq hP 1 (trivOutside_one _) J.one_mem h1
     have e : (⟨s.loc n 1, h1⟩ : paraSub s r J χ ξ hP) = 1 := by apply Subtype.ext; simp
     rw [e] at this
@@ -139,7 +150,25 @@ end GlobalTheory.ParaLevel
 
 namespace GlobalTheory.ParaLevel
 
-theorem exists_parahoric_char : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : SplitPlace L) (r : ℕ) (J : Subgroup (GAf L n)) (χ : J →* ℂˣ) (ξ : (s.v.adicCompletion (maximalRealSubfield L))ˣ →* ℂˣ), NG.LevelPara J χ s r ξ → (∃ N : ℕ, ∀ u : (s.v.adicCompletion (maximalRealSubfield L))ˣ, Valued.v ((u : s.v.adicCompletion (maximalRealSubfield L)) - 1) ≤ WithZero.exp (-(N : ℤ)) → ξ u = 1) → ∃ (K : Subgroup (GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))) (θ : K →* ℂˣ), (∀ g, g ∈ K ↔ NG.ParaRT s r g) ∧ (∀ g (h : g ∈ K) (d : (s.v.adicCompletion (maximalRealSubfield L))ˣ), (d : s.v.adicCompletion (maximalRealSubfield L)) = NG.detDD s r g → θ ⟨g, h⟩ = ξ d) ∧ (∀ g ∈ K, g ∈ Formalism.UG.GLint (Fin n) (s.v.adicCompletionIntegers (maximalRealSubfield L)).toSubring) ∧ IsOpen (θ.ker : Set K) ∧ ∀ κ, TrivOutside {s.v} κ → ∀ (hJ : κ ∈ J) (h : s.loc n κ ∈ K), χ ⟨κ, hJ⟩ = θ ⟨s.loc n κ, h⟩ := by
+theorem exists_parahoric_char
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : SplitPlace L) (r : ℕ)
+        (J : Subgroup (GAf L n)) (χ : J →* ℂˣ)
+        (ξ : (s.v.adicCompletion (maximalRealSubfield L))ˣ →* ℂˣ),
+      NG.LevelPara J χ s r ξ
+        → (∃ N : ℕ, ∀ u : (s.v.adicCompletion (maximalRealSubfield L))ˣ,
+          Valued.v ((u : s.v.adicCompletion (maximalRealSubfield L)) - 1) ≤ WithZero.exp (-(N : ℤ))
+            → ξ u = 1)
+        → ∃ (K : Subgroup (GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))) (θ : K →* ℂˣ),
+          (∀ g, g ∈ K ↔ NG.ParaRT s r g)
+            ∧ (∀ g (h : g ∈ K) (d : (s.v.adicCompletion (maximalRealSubfield L))ˣ),
+              (d : s.v.adicCompletion (maximalRealSubfield L)) = NG.detDD s r g → θ ⟨g, h⟩ = ξ d)
+            ∧ (∀ g ∈ K,
+              g ∈ Formalism.UG.GLint (Fin n)
+                (s.v.adicCompletionIntegers (maximalRealSubfield L)).toSubring)
+            ∧ IsOpen (θ.ker : Set K)
+            ∧ ∀ κ,
+              TrivOutside {s.v} κ
+                → ∀ (hJ : κ ∈ J) (h : s.loc n κ ∈ K), χ ⟨κ, hJ⟩ = θ ⟨s.loc n κ, h⟩ := by
   intro L _ _ _ n s r J χ ξ hP hξ
   obtain ⟨N, hN⟩ := hξ
   refine ⟨paraSub s r J χ ξ hP, theta hP, fun g => Iff.rfl, ?_, fun g hg => hg.1, ?_, ?_⟩
@@ -153,12 +182,17 @@ theorem exists_parahoric_char : ∀ (L : Type) [Field L] [NumberField L] [IsCMFi
     obtain ⟨π, hπ⟩ := s.v.valuation_exists_uniformizer (maximalRealSubfield L)
     set a : s.v.adicCompletion (maximalRealSubfield L) := ((π : maximalRealSubfield L) : s.v.adicCompletion (maximalRealSubfield L)) ^ N
     have ha : Valued.v a = WithZero.exp (-(N : ℤ)) := by
-      simp only [a, map_pow, HeightOneSpectrum.valuedAdicCompletion_eq_valuation', hπ, ← WithZero.exp_nsmul]
-      congr 1; simp
+      simp only [a, map_pow, HeightOneSpectrum.valuedAdicCompletion_eq_valuation', hπ,
+        ← WithZero.exp_nsmul]
+      congr 1
+      simp
     have ha0 : (Valued.v a) ≠ 0 := by rw [ha]; simp
-    have hnhds : {x : s.v.adicCompletion (maximalRealSubfield L) |
-        Valued.v (x - 1) < WithZero.exp (-(N : ℤ))} ∈ nhds (1 : s.v.adicCompletion (maximalRealSubfield L)) := by
-      refine Valued.mem_nhds.2 ⟨Units.mk0 (Valued.v.restrict a) (by rwa [ne_eq, Valuation.restrict_eq_zero_iff]), ?_⟩
+    have hnhds
+        : {x : s.v.adicCompletion (maximalRealSubfield L) |
+            Valued.v (x - 1) < WithZero.exp (-(N : ℤ))}
+          ∈ nhds (1 : s.v.adicCompletion (maximalRealSubfield L)) := by
+      refine Valued.mem_nhds.2
+        ⟨Units.mk0 (Valued.v.restrict a) (by rwa [ne_eq, Valuation.restrict_eq_zero_iff]), ?_⟩
       intro y hy
       simp only [Set.mem_setOf_eq, Units.val_mk0] at hy ⊢
       rw [← ha]

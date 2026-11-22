@@ -18,42 +18,53 @@ section Local
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem valued_absNorm_le (v : HeightOneSpectrum (𝓞 F)) :
-    Valued.v ((Ideal.absNorm v.asIdeal : ℕ) : v.adicCompletion F) ≤ WithZero.exp (-1 : ℤ) := by
-  have h1 : ((Ideal.absNorm v.asIdeal : ℕ) : v.adicCompletion F) =
-      FinitePlace.embedding v (algebraMap (𝓞 F) F (Ideal.absNorm v.asIdeal : ℕ)) := by
+theorem valued_absNorm_le (v : HeightOneSpectrum (𝓞 F))
+    : Valued.v ((Ideal.absNorm v.asIdeal : ℕ) : v.adicCompletion F) ≤ WithZero.exp (-1 : ℤ) := by
+  have h1
+      : ((Ideal.absNorm v.asIdeal : ℕ) : v.adicCompletion F)
+        = FinitePlace.embedding v (algebraMap (𝓞 F) F (Ideal.absNorm v.asIdeal : ℕ)) := by
     simp
   rw [h1, FinitePlace.embedding_apply, HeightOneSpectrum.valuedAdicCompletion_eq_valuation',
     HeightOneSpectrum.valuation_of_algebraMap]
-  have h2 := (HeightOneSpectrum.intValuation_le_pow_iff_mem v
-    ((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 F) 1).2 (by simpa using Ideal.absNorm_mem v.asIdeal)
+  have h2 :=
+    (HeightOneSpectrum.intValuation_le_pow_iff_mem v ((Ideal.absNorm v.asIdeal : ℕ) : 𝓞 F) 1).2
+      (by simpa using Ideal.absNorm_mem v.asIdeal)
   simpa using h2
 
-theorem local_den (v : HeightOneSpectrum (𝓞 F)) (x : v.adicCompletion F) :
-    ∃ n : ℕ, 0 < n ∧ (n : ℝ≥0) ≤ max 1 ‖x‖₊ ∧ (n : v.adicCompletion F) * x ∈ v.adicCompletionIntegers F := by
+theorem local_den (v : HeightOneSpectrum (𝓞 F)) (x : v.adicCompletion F)
+    : ∃ n : ℕ,
+      0 < n ∧ (n : ℝ≥0) ≤ max 1 ‖x‖₊
+        ∧ (n : v.adicCompletion F) * x ∈ v.adicCompletionIntegers F := by
   by_cases hx : Valued.v x ≤ 1
   · exact ⟨1, one_pos, by simp, by simpa [HeightOneSpectrum.mem_adicCompletionIntegers] using hx⟩
   · have h1 : 1 < Valued.v x := not_le.1 hx
     have h0 : Valued.v x ≠ 0 := (zero_lt_one.trans h1).ne'
     obtain ⟨e, he⟩ : ∃ e : ℤ, Valued.v x = WithZero.exp e := ⟨_, (WithZero.exp_log h0).symm⟩
-    have hpos : 0 < e := by
-      rw [he, ← WithZero.exp_zero, WithZero.exp_lt_exp] at h1; exact h1
+    have hpos : 0 < e := by rw [he, ← WithZero.exp_zero, WithZero.exp_lt_exp] at h1; exact h1
     obtain ⟨k, rfl⟩ := Int.eq_ofNat_of_zero_le hpos.le
-    refine ⟨Ideal.absNorm v.asIdeal ^ k,
-      pow_pos (zero_lt_one.trans (NumberField.HeightOneSpectrum.one_lt_absNorm v)) k, ?_, ?_⟩
+    refine ⟨
+      Ideal.absNorm v.asIdeal ^ k,
+      pow_pos (zero_lt_one.trans (NumberField.HeightOneSpectrum.one_lt_absNorm v)) k,
+      ?_,
+      ?_
+    ⟩
     · refine le_max_of_le_right (le_of_eq ?_)
       apply NNReal.eq
-      rw [coe_nnnorm, FinitePlace.norm_def, he, WithZeroMulInt.toNNReal_neg_apply _ WithZero.exp_ne_zero]
+      rw [coe_nnnorm, FinitePlace.norm_def, he,
+        WithZeroMulInt.toNNReal_neg_apply _ WithZero.exp_ne_zero]
       simp only [WithZero.log_exp, zpow_natCast, Nat.cast_pow, NNReal.coe_pow]
     · rw [HeightOneSpectrum.mem_adicCompletionIntegers, map_mul, he, Nat.cast_pow, map_pow]
-      calc _ ≤ (WithZero.exp (-1 : ℤ)) ^ k * WithZero.exp (k : ℤ) := by
-            gcongr; exact valued_absNorm_le v
+      calc
+        _ ≤ (WithZero.exp (-1 : ℤ)) ^ k * WithZero.exp (k : ℤ) := by
+          gcongr; exact valued_absNorm_le v
         _ = 1 := by rw [← WithZero.exp_nsmul, ← WithZero.exp_add]; simp
 
-theorem adele_den (c : FiniteAdeleRing (𝓞 F) F) (h : HeightOneSpectrum (𝓞 F) → ℝ≥0)
-    (hf : (Function.mulSupport h).Finite) (h1 : ∀ v, 1 ≤ h v) (hc : ∀ v, ‖c v‖₊ ≤ h v) :
-    ∃ n : ℕ, 0 < n ∧ (n : ℝ≥0) ≤ ∏ᶠ v, h v ∧
-      ∀ v, (n : v.adicCompletion F) * c v ∈ v.adicCompletionIntegers F := by
+theorem adele_den
+    (c : FiniteAdeleRing (𝓞 F) F) (h : HeightOneSpectrum (𝓞 F) → ℝ≥0)
+    (hf : (Function.mulSupport h).Finite) (h1 : ∀ v, 1 ≤ h v) (hc : ∀ v, ‖c v‖₊ ≤ h v)
+    : ∃ n : ℕ,
+      0 < n ∧ (n : ℝ≥0) ≤ ∏ᶠ v, h v
+        ∧ ∀ v, (n : v.adicCompletion F) * c v ∈ v.adicCompletionIntegers F := by
   classical
   choose m hm0 hm1 hm2 using fun v => local_den v (c v)
   have hm3 : ∀ v, (m v : ℝ≥0) ≤ h v := fun v => (hm1 v).trans (max_le (h1 v) (hc v))
@@ -74,19 +85,26 @@ theorem adele_den (c : FiniteAdeleRing (𝓞 F) F) (h : HeightOneSpectrum (𝓞 
       rw [hm, Nat.cast_one, one_mul] at this
       exact mul_mem (natCast_mem _ _) this
 
-theorem family_den {ι : Type} [Fintype ι] (c : ι → FiniteAdeleRing (𝓞 F) F) (h : HeightOneSpectrum (𝓞 F) → ℝ≥0)
-    (hf : (Function.mulSupport h).Finite) (h1 : ∀ v, 1 ≤ h v) (hc : ∀ p v, ‖c p v‖₊ ≤ h v) :
-    ∃ n : ℕ, 0 < n ∧ (n : ℝ≥0) ≤ (∏ᶠ v, h v) ^ Fintype.card ι ∧
-      ∀ p v, (n : v.adicCompletion F) * c p v ∈ v.adicCompletionIntegers F := by
+theorem family_den
+    {ι : Type} [Fintype ι]
+    (c : ι → FiniteAdeleRing (𝓞 F) F) (h : HeightOneSpectrum (𝓞 F) → ℝ≥0)
+    (hf : (Function.mulSupport h).Finite) (h1 : ∀ v, 1 ≤ h v) (hc : ∀ p v, ‖c p v‖₊ ≤ h v)
+    : ∃ n : ℕ,
+      0 < n ∧ (n : ℝ≥0) ≤ (∏ᶠ v, h v) ^ Fintype.card ι
+        ∧ ∀ p v, (n : v.adicCompletion F) * c p v ∈ v.adicCompletionIntegers F := by
   choose n hn using fun p => adele_den (c p) h hf h1 (hc p)
   refine ⟨∏ p, n p, Finset.prod_pos fun p _ => (hn p).1, ?_, ?_⟩
   · push_cast
-    calc ∏ p, (n p : ℝ≥0) ≤ ∏ _p : ι, ∏ᶠ v, h v := Finset.prod_le_prod' fun p _ => (hn p).2.1
+    calc
+      ∏ p, (n p : ℝ≥0)
+        ≤ ∏ _p : ι, ∏ᶠ v, h v := Finset.prod_le_prod' fun p _ => (hn p).2.1
       _ = (∏ᶠ v, h v) ^ Fintype.card ι := by rw [Finset.prod_const, Finset.card_univ]
   · intro p v
     classical
-    have e : ((∏ q, n q : ℕ) : v.adicCompletion F) * c p v =
-        ((∏ q ∈ Finset.univ.erase p, n q : ℕ) : v.adicCompletion F) * ((n p : v.adicCompletion F) * c p v) := by
+    have e
+        : ((∏ q, n q : ℕ) : v.adicCompletion F) * c p v
+          = ((∏ q ∈ Finset.univ.erase p, n q : ℕ) : v.adicCompletion F)
+            * ((n p : v.adicCompletion F) * c p v) := by
       rw [← mul_assoc, ← Nat.cast_mul, Finset.prod_erase_mul _ _ (Finset.mem_univ p)]
     rw [e]
     exact mul_mem (natCast_mem _ _) ((hn p).2.2 v)
@@ -97,8 +115,8 @@ section Lattice
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem exists_nat_mem (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : I ≠ 0) :
-    ∃ n : ℕ, 0 < n ∧ (n : E) ∈ I := by
+theorem exists_nat_mem (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : I ≠ 0)
+    : ∃ n : ℕ, 0 < n ∧ (n : E) ∈ I := by
   obtain ⟨α, hα, hαI⟩ := FractionalIdeal.exists_ne_zero_mem_isInteger hI
   have hn : Ideal.absNorm (Ideal.span {α}) ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]; exact hα
@@ -109,9 +127,11 @@ theorem exists_nat_mem (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : 
   rw [this]
   exact Submodule.smul_mem (I : Submodule (𝓞 E) E) β hαI
 
-theorem exists_nat_smul_mem {W : Type} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W]
-    (L : Submodule (𝓞 E) W) (hL : Submodule.span E (L : Set W) = ⊤) (x : W) :
-    ∃ n : ℕ, 0 < n ∧ (n : E) • x ∈ L := by
+theorem exists_nat_smul_mem
+    {W : Type} [AddCommGroup W] [Module E W] [Module (𝓞 E) W] [IsScalarTower (𝓞 E) E W]
+    (L : Submodule (𝓞 E) W) (hL : Submodule.span E (L : Set W) = ⊤)
+    (x : W)
+    : ∃ n : ℕ, 0 < n ∧ (n : E) • x ∈ L := by
   have hx : x ∈ Submodule.span E (L : Set W) := by rw [hL]; trivial
   have key : ∀ (n : ℕ) (y : W), y ∈ L → (n : E) • y ∈ L := fun n y hy => by
     rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hy n
@@ -140,20 +160,23 @@ theorem exists_nat_smul_mem {W : Type} [AddCommGroup W] [Module E W] [Module (�
     have : ((m.natAbs * s : ℕ) : E) • e • y = r • ((s : E) • y) := by
       rw [← algebraMap_smul E r, smul_smul, smul_smul, hr]
       congr 1
-      push_cast; ring
+      push_cast
+      ring
     rw [this]
     exact L.smul_mem _ hsy
 
 end Lattice
 
-theorem column_expand {F E R W n κ : Type} [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R]
-    [AddCommGroup W] [Module E W] [Fintype n] [DecidableEq n] [Fintype κ] (b : Module.Basis κ F E)
-    (f : Module.Basis n E W) (M : Matrix n n (R ⊗[F] E)) (i : n) (B N : ℕ) :
-    M.mulVec (fun l => (1 : R) ⊗ₜ[F] (Pi.single i ((B * N : ℕ) : E) : n → E) l) =
-      ∑ j, ∑ k, fun l => ((N : R) * (Algebra.TensorProduct.basis R b).repr (M j i) k) ⊗ₜ[F]
-        f.repr (((B : E) * b k) • f j) l := by
-  have hv : (fun l => (1 : R) ⊗ₜ[F] (Pi.single i ((B * N : ℕ) : E) : n → E) l) =
-      Pi.single i ((B * N : ℕ) : R ⊗[F] E) := by
+theorem column_expand
+    {F E R W n κ : Type} [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R]
+    [AddCommGroup W] [Module E W] [Fintype n] [DecidableEq n] [Fintype κ]
+    (b : Module.Basis κ F E) (f : Module.Basis n E W) (M : Matrix n n (R ⊗[F] E)) (i : n) (B N : ℕ)
+    : M.mulVec (fun l => (1 : R) ⊗ₜ[F] (Pi.single i ((B * N : ℕ) : E) : n → E) l)
+      = ∑ j, ∑ k, fun l => ((N : R) * (Algebra.TensorProduct.basis R b).repr (M j i) k) ⊗ₜ[F]
+          f.repr (((B : E) * b k) • f j) l := by
+  have hv
+      : (fun l => (1 : R) ⊗ₜ[F] (Pi.single i ((B * N : ℕ) : E) : n → E) l)
+        = Pi.single i ((B * N : ℕ) : R ⊗[F] E) := by
     funext l
     by_cases hl : l = i
     · subst hl
@@ -174,21 +197,24 @@ theorem column_expand {F E R W n κ : Type} [Field F] [Field E] [Algebra F E] [C
     conv_lhs => rw [← hy2, Finset.sum_mul]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [MulOpposite.unop_op, e1, Algebra.TensorProduct.basis_apply, TensorProduct.smul_tmul',
-      Algebra.TensorProduct.tmul_mul_tmul,
-      smul_eq_mul, mul_one, map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_eq_same,
-      smul_eq_mul, mul_one, mul_comm (b k), mul_comm _ (N : R)]
+      Algebra.TensorProduct.tmul_mul_tmul, smul_eq_mul, mul_one, map_smul, Module.Basis.repr_self,
+      Finsupp.smul_apply, Finsupp.single_eq_same, smul_eq_mul, mul_one, mul_comm (b k),
+      mul_comm _ (N : R)]
   · intro j _ hj
     rw [Finset.sum_apply]
     refine Finset.sum_eq_zero fun k _ => ?_
-    rw [map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_eq_of_ne hj.symm, smul_zero,
-      TensorProduct.tmul_zero]
+    rw [map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_eq_of_ne hj.symm,
+      smul_zero, TensorProduct.tmul_zero]
   · intro h; exact absurd (Finset.mem_univ l) h
 
-theorem natCast_mul_apply {F : Type} [Field F] [NumberField F] (N : ℕ) (a : FiniteAdeleRing (𝓞 F) F)
-    (v : HeightOneSpectrum (𝓞 F)) :
-    ((N : FiniteAdeleRing (𝓞 F) F) * a) v = (N : v.adicCompletion F) * a v := by first | rfl | simp
+theorem natCast_mul_apply
+    {F : Type} [Field F] [NumberField F]
+    (N : ℕ) (a : FiniteAdeleRing (𝓞 F) F) (v : HeightOneSpectrum (𝓞 F))
+    : ((N : FiniteAdeleRing (𝓞 F) F) * a) v = (N : v.adicCompletion F) * a v := by
+  first | rfl | simp
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

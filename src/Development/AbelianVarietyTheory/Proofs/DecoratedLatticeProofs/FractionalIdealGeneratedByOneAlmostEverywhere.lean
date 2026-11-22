@@ -9,9 +9,10 @@ open Formalism.BasicNotions IsDedekindDomain NumberField
 
 namespace GlobalTheory.IdeleGen
 
-theorem exists_nat_mem_mul_integral {E : Type} [Field E] [NumberField E]
-    (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : I ≠ 0) :
-    ∃ N : ℕ, N ≠ 0 ∧ (N : E) ∈ I ∧ ∀ b ∈ I, ∃ o : 𝓞 E, (N : E) * b = (o : E) := by
+theorem exists_nat_mem_mul_integral
+    {E : Type} [Field E] [NumberField E]
+    (I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hI : I ≠ 0)
+    : ∃ N : ℕ, N ≠ 0 ∧ (N : E) ∈ I ∧ ∀ b ∈ I, ∃ o : 𝓞 E, (N : E) * b = (o : E) := by
   obtain ⟨a, ha, hint⟩ := I.isFractional
   have ha0 : a ≠ 0 := nonZeroDivisors.ne_zero ha
   have hbot : (I : Submodule (𝓞 E) E) ≠ ⊥ := by
@@ -20,11 +21,12 @@ theorem exists_nat_mem_mul_integral {E : Type} [Field E] [NumberField E]
     exact FractionalIdeal.coeToSubmodule_injective (h.trans FractionalIdeal.coe_zero.symm)
   obtain ⟨x, hxI, hx0⟩ := (Submodule.ne_bot_iff _).1 hbot
   obtain ⟨j, hj⟩ := hint x hxI
-  have hj' : (j : E) = (a : E) * x := by
-    simpa [Algebra.smul_def] using hj
+  have hj' : (j : E) = (a : E) * x := by simpa [Algebra.smul_def] using hj
   have haE : (a : E) ≠ 0 := by exact_mod_cast ha0
   have hj0 : j ≠ 0 := by
-    intro h; rw [h] at hj'; simp at hj'
+    intro h
+    rw [h] at hj'
+    simp at hj'
     rcases hj' with h1 | h1
     · first | exact ha0 h1 | exact ha0 h1.symm | exact haE h1 | exact haE h1.symm
     · first | exact hx0 h1 | exact hx0 h1.symm
@@ -58,9 +60,12 @@ theorem exists_nat_mem_mul_integral {E : Type} [Field E] [NumberField E]
     push_cast
     linear_combination (-((Nj : E) * (o₁ : E))) * hy'
 
-theorem aeGen : ∀ (D : D7) (I : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E), I ≠ 0 →
-    ∃ S : Finset (HeightOneSpectrum (𝓞 D.host.F)), ∀ v ∉ S, ∃ c : 𝓞 D.host.F, c ∉ v.asIdeal ∧
-      ((c : D.host.F) : D.host.E) ∈ I ∧ ∀ b ∈ I, ∃ o : 𝓞 D.host.E, ((c : D.host.F) : D.host.E) * b = (o : D.host.E) := by
+theorem aeGen
+    : ∀ (D : D7) (I : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E),
+      I ≠ 0
+        → ∃ S : Finset (HeightOneSpectrum (𝓞 D.host.F)), ∀ v ∉ S, ∃ c : 𝓞 D.host.F,
+          c ∉ v.asIdeal ∧ ((c : D.host.F) : D.host.E) ∈ I
+            ∧ ∀ b ∈ I, ∃ o : 𝓞 D.host.E, ((c : D.host.F) : D.host.E) * b = (o : D.host.E) := by
   intro D I hI
   obtain ⟨N, hN0, hNI, hNb⟩ := exists_nat_mem_mul_integral I hI
   have hc0 : Ideal.span {(N : 𝓞 D.host.F)} ≠ 0 := by
@@ -70,11 +75,14 @@ theorem aeGen : ∀ (D : D7) (I : FractionalIdeal (nonZeroDivisors (𝓞 D.host.
   refine ⟨hfin.toFinset, fun v hv => ⟨(N : 𝓞 D.host.F), ?_, ?_, ?_⟩⟩
   · intro hmem
     apply hv
-    rw [Set.Finite.mem_toFinset, Set.mem_setOf_eq, Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
+    rw [Set.Finite.mem_toFinset, Set.mem_setOf_eq, Ideal.dvd_iff_le,
+      Ideal.span_singleton_le_iff_mem]
     exact hmem
   · have : (((N : 𝓞 D.host.F) : D.host.F) : D.host.E) = (N : D.host.E) := by push_cast; rfl
-    rw [this]; exact hNI
+    rw [this]
+    exact hNI
   · have : (((N : 𝓞 D.host.F) : D.host.F) : D.host.E) = (N : D.host.E) := by push_cast; rfl
-    rw [this]; exact hNb
+    rw [this]
+    exact hNb
 
 end GlobalTheory.IdeleGen

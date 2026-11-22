@@ -246,9 +246,12 @@ lemma vand_lam_le_cfg (c : Sz.Cfg) (hc : c.Ok) (hs : c.vth ≤ 1 / 10) (hmk : c.
         (Real.exp (2 * L) ^ c.m) ^ c.k) * Sz.Vand c.k (c.u de) := by ring
     _ ≤ _ := mul_le_mul_of_nonneg_right hexp hU1
 
-theorem vand_lamSH_le : ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl Cg cb Cu cT CT C0 : ℝ),
-    Cnt.Hyp0 D large₂ C' Cl Cg cb Cu cT CT C0 → 40 ≤ Cl → ∀ u τ,
-      vand (lamSH D.R (D.hc τ)) ≤ Real.exp (10 * D.R.k * D.R.m * large₂.sc.L) * vand (uS D u τ) := by
+theorem vand_lamSH_le
+    : ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl Cg cb Cu cT CT C0 : ℝ),
+      Cnt.Hyp0 D large₂ C' Cl Cg cb Cu cT CT C0 → 40 ≤ Cl
+        → ∀ u τ,
+          vand (lamSH D.R (D.hc τ))
+            ≤ Real.exp (10 * D.R.k * D.R.m * large₂.sc.L) * vand (uS D u τ) := by
   intro D large₂ C' Cl Cg cb Cu cT CT C0 hH h40 u τ
   obtain ⟨hS, hD, -⟩ := hH
   have hok := BridgeLemma.cfg_ok hD hS τ
@@ -257,9 +260,12 @@ theorem vand_lamSH_le : ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl Cg cb Cu 
   obtain ⟨-, -, -, -, d5, -⟩ := hD
   rw [← BridgeLemma.Vand_lam D τ, ← BridgeLemma.Vand_u D u τ (d5 u τ)]
   have hb : large₂.sc.b ^ 2 = Real.exp (2 * large₂.sc.L) := by
-    rw [← BridgeLemma.log_b large₂, two_mul, Real.exp_add, Real.exp_log (by linarith [BridgeLemma.one_lt_b large₂]), sq]
+    rw [← BridgeLemma.log_b large₂, two_mul, Real.exp_add,
+      Real.exp_log (by linarith [BridgeLemma.one_lt_b large₂]), sq]
   have hmk : D.R.m ≤ D.R.k := by have := D.R.m_add_three_le_k; omega
-  exact vand_lam_le_cfg (BridgeLemma.cfgOf D τ) hok hsm.hvth hmk large₂.sc.L (BridgeLemma.one_le_L large₂)
-    (fun j h1 h2 => hb ▸ hsm.hbj j h1 h2) _ (BridgeLemma.isWord_deOf D u)
+  exact vand_lam_le_cfg (BridgeLemma.cfgOf D τ) hok hsm.hvth hmk large₂.sc.L
+    (BridgeLemma.one_le_L large₂)
+    (fun j h1 h2 => hb ▸ hsm.hbj j h1 h2)
+    _ (BridgeLemma.isWord_deOf D u)
 
 end GlobalTheory.RowVand

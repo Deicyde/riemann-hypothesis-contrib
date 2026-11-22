@@ -13,22 +13,22 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ConcatAp
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL Zc Zc.Seg GlobalTheory.CompanionTheory.SegCoarse
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL Zc Zc.Seg
+  GlobalTheory.CompanionTheory.SegCoarse
 
 namespace GlobalTheory.CompanionTheory.SegGenNu
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem card_after {n : ℕ} (a : Fin n) :
-    ∑ b ∈ Finset.univ.filter (fun b => a < b), 1 = (Fin.rev a : ℕ) := by
-  have h : Finset.univ.filter (fun b : Fin n => a < b) = Finset.Ioi a := by
-    ext b; simp
+theorem card_after {n : ℕ} (a : Fin n)
+    : ∑ b ∈ Finset.univ.filter (fun b => a < b), 1 = (Fin.rev a : ℕ) := by
+  have h : Finset.univ.filter (fun b : Fin n => a < b) = Finset.Ioi a := by ext b; simp
   rw [h]
   simp [Fin.val_rev]
   omega
 
-theorem isLSeg_fine (G : Segment k) (a : Fin G.len) :
-    IsLSeg (topCut G (fun _ => 1) (fun _ => one_pos) a) (dec G a).rep := by
+theorem isLSeg_fine (G : Segment k) (a : Fin G.len)
+    : IsLSeg (topCut G (fun _ => 1) (fun _ => one_pos) a) (dec G a).rep := by
   have hc : (dec G a).IsCusp := G.isCusp_term _
   have e : topCut G (fun _ => 1) (fun _ => one_pos) a = Segment.single (dec G a) hc := by
     refine Segment.ext_first ?_ rfl
@@ -37,9 +37,10 @@ theorem isLSeg_fine (G : Segment k) (a : Fin G.len) :
   rw [e]
   exact (single_spec hc).2.1
 
-theorem exists_cut (hJ : LSegJacquet k) {G G' : Segment k} {x : IrrGL (k := k)} (h : IsLSeg G x.rep)
-    (h' : IsLSeg G' x.rep) :
-    ∃ Γ : Fin G.len → Segment k, IsTopCut G' Γ ∧ ∀ a, IsLSeg (Γ a) (dec G a).rep := by
+theorem exists_cut
+    (hJ : LSegJacquet k)
+    {G G' : Segment k} {x : IrrGL (k := k)} (h : IsLSeg G x.rep) (h' : IsLSeg G' x.rep)
+    : ∃ Γ : Fin G.len → Segment k, IsTopCut G' Γ ∧ ∀ a, IsLSeg (Γ a) (dec G a).rep := by
   have hd : ∑ a, (dec G a).1 = x.1 := (sum_dec G).trans h.deg_eq
   have hpos : ∀ a, 0 < (dec G a).1 := fun a => (G.isCusp_term _).1
   have h1 : jm (dec G) hd x.rep = 1 :=
@@ -50,13 +51,17 @@ theorem exists_cut (hJ : LSegJacquet k) {G G' : Segment k} {x : IrrGL (k := k)} 
   rw [h1] at h0
   exact one_ne_zero h0
 
-theorem card_le_len {G : Segment k} {s : ℕ} {Γ : Fin s → Segment k} (h : IsTopCut G Γ) : s ≤ G.len := by
+theorem card_le_len {G : Segment k} {s : ℕ} {Γ : Fin s → Segment k} (h : IsTopCut G Γ)
+    : s ≤ G.len := by
   rw [← h.1]
-  calc s = ∑ _ : Fin s, 1 := by simp
+  calc
+    s = ∑ _ : Fin s, 1 := by simp
     _ ≤ ∑ a, (Γ a).len := Finset.sum_le_sum fun a _ => (Γ a).len_pos
 
-theorem first_eq (hJ : LSegJacquet k) {G G' : Segment k} {x : IrrGL (k := k)} (h : IsLSeg G x.rep)
-    (h' : IsLSeg G' x.rep) : G.first = G'.first := by
+theorem first_eq
+    (hJ : LSegJacquet k)
+    {G G' : Segment k} {x : IrrGL (k := k)} (h : IsLSeg G x.rep) (h' : IsLSeg G' x.rep)
+    : G.first = G'.first := by
   obtain ⟨Γ, hΓ, hL⟩ := exists_cut hJ h h'
   obtain ⟨Γ', hΓ', -⟩ := exists_cut hJ h' h
   have hle := card_le_len hΓ
@@ -94,9 +99,11 @@ theorem first_eq (hJ : LSegJacquet k) {G G' : Segment k} {x : IrrGL (k := k)} (h
   rw [← h7]
   exact eq_of_isLSeg (hL l) h6
 
-theorem lSegGeneric_of_nuPair (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (_hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hJ : Zc.LSegJacquet k)
-    (hP : GlobalTheory.BZSeg.NuPair k) : GlobalTheory.BZSeg.LSegGeneric k := by
+theorem lSegGeneric_of_nuPair
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (_hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hJ : Zc.LSegJacquet k)
+    (hP : GlobalTheory.BZSeg.NuPair k)
+    : GlobalTheory.BZSeg.LSegGeneric k := by
   intro Δ N V _ _ π hπ
   by_contra hg
   obtain ⟨α, β, β', hd, hd', hα, hβ, hββ, h1, h2⟩ :=
@@ -131,8 +138,7 @@ theorem lSegGeneric_of_nuPair (k : Type) [Field k] [ValuativeRel k] [Topological
     have h3 : (1 : Fin 2) < b := (Finset.mem_filter.1 hb).2
     exact absurd h3 (by omega)
   rw [hΓ.2 0, hΓ'.2 1, hb, IrrGL.nu_nu] at e3
-  have e4 : Δ.first.nu (((below Γ 0 + 1 : ℕ)) : ℂ) = Δ.first.nu ((0 : ℕ) : ℂ) := by
-    simpa using e3
+  have e4 : Δ.first.nu (((below Γ 0 + 1 : ℕ)) : ℂ) = Δ.first.nu ((0 : ℕ) : ℂ) := by simpa using e3
   have e5 := (IrrGL.nu_natCast_inj Δ.isCusp_first.1).1 e4
   omega
 

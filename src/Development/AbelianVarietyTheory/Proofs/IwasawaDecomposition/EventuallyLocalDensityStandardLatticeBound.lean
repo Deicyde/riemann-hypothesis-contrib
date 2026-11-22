@@ -15,7 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Exists
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
 open scoped TensorProduct NNReal ENNReal Matrix
 
 noncomputable section
@@ -24,11 +25,13 @@ namespace GlobalTheory.GaugeDensity
 
 section Gram
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {d M : ℕ} (b : Module.Basis (Fin d) F E) (J : Matrix (Fin M) (Fin M) E)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {d M : ℕ} (b : Module.Basis (Fin d) F E) (J : Matrix (Fin M) (Fin M) E)
 
-def gram : Matrix (Fin M × Fin d) (Fin M × Fin d) F :=
-  fun p q => 1 / 2 * Algebra.trace F E (σ (b p.2) * J p.1 q.1 * b q.2)
+def gram : Matrix (Fin M × Fin d) (Fin M × Fin d) F := fun p q =>
+  1 / 2 * Algebra.trace F E (σ (b p.2) * J p.1 q.1 * b q.2)
 
 theorem invol (h : IsCMExt F E σ) (e : E) : σ (σ e) = e := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
@@ -36,7 +39,8 @@ theorem invol (h : IsCMExt F E σ) (e : E) : σ (σ e) = e := by
   rw [h.2.2.2, h.2.2.2, star_star]
 
 theorem trace_conj (h : IsCMExt F E σ) (e : E) : Algebra.trace F E (σ e) = Algebra.trace F E e :=
-  Algebra.trace_eq_of_algEquiv (AlgEquiv.ofBijective σ (Function.Involutive.bijective (invol σ h))) e
+  Algebra.trace_eq_of_algEquiv (AlgEquiv.ofBijective σ (Function.Involutive.bijective (invol σ h)))
+    e
 
 theorem gram_symm (h : IsCMExt F E σ) (hJ : IsHermND σ J) : (gram σ b J).IsSymm := by
   ext p q
@@ -54,32 +58,37 @@ theorem gram_det (h : IsCMExt F E σ) (hJ : IsHermND σ J) : (gram σ b J).det �
     intro i k
     have := congrFun hx (i, k)
     simp only [Matrix.mulVec, dotProduct, gram, Fintype.sum_prod_type, Pi.zero_apply, mul_assoc,
-      ← Finset.mul_sum] at this
+        ← Finset.mul_sum]
+      at this
     have h2 := (mul_eq_zero.1 this).resolve_left (by norm_num)
     rw [← h2]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Matrix.mulVec, dotProduct, y, Finset.mul_sum, map_sum, mul_smul_comm, map_smul,
-      smul_eq_mul]
+        smul_eq_mul]
     exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun l _ => mul_comm _ _
   have h2 : J *ᵥ y = 0 := by
     funext i
     refine (traceForm_nondegenerate F E).1 _ fun z => ?_
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [Algebra.traceForm_apply, ← invol σ h z, ← b.sum_repr (σ z), map_sum, Finset.mul_sum, map_sum]
+      rw [Algebra.traceForm_apply, ← invol σ h z, ← b.sum_repr (σ z), map_sum, Finset.mul_sum,
+        map_sum]
     refine Finset.sum_eq_zero fun k _ => ?_
     rw [Algebra.smul_def, map_mul σ, σ.commutes, ← Algebra.smul_def, mul_smul_comm, map_smul,
       mul_comm, h1, smul_zero]
   have h3 : y = 0 := Matrix.eq_zero_of_mulVec_eq_zero hJ.2 h2
   refine hx0 (funext fun p => ?_)
-  exact Fintype.linearIndependent_iff.1 b.linearIndependent (fun l => x (p.1, l)) (congrFun h3 p.1) p.2
+  exact
+    Fintype.linearIndependent_iff.1 b.linearIndependent (fun l => x (p.1, l)) (congrFun h3 p.1) p.2
 
 variable (R : Type) [CommRing R] [Algebra F R]
 
-theorem qR_eq (x : Fin M → R ⊗[F] E) :
-    qR R σ J x = (fun p : Fin M × Fin d => (Algebra.TensorProduct.basis R b).repr (x p.1) p.2) ⬝ᵥ
-      ((gram σ b J).map (algebraMap F R)) *ᵥ
-        (fun p : Fin M × Fin d => (Algebra.TensorProduct.basis R b).repr (x p.1) p.2) := by
-  obtain ⟨c, hc⟩ : ∃ c : Fin M → Fin d → R, ∀ i k, (Algebra.TensorProduct.basis R b).repr (x i) k = c i k :=
+theorem qR_eq (x : Fin M → R ⊗[F] E)
+    : qR R σ J x
+      = (fun p : Fin M × Fin d => (Algebra.TensorProduct.basis R b).repr (x p.1) p.2)
+        ⬝ᵥ ((gram σ b J).map (algebraMap F R))
+          *ᵥ (fun p : Fin M × Fin d => (Algebra.TensorProduct.basis R b).repr (x p.1) p.2) := by
+  obtain ⟨c, hc⟩
+      : ∃ c : Fin M → Fin d → R, ∀ i k, (Algebra.TensorProduct.basis R b).repr (x i) k = c i k :=
     ⟨_, fun _ _ => rfl⟩
   have hx : ∀ i, x i = ∑ k, c i k ⊗ₜ[F] b k := by
     intro i
@@ -89,9 +98,9 @@ theorem qR_eq (x : Fin M → R ⊗[F] E) :
   have hs : ∀ (r : R) (e : E), sigR R σ (r ⊗ₜ[F] e) = r ⊗ₜ[F] σ e := fun _ _ => rfl
   have hi : ∀ e : E, inclR (F := F) R e = (1 : R) ⊗ₜ[F] e := fun _ => rfl
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [qR, hR, Formalism.UG.hform, JR, Matrix.map_apply, hx, map_sum, hs, hi, Finset.sum_mul,
-    Finset.mul_sum, Algebra.TensorProduct.tmul_mul_tmul, qloc_trace_tmul, dotProduct, Matrix.mulVec,
-    Fintype.sum_prod_type, gram, map_mul]
+    simp only [qR, hR, Formalism.UG.hform, JR, Matrix.map_apply, hx, map_sum, hs, hi,
+      Finset.sum_mul, Finset.mul_sum, Algebra.TensorProduct.tmul_mul_tmul, qloc_trace_tmul,
+      dotProduct, Matrix.mulVec, Fintype.sum_prod_type, gram, map_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_comm (s := Finset.univ (α := Fin d)) (t := Finset.univ (α := Fin M))]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -109,8 +118,10 @@ end Gram
 
 section Local
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {d M : ℕ} (b : Module.Basis (Fin d) F E) (J : Matrix (Fin M) (Fin M) E)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {d M : ℕ} (b : Module.Basis (Fin d) F E) (J : Matrix (Fin M) (Fin M) E)
   (v : HeightOneSpectrum (𝓞 F))
 
 def coordLin : (Fin 1 → Fin M → Fv F v ⊗[F] E) ≃ₗ[Fv F v] (Fin M × Fin d → Fv F v) where
@@ -124,18 +135,20 @@ def coordLin : (Fin 1 → Fin M → Fv F v ⊗[F] E) ≃ₗ[Fv F v] (Fin M × Fi
     exact (Algebra.TensorProduct.basis (Fv F v) b).equivFun.symm_apply_apply (X 0 i)
   right_inv y := by
     funext p
-    exact congrFun ((Algebra.TensorProduct.basis (Fv F v) b).equivFun.apply_symm_apply
-      fun k => y (p.1, k)) p.2
+    exact congrFun
+      ((Algebra.TensorProduct.basis (Fv F v) b).equivFun.apply_symm_apply fun k => y (p.1, k)) p.2
 
-def coord : (Fin 1 → Fin M → Fv F v ⊗[F] E) ≃L[Fv F v] (Fin M × Fin d → Fv F v) :=
-  { coordLin b v with
-    continuous_toFun := IsModuleTopology.continuous_of_linearMap (coordLin (M := M) b v).toLinearMap
-    continuous_invFun :=
-      haveI := IsModuleTopology.toContinuousSMul (Fv F v) (Fv F v ⊗[F] E)
-      IsModuleTopology.continuous_of_linearMap (coordLin (M := M) b v).symm.toLinearMap }
+def coord : (Fin 1 → Fin M → Fv F v ⊗[F] E) ≃L[Fv F v] (Fin M × Fin d → Fv F v) := {
+  coordLin b v with
+  continuous_toFun := IsModuleTopology.continuous_of_linearMap (coordLin (M := M) b v).toLinearMap
+  continuous_invFun :=
+    haveI := IsModuleTopology.toContinuousSMul (Fv F v) (Fv F v ⊗[F] E)
+    IsModuleTopology.continuous_of_linearMap (coordLin (M := M) b v).symm.toLinearMap
+}
 
-theorem latV_eq : (latV b v : Set (Fin 1 → Fin M → Fv F v ⊗[F] E)) =
-    {X | ∀ p, coord b v X p ∈ v.adicCompletionIntegers F} := by
+theorem latV_eq
+    : (latV b v : Set (Fin 1 → Fin M → Fv F v ⊗[F] E))
+      = {X | ∀ p, coord b v X p ∈ v.adicCompletionIntegers F} := by
   ext X
   exact ⟨fun h p => h 0 p.1 p.2, fun h a i k => by rw [Subsingleton.elim a 0]; exact h (i, k)⟩
 
@@ -145,32 +158,36 @@ theorem isOpen_latV : IsOpen (latV b v : Set (Fin 1 → Fin M → Fv F v ⊗[F] 
   exact isOpen_iInter_of_finite fun p =>
     hO.preimage ((continuous_apply p).comp (coord b v).continuous)
 
-theorem q_coord (X : Fin 1 → Fin M → Fv F v ⊗[F] E) : qR (Fv F v) σ J (X 0) =
-    coord b v X ⬝ᵥ ((gram σ b J).map (algebraMap F (Fv F v))) *ᵥ coord b v X :=
+theorem q_coord (X : Fin 1 → Fin M → Fv F v ⊗[F] E)
+    : qR (Fv F v) σ J (X 0)
+      = coord b v X ⬝ᵥ ((gram σ b J).map (algebraMap F (Fv F v))) *ᵥ coord b v X :=
   qR_eq σ b J _ _
 
-theorem continuous_q :
-    Continuous fun X : Fin 1 → Fin M → Fv F v ⊗[F] E => qR (Fv F v) σ J (X 0) := by
+theorem continuous_q
+    : Continuous fun X : Fin 1 → Fin M → Fv F v ⊗[F] E => qR (Fv F v) σ J (X 0) := by
   simp only [q_coord σ (Module.finBasis F E)]
   exact (coord _ v).continuous.dotProduct (continuous_const.matrix_mulVec (coord _ v).continuous)
 
-theorem exists_sqrt (h2 : Valued.v (2 : Fv F v) = 1) (u : Fv F v) (hu : Valued.v (u - 1) < 1) :
-    ∃ r : Fv F v, Valued.v r = 1 ∧ r * r = u := by
+theorem exists_sqrt (h2 : Valued.v (2 : Fv F v) = 1) (u : Fv F v) (hu : Valued.v (u - 1) < 1)
+    : ∃ r : Fv F v, Valued.v r = 1 ∧ r * r = u := by
   haveI := GlobalTheory.SelfDualGenus.isAdicComplete_adicCompletionIntegers v
   have hu1 : Valued.v u = 1 := by
     have := Valuation.map_one_add_of_lt _ hu
     rwa [add_sub_cancel] at this
   obtain ⟨y, hy, hy0⟩ := (GlobalTheory.ResidueBoxVolume.exists_residue_eq_zero_iff v _).2 hu
-  obtain ⟨s, hs⟩ := GlobalTheory.QuadFieldCriterion.exists_root_of_residual (0 : v.adicCompletionIntegers F)
-    (-(1 + y)) (by
-      rw [HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one]
-      have : ((0 ^ 2 - 4 * -(1 + y) : v.adicCompletionIntegers F) : Fv F v) = 2 * 2 * u := by
-        push_cast
-        rw [← hy]
-        have : ((4 : v.adicCompletionIntegers F) : Fv F v) = 4 := rfl
-        rw [this]
-        ring
-      rw [this, map_mul, map_mul, h2, hu1, mul_one, mul_one]) 1 (by simp [hy0])
+  obtain ⟨s, hs⟩ :=
+    GlobalTheory.QuadFieldCriterion.exists_root_of_residual (0 : v.adicCompletionIntegers F)
+      (-(1 + y))
+      (by
+        rw [HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one]
+        have : ((0 ^ 2 - 4 * -(1 + y) : v.adicCompletionIntegers F) : Fv F v) = 2 * 2 * u := by
+          push_cast
+          rw [← hy]
+          have : ((4 : v.adicCompletionIntegers F) : Fv F v) = 4 := rfl
+          rw [this]
+          ring
+        rw [this, map_mul, map_mul, h2, hu1, mul_one, mul_one])
+      1 (by simp [hy0])
   have hs' : (s : Fv F v) * s = u := by
     have := congrArg (fun z : v.adicCompletionIntegers F => (z : Fv F v)) hs
     push_cast at this
@@ -184,21 +201,25 @@ theorem exists_sqrt (h2 : Valued.v (2 : Fv F v) = 1) (u : Fv F v) (hu : Valued.v
 theorem modu_unit (r : Fv F v) (hr : Valued.v r = 1) : modu (Fv F v) r = 1 := by
   have h0 : r ≠ 0 := by rintro rfl; simp at hr
   have h := GlobalTheory.GaugeProdFormula.modu_finite F v r h0
-  have h1 : ‖r‖ = 1 := le_antisymm (Valued.toNormedField.norm_le_one_iff.2 hr.le)
-    (Valued.toNormedField.one_le_norm_iff.2 hr.ge)
+  have h1 : ‖r‖ = 1 :=
+    le_antisymm (Valued.toNormedField.norm_le_one_iff.2 hr.le)
+      (Valued.toNormedField.one_le_norm_iff.2 hr.ge)
   rw [h1] at h
   exact_mod_cast h
 
-theorem fib_const (hσ : IsCMExt F E σ) (h2 : Valued.v (2 : Fv F v) = 1)
-    (lam : Measure (Fv F v ⊗[F] E)) (ν : Measure (Fv F v)) (hl : lam.IsAddHaarMeasure)
-    (hν : ν.IsAddHaarMeasure) (β c : Fv F v) (hβ : Valued.v β = 1) (hc : Valued.v (c - β) < 1)
+theorem fib_const
+    (hσ : IsCMExt F E σ) (h2 : Valued.v (2 : Fv F v) = 1)
+    (lam : Measure (Fv F v ⊗[F] E)) (ν : Measure (Fv F v))
+    (hl : lam.IsAddHaarMeasure) (hν : ν.IsAddHaarMeasure)
+    (β c : Fv F v) (hβ : Valued.v β = 1) (hc : Valued.v (c - β) < 1)
     (m m' : Measure (Fin 1 → Fin M → Fv F v ⊗[F] E))
     (hm : FibAt (Fv F v) σ J (tupMeas lam 1 M) ν β m)
-    (hm' : FibAt (Fv F v) σ J (tupMeas lam 1 M) ν c m') : m' (latV b v) = m (latV b v) := by
+    (hm' : FibAt (Fv F v) σ J (tupMeas lam 1 M) ν c m')
+    : m' (latV b v) = m (latV b v) := by
   haveI := IsModuleTopology.toContinuousSMul (Fv F v) (Fv F v ⊗[F] E)
   have hβ0 : β ≠ 0 := by rintro rfl; simp at hβ
-  obtain ⟨r, hr, hrr⟩ := exists_sqrt v h2 (c / β) (by
-    rw [div_sub_one hβ0, map_div₀, hβ, div_one]; exact hc)
+  obtain ⟨r, hr, hrr⟩ :=
+    exists_sqrt v h2 (c / β) (by rw [div_sub_one hβ0, map_div₀, hβ, div_one]; exact hc)
   have hr0 : r ≠ 0 := by rintro rfl; simp at hr
   let g : Matrix (Fin M) (Fin M) (Fv F v ⊗[F] E) := Matrix.diagonal fun _ => algebraMap _ _ r
   have hg : ∀ z, g *ᵥ z = r • z := fun z => by
@@ -207,14 +228,17 @@ theorem fib_const (hσ : IsCMExt F E σ) (h2 : Valued.v (2 : Fv F v) = 1)
   have hd : g.det = algebraMap _ _ (r ^ M) := by simp [g]
   have hdu : IsUnit g.det := hd ▸ (pow_ne_zero M hr0).isUnit.map _
   have hN := (nice_ainf_fv F).2 v
-  have ht := fibAt_similitude F E σ (Fv F v) hN M J J lam ν β (r * r) m g hl hν hdu
-    (mul_ne_zero hr0 hr0).isUnit (fun z => by rw [hg, qR_smul, sq]) hm
+  have ht :=
+    fibAt_similitude F E σ (Fv F v) hN M J J lam ν β (r * r) m g hl hν hdu
+      (mul_ne_zero hr0 hr0).isUnit
+      (fun z => by rw [hg, qR_smul, sq])
+      hm
   have hmd : modu (Fv F v ⊗[F] E) g.det = 1 := by
-    rw [(modu_eq_modu_norm F E σ hσ (Fv F v) g.det (r ^ M * r ^ M) hdu (by
-      rw [hd, map_mul]; congr 1; simp [sigR])).2]
+    rw [(modu_eq_modu_norm F E σ hσ (Fv F v) g.det (r ^ M * r ^ M) hdu
+      (by rw [hd, map_mul]; congr 1; simp [sigR])).2]
     exact modu_unit v _ (by simp [hr])
-  rw [hmd, modu_unit v _ (by simp [hr]), inv_one, mul_one, one_smul, hrr,
-    div_mul_cancel₀ _ hβ0] at ht
+  rw [hmd, modu_unit v _ (by simp [hr]), inv_one, mul_one, one_smul, hrr, div_mul_cancel₀ _ hβ0]
+    at ht
   have hc0 : IsUnit c := by
     rw [← div_mul_cancel₀ c hβ0, ← hrr]
     exact (mul_ne_zero (mul_ne_zero hr0 hr0) hβ0).isUnit
@@ -230,33 +254,41 @@ theorem fib_const (hσ : IsCMExt F E σ) (h2 : Valued.v (2 : Fv F v) = 1)
   simp only [latV_eq, Set.mem_preimage, Set.mem_setOf_eq, map_smul, Pi.smul_apply, smul_eq_mul,
     HeightOneSpectrum.mem_adicCompletionIntegers, map_mul, hr, one_mul]
 
-theorem residue_eq_iff (x y : v.adicCompletionIntegers F) :
-    IsLocalRing.residue _ x = IsLocalRing.residue _ y ↔ Valued.v ((x : Fv F v) - y) < 1 := by
+theorem residue_eq_iff (x y : v.adicCompletionIntegers F)
+    : IsLocalRing.residue _ x = IsLocalRing.residue _ y ↔ Valued.v ((x : Fv F v) - y) < 1 := by
   rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff]
   exact Valuation.mem_maximalIdeal_iff (v := (Valued.v : Valuation (Fv F v) _))
 
 theorem isOpen_class (β : Fv F v) : IsOpen {c : Fv F v | Valued.v (c - β) < 1} :=
   (GlobalTheory.ResidueBoxVolume.isOpen_val_lt_one v).preimage (continuous_id.sub continuous_const)
 
-theorem vol_class (ν : Measure (Fv F v)) [ν.IsAddHaarMeasure]
-    (hν : ν (v.adicCompletionIntegers F : Set (Fv F v)) = 1) (β : v.adicCompletionIntegers F) :
-    ν.real {c | Valued.v (c - β) < 1} * (Ideal.absNorm v.asIdeal : ℝ) = 1 := by
-  have h := GlobalTheory.ResidueBoxVolume.measureReal_residueBox F v (Fv F v) ν Unit
-    (ContinuousLinearEquiv.funUnique Unit (Fv F v) (Fv F v)).symm
-    {fun _ => IsLocalRing.residue _ β}
-  have e2 : {y : Fv F v | ∀ i, (ContinuousLinearEquiv.funUnique Unit (Fv F v) (Fv F v)).symm y i ∈
-      v.adicCompletionIntegers F} = (v.adicCompletionIntegers F : Set (Fv F v)) := by
+theorem vol_class
+    (ν : Measure (Fv F v)) [ν.IsAddHaarMeasure]
+    (hν : ν (v.adicCompletionIntegers F : Set (Fv F v)) = 1) (β : v.adicCompletionIntegers F)
+    : ν.real {c | Valued.v (c - β) < 1} * (Ideal.absNorm v.asIdeal : ℝ) = 1 := by
+  have h :=
+    GlobalTheory.ResidueBoxVolume.measureReal_residueBox F v (Fv F v) ν Unit
+      (ContinuousLinearEquiv.funUnique Unit (Fv F v) (Fv F v)).symm
+      {fun _ => IsLocalRing.residue _ β}
+  have e2
+      : {y : Fv F v | ∀ i, (ContinuousLinearEquiv.funUnique Unit (Fv F v) (Fv F v)).symm y i ∈
+          v.adicCompletionIntegers F}
+        = (v.adicCompletionIntegers F : Set (Fv F v)) := by
     ext y
     simp
-  rw [e2, GlobalTheory.GaugeProdFormula.card_residue, Fintype.card_unit, pow_one, Set.ncard_singleton,
-    measureReal_def (s := (v.adicCompletionIntegers F : Set (Fv F v))), hν] at h
+  rw [e2, GlobalTheory.GaugeProdFormula.card_residue, Fintype.card_unit, pow_one,
+      Set.ncard_singleton, measureReal_def (s := (v.adicCompletionIntegers F : Set (Fv F v))), hν]
+    at h
   convert h using 3
   · ext c
     constructor
     · intro hc
       have hc1 : c ∈ v.adicCompletionIntegers F := by
-        have := add_mem (show c - β ∈ v.adicCompletionIntegers F from
-          (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).2 (le_of_lt hc)) β.2
+        have :=
+          add_mem
+            (show c - β ∈ v.adicCompletionIntegers F from
+              (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).2 (le_of_lt hc))
+            β.2
         rwa [sub_add_cancel] at this
       exact ⟨fun _ => ⟨c, hc1⟩, fun _ => rfl, funext fun _ => (residue_eq_iff v _ _).2 hc⟩
     · rintro ⟨y, h1, h2⟩
@@ -265,20 +297,23 @@ theorem vol_class (ν : Measure (Fv F v)) [ν.IsAddHaarMeasure]
       exact (residue_eq_iff v _ _).1 (congrFun h2 ())
   · simp
 
-theorem vol_fibre (hσ : IsCMExt F E σ) (h2 : Valued.v (2 : Fv F v) = 1)
-    (lam : Measure (Fv F v ⊗[F] E)) (ν : Measure (Fv F v)) (hl : lam.IsAddHaarMeasure)
-    (hν : ν.IsAddHaarMeasure) (β : Fv F v) (hβ : Valued.v β = 1)
-    (m : Measure (Fin 1 → Fin M → Fv F v ⊗[F] E))
-    (hm : FibAt (Fv F v) σ J (tupMeas lam 1 M) ν β m) :
-    tupMeas lam 1 M (latV b v ∩ (fun X => qR (Fv F v) σ J (X 0)) ⁻¹' {c | Valued.v (c - β) < 1}) =
-      m (latV b v) * ν {c | Valued.v (c - β) < 1} := by
+theorem vol_fibre
+    (hσ : IsCMExt F E σ) (h2 : Valued.v (2 : Fv F v) = 1)
+    (lam : Measure (Fv F v ⊗[F] E)) (ν : Measure (Fv F v))
+    (hl : lam.IsAddHaarMeasure) (hν : ν.IsAddHaarMeasure)
+    (β : Fv F v) (hβ : Valued.v β = 1)
+    (m : Measure (Fin 1 → Fin M → Fv F v ⊗[F] E)) (hm : FibAt (Fv F v) σ J (tupMeas lam 1 M) ν β m)
+    : tupMeas lam 1 M (latV b v ∩ (fun X => qR (Fv F v) σ J (X 0)) ⁻¹' {c | Valued.v (c - β) < 1})
+      = m (latV b v) * ν {c | Valued.v (c - β) < 1} := by
   obtain ⟨fib, hf, -⟩ := id hm
   have hSm := (isOpen_class v β).measurableSet
   have hpm := (continuous_q σ J v).measurable hSm
   have hLm := (isOpen_latV (M := M) b v).measurableSet
   set S : Set (Fv F v) := {c | Valued.v (c - β) < 1} with hS
-  have hfb : ∀ c, fib c (latV b v ∩ (fun X => qR (Fv F v) σ J (X 0)) ⁻¹' S) =
-      S.indicator (fun _ => m (latV b v)) c := by
+  have hfb
+      : ∀ c,
+        fib c (latV b v ∩ (fun X => qR (Fv F v) σ J (X 0)) ⁻¹' S)
+          = S.indicator (fun _ => m (latV b v)) c := by
     intro c
     have hae : ∀ᵐ X ∂(fib c), qR (Fv F v) σ J (X 0) = c := by
       have := hf.1 c
@@ -295,31 +330,33 @@ theorem vol_fibre (hσ : IsCMExt F E σ) (h2 : Valued.v (2 : Fv F v) = 1)
       intro X hX hX'
       have e : qR (Fv F v) σ J (X 0) = c := hX'
       exact hc (e ▸ hX.2)
-  have := hf.2.1 ((latV b v ∩ (fun X => qR (Fv F v) σ J (X 0)) ⁻¹' S).indicator 1)
-    (measurable_one.indicator (hLm.inter hpm))
+  have :=
+    hf.2.1 ((latV b v ∩ (fun X => qR (Fv F v) σ J (X 0)) ⁻¹' S).indicator 1)
+      (measurable_one.indicator (hLm.inter hpm))
   simp only [Measure.restrict_univ, lintegral_indicator_one (hLm.inter hpm), hfb] at this
   rw [this, lintegral_indicator hSm, setLIntegral_const]
 
-theorem tupMeas_latV (lam : Measure (Fv F v ⊗[F] E)) [lam.IsAddHaarMeasure] (h : lam (intV b v) = 1) :
-    tupMeas lam 1 M (latV b v) = 1 := by
-  have e : (latV b v : Set (Fin 1 → Fin M → Fv F v ⊗[F] E)) =
-      Set.univ.pi fun _ => Set.univ.pi fun _ => intV b v := by
+theorem tupMeas_latV (lam : Measure (Fv F v ⊗[F] E)) [lam.IsAddHaarMeasure] (h : lam (intV b v) = 1)
+    : tupMeas lam 1 M (latV b v) = 1 := by
+  have e
+      : (latV b v : Set (Fin 1 → Fin M → Fv F v ⊗[F] E))
+        = Set.univ.pi fun _ => Set.univ.pi fun _ => intV b v := by
     ext X
     simp only [mem_latV_iff, Set.mem_pi, Set.mem_univ, true_implies]
   rw [e, tupMeas, Measure.pi_pi]
   simp [Measure.pi_pi, h]
 
-theorem local_bound (hσ : IsCMExt F E σ) (hJ : IsHermND σ J) (hM : 1 ≤ M)
-    (h2 : Valued.v (2 : Fv F v) = 1)
+theorem local_bound
+    (hσ : IsCMExt F E σ) (hJ : IsHermND σ J) (hM : 1 ≤ M) (h2 : Valued.v (2 : Fv F v) = 1)
     (hS : ∀ p q, algebraMap F (Fv F v) (gram σ b J p q) ∈ v.adicCompletionIntegers F)
     (hdet : Valued.v (algebraMap F (Fv F v) (gram σ b J).det) = 1)
-    (lam : Measure (Fv F v ⊗[F] E)) (ν : Measure (Fv F v)) (hl : lam.IsAddHaarMeasure)
-    (hν : ν.IsAddHaarMeasure) (hl1 : lam (intV b v) = 1)
-    (hν1 : ν (v.adicCompletionIntegers F : Set (Fv F v)) = 1) (β : Fv F v) (hβ : Valued.v β = 1)
-    (m : Measure (Fin 1 → Fin M → Fv F v ⊗[F] E))
-    (hm : FibAt (Fv F v) σ J (tupMeas lam 1 M) ν β m) :
-    |(m (latV b v)).toReal - 1| * (Ideal.absNorm v.asIdeal : ℝ) ^ M ≤
-      (Ideal.absNorm v.asIdeal : ℝ) := by
+    (lam : Measure (Fv F v ⊗[F] E)) (ν : Measure (Fv F v))
+    (hl : lam.IsAddHaarMeasure) (hν : ν.IsAddHaarMeasure) (hl1 : lam (intV b v) = 1)
+    (hν1 : ν (v.adicCompletionIntegers F : Set (Fv F v)) = 1)
+    (β : Fv F v) (hβ : Valued.v β = 1)
+    (m : Measure (Fin 1 → Fin M → Fv F v ⊗[F] E)) (hm : FibAt (Fv F v) σ J (tupMeas lam 1 M) ν β m)
+    : |(m (latV b v)).toReal - 1| * (Ideal.absNorm v.asIdeal : ℝ) ^ M
+      ≤ (Ideal.absNorm v.asIdeal : ℝ) := by
   classical
   haveI := GlobalTheory.SelfDualGenus.finite_residueField_adicCompletionIntegers v
   letI := Fintype.ofFinite (IsLocalRing.ResidueField (v.adicCompletionIntegers F))
@@ -336,25 +373,28 @@ theorem local_bound (hσ : IsCMExt F E σ) (hJ : IsHermND σ J) (hM : 1 ≤ M)
   have hS₀ : S₀.map O.subtype = (gram σ b J).map (algebraMap F (Fv F v)) := rfl
   have hunit : ∀ x : O, Valued.v (x : Fv F v) = 1 → ρ x ≠ 0 := fun x hx =>
     ((HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one.2 hx).map ρ).ne_zero
-  have hcount := GlobalTheory.QuadricCount.card_quadric_sub_sq_le _ _ (S₀.map ρ) (ρ β₀)
-    (by have := hunit 2 h2; rwa [map_ofNat] at this)
-    (by
-      ext p q
-      simp only [Matrix.transpose_apply, Matrix.map_apply]
-      congr 1
-      exact Subtype.ext (congrArg (algebraMap F (Fv F v)) ((gram_symm σ b J hσ hJ).apply p q)))
-    (by
-      rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
-      refine hunit _ ?_
-      rw [← hdet, RingHom.map_det, RingHom.mapMatrix_apply, ← hS₀, ← RingHom.mapMatrix_apply,
-        ← RingHom.map_det]
-      rfl)
-  have hbox := GlobalTheory.ResidueBoxVolume.measureReal_residueBox F v _ (tupMeas lam 1 M) _ (coord b v)
-    {x | x ⬝ᵥ (S₀.map ρ) *ᵥ x = ρ β₀}
-  have key : ∀ (X : Fin 1 → Fin M → Fv F v ⊗[F] E) (y : Fin M × Fin 2 → O),
-      (∀ i, coord b v X i = (y i : Fv F v)) →
-      ((fun i => ρ (y i)) ⬝ᵥ (S₀.map ρ) *ᵥ (fun i => ρ (y i)) = ρ β₀ ↔
-        Valued.v (qR (Fv F v) σ J (X 0) - β) < 1) := by
+  have hcount :=
+    GlobalTheory.QuadricCount.card_quadric_sub_sq_le _ _ (S₀.map ρ) (ρ β₀)
+      (by have := hunit 2 h2; rwa [map_ofNat] at this)
+      (by
+        ext p q
+        simp only [Matrix.transpose_apply, Matrix.map_apply]
+        congr 1
+        exact Subtype.ext (congrArg (algebraMap F (Fv F v)) ((gram_symm σ b J hσ hJ).apply p q)))
+      (by
+        rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
+        refine hunit _ ?_
+        rw [← hdet, RingHom.map_det, RingHom.mapMatrix_apply, ← hS₀, ← RingHom.mapMatrix_apply,
+          ← RingHom.map_det]
+        rfl)
+  have hbox :=
+    GlobalTheory.ResidueBoxVolume.measureReal_residueBox F v _ (tupMeas lam 1 M) _ (coord b v)
+      {x | x ⬝ᵥ (S₀.map ρ) *ᵥ x = ρ β₀}
+  have key
+      : ∀ (X : Fin 1 → Fin M → Fv F v ⊗[F] E) (y : Fin M × Fin 2 → O),
+        (∀ i, coord b v X i = (y i : Fv F v))
+          → ((fun i => ρ (y i)) ⬝ᵥ (S₀.map ρ) *ᵥ (fun i => ρ (y i)) = ρ β₀
+            ↔ Valued.v (qR (Fv F v) σ J (X 0) - β) < 1) := by
     intro X y hy
     have e1 : (fun i => ρ (y i)) ⬝ᵥ (S₀.map ρ) *ᵥ (fun i => ρ (y i)) = ρ (y ⬝ᵥ S₀ *ᵥ y) := by
       simp [dotProduct, Matrix.mulVec]
@@ -365,9 +405,10 @@ theorem local_bound (hσ : IsCMExt F E σ) (hJ : IsHermND σ J) (hM : 1 ≤ M)
       rfl
     rw [e1, e2, residue_eq_iff]
     rfl
-  have hset : {X | ∃ y : Fin M × Fin 2 → O, (∀ i, coord b v X i = (y i : Fv F v)) ∧
-      (fun i => ρ (y i)) ∈ {x | x ⬝ᵥ (S₀.map ρ) *ᵥ x = ρ β₀}} =
-      latV b v ∩ (fun X => qR (Fv F v) σ J (X 0)) ⁻¹' {c | Valued.v (c - β) < 1} := by
+  have hset
+      : {X | ∃ y : Fin M × Fin 2 → O, (∀ i, coord b v X i = (y i : Fv F v)) ∧
+          (fun i => ρ (y i)) ∈ {x | x ⬝ᵥ (S₀.map ρ) *ᵥ x = ρ β₀}}
+        = latV b v ∩ (fun X => qR (Fv F v) σ J (X 0)) ⁻¹' {c | Valued.v (c - β) < 1} := by
     rw [latV_eq]
     ext X
     constructor
@@ -376,8 +417,10 @@ theorem local_bound (hσ : IsCMExt F E σ) (hJ : IsHermND σ J) (hM : 1 ≤ M)
     · rintro ⟨h1, h3⟩
       exact ⟨fun i => ⟨_, h1 i⟩, fun _ => rfl, (key X (fun i => ⟨_, h1 i⟩) fun _ => rfl).2 h3⟩
   rw [hset, ← latV_eq, measureReal_def, measureReal_def, tupMeas_latV b v lam hl1,
-    vol_fibre σ b J v hσ h2 lam ν hl hν β hβ m hm, ENNReal.toReal_mul, ENNReal.toReal_one, mul_one,
-    GlobalTheory.GaugeProdFormula.card_residue, Set.ncard_eq_toFinset_card', Set.toFinset_setOf] at hbox
+      vol_fibre σ b J v hσ h2 lam ν hl hν β hβ m hm, ENNReal.toReal_mul, ENNReal.toReal_one,
+      mul_one, GlobalTheory.GaugeProdFormula.card_residue, Set.ncard_eq_toFinset_card',
+      Set.toFinset_setOf]
+    at hbox
   have hv := vol_class v ν hν1 β₀
   rw [← Nat.card_eq_fintype_card, GlobalTheory.GaugeProdFormula.card_residue, ← hbox] at hcount
   have hq : (0 : ℝ) < (Ideal.absNorm v.asIdeal : ℝ) := by
@@ -389,8 +432,9 @@ theorem local_bound (hσ : IsCMExt F E σ) (hJ : IsHermND σ J) (hM : 1 ≤ M)
   generalize (ν {c | Valued.v (c - β) < 1}).toReal = t at hv hcount
   generalize (m (latV b v)).toReal = a at hcount ⊢
   generalize (Ideal.absNorm v.asIdeal : ℝ) = q at hq hv hcount ⊢
-  have e : (a * t * q ^ (2 * n + 1 + 1) - q ^ (2 * n + 1)) ^ 2 =
-      (|a - 1| * q ^ (n + 1)) ^ 2 * q ^ (2 * n) := by
+  have e
+      : (a * t * q ^ (2 * n + 1 + 1) - q ^ (2 * n + 1)) ^ 2
+        = (|a - 1| * q ^ (n + 1)) ^ 2 * q ^ (2 * n) := by
     rw [mul_pow, sq_abs]
     have : a * t * q ^ (2 * n + 1 + 1) = a * q ^ (2 * n + 1) := by
       rw [pow_succ q (2 * n + 1)]; linear_combination a * q ^ (2 * n + 1) * hv
@@ -402,17 +446,18 @@ theorem local_bound (hσ : IsCMExt F E σ) (hJ : IsHermND σ J) (hM : 1 ≤ M)
 
 end Local
 
-theorem eventually_valued_eq_one {F : Type} [Field F] [NumberField F] {x : F} (hx : x ≠ 0) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, Valued.v (algebraMap F (Fv F v) x) = 1 := by
-  have h : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, v.valuation F x = 1 :=
-    GlobalTheory.QNorm.finite_valuation_ne_one F (Units.mk0 x hx)
-  filter_upwards [h] with v hv
-  rw [← hv]
-  exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
+theorem eventually_valued_eq_one {F : Type} [Field F] [NumberField F] {x : F} (hx : x ≠ 0)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, Valued.v (algebraMap F (Fv F v) x) = 1 :=
+  by
+    have h : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, v.valuation F x = 1 :=
+      GlobalTheory.QNorm.finite_valuation_ne_one F (Units.mk0 x hx)
+    filter_upwards [h] with v hv
+    rw [← hv]
+    exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v x
 
-theorem eventually_mem {F : Type} [Field F] [NumberField F] (x : F) :
-    ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
-      algebraMap F (Fv F v) x ∈ v.adicCompletionIntegers F := by
+theorem eventually_mem {F : Type} [Field F] [NumberField F] (x : F)
+    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
+        algebraMap F (Fv F v) x ∈ v.adicCompletionIntegers F := by
   by_cases hx : x = 0
   · exact Filter.Eventually.of_forall fun v => by rw [hx, map_zero]; exact zero_mem _
   · exact (eventually_valued_eq_one hx).mono fun v hv => hv.le

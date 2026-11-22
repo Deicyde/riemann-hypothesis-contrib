@@ -12,22 +12,26 @@ namespace PI.VolStabS
 namespace VolAAW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes SdUniqW
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes SdUniqW
 
 def CondAA : Prop :=
-  ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsCharAF F ψ →
-    ∀ᶠ v in cofinite, ∀ t : Fv F v,
-      (∀ s ∈ v.adicCompletionIntegers F, psiV F ψ v (s * t) = 1) ↔ t ∈ v.adicCompletionIntegers F
+  ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+    IsCharAF F ψ
+      → ∀ᶠ v in cofinite, ∀ t : Fv F v,
+          (∀ s ∈ v.adicCompletionIntegers F, psiV F ψ v (s * t) = 1) ↔ t ∈ v.adicCompletionIntegers F
 
 section Vol
 
-variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+variable
+  {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
   [MeasurableSpace V] [BorelSpace V]
 
-theorem vol_one_of_ann {μ : Measure V} {χ : V → V → ℂ} (hμ : SelfDual μ χ)
-    (hχ : ∀ x t y, χ (t + x) y = χ t y * χ x y) (L : AddSubgroup V)
-    (hLc : IsCompact (L : Set V)) (hLo : IsOpen (L : Set V)) (hA : ann χ (L : Set V) = L) :
-    μ (L : Set V) = 1 := by
+theorem vol_one_of_ann
+    {μ : Measure V} {χ : V → V → ℂ} (hμ : SelfDual μ χ) (hχ : ∀ x t y, χ (t + x) y = χ t y * χ x y)
+    (L : AddSubgroup V)
+    (hLc : IsCompact (L : Set V)) (hLo : IsOpen (L : Set V)) (hA : ann χ (L : Set V) = L)
+    : μ (L : Set V) = 1 := by
   classical
   have := hμ.1
   set c : ℝ := μ.real (L : Set V) with hc
@@ -53,8 +57,9 @@ theorem vol_one_of_ann {μ : Measure V} {χ : V → V → ℂ} (hμ : SelfDual �
     rw [hT y]
     by_cases hy : y ∈ (L : Set V) <;> simp [hΦ, hy]
   rw [e1, integral_const_mul, hΦ, transform_indicator μ χ hχ L hLo 0, hA,
-    Set.indicator_of_mem (SetLike.mem_coe.2 L.zero_mem), neg_zero,
-    Set.indicator_of_mem (SetLike.mem_coe.2 L.zero_mem)] at h0
+      Set.indicator_of_mem (SetLike.mem_coe.2 L.zero_mem), neg_zero,
+      Set.indicator_of_mem (SetLike.mem_coe.2 L.zero_mem)]
+    at h0
   have h1 : c * c = 1 := by exact_mod_cast h0
   have hc0 : 0 ≤ c := measureReal_nonneg
   have hc1 : c = 1 := by nlinarith
@@ -67,12 +72,14 @@ section Ann
 
 variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 
-theorem ann_eq {V : Type} (ψ0 : Fv F v → ℂ) (B : V → V → Fv F v) (L : Set V)
-    (hC : ∀ t : Fv F v, (∀ s ∈ v.adicCompletionIntegers F, ψ0 (s * t) = 1) ↔
-      t ∈ v.adicCompletionIntegers F)
+theorem ann_eq
+    {V : Type}
+    (ψ0 : Fv F v → ℂ) (B : V → V → Fv F v) (L : Set V)
+    (hC : ∀ t : Fv F v,
+      (∀ s ∈ v.adicCompletionIntegers F, ψ0 (s * t) = 1) ↔ t ∈ v.adicCompletionIntegers F)
     (hs : ∀ s ∈ v.adicCompletionIntegers F, ∀ x ∈ L, ∃ x' ∈ L, ∀ y, B x' y = s * B x y)
-    (hD : {y | ∀ x ∈ L, B x y ∈ v.adicCompletionIntegers F} = L) :
-    ann (fun x y => ψ0 (B x y)) L = L := by
+    (hD : {y | ∀ x ∈ L, B x y ∈ v.adicCompletionIntegers F} = L)
+    : ann (fun x y => ψ0 (B x y)) L = L := by
   ext y
   constructor
   · intro hy
@@ -89,8 +96,8 @@ theorem ann_eq {V : Type} (ψ0 : Fv F v → ℂ) (B : V → V → Fv F v) (L : S
     have ht := (hC _).2 (hy x hx) 1 (one_mem _)
     simpa using ht
 
-theorem ev_int (f : F) :
-    ∀ᶠ v in cofinite, algebraMap F (Fv F v) f ∈ (v.adicCompletionIntegers F) := by
+theorem ev_int (f : F)
+    : ∀ᶠ v in cofinite, algebraMap F (Fv F v) f ∈ (v.adicCompletionIntegers F) := by
   have hfin := HeightOneSpectrum.Support.finite (𝓞 F) f
   refine hfin.eventually_cofinite_notMem.mono fun v hv => ?_
   simp only [HeightOneSpectrum.Support, Set.mem_setOf_eq, not_lt] at hv
@@ -99,8 +106,8 @@ theorem ev_int (f : F) :
     HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v f
   exact (this ▸ hv : Valued.v ((f : v.adicCompletion F)) ≤ 1)
 
-theorem ev_int_all {ι : Type} [Finite ι] (f : ι → F) :
-    ∀ᶠ v in cofinite, ∀ i, algebraMap F (Fv F v) (f i) ∈ (v.adicCompletionIntegers F) :=
+theorem ev_int_all {ι : Type} [Finite ι] (f : ι → F)
+    : ∀ᶠ v in cofinite, ∀ i, algebraMap F (Fv F v) (f i) ∈ (v.adicCompletionIntegers F) :=
   Filter.eventually_all.2 fun i => ev_int (f i)
 
 end Ann

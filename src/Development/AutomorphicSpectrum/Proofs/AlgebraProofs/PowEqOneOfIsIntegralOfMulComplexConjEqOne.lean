@@ -8,9 +8,9 @@ open NumberField
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem pow_eq_one_of_isIntegral_of_mul_complexConj_eq_one :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (u : E), IsIntegral ℤ u →
-      u * IsCMField.complexConj E u = 1 → ∃ n : ℕ, 0 < n ∧ u ^ n = 1 := by
+theorem pow_eq_one_of_isIntegral_of_mul_complexConj_eq_one
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (u : E),
+      IsIntegral ℤ u → u * IsCMField.complexConj E u = 1 → ∃ n : ℕ, 0 < n ∧ u ^ n = 1 := by
   intro E _ _ _ u hu h
   have hn : ∀ s : E →+* ℂ, ‖s u‖ = 1 := by
     intro s

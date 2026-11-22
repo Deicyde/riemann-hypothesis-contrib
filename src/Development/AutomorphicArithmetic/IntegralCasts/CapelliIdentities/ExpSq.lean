@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qf11.expSq :
-    ∀ {n : ℕ} (N : Matrix (Fin n) (Fin n) ℂ),
-    N * N = (0 : Matrix (Fin n) (Fin n) ℂ) → NormedSpace.exp N = (1 : Matrix (Fin n) (Fin n) ℂ) + N := by
+theorem UpperTheory.Reformulated.B.Qf11.expSq
+    : ∀ {n : ℕ} (N : Matrix (Fin n) (Fin n) ℂ),
+      N * N = (0 : Matrix (Fin n) (Fin n) ℂ)
+        → NormedSpace.exp N = (1 : Matrix (Fin n) (Fin n) ℂ) + N := by
   intro n N h
   have hz : ∀ k : ℕ, k ∉ Finset.range 2 → ((k.factorial : ℂ)⁻¹) • N ^ k = 0 := by
     intro k hk

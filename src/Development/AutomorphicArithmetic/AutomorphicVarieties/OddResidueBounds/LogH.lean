@@ -6,15 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueB
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
 
-theorem UpperTheory.V.Odd.logH :
-    ∀ (E : Type) [Field E] [NumberField E] (N : ℕ), 2 ≤ N → Nonempty (E →ₐ[ℚ] CyclotomicField N ℚ) → Real.log (classNumber E) ≤ 3 * Module.finrank ℚ E * Real.log N := by
+theorem UpperTheory.V.Odd.logH
+    : ∀ (E : Type) [Field E] [NumberField E] (N : ℕ),
+      2 ≤ N → Nonempty (E →ₐ[ℚ] CyclotomicField N ℚ)
+        → Real.log (classNumber E) ≤ 3 * Module.finrank ℚ E * Real.log N := by
   intro E _ _ N hN hE
   obtain ⟨hd, hn⟩ := UpperTheory.V.Odd.logDisc E N (by omega) hE
   have hc := KStar.IdealCounting.log_classNumber_le E
-  have hd1 : (1 : ℝ) ≤ |(discr E : ℝ)| := by
-    exact_mod_cast Int.one_le_abs (discr_ne_zero E)
+  have hd1 : (1 : ℝ) ≤ |(discr E : ℝ)| := by exact_mod_cast Int.one_le_abs (discr_ne_zero E)
   have hd2 : |(discr E : ℝ)| ≤ (N : ℝ) ^ Module.finrank ℚ E := by
     have h : (((discr E).natAbs : ℕ) : ℝ) ≤ (N : ℝ) ^ Module.finrank ℚ E := by exact_mod_cast hd
     rwa [Nat.cast_natAbs, Int.cast_abs] at h

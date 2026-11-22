@@ -14,8 +14,12 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem nonnorm_pIdx_map (p : ℕ) {G H : Type} [CommGroup G] [CommGroup H] (f : G →* H)
-    (hf : Function.Injective f) (U : Subgroup G) : pIdx p (U.map f) = pIdx p U := by
+theorem nonnorm_pIdx_map
+    (p : ℕ)
+    {G H : Type} [CommGroup G] [CommGroup H]
+    (f : G →* H) (hf : Function.Injective f)
+    (U : Subgroup G)
+    : pIdx p (U.map f) = pIdx p U := by
   have h : pows p (U.map f) = (pows p U).map f := by
     unfold pows
     rw [Subgroup.map_map, Subgroup.map_map]
@@ -25,23 +29,29 @@ theorem nonnorm_pIdx_map (p : ℕ) {G H : Type} [CommGroup G] [CommGroup H] (f :
   unfold pIdx
   rw [h, Subgroup.relIndex_map_map_of_injective _ _ hf]
 
-theorem nonnorm_pTor_map (p : ℕ) {G H : Type} [CommGroup G] [CommGroup H] (f : G →* H)
-    (hf : Function.Injective f) (U : Subgroup G) : pTor p (U.map f) = pTor p U := by
+theorem nonnorm_pTor_map
+    (p : ℕ)
+    {G H : Type} [CommGroup G] [CommGroup H]
+    (f : G →* H) (hf : Function.Injective f)
+    (U : Subgroup G)
+    : pTor p (U.map f) = pTor p U := by
   unfold pTor
   symm
   refine Nat.card_eq_of_bijective
-    (fun x => ⟨f x.1, Subgroup.mem_map_of_mem f x.2.1, by rw [← map_pow, x.2.2, map_one]⟩) ⟨?_, ?_⟩
+    (fun x => ⟨f x.1, Subgroup.mem_map_of_mem f x.2.1, by rw [← map_pow, x.2.2, map_one]⟩)
+    ⟨?_, ?_⟩
   · intro x y hxy
     exact Subtype.ext (hf (congrArg Subtype.val hxy))
   · rintro ⟨_, ⟨x, hx, rfl⟩, h⟩
     refine ⟨⟨x, hx, hf ?_⟩, rfl⟩
     rw [map_pow, h, map_one]
 
-theorem exists_local_nonnorm : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F] (ζ δ : F)
-    (v : HeightOneSpectrum (𝓞 F)), p.Prime → IsPrimitiveRoot ζ p →
-    (∀ r : v.adicCompletion F, r ^ p ≠ algebraMap F (v.adicCompletion F) δ) →
-    ∃ c : (v.adicCompletion F)ˣ, c ∉ kNorm p (RingHom.id (v.adicCompletion F))
-      (algebraMap F (v.adicCompletion F) δ) := by
+theorem exists_local_nonnorm
+    : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F] (ζ δ : F) (v : HeightOneSpectrum (𝓞 F)),
+      p.Prime → IsPrimitiveRoot ζ p
+        → (∀ r : v.adicCompletion F, r ^ p ≠ algebraMap F (v.adicCompletion F) δ)
+        → ∃ c : (v.adicCompletion F)ˣ,
+          c ∉ kNorm p (RingHom.id (v.adicCompletion F)) (algebraMap F (v.adicCompletion F) δ) := by
   intro p F _ _ ζ δ v hp hζ hδ
   by_contra hall
   push_neg at hall
@@ -50,7 +60,8 @@ theorem exists_local_nonnorm : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F
   have hζ' : IsPrimitiveRoot (algebraMap F (v.adicCompletion F) ζ) p :=
     hζ.map_of_injective (algebraMap F (v.adicCompletion F)).injective
   obtain ⟨L, _, _, θ, σ, hK⟩ := exists_isKum p (v.adicCompletion F) _ _ hp hζ' hδ
-  obtain ⟨hfd, hrk, hσp, hfix, -, -, hnorm⟩ := GlobalTheory.T.cyclic_hilbert90_kummer_and_mem_kNorm_iff p _ L _ _ θ σ hK
+  obtain ⟨hfd, hrk, hσp, hfix, -, -, hnorm⟩ :=
+    GlobalTheory.T.cyclic_hilbert90_kummer_and_mem_kNorm_iff p _ L _ _ θ σ hK
   obtain ⟨e, he⟩ : ∃ e : ℕ, v.valuation F (p : F) = WithZero.exp (-(e : ℤ)) := by
     have h0 : v.valuation F (p : F) ≠ 0 := by
       rw [Valuation.ne_zero_iff]
@@ -61,10 +72,13 @@ theorem exists_local_nonnorm : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F
     have h2 : WithZero.log (v.valuation F (p : F)) ≤ 0 := by
       rw [← WithZero.exp_log h0, ← WithZero.exp_zero, WithZero.exp_le_exp] at h1
       exact h1
-    refine ⟨(-WithZero.log (v.valuation F (p : F))).toNat, ?_⟩
+    refine ⟨(- WithZero.log (v.valuation F (p : F))).toNat, ?_⟩
     rw [Int.toNat_of_nonneg (by omega), neg_neg, WithZero.exp_log h0]
-  obtain ⟨htL, hiL⟩ := GlobalTheory.T.pIdx_units_finite_extension_adicCompletion' p F v e L hp.pos he
-  obtain ⟨htK, hiK⟩ := GlobalTheory.T.pIdx_units_finite_extension_adicCompletion' p F v e (v.adicCompletion F) hp.pos he
+  obtain ⟨htL, hiL⟩ :=
+    GlobalTheory.T.pIdx_units_finite_extension_adicCompletion' p F v e L hp.pos he
+  obtain ⟨htK, hiK⟩ :=
+    GlobalTheory.T.pIdx_units_finite_extension_adicCompletion' p F v e (v.adicCompletion F) hp.pos
+      he
   rw [hrk] at hiL
   rw [Module.finrank_self, pow_one] at hiK
   have hQ : Ideal.absNorm v.asIdeal ^ e ≠ 0 :=
@@ -98,8 +112,8 @@ theorem exists_local_nonnorm : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F
   have hiL0 : pIdx p (⊤ : Subgroup Lˣ) ≠ 0 := by
     rw [hiL]
     exact mul_ne_zero (mul_ne_zero hp.ne_zero (pow_ne_zero _ hQ)) htL
-  obtain ⟨-, h1, -, -, hH⟩ := GlobalTheory.T.herbrand_prime_order' p Lˣ s hp
-    (fun a => Units.ext (by rw [hs, hσp])) hiL0 htL
+  obtain ⟨-, h1, -, -, hH⟩ :=
+    GlobalTheory.T.herbrand_prime_order' p Lˣ s hp (fun a => Units.ext (by rw [hs, hσp])) hiL0 htL
   have h0 : (nrm s p).range.relIndex (fix s) = 1 := by
     rw [Subgroup.relIndex_eq_one, hfx]
     rintro _ ⟨c, -, rfl⟩
@@ -125,7 +139,9 @@ theorem exists_local_nonnorm : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F
     rw [mul_pow, mul_pow] at hH
     linear_combination hH
   have hle : p ^ p ≤ p := by
-    calc p ^ p ≤ h ^ (p - 1) * p ^ p := Nat.le_mul_of_pos_left _ (Nat.pos_of_ne_zero (pow_ne_zero _ h1))
+    calc
+      p ^ p
+        ≤ h ^ (p - 1) * p ^ p := Nat.le_mul_of_pos_left _ (Nat.pos_of_ne_zero (pow_ne_zero _ h1))
       _ = p := key.symm
   have hlt : p ^ 1 < p ^ p := Nat.pow_lt_pow_right hp.one_lt hp.one_lt
   rw [pow_one] at hlt

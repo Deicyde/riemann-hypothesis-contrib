@@ -51,8 +51,11 @@ theorem hilbert_cone_of_stable_mollifier : StepStable → StepMoll → StepWtSpa
     rw [← hyx, h, map_zero]
   have hyw : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) (rreg ε) ν y := by
     intro θ hθ
-    have h1' : A (rreg ε (Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I))) y -
-        Complex.exp (((∑ a, ν a * θ a : ℝ) : ℂ) * Complex.I) • y) = 0 := by
+    have h1'
+        : A
+            (rreg ε (Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I))) y
+              - Complex.exp (((∑ a, ν a * θ a : ℝ) : ℂ) * Complex.I) • y)
+          = 0 := by
       rw [map_sub, map_smul, hAK _ hθ, hyx, hxw θ hθ, sub_self]
     have h2' := hAinj _ (Submodule.sub_mem _ (hSK.2.1 _ hθ y hy) (Submodule.smul_mem _ _ hy)) h1'
     exact sub_eq_zero.1 h2'

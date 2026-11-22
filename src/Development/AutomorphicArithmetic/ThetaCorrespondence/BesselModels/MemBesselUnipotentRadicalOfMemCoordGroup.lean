@@ -9,11 +9,15 @@ open Matrix GlobalTheory.RealBessel GlobalTheory.BesselMapOne Formalism.L2.Theta
 
 namespace UpperTheory.Lit.Bur.BesselRadical
 
-theorem mem_unipRad_of_mem_Nset {k r : ℕ} {u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (hu : u ∈ Formalism.QuantumDeterminants.Nset k r) : u ∈ unipRad (Formalism.QuantumDeterminants.Hpk k r) (colE k r) := by
+theorem mem_unipRad_of_mem_Nset
+    {k r : ℕ} {u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (hu : u ∈ Formalism.QuantumDeterminants.Nset k r)
+    : u ∈ unipRad (Formalism.QuantumDeterminants.Hpk k r) (colE k r) := by
   obtain ⟨hU, hcol, hmid⟩ := hu
-  have hspan : ∀ y : Fin (2 * r + k + 1) → ℂ, (∀ i : Fin (2 * r + k + 1), r ≤ (i : ℕ) → y i = 0) →
-      y = colE k r *ᵥ fun b => y (PI.UpqRep.eI k r b) := by
+  have hspan
+      : ∀ y : Fin (2 * r + k + 1) → ℂ,
+        (∀ i : Fin (2 * r + k + 1), r ≤ (i : ℕ) → y i = 0)
+          → y = colE k r *ᵥ fun b => y (PI.UpqRep.eI k r b) := by
     intro y hy
     funext i
     simp only [Matrix.mulVec, dotProduct, colE, ite_mul, one_mul, zero_mul]
@@ -36,8 +40,10 @@ theorem mem_unipRad_of_mem_Nset {k r : ℕ} {u : Matrix (Fin (2 * r + k + 1)) (F
       apply hi
       rw [h]
       exact b.isLt
-  have key : ∀ (x : Fin (2 * r + k + 1) → ℂ) (b : Fin r) (j : Fin (2 * r + k + 1)), (b : ℕ) + j = 2 * r + k →
-      (((colE k r)ᴴ * Formalism.QuantumDeterminants.Hpk k r) *ᵥ x) b = x j := by
+  have key
+      : ∀ (x : Fin (2 * r + k + 1) → ℂ) (b : Fin r) (j : Fin (2 * r + k + 1)),
+        (b : ℕ) + j = 2 * r + k
+          → (((colE k r)ᴴ * Formalism.QuantumDeterminants.Hpk k r) *ᵥ x) b = x j := by
     intro x b j hbj
     rw [← Matrix.mulVec_mulVec]
     have hc : ∀ w : Fin (2 * r + k + 1) → ℂ, ((colE k r)ᴴ *ᵥ w) b = w (PI.UpqRep.eI k r b) := by
@@ -59,8 +65,10 @@ theorem mem_unipRad_of_mem_Nset {k r : ℕ} {u : Matrix (Fin (2 * r + k + 1)) (F
       exact absurd (Finset.mem_univ _) h
   refine ⟨hU, ?_, ?_⟩
   · intro i
-    have hy : ∀ m, ((u - 1) *ᵥ fun m => colE k r m i) m
-        = u m (PI.UpqRep.eI k r i) - if m = PI.UpqRep.eI k r i then 1 else 0 := by
+    have hy
+        : ∀ m,
+          ((u - 1) *ᵥ fun m => colE k r m i) m
+            = u m (PI.UpqRep.eI k r i) - if m = PI.UpqRep.eI k r i then 1 else 0 := by
       intro m
       simp [Matrix.mulVec, dotProduct, colE, Matrix.sub_apply, Matrix.one_apply, sub_mul]
     refine ⟨fun b => ((u - 1) *ᵥ fun m => colE k r m i) (PI.UpqRep.eI k r b), ?_, hspan _ ?_⟩
@@ -97,5 +105,11 @@ end UpperTheory.Lit.Bur.BesselRadical
 
 open Matrix GlobalTheory.RealBessel GlobalTheory.BesselMapOne Formalism.L2.Theta GlobalTheory.SmVec
 set_option maxHeartbeats 1000000 in
-theorem _root_.UpperTheory.Lit.Bur.mem_besselUnipotentRadical_of_mem_coordGroup : ∀ {k r : ℕ} {u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hu : u ∈ Formalism.QuantumDeterminants.Nset k r), u ∈ unipRad (Formalism.QuantumDeterminants.Hpk k r) (colE k r) := by
-  first | exact @UpperTheory.Lit.Bur.BesselRadical.mem_unipRad_of_mem_Nset | exact UpperTheory.Lit.Bur.BesselRadical.mem_unipRad_of_mem_Nset | (intros; apply UpperTheory.Lit.Bur.BesselRadical.mem_unipRad_of_mem_Nset <;> assumption)
+theorem _root_.UpperTheory.Lit.Bur.mem_besselUnipotentRadical_of_mem_coordGroup
+    : ∀ {k r : ℕ} {u : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+        (hu : u ∈ Formalism.QuantumDeterminants.Nset k r),
+      u ∈ unipRad (Formalism.QuantumDeterminants.Hpk k r) (colE k r) := by
+  first
+  | exact @UpperTheory.Lit.Bur.BesselRadical.mem_unipRad_of_mem_Nset
+  | exact UpperTheory.Lit.Bur.BesselRadical.mem_unipRad_of_mem_Nset
+  | (intros; apply UpperTheory.Lit.Bur.BesselRadical.mem_unipRad_of_mem_Nset <;> assumption)

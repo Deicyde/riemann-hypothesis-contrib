@@ -15,10 +15,16 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IneLeF
 
 attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
 
-open NumberField IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Aut UpperTheory.V.Pr UpperTheory.V
+open NumberField IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Aut UpperTheory.V.Pr
+  UpperTheory.V
 
-private theorem fix_iff {K Ω : Type} [Field K] [NumberField K] [Field Ω] [CharZero Ω] (hK : Module.finrank ℚ K = 2)
-    (f g : K →+* Ω) (s : Ω ≃ₐ[ℚ] Ω) (h : ∀ x, s (f x) = f x) (x : K) : s (g x) = g x := by
+private theorem fix_iff
+    {K Ω : Type} [Field K] [NumberField K] [Field Ω] [CharZero Ω]
+    (hK : Module.finrank ℚ K = 2)
+    (f g : K →+* Ω) (s : Ω ≃ₐ[ℚ] Ω) (h : ∀ x, s (f x) = f x)
+    (x : K)
+    : s (g x) = g x := by
   by_cases hq : ∃ q : ℚ, (q : K) = x
   · obtain ⟨q, rfl⟩ := hq
     simp only [map_ratCast]
@@ -42,17 +48,16 @@ private theorem fix_iff {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Char
       rw [hspan]
       exact Submodule.mem_top
     rw [Matrix.range_cons, Matrix.range_cons, Matrix.range_empty, Set.union_empty,
-      Set.singleton_union, Submodule.mem_span_pair] at hmem
+        Set.singleton_union, Submodule.mem_span_pair]
+      at hmem
     obtain ⟨a, b, hab⟩ := hmem
     rw [Rat.smul_def, Rat.smul_def, mul_one] at hab
     have hg : g x * g x = a + b * g x := by
       rw [← map_mul, ← hab, map_add (f := _), map_mul, map_ratCast, map_ratCast]
     have hf : f x * f x = a + b * f x := by
       rw [← map_mul, ← hab, map_add (f := _), map_mul, map_ratCast, map_ratCast]
-    have hprod : (g x - f x) * (g x - ((b : Ω) - f x)) = 0 := by
-      linear_combination hg - hf
+    have hprod : (g x - f x) * (g x - ((b : Ω) - f x)) = 0 := by linear_combination hg - hf
     rcases mul_eq_zero.mp hprod with h1 | h1
     · rw [sub_eq_zero.mp h1, h x]
-    · have h2 : g x = f ((b : K) - x) := by
-        rw [sub_eq_zero.mp h1, map_sub, map_ratCast]
+    · have h2 : g x = f ((b : K) - x) := by rw [sub_eq_zero.mp h1, map_sub, map_ratCast]
       rw [h2, h]

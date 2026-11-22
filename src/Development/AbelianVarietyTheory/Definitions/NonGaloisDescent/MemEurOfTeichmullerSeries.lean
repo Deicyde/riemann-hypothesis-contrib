@@ -12,7 +12,8 @@ set_option synthInstance.maxHeartbeats 400000
 
 noncomputable section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct
 
 namespace GlobalTheory.Cyc
 
@@ -51,7 +52,8 @@ theorem act_eq (c : ℤ_[l]) : act l O c = Fon.gam O c :=
 
 theorem phi_eq : phi l O = Fon.phi0 l O := by rw [phi, act_eq, Fon.gam_l]
 
-theorem phi_X : phi l O PowerSeries.X = (1 + PowerSeries.X) ^ l - 1 := by rw [phi_eq, Fon.cyclotomicFrobeniusPowerSeries_X]
+theorem phi_X : phi l O PowerSeries.X = (1 + PowerSeries.X) ^ l - 1 := by
+  rw [phi_eq, Fon.cyclotomicFrobeniusPowerSeries_X]
 
 theorem phi_pow_X (s : ℕ) : (phi l O ^ (s - 1)) PowerSeries.X = XX l O s := by
   rw [phi_eq, Fon.cyclotomicFrobeniusPowerSeries_pow_apply_X, XX]
@@ -70,8 +72,9 @@ def EE (n : ℕ) : Type :=
     (Localization.Away (letπ : LetA O n))
 
 instance (n : ℕ) : CommRing (EE l O n) :=
-  inferInstanceAs (CommRing (AdicCompletion (Ideal.span {((l : ℕ) : Localization.Away (letπ : LetA O n))})
-    (Localization.Away (letπ : LetA O n))))
+  inferInstanceAs
+    (CommRing (AdicCompletion (Ideal.span {((l : ℕ) : Localization.Away (letπ : LetA O n))})
+      (Localization.Away (letπ : LetA O n))))
 
 instance (n : ℕ) : Algebra (Localization.Away (letπ : LetA O n)) (EE l O n) :=
   inferInstanceAs (Algebra (Localization.Away (letπ : LetA O n))
@@ -87,15 +90,9 @@ open Series
 
 variable (n : ℕ)
 
-
 variable {l O n}
 
-
-
-
-
 variable (l O n)
-
 
 end Completion
 
@@ -108,27 +105,30 @@ def clW (S : Set (WCb l)) : Set (WCb l) :=
 
 variable {l}
 
-theorem mem_clW {S : Set (WCb l)} {x : WCb l} :
-    x ∈ clW l S ↔ ∀ k : ℕ, ∃ y ∈ S, (l : WCb l) ^ k ∣ x - y := by
+theorem mem_clW {S : Set (WCb l)} {x : WCb l}
+    : x ∈ clW l S ↔ ∀ k : ℕ, ∃ y ∈ S, (l : WCb l) ^ k ∣ x - y := by
   simp only [clW, Set.mem_setOf_eq, Ideal.mem_span_singleton]
 
 def clAlg (S : Subalgebra ℤ_[l] (WCb l)) : Subalgebra ℤ_[l] (WCb l) where
   carrier := clW l S
-  add_mem' {a b} ha hb := mem_clW.2 fun k => by
-    obtain ⟨x, hx, h⟩ := mem_clW.1 ha k
-    obtain ⟨y, hy, h'⟩ := mem_clW.1 hb k
-    exact ⟨x + y, S.add_mem hx hy, by convert h.add h' using 1; ring⟩
-  mul_mem' {a b} ha hb := mem_clW.2 fun k => by
-    obtain ⟨x, hx, h⟩ := mem_clW.1 ha k
-    obtain ⟨y, hy, h'⟩ := mem_clW.1 hb k
-    exact ⟨x * y, S.mul_mem hx hy, by convert (h.mul_right b).add (h'.mul_left x) using 1; ring⟩
+  add_mem' {a b} ha hb :=
+    mem_clW.2 fun k => by
+      obtain ⟨x, hx, h⟩ := mem_clW.1 ha k
+      obtain ⟨y, hy, h'⟩ := mem_clW.1 hb k
+      exact ⟨x + y, S.add_mem hx hy, by convert h.add h' using 1; ring⟩
+  mul_mem' {a b} ha hb :=
+    mem_clW.2 fun k => by
+      obtain ⟨x, hx, h⟩ := mem_clW.1 ha k
+      obtain ⟨y, hy, h'⟩ := mem_clW.1 hb k
+      exact ⟨x * y, S.mul_mem hx hy, by convert (h.mul_right b).add (h'.mul_left x) using 1; ring⟩
   algebraMap_mem' z := mem_clW.2 fun _ => ⟨_, S.algebraMap_mem z, by simp⟩
 
-theorem mem_clAlg {S : Subalgebra ℤ_[l] (WCb l)} {x : WCb l} :
-    x ∈ clAlg S ↔ ∀ k : ℕ, ∃ y ∈ S, (l : WCb l) ^ k ∣ x - y := mem_clW
+theorem mem_clAlg {S : Subalgebra ℤ_[l] (WCb l)} {x : WCb l}
+    : x ∈ clAlg S ↔ ∀ k : ℕ, ∃ y ∈ S, (l : WCb l) ^ k ∣ x - y :=
+  mem_clW
 
-theorem le_clAlg (S : Subalgebra ℤ_[l] (WCb l)) : S ≤ clAlg S :=
-  fun x hx => mem_clAlg.2 fun _ => ⟨x, hx, by simp⟩
+theorem le_clAlg (S : Subalgebra ℤ_[l] (WCb l)) : S ≤ clAlg S := fun x hx =>
+  mem_clAlg.2 fun _ => ⟨x, hx, by simp⟩
 
 def IsIo (e : OCb l) (io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l) : Prop :=
   io PowerSeries.X = WittVector.teichmuller l e - 1
@@ -137,19 +137,25 @@ theorem εroot_pow {P : LocPrime l} (AI : LocAinf l P) (s : ℕ) : AI.εroot s ^
   induction s with
   | zero => simp [LocAinf.εroot]
   | succ s ih =>
-    rw [← ih, pow_succ', pow_mul, LocAinf.εroot, Function.iterate_succ_apply', frobeniusEquiv_symm_pow_p,
-      LocAinf.εroot]
+    rw [← ih, pow_succ', pow_mul, LocAinf.εroot, Function.iterate_succ_apply',
+      frobeniusEquiv_symm_pow_p, LocAinf.εroot]
 
-theorem εroot_sub_one_not_unit {P : LocPrime l} (AI : LocAinf l P) (s : ℕ) : ¬ IsUnit (AI.εroot s - 1) := by
+theorem εroot_sub_one_not_unit {P : LocPrime l} (AI : LocAinf l P) (s : ℕ)
+    : ¬ IsUnit (AI.εroot s - 1) := by
   intro h
   have h1 := (h.pow (l ^ s)).map (PreTilt.coeff 0)
-  rw [sub_pow_char_pow, εroot_pow, one_pow, map_sub, AI.ε_coeff, AI.ζ_zero, map_one, map_one, sub_self] at h1
+  rw [sub_pow_char_pow, εroot_pow, one_pow, map_sub, AI.ε_coeff, AI.ζ_zero, map_one, map_one,
+      sub_self]
+    at h1
   haveI : Nontrivial (ModP (OC l) l) := CharP.nontrivial_of_char_ne_one (Fact.out : l.Prime).ne_one
   exact not_isUnit_zero h1
 
-private theorem coeff_mem {A : Type} [CommRing A] [Algebra ℤ_[l] A] (S : Subalgebra ℤ_[l] A) {a : A}
-    (ha : a ∈ S) (m k i : ℕ) :
-    (Polynomial.X ^ m - Polynomial.C a * Polynomial.X ^ k : Polynomial A).coeff i ∈ S := by
+private theorem coeff_mem
+    {A : Type} [CommRing A] [Algebra ℤ_[l] A]
+    (S : Subalgebra ℤ_[l] A)
+    {a : A} (ha : a ∈ S)
+    (m k i : ℕ)
+    : (Polynomial.X ^ m - Polynomial.C a * Polynomial.X ^ k : Polynomial A).coeff i ∈ S := by
   rw [Polynomial.coeff_sub, Polynomial.coeff_X_pow, Polynomial.coeff_C_mul_X_pow]
   refine S.sub_mem ?_ ?_ <;> split_ifs <;> first | exact one_mem _ | exact zero_mem _ | exact ha
 
@@ -158,7 +164,8 @@ section Rings
 variable (io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l)
 
 def E0loc : Subalgebra ℤ_[l] (WCb l) where
-  carrier := {x | ∃ (a : PowerSeries ℤ_[l]) (m : ℕ), x * inclW l (io PowerSeries.X) ^ m = inclW l (io a)}
+  carrier :=
+    {x | ∃ (a : PowerSeries ℤ_[l]) (m : ℕ), x * inclW l (io PowerSeries.X) ^ m = inclW l (io a)}
   add_mem' := by
     rintro x y ⟨a, m, h⟩ ⟨b, n, h'⟩
     refine ⟨a * PowerSeries.X ^ n + b * PowerSeries.X ^ m, m + n, ?_⟩
@@ -169,8 +176,11 @@ def E0loc : Subalgebra ℤ_[l] (WCb l) where
     refine ⟨a * b, m + n, ?_⟩
     simp only [map_mul, ← h, ← h']
     ring
-  algebraMap_mem' z := ⟨algebraMap _ _ z, 0, by
-    rw [pow_zero, mul_one, io.commutes]; exact ((inclWA l).commutes z).symm⟩
+  algebraMap_mem' z := ⟨
+    algebraMap _ _ z,
+    0,
+    by rw [pow_zero, mul_one, io.commutes]; exact ((inclWA l).commutes z).symm
+  ⟩
 
 def E0 : Subalgebra ℤ_[l] (WCb l) := clAlg (E0loc io)
 
@@ -182,18 +192,23 @@ def EurAlg : Subalgebra ℤ_[l] (WCb l) := Algebra.adjoin ℤ_[l] (simpleRoots i
 
 def Eur : Subalgebra ℤ_[l] (WCb l) := clAlg (EurAlg io)
 
-theorem simpleRoots_subset_Eur : simpleRoots io ⊆ Eur io :=
-  fun _ hy => le_clAlg _ (Algebra.subset_adjoin hy)
+theorem simpleRoots_subset_Eur : simpleRoots io ⊆ Eur io := fun _ hy =>
+  le_clAlg _ (Algebra.subset_adjoin hy)
 
 variable {io}
 
 variable (io)
 
-theorem teichmuller_mem_Eur {a : Cb l} {d : ℕ} (hd : 0 < d) (ha : a ^ l ^ d = a) :
-    WittVector.teichmuller l a ∈ Eur io := by
+theorem teichmuller_mem_Eur {a : Cb l} {d : ℕ} (hd : 0 < d) (ha : a ^ l ^ d = a)
+    : WittVector.teichmuller l a ∈ Eur io := by
   have h1 : 1 < l ^ d := Nat.one_lt_pow hd.ne' (Fact.out : l.Prime).one_lt
-  refine simpleRoots_subset_Eur io ⟨Polynomial.X ^ l ^ d - Polynomial.X,
-    Polynomial.monic_X_pow_sub (by rw [Polynomial.degree_X]; exact_mod_cast h1), fun i => ?_, ?_, ?_⟩
+  refine simpleRoots_subset_Eur io ⟨
+    Polynomial.X ^ l ^ d - Polynomial.X,
+    Polynomial.monic_X_pow_sub (by rw [Polynomial.degree_X]; exact_mod_cast h1),
+    fun i => ?_,
+    ?_,
+    ?_
+  ⟩
   · have h := coeff_mem (E0 io) (E0 io).one_mem (l ^ d) 1 i
     rwa [pow_one, map_one, one_mul] at h
   · rw [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, ← map_pow, ha, sub_self]
@@ -208,38 +223,50 @@ end Rings
 
 section Module
 
-@[reducible] def leftModuleGen (O R M : Type) [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup M]
-    [Module O M] : Module R (R ⊗[O] M) := inferInstance
+@[reducible]
+def leftModuleGen
+    (O R M : Type) [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup M] [Module O M]
+    : Module R (R ⊗[O] M) :=
+  inferInstance
 
-@[reducible] def leftSMulGen (O R M : Type) [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup M]
-    [Module O M] : SMul R (R ⊗[O] M) := inferInstance
+@[reducible]
+def leftSMulGen (O R M : Type) [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup M] [Module O M]
+    : SMul R (R ⊗[O] M) :=
+  inferInstance
 
 variable {G : Type} [Group G] [TopologicalSpace G]
 
-scoped instance smulTW (LL : FinExt l) (T : LocLat G ℚ_[l] ↥LL.1 ↥(OL LL)) : SMul (RW LL) (TW (RW LL) T) :=
+scoped instance smulTW (LL : FinExt l) (T : LocLat G ℚ_[l] ↥LL.1 ↥(OL LL))
+    : SMul (RW LL) (TW (RW LL) T) :=
   leftSMulGen _ _ _
 
-def EurT (LL : FinExt l) (io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l) (T : LocLat G ℚ_[l] ↥LL.1 ↥(OL LL)) :
-    Submodule ↥(OL LL) (TW (RW LL) T) :=
-  Submodule.span ↥(OL LL) {z | ∃ w ∈ Eur io, ∃ t : ↥T.L.T,
-    z = ((1 : ↥(OL LL)) ⊗ₜ[ℤ_[l]] w) ⊗ₜ[↥(OL LL)] t}
+def EurT
+    (LL : FinExt l) (io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l) (T : LocLat G ℚ_[l] ↥LL.1 ↥(OL LL))
+    : Submodule ↥(OL LL) (TW (RW LL) T) :=
+  Submodule.span ↥(OL LL)
+    {z | ∃ w ∈ Eur io, ∃ t : ↥T.L.T,
+      z = ((1 : ↥(OL LL)) ⊗ₜ[ℤ_[l]] w) ⊗ₜ[↥(OL LL)] t}
 
-variable {LL : FinExt l} {io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l} {T : LocLat G ℚ_[l] ↥LL.1 ↥(OL LL)}
+variable
+  {LL : FinExt l} {io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l} {T : LocLat G ℚ_[l] ↥LL.1 ↥(OL LL)}
 
 end Module
 
-def FonD {P : LocPrime l} (AI : LocAinf l P) (K LL : FinExt l)
-    (io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) :
-    Submodule ↥(OL LL) (TW (RW LL) T) :=
-  EurT LL io T ⊓ ⨅ g : {g : ↥(GK K) // P.χQ (g : GQ l) = 1},
-    LinearMap.eqLocus (TWact (AI.gRW LL (g.1 : GQ l)) T g.1)
-      (LinearMap.id : TW (RW LL) T →ₗ[↥(OL LL)] TW (RW LL) T)
+def FonD
+    {P : LocPrime l} (AI : LocAinf l P)
+    (K LL : FinExt l)
+    (io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL))
+    : Submodule ↥(OL LL) (TW (RW LL) T) :=
+  EurT LL io T
+    ⊓ ⨅ g : {g : ↥(GK K) // P.χQ (g : GQ l) = 1},
+      LinearMap.eqLocus (TWact (AI.gRW LL (g.1 : GQ l)) T g.1)
+        (LinearMap.id : TW (RW LL) T →ₗ[↥(OL LL)] TW (RW LL) T)
 
 section Fon
 
-variable {P : LocPrime l} {AI : LocAinf l P} {K LL : FinExt l}
+variable
+  {P : LocPrime l} {AI : LocAinf l P} {K LL : FinExt l}
   {io : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] Ainf l} {T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)}
-
 
 end Fon
 

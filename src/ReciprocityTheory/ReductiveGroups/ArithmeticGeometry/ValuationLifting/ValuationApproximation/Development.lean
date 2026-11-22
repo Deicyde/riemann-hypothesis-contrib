@@ -8,8 +8,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ValuationLift
 
 namespace ReciprocityTheory.ChartRestriction.G.Lift.VA
 
-theorem valApprox_of (hP : PairSep) (hL : LargeSmall) (hN : NearOne) (hA : Assembly) :
-    ReciprocityTheory.ChartRestriction.G.Lift.ApproxStatement := by
+theorem valApprox_of (hP : PairSep) (hL : LargeSmall) (hN : NearOne) (hA : Assembly)
+    : ReciprocityTheory.ChartRestriction.G.Lift.ApproxStatement := by
   intro Ω _ ι _ v h1 hne n
   have h1' : ∀ i, ∃ x, v i x = WithZero.exp (1 : ℤ) := h1
   have hgt : ∀ i, ∃ x, 1 < v i x := fun i => by

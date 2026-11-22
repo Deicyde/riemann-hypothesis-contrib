@@ -8,13 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RealLieSmoot
 
 noncomputable section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory
+  GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
 
 namespace GlobalTheory.AutGrowth
 
-theorem height_mul_le_of_isCompact : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
-    (Ω : Set (GL (Fin a) (Cinf E))), IsCompact Ω →
-    ∃ B : ℝ, 1 ≤ B ∧ ∀ c ∈ Ω, ∀ y : GL (Fin a) (Cinf E), CuspRep.height (y * c) ≤ B * CuspRep.height y := by
+theorem height_mul_le_of_isCompact
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (Ω : Set (GL (Fin a) (Cinf E))),
+      IsCompact Ω
+        → ∃ B : ℝ,
+          1 ≤ B
+            ∧ ∀ c ∈ Ω, ∀ y : GL (Fin a) (Cinf E),
+              CuspRep.height (y * c) ≤ B * CuspRep.height y := by
   intro E _ _ _ a Ω hK
   have c1 : Continuous fun u : GL (Fin a) (Cinf E) => toL u.val :=
     (Units.continuous_val : Continuous fun u : GL (Fin a) (Cinf E) => u.val)
@@ -36,8 +42,9 @@ theorem height_mul_le_of_isCompact : ∀ (E : Type) [Field E] [NumberField E] [_
   have n1 := norm_nonneg (toL y.val)
   have n2 := norm_nonneg (toL (y⁻¹).val)
   have q1 : (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * M * ‖toL y.val‖ := by
-    calc (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * (‖toL y.val‖ * M) :=
-          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left m1 n1) (Nat.cast_nonneg a)
+    calc
+      (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * (‖toL y.val‖ * M) :=
+        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left m1 n1) (Nat.cast_nonneg a)
       _ = a * M * ‖toL y.val‖ := by ring
   have q2 : (a : ℝ) * (‖toL (u⁻¹).val‖ * ‖toL (y⁻¹).val‖) ≤ a * M * ‖toL (y⁻¹).val‖ := by
     rw [← mul_assoc]

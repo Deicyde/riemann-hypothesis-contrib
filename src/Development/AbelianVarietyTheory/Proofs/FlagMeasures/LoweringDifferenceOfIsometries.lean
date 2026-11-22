@@ -10,27 +10,31 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem hform_sub_left_flag {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A)
-    (J : Matrix n n A) (x x' y : n → A) :
-    Formalism.UG.hform σ J (x - x') y = Formalism.UG.hform σ J x y - Formalism.UG.hform σ J x' y := by
+theorem hform_sub_left_flag
+    {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A) (J : Matrix n n A) (x x' y : n → A)
+    : Formalism.UG.hform σ J (x - x') y
+      = Formalism.UG.hform σ J x y - Formalism.UG.hform σ J x' y := by
   unfold Formalism.UG.hform
   simp only [Pi.sub_apply, map_sub, sub_mul, Finset.sum_sub_distrib]
 
-theorem hform_sub_right_flag {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A)
-    (J : Matrix n n A) (x y y' : n → A) :
-    Formalism.UG.hform σ J x (y - y') = Formalism.UG.hform σ J x y - Formalism.UG.hform σ J x y' := by
+theorem hform_sub_right_flag
+    {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A) (J : Matrix n n A) (x y y' : n → A)
+    : Formalism.UG.hform σ J x (y - y')
+      = Formalism.UG.hform σ J x y - Formalism.UG.hform σ J x y' := by
   unfold Formalism.UG.hform
   simp only [Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
-private theorem hform_eq_dotProduct_mulVec {K : Type} [CommRing K] {n : ℕ} (σ : K →+* K)
-    (J : Matrix (Fin n) (Fin n) K) (x y : Fin n → K) :
-    Formalism.UG.hform σ J x y = (fun i => σ (x i)) ⬝ᵥ (J *ᵥ y) := by
+private theorem hform_eq_dotProduct_mulVec
+    {K : Type} [CommRing K] {n : ℕ} (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K) (x y : Fin n → K)
+    : Formalism.UG.hform σ J x y = (fun i => σ (x i)) ⬝ᵥ (J *ᵥ y) := by
   unfold Formalism.UG.hform
   simp only [dotProduct, mulVec, Finset.mul_sum, mul_assoc]
 
-private theorem hform_mulVec_eq_of_unitary {K : Type} [CommRing K] {n : ℕ} (σ : K →+* K)
-    (J γ : Matrix (Fin n) (Fin n) K) (hγ : Formalism.UG.cT σ γ * J * γ = J) (x y : Fin n → K) :
-    Formalism.UG.hform σ J (γ *ᵥ x) (γ *ᵥ y) = Formalism.UG.hform σ J x y := by
+private theorem hform_mulVec_eq_of_unitary
+    {K : Type} [CommRing K]
+    {n : ℕ} (σ : K →+* K) (J γ : Matrix (Fin n) (Fin n) K) (hγ : Formalism.UG.cT σ γ * J * γ = J)
+    (x y : Fin n → K)
+    : Formalism.UG.hform σ J (γ *ᵥ x) (γ *ᵥ y) = Formalism.UG.hform σ J x y := by
   rw [hform_eq_dotProduct_mulVec, hform_eq_dotProduct_mulVec]
   have h1 : (fun i => σ ((γ *ᵥ x) i)) = γ.map σ *ᵥ (fun i => σ (x i)) := by
     funext i
@@ -40,12 +44,37 @@ private theorem hform_mulVec_eq_of_unitary {K : Type} [CommRing K] {n : ℕ} (σ
   rw [h1, ← vecMul_transpose (γ.map σ), ← dotProduct_mulVec]
   simp only [mulVec_mulVec, hγ]
 
-theorem lowering_difference_of_isometries :
-    ∀ (K R : Type) [Field K] [StarRing K] [CommRing R] [Algebra R K] (n : ℕ) (J : Matrix (Fin n) (Fin n) K), Formalism.UG.IsHerm (starRingEnd K) J → ∀ (a : ℕ) (G : ℕ → Submodule R (Fin n → K)), G 0 = ⊥ → Monotone G → (∀ p ≤ 2 * a + 1, ∀ y, y ∈ G (2 * a + 1 - p) ↔ y ∈ G (2 * a + 1) ∧ ∀ s ∈ G p, Formalism.UG.hform (starRingEnd K) J s y = 0) → ∀ γ γ' : Matrix (Fin n) (Fin n) K, Formalism.UG.cT (starRingEnd K) γ * J * γ = J → Formalism.UG.cT (starRingEnd K) γ' * J * γ' = J → (∀ p ≤ 2 * a, ∀ y ∈ G (p + 1), (γ - 1) *ᵥ y ∈ G p) → (∀ p ≤ 2 * a, ∀ y ∈ G (p + 1), (γ' - 1) *ᵥ y ∈ G p) → ∀ c : ℕ, 1 ≤ c → (∀ q p : ℕ, q < p → q + p ≤ 2 * a → p - q < c → ∀ y ∈ G (p + 1), (γ - γ') *ᵥ y ∈ G q) → (∀ p ≤ 2 * a + 1, ∀ y ∈ G p, (γ - γ') *ᵥ y ∈ G (p - c)) ∧ ∀ p p' : ℕ, p ≤ 2 * a → p' ≤ 2 * a → p + p' ≤ 2 * a + c → ∀ x ∈ G (p + 1), ∀ y ∈ G (p' + 1), Formalism.UG.hform (starRingEnd K) J ((γ - γ') *ᵥ x) y + Formalism.UG.hform (starRingEnd K) J x ((γ - γ') *ᵥ y) = 0 := by
+theorem lowering_difference_of_isometries
+    : ∀ (K R : Type) [Field K] [StarRing K] [CommRing R] [Algebra R K] (n : ℕ)
+        (J : Matrix (Fin n) (Fin n) K),
+      Formalism.UG.IsHerm (starRingEnd K) J
+        → ∀ (a : ℕ) (G : ℕ → Submodule R (Fin n → K)),
+          G 0 = ⊥ → Monotone G
+            → (∀ p ≤ 2 * a + 1, ∀ y,
+              y ∈ G (2 * a + 1 - p)
+                ↔ y ∈ G (2 * a + 1) ∧ ∀ s ∈ G p, Formalism.UG.hform (starRingEnd K) J s y = 0)
+            → ∀ γ γ' : Matrix (Fin n) (Fin n) K,
+              Formalism.UG.cT (starRingEnd K) γ * J * γ = J
+                → Formalism.UG.cT (starRingEnd K) γ' * J * γ' = J
+                → (∀ p ≤ 2 * a, ∀ y ∈ G (p + 1), (γ - 1) *ᵥ y ∈ G p)
+                → (∀ p ≤ 2 * a, ∀ y ∈ G (p + 1), (γ' - 1) *ᵥ y ∈ G p)
+                → ∀ c : ℕ,
+                  1 ≤ c
+                    → (∀ q p : ℕ,
+                      q < p → q + p ≤ 2 * a → p - q < c → ∀ y ∈ G (p + 1), (γ - γ') *ᵥ y ∈ G q)
+                    → (∀ p ≤ 2 * a + 1, ∀ y ∈ G p, (γ - γ') *ᵥ y ∈ G (p - c))
+                      ∧ ∀ p p' : ℕ,
+                        p ≤ 2 * a → p' ≤ 2 * a → p + p' ≤ 2 * a + c
+                          → ∀ x ∈ G (p + 1), ∀ y ∈ G (p' + 1),
+                            Formalism.UG.hform (starRingEnd K) J ((γ - γ') *ᵥ x) y
+                                + Formalism.UG.hform (starRingEnd K) J x ((γ - γ') *ᵥ y)
+                              = 0 := by
   intro K R _ _ _ _ n J _ a G hG0 hGm hdual γ γ' hγ hγ' hl hl' c hc hlow
   set hf := Formalism.UG.hform (starRingEnd K) J with hhf
-  have hL : ∀ x x' y, hf (x - x') y = hf x y - hf x' y := fun x x' y => hform_sub_left_flag _ J x x' y
-  have hR : ∀ x y y', hf x (y - y') = hf x y - hf x y' := fun x y y' => hform_sub_right_flag _ J x y y'
+  have hL : ∀ x x' y, hf (x - x') y = hf x y - hf x' y := fun x x' y =>
+    hform_sub_left_flag _ J x x' y
+  have hR : ∀ x y y', hf x (y - y') = hf x y - hf x y' := fun x y y' =>
+    hform_sub_right_flag _ J x y y'
   have iso : ∀ x y, hf (γ *ᵥ x) (γ *ᵥ y) = hf x y := hform_mulVec_eq_of_unitary _ J γ hγ
   have iso' : ∀ x y, hf (γ' *ᵥ x) (γ' *ᵥ y) = hf x y := hform_mulVec_eq_of_unitary _ J γ' hγ'
   have h0 : ∀ v, hf 0 v = 0 := fun v => by simp [hhf, Formalism.UG.hform]
@@ -96,14 +125,16 @@ theorem lowering_difference_of_isometries :
         | succ j ihj =>
           intro hj s hs
           have k := key s y
-          have ha : hf ((γ' - 1) *ᵥ s) ((γ - γ') *ᵥ y) =
-              hf (γ' *ᵥ s) ((γ - γ') *ᵥ y) - hf s ((γ - γ') *ᵥ y) := by
+          have ha
+              : hf ((γ' - 1) *ᵥ s) ((γ - γ') *ᵥ y)
+                = hf (γ' *ᵥ s) ((γ - γ') *ᵥ y) - hf s ((γ - γ') *ᵥ y) := by
             rw [sub_mulVec γ' 1, one_mulVec, hL]
           have hz1 := ihj (by omega) _ (hl' j (by omega) s hs)
           have hz2 := orth (j + 1 - c) p (by omega) _ (ih (j + 1) (by omega) (by omega) s hs) _ hγy
           linear_combination k + ha - hz1 - hz2
-      have hd := (hdual (2 * a + 1 - (p - c)) (by omega) ((γ - γ') *ᵥ y)).2
-        ⟨hGm (by omega) (base p hp y hy), fun s hs => inner _ le_rfl s hs⟩
+      have hd :=
+        (hdual (2 * a + 1 - (p - c)) (by omega) ((γ - γ') *ᵥ y)).2
+          ⟨hGm (by omega) (base p hp y hy), fun s hs => inner _ le_rfl s hs⟩
       have e2 : 2 * a + 1 - (2 * a + 1 - (p - c)) = p - c := by omega
       rwa [e2] at hd
   refine ⟨main1, ?_⟩

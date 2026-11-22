@@ -9,8 +9,8 @@ open NumberField ReciprocityTheory.Aut Formalism.L2.NG
 
 namespace PI.UnitaryGroupMassFormula.AlgWtDualUniq
 
-theorem main (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) : Formalism.L2.Props.DualUnique L n := by
-
+theorem main (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ)
+    : Formalism.L2.Props.DualUnique L n := by
   have fd : ∀ c : AlgWt L n, FiniteDimensional ℂ c.W := by
     intro c
     have h := c.alg

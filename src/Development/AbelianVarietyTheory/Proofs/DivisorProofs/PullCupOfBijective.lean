@@ -19,30 +19,51 @@ open GlobalTheory.CatCoh
 
 universe u v u' v' u'' v''
 
-theorem pull_cup_of_bijective {R R' : Type} [CommRing R] [CommRing R']
-    {C : Type u} [Category.{v} C] {C' : Type u'} [Category.{v'} C'] {C'' : Type u''} [Category.{v''} C'']
+theorem pull_cup_of_bijective
+    {R R' : Type} [CommRing R] [CommRing R']
+    {C : Type u} [Category.{v} C]
+    {C' : Type u'} [Category.{v'} C']
+    {C'' : Type u''} [Category.{v''} C'']
     {σ : R →+* R'} {F : C ⥤ CommAlgCat.{0} R} {F' : C' ⥤ CommAlgCat.{0} R'}
     {F'' : C'' ⥤ CommAlgCat.{0} R'} (m : CoefMap σ F F'') (n : CoefMap (RingHom.id R') F' F'')
-    (h1 : Function.Bijective n.pull1) (h2 : Function.Bijective n.pull2) (a b : H1 F) :
-    (LinearEquiv.ofBijective n.pull2 h2).symm (m.pull2 (cup F a b)) =
-      cup F' ((LinearEquiv.ofBijective n.pull1 h1).symm (m.pull1 a))
+    (h1 : Function.Bijective n.pull1) (h2 : Function.Bijective n.pull2) (a b : H1 F)
+    : (LinearEquiv.ofBijective n.pull2 h2).symm (m.pull2 (cup F a b))
+      = cup F' ((LinearEquiv.ofBijective n.pull1 h1).symm (m.pull1 a))
         ((LinearEquiv.ofBijective n.pull1 h1).symm (m.pull1 b)) := by
   have back : ∀ x, n.pull1 ((LinearEquiv.ofBijective n.pull1 h1).symm x) = x := fun x =>
     (LinearEquiv.ofBijective n.pull1 h1).apply_symm_apply x
   apply (LinearEquiv.ofBijective n.pull2 h2).injective
-  rw [LinearEquiv.apply_symm_apply, LinearEquiv.ofBijective_apply, n.pullCohomologyTwo_cup, back, back, m.pullCohomologyTwo_cup]
+  rw [LinearEquiv.apply_symm_apply, LinearEquiv.ofBijective_apply, n.pullCohomologyTwo_cup, back,
+    back, m.pullCohomologyTwo_cup]
 
-variable {R R' : Type} [CommRing R] [CommRing R'] {X X' : AlgebraicGeometry.Scheme}
-  {s : X ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R} {s' : X' ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R'} {σ : R →+* R'}
-  {φ : X' ⟶ X}
+variable
+  {R R' : Type} [CommRing R] [CommRing R']
+  {X X' : AlgebraicGeometry.Scheme} {s : X ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R}
+  {s' : X' ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R'} {σ : R →+* R'} {φ : X' ⟶ X}
 
-theorem pullHO2_cup (h : φ ≫ s = s' ≫ ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap σ) (a b : GlobalTheory.CechDR.HO1 s) :
-    GlobalTheory.AbCoh.pullHO2 h (cup _ a b) = cup _ (GlobalTheory.CechDR.pullHO1 h a) (GlobalTheory.CechDR.pullHO1 h b) := by
+theorem pullHO2_cup
+    (h : φ ≫ s = s' ≫ ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap σ)
+    (a b : GlobalTheory.CechDR.HO1 s)
+    : GlobalTheory.AbCoh.pullHO2 h (cup _ a b)
+      = cup _ (GlobalTheory.CechDR.pullHO1 h a) (GlobalTheory.CechDR.pullHO1 h b) := by
   unfold GlobalTheory.AbCoh.pullHO2 GlobalTheory.CechDR.pullHO1 GlobalTheory.CechDR.pairResEquivO
   simp only [LinearMap.comp_apply, LinearEquiv.coe_coe]
   exact pull_cup_of_bijective _ _ _ _ a b
 
-theorem main : ∀ (R R' : Type) [inst : CommRing R] [inst_1 : CommRing R'] (X X' : AlgebraicGeometry.Scheme) (s : X ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R) (s' : X' ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R') (σ : R →+* R') (φ : X' ⟶ X) (h : CategoryTheory.CategoryStruct.comp φ s = CategoryTheory.CategoryStruct.comp s' (ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap σ)), Function.Surjective (⇑(GlobalTheory.CechDR.pullHO1 h) : GlobalTheory.CechDR.HO1 s → GlobalTheory.CechDR.HO1 s') → GlobalTheory.AbCoh.WedgeO (GlobalTheory.CechDR.OAff s') → Function.Surjective (⇑(GlobalTheory.AbCoh.pullHO2 h) : GlobalTheory.AbCoh.HO2 s → GlobalTheory.AbCoh.HO2 s') := by
+theorem main
+    : ∀ (R R' : Type) [inst : CommRing R] [inst_1 : CommRing R'] (X X' : AlgebraicGeometry.Scheme)
+        (s : X ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R)
+        (s' : X' ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R') (σ : R →+* R') (φ : X' ⟶ X)
+        (h : CategoryTheory.CategoryStruct.comp φ s
+          = CategoryTheory.CategoryStruct.comp s'
+            (ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap σ)),
+      Function.Surjective
+          (⇑(GlobalTheory.CechDR.pullHO1 h)
+            : GlobalTheory.CechDR.HO1 s → GlobalTheory.CechDR.HO1 s')
+        → GlobalTheory.AbCoh.WedgeO (GlobalTheory.CechDR.OAff s')
+        → Function.Surjective
+          (⇑(GlobalTheory.AbCoh.pullHO2 h)
+            : GlobalTheory.AbCoh.HO2 s → GlobalTheory.AbCoh.HO2 s') := by
   intro R R' _ _ X X' s s' σ φ h hsurj hwedge
   obtain ⟨e, he⟩ := hwedge
 

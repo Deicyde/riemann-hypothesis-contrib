@@ -21,7 +21,6 @@ def OrthAt (E : HermitianBundle.{0} K) (F F' : Submodule (𝓞 K) E.carrier) : P
     (E.metric.form σ).inner ((1 : ComplexAt σ) ⊗ₜ[𝓞 K] x) ((1 : ComplexAt σ) ⊗ₜ[𝓞 K] y) = 0
 
 structure SatFlag (E : HermitianBundle.{0} K) (r : ℕ) where
-
   F : Fin (r + 1) → Submodule (𝓞 K) E.carrier
   mono : Monotone F
   sat : ∀ i, E.Saturated (F i)
@@ -33,14 +32,13 @@ variable {E : HermitianBundle.{0} K} {r : ℕ}
 
 def top (A : SatFlag E r) : Submodule (𝓞 K) E.carrier := A.F (Fin.last r)
 
-def grDeg (A : SatFlag E r) (i : Fin r) : ℝ := E.normDegree (A.F i.succ) - E.normDegree (A.F i.castSucc)
+def grDeg (A : SatFlag E r) (i : Fin r) : ℝ :=
+  E.normDegree (A.F i.succ) - E.normDegree (A.F i.castSucc)
 
 end SatFlag
 
 structure FlagPair (E : HermitianBundle.{0} K) (Ψ : Type) (j k : ℕ) where
-
   W : Ψ → SatFlag E j
-
   S : Ψ → SatFlag E k
 
 namespace FlagPair
@@ -51,13 +49,15 @@ def lamDeg (A : FlagPair E Ψ j k) (lam : Ψ → Fin (j + k) → ℝ) : ℝ :=
   ∑ τ, (-(∑ i : Fin j, lam τ (Fin.castAdd k i) * (A.W τ).grDeg i) +
     ∑ i : Fin k, lam τ (Fin.natAdd j i) * (A.S τ).grDeg i.rev)
 
-def flatDeg (A : FlagPair E Ψ j k) (τ : Ψ) : ℝ := E.normDegree (A.W τ).top - E.normDegree (A.S τ).top
+def flatDeg (A : FlagPair E Ψ j k) (τ : Ψ) : ℝ :=
+  E.normDegree (A.W τ).top - E.normDegree (A.S τ).top
 
 def part (A : FlagPair E Ψ j k) : Ψ ⊕ Ψ → Submodule (𝓞 K) E.carrier :=
   Sum.elim (fun τ => (A.W τ).top) (fun τ => (A.S τ).top)
 
 def IsOrthFull (A : FlagPair E Ψ j k) : Prop :=
-  (∀ a b, a ≠ b → OrthAt E (A.part a) (A.part b)) ∧ Fintype.card Ψ * (j + k) = Module.finrank (𝓞 K) E.carrier
+  (∀ a b, a ≠ b → OrthAt E (A.part a) (A.part b))
+    ∧ Fintype.card Ψ * (j + k) = Module.finrank (𝓞 K) E.carrier
 
 end FlagPair
 

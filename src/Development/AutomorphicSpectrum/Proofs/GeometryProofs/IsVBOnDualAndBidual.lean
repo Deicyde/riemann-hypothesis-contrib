@@ -5,24 +5,27 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EtaleLo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.LatDual
 
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-  {E : Type} [AddCommGroup E] [Module Ω E]
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem mem_span_basis_iff (p : Cpt ξ) {r : ℕ} (B : Module.Basis (Fin r) Ω E) (e : E) :
-    e ∈ Submodule.span (regAt ξ p) (Set.range B) ↔ ∀ i, B.repr e i ∈ regAt ξ p := by
+theorem mem_span_basis_iff (p : Cpt ξ) {r : ℕ} (B : Module.Basis (Fin r) Ω E) (e : E)
+    : e ∈ Submodule.span (regAt ξ p) (Set.range B) ↔ ∀ i, B.repr e i ∈ regAt ξ p := by
   constructor
   · intro he
-    let N : Submodule (regAt ξ p) E :=
-      { carrier := {x | ∀ i, B.repr x i ∈ regAt ξ p}
-        add_mem' := fun ha hb i => by simpa using add_mem (ha i) (hb i)
-        zero_mem' := fun i => by simp
-        smul_mem' := fun c x hx i => by
-          show B.repr ((c : Ω) • x) i ∈ regAt ξ p
-          simpa using mul_mem c.2 (hx i) }
+    let N : Submodule (regAt ξ p) E := {
+      carrier := {x | ∀ i, B.repr x i ∈ regAt ξ p}
+      add_mem' := fun ha hb i => by simpa using add_mem (ha i) (hb i)
+      zero_mem' := fun i => by simp
+      smul_mem' := fun c x hx i => by
+        show B.repr ((c : Ω) • x) i ∈ regAt ξ p
+        simpa using mul_mem c.2 (hx i)
+    }
     have hle : Submodule.span (regAt ξ p) (Set.range B) ≤ N := by
       rw [Submodule.span_le]
       rintro _ ⟨j, rfl⟩
@@ -40,28 +43,31 @@ theorem mem_span_basis_iff (p : Cpt ξ) {r : ℕ} (B : Module.Basis (Fin r) Ω E
     rw [hc]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem mem_dual_iff (L : Lat ξ E) (p : Cpt ξ) {r : ℕ} (b : Fin r → E)
-    (h : L p = Submodule.span (regAt ξ p) (Set.range b)) (w : Module.Dual Ω E) :
-    w ∈ L.dual p ↔ ∀ i, w (b i) ∈ regAt ξ p := by
+theorem mem_dual_iff
+    (L : Lat ξ E) (p : Cpt ξ)
+    {r : ℕ} (b : Fin r → E) (h : L p = Submodule.span (regAt ξ p) (Set.range b))
+    (w : Module.Dual Ω E)
+    : w ∈ L.dual p ↔ ∀ i, w (b i) ∈ regAt ξ p := by
   show (∀ e ∈ L p, w e ∈ regAt ξ p) ↔ _
   rw [h]
   constructor
   · intro hw i
     exact hw _ (Submodule.subset_span ⟨i, rfl⟩)
   · intro hw
-    let N : Submodule (regAt ξ p) E :=
-      { carrier := {x | w x ∈ regAt ξ p}
-        add_mem' := fun {a c} ha hc => by
-          show w (a + c) ∈ regAt ξ p
-          rw [map_add (f := _)]
-          exact add_mem ha hc
-        zero_mem' := by
-          show w 0 ∈ regAt ξ p
-          simp
-        smul_mem' := fun c x hx => by
-          show w ((c : Ω) • x) ∈ regAt ξ p
-          rw [map_smul, smul_eq_mul]
-          exact mul_mem c.2 hx }
+    let N : Submodule (regAt ξ p) E := {
+      carrier := {x | w x ∈ regAt ξ p}
+      add_mem' := fun {a c} ha hc => by
+        show w (a + c) ∈ regAt ξ p
+        rw [map_add (f := _)]
+        exact add_mem ha hc
+      zero_mem' := by
+        show w 0 ∈ regAt ξ p
+        simp
+      smul_mem' := fun c x hx => by
+        show w ((c : Ω) • x) ∈ regAt ξ p
+        rw [map_smul, smul_eq_mul]
+        exact mul_mem c.2 hx
+    }
     have hle : Submodule.span (regAt ξ p) (Set.range b) ≤ N := by
       rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
@@ -69,9 +75,10 @@ theorem mem_dual_iff (L : Lat ξ E) (p : Cpt ξ) {r : ℕ} (b : Fin r → E)
     intro e he
     exact hle he
 
-theorem dual_eq_span (L : Lat ξ E) (p : Cpt ξ) {r : ℕ} (B : Module.Basis (Fin r) Ω E)
-    (h : L p = Submodule.span (regAt ξ p) (Set.range B)) :
-    L.dual p = Submodule.span (regAt ξ p) (Set.range B.dualBasis) := by
+theorem dual_eq_span
+    (L : Lat ξ E) (p : Cpt ξ)
+    {r : ℕ} (B : Module.Basis (Fin r) Ω E) (h : L p = Submodule.span (regAt ξ p) (Set.range B))
+    : L.dual p = Submodule.span (regAt ξ p) (Set.range B.dualBasis) := by
   ext w
   rw [mem_dual_iff L p B h w, mem_span_basis_iff p B.dualBasis w]
   simp only [Module.Basis.dualBasis_repr]
@@ -82,8 +89,11 @@ namespace GlobalTheory.CompanionTheory.Ar
 
 open LatDual
 
-theorem Lat.isVBOn_dual_and_bidual :
-    ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (T : Set (Cpt ξ)) (r : ℕ), L.IsVBOn T r ⊤ → L.dual.IsVBOn T r ⊤ ∧ ∀ p ∈ T, ∀ e : E, e ∈ L p ↔ ∀ w ∈ L.dual p, w e ∈ regAt ξ p := by
+theorem Lat.isVBOn_dual_and_bidual
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type)
+        [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (T : Set (Cpt ξ)) (r : ℕ),
+      L.IsVBOn T r ⊤
+        → L.dual.IsVBOn T r ⊤ ∧ ∀ p ∈ T, ∀ e : E, e ∈ L p ↔ ∀ w ∈ L.dual p, w e ∈ regAt ξ p := by
   intro X Ω _ ξ E _ _ L T r hL
   refine ⟨?_, ?_⟩
   · intro p hp

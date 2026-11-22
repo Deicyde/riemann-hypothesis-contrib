@@ -4,4 +4,6 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-noncomputable abbrev UpperTheory.V.W.UniversalOrdinaryDeterminantRing.arithmeticPointClassicalityDense := @UpperTheory.Gal.projectedFormsSystemPart.IrrArithPointsAutomorphicAway
+noncomputable abbrev
+    UpperTheory.V.W.UniversalOrdinaryDeterminantRing.arithmeticPointClassicalityDense :=
+  @UpperTheory.Gal.projectedFormsSystemPart.IrrArithPointsAutomorphicAway

@@ -13,17 +13,17 @@ open Matrix
 
 namespace PSymplDetBound
 
-theorem step_bound (n : ℕ) (ρ : ℝ) (hle : ρ ≤ 2 * ((n : ℝ) + 1)) :
-    ρ * (2 * (n : ℝ)) ^ n ≤ (2 * ((n + 1 : ℕ) : ℝ)) ^ (n + 1) := by
+theorem step_bound (n : ℕ) (ρ : ℝ) (hle : ρ ≤ 2 * ((n : ℝ) + 1))
+    : ρ * (2 * (n : ℝ)) ^ n ≤ (2 * ((n + 1 : ℕ) : ℝ)) ^ (n + 1) := by
   have h0 : (0 : ℝ) ≤ (2 * (n : ℝ)) ^ n := by positivity
-  calc ρ * (2 * (n : ℝ)) ^ n ≤ (2 * ((n : ℝ) + 1)) * (2 * (n : ℝ)) ^ n :=
-        mul_le_mul_of_nonneg_right hle h0
+  calc
+    ρ * (2 * (n : ℝ)) ^ n
+      ≤ (2 * ((n : ℝ) + 1)) * (2 * (n : ℝ)) ^ n := mul_le_mul_of_nonneg_right hle h0
     _ ≤ (2 * ((n : ℝ) + 1)) * (2 * ((n : ℝ) + 1)) ^ n := by
-        apply mul_le_mul_of_nonneg_left _ (by positivity)
-        apply pow_le_pow_left₀ (by positivity)
-        linarith
-    _ = (2 * ((n + 1 : ℕ) : ℝ)) ^ (n + 1) := by
-        push_cast; ring
+      apply mul_le_mul_of_nonneg_left _ (by positivity)
+      apply pow_le_pow_left₀ (by positivity)
+      linarith
+    _ = (2 * ((n + 1 : ℕ) : ℝ)) ^ (n + 1) := by push_cast; ring
 
 end PSymplDetBound
 

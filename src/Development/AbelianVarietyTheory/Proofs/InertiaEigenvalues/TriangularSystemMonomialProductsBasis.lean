@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Delt
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.TriBasis
@@ -14,8 +16,8 @@ namespace GlobalTheory.TriBasis
 noncomputable def revLex : MonomialOrder.{0, 0} ℕ :=
   (MonomialOrder.lex (σ := ℕᵒᵈ) : MonomialOrder ℕᵒᵈ)
 
-theorem revLex_lt {β γ : ℕ →₀ ℕ} (i : ℕ) (h1 : ∀ j, i < j → β j = γ j) (h2 : β i < γ i) :
-    revLex.toSyn β < revLex.toSyn γ := by
+theorem revLex_lt {β γ : ℕ →₀ ℕ} (i : ℕ) (h1 : ∀ j, i < j → β j = γ j) (h2 : β i < γ i)
+    : revLex.toSyn β < revLex.toSyn γ := by
   exact ⟨OrderDual.toDual i, fun j hj => h1 (OrderDual.ofDual j) hj, h2⟩
 
 variable {σ : Type} {R : Type} [CommRing R]
@@ -23,21 +25,24 @@ variable {σ : Type} {R : Type} [CommRing R]
 def Led (m : MonomialOrder.{0, 0} σ) (p : MvPolynomial σ R) (γ : σ →₀ ℕ) : Prop :=
   IsUnit (AddMonoidAlgebra.coeff p γ) ∧ m.toSyn (m.degree p) ≤ m.toSyn γ
 
-theorem Led.mul {m : MonomialOrder.{0, 0} σ} {p q : MvPolynomial σ R} {γ δ : σ →₀ ℕ}
-    (hp : Led m p γ) (hq : Led m q δ) : Led m (p * q) (γ + δ) := by
+theorem Led.mul
+    {m : MonomialOrder.{0, 0} σ} {p q : MvPolynomial σ R} {γ δ : σ →₀ ℕ}
+    (hp : Led m p γ) (hq : Led m q δ)
+    : Led m (p * q) (γ + δ) := by
   obtain ⟨hp1, hp2⟩ := hp
   obtain ⟨hq1, hq2⟩ := hq
   refine ⟨?_, ?_⟩
   · rw [MonomialOrder.coeff_mul_of_add_of_degree_le hp2 hq2]
     exact hp1.mul hq1
-  · calc m.toSyn (m.degree (p * q)) ≤ m.toSyn (m.degree p + m.degree q) :=
-          MonomialOrder.degree_mul_le
+  · calc
+      m.toSyn (m.degree (p * q))
+        ≤ m.toSyn (m.degree p + m.degree q) := MonomialOrder.degree_mul_le
       _ = m.toSyn (m.degree p) + m.toSyn (m.degree q) := map_add _ _ _
       _ ≤ m.toSyn γ + m.toSyn δ := add_le_add hp2 hq2
       _ = m.toSyn (γ + δ) := (map_add _ _ _).symm
 
-theorem Led.monomial (m : MonomialOrder.{0, 0} σ) (γ : σ →₀ ℕ) :
-    Led m (MvPolynomial.monomial γ (1 : R)) γ := by
+theorem Led.monomial (m : MonomialOrder.{0, 0} σ) (γ : σ →₀ ℕ)
+    : Led m (MvPolynomial.monomial γ (1 : R)) γ := by
   classical
   refine ⟨?_, MonomialOrder.degree_monomial_le _⟩
   rw [MvPolynomial.coeff_monomial, if_pos rfl]
@@ -47,8 +52,9 @@ theorem Led.one (m : MonomialOrder.{0, 0} σ) : Led m (1 : MvPolynomial σ R) 0 
   have h := Led.monomial (R := R) m 0
   rwa [← MvPolynomial.C_apply, MvPolynomial.C_1] at h
 
-theorem Led.pow {m : MonomialOrder.{0, 0} σ} {p : MvPolynomial σ R} {γ : σ →₀ ℕ}
-    (hp : Led m p γ) (n : ℕ) : Led m (p ^ n) (n • γ) := by
+theorem Led.pow
+    {m : MonomialOrder.{0, 0} σ} {p : MvPolynomial σ R} {γ : σ →₀ ℕ} (hp : Led m p γ) (n : ℕ)
+    : Led m (p ^ n) (n • γ) := by
   induction n with
   | zero =>
     have e : (0 : ℕ) • γ = 0 := by ext; simp
@@ -59,9 +65,10 @@ theorem Led.pow {m : MonomialOrder.{0, 0} σ} {p : MvPolynomial σ R} {γ : σ �
     rw [pow_succ, e]
     exact ih.mul hp
 
-theorem Led.prod {ι : Type} {m : MonomialOrder.{0, 0} σ} (s : Finset ι)
-    {p : ι → MvPolynomial σ R} {γ : ι → σ →₀ ℕ}
-    (hp : ∀ i, Led m (p i) (γ i)) : Led m (∏ i ∈ s, p i) (∑ i ∈ s, γ i) := by
+theorem Led.prod
+    {ι : Type} {m : MonomialOrder.{0, 0} σ} (s : Finset ι)
+    {p : ι → MvPolynomial σ R} {γ : ι → σ →₀ ℕ} (hp : ∀ i, Led m (p i) (γ i))
+    : Led m (∏ i ∈ s, p i) (∑ i ∈ s, γ i) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -71,26 +78,33 @@ theorem Led.prod {ι : Type} {m : MonomialOrder.{0, 0} σ} (s : Finset ι)
     rw [Finset.prod_insert hj, Finset.sum_insert hj]
     exact (hp j).mul ih
 
-theorem apply_eq_zero_of_supported {i : ℕ} {a : MvPolynomial ℕ R}
-    (ha : a ∈ MvPolynomial.supported R (Set.Iio i)) {β : ℕ →₀ ℕ} (hβ : β ∈ a.support)
-    {j : ℕ} (hj : i ≤ j) : β j = 0 := by
+theorem apply_eq_zero_of_supported
+    {i : ℕ} {a : MvPolynomial ℕ R} (ha : a ∈ MvPolynomial.supported R (Set.Iio i))
+    {β : ℕ →₀ ℕ} (hβ : β ∈ a.support)
+    {j : ℕ} (hj : i ≤ j)
+    : β j = 0 := by
   by_contra h
   have hv : j ∈ a.vars :=
     (MvPolynomial.mem_vars_iff_mem_support j).2 ⟨β, hβ, Finsupp.mem_support_iff.2 h⟩
   have hlt : j < i := MvPolynomial.mem_supported.1 ha hv
   omega
 
-theorem led_tri {l : ℕ} (hl : 2 ≤ l) (i : ℕ) (v : Rˣ) {a b : MvPolynomial ℕ R}
-    (ha : a ∈ MvPolynomial.supported R (Set.Iio i))
-    (hb : b ∈ MvPolynomial.supported R (Set.Iio i)) :
-    Led revLex (MvPolynomial.C (v : R) * MvPolynomial.X i ^ l + a * MvPolynomial.X i + b)
+theorem led_tri
+    {l : ℕ} (hl : 2 ≤ l)
+    (i : ℕ)
+    (v : Rˣ)
+    {a b : MvPolynomial ℕ R}
+    (ha : a ∈ MvPolynomial.supported R (Set.Iio i)) (hb : b ∈ MvPolynomial.supported R (Set.Iio i))
+    : Led revLex (MvPolynomial.C (v : R) * MvPolynomial.X i ^ l + a * MvPolynomial.X i + b)
       (Finsupp.single i l) := by
   classical
-  have hmon : MvPolynomial.C (v : R) * MvPolynomial.X i ^ l =
-      MvPolynomial.monomial (Finsupp.single i l) (v : R) := by
+  have hmon
+      : MvPolynomial.C (v : R) * MvPolynomial.X i ^ l
+        = MvPolynomial.monomial (Finsupp.single i l) (v : R) := by
     rw [MvPolynomial.X_pow_eq_monomial, MvPolynomial.C_mul_monomial, mul_one]
-  have hsmall : ∀ c : ℕ →₀ ℕ, (∀ j, i < j → c j = 0) → c i < l →
-      revLex.toSyn c < revLex.toSyn (Finsupp.single i l) := by
+  have hsmall
+      : ∀ c : ℕ →₀ ℕ,
+        (∀ j, i < j → c j = 0) → c i < l → revLex.toSyn c < revLex.toSyn (Finsupp.single i l) := by
     intro c h1 h2
     refine revLex_lt i (fun j hj => ?_) (by simpa using h2)
     rw [h1 j hj]
@@ -121,8 +135,8 @@ theorem led_tri {l : ℕ} (hl : 2 ≤ l) (i : ℕ) (v : Rˣ) {a b : MvPolynomial
       have h' := hb0 _ h i le_rfl
       rw [Finsupp.single_eq_same] at h'
       omega
-    rw [MvPolynomial.coeff_add, MvPolynomial.coeff_add, hmon, MvPolynomial.coeff_monomial, if_pos rfl,
-      h1, h2, add_zero, add_zero]
+    rw [MvPolynomial.coeff_add, MvPolynomial.coeff_add, hmon, MvPolynomial.coeff_monomial,
+      if_pos rfl, h1, h2, add_zero, add_zero]
     exact v.isUnit
   · rw [MonomialOrder.degree_le_iff]
     intro c hc
@@ -130,7 +144,8 @@ theorem led_tri {l : ℕ} (hl : 2 ≤ l) (i : ℕ) (v : Rˣ) {a b : MvPolynomial
     · rw [hce]
     · have hc' := MvPolynomial.mem_support_iff.1 hc
       rw [MvPolynomial.coeff_add, MvPolynomial.coeff_add, hmon, MvPolynomial.coeff_monomial,
-        if_neg (Ne.symm hce), zero_add] at hc'
+          if_neg (Ne.symm hce), zero_add]
+        at hc'
       by_cases hA : (a * MvPolynomial.X i).coeff c = 0
       · rw [hA, zero_add] at hc'
         have h := hb0 c hc'
@@ -140,8 +155,8 @@ theorem led_tri {l : ℕ} (hl : 2 ≤ l) (i : ℕ) (v : Rˣ) {a b : MvPolynomial
       · have h := ha0 c hA
         exact (hsmall c h.1 (by omega)).le
 
-theorem bij (l : ℕ) [hl : Fact l.Prime] :
-    Function.Bijective (fun x : Digits l × (ℕ →₀ ℕ) => x.1.1 + l • x.2) := by
+theorem bij (l : ℕ) [hl : Fact l.Prime]
+    : Function.Bijective (fun x : Digits l × (ℕ →₀ ℕ) => x.1.1 + l • x.2) := by
   have hl0 : 0 < l := hl.out.pos
   constructor
   · rintro ⟨⟨α, hα⟩, γ⟩ ⟨⟨α', hα'⟩, γ'⟩ h
@@ -152,7 +167,8 @@ theorem bij (l : ℕ) [hl : Fact l.Prime] :
       simp only [Finsupp.add_apply, Finsupp.smul_apply, smul_eq_mul] at e
       have e1 : α k = α' k := by
         have h2 := congrArg (· % l) e
-        simp only [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt (hα k), Nat.mod_eq_of_lt (hα' k)] at h2
+        simp only [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt (hα k), Nat.mod_eq_of_lt (hα' k)]
+          at h2
         exact h2
       refine ⟨e1, ?_⟩
       rw [e1] at e
@@ -163,15 +179,30 @@ theorem bij (l : ℕ) [hl : Fact l.Prime] :
     subst e2
     rfl
   · intro β
-    refine ⟨(⟨Finsupp.mapRange (· % l) (Nat.zero_mod l) β, fun k => ?_⟩,
-      Finsupp.mapRange (· / l) (Nat.zero_div l) β), ?_⟩
+    refine ⟨
+      (
+        ⟨Finsupp.mapRange (· % l) (Nat.zero_mod l) β, fun k => ?_⟩,
+        Finsupp.mapRange (· / l) (Nat.zero_div l) β
+      ),
+      ?_
+    ⟩
     · rw [Finsupp.mapRange_apply]
       exact Nat.mod_lt _ hl0
     · ext k
       simp only [Finsupp.add_apply, Finsupp.smul_apply, Finsupp.mapRange_apply, smul_eq_mul]
       exact Nat.mod_add_div (β k) l
 
-theorem tri_basis : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (t : ℕ → MvPolynomial ℕ R), (∀ i, ∃ (v : Rˣ) (a b : MvPolynomial ℕ R), a ∈ MvPolynomial.supported R (Set.Iio i) ∧ b ∈ MvPolynomial.supported R (Set.Iio i) ∧ t i = MvPolynomial.C (v : R) * MvPolynomial.X i ^ l + a * MvPolynomial.X i + b) → LinearIndependent R (fun x : Digits l × (ℕ →₀ ℕ) => MvPolynomial.monomial x.1.1 (1 : R) * x.2.prod fun i n => t i ^ n) ∧ Submodule.span R (Set.range fun x : Digits l × (ℕ →₀ ℕ) => MvPolynomial.monomial x.1.1 (1 : R) * x.2.prod fun i n => t i ^ n) = ⊤ := by
+theorem tri_basis
+    : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (t : ℕ → MvPolynomial ℕ R),
+      (∀ i, ∃ (v : Rˣ) (a b : MvPolynomial ℕ R),
+          a ∈ MvPolynomial.supported R (Set.Iio i) ∧ b ∈ MvPolynomial.supported R (Set.Iio i)
+            ∧ t i = MvPolynomial.C (v : R) * MvPolynomial.X i ^ l + a * MvPolynomial.X i + b)
+        → LinearIndependent R (fun x : Digits l × (ℕ →₀ ℕ) =>
+            MvPolynomial.monomial x.1.1 (1 : R) * x.2.prod fun i n => t i ^ n)
+          ∧ Submodule.span R
+              (Set.range fun x : Digits l × (ℕ →₀ ℕ) =>
+                MvPolynomial.monomial x.1.1 (1 : R) * x.2.prod fun i n => t i ^ n)
+            = ⊤ := by
   intro l hlp R _ t ht
   classical
   choose v a b ha hb hteq using ht
@@ -207,8 +238,8 @@ theorem tri_basis : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (t : �
     intro s g hg i0 hi0s
     by_contra hi0
     have hs' : (s.filter fun x => g x ≠ 0).Nonempty := ⟨i0, Finset.mem_filter.2 ⟨hi0s, hi0⟩⟩
-    obtain ⟨x, hx, hxmax⟩ := Finset.exists_max_image _
-      (fun x : Digits l × (ℕ →₀ ℕ) => revLex.toSyn (x.1.1 + l • x.2)) hs'
+    obtain ⟨x, hx, hxmax⟩ :=
+      Finset.exists_max_image _ (fun x : Digits l × (ℕ →₀ ℕ) => revLex.toSyn (x.1.1 + l • x.2)) hs'
     rw [Finset.mem_filter] at hx
     have hc := congrArg (AddMonoidAlgebra.coeff · (x.1.1 + l • x.2)) hg
     rw [MvPolynomial.coeff_sum, MvPolynomial.coeff_zero, Finset.sum_eq_single x] at hc
@@ -228,8 +259,9 @@ theorem tri_basis : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (t : �
     · intro h
       exact absurd hx.1 h
   · rw [Submodule.eq_top_iff']
-    have key : ∀ s : revLex.syn, ∀ q : MvPolynomial ℕ R,
-        revLex.toSyn (revLex.degree q) = s → q ∈ Submodule.span R (Set.range F) := by
+    have key
+        : ∀ s : revLex.syn, ∀ q : MvPolynomial ℕ R,
+          revLex.toSyn (revLex.degree q) = s → q ∈ Submodule.span R (Set.range F) := by
       intro s
       induction s using WellFoundedLT.induction with
       | ind s ih =>
@@ -238,22 +270,27 @@ theorem tri_basis : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (t : �
         have hx' : x.1.1 + l • x.2 = revLex.degree q := hx
         obtain ⟨hu, hdeg⟩ := hLed x
         rw [hx'] at hu hdeg
-        have hmem : (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x ∈ Submodule.span R (Set.range F) :=
+        have hmem
+            : (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x ∈ Submodule.span R (Set.range F) :=
           Submodule.smul_mem _ _ (Submodule.subset_span ⟨x, rfl⟩)
-        have hrest : q - (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x ∈
-            Submodule.span R (Set.range F) := by
+        have hrest
+            : q - (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x
+              ∈ Submodule.span R (Set.range F) := by
           by_cases h0 : q - (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x = 0
           · rw [h0]
             exact Submodule.zero_mem _
           · refine ih _ ?_ _ rfl
             rw [← hq]
-            have hle : revLex.toSyn (revLex.degree (q - (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x))
-                ≤ revLex.toSyn (revLex.degree q) :=
+            have hle
+                : revLex.toSyn (revLex.degree (q - (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x))
+                  ≤ revLex.toSyn (revLex.degree q) :=
               le_trans MonomialOrder.degree_sub_le
                 (sup_le le_rfl (le_trans MonomialOrder.degree_smul_le hdeg))
             refine lt_of_le_of_ne hle (fun e => ?_)
             have e' := revLex.toSyn.injective e
-            have hz : (q - (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x).coeff (revLex.degree q) = 0 := by
+            have hz
+                : (q - (q.coeff (revLex.degree q) * ↑hu.unit⁻¹) • F x).coeff (revLex.degree q)
+                  = 0 := by
               rw [MvPolynomial.coeff_sub, MvPolynomial.coeff_smul, smul_eq_mul, mul_assoc,
                 hu.val_inv_mul, mul_one, sub_self]
             exact (MonomialOrder.coeff_degree_ne_zero_iff.2 h0) (by rw [e']; exact hz)

@@ -58,8 +58,10 @@ private lemma idempotent_corner_part_inv {A : Type} [Ring A] (E g h : A) (hE : E
     _ = 1 - E * g * E * h * F := by rw [a1]
     _ = _ := by noncomm_ring
 
-theorem isPre_blk_image :
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)) (e : Matrix ι ι ℚ), IsPre Γ → e * e = e → (∀ g ∈ Γ, (1 - e.map (algebraMap ℚ ℂ)) * g * e.map (algebraMap ℚ ℂ) = 0) → IsPre (blk e '' Γ) := by
+theorem isPre_blk_image
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)) (e : Matrix ι ι ℚ),
+      IsPre Γ → e * e = e → (∀ g ∈ Γ, (1 - e.map (algebraMap ℚ ℂ)) * g * e.map (algebraMap ℚ ℂ) = 0)
+        → IsPre (blk e '' Γ) := by
   intro ι _ _ Γ e hΓ he htri
   have hE : e.map (algebraMap ℚ ℂ) * e.map (algebraMap ℚ ℂ) = e.map (algebraMap ℚ ℂ) := by
     rw [← Matrix.map_mul, he]
@@ -71,7 +73,8 @@ theorem isPre_blk_image :
   have hinv : ∀ g ∈ Γ, blk e g * blk e g.adjugate = 1 := fun g hg => by
     rw [hmul g hg _ (hΓ.adj_mem g hg), hga g hg, hone]
   have hdet : ∀ g ∈ Γ, (blk e g).det = 1 := fun g hg => by
-    have h1 := idempotent_corner_part_inv _ g g.adjugate hE (htri g hg) (htri _ (hΓ.adj_mem g hg)) (hga g hg)
+    have h1 :=
+      idempotent_corner_part_inv _ g g.adjugate hE (htri g hg) (htri _ (hΓ.adj_mem g hg)) (hga g hg)
     have h2 : (g * blk e g.adjugate).det = 1 := by
       unfold blk
       rw [h1, Matrix.det_one_add_mul_comm, mul_assoc, sub_mul, one_mul, hE, sub_self, mul_zero,
@@ -84,8 +87,9 @@ theorem isPre_blk_image :
     exact ⟨g * h, hΓ.mul_mem g hg h hh, (hmul g hg h hh).symm⟩
   · rintro _ ⟨g, hg, rfl⟩
     refine ⟨g.adjugate, hΓ.adj_mem g hg, ?_⟩
-    calc blk e g.adjugate = ((blk e g).adjugate * blk e g) * blk e g.adjugate := by
-          rw [Matrix.adjugate_mul, hdet g hg, one_smul, one_mul]
+    calc
+      blk e g.adjugate = ((blk e g).adjugate * blk e g) * blk e g.adjugate := by
+        rw [Matrix.adjugate_mul, hdet g hg, one_smul, one_mul]
       _ = _ := by rw [mul_assoc, hinv g hg, mul_one]
   · rintro _ ⟨g, hg, rfl⟩
     exact hdet g hg

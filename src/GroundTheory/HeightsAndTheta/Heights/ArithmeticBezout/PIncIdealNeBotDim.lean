@@ -22,7 +22,8 @@ theorem IncIdealNeBotDim.proof (h₁ : IncIdealDim.Statement) : IncIdealNeBotDim
   have hle : ringKrullDim (MvPolynomial (Fin n) F ⧸ Q) ≤ ((n : ℕ) : WithBot ℕ∞) := by
     have h := ringKrullDim_le_of_surjective (Ideal.Quotient.mk Q) Ideal.Quotient.mk_surjective
     rwa [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
-      Nat.card_eq_fintype_card, Fintype.card_fin, zero_add] at h
+        Nat.card_eq_fintype_card, Fintype.card_fin, zero_add]
+      at h
   obtain ⟨m, hm⟩ : ∃ m : ℕ, ringKrullDim (MvPolynomial (Fin n) F ⧸ Q) = ((m : ℕ) : WithBot ℕ∞) := by
     have hbot : ringKrullDim (MvPolynomial (Fin n) F ⧸ Q) ≠ ⊥ :=
       ne_bot_of_le_ne_bot (by simp) ringKrullDim_nonneg_of_nontrivial
@@ -49,10 +50,12 @@ theorem IncIdealNeBotDim.proof (h₁ : IncIdealDim.Statement) : IncIdealNeBotDim
   rw [hmin, Nat.sub_add_cancel hkn] at hdim
 
   obtain ⟨g, hg, hg0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
-  have hgnz : g ∈ nonZeroDivisors (MvPolynomial (Fin k × Fin n) F) := mem_nonZeroDivisors_of_ne_zero hg0
+  have hgnz : g ∈ nonZeroDivisors (MvPolynomial (Fin k × Fin n) F) :=
+    mem_nonZeroDivisors_of_ne_zero hg0
   have h2 := ringKrullDim_quotient_succ_le_of_nonZeroDivisor hgnz
-  have h3 : ringKrullDim (MvPolynomial (Fin k × Fin n) F ⧸ incIdeal Q k) ≤
-      ringKrullDim (MvPolynomial (Fin k × Fin n) F ⧸ Ideal.span {g}) :=
+  have h3
+      : ringKrullDim (MvPolynomial (Fin k × Fin n) F ⧸ incIdeal Q k)
+        ≤ ringKrullDim (MvPolynomial (Fin k × Fin n) F ⧸ Ideal.span {g}) :=
     ringKrullDim_le_of_surjective
       (Ideal.Quotient.factor ((Ideal.span_singleton_le_iff_mem _).mpr hg))
       (Ideal.Quotient.factor_surjective _)

@@ -15,9 +15,11 @@ open Formalism.MainNotions.G Formalism.MainNotions.Pf14 Formalism.MainNotions.G.
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem valLe_of_vK {p : ℕ} (S : UniformizedDVR p O) (D : ℕ) (a : O)
-    (h : Formalism.MainNotions.PlaneGramData.leQ (vK p (algebraMap O (KK O) a)) (D : ℝ)) :
-    ValLe (Kf := KK O) (p : O) D (algebraMap O (KK O) a) := by
+theorem valLe_of_vK
+    {p : ℕ} (S : UniformizedDVR p O)
+    (D : ℕ) (a : O)
+    (h : Formalism.MainNotions.PlaneGramData.leQ (vK p (algebraMap O (KK O) a)) (D : ℝ))
+    : ValLe (Kf := KK O) (p : O) D (algebraMap O (KK O) a) := by
   obtain ⟨q, hq, hqD⟩ := h
   have ha : a ≠ 0 := by
     rintro rfl

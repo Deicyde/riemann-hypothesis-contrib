@@ -9,10 +9,12 @@ open ValuativeRel GlobalTheory.SplitWeil Matrix
 
 namespace GlobalTheory
 
-theorem exists_finite_integer_residues (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] [CharZero k] (n : ℕ) (hn : 0 < n) :
-    ∃ (ι : Type) (_ : Finite ι) (x : ι → k), (∀ i, x i ∈ 𝒪[k]) ∧
-      ∀ y ∈ 𝒪[k], ∃ i, ∃ u ∈ 𝒪[k], y = x i + (n : k) * u := by
+theorem exists_finite_integer_residues
+    (k : Type)
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
+    (n : ℕ) (hn : 0 < n)
+    : ∃ (ι : Type) (_ : Finite ι) (x : ι → k),
+      (∀ i, x i ∈ 𝒪[k]) ∧ ∀ y ∈ 𝒪[k], ∃ i, ∃ u ∈ 𝒪[k], y = x i + (n : k) * u := by
   let U : Set k := ((𝒪[k] : Subring k) : Set k)
   have hUo : IsOpen U := Valuation.isOpen_integer
   have hUc : IsCompact U := isCompact_iff_compactSpace.mpr (inferInstance : CompactSpace 𝒪[k])
@@ -36,10 +38,15 @@ theorem exists_finite_integer_residues (k : Type) [Field k] [ValuativeRel k] [To
   field_simp
   ring
 
-theorem matrix_integers_mod_nat_finite : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] [CharZero k] (Y Y' : Type) [Fintype Y] [Fintype Y'] (n : ℕ), 0 < n →
-    ∃ R : Set (Matrix Y Y' k), R.Finite ∧ ∀ t : Matrix Y Y' k, (∀ r q, t r q ∈ 𝒪[k]) →
-      ∃ s ∈ R, ∃ u : Matrix Y Y' k, (∀ r q, u r q ∈ 𝒪[k]) ∧ t = s + n • u := by
+theorem matrix_integers_mod_nat_finite
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [CharZero k] (Y Y' : Type) [Fintype Y] [Fintype Y'] (n : ℕ),
+      0 < n
+        → ∃ R : Set (Matrix Y Y' k),
+          R.Finite
+            ∧ ∀ t : Matrix Y Y' k,
+              (∀ r q, t r q ∈ 𝒪[k])
+                → ∃ s ∈ R, ∃ u : Matrix Y Y' k, (∀ r q, u r q ∈ 𝒪[k]) ∧ t = s + n • u := by
   intro k _ _ _ _ _ Y Y' _ _ n hn
   obtain ⟨ι, hι, x, -, hx⟩ := exists_finite_integer_residues k n hn
   refine ⟨Set.range (fun f : Y → Y' → ι => Matrix.of fun r q => x (f r q)), Set.finite_range _, ?_⟩

@@ -5,5 +5,6 @@ public import Development.EtaleCohomology.TateTwists.EtaleChainCochainEvalDiffer
 
 @[expose] public section
 
-theorem LateralTheory.EtaleFoundations.pp_ev_delta_of : LateralTheory.EtaleFoundations.pp_ev_delta :=
+theorem LateralTheory.EtaleFoundations.pp_ev_delta_of
+    : LateralTheory.EtaleFoundations.pp_ev_delta :=
   LateralTheory.EtaleFoundations.etale_chain_cochain_eval_differential_formula_holds

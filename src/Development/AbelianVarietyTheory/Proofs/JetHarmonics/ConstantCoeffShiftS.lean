@@ -205,9 +205,27 @@ lemma DT_shiftS {ζ : ℂ_[q]} (h : ‖ζ - 1‖ < 1) {f : ℂ_[q]⟦X⟧} (hf :
         simp
     _ = _ := (s3.tsum_add s2).symm
 
-theorem shift_laws : ∀ (q : ℕ) [Fact q.Prime] (ζ : ℂ_[q]), ‖ζ - 1‖ < 1 → (∀ (f : ℂ_[q]⟦X⟧) (B : ℝ), Bd B f → Bd B (shiftS ζ f)) ∧ (∀ f g : ℂ_[q]⟦X⟧, Bdd f → Bdd g → shiftS ζ (f + g) = shiftS ζ f + shiftS ζ g ∧ shiftS ζ (f * g) = shiftS ζ f * shiftS ζ g) ∧ (∀ c : ℂ_[q], shiftS ζ (C c) = C c) ∧ shiftS ζ X = C ζ * (1 + X) - 1 ∧ (∀ f : ℂ_[q]⟦X⟧, constantCoeff (shiftS ζ f) = ev f (ζ - 1)) ∧ (∀ f : ℂ_[q]⟦X⟧, Bdd f → DT (shiftS ζ f) = shiftS ζ (DT f)) ∧ (∀ f : ℂ_[q]⟦X⟧, shiftS 1 f = f) := by
+theorem shift_laws
+    : ∀ (q : ℕ) [Fact q.Prime] (ζ : ℂ_[q]),
+      ‖ζ - 1‖ < 1
+        → (∀ (f : ℂ_[q]⟦X⟧) (B : ℝ), Bd B f → Bd B (shiftS ζ f))
+          ∧ (∀ f g : ℂ_[q]⟦X⟧,
+            Bdd f → Bdd g
+              → shiftS ζ (f + g) = shiftS ζ f + shiftS ζ g
+                ∧ shiftS ζ (f * g) = shiftS ζ f * shiftS ζ g)
+          ∧ (∀ c : ℂ_[q], shiftS ζ (C c) = C c) ∧ shiftS ζ X = C ζ * (1 + X) - 1
+          ∧ (∀ f : ℂ_[q]⟦X⟧, constantCoeff (shiftS ζ f) = ev f (ζ - 1))
+          ∧ (∀ f : ℂ_[q]⟦X⟧, Bdd f → DT (shiftS ζ f) = shiftS ζ (DT f))
+          ∧ (∀ f : ℂ_[q]⟦X⟧, shiftS 1 f = f) := by
   intro q _ ζ h
-  exact ⟨fun f B hf => bd_shiftS h hf, fun f g hf hg => ⟨shiftS_add h hf hg, shiftS_mul h hf hg⟩,
-    shiftS_C ζ, shiftS_X ζ, constantCoeff_shiftS ζ, fun f hf => DT_shiftS h hf, shiftS_one⟩
+  exact ⟨
+    fun f B hf => bd_shiftS h hf,
+    fun f g hf hg => ⟨shiftS_add h hf hg, shiftS_mul h hf hg⟩,
+    shiftS_C ζ,
+    shiftS_X ζ,
+    constantCoeff_shiftS ζ,
+    fun f hf => DT_shiftS h hf,
+    shiftS_one
+  ⟩
 
 end GlobalTheory.MomOne.Shift

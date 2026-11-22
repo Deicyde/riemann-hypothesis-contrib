@@ -4,13 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Yhb2.main :
-    ∀ {a : WithBot ℕ∞} {d : ℕ}, a < (↑(d + (1 : ℕ)) : WithBot ℕ∞) → a ≤ (↑d : WithBot ℕ∞) := by
+theorem UpperTheory.Reformulated.B.Yhb2.main
+    : ∀ {a : WithBot ℕ∞} {d : ℕ}, a < (↑(d + (1 : ℕ)) : WithBot ℕ∞) → a ≤ (↑d : WithBot ℕ∞) := by
   intro a d h
   induction a using WithBot.recBotCoe with
   | bot => exact bot_le
   | coe b =>
-    have h1 : b < ((d+1 : ℕ) : ℕ∞) := by exact_mod_cast h
+    have h1 : b < ((d + 1 : ℕ) : ℕ∞) := by exact_mod_cast h
     have h2 : b ≤ (d : ℕ∞) := by
       induction b using ENat.recTopCoe with
       | top => exact absurd h1 (not_lt.mpr le_top)

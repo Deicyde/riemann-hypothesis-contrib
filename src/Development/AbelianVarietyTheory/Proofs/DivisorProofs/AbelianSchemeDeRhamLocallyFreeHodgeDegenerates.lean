@@ -20,7 +20,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DeRhamH1Rank
 set_option autoImplicit false
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.AbCoh
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.AbCoh
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -33,11 +35,18 @@ theorem abelianHodgeDeRham : GlobalTheory.Published.AbelianHodgeDeRham := by
   have hcl := GlobalTheory.T.abelianScheme_globalOneForms_closed R A g hA hg
   have hs := GlobalTheory.T.de_rham_to_structure_h1_surjective R A g hA hg
   have hH := (GlobalTheory.T.de_rham_h1_rank_primitive R A g hA hg).1
-  refine ⟨⟨hH.1, hH.2.1, fun p ↦ (hH.2.2 p).trans (by push_cast; rfl)⟩,
-    GlobalTheory.T.hyper_h2_exterior_square_iso R _ (OAff A.hom) hfr h0 hcl hs hW (GlobalTheory.T.cup_self_zero_de_rham_abelian R A g hA hg),
-    GlobalTheory.T.abelianScheme_global_oneForms_projective_rank R A g hA hg, hO, ⟨hcl, ofForm_injective_of_H0Const R _ (OAff A.hom) h0, hs⟩, ?_⟩
+  refine ⟨
+    ⟨hH.1, hH.2.1, fun p ↦ (hH.2.2 p).trans (by push_cast; rfl)⟩,
+    GlobalTheory.T.hyper_h2_exterior_square_iso R _ (OAff A.hom) hfr h0 hcl hs hW
+      (GlobalTheory.T.cup_self_zero_de_rham_abelian R A g hA hg),
+    GlobalTheory.T.abelianScheme_global_oneForms_projective_rank R A g hA hg,
+    hO,
+    ⟨hcl, ofForm_injective_of_H0Const R _ (OAff A.hom) h0, hs⟩,
+    ?_
+  ⟩
   intro R' _ _ X' s' φ h
-  obtain ⟨⟨e₁, he₁⟩, e₂, he₂⟩ := GlobalTheory.T.de_rham_global_forms_base_change R A g hA hg R' X' s' φ h
+  obtain ⟨⟨e₁, he₁⟩, e₂, he₂⟩ :=
+    GlobalTheory.T.de_rham_global_forms_base_change R A g hA hg R' X' s' φ h
   obtain ⟨e₃, he₃⟩ := hB1 R' X' s' φ h
   refine ⟨⟨e₁, fun c ↦ ?_⟩, ⟨e₂, fun c ↦ ?_⟩, e₃, fun c ↦ ?_⟩
   · rw [he₁]; exact isPull1_pullHH1 h.w c

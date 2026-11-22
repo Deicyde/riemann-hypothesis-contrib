@@ -58,7 +58,10 @@ private lemma hc_swap_eq_hc_aflipG {F : Type} [Field F] (a b : ℕ) (α : GL (Fi
   rfl
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.harishChandraInductionGL_comm : ∀ (F : Type) [Field F] [Finite F], ∀ (a b n : ℕ) (α : GL (Fin a) F → ℂ) (β : GL (Fin b) F → ℂ), IsCl α → IsCl β → n = a + b → hc a b α β n = hc b a β α n := by
+theorem _root_.GlobalTheory.T.harishChandraInductionGL_comm
+    : ∀ (F : Type) [Field F] [Finite F],
+      ∀ (a b n : ℕ) (α : GL (Fin a) F → ℂ) (β : GL (Fin b) F → ℂ),
+        IsCl α → IsCl β → n = a + b → hc a b α β n = hc b a β α n := by
   intro F _ _ a b n α β hα hβ hn
   subst hn
   funext x

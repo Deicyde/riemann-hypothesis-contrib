@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FlatOfFor
 
 open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
   AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -16,8 +17,8 @@ namespace GlobalTheory
 
 namespace FiniteEndFlat
 
-theorem strictMono_of_locallyQuasiFinite {X Y : Scheme.{0}} (f : X ⟶ Y) [LocallyQuasiFinite f] :
-    StrictMono (f : X → Y) := by
+theorem strictMono_of_locallyQuasiFinite {X Y : Scheme.{0}} (f : X ⟶ Y) [LocallyQuasiFinite f]
+    : StrictMono (f : X → Y) := by
   intro x y hxy
   have h : y ⤳ x := hxy.le
   refine lt_of_le_not_ge (show f y ⤳ f x from h.map f.continuous) fun h' => hxy.not_ge ?_
@@ -27,9 +28,11 @@ theorem strictMono_of_locallyQuasiFinite {X Y : Scheme.{0}} (f : X ⟶ Y) [Local
   have : y = x := congrArg Subtype.val h2.eq
   exact this.le
 
-theorem apply_genericPoint {X : Scheme.{0}} [IrreducibleSpace X] [IsLocallyNoetherian X]
-    (f : X ⟶ X) [LocallyQuasiFinite f] {o : X} (ho : f o = o) :
-    f (genericPoint X) = genericPoint X := by
+theorem apply_genericPoint
+    {X : Scheme.{0}} [IrreducibleSpace X] [IsLocallyNoetherian X]
+    (f : X ⟶ X) [LocallyQuasiFinite f]
+    {o : X} (ho : f o = o)
+    : f (genericPoint X) = genericPoint X := by
   have hs := strictMono_of_locallyQuasiFinite f
   let g : Set.Ici o → Set.Ici o := fun x =>
     ⟨f x, ho.ge.trans (show f x ⤳ f o from Specializes.map (show x.1 ⤳ o from x.2) f.continuous)⟩
@@ -48,14 +51,18 @@ theorem apply_genericPoint {X : Scheme.{0}} [IrreducibleSpace X] [IsLocallyNoeth
   exact (Specializes.antisymm (show f (genericPoint X) ⤳ genericPoint X from hge)
     (genericPoint_specializes _)).eq
 
-theorem exists_flat_away {A B : Type} [CommRing A] [CommRing B] [IsDomain A] [IsNoetherianRing A]
-    (φ : A →+* B) (hφ : φ.Finite) :
-    ∃ r : A, r ≠ 0 ∧ ∀ (C : Type) [CommRing C] [Algebra B C] [IsLocalization.Away (φ r) C],
-      ((algebraMap B C).comp φ).Flat := by
+theorem exists_flat_away
+    {A B : Type} [CommRing A] [CommRing B] [IsDomain A] [IsNoetherianRing A]
+    (φ : A →+* B) (hφ : φ.Finite)
+    : ∃ r : A,
+      r ≠ 0
+        ∧ ∀ (C : Type) [CommRing C] [Algebra B C] [IsLocalization.Away (φ r) C],
+          ((algebraMap B C).comp φ).Flat := by
   algebraize [φ]
   have : Module.FinitePresentation A B := Module.finitePresentation_of_finite A B
-  obtain ⟨r, hr, hfree, -⟩ := Module.FinitePresentation.exists_free_localizedModule_powers
-    (nonZeroDivisors A) (LocalizedModule.mkLinearMap (nonZeroDivisors A) B) (FractionRing A)
+  obtain ⟨r, hr, hfree, -⟩ :=
+    Module.FinitePresentation.exists_free_localizedModule_powers (nonZeroDivisors A)
+      (LocalizedModule.mkLinearMap (nonZeroDivisors A) B) (FractionRing A)
   refine ⟨r, nonZeroDivisors.ne_zero hr, fun C _ _ _ => ?_⟩
   letI : Algebra A C := ((algebraMap B C).comp φ).toAlgebra
   haveI : IsScalarTower A B C := IsScalarTower.of_algebraMap_eq' rfl
@@ -63,15 +70,15 @@ theorem exists_flat_away {A B : Type} [CommRing A] [CommRing B] [IsDomain A] [Is
     rw [Algebra.algebraMapSubmonoid_powers]; assumption
   have h1 : Module.Flat A (LocalizedModule (Submonoid.powers r) B) :=
     Module.Flat.trans A (Localization (Submonoid.powers r)) _
-  exact Module.Flat.of_linearEquiv
-    (IsLocalizedModule.iso (Submonoid.powers r) (IsScalarTower.toAlgHom A B C).toLinearMap).symm
-
+  exact Module.Flat.of_linearEquiv (IsLocalizedModule.iso (Submonoid.powers r)
+    (IsScalarTower.toAlgHom A B C).toLinearMap).symm
 
 open UnramifiedEndFlat in
-theorem exists_open_flat {X Y : Scheme.{0}} [IrreducibleSpace X] [IsIntegral Y]
-    [IsLocallyNoetherian Y] (f : X ⟶ Y) [IsFinite f]
-    (hf : f (genericPoint X) = genericPoint Y) :
-    ∃ W : X.Opens, (W : Set X).Nonempty ∧ ∀ x ∈ W, (f.stalkMap x).hom.Flat := by
+theorem exists_open_flat
+    {X Y : Scheme.{0}} [IrreducibleSpace X] [IsIntegral Y] [IsLocallyNoetherian Y]
+    (f : X ⟶ Y) [IsFinite f]
+    (hf : f (genericPoint X) = genericPoint Y)
+    : ∃ W : X.Opens, (W : Set X).Nonempty ∧ ∀ x ∈ W, (f.stalkMap x).hom.Flat := by
   obtain ⟨_, ⟨U, hU, rfl⟩, hξ, -⟩ :=
     Y.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (genericPoint Y)) isOpen_univ
   have : Nonempty U := ⟨⟨_, hξ⟩⟩
@@ -95,12 +102,12 @@ theorem exists_open_flat {X Y : Scheme.{0}} [IrreducibleSpace X] [IsIntegral Y]
 
 end FiniteEndFlat
 
-
 open UnramifiedEndFlat FiniteEndFlat in
-theorem flat_and_surjective_of_isFinite_grpEnd (K : Type) [Field K] [IsAlgClosed K]
-    (G : Over (Spec (CommRingCat.of K))) [GrpObj G] [IsIntegral G.left]
-    [LocallyOfFiniteType G.hom] (φ : G ⟶ G) [IsMonHom φ] [IsFinite φ.left] :
-    Flat φ.left ∧ Surjective φ.left := by
+theorem flat_and_surjective_of_isFinite_grpEnd
+    (K : Type) [Field K] [IsAlgClosed K]
+    (G : Over (Spec (CommRingCat.of K))) [GrpObj G] [IsIntegral G.left] [LocallyOfFiniteType G.hom]
+    (φ : G ⟶ G) [IsMonHom φ] [IsFinite φ.left]
+    : Flat φ.left ∧ Surjective φ.left := by
   have := LocallyOfFiniteType.jacobsonSpace G.hom
   have : IsLocallyNoetherian G.left := LocallyOfFiniteType.isLocallyNoetherian G.hom
   let o : G.left := η[G].left (IsLocalRing.closedPoint K)
@@ -121,8 +128,7 @@ theorem flat_and_surjective_of_isFinite_grpEnd (K : Type) [Field K] [IsAlgClosed
       generalize y'⁻¹ * x' = z
       simp [comp_lift_assoc]
     have hα : y' ≫ α.hom = x' := by
-      have : y' ≫ α.hom = y' * (y'⁻¹ * x') := by
-        simp [α, comp_lift_assoc, Hom.mul_def]
+      have : y' ≫ α.hom = y' * (y'⁻¹ * x') := by simp [α, comp_lift_assoc, Hom.mul_def]
       rw [this, mul_inv_cancel_left]
     have hα' : α.hom.left y = x := by
       have h := congr(($hα).left (IsLocalRing.closedPoint K))
@@ -136,16 +142,16 @@ theorem flat_and_surjective_of_isFinite_grpEnd (K : Type) [Field K] [IsAlgClosed
       exact (Flat.stalkMap β.hom.left _).comp (H y hy)
     rw [← Over.comp_left, ← hαβ, Over.comp_left, Scheme.Hom.stalkMap_comp] at h1
     rw [← hα']
-    exact (RingHom.Flat.respectsIso.cancel_right_isIso
-      (φ.left.stalkMap (α.hom.left y)) (α.hom.left.stalkMap y)).mp h1
+    exact (RingHom.Flat.respectsIso.cancel_right_isIso (φ.left.stalkMap (α.hom.left y))
+      (α.hom.left.stalkMap y)).mp h1
   · exact (genericPoint_specializes y).mem_closed φ.left.isClosedMap.isClosed_range ⟨_, hξ⟩
 
-theorem flat_and_surjective_of_isFinite_abelianEnd :
-    (∀ (X S : Scheme.{0}) (f : X ⟶ S),
-      Smooth f → GeometricallyConnected f → GeometricallyIntegral f) →
-    ∀ (K : Type) [Field K] [IsAlgClosed K] (A : Over (Spec (CommRingCat.of K))) [GrpObj A],
-      IsAbelianScheme A → ∀ f : A ⟶ A, IsMonHom f → IsFinite f.left →
-        Flat f.left ∧ Surjective f.left := by
+theorem flat_and_surjective_of_isFinite_abelianEnd
+    : (∀ (X S : Scheme.{0}) (f : X ⟶ S),
+        Smooth f → GeometricallyConnected f → GeometricallyIntegral f)
+      → ∀ (K : Type) [Field K] [IsAlgClosed K] (A : Over (Spec (CommRingCat.of K))) [GrpObj A],
+        IsAbelianScheme A
+          → ∀ f : A ⟶ A, IsMonHom f → IsFinite f.left → Flat f.left ∧ Surjective f.left := by
   intro h K _ _ A _ hA f _ _
   have := hA.smooth
   have := h _ _ A.hom hA.smooth hA.geomConnected

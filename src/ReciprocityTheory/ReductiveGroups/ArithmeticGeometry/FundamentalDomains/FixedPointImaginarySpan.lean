@@ -6,8 +6,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.FixedPointImaginarySpan
 
-open NumberField Complex ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientMatrices
-  ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientLattice ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
+open NumberField Complex ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientMatrices
+  ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientLattice
+  ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
 open scoped ComplexConjugate
 
 noncomputable section
@@ -130,25 +132,27 @@ theorem exists_basis (hg : 0 < g) : ∃ ω, X.IsLZBasis g ω := by
     have h1 := congrArg Subtype.val (bZ.sum_repr ⟨kap b, hmem⟩)
     simp only [Submodule.coe_sum, Submodule.coe_smul_of_tower] at h1
     have hb' : b = ∑ j, (n j : ℂ) • th (eR j) := by
-      calc b = thL (kap b) := (th_kap (herm_of_LZ X g hb)).symm
+      calc
+        b = thL (kap b) := (th_kap (herm_of_LZ X g hb)).symm
         _ = thL (∑ j, ((n j : ℝ)) • eR j) := by
-            congr 1
-            rw [← h1]
-            refine Finset.sum_congr rfl fun j _ => ?_
-            rw [heR, Int.cast_smul_eq_zsmul]
+          congr 1
+          rw [← h1]
+          refine Finset.sum_congr rfl fun j _ => ?_
+          rw [heR, Int.cast_smul_eq_zsmul]
         _ = ∑ j, (n j : ℂ) • th (eR j) := by
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [map_sum]
-            refine Finset.sum_congr rfl fun j _ => ?_
-            rw [map_smul, hc]
-            rfl
+          set_option synthInstance.maxHeartbeats 100000 in
+            rw [map_sum]
+          refine Finset.sum_congr rfl fun j _ => ?_
+          rw [map_smul, hc]
+          rfl
     refine ⟨n, hb', fun n' hn' => ?_⟩
     have e : ∑ j, (n' j : ℝ) • th (eR j) = ∑ j, (n j : ℝ) • th (eR j) := by
       have := hn'.symm.trans hb'
       simpa only [hc] using this
-    have hz := Fintype.linearIndependent_iff.1 hli (fun j => (n' j : ℝ) - n j) (by
-      simp only [sub_smul, Finset.sum_sub_distrib]
-      rw [e, sub_self])
+    have hz :=
+      Fintype.linearIndependent_iff.1 hli (fun j => (n' j : ℝ) - n j) (by
+        simp only [sub_smul, Finset.sum_sub_distrib]
+        rw [e, sub_self])
     funext j
     have := sub_eq_zero.1 (hz j)
     exact_mod_cast this

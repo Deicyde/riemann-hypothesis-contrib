@@ -9,7 +9,8 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
 section
 
@@ -17,14 +18,14 @@ open KStar.TotallyRealRoots
 
 variable {l : ℕ} [Fact l.Prime]
 
-private theorem nlb_nu_le {U : Subgroup ℤ_[l]ˣ} {u : ℤ_[l]ˣ} (hu : u ∈ U) (tr : ℕ) :
-    nu l U tr ≤ emultiplicity (l : ℤ_[l]) ((u : ℤ_[l]) ^ tr - 1) := by
+private theorem nlb_nu_le {U : Subgroup ℤ_[l]ˣ} {u : ℤ_[l]ˣ} (hu : u ∈ U) (tr : ℕ)
+    : nu l U tr ≤ emultiplicity (l : ℤ_[l]) ((u : ℤ_[l]) ^ tr - 1) := by
   refine ENat.forall_natCast_le_iff_le.mp fun n hn => ?_
   rw [le_nu_iff] at hn
   exact le_emultiplicity_of_pow_dvd (hn u hu)
 
-private theorem nlb_exists_unit {a : ℕ} (ha : 1 ≤ a) :
-    ∃ u : ℤ_[l]ˣ, (u : ℤ_[l]) - 1 = (l : ℤ_[l]) ^ a := by
+private theorem nlb_exists_unit {a : ℕ} (ha : 1 ≤ a)
+    : ∃ u : ℤ_[l]ˣ, (u : ℤ_[l]) - 1 = (l : ℤ_[l]) ^ a := by
   have h : IsUnit (1 + (l : ℤ_[l]) ^ a) := by
     by_contra hn
     have h1 : ‖1 + (l : ℤ_[l]) ^ a‖ < 1 := PadicInt.not_isUnit_iff.mp hn
@@ -33,19 +34,21 @@ private theorem nlb_exists_unit {a : ℕ} (ha : 1 ≤ a) :
     exact PadicInt.prime_p.not_dvd_one ((dvd_add_left h2).mp h1)
   exact ⟨h.unit, by simp⟩
 
-private theorem nlb_main {U : Subgroup ℤ_[l]ˣ} {s e : ℕ} (h : princ l s ≤ U) (he : e ≠ 0) :
-    nu l U e ≤ ((max s (if l = 2 then 2 else 1) + e.factorization l : ℕ) : ℕ∞) := by
+private theorem nlb_main {U : Subgroup ℤ_[l]ˣ} {s e : ℕ} (h : princ l s ≤ U) (he : e ≠ 0)
+    : nu l U e ≤ ((max s (if l = 2 then 2 else 1) + e.factorization l : ℕ) : ℕ∞) := by
   have hp : l.Prime := Fact.out
   set a := max s (if l = 2 then 2 else 1) with ha
   have ha1 : 1 ≤ a := le_trans (by split_ifs <;> omega) (le_max_right _ _)
   obtain ⟨u, hu⟩ := nlb_exists_unit (l := l) ha1
-  have hm : u ∈ U := h (by
-    rw [mem_princ, hu]
-    exact pow_dvd_pow _ (le_max_left _ _))
+  have hm : u ∈ U :=
+    h (by
+      rw [mem_princ, hu]
+      exact pow_dvd_pow _ (le_max_left _ _))
   have hem : emultiplicity (l : ℤ_[l]) ((u : ℤ_[l]) - 1) = a := by
     rw [hu, emultiplicity_pow_self_of_prime PadicInt.prime_p]
-  have key : emultiplicity (l : ℤ_[l]) ((u : ℤ_[l]) ^ e - 1) =
-      emultiplicity (l : ℤ_[l]) ((u : ℤ_[l]) - 1) + emultiplicity l e := by
+  have key
+      : emultiplicity (l : ℤ_[l]) ((u : ℤ_[l]) ^ e - 1)
+        = emultiplicity (l : ℤ_[l]) ((u : ℤ_[l]) - 1) + emultiplicity l e := by
     by_cases hl : l = 2
     · refine emultiplicity_pow_sub_one_sq ?_ e
       rw [hu]
@@ -62,8 +65,10 @@ private theorem nlb_main {U : Subgroup ℤ_[l]ˣ} {s e : ℕ} (h : princ l s ≤
 
 end
 
-theorem UpperTheory.V.LDataCardLeFinrank.nuLeBound :
-    ∀ (l : ℕ) [Fact l.Prime] (N e : ℕ) (U : Subgroup ℤ_[l]ˣ), KStar.TotallyRealRoots.princ l (N.factorization l) ≤ U → e ≠ 0 → KStar.TotallyRealRoots.nu l U e ≤ (nuBound l N e : ℕ∞) := by
+theorem UpperTheory.V.LDataCardLeFinrank.nuLeBound
+    : ∀ (l : ℕ) [Fact l.Prime] (N e : ℕ) (U : Subgroup ℤ_[l]ˣ),
+      KStar.TotallyRealRoots.princ l (N.factorization l) ≤ U → e ≠ 0
+        → KStar.TotallyRealRoots.nu l U e ≤ (nuBound l N e : ℕ∞) := by
   intro l _ N e U h he
   unfold nuBound
   by_cases hc : l ∣ N ∨ l - 1 ∣ e

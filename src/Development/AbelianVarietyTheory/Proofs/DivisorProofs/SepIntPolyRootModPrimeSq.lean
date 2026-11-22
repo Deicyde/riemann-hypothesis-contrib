@@ -11,9 +11,8 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem int_bezout_derivative_of_separable (f : ℤ[X])
-    (hf : (f.map (Int.castRingHom ℚ)).Separable) :
-    ∃ A B : ℤ[X], ∃ N : ℤ, N ≠ 0 ∧ A * f + B * derivative f = C N := by
+theorem int_bezout_derivative_of_separable (f : ℤ[X]) (hf : (f.map (Int.castRingHom ℚ)).Separable)
+    : ∃ A B : ℤ[X], ∃ N : ℤ, N ≠ 0 ∧ A * f + B * derivative f = C N := by
   obtain ⟨a, b, hab⟩ := hf
   obtain ⟨c1, hc1_mem, hc1⟩ := IsLocalization.integerNormalization_spec (nonZeroDivisors ℤ) a
   obtain ⟨c2, hc2_mem, hc2⟩ := IsLocalization.integerNormalization_spec (nonZeroDivisors ℤ) b
@@ -28,20 +27,23 @@ theorem int_bezout_derivative_of_separable (f : ℤ[X])
     have e2 : B.map (Int.castRingHom ℚ) = (c2 : ℚ) • b := by
       rw [show Int.castRingHom ℚ = algebraMap ℤ ℚ from rfl, hc2]
       exact (Int.cast_smul_eq_zsmul ℚ _ _).symm
-    simp only [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_smul, Polynomial.map_C,
-      ← Polynomial.derivative_map, e1, e2]
+    simp only [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_smul,
+      Polynomial.map_C, ← Polynomial.derivative_map, e1, e2]
     rw [smul_eq_C_mul, smul_eq_C_mul, smul_eq_C_mul, smul_eq_C_mul]
-    calc _ = C ((c1 : ℚ) * (c2 : ℚ)) *
-            (a * map (Int.castRingHom ℚ) f + b * derivative (map (Int.castRingHom ℚ) f)) := by
-          rw [C_mul]; simp only [eq_intCast]; ring
+    calc
+      _ = C ((c1 : ℚ) * (c2 : ℚ))
+          * (a * map (Int.castRingHom ℚ) f + b * derivative (map (Int.castRingHom ℚ) f)) := by
+        rw [C_mul]; simp only [eq_intCast]; ring
       _ = _ := by rw [hab, mul_one]; simp
 
-theorem sep_int_poly_root_mod_prime_sq :
-    ∀ f : ℤ[X], 0 < f.natDegree → (f.map (Int.castRingHom ℚ)).Separable →
-      ∀ n : ℕ, ∃ p : ℕ, p.Prime ∧ n < p ∧ ∃ x : ℤ, ((p : ℤ) ^ 2) ∣ f.eval x := by
+theorem sep_int_poly_root_mod_prime_sq
+    : ∀ f : ℤ[X],
+      0 < f.natDegree → (f.map (Int.castRingHom ℚ)).Separable
+        → ∀ n : ℕ, ∃ p : ℕ, p.Prime ∧ n < p ∧ ∃ x : ℤ, ((p : ℤ) ^ 2) ∣ f.eval x := by
   intro f hdeg hsep n
   obtain ⟨A, B, N, hN, hAB⟩ := int_bezout_derivative_of_separable f hsep
-  obtain ⟨p, hp, hnp, x, hx⟩ := GlobalTheory.T.exists_large_prime_dvd_int_polynomial_eval f hdeg (max n N.natAbs)
+  obtain ⟨p, hp, hnp, x, hx⟩ :=
+    GlobalTheory.T.exists_large_prime_dvd_int_polynomial_eval f hdeg (max n N.natAbs)
   refine ⟨p, hp, lt_of_le_of_lt (le_max_left _ _) hnp, ?_⟩
   have hpZ : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
   have hev : A.eval x * f.eval x + B.eval x * (derivative f).eval x = N := by

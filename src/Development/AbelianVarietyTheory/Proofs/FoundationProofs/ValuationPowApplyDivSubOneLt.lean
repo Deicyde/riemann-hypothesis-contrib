@@ -5,16 +5,18 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.DataN
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions
 
 namespace GlobalTheory
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.valuation_pow_apply_div_sub_one_lt {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
-    (A : ValuationSubring Ω) (σ : Ω ≃ₐ[E] Ω)
-    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) (x : Ω) (hx : x ≠ 0) (i : ℕ) :
-    A.valuation ((σ ^ i) x / x - 1) < 1 := by
+theorem _root_.GlobalTheory.valuation_pow_apply_div_sub_one_lt
+    {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+    (A : ValuationSubring Ω) (σ : Ω ≃ₐ[E] Ω) (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+    (x : Ω) (hx : x ≠ 0)
+    (i : ℕ)
+    : A.valuation ((σ ^ i) x / x - 1) < 1 := by
   induction i with
   | zero => simp [hx]
   | succ i ih =>
@@ -23,22 +25,31 @@ theorem _root_.GlobalTheory.valuation_pow_apply_div_sub_one_lt {E Ω : Type} [Fi
       have e : (σ ^ i) x / x = ((σ ^ i) x / x - 1) + 1 := by ring
       rw [e]
       exact (Valuation.map_add _ _ _).trans (max_le ih.le (by simp))
-    have key : (σ ^ (i + 1)) x / x - 1 =
-        (σ ((σ ^ i) x) / (σ ^ i) x - 1) * ((σ ^ i) x / x) + ((σ ^ i) x / x - 1) := by
+    have key
+        : (σ ^ (i + 1)) x / x - 1
+          = (σ ((σ ^ i) x) / (σ ^ i) x - 1) * ((σ ^ i) x / x) + ((σ ^ i) x / x - 1) := by
       rw [pow_succ', AlgEquiv.mul_apply]
       field_simp
       ring
     rw [key]
     apply Valuation.map_add_lt _ _ ih
     rw [map_mul]
-    calc A.valuation (σ ((σ ^ i) x) / (σ ^ i) x - 1) * A.valuation ((σ ^ i) x / x)
+    calc
+      A.valuation (σ ((σ ^ i) x) / (σ ^ i) x - 1) * A.valuation ((σ ^ i) x / x)
         ≤ A.valuation (σ ((σ ^ i) x) / (σ ^ i) x - 1) * 1 := by gcongr
       _ < 1 := by simpa using hσ _ hy0
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.mem_of_wild_of_pow_mem_open_normal :
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 E)), _root_.Formalism.ConjugateSelfDual.IsPlaceOver A v → ∀ (H : Subgroup (_root_.Formalism.ConjugateSelfDual.G E Ω)), H.Normal → IsOpen (H : Set (_root_.Formalism.ConjugateSelfDual.G E Ω)) → ∀ (σ : _root_.Formalism.ConjugateSelfDual.G E Ω) (n : ℕ), ((n : ℕ) : 𝓞 E) ∉ v.asIdeal → (∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) → σ ^ n ∈ H → σ ∈ H := by
+theorem _root_.GlobalTheory.mem_of_wild_of_pow_mem_open_normal
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 E)),
+      _root_.Formalism.ConjugateSelfDual.IsPlaceOver A v
+        → ∀ (H : Subgroup (_root_.Formalism.ConjugateSelfDual.G E Ω)),
+          H.Normal → IsOpen (H : Set (_root_.Formalism.ConjugateSelfDual.G E Ω))
+            → ∀ (σ : _root_.Formalism.ConjugateSelfDual.G E Ω) (n : ℕ),
+              ((n : ℕ) : 𝓞 E) ∉ v.asIdeal → (∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+                → σ ^ n ∈ H
+                → σ ∈ H := by
   intro E Ω _ _ _ _ _ A v hA H _ hH σ n hn hσ hpow
   change Ω ≃ₐ[E] Ω at σ
   have hv : A.valuation (n : Ω) = 1 := by
@@ -47,15 +58,13 @@ theorem _root_.GlobalTheory.mem_of_wild_of_pow_mem_open_normal :
       apply hn
       rw [← hA]
       simpa using h
-    have h2 : A.valuation (n : Ω) ≤ 1 := by
-      simpa using A.valuation_le_one (n : A)
+    have h2 : A.valuation (n : Ω) ≤ 1 := by simpa using A.valuation_le_one (n : A)
     exact le_antisymm h2 (not_lt.1 h1)
   have hn0 : (n : Ω) ≠ 0 := by
     intro h
     rw [h, map_zero] at hv
     exact zero_ne_one hv
-  obtain ⟨s, hsdef⟩ : ∃ s : Ω → Ω, ∀ z, s z = ∑ i ∈ Finset.range n, (σ ^ i) z :=
-    ⟨_, fun _ => rfl⟩
+  obtain ⟨s, hsdef⟩ : ∃ s : Ω → Ω, ∀ z, s z = ∑ i ∈ Finset.range n, (σ ^ i) z := ⟨_, fun _ => rfl⟩
   have hs : ∀ z, (σ ^ n) z = z → σ (s z) = s z := by
     intro z hz
     have e1 := Finset.sum_range_succ (fun i => (σ ^ i) z) n
@@ -87,8 +96,8 @@ theorem _root_.GlobalTheory.mem_of_wild_of_pow_mem_open_normal :
     have h1 : ∀ i, (σ ^ i) ((n : Ω) * y - s y) = n * (σ ^ i) y - s y := fun i => by
       rw [map_sub, map_mul, map_natCast, hk (s y) hsy i]
     have hsz : s ((n : Ω) * y - s y) = 0 := by
-      rw [hsdef, Finset.sum_congr rfl (fun i _ => h1 i), Finset.sum_sub_distrib,
-        ← Finset.mul_sum, ← hsdef, Finset.sum_const, Finset.card_range, nsmul_eq_mul, sub_self]
+      rw [hsdef, Finset.sum_congr rfl (fun i _ => h1 i), Finset.sum_sub_distrib, ← Finset.mul_sum,
+        ← hsdef, Finset.sum_const, Finset.card_range, nsmul_eq_mul, sub_self]
     have hz : (n : Ω) * y - s y = 0 := by
       by_contra h
       exact hne _ h hsz

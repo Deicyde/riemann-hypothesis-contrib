@@ -10,15 +10,22 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.WeilDeligne GlobalTheory.GalOfCusp GlobalTheory.HeckeGal GlobalTheory.LocLanglands GlobalTheory.Published UpperTheory.V.W
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.WeilDeligne GlobalTheory.GalOfCusp
+  GlobalTheory.HeckeGal GlobalTheory.LocLanglands GlobalTheory.Published UpperTheory.V.W
 
-private theorem isCM_of_conj (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
-    (h : ∀ x : K, ∃ y : K, ∀ φ : K →+* ℂ, φ y = starRingEnd ℂ (φ x)) : IsCMField K :=
+private theorem isCM_of_conj
+    (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    (h : ∀ x : K, ∃ y : K, ∀ φ : K →+* ℂ, φ y = starRingEnd ℂ (φ x))
+    : IsCMField K :=
   _root_.UpperTheory.Reformulated.B.Qh9.isCM_of_conj K h
 
-private theorem exists_root_lift {Ω M : Type} [Field Ω] [CharZero Ω] [IsAlgClosed Ω] [Field M] [CharZero M]
-    (j : Ω →+* M) (g : Polynomial ℚ) (hg : g ≠ 0) (β : M) (hβ : Polynomial.aeval β g = 0) :
-    ∃ b : Ω, j b = β ∧ Polynomial.aeval b g = 0 := by
+private theorem exists_root_lift
+    {Ω M : Type} [Field Ω] [CharZero Ω] [IsAlgClosed Ω] [Field M] [CharZero M]
+    (j : Ω →+* M)
+    (g : Polynomial ℚ) (hg : g ≠ 0)
+    (β : M) (hβ : Polynomial.aeval β g = 0)
+    : ∃ b : Ω, j b = β ∧ Polynomial.aeval b g = 0 := by
   have hs : (g.map (algebraMap ℚ Ω)).Splits := IsAlgClosed.splits _
   have hne : g.map (algebraMap ℚ Ω) ≠ 0 := Polynomial.map_ne_zero hg
   have hroot : ((g.map (algebraMap ℚ Ω)).map j).IsRoot β := by
@@ -33,23 +40,34 @@ private theorem exists_root_lift {Ω M : Type} [Field Ω] [CharZero Ω] [IsAlgCl
 
 private theorem exists_sqrt_padic (l : ℕ) [Fact l.Prime] : ∃ d : ℚ_[l], d ^ 2 = 1 - 4 * l := by
   let P : Polynomial ℤ_[l] := Polynomial.X ^ 2 - Polynomial.X + Polynomial.C (l : ℤ_[l])
-  have h : ‖Polynomial.aeval (0 : ℤ_[l]) P‖ < ‖Polynomial.aeval (0 : ℤ_[l]) (Polynomial.derivative P)‖ ^ 2 := by
+  have h
+      : ‖Polynomial.aeval (0 : ℤ_[l]) P‖
+        < ‖Polynomial.aeval (0 : ℤ_[l]) (Polynomial.derivative P)‖ ^ 2 := by
     have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
     simp [P]
     exact inv_lt_one_of_one_lt₀ hl
   obtain ⟨z, hz, -⟩ := hensels_lemma h
   have hz' : z ^ 2 - z + l = 0 := by simpa [P] using hz
-  have hz2 : (z : ℚ_[l]) ^ 2 - z + l = 0 := by exact_mod_cast congrArg (fun t : ℤ_[l] => (t : ℚ_[l])) hz'
+  have hz2 : (z : ℚ_[l]) ^ 2 - z + l = 0 := by
+    exact_mod_cast congrArg (fun t : ℤ_[l] => (t : ℚ_[l])) hz'
   exact ⟨2 * z - 1, by linear_combination 4 * hz2⟩
 
-theorem UpperTheory.exists_totally_imaginary_padic_sqrt :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (j : Ω →+* Om l) (K : FinExt l), ∃ (E : Type) (_ : Field E) (_ : NumberField E) (_ : IsCMField E) (_ : Algebra E Ω) (_ : IsAlgClosure E Ω), IntermediateField.adjoin ℚ_[l] (Set.range fun x : E => j (algebraMap E Ω x)) = K.1 ∧ ∃ δ : E, δ ≠ 0 ∧ (∀ φ : E →+* ℂ, starRingEnd ℂ (φ δ) = -φ δ) ∧ j (algebraMap E Ω δ) ∈ Set.range (algebraMap ℚ_[l] (Om l)) := by
+theorem UpperTheory.exists_totally_imaginary_padic_sqrt
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (j : Ω →+* Om l) (K : FinExt l),
+      ∃ (E : Type) (_ : Field E) (_ : NumberField E) (_ : IsCMField E) (_ : Algebra E Ω)
+          (_ : IsAlgClosure E Ω),
+        IntermediateField.adjoin ℚ_[l] (Set.range fun x : E => j (algebraMap E Ω x)) = K.1
+          ∧ ∃ δ : E,
+            δ ≠ 0 ∧ (∀ φ : E →+* ℂ, starRingEnd ℂ (φ δ) = - φ δ)
+              ∧ j (algebraMap E Ω δ) ∈ Set.range (algebraMap ℚ_[l] (Om l)) := by
   intro F Ω _ _ _ _ _ l _ j K
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   have : CharZero (Om l) := charZero_of_injective_algebraMap (algebraMap ℚ_[l] (Om l)).injective
   have halg : Algebra.IsAlgebraic ℚ Ω := Algebra.IsAlgebraic.trans ℚ F Ω
-  obtain ⟨β, g, hg, hβ, hreal, hK⟩ := UpperTheory.exists_totally_real_primitive_element_padic_finite_ext l K
+  obtain ⟨β, g, hg, hβ, hreal, hK⟩ :=
+    UpperTheory.exists_totally_real_primitive_element_padic_finite_ext l K
   obtain ⟨b, hb, hbg⟩ := exists_root_lift j g hg.ne_zero β hβ
   obtain ⟨d, hd⟩ := exists_sqrt_padic l
   obtain ⟨e, he⟩ := IsAlgClosed.exists_pow_nat_eq (1 - 4 * l : Ω) (n := 2) two_pos
@@ -65,8 +83,9 @@ theorem UpperTheory.exists_totally_imaginary_padic_sqrt :
   have hNF : NumberField E := ⟨⟩
   let b' : E := ⟨b, IntermediateField.subset_adjoin ℚ _ (by simp)⟩
   let δ' : E := ⟨δ, IntermediateField.subset_adjoin ℚ _ (by simp)⟩
-  have hδ' : δ' ^ 2 = 1 - 4 * l := (algebraMap E Ω).injective (by
-    rw [map_pow, map_sub, map_mul, map_one, map_ofNat, map_natCast]; exact hδ)
+  have hδ' : δ' ^ 2 = 1 - 4 * l :=
+    (algebraMap E Ω).injective
+      (by rw [map_pow, map_sub, map_mul, map_one, map_ofNat, map_natCast]; exact hδ)
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   have hre : ∀ φ : E →+* ℂ, (φ δ').re = 0 ∧ (φ δ').im ≠ 0 := fun φ => by
     have h : φ δ' ^ 2 = 1 - 4 * l := by rw [← map_pow, hδ']; simp [map_ofNat]
@@ -80,7 +99,7 @@ theorem UpperTheory.exists_totally_imaginary_padic_sqrt :
     refine ⟨?_, h3⟩
     have : (φ δ').re * (φ δ').im = 0 := by linarith
     exact (mul_eq_zero.mp this).resolve_right h3
-  have hconj : ∀ φ : E →+* ℂ, starRingEnd ℂ (φ δ') = -φ δ' := fun φ => by
+  have hconj : ∀ φ : E →+* ℂ, starRingEnd ℂ (φ δ') = - φ δ' := fun φ => by
     apply Complex.ext <;> simp [(hre φ).1]
   have hbb : ∀ φ : E →+* ℂ, (φ b').im = 0 := fun φ => by
     apply hreal
@@ -91,11 +110,14 @@ theorem UpperTheory.exists_totally_imaginary_padic_sqrt :
     have := Polynomial.aeval_algHom_apply φ.toRatAlgHom b' g
     rw [h0, map_zero] at this
     exact this
-  have htc : IsTotallyComplex E := ⟨fun w => by
-    rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_iff, ComplexEmbedding.isReal_iff]
-    intro h
-    have h1 : starRingEnd ℂ (w.embedding δ') = w.embedding δ' := congrArg (fun f : E →+* ℂ => f δ') h
-    exact (hre w.embedding).2 (Complex.conj_eq_iff_im.mp h1)⟩
+  have htc : IsTotallyComplex E :=
+    ⟨fun w => by
+      rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_iff,
+        ComplexEmbedding.isReal_iff]
+      intro h
+      have h1 : starRingEnd ℂ (w.embedding δ') = w.embedding δ' :=
+        congrArg (fun f : E →+* ℂ => f δ') h
+      exact (hre w.embedding).2 (Complex.conj_eq_iff_im.mp h1)⟩
   have hCM : IsCMField E := by
     refine isCM_of_conj _ ?_
     rintro ⟨x, hx⟩

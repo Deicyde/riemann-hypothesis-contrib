@@ -8,32 +8,42 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 open scoped CategoryTheory.Obj
 
 namespace PositivityTheory.UnitarySelfGeneration
 
-theorem latagree_le (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) [IsLocallyNoetherian X]
-    (hξ : IsCptGen ξ) (T : Set (Cpt ξ)) (hT : ∀ p ∈ T, ∀ q : Cpt ξ, q.1 ⤳ p.1 → q ∈ T)
-    (hn : ∀ p ∈ T, IsIntegrallyClosed (X.presheaf.stalk p.1)) (E : Type) [AddCommGroup E] [Module Ω E]
+theorem latagree_le
+    (X : Scheme.{0})
+    (Ω : Type) [Field Ω]
+    (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+    [IsLocallyNoetherian X]
+    (hξ : IsCptGen ξ)
+    (T : Set (Cpt ξ)) (hT : ∀ p ∈ T, ∀ q : Cpt ξ, q.1 ⤳ p.1 → q ∈ T)
+    (hn : ∀ p ∈ T, IsIntegrallyClosed (X.presheaf.stalk p.1))
+    (E : Type) [AddCommGroup E] [Module Ω E]
     (L L' : Lat ξ E) (r : ℕ) (V : Submodule Ω E) (hL : L.IsVBOn T r V) (hL' : L'.IsVBOn T r V)
-    (h1 : ∀ p ∈ T, ringKrullDim (X.presheaf.stalk p.1) = 1 → L p = L' p) (p : Cpt ξ) (hp : p ∈ T) :
-    L' p ≤ L p := by
+    (h1 : ∀ p ∈ T, ringKrullDim (X.presheaf.stalk p.1) = 1 → L p = L' p)
+    (p : Cpt ξ) (hp : p ∈ T)
+    : L' p ≤ L p := by
   obtain ⟨U, hU, b, hb, hbq⟩ := hL p hp
   obtain ⟨U', hU', b', hb', hbq'⟩ := hL' p hp
   obtain ⟨hfr, hno, hic⟩ := GlobalTheory.T.regAt_fraction_noetherian_closed X Ω ξ hξ p
   haveI := hfr
   haveI := hno inferInstance
   haveI := hic (hn p hp)
-  have key := GlobalTheory.CompanionTheory.HeightOneFrame.integral_of_integral_at_height_one (regAt ξ p) Ω E r b b'
-    (hbq p hp hU).1 ?_ ?_
+  have key :=
+    GlobalTheory.CompanionTheory.HeightOneFrame.integral_of_integral_at_height_one (regAt ξ p) Ω E r
+      b b' (hbq p hp hU).1 ?_ ?_
   · rw [(hbq' p hp hU').2, (hbq p hp hU).2, Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     obtain ⟨c, hc⟩ := key i
     rw [hc]
     exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ (c k) (Submodule.subset_span ⟨k, rfl⟩)
   · intro P hP i
-    obtain ⟨q, hqp, hq⟩ := GlobalTheory.T.exists_point_localization_prime X Ω ξ hξ p P.asIdeal P.isPrime
+    obtain ⟨q, hqp, hq⟩ :=
+      GlobalTheory.T.exists_point_localization_prime X Ω ξ hξ p P.asIdeal P.isPrime
     have hqT := hT p hp q hqp
     have hle : regAt ξ p ≤ regAt ξ q := fun a ha =>
       (hq a).2 ⟨1, (Ideal.ne_top_iff_one _).1 P.isPrime.ne_top, by simpa using ha⟩
@@ -53,9 +63,11 @@ theorem latagree_le (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRing
         have : x = y := Subtype.ext (congrArg Subtype.val hxy :)
         exact ⟨1, by rw [this]⟩
     have hdim : ringKrullDim (X.presheaf.stalk q.1) = 1 := by
-      have e : X.presheaf.stalk q.1 ≃+* regAt ξ q := RingEquiv.ofBijective (genMap ξ q).rangeRestrict
-        ⟨fun x y h => hξ.inj q (congrArg Subtype.val h :), (genMap ξ q).rangeRestrict_surjective⟩
-      rw [ringKrullDim_eq_of_ringEquiv e, IsLocalization.AtPrime.ringKrullDim_eq_height P.asIdeal, hP]
+      have e : X.presheaf.stalk q.1 ≃+* regAt ξ q :=
+        RingEquiv.ofBijective (genMap ξ q).rangeRestrict
+          ⟨fun x y h => hξ.inj q (congrArg Subtype.val h :), (genMap ξ q).rangeRestrict_surjective⟩
+      rw [ringKrullDim_eq_of_ringEquiv e, IsLocalization.AtPrime.ringKrullDim_eq_height P.asIdeal,
+        hP]
       rfl
     have hmem : b' i ∈ L q := by
       rw [h1 q hqT hdim, (hbq' q hqT (hqp.mem_open U'.2 hU')).2]
@@ -77,7 +89,18 @@ theorem latagree_le (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRing
     rw [hb, ← hb']
     exact Submodule.subset_span ⟨i, rfl⟩
 
-theorem lattices_agree_of_height_one : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) [IsLocallyNoetherian X], IsCptGen ξ → ∀ (T : Set (Cpt ξ)), (∀ p ∈ T, ∀ q : Cpt ξ, q.1 ⤳ p.1 → q ∈ T) → (∀ p ∈ T, IsIntegrallyClosed (X.presheaf.stalk p.1)) → ∀ (E : Type) [AddCommGroup E] [Module Ω E] (L L' : Lat ξ E) (r : ℕ) (V : Submodule Ω E), L.IsVBOn T r V → L'.IsVBOn T r V → (∀ p ∈ T, ringKrullDim (X.presheaf.stalk p.1) = 1 → L p = L' p) → ∀ p ∈ T, L p = L' p := by
+theorem lattices_agree_of_height_one
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+        [IsLocallyNoetherian X],
+      IsCptGen ξ
+        → ∀ (T : Set (Cpt ξ)),
+          (∀ p ∈ T, ∀ q : Cpt ξ, q.1 ⤳ p.1 → q ∈ T)
+            → (∀ p ∈ T, IsIntegrallyClosed (X.presheaf.stalk p.1))
+            → ∀ (E : Type) [AddCommGroup E] [Module Ω E] (L L' : Lat ξ E) (r : ℕ)
+                (V : Submodule Ω E),
+              L.IsVBOn T r V → L'.IsVBOn T r V
+                → (∀ p ∈ T, ringKrullDim (X.presheaf.stalk p.1) = 1 → L p = L' p)
+                → ∀ p ∈ T, L p = L' p := by
   intro X Ω _ ξ _ hξ T hT hn E _ _ L L' r V hL hL' h1 p hp
   exact le_antisymm
     (latagree_le X Ω ξ hξ T hT hn E L' L r V hL' hL (fun p hp h => (h1 p hp h).symm) p hp)

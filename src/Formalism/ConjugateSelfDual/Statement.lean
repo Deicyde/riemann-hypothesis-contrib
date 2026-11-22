@@ -12,11 +12,10 @@ abbrev G (F Ω : Type*) [Field F] [Field Ω] [Algebra F Ω] := Ω ≃ₐ[F] Ω
 
 abbrev Qbar (l : ℕ) [Fact l.Prime] := PadicAlgCl l
 
-def cyc (F Ω : Type*) [Field F] [Field Ω] [Algebra F Ω] (l : ℕ) [Fact l.Prime] :
-    G F Ω →* (Qbar l)ˣ :=
+def cyc (F Ω : Type*) [Field F] [Field Ω] [Algebra F Ω] (l : ℕ) [Fact l.Prime]
+    : G F Ω →* (Qbar l)ˣ :=
   (Units.map ((algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom).toMonoidHom).comp
-    ((cyclotomicCharacter (Ω) l).comp
-      (MulSemiringAction.toRingAut (G F Ω) (Ω)))
+    ((cyclotomicCharacter (Ω) l).comp (MulSemiringAction.toRingAut (G F Ω) (Ω)))
 
 section places
 

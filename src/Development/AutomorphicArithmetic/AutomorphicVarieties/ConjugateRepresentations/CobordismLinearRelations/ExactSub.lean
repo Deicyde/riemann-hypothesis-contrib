@@ -6,23 +6,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.LFun
-open UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Cj
+open NumberField IsDedekindDomain Matrix Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh
+  GlobalTheory.LFun
+open UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Geo
+  UpperTheory.V.Lit.Bor UpperTheory.V.Cj
 open scoped TensorProduct
 
-private theorem conj_level {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (U : Subgroup G)
-    (h1 : IsOpen (U : Set G)) (h2 : IsCompact (U : Set G)) (x : G) :
-    ∃ U' : Subgroup G, IsOpen (U' : Set G) ∧ IsCompact (U' : Set G) ∧ ∀ u ∈ U', x⁻¹ * u * x ∈ U := by
-  have e : ((U.comap (MulAut.conj x⁻¹).toMonoidHom : Subgroup G) : Set G) =
-      ((Homeomorph.mulLeft x⁻¹).trans (Homeomorph.mulRight x)) ⁻¹' (U : Set G) := by
+private theorem conj_level
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (U : Subgroup G) (h1 : IsOpen (U : Set G)) (h2 : IsCompact (U : Set G))
+    (x : G)
+    : ∃ U' : Subgroup G,
+      IsOpen (U' : Set G) ∧ IsCompact (U' : Set G) ∧ ∀ u ∈ U', x⁻¹ * u * x ∈ U := by
+  have e
+      : ((U.comap (MulAut.conj x⁻¹).toMonoidHom : Subgroup G) : Set G)
+        = ((Homeomorph.mulLeft x⁻¹).trans (Homeomorph.mulRight x)) ⁻¹' (U : Set G) := by
     ext u
     simp
   refine ⟨U.comap (MulAut.conj x⁻¹).toMonoidHom, ?_, ?_, fun u hu => by simpa using hu⟩
   · rw [e]; exact h1.preimage (Homeomorph.continuous _)
   · rw [e]; exact (Homeomorph.isCompact_preimage _).2 h2
 
-theorem UpperTheory.V.Cj.exactSub :
-    UpperTheory.V.Cj.ExactSub := by
+theorem UpperTheory.V.Cj.exactSub : UpperTheory.V.Cj.ExactSub := by
   intro E _ _ _ a Ξ q
   have comb : ∀ (s : ℂ) (α β : Co Ξ q), Exact Ξ α → Exact Ξ β → Exact Ξ (s • α + β) := by
     rintro s α β ⟨U, u1, u2, hα⟩ ⟨V, v1, v2, hβ⟩
@@ -46,12 +51,22 @@ theorem UpperTheory.V.Cj.exactSub :
     cases q with
     | zero => rfl
     | succ q =>
-      exact ⟨0, ⟨fun k X => by simp, fun X i _ => rfl, fun X => Submodule.zero_mem _⟩,
-        AlternatingMap.ext fun X => by simp [dCo_apply]⟩
-  refine ⟨{ carrier := {ω | Exact Ξ ω}
-            add_mem' := fun {α β} hα hβ => by simpa only [one_smul, Set.mem_ofPred_eq] using comb 1 α β hα hβ
-            zero_mem' := hz
-            smul_mem' := fun s α hα => by simpa only [add_zero, Set.mem_ofPred_eq] using comb s α 0 hα hz }, fun _ => Iff.rfl, ?_⟩
+      exact ⟨
+        0,
+        ⟨fun k X => by simp, fun X i _ => rfl, fun X => Submodule.zero_mem _⟩,
+        AlternatingMap.ext fun X => by simp [dCo_apply]
+      ⟩
+  refine ⟨
+    {
+      carrier := {ω | Exact Ξ ω}
+      add_mem' := fun {α β} hα hβ => by
+        simpa only [one_smul, Set.mem_ofPred_eq] using comb 1 α β hα hβ
+      zero_mem' := hz
+      smul_mem' := fun s α hα => by simpa only [add_zero, Set.mem_ofPred_eq] using comb s α 0 hα hz
+    },
+    fun _ => Iff.rfl,
+    ?_
+  ⟩
   rintro x ω ⟨U, u1, u2, hω⟩
   obtain ⟨U', v1, v2, hx⟩ := conj_level U u1 u2 x
   refine ⟨U', v1, v2, ?_⟩

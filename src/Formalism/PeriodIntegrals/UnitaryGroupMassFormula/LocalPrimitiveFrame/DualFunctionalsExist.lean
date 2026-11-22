@@ -21,12 +21,14 @@ theorem Dual_smul_coe (o : 𝓞 E) (y : Fin n → E) : o • y = (o : E) • y :
   ext i
   simp [Algebra.smul_def]
 
-theorem Dual_ne_zero (Lb : Submodule (𝓞 E) (Fin n → E)) (z : Fin n → E)
-    (hprim : ∀ c : E, c • z ∈ Lb → ∃ o : 𝓞 E, (o : E) = c) : z ≠ 0 := by
+theorem Dual_ne_zero
+    (Lb : Submodule (𝓞 E) (Fin n → E)) (z : Fin n → E)
+    (hprim : ∀ c : E, c • z ∈ Lb → ∃ o : 𝓞 E, (o : E) = c)
+    : z ≠ 0 := by
   intro hz
   obtain ⟨o, ho⟩ := hprim (algebraMap ℚ E (1 / 2)) (by rw [hz, smul_zero]; exact Lb.zero_mem)
   have hint : IsIntegral ℤ (algebraMap ℚ E (1 / 2)) := ho ▸ RingOfIntegers.isIntegral_coe o
-  rw [isIntegral_algebraMap_iff ] at hint
+  rw [isIntegral_algebraMap_iff] at hint
   obtain ⟨m, hm⟩ := IsIntegrallyClosed.isIntegral_iff.1 hint
   have h2 : ((2 * m : ℤ) : ℚ) = 1 := by
     push_cast
@@ -35,9 +37,10 @@ theorem Dual_ne_zero (Lb : Submodule (𝓞 E) (Fin n → E)) (z : Fin n → E)
   have h2' : 2 * m = 1 := by exact_mod_cast h2
   omega
 
-theorem Dual_retract (Lb : Submodule (𝓞 E) (Fin n → E)) (hfg : Lb.FG) (z : Fin n → E) (hz : z ∈ Lb)
-    (hprim : ∀ c : E, c • z ∈ Lb → ∃ o : 𝓞 E, (o : E) = c) :
-    ∃ ψ : Lb →ₗ[𝓞 E] 𝓞 E, ψ ⟨z, hz⟩ = 1 := by
+theorem Dual_retract
+    (Lb : Submodule (𝓞 E) (Fin n → E)) (hfg : Lb.FG)
+    (z : Fin n → E) (hz : z ∈ Lb) (hprim : ∀ c : E, c • z ∈ Lb → ∃ o : 𝓞 E, (o : E) = c)
+    : ∃ ψ : Lb →ₗ[𝓞 E] 𝓞 E, ψ ⟨z, hz⟩ = 1 := by
   classical
   have hz0 : z ≠ 0 := Dual_ne_zero Lb z hprim
   have : Module.IsTorsionFree (𝓞 E) Lb := by
@@ -57,7 +60,9 @@ theorem Dual_retract (Lb : Submodule (𝓞 E) (Fin n → E)) (hfg : Lb.FG) (z : 
     by_cases hr : r = 0
     · exact Or.inl hr
     right
-    rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero, hN, Submodule.mem_span_singleton] at hrq
+    rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero, hN,
+        Submodule.mem_span_singleton]
+      at hrq
     obtain ⟨a, ha⟩ := hrq
     have hrE : (r : E) ≠ 0 := fun h => hr (Dual_coe_injective (by rw [h]; rfl))
     have hV : ((a : E) / (r : E)) • z = (l : Fin n → E) := by
@@ -84,14 +89,16 @@ theorem Dual_retract (Lb : Submodule (𝓞 E) (Fin n → E)) (hfg : Lb.FG) (z : 
   have hρ : ρ ⟨z, hz⟩ = ⟨⟨z, hz⟩, Submodule.mem_span_singleton_self _⟩ := by
     apply Subtype.ext
     change (⟨z, hz⟩ : Lb) - s (N.mkQ ⟨z, hz⟩) = ⟨z, hz⟩
-    rw [(Submodule.mkQ_apply N _).trans ((Submodule.Quotient.mk_eq_zero N).2 (Submodule.mem_span_singleton_self _)),
+    rw [(Submodule.mkQ_apply N _).trans
+        ((Submodule.Quotient.mk_eq_zero N).2 (Submodule.mem_span_singleton_self _)),
       map_zero, sub_zero]
   rw [LinearMap.comp_apply, hρ]
   exact LinearEquiv.coord_self (𝓞 E) Lb ⟨z, hz⟩ hz0'
 
-theorem Dual_den {ι : Type} [Fintype ι] (g : ι → Fin n → E) (y : Fin n → E)
-    (hy : y ∈ Submodule.span E (Set.range g)) :
-    ∃ d : 𝓞 E, d ≠ 0 ∧ ∃ o : ι → 𝓞 E, (d : E) • y = ∑ i, (o i : E) • g i := by
+theorem Dual_den
+    {ι : Type} [Fintype ι]
+    (g : ι → Fin n → E) (y : Fin n → E) (hy : y ∈ Submodule.span E (Set.range g))
+    : ∃ d : 𝓞 E, d ≠ 0 ∧ ∃ o : ι → 𝓞 E, (d : E) • y = ∑ i, (o i : E) • g i := by
   classical
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 hy
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 E)) Finset.univ c
@@ -105,8 +112,8 @@ theorem Dual_den {ι : Type} [Fintype ι] (g : ι → Fin n → E) (y : Fin n �
   rw [Algebra.smul_def] at h
   exact h.symm
 
-theorem Dual_ext {ι : Type} (g : ι → Fin n → E) (hg : LinearIndependent E g) (val : ι → E) :
-    ∃ φ : (Fin n → E) →ₗ[E] E, ∀ i, φ (g i) = val i := by
+theorem Dual_ext {ι : Type} (g : ι → Fin n → E) (hg : LinearIndependent E g) (val : ι → E)
+    : ∃ φ : (Fin n → E) →ₗ[E] E, ∀ i, φ (g i) = val i := by
   classical
   obtain ⟨φ, hφ⟩ := LinearMap.exists_extend ((Basis.span hg).constr E val)
   refine ⟨φ, fun i => ?_⟩
@@ -148,8 +155,9 @@ theorem dualFunctionalsExist : Dual := by
     have hdE : (d : E) ≠ 0 := fun h => hd (Dual_coe_injective (by rw [h]; rfl))
     exact (smul_eq_zero.1 h0).resolve_left hdE
   have hfam := hind.sum_type hBind hdisj
-  have key : ∀ (χ : (Fin n → E) →ₗ[E] E) (ρ : Lb →ₗ[𝓞 E] 𝓞 E),
-      (∀ t : B, χ t = (ρ ⟨t, hBLb t t.2⟩ : E)) → ∀ l (hl : l ∈ Lb), χ l = (ρ ⟨l, hl⟩ : E) := by
+  have key
+      : ∀ (χ : (Fin n → E) →ₗ[E] E) (ρ : Lb →ₗ[𝓞 E] 𝓞 E),
+        (∀ t : B, χ t = (ρ ⟨t, hBLb t t.2⟩ : E)) → ∀ l (hl : l ∈ Lb), χ l = (ρ ⟨l, hl⟩ : E) := by
     intro χ ρ hχ
     have hgen : ∀ s (hs : s ∈ S), χ s = (ρ ⟨s, hSLb s hs⟩ : E) := by
       intro s hs
@@ -181,8 +189,10 @@ theorem dualFunctionalsExist : Dual := by
           simp only [map_mul, map_sum] at h3
         exact h3.symm
       exact mul_left_cancel₀ hdE h1
-    have key' : ∀ l, l ∈ Submodule.span (𝓞 E) (S : Set (Fin n → E)) → ∀ hl : l ∈ Lb,
-        χ l = (ρ ⟨l, hl⟩ : E) := by
+    have key'
+        : ∀ l,
+          l ∈ Submodule.span (𝓞 E) (S : Set (Fin n → E))
+            → ∀ hl : l ∈ Lb, χ l = (ρ ⟨l, hl⟩ : E) := by
       intro l hl'
       induction hl' using Submodule.span_induction with
       | mem x hx => intro hl; exact hgen x hx
@@ -202,26 +212,43 @@ theorem dualFunctionalsExist : Dual := by
         intro hl
         have hx' : x ∈ Lb := hS ▸ hx
         have h0 : (⟨a • x, hl⟩ : Lb) = a • ⟨x, hx'⟩ := rfl
-        rw [h0, LinearMap.map_smul ρ, Dual_smul_coe, LinearMap.map_smul χ, ihx hx', smul_eq_mul, smul_eq_mul]
+        rw [h0, LinearMap.map_smul ρ, Dual_smul_coe, LinearMap.map_smul χ, ihx hx', smul_eq_mul,
+          smul_eq_mul]
         exact (map_mul (algebraMap (𝓞 E) E) _ _).symm
     intro l hl
     exact key' l (hS.symm ▸ hl) hl
   obtain ⟨φz, hφz⟩ := Dual_ext _ hfam (Sum.elim (fun _ => 0) fun t : B => (ψ ⟨t, hBLb t t.2⟩ : E))
-  have hφ : ∀ a : Fin r, ∃ φ : (Fin n → E) →ₗ[E] E, ∀ k, φ (Sum.elim (Fin.append e f)
-      ((↑) : B → Fin n → E) k) =
-      Sum.elim (Fin.append (fun b : Fin r => if a = b then (1 : E) else 0) fun _ => 0) (fun _ => 0) k :=
-    fun a => Dual_ext _ hfam _
+  have hφ
+      : ∀ a : Fin r, ∃ φ : (Fin n → E) →ₗ[E] E, ∀ k,
+        φ (Sum.elim (Fin.append e f) ((↑) : B → Fin n → E) k)
+          = Sum.elim (Fin.append (fun b : Fin r => if a = b then (1 : E) else 0) fun _ => 0)
+            (fun _ => 0)
+            k := fun a =>
+    Dual_ext _ hfam _
   choose φ hφ using hφ
-  refine ⟨φ, φz, fun a b => ?_, fun a b => ?_, fun a l hl => ?_, fun a => ?_, fun a => ?_, ?_, fun l hl => ?_⟩
+  refine ⟨
+    φ,
+    φz,
+    fun a b => ?_,
+    fun a b => ?_,
+    fun a l hl => ?_,
+    fun a => ?_,
+    fun a => ?_,
+    ?_,
+    fun l hl => ?_
+  ⟩
   · have := hφ a (Sum.inl (Fin.castAdd r b))
     simpa only [Sum.elim_inl, Fin.append_left] using this
   · have := hφ a (Sum.inl (Fin.natAdd r b))
     simpa only [Sum.elim_inl, Fin.append_right] using this
-  · have := key (φ a) 0 (fun t => by
-      have h := hφ a (Sum.inr t)
-      simp only [Sum.elim_inr] at h
-      rw [h]
-      rfl) l hl
+  · have :=
+      key (φ a) 0
+        (fun t => by
+          have h := hφ a (Sum.inr t)
+          simp only [Sum.elim_inr] at h
+          rw [h]
+          rfl)
+        l hl
     rw [this]
     rfl
   · have := hφz (Sum.inl (Fin.castAdd r a))

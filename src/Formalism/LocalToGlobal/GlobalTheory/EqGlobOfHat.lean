@@ -15,7 +15,8 @@ namespace Formalism.L2.GlobalTheoryTheory.Comp
 
 open Formalism.UG Formalism.UG.CS Formalism.UG.P Formalism.BasicNotions
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {n : Type} [Fintype n] [DecidableEq n]
 
 local notation "𝒜" => E ⊗[F] FiniteAdeleRing (𝓞 F) F
@@ -32,10 +33,12 @@ abbrev hat (Λ : Submodule (𝓞 E) (n → E)) : Submodule 𝒮 (n → 𝒜) :=
 theorem hat_mono {A B : Submodule (𝓞 E) (n → E)} (h : A ≤ B) : hat F A ≤ hat F B :=
   Submodule.span_mono (Set.image_mono h)
 
-theorem glob_mono (g : GL n 𝒜) {A B : Submodule (𝓞 E) (n → E)} (h : A ≤ B) : globLat g A ≤ globLat g B :=
-  fun _ hx => hat_mono h hx
+theorem glob_mono (g : GL n 𝒜) {A B : Submodule (𝓞 E) (n → E)} (h : A ≤ B)
+    : globLat g A ≤ globLat g B := fun _ hx =>
+  hat_mono h hx
 
-theorem isLat_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 𝒜) : IsLat (globLat g Λ) := by
+theorem isLat_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 𝒜)
+    : IsLat (globLat g Λ) := by
   have hLat := global_lattice_isLattice_holds F E n Λ h.1 h.2 g
   refine ⟨Module.Finite.iff_fg.2 hLat.fg, ?_⟩
   obtain ⟨c, hc, hLower⟩ := adelstabL_lower (F := F) Λ h.2
@@ -45,40 +48,44 @@ theorem isLat_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 
 theorem glob_one {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) : globLat (F := F) 1 Λ = Λ :=
   global_lattice_one_holds F E n Λ h.1 h.2
 
-theorem mem_hat_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 𝒜) (u : n → 𝒜) :
-    u ∈ hat F (globLat g Λ) ↔ ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ u ∈ hat F Λ :=
+theorem mem_hat_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 𝒜) (u : n → 𝒜)
+    : u ∈ hat F (globLat g Λ) ↔ ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ u ∈ hat F Λ :=
   span_recovery_of_integral_adelic_approx csGlob_intAdApprox F E n Λ h.1 h.2 g u
 
-theorem glob_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g k : GL n 𝒜) :
-    globLat g (globLat k Λ) = globLat (g * k) Λ := by
+theorem glob_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g k : GL n 𝒜)
+    : globLat g (globLat k Λ) = globLat (g * k) Λ := by
   ext x
   show ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => ιA (x i)) ∈ hat F (globLat k Λ) ↔
     (((g * k)⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => ιA (x i)) ∈ hat F Λ
   rw [mem_hat_glob h, mulVec_mulVec, _root_.mul_inv_rev, Units.val_mul]
 
-theorem glob_inv_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 𝒜) :
-    globLat g (globLat g⁻¹ Λ) = Λ := by
+theorem glob_inv_glob {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 𝒜)
+    : globLat g (globLat g⁻¹ Λ) = Λ := by
   rw [glob_glob h, mul_inv_cancel, glob_one h]
 
-theorem glob_glob_inv {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 𝒜) :
-    globLat g⁻¹ (globLat g Λ) = Λ := by
+theorem glob_glob_inv {Λ : Submodule (𝓞 E) (n → E)} (h : IsLat Λ) (g : GL n 𝒜)
+    : globLat g⁻¹ (globLat g Λ) = Λ := by
   rw [glob_glob h, inv_mul_cancel, glob_one h]
 
-theorem eq_glob_of_hat {Λ M : Submodule (𝓞 E) (n → E)} (hM : IsLat M) (g : GL n 𝒜)
-    (h : ∀ u : n → 𝒜, u ∈ hat F M ↔ ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ u ∈ hat F Λ) : M = globLat g Λ := by
+theorem eq_glob_of_hat
+    {Λ M : Submodule (𝓞 E) (n → E)} (hM : IsLat M)
+    (g : GL n 𝒜) (h : ∀ u : n → 𝒜, u ∈ hat F M ↔ ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ u ∈ hat F Λ)
+    : M = globLat g Λ := by
   rw [← glob_one (F := F) hM]
   ext x
   show (((1 : GL n 𝒜)⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => ιA (x i)) ∈ hat F M ↔
     ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => ιA (x i)) ∈ hat F Λ
   rw [inv_one, Units.val_one, one_mulVec, h]
 
-theorem isLat_sup {A B : Submodule (𝓞 E) (n → E)} (hA : IsLat A) (hB : IsLat B) : IsLat (A ⊔ B) := by
-  refine ⟨Module.Finite.iff_fg.2 ((Module.Finite.iff_fg.1 hA.1).sup (Module.Finite.iff_fg.1 hB.1)), ?_⟩
+theorem isLat_sup {A B : Submodule (𝓞 E) (n → E)} (hA : IsLat A) (hB : IsLat B)
+    : IsLat (A ⊔ B) := by
+  refine
+    ⟨Module.Finite.iff_fg.2 ((Module.Finite.iff_fg.1 hA.1).sup (Module.Finite.iff_fg.1 hB.1)), ?_⟩
   rw [eq_top_iff, ← hA.2]
   exact Submodule.span_mono (fun x hx => (le_sup_left : A ≤ A ⊔ B) hx)
 
-theorem glob_sup {A B : Submodule (𝓞 E) (n → E)} (hA : IsLat A) (hB : IsLat B) (g : GL n 𝒜) :
-    globLat g (A ⊔ B) = globLat g A ⊔ globLat g B := by
+theorem glob_sup {A B : Submodule (𝓞 E) (n → E)} (hA : IsLat A) (hB : IsLat B) (g : GL n 𝒜)
+    : globLat g (A ⊔ B) = globLat g A ⊔ globLat g B := by
   apply le_antisymm
   · have h1 : A ⊔ B ≤ globLat g⁻¹ (globLat g A ⊔ globLat g B) := by
       refine sup_le ?_ ?_
@@ -90,12 +97,17 @@ theorem glob_sup {A B : Submodule (𝓞 E) (n → E)} (hA : IsLat A) (hB : IsLat
     rwa [glob_inv_glob (isLat_sup (isLat_glob hA g) (isLat_glob hB g))] at h2
   · exact sup_le (glob_mono g le_sup_left) (glob_mono g le_sup_right)
 
-theorem isLat_smul {A : Submodule (𝓞 E) (n → E)} (hA : IsLat A) {a : 𝓞 E} (ha : a ≠ 0) :
-    IsLat (Ideal.span {a} • A) := by
-  refine ⟨Module.Finite.iff_fg.2 (Submodule.FG.smul (Submodule.fg_span_singleton a) (Module.Finite.iff_fg.1 hA.1)), ?_⟩
+theorem isLat_smul {A : Submodule (𝓞 E) (n → E)} (hA : IsLat A) {a : 𝓞 E} (ha : a ≠ 0)
+    : IsLat (Ideal.span {a} • A) := by
+  refine ⟨
+    Module.Finite.iff_fg.2 (Submodule.FG.smul (Submodule.fg_span_singleton a)
+      (Module.Finite.iff_fg.1 hA.1)),
+    ?_
+  ⟩
   rw [eq_top_iff, ← hA.2, Submodule.span_le]
   intro x hx
-  have h1 : a • x ∈ Ideal.span {a} • A := Submodule.smul_mem_smul (Ideal.mem_span_singleton_self a) hx
+  have h1 : a • x ∈ Ideal.span {a} • A :=
+    Submodule.smul_mem_smul (Ideal.mem_span_singleton_self a) hx
   have h2 : (a : E) ≠ 0 := fun h => ha (RingOfIntegers.ext h)
   have h3 : x = (a : E)⁻¹ • (a • x) := by
     rw [← algebraMap_smul E a x, smul_smul]
@@ -104,23 +116,26 @@ theorem isLat_smul {A : Submodule (𝓞 E) (n → E)} (hA : IsLat A) {a : 𝓞 E
   rw [h3]
   exact Submodule.smul_mem _ _ (Submodule.subset_span h1)
 
-theorem smul_hat (A : Submodule (𝓞 E) (n → E)) (a : 𝓞 E) (u : n → 𝒜) (hu : u ∈ hat F A) :
-    ιA (a : E) • u ∈ hat F (Ideal.span {a} • A) := by
+theorem smul_hat (A : Submodule (𝓞 E) (n → E)) (a : 𝓞 E) (u : n → 𝒜) (hu : u ∈ hat F A)
+    : ιA (a : E) • u ∈ hat F (Ideal.span {a} • A) := by
   induction hu using Submodule.span_induction with
   | mem u hu =>
     obtain ⟨y, hy, rfl⟩ := hu
-    refine Submodule.subset_span ⟨a • y, Submodule.smul_mem_smul (Ideal.mem_span_singleton_self a) hy, ?_⟩
+    refine Submodule.subset_span
+      ⟨a • y, Submodule.smul_mem_smul (Ideal.mem_span_singleton_self a) hy, ?_⟩
     funext i
     show ιA ((a : E) * y i) = ιA (a : E) * ιA (y i)
     rw [map_mul]
-  | zero => rw [smul_zero]; exact zero_mem _
-  | add u v _ _ hu hv => rw [smul_add]; exact add_mem hu hv
+  | zero =>
+    rw [smul_zero]; exact zero_mem _
+  | add u v _ _ hu hv =>
+    rw [smul_add]; exact add_mem hu hv
   | smul s u _ hu =>
     rw [smul_comm]
     exact Submodule.smul_mem _ s hu
 
-theorem smul_glob_le (A : Submodule (𝓞 E) (n → E)) (a : 𝓞 E) (g : GL n 𝒜) :
-    Ideal.span {a} • globLat g A ≤ globLat g (Ideal.span {a} • A) := by
+theorem smul_glob_le (A : Submodule (𝓞 E) (n → E)) (a : 𝓞 E) (g : GL n 𝒜)
+    : Ideal.span {a} • globLat g A ≤ globLat g (Ideal.span {a} • A) := by
   rw [Submodule.smul_le]
   intro r hr x hx
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton.1 hr
@@ -134,8 +149,8 @@ theorem smul_glob_le (A : Submodule (𝓞 E) (n → E)) (a : 𝓞 E) (g : GL n �
   rw [h1, mulVec_smul]
   exact smul_hat A a _ hx
 
-theorem glob_smul {A : Submodule (𝓞 E) (n → E)} (hA : IsLat A) {a : 𝓞 E} (ha : a ≠ 0) (g : GL n 𝒜) :
-    globLat g (Ideal.span {a} • A) = Ideal.span {a} • globLat g A := by
+theorem glob_smul {A : Submodule (𝓞 E) (n → E)} (hA : IsLat A) {a : 𝓞 E} (ha : a ≠ 0) (g : GL n 𝒜)
+    : globLat g (Ideal.span {a} • A) = Ideal.span {a} • globLat g A := by
   apply le_antisymm
   · have h1 := smul_glob_le (globLat g A) a g⁻¹
     rw [glob_glob_inv hA] at h1
@@ -146,22 +161,23 @@ theorem glob_smul {A : Submodule (𝓞 E) (n → E)} (hA : IsLat A) {a : 𝓞 E}
 def dl (σ : E →ₐ[F] E) (J : Matrix n n E) (Λ : Submodule (𝓞 E) (n → E)) : Submodule (𝓞 E) (n → E) :=
   Submodule.span (𝓞 E) (dualSet (σ : E →+* E) J Λ)
 
-theorem hform_add_right {A : Type} [CommRing A] (τ : A →+* A) (J : Matrix n n A) (u v w : n → A) :
-    hform τ J u (v + w) = hform τ J u v + hform τ J u w := by
+theorem hform_add_right {A : Type} [CommRing A] (τ : A →+* A) (J : Matrix n n A) (u v w : n → A)
+    : hform τ J u (v + w) = hform τ J u v + hform τ J u w := by
   simp only [hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-theorem hform_smul_right {A : Type} [CommRing A] (τ : A →+* A) (J : Matrix n n A) (s : A) (u w : n → A) :
-    hform τ J u (s • w) = s * hform τ J u w := by
+theorem hform_smul_right
+    {A : Type} [CommRing A] (τ : A →+* A) (J : Matrix n n A) (s : A) (u w : n → A)
+    : hform τ J u (s • w) = s * hform τ J u w := by
   simp only [hform, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hform_zero_right {A : Type} [CommRing A] (τ : A →+* A) (J : Matrix n n A) (u : n → A) :
-    hform τ J u 0 = 0 := by
+theorem hform_zero_right {A : Type} [CommRing A] (τ : A →+* A) (J : Matrix n n A) (u : n → A)
+    : hform τ J u 0 = 0 := by
   simp [hform]
 
-theorem mem_dl (σ : E →ₐ[F] E) (J : Matrix n n E) (Λ : Submodule (𝓞 E) (n → E)) (y : n → E) :
-    y ∈ dl σ J Λ ↔ ∀ x ∈ Λ, hform (σ : E →+* E) J x y ∈ (algebraMap (𝓞 E) E).range := by
+theorem mem_dl (σ : E →ₐ[F] E) (J : Matrix n n E) (Λ : Submodule (𝓞 E) (n → E)) (y : n → E)
+    : y ∈ dl σ J Λ ↔ ∀ x ∈ Λ, hform (σ : E →+* E) J x y ∈ (algebraMap (𝓞 E) E).range := by
   constructor
   · intro hy x hx
     induction hy using Submodule.span_induction with
@@ -174,28 +190,37 @@ theorem mem_dl (σ : E →ₐ[F] E) (J : Matrix n n E) (Λ : Submodule (𝓞 E) 
   · intro h
     exact Submodule.subset_span h
 
-theorem hform_hat (σ : E →ₐ[F] E) (J : Matrix n n E) (Λ : Submodule (𝓞 E) (n → E)) (u w : n → 𝒜)
-    (hu : u ∈ hat F Λ) (hw : w ∈ hat F (dl σ J Λ)) :
-    hform (sigR σ (FiniteAdeleRing (𝓞 F) F)) (J.map ιA) u w ∈ 𝒮 := by
+theorem hform_hat
+    (σ : E →ₐ[F] E) (J : Matrix n n E) (Λ : Submodule (𝓞 E) (n → E)) (u w : n → 𝒜)
+    (hu : u ∈ hat F Λ) (hw : w ∈ hat F (dl σ J Λ))
+    : hform (sigR σ (FiniteAdeleRing (𝓞 F) F)) (J.map ιA) u w ∈ 𝒮 := by
   induction hw using Submodule.span_induction with
   | mem w hw =>
     obtain ⟨x, hx, rfl⟩ := hw
     exact csDual_span σ J Λ x ((mem_dl σ J Λ x).1 hx) u hu
-  | zero => rw [hform_zero_right]; exact zero_mem _
-  | add v w _ _ hv hw => rw [hform_add_right]; exact add_mem hv hw
+  | zero =>
+    rw [hform_zero_right]; exact zero_mem _
+  | add v w _ _ hv hw =>
+    rw [hform_add_right]; exact add_mem hv hw
   | smul s w _ hw =>
     rw [Subring.smul_def, hform_smul_right]
     exact mul_mem s.2 hw
 
-theorem glob_dl_le (σ : E →ₐ[F] E) (J : Matrix n n E) (Λ : Submodule (𝓞 E) (n → E)) (g : GL n 𝒜)
-    (hg : g ∈ UPts σ J (FiniteAdeleRing (𝓞 F) F)) : globLat g (dl σ J Λ) ≤ dl σ J (globLat g Λ) := by
+theorem glob_dl_le
+    (σ : E →ₐ[F] E) (J : Matrix n n E)
+    (Λ : Submodule (𝓞 E) (n → E))
+    (g : GL n 𝒜) (hg : g ∈ UPts σ J (FiniteAdeleRing (𝓞 F) F))
+    : globLat g (dl σ J Λ) ≤ dl σ J (globLat g Λ) := by
   intro x hx
   rw [mem_dl]
   intro y hy
   have h1 := hform_hat σ J Λ _ _ hy hx
   have hg' : g⁻¹ ∈ UPts σ J (FiniteAdeleRing (𝓞 F) F) := inv_mem hg
-  have h2 : cT (sigR σ (FiniteAdeleRing (𝓞 F) F)) ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) * J.map ιA *
-      ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) = J.map ιA := hg'
+  have h2
+      : cT (sigR σ (FiniteAdeleRing (𝓞 F) F)) ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜) * J.map ιA
+          * ((g⁻¹ : GL n 𝒜) : Matrix n n 𝒜)
+        = J.map ιA :=
+    hg'
   rw [hform_mulVec, h2, csDual_hform_incl] at h1
   let e := hform (σ : E →+* E) J y x
   let v : Unit → E := fun _ => 1
@@ -229,10 +254,12 @@ theorem glob_dl_le (σ : E →ₐ[F] E) (J : Matrix n n E) (Λ : Submodule (𝓞
   change algebraMap (𝓞 E) E a * 1 = e at ha'
   simpa only [mul_one] using ha'
 
-theorem glob_dl (σ : E →ₐ[F] E) (J : Matrix n n E)
+theorem glob_dl
+    (σ : E →ₐ[F] E) (J : Matrix n n E)
     (hJ : ∀ M : Submodule (𝓞 E) (n → E), IsLat M → IsLat (dl σ J M))
-    {Λ : Submodule (𝓞 E) (n → E)} (hΛ : IsLat Λ) (g : GL n 𝒜)
-    (hg : g ∈ UPts σ J (FiniteAdeleRing (𝓞 F) F)) : globLat g (dl σ J Λ) = dl σ J (globLat g Λ) := by
+    {Λ : Submodule (𝓞 E) (n → E)} (hΛ : IsLat Λ)
+    (g : GL n 𝒜) (hg : g ∈ UPts σ J (FiniteAdeleRing (𝓞 F) F))
+    : globLat g (dl σ J Λ) = dl σ J (globLat g Λ) := by
   apply le_antisymm (glob_dl_le σ J Λ g hg)
   have h1 := glob_dl_le σ J (globLat g Λ) g⁻¹ (inv_mem hg)
   rw [glob_glob_inv hΛ] at h1

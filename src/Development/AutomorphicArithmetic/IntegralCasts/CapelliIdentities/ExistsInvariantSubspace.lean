@@ -4,22 +4,31 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.exists_invariant_subspace :
-    ∀ (H : Type) [AddCommGroup H] [Module ℂ H] (G ι : Type) [Fintype ι] (K : Set G)
+theorem UpperTheory.exists_invariant_subspace
+    : ∀ (H : Type) [AddCommGroup H] [Module ℂ H] (G ι : Type) [Fintype ι] (K : Set G)
         (σ : G → H →ₗ[ℂ] H) (S : Submodule ℂ H) (E : ι → Module.End ℂ S) (c : G → ι → ι → ℂ),
-        (∀ g ∈ K, ∀ v ∈ S, σ g v ∈ S) →
-        (∀ g ∈ K, ∀ (i : ι) (v w : S), (w : H) = σ g (v : H) →
-          σ g ((E i v : S) : H) = ∑ j, c g i j • ((E j w : S) : H)) →
-        ∃ V₀ : Submodule ℂ S,
-          (∀ x : S, x ∈ V₀ ↔ ∃ T : Submodule ℂ H, FiniteDimensional ℂ T ∧ (x : H) ∈ T ∧
-            ∀ g ∈ K, ∀ v ∈ T, σ g v ∈ T) ∧
-          ∀ i, ∀ x ∈ V₀, E i x ∈ V₀ := by
+      (∀ g ∈ K, ∀ v ∈ S, σ g v ∈ S)
+        → (∀ g ∈ K, ∀ (i : ι) (v w : S),
+          (w : H) = σ g (v : H) → σ g ((E i v : S) : H) = ∑ j, c g i j • ((E j w : S) : H))
+        → ∃ V₀ : Submodule ℂ S,
+          (∀ x : S,
+              x ∈ V₀
+                ↔ ∃ T : Submodule ℂ H,
+                  FiniteDimensional ℂ T ∧ (x : H) ∈ T ∧ ∀ g ∈ K, ∀ v ∈ T, σ g v ∈ T)
+            ∧ ∀ i, ∀ x ∈ V₀, E i x ∈ V₀ := by
   intro H _ _ G ι _ K σ S E c hS hE
-  refine ⟨{ carrier := {x : S | ∃ T : Submodule ℂ H, FiniteDimensional ℂ T ∧ (x : H) ∈ T ∧
-              ∀ g ∈ K, ∀ v ∈ T, σ g v ∈ T}
-            add_mem' := ?_
-            zero_mem' := ?_
-            smul_mem' := ?_ }, fun x => Iff.rfl, ?_⟩
+  refine ⟨
+    {
+      carrier :=
+        {x : S | ∃ T : Submodule ℂ H, FiniteDimensional ℂ T ∧ (x : H) ∈ T ∧
+          ∀ g ∈ K, ∀ v ∈ T, σ g v ∈ T}
+      add_mem' := ?_
+      zero_mem' := ?_
+      smul_mem' := ?_
+    },
+    fun x => Iff.rfl,
+    ?_
+  ⟩
   · rintro a b ⟨T₁, f₁, ha, h₁⟩ ⟨T₂, f₂, hb, h₂⟩
     refine ⟨T₁ ⊔ T₂, inferInstance, Submodule.add_mem_sup ha hb, ?_⟩
     intro g hg v hv
@@ -39,17 +48,18 @@ theorem UpperTheory.exists_invariant_subspace :
         apply Subtype.ext
         apply Subtype.ext
         exact congrArg (fun t : T => (t : H)) hab)
-    have hmem : ∀ (j : ι) (u : S), (u : H) ∈ T →
-        ((E j u : S) : H) ∈ ⨆ k, (T.comap S.subtype).map (S.subtype ∘ₗ E k) := fun j u hu =>
-      Submodule.mem_iSup_of_mem j ⟨u, hu, rfl⟩
+    have hmem
+        : ∀ (j : ι) (u : S),
+          (u : H) ∈ T → ((E j u : S) : H) ∈ ⨆ k, (T.comap S.subtype).map (S.subtype ∘ₗ E k) :=
+      fun j u hu => Submodule.mem_iSup_of_mem j ⟨u, hu, rfl⟩
     refine ⟨⨆ k, (T.comap S.subtype).map (S.subtype ∘ₗ E k), inferInstance, hmem i x hx, ?_⟩
     intro g hg v hv
-    have hle : (⨆ k, (T.comap S.subtype).map (S.subtype ∘ₗ E k)) ≤
-        (⨆ k, (T.comap S.subtype).map (S.subtype ∘ₗ E k)).comap (σ g) := by
+    have hle
+        : (⨆ k, (T.comap S.subtype).map (S.subtype ∘ₗ E k))
+          ≤ (⨆ k, (T.comap S.subtype).map (S.subtype ∘ₗ E k)).comap (σ g) := by
       refine iSup_le fun j => ?_
       rintro _ ⟨u, hu, rfl⟩
       rw [Submodule.mem_comap, LinearMap.comp_apply, Submodule.subtype_apply]
       rw [hE g hg j u ⟨σ g u, hS g hg u u.2⟩ rfl]
-      exact Submodule.sum_mem _ fun k _ =>
-        Submodule.smul_mem _ _ (hmem k _ (h g hg u hu))
+      exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (hmem k _ (h g hg u hu))
     exact hle hv

@@ -11,12 +11,16 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.CuspGL
 
-theorem IsPrimitive.finsum_unipotentRadical_eq_zero (F : Type) [Field F] [Finite F] (d : ℕ)
-    (φ : Module.End F (Fin d → F) → ℂ) (hφ : IsPrimitive φ) (a : ℕ) (ha : 0 < a) (had : a < d) :
-    ∑ᶠ u ∈ {u : GL (Fin d) F | ∀ i j : Fin d,
-      (u : Matrix (Fin d) (Fin d) F) i j = (if i = j then 1 else 0) ∨ (i.val < a ∧ a ≤ j.val)},
-      φ (Matrix.toLin' (u : Matrix (Fin d) (Fin d) F)) = 0 := by
-  obtain ⟨A, H, hA, hH, hbij⟩ := GlobalTheory.T.exists_standardUnipotentRadical_bijOn_nilradical F d a had.le
+theorem IsPrimitive.finsum_unipotentRadical_eq_zero
+    (F : Type) [Field F] [Finite F]
+    (d : ℕ) (φ : Module.End F (Fin d → F) → ℂ) (hφ : IsPrimitive φ)
+    (a : ℕ) (ha : 0 < a) (had : a < d)
+    : ∑ᶠ u ∈ {u : GL (Fin d) F | ∀ i j : Fin d,
+        (u : Matrix (Fin d) (Fin d) F) i j = (if i = j then 1 else 0) ∨ (i.val < a ∧ a ≤ j.val)},
+        φ (Matrix.toLin' (u : Matrix (Fin d) (Fin d) F))
+      = 0 := by
+  obtain ⟨A, H, hA, hH, hbij⟩ :=
+    GlobalTheory.T.exists_standardUnipotentRadical_bijOn_nilradical F d a had.le
   have hbot : A ≠ ⊥ := by
     rintro rfl
     rw [finrank_bot] at hA

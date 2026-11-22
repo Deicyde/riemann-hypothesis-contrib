@@ -12,8 +12,11 @@ open Complex DirichletCharacter
 
 namespace GlobalTheory.LandauPageRegion
 
-theorem inRegion_mono {c c' : ℝ} (h : c ≤ c') (q : ℕ) [NeZero q] {s : ℂ}
-    (hs : Formalism.ZeroFreeDirichlet.InRegion c q s) : 1 - c' / Real.log ((q : ℝ) * (|s.im| + 2)) ≤ s.re := by
+theorem inRegion_mono
+    {c c' : ℝ} (h : c ≤ c')
+    (q : ℕ) [NeZero q]
+    {s : ℂ} (hs : Formalism.ZeroFreeDirichlet.InRegion c q s)
+    : 1 - c' / Real.log ((q : ℝ) * (|s.im| + 2)) ≤ s.re := by
   have hq : (1 : ℝ) ≤ q := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne q)
   have hL : 0 ≤ Real.log ((q : ℝ) * (|s.im| + 2)) := by
     apply Real.log_nonneg
@@ -24,15 +27,19 @@ theorem inRegion_mono {c c' : ℝ} (h : c ≤ c') (q : ℕ) [NeZero q] {s : ℂ}
   have hs' : 1 - c / Real.log ((q : ℝ) * (|s.im| + 2)) ≤ s.re := hs
   linarith
 
-private theorem real_zero_of_mem_zeroFreeRegion {c₁ c₂ c₃ c : ℝ} (hc₁ : c ≤ c₁) (hc₂ : c ≤ c₂) (hc₃ : c ≤ c₃)
-    (hA : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (s : ℂ), χ ≠ 1 → LFunction χ s = 0 →
-      (χ ^ 2 ≠ 1 ∨ s.im ≠ 0) → s.re < 1 - c₁ / Real.log (q * (|s.im| + 2)))
-    (hC : ∀ (q : ℕ) [NeZero q] (s : ℂ), s ≠ 1 → LFunction (1 : DirichletCharacter ℂ q) s = 0 →
-      s.re < 1 - c₃ / Real.log (q * (|s.im| + 2)))
-    {q : ℕ} [NeZero q] {χ : DirichletCharacter ℂ q} {s : ℂ}
-    (hs : Formalism.ZeroFreeDirichlet.InRegion c q s) (hz : Formalism.ZeroFreeDirichlet.IsLZero χ s) :
-    χ ≠ 1 ∧ χ ^ 2 = 1 ∧ s.im = 0 ∧ 1 - c₂ / Real.log (2 * q) ≤ s.re ∧
-      LFunction χ (s.re : ℂ) = 0 ∧ s = (s.re : ℂ) := by
+private theorem real_zero_of_mem_zeroFreeRegion
+    {c₁ c₂ c₃ c : ℝ} (hc₁ : c ≤ c₁) (hc₂ : c ≤ c₂) (hc₃ : c ≤ c₃)
+    (hA : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q) (s : ℂ),
+      χ ≠ 1 → LFunction χ s = 0 → (χ ^ 2 ≠ 1 ∨ s.im ≠ 0)
+        → s.re < 1 - c₁ / Real.log (q * (|s.im| + 2)))
+    (hC : ∀ (q : ℕ) [NeZero q] (s : ℂ),
+      s ≠ 1 → LFunction (1 : DirichletCharacter ℂ q) s = 0
+        → s.re < 1 - c₃ / Real.log (q * (|s.im| + 2)))
+    {q : ℕ} [NeZero q]
+    {χ : DirichletCharacter ℂ q} {s : ℂ}
+    (hs : Formalism.ZeroFreeDirichlet.InRegion c q s) (hz : Formalism.ZeroFreeDirichlet.IsLZero χ s)
+    : χ ≠ 1 ∧ χ ^ 2 = 1 ∧ s.im = 0 ∧ 1 - c₂ / Real.log (2 * q) ≤ s.re ∧ LFunction χ (s.re : ℂ) = 0
+      ∧ s = (s.re : ℂ) := by
   obtain ⟨hne, hL⟩ := hz
   have h1 : χ ≠ 1 := by
     rintro rfl
@@ -40,7 +47,7 @@ private theorem real_zero_of_mem_zeroFreeRegion {c₁ c₂ c₃ c : ℝ} (hc₁ 
     have h3 := hC q s hs1 hL
     have h4 := inRegion_mono hc₃ q hs
     linarith
-  have h2 : ¬ (χ ^ 2 ≠ 1 ∨ s.im ≠ 0) := by
+  have h2 : ¬(χ ^ 2 ≠ 1 ∨ s.im ≠ 0) := by
     intro h
     have h3 := hA q χ s h1 hL h
     have h4 := inRegion_mono hc₁ q hs
@@ -70,7 +77,8 @@ theorem main : Formalism.ZeroFreeDirichlet.ZFRDirichlet := by
   · rw [hseq]
     exact hself.2.2
   · intro χ' s' hs' hz'
-    obtain ⟨h1', hsq', -, hre', hL', hseq'⟩ := real_zero_of_mem_zeroFreeRegion m₁ m₂ m₃ hA hC hs' hz'
+    obtain ⟨h1', hsq', -, hre', hL', hseq'⟩ :=
+      real_zero_of_mem_zeroFreeRegion m₁ m₂ m₃ hA hC hs' hz'
     obtain ⟨hχ, hβ, -⟩ := hB q χ' χ s'.re s.re h1' h1 hsq' hsq hre' hre hL' hL
     refine ⟨hχ, ?_⟩
     rw [hseq', hseq, hβ]

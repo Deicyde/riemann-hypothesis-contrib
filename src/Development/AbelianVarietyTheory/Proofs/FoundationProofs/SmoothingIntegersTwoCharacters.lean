@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_unit_dirichletCharacter_ne_one_ne_one {N : ℕ} (θ₁ θ₂ : DirichletCharacter ℂ N)
-    (h₁ : θ₁ ≠ 1) (h₂ : θ₂ ≠ 1) :
-    ∃ u : (ZMod N)ˣ, θ₁ (u : ZMod N) ≠ 1 ∧ θ₂ (u : ZMod N) ≠ 1 := by
+theorem exists_unit_dirichletCharacter_ne_one_ne_one
+    {N : ℕ} (θ₁ θ₂ : DirichletCharacter ℂ N) (h₁ : θ₁ ≠ 1) (h₂ : θ₂ ≠ 1)
+    : ∃ u : (ZMod N)ˣ, θ₁ (u : ZMod N) ≠ 1 ∧ θ₂ (u : ZMod N) ≠ 1 := by
   obtain ⟨u₁, hu₁⟩ := MulChar.ne_one_iff.1 h₁
   obtain ⟨u₂, hu₂⟩ := MulChar.ne_one_iff.1 h₂
   by_cases a : θ₂ (u₁ : ZMod N) = 1
@@ -19,9 +19,11 @@ theorem exists_unit_dirichletCharacter_ne_one_ne_one {N : ℕ} (θ₁ θ₂ : Di
     · exact ⟨u₂, b, hu₂⟩
   · exact ⟨u₁, hu₁, a⟩
 
-theorem sq_ne_pow_succ_mul_zpow {p e : ℕ} (hp : 1 < p) (he : 1 ≤ e) {x : ℂ} (hx : ‖x‖ = 1)
-    (hx1 : x ≠ 1) {n : ℤ} (hn : n = 1 ∨ n = -1) :
-    (p : ℂ) ^ 2 ≠ (p : ℂ) ^ (e + 1) * x ^ n := by
+theorem sq_ne_pow_succ_mul_zpow
+    {p e : ℕ} (hp : 1 < p) (he : 1 ≤ e)
+    {x : ℂ} (hx : ‖x‖ = 1) (hx1 : x ≠ 1)
+    {n : ℤ} (hn : n = 1 ∨ n = -1)
+    : (p : ℂ) ^ 2 ≠ (p : ℂ) ^ (e + 1) * x ^ n := by
   have hy1 : x ^ n ≠ 1 := by
     rcases hn with rfl | rfl
     · simpa using hx1
@@ -40,13 +42,16 @@ theorem sq_ne_pow_succ_mul_zpow {p e : ℕ} (hp : 1 < p) (he : 1 ≤ e) {x : ℂ
     have := pow_lt_pow_right₀ hp' (show 2 < e + 1 by omega)
     linarith
 
-theorem smoothing_integers_two_characters : ∀ (N l e : ℕ) (θ₁ θ₂ : DirichletCharacter ℂ N)
-    (ψ : DirichletCharacter ℂ l), 0 < N → l.Prime → ¬ l ∣ N → 1 ≤ e → θ₁ ≠ 1 → θ₂ ≠ 1 →
-    ∃ c d : ℕ, 1 < c ∧ 1 < d ∧ c.Coprime (6 * N * l) ∧ d.Coprime (6 * N * l) ∧
-      (∀ z : ℂ, ‖z‖ = 1 → (c : ℂ) ^ e ≠ z) ∧
-      ∀ n₁ n₂ : ℤ, (n₁ = 1 ∨ n₁ = -1) →
-        (d : ℂ) ^ 2 ≠ (d : ℂ) ^ (e + 1) * (θ₁ d ^ n₁ * ψ d ^ n₂) ∧
-        (d : ℂ) ^ 2 ≠ (d : ℂ) ^ (e + 1) * (θ₂ d ^ n₁ * ψ d ^ n₂) := by
+theorem smoothing_integers_two_characters
+    : ∀ (N l e : ℕ) (θ₁ θ₂ : DirichletCharacter ℂ N) (ψ : DirichletCharacter ℂ l),
+      0 < N → l.Prime → ¬ l ∣ N → 1 ≤ e → θ₁ ≠ 1 → θ₂ ≠ 1
+        → ∃ c d : ℕ,
+          1 < c ∧ 1 < d ∧ c.Coprime (6 * N * l) ∧ d.Coprime (6 * N * l)
+            ∧ (∀ z : ℂ, ‖z‖ = 1 → (c : ℂ) ^ e ≠ z)
+            ∧ ∀ n₁ n₂ : ℤ,
+              (n₁ = 1 ∨ n₁ = -1)
+                → (d : ℂ) ^ 2 ≠ (d : ℂ) ^ (e + 1) * (θ₁ d ^ n₁ * ψ d ^ n₂)
+                  ∧ (d : ℂ) ^ 2 ≠ (d : ℂ) ^ (e + 1) * (θ₂ d ^ n₁ * ψ d ^ n₂) := by
   intro N l e θ₁ θ₂ ψ hN hl hlN he h₁ h₂
   haveI : NeZero N := ⟨hN.ne'⟩
   haveI : NeZero l := ⟨hl.ne_zero⟩
@@ -57,8 +62,7 @@ theorem smoothing_integers_two_characters : ∀ (N l e : ℕ) (θ₁ θ₂ : Dir
   obtain ⟨k, hkN, hkl⟩ := Nat.chineseRemainder hcop (u : ZMod N).val 1
   have hkN' : (k : ZMod N) = u := by
     rw [(ZMod.natCast_eq_natCast_iff k _ N).2 hkN, ZMod.natCast_zmod_val]
-  have hkl' : (k : ZMod l) = 1 := by
-    rw [(ZMod.natCast_eq_natCast_iff k 1 l).2 hkl, Nat.cast_one]
+  have hkl' : (k : ZMod l) = 1 := by rw [(ZMod.natCast_eq_natCast_iff k 1 l).2 hkl, Nat.cast_one]
   have hk1 : k.Coprime N := (ZMod.isUnit_iff_coprime k N).1 (hkN' ▸ u.isUnit)
   have hk2 : k.Coprime l := (ZMod.isUnit_iff_coprime k l).1 (hkl' ▸ isUnit_one)
   have hunit : IsUnit (k : ZMod (N * l)) :=
@@ -79,12 +83,15 @@ theorem smoothing_integers_two_characters : ∀ (N l e : ℕ) (θ₁ θ₂ : Dir
   · intro z hz h
     have h2 := congrArg norm h
     rw [norm_pow, Complex.norm_natCast, hz] at h2
-    have hc' : (1 : ℝ) < ((6 * N * l + 1 : ℕ) : ℝ) := by exact_mod_cast (show 1 < 6 * N * l + 1 by omega)
+    have hc' : (1 : ℝ) < ((6 * N * l + 1 : ℕ) : ℝ) := by
+      exact_mod_cast (show 1 < 6 * N * l + 1 by omega)
     have := one_lt_pow₀ hc' (show e ≠ 0 by omega)
     linarith
   · intro n₁ n₂ hn
     rw [hpl, map_one, one_zpow, mul_one, mul_one, hpN]
-    exact ⟨sq_ne_pow_succ_mul_zpow hp.one_lt he (DirichletCharacter.unit_norm_eq_one _ _) hu₁ hn,
-      sq_ne_pow_succ_mul_zpow hp.one_lt he (DirichletCharacter.unit_norm_eq_one _ _) hu₂ hn⟩
+    exact ⟨
+      sq_ne_pow_succ_mul_zpow hp.one_lt he (DirichletCharacter.unit_norm_eq_one _ _) hu₁ hn,
+      sq_ne_pow_succ_mul_zpow hp.one_lt he (DirichletCharacter.unit_norm_eq_one _ _) hu₂ hn
+    ⟩
 
 end GlobalTheory

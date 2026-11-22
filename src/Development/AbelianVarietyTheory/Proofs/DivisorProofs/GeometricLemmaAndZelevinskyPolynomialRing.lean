@@ -12,11 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Grothen
 
 namespace GlobalTheory
 
-theorem geometricLemma_and_zelevinskyPolynomialRing :
-    GlobalTheory.Published.GeometricLemma ∧ GlobalTheory.Published.ZelevinskyPolynomialRing :=
-  ⟨GlobalTheory.geometricLemma_of_filtration GlobalTheory.Laid.bzfin_holds
-               GlobalTheory.geometricLemmaFiltration_unconditional,
-    GlobalTheory.zelevinskyPolynomialRing_of_parts GlobalTheory.Laid.bzfin_holds
-      GlobalTheory.segmentRepresentation' GlobalTheory.grothendieckRingPolynomial_outright⟩
+theorem geometricLemma_and_zelevinskyPolynomialRing
+    : GlobalTheory.Published.GeometricLemma ∧ GlobalTheory.Published.ZelevinskyPolynomialRing := ⟨
+  GlobalTheory.geometricLemma_of_filtration GlobalTheory.Laid.bzfin_holds
+    GlobalTheory.geometricLemmaFiltration_unconditional,
+  GlobalTheory.zelevinskyPolynomialRing_of_parts GlobalTheory.Laid.bzfin_holds
+    GlobalTheory.segmentRepresentation' GlobalTheory.grothendieckRingPolynomial_outright
+⟩
 
 end GlobalTheory

@@ -19,12 +19,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Hecke
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Nf UpperTheory.V.Sd
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Nf UpperTheory.V.Sd
   UpperTheory.V.Br CongruenceSubgroup
 
-private theorem untwist (k N : ℕ) [NeZero N] (hk : 1 ≤ k) (χ ψ : DirichletCharacter ℂ N) (g : Eigenform k N χ) :
-    ∃ (χ' : DirichletCharacter ℂ (N * N)) (g' : Eigenform k (N * N) χ'), ∀ p : ℕ, p.Prime → ¬ p ∣ N →
-      g'.a p * ψ (p : ZMod N) = g.a p ∧ χ' (p : ZMod (N * N)) * ψ (p : ZMod N) ^ 2 = χ (p : ZMod N) := by
+private theorem untwist
+    (k N : ℕ) [NeZero N] (hk : 1 ≤ k) (χ ψ : DirichletCharacter ℂ N) (g : Eigenform k N χ)
+    : ∃ (χ' : DirichletCharacter ℂ (N * N)) (g' : Eigenform k (N * N) χ'), ∀ p : ℕ,
+      p.Prime → ¬ p ∣ N
+        → g'.a p * ψ (p : ZMod N) = g.a p
+          ∧ χ' (p : ZMod (N * N)) * ψ (p : ZMod N) ^ 2 = χ (p : ZMod N) := by
   haveI : NeZero (N * N) := ⟨mul_ne_zero (NeZero.ne N) (NeZero.ne N)⟩
   obtain ⟨h, hc, hn⟩ := clTwist N k χ ψ⁻¹ g.f g.char
   have h0 : h ≠ 0 := by
@@ -37,8 +41,9 @@ private theorem untwist (k N : ℕ) [NeZero N] (hk : 1 ≤ k) (χ ψ : Dirichlet
   have hu : IsUnit (p : ZMod (N * N)) :=
     (ZMod.isUnit_prime_iff_not_dvd hp).2 fun e => hd ((hp.dvd_mul.1 e).elim id id)
   have hu' : IsUnit (p : ZMod N) := (ZMod.isUnit_prime_iff_not_dvd hp).2 hd
-  have e : DirichletCharacter.changeLevel (dvd_mul_right N N) (χ * ψ⁻¹ ^ 2) (p : ZMod (N * N)) =
-      χ (p : ZMod N) * ψ⁻¹ (p : ZMod N) ^ 2 := by
+  have e
+      : DirichletCharacter.changeLevel (dvd_mul_right N N) (χ * ψ⁻¹ ^ 2) (p : ZMod (N * N))
+        = χ (p : ZMod N) * ψ⁻¹ (p : ZMod N) ^ 2 := by
     have := DirichletCharacter.changeLevel_eq_cast_of_dvd (χ * ψ⁻¹ ^ 2) (dvd_mul_right N N) hu.unit
     rw [IsUnit.unit_spec, ZMod.cast_natCast (dvd_mul_right N N)] at this
     rw [this, MulChar.mul_apply, MulChar.pow_apply' _ two_ne_zero]
@@ -59,21 +64,27 @@ private theorem untwist (k N : ℕ) [NeZero N] (hk : 1 ≤ k) (χ ψ : Dirichlet
   · rw [e]
     linear_combination χ (p : ZMod N) * (ψ⁻¹ (p : ZMod N) * ψ (p : ZMod N) + 1) * e1
 
-private theorem eig_unique {k N p : ℕ} [NeZero N] {χ : DirichletCharacter ℂ N} {f : CuspForm (Gamma1 N) (k : ℤ)} (hf : f ≠ 0)
-    {a b : ℂ} (ha : IsEigAt k χ f p a) (hb : IsEigAt k χ f p b) : a = b := by
+private theorem eig_unique
+    {k N p : ℕ} [NeZero N]
+    {χ : DirichletCharacter ℂ N} {f : CuspForm (Gamma1 N) (k : ℤ)} (hf : f ≠ 0)
+    {a b : ℂ} (ha : IsEigAt k χ f p a) (hb : IsEigAt k χ f p b)
+    : a = b := by
   by_contra h
   exact hf ((finDim N k).2 f fun n hn =>
-    (mul_eq_zero.1 (show (a - b) * coef f n = 0 by linear_combination hb n hn - ha n hn)).resolve_left (sub_ne_zero.2 h))
+    (mul_eq_zero.1 (show (a - b) * coef f n = 0 by
+      linear_combination hb n hn - ha n hn)).resolve_left (sub_ne_zero.2 h))
 
-private theorem level_zero_eq_maximal_compact {F : Type} [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F)) :
-    K1 w 0 = GlobalTheory.LFun.KGL w (n := 2) := by
+private theorem level_zero_eq_maximal_compact
+    {F : Type} [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F))
+    : K1 w 0 = GlobalTheory.LFun.KGL w (n := 2) := by
   ext g
   refine ⟨fun ⟨k, _, e⟩ => ⟨k, e⟩, fun ⟨k, e⟩ => ⟨k, ?_, e⟩⟩
   haveI : Subsingleton (w.adicCompletionIntegers F ⧸ IsLocalRing.maximalIdeal (w.adicCompletionIntegers F) ^ 0) :=
     Ideal.Quotient.subsingleton_iff.2 (by simp)
   exact Subsingleton.elim _ _
 
-private theorem lie_one (φ : TR.Sm ℚ 2) (h : ∀ v, TR.Eop v 0 0 φ + TR.Eop v 1 1 φ = 0) : TR.lie ℚ 2 (TR.oneL ℚ 2) φ = 0 := by
+private theorem lie_one (φ : TR.Sm ℚ 2) (h : ∀ v, TR.Eop v 0 0 φ + TR.Eop v 1 1 φ = 0)
+    : TR.lie ℚ 2 (TR.oneL ℚ 2) φ = 0 := by
   classical
   have hX : TR.lie ℚ 2 (TR.oneL ℚ 2) = ∑ i, TR.lieS ℚ 2 i i 1 := by
     set_option synthInstance.maxHeartbeats 100000 in

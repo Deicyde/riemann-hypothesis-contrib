@@ -18,7 +18,8 @@ theorem parEps_pOf (k r : ℕ) (hk : 1 ≤ k) : pOf (parEps k r) = k + r := by
 
 theorem walkStep : WalkStepStatement := by
   intro hIS hStep k r u v b h t hk hHC hI hH hL hG hB
-  exact walk k r u v b h t (fun lam => BesselNZ (parEps k r) lam u) hk hHC hI hH hL
-    (hStep hIS k r (parEps k r) u h hG (parEps_pOf k r hk) (parEps_qOf k r hk)) hB
+  exact walk k r u v b h t
+    (fun lam => BesselNZ (parEps k r) lam u)
+    hk hHC hI hH hL (hStep hIS k r (parEps k r) u h hG (parEps_pOf k r hk) (parEps_qOf k r hk)) hB
 
 end ReciprocityTheory.ChartRestriction.DS.Lap

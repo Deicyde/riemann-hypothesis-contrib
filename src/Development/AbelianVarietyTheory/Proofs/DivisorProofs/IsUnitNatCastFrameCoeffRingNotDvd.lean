@@ -9,8 +9,9 @@ open GlobalTheory.ExpFrame Formalism.CohomologicalDescent.DepthNonnegative
 
 namespace GlobalTheory.ExpFrame.Frame
 
-theorem isUnit_natCast_of_not_dvd : ∀ (l : ℕ) [Fact l.Prime] (ι : Type) [DecidableEq ι] (N : ℕ) (F : Frame l ι N), F.Ok →
-    ∀ n : ℕ, ¬ l ∣ n → IsUnit (n : F.O) := by
+theorem isUnit_natCast_of_not_dvd
+    : ∀ (l : ℕ) [Fact l.Prime] (ι : Type) [DecidableEq ι] (N : ℕ) (F : Frame l ι N),
+      F.Ok → ∀ n : ℕ, ¬ l ∣ n → IsUnit (n : F.O) := by
   intro l _ ι _ N F hF n hn
   obtain ⟨hinj, L, _, hrange⟩ := hF.ring
   have hnorm : ‖(n : PadicAlgCl l)‖ = 1 := by

@@ -13,9 +13,11 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting
-  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.MainNotions.S.Cnt Formalism.MainNotions.KappaEndpoints Formalism.MainNotions.LatticeGluingRadicals
-  Formalism.MainNotions.BridgeLemma
+open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full
+  Formalism.MainNotions.S.Cnt Formalism.MainNotions.KappaEndpoints
+  Formalism.MainNotions.LatticeGluingRadicals Formalism.MainNotions.BridgeLemma
 
 namespace Formalism.L2.SG.KappaOffDiagonal
 
@@ -25,11 +27,13 @@ section ZsC1c
 
 variable {D : D7} {X : HidaSetting D}
 
-theorem isIdentity_of_equal_flags (hTg : ∀ u : D.what₂.Word, (D.mem u).A.T ≠ D.host.g 0 ∧ (D.mem u).A.T ≠ D.host.g 1)
-    (Y : Full X) {u : D.what₂.Word} (t : GTu Y u)
-    (hXa : ∀ a, (frq X t.rep).fl.Xa a = (lf D (X.Fu u)).fl.Xa a)
+theorem isIdentity_of_equal_flags
+    (hTg : ∀ u : D.what₂.Word, (D.mem u).A.T ≠ D.host.g 0 ∧ (D.mem u).A.T ≠ D.host.g 1)
+    (Y : Full X)
+    {u : D.what₂.Word} (t : GTu Y u) (hXa : ∀ a, (frq X t.rep).fl.Xa a = (lf D (X.Fu u)).fl.Xa a)
     (hXp : (frq X t.rep).fl.Xplus = (lf D (X.Fu u)).fl.Xplus)
-    (hrel : Relevant D.host.F (lf D (X.Fu u)).fl (frq X t.rep).fl) : t.isId := by
+    (hrel : Relevant D.host.F (lf D (X.Fu u)).fl (frq X t.rep).fl)
+    : t.isId := by
   have hT0 : ((Tu D u : ℕ) : D.host.E) ≠ 0 := Nat.cast_ne_zero.2 (tie_Tu_pos D u).ne'
   have hrow : IsRowLat D (X.Fu u) t.lam := (Y.rowsOK u).1 t.lam t.mem
   have hfix : FixedHyp D t.lam (lf D (X.Fu u)) := hrow.2.1
@@ -37,16 +41,20 @@ theorem isIdentity_of_equal_flags (hTg : ∀ u : D.what₂.Word, (D.mem u).A.T �
   have hlift : IsLift t.lam (frq X t.rep) := hPD.1
   have hadm : IsAdmissible t.lam (gS D) (lf D (X.Fu u)) (frq X t.rep) := hPD.2.1
   have hconv : IsFixedConv t.lam (gS D) (frq X t.rep) := hPD.2.2.1
-  obtain ⟨c, hcc, he, hz⟩ := id_scal D.host.F D.host.E (hS D) D.R.rS _ (lf D (X.Fu u)).fl (frq X t.rep).fl hT0
-    (tie_trace D.sp.cm) hXa hXp hrel
-  have hX : (frq X t.rep).fl.X = (lf D (X.Fu u)).fl.X := by rw [tie_X_eq_Xa, tie_X_eq_Xa]; exact hXa _
-  obtain ⟨o, ho, N, hN, hoN⟩ := id_unit D.host.E (hS D) D.R.rS _ t.lam (lf D (X.Fu u)) (frq X t.rep) c (p_starConj D)
-    hlift.1 hfix.2.2.2.2 hcc hz hX
-  have hcong : ∀ i : Fin 2, ∀ P : HeightOneSpectrum (𝓞 D.host.E), ((D.host.g i : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal →
-      o - 1 ∈ P.asIdeal := by
+  obtain ⟨c, hcc, he, hz⟩ :=
+    id_scal D.host.F D.host.E (hS D) D.R.rS _ (lf D (X.Fu u)).fl (frq X t.rep).fl hT0
+      (tie_trace D.sp.cm) hXa hXp hrel
+  have hX : (frq X t.rep).fl.X = (lf D (X.Fu u)).fl.X := by
+    rw [tie_X_eq_Xa, tie_X_eq_Xa]; exact hXa _
+  obtain ⟨o, ho, N, hN, hoN⟩ :=
+    id_unit D.host.E (hS D) D.R.rS _ t.lam (lf D (X.Fu u)) (frq X t.rep) c (p_starConj D) hlift.1
+      hfix.2.2.2.2 hcc hz hX
+  have hcong
+      : ∀ i : Fin 2, ∀ P : HeightOneSpectrum (𝓞 D.host.E),
+        ((D.host.g i : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal → o - 1 ∈ P.asIdeal := by
     intro i P hP
-    refine id_cong D.host.E (hS D) D.R.rS (Tu D u) t.lam (gS D) (lf D (X.Fu u)) (frq X t.rep) o hfix.2.1
-      hfix.2.2.1.1 hadm (by rw [ho]; exact hz) P ?_ ?_
+    refine id_cong D.host.E (hS D) D.R.rS (Tu D u) t.lam (gS D) (lf D (X.Fu u)) (frq X t.rep) o
+      hfix.2.1 hfix.2.2.1.1 hadm (by rw [ho]; exact hz) P ?_ ?_
     · unfold gS
       rw [Nat.cast_mul]
       fin_cases i
@@ -59,8 +67,9 @@ theorem isIdentity_of_equal_flags (hTg : ∀ u : D.what₂.Word, (D.mem u).A.T �
       · exact (hTg u).2.symm
   obtain ⟨P1, hP1⟩ := id_over D.host.E _ (D.host.g_prime 0)
   obtain ⟨P2, hP2⟩ := id_over D.host.E _ (D.host.g_prime 1)
-  have ho1 : o = 1 := id_root (𝓞 D.host.E) o N _ _ P1.asIdeal P2.asIdeal hN hoN (D.host.g_prime 0) (D.host.g_prime 1)
-    D.host.g_ne P1.isPrime.ne_top P2.isPrime.ne_top hP1 hP2 (hcong 0 P1 hP1) (hcong 1 P2 hP2)
+  have ho1 : o = 1 :=
+    id_root (𝓞 D.host.E) o N _ _ P1.asIdeal P2.asIdeal hN hoN (D.host.g_prime 0) (D.host.g_prime 1)
+      D.host.g_ne P1.isPrime.ne_top P2.isPrime.ne_top hP1 hP2 (hcong 0 P1 hP1) (hcong 1 P2 hP2)
   have hc1 : c = 1 := by rw [← ho, ho1]; rfl
   subst hc1
   simp only [one_smul] at he hz
@@ -69,15 +78,27 @@ theorem isIdentity_of_equal_flags (hTg : ∀ u : D.what₂.Word, (D.mem u).A.T �
     rw [p_mem_orth]
     exact tie_X_le_ker _ _ (lf D (X.Fu u)).fl.z_orth
   have h3' := hn.2.2 _ hzo
-  have hzz : n (lf D (X.Fu u)).fl.z - (frq X t.rep).fl.z =
-      (n (lf D (X.Fu u)).fl.z - (lf D (X.Fu u)).fl.z) - ((frq X t.rep).fl.z - (lf D (X.Fu u)).fl.z) := by abel
-  refine ⟨frq X t.rep, TermDef.rep_mk (⟨frq X t.rep, hPD⟩ : TermDef.Carrier (TermDef.PD D t.lam (lf D (X.Fu u)) u)),
-    n, hn, hne, ?_⟩
+  have hzz
+      : n (lf D (X.Fu u)).fl.z - (frq X t.rep).fl.z
+        = (n (lf D (X.Fu u)).fl.z - (lf D (X.Fu u)).fl.z)
+          - ((frq X t.rep).fl.z - (lf D (X.Fu u)).fl.z) := by
+    abel
+  refine ⟨
+    frq X t.rep,
+    TermDef.rep_mk (⟨frq X t.rep, hPD⟩ : TermDef.Carrier (TermDef.PD D t.lam (lf D (X.Fu u)) u)),
+    n,
+    hn,
+    hne,
+    ?_
+  ⟩
   rw [hzz]
   exact Submodule.sub_mem _ h3' hz
 
-theorem one_le_index_of_relevant (hTg : ∀ u : D.what₂.Word, (D.mem u).A.T ≠ D.host.g 0 ∧ (D.mem u).A.T ≠ D.host.g 1)
-    (Y : Full X) {u : D.what₂.Word} (t : GTu Y u) (ht : t ∈ relSet Y u) : 1 ≤ jT t := by
+theorem one_le_index_of_relevant
+    (hTg : ∀ u : D.what₂.Word, (D.mem u).A.T ≠ D.host.g 0 ∧ (D.mem u).A.T ≠ D.host.g 1)
+    (Y : Full X)
+    {u : D.what₂.Word} (t : GTu Y u) (ht : t ∈ relSet Y u)
+    : 1 ≤ jT t := by
   obtain ⟨hr, hG, hid⟩ := relevantSet_zeroG_not_identity ht
   obtain ⟨j, hj, c, hN⟩ := exists_nfFull_of_relevant_of_G_eq_zero Y t hr hG
   rw [index_eq_normalForm t hN]

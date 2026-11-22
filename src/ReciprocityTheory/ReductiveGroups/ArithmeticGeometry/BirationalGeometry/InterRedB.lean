@@ -10,37 +10,45 @@ namespace ReciprocityTheory.ChartRestriction.G.Geo
 
 open MvPolynomial ReciprocityTheory.AnForm.M Filter Topology
 
-variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {P J : Ideal (MRing ι)}
-  {e : ℕ}
+variable
+  {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)] {P J : Ideal (MRing ι)} {e : ℕ}
 
-theorem continuousOn_lift (R : AnLogRes P J e) (x : R.X) (p : Σ k, ι k) :
-    ContinuousOn (fun z => R.lift x z p) (R.U x) := by
+theorem continuousOn_lift (R : AnLogRes P J e) (x : R.X) (p : Σ k, ι k)
+    : ContinuousOn (fun z => R.lift x z p) (R.U x) := by
   intro z hz
   obtain ⟨j, hj⟩ := R.A.cover z
   have ha : AnalyticAt ℂ ((fun w => R.lift x w p) ∘ (R.A.chart j).symm) (R.A.chart j z) :=
-    R.holo x p j _ ⟨(R.A.chart j).map_source hj, by
-      simp only [Set.mem_preimage, (R.A.chart j).left_inv hj]; exact hz⟩
+    R.holo x p j _ ⟨
+      (R.A.chart j).map_source hj,
+      by simp only [Set.mem_preimage, (R.A.chart j).left_inv hj]; exact hz
+    ⟩
   have hc : ContinuousAt (((fun w => R.lift x w p) ∘ (R.A.chart j).symm) ∘ (R.A.chart j)) z :=
     ha.continuousAt.comp ((R.A.chart j).continuousAt hj)
   refine (hc.congr ?_).continuousWithinAt
   filter_upwards [(R.A.chart j).open_source.mem_nhds hj] with w hw
   simp only [Function.comp_apply, (R.A.chart j).left_inv hw]
 
-private theorem smoothOn_potOf_of_isSmoothHerm (R : AnLogRes P J e) {L : HermLine ι} (hL : IsSmoothHerm L)
-    (x : R.X) : R.A.SmoothOn ((potOf R L).U x) ((potOf R L).φ x) := by
+private theorem smoothOn_potOf_of_isSmoothHerm
+    (R : AnLogRes P J e) {L : HermLine ι} (hL : IsSmoothHerm L) (x : R.X)
+    : R.A.SmoothOn ((potOf R L).U x) ((potOf R L).φ x) := by
   intro j
-  have hlift : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun w => R.lift x ((R.A.chart j).symm w))
+  have hlift : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
+      (fun w => R.lift x ((R.A.chart j).symm w))
       ((R.A.chart j).target ∩ (R.A.chart j).symm ⁻¹' R.U x) := by
     refine contDiffOn_pi.mpr fun p => ?_
-    exact ((R.holo x p j).contDiffOn ((R.A.chart j).isOpen_inter_preimage_symm
-      (R.isOpen_U x)).uniqueDiffOn).restrict_scalars ℝ
-  have hcomp := (hL : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) L.h _).comp hlift (fun w hw => (R.mem x _ hw.2).1)
+    exact ((R.holo x p j).contDiffOn
+      ((R.A.chart j).isOpen_inter_preimage_symm (R.isOpen_U x)).uniqueDiffOn).restrict_scalars ℝ
+  have hcomp :=
+    (hL : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) L.h _).comp hlift (fun w hw => (R.mem x _ hw.2).1)
   exact hcomp.log fun w hw => (L.pos _ (R.mem x _ hw.2).1).ne'
 
-private theorem exists_holo_re_eq_potOf_sub_on_overlap (R : AnLogRes P J e) (L : HermLine ι) (x x' y : R.X)
-    (hy : y ∈ R.U x ∩ R.U x') : ∃ W : Set R.X, IsOpen W ∧ y ∈ W ∧ ∃ G : R.X → ℂ,
-      R.A.HoloOn W G ∧ ∀ z ∈ W ∩ R.U x ∩ R.U x',
-        (potOf R L).φ x z - (potOf R L).φ x' z = (G z).re := by
+private theorem exists_holo_re_eq_potOf_sub_on_overlap
+    (R : AnLogRes P J e) (L : HermLine ι) (x x' y : R.X) (hy : y ∈ R.U x ∩ R.U x')
+    : ∃ W : Set R.X,
+      IsOpen W ∧ y ∈ W
+        ∧ ∃ G : R.X → ℂ,
+          R.A.HoloOn W G
+            ∧ ∀ z ∈ W ∩ R.U x ∩ R.U x', (potOf R L).φ x z - (potOf R L).φ x' z = (G z).re := by
   classical
   obtain ⟨c, hc, hxy⟩ := R.compat x x' y hy
   choose i hi using (R.mem x' y hy.2).1
@@ -67,8 +75,8 @@ private theorem exists_holo_re_eq_potOf_sub_on_overlap (R : AnLogRes P J e) (L :
       field_simp [hi k, hc k]
     simp only [Set.mem_preimage, this]
     exact Complex.one_mem_slitPlane
-  refine ⟨W, hW, hyW, fun z => ∑ k, (L.a k : ℂ) * (Complex.log (r k z) + (Real.log ‖c k‖ : ℂ)),
-    ?_, ?_⟩
+  refine
+    ⟨W, hW, hyW, fun z => ∑ k, (L.a k : ℂ) * (Complex.log (r k z) + (Real.log ‖c k‖ : ℂ)), ?_, ?_⟩
   · intro j w hw
     have hzV : (R.A.chart j).symm w ∈ R.U x ∩ R.U x' := hw.2.1
     have hzk := fun k => Set.mem_iInter.mp hw.2.2 k
@@ -105,8 +113,10 @@ private theorem exists_holo_re_eq_potOf_sub_on_overlap (R : AnLogRes P J e) (L :
       norm_div, Real.log_div (norm_ne_zero_iff.mpr (hc' k)) (norm_ne_zero_iff.mpr (hc k))]
     ring
 
-theorem isPotential_potOf (R : AnLogRes P J e) {L : HermLine ι} (hL : IsSmoothHerm L) :
-    IsPotential R.A (potOf R L) :=
-  ⟨smoothOn_potOf_of_isSmoothHerm R hL, fun x x' y hy => exists_holo_re_eq_potOf_sub_on_overlap R L x x' y hy⟩
+theorem isPotential_potOf (R : AnLogRes P J e) {L : HermLine ι} (hL : IsSmoothHerm L)
+    : IsPotential R.A (potOf R L) := ⟨
+  smoothOn_potOf_of_isSmoothHerm R hL,
+  fun x x' y hy => exists_holo_re_eq_potOf_sub_on_overlap R L x x' y hy
+⟩
 
 end ReciprocityTheory.ChartRestriction.G.Geo

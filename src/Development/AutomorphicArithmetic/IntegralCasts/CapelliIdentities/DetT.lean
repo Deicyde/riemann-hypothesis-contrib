@@ -13,8 +13,9 @@ private lemma detT {R : Type} [CommRing R] {r : ℕ} (M : Matrix (Fin r) (Fin r)
 
 end YgbHelp
 
-theorem UpperTheory.Reformulated.B.Ygb2.main :
-    ∀ {R : Type} [inst : CommRing R] {r n : ℕ} (B : Matrix (Fin r) (Fin n) R) (C : Matrix (Fin n) (Fin r) R),
+theorem UpperTheory.Reformulated.B.Ygb2.main
+    : ∀ {R : Type} [inst : CommRing R] {r n : ℕ} (B : Matrix (Fin r) (Fin n) R)
+        (C : Matrix (Fin n) (Fin r) R),
       (B * C).det = ∑ f : Fin r → Fin n, (∏ i : Fin r, B i (f i)) * (C.submatrix f id).det := by
   intro R inst r n B C
   rw [YgbHelp.detT]

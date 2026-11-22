@@ -15,15 +15,19 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LevelMapFinit
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
 namespace GlobalTheory.LevelMapField
 
-private theorem KA_mono_of_A_dvd {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
-    {l₀ l : Level H} (h : l₀.A ∣ l.A) : KA l₀ ≤ KA l := by
+private theorem KA_mono_of_A_dvd
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} {l₀ l : Level H} (h : l₀.A ∣ l.A)
+    : KA l₀ ≤ KA l := by
   unfold KA
   rw [IntermediateField.adjoin_le_iff]
   intro x hx
@@ -32,19 +36,37 @@ private theorem KA_mono_of_A_dvd {E : Type} [Field E] [NumberField E] [IsCMField
   · rw [GlobalTheory.LevelCover.zeta_dvd l.A_pos h]
     exact pow_mem (IntermediateField.subset_adjoin _ _ (by simp)) _
 
-private theorem M'_dvd_of_level_dvd {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
-    {l₀ l : Level H} (h : l₀.Dvd l) : l₀.M' ∣ l.M' := by
+private theorem M'_dvd_of_level_dvd
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {l₀ l : Level H} (h : l₀.Dvd l)
+    : l₀.M' ∣ l.M' := by
   unfold Level.Dvd at h
   unfold Level.M'
   exact Nat.lcm_dvd (h.1.trans (Nat.dvd_lcm_left _ _)) (h.2.2.trans (Nat.dvd_lcm_right _ _))
 
-private theorem M'_pos' {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
-    (l : Level H) : 0 < l.M' := by
+private theorem M'_pos'
+    {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (l : Level H)
+    : 0 < l.M' := by
   unfold Level.M'
   have h3 := l.three_le
   exact Nat.lcm_pos (by omega) l.A_pos
 
-theorem exists_levelMap : Out.Laws → Out.Laws2 → Out.Laws3 → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (Xo : ∀ l : Level H, Moduli D l), ToroidalLevelCompatibility (H := H) (D := D) → ∀ (l₀ l : Level H) (c : Coeff l) (o : Obj D l (baseKA l) (pullback.fst (Xo l).s (spMap (IntermediateField.inclusion c.le).toRingHom) ≫ (Xo l).s)) (_ : ObjMap o (Xo l).univ (pullback.fst _ _)), l₀.Dvd l → ∃ (k : KA l₀ →+* c.F) (r : (Xo l).XF c ⟶ (Xo l₀).X) (ν : SABMap o.t (Xo l₀).univ.t r) (hr : r ≫ (Xo l₀).s = pullback.snd _ _ ≫ spMap k), IsInc (KA l₀).val.toRingHom c.F.val.toRingHom k ∧ LevComp o (Xo l₀).univ r ν ∧ IsFinite (pullback.lift r _ hr) ∧ Etale (pullback.lift r _ hr) ∧ Surjective (pullback.lift r _ hr) := by
+theorem exists_levelMap
+    : Out.Laws → Out.Laws2 → Out.Laws3
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
+          (Xo : ∀ l : Level H, Moduli D l),
+        ToroidalLevelCompatibility (H := H) (D := D)
+          → ∀ (l₀ l : Level H) (c : Coeff l)
+              (o : Obj D l (baseKA l)
+                (pullback.fst (Xo l).s (spMap (IntermediateField.inclusion c.le).toRingHom)
+                  ≫ (Xo l).s))
+              (_ : ObjMap o (Xo l).univ (pullback.fst _ _)),
+            l₀.Dvd l
+              → ∃ (k : KA l₀ →+* c.F) (r : (Xo l).XF c ⟶ (Xo l₀).X)
+                  (ν : SABMap o.t (Xo l₀).univ.t r)
+                  (hr : r ≫ (Xo l₀).s = pullback.snd _ _ ≫ spMap k),
+                IsInc (KA l₀).val.toRingHom c.F.val.toRingHom k ∧ LevComp o (Xo l₀).univ r ν
+                  ∧ IsFinite (pullback.lift r _ hr) ∧ Etale (pullback.lift r _ hr)
+                  ∧ Surjective (pullback.lift r _ hr) := by
   intro _ _ _ E _ _ _ H D Xo hN l₀ l c o mo hd
   have hA : l₀.A ∣ l.A := by
     unfold Level.Dvd at hd
@@ -57,8 +79,9 @@ theorem exists_levelMap : Out.Laws → Out.Laws2 → Out.Laws3 → ∀ (E : Type
   obtain ⟨rF, h1, h2, hfin, het, hsurj, -⟩ := hF ⟨c.F, c.fin, c.conj, hz, hle⟩ c rfl
   have hid : spMap (IntermediateField.inclusion (le_refl c.F)).toRingHom = 𝟙 (Sp c.F) :=
     GlobalTheory.LevelCover.spMap_inclusion_self _
-  have hr : (rF ≫ pullback.fst _ _) ≫ (Xo l₀).s =
-      pullback.snd _ _ ≫ spMap (IntermediateField.inclusion hle).toRingHom := by
+  have hr
+      : (rF ≫ pullback.fst _ _) ≫ (Xo l₀).s
+        = pullback.snd _ _ ≫ spMap (IntermediateField.inclusion hle).toRingHom := by
     rw [Category.assoc, pullback.condition, ← Category.assoc, h2]
     erw [hid, Category.comp_id]
   have hlift : pullback.lift (rF ≫ pullback.fst _ _) (pullback.snd _ _) hr = rF := by
@@ -66,9 +89,19 @@ theorem exists_levelMap : Out.Laws → Out.Laws2 → Out.Laws3 → ∀ (E : Type
     · rw [pullback.lift_fst]
     · rw [pullback.lift_snd, h2]
       erw [hid, Category.comp_id]
-  obtain ⟨ν, hν⟩ := GlobalTheory.LevelCover.sab_comp mo.toSABMap m (e := rF ≫ pullback.fst _ _) h1.symm
-  refine ⟨(IntermediateField.inclusion hle).toRingHom, rF ≫ pullback.fst _ _, ν, hr,
-    fun x => rfl, ?_, ?_, ?_, ?_⟩
+  obtain ⟨ν, hν⟩ :=
+    GlobalTheory.LevelCover.sab_comp mo.toSABMap m (e := rF ≫ pullback.fst _ _) h1.symm
+  refine ⟨
+    (IntermediateField.inclusion hle).toRingHom,
+    rF ≫ pullback.fst _ _,
+    ν,
+    hr,
+    fun x => rfl,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · unfold LevComp
     refine ⟨fun a => ?_, fun a => ?_⟩
     · rw [hν, ← Category.assoc,

@@ -51,7 +51,8 @@ theorem MainStatements.WeightKernel.closedGraph : MainStatements.WeightKernel.Cl
   intro Ω I _ m u hbd hint
   choose M hM using hbd
   let Tf : lp (fun _ : I => ℂ) 1 → Ω → ℂ := fun a x => ∑' i, a i * u i x
-  have hTi : ∀ a : lp (fun _ : I => ℂ) 1, Integrable (Tf a) m := fun a => hint a (summable_norm_lp a)
+  have hTi : ∀ a : lp (fun _ : I => ℂ) 1, Integrable (Tf a) m := fun a =>
+    hint a (summable_norm_lp a)
   have hadd : ∀ a b : lp (fun _ : I => ℂ) 1, Tf (a + b) = Tf a + Tf b := by
     intro a b
     funext x
@@ -63,17 +64,18 @@ theorem MainStatements.WeightKernel.closedGraph : MainStatements.WeightKernel.Cl
     funext x
     simp only [Tf, lp.coeFn_smul, Pi.smul_apply, smul_eq_mul, mul_assoc]
     exact tsum_mul_left
-  let T : lp (fun _ : I => ℂ) 1 →ₗ[ℂ] Lp ℂ 1 m :=
-    { toFun := fun a => Integrable.toL1 (Tf a) (hTi a)
-      map_add' := by
-        intro a b
-        rw [← Integrable.toL1_add, Integrable.toL1_eq_toL1_iff]
-        exact Filter.Eventually.of_forall (congrFun (hadd a b))
-      map_smul' := by
-        intro c a
-        simp only [RingHom.id_apply]
-        rw [← Integrable.toL1_smul, Integrable.toL1_eq_toL1_iff]
-        exact Filter.Eventually.of_forall (congrFun (hsmul c a)) }
+  let T : lp (fun _ : I => ℂ) 1 →ₗ[ℂ] Lp ℂ 1 m := {
+    toFun := fun a => Integrable.toL1 (Tf a) (hTi a)
+    map_add' := by
+      intro a b
+      rw [← Integrable.toL1_add, Integrable.toL1_eq_toL1_iff]
+      exact Filter.Eventually.of_forall (congrFun (hadd a b))
+    map_smul' := by
+      intro c a
+      simp only [RingHom.id_apply]
+      rw [← Integrable.toL1_smul, Integrable.toL1_eq_toL1_iff]
+      exact Filter.Eventually.of_forall (congrFun (hsmul c a))
+  }
   have hTapp : ∀ a, T a = Integrable.toL1 (Tf a) (hTi a) := fun a => rfl
   have hcont : Continuous T := by
     refine T.continuous_of_seq_closed_graph fun s a y hs hy => ?_
@@ -120,6 +122,8 @@ theorem MainStatements.WeightKernel.closedGraph : MainStatements.WeightKernel.Cl
     rw [lp.norm_single (by norm_num)]
     simp
   rw [← hn]
-  calc ‖T e‖ = ‖T' e‖ := rfl
+  calc
+    ‖T e‖
+      = ‖T' e‖ := rfl
     _ ≤ ‖T'‖ * ‖e‖ := hle
     _ = ‖T'‖ := by rw [he, mul_one]

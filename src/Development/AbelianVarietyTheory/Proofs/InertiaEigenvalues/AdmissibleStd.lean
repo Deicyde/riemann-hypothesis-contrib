@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.GoodCoe
 
 noncomputable section
 
-open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps
+  Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
 open Formalism.MainNotions.N (twistRep coefRep)
 open Formalism.GaloisCohomology (scalRep)
 open TensorProduct
@@ -21,34 +22,43 @@ namespace GlobalTheory.TopSteps.StdAdm
 section Alg
 
 variable {O G : Type} [CommRing O] [Group G]
-variable {M N P : Type} [AddCommGroup M] [Module O M] [AddCommGroup N] [Module O N] [AddCommGroup P] [Module O P]
+variable
+  {M N P : Type}
+  [AddCommGroup M] [Module O M] [AddCommGroup N] [Module O N] [AddCommGroup P] [Module O P]
 
-def asModuleIso (π : Representation O G M) (π' : Representation O G N) (e : M ≃ₗ[O] N)
-    (he : ∀ g x, e (π g x) = π' g (e x)) : π.asModule ≃ₗ[MonoidAlgebra O G] π'.asModule :=
-  { (π.asModuleEquiv.trans (e.trans π'.asModuleEquiv.symm)).toAddEquiv with
-    map_smul' := fun r x => by
-      apply π'.asModuleEquiv.injective
-      change e (π.asModuleEquiv (r • x)) = π'.asModuleEquiv (r • π'.asModuleEquiv.symm (e (π.asModuleEquiv x)))
-      rw [Representation.asModuleEquiv_map_smul, Representation.asModuleEquiv_map_smul,
-        LinearEquiv.apply_symm_apply]
-      induction r using MonoidAlgebra.induction_on with
-      | of g => simp [he]
-      | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, ha, hb]
-      | smul c a ha => simp only [map_smul, LinearMap.smul_apply, ha] }
+def asModuleIso
+    (π : Representation O G M) (π' : Representation O G N) (e : M ≃ₗ[O] N)
+    (he : ∀ g x, e (π g x) = π' g (e x))
+    : π.asModule ≃ₗ[MonoidAlgebra O G] π'.asModule := {
+  (π.asModuleEquiv.trans (e.trans π'.asModuleEquiv.symm)).toAddEquiv with
+  map_smul' := fun r x => by
+    apply π'.asModuleEquiv.injective
+    change e (π.asModuleEquiv (r • x))
+      = π'.asModuleEquiv (r • π'.asModuleEquiv.symm (e (π.asModuleEquiv x)))
+    rw [Representation.asModuleEquiv_map_smul, Representation.asModuleEquiv_map_smul,
+      LinearEquiv.apply_symm_apply]
+    induction r using MonoidAlgebra.induction_on with
+    | of g => simp [he]
+    | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, ha, hb]
+    | smul c a ha => simp only [map_smul, LinearMap.smul_apply, ha]
+}
 
-theorem sameSS_of_equiv {π₀ : Representation O G P} {π : Representation O G M} {π' : Representation O G N}
-    (h : SameSS π₀ π) (e : M ≃ₗ[O] N) (he : ∀ g x, e (π g x) = π' g (e x)) : SameSS π₀ π' := by
+theorem sameSS_of_equiv
+    {π₀ : Representation O G P} {π : Representation O G M} {π' : Representation O G N}
+    (h : SameSS π₀ π)
+    (e : M ≃ₗ[O] N) (he : ∀ g x, e (π g x) = π' g (e x))
+    : SameSS π₀ π' := by
   have hf : IsFiniteLength (MonoidAlgebra O G) π.asModule := by
     obtain ⟨_, t, _, _, h3, h4, _⟩ := h
     exact isFiniteLength_iff_exists_compositionSeries.mpr ⟨t, h3, h4⟩
   exact SameFactors.trans h (SameFactors.of_equiv hf (asModuleIso π π' e he))
 
-theorem exists_modRep_equiv (π : Representation O G M) (π' : Representation O G N) (c : O) (p : M →ₗ[O] N)
+theorem exists_modRep_equiv
+    (π : Representation O G M) (π' : Representation O G N) (c : O) (p : M →ₗ[O] N)
     (hp : Function.Surjective p) (hk : ∀ x, p x = 0 ↔ x ∈ c • (⊤ : Submodule O M))
-    (hg : ∀ g x, p (π g x) = π' g (p x)) :
-    ∃ e : QuotSMulTop c M ≃ₗ[O] N, ∀ g x, e (modRep π c g x) = π' g (e x) := by
-  have hker : c • (⊤ : Submodule O M) = LinearMap.ker p := by
-    ext x; rw [LinearMap.mem_ker, hk]
+    (hg : ∀ g x, p (π g x) = π' g (p x))
+    : ∃ e : QuotSMulTop c M ≃ₗ[O] N, ∀ g x, e (modRep π c g x) = π' g (e x) := by
+  have hker : c • (⊤ : Submodule O M) = LinearMap.ker p := by ext x; rw [LinearMap.mem_ker, hk]
   refine ⟨(Submodule.quotEquivOfEq _ _ hker).trans (p.quotKerEquivOfSurjective hp), fun g x => ?_⟩
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   exact hg g x
@@ -61,8 +71,8 @@ theorem finite_tensor [Module.Finite O M] [Finite N] : Finite (M ⊗[O] N) := by
   have h2 : Finite (N ⊗[O] M) := Finite.of_surjective _ (LinearMap.lTensor_surjective N hf)
   exact Finite.of_equiv _ (TensorProduct.comm O N M).toEquiv
 
-theorem lTensor_coefRep (W : Representation O G M) (f : N →ₗ[O] P) (g : G) (m : M ⊗[O] N) :
-    f.lTensor M (coefRep W N g m) = coefRep W P g (f.lTensor M m) := by
+theorem lTensor_coefRep (W : Representation O G M) (f : N →ₗ[O] P) (g : G) (m : M ⊗[O] N)
+    : f.lTensor M (coefRep W N g m) = coefRep W P g (f.lTensor M m) := by
   induction m using TensorProduct.induction_on with
   | zero => simp
   | tmul a x => simp [coefRep_tmul]
@@ -72,13 +82,18 @@ end Alg
 
 section Lat
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Type} [Field Qp] [Field LL] [Algebra Qp LL]
-  [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp LL O : Type}
+  [Field Qp] [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
 
-theorem finite_lat (T : LocLat G Qp LL O) : Module.Finite O ↥T.L.T := Module.Finite.iff_fg.mpr T.L.fg
+theorem finite_lat (T : LocLat G Qp LL O) : Module.Finite O ↥T.L.T :=
+  Module.Finite.iff_fg.mpr T.L.fg
 
-def prodSubEquiv {R A B : Type} [Ring R] [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
-    (p : Submodule R A) (q : Submodule R B) : ↥(p.prod q) ≃ₗ[R] (↥p × ↥q) where
+def prodSubEquiv
+    {R A B : Type} [Ring R] [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
+    (p : Submodule R A) (q : Submodule R B)
+    : ↥(p.prod q) ≃ₗ[R] (↥p × ↥q) where
   toFun x := (⟨x.1.1, x.2.1⟩, ⟨x.1.2, x.2.2⟩)
   invFun y := ⟨(y.1.1, y.2.1), y.1.2, y.2.2⟩
   map_add' _ _ := rfl
@@ -90,38 +105,43 @@ def prodLat (T T' : LocLat G Qp LL O) : LocLat G Qp LL O where
   V := T.V × T'.V
   ρ := T.ρ.prod T'.ρ
   cont := fun x => (T.cont x.1).prodMk (T'.cont x.2)
-  L :=
-    { T := T.L.T.prod T'.L.T
-      stable := fun g x hx => ⟨T.L.stable g _ hx.1, T'.L.stable g _ hx.2⟩
-      fg := T.L.fg.prod T'.L.fg
-      free := by
-        have := T.L.free
-        have := T'.L.free
-        exact Module.Free.of_equiv (prodSubEquiv T.L.T T'.L.T).symm
-      span := by
-        rw [eq_top_iff]
-        rintro ⟨x, y⟩ -
-        have hx : x ∈ Submodule.span LL (T.L.T : Set T.V) := by rw [T.L.span]; trivial
-        have hy : y ∈ Submodule.span LL (T'.L.T : Set T'.V) := by rw [T'.L.span]; trivial
-        have h1 := Submodule.mem_map_of_mem (f := LinearMap.inl LL T.V T'.V) hx
-        have h2 := Submodule.mem_map_of_mem (f := LinearMap.inr LL T.V T'.V) hy
-        rw [Submodule.map_span] at h1 h2
-        have h3 : (x, y) = LinearMap.inl LL T.V T'.V x + LinearMap.inr LL T.V T'.V y := by simp
-        rw [h3]
-        refine Submodule.add_mem _ (Submodule.span_mono ?_ h1) (Submodule.span_mono ?_ h2)
-        · rintro _ ⟨a, ha, rfl⟩; exact ⟨ha, Submodule.zero_mem _⟩
-        · rintro _ ⟨a, ha, rfl⟩; exact ⟨Submodule.zero_mem _, ha⟩ }
+  L := {
+    T := T.L.T.prod T'.L.T
+    stable := fun g x hx => ⟨T.L.stable g _ hx.1, T'.L.stable g _ hx.2⟩
+    fg := T.L.fg.prod T'.L.fg
+    free := by
+      have := T.L.free
+      have := T'.L.free
+      exact Module.Free.of_equiv (prodSubEquiv T.L.T T'.L.T).symm
+    span := by
+      rw [eq_top_iff]
+      rintro ⟨x, y⟩ -
+      have hx : x ∈ Submodule.span LL (T.L.T : Set T.V) := by rw [T.L.span]; trivial
+      have hy : y ∈ Submodule.span LL (T'.L.T : Set T'.V) := by rw [T'.L.span]; trivial
+      have h1 := Submodule.mem_map_of_mem (f := LinearMap.inl LL T.V T'.V) hx
+      have h2 := Submodule.mem_map_of_mem (f := LinearMap.inr LL T.V T'.V) hy
+      rw [Submodule.map_span] at h1 h2
+      have h3 : (x, y) = LinearMap.inl LL T.V T'.V x + LinearMap.inr LL T.V T'.V y := by simp
+      rw [h3]
+      refine Submodule.add_mem _ (Submodule.span_mono ?_ h1) (Submodule.span_mono ?_ h2)
+      · rintro _ ⟨a, ha, rfl⟩; exact ⟨ha, Submodule.zero_mem _⟩
+      · rintro _ ⟨a, ha, rfl⟩; exact ⟨Submodule.zero_mem _, ha⟩
+  }
 
 def prodLatEquiv (T T' : LocLat G Qp LL O) : ↥(prodLat T T').L.T ≃ₗ[O] (↥T.L.T × ↥T'.L.T) :=
   prodSubEquiv T.L.T T'.L.T
 
-theorem prodLatEquiv_act (T T' : LocLat G Qp LL O) (g : G) (x : ↥(prodLat T T').L.T) :
-    prodLatEquiv T T' (latRep (prodLat T T').L g x) =
-      (latRep T.L g (prodLatEquiv T T' x).1, latRep T'.L g (prodLatEquiv T T' x).2) := rfl
+theorem prodLatEquiv_act (T T' : LocLat G Qp LL O) (g : G) (x : ↥(prodLat T T').L.T)
+    : prodLatEquiv T T' (latRep (prodLat T T').L g x)
+      = (latRep T.L g (prodLatEquiv T T' x).1, latRep T'.L g (prodLatEquiv T T' x).2) :=
+  rfl
 
-def kerLattice [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL] (T : LocLat G Qp LL O) {M : Type}
-    [AddCommGroup M] [Module O M] [Finite M] (π : Representation O G M) (p : ↥T.L.T →ₗ[O] M)
-    (hg : ∀ g x, p (latRep T.L g x) = π g (p x)) : Lattice (O := O) T.ρ where
+def kerLattice
+    [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL]
+    (T : LocLat G Qp LL O)
+    {M : Type} [AddCommGroup M] [Module O M] [Finite M]
+    (π : Representation O G M) (p : ↥T.L.T →ₗ[O] M) (hg : ∀ g x, p (latRep T.L g x) = π g (p x))
+    : Lattice (O := O) T.ρ where
   T := (LinearMap.ker p).map T.L.T.subtype
   stable := by
     rintro g _ ⟨x, hx, rfl⟩
@@ -148,10 +168,11 @@ def kerLattice [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL] (T : LocLat G
     have h2 := Submodule.smul_mem _ ((Nat.card M : ℕ) : LL)⁻¹ (Submodule.subset_span (R := LL) h1)
     rwa [← Nat.cast_smul_eq_nsmul LL, inv_smul_smul₀ hn] at h2
 
-theorem twistRep_charRep (χ θ : G →* Oˣ) :
-    twistRep (charRep (chiLL LL χ)) (chiLL LL θ) = charRep (chiLL LL (χ * θ)) := by
+theorem twistRep_charRep (χ θ : G →* Oˣ)
+    : twistRep (charRep (chiLL LL χ)) (chiLL LL θ) = charRep (chiLL LL (χ * θ)) := by
   ext g
-  change algebraMap O LL (θ g) • (algebraMap O LL (χ g) • (1 : LL)) = algebraMap O LL (χ g * θ g) • (1 : LL)
+  change algebraMap O LL (θ g) • (algebraMap O LL (χ g) • (1 : LL))
+    = algebraMap O LL (χ g * θ g) • (1 : LL)
   simp [mul_comm]
 
 end Lat
@@ -164,40 +185,53 @@ theorem block_succ (w : ℤ) (k : ℕ) : block w (k + 1) = block w k + {w + k} :
 
 section Per
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {n : ℕ} {emb : ZMod n → (K₀ →ₐ[Qp] LL)}
-    {Γ : GalData G Qp LL O}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {n : ℕ} {emb : ZMod n → (K₀ →ₐ[Qp] LL)} {Γ : GalData G Qp LL O}
 
-def SumRule (PD : PeriodData G Qp K₀ K B BdR) (emb : ZMod n → (K₀ →ₐ[Qp] LL)) (O : Type) [CommRing O]
-    [Algebra O LL] : Prop :=
+def SumRule
+    (PD : PeriodData G Qp K₀ K B BdR) (emb : ZMod n → (K₀ →ₐ[Qp] LL))
+    (O : Type) [CommRing O] [Algebra O LL]
+    : Prop :=
   ∀ (T T' T'' : LocLat G Qp LL O) (U U' : ZMod n → Multiset ℤ) (e : T''.V ≃ₗ[LL] (T.V × T'.V)),
-    (∀ σ x, e (T''.ρ σ x) = (T.ρ σ (e x).1, T'.ρ σ (e x).2)) → CrysWith PD emb T.ρ U →
-    CrysWith PD emb T'.ρ U' → CrysWith PD emb T''.ρ (fun i => U i + U' i)
+    (∀ σ x, e (T''.ρ σ x) = (T.ρ σ (e x).1, T'.ρ σ (e x).2)) → CrysWith PD emb T.ρ U
+      → CrysWith PD emb T'.ρ U'
+      → CrysWith PD emb T''.ρ (fun i => U i + U' i)
 
-def TwistRule (PD : PeriodData G Qp K₀ K B BdR) (emb : ZMod n → (K₀ →ₐ[Qp] LL)) (O : Type) [CommRing O]
-    [Algebra O LL] : Prop :=
+def TwistRule
+    (PD : PeriodData G Qp K₀ K B BdR) (emb : ZMod n → (K₀ →ₐ[Qp] LL))
+    (O : Type) [CommRing O] [Algebra O LL]
+    : Prop :=
   ∀ (T : LocLat G Qp LL O) (U : ZMod n → Multiset ℤ) (θ : G →* Oˣ) (a : ZMod n → ℤ),
-    CrysWith PD emb T.ρ U → IsCrysChar PD emb θ a →
-    CrysWith PD emb (twistRep T.ρ (chiLL LL θ)) (fun i => (U i).map (· + a i)) ∧
-    IsCrysChar PD emb θ⁻¹ (fun i => -a i)
+    CrysWith PD emb T.ρ U → IsCrysChar PD emb θ a
+      → CrysWith PD emb (twistRep T.ρ (chiLL LL θ)) (fun i => (U i).map (· + a i))
+        ∧ IsCrysChar PD emb θ⁻¹ (fun i => - a i)
 
-def QuotSum (PD : PeriodData G Qp K₀ K B BdR) (emb : ZMod n → (K₀ →ₐ[Qp] LL)) (Γ : GalData G Qp LL O) (t : ℕ)
-    (Ut : ZMod n → Multiset ℤ) : Prop :=
+def QuotSum
+    (PD : PeriodData G Qp K₀ K B BdR) (emb : ZMod n → (K₀ →ₐ[Qp] LL)) (Γ : GalData G Qp LL O)
+    (t : ℕ) (Ut : ZMod n → Multiset ℤ)
+    : Prop :=
   ∀ (M M' : Type) [AddCommGroup M] [Module O M] [AddCommGroup M'] [Module O M']
-    (π : Representation O G M) (π' : Representation O G M'),
-    (∀ f : M →ₗ[O] M', (∀ σ x, f (π σ x) = π' σ (f x)) →
-      Function.Surjective f → Admissible PD emb Γ t Ut π → Admissible PD emb Γ t Ut π') ∧
-    (Admissible PD emb Γ t Ut π → Admissible PD emb Γ t Ut π' → Admissible PD emb Γ t Ut (π.prod π'))
+      (π : Representation O G M) (π' : Representation O G M'),
+    (∀ f : M →ₗ[O] M',
+        (∀ σ x, f (π σ x) = π' σ (f x)) → Function.Surjective f → Admissible PD emb Γ t Ut π
+          → Admissible PD emb Γ t Ut π')
+      ∧ (Admissible PD emb Γ t Ut π → Admissible PD emb Γ t Ut π'
+        → Admissible PD emb Γ t Ut (π.prod π'))
 
-theorem isCrysChar_chi [IsTopologicalRing LL] (hinj : Function.Injective (algebraMap O LL))
-    (htw : TwistRule PD emb O) {w : ZMod n → ℤ} (h1 : IsCrysChar PD emb Γ.χ₁ w)
-    (hε : IsCrysChar PD emb Γ.ε (fun _ => -1)) (c : ℕ) :
-    IsCrysChar PD emb (Γ.chi (c + 1)) (fun i => w i + c) := by
+theorem isCrysChar_chi
+    [IsTopologicalRing LL]
+    (hinj : Function.Injective (algebraMap O LL)) (htw : TwistRule PD emb O)
+    {w : ZMod n → ℤ} (h1 : IsCrysChar PD emb Γ.χ₁ w)
+    (hε : IsCrysChar PD emb Γ.ε (fun _ => -1)) (c : ℕ)
+    : IsCrysChar PD emb (Γ.chi (c + 1)) (fun i => w i + c) := by
   induction c with
   | zero => simpa using h1
   | succ c ih =>
@@ -208,19 +242,26 @@ theorem isCrysChar_chi [IsTopologicalRing LL] (hinj : Function.Injective (algebr
     · refine (ih.1.mul hinv.1).congr fun g => ?_
       simp only [Pi.mul_apply, MonoidHom.mul_apply, Units.val_mul, map_mul]
     · have h' : CrysWith PD emb (twistRep (charRep (chiLL LL (Γ.chi (c + 1)))) (chiLL LL Γ.ε⁻¹))
-        (fun i => ({w i + c} : Multiset ℤ).map (· + -(-1))) := h
+          (fun i => ({w i + c} : Multiset ℤ).map (· + -(-1))) :=
+        h
       rw [twistRep_charRep] at h'
       simpa [add_assoc] using h'
 
-theorem exists_sum [IsTopologicalRing LL] (hinj : Function.Injective (algebraMap O LL))
-    (hsum : SumRule PD emb O) {U : ZMod n → Multiset ℤ} {w : ZMod n → ℤ} (h0 : CrysWith PD emb Γ.T₀.ρ U)
-    (hχ : ∀ c : ℕ, IsCrysChar PD emb (Γ.chi (c + 1)) (fun i => w i + c)) (k : ℕ) :
-    ∃ (T : LocLat G Qp LL O) (e : ↥T.L.T ≃ₗ[O] (↥Γ.T₀.L.T × (Fin k → O))),
-      CrysWith PD emb T.ρ (fun i => U i + block (w i) k) ∧
-      ∀ g x, e (latRep T.L g x) = (Γ.W₀ g (e x).1, fun c : Fin k => Γ.Wchi (c.val + 1) g ((e x).2 c)) := by
+theorem exists_sum
+    [IsTopologicalRing LL]
+    (hinj : Function.Injective (algebraMap O LL)) (hsum : SumRule PD emb O)
+    {U : ZMod n → Multiset ℤ} {w : ZMod n → ℤ} (h0 : CrysWith PD emb Γ.T₀.ρ U)
+    (hχ : ∀ c : ℕ, IsCrysChar PD emb (Γ.chi (c + 1)) (fun i => w i + c))
+    (k : ℕ)
+    : ∃ (T : LocLat G Qp LL O) (e : ↥T.L.T ≃ₗ[O] (↥Γ.T₀.L.T × (Fin k → O))),
+      CrysWith PD emb T.ρ (fun i => U i + block (w i) k)
+        ∧ ∀ g x,
+          e (latRep T.L g x)
+            = (Γ.W₀ g (e x).1, fun c : Fin k => Γ.Wchi (c.val + 1) g ((e x).2 c)) := by
   induction k with
   | zero =>
-    refine ⟨Γ.T₀, (LinearEquiv.prodUnique).symm, ?_, fun g x => Prod.ext rfl (Subsingleton.elim _ _)⟩
+    refine
+      ⟨Γ.T₀, (LinearEquiv.prodUnique).symm, ?_, fun g x => Prod.ext rfl (Subsingleton.elim _ _)⟩
     simpa [block] using h0
   | succ k ih =>
     obtain ⟨T, e, hT, he⟩ := ih
@@ -232,21 +273,30 @@ theorem exists_sum [IsTopologicalRing LL] (hinj : Function.Injective (algebraMap
       obtain ⟨a, rfl⟩ := e₁'.surjective y
       rw [LinearEquiv.symm_apply_eq, LinearEquiv.symm_apply_apply]
       exact (he₁ g a).symm
-    let s : ((↥Γ.T₀.L.T × (Fin k → O)) × O) ≃ₗ[O] (↥Γ.T₀.L.T × (Fin (k + 1) → O)) :=
-      { toFun := fun x => (x.1.1, Fin.snoc (α := fun _ => O) x.1.2 x.2)
-        invFun := fun y => ((y.1, Fin.init y.2), y.2 (Fin.last k))
-        map_add' := fun a b => Prod.ext rfl (by
-          funext c; refine Fin.lastCases ?_ (fun c => ?_) c <;> simp)
-        map_smul' := fun a b => Prod.ext rfl (by
-          funext c; refine Fin.lastCases ?_ (fun c => ?_) c <;> simp)
-        left_inv := fun x => by simp
-        right_inv := fun y => by simp }
-    refine ⟨prodLat T C, (prodLatEquiv T C).trans ((e.prodCongr e₁'.symm).trans s), ?_, fun g x => ?_⟩
+    let s : ((↥Γ.T₀.L.T × (Fin k → O)) × O) ≃ₗ[O] (↥Γ.T₀.L.T × (Fin (k + 1) → O)) := {
+      toFun := fun x => (x.1.1, Fin.snoc (α := fun _ => O) x.1.2 x.2)
+      invFun := fun y => ((y.1, Fin.init y.2), y.2 (Fin.last k))
+      map_add' := fun a b =>
+        Prod.ext rfl (by funext c; refine Fin.lastCases ?_ (fun c => ?_) c <;> simp)
+      map_smul' := fun a b =>
+        Prod.ext rfl (by funext c; refine Fin.lastCases ?_ (fun c => ?_) c <;> simp)
+      left_inv := fun x => by simp
+      right_inv := fun y => by simp
+    }
+    refine
+      ⟨prodLat T C, (prodLatEquiv T C).trans ((e.prodCongr e₁'.symm).trans s), ?_, fun g x => ?_⟩
     · have h := hsum T C (prodLat T C) _ _ (LinearEquiv.refl _ _) (fun _ _ => rfl) hT (hχ k).2
       simpa only [block_succ, add_assoc] using h
-    · change s (e (latRep T.L g (prodLatEquiv T C x).1), e₁'.symm (latRep C.L g (prodLatEquiv T C x).2)) =
-        (Γ.W₀ g (e (prodLatEquiv T C x).1).1, fun c : Fin (k + 1) => Γ.Wchi (c.val + 1) g
-          (Fin.snoc (α := fun _ => O) (e (prodLatEquiv T C x).1).2 (e₁'.symm (prodLatEquiv T C x).2) c))
+    · change s
+          (e (latRep T.L g (prodLatEquiv T C x).1), e₁'.symm (latRep C.L g (prodLatEquiv T C x).2))
+        = (
+          Γ.W₀ g (e (prodLatEquiv T C x).1).1,
+          fun c : Fin (k + 1) =>
+            Γ.Wchi (c.val + 1) g
+              (Fin.snoc
+                (α := fun _ => O)
+                (e (prodLatEquiv T C x).1).2 (e₁'.symm (prodLatEquiv T C x).2) c)
+        )
       rw [he, he₁']
       refine Prod.ext rfl ?_
       funext c
@@ -255,15 +305,20 @@ theorem exists_sum [IsTopologicalRing LL] (hinj : Function.Injective (algebraMap
       · simp only [Fin.snoc_last, Fin.val_last]
       · simp only [Fin.snoc_castSucc, Fin.val_castSucc]
 
-theorem full_of_equiv [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O LL] (hlam : Irreducible Γ.lam)
-    {t : ℕ} {Ut : ZMod n → Multiset ℤ} (T : LocLat G Qp LL O) (e : ↥T.L.T ≃ₗ[O] (↥Γ.T₀.L.T × (Fin t → O)))
+theorem full_of_equiv
+    [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O LL]
+    (hlam : Irreducible Γ.lam)
+    {t : ℕ} {Ut : ZMod n → Multiset ℤ}
+    (T : LocLat G Qp LL O) (e : ↥T.L.T ≃ₗ[O] (↥Γ.T₀.L.T × (Fin t → O)))
     (hT : CrysWith PD emb T.ρ Ut)
-    (he : ∀ g x, e (latRep T.L g x) = (Γ.W₀ g (e x).1, fun c : Fin t => Γ.Wchi (c.val + 1) g ((e x).2 c))) :
-    Full PD emb Γ t Ut T := by
+    (he : ∀ g x,
+      e (latRep T.L g x) = (Γ.W₀ g (e x).1, fun c : Fin t => Γ.Wchi (c.val + 1) g ((e x).2 c)))
+    : Full PD emb Γ t Ut T := by
   refine ⟨hT, fun L => ?_⟩
   let p : ↥T.L.T →ₗ[O] (QuotSMulTop Γ.lam ↥Γ.T₀.L.T × (Fin t → QuotSMulTop Γ.lam O)) :=
     ((Submodule.mkQ _).prodMap ((Submodule.mkQ _).compLeft (Fin t))).comp e.toLinearMap
-  have hp : ∀ x, p x = (Submodule.Quotient.mk (e x).1, fun c => Submodule.Quotient.mk ((e x).2 c)) :=
+  have hp
+      : ∀ x, p x = (Submodule.Quotient.mk (e x).1, fun c => Submodule.Quotient.mk ((e x).2 c)) :=
     fun _ => rfl
   refine (exists_modRep_equiv (latRep T.L) (Γ.refRep t) Γ.lam p ?_ ?_ ?_).elim fun f hf =>
     sameSS_of_equiv (reduction_sameSS_of_lattices T.ρ L T.L Γ.lam hlam) f hf
@@ -290,22 +345,30 @@ theorem full_of_equiv [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O
     rw [hp, hp, he]
     rfl
 
-theorem admissible_of_surjective [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL] {t : ℕ}
-    {Ut : ZMod n → Multiset ℤ} {T : LocLat G Qp LL O} (hT : Full PD emb Γ t Ut T) {M : Type}
-    [AddCommGroup M] [Module O M] [Finite M] (π : Representation O G M) (p : ↥T.L.T →ₗ[O] M)
-    (hp : Function.Surjective p) (hg : ∀ g x, p (latRep T.L g x) = π g (p x)) : Admissible PD emb Γ t Ut π := by
-  refine ⟨‹_›, 1, T, hT.sumFull, kerLattice T π p hg, p, ?_, hp, hg, fun x => ⟨fun h => ⟨x, h, rfl⟩, ?_⟩⟩
+theorem admissible_of_surjective
+    [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL]
+    {t : ℕ} {Ut : ZMod n → Multiset ℤ} {T : LocLat G Qp LL O} (hT : Full PD emb Γ t Ut T)
+    {M : Type} [AddCommGroup M] [Module O M] [Finite M]
+    (π : Representation O G M) (p : ↥T.L.T →ₗ[O] M)
+    (hp : Function.Surjective p) (hg : ∀ g x, p (latRep T.L g x) = π g (p x))
+    : Admissible PD emb Γ t Ut π := by
+  refine
+    ⟨‹_›, 1, T, hT.sumFull, kerLattice T π p hg, p, ?_, hp, hg, fun x => ⟨fun h => ⟨x, h, rfl⟩, ?_⟩⟩
   · rintro _ ⟨x, -, rfl⟩
     exact x.2
   · rintro ⟨y, hy, hxy⟩
     obtain rfl : y = x := Subtype.ext hxy
     exact hy
 
-theorem admissible_coefRep [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL] {t : ℕ}
-    {Ut : ZMod n → Multiset ℤ} (hc : QuotSum PD emb Γ t Ut) {T : LocLat G Qp LL O} (hT : Full PD emb Γ t Ut T)
-    {M : Type} [AddCommGroup M] [Module O M] (W : Representation O G M) (q : ↥T.L.T →ₗ[O] M)
+theorem admissible_coefRep
+    [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL]
+    {t : ℕ} {Ut : ZMod n → Multiset ℤ} (hc : QuotSum PD emb Γ t Ut)
+    {T : LocLat G Qp LL O} (hT : Full PD emb Γ t Ut T)
+    {M : Type} [AddCommGroup M] [Module O M]
+    (W : Representation O G M) (q : ↥T.L.T →ₗ[O] M)
     (hq : Function.Surjective q) (hg : ∀ g x, q (latRep T.L g x) = W g (q x))
-    (X : Type) [AddCommGroup X] [Module O X] [Finite X] : Admissible PD emb Γ t Ut (coefRep W X) := by
+    (X : Type) [AddCommGroup X] [Module O X] [Finite X]
+    : Admissible PD emb Γ t Ut (coefRep W X) := by
   have := finite_lat T
   have : Module.Finite O M := Module.Finite.of_surjective q hq
   have key : ∀ (N : Submodule O X), N.FG → Admissible PD emb Γ t Ut (coefRep W ↥N) := by
@@ -333,11 +396,13 @@ theorem admissible_coefRep [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL] {
         change q (latRep T.L g y) ⊗ₜ[O] x' = coefRep W _ g (q y ⊗ₜ[O] x')
         rw [hg, coefRep_tmul]
     | sup N₁ N₂ _ _ h₁ h₂ =>
-      refine (hc _ _ _ _).1 (((Submodule.inclusion (le_sup_left : N₁ ≤ N₁ ⊔ N₂)).lTensor M).coprod
-        ((Submodule.inclusion (le_sup_right : N₂ ≤ N₁ ⊔ N₂)).lTensor M)) ?_ ?_ ((hc _ _ _ _).2 h₁ h₂)
+      refine (hc _ _ _ _).1
+        (((Submodule.inclusion (le_sup_left : N₁ ≤ N₁ ⊔ N₂)).lTensor M).coprod
+          ((Submodule.inclusion (le_sup_right : N₂ ≤ N₁ ⊔ N₂)).lTensor M))
+        ?_ ?_ ((hc _ _ _ _).2 h₁ h₂)
       · rintro g ⟨a, b⟩
-        change LinearMap.lTensor M _ (coefRep W _ g a) + LinearMap.lTensor M _ (coefRep W _ g b) =
-          coefRep W _ g (LinearMap.lTensor M _ a + LinearMap.lTensor M _ b)
+        change LinearMap.lTensor M _ (coefRep W _ g a) + LinearMap.lTensor M _ (coefRep W _ g b)
+          = coefRep W _ g (LinearMap.lTensor M _ a + LinearMap.lTensor M _ b)
         rw [lTensor_coefRep, lTensor_coefRep, map_add (f := _)]
       · intro y
         induction y using TensorProduct.induction_on with
@@ -356,24 +421,32 @@ theorem admissible_coefRep [IsDomain O] [IsPrincipalIdealRing O] [CharZero LL] {
   exact (hc _ _ _ _).1 ((⊤ : Submodule O X).subtype.lTensor M) (lTensor_coefRep W _)
     (LinearMap.lTensor_surjective M fun x => ⟨⟨x, trivial⟩, rfl⟩) (key ⊤ Module.Finite.fg_top)
 
-theorem admissible_std [IsTopologicalRing LL] [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O LL]
-    [CharZero LL] (hlam : Irreducible Γ.lam) {r : ℕ} {D : TopData n r} (hD : IsTopGal PD emb D Γ)
+theorem admissible_std
+    [IsTopologicalRing LL] [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O LL]
+    [CharZero LL]
+    (hlam : Irreducible Γ.lam)
+    {r : ℕ} {D : TopData n r} (hD : IsTopGal PD emb D Γ)
     (hsum : SumRule PD emb O) (htw : TwistRule PD emb O) (hε : IsCrysChar PD emb Γ.ε (fun _ => -1))
-    (hc : QuotSum PD emb Γ D.t D.Ut) :
-    (∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X], Admissible PD emb Γ D.t D.Ut (coefRep Γ.W₀ X)) ∧
-    ∀ c : ℕ, 1 ≤ c → c ≤ D.t → ∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X],
-      Admissible PD emb Γ D.t D.Ut (coefRep (Γ.Wchi c) X) := by
+    (hc : QuotSum PD emb Γ D.t D.Ut)
+    : (∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X],
+        Admissible PD emb Γ D.t D.Ut (coefRep Γ.W₀ X))
+      ∧ ∀ c : ℕ,
+        1 ≤ c → c ≤ D.t
+          → ∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X],
+            Admissible PD emb Γ D.t D.Ut (coefRep (Γ.Wchi c) X) := by
   have hinj := IsFractionRing.injective O LL
   obtain ⟨T, e, hT, he⟩ := exists_sum hinj hsum hD.2.1 (isCrysChar_chi hinj htw hD.2.2.1 hε) D.t
   have hF : Full PD emb Γ D.t D.Ut T := full_of_equiv hlam T e hT he
-  refine ⟨fun X _ _ _ => admissible_coefRep hc hF _ ((LinearMap.fst O _ _).comp e.toLinearMap) ?_ ?_ X,
-    fun c h1 h2 X _ _ _ => ?_⟩
+  refine ⟨
+    fun X _ _ _ => admissible_coefRep hc hF _ ((LinearMap.fst O _ _).comp e.toLinearMap) ?_ ?_ X,
+    fun c h1 h2 X _ _ _ => ?_
+  ⟩
   · exact Prod.fst_surjective.comp e.surjective
   · intro g x
     exact congrArg Prod.fst (he g x)
   · obtain ⟨c, rfl⟩ : ∃ c', c = c' + 1 := ⟨c - 1, by omega⟩
-    refine admissible_coefRep hc hF _ ((LinearMap.proj (⟨c, h2⟩ : Fin D.t)).comp
-      ((LinearMap.snd O _ _).comp e.toLinearMap)) ?_ ?_ X
+    refine admissible_coefRep hc hF _
+      ((LinearMap.proj (⟨c, h2⟩ : Fin D.t)).comp ((LinearMap.snd O _ _).comp e.toLinearMap)) ?_ ?_ X
     · intro a
       exact ⟨e.symm (0, fun _ => a), by simp⟩
     · intro g x
@@ -381,7 +454,9 @@ theorem admissible_std [IsTopologicalRing LL] [IsDomain O] [IsDiscreteValuationR
 
 end Per
 
-theorem stdAdm : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (S : TopSit P), S.CrysCalc → S.Closed → S.StdAdm := by
+theorem stdAdm
+    : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (S : TopSit P),
+      S.CrysCalc → S.Closed → S.StdAdm := by
   intro l _ P S hcr hcl
   obtain ⟨⟨_, h1, h2⟩, -, -, h3, -⟩ := GlobalTheory.LocalIntegers.goodO_integers l S.LL
   exact admissible_std S.hyp.1.2.2.2.2.2 S.hyp.2.1 hcr.1 hcr.2.1 hcr.2.2.1

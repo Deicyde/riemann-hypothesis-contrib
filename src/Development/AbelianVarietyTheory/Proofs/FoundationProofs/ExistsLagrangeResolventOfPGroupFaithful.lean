@@ -11,10 +11,15 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem exists_lagrange_resolvent : ∀ (L : Type) [Field L] (p : ℕ), p.Prime → ∀ (G : Type) [Group G]
-    [MulSemiringAction G L] [Finite G] [Nontrivial G] [FaithfulSMul G L], IsPGroup p G →
-    ∀ ζ : L, IsPrimitiveRoot ζ p → (∀ g : G, g • ζ = ζ) →
-    ∃ (σ : G) (α : L), α ≠ 0 ∧ σ • α = ζ * α ∧ ∀ g : G, g • α ^ p = α ^ p := by
+theorem exists_lagrange_resolvent
+    : ∀ (L : Type) [Field L] (p : ℕ),
+      p.Prime
+        → ∀ (G : Type) [Group G] [MulSemiringAction G L] [Finite G] [Nontrivial G]
+            [FaithfulSMul G L],
+          IsPGroup p G
+            → ∀ ζ : L,
+              IsPrimitiveRoot ζ p → (∀ g : G, g • ζ = ζ)
+                → ∃ (σ : G) (α : L), α ≠ 0 ∧ σ • α = ζ * α ∧ ∀ g : G, g • α ^ p = α ^ p := by
   intro L _ p hp G _ _ _ _ _ hG ζ hζ hfix
   haveI : Fact p.Prime := ⟨hp⟩
   haveI : Fact (1 < p) := ⟨hp.one_lt⟩
@@ -57,8 +62,7 @@ theorem exists_lagrange_resolvent : ∀ (L : Type) [Field L] (p : ℕ), p.Prime 
     simp only [smul_mul', hψfix, smul_smul]
     refine Fintype.sum_equiv (Equiv.mulLeft h) _ _ (fun g => ?_)
     simp only [Equiv.coe_mulLeft]
-    have e : ψ h * ψ h⁻¹ = 1 := by
-      rw [← hψmul, mul_inv_cancel]; simp [hψdef]
+    have e : ψ h * ψ h⁻¹ = 1 := by rw [← hψmul, mul_inv_cancel]; simp [hψdef]
     rw [mul_inv_rev, hψmul g⁻¹ h⁻¹]
     linear_combination (-(ψ g⁻¹ * ((h * g) • x))) * e
   obtain ⟨σ, hσ⟩ := hχ (Multiplicative.ofAdd 1)

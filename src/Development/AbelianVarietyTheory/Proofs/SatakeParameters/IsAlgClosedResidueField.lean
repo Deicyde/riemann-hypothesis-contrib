@@ -8,8 +8,8 @@ open Polynomial
 
 namespace GlobalTheory.AlgClosedResidueField
 
-theorem isAlgClosed_residueField {K : Type} [Field K] (O : ValuationSubring K) [IsAlgClosed K] :
-    IsAlgClosed (IsLocalRing.ResidueField O) := by
+theorem isAlgClosed_residueField {K : Type} [Field K] (O : ValuationSubring K) [IsAlgClosed K]
+    : IsAlgClosed (IsLocalRing.ResidueField O) := by
   refine IsAlgClosed.of_exists_root _ fun p hp hirr => ?_
   have hsurj : Function.Surjective (IsLocalRing.residue O) := IsLocalRing.residue_surjective
   have hl : p ∈ Polynomial.lifts (IsLocalRing.residue O) :=

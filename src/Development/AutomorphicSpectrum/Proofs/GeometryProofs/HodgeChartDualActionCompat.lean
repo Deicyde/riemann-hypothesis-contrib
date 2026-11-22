@@ -9,7 +9,28 @@ open Module NumberField GlobalTheory.CompanionTheory.Ar.HT GlobalTheory.Companio
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.HTL
 
-theorem exists_retraction_mod : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [Field K] [Algebra A K] [IsFractionRing A K] [CharZero K] (E : Type) [Field E] [NumberField E] (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (p R N : ℕ) [Fact p.Prime] (Li : Type) [AddCommGroup Li] [Module K Li] (D : HTChart A K c p R N (Module.Dual K Li)) (ρ : 𝓞 E →+* Module.End K Li), (∀ (a : 𝓞 E) (w : Module.Dual K Li), D.ρΩ a w = w ∘ₗ ρ (RingOfIntegers.mapRingEquiv c a)) → ∀ (σ : E →+* K) (m : ℕ), Module.Projective A (D.omHT σ) → (∀ y ∈ D.omHT σ, ∃ x : Fin N → A, ∃ y' ∈ D.omHT σ, y = D.q σ x + ((p : A) ^ m) • y') → ∃ Rr : (Fin N → K) →ₗ[K] Li, (∀ k, Rr (Pi.single k 1) ∈ HTL.latOn D (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom)) 1 (algebraMap A K).range) ∧ ∀ e ∈ HTL.latOn D (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom)) 1 (algebraMap A K).range, ∃ e' ∈ HTL.latOn D (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom)) 1 (algebraMap A K).range, Rr (fun l => D.h (Pi.single l 1) e) = e + ((p : K) ^ m) • e' := by
+theorem exists_retraction_mod
+    : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [Field K] [Algebra A K]
+        [IsFractionRing A K] [CharZero K] (E : Type) [Field E] [NumberField E] (c : E ≃+* E)
+        (hc : ∀ x, c (c x) = x) (p R N : ℕ) [Fact p.Prime] (Li : Type) [AddCommGroup Li]
+        [Module K Li] (D : HTChart A K c p R N (Module.Dual K Li)) (ρ : 𝓞 E →+* Module.End K Li),
+      (∀ (a : 𝓞 E) (w : Module.Dual K Li), D.ρΩ a w = w ∘ₗ ρ (RingOfIntegers.mapRingEquiv c a))
+        → ∀ (σ : E →+* K) (m : ℕ),
+          Module.Projective A (D.omHT σ)
+            → (∀ y ∈ D.omHT σ, ∃ x : Fin N → A, ∃ y' ∈ D.omHT σ, y = D.q σ x + ((p : A) ^ m) • y')
+            → ∃ Rr : (Fin N → K) →ₗ[K] Li,
+              (∀ k,
+                  Rr (Pi.single k 1)
+                    ∈ HTL.latOn D (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom))
+                      1 (algebraMap A K).range)
+                ∧ ∀ e
+                    ∈ HTL.latOn D (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom))
+                      1 (algebraMap A K).range,
+                  ∃ e'
+                      ∈ HTL.latOn D
+                        (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom)) 1
+                        (algebraMap A K).range,
+                    Rr (fun l => D.h (Pi.single l 1) e) = e + ((p : K) ^ m) • e' := by
   intro A K _ _ _ _ _ _ _ E _ _ c hc p R N _ Li _ _ D ρ hact σ m hproj hsurj
   classical
   have hp : (p : K) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero
@@ -22,7 +43,8 @@ theorem exists_retraction_mod : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNo
   have hQ : ∀ x, ((Q x : D.omHT σ) : Module.Dual K Li) = D.q σ x := by
     intro x
     simp [Q, Fintype.linearCombination_apply, HTChart.q, v]
-  let P : Submodule A (D.omHT σ) := LinearMap.range (((p : A) ^ m) • (LinearMap.id : D.omHT σ →ₗ[A] D.omHT σ))
+  let P : Submodule A (D.omHT σ) :=
+    LinearMap.range (((p : A) ^ m) • (LinearMap.id : D.omHT σ →ₗ[A] D.omHT σ))
   have hsurjQ : Function.Surjective (P.mkQ ∘ₗ Q) := by
     intro y
     obtain ⟨z, rfl⟩ := P.mkQ_surjective y
@@ -42,13 +64,18 @@ theorem exists_retraction_mod : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNo
     obtain ⟨z', hz'⟩ := this
     refine ⟨z', ?_⟩
     simp only [LinearMap.smul_apply, LinearMap.id_apply] at hz'
-    rw [hz']; abel
+    rw [hz']
+    abel
   have hvec := fun k => HTL.exists_vec D ρ hc hact σ ((LinearMap.proj k) ∘ₗ r)
   choose ev hev hevz using hvec
   let Rr : (Fin N → K) →ₗ[K] Li := Fintype.linearCombination K ev
   have hRr : ∀ x, Rr x = ∑ k, x k • ev k := fun x => by simp [Rr, Fintype.linearCombination_apply]
-  have hzL : ∀ e ∈ HTL.latOn D (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom)) 1 (algebraMap A K).range,
-      ∀ z : D.omHT σ, (z : Module.Dual K Li) e ∈ (algebraMap A K).range := by
+  have hzL
+      : ∀ e
+          ∈ HTL.latOn D (GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom)) 1
+            (algebraMap A K).range,
+        ∀ z : D.omHT σ,
+          (z : Module.Dual K Li) e ∈ (algebraMap A K).range := by
     intro e he z
     obtain ⟨w, hw, hz⟩ := z.2
     have hz' : eigProj D.ρΩ σ w = z := hz
@@ -64,8 +91,10 @@ theorem exists_retraction_mod : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNo
     have hRx : Rr x ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom) := by
       rw [hRr]
       exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (hev k)
-    have key : ∀ z : D.omHT σ, ∃ z' : D.omHT σ, (z : Module.Dual K Li) (Rr x) =
-        (z : Module.Dual K Li) e + (p : K) ^ m * (z' : Module.Dual K Li) e := by
+    have key
+        : ∀ z : D.omHT σ, ∃ z' : D.omHT σ,
+          (z : Module.Dual K Li) (Rr x)
+            = (z : Module.Dual K Li) e + (p : K) ^ m * (z' : Module.Dual K Li) e := by
       intro z
       obtain ⟨z', hz'⟩ := hr' z
       refine ⟨z', ?_⟩
@@ -75,12 +104,14 @@ theorem exists_retraction_mod : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNo
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [map_smul, hevz k z]
         rfl
-      have h2 : ((Q (r z) : D.omHT σ) : Module.Dual K Li) e = ∑ k, algebraMap A K (r z k) * x k := by
+      have h2
+          : ((Q (r z) : D.omHT σ) : Module.Dual K Li) e = ∑ k, algebraMap A K (r z k) * x k := by
         rw [hQ, HTChart.q, LinearMap.sum_apply]
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [LinearMap.smul_apply, eigProj_apply D ρ hc hact σ he.1, Algebra.smul_def]
-      have h3 : ((Q (r z) : D.omHT σ) : Module.Dual K Li) e =
-          (z : Module.Dual K Li) e + (p : K) ^ m * (z' : Module.Dual K Li) e := by
+      have h3
+          : ((Q (r z) : D.omHT σ) : Module.Dual K Li) e
+            = (z : Module.Dual K Li) e + (p : K) ^ m * (z' : Module.Dual K Li) e := by
         rw [hz']
         simp [Algebra.smul_def]
       rw [h1, ← h3, h2]
@@ -91,7 +122,9 @@ theorem exists_retraction_mod : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNo
       obtain ⟨z', hz'⟩ := key ⟨_, hmemM w hw⟩
       have hval : eigProj D.ρΩ σ w (((p : K) ^ m)⁻¹ • (Rr x - e)) = (z' : Module.Dual K Li) e := by
         rw [map_smul, map_sub]
-        have : eigProj D.ρΩ σ w (Rr x) = eigProj D.ρΩ σ w e + (p : K) ^ m * (z' : Module.Dual K Li) e := hz'
+        have : eigProj D.ρΩ σ w (Rr x)
+            = eigProj D.ρΩ σ w e + (p : K) ^ m * (z' : Module.Dual K Li) e :=
+          hz'
         rw [this, add_sub_cancel_left, smul_eq_mul, inv_mul_cancel_left₀ hpm]
       rw [hval]
       exact hzL e he z'

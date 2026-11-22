@@ -12,9 +12,10 @@ namespace UpperTheory.V.Z.Kato.Sym.PT
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 
-theorem mem_int (X : Tower Ω ε) (M : ℕ) (f : topL X M) (h : IsIntegral (Algebra.adjoin Ω {X.jK}) (f : X.K)) :
-    letI := algPoly X (CongruenceSubgroup.Gamma M)
-    f ∈ FunctionField.ringOfIntegers Ω (topL X M) := by
+theorem mem_int
+    (X : Tower Ω ε) (M : ℕ) (f : topL X M) (h : IsIntegral (Algebra.adjoin Ω {X.jK}) (f : X.K))
+    : letI := algPoly X (CongruenceSubgroup.Gamma M)
+      f ∈ FunctionField.ringOfIntegers Ω (topL X M) := by
   letI := algPoly X (CongruenceSubgroup.Gamma M)
   obtain ⟨p, hpm, hp⟩ := h
   have hmem : ∀ P : Polynomial Ω, aeval X.jK P ∈ Algebra.adjoin Ω {X.jK} := fun P => by
@@ -30,10 +31,14 @@ theorem mem_int (X : Tower Ω ε) (M : ℕ) (f : topL X M) (h : IsIntegral (Alge
   obtain ⟨q, hq, -, hqm⟩ :=
     lifts_and_natDegree_eq_and_monic ((lifts_iff_coeff_lifts p).mpr fun n => hg _) hpm
   refine ⟨q, hqm, Subtype.val_injective ?_⟩
-  have e1 : ((topL X M).subtype).comp (algebraMap (Polynomial Ω) (topL X M)) =
-      (aeval X.jK : Polynomial Ω →ₐ[Ω] X.K).toRingHom := RingHom.ext fun P => coe_jPoly X _ P
-  have e2 : (algebraMap (Algebra.adjoin Ω {X.jK}) X.K).comp g =
-      (aeval X.jK : Polynomial Ω →ₐ[Ω] X.K).toRingHom := RingHom.ext fun P => rfl
+  have e1
+      : ((topL X M).subtype).comp (algebraMap (Polynomial Ω) (topL X M))
+        = (aeval X.jK : Polynomial Ω →ₐ[Ω] X.K).toRingHom :=
+    RingHom.ext fun P => coe_jPoly X _ P
+  have e2
+      : (algebraMap (Algebra.adjoin Ω {X.jK}) X.K).comp g
+        = (aeval X.jK : Polynomial Ω →ₐ[Ω] X.K).toRingHom :=
+    RingHom.ext fun P => rfl
   have key := Polynomial.hom_eval₂ q (algebraMap (Polynomial Ω) (topL X M)) (topL X M).subtype f
   rw [e1] at key
   rw [← hq, eval₂_map, e2] at hp
@@ -41,8 +46,14 @@ theorem mem_int (X : Tower Ω ε) (M : ℕ) (f : topL X M) (h : IsIntegral (Alge
   rw [key, ZeroMemClass.coe_zero]
   exact hp
 
-theorem isTopUnit [IsAlgClosure ℚ Ω] (X : Tower Ω ε) (M : ℕ) {u : X.K} (hu : IsU X u) (hF : u ∈ topF X M) :
-    TopUnits.IsTopUnit X M u :=
-  ⟨hu.1, hF, mdl_le_lev X _ _ hF, mem_int X M _ (intU Ω ε X M u hu).1, mem_int X M _ (intU Ω ε X M u hu).2⟩
+theorem isTopUnit
+    [IsAlgClosure ℚ Ω] (X : Tower Ω ε) (M : ℕ) {u : X.K} (hu : IsU X u) (hF : u ∈ topF X M)
+    : TopUnits.IsTopUnit X M u := ⟨
+  hu.1,
+  hF,
+  mdl_le_lev X _ _ hF,
+  mem_int X M _ (intU Ω ε X M u hu).1,
+  mem_int X M _ (intU Ω ε X M u hu).2
+⟩
 
 end UpperTheory.V.Z.Kato.Sym.PT

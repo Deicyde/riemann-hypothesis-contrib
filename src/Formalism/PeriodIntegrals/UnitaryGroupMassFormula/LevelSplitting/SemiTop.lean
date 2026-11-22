@@ -11,45 +11,55 @@ noncomputable section
 
 namespace PI.LevelKSplit.W.SemiT
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub PI.LevelKSplit.W.SemiA PI.VolSemiDirect.W
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  PI.LevelKSplit.W.SemiA PI.VolSemiDirect.W
 open scoped TensorProduct
 
 section Cont
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E] {R : Type}
-  [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  {R : Type} [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
   {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E} {r : ℕ} {P : Frame E M r} {T : F}
 
-theorem piMat_eq (g : HA R σ J) :
-    piMat (P := P) (T := T) g = LinearMap.toMatrix' (datR R σ J P T).pU +
-      LinearMap.toMatrix' (datR R σ J P T).pW *
-        ((HA.mat R σ J g : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E)) *
-          LinearMap.toMatrix' (datR R σ J P T).pW := by
+theorem piMat_eq (g : HA R σ J)
+    : piMat (P := P) (T := T) g
+      = LinearMap.toMatrix' (datR R σ J P T).pU
+        + LinearMap.toMatrix' (datR R σ J P T).pW
+          * ((HA.mat R σ J g : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E))
+          * LinearMap.toMatrix' (datR R σ J P T).pW := by
   rw [piMat, PI.LevelKSplit.W.SemiG.Dat.Pi, map_add (f := _), LinearMap.toMatrix'_comp,
-    LinearMap.toMatrix'_comp, lin, ← Matrix.toLin'_apply', LinearMap.toMatrix'_toLin', Matrix.mul_assoc]
+    LinearMap.toMatrix'_comp, lin, ← Matrix.toLin'_apply', LinearMap.toMatrix'_toLin',
+    Matrix.mul_assoc]
 
 theorem continuous_piMat : Continuous fun g : HA R σ J => piMat (P := P) (T := T) g := by
   have hm : Continuous fun g : HA R σ J =>
       ((HA.mat R σ J g : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E)) :=
     Units.continuous_val.comp continuous_subtype_val
-  have he : (fun g : HA R σ J => piMat (P := P) (T := T) g) = fun g =>
-      LinearMap.toMatrix' (datR R σ J P T).pU + LinearMap.toMatrix' (datR R σ J P T).pW *
-        ((HA.mat R σ J g : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E)) *
-          LinearMap.toMatrix' (datR R σ J P T).pW := funext piMat_eq
+  have he
+      : (fun g : HA R σ J => piMat (P := P) (T := T) g)
+        = fun g =>
+          LinearMap.toMatrix' (datR R σ J P T).pU
+            + LinearMap.toMatrix' (datR R σ J P T).pW
+              * ((HA.mat R σ J g : GL (Fin M) (R ⊗[F] E)) : Matrix (Fin M) (Fin M) (R ⊗[F] E))
+              * LinearMap.toMatrix' (datR R σ J P T).pW :=
+    funext piMat_eq
   rw [he]
   exact continuous_const.add ((continuous_const.matrix_mul hm).matrix_mul continuous_const)
 
 theorem continuous_piMat_inv : Continuous fun g : HA R σ J => piMat (P := P) (T := T) g⁻¹ := by
   exact (continuous_piMat (P := P) (T := T)).comp continuous_inv
 
-
 variable (R) in
-def fwdM (hP : P.IsStd σ J T) (p : Nsub R σ J P × Hsub R σ J P) : Ssub R σ J P :=
-  ⟨(p.1 : HA R σ J) * (p.2 : HA R σ J), (Ssub R σ J P).mul_mem (N_le_S' (R := R) hP p.1.2) (H_le_S p.2.2)⟩
+def fwdM (hP : P.IsStd σ J T) (p : Nsub R σ J P × Hsub R σ J P) : Ssub R σ J P := ⟨
+  (p.1 : HA R σ J) * (p.2 : HA R σ J),
+  (Ssub R σ J P).mul_mem (N_le_S' (R := R) hP p.1.2) (H_le_S p.2.2)
+⟩
 
 theorem continuous_fwdM (hP : P.IsStd σ J T) : Continuous (fwdM R hP) := by
   apply continuous_induced_rng.2
-  exact (continuous_subtype_val.comp continuous_fst).mul (continuous_subtype_val.comp continuous_snd)
+  exact (continuous_subtype_val.comp continuous_fst).mul
+    (continuous_subtype_val.comp continuous_snd)
 
 variable (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T)
 include hσσ hJ hP
@@ -60,11 +70,11 @@ theorem continuous_piG : Continuous fun s : Ssub R σ J P => piG hσσ hJ hP (s 
   · exact (continuous_piMat (P := P) (T := T)).comp continuous_subtype_val
   · exact (continuous_piMat_inv (P := P) (T := T)).comp continuous_subtype_val
 
-
 variable (R) in
-def bwdM (s : Ssub R σ J P) : Nsub R σ J P × Hsub R σ J P :=
-  (⟨(s : HA R σ J) * (piG (R := R) hσσ hJ hP (s : HA R σ J) s.2)⁻¹, mul_inv_piG_mem_N hσσ hJ hP s.2⟩,
-    ⟨piG (R := R) hσσ hJ hP (s : HA R σ J) s.2, piG_mem_H hσσ hJ hP (s : HA R σ J) s.2⟩)
+def bwdM (s : Ssub R σ J P) : Nsub R σ J P × Hsub R σ J P := (
+  ⟨(s : HA R σ J) * (piG (R := R) hσσ hJ hP (s : HA R σ J) s.2)⁻¹, mul_inv_piG_mem_N hσσ hJ hP s.2⟩,
+  ⟨piG (R := R) hσσ hJ hP (s : HA R σ J) s.2, piG_mem_H hσσ hJ hP (s : HA R σ J) s.2⟩
+)
 
 theorem continuous_bwdM : Continuous (bwdM R hσσ hJ hP) := by
   have hpi := continuous_piG (R := R) hσσ hJ hP
@@ -78,8 +88,9 @@ theorem bwd_fwd : Function.LeftInverse (bwdM R hσσ hJ hP) (fwdM R hP) := by
   rintro ⟨n, h⟩
   have hnS := N_le_S' (R := R) hP n.2
   have hhS := H_le_S (R := R) h.2
-  have key : piG (R := R) hσσ hJ hP ((n : HA R σ J) * (h : HA R σ J))
-      ((Ssub R σ J P).mul_mem hnS hhS) = h := by
+  have key
+      : piG (R := R) hσσ hJ hP ((n : HA R σ J) * (h : HA R σ J)) ((Ssub R σ J P).mul_mem hnS hhS)
+        = h := by
     rw [piG_mul hσσ hJ hP hnS hhS, piG_of_N hσσ hJ hP n.2 hnS, piG_of_H hσσ hJ hP h.2 hhS, one_mul]
   refine Prod.ext (Subtype.ext ?_) (Subtype.ext ?_)
   · show (n : HA R σ J) * (h : HA R σ J) *
@@ -91,7 +102,6 @@ theorem fwd_bwd : Function.RightInverse (bwdM R hσσ hJ hP) (fwdM R hP) := by
   intro s
   apply Subtype.ext
   exact inv_mul_cancel_right _ _
-
 
 variable (R) in
 def homeoNH : (Nsub R σ J P × Hsub R σ J P) ≃ₜ Ssub R σ J P where

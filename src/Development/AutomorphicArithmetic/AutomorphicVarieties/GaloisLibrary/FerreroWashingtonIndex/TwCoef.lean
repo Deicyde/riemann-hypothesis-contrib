@@ -8,10 +8,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-private theorem push_units {k : Type} [CommRing k] {M : ℕ} [NeZero M] {m : ℕ} (h : m ∣ M)
-    (χ : (ZMod M)ˣ →* kˣ) (g : ZMod M → k) (z : ZMod m) :
-    push h (fun s => g s * MulChar.ofUnitHom χ s) z =
-      ∑ s : (ZMod M)ˣ with ((ZMod.unitsMap h s : (ZMod m)ˣ) : ZMod m) = z, g s * (χ s : k) := by
+private theorem push_units
+    {k : Type} [CommRing k]
+    {M : ℕ} [NeZero M]
+    {m : ℕ} (h : m ∣ M)
+    (χ : (ZMod M)ˣ →* kˣ) (g : ZMod M → k) (z : ZMod m)
+    : push h (fun s => g s * MulChar.ofUnitHom χ s) z
+      = ∑ s : (ZMod M)ˣ with ((ZMod.unitsMap h s : (ZMod m)ˣ) : ZMod m) = z, g s * (χ s : k) := by
   classical
   unfold push
   symm
@@ -39,8 +42,8 @@ private theorem push_units {k : Type} [CommRing k] {M : ℕ} [NeZero M] {m : ℕ
     show g u * (χ u : k) = g u * (MulChar.ofUnitHom χ) u
     rw [MulChar.ofUnitHom_coe]
 
-private theorem half_val {M : ℕ} [NeZero M] (hM : 2 < M) (s : (ZMod M)ˣ) :
-    2 * ((-s : (ZMod M)ˣ) : ZMod M).val < M ↔ ¬ 2 * (s : ZMod M).val < M := by
+private theorem half_val {M : ℕ} [NeZero M] (hM : 2 < M) (s : (ZMod M)ˣ)
+    : 2 * ((-s : (ZMod M)ˣ) : ZMod M).val < M ↔ ¬ 2 * (s : ZMod M).val < M := by
   haveI : Fact (1 < M) := ⟨by omega⟩
   have hs0 : (s : ZMod M) ≠ 0 := s.ne_zero
   have hv : (s : ZMod M).val < M := ZMod.val_lt _
@@ -61,14 +64,25 @@ private theorem half_val {M : ℕ} [NeZero M] (hM : 2 < M) (s : (ZMod M)ˣ) :
   rw [Units.val_neg, ZMod.neg_val, if_neg hs0]
   omega
 
-theorem UpperTheory.V.FW.twCoef :
-    ∀ (l : ℕ) [Fact l.Prime] (M n₀ : ℕ) [NeZero M] (h : l ^ n₀ ∣ M) (k : Type) [CommRing k] (χ : (ZMod M)ˣ →* kˣ) (g : ZMod M → ℤ) (R : Finset ℤ_[l]ˣ), 2 ≤ n₀ → χ (-1) = -1 → (∀ s : (ZMod M)ˣ, g (-(s : ZMod M)) = -g s) → (∀ r ∈ R, r ∈ WW l) → (∀ r ∈ R, -r ∉ R) → (∀ w ∈ WW l, w ∈ R ∨ -w ∈ R) → tw χ (piQ l n₀ h) (toK k _ (∑ s ∈ Finset.univ.filter fun s : (ZMod M)ˣ => 2 * (s : ZMod M).val < M, MonoidAlgebra.single s (g s))) = 0 → ∀ y : ZMod (l ^ n₀), ∑ r : R, push h (fun s => (g s : k) * MulChar.ofUnitHom χ s) (((redU l n₀ r.1)⁻¹ : (ZMod (l ^ n₀))ˣ) * y) = 0 := by
+theorem UpperTheory.V.FW.twCoef
+    : ∀ (l : ℕ) [Fact l.Prime] (M n₀ : ℕ) [NeZero M] (h : l ^ n₀ ∣ M) (k : Type) [CommRing k]
+        (χ : (ZMod M)ˣ →* kˣ) (g : ZMod M → ℤ) (R : Finset ℤ_[l]ˣ),
+      2 ≤ n₀ → χ (-1) = -1 → (∀ s : (ZMod M)ˣ, g (-(s : ZMod M)) = - g s) → (∀ r ∈ R, r ∈ WW l)
+        → (∀ r ∈ R, -r ∉ R) → (∀ w ∈ WW l, w ∈ R ∨ -w ∈ R)
+        → tw χ (piQ l n₀ h)
+            (toK k _
+              (∑ s ∈ Finset.univ.filter fun s : (ZMod M)ˣ => 2 * (s : ZMod M).val < M, MonoidAlgebra.single s (g s)))
+          = 0
+        → ∀ y : ZMod (l ^ n₀),
+          ∑ r : R, push h (fun s => (g s : k) * MulChar.ofUnitHom χ s) (((redU l n₀ r.1)⁻¹ : (ZMod (l ^ n₀))ˣ) * y)
+            = 0 := by
   intro l _ M n₀ _ h k _ χ g R hn₀ hχ hg hRW hRneg hWR htw y
   classical
   have hl : l.Prime := Fact.out
   have hM : 2 < M := by
     have h4 : 4 ≤ l ^ n₀ :=
-      calc 4 = 2 ^ 2 := by norm_num
+      calc
+        4 = 2 ^ 2 := by norm_num
         _ ≤ l ^ 2 := Nat.pow_le_pow_left hl.two_le 2
         _ ≤ l ^ n₀ := Nat.pow_le_pow_right hl.pos hn₀
     have := Nat.le_of_dvd (Nat.pos_of_ne_zero (NeZero.ne M)) h
@@ -89,29 +103,36 @@ theorem UpperTheory.V.FW.twCoef :
     rw [← neg_one_mul v]
     exact mul_mem hneg1 hv
   obtain ⟨-, -, -, -, -, -, -, hinj⟩ := reps l
-  have hredneg : ∀ v : ℤ_[l]ˣ, redU l n₀ (-v) = -redU l n₀ v := fun v => by
+  have hredneg : ∀ v : ℤ_[l]ˣ, redU l n₀ (-v) = - redU l n₀ v := fun v => by
     ext
     simp [redU]
-  have hρneg : ∀ x : (ZMod M)ˣ, ZMod.unitsMap h (-x) = -ZMod.unitsMap h x := fun x => by
+  have hρneg : ∀ x : (ZMod M)ˣ, ZMod.unitsMap h (-x) = - ZMod.unitsMap h x := fun x => by
     ext
     simp [ZMod.unitsMap_def]
   have hredinj : ∀ v ∈ WW l, ∀ w ∈ WW l, redU l n₀ v = redU l n₀ w → v = w := by
     intro v hv w hw hvw
     have h1 : redU l n₀ (v * w⁻¹) = 1 := by rw [map_mul, map_inv, hvw, mul_inv_cancel]
     exact mul_inv_eq_one.mp (hinj n₀ hn₀ _ (mul_mem hv (inv_mem hw)) h1)
-  have hcoef : ∀ q, ∑ s ∈ (Finset.univ.filter fun s : (ZMod M)ˣ => 2 * (s : ZMod M).val < M).filter
-      (fun s => piQ l n₀ h s = q), (g s : k) * (χ s : k) = 0 := by
+  have hcoef
+      : ∀ q,
+        ∑ s ∈ (Finset.univ.filter fun s : (ZMod M)ˣ => 2 * (s : ZMod M).val < M).filter
+            (fun s => piQ l n₀ h s = q), (g s : k) * (χ s : k)
+          = 0 := by
     intro q
     have h1 := congrArg (fun x => MonoidAlgebra.coeff x q) htw
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, toK, MonoidAlgebra.mapRingHom_single, eq_intCast, tw_single,
-      MonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply, MonoidAlgebra.single_apply,
-      MonoidAlgebra.coeff_zero, Finsupp.coe_zero, Pi.zero_apply] at h1
+          MonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply, MonoidAlgebra.single_apply,
+          MonoidAlgebra.coeff_zero, Finsupp.coe_zero, Pi.zero_apply]
+        at h1
     rw [Finset.sum_filter]
     exact h1
-  have hpu : ∀ z, push h (fun s => (g s : k) * MulChar.ofUnitHom χ s) z =
-      ∑ s : (ZMod M)ˣ with ((ZMod.unitsMap h s : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) = z,
-        (g s : k) * (χ s : k) := fun z => push_units h χ (fun s => (g s : k)) z
+  have hpu
+      : ∀ z,
+        push h (fun s => (g s : k) * MulChar.ofUnitHom χ s) z
+          = ∑ s : (ZMod M)ˣ with ((ZMod.unitsMap h s : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) = z,
+              (g s : k) * (χ s : k) := fun z =>
+    push_units h χ (fun s => (g s : k)) z
   simp only [hpu]
   by_cases hy : IsUnit y
   swap
@@ -122,18 +143,22 @@ theorem UpperTheory.V.FW.twCoef :
     exfalso
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hs
     apply hy
-    have : y = ((redU l n₀ r.1 : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) *
-        ((ZMod.unitsMap h s : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) := by
+    have : y
+        = ((redU l n₀ r.1 : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀))
+          * ((ZMod.unitsMap h s : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) := by
       rw [hs, ← mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, one_mul]
     rw [this]
     exact (Units.isUnit _).mul (Units.isUnit _)
   obtain ⟨u, rfl⟩ := hy
   let t : R → Finset (ZMod M)ˣ := fun r =>
     Finset.univ.filter fun s => ZMod.unitsMap h s = (redU l n₀ r.1)⁻¹ * u
-  have hgoal : ∀ r : R, ∑ s ∈ Finset.univ.filter (fun s : (ZMod M)ˣ =>
-      ((ZMod.unitsMap h s : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) =
-        (((redU l n₀ r.1)⁻¹ : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) * (u : ZMod (l ^ n₀))),
-      (g s : k) * (χ s : k) = ∑ s ∈ t r, (g s : k) * (χ s : k) := fun r =>
+  have hgoal
+      : ∀ r : R,
+        ∑ s ∈ Finset.univ.filter (fun s : (ZMod M)ˣ =>
+            ((ZMod.unitsMap h s : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) =
+              (((redU l n₀ r.1)⁻¹ : (ZMod (l ^ n₀))ˣ) : ZMod (l ^ n₀)) * (u : ZMod (l ^ n₀))),
+            (g s : k) * (χ s : k)
+          = ∑ s ∈ t r, (g s : k) * (χ s : k) := fun r =>
     Finset.sum_congr (Finset.filter_congr (fun s _ => by rw [Units.ext_iff, Units.val_mul]))
       (fun _ _ => rfl)
   refine Eq.trans (Finset.sum_congr rfl (fun r _ => hgoal r)) ?_
@@ -150,16 +175,19 @@ theorem UpperTheory.V.FW.twCoef :
     rw [mul_left_inj, inv_inj] at h12
     exact h12
   refine Eq.trans (Finset.sum_biUnion hdisj).symm ?_
-  have hπ : ∀ v ∈ WW l, ∀ x : (ZMod M)ˣ, ZMod.unitsMap h x = (redU l n₀ v)⁻¹ * u →
-      piQ l n₀ h x = QuotientGroup.mk' (Subgroup.map (redU l n₀) (WW l)) u := by
+  have hπ
+      : ∀ v ∈ WW l, ∀ x : (ZMod M)ˣ,
+        ZMod.unitsMap h x = (redU l n₀ v)⁻¹ * u
+          → piQ l n₀ h x = QuotientGroup.mk' (Subgroup.map (redU l n₀) (WW l)) u := by
     intro v hv x hx
     have h1 : QuotientGroup.mk' (Subgroup.map (redU l n₀) (WW l)) (redU l n₀ v)⁻¹ = 1 := by
       rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
       exact inv_mem (Subgroup.mem_map_of_mem _ hv)
     show QuotientGroup.mk' _ (ZMod.unitsMap h x) = _
     rw [hx, map_mul, h1, one_mul]
-  refine Eq.trans (halfSum (ZMod M)ˣ k Neg.neg _ _ (fun s => (g s : k) * (χ s : k))
-    ?_ ?_ ?_ ?_ ?_ ?_) (hcoef (QuotientGroup.mk' (Subgroup.map (redU l n₀) (WW l)) u))
+  refine Eq.trans
+    (halfSum (ZMod M)ˣ k Neg.neg _ _ (fun s => (g s : k) * (χ s : k)) ?_ ?_ ?_ ?_ ?_ ?_)
+    (hcoef (QuotientGroup.mk' (Subgroup.map (redU l n₀) (WW l)) u))
   · exact fun x => neg_neg x
   · intro x
     have hχx : (χ (-x) : k) = -(χ x : k) := by
@@ -174,8 +202,7 @@ theorem UpperTheory.V.FW.twCoef :
     obtain ⟨r', hr'⟩ := hnx
     rw [hρneg, hr, ← neg_mul] at hr'
     have h2 := mul_right_cancel hr'
-    have h3 : redU l n₀ r'.1 = redU l n₀ (-r.1) := by
-      rw [hredneg, ← inv_inj, ← h2, inv_neg]
+    have h3 : redU l n₀ r'.1 = redU l n₀ (-r.1) := by rw [hredneg, ← inv_inj, ← h2, inv_neg]
     have h4 := hredinj _ (hRW _ r'.2) _ (hnegmem _ (hRW _ r.2)) h3
     exact hRneg _ r.2 (h4 ▸ r'.2)
   · intro x hx hnx
@@ -192,17 +219,19 @@ theorem UpperTheory.V.FW.twCoef :
   · intro x hx
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hx
     obtain ⟨-, hq⟩ := hx
-    have hq' : QuotientGroup.mk' (Subgroup.map (redU l n₀) (WW l)) (ZMod.unitsMap h x) =
-        QuotientGroup.mk' _ u := hq
+    have hq'
+        : QuotientGroup.mk' (Subgroup.map (redU l n₀) (WW l)) (ZMod.unitsMap h x)
+          = QuotientGroup.mk' _ u :=
+      hq
     rw [QuotientGroup.mk'_eq_mk'] at hq'
     obtain ⟨z, hz, hxz⟩ := hq'
     obtain ⟨w, hw, rfl⟩ := Subgroup.mem_map.mp hz
     have hx' : ZMod.unitsMap h x = (redU l n₀ w)⁻¹ * u :=
       eq_inv_mul_of_mul_eq ((mul_comm _ _).trans hxz)
     rcases hWR w hw with hR | hR
-    · exact Or.inl (Finset.mem_biUnion.mpr ⟨⟨w, hR⟩, Finset.mem_univ _,
-        Finset.mem_filter.mpr ⟨Finset.mem_univ _, hx'⟩⟩)
-    · refine Or.inr (Finset.mem_biUnion.mpr ⟨⟨-w, hR⟩, Finset.mem_univ _,
-        Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩⟩)
+    · exact Or.inl (Finset.mem_biUnion.mpr
+        ⟨⟨w, hR⟩, Finset.mem_univ _, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hx'⟩⟩)
+    · refine Or.inr (Finset.mem_biUnion.mpr
+        ⟨⟨-w, hR⟩, Finset.mem_univ _, Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩⟩)
       show ZMod.unitsMap h (-x) = (redU l n₀ (-w))⁻¹ * u
       rw [hρneg, hx', hredneg, inv_neg, neg_mul]

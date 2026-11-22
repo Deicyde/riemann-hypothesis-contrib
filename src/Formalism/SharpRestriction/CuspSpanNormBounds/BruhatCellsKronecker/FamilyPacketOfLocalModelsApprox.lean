@@ -9,7 +9,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocalSplitGroups Formalism.MainNotions.JointEigenvalueBoundsFromAnyDatum Formalism.MainNotions.LocalModelPeriodLattices
+open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.MainNotions.JointEigenvalueBoundsFromAnyDatum
+  Formalism.MainNotions.LocalModelPeriodLattices
 open scoped nonZeroDivisors
 
 section Blocks

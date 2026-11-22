@@ -16,13 +16,16 @@ open scoped TensorProduct
 
 namespace GlobalTheory.KeyOriginNoeth
 
-theorem isEtaleAt_closure_of_disjoint : ∀ (A R D : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R] [CommRing D]
-    [Algebra (GlobalTheory.LocAcyc.GenFib A R) D]
-    [Module.Finite (GlobalTheory.LocAcyc.GenFib A R) D] [Algebra.Etale (GlobalTheory.LocAcyc.GenFib A R) D],
-    letI := GlobalTheory.KeyOriginNoeth.closureAlg A R D;
-    ∀ (Q : Ideal (GlobalTheory.KeyOriginNoeth.closure A R D)) [Q.IsPrime],
-      (∀ a : A, a ≠ 0 → algebraMap R (GlobalTheory.KeyOriginNoeth.closure A R D) (algebraMap A R a) ∉ Q) →
-      Algebra.IsEtaleAt R Q := by
+theorem isEtaleAt_closure_of_disjoint
+    : ∀ (A R D : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R] [CommRing D]
+        [Algebra (GlobalTheory.LocAcyc.GenFib A R) D]
+        [Module.Finite (GlobalTheory.LocAcyc.GenFib A R) D]
+        [Algebra.Etale (GlobalTheory.LocAcyc.GenFib A R) D],
+      letI := GlobalTheory.KeyOriginNoeth.closureAlg A R D
+      ∀ (Q : Ideal (GlobalTheory.KeyOriginNoeth.closure A R D)) [Q.IsPrime],
+        (∀ a : A,
+            a ≠ 0 → algebraMap R (GlobalTheory.KeyOriginNoeth.closure A R D) (algebraMap A R a) ∉ Q)
+          → Algebra.IsEtaleAt R Q := by
   intro A R D _ _ _ _ _ _ _ _
   letI := closureAlg A R D
   intro Q _ hQ
@@ -30,13 +33,15 @@ theorem isEtaleAt_closure_of_disjoint : ∀ (A R D : Type) [CommRing A] [IsDomai
   haveI : IsScalarTower R (GlobalTheory.LocAcyc.GenFib A R) D := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   let SR : Submonoid R := Algebra.algebraMapSubmonoid R (nonZeroDivisors A)
   let SC : Submonoid (closure A R D) := Algebra.algebraMapSubmonoid (closure A R D) SR
-  have hCD : ∀ r : R, algebraMap (closure A R D) D (algebraMap R (closure A R D) r) = algebraMap R D r :=
+  have hCD
+      : ∀ r : R, algebraMap (closure A R D) D (algebraMap R (closure A R D) r) = algebraMap R D r :=
     fun _ => rfl
   haveI : IsScalarTower R (closure A R D) D := IsScalarTower.of_algebraMap_eq (fun r => (hCD r).symm)
   have hunit : ∀ a : A, a ∈ nonZeroDivisors A → IsUnit (algebraMap R D (algebraMap A R a)) := by
     intro a ha
     have h1 : IsUnit (algebraMap R (GlobalTheory.LocAcyc.GenFib A R) (algebraMap A R a)) :=
-      IsLocalization.map_units (GlobalTheory.LocAcyc.GenFib A R) (⟨algebraMap A R a, a, ha, rfl⟩ : SR)
+      IsLocalization.map_units (GlobalTheory.LocAcyc.GenFib A R)
+        (⟨algebraMap A R a, a, ha, rfl⟩ : SR)
     rw [IsScalarTower.algebraMap_apply R (GlobalTheory.LocAcyc.GenFib A R) D]
     exact h1.map _
   haveI hloc : IsLocalization SC D := by

@@ -12,9 +12,9 @@ namespace Formalism.L2.SG.Pf
 theorem oeApprox_holds : Formalism.L2.SG.Pf.UnipLat.OEApprox := by
   intro F E _ _ _ _ _ _ hE _ φ hφ
   classical
-
-  obtain ⟨R, hR⟩ := isBounded_iff_forall_norm_le.mp
-    (ZSpan.fundamentalDomain_isBounded (mixedEmbedding.latticeBasis E))
+  obtain ⟨R, hR⟩ :=
+    isBounded_iff_forall_norm_le.mp (ZSpan.fundamentalDomain_isBounded (mixedEmbedding.latticeBasis
+      E))
   refine ⟨R, fun t => ?_⟩
 
   let w : InfinitePlace F → InfinitePlace E := fun v => InfinitePlace.mk (φ v)
@@ -27,10 +27,9 @@ theorem oeApprox_holds : Formalism.L2.SG.Pf.UnipLat.OEApprox := by
     rw [← hw v, ← hw v', h]
   let c : InfinitePlace F → ℂ := fun v =>
     if (w v).embedding = φ v then t v else (starRingEnd ℂ) (t v)
-  let x : mixedEmbedding.mixedSpace E :=
-    (0, fun u => if h : ∃ v, u.1 = w v then c h.choose else 0)
-  have hmem : x - ZSpan.fract (mixedEmbedding.latticeBasis E) x ∈
-      mixedEmbedding.integerLattice E := by
+  let x : mixedEmbedding.mixedSpace E := (0, fun u => if h : ∃ v, u.1 = w v then c h.choose else 0)
+  have hmem
+      : x - ZSpan.fract (mixedEmbedding.latticeBasis E) x ∈ mixedEmbedding.integerLattice E := by
     rw [← mixedEmbedding.mem_span_latticeBasis, ZSpan.fract_apply, sub_sub_cancel]
     exact (ZSpan.floor _ x).2
   obtain ⟨m, hm⟩ := hmem
@@ -44,8 +43,8 @@ theorem oeApprox_holds : Formalism.L2.SG.Pf.UnipLat.OEApprox := by
     rw [dite_eq_left hex, hinj _ _ hex.choose_spec.symm]
   have hfr : x - mixedEmbedding E (m : E) = ZSpan.fract (mixedEmbedding.latticeBasis E) x := by
     rw [hm', sub_sub_cancel]
-  have hval : (ZSpan.fract (mixedEmbedding.latticeBasis E) x).2 u
-      = c v - (w v).embedding (m : E) := by
+  have hval
+      : (ZSpan.fract (mixedEmbedding.latticeBasis E) x).2 u = c v - (w v).embedding (m : E) := by
     rw [← hfr, Prod.snd_sub, Pi.sub_apply, hxu, mixedEmbedding.mixedEmbedding_apply_isComplex]
   have hb : ‖c v - (w v).embedding (m : E)‖ ≤ R := by
     rw [← hval]

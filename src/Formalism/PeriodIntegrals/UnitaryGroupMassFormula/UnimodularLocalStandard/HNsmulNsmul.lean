@@ -11,7 +11,12 @@ open scoped ComplexConjugate
 namespace PI.UnitaryGroupMassFormula.UnimodLocStd
 open PI.ULS
 
-variable (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (hlam : lam ≠ 0)
+variable
+  (a : ℕ)
+  (b c : ℤ)
+  (d : ℕ)
+  (ha : 0 < a) (hd : 0 < d)
+  (lam : ℂ) (hlam : lam ≠ 0)
   (m : Type) [Fintype m] [DecidableEq m]
 
 lemma kappa_real : conj (repKappa a b d ha hd lam hlam) = repKappa a b d ha hd lam hlam := by

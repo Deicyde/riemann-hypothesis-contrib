@@ -6,14 +6,21 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Tat
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AbVarRedRes
 
-theorem residue_perfect_and_char :
-  ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K] [IsFractionRing R K] [PerfectField (ResidueField R)] (L W : Type) [Field L] [Algebra K L] [FiniteDimensional K L] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Algebra W L] [IsFractionRing W L], IsAbove R K (algebraMap W L).range → PerfectField (ResidueField W) ∧ ∀ m : ℕ, (m : ResidueField R) ≠ 0 → (m : ResidueField W) ≠ 0 := by
+theorem residue_perfect_and_char
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+        [IsFractionRing R K] [PerfectField (ResidueField R)] (L W : Type) [Field L] [Algebra K L]
+        [FiniteDimensional K L] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Algebra W L]
+        [IsFractionRing W L],
+      IsAbove R K (algebraMap W L).range
+        → PerfectField (ResidueField W)
+          ∧ ∀ m : ℕ, (m : ResidueField R) ≠ 0 → (m : ResidueField W) ≠ 0 := by
   intro R K _ _ _ _ _ _ _ L W _ _ _ _ _ _ _ _ h
   have hWL : Function.Injective (algebraMap W L) := IsFractionRing.injective W L
   have hRK : Function.Injective (algebraMap R K) := IsFractionRing.injective R K
@@ -21,14 +28,17 @@ theorem residue_perfect_and_char :
   have memV : ∀ x : K, algebraMap K L x ∈ V ↔ x ∈ (algebraMap R K).range := by
     intro x
     rw [← Subring.mem_comap, show V.comap (algebraMap K L) = (algebraMap R K).range from h]
-  let e : W ≃+* V := RingEquiv.ofBijective (algebraMap W L).rangeRestrict
-    ⟨fun a b hab => hWL (by simpa using congrArg Subtype.val hab), (algebraMap W L).rangeRestrict_surjective⟩
+  let e : W ≃+* V :=
+    RingEquiv.ofBijective (algebraMap W L).rangeRestrict ⟨
+      fun a b hab => hWL (by simpa using congrArg Subtype.val hab),
+      (algebraMap W L).rangeRestrict_surjective
+    ⟩
   have he : ∀ v : V, algebraMap W L (e.symm v) = v := by
     intro v
     have := congrArg Subtype.val (e.apply_symm_apply v)
     exact this
-  let ψ : R →+* V := ((algebraMap K L).comp (algebraMap R K)).codRestrict V
-    (fun r => (memV _).2 ⟨r, rfl⟩)
+  let ψ : R →+* V :=
+    ((algebraMap K L).comp (algebraMap R K)).codRestrict V (fun r => (memV _).2 ⟨r, rfl⟩)
   let φ : R →+* W := e.symm.toRingHom.comp ψ
   have hφ : ∀ r, algebraMap W L (φ r) = algebraMap K L (algebraMap R K r) := by
     intro r; exact he (ψ r)

@@ -8,7 +8,8 @@ open Formalism.FourierDecayAlt
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Geom
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.AdmissibleLieWords
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.AdmissibleLieWords
 open PI.UnitaryGroupMassFormula.GsFr PI.UnitaryGroupMassFormula.DLm.Gram
 open Matrix
 
@@ -199,11 +200,16 @@ lemma N_orth {z : Fin (2 * r + k + 1) → ℂ} (hz : C2.StdZ k r z) {n : B.Mat k
     _ = herm (Hpk k r) p (n⁻¹ *ᵥ fvec k r z a) := hU _ _
     _ = 0 := horthF _ hf
 
-private theorem herm_hpk_mulVec_of_mem_uh {h : B.Mat k r} (hh : h ∈ UH (Hpk k r)) (v w : Fin (2 * r + k + 1) → ℂ) :
-    Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) (h *ᵥ v) (h *ᵥ w) = Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) v w := by
-  have hh' : hᴴ * Formalism.QuantumDeterminants.Hpk k r * h = Formalism.QuantumDeterminants.Hpk k r := hh
+private theorem herm_hpk_mulVec_of_mem_uh
+    {h : B.Mat k r} (hh : h ∈ UH (Hpk k r)) (v w : Fin (2 * r + k + 1) → ℂ)
+    : Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) (h *ᵥ v) (h *ᵥ w)
+      = Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) v w := by
+  have hh'
+      : hᴴ * Formalism.QuantumDeterminants.Hpk k r * h = Formalism.QuantumDeterminants.Hpk k r :=
+    hh
   show star (h *ᵥ w) ⬝ᵥ (Formalism.QuantumDeterminants.Hpk k r *ᵥ (h *ᵥ v)) = star w ⬝ᵥ (Formalism.QuantumDeterminants.Hpk k r *ᵥ v)
-  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hh']
+  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
+    hh']
 
 lemma UW_orth {z : Fin (2 * r + k + 1) → ℂ} {h : B.Mat k r} (hh : h ∈ UWset k r z)
     {p : Fin (2 * r + k + 1) → ℂ} (hp : ∀ b, herm (Hpk k r) p (fvec k r z b) = 0) (a : Fin (r + 1)) :
@@ -234,9 +240,12 @@ lemma unitH_UH {h : B.Mat k r} (hh : h ∈ UH (Hpk k r)) (v : Fin (2 * r + k + 1
     h *ᵥ ((((Real.sqrt (Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) v v).re)⁻¹ : ℝ) : ℂ) • v)
   rw [herm_hpk_mulVec_of_mem_uh hh, Matrix.mulVec_smul]
 
-private theorem rk_mulVec_eq_herm_smul (p q v : Fin (2 * r + k + 1) → ℂ) :
-    Rk k r p q *ᵥ v = Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) v q • p := by
-  have e1 : Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) v q = (star q ᵥ* Formalism.QuantumDeterminants.Hpk k r) ⬝ᵥ v := by
+private theorem rk_mulVec_eq_herm_smul (p q v : Fin (2 * r + k + 1) → ℂ)
+    : Rk k r p q *ᵥ v
+      = Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) v q • p := by
+  have e1
+      : Formalism.QuantumDeterminants.herm (Formalism.QuantumDeterminants.Hpk k r) v q
+        = (star q ᵥ* Formalism.QuantumDeterminants.Hpk k r) ⬝ᵥ v := by
     show star q ⬝ᵥ (Formalism.QuantumDeterminants.Hpk k r *ᵥ v) = _
     exact Matrix.dotProduct_mulVec _ _ _
   rw [e1]
@@ -245,7 +254,8 @@ private theorem rk_mulVec_eq_herm_smul (p q v : Fin (2 * r + k + 1) → ℂ) :
   rw [Finset.sum_mul]
   exact Finset.sum_congr rfl fun j _ => by ring
 
-private theorem dw_mulVec_eq_wbPart (v : Fin (2 * r + k + 1) → ℂ) : Dw k r *ᵥ v = PI.UnitaryGroupMassFormula.GsFr.wbPart k r v := by
+private theorem dw_mulVec_eq_wbPart (v : Fin (2 * r + k + 1) → ℂ)
+    : Dw k r *ᵥ v = PI.UnitaryGroupMassFormula.GsFr.wbPart k r v := by
   ext i
   simp only [Dw, Matrix.mulVec_diagonal, PI.UnitaryGroupMassFormula.GsFr.wbPart]
   split_ifs <;> simp
@@ -326,22 +336,23 @@ theorem geometry_equivariance_embedding : GeomEqvIo := by
   have hd : (Zhat k r z z' g).det ≠ 0 := det_ne_of_G hz hz' hg.2
   have hdy : (Zhat k r z z' y).det ≠ 0 := by rw [hyA]; exact det_tilde hz hz' hn hh hn' hh' hd
   have hom : omW' k r z z' g = h' *ᵥ omW' k r z z' y := by
-    rw [hyA, omW'_UW hz hz' (Wz.inv_mem h hh) hh', omW'_N hz hz' (Nc.inv_mem n hn) hn' hg.1, mulVec_mulVec,
-      Matrix.mul_nonsing_inv _ (Wz'.unit h' hh'), one_mulVec]
-  have hν' : nuG' z z' g = h' *ᵥ nuG' z z' y := by
-    unfold nuG'; rw [hom, unitH_UH hh'.1]
+    rw [hyA, omW'_UW hz hz' (Wz.inv_mem h hh) hh', omW'_N hz hz' (Nc.inv_mem n hn) hn' hg.1,
+      mulVec_mulVec, Matrix.mul_nonsing_inv _ (Wz'.unit h' hh'), one_mulVec]
+  have hν' : nuG' z z' g = h' *ᵥ nuG' z z' y := by unfold nuG'; rw [hom, unitH_UH hh'.1]
   have hP : ∀ v, PpG z z' g *ᵥ (h' *ᵥ v) = h' *ᵥ (PpG z z' y *ᵥ v) := by
     intro v
-    rw [PpG_mulVec, PpG_mulVec, hν', prW_UW hz' hh', Formalism.FourierDecayAlt.P.TwoByOneBlock.herm_UH hh'.1, mulVec_sub, mulVec_smul]
+    rw [PpG_mulVec, PpG_mulVec, hν', prW_UW hz' hh',
+      Formalism.FourierDecayAlt.P.TwoByOneBlock.herm_UH hh'.1, mulVec_sub, mulVec_smul]
   have hPw : ∀ v, inWb k r (PpG z z' y *ᵥ v) := by
     intro v i hi
     have h1 := (prW_mem hz' v).1 i hi
     have h2 : omW' k r z z' y i = 0 := (prW_mem hz' _).1 i hi
-    simp only [PpG_mulVec, nuG', unitH, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, h1, h2, mul_zero, sub_zero]
+    simp only [PpG_mulVec, nuG', unitH, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, h1, h2, mul_zero,
+      sub_zero]
   have hPhi : ∀ w, inWb k r w → Phi k r z z' g *ᵥ (h' *ᵥ w) = h *ᵥ (Phi k r z z' y *ᵥ w) := by
     intro w hw
-    rw [Phi_mulVec, Phi_mulVec, lift_eq hz hz' hn hh hn' hh' hd hdy hgy hw, mulVec_mulVec _ n' h', mulVec_mulVec,
-      hgy, ← mulVec_mulVec, ← mulVec_mulVec, prW_NUW hz hn hh (lift_orth hdy w)]
+    rw [Phi_mulVec, Phi_mulVec, lift_eq hz hz' hn hh hn' hh' hd hdy hgy hw, mulVec_mulVec _ n' h',
+      mulVec_mulVec, hgy, ← mulVec_mulVec, ← mulVec_mulVec, prW_NUW hz hn hh (lift_orth hdy w)]
   have key : ∀ v, ioG z z' g *ᵥ (h' *ᵥ v) = h *ᵥ (ioG z z' y *ᵥ v) := by
     intro v; rw [ioG_mulVec, ioG_mulVec, hP, hPhi _ (hPw v)]
   have hm : ioG z z' g * h' = h * ioG z z' y := by
@@ -349,8 +360,9 @@ theorem geometry_equivariance_embedding : GeomEqvIo := by
     have := congrFun (key (Pi.single j 1)) i
     rw [mulVec_mulVec, mulVec_mulVec] at this
     simpa [Matrix.mulVec_single_one] using this
-  calc ioG z z' g = ioG z z' g * h' * h'⁻¹ := by
-        rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (Wz'.unit h' hh'), Matrix.mul_one]
+  calc
+    ioG z z' g = ioG z z' g * h' * h'⁻¹ := by
+      rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (Wz'.unit h' hh'), Matrix.mul_one]
     _ = h * ioG z z' y * h'⁻¹ := by rw [hm]
 
 end

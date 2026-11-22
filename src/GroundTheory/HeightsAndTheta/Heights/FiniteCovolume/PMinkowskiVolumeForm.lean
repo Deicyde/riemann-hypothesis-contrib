@@ -9,7 +9,8 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open Module MeasureTheory Submodule
 
-variable (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+variable
+  (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   (d : ℕ) [Fact (finrank ℝ V = d)]
 
 theorem MinkowskiVolumeForm.proof : MinkowskiVolumeForm.Statement V d := by
@@ -81,12 +82,14 @@ theorem MinkowskiVolumeForm.proof : MinkowskiVolumeForm.Statement V d := by
       rw [ENNReal.ofReal_lt_ofReal_iff_of_nonneg (by positivity), mul_pow, mul_comm]
       exact mul_lt_mul_of_pos_left hlt (by positivity)
     rwa [ENNReal.ofReal_mul (abs_nonneg _), ENNReal.ofReal_pow (mul_nonneg zero_le_two hσ0),
-      ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ← hF, ← hvol] at h
+        ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ← hF, ← hvol]
+      at h
   have hcount : Countable (span ℤ (Set.range B)).toAddSubgroup := by
     change Countable (span ℤ (Set.range B))
     infer_instance
-  obtain ⟨⟨x, hxL⟩, hx0, hxs⟩ := exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure
-    (ZSpan.isAddFundamentalDomain' B volume) hsymm hconv hlt'
+  obtain ⟨⟨x, hxL⟩, hx0, hxs⟩ :=
+    exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure
+      (ZSpan.isAddFundamentalDomain' B volume) hsymm hconv hlt'
   have hx0' : x ≠ 0 := by
     rintro rfl
     exact hx0 rfl
@@ -100,15 +103,16 @@ theorem MinkowskiVolumeForm.proof : MinkowskiVolumeForm.Statement V d := by
         rw [hσ, div_pow, Real.sq_sqrt (Nat.cast_nonneg _)]
         field_simp
       rw [← e.repr.norm_map, EuclideanSpace.norm_eq]
-      calc Real.sqrt (∑ i, ‖e.repr x i‖ ^ 2) < Real.sqrt (∑ _i : Fin d, σ ^ 2) := by
-            apply Real.sqrt_lt_sqrt (by positivity)
-            apply Finset.sum_lt_sum_of_nonempty (Finset.univ_nonempty_iff.2 ⟨⟨0, hdpos⟩⟩)
-            intro i _
-            rw [Real.norm_eq_abs, sq_lt_sq, abs_of_pos hσpos, abs_abs]
-            exact hxs i
+      calc
+        Real.sqrt (∑ i, ‖e.repr x i‖ ^ 2) < Real.sqrt (∑ _i : Fin d, σ ^ 2) := by
+          apply Real.sqrt_lt_sqrt (by positivity)
+          apply Finset.sum_lt_sum_of_nonempty (Finset.univ_nonempty_iff.2 ⟨⟨0, hdpos⟩⟩)
+          intro i _
+          rw [Real.norm_eq_abs, sq_lt_sq, abs_of_pos hσpos, abs_abs]
+          exact hxs i
         _ = lam := by
-            rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hsq,
-              Real.sqrt_sq hlam.le]
+          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hsq,
+            Real.sqrt_sq hlam.le]
   linarith
 
 end GroundTheory.Heights₂.Heights.FiniteCovolume

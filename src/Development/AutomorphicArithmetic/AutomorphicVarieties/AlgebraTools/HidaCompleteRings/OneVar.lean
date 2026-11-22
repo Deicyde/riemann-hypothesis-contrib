@@ -6,8 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open IsLocalRing
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.oneVar :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [Field K] (ι : O →+* K), Function.Injective ι → ∀ (g : PowerSeries O) (Z : Set K), Z.Infinite → (∀ z ∈ Z, ∃ y : PowerSeries O →+* K, (∀ a, y (PowerSeries.C a) = ι a) ∧ y PowerSeries.X = z ∧ y g = 0) → g = 0 := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.oneVar
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [Field K] (ι : O →+* K),
+      Function.Injective ι
+        → ∀ (g : PowerSeries O) (Z : Set K),
+          Z.Infinite
+            → (∀ z ∈ Z, ∃ y : PowerSeries O →+* K,
+              (∀ a, y (PowerSeries.C a) = ι a) ∧ y PowerSeries.X = z ∧ y g = 0)
+            → g = 0 := by
   intro O K _ _ _ _ _ ι hι g Z hZ h
   by_contra hg
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O

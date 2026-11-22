@@ -24,15 +24,14 @@ section CauchyBinet
 
 variable {k n : ℕ}
 
-private theorem det_mul_eq_sum_fun (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n) (Fin k) R) :
-    (A * B).det = ∑ p : Fin k → Fin n, (A.submatrix id p).det * ∏ i, B (p i) i := by
+private theorem det_mul_eq_sum_fun (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n) (Fin k) R)
+    : (A * B).det = ∑ p : Fin k → Fin n, (A.submatrix id p).det * ∏ i, B (p i) i := by
   simp only [det_apply', Matrix.mul_apply, prod_univ_sum, mul_sum, Fintype.piFinset_univ,
     submatrix_apply, id, sum_mul, prod_mul_distrib, mul_assoc]
   rw [Finset.sum_comm]
 
-theorem det_mul_eq_sum_minors (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n) (Fin k) R) :
-    (A * B).det =
-      ∑ s : KSubset n k, (A.submatrix id s.emb).det * (B.submatrix s.emb id).det := by
+theorem det_mul_eq_sum_minors (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n) (Fin k) R)
+    : (A * B).det = ∑ s : KSubset n k, (A.submatrix id s.emb).det * (B.submatrix s.emb id).det := by
   classical
   set F : (Fin k → Fin n) → R := fun p => (A.submatrix id p).det * ∏ i, B (p i) i with hF
   have hzero : ∀ p, ¬ Function.Injective p → F p = 0 := by
@@ -43,16 +42,19 @@ theorem det_mul_eq_sum_minors (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n)
       exact ⟨i, j, h, hne⟩
     simp only [hF]
     rw [det_zero_of_column_eq hne (fun r => by simp [hij]), zero_mul]
-  have hterm : ∀ (s : KSubset n k) (σ : Perm (Fin k)),
-      F (s.emb ∘ σ) = (A.submatrix id s.emb).det * (Perm.sign σ * ∏ i, B (s.emb (σ i)) i) := by
+  have hterm
+      : ∀ (s : KSubset n k) (σ : Perm (Fin k)),
+        F (s.emb ∘ σ) = (A.submatrix id s.emb).det * (Perm.sign σ * ∏ i, B (s.emb (σ i)) i) := by
     intro s σ
     simp only [hF]
     have : A.submatrix id (s.emb ∘ σ) = (A.submatrix id s.emb).submatrix id σ := rfl
     rw [this, det_permute']
     simp only [Function.comp_apply]
     ring
-  have hs : ∀ s : KSubset n k, (A.submatrix id s.emb).det * (B.submatrix s.emb id).det =
-      ∑ σ : Perm (Fin k), F (s.emb ∘ σ) := by
+  have hs
+      : ∀ s : KSubset n k,
+        (A.submatrix id s.emb).det * (B.submatrix s.emb id).det
+          = ∑ σ : Perm (Fin k), F (s.emb ∘ σ) := by
     intro s
     simp only [hterm, ← mul_sum]
     congr 1
@@ -62,8 +64,9 @@ theorem det_mul_eq_sum_minors (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n)
   simp only at hprod
   rw [det_mul_eq_sum_fun, Finset.sum_congr rfl (fun s _ => hs s)]
   change ∑ p, F p = _
-  rw [← hprod, ← Finset.sum_filter_of_ne (p := Function.Injective) (fun p _ h => by
-      by_contra hp; exact h (hzero p hp))]
+  rw [← hprod,
+    ← Finset.sum_filter_of_ne (p := Function.Injective)
+      (fun p _ h => by by_contra hp; exact h (hzero p hp))]
   symm
   refine Finset.sum_bij (fun x _ => x.1.emb ∘ x.2) ?_ ?_ ?_ ?_
   · intro x _
@@ -75,7 +78,8 @@ theorem det_mul_eq_sum_minors (A : Matrix (Fin k) (Fin n) R) (B : Matrix (Fin n)
       apply Subtype.ext
       have h1 : Set.range (s.emb ∘ σ) = Set.range (t.emb ∘ τ) := by rw [h]
       rw [Set.range_comp, Set.range_comp, σ.range_eq_univ, τ.range_eq_univ, Set.image_univ,
-        Set.image_univ, KSubset.range_emb, KSubset.range_emb] at h1
+          Set.image_univ, KSubset.range_emb, KSubset.range_emb]
+        at h1
       exact_mod_cast h1
     subst hst
     have : σ = τ := by
@@ -112,8 +116,7 @@ section Minors
 
 variable {m n k : ℕ}
 
-def maxMinor (B : Matrix (Fin n) (Fin k) R) (s : KSubset n k) : R :=
-  (B.submatrix s.emb id).det
+def maxMinor (B : Matrix (Fin n) (Fin k) R) (s : KSubset n k) : R := (B.submatrix s.emb id).det
 
 end Minors
 
@@ -121,8 +124,8 @@ section Independence
 
 variable {n k : ℕ}
 
-theorem linearIndependent_col_iff_mulVec_eq_zero (B : Matrix (Fin n) (Fin k) R) :
-    LinearIndependent R B.col ↔ ∀ v, B *ᵥ v = 0 → v = 0 := by
+theorem linearIndependent_col_iff_mulVec_eq_zero (B : Matrix (Fin n) (Fin k) R)
+    : LinearIndependent R B.col ↔ ∀ v, B *ᵥ v = 0 → v = 0 := by
   rw [Fintype.linearIndependent_iff]
   have key : ∀ v : Fin k → R, ∑ j, v j • B.col j = B *ᵥ v := by
     intro v; ext i; simp [mulVec, dotProduct, Finset.sum_apply, col, mul_comm]
@@ -134,9 +137,9 @@ theorem linearIndependent_col_iff_mulVec_eq_zero (B : Matrix (Fin n) (Fin k) R) 
     have := h g (by rw [← key, hg])
     exact congrFun this j
 
-theorem exists_maxMinor_ne_zero_of_linearIndependent [IsDomain R]
-    (B : Matrix (Fin n) (Fin k) R) (hB : LinearIndependent R B.col) :
-    ∃ s : KSubset n k, maxMinor B s ≠ 0 :=
+theorem exists_maxMinor_ne_zero_of_linearIndependent
+    [IsDomain R] (B : Matrix (Fin n) (Fin k) R) (hB : LinearIndependent R B.col)
+    : ∃ s : KSubset n k, maxMinor B s ≠ 0 :=
   _root_.GroundTheory.Variant₂.N1.exists_maxMinor_ne_zero_of_linearIndependent_alt B hB
 
 end Independence

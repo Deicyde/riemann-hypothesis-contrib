@@ -10,20 +10,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Hermitia
 open Matrix Polynomial NumberField IsDedekindDomain
 open scoped TensorProduct
 
-private theorem root_isUnit {F : Type} [Field F] (p : F[X]) (h : p.coeff 0 ≠ 0) :
-    IsUnit (AdjoinRoot.root p) := by
+private theorem root_isUnit {F : Type} [Field F] (p : F[X]) (h : p.coeff 0 ≠ 0)
+    : IsUnit (AdjoinRoot.root p) := by
   have h1 : AdjoinRoot.mk p (X * p.divX + C (p.coeff 0)) = 0 := by
     rw [X_mul_divX_add, AdjoinRoot.mk_self]
   rw [map_add (f := _), map_mul, AdjoinRoot.mk_X, AdjoinRoot.mk_C, add_eq_zero_iff_eq_neg] at h1
   exact isUnit_of_mul_isUnit_left (h1 ▸ ((Ne.isUnit h).map (AdjoinRoot.of p)).neg)
 
-private theorem root_reduced {F : Type} [Field F] (p : F[X]) (h : p.Separable) :
-    IsReduced (AdjoinRoot p) :=
-  (Ideal.isRadical_iff_quotient_reduced _).1
-    (isRadical_iff_span_singleton.1 h.squarefree.isRadical)
+private theorem root_reduced {F : Type} [Field F] (p : F[X]) (h : p.Separable)
+    : IsReduced (AdjoinRoot p) :=
+  (Ideal.isRadical_iff_quotient_reduced _).1 (isRadical_iff_span_singleton.1 h.squarefree.isRadical)
 
-theorem UpperTheory.ConvolutionTheory.D.nmHasse :
-    UpperTheory.ConvolutionTheory.D.NmHasse := by
+theorem UpperTheory.ConvolutionTheory.D.nmHasse : UpperTheory.ConvolutionTheory.D.NmHasse := by
   intro F E _ _ _ _ _ _ σ hσ n γ hγ hf hi
   have hG := galField F E σ hσ
   haveI : IsCyclic (E ≃ₐ[F] E) := ⟨⟨σ, hσ⟩⟩

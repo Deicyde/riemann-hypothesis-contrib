@@ -8,8 +8,9 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem finrank_dvd_of_ringOfIntegers_to_matrix (E : Type) [Field E] [NumberField E] {r : ℕ}
-    (ρ : 𝓞 E →+* Matrix (Fin r) (Fin r) ℤ) : ∃ s : ℕ, r = s * Module.finrank ℚ E := by
+theorem finrank_dvd_of_ringOfIntegers_to_matrix
+    (E : Type) [Field E] [NumberField E] {r : ℕ} (ρ : 𝓞 E →+* Matrix (Fin r) (Fin r) ℤ)
+    : ∃ s : ℕ, r = s * Module.finrank ℚ E := by
   classical
   haveI : IsLocalization (Algebra.algebraMapSubmonoid (𝓞 E) (nonZeroDivisors ℤ)) E :=
     IsIntegralClosure.isLocalization ℤ ℚ E (𝓞 E)
@@ -24,8 +25,7 @@ theorem finrank_dvd_of_ringOfIntegers_to_matrix (E : Type) [Field E] [NumberFiel
   let g₁ : 𝓞 E →+* S := g.codRestrict S (fun a => Algebra.subset_adjoin ⟨a, rfl⟩)
   have hg : ∀ y : Algebra.algebraMapSubmonoid (𝓞 E) (nonZeroDivisors ℤ), IsUnit (g₁ y) := by
     rintro ⟨_, m, hm, rfl⟩
-    have hm0 : (m : ℚ) ≠ 0 := by
-      exact_mod_cast mem_nonZeroDivisors_iff_ne_zero.mp hm
+    have hm0 : (m : ℚ) ≠ 0 := by exact_mod_cast mem_nonZeroDivisors_iff_ne_zero.mp hm
     have : g₁ (algebraMap ℤ (𝓞 E) m) = algebraMap ℚ S (m : ℚ) := by
       apply Subtype.ext
       simp [g₁, g, map_intCast]
@@ -35,7 +35,8 @@ theorem finrank_dvd_of_ringOfIntegers_to_matrix (E : Type) [Field E] [NumberFiel
   letI : Module E (Fin r → ℚ) :=
     Module.compHom (Fin r → ℚ)
       ((Matrix.toLinAlgEquiv' : Matrix (Fin r) (Fin r) ℚ ≃ₐ[ℚ] _).toRingEquiv.toRingHom.comp ρ')
-  have hq : ρ'.comp (algebraMap ℚ E) = algebraMap ℚ (Matrix (Fin r) (Fin r) ℚ) := RingHom.ext_rat _ _
+  have hq : ρ'.comp (algebraMap ℚ E) = algebraMap ℚ (Matrix (Fin r) (Fin r) ℚ) :=
+    RingHom.ext_rat _ _
   haveI : IsScalarTower ℚ E (Fin r → ℚ) := by
     refine ⟨fun q e v => ?_⟩
     show Matrix.toLin' (ρ' (q • e)) v = q • Matrix.toLin' (ρ' e) v

@@ -32,7 +32,8 @@ def vIdeal (σ : E →+* K) : Ideal (𝓞 E) where
     exact zero_lt_one
   smul_mem' := by
     intro c x hx
-    simp only [Set.mem_ofPred_eq, smul_eq_mul, MulMemClass.coe_mul, map_mul, Valuation.map_mul] at hx ⊢
+    simp only [Set.mem_ofPred_eq, smul_eq_mul, MulMemClass.coe_mul, map_mul, Valuation.map_mul]
+      at hx ⊢
     exact mul_lt_of_le_one_of_lt (sig_le_one σ c) hx
 
 theorem mem_vIdeal (σ : E →+* K) (o : 𝓞 E) : o ∈ vIdeal σ ↔ valuation K (σ (o : E)) < 1 := Iff.rfl
@@ -51,7 +52,8 @@ theorem vIdeal_prime (σ : E →+* K) : (vIdeal σ).IsPrime := by
     simp only [MulMemClass.coe_mul, map_mul, Valuation.map_mul, hx, hy, mul_one] at hxy
     exact lt_irrefl _ hxy
 
-def vPrime (σ : E →+* K) (l : ℕ) (hl0 : l ≠ 0) (hl : valuation K (l : K) < 1) : HeightOneSpectrum (𝓞 E) where
+def vPrime (σ : E →+* K) (l : ℕ) (hl0 : l ≠ 0) (hl : valuation K (l : K) < 1)
+    : HeightOneSpectrum (𝓞 E) where
   asIdeal := vIdeal σ
   isPrime := vIdeal_prime σ
   ne_bot := by
@@ -62,13 +64,17 @@ def vPrime (σ : E →+* K) (l : ℕ) (hl0 : l ≠ 0) (hl : valuation K (l : K) 
     rw [h, Ideal.mem_bot] at hm
     exact hl0 (by exact_mod_cast hm)
 
-theorem val_one_of_not_mem (σ : E →+* K) (l : ℕ) (hl0 : l ≠ 0) (hl : valuation K (l : K) < 1) (s : 𝓞 E)
-    (hs : s ∉ (vPrime σ l hl0 hl).asIdeal) : valuation K (σ (s : E)) = 1 :=
+theorem val_one_of_not_mem
+    (σ : E →+* K)
+    (l : ℕ) (hl0 : l ≠ 0) (hl : valuation K (l : K) < 1)
+    (s : 𝓞 E) (hs : s ∉ (vPrime σ l hl0 hl).asIdeal)
+    : valuation K (σ (s : E)) = 1 :=
   le_antisymm (sig_le_one σ s) (not_lt.1 hs)
 
-theorem div_q (σ : E →+* K) (q m : 𝒪[K]) (j n : ℕ) (c x : E) (o : 𝓞 E)
-    (hc : valuation K (σ c) = 1) (hn : (n : K) = (q : K) ^ j * m) (h : c * x = (n : E) * o) :
-    ∃ t : 𝒪[K], σ x = (q : K) ^ j * t := by
+theorem div_q
+    (σ : E →+* K) (q m : 𝒪[K]) (j n : ℕ) (c x : E) (o : 𝓞 E)
+    (hc : valuation K (σ c) = 1) (hn : (n : K) = (q : K) ^ j * m) (h : c * x = (n : E) * o)
+    : ∃ t : 𝒪[K], σ x = (q : K) ^ j * t := by
   have hc0 : σ c ≠ 0 := by
     intro h0
     rw [h0, Valuation.map_zero] at hc
@@ -79,7 +85,8 @@ theorem div_q (σ : E →+* K) (q m : 𝒪[K]) (j n : ℕ) (c x : E) (o : 𝓞 E
   have hm : valuation K (m : K) ≤ 1 := (Valuation.mem_integer_iff _ _).1 m.2
   have ho : valuation K (σ (o : E)) ≤ 1 := sig_le_one σ o
   refine ⟨⟨(m : K) * σ (o : E) * (σ c)⁻¹, ?_⟩, ?_⟩
-  · rw [Valuation.mem_integer_iff, Valuation.map_mul, Valuation.map_mul, Valuation.map_inv, hc, inv_one, mul_one]
+  · rw [Valuation.mem_integer_iff, Valuation.map_mul, Valuation.map_mul, Valuation.map_inv, hc,
+      inv_one, mul_one]
     exact mul_le_one' hm ho
   · simp only
     rw [hn] at hσ

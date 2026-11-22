@@ -27,8 +27,7 @@ theorem schurDichotomy : SchurDichotomy := by
     rw [← hθm, mul_inv_cancel, hθ1]
   have hθmp : MeasurePreserving θ μ μ := ⟨hθc.measurable, hmap⟩
   have hR : Formalism.MainNotions.BridgeCSchur.SqRep μ ρ := ⟨hρ1, hρm, hiso, hcont, hsq⟩
-  obtain ⟨τ, hτ⟩ : ∃ τ : G → (Cj H →L[ℂ] Cj H),
-      ∀ g v, τ g v = toCj (ρ (θ g)⁻¹ (ofCj v)) :=
+  obtain ⟨τ, hτ⟩ : ∃ τ : G → (Cj H →L[ℂ] Cj H), ∀ g v, τ g v = toCj (ρ (θ g)⁻¹ (ofCj v)) :=
     ⟨fun g => opCj (ρ (θ g)⁻¹), fun g v => opCj_apply _ _⟩
   have hcoef : ∀ g (v w : Cj H), ⟪w, τ g v⟫_ℂ = ⟪ofCj v, ρ (θ g) (ofCj w)⟫_ℂ := by
     intro g v w
@@ -58,18 +57,20 @@ theorem schurDichotomy : SchurDichotomy := by
         funext fun g => hcoef g v w
       rw [e]
       exact (hsq (ofCj w) (ofCj v)).comp_measurePreserving hθmp
-  have hirrT : ∀ S : Submodule ℂ (Cj H), IsClosed (S : Set (Cj H)) →
-      (∀ g, ∀ v ∈ S, τ g v ∈ S) → S = ⊥ ∨ S = ⊤ := by
+  have hirrT
+      : ∀ S : Submodule ℂ (Cj H),
+        IsClosed (S : Set (Cj H)) → (∀ g, ∀ v ∈ S, τ g v ∈ S) → S = ⊥ ∨ S = ⊤ := by
     intro S hS hSi
-    let S' : Submodule ℂ H :=
-      { carrier := {x | toCj x ∈ S}
-        add_mem' := fun ha hb => S.add_mem ha hb
-        zero_mem' := S.zero_mem
-        smul_mem' := fun c x hx => by
-          have h2 := S.smul_mem (conj c) (show toCj x ∈ S from hx)
-          rw [smul_def, Complex.conj_conj] at h2
-          show toCj (c • x) ∈ S
-          exact h2 }
+    let S' : Submodule ℂ H := {
+      carrier := {x | toCj x ∈ S}
+      add_mem' := fun ha hb => S.add_mem ha hb
+      zero_mem' := S.zero_mem
+      smul_mem' := fun c x hx => by
+        have h2 := S.smul_mem (conj c) (show toCj x ∈ S from hx)
+        rw [smul_def, Complex.conj_conj] at h2
+        show toCj (c • x) ∈ S
+        exact h2
+    }
     have hS'c : IsClosed (S' : Set H) := hS.preimage (eCj (H := H)).symm.continuous
     have hS'i : ∀ h, ∀ x ∈ S', ρ h x ∈ S' := by
       intro h x hx
@@ -93,7 +94,9 @@ theorem schurDichotomy : SchurDichotomy := by
     obtain ⟨U, hU⟩ := hne
     refine ⟨((eCj (H := H)).symm.trans U : H ≃ₗᵢ⋆[ℂ] H), ?_, ?_⟩
     · intro g x y
-      calc ⟪y, ρ (θ g) x⟫_ℂ = ⟪toCj x, τ g (toCj y)⟫_ℂ := (hcoef g (toCj y) (toCj x)).symm
+      calc
+        ⟪y, ρ (θ g) x⟫_ℂ
+          = ⟪toCj x, τ g (toCj y)⟫_ℂ := (hcoef g (toCj y) (toCj x)).symm
         _ = ⟪U (toCj x), U (τ g (toCj y))⟫_ℂ := (U.inner_map_map _ _).symm
         _ = ⟪U (toCj x), ρ g (U (toCj y))⟫_ℂ := by rw [hU]
     · intro h v
@@ -102,9 +105,12 @@ theorem schurDichotomy : SchurDichotomy := by
       exact h2
   · left
     intro x y x' y'
-    have h0 := Formalism.MainNotions.BridgeCSchur.schur_orth_ineq hT hR hirrT hirr hne (toCj y) (toCj x) x' y'
-    have e : (fun g => ⟪y, ρ (θ g) x⟫_ℂ * star ⟪y', ρ g x'⟫_ℂ) =
-        fun g => ⟪toCj x, τ g (toCj y)⟫_ℂ * star ⟪y', ρ g x'⟫_ℂ :=
+    have h0 :=
+      Formalism.MainNotions.BridgeCSchur.schur_orth_ineq hT hR hirrT hirr hne (toCj y) (toCj x) x'
+        y'
+    have e
+        : (fun g => ⟪y, ρ (θ g) x⟫_ℂ * star ⟪y', ρ g x'⟫_ℂ)
+          = fun g => ⟪toCj x, τ g (toCj y)⟫_ℂ * star ⟪y', ρ g x'⟫_ℂ :=
       funext fun g => congrArg (· * star ⟪y', ρ g x'⟫_ℂ) (hcoef g (toCj y) (toCj x)).symm
     exact (congrArg (fun f => ∫ g, f g ∂μ) e).trans h0
 

@@ -11,7 +11,10 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.ListSumSplittings
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4 Formalism.FourierDecayAlt.P.Ux10 Formalism.FourierDecayAlt.P.SmoothnessOrderArithmetic Formalism.FourierDecayAlt.P.ListSumInequalities
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4 Formalism.FourierDecayAlt.P.Ux10
+  Formalism.FourierDecayAlt.P.SmoothnessOrderArithmetic
+  Formalism.FourierDecayAlt.P.ListSumInequalities
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -94,9 +97,13 @@ lemma op_listSumF {α : Type*} {b : Bool} {X : Mat k r} (hX : inLie k r X) (φ :
     rw [e, op_add b hX (hL a List.mem_cons_self) (ckOn_listSumF φ L hL') hg, ih hL' g hg]
     simp
 
-theorem W_smulF : ∀ (w : List (Bool × Mat k r)), AllLie w → ∀ (f : Mat k r → ℂ) (H : Mat k r → E),
-    CkOn ((w.length : ℕ) : ℕ∞) (GV k r) f → CkOn ((w.length : ℕ) : ℕ∞) (GV k r) H → ∀ g ∈ GV k r,
-      W w (fun g => f g • H g) g = ((splits w).map fun p => W p.1 f g • W p.2 H g).sum := by
+theorem W_smulF
+    : ∀ (w : List (Bool × Mat k r)),
+      AllLie w
+        → ∀ (f : Mat k r → ℂ) (H : Mat k r → E),
+          CkOn ((w.length : ℕ) : ℕ∞) (GV k r) f → CkOn ((w.length : ℕ) : ℕ∞) (GV k r) H
+            → ∀ g ∈ GV k r,
+              W w (fun g => f g • H g) g = ((splits w).map fun p => W p.1 f g • W p.2 H g).sum := by
   intro w
   induction w with
   | nil => intro _ f H _ _ g _; simp [splits, W_nil]
@@ -108,13 +115,20 @@ theorem W_smulF : ∀ (w : List (Bool × Mat k r)), AllLie w → ∀ (f : Mat k 
     have hH' : CkOn ((w.length : ℕ) : ℕ∞) (GV k r) H := ckOn_mono (by simp) hH
     rw [W_cons, op_congr x.1 hx (ih hw' f H hf' hH') g hg]
     have hCf : ∀ l : List (Bool × Mat k r), l.Sublist w → CkOn ((1 : ℕ) : ℕ∞) (GV k r) (W l f) :=
-      fun l hl => smooth_on_of_word_derivatives l (fun y hy => hw' y (hl.subset hy)) 1
-        (ckOn_mono (by have := hl.length_le; simp; omega) hf)
+      fun l hl =>
+        smooth_on_of_word_derivatives l
+          (fun y hy => hw' y (hl.subset hy))
+          1 (ckOn_mono (by have := hl.length_le; simp; omega) hf)
     have hCH : ∀ l : List (Bool × Mat k r), l.Sublist w → CkOn ((1 : ℕ) : ℕ∞) (GV k r) (W l H) :=
-      fun l hl => smooth_on_of_word_derivatives l (fun y hy => hw' y (hl.subset hy)) 1
-        (ckOn_mono (by have := hl.length_le; simp; omega) hH)
-    rw [op_listSumF hx (fun p g' => W p.1 f g' • W p.2 H g') (splits w)
-      (fun p hp => ckOn_mulF (hCf p.1 (splits_mem w p hp).1) (hCH p.2 (splits_mem w p hp).2)) g hg]
+      fun l hl =>
+        smooth_on_of_word_derivatives l
+          (fun y hy => hw' y (hl.subset hy))
+          1 (ckOn_mono (by have := hl.length_le; simp; omega) hH)
+    rw [op_listSumF hx
+      (fun p g' => W p.1 f g' • W p.2 H g')
+      (splits w)
+      (fun p hp => ckOn_mulF (hCf p.1 (splits_mem w p hp).1) (hCH p.2 (splits_mem w p hp).2))
+      g hg]
     rw [splits, list_sum_flatMap]
     congr 1
     refine List.map_congr_left fun p hp => ?_
@@ -122,8 +136,9 @@ theorem W_smulF : ∀ (w : List (Bool × Mat k r)), AllLie w → ∀ (f : Mat k 
     simp [W_cons]
 
 def PolyClass (D : ℕ) (P : Mat k r → ℂ) : Prop :=
-  CkOn (⊤ : ℕ∞) (GV k r) P ∧ ∀ a : List (Bool × Mat k r), AllLie a →
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ g ∈ GV k r, ‖W a P g‖ ≤ C * gN g ^ D
+  CkOn (⊤ : ℕ∞) (GV k r) P
+    ∧ ∀ a : List (Bool × Mat k r),
+      AllLie a → ∃ C : ℝ, 0 ≤ C ∧ ∀ g ∈ GV k r, ‖W a P g‖ ≤ C * gN g ^ D
 
 lemma polyClass_mono {D D' : ℕ} {P : Mat k r → ℂ} (h : D ≤ D') (hP : PolyClass D P) : PolyClass D' P := by
   refine ⟨hP.1, fun a ha => ?_⟩
@@ -302,10 +317,13 @@ def varCj (p : Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) : Mat k r →ₗ[ℝ]
   map_add' x y := by simp
   map_smul' c g := by simp [Complex.real_smul]
 
-def varL : (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) ⊕ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) →
-    (Mat k r →ₗ[ℝ] ℂ) := Sum.elim varIn varCj
+def varL
+    : (Fin (2 * r + k + 1) × Fin (2 * r + k + 1)) ⊕ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1))
+      → (Mat k r →ₗ[ℝ] ℂ) :=
+  Sum.elim varIn varCj
 
-theorem polyClass_of_isPolyDeg {D : ℕ} {P : Mat k r → ℂ} (hP : C2.IsPolyDeg D P) : PolyClass D P := by
+theorem polyClass_of_isPolyDeg {D : ℕ} {P : Mat k r → ℂ} (hP : C2.IsPolyDeg D P)
+    : PolyClass D P := by
   obtain ⟨q, hq, hPq⟩ := hP
   have e : P = fun g => ∑ d ∈ q.support, q.coeff d * ∏ v, (varL v g) ^ d v := by
     funext g
@@ -321,7 +339,9 @@ theorem polyClass_of_isPolyDeg {D : ℕ} {P : Mat k r → ℂ} (hP : C2.IsPolyDe
     rw [Finsupp.sum_fintype _ _ (fun _ => rfl)] at h1
     simpa using h1.trans hq
   refine polyClass_mono hdeg (polyClass_cmul _ ?_)
-  exact polyClass_prod Finset.univ (fun v => d v * 1) (fun v g => (varL v g) ^ d v)
+  exact polyClass_prod Finset.univ
+    (fun v => d v * 1)
+    (fun v g => (varL v g) ^ d v)
     fun v _ => polyClass_pow (polyClass_lin (varL v)) (d v)
 
 end Formalism.FourierDecayAlt.P.ListSumSplittings

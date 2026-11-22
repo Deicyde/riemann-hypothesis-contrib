@@ -21,9 +21,12 @@ theorem isOpen_invertible_matrices (n : ℕ) : IsOpen (GLs n) := by
   have hc : Continuous (fun y : Mat n => y.det) := Continuous.matrix_det continuous_id
   exact isOpen_ne.preimage hc
 
-theorem avg_joint_smooth : ∀ (n : ℕ) {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V]
-    (U : ℝ → Mat n → V) (g : ℝ → ℝ) (T : ℝ), ContDiffOn ℝ ∞ (Function.uncurry U) (Set.univ ×ˢ GLs n) →
-    IsBump g T → ContDiffOn ℝ ∞ (Function.uncurry fun t x => ∫ s, (g s : ℂ) • U (t + s) x) (Set.univ ×ˢ GLs n) := by
+theorem avg_joint_smooth
+    : ∀ (n : ℕ) {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V]
+        (U : ℝ → Mat n → V) (g : ℝ → ℝ) (T : ℝ),
+      ContDiffOn ℝ ∞ (Function.uncurry U) (Set.univ ×ˢ GLs n) → IsBump g T
+        → ContDiffOn ℝ ∞ (Function.uncurry fun t x => ∫ s, (g s : ℂ) • U (t + s) x)
+          (Set.univ ×ˢ GLs n) := by
   intro n V _ _ _ U g T hU hg
   obtain ⟨hgs, hev, hsupp⟩ := hg
   set S : Set (ℝ × Mat n) := Set.univ ×ˢ GLs n with hS
@@ -34,7 +37,9 @@ theorem avg_joint_smooth : ∀ (n : ℕ) {V : Type} [NormedAddCommGroup V] [Norm
       Complex.ofRealCLM.contDiff.comp (hgs.comp contDiff_snd.neg)
     have h2 : ContDiff ℝ ∞ (fun q : (ℝ × Mat n) × ℝ => (q.1.1 - q.2, q.1.2)) :=
       ((contDiff_fst.comp contDiff_fst).sub contDiff_snd).prodMk (contDiff_snd.comp contDiff_fst)
-    have h3 : ContDiffOn ℝ ∞ (fun q : (ℝ × Mat n) × ℝ => Function.uncurry U (q.1.1 - q.2, q.1.2)) (S ×ˢ Set.univ) := by
+    have h3 : ContDiffOn ℝ ∞
+        (fun q : (ℝ × Mat n) × ℝ => Function.uncurry U (q.1.1 - q.2, q.1.2))
+        (S ×ˢ Set.univ) := by
       refine hU.comp h2.contDiffOn ?_
       rintro ⟨⟨t, x⟩, y⟩ ⟨hp, -⟩
       exact ⟨Set.mem_univ _, hp.2⟩
@@ -47,9 +52,13 @@ theorem avg_joint_smooth : ∀ (n : ℕ) {V : Type} [NormedAddCommGroup V] [Norm
     simp [h, this]
   have hloc : LocallyIntegrable (fun _ : ℝ => (1 : ℝ)) (volume : Measure ℝ) :=
     (continuous_const).locallyIntegrable
-  have hc := contDiffOn_convolution_right_with_param (𝕜 := ℝ) (μ := (volume : Measure ℝ)) (n := ⊤)
-    (f := fun _ : ℝ => (1 : ℝ)) (ContinuousLinearMap.lsmul ℝ ℝ : ℝ →L[ℝ] V →L[ℝ] V) hSo hk hz hloc hh
-  have hcomp : ContDiffOn ℝ ∞ (fun p : ℝ × Mat n => ((fun _ : ℝ => (1 : ℝ)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] h p) 0) S := by
+  have hc :=
+    contDiffOn_convolution_right_with_param (𝕜 := ℝ) (μ := (volume : Measure ℝ)) (n := ⊤)
+      (f := fun _ : ℝ => (1 : ℝ))
+      (ContinuousLinearMap.lsmul ℝ ℝ : ℝ →L[ℝ] V →L[ℝ] V) hSo hk hz hloc hh
+  have hcomp : ContDiffOn ℝ ∞
+      (fun p : ℝ × Mat n => ((fun _ : ℝ => (1 : ℝ)) ⋆[ContinuousLinearMap.lsmul ℝ ℝ, volume] h p) 0)
+      S := by
     refine hc.comp (contDiff_id.prodMk contDiff_const).contDiffOn ?_
     intro p hp
     exact ⟨hp, Set.mem_univ _⟩

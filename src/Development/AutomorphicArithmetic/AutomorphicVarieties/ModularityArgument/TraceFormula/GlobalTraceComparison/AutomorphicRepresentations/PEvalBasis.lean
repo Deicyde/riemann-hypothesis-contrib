@@ -10,8 +10,7 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.PiSee
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi DiscreteGroups.T1.G
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.evalBasis_pf :
-    EvalBasis := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.evalBasis_pf : EvalBasis := by
   intro X V _ _ ev hsep W hW
   classical
   haveI := hW
@@ -20,9 +19,10 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.evalBasis_pf :
     by_contra hne
     obtain ⟨f, hf0, hf⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
     obtain ⟨v, rfl⟩ := (Module.evalEquiv ℂ W).surjective f
-    have hv : (v : V) = 0 := hsep v fun x => by
-      have h := hf (Submodule.subset_span (Set.mem_range_self x))
-      simpa [r] using h
+    have hv : (v : V) = 0 :=
+      hsep v fun x => by
+        have h := hf (Submodule.subset_span (Set.mem_range_self x))
+        simpa [r] using h
     have hv0 : v = 0 := Subtype.ext hv
     exact hf0 (by simp [hv0])
   obtain ⟨b, hbs, hbspan, hli⟩ := exists_linearIndependent ℂ (Set.range r)
@@ -34,8 +34,13 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.evalBasis_pf :
     have hm : B i ∈ b := by simp [B, B0]
     exact hbs hm
   choose x hx using hx
-  refine ⟨Fintype.card b, x, fun i => ((Module.evalEquiv ℂ W).symm (B.coord i) : W),
-    fun i => Subtype.coe_prop _, fun v hv => ?_⟩
+  refine ⟨
+    Fintype.card b,
+    x,
+    fun i => ((Module.evalEquiv ℂ W).symm (B.coord i) : W),
+    fun i => Subtype.coe_prop _,
+    fun v hv => ?_
+  ⟩
   have key : (⟨v, hv⟩ : W) = ∑ i, (B i ⟨v, hv⟩) • (Module.evalEquiv ℂ W).symm (B.coord i) := by
     apply (Module.evalEquiv ℂ W).injective
     set_option synthInstance.maxHeartbeats 100000 in

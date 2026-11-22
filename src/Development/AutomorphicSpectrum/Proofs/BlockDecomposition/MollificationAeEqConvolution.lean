@@ -16,10 +16,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.PresSobA
 
-theorem mol_ae_lConv : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n))
-    [μ.IsHaarMeasure] (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V],
-    Unimod → ∀ φ : Mat n → ℝ, IsTest φ → ∀ x : Lp V 2 μ,
-      (fun y : G n => Mol μ φ (⇑x) y.val) =ᵐ[μ] lConv μ V φ x := by
+theorem mol_ae_lConv
+    : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
+        (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V],
+      Unimod
+        → ∀ φ : Mat n → ℝ,
+          IsTest φ → ∀ x : Lp V 2 μ, (fun y : G n => Mol μ φ (⇑x) y.val) =ᵐ[μ] lConv μ V φ x := by
   intro n _ _ μ _ V _ _ _ hU φ hφ x
   obtain ⟨h1, h2⟩ := hU n μ
   have hφc : Continuous φ := hφ.1.continuous
@@ -28,8 +30,8 @@ theorem mol_ae_lConv : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] 
   have hcont : Continuous (fun y : G n => φ y.val • lT μ V y x) :=
     hφv.smul (GlobalTheory.T.regular_representation_continuous n μ V hU x).2
   have hK : IsCompact ((Units.val : G n → Mat n) ⁻¹' tsupport φ) := by
-    refine ((GlobalTheory.CompanionTheory.SobGL.HaarDom.isOpenEmbedding_valG n).isInducing.isCompact_preimage_iff
-      ?_).2 hφ.2.1
+    refine ((GlobalTheory.CompanionTheory.SobGL.HaarDom.isOpenEmbedding_valG
+      n).isInducing.isCompact_preimage_iff ?_).2 hφ.2.1
     intro g hg
     have hd : g.det ≠ 0 := hφ.2.2 hg
     have hu : IsUnit g := (Matrix.isUnit_iff_isUnit_det g).2 (isUnit_iff_ne_zero.2 hd)
@@ -51,13 +53,17 @@ theorem mol_ae_lConv : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] 
     have a2 : StronglyMeasurable (fun p : G n × G n => (x : G n → V) (p.1⁻¹ * p.2)) :=
       (Lp.stronglyMeasurable x).comp_measurable hmul
     exact a1.smul a2
-  have hae : ∀ᵐ y ∂μ, (φ y.val • lT μ V y x : Lp V 2 μ) =ᵐ[μ]
-      fun z => φ y.val • (x : G n → V) (y⁻¹ * z) := by
+  have hae
+      : ∀ᵐ y ∂μ, (φ y.val • lT μ V y x : Lp V 2 μ) =ᵐ[μ]
+        fun z => φ y.val • (x : G n → V) (y⁻¹ * z) := by
     refine Eventually.of_forall fun y => ?_
     filter_upwards [Lp.coeFn_smul (φ y.val) (lT μ V y x), lT_coe μ y x] with z e1 e2
     rw [e1, Pi.smul_apply, e2]
-  have key := GlobalTheory.T.lp_integral_ae_pointwise (G n) (G n) V μ μ (fun y : G n => φ y.val • lT μ V y x)
-    (fun y z => φ y.val • (x : G n → V) (y⁻¹ * z)) hint hF hae
+  have key :=
+    GlobalTheory.T.lp_integral_ae_pointwise (G n) (G n) V μ μ
+      (fun y : G n => φ y.val • lT μ V y x)
+      (fun y z => φ y.val • (x : G n → V) (y⁻¹ * z))
+      hint hF hae
   have hconv : lConv μ V φ x = ∫ y : G n, φ y.val • lT μ V y x ∂μ := rfl
   rw [hconv]
   filter_upwards [key] with z hz

@@ -8,16 +8,19 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem flat_comap_map_of_one_tmul_mem {B C R : Type} [CommRing B] [CommRing C] [CommRing R]
-    [Algebra B C] [Algebra B R] [Module.Flat B R] (J : Ideal C) (r : R)
-    (h : (1 : C) ⊗ₜ[B] r ∈ J.map (Algebra.TensorProduct.includeLeftRingHom : C →+* C ⊗[B] R)) :
-    r ∈ (J.comap (algebraMap B C)).map (algebraMap B R) := by
+theorem flat_comap_map_of_one_tmul_mem
+    {B C R : Type}
+    [CommRing B] [CommRing C] [CommRing R] [Algebra B C] [Algebra B R] [Module.Flat B R]
+    (J : Ideal C) (r : R)
+    (h : (1 : C) ⊗ₜ[B] r ∈ J.map (Algebra.TensorProduct.includeLeftRingHom : C →+* C ⊗[B] R))
+    : r ∈ (J.comap (algebraMap B C)).map (algebraMap B R) := by
   let f : B →ₗ[B] C ⧸ J := (Ideal.Quotient.mkₐ B J).toLinearMap ∘ₗ Algebra.linearMap B C
   have hex := Module.Flat.rTensor_exact R (LinearMap.exact_subtype_ker_map f)
   let φ : C ⊗[B] R →ₐ[B] (C ⧸ J) ⊗[B] R :=
     Algebra.TensorProduct.map (Ideal.Quotient.mkₐ B J) (AlgHom.id B R)
-  have hle : J.map (Algebra.TensorProduct.includeLeftRingHom : C →+* C ⊗[B] R) ≤
-      RingHom.ker φ.toRingHom := by
+  have hle
+      : J.map (Algebra.TensorProduct.includeLeftRingHom : C →+* C ⊗[B] R)
+        ≤ RingHom.ker φ.toRingHom := by
     rw [Ideal.map_le_iff_le_comap]
     intro j hj
     simp only [Ideal.mem_comap, RingHom.mem_ker]
@@ -28,9 +31,10 @@ theorem flat_comap_map_of_one_tmul_mem {B C R : Type} [CommRing B] [CommRing C] 
     rw [RingHom.mem_ker] at this
     simpa [f, φ, LinearMap.rTensor_tmul, Algebra.TensorProduct.map_tmul] using this
   obtain ⟨x, hx⟩ := (hex ((1 : B) ⊗ₜ[B] r)).1 h0
-  have key : ∀ y : (LinearMap.ker f) ⊗[B] R,
-      TensorProduct.lid B R (LinearMap.rTensor R (LinearMap.ker f).subtype y) ∈
-        (J.comap (algebraMap B C)).map (algebraMap B R) := by
+  have key
+      : ∀ y : (LinearMap.ker f) ⊗[B] R,
+        TensorProduct.lid B R (LinearMap.rTensor R (LinearMap.ker f).subtype y)
+          ∈ (J.comap (algebraMap B C)).map (algebraMap B R) := by
     intro y
     induction y using TensorProduct.induction_on with
     | zero => simp
@@ -42,7 +46,8 @@ theorem flat_comap_map_of_one_tmul_mem {B C R : Type} [CommRing B] [CommRing C] 
       have hi := i.2
       rw [LinearMap.mem_ker] at hi
       simp only [f, LinearMap.coe_comp, Function.comp_apply, Algebra.linearMap_apply,
-        AlgHom.toLinearMap_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem] at hi
+          AlgHom.toLinearMap_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
+        at hi
       exact hi
     | add a b ha hb => simpa [map_add (f := _)] using Ideal.add_mem _ ha hb
   have := key x

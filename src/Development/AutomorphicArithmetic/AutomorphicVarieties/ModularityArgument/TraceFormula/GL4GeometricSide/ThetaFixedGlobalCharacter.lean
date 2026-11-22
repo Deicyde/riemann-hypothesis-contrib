@@ -9,15 +9,21 @@ noncomputable section
 open NumberField MeasureTheory Matrix Finset
 open GlobalTheory.CuspRep GlobalTheory.UnitaryBC
 open PositivityTheory.Rg.BcB (thetaA)
-open UpperTheory.V.Z.GSp4Splitting PositivityTheory.RgBcC PositivityTheory.RgBcC.RealD PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.GSp4Splitting PositivityTheory.RgBcC PositivityTheory.RgBcC.RealD
+  PositivityTheory.Rg.BcB.Desc
 
 namespace UpperTheory.V.Z.GSp4Splitting
 
-private theorem trace_range {V U : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup U] [Module ℂ U]
-    (i : U →ₗ[ℂ] V) (B : V →ₗ[ℂ] U) (F : Submodule ℂ U) [FiniteDimensional ℂ F] (hB : ∀ v, B v ∈ F) :
-    FiniteDimensional ℂ (LinearMap.range (i ∘ₗ B)) ∧
-      trOn F (B ∘ₗ i) = LinearMap.trace ℂ (LinearMap.range (i ∘ₗ B))
-        ((i ∘ₗ B).restrict fun x _ => LinearMap.mem_range_self (i ∘ₗ B) x) := by
+private theorem trace_range
+    {V U : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup U] [Module ℂ U]
+    (i : U →ₗ[ℂ] V)
+    (B : V →ₗ[ℂ] U)
+    (F : Submodule ℂ U) [FiniteDimensional ℂ F]
+    (hB : ∀ v, B v ∈ F)
+    : FiniteDimensional ℂ (LinearMap.range (i ∘ₗ B))
+      ∧ trOn F (B ∘ₗ i)
+        = LinearMap.trace ℂ (LinearMap.range (i ∘ₗ B))
+          ((i ∘ₗ B).restrict fun x _ => LinearMap.mem_range_self (i ∘ₗ B) x) := by
   have hle : LinearMap.range B ≤ F := by
     rintro _ ⟨v, rfl⟩
     exact hB v
@@ -26,7 +32,8 @@ private theorem trace_range {V U : Type} [AddCommGroup V] [Module ℂ V] [AddCom
     rw [LinearMap.range_comp]
     infer_instance
   refine ⟨hfin, ?_⟩
-  let a : LinearMap.range (i ∘ₗ B) →ₗ[ℂ] LinearMap.range B := B.rangeRestrict ∘ₗ (LinearMap.range (i ∘ₗ B)).subtype
+  let a : LinearMap.range (i ∘ₗ B) →ₗ[ℂ] LinearMap.range B :=
+    B.rangeRestrict ∘ₗ (LinearMap.range (i ∘ₗ B)).subtype
   let b : LinearMap.range B →ₗ[ℂ] LinearMap.range (i ∘ₗ B) :=
     (i ∘ₗ (LinearMap.range B).subtype).codRestrict _ (by
       rintro ⟨_, v, rfl⟩
@@ -44,8 +51,12 @@ private theorem trace_range {V U : Type} [AddCommGroup V] [Module ℂ V] [AddCom
     rfl
   rw [trOn, dif_pos h0, e1, LinearMap.trace_comp_comm', e2, LinearMap.trace_comp_comm', e3]
 
-private theorem trOn_smul {U : Type} [AddCommGroup U] [Module ℂ U] (F : Submodule ℂ U) (c : ℂ) (f : U →ₗ[ℂ] U)
-    (hf : ∀ x ∈ F, f x ∈ F) : trOn F (c • f) = c * trOn F f := by
+private theorem trOn_smul
+    {U : Type} [AddCommGroup U] [Module ℂ U]
+    (F : Submodule ℂ U)
+    (c : ℂ)
+    (f : U →ₗ[ℂ] U) (hf : ∀ x ∈ F, f x ∈ F)
+    : trOn F (c • f) = c * trOn F f := by
   have h : ∀ x ∈ F, (c • f) x ∈ F := fun x hx => F.smul_mem c (hf x hx)
   have e : (c • f).restrict h = c • f.restrict hf := by
     ext x
@@ -56,10 +67,11 @@ section Conc
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-private theorem exists_theta (π : CuspSub E n) (hθ : ThetaFix π) :
-    ∃ t : π.V →ₗ[ℂ] π.V, ∀ ψ g, (t ψ).1.1 g = ψ.1.1 (thetaA E n g) := by
+private theorem exists_theta (π : CuspSub E n) (hθ : ThetaFix π)
+    : ∃ t : π.V →ₗ[ℂ] π.V, ∀ ψ g, (t ψ).1.1 g = ψ.1.1 (thetaA E n g) := by
   choose f hf hfe using hθ.2
-  refine ⟨⟨⟨fun ψ => ⟨f ψ.1 ψ.2, hf ψ.1 ψ.2⟩, fun a b => ?_⟩, fun c a => ?_⟩, fun ψ g => hfe ψ.1 ψ.2 g⟩
+  refine
+    ⟨⟨⟨fun ψ => ⟨f ψ.1 ψ.2, hf ψ.1 ψ.2⟩, fun a b => ?_⟩, fun c a => ?_⟩, fun ψ g => hfe ψ.1 ψ.2 g⟩
   · refine Subtype.ext (Subtype.ext (funext fun g => ?_))
     change (f (a + b).1 (a + b).2).1 g = (f a.1 a.2).1 g + (f b.1 b.2).1 g
     rw [hfe, hfe, hfe]
@@ -69,27 +81,39 @@ private theorem exists_theta (π : CuspSub E n) (hθ : ThetaFix π) :
     rw [hfe, hfe]
     rfl
 
-private theorem integrable_hecke (π : CuspSub E n) {K : Subgroup (GL (Fin n) (Af E))}
-    (hKo : IsOpen (K : Set (GL (Fin n) (Af E)))) [MeasurableSpace (GL (Fin n) (Af E))] [BorelSpace (GL (Fin n) (Af E))]
-    (μf : Measure (GL (Fin n) (Af E))) [μf.IsHaarMeasure] {h : GL (Fin n) (Af E) → ℂ} (hh : IsHeckeF K h) (ψ : π.V)
-    (x : GA E n) : Integrable (fun g => h g * ψ.1.1 (x * finGL E n g)) μf := by
+private theorem integrable_hecke
+    (π : CuspSub E n)
+    {K : Subgroup (GL (Fin n) (Af E))} (hKo : IsOpen (K : Set (GL (Fin n) (Af E))))
+    [MeasurableSpace (GL (Fin n) (Af E))] [BorelSpace (GL (Fin n) (Af E))]
+    (μf : Measure (GL (Fin n) (Af E))) [μf.IsHaarMeasure]
+    {h : GL (Fin n) (Af E) → ℂ} (hh : IsHeckeF K h)
+    (ψ : π.V) (x : GA E n)
+    : Integrable (fun g => h g * ψ.1.1 (x * finGL E n g)) μf := by
   refine Continuous.integrable_of_hasCompactSupport ?_ hh.1.mul_right
   refine IsLocallyConstant.continuous ((IsLocallyConstant.iff_eventually_eq _).2 fun g => ?_)
   have hS : IsOpen {k | finRep E n k ψ.1 = ψ.1} := (π.cusp ψ.1 ψ.2).1.level
-  have ho : IsOpen ((fun y => g⁻¹ * y) ⁻¹' ((K : Set (GL (Fin n) (Af E))) ∩ {k | finRep E n k ψ.1 = ψ.1})) :=
+  have ho : IsOpen
+      ((fun y => g⁻¹ * y) ⁻¹' ((K : Set (GL (Fin n) (Af E))) ∩ {k | finRep E n k ψ.1 = ψ.1})) :=
     (hKo.inter hS).preimage (continuous_const.mul continuous_id)
   filter_upwards [ho.mem_nhds (x := g) (by simp [K.one_mem])] with y hy
   have e1 : h y = h g := by simpa using hh.2 1 K.one_mem _ hy.1 g
   have e2 : ψ.1.1 (x * finGL E n g * finGL E n (g⁻¹ * y)) = ψ.1.1 (x * finGL E n g) :=
-    congrArg (fun φ : Sm E n => φ.1 (x * finGL E n g)) (show finRep E n (g⁻¹ * y) ψ.1 = ψ.1 from hy.2)
+    congrArg
+      (fun φ : Sm E n => φ.1 (x * finGL E n g))
+      (show finRep E n (g⁻¹ * y) ψ.1 = ψ.1 from hy.2)
   rw [mul_assoc, ← map_mul, mul_inv_cancel_left] at e2
   rw [e1, e2]
 
-private theorem exists_hecke (hM : HeckeMem) (π : CuspSub E n) {K : Subgroup (GL (Fin n) (Af E))}
+private theorem exists_hecke
+    (hM : HeckeMem)
+    (π : CuspSub E n)
+    {K : Subgroup (GL (Fin n) (Af E))}
     (hKo : IsOpen (K : Set (GL (Fin n) (Af E)))) (hKc : IsCompact (K : Set (GL (Fin n) (Af E))))
     [MeasurableSpace (GL (Fin n) (Af E))] [BorelSpace (GL (Fin n) (Af E))]
-    (μf : Measure (GL (Fin n) (Af E))) [μf.IsHaarMeasure] (D : Rl π K μf) {h : GL (Fin n) (Af E) → ℂ} (hh : IsHeckeF K h) :
-    ∃ S : π.V →ₗ[ℂ] D.U, ∀ ψ, (D.i (S ψ)).1.1 = heckeOp μf h ψ.1.1 := by
+    (μf : Measure (GL (Fin n) (Af E))) [μf.IsHaarMeasure]
+    (D : Rl π K μf)
+    {h : GL (Fin n) (Af E) → ℂ} (hh : IsHeckeF K h)
+    : ∃ S : π.V →ₗ[ℂ] D.U, ∀ ψ, (D.i (S ψ)).1.1 = heckeOp μf h ψ.1.1 := by
   have hex : ∀ ψ : π.V, ∃ u, (D.i u).1.1 = heckeOp μf h ψ.1.1 := fun ψ => by
     obtain ⟨-, -, ψ', -, h1, h2⟩ := hM E n π K hKo hKc μf h hh ψ
     obtain ⟨u, rfl⟩ := (D.rng ψ').2 h2
@@ -115,8 +139,10 @@ end Conc
 end UpperTheory.V.Z.GSp4Splitting
 
 attribute [local instance] PositivityTheory.Rg.BcB.E.borelH in
-theorem UpperTheory.V.Z.GSp4Splitting.exists_global_hecke_theta_lift :
-    AvgEx → AbsGlob → LowIso → HeckeMem → RlEx → RlPair → RlChar → RlK → RlTheta → RlComm → RlHecke → RlSimple → RlFin → RlLow → OpForm → ThetaFixedGlobalCharacter := by
+theorem UpperTheory.V.Z.GSp4Splitting.exists_global_hecke_theta_lift
+    : AvgEx → AbsGlob → LowIso → HeckeMem → RlEx → RlPair → RlChar → RlK → RlTheta → RlComm
+      → RlHecke → RlSimple → RlFin → RlLow → OpForm
+      → ThetaFixedGlobalCharacter := by
   intro hAvg hAbs hLow hM hEx hPair hChar hK hTh hComm hHk hSim hFin hRL hOp
   intro E _ _ _ n hn π hreg hθ lam hlam hch K hKo hKc hKθ hfix _ _ μC _ _ _ μf _ μ _
   classical
@@ -141,14 +167,29 @@ theorem UpperTheory.V.Z.GSp4Splitting.exists_global_hecke_theta_lift :
   haveI : BorelSpace (Un n) := ⟨rfl⟩
   let ν : Measure (Un n) := Measure.haarMeasure ⊤
   have hν : ν Set.univ = 1 := Measure.haarMeasure_self (K₀ := ⊤)
-  have hloc : ∀ w, IsLoc (infOf (lam w)) (D.E1 w) (D.E2 w) (D.σ w) D.Θ := fun w =>
-    ⟨hPair w, (hChar w (lam w) (hch w)).1, (hChar w (lam w) (hch w)).2, (hK w).2, (hK w).1, hsq, hiso, (hT w).1, (hT w).2⟩
+  have hloc : ∀ w, IsLoc (infOf (lam w)) (D.E1 w) (D.E2 w) (D.σ w) D.Θ := fun w => ⟨
+    hPair w,
+    (hChar w (lam w) (hch w)).1,
+    (hChar w (lam w) (hch w)).2,
+    (hK w).2,
+    (hK w).1,
+    hsq,
+    hiso,
+    (hT w).1,
+    (hT w).2
+  ⟩
   choose P hP using fun w => hAvg n ν D.U (D.σ w) (hK w).1 (lefE n (lam w)) (lefT n (lam w))
-  obtain ⟨Y, c₁, hc₁, hYf, hY0, hYR, hYΘ, hYs, hPF, htr⟩ := hAbs n (InfinitePlace E) lam hlam (fun w => lefE n (lam w))
-    (fun w => lefT n (lam w)) (fun w => isLefK_model (lam w) (hlam w)) ν hν D.U D.E1 D.E2 D.σ D.Θ P _ D.R hloc hP hc1 hc2 hc3
-    hadj (fun h => (htw h).imp fun _ h' => h'.2) hsq hSim hnt hFin
-    (fun w => hLow n (lam w) (hlam w) _ _ (isLefK_model (lam w) (hlam w)) D.U _ _ _ _ (hloc w)
-      (hRL hnt w (lam w) (hlam w) (hch w)))
+  obtain ⟨Y, c₁, hc₁, hYf, hY0, hYR, hYΘ, hYs, hPF, htr⟩ :=
+    hAbs n (InfinitePlace E) lam hlam
+      (fun w => lefE n (lam w))
+      (fun w => lefT n (lam w))
+      (fun w => isLefK_model (lam w) (hlam w))
+      ν hν D.U D.E1 D.E2 D.σ D.Θ P _ D.R hloc hP hc1 hc2 hc3 hadj
+      (fun h => (htw h).imp fun _ h' => h'.2)
+      hsq hSim hnt hFin
+      (fun w =>
+        hLow n (lam w) (hlam w) _ _ (isLefK_model (lam w) (hlam w)) D.U _ _ _ _ (hloc w)
+          (hRL hnt w (lam w) (hlam w) (hch w)))
   obtain ⟨c₂, hc₂, hop⟩ := hOp ν hν μC μ P hP
   let j : D.U →ₗ[ℂ] Sm E n := π.V.subtype ∘ₗ D.i
   have hj : Function.Injective j := Subtype.val_injective.comp D.inj
@@ -156,10 +197,26 @@ theorem UpperTheory.V.Z.GSp4Splitting.exists_global_hecke_theta_lift :
   have he : ∀ y : Y, ((e y : Y.map j) : Sm E n) = (D.i y).1 := fun _ => rfl
   let ρ : (GL (Fin n) (Af E) → ℂ) → Module.End ℂ (Y.map j) := fun h =>
     if hh : IsHeckeF K h then e.conj ((D.R ⟨h, hh⟩).restrict (hYR ⟨h, hh⟩)) else 0
-  have hρ : ∀ h (hh : IsHeckeF K h), ρ h = e.conj ((D.R ⟨h, hh⟩).restrict (hYR ⟨h, hh⟩)) := fun h hh => dif_pos hh
-  have hmul : ∀ f g : Module.End ℂ Y, e.conj f * e.conj g = e.conj (f * g) := fun f g => (e.conj_comp g f).symm
-  refine ⟨Y.map j, ρ, e.conj (D.Θ.restrict hYΘ), c₂ * c₁, ?_, inferInstance, ?_, ?_, ?_, ?_, ?_, ?_,
-    mul_ne_zero hc₂ hc₁, ?_⟩
+  have hρ : ∀ h (hh : IsHeckeF K h), ρ h = e.conj ((D.R ⟨h, hh⟩).restrict (hYR ⟨h, hh⟩)) :=
+    fun h hh => dif_pos hh
+  have hmul : ∀ f g : Module.End ℂ Y, e.conj f * e.conj g = e.conj (f * g) := fun f g =>
+    (e.conj_comp g f).symm
+  refine ⟨
+    Y.map j,
+    ρ,
+    e.conj (D.Θ.restrict hYΘ),
+    c₂ * c₁,
+    ?_,
+    inferInstance,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    mul_ne_zero hc₂ hc₁,
+    ?_
+  ⟩
   · rintro _ ⟨u, -, rfl⟩
     exact (D.i u).2
   · intro h0
@@ -174,10 +231,11 @@ theorem UpperTheory.V.Z.GSp4Splitting.exists_global_hecke_theta_lift :
     exact D.hR ⟨h, hh⟩ y
   · intro W hW
     rcases hYs ((W.comap e.toLinearMap).map Y.subtype) (Submodule.map_subtype_le _ _) (by
-      rintro ⟨h, hh⟩ _ ⟨y, hy, rfl⟩
-      refine ⟨(D.R ⟨h, hh⟩).restrict (hYR ⟨h, hh⟩) y, ?_, rfl⟩
-      have := hW h hh (e y) hy
-      rwa [hρ h hh, LinearEquiv.conj_apply_apply, e.symm_apply_apply] at this) with h0 | h1
+        rintro ⟨h, hh⟩ _ ⟨y, hy, rfl⟩
+        refine ⟨(D.R ⟨h, hh⟩).restrict (hYR ⟨h, hh⟩) y, ?_, rfl⟩
+        have := hW h hh (e y) hy
+        rwa [hρ h hh, LinearEquiv.conj_apply_apply, e.symm_apply_apply] at this)
+      with h0 | h1
     · refine Or.inl ((Submodule.eq_bot_iff _).2 fun y hy => ?_)
       obtain ⟨y, rfl⟩ := e.surjective y
       have : (y : D.U) = 0 := (Submodule.eq_bot_iff _).1 h0 _ ⟨y, hy, rfl⟩
@@ -202,8 +260,9 @@ theorem UpperTheory.V.Z.GSp4Splitting.exists_global_hecke_theta_lift :
     set Q : Module.End ℂ D.U := ((univ : Finset (InfinitePlace E)).toList.map P).prod with hQ
     set a : ℂ := c₂ * ∏ w, val w (infOf (lam w)) with ha
     haveI := hFin
-    obtain ⟨hf, htrL⟩ := trace_range D.i (a • (Q ∘ₗ S ∘ₗ t)) (⨅ w, isoSp (D.σ w) (lefE n (lam w)))
-      fun v => Submodule.smul_mem _ _ (hPF _)
+    obtain ⟨hf, htrL⟩ :=
+      trace_range D.i (a • (Q ∘ₗ S ∘ₗ t)) (⨅ w, isoSp (D.σ w) (lefE n (lam w))) fun v =>
+        Submodule.smul_mem _ _ (hPF _)
     refine ⟨D.i ∘ₗ (a • (Q ∘ₗ S ∘ₗ t)), fun ψ x => ?_, hf, ?_⟩
     · have h1 := hop k val T hk h hh (t ψ) (S (t ψ)) (hS _) x
       simp only [ht] at h1
@@ -211,11 +270,15 @@ theorem UpperTheory.V.Z.GSp4Splitting.exists_global_hecke_theta_lift :
       rfl
     · have h2 : (a • (Q ∘ₗ S ∘ₗ t)) ∘ₗ D.i = a • (Q * D.R ⟨h, hh⟩ * D.Θ) := by
         refine LinearMap.ext fun u => ?_
-        have h3 : t (D.i u) = D.i (D.Θ u) := Subtype.ext (Subtype.ext (funext fun g => by rw [ht, D.hΘ]))
-        have h4 : S (D.i (D.Θ u)) = D.R ⟨h, hh⟩ (D.Θ u) := D.inj (Subtype.ext (Subtype.ext (by rw [hS, D.hR])))
+        have h3 : t (D.i u) = D.i (D.Θ u) :=
+          Subtype.ext (Subtype.ext (funext fun g => by rw [ht, D.hΘ]))
+        have h4 : S (D.i (D.Θ u)) = D.R ⟨h, hh⟩ (D.Θ u) :=
+          D.inj (Subtype.ext (Subtype.ext (by rw [hS, D.hR])))
         simp only [LinearMap.comp_apply, LinearMap.smul_apply, Module.End.mul_apply, h3, h4]
       have h5 : ∀ y ∈ Y, (D.R ⟨h, hh⟩ * D.Θ) y ∈ Y := fun y hy => hYR _ _ (hYΘ y hy)
-      have h6 : LinearMap.trace ℂ (Y.map j) (ρ h * e.conj (D.Θ.restrict hYΘ)) = trOn Y (D.R ⟨h, hh⟩ * D.Θ) := by
+      have h6
+          : LinearMap.trace ℂ (Y.map j) (ρ h * e.conj (D.Θ.restrict hYΘ))
+            = trOn Y (D.R ⟨h, hh⟩ * D.Θ) := by
         rw [hρ h hh, hmul, LinearMap.trace_conj', trOn, dif_pos h5]
         rfl
       rw [← htrL, h2, trOn_smul _ a (Q * D.R ⟨h, hh⟩ * D.Θ) (fun x _ => hPF _), htr, h6, ha]

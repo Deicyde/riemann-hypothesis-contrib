@@ -7,16 +7,19 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 
 namespace PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n : ℕ}
-  {Y : Spc F E n} {b : GL (Fin n ⊕ Fin n) E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E} {n : ℕ} {Y : Spc F E n} {b : GL (Fin n ⊕ Fin n) E}
 
-theorem mem_stabiliser_iff_frame_lower_block (hb : IsFrame2 σ Y b) (p : G2 σ Y) :
-    p ∈ par2 σ Y ↔ (inFrame b p).toBlocks₂₁ = 0 := by
+theorem mem_stabiliser_iff_frame_lower_block (hb : IsFrame2 σ Y b) (p : G2 σ Y)
+    : p ∈ par2 σ Y ↔ (inFrame b p).toBlocks₂₁ = 0 := by
   obtain ⟨-, t₀, ht₀⟩ := hb
   rw [GlobalTheory.ThK.Dbl.mem_parabolic_GL2_iff]
   constructor
@@ -25,7 +28,8 @@ theorem mem_stabiliser_iff_frame_lower_block (hb : IsFrame2 σ Y b) (p : G2 σ Y
   · intro h
     set M := inFrame b p with hM
     have hMi : M * inFrame b p⁻¹ = 1 := by
-      rw [hM, ← GlobalTheory.EisBL.DoubledParabolic.inFrame_mul, mul_inv_cancel, GlobalTheory.EisBL.DoubledParabolic.inFrame_one]
+      rw [hM, ← GlobalTheory.EisBL.DoubledParabolic.inFrame_mul, mul_inv_cancel,
+        GlobalTheory.EisBL.DoubledParabolic.inFrame_one]
     have hdet : IsUnit M.det := Matrix.isUnit_det_of_right_inverse hMi
     have hsplit : M = Matrix.fromBlocks M.toBlocks₁₁ M.toBlocks₁₂ 0 M.toBlocks₂₂ := by
       rw [← h, Matrix.fromBlocks_toBlocks]
@@ -46,11 +50,20 @@ theorem mem_stabiliser_iff_frame_lower_block (hb : IsFrame2 σ Y b) (p : G2 σ Y
       exact Matrix.map_one _ (map_zero _) (map_one _)
     have hAA : A * A⁻¹ = 1 := Matrix.mul_nonsing_inv A hA
     have hAA' : A⁻¹ * A = 1 := Matrix.nonsing_inv_mul A hA
-    let t : GL (Fin n) (AE F E) := ⟨T0 * A * T0i, T0 * A⁻¹ * T0i, by
-        calc T0 * A * T0i * (T0 * A⁻¹ * T0i) = T0 * (A * (T0i * T0) * A⁻¹) * T0i := by simp only [Matrix.mul_assoc]
-          _ = 1 := by rw [e2, Matrix.mul_one, hAA, Matrix.mul_one, e1], by
-        calc T0 * A⁻¹ * T0i * (T0 * A * T0i) = T0 * (A⁻¹ * (T0i * T0) * A) * T0i := by simp only [Matrix.mul_assoc]
-          _ = 1 := by rw [e2, Matrix.mul_one, hAA', Matrix.mul_one, e1]⟩
+    let t : GL (Fin n) (AE F E) := ⟨
+      T0 * A * T0i,
+      T0 * A⁻¹ * T0i,
+      by
+        calc
+          T0 * A * T0i * (T0 * A⁻¹ * T0i)
+            = T0 * (A * (T0i * T0) * A⁻¹) * T0i := by simp only [Matrix.mul_assoc]
+          _ = 1 := by rw [e2, Matrix.mul_one, hAA, Matrix.mul_one, e1],
+      by
+        calc
+          T0 * A⁻¹ * T0i * (T0 * A * T0i)
+            = T0 * (A⁻¹ * (T0i * T0) * A) * T0i := by simp only [Matrix.mul_assoc]
+          _ = 1 := by rw [e2, Matrix.mul_one, hAA', Matrix.mul_one, e1]
+    ⟩
     exact ⟨t, (kunf.isPar_frame ht₀ p t).2 ⟨h, rfl⟩⟩
 
 end PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity

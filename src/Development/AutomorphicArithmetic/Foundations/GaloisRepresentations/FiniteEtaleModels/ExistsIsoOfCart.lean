@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ZarhinOrderI
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.crystallineComparison.Mod (Std TjD KerAt)
 open scoped TensorProduct
@@ -20,8 +23,9 @@ section Grp
 
 variable {X : Scheme.{0}}
 
-private theorem exists_iso_of_cart {A B : Over X} [GrpObj A] [GrpObj B] {φ : A.left ⟶ B.left}
-    (h : IsGrpPullback A B (𝟙 X) φ) : ∃ e : A ≅ B, e.hom.left = φ ∧ IsMonHom e.hom ∧ IsMonHom e.inv := by
+private theorem exists_iso_of_cart
+    {A B : Over X} [GrpObj A] [GrpObj B] {φ : A.left ⟶ B.left} (h : IsGrpPullback A B (𝟙 X) φ)
+    : ∃ e : A ≅ B, e.hom.left = φ ∧ IsMonHom e.hom ∧ IsMonHom e.inv := by
   have hφ : IsIso φ := h.1.isIso_fst_of_isIso
   have hw : (asIso φ).hom ≫ B.hom = A.hom := by simpa using h.1.w
   have hel : (Over.isoMk (asIso φ) hw).hom.left = φ := rfl
@@ -29,8 +33,9 @@ private theorem exists_iso_of_cart {A B : Over X} [GrpObj A] [GrpObj B] {φ : A.
     refine GlobalTheory.ZarhinFam.RAct.isMonHom_of_mul_comp _ ?_
     intro T x y
     let i : Over.mk (T.hom ≫ 𝟙 X) ⟶ T := Over.homMk (𝟙 T.left) (by simp)
-    have key := h.2 T x y (i ≫ x ≫ (Over.isoMk (asIso φ) hw).hom)
-      (i ≫ y ≫ (Over.isoMk (asIso φ) hw).hom) (by simp [i, hel]) (by simp [i, hel])
+    have key :=
+      h.2 T x y (i ≫ x ≫ (Over.isoMk (asIso φ) hw).hom) (i ≫ y ≫ (Over.isoMk (asIso φ) hw).hom)
+        (by simp [i, hel]) (by simp [i, hel])
     rw [← MonObj.comp_mul] at key
     apply Over.OverMorphism.ext
     have hi : i.left = 𝟙 T.left := rfl
@@ -39,31 +44,37 @@ private theorem exists_iso_of_cart {A B : Over X} [GrpObj A] [GrpObj B] {φ : A.
     exact key.symm.trans (Category.id_comp _)
   exact ⟨Over.isoMk (asIso φ) hw, rfl, he, inferInstance⟩
 
-private theorem comp_pow_id {A B : Over X} [GrpObj A] [GrpObj B] (e : A ⟶ B) [IsMonHom e] (n : ℕ) :
-    ((𝟙 A) ^ n) ≫ e = e ≫ ((𝟙 B) ^ n) := by
+private theorem comp_pow_id {A B : Over X} [GrpObj A] [GrpObj B] (e : A ⟶ B) [IsMonHom e] (n : ℕ)
+    : ((𝟙 A) ^ n) ≫ e = e ≫ ((𝟙 B) ^ n) := by
   rw [MonObj.pow_comp, MonObj.comp_pow, Category.id_comp, Category.comp_id]
 
-private theorem comp_iso_eq_one {A B T : Over X} [GrpObj A] [GrpObj B] (e : A ≅ B) [IsMonHom e.hom] [IsMonHom e.inv] (a : T ⟶ A) :
-    a ≫ e.hom = 1 ↔ a = 1 := by
+private theorem comp_iso_eq_one
+    {A B T : Over X} [GrpObj A] [GrpObj B] (e : A ≅ B) [IsMonHom e.hom] [IsMonHom e.inv] (a : T ⟶ A)
+    : a ≫ e.hom = 1 ↔ a = 1 := by
   constructor
   · intro h
-    calc a = (a ≫ e.hom) ≫ e.inv := by simp
+    calc
+      a = (a ≫ e.hom) ≫ e.inv := by simp
       _ = 1 := by rw [h, MonObj.one_comp]
   · rintro rfl
     exact MonObj.one_comp _
 
 end Grp
 
-private theorem lbIso_move {Y Y₁ Z Z₁ : Scheme.{0}} {P : LB Y} {P₁ : LB Y₁} {Q : LB Z} {Q₁ : LB Z₁}
-    (hP : P.IsLB) (hP₁ : P₁.IsLB) (hQ : Q.IsLB) (hQ₁ : Q₁.IsLB) (f : Y ⟶ Y₁) [IsIso f] (g : Z ⟶ Z₁) (a : Y ⟶ Z) (a₁ : Y₁ ⟶ Z₁)
-    (w : f ≫ a₁ = a ≫ g) (c : ℕ) (h₁ : LBIso P (P₁.pull f)) (h₂ : LBIso Q (Q₁.pull g))
-    (h : LBIso (Hecke.lbPow P c) (Q.pull a)) : LBIso (Hecke.lbPow P₁ c) (Q₁.pull a₁) := by
+private theorem lbIso_move
+    {Y Y₁ Z Z₁ : Scheme.{0}} {P : LB Y} {P₁ : LB Y₁} {Q : LB Z} {Q₁ : LB Z₁}
+    (hP : P.IsLB) (hP₁ : P₁.IsLB) (hQ : Q.IsLB) (hQ₁ : Q₁.IsLB) (f : Y ⟶ Y₁) [IsIso f]
+    (g : Z ⟶ Z₁) (a : Y ⟶ Z) (a₁ : Y₁ ⟶ Z₁) (w : f ≫ a₁ = a ≫ g)
+    (c : ℕ)
+    (h₁ : LBIso P (P₁.pull f)) (h₂ : LBIso Q (Q₁.pull g)) (h : LBIso (Hecke.lbPow P c) (Q.pull a))
+    : LBIso (Hecke.lbPow P₁ c) (Q₁.pull a₁) := by
   have hPc : ∀ {Z : Scheme.{0}} (L : LB Z), L.IsLB → (Hecke.lbPow L c).IsLB := by
     intro Z L hL
     unfold Hecke.lbPow
     exact LB.isLB_linComb hL _ _
-  have pw : ∀ {Z : Scheme.{0}} (L : LB Z) (hL : L.IsLB) (h' : (Hecke.lbPow L c).IsLB),
-      GlobalTheory.CechPic.cls _ h' = c • GlobalTheory.CechPic.cls L hL := by
+  have pw
+      : ∀ {Z : Scheme.{0}} (L : LB Z) (hL : L.IsLB) (h' : (Hecke.lbPow L c).IsLB),
+        GlobalTheory.CechPic.cls _ h' = c • GlobalTheory.CechPic.cls L hL := by
     intro Z L hL h'
     unfold Hecke.lbPow at h' ⊢
     rw [GlobalTheory.CechPic.cls_linComb hL]
@@ -74,15 +85,17 @@ private theorem lbIso_move {Y Y₁ Z Z₁ : Scheme.{0}} {P : LB Y} {P₁ : LB Y�
   rw [← GlobalTheory.CechPic.cls_eq_iff (hPc P hP) (pull_isLB hQ a)] at h
   rw [GlobalTheory.CechPic.cls_pull hP₁] at h₁
   rw [GlobalTheory.CechPic.cls_pull hQ₁] at h₂
-  rw [GlobalTheory.CechPic.cls_pull hQ, pw P hP, h₁, h₂, ← map_nsmul, ← GlobalTheory.CechPic.pull_comp, ← w,
-    GlobalTheory.CechPic.pull_comp] at h
+  rw [GlobalTheory.CechPic.cls_pull hQ, pw P hP, h₁, h₂, ← map_nsmul,
+      ← GlobalTheory.CechPic.pull_comp, ← w, GlobalTheory.CechPic.pull_comp]
+    at h
   rw [pw P₁ hP₁, GlobalTheory.CechPic.cls_pull hQ₁]
   have inj : ∀ z, GlobalTheory.CechPic.pull (inv f) (GlobalTheory.CechPic.pull f z) = z := by
     intro z
     rw [← GlobalTheory.CechPic.pull_comp, IsIso.inv_hom_id, GlobalTheory.CechPic.pull_id]
   rw [← inj (c • _), h, inj]
 
-private theorem isIntAf_mul {p : ℕ} [Fact p.Prime] {a b : AfP p} (ha : IsIntAf a) (hb : IsIntAf b) : IsIntAf (a * b) := fun v => by
+private theorem isIntAf_mul {p : ℕ} [Fact p.Prime] {a b : AfP p} (ha : IsIntAf a) (hb : IsIntAf b)
+    : IsIntAf (a * b) := fun v => by
   rw [map_mul]
   exact mul_mem (ha v) (hb v)
 
@@ -91,9 +104,9 @@ private theorem inAf_mem {p : ℕ} [Fact p.Prime] (D : Datum p) (x : D.La) : inA
 
 end UpperTheory.Gal.FiniteEtaleModels
 
-theorem UpperTheory.Gal.FiniteEtaleModels.isogG_of :
-    TrEta → TrBack → MultUnit → TrTj → IsogG := by
-  intro hTE hTB hMU hTT p hp D G L R' _ _ gb q hq r 𝔴₀ 𝔴 atq sp hm h𝔴 hle R _ b N₀ hN₀ i e hnorm h u hTj hInt hu N' N c' c hN' hN X s o' o ψ hψ s₀ o₁ o₂ n₁ n₂
+theorem UpperTheory.Gal.FiniteEtaleModels.isogG_of : TrEta → TrBack → MultUnit → TrTj → IsogG := by
+  intro hTE hTB hMU hTT p hp D G L R' _ _ gb q hq r 𝔴₀ 𝔴 atq sp hm h𝔴 hle R _ b N₀ hN₀ i e hnorm h u
+    hTj hInt hu N' N c' c hN' hN X s o' o ψ hψ s₀ o₁ o₂ n₁ n₂
   obtain ⟨e₁, he₁, m₁, m₁'⟩ := exists_iso_of_cart n₁.cart
   obtain ⟨e₂, he₂, m₂, m₂'⟩ := exists_iso_of_cart n₂.cart
   have mψ : IsMonHom ψ := hψ.1
@@ -148,8 +161,10 @@ theorem UpperTheory.Gal.FiniteEtaleModels.isogG_of :
     have hc : c₀ = q ^ e := by
       refine (hMU p D G L).2 c₀ (q ^ e) (t₁ * _ * t') (t * t₂' * t₁') hc₀ hcop
         (isIntAf_mul (isIntAf_mul ht₁ hu₂) ht') (isIntAf_mul (isIntAf_mul ht ht₂') ht₁') ?_ ?_
-      · rw [show ∀ a b c d f g : AfP p, a * b * c * (d * f * g) = (a * g) * (b * f) * (d * c) from
-          fun _ _ _ _ _ _ => by ring, htt₁, htt₂, htt, _root_.one_mul, _root_.one_mul]
+      · rw [show ∀ a b c d f g : AfP p,
+              a * b * c * (d * f * g) = (a * g) * (b * f) * (d * c) from fun _ _ _ _ _ _ => by
+            ring,
+          htt₁, htt₂, htt, _root_.one_mul, _root_.one_mul]
       · rw [← _root_.mul_one (c₀ : AfP p), ← htt, ← _root_.mul_assoc, ← hht, hh₁, hnorm]
         ring
     subst hc
@@ -174,15 +189,17 @@ theorem UpperTheory.Gal.FiniteEtaleModels.isogG_of :
     · simp only [Category.assoc, Iso.hom_inv_id_assoc]
       rw [reassoc_of% h2, comp_pow_id, Iso.inv_hom_id_assoc]
   · intro k _ _ _ x
-    obtain ⟨hT1, hT2⟩ := hTT p D G L R' gb (h * u) X s N' N o' o ψ hψ q r 𝔴 i h u atP hTj hInt hu1 rfl k x
-    have hk : ∀ {T : Over X} (g : T ⟶ o₁.A) (a : D.O),
-        g ≫ o₁.act.act a = 1 ↔ (g ≫ e₁.inv) ≫ o'.act.act a = 1 := by
+    obtain ⟨hT1, hT2⟩ :=
+      hTT p D G L R' gb (h * u) X s N' N o' o ψ hψ q r 𝔴 i h u atP hTj hInt hu1 rfl k x
+    have hk
+        : ∀ {T : Over X} (g : T ⟶ o₁.A) (a : D.O),
+          g ≫ o₁.act.act a = 1 ↔ (g ≫ e₁.inv) ≫ o'.act.act a = 1 := by
       intro T g a
       rw [← comp_iso_eq_one e₁ ((g ≫ e₁.inv) ≫ o'.act.act a)]
       simp only [Category.assoc]
       rw [show o'.act.act a ≫ e₁.hom = e₁.hom ≫ o₁.act.act a from hact₁ a, Iso.inv_hom_id_assoc]
-    have hz : ∀ {T : Over X} (g : T ⟶ o₁.A),
-        g ≫ (e₁.inv ≫ ψ ≫ e₂.hom) = 1 ↔ (g ≫ e₁.inv) ≫ ψ = 1 := by
+    have hz
+        : ∀ {T : Over X} (g : T ⟶ o₁.A), g ≫ (e₁.inv ≫ ψ ≫ e₂.hom) = 1 ↔ (g ≫ e₁.inv) ≫ ψ = 1 := by
       intro T g
       rw [← comp_iso_eq_one e₂ ((g ≫ e₁.inv) ≫ ψ)]
       simp only [Category.assoc]
@@ -193,9 +210,13 @@ theorem UpperTheory.Gal.FiniteEtaleModels.isogG_of :
     · show _ = Ideal.absNorm 𝔴 ^ (D.m * i)
       rw [hm, _root_.one_mul, ← hT2]
       apply Nat.card_congr
-      exact
-        { toFun := fun g => ⟨g.1 ≫ e₁.inv, (hz g.1).1 g.2.1, fun y hy => (hk g.1 _).1 (g.2.2 y hy)⟩
-          invFun := fun g => ⟨g.1 ≫ e₁.hom, (hz _).2 (by simpa using g.2.1),
-            fun y hy => (hk _ _).2 (by simpa using g.2.2 y hy)⟩
-          left_inv := fun g => Subtype.ext (by simp)
-          right_inv := fun g => Subtype.ext (by simp) }
+      exact {
+        toFun := fun g => ⟨g.1 ≫ e₁.inv, (hz g.1).1 g.2.1, fun y hy => (hk g.1 _).1 (g.2.2 y hy)⟩
+        invFun := fun g => ⟨
+          g.1 ≫ e₁.hom,
+          (hz _).2 (by simpa using g.2.1),
+          fun y hy => (hk _ _).2 (by simpa using g.2.2 y hy)
+        ⟩
+        left_inv := fun g => Subtype.ext (by simp)
+        right_inv := fun g => Subtype.ext (by simp)
+      }

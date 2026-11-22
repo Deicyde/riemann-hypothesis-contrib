@@ -12,9 +12,11 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.Per
 
-theorem exists_unit_character_of_stable_line (l : ℕ) [Fact l.Prime] (y : ℂ_[l]) (hy : y ≠ 0)
-    (h : ∀ g : GQ l, ∃ x : ℚ_[l], Per.σC g y = algebraMap ℚ_[l] ℂ_[l] x * y) :
-    ∃ η : GQ l →* ℤ_[l]ˣ, ∀ g : GQ l,
+theorem exists_unit_character_of_stable_line
+    (l : ℕ) [Fact l.Prime]
+    (y : ℂ_[l])
+    (hy : y ≠ 0) (h : ∀ g : GQ l, ∃ x : ℚ_[l], Per.σC g y = algebraMap ℚ_[l] ℂ_[l] x * y)
+    : ∃ η : GQ l →* ℤ_[l]ˣ, ∀ g : GQ l,
       Per.σC g y = algebraMap ℚ_[l] ℂ_[l] ((η g : ℤ_[l]) : ℚ_[l]) * y := by
   choose x hx using h
   have hn : ∀ g, ‖x g‖ = 1 := fun g => by

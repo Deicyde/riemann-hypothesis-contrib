@@ -8,10 +8,11 @@ open AlgebraicGeometry CategoryTheory
 
 namespace GlobalTheory
 
-theorem spec_local_hom_factors_affineOpen : ∀ (X : Scheme.{0}) (V : X.Opens) (hV : IsAffineOpen V)
-    (A : Type) [CommRing A] [IsLocalRing A]
-    (f : Spec (CommRingCat.of A) ⟶ X), f (IsLocalRing.closedPoint A) ∈ V →
-    ∃ g : Γ(X, V) →+* A, f = Spec.map (CommRingCat.ofHom g) ≫ hV.fromSpec := by
+theorem spec_local_hom_factors_affineOpen
+    : ∀ (X : Scheme.{0}) (V : X.Opens) (hV : IsAffineOpen V) (A : Type) [CommRing A] [IsLocalRing A]
+        (f : Spec (CommRingCat.of A) ⟶ X),
+      f (IsLocalRing.closedPoint A) ∈ V
+        → ∃ g : Γ(X, V) →+* A, f = Spec.map (CommRingCat.ofHom g) ≫ hV.fromSpec := by
   intro X V hV A _ _ f hf
   have H : Set.range f ⊆ Set.range hV.fromSpec := by
     rw [hV.range_fromSpec]

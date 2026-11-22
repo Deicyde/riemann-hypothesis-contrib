@@ -19,7 +19,8 @@ namespace GlobalTheory.CompanionTheory.CechOne
 
 variable {R : Type} [CommRing R]
 
-theorem mem_B_of_cls {K : Cx.{w} R} {n : ℕ} {x : K.X n} (hx : K.d n x = 0) (h : K.cls x hx = 0) : x ∈ K.B n :=
+theorem mem_B_of_cls {K : Cx.{w} R} {n : ℕ} {x : K.X n} (hx : K.d n x = 0) (h : K.cls x hx = 0)
+    : x ∈ K.B n :=
   (Submodule.Quotient.mk_eq_zero ((K.B n).submoduleOf (K.Z n))).1 h
 
 theorem d_of_mem_B (K : Cx.{w} R) (n : ℕ) (x : K.X n) (h : x ∈ K.B n) : K.d n x = 0 := by
@@ -36,13 +37,15 @@ section Tic
 variable {K : DCx.{w} R} {E : Cx.{w'} R} (e : DCx.AugRow E K) {a : ℕ}
 
 def LowB (q : ℕ) : Prop :=
-  (∀ p (b : K.X (p + 1) q), b ∈ (K.col (p + 1)).B q → K.dh (p + 1) q b = 0 →
-    ∃ b' ∈ (K.col p).B q, K.dh p q b' = b) ∧
-  (∀ b : K.X 0 q, b ∈ (K.col 0).B q → K.dh 0 q b = 0 → ∃ z ∈ E.B q, e.ε q z = b)
+  (∀ p (b : K.X (p + 1) q),
+      b ∈ (K.col (p + 1)).B q → K.dh (p + 1) q b = 0 → ∃ b' ∈ (K.col p).B q, K.dh p q b' = b)
+    ∧ (∀ b : K.X 0 q, b ∈ (K.col 0).B q → K.dh 0 q b = 0 → ∃ z ∈ E.B q, e.ε q z = b)
 
-theorem lowB (hr0 : ∀ q x, K.dh 0 q x = 0 → ∃ y, e.ε q y = x)
+theorem lowB
+    (hr0 : ∀ q x, K.dh 0 q x = 0 → ∃ y, e.ε q y = x)
     (hr : ∀ p q x, K.dh (p + 1) q x = 0 → ∃ y, K.dh p q y = x)
-    (hc : ∀ p q, q ≠ a → ∀ x, K.dv p q x = 0 → x ∈ (K.col p).B q) : ∀ q, q ≤ a → LowB e q := by
+    (hc : ∀ p q, q ≠ a → ∀ x, K.dv p q x = 0 → x ∈ (K.col p).B q)
+    : ∀ q, q ≤ a → LowB e q := by
   intro q
   induction q with
   | zero =>
@@ -57,8 +60,9 @@ theorem lowB (hr0 : ∀ q x, K.dh 0 q x = 0 → ∃ y, e.ε q y = x)
   | succ q ih =>
     intro hq
     obtain ⟨i1, -⟩ := ih (by omega)
-    have L1 : ∀ p (x : K.X (p + 1) q), K.dv (p + 1) q x = 0 → K.dh (p + 1) q x = 0 →
-        ∃ y, K.dh p q y = x ∧ K.dv p q y = 0 := by
+    have L1
+        : ∀ p (x : K.X (p + 1) q),
+          K.dv (p + 1) q x = 0 → K.dh (p + 1) q x = 0 → ∃ y, K.dh p q y = x ∧ K.dv p q y = 0 := by
       intro p x hv hh
       obtain ⟨b', hb', e'⟩ := i1 p x (hc _ _ (by omega) x hv) hh
       exact ⟨b', e', d_of_mem_B (K.col p) q b' hb'⟩
@@ -80,14 +84,18 @@ theorem lowB (hr0 : ∀ q x, K.dh 0 q x = 0 → ∃ y, e.ε q y = x)
       change e.ε (q + 1) (E.d q z) = K.dv 0 q c
       rw [← e.comm, hz, map_sub, hyv, sub_zero]
 
-theorem mem_B_of_eps (hinj : ∀ q, Function.Injective (e.ε q)) (h : ∀ q, q ≤ a → LowB e q) {q : ℕ} (hq : q ≤ a)
-    (z : E.X q) (hz : e.ε q z ∈ (K.col 0).B q) : z ∈ E.B q := by
+theorem mem_B_of_eps
+    (hinj : ∀ q, Function.Injective (e.ε q)) (h : ∀ q, q ≤ a → LowB e q)
+    {q : ℕ} (hq : q ≤ a) (z : E.X q) (hz : e.ε q z ∈ (K.col 0).B q)
+    : z ∈ E.B q := by
   obtain ⟨z', hz', h'⟩ := (h q hq).2 _ hz (e.hε q z)
   rwa [← hinj q h']
 
-theorem exists_lift (hinj : ∀ q, Function.Injective (e.ε q)) (hr0 : ∀ q x, K.dh 0 q x = 0 → ∃ y, e.ε q y = x)
-    (h : ∀ q, q ≤ a → LowB e q) (u : K.X 0 a) (hu : K.dv 0 a u = 0) (hd : K.dh 0 a u ∈ (K.col 1).B a) :
-    ∃ z b, E.d a z = 0 ∧ b ∈ (K.col 0).B a ∧ e.ε a z + b = u := by
+theorem exists_lift
+    (hinj : ∀ q, Function.Injective (e.ε q)) (hr0 : ∀ q x, K.dh 0 q x = 0 → ∃ y, e.ε q y = x)
+    (h : ∀ q, q ≤ a → LowB e q)
+    (u : K.X 0 a) (hu : K.dv 0 a u = 0) (hd : K.dh 0 a u ∈ (K.col 1).B a)
+    : ∃ z b, E.d a z = 0 ∧ b ∈ (K.col 0).B a ∧ e.ε a z + b = u := by
   obtain ⟨b, hb, eb⟩ := (h a le_rfl).1 0 _ hd (K.hh _ _ _)
   obtain ⟨z, hz⟩ := hr0 a (u - b) (by rw [map_sub, eb, sub_self])
   refine ⟨z, b, hinj (a + 1) ?_, hb, by rw [hz, sub_add_cancel]⟩
@@ -97,10 +105,12 @@ end Tic
 
 variable {ι : Type} [DecidableEq ι]
 
-theorem cech_d_apply (P : PM.{w} R ι) (p : ℕ) (x : P.cech.X p) (t : Fin (p + 2) → ι) :
-    P.cech.d p x t = ∑ k : Fin (p + 2), (-1 : ℤ) ^ (k : ℕ) • P.res (ent_comp t k.succAbove) (x (t ∘ k.succAbove)) := by
-  rw [Cos.d_apply, Finset.sum_apply]
-  rfl
+theorem cech_d_apply (P : PM.{w} R ι) (p : ℕ) (x : P.cech.X p) (t : Fin (p + 2) → ι)
+    : P.cech.d p x t
+      = ∑ k : Fin (p + 2), (-1 : ℤ) ^ (k : ℕ) • P.res (ent_comp t k.succAbove) (x (t ∘ k.succAbove)) :=
+  by
+    rw [Cos.d_apply, Finset.sum_apply]
+    rfl
 
 theorem d_aug (P : PM.{w} R ι) (x : P.M ∅) : P.cech.d 0 (P.aug x) = 0 := by
   funext t
@@ -139,7 +149,8 @@ def aug : DCx.AugRow (A.K ∅) (dcx A) where
     funext i
     exact (A.res _).comm q x
 
-theorem mem_col_B {p q : ℕ} (x : (dcx A).X p q) (h : ∀ i, x i ∈ (A.K (ent i)).B q) : x ∈ ((dcx A).col p).B q := by
+theorem mem_col_B {p q : ℕ} (x : (dcx A).X p q) (h : ∀ i, x i ∈ (A.K (ent i)).B q)
+    : x ∈ ((dcx A).col p).B q := by
   cases q with
   | zero =>
     have h0 : x = 0 := funext h
@@ -148,7 +159,8 @@ theorem mem_col_B {p q : ℕ} (x : (dcx A).X p q) (h : ∀ i, x i ∈ (A.K (ent 
     choose c hc using h
     exact ⟨c, funext hc⟩
 
-theorem col_B_mem {p q : ℕ} (x : (dcx A).X p q) (h : x ∈ ((dcx A).col p).B q) (i) : x i ∈ (A.K (ent i)).B q := by
+theorem col_B_mem {p q : ℕ} (x : (dcx A).X p q) (h : x ∈ ((dcx A).col p).B q) (i)
+    : x i ∈ (A.K (ent i)).B q := by
   cases q with
   | zero =>
     have h0 : x = 0 := h
@@ -200,12 +212,17 @@ theorem oneLow : OneLow := by
         refine mem_col_B A _ fun t => ?_
         have h := congrFun hy t
         rw [cech_d_apply, Fin.sum_univ_two, ← hu, ← hu] at h
-        have hz : (A.K (ent t)).d a ((dcx A).dh 0 a u' t) = 0 := congrFun ((dcx A).hv 0 a u' ▸ (by rw [hv, map_zero] : (dcx A).dh 0 (a + 1) ((dcx A).dv 0 a u') = 0)) t
+        have hz : (A.K (ent t)).d a ((dcx A).dh 0 a u' t) = 0 :=
+          congrFun
+            ((dcx A).hv 0 a u'
+              ▸ (by rw [hv, map_zero] : (dcx A).dh 0 (a + 1) ((dcx A).dv 0 a u') = 0))
+            t
         refine mem_B_of_cls hz ?_
         simp only [Fin.val_zero, Fin.val_one, pow_zero, pow_one, one_smul, neg_smul] at h
-        have e : (⟨(dcx A).dh 0 a u' t, hz⟩ : (A.K (ent t)).Z a) =
-            (A.res (ent_comp t (Fin.succAbove 0))).mapZ a (u (t ∘ Fin.succAbove 0)) -
-              (A.res (ent_comp t (Fin.succAbove 1))).mapZ a (u (t ∘ Fin.succAbove 1)) := by
+        have e
+            : (⟨(dcx A).dh 0 a u' t, hz⟩ : (A.K (ent t)).Z a)
+              = (A.res (ent_comp t (Fin.succAbove 0))).mapZ a (u (t ∘ Fin.succAbove 0))
+                - (A.res (ent_comp t (Fin.succAbove 1))).mapZ a (u (t ∘ Fin.succAbove 1)) := by
           refine Subtype.ext ?_
           change (A.term a).cech.d 0 u' t = _
           rw [cech_d_apply, Fin.sum_univ_two]
@@ -218,7 +235,8 @@ theorem oneLow : OneLow := by
       refine ⟨Submodule.Quotient.mk ⟨z, hz⟩, ?_⟩
       funext i
       rw [← hu]
-      change Submodule.Quotient.mk ((A.res (Finset.empty_subset _)).mapZ a ⟨z, hz⟩) = Submodule.Quotient.mk (u i)
+      change Submodule.Quotient.mk ((A.res (Finset.empty_subset _)).mapZ a ⟨z, hz⟩)
+        = Submodule.Quotient.mk (u i)
       refine (Submodule.Quotient.eq _).2 ?_
       have hbi := col_B_mem A b hb i
       have e' : (A.term a).aug z i + b i = (u i).1 := congrFun e i

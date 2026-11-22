@@ -28,18 +28,23 @@ theorem measurable_sheetJac (s : (Fin d → ℂ) → Fin n → ℂ) : Measurable
     (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin d => ℂ)).toContinuousLinearMap
   let ψ : (Fin n → ℂ) →L[ℝ] EuclideanSpace ℂ (Fin n) :=
     (PiLp.continuousLinearEquiv 2 ℝ (fun _ : Fin n => ℂ)).symm.toContinuousLinearMap
-  have h : sheetJac s = (fun M : EuclideanSpace ℂ (Fin d) →L[ℝ] EuclideanSpace ℂ (Fin n) =>
-      areaJacobian (M : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n))) ∘
-        (fun L : (Fin d → ℂ) →L[ℝ] (Fin n → ℂ) => ψ.comp (L.comp φ)) ∘ fderiv ℝ s := by
+  have h
+      : sheetJac s
+        = (fun M : EuclideanSpace ℂ (Fin d) →L[ℝ] EuclideanSpace ℂ (Fin n) =>
+            areaJacobian (M : EuclideanSpace ℂ (Fin d) →ₗ[ℝ] EuclideanSpace ℂ (Fin n)))
+          ∘ (fun L : (Fin d → ℂ) →L[ℝ] (Fin n → ℂ) => ψ.comp (L.comp φ)) ∘ fderiv ℝ s := by
     funext y
     rfl
   rw [h]
   have hc : Continuous fun L : (Fin d → ℂ) →L[ℝ] (Fin n → ℂ) => ψ.comp (L.comp φ) := by fun_prop
   exact continuous_areaJacobian.measurable.comp (hc.measurable.comp (measurable_fderiv ℝ s))
 
-theorem exists_lintegral_volume_eq (d : ℕ) : ∃ c : NNReal, ∀ F : (Fin d → ℂ) → ℝ≥0∞,
-    ∫⁻ y, F y = c * ∫⁻ y, F (WithLp.ofLp y)
-      ∂(μH[((2 * d : ℕ) : ℝ)] : Measure (EuclideanSpace ℂ (Fin d))) := by
+theorem exists_lintegral_volume_eq (d : ℕ)
+    : ∃ c : NNReal, ∀ F : (Fin d → ℂ) → ℝ≥0∞,
+      ∫⁻ y, F y
+        = c
+          * ∫⁻ y, F (WithLp.ofLp y)
+            ∂(μH[((2 * d : ℕ) : ℝ)] : Measure (EuclideanSpace ℂ (Fin d))) := by
   let e := (EuclideanSpace.equiv (Fin d) ℂ).toHomeomorph.toMeasurableEquiv
   let ν : Measure (Fin d → ℂ) := (μH[((2 * d : ℕ) : ℝ)] : Measure (EuclideanSpace ℂ (Fin d))).map e
   have : ν.IsAddHaarMeasure := (EuclideanSpace.equiv (Fin d) ℂ).isAddHaarMeasure_map _
@@ -48,35 +53,61 @@ theorem exists_lintegral_volume_eq (d : ℕ) : ∃ c : NNReal, ∀ F : (Fin d �
   rw [lintegral_smul_measure, lintegral_map_equiv F e]
   rfl
 
-theorem ofReal_finsum_le_tsum {α : Type*} (f : α → ℝ) (hf : ∀ a, 0 ≤ f a) :
-    ENNReal.ofReal (∑ᶠ a, f a) ≤ ∑' a, ENNReal.ofReal (f a) := by
+theorem ofReal_finsum_le_tsum {α : Type*} (f : α → ℝ) (hf : ∀ a, 0 ≤ f a)
+    : ENNReal.ofReal (∑ᶠ a, f a) ≤ ∑' a, ENNReal.ofReal (f a) := by
   by_cases h : (Function.support f).Finite
   · rw [finsum_eq_sum f h, ENNReal.ofReal_sum_of_nonneg fun a _ => hf a]
     exact ENNReal.sum_le_tsum _
   · rw [finsum_of_infinite_support h]
     simp
 
-theorem exists_sheet_nhds {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin d) (Fin n) ℂ}
-    (x : Fin n → ℂ) :
-    ∃ (s : (Fin d → ℂ) → Fin n → ℂ) (U : Set (Fin d → ℂ)) (W : Set (Fin n → ℂ)),
-      IsOpen U ∧ IsOpen W ∧ DifferentiableOn ℂ s U ∧ (∀ y ∈ U, A *ᵥ s y = y ∧ s y ∈ zeroSet J) ∧
-      (∀ x' ∈ zeroSet J ∩ W, A *ᵥ x' ∈ U ∧ IsSheetAt J A x' s) ∧
-      ((∃ s, IsSheetAt J A x s) → x ∈ W) := by
+theorem exists_sheet_nhds
+    {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin d) (Fin n) ℂ} (x : Fin n → ℂ)
+    : ∃ (s : (Fin d → ℂ) → Fin n → ℂ) (U : Set (Fin d → ℂ)) (W : Set (Fin n → ℂ)),
+      IsOpen U ∧ IsOpen W ∧ DifferentiableOn ℂ s U ∧ (∀ y ∈ U, A *ᵥ s y = y ∧ s y ∈ zeroSet J)
+        ∧ (∀ x' ∈ zeroSet J ∩ W, A *ᵥ x' ∈ U ∧ IsSheetAt J A x' s)
+        ∧ ((∃ s, IsSheetAt J A x s) → x ∈ W) := by
   by_cases hx : ∃ s, IsSheetAt J A x s
   · obtain ⟨s, U, hU, hxU, hsd, hsx, hsec, V, hV, hVs⟩ := hx
     have hAc : Continuous fun z : Fin n → ℂ => A *ᵥ z := by fun_prop
-    refine ⟨s, U, interior V ∩ (fun z => A *ᵥ z) ⁻¹' U, hU,
-      isOpen_interior.inter (hU.preimage hAc), hsd, hsec, ?_, fun _ =>
-        ⟨mem_interior_iff_mem_nhds.2 hV, hxU⟩⟩
+    refine ⟨
+      s,
+      U,
+      interior V ∩ (fun z => A *ᵥ z) ⁻¹' U,
+      hU,
+      isOpen_interior.inter (hU.preimage hAc),
+      hsd,
+      hsec,
+      ?_,
+      fun _ => ⟨mem_interior_iff_mem_nhds.2 hV, hxU⟩
+    ⟩
     rintro x' ⟨hx'Z, hx'V, hx'U⟩
     have hx's : s (A *ᵥ x') = x' := (hVs x' ⟨hx'Z, interior_subset hx'V⟩ hx'U).symm
-    exact ⟨hx'U, U, hU, hx'U, hsd, hx's, hsec, interior V, isOpen_interior.mem_nhds hx'V,
-      fun x'' hx'' hAx'' => hVs x'' ⟨hx''.1, interior_subset hx''.2⟩ hAx''⟩
-  · exact ⟨fun _ => x, ∅, ∅, isOpen_empty, isOpen_empty, differentiableOn_empty, by simp,
-      by simp, fun h => absurd h hx⟩
+    exact ⟨
+      hx'U,
+      U,
+      hU,
+      hx'U,
+      hsd,
+      hx's,
+      hsec,
+      interior V,
+      isOpen_interior.mem_nhds hx'V,
+      fun x'' hx'' hAx'' => hVs x'' ⟨hx''.1, interior_subset hx''.2⟩ hAx''
+    ⟩
+  · exact ⟨
+      fun _ => x,
+      ∅,
+      ∅,
+      isOpen_empty,
+      isOpen_empty,
+      differentiableOn_empty,
+      by simp,
+      by simp,
+      fun h => absurd h hx
+    ⟩
 
 end SheetAreaCompare
-
 
 open SheetAreaCompare in
 theorem SheetAreaCompare.proof (h₁ : SheetImageArea.Statement) : SheetAreaCompare.Statement := by
@@ -124,8 +155,7 @@ theorem SheetAreaCompare.proof (h₁ : SheetImageArea.Statement) : SheetAreaComp
   have hσ'eq : ∀ k, ∀ y ∈ U (e k), σ' k y = σ (e k) y := fun k y hy => by
     simp [hσ', Set.piecewise_eq_of_mem _ _ _ hy]
   set B : ℕ → Set (Fin d → ℂ) := fun k => U (e k) ∩ σ' k ⁻¹' E k with hB
-  have hBm : ∀ k, MeasurableSet (B k) := fun k =>
-    (hU (e k)).measurableSet.inter (hσ'm k (hEm k))
+  have hBm : ∀ k, MeasurableSet (B k) := fun k => (hU (e k)).measurableSet.inter (hσ'm k (hEm k))
   have hBmem : ∀ k y, y ∈ B k ↔ y ∈ U (e k) ∧ σ (e k) y ∈ E k := by
     intro k y
     constructor
@@ -146,8 +176,9 @@ theorem SheetAreaCompare.proof (h₁ : SheetImageArea.Statement) : SheetAreaComp
     split_ifs
     · exact mul_nonneg (abs_nonneg _) (sheetJac_nonneg _ _)
     · exact le_rfl
-  have htE : ∀ k x, x ∈ E k →
-      ENNReal.ofReal (t x) = G k (A *ᵥ x) ∧ A *ᵥ x ∈ B k ∧ σ (e k) (A *ᵥ x) = x := by
+  have htE
+      : ∀ k x,
+        x ∈ E k → ENNReal.ofReal (t x) = G k (A *ᵥ x) ∧ A *ᵥ x ∈ B k ∧ σ (e k) (A *ᵥ x) = x := by
     intro k x hx
     obtain ⟨hAU, hsh⟩ := hWsh (e k) x (hEW k hx)
     have hsx : σ (e k) (A *ᵥ x) = x := by
@@ -161,17 +192,21 @@ theorem SheetAreaCompare.proof (h₁ : SheetImageArea.Statement) : SheetAreaComp
     simp only [ht, dif_pos hex, hG, hσ'eq k _ hAU, hsx, hJ]
     rw [ENNReal.ofReal_mul (abs_nonneg _), Real.enorm_eq_ofReal_abs]
 
-  have hpt : ∀ y, ‖sheetSum J A (fun x s => |h x| * sheetJac s (A *ᵥ x)) y‖ₑ ≤
-      ∑' k, (B k).indicator (G k) y := by
+  have hpt
+      : ∀ y,
+        ‖sheetSum J A (fun x s => |h x| * sheetJac s (A *ᵥ x)) y‖ₑ
+          ≤ ∑' k, (B k).indicator (G k) y := by
     intro y
-    have hS : sheetSum J A (fun x s => |h x| * sheetJac s (A *ᵥ x)) y =
-        ∑ᶠ x, (fibre J A y).indicator t x := by
+    have hS
+        : sheetSum J A (fun x s => |h x| * sheetJac s (A *ᵥ x)) y
+          = ∑ᶠ x, (fibre J A y).indicator t x := by
       unfold sheetSum
       rw [finsum_mem_def]
     have hnn : ∀ x, 0 ≤ (fibre J A y).indicator t x := fun x =>
       Set.indicator_nonneg (fun x _ => ht0 x) x
     rw [hS, Real.enorm_eq_ofReal (finsum_nonneg hnn)]
-    calc ENNReal.ofReal (∑ᶠ x, (fibre J A y).indicator t x)
+    calc
+      ENNReal.ofReal (∑ᶠ x, (fibre J A y).indicator t x)
         ≤ ∑' x, ENNReal.ofReal ((fibre J A y).indicator t x) := ofReal_finsum_le_tsum _ hnn
       _ ≤ ∑' x, ∑' k, (E k ∩ fibre J A y).indicator (fun x => ENNReal.ofReal (t x)) x := by
         refine ENNReal.tsum_le_tsum fun x => ?_
@@ -179,8 +214,9 @@ theorem SheetAreaCompare.proof (h₁ : SheetImageArea.Statement) : SheetAreaComp
         · by_cases hx : ∃ s, IsSheetAt J A x s
           · obtain ⟨k, hk⟩ := hEcover x hx
             rw [Set.indicator_of_mem hxf]
-            have hle : (E k ∩ fibre J A y).indicator (fun x => ENNReal.ofReal (t x)) x ≤
-                ∑' k, (E k ∩ fibre J A y).indicator (fun x => ENNReal.ofReal (t x)) x :=
+            have hle
+                : (E k ∩ fibre J A y).indicator (fun x => ENNReal.ofReal (t x)) x
+                  ≤ ∑' k, (E k ∩ fibre J A y).indicator (fun x => ENNReal.ofReal (t x)) x :=
               le_tsum (fun k => (E k ∩ fibre J A y).indicator (fun x => ENNReal.ofReal (t x)) x) k
             exact (Set.indicator_of_mem (show x ∈ E k ∩ fibre J A y from ⟨hk, hxf⟩)
               (fun x => ENNReal.ofReal (t x))).symm.le.trans hle
@@ -208,18 +244,28 @@ theorem SheetAreaCompare.proof (h₁ : SheetImageArea.Statement) : SheetAreaComp
           have hAx : A *ᵥ x = y := hx.2.2
           rw [← hAx, hsx]
 
-  have hpiece : ∀ k, ∫⁻ y, (B k).indicator (G k) y = c * ∫⁻ z in (WithLp.ofLp ⁻¹' E k : Set (EuclideanSpace ℂ (Fin n))),
-      ‖h (WithLp.ofLp z)‖ₑ ∂(μH[((2 * d : ℕ) : ℝ)]) := by
+  have hpiece
+      : ∀ k,
+        ∫⁻ y, (B k).indicator (G k) y
+          = c
+            * ∫⁻ z in (WithLp.ofLp ⁻¹' E k : Set (EuclideanSpace ℂ (Fin n))),
+              ‖h (WithLp.ofLp z)‖ₑ ∂(μH[((2 * d : ℕ) : ℝ)]) := by
     intro k
     have hBm' : MeasurableSet (WithLp.ofLp ⁻¹' B k : Set (EuclideanSpace ℂ (Fin d))) :=
       (EuclideanSpace.equiv (Fin d) ℂ).continuous.measurable (hBm k)
     rw [hc]
     congr 1
-    have h2 := h₁ n d A (U (e k)) (σ (e k)) (hU (e k)) (hσd (e k)) (fun y hy => (hσsec (e k) y hy).1)
-      (WithLp.ofLp ⁻¹' B k) hBm' (fun y hy => hy.1) (fun z => ‖h (WithLp.ofLp z)‖ₑ)
-      (hh.comp (EuclideanSpace.equiv (Fin n) ℂ).continuous.measurable).enorm
-    have himg : (fun y : EuclideanSpace ℂ (Fin d) => WithLp.toLp 2 (σ (e k) (WithLp.ofLp y))) ''
-        (WithLp.ofLp ⁻¹' B k) = WithLp.ofLp ⁻¹' E k := by
+    have h2 :=
+      h₁ n d A (U (e k)) (σ (e k)) (hU (e k)) (hσd (e k))
+        (fun y hy => (hσsec (e k) y hy).1)
+        (WithLp.ofLp ⁻¹' B k) hBm'
+        (fun y hy => hy.1)
+        (fun z => ‖h (WithLp.ofLp z)‖ₑ)
+        (hh.comp (EuclideanSpace.equiv (Fin n) ℂ).continuous.measurable).enorm
+    have himg
+        : (fun y : EuclideanSpace ℂ (Fin d) => WithLp.toLp 2 (σ (e k) (WithLp.ofLp y)))
+            '' (WithLp.ofLp ⁻¹' B k)
+          = WithLp.ofLp ⁻¹' E k := by
       ext z
       constructor
       · rintro ⟨y, hy, rfl⟩
@@ -236,23 +282,26 @@ theorem SheetAreaCompare.proof (h₁ : SheetImageArea.Statement) : SheetAreaComp
     · rw [Set.indicator_of_notMem hy, Set.indicator_of_notMem (show WithLp.ofLp y ∉ B k from hy)]
   have hImeas : ∀ k, MeasurableSet (WithLp.ofLp ⁻¹' E k : Set (EuclideanSpace ℂ (Fin n))) :=
     fun k => (EuclideanSpace.equiv (Fin n) ℂ).continuous.measurable (hEm k)
-  have hIdisj : Pairwise fun k k' => Disjoint (WithLp.ofLp ⁻¹' E k : Set (EuclideanSpace ℂ (Fin n)))
-      (WithLp.ofLp ⁻¹' E k') :=
+  have hIdisj : Pairwise fun k k' =>
+      Disjoint (WithLp.ofLp ⁻¹' E k : Set (EuclideanSpace ℂ (Fin n))) (WithLp.ofLp ⁻¹' E k') :=
     fun k k' hkk' => (hEdisj hkk').preimage _
   have hIsub : (⋃ k, (WithLp.ofLp ⁻¹' E k : Set (EuclideanSpace ℂ (Fin n)))) ⊆ zeroSetEuc J := by
     intro z hz
     obtain ⟨k, hk⟩ := Set.mem_iUnion.1 hz
     intro q hq
     exact (hEW k hk).1 q hq
-  calc ∫⁻ y, ‖sheetSum J A (fun x s => |h x| * sheetJac s (A *ᵥ x)) y‖ₑ
+  calc
+    ∫⁻ y, ‖sheetSum J A (fun x s => |h x| * sheetJac s (A *ᵥ x)) y‖ₑ
       ≤ ∫⁻ y, ∑' k, (B k).indicator (G k) y := lintegral_mono hpt
     _ = ∑' k, ∫⁻ y, (B k).indicator (G k) y :=
-        lintegral_tsum fun k => ((hGm k).indicator (hBm k)).aemeasurable
-    _ = c * ∫⁻ z in ⋃ k, (WithLp.ofLp ⁻¹' E k : Set (EuclideanSpace ℂ (Fin n))), ‖h (WithLp.ofLp z)‖ₑ ∂(μH[((2 * d : ℕ) : ℝ)]) := by
+      lintegral_tsum fun k => ((hGm k).indicator (hBm k)).aemeasurable
+    _ = c
+        * ∫⁻ z in ⋃ k, (WithLp.ofLp ⁻¹' E k : Set (EuclideanSpace ℂ (Fin n))), ‖h (WithLp.ofLp z)‖ₑ ∂(μH[((2 * d : ℕ) : ℝ)]) :=
+      by
         rw [lintegral_iUnion hImeas hIdisj, ← ENNReal.tsum_mul_left]
         exact tsum_congr hpiece
     _ ≤ c * ∫⁻ z in zeroSetEuc J, ‖h (WithLp.ofLp z)‖ₑ ∂(μH[((2 * d : ℕ) : ℝ)]) :=
-        mul_le_mul_of_nonneg_left (lintegral_mono_set hIsub) zero_le
+      mul_le_mul_of_nonneg_left (lintegral_mono_set hIsub) zero_le
 
 end
 

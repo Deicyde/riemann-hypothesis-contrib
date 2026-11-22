@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.Continuou
 
 noncomputable section
 
-open MeasureTheory Filter Topology Matrix GlobalTheory.Orb GlobalTheory.OpTrace GlobalTheory.AutomorphicL2Unitary
+open MeasureTheory Filter Topology Matrix GlobalTheory.Orb GlobalTheory.OpTrace
+  GlobalTheory.AutomorphicL2Unitary
 open PositivityTheory.Rg.Pc1 (IsProfile)
 
 namespace PositivityTheory.RgTw
@@ -29,7 +30,10 @@ section
 
 variable (n) [MeasurableSpace (G n)] [BorelSpace (G n)]
 
-def IsThetaOp {U : Type} [NormedAddCommGroup U] [InnerProductSpace ℂ U] (π : G n →* (U →L[ℂ] U)) (A : U →L[ℂ] U) : Prop :=
+def IsThetaOp
+    {U : Type} [NormedAddCommGroup U] [InnerProductSpace ℂ U]
+    (π : G n →* (U →L[ℂ] U)) (A : U →L[ℂ] U)
+    : Prop :=
   (∀ v, ‖A v‖ = ‖v‖) ∧ Function.Surjective A ∧ ∀ x, A ∘L π x = π (th x) ∘L A
 
 end

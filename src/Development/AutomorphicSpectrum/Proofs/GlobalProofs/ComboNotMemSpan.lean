@@ -6,13 +6,17 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.CongSubgroup
 
 @[expose] public section
 
-open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
+open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones.StellarLI
 
-theorem combo_notMem_span {V : Type} [AddCommGroup V] [Module ℚ V] {s : Set V} {p q : V} {a b : ℚ}
-    (ha : a ≠ 0) (hp : p ∉ Submodule.span ℚ s) (hq : q ∈ Submodule.span ℚ s) :
-    a • p + b • q ∉ Submodule.span ℚ s := by
+theorem combo_notMem_span
+    {V : Type} [AddCommGroup V] [Module ℚ V]
+    {s : Set V} {p q : V} {a b : ℚ}
+    (ha : a ≠ 0) (hp : p ∉ Submodule.span ℚ s) (hq : q ∈ Submodule.span ℚ s)
+    : a • p + b • q ∉ Submodule.span ℚ s := by
   intro h
   apply hp
   have h1 : a • p ∈ Submodule.span ℚ s := by
@@ -21,12 +25,14 @@ theorem combo_notMem_span {V : Type} [AddCommGroup V] [Module ℚ V] {s : Set V}
   have h2 := Submodule.smul_mem _ a⁻¹ h1
   rwa [smul_smul, inv_mul_cancel₀ ha, one_smul] at h2
 
-theorem main : ∀ {V : Type} [AddCommGroup V] [Module ℚ V] [DecidableEq V] (p q : V) (r : Finset V) (a b : ℚ), 0 < a → 0 < b → p ≠ q → p ∉ r → q ∉ r →
-  LinearIndepOn ℚ id ((insert p (insert q r) : Finset V) : Set V) →
-  (a • p + b • q) ∉ r ∧ (a • p + b • q) ≠ p ∧ (a • p + b • q) ≠ q ∧
-  LinearIndepOn ℚ id ((insert (a • p + b • q) (insert q r) : Finset V) : Set V) ∧
-  LinearIndepOn ℚ id ((insert p (insert (a • p + b • q) r) : Finset V) : Set V) ∧
-  LinearIndepOn ℚ id ((insert (a • p + b • q) r : Finset V) : Set V) := by
+theorem main
+    : ∀ {V : Type} [AddCommGroup V] [Module ℚ V] [DecidableEq V] (p q : V) (r : Finset V) (a b : ℚ),
+      0 < a → 0 < b → p ≠ q → p ∉ r → q ∉ r
+        → LinearIndepOn ℚ id ((insert p (insert q r) : Finset V) : Set V)
+        → (a • p + b • q) ∉ r ∧ (a • p + b • q) ≠ p ∧ (a • p + b • q) ≠ q
+          ∧ LinearIndepOn ℚ id ((insert (a • p + b • q) (insert q r) : Finset V) : Set V)
+          ∧ LinearIndepOn ℚ id ((insert p (insert (a • p + b • q) r) : Finset V) : Set V)
+          ∧ LinearIndepOn ℚ id ((insert (a • p + b • q) r : Finset V) : Set V) := by
   intro V _ _ _ p q r a b ha hb hpq hpr hqr hli
   simp only [Finset.coe_insert] at hli ⊢
   have hp' : p ∉ insert q (r : Set V) := by simp [hpq, hpr]

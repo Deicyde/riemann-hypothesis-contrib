@@ -11,18 +11,22 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsC
 open TensorProduct
 namespace GlobalTheory.FieldExtensionExists
 
-theorem exists_field_extension {R R' K : Type} [CommRing R] [CommRing R'] [Field K]
-    (ρ : R →+* R') (hinj : Function.Injective ρ) (hfin : ρ.Finite) (φ : R →+* K) :
-    ∃ (L : Type) (_ : Field L) (_ : Algebra K L) (_ : FiniteDimensional K L) (χ : R' →+* L),
+theorem exists_field_extension
+    {R R' K : Type} [CommRing R] [CommRing R'] [Field K]
+    (ρ : R →+* R') (hinj : Function.Injective ρ) (hfin : ρ.Finite)
+    (φ : R →+* K)
+    : ∃ (L : Type) (_ : Field L) (_ : Algebra K L) (_ : FiniteDimensional K L) (χ : R' →+* L),
       χ.comp ρ = (algebraMap K L).comp φ := by
   letI : Algebra R R' := ρ.toAlgebra
   haveI : Algebra.IsIntegral R R' := ⟨fun x => hfin.to_isIntegral x⟩
   haveI : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime φ
-  obtain ⟨q, -, hq, hqc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (RingHom.ker φ) (⊥ : Ideal R') (by
-    intro x hx
-    have : ρ x = 0 := hx
-    have h0 : x = 0 := hinj (this.trans (map_zero ρ).symm)
-    rw [h0]; exact Ideal.zero_mem _)
+  obtain ⟨q, -, hq, hqc⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (RingHom.ker φ) (⊥ : Ideal R') (by
+      intro x hx
+      have : ρ x = 0 := hx
+      have h0 : x = 0 := hinj (this.trans (map_zero ρ).symm)
+      rw [h0]
+      exact Ideal.zero_mem _)
   have hqc' : q.comap ρ = RingHom.ker φ := hqc
   let j : (R ⧸ RingHom.ker φ) →+* (R' ⧸ q) := Ideal.quotientMap q ρ hqc'.ge
   have hj : Function.Injective j := Ideal.quotientMap_injective' hqc'.le
@@ -39,27 +43,41 @@ theorem exists_field_extension {R R' K : Type} [CommRing R] [CommRing R'] [Field
     Algebra.TensorProduct.nontrivial_of_algebraMap_injective_of_isDomain _ _ _
       (RingHom.kerLift_injective φ) hj
   obtain ⟨M, hM⟩ := Ideal.exists_maximal (K ⊗[R ⧸ RingHom.ker φ] (R' ⧸ q))
-  refine ⟨(K ⊗[R ⧸ RingHom.ker φ] (R' ⧸ q)) ⧸ M, Ideal.Quotient.field M, inferInstance,
+  refine ⟨
+    (K ⊗[R ⧸ RingHom.ker φ] (R' ⧸ q)) ⧸ M,
+    Ideal.Quotient.field M,
+    inferInstance,
     (inferInstance : Module.Finite K ((K ⊗[R ⧸ RingHom.ker φ] (R' ⧸ q)) ⧸ M)),
-    (Ideal.Quotient.mk M).comp ((Algebra.TensorProduct.includeRight (R := R ⧸ RingHom.ker φ) (A := K)
-      (B := R' ⧸ q)).toRingHom.comp (Ideal.Quotient.mk q)), ?_⟩
+    (Ideal.Quotient.mk M).comp
+      ((Algebra.TensorProduct.includeRight (R := R ⧸ RingHom.ker φ) (A := K)
+        (B := R' ⧸ q)).toRingHom.comp (Ideal.Quotient.mk q)),
+    ?_
+  ⟩
   ext r
-  change Ideal.Quotient.mk M (Algebra.TensorProduct.includeRight (R := R ⧸ RingHom.ker φ) (A := K)
-      (B := R' ⧸ q) (algebraMap (R ⧸ RingHom.ker φ) (R' ⧸ q) (Ideal.Quotient.mk _ r))) =
-    Ideal.Quotient.mk M ((φ r) ⊗ₜ 1)
+  change Ideal.Quotient.mk M
+      (Algebra.TensorProduct.includeRight (R := R ⧸ RingHom.ker φ) (A := K) (B := R' ⧸ q)
+        (algebraMap (R ⧸ RingHom.ker φ) (R' ⧸ q) (Ideal.Quotient.mk _ r)))
+    = Ideal.Quotient.mk M ((φ r) ⊗ₜ 1)
   rw [AlgHom.commutes, Algebra.TensorProduct.algebraMap_apply]
   rfl
 
-theorem exists_extension : ∀ (R R' : Type) [CommRing R] [IsLocalRing R] [CommRing R'] [IsLocalRing R'] (ρ : R →+* R'),
-    Function.Injective ρ → ρ.Finite → ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], GlobalTheory.LN.CDvr V →
-    ∀ (ψ : R →+* V), IsLocalHom ψ → ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsLocalRing V')
-      (f : V →+* V') (ψ' : R' →+* V'), GlobalTheory.LN.CDvr V' ∧ Function.Injective f ∧ IsLocalHom f ∧ IsLocalHom ψ' ∧
-      ψ'.comp ρ = f.comp ψ := by
+theorem exists_extension
+    : ∀ (R R' : Type) [CommRing R] [IsLocalRing R] [CommRing R'] [IsLocalRing R'] (ρ : R →+* R'),
+      Function.Injective ρ → ρ.Finite
+        → ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
+          GlobalTheory.LN.CDvr V
+            → ∀ (ψ : R →+* V),
+              IsLocalHom ψ
+                → ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsLocalRing V')
+                    (f : V →+* V') (ψ' : R' →+* V'),
+                  GlobalTheory.LN.CDvr V' ∧ Function.Injective f ∧ IsLocalHom f ∧ IsLocalHom ψ'
+                    ∧ ψ'.comp ρ = f.comp ψ := by
   intro R R' _ _ _ _ ρ hinj hfin V _ _ _ hV ψ hψ
   obtain ⟨h1, h2, h3⟩ := hV
   haveI : CharZero (FractionRing V) :=
     charZero_of_injective_algebraMap (IsFractionRing.injective V (FractionRing V))
-  obtain ⟨L, _, _, _, χ, hχ⟩ := exists_field_extension ρ hinj hfin ((algebraMap V (FractionRing V)).comp ψ)
+  obtain ⟨L, _, _, _, χ, hχ⟩ :=
+    exists_field_extension ρ hinj hfin ((algebraMap V (FractionRing V)).comp ψ)
   obtain ⟨W, _, _, hW1, hW2, _, _, _, hc, -, hf, hl, hint, -⟩ :=
     GlobalTheory.SS.exists_complete_dvr_finite_extension V (FractionRing V) L
   have hWL : Function.Injective (algebraMap W L) := IsFractionRing.injective W L
@@ -69,12 +87,13 @@ theorem exists_extension : ∀ (R R' : Type) [CommRing R] [IsLocalRing R] [CommR
     refine hint (χ x) ⟨P.map ψ, hP.map ψ, ?_⟩
     rw [Polynomial.eval₂_map, RingHom.comp_assoc, ← hχ, ← Polynomial.hom_eval₂, hPx, map_zero]
   choose g hg using hmem
-  let ψ' : R' →+* W :=
-    { toFun := g
-      map_one' := hWL (by simp [hg])
-      map_mul' := fun x y => hWL (by simp [hg])
-      map_zero' := hWL (by simp [hg])
-      map_add' := fun x y => hWL (by simp [hg]) }
+  let ψ' : R' →+* W := {
+    toFun := g
+    map_one' := hWL (by simp [hg])
+    map_mul' := fun x y => hWL (by simp [hg])
+    map_zero' := hWL (by simp [hg])
+    map_add' := fun x y => hWL (by simp [hg])
+  }
   have hcomp : ψ'.comp ρ = (algebraMap V W).comp ψ := by
     ext r
     apply hWL
@@ -90,8 +109,19 @@ theorem exists_extension : ∀ (R R' : Type) [CommRing R] [IsLocalRing R] [CommR
       ((IsLocalRing.local_hom_tfae (ψ'.comp ρ)).out 1 5).1 hloc
     rw [Ideal.comap_comap, e]
     infer_instance
-  refine ⟨W, inferInstance, inferInstance, inferInstance, algebraMap V W, ψ',
-    ⟨hW1, hW2, charZero_of_injective_algebraMap hf⟩, hf, hl, ?_, hcomp⟩
+  refine ⟨
+    W,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    algebraMap V W,
+    ψ',
+    ⟨hW1, hW2, charZero_of_injective_algebraMap hf⟩,
+    hf,
+    hl,
+    ?_,
+    hcomp
+  ⟩
   exact ((IsLocalRing.local_hom_tfae ψ').out 1 5).2 (IsLocalRing.eq_maximalIdeal hmax)
 
 end GlobalTheory.FieldExtensionExists

@@ -13,16 +13,20 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.discriminantNormShapes
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.idealPowerSpanBounds Formalism.HermitianLattices.Ext.L3.traceDeterminantCongruences Formalism.HermitianLattices.Ext.L3.reductionMapsOfForms
-  Formalism.L2.SG.Pf.Cnt Formalism.L2.SG.Pf.G5
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.idealPowerSpanBounds
+  Formalism.HermitianLattices.Ext.L3.traceDeterminantCongruences
+  Formalism.HermitianLattices.Ext.L3.reductionMapsOfForms Formalism.L2.SG.Pf.Cnt
+  Formalism.L2.SG.Pf.G5
 
-variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-  [Fact (IsFixF K F)] {m : ℕ}
+variable
+  {K F : Type}
+  [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K] [Fact (IsFixF K F)]
+  {m : ℕ}
 
 local notation "ι" => algebraMap (𝓞 F) (𝓞 K)
 
-theorem exists_inv_unit {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {b : 𝓞 F} (hb : b ∉ 𝔭) (k : ℕ) :
-    ∃ g : 𝓞 K ⧸ extP K 𝔭 ^ k, g * Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι b) = 1 := by
+theorem exists_inv_unit {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {b : 𝓞 F} (hb : b ∉ 𝔭) (k : ℕ)
+    : ∃ g : 𝓞 K ⧸ extP K 𝔭 ^ k, g * Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι b) = 1 := by
   obtain ⟨y, i, hi, hyi⟩ := h𝔭.exists_inv hb
 
   have hnil : IsNilpotent (Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι i)) := by
@@ -31,19 +35,25 @@ theorem exists_inv_unit {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {b : �
     exact Ideal.pow_mem_pow (Ideal.mem_map_of_mem _ hi) k
   obtain ⟨u, hu⟩ := hnil.isUnit_one_sub
   refine ⟨↑u⁻¹ * Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι y), ?_⟩
-  have h : Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι y) * Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι b) = 1 - Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι i) := by
-    rw [← map_mul, ← map_mul, eq_sub_iff_add_eq, ← map_add (f := _), ← map_add (f := _), hyi, map_one, map_one]
+  have h
+      : Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι y) * Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι b)
+        = 1 - Ideal.Quotient.mk (extP K 𝔭 ^ k) (ι i) := by
+    rw [← map_mul, ← map_mul, eq_sub_iff_add_eq, ← map_add (f := _), ← map_add (f := _), hyi,
+      map_one, map_one]
   rw [mul_assoc, h, ← hu, Units.inv_mul]
 
-
 open Classical in
-def gQ (K : Type) {F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F]
-    [Algebra F K] [Fact (IsFixF K F)] {m : ℕ} {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ)
-    (a : Fin m → 𝓞 F) : Matrix (Fin m) (Fin m) (𝓞 K ⧸ extP K 𝔭 ^ k) :=
+def gQ
+    (K : Type)
+    {F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+    [Fact (IsFixF K F)]
+    {m : ℕ} {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    (k : ℕ) (a : Fin m → 𝓞 F)
+    : Matrix (Fin m) (Fin m) (𝓞 K ⧸ extP K 𝔭 ^ k) :=
   Matrix.diagonal fun j => if h : a j ∈ 𝔭 then 0 else (exists_inv_unit (K := K) h𝔭 h k).choose
 
-theorem gQ_mul_diagQ {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) (a : Fin m → 𝓞 F) :
-    gQ K h𝔭 k a * diagQ K 𝔭 k a = 1 - eQ K 𝔭 k a := by
+theorem gQ_mul_diagQ {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) (a : Fin m → 𝓞 F)
+    : gQ K h𝔭 k a * diagQ K 𝔭 k a = 1 - eQ K 𝔭 k a := by
   unfold gQ eQ diagQ
   rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one, Matrix.diagonal_sub]
   congr 1
@@ -53,8 +63,8 @@ theorem gQ_mul_diagQ {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) 
   · rw [dite_eq_right h, if_neg h, sub_zero]
     exact (exists_inv_unit (K := K) h𝔭 h k).choose_spec
 
-theorem diag_comm {R : Type*} [CommRing R] {n : Type*} [Fintype n] [DecidableEq n] (d d' : n → R) :
-    diagonal d * diagonal d' = diagonal d' * diagonal d := by
+theorem diag_comm {R : Type*} [CommRing R] {n : Type*} [Fintype n] [DecidableEq n] (d d' : n → R)
+    : diagonal d * diagonal d' = diagonal d' * diagonal d := by
   rw [Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal]
   congr 1
   funext i
@@ -73,8 +83,8 @@ theorem norm_shape_holds : NormShape := by
   have hHG : H * G = G * H := diag_comm _ _
   have hEE : E * E = E := eQ_mul_self 𝔭 k a
   have hE : Eᴴ = E := eQ_conjTranspose 𝔭 k a
-  have hEE' : ∀ M : Matrix (Fin m) (Fin m) (𝓞 K ⧸ extP K 𝔭 ^ k), E * (E * M) = E * M :=
-    fun M => by rw [← Matrix.mul_assoc, hEE]
+  have hEE' : ∀ M : Matrix (Fin m) (Fin m) (𝓞 K ⧸ extP K 𝔭 ^ k), E * (E * M) = E * M := fun M => by
+    rw [← Matrix.mul_assoc, hEE]
   have hHh : Hᴴ = H := diagQ_conjTranspose 𝔭 k a
   have hE0E : (1 - E) * E = 0 := by rw [Matrix.sub_mul, Matrix.one_mul, hEE, sub_self]
   have hEE0 : E * (1 - E) = 0 := by rw [Matrix.mul_sub, Matrix.mul_one, hEE, sub_self]
@@ -108,7 +118,9 @@ theorem norm_shape_holds : NormShape := by
         Matrix.mul_assoc (1 - E) H E, hHE, ← Matrix.mul_assoc, hE0E, Matrix.zero_mul, sub_zero]
     rw [hW1] at h1
     have h2 : G * ((1 - E) * H) = 1 - E := by rw [← hHE0, ← Matrix.mul_assoc, hGH, hE0E0]
-    calc (1 - E) * Y1 * E = G * ((1 - E) * H) * Y1 * E := by rw [h2]
+    calc
+      (1 - E) * Y1 * E
+        = G * ((1 - E) * H) * Y1 * E := by rw [h2]
       _ = G * ((1 - E) * H * Y1 * E) := by simp only [Matrix.mul_assoc]
       _ = G * ((1 - E) * (H * W1 * H) * E) := by rw [← h1]
       _ = G * ((1 - E) * H) * W1 * (H * E) := by simp only [Matrix.mul_assoc]
@@ -156,14 +168,17 @@ theorem norm_shape_holds : NormShape := by
     rw [hXdef, conjTranspose_sub, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose,
       hHh, Matrix.mul_assoc]
   have hA : H * (E * W2 * E) * H = X := by
-    calc H * (E * W2 * E) * H = (H * E) * W2 * (E * H) := by simp only [Matrix.mul_assoc]
+    calc
+      H * (E * W2 * E) * H
+        = (H * E) * W2 * (E * H) := by simp only [Matrix.mul_assoc]
       _ = (E * H) * W2 * (H * E) := by rw [hHE]
       _ = E * (H * W2 * H) * E := by simp only [Matrix.mul_assoc]
       _ = X := by rw [← hW2, hEX, hXE]
   obtain ⟨t, ht⟩ := exists_trace_one hK hF h𝔭 k
   set θ := Ideal.Quotient.mk (extP K 𝔭 ^ k) t with hθ
   have hθ1 : θ + star θ = 1 := by
-    rw [hθ, star_mk, ← map_add (f := _), ← map_one (Ideal.Quotient.mk (extP K 𝔭 ^ k)), Ideal.Quotient.eq]
+    rw [hθ, star_mk, ← map_add (f := _), ← map_one (Ideal.Quotient.mk (extP K 𝔭 ^ k)),
+      Ideal.Quotient.eq]
     exact ht
   set A := E * W2 * E with hAdef
   clear_value A
@@ -173,13 +188,12 @@ theorem norm_shape_holds : NormShape := by
     have := congrArg conjTranspose hA
     rwa [conjTranspose_mul, conjTranspose_mul, hHh, hXh, ← Matrix.mul_assoc] at this
   have hW' : Y2ᴴ * H * Y2 - H = H * W' * H := by
-    rw [← hXdef, hW'def, Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.mul_smul, Matrix.smul_mul,
-      Matrix.smul_mul, hA, hAh, ← add_smul, hθ1, one_smul]
+    rw [← hXdef, hW'def, Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.mul_smul,
+      Matrix.smul_mul, Matrix.smul_mul, hA, hAh, ← add_smul, hθ1, one_smul]
   have hW'h : W'ᴴ = W' := by
-    rw [hW'def, conjTranspose_add, conjTranspose_smul, conjTranspose_smul, conjTranspose_conjTranspose,
-      star_star, add_comm]
-  have hEAE : E * A * E = A := by
-    rw [hAdef]; simp only [Matrix.mul_assoc, hEE, hEE']
+    rw [hW'def, conjTranspose_add, conjTranspose_smul, conjTranspose_smul,
+      conjTranspose_conjTranspose, star_star, add_comm]
+  have hEAE : E * A * E = A := by rw [hAdef]; simp only [Matrix.mul_assoc, hEE, hEE']
   have hEAhE : E * Aᴴ * E = Aᴴ := by
     have := congrArg conjTranspose hEAE
     rwa [conjTranspose_mul, conjTranspose_mul, hE, ← Matrix.mul_assoc] at this
@@ -193,7 +207,9 @@ theorem norm_shape_holds : NormShape := by
     simp only [Matrix.mul_assoc, hEE, hEE']
   have hP3H : P3 * H = H * Y2 := by
     have e1 : E * P2 * E * H = H * (E * Y0 * E) := by
-      calc E * P2 * E * H = E * P2 * (E * H) := by simp only [Matrix.mul_assoc]
+      calc
+        E * P2 * E * H
+          = E * P2 * (E * H) := by simp only [Matrix.mul_assoc]
         _ = E * P2 * (H * E) := by rw [hHE]
         _ = E * (P2 * H) * E := by simp only [Matrix.mul_assoc]
         _ = E * (H * Y2) * E := by rw [hP2]
@@ -207,14 +223,13 @@ theorem norm_shape_holds : NormShape := by
     rw [hP3def, Matrix.mul_add, Matrix.add_mul, hEE0, Matrix.zero_mul]
     simp only [Matrix.mul_assoc, hEE, hEE', zero_add]
   have hP3E : P3 * E = E * P3 * E := by
-    rw [hP3def, Matrix.add_mul, hE0E, zero_add, Matrix.mul_add, Matrix.add_mul, hEE0, Matrix.zero_mul,
-      zero_add]
+    rw [hP3def, Matrix.add_mul, hE0E, zero_add, Matrix.mul_add, Matrix.add_mul, hEE0,
+      Matrix.zero_mul, zero_add]
     simp only [Matrix.mul_assoc, hEE, hEE']
   refine ⟨Y2, P3, W', ZA + ZB, ?_, hP3H, hW', hW'h, hW's, hEP3, hP3E⟩
   rw [Matrix.add_mul, ← hY2, ← hY1]
   abel
 
-theorem discOnto_of_uDModel (hU : UDModel) : DiscOnto :=
-  discOnto_of_shape hU norm_shape_holds
+theorem discOnto_of_uDModel (hU : UDModel) : DiscOnto := discOnto_of_shape hU norm_shape_holds
 
 end Formalism.L2.SG.Pf.discriminantNormShapes

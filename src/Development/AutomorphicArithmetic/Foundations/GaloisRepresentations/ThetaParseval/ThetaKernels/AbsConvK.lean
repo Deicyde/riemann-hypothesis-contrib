@@ -19,8 +19,11 @@ section
 set_option linter.style.haveILetI false
 noncomputable section
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.Rg.Sw
 namespace PositivityTheory.SiegelWeilFormula.Act
 open ComplexParameterFamilyContinuity
 theorem cptDom_k : _root_.PositivityTheory.SiegelWeilFormula.Act.CptDom_k := by
@@ -48,11 +51,16 @@ theorem absConv_k : _root_.PositivityTheory.SiegelWeilFormula.Act.AbsConv_k := b
   obtain ⟨iLC, iSC, iT2, iBo⟩ := kfour.nA_top hσ d.ok.frame
   obtain ⟨hnb, hlam, hfd, h1⟩ := h𝓖
   obtain ⟨hfr, hν, hfdU, hU1⟩ := h𝓤
-  have cu : Continuous uM := _root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.continuous_uM_k L ⟨hfr, hν, hfdU, hU1⟩
+  have cu : Continuous uM :=
+    _root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.continuous_uM_k L
+      ⟨hfr, hν, hfdU, hU1⟩
   have cn : Continuous nb := kunf.continuous_nb hnb
-  have cφ : Continuous (_root_.PositivityTheory.SiegelWeilFormula.Act.phz_k d f s₁ z) := _root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.continuous_phz_k d hf.cont s₁ z
+  have cφ : Continuous (_root_.PositivityTheory.SiegelWeilFormula.Act.phz_k d f s₁ z) :=
+    _root_.PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity.continuous_phz_k
+      d hf.cont s₁ z
   set m : (Fin L.n → AE F E) × nA σ d.Y d.b → d.G := fun p => nb p.2 * (uM p.1 * x) with hm
-  have cm : Continuous m := (cn.comp continuous_snd).mul ((cu.comp continuous_fst).mul continuous_const)
+  have cm : Continuous m :=
+    (cn.comp continuous_snd).mul ((cu.comp continuous_fst).mul continuous_const)
   have hKc : IsCompact (closure 𝓤 ×ˢ closure 𝓖) := hc𝓤.prod hc𝓖
   obtain ⟨u, hu, hub⟩ := (hmaj z hz).1 (m '' (closure 𝓤 ×ˢ closure 𝓖)) (hKc.image cm)
   have hψ := GlobalTheory.StdCharWeilDatum.isCharAF d.ok.good.std
@@ -69,28 +77,48 @@ theorem absConv_k : _root_.PositivityTheory.SiegelWeilFormula.Act.AbsConv_k := b
       rcases hp with hp | hp
       · exact Or.inl ⟨hp, Set.mem_univ _⟩
       · exact Or.inr ⟨Set.mem_univ _, hp⟩
-    · have eU : (closure 𝓤)ᶜ ∩ 𝓤 = ∅ := (show Disjoint (closure 𝓤)ᶜ 𝓤 from
-        Set.disjoint_left.2 fun y (hy : y ∈ (closure 𝓤)ᶜ) (h' : y ∈ 𝓤) => hy (subset_closure h')).inter_eq
-      have eG : (closure 𝓖)ᶜ ∩ 𝓖 = ∅ := (show Disjoint (closure 𝓖)ᶜ 𝓖 from
-        Set.disjoint_left.2 fun y (hy : y ∈ (closure 𝓖)ᶜ) (h' : y ∈ 𝓖) => hy (subset_closure h')).inter_eq
+    · have eU : (closure 𝓤)ᶜ ∩ 𝓤 = ∅ :=
+        (show Disjoint (closure 𝓤)ᶜ 𝓤 from
+          Set.disjoint_left.2 fun y (hy : y ∈ (closure 𝓤)ᶜ) (h' : y ∈ 𝓤) =>
+            hy (subset_closure h')).inter_eq
+      have eG : (closure 𝓖)ᶜ ∩ 𝓖 = ∅ :=
+        (show Disjoint (closure 𝓖)ᶜ 𝓖 from
+          Set.disjoint_left.2 fun y (hy : y ∈ (closure 𝓖)ᶜ) (h' : y ∈ 𝓖) =>
+            hy (subset_closure h')).inter_eq
       refine measure_union_null ?_ ?_
-      · rw [Measure.prod_prod, Measure.restrict_apply isClosed_closure.measurableSet.compl, eU, measure_empty, zero_mul]
-      · rw [Measure.prod_prod, Measure.restrict_apply isClosed_closure.measurableSet.compl, eG, measure_empty, mul_zero]
-  have hbd : ∀ q : _root_.PositivityTheory.SiegelWeilFormula.Act.Cs_k d, ∀ᵐ p ∂μ, ‖_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k L f s₁ z nb T uM (_root_.PositivityTheory.SiegelWeilFormula.Act.rep_k q) x p‖ ≤ |u q| * |Mψ| := by
-    intro q
-    filter_upwards [hS] with p hp
-    simp only [_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k, norm_mul]
-    refine mul_le_mul ((hub (m p) ⟨p, hp, rfl⟩ q).trans (le_abs_self _)) ((hMψ p.2 hp.2).trans (le_abs_self _))
-      (norm_nonneg _) (abs_nonneg _)
-  have hcq : ∀ q : _root_.PositivityTheory.SiegelWeilFormula.Act.Cs_k d, Continuous (_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k L f s₁ z nb T uM (_root_.PositivityTheory.SiegelWeilFormula.Act.rep_k q) x) := fun q =>
+      · rw [Measure.prod_prod, Measure.restrict_apply isClosed_closure.measurableSet.compl, eU,
+          measure_empty, zero_mul]
+      · rw [Measure.prod_prod, Measure.restrict_apply isClosed_closure.measurableSet.compl, eG,
+          measure_empty, mul_zero]
+  have hbd
+      : ∀ q : _root_.PositivityTheory.SiegelWeilFormula.Act.Cs_k d,
+        ∀ᵐ p ∂μ, ‖_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k L f s₁ z nb T uM (_root_.PositivityTheory.SiegelWeilFormula.Act.rep_k q) x p‖ ≤ |u q| * |Mψ| :=
+    by
+      intro q
+      filter_upwards [hS] with p hp
+      simp only [_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k, norm_mul]
+      refine mul_le_mul ((hub (m p) ⟨p, hp, rfl⟩ q).trans (le_abs_self _))
+        ((hMψ p.2 hp.2).trans (le_abs_self _)) (norm_nonneg _) (abs_nonneg _)
+  have hcq
+      : ∀ q : _root_.PositivityTheory.SiegelWeilFormula.Act.Cs_k d,
+        Continuous (_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k L f s₁ z nb T uM
+          (_root_.PositivityTheory.SiegelWeilFormula.Act.rep_k q) x) := fun q =>
     (cφ.comp (continuous_const.mul cm)).mul (cψ.comp continuous_snd)
-  have hint : ∀ q : _root_.PositivityTheory.SiegelWeilFormula.Act.Cs_k d, Integrable (_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k L f s₁ z nb T uM (_root_.PositivityTheory.SiegelWeilFormula.Act.rep_k q) x) μ := fun q =>
+  have hint
+      : ∀ q : _root_.PositivityTheory.SiegelWeilFormula.Act.Cs_k d,
+        Integrable
+          (_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k L f s₁ z nb T uM
+            (_root_.PositivityTheory.SiegelWeilFormula.Act.rep_k q) x)
+          μ := fun q =>
     Integrable.of_bound (hcq q).aestronglyMeasurable _ (hbd q)
   refine ⟨hint, ?_⟩
-  refine Summable.of_nonneg_of_le (fun q => integral_nonneg fun p => norm_nonneg _) (fun q => ?_)
+  refine Summable.of_nonneg_of_le
+    (fun q => integral_nonneg fun p => norm_nonneg _)
+    (fun q => ?_)
     ((hu.abs.mul_right |Mψ|).mul_right (μ.real Set.univ))
-  calc ∫ p, ‖_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k L f s₁ z nb T uM (_root_.PositivityTheory.SiegelWeilFormula.Act.rep_k q) x p‖ ∂μ ≤ ∫ _p, |u q| * |Mψ| ∂μ :=
-        integral_mono_ae (hint q).norm (integrable_const _) (hbd q)
+  calc
+    ∫ p, ‖_root_.PositivityTheory.SiegelWeilFormula.Act.kq_k L f s₁ z nb T uM (_root_.PositivityTheory.SiegelWeilFormula.Act.rep_k q) x p‖ ∂μ
+      ≤ ∫ _p, |u q| * |Mψ| ∂μ := integral_mono_ae (hint q).norm (integrable_const _) (hbd q)
     _ = |u q| * |Mψ| * μ.real Set.univ := by rw [integral_const, smul_eq_mul, mul_comm]
 end PositivityTheory.SiegelWeilFormula.Act
 end

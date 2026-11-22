@@ -25,14 +25,15 @@ section
 open NumberField IsDedekindDomain GlobalTheory.FieldSize GlobalTheory.FieldSize.RayExistCurve
 open scoped IntermediateField
 
-theorem not_dvd_discr_of_unramIn (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-    [IsGalois K L] {n q : ℕ} (hq : q.Prime) (hn : ¬ q ∣ n) (hK : ¬ (q : ℤ) ∣ discr K)
-    (hL : ∀ 𝔭 : HeightOneSpectrum (𝓞 K), ¬ 𝔭.asIdeal ∣ Ideal.span {(n : 𝓞 K)} → GlobalTheory.NT.UnramIn L 𝔭) :
-    ¬ (q : ℤ) ∣ discr L := by
+theorem not_dvd_discr_of_unramIn
+    (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+    {n q : ℕ} (hq : q.Prime) (hn : ¬ q ∣ n) (hK : ¬ (q : ℤ) ∣ discr K)
+    (hL : ∀ 𝔭 : HeightOneSpectrum (𝓞 K),
+      ¬ 𝔭.asIdeal ∣ Ideal.span {(n : 𝓞 K)} → GlobalTheory.NT.UnramIn L 𝔭)
+    : ¬ (q : ℤ) ∣ discr L := by
   have hqz : Prime (q : ℤ) := Nat.prime_iff_prime_int.1 hq
   refine (not_dvd_discr_iff_forall_mem L (𝓞 L) hqz).2 fun P hP hqP => ?_
-  have hqp : ((q : ℤ) : 𝓞 K) ∈ P.under (𝓞 K) := by
-    rw [Ideal.mem_under, map_intCast]; exact hqP
+  have hqp : ((q : ℤ) : 𝓞 K) ∈ P.under (𝓞 K) := by rw [Ideal.mem_under, map_intCast]; exact hqP
   have hp0 : P.under (𝓞 K) ≠ ⊥ := fun e => by
     rw [e, Ideal.mem_bot] at hqp
     exact hq.ne_zero (by exact_mod_cast hqp)
@@ -42,19 +43,25 @@ theorem not_dvd_discr_of_unramIn (K L : Type) [Field K] [NumberField K] [Field L
   have hnd : ¬ 𝔭.asIdeal ∣ Ideal.span {(n : 𝓞 K)} := by
     rw [Ideal.dvd_span_singleton]
     intro hnp
-    obtain ⟨a, b, hab⟩ : IsCoprime (q : ℤ) (n : ℤ) := Nat.isCoprime_iff_coprime.2 ((Nat.Prime.coprime_iff_not_dvd hq).2 hn)
+    obtain ⟨a, b, hab⟩ : IsCoprime (q : ℤ) (n : ℤ) :=
+      Nat.isCoprime_iff_coprime.2 ((Nat.Prime.coprime_iff_not_dvd hq).2 hn)
     have h2 : ((a * q + b * n : ℤ) : 𝓞 K) ∈ 𝔭.asIdeal := by
       rw [Int.cast_add, Int.cast_mul, Int.cast_mul]
-      exact add_mem (Ideal.mul_mem_left _ _ hqp) (Ideal.mul_mem_left _ _ (by rwa [Int.cast_natCast]))
+      exact add_mem (Ideal.mul_mem_left _ _ hqp)
+        (Ideal.mul_mem_left _ _ (by rwa [Int.cast_natCast]))
     rw [hab, Int.cast_one] at h2
     exact 𝔭.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h2)
   have : P.LiesOver 𝔭.asIdeal := ⟨rfl⟩
   have h3 : Algebra.IsUnramifiedAt (𝓞 K) P := GlobalTheory.NT.isUnramifiedAt_of_unramIn (hL 𝔭 hnd) P
   exact Algebra.IsUnramifiedAt.comp (P.under (𝓞 K)) P
 
-theorem exists_field_of_rayField (hRF : GlobalTheory.NT.RayField) (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (n q : ℕ) (hn : 3 ≤ n) (hq : q.Prime) (hqn : ¬ q ∣ n) (hqd : ¬ q ∣ H.d) :
-    ∃ (F' : IntermediateField ℚ ℂ) (_ : NumberField F'), ¬ (q : ℤ) ∣ discr F' ∧ GlobalTheory.CompRat.CurveOver H F' n := by
+theorem exists_field_of_rayField
+    (hRF : GlobalTheory.NT.RayField)
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (n q : ℕ)
+    (hn : 3 ≤ n) (hq : q.Prime) (hqn : ¬ q ∣ n) (hqd : ¬ q ∣ H.d)
+    : ∃ (F' : IntermediateField ℚ ℂ) (_ : NumberField F'),
+      ¬ (q : ℤ) ∣ discr F' ∧ GlobalTheory.CompRat.CurveOver H F' n := by
   have hdm := H.d_mod
   have hd0 : 0 < H.d := H.d_prime.pos
   obtain ⟨hfin, h2⟩ := finrank_adjoin hd0 H.sqrt_neg_disc_sq
@@ -71,7 +78,8 @@ theorem exists_field_of_rayField (hRF : GlobalTheory.NT.RayField) (E : Type) [Fi
       rw [← map_pow, hr, map_neg, map_natCast]
     have h3 : (0 : ℝ) < H.d := by exact_mod_cast hd0
     nlinarith [sq_nonneg (InfinitePlace.embedding_of_isReal hv ⟨H.rt0, hr0⟩)]
-  obtain ⟨w, hw, hgen⟩ := exists_integer_generator_of_sq_eq_neg h2 H.d_prime.squarefree (by omega) hr
+  obtain ⟨w, hw, hgen⟩ :=
+    exists_integer_generator_of_sq_eq_neg h2 H.d_prime.squarefree (by omega) hr
   let φ : K₀ →+* ℂ := algebraMap K₀ ℂ
   have hw' : φ w = (1 + H.rt0) / 2 := by
     have := congrArg φ hw
@@ -82,12 +90,12 @@ theorem exists_field_of_rayField (hRF : GlobalTheory.NT.RayField) (E : Type) [Fi
     rw [← hw']
     simp
   have hn0 : (n : 𝓞 K₀) ≠ 0 := by exact_mod_cast (show n ≠ 0 by omega)
-  obtain ⟨L, _, _, _, hL⟩ := GlobalTheory.Mem.Fld.rayField_iff.1 hRF K₀ (Ideal.span {(n : 𝓞 K₀)})
-    (by rwa [Ne, Ideal.span_singleton_eq_bot])
+  obtain ⟨L, _, _, _, hL⟩ :=
+    GlobalTheory.Mem.Fld.rayField_iff.1 hRF K₀ (Ideal.span {(n : 𝓞 K₀)})
+      (by rwa [Ne, Ideal.span_singleton_eq_bot])
   let ψ : L →ₐ[K₀] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let e₀ : L ≃ₐ[K₀] ψ.fieldRange := AlgEquiv.ofInjectiveField ψ
   have hfR : FiniteDimensional K₀ ψ.fieldRange := e₀.toLinearEquiv.finiteDimensional
@@ -101,9 +109,12 @@ theorem exists_field_of_rayField (hRF : GlobalTheory.NT.RayField) (E : Type) [Fi
   refine ⟨R.restrictScalars ℚ, hNR, hdR, ?_⟩
   refine (GlobalTheory.FinalJoin.CurveField.curveOver_of_weberIn E H _ n (by omega)).1
     (R.algebraMap_mem (⟨H.rt0, hr0⟩ : K₀)) fun P hP => ?_
-  have hW := GlobalTheory.FieldSize.InRayAny.weberSet_subset K₀ h2 (by omega) P (fun z => ?_) n hn R hR
-  · exact ⟨hW (Set.mem_insert _ _), fun s hs => hW (Set.mem_insert_of_mem _
-      ⟨_, (hP _).2 ⟨s, rfl⟩, hs, rfl⟩)⟩
+  have hW :=
+    GlobalTheory.FieldSize.InRayAny.weberSet_subset K₀ h2 (by omega) P (fun z => ?_) n hn R hR
+  · exact ⟨
+      hW (Set.mem_insert _ _),
+      fun s hs => hW (Set.mem_insert_of_mem _ ⟨_, (hP _).2 ⟨s, rfl⟩, hs, rfl⟩)
+    ⟩
   · rw [hP]
     constructor
     · rintro ⟨s, rfl⟩
@@ -114,6 +125,10 @@ theorem exists_field_of_rayField (hRF : GlobalTheory.NT.RayField) (E : Type) [Fi
 
 end
 
-open GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.FlatTw GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.RefSum
+open GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects NumberField IsDedekindDomain
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.FlatLine
+  GlobalTheory.FlatTw GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop
+  GlobalTheory.RefSum
 
 end GlobalTheory.RefSum.UnramCurveField

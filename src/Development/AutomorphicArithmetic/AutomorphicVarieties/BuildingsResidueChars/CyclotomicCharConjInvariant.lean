@@ -5,10 +5,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PartsSign
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published UpperTheory.V.Af.Sol
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published UpperTheory.V.Af.Sol
 
-theorem UpperTheory.cyclotomic_char_conj_invariant :
-    UpperTheory.V.Af.Sol.CycConj := by
+theorem UpperTheory.cyclotomic_char_conj_invariant : UpperTheory.V.Af.Sol.CycConj := by
   intro F Ω _ _ _ _ _ l _ c hc
   obtain ⟨j, hj⟩ := hc
   haveI : CharZero Ω := j.charZero
@@ -19,9 +21,9 @@ theorem UpperTheory.cyclotomic_char_conj_invariant :
     apply j.injective
     rw [hj, map_inv₀]
     have hn : ‖j x‖ = 1 := Complex.norm_eq_one_of_pow_eq_one (by rw [← map_pow, hx, map_one]) hm
-    have hs : Complex.normSq (j x) = 1 := by
-      rw [Complex.normSq_eq_norm_sq, hn]; norm_num
-    rw [Complex.inv_def, hs]; simp
+    have hs : Complex.normSq (j x) = 1 := by rw [Complex.normSq_eq_norm_sq, hn]; norm_num
+    rw [Complex.inv_def, hs]
+    simp
   set g : Ω ≃+* Ω := MulSemiringAction.toRingAut (Formalism.ConjugateSelfDual.G F Ω) Ω c with hg
   have hcyc : cyclotomicCharacter Ω l g = -1 := by
     ext1
@@ -46,4 +48,5 @@ theorem UpperTheory.cyclotomic_char_conj_invariant :
   show Units.map _ (ReciprocityTheory.Gal.cycZ F Ω l c) = -1
   have : ReciprocityTheory.Gal.cycZ F Ω l c = -1 := hcyc
   rw [this]
-  ext; simp
+  ext
+  simp

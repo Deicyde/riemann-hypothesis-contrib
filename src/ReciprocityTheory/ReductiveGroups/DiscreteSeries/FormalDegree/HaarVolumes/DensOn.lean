@@ -19,9 +19,14 @@ abbrev KPair (ε : Fin n → Bool) : Type := {ab : Fin n × Fin n // ab.2 < ab.1
 abbrev KCo (ε : Fin n → Bool) : Type := (Fin n → ℝ) × (KPair ε → ℂ)
 
 def kMat {ε : Fin n → Bool} (w : KCo ε) : Matrix (Fin n) (Fin n) ℂ := fun a b =>
-  if a = b then Complex.I * ((w.1 a : ℝ) : ℂ)
-  else if h : b < a ∧ ε a = ε b then w.2 ⟨(a, b), h⟩
-  else if h' : a < b ∧ ε b = ε a then -star (w.2 ⟨(b, a), h'⟩) else 0
+  if a = b then
+    Complex.I * ((w.1 a : ℝ) : ℂ)
+  else if h : b < a ∧ ε a = ε b then
+    w.2 ⟨(a, b), h⟩
+  else if h' : a < b ∧ ε b = ε a then
+    - star (w.2 ⟨(b, a), h'⟩)
+  else
+    0
 
 abbrev GCo (ε : Fin n → Bool) : Type := KCo ε × (PCoord ε → ℂ)
 
@@ -34,7 +39,11 @@ def polSet {ε : Fin n → Bool} (S : Set (GCo ε)) : Set (UJ ε) :=
   {g | ∃ s ∈ S, toM g = NormedSpace.exp (kMat s.1) * NormedSpace.exp (pmat s.2)}
 
 def DensOn {ε : Fin n → Bool} (ν : Set (GCo ε) → ENNReal) (d : ℝ) : Prop :=
-  ∀ η : ℝ, 0 < η → ∃ δ > 0, ∀ S : Set (GCo ε), MeasurableSet S → (∀ s ∈ S, ‖s‖ < δ) →
-    ν S ≤ ENNReal.ofReal ((1 + η) * d) * volume S ∧ ENNReal.ofReal ((1 - η) * d) * volume S ≤ ν S
+  ∀ η : ℝ,
+    0 < η
+      → ∃ δ > 0, ∀ S : Set (GCo ε),
+        MeasurableSet S → (∀ s ∈ S, ‖s‖ < δ)
+          → ν S ≤ ENNReal.ofReal ((1 + η) * d) * volume S
+            ∧ ENNReal.ofReal ((1 - η) * d) * volume S ≤ ν S
 
 end ReciprocityTheory.ChartRestriction.DS

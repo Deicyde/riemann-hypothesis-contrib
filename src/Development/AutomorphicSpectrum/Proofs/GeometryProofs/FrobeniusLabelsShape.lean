@@ -10,8 +10,12 @@ public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.Frobeniu
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory NumberField MvPolynomial ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top
-open GroundTheory.Heights₂.Heights.NumbersDVR (pointIdeal segreVec IsFlagFrame IsFlagPair SameGenericFibre IsModelOver)
+open AlgebraicGeometry CategoryTheory NumberField MvPolynomial ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top
+open GroundTheory.Heights₂.Heights.NumbersDVR
+  (pointIdeal segreVec IsFlagFrame IsFlagPair SameGenericFibre IsModelOver)
 
 noncomputable section
 
@@ -33,20 +37,19 @@ def embPrecomp (g : E ≃ₐ[ℚ] E) : (E →+* ℂ) ≃ (E →+* ℂ) where
 def labelPerm (H : Host E) (g : E ≃ₐ[ℚ] E) : Equiv.Perm (CMType H ⊕ CMType H) :=
   (labelEquiv H).trans ((embPrecomp g).trans (labelEquiv H).symm)
 
-theorem labelCx_labelPerm (H : Host E) (g : E ≃ₐ[ℚ] E) (s : CMType H ⊕ CMType H) (x : E) :
-    LabelCount.labelCx H (labelPerm H g s) x = LabelCount.labelCx H s (g x) := by
-  have h : labelEquiv H (labelPerm H g s) = embPrecomp g (labelEquiv H s) := by
-    simp [labelPerm]
+theorem labelCx_labelPerm (H : Host E) (g : E ≃ₐ[ℚ] E) (s : CMType H ⊕ CMType H) (x : E)
+    : LabelCount.labelCx H (labelPerm H g s) x = LabelCount.labelCx H s (g x) := by
+  have h : labelEquiv H (labelPerm H g s) = embPrecomp g (labelEquiv H s) := by simp [labelPerm]
   exact RingHom.congr_fun h x
 
-theorem labelCx_rt (H : Host E) (s : CMType H ⊕ CMType H) :
-    LabelCount.labelCx H s (H.rt : E) = if s.isLeft then H.rt0 else -H.rt0 := by
+theorem labelCx_rt (H : Host E) (s : CMType H ⊕ CMType H)
+    : LabelCount.labelCx H s (H.rt : E) = if s.isLeft then H.rt0 else -H.rt0 := by
   rcases s with τ | τ
   · simp [LabelCount.labelCx, τ.2]
   · simp [LabelCount.labelCx, τ.2, HodgeCptTest.imaginary_root_conj]
 
-theorem labelPerm_side (H : Host E) (g : E ≃ₐ[ℚ] E) :
-    (∀ σ, (labelPerm H g σ).isLeft = σ.isLeft) ∨ ∀ σ, (labelPerm H g σ).isLeft = σ.isRight := by
+theorem labelPerm_side (H : Host E) (g : E ≃ₐ[ℚ] E)
+    : (∀ σ, (labelPerm H g σ).isLeft = σ.isLeft) ∨ ∀ σ, (labelPerm H g σ).isLeft = σ.isRight := by
   have hsq : ((H.rt : 𝓞 E) : E) ^ 2 = -(H.d : E) := by
     have := congrArg (fun x : 𝓞 E => (x : E)) H.rt_sq
     simpa using this
@@ -74,8 +77,8 @@ theorem labelPerm_side (H : Host E) (g : E ≃ₐ[ℚ] E) :
 
 variable {H : Host E} {l : Level H}
 
-theorem coe_labelEmb_eq (c : Coeff l) (s : CMType H ⊕ CMType H) (a : 𝓞 E) :
-    ((labelEmb c s a : c.F) : ℂ) = LabelCount.labelCx H s (a : E) := by
+theorem coe_labelEmb_eq (c : Coeff l) (s : CMType H ⊕ CMType H) (a : 𝓞 E)
+    : ((labelEmb c s a : c.F) : ℂ) = LabelCount.labelCx H s (a : E) := by
   rcases s with τ | τ
   · rfl
   · show τ.1 ((H.bar a : 𝓞 E) : E) = (starRingEnd ℂ) (τ.1 (a : E))
@@ -85,13 +88,18 @@ def labelInt (c : Coeff l) (s : CMType H ⊕ CMType H) : 𝓞 E →+* 𝓞 c.F :
   (labelEmb c s).codRestrict (integralClosure ℤ c.F).toSubring fun a =>
     IsIntegral.map (labelEmb c s).toIntAlgHom (RingOfIntegers.isIntegral a)
 
-theorem coe_labelInt (c : Coeff l) (s : CMType H ⊕ CMType H) (a : 𝓞 E) :
-    ((labelInt c s a : 𝓞 c.F) : c.F) = labelEmb c s a := rfl
+theorem coe_labelInt (c : Coeff l) (s : CMType H ⊕ CMType H) (a : 𝓞 E)
+    : ((labelInt c s a : 𝓞 c.F) : c.F) = labelEmb c s a :=
+  rfl
 
-theorem labelPerm_isFrobLabels (c : Coeff l) (p : ℕ) (g : E ≃ₐ[ℚ] E)
-    (hg : ∀ (O : Type) [CommRing O] (n : Ideal O), n.IsPrime → (p : O) ∈ n → ∀ (τ : 𝓞 E →+* O) (x : 𝓞 E),
-      τ (RingOfIntegers.mapRingEquiv g.toRingEquiv x) - τ x ^ p ∈ n) :
-    IsFrobLabels c p (labelPerm H g) := by
+theorem labelPerm_isFrobLabels
+    (c : Coeff l)
+    (p : ℕ) (g : E ≃ₐ[ℚ] E)
+    (hg : ∀ (O : Type) [CommRing O] (n : Ideal O),
+      n.IsPrime → (p : O) ∈ n
+        → ∀ (τ : 𝓞 E →+* O) (x : 𝓞 E),
+          τ (RingOfIntegers.mapRingEquiv g.toRingEquiv x) - τ x ^ p ∈ n)
+    : IsFrobLabels c p (labelPerm H g) := by
   intro n hn hp s a u v hu hv
   have key := hg (𝓞 c.F) n hn hp (labelInt c s) a
   have h1 : u = labelInt c s (RingOfIntegers.mapRingEquiv g.toRingEquiv a) := by
@@ -110,7 +118,13 @@ theorem labelPerm_isFrobLabels (c : Coeff l) (p : ℕ) (g : E ≃ₐ[ℚ] E)
 
 end Labels
 
-theorem exists_frob_labels : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [IsGalois ℚ E], (∀ a b : E ≃ₐ[ℚ] E, a * b = b * a) → ∀ (H : Host E) (l : Level H) (c : Coeff l) [Fintype (CMType H)] [DecidableEq (CMType H)], ∃ φ : ℕ → Equiv.Perm (CMType H ⊕ CMType H), (∀ p : ℕ, p.Prime → IsFrobLabels c p (φ p)) ∧ FrobShape fun p τ n => (φ p ^ (n + 1)) (Sum.inl τ) := by
+theorem exists_frob_labels
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] [IsGalois ℚ E],
+      (∀ a b : E ≃ₐ[ℚ] E, a * b = b * a)
+        → ∀ (H : Host E) (l : Level H) (c : Coeff l) [Fintype (CMType H)] [DecidableEq (CMType H)],
+          ∃ φ : ℕ → Equiv.Perm (CMType H ⊕ CMType H),
+            (∀ p : ℕ, p.Prime → IsFrobLabels c p (φ p))
+              ∧ FrobShape fun p τ n => (φ p ^ (n + 1)) (Sum.inl τ) := by
   intro E _ _ _ _ hab H l c _ _
   classical
   have h := GlobalTheory.T.abelian_frobenius_lift E hab

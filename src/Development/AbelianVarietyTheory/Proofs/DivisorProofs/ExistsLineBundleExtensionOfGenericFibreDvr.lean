@@ -14,14 +14,22 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsR
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem exists_lineBundle_extension_of_genericFibre_dvr :
-    ∀ (W K' : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field K'] [Algebra W K'] [IsFractionRing W K'] (G : Over (Sp W)) [GrpObj G], IsAbelianScheme G → ∀ N : LB (pullback G.hom (spMap (algebraMap W K'))), N.IsLB → ∃ (M : LB G.left) (w : LB.Iso (M.pull (pullback.fst G.hom (spMap (algebraMap W K')))) N), M.IsLB ∧ w.IsGen := by
+theorem exists_lineBundle_extension_of_genericFibre_dvr
+    : ∀ (W K' : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field K']
+        [Algebra W K'] [IsFractionRing W K'] (G : Over (Sp W)) [GrpObj G],
+      IsAbelianScheme G
+        → ∀ N : LB (pullback G.hom (spMap (algebraMap W K'))),
+          N.IsLB
+            → ∃ (M : LB G.left)
+                (w : LB.Iso (M.pull (pullback.fst G.hom (spMap (algebraMap W K')))) N),
+              M.IsLB ∧ w.IsGen := by
   intro R K _ _ _ _ _ _ A _ hA N hN
   have hφ := IsPullback.of_hasPullback A.hom (spMap (algebraMap R K))
   have := hA.smooth
@@ -38,8 +46,8 @@ theorem exists_lineBundle_extension_of_genericFibre_dvr :
   have : Smooth (pullback.snd A.hom (spMap (algebraMap R K))) :=
     MorphismProperty.of_isPullback (P := @Smooth) hφ inferInstance
   have : IsIntegral (pullback A.hom (spMap (algebraMap R K))) :=
-    GeometricallyIntegral.isIntegral_of_isLocallyNoetherian
-      (pullback.snd A.hom (spMap (algebraMap R K)))
+    GeometricallyIntegral.isIntegral_of_isLocallyNoetherian (pullback.snd A.hom
+      (spMap (algebraMap R K)))
   have h1 : IsPreimmersion (spMap (algebraMap R K)) :=
     IsPreimmersion.of_isLocalization (nonZeroDivisors R)
   have h2 : Flat (spMap (algebraMap R K)) := by
@@ -54,8 +62,9 @@ theorem exists_lineBundle_extension_of_genericFibre_dvr :
     uniqueFactorizationMonoid_of_isRegularRing_of_isLocalRing
       exists_hasProjectiveDimensionLE_of_isRegularLocalRing
       isPrincipal_map_away_of_hasProjectiveDimensionLE _
-  obtain ⟨L, hL, w, hw⟩ := exists_lineBundle_extension_of_generalizing A.left _
-    (pullback.fst A.hom (spMap (algebraMap R K))) (Flat.generalizingMap _) hst N hN
+  obtain ⟨L, hL, w, hw⟩ :=
+    exists_lineBundle_extension_of_generalizing A.left _
+      (pullback.fst A.hom (spMap (algebraMap R K))) (Flat.generalizingMap _) hst N hN
   exact ⟨L, w, hL, hw⟩
 
 end GlobalTheory

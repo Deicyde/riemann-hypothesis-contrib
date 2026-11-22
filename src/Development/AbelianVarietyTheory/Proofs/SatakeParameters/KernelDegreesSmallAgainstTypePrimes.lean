@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.NuR
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.AtG
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Ker GlobalTheory.AtG
 
 noncomputable section
 
@@ -19,14 +20,16 @@ namespace GlobalTheory.AtG.KernelSizes
 
 variable {D : D7} {L : SizeData₂ D}
 
-theorem key_ineq (A N Y : ℝ) (hA : 10 ≤ A) (hN : 2 ≤ N) (h1 : A ^ 8 ≤ Y) (h2 : N ^ 16 ≤ Y) :
-    6 * A ^ 2 * N + 2 < Y := by
+theorem key_ineq (A N Y : ℝ) (hA : 10 ≤ A) (hN : 2 ≤ N) (h1 : A ^ 8 ≤ Y) (h2 : N ^ 16 ≤ Y)
+    : 6 * A ^ 2 * N + 2 < Y := by
   have hA1 : 1 ≤ A := by linarith
   by_cases h : N ≤ A ^ 5
   · have hA7 : 1 ≤ A ^ 7 := one_le_pow₀ hA1
     have e1 : 6 * A ^ 2 * N ≤ 6 * A ^ 7 := by
       have := mul_le_mul_of_nonneg_left h (by positivity : (0 : ℝ) ≤ 6 * A ^ 2)
-      calc 6 * A ^ 2 * N ≤ 6 * A ^ 2 * A ^ 5 := this
+      calc
+        6 * A ^ 2 * N
+          ≤ 6 * A ^ 2 * A ^ 5 := this
         _ = 6 * A ^ 7 := by ring
     have e2 : A ^ 8 = A * A ^ 7 := by ring
     have e3 : 10 * A ^ 7 ≤ A * A ^ 7 := mul_le_mul_of_nonneg_right hA (by positivity)
@@ -42,8 +45,9 @@ theorem key_ineq (A N Y : ℝ) (hA : 10 ≤ A) (hN : 2 ≤ N) (h1 : A ^ 8 ≤ Y)
     have e3 : N ^ 2 * 8 ≤ N ^ 2 * N ^ 14 := mul_le_mul_of_nonneg_left hN14 (by positivity)
     nlinarith
 
-theorem exists_Y (P : ParameterChoice' D L) :
-    ∃ Y : ℝ, ((D.R.k : ℝ) * L.sc.b) ^ 8 ≤ Y ∧ (D.R.N D.R.m : ℝ) ^ 16 ≤ Y ∧ ∀ i, Y ≤ (D.host.g i : ℝ) := by
+theorem exists_Y (P : ParameterChoice' D L)
+    : ∃ Y : ℝ,
+      ((D.R.k : ℝ) * L.sc.b) ^ 8 ≤ Y ∧ (D.R.N D.R.m : ℝ) ^ 16 ≤ Y ∧ ∀ i, Y ≤ (D.host.g i : ℝ) := by
   obtain ⟨Y, h1, h2, -, h4⟩ := P.g_Y
   have hx0 : (0 : ℝ) < L.sc.x := by linarith [L.sc.one_lt_alt]
   have hq : (0 : ℝ) < D.host.q := lt_trans (Real.rpow_pos_of_pos hx0 _) P.qd_pow.1
@@ -58,7 +62,9 @@ theorem exists_Y (P : ParameterChoice' D L) :
   have hc : (1 : ℝ) ≤ (LevelStarExponents.condE D : ℝ) := by
     unfold LevelStarExponents.condE
     push_cast
-    calc (1 : ℝ) ≤ 1 * 1 * 1 := by norm_num
+    calc
+      (1 : ℝ)
+        ≤ 1 * 1 * 1 := by norm_num
       _ ≤ (D.host.QS : ℝ) * D.host.q * D.host.d := by gcongr
   have hcC : 1 ≤ (LevelStarExponents.condE D : ℝ) ^ P.CY := Real.one_le_rpow hc P.CY_pos.le
   have hY0 : 0 ≤ Y := le_trans (by positivity) h1
@@ -72,11 +78,16 @@ theorem exists_Y (P : ParameterChoice' D L) :
     rw [← Real.rpow_natCast (Y ^ ((1 : ℝ) / 4)), ← Real.rpow_mul hY0]
     norm_num
   rw [h6] at h5
-  calc (D.R.N D.R.m : ℝ) ^ 16 = ((D.R.N D.R.m : ℝ) ^ 4) ^ 4 := by ring
+  calc
+    (D.R.N D.R.m : ℝ) ^ 16
+      = ((D.R.N D.R.m : ℝ) ^ 4) ^ 4 := by ring
     _ ≤ Y := h5
 
-theorem nuAbs_le (P : ParameterChoice' D L) (u : D.what₂.Word) (j : ℕ) (hj : j ∈ LiftErrorLocal.lifts D) (τ : D.what₂.Tau) :
-    nuAbs D u j τ ≤ (D.R.N D.R.m : ℝ) * (3 * L.sc.a) := by
+theorem nuAbs_le
+    (P : ParameterChoice' D L) (u : D.what₂.Word)
+    (j : ℕ) (hj : j ∈ LiftErrorLocal.lifts D)
+    (τ : D.what₂.Tau)
+    : nuAbs D u j τ ≤ (D.R.N D.R.m : ℝ) * (3 * L.sc.a) := by
   unfold LiftErrorLocal.lifts at hj
   obtain ⟨j1, j2⟩ := Finset.mem_Icc.1 hj
   obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
@@ -106,19 +117,28 @@ theorem nuAbs_le (P : ParameterChoice' D L) (u : D.what₂.Word) (j : ℕ) (hj :
       omega
     exact_mod_cast this
   rw [Nat.add_sub_cancel]
-  calc _ ≤ (D.R.N i : ℝ) * (3 * L.sc.a) := hs
+  calc
+    _ ≤ (D.R.N i : ℝ) * (3 * L.sc.a) := hs
     _ ≤ _ := mul_le_mul_of_nonneg_right hNi (by positivity)
 
-theorem Dpi_le (P : ParameterChoice' D L) (u : D.what₂.Word) (j : ℕ) (hj : j ∈ LiftErrorLocal.lifts D) :
-    LiftErrorLocal.Dpi D u j ≤ (D.R.f : ℝ) * ((D.R.N D.R.m : ℝ) * (3 * L.sc.a)) := by
+theorem Dpi_le
+    (P : ParameterChoice' D L) (u : D.what₂.Word) (j : ℕ) (hj : j ∈ LiftErrorLocal.lifts D)
+    : LiftErrorLocal.Dpi D u j ≤ (D.R.f : ℝ) * ((D.R.N D.R.m : ℝ) * (3 * L.sc.a)) := by
   unfold LiftErrorLocal.Dpi
-  have hs := Finset.sum_le_card_nsmul (Finset.univ : Finset D.what₂.Tau) (fun τ => nuAbs D u j τ) _
-    (fun τ _ => nuAbs_le P u j hj τ)
+  have hs :=
+    Finset.sum_le_card_nsmul (Finset.univ : Finset D.what₂.Tau)
+      (fun τ => nuAbs D u j τ)
+      _
+      (fun τ _ => nuAbs_le P u j hj τ)
   rw [Finset.card_univ, D.what₂.card_Tau, nsmul_eq_mul] at hs
   exact hs
 
-theorem sizeAt_of_params : ∀ eps : ℝ, 0 < eps → eps < 1 / 52 → ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D), ParameterChoice' D L →
-    Formalism.MainNotions.SizesAt L → L.sc.eps = eps → x0 ≤ L.sc.x → ∀ i, GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound.SizeAt D i := by
+theorem sizeAt_of_params
+    : ∀ eps : ℝ,
+      0 < eps → eps < 1 / 52
+        → ∃ x0 : ℝ, ∀ (D : D7) (L : SizeData₂ D),
+          ParameterChoice' D L → Formalism.MainNotions.SizesAt L → L.sc.eps = eps → x0 ≤ L.sc.x
+            → ∀ i, GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound.SizeAt D i := by
   intro eps _ _
   refine ⟨0, fun D L P hS _ _ i => ?_⟩
   obtain ⟨Y, hY1, hY2, hY3⟩ := exists_Y P
@@ -159,14 +179,19 @@ theorem sizeAt_of_params : ∀ eps : ℝ, 0 < eps → eps < 1 / 52 → ∃ x0 : 
       mul_le_mul_of_nonneg_left (by linarith) (by positivity)
     nlinarith
 
-  have hD : ∀ u : D.what₂.Word, ∀ j ∈ LiftErrorLocal.lifts D, LiftErrorLocal.Dpi D u j ≤ 3 * A ^ 2 * N := by
+  have hD
+      : ∀ u : D.what₂.Word, ∀ j ∈ LiftErrorLocal.lifts D,
+        LiftErrorLocal.Dpi D u j ≤ 3 * A ^ 2 * N := by
     intro u j hj
     have h1 := Dpi_le P u j hj
     have hN0 : 0 ≤ N := by linarith
     have h2 : (D.R.f : ℝ) * (N * (3 * L.sc.a)) ≤ (D.R.k : ℝ) * (N * (3 * (D.R.k * L.sc.b))) := by
-      apply mul_le_mul hfk _ (by have := GlobalTheory.CoreHt.RowsRange.one_le_b L; unfold Scale.a; positivity) (by linarith)
+      apply mul_le_mul hfk _
+        (by have := GlobalTheory.CoreHt.RowsRange.one_le_b L; unfold Scale.a; positivity)
+        (by linarith)
       exact mul_le_mul_of_nonneg_left (by linarith) hN0
-    have h3 : (D.R.k : ℝ) * (N * (3 * (D.R.k * L.sc.b))) = 3 * ((D.R.k : ℝ) ^ 2 * L.sc.b) * N := by ring
+    have h3 : (D.R.k : ℝ) * (N * (3 * (D.R.k * L.sc.b))) = 3 * ((D.R.k : ℝ) ^ 2 * L.sc.b) * N := by
+      ring
     have h4 : 3 * ((D.R.k : ℝ) ^ 2 * L.sc.b) * N ≤ 3 * A ^ 2 * N := by
       have := mul_le_mul_of_nonneg_left hkA (by norm_num : (0 : ℝ) ≤ 3)
       exact mul_le_mul_of_nonneg_right this hN0

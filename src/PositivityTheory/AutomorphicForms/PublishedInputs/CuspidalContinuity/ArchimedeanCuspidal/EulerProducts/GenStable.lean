@@ -7,7 +7,8 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.CuspidalContinui
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Filter Topology
-open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.GodementSection (localChar)
 open scoped NumberField.AdeleRing ValuativeRel
 

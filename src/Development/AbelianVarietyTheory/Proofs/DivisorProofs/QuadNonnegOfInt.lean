@@ -57,12 +57,13 @@ private lemma gram_quadratic_real_nonneg {s : ℕ} {X : Type} [AddCommGroup X]
   rw [← key] at h0
   exact (mul_nonneg_iff_of_pos_left hNpos).mp h0
 
-
 open Matrix in
-theorem _root_.GlobalTheory.Poinc.qW_nonneg_of_posW : ∀ {s : ℕ} (W : Matrix (Fin s) (Fin s) ℤ),
-    _root_.GlobalTheory.Poinc.PosW W → ∀ {X : Type} [AddCommGroup X]
-    (β : LinearMap.BilinForm ℤ X), (∀ a b, β a b = β b a) → (∀ x, 0 ≤ β x x) →
-    ∀ y : Fin s → X, 0 ≤ _root_.GlobalTheory.Poinc.qW W β y := by
+theorem _root_.GlobalTheory.Poinc.qW_nonneg_of_posW
+    : ∀ {s : ℕ} (W : Matrix (Fin s) (Fin s) ℤ),
+      _root_.GlobalTheory.Poinc.PosW W
+        → ∀ {X : Type} [AddCommGroup X] (β : LinearMap.BilinForm ℤ X),
+          (∀ a b, β a b = β b a) → (∀ x, 0 ≤ β x x)
+            → ∀ y : Fin s → X, 0 ≤ _root_.GlobalTheory.Poinc.qW W β y := by
   intro s W hW X _ β hsymm hpos y
   unfold _root_.GlobalTheory.Poinc.PosW at hW
   unfold _root_.GlobalTheory.Poinc.qW
@@ -72,27 +73,34 @@ theorem _root_.GlobalTheory.Poinc.qW_nonneg_of_posW : ∀ {s : ℕ} (W : Matrix 
     rw [hS, Finset.sum_comm]
     refine Finset.sum_congr rfl fun u _ => Finset.sum_congr rfl fun w _ => ?_
     rw [hsymm]
-  have htwo : ((2 * S : ℤ) : ℝ) = ∑ u, ∑ w,
-      ((W + W.transpose).map (Int.cast : ℤ → ℝ)) u w * ((β (y u) (y w) : ℤ) : ℝ) := by
+  have htwo
+      : ((2 * S : ℤ) : ℝ)
+        = ∑ u, ∑ w,
+          ((W + W.transpose).map (Int.cast : ℤ → ℝ)) u w * ((β (y u) (y w) : ℤ) : ℝ) := by
     have : (2 * S : ℤ) = ∑ u, ∑ w, (W u w + W w u) * β (y u) (y w) := by
       simp only [add_mul, Finset.sum_add_distrib, hswap, hS]
       ring
     rw [this]
     push_cast
     simp [Matrix.map_apply, Matrix.add_apply, Matrix.transpose_apply]
-  have hnonneg : (0 : ℝ) ≤ ∑ u, ∑ w,
-      ((W + W.transpose).map (Int.cast : ℤ → ℝ)) u w * ((β (y u) (y w) : ℤ) : ℝ) := by
+  have hnonneg
+      : (0 : ℝ)
+        ≤ ∑ u, ∑ w,
+          ((W + W.transpose).map (Int.cast : ℤ → ℝ)) u w * ((β (y u) (y w) : ℤ) : ℝ) := by
     rw [hv]
-    have e : ∀ u w, (∑ i, vecMulVec (v i) (star (v i))) u w * ((β (y u) (y w) : ℤ) : ℝ) =
-        ∑ i, v i u * v i w * ((β (y u) (y w) : ℤ) : ℝ) := by
+    have e
+        : ∀ u w,
+          (∑ i, vecMulVec (v i) (star (v i))) u w * ((β (y u) (y w) : ℤ) : ℝ)
+            = ∑ i, v i u * v i w * ((β (y u) (y w) : ℤ) : ℝ) := by
       intro u w
       simp [Matrix.sum_apply, Matrix.vecMulVec_apply, Finset.sum_mul]
     simp_rw [e]
-    calc (0 : ℝ) ≤ ∑ i, ∑ u, ∑ w, v i u * v i w * ((β (y u) (y w) : ℤ) : ℝ) :=
-          Finset.sum_nonneg fun i _ => gram_quadratic_real_nonneg β hpos y (v i)
+    calc
+      (0 : ℝ) ≤ ∑ i, ∑ u, ∑ w, v i u * v i w * ((β (y u) (y w) : ℤ) : ℝ) :=
+        Finset.sum_nonneg fun i _ => gram_quadratic_real_nonneg β hpos y (v i)
       _ = ∑ u, ∑ i, ∑ w, v i u * v i w * ((β (y u) (y w) : ℤ) : ℝ) := Finset.sum_comm
       _ = ∑ u, ∑ w, ∑ i, v i u * v i w * ((β (y u) (y w) : ℤ) : ℝ) :=
-          Finset.sum_congr rfl fun u _ => Finset.sum_comm
+        Finset.sum_congr rfl fun u _ => Finset.sum_comm
   rw [← htwo] at hnonneg
   have : (0 : ℝ) ≤ (S : ℝ) := by push_cast at hnonneg; linarith
   exact_mod_cast this

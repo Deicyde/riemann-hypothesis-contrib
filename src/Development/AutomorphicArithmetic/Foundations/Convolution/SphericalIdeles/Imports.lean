@@ -21,11 +21,12 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.NormChar
 
 open MeasureTheory NumberField IsDedekindDomain Filter
 open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.T GlobalTheory.CuspRep Formalism.L2.Host Formalism.ConjugateSelfDual
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.T GlobalTheory.CuspRep
+  Formalism.L2.Host Formalism.ConjugateSelfDual
 open UpperTheory.V.Published UpperTheory.CBC PositivityTheory.RgJS
 
-theorem UpperTheory.ConvolutionTheory.Sph.down :
-    UpperTheory.ConvolutionTheory.Sph.Down := by
+theorem UpperTheory.ConvolutionTheory.Sph.down : UpperTheory.ConvolutionTheory.Sph.Down := by
   classical
   intro F E _ _ _ _ _ _ _ _ σ hσ hp n hn π P hW v hv ⟨w, hwv, B', hB'⟩
   let μE : Measure (normOneGL (K := E) (n := n)) := Measure.haar
@@ -41,9 +42,11 @@ theorem UpperTheory.ConvolutionTheory.Sph.down :
     rw [CG.twist_mk] at this
     exact ⟨_, this⟩
   obtain ⟨B₁, hB₁⟩ := hsat
-  have hS1 : SSat μE V' w (B₁.map fun b : ℂˣ => (b : ℂ)) := (Dp.sSatIff E n μE _ V' hV' w _).2 ⟨B₁, rfl, hB₁⟩
+  have hS1 : SSat μE V' w (B₁.map fun b : ℂˣ => (b : ℂ)) :=
+    (Dp.sSatIff E n μE _ V' hV' w _).2 ⟨B₁, rfl, hB₁⟩
   have hsph : ∀ u : Pl E, u.under (𝓞 F) = v → ∃ B, SSat μE V' u B := fun u hu =>
-    Dp.sSatEx E n μE V' hV'.summand u (Sph.sphConj F E σ hσ hp n hn μE θ hθ V' hst w u (hwv.trans hu.symm) hS1.2.1)
+    Dp.sSatEx E n μE V' hV'.summand u
+      (Sph.sphConj F E σ hσ hp n hn μE θ hθ V' hst w u (hwv.trans hu.symm) hS1.2.1)
   choose! b hb using hsph
   obtain ⟨Λ, t, S, hS, hAt⟩ := hAtE V' hV'.summand
   let t₁ : Pl E → Multiset ℂ := fun u => if u.under (𝓞 F) = v then b u else t u
@@ -57,11 +60,13 @@ theorem UpperTheory.ConvolutionTheory.Sph.down :
     · simp only [t₁, if_neg h]
       exact hAt.2 u fun h' => hu ⟨h', h⟩
   have hAE₁ : AtAE μE V' Λ t₁ := ⟨S₀, hS₀, hAt₁⟩
-  obtain ⟨V₀, Λ₀, t₀, hV₀, hAt₀, hΛ, ht, hv₀, -⟩ := Sph.descAt ci Sph.gm F E σ hσ hp n hn μE μF θ hθ V' Λ t₁ S₀
-    hV'.summand hst hS₀ hAt₁ (hOff _ _ hAE₁) v hv (fun u hu h => h.2 hu)
+  obtain ⟨V₀, Λ₀, t₀, hV₀, hAt₀, hΛ, ht, hv₀, -⟩ :=
+    Sph.descAt ci Sph.gm F E σ hσ hp n hn μE μF θ hθ V' Λ t₁ S₀ hV'.summand hst hS₀ hAt₁
+      (hOff _ _ hAE₁) v hv (fun u hu h => h.2 hu)
   obtain ⟨π₀, hπ₀, -⟩ := Dp.exCusp F n μF V₀ hV₀
   have hl := hcl π₀ _ V₀ V' Λ₀ t₀ Λ t₁ hπ₀ hV' hAt₀ hAE₁ hΛ ht
-  obtain ⟨η, hη, hiso⟩ := (R.fibre_holds F E hp n hn (.cx π₀) (.cx (P.twist χ')) hl.1).2 (.cx (π.twist χ)) hW'
+  obtain ⟨η, hη, hiso⟩ :=
+    (R.fibre_holds F E hp n hn (.cx π₀) (.cx (P.twist χ')) hl.1).2 (.cx (π.twist χ)) hW'
   have he : π₀.twist η = π.twist χ := (Dp.isoEq F n _ _).1 hiso
   obtain ⟨B₀, -, hB₀⟩ := (Dp.sSatIff F n μF π₀ V₀ hπ₀ v _).1 hv₀
   have hηu : η.UnrAt v := by

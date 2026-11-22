@@ -21,34 +21,50 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 @[expose] public section
 
 section
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix GlobalTheory.VacAny
 noncomputable section
 namespace GlobalTheory.NabFixSplitV
 open GlobalTheory.DblVacLineTransp GlobalTheory.DblVacLine GlobalTheory.SplitParLeft in
-theorem connection_fixes_split_subspace : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E)
-    (a a' : ℕ) (G : Geo σ a a') (X : Chars F E) (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W), IsTriple B G X om om' →
-    ∀ (v : Pl F), Formalism.MainNotions.SchurIrreducible.IsSplit (E := E) v → v ∉ X.T → PsiUnr B.ψ v → (2 : 𝓞 F) ∉ v.asIdeal →
-    G.M'.vac v = Set.indicator {x | ∀ i, x i ∈ v.adicCompletionIntegers F} 1 →
-    ∀ (d' : Darboux (symp (cA σ) (-1) (incM F G.W.J) (incM F G.V'.J)) (Fin a' × Fin (a + a'))),
-      (∀ x : Matrix (Fin a') (Fin (a + a')) (AE F E), d'.e xᵀ = G.M'.co.e x) →
-    ∀ (dd : Darboux (symp (cA σ) (-1) (incM F G.W.J) (dbl (incM F G.V'.J))) (Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a')))
-      (omd : UG (cA σ) (dbl (incM F G.V'.J)) →* Module.End ℂ ((Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a') → AF F) → ℂ)),
-      IsDblCoord (cA σ) (-1) (incM F G.W.J) (incM F G.V'.J) d' dd →
-      IsUWeilSplit (cA σ) (adeleClass F) B.ψ (-1) (incM F G.W.J) (dbl (incM F G.V'.J)) dd (X.α / X.β) (diagCols (Fin a')) omd →
-    ∀ R : (Fin a' × Fin (a + a') → AF F) → ℂ, R 0 ≠ 0 → Rest (evFin F v) (G.M'.vac v) R →
-    ∀ n ∈ GlobalTheory.InertDbl.NabD σ G.V' v, omd n (GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R)) =
-      GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R) := by
+theorem connection_fixes_split_subspace
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+          (σ : E →ₐ[F] E) (B : Base F E) (a a' : ℕ) (G : Geo σ a a') (X : Chars F E)
+          (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W),
+        IsTriple B G X om om'
+          → ∀ (v : Pl F),
+            Formalism.MainNotions.SchurIrreducible.IsSplit (E := E) v → v ∉ X.T → PsiUnr B.ψ v
+              → (2 : 𝓞 F) ∉ v.asIdeal
+              → G.M'.vac v = Set.indicator {x | ∀ i, x i ∈ v.adicCompletionIntegers F} 1
+              → ∀ (d' : Darboux (symp (cA σ) (-1) (incM F G.W.J) (incM F G.V'.J))
+                  (Fin a' × Fin (a + a'))),
+                (∀ x : Matrix (Fin a') (Fin (a + a')) (AE F E), d'.e xᵀ = G.M'.co.e x)
+                  → ∀ (dd : Darboux (symp (cA σ) (-1) (incM F G.W.J) (dbl (incM F G.V'.J)))
+                      (Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a')))
+                      (omd : UG (cA σ) (dbl (incM F G.V'.J)) →* Module.End ℂ
+                        ((Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a') → AF F) → ℂ)),
+                    IsDblCoord (cA σ) (-1) (incM F G.W.J) (incM F G.V'.J) d' dd
+                      → IsUWeilSplit (cA σ) (adeleClass F) B.ψ (-1) (incM F G.W.J)
+                        (dbl (incM F G.V'.J)) dd (X.α / X.β) (diagCols (Fin a')) omd
+                      → ∀ R : (Fin a' × Fin (a + a') → AF F) → ℂ,
+                        R 0 ≠ 0 → Rest (evFin F v) (G.M'.vac v) R
+                          → ∀ n ∈ GlobalTheory.InertDbl.NabD σ G.V' v,
+                            omd n (GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R))
+                              = GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R) := by
   have hConj := GlobalTheory.T.adelicSchwartzSpace_le_span_pureTensors
-  intro _ F E _ _ _ _ _ σ B a a' G X om om' hTr v hsp hT hψ h2 _ d' hd' dd omd hdc hws R hR0 hRv n hn
+  intro _ F E _ _ _ _ _ σ B a a' G X om om' hTr v hsp hT hψ h2 _ d' hd' dd omd hdc hws R hR0 hRv n
+    hn
   set Φ := GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R) with hΦdef
   have hLine : ∃ c : ℂ, omd n Φ = c • Φ := by
     obtain ⟨hSB, h0, θ, hθ, hvac⟩ := hTr.geo.hM'.vac v
-    refine dbl_line_co hTr.base.std v hψ hTr.geo.hW.lat.toIsLattice hTr.geo.hV'.lat.toIsLattice ?_ d' (G.M'.vac v)
-      ⟨hSB, h0, θ, hθ, ?_⟩ dd omd hdc hws.2.1 R hRv n hn.1
+    refine dbl_line_co hTr.base.std v hψ hTr.geo.hW.lat.toIsLattice hTr.geo.hV'.lat.toIsLattice ?_
+      d' (G.M'.vac v) ⟨hSB, h0, θ, hθ, ?_⟩ dd omd hdc hws.2.1 R hRv n hn.1
     · intro z hz
-      have h := GlobalTheory.LatSelfDualAll.latAtV_selfDual F E σ B _ _ G.V' G.W _ _ _ _
-        hTr.base hTr.geo.hV' hTr.geo.hW v zᵀ ((at_transpose v z).2 hz)
+      have h :=
+        GlobalTheory.LatSelfDualAll.latAtV_selfDual F E σ B _ _ G.V' G.W _ _ _ _ hTr.base
+          hTr.geo.hV' hTr.geo.hW v zᵀ ((at_transpose v z).2 hz)
       rw [mem_latAtV_transpose] at h
       rw [h]
       constructor
@@ -74,7 +90,8 @@ theorem connection_fixes_split_subspace : _root_.GlobalTheory.FunPr.ThetaLocalIn
     let Ψ := tens (evFin F v) (G.M'.vac v) R
     have hΨ : Ψ ∈ schA F _ := hRv.2
     have hΦ : Φ ∈ schA F _ :=
-      GlobalTheory.SchwartzBox.boxFun_mem_schA F _ _ Ψ hΨ _ (GlobalTheory.SchAConj.star_mem_schA F _ Ψ hΨ)
+      GlobalTheory.SchwartzBox.boxFun_mem_schA F _ _ Ψ hΨ _
+        (GlobalTheory.SchAConj.star_mem_schA F _ Ψ hΨ)
     obtain ⟨y, hy⟩ := Function.ne_iff.mp (hTr.geo.hM'.vac v).2.1
     have hΨne : Ψ ≠ 0 := by
       intro h0
@@ -88,14 +105,22 @@ theorem connection_fixes_split_subspace : _root_.GlobalTheory.FunPr.ThetaLocalIn
     obtain ⟨k, hk⟩ := dblFun_eigen_left hTr.base hTr.geo v hψ d' hd' dd omd hdc hws.2.1 R hRv s hs.1
     obtain ⟨l, hl, hinv, hl0⟩ := GlobalTheory.DblDiagForm.exists_form F _ Ψ hΨ hΨne
     obtain ⟨t, ht⟩ := hs.2
-    have hS := hws.2.2 l hl (fun z φ hφ => hinv φ hφ _ _ (GlobalTheory.WeilM.SiegelModel.rho_diag B.ψ hdc z φ)) s t ht _ hΦ
+    have hS :=
+      hws.2.2 l hl
+        (fun z φ hφ => hinv φ hφ _ _ (GlobalTheory.WeilM.SiegelModel.rho_diag B.ψ hdc z φ))
+        s t ht _ hΦ
     have hts := GlobalTheory.InertDbl.parD_diag_action F E σ G.V' v s hs t ht
     have hw : ∀ w : HeightOneSpectrum (𝓞 E), w.under (𝓞 F) = v → w ∉ above E (X.T : Set (Pl F)) :=
       fun w h hm => hT (h ▸ hm)
     have ha : (X.α / X.β) (Matrix.GeneralLinearGroup.det t) = 1 := by
       rw [MonoidHom.div_apply,
-        chr_det_eq_one G.V' hTr.geo.hV'.lat v X.α (fun w h => hTr.chars.unrα w (hw w h)) t hts.1 hts.2,
-        chr_det_eq_one G.V' hTr.geo.hV'.lat v X.β (fun w h => hTr.chars.unrβ w (hw w h)) t hts.1 hts.2, div_one]
+        chr_det_eq_one G.V' hTr.geo.hV'.lat v X.α
+          (fun w h => hTr.chars.unrα w (hw w h))
+          t hts.1 hts.2,
+        chr_det_eq_one G.V' hTr.geo.hV'.lat v X.β
+          (fun w h => hTr.chars.unrβ w (hw w h))
+          t hts.1 hts.2,
+        div_one]
     have hb := GlobalTheory.IntegralDetModule.modu_norm_det G.V' hTr.geo.hV'.lat v t hts.1 hts.2
     rw [ha, hb] at hS
     simp only [Circle.coe_one, NNReal.coe_one, Real.one_rpow, Complex.ofReal_one, one_mul] at hS
@@ -130,21 +155,35 @@ end
 end
 
 section
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.nabla_fixed_split_subspace : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E)
-    (a a' : ℕ) (G : Geo σ a a') (X : Chars F E) (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W), IsTriple B G X om om' →
-    ∀ (v : Pl F), Formalism.MainNotions.SchurIrreducible.IsSplit (E := E) v → v ∉ X.T → PsiUnr B.ψ v → (2 : 𝓞 F) ∉ v.asIdeal →
-    G.M'.vac v = Set.indicator {x | ∀ i, x i ∈ v.adicCompletionIntegers F} 1 →
-    ∀ (d' : Darboux (symp (cA σ) (-1) (incM F G.W.J) (incM F G.V'.J)) (Fin a' × Fin (a + a'))),
-      (∀ x : Matrix (Fin a') (Fin (a + a')) (AE F E), d'.e xᵀ = G.M'.co.e x) →
-    ∀ (dd : Darboux (symp (cA σ) (-1) (incM F G.W.J) (dbl (incM F G.V'.J))) (Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a')))
-      (omd : UG (cA σ) (dbl (incM F G.V'.J)) →* Module.End ℂ ((Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a') → AF F) → ℂ)),
-      IsDblCoord (cA σ) (-1) (incM F G.W.J) (incM F G.V'.J) d' dd →
-      IsUWeilSplit (cA σ) (adeleClass F) B.ψ (-1) (incM F G.W.J) (dbl (incM F G.V'.J)) dd (X.α / X.β) (diagCols (Fin a')) omd →
-    ∀ R : (Fin a' × Fin (a + a') → AF F) → ℂ, R 0 ≠ 0 → Rest (evFin F v) (G.M'.vac v) R →
-    ∀ n ∈ GlobalTheory.InertDbl.NabD σ G.V' v, omd n (GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R)) =
-      GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R) := by
+theorem _root_.GlobalTheory.T.nabla_fixed_split_subspace
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+          (σ : E →ₐ[F] E) (B : Base F E) (a a' : ℕ) (G : Geo σ a a') (X : Chars F E)
+          (om : Rep σ G.V G.W) (om' : Rep σ G.V' G.W),
+        IsTriple B G X om om'
+          → ∀ (v : Pl F),
+            Formalism.MainNotions.SchurIrreducible.IsSplit (E := E) v → v ∉ X.T → PsiUnr B.ψ v
+              → (2 : 𝓞 F) ∉ v.asIdeal
+              → G.M'.vac v = Set.indicator {x | ∀ i, x i ∈ v.adicCompletionIntegers F} 1
+              → ∀ (d' : Darboux (symp (cA σ) (-1) (incM F G.W.J) (incM F G.V'.J))
+                  (Fin a' × Fin (a + a'))),
+                (∀ x : Matrix (Fin a') (Fin (a + a')) (AE F E), d'.e xᵀ = G.M'.co.e x)
+                  → ∀ (dd : Darboux (symp (cA σ) (-1) (incM F G.W.J) (dbl (incM F G.V'.J)))
+                      (Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a')))
+                      (omd : UG (cA σ) (dbl (incM F G.V'.J)) →* Module.End ℂ
+                        ((Fin a' × Fin (a + a') ⊕ Fin a' × Fin (a + a') → AF F) → ℂ)),
+                    IsDblCoord (cA σ) (-1) (incM F G.W.J) (incM F G.V'.J) d' dd
+                      → IsUWeilSplit (cA σ) (adeleClass F) B.ψ (-1) (incM F G.W.J)
+                        (dbl (incM F G.V'.J)) dd (X.α / X.β) (diagCols (Fin a')) omd
+                      → ∀ R : (Fin a' × Fin (a + a') → AF F) → ℂ,
+                        R 0 ≠ 0 → Rest (evFin F v) (G.M'.vac v) R
+                          → ∀ n ∈ GlobalTheory.InertDbl.NabD σ G.V' v,
+                            omd n (GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R))
+                              = GlobalTheory.InertDbl.dblFun (tens (evFin F v) (G.M'.vac v) R) := by
   exact _root_.GlobalTheory.NabFixSplitV.connection_fixes_split_subspace
 end

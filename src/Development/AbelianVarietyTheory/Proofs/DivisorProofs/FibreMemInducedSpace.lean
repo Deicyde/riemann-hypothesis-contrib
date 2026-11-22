@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 noncomputable section
 
-open Matrix MeasureTheory GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.PRep GlobalTheory.WeilM
+open Matrix MeasureTheory GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.PRep
+  GlobalTheory.WeilM
 
 namespace GlobalTheory.RankFibre
 
@@ -17,13 +18,14 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 theorem stdSum_rfl' (a b : ℕ) : stdSum (rfl : a + b = a + b) = finSumFinEquiv := by
   ext x; simp [stdSum]
 
-theorem X0_mul_invT_parab (a b : ℕ) (p : parab k (blocks a b)) :
-    (X0 (k := k) (finSumFinEquiv (m := a) (n := b)) * (invT (p : GL (Fin (a + b)) k)).val :
-      Matrix (Fin a) (Fin (a + b)) k) =
-      ((invT (leviProj k (blocks a b) p false)).val : Matrix (Fin a) (Fin a) k) *
-        X0 (k := k) (finSumFinEquiv (m := a) (n := b)) := by
-  have hA : (invT (leviProj k (blocks a b) p false)).val
-      = ((leviProj k (blocks a b) p⁻¹ false : GL (Fin a) k) : Matrix (Fin a) (Fin a) k)ᵀ := by
+theorem X0_mul_invT_parab (a b : ℕ) (p : parab k (blocks a b))
+    : (X0 (k := k) (finSumFinEquiv (m := a) (n := b)) * (invT (p : GL (Fin (a + b)) k)).val
+        : Matrix (Fin a) (Fin (a + b)) k)
+      = ((invT (leviProj k (blocks a b) p false)).val : Matrix (Fin a) (Fin a) k)
+        * X0 (k := k) (finSumFinEquiv (m := a) (n := b)) := by
+  have hA
+      : (invT (leviProj k (blocks a b) p false)).val
+        = ((leviProj k (blocks a b) p⁻¹ false : GL (Fin a) k) : Matrix (Fin a) (Fin a) k)ᵀ := by
     rw [invT_val, map_inv]; rfl
   refine Matrix.ext fun i j => ?_
   rw [frameMatrixFirstColumnBlock_mul_apply, invT_val, hA]
@@ -40,8 +42,8 @@ theorem X0_mul_invT_parab (a b : ℕ) (p : parab k (blocks a b)) :
 
 variable [MeasurableSpace k] [BorelSpace k]
 
-theorem fibre_mem_indSpace (a b : ℕ) (ν β : kˣ →* ℂˣ) (Φ : Matrix (Fin a) (Fin (a + b)) k → ℂ) :
-    fibre ν β a b Φ ∈ indSpace (parab k (blocks a b)) (ofChar (parChar ν β a b)) := by
+theorem fibre_mem_indSpace (a b : ℕ) (ν β : kˣ →* ℂˣ) (Φ : Matrix (Fin a) (Fin (a + b)) k → ℂ)
+    : fibre ν β a b Φ ∈ indSpace (parab k (blocks a b)) (ofChar (parChar ν β a b)) := by
   intro p x
   rw [ofChar_apply]
   set A : GL (Fin a) k := leviProj k (blocks a b) p false with hAdef
@@ -53,22 +55,29 @@ theorem fibre_mem_indSpace (a b : ℕ) (ν β : kˣ →* ℂˣ) (Φ : Matrix (Fi
     apow (gdet g) z with hF
   set c : ℂ := (β (gdet (p : GL (Fin (a + b)) k)) : ℂ) * apow (gdet (p : GL (Fin (a + b)) k)) (-(a : ℂ) / 2) *
     ν (gdet A) * apow (gdet A) z with hc
-  have h1 : omA ν β 1 ((p : GL (Fin (a + b)) k) * x) Φ = omA ν β 1 ↑p Ψ := by rw [hΨ, ← omA_mul, one_mul]
-  have h2 : ∀ Y, omA ν β 1 (↑p : GL (Fin (a + b)) k) Ψ Y =
-      (β (gdet (p : GL (Fin (a + b)) k)) : ℂ) * apow (gdet (p : GL (Fin (a + b)) k)) (-(a : ℂ) / 2) *
-        Ψ (Y * (invT (p : GL (Fin (a + b)) k)).val) := by
+  have h1 : omA ν β 1 ((p : GL (Fin (a + b)) k) * x) Φ = omA ν β 1 ↑p Ψ := by
+    rw [hΨ, ← omA_mul, one_mul]
+  have h2
+      : ∀ Y,
+        omA ν β 1 (↑p : GL (Fin (a + b)) k) Ψ Y
+          = (β (gdet (p : GL (Fin (a + b)) k)) : ℂ)
+            * apow (gdet (p : GL (Fin (a + b)) k)) (-(a : ℂ) / 2)
+            * Ψ (Y * (invT (p : GL (Fin (a + b)) k)).val) := by
     intro Y
     simp [omA]
-  have hm : ∀ g : GL (Fin a) k,
-      (g.val * X) * (invT (p : GL (Fin (a + b)) k)).val = (g * invT A).val * X := by
+  have hm
+      : ∀ g : GL (Fin a) k,
+        (g.val * X) * (invT (p : GL (Fin (a + b)) k)).val = (g * invT A).val * X := by
     intro g
     rw [Matrix.mul_assoc, X0_mul_invT_parab, ← Matrix.mul_assoc, ← Units.val_mul]
-  have key : ∀ g : GL (Fin a) k, omA ν β 1 ((p : GL (Fin (a + b)) k) * x) Φ (g.val * X) * (ν (gdet g) : ℂ) *
-      apow (gdet g) z = c * F (g * invT A) := by
+  have key
+      : ∀ g : GL (Fin a) k,
+        omA ν β 1 ((p : GL (Fin (a + b)) k) * x) Φ (g.val * X) * (ν (gdet g) : ℂ) * apow (gdet g) z
+          = c * F (g * invT A) := by
     intro g
     rw [h1, h2, hm g]
-    simp only [hF, hc, gdet_mul, gdet_invT, map_mul, map_inv, Units.val_mul, Units.val_inv_eq_inv_val, apow_mul,
-      apow_inv, apow_neg]
+    simp only [hF, hc, gdet_mul, gdet_invT, map_mul, map_inv, Units.val_mul,
+      Units.val_inv_eq_inv_val, apow_mul, apow_inv, apow_neg]
     have n1 : (ν (gdet A) : ℂ) ≠ 0 := Units.ne_zero _
     have n2 : apow (gdet A) z ≠ 0 := apow_ne_zero _ _
     field_simp
@@ -89,8 +98,9 @@ theorem fibre_mem_indSpace (a b : ℕ) (ν β : kˣ →* ℂˣ) (Φ : Matrix (Fi
     rw [← e]
     ring
   rw [hchar]
-  have I1 : fibre ν β a b Φ ((p : GL (Fin (a + b)) k) * x) =
-      ∫ g, c * F (g * invT A) ∂(haarVol (GlobalTheory.SplitWeil.KO k (Fin a))) :=
+  have I1
+      : fibre ν β a b Φ ((p : GL (Fin (a + b)) k) * x)
+        = ∫ g, c * F (g * invT A) ∂(haarVol (GlobalTheory.SplitWeil.KO k (Fin a))) :=
     integral_congr_ae (Filter.Eventually.of_forall key)
   have I2 : fibre ν β a b Φ x = ∫ g, F g ∂(haarVol (GlobalTheory.SplitWeil.KO k (Fin a))) := rfl
   rw [I1, I2, integral_const_mul, integral_mul_right_eq_self F (invT A)]

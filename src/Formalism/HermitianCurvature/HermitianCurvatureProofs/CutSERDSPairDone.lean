@@ -14,7 +14,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutSERDSPLoc
 namespace Formalism.FourierDecayAlt.P.CutSE
 
 theorem spectral_pairing_identity : RDSPair :=
-  rDSPair_of_cut spectral_pairing_inner_swap spectral_pairing_big_cell spectral_pairing_zero_right spectral_pairing_exhaustion spectral_pairing_orbital_membership spectral_pairing_operator
+  rDSPair_of_cut spectral_pairing_inner_swap spectral_pairing_big_cell spectral_pairing_zero_right
+    spectral_pairing_exhaustion spectral_pairing_orbital_membership spectral_pairing_operator
     spectral_pairing_locality
 
 end Formalism.FourierDecayAlt.P.CutSE

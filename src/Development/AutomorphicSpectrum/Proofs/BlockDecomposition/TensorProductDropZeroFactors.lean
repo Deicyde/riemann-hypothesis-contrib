@@ -8,17 +8,20 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DropHom
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.Cos
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc Zc.Cos
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.FineProd.TensorLine
 
-theorem exists_line {G V : Type} [Group G] [Subsingleton G] [AddCommGroup V] [Module ℂ V]
-    {ρ : Representation ℂ G V} (hi : ρ.IsIrreducible) : Nonempty (V ≃ₗ[ℂ] ℂ) := by
+theorem exists_line
+    {G V : Type} [Group G] [Subsingleton G] [AddCommGroup V] [Module ℂ V]
+    {ρ : Representation ℂ G V} (hi : ρ.IsIrreducible)
+    : Nonempty (V ≃ₗ[ℂ] ℂ) := by
   have := nontrivial_of_irreducible hi
   obtain ⟨v, hv⟩ := exists_ne (0 : V)
-  let S : Subrepresentation ρ := ⟨Submodule.span ℂ {v}, fun g w hw => by
-    rw [Subsingleton.elim g 1, map_one]; exact hw⟩
+  let S : Subrepresentation ρ :=
+    ⟨Submodule.span ℂ {v}, fun g w hw => by rw [Subsingleton.elim g 1, map_one]; exact hw⟩
   have hvS : v ∈ S.toSubmodule := Submodule.mem_span_singleton_self v
   have hS : S = ⊤ := by
     rcases hi.eq_bot_or_eq_top S with h | h
@@ -61,35 +64,38 @@ def blockEquiv (o : Fin r' → Fin r) (ho : Function.Injective o) : Fin r' ⊕ O
 
 variable {X : Fin r → Type} [∀ j, AddCommGroup (X j)] [∀ j, Module ℂ (X j)]
 
-
 open scoped Classical in
-def dropEquiv (o : Fin r' → Fin r) (ho : Function.Injective o) (φ : ∀ c : Off o, X c ≃ₗ[ℂ] ℂ) :
-    (⨂[ℂ] j, X j) ≃ₗ[ℂ] ⨂[ℂ] a, X (o a) :=
+def dropEquiv (o : Fin r' → Fin r) (ho : Function.Injective o) (φ : ∀ c : Off o, X c ≃ₗ[ℂ] ℂ)
+    : (⨂[ℂ] j, X j) ≃ₗ[ℂ] ⨂[ℂ] a, X (o a) :=
   (PiTensorProduct.reindex ℂ X (blockEquiv o ho).symm).trans <|
     ((PiTensorProduct.tmulEquivDep ℂ fun i => X (blockEquiv o ho i)).symm).trans <|
       (TensorProduct.congr (LinearEquiv.refl ℂ (⨂[ℂ] a, X (o a)))
-        ((PiTensorProduct.congr fun c : Off o => φ c).trans
-          (PiTensorProduct.constantBaseRingEquiv (Off o) ℂ).toLinearEquiv)).trans
+          ((PiTensorProduct.congr fun c : Off o => φ c).trans
+            (PiTensorProduct.constantBaseRingEquiv (Off o) ℂ).toLinearEquiv)).trans
         (TensorProduct.rid ℂ _)
 
-
 open scoped Classical in
-theorem dropEquiv_tprod (o : Fin r' → Fin r) (ho : Function.Injective o)
-    (φ : ∀ c : Off o, X c ≃ₗ[ℂ] ℂ) (x : ∀ j, X j) :
-    dropEquiv o ho φ (PiTensorProduct.tprod ℂ x) =
-      (∏ c : Off o, φ c (x c)) • PiTensorProduct.tprod ℂ fun a => x (o a) := by
-  have h1 : PiTensorProduct.reindex ℂ X (blockEquiv o ho).symm (PiTensorProduct.tprod ℂ x) =
-      PiTensorProduct.tprod ℂ fun i => x (blockEquiv o ho i) :=
+theorem dropEquiv_tprod
+    (o : Fin r' → Fin r) (ho : Function.Injective o) (φ : ∀ c : Off o, X c ≃ₗ[ℂ] ℂ) (x : ∀ j, X j)
+    : dropEquiv o ho φ (PiTensorProduct.tprod ℂ x)
+      = (∏ c : Off o, φ c (x c)) • PiTensorProduct.tprod ℂ fun a => x (o a) := by
+  have h1
+      : PiTensorProduct.reindex ℂ X (blockEquiv o ho).symm (PiTensorProduct.tprod ℂ x)
+        = PiTensorProduct.tprod ℂ fun i => x (blockEquiv o ho i) :=
     PiTensorProduct.reindex_tprod _ _
-  have h2 := PiTensorProduct.tmulEquivDep_symm_apply ℂ (fun i => X (blockEquiv o ho i))
-    (fun i => x (blockEquiv o ho i))
-  have h3 : (PiTensorProduct.congr fun c : Off o => φ c)
-      (PiTensorProduct.tprod ℂ fun c : Off o => x c) = PiTensorProduct.tprod ℂ fun c : Off o => φ c (x c) :=
+  have h2 :=
+    PiTensorProduct.tmulEquivDep_symm_apply ℂ
+      (fun i => X (blockEquiv o ho i))
+      (fun i => x (blockEquiv o ho i))
+  have h3
+      : (PiTensorProduct.congr fun c : Off o => φ c) (PiTensorProduct.tprod ℂ fun c : Off o => x c)
+        = PiTensorProduct.tprod ℂ fun c : Off o => φ c (x c) :=
     PiTensorProduct.congr_tprod _ _
-  have ht : ((PiTensorProduct.tmulEquivDep ℂ fun i => X (blockEquiv o ho i)).symm
-      (PiTensorProduct.reindex ℂ X (blockEquiv o ho).symm (PiTensorProduct.tprod ℂ x)) :
-        TensorProduct ℂ (⨂[ℂ] a, X (o a)) (⨂[ℂ] c : Off o, X c)) =
-      (PiTensorProduct.tprod ℂ fun a => x (o a)) ⊗ₜ[ℂ] (PiTensorProduct.tprod ℂ fun c : Off o => x c) :=
+  have ht
+      : ((PiTensorProduct.tmulEquivDep ℂ fun i => X (blockEquiv o ho i)).symm
+            (PiTensorProduct.reindex ℂ X (blockEquiv o ho).symm (PiTensorProduct.tprod ℂ x))
+          : TensorProduct ℂ (⨂[ℂ] a, X (o a)) (⨂[ℂ] c : Off o, X c))
+        = (PiTensorProduct.tprod ℂ fun a => x (o a)) ⊗ₜ[ℂ] (PiTensorProduct.tprod ℂ fun c : Off o => x c) :=
     (congrArg _ h1).trans h2
   show (TensorProduct.rid ℂ _) ((TensorProduct.congr (LinearEquiv.refl ℂ (⨂[ℂ] a, X (o a)))
         ((PiTensorProduct.congr fun c : Off o => φ c).trans
@@ -101,7 +107,14 @@ theorem dropEquiv_tprod (o : Fin r' → Fin r) (ho : Function.Injective o)
   congr 1
   exact PiTensorProduct.constantBaseRingEquiv_tprod _
 
-theorem piTensor_drop_equiv : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {r r' : ℕ} (y : Fin r → IrrGL (k := k)) (o : Fin r' → Fin r), StrictMono o → (∀ j, (y j).1 ≠ 0 → j ∈ Set.range o) → Nonempty ((piTensor fun j => (y j).rep).Equiv ((piTensor fun a => (y (o a)).rep).comp (GlobalTheory.CompanionTheory.FineProd.dropHom (k := k) (fun j => (y j).1) o) : Representation ℂ (Levi k fun j => Fin (y j).1) _)) := by
+theorem piTensor_drop_equiv
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {r r' : ℕ} (y : Fin r → IrrGL (k := k)) (o : Fin r' → Fin r),
+      StrictMono o → (∀ j, (y j).1 ≠ 0 → j ∈ Set.range o)
+        → Nonempty ((piTensor fun j => (y j).rep).Equiv
+          ((piTensor fun a => (y (o a)).rep).comp
+              (GlobalTheory.CompanionTheory.FineProd.dropHom (k := k) (fun j => (y j).1) o)
+            : Representation ℂ (Levi k fun j => Fin (y j).1) _)) := by
   intro k _ _ _ _ r r' y o ho hy
   have hz : ∀ c : Off o, (y c).1 = 0 := fun c => by
     by_contra h

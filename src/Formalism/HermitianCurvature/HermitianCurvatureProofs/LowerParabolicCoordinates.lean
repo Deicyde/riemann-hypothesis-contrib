@@ -129,11 +129,13 @@ theorem unipotent_radical_image : C2.URImage := by
   · rintro ⟨hu, u', hu', he⟩
     refine ⟨hu, ut_conjT hu, ?_⟩
     have : P⁻¹ * uᴴ * P = u'⁻¹ := by
-      calc P⁻¹ * uᴴ * P = P⁻¹ * uᴴ * P * (u' * u'⁻¹) := by
-            rw [Matrix.mul_nonsing_inv _ (ut_unit hu'), Matrix.mul_one]
+      calc
+        P⁻¹ * uᴴ * P = P⁻¹ * uᴴ * P * (u' * u'⁻¹) := by
+          rw [Matrix.mul_nonsing_inv _ (ut_unit hu'), Matrix.mul_one]
         _ = P⁻¹ * (uᴴ * P * u') * u'⁻¹ := by simp only [Matrix.mul_assoc]
         _ = u'⁻¹ := by rw [he, Matrix.nonsing_inv_mul _ hPu, Matrix.one_mul]
-    rw [this]; exact ut_inv hu'
+    rw [this]
+    exact ut_inv hu'
   · rintro ⟨hu, _, hX⟩
     refine ⟨hu, (P⁻¹ * uᴴ * P)⁻¹, ut_inv hX, ?_⟩
     have e : uᴴ * P = P * (P⁻¹ * uᴴ * P) := by
@@ -167,21 +169,23 @@ theorem lower_parabolic_coordinates : C2.LPCoords := by
     constructor
     · rintro ⟨v, rfl⟩
       refine ⟨⟨fun i j hij => ?_, fun i => ?_⟩, ⟨fun a b hab => ?_, fun a => ?_⟩⟩
-      · rw [c2x2_lowOf_sub, Matrix.one_apply_ne (ne_of_lt hij), dite_eq_right (fun h => absurd h.1 (not_lt.mpr (le_of_lt hij))), add_zero]
+      · rw [c2x2_lowOf_sub, Matrix.one_apply_ne (ne_of_lt hij),
+          dite_eq_right (fun h => absurd h.1 (not_lt.mpr (le_of_lt hij))), add_zero]
       · rw [c2x2_lowOf_sub, Matrix.one_apply_eq, dite_eq_right (fun h => lt_irrefl _ h.1), add_zero]
       · rw [monomialMatrix_conj_apply w d hd, c2x2_lowOf_sub,
           Matrix.one_apply_ne (fun e => (ne_of_lt hab) (w.injective e)), dite_eq_right]
         · simp
         · intro h; simp at h; exact absurd h.2 (not_lt.mpr (le_of_lt hab))
-      · rw [monomialMatrix_conj_apply w d hd, c2x2_lowOf_sub, Matrix.one_apply_eq, dite_eq_right (fun h => lt_irrefl _ h.1)]
+      · rw [monomialMatrix_conj_apply w d hd, c2x2_lowOf_sub, Matrix.one_apply_eq,
+          dite_eq_right (fun h => lt_irrefl _ h.1)]
         simp [hd a]
     · rintro ⟨hl, hc⟩
       refine ⟨fun q => l q.1.1 q.1.2, ?_⟩
       ext i j
       rw [c2x2_lowOf_sub]
       rcases lt_trichotomy i j with hij | rfl | hij
-      · rw [Matrix.one_apply_ne (ne_of_lt hij), dite_eq_right (fun h => absurd h.1 (not_lt.mpr (le_of_lt hij))),
-          hl.1 i j hij, add_zero]
+      · rw [Matrix.one_apply_ne (ne_of_lt hij),
+          dite_eq_right (fun h => absurd h.1 (not_lt.mpr (le_of_lt hij))), hl.1 i j hij, add_zero]
       · rw [Matrix.one_apply_eq, dite_eq_right (fun h => lt_irrefl _ h.1), hl.2, add_zero]
       · rw [Matrix.one_apply_ne (ne_of_gt hij), zero_add]
         split_ifs with h
@@ -206,21 +210,23 @@ theorem lower_parabolic_coordinates : C2.LPCoords := by
     constructor
     · rintro ⟨v, rfl⟩
       refine ⟨⟨fun i j hij => ?_, fun i => ?_⟩, ⟨fun a b hab => ?_, fun a => ?_⟩⟩
-      · rw [c2x2_lowOf_sub, Matrix.one_apply_ne (ne_of_lt hij), dite_eq_right (fun h => absurd h.1 (not_lt.mpr (le_of_lt hij))), add_zero]
+      · rw [c2x2_lowOf_sub, Matrix.one_apply_ne (ne_of_lt hij),
+          dite_eq_right (fun h => absurd h.1 (not_lt.mpr (le_of_lt hij))), add_zero]
       · rw [c2x2_lowOf_sub, Matrix.one_apply_eq, dite_eq_right (fun h => lt_irrefl _ h.1), add_zero]
       · rw [monomialMatrix_conj_apply w d hd, c2x2_lowOf_sub,
           Matrix.one_apply_ne (fun e => (ne_of_gt hab) (w.injective e)), dite_eq_right]
         · simp
         · intro h; simp at h; exact absurd h.2 (not_lt.mpr (le_of_lt hab))
-      · rw [monomialMatrix_conj_apply w d hd, c2x2_lowOf_sub, Matrix.one_apply_eq, dite_eq_right (fun h => lt_irrefl _ h.1)]
+      · rw [monomialMatrix_conj_apply w d hd, c2x2_lowOf_sub, Matrix.one_apply_eq,
+          dite_eq_right (fun h => lt_irrefl _ h.1)]
         simp [hd a]
     · rintro ⟨hl, hc⟩
       refine ⟨fun q => l q.1.1 q.1.2, ?_⟩
       ext i j
       rw [c2x2_lowOf_sub]
       rcases lt_trichotomy i j with hij | rfl | hij
-      · rw [Matrix.one_apply_ne (ne_of_lt hij), dite_eq_right (fun h => absurd h.1 (not_lt.mpr (le_of_lt hij))),
-          hl.1 i j hij, add_zero]
+      · rw [Matrix.one_apply_ne (ne_of_lt hij),
+          dite_eq_right (fun h => absurd h.1 (not_lt.mpr (le_of_lt hij))), hl.1 i j hij, add_zero]
       · rw [Matrix.one_apply_eq, dite_eq_right (fun h => lt_irrefl _ h.1), hl.2, add_zero]
       · rw [Matrix.one_apply_ne (ne_of_gt hij), zero_add]
         split_ifs with h

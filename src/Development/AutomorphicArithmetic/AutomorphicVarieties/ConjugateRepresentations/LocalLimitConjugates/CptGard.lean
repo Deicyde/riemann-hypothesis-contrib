@@ -10,16 +10,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
+open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
 open UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Lit.Dr
 open scoped TensorProduct GlobalTheory.CuspRep.CuspidalL2GL
 open UpperTheory.V.Cj UpperTheory.V.Cj.H
 
 open scoped Pointwise in
-private theorem summable_conv {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
-    [MeasurableSpace G] [BorelSpace G] [LocallyCompactSpace G] [T2Space G] (Γ : Subgroup G) [DiscreteTopology Γ]
-    (μ : Measure G) [μ.IsHaarMeasure] [μ.IsMulRightInvariant] {u v : G → ℂ} (hu : HasCompactSupport u)
-    (hv : HasCompactSupport v) (x : G) : Summable fun γ : Γ => GlobalTheory.AutomorphicL2Unitary.conv μ u v (γ * x) := by
+private theorem summable_conv
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+    [MeasurableSpace G] [BorelSpace G] [LocallyCompactSpace G] [T2Space G]
+    (Γ : Subgroup G) [DiscreteTopology Γ]
+    (μ : Measure G) [μ.IsHaarMeasure] [μ.IsMulRightInvariant]
+    {u v : G → ℂ} (hu : HasCompactSupport u) (hv : HasCompactSupport v)
+    (x : G)
+    : Summable fun γ : Γ => GlobalTheory.AutomorphicL2Unitary.conv μ u v (γ * x) := by
   obtain ⟨N, hN⟩ := (locInt G Γ μ).2 _ (IsCompact.mul hu hv)
   refine summable_of_hasFiniteSupport ((Set.finite_of_encard_le_coe (hN x)).subset fun γ hγ => ?_)
   by_contra hn
@@ -27,13 +32,17 @@ private theorem summable_conv {G : Type} [Group G] [TopologicalSpace G] [IsTopol
   have h0 : (fun y => u y * v (y⁻¹ * ((γ : G) * x))) = 0 := by
     funext y
     by_contra hy
-    exact hn ⟨y, subset_tsupport u (left_ne_zero_of_mul hy), y⁻¹ * ((γ : G) * x),
-      subset_tsupport v (right_ne_zero_of_mul hy), mul_inv_cancel_left _ _⟩
+    exact hn ⟨
+      y,
+      subset_tsupport u (left_ne_zero_of_mul hy),
+      y⁻¹ * ((γ : G) * x),
+      subset_tsupport v (right_ne_zero_of_mul hy),
+      mul_inv_cancel_left _ _
+    ⟩
   simp only [GlobalTheory.AutomorphicL2Unitary.conv, h0]
   simp
 
-theorem UpperTheory.V.Cj.H.cptGard :
-    UpperTheory.V.Cj.H.CptGard := by
+theorem UpperTheory.V.Cj.H.cptGard : UpperTheory.V.Cj.H.CptGard := by
   intro E _ _ _ a μ _ _ φ hl hi C hC hs
   obtain ⟨f, hf, hφ⟩ := orbLift E a φ hl hi C hC hs
   obtain ⟨k, u, v, huv, hsum⟩ := dmTest E a μ f hf

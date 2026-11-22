@@ -4,20 +4,19 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.SumRightInverse.sum_rightInv :
-    ∀ {G : Type} [inst : Group G] [inst_1 : TopologicalSpace G]
-    [IsTopologicalGroup G] [inst_3 : MeasurableSpace G] [BorelSpace G] (μ : MeasureTheory.Measure G)
-    [μ.IsMulLeftInvariant] (K : Subgroup G),
-    IsOpen (↑K : Set G) →
-      (μ : Set G → ENNReal) (↑K : Set G) ≠ ⊤ →
-        ∀ {S : Set G},
-          IsCompact S →
-            (∀ s ∈ S, ∀ k ∈ K, s * k ∈ S) →
-              ∃ (t : Finset (G ⧸ K)),
-                (∀ Q ∈ t, Quotient.out Q ∈ S) ∧
-                  ∀ (f : G → ℂ),
-                    (∀ s ∈ S, ∀ k ∈ K, f (s * k) = f s) →
-                      ∫ (g : G) in S, f g ∂μ = ∑ Q ∈ t, f (Quotient.out Q) * (↑(μ.real (↑K : Set G)) : ℂ) := by
+theorem UpperTheory.Reformulated.B.SumRightInverse.sum_rightInv
+    : ∀ {G : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
+        [inst_3 : MeasurableSpace G] [BorelSpace G] (μ : MeasureTheory.Measure G)
+        [μ.IsMulLeftInvariant] (K : Subgroup G),
+      IsOpen (↑K : Set G) → (μ : Set G → ENNReal) (↑K : Set G) ≠ ⊤
+        → ∀ {S : Set G},
+          IsCompact S → (∀ s ∈ S, ∀ k ∈ K, s * k ∈ S)
+            → ∃ (t : Finset (G ⧸ K)),
+              (∀ Q ∈ t, Quotient.out Q ∈ S)
+                ∧ ∀ (f : G → ℂ),
+                  (∀ s ∈ S, ∀ k ∈ K, f (s * k) = f s)
+                    → ∫ (g : G) in S, f g ∂μ
+                      = ∑ Q ∈ t, f (Quotient.out Q) * (↑(μ.real (↑K : Set G)) : ℂ) := by
   intro G _ _ _ _ _ μ _ K hK hμ S hS hSK
   classical
   haveI : DiscreteTopology (G ⧸ K) := QuotientGroup.discreteTopology hK
@@ -53,8 +52,8 @@ theorem UpperTheory.Reformulated.B.SumRightInverse.sum_rightInv :
     intro Q hQ g hg
     have := hf _ (hout Q hQ) _ hg
     simpa using this
-  have hsplit : ∫ g in ⋃ Q ∈ hfin.toFinset, C Q, f g ∂μ
-      = ∑ Q ∈ hfin.toFinset, ∫ g in C Q, f g ∂μ := by
+  have hsplit
+      : ∫ g in ⋃ Q ∈ hfin.toFinset, C Q, f g ∂μ = ∑ Q ∈ hfin.toFinset, ∫ g in C Q, f g ∂μ := by
     refine MeasureTheory.integral_biUnion_finset _ (fun Q _ => hmeas Q) ?_ ?_
     · intro Q _ R _ hQR
       refine Set.disjoint_left.2 fun g h1 h2 => hQR ?_
@@ -65,6 +64,5 @@ theorem UpperTheory.Reformulated.B.SumRightInverse.sum_rightInv :
   rw [← hU] at hsplit
   rw [hsplit]
   refine Finset.sum_congr rfl fun Q hQ => ?_
-  rw [MeasureTheory.setIntegral_congr_fun (hmeas Q) (hconst Q hQ),
-    MeasureTheory.setIntegral_const, MeasureTheory.measureReal_def, hμC,
-    MeasureTheory.measureReal_def, Complex.real_smul, mul_comm]
+  rw [MeasureTheory.setIntegral_congr_fun (hmeas Q) (hconst Q hQ), MeasureTheory.setIntegral_const,
+    MeasureTheory.measureReal_def, hμC, MeasureTheory.measureReal_def, Complex.real_smul, mul_comm]

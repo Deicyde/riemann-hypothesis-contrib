@@ -18,9 +18,9 @@ namespace LelongNumberMonotone
 
 variable {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin (d + 1)) (Fin n) ℂ}
 
-theorem maDens_logDistSq_nonneg (x z : Fin n → ℂ) (s : (Fin (d + 1) → ℂ) → Fin n → ℂ) (hzx : z ≠ x)
-    (hs : IsSheetAt J A z s) :
-    0 ≤ ReciprocityTheory.AnForm.maDens (fun _ : Fin (d + 1) => logDistSq x ∘ s) (A *ᵥ z) := by
+theorem maDens_logDistSq_nonneg
+    (x z : Fin n → ℂ) (s : (Fin (d + 1) → ℂ) → Fin n → ℂ) (hzx : z ≠ x) (hs : IsSheetAt J A z s)
+    : 0 ≤ ReciprocityTheory.AnForm.maDens (fun _ : Fin (d + 1) => logDistSq x ∘ s) (A *ᵥ z) := by
   have han : AnalyticAt ℂ s (A *ᵥ z) := FormIntegralPositivity.analyticAt_sheet hs
   have hsz : s (A *ᵥ z) = z := by
     obtain ⟨U, -, -, -, h, -⟩ := hs
@@ -28,8 +28,11 @@ theorem maDens_logDistSq_nonneg (x z : Fin n → ℂ) (s : (Fin (d + 1) → ℂ)
   exact ReciprocityTheory.AnForm.A.maDens_nonneg_of_posSemidef _ _ fun _ =>
     RegularizedLogDensityNonneg.hessC_logDistSq_comp_posSemidef x s _ han (hsz.symm ▸ hzx)
 
-theorem chartDens_annulus_nonneg (x : Fin n → ℂ) {r s : ℝ} (hr : 0 < r) (y : Fin (d + 1) → ℂ) :
-    0 ≤ chartDens J A ((euclBall x s \ euclBall x r).indicator fun _ => 1) (fun _ => logDistSq x) y := by
+theorem chartDens_annulus_nonneg (x : Fin n → ℂ) {r s : ℝ} (hr : 0 < r) (y : Fin (d + 1) → ℂ)
+    : 0
+      ≤ chartDens J A ((euclBall x s \ euclBall x r).indicator fun _ => 1)
+        (fun _ => logDistSq x)
+        y := by
   unfold chartDens sheetSum
   refine finsum_nonneg fun z => finsum_nonneg fun hz => ?_
   split_ifs with h
@@ -43,13 +46,14 @@ theorem chartDens_annulus_nonneg (x : Fin n → ℂ) {r s : ℝ} (hr : 0 < r) (y
 
 end LelongNumberMonotone
 
-
 open LelongNumberMonotone in
 theorem VarLelongMono.proof (hA : VarLelongAnnulus.Statement) : VarLelongMono.Statement := by
   intro n d J A x r s hJ hdim hAf hr hrs
   have heq := hA n d J A x r s hJ hdim hAf hr hrs
-  have hτ : 0 ≤ ∫ y, chartDens J A ((euclBall x s \ euclBall x r).indicator fun _ => 1)
-      (fun _ => logDistSq x) y :=
+  have hτ
+      : 0
+        ≤ ∫ y, chartDens J A ((euclBall x s \ euclBall x r).indicator fun _ => 1)
+          (fun _ => logDistSq x) y :=
     integral_nonneg fun y => chartDens_annulus_nonneg x hr y
   have hrs0 : 0 ≤ r ^ (2 * (d + 1)) * s ^ (2 * (d + 1)) :=
     mul_nonneg (pow_nonneg hr.le _) (pow_nonneg (hr.le.trans hrs) _)

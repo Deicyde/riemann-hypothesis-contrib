@@ -30,21 +30,24 @@ def subrepIso (ρ : Representation ℂ G X) : Subrepresentation ρ ≃o Submodul
   right_inv _ := rfl
   map_rel_iff' := Iff.rfl
 
-theorem isIrreducible_iff_finrank (ρ : Representation ℂ G X) :
-    ρ.IsIrreducible ↔ Module.finrank ℂ X = 1 := by
+theorem isIrreducible_iff_finrank (ρ : Representation ℂ G X)
+    : ρ.IsIrreducible ↔ Module.finrank ℂ X = 1 := by
   unfold Representation.IsIrreducible
   exact (PositivityTheory.PfBern.Props2.subrepIso ρ).isSimpleOrder_iff.trans
     ((isSimpleModule_iff ℂ X).symm.trans isSimpleModule_iff_finrank_eq_one)
 
-theorem finrank_smoothPart_ind [TopologicalSpace G] [IsTopologicalGroup G] {Z : Type} [AddCommGroup Z]
-    [Module ℂ Z] (H : Subgroup G) (σ : Representation ℂ H Z) :
-    Module.finrank ℂ (smoothPart (ind H σ)) = Module.finrank ℂ Z := by
+theorem finrank_smoothPart_ind
+    [TopologicalSpace G] [IsTopologicalGroup G]
+    {Z : Type} [AddCommGroup Z] [Module ℂ Z]
+    (H : Subgroup G) (σ : Representation ℂ H Z)
+    : Module.finrank ℂ (smoothPart (ind H σ)) = Module.finrank ℂ Z := by
   haveI : DiscreteTopology G := Subsingleton.discreteTopology
   have hmem : ∀ z : Z, (fun _ : G => z) ∈ GlobalTheory.PRep.indSpace H σ := by
     intro z
     simp [GlobalTheory.PRep.indSpace, Subsingleton.elim _ (1 : H)]
-  have hsmooth : ∀ v : GlobalTheory.PRep.indSpace H σ,
-      v ∈ GlobalTheory.PRep.smoothPart (GlobalTheory.PRep.ind H σ) := by
+  have hsmooth
+      : ∀ v : GlobalTheory.PRep.indSpace H σ,
+        v ∈ GlobalTheory.PRep.smoothPart (GlobalTheory.PRep.ind H σ) := by
     intro v
     exact isOpen_discrete _
   let e : GlobalTheory.PRep.smoothPart (GlobalTheory.PRep.ind H σ) →ₗ[ℂ] Z :=
@@ -65,9 +68,10 @@ end GL0
 
 instance subsingleton_GL0 : Subsingleton (GL (Fin 0) k) := inferInstance
 
-theorem prodGL0Irreducible_at (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    (π₁ : Representation ℂ (GL (Fin 0) k) V) (π₂ : Representation ℂ (GL (Fin 0) k) W) :
-    π₁.IsIrreducible → π₂.IsIrreducible → (prod₂ π₁ π₂).IsIrreducible := by
+theorem prodGL0Irreducible_at
+    (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (π₁ : Representation ℂ (GL (Fin 0) k) V) (π₂ : Representation ℂ (GL (Fin 0) k) W)
+    : π₁.IsIrreducible → π₂.IsIrreducible → (prod₂ π₁ π₂).IsIrreducible := by
   intro h₁ h₂
   haveI : Subsingleton (GL (Fin (0 + 0)) k) := PositivityTheory.PfBern.Props2.subsingleton_GL0
   rw [PositivityTheory.PfBern.Props2.isIrreducible_iff_finrank] at h₁ h₂ ⊢

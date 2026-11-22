@@ -10,57 +10,61 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Gaps.EtaleWeightGaps NumberField IsDedekindDomain
+open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.Gaps.EtaleWeightGaps NumberField IsDedekindDomain
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j} {E : PtExt X} {hM : IntAtExt X E}
-  {ka wL wF : WeightFamilies.Wt D j} {G : GlobalFamilyData (xplus X E hM) ka wL wF} {la : HeightOneSpectrum (𝓞 B.KO)}
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j}
+  {E : PtExt X} {hM : IntAtExt X E} {ka wL wF : WeightFamilies.Wt D j}
+  {G : GlobalFamilyData (xplus X E hM) ka wL wF} {la : HeightOneSpectrum (𝓞 B.KO)}
 
 structure SecPt (ζ : PtsG G la) (y : E.Pt' la) where
-
   T : CDVR
-
   ep_pos : 0 < ep (unifO (xplus X E hM) la G.N) ζ
-
   ev : Rp (xplus X E hM) la G.N →+* T.Fr
-
-  hv : ∀ (w : WeightFamilies.Wt D j) (F : B.Cusp j w), E.vAt' la y (X.inc w F) =
-    nval T.V (ep (unifO (xplus X E hM) la G.N) ζ) (ev (emb (xplus X E hM) la G.N (X.inc w F)))
-
+  hv
+    : ∀ (w : WeightFamilies.Wt D j) (F : B.Cusp j w),
+      E.vAt' la y (X.inc w F)
+        = nval T.V (ep (unifO (xplus X E hM) la G.N) ζ) (ev (emb (xplus X E hM) la G.N (X.inc w F)))
   onS : ∀ i : Fin (WeightFamilies.dimY D j), ev (sec (xplus X E hM) la G.w i.succ) = 0
-
   s0 : IsUnit (ev (sec (xplus X E hM) la G.w 0))
-
-  ord : ∀ x : ↥(Frac0 (xplus X E hM) la G.w),
-    toE (ord (unifO (xplus X E hM) la G.N) ζ (toOsK (xplus X E hM) la G.w x)) =
-      nval T.V 1 (IsLocalization.Away.lift (sec (xplus X E hM) la G.w 0) s0 (x : Lw (xplus X E hM) la G.w))
+  ord
+    : ∀ x : ↥(Frac0 (xplus X E hM) la G.w),
+      toE (ord (unifO (xplus X E hM) la G.N) ζ (toOsK (xplus X E hM) la G.w x))
+        = nval T.V 1
+          (IsLocalization.Away.lift (sec (xplus X E hM) la G.w 0) s0 (x : Lw (xplus X E hM) la G.w))
 
 structure FromW (ζ : PtsG G la) (y : E.Pt' la) extends SecPt ζ y where
-
   ι : Loc ζ →+* T.V
-
   loc : IsLocalHom ι
   unr : ∃ ϖ : Loc ζ, Irreducible ϖ ∧ Irreducible (ι ϖ)
+  evW
+    : ∀ (x : ↥(Frac0 (xplus X E hM) la G.w))
+        (a : ↥(As (Op (xplus X E hM) la G.N) (OsK (xplus X E hM) la G.w))),
+      toOsK (xplus X E hM) la G.w x = (a : OsK (xplus X E hM) la G.w)
+        → IsLocalization.Away.lift (sec (xplus X E hM) la G.w 0) toSecPt.s0
+            (x : Lw (xplus X E hM) la G.w)
+          = algebraMap T.V T.Fr (ι (algebraMap _ (Loc ζ) a))
 
-  evW : ∀ (x : ↥(Frac0 (xplus X E hM) la G.w)) (a : ↥(As (Op (xplus X E hM) la G.N) (OsK (xplus X E hM) la G.w))),
-    toOsK (xplus X E hM) la G.w x = (a : OsK (xplus X E hM) la G.w) →
-    IsLocalization.Away.lift (sec (xplus X E hM) la G.w 0) toSecPt.s0 (x : Lw (xplus X E hM) la G.w) =
-      algebraMap T.V T.Fr (ι (algebraMap _ (Loc ζ) a))
-
-def secQ (y : PtsG G la → E.Pt' la) (hs : ∀ ζ, SecPt ζ (y ζ)) (g0 : B.Cusp j wF) : LocalPointData G la where
+def secQ (y : PtsG G la → E.Pt' la) (hs : ∀ ζ, SecPt ζ (y ζ)) (g0 : B.Cusp j wF)
+    : LocalPointData G la where
   y ζ := .inr (y ζ)
   g0 := g0
   c ζ := vV (hs ζ).T.V ((hs ζ).ev (emb (xplus X E hM) la G.N (X.inc wF g0)))
 
 def InTieSecSt : Prop :=
-  ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ) (X : PJ D B P j) (E : PtExt X) (hM : IntAtExt X E)
-    (ka wL wF : WeightFamilies.Wt D j) (G : GlobalFamilyData (xplus X E hM) ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO)) (S : Scal B)
-    (y : PtsG G la → E.Pt' la) (hs : ∀ ζ, SecPt ζ (y ζ)) (g0 : B.Cusp j wF),
-    (∀ ζ, (xplus X E hM).depth S.sW wL la (.inr (y ζ)) =
-      nval (hs ζ).T.V (ep (unifO (xplus X E hM) la G.N) ζ) ((hs ζ).ev (sec (xplus X E hM) la G.w 0))) →
-    (j < D.R.m → ∀ ζ, (hs ζ).ev (emb (xplus X E hM) la G.N (X.inc _ G.et)) ≠ 0) →
-    (∀ ζ, (hs ζ).ev (emb (xplus X E hM) la G.N (X.inc wF g0)) ≠ 0) →
-    IsGen (OsK (xplus X E hM) la G.w) (resF G la g0) →
-    (secQ y hs g0).InTie S
+  ∀ (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) (j : ℕ) (X : PJ D B P j)
+      (E : PtExt X) (hM : IntAtExt X E) (ka wL wF : WeightFamilies.Wt D j)
+      (G : GlobalFamilyData (xplus X E hM) ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO)) (S : Scal B)
+      (y : PtsG G la → E.Pt' la) (hs : ∀ ζ, SecPt ζ (y ζ)) (g0 : B.Cusp j wF),
+    (∀ ζ,
+        (xplus X E hM).depth S.sW wL la (.inr (y ζ))
+          = nval (hs ζ).T.V (ep (unifO (xplus X E hM) la G.N) ζ)
+            ((hs ζ).ev (sec (xplus X E hM) la G.w 0)))
+      → (j < D.R.m → ∀ ζ, (hs ζ).ev (emb (xplus X E hM) la G.N (X.inc _ G.et)) ≠ 0)
+      → (∀ ζ, (hs ζ).ev (emb (xplus X E hM) la G.N (X.inc wF g0)) ≠ 0)
+      → IsGen (OsK (xplus X E hM) la G.w) (resF G la g0)
+      → (secQ y hs g0).InTie S
 
 section Nval
 
@@ -168,24 +172,30 @@ theorem inTieSec : InTieSecSt := by
   intro D B P j X E hM ka wL wF G la S y hs g0 hdep het hg0 hgen ζ
   have hd := hdep ζ
   have hg0' := hg0 ζ
-  have het' : j < D.R.m → (hs ζ).ev (emb (xplus X E hM) la G.N (X.inc _ G.et)) ≠ 0 := fun hj => het hj ζ
+  have het' : j < D.R.m → (hs ζ).ev (emb (xplus X E hM) la G.N (X.inc _ G.et)) ≠ 0 := fun hj =>
+    het hj ζ
   set h := hs ζ with hh
   have hb : h.ev (sec (xplus X E hM) la G.w 0) ≠ 0 := h.s0.ne_zero
   have he := h.ep_pos
-  have hvat : ∀ (w : WeightFamilies.Wt D j) (F : B.Cusp j w), (xplus X E hM).vAt la (.inr (y ζ)) ((xplus X E hM).inc w F) =
-      nval h.T.V (ep (unifO (xplus X E hM) la G.N) ζ) (h.ev (emb (xplus X E hM) la G.N (X.inc w F))) :=
-    fun w F => h.hv w F
+  have hvat
+      : ∀ (w : WeightFamilies.Wt D j) (F : B.Cusp j w),
+        (xplus X E hM).vAt la (.inr (y ζ)) ((xplus X E hM).inc w F)
+          = nval h.T.V (ep (unifO (xplus X E hM) la G.N) ζ)
+            (h.ev (emb (xplus X E hM) la G.N (X.inc w F))) := fun w F =>
+    h.hv w F
   have hQy : (secQ y hs g0).y ζ = .inr (y ζ) := rfl
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · rw [hQy, hd, nval_of_ne hb]; exact EReal.coe_ne_top _
   · rw [hQy, hd, nval_of_ne hb]; exact EReal.coe_ne_bot _
   · intro hj
-    rw [hQy, hvat, nval_of_ne (het' hj)]; exact EReal.coe_ne_top _
+    rw [hQy, hvat, nval_of_ne (het' hj)]
+    exact EReal.coe_ne_top _
   · refine ⟨vV h.T.V (h.ev (sec (xplus X E hM) la G.w 0)), ?_⟩
     simp only [LocalPointData.nu, hQy, hd]
     exact normalized_valuation_mul he _ (hs ζ).s0.ne_zero
-  · change (((vV h.T.V (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))) : ℤ) : ℝ) : EReal) =
-      (ep (unifO (xplus X E hM) la G.N) ζ : EReal) * (xplus X E hM).vAt la (.inr (y ζ)) ((xplus X E hM).inc wF g0)
+  · change (((vV h.T.V (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))) : ℤ) : ℝ) : EReal)
+      = (ep (unifO (xplus X E hM) la G.N) ζ : EReal)
+        * (xplus X E hM).vAt la (.inr (y ζ)) ((xplus X E hM).inc wF g0)
     rw [hvat, e_mul_nval he, nval_of_ne hg0']
     simp
   · intro k g
@@ -197,27 +207,39 @@ theorem inTieSec : InTieSecSt := by
       ⟨emb (xplus X E hM) la G.N ((xplus X E hM).inc _ g), emb_mem_Vw (xplus X E hM) la G.N _ g⟩) with ha
     obtain ⟨x, hx⟩ := toOsK_surjective (xplus X E hM) la G.w (coord ((secQ y hs g0).e) a)
     have hca : coord ((secQ y hs g0).e) a • (secQ y hs g0).e = a := coord_smul_self hgen' a
-    have h1 : toA0K (xplus X E hM) la G.w wF (x • toHK0 (xplus X E hM) la G.w wF
-        ⟨emb (xplus X E hM) la G.N (X.inc wF g0), emb_mem_Vw (xplus X E hM) la G.N wF g0⟩) = a := by
+    have h1
+        : toA0K (xplus X E hM) la G.w wF
+            (x • toHK0 (xplus X E hM) la G.w wF
+              ⟨emb (xplus X E hM) la G.N (X.inc wF g0), emb_mem_Vw (xplus X E hM) la G.N wF g0⟩)
+          = a := by
       rw [map_smul, ← restriction_apply_eq_reduction, ← hca, ← hx]
       exact (algebraMap_smul (OsK (xplus X E hM) la G.w) x _).symm
     have h2 := (Submodule.Quotient.eq _).1 h1
     have h3 := h.lift_JHK h2
-    rw [Submodule.coe_sub, map_sub, sub_eq_zero, Submodule.coe_smul, Algebra.smul_def, map_mul, coe_toHK0,
-      coe_toHK, h.lift_alg] at h3
-    have h3' : h.lift (x : Lw (xplus X E hM) la G.w) * h.ev (emb (xplus X E hM) la G.N (X.inc wF g0)) =
-        h.lift (frac (xplus X E hM) la G.w k (emb (xplus X E hM) la G.N ((xplus X E hM).inc _ g))) := h3
+    rw [Submodule.coe_sub, map_sub, sub_eq_zero, Submodule.coe_smul, Algebra.smul_def, map_mul,
+        coe_toHK0, coe_toHK, h.lift_alg]
+      at h3
+    have h3'
+        : h.lift (x : Lw (xplus X E hM) la G.w) * h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))
+          = h.lift (frac (xplus X E hM) la G.w k
+            (emb (xplus X E hM) la G.N ((xplus X E hM).inc _ g))) :=
+      h3
     have hord := h.ord x
     rw [hx] at hord
     simp only [LocalPointData.ordA, ordV]
     rw [toE_add_coe, hord]
-    change nval h.T.V 1 (h.lift (x : Lw (xplus X E hM) la G.w)) +
-      (((vV h.T.V (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))) : ℤ) : ℝ) : EReal) = _
-    have hm := nval_mul (V := h.T.V) 1 (h.lift (x : Lw (xplus X E hM) la G.w))
-      (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0)))
+    change nval h.T.V 1 (h.lift (x : Lw (xplus X E hM) la G.w))
+        + (((vV h.T.V (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))) : ℤ) : ℝ) : EReal)
+      = _
+    have hm :=
+      nval_mul (V := h.T.V) 1 (h.lift (x : Lw (xplus X E hM) la G.w))
+        (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0)))
     rw [h3', nval_of_ne hg0'] at hm
-    have hc : (((vV h.T.V (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))) : ℤ) : ℝ) : EReal) =
-        (((vV h.T.V (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))) : ℝ) / ((1 : ℕ) : ℝ) : ℝ) : EReal) := by simp
+    have hc
+        : (((vV h.T.V (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))) : ℤ) : ℝ) : EReal)
+          = (((vV h.T.V (h.ev (emb (xplus X E hM) la G.N (X.inc wF g0))) : ℝ) / ((1 : ℕ) : ℝ) : ℝ)
+            : EReal) := by
+      simp
     rw [hc, ← hm, h.lift_frac, nval_frac he _ _ hb, hQy, hvat, hd]
     rfl
 

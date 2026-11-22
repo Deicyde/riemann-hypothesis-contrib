@@ -13,16 +13,22 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut
-open GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.ConsExists GlobalTheory.SpanRing
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut
+open GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.ConsExists
+  GlobalTheory.SpanRing
 namespace GlobalTheory.CycGen
 
 open Pointwise
 
-theorem fix_of_unram {E Ω : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field Ω] [Algebra E Ω]
-    [Algebra ℚ Ω] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (hw : IsPlaceOver A w)
-    (he : w.asIdeal.ramificationIdx ℤ = 1) (σ : G ℚ Ω) (hσ : σ ∈ Ine (F := ℚ) A) (x : E) :
-    σ (algebraMap E Ω x) = algebraMap E Ω x := by
+theorem fix_of_unram
+    {E Ω : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field Ω] [Algebra E Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E))
+    (hw : IsPlaceOver A w) (he : w.asIdeal.ramificationIdx ℤ = 1)
+    (σ : G ℚ Ω) (hσ : σ ∈ Ine (F := ℚ) A)
+    (x : E)
+    : σ (algebraMap E Ω x) = algebraMap E Ω x := by
   have : IsScalarTower ℚ E Ω := IsScalarTower.of_algebraMap_eq' (RingHom.ext_rat _ _)
   set τ : E ≃ₐ[ℚ] E := AlgEquiv.restrictNormalHom E σ with hτdef
   have hcomm : ∀ y : E, algebraMap E Ω (τ y) = σ (algebraMap E Ω y) := fun y =>
@@ -52,12 +58,11 @@ end GlobalTheory.CycGen
 
 namespace GlobalTheory.CycGen
 
-theorem exists_unit_gen (l : ℕ) [Fact l.Prime] :
-    ∃ v : ℤ_[l]ˣ, orderOf (PadicInt.toZMod (v : ℤ_[l])) = l - 1 := by
+theorem exists_unit_gen (l : ℕ) [Fact l.Prime]
+    : ∃ v : ℤ_[l]ˣ, orderOf (PadicInt.toZMod (v : ℤ_[l])) = l - 1 := by
   obtain ⟨a, ha⟩ := IsCyclic.exists_generator (α := (ZMod l)ˣ)
   set b : ℤ_[l] := ((a : ZMod l).val : ℤ_[l])
-  have hb : PadicInt.toZMod b = (a : ZMod l) := by
-    simp only [b, map_natCast, ZMod.natCast_zmod_val]
+  have hb : PadicInt.toZMod b = (a : ZMod l) := by simp only [b, map_natCast, ZMod.natCast_zmod_val]
   have hu : IsUnit b := by
     by_contra hn
     have hm : b ∈ IsLocalRing.maximalIdeal ℤ_[l] := hn
@@ -67,7 +72,13 @@ theorem exists_unit_gen (l : ℕ) [Fact l.Prime] :
   rw [IsUnit.unit_spec, hb, orderOf_units, orderOf_eq_card_of_forall_mem_zpowers ha,
     Nat.card_eq_fintype_card, ZMod.card_units]
 
-theorem main : ∀ {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (i : N.Loc), (∀ v ∈ placesOver H.E (N.l i), v.asIdeal.ramificationIdx ℤ = 1) → ∃ w ∈ placesOver H.E (N.l i), ∃ g0 ∈ Ine (F := H.E) (N.plOm.1 w), orderOf (PadicInt.toZMod ((cycZ (F := H.E) (Ω := N.Om) (N.l i) g0 : ℤ_[N.l i]ˣ) : ℤ_[N.l i])) = N.l i - 1 := by
+theorem main
+    : ∀ {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (i : N.Loc),
+      (∀ v ∈ placesOver H.E (N.l i), v.asIdeal.ramificationIdx ℤ = 1)
+        → ∃ w ∈ placesOver H.E (N.l i), ∃ g0 ∈ Ine (F := H.E) (N.plOm.1 w),
+          orderOf (PadicInt.toZMod
+              ((cycZ (F := H.E) (Ω := N.Om) (N.l i) g0 : ℤ_[N.l i]ˣ) : ℤ_[N.l i]))
+            = N.l i - 1 := by
   intro R H what₂ N i hram
   obtain ⟨w, hw⟩ := GlobalTheory.TameFixedLift.exists_place H.E (N.l i)
   refine ⟨w, hw, ?_⟩
@@ -81,8 +92,9 @@ theorem main : ∀ {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R
   have := H.hostE_isGalois
   obtain ⟨v, hv⟩ := exists_unit_gen (N.l i)
   obtain ⟨σ, hσ, hσv⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective N.Om (N.l i) (N.plOm.1 w) hA v
-  obtain ⟨g, hg, hc⟩ := GlobalTheory.TameFixedLift.transfer (E := H.E) (N.plOm.1 w) (N.l i) σ hσ
-    (fix_of_unram (N.plOm.1 w) w (N.plOm.2 w) (hram w hw) σ hσ)
+  obtain ⟨g, hg, hc⟩ :=
+    GlobalTheory.TameFixedLift.transfer (E := H.E) (N.plOm.1 w) (N.l i) σ hσ
+      (fix_of_unram (N.plOm.1 w) w (N.plOm.2 w) (hram w hw) σ hσ)
   exact ⟨g, hg, by rw [hc, hσv, hv]⟩
 
 end GlobalTheory.CycGen

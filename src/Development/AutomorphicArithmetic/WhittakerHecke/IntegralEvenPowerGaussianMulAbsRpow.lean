@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -15,14 +17,18 @@ open scoped ComplexOrder
 private noncomputable def gg (a : ℂ) (r : ℝ) : ℂ :=
   (r : ℂ) ^ (2 * a - 1) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ))
 
-private theorem gg_int {a : ℂ} (ha : 0 < a.re) : IntegrableOn (gg a) (Set.Ioi 0) ∧
-    ∫ r in Set.Ioi (0 : ℝ), gg a r = (Real.pi : ℂ) ^ (-a) * Complex.Gamma a / 2 := by
+private theorem gg_int {a : ℂ} (ha : 0 < a.re)
+    : IntegrableOn (gg a) (Set.Ioi 0)
+      ∧ ∫ r in Set.Ioi (0 : ℝ), gg a r = (Real.pi : ℂ) ^ (-a) * Complex.Gamma a / 2 := by
   let F : ℝ → ℂ := fun t => (t : ℂ) ^ (a - 1) * Complex.exp (-((Real.pi : ℝ) * t))
-  have key : ∀ x ∈ Set.Ioi (0 : ℝ), (|(2 : ℝ)| * x ^ ((2 : ℝ) - 1)) • F (x ^ (2 : ℝ)) = 2 * gg a x := fun x hx => by
+  have key
+      : ∀ x ∈ Set.Ioi (0 : ℝ),
+        (|(2 : ℝ)| * x ^ ((2 : ℝ) - 1)) • F (x ^ (2 : ℝ)) = 2 * gg a x := fun x hx => by
     have hx' : (0 : ℝ) < x := hx
     have h0 : (x : ℂ) ≠ 0 := by exact_mod_cast hx'.ne'
     have h1 : ((x ^ (2 : ℝ) : ℝ) : ℂ) ^ (a - 1) = (x : ℂ) ^ (2 * (a - 1)) := by
-      rw [Real.rpow_two, sq, Complex.ofReal_mul, Complex.mul_cpow_ofReal_nonneg hx'.le hx'.le, ← Complex.cpow_add _ _ h0]
+      rw [Real.rpow_two, sq, Complex.ofReal_mul, Complex.mul_cpow_ofReal_nonneg hx'.le hx'.le,
+        ← Complex.cpow_add _ _ h0]
       congr 1
       ring
     have h2 : (x : ℂ) ^ (2 * a - 1) = x * (x : ℂ) ^ (2 * (a - 1)) := by
@@ -32,8 +38,10 @@ private theorem gg_int {a : ℂ} (ha : 0 < a.re) : IntegrableOn (gg a) (Set.Ioi 
     push_cast
     ring_nf
   have hF : IntegrableOn F (Set.Ioi 0) := by
-    have h := (integrableOn_Ioi_comp_mul_left_iff (fun t : ℝ => (Real.exp (-t) : ℂ) * (t : ℂ) ^ (a - 1)) 0 Real.pi_pos).2
-      (by simpa using Complex.GammaIntegral_convergent ha)
+    have h :=
+      (integrableOn_Ioi_comp_mul_left_iff
+        (fun t : ℝ => (Real.exp (-t) : ℂ) * (t : ℂ) ^ (a - 1))
+        0 Real.pi_pos).2 (by simpa using Complex.GammaIntegral_convergent ha)
     refine (h.const_mul ((Real.pi : ℂ) ^ (a - 1))⁻¹).congr ?_
     filter_upwards [ae_restrict_mem measurableSet_Ioi] with t ht
     have hp : (Real.pi : ℂ) ^ (a - 1) ≠ 0 := by simp [Complex.cpow_eq_zero_iff, Real.pi_ne_zero]
@@ -44,28 +52,43 @@ private theorem gg_int {a : ℂ} (ha : 0 < a.re) : IntegrableOn (gg a) (Set.Ioi 
   have h1 := (integrableOn_Ioi_comp_rpow_iff F (p := 2) two_ne_zero).2 hF
   have h2 := integral_comp_rpow_Ioi F (p := 2) two_ne_zero
   refine ⟨?_, ?_⟩
-  · refine ((h1.congr_fun key measurableSet_Ioi).const_mul (2 : ℂ)⁻¹).congr (ae_of_all _ fun x => ?_)
+  · refine ((h1.congr_fun key measurableSet_Ioi).const_mul (2 : ℂ)⁻¹).congr
+      (ae_of_all _ fun x => ?_)
     simp
   · rw [setIntegral_congr_fun measurableSet_Ioi key, integral_const_mul,
-      Complex.integral_cpow_mul_exp_neg_mul_Ioi ha Real.pi_pos] at h2
+        Complex.integral_cpow_mul_exp_neg_mul_Ioi ha Real.pi_pos]
+      at h2
     rw [eq_div_iff two_ne_zero, mul_comm, h2, Complex.cpow_neg, one_div,
-      Complex.inv_cpow _ _ (by rw [Complex.arg_ofReal_of_nonneg Real.pi_pos.le]; exact Real.pi_ne_zero.symm)]
+      Complex.inv_cpow _ _
+        (by rw [Complex.arg_ofReal_of_nonneg Real.pi_pos.le]; exact Real.pi_ne_zero.symm)]
 
-theorem UpperTheory.integral_even_power_gaussian_mul_abs_rpow :
-    ∀ (e : ℕ) (s : ℂ), 0 < s.re → Integrable (fun r : ℝ => (r : ℂ) ^ (2 * e) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ)) * ((|r| : ℝ) : ℂ) ^ (2 * s - 1)) ∧ ∫ r : ℝ, (r : ℂ) ^ (2 * e) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ)) * ((|r| : ℝ) : ℂ) ^ (2 * s - 1) = (Real.pi : ℂ) ^ (-(s + e)) * Complex.Gamma (s + e) := by
+theorem UpperTheory.integral_even_power_gaussian_mul_abs_rpow
+    : ∀ (e : ℕ) (s : ℂ),
+      0 < s.re
+        → Integrable (fun r : ℝ =>
+            (r : ℂ) ^ (2 * e) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ))
+              * ((|r| : ℝ) : ℂ) ^ (2 * s - 1))
+          ∧ ∫ r : ℝ, (r : ℂ) ^ (2 * e) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ)) * ((|r| : ℝ) : ℂ) ^ (2 * s - 1)
+            = (Real.pi : ℂ) ^ (-(s + e)) * Complex.Gamma (s + e) := by
   intro e s hs
   have ha : 0 < (s + e).re := by simp; positivity
-  have hf : ∀ r : ℝ, r ≠ 0 → (r : ℂ) ^ (2 * e) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ)) * ((|r| : ℝ) : ℂ) ^ (2 * s - 1) =
-      gg (s + e) |r| := fun r hr => by
+  have hf
+      : ∀ r : ℝ,
+        r ≠ 0
+          → (r : ℂ) ^ (2 * e) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ))
+              * ((|r| : ℝ) : ℂ) ^ (2 * s - 1)
+            = gg (s + e) |r| := fun r hr => by
     have h1 : ((|r| : ℝ) : ℂ) ≠ 0 := by simpa using hr
     have h2 : (r : ℂ) ^ (2 * e) = ((|r| : ℝ) : ℂ) ^ ((2 * e : ℕ) : ℂ) := by
-      rw [Complex.cpow_natCast, ← Complex.ofReal_pow, ← Complex.ofReal_pow, pow_mul, pow_mul, sq_abs]
+      rw [Complex.cpow_natCast, ← Complex.ofReal_pow, ← Complex.ofReal_pow, pow_mul, pow_mul,
+        sq_abs]
     rw [h2, gg, mul_right_comm, ← Complex.cpow_add _ _ h1, sq_abs]
     congr 2
     push_cast
     ring
-  have hae : (fun r : ℝ => (r : ℂ) ^ (2 * e) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ)) * ((|r| : ℝ) : ℂ) ^ (2 * s - 1)) =ᵐ[volume]
-      fun r => gg (s + e) |r| := by
+  have hae
+      : (fun r : ℝ => (r : ℂ) ^ (2 * e) * Complex.exp (-(Real.pi : ℂ) * ((r ^ 2 : ℝ) : ℂ)) * ((|r| : ℝ) : ℂ) ^ (2 * s - 1)) =ᵐ[volume]
+        fun r => gg (s + e) |r| := by
     filter_upwards [compl_mem_ae_iff.2 (measure_singleton (0 : ℝ))] with r hr using hf r hr
   obtain ⟨hi, hv⟩ := gg_int ha
   have hp : IntegrableOn (fun r => gg (s + e) |r|) (Set.Ioi 0) :=

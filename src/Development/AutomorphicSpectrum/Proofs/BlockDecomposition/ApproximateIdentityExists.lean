@@ -14,14 +14,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.PresSobA
 
-theorem one_mem_GLs (n : ℕ) : (1 : Mat n) ∈ GLs n := by
-  simp [GLs]
+theorem one_mem_GLs (n : ℕ) : (1 : Mat n) ∈ GLs n := by simp [GLs]
 
-theorem exists_mollifiers (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n))
-    [μ.IsHaarMeasure] :
-    ∃ φ : ℕ → Mat n → ℝ, (∀ k, IsTest (φ k)) ∧ (∀ k y, 0 ≤ φ k y) ∧
-      (∀ k, ∫ y : G n, φ k y.val ∂μ = 1) ∧
-      ∀ N ∈ 𝓝 (1 : G n), ∀ᶠ k in atTop, ∀ y : G n, φ k y.val ≠ 0 → y ∈ N := by
+theorem exists_mollifiers
+    (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
+    : ∃ φ : ℕ → Mat n → ℝ,
+      (∀ k, IsTest (φ k)) ∧ (∀ k y, 0 ≤ φ k y) ∧ (∀ k, ∫ y : G n, φ k y.val ∂μ = 1)
+        ∧ ∀ N ∈ 𝓝 (1 : G n), ∀ᶠ k in atTop, ∀ y : G n, φ k y.val ≠ 0 → y ∈ N := by
   haveI : ProperSpace (Mat n) := FiniteDimensional.proper ℝ _
   have hemb := GlobalTheory.CompanionTheory.SobGL.HaarDom.isOpenEmbedding_valG n
   obtain ⟨r, hr0, hr⟩ : ∃ r > 0, Metric.closedBall (1 : Mat n) r ⊆ GLs n :=
@@ -30,13 +29,14 @@ theorem exists_mollifiers (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (
     intro x hx
     have hu : IsUnit x := (Matrix.isUnit_iff_isUnit_det x).2 (isUnit_iff_ne_zero.2 hx)
     exact ⟨hu.unit, rfl⟩
-  let b : ℕ → ContDiffBump (1 : Mat n) := fun k =>
-    { rIn := r / (2 * ((k : ℝ) + 1))
-      rOut := r / ((k : ℝ) + 1)
-      rIn_pos := by positivity
-      rIn_lt_rOut := by
-        have : (0 : ℝ) < (k : ℝ) + 1 := by positivity
-        exact div_lt_div_of_pos_left hr0 this (by linarith) }
+  let b : ℕ → ContDiffBump (1 : Mat n) := fun k => {
+    rIn := r / (2 * ((k : ℝ) + 1))
+    rOut := r / ((k : ℝ) + 1)
+    rIn_pos := by positivity
+    rIn_lt_rOut := by
+      have : (0 : ℝ) < (k : ℝ) + 1 := by positivity
+      exact div_lt_div_of_pos_left hr0 this (by linarith)
+  }
   have hbOut : ∀ k, (b k).rOut ≤ r := by
     intro k
     exact div_le_self hr0.le (by have : (0 : ℝ) ≤ k := Nat.cast_nonneg k; linarith)
@@ -57,8 +57,12 @@ theorem exists_mollifiers (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (
   have hpos : ∀ k, 0 < ∫ y : G n, b k y.val ∂μ := by
     intro k
     refine Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero (x := (1 : G n)) (hcont k)
-      (hcomp k) (fun y => (b k).nonneg) ?_
-    simpa using (b k).one_of_mem_closedBall (x := (1 : Mat n)) (by simp [(b k).rIn_pos.le]) |>.symm ▸ one_ne_zero
+      (hcomp k)
+      (fun y => (b k).nonneg)
+      ?_
+    simpa using
+      (b k).one_of_mem_closedBall (x := (1 : Mat n)) (by simp [(b k).rIn_pos.le]) |>.symm
+        ▸ one_ne_zero
   refine ⟨fun k x => (∫ y : G n, b k y.val ∂μ)⁻¹ * b k x, ?_, ?_, ?_, ?_⟩
   · intro k
     have hts : tsupport (b k) ⊆ Metric.closedBall (1 : Mat n) r := by

@@ -12,11 +12,14 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Admissib
 
 open scoped Classical InnerProductSpace ComplexConjugate
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.SpectralAccumulation GlobalTheory.AutomorphicL2Unitary GlobalTheory.SqIntGL
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+  PositivityTheory.Rg.BcB.SpectralAccumulation GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.SqIntGL
 open scoped GlobalTheory.CuspRep.CuspidalL2GL
 namespace GlobalTheory.CompanionTheory.FinDiscRepr
 
-variable {K : Type} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
+variable
+  {K : Type} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
   [MeasurableSpace K] [BorelSpace K]
 
 lemma integrable_of_cont (ν : Measure K) [ν.IsHaarMeasure] {f : K → ℂ} (hf : Continuous f) :
@@ -116,7 +119,8 @@ end GlobalTheory.CompanionTheory.FinDiscRepr
 
 namespace GlobalTheory.CompanionTheory.FinDiscRepr
 
-variable {K : Type} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
+variable
+  {K : Type} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
   [MeasurableSpace K] [BorelSpace K]
 
 lemma end_coeff_continuous {M : Type} [AddCommGroup M] [Module ℂ M]
@@ -148,13 +152,24 @@ lemma end_coeff_continuous {M : Type} [AddCommGroup M] [Module ℂ M]
   simp only [this]
   exact hr ℓ' (b i)
 
-theorem representing_vector : ∀ {K M H X : Type} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K] [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [ν.IsHaarMeasure] [AddCommGroup M] [Module ℂ M] [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ρ : Representation ℂ K M) (ι : M →ₗ[ℂ] H) (U U' : Submodule ℂ M) (ev : X → M →ₗ[ℂ] ℂ),
-  (∀ k, ∀ x ∈ U', ∀ y ∈ U, ⟪ι (ρ k x), ι (ρ k y)⟫_ℂ = ⟪ι x, ι y⟫_ℂ) →
-  (∀ k, ∀ x ∈ U', ∀ y ∈ U', ⟪ι (ρ k x), ι (ρ k y)⟫_ℂ = ⟪ι x, ι y⟫_ℂ) →
-  (∀ x ∈ U, ∃ A : Submodule ℂ M, FiniteDimensional ℂ A ∧ x ∈ A ∧ A ≤ U ∧ (∀ k, ∀ a ∈ A, ρ k a ∈ A) ∧ ∀ ℓ : M →ₗ[ℂ] ℂ, ∀ a ∈ A, Continuous fun k => ℓ (ρ k a)) →
-  (∀ x ∈ U', ∃ A : Submodule ℂ M, FiniteDimensional ℂ A ∧ x ∈ A ∧ A ≤ U' ∧ (∀ k, ∀ a ∈ A, ρ k a ∈ A) ∧ ∀ ℓ : M →ₗ[ℂ] ℂ, ∀ a ∈ A, Continuous fun k => ℓ (ρ k a)) →
-  (∀ W : Submodule ℂ (K → ℂ), FiniteDimensional ℂ W → FiniteDimensional ℂ (Submodule.span ℂ {x | x ∈ U' ∧ ∀ t, (fun k => ev t (ρ k x)) ∈ W})) →
-  ∀ x ∈ U, ∃ y ∈ U', ∀ z ∈ U', ⟪ι z, ι x⟫_ℂ = ⟪ι z, ι y⟫_ℂ := by
+theorem representing_vector
+    : ∀ {K M H X : Type} [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
+        [MeasurableSpace K] [BorelSpace K] (ν : Measure K) [ν.IsHaarMeasure] [AddCommGroup M]
+        [Module ℂ M] [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ρ : Representation ℂ K M)
+        (ι : M →ₗ[ℂ] H) (U U' : Submodule ℂ M) (ev : X → M →ₗ[ℂ] ℂ),
+      (∀ k, ∀ x ∈ U', ∀ y ∈ U, ⟪ι (ρ k x), ι (ρ k y)⟫_ℂ = ⟪ι x, ι y⟫_ℂ)
+        → (∀ k, ∀ x ∈ U', ∀ y ∈ U', ⟪ι (ρ k x), ι (ρ k y)⟫_ℂ = ⟪ι x, ι y⟫_ℂ)
+        → (∀ x ∈ U, ∃ A : Submodule ℂ M,
+          FiniteDimensional ℂ A ∧ x ∈ A ∧ A ≤ U ∧ (∀ k, ∀ a ∈ A, ρ k a ∈ A)
+            ∧ ∀ ℓ : M →ₗ[ℂ] ℂ, ∀ a ∈ A, Continuous fun k => ℓ (ρ k a))
+        → (∀ x ∈ U', ∃ A : Submodule ℂ M,
+          FiniteDimensional ℂ A ∧ x ∈ A ∧ A ≤ U' ∧ (∀ k, ∀ a ∈ A, ρ k a ∈ A)
+            ∧ ∀ ℓ : M →ₗ[ℂ] ℂ, ∀ a ∈ A, Continuous fun k => ℓ (ρ k a))
+        → (∀ W : Submodule ℂ (K → ℂ),
+          FiniteDimensional ℂ W
+            → FiniteDimensional ℂ
+              (Submodule.span ℂ {x | x ∈ U' ∧ ∀ t, (fun k => ev t (ρ k x)) ∈ W}))
+        → ∀ x ∈ U, ∃ y ∈ U', ∀ z ∈ U', ⟪ι z, ι x⟫_ℂ = ⟪ι z, ι y⟫_ℂ := by
   intro K M H X _ _ _ _ _ _ ν _ _ _ _ _ ρ ι U U' ev h1 h2 hU hU' hadm x hx
   obtain ⟨A, hAfd, hxA, hAU, hAst, hAc⟩ := hU x hx
   haveI := hAfd
@@ -168,13 +183,13 @@ theorem representing_vector : ∀ {K M H X : Type} [Group K] [TopologicalSpace K
     ext a
     simp [hρA]
   have hcont : ∀ η : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ, Continuous fun k => η (ρA k) :=
-    end_coeff_continuous A ρA (fun ℓ a => by
-      simpa [hρA] using hAc ℓ a a.2)
-  have hinv : ∀ η : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ, Continuous fun k => η (ρA k⁻¹) :=
-    fun η => (hcont η).comp continuous_inv
+    end_coeff_continuous A ρA (fun ℓ a => by simpa [hρA] using hAc ℓ a a.2)
+  have hinv : ∀ η : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ, Continuous fun k => η (ρA k⁻¹) := fun η =>
+    (hcont η).comp continuous_inv
   obtain ⟨τ, hτ⟩ := exists_repr_point ν (fun k => ρA k⁻¹) hinv
-  have hτ' : ∀ σ : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ, σ LinearMap.id =
-      ∫ k, (starRingEnd ℂ) (τ (ρA k⁻¹)) * σ (ρA k⁻¹) ∂ν := by
+  have hτ'
+      : ∀ σ : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ,
+        σ LinearMap.id = ∫ k, (starRingEnd ℂ) (τ (ρA k⁻¹)) * σ (ρA k⁻¹) ∂ν := by
     intro σ
     have := hτ σ
     simpa [hρA1] using this
@@ -182,13 +197,13 @@ theorem representing_vector : ∀ {K M H X : Type} [Group K] [TopologicalSpace K
   have hg : Continuous g := hinv τ
   have hcg : Continuous fun k => (starRingEnd ℂ) (g k) := Complex.continuous_conj.comp hg
 
-  have K1 : ∀ ℓ : M →ₗ[ℂ] ℂ, ∀ w ∈ A,
-      ℓ w = ∫ k, (starRingEnd ℂ) (g k) * ℓ (ρ k⁻¹ w) ∂ν := by
+  have K1 : ∀ ℓ : M →ₗ[ℂ] ℂ, ∀ w ∈ A, ℓ w = ∫ k, (starRingEnd ℂ) (g k) * ℓ (ρ k⁻¹ w) ∂ν := by
     intro ℓ w hw
-    let σ : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ :=
-      { toFun := fun φ => ℓ (φ ⟨w, hw⟩ : M)
-        map_add' := fun φ ψ => by simp
-        map_smul' := fun c φ => by simp }
+    let σ : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ := {
+      toFun := fun φ => ℓ (φ ⟨w, hw⟩ : M)
+      map_add' := fun φ ψ => by simp
+      map_smul' := fun c φ => by simp
+    }
     exact hτ' σ
 
   have hst' : ∀ k, ∀ z ∈ U', ρ k z ∈ U' := by
@@ -196,10 +211,11 @@ theorem representing_vector : ∀ {K M H X : Type} [Group K] [TopologicalSpace K
     obtain ⟨B, _, hzB, hBU, hBst, _⟩ := hU' z hz
     exact hBU (hBst k z hzB)
 
-  let Φ : ((A →ₗ[ℂ] A) →ₗ[ℂ] ℂ) →ₗ[ℂ] (K → ℂ) :=
-    { toFun := fun η k => η (ρA k)
-      map_add' := fun η η' => rfl
-      map_smul' := fun c η => rfl }
+  let Φ : ((A →ₗ[ℂ] A) →ₗ[ℂ] ℂ) →ₗ[ℂ] (K → ℂ) := {
+    toFun := fun η k => η (ρA k)
+    map_add' := fun η η' => rfl
+    map_smul' := fun c η => rfl
+  }
   let Wf : Submodule ℂ (K → ℂ) := LinearMap.range Φ
   haveI hWf : FiniteDimensional ℂ Wf := inferInstance
   let S : Set M := {x | x ∈ U' ∧ ∀ t, (fun k => ev t (ρ k x)) ∈ Wf}
@@ -211,30 +227,36 @@ theorem representing_vector : ∀ {K M H X : Type} [Group K] [TopologicalSpace K
     intro z hz
     obtain ⟨B, hBfd, hzB, hBU, hBst, hBc⟩ := hU' z hz
     haveI := hBfd
-    obtain ⟨z₁, hz₁B, hz₁⟩ := exists_weak_integral_sub ν B (fun k => ρ k z)
-      (fun k => hBst k z hzB) g hg (fun ℓ => hBc ℓ z hzB)
+    obtain ⟨z₁, hz₁B, hz₁⟩ :=
+      exists_weak_integral_sub ν B
+        (fun k => ρ k z)
+        (fun k => hBst k z hzB)
+        g hg
+        (fun ℓ => hBc ℓ z hzB)
     refine ⟨z₁, ⟨hBU hz₁B, fun t => ?_⟩, hz₁⟩
     let f : K → ℂ := fun k => ev t (ρ k z)
     have hf : Continuous f := hBc (ev t) z hzB
     have hcomp : ∀ φ : A →ₗ[ℂ] A, Continuous fun k => τ (ρA k⁻¹ ∘ₗ φ) := by
       intro φ
-      let σ : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ :=
-        { toFun := fun ψ => τ (ψ ∘ₗ φ)
-          map_add' := fun ψ ψ' => by rw [LinearMap.add_comp, map_add (f := _)]
-          map_smul' := fun c ψ => by rw [LinearMap.smul_comp, map_smul]; rfl }
+      let σ : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ := {
+        toFun := fun ψ => τ (ψ ∘ₗ φ)
+        map_add' := fun ψ ψ' => by rw [LinearMap.add_comp, map_add (f := _)]
+        map_smul' := fun c ψ => by rw [LinearMap.smul_comp, map_smul]; rfl
+      }
       exact hinv σ
-    let η : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ :=
-      { toFun := fun φ => ∫ k, τ (ρA k⁻¹ ∘ₗ φ) * f k ∂ν
-        map_add' := fun φ ψ => by
-          have i1 : Integrable (fun k => τ (ρA k⁻¹ ∘ₗ φ) * f k) ν :=
-            integrable_of_cont ν ((hcomp φ).mul hf)
-          have i2 : Integrable (fun k => τ (ρA k⁻¹ ∘ₗ ψ) * f k) ν :=
-            integrable_of_cont ν ((hcomp ψ).mul hf)
-          rw [← integral_add i1 i2]
-          simp [LinearMap.comp_add, add_mul]
-        map_smul' := fun c φ => by
-          rw [RingHom.id_apply, smul_eq_mul, ← integral_const_mul]
-          simp [LinearMap.comp_smul, mul_assoc] }
+    let η : (A →ₗ[ℂ] A) →ₗ[ℂ] ℂ := {
+      toFun := fun φ => ∫ k, τ (ρA k⁻¹ ∘ₗ φ) * f k ∂ν
+      map_add' := fun φ ψ => by
+        have i1 : Integrable (fun k => τ (ρA k⁻¹ ∘ₗ φ) * f k) ν :=
+          integrable_of_cont ν ((hcomp φ).mul hf)
+        have i2 : Integrable (fun k => τ (ρA k⁻¹ ∘ₗ ψ) * f k) ν :=
+          integrable_of_cont ν ((hcomp ψ).mul hf)
+        rw [← integral_add i1 i2]
+        simp [LinearMap.comp_add, add_mul]
+      map_smul' := fun c φ => by
+        rw [RingHom.id_apply, smul_eq_mul, ← integral_const_mul]
+        simp [LinearMap.comp_smul, mul_assoc]
+    }
     refine ⟨η, funext fun k₀ => ?_⟩
     show ∫ k, τ (ρA k⁻¹ ∘ₗ ρA k₀) * f k ∂ν = ev t (ρ k₀ z₁)
     have e1 : ev t (ρ k₀ z₁) = ∫ k, g k * f (k₀ * k) ∂ν := by
@@ -248,8 +270,10 @@ theorem representing_vector : ∀ {K M H X : Type} [Group K] [TopologicalSpace K
       simp
     rw [this]
 
-  have I1 : ∀ (z z₁ : M), (∀ ℓ : M →ₗ[ℂ] ℂ, ℓ z₁ = ∫ k, g k * ℓ (ρ k z) ∂ν) → ∀ w : M,
-      ⟪ι z₁, ι w⟫_ℂ = ∫ k, (starRingEnd ℂ) (g k) * ⟪ι (ρ k z), ι w⟫_ℂ ∂ν := by
+  have I1
+      : ∀ (z z₁ : M),
+        (∀ ℓ : M →ₗ[ℂ] ℂ, ℓ z₁ = ∫ k, g k * ℓ (ρ k z) ∂ν)
+          → ∀ w : M, ⟪ι z₁, ι w⟫_ℂ = ∫ k, (starRingEnd ℂ) (g k) * ⟪ι (ρ k z), ι w⟫_ℂ ∂ν := by
     intro z z₁ hz₁ w
     have := hz₁ ((innerₛₗ ℂ (ι w)) ∘ₗ ι)
     simp only [LinearMap.comp_apply, innerₛₗ_apply_apply] at this
@@ -276,9 +300,13 @@ theorem representing_vector : ∀ {K M H X : Type} [Group K] [TopologicalSpace K
   have ht₀U : t₀ ∈ U' := hDU ht₀D
   obtain ⟨B, hBfd, htB, hBU, hBst, hBc⟩ := hU' t₀ ht₀U
   haveI := hBfd
-  obtain ⟨y, hyB, hy⟩ := exists_weak_integral_sub ν B (fun k => ρ k⁻¹ t₀)
-    (fun k => hBst k⁻¹ t₀ htB) (fun k => (starRingEnd ℂ) (g k)) hcg
-    (fun ℓ => (hBc ℓ t₀ htB).comp continuous_inv)
+  obtain ⟨y, hyB, hy⟩ :=
+    exists_weak_integral_sub ν B
+      (fun k => ρ k⁻¹ t₀)
+      (fun k => hBst k⁻¹ t₀ htB)
+      (fun k => (starRingEnd ℂ) (g k))
+      hcg
+      (fun ℓ => (hBc ℓ t₀ htB).comp continuous_inv)
   refine ⟨y, hBU hyB, fun z hz => ?_⟩
   obtain ⟨z₁, hz₁S, hz₁⟩ := Z z hz
   have hcancel : ∀ k, ρ k⁻¹ (ρ k z) = z := by

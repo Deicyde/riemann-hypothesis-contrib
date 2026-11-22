@@ -5,9 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual UpperTheory.V.Af UpperTheory.V.Af.Nf in
-theorem UpperTheory.V.Af.Rn.evPl :
-    UpperTheory.V.Af.Rn.EvPl := by
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual UpperTheory.V.Af
+  UpperTheory.V.Af.Nf in
+theorem UpperTheory.V.Af.Rn.evPl : UpperTheory.V.Af.Rn.EvPl := by
   have hinj : Function.Injective fun w : HeightOneSpectrum (𝓞 ℚ) => normV w := fun v w h =>
     HeightOneSpectrum.ext (by rw [(places v).2.1, (places w).2.1, show normV v = normV w from h])
   refine ⟨fun P => ⟨fun h => ?_, fun h => ?_⟩, fun M hM => ?_⟩
@@ -20,9 +20,11 @@ theorem UpperTheory.V.Af.Rn.evPl :
         rw [e]
         exact (MulEquiv.prime_iff Rat.ringOfIntegersEquiv.symm.toMulEquiv).mpr
           (Nat.prime_iff_prime_int.mp hp)
-      let w : HeightOneSpectrum (𝓞 ℚ) :=
-        ⟨Ideal.span {(p : 𝓞 ℚ)}, (Ideal.span_singleton_prime hprime.ne_zero).mpr hprime,
-          by rw [Ne, Ideal.span_singleton_eq_bot]; exact hprime.ne_zero⟩
+      let w : HeightOneSpectrum (𝓞 ℚ) := ⟨
+        Ideal.span {(p : 𝓞 ℚ)},
+        (Ideal.span_singleton_prime hprime.ne_zero).mpr hprime,
+        by rw [Ne, Ideal.span_singleton_eq_bot]; exact hprime.ne_zero
+      ⟩
       refine ⟨w, (places w).2.2.1.symm.trans ?_⟩
       change Ideal.absNorm (Ideal.span {(p : 𝓞 ℚ)}) = p
       rw [Ideal.absNorm_span_natCast, RingOfIntegers.rank]

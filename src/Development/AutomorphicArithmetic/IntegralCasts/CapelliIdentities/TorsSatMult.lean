@@ -4,10 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qi35.torsSat_mult :
-    ∀ {M : Type} [inst : AddCommGroup M] (L : Set M)
-    (N : Submodule ℤ M),
-    (∀ x ∈ L, ∃ (n : ℤ), n ≠ (0 : ℤ) ∧ n • x ∈ N) → ∀ x ∈ Submodule.span ℤ L, ∃ (n : ℤ), n ≠ (0 : ℤ) ∧ n • x ∈ N := by
+theorem UpperTheory.Reformulated.B.Qi35.torsSat_mult
+    : ∀ {M : Type} [inst : AddCommGroup M] (L : Set M) (N : Submodule ℤ M),
+      (∀ x ∈ L, ∃ (n : ℤ), n ≠ (0 : ℤ) ∧ n • x ∈ N)
+        → ∀ x ∈ Submodule.span ℤ L, ∃ (n : ℤ), n ≠ (0 : ℤ) ∧ n • x ∈ N := by
   intro M _ L N h x hx
   induction hx using Submodule.span_induction with
   | mem y hy => exact h y hy

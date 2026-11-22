@@ -4,14 +4,18 @@ public import Mathlib
 
 @[expose] public section
 
-theorem _root_.UpperTheory.KN.exists_linearMap_span_baseChange_of_semilinear :
-    ∀ {O O' LL Q : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [CommRing O'] [Field LL] [Algebra O' LL]
-      [AddCommGroup Q] [Module O' Q] (f : O →+* O') (fK : FractionRing O →+* LL) {a n : ℕ}
-      (Y : Submodule O (Fin a → Fin n → FractionRing O)) (ψ : ↥Y →+ Q),
-      Function.Injective (algebraMap O' LL) → (∀ c, fK (algebraMap O (FractionRing O) c) = algebraMap O' LL (f c)) → Y.FG →
-      (∀ (c : O) (y : ↥Y), ψ (c • y) = f c • ψ y) →
-      ∃ φ : ↥(Submodule.span O' ((fun (y : Fin a → Fin n → FractionRing O) j m => fK (y j m)) '' (Y : Set _))) →ₗ[O'] Q,
-        ∀ y : ↥Y, φ ⟨fun j m => fK (y.1 j m), Submodule.subset_span ⟨y.1, y.2, rfl⟩⟩ = ψ y := by
+theorem _root_.UpperTheory.KN.exists_linearMap_span_baseChange_of_semilinear
+    : ∀ {O O' LL Q : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [CommRing O']
+        [Field LL] [Algebra O' LL] [AddCommGroup Q] [Module O' Q] (f : O →+* O')
+        (fK : FractionRing O →+* LL) {a n : ℕ} (Y : Submodule O (Fin a → Fin n → FractionRing O))
+        (ψ : ↥Y →+ Q),
+      Function.Injective (algebraMap O' LL)
+        → (∀ c, fK (algebraMap O (FractionRing O) c) = algebraMap O' LL (f c)) → Y.FG
+        → (∀ (c : O) (y : ↥Y), ψ (c • y) = f c • ψ y)
+        → ∃ φ
+            : ↥(Submodule.span O' ((fun (y : Fin a → Fin n → FractionRing O) j m => fK (y j m)) '' (Y : Set _))) →ₗ[O'] Q,
+          ∀ y : ↥Y,
+            φ ⟨fun j m => fK (y.1 j m), Submodule.subset_span ⟨y.1, y.2, rfl⟩⟩ = ψ y := by
   intro O O' LL Q _ _ _ _ _ _ _ _ f fK a n Y ψ hinj hf hfg hψ
   classical
   haveI : Module.Finite O Y := Module.Finite.iff_fg.mpr hfg
@@ -27,7 +31,8 @@ theorem _root_.UpperTheory.KN.exists_linearMap_span_baseChange_of_semilinear :
     funext j m
     have := congrFun hg (j, m)
     simpa [Finset.sum_apply] using this
-  have h2 : LinearIndependent (FractionRing O) (fun i => fun p : Fin a × Fin n => (b i).1 p.1 p.2) :=
+  have h2
+      : LinearIndependent (FractionRing O) (fun i => fun p : Fin a × Fin n => (b i).1 p.1 p.2) :=
     (LinearIndependent.iff_fractionRing O (FractionRing O)).mp h1
   have h3 : LinearIndependent LL (fun i => fun p : Fin a × Fin n => fK ((b i).1 p.1 p.2)) := by
     letI := fK.toAlgebra
@@ -48,8 +53,10 @@ theorem _root_.UpperTheory.KN.exists_linearMap_span_baseChange_of_semilinear :
     simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply] at h
     rw [← h]
     simp [Finset.sum_apply, v, Algebra.smul_def, hf]
-  have hspan : Submodule.span O' ((fun (y : Fin a → Fin n → FractionRing O) j m => fK (y j m)) '' (Y : Set _))
-      = Submodule.span O' (Set.range v) := by
+  have hspan
+      : Submodule.span O'
+          ((fun (y : Fin a → Fin n → FractionRing O) j m => fK (y j m)) '' (Y : Set _))
+        = Submodule.span O' (Set.range v) := by
     apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨y, hy, rfl⟩
@@ -62,11 +69,15 @@ theorem _root_.UpperTheory.KN.exists_linearMap_span_baseChange_of_semilinear :
       rintro _ ⟨i, rfl⟩
       exact ⟨(b i).1, (b i).2, rfl⟩
   let B := Module.Basis.span h4
-  refine ⟨(B.constr O' (fun i => ψ (b i))).comp (LinearEquiv.ofEq _ _ hspan).toLinearMap, fun y => ?_⟩
-  have h5 : (LinearEquiv.ofEq _ _ hspan) ⟨fun j m => fK (y.1 j m), Submodule.subset_span ⟨y.1, y.2, rfl⟩⟩
-      = ∑ i, f (b.repr y i) • B i := by
+  refine
+    ⟨(B.constr O' (fun i => ψ (b i))).comp (LinearEquiv.ofEq _ _ hspan).toLinearMap, fun y => ?_⟩
+  have h5
+      : (LinearEquiv.ofEq _ _ hspan)
+          ⟨fun j m => fK (y.1 j m), Submodule.subset_span ⟨y.1, y.2, rfl⟩⟩
+        = ∑ i, f (b.repr y i) • B i := by
     apply Subtype.ext
-    simp only [LinearEquiv.coe_ofEq_apply, Submodule.coe_sum, Submodule.coe_smul, B, Module.Basis.span_apply]
+    simp only [LinearEquiv.coe_ofEq_apply, Submodule.coe_sum, Submodule.coe_smul, B,
+      Module.Basis.span_apply]
     exact hexp y
   set_option synthInstance.maxHeartbeats 100000 in
     rw [LinearMap.comp_apply, LinearEquiv.coe_coe, h5, map_sum]

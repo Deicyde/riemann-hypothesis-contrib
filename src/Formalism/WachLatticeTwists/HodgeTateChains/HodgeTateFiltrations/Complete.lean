@@ -55,10 +55,12 @@ theorem onePlus : StatOnePlus := by
       | succ n ih =>
         rw [hfs, map_add (f := _), smul_add, has, map_smul, smul_smul, ← pow_succ', smul_neg]
         have : f n + ϖ ^ n • a n + (ϖ • E (f n) + ϖ ^ (n + 1) • E (a n))
-            = (f n + ϖ • E (f n)) + ϖ ^ n • a n + ϖ ^ (n + 1) • E (a n) := by abel
-        rw [this, ih]; abel
-    have hcau : ∀ {m n : ℕ}, m ≤ n →
-        f m ≡ f n [SMOD ((Ideal.span {ϖ}) ^ m • (⊤ : Submodule R Xm))] := by
+            = (f n + ϖ • E (f n)) + ϖ ^ n • a n + ϖ ^ (n + 1) • E (a n) := by
+          abel
+        rw [this, ih]
+        abel
+    have hcau
+        : ∀ {m n : ℕ}, m ≤ n → f m ≡ f n [SMOD ((Ideal.span {ϖ}) ^ m • (⊤ : Submodule R Xm))] := by
       intro m n hmn
       rw [SModEq.sub_mem, mem_pow_smul_top]
       induction n, hmn using Nat.le_induction with
@@ -87,11 +89,12 @@ theorem onePlus : StatOnePlus := by
 theorem third_estimate_of_first_two (h1 : StatOnePlus) : PerturbationOperatorIntegral := by
   intro R _ Xm _ _ ϖ z hc hz g S B hgS hSg
   have hb := h1 R Xm ϖ hc (S ∘ₗ B ∘ₗ g)
-  have key : ∀ x, (g x + (z * ϖ) • B (g x)) - x
-      = g (x + ϖ • S (B (g x))) - (x + ϖ • S (B (g x))) := by
+  have key
+      : ∀ x, (g x + (z * ϖ) • B (g x)) - x = g (x + ϖ • S (B (g x))) - (x + ϖ • S (B (g x))) := by
     intro x
     have h := hgS (B (g x))
-    rw [map_add (f := _), map_smul, mul_comm z ϖ, mul_smul, ← h, smul_sub]; abel
+    rw [map_add (f := _), map_smul, mul_comm z ϖ, mul_smul, ← h, smul_sub]
+    abel
   have hinj : ∀ x, g x = x → x = 0 := fun x hx => hz x (by rw [← hSg, hx, sub_self, map_zero])
   refine ⟨?_, ?_, ?_⟩
   · intro x hx
@@ -100,7 +103,8 @@ theorem third_estimate_of_first_two (h1 : StatOnePlus) : PerturbationOperatorInt
     have h2 := hinj _ h0
     apply hb.1
     show x + ϖ • S (B (g x)) = 0 + ϖ • S (B (g 0))
-    rw [h2]; simp
+    rw [h2]
+    simp
   · intro y
     constructor
     · rintro ⟨x, rfl⟩; exact ⟨_, key x⟩

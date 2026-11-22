@@ -9,9 +9,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-private theorem exists_sum_of_mem_span_smul_top {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [Module R M]
-    {n : ℕ} (g : Fin n → R) (x : M) (hx : x ∈ (Ideal.span (Set.range g) • ⊤ : Submodule R M)) :
-    ∃ q : Fin n → M, x = ∑ c, g c • q c := by
+private theorem exists_sum_of_mem_span_smul_top
+    {R : Type} [CommRing R]
+    {M : Type} [AddCommGroup M] [Module R M]
+    {n : ℕ} (g : Fin n → R)
+    (x : M) (hx : x ∈ (Ideal.span (Set.range g) • ⊤ : Submodule R M))
+    : ∃ q : Fin n → M, x = ∑ c, g c • q c := by
   refine Submodule.smul_induction_on hx ?_ ?_
   · intro r hr m _
     obtain ⟨c, rfl⟩ := Ideal.mem_span_range_iff_exists_fun.1 hr
@@ -22,10 +25,15 @@ private theorem exists_sum_of_mem_span_smul_top {R : Type} [CommRing R] {M : Typ
   · rintro x y ⟨q, rfl⟩ ⟨q', rfl⟩
     exact ⟨fun i => q i + q' i, by simp [smul_add, Finset.sum_add_distrib]⟩
 
-theorem UpperTheory.V.AlgebraTools.ULim.mem_smul_top_iff :
-    ∀ (R : Type) [CommRing R] (F : Filter ℕ), F ≤ atTop → ∀ (I : ℕ → Ideal R) (M : ℕ → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)] (a : Ideal R), a.FG → Antitone I →
-      ∀ p : ∀ i, M i, ULim.mk F I M p ∈ (a • ⊤ : Submodule R (ULim F I M)) ↔
-        ∀ j, ∀ᶠ N in F, p N ∈ ((a ⊔ I j) • ⊤ : Submodule R (M N)) := by
+theorem UpperTheory.V.AlgebraTools.ULim.mem_smul_top_iff
+    : ∀ (R : Type) [CommRing R] (F : Filter ℕ),
+      F ≤ atTop
+        → ∀ (I : ℕ → Ideal R) (M : ℕ → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)]
+            (a : Ideal R),
+          a.FG → Antitone I
+            → ∀ p : ∀ i, M i,
+              ULim.mk F I M p ∈ (a • ⊤ : Submodule R (ULim F I M))
+                ↔ ∀ j, ∀ᶠ N in F, p N ∈ ((a ⊔ I j) • ⊤ : Submodule R (M N)) := by
   intro R _ F hF I M _ _ a ha hI p
   obtain ⟨n, g, hg⟩ := Submodule.fg_iff_exists_fin_generating_family.1 ha
   have hg' : Ideal.span (Set.range g) = a := hg
@@ -44,13 +52,16 @@ theorem UpperTheory.V.AlgebraTools.ULim.mem_smul_top_iff :
       rw [Finset.sum_apply]
       exact Submodule.sum_mem _ fun c _ =>
         Submodule.smul_mem_smul (Ideal.mem_sup_left (hga c)) Submodule.mem_top
-    have h2 := Submodule.add_mem ((a ⊔ I j) • ⊤ : Submodule R (M N)) (Submodule.smul_mono_left (le_sup_right : I j ≤ a ⊔ I j) hN) h1
+    have h2 :=
+      Submodule.add_mem ((a ⊔ I j) • ⊤ : Submodule R (M N))
+        (Submodule.smul_mono_left (le_sup_right : I j ≤ a ⊔ I j) hN) h1
     simpa using h2
   · intro hp
-    obtain ⟨ν, hν, hP⟩ := exists_diag F hF
-      (fun j N => p N ∈ ((a ⊔ I j) • ⊤ : Submodule R (M N))) hp
-    have key : ∀ N, ∃ q : Fin n → M N, p N ∈ ((a ⊔ I (ν N)) • ⊤ : Submodule R (M N)) →
-        p N - ∑ c, g c • q c ∈ (I (ν N) • ⊤ : Submodule R (M N)) := by
+    obtain ⟨ν, hν, hP⟩ := exists_diag F hF (fun j N => p N ∈ ((a ⊔ I j) • ⊤ : Submodule R (M N))) hp
+    have key
+        : ∀ N, ∃ q : Fin n → M N,
+          p N ∈ ((a ⊔ I (ν N)) • ⊤ : Submodule R (M N))
+            → p N - ∑ c, g c • q c ∈ (I (ν N) • ⊤ : Submodule R (M N)) := by
       intro N
       by_cases h : p N ∈ ((a ⊔ I (ν N)) • ⊤ : Submodule R (M N))
       · have h' := h

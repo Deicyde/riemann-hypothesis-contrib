@@ -4,10 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-private theorem inf_pow_bot (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (I : Ideal R)
-    (h : maximalIdeal R * I = ⊥) : ∃ N : ℕ, ∀ x ∈ I, x ∈ maximalIdeal R ^ N → x = 0 := by
+private theorem inf_pow_bot
+    (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    (I : Ideal R) (h : maximalIdeal R * I = ⊥)
+    : ∃ N : ℕ, ∀ x ∈ I, x ∈ maximalIdeal R ^ N → x = 0 := by
   obtain ⟨k, hk⟩ := Ideal.exists_pow_inf_eq_pow_smul (maximalIdeal R) (I : Submodule R R)
   refine ⟨k + 1, fun x hxI hxm => ?_⟩
   have hx : x ∈ (maximalIdeal R ^ (k + 1) • ⊤ ⊓ (I : Submodule R R)) :=
@@ -17,8 +20,16 @@ private theorem inf_pow_bot (R : Type) [CommRing R] [IsLocalRing R] [IsNoetheria
   rw [smul_eq_mul, h] at hmem
   simpa using hmem
 
-theorem UpperTheory.V.Ws.X1.contLift :
-    ∀ {Λ : Type} [CommRing Λ] [IsLocalRing Λ] [IsNoetherianRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ] {A R : Type} [CommRing A] [Algebra Λ A] [IsCO Λ A] [CommRing R] [Algebra Λ R] [IsCO Λ R] (p : A →ₐ[Λ] R), Function.Surjective p → maximalIdeal A * RingHom.ker p = ⊥ → (∀ (S : Type) [TopologicalSpace S] (x : S → R), AdicCont (maximalIdeal R) x → ∃ y : S → A, AdicCont (maximalIdeal A) y ∧ ∀ s, p (y s) = x s) ∧ ∀ (S : Type) [TopologicalSpace S] (y : S → A), AdicCont (maximalIdeal A) y → (∀ s, p (y s) = 0) → IsLocallyConstant y := by
+theorem UpperTheory.V.Ws.X1.contLift
+    : ∀ {Λ : Type} [CommRing Λ] [IsLocalRing Λ] [IsNoetherianRing Λ]
+        [IsAdicComplete (maximalIdeal Λ) Λ] {A R : Type} [CommRing A] [Algebra Λ A] [IsCO Λ A]
+        [CommRing R] [Algebra Λ R] [IsCO Λ R] (p : A →ₐ[Λ] R),
+      Function.Surjective p → maximalIdeal A * RingHom.ker p = ⊥
+        → (∀ (S : Type) [TopologicalSpace S] (x : S → R),
+            AdicCont (maximalIdeal R) x
+              → ∃ y : S → A, AdicCont (maximalIdeal A) y ∧ ∀ s, p (y s) = x s)
+          ∧ ∀ (S : Type) [TopologicalSpace S] (y : S → A),
+            AdicCont (maximalIdeal A) y → (∀ s, p (y s) = 0) → IsLocallyConstant y := by
   intro Λ _ _ _ _ A R _ _ _ _ _ _ p hp hK
   haveI : IsNoetherianRing A := IsCO.toIsNoetherian Λ
   obtain ⟨N0, hN0⟩ := inf_pow_bot A (RingHom.ker p) hK
@@ -50,7 +61,9 @@ theorem UpperTheory.V.Ws.X1.contLift :
     intro r
     simp only [σ, map_add (f := _), hl, hu2]
     ring
-  have hL : ∀ M, N0 ≤ M → ∀ r r' : R, r - r' ∈ maximalIdeal R ^ M → σ r - σ r' ∈ maximalIdeal A ^ M := by
+  have hL
+      : ∀ M,
+        N0 ≤ M → ∀ r r' : R, r - r' ∈ maximalIdeal R ^ M → σ r - σ r' ∈ maximalIdeal A ^ M := by
     intro M hM r r' h
     have hq : (Ideal.Quotient.mk (maximalIdeal R ^ N0) r) = Ideal.Quotient.mk _ r' :=
       Ideal.Quotient.eq.mpr (Ideal.pow_le_pow_right hM h)

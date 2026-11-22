@@ -13,18 +13,19 @@ section SlopeTestRemainingChoices
 
 variable {F : Type} [Field F] {n : ℕ}
 
-private theorem dA_ev {a : ℕ} (N : Matrix (Fin n) (Fin n) F) :
-    N ∈ Ev F F n a ↔ ∀ i j : Fin n, ¬ (((i : ℕ) < a) ↔ ((j : ℕ) < a)) → N i j = 0 := by
+private theorem dA_ev {a : ℕ} (N : Matrix (Fin n) (Fin n) F)
+    : N ∈ Ev F F n a ↔ ∀ i j : Fin n, ¬(((i : ℕ) < a) ↔ ((j : ℕ) < a)) → N i j = 0 := by
   change (∀ i j : Fin n, _) ↔ _
   simp
 
-private theorem dA_od {a : ℕ} (N : Matrix (Fin n) (Fin n) F) :
-    N ∈ Od F F n a ↔ ∀ i j : Fin n, (((i : ℕ) < a) ↔ ((j : ℕ) < a)) → N i j = 0 := by
+private theorem dA_od {a : ℕ} (N : Matrix (Fin n) (Fin n) F)
+    : N ∈ Od F F n a ↔ ∀ i j : Fin n, (((i : ℕ) < a) ↔ ((j : ℕ) < a)) → N i j = 0 := by
   change (∀ i j : Fin n, _) ↔ _
   simp
 
-private theorem dA_oo {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Od F F n a)
-    (h' : N' ∈ Od F F n a) : N * N' ∈ Ev F F n a := by
+private theorem dA_oo
+    {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Od F F n a) (h' : N' ∈ Od F F n a)
+    : N * N' ∈ Ev F F n a := by
   rw [dA_od] at h h'
   rw [dA_ev]
   intro i j e
@@ -34,8 +35,9 @@ private theorem dA_oo {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Od 
   · rw [h i k c, zero_mul]
   · rw [h' k j (by tauto), mul_zero]
 
-private theorem dA_eo {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Ev F F n a)
-    (h' : N' ∈ Od F F n a) : N * N' ∈ Od F F n a := by
+private theorem dA_eo
+    {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Ev F F n a) (h' : N' ∈ Od F F n a)
+    : N * N' ∈ Od F F n a := by
   rw [dA_od] at h' ⊢
   rw [dA_ev] at h
   intro i j e
@@ -45,8 +47,9 @@ private theorem dA_eo {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Ev 
   · rw [h' k j (by tauto), mul_zero]
   · rw [h i k c, zero_mul]
 
-private theorem dA_oe {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Od F F n a)
-    (h' : N' ∈ Ev F F n a) : N * N' ∈ Od F F n a := by
+private theorem dA_oe
+    {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Od F F n a) (h' : N' ∈ Ev F F n a)
+    : N * N' ∈ Od F F n a := by
   rw [dA_od] at h ⊢
   rw [dA_ev] at h'
   intro i j e
@@ -58,22 +61,34 @@ private theorem dA_oe {a : ℕ} {N N' : Matrix (Fin n) (Fin n) F} (h : N ∈ Od 
 
 end SlopeTestRemainingChoices
 
-private theorem smul_commutator_conj_mul_eq_add_add {F : Type} [Field F] {n : ℕ}
-    (P Pi Q Qi K1 K2 PoissonCutoffFormula Y L PQ PQi : Matrix (Fin n) (Fin n) F) (a b : F)
+private theorem smul_commutator_conj_mul_eq_add_add
+    {F : Type} [Field F]
+    {n : ℕ} (P Pi Q Qi K1 K2 PoissonCutoffFormula Y L PQ PQi : Matrix (Fin n) (Fin n) F)
+    (a b : F)
     (hP : Pi * P = 1) (hK : PoissonCutoffFormula = K1 + P * K2 * Pi) (hL : L = b • (Q * Y * Qi) - Y)
-    (hPQ : PQ = P * Q) (hPQi : PQi = Qi * Pi) :
-    (a * b) • (PoissonCutoffFormula * (PQ * Y * PQi) - PQ * Y * PQi * PoissonCutoffFormula) =
-      a • (K1 * (P * L * Pi) - P * L * Pi * K1) + a • (K1 * (P * Y * Pi) - P * Y * Pi * K1) +
-        (a * b) • (P * (K2 * (Q * Y * Qi) - Q * Y * Qi * K2) * Pi) := by
+    (hPQ : PQ = P * Q) (hPQi : PQi = Qi * Pi)
+    : (a * b) • (PoissonCutoffFormula * (PQ * Y * PQi) - PQ * Y * PQi * PoissonCutoffFormula)
+      = a • (K1 * (P * L * Pi) - P * L * Pi * K1) + a • (K1 * (P * Y * Pi) - P * Y * Pi * K1)
+        + (a * b) • (P * (K2 * (Q * Y * Qi) - Q * Y * Qi * K2) * Pi) := by
   subst hK hL hPQ hPQi
   have e : ∀ X : Matrix (Fin n) (Fin n) F, Pi * (P * X) = X := fun X => by
     rw [← mul_assoc, hP, one_mul]
-  simp only [mul_sub, sub_mul, add_mul, mul_add, smul_sub, mul_smul_comm, smul_mul_assoc, mul_assoc, e,
-    smul_smul, smul_add]
+  simp only [mul_sub, sub_mul, add_mul, mul_add, smul_sub, mul_smul_comm, smul_mul_assoc, mul_assoc,
+    e, smul_smul, smul_add]
   abel
 
-theorem UpperTheory.V.Pa.Det.detAlg :
-    ∀ {F G : Type} [Field F] [Group G] {n : ℕ} (D : DetFr F G n) {m : ℕ} (κ la : Fin m → G → Matrix (Fin n) (Fin n) F) (s : F) (ph : G → Matrix (Fin n) (Fin n) F), D.IsKap κ → D.IsTw κ s ph la → ∃ (Y₀ : Matrix (Fin n) (Fin n) F) (Y : Fin m → Matrix (Fin n) (Fin n) F), Y₀ ∈ Ev F F n D.a ∧ s • Y₀ᵀ = Y₀ ∧ (∀ k, Y k ∈ Od F F n D.a ∧ s • (Y k)ᵀ = Y k ∧ ∀ g, la k g = dTw D.χF D.r (Y k) g) ∧ ∀ g, ph g = dTw D.χF D.r Y₀ g + D.χF g • ∑ k, (κ k g * (D.r g * Y k * D.r g⁻¹) - (D.r g * Y k * D.r g⁻¹) * κ k g) := by
+theorem UpperTheory.V.Pa.Det.detAlg
+    : ∀ {F G : Type} [Field F] [Group G] {n : ℕ} (D : DetFr F G n) {m : ℕ}
+        (κ la : Fin m → G → Matrix (Fin n) (Fin n) F) (s : F) (ph : G → Matrix (Fin n) (Fin n) F),
+      D.IsKap κ → D.IsTw κ s ph la
+        → ∃ (Y₀ : Matrix (Fin n) (Fin n) F) (Y : Fin m → Matrix (Fin n) (Fin n) F),
+          Y₀ ∈ Ev F F n D.a ∧ s • Y₀ᵀ = Y₀
+            ∧ (∀ k, Y k ∈ Od F F n D.a ∧ s • (Y k)ᵀ = Y k ∧ ∀ g, la k g = dTw D.χF D.r (Y k) g)
+            ∧ ∀ g,
+              ph g
+                = dTw D.χF D.r Y₀ g
+                  + D.χF g
+                    • ∑ k, (κ k g * (D.r g * Y k * D.r g⁻¹) - (D.r g * Y k * D.r g⁻¹) * κ k g) := by
   intro F G _ _ n D m κ la s ph hK hT
   choose Y hYod hYs hYla using Det.oddPart D κ la s ph hK hT
   have rinv : ∀ g, D.r g⁻¹ * D.r g = 1 := fun g => by rw [← map_mul, inv_mul_cancel, map_one]
@@ -83,14 +98,15 @@ theorem UpperTheory.V.Pa.Det.detAlg :
   let ψ : G → Matrix (Fin n) (Fin n) F := fun g => ph g - D.χF g • c g
   have hcoc : TwCoc D.χF D.r Set.univ ψ := by
     intro g _ h _
-    have hcgh : (D.χF g * D.χF h) • c (g * h) =
-        D.χF g • ∑ k, (κ k g * (D.r g * la k h * D.r g⁻¹) - D.r g * la k h * D.r g⁻¹ * κ k g) +
-          D.χF g • c g + (D.χF g * D.χF h) • (D.r g * c h * D.r g⁻¹) := by
+    have hcgh
+        : (D.χF g * D.χF h) • c (g * h)
+          = D.χF g • ∑ k, (κ k g * (D.r g * la k h * D.r g⁻¹) - D.r g * la k h * D.r g⁻¹ * κ k g)
+            + D.χF g • c g + (D.χF g * D.χF h) • (D.r g * c h * D.r g⁻¹) := by
       simp only [c, Finset.smul_sum, Finset.mul_sum, Finset.sum_mul, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
       exact smul_commutator_conj_mul_eq_add_add _ _ _ _ _ _ _ _ _ _ _ _ _ (rinv g)
-        (by have := (hK.coc k) g trivial h trivial; simpa using this)
-        (by rw [hYla k h]; rfl) (map_mul _ _ _) (by rw [_root_.mul_inv_rev, map_mul])
+        (by have := (hK.coc k) g trivial h trivial; simpa using this) (by rw [hYla k h]; rfl)
+        (map_mul _ _ _) (by rw [_root_.mul_inv_rev, map_mul])
     show ph (g * h) - D.χF (g * h) • c (g * h) = ph g - D.χF g • c g + D.χF g • (D.r g * (ph h - D.χF h • c h) * D.r g⁻¹)
     rw [χmul, hcgh, hT.ph_mul g h]
     simp only [mul_sub, sub_mul, smul_sub, smul_add, mul_smul_comm, smul_mul_assoc, smul_smul]
@@ -106,7 +122,8 @@ theorem UpperTheory.V.Pa.Det.detAlg :
   have hYT : ∀ k, (Y k)ᵀ = s • Y k := fun k => by
     conv_rhs => rw [← hYs k]
     rw [smul_smul, hT.sq, one_smul]
-  have hRσ : ∀ k g, D.r (D.σ g) * Y k * D.r (D.σ g)⁻¹ = s • (D.r g * Y k * D.r g⁻¹)ᵀ := fun k g => by
+  have hRσ
+      : ∀ k g, D.r (D.σ g) * Y k * D.r (D.σ g)⁻¹ = s • (D.r g * Y k * D.r g⁻¹)ᵀ := fun k g => by
     have := Det.dSigma D (fun _ => 1) (Y k) g (fun _ => rfl)
     simp only [dTw, one_smul] at this
     rw [hYT k] at this
@@ -121,8 +138,8 @@ theorem UpperTheory.V.Pa.Det.detAlg :
       simp only [c, hRσ, hK.pol, Matrix.transpose_sum, Finset.smul_sum, Matrix.transpose_sub,
         Matrix.transpose_mul]
       refine Finset.sum_congr rfl fun k _ => ?_
-      simp only [neg_mul, mul_neg, mul_smul_comm, smul_mul_assoc, smul_sub, sub_neg_eq_add, neg_smul,
-        one_smul, smul_neg]
+      simp only [neg_mul, mul_neg, mul_smul_comm, smul_mul_assoc, smul_sub, sub_neg_eq_add,
+        neg_smul, one_smul, smul_neg]
       abel
     rw [hc, Matrix.transpose_sub, Matrix.transpose_smul, smul_sub, smul_comm s (D.χF g)]
   have htr : ∀ g ∈ D.G', (ψ g * D.r g).trace = 0 := fun g hg => by

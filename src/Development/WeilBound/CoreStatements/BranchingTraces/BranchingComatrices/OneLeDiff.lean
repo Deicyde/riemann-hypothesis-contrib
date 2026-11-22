@@ -12,21 +12,30 @@ open Matrix Finset
 
 namespace PositivityTheory.UnitaryDecomposition.Com
 
-open Formalism.REAL PI.DSInfCharCap CompanionTheory.D.DSIC Formalism.FourierDecayAlt.P.CapelliAbstractCharacter
+open Formalism.REAL PI.DSInfCharCap CompanionTheory.D.DSIC
+  Formalism.FourierDecayAlt.P.CapelliAbstractCharacter
 
-theorem cap_of {m : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {π : Matrix (Fin m) (Fin m) ℂ → (H →L[ℂ] H)} (hl : Formalism.QuantumDeterminants.IsHCParam lam) (hπ : Formalism.MainNotions.S.IsDS ε lam π)
-    {S : Submodule ℂ H} {E : Fin m → Fin m → Module.End ℂ S} (hS : IsSmMod ε π S E) (u : ℂ) (v : S) :
-    qdet E u v = (∏ j, (u + ((lam j : ℂ) - ((m : ℂ) - 1) / 2))) • v := by
-  have h := discrete_series_infinitesimal_character m ε lam H π hl hπ v ((hS.mem _).1 v.2) (u - ((m : ℂ) - 1) / 2)
+theorem cap_of
+    {m : ℕ} {ε : Fin m → Bool} {lam : Fin m → ℝ} {H : Type}
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {π : Matrix (Fin m) (Fin m) ℂ → (H →L[ℂ] H)}
+    (hl : Formalism.QuantumDeterminants.IsHCParam lam) (hπ : Formalism.MainNotions.S.IsDS ε lam π)
+    {S : Submodule ℂ H} {E : Fin m → Fin m → Module.End ℂ S} (hS : IsSmMod ε π S E)
+    (u : ℂ) (v : S)
+    : qdet E u v = (∏ j, (u + ((lam j : ℂ) - ((m : ℂ) - 1) / 2))) • v := by
+  have h :=
+    discrete_series_infinitesimal_character m ε lam H π hl hπ v ((hS.mem _).1 v.2)
+      (u - ((m : ℂ) - 1) / 2)
   rw [sub_add_cancel, hActQ m ε H π S E hS] at h
   refine Subtype.ext (h.trans ?_)
   rw [Submodule.coe_smul, Formalism.QuantumDeterminants.capP]
   congr 1
   exact Finset.prod_congr rfl fun j _ => by ring
 
-theorem one_le_diff {m : ℕ} {lam : Fin m → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam) {i j : Fin m} (h : j ≠ i) :
-    1 ≤ |lam j - lam i| := by
+theorem one_le_diff
+    {m : ℕ} {lam : Fin m → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam)
+    {i j : Fin m} (h : j ≠ i)
+    : 1 ≤ |lam j - lam i| := by
   obtain ⟨a, ha⟩ := hl.2 i
   obtain ⟨b, hb⟩ := hl.2 j
   have e : lam j - lam i = ((b - a : ℤ) : ℝ) := by push_cast; linarith
@@ -34,8 +43,10 @@ theorem one_le_diff {m : ℕ} {lam : Fin m → ℝ} (hl : Formalism.QuantumDeter
   rw [e, ← Int.cast_abs]
   exact_mod_cast Int.one_le_abs h0
 
-theorem spread {n : ℕ} {lam : Fin (n + 1) → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam) {B : ℝ} (hB : ∀ a, |lam a| ≤ B) :
-    (n : ℝ) ≤ 2 * B := by
+theorem spread
+    {n : ℕ} {lam : Fin (n + 1) → ℝ} (hl : Formalism.QuantumDeterminants.IsHCParam lam)
+    {B : ℝ} (hB : ∀ a, |lam a| ≤ B)
+    : (n : ℝ) ≤ 2 * B := by
   have hA := hl.1
   have key : ∀ k : ℕ, ∀ hk : k ≤ n, (k : ℝ) ≤ lam 0 - lam ⟨k, by omega⟩ := by
     intro k
@@ -55,21 +66,30 @@ theorem spread {n : ℕ} {lam : Fin (n + 1) → ℝ} (hl : Formalism.QuantumDete
   have hn := (abs_le.mp (hB ⟨n, by omega⟩)).1
   linarith
 
-private theorem exists_norm_le_one_p_eq_smul_Th {n : ℕ} {ε : Fin (n + 1) → Bool} {lam : Fin (n + 1) → ℝ} {H : Type}
-    [NormedAddCommGroup H] [InnerProductSpace ℂ H] {π : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ → H →L[ℂ] H}
-    (hl : Formalism.QuantumDeterminants.IsHCParam lam) (hπ : Formalism.MainNotions.S.IsDS ε lam π) {S : Submodule ℂ H}
-    {E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ S} (hS : IsSmMod ε π S E) (X : Dec ε lam π)
-    {s : Fin (n + 1)} (hs : s ∈ X.S) :
-    ∃ (i : Fin (n + 1)) (c0 : ℂ), ‖c0‖ ≤ 1 ∧ ∀ (x : Fin (n + 1) → S) (c : Fin (n + 1)),
-      X.p s (fun l => (x l : H)) c =
-        c0 • ((Th E (-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2)) x c : S) : H) := by
+private theorem exists_norm_le_one_p_eq_smul_Th
+    {n : ℕ} {ε : Fin (n + 1) → Bool} {lam : Fin (n + 1) → ℝ} {H : Type}
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {π : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ → H →L[ℂ] H}
+    (hl : Formalism.QuantumDeterminants.IsHCParam lam) (hπ : Formalism.MainNotions.S.IsDS ε lam π)
+    {S : Submodule ℂ H} {E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ S} (hS : IsSmMod ε π S E)
+    (X : Dec ε lam π)
+    {s : Fin (n + 1)} (hs : s ∈ X.S)
+    : ∃ (i : Fin (n + 1)) (c0 : ℂ),
+      ‖c0‖ ≤ 1
+        ∧ ∀ (x : Fin (n + 1) → S) (c : Fin (n + 1)),
+          X.p s (fun l => (x l : H)) c
+            = c0 • ((Th E (-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2)) x c : S) : H) := by
   classical
   set mm : Fin (n + 1) → ℂ := fun j => (lam j : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2 with hmm
   have hq : ∀ (u : ℂ) (v : S), qdet E u v = (∏ j, (u + mm j)) • v := fun u v => cap_of hl hπ hS u v
   have hgl : GlRel E := hS.gl
-  have hxs : ∀ x : Fin (n + 1) → S, (fun l => (x l : H)) ∈ SmT ε π := fun x l => (hS.mem _).1 (x l).2
+  have hxs : ∀ x : Fin (n + 1) → S, (fun l => (x l : H)) ∈ SmT ε π := fun x l =>
+    (hS.mem _).1 (x l).2
   let Y : (Fin (n + 1) → S) → Fin (n + 1) → Fin (n + 1) → S := fun x t c =>
-    if ht : t ∈ X.S then ⟨X.p t (fun l => (x l : H)) c, (hS.mem _).2 (X.p_sm t ht _ (hxs x) c)⟩ else 0
+    if ht : t ∈ X.S then
+      ⟨X.p t (fun l => (x l : H)) c, (hS.mem _).2 (X.p_sm t ht _ (hxs x) c)⟩
+    else
+      0
   have hYs : ∀ x t, t ∈ X.S → ∀ c, ((Y x t c : S) : H) = X.p t (fun l => (x l : H)) c := by
     intro x t ht c
     simp [Y, ht]
@@ -97,12 +117,14 @@ private theorem exists_norm_le_one_p_eq_smul_Th {n : ℕ} {ε : Fin (n + 1) → 
     set D := ∏ j ∈ univ.erase i, (-mm i + mm j) with hD
     have hD1 : 1 ≤ ‖D‖ := by
       rw [hD, norm_prod]
-      calc (1 : ℝ) = ∏ j ∈ univ.erase i, (1 : ℝ) := by simp
+      calc
+        (1 : ℝ)
+          = ∏ j ∈ univ.erase i, (1 : ℝ) := by simp
         _ ≤ ∏ j ∈ univ.erase i, ‖-mm i + mm j‖ := by
           apply Finset.prod_le_prod₀ (fun _ _ => zero_le_one)
           intro j hj
           have hji : j ≠ i := Finset.ne_of_mem_erase hj
-          have he : -mm i + mm j = ((lam j - lam i : ℝ) : ℂ) := by
+          have he : - mm i + mm j = ((lam j - lam i : ℝ) : ℂ) := by
             simp only [hmm]
             push_cast
             ring
@@ -117,13 +139,16 @@ private theorem exists_norm_le_one_p_eq_smul_Th {n : ℕ} {ε : Fin (n + 1) → 
       exact inv_le_one_of_one_le₀ hD1
     · have hT := th_proj hgl hq X.S (Y x) X.κ X.κ_inj (fun t ht => hEig x t ht) hs i hi
       rw [hSum x] at hT
-      rw [hT, Pi.smul_apply, Submodule.coe_smul, smul_smul, inv_mul_cancel₀ hDne, one_smul, hYs x s hs c]
+      rw [hT, Pi.smul_apply, Submodule.coe_smul, smul_smul, inv_mul_cancel₀ hDne, one_smul,
+        hYs x s hs c]
 
-private theorem list_prod_E_apply_eq_dsigCW {m : ℕ} {ε : Fin m → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {π : Matrix (Fin m) (Fin m) ℂ → H →L[ℂ] H} {S : Submodule ℂ H} {E : Fin m → Fin m → Module.End ℂ S}
-    (hS : IsSmMod ε π S E) (W : List (Fin m × Fin m)) (w : S) :
-    (((W.map (fun p => E p.1 p.2)).prod w : S) : H) =
-      dsigCW ε π (W.map (fun p => single p.1 p.2 (1 : ℂ))) (w : H) := by
+private theorem list_prod_E_apply_eq_dsigCW
+    {m : ℕ} {ε : Fin m → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {π : Matrix (Fin m) (Fin m) ℂ → H →L[ℂ] H} {S : Submodule ℂ H}
+    {E : Fin m → Fin m → Module.End ℂ S} (hS : IsSmMod ε π S E)
+    (W : List (Fin m × Fin m)) (w : S)
+    : (((W.map (fun p => E p.1 p.2)).prod w : S) : H)
+      = dsigCW ε π (W.map (fun p => single p.1 p.2 (1 : ℂ))) (w : H) := by
   induction W with
   | nil => rfl
   | cons p W ih =>
@@ -166,13 +191,15 @@ theorem comat_of (hW : WordBd) : Comat := by
       · simp [h]
     have h1 := hform (Pi.single l vs) c
     rw [hx, th_single] at h1
-    rw [h1, norm_smul, Submodule.coe_smul, norm_smul, norm_pow, norm_neg, norm_one, one_pow, one_mul]
+    rw [h1, norm_smul, Submodule.coe_smul, norm_smul, norm_pow, norm_neg, norm_one, one_pow,
+      one_mul]
     set M : ℝ := 8 * √((n + 1 : ℕ) : ℝ) * (B + n) with hMdef
-    have hM : ∀ W : List (Fin (n + 1) × Fin (n + 1)), W.length ≤ n →
-        ‖(W.map (fun p => E p.1 p.2)).prod vs‖ ≤ M ^ W.length * ‖vs‖ := by
+    have hM
+        : ∀ W : List (Fin (n + 1) × Fin (n + 1)),
+          W.length ≤ n → ‖(W.map (fun p => E p.1 p.2)).prod vs‖ ≤ M ^ W.length * ‖vs‖ := by
       intro W hWl
-      have h3 := hwb n (W.map (fun p => single p.1 p.2 (1 : ℂ))) (by simpa using hWl)
-        (by
+      have h3 :=
+        hwb n (W.map (fun p => single p.1 p.2 (1 : ℂ))) (by simpa using hWl) (by
           simp only [List.mem_map]
           rintro _ ⟨p, _, rfl⟩
           exact hs_single_one_le_one p.1 p.2)
@@ -180,10 +207,12 @@ theorem comat_of (hW : WordBd) : Comat := by
       show ‖(((W.map (fun p => E p.1 p.2)).prod vs : S) : H)‖ ≤ M ^ W.length * ‖v‖
       rw [list_prod_E_apply_eq_dsigCW hS W vs]
       exact h3
-    have hR : ∀ k : Fin n, ‖-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) - ((k : ℕ) : ℂ)‖ ≤ 4 * B := by
+    have hR
+        : ∀ k : Fin n, ‖-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) - ((k : ℕ) : ℂ)‖ ≤ 4 * B := by
       intro k
-      have he : -((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) - ((k : ℕ) : ℂ)
-          = ((-lam i + (n : ℝ) / 2 - (k : ℕ) : ℝ) : ℂ) := by
+      have he
+          : -((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) - ((k : ℕ) : ℂ)
+            = ((- lam i + (n : ℝ) / 2 - (k : ℕ) : ℝ) : ℂ) := by
         push_cast
         ring
       rw [he, Complex.norm_real, Real.norm_eq_abs]
@@ -192,8 +221,9 @@ theorem comat_of (hW : WordBd) : Comat := by
       have h2 := hP.bd i
       rw [abs_le] at h2 ⊢
       constructor <;> nlinarith
-    have hq : ‖((qminor E l.succAbove c.succAbove (-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2)) vs : S) : H)‖
-        ≤ (n.factorial : ℝ) * ((4 * B + M) ^ n * ‖v‖) :=
+    have hq
+        : ‖((qminor E l.succAbove c.succAbove (-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2)) vs : S) : H)‖
+          ≤ (n.factorial : ℝ) * ((4 * B + M) ^ n * ‖v‖) :=
       qminor_bd (t := n) (by linarith) (by positivity) hM l.succAbove c.succAbove _ hR
     set K : ℝ := 8 * ((n : ℝ) + 1) * B with hKdef
     have hsq : √((n + 1 : ℕ) : ℝ) ≤ (n : ℝ) + 1 :=
@@ -202,51 +232,66 @@ theorem comat_of (hW : WordBd) : Comat := by
       rw [hMdef, hKdef]
       have h0 : (0 : ℝ) ≤ B + n := by positivity
       have h5 : B + n ≤ 3 * B := by linarith
-      calc 8 * √((n + 1 : ℕ) : ℝ) * (B + n) ≤ 8 * ((n : ℝ) + 1) * (3 * B) := by
-            apply mul_le_mul (by linarith) h5 h0 (by positivity)
+      calc
+        8 * √((n + 1 : ℕ) : ℝ) * (B + n)
+          ≤ 8 * ((n : ℝ) + 1) * (3 * B) := by apply mul_le_mul (by linarith) h5 h0 (by positivity)
         _ = 3 * (8 * ((n : ℝ) + 1) * B) := by ring
     have hK24 : 24 * B ≤ K := by rw [hKdef]; nlinarith
     have h4 : 4 * B + M ≤ K ^ 2 := by nlinarith
     have hfact : (n.factorial : ℝ) ≤ K ^ n := by
-      calc (n.factorial : ℝ) ≤ ((n ^ n : ℕ) : ℝ) := by exact_mod_cast Nat.factorial_le_pow n
+      calc
+        (n.factorial : ℝ)
+          ≤ ((n ^ n : ℕ) : ℝ) := by exact_mod_cast Nat.factorial_le_pow n
         _ = (n : ℝ) ^ n := by push_cast; ring
         _ ≤ K ^ n := pow_le_pow_left₀ (by positivity) (by nlinarith) n
-    calc ‖c0‖ * _ ≤ 1 * ((n.factorial : ℝ) * ((4 * B + M) ^ n * ‖v‖)) :=
-          mul_le_mul hc0 hq (norm_nonneg _) zero_le_one
+    calc
+      ‖c0‖ * _ ≤ 1 * ((n.factorial : ℝ) * ((4 * B + M) ^ n * ‖v‖)) :=
+        mul_le_mul hc0 hq (norm_nonneg _) zero_le_one
       _ = ((n.factorial : ℝ) * (4 * B + M) ^ n) * ‖v‖ := by ring
       _ ≤ K ^ (4 * (n + 1)) * ‖v‖ := by
         apply mul_le_mul_of_nonneg_right _ (norm_nonneg v)
         have hM0 : 0 ≤ M := by positivity
-        calc (n.factorial : ℝ) * (4 * B + M) ^ n ≤ K ^ n * (K ^ 2) ^ n :=
-              mul_le_mul hfact (pow_le_pow_left₀ (by positivity) h4 n) (by positivity) (by positivity)
+        calc
+          (n.factorial : ℝ) * (4 * B + M) ^ n ≤ K ^ n * (K ^ 2) ^ n :=
+            mul_le_mul hfact (pow_le_pow_left₀ (by positivity) h4 n) (by positivity) (by positivity)
           _ = K ^ (3 * n) := by rw [← pow_mul, ← pow_add]; ring_nf
           _ ≤ K ^ (4 * (n + 1)) := pow_le_pow_right₀ hK1 (by omega)
-  · refine ⟨c0 * ∏ j : Fin n, (-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) + ((mu j : ℂ) - ((n : ℂ) - 1) / 2)), ?_, ?_⟩
+  · refine ⟨
+      c0
+        * ∏ j : Fin n, (-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) + ((mu j : ℂ) - ((n : ℂ) - 1) / 2)),
+      ?_,
+      ?_
+    ⟩
     · rw [norm_mul, norm_prod]
-      have hprod : ∏ j : Fin n, ‖-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) + ((mu j : ℂ) - ((n : ℂ) - 1) / 2)‖
-          ≤ (8 * ((n : ℝ) + 1) * B) ^ n := by
-        calc _ ≤ ∏ j : Fin n, (8 * ((n : ℝ) + 1) * B) := by
-              apply Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _)
-              intro j _
-              have he : -((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) + ((mu j : ℂ) - ((n : ℂ) - 1) / 2)
+      have hprod
+          : ∏ j : Fin n, ‖-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) + ((mu j : ℂ) - ((n : ℂ) - 1) / 2)‖
+            ≤ (8 * ((n : ℝ) + 1) * B) ^ n := by
+        calc
+          _ ≤ ∏ j : Fin n, (8 * ((n : ℝ) + 1) * B) := by
+            apply Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _)
+            intro j _
+            have he
+                : -((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2) + ((mu j : ℂ) - ((n : ℂ) - 1) / 2)
                   = ((mu j - lam i + 1 / 2 : ℝ) : ℂ) := by
-                push_cast
-                ring
-              rw [he, Complex.norm_real, Real.norm_eq_abs]
-              have h1 := hP.bd i
-              have h2 := hP.bd' j
-              rw [abs_le] at h1 h2 ⊢
-              constructor <;> nlinarith
+              push_cast
+              ring
+            rw [he, Complex.norm_real, Real.norm_eq_abs]
+            have h1 := hP.bd i
+            have h2 := hP.bd' j
+            rw [abs_le] at h1 h2 ⊢
+            constructor <;> nlinarith
           _ = _ := by simp
-      calc ‖c0‖ * _ ≤ 1 * (8 * ((n : ℝ) + 1) * B) ^ n :=
-            mul_le_mul hc0 hprod (Finset.prod_nonneg fun _ _ => norm_nonneg _) zero_le_one
+      calc
+        ‖c0‖ * _ ≤ 1 * (8 * ((n : ℝ) + 1) * B) ^ n :=
+          mul_le_mul hc0 hprod (Finset.prod_nonneg fun _ _ => norm_nonneg _) zero_le_one
         _ ≤ _ := by
           rw [one_mul]
           exact pow_le_pow_right₀ hK1 (Nat.le_succ n)
     · intro P hPI η hη
       have hηS : η ∈ S := (hS.mem η).2 hη
       let ηs : S := ⟨η, hηS⟩
-      have hx : (fun l => ((Pi.single (zi e) ηs : Fin (n + 1) → S) l : H)) = Pi.single (zi e) η := by
+      have hx
+          : (fun l => ((Pi.single (zi e) ηs : Fin (n + 1) → S) l : H)) = Pi.single (zi e) η := by
         funext l
         by_cases h : l = zi e
         · subst h
@@ -259,8 +304,8 @@ theorem comat_of (hW : WordBd) : Comat := by
         rw [← two_mul, pow_mul]
         simp
       rw [hpow, one_smul]
-      have hι : Function.Injective (fun a : Fin n => e (Sum.inl a)) :=
-        fun a b h => Sum.inl_injective (e.injective h)
+      have hι : Function.Injective (fun a : Fin n => e (Sum.inl a)) := fun a b h =>
+        Sum.inl_injective (e.injective h)
       have hιz : ∀ a : Fin n, e (Sum.inl a) ≠ zi e := fun a h => by
         have := e.injective h
         simp at this
@@ -268,14 +313,16 @@ theorem comat_of (hW : WordBd) : Comat := by
       have hPS : ∀ w : S, P w ∈ S' := fun w => (hS'.mem _).2 (smooth_map hF hPI ((hS.mem _).1 w.2))
       let f : S →ₗ[ℂ] S' := LinearMap.codRestrict S' (P.toLinearMap ∘ₗ S.subtype) hPS
       have hf : ∀ w : S, ((f w : S') : H') = P w := fun w => rfl
-      have hcomm : ∀ (a b : Fin n) (w : S),
-          f (E (e (Sum.inl a)) (e (Sum.inl b)) w) = E' a b (f w) := by
+      have hcomm
+          : ∀ (a b : Fin n) (w : S), f (E (e (Sum.inl a)) (e (Sum.inl b)) w) = E' a b (f w) := by
         intro a b w
         apply Subtype.ext
         rw [hf, hS'.act, hf, hS.act, ← blk_single]
         exact dsigC_map hF hPI (fun Xm hXm => (hS.real Xm hXm w).differentiableAt) (single a b 1)
-      have hqi := qdet_int (E := fun a b => E (e (Sum.inl a)) (e (Sum.inl b))) f hcomm
-        (-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2)) ηs
+      have hqi :=
+        qdet_int
+          (E := fun a b => E (e (Sum.inl a)) (e (Sum.inl b)))
+          f hcomm (-((lam i : ℂ) - (((n + 1 : ℕ) : ℂ) - 1) / 2)) ηs
       rw [cap_of hP.hc' hσ hS'] at hqi
       rw [map_smul, ← hf, hqi, Submodule.coe_smul, hf, smul_smul]
 

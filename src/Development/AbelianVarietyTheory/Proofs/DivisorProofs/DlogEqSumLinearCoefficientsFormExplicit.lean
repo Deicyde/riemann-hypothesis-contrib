@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.FormalExpMu
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat GlobalTheory.FormalCalc
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat GlobalTheory.FormalCalc
 
 set_option autoImplicit false
 
@@ -17,8 +19,8 @@ open GlobalTheory.PDiv
 
 variable {p : ℕ} {O : Type} [CommRing O] {G : PDivGroup p O} {d : ℕ}
 
-theorem exists_eq_add_single {α : Fin d →₀ ℕ} (h : α ≠ 0) :
-    ∃ (i : Fin d) (β : Fin d →₀ ℕ), α = β + Finsupp.single i 1 ∧ α.degree = β.degree + 1 := by
+theorem exists_eq_add_single {α : Fin d →₀ ℕ} (h : α ≠ 0)
+    : ∃ (i : Fin d) (β : Fin d →₀ ℕ), α = β + Finsupp.single i 1 ∧ α.degree = β.degree + 1 := by
   obtain ⟨i, hi⟩ : ∃ i, α i ≠ 0 := by
     by_contra hc
     push_neg at hc
@@ -34,15 +36,15 @@ theorem exists_eq_add_single {α : Fin d →₀ ℕ} (h : α ≠ 0) :
 
 variable (c : Chart G d)
 
-theorem counit_ev_monomial (n : ℕ) {β : Fin d →₀ ℕ} (hβ : β ≠ 0) (a : O) :
-    Bialgebra.counitAlgHom O (G.A n) (c.ev n (monomial β a)) = 0 := by
+theorem counit_ev_monomial (n : ℕ) {β : Fin d →₀ ℕ} (hβ : β ≠ 0) (a : O)
+    : Bialgebra.counitAlgHom O (G.A n) (c.ev n (monomial β a)) = 0 := by
   obtain ⟨i, γ, rfl, -⟩ := exists_eq_add_single hβ
   rw [← mul_one a, ← monomial_mul_monomial, map_mul, map_mul]
   change _ * Bialgebra.counitAlgHom O (G.A n) (c.ev n (X i)) = 0
   rw [(c.isEval n).1 i, Bialgebra.counitAlgHom_apply O (G.A n) (c.x n i), c.aug, mul_zero]
 
-theorem dUnit_ev_monomial (n : ℕ) {α : Fin d →₀ ℕ} (hα : 2 ≤ α.degree) (a : O) :
-    dUnit (R := O) (c.ev n (monomial α a)) = 0 := by
+theorem dUnit_ev_monomial (n : ℕ) {α : Fin d →₀ ℕ} (hα : 2 ≤ α.degree) (a : O)
+    : dUnit (R := O) (c.ev n (monomial α a)) = 0 := by
   have h0 : α ≠ 0 := by
     rintro rfl
     simp at hα
@@ -50,15 +52,17 @@ theorem dUnit_ev_monomial (n : ℕ) {α : Fin d →₀ ℕ} (hα : 2 ≤ α.degr
   have hβ : β ≠ 0 := by
     have hb : β.degree ≠ 0 := by omega
     exact fun h => hb (by rw [h]; simp)
-  rw [← mul_one a, ← monomial_mul_monomial, map_mul, dUnit, AugCot.d_mul,
-    c.counit_ev_monomial n hβ]
+  rw [← mul_one a, ← monomial_mul_monomial, map_mul, dUnit, AugCot.d_mul, c.counit_ev_monomial n hβ]
   change _ • _ + Bialgebra.counitAlgHom O (G.A n) (c.ev n (X i)) • _ = 0
-  rw [(c.isEval n).1 i, Bialgebra.counitAlgHom_apply O (G.A n) (c.x n i), c.aug, zero_smul, zero_smul, add_zero]
+  rw [(c.isEval n).1 i, Bialgebra.counitAlgHom_apply O (G.A n) (c.x n i), c.aug, zero_smul,
+    zero_smul, add_zero]
 
-theorem dUnit_ev_of_high (n N : ℕ) (hN : ∀ f : MvPowerSeries (Fin d) O,
-    (∀ α : Fin d →₀ ℕ, α.degree < N → coeff α f = 0) → (p : G.A n) ^ n ∣ c.ev n f)
-    (f : MvPowerSeries (Fin d) O) (hf : ∀ α : Fin d →₀ ℕ, α.degree < N → coeff α f = 0) :
-    dUnit (R := O) (c.ev n f) = 0 := by
+theorem dUnit_ev_of_high
+    (n N : ℕ)
+    (hN : ∀ f : MvPowerSeries (Fin d) O,
+      (∀ α : Fin d →₀ ℕ, α.degree < N → coeff α f = 0) → (p : G.A n) ^ n ∣ c.ev n f)
+    (f : MvPowerSeries (Fin d) O) (hf : ∀ α : Fin d →₀ ℕ, α.degree < N → coeff α f = 0)
+    : dUnit (R := O) (c.ev n f) = 0 := by
   obtain ⟨b, hb⟩ := hN f hf
   rw [hb, dUnit, AugCot.d_mul]
   have h1 : ((p : G.A n) ^ n) = algebraMap O (G.A n) ((p : O) ^ n) := by simp
@@ -66,8 +70,9 @@ theorem dUnit_ev_of_high (n N : ℕ) (hN : ∀ f : MvPowerSeries (Fin d) O,
     RingHom.id_apply]
   exact G.pow_smul_cot n _
 
-theorem dUnit_ev_of_two (n : ℕ) (f : MvPowerSeries (Fin d) O)
-    (hf : ∀ α : Fin d →₀ ℕ, α.degree ≤ 1 → coeff α f = 0) : dUnit (R := O) (c.ev n f) = 0 := by
+theorem dUnit_ev_of_two
+    (n : ℕ) (f : MvPowerSeries (Fin d) O) (hf : ∀ α : Fin d →₀ ℕ, α.degree ≤ 1 → coeff α f = 0)
+    : dUnit (R := O) (c.ev n f) = 0 := by
   obtain ⟨N, hN⟩ := (c.isEval n).2 n
   classical
   set P := trunc' O (Finsupp.equivFunOnFinite.symm fun _ => N) f with hP
@@ -75,9 +80,10 @@ theorem dUnit_ev_of_two (n : ℕ) (f : MvPowerSeries (Fin d) O)
   rw [hsplit, map_add (f := _), dUnit, map_add (f := _), ← dUnit, ← dUnit]
   rw [c.dUnit_ev_of_high n N hN (f - P) fun α hα => ?_, add_zero]
   · rw [MvPolynomial.as_sum P]
-    have : ((∑ v ∈ P.support, MvPolynomial.monomial v (AddMonoidAlgebra.coeff P v) :
-        MvPolynomial (Fin d) O) : MvPowerSeries (Fin d) O) =
-        ∑ v ∈ P.support, monomial v (AddMonoidAlgebra.coeff P v) := by
+    have : ((∑ v ∈ P.support, MvPolynomial.monomial v (AddMonoidAlgebra.coeff P v)
+            : MvPolynomial (Fin d) O)
+          : MvPowerSeries (Fin d) O)
+        = ∑ v ∈ P.support, monomial v (AddMonoidAlgebra.coeff P v) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [← MvPolynomial.coeToMvPowerSeries.ringHom_apply, map_sum]
       simp only [MvPolynomial.coeToMvPowerSeries.ringHom_apply, MvPolynomial.coe_monomial]
@@ -97,9 +103,11 @@ theorem dUnit_ev_of_two (n : ℕ) (f : MvPowerSeries (Fin d) O)
     intro j
     exact ((Finsupp.le_degree j α).trans hα.le)
 
-theorem dlog_eq_sum_lin [Fact p.Prime] (χ : G.dual.Tate) (u : MvPowerSeries (Fin d) O)
-    (h1 : constantCoeff u = 1) (hu : ∀ n, c.ev n u = charElem χ n) :
-    dlog G χ = ∑ i, lin u i • c.form i := by
+theorem dlog_eq_sum_lin
+    [Fact p.Prime]
+    (χ : G.dual.Tate) (u : MvPowerSeries (Fin d) O)
+    (h1 : constantCoeff u = 1) (hu : ∀ n, c.ev n u = charElem χ n)
+    : dlog G χ = ∑ i, lin u i • c.form i := by
   classical
   apply Subtype.ext
   funext n
@@ -112,8 +120,10 @@ theorem dlog_eq_sum_lin [Fact p.Prime] (χ : G.dual.Tate) (u : MvPowerSeries (Fi
       rw [hg, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, (c.isEval n).1 i]
-  have e1 : dUnit (R := O) (c.ev n u) = dUnit (R := O) (c.ev n 1) + dUnit (R := O) (c.ev n g) +
-      dUnit (R := O) (c.ev n (u - 1 - g)) := by
+  have e1
+      : dUnit (R := O) (c.ev n u)
+        = dUnit (R := O) (c.ev n 1) + dUnit (R := O) (c.ev n g)
+          + dUnit (R := O) (c.ev n (u - 1 - g)) := by
     conv_lhs => rw [hsplit]
     simp only [PDiv.dUnit, map_add (f := _)]
   rw [e1, c.dUnit_ev_of_two n (u - 1 - g) ?_, add_zero, map_one, hev]
@@ -161,7 +171,11 @@ end GlobalTheory.QLog.Chart
 
 namespace GlobalTheory.QLog.Chart
 
-theorem dlog_eq_sum_lin' : ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (G : PDivGroup p O) (d : ℕ) (c : QLog.Chart G d) (χ : G.dual.Tate) (u : MvPowerSeries (Fin d) O), constantCoeff u = 1 → (∀ n, c.ev n u = charElem χ n) → dlog G χ = ∑ i, lin u i • c.form i :=
+theorem dlog_eq_sum_lin'
+    : ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] (G : PDivGroup p O) (d : ℕ) (c : QLog.Chart G d)
+        (χ : G.dual.Tate) (u : MvPowerSeries (Fin d) O),
+      constantCoeff u = 1 → (∀ n, c.ev n u = charElem χ n) → dlog G χ = ∑ i, lin u i • c.form i :=
   fun _ _ _ _ _ _ _ _ c χ u h1 hu => c.dlog_eq_sum_lin χ u h1 hu
 
 end GlobalTheory.QLog.Chart

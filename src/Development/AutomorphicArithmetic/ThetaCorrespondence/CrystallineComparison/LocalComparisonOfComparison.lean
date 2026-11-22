@@ -13,21 +13,25 @@ open scoped Formalism.Per
 
 variable {l : ℕ} [Fact l.Prime]
 
-def ofSix {eB : Per.Bcris l ≃+* Per6.Bcris l} {eD : Per.BdR l ≃+* Per6.BdR l} {eP : Per.BdRp l ≃+* Per6.BdRp l}
-    (h : Compat l eB eD eP) {P : LocPrime l} {AI : LocAinf l P} (T : LocTied6 l P AI) : LocTied l P AI := by
-  refine
-    { eB := T.eB.trans eB.symm
-      eD := T.eD.trans eD.symm
-      zB := fun z => ?_
-      zD := fun z => ?_
-      om := fun x => ?_
-      actB := fun g b => ?_
-      actD := fun g b => ?_
-      frob := fun b => ?_
-      incl := ?_
-      fil := fun K a x => ?_
-      t := ?_
-      ιA := fun a => ?_ }
+def ofSix
+    {eB : Per.Bcris l ≃+* Per6.Bcris l} {eD : Per.BdR l ≃+* Per6.BdR l}
+    {eP : Per.BdRp l ≃+* Per6.BdRp l} (h : Compat l eB eD eP)
+    {P : LocPrime l} {AI : LocAinf l P} (T : LocTied6 l P AI)
+    : LocTied l P AI := by
+  refine {
+    eB := T.eB.trans eB.symm
+    eD := T.eD.trans eD.symm
+    zB := fun z => ?_
+    zD := fun z => ?_
+    om := fun x => ?_
+    actB := fun g b => ?_
+    actD := fun g b => ?_
+    frob := fun b => ?_
+    incl := ?_
+    fil := fun K a x => ?_
+    t := ?_
+    ιA := fun a => ?_
+  }
   · rw [RingEquiv.trans_apply, T.zB z, ← h.zB z, RingEquiv.symm_apply_apply]
   · rw [RingEquiv.trans_apply, T.zD z, ← h.zD z, RingEquiv.symm_apply_apply]
   · obtain ⟨y, hy, hθ⟩ := T.om x
@@ -52,8 +56,8 @@ def ofSix {eB : Per.Bcris l ≃+* Per6.Bcris l} {eD : Per.BdR l ≃+* Per6.BdR l
     rw [RingEquiv.trans_apply, he, RingEquiv.symm_apply_eq, h.alg, RingEquiv.apply_symm_apply]
   · rw [RingEquiv.trans_apply, T.ιA a, ← h.aB a, RingEquiv.symm_apply_apply]
 
-theorem local_comparison_of_comparison (hC : Cmp l) (P : LocPrime l) (AI : LocAinf l P) :
-    Nonempty (LocTied6 l P AI) → Nonempty (LocTied l P AI) := by
+theorem local_comparison_of_comparison (hC : Cmp l) (P : LocPrime l) (AI : LocAinf l P)
+    : Nonempty (LocTied6 l P AI) → Nonempty (LocTied l P AI) := by
   rintro ⟨T⟩
   obtain ⟨eB, eD, eP, h⟩ := hC
   exact ⟨ofSix h T⟩

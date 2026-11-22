@@ -6,10 +6,11 @@ public import Mathlib
 
 open Matrix
 
-private theorem eig_sum_zero {O : Type} [CommRing O] [IsDomain O] {n : ℕ}
-    (A : Matrix (Fin n) (Fin n) O) (al : Fin n → O) (hal : Function.Injective al)
-    (u : Fin n → Fin n → O) (hu : ∀ i, A.mulVec (u i) = al i • u i) (hs : ∑ i, u i = 0) :
-    ∀ i, u i = 0 := by
+private theorem eig_sum_zero
+    {O : Type} [CommRing O] [IsDomain O]
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (al : Fin n → O) (hal : Function.Injective al)
+    (u : Fin n → Fin n → O) (hu : ∀ i, A.mulVec (u i) = al i • u i) (hs : ∑ i, u i = 0)
+    : ∀ i, u i = 0 := by
   have hk : ∀ k : ℕ, ∑ i, al i ^ k • u i = 0 := by
     intro k
     induction k with
@@ -29,13 +30,13 @@ private theorem eig_sum_zero {O : Type} [CommRing O] [IsDomain O] {n : ℕ}
     simpa [Finset.sum_apply, mul_comm] using this
   exact congrFun h i
 
-theorem UpperTheory.Reformulated.B.ExistsCyclic.exists_cyc :
-    ∀ {O : Type} [inst : CommRing O] [IsDomain O] {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (al : Fin n → O),
-      Function.Injective al →
-        A.charpoly = ∏ i : Fin n, (Polynomial.X - (Polynomial.C : O → Polynomial O) (al i)) →
-          ∃ (v : Fin n → O),
-            ∀ (Y : Matrix (Fin n) (Fin n) O),
-              A * Y = Y * A → Y.mulVec v = (0 : Fin n → O) → Y = (0 : Matrix (Fin n) (Fin n) O) := by
+theorem UpperTheory.Reformulated.B.ExistsCyclic.exists_cyc
+    : ∀ {O : Type} [inst : CommRing O] [IsDomain O] {n : ℕ} (A : Matrix (Fin n) (Fin n) O)
+        (al : Fin n → O),
+      Function.Injective al
+        → A.charpoly = ∏ i : Fin n, (Polynomial.X - (Polynomial.C : O → Polynomial O) (al i))
+        → ∃ (v : Fin n → O), ∀ (Y : Matrix (Fin n) (Fin n) O),
+          A * Y = Y * A → Y.mulVec v = (0 : Fin n → O) → Y = (0 : Matrix (Fin n) (Fin n) O) := by
   intro O _ _ n A al hal hc
   have hw : ∀ i, ∃ w : Fin n → O, w ≠ 0 ∧ A.mulVec w = al i • w := by
     intro i
@@ -59,12 +60,14 @@ theorem UpperTheory.Reformulated.B.ExistsCyclic.exists_cyc :
     intro h0
     obtain ⟨c, hc0, hc⟩ := Matrix.exists_vecMul_eq_zero_iff.mpr h0
     apply hc0
-    have h := eig_sum_zero A al hal (fun i => c i • w i)
-      (fun i => by rw [Matrix.mulVec_smul, hw, smul_comm])
-      (by
-        funext j
-        have := congrFun hc j
-        simpa [Matrix.vecMul, dotProduct, Finset.sum_apply] using this)
+    have h :=
+      eig_sum_zero A al hal
+        (fun i => c i • w i)
+        (fun i => by rw [Matrix.mulVec_smul, hw, smul_comm])
+        (by
+          funext j
+          have := congrFun hc j
+          simpa [Matrix.vecMul, dotProduct, Finset.sum_apply] using this)
     funext i
     exact (smul_eq_zero.mp (h i)).resolve_right (hw0 i)
   ext r j

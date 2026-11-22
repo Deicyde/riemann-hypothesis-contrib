@@ -25,7 +25,10 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.GR
 
-theorem tors_pts_finite : ∀ (R : Type) [CommRing R] [IsDomain R] (p : ℕ) (G : Over (Spec (CommRingCat.of R))) [GrpObj G] (T : TorsRep G p) (N : Type) [AddCommGroup N] (pt : N → (sp (R₀ := R) R ⟶ G)), IsTorsPts G p pt → Finite N := by
+theorem tors_pts_finite
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (p : ℕ) (G : Over (Spec (CommRingCat.of R))) [GrpObj G]
+        (T : TorsRep G p) (N : Type) [AddCommGroup N] (pt : N → (sp (R₀ := R) R ⟶ G)),
+      IsTorsPts G p pt → Finite N := by
   intro R _ _ p G _ T N _ pt h
   haveI := T.free
   haveI := T.fin

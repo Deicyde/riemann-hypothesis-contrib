@@ -5,7 +5,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LeftPhaseRule.Ha
 @[expose] public section
 
 open Matrix
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.QuantumDeterminants.WeylGroupFacts
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.QuantumDeterminants.WeylGroupFacts
 
 noncomputable section
 
@@ -147,8 +148,10 @@ lemma ell_dag_form {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {l : Fin 
 
 section Cases
 
-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {z : Fin (2 * r + k + 1) → ℂ}
-  {l : Fin r} {D : Set (Mx k r)} {f : Mx k r → E} {c : ℂ} {g₁ : Mx k r}
+variable
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+  {z : Fin (2 * r + k + 1) → ℂ} {l : Fin r} {D : Set (Mx k r)} {f : Mx k r → E} {c : ℂ}
+  {g₁ : Mx k r}
 
 lemma ginv_eq (hc : c ≠ 0) : (w1 k r l c * g₁)⁻¹ = g₁⁻¹ * w1 k r l (star c) := by
   rw [Matrix.mul_inv_rev, weyl_cell_inv l c hc]

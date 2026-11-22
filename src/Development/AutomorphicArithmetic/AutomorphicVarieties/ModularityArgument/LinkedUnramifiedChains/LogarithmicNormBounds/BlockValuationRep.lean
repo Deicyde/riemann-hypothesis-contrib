@@ -9,30 +9,38 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.DotProductS
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.HV GlobalTheory.GalOfCusp UpperTheory.V.Th UpperTheory.V.Z.J
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial UpperTheory.V UpperTheory.V.HV GlobalTheory.GalOfCusp UpperTheory.V.Th
+  UpperTheory.V.Z.J
 open scoped Pointwise
 
 namespace UpperTheory.V.Z.J.UnitaryRankTwoFlags
 
 open UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Th.End3
 
-attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
+attribute [-instance]
+  UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
 attribute [local instance 10000] IsDiscreteValuationRing.toIsLocalRing
 
-private theorem block_triangular_diag_mul {k : Type} [CommRing k] {n : ℕ} (A B : Matrix (Fin n) (Fin n) k)
-    (hA : A.BlockTriangular id) (hB : B.BlockTriangular id) (i : Fin n) :
-    (A * B) i i = A i i * B i i := by
+private theorem block_triangular_diag_mul
+    {k : Type} [CommRing k]
+    {n : ℕ} (A B : Matrix (Fin n) (Fin n) k) (hA : A.BlockTriangular id) (hB : B.BlockTriangular id)
+    (i : Fin n)
+    : (A * B) i i = A i i * B i i := by
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_single i (fun j _ hj => ?_) (by simp)
   rcases lt_or_gt_of_ne hj with h | h
   · rw [hA (show id j < id i from h), zero_mul]
   · rw [hB (show id i < id j from h), mul_zero]
 
-private theorem flag_match {H k : Type} [Field k] (T : H → Matrix (Fin 3) (Fin 3) k) (ψ : Fin 3 → H → k)
-    (D : Fin 3 → H → k) (Q : GL (Fin 3) k)
-    (tri : ∀ g, (Q.val * T g * (Q⁻¹).val).BlockTriangular id)
+private theorem flag_match
+    {H k : Type} [Field k]
+    (T : H → Matrix (Fin 3) (Fin 3) k)
+    (ψ : Fin 3 → H → k)
+    (D : Fin 3 → H → k) (Q : GL (Fin 3) k) (tri : ∀ g, (Q.val * T g * (Q⁻¹).val).BlockTriangular id)
     (dg : ∀ g i, (Q.val * T g * (Q⁻¹).val) i i = D i g)
-    (ord : ∀ g, Fr.ordProd T ψ g = 0) (b : Fin 3) : ∃ a, ∀ g, D b g = ψ a g := by
+    (ord : ∀ g, Fr.ordProd T ψ g = 0) (b : Fin 3)
+    : ∃ a, ∀ g, D b g = ψ a g := by
   by_contra hne
   push_neg at hne
   choose g hg using hne
@@ -40,7 +48,8 @@ private theorem flag_match {H k : Type} [Field k] (T : H → Matrix (Fin 3) (Fin
   have hQ : (Q⁻¹).val * Q.val = 1 := Units.inv_mul Q
   have hQ' : Q.val * (Q⁻¹).val = 1 := Units.mul_inv Q
   have hU : ∀ a, U a = Q.val * T (g a) * (Q⁻¹).val - ψ a (g a) • 1 := fun a => by
-    simp only [U, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one, hQ']
+    simp only [U, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one,
+      hQ']
   have hUt : ∀ a, (U a).BlockTriangular id := fun a => by
     rw [hU]
     refine (tri _).sub fun i j hij => ?_
@@ -53,21 +62,33 @@ private theorem flag_match {H k : Type} [Field k] (T : H → Matrix (Fin 3) (Fin
     exact sub_ne_zero.2 (hg a)
   have h0 : U 0 * (U 1 * U 2) = 0 := by
     have h1 := ord g
-    simp only [Fr.ordProd, List.ofFn_succ, List.ofFn_zero, List.prod_cons, List.prod_nil, mul_one] at h1
-    have h2 : Q.val * ((T (g 0) - ψ 0 (g 0) • 1) * ((T (g 1) - ψ 1 (g 1) • 1) * (T (g 2) - ψ 2 (g 2) • 1))) * (Q⁻¹).val = 0 := by
-      have h3 : (T (g 0) - ψ 0 (g 0) • 1) * ((T (g 1) - ψ 1 (g 1) • 1) * (T (g 2) - ψ 2 (g 2) • 1)) = 0 := h1
+    simp only [Fr.ordProd, List.ofFn_succ, List.ofFn_zero, List.prod_cons, List.prod_nil, mul_one]
+      at h1
+    have h2
+        : Q.val
+            * ((T (g 0) - ψ 0 (g 0) • 1) * ((T (g 1) - ψ 1 (g 1) • 1) * (T (g 2) - ψ 2 (g 2) • 1)))
+            * (Q⁻¹).val
+          = 0 := by
+      have h3
+          : (T (g 0) - ψ 0 (g 0) • 1) * ((T (g 1) - ψ 1 (g 1) • 1) * (T (g 2) - ψ 2 (g 2) • 1))
+            = 0 :=
+        h1
       rw [h3, Matrix.mul_zero, Matrix.zero_mul]
     rw [← h2]
     simp only [U]
-    calc _ = Q.val * (T (g 0) - ψ 0 (g 0) • 1) * ((Q⁻¹).val * Q.val) * (T (g 1) - ψ 1 (g 1) • 1) * ((Q⁻¹).val * Q.val) *
-          (T (g 2) - ψ 2 (g 2) • 1) * (Q⁻¹).val := by simp only [Matrix.mul_assoc]
+    calc
+      _ = Q.val * (T (g 0) - ψ 0 (g 0) • 1) * ((Q⁻¹).val * Q.val) * (T (g 1) - ψ 1 (g 1) • 1)
+          * ((Q⁻¹).val * Q.val) * (T (g 2) - ψ 2 (g 2) • 1) * (Q⁻¹).val := by
+        simp only [Matrix.mul_assoc]
       _ = _ := by rw [hQ]; simp only [Matrix.mul_one, Matrix.mul_assoc]
   have h4 := congrFun (congrFun h0 b) b
-  rw [block_triangular_diag_mul _ _ (hUt 0) ((hUt 1).mul (hUt 2)), block_triangular_diag_mul _ _ (hUt 1) (hUt 2)] at h4
+  rw [block_triangular_diag_mul _ _ (hUt 0) ((hUt 1).mul (hUt 2)),
+      block_triangular_diag_mul _ _ (hUt 1) (hUt 2)]
+    at h4
   exact mul_ne_zero (hUd 0) (mul_ne_zero (hUd 1) (hUd 2)) h4
 
-private theorem theta_tri {k : Type} [Field k] (b : GL (Fin 3) k) (hb : b.val.BlockTriangular id) :
-    (theta b).val.BlockTriangular id ∧ ∀ i, (theta b).val i i = (b.val i.rev i.rev)⁻¹ := by
+private theorem theta_tri {k : Type} [Field k] (b : GL (Fin 3) k) (hb : b.val.BlockTriangular id)
+    : (theta b).val.BlockTriangular id ∧ ∀ i, (theta b).val i i = (b.val i.rev i.rev)⁻¹ := by
   have hc : ((b⁻¹ : GL (Fin 3) k)).val.BlockTriangular id := by
     haveI : Invertible b.val := ⟨(b⁻¹ : GL (Fin 3) k).val, Units.inv_mul b, Units.mul_inv b⟩
     rw [Matrix.coe_units_inv]
@@ -92,13 +113,16 @@ private theorem theta_tri {k : Type} [Field k] (b : GL (Fin 3) k) (hb : b.val.Bl
     exact hc (show id i.rev < id j.rev from Fin.rev_lt_rev.2 hij)
   · rw [he, hd]
 
-private theorem gg_conj_pos {k : Type} [CommRing k] (x y : GG (m := 3) (R := k)) (h1 : x.right = 1) (h2 : y.right = 1) :
-    (x * y * x⁻¹).left = x.left * y.left * x.left⁻¹ := by
+private theorem gg_conj_pos
+    {k : Type} [CommRing k] (x y : GG (m := 3) (R := k)) (h1 : x.right = 1) (h2 : y.right = 1)
+    : (x * y * x⁻¹).left = x.left * y.left * x.left⁻¹ := by
   simp [SemidirectProduct.mul_left, SemidirectProduct.inv_left, h1, h2, sgnAct_one]
 
-private theorem gg_conj_neg {k : Type} [CommRing k] (x y : GG (m := 3) (R := k)) (h1 : x.right = -1) (h2 : y.right = 1) :
-    (x * y * x⁻¹).left = x.left * theta y.left * x.left⁻¹ := by
-  simp [SemidirectProduct.mul_left, SemidirectProduct.inv_left, h1, h2, sgnAct_neg_one, sgnAct_one, theta_theta]
+private theorem gg_conj_neg
+    {k : Type} [CommRing k] (x y : GG (m := 3) (R := k)) (h1 : x.right = -1) (h2 : y.right = 1)
+    : (x * y * x⁻¹).left = x.left * theta y.left * x.left⁻¹ := by
+  simp [SemidirectProduct.mul_left, SemidirectProduct.inv_left, h1, h2, sgnAct_neg_one, sgnAct_one,
+    theta_theta]
 
 section Mv
 
@@ -107,9 +131,11 @@ variable {Γ k : Type} [Group Γ] [Field k]
 private def dRes (c : Γ →* Γ) (H H' : Subgroup Γ) (hc : ∀ s ∈ H', c s ∈ H) : ↥H' →* ↥H :=
   (c.comp H'.subtype).codRestrict H fun s => hc s s.2
 
-private theorem flag_pos (ρ : Γ →* GL (Fin 3) k) (c : Γ →* Γ) (H H' : Subgroup Γ) (hc : ∀ s ∈ H', c s ∈ H)
-    (κ : Fin 3 → ↥H →* kˣ) (hf : Af.IsFlagOn ρ H κ) (a : GL (Fin 3) k) (ha : ∀ s, ρ (c s) = a * ρ s * a⁻¹) :
-    Af.IsFlagOn ρ H' fun i => (κ i).comp (dRes c H H' hc) := by
+private theorem flag_pos
+    (ρ : Γ →* GL (Fin 3) k) (c : Γ →* Γ) (H H' : Subgroup Γ)
+    (hc : ∀ s ∈ H', c s ∈ H) (κ : Fin 3 → ↥H →* kˣ) (hf : Af.IsFlagOn ρ H κ)
+    (a : GL (Fin 3) k) (ha : ∀ s, ρ (c s) = a * ρ s * a⁻¹)
+    : Af.IsFlagOn ρ H' fun i => (κ i).comp (dRes c H H' hc) := by
   obtain ⟨P, hP⟩ := hf
   refine ⟨P * a, fun s => ?_⟩
   have e : (P * a) * ρ s * (P * a)⁻¹ = P * ρ (dRes c H H' hc s : Γ) * P⁻¹ := by
@@ -118,27 +144,35 @@ private theorem flag_pos (ρ : Γ →* GL (Fin 3) k) (c : Γ →* Γ) (H H' : Su
   rw [e]
   exact hP (dRes c H H' hc s)
 
-private theorem flag_neg (ρ : Γ →* GL (Fin 3) k) (c : Γ →* Γ) (H H' : Subgroup Γ) (hc : ∀ s ∈ H', c s ∈ H)
-    (κ : Fin 3 → ↥H →* kˣ) (hf : Af.IsFlagOn ρ H κ) (a : GL (Fin 3) k) (ha : ∀ s, ρ (c s) = a * theta (ρ s) * a⁻¹) :
-    Af.IsFlagOn ρ H' fun i => ((κ i.rev).comp (dRes c H H' hc))⁻¹ := by
+private theorem flag_neg
+    (ρ : Γ →* GL (Fin 3) k) (c : Γ →* Γ) (H H' : Subgroup Γ)
+    (hc : ∀ s ∈ H', c s ∈ H) (κ : Fin 3 → ↥H →* kˣ) (hf : Af.IsFlagOn ρ H κ)
+    (a : GL (Fin 3) k) (ha : ∀ s, ρ (c s) = a * theta (ρ s) * a⁻¹)
+    : Af.IsFlagOn ρ H' fun i => ((κ i.rev).comp (dRes c H H' hc))⁻¹ := by
   obtain ⟨P, hP⟩ := hf
   refine ⟨theta (P * a), fun s => ?_⟩
   have t : ∀ x : GL (Fin 3) k, theta x = thetaAut 3 k x := fun _ => rfl
-  have e : theta (P * a) * ρ s * (theta (P * a))⁻¹ = theta (P * ρ (dRes c H H' hc s : Γ) * P⁻¹) := by
+  have e
+      : theta (P * a) * ρ s * (theta (P * a))⁻¹ = theta (P * ρ (dRes c H H' hc s : Γ) * P⁻¹) := by
     rw [show ((dRes c H H' hc s : ↥H) : Γ) = c s from rfl, ha]
     simp only [t, map_mul, map_inv]
     simp only [← t, theta_theta]
     group
   obtain ⟨h1, h2⟩ := hP (dRes c H H' hc s)
-  obtain ⟨h3, h4⟩ := theta_tri _ (show ((P * ρ (dRes c H H' hc s : Γ) * P⁻¹ : GL (Fin 3) k)).val.BlockTriangular id from
-    fun i j hij => h1 i j hij)
+  obtain ⟨h3, h4⟩ :=
+    theta_tri _
+      (show ((P * ρ (dRes c H H' hc s : Γ) * P⁻¹ : GL (Fin 3) k)).val.BlockTriangular id from
+        fun i j hij => h1 i j hij)
   rw [e]
   refine ⟨fun i j hij => h3 hij, fun i => ?_⟩
   rw [h4, h2]
   simp
 
-private theorem val_move {Ω : Type} [Field Ω] [CharZero Ω] {A A' : ValuationSubring Ω} (u : G ℚ Ω) (hA : ∀ x, x ∈ A' ↔ u x ∈ A) (n : ℕ)
-    (h : A.valuation (n : Ω) < 1) : A'.valuation (n : Ω) < 1 := by
+private theorem val_move
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    {A A' : ValuationSubring Ω} (u : G ℚ Ω) (hA : ∀ x, x ∈ A' ↔ u x ∈ A)
+    (n : ℕ) (h : A.valuation (n : Ω) < 1)
+    : A'.valuation (n : Ω) < 1 := by
   rw [valuation_lt_one_iff'] at h ⊢
   have e1 : u (n : Ω) = n := map_natCast u n
   have e2 : u ((n : Ω)⁻¹) = (n : Ω)⁻¹ := by rw [map_inv₀, e1]
@@ -148,22 +182,30 @@ end Mv
 
 section Move
 
-variable {Ω K : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
+variable
+  {Ω K : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Field K] [NumberField K] [Algebra K Ω]
+  [IsAlgClosure K Ω]
   {l : ℕ} [Fact l.Prime]
 
-private theorem move_all (ρ : G K Ω →* GL (Fin 3) (Qbar l)) (R : G ℚ Ω →* GG (m := 3) (R := Qbar l))
+private theorem move_all
+    (ρ : G K Ω →* GL (Fin 3) (Qbar l)) (R : G ℚ Ω →* GG (m := 3) (R := Qbar l))
     (hρ : ∀ s, ρ s = (R (galEmb ℚ K Ω s)).left) (hK : ∀ s, (R (galEmb ℚ K Ω s)).right = 1)
-    (hN : (galOf ℚ K Ω).Normal) (u : G ℚ Ω) (P P' : ValuationSubring Ω) (hP : ∀ x, x ∈ P' ↔ u x ∈ P)
-    (κ : Fin 3 → ↥(Dec (F := K) P) →* (Qbar l)ˣ) (hf : Af.IsFlagOn ρ (Dec (F := K) P) κ) (hp : Af.PotCrysAt ρ P)
-    (i j : Fin 3) (hij : κ i = κ j * (cycBar K Ω l).comp (Dec (F := K) P).subtype) :
-    Af.PotCrysAt ρ P' ∧ ∃ κ' : Fin 3 → ↥(Dec (F := K) P') →* (Qbar l)ˣ, Af.IsFlagOn ρ (Dec (F := K) P') κ' ∧
-      ∃ i' j', κ' i' = κ' j' * (cycBar K Ω l).comp (Dec (F := K) P').subtype := by
+    (hN : (galOf ℚ K Ω).Normal)
+    (u : G ℚ Ω) (P P' : ValuationSubring Ω)
+    (hP : ∀ x, x ∈ P' ↔ u x ∈ P) (κ : Fin 3 → ↥(Dec (F := K) P) →* (Qbar l)ˣ)
+    (hf : Af.IsFlagOn ρ (Dec (F := K) P) κ) (hp : Af.PotCrysAt ρ P)
+    (i j : Fin 3) (hij : κ i = κ j * (cycBar K Ω l).comp (Dec (F := K) P).subtype)
+    : Af.PotCrysAt ρ P'
+      ∧ ∃ κ' : Fin 3 → ↥(Dec (F := K) P') →* (Qbar l)ˣ,
+        Af.IsFlagOn ρ (Dec (F := K) P') κ'
+          ∧ ∃ i' j', κ' i' = κ' j' * (cycBar K Ω l).comp (Dec (F := K) P').subtype := by
   have hinj : Function.Injective (galEmb ℚ K Ω) := (galEmbTop ℚ K Ω).1.injective
   haveI hNr : (galEmb ℚ K Ω).range.Normal := by rw [range_galEmb]; exact hN
   let e := MonoidHom.ofInjective hinj
   let c : G K Ω ≃* G K Ω := (e.trans (MulAut.conjNormal u)).trans e.symm
   have hc : ∀ s, galEmb ℚ K Ω (c s) = u * galEmb ℚ K Ω s * u⁻¹ := fun s =>
-    (MonoidHom.apply_ofInjective_symm hinj _).trans (by simp [e, MulAut.conjNormal_apply, MonoidHom.ofInjective_apply])
+    (MonoidHom.apply_ofInjective_symm hinj _).trans
+      (by simp [e, MulAut.conjNormal_apply, MonoidHom.ofInjective_apply])
   have hgP : u • P' = P := by
     ext x
     rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, hP]
@@ -177,33 +219,55 @@ private theorem move_all (ρ : G K Ω →* GL (Fin 3) (Qbar l)) (R : G ℚ Ω �
     rw [hc, map_mul, map_mul, map_inv, mul_inv_cancel_comm]
   have hρc : ∀ s, ρ (c s) = (R u * R (galEmb ℚ K Ω s) * (R u)⁻¹).left := fun s => by
     rw [hρ, hc, map_mul, map_mul, map_inv]
-  have h1 : Af.PotCrysAt (ρ.comp c.toMonoidHom) P' := UpperTheory.potentiallyCrystalline_comp_conjugation u c hc ρ P P' hP hp
-  have hev : ∀ s : ↥(Dec (F := K) P'), ((κ i).comp (dRes c.toMonoidHom _ _ hd)) s =
-      ((κ j).comp (dRes c.toMonoidHom _ _ hd)) s * (cycBar K Ω l).comp (Dec (F := K) P').subtype s := fun s => by
+  have h1 : Af.PotCrysAt (ρ.comp c.toMonoidHom) P' :=
+    UpperTheory.potentiallyCrystalline_comp_conjugation u c hc ρ P P' hP hp
+  have hev
+      : ∀ s : ↥(Dec (F := K) P'),
+        ((κ i).comp (dRes c.toMonoidHom _ _ hd)) s
+          = ((κ j).comp (dRes c.toMonoidHom _ _ hd)) s
+            * (cycBar K Ω l).comp (Dec (F := K) P').subtype s := fun s => by
     have := DFunLike.congr_fun hij (dRes c.toMonoidHom _ _ hd s)
-    rw [MonoidHom.comp_apply, MonoidHom.comp_apply, this, MonoidHom.mul_apply, MonoidHom.comp_apply, MonoidHom.comp_apply]
+    rw [MonoidHom.comp_apply, MonoidHom.comp_apply, this, MonoidHom.mul_apply, MonoidHom.comp_apply,
+      MonoidHom.comp_apply]
     exact congrArg _ (hcyc s)
   rcases Int.units_eq_one_or (R u).right with hu | hu
   · have ha : ∀ s, ρ (c.toMonoidHom s) = (R u).left * ρ s * (R u).left⁻¹ := fun s => by
       rw [hρ s]
       exact (hρc s).trans (gg_conj_pos _ _ hu (hK s))
-    refine ⟨h1.of_iso ⟨(R u).left⁻¹, fun s => ?_⟩, _, flag_pos ρ c.toMonoidHom _ _ hd κ hf _ ha, i, j, MonoidHom.ext hev⟩
+    refine ⟨
+      h1.of_iso ⟨(R u).left⁻¹, fun s => ?_⟩,
+      _,
+      flag_pos ρ c.toMonoidHom _ _ hd κ hf _ ha,
+      i,
+      j,
+      MonoidHom.ext hev
+    ⟩
     rw [MonoidHom.comp_apply, ha]
     group
   · have ha : ∀ s, ρ (c.toMonoidHom s) = (R u).left * theta (ρ s) * (R u).left⁻¹ := fun s => by
       rw [hρ s]
       exact (hρc s).trans (gg_conj_neg _ _ hu (hK s))
-    let r₂ : G K Ω →* GL (Fin 3) (Qbar l) :=
-      { toFun := fun s => trInv (ρ (c s))
-        map_one' := by
-          apply Units.ext
-          simp [trInv_val]
-        map_mul' := fun a b => by rw [map_mul, map_mul, trInv_mul] }
-    have h2 : Af.PotCrysAt r₂ P' := UpperTheory.potentiallyCrystalline_contragredient (ρ.comp c.toMonoidHom) r₂ P' (fun s => rfl) h1
+    let r₂ : G K Ω →* GL (Fin 3) (Qbar l) := {
+      toFun := fun s => trInv (ρ (c s))
+      map_one' := by
+        apply Units.ext
+        simp [trInv_val]
+      map_mul' := fun a b => by rw [map_mul, map_mul, trInv_mul]
+    }
+    have h2 : Af.PotCrysAt r₂ P' :=
+      UpperTheory.potentiallyCrystalline_contragredient (ρ.comp c.toMonoidHom) r₂ P'
+        (fun s => rfl)
+        h1
     have hJ : (Jgl (R := Qbar l) 3)⁻¹ = Jgl (R := Qbar l) 3 := inv_eq_of_mul_eq_one_left Jgl_mul_Jgl
     have t : ∀ x : GL (Fin 3) (Qbar l), theta x = thetaAut 3 (Qbar l) x := fun _ => rfl
-    refine ⟨h2.of_iso ⟨(theta (R u).left)⁻¹ * Jgl (R := Qbar l) 3, fun s => ?_⟩, _, flag_neg ρ c.toMonoidHom _ _ hd κ hf _ ha,
-      j.rev, i.rev, MonoidHom.ext fun s => ?_⟩
+    refine ⟨
+      h2.of_iso ⟨(theta (R u).left)⁻¹ * Jgl (R := Qbar l) 3, fun s => ?_⟩,
+      _,
+      flag_neg ρ c.toMonoidHom _ _ hd κ hf _ ha,
+      j.rev,
+      i.rev,
+      MonoidHom.ext fun s => ?_
+    ⟩
     · have h3 : theta (ρ (c s)) = theta (R u).left * ρ s * (theta (R u).left)⁻¹ := by
         have := congrArg theta (ha s)
         simp only [t, map_mul, map_inv] at this ⊢
@@ -211,7 +275,10 @@ private theorem move_all (ρ : G K Ω →* GL (Fin 3) (Qbar l)) (R : G ℚ Ω �
         exact this
       have h4 : theta (ρ (c s)) = Jgl (R := Qbar l) 3 * r₂ s * Jgl (R := Qbar l) 3 := rfl
       rw [_root_.mul_inv_rev, inv_inv, hJ]
-      calc ρ s = (theta (R u).left)⁻¹ * (theta (R u).left * ρ s * (theta (R u).left)⁻¹) * theta (R u).left := by group
+      calc
+        ρ s = (theta (R u).left)⁻¹ * (theta (R u).left * ρ s * (theta (R u).left)⁻¹)
+            * theta (R u).left := by
+          group
         _ = _ := by rw [← h3, h4]; simp only [mul_assoc]
     · have := hev s
       simp only [MonoidHom.mul_apply, MonoidHom.inv_apply, Fin.rev_rev]
@@ -220,24 +287,32 @@ private theorem move_all (ρ : G K Ω →* GL (Fin 3) (Qbar l)) (R : G ℚ Ω �
 
 end Move
 
-private theorem lc_of_ker {Γ C : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group C] (η : Γ →* C)
-    (h : IsOpen (η.ker : Set Γ)) : IsLocallyConstant η :=
-  (IsLocallyConstant.iff_exists_open _).2 fun x =>
-    ⟨(fun y => x⁻¹ * y) ⁻¹' η.ker, h.preimage (continuous_const.mul continuous_id), by simp, fun y hy => by
+private theorem lc_of_ker
+    {Γ C : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group C]
+    (η : Γ →* C) (h : IsOpen (η.ker : Set Γ))
+    : IsLocallyConstant η :=
+  (IsLocallyConstant.iff_exists_open _).2 fun x => ⟨
+    (fun y => x⁻¹ * y) ⁻¹' η.ker,
+    h.preimage (continuous_const.mul continuous_id),
+    by simp,
+    fun y hy => by
       have : η (x⁻¹ * y) = 1 := hy
       rw [map_mul, map_inv, inv_mul_eq_one] at this
-      exact this.symm⟩
+      exact this.symm
+  ⟩
 
 end UpperTheory.V.Z.J.UnitaryRankTwoFlags
 
-attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
+attribute [-instance]
+  UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
 attribute [local instance 10000] IsDiscreteValuationRing.toIsLocalRing
 
 set_option maxHeartbeats 1000000 in
-open UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Th.End3 UpperTheory.V.Z.J.UnitaryRankTwoFlags in
-theorem UpperTheory.V.Z.J.unlEnd3E :
-    LinkedUnlE → UnlEndLogNorm := by
-  intro hU Ω _ _ _ l _ c _ N _ e ψ η σ g₁ B M H hev hΨ hF A _ _ r hr hirr K _ _ _ _ _ hK2 hker ρ hρ N' hN' hlev
+open UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Th.End3
+  UpperTheory.V.Z.J.UnitaryRankTwoFlags in
+theorem UpperTheory.V.Z.J.unlEnd3E : LinkedUnlE → UnlEndLogNorm := by
+  intro hU Ω _ _ _ l _ c _ N _ e ψ η σ g₁ B M H hev hΨ hF A _ _ r hr hirr K _ _ _ _ _ hK2 hker ρ hρ
+    N' hN' hlev
   obtain ⟨L, _, _, _, _, g₂, Φ, C₀, ⟨k⟩, hok, hbig, hseed⟩ := hF
   haveI := algClo L Ω
   obtain ⟨hcpl, hloc, hcont⟩ := sub_facts c A
@@ -249,36 +324,48 @@ theorem UpperTheory.V.Z.J.unlEnd3E :
     intro h0
     exact hok.l_odd ((Nat.prime_dvd_prime_iff_eq Fact.out Nat.prime_two).1
       ((CharP.cast_eq_zero_iff (ResidueField c.O) l 2).1 (by exact_mod_cast h0)))
-  have mapConj {S : Type} [CommRing S] (f : A →+* S) (a : GL (Fin 3) A) (r₁ : G ℚ Ω →* GG (m := 3) (R := A)) :
-      (GG.map f).comp (conjBy a r₁) = conjBy (Matrix.GeneralLinearGroup.map f a) ((GG.map f).comp r₁) := by
+  have mapConj
+      {S : Type} [CommRing S] (f : A →+* S) (a : GL (Fin 3) A) (r₁ : G ℚ Ω →* GG (m := 3) (R := A))
+      : (GG.map f).comp (conjBy a r₁)
+        = conjBy (Matrix.GeneralLinearGroup.map f a) ((GG.map f).comp r₁) := by
     have e : GG.map f (GG.ofGL a) = GG.ofGL (Matrix.GeneralLinearGroup.map f a) := rfl
     refine MonoidHom.ext fun g => ?_
-    simp only [conjBy, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply, map_mul, map_inv, e]
-  have conjLeft {S : Type} [CommRing S] (a : GL (Fin 3) S) (r₁ : G ℚ Ω →* GG (m := 3) (R := S)) (g : G ℚ Ω) :
-      (conjBy a r₁ g).left = a * (r₁ g).left * sgnAct 3 S (r₁ g).right a⁻¹ := by
+    simp only [conjBy, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply, map_mul,
+      map_inv, e]
+  have conjLeft
+      {S : Type} [CommRing S] (a : GL (Fin 3) S) (r₁ : G ℚ Ω →* GG (m := 3) (R := S)) (g : G ℚ Ω)
+      : (conjBy a r₁ g).left = a * (r₁ g).left * sgnAct 3 S (r₁ g).right a⁻¹ := by
     simp [conjBy]
   let f₀ := (residue A).comp (algebraMap c.O A)
   let Ψ := Chr.Psi l e (Chr.dirG ℚ Ω ψ)
   let Ψ₀ := (Units.map f₀.toMonoidHom).comp Ψ
-  obtain ⟨h, hh, hN⟩ := exists_normalised η Ψ₀ σ g₂ r
-    (by simpa only [map_ofNat] using h2.map (algebraMap c.O A))
-    ⟨hM.csq, hM.ηc, by simpa [Ψ₀, Ψ] using congrArg (Units.map f₀.toMonoidHom) hM.Ψc,
-      hM.ηg, by simpa [Ψ₀] using hM.Ψg.map f₀⟩ (by
-      refine MonoidHom.ext fun g => SemidirectProduct.ext (Units.ext ?_) (hr.red.mult g)
-      have e : (tor c.O (Ψ g)).val.map f₀ = (tor (ResidueField A) (Ψ₀ g)).val := by
-        rw [tor_val, tor_val, Matrix.diagonal_map (map_zero f₀)]
-        congr 1
-        funext i
-        rw [show Ψ₀ g = Units.map f₀.toMonoidHom (Ψ g) from rfl, ← map_zpow (Units.map f₀.toMonoidHom)]
-        rfl
-      rw [unitaryThreeReflection_left, ← e]
-      ext a b
-      have hz : residue A ((r g).mat a b - algebraMap c.O A ((r0 η Ψ g).mat a b)) = 0 :=
-        (residue_eq_zero_iff _).2 (hr.red.red g a b)
-      rw [(residue A).map_sub] at hz
-      exact sub_eq_zero.mp hz)
-  have congOne (a : GL (Fin 3) A) :
-      CongOne (maximalIdeal A) a ↔ Matrix.GeneralLinearGroup.map (Ideal.Quotient.mk (maximalIdeal A)) a = 1 := by
+  obtain ⟨h, hh, hN⟩ :=
+    exists_normalised η Ψ₀ σ g₂ r (by simpa only [map_ofNat] using h2.map (algebraMap c.O A))
+      ⟨
+        hM.csq,
+        hM.ηc,
+        by simpa [Ψ₀, Ψ] using congrArg (Units.map f₀.toMonoidHom) hM.Ψc,
+        hM.ηg,
+        by simpa [Ψ₀] using hM.Ψg.map f₀
+      ⟩
+      (by
+        refine MonoidHom.ext fun g => SemidirectProduct.ext (Units.ext ?_) (hr.red.mult g)
+        have e : (tor c.O (Ψ g)).val.map f₀ = (tor (ResidueField A) (Ψ₀ g)).val := by
+          rw [tor_val, tor_val, Matrix.diagonal_map (map_zero f₀)]
+          congr 1
+          funext i
+          rw [show Ψ₀ g = Units.map f₀.toMonoidHom (Ψ g) from rfl,
+            ← map_zpow (Units.map f₀.toMonoidHom)]
+          rfl
+        rw [unitaryThreeReflection_left, ← e]
+        ext a b
+        have hz : residue A ((r g).mat a b - algebraMap c.O A ((r0 η Ψ g).mat a b)) = 0 :=
+          (residue_eq_zero_iff _).2 (hr.red.red g a b)
+        rw [(residue A).map_sub] at hz
+        exact sub_eq_zero.mp hz)
+  have congOne (a : GL (Fin 3) A)
+      : CongOne (maximalIdeal A) a
+        ↔ Matrix.GeneralLinearGroup.map (Ideal.Quotient.mk (maximalIdeal A)) a = 1 := by
     constructor
     · intro ha
       apply Units.ext
@@ -286,34 +373,48 @@ theorem UpperTheory.V.Z.J.unlEnd3E :
       have he := Ideal.Quotient.eq.2 (ha i j)
       by_cases hij : i = j <;> simpa [Matrix.one_apply, hij] using he
     · intro ha i j
-      refine Ideal.Quotient.eq.1 ((congrArg (fun x : GL (Fin 3) (A ⧸ maximalIdeal A) => x.val i j) ha).trans ?_)
+      refine Ideal.Quotient.eq.1
+        ((congrArg (fun x : GL (Fin 3) (A ⧸ maximalIdeal A) => x.val i j) ha).trans ?_)
       by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
   have hr' : Pr.OrdPt l η Ψ σ g₂ B (conjBy h r) := by
-    refine ⟨⟨fun g => (show (conjBy h r g).right = (r g).right by simp [conjBy]).trans (hr.red.mult g),
-      fun g a b => ?_⟩, fun n => ?_, hN, fun B' h₁ s h₂ h₃ h₄ => ?_, ?_⟩
+    refine ⟨
+      ⟨
+        fun g => (show (conjBy h r g).right = (r g).right by simp [conjBy]).trans (hr.red.mult g),
+        fun g a b => ?_
+      ⟩,
+      fun n => ?_,
+      hN,
+      fun B' h₁ s h₂ h₃ h₄ => ?_,
+      ?_
+    ⟩
     · have he := DFunLike.congr_fun (mapConj (Ideal.Quotient.mk (maximalIdeal A)) h r) g
       rw [(congOne h).1 hh] at he
-      have he' : (conjBy h r g).mat.map (Ideal.Quotient.mk (maximalIdeal A)) =
-          (r g).mat.map (Ideal.Quotient.mk (maximalIdeal A)) := by
+      have he'
+          : (conjBy h r g).mat.map (Ideal.Quotient.mk (maximalIdeal A))
+            = (r g).mat.map (Ideal.Quotient.mk (maximalIdeal A)) := by
         refine (congrArg GG.mat he).trans ?_
         simp [conjBy]
-      exact Ideal.Quotient.eq.1 ((congrFun (congrFun he' a) b).trans (Ideal.Quotient.eq.2 (hr.red.red g a b)))
+      exact Ideal.Quotient.eq.1 ((congrFun (congrFun he' a) b).trans
+        (Ideal.Quotient.eq.2 (hr.red.red g a b)))
     · have hη := lc_of_ker η (hker ▸ (galEmbTop ℚ K Ω).2.1)
-      have := ((hr.cont n).prodMk hη).comp fun p : Matrix (Fin 3) (Fin 3) (A ⧸ maximalIdeal A ^ n) × ℤˣ =>
-        h.val.map (Ideal.Quotient.mk (maximalIdeal A ^ n)) * p.1 *
-          (sgnAct 3 A p.2 h⁻¹).val.map (Ideal.Quotient.mk (maximalIdeal A ^ n))
+      have :=
+        ((hr.cont n).prodMk hη).comp fun p : Matrix (Fin 3) (Fin 3) (A ⧸ maximalIdeal A ^ n) × ℤˣ =>
+          h.val.map (Ideal.Quotient.mk (maximalIdeal A ^ n)) * p.1
+            * (sgnAct 3 A p.2 h⁻¹).val.map (Ideal.Quotient.mk (maximalIdeal A ^ n))
       convert this using 1
       funext g
-      rw [GG.mat, conjLeft, hr.red.mult g, Units.val_mul, Units.val_mul, Matrix.map_mul, Matrix.map_mul]
+      rw [GG.mat, conjLeft, hr.red.mult g, Units.val_mul, Units.val_mul, Matrix.map_mul,
+        Matrix.map_mul]
       rfl
     · show GG.ofGL h * r s * (GG.ofGL h)⁻¹ = 1
       rw [hr.away B' h₁ s h₂ h₃ h₄, mul_one, mul_inv_cancel]
     · obtain ⟨a, ha, htri⟩ := hr.ord
-      have he : conjBy (h * a)⁻¹ ((conjBy h r).comp (Dec (F := ℚ) B).subtype) =
-          conjBy a⁻¹ (r.comp (Dec (F := ℚ) B).subtype) := by
+      have he
+          : conjBy (h * a)⁻¹ ((conjBy h r).comp (Dec (F := ℚ) B).subtype)
+            = conjBy a⁻¹ (r.comp (Dec (F := ℚ) B).subtype) := by
         refine MonoidHom.ext fun g => ?_
-        change GG.ofGL (h * a)⁻¹ * (GG.ofGL h * r g * (GG.ofGL h)⁻¹) * (GG.ofGL (h * a)⁻¹)⁻¹ =
-          GG.ofGL a⁻¹ * r g * (GG.ofGL a⁻¹)⁻¹
+        change GG.ofGL (h * a)⁻¹ * (GG.ofGL h * r g * (GG.ofGL h)⁻¹) * (GG.ofGL (h * a)⁻¹)⁻¹
+          = GG.ofGL a⁻¹ * r g * (GG.ofGL a⁻¹)⁻¹
         simp only [map_mul, map_inv]
         group
       refine ⟨h * a, (congOne _).2 ?_, ?_, ?_⟩
@@ -323,40 +424,63 @@ theorem UpperTheory.V.Z.J.unlEnd3E :
       · rw [he]
         exact htri.ine
   let h' : GL (Fin 3) (Qbar l) := Matrix.GeneralLinearGroup.map (A.val : A →+* PadicAlgCl l) h
-  have eR : UnitaryThreeInertia.push A.val (conjBy h r) = conjBy h' (UnitaryThreeInertia.push A.val r) := mapConj _ h r
-  have hmat : ∀ g ∈ η.ker, (UnitaryThreeInertia.push A.val (conjBy h r) g).left = h' * (UnitaryThreeInertia.push A.val r g).left * h'⁻¹ := fun g hg => by
-    rw [eR, conjLeft, show (UnitaryThreeInertia.push A.val r g).right = 1 from (hr.red.mult g).trans hg, sgnAct_one]
+  have eR
+      : UnitaryThreeInertia.push A.val (conjBy h r)
+        = conjBy h' (UnitaryThreeInertia.push A.val r) :=
+    mapConj _ h r
+  have hmat
+      : ∀ g ∈ η.ker,
+        (UnitaryThreeInertia.push A.val (conjBy h r) g).left
+          = h' * (UnitaryThreeInertia.push A.val r g).left * h'⁻¹ := fun g hg => by
+    rw [eR, conjLeft,
+      show (UnitaryThreeInertia.push A.val r g).right = 1 from (hr.red.mult g).trans hg, sgnAct_one]
   have hmem : ∀ s : G K Ω, galEmb ℚ K Ω s ∈ η.ker := fun s => hker ▸ galEmb_mem ℚ K Ω s
   let ρ' : G K Ω →* GL (Fin 3) (Qbar l) := (MulAut.conj h').toMonoidHom.comp ρ
   have hiso : ∀ s, ρ' s = h' * ρ s * h'⁻¹ := fun _ => rfl
-  have hρ' : ∀ s, ρ' s = (UnitaryThreeInertia.push A.val (conjBy h r) (galEmb ℚ K Ω s)).left := fun s => by
+  have hρ'
+      : ∀ s,
+        ρ' s = (UnitaryThreeInertia.push A.val (conjBy h r) (galEmb ℚ K Ω s)).left := fun s => by
     rw [hmat _ (hmem s), hiso, show ρ s = _ from Units.ext (hρ s)]
   have hLη : galOf ℚ L Ω ≤ η.ker := Db.galL_le k
-  have hirrU : ∀ U : Subgroup (G ℚ Ω), IsOpen (U : Set (G ℚ Ω)) → U ≤ η.ker →
-      MatIrr U (mats (UnitaryThreeInertia.push A.val (conjBy h r))) := fun U h1 h3 =>
+  have hirrU
+      : ∀ U : Subgroup (G ℚ Ω),
+        IsOpen (U : Set (G ℚ Ω)) → U ≤ η.ker
+          → MatIrr U (mats (UnitaryThreeInertia.push A.val (conjBy h r))) := fun U h1 h3 =>
     matIrr_conj (hirr U h1 h3) h' fun g hg => congrArg Units.val (hmat g (h3 hg))
   generalize conjBy h r = r' at hr' hρ' hirrU
   have hright : ∀ g, (UnitaryThreeInertia.push A.val r' g).right = η g := hr'.red.mult
-  have hK : ∀ s, (UnitaryThreeInertia.push A.val r' (galEmb ℚ K Ω s)).right = 1 := fun s => (hright _).trans (hmem s)
+  have hK : ∀ s, (UnitaryThreeInertia.push A.val r' (galEmb ℚ K Ω s)).right = 1 := fun s =>
+    (hright _).trans (hmem s)
   obtain ⟨_, _⟩ := Db.algKL K L Ω (hLη.trans hker.le)
   obtain ⟨ν, n1, n2, n3⟩ := Pr.exists_nrep3 k hok hl hσ r' hr'
   have key := hU Ω l c N e ψ η σ g₂ B M H hev L Φ C₀ k hok hbig hseed
   have n4 : ∀ s, (ρ'.comp (galEmb K L Ω) s).val = (ν.r (k.p0 s)).map A.val := fun s => by
     rw [n2, MonoidHom.comp_apply, hρ']
     rfl
-  have n5 : ∀ v i, ∀ g ∈ Φ.Iv v, (ν.ψ v i g).val =
-      algebraMap c.O A (Chr.Psi l e (Chr.dirG ℚ Ω ψ) (k.j v g) ^ Fr.w 3 i).val := fun v i g hg => by
+  have n5
+      : ∀ v i, ∀ g ∈ Φ.Iv v,
+        (ν.ψ v i g).val
+          = algebraMap c.O A
+            (Chr.Psi l e (Chr.dirG ℚ Ω ψ) (k.j v g) ^ Fr.w 3 i).val := fun v i g hg => by
     rw [n3 v i g hg, Fr.w, if_pos rfl]
     rfl
-  have irr : ∀ U : Subgroup (G L Ω), IsOpen (U : Set (G L Ω)) → Af.IsIrr ((ρ'.comp (galEmb K L Ω)).comp U.subtype) := by
+  have irr
+      : ∀ U : Subgroup (G L Ω),
+        IsOpen (U : Set (G L Ω)) → Af.IsIrr ((ρ'.comp (galEmb K L Ω)).comp U.subtype) := by
     intro U hUo
-    have hoe : Topology.IsOpenEmbedding (galEmb ℚ L Ω) :=
-      ⟨(galEmbTop ℚ L Ω).1, by
+    have hoe : Topology.IsOpenEmbedding (galEmb ℚ L Ω) := ⟨
+      (galEmbTop ℚ L Ω).1,
+      by
         rw [← MonoidHom.coe_range, range_galEmb]
-        exact (galEmbTop ℚ L Ω).2.1⟩
+        exact (galEmbTop ℚ L Ω).2.1
+    ⟩
     refine Db.irr_of_matIrr (by norm_num) (U.map (galEmb ℚ L Ω)) _
-      (hirrU (U.map (galEmb ℚ L Ω)) (hoe.isOpenMap _ hUo) (Subgroup.map_le_iff_le_comap.2 fun s _ => hLη (galEmb_mem ℚ L Ω s)))
-      ((galEmb ℚ L Ω).comp U.subtype) (fun g hg => ?_) _ fun s => ?_
+      (hirrU (U.map (galEmb ℚ L Ω)) (hoe.isOpenMap _ hUo)
+        (Subgroup.map_le_iff_le_comap.2 fun s _ => hLη (galEmb_mem ℚ L Ω s)))
+      ((galEmb ℚ L Ω).comp U.subtype)
+      (fun g hg => ?_)
+      _
+      fun s => ?_
     · obtain ⟨s, hs, e⟩ := hg
       exact ⟨⟨s, hs⟩, e⟩
     · show (ρ' (galEmb K L Ω s.1)).val = _
@@ -376,8 +500,9 @@ theorem UpperTheory.V.Z.J.unlEnd3E :
   have hAv : ∀ x, x ∈ k.pl v ↔ u x ∈ P := fun x => by
     rw [hPv]
     exact ValuationSubring.smul_mem_pointwise_smul_iff.symm
-  obtain ⟨pot, κ', ⟨Q, fl⟩, i', j', hl'⟩ := move_all ρ' (UnitaryThreeInertia.push A.val r') hρ' hK
-    (by rw [← hker]; exact η.normal_ker) u P (k.pl v) hAv κ (h3.of_iso ⟨h', hiso⟩) (h5.of_iso ⟨h', hiso⟩) i j hij
+  obtain ⟨pot, κ', ⟨Q, fl⟩, i', j', hl'⟩ :=
+    move_all ρ' (UnitaryThreeInertia.push A.val r') hρ' hK (by rw [← hker]; exact η.normal_ker) u P
+      (k.pl v) hAv κ (h3.of_iso ⟨h', hiso⟩) (h5.of_iso ⟨h', hiso⟩) i j hij
   have hlv : (k.pl v).valuation (l : Ω) < 1 := val_move u hAv l hPl
   have hMv : (k.pl v).valuation (M : Ω) < 1 := by
     obtain ⟨t, rfl⟩ := hl
@@ -400,7 +525,11 @@ theorem UpperTheory.V.Z.J.unlEnd3E :
     rw [hloc0]
     exact (n4 (t g)).symm
   have mt : ∀ b, ∃ a, ∀ g, (κ' b (d g) : Qbar l) = f (ν.ψ v a g : A) := fun b =>
-    flag_match (fun g => f.mapMatrix (ν.r (Φ.loc0 v g))) (fun a g => f (ν.ψ v a g : A)) (fun a g => (κ' a (d g) : Qbar l)) Q
+    flag_match
+      (fun g => f.mapMatrix (ν.r (Φ.loc0 v g)))
+      (fun a g => f (ν.ψ v a g : A))
+      (fun a g => (κ' a (d g) : Qbar l))
+      Q
       (fun g => by
         rw [hT]
         exact fun x y hxy => (fl (d g)).1 x y hxy)
@@ -408,12 +537,15 @@ theorem UpperTheory.V.Z.J.unlEnd3E :
         rw [hT]
         exact (fl (d g)).2 x)
       (fun g => by
-        rw [Fr.ordProd_map f (fun s => ν.r (Φ.loc0 v s)) (fun a s => (ν.ψ v a s : A)) g, ν.ord v g, map_zero]) b
+        rw [Fr.ordProd_map f (fun s => ν.r (Φ.loc0 v s)) (fun a s => (ν.ψ v a s : A)) g, ν.ord v g,
+          map_zero])
+      b
   obtain ⟨a, ha⟩ := mt i'
   obtain ⟨b, hb⟩ := mt j'
   obtain ⟨g, hg⟩ := key A ν n1 n5 _ n4 irr v (Br.potRes K L Ω l 3 ρ' _ pot) a b
   apply hg
-  have e1 := congrArg (fun x : ↥(Dec (F := K) (k.pl v)) →* (Qbar l)ˣ => ((x (d g) : (Qbar l)ˣ) : Qbar l)) hl'
+  have e1 :=
+    congrArg (fun x : ↥(Dec (F := K) (k.pl v)) →* (Qbar l)ˣ => ((x (d g) : (Qbar l)ˣ) : Qbar l)) hl'
   have e2 : cycBar K Ω l (d g).1 = cycBar ℚ Ω l (k.j v g).1 := by
     rw [← ht]
     rfl

@@ -8,27 +8,39 @@ public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.Pro
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
 
 namespace GlobalTheory.CompanionTheory.Ar.Conj.GapThreshold
 
-theorem ent_of_lt {T : Type} [Fintype T] {N : ℕ} (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N) (τ : T) {i : ℕ} (h : i < N) :
-    GlobalTheory.CompanionTheory.Ar.Top.ent mu τ i = mu τ ⟨i, h⟩ := by
+theorem ent_of_lt
+    {T : Type} [Fintype T]
+    {N : ℕ} (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N)
+    (τ : T)
+    {i : ℕ} (h : i < N)
+    : GlobalTheory.CompanionTheory.Ar.Top.ent mu τ i = mu τ ⟨i, h⟩ := by
   unfold GlobalTheory.CompanionTheory.Ar.Top.ent
   rw [dif_pos h]
 
-theorem abs_le_norm {T : Type} [Fintype T] {N : ℕ} (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N) (τ : T) (i : Fin N) :
-    |mu τ i| ≤ ‖mu‖ := by
+theorem abs_le_norm
+    {T : Type} [Fintype T]
+    {N : ℕ} (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N)
+    (τ : T) (i : Fin N)
+    : |mu τ i| ≤ ‖mu‖ := by
   have h1 : ‖mu τ i‖ ≤ ‖mu τ‖ := norm_le_pi_norm (mu τ) i
   have h2 : ‖mu τ‖ ≤ ‖mu‖ := norm_le_pi_norm mu τ
   rw [Real.norm_eq_abs] at h1
   exact h1.trans h2
 
-theorem gapCond_of_threshold {T : Type} [Fintype T] {N j p : ℕ} (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N)
-    (hp : 2 < p) (hj : 1 ≤ j) (hjN : j < N) (hd : GlobalTheory.CompanionTheory.Ar.Top.Dominant mu)
-    (ht : GlobalTheory.CompanionTheory.Ar.Top.NefThreshold j p mu) :
-    GapCond p j (N - j) (fun τ i => GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (i - 1)) := by
-  unfold GlobalTheory.CompanionTheory.Ar.Top.NefThreshold GlobalTheory.CompanionTheory.Ar.Top.gap at ht
+theorem gapCond_of_threshold
+    {T : Type} [Fintype T]
+    {N j p : ℕ} (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N) (hp : 2 < p) (hj : 1 ≤ j)
+    (hjN : j < N) (hd : GlobalTheory.CompanionTheory.Ar.Top.Dominant mu)
+    (ht : GlobalTheory.CompanionTheory.Ar.Top.NefThreshold j p mu)
+    : GapCond p j (N - j) (fun τ i => GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (i - 1)) := by
+  unfold GlobalTheory.CompanionTheory.Ar.Top.NefThreshold GlobalTheory.CompanionTheory.Ar.Top.gap
+    at ht
   unfold GlobalTheory.CompanionTheory.Ar.Top.Dominant at hd
   have hp' : (0 : ℝ) < (p : ℝ) - 2 := by
     have : (2 : ℝ) < p := by exact_mod_cast hp
@@ -50,22 +62,31 @@ theorem gapCond_of_threshold {T : Type} [Fintype T] {N j p : ℕ} (mu : GlobalTh
     simp only [Nat.add_sub_cancel]
     rw [div_le_iff₀ hp']
     linarith [ht τ, mul_comm ((p : ℝ) - 2) (GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (j - 1) - GlobalTheory.CompanionTheory.Ar.Top.ent mu τ j)]
-  · have e : ((p : ℝ) - 2) * (4 * (Fintype.card T) * ‖mu‖ / ((p : ℝ) - 2)) = 4 * (Fintype.card T) * ‖mu‖ := by
+  · have e
+        : ((p : ℝ) - 2) * (4 * (Fintype.card T) * ‖mu‖ / ((p : ℝ) - 2))
+          = 4 * (Fintype.card T) * ‖mu‖ := by
       field_simp
     exact e.ge
 
-theorem lmuNum_eq_sum {T : Type} [Fintype T] {N j : ℕ} (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N)
-    (x : T × Fin N → ℝ) (w l : T → ℕ → ℝ) (hjN : j < N)
-    (hx : ∀ τ (i : Fin N), (i : ℕ) < j → x (τ, i) = w τ (i + 1) - w τ i)
-    (hy : ∀ τ (i : Fin N), j ≤ (i : ℕ) → x (τ, i) = -(l τ (N - 1 - i + 1) - l τ (N - 1 - i))) :
-    lmuNum j (N - j) (fun τ i => GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (i - 1)) w l = ∑ r : T × Fin N, -mu r.1 r.2 * x r := by
+theorem lmuNum_eq_sum
+    {T : Type} [Fintype T]
+    {N j : ℕ} (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N) (x : T × Fin N → ℝ)
+    (w l : T → ℕ → ℝ)
+    (hjN : j < N) (hx : ∀ τ (i : Fin N), (i : ℕ) < j → x (τ, i) = w τ (i + 1) - w τ i)
+    (hy : ∀ τ (i : Fin N), j ≤ (i : ℕ) → x (τ, i) = -(l τ (N - 1 - i + 1) - l τ (N - 1 - i)))
+    : lmuNum j (N - j) (fun τ i => GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (i - 1)) w l
+      = ∑ r : T × Fin N, -mu r.1 r.2 * x r := by
   classical
   unfold lmuNum
   set xx : T → ℕ → ℝ := fun τ i => if h : i < N then x (τ, ⟨i, h⟩) else 0 with hxx
-  have hrow : ∀ τ, ∑ i : Fin N, -mu τ i * x (τ, i) =
-      ∑ i ∈ Finset.range N, -GlobalTheory.CompanionTheory.Ar.Top.ent mu τ i * xx τ i := by
+  have hrow
+      : ∀ τ,
+        ∑ i : Fin N, -mu τ i * x (τ, i)
+          = ∑ i ∈ Finset.range N, -GlobalTheory.CompanionTheory.Ar.Top.ent mu τ i * xx τ i := by
     intro τ
-    rw [← Fin.sum_univ_eq_sum_range (fun i => -GlobalTheory.CompanionTheory.Ar.Top.ent mu τ i * xx τ i) N]
+    rw [← Fin.sum_univ_eq_sum_range
+      (fun i => - GlobalTheory.CompanionTheory.Ar.Top.ent mu τ i * xx τ i)
+      N]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp only [hxx, dif_pos i.isLt, ent_of_lt mu τ i.isLt]
   rw [Fintype.sum_prod_type, ← Finset.sum_neg_distrib]
@@ -90,7 +111,16 @@ theorem lmuNum_eq_sum {T : Type} [Fintype T] {N j : ℕ} (mu : GlobalTheory.Comp
     rw [e1, e2]
     ring
 
-theorem gapCond_and_lmuNum : ∀ (T : Type) [Fintype T] (N j p : ℕ) (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N) (x : T × Fin N → ℝ) (w l : T → ℕ → ℝ), 2 < p → 1 ≤ j → j < N → GlobalTheory.CompanionTheory.Ar.Top.Dominant mu → GlobalTheory.CompanionTheory.Ar.Top.NefThreshold j p mu → (∀ τ (i : Fin N), (i : ℕ) < j → x (τ, i) = w τ (i + 1) - w τ i) → (∀ τ (i : Fin N), j ≤ (i : ℕ) → x (τ, i) = -(l τ (N - 1 - i + 1) - l τ (N - 1 - i))) → GapCond p j (N - j) (fun τ i => GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (i - 1)) ∧ lmuNum j (N - j) (fun τ i => GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (i - 1)) w l = ∑ r : T × Fin N, -mu r.1 r.2 * x r := by
+theorem gapCond_and_lmuNum
+    : ∀ (T : Type) [Fintype T] (N j p : ℕ) (mu : GlobalTheory.CompanionTheory.Ar.Top.Wt T N)
+        (x : T × Fin N → ℝ) (w l : T → ℕ → ℝ),
+      2 < p → 1 ≤ j → j < N → GlobalTheory.CompanionTheory.Ar.Top.Dominant mu
+        → GlobalTheory.CompanionTheory.Ar.Top.NefThreshold j p mu
+        → (∀ τ (i : Fin N), (i : ℕ) < j → x (τ, i) = w τ (i + 1) - w τ i)
+        → (∀ τ (i : Fin N), j ≤ (i : ℕ) → x (τ, i) = -(l τ (N - 1 - i + 1) - l τ (N - 1 - i)))
+        → GapCond p j (N - j) (fun τ i => GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (i - 1))
+          ∧ lmuNum j (N - j) (fun τ i => GlobalTheory.CompanionTheory.Ar.Top.ent mu τ (i - 1)) w l
+            = ∑ r : T × Fin N, -mu r.1 r.2 * x r := by
   intro T _ N j p mu x w l hp hj hjN hd ht hx hy
   exact ⟨gapCond_of_threshold mu hp hj hjN hd ht, lmuNum_eq_sum mu x w l hjN hx hy⟩
 

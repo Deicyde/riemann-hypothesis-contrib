@@ -18,38 +18,40 @@ open PositivityTheory.RgUd.Form
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-
 variable (k) in
-def qIter (ψ : AddChar k Circle) {n : ℕ} : (j : ℕ) → (τ : MRep k (n + j)) → τ.V →ₗ[ℂ] (iterPhi k ψ j τ).V
+def qIter (ψ : AddChar k Circle) {n : ℕ}
+    : (j : ℕ) → (τ : MRep k (n + j)) → τ.V →ₗ[ℂ] (iterPhi k ψ j τ).V
   | 0, _ => LinearMap.id
-  | j + 1, τ => (qIter ψ j (MRep.phiM k ψ τ)).comp (twKer τ.ρ (MirUin k (n + j + 1)) (mirChar k ψ (n + j))).mkQ
-
+  | j + 1, τ =>
+    (qIter ψ j (MRep.phiM k ψ τ)).comp (twKer τ.ρ (MirUin k (n + j + 1)) (mirChar k ψ (n + j))).mkQ
 
 variable (k) in
 def emb (n : ℕ) : (j : ℕ) → Mir k n →* Mir k (n + j)
   | 0 => MonoidHom.id _
   | j + 1 => ((levi k (n + j + 1)).comp (Mir k (n + j)).subtype).comp (emb n j)
 
-theorem qIter_surjective (ψ : AddChar k Circle) {n : ℕ} :
-    ∀ (j : ℕ) (τ : MRep k (n + j)), Function.Surjective (qIter k ψ j τ)
+theorem qIter_surjective (ψ : AddChar k Circle) {n : ℕ}
+    : ∀ (j : ℕ) (τ : MRep k (n + j)), Function.Surjective (qIter k ψ j τ)
   | 0, _ => Function.surjective_id
   | j + 1, τ => (qIter_surjective ψ j (MRep.phiM k ψ τ)).comp (Submodule.mkQ_surjective _)
 
-theorem qIter_equiv (ψ : AddChar k Circle) {n : ℕ} :
-    ∀ (j : ℕ) (τ : MRep k (n + j)) (p : Mir k n) (v : τ.V),
+theorem qIter_equiv (ψ : AddChar k Circle) {n : ℕ}
+    : ∀ (j : ℕ) (τ : MRep k (n + j)) (p : Mir k n) (v : τ.V),
       qIter k ψ j τ (τ.ρ (emb k n j p) v) = (iterPhi k ψ j τ).ρ p (qIter k ψ j τ v)
   | 0, _, _, _ => rfl
   | j + 1, τ, p, v => by
-    have ih := qIter_equiv ψ j (MRep.phiM k ψ τ) p
-      ((twKer τ.ρ (MirUin k (n + j + 1)) (mirChar k ψ (n + j))).mkQ v)
+    have ih :=
+      qIter_equiv ψ j (MRep.phiM k ψ τ) p
+        ((twKer τ.ρ (MirUin k (n + j + 1)) (mirChar k ψ (n + j))).mkQ v)
     exact ih
 
-theorem ker_qIter (ψ : AddChar k Circle) {n : ℕ} :
-    ∀ (j : ℕ) (τ : MRep k (n + j)),
-      LinearMap.ker ((twKer (iterPhi k ψ j τ).ρ (MirUin k n) 1).mkQ ∘ₗ qIter k ψ j τ) =
-        twKer τ.ρ (derUnipM k (n + j) n) (derCharM k ψ (n + j) n)
+theorem ker_qIter (ψ : AddChar k Circle) {n : ℕ}
+    : ∀ (j : ℕ) (τ : MRep k (n + j)),
+      LinearMap.ker ((twKer (iterPhi k ψ j τ).ρ (MirUin k n) 1).mkQ ∘ₗ qIter k ψ j τ)
+        = twKer τ.ρ (derUnipM k (n + j) n) (derCharM k ψ (n + j) n)
   | 0, τ => by
-    exact (Submodule.ker_mkQ _).trans (GlobalTheory.T.mirabolic_twisted_kernel_derivative_zero k ψ n τ.V τ.ρ)
+    exact (Submodule.ker_mkQ _).trans
+      (GlobalTheory.T.mirabolic_twisted_kernel_derivative_zero k ψ n τ.V τ.ρ)
   | j + 1, τ => by
     let s := (levi k (n + j + 1)).comp (Mir k (n + j)).subtype
     let N₁ := MirUin k (n + j + 1)
@@ -64,9 +66,8 @@ theorem ker_qIter (ψ : AddChar k Circle) {n : ℕ} :
     let T := twKer σ N₂ θ₂
     have hnm : n ≤ n + j := Nat.le_add_right n j
     have hmap : T = L.map K.mkQ ∧ K ≤ L :=
-      GlobalTheory.CompanionTheory.BZMirStep.twKer_twAct_eq_map τ.ρ N₁ θ₁ s
-        (levi_stab ψ (n + j)) N₂ θ₂ N θ
-        (GlobalTheory.CompanionTheory.BZMirStep.MirUin_step ψ hnm)
+      GlobalTheory.CompanionTheory.BZMirStep.twKer_twAct_eq_map τ.ρ N₁ θ₁ s (levi_stab ψ (n + j)) N₂
+        θ₂ N θ (GlobalTheory.CompanionTheory.BZMirStep.MirUin_step ψ hnm)
         (GlobalTheory.CompanionTheory.BZMirStep.levi_step ψ hnm)
         (GlobalTheory.CompanionTheory.BZMirStep.derUnipM_decomp hnm)
     have hcomap : T.comap K.mkQ = L := by
@@ -75,10 +76,12 @@ theorem ker_qIter (ψ : AddChar k Circle) {n : ℕ} :
     exact (congrArg (Submodule.comap K.mkQ) ih).trans hcomap
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem glEmbMat_apply' (n : ℕ) (A : Matrix (Fin n) (Fin n) k) (a b : Fin (n + 1)) :
-    glEmbMat k n A a b =
-      if ha : (a : ℕ) < n then (if hb : (b : ℕ) < n then A ⟨a, ha⟩ ⟨b, hb⟩ else 0)
-      else (if a = b then 1 else 0) := by
+theorem glEmbMat_apply' (n : ℕ) (A : Matrix (Fin n) (Fin n) k) (a b : Fin (n + 1))
+    : glEmbMat k n A a b
+      = if ha : (a : ℕ) < n then
+          (if hb : (b : ℕ) < n then A ⟨a, ha⟩ ⟨b, hb⟩ else 0)
+        else
+          (if a = b then 1 else 0) := by
   induction a using Fin.lastCases with
   | last =>
     induction b using Fin.lastCases with
@@ -89,13 +92,18 @@ theorem glEmbMat_apply' (n : ℕ) (A : Matrix (Fin n) (Fin n) k) (a b : Fin (n +
     | last => simp [glEmbMat]
     | cast b => simp [glEmbMat]
 
-theorem emb_val (n : ℕ) (p : Mir k n) :
-    ∀ (j : ℕ) (a b : Fin (n + j + 1)),
-      (((emb k n j p : Mir k (n + j)) : GL (Fin (n + j + 1)) k) : Matrix (Fin (n + j + 1)) (Fin (n + j + 1)) k) a b =
-        if ha : (a : ℕ) < n + 1 then
-          (if hb : (b : ℕ) < n + 1 then ((p : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k) ⟨a, ha⟩ ⟨b, hb⟩
-            else 0)
-        else (if a = b then 1 else 0)
+theorem emb_val (n : ℕ) (p : Mir k n)
+    : ∀ (j : ℕ) (a b : Fin (n + j + 1)),
+      (((emb k n j p : Mir k (n + j)) : GL (Fin (n + j + 1)) k)
+            : Matrix (Fin (n + j + 1)) (Fin (n + j + 1)) k)
+          a b
+        = if ha : (a : ℕ) < n + 1 then
+            (if hb : (b : ℕ) < n + 1 then
+               ((p : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k) ⟨a, ha⟩ ⟨b, hb⟩
+             else
+               0)
+          else
+            (if a = b then 1 else 0)
   | 0, a, b => by
     rw [dif_pos a.isLt, dif_pos b.isLt]
     rfl
@@ -123,12 +131,16 @@ theorem emb_val (n : ℕ) (p : Mir k n) :
       have ha' : ¬ (a : ℕ) < n + 1 := by omega
       rw [dif_neg ha']
 
-theorem emb_levi (n j : ℕ) (g : GL (Fin n) k) :
-    ((emb k n j (levi k n g) : Mir k (n + j)) : GL (Fin (n + j + 1)) k) = blkAt k n (n + j + 1) (by omega) g := by
+theorem emb_levi (n j : ℕ) (g : GL (Fin n) k)
+    : ((emb k n j (levi k n g) : Mir k (n + j)) : GL (Fin (n + j + 1)) k)
+      = blkAt k n (n + j + 1) (by omega) g := by
   ext a b
   rw [emb_val, blkAt_apply]
-  have hl : ∀ (a' b' : Fin (n + 1)), (((levi k n g : Mir k n) : GL (Fin (n + 1)) k) :
-      Matrix (Fin (n + 1)) (Fin (n + 1)) k) a' b' = glEmbMat k n (g : Matrix (Fin n) (Fin n) k) a' b' := fun _ _ => rfl
+  have hl
+      : ∀ (a' b' : Fin (n + 1)),
+        (((levi k n g : Mir k n) : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k) a' b'
+          = glEmbMat k n (g : Matrix (Fin n) (Fin n) k) a' b' := fun _ _ =>
+    rfl
   by_cases ha : (a : ℕ) < n
   · have ha' : (a : ℕ) < n + 1 := by omega
     rw [dif_pos ha', dif_pos ha]
@@ -152,14 +164,20 @@ theorem emb_levi (n j : ℕ) (g : GL (Fin n) k) :
         split_ifs with h <;> first | rfl | (simp only [Fin.ext_iff] at h; omega)
     · rw [dif_neg ha']
 
-theorem derDict (ψ : AddChar k Circle) (n j : ℕ) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (GL (Fin (n + j + 1)) k) V) :
-    ∃ q : V →ₗ[ℂ] TwJacquet (iterPhi k ψ j (resM k π)).ρ (MirUin k n) 1, Function.Surjective q ∧
-      LinearMap.ker q = twKer π (derUnip k (n + j + 1) n) (derChar k ψ (n + j + 1) n) ∧
-      ∀ g v, q (π (blkAt k n (n + j + 1) (by omega) g) v) = deriv k ψ j π g (q v) := by
-  refine ⟨(twKer (iterPhi k ψ j (resM k π)).ρ (MirUin k n) 1).mkQ ∘ₗ qIter k ψ j (resM k π), ?_, ?_, ?_⟩
+theorem derDict
+    (ψ : AddChar k Circle)
+    (n j : ℕ)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (GL (Fin (n + j + 1)) k) V)
+    : ∃ q : V →ₗ[ℂ] TwJacquet (iterPhi k ψ j (resM k π)).ρ (MirUin k n) 1,
+      Function.Surjective q
+        ∧ LinearMap.ker q = twKer π (derUnip k (n + j + 1) n) (derChar k ψ (n + j + 1) n)
+        ∧ ∀ g v, q (π (blkAt k n (n + j + 1) (by omega) g) v) = deriv k ψ j π g (q v) := by
+  refine
+    ⟨(twKer (iterPhi k ψ j (resM k π)).ρ (MirUin k n) 1).mkQ ∘ₗ qIter k ψ j (resM k π), ?_, ?_, ?_⟩
   · exact (Submodule.mkQ_surjective _).comp (qIter_surjective ψ j _)
-  · exact (ker_qIter ψ j (resM k π)).trans (GlobalTheory.T.restriction_mirabolic_twisted_kernel k ψ (n + j) n V π)
+  · exact (ker_qIter ψ j (resM k π)).trans
+      (GlobalTheory.T.restriction_mirabolic_twisted_kernel k ψ (n + j) n V π)
   · intro g v
     rw [← emb_levi n j g]
     show (twKer (iterPhi k ψ j (resM k π)).ρ (MirUin k n) 1).mkQ

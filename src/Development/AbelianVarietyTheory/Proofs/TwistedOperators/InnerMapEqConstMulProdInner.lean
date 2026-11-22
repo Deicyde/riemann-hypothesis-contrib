@@ -9,10 +9,11 @@ open scoped InnerProductSpace
 namespace GlobalTheory
 
 theorem MultilinearMap.inner_map_eq_const_mul_prod_inner
-    {ι : Type} [Fintype ι] {Xs : ι → Type} [∀ i, NormedAddCommGroup (Xs i)]
-    [∀ i, InnerProductSpace ℂ (Xs i)] {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    (f : (Π i, Xs i) →ₘₗ[ℂ] E) (K : ℝ) (hf : ∀ x, ‖f x‖ ^ 2 = K * ∏ i, ‖x i‖ ^ 2) :
-    ∀ x y, ⟪f x, f y⟫_ℂ = (K : ℂ) * ∏ i, ⟪x i, y i⟫_ℂ := by
+    {ι : Type} [Fintype ι]
+    {Xs : ι → Type} [∀ i, NormedAddCommGroup (Xs i)] [∀ i, InnerProductSpace ℂ (Xs i)]
+    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    (f : (Π i, Xs i) →ₘₗ[ℂ] E) (K : ℝ) (hf : ∀ x, ‖f x‖ ^ 2 = K * ∏ i, ‖x i‖ ^ 2)
+    : ∀ x y, ⟪f x, f y⟫_ℂ = (K : ℂ) * ∏ i, ⟪x i, y i⟫_ℂ := by
   classical
   have hdiag : ∀ x, ⟪f x, f x⟫_ℂ = (K : ℂ) * ∏ i, ⟪x i, x i⟫_ℂ := by
     intro x
@@ -20,9 +21,10 @@ theorem MultilinearMap.inner_map_eq_const_mul_prod_inner
     have h := congrArg (fun r : ℝ => (r : ℂ)) (hf x)
     simp only [Complex.ofReal_mul, Complex.ofReal_pow, Complex.ofReal_prod] at h
     exact h
-  have hprod : ∀ (x y : ∀ i, Xs i) (j : ι) (u v : Xs j),
-      ∏ i, ⟪Function.update x j u i, Function.update y j v i⟫_ℂ
-        = ⟪u, v⟫_ℂ * ∏ i ∈ Finset.univ.erase j, ⟪x i, y i⟫_ℂ := by
+  have hprod
+      : ∀ (x y : ∀ i, Xs i) (j : ι) (u v : Xs j),
+        ∏ i, ⟪Function.update x j u i, Function.update y j v i⟫_ℂ
+          = ⟪u, v⟫_ℂ * ∏ i ∈ Finset.univ.erase j, ⟪x i, y i⟫_ℂ := by
     intro x y j u v
     rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ j)]
     simp only [Function.update_self]
@@ -30,8 +32,9 @@ theorem MultilinearMap.inner_map_eq_const_mul_prod_inner
     refine Finset.prod_congr rfl fun i hi => ?_
     rw [Function.update_of_ne (Finset.ne_of_mem_erase hi),
       Function.update_of_ne (Finset.ne_of_mem_erase hi)]
-  have key : ∀ s : Finset ι, ∀ x y : (∀ i, Xs i), (∀ i ∉ s, x i = y i) →
-      ⟪f x, f y⟫_ℂ = (K : ℂ) * ∏ i, ⟪x i, y i⟫_ℂ := by
+  have key
+      : ∀ s : Finset ι, ∀ x y : (∀ i, Xs i),
+        (∀ i ∉ s, x i = y i) → ⟪f x, f y⟫_ℂ = (K : ℂ) * ∏ i, ⟪x i, y i⟫_ℂ := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -42,8 +45,10 @@ theorem MultilinearMap.inner_map_eq_const_mul_prod_inner
     | insert j s hj ih =>
       intro x y hxy
       set C := ∏ i ∈ Finset.univ.erase j, ⟪x i, y i⟫_ℂ with hC
-      have hd : ∀ u : Xs j, ⟪f (Function.update x j u), f (Function.update y j u)⟫_ℂ
-          = (K : ℂ) * (⟪u, u⟫_ℂ * C) := by
+      have hd
+          : ∀ u : Xs j,
+            ⟪f (Function.update x j u), f (Function.update y j u)⟫_ℂ
+              = (K : ℂ) * (⟪u, u⟫_ℂ * C) := by
         intro u
         rw [ih _ _ ?_, hprod]
         intro i hi
@@ -51,22 +56,29 @@ theorem MultilinearMap.inner_map_eq_const_mul_prod_inner
         · subst hij; simp
         · rw [Function.update_of_ne hij, Function.update_of_ne hij]
           exact hxy i (by simp [hij, hi])
-      have hab : ∀ a b : Xs j, ⟪f (Function.update x j a), f (Function.update y j b)⟫_ℂ
-          = (K : ℂ) * (⟪a, b⟫_ℂ * C) := by
+      have hab
+          : ∀ a b : Xs j,
+            ⟪f (Function.update x j a), f (Function.update y j b)⟫_ℂ
+              = (K : ℂ) * (⟪a, b⟫_ℂ * C) := by
         intro a b
         have ha := hd a
         have hb := hd b
         have h1 := hd (a + b)
         have h2 := hd (a + Complex.I • b)
         simp only [MultilinearMap.map_update_add, MultilinearMap.map_update_smul, RingHom.id_apply,
-          inner_add_left, inner_add_right, inner_smul_left, inner_smul_right, Complex.conj_I] at h1 h2
-        have e1 : ⟪f (Function.update x j a), f (Function.update y j b)⟫_ℂ
-            + ⟪f (Function.update x j b), f (Function.update y j a)⟫_ℂ
-            = (K : ℂ) * C * (⟪a, b⟫_ℂ + ⟪b, a⟫_ℂ) := by
+            inner_add_left, inner_add_right, inner_smul_left, inner_smul_right, Complex.conj_I]
+          at h1 h2
+        have e1
+            : ⟪f (Function.update x j a), f (Function.update y j b)⟫_ℂ
+                + ⟪f (Function.update x j b), f (Function.update y j a)⟫_ℂ
+              = (K : ℂ) * C * (⟪a, b⟫_ℂ + ⟪b, a⟫_ℂ) := by
           linear_combination h1 - ha - hb
-        have e2 : Complex.I * (⟪f (Function.update x j a), f (Function.update y j b)⟫_ℂ
-            - ⟪f (Function.update x j b), f (Function.update y j a)⟫_ℂ
-            - (K : ℂ) * C * (⟪a, b⟫_ℂ - ⟪b, a⟫_ℂ)) = 0 := by
+        have e2
+            : Complex.I
+                * (⟪f (Function.update x j a), f (Function.update y j b)⟫_ℂ
+                  - ⟪f (Function.update x j b), f (Function.update y j a)⟫_ℂ
+                  - (K : ℂ) * C * (⟪a, b⟫_ℂ - ⟪b, a⟫_ℂ))
+              = 0 := by
           linear_combination h2 - ha + Complex.I * Complex.I * hb
         have e3 := (mul_eq_zero.mp e2).resolve_left Complex.I_ne_zero
         linear_combination (e1 + e3) / 2

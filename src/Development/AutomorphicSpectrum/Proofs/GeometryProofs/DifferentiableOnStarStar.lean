@@ -11,7 +11,9 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.Flat.Conj
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights.Regular
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GroundTheory.Heights₂.Heights.Regular
 
 section Polydisc
 
@@ -23,8 +25,8 @@ theorem norm_star_vec (z : Fin n → ℂ) : ‖star z‖ = ‖z‖ := by
   refine Finset.sup_congr rfl fun i _ => ?_
   simp [nnnorm_star]
 
-theorem star_mem_ball {ρ : ℝ} {z : Fin n → ℂ} :
-    star z ∈ Metric.ball (0 : Fin n → ℂ) ρ ↔ z ∈ Metric.ball (0 : Fin n → ℂ) ρ := by
+theorem star_mem_ball {ρ : ℝ} {z : Fin n → ℂ}
+    : star z ∈ Metric.ball (0 : Fin n → ℂ) ρ ↔ z ∈ Metric.ball (0 : Fin n → ℂ) ρ := by
   simp only [mem_ball_zero_iff, norm_star_vec]
 
 theorem star_mem_punct {ρ : ℝ} {z : Fin n → ℂ} : star z ∈ punct n a ρ ↔ z ∈ punct n a ρ := by
@@ -45,10 +47,14 @@ theorem star_real_smul (ρ : ℝ) (z : Fin n → ℂ) : star ((ρ : ℂ) • z) 
   funext k
   simp
 
-theorem differentiableOn_star_star {F : Type} [NormedAddCommGroup F] [NormedSpace ℂ F] [StarAddMonoid F]
-    [StarModule ℂ F] [ContinuousStar F] {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [StarAddMonoid V]
-    [StarModule ℂ V] [ContinuousStar V] {f : V → F} {B : Set V} (hB : IsOpen B) (hs : ∀ z, star z ∈ B ↔ z ∈ B)
-    (hf : DifferentiableOn ℂ f B) : DifferentiableOn ℂ (fun z => star (f (star z))) B := by
+theorem differentiableOn_star_star
+    {F : Type}
+    [NormedAddCommGroup F] [NormedSpace ℂ F] [StarAddMonoid F] [StarModule ℂ F] [ContinuousStar F]
+    {V : Type}
+    [NormedAddCommGroup V] [NormedSpace ℂ V] [StarAddMonoid V] [StarModule ℂ V] [ContinuousStar V]
+    {f : V → F} {B : Set V}
+    (hB : IsOpen B) (hs : ∀ z, star z ∈ B ↔ z ∈ B) (hf : DifferentiableOn ℂ f B)
+    : DifferentiableOn ℂ (fun z => star (f (star z))) B := by
   intro z hz
   have h1 : DifferentiableAt ℂ f (star z) := hf.differentiableAt (hB.mem_nhds ((hs z).2 hz))
   have h2 := h1.star_star
@@ -59,16 +65,25 @@ end Polydisc
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
 
-def conjPts {R : Type} [CommRing R] {n : ℕ} (ψ : (Fin n → ℂ) → (R →+* ℂ)) (z : Fin n → ℂ) : R →+* ℂ :=
+def conjPts {R : Type} [CommRing R] {n : ℕ} (ψ : (Fin n → ℂ) → (R →+* ℂ)) (z : Fin n → ℂ)
+    : R →+* ℂ :=
   (starRingEnd ℂ).comp (ψ (star z))
 
-theorem isHolPts_conjPts {R : Type} [CommRing R] {n : ℕ} {ψ : (Fin n → ℂ) → (R →+* ℂ)} {ρ : ℝ}
-    (h : IsHolPts (Metric.ball 0 ρ) ψ) : IsHolPts (Metric.ball 0 ρ) (conjPts ψ) :=
-  ⟨Metric.isOpen_ball, fun r => differentiableOn_star_star (f := fun b => ψ b r) Metric.isOpen_ball
-    (fun _ => star_mem_ball) (h.2 r)⟩
+theorem isHolPts_conjPts
+    {R : Type} [CommRing R]
+    {n : ℕ} {ψ : (Fin n → ℂ) → (R →+* ℂ)} {ρ : ℝ} (h : IsHolPts (Metric.ball 0 ρ) ψ)
+    : IsHolPts (Metric.ball 0 ρ) (conjPts ψ) := ⟨
+  Metric.isOpen_ball,
+  fun r =>
+    differentiableOn_star_star
+      (f := fun b => ψ b r)
+      Metric.isOpen_ball
+      (fun _ => star_mem_ball)
+      (h.2 r)
+⟩
 
-def chart {Xo : Moduli D l} {σ : KA l →+* ℂ} {n a : ℕ} (C : BdryChart Xo σ n a) :
-    BdryChart Xo ((starRingEnd ℂ).comp σ) n a where
+def chart {Xo : Moduli D l} {σ : KA l →+* ℂ} {n a : ℕ} (C : BdryChart Xo σ n a)
+    : BdryChart Xo ((starRingEnd ℂ).comp σ) n a where
   a_le := C.a_le
   R := C.R
   t := C.t

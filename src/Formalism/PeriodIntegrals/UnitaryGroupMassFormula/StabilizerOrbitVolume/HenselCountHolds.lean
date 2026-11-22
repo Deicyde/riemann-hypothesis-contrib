@@ -13,18 +13,22 @@ open MeasureTheory Topology
 
 section Hensel
 
-variable {V X : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-  [MeasurableSpace V] [BorelSpace V] [AddCommGroup X] [TopologicalSpace X]
-  [IsTopologicalAddGroup X] [MeasurableSpace X] [BorelSpace X]
+variable
+  {V X : Type}
+  [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
+  [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [MeasurableSpace X] [BorelSpace X]
 
 def hlev (Λ0 : AddSubgroup V) (H : AddSubgroup X) (G : V → X) (y : V) (h : X) : Set V :=
   {Z | Z ∈ Λ0 ∧ G (y + Z) - h ∈ H}
 
-private theorem mem_hlev_iff {Λ0 : AddSubgroup V} {H : AddSubgroup X} {G : V → X} {y : V} {h : X}
-    {Z : V} : Z ∈ hlev Λ0 H G y h ↔ Z ∈ Λ0 ∧ G (y + Z) - h ∈ H := Iff.rfl
+private theorem mem_hlev_iff
+    {Λ0 : AddSubgroup V} {H : AddSubgroup X} {G : V → X} {y : V} {h : X} {Z : V}
+    : Z ∈ hlev Λ0 H G y h ↔ Z ∈ Λ0 ∧ G (y + Z) - h ∈ H :=
+  Iff.rfl
 
-private theorem isOpen_of_add_openSubgroup_stable (U : AddSubgroup V) (hU : IsOpen (U : Set V)) (A : Set V)
-    (hA : ∀ Z ∈ A, ∀ W ∈ U, Z + W ∈ A) : IsOpen A := by
+private theorem isOpen_of_add_openSubgroup_stable
+    (U : AddSubgroup V) (hU : IsOpen (U : Set V)) (A : Set V) (hA : ∀ Z ∈ A, ∀ W ∈ U, Z + W ∈ A)
+    : IsOpen A := by
   rw [isOpen_iff_forall_mem_open]
   intro Z hZ
   refine ⟨(fun W => -Z + W) ⁻¹' (U : Set V), ?_, ?_, ?_⟩
@@ -35,23 +39,28 @@ private theorem isOpen_of_add_openSubgroup_stable (U : AddSubgroup V) (hU : IsOp
   · show -Z + Z ∈ (U : Set V)
     simp
 
-private theorem finite_image_mk_of_isOpen_of_isCompact' (K L : AddSubgroup X) (hKo : IsOpen (K : Set X))
-    (hLc : IsCompact (L : Set X)) :
-    ((QuotientAddGroup.mk : X → X ⧸ K) '' (L : Set X)).Finite := by
-  obtain ⟨T, hT⟩ := hLc.elim_finite_subcover (fun x : X => (fun z => -x + z) ⁻¹' (K : Set X))
-    (fun x => hKo.preimage (continuous_const_add (-x)))
-    (fun l _ => Set.mem_iUnion.2 ⟨l, by simp⟩)
+private theorem finite_image_mk_of_isOpen_of_isCompact'
+    (K L : AddSubgroup X) (hKo : IsOpen (K : Set X)) (hLc : IsCompact (L : Set X))
+    : ((QuotientAddGroup.mk : X → X ⧸ K) '' (L : Set X)).Finite := by
+  obtain ⟨T, hT⟩ :=
+    hLc.elim_finite_subcover
+      (fun x : X => (fun z => -x + z) ⁻¹' (K : Set X))
+      (fun x => hKo.preimage (continuous_const_add (-x)))
+      (fun l _ => Set.mem_iUnion.2 ⟨l, by simp⟩)
   refine (T.finite_toSet.image (QuotientAddGroup.mk : X → X ⧸ K)).subset ?_
   rintro _ ⟨l, hl, rfl⟩
   obtain ⟨x, hx, hlx⟩ := Set.mem_iUnion₂.1 (hT hl)
   exact ⟨x, hx, QuotientAddGroup.eq.2 hlx⟩
 
-private theorem measure_mul_eq_of_const_fibres (μ : Measure V) (ν : Measure X) [ν.IsAddHaarMeasure]
+private theorem measure_mul_eq_of_const_fibres
+    (μ : Measure V)
+    (ν : Measure X) [ν.IsAddHaarMeasure]
     (K L : AddSubgroup X) (hKL : K ≤ L) (hKo : IsOpen (K : Set X)) (hLc : IsCompact (L : Set X))
-    (P : Set V) (f : V → X) (hfP : ∀ Z ∈ P, f Z ∈ L) (m : ENNReal)
+    (P : Set V) (f : V → X) (hfP : ∀ Z ∈ P, f Z ∈ L)
+    (m : ENNReal)
     (hmeas : ∀ t ∈ L, MeasurableSet {Z | Z ∈ P ∧ f Z - t ∈ K})
-    (hm : ∀ t ∈ L, μ {Z | Z ∈ P ∧ f Z - t ∈ K} = m) :
-    μ P * ν K = m * ν L := by
+    (hm : ∀ t ∈ L, μ {Z | Z ∈ P ∧ f Z - t ∈ K} = m)
+    : μ P * ν K = m * ν L := by
   classical
   have hF := finite_image_mk_of_isOpen_of_isCompact' K L hKo hLc
   have hqeq : ∀ a b : X, ((a : X ⧸ K) = (b : X ⧸ K) ↔ a - b ∈ K) := by
@@ -85,8 +94,7 @@ private theorem measure_mul_eq_of_const_fibres (μ : Measure V) (ν : Measure X)
     obtain ⟨t, ht, rfl⟩ := (hC c).1 hc
     have e : B (t : X ⧸ K) = (fun x => -t + x) ⁻¹' (K : Set X) := by
       ext x
-      simp only [B, Set.mem_preimage, Set.mem_singleton_iff, hqeq, SetLike.mem_coe,
-        sub_eq_neg_add]
+      simp only [B, Set.mem_preimage, Set.mem_singleton_iff, hqeq, SetLike.mem_coe, sub_eq_neg_add]
     rw [e, measure_preimage_add]
     exact ⟨(hKo.preimage (continuous_const_add (-t))).measurableSet, rfl⟩
   have hPU : P = ⋃ c ∈ hF.toFinset, A c := by
@@ -134,26 +142,36 @@ private theorem measure_mul_eq_of_const_fibres (μ : Measure V) (ν : Measure X)
   rw [hμP, hνL]
   ring
 
-private theorem ennreal_mul_cross_cancel {a b c d e f : ENNReal} (hc0 : c ≠ 0) (hct : c ≠ ⊤)
-    (h1 : a * f = b * c) (h2 : a * d = e * c) : b * d = e * f := by
+private theorem ennreal_mul_cross_cancel
+    {a b c d e f : ENNReal} (hc0 : c ≠ 0) (hct : c ≠ ⊤) (h1 : a * f = b * c) (h2 : a * d = e * c)
+    : b * d = e * f := by
   have h3 : b * d * c = e * f * c := by
-    calc b * d * c = (b * c) * d := by ring
+    calc
+      b * d * c
+        = (b * c) * d := by ring
       _ = (a * f) * d := by rw [h1]
       _ = (a * d) * f := by ring
       _ = (e * c) * f := by rw [h2]
       _ = e * f * c := by ring
-  calc b * d = b * d * (c * c⁻¹) := by rw [ENNReal.mul_inv_cancel hc0 hct, mul_one]
+  calc
+    b * d
+      = b * d * (c * c⁻¹) := by rw [ENNReal.mul_inv_cancel hc0 hct, mul_one]
     _ = (b * d * c) * c⁻¹ := (mul_assoc _ _ _).symm
     _ = (e * f * c) * c⁻¹ := by rw [h3]
     _ = e * f := by rw [mul_assoc, ENNReal.mul_inv_cancel hc0 hct, mul_one]
 
-theorem hensel_main (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.IsAddHaarMeasure]
-    (Λ : ℕ → AddSubgroup V) (H : ℕ → AddSubgroup X) (hΛo : ∀ n, IsOpen (Λ n : Set V))
-    (hΛa : Antitone Λ) (hHo : ∀ n, IsOpen (H n : Set X)) (hHc : ∀ n, IsCompact (H n : Set X))
-    (D : V →+ X) (hD : ∀ n, (Λ n).map D = H n) (G : V → X) (y : V)
+theorem hensel_main
+    (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.IsAddHaarMeasure]
+    (Λ : ℕ → AddSubgroup V)
+    (H : ℕ → AddSubgroup X)
+    (hΛo : ∀ n, IsOpen (Λ n : Set V)) (hΛa : Antitone Λ) (hHo : ∀ n, IsOpen (H n : Set X))
+    (hHc : ∀ n, IsCompact (H n : Set X))
+    (D : V →+ X) (hD : ∀ n, (Λ n).map D = H n)
+    (G : V → X) (y : V)
     (hG : ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n, G (y + Z + W) - G (y + Z) - D W ∈ H (n + 1))
-    (h : X) (hh : h - G y ∈ H 0) (n : ℕ) :
-    μ (hlev (Λ 0) (H n) G y h) * ν (H 0) = μ (Λ 0) * ν (H n) := by
+    (h : X) (hh : h - G y ∈ H 0)
+    (n : ℕ)
+    : μ (hlev (Λ 0) (H n) G y h) * ν (H 0) = μ (Λ 0) * ν (H n) := by
   have hΛ0 : ∀ k, Λ k ≤ Λ 0 := fun k => hΛa (Nat.zero_le k)
   have hHa : ∀ k l, k ≤ l → H l ≤ H k := by
     intro k l hkl
@@ -171,8 +189,8 @@ theorem hensel_main (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.
     intro k Z hZ W hW
     have := hG k Z hZ W hW
     rwa [add_assoc y Z W] at this
-  have hstab : ∀ k h', ∀ Z ∈ hlev (Λ 0) (H k) G y h', ∀ W ∈ Λ k,
-      Z + W ∈ hlev (Λ 0) (H k) G y h' := by
+  have hstab
+      : ∀ k h', ∀ Z ∈ hlev (Λ 0) (H k) G y h', ∀ W ∈ Λ k, Z + W ∈ hlev (Λ 0) (H k) G y h' := by
     intro k h' Z hZ W hW
     rw [mem_hlev_iff] at hZ ⊢
     refine ⟨(Λ 0).add_mem hZ.1 (hΛ0 k hW), ?_⟩
@@ -180,10 +198,10 @@ theorem hensel_main (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.
     have h2 := (H k).add_mem ((H k).add_mem h1 hZ.2) (hDm k W hW)
     convert h2 using 1
     abel
-  have hopen : ∀ k h', IsOpen (hlev (Λ 0) (H k) G y h') :=
-    fun k h' => isOpen_of_add_openSubgroup_stable (Λ k) (hΛo k) _ (hstab k h')
-  have key : ∀ k, ∀ h', h' - G y ∈ H 0 →
-      μ (hlev (Λ 0) (H k) G y h') * ν (H 0) = μ (Λ 0) * ν (H k) := by
+  have hopen : ∀ k h', IsOpen (hlev (Λ 0) (H k) G y h') := fun k h' =>
+    isOpen_of_add_openSubgroup_stable (Λ k) (hΛo k) _ (hstab k h')
+  have key
+      : ∀ k, ∀ h', h' - G y ∈ H 0 → μ (hlev (Λ 0) (H k) G y h') * ν (H 0) = μ (Λ 0) * ν (H k) := by
     intro k
     induction k with
     | zero =>
@@ -203,9 +221,10 @@ theorem hensel_main (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.
       rw [e]
     | succ k ih =>
       intro h' hh'
-      have hpiece : ∀ t ∈ H k,
-          {Z | Z ∈ hlev (Λ 0) (H k) G y h' ∧ (G (y + Z) - h') - t ∈ H (k + 1)}
-            = hlev (Λ 0) (H (k + 1)) G y (h' + t) := by
+      have hpiece
+          : ∀ t ∈ H k,
+            {Z | Z ∈ hlev (Λ 0) (H k) G y h' ∧ (G (y + Z) - h') - t ∈ H (k + 1)}
+              = hlev (Λ 0) (H (k + 1)) G y (h' + t) := by
         intro t ht
         ext Z
         simp only [Set.mem_setOf_eq, mem_hlev_iff]
@@ -219,13 +238,15 @@ theorem hensel_main (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.
           refine ⟨⟨hZ, ?_⟩, h2⟩
           have := (H k).add_mem (hHa k (k + 1) (Nat.le_succ k) h2) ht
           simpa using this
-      have htrans : ∀ t ∈ H k, μ (hlev (Λ 0) (H (k + 1)) G y (h' + t))
-          = μ (hlev (Λ 0) (H (k + 1)) G y h') := by
+      have htrans
+          : ∀ t ∈ H k,
+            μ (hlev (Λ 0) (H (k + 1)) G y (h' + t)) = μ (hlev (Λ 0) (H (k + 1)) G y h') := by
         intro t ht
         obtain ⟨W, hW, rfl⟩ := hDs k t ht
         have hW0 := hΛ0 k hW
-        have e : hlev (Λ 0) (H (k + 1)) G y h' =
-            (fun Z => W + Z) ⁻¹' hlev (Λ 0) (H (k + 1)) G y (h' + D W) := by
+        have e
+            : hlev (Λ 0) (H (k + 1)) G y h'
+              = (fun Z => W + Z) ⁻¹' hlev (Λ 0) (H (k + 1)) G y (h' + D W) := by
           ext Z
           simp only [Set.mem_preimage, mem_hlev_iff]
           constructor
@@ -245,11 +266,14 @@ theorem hensel_main (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.
             rw [add_comm W Z]
             abel
         rw [e, measure_preimage_add]
-      have hc := measure_mul_eq_of_const_fibres μ ν (H (k + 1)) (H k) (hHa k (k + 1) (Nat.le_succ k))
-        (hHo (k + 1)) (hHc k) (hlev (Λ 0) (H k) G y h') (fun Z => G (y + Z) - h')
-        (fun Z hZ => (mem_hlev_iff.1 hZ).2) (μ (hlev (Λ 0) (H (k + 1)) G y h'))
-        (fun t ht => by rw [hpiece t ht]; exact (hopen (k + 1) (h' + t)).measurableSet)
-        (fun t ht => by rw [hpiece t ht]; exact htrans t ht)
+      have hc :=
+        measure_mul_eq_of_const_fibres μ ν (H (k + 1)) (H k) (hHa k (k + 1) (Nat.le_succ k))
+          (hHo (k + 1)) (hHc k) (hlev (Λ 0) (H k) G y h')
+          (fun Z => G (y + Z) - h')
+          (fun Z hZ => (mem_hlev_iff.1 hZ).2)
+          (μ (hlev (Λ 0) (H (k + 1)) G y h'))
+          (fun t ht => by rw [hpiece t ht]; exact (hopen (k + 1) (h' + t)).measurableSet)
+          (fun t ht => by rw [hpiece t ht]; exact htrans t ht)
       have hne0 : ν (H k : Set X) ≠ 0 := (hHo k).measure_ne_zero ν ⟨0, (H k).zero_mem⟩
       have hnetop : ν (H k : Set X) ≠ ⊤ := (hHc k).measure_lt_top.ne
       exact ennreal_mul_cross_cancel hne0 hnetop hc (ih h' hh')

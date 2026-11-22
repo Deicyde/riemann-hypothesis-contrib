@@ -19,7 +19,8 @@ variable {R : Type*} [Ring R] (a c d : ℕ → R)
 
 def Mi (i : ℕ) : Matrix (Fin 2) (Fin 2) R := !![a i, d i; -c i, 0]
 
-def prodM (lo n : ℕ) : Matrix (Fin 2) (Fin 2) R := ((List.range n).map fun j => Mi a c d (lo + j)).prod
+def prodM (lo n : ℕ) : Matrix (Fin 2) (Fin 2) R :=
+  ((List.range n).map fun j => Mi a c d (lo + j)).prod
 
 def bus : ℕ → R × R
   | 0 => (1, 0)
@@ -28,11 +29,16 @@ def bus : ℕ → R × R
 def tds (r : ℕ) : ℕ → Fin 2 → R
   | 0, b => if b = 0 then 1 else 0
   | 1, b => if 1 ≤ r then (if b = 0 then a (r - 1) else d (r - 1)) else 0
-  | m + 2, b => if m + 2 ≤ r then a (r - (m + 2)) * tds r (m + 1) b - c (r - (m + 1)) * d (r - (m + 2)) * tds r m b else 0
+  | m + 2, b =>
+    if m + 2 ≤ r then
+      a (r - (m + 2)) * tds r (m + 1) b - c (r - (m + 1)) * d (r - (m + 2)) * tds r m b
+    else
+      0
 
 variable {a c d}
 
-theorem prodM_succ_left (lo n : ℕ) : prodM a c d lo (n + 1) = Mi a c d lo * prodM a c d (lo + 1) n := by
+theorem prodM_succ_left (lo n : ℕ)
+    : prodM a c d lo (n + 1) = Mi a c d lo * prodM a c d (lo + 1) n := by
   unfold prodM
   rw [List.range_succ_eq_map, List.map_cons, List.prod_cons, List.map_map]
   congr 2
@@ -41,12 +47,14 @@ theorem prodM_succ_left (lo n : ℕ) : prodM a c d lo (n + 1) = Mi a c d lo * pr
     congr 1
     omega)
 
-theorem prodM_succ_right (lo n : ℕ) : prodM a c d lo (n + 1) = prodM a c d lo n * Mi a c d (lo + n) := by
+theorem prodM_succ_right (lo n : ℕ)
+    : prodM a c d lo (n + 1) = prodM a c d lo n * Mi a c d (lo + n) := by
   unfold prodM
   rw [List.range_succ, List.map_append, List.prod_append]
   simp
 
-theorem bus_eq : ∀ i, (bus a c d i).1 = prodM a c d 0 i 0 0 ∧ (bus a c d i).2 = prodM a c d 0 i 0 1 := by
+theorem bus_eq
+    : ∀ i, (bus a c d i).1 = prodM a c d 0 i 0 0 ∧ (bus a c d i).2 = prodM a c d 0 i 0 1 := by
   intro i
   induction i with
   | zero => simp [bus, prodM]
@@ -56,8 +64,8 @@ theorem bus_eq : ∀ i, (bus a c d i).1 = prodM a c d 0 i 0 0 ∧ (bus a c d i).
     simp only [bus, h1, h2, Matrix.mul_apply, Fin.sum_univ_two, Mi, zero_add]
     simp [sub_eq_add_neg]
 
-theorem tds_eq (hcd : ∀ i, Commute (c (i + 1)) (d i)) (r : ℕ) :
-    ∀ m, m ≤ r → ∀ b, tds a c d r m b = prodM a c d (r - m) m 0 b
+theorem tds_eq (hcd : ∀ i, Commute (c (i + 1)) (d i)) (r : ℕ)
+    : ∀ m, m ≤ r → ∀ b, tds a c d r m b = prodM a c d (r - m) m 0 b
   | 0, _, b => by fin_cases b <;> simp [tds, prodM]
   | 1, hm, b => by
     rw [prodM_succ_left]
@@ -69,21 +77,23 @@ theorem tds_eq (hcd : ∀ i, Commute (c (i + 1)) (d i)) (r : ℕ) :
     have e2 : r - (m + 1) + 1 = r - m := by omega
     show (if m + 2 ≤ r then a (r - (m + 2)) * tds a c d r (m + 1) b -
         c (r - (m + 1)) * d (r - (m + 2)) * tds a c d r m b else 0) = _
-    have hL : prodM a c d (r - (m + 1)) (m + 1) = Mi a c d (r - (m + 1)) * prodM a c d (r - m) m := by
+    have hL
+        : prodM a c d (r - (m + 1)) (m + 1) = Mi a c d (r - (m + 1)) * prodM a c d (r - m) m := by
       rw [prodM_succ_left, e2]
-    have hR : prodM a c d (r - (m + 2)) (m + 2) =
-        Mi a c d (r - (m + 2)) * (Mi a c d (r - (m + 1)) * prodM a c d (r - m) m) := by
+    have hR
+        : prodM a c d (r - (m + 2)) (m + 2)
+          = Mi a c d (r - (m + 2)) * (Mi a c d (r - (m + 1)) * prodM a c d (r - m) m) := by
       rw [prodM_succ_left, e1, hL]
     rw [if_pos hm, ih1, ih0, hL, hR]
     have hc := (hcd (r - (m + 2))).eq
     rw [e1] at hc
     simp only [Matrix.mul_apply, Fin.sum_univ_two, Mi]
-    simp only [Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.empty_val',
-      Matrix.cons_val_fin_one, zero_mul, add_zero, neg_mul]
+    simp only [Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.empty_val', Matrix.cons_val_fin_one, zero_mul, add_zero, neg_mul]
     simp only [hc, mul_neg, mul_assoc, sub_eq_add_neg]
 
-theorem tds_bus (hcd : ∀ i, Commute (c (i + 1)) (d i)) (r : ℕ) :
-    tds a c d r r 0 = (bus a c d r).1 ∧ tds a c d r r 1 = (bus a c d r).2 := by
+theorem tds_bus (hcd : ∀ i, Commute (c (i + 1)) (d i)) (r : ℕ)
+    : tds a c d r r 0 = (bus a c d r).1 ∧ tds a c d r r 1 = (bus a c d r).2 := by
   rw [tds_eq hcd r r le_rfl, tds_eq hcd r r le_rfl, (bus_eq r).1, (bus_eq r).2, Nat.sub_self]
   exact ⟨rfl, rfl⟩
 
@@ -95,45 +105,54 @@ open ContPf
 
 variable {r : ℕ} {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X]
 
-
 variable (X) in
 def aSv (Y : ℂ) (i : ℕ) : Module.End ℂ (WSm r X) := algebraMap ℂ _ Y - eS X i 3
 
-theorem cp_vABs (Y : ℂ) : ∀ i, i ≤ r → ∀ f : WSm r X,
-    (Q.vABs r Y i).1 (f : (Fin r → ℂ) → X) = (((bus (aSv X Y) (eS X · 4) (eS X · 5) i).1 f : WSm r X) : (Fin r → ℂ) → X) ∧
-      (Q.vABs r Y i).2 (f : (Fin r → ℂ) → X) = (((bus (aSv X Y) (eS X · 4) (eS X · 5) i).2 f : WSm r X) : (Fin r → ℂ) → X)
+theorem cp_vABs (Y : ℂ)
+    : ∀ i,
+      i ≤ r
+        → ∀ f : WSm r X,
+          (Q.vABs r Y i).1 (f : (Fin r → ℂ) → X)
+              = (((bus (aSv X Y) (eS X · 4) (eS X · 5) i).1 f : WSm r X) : (Fin r → ℂ) → X)
+            ∧ (Q.vABs r Y i).2 (f : (Fin r → ℂ) → X)
+              = (((bus (aSv X Y) (eS X · 4) (eS X · 5) i).2 f : WSm r X) : (Fin r → ℂ) → X)
   | 0, _, f => ⟨rfl, rfl⟩
   | i + 1, hi, f => by
     have hir : i < r := by omega
     have ih := cp_vABs Y i (by omega)
     simp only [Q.vABs, dif_pos hir, bus]
     refine ⟨?_, ?_⟩
-    · have e1 : Y • (f : (Fin r → ℂ) → X) - pbOp ⟨i, hir⟩ (f : (Fin r → ℂ) → X) =
-          ((aSv X Y i f : WSm r X) : (Fin r → ℂ) → X) := by
+    · have e1
+          : Y • (f : (Fin r → ℂ) → X) - pbOp ⟨i, hir⟩ (f : (Fin r → ℂ) → X)
+            = ((aSv X Y i f : WSm r X) : (Fin r → ℂ) → X) := by
         simp only [aSv, eS, dif_pos hir]
         rfl
-      have e2 : cbOp ⟨i, hir⟩ (f : (Fin r → ℂ) → X) = ((eS X i 4 f : WSm r X) : (Fin r → ℂ) → X) := by
+      have e2
+          : cbOp ⟨i, hir⟩ (f : (Fin r → ℂ) → X) = ((eS X i 4 f : WSm r X) : (Fin r → ℂ) → X) := by
         simp only [eS, dif_pos hir]
         rfl
       rw [e1, e2, (ih _).1, (ih _).2]
       rfl
-    · have e3 : cbiOp ⟨i, hir⟩ (f : (Fin r → ℂ) → X) = ((eS X i 5 f : WSm r X) : (Fin r → ℂ) → X) := by
+    · have e3
+          : cbiOp ⟨i, hir⟩ (f : (Fin r → ℂ) → X) = ((eS X i 5 f : WSm r X) : (Fin r → ℂ) → X) := by
         simp only [eS, dif_pos hir]
         rfl
       rw [e3, (ih _).1]
       rfl
 
-theorem cp_tdUv (Y : ℂ) (b : Fin 2) : ∀ m, ∀ f : WSm r X,
-    tdUv r Y m b (f : (Fin r → ℂ) → X) = ((tds (aSv X Y) (eS X · 4) (eS X · 5) r m b f : WSm r X) : (Fin r → ℂ) → X)
-  | 0, f => by
-    fin_cases b <;> simp [tdUv, tds]
+theorem cp_tdUv (Y : ℂ) (b : Fin 2)
+    : ∀ m, ∀ f : WSm r X,
+      tdUv r Y m b (f : (Fin r → ℂ) → X)
+        = ((tds (aSv X Y) (eS X · 4) (eS X · 5) r m b f : WSm r X) : (Fin r → ℂ) → X)
+  | 0, f => by fin_cases b <;> simp [tdUv, tds]
   | 1, f => by
     by_cases h1 : 1 ≤ r
     · have hr : r - 1 < r := by omega
       fin_cases b
       · simp only [tdUv, tds, dif_pos h1, if_pos h1, Fin.zero_eta, if_true, aSv, eS, dif_pos hr]
         rfl
-      · simp only [tdUv, tds, dif_pos h1, if_pos h1, Fin.mk_one, one_ne_zero, if_false, eS, dif_pos hr]
+      · simp only [tdUv, tds, dif_pos h1, if_pos h1, Fin.mk_one, one_ne_zero, if_false, eS,
+          dif_pos hr]
         rfl
     · simp only [tdUv, tds, dif_neg h1, if_neg h1]
       rfl
@@ -202,8 +221,10 @@ theorem loc_vABs (Y : ℂ) : ∀ i, Loc (X := X) (Q.vABs r Y i).1 ∧ Loc (X := 
     obtain ⟨h1, h2⟩ := ih
     by_cases hi : i < r
     · simp only [Q.vABs, dif_pos hi]
-      exact ⟨loc_sub (loc_comp h1 (loc_sub (loc_smul Y loc_id) (loc_pbOp _))) (loc_comp h2 (loc_cbOp _)),
-        loc_comp h1 (loc_cbiOp _)⟩
+      exact ⟨
+        loc_sub (loc_comp h1 (loc_sub (loc_smul Y loc_id) (loc_pbOp _))) (loc_comp h2 (loc_cbOp _)),
+        loc_comp h1 (loc_cbiOp _)
+      ⟩
     · simp only [Q.vABs, dif_neg hi]
       exact ⟨h1, h2⟩
 
@@ -219,21 +240,23 @@ theorem mirror_residue_continuity : JDRvCont := by
   have ev := loc_vABs (X := X) (r := r) Y r
   have h3 := cp_tdUv Y b r ⟨f', hf'm⟩
   have h4 := cp_vABs Y r le_rfl ⟨f', hf'm⟩
-  have h5 := tds_bus (a := aSv (r := r) X Y) (c := (eS X · 4)) (d := (eS X · 5))
-    (fun i => eS_comm (i + 1) i (by omega) 4 5) r
+  have h5 :=
+    tds_bus (a := aSv (r := r) X Y) (c := (eS X · 4)) (d := (eS X · 5))
+      (fun i => eS_comm (i + 1) i (by omega) 4 5)
+      r
   have hb : b = 0 ∨ b = 1 := by fin_cases b <;> simp
   rcases hb with rfl | rfl
   · have e2 : (Q.vABs r Y r).1 f c = (Q.vABs r Y r).1 f' c := (ev.1 f f' c hf'e.symm).eq_of_nhds
     simp only [Q.cmp, if_true]
     rw [e1, e2]
-    change tdUv r Y r 0 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c =
-      (Q.vABs r Y r).1 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
+    change tdUv r Y r 0 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
+      = (Q.vABs r Y r).1 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
     rw [h3, h4.1, h5.1]
   · have e2 : (Q.vABs r Y r).2 f c = (Q.vABs r Y r).2 f' c := (ev.2 f f' c hf'e.symm).eq_of_nhds
-    simp only [Q.cmp, show ¬ ((1 : Fin 2) = 0) by decide, if_false]
+    simp only [Q.cmp, show ¬((1 : Fin 2) = 0) by decide, if_false]
     rw [e1, e2]
-    change tdUv r Y r 1 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c =
-      (Q.vABs r Y r).2 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
+    change tdUv r Y r 1 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
+      = (Q.vABs r Y r).2 ((⟨f', hf'm⟩ : WSm r X) : (Fin r → ℂ) → X) c
     rw [h3, h4.2, h5.2]
 
 end

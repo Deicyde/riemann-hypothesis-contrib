@@ -12,22 +12,29 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.StandardF
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.LinModSpan
 
-theorem isComp_mul_inv {E : Type} [Field E] [NumberField E] {μ η : HChar E} {w : HeightOneSpectrum (𝓞 E)}
-    {μw ηw : (w.adicCompletion E)ˣ →* ℂˣ} (hμ : IsComp μ w μw) (hη : IsComp η w ηw) :
-    IsComp (μ * η⁻¹) w (μw * ηw⁻¹) := by
+theorem isComp_mul_inv
+    {E : Type} [Field E] [NumberField E]
+    {μ η : HChar E} {w : HeightOneSpectrum (𝓞 E)} {μw ηw : (w.adicCompletion E)ˣ →* ℂˣ}
+    (hμ : IsComp μ w μw) (hη : IsComp η w ηw)
+    : IsComp (μ * η⁻¹) w (μw * ηw⁻¹) := by
   refine ⟨?_, fun x => ?_⟩
   · have h1 := hμ.1
     have h2 := hη.1
     unfold GlobalTheory.SmGL.IsSmoothChar at h1 h2 ⊢
     have h3 : IsOpen (((μw.ker ⊓ ηw.ker : Subgroup _)) : Set (w.adicCompletion E)ˣ) := h1.inter h2
-    exact Subgroup.isOpen_mono (H₁ := μw.ker ⊓ ηw.ker) (fun y hy => by
-      simp only [Subgroup.mem_inf, MonoidHom.mem_ker] at hy ⊢
-      simp [hy.1, hy.2]) h3
+    exact Subgroup.isOpen_mono (H₁ := μw.ker ⊓ ηw.ker)
+      (fun y hy => by
+        simp only [Subgroup.mem_inf, MonoidHom.mem_ker] at hy ⊢
+        simp [hy.1, hy.2])
+      h3
   · simp only [MonoidHom.mul_apply, MonoidHom.inv_apply, hμ.2 x, hη.2 x]
     rfl
 

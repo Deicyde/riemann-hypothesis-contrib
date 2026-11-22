@@ -9,21 +9,25 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.FrobeniusPowerSeries
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80.SatW
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup Formalism.MainNotions.UnusedSlot80.SatW
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
 variable (W : LocWach PD LL O v n)
 
-theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W) {T : LocLat G Qp LL O}
-    (hT : IsCrys PD T.ρ)
+theorem coef_step_of
+    (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    {T : LocLat G Qp LL O} (hT : IsCrys PD T.ρ)
     (hgpi0 : ∃ κ ∈ W.AΔ, IsUnit κ ∧ W.γA W.gam W.π₀ = W.π₀ * (1 + κ * qA W))
     (hA2 : ∀ f ∈ W.AΔ, ∃ g ∈ W.AΔ, W.γA W.gam f - f = W.π₀ * qA W * g)
     (hA3 : ∀ k ≥ 1, ∃ g ∈ W.AΔ, W.γA W.gam (ps W k) = ps W k * (1 + W.π₀ * qA W * g))
@@ -32,11 +36,14 @@ theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 
     (cc : ℤ → O) (hcc : ∀ m : ℤ, (-((PD.p : ℕ) : O)) * cc m = (((W.χΓ W.gam) ^ (-m) : Oˣ) : O) - 1)
     (bi : ℕ) (s : W.EE) (s' : LetA O n) (hs' : s' ∈ Submonoid.closure {x | ∃ k ≥ 1, x = ps W k})
     (hs : algebraMap (LetA O n) W.EE (qA W ^ bi) * s = algebraMap (LetA O n) W.EE s')
-    (j : ℕ) (hj : j ≤ bi) (g : LetA O n) (hg : g ∈ W.AΔ) :
-    ∃ h ∈ W.AΔ, W.γE W.gam (algebraMap (LetA O n) W.EE (qA W ^ j * g) * s) -
-        algebraMap (LetA O n) W.EE (qA W ^ j * g) * s =
-      algebraMap (LetA O n) W.EE (W.π₀ * qA W ^ j *
-        (algebraMap O (LetA O n) (cc ((bi : ℤ) - j)) * g + qA W * h)) * s := by
+    (j : ℕ) (hj : j ≤ bi)
+    (g : LetA O n) (hg : g ∈ W.AΔ)
+    : ∃ h ∈ W.AΔ,
+      W.γE W.gam (algebraMap (LetA O n) W.EE (qA W ^ j * g) * s)
+          - algebraMap (LetA O n) W.EE (qA W ^ j * g) * s
+        = algebraMap (LetA O n) W.EE
+            (W.π₀ * qA W ^ j * (algebraMap O (LetA O n) (cc ((bi : ℤ) - j)) * g + qA W * h))
+          * s := by
   obtain ⟨hbij, hs1, hp2⟩ := hcase
   have hfin : Module.finrank K₀ K = 1 := finrank_one_of_bij' hbij
   obtain ⟨-, -, h9c⟩ := hP9 T hT hs1 hp2
@@ -49,17 +56,17 @@ theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 
   have hUπ : UPi PD.p W.π₀ := ⟨wπ, PD.p - 1, 0, by rw [hwπ, mul_zero, add_zero]⟩
   have hUQ : UPi PD.p (qA W) := ⟨wπ, PD.p - 1, 1, by rw [hQe, hwπ, mul_one]⟩
   have hEQ : IsUnit (algebraMap (LetA O n) W.EE (qA W)) := isUnit_EE_of_UPi W hUQ
-  have hΓ : ∀ a : LetA O n, W.γE W.gam (algebraMap (LetA O n) W.EE a) =
-      algebraMap (LetA O n) W.EE (W.γA W.gam a) := fun a => W.γE_ext W.gam a
+  have hΓ
+      : ∀ a : LetA O n,
+        W.γE W.gam (algebraMap (LetA O n) W.EE a) = algebraMap (LetA O n) W.EE (W.γA W.gam a) :=
+    fun a => W.γE_ext W.gam a
 
   obtain ⟨g4, hg4, h4⟩ := hA4
-  obtain ⟨Xc, hXc⟩ : ∃ X : LetA O n, X = algebraMap O (LetA O n) ((W.χΓ W.gam : Oˣ) : O) :=
-    ⟨_, rfl⟩
+  obtain ⟨Xc, hXc⟩ : ∃ X : LetA O n, X = algebraMap O (LetA O n) ((W.χΓ W.gam : Oˣ) : O) := ⟨_, rfl⟩
   have hXcΔ : Xc ∈ W.AΔ := by rw [hXc]; exact Subalgebra.algebraMap_mem _ _
   obtain ⟨w, hw⟩ : ∃ w : LetA O n, w = Xc + qA W * g4 := ⟨_, rfl⟩
   have hwΔ : w ∈ W.AΔ := by rw [hw]; exact add_mem hXcΔ (mul_mem hQΔ hg4)
-  have h4' : W.γA W.gam (qA W) = qA W * w := by
-    rw [h4, hw, hXc, Algebra.smul_def]; ring
+  have h4' : W.γA W.gam (qA W) = qA W * w := by rw [h4, hw, hXc, Algebra.smul_def]; ring
   obtain ⟨g5, hg5, h5⟩ := hA2 (qA W) hQΔ
   have hw1 : w = 1 + W.π₀ * g5 := by
     apply W.EE_inj
@@ -67,11 +74,12 @@ theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 
     rw [← map_mul (algebraMap (LetA O n) W.EE), ← map_mul (algebraMap (LetA O n) W.EE)]
     exact congrArg (algebraMap (LetA O n) W.EE) (by linear_combination h5 - h4')
 
-  have hmulw : w * (fun i => PowerSeries.invOfUnit (w i) 1) = 1 := funext fun i => by
-    show w i * PowerSeries.invOfUnit (w i) 1 = 1
-    refine PowerSeries.mul_invOfUnit (w i) 1 ?_
-    rw [hw1, hwπ]
-    simp [letπ, zero_pow hp1]
+  have hmulw : w * (fun i => PowerSeries.invOfUnit (w i) 1) = 1 :=
+    funext fun i => by
+      show w i * PowerSeries.invOfUnit (w i) 1 = 1
+      refine PowerSeries.mul_invOfUnit (w i) 1 ?_
+      rw [hw1, hwπ]
+      simp [letπ, zero_pow hp1]
   have hwU : IsUnit w := ⟨⟨w, _, hmulw, by rw [mul_comm]; exact hmulw⟩, rfl⟩
   obtain ⟨wu, hwu⟩ := id hwU
   obtain ⟨wi, hwi⟩ : ∃ x : LetA O n, x = ((wu⁻¹ : (LetA O n)ˣ) : LetA O n) := ⟨_, rfl⟩
@@ -81,7 +89,9 @@ theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 
     show ∀ δ ∈ W.DelF, W.γA δ wi = wi
     intro δ hδ
     apply hwU.mul_left_cancel
-    calc w * W.γA δ wi = W.γA δ w * W.γA δ wi := by rw [hwδ δ hδ]
+    calc
+      w * W.γA δ wi
+        = W.γA δ w * W.γA δ wi := by rw [hwδ δ hδ]
       _ = W.γA δ (w * wi) := (map_mul (W.γA δ) w wi).symm
       _ = w * wi := by rw [hwwi, map_one]
 
@@ -100,8 +110,9 @@ theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 
     have := congrArg (algebraMap O (LetA O n)) hc'
     simpa only [map_mul, map_sub, map_one, map_pow, map_natCast, ← hC, ← hXc] using this
 
-  obtain ⟨R1, hR1d⟩ : ∃ R : LetA O n,
-      R = (Finset.range m).sum (fun i => w ^ i * Xc ^ (m - 1 - i)) := ⟨_, rfl⟩
+  obtain ⟨R1, hR1d⟩
+      : ∃ R : LetA O n, R = (Finset.range m).sum (fun i => w ^ i * Xc ^ (m - 1 - i)) :=
+    ⟨_, rfl⟩
   obtain ⟨R2, hR2d⟩ : ∃ R : LetA O n, R = (Finset.range m).sum (fun i => w ^ i) := ⟨_, rfl⟩
   have hR1 : R1 * (w - Xc) = w ^ m - Xc ^ m := by rw [hR1d]; exact geom_sum₂_mul w Xc m
   have hR2 : R2 * (w - 1) = w ^ m - 1 := by rw [hR2d]; exact geom_sum_mul w m
@@ -131,14 +142,19 @@ theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 
   have hZΔ : Z ∈ W.AΔ := mem_AΔ_of_p_pow W hO 1 (by rw [← hZ]; exact sub_mem hNΔ hMΔ)
   have hYM : w ^ m * (1 + W.π₀ * C) = 1 + qA W * (W.π₀ * Z) := by rw [← hMZ]; exact hQM
 
-  let S : Submonoid (LetA O n) :=
-    { carrier := {x | ∃ t ∈ W.AΔ, W.γA W.gam x = x * (1 + W.π₀ * qA W * t)}
-      mul_mem' := by
-        rintro a b ⟨ta, hta, ha⟩ ⟨tb, htb, hb⟩
-        refine ⟨ta + tb + W.π₀ * qA W * ta * tb,
-          add_mem (add_mem hta htb) (mul_mem (mul_mem (mul_mem hπ hQΔ) hta) htb), ?_⟩
-        rw [map_mul (W.γA W.gam), ha, hb]; ring
-      one_mem' := ⟨0, zero_mem _, by simp⟩ }
+  let S : Submonoid (LetA O n) := {
+    carrier := {x | ∃ t ∈ W.AΔ, W.γA W.gam x = x * (1 + W.π₀ * qA W * t)}
+    mul_mem' := by
+      rintro a b ⟨ta, hta, ha⟩ ⟨tb, htb, hb⟩
+      refine ⟨
+        ta + tb + W.π₀ * qA W * ta * tb,
+        add_mem (add_mem hta htb) (mul_mem (mul_mem (mul_mem hπ hQΔ) hta) htb),
+        ?_
+      ⟩
+      rw [map_mul (W.γA W.gam), ha, hb]
+      ring
+    one_mem' := ⟨0, zero_mem _, by simp⟩
+  }
   have hsub : {x : LetA O n | ∃ k ≥ 1, x = ps W k} ⊆ (S : Set (LetA O n)) := by
     rintro x ⟨k, hk, rfl⟩
     exact hA3 k hk
@@ -147,18 +163,21 @@ theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 
 
   have h1 := congrArg (W.γE W.gam) hs
   rw [map_mul (W.γE W.gam), hΓ, hΓ, hts, map_pow (W.γA W.gam), h4', mul_pow,
-    map_mul (algebraMap (LetA O n) W.EE), map_mul (algebraMap (LetA O n) W.EE), ← hs] at h1
-  have hu : IsUnit (algebraMap (LetA O n) W.EE (qA W ^ bi)) := by
-    rw [map_pow]; exact hEQ.pow bi
-  have h2' : algebraMap (LetA O n) W.EE (w ^ bi) * W.γE W.gam s =
-      s * algebraMap (LetA O n) W.EE (1 + W.π₀ * qA W * t) := by
+      map_mul (algebraMap (LetA O n) W.EE), map_mul (algebraMap (LetA O n) W.EE), ← hs]
+    at h1
+  have hu : IsUnit (algebraMap (LetA O n) W.EE (qA W ^ bi)) := by rw [map_pow]; exact hEQ.pow bi
+  have h2'
+      : algebraMap (LetA O n) W.EE (w ^ bi) * W.γE W.gam s
+        = s * algebraMap (LetA O n) W.EE (1 + W.π₀ * qA W * t) := by
     apply hu.mul_left_cancel
     linear_combination h1
   have hEwb : algebraMap (LetA O n) W.EE w ^ bi * algebraMap (LetA O n) W.EE wi ^ bi = 1 := by
     rw [← mul_pow, ← map_mul, hwwi, map_one, one_pow]
   rw [map_pow] at h2'
-  have hΓs : W.γE W.gam s = algebraMap (LetA O n) W.EE wi ^ bi *
-      (s * algebraMap (LetA O n) W.EE (1 + W.π₀ * qA W * t)) := by
+  have hΓs
+      : W.γE W.gam s
+        = algebraMap (LetA O n) W.EE wi ^ bi
+          * (s * algebraMap (LetA O n) W.EE (1 + W.π₀ * qA W * t)) := by
     linear_combination (algebraMap (LetA O n) W.EE wi ^ bi) * h2' - (W.γE W.gam s) * hEwb
 
   obtain ⟨g2, hg2, h2⟩ := hA2 g hg
@@ -166,25 +185,28 @@ theorem coef_step_of (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (hP9 
   have hwj : w ^ j * wi ^ j = 1 := by rw [← mul_pow, hwwi, one_pow]
   have hwm1 : w ^ m * wi ^ m = 1 := by rw [← mul_pow, hwwi, one_pow]
   have hwbi : wi ^ bi = wi ^ j * wi ^ m := by rw [← pow_add, ← hbi]
-  obtain ⟨h, hh⟩ : ∃ h : LetA O n,
-      h = wi ^ m * (g2 + g * t + W.π₀ * qA W * g2 * t - g * Z) := ⟨_, rfl⟩
-  have keyA : W.γA W.gam (qA W ^ j * g) * (wi ^ bi * (1 + W.π₀ * qA W * t)) =
-      qA W ^ j * g + W.π₀ * qA W ^ j * (C * g + qA W * h) := by
+  obtain ⟨h, hh⟩ : ∃ h : LetA O n, h = wi ^ m * (g2 + g * t + W.π₀ * qA W * g2 * t - g * Z) :=
+    ⟨_, rfl⟩
+  have keyA
+      : W.γA W.gam (qA W ^ j * g) * (wi ^ bi * (1 + W.π₀ * qA W * t))
+        = qA W ^ j * g + W.π₀ * qA W ^ j * (C * g + qA W * h) := by
     rw [map_mul (W.γA W.gam), map_pow (W.γA W.gam), h4', hg']
     linear_combination
       ((qA W * w) ^ j * (g + W.π₀ * qA W * g2) * (1 + W.π₀ * qA W * t)) * hwbi +
       (qA W ^ j * (g + W.π₀ * qA W * g2) * (1 + W.π₀ * qA W * t) * wi ^ m) * hwj -
       (qA W ^ j * g * wi ^ m) * hYM + (qA W ^ j * g * (1 + W.π₀ * C)) * hwm1 -
       (W.π₀ * qA W ^ j * qA W) * hh
-  have hfin2 : W.γE W.gam (algebraMap (LetA O n) W.EE (qA W ^ j * g) * s) =
-      algebraMap (LetA O n) W.EE (qA W ^ j * g + W.π₀ * qA W ^ j * (C * g + qA W * h)) * s := by
+  have hfin2
+      : W.γE W.gam (algebraMap (LetA O n) W.EE (qA W ^ j * g) * s)
+        = algebraMap (LetA O n) W.EE (qA W ^ j * g + W.π₀ * qA W ^ j * (C * g + qA W * h)) * s := by
     rw [map_mul (W.γE W.gam), hΓ, hΓs, ← keyA]
     simp only [map_mul, map_pow]
     ring
   refine ⟨h, ?_, ?_⟩
   · rw [hh]
-    exact mul_mem (pow_mem hwiΔ _) (sub_mem (add_mem (add_mem hg2 (mul_mem hg ht))
-      (mul_mem (mul_mem (mul_mem hπ hQΔ) hg2) ht)) (mul_mem hg hZΔ))
+    exact mul_mem (pow_mem hwiΔ _)
+      (sub_mem (add_mem (add_mem hg2 (mul_mem hg ht)) (mul_mem (mul_mem (mul_mem hπ hQΔ) hg2) ht))
+        (mul_mem hg hZΔ))
   · rw [← hC, hfin2, map_add (f := _)]
     ring
 

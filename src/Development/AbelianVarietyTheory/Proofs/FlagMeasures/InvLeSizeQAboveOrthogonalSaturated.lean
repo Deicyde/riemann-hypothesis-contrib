@@ -9,13 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrthogonalCan
 
 @[expose] public section
 
-open GlobalTheory.Count GlobalTheory.IndefiniteRowSideFullHecke.CenteredPerpendicularSets Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField Finset
+open GlobalTheory.Count GlobalTheory.IndefiniteRowSideFullHecke.CenteredPerpendicularSets
+  Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField Finset
 
 namespace GlobalTheory.Count.PerpSize
 
 open GlobalTheory.Count.PerpStep
 
-theorem inv_le_sizeQ_perp : ∀ (I : AutInst) (x : I.GA) (R : Submodule (𝓞 I.E) (Fin I.n → I.E)) (hi : ℝ), IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) R → 0 < hi → largestSize (bas I) (frm I x) R ≤ hi → ∀ N, perpIn I x R < N → N ≤ lamX I x → hi⁻¹ ≤ sizeQ (bas I) (frm I x) N (perpIn I x R) := by
+theorem inv_le_sizeQ_perp
+    : ∀ (I : AutInst) (x : I.GA) (R : Submodule (𝓞 I.E) (Fin I.n → I.E)) (hi : ℝ),
+      IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) R → 0 < hi
+        → largestSize (bas I) (frm I x) R ≤ hi
+        → ∀ N,
+          perpIn I x R < N → N ≤ lamX I x → hi⁻¹ ≤ sizeQ (bas I) (frm I x) N (perpIn I x R) := by
   intro I x R hi hR hhi hL N hPN hNA
   obtain ⟨-, hA, -⟩ := GlobalTheory.PointLattice.lamX_selfDual I x
   obtain ⟨htc, -, -, -, hw⟩ := GlobalTheory.Count.FrameMajorant.frames_give_majorants I x
@@ -36,7 +42,8 @@ theorem inv_le_sizeQ_perp : ∀ (I : AutInst) (x : I.GA) (R : Submodule (𝓞 I.
     rw [h1] at ppN
     exact (lt_of_lt_of_le hPN n1).ne ppN
   rw [htQ_eq _ _ hX _ _ (hfg hR.1) (sat_mono _ _ sS hle hR.1),
-    htQ_eq _ _ hX _ _ (hfg n2.1) (sat_mono _ _ sP hPN' n2.1), ← Real.exp_neg] at hq
+      htQ_eq _ _ hX _ _ (hfg n2.1) (sat_mono _ _ sP hPN' n2.1), ← Real.exp_neg]
+    at hq
   have hq' := Real.exp_injective hq
   obtain ⟨l0, lb⟩ := largest_bound (bas I) (frm I x) hX (hfg hR.1) hR0 hle
   have hd := rk_lt (bas I) (frm I x) hX hA sP hPN hNA
@@ -44,15 +51,17 @@ theorem inv_le_sizeQ_perp : ∀ (I : AutInst) (x : I.GA) (R : Submodule (𝓞 I.
   have r2 := (plLat _ _ _ (bas I) (frm I x) hX _ (hfg sP.1)).2.1
   have r3 := (plLat _ _ _ (bas I) (frm I x) hX _ (hfg sS.1)).2.1
   have r4 := (plLat _ _ _ (bas I) (frm I x) hX _ (hfg n2.1)).2.1
-  have hrk : rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (perpIn I x R) +
-      rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) R =
-      rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (perpIn I x N') +
-      rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) N := by
+  have hrk
+      : rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (perpIn I x R)
+          + rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) R
+        = rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (perpIn I x N')
+          + rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) N := by
     rw [← n3, r1, r2, r3, r4, ← mul_add, ← mul_add, rP, rS]
-  have hrk' : (rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) R : ℝ) -
-      rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (perpIn I x N') =
-      (rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) N : ℝ) -
-      rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (perpIn I x R) := by
+  have hrk'
+      : (rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) R : ℝ)
+          - rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (perpIn I x N')
+        = (rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) N : ℝ)
+          - rk (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (perpIn I x R) := by
     have h := congrArg (Nat.cast : ℕ → ℝ) hrk
     push_cast at h
     linarith

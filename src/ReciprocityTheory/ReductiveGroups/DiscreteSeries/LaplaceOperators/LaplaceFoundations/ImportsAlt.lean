@@ -21,22 +21,24 @@ theorem link : LinkStatement := by
     have h1 := T.w_norm
     rw [h, norm_zero] at h1
     exact zero_ne_one h1
-  have hN0 : ‖uniformisationL2 ε Ψ T.w T.w‖ ≠ 0 := norm_ne_zero_iff.mpr (datumEmbedding_highest_ne_zero hgap hP hv₀)
+  have hN0 : ‖uniformisationL2 ε Ψ T.w T.w‖ ≠ 0 :=
+    norm_ne_zero_iff.mpr (datumEmbedding_highest_ne_zero hgap hP hv₀)
   obtain ⟨c, hc⟩ : ∃ c : ℂ, c = ((‖uniformisationL2 ε Ψ T.w T.w‖⁻¹ : ℝ) : ℂ) := ⟨_, rfl⟩
   have h0 : uniformisationL2 ε Ψ T.w 0 = 0 := by simpa using datumEmbedding_smul hP T.w 0 T.w
   have hmem := datumEmbedding_mem_smooth hP T.w (c • T.w)
   refine ⟨L2 ε, inferInstance, inferInstance, rreg ε, uniformisationL2 ε Ψ T.w (c • T.w), ?_, ?_⟩
   · refine ⟨rreg_isURepOn ε, hmem, ?_, ?_, ?_⟩
-    · rw [datumEmbedding_smul hP, norm_smul, hc, Complex.norm_of_nonneg (inv_nonneg.mpr (norm_nonneg _)),
-        inv_mul_cancel₀ hN0]
+    · rw [datumEmbedding_smul hP, norm_smul, hc,
+        Complex.norm_of_nonneg (inv_nonneg.mpr (norm_nonneg _)), inv_mul_cancel₀ hN0]
     · constructor
       · intro a
         apply Subtype.ext
-        rw [rightDerivative_datum_embedding hP T.w (c • T.w) rfl, map_smul, T.w_wt a, Submodule.coe_smul, ← datumEmbedding_smul hP,
-          smul_comm]
+        rw [rightDerivative_datum_embedding hP T.w (c • T.w) rfl, map_smul, T.w_wt a,
+          Submodule.coe_smul, ← datumEmbedding_smul hP, smul_comm]
       · intro a b hab hε
         apply Subtype.ext
-        rw [rightDerivative_datum_embedding hP T.w (c • T.w) hε, map_smul, T.w_hw a b hab hε, smul_zero, h0]
+        rw [rightDerivative_datum_embedding hP T.w (c • T.w) hε, map_smul, T.w_hw a b hab hε,
+          smul_zero, h0]
         rfl
     · exact datumV_casimir hP T.w _ ((mem_datumV_iff hP T.w _).2 ⟨c • T.w, rfl⟩)
   · intro g hg

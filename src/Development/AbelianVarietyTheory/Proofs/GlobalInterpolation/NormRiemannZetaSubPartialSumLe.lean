@@ -80,9 +80,9 @@ lemma piece {s : ℂ} (hs : 0 < s.re) (hs1 : s ≠ 1) {M : ℕ} (hM : 1 ≤ M) :
   field_simp
   ring
 
-theorem zeta_eq_sum {s : ℂ} (hs : 0 < s.re) (hs1 : s ≠ 1) {M : ℕ} (hM : 1 ≤ M) :
-    riemannZeta s = ∑ n ∈ Finset.Icc 1 M, (n : ℂ) ^ (-s) + (M : ℂ) ^ (1 - s) / (s - 1)
-      - s * tailInt s M := by
+theorem zeta_eq_sum {s : ℂ} (hs : 0 < s.re) (hs1 : s ≠ 1) {M : ℕ} (hM : 1 ≤ M)
+    : riemannZeta s
+      = ∑ n ∈ Finset.Icc 1 M, (n : ℂ) ^ (-s) + (M : ℂ) ^ (1 - s) / (s - 1) - s * tailInt s M := by
   induction M, hM using Nat.le_induction with
   | base =>
     have hs1' : s - 1 ≠ 0 := sub_ne_zero.2 hs1
@@ -93,26 +93,30 @@ theorem zeta_eq_sum {s : ℂ} (hs : 0 < s.re) (hs1 : s ≠ 1) {M : ℕ} (hM : 1 
   | succ M hM ih =>
     have hM1 : (1 : ℝ) ≤ M := by exact_mod_cast hM
     have hle : (M : ℝ) ≤ M + 1 := by linarith
-    have hsplit : tailInt s M
-        = (∫ t in Ioc (M : ℝ) (M + 1), ((Int.fract t : ℝ) : ℂ) * (t : ℂ) ^ (-(s + 1)))
-          + tailInt s ((M : ℝ) + 1) := by
+    have hsplit
+        : tailInt s M
+          = (∫ t in Ioc (M : ℝ) (M + 1), ((Int.fract t : ℝ) : ℂ) * (t : ℂ) ^ (-(s + 1)))
+            + tailInt s ((M : ℝ) + 1) := by
       unfold tailInt
       rw [← Ioc_union_Ioi_eq_Ioi hle, setIntegral_union Ioc_disjoint_Ioi_same measurableSet_Ioi]
       · exact (integrableOn_integrand hs).mono_set fun t ht => lt_of_le_of_lt hM1 ht.1
-      · exact (integrableOn_integrand hs).mono_set fun t ht =>
-          lt_of_le_of_lt (hM1.trans hle) ht
+      · exact (integrableOn_integrand hs).mono_set fun t ht => lt_of_le_of_lt (hM1.trans hle) ht
     rw [ih, Finset.sum_Icc_succ_top (by omega), hsplit, mul_add, piece hs hs1 hM]
     push_cast
     ring
 
-theorem norm_zeta_sub_sum_le :
-    ∀ s : ℂ, 0 < s.re → s ≠ 1 → ∀ M : ℕ, 1 ≤ M →
-      ‖riemannZeta s - ∑ n ∈ Finset.Icc 1 M, (n : ℂ) ^ (-s) - (M : ℂ) ^ (1 - s) / (s - 1)‖
-        ≤ ‖s‖ / s.re * (M : ℝ) ^ (-s.re) := by
+theorem norm_zeta_sub_sum_le
+    : ∀ s : ℂ,
+      0 < s.re → s ≠ 1
+        → ∀ M : ℕ,
+          1 ≤ M
+            → ‖riemannZeta s - ∑ n ∈ Finset.Icc 1 M, (n : ℂ) ^ (-s) - (M : ℂ) ^ (1 - s) / (s - 1)‖
+              ≤ ‖s‖ / s.re * (M : ℝ) ^ (-s.re) := by
   intro s hs hs1 M hM
   have hM0 : (0 : ℝ) < M := by exact_mod_cast hM
-  have e : riemannZeta s - ∑ n ∈ Finset.Icc 1 M, (n : ℂ) ^ (-s) - (M : ℂ) ^ (1 - s) / (s - 1)
-      = -(s * tailInt s M) := by
+  have e
+      : riemannZeta s - ∑ n ∈ Finset.Icc 1 M, (n : ℂ) ^ (-s) - (M : ℂ) ^ (1 - s) / (s - 1)
+        = -(s * tailInt s M) := by
     rw [zeta_eq_sum hs hs1 hM]; ring
   rw [e, norm_neg, norm_mul, div_mul_eq_mul_div, mul_div_assoc]
   exact mul_le_mul_of_nonneg_left (norm_tailInt_le hs hM0) (norm_nonneg s)

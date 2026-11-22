@@ -8,22 +8,23 @@ namespace GlobalTheory.PadicVal
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem exists_rat_log (x : PadicAlgCl p) (hx : x ≠ 0) : ∃ q : ℚ, Real.log ‖x‖ = q * Real.log p := by
+theorem exists_rat_log (x : PadicAlgCl p) (hx : x ≠ 0)
+    : ∃ q : ℚ, Real.log ‖x‖ = q * Real.log p := by
   have hint : IsIntegral ℚ_[p] x := Algebra.IsIntegral.isIntegral x
   have hc : (minpoly ℚ_[p] x).coeff 0 ≠ 0 := minpoly.coeff_zero_ne_zero hint hx
   have hn : ‖x‖ = ‖(minpoly ℚ_[p] x).coeff 0‖ ^ (1 / (minpoly ℚ_[p] x).natDegree : ℝ) := by
     rw [← PadicAlgCl.spectralNorm_eq]
     exact spectralNorm.spectralNorm_eq_norm_coeff_zero_rpow ℚ_[p] (PadicAlgCl p) x
-  refine ⟨((-((minpoly ℚ_[p] x).coeff 0).valuation : ℤ) : ℚ) / ((minpoly ℚ_[p] x).natDegree : ℚ), ?_⟩
+  refine
+    ⟨((-((minpoly ℚ_[p] x).coeff 0).valuation : ℤ) : ℚ) / ((minpoly ℚ_[p] x).natDegree : ℚ), ?_⟩
   rw [hn, Real.log_rpow (norm_pos_iff.2 hc), Padic.norm_eq_zpow_neg_valuation hc, Real.log_zpow]
   push_cast
   ring
 
-
 open Classical in
-theorem exists_addValuation (π : PadicAlgCl p) (h0 : 0 < ‖π‖) (h1 : ‖π‖ < 1) :
-    ∃ v : AddValuation (PadicAlgCl p) (WithTop ℚ), ∀ x, x ≠ 0 →
-      ∃ q : ℚ, v x = (q : WithTop ℚ) ∧ Real.log ‖x‖ = q * Real.log ‖π‖ := by
+theorem exists_addValuation (π : PadicAlgCl p) (h0 : 0 < ‖π‖) (h1 : ‖π‖ < 1)
+    : ∃ v : AddValuation (PadicAlgCl p) (WithTop ℚ), ∀ x,
+      x ≠ 0 → ∃ q : ℚ, v x = (q : WithTop ℚ) ∧ Real.log ‖x‖ = q * Real.log ‖π‖ := by
   classical
   have hL : Real.log ‖π‖ < 0 := Real.log_neg h0 h1
   have hex : ∀ x : PadicAlgCl p, x ≠ 0 → ∃ q : ℚ, Real.log ‖x‖ = q * Real.log ‖π‖ := by
@@ -54,8 +55,7 @@ theorem exists_addValuation (π : PadicAlgCl p) (h0 : 0 < ‖π‖) (h1 : ‖π�
   have f_ne : ∀ x, x ≠ 0 → f x = (r x : WithTop ℚ) := fun x hx => if_neg hx
   have f_zero : f 0 = ⊤ := if_pos rfl
   refine ⟨AddValuation.of f f_zero ?_ ?_ ?_, ?_⟩
-  · have h : (r 1 : ℝ) = 0 := by
-      rw [hr' 1 one_ne_zero, norm_one, Real.log_one, zero_div]
+  · have h : (r 1 : ℝ) = 0 := by rw [hr' 1 one_ne_zero, norm_one, Real.log_one, zero_div]
     rw [f_ne 1 one_ne_zero, Rat.cast_eq_zero.1 h]
     rfl
   · intro x y
@@ -76,11 +76,9 @@ theorem exists_addValuation (π : PadicAlgCl p) (h0 : 0 < ‖π‖) (h1 : ‖π�
     have hpos : 0 < ‖x + y‖ := norm_pos_iff.2 hxy
     rcases le_total ‖y‖ ‖x‖ with h | h
     · rw [max_eq_left h] at hle
-      exact (min_le_left _ _).trans
-        (div_le_div_of_nonpos_of_le hL.le (Real.log_le_log hpos hle))
+      exact (min_le_left _ _).trans (div_le_div_of_nonpos_of_le hL.le (Real.log_le_log hpos hle))
     · rw [max_eq_right h] at hle
-      exact (min_le_right _ _).trans
-        (div_le_div_of_nonpos_of_le hL.le (Real.log_le_log hpos hle))
+      exact (min_le_right _ _).trans (div_le_div_of_nonpos_of_le hL.le (Real.log_le_log hpos hle))
   · intro x y
     by_cases hx : x = 0
     · subst hx
@@ -97,11 +95,12 @@ theorem exists_addValuation (π : PadicAlgCl p) (h0 : 0 < ‖π‖) (h1 : ‖π�
   · intro x hx
     exact ⟨r x, f_ne x hx, hr x hx⟩
 
-theorem tendsto_of_null {π : PadicAlgCl p} (h0 : 0 < ‖π‖) (h1 : ‖π‖ < 1)
+theorem tendsto_of_null
+    {π : PadicAlgCl p} (h0 : 0 < ‖π‖) (h1 : ‖π‖ < 1)
     {v : AddValuation (PadicAlgCl p) (WithTop ℚ)}
     (hv : ∀ x, x ≠ 0 → ∃ q : ℚ, v x = (q : WithTop ℚ) ∧ Real.log ‖x‖ = q * Real.log ‖π‖)
-    {I : Type} {x : I → PadicAlgCl p} (hx : ∀ q : ℚ, {i | v (x i) < (q : WithTop ℚ)}.Finite) :
-    Filter.Tendsto x Filter.cofinite (nhds 0) := by
+    {I : Type} {x : I → PadicAlgCl p} (hx : ∀ q : ℚ, {i | v (x i) < (q : WithTop ℚ)}.Finite)
+    : Filter.Tendsto x Filter.cofinite (nhds 0) := by
   have hL : Real.log ‖π‖ < 0 := Real.log_neg h0 h1
   rw [tendsto_zero_iff_norm_tendsto_zero, Metric.tendsto_nhds]
   intro ε hε
@@ -126,9 +125,11 @@ theorem tendsto_of_null {π : PadicAlgCl p} (h0 : 0 < ‖π‖) (h1 : ‖π‖ <
   have h4 : Real.log ‖x i‖ < Real.log ε := by linarith
   exact (Real.log_lt_log_iff (norm_pos_iff.2 hxi) hε).1 h4
 
-theorem summable_of_mem (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K]
-    {I : Type} {x : I → PadicAlgCl p} (hK : ∀ i, x i ∈ K) (hx : Filter.Tendsto x Filter.cofinite (nhds 0)) :
-    Summable x := by
+theorem summable_of_mem
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K]
+    {I : Type} {x : I → PadicAlgCl p}
+    (hK : ∀ i, x i ∈ K) (hx : Filter.Tendsto x Filter.cofinite (nhds 0))
+    : Summable x := by
   have : CompleteSpace K := FiniteDimensional.complete ℚ_[p] K
   let y : I → K := fun i => ⟨x i, hK i⟩
   have hy : Filter.Tendsto y Filter.cofinite (nhds 0) := by

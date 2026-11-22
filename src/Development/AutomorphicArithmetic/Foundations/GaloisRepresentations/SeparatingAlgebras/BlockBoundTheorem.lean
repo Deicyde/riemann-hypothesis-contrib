@@ -106,7 +106,8 @@ theorem gammaEig_holds : GammaEig := gammaEig_pf
 theorem gammaInt_holds : GammaInt := gammaInt_pf rInt_holds densCont_holds
 theorem gammaConj_holds : GammaConj := gammaConj_pf rConj_holds
 theorem repsEx_holds : RepsEx := repsEx_pf
-theorem planch_holds : Planch := planch_pf gammaInt_holds gammaConj_holds gammaEig_holds injAE_holds densCont_holds
+theorem planch_holds : Planch :=
+  planch_pf gammaInt_holds gammaConj_holds gammaEig_holds injAE_holds densCont_holds
 theorem combine_holds : Combine := combine_pf
 theorem restrict_holds : Restrict := restrict_pf
 theorem algC_holds : AlgC := algC_pf alg_holds
@@ -130,7 +131,9 @@ theorem count_holds : Count := count_pf countCore_holds cover_holds sep_holds pa
 theorem countGen_holds : CountGen := countGen_pf count_holds neglAt_holds
 theorem stepCore_holds : StepCore := stepCore_pf algC_holds codim_holds partFacts_holds
 theorem smoothAt_holds : SmoothAt := smoothAt_pf
-theorem step_holds : Step := step_pf smoothAt_holds tower_holds levFacts_holds ell_holds countGen_holds stepCore_holds partFacts_holds
+theorem step_holds : Step :=
+  step_pf smoothAt_holds tower_holds levFacts_holds ell_holds countGen_holds stepCore_holds
+    partFacts_holds
 theorem denseGen_holds : DenseGen := denseGen_pf step_holds partFacts_holds
 theorem toPolyX_holds : ToPolyX := toPolyX_pf partFacts_holds
 theorem kappa_holds : Kappa := kappa_pf
@@ -139,15 +142,18 @@ theorem degLe_holds : DegLe := degLe_pf
 theorem blockBound_holds : BlockBound := blockBound_pf
 theorem detBound_holds : DetBound := detBound_pf
 theorem sizeLe_holds : SizeLe := sizeLe_pf
-theorem rhoBound_holds : RhoBound := rhoBound_pf degLe_holds blockBound_holds detBound_holds sizeLe_holds
+theorem rhoBound_holds : RhoBound :=
+  rhoBound_pf degLe_holds blockBound_holds detBound_holds sizeLe_holds
 theorem latFacts_holds : LatFacts := latFacts_pf
 theorem levelEx_holds : LevelEx := levelEx_pf
-theorem frameW_holds : FrameW := frameW_pf kappa_holds denomBdd_holds rhoBound_holds latFacts_holds levelEx_holds
+theorem frameW_holds : FrameW :=
+  frameW_pf kappa_holds denomBdd_holds rhoBound_holds latFacts_holds levelEx_holds
 theorem maxCpt_holds : MaxCpt := maxCpt_pf
 theorem powNhds_holds : PowNhds := powNhds_pf
 theorem kerOpen_holds : KerOpen := kerOpen_pf powNhds_holds
 theorem charSum_holds : CharSum := charSum_pf
 theorem twistPart_holds : TwistPart := twistPart_pf
-theorem tyStep_holds : TyStep := tyStep_pf levFacts_holds ell_holds kerOpen_holds charSum_holds twistPart_holds
+theorem tyStep_holds : TyStep :=
+  tyStep_pf levFacts_holds ell_holds kerOpen_holds charSum_holds twistPart_holds
 
 end UpperTheory.Gal.Gen

@@ -19,8 +19,8 @@ theorem mfac_nonneg (K : ℕ) {L : ℝ} (hL : 0 ≤ L) (a : ℝ) (ha : 0 ≤ a) 
   · exact zero_le_one
   · exact le_min zero_le_one (by positivity)
 
-theorem mfac_anti (K : ℕ) {L : ℝ} (hL : 0 < L) {b b' : ℝ} (hb : 0 ≤ b) (hbb : b ≤ b') :
-    mfac K L b' ≤ mfac K L b := by
+theorem mfac_anti (K : ℕ) {L : ℝ} (hL : 0 < L) {b b' : ℝ} (hb : 0 ≤ b) (hbb : b ≤ b')
+    : mfac K L b' ≤ mfac K L b := by
   unfold mfac
   by_cases hb0 : b = 0
   · rw [if_pos hb0]

@@ -11,15 +11,17 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianSchem
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace GlobalTheory.CompanionTheory.Ar.Approx
 
-theorem dense_range_fst_generic (R K : Type) [CommRing R] [IsDomain R] [Field K] [Algebra R K]
-    [IsFractionRing R K] {X : Scheme.{0}} (p : X ⟶ Sp R) (hp : IsOpenMap p) :
-    Dense (Set.range (pullback.fst p (spMap (algebraMap R K)))) := by
+theorem dense_range_fst_generic
+    (R K : Type) [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    {X : Scheme.{0}} (p : X ⟶ Sp R) (hp : IsOpenMap p)
+    : Dense (Set.range (pullback.fst p (spMap (algebraMap R K)))) := by
   classical
   have hinj : Function.Injective (algebraMap R K) := IsFractionRing.injective R K
   let y : PrimeSpectrum K := ⟨⊥, Ideal.isPrime_bot⟩
@@ -40,7 +42,12 @@ theorem dense_range_fst_generic (R K : Type) [CommRing R] [IsDomain R] [Field K]
   obtain ⟨x', hx'U, hx'⟩ := hmem
   exact ⟨x', hx'U, ⟨y, hx'.symm⟩⟩
 
-theorem geometricallyConnected_of_generic : ∀ (R K : Type) [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G], Smooth G.hom → IsProper G.hom → GeometricallyConnected (pullback.snd G.hom (spMap (algebraMap R K))) → GeometricallyConnected G.hom := by
+theorem geometricallyConnected_of_generic
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+        (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G],
+      Smooth G.hom → IsProper G.hom
+        → GeometricallyConnected (pullback.snd G.hom (spMap (algebraMap R K)))
+        → GeometricallyConnected G.hom := by
   intro R K _ _ _ _ _ G _ _ hsm hpr hgc
   set f := spMap (algebraMap R K) with hf
   let F := Over.pullback f
@@ -51,7 +58,8 @@ theorem geometricallyConnected_of_generic : ∀ (R K : Type) [CommRing R] [IsDom
       infer_instance
     · show IsProper (pullback.snd G.hom f)
       infer_instance
-  refine GlobalTheory.T.geometricallyConnected_of_commGroup_nsmul_surjective (Sp R) G inferInstance inferInstance ?_
+  refine GlobalTheory.T.geometricallyConnected_of_commGroup_nsmul_surjective (Sp R) G inferInstance
+    inferInstance ?_
   intro n hn
   have hK := GlobalTheory.T.abelianScheme_nsmul_surjective K GK hab n hn
   have hmap : F.map (𝟙 G ^ n) = 𝟙 GK ^ n := by
@@ -66,8 +74,10 @@ theorem geometricallyConnected_of_generic : ∀ (R K : Type) [CommRing R] [IsDom
   have hsep : IsSeparated G.hom := inferInstance
   have hprop : UniversallyClosed φ := by
     first
-    | exact (MorphismProperty.of_postcomp (W := @IsProper) (W' := @IsSeparated) φ G.hom hsep hcomp).toUniversallyClosed
-    | exact MorphismProperty.of_postcomp (W := @UniversallyClosed) (W' := @IsSeparated) φ G.hom hsep inferInstance
+    | exact (MorphismProperty.of_postcomp (W := @IsProper) (W' := @IsSeparated) φ G.hom hsep
+        hcomp).toUniversallyClosed
+    | exact MorphismProperty.of_postcomp (W := @UniversallyClosed) (W' := @IsSeparated) φ G.hom hsep
+        inferInstance
     | exact UniversallyClosed.of_comp_of_isSeparated φ G.hom
     | exact (IsProper.of_comp φ G.hom).toUniversallyClosed
   have hcl : IsClosed (Set.range φ) := φ.isClosedMap.isClosed_range
@@ -78,8 +88,7 @@ theorem geometricallyConnected_of_generic : ∀ (R K : Type) [CommRing R] [IsDom
     obtain ⟨w, rfl⟩ := hK.surj z
     refine ⟨pullback.fst G.hom f w, ?_⟩
     rw [← Scheme.Hom.comp_apply, ← hsq, Scheme.Hom.comp_apply]
-  have huniv : Set.range φ = Set.univ :=
-    (hdense.mono hsub).closure_eq ▸ hcl.closure_eq.symm
+  have huniv : Set.range φ = Set.univ := (hdense.mono hsub).closure_eq ▸ hcl.closure_eq.symm
   exact ⟨fun x => by
     have : x ∈ Set.range φ := huniv ▸ Set.mem_univ x
     exact this⟩

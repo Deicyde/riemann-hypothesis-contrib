@@ -17,8 +17,8 @@ namespace GlobalTheory.PairFourier
 
 open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
 
-theorem tsum_natCast_eq {ι : Type} (n : ι → ℕ) (h : Summable (fun i ↦ (n i : ℂ))) :
-    ∃ m : ℕ, ∑' i, (n i : ℂ) = m := by
+theorem tsum_natCast_eq {ι : Type} (n : ι → ℕ) (h : Summable (fun i ↦ (n i : ℂ)))
+    : ∃ m : ℕ, ∑' i, (n i : ℂ) = m := by
   have hfin : (Function.support n).Finite := by
     have ht := h.tendsto_cofinite_zero
     have hev : ∀ᶠ i in Filter.cofinite, ‖(n i : ℂ)‖ < 1 := by
@@ -40,15 +40,16 @@ theorem tsum_natCast_eq {ι : Type} (n : ι → ℕ) (h : Summable (fun i ↦ (n
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem norm_div_eq_nat (𝔞 : Frac F) {ν : F} (hν : ν ∈ (𝔞 : FractionalIdeal (𝓞 F)⁰ F)) :
-    ∃ m : ℕ, |((Algebra.norm ℚ ν : ℚ) : ℝ)| / nrm 𝔞 = m := by
+theorem norm_div_eq_nat (𝔞 : Frac F) {ν : F} (hν : ν ∈ (𝔞 : FractionalIdeal (𝓞 F)⁰ F))
+    : ∃ m : ℕ, |((Algebra.norm ℚ ν : ℚ) : ℝ)| / nrm 𝔞 = m := by
   set J : FractionalIdeal (𝓞 F)⁰ F :=
     FractionalIdeal.spanSingleton (𝓞 F)⁰ ν * ((𝔞⁻¹ : Frac F) : FractionalIdeal (𝓞 F)⁰ F) with hJdef
   have hle : J ≤ 1 := by
     have h1 : FractionalIdeal.spanSingleton (𝓞 F)⁰ ν ≤ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) :=
       FractionalIdeal.spanSingleton_le_iff_mem.2 hν
-    calc J ≤ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) * ((𝔞⁻¹ : Frac F) : FractionalIdeal (𝓞 F)⁰ F) :=
-          mul_le_mul_left h1 _
+    calc
+      J ≤ (𝔞 : FractionalIdeal (𝓞 F)⁰ F) * ((𝔞⁻¹ : Frac F) : FractionalIdeal (𝓞 F)⁰ F) :=
+        mul_le_mul_left h1 _
       _ = 1 := by rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
   obtain ⟨I, hI⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.1 hle
   have hJa : J * (𝔞 : FractionalIdeal (𝓞 F)⁰ F) = FractionalIdeal.spanSingleton (𝓞 F)⁰ ν := by
@@ -67,17 +68,20 @@ theorem norm_div_eq_nat (𝔞 : Frac F) {ν : F} (hν : ν ∈ (𝔞 : Fractiona
 
 variable [IsTotallyReal F]
 
-def pairPt (𝔞 𝔟 : Frac F) (c : Quotient (qRel 𝔞 𝔟)) : GlobalTheory.RealMult.FracId.elt (𝔞 * 𝔟) :=
-  ⟨c.out.1.1 * c.out.1.2, by
+def pairPt (𝔞 𝔟 : Frac F) (c : Quotient (qRel 𝔞 𝔟)) : GlobalTheory.RealMult.FracId.elt (𝔞 * 𝔟) := ⟨
+  c.out.1.1 * c.out.1.2,
+  by
     show _ ∈ ((𝔞 * 𝔟 : Frac F) : FractionalIdeal (𝓞 F)⁰ F)
     rw [Units.val_mul]
-    exact FractionalIdeal.mul_mem_mul c.out.2.1 c.out.2.2.1⟩
+    exact FractionalIdeal.mul_mem_mul c.out.2.1 c.out.2.2.1
+⟩
 
 def pairCoef (𝔞 𝔟 : Frac F) (k : ℕ) (c : Quotient (qRel 𝔞 𝔟)) : ℕ :=
   (norm_div_eq_nat 𝔞 c.out.2.1).choose ^ (k - 1)
 
-theorem qClass_eq (𝔞 𝔟 : Frac F) (k : ℕ) (z : Emb F → ℂ) (c : Quotient (qRel 𝔞 𝔟)) :
-    qClass 𝔞 𝔟 k z c = (pairCoef 𝔞 𝔟 k c : ℂ) * GlobalTheory.RealMult.qPower ((pairPt 𝔞 𝔟 c : F)) z := by
+theorem qClass_eq (𝔞 𝔟 : Frac F) (k : ℕ) (z : Emb F → ℂ) (c : Quotient (qRel 𝔞 𝔟))
+    : qClass 𝔞 𝔟 k z c
+      = (pairCoef 𝔞 𝔟 k c : ℂ) * GlobalTheory.RealMult.qPower ((pairPt 𝔞 𝔟 c : F)) z := by
   unfold qClass qTerm pairCoef pairPt
   have hs := (norm_div_eq_nat 𝔞 c.out.2.1).choose_spec
   generalize (norm_div_eq_nat 𝔞 c.out.2.1).choose = m at hs ⊢

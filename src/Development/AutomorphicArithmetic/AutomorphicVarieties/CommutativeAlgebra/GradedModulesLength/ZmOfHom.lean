@@ -24,8 +24,10 @@ private def zmJ (ι : ℕ → A →+ R) (p : Ideal R) : Ideal A where
 
 variable (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] (ι : ℕ → A →+ R) (p : Ideal R)
 
-private theorem zm_of_hom (h0 : ∀ (n : ℕ) j a, a ∈ 𝒜 j → j ≠ -(2 * n) → ι n a = 0) {j : ℤ} {g : A} (hg : g ∈ 𝒜 j)
-    (H : ∀ (n : ℕ) h, h ∈ 𝒜 (-(2 * n) - j) → ι n (h * g) ∈ p) : g ∈ zmJ ι p := by
+private theorem zm_of_hom
+    (h0 : ∀ (n : ℕ) j a, a ∈ 𝒜 j → j ≠ -(2 * n) → ι n a = 0)
+    {j : ℤ} {g : A} (hg : g ∈ 𝒜 j) (H : ∀ (n : ℕ) h, h ∈ 𝒜 (-(2 * n) - j) → ι n (h * g) ∈ p)
+    : g ∈ zmJ ι p := by
   classical
   show ∀ h n, ι n (h * g) ∈ p
   intro h n
@@ -38,14 +40,16 @@ private theorem zm_of_hom (h0 : ∀ (n : ℕ) j a, a ∈ 𝒜 j → j ≠ -(2 * 
   · rw [h0 n (i + j) _ (SetLike.GradedMul.mul_mem (SetLike.coe_mem _) hg) (by omega)]
     exact p.zero_mem
 
-private theorem zm_abs (hp : p.IsPrime) (h0 : ∀ (n : ℕ) j a, a ∈ 𝒜 j → j ≠ -(2 * n) → ι n a = 0)
+private theorem zm_abs
+    (hp : p.IsPrime) (h0 : ∀ (n : ℕ) j a, a ∈ 𝒜 j → j ≠ -(2 * n) → ι n a = 0)
     (hm : ∀ (n m : ℕ) a b, a ∈ 𝒜 (-(2 * n)) → b ∈ 𝒜 (-(2 * m)) → ι (n + m) (a * b) = ι n a * ι m b)
-    {f : A} (hf : f ∈ 𝒜 (-2)) (hfp : ι 1 f ∉ p) :
-    (∀ j g, g ∈ 𝒜 j → g ^ 2 ∈ zmJ ι p → g ∈ zmJ ι p) ∧ (∀ j g, g ∈ 𝒜 j → f * g ∈ zmJ ι p → g ∈ zmJ ι p) ∧
-    (∀ b, b ∈ 𝒜 0 → ι 0 b ∈ p → b ∈ zmJ ι p) ∧ (∀ b, b ∈ 𝒜 (-2) → ι 1 b ∈ p → b ∈ zmJ ι p) ∧
-    (∀ b (n : ℕ), b ∈ 𝒜 0 → ι 0 b ∉ p → b * f ^ n ∉ zmJ ι p) := by
-  have mul' : ∀ {i j k : ℤ} {a b : A}, a ∈ 𝒜 i → b ∈ 𝒜 j → i + j = k → a * b ∈ 𝒜 k :=
-    fun ha hb h => h ▸ SetLike.GradedMul.mul_mem ha hb
+    {f : A} (hf : f ∈ 𝒜 (-2)) (hfp : ι 1 f ∉ p)
+    : (∀ j g, g ∈ 𝒜 j → g ^ 2 ∈ zmJ ι p → g ∈ zmJ ι p)
+      ∧ (∀ j g, g ∈ 𝒜 j → f * g ∈ zmJ ι p → g ∈ zmJ ι p) ∧ (∀ b, b ∈ 𝒜 0 → ι 0 b ∈ p → b ∈ zmJ ι p)
+      ∧ (∀ b, b ∈ 𝒜 (-2) → ι 1 b ∈ p → b ∈ zmJ ι p)
+      ∧ (∀ b (n : ℕ), b ∈ 𝒜 0 → ι 0 b ∉ p → b * f ^ n ∉ zmJ ι p) := by
+  have mul' : ∀ {i j k : ℤ} {a b : A}, a ∈ 𝒜 i → b ∈ 𝒜 j → i + j = k → a * b ∈ 𝒜 k := fun ha hb h =>
+    h ▸ SetLike.GradedMul.mul_mem ha hb
   have hf1 : f ∈ 𝒜 (-(2 * ((1 : ℕ) : ℤ))) := by simpa using hf
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro j g hg hg2
@@ -94,30 +98,40 @@ private theorem zm_abs (hp : p.IsPrime) (h0 : ∀ (n : ℕ) j a, a ∈ 𝒜 j �
 
 end Abs
 
-private theorem zm_lat {B A : Type} [CommRing B] [CommRing A] [Algebra B A] {k : ℕ} (N : Fin k → Submodule B A)
-    (i : Fin k) (n : ℕ) : lat N (Finsupp.single i n) = N i ^ n := by
+private theorem zm_lat
+    {B A : Type} [CommRing B] [CommRing A] [Algebra B A]
+    {k : ℕ} (N : Fin k → Submodule B A) (i : Fin k)
+    (n : ℕ)
+    : lat N (Finsupp.single i n) = N i ^ n := by
   simp [lat, Finsupp.prod_single_index, Finsupp.single_apply]
 
-private theorem zm_iota {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜]
-    (F : A) (hpow : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = oz 𝒜 (-2) ^ n) :
-    ∃ ι : ℕ → A →+ rees (mN 𝒜 F), (∀ (n : ℕ) j a, a ∈ 𝒜 j → j ≠ -(2 * n) → ι n a = 0) ∧
-      ∀ (n : ℕ) a, a ∈ 𝒜 (-(2 * n)) → (ι n a).1 = MvPolynomial.monomial (Finsupp.single 0 n) a := by
+private theorem zm_iota
+    {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+    (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜]
+    (F : A) (hpow : ∀ n : ℕ, oz 𝒜 (-(2 * n)) = oz 𝒜 (-2) ^ n)
+    : ∃ ι : ℕ → A →+ rees (mN 𝒜 F),
+      (∀ (n : ℕ) j a, a ∈ 𝒜 j → j ≠ -(2 * n) → ι n a = 0)
+        ∧ ∀ (n : ℕ) a,
+          a ∈ 𝒜 (-(2 * n)) → (ι n a).1 = MvPolynomial.monomial (Finsupp.single 0 n) a := by
   classical
-  have hmem : ∀ (n : ℕ) (b : A), b ∈ 𝒜 (-(2 * (n : ℤ))) → b ∈ lat (mN 𝒜 F) (Finsupp.single 0 n) := by
+  have hmem
+      : ∀ (n : ℕ) (b : A), b ∈ 𝒜 (-(2 * (n : ℤ))) → b ∈ lat (mN 𝒜 F) (Finsupp.single 0 n) := by
     intro n b hb
     rw [zm_lat, show mN 𝒜 F 0 = oz 𝒜 (-2) from rfl, ← hpow, mem_oz]
     exact hb
-  let ι : ℕ → A →+ rees (mN 𝒜 F) := fun n =>
-    { toFun := fun a => mono (mN 𝒜 F) (Finsupp.single 0 n) (DirectSum.decompose 𝒜 a (-(2 * (n : ℤ))) : A)
+  let ι : ℕ → A →+ rees (mN 𝒜 F) := fun n => {
+    toFun := fun a =>
+      mono (mN 𝒜 F) (Finsupp.single 0 n) (DirectSum.decompose 𝒜 a (-(2 * (n : ℤ))) : A)
         (hmem n _ (SetLike.coe_mem _))
-      map_zero' := by
-        apply Subtype.ext
-        show MvPolynomial.monomial _ _ = _
-        simp
-      map_add' := fun a b => by
-        apply Subtype.ext
-        show MvPolynomial.monomial _ _ = MvPolynomial.monomial _ _ + MvPolynomial.monomial _ _
-        simp [map_add (f := _)] }
+    map_zero' := by
+      apply Subtype.ext
+      show MvPolynomial.monomial _ _ = _
+      simp
+    map_add' := fun a b => by
+      apply Subtype.ext
+      show MvPolynomial.monomial _ _ = MvPolynomial.monomial _ _ + MvPolynomial.monomial _ _
+      simp [map_add (f := _)]
+  }
   refine ⟨ι, ?_, ?_⟩
   · intro n j a ha hj
     apply Subtype.ext
@@ -128,8 +142,10 @@ private theorem zm_iota {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (�
     show MvPolynomial.monomial _ _ = _
     rw [DirectSum.decompose_of_mem_same 𝒜 ha]
 
-private theorem zm_f {B A : Type} [CommRing B] [CommRing A] [Algebra B A] {k : ℕ} (N : Fin k → Submodule B A)
-    (p : Ideal (rees N)) (hp : ¬ Irr (reesGr N) ≤ p) (i : Fin k) : ∃ f, ∃ hf : f ∈ N i, sec N i f hf ∉ p := by
+private theorem zm_f
+    {B A : Type} [CommRing B] [CommRing A] [Algebra B A]
+    {k : ℕ} (N : Fin k → Submodule B A) (p : Ideal (rees N)) (hp : ¬ Irr (reesGr N) ≤ p) (i : Fin k)
+    : ∃ f, ∃ hf : f ∈ N i, sec N i f hf ∉ p := by
   classical
   have hdeg : toDeg (Finsupp.single i 1) = e i := by
     unfold toDeg e
@@ -165,21 +181,27 @@ private theorem zm_f {B A : Type} [CommRing B] [CommRing A] [Algebra B A] {k : �
 
 end UpperTheory.V.Alg.M
 
-theorem UpperTheory.V.Alg.M.zm_holds :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (K : Type) [Field K] [Algebra O K] [IsAlgClosed K] [FaithfulSMul O K]
-      (A : Type) [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O), IsWRing 𝒜 x →
-    ∀ (r s r' s' m : ℕ) (Q : Eqns 𝒜 x r s r' s' m),
-    ∀ p : Ideal (mR Q), p.IsPrime → ¬ Irr (mGr Q) ≤ p → secs (ts Q) ≤ p → (∀ i, algebraMap (𝒜 0) (mR Q) ⟨Q.Z i, (Q.hZ i).1⟩ ∈ p) →
-      (idD 𝒜).map (algebraMap (𝒜 0) (mR Q)) ≤ p → ∀ σ : 𝒜 0 →ₐ[O] K, RingHom.ker σ = p.comap (algebraMap (𝒜 0) (mR Q)) →
-      ∃ ξ : A →ₐ[O] K, OnS Q.ideal ξ ∧ PosZero 𝒜 ξ ∧ ¬ NegZero 𝒜 ξ ∧ res0 𝒜 ξ = σ := by
+theorem UpperTheory.V.Alg.M.zm_holds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (K : Type) [Field K] [Algebra O K]
+        [IsAlgClosed K] [FaithfulSMul O K] (A : Type) [CommRing A] [Algebra O A]
+        (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O),
+      IsWRing 𝒜 x
+        → ∀ (r s r' s' m : ℕ) (Q : Eqns 𝒜 x r s r' s' m), ∀ p : Ideal (mR Q),
+          p.IsPrime → ¬ Irr (mGr Q) ≤ p → secs (ts Q) ≤ p
+            → (∀ i, algebraMap (𝒜 0) (mR Q) ⟨Q.Z i, (Q.hZ i).1⟩ ∈ p)
+            → (idD 𝒜).map (algebraMap (𝒜 0) (mR Q)) ≤ p
+            → ∀ σ : 𝒜 0 →ₐ[O] K,
+              RingHom.ker σ = p.comap (algebraMap (𝒜 0) (mR Q))
+                → ∃ ξ : A →ₐ[O] K, OnS Q.ideal ξ ∧ PosZero 𝒜 ξ ∧ ¬ NegZero 𝒜 ξ ∧ res0 𝒜 ξ = σ := by
   intro O _ _ _ _ _ K _ _ _ _ A _ _ 𝒜 _ _ x hW r s r' s' m Q p hp hirr hts hZ hD σ hσ
   classical
   set F := Q.F (Fin.last r) with hFdef
   have hpow := fun n : ℕ => oz_two_mul_eq_pow O A 𝒜 x hW n
   obtain ⟨ι, h0, h1⟩ := zm_iota 𝒜 F (fun n => (hpow n).1)
-  have hm : ∀ (n k : ℕ) a b, a ∈ 𝒜 (-(2 * (n : ℤ))) → b ∈ 𝒜 (-(2 * (k : ℤ))) →
-      ι (n + k) (a * b) = ι n a * ι k b := by
+  have hm
+      : ∀ (n k : ℕ) a b,
+        a ∈ 𝒜 (-(2 * (n : ℤ))) → b ∈ 𝒜 (-(2 * (k : ℤ))) → ι (n + k) (a * b) = ι n a * ι k b := by
     intro n k a b ha hb
     apply Subtype.ext
     have hab : a * b ∈ 𝒜 (-(2 * ((n + k : ℕ) : ℤ))) := by
@@ -187,7 +209,8 @@ theorem UpperTheory.V.Alg.M.zm_holds :
       convert this using 2
       push_cast
       ring
-    rw [Subalgebra.coe_mul, h1 _ _ hab, h1 _ _ ha, h1 _ _ hb, MvPolynomial.monomial_mul, Finsupp.single_add]
+    rw [Subalgebra.coe_mul, h1 _ _ hab, h1 _ _ ha, h1 _ _ hb, MvPolynomial.monomial_mul,
+      Finsupp.single_add]
   obtain ⟨f, hfN, hfp⟩ := zm_f (mN 𝒜 F) p hirr 0
   have hf : f ∈ 𝒜 (-2) := (mem_oz 𝒜).1 hfN
   have hf1 : f ∈ 𝒜 (-(2 * ((1 : ℕ) : ℤ))) := by simpa using hf

@@ -14,8 +14,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 noncomputable section
@@ -23,37 +25,44 @@ namespace GlobalTheory.ConnOpen
 
 open GlobalTheory.AbLaw GlobalTheory.AbLaw.Seesaw ReciprocityTheory.ChartRestriction.G.Out
 
-theorem preconnectedSpace_of_functions (Y : Scheme.{0})
-    (H : ∀ s : Γ(Y, ⊤), Y.basicOpen s = ⊥ ∨ Y.basicOpen s = ⊤) : PreconnectedSpace Y := by
+theorem preconnectedSpace_of_functions
+    (Y : Scheme.{0}) (H : ∀ s : Γ(Y, ⊤), Y.basicOpen s = ⊥ ∨ Y.basicOpen s = ⊤)
+    : PreconnectedSpace Y := by
   refine ⟨fun U W hU hW hc ⟨u, _, hu⟩ ⟨w, _, hw⟩ => ?_⟩
   by_contra hne
   let O : Bool → Y.Opens := fun i => bif i then ⟨U, hU⟩ else ⟨W, hW⟩
   have hd : O true ⊓ O false = ⊥ := le_bot_iff.1 fun y hy => hne ⟨y, trivial, hy⟩
-  have hcov : ⨆ i, O i = ⊤ := top_unique fun y _ => by
-    rcases hc (Set.mem_univ y) with h | h
-    · exact TopologicalSpace.Opens.mem_iSup.2 ⟨true, h⟩
-    · exact TopologicalSpace.Opens.mem_iSup.2 ⟨false, h⟩
-  obtain ⟨s, hs⟩ := TLinPf.glue O hcov (fun i => bif i then 1 else 0) (fun i j => by
-    have sub : ∀ T : Y.Opens, T = ⊥ → Subsingleton Γ(Y, T) := fun T hT => by
-      subst hT; infer_instance
-    cases i <;> cases j
-    · exact (map_zero _).trans (map_zero _).symm
-    · exact (sub _ ((inf_comm _ _).trans hd)).elim _ _
-    · exact (sub _ hd).elim _ _
-    · exact (map_one _).trans (map_one _).symm)
+  have hcov : ⨆ i, O i = ⊤ :=
+    top_unique fun y _ => by
+      rcases hc (Set.mem_univ y) with h | h
+      · exact TopologicalSpace.Opens.mem_iSup.2 ⟨true, h⟩
+      · exact TopologicalSpace.Opens.mem_iSup.2 ⟨false, h⟩
+  obtain ⟨s, hs⟩ :=
+    TLinPf.glue O hcov
+      (fun i => bif i then 1 else 0)
+      (fun i j => by
+        have sub : ∀ T : Y.Opens, T = ⊥ → Subsingleton Γ(Y, T) := fun T hT => by
+          subst hT; infer_instance
+        cases i <;> cases j
+        · exact (map_zero _).trans (map_zero _).symm
+        · exact (sub _ ((inf_comm _ _).trans hd)).elim _ _
+        · exact (sub _ hd).elim _ _
+        · exact (map_one _).trans (map_one _).symm)
   rcases H s with h | h
-  · have h₁ : u ∈ Y.basicOpen s := (mem_basicOpen_rs (le_top : O true ≤ ⊤) s hu).1 (by
-      rw [show rs Y (le_top : O true ≤ ⊤) s = 1 from hs true]
-      exact mem_of_isUnit isUnit_one hu)
+  · have h₁ : u ∈ Y.basicOpen s :=
+      (mem_basicOpen_rs (le_top : O true ≤ ⊤) s hu).1 (by
+        rw [show rs Y (le_top : O true ≤ ⊤) s = 1 from hs true]
+        exact mem_of_isUnit isUnit_one hu)
     rw [h] at h₁
     exact h₁
   · have h₁ := (mem_basicOpen_rs (le_top : O false ≤ ⊤) s hw).2 (h.ge (Set.mem_univ w))
     rw [show rs Y (le_top : O false ≤ ⊤) s = 0 from hs false, Scheme.basicOpen_zero] at h₁
     exact h₁
 
-theorem surjective_appTop {k : Type} [Field k] [IsAlgClosed k] {X : Scheme.{0}}
-    (p : X ⟶ Spec (.of k)) [IsIntegral X] [UniversallyClosed p] :
-    Function.Surjective p.appTop.hom := by
+theorem surjective_appTop
+    {k : Type} [Field k] [IsAlgClosed k]
+    {X : Scheme.{0}} (p : X ⟶ Spec (.of k)) [IsIntegral X] [UniversallyClosed p]
+    : Function.Surjective p.appTop.hom := by
   let F := (Scheme.ΓSpecIso (.of k)).inv ≫ p.appTop
   have hF : F.hom.IsIntegral := by
     apply RingHom.isIntegral_respectsIso.2 (e := (Scheme.ΓSpecIso _).symm.commRingCatIsoToRingEquiv)
@@ -73,19 +82,25 @@ def fnSec (π : X' ⟶ X) (s : Γ(X', ⊤)) : LB.Sec ((Inh.trivLB X).pull π) wh
     rw [Inh.linComb_triv_g, Units.val_one, _root_.one_mul]
     exact (rs_rs _ _ s).trans (rs_rs _ _ s).symm
 
-theorem triv_pull (π : X' ⟶ X) : Triv ((Inh.trivLB X).pull π) :=
-  ⟨⟨fun _ => 1⟩, fun i j => by
+theorem triv_pull (π : X' ⟶ X) : Triv ((Inh.trivLB X).pull π) := ⟨
+  ⟨fun _ => 1⟩,
+  fun i j => by
     erw [Inh.linComb_triv_g, _root_.one_mul]
-    exact (map_one _).trans (map_one _).symm⟩
+    exact (map_one _).trans (map_one _).symm
+⟩
 
-theorem preconnectedSpace_of_line {R F : Type} [CommRing R] [Field F]
-    {f : X ⟶ Spec (CommRingCat.of R)} (P : Perf f (Inh.trivLB X)) {g : R →+* F} {π : X' ⟶ X}
-    {f' : X' ⟶ Spec (CommRingCat.of F)} (h : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
-    (v : Fin P.a → F) (hv : ∀ w, (P.D₀.map g).mulVec w = 0 → ∃ c : F, w = c • v) :
-    PreconnectedSpace X' := by
+theorem preconnectedSpace_of_line
+    {R F : Type} [CommRing R] [Field F]
+    {f : X ⟶ Spec (CommRingCat.of R)} (P : Perf f (Inh.trivLB X))
+    {g : R →+* F} {π : X' ⟶ X} {f' : X' ⟶ Spec (CommRingCat.of F)}
+    (h : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
+    (v : Fin P.a → F) (hv : ∀ w, (P.D₀.map g).mulVec w = 0 → ∃ c : F, w = c • v)
+    : PreconnectedSpace X' := by
   obtain ⟨E, hE⟩ := P.sec F g X' π f' h
-  have key : ∀ s : Γ(X', ⊤), ∃ c : F, ∀ i,
-      rs X' (le_top : π ⁻¹ᵁ P.W i ≤ ⊤) s = GlobalTheory.AbLaw.cst f' _ c * loc P π f' v i := fun s => by
+  have key
+      : ∀ s : Γ(X', ⊤), ∃ c : F, ∀ i,
+        rs X' (le_top : π ⁻¹ᵁ P.W i ≤ ⊤) s
+          = GlobalTheory.AbLaw.cst f' _ c * loc P π f' v i := fun s => by
     obtain ⟨w, hw⟩ := E.surjective (fnSec π s)
     obtain ⟨c, hc⟩ := hv w.1 w.2
     refine ⟨c, fun i => ?_⟩
@@ -110,9 +125,13 @@ theorem preconnectedSpace_of_line {R F : Type} [CommRing R] [Field F]
     rw [hc]
     exact mem_of_isUnit (((IsUnit.mk0 c h0).map _).mul (hu i)) hi
 
-theorem exists_nonempty_fibre {R K : Type} [CommRing R] [Field K] {Z Z₀ : Scheme.{0}} (s : Z ⟶ Sp R)
-    (hs : IsOpenMap s) (x : R →+* K) {π : Z₀ ⟶ Z} {q : Z₀ ⟶ Sp K} (h : π ≫ s = q ≫ spMap x) (z : Z₀) :
-    ∃ e : R, x e ≠ 0 ∧ ∀ p : PrimeSpectrum R, e ∉ p.asIdeal → ∃ y : Z, s y = p := by
+theorem exists_nonempty_fibre
+    {R K : Type} [CommRing R] [Field K]
+    {Z Z₀ : Scheme.{0}} (s : Z ⟶ Sp R) (hs : IsOpenMap s)
+    (x : R →+* K)
+    {π : Z₀ ⟶ Z} {q : Z₀ ⟶ Sp K} (h : π ≫ s = q ≫ spMap x)
+    (z : Z₀)
+    : ∃ e : R, x e ≠ 0 ∧ ∀ p : PrimeSpectrum R, e ∉ p.asIdeal → ∃ y : Z, s y = p := by
   have hz : s (π z) ∈ Set.range s := ⟨_, rfl⟩
   obtain ⟨_, ⟨e, rfl⟩, he, hle⟩ :=
     PrimeSpectrum.isTopologicalBasis_basic_opens.exists_subset_of_mem_open hz hs.isOpen_range
@@ -124,10 +143,17 @@ theorem exists_nonempty_fibre {R K : Type} [CommRing R] [Field K] {Z Z₀ : Sche
   rw [h0]
   exact zero_mem _
 
-theorem geometricallyConnected_near : ∀ (R : Type) [CommRing R] (Z : Scheme.{0}) (s : Z ⟶ Sp R) (K : Type) [Field K] (x : R →+* K), IsProjOver s → Smooth s → GeometricallyConnected (pullback.snd s (spMap x)) → ∃ f : R, x f ≠ 0 ∧ ∀ (R' : Type) [CommRing R'] (φ : R →+* R'), IsUnit (φ f) → GeometricallyConnected (pullback.snd s (spMap φ)) := by
+theorem geometricallyConnected_near
+    : ∀ (R : Type) [CommRing R] (Z : Scheme.{0}) (s : Z ⟶ Sp R) (K : Type) [Field K] (x : R →+* K),
+      IsProjOver s → Smooth s → GeometricallyConnected (pullback.snd s (spMap x))
+        → ∃ f : R,
+          x f ≠ 0
+            ∧ ∀ (R' : Type) [CommRing R'] (φ : R →+* R'),
+              IsUnit (φ f) → GeometricallyConnected (pullback.snd s (spMap φ)) := by
   intro R _ Z s K _ x hp hs hc
   have hp' := (GlobalTheory.ProjSpace.isProjBy_iff_isProjOver s).2 hp
-  obtain ⟨P⟩ := GlobalTheory.T.nonempty_perfectSectionsComplex_of_smooth_proj R Z s hs hp' _ (Inh.trivLB_isLB _)
+  obtain ⟨P⟩ :=
+    GlobalTheory.T.nonempty_perfectSectionsComplex_of_smooth_proj R Z s hs hp' _ (Inh.trivLB_isLB _)
   have hpr : IsProper s := GlobalTheory.AbLaw.isProper_of_isProjBy R Z s hp'
   let L := AlgebraicClosure K
   let g₀ : R →+* L := (algebraMap K L).comp x
@@ -137,7 +163,9 @@ theorem geometricallyConnected_near : ∀ (R : Type) [CommRing R] (Z : Scheme.{0
       (Spec.map (CommRingCat.ofHom g₀)) := by
     have := (IsPullback.of_hasPullback q y₀).paste_horiz (IsPullback.of_hasPullback s (spMap x))
     rwa [← Spec.map_comp] at this
-  have hi := GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ q inferInstance hc
+  have hi :=
+    GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ q
+      inferInstance hc
   have hint : IsIntegral (pullback q y₀) :=
     GeometricallyIntegral.geometrically_isIntegral _ _ _ (.of_hasPullback q y₀)
   have hpr₀ : IsProper (pullback.snd q y₀) := MorphismProperty.of_isPullback h₀ hpr
@@ -163,8 +191,8 @@ theorem geometricallyConnected_near : ∀ (R : Type) [CommRing R] (Z : Scheme.{0
     rw [← map_mul]
     exact hφ.map (algebraMap R' F)
   have := preconnectedSpace_of_line P h₁ _ (hker F g (isUnit_of_mul_isUnit_left hg))
-  obtain ⟨y, hy⟩ := him (PrimeSpectrum.comap g ⊥) fun hm =>
-    (isUnit_of_mul_isUnit_right hg).ne_zero hm
+  obtain ⟨y, hy⟩ :=
+    him (PrimeSpectrum.comap g ⊥) fun hm => (isUnit_of_mul_isUnit_right hg).ne_zero hm
   obtain ⟨z, -⟩ := Scheme.exists_preimage_of_isPullback h₁ y (⊥ : PrimeSpectrum F) hy
   exact ⟨⟨z⟩⟩
 

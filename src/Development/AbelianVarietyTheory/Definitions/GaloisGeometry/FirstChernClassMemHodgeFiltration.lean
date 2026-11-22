@@ -25,10 +25,9 @@ theorem isNilpotent_of_mem (T : Thick L) {x : T.B} (hx : x ∈ T.J) : IsNilpoten
   · obtain ⟨n, hn⟩ := T.adm.1 hp
     refine ⟨b.p ^ n, ?_⟩
     rw [← T.δ.factorial_mul_dpow_eq_pow hx]
-    obtain ⟨c, hc⟩ : b.p ^ n ∣ (b.p ^ n).factorial := Nat.dvd_factorial (Nat.pos_of_ne_zero (pow_ne_zero _ hp)) le_rfl
+    obtain ⟨c, hc⟩ : b.p ^ n ∣ (b.p ^ n).factorial :=
+      Nat.dvd_factorial (Nat.pos_of_ne_zero (pow_ne_zero _ hp)) le_rfl
     rw [hc, Nat.cast_mul, Nat.cast_pow, hn, zero_mul, zero_mul]
-
-
 
 end GlobalTheory.LogCris.CupModel
 

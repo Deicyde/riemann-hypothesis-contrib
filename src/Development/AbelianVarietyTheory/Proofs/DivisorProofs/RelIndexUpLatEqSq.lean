@@ -12,8 +12,9 @@ open GlobalTheory.LGrp GlobalTheory.BorelUMod Formalism.UG
 noncomputable section
 namespace GlobalTheory.BorelUMod
 
-theorem relIndex_prod_prod {G G' : Type} [AddGroup G] [AddGroup G'] (H K : AddSubgroup G) (H' K' : AddSubgroup G') :
-    (H.prod H').relIndex (K.prod K') = H.relIndex K * H'.relIndex K' := by
+theorem relIndex_prod_prod
+    {G G' : Type} [AddGroup G] [AddGroup G'] (H K : AddSubgroup G) (H' K' : AddSubgroup G')
+    : (H.prod H').relIndex (K.prod K') = H.relIndex K * H'.relIndex K' := by
   unfold AddSubgroup.relIndex
   rw [← AddSubgroup.index_prod,
     ← AddSubgroup.index_comap_of_surjective ((H.addSubgroupOf K).prod (H'.addSubgroupOf K'))
@@ -22,14 +23,16 @@ theorem relIndex_prod_prod {G G' : Type} [AddGroup G] [AddGroup G'] (H K : AddSu
 
 variable {L : Type} [Field L] {n : ℕ}
 
-def skewPair (σ : L →+* L) (θ d : L) :
-    Matrix (Fin n) (Fin n) L →+ Matrix (Fin n) (Fin n) L × Matrix (Fin n) (Fin n) L :=
-  AddMonoidHom.mk' (fun X => (X - θ • (X + adjJ σ X), d • (X + adjJ σ X))) (fun X Y => by
-    ext i j <;> simp [adjJ] <;> ring)
+def skewPair (σ : L →+* L) (θ d : L)
+    : Matrix (Fin n) (Fin n) L →+ Matrix (Fin n) (Fin n) L × Matrix (Fin n) (Fin n) L :=
+  AddMonoidHom.mk'
+    (fun X => (X - θ • (X + adjJ σ X), d • (X + adjJ σ X)))
+    (fun X Y => by ext i j <;> simp [adjJ] <;> ring)
 
-theorem skewPair_injective (σ : L →+* L) (θ : L) {d : L} (hd : d ≠ 0) :
-    Function.Injective (skewPair (n := n) σ θ d) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem skewPair_injective (σ : L →+* L) (θ : L) {d : L} (hd : d ≠ 0)
+    : Function.Injective (skewPair (n := n) σ θ d) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro X hX
   have h1 : X - θ • (X + adjJ σ X) = 0 := congrArg Prod.fst hX
   have h2 : d • (X + adjJ σ X) = 0 := congrArg Prod.snd hX
@@ -38,10 +41,11 @@ theorem skewPair_injective (σ : L →+* L) (θ : L) {d : L} (hd : d ≠ 0) :
 
 variable [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem map_skewPair_upLat {σ : L →+* L} (hσ : ∀ x, σ (σ x) = x) (hv : ∀ x, Valued.v (σ x) = Valued.v x)
+theorem map_skewPair_upLat
+    {σ : L →+* L} (hσ : ∀ x, σ (σ x) = x) (hv : ∀ x, Valued.v (σ x) = Valued.v x)
     {θ d : L} (hθ : Valued.v θ ≤ 1) (hθ1 : θ + σ θ = 1) (hd : Valued.v d = 1) (hd1 : σ d = -d)
-    {c : Fin n → Fin n → ℤ} (hc : ∀ i j, c j.rev i.rev = c i j) :
-    (upLat L c).map (skewPair σ θ d) = (upLat L c ⊓ skewJ σ n).prod (upLat L c ⊓ skewJ σ n) := by
+    {c : Fin n → Fin n → ℤ} (hc : ∀ i j, c j.rev i.rev = c i j)
+    : (upLat L c).map (skewPair σ θ d) = (upLat L c ⊓ skewJ σ n).prod (upLat L c ⊓ skewJ σ n) := by
   have hd0 : d ≠ 0 := fun e => by simp [e] at hd
   have hσθ : σ θ = 1 - θ := by linear_combination hθ1
   apply le_antisymm
@@ -66,10 +70,15 @@ theorem map_skewPair_upLat {σ : L →+* L} (hσ : ∀ x, σ (σ x) = x) (hv : �
       d • (A + (θ * d⁻¹) • B + adjJ σ (A + (θ * d⁻¹) • B))) = (A, B)
     rw [key, smul_smul, smul_smul, mul_inv_cancel₀ hd0, one_smul, add_sub_cancel_right]
 
-theorem relIndex_upLat_eq_sq : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ϖ : L) (σ : L →+* L)
-    (q n : ℕ), IsUnramInv ϖ σ q → ∀ (c C : Fin n → Fin n → ℤ), (∀ i j, c j.rev i.rev = c i j) →
-    (∀ i j, C j.rev i.rev = C i j) → (∀ i j, i < j → c i j ≤ C i j) →
-    (upLat L C).relIndex (upLat L c) = ((upLat L C ⊓ skewJ σ n).relIndex (upLat L c ⊓ skewJ σ n)) ^ 2 := by
+theorem relIndex_upLat_eq_sq
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ϖ : L) (σ : L →+* L)
+        (q n : ℕ),
+      IsUnramInv ϖ σ q
+        → ∀ (c C : Fin n → Fin n → ℤ),
+          (∀ i j, c j.rev i.rev = c i j) → (∀ i j, C j.rev i.rev = C i j)
+            → (∀ i j, i < j → c i j ≤ C i j)
+            → (upLat L C).relIndex (upLat L c)
+              = ((upLat L C ⊓ skewJ σ n).relIndex (upLat L c ⊓ skewJ σ n)) ^ 2 := by
   intro L _ _ ϖ σ q n h c C hc hC _
   obtain ⟨⟨θ, hθ, hθ1⟩, d, hd, hd1⟩ := exists_trace_one h
   have hd0 : d ≠ 0 := fun e => by simp [e] at hd

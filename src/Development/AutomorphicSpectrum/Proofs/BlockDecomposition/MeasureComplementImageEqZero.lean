@@ -12,8 +12,8 @@ namespace GlobalTheory.CompanionTheory.NullFr.SmallUnit
 
 variable {A : Type} [CommRing A] [TopologicalSpace A] [IsTopologicalRing A] [T2Space A]
 
-theorem infinite_factor_points {f : A} (hf : NonDiscreteAt f) {W : Set A} (hW : W ∈ 𝓝 (0 : A)) :
-    {x | x ∈ W ∧ f * x = x}.Infinite := by
+theorem infinite_factor_points {f : A} (hf : NonDiscreteAt f) {W : Set A} (hW : W ∈ 𝓝 (0 : A))
+    : {x | x ∈ W ∧ f * x = x}.Infinite := by
   intro hfin
   have hfin' : ({x | x ∈ W ∧ f * x = x} \ {0}).Finite := hfin.subset Set.diff_subset
   have hV : ({x | x ∈ W ∧ f * x = x} \ {0})ᶜ ∈ 𝓝 (0 : A) :=
@@ -21,10 +21,12 @@ theorem infinite_factor_points {f : A} (hf : NonDiscreteAt f) {W : Set A} (hW : 
   obtain ⟨x, hx, hx0, hfx⟩ := hf _ (inter_mem hW hV)
   exact hx.2 ⟨⟨hx.1, hfx⟩, hx0⟩
 
-theorem measure_complement_image_eq_zero [MeasurableSpace A] [BorelSpace A]
-    (h : Measure A) [h.IsAddHaarMeasure] {f : A} (hid : f * f = f) (hf : NonDiscreteAt f)
-    {W : Set A} (hWc : IsCompact W) (hW : W ∈ 𝓝 (0 : A)) :
-    h ((fun w => (1 - f) * w) '' W) = 0 := by
+theorem measure_complement_image_eq_zero
+    [MeasurableSpace A] [BorelSpace A]
+    (h : Measure A) [h.IsAddHaarMeasure]
+    {f : A} (hid : f * f = f) (hf : NonDiscreteAt f)
+    {W : Set A} (hWc : IsCompact W) (hW : W ∈ 𝓝 (0 : A))
+    : h ((fun w => (1 - f) * w) '' W) = 0 := by
   set Q : Set A := (fun w => (1 - f) * w) '' W with hQ
   have hQc : IsCompact Q := hWc.image (by fun_prop)
   by_contra hne
@@ -57,29 +59,34 @@ theorem measure_complement_image_eq_zero [MeasurableSpace A] [BorelSpace A]
   rw [hsum, Finset.sum_congr rfl (fun p _ => each p), Finset.sum_const, hTc, nsmul_eq_mul] at hle
   exact absurd hle (not_le.2 hn)
 
-theorem exists_nhds_add_mul_subset {Q W O : Set A} (hQ : IsCompact Q) (hW : IsCompact W)
-    (hO : IsOpen O) (hQO : Q ⊆ O) :
-    ∃ N ∈ 𝓝 (0 : A), ∀ x ∈ N, ∀ q ∈ Q, ∀ w ∈ W, q + x * w ∈ O := by
-  have hn : IsOpen ((fun p : A × A × A => p.2.1 + p.1 * p.2.2) ⁻¹' O) :=
-    hO.preimage (by fun_prop)
-  obtain ⟨u, v, hu, -, h0u, hQWv, huv⟩ := generalized_tube_lemma (isCompact_singleton (x := (0 : A)))
-    (hQ.prod hW) hn (by
+theorem exists_nhds_add_mul_subset
+    {Q W O : Set A} (hQ : IsCompact Q) (hW : IsCompact W) (hO : IsOpen O) (hQO : Q ⊆ O)
+    : ∃ N ∈ 𝓝 (0 : A), ∀ x ∈ N, ∀ q ∈ Q, ∀ w ∈ W, q + x * w ∈ O := by
+  have hn : IsOpen ((fun p : A × A × A => p.2.1 + p.1 * p.2.2) ⁻¹' O) := hO.preimage (by fun_prop)
+  obtain ⟨u, v, hu, -, h0u, hQWv, huv⟩ :=
+    generalized_tube_lemma (isCompact_singleton (x := (0 : A))) (hQ.prod hW) hn (by
       rintro ⟨x, q, w⟩ ⟨hx, hq, hw⟩
       have hx0 : x = 0 := hx
       simpa [hx0] using hQO hq)
-  exact ⟨u, hu.mem_nhds (h0u rfl), fun x hx q hq w hw => huv (Set.mk_mem_prod hx (show (q, w) ∈ v from hQWv ⟨hq, hw⟩))⟩
+  exact ⟨
+    u,
+    hu.mem_nhds (h0u rfl),
+    fun x hx q hq w hw => huv (Set.mk_mem_prod hx (show (q, w) ∈ v from hQWv ⟨hq, hw⟩))
+  ⟩
 
 end GlobalTheory.CompanionTheory.NullFr.SmallUnit
 
 namespace GlobalTheory.CompanionTheory.NullFr
 
-
 open SmallUnit in
-theorem exists_unit_small_module {A : Type} [CommRing A] [TopologicalSpace A] [IsTopologicalRing A]
-    [LocallyCompactSpace A] [T2Space A] [SecondCountableTopology A] [MeasurableSpace A]
-    [BorelSpace A] (md : Aˣ →* ℝ≥0) (hmd : IsHaarMod md) (f : A) (hfi : IsFieldIdem f)
-    (hnd : NonDiscreteAt f) (ε : ℝ≥0) (hε : 0 < ε) (V : Set A) (hV : V ∈ 𝓝 (0 : A)) :
-    ∃ u : Aˣ, (1 - f) * (u : A) = 1 - f ∧ f * (u : A) ∈ V ∧ md u < ε := by
+theorem exists_unit_small_module
+    {A : Type} [CommRing A] [TopologicalSpace A] [IsTopologicalRing A] [LocallyCompactSpace A]
+    [T2Space A] [SecondCountableTopology A] [MeasurableSpace A] [BorelSpace A]
+    (md : Aˣ →* ℝ≥0) (hmd : IsHaarMod md)
+    (f : A) (hfi : IsFieldIdem f) (hnd : NonDiscreteAt f)
+    (ε : ℝ≥0) (hε : 0 < ε)
+    (V : Set A) (hV : V ∈ 𝓝 (0 : A))
+    : ∃ u : Aˣ, (1 - f) * (u : A) = 1 - f ∧ f * (u : A) ∈ V ∧ md u < ε := by
   obtain ⟨W, hWc, hW⟩ := exists_compact_mem_nhds (0 : A)
   let h : Measure A := Measure.addHaar
   have hWpos : 0 < h W := Measure.measure_pos_of_mem_nhds h hW
@@ -96,12 +103,13 @@ theorem exists_unit_small_module {A : Type} [CommRing A] [TopologicalSpace A] [I
   obtain ⟨y, hy⟩ := hfi.inv x (by rwa [hfx])
   rw [hfx] at hy
   have hz : f * (1 - f) = 0 := by rw [mul_sub, mul_one, hfi.idem, sub_self]
-  have hzz : (1 - f) * (1 - f) = 1 - f := by
-    rw [sub_mul, one_mul, hz, sub_zero]
+  have hzz : (1 - f) * (1 - f) = 1 - f := by rw [sub_mul, one_mul, hz, sub_zero]
   have hxz : (1 - f) * x = 0 := by rw [← hfx, ← mul_assoc, mul_comm (1 - f), hz, zero_mul]
   have huv : (1 - f + x) * (1 - f + f * y) = 1 := by
-    have e : (1 - f + x) * (1 - f + f * y) =
-        (1 - f) * (1 - f) + (f * (1 - f)) * y + (1 - f) * x + (f * x) * y := by ring
+    have e
+        : (1 - f + x) * (1 - f + f * y)
+          = (1 - f) * (1 - f) + (f * (1 - f)) * y + (1 - f) * x + (f * x) * y := by
+      ring
     rw [e, hzz, hz, hxz, hfx, hy]
     ring
   let u : Aˣ := ⟨1 - f + x, 1 - f + f * y, huv, by rw [mul_comm]; exact huv⟩
@@ -112,7 +120,8 @@ theorem exists_unit_small_module {A : Type} [CommRing A] [TopologicalSpace A] [I
     exact hxV
   · have hmap := hmd h inferInstance u⁻¹
     have hWm : MeasurableSet W := hWc.isClosed.measurableSet
-    have hg : Measurable (fun z : A => ((u⁻¹ : Aˣ) : A) * z) := (by fun_prop : Continuous _).measurable
+    have hg : Measurable (fun z : A => ((u⁻¹ : Aˣ) : A) * z) :=
+      (by fun_prop : Continuous _).measurable
     have hpre : h ((fun z : A => ((u⁻¹ : Aˣ) : A) * z) ⁻¹' W) = (md u : ℝ≥0∞) * h W := by
       rw [← Measure.map_apply hg hWm, hmap, Measure.smul_apply, smul_eq_mul]
       congr 1

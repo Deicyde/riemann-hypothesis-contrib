@@ -7,19 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Eisenst
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.EisShift
 
-theorem taylor_coeff_pred {R : Type*} [CommRing R] (f : Polynomial R) (hf : f.Monic) (n : ℕ)
-    (hn : f.natDegree = n + 1) (r : R) :
-    (Polynomial.taylor r f).coeff n = f.coeff n + ((n + 1 : ℕ) : R) * r := by
+theorem taylor_coeff_pred
+    {R : Type*} [CommRing R]
+    (f : Polynomial R) (hf : f.Monic)
+    (n : ℕ) (hn : f.natDegree = n + 1)
+    (r : R)
+    : (Polynomial.taylor r f).coeff n = f.coeff n + ((n + 1 : ℕ) : R) * r := by
   have h1 : (Polynomial.hasseDeriv n f).natDegree ≤ 1 := by
     have := Polynomial.natDegree_hasseDeriv_le f n
     omega
-  have hl : f.coeff (1 + n) = 1 := by
-    rw [add_comm, ← hn]; exact hf.coeff_natDegree
+  have hl : f.coeff (1 + n) = 1 := by rw [add_comm, ← hn]; exact hf.coeff_natDegree
   rw [Polynomial.taylor_coeff, Polynomial.eq_X_add_C_of_natDegree_le_one h1]
   simp only [Polynomial.hasseDeriv_coeff, hl, zero_add, Nat.choose_self, Polynomial.eval_add,
     Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_X]
@@ -27,11 +31,14 @@ theorem taylor_coeff_pred {R : Type*} [CommRing R] (f : Polynomial R) (hf : f.Mo
   push_cast
   ring
 
-theorem sq_dvd {R O : Type*} [CommRing R] [IsDomain R] [CommRing O] [IsLocalRing O] [Algebra R O]
-    (p : R) (hp : p ≠ 0) (π : O) (hπ : ¬ IsUnit π) (E : Polynomial R) (hE : E.Monic)
-    (h2 : 2 ≤ E.natDegree) (hd : ∀ i < E.natDegree, p ∣ E.coeff i)
-    (w : Rˣ) (h0 : E.coeff 0 = p * w) (hr : Polynomial.aeval π E = 0) :
-    π ^ 2 ∣ algebraMap R O p := by
+theorem sq_dvd
+    {R O : Type*} [CommRing R] [IsDomain R] [CommRing O] [IsLocalRing O] [Algebra R O]
+    (p : R) (hp : p ≠ 0)
+    (π : O) (hπ : ¬ IsUnit π)
+    (E : Polynomial R) (hE : E.Monic) (h2 : 2 ≤ E.natDegree) (hd : ∀ i < E.natDegree, p ∣ E.coeff i)
+    (w : Rˣ) (h0 : E.coeff 0 = p * w)
+    (hr : Polynomial.aeval π E = 0)
+    : π ^ 2 ∣ algebraMap R O p := by
   have hg : Polynomial.C p ∣ E - Polynomial.X ^ E.natDegree := by
     rw [Polynomial.C_dvd_iff_dvd_coeff]
     intro i
@@ -47,8 +54,7 @@ theorem sq_dvd {R O : Type*} [CommRing R] [IsDomain R] [CommRing O] [IsLocalRing
     rw [if_neg (by omega), sub_zero, h0] at this
     exact (mul_left_cancel₀ hp this).symm
   have hu : IsUnit (Polynomial.aeval π g) := by
-    have e : Polynomial.aeval π g
-        = algebraMap R O w + π * Polynomial.aeval π g.divX := by
+    have e : Polynomial.aeval π g = algebraMap R O w + π * Polynomial.aeval π g.divX := by
       conv_lhs => rw [← Polynomial.X_mul_divX_add g]
       simp [hg0, add_comm]
     by_contra hn
@@ -63,10 +69,22 @@ theorem sq_dvd {R O : Type*} [CommRing R] [IsDomain R] [CommRing O] [IsLocalRing
   rw [← hu.dvd_mul_right, ← e, dvd_neg]
   exact pow_dvd_pow _ h2
 
-theorem exists_uniformiser : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra (Wq l a) O] [Module.Finite (Wq l a) O], Function.Injective (algebraMap (Wq l a) O) → (∀ x : O, ∃ c : Wq l a, ¬ IsUnit (x - algebraMap (Wq l a) O c)) → ∃ (π : O) (Ep : Polynomial (Wq l a)), Irreducible π ∧ (Ep.Monic ∧ 0 < Ep.natDegree ∧ (∀ i < Ep.natDegree, (l : Wq l a) ∣ Ep.coeff i) ∧ (∃ w : (Wq l a)ˣ, Ep.coeff 0 = (l : Wq l a) * w)) ∧ (∃ i, ¬ l ∣ i ∧ Ep.coeff i ≠ 0) ∧ Polynomial.aeval π Ep = 0 ∧ (∀ x : O, ∃ f : Polynomial (Wq l a), Polynomial.aeval π f = x) ∧ ∀ f : Polynomial (Wq l a), Polynomial.aeval π f = 0 → Ep ∣ f := by
+theorem exists_uniformiser
+    : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (O : Type) [CommRing O] [IsDomain O]
+        [IsDiscreteValuationRing O] [Algebra (Wq l a) O] [Module.Finite (Wq l a) O],
+      Function.Injective (algebraMap (Wq l a) O)
+        → (∀ x : O, ∃ c : Wq l a, ¬ IsUnit (x - algebraMap (Wq l a) O c))
+        → ∃ (π : O) (Ep : Polynomial (Wq l a)),
+          Irreducible π
+            ∧ (Ep.Monic ∧ 0 < Ep.natDegree ∧ (∀ i < Ep.natDegree, (l : Wq l a) ∣ Ep.coeff i)
+              ∧ (∃ w : (Wq l a)ˣ, Ep.coeff 0 = (l : Wq l a) * w))
+            ∧ (∃ i, ¬ l ∣ i ∧ Ep.coeff i ≠ 0) ∧ Polynomial.aeval π Ep = 0
+            ∧ (∀ x : O, ∃ f : Polynomial (Wq l a), Polynomial.aeval π f = x)
+            ∧ ∀ f : Polynomial (Wq l a), Polynomial.aeval π f = 0 → Ep ∣ f := by
   intro l _ a _ O _ _ _ _ _ hinj hres
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible O
-  obtain ⟨E, hm, hpos, hd, ⟨w, h0⟩, hr, hs, hmin⟩ := GlobalTheory.T.eisenstein_minpoly_uniformizer_witt_totallyRamified l a O hinj hres π hπ
+  obtain ⟨E, hm, hpos, hd, ⟨w, h0⟩, hr, hs, hmin⟩ :=
+    GlobalTheory.T.eisenstein_minpoly_uniformizer_witt_totallyRamified l a O hinj hres π hπ
   by_cases h : ∃ i, ¬ l ∣ i ∧ E.coeff i ≠ 0
   · exact ⟨π, E, hπ, ⟨hm, hpos, hd, w, h0⟩, h, hr, hs, hmin⟩
   push_neg at h
@@ -98,7 +116,8 @@ theorem exists_uniformiser : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (
     have : π + algebraMap (Wq l a) O l = π * (1 + π * t) := by rw [ht]; ring
     rw [this]
     exact (irreducible_mul_isUnit hu).2 hπ
-  obtain ⟨F, fm, fpos, fd, fw, fr, fs, fmin⟩ := GlobalTheory.T.eisenstein_minpoly_uniformizer_witt_totallyRamified l a O hinj hres _ hπ'
+  obtain ⟨F, fm, fpos, fd, fw, fr, fs, fmin⟩ :=
+    GlobalTheory.T.eisenstein_minpoly_uniformizer_witt_totallyRamified l a O hinj hres _ hπ'
   refine ⟨_, F, hπ', ⟨fm, fpos, fd, fw⟩, ?_, fr, fs, fmin⟩
   have d1 : F ∣ Polynomial.taylor (-(l : Wq l a)) E := by
     apply fmin

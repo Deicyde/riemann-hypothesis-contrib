@@ -13,28 +13,35 @@ noncomputable section
 namespace GlobalTheory.FixedByDense
 
 section
-open Formalism.MainNotions Formalism.MainNotions.InvariantsGenerators Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.tableLineDegreeTwo Formalism.MainNotions.LocalSituation TensorProduct
+open Formalism.MainNotions Formalism.MainNotions.InvariantsGenerators
+  Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.tableLineDegreeTwo Formalism.MainNotions.LocalSituation TensorProduct
 
 def PGen (S : Sit) : Set S.G :=
   {g | S.W.resΓ g ∈ Subgroup.closure (insert S.W.gamK (S.W.DelF : Set S.W.Gam))}
 
-theorem genFix_of_dense (S : Sit) (hT2 : ∀ T : LocLat S.G S.Qp S.LL S.O, T2Space T.V)
-    (hd : Dense (PGen S)) : GenFix S := by
+theorem genFix_of_dense
+    (S : Sit) (hT2 : ∀ T : LocLat S.G S.Qp S.LL S.O, T2Space T.V) (hd : Dense (PGen S))
+    : GenFix S := by
   intro T t hK hΔ h1 g
   have hact : ∀ g : S.G, T.actT g t = t ↔ T.ρ g (t : T.V) = t := fun g =>
     ⟨fun h => congrArg Subtype.val h, fun h => Subtype.ext h⟩
-  let St : Subgroup S.G :=
-    { carrier := {g | T.ρ g (t : T.V) = t}
-      mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
-        rw [hb, ha]
-      one_mem' := by simp
-      inv_mem' := fun {a} ha => by
-        change T.ρ a (t : T.V) = t at ha
-        change T.ρ a⁻¹ (t : T.V) = t
-        calc T.ρ a⁻¹ (t : T.V) = T.ρ a⁻¹ (T.ρ a (t : T.V)) := by rw [ha]
-          _ = t := by rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
+  let St : Subgroup S.G := {
+    carrier := {g | T.ρ g (t : T.V) = t}
+    mul_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
+      rw [hb, ha]
+    one_mem' := by simp
+    inv_mem' := fun {a} ha => by
+      change T.ρ a (t : T.V) = t at ha
+      change T.ρ a⁻¹ (t : T.V) = t
+      calc
+        T.ρ a⁻¹ (t : T.V)
+          = T.ρ a⁻¹ (T.ρ a (t : T.V)) := by rw [ha]
+        _ = t := by
+          rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+  }
   have hmem : ∀ g, g ∈ St ↔ T.ρ g (t : T.V) = t := fun g => Iff.rfl
   have hmap : Subgroup.closure (insert S.W.gamK (S.W.DelF : Set S.W.Gam)) ≤ St.map S.W.resΓ := by
     rw [Subgroup.closure_le]
@@ -46,7 +53,8 @@ theorem genFix_of_dense (S : Sit) (hT2 : ∀ T : LocLat S.G S.Qp S.LL S.O, T2Spa
   have hP : PGen S ⊆ (St : Set S.G) := by
     intro g hg
     obtain ⟨h, hh, he⟩ := hmap hg
-    have hk : h⁻¹ * g ∈ St := (hmem _).2 ((hact _).1 (h1 _ (by rw [map_mul, map_inv, he, inv_mul_cancel])))
+    have hk : h⁻¹ * g ∈ St :=
+      (hmem _).2 ((hact _).1 (h1 _ (by rw [map_mul, map_inv, he, inv_mul_cancel])))
     have := St.mul_mem hh hk
     rwa [mul_inv_cancel_left] at this
   have hcl : IsClosed (St : Set S.G) := isClosed_eq (T.cont (t : T.V)) continuous_const
@@ -61,22 +69,28 @@ local instance contAddLL (LL : FinExt l) : ContinuousAdd ↥LL.1 :=
   ⟨continuous_induced_rng.2 ((continuous_subtype_val.comp continuous_fst).add
     (continuous_subtype_val.comp continuous_snd))⟩
 
-theorem t2Space_locLat_V' {G : Type} [Group G] [TopologicalSpace G] (LL : FinExt l)
-    (T : LocLat G ℚ_[l] ↥LL.1 ↥(OL LL)) : T2Space T.V := by
+theorem t2Space_locLat_V'
+    {G : Type} [Group G] [TopologicalSpace G] (LL : FinExt l) (T : LocLat G ℚ_[l] ↥LL.1 ↥(OL LL))
+    : T2Space T.V := by
   let b := Module.finBasis ↥LL.1 T.V
   have hc : Continuous b.equivFun := IsModuleTopology.continuous_of_linearMap b.equivFun.toLinearMap
   exact T2Space.of_injective_continuous b.equivFun.injective hc
 
-theorem t2Space_lattice_V_of_good_situation (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l)) (K : FinExt l) (s : ℕ)
-    (LL : FinExt l) (h : Good K s LL) (T : LocLat (sit LT HW l AI K s LL h).G (sit LT HW l AI K s LL h).Qp
-      (sit LT HW l AI K s LL h).LL (sit LT HW l AI K s LL h).O) : T2Space T.V :=
+theorem t2Space_lattice_V_of_good_situation
+    (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l))
+    (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL)
+    (T : LocLat (sit LT HW l AI K s LL h).G (sit LT HW l AI K s LL h).Qp
+      (sit LT HW l AI K s LL h).LL (sit LT HW l AI K s LL h).O)
+    : T2Space T.V :=
   t2Space_locLat_V' (G := ↥(GK K)) LL T
 
 end
 
 section
-open Formalism.MainNotions Formalism.MainNotions.InvariantsGenerators Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.tableLineDegreeTwo Formalism.MainNotions.LocalSituation Topology Filter
+open Formalism.MainNotions Formalism.MainNotions.InvariantsGenerators
+  Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.tableLineDegreeTwo Formalism.MainNotions.LocalSituation Topology Filter
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
@@ -90,7 +104,8 @@ theorem zetaQ_order (P : LocPrime l) (m : ℕ) (hm : 1 ≤ m) : orderOf (P.ζQ m
   apply orderOf_eq_prime_pow
   · have := zetaQ_pow P 1 k
     rw [add_comm] at this
-    rw [this]; exact P.ζQ_one
+    rw [this]
+    exact P.ζQ_one
   · have := zetaQ_pow P 0 (k + 1)
     rw [zero_add] at this
     rw [this, P.ζQ_zero]
@@ -99,8 +114,8 @@ theorem zetaQ_root (P : LocPrime l) (m : ℕ) : P.ζQ m ^ (l ^ m) = 1 := by
   have := zetaQ_pow P 0 m
   rwa [zero_add, P.ζQ_zero] at this
 
-theorem chiQ_fix (P : LocPrime l) (h : GQ l) (m : ℕ) (hm : 1 ≤ m) (hζ : h (P.ζQ m) = P.ζQ m) :
-    ‖(P.χQ h : ℚ_[l]) - 1‖ ≤ (l : ℝ) ^ (-(m : ℤ)) := by
+theorem chiQ_fix (P : LocPrime l) (h : GQ l) (m : ℕ) (hm : 1 ≤ m) (hζ : h (P.ζQ m) = P.ζQ m)
+    : ‖(P.χQ h : ℚ_[l]) - 1‖ ≤ (l : ℝ) ^ (-(m : ℤ)) := by
   obtain ⟨a, ha, hha⟩ := P.χQ_cyc h m (P.ζQ m) (zetaQ_root P m)
   have h1 : P.ζQ m ^ a = P.ζQ m := by rw [← hha, hζ]
   have hord := zetaQ_order P m hm
@@ -144,7 +159,8 @@ theorem chiQ_norm (P : LocPrime l) (h : GQ l) : ‖(P.χQ h : ℚ_[l])‖ = 1 :=
     exact P.ζQ_one (h.injective (h1.trans (map_one h).symm))
   have hA : ‖((a : ℤ) : ℚ_[l])‖ = 1 := by
     have : ‖((a : ℤ) : ℤ_[l])‖ = 1 :=
-      le_antisymm (PadicInt.norm_le_one _) (not_lt.1 fun hlt => hna ((PadicInt.norm_int_lt_one_iff_dvd _).1 hlt))
+      le_antisymm (PadicInt.norm_le_one _)
+        (not_lt.1 fun hlt => hna ((PadicInt.norm_int_lt_one_iff_dvd _).1 hlt))
     rw [PadicInt.norm_def, PadicInt.coe_intCast] at this
     exact this
   have hlt : ‖(P.χQ h : ℚ_[l]) - a‖ < ‖((a : ℤ) : ℚ_[l])‖ := by
@@ -166,7 +182,8 @@ theorem chiQ_cont (P : LocPrime l) : Continuous (fun h : GQ l => (P.χQ h : ℚ_
   haveI : FiniteDimensional ℚ_[l] E :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral _)
   have hU : IsOpen (E.fixingSubgroup : Set (GQ l)) := E.fixingSubgroup_isOpen
-  have hopen : IsOpen {h : GQ l | g⁻¹ * h ∈ E.fixingSubgroup} := hU.preimage (continuous_const_mul g⁻¹)
+  have hopen : IsOpen {h : GQ l | g⁻¹ * h ∈ E.fixingSubgroup} :=
+    hU.preimage (continuous_const_mul g⁻¹)
   filter_upwards [hopen.mem_nhds (by simp)] with h hh
   rw [dist_eq_norm]
   have hfix : (g⁻¹ * h) (P.ζQ (m + 1)) = P.ζQ (m + 1) :=
@@ -177,19 +194,23 @@ theorem chiQ_cont (P : LocPrime l) : Continuous (fun h : GQ l => (P.χQ h : ℚ_
   have hle : (l : ℝ) ^ (-((m + 1 : ℕ) : ℤ)) ≤ (l : ℝ)⁻¹ ^ m := by
     rw [zpow_neg, zpow_natCast, ← inv_pow]
     exact pow_le_pow_of_le_one (by positivity) hl1.le (by omega)
-  calc ‖(P.χQ h : ℚ_[l]) - P.χQ g‖ = ‖(P.χQ g : ℚ_[l])‖ * ‖(P.χQ (g⁻¹ * h) : ℚ_[l]) - 1‖ := by
-        rw [hmul, ← norm_mul, mul_sub, mul_one]
-    _ ≤ 1 * (l : ℝ) ^ (-((m + 1 : ℕ) : ℤ)) := by rw [chiQ_norm]; exact mul_le_mul_of_nonneg_left h1 zero_le_one
+  calc
+    ‖(P.χQ h : ℚ_[l]) - P.χQ g‖ = ‖(P.χQ g : ℚ_[l])‖ * ‖(P.χQ (g⁻¹ * h) : ℚ_[l]) - 1‖ := by
+      rw [hmul, ← norm_mul, mul_sub, mul_one]
+    _ ≤ 1 * (l : ℝ) ^ (-((m + 1 : ℕ) : ℤ)) := by
+      rw [chiQ_norm]; exact mul_le_mul_of_nonneg_left h1 zero_le_one
     _ < ε := by rw [one_mul]; exact lt_of_le_of_lt hle hm
 
-theorem norm_of_v_one (P : LocPrime l) (LL : FinExt l) (x : ℚ_[l])
-    (hv : P.v LL (algebraMap ℚ_[l] ↥LL.1 x) = 1) : ‖x‖ = (l : ℝ)⁻¹ := by
+theorem norm_of_v_one
+    (P : LocPrime l) (LL : FinExt l) (x : ℚ_[l]) (hv : P.v LL (algebraMap ℚ_[l] ↥LL.1 x) = 1)
+    : ‖x‖ = (l : ℝ)⁻¹ := by
   have hint : ∀ z : ℚ_[l], 0 ≤ P.v LL (algebraMap ℚ_[l] ↥LL.1 z) → ‖z‖ ≤ 1 := by
     intro z hz
     have hO := (P.v_O LL _).1 hz
     have hI : IsIntegral ℤ_[l] (algebraMap ℚ_[l] ↥LL.1 z) := hO
     have hI' : IsIntegral ℤ_[l] z :=
-      (isIntegral_algHom_iff (IsScalarTower.toAlgHom ℤ_[l] ℚ_[l] ↥LL.1) (algebraMap ℚ_[l] ↥LL.1).injective).1 hI
+      (isIntegral_algHom_iff (IsScalarTower.toAlgHom ℤ_[l] ℚ_[l] ↥LL.1)
+        (algebraMap ℚ_[l] ↥LL.1).injective).1 hI
     obtain ⟨y, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.1 hI'
     rw [PadicInt.algebraMap_apply]
     exact PadicInt.norm_le_one y
@@ -219,13 +240,18 @@ theorem norm_of_v_one (P : LocPrime l) (LL : FinExt l) (x : ℚ_[l])
     exact le_antisymm hy1 (by rwa [inv_le_one₀ hpos] at hy2)
   rw [hxy, norm_mul, hyn, one_mul, Padic.norm_p]
 
-theorem dense_PGen (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l)) (K LL : FinExt l)
-    (hl2 : l ≠ 2) (h : Good K 1 LL) : Dense (PGen (sit LT HW l AI K 1 LL h)) := by
+theorem dense_PGen
+    (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l))
+    (K LL : FinExt l)
+    (hl2 : l ≠ 2) (h : Good K 1 LL)
+    : Dense (PGen (sit LT HW l AI K 1 LL h)) := by
   let W := (HW l).W K 1 LL h
   let P := LT l
   let χ' : ↥(GK K) → ℚ_[l] := fun g => (P.χQ (g : GQ l) : ℚ_[l])
-  have hlink : ∀ g : ↥(GK K), algebraMap ↥(OL LL) ↥LL.1 ((W.χΓ (W.resΓ g) : ↥(OL LL))) =
-      algebraMap ℚ_[l] ↥LL.1 (χ' g) := fun g => by
+  have hlink
+      : ∀ g : ↥(GK K),
+        algebraMap ↥(OL LL) ↥LL.1 ((W.χΓ (W.resΓ g) : ↥(OL LL)))
+          = algebraMap ℚ_[l] ↥LL.1 (χ' g) := fun g => by
     rw [W.χΓ_res g, P.PD_χ K g]
   have hres : ∀ g g' : ↥(GK K), χ' g = χ' g' → W.resΓ g = W.resΓ g' := by
     intro g g' he
@@ -263,13 +289,15 @@ theorem dense_PGen (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l)) (K LL
     exact Subgroup.subset_closure (Set.mem_insert W.gamK (W.DelF : Set W.Gam))
   have hun : ‖χ' g₁‖ ≤ 1 := (chiQ_norm P _).le
   let uZ : ℤ_[l] := ⟨χ' g₁, hun⟩
-  have huZ : ‖uZ - 1‖ = (l : ℝ)⁻¹ := by rw [PadicInt.norm_def, PadicInt.coe_sub, PadicInt.coe_one]; exact hu
+  have huZ : ‖uZ - 1‖ = (l : ℝ)⁻¹ := by
+    rw [PadicInt.norm_def, PadicInt.coe_sub, PadicInt.coe_one]; exact hu
   have happrox : ∀ y : ℤ_[l], ‖y - 1‖ < 1 → ∃ q ∈ Q, χ' q = y := by
     intro y hy
     choose k hk using fun N => Cyc.pow_approx hl2 uZ huZ y hy N
     let x : ℕ → ↥(GK K) := fun N => g₁ ^ (k N)
     have hF : Filter.map x atTop ≤ 𝓟 (Q : Set ↥(GK K)) :=
-      Filter.le_principal_iff.2 (Filter.mem_map.2 (Filter.univ_mem' fun N => hPQ (Pg.pow_mem hg1 _)))
+      Filter.le_principal_iff.2 (Filter.mem_map.2 (Filter.univ_mem' fun N =>
+        hPQ (Pg.pow_mem hg1 _)))
     obtain ⟨q, hq, hcl⟩ := hQc.isCompact.exists_clusterPt hF
     refine ⟨q, hq, ?_⟩
     have htend : Tendsto χ' (Filter.map x atTop) (𝓝 (y : ℚ_[l])) := by
@@ -279,8 +307,7 @@ theorem dense_PGen (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l)) (K LL
       obtain ⟨N₀, hN₀⟩ := exists_pow_lt_of_lt_one hε hl1
       refine ⟨N₀, fun N hN => ?_⟩
       rw [dist_eq_norm]
-      have hx : χ' (x N) = ((uZ ^ k N : ℤ_[l]) : ℚ_[l]) := by
-        rw [hχpow, PadicInt.coe_pow]
+      have hx : χ' (x N) = ((uZ ^ k N : ℤ_[l]) : ℚ_[l]) := by rw [hχpow, PadicInt.coe_pow]
       rw [Function.comp_apply, hx, ← PadicInt.coe_sub, ← PadicInt.norm_def]
       refine lt_of_le_of_lt (hk N) (lt_of_le_of_lt ?_ hN₀)
       rw [zpow_neg, zpow_natCast, ← inv_pow]
@@ -324,9 +351,13 @@ theorem dense_PGen (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l)) (K LL
   have := Q.mul_mem (hPQ hgq) (Q.inv_mem hq)
   rwa [mul_inv_cancel_right] at this
 
-theorem genFix_sit (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l)) (K LL : FinExt l)
-    (hl2 : l ≠ 2) (h : Good K 1 LL) : GenFix (sit LT HW l AI K 1 LL h) :=
-  genFix_of_dense _ (t2Space_lattice_V_of_good_situation LT HW AI K 1 LL h) (dense_PGen LT HW AI K LL hl2 h)
+theorem genFix_sit
+    (LT : LocTheory) (HW : HWOf LT) (AI : LocAinf l (LT l))
+    (K LL : FinExt l)
+    (hl2 : l ≠ 2) (h : Good K 1 LL)
+    : GenFix (sit LT HW l AI K 1 LL h) :=
+  genFix_of_dense _ (t2Space_lattice_V_of_good_situation LT HW AI K 1 LL h)
+    (dense_PGen LT HW AI K LL hl2 h)
 
 end
 
@@ -335,9 +366,14 @@ end GlobalTheory.FixedByDense
 namespace GlobalTheory
 open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 
-theorem invariants_of_field_of_norms : ∀ (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW), Formalism.MainNotions.InvariantsGenerators.H0InvariantsTheorem D HW F :=
-  fun D HW F => Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators.invariants_iso_of_generators D HW F
-    (fun l _ K LL hA => Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators.oneInj_sit D.loc HW (D.locA l) K 1 LL hA.2.2)
+theorem invariants_of_field_of_norms
+    : ∀ (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW),
+      Formalism.MainNotions.InvariantsGenerators.H0InvariantsTheorem D HW F := fun D HW F =>
+  Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators.invariants_iso_of_generators D
+    HW F
+    (fun l _ K LL hA =>
+      Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators.oneInj_sit D.loc HW
+        (D.locA l) K 1 LL hA.2.2)
     (fun l _ K LL hA => FixedByDense.genFix_sit D.loc HW (D.locA l) K LL hA.2.1 hA.2.2)
 
 end GlobalTheory

@@ -15,9 +15,9 @@ open MvPolynomial
 noncomputable section
 
 def ConeAvoidsExists.Statement : Prop :=
-  ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)), J.IsPrime →
-    ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d →
-      ∃ (A : Matrix (Fin d) (Fin n) ℂ) (N : ℕ), ConeAvoids J A N
+  ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)),
+    J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d
+      → ∃ (A : Matrix (Fin d) (Fin n) ℂ) (N : ℕ), ConeAvoids J A N
 
 end
 

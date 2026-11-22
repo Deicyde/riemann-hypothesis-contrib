@@ -13,8 +13,8 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 open MvPolynomial
 
-theorem VerticalComponentFibre.proof (h : FibreVarieties.Statement.{0}) :
-    VerticalComponentFibre.Statement := by
+theorem VerticalComponentFibre.proof (h : FibreVarieties.Statement.{0})
+    : VerticalComponentFibre.Statement := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hP f b hf hfP W hW hrel hϖW
   have hWp : W.IsPrime := hW.1.1
   have hPp : P.IsPrime := hP.multiProj.isPrime
@@ -43,7 +43,8 @@ theorem VerticalComponentFibre.proof (h : FibreVarieties.Statement.{0}) :
       refine (Ideal.map_mono hlt.le).lt_of_not_ge fun e => hlt.not_ge ?_
       have := Ideal.comap_mono (f := π) e
       rwa [Ideal.comap_map_of_surjective' π hsurj, Ideal.comap_map_of_surjective' π hsurj,
-        Ideal.mk_ker, sup_eq_left.mpr hPW, sup_eq_left.mpr hPQ] at this
+          Ideal.mk_ker, sup_eq_left.mpr hPW, sup_eq_left.mpr hPQ]
+        at this
     have : (W.map π).FiniteHeight := ⟨Or.inr (hle1.trans_lt (WithTop.coe_lt_top 1)).ne⟩
     have h0 := (Ideal.height_strict_mono_of_isPrime_of_isPrime hlt').trans_le hle1
     rw [Order.lt_one_iff, Ideal.height_eq_zero_iff] at h0
@@ -55,21 +56,27 @@ theorem VerticalComponentFibre.proof (h : FibreVarieties.Statement.{0}) :
   have hdiv : divCycle P (C ϖ) W ≠ 0 := by
     unfold divCycle
     rw [dite_eq_left ⟨hmin, hrel⟩]
-    have hm : IsLocalRing.maximalIdeal (Localization.AtPrime W) ∈
-        ((P ⊔ Ideal.span {(C ϖ : MRing ι O)}).map
-          (algebraMap (MRing ι O) (Localization.AtPrime W))).minimalPrimes := by
-      rw [IsLocalization.minimalPrimes_map W.primeCompl (Localization.AtPrime W),
-        Set.mem_preimage, Localization.AtPrime.under_maximalIdeal]
+    have hm
+        : IsLocalRing.maximalIdeal (Localization.AtPrime W)
+          ∈ ((P ⊔ Ideal.span {(C ϖ : MRing ι O)}).map
+            (algebraMap (MRing ι O) (Localization.AtPrime W))).minimalPrimes := by
+      rw [IsLocalization.minimalPrimes_map W.primeCompl (Localization.AtPrime W), Set.mem_preimage,
+        Localization.AtPrime.under_maximalIdeal]
       exact hmin
-    have hne := ReciprocityTheory.ChartRestriction.G.AI.I1.SwapLoc.length_quot_ne_top_of_mem_minimalPrimes _ hm
-    have : Nontrivial (Localization.AtPrime W ⧸
-        (P ⊔ Ideal.span {(C ϖ : MRing ι O)}).map
-          (algebraMap (MRing ι O) (Localization.AtPrime W))) :=
-      Ideal.Quotient.nontrivial_iff.mpr
-        (ne_top_of_le_ne_top (IsLocalRing.maximalIdeal.isMaximal _).ne_top hm.1.2)
-    have hpos := Module.length_pos (R := Localization.AtPrime W)
-      (M := Localization.AtPrime W ⧸
-        (P ⊔ Ideal.span {(C ϖ : MRing ι O)}).map (algebraMap (MRing ι O) (Localization.AtPrime W)))
+    have hne :=
+      ReciprocityTheory.ChartRestriction.G.AI.I1.SwapLoc.length_quot_ne_top_of_mem_minimalPrimes _
+        hm
+    have : Nontrivial
+        (Localization.AtPrime W ⧸
+          (P ⊔ Ideal.span {(C ϖ : MRing ι O)}).map
+            (algebraMap (MRing ι O) (Localization.AtPrime W))) :=
+      Ideal.Quotient.nontrivial_iff.mpr (ne_top_of_le_ne_top
+        (IsLocalRing.maximalIdeal.isMaximal _).ne_top hm.1.2)
+    have hpos :=
+      Module.length_pos (R := Localization.AtPrime W)
+        (M :=
+          Localization.AtPrime W ⧸
+            (P ⊔ Ideal.span {(C ϖ : MRing ι O)}).map (algebraMap (MRing ι O) (Localization.AtPrime W)))
     rw [multAt, ReciprocityTheory.ChartRestriction.G.AI.I1.inh_length_locQuot]
     exact_mod_cast (ENat.toNat_pos hpos.ne' hne).ne'
   exact (h O ϖ hϖ K ι P d hP).2 W hdiv

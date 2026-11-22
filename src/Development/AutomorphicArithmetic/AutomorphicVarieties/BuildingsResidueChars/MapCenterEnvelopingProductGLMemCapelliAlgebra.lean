@@ -9,21 +9,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 attribute [local instance 100] LieRing.ofAssociativeRing
 
 open UpperTheory.V.Af.CuspFin in
-theorem UpperTheory.map_center_envelopingProductGL_mem_capelliAlgebra :
-    ∀ (𝔤 : Type) [LieRing 𝔤] [LieAlgebra ℝ 𝔤] (ι : Type) [Fintype ι] (n : ℕ) (b : Module.Basis (ι × Fin n × Fin n) ℝ 𝔤), (∀ v i j k l, ⁅b (v, i, j), b (v, k, l)⁆ = (if j = k then b (v, i, l) else 0) - (if l = i then b (v, k, j) else 0)) → (∀ v v', v ≠ v' → ∀ i j k l, ⁅b (v, i, j), b (v', k, l)⁆ = 0) → ∀ (A : Type) [Ring A] [Algebra ℂ A] [Algebra ℝ A] [IsScalarTower ℝ ℂ A] (ψ : UniversalEnvelopingAlgebra ℝ 𝔤 →ₐ[ℝ] A), ∀ z ∈ Subalgebra.center ℝ (UniversalEnvelopingAlgebra ℝ 𝔤), ψ z ∈ UpperTheory.V.Af.CuspFin.capAlg fun v i j => ψ (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j))) := by
+theorem UpperTheory.map_center_envelopingProductGL_mem_capelliAlgebra
+    : ∀ (𝔤 : Type) [LieRing 𝔤] [LieAlgebra ℝ 𝔤] (ι : Type) [Fintype ι] (n : ℕ)
+        (b : Module.Basis (ι × Fin n × Fin n) ℝ 𝔤),
+      (∀ v i j k l,
+          ⁅b (v, i, j), b (v, k, l)⁆
+            = (if j = k then b (v, i, l) else 0) - (if l = i then b (v, k, j) else 0))
+        → (∀ v v', v ≠ v' → ∀ i j k l, ⁅b (v, i, j), b (v', k, l)⁆ = 0)
+        → ∀ (A : Type) [Ring A] [Algebra ℂ A] [Algebra ℝ A] [IsScalarTower ℝ ℂ A]
+            (ψ : UniversalEnvelopingAlgebra ℝ 𝔤 →ₐ[ℝ] A),
+          ∀ z ∈ Subalgebra.center ℝ (UniversalEnvelopingAlgebra ℝ 𝔤),
+            ψ z ∈ UpperTheory.V.Af.CuspFin.capAlg fun v i j =>
+              ψ (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j))) := by
   intro 𝔤 _ _ ι _ n b h1 h2 A _ _ _ _ ψ z hz
-  obtain ⟨T, _, _, E, hE⟩ := hasUniv_of_sum (UpperTheory.glRelations_hasUniversalProperty n) (UpperTheory.capelliAlgebra_map_of_glRelations n) ι
+  obtain ⟨T, _, _, E, hE⟩ :=
+    hasUniv_of_sum (UpperTheory.glRelations_hasUniversalProperty n)
+      (UpperTheory.capelliAlgebra_map_of_glRelations n) ι
   letI : Algebra ℝ T := Algebra.compHom T (algebraMap ℝ ℂ)
   haveI : IsScalarTower ℝ ℂ T := IsScalarTower.of_algebraMap_eq fun _ => rfl
   let l : 𝔤 →ₗ[ℝ] T := b.constr ℝ fun p => E p.1 p.2.1 p.2.2
   have hl : ∀ v i j, l (b (v, i, j)) = E v i j := fun v i j => b.constr_basis ℝ _ _
   have hlie : ∀ x y, l ⁅x, y⁆ = l x * l y - l y * l x := by
-    have key : (LieModule.toEnd ℝ 𝔤 𝔤 : 𝔤 →ₗ[ℝ] 𝔤 →ₗ[ℝ] 𝔤).compr₂ l =
-        (LinearMap.mul ℝ T).compl₁₂ l l - ((LinearMap.mul ℝ T).compl₁₂ l l).flip := by
+    have key
+        : (LieModule.toEnd ℝ 𝔤 𝔤 : 𝔤 →ₗ[ℝ] 𝔤 →ₗ[ℝ] 𝔤).compr₂ l
+          = (LinearMap.mul ℝ T).compl₁₂ l l - ((LinearMap.mul ℝ T).compl₁₂ l l).flip := by
       refine LinearMap.ext_basis b b ?_
       rintro ⟨v, i, j⟩ ⟨v', k, m⟩
-      change l ⁅b (v, i, j), b (v', k, m)⁆ =
-        l (b (v, i, j)) * l (b (v', k, m)) - l (b (v', k, m)) * l (b (v, i, j))
+      change l ⁅b (v, i, j), b (v', k, m)⁆
+        = l (b (v, i, j)) * l (b (v', k, m)) - l (b (v', k, m)) * l (b (v, i, j))
       rw [hl, hl]
       by_cases hv : v = v'
       · subst hv
@@ -44,10 +57,11 @@ theorem UpperTheory.map_center_envelopingProductGL_mem_capelliAlgebra :
     refine (Algebra.commute_of_mem_adjoin_of_forall_mem_commute ht ?_).symm.eq
     rintro _ ⟨v, i, j, rfl⟩
     rw [← hf, Commute, SemiconjBy, ← map_mul, ← map_mul, Subalgebra.mem_center_iff.1 hz]
-  have hbr : ∀ x y : 𝔤,
-      ψ (UniversalEnvelopingAlgebra.ι ℝ x) * ψ (UniversalEnvelopingAlgebra.ι ℝ y) -
-        ψ (UniversalEnvelopingAlgebra.ι ℝ y) * ψ (UniversalEnvelopingAlgebra.ι ℝ x) =
-      ψ (UniversalEnvelopingAlgebra.ι ℝ ⁅x, y⁆) := fun x y => by
+  have hbr
+      : ∀ x y : 𝔤,
+        ψ (UniversalEnvelopingAlgebra.ι ℝ x) * ψ (UniversalEnvelopingAlgebra.ι ℝ y)
+            - ψ (UniversalEnvelopingAlgebra.ι ℝ y) * ψ (UniversalEnvelopingAlgebra.ι ℝ x)
+          = ψ (UniversalEnvelopingAlgebra.ι ℝ ⁅x, y⁆) := fun x y => by
     rw [LieHom.map_lie, Ring.lie_def, map_sub, map_mul, map_mul]
   have hrel : MultiRel fun v i j => ψ (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j))) := by
     refine ⟨fun v i j k m => ?_, fun v v' hv i j k m => ?_⟩
@@ -57,16 +71,17 @@ theorem UpperTheory.map_center_envelopingProductGL_mem_capelliAlgebra :
   obtain ⟨ρ, hρ⟩ := hE.univ A _ hrel
   have hcomp : (ρ.restrictScalars ℝ).comp f = ψ := by
     apply UniversalEnvelopingAlgebra.hom_ext
-    refine LieHom.ext fun x => LinearMap.congr_fun (f := LieHom.toLinearMap _)
-      (g := LieHom.toLinearMap _) (b.ext ?_) x
+    refine LieHom.ext fun x =>
+      LinearMap.congr_fun (f := LieHom.toLinearMap _) (g := LieHom.toLinearMap _) (b.ext ?_) x
     rintro ⟨v, i, j⟩
-    change ρ (f (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j)))) =
-      ψ (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j)))
+    change ρ (f (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j))))
+      = ψ (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j)))
     rw [hf, hρ]
   have hψ : ψ z = ρ (f z) := by rw [← hcomp]; rfl
   rw [hψ]
-  have hle : capAlg E ≤ (capAlg fun v i j =>
-      ψ (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j)))).comap ρ := by
+  have hle
+      : capAlg E
+        ≤ (capAlg fun v i j => ψ (UniversalEnvelopingAlgebra.ι ℝ (b (v, i, j)))).comap ρ := by
     refine Algebra.adjoin_le ?_
     rintro _ ⟨v, u, rfl⟩
     refine Algebra.subset_adjoin ⟨v, u, ?_⟩

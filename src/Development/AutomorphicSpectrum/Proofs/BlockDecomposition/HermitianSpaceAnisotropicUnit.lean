@@ -9,8 +9,9 @@ open PositivityTheory.PfSWUS.Loc GlobalTheory.CompanionTheory.UnrDens
 
 namespace GlobalTheory.CompanionTheory.UnrDens
 
-theorem exists_trace_ne_zero {E : Type} [CommRing E] {τ : E →+* E} {q : ℕ} {ε : ℤ}
-    (hE : ResAlg E τ q ε) {a : E} (ha : a ≠ 0) : ∃ c : E, c * a + τ (c * a) ≠ 0 := by
+theorem exists_trace_ne_zero
+    {E : Type} [CommRing E] {τ : E →+* E} {q : ℕ} {ε : ℤ} (hE : ResAlg E τ q ε) {a : E} (ha : a ≠ 0)
+    : ∃ c : E, c * a + τ (c * a) ≠ 0 := by
   by_contra hcon
   push_neg at hcon
   obtain ⟨u, hu, -⟩ := hE.basis
@@ -23,9 +24,12 @@ theorem exists_trace_ne_zero {E : Type} [CommRing E] {τ : E →+* E} {q : ℕ} 
   apply ha
   linear_combination w' * h2 - a * hw'
 
-theorem exists_unit_norm (E : Type) [CommRing E] (τ : E →+* E) (q : ℕ) (ε : ℤ)
-    (hE : ResAlg E τ q ε) (V : Type) [AddCommGroup V] [Module E V] (B : HermSp E τ V)
-    (hV : Nontrivial V) : ∃ w : V, IsUnit (B.h w w) := by
+theorem exists_unit_norm
+    (E : Type) [CommRing E]
+    (τ : E →+* E) (q : ℕ) (ε : ℤ) (hE : ResAlg E τ q ε)
+    (V : Type) [AddCommGroup V] [Module E V]
+    (B : HermSp E τ V) (hV : Nontrivial V)
+    : ∃ w : V, IsUnit (B.h w w) := by
   have key : ∀ w : V, B.h w w ≠ 0 → IsUnit (B.h w w) := fun w hw =>
     hE.fixedUnit _ (B.self_fixed hE.inv w) hw
   obtain ⟨v, hv⟩ := exists_ne (0 : V)

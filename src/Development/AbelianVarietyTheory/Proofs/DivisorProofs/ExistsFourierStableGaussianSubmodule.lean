@@ -8,31 +8,39 @@ open FourierTransform MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem exists_fourier_stable_gaussian_submodule :
-    ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
-    (N : Submodule ℂ (SchwartzMap E ℂ)) (G : SchwartzMap E ℂ),
-    (∀ y, G y = Complex.exp (-((Real.pi * ‖y‖ ^ 2 : ℝ) : ℂ))) → G ∈ N →
-    (∀ (v : E) (f f₁ : SchwartzMap E ℂ), f ∈ N → (∀ x, f₁ x = fderiv ℝ (⇑f) x v) → f₁ ∈ N) →
-    (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ), f ∈ N → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ N) →
-    ∃ W : Submodule ℂ (SchwartzMap E ℂ), W ≤ N ∧ G ∈ W ∧
-      (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ), f ∈ W → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ W) ∧
-      (∀ f ∈ W, 𝓕 f ∈ W) := by
+theorem exists_fourier_stable_gaussian_submodule
+    : ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+        [MeasurableSpace E] [BorelSpace E] (N : Submodule ℂ (SchwartzMap E ℂ))
+        (G : SchwartzMap E ℂ),
+      (∀ y, G y = Complex.exp (-((Real.pi * ‖y‖ ^ 2 : ℝ) : ℂ))) → G ∈ N
+        → (∀ (v : E) (f f₁ : SchwartzMap E ℂ), f ∈ N → (∀ x, f₁ x = fderiv ℝ (⇑f) x v) → f₁ ∈ N)
+        → (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ),
+          f ∈ N → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ N)
+        → ∃ W : Submodule ℂ (SchwartzMap E ℂ),
+          W ≤ N ∧ G ∈ W
+            ∧ (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ),
+              f ∈ W → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ W)
+            ∧ (∀ f ∈ W, 𝓕 f ∈ W) := by
   intro E _ _ _ _ _ N G hG hGN hD hL
-  let S : Set (Submodule ℂ (SchwartzMap E ℂ)) := {K | G ∈ K ∧
-    (∀ (v : E) (f f₁ : SchwartzMap E ℂ), f ∈ K → (∀ x, f₁ x = fderiv ℝ (⇑f) x v) → f₁ ∈ K) ∧
-    (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ), f ∈ K → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ K)}
+  let S : Set (Submodule ℂ (SchwartzMap E ℂ)) :=
+    {K | G ∈ K ∧
+      (∀ (v : E) (f f₁ : SchwartzMap E ℂ), f ∈ K → (∀ x, f₁ x = fderiv ℝ (⇑f) x v) → f₁ ∈ K) ∧
+      (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ), f ∈ K → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ K)}
   have hWG : G ∈ sInf S := Submodule.mem_sInf.2 fun K hK => hK.1
-  have hWD : ∀ (v : E) (f f₁ : SchwartzMap E ℂ), f ∈ sInf S →
-      (∀ x, f₁ x = fderiv ℝ (⇑f) x v) → f₁ ∈ sInf S := fun v f f₁ hf h =>
+  have hWD
+      : ∀ (v : E) (f f₁ : SchwartzMap E ℂ),
+        f ∈ sInf S → (∀ x, f₁ x = fderiv ℝ (⇑f) x v) → f₁ ∈ sInf S := fun v f f₁ hf h =>
     Submodule.mem_sInf.2 fun K hK => hK.2.1 v f f₁ (Submodule.mem_sInf.1 hf K hK) h
-  have hWL : ∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ), f ∈ sInf S →
-      (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ sInf S := fun v f f₁ hf h =>
+  have hWL
+      : ∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ),
+        f ∈ sInf S → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ sInf S := fun v f f₁ hf h =>
     Submodule.mem_sInf.2 fun K hK => hK.2.2 v f f₁ (Submodule.mem_sInf.1 hf K hK) h
   have htemp : ∀ m : E, Function.HasTemperateGrowth (fun x : E => inner ℝ x m) := by
     intro m
     have : (fun x : E => inner ℝ x m) = (innerSL ℝ m : E →L[ℝ] ℝ) := by
       funext x; simp [real_inner_comm]
-    rw [this]; exact (innerSL ℝ m).hasTemperateGrowth
+    rw [this]
+    exact (innerSL ℝ m).hasTemperateGrowth
   have hFG : 𝓕 G = G := by
     ext w
     have h1 : (⇑G) = fun v : E => Complex.exp (-(Real.pi : ℂ) * (‖v‖ : ℂ) ^ 2) := by
@@ -43,10 +51,12 @@ theorem exists_fourier_stable_gaussian_submodule :
       Complex.one_cpow, one_mul]
     congr 1
     field_simp
-  have hK : (sInf S).comap (SchwartzMap.fourierTransformCLM ℂ (V := E) (E := ℂ)).toLinearMap ∈ S := by
+  have hK
+      : (sInf S).comap (SchwartzMap.fourierTransformCLM ℂ (V := E) (E := ℂ)).toLinearMap ∈ S := by
     refine ⟨?_, ?_, ?_⟩
     · show 𝓕 G ∈ sInf S
-      rw [hFG]; exact hWG
+      rw [hFG]
+      exact hWG
     · intro v f f₁ hf h
       have hf' : 𝓕 f ∈ sInf S := hf
       show 𝓕 f₁ ∈ sInf S
@@ -68,9 +78,9 @@ theorem exists_fourier_stable_gaussian_submodule :
       have h2 : LineDeriv.lineDerivOp u (𝓕 f) ∈ sInf S :=
         hWD u _ _ hf' fun x => SchwartzMap.lineDerivOp_apply_eq_fderiv _ _ _
       rw [SchwartzMap.lineDerivOp_fourier_eq, ← h1, ← SchwartzMap.fourierTransformCLM_apply ℂ,
-        map_smul, SchwartzMap.fourierTransformCLM_apply] at h2
-      have hc : (-(2 * (Real.pi : ℂ) * Complex.I)) ≠ 0 := by
-        simp [Real.pi_ne_zero]
+          map_smul, SchwartzMap.fourierTransformCLM_apply]
+        at h2
+      have hc : (-(2 * (Real.pi : ℂ) * Complex.I)) ≠ 0 := by simp [Real.pi_ne_zero]
       exact (Submodule.smul_mem_iff _ hc).1 h2
   exact ⟨sInf S, sInf_le ⟨hGN, hD, hL⟩, hWG, hWL, fun f hf => sInf_le hK hf⟩
 

@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -20,18 +22,18 @@ private noncomputable def fstR : A F →+* InfiniteAdeleRing F :=
 private theorem cont_fst : Continuous (fun x : A F => x.1) :=
   continuous_fst (X := InfiniteAdeleRing F) (Y := FiniteAdeleRing (𝓞 F) F)
 
-private theorem cont_pair (y : FiniteAdeleRing (𝓞 F) F) :
-    Continuous (fun x : InfiniteAdeleRing F => ((x, y) : A F)) :=
+private theorem cont_pair (y : FiniteAdeleRing (𝓞 F) F)
+    : Continuous (fun x : InfiniteAdeleRing F => ((x, y) : A F)) :=
   Continuous.prodMk_left (X := InfiniteAdeleRing F) (Y := FiniteAdeleRing (𝓞 F) F) y
 
 private theorem cont_entry (i j : Fin 2) : Continuous (fun h : G1 F => h i j) :=
   (continuous_apply j).comp ((continuous_apply i).comp continuous_subtype_val)
 
-private theorem d_one : ((1 : G1 F) 1 1).1 = 1 := by
-  simp
+private theorem d_one : ((1 : G1 F) 1 1).1 = 1 := by simp
 
 private theorem cont_d (v : InfinitePlace F) : Continuous (fun h : G1 F => (h 1 1).1 v) :=
-  (continuous_apply (A := fun v : InfinitePlace F => v.Completion) v).comp (cont_fst.comp (cont_entry 1 1))
+  (continuous_apply (A := fun v : InfinitePlace F => v.Completion) v).comp
+    (cont_fst.comp (cont_entry 1 1))
 
 private theorem ne_one (v : InfinitePlace F) : ((1 : G1 F) 1 1).1 v ≠ 0 := by
   rw [d_one]
@@ -58,10 +60,14 @@ private theorem eI_one : eI (1 : G1 F) = 1 := by
   exact inv_one
 
 private noncomputable def aU (h : G1 F) : (A F)ˣ :=
-  if hu : ∀ v, (h 1 1).1 v ≠ 0 then
-    ⟨(eI h, 1), ((h 1 1).1, 1), Prod.ext (eI_mul hu) (mul_one _),
-      Prod.ext ((mul_comm _ _).trans (eI_mul hu)) (mul_one _)⟩
-  else 1
+  if hu : ∀ v, (h 1 1).1 v ≠ 0 then ⟨
+    (eI h, 1),
+    ((h 1 1).1, 1),
+    Prod.ext (eI_mul hu) (mul_one _),
+    Prod.ext ((mul_comm _ _).trans (eI_mul hu)) (mul_one _)
+  ⟩
+  else
+    1
 
 private noncomputable def bU (h : G1 F) : A F := ((h 0 1).1 * eI h, 0)
 private noncomputable def cU (h : G1 F) : A F := (-(h 1 0).1 * eI h, 0)
@@ -69,9 +75,10 @@ private noncomputable def cU (h : G1 F) : A F := (-(h 1 0).1 * eI h, 0)
 private noncomputable def pU (b : A F) (a : (A F)ˣ) (c : A F) : G1 F :=
   nU b * mD a * wW F * nU c * (wW F)⁻¹
 
-private theorem pU_coe (b : A F) (a : (A F)ˣ) (c : A F) :
-    (pU b a c).1 = !![(a : A F) - b * c * ((a⁻¹ : (A F)ˣ) : A F), b * ((a⁻¹ : (A F)ˣ) : A F);
-      -c * ((a⁻¹ : (A F)ˣ) : A F), ((a⁻¹ : (A F)ˣ) : A F)] := by
+private theorem pU_coe (b : A F) (a : (A F)ˣ) (c : A F)
+    : (pU b a c).1
+      = !![(a : A F) - b * c * ((a⁻¹ : (A F)ˣ) : A F), b * ((a⁻¹ : (A F)ˣ) : A F);
+        -c * ((a⁻¹ : (A F)ˣ) : A F), ((a⁻¹ : (A F)ˣ) : A F)] := by
   have hw : ((wW F)⁻¹).1 = !![0, -1; 1, 0] := by
     rw [Matrix.SpecialLinearGroup.coe_inv, Matrix.adjugate_fin_two]
     simp [wW]
@@ -84,16 +91,16 @@ private theorem fstR_a {h : G1 F} (hu : ∀ v, (h 1 1).1 v ≠ 0) : fstR (aU h :
   simp only [aU, dif_pos hu]
   rfl
 
-private theorem fstR_ai {h : G1 F} (hu : ∀ v, (h 1 1).1 v ≠ 0) :
-    fstR (((aU h)⁻¹ : (A F)ˣ) : A F) = (h 1 1).1 := by
+private theorem fstR_ai {h : G1 F} (hu : ∀ v, (h 1 1).1 v ≠ 0)
+    : fstR (((aU h)⁻¹ : (A F)ˣ) : A F) = (h 1 1).1 := by
   simp only [aU, dif_pos hu]
   rfl
 
 private theorem fstR_b (h : G1 F) : fstR (bU h) = (h 0 1).1 * eI h := rfl
 private theorem fstR_c (h : G1 F) : fstR (cU h) = -(h 1 0).1 * eI h := rfl
 
-private theorem pU_fst {h : G1 F} (hu : ∀ v, (h 1 1).1 v ≠ 0) (i j : Fin 2) :
-    ((pU (bU h) (aU h) (cU h)).1 i j).1 = (h i j).1 := by
+private theorem pU_fst {h : G1 F} (hu : ∀ v, (h 1 1).1 v ≠ 0) (i j : Fin 2)
+    : ((pU (bU h) (aU h) (cU h)).1 i j).1 = (h i j).1 := by
   have hdet : (h 0 0).1 * (h 1 1).1 - (h 0 1).1 * (h 1 0).1 = 1 := by
     have h1 : h 0 0 * h 1 1 - h 0 1 * h 1 0 = 1 := by
       have := h.det_coe
@@ -108,7 +115,7 @@ private theorem pU_fst {h : G1 F} (hu : ∀ v, (h 1 1).1 v ≠ 0) (i j : Fin 2) 
   have e01 : fstR (bU h * (((aU h)⁻¹ : (A F)ˣ) : A F)) = (h 0 1).1 := by
     rw [map_mul, fstR_ai hu, fstR_b]
     linear_combination (h 0 1).1 * he
-  have e10 : fstR (-cU h * (((aU h)⁻¹ : (A F)ˣ) : A F)) = (h 1 0).1 := by
+  have e10 : fstR (- cU h * (((aU h)⁻¹ : (A F)ˣ) : A F)) = (h 1 0).1 := by
     rw [map_mul, map_neg, fstR_ai hu, fstR_c]
     linear_combination (h 1 0).1 * he
   have e11 : fstR (((aU h)⁻¹ : (A F)ˣ) : A F) = (h 1 1).1 := fstR_ai hu
@@ -119,16 +126,19 @@ private theorem pU_fst {h : G1 F} (hu : ∀ v, (h 1 1).1 v ≠ 0) (i j : Fin 2) 
 private noncomputable def kU (h : G1 F) : G1 F := (pU (bU h) (aU h) (cU h))⁻¹ * h
 
 private theorem infOne_kU {h : G1 F} (hu : ∀ v, (h 1 1).1 v ≠ 0) : InfOne (kU h) := by
-  have hP : Matrix.SpecialLinearGroup.map fstR (pU (bU h) (aU h) (cU h)) =
-      Matrix.SpecialLinearGroup.map fstR h := by
+  have hP
+      : Matrix.SpecialLinearGroup.map fstR (pU (bU h) (aU h) (cU h))
+        = Matrix.SpecialLinearGroup.map fstR h := by
     ext i j
     exact pU_fst hu i j
   have hk : Matrix.SpecialLinearGroup.map fstR (kU h) = 1 := by
     rw [kU, map_mul, map_inv, hP, inv_mul_cancel]
   intro i j
   have h1 : fstR ((kU h).1 i j) = (Matrix.SpecialLinearGroup.map fstR (kU h)).1 i j := rfl
-  have h2 : fstR ((1 : Matrix (Fin 2) (Fin 2) (A F)) i j) =
-      (fstR.mapMatrix (1 : Matrix (Fin 2) (Fin 2) (A F))) i j := rfl
+  have h2
+      : fstR ((1 : Matrix (Fin 2) (Fin 2) (A F)) i j)
+        = (fstR.mapMatrix (1 : Matrix (Fin 2) (Fin 2) (A F))) i j :=
+    rfl
   have h3 := h1.trans (by rw [hk]; rfl : _ = (1 : Matrix (Fin 2) (Fin 2) (InfiniteAdeleRing F)) i j)
   rw [map_one] at h2
   exact h3.trans h2.symm
@@ -146,8 +156,7 @@ private theorem cont_mD : Continuous (mD : (A F)ˣ → G1 F) := by
   · exact Units.continuous_val.comp continuous_inv
 
 private theorem bU_cont : ContinuousAt (bU : G1 F → A F) 1 :=
-  (cont_pair 0).continuousAt.comp
-    (((cont_fst.comp (cont_entry 0 1)).continuousAt).mul eI_cont)
+  (cont_pair 0).continuousAt.comp (((cont_fst.comp (cont_entry 0 1)).continuousAt).mul eI_cont)
 
 private theorem cU_cont : ContinuousAt (cU : G1 F → A F) 1 :=
   (cont_pair 0).continuousAt.comp
@@ -155,10 +164,13 @@ private theorem cU_cont : ContinuousAt (cU : G1 F → A F) 1 :=
 
 private theorem aU_cont : ContinuousAt (aU : G1 F → (A F)ˣ) 1 := by
   rw [Units.isEmbedding_embedProduct.isInducing.continuousAt_iff]
-  have hf : ContinuousAt (fun h : G1 F => ((((eI h, 1) : A F), MulOpposite.op (((h 1 1).1, 1) : A F)) :
-      A F × (A F)ᵐᵒᵖ)) 1 := by
+  have hf : ContinuousAt
+      (fun h : G1 F =>
+        ((((eI h, 1) : A F), MulOpposite.op (((h 1 1).1, 1) : A F)) : A F × (A F)ᵐᵒᵖ))
+      1 := by
     refine ContinuousAt.prodMk ((cont_pair 1).continuousAt.comp eI_cont) ?_
-    exact (MulOpposite.continuous_op.comp ((cont_pair 1).comp (cont_fst.comp (cont_entry 1 1)))).continuousAt
+    exact (MulOpposite.continuous_op.comp ((cont_pair 1).comp
+      (cont_fst.comp (cont_entry 1 1)))).continuousAt
   refine hf.congr ?_
   filter_upwards [ev_ne] with h hu
   simp only [Function.comp, aU, dif_pos hu]
@@ -199,12 +211,14 @@ private theorem kU_tendsto : Tendsto (kU : G1 F → G1 F) (𝓝 1) (𝓝 1) := b
 end UpperTheory.ConvolutionTheory.R2.C.NearIdentityUnipotents
 
 open UpperTheory.ConvolutionTheory.R2.C.NearIdentityUnipotents in
-theorem UpperTheory.ConvolutionTheory.R2.C.near :
-    ∀ (F : Type) [Field F] [NumberField F], ∃ (b c : G1 F → A F) (a : G1 F → (A F)ˣ) (k : G1 F → G1 F), ContinuousAt b 1 ∧ ContinuousAt c 1 ∧ ContinuousAt a 1 ∧
-    Tendsto k (𝓝 1) (𝓝 1) ∧ ∀ᶠ h in 𝓝 (1 : G1 F), InfOne (k h) ∧ h = nU (b h) * mD (a h) * wW F * nU (c h) * (wW F)⁻¹ * k h := by
-  intro F _ _
-  refine ⟨bU, cU, aU, kU, bU_cont, cU_cont, aU_cont, kU_tendsto, ?_⟩
-  filter_upwards [ev_ne] with h hu
-  refine ⟨infOne_kU hu, ?_⟩
-  show h = pU (bU h) (aU h) (cU h) * kU h
-  rw [kU, mul_inv_cancel_left]
+theorem UpperTheory.ConvolutionTheory.R2.C.near
+    : ∀ (F : Type) [Field F] [NumberField F], ∃ (b c : G1 F → A F) (a : G1 F → (A F)ˣ) (k : G1 F → G1 F),
+      ContinuousAt b 1 ∧ ContinuousAt c 1 ∧ ContinuousAt a 1 ∧ Tendsto k (𝓝 1) (𝓝 1)
+        ∧ ∀ᶠ h in 𝓝 (1 : G1 F), InfOne (k h) ∧ h = nU (b h) * mD (a h) * wW F * nU (c h) * (wW F)⁻¹ * k h :=
+  by
+    intro F _ _
+    refine ⟨bU, cU, aU, kU, bU_cont, cU_cont, aU_cont, kU_tendsto, ?_⟩
+    filter_upwards [ev_ne] with h hu
+    refine ⟨infOne_kU hu, ?_⟩
+    show h = pU (bU h) (aU h) (cU h) * kU h
+    rw [kU, mul_inv_cancel_left]

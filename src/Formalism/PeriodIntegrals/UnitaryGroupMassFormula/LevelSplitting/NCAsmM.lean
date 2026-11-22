@@ -9,14 +9,18 @@ noncomputable section
 
 namespace PI.LevelKSplit.W.NCA
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory Topology
 open PI.LevelKSplit PI.LevelKSplit.W.NC PI.LevelKSplit.W.SemiA PI.VolSemiDirect.W
 open scoped TensorProduct
 
-theorem conjInv_of_one {X : Type} [Group X] [TopologicalSpace X] [MeasurableSpace X]
-    [BorelSpace X] (N H : Subgroup X) (hN : LCSC N)
-    (hex : ∀ h ∈ H, ∃ μ0 : Measure N, μ0.IsHaarMeasure ∧ ∀ f : X → ENNReal, Measurable f →
-      ∫⁻ n, f (h * (n : X) * h⁻¹) ∂μ0 = ∫⁻ n, f (n : X) ∂μ0) : ConjInv N H := by
+theorem conjInv_of_one
+    {X : Type} [Group X] [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X]
+    (N H : Subgroup X) (hN : LCSC N)
+    (hex : ∀ h ∈ H, ∃ μ0 : Measure N,
+      μ0.IsHaarMeasure
+        ∧ ∀ f : X → ENNReal, Measurable f → ∫⁻ n, f (h * (n : X) * h⁻¹) ∂μ0 = ∫⁻ n, f (n : X) ∂μ0)
+    : ConjInv N H := by
   obtain ⟨hlc, hsc, ht2, htg⟩ := hN
   intro μN hμN h hh f hf
   obtain ⟨μ0, hμ0, hinv⟩ := hex h hh
@@ -25,18 +29,21 @@ theorem conjInv_of_one {X : Type} [Group X] [TopologicalSpace X] [MeasurableSpac
 
 section Af
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  [FiniteDimensional F E] {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E}
+variable
+  {F E : Type}
+  [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [FiniteDimensional F E]
+  {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E}
 
-theorem conjNH_of (hC : NCoord F E σ M J) (hV : PI.LevelKSplit.W.CD.ModV F E σ M J) :
-    PI.LevelKSplit.W.ExS.ConjNH F E σ M J := by
+theorem conjNH_of (hC : NCoord F E σ M J) (hV : PI.LevelKSplit.W.CD.ModV F E σ M J)
+    : PI.LevelKSplit.W.ExS.ConjNH F E σ M J := by
   intro hJ hσσ r P T hP
   have hsc : SecondCountableTopology (Af F) := PI.LevelKSplit.W.SC.finite_adeles_secondCountable F
   have hL : LCSC (HA (Af F) σ J) := PI.LevelKSplit.W.ExS.lcsc_HAf hsc
   have : BorelSpace (HA (Af F) σ J) := ⟨rfl⟩
   have : SecondCountableTopology (HA (Af F) σ J) := hL.2.1
   obtain ⟨-, cN, -⟩ := PI.LevelKSplit.W.ExC.closed_SNH hJ hσσ P T hP
-  obtain ⟨lN, -⟩ := subgroup_locally_compact_holds (HA (Af F) σ J) ⊥ _ hL cN inferInstance inferInstance
+  obtain ⟨lN, -⟩ :=
+    subgroup_locally_compact_holds (HA (Af F) σ J) ⊥ _ hL cN inferInstance inferInstance
   refine conjInv_of_one _ _ lN ?_
   intro h hh
   obtain ⟨A, Z, Ψ, cA, cZ, hleft, hconj⟩ := hC hJ hσσ r P T hP
@@ -52,15 +59,17 @@ theorem conjNH_of (hC : NCoord F E σ M J) (hV : PI.LevelKSplit.W.CD.ModV F E σ
   have : BorelSpace (Af F ⊗[F] E) := ⟨rfl⟩
   have : BorelSpace (Fin M → Af F ⊗[F] E) := Pi.borelSpace
   have H := SemiA.datR_hyp (R := Af F) hσσ hJ hP
-  have cW : IsClosed ((Wp (Af F) σ J P : AddSubgroup (Fin M → Af F ⊗[F] E)) :
-      Set (Fin M → Af F ⊗[F] E)) := by
-    have e1 : ((Wp (Af F) σ J P : AddSubgroup (Fin M → Af F ⊗[F] E)) : Set (Fin M → Af F ⊗[F] E)) =
-        {v | PI.LevelKSplit.W.NCA.DatL.pL (SemiA.datR (Af F) σ J P T) v = v} := by
+  have cW : IsClosed
+      ((Wp (Af F) σ J P : AddSubgroup (Fin M → Af F ⊗[F] E)) : Set (Fin M → Af F ⊗[F] E)) := by
+    have e1
+        : ((Wp (Af F) σ J P : AddSubgroup (Fin M → Af F ⊗[F] E)) : Set (Fin M → Af F ⊗[F] E))
+          = {v | PI.LevelKSplit.W.NCA.DatL.pL (SemiA.datR (Af F) σ J P T) v = v} := by
       ext v
       exact mem_Wp_iff H v
     rw [e1]
     exact isClosed_eq (LinearMap.continuous_on_pi _) continuous_id
-  have : LocallyCompactSpace (Wp (Af F) σ J P) := cW.isClosedEmbedding_subtypeVal.locallyCompactSpace
+  have : LocallyCompactSpace (Wp (Af F) σ J P) :=
+    cW.isClosedEmbedding_subtypeVal.locallyCompactSpace
   have : SecondCountableTopology (Wp (Af F) σ J P) :=
     TopologicalSpace.secondCountableTopology_induced _ _ Subtype.val
   have : BorelSpace (Wp (Af F) σ J P) := Subtype.borelSpace _
@@ -77,15 +86,20 @@ theorem conjNH_of (hC : NCoord F E σ M J) (hV : PI.LevelKSplit.W.CD.ModV F E σ
   · have hli : (ρ.map Ψ).IsMulLeftInvariant := by
       refine ⟨fun n0 => ?_⟩
       obtain ⟨a0, t, c, ht, hc, hform⟩ := hleft n0
-      have hcomm : (fun n => n0 * n) ∘ Ψ = Ψ ∘ (fun p : A × ((Fin r → Wp (Af F) σ J P) × Z) =>
-          (a0 * p.1, (p.2.1 + t p.1, c (p.1, p.2.1) * p.2.2))) := by
+      have hcomm
+          : (fun n => n0 * n) ∘ Ψ
+            = Ψ ∘ (fun p : A × ((Fin r → Wp (Af F) σ J P) × Z) =>
+              (a0 * p.1, (p.2.1 + t p.1, c (p.1, p.2.1) * p.2.2))) := by
         funext ⟨u, y, z⟩
         exact hform u y z
-      have hinner : ∀ u : A, MeasurePreserving
-          (fun q : (Fin r → Wp (Af F) σ J P) × Z => (q.1 + t u, c (u, q.1) * q.2))
-          (μQ.prod μZ) (μQ.prod μZ) := by
+      have hinner
+          : ∀ u : A,
+            MeasurePreserving
+              (fun q : (Fin r → Wp (Af F) σ J P) × Z => (q.1 + t u, c (u, q.1) * q.2))
+              (μQ.prod μZ) (μQ.prod μZ) := by
         intro u
-        refine (measurePreserving_add_right μQ (t u)).skew_product (g := fun y z => c (u, y) * z)
+        refine (measurePreserving_add_right μQ (t u)).skew_product
+          (g := fun y z => c (u, y) * z)
           ?_ (Filter.Eventually.of_forall fun y => map_mul_left_eq_self μZ (c (u, y)))
         exact (show Continuous fun q : (Fin r → Wp (Af F) σ J P) × Z => c (u, q.1) * q.2 from
           (hc.comp (continuous_const.prodMk continuous_fst)).mul continuous_snd).measurable
@@ -93,11 +107,13 @@ theorem conjNH_of (hC : NCoord F E σ M J) (hV : PI.LevelKSplit.W.CD.ModV F E σ
           (p.2.1 + t p.1, c (p.1, p.2.1) * p.2.2) :=
         (continuous_snd.fst.add (ht.comp continuous_fst)).prodMk
           ((hc.comp (continuous_fst.prodMk continuous_snd.fst)).mul continuous_snd.snd)
-      have hT : MeasurePreserving (fun p : A × ((Fin r → Wp (Af F) σ J P) × Z) =>
-          (a0 * p.1, (p.2.1 + t p.1, c (p.1, p.2.1) * p.2.2))) ρ ρ :=
+      have hT : MeasurePreserving
+          (fun p : A × ((Fin r → Wp (Af F) σ J P) × Z) =>
+            (a0 * p.1, (p.2.1 + t p.1, c (p.1, p.2.1) * p.2.2)))
+          ρ ρ :=
         (measurePreserving_mul_left μA a0).skew_product
-          (g := fun (u : A) (q : (Fin r → Wp (Af F) σ J P) × Z) => (q.1 + t u, c (u, q.1) * q.2)) hgm.measurable
-          (Filter.Eventually.of_forall fun u => (hinner u).map_eq)
+          (g := fun (u : A) (q : (Fin r → Wp (Af F) σ J P) × Z) => (q.1 + t u, c (u, q.1) * q.2))
+          hgm.measurable (Filter.Eventually.of_forall fun u => (hinner u).map_eq)
       rw [Measure.map_map (measurable_const_mul n0) hΨm, hcomm, ← Measure.map_map hΨm hT.measurable,
         hT.map_eq]
     have hfc : IsFiniteMeasureOnCompacts (ρ.map Ψ) := Measure.IsFiniteMeasureOnCompacts.map ρ Ψ
@@ -116,22 +132,25 @@ theorem conjNH_of (hC : NCoord F E σ M J) (hV : PI.LevelKSplit.W.CD.ModV F E σ
         _).measurable
     let Lq : (Fin r → Wp (Af F) σ J P) → (Fin r → Wp (Af F) σ J P) := fun y a => linWp hh (y a)
     have hLq : MeasurePreserving Lq μQ μQ :=
-      measurePreserving_pi (fun _ => μW) (fun _ => μW)
+      measurePreserving_pi
+        (fun _ => μW)
+        (fun _ => μW)
         (fun _ => ⟨hlinm, wp_map hσσ hJ hP hV hh μW inferInstance⟩)
     have hT : MeasurePreserving (Prod.map id (Prod.map Lq id)) ρ ρ :=
       (MeasurePreserving.id μA).prod (hLq.prod (MeasurePreserving.id μZ))
     rw [lintegral_map hF hΨm, lintegral_map hF0 hΨm]
-    calc ∫⁻ p, f (h * (Ψ p : HA (Af F) σ J) * h⁻¹) ∂ρ
-        = ∫⁻ p, f (Ψ (Prod.map id (Prod.map Lq id) p) : HA (Af F) σ J) ∂ρ := by
-          congr 1
-          funext ⟨u, y, z⟩
-          obtain ⟨y', hy', he⟩ := hconj h hh u y z
-          have e2 : y' = Lq y := funext fun a => Subtype.ext (hy' a)
-          show f (h * (Ψ (u, y, z) : HA (Af F) σ J) * h⁻¹) = f (Ψ (u, Lq y, z) : HA (Af F) σ J)
-          rw [he, e2]
+    calc
+      ∫⁻ p, f (h * (Ψ p : HA (Af F) σ J) * h⁻¹) ∂ρ
+          = ∫⁻ p, f (Ψ (Prod.map id (Prod.map Lq id) p) : HA (Af F) σ J) ∂ρ := by
+        congr 1
+        funext ⟨u, y, z⟩
+        obtain ⟨y', hy', he⟩ := hconj h hh u y z
+        have e2 : y' = Lq y := funext fun a => Subtype.ext (hy' a)
+        show f (h * (Ψ (u, y, z) : HA (Af F) σ J) * h⁻¹) = f (Ψ (u, Lq y, z) : HA (Af F) σ J)
+        rw [he, e2]
       _ = ∫⁻ p, f (Ψ p : HA (Af F) σ J) ∂ρ :=
-          hT.lintegral_comp (show Measurable fun p => f (Ψ p : HA (Af F) σ J) from
-            hf.comp (continuous_subtype_val.comp Ψ.continuous).measurable)
+        hT.lintegral_comp (show Measurable fun p => f (Ψ p : HA (Af F) σ J) from
+          hf.comp (continuous_subtype_val.comp Ψ.continuous).measurable)
 
 theorem normal_conjugation_hypothesis : NCAsm F E σ M J := fun hC hV => conjNH_of hC hV
 

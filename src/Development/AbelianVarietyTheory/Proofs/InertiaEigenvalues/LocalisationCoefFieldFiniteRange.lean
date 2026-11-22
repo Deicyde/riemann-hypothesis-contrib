@@ -11,16 +11,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Polariz
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 NumberField IsDedekindDomain Polynomial GlobalTheory.EtaJoin GlobalTheory.CoefDuty
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 NumberField IsDedekindDomain Polynomial GlobalTheory.EtaJoin GlobalTheory.CoefDuty
 
 namespace GlobalTheory.Proof.CoefField
 
-theorem exists_coefField {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (ι : FractionRing O →+* Qbar l)
-    (hι : ∀ z : ℤ_[l], ι (algebraMap O (FractionRing O) (algebraMap ℤ_[l] O z)) =
-      algebraMap ℚ_[l] (Qbar l) (z : ℚ_[l])) :
-    ∃ K : IntermediateField ℚ_[l] (Qbar l), (∀ z, z ∈ K ↔ ∃ x, ι x = z) ∧ FiniteDimensional ℚ_[l] K ∧
-      ∀ x : FractionRing O, ‖ι x‖ ≤ 1 ↔ x ∈ (algebraMap O (FractionRing O)).range := by
+theorem exists_coefField
+    {l : ℕ} [Fact l.Prime]
+    {O : Type}
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+    (ι : FractionRing O →+* Qbar l)
+    (hι : ∀ z : ℤ_[l],
+      ι (algebraMap O (FractionRing O) (algebraMap ℤ_[l] O z))
+        = algebraMap ℚ_[l] (Qbar l) (z : ℚ_[l]))
+    : ∃ K : IntermediateField ℚ_[l] (Qbar l),
+      (∀ z, z ∈ K ↔ ∃ x, ι x = z) ∧ FiniteDimensional ℚ_[l] K
+        ∧ ∀ x : FractionRing O, ‖ι x‖ ≤ 1 ↔ x ∈ (algebraMap O (FractionRing O)).range := by
   classical
   let φ : O →+* Qbar l := ι.comp (algebraMap O (FractionRing O))
   have hφ : ∀ z : ℤ_[l], φ (algebraMap ℤ_[l] O z) = algebraMap ℚ_[l] (Qbar l) (z : ℚ_[l]) := hι
@@ -41,7 +48,8 @@ theorem exists_coefField {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDom
     refine ⟨p.map (algebraMap ℤ_[l] ℚ_[l]), hp.map _, ?_⟩
     have := congrArg φ hy
     rw [map_zero, Polynomial.hom_eval₂] at this
-    have e : (algebraMap ℚ_[l] (Qbar l)).comp (algebraMap ℤ_[l] ℚ_[l]) = φ.comp (algebraMap ℤ_[l] O) :=
+    have e
+        : (algebraMap ℚ_[l] (Qbar l)).comp (algebraMap ℤ_[l] ℚ_[l]) = φ.comp (algebraMap ℤ_[l] O) :=
       RingHom.ext fun z => (hφ z).symm
     rw [Polynomial.eval₂_map, e]
     exact this
@@ -63,7 +71,13 @@ theorem exists_coefField {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDom
     obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := O) x
     rw [map_div₀]
     exact div_mem (hO a) (hO b)
-  refine ⟨K, hK, ?_, fun x => (GlobalTheory.Proof.SemisimpleRepresentationIntegralConjugate.mem_range_iff ι hι x).symm⟩
+  refine ⟨
+    K,
+    hK,
+    ?_,
+    fun x =>
+      (GlobalTheory.Proof.SemisimpleRepresentationIntegralConjugate.mem_range_iff ι hι x).symm
+  ⟩
   have hge : IntermediateField.adjoin ℚ_[l] S ≤ K := by
     rw [IntermediateField.adjoin_le_iff]
     rintro _ ⟨y, -, rfl⟩
@@ -72,7 +86,13 @@ theorem exists_coefField {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDom
   rw [heq]
   exact hfd
 
-theorem coefField_range : ∀ {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N) (i : N.Loc), ∃ K : IntermediateField ℚ_[N.l i] (Qbar (N.l i)), (∀ z, z ∈ K ↔ ∃ x, A.iotaQ i x = z) ∧ FiniteDimensional ℚ_[N.l i] K ∧ ∀ x : FractionRing (N.O i), ‖A.iotaQ i x‖ ≤ 1 ↔ x ∈ (algebraMap (N.O i) (FractionRing (N.O i))).range := by
+theorem coefField_range
+    : ∀ {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N)
+        (i : N.Loc),
+      ∃ K : IntermediateField ℚ_[N.l i] (Qbar (N.l i)),
+        (∀ z, z ∈ K ↔ ∃ x, A.iotaQ i x = z) ∧ FiniteDimensional ℚ_[N.l i] K
+          ∧ ∀ x : FractionRing (N.O i),
+            ‖A.iotaQ i x‖ ≤ 1 ↔ x ∈ (algebraMap (N.O i) (FractionRing (N.O i))).range := by
   intro R H what₂ N A i
   exact exists_coefField (A.iotaQ i) (A.iotaQ_alg i)
 

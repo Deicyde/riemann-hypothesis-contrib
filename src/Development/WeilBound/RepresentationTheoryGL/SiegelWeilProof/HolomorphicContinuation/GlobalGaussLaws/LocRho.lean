@@ -7,7 +7,9 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 noncomputable section
 
 open scoped Matrix NNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum MeasureTheory
 open GlobalTheory.AdelicU GlobalTheory.StdUnn
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 
@@ -23,11 +25,14 @@ theorem lIrho : LIrho := by
   intro D n V ψ χ θ μ ω H l s ν τ ε fr ι hC hT L hL
   classical
   obtain ⟨𝓕, hμ⟩ := hC.hμ
-  have hΨ0m : psi0 θ V n l s τ ∈ awayA θ V n l s τ := unitaryFinitePointsToGLFiniteAdeles_isUnitary θ V l s τ
+  have hΨ0m : psi0 θ V n l s τ ∈ awayA θ V n l s τ :=
+    unitaryFinitePointsToGLFiniteAdeles_isUnitary θ V l s τ
   have hl0 : ∀ τ, l τ ≠ 0 := l_ne_zero D n V ψ hC.hψ χ hC.hχ hC.hη θ hC.hθ μ 𝓕 hμ ω hC.hω l hC.hl
-  have hmem : ∀ P : PX V.rank n, tens θ τ fr (fP (cLoc l τ) P) (psi0 θ V n l s τ) ∈ schwartzA θ V.rank n ∧
-      tens θ τ fr (fP (cLoc l τ) P) (psi0 θ V n l s τ) ∈ fockA θ V n l s :=
-    fun P => hT D n V θ l s τ ε fr hC.hθ hl0 hC.hs hC.hfr _ hΨ0m P
+  have hmem
+      : ∀ P : PX V.rank n,
+        tens θ τ fr (fP (cLoc l τ) P) (psi0 θ V n l s τ) ∈ schwartzA θ V.rank n
+          ∧ tens θ τ fr (fP (cLoc l τ) P) (psi0 θ V n l s τ) ∈ fockA θ V n l s := fun P =>
+    hT D n V θ l s τ ε fr hC.hθ hl0 hC.hs hC.hfr _ hΨ0m P
   have hfP0 : fP (cLoc l τ) (0 : PX V.rank n) = 0 := by
     funext u
     simp [fP, evX]
@@ -39,19 +44,23 @@ theorem lIrho : LIrho := by
     apply Subtype.ext
     rw [phiS_val (hmem 0).1, hfP0, htens0]
     rfl
-  have hlin : ∀ (a : ℂ) (P Q : PX V.rank n), phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ) (a • P + Q) =
-      a • phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ) P + phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ) Q := by
+  have hlin
+      : ∀ (a : ℂ) (P Q : PX V.rank n),
+        phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ) (a • P + Q)
+          = a • phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ) P
+            + phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ) Q := by
     intro a P Q
     apply Subtype.ext
-    rw [Submodule.coe_add, Submodule.coe_smul, phiS_val (hmem _).1, phiS_val (hmem _).1, phiS_val (hmem _).1,
-      fP_add_smul, tens_add_smul]
-  let jL : PX V.rank n →ₗ[ℂ] schwartzA θ V.rank n :=
-    { toFun := phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ)
-      map_add' := fun P Q => by simpa using hlin 1 P Q
-      map_smul' := fun a P => by
-        have := hlin a P 0
-        rw [add_zero, hphi0, add_zero] at this
-        exact this }
+    rw [Submodule.coe_add, Submodule.coe_smul, phiS_val (hmem _).1, phiS_val (hmem _).1,
+      phiS_val (hmem _).1, fP_add_smul, tens_add_smul]
+  let jL : PX V.rank n →ₗ[ℂ] schwartzA θ V.rank n := {
+    toFun := phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ)
+    map_add' := fun P Q => by simpa using hlin 1 P Q
+    map_smul' := fun a P => by
+      have := hlin a P 0
+      rw [add_zero, hphi0, add_zero] at this
+      exact this
+  }
   have hjinj : Function.Injective jL := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro R hR
@@ -64,22 +73,30 @@ theorem lIrho : LIrho := by
     have hΦ : (phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ) P).1 ∈ fockA θ V n l s := by
       rw [phiS_val (hmem P).1]
       exact (hmem P).2
-    have hst := fock_stable D n V ψ hC.hψ χ hC.hχ hC.hη θ hC.hθ μ 𝓕 hμ ω hC.hω l hC.hl s hC.hs _ hΦ (ι k)
-      (iota_mem_K hC.hθ hC.hι k hk)
+    have hst :=
+      fock_stable D n V ψ hC.hψ χ hC.hχ hC.hη θ hC.hθ μ 𝓕 hμ ω hC.hω l hC.hl s hC.hs _ hΦ (ι k)
+        (iota_mem_K hC.hθ hC.hι k hk)
     rw [hL k _ hΨ0m P] at hst
     exact tens_slice hC.hθ hC.hfr l _ hst
-  have hLlin : ∀ k : GR n, InK (mR k) → ∀ (a : ℂ) (P Q : PX V.rank n),
-      L k (fP (cLoc l τ) (a • P + Q)) = a • L k (fP (cLoc l τ) P) + L k (fP (cLoc l τ) Q) := by
+  have hLlin
+      : ∀ k : GR n,
+        InK (mR k)
+          → ∀ (a : ℂ) (P Q : PX V.rank n),
+            L k (fP (cLoc l τ) (a • P + Q))
+              = a • L k (fP (cLoc l τ) P) + L k (fP (cLoc l τ) Q) := by
     intro k hk a P Q
     apply tensor_gaussian_vacuum_injective hC.hθ hC.hfr l
-    rw [tens_add_smul, ← hL k _ hΨ0m, ← hL k _ hΨ0m, ← hL k _ hΨ0m, hlin, map_add (f := _), map_smul]
+    rw [tens_add_smul, ← hL k _ hΨ0m, ← hL k _ hΨ0m, ← hL k _ hΨ0m, hlin, map_add (f := _),
+      map_smul]
     rfl
-  let ρ0 : GR n → PX V.rank n → PX V.rank n := fun k P => if hk : InK (mR k) then (hexist k hk P).choose else P
+  let ρ0 : GR n → PX V.rank n → PX V.rank n := fun k P =>
+    if hk : InK (mR k) then (hexist k hk P).choose else P
   have hρ0 : ∀ (k : GR n) (hk : InK (mR k)) P, L k (fP (cLoc l τ) P) = fP (cLoc l τ) (ρ0 k P) := by
     intro k hk P
     simp only [ρ0, dif_pos hk]
     exact (hexist k hk P).choose_spec
-  have hρlin : ∀ (k : GR n) (a : ℂ) (P Q : PX V.rank n), ρ0 k (a • P + Q) = a • ρ0 k P + ρ0 k Q := by
+  have hρlin
+      : ∀ (k : GR n) (a : ℂ) (P Q : PX V.rank n), ρ0 k (a • P + Q) = a • ρ0 k P + ρ0 k Q := by
     intro k a P Q
     by_cases hk : InK (mR k)
     · apply fP_inj (cLoc l τ)
@@ -91,13 +108,14 @@ theorem lIrho : LIrho := by
     simp only [one_smul, add_zero] at this
     have h2 : ρ0 k 0 + ρ0 k 0 = ρ0 k 0 + 0 := by rw [← this, add_zero]
     exact add_left_cancel h2
-  let ρ : GR n → PX V.rank n →ₗ[ℂ] PX V.rank n := fun k =>
-    { toFun := ρ0 k
-      map_add' := fun P Q => by simpa using hρlin k 1 P Q
-      map_smul' := fun a P => by
-        have := hρlin k a P 0
-        rw [add_zero, hρ00, add_zero] at this
-        exact this }
+  let ρ : GR n → PX V.rank n →ₗ[ℂ] PX V.rank n := fun k => {
+    toFun := ρ0 k
+    map_add' := fun P Q => by simpa using hρlin k 1 P Q
+    map_smul' := fun a P => by
+      have := hρlin k a P 0
+      rw [add_zero, hρ00, add_zero] at this
+      exact this
+  }
   have hρ : ∀ (k : GR n) P, InK (mR k) → L k (fP (cLoc l τ) P) = fP (cLoc l τ) (ρ k P) :=
     fun k P hk => hρ0 k hk P
   have hjρ : ∀ (k : GR n), InK (mR k) → ∀ Q, jL (ρ k Q) = ω (ι k) (jL Q) := by
@@ -112,7 +130,9 @@ theorem lIrho : LIrho := by
     show (phiS θ τ fr (cLoc l τ) (psi0 θ V n l s τ) R).1 ∈ fockA θ V n l s
     rw [phiS_val (hmem R).1]
     exact (hmem R).2
-  have hfd := GlobalTheory.T.fockVector_schrodingerModel_isKFinite D n V ψ hC.hψ χ hC.hχ hC.hη θ hC.hθ μ 𝓕 hμ ω hC.hω l hC.hl s hC.hs (jL P) (hjmem P)
+  have hfd :=
+    GlobalTheory.T.fockVector_schrodingerModel_isKFinite D n V ψ hC.hψ χ hC.hχ hC.hη θ hC.hθ μ 𝓕 hμ
+      ω hC.hω l hC.hl s hC.hs (jL P) (hjmem P)
   set S := Submodule.span ℂ {Ψ' : schwartzA θ V.rank n | ∃ k ∈ K D n, Ψ' = ω k (jL P)} with hS
   have hSstab : ∀ κ ∈ K D n, ∀ x ∈ S, ω κ x ∈ S := by
     intro κ hκ x hx
@@ -141,10 +161,15 @@ theorem lIrho : LIrho := by
     have hΛj : ∀ R, Λ (jL R) = l' R := by
       intro R
       have := congrArg (fun F => F ⟨jL R, LinearMap.mem_range_self jL R⟩) hΛ
-      simp only [LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype, LinearEquiv.coe_coe] at this
+      simp only [LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype,
+          LinearEquiv.coe_coe]
+        at this
       rw [this]
-      exact congrArg l' (e.symm_apply_eq.2 (Subtype.ext (LinearEquiv.ofInjective_apply jL (h := hjinj) R).symm))
-    have hcont := orbit_cont D n V ψ hC.hψ χ hC.hχ hC.hη θ hC.hθ μ 𝓕 hμ ω hC.hω l hC.hl s hC.hs (jL Q) (hjmem Q) Λ
+      exact congrArg l'
+        (e.symm_apply_eq.2 (Subtype.ext (LinearEquiv.ofInjective_apply jL (h := hjinj) R).symm))
+    have hcont :=
+      orbit_cont D n V ψ hC.hψ χ hC.hχ hC.hη θ hC.hθ μ 𝓕 hμ ω hC.hω l hC.hl s hC.hs (jL Q) (hjmem Q)
+        Λ
     have hιc : ContinuousOn (fun k : GR n => ι k) {k | InK (mR k)} := hC.hι.1.continuousOn
     have hmaps : Set.MapsTo (fun k : GR n => ι k) {k | InK (mR k)} (K D n : Set (G D n)) :=
       fun k hk => iota_mem_K hC.hθ hC.hι k hk

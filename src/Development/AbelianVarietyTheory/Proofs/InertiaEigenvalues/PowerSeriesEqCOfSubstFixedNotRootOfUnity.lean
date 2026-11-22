@@ -6,13 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-
 open PowerSeries in
-theorem powerSeries_eq_C_of_subst_eq_self (L : Type) [Field L] (y : PowerSeries L)
-    (hy : PowerSeries.constantCoeff y = 0)
-    (hu : ∀ k : ℕ, 0 < k → (PowerSeries.coeff 1 y) ^ k ≠ 1) (a : PowerSeries L)
-    (ha : (PowerSeries.subst y a : PowerSeries L) = a) :
-    a = PowerSeries.C (PowerSeries.constantCoeff a) := by
+theorem powerSeries_eq_C_of_subst_eq_self
+    (L : Type) [Field L]
+    (y : PowerSeries L)
+    (hy : PowerSeries.constantCoeff y = 0) (hu : ∀ k : ℕ, 0 < k → (PowerSeries.coeff 1 y) ^ k ≠ 1)
+    (a : PowerSeries L) (ha : (PowerSeries.subst y a : PowerSeries L) = a)
+    : a = PowerSeries.C (PowerSeries.constantCoeff a) := by
   classical
   obtain ⟨z, rfl⟩ : X ∣ y := by rwa [PowerSeries.X_dvd_iff]
   have hs : HasSubst (X * z) := HasSubst.of_constantCoeff_zero' hy
@@ -20,8 +20,10 @@ theorem powerSeries_eq_C_of_subst_eq_self (L : Type) [Field L] (y : PowerSeries 
     rw [coeff_succ_X_mul, coeff_zero_eq_constantCoeff_apply]
   rw [hu1] at hu
 
-  have hc : ∀ n, coeff n (a.subst (X * z)) =
-      ∑ d ∈ Finset.range (n + 1), coeff d a * coeff (n - d) (z ^ d) := by
+  have hc
+      : ∀ n,
+        coeff n (a.subst (X * z))
+          = ∑ d ∈ Finset.range (n + 1), coeff d a * coeff (n - d) (z ^ d) := by
     intro n
     rw [coeff_subst' hs, finsum_eq_sum_of_support_subset (s := Finset.range (n + 1))]
     · refine Finset.sum_congr rfl fun d hd => ?_
@@ -41,7 +43,8 @@ theorem powerSeries_eq_C_of_subst_eq_self (L : Type) [Field L] (y : PowerSeries 
       intro hk
       have h1 := hc k
       rw [ha, Finset.sum_range_succ, Finset.sum_eq_zero, zero_add, Nat.sub_self,
-        coeff_zero_eq_constantCoeff_apply, map_pow] at h1
+          coeff_zero_eq_constantCoeff_apply, map_pow]
+        at h1
       · have h2 : coeff k a * (1 - constantCoeff z ^ k) = 0 := by
           rw [mul_sub, mul_one, ← h1, sub_self]
         rcases mul_eq_zero.mp h2 with h | h

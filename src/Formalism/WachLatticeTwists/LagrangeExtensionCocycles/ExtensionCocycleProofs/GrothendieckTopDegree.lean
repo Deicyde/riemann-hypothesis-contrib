@@ -14,16 +14,19 @@ open Polynomial Formalism.CoboundaryTransfers
 
 theorem lift_to_subgroup_exists : StatLiftSub := by
   unfold StatLiftSub
-  intro ℓ _ H₁ H₂ H₁' H₂' _ _ _ _ _ _ _ _ Hf₁ Hf₂ Hf₁' Hf₂' h h' res₂ cor₁ cor₂ g E hg hcr hcomm hres hcor hlift κ' hκ'
+  intro ℓ _ H₁ H₂ H₁' H₂' _ _ _ _ _ _ _ _ Hf₁ Hf₂ Hf₁' Hf₂' h h' res₂ cor₁ cor₂ g E hg hcr hcomm
+    hres hcor hlift κ' hκ'
   obtain ⟨κ₁, hκ₁, he⟩ := hlift (res₂ κ') (hres κ' hκ')
   set v := padicValNat ℓ g with hv
-  obtain ⟨m, hm⟩ : ℓ ^ v ∣ g := (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
+  obtain ⟨m, hm⟩ : ℓ ^ v ∣ g :=
+    (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
   have hcop : ¬ ℓ ∣ m := by
     intro hdvd
     have h5 : ℓ ^ (v + 1) ∣ g := by
       rw [hm, pow_succ]
       exact mul_dvd_mul_left _ hdvd
-    exact pow_succ_multiplicity_not_dvd (p := ℓ) (n := g) (Nat.ne_of_gt hg) (by simpa [hv, Nat.padicValNat_def] using h5)
+    exact pow_succ_multiplicity_not_dvd (p := ℓ) (n := g) (Nat.ne_of_gt hg)
+      (by simpa [hv, Nat.padicValNat_def] using h5)
   have hu : IsUnit (m : ℤ_[ℓ]) := by
     rw [PadicInt.isUnit_iff]
     have h1 : ‖((m : ℤ) : ℤ_[ℓ])‖ ≤ 1 := PadicInt.norm_le_one _
@@ -115,7 +118,8 @@ theorem extension_class_is_cocycle : StatExtCocycle := by
     show ((y, z) : D × D) ∈ LinearMap.ker ((W.γ - LinearMap.id).coprod (-(W.φ - LinearMap.id)))
     simp only [LinearMap.mem_ker, LinearMap.coprod_apply, LinearMap.sub_apply, LinearMap.id_apply,
       LinearMap.neg_apply]
-    calc _ = (W.γ y - y) - (W.φ z - z) := by abel
+    calc
+      _ = (W.γ y - y) - (W.φ z - z) := by abel
       _ = 0 := hd
   have hQ : B.Q ^ M • y ∈ W.N := by
     apply E.S.sat
@@ -137,7 +141,8 @@ theorem extension_class_is_cocycle : StatExtCocycle := by
 
 theorem rational_points_map_surjective : StatRatSurj := by
   unfold StatRatSurj
-  intro ℓ _ A _ _ B M D₀ D₁ D₂ _ _ _ _ _ _ _ _ _ _ _ _ W₀ W₁ W₂ S H₁ H₂ _ _ _ _ cl₁ cl₂ Hf₁ Hf₂ g e₁ hp hnat hcoc hherr honto hlift
+  intro ℓ _ A _ _ B M D₀ D₁ D₂ _ _ _ _ _ _ _ _ _ _ _ _ W₀ W₁ W₂ S H₁ H₂ _ _ _ _ cl₁ cl₂ Hf₁ Hf₂ g e₁
+    hp hnat hcoc hherr honto hlift
   unfold Formalism.CoboundaryTransfers.RatSurj
   intro y z hyz
   have memZ : ∀ a b : D₂, W₂.γ a - a - (W₂.φ b - b) = 0 → ((a, b) : D₂ × D₂) ∈ W₂.Z1 := by
@@ -145,7 +150,8 @@ theorem rational_points_map_surjective : StatRatSurj := by
     show ((a, b) : D₂ × D₂) ∈ LinearMap.ker ((W₂.γ - LinearMap.id).coprod (-(W₂.φ - LinearMap.id)))
     simp only [LinearMap.mem_ker, LinearMap.coprod_apply, LinearMap.sub_apply, LinearMap.id_apply,
       LinearMap.neg_apply]
-    calc _ = W₂.γ a - a - (W₂.φ b - b) := by abel
+    calc
+      _ = W₂.γ a - a - (W₂.φ b - b) := by abel
       _ = 0 := h
   have hyz' := hyz
   unfold WachMod.Cocycle WachMod.C1 WachMod.QInv WachMod.XN WachMod.d1 at hyz'
@@ -165,20 +171,27 @@ theorem rational_points_map_surjective : StatRatSurj := by
   obtain ⟨c, hc⟩ : ∃ c : ℤ_[ℓ], c = (ℓ : ℤ_[ℓ]) ^ (e₁ + k) := ⟨_, rfl⟩
   have hcP : W₂.Cocycle (S.π.f y₁ - c • y) (S.π.f z₁ - c • z) := by
     unfold WachMod.Cocycle WachMod.C1 WachMod.QInv WachMod.XN WachMod.d1
-    refine ⟨⟨?_, S.π.f n₁ - c • n₂, W₂.N.sub_mem (S.π.N_le _ hn₁) (W₂.N.smul_of_tower_mem c hn₂), ?_⟩, ?_⟩
+    refine ⟨
+      ⟨?_, S.π.f n₁ - c • n₂, W₂.N.sub_mem (S.π.N_le _ hn₁) (W₂.N.smul_of_tower_mem c hn₂), ?_⟩,
+      ?_
+    ⟩
     · rw [smul_sub, ← map_smul, smul_comm (B.Q ^ M) c y]
       exact W₂.N.sub_mem (S.π.N_le _ hQ₁) (W₂.N.smul_of_tower_mem c hQ₂)
     · rw [hz₁, hz₂, map_smul, smul_sub, smul_comm c B.X n₂]
-    · calc W₂.γ (S.π.f y₁ - c • y) - (S.π.f y₁ - c • y) - (W₂.φ (S.π.f z₁ - c • z) - (S.π.f z₁ - c • z))
-          = (W₂.γ (S.π.f y₁) - S.π.f y₁ - (W₂.φ (S.π.f z₁) - S.π.f z₁)) -
-              c • (W₂.γ y - y - (W₂.φ z - z)) := by
-            rw [map_sub, map_sub, map_smul, map_smul]
-            simp only [smul_sub]
-            abel
+    · calc
+        W₂.γ (S.π.f y₁ - c • y) - (S.π.f y₁ - c • y)
+              - (W₂.φ (S.π.f z₁ - c • z) - (S.π.f z₁ - c • z))
+            = (W₂.γ (S.π.f y₁) - S.π.f y₁ - (W₂.φ (S.π.f z₁) - S.π.f z₁))
+              - c • (W₂.γ y - y - (W₂.φ z - z)) := by
+          rw [map_sub, map_sub, map_smul, map_smul]
+          simp only [smul_sub]
+          abel
         _ = 0 := by rw [hd₁', hd₂, smul_zero, sub_zero]
   have hcl : cl₂ (⟨(S.π.f y₁, S.π.f z₁), memZ _ _ hd₁'⟩ - c • ⟨(y, z), memZ y z hd₂⟩) = 0 := by
-    rw [map_sub, map_smul, ← hnat ⟨(y₁, z₁), hZ₁⟩ ⟨(S.π.f y₁, S.π.f z₁), memZ _ _ hd₁'⟩
-      (by first | rfl | simp [Formalism.CoboundaryTransfers.Hom.f2]), hpr₁, map_smul, hgk, hc, pow_add, mul_smul, sub_self]
+    rw [map_sub, map_smul,
+      ← hnat ⟨(y₁, z₁), hZ₁⟩ ⟨(S.π.f y₁, S.π.f z₁), memZ _ _ hd₁'⟩
+        (by first | rfl | simp [Formalism.CoboundaryTransfers.Hom.f2]),
+      hpr₁, map_smul, hgk, hc, pow_add, mul_smul, sub_self]
   have hcob := hherr _ hcP hcl
   unfold WachMod.IsCob1 at hcob
   obtain ⟨x, hxN, hx1, hx2⟩ := hcob

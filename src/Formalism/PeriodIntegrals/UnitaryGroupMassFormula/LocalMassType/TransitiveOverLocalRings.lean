@@ -10,14 +10,13 @@ namespace PI.LocMassTypW.WCoreP
 
 open Matrix Module
 
-theorem model_inj {K V W Z : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W]
-    [Module K W] [AddCommGroup Z] [Module K Z]
+theorem model_inj
+    {K V W Z : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    [AddCommGroup Z] [Module K Z]
     (a : W →ₗ[K] V) (b : V →ₗ[K] W) (s : W →ₗ[K] V) (T : Submodule K W) (ζ : Z →ₗ[K] V)
-    (ha : Function.Injective a) (hbs : ∀ w, b (s w) = w)
-    (hT : ∀ w, b (a w) ∈ T → b (a w) = 0)
-    (hζ : Function.Injective ζ) (hζb : ∀ z, b (ζ z) = 0)
-    (hζa : ∀ z w, ζ z = a w → ζ z = 0) :
-    Function.Injective (LinearMap.coprod a (LinearMap.coprod (s ∘ₗ T.subtype) ζ)) := by
+    (ha : Function.Injective a) (hbs : ∀ w, b (s w) = w) (hT : ∀ w, b (a w) ∈ T → b (a w) = 0)
+    (hζ : Function.Injective ζ) (hζb : ∀ z, b (ζ z) = 0) (hζa : ∀ z w, ζ z = a w → ζ z = 0)
+    : Function.Injective (LinearMap.coprod a (LinearMap.coprod (s ∘ₗ T.subtype) ζ)) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   rintro ⟨w, ⟨⟨t, ht⟩, z⟩⟩ h
   simp only [LinearMap.coprod_apply, LinearMap.comp_apply, Submodule.subtype_apply] at h
@@ -43,12 +42,14 @@ theorem model_inj {K V W Z : Type*} [Field K] [AddCommGroup V] [Module K V] [Add
   subst w0
   rfl
 
-theorem exists_Z {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W]
-    [Module K W] [FiniteDimensional K V] [FiniteDimensional K W]
+theorem exists_Z
+    {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    [FiniteDimensional K V] [FiniteDimensional K W]
     (a : W →ₗ[K] V) (b : V →ₗ[K] W) (s : W →ₗ[K] V)
-    (ha : Function.Injective a) (hbs : ∀ w, b (s w) = w) :
-    ∃ Z : Submodule K V, Z ≤ LinearMap.ker b ∧ (∀ z ∈ Z, z ∈ LinearMap.range a → z = 0) ∧
-      finrank K Z + finrank K (LinearMap.ker (b ∘ₗ a)) + finrank K W = finrank K V := by
+    (ha : Function.Injective a) (hbs : ∀ w, b (s w) = w)
+    : ∃ Z : Submodule K V,
+      Z ≤ LinearMap.ker b ∧ (∀ z ∈ Z, z ∈ LinearMap.range a → z = 0)
+        ∧ finrank K Z + finrank K (LinearMap.ker (b ∘ₗ a)) + finrank K W = finrank K V := by
   set S := LinearMap.range a ⊓ LinearMap.ker b with hSdef
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl (Submodule.comap (LinearMap.ker b).subtype S)
   refine ⟨C.map (LinearMap.ker b).subtype, Submodule.map_subtype_le _ _, ?_, ?_⟩
@@ -59,7 +60,8 @@ theorem exists_Z {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCom
     rw [h0, map_zero]
   · have h1 := Submodule.finrank_add_eq_of_isCompl hC
     rw [← Submodule.finrank_map_subtype_eq (LinearMap.ker b) (Submodule.comap _ S),
-      Submodule.map_comap_subtype] at h1
+        Submodule.map_comap_subtype]
+      at h1
     rw [Submodule.finrank_map_subtype_eq]
     have h2 : finrank K ↥(LinearMap.ker b ⊓ S) = finrank K (LinearMap.ker (b ∘ₗ a)) := by
       have hS : LinearMap.ker b ⊓ S = (LinearMap.ker (b ∘ₗ a)).map a := by
@@ -73,13 +75,13 @@ theorem exists_Z {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCom
       omega
     omega
 
-theorem field_core {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W]
-    [Module K W] [FiniteDimensional K V] [FiniteDimensional K W]
+theorem field_core
+    {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    [FiniteDimensional K V] [FiniteDimensional K W]
     (a0 a : W →ₗ[K] V) (b0 b : V →ₗ[K] W) (s0 s : W →ₗ[K] V)
-    (ha0 : Function.Injective a0) (ha : Function.Injective a)
-    (hs0 : ∀ w, b0 (s0 w) = w) (hs : ∀ w, b (s w) = w) (hc : ∀ w, b (a w) = b0 (a0 w)) :
-    ∃ e : V ≃ₗ[K] V, (∀ w, e (a0 w) = a w) ∧ ∀ v, b (e v) = b0 v := by
-
+    (ha0 : Function.Injective a0) (ha : Function.Injective a) (hs0 : ∀ w, b0 (s0 w) = w)
+    (hs : ∀ w, b (s w) = w) (hc : ∀ w, b (a w) = b0 (a0 w))
+    : ∃ e : V ≃ₗ[K] V, (∀ w, e (a0 w) = a w) ∧ ∀ v, b (e v) = b0 v := by
   obtain ⟨T, hT⟩ := Submodule.exists_isCompl (LinearMap.range (b ∘ₗ a))
   obtain ⟨Z, hZb, hZa, hZd⟩ := exists_Z a b s ha hs
   obtain ⟨Z0, hZ0b, hZ0a, hZ0d⟩ := exists_Z a0 b0 s0 ha0 hs0
@@ -93,10 +95,12 @@ theorem field_core {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddC
   set F0 := LinearMap.coprod a0 (LinearMap.coprod (s0 ∘ₗ T.subtype) Z0.subtype) with hF0
   have hFi : Function.Injective F :=
     model_inj a b s T Z.subtype ha hs hTcond Subtype.val_injective
-      (fun z => LinearMap.mem_ker.mp (hZb z.2)) (fun z w h => hZa z z.2 ⟨w, h.symm⟩)
+      (fun z => LinearMap.mem_ker.mp (hZb z.2))
+      (fun z w h => hZa z z.2 ⟨w, h.symm⟩)
   have hF0i : Function.Injective F0 :=
     model_inj a0 b0 s0 T Z0.subtype ha0 hs0 hT0cond Subtype.val_injective
-      (fun z => LinearMap.mem_ker.mp (hZ0b z.2)) (fun z w h => hZ0a z z.2 ⟨w, h.symm⟩)
+      (fun z => LinearMap.mem_ker.mp (hZ0b z.2))
+      (fun z w h => hZ0a z z.2 ⟨w, h.symm⟩)
   have hTd : finrank K T = finrank K (LinearMap.ker (b ∘ₗ a)) := by
     have h1 := Submodule.finrank_add_eq_of_isCompl hT
     have h2 := LinearMap.finrank_range_add_finrank_ker (b ∘ₗ a)
@@ -112,10 +116,12 @@ theorem field_core {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddC
     have h2 := hZ0d
     rw [hba] at h1
     omega
-  let EF : (W × T × Z) ≃ₗ[K] V := LinearEquiv.ofBijective F
-    ⟨hFi, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).mp hFi⟩
-  let EF0 : (W × T × Z0) ≃ₗ[K] V := LinearEquiv.ofBijective F0
-    ⟨hF0i, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim0).mp hF0i⟩
+  let EF : (W × T × Z) ≃ₗ[K] V :=
+    LinearEquiv.ofBijective F
+      ⟨hFi, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).mp hFi⟩
+  let EF0 : (W × T × Z0) ≃ₗ[K] V :=
+    LinearEquiv.ofBijective F0
+      ⟨hF0i, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim0).mp hF0i⟩
   let φ : Z0 ≃ₗ[K] Z := LinearEquiv.ofFinrankEq Z0 Z hZZ
   let G : (W × T × Z0) ≃ₗ[K] (W × T × Z) :=
     (LinearEquiv.refl K W).prodCongr ((LinearEquiv.refl K T).prodCongr φ)
@@ -132,35 +138,44 @@ theorem field_core {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddC
     show b (F (G (w, t, z0))) = b0 (F0 (w, t, z0))
     have hz : b (φ z0 : V) = 0 := LinearMap.mem_ker.mp (hZb (φ z0).2)
     have hz0 : b0 (z0 : V) = 0 := LinearMap.mem_ker.mp (hZ0b z0.2)
-    simp only [hF, hF0, G, LinearEquiv.prodCongr_apply, LinearEquiv.refl_apply, LinearMap.coprod_apply,
-      LinearMap.comp_apply, Submodule.subtype_apply, map_add, hs, hs0, hz, hz0, hc]
+    simp only [hF, hF0, G, LinearEquiv.prodCongr_apply, LinearEquiv.refl_apply,
+      LinearMap.coprod_apply, LinearMap.comp_apply, Submodule.subtype_apply, map_add, hs, hs0, hz,
+      hz0, hc]
 
-theorem field_mat {K : Type*} [Field K] {n m : ℕ} (A0 A B0 B : Matrix (Fin n) (Fin m) K)
-    (L0 L M0 M : Matrix (Fin m) (Fin n) K) (hL0 : L0 * A0 = 1) (hL : L * A = 1)
-    (hM0 : M0 * B0 = 1) (hM : M * B = 1) (hC : A0ᵀ * B0 = Aᵀ * B) :
-    ∃ k : Matrix (Fin n) (Fin n) K, IsUnit k ∧ k * A0 = A ∧ Bᵀ * k = B0ᵀ := by
-  have inj : ∀ {A' : Matrix (Fin n) (Fin m) K} {L' : Matrix (Fin m) (Fin n) K}, L' * A' = 1 →
-      Function.Injective (Matrix.toLin' A') := by
+theorem field_mat
+    {K : Type*} [Field K]
+    {n m : ℕ} (A0 A B0 B : Matrix (Fin n) (Fin m) K) (L0 L M0 M : Matrix (Fin m) (Fin n) K)
+    (hL0 : L0 * A0 = 1) (hL : L * A = 1) (hM0 : M0 * B0 = 1) (hM : M * B = 1)
+    (hC : A0ᵀ * B0 = Aᵀ * B)
+    : ∃ k : Matrix (Fin n) (Fin n) K, IsUnit k ∧ k * A0 = A ∧ Bᵀ * k = B0ᵀ := by
+  have inj
+      : ∀ {A' : Matrix (Fin n) (Fin m) K} {L' : Matrix (Fin m) (Fin n) K},
+        L' * A' = 1 → Function.Injective (Matrix.toLin' A') := by
     intro A' L' h x y hxy
     have h2 := congrArg (Matrix.toLin' L') hxy
     simpa [Matrix.toLin'_apply, Matrix.mulVec_mulVec, h] using h2
-  have sec : ∀ {B' : Matrix (Fin n) (Fin m) K} {M' : Matrix (Fin m) (Fin n) K}, M' * B' = 1 →
-      ∀ w, Matrix.toLin' B'ᵀ (Matrix.toLin' M'ᵀ w) = w := by
+  have sec
+      : ∀ {B' : Matrix (Fin n) (Fin m) K} {M' : Matrix (Fin m) (Fin n) K},
+        M' * B' = 1 → ∀ w, Matrix.toLin' B'ᵀ (Matrix.toLin' M'ᵀ w) = w := by
     intro B' M' h w
     simp [Matrix.toLin'_apply, Matrix.mulVec_mulVec, ← Matrix.transpose_mul, h]
   have hC' : Bᵀ * A = B0ᵀ * A0 := by
     have h := congrArg Matrix.transpose hC
     simp only [Matrix.transpose_mul, Matrix.transpose_transpose] at h
     exact h.symm
-  obtain ⟨e, he1, he2⟩ := field_core (Matrix.toLin' A0) (Matrix.toLin' A) (Matrix.toLin' B0ᵀ)
-    (Matrix.toLin' Bᵀ) (Matrix.toLin' M0ᵀ) (Matrix.toLin' Mᵀ) (inj hL0) (inj hL) (sec hM0) (sec hM)
-    (fun w => by simp [Matrix.toLin'_apply, Matrix.mulVec_mulVec, hC'])
+  obtain ⟨e, he1, he2⟩ :=
+    field_core (Matrix.toLin' A0) (Matrix.toLin' A) (Matrix.toLin' B0ᵀ) (Matrix.toLin' Bᵀ)
+      (Matrix.toLin' M0ᵀ) (Matrix.toLin' Mᵀ) (inj hL0) (inj hL) (sec hM0) (sec hM)
+      (fun w => by simp [Matrix.toLin'_apply, Matrix.mulVec_mulVec, hC'])
   refine ⟨LinearMap.toMatrix' (e : (Fin n → K) →ₗ[K] (Fin n → K)), ?_, ?_, ?_⟩
-  · have h : LinearMap.toMatrix' (e : (Fin n → K) →ₗ[K] (Fin n → K)) *
-        LinearMap.toMatrix' (e.symm : (Fin n → K) →ₗ[K] (Fin n → K)) = 1 := by
+  · have h
+        : LinearMap.toMatrix' (e : (Fin n → K) →ₗ[K] (Fin n → K))
+            * LinearMap.toMatrix' (e.symm : (Fin n → K) →ₗ[K] (Fin n → K))
+          = 1 := by
       rw [← LinearMap.toMatrix'_comp]
-      have h2 : (e : (Fin n → K) →ₗ[K] (Fin n → K)) ∘ₗ (e.symm : (Fin n → K) →ₗ[K] (Fin n → K)) =
-          LinearMap.id := by
+      have h2
+          : (e : (Fin n → K) →ₗ[K] (Fin n → K)) ∘ₗ (e.symm : (Fin n → K) →ₗ[K] (Fin n → K))
+            = LinearMap.id := by
         ext x
         simp
       rw [h2, LinearMap.toMatrix'_id]
@@ -174,15 +189,18 @@ theorem field_mat {K : Type*} [Field K] {n m : ℕ} (A0 A B0 B : Matrix (Fin n) 
       LinearMap.ext he2
     rw [h, LinearMap.toMatrix'_toLin']
 
-def k1 {R : Type*} [CommRing R] {n m : ℕ} (A B0 B : Matrix (Fin n) (Fin m) R)
-    (L0 M : Matrix (Fin m) (Fin n) R) : Matrix (Fin n) (Fin n) R :=
+def k1
+    {R : Type*} [CommRing R]
+    {n m : ℕ} (A B0 B : Matrix (Fin n) (Fin m) R) (L0 M : Matrix (Fin m) (Fin n) R)
+    : Matrix (Fin n) (Fin n) R :=
   A * L0 + Mᵀ * B0ᵀ - Mᵀ * Bᵀ * A * L0
 
-theorem affine_sol {R : Type*} [CommRing R] {n m : ℕ} (A0 A B0 B : Matrix (Fin n) (Fin m) R)
-    (L0 M : Matrix (Fin m) (Fin n) R) (hL0 : L0 * A0 = 1) (hM : M * B = 1)
-    (hC' : B0ᵀ * A0 = Bᵀ * A) (X : Matrix (Fin n) (Fin n) R) :
-    (k1 A B0 B L0 M + (1 - Mᵀ * Bᵀ) * X * (1 - A0 * L0)) * A0 = A ∧
-      Bᵀ * (k1 A B0 B L0 M + (1 - Mᵀ * Bᵀ) * X * (1 - A0 * L0)) = B0ᵀ := by
+theorem affine_sol
+    {R : Type*} [CommRing R]
+    {n m : ℕ} (A0 A B0 B : Matrix (Fin n) (Fin m) R) (L0 M : Matrix (Fin m) (Fin n) R)
+    (hL0 : L0 * A0 = 1) (hM : M * B = 1) (hC' : B0ᵀ * A0 = Bᵀ * A) (X : Matrix (Fin n) (Fin n) R)
+    : (k1 A B0 B L0 M + (1 - Mᵀ * Bᵀ) * X * (1 - A0 * L0)) * A0 = A
+      ∧ Bᵀ * (k1 A B0 B L0 M + (1 - Mᵀ * Bᵀ) * X * (1 - A0 * L0)) = B0ᵀ := by
   have hBM : Bᵀ * Mᵀ = 1 := by rw [← Matrix.transpose_mul, hM, Matrix.transpose_one]
   have hQ : (1 - A0 * L0) * A0 = 0 := by
     rw [Matrix.sub_mul, Matrix.one_mul, Matrix.mul_assoc, hL0, Matrix.mul_one, sub_self]
@@ -198,10 +216,11 @@ theorem affine_sol {R : Type*} [CommRing R] {n m : ℕ} (A0 A B0 B : Matrix (Fin
     simp only [k1, Matrix.mul_add, Matrix.mul_sub, ← Matrix.mul_assoc, hBM, Matrix.one_mul]
     abel
 
-theorem proj_fix {R : Type*} [CommRing R] {n m : ℕ} (A0 B : Matrix (Fin n) (Fin m) R)
-    (L0 M : Matrix (Fin m) (Fin n) R) (h : Matrix (Fin n) (Fin n) R)
-    (h1 : h * A0 = 0) (h2 : Bᵀ * h = 0) :
-    (1 - Mᵀ * Bᵀ) * h * (1 - A0 * L0) = h := by
+theorem proj_fix
+    {R : Type*} [CommRing R]
+    {n m : ℕ} (A0 B : Matrix (Fin n) (Fin m) R) (L0 M : Matrix (Fin m) (Fin n) R)
+    (h : Matrix (Fin n) (Fin n) R) (h1 : h * A0 = 0) (h2 : Bᵀ * h = 0)
+    : (1 - Mᵀ * Bᵀ) * h * (1 - A0 * L0) = h := by
   have e1 : Mᵀ * Bᵀ * h = 0 := by rw [Matrix.mul_assoc, h2, Matrix.mul_zero]
   have e2 : h * (1 - A0 * L0) = h := by
     rw [Matrix.mul_sub, Matrix.mul_one, ← Matrix.mul_assoc, h1, Matrix.zero_mul, sub_zero]
@@ -216,15 +235,17 @@ open Matrix WCoreP
 theorem transitiveOverLocalRings : WCore := by
   intro O _ _ n m A0 A B0 B ⟨L0, hL0⟩ ⟨L, hL⟩ ⟨M0, hM0⟩ ⟨M, hM⟩ hC
   set f := IsLocalRing.residue O with hf
-  have hmap1 : ∀ {X : Matrix (Fin m) (Fin n) O} {Y : Matrix (Fin n) (Fin m) O}, X * Y = 1 →
-      X.map f * Y.map f = 1 := by
+  have hmap1
+      : ∀ {X : Matrix (Fin m) (Fin n) O} {Y : Matrix (Fin n) (Fin m) O},
+        X * Y = 1 → X.map f * Y.map f = 1 := by
     intro X Y h
     rw [← Matrix.map_mul, h, Matrix.map_one _ (map_zero f) (map_one f)]
   have hCf : (A0.map f)ᵀ * B0.map f = (A.map f)ᵀ * B.map f := by
     rw [← Matrix.transpose_map, ← Matrix.transpose_map, ← Matrix.map_mul, ← Matrix.map_mul, hC]
 
-  obtain ⟨kb, hkbu, hkbA, hkbB⟩ := field_mat (A0.map f) (A.map f) (B0.map f) (B.map f) (L0.map f) (L.map f)
-    (M0.map f) (M.map f) (hmap1 hL0) (hmap1 hL) (hmap1 hM0) (hmap1 hM) hCf
+  obtain ⟨kb, hkbu, hkbA, hkbB⟩ :=
+    field_mat (A0.map f) (A.map f) (B0.map f) (B.map f) (L0.map f) (L.map f) (M0.map f) (M.map f)
+      (hmap1 hL0) (hmap1 hL) (hmap1 hM0) (hmap1 hM) hCf
   have hC' : B0ᵀ * A0 = Bᵀ * A := by
     have h := congrArg Matrix.transpose hC
     simpa only [Matrix.transpose_mul, Matrix.transpose_transpose] using h
@@ -239,7 +260,8 @@ theorem transitiveOverLocalRings : WCore := by
       Matrix.transpose_map, sub_self]
   have hproj := proj_fix (A0.map f) (B.map f) (L0.map f) (M.map f) hbar hb1 hb2
 
-  let X : Matrix (Fin n) (Fin n) O := fun i j => Function.surjInv IsLocalRing.residue_surjective (hbar i j)
+  let X : Matrix (Fin n) (Fin n) O := fun i j =>
+    Function.surjInv IsLocalRing.residue_surjective (hbar i j)
   have hX : X.map f = hbar := by
     ext i j
     exact Function.surjInv_eq IsLocalRing.residue_surjective (hbar i j)
@@ -248,7 +270,8 @@ theorem transitiveOverLocalRings : WCore := by
   have hkmap : k.map f = kb := by
     rw [← RingHom.mapMatrix_apply, hk]
     simp only [map_add (f := _), map_mul, map_sub, map_one, RingHom.mapMatrix_apply]
-    rw [Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map, Matrix.transpose_map, hX, hproj, hhbar]
+    rw [Matrix.map_mul, Matrix.map_mul, Matrix.transpose_map, Matrix.transpose_map, hX, hproj,
+      hhbar]
     abel
   refine ⟨k, ?_, hkA, ?_⟩
   · rw [Matrix.isUnit_iff_isUnit_det, ← IsLocalRing.residue_ne_zero_iff_isUnit]

@@ -11,9 +11,10 @@ open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.
 
 namespace GlobalTheory
 
-theorem bijective_of_existsUnique_field_point {S T : Scheme.{0}} (f : S ⟶ T)
-    (h : ∀ (k : Type) [Field k] (w : Sp k ⟶ T), ∃! z : Sp k ⟶ S, z ≫ f = w) :
-    Function.Bijective f := by
+theorem bijective_of_existsUnique_field_point
+    {S T : Scheme.{0}}
+    (f : S ⟶ T) (h : ∀ (k : Type) [Field k] (w : Sp k ⟶ T), ∃! z : Sp k ⟶ S, z ≫ f = w)
+    : Function.Bijective f := by
   constructor
   · intro x x' hx
     obtain ⟨z, hz, hz'⟩ := Scheme.Pullback.exists_preimage_pullback (f := f) (g := f) x x' hx
@@ -32,9 +33,12 @@ theorem bijective_of_existsUnique_field_point {S T : Scheme.{0}} (f : S ⟶ T)
     rw [← Scheme.Hom.comp_apply, hz]
     exact Scheme.fromSpecResidueField_apply t a
 
-theorem existsUnique_field_point_morphismRestrict {S T : Scheme.{0}} (f : S ⟶ T)
+theorem existsUnique_field_point_morphismRestrict
+    {S T : Scheme.{0}} (f : S ⟶ T)
     (h : ∀ (k : Type) [Field k] (w : Sp k ⟶ T), ∃! z : Sp k ⟶ S, z ≫ f = w) (V : T.Opens)
-    (k : Type) [Field k] (w : Sp k ⟶ V) : ∃! z : Sp k ⟶ (f ⁻¹ᵁ V), z ≫ (f ∣_ V) = w := by
+    (k : Type) [Field k]
+    (w : Sp k ⟶ V)
+    : ∃! z : Sp k ⟶ (f ⁻¹ᵁ V), z ≫ (f ∣_ V) = w := by
   obtain ⟨z, hz, hu⟩ := h k (w ≫ V.ι)
   have P := (isPullback_morphismRestrict f V).flip
   refine ⟨P.lift z w hz, P.lift_snd _ _ _, fun y hy ↦ ?_⟩
@@ -45,10 +49,11 @@ theorem existsUnique_field_point_morphismRestrict {S T : Scheme.{0}} (f : S ⟶ 
     rw [Category.assoc, ← morphismRestrict_ι, ← Category.assoc, hy]
   · rw [P.lift_snd]; exact hy
 
-theorem isIso_stalkMap_genericPoint_of_lift {S T : Scheme.{0}} (f : S ⟶ T) [IsIntegral S]
-    [IsIntegral T] [IsDominant f] (hf : Function.Injective f)
-    (z : Spec T.functionField ⟶ S) (hz : z ≫ f = T.fromSpecStalk (genericPoint T)) :
-    IsIso (f.stalkMap (genericPoint S)) := by
+theorem isIso_stalkMap_genericPoint_of_lift
+    {S T : Scheme.{0}} (f : S ⟶ T) [IsIntegral S] [IsIntegral T] [IsDominant f]
+    (hf : Function.Injective f)
+    (z : Spec T.functionField ⟶ S) (hz : z ≫ f = T.fromSpecStalk (genericPoint T))
+    : IsIso (f.stalkMap (genericPoint S)) := by
   have hs : z (IsLocalRing.closedPoint _) = genericPoint S := by
     apply hf
     rw [apply_genericPoint_of_isDominant f]
@@ -72,28 +77,34 @@ theorem isIso_stalkMap_genericPoint_of_lift {S T : Scheme.{0}} (f : S ⟶ T) [Is
       exact ⟨_, hx⟩
   exact @IsIso.of_isIso_comp_right _ _ _ _ _ _ (Scheme.stalkClosedPointTo z) h2 h1
 
-theorem isIso_of_isProper_of_existsUnique_field_point_of_isIntegral {S T : Scheme.{0}} (f : S ⟶ T)
+theorem isIso_of_isProper_of_existsUnique_field_point_of_isIntegral
+    {S T : Scheme.{0}} (f : S ⟶ T)
     [IsProper f] [IsReduced S] [IsIntegral T] [GlobalTheory.IsNormalScheme T]
-    (h : ∀ (k : Type) [Field k] (w : Sp k ⟶ T), ∃! z : Sp k ⟶ S, z ≫ f = w) : IsIso f := by
+    (h : ∀ (k : Type) [Field k] (w : Sp k ⟶ T), ∃! z : Sp k ⟶ S, z ≫ f = w)
+    : IsIso f := by
   have hb := bijective_of_existsUnique_field_point f h
   have hh : IsHomeomorph f :=
     isHomeomorph_iff_continuous_isClosedMap_bijective.mpr ⟨f.continuous, f.isClosedMap, hb⟩
   have : IrreducibleSpace S := hh.homeomorph.symm.irreducibleSpace_iff.mp inferInstance
   have : IsIntegral S := isIntegral_of_irreducibleSpace_of_isReduced S
   have : IsDominant f := ⟨hb.2.denseRange⟩
-  have : LocallyQuasiFinite f := LocallyQuasiFinite.of_finite_preimage_singleton f
-    fun t ↦ (Set.finite_singleton t).preimage hb.1.injOn
+  have : LocallyQuasiFinite f :=
+    LocallyQuasiFinite.of_finite_preimage_singleton f fun t ↦
+      (Set.finite_singleton t).preimage hb.1.injOn
   obtain ⟨z, hz, -⟩ := h T.functionField (T.fromSpecStalk (genericPoint T))
   have := isIso_stalkMap_genericPoint_of_lift f hb.1 z hz
   exact isIso_of_isProper_of_quasiFinite_of_isIso_stalkMap f fun _ ↦ inferInstance
 
-theorem isIso_of_isProper_of_existsUnique_field_point (S T : Scheme.{0}) (f : S ⟶ T)
-    (hf : IsProper f) (hS : IsReduced S) (hT : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme T)
+theorem isIso_of_isProper_of_existsUnique_field_point
+    (S T : Scheme.{0}) (f : S ⟶ T) (hf : IsProper f) (hS : IsReduced S)
+    (hT : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme T)
     (hN : IsLocallyNoetherian T)
-    (h : ∀ (k : Type) [Field k] (w : Sp k ⟶ T), ∃! z : Sp k ⟶ S, z ≫ f = w) : IsIso f := by
+    (h : ∀ (k : Type) [Field k] (w : Sp k ⟶ T), ∃! z : Sp k ⟶ S, z ≫ f = w)
+    : IsIso f := by
   have := GlobalTheory.IsNormalScheme.of_pred hT
   refine (IsZariskiLocalAtTarget.iff_of_iSup_eq_top (P := .isomorphisms _)
-    GlobalTheory.IsNormalScheme.component (@GlobalTheory.IsNormalScheme.iSup_component T _ _)).mpr fun Z ↦ ?_
+      GlobalTheory.IsNormalScheme.component (@GlobalTheory.IsNormalScheme.iSup_component T _ _)).mpr
+    fun Z ↦ ?_
   exact isIso_of_isProper_of_existsUnique_field_point_of_isIntegral
     (f ∣_ GlobalTheory.IsNormalScheme.component Z) (existsUnique_field_point_morphismRestrict f h _)
 

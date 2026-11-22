@@ -50,13 +50,43 @@ structure Ax : Prop where
   exists_pow_mul_inv_mem : ∀ a ∈ D.P, ∃ k : ℕ, D.z ^ k * a⁻¹ ∈ D.P
   gen : ∀ t ∈ D.Tf, ∃ s ∈ D.T, ∃ a ∈ D.P, ∃ b ∈ D.P, t = s * a * b⁻¹
 
-def toIwa (h : D.Ax) : Iwa G :=
-  ⟨D.Nf, D.Tf, D.N, D.T, D.Tc, D.Nm, D.P, D.z, h.N_le, h.T_le, h.P_le, h.z_mem, h.Tc_le, h.Tc_anti, h.Nm_anti, h.comm, h.Tf_Nf,
-    h.T_N, h.T_Nm, h.P_N, h.P_Nm, h.z_Nm, h.swap, h.uniq, h.fin_N, h.fin_Nm, h.fin_Tc, h.exh, h.exists_pow_mul_inv_mem, h.gen⟩
+def toIwa (h : D.Ax) : Iwa G := ⟨
+  D.Nf,
+  D.Tf,
+  D.N,
+  D.T,
+  D.Tc,
+  D.Nm,
+  D.P,
+  D.z,
+  h.N_le,
+  h.T_le,
+  h.P_le,
+  h.z_mem,
+  h.Tc_le,
+  h.Tc_anti,
+  h.Nm_anti,
+  h.comm,
+  h.Tf_Nf,
+  h.T_N,
+  h.T_Nm,
+  h.P_N,
+  h.P_Nm,
+  h.z_Nm,
+  h.swap,
+  h.uniq,
+  h.fin_N,
+  h.fin_Nm,
+  h.fin_Tc,
+  h.exh,
+  h.exists_pow_mul_inv_mem,
+  h.gen
+⟩
 
 end IwaData
 
-def piData {σ : Type} {G : σ → Type} [∀ v, Group (G v)] (I : ∀ v, Iwa (G v)) : IwaData (∀ v, G v) where
+def piData {σ : Type} {G : σ → Type} [∀ v, Group (G v)] (I : ∀ v, Iwa (G v))
+    : IwaData (∀ v, G v) where
   Nf := Subgroup.pi Set.univ fun v => (I v).Nf
   Tf := Subgroup.pi Set.univ fun v => (I v).Tf
   N := Subgroup.pi Set.univ fun v => (I v).N
@@ -68,10 +98,12 @@ def piData {σ : Type} {G : σ → Type} [∀ v, Group (G v)] (I : ∀ v, Iwa (G
 
 section Lin
 
-variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
+variable
+  (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
 
 def Kc (c : ℕ) : Subgroup (GL (Fin n) k) :=
-  (GeneralLinearGroup.map (n := Fin n) (Ideal.Quotient.mk (IsLocalRing.maximalIdeal 𝒪[k] ^ c))).ker.map
+  (GeneralLinearGroup.map (n := Fin n)
+      (Ideal.Quotient.mk (IsLocalRing.maximalIdeal 𝒪[k] ^ c))).ker.map
     (GeneralLinearGroup.map (algebraMap 𝒪[k] k))
 
 def unif : kˣ := Classical.epsilon fun x : kˣ => valuation k (x : k) = uniformizer k
@@ -102,31 +134,41 @@ def glData : IwaData (GL (Fin n) k) where
   T := (torusO k (Fin n)).map (diagT k (Fin n))
   Tc c := (torusO k (Fin n)).map (diagT k (Fin n)) ⊓ Kc k n (c + 1)
   Nm c := (unipB k (Fin n)).comap (GlobalTheory.CuspRep.invT n k) ⊓ Kc k n (c + 1)
-  P :=
-    { carrier := {g | ∃ a : Fin n → ℤ, Antitone a ∧ g = upow k n a}
-      one_mem' := ⟨0, fun _ _ _ => le_rfl, by
-        rw [upow, ← (diagT k (Fin n)).map_one]; congr 1; funext i; simp⟩
-      mul_mem' := by
-        rintro _ _ ⟨a, ha, rfl⟩ ⟨b, hb, rfl⟩
-        refine ⟨a + b, ha.add hb, ?_⟩
-        rw [upow, upow, upow, ← map_mul]
-        congr 1
-        funext i
-        simp [_root_.zpow_add] }
+  P := {
+    carrier := {g | ∃ a : Fin n → ℤ, Antitone a ∧ g = upow k n a}
+    one_mem' :=
+      ⟨0, fun _ _ _ => le_rfl, by rw [upow, ← (diagT k (Fin n)).map_one]; congr 1; funext i; simp⟩
+    mul_mem' := by
+      rintro _ _ ⟨a, ha, rfl⟩ ⟨b, hb, rfl⟩
+      refine ⟨a + b, ha.add hb, ?_⟩
+      rw [upow, upow, upow, ← map_mul]
+      congr 1
+      funext i
+      simp [_root_.zpow_add]
+  }
   z := upow k n fun i => (n : ℤ) - 1 - (i : ℕ)
 
-theorem al_mem (j : ℕ) : al k n j ∈ (glData k n).P :=
-  ⟨_, fun i i' h => by
+theorem al_mem (j : ℕ) : al k n j ∈ (glData k n).P := ⟨
+  _,
+  fun i i' h => by
     have : (i : ℕ) ≤ i' := h
     change (if (i' : ℕ) < j then (1 : ℤ) else 0) ≤ if (i : ℕ) < j then 1 else 0
-    split_ifs <;> omega, rfl⟩
+    split_ifs <;> omega,
+  rfl
+⟩
 
 def eT (i : Fin n) : Uo k →* (glData k n).T where
-  toFun y := ⟨diagT k (Fin n) (Pi.mulSingle i (y : kˣ)), Pi.mulSingle i (y : kˣ), fun j => by
-    by_cases h : j = i
-    · subst h
-      rw [Pi.mulSingle_eq_same]; exact y.2
-    · simp [Pi.mulSingle_eq_of_ne h], rfl⟩
+  toFun y := ⟨
+    diagT k (Fin n) (Pi.mulSingle i (y : kˣ)),
+    Pi.mulSingle i (y : kˣ),
+    fun j => by
+      by_cases h : j = i
+      · subst h
+        rw [Pi.mulSingle_eq_same]
+        exact y.2
+      · simp [Pi.mulSingle_eq_of_ne h],
+    rfl
+  ⟩
   map_one' := Subtype.ext (by simp)
   map_mul' x y := Subtype.ext (by simp [Pi.mulSingle_mul])
 

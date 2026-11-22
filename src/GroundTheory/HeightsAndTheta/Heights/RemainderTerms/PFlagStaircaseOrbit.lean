@@ -11,9 +11,10 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 noncomputable section
 
-theorem FlagStaircaseOrbit.bijective_of_injective {f N : ℕ} (γ : Fin f × Fin N →₀ ℕ) (τ : Fin f)
-    (hlt : ∀ i, γ (τ, i) < N) (hinj : Function.Injective fun i : Fin N => γ (τ, i)) :
-    Function.Bijective fun i : Fin N => (⟨γ (τ, i), hlt i⟩ : Fin N) := by
+theorem FlagStaircaseOrbit.bijective_of_injective
+    {f N : ℕ} (γ : Fin f × Fin N →₀ ℕ) (τ : Fin f) (hlt : ∀ i, γ (τ, i) < N)
+    (hinj : Function.Injective fun i : Fin N => γ (τ, i))
+    : Function.Bijective fun i : Fin N => (⟨γ (τ, i), hlt i⟩ : Fin N) := by
   refine Finite.injective_iff_bijective.mp ?_
   intro i j h
   exact hinj (congrArg Fin.val h)

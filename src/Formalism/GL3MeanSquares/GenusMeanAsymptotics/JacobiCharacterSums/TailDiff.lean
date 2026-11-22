@@ -68,10 +68,10 @@ lemma tail_diff_term {N : ℕ} (χ : DirichletCharacter ℂ N) (z h : ℝ) (hz :
       _ = _ := mul_one _
   exact mul_le_mul e1 ht1 ht0 hlog
 
-theorem tail_diff_schi {N : ℕ} (χ : DirichletCharacter ℂ N) (z h : ℝ) (hz : 1 ≤ z) (hh : 0 < h) :
-    ‖Formalism.ZeroFreeDirichlet.Schi χ (z + h) - Formalism.ZeroFreeDirichlet.Schi χ z -
-              (h : ℂ) * ∑ n ∈ Icc 1 ⌊z⌋₊, ((Λ n : ℝ) : ℂ) * χ (n : ZMod N) / (n : ℂ)‖ ≤
-      h * (h + 1) * Real.log (z + h) / z := by
+theorem tail_diff_schi {N : ℕ} (χ : DirichletCharacter ℂ N) (z h : ℝ) (hz : 1 ≤ z) (hh : 0 < h)
+    : ‖Formalism.ZeroFreeDirichlet.Schi χ (z + h) - Formalism.ZeroFreeDirichlet.Schi χ z -
+                (h : ℂ) * ∑ n ∈ Icc 1 ⌊z⌋₊, ((Λ n : ℝ) : ℂ) * χ (n : ZMod N) / (n : ℂ)‖
+      ≤ h * (h + 1) * Real.log (z + h) / z := by
   rw [tail_diff_identity χ z h hh]
   have hzpos : 0 < z := by linarith
   have hlog : 0 ≤ Real.log (z + h) := Real.log_nonneg (by linarith)
@@ -81,12 +81,13 @@ theorem tail_diff_schi {N : ℕ} (χ : DirichletCharacter ℂ N) (z h : ℝ) (hz
     have h1 : (⌊z + h⌋₊ : ℝ) ≤ z + h := Nat.floor_le (by linarith)
     have h2 : z < ⌊z⌋₊ + 1 := Nat.lt_floor_add_one z
     linarith
-  calc _ ≤ ∑ n ∈ Ioc ⌊z⌋₊ ⌊z + h⌋₊, Real.log (z + h) * (h / z) :=
-        (norm_sum_le _ _).trans (sum_le_sum fun n hn => tail_diff_term χ z h hz hh hn)
+  calc
+    _ ≤ ∑ n ∈ Ioc ⌊z⌋₊ ⌊z + h⌋₊, Real.log (z + h) * (h / z) :=
+      (norm_sum_le _ _).trans (sum_le_sum fun n hn => tail_diff_term χ z h hz hh hn)
     _ = ((Ioc ⌊z⌋₊ ⌊z + h⌋₊).card : ℝ) * (Real.log (z + h) * (h / z)) := by
-        rw [sum_const, nsmul_eq_mul]
+      rw [sum_const, nsmul_eq_mul]
     _ ≤ (h + 1) * (Real.log (z + h) * (h / z)) :=
-        mul_le_mul_of_nonneg_right hcard (mul_nonneg hlog (div_nonneg hh.le hzpos.le))
+      mul_le_mul_of_nonneg_right hcard (mul_nonneg hlog (div_nonneg hh.le hzpos.le))
     _ = h * (h + 1) * Real.log (z + h) / z := by ring
 
 end Formalism.HermitianLattices.Ext.BoxTail

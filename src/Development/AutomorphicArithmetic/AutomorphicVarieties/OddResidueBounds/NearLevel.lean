@@ -7,12 +7,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueB
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
 
-private theorem near_level (l : ℕ) [Fact l.Prime] (Γ : Type) [CommGroup Γ] [Finite Γ] (N : ℕ) [NeZero N]
-    (φ : (ZMod N)ˣ →* Γ) (e a : ℕ) (ha : a.Coprime N) (ho : Odd a) (hl : l ∣ N) (r m : ℕ)
-    (hm : r + ck l (e + 1) + 1 ≤ m) (M : ℕ) [NeZero M] (h : N ∣ M) (hM : M = N * l ^ m) (g : Γ) :
-    InPow l r ((yEl (e + 1) a ha φ).coeff g - (((ytEl e a (φ.comp (ZMod.unitsMap h))).coeff g : ℤ) : ℚ)) := by
+private theorem near_level
+    (l : ℕ) [Fact l.Prime]
+    (Γ : Type) [CommGroup Γ] [Finite Γ]
+    (N : ℕ) [NeZero N]
+    (φ : (ZMod N)ˣ →* Γ)
+    (e a : ℕ) (ha : a.Coprime N) (ho : Odd a)
+    (hl : l ∣ N)
+    (r m : ℕ) (hm : r + ck l (e + 1) + 1 ≤ m)
+    (M : ℕ) [NeZero M]
+    (h : N ∣ M) (hM : M = N * l ^ m) (g : Γ)
+    : InPow l r
+      ((yEl (e + 1) a ha φ).coeff g
+        - (((ytEl e a (φ.comp (ZMod.unitsMap h))).coeff g : ℤ) : ℚ)) := by
   have haN : a.Coprime l := Nat.Coprime.coprime_dvd_right hl ha
   have haM : a.Coprime M := by
     rw [hM]
@@ -25,8 +36,17 @@ private theorem near_level (l : ℕ) [Fact l.Prime] (Γ : Type) [CommGroup Γ] [
   have := (intAt_iff l r _).mp hI g
   simpa [coeff_coefMap] using this
 
-theorem UpperTheory.V.Odd.congr :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [CommGroup Γ] [Finite Γ] (N : ℕ) [NeZero N] (φ : (ZMod N)ˣ →* Γ) (e a : ℕ) (ha : a.Coprime N), Odd a → l ∣ N → ∃ z : MonoidAlgebra ℤ_[l] Γ, IsInt l z (yEl (e + 1) a ha φ) ∧ ∀ r : ℕ, ∃ m₀ : ℕ, ∀ m ≥ m₀, ∀ (M : ℕ) [NeZero M] (h : N ∣ M), M = N * l ^ m → ∃ w : MonoidAlgebra ℤ_[l] Γ, coefMap ℤ_[l] Γ (ytEl e a (φ.comp (ZMod.unitsMap h))) = z + (l : ℤ_[l]) ^ r • w := by
+theorem UpperTheory.V.Odd.congr
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [CommGroup Γ] [Finite Γ] (N : ℕ) [NeZero N]
+        (φ : (ZMod N)ˣ →* Γ) (e a : ℕ) (ha : a.Coprime N),
+      Odd a → l ∣ N
+        → ∃ z : MonoidAlgebra ℤ_[l] Γ,
+          IsInt l z (yEl (e + 1) a ha φ)
+            ∧ ∀ r : ℕ, ∃ m₀ : ℕ, ∀ m ≥ m₀, ∀ (M : ℕ) [NeZero M] (h : N ∣ M),
+              M = N * l ^ m
+                → ∃ w : MonoidAlgebra ℤ_[l] Γ,
+                  coefMap ℤ_[l] Γ (ytEl e a (φ.comp (ZMod.unitsMap h)))
+                    = z + (l : ℤ_[l]) ^ r • w := by
   intro l _ Γ _ _ N _ φ e a ha ho hl
   classical
   have hl0 : l ≠ 0 := (Fact.out : l.Prime).ne_zero
@@ -35,11 +55,14 @@ theorem UpperTheory.V.Odd.congr :
     rw [intAt_iff]
     intro g
     haveI : NeZero (N * l ^ (ck l (e + 1) + 1)) := ⟨mul_ne_zero (NeZero.ne N) (pow_ne_zero _ hl0)⟩
-    have hn := near_level l Γ N φ e a ha ho hl 0 (ck l (e + 1) + 1) (by omega)
-      (N * l ^ (ck l (e + 1) + 1)) (dvd_mul_right _ _) rfl g
+    have hn :=
+      near_level l Γ N φ e a ha ho hl 0 (ck l (e + 1) + 1) (by omega) (N * l ^ (ck l (e + 1) + 1))
+        (dvd_mul_right _ _) rfl g
     have h1 := hn.mem
-    have h2 := add_mem h1 (intCast_mem (Zl l) ((ytEl e a (φ.comp (ZMod.unitsMap
-      (dvd_mul_right N (l ^ (ck l (e + 1) + 1)))))).coeff g))
+    have h2 :=
+      add_mem h1
+        (intCast_mem (Zl l)
+          ((ytEl e a (φ.comp (ZMod.unitsMap (dvd_mul_right N (l ^ (ck l (e + 1) + 1)))))).coeff g))
     rw [sub_add_cancel] at h2
     show y.coeff g / (l : ℚ) ^ 0 ∈ Zl l
     simpa using h2
@@ -52,8 +75,10 @@ theorem UpperTheory.V.Odd.congr :
   intro r
   refine ⟨r + ck l (e + 1) + 1, ?_⟩
   intro m hm M _ h hM
-  have hc : ∀ g, ∃ c : ℤ_[l], (((ytEl e a (φ.comp (ZMod.unitsMap h))).coeff g : ℤ) : ℤ_[l]) =
-      Yp.coeff g + (l : ℤ_[l]) ^ r * c := by
+  have hc
+      : ∀ g, ∃ c : ℤ_[l],
+        (((ytEl e a (φ.comp (ZMod.unitsMap h))).coeff g : ℤ) : ℤ_[l])
+          = Yp.coeff g + (l : ℤ_[l]) ^ r * c := by
     intro g
     have hn := near_level l Γ N φ e a ha ho hl r m hm M h hM g
     set t : ℤ := (ytEl e a (φ.comp (ZMod.unitsMap h))).coeff g

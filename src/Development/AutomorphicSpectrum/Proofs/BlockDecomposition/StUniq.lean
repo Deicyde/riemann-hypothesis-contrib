@@ -6,11 +6,13 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.EdgeStair
 
-theorem stUniq : CrystallineSemistableComparison.E.StCol → CrystallineSemistableComparison.E.StUniq := by
+theorem stUniq
+    : CrystallineSemistableComparison.E.StCol → CrystallineSemistableComparison.E.StUniq := by
   intro hcol R _ C _ F T hT j z
   obtain ⟨hι, hdv, hinj, hex0, hex⟩ := hcol R C F T hT
   have key : ∀ (s k : ℕ) (x : Cn (T.K s) k), T.St z s k x → T.BZ s k x → z ∈ (cx F).B j := by
@@ -37,8 +39,7 @@ theorem stUniq : CrystallineSemistableComparison.E.StCol → CrystallineSemistab
       intro k x hS hB
       obtain ⟨a, rfl, hS'⟩ := hS
       cases k with
-      | zero =>
-        exact ih 1 _ hS' ⟨a, hB, by simp⟩
+      | zero => exact ih 1 _ hS' ⟨a, hB, by simp⟩
       | succ k =>
         obtain ⟨b, hb, hdb⟩ := hB
         obtain ⟨b', rfl⟩ := (hex s k b).1 hb

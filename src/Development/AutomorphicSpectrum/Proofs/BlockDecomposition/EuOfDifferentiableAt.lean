@@ -21,8 +21,9 @@ namespace GlobalTheory.CompanionTheory.RmHol.GelCoef
 
 variable {n : ℕ}
 
-theorem Eu_of_differentiableAt {f : Mat n → ℂ} {z : Mat n} (hf : DifferentiableAt ℂ f z) (a b : Fin n) :
-    Eu true a b f z = fderiv ℂ f z (z * Matrix.single a b 1) ∧ Eu false a b f z = 0 := by
+theorem Eu_of_differentiableAt
+    {f : Mat n → ℂ} {z : Mat n} (hf : DifferentiableAt ℂ f z) (a b : Fin n)
+    : Eu true a b f z = fderiv ℂ f z (z * Matrix.single a b 1) ∧ Eu false a b f z = 0 := by
   have hR : fderiv ℝ f z = (fderiv ℂ f z).restrictScalars ℝ :=
     (hf.hasFDerivAt.restrictScalars ℝ).fderiv
   have hI : z * Matrix.single a b Complex.I = Complex.I • (z * Matrix.single a b (1 : ℂ)) := by
@@ -36,8 +37,8 @@ theorem Eu_of_differentiableAt {f : Mat n → ℂ} {z : Mat n} (hf : Differentia
       ContinuousLinearMap.coe_restrictScalars', hI, map_smul, smul_eq_mul]
     linear_combination ((1 / 2 : ℂ) * fderiv ℂ f z (z * Matrix.single a b (1 : ℂ))) * hII
 
-theorem Eu_congr_germ {f h : Mat n → ℂ} {g : Mat n} (e : f =ᶠ[𝓝 g] h) (s : Bool) (a b : Fin n) :
-    Eu s a b f g = Eu s a b h g := by
+theorem Eu_congr_germ {f h : Mat n → ℂ} {g : Mat n} (e : f =ᶠ[𝓝 g] h) (s : Bool) (a b : Fin n)
+    : Eu s a b f g = Eu s a b h g := by
   simp only [Eu, Rd, Pi.smul_apply, Pi.add_apply, e.fderiv_eq]
 
 end GlobalTheory.CompanionTheory.RmHol.GelCoef

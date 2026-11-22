@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.OLine
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -41,7 +43,8 @@ theorem ex_nsmul (n : ℕ) (z : Fin g → ℂ) : u.ex (n • z) = u.ex z ^ n := 
   | zero => rw [zero_smul, pow_zero]; exact ex_zero u
   | succ n ih => rw [succ_nsmul, u.ex_add, ih, pow_succ]
 
-theorem ex_sum [IsCommMonObj A] {I : Type} [Fintype I] (z : I → Fin g → ℂ) : u.ex (∑ i, z i) = ∏ i, u.ex (z i) := by
+theorem ex_sum [IsCommMonObj A] {I : Type} [Fintype I] (z : I → Fin g → ℂ)
+    : u.ex (∑ i, z i) = ∏ i, u.ex (z i) := by
   classical
   have key : ∀ s : Finset I, u.ex (∑ i ∈ s, z i) = ∏ i ∈ s, u.ex (z i) := by
     intro s
@@ -52,25 +55,33 @@ theorem ex_sum [IsCommMonObj A] {I : Type} [Fintype I] (z : I → Fin g → ℂ)
 
 end Unif
 
-variable (laws : Out.Laws) (laws2 : Out.Laws2)
-  (hc : ∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left), M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen)
+variable
+  (laws : Out.Laws) (laws2 : Out.Laws2)
+  (hc : ∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left),
+    M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen)
   (hT : ThetaUnifAV)
 include laws laws2 hc hT
 
-theorem hom_ext_of_lin (P P' : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u' : HolUnif P'.A P'.L P'.g)
-    (F : (Fin P.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)) (f f' : P.A ⟶ P'.A) (hf : ∀ z, u'.ex (F z) = u.ex z ≫ f)
-    (hf' : ∀ z, u'.ex (F z) = u.ex z ≫ f') (h1 : IsMonHom f) : f = f' := by
-  have e : ∀ B : Over (Sp ℂ), ∀ [GrpObj B], (η[B] : 𝟙_ _ ⟶ B) = 1 := fun B _ => by rw [Hom.one_def]; simp
-  have h2 : IsMonHom f' := laws.rigidity _ _ _ P.isAb P'.isAb f' (by
-    rw [e, e, ← ex_zero u, ← hf', map_zero, ex_zero])
-  refine (GlobalTheory.T.existsUnique_isMonHom_of_linearMap_lattice_anyDim laws laws2 hc hT P P' _ _ u u' F fun z hz => ?_).unique ⟨h1, hf⟩ ⟨h2, hf'⟩
+theorem hom_ext_of_lin
+    (P P' : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u' : HolUnif P'.A P'.L P'.g)
+    (F : (Fin P.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)) (f f' : P.A ⟶ P'.A)
+    (hf : ∀ z, u'.ex (F z) = u.ex z ≫ f) (hf' : ∀ z, u'.ex (F z) = u.ex z ≫ f') (h1 : IsMonHom f)
+    : f = f' := by
+  have e : ∀ B : Over (Sp ℂ), ∀ [GrpObj B], (η[B] : 𝟙_ _ ⟶ B) = 1 := fun B _ => by
+    rw [Hom.one_def]; simp
+  have h2 : IsMonHom f' :=
+    laws.rigidity _ _ _ P.isAb P'.isAb f' (by rw [e, e, ← ex_zero u, ← hf', map_zero, ex_zero])
+  refine (GlobalTheory.T.existsUnique_isMonHom_of_linearMap_lattice_anyDim laws laws2 hc hT P P' _ _
+    u u' F fun z hz => ?_).unique ⟨h1, hf⟩ ⟨h2, hf'⟩
   rw [← u'.ker, hf, (u.ker z).2 hz, MonObj.one_comp]
 
-theorem exists_proj (P P₀ : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u₀ : HolUnif P₀.A P₀.L P₀.g)
-    {I : Type} [Fintype I] (σ : I × Fin P₀.g ≃ Fin P.g)
-    (hΛ : ∀ z, z ∈ u.Λ ↔ ∀ i, (fun j => z (σ (i, j))) ∈ u₀.Λ) :
-    ∃ pr : I → (P.A ⟶ P₀.A), (∀ i, IsMonHom (pr i)) ∧ (∀ i z, u₀.ex (fun j => z (σ (i, j))) = u.ex z ≫ pr i) ∧
-      ∀ (T : Over (Sp ℂ)) (y : I → (T ⟶ P₀.A)), ∃! x : T ⟶ P.A, ∀ i, x ≫ pr i = y i := by
+theorem exists_proj
+    (P P₀ : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u₀ : HolUnif P₀.A P₀.L P₀.g)
+    {I : Type} [Fintype I]
+    (σ : I × Fin P₀.g ≃ Fin P.g) (hΛ : ∀ z, z ∈ u.Λ ↔ ∀ i, (fun j => z (σ (i, j))) ∈ u₀.Λ)
+    : ∃ pr : I → (P.A ⟶ P₀.A),
+      (∀ i, IsMonHom (pr i)) ∧ (∀ i z, u₀.ex (fun j => z (σ (i, j))) = u.ex z ≫ pr i)
+        ∧ ∀ (T : Over (Sp ℂ)) (y : I → (T ⟶ P₀.A)), ∃! x : T ⟶ P.A, ∀ i, x ≫ pr i = y i := by
   classical
   letI := P.isAb.comm
   letI := P₀.isAb.comm
@@ -97,18 +108,30 @@ theorem exists_proj (P P₀ : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u�
   haveI := fun i => (hpr i).1
   haveI := fun i => (hinc i).1
   have e1 : ∀ i, inc i ≫ pr i = 𝟙 _ := fun i =>
-    hom_ext_of_lin laws laws2 hc hT P₀ P₀ u₀ u₀ LinearMap.id _ _ (fun z => by
-      rw [← Category.assoc, ← (hinc i).2, ← (hpr i).2, hRS]; simp) (fun z => by simp) inferInstance
+    hom_ext_of_lin laws laws2 hc hT P₀ P₀ u₀ u₀ LinearMap.id _ _
+      (fun z => by rw [← Category.assoc, ← (hinc i).2, ← (hpr i).2, hRS]; simp)
+      (fun z => by simp)
+      inferInstance
   have e2 : ∀ i i', i ≠ i' → inc i ≫ pr i' = 1 := fun i i' hi =>
-    hom_ext_of_lin laws laws2 hc hT P₀ P₀ u₀ u₀ 0 _ _ (fun z => by
-      rw [← Category.assoc, ← (hinc i).2, ← (hpr i').2, hRS]; simp [hi.symm])
-      (fun z => by simp [ex_zero]) inferInstance
+    hom_ext_of_lin laws laws2 hc hT P₀ P₀ u₀ u₀ 0 _ _
+      (fun z => by rw [← Category.assoc, ← (hinc i).2, ← (hpr i').2, hRS]; simp [hi.symm])
+      (fun z => by simp [ex_zero])
+      inferInstance
   have e3 : 𝟙 P.A = ∏ i, pr i ≫ inc i :=
-    hom_ext_of_lin laws laws2 hc hT P P u u LinearMap.id _ _ (fun z => by simp) (fun z => by
-      rw [PowMatrixLinear.comp_prod]
-      simp only [← Category.assoc, ← (hpr _).2, ← (hinc _).2]
-      rw [← ex_sum, hSR]; rfl) inferInstance
-  refine ⟨pr, fun i => (hpr i).1, fun i => (hpr i).2, fun T y => ⟨∏ i, y i ≫ inc i, fun i => ?_, fun x hx => ?_⟩⟩
+    hom_ext_of_lin laws laws2 hc hT P P u u LinearMap.id _ _
+      (fun z => by simp)
+      (fun z => by
+        rw [PowMatrixLinear.comp_prod]
+        simp only [← Category.assoc, ← (hpr _).2, ← (hinc _).2]
+        rw [← ex_sum, hSR]
+        rfl)
+      inferInstance
+  refine ⟨
+    pr,
+    fun i => (hpr i).1,
+    fun i => (hpr i).2,
+    fun T y => ⟨∏ i, y i ≫ inc i, fun i => ?_, fun x hx => ?_⟩
+  ⟩
   · rw [PowMatrixLinear.prod_comp, Finset.prod_eq_single i]
     · rw [Category.assoc, e1, Category.comp_id]
     · intro b _ hb

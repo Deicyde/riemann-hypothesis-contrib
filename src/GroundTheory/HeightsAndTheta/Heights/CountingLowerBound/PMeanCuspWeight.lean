@@ -27,8 +27,9 @@ theorem MeanCuspWeight.proof : MeanCuspWeight.Statement := by
   have hr0 : 0 < vr ^ (-(1 / 2 : ℝ)) := Real.rpow_pos_of_pos hvr0 _
   have hlogr : log (vr ^ (-(1 / 2 : ℝ))) = -(1 / 2) * log vr := Real.log_rpow hvr0 _
 
-  have key : ∀ z, max 0 (log (1 / lam z)) ≤
-      max 0 (log (vr ^ (-(1 / 2 : ℝ)) / lam z)) + 1 / 2 * log vr := by
+  have key
+      : ∀ z,
+        max 0 (log (1 / lam z)) ≤ max 0 (log (vr ^ (-(1 / 2 : ℝ)) / lam z)) + 1 / 2 * log vr := by
     intro z
     have hl := h.lam_pos z
     have e : log (1 / lam z) = log (vr ^ (-(1 / 2 : ℝ)) / lam z) + 1 / 2 * log vr := by
@@ -49,12 +50,15 @@ theorem MeanCuspWeight.proof : MeanCuspWeight.Statement := by
       (integrable_const L)).const_mul _
   have hmono : ∫ z, U z ∂μ ≤ ∫ z, g z ∂μ :=
     integral_mono_of_nonneg (ae_of_all _ h.U_nonneg) hint (ae_of_all _ hUg)
-  have hval : ∫ z, g z ∂μ = (f : ℝ) * j' *
-      (2 * ((∫ z, max 0 (log (vr ^ (-(1 / 2 : ℝ)) / lam z)) ∂μ) + 1 / 2 * log vr) + L) := by
+  have hval
+      : ∫ z, g z ∂μ
+        = (f : ℝ) * j'
+          * (2 * ((∫ z, max 0 (log (vr ^ (-(1 / 2 : ℝ)) / lam z)) ∂μ) + 1 / 2 * log vr) + L) := by
     have h1 : Integrable (fun z => max 0 (log (vr ^ (-(1 / 2 : ℝ)) / lam z)) + 1 / 2 * log vr) μ :=
       hint_h.add (integrable_const _)
     have h2 : Integrable
-        (fun z => 2 * (max 0 (log (vr ^ (-(1 / 2 : ℝ)) / lam z)) + 1 / 2 * log vr)) μ :=
+        (fun z => 2 * (max 0 (log (vr ^ (-(1 / 2 : ℝ)) / lam z)) + 1 / 2 * log vr))
+        μ :=
       h1.const_mul 2
     rw [hg, integral_const_mul, integral_add h2 (integrable_const L), integral_const_mul,
       integral_add hint_h (integrable_const _), integral_const, integral_const, probReal_univ,

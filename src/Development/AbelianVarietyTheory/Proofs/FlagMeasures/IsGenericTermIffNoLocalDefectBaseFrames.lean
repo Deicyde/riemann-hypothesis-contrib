@@ -24,10 +24,12 @@ namespace GlobalTheory.Unfold.GenLoc
 
 section Loc
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver
 open scoped Classical
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
   {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 
@@ -213,31 +215,40 @@ lemma tri_map {K W : Type} [CommRing K] [AddCommGroup W] [Module K W] {n : ℕ} 
 end Loc
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full
-  Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem frame_castSucc {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (i : Fin D.R.rS) :
-    frame F i.castSucc = F.fl.e i := by
+theorem frame_castSucc {T : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (i : Fin D.R.rS)
+    : frame F i.castSucc = F.fl.e i := by
   show F.fl.fvec i.castSucc = F.fl.e i
   simp only [FlagG.fvec, Fin.snoc_castSucc]
 
-theorem tri_of_adapt {T : D.host.E} (g : GV D) (F G : LFlag (D.sp.Y 0) D.R.rS T) (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
-    (h : ∀ a : Fin (D.R.rS + 1), g (frame F a) - frame G a ∈ Xflag G a.val) :
-    GlobalTheory.LocOver.Tri D.host.E (frame G) (frame (Formalism.L2.SG.Saturated.mapL g hg F)) := by
+theorem tri_of_adapt
+    {T : D.host.E}
+    (g : GV D) (F G : LFlag (D.sp.Y 0) D.R.rS T)
+    (hg : g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT)
+    (h : ∀ a : Fin (D.R.rS + 1), g (frame F a) - frame G a ∈ Xflag G a.val)
+    : GlobalTheory.LocOver.Tri D.host.E (frame G)
+      (frame (Formalism.L2.SG.Saturated.mapL g hg F)) := by
   have hcs : ∀ i : Fin D.R.rS, frame G i.castSucc = G.fl.e i := fun i => frame_castSucc G i
-  have h0 : ∀ a : Fin (D.R.rS + 1), ∃ l ∈ Finsupp.supported D.host.E D.host.E {i : Fin D.R.rS | i.val < a.val},
-      ∑ i, l i • G.fl.e i = g (frame F a) - frame G a := by
+  have h0
+      : ∀ a : Fin (D.R.rS + 1),
+        ∃ l ∈ Finsupp.supported D.host.E D.host.E {i : Fin D.R.rS | i.val < a.val},
+          ∑ i, l i • G.fl.e i = g (frame F a) - frame G a := by
     intro a
     have ha := h a
     simp only [Xflag, FlagG.Xa] at ha
     obtain ⟨l, hl, hsum⟩ := (Finsupp.mem_span_image_iff_linearCombination (R := D.host.E)).1 ha
     refine ⟨l, hl, ?_⟩
     rw [← hsum, Finsupp.linearCombination_apply, Finsupp.sum_fintype]
-    intro i; simp
+    intro i
+    simp
   choose l hl hsum using h0
   refine ⟨fun a b => (if a = b then 1 else 0) + Fin.lastCases 0 (fun i => l b i) a, ⟨?_, ?_⟩, ?_⟩
   · intro a b hba
@@ -253,7 +264,8 @@ theorem tri_of_adapt {T : D.host.E} (g : GV D) (F G : LFlag (D.sp.Y 0) D.R.rS T)
     beta_reduce
     rw [if_pos rfl]
     rcases Fin.eq_castSucc_or_eq_last a with ⟨i, rfl⟩ | rfl
-    · rw [Fin.lastCases_castSucc, (Finsupp.mem_supported' _ _).1 (hl i.castSucc) i (by simp), add_zero]
+    · rw [Fin.lastCases_castSucc, (Finsupp.mem_supported' _ _).1 (hl i.castSucc) i (by simp),
+        add_zero]
     · rw [Fin.lastCases_last, add_zero]
   · intro b
     rw [Formalism.L2.SG.Saturated.frame_mapL]
@@ -264,24 +276,33 @@ theorem tri_of_adapt {T : D.host.E} (g : GV D) (F G : LFlag (D.sp.Y 0) D.R.rS T)
     rw [hsum b]
     abel
 
-theorem tri_loc (Z : LocDat D) (p : PlF D) {T : D.host.E} (g : GV D) (F G : LFlag (D.sp.Y 0) D.R.rS T)
-    (h : Adapt g F G) (g' : Vp D p ≃ₗ[(D.s.atP p).Ep] Vp D p) (hg' : GlobalTheory.LocOver.Ext p g g') :
-    GlobalTheory.LocOver.Tri (D.s.atP p).Ep (GlobalTheory.LocOver.scaled Z p (frame G))
+theorem tri_loc
+    (Z : LocDat D)
+    (p : PlF D)
+    {T : D.host.E} (g : GV D) (F G : LFlag (D.sp.Y 0) D.R.rS T) (h : Adapt g F G)
+    (g' : Vp D p ≃ₗ[(D.s.atP p).Ep] Vp D p) (hg' : GlobalTheory.LocOver.Ext p g g')
+    : GlobalTheory.LocOver.Tri (D.s.atP p).Ep (GlobalTheory.LocOver.scaled Z p (frame G))
       (fun a => g' (GlobalTheory.LocOver.scaled Z p (frame F) a)) := by
   obtain ⟨hg, hadp⟩ := h
   obtain ⟨A, hA, hC⟩ := tri_of_adapt g F G hg hadp
-  obtain ⟨Ap, hAp, -⟩ := GlobalTheory.LocOver.tri_scaled D Z (frame G) (frame (Formalism.L2.SG.Saturated.mapL g hg F)) A hA hC
+  obtain ⟨Ap, hAp, -⟩ :=
+    GlobalTheory.LocOver.tri_scaled D Z (frame G) (frame (Formalism.L2.SG.Saturated.mapL g hg F)) A
+      hA hC
   obtain ⟨hU, hC'⟩ := hAp p
   have hx : ∀ x, g' (baseChange₂ D p x) = baseChange₂ D p (g x) := hg'
-  have e : GlobalTheory.LocOver.scaled Z p (frame (Formalism.L2.SG.Saturated.mapL g hg F)) =
-      fun a => g' (GlobalTheory.LocOver.scaled Z p (frame F) a) := by
+  have e
+      : GlobalTheory.LocOver.scaled Z p (frame (Formalism.L2.SG.Saturated.mapL g hg F))
+        = fun a => g' (GlobalTheory.LocOver.scaled Z p (frame F) a) := by
     funext a
     simp only [GlobalTheory.LocOver.scaled, Formalism.L2.SG.Saturated.frame_mapL, map_smul, hx]
   exact ⟨Ap p, hU, e ▸ hC'⟩
 
-theorem locBBne_iff (Z : LocDat D) (p : PlF D) (Λ : LV D) {T T' : D.host.E}
-    (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T') (Tn T'n : ℕ) :
-    LocNG.BBne (H := locH Z p) (GlobalTheory.LocOver.locU Z p Λ F F' Tn T'n) ↔ locBBne Z p Λ F F' Tn T'n := by
+theorem locBBne_iff
+    (Z : LocDat D) (p : PlF D) (Λ : LV D)
+    {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
+    (Tn T'n : ℕ)
+    : LocNG.BBne (H := locH Z p) (GlobalTheory.LocOver.locU Z p Λ F F' Tn T'n)
+      ↔ locBBne Z p Λ F F' Tn T'n := by
   have hmem : ∀ x : (D.s.atP p).Ep, x * x = 1 → x ∈ (Z.M p).L.O := fun x hx => by
     rw [(Z.M p).L.O_def]
     exact IsIntegral.of_pow two_pos (by rw [sq, hx]; exact isIntegral_one)
@@ -298,39 +319,54 @@ theorem locBBne_iff (Z : LocDat D) (p : PlF D) (Λ : LV D) {T T' : D.host.E}
   let s : Fin (D.R.rS + 1) → (Z.M p).L.O := fun a => ⟨sgnP D p a, hmem _ (localSign_sq p a)⟩
   let s' : Fin (D.R.rS + 1) → (Z.M p).L.O := fun a => ⟨sgnP' D p a, hmem _ (sgnP'_sq p a)⟩
   unfold locBBne
-  exact bbne_sign (locH Z p) (locTerm Z p Λ F F' Tn T'n) (GlobalTheory.LocOver.locU Z p Λ F F' Tn T'n) s s'
-    (fun a => Subtype.ext (localSign_sq p a)) (fun a => Subtype.ext (sgnP'_sq p a)) rfl
+  exact bbne_sign (locH Z p) (locTerm Z p Λ F F' Tn T'n)
+    (GlobalTheory.LocOver.locU Z p Λ F F' Tn T'n) s s'
+    (fun a => Subtype.ext (localSign_sq p a))
+    (fun a => Subtype.ext (sgnP'_sq p a))
+    rfl
     (fun a => congrFun (GlobalTheory.LocOver.locU_f_eq Z p Λ F F' Tn T'n) a)
     (fun a => congrFun (GlobalTheory.LocOver.locU_f'_eq Z p Λ F F' Tn T'n) a)
     (fun g hg => funext fun b => Subtype.ext (hsplit g hg b))
 
-theorem generic_iff_frame {X : HidaSetting D} {Y : Full X} {u u' : D.what₂.Word} (Z : LocDat D) (t : TauC Y u u') :
-    t.generic ↔ ∀ p, ¬ locBBne Z p t.lam (lf D (X.Fu u)) t.frame (Tu D u) (Tu D u') := by
-  have hG := genIffLocBB_of Z (Formalism.L2.SG.Pf.bbTie_holds D Z) u u' (Formalism.L2.SG.Pf.big_block_function_holds D u u')
-    (fun F0 Λ F' => Formalism.L2.SG.Pf.m_plus_independent _ _ _ _)
+theorem generic_iff_frame
+    {X : HidaSetting D} {Y : Full X} {u u' : D.what₂.Word} (Z : LocDat D) (t : TauC Y u u')
+    : t.generic ↔ ∀ p, ¬ locBBne Z p t.lam (lf D (X.Fu u)) t.frame (Tu D u) (Tu D u') := by
+  have hG :=
+    genIffLocBB_of Z (Formalism.L2.SG.Pf.bbTie_holds D Z) u u'
+      (Formalism.L2.SG.Pf.big_block_function_holds D u u')
+      (fun F0 Λ F' => Formalism.L2.SG.Pf.m_plus_independent _ _ _ _)
   have hR : IsRowLat D (X.Fu u) t.lam := (Y.rowsOK u).1 _ t.mem
-  have hf : ∀ p (x y : Formalism.L2.SG.TermDef.Carrier (Formalism.L2.SG.TermDef.PD D t.lam (lf D (X.Fu u)) u')),
-      Formalism.L2.SG.TermDef.Rel t.lam (lf D (X.Fu u)) (Formalism.L2.SG.TermDef.PD D t.lam (lf D (X.Fu u)) u') x y →
-      locBBne Z p t.lam (lf D (X.Fu u)) x.1 (Tu D u) (Tu D u') =
-        locBBne Z p t.lam (lf D (X.Fu u)) y.1 (Tu D u) (Tu D u') := by
+  have hf
+      : ∀ p
+          (x y : Formalism.L2.SG.TermDef.Carrier (Formalism.L2.SG.TermDef.PD D t.lam (lf D (X.Fu u))
+            u')),
+        Formalism.L2.SG.TermDef.Rel t.lam (lf D (X.Fu u))
+            (Formalism.L2.SG.TermDef.PD D t.lam (lf D (X.Fu u)) u') x y
+          → locBBne Z p t.lam (lf D (X.Fu u)) x.1 (Tu D u) (Tu D u')
+            = locBBne Z p t.lam (lf D (X.Fu u)) y.1 (Tu D u) (Tu D u') := by
     intro p x y hxy
     apply propext
-    have e1 := Formalism.L2.SG.Pf.bbTie_holds D Z u u' (X.Fu u) t.lam x.1 hR x.2
-      (Formalism.L2.SG.Pf.m_plus_independent _ _ _ _) p
-    have e2 := Formalism.L2.SG.Pf.bbTie_holds D Z u u' (X.Fu u) t.lam y.1 hR y.2
-      (Formalism.L2.SG.Pf.m_plus_independent _ _ _ _) p
+    have e1 :=
+      Formalism.L2.SG.Pf.bbTie_holds D Z u u' (X.Fu u) t.lam x.1 hR x.2
+        (Formalism.L2.SG.Pf.m_plus_independent _ _ _ _) p
+    have e2 :=
+      Formalism.L2.SG.Pf.bbTie_holds D Z u u' (X.Fu u) t.lam y.1 hR y.2
+        (Formalism.L2.SG.Pf.m_plus_independent _ _ _ _) p
     refine e1.symm.trans (Iff.trans ?_ e2)
     unfold Formalism.L2.SG.Saturated.BBneF
-    exact exists_congr fun P => and_congr_right fun _ =>
-      Formalism.L2.SG.Pf.big_block_function_holds D u u' (X.Fu u) t.lam hR P x y hxy
+    exact exists_congr fun P =>
+      and_congr_right fun _ =>
+        Formalism.L2.SG.Pf.big_block_function_holds D u u' (X.Fu u) t.lam hR P x y hxy
   unfold GTerm.generic GTerm.frame
   rw [hG (X.Fu u) (Y.what₂ u) (Y.rowsOK u) (GTerm.toTerm t)]
   unfold GTerm.toTerm
   refine forall_congr' fun p => not_congr ?_
   unfold locBBneT
   exact (Formalism.L2.SG.TermDef.const_of_mk
-    (fun x : Formalism.L2.SG.TermDef.Carrier (Formalism.L2.SG.TermDef.PD D t.lam (lf D (X.Fu u)) u') =>
-      locBBne Z p t.lam (lf D (X.Fu u)) x.1 (Tu D u) (Tu D u')) (hf p) (Quot.out_eq _)).to_iff
+    (fun x
+        : Formalism.L2.SG.TermDef.Carrier (Formalism.L2.SG.TermDef.PD D t.lam (lf D (X.Fu u)) u') =>
+      locBBne Z p t.lam (lf D (X.Fu u)) x.1 (Tu D u) (Tu D u'))
+    (hf p) (Quot.out_eq _)).to_iff
 
 theorem rank_loc (p : PlF D) : Module.finrank (D.s.atP p).Ep (Vp D p) = D.R.k + 2 * D.R.rS + 1 := by
   rw [finrank_Vp]
@@ -338,10 +374,24 @@ theorem rank_loc (p : PlF D) : Module.finrank (D.s.atP p).Ep (Vp D p) = D.R.k + 
   have h2 := Ranks.rS_two (R := D.R)
   omega
 
-theorem generic_iff_local : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word), ∀ (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E)) (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (w : Point D.host.E (D.R.rS + 1)), ZhatOM (ZhatL F F') = ptMat w → Gval F F' ≠ 0 → ∀ (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS), Based Z FP (Tu D u) (Tu D u') F F' → (∀ p, (FP p).RelG (LocNG.theta (Z.M p))) → ∀ (t : TauC Y u u') (Λ : LV D), TG F F' t Λ → (t.generic ↔ ∀ p d τ, LocNG.IsTermOver (FP p) d τ → τ.abelian₂ = lattice₂ D Z.M p Λ → ¬ LocNG.BBne (H := locH Z p) τ) := by
+theorem generic_iff_local
+    : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
+      ∀ (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
+          (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
+          (w : Point D.host.E (D.R.rS + 1)),
+        ZhatOM (ZhatL F F') = ptMat w → Gval F F' ≠ 0
+          → ∀ (Z : LocDat D) (FP : ∀ p : PlF D, LocNG.FPair (locH Z p) D.R.rS),
+            Based Z FP (Tu D u) (Tu D u') F F' → (∀ p, (FP p).RelG (LocNG.theta (Z.M p)))
+              → ∀ (t : TauC Y u u') (Λ : LV D),
+                TG F F' t Λ
+                  → (t.generic
+                    ↔ ∀ p d τ,
+                      LocNG.IsTermOver (FP p) d τ → τ.abelian₂ = lattice₂ D Z.M p Λ
+                        → ¬ LocNG.BBne (H := locH Z p) τ) := by
   intro D X Y u u' F F' w hZw hGv Z FP hB hRel t Λ hTG
   have hC := GlobalTheory.T.term_at_base_point_of_frames D X Y u u' F F' w hZw hGv t Λ hTG
-  have hPD : Formalism.L2.SG.TermDef.PD D t.lam (lf D (X.Fu u)) u' (GTerm.frame t) := (Quot.out t.cls).2.2.2.2
+  have hPD : Formalism.L2.SG.TermDef.PD D t.lam (lf D (X.Fu u)) u' (GTerm.frame t) :=
+    (Quot.out t.cls).2.2.2.2
   have hR : IsRowLat D (X.Fu u) t.lam := (Y.rowsOK u).1 _ t.mem
   have hgf := (Formalism.L2.SG.Closed.TermFun_holds D u u' (X.Fu u) t.lam hR).1
   have hG0 : Gval (lf D (X.Fu u)) (GTerm.frame t) ≠ 0 := by
@@ -351,8 +401,10 @@ theorem generic_iff_local : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' 
   obtain ⟨g, hA1, hA2, hΛ⟩ := hTG
   rw [generic_iff_frame Z t]
   refine forall_congr' fun p => ?_
-  obtain ⟨gp, hext, hunit, -, himg, -⟩ := GlobalTheory.T.rational_isometry_extends_local_isometry D Z p g hA1.1
-  obtain ⟨hU, htriU⟩ := GlobalTheory.LocOver.locU_isTerm D Z u u' (X.Fu u) t.lam hR (GTerm.frame t) hPD hG0 p
+  obtain ⟨gp, hext, hunit, -, himg, -⟩ :=
+    GlobalTheory.T.rational_isometry_extends_local_isometry D Z p g hA1.1
+  obtain ⟨hU, htriU⟩ :=
+    GlobalTheory.LocOver.locU_isTerm D Z u u' (X.Fu u) t.lam hR (GTerm.frame t) hPD hG0 p
   have hOK : (Z.M p).OK := (Z.agree p).1
   obtain ⟨hfA, hfB, hTA, hTB⟩ := hB p
   set τ0 := GlobalTheory.LocOver.move gp
@@ -364,16 +416,19 @@ theorem generic_iff_local : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' 
   have htB : GlobalTheory.LocOver.Tri (D.s.atP p).Ep (FP p).B.f τ0.f' := by
     rw [hfB]
     exact tri_trans (tri_loc Z p g (GTerm.frame t) F' hA2 gp hext) (tri_map gp htriU)
-  obtain ⟨d0, hd0⟩ := GlobalTheory.T.exists_datum_of_two_congruent_frames (Z.M p) hOK (locH Z p) D.R.rS (FP p) τ0 hτ0T hTA.symm hTB.symm htA htB
+  obtain ⟨d0, hd0⟩ :=
+    GlobalTheory.T.exists_datum_of_two_congruent_frames (Z.M p) hOK (locH Z p) D.R.rS (FP p) τ0 hτ0T
+      hTA.symm hTB.symm htA htB
   have hLam : τ0.abelian₂ = lattice₂ D Z.M p Λ := by
     rw [hΛ]
     exact himg t.lam
-  rw [← locBBne_iff, ← bbne_move (locH Z p) gp
-    (GlobalTheory.LocOver.locU Z p t.lam (lf D (X.Fu u)) (GTerm.frame t) (Tu D u) (Tu D u'))]
+  rw [← locBBne_iff,
+    ← bbne_move (locH Z p) gp
+      (GlobalTheory.LocOver.locU Z p t.lam (lf D (X.Fu u)) (GTerm.frame t) (Tu D u) (Tu D u'))]
   constructor
   · intro hn d τ hτ hτL h
-    exact hn ((GlobalTheory.T.localTerm_defect_eq_of_lattice_eq (Z.M p) hOK (locH Z p) D.R.rS D.R.k (FP p) (rank_loc p) (hRel p) d d0 τ τ0 hτ hd0
-      (hτL.trans hLam.symm)).1 h)
+    exact hn ((GlobalTheory.T.localTerm_defect_eq_of_lattice_eq (Z.M p) hOK (locH Z p) D.R.rS D.R.k
+      (FP p) (rank_loc p) (hRel p) d d0 τ τ0 hτ hd0 (hτL.trans hLam.symm)).1 h)
   · intro h
     exact h d0 τ0 hd0 hLam
 

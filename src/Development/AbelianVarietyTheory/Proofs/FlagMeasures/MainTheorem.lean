@@ -8,10 +8,12 @@ namespace GlobalTheory.DenominatorTheorem
 
 open NumberField
 
-theorem main_theorem : ∀ {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
-    (G : Submodule (NumberField.RingOfIntegers E) (Fin n → E)),
-    Submodule.span E (↑G : Set (Fin n → E)) = ⊤ → ∀ (y : Fin n → E),
-    ∃ (c : NumberField.RingOfIntegers E), c ≠ (0 : NumberField.RingOfIntegers E) ∧ c • y ∈ G := by
+theorem main_theorem
+    : ∀ {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
+        (G : Submodule (NumberField.RingOfIntegers E) (Fin n → E)),
+      Submodule.span E (↑G : Set (Fin n → E)) = ⊤
+        → ∀ (y : Fin n → E), ∃ (c : NumberField.RingOfIntegers E),
+          c ≠ (0 : NumberField.RingOfIntegers E) ∧ c • y ∈ G := by
   intro E _ _ n G hG y
   have hy : y ∈ Submodule.span E (G : Set (Fin n → E)) := hG ▸ Submodule.mem_top
   induction hy using Submodule.span_induction with

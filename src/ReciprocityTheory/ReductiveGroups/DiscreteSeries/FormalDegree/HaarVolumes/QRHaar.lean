@@ -18,9 +18,14 @@ open ReciprocityTheory.ChartRestriction.DS.S7 ReciprocityTheory.ChartRestriction
 
 variable {N : ℕ}
 
-theorem qr_lintegral (μ : Measure (UNgrp N)) [μ.IsHaarMeasure] [IsProbabilityMeasure μ] :
-    ∃ C : ℝ, 0 < C ∧ ∀ f : (Fin N → Fin N → ℂ) → ENNReal, Measurable f →
-      ∫⁻ Z, f Z = ENNReal.ofReal C * ∫⁻ k, (∫⁻ t in triPos N, f (qrMap (k, t)) * ENNReal.ofReal (qrWt t)) ∂μ := by
+theorem qr_lintegral (μ : Measure (UNgrp N)) [μ.IsHaarMeasure] [IsProbabilityMeasure μ]
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ f : (Fin N → Fin N → ℂ) → ENNReal,
+          Measurable f
+            → ∫⁻ Z, f Z
+              = ENNReal.ofReal C
+                * ∫⁻ k, (∫⁻ t in triPos N, f (qrMap (k, t)) * ENNReal.ofReal (qrWt t)) ∂μ := by
   haveI hcpt : CompactSpace (UNgrp N) := by
     by_contra hnc
     rw [not_compactSpace_iff] at hnc
@@ -39,7 +44,8 @@ theorem qr_lintegral (μ : Measure (UNgrp N)) [μ.IsHaarMeasure] [IsProbabilityM
   have hprod := nuQR_eq_prod (N := N) μ
   have hcd : Continuous fun Z : Fin N → Fin N → ℂ => (Matrix.of Z).det :=
     Continuous.matrix_det (continuous_id : Continuous fun Z : Fin N → Fin N → ℂ => Matrix.of Z)
-  have hdet : Measurable fun Z : Fin N → Fin N → ℂ => ENNReal.ofReal (‖(Matrix.of Z).det‖ ^ (2 * N)) :=
+  have hdet
+      : Measurable fun Z : Fin N → Fin N → ℂ => ENNReal.ofReal (‖(Matrix.of Z).det‖ ^ (2 * N)) :=
     ((hcd.norm.pow _).measurable).ennreal_ofReal
   have hgm : Measurable (gmDens N) := by
     have he : gmDens N = fun Z => ENNReal.ofReal ((‖(Matrix.of Z).det‖ ^ (2 * N))⁻¹) := by
@@ -50,29 +56,35 @@ theorem qr_lintegral (μ : Measure (UNgrp N)) [μ.IsHaarMeasure] [IsProbabilityM
     exact ((hcd.norm.pow _).measurable.inv).ennreal_ofReal
   have htd : Measurable (triDens (N := N)) := by
     unfold triDens
-    first
-    | fun_prop
-    | measurability
-  have key : ∀ f : (Fin N → Fin N → ℂ) → ENNReal, Measurable f →
-      ∫⁻ Z, f Z = c * ∫⁻ k, (∫⁻ t in triPos N, f (qrMap (k, t)) * ENNReal.ofReal (qrWt t)) ∂μ := by
+    first | fun_prop | measurability
+  have key
+      : ∀ f : (Fin N → Fin N → ℂ) → ENNReal,
+        Measurable f
+          → ∫⁻ Z, f Z
+            = c * ∫⁻ k, (∫⁻ t in triPos N, f (qrMap (k, t)) * ENNReal.ofReal (qrWt t)) ∂μ := by
     intro f hf
-    have hg : Measurable fun Z => f Z * ENNReal.ofReal (‖(Matrix.of Z).det‖ ^ (2 * N)) := hf.mul hdet
+    have hg : Measurable fun Z => f Z * ENNReal.ofReal (‖(Matrix.of Z).det‖ ^ (2 * N)) :=
+      hf.mul hdet
     have hgq : Measurable fun p : UNgrp N × TriCo N =>
-        f (qrMap p) * ENNReal.ofReal (‖(Matrix.of (qrMap p)).det‖ ^ (2 * N)) := hg.comp measurable_qrMap
+        f (qrMap p) * ENNReal.ofReal (‖(Matrix.of (qrMap p)).det‖ ^ (2 * N)) :=
+      hg.comp measurable_qrMap
     have s1 : ∫⁻ Z, f Z = ∫⁻ Z in glSet N, f Z := by
       rw [← lintegral_add_compl f (measurableSet_glSet (N := N))]
       have hc : (glSet N)ᶜ = {Z : Fin N → Fin N → ℂ | (Matrix.of Z).det = 0} := by
         ext Z
         simp [glSet]
       rw [hc, setLIntegral_measure_zero _ _ volume_det_eq_zero, add_zero]
-    have s2 : ∫⁻ Z in glSet N, f Z =
-        ∫⁻ Z, f Z * ENNReal.ofReal (‖(Matrix.of Z).det‖ ^ (2 * N)) ∂((gmMeas N).restrict (glSet N)) := by
-      unfold gmMeas
-      rw [restrict_withDensity measurableSet_glSet, lintegral_withDensity_eq_lintegral_mul _ hgm hg]
-      apply setLIntegral_congr_fun measurableSet_glSet
-      intro Z hZ
-      simp only [Pi.mul_apply]
-      rw [mul_comm (f Z), ← mul_assoc, gmDens_mul Z hZ, one_mul]
+    have s2
+        : ∫⁻ Z in glSet N, f Z
+          = ∫⁻ Z, f Z * ENNReal.ofReal (‖(Matrix.of Z).det‖ ^ (2 * N)) ∂((gmMeas N).restrict (glSet N)) :=
+      by
+        unfold gmMeas
+        rw [restrict_withDensity measurableSet_glSet,
+          lintegral_withDensity_eq_lintegral_mul _ hgm hg]
+        apply setLIntegral_congr_fun measurableSet_glSet
+        intro Z hZ
+        simp only [Pi.mul_apply]
+        rw [mul_comm (f Z), ← mul_assoc, gmDens_mul Z hZ, one_mul]
     rw [s1, s2, ← map_qrMap_nuQR, lintegral_map hg measurable_qrMap, ← hprod,
       lintegral_prod _ hgq.aemeasurable, ← lintegral_const_mul' _ _ hct]
     apply lintegral_congr
@@ -80,10 +92,8 @@ theorem qr_lintegral (μ : Measure (UNgrp N)) [μ.IsHaarMeasure] [IsProbabilityM
     rw [hkap, lintegral_smul_measure]
     congr 1
     unfold triMeas
-    rw [lintegral_withDensity_eq_lintegral_mul _ htd (by
-      first
-      | exact hgq.comp measurable_prodMk_left
-      | exact hgq.comp measurable_prod_mk_left)]
+    rw [lintegral_withDensity_eq_lintegral_mul _ htd
+      (by first | exact hgq.comp measurable_prodMk_left | exact hgq.comp measurable_prod_mk_left)]
     apply setLIntegral_congr_fun measurableSet_triPos
     intro t ht
     simp only [Pi.mul_apply]

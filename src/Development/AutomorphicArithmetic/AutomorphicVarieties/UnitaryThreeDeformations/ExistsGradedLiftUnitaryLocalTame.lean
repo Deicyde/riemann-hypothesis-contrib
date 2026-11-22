@@ -11,12 +11,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
 namespace UpperTheory.V.UnitaryThreeInertia
 
-private theorem lc_hom {R D : Type} [CommRing R] [Group D] [TopologicalSpace D] (η : D →* ℤˣ) (r : D →* GG (m := 3) (R := R))
-    (hη : IsLocallyConstant η) (hm : HasMult η r) (hr : IsLocallyConstant (mats r)) : IsLocallyConstant r := by
+private theorem lc_hom
+    {R D : Type} [CommRing R] [Group D] [TopologicalSpace D]
+    (η : D →* ℤˣ) (r : D →* GG (m := 3) (R := R))
+    (hη : IsLocallyConstant η) (hm : HasMult η r) (hr : IsLocallyConstant (mats r))
+    : IsLocallyConstant r := by
   rw [IsLocallyConstant.iff_eventually_eq] at *
   intro x
   filter_upwards [hη x, hr x] with y h1 h2
@@ -26,13 +30,19 @@ private theorem lc_hom {R D : Type} [CommRing R] [Group D] [TopologicalSpace D] 
   · rw [hm y, hm x]
     exact h1
 
-private theorem gg_ext {R : Type} [CommRing R] {x y : GG (m := 3) (R := R)} (h : x.mat = y.mat) (h' : x.right = y.right) : x = y :=
+private theorem gg_ext
+    {R : Type} [CommRing R]
+    {x y : GG (m := 3) (R := R)} (h : x.mat = y.mat) (h' : x.right = y.right)
+    : x = y :=
   SemidirectProduct.ext (Units.ext h) h'
 
 private theorem wt_self (a : Fin 3) : wt a a = 0 := sub_self _
 
-private theorem isUnit_of_isUnit_surjective_localRingHom {R R' : Type} [CommRing R] [IsLocalRing R] [CommRing R'] [IsLocalRing R']
-    (p : R →+* R') (hp : Function.Surjective p) (a : R) (h : IsUnit (p a)) : IsUnit a := by
+private theorem isUnit_of_isUnit_surjective_localRingHom
+    {R R' : Type} [CommRing R] [IsLocalRing R] [CommRing R'] [IsLocalRing R']
+    (p : R →+* R') (hp : Function.Surjective p)
+    (a : R) (h : IsUnit (p a))
+    : IsUnit a := by
   by_contra ha
   obtain ⟨u, hu⟩ := h
   obtain ⟨b, hb⟩ := hp (↑u⁻¹ : R')
@@ -40,20 +50,32 @@ private theorem isUnit_of_isUnit_surjective_localRingHom {R R' : Type} [CommRing
     rw [RingHom.mem_ker, RingHom.map_sub, map_mul, hb, ← hu, map_one]
     simp
   have hker : RingHom.ker p ≤ maximalIdeal R := IsLocalRing.le_maximalIdeal (RingHom.ker_ne_top p)
-  have h1 : a * b ∈ maximalIdeal R := Ideal.mul_mem_right b _ ((IsLocalRing.mem_maximalIdeal a).2 ha)
+  have h1 : a * b ∈ maximalIdeal R :=
+    Ideal.mul_mem_right b _ ((IsLocalRing.mem_maximalIdeal a).2 ha)
   have h2 := Ideal.sub_mem _ h1 (hker hk)
   rw [sub_sub_cancel] at h2
   exact (IsLocalRing.maximalIdeal.isMaximal R).ne_top ((Ideal.eq_top_iff_one _).2 h2)
 
-private theorem lift_elt {O R R' : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [CommRing R']
-    [IsLocalRing R'] [Algebra O R'] (𝒜 : ℤ → Submodule O R) (p : R →ₐ[O] R') (hp : Function.Surjective p)
-    (y : GG (m := 3) (R := R')) (t : GG (m := 3) (R := R)) (hy : ∀ a b, wt a b < 0 → y.mat a b = 0) (hX : ∃ X, GrMat 𝒜 X ∧ X.map p = y.mat)
-    (ht : ∀ a, t.mat a a ∈ 𝒜 0) (hty : ∀ a, p (t.mat a a) = y.mat a a) :
-    ∃ x : GG (m := 3) (R := R), GG.map (p : R →+* R') x = y ∧ GrMat 𝒜 x.mat ∧ (∀ a b, wt a b < 0 → x.mat a b = 0) ∧
-      ∀ a, x.mat a a = t.mat a a := by
+private theorem lift_elt
+    {O R R' : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [CommRing R']
+    [IsLocalRing R'] [Algebra O R']
+    (𝒜 : ℤ → Submodule O R)
+    (p : R →ₐ[O] R') (hp : Function.Surjective p)
+    (y : GG (m := 3) (R := R')) (t : GG (m := 3) (R := R))
+    (hy : ∀ a b, wt a b < 0 → y.mat a b = 0) (hX : ∃ X, GrMat 𝒜 X ∧ X.map p = y.mat)
+    (ht : ∀ a, t.mat a a ∈ 𝒜 0) (hty : ∀ a, p (t.mat a a) = y.mat a a)
+    : ∃ x : GG (m := 3) (R := R),
+      GG.map (p : R →+* R') x = y ∧ GrMat 𝒜 x.mat ∧ (∀ a b, wt a b < 0 → x.mat a b = 0)
+        ∧ ∀ a, x.mat a a = t.mat a a := by
   classical
   obtain ⟨X, hXg, hXp⟩ := hX
-  let M : Matrix (Fin 3) (Fin 3) R := fun a b => if wt a b < 0 then 0 else if a = b then t.mat a a else X a b
+  let M : Matrix (Fin 3) (Fin 3) R := fun a b =>
+    if wt a b < 0 then
+      0
+    else if a = b then
+      t.mat a a
+    else
+      X a b
   have hMp : M.map (p : R →+* R') = y.mat := by
     ext a b
     show (p : R →+* R') (M a b) = y.mat a b
@@ -89,15 +111,21 @@ private theorem lift_elt {O R R' : Type} [CommRing O] [CommRing R] [IsLocalRing 
     show M a a = t.mat a a
     simp [M, wt_self]
 
-private theorem gr_eq_zero {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (𝒜 : ℤ → Submodule O R)
-    [GradedAlgebra 𝒜] {i j : ℤ} {x : R} (hi : x ∈ 𝒜 i) (hj : x ∈ 𝒜 j) (h : i ≠ j) : x = 0 := by
+private theorem gr_eq_zero
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R]
+    (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜]
+    {i j : ℤ} {x : R} (hi : x ∈ 𝒜 i) (hj : x ∈ 𝒜 j) (h : i ≠ j)
+    : x = 0 := by
   have h1 := DirectSum.decompose_of_mem_same 𝒜 hj
   have h2 := DirectSum.decompose_of_mem_ne 𝒜 hi h
   rw [h2] at h1
   exact h1.symm
 
-private theorem grMat_mul {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (𝒜 : ℤ → Submodule O R)
-    [GradedAlgebra 𝒜] {X Y : Matrix (Fin 3) (Fin 3) R} (hX : GrMat 𝒜 X) (hY : GrMat 𝒜 Y) : GrMat 𝒜 (X * Y) := by
+private theorem grMat_mul
+    {O R : Type} [CommRing O] [CommRing R] [Algebra O R]
+    (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜]
+    {X Y : Matrix (Fin 3) (Fin 3) R} (hX : GrMat 𝒜 X) (hY : GrMat 𝒜 Y)
+    : GrMat 𝒜 (X * Y) := by
   intro a b
   rw [Matrix.mul_apply]
   refine Submodule.sum_mem _ fun c _ => ?_
@@ -107,9 +135,12 @@ private theorem grMat_mul {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (
     ring
   rwa [e] at h
 
-private theorem strict_mul {R : Type} [CommRing R] {b X : Matrix (Fin 3) (Fin 3) R}
-    (hb : ∀ a c, wt a c ≤ 0 → b a c = 0) (hX : ∀ a c, wt a c < 0 → X a c = 0) (a c : Fin 3) (h : wt a c ≤ 0) :
-    ((1 + b) * X) a c = X a c := by
+private theorem strict_mul
+    {R : Type} [CommRing R]
+    {b X : Matrix (Fin 3) (Fin 3) R}
+    (hb : ∀ a c, wt a c ≤ 0 → b a c = 0) (hX : ∀ a c, wt a c < 0 → X a c = 0)
+    (a c : Fin 3) (h : wt a c ≤ 0)
+    : ((1 + b) * X) a c = X a c := by
   rw [add_mul, one_mul, Matrix.add_apply, Matrix.mul_apply, Finset.sum_eq_zero, add_zero]
   intro d _
   by_cases hd : wt a d ≤ 0
@@ -120,10 +151,12 @@ private theorem strict_mul {R : Type} [CommRing R] {b X : Matrix (Fin 3) (Fin 3)
     have hlt : wt d c < 0 := by omega
     rw [hX d c hlt, mul_zero]
 
-private theorem psi_lc {O R D : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R] [Finite R]
-    [TopologicalSpace D] (f : D → O)
-    (hf : ∀ n : ℕ, IsLocallyConstant fun g => Ideal.Quotient.mk (maximalIdeal O ^ n) (f g)) :
-    IsLocallyConstant fun g => algebraMap O R (f g) := by
+private theorem psi_lc
+    {O R D : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R] [Finite R]
+    [TopologicalSpace D]
+    (f : D → O)
+    (hf : ∀ n : ℕ, IsLocallyConstant fun g => Ideal.Quotient.mk (maximalIdeal O ^ n) (f g))
+    : IsLocallyConstant fun g => algebraMap O R (f g) := by
   have hloc : IsLocalHom (algebraMap O R) := IsCO.isLocalHom
   have hnil : IsNilpotent (Ideal.jacobson (⊥ : Ideal R)) := IsArtinianRing.isNilpotent_jacobson_bot
   rw [IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top] at hnil
@@ -142,8 +175,9 @@ private theorem psi_lc {O R D : Type} [CommRing O] [IsLocalRing O] [CommRing R] 
   have h := (hf n).comp (Ideal.Quotient.lift (maximalIdeal O ^ n) (algebraMap O R) hker)
   exact h
 
-private theorem gg_mul_mat_of_right_eq_one {R : Type} [CommRing R] (z v : GG (m := 3) (R := R)) (h : z.right = 1) :
-    (z * v).mat = z.mat * v.mat := by
+private theorem gg_mul_mat_of_right_eq_one
+    {R : Type} [CommRing R] (z v : GG (m := 3) (R := R)) (h : z.right = 1)
+    : (z * v).mat = z.mat * v.mat := by
   show ((z * v).left : Matrix (Fin 3) (Fin 3) R) = _
   rw [SemidirectProduct.mul_left, h, map_one]
   rfl
@@ -151,21 +185,30 @@ private theorem gg_mul_mat_of_right_eq_one {R : Type} [CommRing R] (z v : GG (m 
 private theorem eq_of_wt_eq_zero (a b : Fin 3) (h : wt a b = 0) : a = b := by
   fin_cases a <;> fin_cases b <;> simp_all [wt, wt1]
 
-private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
+private theorem tri_lift
+    {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
     [CommRing R'] [Algebra O R'] [IsCO O R'] [Group D] [TopologicalSpace D] [IsTopologicalGroup D]
-    (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜] (p : R →ₐ[O] R') (j : ℤ) (hp : Function.Surjective p)
-    (hs : SmallExt O 𝒜 (RingHom.ker p) j) (η : D →* ℤˣ) (Ψ : D →* Oˣ) (I : Subgroup D) (φ : D)
-    (hφ : (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤)
-    (hd : ∀ n : ℕ, 0 < n → ∃ d : D →* Multiplicative (ZMod n), IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧
-      d φ = Multiplicative.ofAdd 1)
-    (hη : IsLocallyConstant η) (hηI : ∀ s ∈ I, η s = 1) (hΨ : IsLocallyConstant fun g => algebraMap O R (Ψ g : O))
+    (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜]
+    (p : R →ₐ[O] R')
+    (j : ℤ)
+    (hp : Function.Surjective p) (hs : SmallExt O 𝒜 (RingHom.ker p) j)
+    (η : D →* ℤˣ) (Ψ : D →* Oˣ)
+    (I : Subgroup D) (φ : D) (hφ : (I ⊔ Subgroup.zpowers φ).topologicalClosure = ⊤)
+    (hd : ∀ n : ℕ,
+      0 < n
+        → ∃ d : D →* Multiplicative (ZMod n),
+          IsLocallyConstant d ∧ (∀ s ∈ I, d s = 1) ∧ d φ = Multiplicative.ofAdd 1)
+    (hη : IsLocallyConstant η) (hηI : ∀ s ∈ I, η s = 1)
+    (hΨ : IsLocallyConstant fun g => algebraMap O R (Ψ g : O))
     (h2 : 0 < j → Subsingleton (H2 (gRep η ((Units.map (residue O).toMonoidHom).comp Ψ) j)))
     (r' : D →* GG (m := 3) (R := R')) (hr : Red η Ψ r') (hlc : IsLocallyConstant (mats r'))
     (hup : ∀ g a b, wt a b < 0 → (r' g).mat a b = 0)
     (hI : ∀ s ∈ I, ∀ a, (r' s).mat a a = algebraMap O R' (psi Ψ a s))
-    (hgr : ∀ g, ∃ X, GrMat 𝒜 X ∧ X.map p = (r' g).mat) :
-    ∃ r : D →* GG (m := 3) (R := R), push p r = r' ∧ IsLocallyConstant (mats r) ∧ (∀ g, GrMat 𝒜 (r g).mat) ∧
-      (∀ g a b, wt a b < 0 → (r g).mat a b = 0) ∧ ∀ s ∈ I, ∀ a, (r s).mat a a = algebraMap O R (psi Ψ a s) := by
+    (hgr : ∀ g, ∃ X, GrMat 𝒜 X ∧ X.map p = (r' g).mat)
+    : ∃ r : D →* GG (m := 3) (R := R),
+      push p r = r' ∧ IsLocallyConstant (mats r) ∧ (∀ g, GrMat 𝒜 (r g).mat)
+        ∧ (∀ g a b, wt a b < 0 → (r g).mat a b = 0)
+        ∧ ∀ s ∈ I, ∀ a, (r s).mat a a = algebraMap O R (psi Ψ a s) := by
   classical
   haveI : Finite R := hs.fin
   haveI : Finite R' := Finite.of_surjective p hp
@@ -177,7 +220,9 @@ private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRin
   have hu'mat : ∀ g, (u' g).mat = Matrix.diagonal fun a => (r' g).mat a a := fun g => (hdg (rB g)).2
   have hu'right : ∀ g, (u' g).right = η g := fun g => (hdg (rB g)).1.trans (hr.mult g)
   have hu'lc : IsLocallyConstant (mats u') := by
-    have e : mats u' = (fun M : Matrix (Fin 3) (Fin 3) R' => Matrix.diagonal fun a => M a a) ∘ mats r' :=
+    have e
+        : mats u'
+          = (fun M : Matrix (Fin 3) (Fin 3) R' => Matrix.diagonal fun a => M a a) ∘ mats r' :=
       funext hu'mat
     rw [e]
     exact hlc.comp _
@@ -197,15 +242,18 @@ private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRin
   have hu'I : ∀ s ∈ I, ∀ a, (u' s).mat a a = algebraMap O R' (psi Ψ a s) := by
     intro s hsI a
     rw [hu'mat, Matrix.diagonal_apply_eq, hI s hsI a]
-  obtain ⟨u, hpu, hulc, hudiag, huA, huI⟩ := lt_torus (SetLike.GradeZero.subalgebra 𝒜) p hp η Ψ I φ hφ hd hη hηI hΨ
-    u' hu'right hu'lc hu'diag hu'A hu'I
+  obtain ⟨u, hpu, hulc, hudiag, huA, huI⟩ :=
+    lt_torus (SetLike.GradeZero.subalgebra 𝒜) p hp η Ψ I φ hφ hd hη hηI hΨ u' hu'right hu'lc hu'diag
+      hu'A hu'I
   have hur : ∀ g, (u g).right = η g := fun g =>
     (congrArg SemidirectProduct.right (DFunLike.congr_fun hpu g)).trans (hu'right g)
   have hupm : ∀ g, (u g).mat.map p = (u' g).mat := fun g =>
     congrArg GG.mat (DFunLike.congr_fun hpu g)
   let P : GG (m := 3) (R := R') → GG (m := 3) (R := R) → GG (m := 3) (R := R) → Prop := fun y t x =>
-    GG.map (p : R →+* R') x = y ∧ GrMat 𝒜 x.mat ∧ (∀ a b, wt a b < 0 → x.mat a b = 0) ∧ ∀ a, x.mat a a = t.mat a a
-  let L : GG (m := 3) (R := R') → GG (m := 3) (R := R) → GG (m := 3) (R := R) := fun y t => if h : ∃ x, P y t x then h.choose else 1
+    GG.map (p : R →+* R') x = y ∧ GrMat 𝒜 x.mat ∧ (∀ a b, wt a b < 0 → x.mat a b = 0)
+      ∧ ∀ a, x.mat a a = t.mat a a
+  let L : GG (m := 3) (R := R') → GG (m := 3) (R := R) → GG (m := 3) (R := R) := fun y t =>
+    if h : ∃ x, P y t x then h.choose else 1
   let s : D → GG (m := 3) (R := R) := fun g => L (r' g) (u g)
   have hsP : ∀ g, P (r' g) (u g) (s g) := by
     intro g
@@ -232,9 +280,11 @@ private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRin
       by_contra h
       exact hn ((IsLocalRing.mem_maximalIdeal _).2 h)
     apply (IsLocalRing.mem_maximalIdeal _).1 h1
-    have e : p (((s g).mat - ((r0 η Ψ) g).mat.map (algebraMap O R)) a b) =
-        ((r' g).mat - ((r0 η Ψ) g).mat.map (algebraMap O R')) a b := by
-      rw [Matrix.sub_apply, Matrix.sub_apply, map_sub, Matrix.map_apply, Matrix.map_apply, AlgHom.commutes]
+    have e
+        : p (((s g).mat - ((r0 η Ψ) g).mat.map (algebraMap O R)) a b)
+          = ((r' g).mat - ((r0 η Ψ) g).mat.map (algebraMap O R')) a b := by
+      rw [Matrix.sub_apply, Matrix.sub_apply, map_sub, Matrix.map_apply, Matrix.map_apply,
+        AlgHom.commutes]
       congr 1
       rw [← (hsP g).1]
       rfl
@@ -259,9 +309,10 @@ private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRin
       rw [wt_self]
       exact SetLike.GradedOne.one_mem
     · exact Submodule.zero_mem _
-  have hcoc : ∀ g h, ∃ c : Matrix (Fin 3) (Fin 3) R, c ∈ gw R j ∧ EntIn (RingHom.ker p) c ∧
-      (∀ a, c a a = 0) ∧ (∀ a b, wt a b < 0 → c a b = 0) ∧
-      (s g * s h).mat = (1 + c) * (s (g * h)).mat := by
+  have hcoc
+      : ∀ g h, ∃ c : Matrix (Fin 3) (Fin 3) R,
+        c ∈ gw R j ∧ EntIn (RingHom.ker p) c ∧ (∀ a, c a a = 0) ∧ (∀ a b, wt a b < 0 → c a b = 0)
+          ∧ (s g * s h).mat = (1 + c) * (s (g * h)).mat := by
     intro g h
     set z := s g * s h * (s (g * h))⁻¹ with hz
     have hzr : z.right = 1 := by
@@ -303,12 +354,17 @@ private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRin
         exact lt_irrefl _ hab
       rw [Matrix.sub_apply, (hB0 z).1 hzB a b hab, Matrix.one_apply_ne hne, sub_self]
     · rw [add_sub_cancel, ← gg_mul_mat_of_right_eq_one z (s (g * h)) hzr, hz, inv_mul_cancel_right]
-  obtain ⟨r, hrlc, hrg⟩ : ∃ r : D →* GG (m := 3) (R := R), IsLocallyConstant (mats r) ∧ ∀ g, (r g).right = η g ∧
-      ∃ b : Matrix (Fin 3) (Fin 3) R, (∀ a c, wt a c ≤ 0 → b a c = 0) ∧ EntIn (RingHom.ker p) b ∧
-        GrMat 𝒜 b ∧ (r g).mat = (1 + b) * (s g).mat := by
+  obtain ⟨r, hrlc, hrg⟩
+      : ∃ r : D →* GG (m := 3) (R := R),
+        IsLocallyConstant (mats r)
+          ∧ ∀ g,
+            (r g).right = η g
+              ∧ ∃ b : Matrix (Fin 3) (Fin 3) R,
+                (∀ a c, wt a c ≤ 0 → b a c = 0) ∧ EntIn (RingHom.ker p) b ∧ GrMat 𝒜 b
+                  ∧ (r g).mat = (1 + b) * (s g).mat := by
     by_cases hj : 0 < j
-    · obtain ⟨r, hrlc, hrg⟩ := lt_corr η Ψ (RingHom.ker p) j hs.kill hs.le (h2 hj) s hslc hsr hsred
-        (fun g h => by
+    · obtain ⟨r, hrlc, hrg⟩ :=
+        lt_corr η Ψ (RingHom.ker p) j hs.kill hs.le (h2 hj) s hslc hsr hsred (fun g h => by
           obtain ⟨c, hc, hcK, -, -, hce⟩ := hcoc g h
           exact ⟨c, hc, hcK, hce⟩)
       refine ⟨r, hrlc, fun g => ⟨(hrg g).1, ?_⟩⟩
@@ -339,8 +395,18 @@ private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRin
         apply gg_ext
         · rw [hce, hc0, add_zero, one_mul]
         · rw [SemidirectProduct.mul_right, hsr, hsr, hsr, map_mul]
-      refine ⟨MonoidHom.mk' s hmul, hslc.comp GG.mat, fun g => ⟨hsr g, 0, fun _ _ _ => rfl,
-        fun a b => Ideal.zero_mem _, fun a b => Submodule.zero_mem _, ?_⟩⟩
+      refine ⟨
+        MonoidHom.mk' s hmul,
+        hslc.comp GG.mat,
+        fun g => ⟨
+          hsr g,
+          0,
+          fun _ _ _ => rfl,
+          fun a b => Ideal.zero_mem _,
+          fun a b => Submodule.zero_mem _,
+          ?_
+        ⟩
+      ⟩
       rw [add_zero, one_mul]
       rfl
   refine ⟨r, ?_, hrlc, ?_, ?_, ?_⟩
@@ -352,7 +418,8 @@ private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRin
       have hb0 : (1 + b).map (p : R →+* R') = 1 := by
         ext a c
         change p ((1 + b) a c) = (1 : Matrix (Fin 3) (Fin 3) R') a c
-        rw [Matrix.add_apply, map_add (f := _), RingHom.mem_ker.1 (hbK a c), add_zero, Matrix.one_apply, Matrix.one_apply]
+        rw [Matrix.add_apply, map_add (f := _), RingHom.mem_ker.1 (hbK a c), add_zero,
+          Matrix.one_apply, Matrix.one_apply]
         split_ifs <;> simp
       rw [hb0, one_mul]
       rfl
@@ -373,10 +440,12 @@ private theorem tri_lift {O R R' D : Type} [CommRing O] [IsLocalRing O] [CommRin
     obtain ⟨b, hb, -, -, hbe⟩ := (hrg t).2
     rw [hbe, strict_mul hb (hsP t).2.2.1 a a (by rw [wt_self]), (hsP t).2.2.2 a, huI t ht a]
 
-private theorem lift_gg {O R R' : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [CommRing R']
-    [IsLocalRing R'] [Algebra O R'] (p : R →ₐ[O] R') (hp : Function.Surjective p)
-    (y : GG (m := 3) (R := R')) (M : Matrix (Fin 3) (Fin 3) R) (hM : M.map p = y.mat) :
-    ∃ x : GG (m := 3) (R := R), GG.map (p : R →+* R') x = y ∧ x.mat = M := by
+private theorem lift_gg
+    {O R R' : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [CommRing R']
+    [IsLocalRing R'] [Algebra O R']
+    (p : R →ₐ[O] R') (hp : Function.Surjective p)
+    (y : GG (m := 3) (R := R')) (M : Matrix (Fin 3) (Fin 3) R) (hM : M.map p = y.mat)
+    : ∃ x : GG (m := 3) (R := R), GG.map (p : R →+* R') x = y ∧ x.mat = M := by
   have hdet : IsUnit M.det := by
     apply isUnit_of_isUnit_surjective_localRingHom (p : R →+* R') hp
     rw [RingHom.map_det, RingHom.mapMatrix_apply]
@@ -389,24 +458,37 @@ private theorem lift_gg {O R R' : Type} [CommRing O] [CommRing R] [IsLocalRing R
     exact hM
   · rfl
 
-private theorem conjBy_app {C D : Type} [CommRing C] [Group D] (h : GL (Fin 3) C) (r : D →* GG (m := 3) (R := C)) (g : D) :
-    conjBy h r g = GG.ofGL h * r g * (GG.ofGL h)⁻¹ := rfl
+private theorem conjBy_app
+    {C D : Type} [CommRing C] [Group D] (h : GL (Fin 3) C) (r : D →* GG (m := 3) (R := C)) (g : D)
+    : conjBy h r g = GG.ofGL h * r g * (GG.ofGL h)⁻¹ :=
+  rfl
 
-private theorem map_ofGL {C C' : Type} [CommRing C] [CommRing C'] (f : C →+* C') (h : GL (Fin 3) C) :
-    GG.map f (GG.ofGL h) = GG.ofGL (GeneralLinearGroup.map f h) := by
+private theorem map_ofGL {C C' : Type} [CommRing C] [CommRing C'] (f : C →+* C') (h : GL (Fin 3) C)
+    : GG.map f (GG.ofGL h) = GG.ofGL (GeneralLinearGroup.map f h) := by
   simp [GG.map, GG.ofGL, SemidirectProduct.map_inl]
 
 end UpperTheory.V.UnitaryThreeInertia
 
-theorem UpperTheory.V.UnitaryThreeInertia.exists_graded_lift_unitary_local_tame :
-    ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O] [Finite (ResidueField O)]
-      {G Γ ι : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
-      [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [T2Space Γ] [TotallyDisconnectedSpace Γ] [Finite ι] (F : Frame O G Γ ι), F.Ok →
-    F.LocVan → ∀ {R R' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R'] (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜] (p : R →ₐ[O] R') (j : ℤ), Function.Surjective p → SmallExt O 𝒜 (RingHom.ker p) j →
-    ∀ (v : ι), v = F.vl → ∀ (r' : F.D v →* GG (m := 3) (R := R')), Red (F.ηv v) (F.Ψv v) r' → F.LocAt v r' → IsLocallyConstant (mats r') →
-      (∀ g, ∃ X, GrMat 𝒜 X ∧ X.map p = (r' g).mat) →
-      ∃ r : F.D v →* GG (m := 3) (R := R), push p r = r' ∧ F.LocAt v r ∧ IsLocallyConstant (mats r) ∧ ∀ g, GrMat 𝒜 (r g).mat := by
-  intro O _ _ _ _ _ _ G Γ ι _ _ _ _ _ _ _ _ _ _ _ _ _ F hF hV R R' _ _ _ _ _ _ 𝒜 _ p j hp hs v hv r' hr hloc hlc hgr
+theorem UpperTheory.V.UnitaryThreeInertia.exists_graded_lift_unitary_local_tame
+    : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] [Finite (ResidueField O)] {G Γ ι : Type}
+        [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [T2Space G]
+        [TotallyDisconnectedSpace G] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [T2Space Γ] [TotallyDisconnectedSpace Γ] [Finite ι] (F : Frame O G Γ ι),
+      F.Ok → F.LocVan
+        → ∀ {R R' : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing R'] [Algebra O R']
+            [IsCO O R'] (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜] (p : R →ₐ[O] R') (j : ℤ),
+          Function.Surjective p → SmallExt O 𝒜 (RingHom.ker p) j
+            → ∀ (v : ι),
+              v = F.vl
+                → ∀ (r' : F.D v →* GG (m := 3) (R := R')),
+                  Red (F.ηv v) (F.Ψv v) r' → F.LocAt v r' → IsLocallyConstant (mats r')
+                    → (∀ g, ∃ X, GrMat 𝒜 X ∧ X.map p = (r' g).mat)
+                    → ∃ r : F.D v →* GG (m := 3) (R := R),
+                      push p r = r' ∧ F.LocAt v r ∧ IsLocallyConstant (mats r)
+                        ∧ ∀ g, GrMat 𝒜 (r g).mat := by
+  intro O _ _ _ _ _ _ G Γ ι _ _ _ _ _ _ _ _ _ _ _ _ _ F hF hV R R' _ _ _ _ _ _ 𝒜 _ p j hp hs v hv r'
+    hr hloc hlc hgr
   subst hv
   classical
   haveI : Finite R := hs.fin
@@ -414,15 +496,17 @@ theorem UpperTheory.V.UnitaryThreeInertia.exists_graded_lift_unitary_local_tame 
   have hlocc : Continuous (F.loc F.vl) := hF.π_cont.comp continuous_subtype_val
   have hηlc : IsLocallyConstant (F.ηv F.vl) := hF.η_cont.comp_continuous hlocc
   obtain ⟨x, hx1, hx2⟩ := hF.x F.vl hvT
-  obtain ⟨h, hhin, hhg, hh'in, hhtri⟩ := lt_basis 𝒜 p hp (F.ηv F.vl) (F.Ψv F.vl) (F.Iv F.vl) r' x hr hx1 hx2
-    (hloc.1 rfl) (hgr x)
+  obtain ⟨h, hhin, hhg, hh'in, hhtri⟩ :=
+    lt_basis 𝒜 p hp (F.ηv F.vl) (F.Ψv F.vl) (F.Iv F.vl) r' x hr hx1 hx2 (hloc.1 rfl) (hgr x)
   set h' := GeneralLinearGroup.map (p : R →+* R') h with hh'
   obtain ⟨hinv, -, -⟩ := lt_red_conj (F.ηv F.vl) (F.Ψv F.vl) r' h' hh'in hr
   obtain ⟨-, hr'', hlc''⟩ := lt_red_conj (F.ηv F.vl) (F.Ψv F.vl) r' h'⁻¹ hinv hr
   have hup : ∀ g a b, wt a b < 0 → ((conjBy h'⁻¹ r') g).mat a b = 0 :=
     lt_upper _ _ _ x hr'' hx1 hx2 hhtri.tri
-  have hI : ∀ s ∈ F.Iv F.vl, ∀ a, ((conjBy h'⁻¹ r') s).mat a a = algebraMap O R' (psi (F.Ψv F.vl) a s) :=
-    fun s hs a => hhtri.ine s hs (hF.η_I F.vl hvT s hs) a
+  have hI
+      : ∀ s ∈ F.Iv F.vl, ∀ a,
+        ((conjBy h'⁻¹ r') s).mat a a = algebraMap O R' (psi (F.Ψv F.vl) a s) := fun s hs a =>
+    hhtri.ine s hs (hF.η_I F.vl hvT s hs) a
   obtain ⟨S, hS⟩ := lt_grSub (O := O) 𝒜
   have hhS : GG.ofGL h ∈ S := (hS _).2 hhg
   have hmapS : GG.map (p : R →+* R') (GG.ofGL h) = GG.ofGL h' := map_ofGL _ h
@@ -431,17 +515,24 @@ theorem UpperTheory.V.UnitaryThreeInertia.exists_graded_lift_unitary_local_tame 
     obtain ⟨X, hX, hXp⟩ := hgr g
     obtain ⟨y, hy, hyX⟩ := lift_gg p hp (r' g) X hXp
     have hyS : y ∈ S := (hS _).2 (hyX ▸ hX)
-    refine ⟨((GG.ofGL h)⁻¹ * y * GG.ofGL h).mat, (hS _).1 (S.mul_mem (S.mul_mem (S.inv_mem hhS) hyS) hhS), ?_⟩
+    refine ⟨
+      ((GG.ofGL h)⁻¹ * y * GG.ofGL h).mat,
+      (hS _).1 (S.mul_mem (S.mul_mem (S.inv_mem hhS) hyS) hhS),
+      ?_
+    ⟩
     change (GG.map (p : R →+* R') ((GG.ofGL h)⁻¹ * y * GG.ofGL h)).mat = _
     rw [map_mul, map_mul, map_inv, hmapS, hy, conjBy_app, map_inv, inv_inv]
   have hΨ : IsLocallyConstant fun g => algebraMap O R ((F.Ψv F.vl g : Oˣ) : O) :=
     psi_lc (fun g => ((F.Ψv F.vl g : Oˣ) : O)) (fun n => (hF.Ψ_cont n).comp_continuous hlocc)
-  have h2 : 0 < j → Subsingleton (H2 (gRep (F.ηv F.vl)
-      ((Units.map (residue O).toMonoidHom).comp (F.Ψv F.vl)) j)) :=
-    fun hj => hV.h2 F.vl hvT j (ne_of_gt hj)
+  have h2
+      : 0 < j
+        → Subsingleton (H2 (gRep (F.ηv F.vl) ((Units.map (residue O).toMonoidHom).comp (F.Ψv F.vl))
+          j)) := fun hj =>
+    hV.h2 F.vl hvT j (ne_of_gt hj)
   obtain ⟨φ, hφ, hd⟩ := hF.frob F.vl
-  obtain ⟨r0', hpush, hlc0, hgr0, hup0, hI0⟩ := tri_lift 𝒜 p j hp hs (F.ηv F.vl) (F.Ψv F.vl) (F.Iv F.vl) φ hφ hd
-    hηlc (hF.η_I F.vl hvT) hΨ h2 (conjBy h'⁻¹ r') hr'' (hlc'' hηlc hlc) hup hI hgr''
+  obtain ⟨r0', hpush, hlc0, hgr0, hup0, hI0⟩ :=
+    tri_lift 𝒜 p j hp hs (F.ηv F.vl) (F.Ψv F.vl) (F.Iv F.vl) φ hφ hd hηlc (hF.η_I F.vl hvT) hΨ h2
+      (conjBy h'⁻¹ r') hr'' (hlc'' hηlc hlc) hup hI hgr''
   have hr0r : ∀ g, (r0' g).right = F.ηv F.vl g := fun g =>
     (congrArg SemidirectProduct.right (DFunLike.congr_fun hpush g)).trans (hr''.mult g)
   have hr0lc : IsLocallyConstant r0' := lc_hom _ r0' hηlc hr0r hlc0

@@ -5,14 +5,16 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.BlochKatoPhases
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions
 
 namespace GlobalTheory.TameInertiaGen
 
-theorem exists_topGen {H M : Type*} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [CompactSpace H]
-    [Group M] (θ : ℕ → H →* M) (hcl : ∀ n (s : Set M), IsClosed (θ n ⁻¹' s))
-    (hcyc : ∀ n, IsCyclic (θ n).range) (hker : ∀ n σ, θ (n + 1) σ = 1 → θ n σ = 1) :
-    ∃ γ : H, ∀ σ : H, ∃ h ∈ closure (Subgroup.zpowers γ : Set H), ∀ n, θ n (h⁻¹ * σ) = 1 := by
+theorem exists_topGen
+    {H M : Type*} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [CompactSpace H] [Group M]
+    (θ : ℕ → H →* M) (hcl : ∀ n (s : Set M), IsClosed (θ n ⁻¹' s))
+    (hcyc : ∀ n, IsCyclic (θ n).range) (hker : ∀ n σ, θ (n + 1) σ = 1 → θ n σ = 1)
+    : ∃ γ : H, ∀ σ : H, ∃ h ∈ closure (Subgroup.zpowers γ : Set H), ∀ n, θ n (h⁻¹ * σ) = 1 := by
   have key : ∀ n a b, θ n (a⁻¹ * b) = 1 ↔ θ n b = θ n a := by
     intro n a b
     rw [map_mul, map_inv, inv_mul_eq_one, eq_comm]
@@ -45,8 +47,8 @@ theorem exists_topGen {H M : Type*} [Group H] [TopologicalSpace H] [IsTopologica
   rw [Set.mem_iInter] at hh
   exact ⟨h, (hh 0).1, fun n => (key n _ _).2 (hh n).2.symm⟩
 
-theorem exists_nat_gen {Ω : Type*} [Field Ω] [CharZero Ω] (A : ValuationSubring Ω) :
-    ∃ p : ℕ, p ≠ 0 ∧ ∀ a : ℕ, a ≠ 0 → ∃ k : ℕ, A.valuation (a : Ω) = A.valuation (p : Ω) ^ k := by
+theorem exists_nat_gen {Ω : Type*} [Field Ω] [CharZero Ω] (A : ValuationSubring Ω)
+    : ∃ p : ℕ, p ≠ 0 ∧ ∀ a : ℕ, a ≠ 0 → ∃ k : ℕ, A.valuation (a : Ω) = A.valuation (p : Ω) ^ k := by
   have hle : ∀ z : ℤ, A.valuation (z : Ω) ≤ 1 := fun z =>
     (A.valuation_le_one_iff _).mpr (intCast_mem A z)
   obtain ⟨p, hp0, hp⟩ : ∃ p : ℕ, p ≠ 0 ∧ ∀ q : ℕ, q.Prime → q = p ∨ A.valuation (q : Ω) = 1 := by
@@ -82,10 +84,13 @@ theorem exists_nat_gen {Ω : Type*} [Field Ω] [CharZero Ω] (A : ValuationSubri
     obtain ⟨l, hl⟩ := hb (right_ne_zero_of_mul h)
     exact ⟨k + l, by rw [Nat.cast_mul, map_mul, hk, hl, pow_add]⟩
 
-theorem exists_pow_eq {Ω : Type*} [Field Ω] [CharZero Ω] (A : ValuationSubring Ω) {p : ℕ} (hp0 : p ≠ 0)
-    (hp : ∀ a : ℕ, a ≠ 0 → ∃ k : ℕ, A.valuation (a : Ω) = A.valuation (p : Ω) ^ k)
-    {y : Ω} (hy0 : y ≠ 0) (hy : IsAlgebraic ℤ y) :
-    ∃ (m : ℕ) (k : ℤ), m ≠ 0 ∧ A.valuation y ^ m = A.valuation (p : Ω) ^ k := by
+theorem exists_pow_eq
+    {Ω : Type*} [Field Ω] [CharZero Ω]
+    (A : ValuationSubring Ω)
+    {p : ℕ}
+    (hp0 : p ≠ 0) (hp : ∀ a : ℕ, a ≠ 0 → ∃ k : ℕ, A.valuation (a : Ω) = A.valuation (p : Ω) ^ k)
+    {y : Ω} (hy0 : y ≠ 0) (hy : IsAlgebraic ℤ y)
+    : ∃ (m : ℕ) (k : ℤ), m ≠ 0 ∧ A.valuation y ^ m = A.valuation (p : Ω) ^ k := by
   obtain ⟨f, hf0, hf⟩ := hy
   have hz : ∀ a : ℤ, a ≠ 0 → ∃ k : ℕ, A.valuation (a : Ω) = A.valuation (p : Ω) ^ k := by
     intro a ha
@@ -103,8 +108,8 @@ theorem exists_pow_eq {Ω : Type*} [Field Ω] [CharZero Ω] (A : ValuationSubrin
   have hsum : ∑ i ∈ f.support, t i = 0 := by
     rw [← hf, Polynomial.aeval_def, Polynomial.eval₂_eq_sum, Polynomial.sum_def]
     simp [t]
-  obtain ⟨i, hi, hmax⟩ := f.support.exists_max_image (fun i => A.valuation (t i))
-    (Polynomial.support_nonempty.2 hf0)
+  obtain ⟨i, hi, hmax⟩ :=
+    f.support.exists_max_image (fun i => A.valuation (t i)) (Polynomial.support_nonempty.2 hf0)
   have hti : ∀ i ∈ f.support, A.valuation (t i) ≠ 0 := by
     intro i hi
     have := Polynomial.mem_support_iff.1 hi
@@ -119,8 +124,10 @@ theorem exists_pow_eq {Ω : Type*} [Field Ω] [CharZero Ω] (A : ValuationSubrin
     rw [← Finset.add_sum_erase _ _ hi, add_eq_zero_iff_eq_neg] at hsum
     rw [hsum, Valuation.map_neg] at h1
     exact lt_irrefl _ h1
-  have main : ∀ i ∈ f.support, ∀ j ∈ f.support, i < j → A.valuation (t j) = A.valuation (t i) →
-      ∃ (m : ℕ) (k : ℤ), m ≠ 0 ∧ A.valuation y ^ m = A.valuation (p : Ω) ^ k := by
+  have main
+      : ∀ i ∈ f.support, ∀ j ∈ f.support,
+        i < j → A.valuation (t j) = A.valuation (t i)
+          → ∃ (m : ℕ) (k : ℤ), m ≠ 0 ∧ A.valuation y ^ m = A.valuation (p : Ω) ^ k := by
     intro i hi j hj hij he
     obtain ⟨a, ha⟩ := hz _ (Polynomial.mem_support_iff.1 hi)
     obtain ⟨b, hb⟩ := hz _ (Polynomial.mem_support_iff.1 hj)
@@ -138,12 +145,10 @@ theorem exists_pow_eq {Ω : Type*} [Field Ω] [CharZero Ω] (A : ValuationSubrin
 section
 variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
 
-noncomputable def cob (σ : G E Ω) : Ωˣ →* Ωˣ :=
-  Units.map (σ : Ω →* Ω) / MonoidHom.id Ωˣ
+noncomputable def cob (σ : G E Ω) : Ωˣ →* Ωˣ := Units.map (σ : Ω →* Ω) / MonoidHom.id Ωˣ
 
 omit [NumberField E] in
-theorem coe_cob (σ : G E Ω) (y : Ωˣ) : (cob σ y : Ω) = σ y / y := by
-  simp [cob]
+theorem coe_cob (σ : G E Ω) (y : Ωˣ) : (cob σ y : Ω) = σ y / y := by simp [cob]
 
 omit [NumberField E] in
 theorem cob_mul (σ τ : G E Ω) (y : Ωˣ) : cob (σ * τ) y = cob σ (cob τ y) * cob σ y * cob τ y := by
@@ -154,14 +159,19 @@ theorem cob_mul (σ τ : G E Ω) (y : Ωˣ) : cob (σ * τ) y = cob σ (cob τ y
   simp only [Units.val_mul, coe_cob, AlgEquiv.mul_apply, map_div₀]
   field_simp
 
-theorem cob_mem_of_unit {A : ValuationSubring Ω} {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A) {u : Ωˣ}
-    (hu : A.valuation (u : Ω) = 1) : cob σ u ∈ A.principalUnitGroup := by
-  rw [ValuationSubring.mem_principalUnitGroup_iff, coe_cob, div_sub_one u.ne_zero, map_div₀, hu, div_one]
+theorem cob_mem_of_unit
+    {A : ValuationSubring Ω} {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A)
+    {u : Ωˣ} (hu : A.valuation (u : Ω) = 1)
+    : cob σ u ∈ A.principalUnitGroup := by
+  rw [ValuationSubring.mem_principalUnitGroup_iff, coe_cob, div_sub_one u.ne_zero, map_div₀, hu,
+    div_one]
   exact hσ.2 _ hu.le
 
-theorem cob_mem_of_zpow {A : ValuationSubring Ω} {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A) {r y : Ωˣ} {k : ℤ}
-    (hr : cob σ r ∈ A.principalUnitGroup) (hy : A.valuation (y : Ω) = A.valuation (r : Ω) ^ k) :
-    cob σ y ∈ A.principalUnitGroup := by
+theorem cob_mem_of_zpow
+    {A : ValuationSubring Ω} {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A)
+    {r y : Ωˣ} {k : ℤ}
+    (hr : cob σ r ∈ A.principalUnitGroup) (hy : A.valuation (y : Ω) = A.valuation (r : Ω) ^ k)
+    : cob σ y ∈ A.principalUnitGroup := by
   have e : y = (y / r ^ k) * r ^ k := by simp
   rw [e, map_mul, map_zpow]
   refine mul_mem (cob_mem_of_unit hσ ?_) (zpow_mem hr k)
@@ -172,35 +182,48 @@ omit [NumberField E] in
 theorem cob_pow_eq_one (σ : G E Ω) {r : Ωˣ} {N p : ℕ} (hr : (r : Ω) ^ N = p) : cob σ r ^ N = 1 := by
   rw [← map_pow]
   ext
-  rw [coe_cob, Units.val_pow_eq_pow_val, hr, map_natCast, div_self (hr ▸ pow_ne_zero _ r.ne_zero), Units.val_one]
+  rw [coe_cob, Units.val_pow_eq_pow_val, hr, map_natCast, div_self (hr ▸ pow_ne_zero _ r.ne_zero),
+    Units.val_one]
 
-noncomputable def tameChar (A : ValuationSubring Ω) {r : Ωˣ} {N p : ℕ} (hN : N ≠ 0) (hr : (r : Ω) ^ N = p) :
-    Ine (F := E) A →* Ωˣ ⧸ A.principalUnitGroup :=
-  MonoidHom.mk' (fun σ => QuotientGroup.mk (cob σ.1 r)) fun σ τ => by
-    have h : cob σ.1 (cob τ.1 r) ∈ A.principalUnitGroup :=
-      cob_mem_of_unit σ.2 (valuation_eq_one_of_pow_eq_one A hN (by
-        rw [← Units.val_pow_eq_pow_val, cob_pow_eq_one τ.1 hr, Units.val_one]))
-    rw [Subgroup.coe_mul, cob_mul, QuotientGroup.mk_mul, QuotientGroup.mk_mul,
-      (QuotientGroup.eq_one_iff _).2 h, one_mul]
+noncomputable def tameChar
+    (A : ValuationSubring Ω) {r : Ωˣ} {N p : ℕ} (hN : N ≠ 0) (hr : (r : Ω) ^ N = p)
+    : Ine (F := E) A →* Ωˣ ⧸ A.principalUnitGroup :=
+  MonoidHom.mk'
+    (fun σ => QuotientGroup.mk (cob σ.1 r))
+    fun σ τ => by
+      have h : cob σ.1 (cob τ.1 r) ∈ A.principalUnitGroup :=
+        cob_mem_of_unit σ.2
+          (valuation_eq_one_of_pow_eq_one A hN
+            (by rw [← Units.val_pow_eq_pow_val, cob_pow_eq_one τ.1 hr, Units.val_one]))
+      rw [Subgroup.coe_mul, cob_mul, QuotientGroup.mk_mul, QuotientGroup.mk_mul,
+        (QuotientGroup.eq_one_iff _).2 h, one_mul]
 
-theorem tameChar_eq_one {A : ValuationSubring Ω} {r : Ωˣ} {N p : ℕ} (hN : N ≠ 0) (hr : (r : Ω) ^ N = p)
-    (σ : Ine (F := E) A) : tameChar A hN hr σ = 1 ↔ cob σ.1 r ∈ A.principalUnitGroup :=
+theorem tameChar_eq_one
+    {A : ValuationSubring Ω} {r : Ωˣ} {N p : ℕ}
+    (hN : N ≠ 0) (hr : (r : Ω) ^ N = p) (σ : Ine (F := E) A)
+    : tameChar A hN hr σ = 1 ↔ cob σ.1 r ∈ A.principalUnitGroup :=
   QuotientGroup.eq_one_iff _
 
-theorem isCyclic_range (A : ValuationSubring Ω) {r : Ωˣ} {N p : ℕ} (hN : N ≠ 0) (hr : (r : Ω) ^ N = p) :
-    IsCyclic (tameChar (E := E) A hN hr).range := by
+theorem isCyclic_range
+    (A : ValuationSubring Ω) {r : Ωˣ} {N p : ℕ} (hN : N ≠ 0) (hr : (r : Ω) ^ N = p)
+    : IsCyclic (tameChar (E := E) A hN hr).range := by
   have : NeZero N := ⟨hN⟩
   have : IsCyclic ((rootsOfUnity N Ω).map (QuotientGroup.mk' A.principalUnitGroup)) :=
     isCyclic_of_surjective _ ((QuotientGroup.mk' A.principalUnitGroup).subgroupMap_surjective _)
-  refine Subgroup.isCyclic_of_le (H' := (rootsOfUnity N Ω).map (QuotientGroup.mk' A.principalUnitGroup)) ?_
+  refine Subgroup.isCyclic_of_le
+    (H' := (rootsOfUnity N Ω).map (QuotientGroup.mk' A.principalUnitGroup)) ?_
   rintro _ ⟨σ, rfl⟩
   exact ⟨cob σ.1 r, cob_pow_eq_one σ.1 hr, rfl⟩
 
-theorem isClosed_preimage [IsAlgClosure E Ω] (A : ValuationSubring Ω) {r : Ωˣ} {N p : ℕ} (hN : N ≠ 0)
-    (hr : (r : Ω) ^ N = p) (s : Set (Ωˣ ⧸ A.principalUnitGroup)) :
-    IsClosed (tameChar (E := E) A hN hr ⁻¹' s) := by
-  have h := (isClosed_setOf_apply (F := E) (r : Ω)
-    (fun t => ∃ u : Ωˣ, (u : Ω) = t / r ∧ QuotientGroup.mk u ∈ s)).preimage
+theorem isClosed_preimage
+    [IsAlgClosure E Ω]
+    (A : ValuationSubring Ω)
+    {r : Ωˣ} {N p : ℕ} (hN : N ≠ 0) (hr : (r : Ω) ^ N = p)
+    (s : Set (Ωˣ ⧸ A.principalUnitGroup))
+    : IsClosed (tameChar (E := E) A hN hr ⁻¹' s) := by
+  have h :=
+    (isClosed_setOf_apply (F := E) (r : Ω)
+        (fun t => ∃ u : Ωˣ, (u : Ω) = t / r ∧ QuotientGroup.mk u ∈ s)).preimage
       (continuous_subtype_val (p := fun σ : G E Ω => σ ∈ Ine (F := E) A))
   convert h using 1
   ext σ
@@ -212,8 +235,8 @@ theorem isClosed_preimage [IsAlgClosure E Ω] (A : ValuationSubring Ω) {r : Ω�
     subst this
     exact h
 
-theorem exists_tameGenAt_of_valuationSubring [IsAlgClosure E Ω] (A : ValuationSubring Ω) :
-    ∃ γ : G E Ω, TameGenAt A γ := by
+theorem exists_tameGenAt_of_valuationSubring [IsAlgClosure E Ω] (A : ValuationSubring Ω)
+    : ∃ γ : G E Ω, TameGenAt A γ := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   have : IsGalois E Ω := {}
@@ -230,12 +253,16 @@ theorem exists_tameGenAt_of_valuationSubring [IsAlgClosure E Ω] (A : ValuationS
   choose r hr using hroot
   have hvr : ∀ n, A.valuation (p : Ω) = A.valuation (r n : Ω) ^ (n.factorial : ℤ) := fun n => by
     rw [← hr n, map_pow, zpow_natCast]
-  obtain ⟨γ, hγ⟩ := exists_topGen (fun n => tameChar (E := E) A n.factorial_ne_zero (hr n))
-    (fun n s => isClosed_preimage A _ _ s) (fun n => isCyclic_range A _ _) (fun n σ h => by
-      rw [tameChar_eq_one] at h ⊢
-      refine cob_mem_of_zpow σ.2 (k := (n + 1 : ℕ)) h ?_
-      rw [zpow_natCast, ← pow_left_inj₀ zero_le zero_le n.factorial_ne_zero, ← pow_mul, ← Nat.factorial_succ,
-        ← map_pow, ← map_pow, hr, hr])
+  obtain ⟨γ, hγ⟩ :=
+    exists_topGen
+      (fun n => tameChar (E := E) A n.factorial_ne_zero (hr n))
+      (fun n s => isClosed_preimage A _ _ s)
+      (fun n => isCyclic_range A _ _)
+      (fun n σ h => by
+        rw [tameChar_eq_one] at h ⊢
+        refine cob_mem_of_zpow σ.2 (k := (n + 1 : ℕ)) h ?_
+        rw [zpow_natCast, ← pow_left_inj₀ zero_le zero_le n.factorial_ne_zero, ← pow_mul,
+          ← Nat.factorial_succ, ← map_pow, ← map_pow, hr, hr])
   refine ⟨γ.1, γ.2, fun σ hσ => ?_⟩
   obtain ⟨h, hh, hw⟩ := hγ ⟨σ, hσ⟩
   set C : Subgroup (G E Ω) :=
@@ -251,13 +278,15 @@ theorem exists_tameGenAt_of_valuationSubring [IsAlgClosure E Ω] (A : ValuationS
       exact (IsFractionRing.isAlgebraic_iff ℤ ℚ Ω).2 (Algebra.IsAlgebraic.isAlgebraic y)
     obtain ⟨m, k, hm, hk⟩ := exists_pow_eq A hp0 hp hy halg
     obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hm
-    have := cob_mem_of_zpow (y := Units.mk0 y hy) (k := (m.factorial : ℤ) * k) (h⁻¹ * ⟨σ, hσ⟩).2
-      ((tameChar_eq_one _ _ _).1 (hw (m + 1))) (by
-        rw [Units.val_mk0, ← pow_left_inj₀ zero_le zero_le hm, hk, hvr (m + 1), ← zpow_natCast, ← zpow_mul,
-          ← zpow_mul, Nat.factorial_succ]
-        congr 1
-        push_cast
-        ring)
+    have :=
+      cob_mem_of_zpow (y := Units.mk0 y hy) (k := (m.factorial : ℤ) * k) (h⁻¹ * ⟨σ, hσ⟩).2
+        ((tameChar_eq_one _ _ _).1 (hw (m + 1)))
+        (by
+          rw [Units.val_mk0, ← pow_left_inj₀ zero_le zero_le hm, hk, hvr (m + 1), ← zpow_natCast,
+            ← zpow_mul, ← zpow_mul, Nat.factorial_succ]
+          congr 1
+          push_cast
+          ring)
     rw [ValuationSubring.mem_principalUnitGroup_iff, coe_cob] at this
     exact this
   have h3 := C.topologicalClosure.mul_mem h1 (C.le_topologicalClosure h2)
@@ -266,8 +295,10 @@ theorem exists_tameGenAt_of_valuationSubring [IsAlgClosure E Ω] (A : ValuationS
 
 end
 
-theorem exists_tameGenAt : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (v : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω), IsPlaceOver A v → ∃ γ : G E Ω, TameGenAt A γ :=
-  fun _ _ _ _ _ _ _ _ A _ => exists_tameGenAt_of_valuationSubring A
+theorem exists_tameGenAt
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (v : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω),
+      IsPlaceOver A v → ∃ γ : G E Ω, TameGenAt A γ := fun _ _ _ _ _ _ _ _ A _ =>
+  exists_tameGenAt_of_valuationSubring A
 
 end GlobalTheory.TameInertiaGen

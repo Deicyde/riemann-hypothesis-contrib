@@ -18,8 +18,9 @@ namespace FiniteSubfield
 
 variable {F E : FiniteSubfield} [Fact (F ≤ E)]
 
-theorem apply_mem_of_normal_field [Normal F.1 E.1] {g : ℚ̄ ≃ₐ[ℚ] ℚ̄} (hg : g ∈ F.1.fixingSubgroup)
-    {x : ℚ̄} (hx : x ∈ E.1) : g x ∈ E.1 := by
+theorem apply_mem_of_normal_field
+    [Normal F.1 E.1] {g : ℚ̄ ≃ₐ[ℚ] ℚ̄} (hg : g ∈ F.1.fixingSubgroup) {x : ℚ̄} (hx : x ∈ E.1)
+    : g x ∈ E.1 := by
   let g' : ℚ̄ ≃ₐ[F.1] ℚ̄ := IntermediateField.fixingSubgroupEquiv F.1 ⟨g, hg⟩
   have : IsScalarTower F.1 E.1 ℚ̄ := IsScalarTower.of_algebraMap_eq fun _ ↦ rfl
   have h := AlgEquiv.restrictNormal_commutes g' E.1 ⟨x, hx⟩
@@ -27,8 +28,8 @@ theorem apply_mem_of_normal_field [Normal F.1 E.1] {g : ℚ̄ ≃ₐ[ℚ] ℚ̄}
   rw [← e, ← show algebraMap E.1 ℚ̄ ⟨x, hx⟩ = x from rfl, ← h]
   exact (g'.restrictNormal E.1 ⟨x, hx⟩).2
 
-theorem normal_subgroupOf_of_isGalois [IsGalois F.1 E.1] :
-    (E.1.fixingSubgroup.subgroupOf F.1.fixingSubgroup).Normal := by
+theorem normal_subgroupOf_of_isGalois [IsGalois F.1 E.1]
+    : (E.1.fixingSubgroup.subgroupOf F.1.fixingSubgroup).Normal := by
   refine ⟨fun l hl g ↦ ?_⟩
   rw [Subgroup.mem_subgroupOf, IntermediateField.mem_fixingSubgroup_iff] at hl ⊢
   intro x hx
@@ -42,30 +43,31 @@ end FiniteSubfield
 
 section Transfer
 
-variable {K K' L L' : Type*} [Field K] [NumberField K] [Field K'] [NumberField K'] [Field L]
+variable
+  {K K' L L' : Type*} [Field K] [NumberField K] [Field K'] [NumberField K'] [Field L]
   [NumberField L] [Field L'] [NumberField L'] [Algebra K K'] [Algebra K L] [Algebra K L']
   [Algebra K' L'] [Algebra L L'] [IsScalarTower K K' L'] [IsScalarTower K L L']
 
-
 omit [NumberField K] [NumberField K'] in
-theorem finrank_eq_one_of_bijective (hK : Function.Bijective (algebraMap K K')) :
-    Module.finrank K K' = 1 :=
+theorem finrank_eq_one_of_bijective (hK : Function.Bijective (algebraMap K K'))
+    : Module.finrank K K' = 1 :=
   (AlgEquiv.ofBijective (Algebra.ofId K K') hK).toLinearEquiv.finrank_eq.symm.trans
     (Module.finrank_self K)
 
-
 omit [Algebra K L] [Algebra K L'] [Algebra K' L'] [Algebra L L'] [IsScalarTower K K' L']
   [IsScalarTower K L L'] in
-theorem ideleNorm_ideleEmbedding_of_bijective (hK : Function.Bijective (algebraMap K K'))
-    (x : IdeleGroup K) : ideleNorm K K' (ideleEmbedding K K' x) = x := by
+theorem ideleNorm_ideleEmbedding_of_bijective
+    (hK : Function.Bijective (algebraMap K K')) (x : IdeleGroup K)
+    : ideleNorm K K' (ideleEmbedding K K' x) = x := by
   rw [ideleNorm_ideleEmbedding, finrank_eq_one_of_bijective hK, pow_one]
 
 variable [IsGalois K L]
 
-
 omit [NumberField K] [NumberField K'] [NumberField L] [NumberField L'] in
-theorem restrictNormal_restrictScalars_eq_one (hL : Function.Bijective (algebraMap L L'))
-    {σ : L' ≃ₐ[K'] L'} (h : (σ.restrictScalars K).restrictNormal L = 1) : σ = 1 := by
+theorem restrictNormal_restrictScalars_eq_one
+    (hL : Function.Bijective (algebraMap L L'))
+    {σ : L' ≃ₐ[K'] L'} (h : (σ.restrictScalars K).restrictNormal L = 1)
+    : σ = 1 := by
   refine AlgEquiv.ext fun y ↦ ?_
   obtain ⟨l, rfl⟩ := hL.2 y
   have e := AlgEquiv.restrictNormal_commutes (σ.restrictScalars K) L l
@@ -74,24 +76,26 @@ theorem restrictNormal_restrictScalars_eq_one (hL : Function.Bijective (algebraM
 
 variable [IsMulCommutative (L ≃ₐ[K] L)] [IsGalois K' L'] [IsMulCommutative (L' ≃ₐ[K'] L')]
 
-theorem ideleSymbol_diagonal_of_bijective (hK : Function.Bijective (algebraMap K K'))
-    (hA : ∀ a : K'ˣ, ideleSymbol K' L' (diagonal K' a) = 1) (a : Kˣ) :
-    ideleSymbol K L (diagonal K a) = 1 := by
+theorem ideleSymbol_diagonal_of_bijective
+    (hK : Function.Bijective (algebraMap K K'))
+    (hA : ∀ a : K'ˣ, ideleSymbol K' L' (diagonal K' a) = 1) (a : Kˣ)
+    : ideleSymbol K L (diagonal K a) = 1 := by
   rw [← ideleNorm_ideleEmbedding_of_bijective hK (diagonal K a),
     ← restrictNormal_restrictScalars_ideleSymbol (L := L) (L' := L'), ideleEmbedding_diagonal, hA]
   exact map_one ((AlgEquiv.restrictNormalHom (F := K) (K₁ := L') L).comp (restrictScalarsHom K))
 
-theorem ker_ideleSymbol_le_of_bijective (hK : Function.Bijective (algebraMap K K'))
-    (hL : Function.Bijective (algebraMap L L'))
-    (hker : (ideleSymbol K' L').ker ≤ (diagonal K').range ⊔ (ideleNorm K' L').range) :
-    (ideleSymbol K L).ker ≤ (diagonal K).range ⊔ (ideleNorm K L).range := by
+theorem ker_ideleSymbol_le_of_bijective
+    (hK : Function.Bijective (algebraMap K K')) (hL : Function.Bijective (algebraMap L L'))
+    (hker : (ideleSymbol K' L').ker ≤ (diagonal K').range ⊔ (ideleNorm K' L').range)
+    : (ideleSymbol K L).ker ≤ (diagonal K).range ⊔ (ideleNorm K L).range := by
   intro x hx
   have h1 : ideleSymbol K' L' (ideleEmbedding K K' x) = 1 := by
     refine restrictNormal_restrictScalars_eq_one (K := K) hL ?_
     rw [restrictNormal_restrictScalars_ideleSymbol, ideleNorm_ideleEmbedding_of_bijective hK]
     exact hx
-  have hmap : ((diagonal K').range ⊔ (ideleNorm K' L').range).map (ideleNorm K K') ≤
-      (diagonal K).range ⊔ (ideleNorm K L).range := by
+  have hmap
+      : ((diagonal K').range ⊔ (ideleNorm K' L').range).map (ideleNorm K K')
+        ≤ (diagonal K).range ⊔ (ideleNorm K L).range := by
     rw [Subgroup.map_sup]
     refine sup_le_sup ?_ ?_
     · rintro _ ⟨_, ⟨b, rfl⟩, rfl⟩
@@ -112,15 +116,20 @@ def rangeMap {A : Type*} [Field A] [Algebra ℚ A] (f : A →ₐ[ℚ] ℚ̄) : A
   map_zero' := Subtype.ext (map_zero f)
   map_add' a b := Subtype.ext (map_add f a b)
 
-theorem rangeMap_bijective {A : Type*} [Field A] [Algebra ℚ A] (f : A →ₐ[ℚ] ℚ̄) :
-    Function.Bijective (rangeMap f) :=
+theorem rangeMap_bijective {A : Type*} [Field A] [Algebra ℚ A] (f : A →ₐ[ℚ] ℚ̄)
+    : Function.Bijective (rangeMap f) :=
   ⟨(rangeMap f).injective, by rintro ⟨_, a, rfl⟩; exact ⟨a, rfl⟩⟩
 
-theorem finiteDimensional_fieldRange {A : Type*} [Field A] [NumberField A] (f : A →ₐ[ℚ] ℚ̄) :
-    FiniteDimensional ℚ f.fieldRange :=
+theorem finiteDimensional_fieldRange {A : Type*} [Field A] [NumberField A] (f : A →ₐ[ℚ] ℚ̄)
+    : FiniteDimensional ℚ f.fieldRange :=
   Module.Finite.of_surjective
-    ({ toFun := rangeMap f, map_add' := map_add _, map_smul' := fun c a ↦ Subtype.ext (f.toLinearMap.map_smul c a) } :
-      A →ₗ[ℚ] f.fieldRange) (rangeMap_bijective f).2
+    ({
+       toFun := rangeMap f
+       map_add' := map_add _
+       map_smul' := fun c a ↦ Subtype.ext (f.toLinearMap.map_smul c a)
+     }
+      : A →ₗ[ℚ] f.fieldRange)
+    (rangeMap_bijective f).2
 
 variable (K L : Type*) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
 
@@ -139,9 +148,9 @@ instance fact_baseField_le : Fact (baseField K L ≤ topField L) :=
 
 variable {K L} [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)]
 
-theorem ideleSymbol_diagonal_and_ker_le :
-    (∀ a : Kˣ, ideleSymbol K L (diagonal K a) = 1) ∧
-      (ideleSymbol K L).ker ≤ (diagonal K).range ⊔ (ideleNorm K L).range := by
+theorem ideleSymbol_diagonal_and_ker_le
+    : (∀ a : Kˣ, ideleSymbol K L (diagonal K a) = 1)
+      ∧ (ideleSymbol K L).ker ≤ (diagonal K).range ⊔ (ideleNorm K L).range := by
   let K' := baseField K L
   let L' := topField L
   let _ : Algebra K K'.1 := (rangeMap (baseEmbedding K L)).toAlgebra
@@ -156,22 +165,29 @@ theorem ideleSymbol_diagonal_and_ker_le :
   have : IsGalois K'.1 L'.1 := IsGalois.tower_top_of_isGalois K K'.1 L'.1
   have : IsMulCommutative (L'.1 ≃ₐ[K'.1] L'.1) := by
     refine ⟨⟨fun σ τ ↦ ?_⟩⟩
-    let f := (AlgEquiv.restrictNormalHom (F := K) (K₁ := L'.1) L).comp (restrictScalarsHom (K' := K'.1) (L' := L'.1) K)
-    have h := restrictNormal_restrictScalars_eq_one (K := K) (K' := K'.1) (L := L) (L' := L'.1) hL
-      (σ := σ * τ * (τ * σ)⁻¹) (by
-      change f (σ * τ * (τ * σ)⁻¹) = 1
-      rw [map_mul, map_inv, map_mul, map_mul, mul_comm' (f σ) (f τ), mul_inv_cancel])
+    let f :=
+      (AlgEquiv.restrictNormalHom (F := K) (K₁ := L'.1) L).comp
+        (restrictScalarsHom (K' := K'.1) (L' := L'.1) K)
+    have h :=
+      restrictNormal_restrictScalars_eq_one (K := K) (K' := K'.1) (L := L) (L' := L'.1) hL
+        (σ := σ * τ * (τ * σ)⁻¹)
+        (by
+          change f (σ * τ * (τ * σ)⁻¹) = 1
+          rw [map_mul, map_inv, map_mul, map_mul, mul_comm' (f σ) (f τ), mul_inv_cancel])
     rwa [mul_inv_eq_one] at h
   have := FiniteSubfield.normal_subgroupOf_of_isGalois (F := K') (E := L')
-  exact ⟨ideleSymbol_diagonal_of_bijective hK (IdeleClassLimit.ideleSymbol_diagonal K' L'),
-    ker_ideleSymbol_le_of_bijective hK hL (IdeleClassLimit.ker_ideleSymbol K' L').le⟩
+  exact ⟨
+    ideleSymbol_diagonal_of_bijective hK (IdeleClassLimit.ideleSymbol_diagonal K' L'),
+    ker_ideleSymbol_le_of_bijective hK hL (IdeleClassLimit.ker_ideleSymbol K' L').le
+  ⟩
 
 end Embedding
 
 section Reciprocity
 
-variable {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)]
+variable
+  {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+  [IsMulCommutative (L ≃ₐ[K] L)]
 
 theorem ideleSymbol_diagonal (a : Kˣ) : ideleSymbol K L (diagonal K a) = 1 :=
   ideleSymbol_diagonal_and_ker_le.1 a
@@ -184,19 +200,17 @@ theorem ker_ideleSymbol : (ideleSymbol K L).ker = (diagonal K).range ⊔ (ideleN
   le_antisymm ideleSymbol_diagonal_and_ker_le.2
     (sup_le diagonal_range_le_ker_ideleSymbol (range_ideleNorm_le_ker_ideleSymbol L))
 
-
 omit [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)] in
 instance ideleClassNorm_range_normal : (ideleClassNorm K L).range.Normal :=
   ⟨fun n hn g ↦ by rwa [mul_comm g n, mul_inv_cancel_right]⟩
-
 
 variable (K L) in
 def reciprocityMap : IdeleClassGroup K →* (L ≃ₐ[K] L) :=
   QuotientGroup.lift _ (ideleSymbol K L) diagonal_range_le_ker_ideleSymbol
 
 @[simp]
-theorem reciprocityMap_mk (x : IdeleGroup K) :
-    reciprocityMap K L (IdeleClassGroup.mk K x) = ideleSymbol K L x :=
+theorem reciprocityMap_mk (x : IdeleGroup K)
+    : reciprocityMap K L (IdeleClassGroup.mk K x) = ideleSymbol K L x :=
   rfl
 
 theorem continuous_reciprocityMap : Continuous (reciprocityMap K L) :=
@@ -228,21 +242,23 @@ universe u
 
 section Isomorphism
 
-variable {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)]
+variable
+  {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+  [IsMulCommutative (L ≃ₐ[K] L)]
 
 theorem reciprocityMap_surjective : Function.Surjective (reciprocityMap K L) := fun σ ↦
   let ⟨x, hx⟩ := ideleSymbol_surjective (K := K) (L := L) σ
   ⟨IdeleClassGroup.mk K x, hx⟩
-
 
 variable (K L) in
 def reciprocityMapEquiv : IdeleClassGroup K ⧸ (ideleClassNorm K L).range ≃* (L ≃ₐ[K] L) :=
   (QuotientGroup.quotientMulEquivOfEq (ker_reciprocityMap (K := K) (L := L)).symm).trans
     (QuotientGroup.quotientKerEquivOfSurjective _ reciprocityMap_surjective)
 
-theorem index_range_ideleClassNorm_eq_finrank_of_isMulCommutative : (ideleClassNorm K L).range.index = Module.finrank K L := by
-  rw [Subgroup.index, Nat.card_congr (reciprocityMapEquiv K L).toEquiv, IsGalois.card_aut_eq_finrank]
+theorem index_range_ideleClassNorm_eq_finrank_of_isMulCommutative
+    : (ideleClassNorm K L).range.index = Module.finrank K L := by
+  rw [Subgroup.index, Nat.card_congr (reciprocityMapEquiv K L).toEquiv,
+    IsGalois.card_aut_eq_finrank]
 
 end Isomorphism
 

@@ -9,12 +9,14 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem span_image_inf_of_linearIndependent {K V W ι : Type} [Field K] [AddCommGroup V]
-    [Module K V] [AddCommGroup W] [Module ℂ W] [Finite ι] (σ : K →+* ℂ) (j : V →ₛₗ[σ] W)
+theorem span_image_inf_of_linearIndependent
+    {K V W ι : Type}
+    [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module ℂ W] [Finite ι]
+    (σ : K →+* ℂ) (j : V →ₛₗ[σ] W)
     (b : Module.Basis ι K V) (hb : LinearIndependent ℂ (fun k => j (b k)))
-    (U U' : Submodule K V) :
-    Submodule.span ℂ (j '' (U : Set V)) ⊓ Submodule.span ℂ (j '' (U' : Set V)) =
-      Submodule.span ℂ (j '' ((U ⊓ U' : Submodule K V) : Set V)) := by
+    (U U' : Submodule K V)
+    : Submodule.span ℂ (j '' (U : Set V)) ⊓ Submodule.span ℂ (j '' (U' : Set V))
+      = Submodule.span ℂ (j '' ((U ⊓ U' : Submodule K V) : Set V)) := by
   classical
   letI : Algebra K ℂ := σ.toAlgebra
   haveI := Fintype.ofFinite ι
@@ -27,14 +29,14 @@ theorem span_image_inf_of_linearIndependent {K V W ι : Type} [Field K] [AddComm
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← b.sum_repr v, TensorProduct.tmul_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
-    rw [TensorProduct.tmul_smul, map_smulₛₗ j, ← hJb, ← map_smul,
-      ← algebraMap_smul ℂ (b.repr v k)]
+    rw [TensorProduct.tmul_smul, map_smulₛₗ j, ← hJb, ← map_smul, ← algebraMap_smul ℂ (b.repr v k)]
     rfl
   have hinj : Function.Injective J := by
     apply Module.Basis.injective_constr_of_linearIndependent
     exact hb
-  have key : ∀ A : Submodule K V,
-      Submodule.span ℂ (j '' (A : Set V)) = (A.baseChange ℂ).map J := fun A => by
+  have key
+      : ∀ A : Submodule K V,
+        Submodule.span ℂ (j '' (A : Set V)) = (A.baseChange ℂ).map J := fun A => by
     rw [Submodule.baseChange_eq_span, Submodule.map_span, Submodule.map_coe, Set.image_image]
     congr 1
     exact Set.image_congr fun v _ => (hJ v).symm

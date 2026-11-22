@@ -26,7 +26,8 @@ theorem ParamOffRegularZero.proof : ParamOffRegularZero.Statement := by
     exact (LinearMap.toContinuousLinearMap (Matrix.mulVecLin A)).differentiableAt.comp w hσw
   have hnull : volume (g '' C) = 0 := by
     refine addHaar_image_eq_zero_of_det_fderivWithin_eq_zero volume
-      (f' := fun w => (fderiv ℂ g w).restrictScalars ℝ) ?_ ?_
+      (f' := fun w => (fderiv ℂ g w).restrictScalars ℝ)
+      ?_ ?_
     · intro w hw
       exact ((hgd w hw.1).hasFDerivAt.restrictScalars ℝ).hasFDerivWithinAt
     · intro w hw

@@ -20,8 +20,11 @@ namespace GlobalTheory.HL.CoordHeight
 
 section Val
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E)
+variable
+  {F : Type}
+  [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
+  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+  (L : LocE F E)
   (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ)
 include hϖ
 
@@ -30,13 +33,15 @@ theorem vE_one : vE L ϖ (algebraMap F E 1) = 0 := by
   rw [mul_one] at h
   omega
 
-theorem vE_unit (x : F) (hx : x ≠ 0) (h1 : algebraMap F E x ∈ L.O)
-    (h2 : ∃ y ∈ L.O, algebraMap F E x * y = 1) : vE L ϖ (algebraMap F E x) = 0 := by
+theorem vE_unit
+    (x : F) (hx : x ≠ 0) (h1 : algebraMap F E x ∈ L.O) (h2 : ∃ y ∈ L.O, algebraMap F E x * y = 1)
+    : vE L ϖ (algebraMap F E x) = 0 := by
   obtain ⟨hadd, -, hint, -⟩ := GlobalTheory.UnramVal.vE_valuation L ϖ hϖ
   obtain ⟨-, -, -, -, hO, -⟩ := GlobalTheory.UnramOrder.order_facts L ϖ hϖ
   obtain ⟨y, hy, hxy⟩ := h2
   have e : y = algebraMap F E x⁻¹ := by
-    calc y = algebraMap F E (x⁻¹ * x) * y := by rw [inv_mul_cancel₀ hx, map_one, one_mul]
+    calc
+      y = algebraMap F E (x⁻¹ * x) * y := by rw [inv_mul_cancel₀ hx, map_one, one_mul]
       _ = algebraMap F E x⁻¹ := by rw [map_mul, mul_assoc, hxy, mul_one]
   have a1 := (hint x hx).2 ((hO x).1 h1)
   have a2 := (hint x⁻¹ (inv_ne_zero hx)).2 ((hO _).1 (e ▸ hy))
@@ -44,8 +49,8 @@ theorem vE_unit (x : F) (hx : x ≠ 0) (h1 : algebraMap F E x ∈ L.O)
   rw [mul_inv_cancel₀ hx, vE_one L ϖ hϖ] at a3
   omega
 
-theorem vE_pow (x : F) (hx : x ≠ 0) (n : ℕ) :
-    vE L ϖ (algebraMap F E (x ^ n)) = n * vE L ϖ (algebraMap F E x) := by
+theorem vE_pow (x : F) (hx : x ≠ 0) (n : ℕ)
+    : vE L ϖ (algebraMap F E (x ^ n)) = n * vE L ϖ (algebraMap F E x) := by
   induction n with
   | zero => simpa using vE_one L ϖ hϖ
   | succ n ih =>
@@ -101,7 +106,17 @@ theorem theta_eq : LocNG.theta M = S.th := by
 
 end Transport
 
-theorem height_eq : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), ∀ (S : Frames M.L r k) (c : Coord P S), P.Hp = S.Hp ∧ LocNG.qF F = S.q ∧ (P.PrimeTo → S.gg = false ∧ vE M.L S.ϖ S.G = 0 ∧ ∀ l, S.D l ≠ 0 → vE M.L S.ϖ (S.D l * M.L.cj (S.D l)) = 0) := by
+theorem height_eq
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
+            (P : LocNG.FPair H r),
+          ∀ (S : Frames M.L r k) (c : Coord P S),
+            P.Hp = S.Hp ∧ LocNG.qF F = S.q
+              ∧ (P.PrimeTo
+                → S.gg = false ∧ vE M.L S.ϖ S.G = 0
+                  ∧ ∀ l, S.D l ≠ 0 → vE M.L S.ϖ (S.D l * M.L.cj (S.D l)) = 0) := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P S c
   have := hM.loc
   have := hM.char0
@@ -139,35 +154,41 @@ theorem height_eq : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace 
     have hs0 : ((-1 : F) ^ (r + 1)) ≠ 0 := pow_ne_zero _ (by simp)
     have hd0 : d ≠ 0 := mul_ne_zero (mul_ne_zero hs0 hg0) (inv_ne_zero hp0)
     have hdet : (H.gram P.MMgen).det = algebraMap F E d := by
-      calc (H.gram P.MMgen).det
-          = (H.gram P.MMgen).det * algebraMap F E (S.th ^ (2 * (r + 1)) * (S.th ^ (2 * (r + 1)))⁻¹) := by
-            rw [mul_inv_cancel₀ hp0, map_one, mul_one]
+      calc
+        (H.gram P.MMgen).det
+            = (H.gram P.MMgen).det
+              * algebraMap F E (S.th ^ (2 * (r + 1)) * (S.th ^ (2 * (r + 1)))⁻¹) := by
+          rw [mul_inv_cancel₀ hp0, map_one, mul_one]
         _ = algebraMap F E d := by
-            rw [map_mul, ← mul_assoc, map_pow, hgram, hd]
-            simp only [map_mul, map_pow, map_neg, map_one]
+          rw [map_mul, ← mul_assoc, map_pow, hgram, hd]
+          simp only [map_mul, map_pow, map_neg, map_one]
     have hva : vE M.L S.ϖ (algebraMap F E d) = S.a := by
       have e : d * S.th ^ (2 * (r + 1)) = (-1) ^ (r + 1) * g := by
         rw [hd, mul_assoc, inv_mul_cancel₀ hp0, mul_one]
       have h1 := hadd _ _ hd0 hp0
       rw [e, hadd _ _ hs0 hg0, vE_pow M.L S.ϖ S.ϖ_irr _ hth, vE_pow M.L S.ϖ S.ϖ_irr _ (by simp),
-        vE_neg_one M.L S.ϖ S.ϖ_irr, hvth] at h1
+          vE_neg_one M.L S.ϖ S.ϖ_irr, hvth]
+        at h1
       unfold Frames.a
       rw [hg]
       push_cast at h1
       linarith
-    have hprod : ∏ l ∈ P.ends, M.modK (P.Dm l * M.L.cj (P.Dm l)) = (resQ S.ϖ : ℝ) ^ (-(2 * S.vD)) := by
+    have hprod
+        : ∏ l ∈ P.ends, M.modK (P.Dm l * M.L.cj (P.Dm l)) = (resQ S.ϖ : ℝ) ^ (-(2 * S.vD)) := by
       have hsub : P.ends ⊆ Finset.range (r + 2) := by
         unfold LocNG.FPair.ends
         exact @Finset.filter_subset _ _ (_) _
       rw [← Finset.inter_eq_right.mpr hsub, ← Finset.prod_ite_mem, Finset.prod_range]
       unfold Frames.vD
       rw [Finset.mul_sum, ← Finset.sum_neg_distrib]
-      have hz : ∀ (s : Finset (Fin (r + 2))) (f : Fin (r + 2) → ℤ),
-          (resQ S.ϖ : ℝ) ^ (∑ i ∈ s, f i) = ∏ i ∈ s, (resQ S.ϖ : ℝ) ^ f i := by
+      have hz
+          : ∀ (s : Finset (Fin (r + 2))) (f : Fin (r + 2) → ℤ),
+            (resQ S.ϖ : ℝ) ^ (∑ i ∈ s, f i) = ∏ i ∈ s, (resQ S.ϖ : ℝ) ^ f i := by
         intro s f
         induction s using Finset.induction_on with
         | empty => simp
-        | insert a s ha ih => rw [Finset.sum_insert ha, Finset.prod_insert ha, zpow_add₀ hq0.ne', ih]
+        | insert a s ha ih =>
+          rw [Finset.sum_insert ha, Finset.prod_insert ha, zpow_add₀ hq0.ne', ih]
       rw [hz]
       refine Finset.prod_congr rfl fun l _ => ?_
       by_cases hl : l ≠ 0 ∧ S.D l ≠ 0

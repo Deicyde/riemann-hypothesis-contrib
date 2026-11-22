@@ -16,16 +16,20 @@ namespace RowChartAct
 
 variable {S : Type} [CommRing S] {K : Type} {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem isMultiHomog_mul {f g : MRingOver S ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b) :
-    IsMultiHomog (f * g) (a + b) := by
+theorem isMultiHomog_mul
+    {f g : MRingOver S ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   classical
   intro m hm k
   obtain ⟨m₁, hm₁, m₂, hm₂, rfl⟩ := Finset.mem_add.mp (support_mul f g hm)
   simp only [Finsupp.add_apply, Finset.sum_add_distrib, hf m₁ hm₁ k, hg m₂ hm₂ k, Pi.add_apply]
 
-theorem isMultiHomog_rename [DecidableEq K] (k₀ : K) {N : ℕ} (e : ι k₀ ≃ Fin (N + 1)) {f : MvPolynomial (Fin (N + 1)) S}
-    {d : ℕ} (hf : f.IsHomogeneous d) :
-    IsMultiHomog (rename (fun j => (⟨k₀, e.symm j⟩ : Σ k, ι k)) f) (Pi.single k₀ d) := by
+theorem isMultiHomog_rename
+    [DecidableEq K]
+    (k₀ : K)
+    {N : ℕ} (e : ι k₀ ≃ Fin (N + 1))
+    {f : MvPolynomial (Fin (N + 1)) S} {d : ℕ} (hf : f.IsHomogeneous d)
+    : IsMultiHomog (rename (fun j => (⟨k₀, e.symm j⟩ : Σ k, ι k)) f) (Pi.single k₀ d) := by
   classical
   have hρ : Function.Injective (fun j => (⟨k₀, e.symm j⟩ : Σ k, ι k)) := fun j j' h =>
     e.symm.injective (eq_of_heq (Sigma.mk.inj_iff.mp h).2)
@@ -35,7 +39,9 @@ theorem isMultiHomog_rename [DecidableEq K] (k₀ : K) {N : ℕ} (e : ι k₀ �
   have hd := hf (mem_support_iff.mp hm)
   by_cases hk : k = k₀
   · subst hk
-    have hval : ∀ i, Finsupp.mapDomain (fun j => (⟨k, e.symm j⟩ : Σ k, ι k)) m ⟨k, i⟩ = m (e i) := fun i => by
+    have hval
+        : ∀ i,
+          Finsupp.mapDomain (fun j => (⟨k, e.symm j⟩ : Σ k, ι k)) m ⟨k, i⟩ = m (e i) := fun i => by
       have hi : (⟨k, i⟩ : Σ k, ι k) = (fun j => (⟨k, e.symm j⟩ : Σ k, ι k)) (e i) := by simp
       rw [hi, Finsupp.mapDomain_apply_of_injective hρ]
     simp_rw [hval]
@@ -52,9 +58,14 @@ theorem RowChartAct.proof : RowChartAct.Statement := by
   intro S _ K _ _ ι _ _ Ω _ _ y k₀ N e γ J I r a hr ha
   obtain ⟨f, s, d, hs, hf, hsd, rfl⟩ := hr
   set ρ : Fin (N + 1) → Σ k, ι k := fun j => ⟨k₀, e.symm j⟩ with hρ
-  have hsmem : rename ρ s ∈ ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.cellMon S (baseCell k₀ e J.1 I) := by
-    have hle : (Kleiman.monos (S := S) J.1).map (rename ρ : MvPolynomial _ S →ₐ[S] MRingOver S ι).toRingHom.toMonoidHom ≤
-        ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.cellMon S (baseCell k₀ e J.1 I) := by
+  have hsmem
+      : rename ρ s ∈ ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.cellMon S
+        (baseCell k₀ e J.1 I) := by
+    have hle
+        : (Kleiman.monos (S := S) J.1).map
+            (rename ρ : MvPolynomial _ S →ₐ[S] MRingOver S ι).toRingHom.toMonoidHom
+          ≤ ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.cellMon S
+            (baseCell k₀ e J.1 I) := by
       rw [Kleiman.monos, MonoidHom.map_mclosure]
       refine Submonoid.closure_le.mpr ?_
       rintro _ ⟨_, ⟨j, hj, rfl⟩, rfl⟩
@@ -77,11 +88,13 @@ theorem RowChartAct.proof : RowChartAct.Statement := by
         simp only [Pi.add_apply, Nat.cast_add]
         omega
       · have h2 := RowChartAct.isMultiHomog_mul (RowChartAct.isMultiHomog_rename k₀ e hf) hg
-        have heq : (Pi.single k₀ d + fun k => (γ k + b k).toNat) =
-            fun k => (γ k + ((b + Pi.single k₀ d : K → ℕ) k : ℕ)).toNat := funext fun k => by
-          have h1 := hγ k
-          simp only [Pi.add_apply, Nat.cast_add]
-          omega
+        have heq
+            : (Pi.single k₀ d + fun k => (γ k + b k).toNat)
+              = fun k => (γ k + ((b + Pi.single k₀ d : K → ℕ) k : ℕ)).toNat :=
+          funext fun k => by
+            have h1 := hγ k
+            simp only [Pi.add_apply, Nat.cast_add]
+            omega
         rw [heq] at h2
         exact h2
       · simp only [map_mul, aeval_rename]

@@ -14,18 +14,20 @@ namespace UpperTheory.V.J
 
 section Lift
 
-variable {O R C : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
-  [CommRing C] [Algebra O C] [IsCO O C]
+variable
+  {O R C : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R] [CommRing C]
+  [Algebra O C] [IsCO O C]
 
-private theorem map_max_le (f : R →ₐ[O] C) :
-    (maximalIdeal R).map (f : R →+* C) ≤ maximalIdeal C := by
+private theorem map_max_le (f : R →ₐ[O] C)
+    : (maximalIdeal R).map (f : R →+* C) ≤ maximalIdeal C := by
   refine Ideal.map_le_iff_le_comap.2 fun a ha => ?_
   show f a ∈ maximalIdeal C
   rw [← res_eq_zero_iff O C, res_map, res_eq_zero_iff]
   exact ha
 
-private theorem adic_map {Γ : Type} [TopologicalSpace Γ] (f : R →ₐ[O] C) {u : Γ → R}
-    (hu : AdicCont (maximalIdeal R) u) : AdicCont (maximalIdeal C) fun g => f (u g) := by
+private theorem adic_map
+    {Γ : Type} [TopologicalSpace Γ] (f : R →ₐ[O] C) {u : Γ → R} (hu : AdicCont (maximalIdeal R) u)
+    : AdicCont (maximalIdeal C) fun g => f (u g) := by
   intro N
   have hle : maximalIdeal R ^ N ≤ (maximalIdeal C ^ N).comap (f : R →+* C) := by
     refine Ideal.map_le_iff_le_comap.1 ?_
@@ -35,11 +37,12 @@ private theorem adic_map {Γ : Type} [TopologicalSpace Γ] (f : R →ₐ[O] C) {
 
 variable {l : ℕ} [Fact l.Prime] {F : Frame l (ResidueField O)} {n : ℕ}
 
-private theorem isLift_map (f : R →ₐ[O] C) {ρ : NRep F n R} (h : UpperTheory.V.Fr.IsLift O ρ) :
-    UpperTheory.V.Fr.IsLift O (ρ.map (f : R →+* C)) := by
+private theorem isLift_map (f : R →ₐ[O] C) {ρ : NRep F n R} (h : UpperTheory.V.Fr.IsLift O ρ)
+    : UpperTheory.V.Fr.IsLift O (ρ.map (f : R →+* C)) := by
   obtain ⟨hc, hb, hd⟩ := h
-  have hres : ((res O C : C →ₐ[O] ResidueField O) : C →+* ResidueField O).comp (f : R →+* C) =
-      ((res O R : R →ₐ[O] ResidueField O) : R →+* ResidueField O) := by
+  have hres
+      : ((res O C : C →ₐ[O] ResidueField O) : C →+* ResidueField O).comp (f : R →+* C)
+        = ((res O R : R →ₐ[O] ResidueField O) : R →+* ResidueField O) := by
     ext x
     exact res_map f x
   refine ⟨⟨fun i j => ?_, fun v i => ?_⟩, ?_, ?_⟩
@@ -62,8 +65,9 @@ theorem det : Det := by
   let z : S.R →ₐ[O] TrivSqZeroExt O O := (TrivSqZeroExt.inlAlgHom O O O).comp ξ
   have key : ∀ a : S.R, D a = 0 → y a = z a := fun a ha =>
     TrivSqZeroExt.ext (hy a).1 (by rw [(hy a).2, ha]; rfl)
-  have hmap : NRep.map (y : S.R →+* TrivSqZeroExt O O) S.ρ =
-      NRep.map (z : S.R →+* TrivSqZeroExt O O) S.ρ := by
+  have hmap
+      : NRep.map (y : S.R →+* TrivSqZeroExt O O) S.ρ
+        = NRep.map (z : S.R →+* TrivSqZeroExt O O) S.ρ := by
     apply NRep.ext
     · refine MonoidHom.ext fun g => Matrix.ext fun i j => ?_
       exact key _ (hr g i j)

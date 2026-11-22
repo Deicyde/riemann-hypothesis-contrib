@@ -13,10 +13,12 @@ open scoped InnerProductSpace ComplexOrder TensorProduct Pointwise Classical
 
 namespace GlobalTheory.RowLev
 
-theorem IsChoice.eq_of_mem {I : AutInst} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type}
-    {w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)} (h : IsChoice I g Pl w) {k k' : Fin 2}
-    (u : HeightOneSpectrum (𝓞 I.E)) (h1 : ((g k : ℕ) : 𝓞 I.E) ∈ u.asIdeal) (h2 : ((g k' : ℕ) : 𝓞 I.E) ∈ u.asIdeal) :
-    k = k' := by
+theorem IsChoice.eq_of_mem
+    {I : AutInst} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type} {w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)}
+    (h : IsChoice I g Pl w)
+    {k k' : Fin 2} (u : HeightOneSpectrum (𝓞 I.E)) (h1 : ((g k : ℕ) : 𝓞 I.E) ∈ u.asIdeal)
+    (h2 : ((g k' : ℕ) : 𝓞 I.E) ∈ u.asIdeal)
+    : k = k' := by
   by_contra hkk
   have hg : g k ≠ g k' := by
     intro e
@@ -36,9 +38,11 @@ theorem IsChoice.eq_of_mem {I : AutInst} {g : Fin 2 → ℕ} {Pl : Fin 2 → Typ
   rw [Ideal.eq_top_iff_one, ← e]
   exact add_mem (Ideal.mul_mem_left _ _ h1) (Ideal.mul_mem_left _ _ h2)
 
-theorem IsChoice.ne_of_ne {I : AutInst} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type}
-    {w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)} (h : IsChoice I g Pl w) {a b : Σ k, Pl k} (hab : b ≠ a) :
-    w b.1 b.2 ≠ w a.1 a.2 ∧ ¬ IsConj I (w a.1 a.2) (w b.1 b.2) := by
+theorem IsChoice.ne_of_ne
+    {I : AutInst} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type} {w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)}
+    (h : IsChoice I g Pl w)
+    {a b : Σ k, Pl k} (hab : b ≠ a)
+    : w b.1 b.2 ≠ w a.1 a.2 ∧ ¬ IsConj I (w a.1 a.2) (w b.1 b.2) := by
   obtain ⟨ka, va⟩ := a
   obtain ⟨kb, vb⟩ := b
   dsimp only
@@ -47,12 +51,17 @@ theorem IsChoice.ne_of_ne {I : AutInst} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type
   · subst hk
     have hv : vb ≠ va := fun e => hab (by rw [e])
     exact ⟨fun e => hv (h.2.2.2.2.1 kb e), h.2.2.2.2.2.1 kb va vb⟩
-  · refine ⟨fun e => hk (h.eq_of_mem (w kb vb) (hmem kb vb).1 (by rw [e]; exact (hmem ka va).1)), fun hcj => hk ?_⟩
+  · refine ⟨
+      fun e => hk (h.eq_of_mem (w kb vb) (hmem kb vb).1 (by rw [e]; exact (hmem ka va).1)),
+      fun hcj => hk ?_
+    ⟩
     have hx := (hcj ((g ka : ℕ) : 𝓞 I.E) ((g ka : ℕ) : 𝓞 I.E) (by simp)).mp (hmem ka va).1
     exact (h.eq_of_mem (w kb vb) hx (hmem kb vb).1).symm
 
-theorem PlFrame.actsAs_one_of_mem {I : AutInst} {N p : ℕ} {w : HeightOneSpectrum (𝓞 I.E)} (fr : PlFrame I N p w)
-    {x : I.Gf} (hx : ∀ y ∈ I.Lf, (I.fmat x - 1) *ᵥ y ∈ extId I w.asIdeal • I.Lf) : fr.ActsAs x 1 := by
+theorem PlFrame.actsAs_one_of_mem
+    {I : AutInst} {N p : ℕ} {w : HeightOneSpectrum (𝓞 I.E)} (fr : PlFrame I N p w)
+    {x : I.Gf} (hx : ∀ y ∈ I.Lf, (I.fmat x - 1) *ᵥ y ∈ extId I w.asIdeal • I.Lf)
+    : fr.ActsAs x 1 := by
   intro y h
   rw [Matrix.one_mulVec, ← sub_eq_zero, ← map_sub]
   refine (fr.c_ker _).mpr ?_
@@ -61,16 +70,22 @@ theorem PlFrame.actsAs_one_of_mem {I : AutInst} {N p : ℕ} {w : HeightOneSpectr
   rw [e]
   exact hx _ y.2
 
-private theorem val_eq_lemma {I : AutInst} {N : ℕ} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type}
+private theorem val_eq_lemma
+    {I : AutInst} {N : ℕ} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type}
     {w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)} {fr : ∀ k v, PlFrame I N (g k) (w k v)}
-    {ρ : I.Gf → GProd N g Pl} (hρ : ActsBy fr ρ) {x : I.Gf} (hx : x ∈ I.Kset) (kv : Σ k, Pl k)
-    {M : GL (Fin N) (ZMod (g kv.1))} (hM : (fr kv.1 kv.2).ActsAs x (M : Matrix (Fin N) (Fin N) (ZMod (g kv.1)))) :
-    ρ x kv = M :=
+    {ρ : I.Gf → GProd N g Pl} (hρ : ActsBy fr ρ)
+    {x : I.Gf} (hx : x ∈ I.Kset)
+    (kv : Σ k, Pl k)
+    {M : GL (Fin N) (ZMod (g kv.1))}
+    (hM : (fr kv.1 kv.2).ActsAs x (M : Matrix (Fin N) (Fin N) (ZMod (g kv.1))))
+    : ρ x kv = M :=
   Units.ext (PlFrame.ActsAs.unique (fr kv.1 kv.2) hx (hρ x hx kv.1 kv.2) hM)
 
-theorem exists_red_actsBy : ∀ (I : AutInst) (N : ℕ) (g : Fin 2 → ℕ) (Pl : Fin 2 → Type)
-    (w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)) (fr : ∀ k v, PlFrame I N (g k) (w k v)) [∀ k, Finite (Pl k)],
-    I.n = N → IsChoice I g Pl w → ∃ ρ : Red I (g 0 * g 1) (GProd N g Pl), ActsBy fr ρ.toFun := by
+theorem exists_red_actsBy
+    : ∀ (I : AutInst) (N : ℕ) (g : Fin 2 → ℕ) (Pl : Fin 2 → Type)
+        (w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)) (fr : ∀ k v, PlFrame I N (g k) (w k v))
+        [∀ k, Finite (Pl k)],
+      I.n = N → IsChoice I g Pl w → ∃ ρ : Red I (g 0 * g 1) (GProd N g Pl), ActsBy fr ρ.toFun := by
   intro I N g Pl w fr _ hn hc
   classical
   obtain ⟨ρ, hρ, hmul⟩ := exists_actsBy fr
@@ -90,14 +105,16 @@ theorem exists_red_actsBy : ∀ (I : AutInst) (N : ℕ) (g : Fin 2 → ℕ) (Pl 
     · intro h
       funext kv
       exact hone x hx kv (fun y hy => by rw [h kv.1 kv.2 y hy, Matrix.one_mulVec])
-  · have key : ∀ s : Finset (Σ k, Pl k), ∃ x ∈ I.Kset, ρ x = fun kv => if kv ∈ s then q kv else 1 := by
+  · have key
+        : ∀ s : Finset (Σ k, Pl k), ∃ x ∈ I.Kset, ρ x = fun kv => if kv ∈ s then q kv else 1 := by
       intro s
       refine Finset.induction_on s ?_ ?_
       · exact ⟨1, hK1, funext fun kv => by simpa using hone 1 hK1 kv (fr kv.1 kv.2).actsAs_one⟩
       · intro a s ha ih
         obtain ⟨xs, hxs, es⟩ := ih
-        obtain ⟨xa, hxa, hact, hoth⟩ := GlobalTheory.T.exists_mem_Kset_acts_as_GL_mod_splitPrime I N (g a.1) (w a.1 a.2) (fr a.1 a.2) hn (hc.1 a.1)
-          (hc.2.2.2.1 a.1 a.2).2 (hc.2.2.2.2.2.1 a.1 a.2 a.2) (q a)
+        obtain ⟨xa, hxa, hact, hoth⟩ :=
+          GlobalTheory.T.exists_mem_Kset_acts_as_GL_mod_splitPrime I N (g a.1) (w a.1 a.2)
+            (fr a.1 a.2) hn (hc.1 a.1) (hc.2.2.2.1 a.1 a.2).2 (hc.2.2.2.2.2.1 a.1 a.2 a.2) (q a)
         refine ⟨xa * xs, hKmul xa hxa xs hxs, ?_⟩
         rw [hmul xa hxa xs hxs, es]
         funext kv

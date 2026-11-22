@@ -27,8 +27,8 @@ theorem sDual : SDual E := by
     rw [show algebraMap (𝓞 E) E y = (y : E) from rfl, hk]
     simp
   have h1 : (1 : E) ∈ (1 : Submodule (𝓞 E) E) := Submodule.mem_one.2 ⟨1, map_one _⟩
-  have hI := isIntegral_discr_mul_of_mem_traceDual (A := ℤ) (K := ℚ)
-    (1 : Submodule (𝓞 E) E) hb h1 hx
+  have hI :=
+    isIntegral_discr_mul_of_mem_traceDual (A := ℤ) (K := ℚ) (1 : Submodule (𝓞 E) E) hb h1 hx
   rw [← NumberField.coe_discr, Algebra.smul_def, mul_one, map_intCast] at hI
   let α : 𝓞 E := ⟨_, hI⟩
   have hα : (α : E) = (NumberField.discr E : E) * t := rfl

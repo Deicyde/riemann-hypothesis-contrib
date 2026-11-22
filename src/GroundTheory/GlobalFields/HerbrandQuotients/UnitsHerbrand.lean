@@ -33,21 +33,17 @@ def fullLog : Additive (𝓞 L)ˣ →+ (InfinitePlace L → ℝ) where
     rw [Real.log_mul (pos_at_place _ w).ne' (pos_at_place _ w).ne', mul_add]
 
 omit [NumberField L] in
-theorem fullLog_apply (x : Additive (𝓞 L)ˣ) (w : InfinitePlace L) :
-    fullLog L x w = (w.mult : ℝ) * Real.log (w (algebraMap (𝓞 L) L (x.toMul : 𝓞 L))) :=
+theorem fullLog_apply (x : Additive (𝓞 L)ˣ) (w : InfinitePlace L)
+    : fullLog L x w = (w.mult : ℝ) * Real.log (w (algebraMap (𝓞 L) L (x.toMul : 𝓞 L))) :=
   rfl
 
-theorem sum_fullLog (x : Additive (𝓞 L)ˣ) : ∑ w, fullLog L x w = 0 :=
-  sum_mult_mul_log x.toMul
+theorem sum_fullLog (x : Additive (𝓞 L)ˣ) : ∑ w, fullLog L x w = 0 := sum_mult_mul_log x.toMul
 
-def logLattice : Submodule ℤ (InfinitePlace L → ℝ) :=
-  LinearMap.range (fullLog L).toIntLinearMap
+def logLattice : Submodule ℤ (InfinitePlace L → ℝ) := LinearMap.range (fullLog L).toIntLinearMap
 
-def logProj : (InfinitePlace L → ℝ) →ₗ[ℝ] logSpace L :=
-  LinearMap.funLeft ℝ ℝ Subtype.val
+def logProj : (InfinitePlace L → ℝ) →ₗ[ℝ] logSpace L := LinearMap.funLeft ℝ ℝ Subtype.val
 
-theorem logProj_fullLog (x : Additive (𝓞 L)ˣ) : logProj L (fullLog L x) = logEmbedding L x :=
-  rfl
+theorem logProj_fullLog (x : Additive (𝓞 L)ˣ) : logProj L (fullLog L x) = logEmbedding L x := rfl
 
 theorem fullLog_eq_zero_iff (x : Additive (𝓞 L)ˣ) : fullLog L x = 0 ↔ x.toMul ∈ torsion L := by
   constructor
@@ -64,26 +60,26 @@ theorem logProj_mem_unitLattice (m : logLattice L) : logProj L m ∈ unitLattice
   exact ⟨x, trivial, rfl⟩
 
 def logLatticeEquiv : logLattice L ≃ₗ[ℤ] unitLattice L :=
-  LinearEquiv.ofBijective
-    (LinearMap.codRestrict (unitLattice L) ((logProj L).restrictScalars ℤ ∘ₗ (logLattice L).subtype)
-      (logProj_mem_unitLattice L)) <| by
-    constructor
-    · rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
-      intro m hm
-      obtain ⟨x, hx⟩ := m.2
-      have h1 : logEmbedding L x = 0 := by
-        rw [← logProj_fullLog]
-        have := congrArg Subtype.val hm
-        simp only [ZeroMemClass.coe_zero] at this
-        change logProj L (fullLog L x) = 0
-        rw [show fullLog L x = (m : InfinitePlace L → ℝ) from hx]
-        exact this
-      rw [← ofMul_toMul x, logEmbedding_eq_zero_iff, ← fullLog_eq_zero_iff] at h1
-      apply Subtype.ext
-      rw [← hx]
-      exact h1
-    · rintro ⟨y, x, -, rfl⟩
-      exact ⟨⟨fullLog L x, x, rfl⟩, rfl⟩
+  LinearEquiv.ofBijective (LinearMap.codRestrict (unitLattice L)
+      ((logProj L).restrictScalars ℤ ∘ₗ (logLattice L).subtype) (logProj_mem_unitLattice L)) <|
+    by
+      constructor
+      · rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
+        intro m hm
+        obtain ⟨x, hx⟩ := m.2
+        have h1 : logEmbedding L x = 0 := by
+          rw [← logProj_fullLog]
+          have := congrArg Subtype.val hm
+          simp only [ZeroMemClass.coe_zero] at this
+          change logProj L (fullLog L x) = 0
+          rw [show fullLog L x = (m : InfinitePlace L → ℝ) from hx]
+          exact this
+        rw [← ofMul_toMul x, logEmbedding_eq_zero_iff, ← fullLog_eq_zero_iff] at h1
+        apply Subtype.ext
+        rw [← hx]
+        exact h1
+      · rintro ⟨y, x, -, rfl⟩
+        exact ⟨⟨fullLog L x, x, rfl⟩, rfl⟩
 
 instance : Module.Free ℤ (logLattice L) :=
   have := ZLattice.module_free ℝ (unitLattice L)
@@ -96,8 +92,8 @@ instance : Module.Finite ℤ (logLattice L) :=
 theorem finrank_logLattice : finrank ℤ (logLattice L) = rank L :=
   (logLatticeEquiv L).finrank_eq.trans (unitLattice_rank L)
 
-theorem linearIndependent_logLattice_basis {ι : Type*} (b : Basis ι ℤ (logLattice L)) :
-    LinearIndependent ℝ (fun i => (b i : InfinitePlace L → ℝ)) := by
+theorem linearIndependent_logLattice_basis {ι : Type*} (b : Basis ι ℤ (logLattice L))
+    : LinearIndependent ℝ (fun i => (b i : InfinitePlace L → ℝ)) := by
   apply LinearIndependent.of_comp (logProj L)
   have := ((b.map (logLatticeEquiv L)).ofZLatticeBasis ℝ (unitLattice L)).linearIndependent
   convert this using 1
@@ -122,23 +118,25 @@ theorem mult_smul (g : L ≃ₐ[K] L) (w : InfinitePlace L) : (g • w).mult = w
   · rfl
 
 omit [NumberField K] [NumberField L] in
-theorem fullLog_unitsRep (g : L ≃ₐ[K] L) (x : Additive (𝓞 L)ˣ) :
-    fullLog L (unitsRep K L g x) = funPermRep ℝ (L ≃ₐ[K] L) (InfinitePlace L) g (fullLog L x) := by
+theorem fullLog_unitsRep (g : L ≃ₐ[K] L) (x : Additive (𝓞 L)ˣ)
+    : fullLog L (unitsRep K L g x)
+      = funPermRep ℝ (L ≃ₐ[K] L) (InfinitePlace L) g (fullLog L x) := by
   funext w
   rw [funPermRep_apply, fullLog_apply, fullLog_apply, mult_smul, unitsRep_apply, toMul_ofMul,
     InfinitePlace.smul_apply, AlgEquiv.aut_inv, AlgEquiv.symm_symm]
   rfl
 
 omit [NumberField K] [NumberField L] in
-theorem funPermRep_mem_logLattice (g : L ≃ₐ[K] L) {m : InfinitePlace L → ℝ}
-    (hm : m ∈ logLattice L) : funPermRep ℝ (L ≃ₐ[K] L) (InfinitePlace L) g m ∈ logLattice L := by
+theorem funPermRep_mem_logLattice (g : L ≃ₐ[K] L) {m : InfinitePlace L → ℝ} (hm : m ∈ logLattice L)
+    : funPermRep ℝ (L ≃ₐ[K] L) (InfinitePlace L) g m ∈ logLattice L := by
   obtain ⟨x, rfl⟩ := hm
   exact ⟨unitsRep K L g x, fullLog_unitsRep g x⟩
 
 variable (K L) in
 def logLatticeRep : Representation ℤ (L ≃ₐ[K] L) (logLattice L) where
-  toFun g := ((funPermRep ℝ (L ≃ₐ[K] L) (InfinitePlace L) g).restrictScalars ℤ).restrict
-    fun _ hm => funPermRep_mem_logLattice g hm
+  toFun g :=
+    ((funPermRep ℝ (L ≃ₐ[K] L) (InfinitePlace L) g).restrictScalars ℤ).restrict fun _ hm =>
+      funPermRep_mem_logLattice g hm
   map_one' := by
     refine LinearMap.ext fun m => Subtype.ext ?_
     funext w
@@ -151,28 +149,29 @@ def logLatticeRep : Representation ℤ (L ≃ₐ[K] L) (logLattice L) where
     rw [mul_inv_rev, mul_smul]
 
 omit [NumberField K] [NumberField L] in
-theorem coe_logLatticeRep (g : L ≃ₐ[K] L) (m : logLattice L) :
-    (logLatticeRep (K := K) (L := L) g m : InfinitePlace L → ℝ) =
-      funPermRep ℝ (L ≃ₐ[K] L) (InfinitePlace L) g m :=
+theorem coe_logLatticeRep (g : L ≃ₐ[K] L) (m : logLattice L)
+    : (logLatticeRep (K := K) (L := L) g m : InfinitePlace L → ℝ)
+      = funPermRep ℝ (L ≃ₐ[K] L) (InfinitePlace L) g m :=
   rfl
 
 variable [FiniteDimensional K L]
 
 omit [NumberField K] in
-theorem cycHerbrand_unitsRep_eq_logLattice {σ : L ≃ₐ[K] L} (hσ : ∀ g, g ∈ Subgroup.zpowers σ) :
-    cycHerbrand (unitsRep K L) σ = cycHerbrand (logLatticeRep (K := K) (L := L)) σ := by
+theorem cycHerbrand_unitsRep_eq_logLattice {σ : L ≃ₐ[K] L} (hσ : ∀ g, g ∈ Subgroup.zpowers σ)
+    : cycHerbrand (unitsRep K L) σ = cycHerbrand (logLatticeRep (K := K) (L := L)) σ := by
   let p : Additive (𝓞 L)ˣ →+ logLattice L := (fullLog L).toIntLinearMap.rangeRestrict.toAddMonoidHom
   have hp : Function.Surjective p := (fullLog L).toIntLinearMap.surjective_rangeRestrict
   have : Finite p.ker := by
     refine Finite.of_injective (β := torsion L)
-      (fun x => ⟨(x : Additive (𝓞 L)ˣ).toMul, (fullLog_eq_zero_iff L x).1 ?_⟩) ?_
+      (fun x => ⟨(x : Additive (𝓞 L)ˣ).toMul, (fullLog_eq_zero_iff L x).1 ?_⟩)
+      ?_
     · have := congrArg Subtype.val (AddMonoidHom.mem_ker.1 x.2)
       exact this
     · intro x y h
       simp only [Subtype.mk.injEq] at h
       exact Subtype.ext (Additive.toMul.injective h)
-  exact cycHerbrand_eq_of_surjective_of_finite_ker (unitsRep K L)
-    (logLatticeRep (K := K) (L := L)) σ hp
+  exact cycHerbrand_eq_of_surjective_of_finite_ker (unitsRep K L) (logLatticeRep (K := K) (L := L))
+    σ hp
     (fun g x => Subtype.ext (fullLog_unitsRep g x))
     (hasHerbrandQuotient_cycSubOne_of_finite _ hσ)
 

@@ -13,12 +13,15 @@ open TensorProduct
 
 namespace PositivityTheory.PrwZar.Qi
 
-theorem exists_stable_pow {K H : Type} [Field K] [CommRing H] [Algebra K H] [FiniteDimensional K H]
-    (I : Ideal H) : ∃ (k : ℕ) (e : H), IsIdempotentElem e ∧ I ^ k = Ideal.span {e} ∧ ∀ j, k ≤ j → I ^ j = I ^ k := by
+theorem exists_stable_pow
+    {K H : Type} [Field K] [CommRing H] [Algebra K H] [FiniteDimensional K H] (I : Ideal H)
+    : ∃ (k : ℕ) (e : H),
+      IsIdempotentElem e ∧ I ^ k = Ideal.span {e} ∧ ∀ j, k ≤ j → I ^ j = I ^ k := by
   haveI : IsArtinianRing H := isArtinian_of_tower K inferInstance
   haveI : IsNoetherianRing H := isNoetherian_of_tower K inferInstance
-  obtain ⟨n, hn⟩ := IsArtinian.monotone_stabilizes (R := H) (M := H)
-    ⟨fun n => OrderDual.toDual (I ^ n), fun a b h => Ideal.pow_le_pow_right h⟩
+  obtain ⟨n, hn⟩ :=
+    IsArtinian.monotone_stabilizes (R := H) (M := H)
+      ⟨fun n => OrderDual.toDual (I ^ n), fun a b h => Ideal.pow_le_pow_right h⟩
   have hst : ∀ j, n ≤ j → I ^ j = I ^ n := fun j hj => congrArg OrderDual.ofDual (hn j hj).symm
   have hidem : IsIdempotentElem (I ^ n) := by
     unfold IsIdempotentElem

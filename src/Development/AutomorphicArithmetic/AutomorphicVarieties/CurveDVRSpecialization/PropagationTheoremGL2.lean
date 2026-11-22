@@ -31,66 +31,86 @@ end Nice
 
 section Input
 
-variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)} {n : ℕ}
+variable
+  {l : ℕ} [Fact l.Prime]
+  {O : Type} [CommRing O] [IsLocalRing O]
+  {F : Frame l (ResidueField O)} {n : ℕ}
 
 def P1' (S : Space O F n) (M : Ideal S.B) : Prop :=
-  ∀ (x : Ideal S.A) (L : S.Loc x) (p : Ideal L.R), Nice L.ρ p → L.ρ.TI p → M ≤ L.π p →
-    ∀ P : Ideal L.R, P.IsPrime → P ≤ p → M ≤ L.π P
+  ∀ (x : Ideal S.A) (L : S.Loc x) (p : Ideal L.R),
+    Nice L.ρ p → L.ρ.TI p → M ≤ L.π p → ∀ P : Ideal L.R, P.IsPrime → P ≤ p → M ≤ L.π P
 
 def P23' (S : Space O F 3) (M : Ideal S.B) : Prop :=
-  ∀ (x : Ideal S.A) (L : S.Loc x) (p q : Ideal L.R), Nice L.ρ p → L.ρ.TE p → Relation.ReflTransGen (ThickLink L.ρ) p q →
-    (∃ P : Ideal L.R, P.IsPrime ∧ P ≤ p ∧ L.ρ.TI P ∧ M ≤ L.π P) →
-    ∀ P' : Ideal L.R, P'.IsPrime → P' ≤ q → L.ρ.TI P' → M ≤ L.π P'
+  ∀ (x : Ideal S.A) (L : S.Loc x) (p q : Ideal L.R),
+    Nice L.ρ p → L.ρ.TE p → Relation.ReflTransGen (ThickLink L.ρ) p q
+      → (∃ P : Ideal L.R, P.IsPrime ∧ P ≤ p ∧ L.ρ.TI P ∧ M ≤ L.π P)
+      → ∀ P' : Ideal L.R, P'.IsPrime → P' ≤ q → L.ρ.TI P' → M ≤ L.π P'
 
 def SeedIn (S : Space O F n) (M : Ideal S.B) : Prop :=
-  ∃ (ξ : Ideal S.A) (Z : Ideal S.B), ξ.IsPrime ∧ S.u.TI ξ ∧ Z.IsPrime ∧ M ≤ Z ∧ Z ≤ S.π ξ ∧
-    qdim Z = ((1 + n * F.d : ℕ) : WithBot ℕ∞)
+  ∃ (ξ : Ideal S.A) (Z : Ideal S.B),
+    ξ.IsPrime ∧ S.u.TI ξ ∧ Z.IsPrime ∧ M ≤ Z ∧ Z ≤ S.π ξ ∧ qdim Z = ((1 + n * F.d : ℕ) : WithBot ℕ∞)
 
-def AllGood (S : Space O F n) (M : Ideal S.B) : Prop := ∀ p : Ideal S.A, p.IsPrime → S.u.TI p → M ≤ S.π p
+def AllGood (S : Space O F n) (M : Ideal S.B) : Prop :=
+  ∀ p : Ideal S.A, p.IsPrime → S.u.TI p → M ≤ S.π p
 
-def OffFin (S : Space O F n) : Prop := ∃ I : Ideal S.B, S.FinLam I ∧ ∀ p : Ideal S.A, p.IsPrime → S.u.OffTri p → I ≤ S.π p
+def OffFin (S : Space O F n) : Prop :=
+  ∃ I : Ideal S.B, S.FinLam I ∧ ∀ p : Ideal S.A, p.IsPrime → S.u.OffTri p → I ≤ S.π p
 
 end Input
 
 def PropagationTheoremGL2 : Prop :=
-  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O]
-    (F : Frame l (ResidueField O)) (C₀ : ℕ), F.Ok C₀ → F.Big C₀ → ∀ (S : Space O F 2) (M : Ideal S.B),
-    S.FinLam M → P1' S M → SeedIn S M → AllGood S M
+  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+      [IsCoef l O] (F : Frame l (ResidueField O)) (C₀ : ℕ),
+    F.Ok C₀ → F.Big C₀
+      → ∀ (S : Space O F 2) (M : Ideal S.B), S.FinLam M → P1' S M → SeedIn S M → AllGood S M
 
 def PropagationTheoremGL3 : Prop :=
-  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O]
-    (F : Frame l (ResidueField O)) (C₀ : ℕ), F.Ok C₀ → F.Big C₀ → ∀ (S₂ : Space O F 2) (M₂ : Ideal S₂.B),
-    S₂.FinLam M₂ → AllGood S₂ M₂ → ∀ (S : Space O F 3) (M : Ideal S.B),
-    S.FinLam M → P1' S M → P23' S M → SeedIn S M → AllGood S M ∧ OffFin S
+  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+      [IsCoef l O] (F : Frame l (ResidueField O)) (C₀ : ℕ),
+    F.Ok C₀ → F.Big C₀
+      → ∀ (S₂ : Space O F 2) (M₂ : Ideal S₂.B),
+        S₂.FinLam M₂ → AllGood S₂ M₂
+          → ∀ (S : Space O F 3) (M : Ideal S.B),
+            S.FinLam M → P1' S M → P23' S M → SeedIn S M → AllGood S M ∧ OffFin S
 
 section Points
 
-variable {l : ℕ} [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)} {n : ℕ}
+variable
+  {l : ℕ} [Fact l.Prime]
+  (O : Type) [CommRing O] [IsLocalRing O]
+  {F : Frame l (ResidueField O)} {n : ℕ}
 
-structure IsLiftA {A : Type} [CommRing A] [IsLocalRing A] [Algebra O A] [IsLocalHom (algebraMap O A)]
-    (ρ : NRep F n A) : Prop where
+structure IsLiftA
+    {A : Type} [CommRing A] [IsLocalRing A] [Algebra O A] [IsLocalHom (algebraMap O A)]
+    (ρ : NRep F n A)
+    : Prop where
   cont : ρ.Cont (maximalIdeal A)
   bar : (ρ.map (residue A)).IsBar (ResidueField.map (algebraMap O A))
   diag : (ρ.map (residue A)).IsDiag
 
-
 variable (F n) in
 def FinPt : Prop :=
-  ∀ (A : Type) [CommRing A] [Algebra O A] [IsCD O A] [Algebra (ResidueField O) A] [IsScalarTower O (ResidueField O) A]
-    (ρ : NRep F n A), IsLiftA O ρ → (∀ v i, ∀ g ∈ F.Iv v, F.Ψ (F.loc v g) = 1 → ρ.ψ v i g = 1) →
-    ∀ g, (ρ.r g).charpoly =
-      ∏ i, (Polynomial.X - Polynomial.C (algebraMap (ResidueField O) A ((F.Ψ g ^ w n i : (ResidueField O)ˣ) : ResidueField O)))
+  ∀ (A : Type) [CommRing A] [Algebra O A] [IsCD O A] [Algebra (ResidueField O) A]
+      [IsScalarTower O (ResidueField O) A] (ρ : NRep F n A),
+    IsLiftA O ρ → (∀ v i, ∀ g ∈ F.Iv v, F.Ψ (F.loc v g) = 1 → ρ.ψ v i g = 1)
+      → ∀ g,
+        (ρ.r g).charpoly
+          = ∏ i, (Polynomial.X - Polynomial.C (algebraMap (ResidueField O) A ((F.Ψ g ^ w n i : (ResidueField O)ˣ) : ResidueField O)))
 
 end Points
 
 def FinPtOf : Prop :=
-  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O]
-    (F : Frame l (ResidueField O)) (C₀ : ℕ), F.Ok C₀ → ∀ S : Space O F 3, OffFin S → FinPt O F 3
+  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+      [IsCoef l O] (F : Frame l (ResidueField O)) (C₀ : ℕ),
+    F.Ok C₀ → ∀ S : Space O F 3, OffFin S → FinPt O F 3
 
 section Link
 
-variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
-  (F : Frame l (ResidueField O)) {n : ℕ} {G : W.GFrame l} (r : W.Resid G O n)
+variable
+  {l : ℕ} [Fact l.Prime]
+  {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O]
+  (F : Frame l (ResidueField O))
+  {n : ℕ} {G : W.GFrame l} (r : W.Resid G O n)
 
 structure TwLink where
   π : G.G₀ →* F.G0
@@ -110,8 +130,11 @@ structure TwLink where
   mu : ∀ v, G.mu v ≤ (commutator (G.Gv v)).topologicalClosure
   tame : ∀ u, ∀ g ∈ G.Iu u, ∃ m : ℕ, ¬ l ∣ m ∧ π g ^ m = 1 ∧ κ g ^ m = 1
   ramκ : ∀ g ∈ G.I0, κ g = 1
-  ker : ∀ N : Subgroup G.G₀, N.Normal → IsClosed (N : Set G.G₀) → (∀ g ∈ N, G.conj g ∈ N) →
-    (∀ u, ∀ g ∈ G.Iu u, F.Ψ (π g) = 1 → g ∈ N) → G.I0 ≤ N → π.ker ≤ N
+  ker
+    : ∀ N : Subgroup G.G₀,
+      N.Normal → IsClosed (N : Set G.G₀) → (∀ g ∈ N, G.conj g ∈ N)
+        → (∀ u, ∀ g ∈ G.Iu u, F.Ψ (π g) = 1 → g ∈ N) → G.I0 ≤ N
+        → π.ker ≤ N
 
 namespace TwLink
 

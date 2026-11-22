@@ -10,6 +10,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 
 namespace CompanionTheory.RgExh.Hk
 
-theorem dual_module_facts : DualFacts := dualfacts_of GlobalTheory.T.QuantumDeterminantTau GlobalTheory.T.CayleyHamiltonHk GlobalTheory.T.InfinitesimalCharacterStatement GlobalTheory.T.HeckeNonVanishing
+theorem dual_module_facts : DualFacts :=
+  dualfacts_of GlobalTheory.T.QuantumDeterminantTau GlobalTheory.T.CayleyHamiltonHk
+    GlobalTheory.T.InfinitesimalCharacterStatement GlobalTheory.T.HeckeNonVanishing
 
 end CompanionTheory.RgExh.Hk

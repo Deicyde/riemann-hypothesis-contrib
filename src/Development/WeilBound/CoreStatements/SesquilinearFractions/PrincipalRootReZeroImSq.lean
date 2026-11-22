@@ -4,8 +4,10 @@ public import Development.WeilBound.CoreStatements.SesquilinearFractions.CoefZer
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Matrix GlobalTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexConjugate
 
@@ -32,8 +34,8 @@ theorem principal_root_re_zero_im_sq : H.rt0.re = 0 := by
 theorem rt0_conj_neg_ne_zero : conj H.rt0 = -H.rt0 := by
   apply Complex.ext <;> simp [principal_root_re_zero_im_sq (H := H)]
 
-theorem conjugate_rt (σ : E →+* ℂ) :
-    ComplexEmbedding.conjugate σ (H.rt : E) = H.rt0 ↔ σ (H.rt : E) ≠ H.rt0 := by
+theorem conjugate_rt (σ : E →+* ℂ)
+    : ComplexEmbedding.conjugate σ (H.rt : E) = H.rt0 ↔ σ (H.rt : E) ≠ H.rt0 := by
   rw [ComplexEmbedding.conjugate_coe_eq]
   rcases rt_cases (H := H) σ with h | h
   · rw [h, rt0_conj_neg_ne_zero]
@@ -43,21 +45,24 @@ theorem conjugate_rt (σ : E →+* ℂ) :
     simp only [true_iff]
     exact fun e => Host_rt0_ne_neg (H := H) e.symm
 
-theorem sum_split {M : Type} [AddCommMonoid M] (F : (E →+* ℂ) → M) :
-    ∑ σ, F σ = ∑ σ ∈ Finset.univ.filter (fun σ : E →+* ℂ => σ (H.rt : E) = H.rt0), F σ +
-      ∑ σ ∈ Finset.univ.filter (fun σ : E →+* ℂ => σ (H.rt : E) = H.rt0), F (ComplexEmbedding.conjugate σ) := by
-  rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (fun σ : E →+* ℂ => σ (H.rt : E) = H.rt0)]
-  congr 1
-  refine Finset.sum_nbij' ComplexEmbedding.conjugate ComplexEmbedding.conjugate ?_ ?_ ?_ ?_ ?_
-  · intro σ hσ
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ ⊢
-    exact (conjugate_rt σ).2 hσ
-  · intro σ hσ
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ ⊢
-    exact fun h' => ((conjugate_rt σ).1 h') hσ
-  · intro σ _; ext x; simp
-  · intro σ _; ext x; simp
-  · intro σ _; simp
+theorem sum_split {M : Type} [AddCommMonoid M] (F : (E →+* ℂ) → M)
+    : ∑ σ, F σ
+      = ∑ σ ∈ Finset.univ.filter (fun σ : E →+* ℂ => σ (H.rt : E) = H.rt0), F σ
+        + ∑ σ ∈ Finset.univ.filter (fun σ : E →+* ℂ => σ (H.rt : E) = H.rt0), F (ComplexEmbedding.conjugate σ) :=
+  by
+    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ
+      (fun σ : E →+* ℂ => σ (H.rt : E) = H.rt0)]
+    congr 1
+    refine Finset.sum_nbij' ComplexEmbedding.conjugate ComplexEmbedding.conjugate ?_ ?_ ?_ ?_ ?_
+    · intro σ hσ
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ ⊢
+      exact (conjugate_rt σ).2 hσ
+    · intro σ hσ
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ ⊢
+      exact fun h' => ((conjugate_rt σ).1 h') hσ
+    · intro σ _; ext x; simp
+    · intro σ _; ext x; simp
+    · intro σ _; simp
 
 theorem emb_indep (l : (E →+* ℂ) → ℂ) (h : ∀ b : 𝓞 E, ∑ σ, l σ * σ (b : E) = 0) : l = 0 := by
   let F : (E →+* ℂ) → (𝓞 E →* ℂ) := fun σ => (σ.comp (algebraMap (𝓞 E) E)).toMonoidHom
@@ -72,8 +77,8 @@ theorem emb_indep (l : (E →+* ℂ) → ℂ) (h : ∀ b : 𝓞 E, ∑ σ, l σ 
   funext b
   simpa [F, Finset.sum_apply] using h b
 
-theorem exists_big (a : 𝓞 E) (ha : a ≠ 0) (b : Bool) :
-    ∃ σ : E →+* ℂ, σ (H.rt : E) = (if b then H.rt0 else -H.rt0) ∧ 1 ≤ ‖σ (a : E)‖ := by
+theorem exists_big (a : 𝓞 E) (ha : a ≠ 0) (b : Bool)
+    : ∃ σ : E →+* ℂ, σ (H.rt : E) = (if b then H.rt0 else -H.rt0) ∧ 1 ≤ ‖σ (a : E)‖ := by
   by_contra hcon
   push Not at hcon
   have hall : ∀ σ : E →+* ℂ, ‖σ (a : E)‖ < 1 := by
@@ -82,8 +87,8 @@ theorem exists_big (a : 𝓞 E) (ha : a ≠ 0) (b : Bool) :
     · exact hcon σ hσ
     · have h2 : ComplexEmbedding.conjugate σ (H.rt : E) = (if b then H.rt0 else -H.rt0) := by
         rw [ComplexEmbedding.conjugate_coe_eq]
-        rcases rt_cases (H := H) σ with h | h <;> cases b <;>
-          simp_all [rt0_conj_neg_ne_zero (H := H)]
+        rcases rt_cases (H := H) σ with h | h <;> cases b
+          <;> simp_all [rt0_conj_neg_ne_zero (H := H)]
       have := hcon _ h2
       rwa [ComplexEmbedding.conjugate_coe_eq, Complex.norm_conj] at this
   obtain ⟨σ₀⟩ : Nonempty (E →+* ℂ) := inferInstance
@@ -91,8 +96,9 @@ theorem exists_big (a : 𝓞 E) (ha : a ≠ 0) (b : Bool) :
     rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ σ₀)]
     have h1 : ∏ σ ∈ Finset.univ.erase σ₀, ‖σ (a : E)‖ ≤ 1 :=
       Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) (fun σ _ => (hall σ).le)
-    calc ‖σ₀ (a : E)‖ * ∏ σ ∈ Finset.univ.erase σ₀, ‖σ (a : E)‖ ≤ ‖σ₀ (a : E)‖ * 1 :=
-          mul_le_mul_of_nonneg_left h1 (norm_nonneg _)
+    calc
+      ‖σ₀ (a : E)‖ * ∏ σ ∈ Finset.univ.erase σ₀, ‖σ (a : E)‖
+        ≤ ‖σ₀ (a : E)‖ * 1 := mul_le_mul_of_nonneg_left h1 (norm_nonneg _)
       _ < 1 := by rw [_root_.mul_one]; exact hall σ₀
   have hge : 1 ≤ ∏ σ : E →+* ℂ, ‖σ (a : E)‖ := by
     have hN : Algebra.norm ℤ a ≠ 0 := Algebra.norm_ne_zero_iff.2 ha

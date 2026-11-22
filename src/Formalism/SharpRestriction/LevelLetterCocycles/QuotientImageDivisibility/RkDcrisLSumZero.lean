@@ -16,13 +16,16 @@ open Formalism.BasicNotions
 
 section Dec
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
 
 private lemma mem_DcrisL_iff' (T : LocLat G Qp LL O) (σ : K₀ →ₐ[Qp] LL) (x : T.V ⊗[Qp] B) :
     x ∈ DcrisL PD T.ρ σ ↔ x ∈ Dcris PD T.ρ ∧
@@ -57,8 +60,8 @@ private lemma iotaV_mulVB_comm (T : LocLat G Qp LL O) (c : K₀) (x : T.V ⊗[Qp
   | tmul a b => simp [ιV, mulVB, mulVdR, ← IsScalarTower.algebraMap_apply]
   | add a b ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
 
-theorem rk_lift (hK : Function.Bijective (algebraMap K₀ K)) (σ : K₀ →ₐ[Qp] LL) :
-    ∃ τ : K →ₐ[Qp] LL, τ.comp (IsScalarTower.toAlgHom Qp K₀ K) = σ := by
+theorem rk_lift (hK : Function.Bijective (algebraMap K₀ K)) (σ : K₀ →ₐ[Qp] LL)
+    : ∃ τ : K →ₐ[Qp] LL, τ.comp (IsScalarTower.toAlgHom Qp K₀ K) = σ := by
   let e : K₀ ≃ₐ[Qp] K := AlgEquiv.ofBijective (IsScalarTower.toAlgHom Qp K₀ K) hK
   refine ⟨σ.comp (e.symm : K →ₐ[Qp] K₀), ?_⟩
   ext x
@@ -68,10 +71,13 @@ theorem rk_lift (hK : Function.Bijective (algebraMap K₀ K)) (σ : K₀ →ₐ[
 variable [NeZero n] (W : LocWach PD LL O v n)
 
 include W in
-theorem rk_DcrisL_map (hK : Function.Bijective (algebraMap K₀ K)) (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
-    (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) (τ : K →ₐ[Qp] LL) :
-    (DcrisL PD T.ρ (τ.comp (IsScalarTower.toAlgHom Qp K₀ K))).map (ιV PD (LL := LL) (V := T.V)) =
-      DdRE PD T.ρ τ := by
+theorem rk_DcrisL_map
+    (hK : Function.Bijective (algebraMap K₀ K))
+    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
+    (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ)
+    (τ : K →ₐ[Qp] LL)
+    : (DcrisL PD T.ρ (τ.comp (IsScalarTower.toAlgHom Qp K₀ K))).map (ιV PD (LL := LL) (V := T.V))
+      = DdRE PD T.ρ τ := by
   have hD := (hQ hK T.V T.ρ hT).1
   ext y
   rw [Submodule.mem_map, mem_DdRE_iff']
@@ -92,9 +98,12 @@ theorem rk_DcrisL_map (hK : Function.Bijective (algebraMap K₀ K)) (hQ : Formal
     first | rfl | simp
 
 include W in
-theorem rk_finrank_DcrisL (hK : Function.Bijective (algebraMap K₀ K)) (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
-    (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) (σ : K₀ →ₐ[Qp] LL) :
-    finrank LL ↥(DcrisL PD T.ρ σ) = finrank LL T.V := by
+theorem rk_finrank_DcrisL
+    (hK : Function.Bijective (algebraMap K₀ K))
+    (hQ : Formalism.MainNotions.RamifiedCoefficientChains.DdREqDcris PD LL)
+    (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ)
+    (σ : K₀ →ₐ[Qp] LL)
+    : finrank LL ↥(DcrisL PD T.ρ σ) = finrank LL T.V := by
   obtain ⟨τ, hτ⟩ := rk_lift hK σ
   rw [← hτ]
   have hmap := rk_DcrisL_map W hK hQ T hT τ

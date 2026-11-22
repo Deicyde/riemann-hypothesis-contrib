@@ -8,13 +8,17 @@ public import Formalism.LocalToGlobal.LatticeGeometry.GeoTiedP
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Geo GlobalTheory.ShFam.Pad
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Geo
+  GlobalTheory.ShFam.Pad
 
 namespace GlobalTheory.ShFam.PinPlace
 
-theorem mem_mul_iff {R K : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
-    [IsFractionRing R K] {ϖ : R} (hϖ : Irreducible ϖ) (y : K) :
-    (∃ a : R, y = algebraMap R K (ϖ * a)) ↔ y = 0 ∨ y⁻¹ ∉ (algebraMap R K).range := by
+theorem mem_mul_iff
+    {R K : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+    [IsFractionRing R K]
+    {ϖ : R} (hϖ : Irreducible ϖ)
+    (y : K)
+    : (∃ a : R, y = algebraMap R K (ϖ * a)) ↔ y = 0 ∨ y⁻¹ ∉ (algebraMap R K).range := by
   have hinj := IsFractionRing.injective R K
   constructor
   · rintro ⟨a, rfl⟩
@@ -38,16 +42,18 @@ theorem mem_mul_iff {R K : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationR
 
 variable {D : D7} {p : ℕ} [Fact p.Prime] {la : PlL D p} {jc : DV.KW p →+* ℂ}
 
-theorem mem_range_iff (h : JcPin D p la jc) {y : DV.KW p} {z : D.what₂.LL} (hyz : jc y = D.what₂.embLL z) :
-    y ∈ (algebraMap (WittVector p (AlgebraicClosure (ZMod p))) (DV.KW p)).range ↔
-      la.1.valuation D.what₂.LL z ≤ 1 := by
+theorem mem_range_iff
+    (h : JcPin D p la jc) {y : DV.KW p} {z : D.what₂.LL} (hyz : jc y = D.what₂.embLL z)
+    : y ∈ (algebraMap (WittVector p (AlgebraicClosure (ZMod p))) (DV.KW p)).range
+      ↔ la.1.valuation D.what₂.LL z ≤ 1 := by
   obtain ⟨W, h1, h2⟩ := h
   rw [← h2, hyz, h1]
 
-theorem mem_pW_iff (h : JcPin D p la jc) {y : DV.KW p} {z : D.what₂.LL} (hyz : jc y = D.what₂.embLL z) :
-    (∃ a : WittVector p (AlgebraicClosure (ZMod p)),
-        y = algebraMap (WittVector p (AlgebraicClosure (ZMod p))) (DV.KW p) (p * a)) ↔
-      la.1.valuation D.what₂.LL z < 1 := by
+theorem mem_pW_iff
+    (h : JcPin D p la jc) {y : DV.KW p} {z : D.what₂.LL} (hyz : jc y = D.what₂.embLL z)
+    : (∃ a : WittVector p (AlgebraicClosure (ZMod p)),
+        y = algebraMap (WittVector p (AlgebraicClosure (ZMod p))) (DV.KW p) (p * a))
+      ↔ la.1.valuation D.what₂.LL z < 1 := by
   rw [mem_mul_iff (WittVector.irreducible p) y,
     mem_range_iff h (y := y⁻¹) (z := z⁻¹) (by rw [map_inv₀, map_inv₀, hyz])]
   have h0 : y = 0 ↔ z = 0 := by
@@ -59,15 +65,18 @@ theorem mem_pW_iff (h : JcPin D p la jc) {y : DV.KW p} {z : D.what₂.LL} (hyz :
     rw [one_lt_inv₀ hv]
     simp [hz]
 
-theorem pinned_reads_place : ∀ (D : D7) (jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)),
-    (∀ (p : ℕ) [Fact p.Prime] (la : PlL D p), JcPin D p la (jC p la)) →
-    ∀ (p : ℕ) [Fact p.Prime] (la : PlL D p) (τ : DV.Emb D p) (e : D.host.E →+* D.what₂.LL),
-      (jC p la).comp τ = D.what₂.embLL.comp e → ∀ x : 𝓞 D.host.E,
-        τ x ∈ (algebraMap (WittVector p (AlgebraicClosure (ZMod p))) (DV.KW p)).range ∧
-        ((∃ a : WittVector p (AlgebraicClosure (ZMod p)),
-            τ x = algebraMap (WittVector p (AlgebraicClosure (ZMod p))) (DV.KW p) (p * a)) ↔
-          la.1.valuation D.what₂.LL (e x) < 1) ∧
-        (la.1.valuation D.what₂.LL (e x) < 1 ↔ RingOfIntegers.mapRingHom e x ∈ la.1.asIdeal) := by
+theorem pinned_reads_place
+    : ∀ (D : D7) (jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)),
+      (∀ (p : ℕ) [Fact p.Prime] (la : PlL D p), JcPin D p la (jC p la))
+        → ∀ (p : ℕ) [Fact p.Prime] (la : PlL D p) (τ : DV.Emb D p) (e : D.host.E →+* D.what₂.LL),
+          (jC p la).comp τ = D.what₂.embLL.comp e
+            → ∀ x : 𝓞 D.host.E,
+              τ x ∈ (algebraMap (WittVector p (AlgebraicClosure (ZMod p))) (DV.KW p)).range
+                ∧ ((∃ a : WittVector p (AlgebraicClosure (ZMod p)),
+                    τ x = algebraMap (WittVector p (AlgebraicClosure (ZMod p))) (DV.KW p) (p * a))
+                  ↔ la.1.valuation D.what₂.LL (e x) < 1)
+                ∧ (la.1.valuation D.what₂.LL (e x) < 1
+                  ↔ RingOfIntegers.mapRingHom e x ∈ la.1.asIdeal) := by
   intro D jC h p _ la τ e hτ x
   have hx : jC p la (τ x) = D.what₂.embLL (e x) := RingHom.congr_fun hτ (x : D.host.E)
   have he : e x = algebraMap (𝓞 D.what₂.LL) D.what₂.LL (RingOfIntegers.mapRingHom e x) := rfl
@@ -75,8 +84,9 @@ theorem pinned_reads_place : ∀ (D : D7) (jC : ∀ (p : ℕ) [Fact p.Prime], Pl
   · rw [he]; exact la.1.valuation_le_one _
   · rw [he]; exact la.1.valuation_lt_one_iff_mem _
 
-theorem coeff_zero_eq_zero_iff {k : Type} [Field k] [CharP k p] [PerfectRing k p] (b : WittVector p k) :
-    b.coeff 0 = 0 ↔ ∃ a : WittVector p k, b = p * a := by
+theorem coeff_zero_eq_zero_iff
+    {k : Type} [Field k] [CharP k p] [PerfectRing k p] (b : WittVector p k)
+    : b.coeff 0 = 0 ↔ ∃ a : WittVector p k, b = p * a := by
   constructor
   · intro h0
     have hb : ¬ IsUnit b := by
@@ -94,8 +104,10 @@ theorem coeff_zero_eq_zero_iff {k : Type} [Field k] [CharP k p] [PerfectRing k p
     have : ((p : WittVector p k)).coeff 0 = 0 := by simp
     rw [this, zero_mul]
 
-theorem pinned_tiedFor : ∀ (D : D7) (jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)),
-    (∀ (p : ℕ) [Fact p.Prime] (la : PlL D p), JcPin D p la (jC p la)) → Formalism.L2.Geo.ComplexEmbeddingsCompatible jC := by
+theorem pinned_tiedFor
+    : ∀ (D : D7) (jC : ∀ (p : ℕ) [Fact p.Prime], PlL D p → (DV.KW p →+* ℂ)),
+      (∀ (p : ℕ) [Fact p.Prime] (la : PlL D p), JcPin D p la (jC p la))
+        → Formalism.L2.Geo.ComplexEmbeddingsCompatible jC := by
   intro D jC h p _ la τ e hτ x
   obtain ⟨-, h2, -⟩ := pinned_reads_place D jC h p la τ e hτ x
   rw [← h2]

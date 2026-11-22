@@ -9,14 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSimTriv
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
 namespace GlobalTheory.TateRoot
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain in
 open scoped CategoryTheory.Obj in
 private lemma isCoprime_add_sub_mul_pow_factorial {j N : ℤ} (hj : IsCoprime j N) {n : ℕ} (hn : 0 < n) :
     IsCoprime (j + (1 - j) * N ^ n.factorial) n := by
@@ -44,7 +47,8 @@ private lemma isCoprime_add_sub_mul_pow_factorial {j N : ℤ} (hj : IsCoprime j 
     rw [hs, pow_mul, ZMod.pow_card_sub_one_eq_one hN, one_pow] at hν
     simp at hν
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain in
 open scoped CategoryTheory.Obj in
 private lemma zmod_pow_eq_pow_factorial_of_dvd {n : ℕ} (hn : 0 < n) (x : ZMod n) {c : ℕ}
     (hc : n.factorial ∣ c) (hc0 : 0 < c) : x ^ c = x ^ n.factorial := by
@@ -76,54 +80,73 @@ private lemma zmod_pow_eq_pow_factorial_of_dvd {n : ℕ} (hn : 0 < n) (x : ZMod 
   · exact key b (a - b) (by omega) (by omega) (by omega)
       (by rw [show (b : ℕ) + (a - b) = a by omega]; exact heq)
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain in
 open scoped CategoryTheory.Obj in
-theorem _root_.GlobalTheory.TateRoot.exists_tateIso_zeta_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H) (k : Type) [Field k] (Q : Type) [Group Q]
-    (act : 𝓞 E → Q → Q) (e : ℕ → Q → Q → kˣ → Prop) (_ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.TateIso D k Q act e) (N : ℕ) (z : k),
-    0 < N → IsPrimitiveRoot z N → ∃ I' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.TateIso D k Q act e, (I'.ζ N : k) = z := by
+theorem _root_.GlobalTheory.TateRoot.exists_tateIso_zeta_eq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+        (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H)
+        (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H) (k : Type) [Field k]
+        (Q : Type) [Group Q] (act : 𝓞 E → Q → Q) (e : ℕ → Q → Q → kˣ → Prop)
+        (_ : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.TateIso D k Q act e) (N : ℕ)
+        (z : k),
+      0 < N → IsPrimitiveRoot z N
+        → ∃ I' : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.TateIso D k Q act e,
+          (I'.ζ N : k) = z := by
   intro E _ _ _ H D l k _ Q _ act e I N z hN hz
-  have hζ : IsPrimitiveRoot ((I.ζ N : kˣ) : k) N := IsPrimitiveRoot.coe_units_iff.mpr (I.ζ_prim N hN)
+  have hζ : IsPrimitiveRoot ((I.ζ N : kˣ) : k) N :=
+    IsPrimitiveRoot.coe_units_iff.mpr (I.ζ_prim N hN)
   haveI : NeZero N := ⟨hN.ne'⟩
   obtain ⟨i, -, hi⟩ := hζ.eq_pow_of_pow_eq_one hz.pow_eq_one
   have hcop : IsCoprime (i : ℤ) N := by
     rw [Nat.isCoprime_iff_coprime]
     rw [← hζ.pow_iff_coprime hN, hi]
     exact hz
-  suffices h : ∃ g : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sim D, ∃ hν : (∀ (n m : ℕ), 0 < n → 0 < m → (n : ℤ) ∣ g.ν (n * m) - g.ν n ∧
-      IsCoprime (g.ν n) n), (N : ℤ) ∣ g.ν N - i by
+  suffices h
+      : ∃ g : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sim D,
+        ∃ hν : (∀ (n m : ℕ), 0 < n → 0 < m → (n : ℤ) ∣ g.ν (n * m) - g.ν n ∧ IsCoprime (g.ν n) n),
+          (N : ℤ) ∣ g.ν N - i by
     obtain ⟨g, hν, hg⟩ := h
     refine ⟨_root_.GlobalTheory.LevelTwist.twist I g hν, ?_⟩
-    rw [_root_.GlobalTheory.LevelTwist.twist_ζ, _root_.GlobalTheory.LevelTwist.zeta_zpow_congr I hN hg, zpow_natCast, Units.val_pow_eq_pow_val, hi]
+    rw [_root_.GlobalTheory.LevelTwist.twist_ζ,
+      _root_.GlobalTheory.LevelTwist.zeta_zpow_congr I hN hg, zpow_natCast,
+      Units.val_pow_eq_pow_val, hi]
   rcases Nat.eq_zero_or_pos (D.p + D.q) with hpq | hpq
   · haveI := D.proj
     haveI := D.fin
     have hsub : Subsingleton D.La := Module.finrank_zero_iff.mp (by rw [D.rank]; exact hpq)
-    let g : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sim D :=
-      { f := fun _ => LinearMap.id
-        ν := fun n => i + (1 - i) * (N : ℤ) ^ n.factorial
-        tower := fun n m _ _ a => ⟨0, by simp⟩
-        inv := fun n _ => ⟨LinearMap.id, fun a => ⟨⟨0, Subsingleton.elim _ _⟩, ⟨0, Subsingleton.elim _ _⟩⟩⟩
-        mult := fun n _ a b => by rw [Subsingleton.elim a 0]; simp }
+    let g : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sim D := {
+      f := fun _ => LinearMap.id
+      ν := fun n => i + (1 - i) * (N : ℤ) ^ n.factorial
+      tower := fun n m _ _ a => ⟨0, by simp⟩
+      inv := fun n _ =>
+        ⟨LinearMap.id, fun a => ⟨⟨0, Subsingleton.elim _ _⟩, ⟨0, Subsingleton.elim _ _⟩⟩⟩
+      mult := fun n _ a b => by rw [Subsingleton.elim a 0]; simp
+    }
     refine ⟨g, fun n m hn hm => ⟨?_, isCoprime_add_sub_mul_pow_factorial hcop hn⟩, ?_⟩
-    · have h := zmod_pow_eq_pow_factorial_of_dvd hn (N : ZMod n)
-        (Nat.factorial_dvd_factorial (Nat.le_mul_of_pos_right n hm)) (Nat.factorial_pos _)
-      have h' : (((N : ℤ) ^ n.factorial : ℤ) : ZMod n) =
-          (((N : ℤ) ^ (n * m).factorial : ℤ) : ZMod n) := by
+    · have h :=
+        zmod_pow_eq_pow_factorial_of_dvd hn (N : ZMod n)
+          (Nat.factorial_dvd_factorial (Nat.le_mul_of_pos_right n hm)) (Nat.factorial_pos _)
+      have h'
+          : (((N : ℤ) ^ n.factorial : ℤ) : ZMod n)
+            = (((N : ℤ) ^ (n * m).factorial : ℤ) : ZMod n) := by
         push_cast
         exact h.symm
       rw [ZMod.intCast_eq_intCast_iff_dvd_sub] at h'
       show (n : ℤ) ∣ (i + (1 - i) * (N : ℤ) ^ (n * m).factorial) - (i + (1 - i) * (N : ℤ) ^ n.factorial)
-      rw [show (i + (1 - i) * (N : ℤ) ^ (n * m).factorial) - (i + (1 - i) * (N : ℤ) ^ n.factorial) =
-        (1 - i) * ((N : ℤ) ^ (n * m).factorial - (N : ℤ) ^ n.factorial) by ring]
+      rw [show (i + (1 - i) * (N : ℤ) ^ (n * m).factorial) - (i + (1 - i) * (N : ℤ) ^ n.factorial)
+          = (1 - i) * ((N : ℤ) ^ (n * m).factorial - (N : ℤ) ^ n.factorial) by
+        ring]
       exact Dvd.dvd.mul_left h' _
     · show (N : ℤ) ∣ (i + (1 - i) * (N : ℤ) ^ N.factorial) - i
       rw [add_sub_cancel_left]
       exact Dvd.dvd.mul_left (dvd_pow_self _ (Nat.factorial_ne_zero N)) _
   · have hgrp := _root_.GlobalTheory.SimAlg.sim_group
-    obtain ⟨g, hg, -⟩ := _root_.GlobalTheory.SimMult.exists_sim_trivial_of_mult hgrp _root_.GlobalTheory.exists_sim_lift
-      E H D { l with A := 1, A_pos := Nat.one_pos } N i hN hcop (by simp)
+    obtain ⟨g, hg, -⟩ :=
+      _root_.GlobalTheory.SimMult.exists_sim_trivial_of_mult hgrp
+        _root_.GlobalTheory.exists_sim_lift E H D { l with A := 1, A_pos := Nat.one_pos } N i hN
+        hcop (by simp)
     exact ⟨g, (hgrp E H D hpq).1 g, hg⟩
 
 end GlobalTheory.TateRoot

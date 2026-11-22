@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest Formalism.IndefR.WeilFull GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  Formalism.IndefR.WeilFull GlobalTheory.RowClaim
 
 set_option autoImplicit false
 noncomputable section
@@ -26,21 +29,25 @@ section Coeff
 
 variable {ι : Type} [Fintype ι] {n : ℕ}
 
-theorem coeff_bVV_mem (A : Subfield ℂ) (lam : ι → DomWeight n) (i : VVIdx lam) (m) :
-    AddMonoidAlgebra.coeff ((bVV ℂ lam i : VV ℂ lam) : Pol ℂ ι n) m ∈ A := by
+theorem coeff_bVV_mem (A : Subfield ℂ) (lam : ι → DomWeight n) (i : VVIdx lam) (m)
+    : AddMonoidAlgebra.coeff ((bVV ℂ lam i : VV ℂ lam) : Pol ℂ ι n) m ∈ A := by
   obtain ⟨P, hP⟩ := bVVfun_int ℂ lam i
   rw [bVV_coe, hP, coeff_map]
   exact intCast_mem A _
 
-theorem coeff_mem_of_repr_mem (A : Subfield ℂ) (lam : ι → DomWeight n) (v : VV ℂ lam)
-    (h : ∀ i, (bVV ℂ lam).repr v i ∈ A) (m) : AddMonoidAlgebra.coeff (v : Pol ℂ ι n) m ∈ A := by
-  have e := congrArg (fun x : VV ℂ lam => AddMonoidAlgebra.coeff (x : Pol ℂ ι n) m) ((bVV ℂ lam).sum_repr v)
+theorem coeff_mem_of_repr_mem
+    (A : Subfield ℂ) (lam : ι → DomWeight n) (v : VV ℂ lam) (h : ∀ i, (bVV ℂ lam).repr v i ∈ A) (m)
+    : AddMonoidAlgebra.coeff (v : Pol ℂ ι n) m ∈ A := by
+  have e :=
+    congrArg (fun x : VV ℂ lam => AddMonoidAlgebra.coeff (x : Pol ℂ ι n) m) ((bVV ℂ lam).sum_repr v)
   simp only [Submodule.coe_sum, Submodule.coe_smul, coeff_sum, coeff_smul, smul_eq_mul] at e
   rw [← e]
   exact sum_mem fun i _ => mul_mem (h i) (coeff_bVV_mem A lam i m)
 
-theorem repr_mem_of_coeff_mem (A : Subfield ℂ) (lam : ι → DomWeight n) (v : VV ℂ lam)
-    (h : ∀ m, AddMonoidAlgebra.coeff (v : Pol ℂ ι n) m ∈ A) (i : VVIdx lam) : (bVV ℂ lam).repr v i ∈ A := by
+theorem repr_mem_of_coeff_mem
+    (A : Subfield ℂ) (lam : ι → DomWeight n) (v : VV ℂ lam)
+    (h : ∀ m, AddMonoidAlgebra.coeff (v : Pol ℂ ι n) m ∈ A) (i : VVIdx lam)
+    : (bVV ℂ lam).repr v i ∈ A := by
   classical
   choose P hP using fun j => bVVfun_int ℂ lam j
   let s : A →+* ℂ := A.subtype
@@ -49,9 +56,10 @@ theorem repr_mem_of_coeff_mem (A : Subfield ℂ) (lam : ι → DomWeight n) (v :
     rw [bVV_coe, hP, map_map]
     congr 1
   obtain ⟨v', hv'⟩ : ∃ v' : MvPolynomial (ι × Fin n × Fin n) A, map s v' = (v : Pol ℂ ι n) := by
-    obtain ⟨F', hF'⟩ := (mem_range_map_iff_coeffs_subset (f := s)).2 (fun c hc => by
-      obtain ⟨m, -, rfl⟩ := mem_coeffs_iff.1 hc
-      exact ⟨⟨_, h m⟩, rfl⟩)
+    obtain ⟨F', hF'⟩ :=
+      (mem_range_map_iff_coeffs_subset (f := s)).2 (fun c hc => by
+        obtain ⟨m, -, rfl⟩ := mem_coeffs_iff.1 hc
+        exact ⟨⟨_, h m⟩, rfl⟩)
     exact ⟨F', hF'⟩
   have hliC : LinearIndependent ℂ fun j => ((bVV ℂ lam j : VV ℂ lam) : Pol ℂ ι n) :=
     (bVV ℂ lam).linearIndependent.map' (VV ℂ lam).subtype (Submodule.ker_subtype _)
@@ -70,12 +78,13 @@ theorem repr_mem_of_coeff_mem (A : Subfield ℂ) (lam : ι → DomWeight n) (v :
     have hopt : LinearIndependent A (fun o : Option (VVIdx lam) => Option.casesOn' o v' b') :=
       (linearIndependent_option' (x := v') (v := b')).2 ⟨hli, hn⟩
     have hC := Formalism.L2.Col.linearIndependent_map s _ hopt
-    have hC' : LinearIndependent ℂ (fun o : Option (VVIdx lam) =>
-        Option.casesOn' o (map s v') fun j => map s (b' j)) := by
+    have hC' : LinearIndependent ℂ
+        (fun o : Option (VVIdx lam) => Option.casesOn' o (map s v') fun j => map s (b' j)) := by
       convert hC using 1
       funext o
       cases o <;> rfl
-    obtain ⟨-, hnot⟩ := (linearIndependent_option' (x := map s v') (v := fun j => map s (b' j))).1 hC'
+    obtain ⟨-, hnot⟩ :=
+      (linearIndependent_option' (x := map s v') (v := fun j => map s (b' j))).1 hC'
     apply hnot
     rw [hv']
     have hvs := congrArg (fun x : VV ℂ lam => (x : Pol ℂ ι n)) ((bVV ℂ lam).sum_repr v)
@@ -92,18 +101,27 @@ theorem repr_mem_of_coeff_mem (A : Subfield ℂ) (lam : ι → DomWeight n) (v :
   rw [hvc, (bVV ℂ lam).repr_sum_self]
   exact (c i).2
 
-theorem coeff_map_mem {ι' : Type} [Fintype ι'] {n' : ℕ} (A : Subfield ℂ) (lam : ι → DomWeight n)
-    (mu : ι' → DomWeight n') (f : VV ℂ lam →ₗ[ℂ] VV ℂ mu)
-    (hf : ∀ a b, LinearMap.toMatrix (bVV ℂ lam) (bVV ℂ mu) f a b ∈ A) (v : VV ℂ lam)
-    (hv : ∀ m, AddMonoidAlgebra.coeff (v : Pol ℂ ι n) m ∈ A) (m) : AddMonoidAlgebra.coeff ((f v : VV ℂ mu) : Pol ℂ ι' n') m ∈ A := by
+theorem coeff_map_mem
+    {ι' : Type} [Fintype ι']
+    {n' : ℕ} (A : Subfield ℂ) (lam : ι → DomWeight n) (mu : ι' → DomWeight n')
+    (f : VV ℂ lam →ₗ[ℂ] VV ℂ mu) (hf : ∀ a b, LinearMap.toMatrix (bVV ℂ lam) (bVV ℂ mu) f a b ∈ A)
+    (v : VV ℂ lam) (hv : ∀ m, AddMonoidAlgebra.coeff (v : Pol ℂ ι n) m ∈ A)
+    (m)
+    : AddMonoidAlgebra.coeff ((f v : VV ℂ mu) : Pol ℂ ι' n') m ∈ A := by
   classical
   refine coeff_mem_of_repr_mem A mu (f v) (fun a => ?_) m
   rw [← LinearMap.toMatrix_mulVec_repr (bVV ℂ lam) (bVV ℂ mu) f v, Matrix.mulVec, dotProduct]
   exact sum_mem fun b _ => mul_mem (hf a b) (repr_mem_of_coeff_mem A lam v hv b)
 
-theorem coeff_rhoVr_mem {E : Type} [Field E] (emb : ι → E →+* ℂ) (lam : ι → DomWeight n) (A : Subfield ℂ)
-    (hA : ∀ τ x, emb τ x ∈ A) (γE : GL (Fin n) E) (v : VV ℂ lam) (hv : ∀ m, AddMonoidAlgebra.coeff (v : Pol ℂ ι n) m ∈ A) (m) :
-    AddMonoidAlgebra.coeff ((rhoVr emb lam γE v : VV ℂ lam) : Pol ℂ ι n) m ∈ A := by
+theorem coeff_rhoVr_mem
+    {E : Type} [Field E]
+    (emb : ι → E →+* ℂ)
+    (lam : ι → DomWeight n)
+    (A : Subfield ℂ) (hA : ∀ τ x, emb τ x ∈ A)
+    (γE : GL (Fin n) E)
+    (v : VV ℂ lam) (hv : ∀ m, AddMonoidAlgebra.coeff (v : Pol ℂ ι n) m ∈ A)
+    (m)
+    : AddMonoidAlgebra.coeff ((rhoVr emb lam γE v : VV ℂ lam) : Pol ℂ ι n) m ∈ A := by
   classical
   let R₀ : Subring (Pol ℂ ι n) := (MvPolynomial.map A.subtype).range
   have memR : ∀ F : Pol ℂ ι n, F ∈ R₀ ↔ ∀ m, AddMonoidAlgebra.coeff F m ∈ A := by
@@ -113,12 +131,15 @@ theorem coeff_rhoVr_mem {E : Type} [Field E] (emb : ι → E →+* ℂ) (lam : �
       rw [coeff_map]
       exact (AddMonoidAlgebra.coeff F' m).2
     · intro h
-      obtain ⟨F', hF'⟩ := (mem_range_map_iff_coeffs_subset (f := A.subtype)).2 (fun c hc => by
-        obtain ⟨m, -, rfl⟩ := mem_coeffs_iff.1 hc
-        exact ⟨⟨_, h m⟩, rfl⟩)
+      obtain ⟨F', hF'⟩ :=
+        (mem_range_map_iff_coeffs_subset (f := A.subtype)).2 (fun c hc => by
+          obtain ⟨m, -, rfl⟩ := mem_coeffs_iff.1 hc
+          exact ⟨⟨_, h m⟩, rfl⟩)
       exact ⟨F', hF'⟩
-  have hblock : ∀ M : ι → Matrix (Fin n) (Fin n) ℂ, (∀ τ a b, M τ a b ∈ A) → ∀ F ∈ R₀,
-      Formalism.GradedWeylDivisibility.blockAct ℂ M F ∈ R₀ := by
+  have hblock
+      : ∀ M : ι → Matrix (Fin n) (Fin n) ℂ,
+        (∀ τ a b, M τ a b ∈ A)
+          → ∀ F ∈ R₀, Formalism.GradedWeylDivisibility.blockAct ℂ M F ∈ R₀ := by
     intro M hM F hF
     obtain ⟨F', rfl⟩ := hF
     induction F' using MvPolynomial.induction_on with
@@ -133,16 +154,20 @@ theorem coeff_rhoVr_mem {E : Type} [Field E] (emb : ι → E →+* ℂ) (lam : �
       refine mul_mem hp ?_
       rw [Formalism.GradedWeylDivisibility.blockAct, aeval_X]
       exact sum_mem fun b _ => mul_mem ⟨C ⟨_, hM _ _ _⟩, by rw [map_C]; rfl⟩ ⟨X _, map_X _ _⟩
-  have hent : ∀ τ a b, ((invTrK (embGL emb γE) τ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) a b ∈ A := by
+  have hent
+      : ∀ τ a b, ((invTrK (embGL emb γE) τ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) a b ∈ A := by
     intro τ a b
     show ((((Formalism.UG.bc (emb τ) γE)⁻¹ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ)) b a ∈ A
     rw [← map_inv]
     exact hA τ _
-  have hdet : ∀ τ, ((invTrK (embGL emb γE) τ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ).det ∈ A := by
+  have hdet
+      : ∀ τ, ((invTrK (embGL emb γE) τ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ).det ∈ A := by
     intro τ
     have e := RingHom.map_det A.subtype (Matrix.of fun a b => (⟨_, hent τ a b⟩ : A))
-    rw [show A.subtype.mapMatrix (Matrix.of fun a b => (⟨_, hent τ a b⟩ : A)) =
-      ((invTrK (embGL emb γE) τ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) from Matrix.ext fun a b => rfl] at e
+    rw [show A.subtype.mapMatrix (Matrix.of fun a b => (⟨_, hent τ a b⟩ : A))
+          = ((invTrK (embGL emb γE) τ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) from
+        Matrix.ext fun a b => rfl]
+      at e
     rw [← e]
     exact SetLike.coe_mem _
   have hdt : detTwK lam (invTrK (embGL emb γE)) ∈ A := by
@@ -159,8 +184,10 @@ theorem coeff_rhoVr_mem {E : Type} [Field E] (emb : ι → E →+* ℂ) (lam : �
 
 end Coeff
 
-theorem chainTo_preserves {V : ℕ → Type} [∀ j, AddCommGroup (V j)] [∀ j, Module ℂ (V j)] (k : ∀ j, V j →ₗ[ℂ] V (j + 1))
-    (P : ∀ j, V j → Prop) (hk : ∀ j v, P j v → P (j + 1) (k j v)) : ∀ N v, P 0 v → P N (GlobalTheory.FunObj.chainTo k N v)
+theorem chainTo_preserves
+    {V : ℕ → Type} [∀ j, AddCommGroup (V j)] [∀ j, Module ℂ (V j)]
+    (k : ∀ j, V j →ₗ[ℂ] V (j + 1)) (P : ∀ j, V j → Prop) (hk : ∀ j v, P j v → P (j + 1) (k j v))
+    : ∀ N v, P 0 v → P N (GlobalTheory.FunObj.chainTo k N v)
   | 0, _, hv => hv
   | N + 1, v, hv => hk N _ (chainTo_preserves k P hk N v hv)
 
@@ -172,24 +199,47 @@ open MvPolynomial
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem colMap_coeff_mem : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 T : Type} {A : FamIn D.what₂.LL Γ Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} (ch : Choice R) (large₂ : SizeData₂ D) (F : Face D A), HidaSetting large₂ R F → ch.Is → ch.FieldOK → ∀ (t : T) (Φ : ch.G.Datum), ch.S.SumOK t Φ → ∀ β ∈ ch.S.supp t Φ, ∀ τ, IsCosetExpansion ch.S.toGridChoice t Φ β (expDepth ch.S.toGridChoice t Φ β) τ → ∀ d ∈ τ.support, ∀ (c : ch.S.Classes t Φ β) (u : VV ℂ (wt ch.G (.top 0))), (∀ m, AddMonoidAlgebra.coeff u.1 m ∈ Set.range D.what₂.embLL) → ∀ m, AddMonoidAlgebra.coeff (ch.S.colMap d (ch.S.ptTop c) u).1 m ∈ Set.range D.what₂.embLL := by
+theorem colMap_coeff_mem
+    : ∀ {D : D7} {Γ : Type} [Group Γ] [Fintype Γ] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL Γ Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} (ch : Choice R) (large₂ : SizeData₂ D)
+        (F : Face D A),
+      HidaSetting large₂ R F → ch.Is → ch.FieldOK
+        → ∀ (t : T) (Φ : ch.G.Datum),
+          ch.S.SumOK t Φ
+            → ∀ β ∈ ch.S.supp t Φ, ∀ τ,
+              IsCosetExpansion ch.S.toGridChoice t Φ β (expDepth ch.S.toGridChoice t Φ β) τ
+                → ∀ d ∈ τ.support, ∀ (c : ch.S.Classes t Φ β) (u : VV ℂ (wt ch.G (.top 0))),
+                  (∀ m, AddMonoidAlgebra.coeff u.1 m ∈ Set.range D.what₂.embLL)
+                    → ∀ m,
+                      AddMonoidAlgebra.coeff (ch.S.colMap d (ch.S.ptTop c) u).1 m
+                        ∈ Set.range D.what₂.embLL := by
   intro D Γ _ _ Pl0 T A Ks _ _ _ R ch large₂ F _ _ hF t Φ _ β hβ τ hτ d hd c u hu
   let K : Subfield ℂ := D.what₂.embLL.fieldRange
   have memK : ∀ z : ℂ, z ∈ K ↔ z ∈ Set.range D.what₂.embLL := fun z => Iff.rfl
   have hE : ∀ (σ : D.what₂.Tau) (x : D.host.E), tauE D σ x ∈ K := fun σ x =>
     ⟨labLL D σ x, GlobalTheory.Mem.R3.BrgRead.embLL_labLL_eq σ x⟩
   have hrat := (hF.isRatAt hβ hτ hd c).1
-  have hu' : ∀ m, AddMonoidAlgebra.coeff (u : Pol ℂ D.what₂.Tau (ch.G.V (.top 0)).rank) m ∈ K := fun m => (memK _).2 (hu m)
+  have hu' : ∀ m, AddMonoidAlgebra.coeff (u : Pol ℂ D.what₂.Tau (ch.G.V (.top 0)).rank) m ∈ K :=
+    fun m => (memK _).2 (hu m)
   have h0 := coeff_rhoVr_mem (tauE D) (wt ch.G (.top 0)) K hE (ch.S.N.fr (.top 0))⁻¹ u hu'
-  have hchain := chainTo_preserves (V := fun j => VV ℂ (wt ch.G (.top j)))
-    (fun j => if h : j < D.R.m then ch.S.Z.kkMap 1 (d.1 ⟨j, h⟩) (ch.S.ptTop c j) (ch.S.ptTop c (j + 1)) else 0)
-    (fun j v => ∀ m, AddMonoidAlgebra.coeff (v : Pol ℂ D.what₂.Tau (ch.G.V (.top j)).rank) m ∈ K) (fun j v hv => by
-      by_cases h : j < D.R.m
-      · simp only [dif_pos h]
-        exact coeff_map_mem K _ _ _ (fun a b => (memK _).2 (hrat ⟨j, h⟩ a b)) v hv
-      · simp only [dif_neg h, LinearMap.zero_apply, ZeroMemClass.coe_zero,
-          AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
-        exact fun _ => zero_mem K) D.R.m _ h0
+  have hchain :=
+    chainTo_preserves
+      (V := fun j => VV ℂ (wt ch.G (.top j)))
+      (fun j =>
+        if h : j < D.R.m then
+          ch.S.Z.kkMap 1 (d.1 ⟨j, h⟩) (ch.S.ptTop c j) (ch.S.ptTop c (j + 1))
+        else
+          0)
+      (fun j v => ∀ m, AddMonoidAlgebra.coeff (v : Pol ℂ D.what₂.Tau (ch.G.V (.top j)).rank) m ∈ K)
+      (fun j v hv => by
+        by_cases h : j < D.R.m
+        · simp only [dif_pos h]
+          exact coeff_map_mem K _ _ _ (fun a b => (memK _).2 (hrat ⟨j, h⟩ a b)) v hv
+        · simp only [dif_neg h, LinearMap.zero_apply, ZeroMemClass.coe_zero,
+            AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
+          exact fun _ => zero_mem K)
+      D.R.m _ h0
   intro m
   exact (memK _).1 (hchain m)
 

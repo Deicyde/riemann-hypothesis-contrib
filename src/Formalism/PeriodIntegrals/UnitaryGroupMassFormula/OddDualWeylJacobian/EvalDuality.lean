@@ -66,10 +66,11 @@ theorem evalDuality : EV := by
   have hmap : (MvPolynomial.eval ρ).mapMatrix (genM K (m + 1)) = z := by
     ext i j
     simp [genM, hρ]
-  have hgen : MvPolynomial.eval ρ (genM K (m + 1)).det = z.det := by
-    rw [RingHom.map_det, hmap]
+  have hgen : MvPolynomial.eval ρ (genM K (m + 1)).det = z.det := by rw [RingHom.map_det, hmap]
   have hadj : z.adjugate = z.det • z⁻¹ := by
-    calc z.adjugate = z.adjugate * (z * z⁻¹) := by rw [Matrix.mul_nonsing_inv z hz, Matrix.mul_one]
+    calc
+      z.adjugate
+        = z.adjugate * (z * z⁻¹) := by rw [Matrix.mul_nonsing_inv z hz, Matrix.mul_one]
       _ = (z.adjugate * z) * z⁻¹ := by rw [Matrix.mul_assoc]
       _ = z.det • z⁻¹ := by rw [Matrix.adjugate_mul, Matrix.smul_mul, Matrix.one_mul]
   have hdinv : (z⁻¹).det = z.det⁻¹ := by
@@ -78,30 +79,36 @@ theorem evalDuality : EV := by
     exact eq_inv_of_mul_eq_one_right h1
   have hdetW : (revCol (z⁻¹)ᵀ).det = z.det⁻¹ * sgnK K m := by
     rw [PI.OddDualWeyl.EvA.det_revCol, Matrix.det_transpose, hdinv]
-  have hentry : ∀ i j : Fin (m + 1),
-      MvPolynomial.eval ρ (dualM K (m + 1) i j) = z.det * revCol (z⁻¹)ᵀ i j := by
+  have hentry
+      : ∀ i j : Fin (m + 1),
+        MvPolynomial.eval ρ (dualM K (m + 1) i j) = z.det * revCol (z⁻¹)ᵀ i j := by
     intro i j
-    have h1 : MvPolynomial.eval ρ ((genM K (m + 1)).adjugate (Fin.rev j) i) =
-        ((MvPolynomial.eval ρ).mapMatrix (genM K (m + 1))).adjugate (Fin.rev j) i := by
+    have h1
+        : MvPolynomial.eval ρ ((genM K (m + 1)).adjugate (Fin.rev j) i)
+          = ((MvPolynomial.eval ρ).mapMatrix (genM K (m + 1))).adjugate (Fin.rev j) i := by
       rw [← RingHom.map_adjugate]
-      first
-      | rfl
-      | simp [RingHom.mapMatrix_apply]
+      first | rfl | simp [RingHom.mapMatrix_apply]
     simp only [dualM, Matrix.of_apply]
     rw [h1, hmap, hadj]
     simp [revCol]
-  have hcomp : ∀ (g : Fin (m + 1) × Fin (m + 1) → MvPolynomial (Fin (m + 1) × Fin (m + 1)) K)
-      (p : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K),
-      MvPolynomial.eval ρ (aeval g p) = MvPolynomial.eval (fun v => MvPolynomial.eval ρ (g v)) p := by
+  have hcomp
+      : ∀ (g : Fin (m + 1) × Fin (m + 1) → MvPolynomial (Fin (m + 1) × Fin (m + 1)) K)
+          (p : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K),
+        MvPolynomial.eval ρ (aeval g p)
+          = MvPolynomial.eval (fun v => MvPolynomial.eval ρ (g v)) p := by
     intro g p
     first
-    | (have hh : (MvPolynomial.eval ρ).comp (aeval g).toRingHom =
-          MvPolynomial.eval (fun v => MvPolynomial.eval ρ (g v)) := by
-         ext <;> simp [MvPolynomial.algebraMap_eq]
-       exact RingHom.congr_fun hh p)
+    | (
+        have hh
+            : (MvPolynomial.eval ρ).comp (aeval g).toRingHom
+              = MvPolynomial.eval (fun v => MvPolynomial.eval ρ (g v)) := by
+          ext <;> simp [MvPolynomial.algebraMap_eq]
+        exact RingHom.congr_fun hh p
+      )
     | (induction p using MvPolynomial.induction_on <;> simp_all [MvPolynomial.algebraMap_eq])
-  have hscale : ∀ (b : Fin (m + 1) × Fin (m + 1) → K) (c : K),
-      MvPolynomial.eval (fun v => c * b v) F' = c ^ D * MvPolynomial.eval b F' := by
+  have hscale
+      : ∀ (b : Fin (m + 1) × Fin (m + 1) → K) (c : K),
+        MvPolynomial.eval (fun v => c * b v) F' = c ^ D * MvPolynomial.eval b F' := by
     intro b c
     rw [MvPolynomial.eval_eq, MvPolynomial.eval_eq, Finset.mul_sum]
     refine Finset.sum_congr rfl fun d hd => ?_
@@ -121,22 +128,28 @@ theorem evalDuality : EV := by
       c ^ D * (AddMonoidAlgebra.coeff F' d * ∏ i ∈ d.support, b i ^ d i)
     rw [hprod]
     ring
-  have heval : MvPolynomial.eval ρ (dualSub K (m + 1) F') =
-      z.det ^ D * MvPolynomial.eval (fun x => revCol (z⁻¹)ᵀ x.1 x.2) F' := by
-    rw [show dualSub K (m + 1) F' =
-        aeval (fun v : Fin (m + 1) × Fin (m + 1) => dualM K (m + 1) v.1 v.2) F' from rfl, hcomp]
-    rw [show (fun v : Fin (m + 1) × Fin (m + 1) => MvPolynomial.eval ρ (dualM K (m + 1) v.1 v.2)) =
-        fun v => z.det * revCol (z⁻¹)ᵀ v.1 v.2 from funext fun v => hentry v.1 v.2]
+  have heval
+      : MvPolynomial.eval ρ (dualSub K (m + 1) F')
+        = z.det ^ D * MvPolynomial.eval (fun x => revCol (z⁻¹)ᵀ x.1 x.2) F' := by
+    rw [show dualSub K (m + 1) F'
+          = aeval (fun v : Fin (m + 1) × Fin (m + 1) => dualM K (m + 1) v.1 v.2) F' from
+        rfl,
+      hcomp]
+    rw [show (fun v : Fin (m + 1) × Fin (m + 1) => MvPolynomial.eval ρ (dualM K (m + 1) v.1 v.2))
+        = fun v => z.det * revCol (z⁻¹)ᵀ v.1 v.2 from
+      funext fun v => hentry v.1 v.2]
     exact hscale (fun x => revCol (z⁻¹)ᵀ x.1 x.2) z.det
-  have hrel' : z.det ^ D * MvPolynomial.eval (fun x => revCol (z⁻¹)ᵀ x.1 x.2) F' =
-      z.det ^ M * MvPolynomial.eval ρ F := by
+  have hrel'
+      : z.det ^ D * MvPolynomial.eval (fun x => revCol (z⁻¹)ᵀ x.1 x.2) F'
+        = z.det ^ M * MvPolynomial.eval ρ F := by
     have h1 := congrArg (MvPolynomial.eval ρ) hrel0
     rw [heval, map_mul, map_pow, hgen] at h1
     exact h1
   rw [PI.OddDualWeyl.EvA.arith _ _ hdz (PI.OddDualWeyl.EvA.sgn_sq m) e e' D M h, ← hrel', hdetW,
     MvPolynomial.eval_mul, MvPolynomial.eval_C]
-  have h4 : z.det⁻¹ ^ D * (z.det ^ D * MvPolynomial.eval (fun x => revCol (z⁻¹)ᵀ x.1 x.2) F') =
-      MvPolynomial.eval (fun x => revCol (z⁻¹)ᵀ x.1 x.2) F' := by
+  have h4
+      : z.det⁻¹ ^ D * (z.det ^ D * MvPolynomial.eval (fun x => revCol (z⁻¹)ᵀ x.1 x.2) F')
+        = MvPolynomial.eval (fun x => revCol (z⁻¹)ᵀ x.1 x.2) F' := by
     rw [← _root_.mul_assoc, ← _root_.mul_pow, inv_mul_cancel₀ hdz, _root_.one_pow, _root_.one_mul]
   rw [h4]
 

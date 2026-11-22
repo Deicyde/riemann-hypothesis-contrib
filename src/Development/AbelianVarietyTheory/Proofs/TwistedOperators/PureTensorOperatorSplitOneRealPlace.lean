@@ -20,9 +20,12 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -32,25 +35,33 @@ namespace GlobalTheory.TrSplit
 
 open MeasureTheory
 
-theorem sigmaFinite_update {ι : Type*} [DecidableEq ι] {α : ι → Type*} [∀ i, MeasurableSpace (α i)]
-    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (w : ι) (c : α w) (i : ι) :
-    SigmaFinite (Function.update μ w (Measure.dirac c) i) := by
+theorem sigmaFinite_update
+    {ι : Type*} [DecidableEq ι]
+    {α : ι → Type*} [∀ i, MeasurableSpace (α i)]
+    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)]
+    (w : ι) (c : α w)
+    (i : ι)
+    : SigmaFinite (Function.update μ w (Measure.dirac c) i) := by
   rcases eq_or_ne i w with rfl | h
   · rw [Function.update_self]; infer_instance
   · rw [Function.update_of_ne h]; infer_instance
 
-theorem map_update_prod_pi {ι : Type*} [Fintype ι] [DecidableEq ι] {α : ι → Type*} [∀ i, MeasurableSpace (α i)]
-    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (w : ι) (c : α w)
-    [∀ i, SigmaFinite (Function.update μ w (Measure.dirac c) i)] :
-    ((μ w).prod (Measure.pi (Function.update μ w (Measure.dirac c)))).map
-      (fun p => Function.update p.2 w p.1) = Measure.pi μ := by
+theorem map_update_prod_pi
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {α : ι → Type*} [∀ i, MeasurableSpace (α i)]
+    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)]
+    (w : ι) (c : α w) [∀ i, SigmaFinite (Function.update μ w (Measure.dirac c) i)]
+    : ((μ w).prod (Measure.pi (Function.update μ w (Measure.dirac c)))).map
+        (fun p => Function.update p.2 w p.1)
+      = Measure.pi μ := by
   have hm : Measurable fun p : α w × (∀ i, α i) => Function.update p.2 w p.1 :=
     (measurable_update' (a := w)).comp measurable_swap
   symm
   refine Measure.pi_eq fun s hs => ?_
   rw [Measure.map_apply hm (MeasurableSet.univ_pi hs)]
-  have e : (fun p : α w × (∀ i, α i) => Function.update p.2 w p.1) ⁻¹' Set.univ.pi s =
-      s w ×ˢ Set.univ.pi (Function.update s w Set.univ) := by
+  have e
+      : (fun p : α w × (∀ i, α i) => Function.update p.2 w p.1) ⁻¹' Set.univ.pi s
+        = s w ×ˢ Set.univ.pi (Function.update s w Set.univ) := by
     ext ⟨x, a⟩
     simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_prod]
     constructor
@@ -77,58 +88,72 @@ noncomputable section
 
 namespace GlobalTheory.TrSplit
 
-open MeasureTheory GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb NumberField IsDedekindDomain
+open MeasureTheory GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb NumberField
+  IsDedekindDomain
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
 
-theorem projArch_archFinEquiv_symm (u : InfinitePlace F) (p : (∀ u, GArch σ J u) × GFin σ J) :
-    projArch σ J u ((archFinEquiv σ J).symm p) = p.1 u :=
+theorem projArch_archFinEquiv_symm (u : InfinitePlace F) (p : (∀ u, GArch σ J u) × GFin σ J)
+    : projArch σ J u ((archFinEquiv σ J).symm p) = p.1 u :=
   congrFun (congrArg Prod.fst ((archFinEquiv σ J).apply_symm_apply p)) u
 
-theorem projFin_archFinEquiv_symm (p : (∀ u, GArch σ J u) × GFin σ J) :
-    projFin σ J ((archFinEquiv σ J).symm p) = p.2 :=
+theorem projFin_archFinEquiv_symm (p : (∀ u, GArch σ J u) × GFin σ J)
+    : projFin σ J ((archFinEquiv σ J).symm p) = p.2 :=
   congrArg Prod.snd ((archFinEquiv σ J).apply_symm_apply p)
 
-theorem proj_archFinEquiv_symm (v : HeightOneSpectrum (𝓞 F)) (p : (∀ u, GArch σ J u) × GFin σ J) :
-    proj σ J v ((archFinEquiv σ J).symm p) = projFinLoc σ J v p.2 := by
+theorem proj_archFinEquiv_symm (v : HeightOneSpectrum (𝓞 F)) (p : (∀ u, GArch σ J u) × GFin σ J)
+    : proj σ J v ((archFinEquiv σ J).symm p) = projFinLoc σ J v p.2 := by
   rw [← projFinLoc_projFin, projFin_archFinEquiv_symm]
 
-
 variable (σ J) in
-def killAt [DecidableEq (InfinitePlace F)] (w : InfinitePlace F) :
-    ((∀ u, GArch σ J u) × GFin σ J) →* GAd σ J :=
+def killAt [DecidableEq (InfinitePlace F)] (w : InfinitePlace F)
+    : ((∀ u, GArch σ J u) × GFin σ J) →* GAd σ J :=
   ((archFinEquiv σ J).symm : ((∀ u, GArch σ J u) × GFin σ J) →* GAd σ J).comp
     (MonoidHom.prodMap
-      { toFun := fun a => Function.update a w 1
+      {
+        toFun := fun a => Function.update a w 1
         map_one' := by simp
         map_mul' := fun a b => by
           funext u
           rcases eq_or_ne u w with rfl | h
           · simp
-          · simp [Function.update_of_ne h] }
+          · simp [Function.update_of_ne h]
+      }
       (MonoidHom.id _))
 
-theorem killAt_apply [DecidableEq (InfinitePlace F)] (w : InfinitePlace F) (z : (∀ u, GArch σ J u) × GFin σ J) :
-    killAt σ J w z = (archFinEquiv σ J).symm (Function.update z.1 w 1, z.2) := rfl
+theorem killAt_apply
+    [DecidableEq (InfinitePlace F)] (w : InfinitePlace F) (z : (∀ u, GArch σ J u) × GFin σ J)
+    : killAt σ J w z = (archFinEquiv σ J).symm (Function.update z.1 w 1, z.2) :=
+  rfl
 
-theorem continuous_killAt [DecidableEq (InfinitePlace F)] (w : InfinitePlace F) : Continuous (killAt σ J w) := by
-  change Continuous fun z : (∀ u, GArch σ J u) × GFin σ J => (archFinEquiv σ J).symm (Function.update z.1 w 1, z.2)
-  exact (archFinEquiv σ J).symm.continuous.comp ((continuous_fst.update w continuous_const).prodMk continuous_snd)
+theorem continuous_killAt [DecidableEq (InfinitePlace F)] (w : InfinitePlace F)
+    : Continuous (killAt σ J w) := by
+  change Continuous fun z : (∀ u, GArch σ J u) × GFin σ J =>
+    (archFinEquiv σ J).symm (Function.update z.1 w 1, z.2)
+  exact (archFinEquiv σ J).symm.continuous.comp
+    ((continuous_fst.update w continuous_const).prodMk continuous_snd)
 
-theorem embArch_mul_killAt [DecidableEq (InfinitePlace F)] (w : InfinitePlace F) (x : GArch σ J w)
-    (a : ∀ u, GArch σ J u) (b : GFin σ J) :
-    embArch σ J w x * killAt σ J w (a, b) = (archFinEquiv σ J).symm (Function.update a w x, b) := by
+theorem embArch_mul_killAt
+    [DecidableEq (InfinitePlace F)]
+    (w : InfinitePlace F) (x : GArch σ J w)
+    (a : ∀ u, GArch σ J u) (b : GFin σ J)
+    : embArch σ J w x * killAt σ J w (a, b)
+      = (archFinEquiv σ J).symm (Function.update a w x, b) := by
   refine GAd_ext σ J (fun u => ?_) fun v => ?_
   · rw [map_mul, killAt_apply, projArch_archFinEquiv_symm, projArch_archFinEquiv_symm]
     rcases eq_or_ne u w with rfl | h
     · simp
     · simp [Function.update_of_ne h, projArch_embArch_ne σ J h]
-  · rw [map_mul, killAt_apply, proj_archFinEquiv_symm, proj_archFinEquiv_symm, proj_embArch, one_mul]
+  · rw [map_mul, killAt_apply, proj_archFinEquiv_symm, proj_archFinEquiv_symm, proj_embArch,
+      one_mul]
 
-theorem commute_embArch_killAt [DecidableEq (InfinitePlace F)] (w : InfinitePlace F) (x : GArch σ J w)
-    (z : (∀ u, GArch σ J u) × GFin σ J) :
-    embArch σ J w x * killAt σ J w z = killAt σ J w z * embArch σ J w x := by
+theorem commute_embArch_killAt
+    [DecidableEq (InfinitePlace F)]
+    (w : InfinitePlace F) (x : GArch σ J w)
+    (z : (∀ u, GArch σ J u) × GFin σ J)
+    : embArch σ J w x * killAt σ J w z = killAt σ J w z * embArch σ J w x := by
   refine GAd_ext σ J (fun u => ?_) fun v => ?_
   · rw [map_mul, map_mul, killAt_apply, projArch_archFinEquiv_symm]
     rcases eq_or_ne u w with rfl | h
@@ -140,19 +165,25 @@ end GlobalTheory.TrSplit
 
 namespace GlobalTheory.TrSplit
 
-open MeasureTheory GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb NumberField IsDedekindDomain
+open MeasureTheory GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb NumberField
+  IsDedekindDomain
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
 
-theorem exists_repOp_tensor_eq_mul {L : Submodule (𝓞 E) (Fin n → E)} [Submodule.IsFullLattice E L]
+theorem exists_repOp_tensor_eq_mul
+    {L : Submodule (𝓞 E) (Fin n → E)} [Submodule.IsFullLattice E L]
     {μa : ∀ w, Measure (GArch σ J w)} {μf : ∀ v, Measure (GLoc σ J v)} {μ : Measure (GAd σ J)}
-    (hμ : IsRestrictedProd σ J L μa μf μ) {fa : ∀ w, GArch σ J w → ℂ} {ff : ∀ v, GLoc σ J v → ℂ}
+    (hμ : IsRestrictedProd σ J L μa μf μ)
+    {fa : ∀ w, GArch σ J w → ℂ} {ff : ∀ v, GLoc σ J v → ℂ}
     (hfa : ∀ w, fa w ∈ CcArch σ J w) (hff : IsFinFamily σ J L ff)
     {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    {π : GAd σ J →* (H →L[ℂ] H)} (hπ : IsUnitaryRep π) (w : InfinitePlace F) :
-    ∃ Q : H →L[ℂ] H, (∀ g, Q * π (embArch σ J w g) = π (embArch σ J w g) * Q) ∧
-      repOp π μ (tensor σ J fa ff) = repOp (π.comp (embArch σ J w)) (μa w) (fa w) * Q := by
+    {π : GAd σ J →* (H →L[ℂ] H)} (hπ : IsUnitaryRep π)
+    (w : InfinitePlace F)
+    : ∃ Q : H →L[ℂ] H,
+      (∀ g, Q * π (embArch σ J w g) = π (embArch σ J w g) * Q)
+        ∧ repOp π μ (tensor σ J fa ff) = repOp (π.comp (embArch σ J w)) (μa w) (fa w) * Q := by
   classical
   have := hμ.haar_arch
   have := hμ.haar_loc
@@ -170,18 +201,21 @@ theorem exists_repOp_tensor_eq_mul {L : Submodule (𝓞 E) (Fin n → E)} [Submo
     ⟨fun g v => hπ.norm_apply _ v, fun v => (hπ.continuous_apply v).comp (continuous_killAt w)⟩
   have hπw : IsUnitaryRep (π.comp (embArch σ J w)) :=
     ⟨fun g v => hπ.norm_apply _ v, fun v => (hπ.continuous_apply v).comp (continuous_embArch σ J w)⟩
-  have hcfa : ∀ u, Continuous (fa u) := fun u => continuous_of_mem_ccSmooth (continuous_archCoord σ J u) (hfa u)
+  have hcfa : ∀ u, Continuous (fa u) := fun u =>
+    continuous_of_mem_ccSmooth (continuous_archCoord σ J u) (hfa u)
   have h1 : Integrable (fun a : ∀ u, GArch σ J u => ∏ u, fa' u (a u)) (Measure.pi μa') :=
     Integrable.fintype_prod_dep (f := fa') (μ := μa') fun u => by
       rcases eq_or_ne u w with rfl | h
       · simp [fa', μa']
-      · rw [show fa' u = fa u from Function.update_of_ne h _ _, show μa' u = μa u from Function.update_of_ne h _ _]
+      · rw [show fa' u = fa u from Function.update_of_ne h _ _,
+          show μa' u = μa u from Function.update_of_ne h _ _]
         exact (hcfa u).integrable_of_hasCompactSupport (hfa u).1
   have h2 : Integrable (tensorFin σ J ff) ν :=
     hff.tensorFin_mem.1.continuous.integrable_of_hasCompactSupport hff.tensorFin_mem.2
   have hΨint : Integrable Ψ ρ := h1.mul_prod h2
-  have hQ := hπ'.isRepOp_of_integrable hΨint
-    (fun v => hΨint.aestronglyMeasurable.smul (hπ'.continuous_apply v).aestronglyMeasurable)
+  have hQ :=
+    hπ'.isRepOp_of_integrable hΨint
+      (fun v => hΨint.aestronglyMeasurable.smul (hπ'.continuous_apply v).aestronglyMeasurable)
   refine ⟨repOp π' ρ Ψ, fun x => ?_, ?_⟩
   · ext v
     simp only [ContinuousLinearMap.mul_apply]
@@ -190,15 +224,16 @@ theorem exists_repOp_tensor_eq_mul {L : Submodule (𝓞 E) (Fin n → E)} [Submo
     funext g
     rw [map_smul]
     congr 1
-    change (π (killAt σ J w g)) (π (embArch σ J w x) v) =
-      (π (embArch σ J w x)) (π (killAt σ J w g) v)
+    change (π (killAt σ J w g)) (π (embArch σ J w x) v)
+      = (π (embArch σ J w x)) (π (killAt σ J w g) v)
     rw [← ContinuousLinearMap.mul_apply, ← ContinuousLinearMap.mul_apply, ← map_mul, ← map_mul,
       commute_embArch_killAt]
   · have hfc := continuous_of_mem_ccAd (tensor_mem_ccAd hfa hff)
     set f := tensor σ J fa ff with hfdef
     let e := archFinEquiv σ J
     ext v
-    rw [ContinuousLinearMap.mul_apply, hπ.repOp_apply hfc.1 hfc.2, hπw.repOp_apply (hcfa w) (hfa w).1, (hQ v).2]
+    rw [ContinuousLinearMap.mul_apply, hπ.repOp_apply hfc.1 hfc.2,
+      hπw.repOp_apply (hcfa w) (hfa w).1, (hQ v).2]
     let Fn : (∀ u, GArch σ J u) × GFin σ J → H := fun y => f (e.symm y) • π (e.symm y) v
     have hFc : Continuous Fn :=
       (hfc.1.comp e.symm.continuous).smul ((hπ.continuous_apply v).comp e.symm.continuous)
@@ -223,7 +258,8 @@ theorem exists_repOp_tensor_eq_mul {L : Submodule (𝓞 E) (Fin n → E)} [Submo
     have hU : Measurable fun p : GArch σ J w × (∀ u, GArch σ J u) => Function.update p.2 w p.1 :=
       (measurable_update' (a := w)).comp measurable_swap
     have hTm : Measurable T :=
-      ((measurable_update' (a := w)).comp ((measurable_fst.comp measurable_snd).prodMk measurable_fst)).prodMk
+      ((measurable_update' (a := w)).comp
+          ((measurable_fst.comp measurable_snd).prodMk measurable_fst)).prodMk
         (measurable_snd.comp measurable_snd)
     have hT : MeasurePreserving T ((μa w).prod ρ) ((Measure.pi μa).prod ν) := by
       refine ⟨hTm, ?_⟩
@@ -231,30 +267,37 @@ theorem exists_repOp_tensor_eq_mul {L : Submodule (𝓞 E) (Fin n → E)} [Submo
       have hassoc := (measurePreserving_prodAssoc (μa w) (Measure.pi μa') ν).map_eq
       show Measure.map T ((μa w).prod ((Measure.pi μa').prod ν)) = _
       rw [← hassoc, Measure.map_map hTm MeasurableEquiv.prodAssoc.measurable]
-      have e1 : T ∘ MeasurableEquiv.prodAssoc =
-          Prod.map (fun p : GArch σ J w × (∀ u, GArch σ J u) => Function.update p.2 w p.1) id := by
+      have e1
+          : T ∘ MeasurableEquiv.prodAssoc
+            = Prod.map
+              (fun p : GArch σ J w × (∀ u, GArch σ J u) => Function.update p.2 w p.1)
+              id := by
         funext ⟨⟨x, a⟩, b⟩
         rfl
       rw [e1, ← Measure.map_prod_map _ _ hU measurable_id, hA, Measure.map_id]
-    have hpt : ∀ x (z : (∀ u, GArch σ J u) × GFin σ J),
-        Fn (T (x, z)) = fa w x • π (embArch σ J w x) (Ψ z • π' z v) := by
+    have hpt
+        : ∀ x (z : (∀ u, GArch σ J u) × GFin σ J),
+          Fn (T (x, z)) = fa w x • π (embArch σ J w x) (Ψ z • π' z v) := by
       rintro x ⟨a, b⟩
       have hg : e.symm (Function.update a w x, b) = embArch σ J w x * killAt σ J w (a, b) :=
         (embArch_mul_killAt w x a b).symm
       have hf : f (e.symm (Function.update a w x, b)) = fa w x * Ψ (a, b) := by
-        simp only [hfdef, e, tensor, projArch_archFinEquiv_symm, proj_archFinEquiv_symm, Ψ, fa', tensorFin]
-        rw [Fintype.prod_eq_mul_prod_compl w, Fintype.prod_eq_mul_prod_compl w
-          (fun u => Function.update fa w (fun _ => (1 : ℂ)) u (a u))]
+        simp only [hfdef, e, tensor, projArch_archFinEquiv_symm, proj_archFinEquiv_symm, Ψ, fa',
+          tensorFin]
+        rw [Fintype.prod_eq_mul_prod_compl w,
+          Fintype.prod_eq_mul_prod_compl w
+            (fun u => Function.update fa w (fun _ => (1 : ℂ)) u (a u))]
         simp only [Function.update_self, one_mul]
-        rw [Finset.prod_congr rfl fun u hu => (show fa u (Function.update a w x u) =
-          Function.update fa w (fun _ => (1 : ℂ)) u (a u) by
+        rw [Finset.prod_congr rfl fun u hu =>
+          (show fa u (Function.update a w x u) = Function.update fa w (fun _ => (1 : ℂ)) u (a u) by
             have hu' : u ≠ w := by simpa using hu
             simp [Function.update_of_ne hu'])]
         ring
       change f (e.symm (Function.update a w x, b)) • π (e.symm (Function.update a w x, b)) v = _
       rw [hf, hg, map_mul, mul_smul, ContinuousLinearMap.mul_apply, map_smul]
       rfl
-    rw [h1, ← hT.map_eq, integral_map hT.measurable.aemeasurable (hT.map_eq ▸ hFc.aestronglyMeasurable),
+    rw [h1, ← hT.map_eq,
+      integral_map hT.measurable.aemeasurable (hT.map_eq ▸ hFc.aestronglyMeasurable),
       integral_prod _ (by
         have := (hT.map_eq ▸ hFint : Integrable Fn (((μa w).prod ρ).map T))
         exact this.comp_aemeasurable hT.measurable.aemeasurable)]
@@ -267,7 +310,21 @@ end GlobalTheory.TrSplit
 
 namespace GlobalTheory.TrSplit
 
-theorem repOp_tensor_split : ∀ (D : D7) (V : HSp D) (μa : ∀ w, Measure (GArch D.sp.cm.sig V.gram w)) (μf : ∀ v, Measure (GLoc D.sp.cm.sig V.gram v)) (μ : Measure (GA D V)), IsRestrictedProd D.sp.cm.sig V.gram (frameLat V) μa μf μ → ∀ (fa : ∀ w, GArch D.sp.cm.sig V.gram w → ℂ) (ff : ∀ v, GLoc D.sp.cm.sig V.gram v → ℂ), (∀ w, fa w ∈ CcArch D.sp.cm.sig V.gram w) → IsFinFamily D.sp.cm.sig V.gram (frameLat V) ff → ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (π : GA D V →* (H →L[ℂ] H)), IsUnitaryRep π → ∀ w, ∃ Q : H →L[ℂ] H, (∀ g, Q * π (embArch D.sp.cm.sig V.gram w g) = π (embArch D.sp.cm.sig V.gram w g) * Q) ∧ repOp π μ (tensor D.sp.cm.sig V.gram fa ff) = repOp (π.comp (embArch D.sp.cm.sig V.gram w)) (μa w) (fa w) * Q := by
+theorem repOp_tensor_split
+    : ∀ (D : D7) (V : HSp D) (μa : ∀ w, Measure (GArch D.sp.cm.sig V.gram w))
+        (μf : ∀ v, Measure (GLoc D.sp.cm.sig V.gram v)) (μ : Measure (GA D V)),
+      IsRestrictedProd D.sp.cm.sig V.gram (frameLat V) μa μf μ
+        → ∀ (fa : ∀ w, GArch D.sp.cm.sig V.gram w → ℂ) (ff : ∀ v, GLoc D.sp.cm.sig V.gram v → ℂ),
+          (∀ w, fa w ∈ CcArch D.sp.cm.sig V.gram w) → IsFinFamily D.sp.cm.sig V.gram (frameLat V) ff
+            → ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+                (π : GA D V →* (H →L[ℂ] H)),
+              IsUnitaryRep π
+                → ∀ w, ∃ Q : H →L[ℂ] H,
+                  (∀ g,
+                      Q * π (embArch D.sp.cm.sig V.gram w g)
+                        = π (embArch D.sp.cm.sig V.gram w g) * Q)
+                    ∧ repOp π μ (tensor D.sp.cm.sig V.gram fa ff)
+                      = repOp (π.comp (embArch D.sp.cm.sig V.gram w)) (μa w) (fa w) * Q := by
   intro D V μa μf μ hμ fa ff hfa hff H _ _ _ π hπ w
   exact exists_repOp_tensor_eq_mul hμ hfa hff hπ w
 

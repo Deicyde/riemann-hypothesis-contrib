@@ -41,9 +41,12 @@ theorem scaledPowMemSpanCeil : Trunc := by
       refine Ideal.sum_mem _ fun k hk => ?_
       have hk' : k ≤ m := Nat.lt_succ_iff.mp (Finset.mem_range.mp hk)
       by_cases hX : M ≤ r + ℓ ^ (j - 1) * (m - k)
-      · have e : (ℓ : A) ^ σ * X ^ r * ((a * ℓ) ^ k * (b * X ^ (ℓ ^ (j - 1))) ^ (m - k) * (m.choose k : A)) =
-            X ^ M * (X ^ (r + ℓ ^ (j - 1) * (m - k) - M) *
-              ((ℓ : A) ^ σ * (a * ℓ) ^ k * b ^ (m - k) * (m.choose k : A))) := by
+      · have e
+            : (ℓ : A) ^ σ * X ^ r
+                * ((a * ℓ) ^ k * (b * X ^ (ℓ ^ (j - 1))) ^ (m - k) * (m.choose k : A))
+              = X ^ M
+                * (X ^ (r + ℓ ^ (j - 1) * (m - k) - M)
+                  * ((ℓ : A) ^ σ * (a * ℓ) ^ k * b ^ (m - k) * (m.choose k : A))) := by
           rw [← mul_assoc (X ^ M), ← pow_add, Nat.add_sub_cancel' hX, pow_add, pow_mul]
           ring
         rw [e]
@@ -61,16 +64,21 @@ theorem scaledPowMemSpanCeil : Trunc := by
             max_le (Nat.cast_nonneg _) (by rw [hmR]; linarith)
           push_cast
           linarith
-        have e : (ℓ : A) ^ σ * X ^ r * ((a * ℓ) ^ k * (b * X ^ (ℓ ^ (j - 1))) ^ (m - k) * (m.choose k : A)) =
-            (ℓ : A) ^ c * ((ℓ : A) ^ (σ + k - c) * (X ^ r * a ^ k * (b * X ^ (ℓ ^ (j - 1))) ^ (m - k) *
-              (m.choose k : A))) := by
+        have e
+            : (ℓ : A) ^ σ * X ^ r
+                * ((a * ℓ) ^ k * (b * X ^ (ℓ ^ (j - 1))) ^ (m - k) * (m.choose k : A))
+              = (ℓ : A) ^ c
+                * ((ℓ : A) ^ (σ + k - c)
+                  * (X ^ r * a ^ k * (b * X ^ (ℓ ^ (j - 1))) ^ (m - k) * (m.choose k : A))) := by
           rw [← mul_assoc ((ℓ : A) ^ c) ((ℓ : A) ^ (σ + k - c)), ← pow_add, Nat.add_sub_cancel' hcs]
           ring
         rw [e]
         exact Ideal.mul_mem_right _ _ (Ideal.subset_span (by simp))
     have hj1 : j = (j - 1) + 1 := by omega
-    have hprod : (∏ s ∈ Finset.range j, p s ^ (ℓ - 1)) ^ r =
-        (∏ s ∈ Finset.range j, p s ^ y) * ((∏ s ∈ Finset.range (j - 1), p s ^ m) * p (j - 1) ^ m) := by
+    have hprod
+        : (∏ s ∈ Finset.range j, p s ^ (ℓ - 1)) ^ r
+          = (∏ s ∈ Finset.range j, p s ^ y)
+            * ((∏ s ∈ Finset.range (j - 1), p s ^ m) * p (j - 1) ^ m) := by
       rw [← Finset.prod_pow]
       have e1 : ∀ s, (p s ^ (ℓ - 1)) ^ r = p s ^ y * p s ^ m := fun s => by
         rw [← pow_mul, hm, pow_add]
@@ -79,9 +87,10 @@ theorem scaledPowMemSpanCeil : Trunc := by
       congr 1
       conv_lhs => rw [hj1]
       rw [Finset.prod_range_succ]
-    have heq : (ℓ : A) ^ σ * (u * X * ∏ s ∈ Finset.range j, p s ^ (ℓ - 1)) ^ r =
-        ((ℓ : A) ^ σ * X ^ r * p (j - 1) ^ m) * (∏ s ∈ Finset.range j, p s ^ y) *
-          (u ^ r * ∏ s ∈ Finset.range (j - 1), p s ^ m) := by
+    have heq
+        : (ℓ : A) ^ σ * (u * X * ∏ s ∈ Finset.range j, p s ^ (ℓ - 1)) ^ r
+          = ((ℓ : A) ^ σ * X ^ r * p (j - 1) ^ m) * (∏ s ∈ Finset.range j, p s ^ y)
+            * (u ^ r * ∏ s ∈ Finset.range (j - 1), p s ^ m) := by
       rw [mul_pow, mul_pow, hprod]
       ring
     rw [heq]

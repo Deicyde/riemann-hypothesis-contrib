@@ -13,16 +13,17 @@ namespace GlobalTheory
 
 open Polynomial Module.End
 
-theorem part_projector_mem_adjoin :
-    ∀ (O K V : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
-      [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
-      [FiniteDimensional K V] (S : Set (Module.End K V)), (∀ a ∈ S, ∀ b ∈ S, Commute a b) →
-      (∀ a ∈ S, ⨆ μ, a.maxGenEigenspace μ = ⊤) →
-      (∀ a ∈ S, ∀ μ, a.maxGenEigenspace μ ≠ ⊥ → μ ∈ (algebraMap O K).range) →
-      ∀ (L : Submodule O V), L.FG → Submodule.span K (L : Set V) = ⊤ → (∀ a ∈ S, ∀ x ∈ L, a x ∈ L) →
-      ∀ 𝔪 : Ideal (Algebra.adjoin O S), ∃ t ∈ Algebra.adjoin O S,
-        (∀ x ∈ NCov.part (Algebra.adjoin O S) 𝔪, t x = x) ∧
-          ∀ x ∈ NCov.off (Algebra.adjoin O S) 𝔪, t x = 0 := by
+theorem part_projector_mem_adjoin
+    : ∀ (O K V : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
+        [FiniteDimensional K V] (S : Set (Module.End K V)),
+      (∀ a ∈ S, ∀ b ∈ S, Commute a b) → (∀ a ∈ S, ⨆ μ, a.maxGenEigenspace μ = ⊤)
+        → (∀ a ∈ S, ∀ μ, a.maxGenEigenspace μ ≠ ⊥ → μ ∈ (algebraMap O K).range)
+        → ∀ (L : Submodule O V),
+          L.FG → Submodule.span K (L : Set V) = ⊤ → (∀ a ∈ S, ∀ x ∈ L, a x ∈ L)
+            → ∀ 𝔪 : Ideal (Algebra.adjoin O S), ∃ t ∈ Algebra.adjoin O S,
+              (∀ x ∈ NCov.part (Algebra.adjoin O S) 𝔪, t x = x)
+                ∧ ∀ x ∈ NCov.off (Algebra.adjoin O S) 𝔪, t x = 0 := by
   intro O K V _ _ _ _ _ _ _ _ _ _ _ S hS hsplit hint L _ _ _ 𝔪
   classical
   have hinj : Function.Injective (algebraMap O K) := IsFractionRing.injective O K
@@ -38,8 +39,9 @@ theorem part_projector_mem_adjoin :
     simp [hx]
   obtain ⟨ψ0, rfl⟩ := hA
   have hmax := NCov.cls_isMaximal ψ0
-  have hs : ∀ φ : Algebra.adjoin O S →ₐ[O] O, ∃ s : Algebra.adjoin O S,
-      (NCov.cls φ ≠ NCov.cls ψ0 → s ∈ NCov.cls φ) ∧ s ∉ NCov.cls ψ0 := by
+  have hs
+      : ∀ φ : Algebra.adjoin O S →ₐ[O] O, ∃ s : Algebra.adjoin O S,
+        (NCov.cls φ ≠ NCov.cls ψ0 → s ∈ NCov.cls φ) ∧ s ∉ NCov.cls ψ0 := by
     intro φ
     by_cases h : NCov.cls φ = NCov.cls ψ0
     · exact ⟨1, fun h' => absurd h h', fun h1 => hmax.ne_top ((Ideal.eq_top_iff_one _).2 h1)⟩
@@ -54,7 +56,8 @@ theorem part_projector_mem_adjoin :
     Algebra.isMulCommutative_adjoin O (fun a ha b hb _ => hS a ha b hb)
   open scoped IsMulCommutative in
   obtain ⟨f, hfdef⟩ : ∃ f : Algebra.adjoin O S, f = ∏ φ ∈ FB, s φ := ⟨_, rfl⟩
-  have hres : ∀ ψ : Algebra.adjoin O S →ₐ[O] O, ∀ u, u ∈ NCov.cls ψ ↔ IsLocalRing.residue O (ψ u) = 0 :=
+  have hres
+      : ∀ ψ : Algebra.adjoin O S →ₐ[O] O, ∀ u, u ∈ NCov.cls ψ ↔ IsLocalRing.residue O (ψ u) = 0 :=
     fun ψ u => Iff.rfl
   have hfA : ∀ ψ, NCov.cls ψ = NCov.cls ψ0 → IsLocalRing.residue O (ψ f) ≠ 0 := by
     intro ψ hψ
@@ -78,11 +81,12 @@ theorem part_projector_mem_adjoin :
     rw [map_sub, hfB φ hφ, sub_zero]
     exact hfA ψ (Finset.mem_filter.1 hψ).2
   obtain ⟨p, q, hpq⟩ := hcop
-  have hkill : ∀ (G : Finset (Algebra.adjoin O S →ₐ[O] O)) (ψ) (_ : ψ ∈ G) (x : V),
-      x ∈ NCov.W _ (NCov.pt ψ) → aeval (f : End K V) (∏ φ ∈ G, (X - C (φ f)) ^ d φ) x = 0 := by
+  have hkill
+      : ∀ (G : Finset (Algebra.adjoin O S →ₐ[O] O)) (ψ) (_ : ψ ∈ G) (x : V),
+        x ∈ NCov.W _ (NCov.pt ψ) → aeval (f : End K V) (∏ φ ∈ G, (X - C (φ f)) ^ d φ) x = 0 := by
     intro G ψ hψ x hx
-    rw [show (∏ φ ∈ G, (X - C (φ f)) ^ d φ) =
-        (∏ φ ∈ G.erase ψ, (X - C (φ f)) ^ d φ) * (X - C (ψ f)) ^ d ψ from
+    rw [show (∏ φ ∈ G, (X - C (φ f)) ^ d φ)
+        = (∏ φ ∈ G.erase ψ, (X - C (φ f)) ^ d φ) * (X - C (ψ f)) ^ d ψ from
       (Finset.prod_erase_mul _ _ hψ).symm]
     rw [map_mul, Module.End.mul_apply, map_pow, map_sub, aeval_X, aeval_C]
     rw [NCov.pow_sub_apply_eq_zero ψ f hx, map_zero]
@@ -92,8 +96,9 @@ theorem part_projector_mem_adjoin :
   refine ⟨_, (aeval f (q * h)).2, ?_, ?_⟩
   · intro x hx
     rw [hval]
-    have hle : NCov.part (Algebra.adjoin O S) (NCov.cls ψ0) ≤
-        LinearMap.ker (aeval (f : End K V) (q * h) - 1) := by
+    have hle
+        : NCov.part (Algebra.adjoin O S) (NCov.cls ψ0)
+          ≤ LinearMap.ker (aeval (f : End K V) (q * h) - 1) := by
       unfold NCov.part
       refine iSup₂_le fun ψ hψ => ?_
       intro y hy
@@ -104,15 +109,17 @@ theorem part_projector_mem_adjoin :
       have hψA : ψ ∈ FA := Finset.mem_filter.2 ⟨hF ψ hW, hψ⟩
       have e1 := congrArg (fun P => aeval (f : End K V) P y) hpq
       simp only [map_add (f := _), map_mul, LinearMap.add_apply, Module.End.mul_apply, map_one,
-        Module.End.one_apply] at e1
+          Module.End.one_apply]
+        at e1
       rw [hkill FA ψ hψA y hy, map_zero, zero_add] at e1
       simpa [map_mul, Module.End.mul_apply] using e1
     have := hle hx
     rwa [LinearMap.mem_ker, LinearMap.sub_apply, Module.End.one_apply, sub_eq_zero] at this
   · intro x hx
     rw [hval]
-    have hle : NCov.off (Algebra.adjoin O S) (NCov.cls ψ0) ≤
-        LinearMap.ker (aeval (f : End K V) (q * h)) := by
+    have hle
+        : NCov.off (Algebra.adjoin O S) (NCov.cls ψ0)
+          ≤ LinearMap.ker (aeval (f : End K V) (q * h)) := by
       unfold NCov.off
       refine iSup₂_le fun φ hφ => ?_
       intro y hy

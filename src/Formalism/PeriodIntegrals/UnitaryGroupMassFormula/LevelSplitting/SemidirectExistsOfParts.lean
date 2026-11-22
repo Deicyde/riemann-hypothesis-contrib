@@ -13,30 +13,34 @@ noncomputable section
 
 namespace PI.LevelKSplit.W.ExS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.LevelKSplit
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.LevelKSplit
 open PI.VolSemiDirect.W
 open scoped TensorProduct
 
-def SCAf : Prop :=
-  ∀ (F : Type) [Field F] [NumberField F], SecondCountableTopology (Af F)
+def SCAf : Prop := ∀ (F : Type) [Field F] [NumberField F], SecondCountableTopology (Af F)
 
 section Ext
 
-variable (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
+variable
+  (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
 
 def SemiNHS : Prop :=
-  IsHermND σ J → (∀ x, σ (σ x) = x) → ∀ (r : ℕ) (P : Frame E M r) (T : F), P.IsStd σ J T →
-    Semi (Ssub (Af F) σ J P) (Nsub (Af F) σ J P) (Hsub (Af F) σ J P)
+  IsHermND σ J → (∀ x, σ (σ x) = x)
+    → ∀ (r : ℕ) (P : Frame E M r) (T : F),
+      P.IsStd σ J T → Semi (Ssub (Af F) σ J P) (Nsub (Af F) σ J P) (Hsub (Af F) σ J P)
 
 def ConjNH : Prop :=
-  IsHermND σ J → (∀ x, σ (σ x) = x) → ∀ (r : ℕ) (P : Frame E M r) (T : F), P.IsStd σ J T →
-    ConjInv (Nsub (Af F) σ J P) (Hsub (Af F) σ J P)
+  IsHermND σ J → (∀ x, σ (σ x) = x)
+    → ∀ (r : ℕ) (P : Frame E M r) (T : F),
+      P.IsStd σ J T → ConjInv (Nsub (Af F) σ J P) (Hsub (Af F) σ J P)
 
 variable {F E σ M J}
 
-theorem lcsc_HAf [FiniteDimensional F E] (hsc : SecondCountableTopology (Af F)) :
-    LCSC (HA (Af F) σ J) := by
+theorem lcsc_HAf [FiniteDimensional F E] (hsc : SecondCountableTopology (Af F))
+    : LCSC (HA (Af F) σ J) := by
   haveI := hsc
   refine ⟨inferInstance, ?_, ?_, inferInstance⟩
   · haveI : IsModuleTopology (Af F) (Af F ⊗[F] E) := ⟨rfl⟩
@@ -56,9 +60,11 @@ theorem lcsc_HAf [FiniteDimensional F E] (hsc : SecondCountableTopology (Af F)) 
   · show T2Space ↥(HR (Af F) σ J)
     infer_instance
 
-theorem existS_of [FiniteDimensional F E] (hJ : IsHermND σ J) (hinv : ∀ x, σ (σ x) = x)
-    (hPr : ProdHaarG) (hsc : SecondCountableTopology (Af F)) (hS : SemiNHS F E σ M J)
-    (hCo : ConjNH F E σ M J) : ExistS F E σ M J := by
+theorem existS_of
+    [FiniteDimensional F E]
+    (hJ : IsHermND σ J) (hinv : ∀ x, σ (σ x) = x) (hPr : ProdHaarG)
+    (hsc : SecondCountableTopology (Af F)) (hS : SemiNHS F E σ M J) (hCo : ConjNH F E σ M J)
+    : ExistS F E σ M J := by
   intro r P T hP μN hN μH hH
   obtain ⟨hSc, hNc, hHc⟩ := PI.LevelKSplit.W.ExC.closed_SNH hJ hinv P T hP
   obtain ⟨hLC, hSC, hT2, hTG⟩ := lcsc_HAf (σ := σ) (J := J) hsc
@@ -70,17 +76,17 @@ theorem existS_of [FiniteDimensional F E] (hJ : IsHermND σ J) (hinv : ∀ x, σ
     intro K hK
     refine ⟨?_, ?_, ?_, inferInstance⟩
     · first
-        | exact hK.isClosedEmbedding_subtypeVal.locallyCompactSpace
-        | exact hK.locallyCompactSpace
-        | exact hK.closedEmbedding_subtypeVal.locallyCompactSpace
+      | exact hK.isClosedEmbedding_subtypeVal.locallyCompactSpace
+      | exact hK.locallyCompactSpace
+      | exact hK.closedEmbedding_subtypeVal.locallyCompactSpace
     · first
-        | exact Topology.IsInducing.subtypeVal.secondCountableTopology
-        | exact @Topology.IsInducing.secondCountableTopology _ _ _ _ hSC _ Topology.IsInducing.subtypeVal
-    · first
-        | exact inferInstance
-        | exact Topology.IsEmbedding.subtypeVal.t2Space
-  obtain ⟨μS, hμS, hprod⟩ := hPr (HA (Af F) σ J) _ _ _ (hS hJ hinv r P T hP) (hsub _ hSc)
-    (hsub _ hNc) (hsub _ hHc) (hCo hJ hinv r P T hP) μN hN μH hH
+      | exact Topology.IsInducing.subtypeVal.secondCountableTopology
+      | exact @Topology.IsInducing.secondCountableTopology _ _ _ _ hSC _
+          Topology.IsInducing.subtypeVal
+    · first | exact inferInstance | exact Topology.IsEmbedding.subtypeVal.t2Space
+  obtain ⟨μS, hμS, hprod⟩ :=
+    hPr (HA (Af F) σ J) _ _ _ (hS hJ hinv r P T hP) (hsub _ hSc) (hsub _ hNc) (hsub _ hHc)
+      (hCo hJ hinv r P T hP) μN hN μH hH
   exact ⟨μS, hμS, hprod⟩
 
 end Ext
@@ -89,8 +95,8 @@ def SemiNHSAll : Prop := ForAllCM fun F E _ _ _ _ σ M J => SemiNHS F E σ M J
 
 def ConjNHAll : Prop := ForAllCM fun F E _ _ _ _ σ M J => ConjNH F E σ M J
 
-theorem existSAll_of (hPr : ProdHaarG) (hsc : SCAf) (hS : SemiNHSAll) (hCo : ConjNHAll) :
-    ExistSAll := by
+theorem existSAll_of (hPr : ProdHaarG) (hsc : SCAf) (hS : SemiNHSAll) (hCo : ConjNHAll)
+    : ExistSAll := by
   intro F E _ _ _ _ _ σ hσ M J hJ
   have hinv : ∀ x, σ (σ x) = x := by
     intro x

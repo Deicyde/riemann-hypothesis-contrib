@@ -32,12 +32,13 @@ theorem colEmpty (hx : Ext.All) (hA : PropAStatement) (hS : GSupStatement) : Col
     unfold M1 PT.rd
     positivity
   have hu0 : IsU I (0 : Vsp X.dim) 0 := ⟨Submodule.zero_mem _, fun a _ => by simp [Hf]⟩
-  obtain ⟨s', hs', ζ, hζ, hd, hl⟩ := ct_core hP hGT hA hS hI 0 (Nat.zero_le _) σ 0 0
-    (Submodule.zero_mem _) hu0 1 le_rfl (by norm_num)
-    (fun y _ uy _ => by simpa using mul_nonneg hM (sq_nonneg ‖uy‖))
+  obtain ⟨s', hs', ζ, hζ, hd, hl⟩ :=
+    ct_core hP hGT hA hS hI 0 (Nat.zero_le _) σ 0 0 (Submodule.zero_mem _) hu0 1 le_rfl
+      (by norm_num) (fun y _ uy _ => by simpa using mul_nonneg hM (sq_nonneg ‖uy‖))
   have h0 := hd Fin.elim0 (fun k => k.elim0)
   simp only [d1, iteratedFDeriv_zero_apply, pow_zero, Finset.univ_eq_empty, Finset.prod_empty,
-    mul_one] at h0
+      mul_one]
+    at h0
   refine ⟨s', hs', ?_, by simpa using hl⟩
   have h1 := norm_sub_norm_le ζ (s' 0)
   rw [norm_sub_rev] at h1

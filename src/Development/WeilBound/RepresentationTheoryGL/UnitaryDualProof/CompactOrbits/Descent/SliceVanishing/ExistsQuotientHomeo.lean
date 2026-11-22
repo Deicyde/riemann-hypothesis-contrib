@@ -10,11 +10,13 @@ namespace PositivityTheory.RgUd.T.Desc.SLF
 
 open MulAction
 
-variable {G T : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SigmaCompactSpace G]
-  [TopologicalSpace T] [T2Space T] [BaireSpace T] [MulAction G T] [ContinuousSMul G T] [IsPretransitive G T]
+variable
+  {G T : Type*}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SigmaCompactSpace G] [TopologicalSpace T]
+  [T2Space T] [BaireSpace T] [MulAction G T] [ContinuousSMul G T] [IsPretransitive G T]
 
-theorem exists_quotient_homeo (t : T) :
-    ∃ e : G ⧸ stabilizer G t ≃ₜ T, ∀ g : G, e (g : G ⧸ stabilizer G t) = g • t := by
+theorem exists_quotient_homeo (t : T)
+    : ∃ e : G ⧸ stabilizer G t ≃ₜ T, ∀ g : G, e (g : G ⧸ stabilizer G t) = g • t := by
   let f : G ⧸ stabilizer G t → T := ofQuotientStabilizer G t
   have hinj : Function.Injective f := injective_ofQuotientStabilizer G t
   have hsurj : Function.Surjective f := by
@@ -29,7 +31,8 @@ theorem exists_quotient_homeo (t : T) :
     exact continuous_id.smul continuous_const
   have hopen : IsOpenMap f := by
     intro U hU
-    have : f '' U = (fun g : G => g • t) '' ((QuotientGroup.mk : G → G ⧸ stabilizer G t) ⁻¹' U) := by
+    have : f '' U
+        = (fun g : G => g • t) '' ((QuotientGroup.mk : G → G ⧸ stabilizer G t) ⁻¹' U) := by
       ext y
       constructor
       · rintro ⟨c, hc, rfl⟩

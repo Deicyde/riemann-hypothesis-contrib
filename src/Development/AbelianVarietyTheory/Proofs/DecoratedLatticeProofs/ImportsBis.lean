@@ -9,9 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsWeilDa
 
 namespace GlobalTheory
 
-theorem weilRepresentationUnitaryPair : GlobalTheory.Published.WeilRepresentationUnitaryPair :=
-  fun D ψ S T χS χT hψ hS hT rS rT =>
-    GlobalTheory.WeilExist.exists_isWeilDatumO D ψ hψ S T χS χT
-      (GlobalTheory.WeilParts.exists_isEtaTilde_unramified D) hS hT rS rT
+theorem weilRepresentationUnitaryPair
+    : GlobalTheory.Published.WeilRepresentationUnitaryPair := fun D ψ S T χS χT hψ hS hT rS rT =>
+  GlobalTheory.WeilExist.exists_isWeilDatumO D ψ hψ S T χS χT
+    (GlobalTheory.WeilParts.exists_isEtaTilde_unramified D) hS hT rS rT
 
 end GlobalTheory

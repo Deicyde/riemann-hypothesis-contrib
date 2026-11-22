@@ -7,13 +7,16 @@ public import Mathlib
 namespace GlobalTheory
 
 theorem finite_alg_hom_ker_coker_killed_of_onto_mod_ideal
-    (A : Type) [CommRing A] [IsNoetherianRing A] (J : Ideal A) (M N : Type) [CommRing M]
-    [Algebra A M] [Module.Finite A M] [CommRing N] [Algebra A N] [Module.Finite A N]
-    (φ : M →ₐ[A] N) :
-    (∀ y : N, ∃ t : M, y - φ t ∈ J.map (algebraMap A N)) →
-    (∀ (n : ℕ) (t : M), φ t ∈ (J ^ n).map (algebraMap A N) → t ∈ (J ^ n).map (algebraMap A M)) →
-    ∃ f : A, f - 1 ∈ J ∧ (∀ y : N, algebraMap A N f * y ∈ Set.range φ) ∧
-      ∀ t : M, φ t = 0 → algebraMap A M f * t = 0 := by
+    (A : Type) [CommRing A] [IsNoetherianRing A]
+    (J : Ideal A)
+    (M N : Type)
+    [CommRing M] [Algebra A M] [Module.Finite A M] [CommRing N] [Algebra A N] [Module.Finite A N]
+    (φ : M →ₐ[A] N)
+    : (∀ y : N, ∃ t : M, y - φ t ∈ J.map (algebraMap A N))
+      → (∀ (n : ℕ) (t : M), φ t ∈ (J ^ n).map (algebraMap A N) → t ∈ (J ^ n).map (algebraMap A M))
+      → ∃ f : A,
+        f - 1 ∈ J ∧ (∀ y : N, algebraMap A N f * y ∈ Set.range φ)
+          ∧ ∀ t : M, φ t = 0 → algebraMap A M f * t = 0 := by
   intro h1 h2
 
   set R : Submodule A N := LinearMap.range φ.toLinearMap with hR
@@ -21,8 +24,7 @@ theorem finite_alg_hom_ker_coker_killed_of_onto_mod_ideal
     rintro q -
     obtain ⟨y, rfl⟩ := R.mkQ_surjective q
     obtain ⟨t, ht⟩ := h1 y
-    have hz : y - φ t ∈ J • (⊤ : Submodule A N) := by
-      rw [Ideal.smul_top_eq_map]; exact ht
+    have hz : y - φ t ∈ J • (⊤ : Submodule A N) := by rw [Ideal.smul_top_eq_map]; exact ht
     have hm : R.mkQ (y - φ t) ∈ J • (⊤ : Submodule A (N ⧸ R)) := by
       have := Submodule.mem_map_of_mem (f := R.mkQ) hz
       rw [Submodule.map_smul'', Submodule.map_top, Submodule.range_mkQ] at this
@@ -31,8 +33,9 @@ theorem finite_alg_hom_ker_coker_killed_of_onto_mod_ideal
       rw [map_sub, sub_eq_self, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
       exact ⟨t, rfl⟩
     rwa [he] at hm
-  obtain ⟨r, hr1, hr⟩ := Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul J
-    (⊤ : Submodule A (N ⧸ R)) (Module.Finite.fg_top) hQ
+  obtain ⟨r, hr1, hr⟩ :=
+    Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul J (⊤ : Submodule A (N ⧸ R))
+      (Module.Finite.fg_top) hQ
   have hrR : ∀ y : N, r • y ∈ R := by
     intro y
     have := hr (R.mkQ y) trivial
@@ -52,7 +55,8 @@ theorem finite_alg_hom_ker_coker_killed_of_onto_mod_ideal
     simp only at hst
     rw [← hst]
     exact Submodule.smul_mem_smul hs ht
-  obtain ⟨u, hu1, hu⟩ := Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul J K hKfg hKle
+  obtain ⟨u, hu1, hu⟩ :=
+    Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul J K hKfg hKle
   refine ⟨r * u, ?_, ?_, ?_⟩
   · have : r * u - 1 = r * (u - 1) + (r - 1) := by ring
     rw [this]
@@ -60,10 +64,13 @@ theorem finite_alg_hom_ker_coker_killed_of_onto_mod_ideal
   · intro y
     rw [← Algebra.smul_def, mul_comm, mul_smul]
     obtain ⟨t, ht⟩ := hrR y
-    exact ⟨u • t, by
-      change φ (u • t) = u • (r • y)
-      rw [map_smul]
-      congr 1⟩
+    exact ⟨
+      u • t,
+      by
+        change φ (u • t) = u • (r • y)
+        rw [map_smul]
+        congr 1
+    ⟩
   · intro t ht
     rw [← Algebra.smul_def, mul_smul, hu t ht, smul_zero]
 

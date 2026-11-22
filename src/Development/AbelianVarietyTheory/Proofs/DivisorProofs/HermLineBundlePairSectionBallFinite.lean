@@ -10,14 +10,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PairSections
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 
 namespace GlobalTheory.HSNef
 
-theorem fg_addSubgroup_field_finite_or_basis {K : Type} [Field K] (H : AddSubgroup K) (hH : H.FG) :
-    (H : Set K).Finite ∨ ∃ (r : ℕ) (f : Fin r → K), (∀ j, f j ∈ H) ∧ LinearIndependent ℤ f ∧
-      ∀ x ∈ H, ∃ c : Fin r → ℤ, x = ∑ j, c j • f j := by
+theorem fg_addSubgroup_field_finite_or_basis {K : Type} [Field K] (H : AddSubgroup K) (hH : H.FG)
+    : (H : Set K).Finite
+      ∨ ∃ (r : ℕ) (f : Fin r → K),
+        (∀ j, f j ∈ H) ∧ LinearIndependent ℤ f ∧ ∀ x ∈ H, ∃ c : Fin r → ℤ, x = ∑ j, c j • f j := by
   have hfin : Module.Finite ℤ H :=
     Module.Finite.iff_addGroup_fg.2 ((AddGroup.fg_iff_addSubgroup_fg H).2 hH)
   rcases CharP.char_is_prime_or_zero K (ringChar K) with hq | h0
@@ -41,22 +44,27 @@ theorem fg_addSubgroup_field_finite_or_basis {K : Type} [Field K] (H : AddSubgro
     · intro x hx
       refine ⟨bs.repr ⟨x, hx⟩, ?_⟩
       have h := congrArg Subtype.val (bs.sum_repr ⟨x, hx⟩)
-      calc x = ((⟨x, hx⟩ : H) : K) := rfl
+      calc
+        x = ((⟨x, hx⟩ : H) : K) := rfl
         _ = ((∑ i, bs.repr ⟨x, hx⟩ i • bs i : H) : K) := h.symm
         _ = ∑ j, bs.repr ⟨x, hx⟩ j • (bs j : K) := by
           change H.subtype (∑ i, bs.repr ⟨x, hx⟩ i • bs i) = _
           rw [map_sum]
           rfl
 
-theorem bl_finite : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
-    IsArithVar p D → ∀ (P : Pair p) (a b : ℤ) (R : ℝ), (P.Bl a b R).Finite := by
+theorem bl_finite
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D → ∀ (P : Pair p) (a b : ℤ) (R : ℝ), (P.Bl a b R).Finite := by
   intro k _ X _ p D hX P a b R
-  rcases fg_addSubgroup_field_finite_or_basis (P.H a b) (GlobalTheory.T.pairSections_fg_of_projArithVariety k X p D hX P a b) with
-    hfin | ⟨r, f, hf, hli, hspan⟩
+  rcases fg_addSubgroup_field_finite_or_basis (P.H a b)
+      (GlobalTheory.T.pairSections_fg_of_projArithVariety k X p D hX P a b)
+    with hfin | ⟨r, f, hf, hli, hspan⟩
   · exact hfin.subset (fun x hx => hx.1)
-  · obtain ⟨C, -, hC⟩ := GlobalTheory.T.exists_coeff_bound_of_linearIndependent_sections k X p D hX P a b r f hf hli
+  · obtain ⟨C, -, hC⟩ :=
+      GlobalTheory.T.exists_coeff_bound_of_linearIndependent_sections k X p D hX P a b r f hf hli
     have hS : {c : Fin r → ℤ | ∀ j, |(c j : ℝ)| ≤ C * R}.Finite := by
-      refine (Set.Finite.pi (t := fun _ : Fin r => Set.Icc (-⌈C * R⌉) ⌈C * R⌉)
+      refine (Set.Finite.pi
+        (t := fun _ : Fin r => Set.Icc (- ⌈C * R⌉) ⌈C * R⌉)
         (fun _ => Set.finite_Icc _ _)).subset ?_
       intro c hc j _
       have h := abs_le.1 (hc j)

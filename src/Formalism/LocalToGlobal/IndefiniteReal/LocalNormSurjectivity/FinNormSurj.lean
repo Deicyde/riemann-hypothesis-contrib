@@ -7,8 +7,8 @@ public import Mathlib
 namespace Formalism.IndefR.LocBrg
 
 def FinNormSurj : Prop :=
-  ∀ (k : Type) [Field k] [Fintype k] (τ : k →+* k), (∀ x, τ (τ x) = x) → (∃ x, τ x ≠ x) →
-    ∀ c : k, τ c = c → c ≠ 0 → ∃ x : k, τ x * x = c
+  ∀ (k : Type) [Field k] [Fintype k] (τ : k →+* k),
+    (∀ x, τ (τ x) = x) → (∃ x, τ x ≠ x) → ∀ c : k, τ c = c → c ≠ 0 → ∃ x : k, τ x * x = c
 
 def HenselSqrt : Prop :=
   ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L],

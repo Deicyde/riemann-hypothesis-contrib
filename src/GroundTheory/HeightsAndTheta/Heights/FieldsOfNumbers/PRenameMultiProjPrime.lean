@@ -17,12 +17,14 @@ universe u
 
 namespace RenameMultiProjPrime
 
-variable {S K' : Type} [DecidableEq S] [DecidableEq K'] {κ : S → Type} {ι' : K' → Type} (E : S ≃ K')
-  (σ : (Σ s, κ s) ≃ (Σ k', ι' k'))
+variable
+  {S K' : Type} [DecidableEq S] [DecidableEq K']
+  {κ : S → Type} {ι' : K' → Type}
+  (E : S ≃ K') (σ : (Σ s, κ s) ≃ (Σ k', ι' k'))
 
-theorem weight_mapDomain (hσ : ∀ v, (σ v).1 = E v.1) (d : (Σ s, κ s) →₀ ℕ) :
-    Finsupp.weight (blockWeight ι') (Finsupp.mapDomain σ d) =
-      Finsupp.weight (blockWeight κ) d ∘ E.symm := by
+theorem weight_mapDomain (hσ : ∀ v, (σ v).1 = E v.1) (d : (Σ s, κ s) →₀ ℕ)
+    : Finsupp.weight (blockWeight ι') (Finsupp.mapDomain σ d)
+      = Finsupp.weight (blockWeight κ) d ∘ E.symm := by
   induction d using Finsupp.induction_linear with
   | zero => funext k; simp
   | add f g hf hg =>
@@ -34,10 +36,10 @@ theorem weight_mapDomain (hσ : ∀ v, (σ v).1 = E v.1) (d : (Σ s, κ s) →�
     simp only [blockWeight, hσ, Function.comp_apply, Pi.smul_apply, Pi.single_apply,
       Equiv.symm_apply_eq, smul_eq_mul]
 
-theorem rename_weightedHomogeneousComponent {R : Type u} [CommRing R]
-    (hσ : ∀ v, (σ v).1 = E v.1) (b : S → ℕ) (f : MRing κ R) :
-    rename σ (weightedHomogeneousComponent (blockWeight κ) b f) =
-      weightedHomogeneousComponent (blockWeight ι') (b ∘ E.symm) (rename σ f) := by
+theorem rename_weightedHomogeneousComponent
+    {R : Type u} [CommRing R] (hσ : ∀ v, (σ v).1 = E v.1) (b : S → ℕ) (f : MRing κ R)
+    : rename σ (weightedHomogeneousComponent (blockWeight κ) b f)
+      = weightedHomogeneousComponent (blockWeight ι') (b ∘ E.symm) (rename σ f) := by
   classical
   ext m
   have hm : m = Finsupp.mapDomain σ (Finsupp.mapDomain σ.symm m) := by
@@ -45,8 +47,9 @@ theorem rename_weightedHomogeneousComponent {R : Type u} [CommRing R]
   rw [hm, coeff_weightedHomogeneousComponent, coeff_rename_mapDomain _ σ.injective,
     coeff_rename_mapDomain _ σ.injective, coeff_weightedHomogeneousComponent,
     weight_mapDomain E σ hσ]
-  have hiff : Finsupp.weight (blockWeight κ) (Finsupp.mapDomain σ.symm m) ∘ E.symm = b ∘ E.symm ↔
-      Finsupp.weight (blockWeight κ) (Finsupp.mapDomain σ.symm m) = b :=
+  have hiff
+      : Finsupp.weight (blockWeight κ) (Finsupp.mapDomain σ.symm m) ∘ E.symm = b ∘ E.symm
+        ↔ Finsupp.weight (blockWeight κ) (Finsupp.mapDomain σ.symm m) = b :=
     E.symm.surjective.injective_comp_right.eq_iff
   simp only [hiff]
 

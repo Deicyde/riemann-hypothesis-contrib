@@ -25,12 +25,13 @@ def hqI (k : ℕ) (T' : ℝ) (E : Set ((Fin k → ℂ) × ℂ)) : ℝ≥0∞ :=
   ∫⁻ θ in Set.Ioo (-Real.pi) Real.pi, ∫⁻ y, E.indicator 1 (hq k T' y θ)
 
 def HypTh : Prop :=
-  ∀ (k : ℕ) (T' : ℝ), 0 < T' → ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧
-    ∀ E, MeasurableSet E → hypM k T' E = c * hqI k T' E
+  ∀ (k : ℕ) (T' : ℝ),
+    0 < T' → ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ ∀ E, MeasurableSet E → hypM k T' E = c * hqI k T' E
 
 def ConeVol : Prop :=
-  ∀ (k : ℕ) (T' : ℝ), 0 < T' → ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧
-    ∀ E, MeasurableSet E → volume (coneSh k T' E) = c * hqI k T' E
+  ∀ (k : ℕ) (T' : ℝ),
+    0 < T'
+      → ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ ∀ E, MeasurableSet E → volume (coneSh k T' E) = c * hqI k T' E
 
 theorem coneForm_of (hH : HypTh) (hV : ConeVol) : ConeForm := by
   intro k T' hT'

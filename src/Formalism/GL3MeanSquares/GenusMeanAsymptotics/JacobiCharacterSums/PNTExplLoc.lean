@@ -13,31 +13,32 @@ namespace Formalism.HermitianLattices.Ext.PrimesInProgressions
 
 open Formalism.ZeroFreeDirichlet
 
-private theorem zeros_in_closedBall_finite_of_analyticOnNhd (f : ℂ → ℂ) (z₀ : ℂ) (r s : ℝ) (hs : s < r)
-    (hfa : AnalyticOnNhd ℂ f (Metric.ball z₀ r)) (hfz₀ : f z₀ ≠ 0) :
-    {ρ | ρ ∈ Metric.closedBall z₀ s ∧ f ρ = 0}.Finite := by
+private theorem zeros_in_closedBall_finite_of_analyticOnNhd
+    (f : ℂ → ℂ) (z₀ : ℂ) (r s : ℝ) (hs : s < r) (hfa : AnalyticOnNhd ℂ f (Metric.ball z₀ r))
+    (hfz₀ : f z₀ ≠ 0)
+    : {ρ | ρ ∈ Metric.closedBall z₀ s ∧ f ρ = 0}.Finite := by
   by_contra hinf
-  obtain ⟨x, hxK, hacc⟩ := Set.Infinite.exists_accPt_of_subset_isCompact hinf
-    (isCompact_closedBall z₀ s) (fun y hy => hy.1)
+  obtain ⟨x, hxK, hacc⟩ :=
+    Set.Infinite.exists_accPt_of_subset_isCompact hinf (isCompact_closedBall z₀ s)
+      (fun y hy => hy.1)
   have hxd : dist x z₀ ≤ s := Metric.mem_closedBall.mp hxK
   have hxU : x ∈ Metric.ball z₀ r := Metric.mem_ball.mpr (lt_of_le_of_lt hxd hs)
   have hfreq : ∃ᶠ y in nhdsWithin x {x}ᶜ, f y = 0 :=
     (accPt_iff_frequently_nhdsNE.mp hacc).mono (fun y hy => hy.2)
   have hz0 : z₀ ∈ Metric.ball z₀ r :=
     Metric.mem_ball_self (lt_of_le_of_lt dist_nonneg (lt_of_le_of_lt hxd hs))
-  exact hfz₀ (hfa.eqOn_zero_of_preconnected_of_frequently_eq_zero
-    (convex_ball z₀ r).isPreconnected hxU hfreq hz0)
+  exact hfz₀ (hfa.eqOn_zero_of_preconnected_of_frequently_eq_zero (convex_ball z₀ r).isPreconnected
+    hxU hfreq hz0)
 
-private theorem exists_factor_zeros_differentiableOn_nonvanishing (f : ℂ → ℂ) (K : Set ℂ) (Z : Finset ℂ)
-    (hd : DifferentiableOn ℂ f K) (hZ0 : ∀ ρ ∈ Z, f ρ = 0)
-    (hfa : ∀ ρ ∈ Z, AnalyticAt ℂ f ρ) (hfin : ∀ ρ ∈ Z, analyticOrderAt f ρ ≠ ⊤)
-    (hn : ∀ ρ ∈ Z, 1 ≤ analyticOrderNatAt f ρ) :
-    ∃ g : ℂ → ℂ, DifferentiableOn ℂ g K ∧
-      (∀ z ∈ K, f z = (∏ ρ ∈ Z, (z - ρ) ^ analyticOrderNatAt f ρ) * g z) ∧
-      (∀ ρ ∈ Z, g ρ ≠ 0) := by
+private theorem exists_factor_zeros_differentiableOn_nonvanishing
+    (f : ℂ → ℂ) (K : Set ℂ) (Z : Finset ℂ)
+    (hd : DifferentiableOn ℂ f K) (hZ0 : ∀ ρ ∈ Z, f ρ = 0) (hfa : ∀ ρ ∈ Z, AnalyticAt ℂ f ρ)
+    (hfin : ∀ ρ ∈ Z, analyticOrderAt f ρ ≠ ⊤) (hn : ∀ ρ ∈ Z, 1 ≤ analyticOrderNatAt f ρ)
+    : ∃ g : ℂ → ℂ,
+      DifferentiableOn ℂ g K ∧ (∀ z ∈ K, f z = (∏ ρ ∈ Z, (z - ρ) ^ analyticOrderNatAt f ρ) * g z)
+        ∧ (∀ ρ ∈ Z, g ρ ≠ 0) := by
   classical
-  obtain ⟨P, hP⟩ : ∃ P : ℂ → ℂ, P = fun w => ∏ ρ ∈ Z, (w - ρ) ^ analyticOrderNatAt f ρ :=
-    ⟨_, rfl⟩
+  obtain ⟨P, hP⟩ : ∃ P : ℂ → ℂ, P = fun w => ∏ ρ ∈ Z, (w - ρ) ^ analyticOrderNatAt f ρ := ⟨_, rfl⟩
   have hPd : Differentiable ℂ P := by
     rw [hP]
     fun_prop
@@ -50,8 +51,9 @@ private theorem exists_factor_zeros_differentiableOn_nonvanishing (f : ℂ → �
     intro ρ hρ
     rw [hP]
     exact Finset.prod_eq_zero hρ (by rw [sub_self]; exact zero_pow (by have := hn ρ hρ; omega))
-  have hloc : ∀ ρ ∈ Z, ∃ k : ℂ → ℂ, DifferentiableAt ℂ k ρ ∧ k ρ ≠ 0 ∧
-      ∀ᶠ w in nhdsWithin ρ {ρ}ᶜ, f w / P w = k w := by
+  have hloc
+      : ∀ ρ ∈ Z, ∃ k : ℂ → ℂ,
+        DifferentiableAt ℂ k ρ ∧ k ρ ≠ 0 ∧ ∀ᶠ w in nhdsWithin ρ {ρ}ᶜ, f w / P w = k w := by
     intro ρ hρ
     obtain ⟨h, hha, hhne, hfeq⟩ := (hfa ρ hρ).analyticOrderAt_ne_top.mp (hfin ρ hρ)
     obtain ⟨Q, hQ⟩ : ∃ Q : ℂ → ℂ, Q = fun w => ∏ σ ∈ Z.erase ρ, (w - σ) ^ analyticOrderNatAt f σ :=
@@ -76,8 +78,7 @@ private theorem exists_factor_zeros_differentiableOn_nonvanishing (f : ℂ → �
   obtain ⟨g, hg⟩ : ∃ g : ℂ → ℂ, g = fun w => if w ∈ Z then k w w else f w / P w := ⟨_, rfl⟩
   have hgk : ∀ ρ ∈ Z, g =ᶠ[nhds ρ] k ρ := by
     intro ρ hρ
-    have hopen : IsOpen ((↑(Z.erase ρ) : Set ℂ)ᶜ) :=
-      (Finset.finite_toSet _).isClosed.isOpen_compl
+    have hopen : IsOpen ((↑(Z.erase ρ) : Set ℂ)ᶜ) := (Finset.finite_toSet _).isClosed.isOpen_compl
     have hmem : ρ ∈ ((↑(Z.erase ρ) : Set ℂ)ᶜ) := by simp
     filter_upwards [hopen.mem_nhds hmem, eventually_nhdsWithin_iff.mp (hkeq ρ hρ)] with w hw1 hw2
     by_cases hwρ : w = ρ
@@ -98,7 +99,8 @@ private theorem exists_factor_zeros_differentiableOn_nonvanishing (f : ℂ → �
         filter_upwards [nhdsWithin_le_nhds (hopen.mem_nhds (by simpa using hzZ))] with w hw
         rw [hg]
         simp only [if_neg (show w ∉ Z by simpa using hw)]
-      refine ((hd z hz).div (hPd z).differentiableWithinAt (hPne z hzZ)).congr_of_eventuallyEq hev ?_
+      refine ((hd z hz).div (hPd z).differentiableWithinAt (hPne z hzZ)).congr_of_eventuallyEq hev
+        ?_
       rw [hg]
       simp only [if_neg hzZ]
       rfl
@@ -114,18 +116,17 @@ private theorem exists_factor_zeros_differentiableOn_nonvanishing (f : ℂ → �
     rw [(hgk ρ hρ).self_of_nhds]
     exact hkne ρ hρ
 
-
 open Filter Topology Metric in
-theorem ex_landau_ord_core (f : ℂ → ℂ) (z₀ : ℂ) (r B : ℝ) (hr : 0 < r) (hB : 1 ≤ B)
-    (hf : DifferentiableOn ℂ f (Metric.closedBall z₀ r)) (hfz₀ : f z₀ ≠ 0)
-    (hbound : ∀ z ∈ Metric.closedBall z₀ r, ‖f z‖ ≤ B * ‖f z₀‖) :
-    ∃ (Z : Finset ℂ) (m : ℂ → ℕ),
-      (∀ ρ : ℂ, ρ ∈ Z ↔ (ρ ∈ Metric.closedBall z₀ (r / 3) ∧ f ρ = 0)) ∧
-      (∀ ρ ∈ Z, 1 ≤ m ρ) ∧
-      (∀ ρ ∈ Z, analyticOrderNatAt f ρ = m ρ) ∧
-      ((∑ ρ ∈ Z, m ρ : ℕ) : ℝ) ≤ Real.log B / Real.log 2 ∧
-      ∀ z ∈ Metric.closedBall z₀ (r / 6), f z ≠ 0 →
-        ‖deriv f z / f z - ∑ ρ ∈ Z, (m ρ : ℂ) / (z - ρ)‖ ≤ 72 * Real.log B / r := by
+theorem ex_landau_ord_core
+    (f : ℂ → ℂ) (z₀ : ℂ) (r B : ℝ)
+    (hr : 0 < r) (hB : 1 ≤ B) (hf : DifferentiableOn ℂ f (Metric.closedBall z₀ r))
+    (hfz₀ : f z₀ ≠ 0) (hbound : ∀ z ∈ Metric.closedBall z₀ r, ‖f z‖ ≤ B * ‖f z₀‖)
+    : ∃ (Z : Finset ℂ) (m : ℂ → ℕ),
+      (∀ ρ : ℂ, ρ ∈ Z ↔ (ρ ∈ Metric.closedBall z₀ (r / 3) ∧ f ρ = 0)) ∧ (∀ ρ ∈ Z, 1 ≤ m ρ)
+        ∧ (∀ ρ ∈ Z, analyticOrderNatAt f ρ = m ρ)
+        ∧ ((∑ ρ ∈ Z, m ρ : ℕ) : ℝ) ≤ Real.log B / Real.log 2
+        ∧ ∀ z ∈ Metric.closedBall z₀ (r / 6),
+          f z ≠ 0 → ‖deriv f z / f z - ∑ ρ ∈ Z, (m ρ : ℂ) / (z - ρ)‖ ≤ 72 * Real.log B / r := by
   classical
   have hr3 : r / 3 < r := by linarith
   have hball : DifferentiableOn ℂ f (Metric.ball z₀ r) := hf.mono Metric.ball_subset_closedBall
@@ -143,8 +144,8 @@ theorem ex_landau_ord_core (f : ℂ → ℂ) (z₀ : ℂ) (r B : ℝ) (hr : 0 < 
     rw [(hfa z₀ hz₀).analyticOrderAt_eq_zero.mpr hfz₀]
     exact ENat.zero_ne_top
   have hfinord : ∀ ρ ∈ Z, analyticOrderAt f ρ ≠ ⊤ := fun ρ hρ =>
-    hfa.analyticOrderAt_ne_top_of_isPreconnected (convex_ball z₀ r).isPreconnected hz₀
-      (hZball ρ hρ) hord0
+    hfa.analyticOrderAt_ne_top_of_isPreconnected (convex_ball z₀ r).isPreconnected hz₀ (hZball ρ hρ)
+      hord0
   have hn1 : ∀ ρ ∈ Z, 1 ≤ analyticOrderNatAt f ρ := by
     intro ρ hρ
     have h1 : analyticOrderAt f ρ ≠ 0 :=
@@ -154,10 +155,12 @@ theorem ex_landau_ord_core (f : ℂ → ℂ) (z₀ : ℂ) (r B : ℝ) (hr : 0 < 
     intro h0
     rw [h0] at h2
     exact h1 (by rw [← h2]; simp)
-  obtain ⟨g, hgd, hfg, hgZ⟩ := exists_factor_zeros_differentiableOn_nonvanishing f (Metric.closedBall z₀ r) Z hf
-    (fun ρ hρ => ((hZmem ρ).mp hρ).2) (fun ρ hρ => hfa ρ (hZball ρ hρ)) hfinord hn1
-  obtain ⟨P, hP⟩ : ∃ P : ℂ → ℂ, P = fun w => ∏ ρ ∈ Z, (w - ρ) ^ analyticOrderNatAt f ρ :=
-    ⟨_, rfl⟩
+  obtain ⟨g, hgd, hfg, hgZ⟩ :=
+    exists_factor_zeros_differentiableOn_nonvanishing f (Metric.closedBall z₀ r) Z hf
+      (fun ρ hρ => ((hZmem ρ).mp hρ).2)
+      (fun ρ hρ => hfa ρ (hZball ρ hρ))
+      hfinord hn1
+  obtain ⟨P, hP⟩ : ∃ P : ℂ → ℂ, P = fun w => ∏ ρ ∈ Z, (w - ρ) ^ analyticOrderNatAt f ρ := ⟨_, rfl⟩
   have hfP : ∀ z ∈ Metric.closedBall z₀ r, f z = P z * g z := by
     intro z hz
     rw [hP]
@@ -289,31 +292,36 @@ theorem ex_landau_ord_core (f : ℂ → ℂ) (z₀ : ℂ) (r B : ℝ) (hr : 0 < 
       apply Formalism.ZF.landauLocal_logDeriv_prod
       intro ρ hρ h
       exact hzZ (by rw [sub_eq_zero] at h; rw [h]; exact hρ)
-    have hsplit : deriv f z / f z - ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (z - ρ) =
-        deriv g z / g z := by
+    have hsplit
+        : deriv f z / f z - ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (z - ρ) = deriv g z / g z := by
       rw [← hlog, hderiv, hfP z hzc]
       field_simp
       ring
     have hg6 := hest z hz hgz
     rw [hZ'e, Finset.sum_empty, sub_zero] at hg6
     rw [hsplit]
-    calc ‖deriv g z / g z‖ ≤ 72 * Real.log M / r := hg6
+    calc
+      ‖deriv g z / g z‖
+        ≤ 72 * Real.log M / r := hg6
       _ ≤ 72 * Real.log B / r := by
         apply div_le_div_of_nonneg_right _ hr.le
         linarith
 
-theorem ex_landau_ord (f : ℂ → ℂ) (z₀ : ℂ) (r B : ℝ) (hr : 0 < r) (hB : 1 ≤ B)
-    (hf : DifferentiableOn ℂ f (Metric.closedBall z₀ r)) (hfz₀ : f z₀ ≠ 0)
-    (hbound : ∀ z ∈ Metric.closedBall z₀ r, ‖f z‖ ≤ B * ‖f z₀‖) :
-    ∃ Z : Finset ℂ,
-      (∀ ρ : ℂ, ρ ∈ Z ↔ (ρ ∈ Metric.closedBall z₀ (r / 3) ∧ f ρ = 0)) ∧
-      (∀ ρ ∈ Z, 1 ≤ analyticOrderNatAt f ρ) ∧
-      ((∑ ρ ∈ Z, analyticOrderNatAt f ρ : ℕ) : ℝ) ≤ Real.log B / Real.log 2 ∧
-      ∀ z ∈ Metric.closedBall z₀ (r / 6), f z ≠ 0 →
-        ‖deriv f z / f z - ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (z - ρ)‖ ≤ 72 * Real.log B / r := by
+theorem ex_landau_ord
+    (f : ℂ → ℂ) (z₀ : ℂ) (r B : ℝ)
+    (hr : 0 < r) (hB : 1 ≤ B) (hf : DifferentiableOn ℂ f (Metric.closedBall z₀ r))
+    (hfz₀ : f z₀ ≠ 0) (hbound : ∀ z ∈ Metric.closedBall z₀ r, ‖f z‖ ≤ B * ‖f z₀‖)
+    : ∃ Z : Finset ℂ,
+      (∀ ρ : ℂ, ρ ∈ Z ↔ (ρ ∈ Metric.closedBall z₀ (r / 3) ∧ f ρ = 0))
+        ∧ (∀ ρ ∈ Z, 1 ≤ analyticOrderNatAt f ρ)
+        ∧ ((∑ ρ ∈ Z, analyticOrderNatAt f ρ : ℕ) : ℝ) ≤ Real.log B / Real.log 2
+        ∧ ∀ z ∈ Metric.closedBall z₀ (r / 6),
+          f z ≠ 0
+            → ‖deriv f z / f z - ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (z - ρ)‖
+              ≤ 72 * Real.log B / r := by
   obtain ⟨Z, m, hZ, hm1, hmo, hcnt, hest⟩ := ex_landau_ord_core f z₀ r B hr hB hf hfz₀ hbound
-  have hsum : ∀ z : ℂ, ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (z - ρ) =
-      ∑ ρ ∈ Z, (m ρ : ℂ) / (z - ρ) :=
+  have hsum
+      : ∀ z : ℂ, ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (z - ρ) = ∑ ρ ∈ Z, (m ρ : ℂ) / (z - ρ) :=
     fun z => Finset.sum_congr rfl (fun ρ hρ => by rw [hmo ρ hρ])
   refine ⟨Z, hZ, fun ρ hρ => by rw [hmo ρ hρ]; exact hm1 ρ hρ, ?_, ?_⟩
   · rw [Finset.sum_congr rfl hmo]

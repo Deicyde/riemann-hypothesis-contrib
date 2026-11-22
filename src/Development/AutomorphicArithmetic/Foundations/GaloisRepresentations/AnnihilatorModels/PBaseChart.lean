@@ -8,15 +8,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.baseChart_of :
-    BaseOfSmooth → BaseOfChart := by
+theorem UpperTheory.Gal.crystallineComparison.baseChart_of : BaseOfSmooth → BaseOfChart := by
   intro h
   unfold BaseOfChart
   intro l O _ _ _ ϖ hϖ hl hlu Y g hg U hU
   let φ : O →+* Γ(Y, U) :=
     (g.appLE ⊤ U (by simp)).hom.comp (Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom
-  have hφ : ∀ a : O, φ a = (Y.presheaf.map (homOfLE le_top).op).hom
-      ((g.appTop).hom ((Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom a)) := fun a => rfl
+  have hφ
+      : ∀ a : O,
+        φ a
+          = (Y.presheaf.map (homOfLE le_top).op).hom
+            ((g.appTop).hom ((Scheme.ΓSpecIso (CommRingCat.of O)).inv.hom a)) := fun a =>
+    rfl
   have hsm : φ.Smooth := by
     refine RingHom.Smooth.comp (RingHom.Smooth.of_bijective ?_) ?_
     · exact (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of O)).inv)

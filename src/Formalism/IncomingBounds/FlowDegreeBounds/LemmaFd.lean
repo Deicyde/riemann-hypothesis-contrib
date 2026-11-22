@@ -90,9 +90,11 @@ private theorem one_le_of_mem_oddLevels {i : ℕ} (hi : i ∈ oddLevels d) : 1 �
   obtain ⟨k, rfl⟩ := (Finset.mem_filter.1 hi).2
   omega
 
-private theorem self_le_pow_of_mem_oddLevels (hl : (1 : ℝ) ≤ l) {i : ℕ} (hi : i ∈ oddLevels d) :
-    (l : ℝ) ≤ (l : ℝ) ^ i := by
-  calc (l : ℝ) = (l : ℝ) ^ 1 := (pow_one _).symm
+private theorem self_le_pow_of_mem_oddLevels (hl : (1 : ℝ) ≤ l) {i : ℕ} (hi : i ∈ oddLevels d)
+    : (l : ℝ) ≤ (l : ℝ) ^ i := by
+  calc
+    (l : ℝ)
+      = (l : ℝ) ^ 1 := (pow_one _).symm
     _ ≤ (l : ℝ) ^ i := pow_le_pow_right₀ hl (one_le_of_mem_oddLevels hi)
 
 lemma fd_part1 (hl : 3 ≤ l) (D sig : ZMod d → ℝ) (hopt : IsOptDual l d D sig) (s : ZMod d)
@@ -140,23 +142,28 @@ theorem incomingBound_of (hF : FlowAttained) (hA : LemmaFa) : IncomingBound := b
     rw [Finset.mul_sum]
     have h1 : ∑ i ∈ oddLevels d, (l : ℝ) * x t i ≤ ∑ i ∈ oddLevels d, (l : ℝ) ^ i * x t i :=
       Finset.sum_le_sum fun i hi =>
-        mul_le_mul_of_nonneg_right (_root_.Formalism.IncomingBounds.FlowDualityReindexing.self_le_pow_of_mem_oddLevels (by linarith) hi) (hx.1 t i)
-    have h2 : 0 ≤ ∑ i ∈ oddLevels d, x (t - (i : ZMod d)) i :=
-      Finset.sum_nonneg fun i _ => hx.1 _ _
+        mul_le_mul_of_nonneg_right
+          (_root_.Formalism.IncomingBounds.FlowDualityReindexing.self_le_pow_of_mem_oddLevels
+            (by linarith) hi)
+          (hx.1 t i)
+    have h2 : 0 ≤ ∑ i ∈ oddLevels d, x (t - (i : ZMod d)) i := Finset.sum_nonneg fun i _ => hx.1 _ _
     linarith [hx.2 t]
-  calc (∑ s ∈ Finset.univ.filter (fun s : ZMod d => 2 / (l : ℝ) ≤ sig s), D s)
+  calc
+    (∑ s ∈ Finset.univ.filter (fun s : ZMod d => 2 / (l : ℝ) ≤ sig s), D s)
         = ∑ s ∈ Finset.univ.filter (fun s : ZMod d => 2 / (l : ℝ) ≤ sig s),
             ∑ i ∈ oddLevels d, x (s - (i : ZMod d)) i :=
-          Finset.sum_congr rfl fun s hs =>
-            (Formalism.IncomingBounds.FlowDualityReindexing.fd_part1 hl D sig hopt s (Finset.mem_filter.1 hs).2 x hx hval).2
-      _ ≤ ∑ s : ZMod d, ∑ i ∈ oddLevels d, x (s - (i : ZMod d)) i :=
-          Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
-            fun s _ _ => Finset.sum_nonneg fun i _ => hx.1 _ _
-      _ = ∑ s : ZMod d, ∑ i ∈ oddLevels d, x s i := Formalism.IncomingBounds.FlowDualityReindexing.in_reindex x
-      _ ≤ ∑ s : ZMod d, D s / l :=
-          Finset.sum_le_sum fun t _ => by
-            rw [le_div_iff₀ hlpos, mul_comm]
-            exact hout t
-      _ = (∑ s : ZMod d, D s) / l := by rw [Finset.sum_div]
+      Finset.sum_congr rfl fun s hs =>
+        (Formalism.IncomingBounds.FlowDualityReindexing.fd_part1 hl D sig hopt s
+          (Finset.mem_filter.1 hs).2 x hx hval).2
+    _ ≤ ∑ s : ZMod d, ∑ i ∈ oddLevels d, x (s - (i : ZMod d)) i :=
+      Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) fun s _ _ =>
+        Finset.sum_nonneg fun i _ => hx.1 _ _
+    _ = ∑ s : ZMod d, ∑ i ∈ oddLevels d, x s i :=
+      Formalism.IncomingBounds.FlowDualityReindexing.in_reindex x
+    _ ≤ ∑ s : ZMod d, D s / l :=
+      Finset.sum_le_sum fun t _ => by
+        rw [le_div_iff₀ hlpos, mul_comm]
+        exact hout t
+    _ = (∑ s : ZMod d, D s) / l := by rw [Finset.sum_div]
 
 end Formalism.IncomingBounds

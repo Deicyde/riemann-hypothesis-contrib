@@ -6,8 +6,10 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.JacquetLanglands
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V
+  UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.Wc
 open scoped Matrix NNReal
 
 namespace UpperTheory.Esk.MatrixEntryBounds
@@ -19,14 +21,16 @@ theorem abs_le_of_sq (t s : ℝ) (hs : 0 ≤ s) (h : t ^ 2 ≤ s ^ 2) : |t| ≤ 
   have := sq_le_sq.1 h
   rwa [abs_of_nonneg hs] at this
 
-theorem core (δ C c0 x y x' y' a b c d M L R K : ℝ) (hδ : 0 < δ) (hc0 : 0 < c0) (hx : |x| ≤ C)
+theorem core
+    (δ C c0 x y x' y' a b c d M L R K : ℝ) (hδ : 0 < δ) (hc0 : 0 < c0) (hx : |x| ≤ C)
     (hy : c0 ≤ |y|) (hdet : |a * d - b * c| ≤ C) (hM : M * δ = 4 * C) (hL : L * c0 ^ 2 = M)
     (hR : R * c0 = C) (hK : K * (c0 ^ 2 * δ ^ 2) = 2 * C ^ 2 * δ ^ 2 + 48 * c0 ^ 2)
     (hyy : 0 < y * y') (hk : δ * ((x - x') ^ 2 + (y + y') ^ 2) ≤ 4 * (y * y'))
     (hden : y' * ((c * x + d) ^ 2 + (c * y) ^ 2) = (a * d - b * c) * y)
     (hre : x' * (c * x + d) - y' * (c * y) = a * x + b)
-    (him : x' * (c * y) + y' * (c * x + d) = a * y) :
-    |c| ≤ 1 + L ∧ |d| ≤ 1 + M + (1 + L) * C ∧ |a| ≤ 1 + K * M ∧ |b| ≤ (1 + K * M) * (1 + R) * |y| := by
+    (him : x' * (c * y) + y' * (c * x + d) = a * y)
+    : |c| ≤ 1 + L ∧ |d| ≤ 1 + M + (1 + L) * C ∧ |a| ≤ 1 + K * M
+      ∧ |b| ≤ (1 + K * M) * (1 + R) * |y| := by
   have hC : 0 ≤ C := (abs_nonneg x).trans hx
   have hy0 : 0 < |y| := hc0.trans_le hy
   have hy'0 : y' ≠ 0 := right_ne_zero_of_mul hyy.ne'
@@ -39,10 +43,12 @@ theorem core (δ C c0 x y x' y' a b c d M L R K : ℝ) (hδ : 0 < δ) (hc0 : 0 <
   have h3 : δ * (x - x') ^ 2 ≤ 4 * (y * y') := by
     linarith [mul_nonneg hδ.le (sq_nonneg y'), mul_nonneg hδ.le (sq_nonneg y), mul_pos hδ hyy]
   set N := (c * x + d) ^ 2 + (c * y) ^ 2 with hN
-  have e : (y * y') * (δ * N) = (a * d - b * c) * (δ * y ^ 2) := by linear_combination (δ * y) * hden
+  have e : (y * y') * (δ * N) = (a * d - b * c) * (δ * y ^ 2) := by
+    linear_combination (δ * y) * hden
   have e2 : (a * d - b * c) * (δ * y ^ 2) ≤ C * (4 * (y * y')) := by
-    calc (a * d - b * c) * (δ * y ^ 2) ≤ |a * d - b * c| * (δ * y ^ 2) :=
-          mul_le_mul_of_nonneg_right (le_abs_self _) (by positivity)
+    calc
+      (a * d - b * c) * (δ * y ^ 2) ≤ |a * d - b * c| * (δ * y ^ 2) :=
+        mul_le_mul_of_nonneg_right (le_abs_self _) (by positivity)
       _ ≤ C * (δ * y ^ 2) := mul_le_mul_of_nonneg_right hdet (by positivity)
       _ ≤ C * (4 * (y * y')) := mul_le_mul_of_nonneg_left h1 hC
   have hδN : δ * N ≤ 4 * C := le_of_mul_le_mul_left (by linarith [e, e2]) hyy
@@ -66,7 +72,9 @@ theorem core (δ C c0 x y x' y' a b c d M L R K : ℝ) (hδ : 0 < δ) (hc0 : 0 <
 
   have hy' : δ * |y'| ≤ 4 * |y| := by
     have : |y'| * (δ * |y'|) ≤ |y'| * (4 * |y|) := by
-      calc |y'| * (δ * |y'|) = δ * y' ^ 2 := by rw [← sq_abs y']; ring
+      calc
+        |y'| * (δ * |y'|)
+          = δ * y' ^ 2 := by rw [← sq_abs y']; ring
         _ ≤ 4 * (y * y') := h2
         _ = |y'| * (4 * |y|) := by rw [hyy']; ring
     exact le_of_mul_le_mul_left this hay'
@@ -87,7 +95,8 @@ theorem core (δ C c0 x y x' y' a b c d M L R K : ℝ) (hδ : 0 < δ) (hc0 : 0 <
   have hW : x' ^ 2 + y' ^ 2 ≤ K * y ^ 2 := by
     have hp : 0 < c0 ^ 2 * δ ^ 2 := by positivity
     refine le_of_mul_le_mul_right ?_ hp
-    have : K * y ^ 2 * (c0 ^ 2 * δ ^ 2) = (2 * C ^ 2 * δ ^ 2 + 48 * c0 ^ 2) * y ^ 2 := by rw [← hK]; ring
+    have : K * y ^ 2 * (c0 ^ 2 * δ ^ 2) = (2 * C ^ 2 * δ ^ 2 + 48 * c0 ^ 2) * y ^ 2 := by
+      rw [← hK]; ring
     rw [this]
     linarith [mul_le_mul_of_nonneg_left A1 (sq_nonneg c0), mul_le_mul_of_nonneg_left A2 (sq_nonneg c0),
       mul_le_mul_of_nonneg_left A3 (sq_nonneg δ), mul_nonneg (sq_nonneg (c0 * δ)) (sq_nonneg (2 * x - x'))]
@@ -123,23 +132,33 @@ end UpperTheory.Esk.MatrixEntryBounds
 
 namespace UpperTheory.Esk.MatrixEntryBounds
 
-theorem main : ∀ δ C c : ℝ, 0 < δ → 0 < c → ∃ B : ℝ, ∀ (g : GL (Fin 2) ℝ) (z : P), |z.1.re| ≤ C → c ≤ |z.1.im| →
-    |g.val.det| ≤ C → δ ≤ kap z (g • z) → |g 1 0| ≤ B ∧ |g 0 0| ≤ B ∧ |g 1 1| ≤ B ∧ |g 0 1| ≤ B * |z.1.im| := by
+theorem main
+    : ∀ δ C c : ℝ,
+      0 < δ → 0 < c
+        → ∃ B : ℝ, ∀ (g : GL (Fin 2) ℝ) (z : P),
+          |z.1.re| ≤ C → c ≤ |z.1.im| → |g.val.det| ≤ C → δ ≤ kap z (g • z)
+            → |g 1 0| ≤ B ∧ |g 0 0| ≤ B ∧ |g 1 1| ≤ B ∧ |g 0 1| ≤ B * |z.1.im| := by
   intro δ C c0 hδ hc0
   have hM : (4 * C / δ) * δ = 4 * C := div_mul_cancel₀ _ hδ.ne'
   have hL : (4 * C / δ / c0 ^ 2) * c0 ^ 2 = 4 * C / δ := div_mul_cancel₀ _ (by positivity)
   have hR : (C / c0) * c0 = C := div_mul_cancel₀ _ hc0.ne'
-  have hK : (2 * C ^ 2 / c0 ^ 2 + 48 / δ ^ 2) * (c0 ^ 2 * δ ^ 2) = 2 * C ^ 2 * δ ^ 2 + 48 * c0 ^ 2 := by
+  have hK
+      : (2 * C ^ 2 / c0 ^ 2 + 48 / δ ^ 2) * (c0 ^ 2 * δ ^ 2) = 2 * C ^ 2 * δ ^ 2 + 48 * c0 ^ 2 := by
     field_simp
-  refine ⟨max (max (1 + 4 * C / δ / c0 ^ 2) (1 + 4 * C / δ + (1 + 4 * C / δ / c0 ^ 2) * C))
-    (max (1 + (2 * C ^ 2 / c0 ^ 2 + 48 / δ ^ 2) * (4 * C / δ))
-      ((1 + (2 * C ^ 2 / c0 ^ 2 + 48 / δ ^ 2) * (4 * C / δ)) * (1 + C / c0))), ?_⟩
+  refine ⟨
+    max (max (1 + 4 * C / δ / c0 ^ 2) (1 + 4 * C / δ + (1 + 4 * C / δ / c0 ^ 2) * C))
+      (max (1 + (2 * C ^ 2 / c0 ^ 2 + 48 / δ ^ 2) * (4 * C / δ))
+        ((1 + (2 * C ^ 2 / c0 ^ 2 + 48 / δ ^ 2) * (4 * C / δ)) * (1 + C / c0))),
+    ?_
+  ⟩
   intro g z hx hy hdet hk
   unfold kap at hk
   split_ifs at hk with hyy
   swap
   · exact absurd hk (not_le.2 hδ)
-  have hn : ‖z.1 - (starRingEnd ℂ) (g • z).1‖ ^ 2 = (z.1.re - (g • z).1.re) ^ 2 + (z.1.im + (g • z).1.im) ^ 2 := by
+  have hn
+      : ‖z.1 - (starRingEnd ℂ) (g • z).1‖ ^ 2
+        = (z.1.re - (g • z).1.re) ^ 2 + (z.1.im + (g • z).1.im) ^ 2 := by
     rw [Complex.sq_norm, Complex.normSq_apply]; simp; ring
   have hpos : 0 < (z.1.re - (g • z).1.re) ^ 2 + (z.1.im + (g • z).1.im) ^ 2 := by
     nlinarith [sq_nonneg (z.1.re - (g • z).1.re), sq_nonneg (z.1.im - (g • z).1.im)]
@@ -147,19 +166,25 @@ theorem main : ∀ δ C c : ℝ, 0 < δ → 0 < c → ∃ B : ℝ, ∀ (g : GL (
   have hns : Complex.normSq (den g z.1) = (g 1 0 * z.1.re + g 1 1) ^ 2 + (g 1 0 * z.1.im) ^ 2 := by
     rw [Complex.normSq_apply]; simp [den]; ring
   have hne : Complex.normSq (den g z.1) ≠ 0 := (Complex.normSq_pos.2 (den_ne g z.2)).ne'
-  have hden : (g • z).1.im * ((g 1 0 * z.1.re + g 1 1) ^ 2 + (g 1 0 * z.1.im) ^ 2) =
-      (g 0 0 * g 1 1 - g 0 1 * g 1 0) * z.1.im := by
+  have hden
+      : (g • z).1.im * ((g 1 0 * z.1.re + g 1 1) ^ 2 + (g 1 0 * z.1.im) ^ 2)
+        = (g 0 0 * g 1 1 - g 0 1 * g 1 0) * z.1.im := by
     rw [← hns, coe_smul, im_div, det_eq, div_mul_cancel₀ _ hne]
   have hW : (g • z).1 * den g z.1 = num g z.1 := by rw [coe_smul, div_mul_cancel₀ _ (den_ne g z.2)]
   have hre := congrArg Complex.re hW
   have him := congrArg Complex.im hW
   simp [num, den, Complex.mul_re, Complex.mul_im] at hre him
-  obtain ⟨h1, h2, h3, h4⟩ := core δ C c0 z.1.re z.1.im (g • z).1.re (g • z).1.im (g 0 0) (g 0 1) (g 1 0) (g 1 1)
-    _ _ _ _ hδ hc0 hx hy (by rwa [det_eq] at hdet) hM hL hR hK hyy hk hden
-    (by linear_combination hre) (by linear_combination him)
-  refine ⟨h1.trans ((le_max_left _ _).trans (le_max_left _ _)), h3.trans ((le_max_left _ _).trans (le_max_right _ _)),
+  obtain ⟨h1, h2, h3, h4⟩ :=
+    core δ C c0 z.1.re z.1.im (g • z).1.re (g • z).1.im (g 0 0) (g 0 1) (g 1 0) (g 1 1) _ _ _ _ hδ
+      hc0 hx hy (by rwa [det_eq] at hdet) hM hL hR hK hyy hk hden (by linear_combination hre)
+      (by linear_combination him)
+  refine ⟨
+    h1.trans ((le_max_left _ _).trans (le_max_left _ _)),
+    h3.trans ((le_max_left _ _).trans (le_max_right _ _)),
     h2.trans ((le_max_right _ _).trans (le_max_left _ _)),
-    h4.trans (mul_le_mul_of_nonneg_right ((le_max_right _ _).trans (le_max_right _ _)) (abs_nonneg _))⟩
+    h4.trans (mul_le_mul_of_nonneg_right ((le_max_right _ _).trans (le_max_right _ _))
+      (abs_nonneg _))
+  ⟩
 
 end UpperTheory.Esk.MatrixEntryBounds
 

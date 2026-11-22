@@ -17,15 +17,24 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc.PhiFix
 
-private theorem mem_adjoin_of_mem (l : ℕ) [Fact l.Prime] (s : Per.AinfP l) (hs : s ∈ Per.Acris0 l) :
-    s ∈ Algebra.adjoin (Per.Ainf l) {y : Per.AinfP l | ∃ x : Per.Ainf l, Per.θ l x = 0 ∧ ∃ n : ℕ,
-      ((n.factorial : ℕ) : Per.AinfP l) * y = algebraMap (Per.Ainf l) (Per.AinfP l) x ^ n} :=
+private theorem mem_adjoin_of_mem (l : ℕ) [Fact l.Prime] (s : Per.AinfP l) (hs : s ∈ Per.Acris0 l)
+    : s ∈ Algebra.adjoin (Per.Ainf l)
+      {y : Per.AinfP l | ∃ x : Per.Ainf l, Per.θ l x = 0 ∧ ∃ n : ℕ,
+        ((n.factorial : ℕ) : Per.AinfP l) * y = algebraMap (Per.Ainf l) (Per.AinfP l) x ^ n} :=
   GlobalTheory.RingIface.Acris0_le_of_dividedPowers l _
-    (fun x n y hx hn => Algebra.subset_adjoin (s := {y : Per.AinfP l | ∃ x : Per.Ainf l, Per.θ l x = 0 ∧ ∃ n : ℕ,
-      ((n.factorial : ℕ) : Per.AinfP l) * y = algebraMap (Per.Ainf l) (Per.AinfP l) x ^ n}) (a := y) ⟨x, hx, n, hn⟩) hs
+    (fun x n y hx hn =>
+      Algebra.subset_adjoin
+        (s :=
+          {y : Per.AinfP l | ∃ x : Per.Ainf l, Per.θ l x = 0 ∧ ∃ n : ℕ,
+            ((n.factorial : ℕ) : Per.AinfP l) * y = algebraMap (Per.Ainf l) (Per.AinfP l) x ^ n})
+        (a := y) ⟨x, hx, n, hn⟩)
+    hs
 
-private theorem padicInt_hom_ext (l : ℕ) [Fact l.Prime] {R : Type} [CommRing R]
-    (hH : IsHausdorff (Ideal.span {(l : R)}) R) (f g : ℤ_[l] →+* R) (z : ℤ_[l]) : f z = g z := by
+private theorem padicInt_hom_ext
+    (l : ℕ) [Fact l.Prime]
+    {R : Type} [CommRing R]
+    (hH : IsHausdorff (Ideal.span {(l : R)}) R) (f g : ℤ_[l] →+* R) (z : ℤ_[l])
+    : f z = g z := by
   refine sub_eq_zero.1 (hH.haus _ fun n => ?_)
   rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton.1 (PadicInt.appr_spec n z)
@@ -34,11 +43,14 @@ private theorem padicInt_hom_ext (l : ℕ) [Fact l.Prime] {R : Type} [CommRing R
   rw [map_sub, map_natCast, map_mul, map_pow, map_natCast] at h1 h2
   exact ⟨f y - g y, by linear_combination h1 - h2⟩
 
-theorem fixed_of_mod (l : ℕ) [Fact l.Prime] {R : Type} [CommRing R] (φ : R →+* R) (f : ℤ_[l] →+* R)
-    (hf : ∀ z, φ (f z) = f z) (hH : IsHausdorff (Ideal.span {(l : R)}) R)
-    (htf : ∀ x : R, (l : R) * x = 0 → x = 0)
-    (hmod : ∀ x : R, φ x = x → ∃ c : ℤ, (l : R) ∣ x - c) (x : R) (hx : φ x = x) :
-    ∃ z, x = f z := by
+theorem fixed_of_mod
+    (l : ℕ) [Fact l.Prime]
+    {R : Type} [CommRing R]
+    (φ : R →+* R) (f : ℤ_[l] →+* R) (hf : ∀ z, φ (f z) = f z)
+    (hH : IsHausdorff (Ideal.span {(l : R)}) R) (htf : ∀ x : R, (l : R) * x = 0 → x = 0)
+    (hmod : ∀ x : R, φ x = x → ∃ c : ℤ, (l : R) ∣ x - c)
+    (x : R) (hx : φ x = x)
+    : ∃ z, x = f z := by
   let S : Subring R := φ.eqLocus (RingHom.id R)
   let g : ℤ_[l] →+* S := f.codRestrict S hf
   have hmap : (Ideal.span {(l : ℤ_[l])}).map g = Ideal.span {(l : S)} := by
@@ -71,8 +83,8 @@ theorem fixed_of_mod (l : ℕ) [Fact l.Prime] {R : Type} [CommRing R] (φ : R �
 
 variable (l : ℕ) [Fact l.Prime]
 
-theorem exists_pow_pred_div_factorial (n : ℕ) :
-    ∃ c : ℤ_[l], (((n + 1).factorial : ℕ) : ℤ_[l]) * c = (l : ℤ_[l]) ^ n := by
+theorem exists_pow_pred_div_factorial (n : ℕ)
+    : ∃ c : ℤ_[l], (((n + 1).factorial : ℕ) : ℤ_[l]) * c = (l : ℤ_[l]) ^ n := by
   have h0 : (((n + 1).factorial : ℕ) : ℤ_[l]) ≠ 0 := by exact_mod_cast (n + 1).factorial_ne_zero
   have hv : ((((n + 1).factorial : ℕ) : ℤ_[l])).valuation ≤ n := by
     have h := PadicInt.valuation_coe (((n + 1).factorial : ℕ) : ℤ_[l])
@@ -88,16 +100,18 @@ theorem exists_pow_pred_div_factorial (n : ℕ) :
   obtain ⟨c, hc⟩ := this
   exact ⟨c, hc.symm⟩
 
-theorem pow_eq_mul (x : Per.Ainf l) (hx : Per.θ l x = 0) :
-    ∃ t ∈ Per.Acris0 l, algebraMap (Per.Ainf l) (Per.AinfP l) x ^ l = (l : Per.AinfP l) * t := by
-  obtain ⟨d, hd⟩ := (GlobalTheory.RingBasics.isUnit_nat l l.factorial l.factorial_ne_zero).exists_right_inv
+theorem pow_eq_mul (x : Per.Ainf l) (hx : Per.θ l x = 0)
+    : ∃ t ∈ Per.Acris0 l, algebraMap (Per.Ainf l) (Per.AinfP l) x ^ l = (l : Per.AinfP l) * t := by
+  obtain ⟨d, hd⟩ :=
+    (GlobalTheory.RingBasics.isUnit_nat l l.factorial l.factorial_ne_zero).exists_right_inv
   have hdm : d * algebraMap (Per.Ainf l) (Per.AinfP l) x ^ l ∈ Per.Acris0 l :=
     GlobalTheory.RingIface.dividedPower_mem_Acris0 l x l _ hx (by rw [← mul_assoc, hd, one_mul])
   refine ⟨_, mul_mem (natCast_mem _ (l - 1).factorial) hdm, ?_⟩
-  rw [← mul_assoc, ← Nat.cast_mul, Nat.mul_factorial_pred (Fact.out : l.Prime).ne_zero, ← mul_assoc, hd, one_mul]
+  rw [← mul_assoc, ← Nat.cast_mul, Nat.mul_factorial_pred (Fact.out : l.Prime).ne_zero, ← mul_assoc,
+    hd, one_mul]
 
-theorem phi_mod (s : Per.AinfP l) (hs : s ∈ Per.Acris0 l) :
-    ∃ a : Per.Ainf l, ∃ t ∈ Per.Acris0 l,
+theorem phi_mod (s : Per.AinfP l) (hs : s ∈ Per.Acris0 l)
+    : ∃ a : Per.Ainf l, ∃ t ∈ Per.Acris0 l,
       Per.extP (Per.φA l) s = algebraMap (Per.Ainf l) (Per.AinfP l) a + (l : Per.AinfP l) * t := by
   replace hs := mem_adjoin_of_mem l s hs
   induction hs using Algebra.adjoin_induction with
@@ -113,14 +127,24 @@ theorem phi_mod (s : Per.AinfP l) (hs : s ∈ Per.Acris0 l) :
       have hc' := congrArg ((algebraMap (Per.Ainf l) (Per.AinfP l)).comp (Per.zA l)) hc
       rw [map_mul, map_natCast, map_pow, map_natCast] at hc'
       have e1 := congrArg (Per.extP (Per.φA l)) hn
-      rw [map_mul, map_natCast, map_pow, GlobalTheory.RingBasics.awayMap_algebraMap₂, hz, map_add (f := _), map_pow, e, map_mul, map_natCast,
-        ← mul_add, mul_pow, pow_succ (l : Per.AinfP l), ← hc'] at e1
-      refine ⟨0, ((algebraMap (Per.Ainf l) (Per.AinfP l)).comp (Per.zA l)) c * (t + algebraMap (Per.Ainf l) (Per.AinfP l) z) ^ (n + 1),
-        mul_mem (Subalgebra.algebraMap_mem _ _) (pow_mem (add_mem ht (Subalgebra.algebraMap_mem _ _)) _), ?_⟩
-      apply (GlobalTheory.RingBasics.isUnit_nat l (n + 1).factorial (n + 1).factorial_ne_zero).mul_left_cancel
+      rw [map_mul, map_natCast, map_pow, GlobalTheory.RingBasics.awayMap_algebraMap₂, hz,
+          map_add (f := _), map_pow, e, map_mul, map_natCast, ← mul_add, mul_pow,
+          pow_succ (l : Per.AinfP l), ← hc']
+        at e1
+      refine ⟨
+        0,
+        ((algebraMap (Per.Ainf l) (Per.AinfP l)).comp (Per.zA l)) c
+          * (t + algebraMap (Per.Ainf l) (Per.AinfP l) z) ^ (n + 1),
+        mul_mem (Subalgebra.algebraMap_mem _ _)
+          (pow_mem (add_mem ht (Subalgebra.algebraMap_mem _ _)) _),
+        ?_
+      ⟩
+      apply (GlobalTheory.RingBasics.isUnit_nat l (n + 1).factorial
+        (n + 1).factorial_ne_zero).mul_left_cancel
       rw [e1, map_zero]
       ring
-  | algebraMap r => exact ⟨Per.φA l r, 0, zero_mem _, by rw [GlobalTheory.RingBasics.awayMap_algebraMap₂]; simp⟩
+  | algebraMap r =>
+    exact ⟨Per.φA l r, 0, zero_mem _, by rw [GlobalTheory.RingBasics.awayMap_algebraMap₂]; simp⟩
   | add x y _ _ a b =>
     obtain ⟨a, t, ht, e⟩ := a
     obtain ⟨b, u, hu, e'⟩ := b
@@ -128,9 +152,15 @@ theorem phi_mod (s : Per.AinfP l) (hs : s ∈ Per.Acris0 l) :
   | mul x y _ _ a b =>
     obtain ⟨a, t, ht, e⟩ := a
     obtain ⟨b, u, hu, e'⟩ := b
-    refine ⟨a * b, algebraMap _ _ a * u + t * algebraMap _ _ b + l * t * u,
-      add_mem (add_mem (mul_mem (Subalgebra.algebraMap_mem _ _) hu) (mul_mem ht (Subalgebra.algebraMap_mem _ _)))
-        (mul_mem (mul_mem (natCast_mem _ _) ht) hu), ?_⟩
+    refine ⟨
+      a * b,
+      algebraMap _ _ a * u + t * algebraMap _ _ b + l * t * u,
+      add_mem
+        (add_mem (mul_mem (Subalgebra.algebraMap_mem _ _) hu)
+          (mul_mem ht (Subalgebra.algebraMap_mem _ _)))
+        (mul_mem (mul_mem (natCast_mem _ _) ht) hu),
+      ?_
+    ⟩
     rw [map_mul, map_mul, e, e']
     ring
 
@@ -153,8 +183,8 @@ theorem thetaP_mem (s : Per.AinfP l) (hs : s ∈ Per.Acris0 l) : Per.θP l s ∈
   | add x y _ _ a b => rw [RingHom.map_add (Per.θP l)]; exact add_mem a b
   | mul x y _ _ a b => rw [map_mul]; exact mul_mem a b
 
-theorem exists_int_nilpotent (t : Per.OC l) (ht : (l : Per.OC l) ∣ t ^ l - t) :
-    ∃ (c : ℤ) (N : ℕ), (l : Per.OC l) ∣ (t + c) ^ N := by
+theorem exists_int_nilpotent (t : Per.OC l) (ht : (l : Per.OC l) ∣ t ^ l - t)
+    : ∃ (c : ℤ) (N : ℕ), (l : Per.OC l) ∣ (t + c) ^ N := by
   have hl : (l : IsLocalRing.ResidueField (Per.OC l)) = 0 := by
     rw [← map_natCast (IsLocalRing.residue (Per.OC l)), IsLocalRing.residue_eq_zero_iff]
     exact (Fact.out : ¬ IsUnit (l : Per.OC l))
@@ -176,15 +206,21 @@ theorem exists_int_nilpotent (t : Per.OC l) (ht : (l : Per.OC l) ∣ t ^ l - t) 
       simp [h0] at h
     exact IsUnit.of_mul_eq_one ⟨(y : ℂ_[l])⁻¹, (GlobalTheory.RingBasics.mem_OC _).2 (by simp [h])⟩
       (Subtype.ext (mul_inv_cancel₀ h0))
-  obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one (norm_pos_iff.2 (GlobalTheory.RingBasics.p_ne_zero (p := l))) h3
+  obtain ⟨N, hN⟩ :=
+    exists_pow_lt_of_lt_one (norm_pos_iff.2 (GlobalTheory.RingBasics.p_ne_zero (p := l))) h3
   refine ⟨-n, N, ?_⟩
-  rw [hy, ← Ideal.mem_span_singleton, ← pow_one (Ideal.span _), GlobalTheory.RingBasics.mem_span_pow_OC]
+  rw [hy, ← Ideal.mem_span_singleton, ← pow_one (Ideal.span _),
+    GlobalTheory.RingBasics.mem_span_pow_OC]
   push_cast
   rw [norm_pow, pow_one]
   exact hN.le
 
-theorem add_int_eq_zero {R : Type} [CommRing R] (hl : (l : R) = 0) (b : R) (hb : b ^ l = b) (c : ℤ)
-    (hn : IsNilpotent (b + c)) : b + c = 0 := by
+theorem add_int_eq_zero
+    {R : Type} [CommRing R]
+    (hl : (l : R) = 0)
+    (b : R) (hb : b ^ l = b)
+    (c : ℤ) (hn : IsNilpotent (b + c))
+    : b + c = 0 := by
   have hp : l.Prime := Fact.out
   obtain ⟨r, hr⟩ := exists_add_pow_prime_eq hp b (c : R)
   obtain ⟨k, hk⟩ := Int.prime_dvd_pow_self_sub hp c
@@ -201,17 +237,21 @@ theorem add_int_eq_zero {R : Type} [CommRing R] (hl : (l : R) = 0) (b : R) (hb :
     (hn.pow_of_pos (by have := hp.two_le; omega)).isUnit_one_sub
   exact hu.mul_right_eq_zero.1 (by linear_combination -h1)
 
-theorem acrisFrobeniusRingHom_algebraMap_envelope (s : Per.Acris0 l) :
-    phiA l (algebraMap (Per.Acris0 l) (Per.Acris l) s) = algebraMap (Per.Acris0 l) (Per.Acris l)
-      ⟨Per.extP (Per.φA l) s, (GlobalTheory.CrisMaps.phiA_extends l).mem _ s.2⟩ :=
+theorem acrisFrobeniusRingHom_algebraMap_envelope (s : Per.Acris0 l)
+    : phiA l (algebraMap (Per.Acris0 l) (Per.Acris l) s)
+      = algebraMap (Per.Acris0 l) (Per.Acris l)
+        ⟨Per.extP (Per.φA l) s, (GlobalTheory.CrisMaps.phiA_extends l).mem _ s.2⟩ :=
   (GlobalTheory.CrisMaps.phiA_extends l).env s
 
-theorem alg_eq (a : Per.Ainf l) : algebraMap (Per.Ainf l) (Per.Acris l) a =
-    algebraMap (Per.Acris0 l) (Per.Acris l) (algebraMap (Per.Ainf l) (Per.Acris0 l) a) :=
+theorem alg_eq (a : Per.Ainf l)
+    : algebraMap (Per.Ainf l) (Per.Acris l) a
+      = algebraMap (Per.Acris0 l) (Per.Acris l) (algebraMap (Per.Ainf l) (Per.Acris0 l) a) :=
   GlobalTheory.RingIface.tower l a
 
-theorem phiA_alg (a : Per.Ainf l) : phiA l (algebraMap (Per.Ainf l) (Per.Acris l) a) =
-    algebraMap (Per.Ainf l) (Per.Acris l) (Per.φA l a) := (GlobalTheory.CrisMaps.phiA_extends l).alg a
+theorem phiA_alg (a : Per.Ainf l)
+    : phiA l (algebraMap (Per.Ainf l) (Per.Acris l) a)
+      = algebraMap (Per.Ainf l) (Per.Acris l) (Per.φA l a) :=
+  (GlobalTheory.CrisMaps.phiA_extends l).alg a
 
 theorem φA_zA (z : ℤ_[l]) : Per.φA l (Per.zA l z) = Per.zA l z :=
   padicInt_hom_ext l inferInstance ((Per.φA l).comp (Per.zA l)) (Per.zA l) z
@@ -220,19 +260,27 @@ theorem fixed_mod (x : Per.Acris l) (hx : phiA l x = x) : ∃ c : ℤ, (l : Per.
   obtain ⟨-, -, hd, hdv⟩ := acris_basic l
   obtain ⟨s, z, hs⟩ := hd x 1
   obtain ⟨a, t, ht, e⟩ := phi_mod l s s.2
-  have e0 : (⟨Per.extP (Per.φA l) s, (GlobalTheory.CrisMaps.phiA_extends l).mem _ s.2⟩ : Per.Acris0 l) =
-      algebraMap (Per.Ainf l) (Per.Acris0 l) a + (l : Per.Acris0 l) * ⟨t, ht⟩ := Subtype.ext (by simpa using e)
-  have h1 : x = algebraMap (Per.Ainf l) (Per.Acris l) a + (l : Per.Acris l) *
-      (algebraMap (Per.Acris0 l) (Per.Acris l) ⟨t, ht⟩ + phiA l z) := by
+  have e0
+      : (⟨Per.extP (Per.φA l) s, (GlobalTheory.CrisMaps.phiA_extends l).mem _ s.2⟩ : Per.Acris0 l)
+        = algebraMap (Per.Ainf l) (Per.Acris0 l) a + (l : Per.Acris0 l) * ⟨t, ht⟩ :=
+    Subtype.ext (by simpa using e)
+  have h1
+      : x
+        = algebraMap (Per.Ainf l) (Per.Acris l) a
+          + (l : Per.Acris l) * (algebraMap (Per.Acris0 l) (Per.Acris l) ⟨t, ht⟩ + phiA l z) := by
     have h := congrArg (phiA l) hs
-    rw [hx, RingHom.map_add (phiA l), acrisFrobeniusRingHom_algebraMap_envelope, e0, RingHom.map_add (algebraMap (Per.Acris0 l) (Per.Acris l)), ← alg_eq, pow_one, map_mul, map_mul, map_natCast,
-      map_natCast] at h
+    rw [hx, RingHom.map_add (phiA l), acrisFrobeniusRingHom_algebraMap_envelope, e0,
+        RingHom.map_add (algebraMap (Per.Acris0 l) (Per.Acris l)), ← alg_eq, pow_one, map_mul,
+        map_mul, map_natCast, map_natCast]
+      at h
     linear_combination h
   generalize algebraMap (Per.Acris0 l) (Per.Acris l) ⟨t, ht⟩ + phiA l z = w at h1
   obtain ⟨v, hv⟩ := GlobalTheory.RingBasics.frob_lift l a
   have h2 : (l : Per.Acris l) ∣ algebraMap (Per.Ainf l) (Per.Acris l) (a ^ l - a) := by
     have h := congrArg (phiA l) h1
-    rw [hx, map_add (f := _), phiA_alg, hv, map_add (f := _), map_mul, map_mul, map_natCast, map_natCast] at h
+    rw [hx, map_add (f := _), phiA_alg, hv, map_add (f := _), map_mul, map_mul, map_natCast,
+        map_natCast]
+      at h
     refine ⟨w - phiA l w - algebraMap (Per.Ainf l) (Per.Acris l) v, ?_⟩
     rw [map_sub]
     linear_combination h1 - h
@@ -240,31 +288,44 @@ theorem fixed_mod (x : Per.Acris l) (hx : phiA l x = x) : ∃ c : ℤ, (l : Per.
     have h := h2
     rw [alg_eq, ← pow_one (l : Per.Acris l), hdv, pow_one] at h
     obtain ⟨q, hq⟩ := h
-    have hq' : algebraMap (Per.Ainf l) (Per.AinfP l) (a ^ l - a) = (l : Per.AinfP l) * (q : Per.AinfP l) :=
+    have hq'
+        : algebraMap (Per.Ainf l) (Per.AinfP l) (a ^ l - a)
+          = (l : Per.AinfP l) * (q : Per.AinfP l) :=
       congrArg Subtype.val hq
     have h := congrArg (Per.θP l) hq'
     rw [SecEx.fontaineTheta_algebraMap₂, map_mul, map_natCast, map_sub, map_pow] at h
     exact ⟨⟨_, thetaP_mem l q q.2⟩, Subtype.ext h⟩
   obtain ⟨c, N, y, hy⟩ := exists_int_nilpotent l _ h3
   obtain ⟨y, rfl⟩ := SecEx.θ_surjective l y
-  obtain ⟨k, hk, ek⟩ := pow_eq_mul l ((a + c) ^ N - l * y) (by
-    rw [map_sub, map_pow, map_add (f := _), map_intCast, map_mul, map_natCast, hy, sub_self])
-  have ek0 : algebraMap (Per.Ainf l) (Per.Acris0 l) ((a + c) ^ N - l * y) ^ l = (l : Per.Acris0 l) * ⟨k, hk⟩ :=
+  obtain ⟨k, hk, ek⟩ :=
+    pow_eq_mul l ((a + c) ^ N - l * y)
+      (by rw [map_sub, map_pow, map_add (f := _), map_intCast, map_mul, map_natCast, hy, sub_self])
+  have ek0
+      : algebraMap (Per.Ainf l) (Per.Acris0 l) ((a + c) ^ N - l * y) ^ l
+        = (l : Per.Acris0 l) * ⟨k, hk⟩ :=
     Subtype.ext ek
   have ek1 := congrArg (algebraMap (Per.Acris0 l) (Per.Acris l)) ek0
-  rw [map_pow, ← alg_eq, map_mul, map_natCast, map_sub, map_pow, map_add (f := _), map_intCast, map_mul,
-    map_natCast] at ek1
+  rw [map_pow, ← alg_eq, map_mul, map_natCast, map_sub, map_pow, map_add (f := _), map_intCast,
+      map_mul, map_natCast]
+    at ek1
   let π := Ideal.Quotient.mk (Ideal.span {(l : Per.Acris l)})
   have hπ : ∀ u, π u = 0 ↔ (l : Per.Acris l) ∣ u := fun u => by
     rw [Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton]
-  have hl : (l : Per.Acris l ⧸ Ideal.span {(l : Per.Acris l)}) = 0 := by
-    rw [← map_natCast π, hπ]
-  have h4 := add_int_eq_zero l hl (π (algebraMap (Per.Ainf l) (Per.Acris l) a)) (by
-    have := (hπ _).2 h2
-    rwa [map_sub, map_pow, map_sub, map_pow, sub_eq_zero] at this) c ⟨N * l, by
-    have := congrArg π ek1
-    rwa [map_pow, map_sub, map_mul, map_mul, map_natCast, hl, zero_mul, zero_mul, sub_zero, map_pow, map_add,
-      map_intCast, ← pow_mul] at this⟩
+  have hl : (l : Per.Acris l ⧸ Ideal.span {(l : Per.Acris l)}) = 0 := by rw [← map_natCast π, hπ]
+  have h4 :=
+    add_int_eq_zero l hl (π (algebraMap (Per.Ainf l) (Per.Acris l) a))
+      (by
+        have := (hπ _).2 h2
+        rwa [map_sub, map_pow, map_sub, map_pow, sub_eq_zero] at this)
+      c
+      ⟨
+        N * l,
+        by
+          have := congrArg π ek1
+          rwa [map_pow, map_sub, map_mul, map_mul, map_natCast, hl, zero_mul, zero_mul, sub_zero,
+              map_pow, map_add, map_intCast, ← pow_mul]
+            at this
+      ⟩
   refine ⟨-c, (hπ _).1 ?_⟩
   rw [h1, map_sub, map_add (f := _), map_mul, map_natCast, hl, map_intCast]
   push_cast
@@ -274,8 +335,11 @@ end GlobalTheory.MemLoc.PhiFix
 
 namespace GlobalTheory.MemLoc
 
-theorem phi_fixed_eq_padicInt : ∀ (l : ℕ) [Fact l.Prime], ∀ x : Per.Acris l, phiA l x = x → ∃ z : ℤ_[l], x = algebraMap (Per.Ainf l) (Per.Acris l) (Per.zA l z) :=
-  fun l _ x hx => PhiFix.fixed_of_mod l (phiA l) ((algebraMap (Per.Ainf l) (Per.Acris l)).comp (Per.zA l))
+theorem phi_fixed_eq_padicInt
+    : ∀ (l : ℕ) [Fact l.Prime], ∀ x : Per.Acris l,
+      phiA l x = x
+        → ∃ z : ℤ_[l], x = algebraMap (Per.Ainf l) (Per.Acris l) (Per.zA l z) := fun l _ x hx =>
+  PhiFix.fixed_of_mod l (phiA l) ((algebraMap (Per.Ainf l) (Per.Acris l)).comp (Per.zA l))
     (fun z => (PhiFix.phiA_alg l _).trans (congrArg _ (PhiFix.φA_zA l z)))
     (acris_basic l).1.toIsHausdorff (acris_basic l).2.1 (PhiFix.fixed_mod l) x hx
 

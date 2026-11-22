@@ -26,7 +26,6 @@ lemma gram_diag {l : Type*} [Fintype l] (P : Matrix l l ℤ) (G : Matrix l l ℝ
 
 end PSymplGramMem
 
-
 open PSymplGramMem in
 theorem SymplGramMem.proof : SymplGramMem.Statement := by
   intro n P G hP hG hGpd
@@ -41,7 +40,8 @@ theorem SymplGramMem.proof : SymplGramMem.Statement := by
     rwa [conjTranspose_eq_transpose_of_trivial] at h
   · intro Q
     unfold symplGram
-    have hmap : (Q * P).map (Int.cast : ℤ → ℝ) = Q.map (Int.cast : ℤ → ℝ) * P.map (Int.cast : ℤ → ℝ) :=
+    have hmap
+        : (Q * P).map (Int.cast : ℤ → ℝ) = Q.map (Int.cast : ℤ → ℝ) * P.map (Int.cast : ℤ → ℝ) :=
       Matrix.map_mul (f := Int.castRingHom ℝ)
     rw [hmap, Matrix.transpose_mul]
     simp only [Matrix.mul_assoc]

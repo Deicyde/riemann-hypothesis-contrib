@@ -21,16 +21,23 @@ universe u
 
 namespace ProcyclicCohomology
 
-theorem length_ker_eq_coker {R : Type u} [CommRing R] {V : Type u} [AddCommGroup V] [Module R V]
-    (f : V →ₗ[R] V) (h : IsFiniteLength R V) :
-    Module.length R (LinearMap.ker f) = Module.length R (V ⧸ LinearMap.range f) := by
-  have h1 : Module.length R V = Module.length R (LinearMap.ker f) + Module.length R (LinearMap.range f) :=
-    Module.length_eq_add_of_exact (LinearMap.ker f).subtype f.rangeRestrict (Submodule.injective_subtype _)
-      f.surjective_rangeRestrict
+theorem length_ker_eq_coker
+    {R : Type u} [CommRing R]
+    {V : Type u} [AddCommGroup V] [Module R V]
+    (f : V →ₗ[R] V) (h : IsFiniteLength R V)
+    : Module.length R (LinearMap.ker f) = Module.length R (V ⧸ LinearMap.range f) := by
+  have h1
+      : Module.length R V
+        = Module.length R (LinearMap.ker f) + Module.length R (LinearMap.range f) :=
+    Module.length_eq_add_of_exact (LinearMap.ker f).subtype f.rangeRestrict
+      (Submodule.injective_subtype _) f.surjective_rangeRestrict
       (LinearMap.exact_iff.2 (by rw [LinearMap.ker_rangeRestrict, Submodule.range_subtype]))
-  have h2 : Module.length R V = Module.length R (LinearMap.range f) + Module.length R (V ⧸ LinearMap.range f) :=
+  have h2
+      : Module.length R V
+        = Module.length R (LinearMap.range f) + Module.length R (V ⧸ LinearMap.range f) :=
     Module.length_eq_add_of_exact (LinearMap.range f).subtype (LinearMap.range f).mkQ
-      (Submodule.injective_subtype _) (LinearMap.range f).mkQ_surjective (LinearMap.exact_subtype_mkQ _)
+      (Submodule.injective_subtype _) (LinearMap.range f).mkQ_surjective
+      (LinearMap.exact_subtype_mkQ _)
   have hVt : Module.length R V ≠ ⊤ := Module.length_ne_top_iff.2 h
   have hL : Module.length R (LinearMap.range f) ≠ ⊤ := fun h' => hVt (by rw [h1, h', add_top])
   rw [h1, add_comm (Module.length R (LinearMap.range f))] at h2
@@ -44,14 +51,14 @@ theorem zHat_holds : ZHatStatement.{u} := by
   have hidx := hG.2
   have hc := ProcyclicCohomology.comm_of_dense hs
   have hA := ProcyclicCohomology.model_comparison_degree_zero_bijective M hc hs hidx htor
-  have hH2 : ∀ (M' : TRep R G) [DiscreteTopology M'.V], (∀ m : M'.V, ∃ k : ℕ, 0 < k ∧ k • m = 0) →
-      Subsingleton (M'.H 2) := by
+  have hH2
+      : ∀ (M' : TRep R G) [DiscreteTopology M'.V],
+        (∀ m : M'.V, ∃ k : ℕ, 0 < k ∧ k • m = 0) → Subsingleton (M'.H 2) := by
     intro M' _ ht
     obtain ⟨-, -, -, e2, -⟩ := low_holds R G M'
     have := ProcyclicCohomology.subsingleton_H2_of_procyclic_of_torsion M' hc hs hidx ht
     exact e2.toEquiv.subsingleton
-  have hB : ∀ n, 1 < n → Subsingleton (M.H n) := fun n hn =>
-    shift_holds R G 2 hH2 M htor n hn
+  have hB : ∀ n, 1 < n → Subsingleton (M.H n) := fun n hn => shift_holds R G 2 hH2 M htor n hn
   refine ⟨hA, hB, fun hM => ?_⟩
   obtain ⟨-, ⟨e0, -⟩, ⟨e1, -⟩, -⟩ := low_holds R G M
   obtain ⟨eA, -⟩ := hA
@@ -81,8 +88,7 @@ theorem zHat_holds : ZHatStatement.{u} := by
     · exact fl1
     · have := hB (n + 2) (by omega); exact .of_subsingleton
   refine ⟨⟨hfl, hB⟩, ?_⟩
-  have l0 : Module.length R (M.H 0) = Module.length R (LinearMap.ker f) := by
-    rw [e0.length_eq, hH0]
+  have l0 : Module.length R (M.H 0) = Module.length R (LinearMap.ker f) := by rw [e0.length_eq, hH0]
   have l1 : Module.length R (M.H 1) = Module.length R (M.V ⧸ LinearMap.range f) :=
     (e1.trans eA).length_eq
   have l01 : Module.length R (M.H 0) = Module.length R (M.H 1) := by

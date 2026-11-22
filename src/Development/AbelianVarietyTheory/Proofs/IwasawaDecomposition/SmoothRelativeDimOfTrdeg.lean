@@ -64,15 +64,14 @@ private lemma trdeg_eq_of_ringEquiv {K L K' L' : Type} [Field K] [CommRing L] [F
     RingEquiv.apply_symm_apply] at this
   simp [this]
 
-
 open AlgebraicGeometry CategoryTheory Limits in
-theorem _root_.GlobalTheory.RelDimFibCrit.trdeg_affine {X Y : Scheme.{0}} (f : X ⟶ Y) (U : Y.Opens)
-    (hU : IsAffineOpen U) (V : X.Opens) (hV : IsAffineOpen V) (e : V ≤ f ⁻¹ᵁ U)
-    (p : PrimeSpectrum Γ(X, V)) :
-    @Algebra.trdeg (Y.residueField (f (hV.fromSpec p))) (X.residueField (hV.fromSpec p)) _ _
-      (f.residueFieldMap (hV.fromSpec p)).hom.toAlgebra =
-    @Algebra.trdeg (p.asIdeal.comap (f.appLE U V e).hom).ResidueField p.asIdeal.ResidueField _ _
-      (Ideal.ResidueField.map _ p.asIdeal (f.appLE U V e).hom rfl).toAlgebra := by
+theorem _root_.GlobalTheory.RelDimFibCrit.trdeg_affine
+    {X Y : Scheme.{0}} (f : X ⟶ Y) (U : Y.Opens) (hU : IsAffineOpen U) (V : X.Opens)
+    (hV : IsAffineOpen V) (e : V ≤ f ⁻¹ᵁ U) (p : PrimeSpectrum Γ(X, V))
+    : @Algebra.trdeg (Y.residueField (f (hV.fromSpec p))) (X.residueField (hV.fromSpec p)) _ _
+        (f.residueFieldMap (hV.fromSpec p)).hom.toAlgebra
+      = @Algebra.trdeg (p.asIdeal.comap (f.appLE U V e).hom).ResidueField p.asIdeal.ResidueField _ _
+        (Ideal.ResidueField.map _ p.asIdeal (f.appLE U V e).hom rfl).toAlgebra := by
   obtain ⟨p, rfl⟩ : ∃ p' : Spec Γ(X, V), p' = p := ⟨p, rfl⟩
   haveI : p.asIdeal.IsPrime := PrimeSpectrum.isPrime (p : PrimeSpectrum Γ(X, V))
   set φ := f.appLE U V e
@@ -81,15 +80,18 @@ theorem _root_.GlobalTheory.RelDimFibCrit.trdeg_affine {X Y : Scheme.{0}} (f : X
   have h₁ : hU.fromSpec ((Spec.map φ) p) = f (hV.fromSpec p) :=
     congr($(hU.SpecMap_appLE_fromSpec f hV e) p)
   set q : Spec Γ(Y, U) := (Spec.map φ) p
-  let eL := (asIso (hV.fromSpec.residueFieldMap p) ≪≫
-    Scheme.Spec.residueFieldIso _ p).commRingCatIsoToRingEquiv
-  let eK := (Y.residueFieldCongr h₁.symm ≪≫ asIso (hU.fromSpec.residueFieldMap q) ≪≫
-    Scheme.Spec.residueFieldIso _ q).commRingCatIsoToRingEquiv
-  have hsq : (Y.residueFieldCongr h₁.symm).hom ≫ hU.fromSpec.residueFieldMap q ≫
-      (Scheme.Spec.residueFieldIso _ q).hom ≫
-        CommRingCat.ofHom (Ideal.ResidueField.map (p.asIdeal.comap φ.hom) p.asIdeal φ.hom rfl) =
-      f.residueFieldMap (hV.fromSpec p) ≫ hV.fromSpec.residueFieldMap p ≫
-        (Scheme.Spec.residueFieldIso _ p).hom := by
+  let eL :=
+    (asIso (hV.fromSpec.residueFieldMap p)
+      ≪≫ Scheme.Spec.residueFieldIso _ p).commRingCatIsoToRingEquiv
+  let eK :=
+    (Y.residueFieldCongr h₁.symm ≪≫ asIso (hU.fromSpec.residueFieldMap q)
+      ≪≫ Scheme.Spec.residueFieldIso _ q).commRingCatIsoToRingEquiv
+  have hsq
+      : (Y.residueFieldCongr h₁.symm).hom ≫ hU.fromSpec.residueFieldMap q
+          ≫ (Scheme.Spec.residueFieldIso _ q).hom
+          ≫ CommRingCat.ofHom (Ideal.ResidueField.map (p.asIdeal.comap φ.hom) p.asIdeal φ.hom rfl)
+        = f.residueFieldMap (hV.fromSpec p) ≫ hV.fromSpec.residueFieldMap p
+          ≫ (Scheme.Spec.residueFieldIso _ p).hom := by
     erw [← specMap_residueFieldMap_conj_eq_ofHom_map]
     rw [Iso.hom_inv_id_assoc, ← Category.assoc (hU.fromSpec.residueFieldMap q),
       ← Scheme.residueFieldMap_comp, ← Category.assoc (f.residueFieldMap _),

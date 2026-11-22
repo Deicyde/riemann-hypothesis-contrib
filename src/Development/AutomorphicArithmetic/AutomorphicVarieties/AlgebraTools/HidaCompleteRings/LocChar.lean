@@ -6,16 +6,21 @@ public import Mathlib
 
 open IsLocalRing
 
-private theorem map_mem_smul_top {R N : Type} [CommRing R] [AddCommGroup N] [Module R N]
-    (J : Ideal R) (f : Module.End R N) {x : N} (hx : x ∈ J • (⊤ : Submodule R N)) :
-    f x ∈ J • (⊤ : Submodule R N) := by
+private theorem map_mem_smul_top
+    {R N : Type} [CommRing R] [AddCommGroup N] [Module R N]
+    (J : Ideal R)
+    (f : Module.End R N)
+    {x : N} (hx : x ∈ J • (⊤ : Submodule R N))
+    : f x ∈ J • (⊤ : Submodule R N) := by
   have h1 : f x ∈ (J • (⊤ : Submodule R N)).map f := Submodule.mem_map_of_mem hx
   rw [Submodule.map_smul''] at h1
   exact Submodule.smul_mono le_rfl le_top h1
 
-private theorem pow_mem_pow_smul_top {R N : Type} [CommRing R] [AddCommGroup N] [Module R N]
-    (J : Ideal R) (f : Module.End R N) (hf : ∀ x, f x ∈ J • (⊤ : Submodule R N)) (k : ℕ) :
-    ∀ x, (f ^ k) x ∈ J ^ k • (⊤ : Submodule R N) := by
+private theorem pow_mem_pow_smul_top
+    {R N : Type} [CommRing R] [AddCommGroup N] [Module R N]
+    (J : Ideal R) (f : Module.End R N) (hf : ∀ x, f x ∈ J • (⊤ : Submodule R N))
+    (k : ℕ)
+    : ∀ x, (f ^ k) x ∈ J ^ k • (⊤ : Submodule R N) := by
   induction k with
   | zero =>
     intro x
@@ -23,19 +28,28 @@ private theorem pow_mem_pow_smul_top {R N : Type} [CommRing R] [AddCommGroup N] 
   | succ k ih =>
     intro x
     rw [pow_succ' f k, Module.End.mul_apply, pow_succ J k, Submodule.mul_smul]
-    have h1 : f ((f ^ k) x) ∈ (J ^ k • (⊤ : Submodule R N)).map f :=
-      Submodule.mem_map_of_mem (ih x)
+    have h1 : f ((f ^ k) x) ∈ (J ^ k • (⊤ : Submodule R N)).map f := Submodule.mem_map_of_mem (ih x)
     rw [Submodule.map_smul''] at h1
     refine Submodule.smul_mono le_rfl ?_ h1
     rintro _ ⟨z, _, rfl⟩
     exact hf z
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.locChar :
-    ∀ (R N T ι : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [AddCommGroup N] [Module R N] [Module.Finite R N] [CommRing T] (ρ : T →+* Module.End R N) (I : Ideal T) (u : ι → T) (e : T), (∀ μ ∈ I, ∀ x, ρ μ x ∈ maximalIdeal R • (⊤ : Submodule R N)) → IsIdempotentElem e → (∀ i, ∃ n : ℕ, u i ^ n * e ∈ I) → 1 - e ∈ I ⊔ Ideal.span (Set.range u) → ∀ x, ρ e x = x ↔ ∀ (i : ι) (k : ℕ), ∃ n : ℕ, (ρ (u i) ^ n) x ∈ maximalIdeal R ^ k • (⊤ : Submodule R N) := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.locChar
+    : ∀ (R N T ι : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [AddCommGroup N]
+        [Module R N] [Module.Finite R N] [CommRing T] (ρ : T →+* Module.End R N) (I : Ideal T)
+        (u : ι → T) (e : T),
+      (∀ μ ∈ I, ∀ x, ρ μ x ∈ maximalIdeal R • (⊤ : Submodule R N)) → IsIdempotentElem e
+        → (∀ i, ∃ n : ℕ, u i ^ n * e ∈ I) → 1 - e ∈ I ⊔ Ideal.span (Set.range u)
+        → ∀ x,
+          ρ e x = x
+            ↔ ∀ (i : ι) (k : ℕ), ∃ n : ℕ,
+              (ρ (u i) ^ n) x ∈ maximalIdeal R ^ k • (⊤ : Submodule R N) := by
   intro R N T ι _ _ _ _ _ _ _ ρ I u e hI he hu hspan x
-  have hP : ∀ (k : ℕ) (t : T) {z : N}, z ∈ maximalIdeal R ^ k • (⊤ : Submodule R N) →
-      ρ t z ∈ maximalIdeal R ^ k • (⊤ : Submodule R N) :=
-    fun k t z hz => map_mem_smul_top _ (ρ t) hz
+  have hP
+      : ∀ (k : ℕ) (t : T) {z : N},
+        z ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
+          → ρ t z ∈ maximalIdeal R ^ k • (⊤ : Submodule R N) := fun k t z hz =>
+    map_mem_smul_top _ (ρ t) hz
   constructor
   · intro hx i k
     obtain ⟨n, hn⟩ := hu i
@@ -54,20 +68,21 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.locChar :
     obtain ⟨y, hy⟩ : ∃ y, y = ρ (1 - e) x := ⟨_, rfl⟩
     have hyk : ∀ k : ℕ, y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N) := by
       intro k
-      let S : Ideal T :=
-        { carrier := {t | ρ t y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)}
-          add_mem' := fun {a b} ha hb => by
-            show ρ (a + b) y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
-            rw [map_add (f := _), LinearMap.add_apply]
-            exact add_mem ha hb
-          zero_mem' := by
-            show ρ 0 y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
-            rw [map_zero, LinearMap.zero_apply]
-            exact zero_mem _
-          smul_mem' := fun c t ht => by
-            show ρ (c * t) y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
-            rw [map_mul, Module.End.mul_apply]
-            exact hP k c ht }
+      let S : Ideal T := {
+        carrier := {t | ρ t y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)}
+        add_mem' := fun {a b} ha hb => by
+          show ρ (a + b) y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
+          rw [map_add (f := _), LinearMap.add_apply]
+          exact add_mem ha hb
+        zero_mem' := by
+          show ρ 0 y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
+          rw [map_zero, LinearMap.zero_apply]
+          exact zero_mem _
+        smul_mem' := fun c t ht => by
+          show ρ (c * t) y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
+          rw [map_mul, Module.End.mul_apply]
+          exact hP k c ht
+      }
       have hrad : I ⊔ Ideal.span (Set.range u) ≤ S.radical := by
         refine sup_le (fun μ hμ => Ideal.mem_radical_iff.mpr ⟨k, ?_⟩) (Ideal.span_le.mpr ?_)
         · show ρ (μ ^ k) y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
@@ -78,8 +93,8 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.locChar :
           refine Ideal.mem_radical_iff.mpr ⟨n, ?_⟩
           show ρ (u i ^ n) y ∈ maximalIdeal R ^ k • (⊤ : Submodule R N)
           have hc : ρ (u i ^ n) y = ρ (1 - e) ((ρ (u i) ^ n) x) := by
-            rw [hy, ← map_pow, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul,
-              ← map_mul, mul_comm]
+            rw [hy, ← map_pow, ← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul,
+              mul_comm]
           rw [hc]
           exact hP k _ hn
       obtain ⟨K, hK⟩ := Ideal.mem_radical_iff.mp (hrad hspan)

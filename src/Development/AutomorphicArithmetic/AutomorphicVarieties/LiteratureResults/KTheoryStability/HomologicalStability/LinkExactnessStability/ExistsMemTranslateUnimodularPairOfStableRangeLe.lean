@@ -10,8 +10,11 @@ open GlobalTheory.SeqCx Matrix UpperTheory.V.KL
 
 namespace GlobalTheory
 
-theorem finsupp_coord_ideal_eq_top {R : Type} [CommRing R] (u : ℕ →₀ R) (g : (ℕ →₀ R) →ₗ[R] R)
-    (hg : g u = 1) (K : Ideal R) (hK : ∀ i, u i ∈ K) : K = ⊤ := by
+theorem finsupp_coord_ideal_eq_top
+    {R : Type} [CommRing R]
+    (u : ℕ →₀ R) (g : (ℕ →₀ R) →ₗ[R] R) (hg : g u = 1)
+    (K : Ideal R) (hK : ∀ i, u i ∈ K)
+    : K = ⊤ := by
   rw [Ideal.eq_top_iff_one, ← hg]
   rw [show g u = g (u.sum Finsupp.single) by rw [Finsupp.sum_single]]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -20,8 +23,9 @@ theorem finsupp_coord_ideal_eq_top {R : Type} [CommRing R] (u : ℕ →₀ R) (g
   rw [← Finsupp.smul_single_one, map_smul, smul_eq_mul]
   exact Ideal.mul_mem_right _ _ (hK i)
 
-theorem finsupp_exists_form_of_span {R : Type} [CommRing R] (u : ℕ →₀ R)
-    (h : Ideal.span (Set.range fun i => u i) = ⊤) : ∃ g : (ℕ →₀ R) →ₗ[R] R, g u = 1 := by
+theorem finsupp_exists_form_of_span
+    {R : Type} [CommRing R] (u : ℕ →₀ R) (h : Ideal.span (Set.range fun i => u i) = ⊤)
+    : ∃ g : (ℕ →₀ R) →ₗ[R] R, g u = 1 := by
   have h1 : (1 : R) ∈ Ideal.span (Set.range fun i => u i) := by
     rw [h]
     exact Submodule.mem_top
@@ -30,8 +34,9 @@ theorem finsupp_exists_form_of_span {R : Type} [CommRing R] (u : ℕ →₀ R)
   rw [← hc]
   simp [Finsupp.sum, LinearMap.sum_apply]
 
-private theorem linearMap_apply_mem_span_range_coeffs {R : Type} [CommRing R] (w : ℕ →₀ R)
-    (g : (ℕ →₀ R) →ₗ[R] R) : g w ∈ Ideal.span (Set.range fun i => w i) := by
+private theorem linearMap_apply_mem_span_range_coeffs
+    {R : Type} [CommRing R] (w : ℕ →₀ R) (g : (ℕ →₀ R) →ₗ[R] R)
+    : g w ∈ Ideal.span (Set.range fun i => w i) := by
   have e : g w = ∑ i ∈ w.support, w i * g (Finsupp.single i 1) := by
     conv_lhs => rw [← Finsupp.sum_single w]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -41,8 +46,12 @@ private theorem linearMap_apply_mem_span_range_coeffs {R : Type} [CommRing R] (w
   rw [e]
   exact Ideal.sum_mem _ fun i _ => Ideal.mul_mem_right _ _ (Ideal.subset_span ⟨i, rfl⟩)
 
-theorem unimodular_partner_aff : ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s → ∀ (n j : ℕ), s ≤ n →
-    n ≤ j → ∀ v : ℕ →₀ R, [v] ∈ uniM R (ℕ →₀ R) → ∃ x ∈ aff R n j, [v, x] ∈ uniM R (ℕ →₀ R) := by
+theorem unimodular_partner_aff
+    : ∀ (R : Type) [CommRing R] (s : ℕ),
+      StableRangeLe R s
+        → ∀ (n j : ℕ),
+          s ≤ n → n ≤ j
+            → ∀ v : ℕ →₀ R, [v] ∈ uniM R (ℕ →₀ R) → ∃ x ∈ aff R n j, [v, x] ∈ uniM R (ℕ →₀ R) := by
   intro R _ s hs n j hsn hnj v hv
   obtain ⟨f, hf⟩ := hv
   obtain ⟨f0, hf0⟩ : ∃ f0 : (ℕ →₀ R) →ₗ[R] R, f0 v = 1 :=
@@ -57,16 +66,18 @@ theorem unimodular_partner_aff : ∀ (R : Type) [CommRing R] (s : ℕ), StableRa
     intro k c hk
     have h1 : f0 (Finsupp.single k c) = c * a k := by
       rw [← Finsupp.smul_single_one, map_smul, smul_eq_mul]
-    rw [hφ, h1, Finset.sum_eq_single k
-      (fun b _ hb => by simp [Finsupp.single_apply, Ne.symm hb])
-      (fun h => absurd (Finset.mem_range.2 hk) h)]
+    rw [hφ, h1,
+      Finset.sum_eq_single k
+        (fun b _ hb => by simp [Finsupp.single_apply, Ne.symm hb])
+        (fun h => absurd (Finset.mem_range.2 hk) h)]
     simp only [Finsupp.single_eq_same, Finsupp.single_apply, if_neg (show k ≠ j by omega), mul_zero,
       sub_zero]
     ring
   have hφj : φ (Finsupp.single j 1) = 0 := by
-    rw [hφ, Finset.sum_eq_zero (fun i hi => by
-      have := Finset.mem_range.1 hi
-      simp [Finsupp.single_apply, show j ≠ i by omega])]
+    rw [hφ,
+      Finset.sum_eq_zero (fun i hi => by
+        have := Finset.mem_range.1 hi
+        simp [Finsupp.single_apply, show j ≠ i by omega])]
     simp [a]
   let b' : R := φ v + a j * v j
   let r : Fin (n + 1) → R := fun i => if (i : ℕ) < n then v i else b'
@@ -80,7 +91,8 @@ theorem unimodular_partner_aff : ∀ (R : Type) [CommRing R] (s : ℕ), StableRa
       rw [hφ, ← hf0, ← Finset.sum_range (fun i => a i * v i)]
       ring
     rw [key]
-    exact Ideal.add_mem _ (Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨_, rfl⟩))
+    exact Ideal.add_mem _
+      (Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨_, rfl⟩))
       (Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨_, rfl⟩))
   obtain ⟨t, ht⟩ := hs n hsn r hr
   have ht' : Ideal.span (Set.range fun i => r i.castSucc + t i * r (Fin.last n)) = ⊤ := ht
@@ -135,16 +147,20 @@ theorem unimodular_partner_aff : ∀ (R : Type) [CommRing R] (s : ℕ), StableRa
     conv_lhs => rw [hvdec]
     rw [map_add (f := _), map_smul, hh, smul_eq_mul]
   have hf1x : f1 x = 0 := by
-    simp only [f1, LinearMap.sub_apply, LinearMap.smul_apply, Finsupp.lapply_apply, smul_eq_mul, hxj]
+    simp only [f1, LinearMap.sub_apply, LinearMap.smul_apply, Finsupp.lapply_apply, smul_eq_mul,
+      hxj]
     ring
   have hf1v : f1 v = 1 := by
-    simp only [f1, LinearMap.sub_apply, LinearMap.smul_apply, Finsupp.lapply_apply, smul_eq_mul, hhv]
+    simp only [f1, LinearMap.sub_apply, LinearMap.smul_apply, Finsupp.lapply_apply, smul_eq_mul,
+      hhv]
     ring
   have hf2x : f2 x = 1 := by
-    simp only [f2, LinearMap.sub_apply, LinearMap.smul_apply, Finsupp.lapply_apply, smul_eq_mul, hf1x, hxj]
+    simp only [f2, LinearMap.sub_apply, LinearMap.smul_apply, Finsupp.lapply_apply, smul_eq_mul,
+      hf1x, hxj]
     ring
   have hf2v : f2 v = 0 := by
-    simp only [f2, LinearMap.sub_apply, LinearMap.smul_apply, Finsupp.lapply_apply, smul_eq_mul, hf1v]
+    simp only [f2, LinearMap.sub_apply, LinearMap.smul_apply, Finsupp.lapply_apply, smul_eq_mul,
+      hf1v]
     ring
   refine ⟨x, hxaff, ?_⟩
   simp only [uniM, Set.mem_setOf_eq]
@@ -156,7 +172,12 @@ end GlobalTheory
 
 section
 open GlobalTheory.SeqCx Matrix UpperTheory.V.KL
-theorem _root_.GlobalTheory.T.exists_mem_translate_unimodular_pair_of_stableRangeLe : ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s → ∀ (n j : ℕ), s ≤ n → n ≤ j → ∀ v : ℕ →₀ R, [v] ∈ uniM R (ℕ →₀ R) → ∃ x ∈ aff R n j, [v, x] ∈ uniM R (ℕ →₀ R) := by
+theorem _root_.GlobalTheory.T.exists_mem_translate_unimodular_pair_of_stableRangeLe
+    : ∀ (R : Type) [CommRing R] (s : ℕ),
+      StableRangeLe R s
+        → ∀ (n j : ℕ),
+          s ≤ n → n ≤ j
+            → ∀ v : ℕ →₀ R, [v] ∈ uniM R (ℕ →₀ R) → ∃ x ∈ aff R n j, [v, x] ∈ uniM R (ℕ →₀ R) := by
   first
   | exact @GlobalTheory.unimodular_partner_aff
   | exact @GlobalTheory.finsupp_exists_form_of_span

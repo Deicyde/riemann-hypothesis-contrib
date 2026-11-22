@@ -8,17 +8,21 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Poi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 set_option autoImplicit false
 noncomputable section
 
 namespace GlobalTheory.PairStep
 
-theorem eff_divOfSec_of_sec {X : Scheme.{0}} [IsIntegral X] {L : LB X} (hL : L.IsLB) (s : L.Sec)
-    (hs : genericPoint X ∈ nonzeroLocus s) : (divOfSec hL s hs).Eff := by
+theorem eff_divOfSec_of_sec
+    {X : Scheme.{0}} [IsIntegral X]
+    {L : LB X} (hL : L.IsLB) (s : L.Sec) (hs : genericPoint X ∈ nonzeroLocus s)
+    : (divOfSec hL s hs).Eff := by
   refine CartierDiv.eff_iff.2 fun y g hg => ?_
   obtain ⟨i, hi⟩ := exists_chart hL y
   have h1 := (presents_divOfRatSec hL (isRatSec_ratOfSec s hs)).isEqn i y hi
@@ -29,7 +33,14 @@ theorem eff_divOfSec_of_sec {X : Scheme.{0}} [IsIntegral X] {L : LB X} (hL : L.I
   have := hu.regAt.mul hr
   rwa [div_mul_cancel₀ _ (Units.ne_zero _)] at this
 
-theorem qNum_divOfSec : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ), IsProjOver p → ∀ (N : LB X) (hN : N.IsLB) (l m : ℕ) (s : (lbPow N l).Sec) (hs : genericPoint X ∈ nonzeroLocus s), 0 < m → (divOfSec (isLB_lbPow hN l) s hs).Eff ∧ QNum p N ((l : ℚ) / m) (qWeil (divOfSec (isLB_lbPow hN l) s hs) m) := by
+theorem qNum_divOfSec
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ),
+      IsProjOver p
+        → ∀ (N : LB X) (hN : N.IsLB) (l m : ℕ) (s : (lbPow N l).Sec)
+            (hs : genericPoint X ∈ nonzeroLocus s),
+          0 < m
+            → (divOfSec (isLB_lbPow hN l) s hs).Eff
+              ∧ QNum p N ((l : ℚ) / m) (qWeil (divOfSec (isLB_lbPow hN l) s hs) m) := by
   intro X _ _ p hp N hN l m s hs hm
   have hE := eff_divOfSec_of_sec (isLB_lbPow hN l) s hs
   refine ⟨hE, m, _, hm, hE, rfl, fun C hC => ?_⟩

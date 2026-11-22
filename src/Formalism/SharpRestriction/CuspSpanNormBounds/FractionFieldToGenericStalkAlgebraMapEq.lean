@@ -11,7 +11,8 @@ open ValuativeRel MeasureTheory ComplexConjugate
 
 namespace Formalism.MainNotions.S.Loc
 
-structure LocE (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
+structure LocE
+    (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
     (E : Type) [CommRing E] [Algebra F E] [TopologicalSpace E] where
   cj : E ≃ₐ[F] E
   cj_cj : ∀ x, cj (cj x) = x
@@ -22,8 +23,11 @@ structure LocE (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
   top : IsModuleTopology F E
   O : Subring E
   O_def : ∀ x : E, x ∈ O ↔ IsIntegral 𝒪[F] x
-  unram : ∀ ϖ : 𝒪[F], Irreducible ϖ → ∀ x ∈ O,
-    x * x ∈ Submodule.span O {algebraMap F E ϖ} → x ∈ Submodule.span O {algebraMap F E ϖ}
+  unram
+    : ∀ ϖ : 𝒪[F],
+      Irreducible ϖ
+        → ∀ x ∈ O,
+          x * x ∈ Submodule.span O {algebraMap F E ϖ} → x ∈ Submodule.span O {algebraMap F E ϖ}
   psi0 : AddChar E ℂ
   local_additive_char_continuous : Continuous psi0
   local_additive_char_conj : ∀ y, psi0 (cj y) = psi0 y
@@ -43,7 +47,8 @@ structure SplitG (L : LocE F E) where
   psiF_cond : ∃ y : 𝒪[F], psiF ((y : F) / (q : F)) ≠ 1
   fractionFieldToGenericStalk_algebraMap_eq : ∀ x, L.psi0 x = psiF ((e x).1 + (e x).2)
 
-structure Model (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
+structure Model
+    (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F]
     (E : Type) [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] where
   L : LocE F E
   split : Option (SplitG L)
@@ -97,11 +102,10 @@ abbrev Cok (M : Model F E) {m : ℕ} (ZZ : M.Mat m) : Type :=
 def eCls (M : Model F E) {m : ℕ} (ZZ : M.Mat (m + 1)) : M.Cok ZZ :=
   Submodule.Quotient.mk (Pi.single (Fin.last m) 1)
 
-def lamRaw (M : Model F E) {m : ℕ} (ZZ : M.Mat (m + 1)) :
-    (Fin (m + 1) → M.R) →ₗ[M.R] E ⧸ M.Rsub :=
-  M.Rsub.mkQ ∘ₗ (LinearMap.proj (Fin.last m)) ∘ₗ
-    ((ZZ.Z.map M.R.subtype)⁻¹.mulVecLin.restrictScalars M.R) ∘ₗ
-    (LinearMap.compLeft (Algebra.linearMap M.R E) (Fin (m + 1)))
+def lamRaw (M : Model F E) {m : ℕ} (ZZ : M.Mat (m + 1)) : (Fin (m + 1) → M.R) →ₗ[M.R] E ⧸ M.Rsub :=
+  M.Rsub.mkQ ∘ₗ (LinearMap.proj (Fin.last m))
+    ∘ₗ ((ZZ.Z.map M.R.subtype)⁻¹.mulVecLin.restrictScalars M.R)
+    ∘ₗ (LinearMap.compLeft (Algebra.linearMap M.R E) (Fin (m + 1)))
 
 lemma lamRaw_range (M : Model F E) {m : ℕ} (ZZ : M.Mat (m + 1)) :
     LinearMap.range ZZ.Z.mulVecLin ≤ LinearMap.ker (M.lamRaw ZZ) := by
@@ -126,8 +130,7 @@ def lam (M : Model F E) {m : ℕ} (ZZ : M.Mat (m + 1)) : M.Cok ZZ →ₗ[M.R] E 
   Submodule.liftQ _ (M.lamRaw ZZ) (M.lamRaw_range ZZ)
 
 def Iso (M : Model F E) {m : ℕ} (ZZ ZZ' : M.Mat (m + 1)) : Type :=
-  {φ : M.Cok ZZ ≃ₗ[M.R] M.Cok ZZ' //
-    φ (M.eCls ZZ) = M.eCls ZZ' ∧ ∀ v, M.lam ZZ' (φ v) = M.lam ZZ v}
+  {φ : M.Cok ZZ ≃ₗ[M.R] M.Cok ZZ' // φ (M.eCls ZZ) = M.eCls ZZ' ∧ ∀ v, M.lam ZZ' (φ v) = M.lam ZZ v}
 
 def nIso (M : Model F E) {m : ℕ} (ZZ ZZ' : M.Mat (m + 1)) : ℕ := Nat.card (M.Iso ZZ ZZ')
 
@@ -146,22 +149,24 @@ def isoSetoid (M : Model F E) (m : ℕ) : Setoid (M.Mat (m + 1)) where
 
 def Cls (M : Model F E) (m : ℕ) : Type := Quotient (M.isoSetoid m)
 
-def nAut (M : Model F E) {m : ℕ} (c : M.Cls m) : ℕ :=
-  M.nIso (Quotient.out c) (Quotient.out c)
+def nAut (M : Model F E) {m : ℕ} (c : M.Cls m) : ℕ := M.nIso (Quotient.out c) (Quotient.out c)
 
 end Model
 
 def ptEntryL : List (Eˣ × ℕ+) → ℕ → ℕ → E
   | [], _, _ => 0
   | (t, s) :: bs, a, b =>
-    if a < s ∧ b < s then (if a + b + 1 = (s : ℕ) then (t : E) else 0)
-    else if (s : ℕ) ≤ a ∧ (s : ℕ) ≤ b then ptEntryL bs (a - s) (b - s) else 0
+    if a < s ∧ b < s then
+      (if a + b + 1 = (s : ℕ) then (t : E) else 0)
+    else if (s : ℕ) ≤ a ∧ (s : ℕ) ≤ b then
+      ptEntryL bs (a - s) (b - s)
+    else
+      0
 
 def sameBlock : List (Eˣ × ℕ+) → ℕ → ℕ → Bool
   | [], _, _ => false
   | (_, s) :: bs, a, b =>
-    (decide (a < s ∧ b < s)) ||
-      (decide ((s : ℕ) ≤ a ∧ (s : ℕ) ≤ b) && sameBlock bs (a - s) (b - s))
+    (decide (a < s ∧ b < s)) || (decide ((s : ℕ) ≤ a ∧ (s : ℕ) ≤ b) && sameBlock bs (a - s) (b - s))
 
 structure Pt (E : Type) [CommRing E] (n : ℕ) where
   blocks : List (Eˣ × ℕ+)
@@ -182,12 +187,21 @@ abbrev IL (n : ℕ) : Type := {p : Fin n × Fin n // p.2 < p.1}
 abbrev IN {n : ℕ} (w : Pt E n) : Type :=
   {p : Fin n × Fin n // p.1 < p.2 ∧ sameBlock w.blocks p.1 p.2 = false}
 
-def uLow {n : ℕ} (x : IL n → E) : Matrix (Fin n) (Fin n) E :=
-  fun a b => if a = b then 1 else if h : b < a then x ⟨(a, b), h⟩ else 0
+def uLow {n : ℕ} (x : IL n → E) : Matrix (Fin n) (Fin n) E := fun a b =>
+  if a = b then
+    1
+  else if h : b < a then
+    x ⟨(a, b), h⟩
+  else
+    0
 
-def uUp {n : ℕ} (w : Pt E n) (y : IN w → E) : Matrix (Fin n) (Fin n) E :=
-  fun a b => if a = b then 1 else
-    if h : a < b ∧ sameBlock w.blocks a b = false then y ⟨(a, b), h⟩ else 0
+def uUp {n : ℕ} (w : Pt E n) (y : IN w → E) : Matrix (Fin n) (Fin n) E := fun a b =>
+  if a = b then
+    1
+  else if h : a < b ∧ sameBlock w.blocks a b = false then
+    y ⟨(a, b), h⟩
+  else
+    0
 
 def simpleLow {n : ℕ} (A : Matrix (Fin n) (Fin n) E) : E :=
   ∑ a : Fin n, ∑ b : Fin n, if (a : ℕ) = b + 1 then A a b else 0
@@ -199,19 +213,27 @@ namespace Model
 
 variable [MeasurableSpace E]
 
-
 open scoped Classical in
-def bbIntegrand (M : Model F E) {m : ℕ} (w : Pt E (m + 1)) (c : M.Cls m)
-    (xy : (IL (m + 1) → E) × (IN w → E)) : ℂ := by
+def bbIntegrand
+    (M : Model F E) {m : ℕ} (w : Pt E (m + 1)) (c : M.Cls m) (xy : (IL (m + 1) → E) × (IN w → E))
+    : ℂ := by
   classical
   let Z : Matrix (Fin (m + 1)) (Fin (m + 1)) E := uLow xy.1 * w.mat * uUp w xy.2
-  exact if h : (∀ a b, Z a b ∈ M.R) ∧ IsUnit Z.det then
-    (M.nIso ⟨Matrix.of fun a b => ⟨Z a b, h.1 a b⟩, by
-        have : (Matrix.of fun a b => (⟨Z a b, h.1 a b⟩ : M.R)).map M.R.subtype = Z :=
-          rfl
-        rw [this]; exact h.2⟩ (Quotient.out c) : ℂ) *
-      M.psiR (simpleLow (uLow xy.1) + simpleUp (uUp w xy.2))
-  else 0
+  exact
+    if h : (∀ a b, Z a b ∈ M.R) ∧ IsUnit Z.det then
+      (M.nIso
+            ⟨
+              Matrix.of fun a b => ⟨Z a b, h.1 a b⟩,
+              by
+                have : (Matrix.of fun a b => (⟨Z a b, h.1 a b⟩ : M.R)).map M.R.subtype = Z := rfl
+                rw [this]
+                exact h.2
+            ⟩
+            (Quotient.out c)
+          : ℂ)
+        * M.psiR (simpleLow (uLow xy.1) + simpleUp (uUp w xy.2))
+    else
+      0
 
 def BB (M : Model F E) {m : ℕ} (w : Pt E (m + 1)) (c : M.Cls m) : ℂ :=
   ∫ xy, M.bbIntegrand w c xy ∂((Measure.pi fun _ : IL (m + 1) => M.mu).prod
@@ -224,8 +246,8 @@ def Kk (M : Model F E) : (i : ℕ) → Pt E i → Pt E i → ℂ
 def N0 (M : Model F E) {m : ℕ} (h h' : Pt E m) : ℂ := M.Kk m h h'
 
 def Ns (M : Model F E) {m : ℕ} (s : ℕ+) (t t' : Eˣ) (h h' : Pt E m) : ℂ :=
-  ((M.modK ((t : E) * t') ^ ((s : ℕ) * ((s : ℕ) - 1) / 2) : ℝ) : ℂ) *
-    M.Kk (m + s) (h.snoc t s) (h'.snoc t' s)
+  ((M.modK ((t : E) * t') ^ ((s : ℕ) * ((s : ℕ) - 1) / 2) : ℝ) : ℂ)
+    * M.Kk (m + s) (h.snoc t s) (h'.snoc t' s)
 
 def detMod (M : Model F E) {m : ℕ} (h : Pt E m) : ℝ := M.modK h.mat.det
 
@@ -249,9 +271,9 @@ variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableS
 
 namespace Model
 
-
-theorem Kk_succ (M : Model F E) (m : ℕ) (w w' : Pt E (m + 1)) :
-    M.Kk (m + 1) w w' = ∑' c : M.Cls m, M.BB w c * conj (M.BB w' c) / (M.nAut c : ℂ) := rfl
+theorem Kk_succ (M : Model F E) (m : ℕ) (w w' : Pt E (m + 1))
+    : M.Kk (m + 1) w w' = ∑' c : M.Cls m, M.BB w c * conj (M.BB w' c) / (M.nAut c : ℂ) :=
+  rfl
 
 end Model
 

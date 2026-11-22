@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowEqPowOfMo
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 open scoped TensorProduct
 open IsDedekindDomain
@@ -32,15 +35,18 @@ theorem exists_nat_mem (v : AwayP p) : ∃ l : ℕ, 0 < l ∧ l.Coprime p ∧ (l
     · rw [← h1]; exact hx
     · rw [← neg_eq_iff_eq_neg.2 h1]; exact neg_mem hx
 
-theorem val_natCast (v : AwayP p) (m : ℕ) :
-    Valued.v ((m : ℕ) : v.1.adicCompletion ℚ) = v.1.valuation ℚ (algebraMap ℤ ℚ (m : ℤ)) := by
+theorem val_natCast (v : AwayP p) (m : ℕ)
+    : Valued.v ((m : ℕ) : v.1.adicCompletion ℚ) = v.1.valuation ℚ (algebraMap ℤ ℚ (m : ℤ)) := by
   have e : ((m : ℕ) : v.1.adicCompletion ℚ) = algebraMap ℤ (v.1.adicCompletion ℚ) (m : ℤ) := by simp
   rw [e, IsScalarTower.algebraMap_apply ℤ ℚ (v.1.adicCompletion ℚ)]
   exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v.1 _
 
-theorem val_eval_eq_one (c : AfP p) (u : ℕ → ℕ)
-    (h : ∀ n : ℕ, 0 < n → n.Coprime p → (u n).Coprime n ∧ ∃ β : AfP p, IsIntAf β ∧ c = (u n : AfP p) + n • β)
-    (v : AwayP p) : Valued.v (AfP.eval v c) = 1 := by
+theorem val_eval_eq_one
+    (c : AfP p) (u : ℕ → ℕ)
+    (h : ∀ n : ℕ,
+      0 < n → n.Coprime p → (u n).Coprime n ∧ ∃ β : AfP p, IsIntAf β ∧ c = (u n : AfP p) + n • β)
+    (v : AwayP p)
+    : Valued.v (AfP.eval v c) = 1 := by
   obtain ⟨l, hl0, hlp, hlv⟩ := exists_nat_mem v
   obtain ⟨hcop, β, hβ, e⟩ := h l hl0 hlp
   have hlt : Valued.v ((l : ℕ) : v.1.adicCompletion ℚ) < 1 := by
@@ -58,9 +64,12 @@ theorem val_eval_eq_one (c : AfP p) (u : ℕ → ℕ)
   rw [e, map_add (f := _), map_natCast]
   rw [Valuation.map_add_eq_of_lt_left _ (by rw [hu]; exact hsmall), hu]
 
-theorem exists_mul_eq_one : ∀ (p : ℕ) [Fact p.Prime] (c : AfP p) (u : ℕ → ℕ),
-    (∀ n : ℕ, 0 < n → n.Coprime p → (u n).Coprime n ∧ ∃ β : AfP p, IsIntAf β ∧ c = (u n : AfP p) + n • β) →
-    ∃ c' : AfP p, c * c' = 1 := by
+theorem exists_mul_eq_one
+    : ∀ (p : ℕ) [Fact p.Prime] (c : AfP p) (u : ℕ → ℕ),
+      (∀ n : ℕ,
+          0 < n → n.Coprime p
+            → (u n).Coprime n ∧ ∃ β : AfP p, IsIntAf β ∧ c = (u n : AfP p) + n • β)
+        → ∃ c' : AfP p, c * c' = 1 := by
   intro p _ c u h
   have hv := val_eval_eq_one c u h
   have hint : ∀ v : AwayP p, (AfP.eval v c)⁻¹ ∈ v.1.adicCompletionIntegers ℚ := fun v => by

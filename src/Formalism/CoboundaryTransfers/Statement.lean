@@ -32,8 +32,9 @@ end Base
 
 variable {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
 
-structure WachMod (B : Base O A) (M : ℕ) (D : Type) [AddCommGroup D] [Module A D]
-    [Module O D] [IsScalarTower O A D] where
+structure WachMod
+    (B : Base O A) (M : ℕ)
+    (D : Type) [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D] where
   N : Submodule A D
   φ : D →ₗ[O] D
   γ : D →ₗ[O] D
@@ -48,8 +49,9 @@ structure WachMod (B : Base O A) (M : ℕ) (D : Type) [AddCommGroup D] [Module A
 
 namespace WachMod
 
-variable {B : Base O A} {M : ℕ} {D : Type} [AddCommGroup D] [Module A D] [Module O D]
-  [IsScalarTower O A D] (W : WachMod B M D)
+variable
+  {B : Base O A} {M : ℕ} {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
+  (W : WachMod B M D)
 
 def QInv (y : D) : Prop := B.Q ^ M • y ∈ W.N
 
@@ -70,11 +72,9 @@ def IsCob2 (ω : D) : Prop := ∃ y z, W.C1 y z ∧ ω = W.d1 y z
 def TorsKilled (c : O) : Prop :=
   ∀ ω, W.C2 ω → (∃ k : ℕ, W.IsCob2 (((B.p : O) ^ k) • ω)) → W.IsCob2 (c • ω)
 
-def Z1 : Submodule O (D × D) :=
-  LinearMap.ker ((W.γ - LinearMap.id).coprod (-(W.φ - LinearMap.id)))
+def Z1 : Submodule O (D × D) := LinearMap.ker ((W.γ - LinearMap.id).coprod (-(W.φ - LinearMap.id)))
 
-def B1 : Submodule O (D × D) :=
-  LinearMap.range ((W.φ - LinearMap.id).prod (W.γ - LinearMap.id))
+def B1 : Submodule O (D × D) := LinearMap.range ((W.φ - LinearMap.id).prod (W.γ - LinearMap.id))
 
 def IntRep (pr : D × D) : Prop := (∃ k : ℕ, B.Q ^ k • pr.1 ∈ W.N) ∧ W.XN pr.2
 
@@ -87,9 +87,10 @@ variable {B : Base O A} {M : ℕ}
 
 section Hom
 
-variable {D D' D'' : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
-  [AddCommGroup D'] [Module A D'] [Module O D'] [IsScalarTower O A D']
-  [AddCommGroup D''] [Module A D''] [Module O D''] [IsScalarTower O A D'']
+variable
+  {D D' D'' : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
+  [AddCommGroup D'] [Module A D'] [Module O D'] [IsScalarTower O A D'] [AddCommGroup D'']
+  [Module A D''] [Module O D''] [IsScalarTower O A D'']
 
 structure Hom (W : WachMod B M D) (W' : WachMod B M D') where
   f : D →ₗ[A] D'
@@ -113,10 +114,10 @@ end Hom
 
 end Hom
 
-structure SES {D₀ D₁ D₂ : Type}
-    [AddCommGroup D₀] [Module A D₀] [Module O D₀] [IsScalarTower O A D₀]
-    [AddCommGroup D₁] [Module A D₁] [Module O D₁] [IsScalarTower O A D₁]
-    [AddCommGroup D₂] [Module A D₂] [Module O D₂] [IsScalarTower O A D₂]
+structure SES
+    {D₀ D₁ D₂ : Type} [AddCommGroup D₀] [Module A D₀] [Module O D₀] [IsScalarTower O A D₀]
+    [AddCommGroup D₁] [Module A D₁] [Module O D₁] [IsScalarTower O A D₁] [AddCommGroup D₂]
+    [Module A D₂] [Module O D₂] [IsScalarTower O A D₂]
     (W₀ : WachMod B M D₀) (W₁ : WachMod B M D₁) (W₂ : WachMod B M D₂) where
   ι : Hom W₀ W₁
   π : Hom W₁ W₂
@@ -126,19 +127,23 @@ structure SES {D₀ D₁ D₂ : Type}
 
 section Hyp
 
-variable {D₀ D₁ D₂ : Type}
-    [AddCommGroup D₀] [Module A D₀] [Module O D₀] [IsScalarTower O A D₀]
-    [AddCommGroup D₁] [Module A D₁] [Module O D₁] [IsScalarTower O A D₁]
-    [AddCommGroup D₂] [Module A D₂] [Module O D₂] [IsScalarTower O A D₂]
-    {W₀ : WachMod B M D₀} {W₁ : WachMod B M D₁} {W₂ : WachMod B M D₂}
+variable
+  {D₀ D₁ D₂ : Type} [AddCommGroup D₀] [Module A D₀] [Module O D₀] [IsScalarTower O A D₀]
+  [AddCommGroup D₁] [Module A D₁] [Module O D₁] [IsScalarTower O A D₁] [AddCommGroup D₂]
+  [Module A D₂] [Module O D₂] [IsScalarTower O A D₂]
+  {W₀ : WachMod B M D₀} {W₁ : WachMod B M D₁} {W₂ : WachMod B M D₂}
 
 def CokerKilled (S : SES W₀ W₁ W₂) (e : ℕ) : Prop :=
   ∀ n ∈ W₂.N, ∃ n₁ ∈ W₁.N, S.π.f n₁ = ((B.p : O) ^ e) • n
 
 def RatSurj (S : SES W₀ W₁ W₂) : Prop :=
-  ∀ y z, W₂.Cocycle y z → ∃ k : ℕ, ∃ y₁ z₁, W₁.Cocycle y₁ z₁ ∧ ∃ x ∈ W₂.N,
-    S.π.f y₁ = ((B.p : O) ^ k) • y + (W₂.φ x - x) ∧
-    S.π.f z₁ = ((B.p : O) ^ k) • z + (W₂.γ x - x)
+  ∀ y z,
+    W₂.Cocycle y z
+      → ∃ k : ℕ, ∃ y₁ z₁,
+        W₁.Cocycle y₁ z₁
+          ∧ ∃ x ∈ W₂.N,
+            S.π.f y₁ = ((B.p : O) ^ k) • y + (W₂.φ x - x)
+              ∧ S.π.f z₁ = ((B.p : O) ^ k) • z + (W₂.γ x - x)
 
 def Lifts (S : SES W₀ W₁ W₂) (c : O) : Prop :=
   ∀ y z, W₂.Cocycle y z → ∃ y₁ z₁, W₁.Cocycle y₁ z₁ ∧ S.π.f y₁ = c • y ∧ S.π.f z₁ = c • z
@@ -147,34 +152,38 @@ end Hyp
 
 namespace WachMod
 
-variable {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
-  (W : WachMod B M D)
+variable
+  {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D] (W : WachMod B M D)
 
 end WachMod
 
 section Gal
 
-variable {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
+variable
+  {D : Type} [AddCommGroup D] [Module A D] [Module O D] [IsScalarTower O A D]
   {H : Type} [AddCommGroup H] [Module O H]
 
 def HerrIso (W : WachMod B M D) (cl : W.Z1 →ₗ[O] H) : Prop :=
   Function.Surjective cl ∧ ∀ pr : W.Z1, (cl pr = 0 ↔ (pr : D × D) ∈ W.B1)
 
 def HerrInj (W : WachMod B M D) (cl : W.Z1 →ₗ[O] H) : Prop :=
-  ∀ pr : W.Z1, W.Cocycle (pr : D × D).1 (pr : D × D).2 → cl pr = 0 →
-    W.IsCob1 (pr : D × D).1 (pr : D × D).2
+  ∀ pr : W.Z1,
+    W.Cocycle (pr : D × D).1 (pr : D × D).2 → cl pr = 0 → W.IsCob1 (pr : D × D).1 (pr : D × D).2
 
 def HfIsZf (W : WachMod B M D) (cl : W.Z1 →ₗ[O] H) (Hf : Submodule O H) : Prop :=
   (W.Zf.comap W.Z1.subtype).map cl = Hf
 
 def HfInt (W : WachMod B M D) (cl : W.Z1 →ₗ[O] H) (Hf : Submodule O H) (eW : ℕ) : Prop :=
-  (∀ pr : W.Z1, W.Cocycle (pr : D × D).1 (pr : D × D).2 → cl pr ∈ Hf) ∧
-    ∀ κ ∈ Hf, ∃ pr : W.Z1, W.Cocycle (pr : D × D).1 (pr : D × D).2 ∧
-      cl pr = ((B.p : O) ^ eW) • κ
+  (∀ pr : W.Z1, W.Cocycle (pr : D × D).1 (pr : D × D).2 → cl pr ∈ Hf)
+    ∧ ∀ κ ∈ Hf, ∃ pr : W.Z1, W.Cocycle (pr : D × D).1 (pr : D × D).2 ∧ cl pr = ((B.p : O) ^ eW) • κ
 
-def ClNat {D' H' : Type} [AddCommGroup D'] [Module A D'] [Module O D'] [IsScalarTower O A D']
-    [AddCommGroup H'] [Module O H'] {W : WachMod B M D} {W' : WachMod B M D'} (F : Hom W W')
-    (cl : W.Z1 →ₗ[O] H) (cl' : W'.Z1 →ₗ[O] H') (g : H →ₗ[O] H') : Prop :=
+def ClNat
+    {D' H' : Type} [AddCommGroup D'] [Module A D'] [Module O D'] [IsScalarTower O A D']
+    [AddCommGroup H'] [Module O H']
+    {W : WachMod B M D} {W' : WachMod B M D'}
+    (F : Hom W W') (cl : W.Z1 →ₗ[O] H) (cl' : W'.Z1 →ₗ[O] H')
+    (g : H →ₗ[O] H')
+    : Prop :=
   ∀ (pr : W.Z1) (pr' : W'.Z1), (pr' : D' × D') = F.f2 pr → g (cl pr) = cl' pr'
 
 end Gal

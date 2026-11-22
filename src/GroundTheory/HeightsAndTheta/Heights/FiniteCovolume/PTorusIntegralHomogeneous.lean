@@ -81,16 +81,19 @@ private lemma integral_scaling (q : κ → ℝ) (n : ℕ) {t : ℝ} (ht : 0 < t)
   congr 3
   ring
 
-theorem TorusIntegralHomogeneous.proof (κ : Type*) [Fintype κ] :
-    TorusIntegralHomogeneous.Statement κ := by
+theorem TorusIntegralHomogeneous.proof (κ : Type*) [Fintype κ]
+    : TorusIntegralHomogeneous.Statement κ := by
   intro q hq n
-  refine ⟨∫⁻ b : κ → ℂ, {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}.indicator
-      (fun b => ∏ i, ‖b i‖ₑ ^ (2 * n)) b, ?_, ?_, fun t ht => integral_scaling q n ht⟩
-  ·
-    rw [lintegral_pos_iff_support (measurable_integrand q n _)]
+  refine ⟨
+    ∫⁻ b : κ → ℂ, {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}.indicator
+      (fun b => ∏ i, ‖b i‖ₑ ^ (2 * n)) b,
+    ?_,
+    ?_,
+    fun t ht => integral_scaling q n ht
+  ⟩
+  · rw [lintegral_pos_iff_support (measurable_integrand q n _)]
     have hS : 0 ≤ ∑ i, q i := Finset.sum_nonneg fun i _ => (hq i).le
-    let V : Set (κ → ℂ) :=
-      {b | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2} ∩ ⋂ i, {b | b i ≠ 0}
+    let V : Set (κ → ℂ) := {b | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2} ∩ ⋂ i, {b | b i ≠ 0}
     have hVo : IsOpen V :=
       (isOpen_lt (by fun_prop) continuous_const).inter
         (isOpen_iInter_of_finite fun i => isOpen_ne_fun (continuous_apply i) continuous_const)
@@ -100,8 +103,7 @@ theorem TorusIntegralHomogeneous.proof (κ : Type*) [Fintype κ] :
         rw [Complex.norm_real, Real.norm_of_nonneg hx.le]
       refine ⟨fun _ => ((((∑ i, q i) + 1)⁻¹ : ℝ) : ℂ), ?_, ?_⟩
       · show ∑ i, q i * ‖((((∑ i, q i) + 1)⁻¹ : ℝ) : ℂ)‖ ^ 2 < 1 ^ 2
-        rw [h1, ← Finset.sum_mul, one_pow, inv_pow, ← div_eq_mul_inv,
-          div_lt_one (by positivity)]
+        rw [h1, ← Finset.sum_mul, one_pow, inv_pow, ← div_eq_mul_inv, div_lt_one (by positivity)]
         nlinarith
       · exact Set.mem_iInter.2 fun i => Complex.ofReal_ne_zero.2 hx.ne'
     refine lt_of_lt_of_le (hVo.measure_pos volume hVne) (measure_mono ?_)
@@ -109,8 +111,7 @@ theorem TorusIntegralHomogeneous.proof (κ : Type*) [Fintype κ] :
     rw [Function.mem_support, Set.indicator_of_mem hb1]
     exact Finset.prod_ne_zero_iff.2 fun i _ =>
       pow_ne_zero _ (enorm_ne_zero.2 (Set.mem_iInter.1 hb2 i))
-  ·
-    set R : ℝ := ∑ i, (q i)⁻¹ + 1 with hR
+  · set R : ℝ := ∑ i, (q i)⁻¹ + 1 with hR
     have hR1 : 1 ≤ R := by
       have : 0 ≤ ∑ i, (q i)⁻¹ := Finset.sum_nonneg fun i _ => (inv_pos.2 (hq i)).le
       linarith
@@ -118,15 +119,22 @@ theorem TorusIntegralHomogeneous.proof (κ : Type*) [Fintype κ] :
       intro b hb i
       have hb' : ∑ j, q j * ‖b j‖ ^ 2 < 1 := by simpa using hb
       have hi : q i * ‖b i‖ ^ 2 < 1 :=
-        lt_of_le_of_lt (Finset.single_le_sum (f := fun j => q j * ‖b j‖ ^ 2)
-          (fun j _ => mul_nonneg (hq j).le (sq_nonneg _)) (Finset.mem_univ i)) hb'
+        lt_of_le_of_lt
+          (Finset.single_le_sum
+            (f := fun j => q j * ‖b j‖ ^ 2)
+            (fun j _ => mul_nonneg (hq j).le (sq_nonneg _))
+            (Finset.mem_univ i))
+          hb'
       have hsq : ‖b i‖ ^ 2 < (q i)⁻¹ := by
-        calc ‖b i‖ ^ 2 = (q i)⁻¹ * (q i * ‖b i‖ ^ 2) := by
-              rw [← mul_assoc, inv_mul_cancel₀ (hq i).ne', one_mul]
+        calc
+          ‖b i‖ ^ 2 = (q i)⁻¹ * (q i * ‖b i‖ ^ 2) := by
+            rw [← mul_assoc, inv_mul_cancel₀ (hq i).ne', one_mul]
           _ < (q i)⁻¹ * 1 := mul_lt_mul_of_pos_left hi (inv_pos.2 (hq i))
           _ = (q i)⁻¹ := mul_one _
       have hle : (q i)⁻¹ ≤ ∑ j, (q j)⁻¹ :=
-        Finset.single_le_sum (f := fun j => (q j)⁻¹) (fun j _ => (inv_pos.2 (hq j)).le)
+        Finset.single_le_sum
+          (f := fun j => (q j)⁻¹)
+          (fun j _ => (inv_pos.2 (hq j)).le)
           (Finset.mem_univ i)
       have hx := norm_nonneg (b i)
       by_contra! h
@@ -135,10 +143,10 @@ theorem TorusIntegralHomogeneous.proof (κ : Type*) [Fintype κ] :
       intro b hb
       rw [mem_ball_zero_iff, pi_norm_lt_iff (by linarith)]
       exact hbd b hb
-    have hle : {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}.indicator
-          (fun b => ∏ i, ‖b i‖ₑ ^ (2 * n)) ≤
-        {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}.indicator
-          (fun _ => ∏ _i : κ, ENNReal.ofReal R ^ (2 * n)) := by
+    have hle
+        : {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}.indicator (fun b => ∏ i, ‖b i‖ₑ ^ (2 * n))
+          ≤ {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}.indicator (fun _ =>
+            ∏ _i : κ, ENNReal.ofReal R ^ (2 * n)) := by
       intro b
       by_cases hb : b ∈ {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}
       · rw [Set.indicator_of_mem hb, Set.indicator_of_mem hb]
@@ -146,12 +154,15 @@ theorem TorusIntegralHomogeneous.proof (κ : Type*) [Fintype κ] :
         rw [← ofReal_norm]
         exact ENNReal.ofReal_le_ofReal (hbd b hb i).le
       · rw [Set.indicator_of_notMem hb, Set.indicator_of_notMem hb]
-    calc _ ≤ ∫⁻ b : κ → ℂ, {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}.indicator
-          (fun _ => ∏ _i : κ, ENNReal.ofReal R ^ (2 * n)) b := lintegral_mono hle
-      _ ≤ (∏ _i : κ, ENNReal.ofReal R ^ (2 * n)) *
-          volume {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2} := lintegral_indicator_const_le _ _
-      _ < ⊤ := ENNReal.mul_lt_top
-          (ENNReal.prod_lt_top fun i _ => ENNReal.pow_lt_top ENNReal.ofReal_lt_top)
+    calc
+      _ ≤ ∫⁻ b : κ → ℂ, {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2}.indicator
+          (fun _ => ∏ _i : κ, ENNReal.ofReal R ^ (2 * n)) b :=
+        lintegral_mono hle
+      _ ≤ (∏ _i : κ, ENNReal.ofReal R ^ (2 * n))
+          * volume {b : κ → ℂ | ∑ i, q i * ‖b i‖ ^ 2 < 1 ^ 2} :=
+        lintegral_indicator_const_le _ _
+      _ < ⊤ :=
+        ENNReal.mul_lt_top (ENNReal.prod_lt_top fun i _ => ENNReal.pow_lt_top ENNReal.ofReal_lt_top)
           (lt_of_le_of_lt (measure_mono hsub) measure_ball_lt_top)
 
 end

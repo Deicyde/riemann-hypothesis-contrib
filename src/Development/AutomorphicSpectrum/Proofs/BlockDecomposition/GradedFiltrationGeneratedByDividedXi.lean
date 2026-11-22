@@ -10,7 +10,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Crystall
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 
 namespace GlobalTheory.CompanionTheory.PerfFil
 
@@ -19,30 +20,37 @@ namespace GradedFiltration
 theorem Fil0_succ_le {l : ℕ} [Fact l.Prime] (A : PAlg l) (r : ℕ) : A.Fil0 (r + 1) ≤ A.Fil0 r :=
   Ideal.span_mono fun _ ⟨k, hk, e⟩ => ⟨k, by omega, e⟩
 
-theorem dividedXi_mem_filtration {l : ℕ} [Fact l.Prime] (A : PAlg l) (r : ℕ) : A.dxi0 r ∈ A.Fil0 r :=
+theorem dividedXi_mem_filtration {l : ℕ} [Fact l.Prime] (A : PAlg l) (r : ℕ)
+    : A.dxi0 r ∈ A.Fil0 r :=
   Ideal.subset_span ⟨r, le_rfl, rfl⟩
 
-theorem mem_filtration_of_prime_pow_mul {l : ℕ} [Fact l.Prime] (A : PAlg l) (r n : ℕ) (z : A.Acr0)
-    (h : (l : A.Acr0) ^ n * z ∈ A.Fil0 r) : z ∈ A.Fil0 r := by
+theorem mem_filtration_of_prime_pow_mul
+    {l : ℕ} [Fact l.Prime] (A : PAlg l) (r n : ℕ) (z : A.Acr0) (h : (l : A.Acr0) ^ n * z ∈ A.Fil0 r)
+    : z ∈ A.Fil0 r := by
   induction n with
   | zero => simpa using h
   | succ n ih =>
     apply ih
     apply GlobalTheory.T.crystalline_filtration_saturated A r
-    rwa [pow_succ', mul_assoc, mul_comm, mul_assoc, mul_comm z, ← mul_assoc, mul_comm _ (l : A.Acr0), mul_assoc] at h
+    rwa [pow_succ', mul_assoc, mul_comm, mul_assoc, mul_comm z, ← mul_assoc,
+        mul_comm _ (l : A.Acr0), mul_assoc]
+      at h
 
-theorem mkAcr_surjective {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) :
-    Function.Surjective (A.mkAcr n) := Ideal.Quotient.mk_surjective
+theorem mkAcr_surjective {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ)
+    : Function.Surjective (A.mkAcr n) :=
+  Ideal.Quotient.mk_surjective
 
 end GradedFiltration
 
-
 open GradedFiltration in
-theorem graded_mod_pow : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n r : ℕ),
-    (∀ z ∈ A.Fil n r, ∃ w : A.W, z - A.toAcr n w * A.dxi n r ∈ A.Fil n (r + 1)) ∧
-    ∀ w : A.W, A.toAcr n w * A.dxi n r ∈ A.Fil n (r + 1) ↔ A.th w ∈ Ideal.span {(l : A.U) ^ n} := by
+theorem graded_mod_pow
+    : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n r : ℕ),
+      (∀ z ∈ A.Fil n r, ∃ w : A.W, z - A.toAcr n w * A.dxi n r ∈ A.Fil n (r + 1))
+        ∧ ∀ w : A.W,
+          A.toAcr n w * A.dxi n r ∈ A.Fil n (r + 1) ↔ A.th w ∈ Ideal.span {(l : A.U) ^ n} := by
   intro l _ A n r
-  have hF : ∀ s, A.Fil n s = (A.Fil0 s).map (A.mkAcr n) := (GlobalTheory.T.crystalline_filtration_multiplicative A).2.2.2.2.1 n
+  have hF : ∀ s, A.Fil n s = (A.Fil0 s).map (A.mkAcr n) :=
+    (GlobalTheory.T.crystalline_filtration_multiplicative A).2.2.2.2.1 n
   have hsurj := mkAcr_surjective A n
   have hto : ∀ w, A.toAcr n w = A.mkAcr n (algebraMap A.W A.Acr0 w) := fun _ => rfl
   have hdx : A.dxi n r = A.mkAcr n (A.dxi0 r) := rfl
@@ -67,8 +75,8 @@ theorem graded_mod_pow : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n r : ℕ),
     obtain ⟨w', hw'⟩ := (GlobalTheory.T.crystalline_graded_pieces_description A r).1 z hzr
     have hxi : w - (l : A.W) ^ n * w' ∈ Ideal.span {A.xi} := by
       rw [← (GlobalTheory.T.crystalline_graded_pieces_description A r).2.1]
-      have : algebraMap A.W A.Acr0 (w - (l : A.W) ^ n * w') * A.dxi0 r =
-          z' + (l : A.Acr0) ^ n * (z - algebraMap A.W A.Acr0 w' * A.dxi0 r) := by
+      have : algebraMap A.W A.Acr0 (w - (l : A.W) ^ n * w') * A.dxi0 r
+          = z' + (l : A.Acr0) ^ n * (z - algebraMap A.W A.Acr0 w' * A.dxi0 r) := by
         rw [map_sub, map_mul, map_pow, map_natCast]
         linear_combination hz
       rw [this]

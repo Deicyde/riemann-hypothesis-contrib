@@ -18,8 +18,9 @@ namespace Formalism.NormUnitaryCountingLemmas
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
 
-theorem discreteTopology_of_norm_ge (L : Submodule ℤ E) {ε : ℝ} (hε : 0 < ε)
-    (h : ∀ x ∈ L, x ≠ 0 → ε ≤ ‖x‖) : DiscreteTopology L := by
+theorem discreteTopology_of_norm_ge
+    (L : Submodule ℤ E) {ε : ℝ} (hε : 0 < ε) (h : ∀ x ∈ L, x ≠ 0 → ε ≤ ‖x‖)
+    : DiscreteTopology L := by
   rw [discreteTopology_iff_isOpen_singleton_zero]
   have hball : ({0} : Set L) = Metric.ball (0 : L) ε := by
     ext x
@@ -36,11 +37,12 @@ theorem discreteTopology_of_norm_ge (L : Submodule ℤ E) {ε : ℝ} (hε : 0 < 
   rw [hball]
   exact Metric.isOpen_ball
 
-theorem exists_ne_zero_norm_le_rank_div_of_dualMinimum (Q : Submodule ℤ E) [hQd : DiscreteTopology Q] (hQ : Q ≠ ⊥) {l : ℝ}
-    (hl : 0 < l)
-    (hdual : ∀ y ∈ span ℝ (Q : Set E), y ≠ 0 →
-      (∀ x ∈ Q, ∃ z : ℤ, inner ℝ x y = (z : ℝ)) → l ≤ ‖y‖) :
-    ∃ q ∈ Q, q ≠ 0 ∧ ‖q‖ ≤ (Formalism.F.rk Q : ℝ) / l := by
+theorem exists_ne_zero_norm_le_rank_div_of_dualMinimum
+    (Q : Submodule ℤ E) [hQd : DiscreteTopology Q]
+    (hQ : Q ≠ ⊥)
+    {l : ℝ} (hl : 0 < l)
+    (hdual : ∀ y ∈ span ℝ (Q : Set E), y ≠ 0 → (∀ x ∈ Q, ∃ z : ℤ, inner ℝ x y = (z : ℝ)) → l ≤ ‖y‖)
+    : ∃ q ∈ Q, q ≠ 0 ∧ ‖q‖ ≤ (Formalism.F.rk Q : ℝ) / l := by
   classical
   set k := Module.finrank ℤ Q with hk
   let b := Module.finBasis ℤ Q
@@ -65,7 +67,8 @@ theorem exists_ne_zero_norm_le_rank_div_of_dualMinimum (Q : Submodule ℤ E) [hQ
     have h1 := congrArg Subtype.val (b.sum_repr ⟨x, hx⟩)
     simp only [Submodule.coe_sum, Submodule.coe_smul] at h1
     have h2 : ∑ i, (b.repr ⟨x, hx⟩ i) • (b i : E) = x := h1
-    calc x = ∑ i, (b.repr ⟨x, hx⟩ i) • (b i : E) := h2.symm
+    calc
+      x = ∑ i, (b.repr ⟨x, hx⟩ i) • (b i : E) := h2.symm
       _ = _ := by
         simp only [Int.cast_smul_eq_zsmul, v]
         try rfl
@@ -80,7 +83,8 @@ theorem exists_ne_zero_norm_le_rank_div_of_dualMinimum (Q : Submodule ℤ E) [hQ
       refine ⟨a j, ?_⟩
       simp only [sum_inner, real_inner_smul_left, hbi]
       simp
-    | zero => exact fun x _ => ⟨0, by simp⟩
+    | zero =>
+      exact fun x _ => ⟨0, by simp⟩
     | add y y' _ _ h1 h2 =>
       intro x hx
       obtain ⟨z1, e1⟩ := h1 x hx
@@ -105,7 +109,8 @@ theorem exists_ne_zero_norm_le_rank_div_of_dualMinimum (Q : Submodule ℤ E) [hQ
     have h1 := congrArg (fun y => inner ℝ (v l) y) hg
     simp only [inner_sum, inner_zero_right] at h1
     simp only [← Int.cast_smul_eq_zsmul ℝ, real_inner_smul_right, hbi, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true] at h1
+        Finset.sum_ite_eq, Finset.mem_univ, if_true]
+      at h1
     exact_mod_cast h1
   let bw := Basis.span hli
   have hcovD : Formalism.F.covol D = Real.sqrt (Matrix.gram ℝ w).det := by
@@ -143,13 +148,16 @@ theorem exists_ne_zero_norm_le_rank_div_of_dualMinimum (Q : Submodule ℤ E) [hQ
   have hsk : Real.sqrt k * Real.sqrt k = k := Real.mul_self_sqrt (Nat.cast_nonneg k)
   have h1 : l * Formalism.F.covol Q ^ ((1 : ℝ) / k) ≤ Real.sqrt k := by
     have h2 := hly.trans hyn
-    calc l * Formalism.F.covol Q ^ ((1 : ℝ) / k)
-        ≤ Real.sqrt k * (Formalism.F.covol Q ^ ((1 : ℝ) / k))⁻¹ * Formalism.F.covol Q ^ ((1 : ℝ) / k) :=
-          mul_le_mul_of_nonneg_right h2 ht.le
+    calc
+      l * Formalism.F.covol Q ^ ((1 : ℝ) / k)
+          ≤ Real.sqrt k * (Formalism.F.covol Q ^ ((1 : ℝ) / k))⁻¹
+            * Formalism.F.covol Q ^ ((1 : ℝ) / k) :=
+        mul_le_mul_of_nonneg_right h2 ht.le
       _ = Real.sqrt k := by field_simp
   rw [le_div_iff₀ hl]
-  calc ‖q‖ * l ≤ Real.sqrt k * Formalism.F.covol Q ^ ((1 : ℝ) / k) * l :=
-        mul_le_mul_of_nonneg_right hqn hl.le
+  calc
+    ‖q‖ * l ≤ Real.sqrt k * Formalism.F.covol Q ^ ((1 : ℝ) / k) * l :=
+      mul_le_mul_of_nonneg_right hqn hl.le
     _ = Real.sqrt k * (l * Formalism.F.covol Q ^ ((1 : ℝ) / k)) := by ring
     _ ≤ Real.sqrt k * Real.sqrt k := mul_le_mul_of_nonneg_left h1 (Real.sqrt_nonneg _)
     _ = k := hsk

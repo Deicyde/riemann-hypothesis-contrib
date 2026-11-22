@@ -51,8 +51,8 @@ theorem adMat_mulVec (Y V : Mat p q) : adMat Y *ᵥ vecM V = vecM (Y * V - V * Y
     simp [Matrix.mulVec, dotProduct, Fintype.sum_prod_type, Matrix.one_apply, Matrix.mul_apply,
       vecM, mul_ite, ite_mul]
   have h2 : (Matrix.kroneckerMap (· * ·) (1 : Mat p q) Yᵀ *ᵥ vecM V) (a, b) = (V * Y) a b := by
-    simp [Matrix.mulVec, dotProduct, Fintype.sum_prod_type_right, Matrix.one_apply, Matrix.mul_apply,
-      vecM, mul_ite, mul_comm]
+    simp [Matrix.mulVec, dotProduct, Fintype.sum_prod_type_right, Matrix.one_apply,
+      Matrix.mul_apply, vecM, mul_ite, mul_comm]
   simp only [adMat, Matrix.sub_mulVec, Pi.sub_apply, h1, h2, vecM, Matrix.sub_apply]
 
 theorem pY_conjTranspose (B : Fin p → Fin q → ℂ) : (pY B)ᴴ = pY B := by
@@ -77,7 +77,8 @@ theorem exists_pY {Y : Mat p q} (hY : Y ∈ pR p q) : ∃ B, Y = pY B := by
   · rfl
   · have h := congrFun (congrFun hu' (Sum.inr i)) (Sum.inl j)
     simp [Matrix.mul_apply, Jm, Formalism.UG.Jpq, Fintype.sum_sum_type, Matrix.one_apply, mul_ite,
-      ite_mul] at h
+        ite_mul]
+      at h
     rw [starRingEnd_apply] at h
     show Y (Sum.inr i) (Sum.inl j) = star (Y (Sum.inl j) (Sum.inr i))
     linear_combination -h
@@ -88,17 +89,22 @@ def posIx : Ix p q → ℕ := Sum.elim (fun i => i.val) (fun j => j.val)
 def cutH (p q : ℕ) (h : ℕ → ℝ) (n : ℕ) : ℝ := if n < min p q then h n else 0
 
 def rootP (h : ℕ → ℝ) (ab : Ix p q × Ix p q) : ℝ :=
-  if ab.1.isLeft then cutH p q h (posIx ab.1) - cutH p q h (posIx ab.2)
-  else cutH p q h (posIx ab.1) + cutH p q h (posIx ab.2)
+  if ab.1.isLeft then
+    cutH p q h (posIx ab.1) - cutH p q h (posIx ab.2)
+  else
+    cutH p q h (posIx ab.1) + cutH p q h (posIx ab.2)
 
 def eigP (ab cd : Ix p q × Ix p q) : ℂ :=
-  if cd = ab then 1
+  if cd = ab then
+    1
   else if ¬ sameBlock cd.1 cd.2 ∧ posIx cd.1 = posIx ab.1 ∧ posIx cd.2 = posIx ab.2 then
     (if ab.1.isLeft then 1 else -1)
-  else 0
+  else
+    0
 
-theorem eigenvectorMatrix_eq_zero_of_sameBlock (ab : PIx p q) (cd : Ix p q × Ix p q) (h : sameBlock cd.1 cd.2) :
-    eigP ab.1 cd = 0 := by
+theorem eigenvectorMatrix_eq_zero_of_sameBlock
+    (ab : PIx p q) (cd : Ix p q × Ix p q) (h : sameBlock cd.1 cd.2)
+    : eigP ab.1 cd = 0 := by
   have hne : cd ≠ ab.1 := by
     rintro rfl
     exact ab.2 h
@@ -109,12 +115,12 @@ def matG (T : GrpData p q) (x : T.G) : Mat p q := ((T.cov x : GL (Ix p q) ℂ) :
 theorem matG_mul (T : GrpData p q) (x y : T.G) : matG T (x * y) = matG T x * matG T y := by
   simp only [matG, map_mul, Units.val_mul]
 
-theorem matG_expt (T : GrpData p q) (B : Fin p → Fin q → ℂ) :
-    matG T (T.expt (pY B)) = NormedSpace.exp (pY B) := by
+theorem matG_expt (T : GrpData p q) (B : Fin p → Fin q → ℂ)
+    : matG T (T.expt (pY B)) = NormedSpace.exp (pY B) := by
   exact T.expt_cov (pY B) (show pY B ∈ upq p q ∧ IsPC (pY B) from pY_mem B).1
 
-theorem continuous_expt_pY (T : GrpData p q) :
-    Continuous fun B : Fin p → Fin q → ℂ => T.expt (pY B) := by
+theorem continuous_expt_pY (T : GrpData p q)
+    : Continuous fun B : Fin p → Fin q → ℂ => T.expt (pY B) := by
   exact T.expt_cont.comp_continuous continuous_pY
     (fun B => (show pY B ∈ upq p q ∧ IsPC (pY B) from pY_mem B).1)
 
@@ -123,7 +129,9 @@ theorem continuous_matG (T : GrpData p q) : Continuous (matG T) := by
   exact Units.continuous_val.comp (continuous_fst.comp T.emb.continuous)
 
 theorem matG_J (T : GrpData p q) (x : T.G) : (matG T x)ᴴ * Jm p q * matG T x = Jm p q := by
-  have h : Formalism.UG.cT (starRingEnd ℂ) (matG T x) * Formalism.UG.Jpq p q * matG T x = Formalism.UG.Jpq p q :=
+  have h
+      : Formalism.UG.cT (starRingEnd ℂ) (matG T x) * Formalism.UG.Jpq p q * matG T x
+        = Formalism.UG.Jpq p q :=
     T.cov_mem x
   have hc : Formalism.UG.cT (starRingEnd ℂ) (matG T x) = (matG T x)ᴴ := by
     ext i j
@@ -131,15 +139,14 @@ theorem matG_J (T : GrpData p q) (x : T.G) : (matG T x)ᴴ * Jm p q * matG T x =
   rw [hc] at h
   exact h
 
-theorem matG_one (T : GrpData p q) : matG T 1 = 1 := by
-  simp [matG]
+theorem matG_one (T : GrpData p q) : matG T 1 = 1 := by simp [matG]
 
-theorem matG_inv (T : GrpData p q) (x : T.G) :
-    matG T x⁻¹ = (((T.cov x)⁻¹ : GL (Ix p q) ℂ) : Mat p q) := by
+theorem matG_inv (T : GrpData p q) (x : T.G)
+    : matG T x⁻¹ = (((T.cov x)⁻¹ : GL (Ix p q) ℂ) : Mat p q) := by
   simp only [matG, map_inv]
 
-theorem exists_blocks (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset) :
-    ∃ U ∈ Matrix.unitaryGroup (Fin p) ℂ, ∃ V ∈ Matrix.unitaryGroup (Fin q) ℂ,
+theorem exists_blocks (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset)
+    : ∃ U ∈ Matrix.unitaryGroup (Fin p) ℂ, ∃ V ∈ Matrix.unitaryGroup (Fin q) ℂ,
       matG T k = Matrix.fromBlocks U 0 0 V := by
   have hK : IsKC (matG T k) := hk
   have h12 : (matG T k).toBlocks₁₂ = 0 := by
@@ -155,7 +162,8 @@ theorem exists_blocks (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset) :
   rw [hMe] at hJ
   generalize (matG T k).toBlocks₁₁ = A at hJ hMe
   generalize (matG T k).toBlocks₂₂ = D at hJ hMe
-  simp only [Jm, Formalism.UG.Jpq, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply] at hJ
+  simp only [Jm, Formalism.UG.Jpq, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply]
+    at hJ
   simp [Matrix.fromBlocks_inj] at hJ
   obtain ⟨hA, hD⟩ := hJ
   refine ⟨A, ?_, D, ?_, hMe⟩
@@ -164,15 +172,15 @@ theorem exists_blocks (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset) :
   · rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose]
     exact hD
 
-theorem matG_star_mul (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset) :
-    (matG T k)ᴴ * matG T k = 1 := by
+theorem matG_star_mul (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset)
+    : (matG T k)ᴴ * matG T k = 1 := by
   obtain ⟨U, hU, V, hV, h⟩ := exists_blocks T hk
   rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose] at hU hV
   rw [h, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_multiply]
   simp [hU, hV]
 
-theorem matG_inv_of_mem (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset) :
-    matG T k⁻¹ = (matG T k)ᴴ := by
+theorem matG_inv_of_mem (T : GrpData p q) {k : T.G} (hk : k ∈ T.Kset)
+    : matG T k⁻¹ = (matG T k)ᴴ := by
   rw [matG_inv]
   exact Units.inv_eq_of_mul_eq_one_left (matG_star_mul T hk)
 
@@ -180,7 +188,8 @@ def Ksub (T : GrpData p q) : Subgroup T.G where
   carrier := T.Kset
   one_mem' := by
     show IsKC (matG T 1)
-    rw [matG_one]; intro a b h
+    rw [matG_one]
+    intro a b h
     have : a ≠ b := by rintro rfl; cases a <;> simp [sameBlock] at h
     simp [Matrix.one_apply, this]
   mul_mem' := by

@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComp
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
 noncomputable section
 
@@ -19,25 +20,31 @@ namespace GlobalTheory.NL.PhiFlat
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
 
-theorem φD_smulA (T : LocLat G Qp LL O) (a : LetA O n) (y : W.DD T) :
-    W.φD T (a • y) = W.φA a • W.φD T y := by
+theorem φD_smulA (T : LocLat G Qp LL O) (a : LetA O n) (y : W.DD T)
+    : W.φD T (a • y) = W.φA a • W.φD T y := by
   rw [← algebraMap_smul W.EE a y, W.φD_smul, W.φE_ext, algebraMap_smul]
   rfl
 
-theorem span_φ (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) {r : ℕ}
-    (bN : Module.Basis (Fin r) (LetA O n) ↥(W.N T)) (hQ : IsUnit (algebraMap (LetA O n) W.EE W.Q)) :
-    Submodule.span W.EE (Set.range fun j => W.φD T (bN j)) = ⊤ := by
+theorem span_φ
+    (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ)
+    {r : ℕ} (bN : Module.Basis (Fin r) (LetA O n) ↥(W.N T))
+    (hQ : IsUnit (algebraMap (LetA O n) W.EE W.Q))
+    : Submodule.span W.EE (Set.range fun j => W.φD T (bN j)) = ⊤ := by
   set S := Submodule.span W.EE (Set.range fun j => W.φD T (bN j)) with hS
-  have hA : Submodule.span (LetA O n) (W.φD T '' (W.N T : Set (W.DD T))) ≤ S.restrictScalars (LetA O n) := by
+  have hA
+      : Submodule.span (LetA O n) (W.φD T '' (W.N T : Set (W.DD T)))
+        ≤ S.restrictScalars (LetA O n) := by
     rw [Submodule.span_le]
     rintro _ ⟨y, hy, rfl⟩
     have hy' : y = ∑ m, bN.repr ⟨y, hy⟩ m • (bN m : W.DD T) := by
@@ -68,13 +75,20 @@ theorem span_φ (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) {r : ℕ}
   rw [hbD]
   exact hb j
 
-theorem phi_flat (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) {r : ℕ}
-    (bN : Module.Basis (Fin r) (LetA O n) ↥(W.N T)) (hQ : IsUnit (algebraMap (LetA O n) W.EE W.Q))
-    [Nontrivial W.EE] (hr : Module.finrank W.EE (W.DD T) = r) (l : ℕ)
-    (hφ₀ : ∀ w : Fin l → PowerSeries O, ∑ j : Fin l, (1 + PowerSeries.X) ^ (j : ℕ) * W.φ₀ (w j) = 0 → w = 0)
+theorem phi_flat
+    (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ)
+    {r : ℕ} (bN : Module.Basis (Fin r) (LetA O n) ↥(W.N T))
+    (hQ : IsUnit (algebraMap (LetA O n) W.EE W.Q))
+    [Nontrivial W.EE]
+    (hr : Module.finrank W.EE (W.DD T) = r)
+    (l : ℕ)
+    (hφ₀ : ∀ w : Fin l → PowerSeries O,
+      ∑ j : Fin l, (1 + PowerSeries.X) ^ (j : ℕ) * W.φ₀ (w j) = 0 → w = 0)
     (z : Fin l → W.DD T) (hz : ∀ j, z j ∈ W.N T)
-    (hsum : ∑ j : Fin l, (fun _ => ((1 : PowerSeries O) + PowerSeries.X) ^ (j : ℕ) : LetA O n) • W.φD T (z j) = 0) :
-    ∀ j, z j = 0 := by
+    (hsum
+      : ∑ j : Fin l, (fun _ => ((1 : PowerSeries O) + PowerSeries.X) ^ (j : ℕ) : LetA O n) • W.φD T (z j)
+        = 0)
+    : ∀ j, z j = 0 := by
   have hsp := span_φ W T hT bN hQ
   let c : Module.Basis (Fin r) W.EE (W.DD T) :=
     basisOfTopLeSpanOfCardEqFinrank (fun j => W.φD T (bN j)) hsp.ge (by rw [hr, Fintype.card_fin])
@@ -102,8 +116,9 @@ theorem phi_flat (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) {r : ℕ}
     intro j m
     funext k
     have h1 := congrFun (hc m) (k + 1)
-    simp only [Finset.sum_apply, Pi.mul_apply, he, LocWach.φA, letφ, AlgHom.pi_apply, AlgHom.comp_apply,
-      Pi.evalAlgHom_apply, add_sub_cancel_right, Pi.zero_apply] at h1
+    simp only [Finset.sum_apply, Pi.mul_apply, he, LocWach.φA, letφ, AlgHom.pi_apply,
+        AlgHom.comp_apply, Pi.evalAlgHom_apply, add_sub_cancel_right, Pi.zero_apply]
+      at h1
     exact congrFun (hφ₀ (fun j => a j m k) h1) j
   intro j
   rw [hzj j]
@@ -115,9 +130,18 @@ end GlobalTheory.NL.PhiFlat
 
 namespace GlobalTheory.NL.PhiFlat
 
-
 set_option maxHeartbeats 1600000 in
-theorem main : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; ∀ T : Lt K LL, IsCrys ((D.loc l).PD K) T.ρ → ∀ z : Fin l → W.DD T, (∀ j, z j ∈ W.N T) → ∑ j : Fin l, (fun _ => ((1 : PowerSeries ↥(OL LL)) + PowerSeries.X) ^ (j : ℕ) : AA K LL) • W.φD T (z j) = 0 → ∀ j, z j = 0 := by
+theorem main
+    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ)
+        [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL),
+      let W := (HW l).W K s LL h
+      ∀ T : Lt K LL,
+        IsCrys ((D.loc l).PD K) T.ρ
+          → ∀ z : Fin l → W.DD T,
+            (∀ j, z j ∈ W.N T)
+              → ∑ j : Fin l, (fun _ => ((1 : PowerSeries ↥(OL LL)) + PowerSeries.X) ^ (j : ℕ) : AA K LL) • W.φD T (z j)
+                = 0
+              → ∀ j, z j = 0 := by
   intro D HW F l _ K s LL h W T hT z hz hsum
   obtain ⟨bN⟩ := GlobalTheory.NL.N_basis D HW F l K s LL h T hT
   have hQ : IsUnit (algebraMap (AA K LL) W.EE W.Q) := by

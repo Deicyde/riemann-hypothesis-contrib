@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MassRowLattic
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory Formalism.BasicNotions Formalism.MainNotions.S
+open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory Formalism.BasicNotions
+  Formalism.MainNotions.S
 open scoped ENNReal Classical
 
 namespace GlobalTheory.Mass.RowsRawMass
@@ -36,17 +37,21 @@ theorem rowsGenus (D : D7) (u : D.what₂.Word) : OrthLatticesOneGenus D u := by
 theorem main : ∀ (D : D7) (u : D.what₂.Word), UnitaryVolumeMass.stLem3L0 D u := by
   intro D u hp h3 hs F0 he hz s hsr
 
-  have glue := Formalism.MainNotions.BridgeLemma₂.gluing_mass_of_lift_number_genus D u (rowsLift D u) (gluingNum D u) (rowsGenus D u)
+  have glue :=
+    Formalism.MainNotions.BridgeLemma₂.gluing_mass_of_lift_number_genus D u (rowsLift D u)
+      (gluingNum D u) (rowsGenus D u)
   have hT : ((Tu D u : ℝ) - 1) ^ D.R.f ≠ 0 := by
     apply pow_ne_zero
     have : (3 : ℝ) ≤ (Tu D u : ℝ) := by exact_mod_cast h3
     linarith
 
-  have hm := fun Λ (hΛ : IsRowLat D F0 Λ) => GlobalTheory.T.mass_rowLattice_orthogonal_split_prime D u F0 he hz hp hs Λ hΛ
+  have hm := fun Λ (hΛ : IsRowLat D F0 Λ) =>
+    GlobalTheory.T.mass_rowLattice_orthogonal_split_prime D u F0 he hz hp hs Λ hΛ
 
   obtain ⟨Λ₀, hΛ₀⟩ := GlobalTheory.Mass.RowEx.main D u F0 he hz hp hs
   refine ⟨?_, fun Λ hΛ => ⟨?_, (hm Λ hΛ).2⟩⟩
-  · rw [glue hp h3 hs F0 he hz Λ₀ hΛ₀ s hsr, (hm Λ₀ hΛ₀).1, div_pow, mul_assoc, div_mul_cancel₀ _ hT]
+  · rw [glue hp h3 hs F0 he hz Λ₀ hΛ₀ s hsr, (hm Λ₀ hΛ₀).1, div_pow, mul_assoc,
+      div_mul_cancel₀ _ hT]
   · rw [glue hp h3 hs F0 he hz Λ hΛ s hsr, mul_div_cancel_right₀ _ hT]
 
 end GlobalTheory.Mass.RowsRawMass

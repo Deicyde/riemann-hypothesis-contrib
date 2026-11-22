@@ -5,17 +5,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsOpenIsIrre
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem exists_mem_and_rightTranslate_mem_of_mem_identityComponent :
-    ∀ (k : Type) [Field k] (G : Over (Spec (CommRingCat.of k))) [GrpObj G], Smooth G.hom → ∀ (U : G.left.Opens) (y : 𝟙_ (Over (Spec (CommRingCat.of k))) ⟶ G), (η[G]).left (IsLocalRing.closedPoint k) ∈ U → y.left (IsLocalRing.closedPoint k) ∈ connectedComponent ((η[G]).left (IsLocalRing.closedPoint k)) → ∃ z : G.left, z ∈ U ∧ (𝟙 G * (toUnit G ≫ y) : G ⟶ G).left z ∈ U := by
+theorem exists_mem_and_rightTranslate_mem_of_mem_identityComponent
+    : ∀ (k : Type) [Field k] (G : Over (Spec (CommRingCat.of k))) [GrpObj G],
+      Smooth G.hom
+        → ∀ (U : G.left.Opens) (y : 𝟙_ (Over (Spec (CommRingCat.of k))) ⟶ G),
+          (η[G]).left (IsLocalRing.closedPoint k) ∈ U
+            → y.left (IsLocalRing.closedPoint k)
+              ∈ connectedComponent ((η[G]).left (IsLocalRing.closedPoint k))
+            → ∃ z : G.left, z ∈ U ∧ (𝟙 G * (toUnit G ≫ y) : G ⟶ G).left z ∈ U := by
   intro k _ G _ hs U y hU hy
   set e : G.left := (η[G]).left (IsLocalRing.closedPoint k) with he
   have hirr : IsIrreducible (connectedComponent e) := by
-    have h := (GlobalTheory.T.isOpen_isIrreducible_componentOfRationalPoint_smooth k G.left G.hom (η[G]).left hs (Over.w (η[G]))).2
+    have h :=
+      (GlobalTheory.T.isOpen_isIrreducible_componentOfRationalPoint_smooth k G.left G.hom
+        (η[G]).left hs (Over.w (η[G]))).2
     have hsub : ∀ a : Spec (CommRingCat.of k), a = IsLocalRing.closedPoint k := fun a =>
       Subsingleton.elim (α := PrimeSpectrum k) _ _
     convert h using 1
@@ -46,9 +55,10 @@ theorem exists_mem_and_rightTranslate_mem_of_mem_identityComponent :
   have hTy : T.left ((ι[G]).left (y.left (IsLocalRing.closedPoint k))) = e := by
     have h2 := congrArg (fun f => f.left (IsLocalRing.closedPoint k)) hT
     exact h2
-  obtain ⟨z, -, hz1, hz2⟩ := hirr.isPreirreducible (U : Set G.left) (T.left ⁻¹' (U : Set G.left))
-    U.isOpen (U.isOpen.preimage T.left.continuous) ⟨e, mem_connectedComponent, hU⟩
-    ⟨_, hyi, by rw [Set.mem_preimage, hTy]; exact hU⟩
+  obtain ⟨z, -, hz1, hz2⟩ :=
+    hirr.isPreirreducible (U : Set G.left) (T.left ⁻¹' (U : Set G.left)) U.isOpen
+      (U.isOpen.preimage T.left.continuous) ⟨e, mem_connectedComponent, hU⟩
+      ⟨_, hyi, by rw [Set.mem_preimage, hTy]; exact hU⟩
   exact ⟨z, hz1, hz2⟩
 
 end GlobalTheory

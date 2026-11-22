@@ -5,18 +5,13 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open scoped IntermediateField Algebra TensorProduct Matrix Pointwise NumberField Topology ContDiff NNReal ENNReal Polynomial DirectSum BigOperators InnerProductSpace Manifold
+open scoped IntermediateField Algebra TensorProduct Matrix Pointwise NumberField Topology ContDiff
+  NNReal ENNReal Polynomial DirectSum BigOperators InnerProductSpace Manifold
 
-theorem UpperTheory.Reformulated.B.ExistsCoordinate.exists_coord :
-    ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E]
-    [inst_2 : NumberField.IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) {y : E},
-    y ∈ ℚ[(↑H.rt : E)] →
-      ∃ (u : ℚ) (v : ℚ),
-        y =
-          (↑u : E) +
-            (↑v : E) *
-              (↑H.rt :
-                E) := by
+theorem UpperTheory.Reformulated.B.ExistsCoordinate.exists_coord
+    : ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [inst_2 : NumberField.IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) {y : E},
+      y ∈ ℚ[(↑H.rt : E)] → ∃ (u : ℚ) (v : ℚ), y = (↑u : E) + (↑v : E) * (↑H.rt : E) := by
   intro E _ _ _ H y hy
   have hsq : (H.rt : E) * (H.rt : E) = -(H.d : E) := by
     have h := congrArg (fun z : NumberField.RingOfIntegers E => (z : E)) H.rt_sq

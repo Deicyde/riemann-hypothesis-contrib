@@ -8,8 +8,10 @@ universe u_1
 
 namespace GlobalTheory.ProductOfFnSingle
 
-theorem prod_ofFn_eq_single {M : Type u_1} [inst : Monoid M] {d : ℕ} (g : Fin d → M) (j : Fin d)
-    (h : ∀ (i : Fin d), i ≠ j → g i = (1 : M)) : List.prod (List.ofFn g) = g j := by
+theorem prod_ofFn_eq_single
+    {M : Type u_1} [inst : Monoid M]
+    {d : ℕ} (g : Fin d → M) (j : Fin d) (h : ∀ (i : Fin d), i ≠ j → g i = (1 : M))
+    : List.prod (List.ofFn g) = g j := by
   induction d with
   | zero => exact j.elim0
   | succ d ih =>

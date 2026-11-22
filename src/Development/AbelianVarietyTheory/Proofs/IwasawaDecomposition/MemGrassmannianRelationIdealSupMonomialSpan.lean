@@ -208,8 +208,9 @@ lemma X_mul_mem (p q : ℕ) (f : MvPolynomial (Bool × ℕ) ℝ)
   rw [this]
   exact (J _ _).add_mem ((J _ _).mul_mem_left _ ha) ((J _ _).mul_mem_left _ hXX)
 
-theorem mem_rel_sup_span_low_or_top : ∀ (p q : ℕ) (h : MvPolynomial (Bool × ℕ) ℝ),
-    h ∈ (J p q).restrictScalars ℝ ⊔ Submodule.span ℝ (basis p q) := by
+theorem mem_rel_sup_span_low_or_top
+    : ∀ (p q : ℕ) (h : MvPolynomial (Bool × ℕ) ℝ),
+      h ∈ (J p q).restrictScalars ℝ ⊔ Submodule.span ℝ (basis p q) := by
   intro p
   induction p with
   | zero => exact base_left

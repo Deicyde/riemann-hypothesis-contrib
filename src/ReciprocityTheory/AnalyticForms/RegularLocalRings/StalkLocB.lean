@@ -13,8 +13,10 @@ noncomputable section
 
 namespace StalkLocB
 
-variable {W : Scheme.{0}} (V : W.Opens) {n : ℕ} (K : Ideal (MvPolynomial (Fin n) ℂ))
-  (iso : V.toScheme ≅ Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K)))
+variable
+  {W : Scheme.{0}} (V : W.Opens)
+  {n : ℕ}
+  (K : Ideal (MvPolynomial (Fin n) ℂ)) (iso : V.toScheme ≅ Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K)))
 
 def secH : MvPolynomial (Fin n) ℂ →+* Γ(W, V) :=
   V.topIso.hom.hom.comp (iso.hom.appTop.hom.comp
@@ -32,8 +34,8 @@ theorem secH_surjective : Function.Surjective (secH V K iso) := by
   exact h1.comp (h2.comp (h3.comp Ideal.Quotient.mk_surjective))
 
 def phiH : (MvPolynomial (Fin n) ℂ ⧸ K) →+* Γ(W, V) :=
-  V.topIso.hom.hom.comp (iso.hom.appTop.hom.comp
-    (Scheme.ΓSpecIso (.of (MvPolynomial (Fin n) ℂ ⧸ K))).inv.hom)
+  V.topIso.hom.hom.comp (iso.hom.appTop.hom.comp (Scheme.ΓSpecIso (.of
+    (MvPolynomial (Fin n) ℂ ⧸ K))).inv.hom)
 
 theorem phiH_bijective : Function.Bijective (phiH V K iso) := by
   have h1 : Function.Bijective V.topIso.hom.hom := (V.topIso.commRingCatIsoToRingEquiv).bijective
@@ -49,34 +51,44 @@ theorem phiH_bijective : Function.Bijective (phiH V K iso) := by
 def phiE : (MvPolynomial (Fin n) ℂ ⧸ K) ≃+* Γ(W, V) :=
   RingEquiv.ofBijective _ (phiH_bijective V K iso)
 
-theorem isUnit_germ_secH_iff (v : V) (f : MvPolynomial (Fin n) ℂ) :
-    IsUnit (W.presheaf.germ V v.1 v.2 (secH V K iso f)) ↔
-      Ideal.Quotient.mk K f ∉ (iso.hom.base v).asIdeal := by
-
-  have hSpec : IsUnit ((Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K))).presheaf.germ ⊤ (iso.hom.base v) trivial
-      ((Scheme.ΓSpecIso (.of (MvPolynomial (Fin n) ℂ ⧸ K))).inv (Ideal.Quotient.mk K f))) ↔
-      Ideal.Quotient.mk K f ∉ (iso.hom.base v).asIdeal := by
-    have key := Scheme.mem_basicOpen (Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K)))
-      ((Scheme.ΓSpecIso (.of (MvPolynomial (Fin n) ℂ ⧸ K))).inv (Ideal.Quotient.mk K f)) (iso.hom.base v) trivial
+theorem isUnit_germ_secH_iff (v : V) (f : MvPolynomial (Fin n) ℂ)
+    : IsUnit (W.presheaf.germ V v.1 v.2 (secH V K iso f))
+      ↔ Ideal.Quotient.mk K f ∉ (iso.hom.base v).asIdeal := by
+  have hSpec
+      : IsUnit ((Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K))).presheaf.germ ⊤ (iso.hom.base v) trivial
+          ((Scheme.ΓSpecIso (.of (MvPolynomial (Fin n) ℂ ⧸ K))).inv (Ideal.Quotient.mk K f)))
+        ↔ Ideal.Quotient.mk K f ∉ (iso.hom.base v).asIdeal := by
+    have key :=
+      Scheme.mem_basicOpen (Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K)))
+        ((Scheme.ΓSpecIso (.of (MvPolynomial (Fin n) ℂ ⧸ K))).inv (Ideal.Quotient.mk K f))
+        (iso.hom.base v) trivial
     rw [basicOpen_eq_of_affine] at key
     exact key.symm.trans (PrimeSpectrum.mem_basicOpen _ _)
 
-  have hMap : ∀ ρ, IsUnit (V.toScheme.presheaf.germ ⊤ v trivial (iso.hom.appTop ρ)) ↔
-      IsUnit ((Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K))).presheaf.germ ⊤ (iso.hom.base v) trivial ρ) := by
+  have hMap
+      : ∀ ρ,
+        IsUnit (V.toScheme.presheaf.germ ⊤ v trivial (iso.hom.appTop ρ))
+          ↔ IsUnit ((Spec (.of (MvPolynomial (Fin n) ℂ ⧸ K))).presheaf.germ ⊤ (iso.hom.base v)
+            trivial ρ) := by
     intro ρ
-    change IsUnit (V.toScheme.presheaf.germ ((TopologicalSpace.Opens.map iso.hom.base).obj ⊤) v trivial
-      (iso.hom.app ⊤ ρ)) ↔ _
+    change IsUnit (V.toScheme.presheaf.germ ((TopologicalSpace.Opens.map iso.hom.base).obj ⊤) v
+        trivial (iso.hom.app ⊤ ρ))
+      ↔ _
     rw [← Scheme.Hom.germ_stalkMap_apply iso.hom ⊤ v trivial ρ]
     haveI : IsLocalHom (iso.hom.stalkMap v).hom := iso.hom.toLRSHom.prop v
     exact isUnit_map_iff (iso.hom.stalkMap v).hom _
 
-  have hOpen : ∀ τ, IsUnit (W.presheaf.germ V v.1 v.2 (V.topIso.hom τ)) ↔
-      IsUnit (V.toScheme.presheaf.germ ⊤ v trivial τ) := by
+  have hOpen
+      : ∀ τ,
+        IsUnit (W.presheaf.germ V v.1 v.2 (V.topIso.hom τ))
+          ↔ IsUnit (V.toScheme.presheaf.germ ⊤ v trivial τ) := by
     intro τ
     rw [Scheme.Opens.topIso_hom]
     erw [TopCat.Presheaf.germ_res_apply]
-    have h := congrArg (fun g => CommRingCat.Hom.hom g τ)
-      (Scheme.Opens.germ_stalkIso_hom V (V := ⊤) v trivial)
+    have h :=
+      congrArg
+        (fun g => CommRingCat.Hom.hom g τ)
+        (Scheme.Opens.germ_stalkIso_hom V (V := ⊤) v trivial)
     simp only [CommRingCat.hom_comp, RingHom.comp_apply] at h
     refine Iff.trans ?_ (MulEquiv.isUnit_map (V.stalkIso v).commRingCatIsoToRingEquiv.toMulEquiv)
     exact iff_of_eq (congrArg IsUnit h.symm)
@@ -85,16 +97,24 @@ theorem isUnit_germ_secH_iff (v : V) (f : MvPolynomial (Fin n) ℂ) :
   rw [hOpen, hMap, hSpec]
 
 variable {K iso} in
-theorem secH_C (s : W ⟶ Spec (.of ℂ))
-    (hover : iso.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K))) =
-      V.ι ≫ s) (c : ℂ) :
-    secH V K iso (C c) = W.presheaf.map (homOfLE le_top : V ⟶ ⊤).op
-      (s.appTop ((Scheme.ΓSpecIso (.of ℂ)).inv c)) := by
-  have h := congrArg (fun g => CommRingCat.Hom.hom g ((Scheme.ΓSpecIso (.of ℂ)).inv c))
-    (congrArg Scheme.Hom.appTop hover)
+theorem secH_C
+    (s : W ⟶ Spec (.of ℂ))
+    (hover : iso.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K)))
+      = V.ι ≫ s)
+    (c : ℂ)
+    : secH V K iso (C c)
+      = W.presheaf.map (homOfLE le_top : V ⟶ ⊤).op
+        (s.appTop ((Scheme.ΓSpecIso (.of ℂ)).inv c)) := by
+  have h :=
+    congrArg
+      (fun g => CommRingCat.Hom.hom g ((Scheme.ΓSpecIso (.of ℂ)).inv c))
+      (congrArg Scheme.Hom.appTop hover)
   simp only [Scheme.Hom.comp_appTop, CommRingCat.hom_comp, RingHom.comp_apply] at h
-  have hnat := congrArg (fun g => CommRingCat.Hom.hom g c)
-    (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K))))
+  have hnat :=
+    congrArg
+      (fun g => CommRingCat.Hom.hom g c)
+      (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom (algebraMap ℂ
+        (MvPolynomial (Fin n) ℂ ⧸ K))))
   simp only [CommRingCat.hom_comp, RingHom.comp_apply] at hnat
   rw [← hnat] at h
   show V.topIso.hom (iso.hom.appTop ((Scheme.ΓSpecIso (.of (MvPolynomial (Fin n) ℂ ⧸ K))).inv
@@ -107,30 +127,33 @@ theorem secH_C (s : W ⟶ Spec (.of ℂ))
   rfl
 
 variable {K iso} in
-theorem germ_secH_C (s : W ⟶ Spec (.of ℂ))
-    (hover : iso.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K))) =
-      V.ι ≫ s) (x : W) (hx : x ∈ V) (c : ℂ) :
-    W.presheaf.germ V x hx (secH V K iso (C c)) =
-      W.presheaf.germ ⊤ x trivial (s.appTop ((Scheme.ΓSpecIso (.of ℂ)).inv c)) := by
+theorem germ_secH_C
+    (s : W ⟶ Spec (.of ℂ))
+    (hover : iso.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K)))
+      = V.ι ≫ s)
+    (x : W) (hx : x ∈ V)
+    (c : ℂ)
+    : W.presheaf.germ V x hx (secH V K iso (C c))
+      = W.presheaf.germ ⊤ x trivial (s.appTop ((Scheme.ΓSpecIso (.of ℂ)).inv c)) := by
   rw [secH_C V s hover c, TopCat.Presheaf.germ_res_apply]
 
-
 variable {K iso} in
-theorem isClosed_of_comap_eq (s : W ⟶ Spec (.of ℂ))
-    (hover : iso.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K))) =
-      V.ι ≫ s) (v : V) (p : Fin n → ℂ)
-    (hp : (iso.hom.base v).asIdeal.comap (Ideal.Quotient.mk K) = ptIdeal p) :
-    IsClosed ({v.1} : Set W) := by
+theorem isClosed_of_comap_eq
+    (s : W ⟶ Spec (.of ℂ))
+    (hover : iso.hom ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin n) ℂ ⧸ K)))
+      = V.ι ≫ s)
+    (v : V) (p : Fin n → ℂ) (hp : (iso.hom.base v).asIdeal.comap (Ideal.Quotient.mk K) = ptIdeal p)
+    : IsClosed ({v.1} : Set W) := by
   set x : W := v.1 with hxdef
   have hV : IsAffineOpen V := IsAffine.of_isIso iso.hom
   have hunit : ∀ f, IsUnit (W.presheaf.germ V x v.2 (secH V K iso f)) ↔ eval p f ≠ 0 := by
     intro f
     rw [isUnit_germ_secH_iff, ← Ideal.mem_comap, hp]
     simp [ptIdeal, RingHom.mem_ker]
-  let γ : ℂ →+* W.presheaf.stalk x := (W.presheaf.germ ⊤ x trivial).hom.comp
-    (s.appTop.hom.comp (Scheme.ΓSpecIso (.of ℂ)).inv.hom)
-  have hγ : ∀ c, γ c = W.presheaf.germ V x v.2 (secH V K iso (C c)) :=
-    fun c => (germ_secH_C V s hover x v.2 c).symm
+  let γ : ℂ →+* W.presheaf.stalk x :=
+    (W.presheaf.germ ⊤ x trivial).hom.comp (s.appTop.hom.comp (Scheme.ΓSpecIso (.of ℂ)).inv.hom)
+  have hγ : ∀ c, γ c = W.presheaf.germ V x v.2 (secH V K iso (C c)) := fun c =>
+    (germ_secH_C V s hover x v.2 c).symm
   have KC : ∀ t : W.presheaf.stalk x, ∃ c : ℂ, t - γ c ∈ IsLocalRing.maximalIdeal _ := by
     intro t
     let _ := TopCat.Presheaf.algebra_section_stalk W.presheaf ⟨x, v.2⟩
@@ -142,23 +165,26 @@ theorem isClosed_of_comap_eq (s : W ⟶ Spec (.of ℂ))
     have hb : algebraMap Γ(W, V) (W.presheaf.stalk x) b ∉ IsLocalRing.maximalIdeal _ := by
       rw [IsLocalization.AtPrime.to_map_mem_maximal_iff (W.presheaf.stalk x) Q]
       exact b.2
-    have hgb : W.presheaf.germ V x v.2 (secH V K iso g) = algebraMap Γ(W, V) _ b := by
-      rw [hg]; rfl
+    have hgb : W.presheaf.germ V x v.2 (secH V K iso g) = algebraMap Γ(W, V) _ b := by rw [hg]; rfl
     have hg0 : eval p g ≠ 0 := by
       rw [← hunit, hgb]
       by_contra h
       exact hb ((IsLocalRing.mem_maximalIdeal _).2 h)
     refine ⟨eval p f / eval p g, ?_⟩
     have hspec := IsLocalization.mk'_spec (W.presheaf.stalk x) (secH V K iso f) b
-    have hfa : algebraMap Γ(W, V) (W.presheaf.stalk x) (secH V K iso f) =
-        W.presheaf.germ V x v.2 (secH V K iso f) := rfl
-    have hzero : W.presheaf.germ V x v.2 (secH V K iso (f - C (eval p f / eval p g) * g)) ∈
-        IsLocalRing.maximalIdeal _ := by
+    have hfa
+        : algebraMap Γ(W, V) (W.presheaf.stalk x) (secH V K iso f)
+          = W.presheaf.germ V x v.2 (secH V K iso f) :=
+      rfl
+    have hzero
+        : W.presheaf.germ V x v.2 (secH V K iso (f - C (eval p f / eval p g) * g))
+          ∈ IsLocalRing.maximalIdeal _ := by
       rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, hunit]
       simp [eval_sub, eval_mul, eval_C, div_mul_cancel₀ _ hg0]
-    have hprod : (IsLocalization.mk' (W.presheaf.stalk x) (secH V K iso f) b -
-        γ (eval p f / eval p g)) * algebraMap Γ(W, V) _ b =
-        W.presheaf.germ V x v.2 (secH V K iso (f - C (eval p f / eval p g) * g)) := by
+    have hprod
+        : (IsLocalization.mk' (W.presheaf.stalk x) (secH V K iso f) b - γ (eval p f / eval p g))
+            * algebraMap Γ(W, V) _ b
+          = W.presheaf.germ V x v.2 (secH V K iso (f - C (eval p f / eval p g) * g)) := by
       rw [sub_mul, hspec, hfa, hγ, ← hgb, map_sub, map_sub, map_mul, map_mul]
     rw [← hprod] at hzero
     exact ((IsLocalRing.maximalIdeal.isMaximal _).isPrime.mem_or_mem hzero).resolve_right hb
@@ -170,8 +196,9 @@ theorem isClosed_of_comap_eq (s : W ⟶ Spec (.of ℂ))
   let _ := TopCat.Presheaf.algebra_section_stalk W.presheaf ⟨x, hxU⟩
   have := hU.isLocalization_stalk ⟨x, hxU⟩
   set P := hU.primeIdealOf ⟨x, hxU⟩
-  let β : ℂ →+* Γ(W, U) := (W.presheaf.map (homOfLE le_top : U ⟶ ⊤).op).hom.comp
-    (s.appTop.hom.comp (Scheme.ΓSpecIso (.of ℂ)).inv.hom)
+  let β : ℂ →+* Γ(W, U) :=
+    (W.presheaf.map (homOfLE le_top : U ⟶ ⊤).op).hom.comp
+      (s.appTop.hom.comp (Scheme.ΓSpecIso (.of ℂ)).inv.hom)
   have hβ : ∀ c, W.presheaf.germ U x hxU (β c) = γ c := fun c =>
     TopCat.Presheaf.germ_res_apply _ _ _ _ _
   have hmax : P.asIdeal.IsMaximal := by

@@ -16,8 +16,8 @@ section SlopeTestRemainingChoices
 
 variable {O : Type u} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem exists_pow_smul_integral {ϖ : O} (hϖ : Irreducible ϖ) (k : FractionRing O) :
-    ∃ (n : ℕ) (a : O), (ϖ ^ n) • k = algebraMap O (FractionRing O) a := by
+theorem exists_pow_smul_integral {ϖ : O} (hϖ : Irreducible ϖ) (k : FractionRing O)
+    : ∃ (n : ℕ) (a : O), (ϖ ^ n) • k = algebraMap O (FractionRing O) a := by
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := O) k
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   obtain ⟨n, w, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hb0 hϖ
@@ -27,13 +27,18 @@ theorem exists_pow_smul_integral {ϖ : O} (hϖ : Irreducible ϖ) (k : FractionRi
   rw [Algebra.smul_def, ← mul_div_assoc, div_eq_iff hne, ← map_mul, ← map_mul]
   congr 1
   have : ((w⁻¹ : Oˣ) : O) * (w : O) = 1 := by simp
-  calc ϖ ^ n * a = ϖ ^ n * a * (((w⁻¹ : Oˣ) : O) * (w : O)) := by rw [this, mul_one]
+  calc
+    ϖ ^ n * a
+      = ϖ ^ n * a * (((w⁻¹ : Oˣ) : O) * (w : O)) := by rw [this, mul_one]
     _ = a * ((w⁻¹ : Oˣ) : O) * ((w : O) * ϖ ^ n) := by ring
 
-theorem exists_pow_smul_mem {V : Type u} [AddCommGroup V] [Module O V] [Module (FractionRing O) V]
-    [IsScalarTower O (FractionRing O) V] {T : Submodule O V}
-    (hT : Submodule.span (FractionRing O) (T : Set V) = ⊤) {ϖ : O} (hϖ : Irreducible ϖ) (x : V) :
-    ∃ n : ℕ, (ϖ ^ n) • x ∈ T := by
+theorem exists_pow_smul_mem
+    {V : Type u}
+    [AddCommGroup V] [Module O V] [Module (FractionRing O) V] [IsScalarTower O (FractionRing O) V]
+    {T : Submodule O V} (hT : Submodule.span (FractionRing O) (T : Set V) = ⊤)
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    (x : V)
+    : ∃ n : ℕ, (ϖ ^ n) • x ∈ T := by
   have hx : x ∈ Submodule.span (FractionRing O) (T : Set V) := by rw [hT]; trivial
   induction hx using Submodule.span_induction with
   | mem x hx => exact ⟨0, by simpa using hx⟩
@@ -51,9 +56,9 @@ theorem exists_pow_smul_mem {V : Type u} [AddCommGroup V] [Module O V] [Module (
     obtain ⟨m, a, ha⟩ := exists_pow_smul_integral hϖ k
     refine ⟨m + n, ?_⟩
     have : (ϖ ^ (m + n)) • k • x = a • (ϖ ^ n) • x := by
-      rw [pow_add, mul_comm, mul_smul, ← smul_assoc (ϖ ^ m) k x, ha, algebraMap_smul,
-        smul_comm]
-    rw [this]; exact T.smul_mem _ hn
+      rw [pow_add, mul_comm, mul_smul, ← smul_assoc (ϖ ^ m) k x, ha, algebraMap_smul, smul_comm]
+    rw [this]
+    exact T.smul_mem _ hn
 
 end SlopeTestRemainingChoices
 

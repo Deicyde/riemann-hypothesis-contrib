@@ -11,33 +11,45 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CMFieldExpo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem ker_le (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {O : Type} [CommRing O] {N : ℕ} [NeZero N]
-    (ψ : DirichletCharacter O N) (m : ℕ) [NeZero m] (h : ψ.conductor ∣ m) :
-    (Chr.cls ℚ Ω m).ker ≤ (Chr.dirG ℚ Ω ψ).ker := by
+private theorem ker_le
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {O : Type} [CommRing O]
+    {N : ℕ} [NeZero N]
+    (ψ : DirichletCharacter O N)
+    (m : ℕ) [NeZero m]
+    (h : ψ.conductor ∣ m)
+    : (Chr.cls ℚ Ω m).ker ≤ (Chr.dirG ℚ Ω ψ).ker := by
   intro σ hσ
   rw [MonoidHom.mem_ker] at hσ ⊢
   obtain ⟨hd, χ₀, hχ⟩ := ψ.factorsThrough_conductor
   haveI : NeZero ψ.conductor := ⟨ψ.conductor_ne_zero⟩
   have e1 := (Chr.clsFacts ℚ Ω N).2.1 ψ.conductor hd
   have e2 := (Chr.clsFacts ℚ Ω m).2.1 ψ.conductor h
-  have hc : Chr.cls ℚ Ω ψ.conductor σ = 1 := by
-    rw [← e2, MonoidHom.comp_apply, hσ, map_one]
+  have hc : Chr.cls ℚ Ω ψ.conductor σ = 1 := by rw [← e2, MonoidHom.comp_apply, hσ, map_one]
   have hu : ∀ u : (ZMod N)ˣ, MulChar.toUnitHom ψ u = MulChar.toUnitHom χ₀ (ZMod.unitsMap hd u) := by
     intro u
     apply Units.ext
     rw [MulChar.coe_toUnitHom, MulChar.coe_toUnitHom]
     conv_lhs => rw [hχ]
-    rw [DirichletCharacter.changeLevel_def, MulChar.ofUnitHom_coe, MonoidHom.comp_apply, MulChar.coe_toUnitHom]
+    rw [DirichletCharacter.changeLevel_def, MulChar.ofUnitHom_coe, MonoidHom.comp_apply,
+      MulChar.coe_toUnitHom]
   unfold Chr.dirG
   rw [MonoidHom.comp_apply, hu, ← MonoidHom.comp_apply (ZMod.unitsMap hd), e1, hc, map_one]
 
-theorem UpperTheory.V.HV.ivField :
-    ∀ (χ : PChar) (l : ℕ) [Fact l.Prime] (j : ℕ), l ≠ 2 → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω],
-      ∃ (L₀ : Type) (_ : Field L₀) (_ : NumberField L₀) (L₁ : Type) (_ : Field L₁) (_ : NumberField L₁) (_ : Algebra L₀ L₁) (_ : Algebra L₁ Ω)
-        (_ : IsAlgClosure L₁ Ω) (_ : IsAbelianGalois ℚ L₁), IsAbField (Lchi χ l) L₀ ∧ IsLayer l j L₀ L₁ ∧ Module.finrank ℚ L₁ ≤ l * χ.N * l ^ j ∧
-        ∀ (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N] (ψ : DirichletCharacter O N), ψ.conductor ∣ χ.N → galOf ℚ L₁ Ω ≤ (Chr.dirG ℚ Ω ψ).ker := by
+theorem UpperTheory.V.HV.ivField
+    : ∀ (χ : PChar) (l : ℕ) [Fact l.Prime] (j : ℕ),
+      l ≠ 2
+        → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω],
+          ∃ (L₀ : Type) (_ : Field L₀) (_ : NumberField L₀) (L₁ : Type) (_ : Field L₁)
+              (_ : NumberField L₁) (_ : Algebra L₀ L₁) (_ : Algebra L₁ Ω) (_ : IsAlgClosure L₁ Ω)
+              (_ : IsAbelianGalois ℚ L₁),
+            IsAbField (Lchi χ l) L₀ ∧ IsLayer l j L₀ L₁ ∧ Module.finrank ℚ L₁ ≤ l * χ.N * l ^ j
+              ∧ ∀ (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N]
+                  (ψ : DirichletCharacter O N),
+                ψ.conductor ∣ χ.N → galOf ℚ L₁ Ω ≤ (Chr.dirG ℚ Ω ψ).ker := by
   intro χ l _ j hl2 Ω _ _ _
   haveI := χ.ne
   have hlp : l.Prime := Fact.out
@@ -77,7 +89,9 @@ theorem UpperTheory.V.HV.ivField :
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient]
     exact Nat.totient_le _
   · intro O _ _ N _ ψ hψ
-    calc galOf ℚ L₁ Ω ≤ galOf ℚ L₀ Ω := galOf_le ℚ L₀ Ω L₁
+    calc
+      galOf ℚ L₁ Ω
+        ≤ galOf ℚ L₀ Ω := galOf_le ℚ L₀ Ω L₁
       _ = Chr.levH ℚ Ω (Lchi χ l).H := hgal0
       _ ≤ (Chr.dirG ℚ Ω ψ).ker := by
         rw [Chr.levH]

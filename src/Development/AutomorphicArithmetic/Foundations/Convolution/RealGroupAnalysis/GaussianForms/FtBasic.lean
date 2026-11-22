@@ -6,7 +6,9 @@ public import GroundTheory.HeightsAndTheta.Theta.AdelicFourierCoord
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -47,9 +49,12 @@ private lemma quaternaryFourier_eq_adelic (δ : F) (φ : V4 F → ℂ) (v : V4 F
 
 end UpperTheory.ConvolutionTheory.R2.C
 
-theorem UpperTheory.ConvolutionTheory.R2.C.ftBasic :
-    ∀ (F : Type) [Field F] [NumberField F] (δ : F), δ ≠ 0 → ∀ φ ∈ schwartzBruhatPi (K := F) (ι := Fin 4),
-    ft4 δ φ ∈ schwartzBruhatPi (K := F) (ι := Fin 4) ∧ (∀ v, ft4 δ (ft4 δ φ) v = φ (-v)) ∧ Th (ft4 δ φ) = Th φ := by
+theorem UpperTheory.ConvolutionTheory.R2.C.ftBasic
+    : ∀ (F : Type) [Field F] [NumberField F] (δ : F),
+      δ ≠ 0
+        → ∀ φ ∈ schwartzBruhatPi (K := F) (ι := Fin 4),
+          ft4 δ φ ∈ schwartzBruhatPi (K := F) (ι := Fin 4) ∧ (∀ v, ft4 δ (ft4 δ φ) v = φ (-v))
+            ∧ Th (ft4 δ φ) = Th φ := by
   intro F _ _ δ hδ φ hφ
   have hGH := Gm_mul_Hm hδ
   have hHG := Hm_mul_Gm hδ
@@ -60,7 +65,8 @@ theorem UpperTheory.ConvolutionTheory.R2.C.ftBasic :
   · rw [hfun]
     exact GroundTheory.Heights₂.Theta.comp_mulVec_mem_schwartzBruhatPi (Gm δ) (Hm δ) hHG hGH hF
   · intro v
-    rw [quaternaryFourier_eq_adelic, hfun, GroundTheory.Heights₂.Theta.adelicFourierPi_comp_mulVec (Gm δ) (Hm δ) hHG hGH,
+    rw [quaternaryFourier_eq_adelic, hfun,
+      GroundTheory.Heights₂.Theta.adelicFourierPi_comp_mulVec (Gm δ) (Hm δ) hHG hGH,
       adelicFourierPi_adelicFourierPi hφ]
     have hT : ((Hm δ).map (algebraMap F (A F)))ᵀ * (Gm δ).map (algebraMap F (A F)) = 1 := by
       have h : (Hm δ)ᵀ * Gm δ = 1 := by
@@ -69,15 +75,17 @@ theorem UpperTheory.ConvolutionTheory.R2.C.ftBasic :
       rw [← Matrix.transpose_map]
       exact GroundTheory.Heights₂.Theta.map_mul_map_eq_one _ h
     simp only [Matrix.mulVec_mulVec, hT, Matrix.one_mulVec]
-  · have hmap : ∀ ξ : Fin 4 → F, ((Gm δ).map (algebraMap F (A F)) *ᵥ fun i => rt (ξ i)) =
-        fun i => rt ((Gm δ *ᵥ ξ) i) := by
+  · have hmap
+        : ∀ ξ : Fin 4 → F,
+          ((Gm δ).map (algebraMap F (A F)) *ᵥ fun i => rt (ξ i)) = fun i => rt ((Gm δ *ᵥ ξ) i) := by
       intro ξ
       exact (GroundTheory.Heights₂.Theta.map_mulVec_eq (algebraMap F (A F)) (Gm δ) ξ).symm
-    let e : (Fin 4 → F) ≃ (Fin 4 → F) :=
-      { toFun := fun ξ => Gm δ *ᵥ ξ
-        invFun := fun ξ => Hm δ *ᵥ ξ
-        left_inv := fun ξ => by simp only [Matrix.mulVec_mulVec, hHG, Matrix.one_mulVec]
-        right_inv := fun ξ => by simp only [Matrix.mulVec_mulVec, hGH, Matrix.one_mulVec] }
+    let e : (Fin 4 → F) ≃ (Fin 4 → F) := {
+      toFun := fun ξ => Gm δ *ᵥ ξ
+      invFun := fun ξ => Hm δ *ᵥ ξ
+      left_inv := fun ξ => by simp only [Matrix.mulVec_mulVec, hHG, Matrix.one_mulVec]
+      right_inv := fun ξ => by simp only [Matrix.mulVec_mulVec, hGH, Matrix.one_mulVec]
+    }
     have h1 : Th (ft4 δ φ) = ∑' ξ : Fin 4 → F, adelicFourierPi F φ fun i => rt (ξ i) := by
       unfold Th
       rw [← e.tsum_eq (fun ξ : Fin 4 → F => adelicFourierPi F φ fun i => rt (ξ i))]

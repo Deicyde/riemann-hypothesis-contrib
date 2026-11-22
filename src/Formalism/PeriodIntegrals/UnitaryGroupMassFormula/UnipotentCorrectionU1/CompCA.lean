@@ -12,7 +12,8 @@ noncomputable section
 
 namespace PI.UnitaryCorollaryDerivatives.CCA
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 

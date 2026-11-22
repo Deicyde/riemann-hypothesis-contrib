@@ -8,12 +8,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistCoh
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial GlobalTheory.EtC GlobalTheory.EtC.GmStep
+open CategoryTheory Limits AlgebraicGeometry Opposite Simplicial GlobalTheory.EtC
+  GlobalTheory.EtC.GmStep
 
 namespace GlobalTheory.EtC.GmStep
 
-theorem finite_piTensorProduct_const (A A' : Type) [CommRing A] [CommRing A'] [Algebra A A'] [Module.Finite A A']
-    (ι : Type) [Fintype ι] : Module.Finite A (PiTensorProduct A fun _ : ι => A') := by
+theorem finite_piTensorProduct_const
+    (A A' : Type) [CommRing A] [CommRing A'] [Algebra A A'] [Module.Finite A A']
+    (ι : Type) [Fintype ι]
+    : Module.Finite A (PiTensorProduct A fun _ : ι => A') := by
   classical
   obtain ⟨S, hS⟩ := Module.Finite.fg_top (R := A) (M := A')
   refine ⟨⟨Finset.univ.image (fun r : ι → S => PiTensorProduct.tprod A (fun i => (r i : A'))), ?_⟩⟩
@@ -29,15 +32,25 @@ theorem finite_piTensorProduct_const (A A' : Type) [CommRing A] [CommRing A'] [A
   rw [Finset.coe_image]
   refine ⟨fun i => ⟨r i, Fintype.mem_piFinset.1 hr i⟩, by simp, rfl⟩
 
-theorem level_vanish : ∀ (q : ℕ) [NeZero q] (n : ℤ), (∀ (A : Type) [CommRing A] [IsNoetherianRing A], SH A → IsUnit (q : A) →
-  ∀ m i : ℤ, 2 ≤ m → m < n → Subsingleton (Ht q (sp (LaurentPolynomial A)) m i)) →
-  ∀ (A : Type) [CommRing A] [IsNoetherianRing A], SH A → IsUnit (q : A) → ∀ (A' : Type) [CommRing A'] [Algebra A A'],
-  Module.Finite A A' → ∀ (k : ℕ) (s i : ℤ), 2 ≤ s → s < n →
-  Subsingleton (Ht q (disc.obj ((cech (laurentHom A A')).obj (op ⦋k⦌))) s i) := by
+theorem level_vanish
+    : ∀ (q : ℕ) [NeZero q] (n : ℤ),
+      (∀ (A : Type) [CommRing A] [IsNoetherianRing A],
+          SH A → IsUnit (q : A)
+            → ∀ m i : ℤ, 2 ≤ m → m < n → Subsingleton (Ht q (sp (LaurentPolynomial A)) m i))
+        → ∀ (A : Type) [CommRing A] [IsNoetherianRing A],
+          SH A → IsUnit (q : A)
+            → ∀ (A' : Type) [CommRing A'] [Algebra A A'],
+              Module.Finite A A'
+                → ∀ (k : ℕ) (s i : ℤ),
+                  2 ≤ s → s < n
+                    → Subsingleton (Ht q (disc.obj ((cech (laurentHom A A')).obj (op ⦋k⦌))) s
+                      i) := by
   intro q _ n hyp A _ _ hSH hq A' _ _ hfin k s i hs hsn
   obtain ⟨_, e, -, -⟩ := GlobalTheory.T.laurentCechNerve_level_spec_tensorPower A A' k
-  have hT := GlobalTheory.T.tateTwistCohomology_laurent_vanishing_finite_algebra q n hyp A hSH hq (PiTensorProduct A fun _ : Fin (k + 1) => A')
-    (finite_piTensorProduct_const A A' (Fin (k + 1))) s i hs hsn
+  have hT :=
+    GlobalTheory.T.tateTwistCohomology_laurent_vanishing_finite_algebra q n hyp A hSH hq
+      (PiTensorProduct A fun _ : Fin (k + 1) => A')
+      (finite_piTensorProduct_const A A' (Fin (k + 1))) s i hs hsn
   haveI : Subsingleton (Ht q (disc.obj (yoneda.obj (Spec (CommRingCat.of
     (LaurentPolynomial (PiTensorProduct A fun _ : Fin (k + 1) => A')))))) s i) := hT
   let f := disc.mapIso e

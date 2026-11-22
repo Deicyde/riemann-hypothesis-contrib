@@ -11,9 +11,9 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem finSigmaFinEquiv_val_eq_range {s : ℕ} (t : Fin s → ℕ) (x : (a : Fin s) × Fin (t a)) :
-    ((finSigmaFinEquiv x : Fin (∑ a, t a)) : ℕ) =
-      (∑ i ∈ Finset.range x.1, (fun i : ℕ => if h : i < s then t ⟨i, h⟩ else 0) i) + x.2 := by
+theorem finSigmaFinEquiv_val_eq_range {s : ℕ} (t : Fin s → ℕ) (x : (a : Fin s) × Fin (t a))
+    : ((finSigmaFinEquiv x : Fin (∑ a, t a)) : ℕ)
+      = (∑ i ∈ Finset.range x.1, (fun i : ℕ => if h : i < s then t ⟨i, h⟩ else 0) i) + x.2 := by
   rw [finSigmaFinEquiv_apply]
   congr 1
   rw [← Fin.sum_univ_eq_sum_range]
@@ -22,15 +22,14 @@ theorem finSigmaFinEquiv_val_eq_range {s : ℕ} (t : Fin s → ℕ) (x : (a : Fi
   simp only [hi, dif_pos]
   rfl
 
-theorem finSigmaFinEquiv_lt_of_lex_lt {s : ℕ} (t : Fin s → ℕ) (x y : (a : Fin s) × Fin (t a))
-    (hxy : toLex x < toLex y) :
-    (finSigmaFinEquiv x : Fin (∑ a, t a)) < finSigmaFinEquiv y := by
+theorem finSigmaFinEquiv_lt_of_lex_lt
+    {s : ℕ} (t : Fin s → ℕ) (x y : (a : Fin s) × Fin (t a)) (hxy : toLex x < toLex y)
+    : (finSigmaFinEquiv x : Fin (∑ a, t a)) < finSigmaFinEquiv y := by
   rw [Fin.lt_def, finSigmaFinEquiv_val_eq_range, finSigmaFinEquiv_val_eq_range]
   set t' : ℕ → ℕ := fun i => if h : i < s then t ⟨i, h⟩ else 0 with ht'
   rcases Sigma.Lex.lt_def.mp hxy with h | ⟨h, h2⟩
   · have h' : (x.1 : ℕ) < y.1 := h
-    have hsub : Finset.range (x.1 + 1) ⊆ Finset.range y.1 :=
-      Finset.range_subset_range.mpr h'
+    have hsub : Finset.range (x.1 + 1) ⊆ Finset.range y.1 := Finset.range_subset_range.mpr h'
     have hle : (Finset.range (x.1 + 1)).sum t' ≤ (Finset.range y.1).sum t' :=
       Finset.sum_le_sum_of_subset hsub
     replace hle := (Finset.sum_range_succ t' x.1).symm.trans_le hle
@@ -47,9 +46,9 @@ theorem finSigmaFinEquiv_lt_of_lex_lt {s : ℕ} (t : Fin s → ℕ) (x y : (a : 
     simp only
     omega
 
-theorem finSigmaFinEquiv_symm_strictMono_lex :
-    ∀ (s : ℕ) (t : Fin s → ℕ), StrictMono fun c : Fin (∑ a, t a) =>
-      (toLex (finSigmaFinEquiv.symm c) : Σₗ a, Fin (t a)) := by
+theorem finSigmaFinEquiv_symm_strictMono_lex
+    : ∀ (s : ℕ) (t : Fin s → ℕ),
+      StrictMono fun c : Fin (∑ a, t a) => (toLex (finSigmaFinEquiv.symm c) : Σₗ a, Fin (t a)) := by
   intro s t c d hcd
   by_contra hn
   rw [not_lt] at hn

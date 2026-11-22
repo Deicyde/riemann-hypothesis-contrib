@@ -18,20 +18,24 @@ namespace PieceCon
 
 variable {n : ℕ}
 
-theorem entry_eq_zero_of_comm {ε : Fin n → Bool} {Y : Matrix (Fin n) (Fin n) ℂ}
-    (hY : Y * Jm ε = Jm ε * Y) {a b : Fin n} (hab : ε a ≠ ε b) : Y a b = 0 := by
+theorem entry_eq_zero_of_comm
+    {ε : Fin n → Bool} {Y : Matrix (Fin n) (Fin n) ℂ} (hY : Y * Jm ε = Jm ε * Y)
+    {a b : Fin n} (hab : ε a ≠ ε b)
+    : Y a b = 0 := by
   have h := congrFun (congrFun hY a) b
   simp only [Jm, Matrix.mul_diagonal, Matrix.diagonal_mul] at h
   cases ha : ε a <;> cases hb : ε b
   · exact absurd (ha.trans hb.symm) hab
-  · rw [ha, hb] at h; simp only [Bool.false_eq_true, if_false, if_true] at h
+  · rw [ha, hb] at h
+    simp only [Bool.false_eq_true, if_false, if_true] at h
     linear_combination h / 2
-  · rw [ha, hb] at h; simp only [Bool.false_eq_true, if_false, if_true] at h
+  · rw [ha, hb] at h
+    simp only [Bool.false_eq_true, if_false, if_true] at h
     linear_combination -h / 2
   · exact absurd (ha.trans hb.symm) hab
 
-theorem single_block {ε : Fin n → Bool} {a b : Fin n} (hab : ε a = ε b) :
-    ∀ i j, ε i ≠ ε j → Matrix.single a b (1 : ℂ) i j = 0 := by
+theorem single_block {ε : Fin n → Bool} {a b : Fin n} (hab : ε a = ε b)
+    : ∀ i j, ε i ≠ ε j → Matrix.single a b (1 : ℂ) i j = 0 := by
   intro i j hij
   rw [Matrix.single_apply]
   split_ifs with h
@@ -40,13 +44,13 @@ theorem single_block {ε : Fin n → Bool} {a b : Fin n} (hab : ε a = ε b) :
 
 def blockPart (ε : Fin n → Bool) : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] Matrix (Fin n) (Fin n) ℂ where
   toFun X := Matrix.of fun a b => if ε a = ε b then X a b else 0
-  map_add' X Y := by
-    ext a b; simp only [Matrix.of_apply, Matrix.add_apply]; split_ifs <;> simp
+  map_add' X Y := by ext a b; simp only [Matrix.of_apply, Matrix.add_apply]; split_ifs <;> simp
   map_smul' c X := by
     ext a b; simp only [Matrix.of_apply, Matrix.smul_apply, RingHom.id_apply]; split_ifs <;> simp
 
-theorem blockPart_eq {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ}
-    (hX : ∀ a b, ε a ≠ ε b → X a b = 0) : blockPart ε X = X := by
+theorem blockPart_eq
+    {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : ∀ a b, ε a ≠ ε b → X a b = 0)
+    : blockPart ε X = X := by
   ext a b
   simp only [blockPart, LinearMap.coe_mk, AddHom.coe_mk, Matrix.of_apply]
   split_ifs with h
@@ -61,16 +65,18 @@ def cut (W : Submodule ℂ V) : (V →L[ℂ] V) →L[ℂ] (W →L[ℂ] W) :=
   (ContinuousLinearMap.compL ℂ W V W W.orthogonalProjectionOnto).comp
     ((ContinuousLinearMap.compL ℂ W V V).flip W.subtypeL)
 
-theorem cut_apply (W : Submodule ℂ V) (A : V →L[ℂ] V) (v : W) :
-    cut W A v = W.orthogonalProjectionOnto (A v) := rfl
+theorem cut_apply (W : Submodule ℂ V) (A : V →L[ℂ] V) (v : W)
+    : cut W A v = W.orthogonalProjectionOnto (A v) :=
+  rfl
 
-theorem cut_apply_mem (W : Submodule ℂ V) (A : V →L[ℂ] V) (v : W) (h : A v ∈ W) :
-    ((cut W A v : W) : V) = A v := by
+theorem cut_apply_mem (W : Submodule ℂ V) (A : V →L[ℂ] V) (v : W) (h : A v ∈ W)
+    : ((cut W A v : W) : V) = A v := by
   rw [cut_apply]
-  exact congrArg Subtype.val (Submodule.orthogonalProjectionOnto_mem_subspace_eq_self (K := W) ⟨A v, h⟩)
+  exact congrArg Subtype.val
+    (Submodule.orthogonalProjectionOnto_mem_subspace_eq_self (K := W) ⟨A v, h⟩)
 
-theorem cut_mul (W : Submodule ℂ V) (A B : V →L[ℂ] V) (hB : ∀ v ∈ W, B v ∈ W) :
-    cut W (A * B) = cut W A * cut W B := by
+theorem cut_mul (W : Submodule ℂ V) (A B : V →L[ℂ] V) (hB : ∀ v ∈ W, B v ∈ W)
+    : cut W (A * B) = cut W A * cut W B := by
   ext1 v
   show cut W (A * B) v = cut W A (cut W B v)
   rw [cut_apply, cut_apply, cut_apply_mem W B v (hB v v.2)]
@@ -88,18 +94,17 @@ section Piece
 
 variable {ε : Fin n → Bool} (R : KRep ε)
 
-theorem op_mul (k k' : KG ε) : R.op (k * k') = R.op k * R.op k' := by
-  simp [KRep.op, map_mul]
+theorem op_mul (k k' : KG ε) : R.op (k * k') = R.op k * R.op k' := by simp [KRep.op, map_mul]
 
-theorem op_one : R.op 1 = 1 := by
-  simp [KRep.op, map_one]
+theorem op_one : R.op 1 = 1 := by simp [KRep.op, map_one]
 
 theorem op_inv (k : KG ε) : R.op k⁻¹ = star (R.op k) := by
   simp [KRep.op, map_inv, ← Unitary.star_eq_inv, Unitary.coe_star]
 
-theorem dτ_mem {W : Submodule ℂ R.V} (hW : Formalism.REAL.KStable ε R.units W)
-    {X : Matrix (Fin n) (Fin n) ℂ} (hX : ∀ a b, ε a ≠ ε b → X a b = 0) :
-    ∀ v ∈ W, R.dτ X v ∈ W := by
+theorem dτ_mem
+    {W : Submodule ℂ R.V} (hW : Formalism.REAL.KStable ε R.units W)
+    {X : Matrix (Fin n) (Fin n) ℂ} (hX : ∀ a b, ε a ≠ ε b → X a b = 0)
+    : ∀ v ∈ W, R.dτ X v ∈ W := by
   intro v hv
   set_option synthInstance.maxHeartbeats 100000 in
     rw [Matrix.matrix_eq_sum_single X, map_sum, _root_.sum_apply]
@@ -128,16 +133,17 @@ theorem star_cut (k : KG ε) : star (cut W (R.op k)) = cut W (R.op k⁻¹) := by
     ContinuousLinearMap.adjoint_inner_left]
 
 theorem cut_mem_unitary (k : KG ε) : cut W (R.op k) ∈ unitary (W →L[ℂ] W) := by
-  rw [Unitary.mem_iff, star_cut R hτ, ← cut_mul W _ _ (hτ k), ← cut_mul W _ _ (hτ k⁻¹),
-    ← op_mul, ← op_mul, inv_mul_cancel, mul_inv_cancel, op_one, cut_one]
+  rw [Unitary.mem_iff, star_cut R hτ, ← cut_mul W _ _ (hτ k), ← cut_mul W _ _ (hτ k⁻¹), ← op_mul,
+    ← op_mul, inv_mul_cancel, mul_inv_cancel, op_one, cut_one]
   exact ⟨rfl, rfl⟩
 
 def tauW : KG ε →* unitary (W →L[ℂ] W) where
   toFun k := ⟨cut W (R.op k), cut_mem_unitary R hτ k⟩
   map_one' := Subtype.ext (by simp only [op_one, cut_one]; rfl)
-  map_mul' k k' := Subtype.ext (by
-    simp only [op_mul]
-    exact cut_mul W _ _ (hτ k'))
+  map_mul' k k' :=
+    Subtype.ext (by
+      simp only [op_mul]
+      exact cut_mul W _ _ (hτ k'))
 
 theorem tauW_coe (k : KG ε) : ((tauW R hτ k : unitary (W →L[ℂ] W)) : W →L[ℂ] W) = cut W (R.op k) :=
   rfl
@@ -151,16 +157,18 @@ end Piece
 
 end PieceCon
 
-
 open PieceCon in
-def pieceKType {n : ℕ} {ε : Fin n → Bool} (R : KRep ε)
-    (hS : KRepStableStatement) (hR : KRepRelStatement) (μ : Fin n → ℝ) (x : R.V) (hx : x ≠ 0)
-    (hhi : Formalism.REAL.KHighest ε R.units μ x) : KType ε μ :=
+def pieceKType
+    {n : ℕ} {ε : Fin n → Bool} (R : KRep ε)
+    (hS : KRepStableStatement) (hR : KRepRelStatement)
+    (μ : Fin n → ℝ) (x : R.V) (hx : x ≠ 0) (hhi : Formalism.REAL.KHighest ε R.units μ x)
+    : KType ε μ :=
   let W := Formalism.REAL.kSpan ε R.units x
   have hK : Formalism.REAL.KStable ε R.units W := Formalism.REAL.isCompactInvariant_compactSpan x
   have hτ : ∀ k : KG ε, ∀ v ∈ W, R.op k v ∈ W := (hS n ε R W).mpr hK
   have hxW : x ∈ W := Formalism.REAL.mem_compactSpan x
-  { V := W
+  {
+    V := W
     τ := tauW R hτ
     cont := tauW_cont R hτ
     irred := by
@@ -175,7 +183,8 @@ def pieceKType {n : ℕ} {ε : Fin n → Bool} (R : KRep ε)
       have hSK : Formalism.REAL.KStable ε R.units S := (hS n ε R S).mp hSτ
       have hle : S ≤ W := Submodule.map_subtype_le W W'
       have hinj := Submodule.map_injective_of_injective W.injective_subtype
-      rcases Formalism.REAL.kIrr R.V n ε R.units μ x inferInstance (hR n ε R).1 (hR n ε R).2 hhi S hle hSK
+      rcases Formalism.REAL.kIrr R.V n ε R.units μ x inferInstance (hR n ε R).1 (hR n ε R).2 hhi S
+          hle hSK
         with h | h
       · left
         apply hinj
@@ -189,7 +198,8 @@ def pieceKType {n : ℕ} {ε : Fin n → Bool} (R : KRep ε)
     hasDeriv := by
       intro X hX γ hγ
       have hb : blockPart ε X = X := blockPart_eq fun a b h => entry_eq_zero_of_comm hX.2 h
-      have hd := ((cut W).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ) (R.hasDeriv X hX γ hγ)
+      have hd :=
+        ((cut W).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt (0 : ℝ) (R.hasDeriv X hX γ hγ)
       show HasDerivAt (fun t => cut W (R.op (γ t))) (cut W (R.dτ (blockPart ε X))) 0
       rw [hb]
       simpa [Function.comp_def] using hd
@@ -218,8 +228,8 @@ def pieceKType {n : ℕ} {ε : Fin n → Bool} (R : KRep ε)
       rw [hb, cut_apply_mem W _ _ (dτ_mem R hK (single_block hε) _ (W.smul_mem _ hxW))]
       simp only [map_smul, Submodule.coe_zero]
       have h1 : R.dτ (Matrix.single a b 1) x = 0 := hhi.2 a b hab hε
-      rw [h1, smul_zero] }
-
+      rw [h1, smul_zero]
+  }
 
 open PieceCon in
 theorem kRepPiece_of (hR : KRepRelStatement) (hS : KRepStableStatement) : KRepPieceStatement := by

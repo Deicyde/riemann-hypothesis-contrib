@@ -23,14 +23,16 @@ theorem BlowUpOverLocCentreDom.proof : BlowUpOverLocCentreDom.Statement.{u} := b
   have hW : W.IsPrime := hWmin.1.1
   have hPW : P ≤ W := le_sup_left.trans hWmin.1.2
   obtain ⟨V, hBV, hnV⟩ := Ideal.image_subset_nonunits_valuationSubring 𝔫 h𝔫.ne_top
-  obtain ⟨W', hp, hh, hr, hb, hc, hloc⟩ := exists_blowUp_centre (J := J) P W hP.multiProj.multiHomog hW hPW
-    hWrel N u hu hu' V ((homLocRing_le_blowUpOverLoc P W u).trans hBV)
+  obtain ⟨W', hp, hh, hr, hb, hc, hloc⟩ :=
+    exists_blowUp_centre (J := J) P W hP.multiProj.multiHomog hW hPW hWrel N u hu hu' V
+      ((homLocRing_le_blowUpOverLoc P W u).trans hBV)
   have h : blowUpOverLoc P W u ≤ blowUpLocRing P u W' := iInf₂_le W' ⟨hp, hh, hr, hb, hc⟩
   refine ⟨W', hp, hh, hr, hb, hc, h, fun y hy hunit => ?_⟩
   obtain ⟨w, hw⟩ := hunit
-  obtain ⟨hyV, hymax⟩ := (ValuationSubring.mem_nonunits_iff_exists_mem_maximalIdeal (A := V)).1
-    (hnV ⟨y, hy, rfl⟩)
-  have hinv : ((w⁻¹ : (blowUpLocRing P u W')ˣ) : FractionRing (MRing ι O ⧸ P)) ∈ V := hloc ((w⁻¹ : (blowUpLocRing P u W')ˣ) : blowUpLocRing P u W').2
+  obtain ⟨hyV, hymax⟩ :=
+    (ValuationSubring.mem_nonunits_iff_exists_mem_maximalIdeal (A := V)).1 (hnV ⟨y, hy, rfl⟩)
+  have hinv : ((w⁻¹ : (blowUpLocRing P u W')ˣ) : FractionRing (MRing ι O ⧸ P)) ∈ V :=
+    hloc ((w⁻¹ : (blowUpLocRing P u W')ˣ) : blowUpLocRing P u W').2
   have hmul : (y : FractionRing (MRing ι O ⧸ P)) * ((w⁻¹ : (blowUpLocRing P u W')ˣ) : _) = 1 := by
     have h1 := congrArg Subtype.val w.mul_inv
     rw [hw] at h1

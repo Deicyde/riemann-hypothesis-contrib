@@ -293,7 +293,8 @@ end Mat2
 
 section Main
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [Module (NumberField.RingOfIntegers K) V] [IsScalarTower (NumberField.RingOfIntegers K) K V]
 
 lemma isAddTorsionFree_ringOfIntegers_submodule (L : Submodule (NumberField.RingOfIntegers K) V) :

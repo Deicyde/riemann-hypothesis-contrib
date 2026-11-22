@@ -16,16 +16,18 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 
 variable {n : ℕ}
 
-def nab (ε : Fin n → Bool) (a b : Fin n) : ℕ := (univ.filter fun c : Fin n => a < c ∧ c < b ∧ ε c ≠ ε a).card
+def nab (ε : Fin n → Bool) (a b : Fin n) : ℕ :=
+  (univ.filter fun c : Fin n => a < c ∧ c < b ∧ ε c ≠ ε a).card
 
-theorem rhoN_sub_nab (ε : Fin n → Bool) {a b : Fin n} (hab : a < b) (he : ε a = ε b) :
-    rhoN ε a - rhoN ε b = (nab ε a b : ℝ) := by
+theorem rhoN_sub_nab (ε : Fin n → Bool) {a b : Fin n} (hab : a < b) (he : ε a = ε b)
+    : rhoN ε a - rhoN ε b = (nab ε a b : ℝ) := by
   unfold rhoN nab
   simp only [Finset.card_filter, Nat.cast_sum, Nat.cast_ite, Nat.cast_one, Nat.cast_zero]
-  have key : ∀ c : Fin n,
-      ((if a < c ∧ ε c ≠ ε a then (1:ℝ) else 0) - (if c < a ∧ ε c ≠ ε a then 1 else 0)) -
-        ((if b < c ∧ ε c ≠ ε b then 1 else 0) - (if c < b ∧ ε c ≠ ε b then 1 else 0)) =
-      2 * (if a < c ∧ c < b ∧ ε c ≠ ε a then 1 else 0) := by
+  have key
+      : ∀ c : Fin n,
+        ((if a < c ∧ ε c ≠ ε a then (1 : ℝ) else 0) - (if c < a ∧ ε c ≠ ε a then 1 else 0))
+            - ((if b < c ∧ ε c ≠ ε b then 1 else 0) - (if c < b ∧ ε c ≠ ε b then 1 else 0))
+          = 2 * (if a < c ∧ c < b ∧ ε c ≠ ε a then 1 else 0) := by
     intro c
     by_cases hc : ε c = ε a
     · have hcb : ε c = ε b := hc.trans he
@@ -46,10 +48,10 @@ theorem rhoN_sub_nab (ε : Fin n → Bool) {a b : Fin n} (hab : a < b) (he : ε 
   simp only [Finset.sum_sub_distrib, ← Finset.mul_sum] at hsum
   linarith
 
-theorem lemma7 {ε : Fin n → Bool} {lam : Fin n → ℝ} (T : KType ε (lowK ε lam)) :
-    (Module.finrank ℂ T.V : ℝ) =
-      (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b ∧ ε a = ε b), (lam a - lam b + (nab ε a b : ℝ))) /
-        ((∏ i ∈ range (pOf ε), (i.factorial : ℝ)) * ∏ i ∈ range (qOf ε), (i.factorial : ℝ)) := by
+theorem lemma7 {ε : Fin n → Bool} {lam : Fin n → ℝ} (T : KType ε (lowK ε lam))
+    : (Module.finrank ℂ T.V : ℝ)
+      = (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b ∧ ε a = ε b), (lam a - lam b + (nab ε a b : ℝ)))
+        / ((∏ i ∈ range (pOf ε), (i.factorial : ℝ)) * ∏ i ∈ range (qOf ε), (i.factorial : ℝ)) := by
   rw [HW.hwfin_weyl T]
   congr 1
   · refine Finset.prod_congr rfl fun a _ => Finset.prod_congr rfl fun b hb => ?_

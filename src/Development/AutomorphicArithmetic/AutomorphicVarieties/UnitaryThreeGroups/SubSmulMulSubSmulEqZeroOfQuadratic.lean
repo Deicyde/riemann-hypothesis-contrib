@@ -5,12 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp
+  Matrix IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
 namespace UpperTheory.V.U3.EtaMu
 
-private def Fx {Ω : Type} [Field Ω] (s : Ω →+* Ω) (a : ℤ) : Prop := ∀ δ : Ω, δ ^ 2 = (a : Ω) → s δ = δ
+private def Fx {Ω : Type} [Field Ω] (s : Ω →+* Ω) (a : ℤ) : Prop :=
+  ∀ δ : Ω, δ ^ 2 = (a : Ω) → s δ = δ
 
 section
 variable {Ω : Type} [Field Ω] {s : Ω →+* Ω}
@@ -42,8 +45,9 @@ private theorem fx_four : Fx s 4 := fx_of (x := 2) (by norm_num) (map_ofNat s 2)
 
 variable {M : ℕ}
 
-private theorem fix_dvd (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) {n : ℕ} (hn : n ∣ M) {ζ : Ω} (hζ : ζ ^ n = 1) :
-    s ζ = ζ := by
+private theorem fix_dvd
+    (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) {n : ℕ} (hn : n ∣ M) {ζ : Ω} (hζ : ζ ^ n = 1)
+    : s ζ = ζ := by
   obtain ⟨k, rfl⟩ := hn
   exact h ζ (by rw [pow_mul, hζ, one_pow])
 
@@ -54,23 +58,30 @@ private theorem fx_neg_one (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (h4 : 4 �
   rw [this, hδ]
   norm_num
 
-private theorem fx_two [IsAlgClosed Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (h8 : 8 ∣ M) : Fx s 2 := by
+private theorem fx_two [IsAlgClosed Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (h8 : 8 ∣ M)
+    : Fx s 2 := by
   obtain ⟨i, hi⟩ := IsAlgClosed.exists_pow_nat_eq (-1 : Ω) (by norm_num : 0 < 2)
   obtain ⟨η, hη⟩ := IsAlgClosed.exists_pow_nat_eq i (by norm_num : 0 < 2)
   have hη8 : η ^ 8 = 1 := by
-    calc η ^ 8 = ((η ^ 2) ^ 2) ^ 2 := by ring
+    calc
+      η ^ 8
+        = ((η ^ 2) ^ 2) ^ 2 := by ring
       _ = 1 := by rw [hη, hi]; norm_num
   have h14 : η ^ 14 = -i := by
-    calc η ^ 14 = ((η ^ 2) ^ 2) ^ 3 * η ^ 2 := by ring
+    calc
+      η ^ 14
+        = ((η ^ 2) ^ 2) ^ 3 * η ^ 2 := by ring
       _ = -i := by rw [hη, hi]; ring
   have hsη : s η = η := fix_dvd h h8 hη8
   refine fx_of (x := η + η ^ 7) ?_ ?_
-  · calc (η + η ^ 7) ^ 2 = η ^ 2 + 2 * η ^ 8 + η ^ 14 := by ring
+  · calc
+      (η + η ^ 7) ^ 2
+        = η ^ 2 + 2 * η ^ 8 + η ^ 14 := by ring
       _ = ((2 : ℤ) : Ω) := by rw [hη, hη8, h14]; push_cast; ring
   · rw [map_add (f := _), map_pow, hsη]
 
-private theorem fx_odd [IsAlgClosed Ω] [CharZero Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (n : ℕ) :
-    n % 2 = 1 → n ∣ M → ∃ a : ℤ, a % 4 = 1 ∧ a.natAbs = n ∧ Fx s a := by
+private theorem fx_odd [IsAlgClosed Ω] [CharZero Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (n : ℕ)
+    : n % 2 = 1 → n ∣ M → ∃ a : ℤ, a % 4 = 1 ∧ a.natAbs = n ∧ Fx s a := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     intro hn2 hnM
@@ -110,8 +121,7 @@ private theorem fx_odd [IsAlgClosed Ω] [CharZero Ω] (h : ∀ ζ : Ω, ζ ^ M =
       have hsx : s x = x := by
         have := (hall x hx).2 s 1 hsz
         simpa [legendreSym.at_one] using this
-      have hps : (CF.pStar p).natAbs = p := by
-        simp [CF.pStar, Int.natAbs_mul, Int.natAbs_pow]
+      have hps : (CF.pStar p).natAbs = p := by simp [CF.pStar, Int.natAbs_mul, Int.natAbs_pow]
       have hp4 : CF.pStar p % 4 = 1 := by
         obtain ⟨a, ha⟩ := hp.odd_of_ne_two hp2
         clear_value p
@@ -129,8 +139,10 @@ private theorem fx_odd [IsAlgClosed Ω] [CharZero Ω] (h : ∀ ζ : Ω, ζ ^ M =
         rfl
       · rw [Int.natAbs_mul, hps, ha'abs, hk]
 
-private theorem fx_disc [IsAlgClosed Ω] [CharZero Ω] {d : ℤ} (hd0 : d ≠ 0) (hd : d % 4 = 0 ∨ d % 4 = 1)
-    (h : ∀ ζ : Ω, ζ ^ d.natAbs = 1 → s ζ = ζ) : Fx s d := by
+private theorem fx_disc
+    [IsAlgClosed Ω] [CharZero Ω]
+    {d : ℤ} (hd0 : d ≠ 0) (hd : d % 4 = 0 ∨ d % 4 = 1) (h : ∀ ζ : Ω, ζ ^ d.natAbs = 1 → s ζ = ζ)
+    : Fx s d := by
   have hM0 : d.natAbs ≠ 0 := Int.natAbs_ne_zero.mpr hd0
   obtain ⟨j, u, hu, hdu⟩ := Nat.exists_eq_two_pow_mul_odd hM0
   obtain ⟨a, ha4, haabs, ha⟩ := fx_odd h u (Nat.odd_iff.mp hu) (Dvd.intro_left _ hdu.symm)
@@ -172,9 +184,10 @@ private theorem fx_disc [IsAlgClosed Ω] [CharZero Ω] {d : ℤ} (hd0 : d ≠ 0)
 
 end
 
-private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2) :
-    (discr K % 4 = 0 ∨ discr K % 4 = 1) ∧ ∃ δ : K, δ ^ 2 = (discr K : K) ∧
-      ∀ x : K, ∃ a b : ℚ, 2 * x * δ = (a : K) * δ + (b : K) := by
+private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic
+    {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
+    : (discr K % 4 = 0 ∨ discr K % 4 = 1)
+      ∧ ∃ δ : K, δ ^ 2 = (discr K : K) ∧ ∀ x : K, ∃ a b : ℚ, 2 * x * δ = (a : K) * δ + (b : K) := by
   classical
   haveI : Algebra.IsQuadraticExtension ℚ K := { finrank_eq_two' := hK }
   haveI : IsGalois ℚ K := inferInstance
@@ -203,7 +216,7 @@ private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] 
         exact hσ1 (mul_left_cancel (h.trans (mul_one σ).symm))
     intro x
     rw [← AlgEquiv.mul_apply, hsq, AlgEquiv.one_apply]
-  have hother : ∀ τ : K ≃ₐ[ℚ] K, ¬ (τ ≠ 1 ∧ τ ≠ σ) := by
+  have hother : ∀ τ : K ≃ₐ[ℚ] K, ¬(τ ≠ 1 ∧ τ ≠ σ) := by
     intro τ hτ
     rcases hall τ with h | h
     · exact hτ.1 h
@@ -225,10 +238,14 @@ private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] 
   let e := Fintype.equivFinOfCardEq hcardι
   obtain ⟨u, hu_def⟩ : ∃ u, u = integralBasis K (e.symm 0) := ⟨_, rfl⟩
   obtain ⟨v, hv_def⟩ : ∃ v, v = integralBasis K (e.symm 1) := ⟨_, rfl⟩
-  have hD : ((discr K : ℤ) : ℚ) = Algebra.trace ℚ K (u * u) * Algebra.trace ℚ K (v * v) -
-      Algebra.trace ℚ K (u * v) * Algebra.trace ℚ K (v * u) := by
-    rw [coe_discr, ← Algebra.discr_reindex ℚ (integralBasis K) e, Algebra.discr_def, Matrix.det_fin_two]
-    simp only [Algebra.traceMatrix_apply, Algebra.traceForm_apply, Function.comp_apply, hu_def, hv_def]
+  have hD
+      : ((discr K : ℤ) : ℚ)
+        = Algebra.trace ℚ K (u * u) * Algebra.trace ℚ K (v * v)
+          - Algebra.trace ℚ K (u * v) * Algebra.trace ℚ K (v * u) := by
+    rw [coe_discr, ← Algebra.discr_reindex ℚ (integralBasis K) e, Algebra.discr_def,
+      Matrix.det_fin_two]
+    simp only [Algebra.traceMatrix_apply, Algebra.traceForm_apply, Function.comp_apply, hu_def,
+      hv_def]
   have hu : IsIntegral ℤ u := by
     rw [hu_def, integralBasis_apply]
     exact RingOfIntegers.isIntegral_coe _
@@ -242,8 +259,10 @@ private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] 
   have hP : IsIntegral ℤ (u * σ v) := hu.mul (map_isIntegral_int σ hv)
   obtain ⟨α, hα⟩ := hintZ _ (Algebra.isIntegral_trace (L := ℚ) hP)
   obtain ⟨β, hβ⟩ := hintZ _ (Algebra.isIntegral_norm ℚ hP)
-  have hDK : ((discr K : ℤ) : K) = (u * u + σ (u * u)) * (v * v + σ (v * v)) -
-      (u * v + σ (u * v)) * (v * u + σ (v * u)) := by
+  have hDK
+      : ((discr K : ℤ) : K)
+        = (u * u + σ (u * u)) * (v * v + σ (v * v))
+          - (u * v + σ (u * v)) * (v * u + σ (v * u)) := by
     have h := congrArg (algebraMap ℚ K) hD
     simp only [map_sub, map_mul, htr, map_intCast] at h
     rw [h]
@@ -288,10 +307,14 @@ private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] 
   rw [h1, h2]
   ring
 
-private theorem cls_eq_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {N : ℕ} [NeZero N] (s : G ℚ Ω)
-    (h : ∀ ζ : Ω, ζ ^ N = 1 → s ζ = ζ) : Chr.cls ℚ Ω N s = 1 := by
-  have key : ∀ t ∈ rootsOfUnity N Ω,
-      (MulSemiringAction.toRingAut (G ℚ Ω) Ω s) (t : Ω) = (t : Ω) ^ (1 : ZMod N).val := by
+private theorem cls_eq_one
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {N : ℕ} [NeZero N]
+    (s : G ℚ Ω) (h : ∀ ζ : Ω, ζ ^ N = 1 → s ζ = ζ)
+    : Chr.cls ℚ Ω N s = 1 := by
+  have key
+      : ∀ t ∈ rootsOfUnity N Ω,
+        (MulSemiringAction.toRingAut (G ℚ Ω) Ω s) (t : Ω) = (t : Ω) ^ (1 : ZMod N).val := by
     intro t ht
     have htN : (t : Ω) ^ N = 1 := by
       rw [mem_rootsOfUnity] at ht
@@ -313,9 +336,12 @@ private theorem cls_eq_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure �
 end UpperTheory.V.U3.EtaMu
 
 open UpperTheory.V.U3.EtaMu in
-theorem UpperTheory.V.U3.eta_killsMu :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
-      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ), Af.KillsMu (discr K).natAbs D.η ∧ 1 ≤ (discr K).natAbs ∧ Af.KillsMu N (Chr.dirG ℚ Ω ψ) ∧ Af.KillsMu N (Chr.dirG ℚ Ω (comp l ψ)) := by
+theorem UpperTheory.V.U3.eta_killsMu
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K]
+        [Algebra K Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ}
+        {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ),
+      Af.KillsMu (discr K).natAbs D.η ∧ 1 ≤ (discr K).natAbs ∧ Af.KillsMu N (Chr.dirG ℚ Ω ψ)
+        ∧ Af.KillsMu N (Chr.dirG ℚ Ω (comp l ψ)) := by
   intro Ω _ _ _ K _ _ _ l _ c N _ e ψ D
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hK := D.gd.quad
@@ -326,8 +352,7 @@ theorem UpperTheory.V.U3.eta_killsMu :
     have hmem : s ∈ galOf ℚ K Ω := by
       rw [mem_galOf]
       have hfx : Fx (s : Ω →+* Ω) (discr K) := fx_disc hd0 hd4 (fun ζ hζ => by simpa using hs ζ hζ)
-      have hδΩ : (algebraMap K Ω δ) ^ 2 = ((discr K : ℤ) : Ω) := by
-        rw [← map_pow, hδ, map_intCast]
+      have hδΩ : (algebraMap K Ω δ) ^ 2 = ((discr K : ℤ) : Ω) := by rw [← map_pow, hδ, map_intCast]
       have hsδ : s (algebraMap K Ω δ) = algebraMap K Ω δ := by simpa using hfx _ hδΩ
       have hδne : algebraMap K Ω δ ≠ 0 := by
         intro h0

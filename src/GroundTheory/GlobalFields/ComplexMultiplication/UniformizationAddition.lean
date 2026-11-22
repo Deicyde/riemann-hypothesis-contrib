@@ -27,21 +27,22 @@ lemma hasDerivAt_derivWeierstrassP {z : ℂ} (hz : z ∉ L.lattice) :
     HasDerivAt ℘'[L] (deriv ℘'[L] z) z :=
   (L.analyticOnNhd_derivWeierstrassP z hz).differentiableAt.hasDerivAt
 
-theorem deriv_derivWeierstrassP {z : ℂ} (hz : z ∉ L.lattice) :
-    deriv ℘'[L] z = 6 * ℘[L] z ^ 2 - L.g₂ / 2 := by
+theorem deriv_derivWeierstrassP {z : ℂ} (hz : z ∉ L.lattice)
+    : deriv ℘'[L] z = 6 * ℘[L] z ^ 2 - L.g₂ / 2 := by
   have hopen : IsOpen (L.lattice : Set ℂ)ᶜ := L.isClosed_lattice.isOpen_compl
-  have key : ∀ u ∉ L.lattice,
-      ℘'[L] u * (2 * deriv ℘'[L] u - (12 * ℘[L] u ^ 2 - L.g₂)) = 0 := by
+  have key : ∀ u ∉ L.lattice, ℘'[L] u * (2 * deriv ℘'[L] u - (12 * ℘[L] u ^ 2 - L.g₂)) = 0 := by
     intro u hu
     have h1 : HasDerivAt (℘'[L] ^ 2) (2 * ℘'[L] u * deriv ℘'[L] u) u :=
       ((hasDerivAt_derivWeierstrassP hu).pow 2).congr_deriv (by norm_num)
-    have h2 : HasDerivAt (fun v ↦ 4 * ℘[L] v ^ 3 - L.g₂ * ℘[L] v - L.g₃)
+    have h2 : HasDerivAt
+        (fun v ↦ 4 * ℘[L] v ^ 3 - L.g₂ * ℘[L] v - L.g₃)
         ((12 * ℘[L] u ^ 2 - L.g₂) * ℘'[L] u) u := by
       have hp := hasDerivAt_weierstrassP hu
       exact ((((hp.pow 3).const_mul 4).sub (hp.const_mul L.g₂)).sub_const L.g₃).congr_deriv
         (by norm_num; ring)
-    have heq : (℘'[L] ^ 2) =ᶠ[𝓝 u]
-        (fun v ↦ 4 * ℘[L] v ^ 3 - L.g₂ * ℘[L] v - L.g₃) := by
+    have heq
+        : (℘'[L] ^ 2) =ᶠ[𝓝 u]
+          (fun v ↦ 4 * ℘[L] v ^ 3 - L.g₂ * ℘[L] v - L.g₃) := by
       filter_upwards [hopen.mem_nhds hu] with v hv
       exact L.derivWeierstrassP_sq v hv
     have := h1.unique (h2.congr_of_eventuallyEq heq)
@@ -60,18 +61,21 @@ theorem deriv_derivWeierstrassP {z : ℂ} (hz : z ∉ L.lattice) :
       · exact absurd h hu1
       · simp only [hD]
         linear_combination h / 2
-    have hlim := tendsto_nhds_unique (hDc.tendsto.mono_left nhdsWithin_le_nhds)
-      (tendsto_const_nhds.congr' (hev.mono fun u hu ↦ hu.symm))
+    have hlim :=
+      tendsto_nhds_unique (hDc.tendsto.mono_left nhdsWithin_le_nhds)
+        (tendsto_const_nhds.congr' (hev.mono fun u hu ↦ hu.symm))
     simp only [hD] at hlim
     linear_combination hlim
   · rcases mul_eq_zero.1 (key z hz) with h | h
     · exact absurd h h0
     · linear_combination h / 2
 
-theorem meromorphicOrderAt_nonneg_of_simple_pole {f : ℂ → ℂ} (hf : IsEllipticFunction L f)
+theorem meromorphicOrderAt_nonneg_of_simple_pole
+    {f : ℂ → ℂ} (hf : IsEllipticFunction L f)
     {p : ℂ} (hp : ((-1 : ℤ) : WithTop ℤ) ≤ meromorphicOrderAt f p)
-    (ho : ∀ z, z - p ∉ L.lattice → 0 ≤ meromorphicOrderAt f z) (z : ℂ) :
-    0 ≤ meromorphicOrderAt f z := by
+    (ho : ∀ z, z - p ∉ L.lattice → 0 ≤ meromorphicOrderAt f z)
+    (z : ℂ)
+    : 0 ≤ meromorphicOrderAt f z := by
   have hdeg : degree L f ≤ 1 := by
     rw [degree, finsum_eq_single _ (Torus.mk L p) (fun x hx ↦ ?_)]
     · rw [torusOrder_mk hf]
@@ -84,13 +88,12 @@ theorem meromorphicOrderAt_nonneg_of_simple_pole {f : ℂ → ℂ} (hf : IsEllip
         omega
     · obtain ⟨y, rfl⟩ := Torus.mk_surjective L x
       rw [torusOrder_mk hf]
-      exact toNat_neg_untopD_eq_zero_of_nonneg
-        (ho y fun h ↦ hx ((Torus.mk_eq_mk_iff L).2 h))
+      exact toNat_neg_untopD_eq_zero_of_nonneg (ho y fun h ↦ hx ((Torus.mk_eq_mk_iff L).2 h))
   have h0 : degree L f = 0 := by
     have := degree_ne_one hf
     omega
-  have hall := eq_zero_of_finsum_eq_zero_nat (finite_support_toNat_neg_torusOrder hf) h0
-    (Torus.mk L z)
+  have hall :=
+    eq_zero_of_finsum_eq_zero_nat (finite_support_toNat_neg_torusOrder hf) h0 (Torus.mk L z)
   rw [torusOrder_mk hf] at hall
   exact nonneg_of_toNat_neg_untopD_eq_zero hall
 
@@ -99,13 +102,11 @@ lemma eq_of_eventuallyEq_nhdsNE {f g : ℂ → ℂ} {x : ℂ} (hf : ContinuousAt
   tendsto_nhds_unique (hf.tendsto.mono_left nhdsWithin_le_nhds)
     ((hg.tendsto.mono_left nhdsWithin_le_nhds).congr' h.symm)
 
-
 variable (L) in
 def chordSlope (L : PeriodPair) (z w : ℂ) : ℂ := (℘'[L] z - ℘'[L] w) / (℘[L] z - ℘[L] w)
 
 lemma chordSlope_comm (z w : ℂ) : chordSlope L z w = chordSlope L w z := by
   rw [chordSlope, chordSlope, ← neg_div_neg_eq, neg_sub, neg_sub]
-
 
 variable (L) in
 def addDefect (L : PeriodPair) (w z : ℂ) : ℂ :=
@@ -284,10 +285,10 @@ lemma neg_one_le_meromorphicOrderAt_addDefect_neg {w : ℂ} (hw : w ∉ L.lattic
     have : (0 : ℤ) ≤ 1 + n := by exact_mod_cast hord
     exact_mod_cast (by omega : (-1 : ℤ) ≤ n)
 
-theorem weierstrassP_add_of_two_mul_notMem {z w : ℂ} (hw : w ∉ L.lattice)
-    (h2w : 2 * w ∉ L.lattice) (hz : z ∉ L.lattice) (hzw : z - w ∉ L.lattice)
-    (hzw' : z + w ∉ L.lattice) :
-    ℘[L] (z + w) = chordSlope L z w ^ 2 / 4 - ℘[L] z - ℘[L] w := by
+theorem weierstrassP_add_of_two_mul_notMem
+    {z w : ℂ} (hw : w ∉ L.lattice) (h2w : 2 * w ∉ L.lattice) (hz : z ∉ L.lattice)
+    (hzw : z - w ∉ L.lattice) (hzw' : z + w ∉ L.lattice)
+    : ℘[L] (z + w) = chordSlope L z w ^ 2 / 4 - ℘[L] z - ℘[L] w := by
   have hE := isEllipticFunction_addDefect (L := L) w
   have hw' : -w ∉ L.lattice := fun h ↦ hw (by simpa using neg_mem h)
   have ho : ∀ u, 0 ≤ meromorphicOrderAt (addDefect L w) u := by
@@ -337,33 +338,39 @@ lemma add_add_eq_zero_of_roots {g₂ g₃ x₁ x₂ x₃ : ℂ} (h12 : x₁ ≠ 
     mul_left_cancel₀ (sub_ne_zero.2 h13) (by linear_combination f1 - f3)
   exact mul_left_cancel₀ (sub_ne_zero.2 h23) (by linear_combination (s12 - s13) / 4)
 
-theorem weierstrassP_add {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice)
-    (hzw : z - w ∉ L.lattice) (hzw' : z + w ∉ L.lattice) :
-    ℘[L] (z + w) = chordSlope L z w ^ 2 / 4 - ℘[L] z - ℘[L] w := by
+theorem weierstrassP_add
+    {z w : ℂ}
+    (hz : z ∉ L.lattice) (hw : w ∉ L.lattice) (hzw : z - w ∉ L.lattice) (hzw' : z + w ∉ L.lattice)
+    : ℘[L] (z + w) = chordSlope L z w ^ 2 / 4 - ℘[L] z - ℘[L] w := by
   by_cases h2w : 2 * w ∈ L.lattice
   · by_cases h2z : 2 * z ∈ L.lattice
     · have d1 := derivWeierstrassP_eq_zero_of_two_mul_mem h2z
       have d2 := derivWeierstrassP_eq_zero_of_two_mul_mem h2w
-      have root : ∀ u ∉ L.lattice, 2 * u ∈ L.lattice →
-          4 * ℘[L] u ^ 3 - L.g₂ * ℘[L] u - L.g₃ = 0 := fun u hu h2 ↦ by
+      have root
+          : ∀ u ∉ L.lattice,
+            2 * u ∈ L.lattice → 4 * ℘[L] u ^ 3 - L.g₂ * ℘[L] u - L.g₃ = 0 := fun u hu h2 ↦ by
         rw [← L.derivWeierstrassP_sq u hu, derivWeierstrassP_eq_zero_of_two_mul_mem h2]
         ring
-      have hne : ∀ {a b : ℂ}, a ∉ L.lattice → b ∉ L.lattice → a - b ∉ L.lattice →
-          a + b ∉ L.lattice → ℘[L] a ≠ ℘[L] b := fun ha hb h1 h2 h ↦
+      have hne
+          : ∀ {a b : ℂ},
+            a ∉ L.lattice → b ∉ L.lattice → a - b ∉ L.lattice → a + b ∉ L.lattice
+              → ℘[L] a ≠ ℘[L] b := fun ha hb h1 h2 h ↦
         (sub_mem_or_add_mem_of_weierstrassP_eq ha hb h).elim h1 h2
       have nz : -z ∉ L.lattice := fun h ↦ hz (by simpa using neg_mem h)
       have nw : -w ∉ L.lattice := fun h ↦ hw (by simpa using neg_mem h)
       have a1 : z - (z + w) ∉ L.lattice := by rwa [show z - (z + w) = -w by ring]
-      have a2 : z + (z + w) ∉ L.lattice := fun h ↦ hw (by
-        have := sub_mem h h2z
-        rwa [show z + (z + w) - 2 * z = w by ring] at this)
+      have a2 : z + (z + w) ∉ L.lattice := fun h ↦
+        hw (by
+          have := sub_mem h h2z
+          rwa [show z + (z + w) - 2 * z = w by ring] at this)
       have a3 : w - (z + w) ∉ L.lattice := by rwa [show w - (z + w) = -z by ring]
-      have a4 : w + (z + w) ∉ L.lattice := fun h ↦ hz (by
-        have := sub_mem h h2w
-        rwa [show w + (z + w) - 2 * w = z by ring] at this)
-      have hs := add_add_eq_zero_of_roots (hne hz hw hzw hzw') (hne hz hzw' a1 a2)
-        (hne hw hzw' a3 a4) (root z hz h2z) (root w hw h2w)
-        (root _ hzw' (by rw [mul_add]; exact add_mem h2z h2w))
+      have a4 : w + (z + w) ∉ L.lattice := fun h ↦
+        hz (by
+          have := sub_mem h h2w
+          rwa [show w + (z + w) - 2 * w = z by ring] at this)
+      have hs :=
+        add_add_eq_zero_of_roots (hne hz hw hzw hzw') (hne hz hzw' a1 a2) (hne hw hzw' a3 a4)
+          (root z hz h2z) (root w hw h2w) (root _ hzw' (by rw [mul_add]; exact add_mem h2z h2w))
       rw [chordSlope, d1, d2, sub_self, zero_div]
       linear_combination hs
     · have hwz : w - z ∉ L.lattice := fun h ↦ hzw (by simpa using neg_mem h)
@@ -388,9 +395,10 @@ lemma derivAdd_algebra (x₁ x₂ y₁ y₂ g₂ g₃ : ℂ) (hD : x₁ - x₂ �
   rw [key, E₁, E₂]
   ring
 
-theorem derivWeierstrassP_add {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice)
-    (hzw : z - w ∉ L.lattice) (hzw' : z + w ∉ L.lattice) :
-    ℘'[L] (z + w) = -(chordSlope L z w * (℘[L] (z + w) - ℘[L] z) + ℘'[L] z) := by
+theorem derivWeierstrassP_add
+    {z w : ℂ}
+    (hz : z ∉ L.lattice) (hw : w ∉ L.lattice) (hzw : z - w ∉ L.lattice) (hzw' : z + w ∉ L.lattice)
+    : ℘'[L] (z + w) = -(chordSlope L z w * (℘[L] (z + w) - ℘[L] z) + ℘'[L] z) := by
   have hopen : IsOpen {u : ℂ | u ∉ L.lattice ∧ u - w ∉ L.lattice ∧ u + w ∉ L.lattice} := by
     have h := L.isClosed_lattice.isOpen_compl
     exact h.inter ((h.preimage (continuous_sub_right w)).inter
@@ -403,22 +411,29 @@ theorem derivWeierstrassP_add {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.l
   have hd : HasDerivAt ℘'[L] (6 * ℘[L] z ^ 2 - L.g₂ / 2) z := by
     rw [← deriv_derivWeierstrassP hz]
     exact hasDerivAt_derivWeierstrassP hz
-  have hm : HasDerivAt (fun u ↦ chordSlope L u w)
-      (((6 * ℘[L] z ^ 2 - L.g₂ / 2) * (℘[L] z - ℘[L] w) - (℘'[L] z - ℘'[L] w) * ℘'[L] z) /
-        (℘[L] z - ℘[L] w) ^ 2) z :=
+  have hm : HasDerivAt
+      (fun u ↦ chordSlope L u w)
+      (((6 * ℘[L] z ^ 2 - L.g₂ / 2) * (℘[L] z - ℘[L] w) - (℘'[L] z - ℘'[L] w) * ℘'[L] z)
+        / (℘[L] z - ℘[L] w) ^ 2)
+      z :=
     (hd.sub_const (℘'[L] w)).div (hp.sub_const (℘[L] w)) hne
-  have hR : HasDerivAt (fun u ↦ chordSlope L u w ^ 2 / 4 - ℘[L] u - ℘[L] w)
-      (2 * chordSlope L z w * (((6 * ℘[L] z ^ 2 - L.g₂ / 2) * (℘[L] z - ℘[L] w) -
-        (℘'[L] z - ℘'[L] w) * ℘'[L] z) / (℘[L] z - ℘[L] w) ^ 2) / 4 - ℘'[L] z) z :=
+  have hR : HasDerivAt
+      (fun u ↦ chordSlope L u w ^ 2 / 4 - ℘[L] u - ℘[L] w)
+      (2 * chordSlope L z w
+          * (((6 * ℘[L] z ^ 2 - L.g₂ / 2) * (℘[L] z - ℘[L] w) - (℘'[L] z - ℘'[L] w) * ℘'[L] z)
+            / (℘[L] z - ℘[L] w) ^ 2)
+          / 4
+        - ℘'[L] z)
+      z :=
     ((((hm.pow 2).div_const 4).sub hp).sub_const (℘[L] w)).congr_deriv (by norm_num)
-  have heq : (fun u ↦ ℘[L] (u + w)) =ᶠ[𝓝 z]
-      (fun u ↦ chordSlope L u w ^ 2 / 4 - ℘[L] u - ℘[L] w) := by
+  have heq
+      : (fun u ↦ ℘[L] (u + w)) =ᶠ[𝓝 z]
+        (fun u ↦ chordSlope L u w ^ 2 / 4 - ℘[L] u - ℘[L] w) := by
     filter_upwards [hopen.mem_nhds ⟨hz, hzw, hzw'⟩] with u hu
     exact weierstrassP_add hu.1 hw hu.2.1 hu.2.2
   rw [hL.unique (hR.congr_of_eventuallyEq heq), weierstrassP_add hz hw hzw hzw']
   simp only [chordSlope]
   exact derivAdd_algebra _ _ _ _ _ _ hne (L.derivWeierstrassP_sq z hz) (L.derivWeierstrassP_sq w hw)
-
 
 variable (L) in
 def tangentSlope (L : PeriodPair) (w : ℂ) : ℂ := (6 * ℘[L] w ^ 2 - L.g₂ / 2) / ℘'[L] w
@@ -450,36 +465,40 @@ lemma exists_continuousAt_chordSlope {w : ℂ} (hw : w ∉ L.lattice) (h2w : 2 *
     rw [dslope_of_ne _ hz, dslope_of_ne _ hz, slope_def_field, slope_def_field,
       div_div_div_cancel_right₀ hz']
 
-theorem weierstrassP_two_mul {w : ℂ} (hw : w ∉ L.lattice) (h2w : 2 * w ∉ L.lattice) :
-    ℘[L] (2 * w) = tangentSlope L w ^ 2 / 4 - 2 * ℘[L] w := by
+theorem weierstrassP_two_mul {w : ℂ} (hw : w ∉ L.lattice) (h2w : 2 * w ∉ L.lattice)
+    : ℘[L] (2 * w) = tangentSlope L w ^ 2 / 4 - 2 * ℘[L] w := by
   obtain ⟨s, hs, hsw, hev⟩ := exists_continuousAt_chordSlope hw h2w
   have hc : ContinuousAt (fun z ↦ ℘[L] (z + w)) w :=
     (analyticAt_weierstrassP_comp_add (show w + w ∉ L.lattice by rwa [← two_mul])).continuousAt
   have hg : ContinuousAt (fun z ↦ s z ^ 2 / 4 - ℘[L] z - ℘[L] w) w :=
     (((hs.pow 2).div_const 4).sub (L.analyticOnNhd_weierstrassP w hw).continuousAt).sub
       continuousAt_const
-  have := eq_of_eventuallyEq_nhdsNE hc hg (hev.mono fun z ⟨h1, h2, h3, h4⟩ ↦ by
-    simp only
-    rw [weierstrassP_add h1 hw h2 h3, h4])
+  have :=
+    eq_of_eventuallyEq_nhdsNE hc hg
+      (hev.mono fun z ⟨h1, h2, h3, h4⟩ ↦ by
+        simp only
+        rw [weierstrassP_add h1 hw h2 h3, h4])
   simp only [hsw] at this
   rw [two_mul, this]
   ring
 
-theorem derivWeierstrassP_two_mul {w : ℂ} (hw : w ∉ L.lattice) (h2w : 2 * w ∉ L.lattice) :
-    ℘'[L] (2 * w) = -(tangentSlope L w * (℘[L] (2 * w) - ℘[L] w) + ℘'[L] w) := by
+theorem derivWeierstrassP_two_mul {w : ℂ} (hw : w ∉ L.lattice) (h2w : 2 * w ∉ L.lattice)
+    : ℘'[L] (2 * w) = -(tangentSlope L w * (℘[L] (2 * w) - ℘[L] w) + ℘'[L] w) := by
   obtain ⟨s, hs, hsw, hev⟩ := exists_continuousAt_chordSlope hw h2w
   have hww : w + w ∉ L.lattice := by rwa [← two_mul]
   have hc : ContinuousAt (fun z ↦ ℘'[L] (z + w)) w :=
-    ((L.analyticOnNhd_derivWeierstrassP (w + w) hww).comp (g := ℘'[L]) (f := fun z ↦ z + w)
-      (by fun_prop)).continuousAt
+    ((L.analyticOnNhd_derivWeierstrassP (w + w) hww).comp (g := ℘'[L]) (f := fun z ↦ z + w) (by
+      fun_prop)).continuousAt
   have hc' : ContinuousAt (fun z ↦ ℘[L] (z + w)) w :=
     (analyticAt_weierstrassP_comp_add hww).continuousAt
   have hg : ContinuousAt (fun z ↦ -(s z * (℘[L] (z + w) - ℘[L] z) + ℘'[L] z)) w :=
     ((hs.mul (hc'.sub (L.analyticOnNhd_weierstrassP w hw).continuousAt)).add
       (L.analyticOnNhd_derivWeierstrassP w hw).continuousAt).neg
-  have := eq_of_eventuallyEq_nhdsNE hc hg (hev.mono fun z ⟨h1, h2, h3, h4⟩ ↦ by
-    simp only
-    rw [derivWeierstrassP_add h1 hw h2 h3, h4])
+  have :=
+    eq_of_eventuallyEq_nhdsNE hc hg
+      (hev.mono fun z ⟨h1, h2, h3, h4⟩ ↦ by
+        simp only
+        rw [derivWeierstrassP_add h1 hw h2 h3, h4])
   simp only [hsw] at this
   rw [two_mul, this]
 

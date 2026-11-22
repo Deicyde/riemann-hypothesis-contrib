@@ -18,8 +18,7 @@ namespace ZetaDoubling
 
 open OriginCoordinatesAdd
 
-def mu (L : PeriodPair) (z : ℂ) : ℂ :=
-  (6 * L.weierstrassP z ^ 2 - L.g₂ / 2) / L.derivWeierstrassP z
+def mu (L : PeriodPair) (z : ℂ) : ℂ := (6 * L.weierstrassP z ^ 2 - L.g₂ / 2) / L.derivWeierstrassP z
 
 lemma hasDerivAt_two_mul (z : ℂ) : HasDerivAt (fun y : ℂ => 2 * y) 2 z := by
   simpa using (hasDerivAt_id z).const_mul (2 : ℂ)
@@ -104,17 +103,17 @@ lemma dblB (L : PeriodPair) {z : ℂ} (hz : z ∉ L.lattice) (h2 : 2 * z ∉ L.l
 
 end ZetaDoubling
 
-
 open OriginCoordinatesAdd ZetaDoubling in
 theorem dblLaw : DblLaw := by
   intro L z hz h2
   refine ⟨dblB L hz h2, ?_⟩
   have hy := derivWeierstrassP_ne_zero L hz h2
   have hL := (hasDerivAt_wp L h2).comp z (hasDerivAt_two_mul z)
-  have hR := (((hasDerivAt_mu L hz hy).pow 2).div_const (4 : ℂ)).sub
-    ((hasDerivAt_wp L hz).const_mul (2 : ℂ))
-  have heq : (fun y => mu L y ^ 2 / 4 - 2 * L.weierstrassP y) =ᶠ[𝓝 z]
-      (L.weierstrassP ∘ fun y : ℂ => 2 * y) := by
+  have hR :=
+    (((hasDerivAt_mu L hz hy).pow 2).div_const (4 : ℂ)).sub ((hasDerivAt_wp L hz).const_mul (2 : ℂ))
+  have heq
+      : (fun y => mu L y ^ 2 / 4 - 2 * L.weierstrassP y) =ᶠ[𝓝 z]
+        (L.weierstrassP ∘ fun y : ℂ => 2 * y) := by
     filter_upwards [ev_self L hz, ev_two L h2] with y h1 h3
     show mu L y ^ 2 / 4 - 2 * L.weierstrassP y = L.weierstrassP (2 * y)
     rw [dblB L h1 h3]

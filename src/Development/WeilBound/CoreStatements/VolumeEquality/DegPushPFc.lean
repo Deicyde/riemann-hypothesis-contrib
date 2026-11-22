@@ -11,11 +11,16 @@ noncomputable section
 
 namespace SheetDecomposition.PF
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I4 GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 open GroundTheory.Heights₂.Heights.NumbersDVR (pointIdeal intNum pointConeMap)
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ b, Fintype (ι b)] {K' : Type} [Fintype K'] {ι' : K' → Type}
-  [∀ b, Fintype (ι' b)]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ b, Fintype (ι b)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ b, Fintype (ι' b)]
 
 def blkE (K K' : Type) : K' ≃ FibreBlock (Sum.inl : K → K ⊕ K') where
   toFun k := ⟨.inr k, by simp⟩
@@ -27,8 +32,9 @@ def blkE (K K' : Type) : K' ≃ FibreBlock (Sum.inl : K → K ⊕ K') where
     | ⟨.inl k, h⟩ => absurd ⟨k, rfl⟩ h
     | ⟨.inr _, _⟩ => rfl
 
-def varE (ι : K → Type) (ι' : K' → Type) :
-    (Σ b, ι' b) ≃ Σ b : FibreBlock (Sum.inl : K → K ⊕ K'), fibreIdx (Sum.elim ι ι') Sum.inl b where
+def varE (ι : K → Type) (ι' : K' → Type)
+    : (Σ b, ι' b)
+      ≃ Σ b : FibreBlock (Sum.inl : K → K ⊕ K'), fibreIdx (Sum.elim ι ι') Sum.inl b where
   toFun p := ⟨⟨.inr p.1, by simp⟩, p.2⟩
   invFun
     | ⟨⟨.inl k, h⟩, _⟩ => absurd ⟨k, rfl⟩ h
@@ -40,10 +46,12 @@ def varE (ι : K → Type) (ι' : K' → Type) :
 
 variable {Ω₁ : Type} [Field Ω₁] {Ω : Type} [Field Ω] [Algebra Ω₁ Ω]
 
-theorem image_join (y : (Σ b, ι b) → Ω₁) (y' : (Σ b, ι' b) → Ω) :
-    imageZ inlV (mCoordIdeal (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')) = mCoordIdeal y := by
-  have key : ∀ f, mConeMap (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y') (rename inlV f) =
-      rename Sum.inl (MvPolynomial.map (algebraMap Ω₁ Ω) (mConeMap y f)) := by
+theorem image_join (y : (Σ b, ι b) → Ω₁) (y' : (Σ b, ι' b) → Ω)
+    : imageZ inlV (mCoordIdeal (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')) = mCoordIdeal y := by
+  have key
+      : ∀ f,
+        mConeMap (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y') (rename inlV f)
+          = rename Sum.inl (MvPolynomial.map (algebraMap Ω₁ Ω) (mConeMap y f)) := by
     intro f
     induction f using MvPolynomial.induction_on with
     | C a => simp [mConeMap]
@@ -62,10 +70,16 @@ theorem image_join (y : (Σ b, ι b) → Ω₁) (y' : (Σ b, ι' b) → Ω) :
   · intro h
     rw [h, map_zero, map_zero]
 
-theorem ker_aeval_cone {Φ : Type} [Field Φ] (y : (Σ b, ι b) → Ω) (ν : MvPolynomial K Ω →+* Φ) (hν : Function.Injective ν) :
-    RingHom.ker (aeval (fun p : Σ b, ι b => ν (C (y p) * X p.1)) : MRing ι →ₐ[ℤ] Φ) = mCoordIdeal y := by
-  have key : ∀ f : MRing ι, (aeval (fun p : Σ b, ι b => ν (C (y p) * X p.1)) : MRing ι →ₐ[ℤ] Φ) f =
-      ν (mConeMap y f) := by
+theorem ker_aeval_cone
+    {Φ : Type} [Field Φ]
+    (y : (Σ b, ι b) → Ω)
+    (ν : MvPolynomial K Ω →+* Φ) (hν : Function.Injective ν)
+    : RingHom.ker (aeval (fun p : Σ b, ι b => ν (C (y p) * X p.1)) : MRing ι →ₐ[ℤ] Φ)
+      = mCoordIdeal y := by
+  have key
+      : ∀ f : MRing ι,
+        (aeval (fun p : Σ b, ι b => ν (C (y p) * X p.1)) : MRing ι →ₐ[ℤ] Φ) f
+          = ν (mConeMap y f) := by
     intro f
     induction f using MvPolynomial.induction_on with
     | C a => simp [mConeMap]
@@ -84,11 +98,15 @@ theorem ker_aeval_cone {Φ : Type} [Field Φ] (y : (Σ b, ι b) → Ω) (ν : Mv
   · intro h
     rw [h, map_zero]
 
-theorem gen_cone {Φ : Type} [Field Φ] [Algebra (MvPolynomial K Ω₁) Φ] [IsFractionRing (MvPolynomial K Ω₁) Φ]
-    {y : (Σ b, ι b) → Ω₁} (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0) (c : Φ) :
-    ∃ f g : MRing ι, aeval (fun p : Σ b, ι b => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1)) g ≠ 0 ∧
-      c = aeval (fun p : Σ b, ι b => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1)) f /
-        aeval (fun p : Σ b, ι b => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1)) g := by
+theorem gen_cone
+    {Φ : Type} [Field Φ] [Algebra (MvPolynomial K Ω₁) Φ] [IsFractionRing (MvPolynomial K Ω₁) Φ]
+    {y : (Σ b, ι b) → Ω₁} (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0)
+    (c : Φ)
+    : ∃ f g : MRing ι,
+      aeval (fun p : Σ b, ι b => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1)) g ≠ 0
+        ∧ c
+          = aeval (fun p : Σ b, ι b => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1)) f
+            / aeval (fun p : Σ b, ι b => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1)) g := by
   set φ : MRing ι →ₐ[ℤ] Φ :=
     aeval (fun p : Σ b, ι b => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1)) with hφ
   have key : ∀ f : MRing ι, φ f = algebraMap (MvPolynomial K Ω₁) Φ (mConeMap y f) := by
@@ -121,8 +139,9 @@ theorem gen_cone {Φ : Type} [Field Φ] [Algebra (MvPolynomial K Ω₁) Φ] [IsF
       intro h0
       have := hinj (h0.trans (map_zero _).symm)
       exact mul_ne_zero hCne hM this
-    have : algebraMap (MvPolynomial K Ω₁) Φ (C s) =
-        algebraMap (MvPolynomial K Ω₁) Φ (mConeMap y g) / algebraMap (MvPolynomial K Ω₁) Φ (mConeMap y h) := by
+    have : algebraMap (MvPolynomial K Ω₁) Φ (C s)
+        = algebraMap (MvPolynomial K Ω₁) Φ (mConeMap y g)
+          / algebraMap (MvPolynomial K Ω₁) Φ (mConeMap y h) := by
       rw [eq_div_iff hden, ← map_mul, eg, eh, heq]
       congr 1
       rw [map_mul]
@@ -159,9 +178,12 @@ theorem gen_cone {Φ : Type} [Field Φ] [Algebra (MvPolynomial K Ω₁) Φ] [IsF
   · exact ⟨f, g, hg0, huv.symm⟩
 
 open Classical in
-theorem exists_genFibre {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω) (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0) :
-    ∃ G : GenFibre inlV (mCoordIdeal (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')), ∀ (r : ℕ) (N : Fin r → K' → ℤ),
-      intNum G.Φ (fibreIdeal Sum.inl G) (fun j => fibreDeg Sum.inl (Sum.elim (0 : K → ℤ) (N j))) = inum Ω₁ y' N := by
+theorem exists_genFibre
+    {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω) (hb : Birational y) (hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0)
+    : ∃ G : GenFibre inlV (mCoordIdeal (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y')),
+      ∀ (r : ℕ) (N : Fin r → K' → ℤ),
+        intNum G.Φ (fibreIdeal Sum.inl G) (fun j => fibreDeg Sum.inl (Sum.elim (0 : K → ℤ) (N j)))
+          = inum Ω₁ y' N := by
   let B := MvPolynomial K' Ω
   let Φ := FractionRing (MvPolynomial K Ω₁)
   let Φ' := FractionRing (MvPolynomial K B)
@@ -176,21 +198,35 @@ theorem exists_genFibre {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω)
   letI alg : Algebra Φ Φ' := L.toAlgebra
   haveI : ∀ b, Fintype (Sum.elim ι ι' b) := fun b => by
     cases b <;> dsimp <;> infer_instance
-  have he : ∀ (c : Ω) (q : Σ b, Sum.elim ι ι' b), e (C c * X q.1) =
-      match q with
-      | ⟨Sum.inl k, _⟩ => C (C c) * X k
-      | ⟨Sum.inr k, _⟩ => C (C c * X k) := by
+  have he
+      : ∀ (c : Ω) (q : Σ b, Sum.elim ι ι' b),
+        e (C c * X q.1)
+          = match q with
+            | ⟨Sum.inl k, _⟩ => C (C c) * X k
+            | ⟨Sum.inr k, _⟩ => C (C c * X k) := by
     rintro c ⟨(k | k), i⟩ <;> simp [e, sumRingEquiv_C, sumRingEquiv_X_inl, sumRingEquiv_X_inr]
   let ψ := pointConeMap Ω₁ y'
   have ha : ∀ c : Ω₁, algebraMap Ω₁ Φ c = algebraMap (MvPolynomial K Ω₁) Φ (C c) := by
     intro c
     rw [IsScalarTower.algebraMap_apply Ω₁ (MvPolynomial K Ω₁) Φ, MvPolynomial.algebraMap_eq]
-  have hL : ∀ r, L (algebraMap (MvPolynomial K Ω₁) Φ r) = ν (MvPolynomial.map (algebraMap Ω₁ B) r) := by
+  have hL
+      : ∀ r, L (algebraMap (MvPolynomial K Ω₁) Φ r) = ν (MvPolynomial.map (algebraMap Ω₁ B) r) := by
     intro r
     exact IsFractionRing.lift_algebraMap hg r
   have hbc := ker_baseChange (algebraMap Ω₁ Φ) ha ν hν L hL ψ
-  refine ⟨⟨Φ, Φ', fun p => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1),
-    fun q => ν' (C (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y' q) * X q.1), ?_, ?_, ?_, ?_⟩, ?_⟩
+  refine ⟨
+    ⟨
+      Φ,
+      Φ',
+      fun p => algebraMap (MvPolynomial K Ω₁) Φ (C (y p) * X p.1),
+      fun q => ν' (C (joinPt (fun x => algebraMap Ω₁ Ω (y x)) y' q) * X q.1),
+      ?_,
+      ?_,
+      ?_,
+      ?_
+    ⟩,
+    ?_
+  ⟩
   · rw [image_join]
     exact ker_aeval_cone y (algebraMap (MvPolynomial K Ω₁) Φ) (IsFractionRing.injective _ _)
   · exact gen_cone hb hne
@@ -202,7 +238,9 @@ theorem exists_genFibre {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω)
     simp [inlV, joinPt, ν]
     rfl
   · intro r N
-    have hdeg : (fun j => fibreDeg Sum.inl (Sum.elim (0 : K → ℤ) (N j))) = fun j => N j ∘ (blkE K K').symm := by
+    have hdeg
+        : (fun j => fibreDeg Sum.inl (Sum.elim (0 : K → ℤ) (N j)))
+          = fun j => N j ∘ (blkE K K').symm := by
       funext j b
       obtain ⟨(k | k), h⟩ := b
       · exact absurd ⟨k, rfl⟩ h
@@ -211,8 +249,9 @@ theorem exists_genFibre {y : (Σ b, ι b) → Ω₁} (y' : (Σ b, ι' b) → Ω)
     dsimp only
     rw [← FieldNumbers.RenameIntNum.full Φ K' (FibreBlock (Sum.inl : K → K ⊕ K')) ι'
       (fibreIdx (Sum.elim ι ι') Sum.inl) (blkE K K') (varE ι ι') (fun v => rfl)]
-    have hmap : ∀ P : Ideal (NumbersDVR.MRing ι' Ω₁),
-        intNum Φ (Ideal.map (MvPolynomial.map (algebraMap Ω₁ Φ)) P) N = intNum Ω₁ P N := by
+    have hmap
+        : ∀ P : Ideal (NumbersDVR.MRing ι' Ω₁),
+          intNum Φ (Ideal.map (MvPolynomial.map (algebraMap Ω₁ Φ)) P) N = intNum Ω₁ P N := by
       intro P
       unfold intNum
       congr 2

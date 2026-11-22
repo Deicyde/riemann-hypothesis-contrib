@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverC
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
 
 namespace GlobalTheory.UPel.HT.GenProj
 
@@ -30,13 +32,22 @@ def baseOfGBase {p : ℕ} [Fact p.Prime] {D : Datum p} (gb : GBase D.toG ℂ) : 
     haveI : CharZero k := (RingHom.charZero_iff β.injective).mp inferInstance
     exact (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero) (CharP.cast_eq_zero k p)
 
-theorem isProjOver_genModel : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p), D.CompactB → ∀ (gb : GBase D.toG ℂ) (N : ℕ),
-    3 ≤ N → N.Coprime p → ∀ X : GenModel gb N, IsProjOver X.s := by
+theorem isProjOver_genModel
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p),
+      D.CompactB
+        → ∀ (gb : GBase D.toG ℂ) (N : ℕ),
+          3 ≤ N → N.Coprime p → ∀ X : GenModel gb N, IsProjOver X.s := by
   intro p _ D hC gb N hN hNp X
   obtain ⟨M⟩ := GlobalTheory.T.harrisTaylorIntegralModel_nonempty p D ℂ (baseOfGBase gb) N hN hNp
-  have hM : IsProjOver M.s := GlobalTheory.UPel.HT.Model.isProjOver_of_compactB p D ℂ (baseOfGBase gb) N hN hNp hC M
-  obtain ⟨j, _, hj, hjs, _⟩ := GlobalTheory.T.exists_open_closed_immersion_genModel_to_fibre p D ℂ (baseOfGBase gb) ℂ (RingHom.id ℂ) gb rfl (fun _ => rfl) N hN hNp M X
+  have hM : IsProjOver M.s :=
+    GlobalTheory.UPel.HT.Model.isProjOver_of_compactB p D ℂ (baseOfGBase gb) N hN hNp hC M
+  obtain ⟨j, _, hj, hjs, _⟩ :=
+    GlobalTheory.T.exists_open_closed_immersion_genModel_to_fibre p D ℂ (baseOfGBase gb) ℂ
+      (RingHom.id ℂ) gb rfl
+      (fun _ => rfl)
+      N hN hNp M X
   rw [← hjs]
-  exact GlobalTheory.ProjSpace.isProjOver_comp_of_isClosedImmersion j (GlobalTheory.ProjSpace.isProjOver_pullback_snd (RingHom.id ℂ) hM)
+  exact GlobalTheory.ProjSpace.isProjOver_comp_of_isClosedImmersion j
+    (GlobalTheory.ProjSpace.isProjOver_pullback_snd (RingHom.id ℂ) hM)
 
 end GlobalTheory.UPel.HT.GenProj

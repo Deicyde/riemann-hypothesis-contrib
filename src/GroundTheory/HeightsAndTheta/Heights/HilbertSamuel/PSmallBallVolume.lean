@@ -40,12 +40,15 @@ theorem pi_pow_div_factorial_le_six (k : ℕ) : π ^ k / (k ! : ℝ) ≤ 6 := by
     | base => exact h3
     | succ n hn ih => exact (step n hn).trans ih
 
-theorem pi_pow_mul_two_pow_div_doubleFactorial_le_six (k : ℕ) :
-    π ^ k * 2 ^ (k + 1) / ((2 * k + 1)‼ : ℝ) ≤ 6 := by
+theorem pi_pow_mul_two_pow_div_doubleFactorial_le_six (k : ℕ)
+    : π ^ k * 2 ^ (k + 1) / ((2 * k + 1)‼ : ℝ) ≤ 6 := by
   have hπ := pi_lt_d2
   have hπ0 := pi_pos
-  have step : ∀ k, 2 ≤ k → π ^ (k + 1) * 2 ^ (k + 1 + 1) / ((2 * (k + 1) + 1)‼ : ℝ) ≤
-      π ^ k * 2 ^ (k + 1) / ((2 * k + 1)‼ : ℝ) := by
+  have step
+      : ∀ k,
+        2 ≤ k
+          → π ^ (k + 1) * 2 ^ (k + 1 + 1) / ((2 * (k + 1) + 1)‼ : ℝ)
+            ≤ π ^ k * 2 ^ (k + 1) / ((2 * k + 1)‼ : ℝ) := by
     intro k hk
     have hk' : (7 : ℝ) ≤ 2 * (k : ℝ) + 3 := by
       have : (2 : ℝ) ≤ k := by exact_mod_cast hk
@@ -79,12 +82,14 @@ theorem SmallBallVolume.proof : SmallBallVolume.Statement := by
       subst hk
       have : (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin 0)) 1)).toReal ≤ 1 := by
         have hle : volume (Metric.ball (0 : EuclideanSpace ℝ (Fin 0)) 1) ≤ 1 := by
-          calc volume (Metric.ball (0 : EuclideanSpace ℝ (Fin 0)) 1)
-              ≤ volume (Set.univ : Set (EuclideanSpace ℝ (Fin 0))) := measure_mono (Set.subset_univ _)
+          calc
+            volume (Metric.ball (0 : EuclideanSpace ℝ (Fin 0)) 1)
+                ≤ volume (Set.univ : Set (EuclideanSpace ℝ (Fin 0))) :=
+              measure_mono (Set.subset_univ _)
             _ = 1 := by
               rw [← (PiLp.volume_preserving_toLp (Fin 0)).measure_preimage
-                MeasurableSet.univ.nullMeasurableSet, Set.preimage_univ, MeasureTheory.volume_pi,
-                Measure.pi_univ]
+                  MeasurableSet.univ.nullMeasurableSet,
+                Set.preimage_univ, MeasureTheory.volume_pi, Measure.pi_univ]
               simp
         exact ENNReal.toReal_le_of_le_ofReal zero_le_one (by simpa using hle)
       linarith

@@ -16,11 +16,14 @@ open ReciprocityTheory.ChartRestriction.DS
 
 namespace DescentAux
 
-variable {n : ℕ} {ε : Fin n → Bool} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
   {E : Fin n → Fin n → Module.End ℂ M}
 
-theorem re_cas_le (hSq : SqId) (hE : IsGlRep E) (hU : IsInfUnitary ε E) {L : Fin n → ℝ} {y : M}
-    (hy : IsKHWVec ε E L y) : (⟪casimir E y, y⟫_ℂ).re ≤ casValK ε L * ‖y‖ ^ 2 := by
+theorem re_cas_le
+    (hSq : SqId) (hE : IsGlRep E) (hU : IsInfUnitary ε E)
+    {L : Fin n → ℝ} {y : M} (hy : IsKHWVec ε E L y)
+    : (⟪casimir E y, y⟫_ℂ).re ≤ casValK ε L * ‖y‖ ^ 2 := by
   unfold SqId ForAlg at hSq
   have hd := (hSq n ε M E hE hU y).2.1
   have hnn : 0 ≤ ∑ a : Fin n, ∑ b ∈ Finset.univ.filter (fun b => ε b ≠ ε a), ‖(E a b) y‖ ^ 2 :=
@@ -37,15 +40,20 @@ theorem abs_root_le (a b c : Fin n) : |root a b c| ≤ 1 := by
   simp only [Pi.sub_apply, Pi.single_apply]
   split_ifs <;> norm_num
 
-theorem main (hSq : SqId) (hK : KIrrEx) (hD : Drop) (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (N : Submodule ℂ M) (hN : Stab E N) (μ L : Fin n → ℝ) (R τ s : ℝ) (J : ℕ) (w : ℝ)
+theorem main
+    (hSq : SqId) (hK : KIrrEx) (hD : Drop) (hE : IsGlRep E) (hU : IsInfUnitary ε E)
+    (N : Submodule ℂ M) (hN : Stab E N)
+    (μ L : Fin n → ℝ) (R τ s : ℝ) (J : ℕ) (w : ℝ)
     (hR : ∀ y ∈ N, (casValK ε L - R) * ‖y‖ ^ 2 ≤ (⟪casimir E y, y⟫_ℂ).re)
     (hτ : ∀ a b, a < b → τ ≤ μ a - μ b) (hJ : R < J * w)
-    (hw : w ≤ 2 * (τ - 2 * (s + J)) - 2 * n - 2) :
-    ∀ k : ℕ, k ≤ J → ∀ (L' : Fin n → ℝ), ∀ y ∈ N, y ≠ 0 → KFin ε E y → IsKHWVec ε E L' y →
-      (∀ a, |L' a - μ a| ≤ s + ((J : ℝ) - (k : ℝ))) → casValK ε L' ≤ casValK ε L - ((J : ℝ) - (k : ℝ)) * w →
-      ∃ (L'' : Fin n → ℝ) (V : Submodule ℂ M), (∀ a, |L'' a - μ a| ≤ s + J) ∧ IsKIrrHW ε E L'' V ∧
-        NoDown ε E L'' V := by
+    (hw : w ≤ 2 * (τ - 2 * (s + J)) - 2 * n - 2)
+    : ∀ k : ℕ,
+      k ≤ J
+        → ∀ (L' : Fin n → ℝ), ∀ y ∈ N,
+          y ≠ 0 → KFin ε E y → IsKHWVec ε E L' y → (∀ a, |L' a - μ a| ≤ s + ((J : ℝ) - (k : ℝ)))
+            → casValK ε L' ≤ casValK ε L - ((J : ℝ) - (k : ℝ)) * w
+            → ∃ (L'' : Fin n → ℝ) (V : Submodule ℂ M),
+              (∀ a, |L'' a - μ a| ≤ s + J) ∧ IsKIrrHW ε E L'' V ∧ NoDown ε E L'' V := by
   unfold KIrrEx ForAlg at hK
   intro k
   induction k with
@@ -61,7 +69,7 @@ theorem main (hSq : SqId) (hK : KIrrEx) (hD : Drop) (hE : IsGlRep E) (hU : IsInf
   | succ k ih =>
     intro hk L' y hyN hy0 hyK hyHW hbd hcas
     obtain ⟨V, hVN, hIrr⟩ := hK n ε M E hE hU N hN L' y hyN hy0 hyK hyHW
-    have hk0 : (0:ℝ) ≤ k := by positivity
+    have hk0 : (0 : ℝ) ≤ k := by positivity
     by_cases hND : NoDown ε E L' V
     · refine ⟨L', V, fun a => ?_, hIrr, hND⟩
       have := hbd a
@@ -92,7 +100,9 @@ end DescentAux
 theorem mem_span_of_frobenius_mem_span : SqId → KIrrEx → Drop → Descent := by
   unfold Descent ForAlg
   intro hSq hK hD n ε M _ _ E hE hU N hN μ L R τ s J hR hτ hs hJ y hyN hy0 hyK hyHW
-  exact DescentAux.main hSq hK hD hE hU N hN μ L R τ s J _ hR hτ hJ le_rfl J le_rfl L y hyN hy0
-    hyK hyHW (fun a => by simpa using hs a) (by simp)
+  exact DescentAux.main hSq hK hD hE hU N hN μ L R τ s J _ hR hτ hJ le_rfl J le_rfl L y hyN hy0 hyK
+    hyHW
+    (fun a => by simpa using hs a)
+    (by simp)
 
 end PositivityTheory.RgHe3

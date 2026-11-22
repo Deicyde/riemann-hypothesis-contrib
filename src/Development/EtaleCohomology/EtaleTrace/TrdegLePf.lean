@@ -9,9 +9,10 @@ open Cardinal IntermediateField.algebraAdjoinAdjoin
 
 namespace LateralTheory.EtaleTrace.Cov
 
-theorem kaehler_adjoin_subsingleton (k K : Type) [Field k] [Field K] [Algebra k K] (s : Set K)
-    (hs : Submodule.span K (KaehlerDifferential.D k K '' s) = ⊤) :
-    Subsingleton Ω[K⁄(IntermediateField.adjoin k s)] := by
+theorem kaehler_adjoin_subsingleton
+    (k K : Type) [Field k] [Field K] [Algebra k K]
+    (s : Set K) (hs : Submodule.span K (KaehlerDifferential.D k K '' s) = ⊤)
+    : Subsingleton Ω[K⁄(IntermediateField.adjoin k s)] := by
   set L := IntermediateField.adjoin k s
   have hD : ∀ x : K, KaehlerDifferential.D L K x = 0 := by
     intro x
@@ -31,10 +32,12 @@ theorem kaehler_adjoin_subsingleton (k K : Type) [Field k] [Field K] [Algebra k 
   have hbot : Submodule.span K (Set.range (KaehlerDifferential.D L K)) = ⊥ := by
     rw [Submodule.span_eq_bot]; rintro _ ⟨x, rfl⟩; exact hD x
   rw [hbot] at htop
-  constructor; intro a b
+  constructor
+  intro a b
   have ha : a ∈ (⊥ : Submodule K Ω[K⁄L]) := by rw [htop]; trivial
   have hb : b ∈ (⊥ : Submodule K Ω[K⁄L]) := by rw [htop]; trivial
-  rw [Submodule.mem_bot] at ha hb; rw [ha, hb]
+  rw [Submodule.mem_bot] at ha hb
+  rw [ha, hb]
 
 theorem TrdegLe_of : TrdegLe := by
   intro k K _ _ _ _
@@ -44,19 +47,22 @@ theorem TrdegLe_of : TrdegLe := by
   choose t ht using hpre
   set s : Set K := Set.range t
   have himg : KaehlerDifferential.D k K '' s = b := by
-    ext ω; constructor
+    ext ω
+    constructor
     · rintro ⟨_, ⟨i, rfl⟩, rfl⟩; rw [ht]; exact i.2
     · intro hω; exact ⟨t ⟨ω, hω⟩, ⟨_, rfl⟩, ht _⟩
   have hsub := kaehler_adjoin_subsingleton k K s (by rw [himg, hbsp])
   set L := IntermediateField.adjoin k s
   have : Algebra.FormallyUnramified L K := ⟨hsub⟩
   have : Algebra.EssFiniteType L K := Algebra.EssFiniteType.of_comp k L K
-  have : Algebra.IsSeparable L K := (Algebra.FormallyUnramified.iff_isSeparable L K).mp inferInstance
+  have : Algebra.IsSeparable L K :=
+    (Algebra.FormallyUnramified.iff_isSeparable L K).mp inferInstance
   have : Algebra.IsAlgebraic (Algebra.adjoin k s) K := Algebra.IsAlgebraic.trans _ L K
   have h1 := Algebra.IsAlgebraic.trdeg_le_cardinalMk k s (A := K)
   have h2 : #s ≤ #b := Cardinal.mk_range_le
   have h3 : #b = (Module.finrank K Ω[K⁄k] : Cardinal) := by
-    rw [Module.finrank_eq_rank, ← (Module.Basis.mk hbli (le_of_eq (by rw [Subtype.range_coe, hbsp]))).mk_eq_rank'']
+    rw [Module.finrank_eq_rank,
+      ← (Module.Basis.mk hbli (le_of_eq (by rw [Subtype.range_coe, hbsp]))).mk_eq_rank'']
   exact h1.trans (h2.trans h3.le)
 
 end LateralTheory.EtaleTrace.Cov

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.Exists
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 
 namespace GlobalTheory.StdHarm
 
@@ -56,8 +57,9 @@ theorem std_unimod (n : ℕ) : (⟨stdLat E n⟩ : GenLat E n).Unimod := by
 
 variable {H : Host E} {Dw : Datum H} {l : Level H} (c : Coeff l)
 
-theorem symO_std (n : ℕ) : Formalism.L2.Pj.symO (Dw := Dw) c (⟨stdLat E n⟩ : GenLat E n) =
-    (MvPolynomial.map (σ := LtN Dw n) (algebraMap (integralClosure ℤ c.F) c.F)).range := by
+theorem symO_std (n : ℕ)
+    : Formalism.L2.Pj.symO (Dw := Dw) c (⟨stdLat E n⟩ : GenLat E n)
+      = (MvPolynomial.map (σ := LtN Dw n) (algebraMap (integralClosure ℤ c.F) c.F)).range := by
   apply le_antisymm
   · refine Subring.closure_le.2 ?_
     rintro f (⟨o, rfl⟩ | ⟨σ, i, b, hb, rfl⟩)
@@ -83,8 +85,8 @@ theorem symO_std (n : ℕ) : Formalism.L2.Pj.symO (Dw := Dw) c (⟨stdLat E n⟩
         simp [hk]
       · simp
 
-theorem harmL_std (n : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) :
-    harmL (Dw := Dw) c (⟨stdLat E n⟩ : GenLat E n) a = harmA c a n := by
+theorem harmL_std (n : ℕ) (a : (E →+* ℂ) × ℕ → ℕ)
+    : harmL (Dw := Dw) c (⟨stdLat E n⟩ : GenLat E n) a = harmA c a n := by
   ext P
   refine and_congr_right fun _ => ?_
   rw [symO_std]
@@ -97,12 +99,24 @@ theorem harmL_std (n : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) :
     obtain ⟨m, -, rfl⟩ := mem_coeffs_iff.1 hx
     exact ⟨⟨_, h m⟩, rfl⟩
 
-theorem harmA_mem_span_short : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (c : Coeff l) (n : ℕ), (∀ a : (E →+* ℂ) × ℕ → ℕ, harmL (Dw := Dw) c (⟨stdLat E n⟩ : GenLat E n) a = harmA c a n) ∧ (Dw.p + Dw.q ≤ n → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (L : ℝ), 2 ≤ L → Real.log (FD.rdE E) ≤ 2 * L → Real.log (FD.fdeg E) ≤ 2 * L → Real.log (1 + DF Dw a) ≤ 2 * L → Real.log n ≤ L → ∀ P ∈ harmA (Dw := Dw) c a n, P ∈ Submodule.span c.F {Q : MvPolynomial (LtN Dw n) c.F | Q ∈ harmA c a n ∧ ∀ σ' : c.F →+* ℂ, Real.log (∑ m ∈ Q.support, ‖σ' (Q.coeff m)‖) ≤ 140 * (Dw.p + Dw.q : ℕ) * L * DF Dw a}) := by
-  intro E _ _ _ H Dw l c n
-  refine ⟨harmL_std c n, fun hn a L hL h1 h2 h3 h4 P hP => ?_⟩
-  obtain ⟨S, hS, hspan, -⟩ := GlobalTheory.T.exists_short_harmonic_family_unimodular E H Dw l c n ⟨stdLat E n⟩ (std_unimod n) (std_fg n)
-    hn a L hL h1 h2 h3 h4
-  refine Submodule.span_mono (fun Q hQ => ?_) (hspan P hP.1)
-  exact ⟨harmL_std c n a ▸ (hS Q hQ).1, (hS Q hQ).2⟩
+theorem harmA_mem_span_short
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (c : Coeff l) (n : ℕ),
+      (∀ a : (E →+* ℂ) × ℕ → ℕ, harmL (Dw := Dw) c (⟨stdLat E n⟩ : GenLat E n) a = harmA c a n)
+        ∧ (Dw.p + Dw.q ≤ n
+          → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (L : ℝ),
+            2 ≤ L → Real.log (FD.rdE E) ≤ 2 * L → Real.log (FD.fdeg E) ≤ 2 * L
+              → Real.log (1 + DF Dw a) ≤ 2 * L → Real.log n ≤ L
+              → ∀ P ∈ harmA (Dw := Dw) c a n,
+                P ∈ Submodule.span c.F
+                  {Q : MvPolynomial (LtN Dw n) c.F | Q ∈ harmA c a n ∧ ∀ σ' : c.F →+* ℂ, Real.log (∑ m ∈ Q.support, ‖σ' (Q.coeff m)‖) ≤ 140 * (Dw.p + Dw.q : ℕ) * L * DF Dw a}) :=
+  by
+    intro E _ _ _ H Dw l c n
+    refine ⟨harmL_std c n, fun hn a L hL h1 h2 h3 h4 P hP => ?_⟩
+    obtain ⟨S, hS, hspan, -⟩ :=
+      GlobalTheory.T.exists_short_harmonic_family_unimodular E H Dw l c n ⟨stdLat E n⟩
+        (std_unimod n) (std_fg n) hn a L hL h1 h2 h3 h4
+    refine Submodule.span_mono (fun Q hQ => ?_) (hspan P hP.1)
+    exact ⟨harmL_std c n a ▸ (hS Q hQ).1, (hS Q hQ).2⟩
 
 end GlobalTheory.StdHarm

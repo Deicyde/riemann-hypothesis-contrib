@@ -16,11 +16,15 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField Matrix Formalism.UG PI.VolStabS.OrbR
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField Matrix Formalism.UG
+  PI.VolStabS.OrbR
 open scoped TensorProduct
 
-theorem cm_fixed {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (a : E) : σ a = a ↔ a ∈ (algebraMap F E).range := by
+theorem cm_fixed
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (h : IsCMExt F E σ)
+    (a : E)
+    : σ a = a ↔ a ∈ (algebraMap F E).range := by
   constructor
   · intro ha
     by_contra hn
@@ -73,16 +77,17 @@ theorem orbTup_holds : OrbTup := by
   have hfix := cm_fixed σ hCM
   set T := gramE σ J X0 with hTdef
   let sE : E →+* E := σ
-  have hTH : IsHerm sE T := by
-    ext i j; exact hT i j
-  have hh : PI.UnitaryGroupMassFormula.HermConj.IsHermForm sE (hform sE T) :=
-    { add := fun x y z => by
-        rw [PIW.AdelicOrbitU.hform_eq_dot, PIW.AdelicOrbitU.hform_eq_dot,
-          PIW.AdelicOrbitU.hform_eq_dot, mulVec_add, dotProduct_add]
-      smul := fun x c y => PIW.AdelicOrbitU.hform_smul_right sE T c x y
-      herm := fun x y => (PIW.AdelicOrbitU.hform_conj sE T hinv hTH x y).symm }
-  obtain ⟨v, hvli, hvo⟩ := PI.UnitaryGroupMassFormula.HermConj.exists_orthogonal_family sE a (Fin a → E)
-    (by simp) (hform sE T) hh
+  have hTH : IsHerm sE T := by ext i j; exact hT i j
+  have hh : PI.UnitaryGroupMassFormula.HermConj.IsHermForm sE (hform sE T) := {
+    add := fun x y z => by
+      rw [PIW.AdelicOrbitU.hform_eq_dot, PIW.AdelicOrbitU.hform_eq_dot,
+        PIW.AdelicOrbitU.hform_eq_dot, mulVec_add, dotProduct_add]
+    smul := fun x c y => PIW.AdelicOrbitU.hform_smul_right sE T c x y
+    herm := fun x y => (PIW.AdelicOrbitU.hform_conj sE T hinv hTH x y).symm
+  }
+  obtain ⟨v, hvli, hvo⟩ :=
+    PI.UnitaryGroupMassFormula.HermConj.exists_orthogonal_family sE a (Fin a → E) (by simp)
+      (hform sE T) hh
   set P : Matrix (Fin a) (Fin a) E := tM v with hP
   have hPu : IsUnit P.det := by
     have h1 : IsUnit (Matrix.of v) := Matrix.linearIndependent_rows_iff_isUnit.mp hvli
@@ -98,8 +103,7 @@ theorem orbTup_holds : OrbTup := by
     · subst hjk; simp
     · rw [hDoff j k hjk, Matrix.diagonal_apply_ne _ hjk]
   have hDdet : D.det ≠ 0 := by
-    have hc : (cT sE P).det = sE P.det := by
-      rw [cT, det_transpose, RingHom.map_det]; rfl
+    have hc : (cT sE P).det = sE P.det := by rw [cT, det_transpose, RingHom.map_det]; rfl
     rw [hD, det_mul, det_mul, hc]
     refine mul_ne_zero (mul_ne_zero ?_ hdet) hPu.ne_zero
     exact (map_ne_zero sE).mpr hPu.ne_zero
@@ -116,15 +120,16 @@ theorem orbTup_holds : OrbTup := by
   have hsS : ∀ z, sS (sS z) = z := (PIW.AdelicOrbitU.stFix F E σ h2 hfix R).1
   have hJS : IsHerm sS JS := PIW.AdelicOrbitU.isHerm_JR R σ J hJ.1
   have hJSd : IsUnit JS.det := PIW.AdelicOrbitU.isUnit_det_JR (F := F) R J hJ.2
-  have hcTmap : ∀ {p q : ℕ} (N : Matrix (Fin p) (Fin q) E),
-      cT sS (N.map (inclR (F := F) R)) = (cT sE N).map (inclR (F := F) R) := by
-    intro p q N; ext i j
+  have hcTmap
+      : ∀ {p q : ℕ} (N : Matrix (Fin p) (Fin q) E),
+        cT sS (N.map (inclR (F := F) R)) = (cT sE N).map (inclR (F := F) R) := by
+    intro p q N
+    ext i j
     simp only [cT, Matrix.map_apply, Matrix.transpose_apply]
     exact PIW.AdelicOrbitU.sigR_inclR (F := F) R σ _
   set Xm : Matrix (Fin M) (Fin a) (R ⊗[F] E) := (tM X0).map (inclR (F := F) R) with hXm
   set Pm : Matrix (Fin a) (Fin a) (R ⊗[F] E) := P.map (inclR (F := F) R) with hPm
-  have hTg : cT sE (tM X0) * J * tM X0 = T := by
-    ext i j; rw [← gram_tM]; rfl
+  have hTg : cT sE (tM X0) * J * tM X0 = T := by ext i j; rw [← gram_tM]; rfl
   have hyg : cT sS (tM y) * JS * tM y = T.map (inclR (F := F) R) := by
     ext i j; rw [← gram_tM]; exact congrFun (congrFun hy i) j
   let x' : Fin a → Fin M → R ⊗[F] E := fun j r => (Xm * Pm) r j
@@ -144,18 +149,19 @@ theorem orbTup_holds : OrbTup := by
     have e : tM y' = tM y * Pm := rfl
     rw [e, gram_mul, hyg, hPm, hcTmap, ← Matrix.map_mul, ← Matrix.map_mul]
     rfl
-  obtain ⟨g, hgU, hgx⟩ := orb_orth sS JS hsS hJS hJSd a x' y'
-    (fun j k hjk => by rw [hGx, hDoff j k hjk, map_zero])
-    (fun j k => by rw [hGx, hGy])
-    (fun j => by rw [hGx]; exact (isUnit_iff_ne_zero.mpr (hDne j)).map _)
-    (fun j t => by
-      obtain ⟨β, hβ⟩ := (hfix _).mp (hDfix j)
-      have hβ0 : β ≠ 0 := by
-        rintro rfl; exact hDne j (by rw [← hβ, map_zero])
-      obtain ⟨lam, hlam, hu⟩ := PIW.AdelicOrbitU.stLam F E σ h2 hfix R (PIW.AdelicOrbitU.stP F) t β hβ0
-      refine ⟨lam, hlam, ?_⟩
-      rw [hGx, ← hβ, PIW.AdelicOrbitU.inclR_algebraMap]
-      exact hu)
+  obtain ⟨g, hgU, hgx⟩ :=
+    orb_orth sS JS hsS hJS hJSd a x' y'
+      (fun j k hjk => by rw [hGx, hDoff j k hjk, map_zero])
+      (fun j k => by rw [hGx, hGy])
+      (fun j => by rw [hGx]; exact (isUnit_iff_ne_zero.mpr (hDne j)).map _)
+      (fun j t => by
+        obtain ⟨β, hβ⟩ := (hfix _).mp (hDfix j)
+        have hβ0 : β ≠ 0 := by rintro rfl; exact hDne j (by rw [← hβ, map_zero])
+        obtain ⟨lam, hlam, hu⟩ :=
+          PIW.AdelicOrbitU.stLam F E σ h2 hfix R (PIW.AdelicOrbitU.stP F) t β hβ0
+        refine ⟨lam, hlam, ?_⟩
+        rw [hGx, ← hβ, PIW.AdelicOrbitU.inclR_algebraMap]
+        exact hu)
   have hmat : (g : Matrix (Fin M) (Fin M) (R ⊗[F] E)) * Xm * Pm = tM y * Pm := by
     ext r j
     rw [Matrix.mul_assoc]
@@ -163,7 +169,8 @@ theorem orbTup_holds : OrbTup := by
     simpa [x', y', Matrix.mul_apply, mulVec, dotProduct] using this
   have hPmu : IsUnit Pm.det := by
     show IsUnit ((inclR (F := F) R).mapMatrix P).det
-    rw [← RingHom.map_det]; exact hPu.map _
+    rw [← RingHom.map_det]
+    exact hPu.map _
   have hmat2 : (g : Matrix (Fin M) (Fin M) (R ⊗[F] E)) * Xm = tM y := by
     have := congrArg (fun N => N * Pm⁻¹) hmat
     simpa only [Matrix.mul_nonsing_inv_cancel_right _ _ hPmu] using this

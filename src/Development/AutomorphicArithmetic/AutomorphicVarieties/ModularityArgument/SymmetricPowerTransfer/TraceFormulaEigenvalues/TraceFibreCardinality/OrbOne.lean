@@ -6,14 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open UpperTheory.V.Z.Sym MulAction in
-theorem UpperTheory.V.Z.Sym.Tf.orbOne :
-    UpperTheory.V.Z.Sym.Tf.OrbOne := by
+theorem UpperTheory.V.Z.Sym.Tf.orbOne : UpperTheory.V.Z.Sym.Tf.OrbOne := by
   intro T G _ _ ι C θ U f δ hinv hδ hC hcov
-  have h := orbReps T G ι C θ U f δ hinv hδ Unit {()} (fun _ => 1)
-    (fun i _ j _ _ _ _ _ => rfl)
-    (fun y hy => by
-      obtain ⟨t, u, hu, e⟩ := hcov y hy
-      exact ⟨t, (), Finset.mem_singleton_self _, u, hu, by simpa using e⟩)
+  have h :=
+    orbReps T G ι C θ U f δ hinv hδ Unit {()}
+      (fun _ => 1)
+      (fun i _ j _ _ _ _ _ => rfl)
+      (fun y hy => by
+        obtain ⟨t, u, hu, e⟩ := hcov y hy
+        exact ⟨t, (), Finset.mem_singleton_self _, u, hu, by simpa using e⟩)
   rw [h, Finset.sum_singleton]
   have hr : (Subgroup.comap ι (stabilizer G ((1 : G) : G ⧸ U))).relIndex C = 1 := by
     rw [Subgroup.relIndex_eq_one]

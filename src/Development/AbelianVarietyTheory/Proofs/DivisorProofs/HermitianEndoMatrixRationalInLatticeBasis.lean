@@ -8,28 +8,25 @@ open Matrix
 
 namespace GlobalTheory
 
-def imFormRight {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (z : Fin g → ℂ) :
-    (Fin g → ℂ) →ₗ[ℝ] ℝ where
+def imFormRight {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (z : Fin g → ℂ) : (Fin g → ℂ) →ₗ[ℝ] ℝ where
   toFun w := (z ⬝ᵥ H *ᵥ star w).im
   map_add' a b := by simp [star_add, mulVec_add, dotProduct_add]
-  map_smul' r w := by
-    simp [star_smul, mulVec_smul, dotProduct_smul, Complex.smul_im]
+  map_smul' r w := by simp [star_smul, mulVec_smul, dotProduct_smul, Complex.smul_im]
 
-def imFormLeft {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (w : Fin g → ℂ) :
-    (Fin g → ℂ) →ₗ[ℝ] ℝ where
+def imFormLeft {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (w : Fin g → ℂ) : (Fin g → ℂ) →ₗ[ℝ] ℝ where
   toFun z := (z ⬝ᵥ H *ᵥ star w).im
   map_add' a b := by simp [add_dotProduct]
-  map_smul' r z := by
-    simp [smul_dotProduct, Complex.smul_im]
+  map_smul' r z := by simp [smul_dotProduct, Complex.smul_im]
 
-theorem herm_endo_matrix_rat : ∀ (g n : ℕ) (e : Module.Basis (Fin n) ℝ (Fin g → ℂ)) (H₁ H₂ : Matrix (Fin g) (Fin g) ℂ),
-    (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ H₁.mulVec (star z)).re) →
-    (∀ k l, ∃ m : ℤ, (m : ℝ) = (e k ⬝ᵥ H₁.mulVec (star (e l))).im) →
-    (∀ k l, ∃ m : ℤ, (m : ℝ) = (e k ⬝ᵥ H₂.mulVec (star (e l))).im) →
-    ∀ (γ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ)),
-    (∀ z w, z ⬝ᵥ H₂.mulVec (star w) = z ⬝ᵥ H₁.mulVec (star (γ w))) →
-    ∃ Tq : Matrix (Fin n) (Fin n) ℚ,
-      Tq.map (Rat.cast : ℚ → ℝ) = LinearMap.toMatrix e e (γ.restrictScalars ℝ) := by
+theorem herm_endo_matrix_rat
+    : ∀ (g n : ℕ) (e : Module.Basis (Fin n) ℝ (Fin g → ℂ)) (H₁ H₂ : Matrix (Fin g) (Fin g) ℂ),
+      (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ H₁.mulVec (star z)).re)
+        → (∀ k l, ∃ m : ℤ, (m : ℝ) = (e k ⬝ᵥ H₁.mulVec (star (e l))).im)
+        → (∀ k l, ∃ m : ℤ, (m : ℝ) = (e k ⬝ᵥ H₂.mulVec (star (e l))).im)
+        → ∀ (γ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ)),
+          (∀ z w, z ⬝ᵥ H₂.mulVec (star w) = z ⬝ᵥ H₁.mulVec (star (γ w)))
+            → ∃ Tq : Matrix (Fin n) (Fin n) ℚ,
+              Tq.map (Rat.cast : ℚ → ℝ) = LinearMap.toMatrix e e (γ.restrictScalars ℝ) := by
   intro g n e H₁ H₂ hpos h1 h2 γ hγ
   classical
   set T := LinearMap.toMatrix e e (γ.restrictScalars ℝ) with hT
@@ -47,12 +44,14 @@ theorem herm_endo_matrix_rat : ∀ (g n : ℕ) (e : Module.Basis (Fin n) ℝ (Fi
     rw [Matrix.mul_apply]
     show _ = (e k ⬝ᵥ H₂ *ᵥ star (e l)).im
     rw [hγ, hγe l]
-    have := map_sum (imFormRight H₁ (e k)) (fun m : Fin n => T m l • e m) (Finset.univ : Finset (Fin n))
+    have :=
+      map_sum (imFormRight H₁ (e k)) (fun m : Fin n => T m l • e m) (Finset.univ : Finset (Fin n))
     simp only [map_smul, smul_eq_mul] at this
     change _ = imFormRight H₁ (e k) _
     rw [this]
     refine Finset.sum_congr rfl fun m _ => ?_
-    rw [mul_comm]; rfl
+    rw [mul_comm]
+    rfl
 
   have hdet : A₁.det ≠ 0 := by
     intro h0
@@ -67,7 +66,8 @@ theorem herm_endo_matrix_rat : ∀ (g n : ℕ) (e : Module.Basis (Fin n) ℝ (Fi
       simp only [mulVec, dotProduct, Pi.zero_apply] at this
       rw [← this]
       refine Finset.sum_congr rfl fun l _ => ?_
-      rw [mul_comm]; rfl
+      rw [mul_comm]
+      rfl
     have hu : ∀ u, imFormLeft H₁ v u = 0 := by
       intro u
       set_option synthInstance.maxHeartbeats 100000 in
@@ -80,7 +80,8 @@ theorem herm_endo_matrix_rat : ∀ (g n : ℕ) (e : Module.Basis (Fin n) ℝ (Fi
     have hre : (v ⬝ᵥ H₁ *ᵥ star v).re = 0 := by
       have := hu (Complex.I • v)
       simp only [imFormLeft, LinearMap.coe_mk, AddHom.coe_mk, smul_dotProduct, smul_eq_mul,
-        Complex.mul_im, Complex.I_re, Complex.I_im] at this
+          Complex.mul_im, Complex.I_re, Complex.I_im]
+        at this
       simpa using this
     have hv0 : v = 0 := by
       by_contra hne
@@ -113,13 +114,14 @@ theorem herm_endo_matrix_rat : ∀ (g n : ℕ) (e : Module.Basis (Fin n) ℝ (Fi
   have hdetR : IsUnit A₁.det := isUnit_iff_ne_zero.2 hdet
   refine ⟨A₁q⁻¹ * A₂q, ?_⟩
   have h3 : A₁ * (A₁q⁻¹ * A₂q).map (Rat.castHom ℝ) = A₂ := by
-    have := congrArg (fun M => M.map (Rat.castHom ℝ)) (Matrix.mul_nonsing_inv_cancel_left A₁q A₂q hdetq)
+    have :=
+      congrArg (fun M => M.map (Rat.castHom ℝ)) (Matrix.mul_nonsing_inv_cancel_left A₁q A₂q hdetq)
     rw [Matrix.map_mul, hA₁, hA₂] at this
     exact this
   have h4 : (A₁q⁻¹ * A₂q).map (Rat.castHom ℝ) = T := by
-    calc (A₁q⁻¹ * A₂q).map (Rat.castHom ℝ)
-        = A₁⁻¹ * (A₁ * (A₁q⁻¹ * A₂q).map (Rat.castHom ℝ)) :=
-          (Matrix.nonsing_inv_mul_cancel_left A₁ _ hdetR).symm
+    calc
+      (A₁q⁻¹ * A₂q).map (Rat.castHom ℝ) = A₁⁻¹ * (A₁ * (A₁q⁻¹ * A₂q).map (Rat.castHom ℝ)) :=
+        (Matrix.nonsing_inv_mul_cancel_left A₁ _ hdetR).symm
       _ = A₁⁻¹ * (A₁ * T) := by rw [h3, key]
       _ = T := Matrix.nonsing_inv_mul_cancel_left A₁ T hdetR
   simpa using h4

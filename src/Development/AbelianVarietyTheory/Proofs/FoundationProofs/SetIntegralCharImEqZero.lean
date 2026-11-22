@@ -11,11 +11,14 @@ open scoped BigOperators ComplexConjugate Real Classical Pointwise
 
 namespace GlobalTheory.UnitaryTheta
 
-theorem setIntegral_mul_char_eq_zero {V : Type} [NormedAddCommGroup V] [MeasurableSpace V] [BorelSpace V]
-    [SecondCountableTopology V]
-    (μ : Measure V) [μ.IsAddHaarMeasure] (Λ : AddSubgroup V) [Countable Λ] (Fd : Set V)
-    (hF : IsAddFundamentalDomain Λ Fd μ) (f : V → ℂ) (hf : ∀ x y, f (x + y) = f x * f y)
-    (hΛ : ∀ y ∈ Λ, f y = 1) (t : V) (ht : f t = -1) : ∫ z in Fd, f z ∂μ = 0 := by
+theorem setIntegral_mul_char_eq_zero
+    {V : Type} [NormedAddCommGroup V] [MeasurableSpace V] [BorelSpace V] [SecondCountableTopology V]
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (Λ : AddSubgroup V) [Countable Λ]
+    (Fd : Set V) (hF : IsAddFundamentalDomain Λ Fd μ)
+    (f : V → ℂ) (hf : ∀ x y, f (x + y) = f x * f y) (hΛ : ∀ y ∈ Λ, f y = 1)
+    (t : V) (ht : f t = -1)
+    : ∫ z in Fd, f z ∂μ = 0 := by
   have hq : MeasurePreserving (fun x => t + x) μ μ := measurePreserving_add_left μ t
   have hF' : IsAddFundamentalDomain Λ ((fun x => t + x) ⁻¹' Fd) μ :=
     hF.preimage_of_equiv hq.quasiMeasurePreserving (e := id) Function.bijective_id
@@ -28,14 +31,24 @@ theorem setIntegral_mul_char_eq_zero {V : Type} [NormedAddCommGroup V] [Measurab
     simp only [hf, ht, neg_one_mul, integral_neg, h1]
   linear_combination (h3 - h2) / 2
 
-theorem setIntegral_char_im_eq_zero :
-    ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V), IsPosHerm H → ∀ (Λ : AddSubgroup V) [Countable Λ] (Fd : Set V), IsAddFundamentalDomain Λ Fd μ → ∀ v : V, v ≠ 0 → (∀ y ∈ Λ, ∃ m : ℤ, (H v y).im = m) → ∫ z in Fd, cexp (2 * π * I * ((H v z).im : ℂ)) ∂μ = 0 := by
+theorem setIntegral_char_im_eq_zero
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
+        [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V),
+      IsPosHerm H
+        → ∀ (Λ : AddSubgroup V) [Countable Λ] (Fd : Set V),
+          IsAddFundamentalDomain Λ Fd μ
+            → ∀ v : V,
+              v ≠ 0 → (∀ y ∈ Λ, ∃ m : ℤ, (H v y).im = m)
+                → ∫ z in Fd, cexp (2 * π * I * ((H v z).im : ℂ)) ∂μ = 0 := by
   intro V _ _ _ _ _ μ _ H hH Λ _ Fd hF v hv hint
   haveI : ProperSpace V := FiniteDimensional.proper ℂ V
   have hpos := hH.2 v hv
   set r : ℝ := (H v v).re with hr
-  refine setIntegral_mul_char_eq_zero μ Λ Fd hF (fun z => cexp (2 * π * I * ((H v z).im : ℂ)))
-    (fun x y => ?_) (fun y hy => ?_) (((-(1 / (2 * r)) : ℝ) * I : ℂ) • v) ?_
+  refine setIntegral_mul_char_eq_zero μ Λ Fd hF
+    (fun z => cexp (2 * π * I * ((H v z).im : ℂ)))
+    (fun x y => ?_)
+    (fun y hy => ?_)
+    (((-(1 / (2 * r)) : ℝ) * I : ℂ) • v) ?_
   · simp only [map_add (f := _), add_im, ofReal_add, mul_add, Complex.exp_add]
   · obtain ⟨m, hm⟩ := hint y hy
     simp only [hm, ofReal_intCast]

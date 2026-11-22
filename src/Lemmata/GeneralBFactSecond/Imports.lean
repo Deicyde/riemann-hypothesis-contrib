@@ -6,13 +6,13 @@ public import Mathlib
 
 namespace Bl.general_b_fact_second
 
-theorem goal1 :
-  ∀ {K : Type} [inst : Field.{0} K] [NumberField.{0} K] {r : Nat}
-  (L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} K) (Fin r → K)),
-  Eq.{1} (Submodule.span.{0, 0} K (SetLike.coe.{0, 0} L)) Top.top.{0} →
-    ∀ (x : Fin r → K),
-      Exists.{1} fun (d : NumberField.RingOfIntegers.{0} K) ↦
-        And (Ne.{1} d 0) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} d x)) := by
+theorem goal1
+    : ∀ {K : Type} [inst : Field.{0} K] [NumberField.{0} K] {r : Nat}
+        (L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} K) (Fin r → K)),
+      Eq.{1} (Submodule.span.{0, 0} K (SetLike.coe.{0, 0} L)) Top.top.{0}
+        → ∀ (x : Fin r → K),
+          Exists.{1} fun (d : NumberField.RingOfIntegers.{0} K) ↦
+            And (Ne.{1} d 0) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} d x)) := by
   intro K _ _ r L hL x
   have hx : x ∈ Submodule.span K (L : Set (Fin r → K)) := by rw [hL]; trivial
   induction hx using Submodule.span_induction with
@@ -29,12 +29,16 @@ theorem goal1 :
   | smul a y _ hy =>
     obtain ⟨d, hd, h⟩ := hy
     obtain ⟨⟨b, c⟩, hbc⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers K)) a
-    refine ⟨(c : NumberField.RingOfIntegers K) * d, mul_ne_zero (nonZeroDivisors.coe_ne_zero c) hd, ?_⟩
+    refine
+      ⟨(c : NumberField.RingOfIntegers K) * d, mul_ne_zero (nonZeroDivisors.coe_ne_zero c) hd, ?_⟩
     have e : ((c : NumberField.RingOfIntegers K) * d) • (a • y) = b • (d • y) := by
-      calc ((c : NumberField.RingOfIntegers K) * d) • (a • y)
+      calc
+        ((c : NumberField.RingOfIntegers K) * d) • (a • y)
           = (c : NumberField.RingOfIntegers K) • (a • (d • y)) := by rw [mul_smul, smul_comm d a y]
-        _ = (algebraMap (NumberField.RingOfIntegers K) K c) • (a • (d • y)) := (algebraMap_smul K _ _).symm
-        _ = (a * algebraMap (NumberField.RingOfIntegers K) K c) • (d • y) := by rw [smul_smul, mul_comm]
+        _ = (algebraMap (NumberField.RingOfIntegers K) K c) • (a • (d • y)) :=
+          (algebraMap_smul K _ _).symm
+        _ = (a * algebraMap (NumberField.RingOfIntegers K) K c) • (d • y) := by
+          rw [smul_smul, mul_comm]
         _ = b • (d • y) := by rw [hbc, algebraMap_smul]
     rw [e]
     exact L.smul_mem b h

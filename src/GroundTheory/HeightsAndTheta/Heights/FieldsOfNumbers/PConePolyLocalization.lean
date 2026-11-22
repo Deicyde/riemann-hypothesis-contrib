@@ -18,11 +18,11 @@ noncomputable section
 
 universe u
 
-
 set_option maxHeartbeats 400000 in
-theorem ConePolyLocalization.proof (h₀ : DegZeroLocLocal.Statement.{u}) (h₁ : ConeVarUnit.Statement.{u})
-    (h₂ : ConeVarSurj.Statement.{u}) (h₃ : ConeVarInj.Statement.{u}) :
-    ConePolyLocalization.Statement.{u} := by
+theorem ConePolyLocalization.proof
+    (h₀ : DegZeroLocLocal.Statement.{u}) (h₁ : ConeVarUnit.Statement.{u})
+    (h₂ : ConeVarSurj.Statement.{u}) (h₃ : ConeVarInj.Statement.{u})
+    : ConePolyLocalization.Statement.{u} := by
   intro F _ K _ _ ι _ P hP W hW hPW v hv
   have := hP.isPrime
   have := hW.isPrime
@@ -30,9 +30,11 @@ theorem ConePolyLocalization.proof (h₀ : DegZeroLocLocal.Statement.{u}) (h₁ 
   refine ⟨hA, ?_⟩
   let _ := (coneVarMap P W hPW v).toRingHom.toAlgebra
   have := isPrime_map_C_mvPolynomial K (maximalIdeal (degZeroLoc P {W}))
-  have hQ : ∀ q : MvPolynomial K (degZeroLoc P {W}),
-      q ∈ ((maximalIdeal (degZeroLoc P {W})).map
-        (C : degZeroLoc P {W} →+* MvPolynomial K _)).primeCompl ↔ ∃ e, IsUnit (q.coeff e) := by
+  have hQ
+      : ∀ q : MvPolynomial K (degZeroLoc P {W}),
+        q ∈ ((maximalIdeal (degZeroLoc P {W})).map
+            (C : degZeroLoc P {W} →+* MvPolynomial K _)).primeCompl
+          ↔ ∃ e, IsUnit (q.coeff e) := by
     intro q
     rw [Ideal.mem_primeCompl_iff, mem_map_C_iff]
     push Not

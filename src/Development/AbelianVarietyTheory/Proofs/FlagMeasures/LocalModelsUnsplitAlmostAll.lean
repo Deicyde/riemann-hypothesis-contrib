@@ -7,25 +7,28 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Gaug
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.TermDef GlobalTheory.LocOver
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc Formalism.L2.SG.TermDef
+  GlobalTheory.LocOver
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.LocSplitFinite
 
-theorem finite_resChar_eq (F : Type) [Field F] [NumberField F] (l : ℕ) (hl : l ≠ 0) :
-    {p : IsDedekindDomain.HeightOneSpectrum (𝓞 F) | Formalism.MainNotions.S.Loc.resChar p = l}.Finite := by
-  have hx : ((l : 𝓞 F)) ≠ 0 := Nat.cast_ne_zero.2 hl
-  have hI : Ideal.span {((l : 𝓞 F))} ≠ 0 := by
-    rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hx
-  refine (Ideal.finite_factors hI).subset ?_
-  intro p hp
-  simp only [Set.mem_setOf_eq] at hp ⊢
-  rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
-  rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
-  unfold Formalism.MainNotions.S.Loc.resChar at hp
-  rw [← hp]
-  exact ringChar.Nat.cast_ringChar
+theorem finite_resChar_eq (F : Type) [Field F] [NumberField F] (l : ℕ) (hl : l ≠ 0)
+    : {p : IsDedekindDomain.HeightOneSpectrum (𝓞 F) | Formalism.MainNotions.S.Loc.resChar p = l}.Finite :=
+  by
+    have hx : ((l : 𝓞 F)) ≠ 0 := Nat.cast_ne_zero.2 hl
+    have hI : Ideal.span {((l : 𝓞 F))} ≠ 0 := by
+      rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hx
+    refine (Ideal.finite_factors hI).subset ?_
+    intro p hp
+    simp only [Set.mem_setOf_eq] at hp ⊢
+    rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
+    rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
+    unfold Formalism.MainNotions.S.Loc.resChar at hp
+    rw [← hp]
+    exact ringChar.Nat.cast_ringChar
 
 theorem split_finite : ∀ (D : D7) (Z : LocDat D), {p : PlF D | (Z.M p).split ≠ none}.Finite := by
   intro D Z

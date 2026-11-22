@@ -22,8 +22,12 @@ theorem cj_int (L : LocE F E) {x : E} (hx : x ∈ L.O) : L.cj x ∈ L.O := by
   rw [L.O_def] at hx ⊢
   exact hx.map L.cj
 
-theorem hf_sum_right (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) {ι : Type} (s : Finset ι)
-    (a : ι → Fin n → E) (y : Fin n → E) : hf L H y (∑ i ∈ s, a i) = ∑ i ∈ s, hf L H y (a i) := by
+theorem hf_sum_right
+    (L : LocE F E)
+    {n : ℕ} (H : Matrix (Fin n) (Fin n) E)
+    {ι : Type} (s : Finset ι) (a : ι → Fin n → E)
+    (y : Fin n → E)
+    : hf L H y (∑ i ∈ s, a i) = ∑ i ∈ s, hf L H y (a i) := by
   induction s using Finset.cons_induction with
   | empty => simp [hf]
   | cons i s hi ih => rw [Finset.sum_cons, Finset.sum_cons, hf_add_right, ih]
@@ -45,8 +49,10 @@ theorem mem_stdLat (L : LocE F E) {n : ℕ} (x : Fin n → E) : x ∈ stdLat L n
       split_ifs
       · exact one_mem _
       · exact zero_mem _
-    | zero => intro i; exact zero_mem _
-    | add u v _ _ hu hv => intro i; exact add_mem (hu i) (hv i)
+    | zero =>
+      intro i; exact zero_mem _
+    | add u v _ _ hu hv =>
+      intro i; exact add_mem (hu i) (hv i)
     | smul c u _ hu =>
       intro i
       rw [Pi.smul_apply, Subring.smul_def, smul_eq_mul]
@@ -58,8 +64,10 @@ theorem mem_stdLat (L : LocE F E) {n : ℕ} (x : Fin n → E) : x ∈ stdLat L n
     rw [hsum]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem isSD_stdLat (L : LocE F E) {n : ℕ} (H K : Matrix (Fin n) (Fin n) E) (hH : IsIntM L H)
-    (hK : IsIntM L K) (hKH : K * H = 1) : IsSD L H (stdLat L n) := by
+theorem isSD_stdLat
+    (L : LocE F E)
+    {n : ℕ} (H K : Matrix (Fin n) (Fin n) E) (hH : IsIntM L H) (hK : IsIntM L K) (hKH : K * H = 1)
+    : IsSD L H (stdLat L n) := by
   refine ⟨⟨Submodule.fg_span (Set.finite_range _), ?_⟩, ?_⟩
   · rw [eq_top_iff]
     intro v _
@@ -75,11 +83,12 @@ theorem isSD_stdLat (L : LocE F E) {n : ℕ} (H K : Matrix (Fin n) (Fin n) E) (h
     · intro h j
       have hrow : ∀ i, (Matrix.mulVec H fun k => L.cj (y k)) i ∈ L.O := by
         intro i
-        have hs : (Pi.single i 1 : Fin n → E) ∈ stdLat L n := (mem_stdLat L _).2 fun k => by
-          rw [Pi.single_apply]
-          split_ifs
-          · exact one_mem _
-          · exact zero_mem _
+        have hs : (Pi.single i 1 : Fin n → E) ∈ stdLat L n :=
+          (mem_stdLat L _).2 fun k => by
+            rw [Pi.single_apply]
+            split_ifs
+            · exact one_mem _
+            · exact zero_mem _
         have := h _ hs
         simpa [hf, Pi.single_apply, Matrix.mulVec, dotProduct] using this
       have hcK : (fun k => L.cj (y k)) = Matrix.mulVec K (Matrix.mulVec H fun k => L.cj (y k)) := by
@@ -92,8 +101,8 @@ theorem isSD_stdLat (L : LocE F E) {n : ℕ} (H K : Matrix (Fin n) (Fin n) E) (h
       simpa [L.cj_cj] using this
     · intro h x hx
       rw [mem_stdLat] at hx
-      exact Subring.sum_mem _ fun i _ => Subring.sum_mem _ fun j _ =>
-        mul_mem (mul_mem (hx i) (hH i j)) (cj_int L (h j))
+      exact Subring.sum_mem _ fun i _ =>
+        Subring.sum_mem _ fun j _ => mul_mem (mul_mem (hx i) (hH i j)) (cj_int L (h j))
 
 section Blocks
 variable {s m N : ℕ} (e : Fin s ⊕ Fin m ≃ Fin N)

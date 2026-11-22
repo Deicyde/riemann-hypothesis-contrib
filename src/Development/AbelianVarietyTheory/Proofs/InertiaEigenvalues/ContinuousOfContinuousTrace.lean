@@ -13,30 +13,37 @@ namespace GlobalTheory.SSCont
 
 variable {Γ k : Type} [Group Γ] [Field k] {n : ℕ}
 
-theorem mem_imAlg_iff (r : Γ →* GL (Fin n) k) (x : Matrix (Fin n) (Fin n) k) :
-    x ∈ PI.SSAscent.UnitaryGroupMassFormula.imAlg r ↔
-      x ∈ Submodule.span k (Set.range fun g => (r g : Matrix (Fin n) (Fin n) k)) := by
-  have h : (Submonoid.closure (Set.range fun g => (r g : Matrix (Fin n) (Fin n) k)) :
-      Set (Matrix (Fin n) (Fin n) k)) = Set.range fun g => (r g : Matrix (Fin n) (Fin n) k) := by
-    have e : (Set.range fun g => (r g : Matrix (Fin n) (Fin n) k)) =
-        (MonoidHom.mrange ((Units.coeHom _).comp r) : Set (Matrix (Fin n) (Fin n) k)) := by
+theorem mem_imAlg_iff (r : Γ →* GL (Fin n) k) (x : Matrix (Fin n) (Fin n) k)
+    : x ∈ PI.SSAscent.UnitaryGroupMassFormula.imAlg r
+      ↔ x ∈ Submodule.span k (Set.range fun g => (r g : Matrix (Fin n) (Fin n) k)) := by
+  have h
+      : (Submonoid.closure (Set.range fun g => (r g : Matrix (Fin n) (Fin n) k))
+          : Set (Matrix (Fin n) (Fin n) k))
+        = Set.range fun g => (r g : Matrix (Fin n) (Fin n) k) := by
+    have e
+        : (Set.range fun g => (r g : Matrix (Fin n) (Fin n) k))
+          = (MonoidHom.mrange ((Units.coeHom _).comp r) : Set (Matrix (Fin n) (Fin n) k)) := by
       ext y
       simp
     rw [e, Submonoid.closure_eq]
-  rw [PI.SSAscent.UnitaryGroupMassFormula.imAlg, ← Subalgebra.mem_toSubmodule, Algebra.adjoin_eq_span, h]
+  rw [PI.SSAscent.UnitaryGroupMassFormula.imAlg, ← Subalgebra.mem_toSubmodule,
+    Algebra.adjoin_eq_span, h]
 
-theorem exists_linear_of_trace [CharZero k] (r : Γ →* GL (Fin n) k) (hr : IsSSRep r) :
-    ∃ (m : ℕ) (c : Fin m → Γ) (ψ : (Fin m → k) →ₗ[k] Matrix (Fin n) (Fin n) k),
-      ∀ g, (r g : Matrix (Fin n) (Fin n) k) =
-        ψ fun i => ((r (g * c i) : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace := by
-  have hnd : PI.SSAscent.UnitaryGroupMassFormula.TrNondeg (PI.SSAscent.UnitaryGroupMassFormula.imAlg r) :=
-    PI.SSAscent.UnitaryGroupMassFormula.downStep_of PI.SSAscent.UnitaryGroupMassFormula.trace_nilpotent_ascent k Γ n r hr
+theorem exists_linear_of_trace [CharZero k] (r : Γ →* GL (Fin n) k) (hr : IsSSRep r)
+    : ∃ (m : ℕ) (c : Fin m → Γ) (ψ : (Fin m → k) →ₗ[k] Matrix (Fin n) (Fin n) k), ∀ g,
+      (r g : Matrix (Fin n) (Fin n) k)
+        = ψ fun i => ((r (g * c i) : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace := by
+  have hnd : PI.SSAscent.UnitaryGroupMassFormula.TrNondeg (PI.SSAscent.UnitaryGroupMassFormula.imAlg
+      r) :=
+    PI.SSAscent.UnitaryGroupMassFormula.downStep_of
+      PI.SSAscent.UnitaryGroupMassFormula.trace_nilpotent_ascent k Γ n r hr
   set S : Set (Matrix (Fin n) (Fin n) k) := Set.range fun g => (r g : Matrix (Fin n) (Fin n) k) with hS
   obtain ⟨f, hf, hspan, -⟩ := Submodule.exists_fun_fin_finrank_span_eq k S
   choose c hc using hf
   let φ : Submodule.span k S →ₗ[k] (Fin (Module.finrank k (Submodule.span k S)) → k) :=
-    LinearMap.pi fun i => (Matrix.traceLinearMap (Fin n) k k) ∘ₗ (LinearMap.mulRight k (f i)) ∘ₗ
-      (Submodule.span k S).subtype
+    LinearMap.pi fun i =>
+      (Matrix.traceLinearMap (Fin n) k k) ∘ₗ (LinearMap.mulRight k (f i))
+        ∘ₗ (Submodule.span k S).subtype
   have hφ : LinearMap.ker φ = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro x hx
@@ -62,7 +69,11 @@ theorem exists_linear_of_trace [CharZero k] (r : Γ →* GL (Fin n) k) (hr : IsS
   rw [h1, LinearMap.comp_apply, h2]
   rfl
 
-theorem continuous_of_continuous_trace : ∀ (Γ k : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Field k] [CharZero k] [TopologicalSpace k] [IsTopologicalRing k] (n : ℕ) (r : Γ →* GL (Fin n) k), IsSSRep r → Continuous (fun g => ((r g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace) → Continuous r := by
+theorem continuous_of_continuous_trace
+    : ∀ (Γ k : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Field k] [CharZero k]
+        [TopologicalSpace k] [IsTopologicalRing k] (n : ℕ) (r : Γ →* GL (Fin n) k),
+      IsSSRep r → Continuous (fun g => ((r g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).trace)
+        → Continuous r := by
   intro Γ k _ _ _ _ _ _ _ n r hr ht
   obtain ⟨m, c, ψ, h⟩ := exists_linear_of_trace r hr
   have hc : Continuous fun g => ((r g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by

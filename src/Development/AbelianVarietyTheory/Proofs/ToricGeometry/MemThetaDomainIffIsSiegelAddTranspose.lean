@@ -16,8 +16,7 @@ variable {ι : Type*} [Fintype ι]
 theorem siegelH_subset_thetaDomain : SiegelH ι ⊆ ThetaDomain ι := by
   intro τ hτ
   obtain ⟨hs, hp⟩ := hτ
-  have ht : (τ.map Complex.im)ᵀ = τ.map Complex.im := by
-    rw [← Matrix.transpose_map, hs.eq]
+  have ht : (τ.map Complex.im)ᵀ = τ.map Complex.im := by rw [← Matrix.transpose_map, hs.eq]
   show (τ.map Complex.im + (τ.map Complex.im)ᵀ).PosDef
   rw [ht]
   exact hp.add hp
@@ -29,13 +28,12 @@ theorem isOpen_thetaDomain : IsOpen (ThetaDomain ι) := by
     intro τ
     ext i j
     simp [hS, add_comm]
-  have hscale : ∀ τ (c : ℝ) (x : ι → ℝ),
-      (c • x) ⬝ᵥ (S τ *ᵥ (c • x)) = c * c * (x ⬝ᵥ (S τ *ᵥ x)) := by
+  have hscale
+      : ∀ τ (c : ℝ) (x : ι → ℝ), (c • x) ⬝ᵥ (S τ *ᵥ (c • x)) = c * c * (x ⬝ᵥ (S τ *ᵥ x)) := by
     intro τ c x
     simp only [Matrix.mulVec_smul, dotProduct_smul, smul_dotProduct, smul_eq_mul]
     ring
-  have key : ∀ τ, τ ∈ ThetaDomain ι ↔
-      ∀ x ∈ Metric.sphere (0 : ι → ℝ) 1, 0 < x ⬝ᵥ (S τ *ᵥ x) := by
+  have key : ∀ τ, τ ∈ ThetaDomain ι ↔ ∀ x ∈ Metric.sphere (0 : ι → ℝ) 1, 0 < x ⬝ᵥ (S τ *ᵥ x) := by
     intro τ
     change (S τ).PosDef ↔ _
     rw [Matrix.posDef_iff_dotProduct_mulVec]
@@ -65,7 +63,8 @@ theorem isOpen_thetaDomain : IsOpen (ThetaDomain ι) := by
   intro τ₀ h₀
   have hev : ∀ᶠ τ in 𝓝 τ₀, ∀ x ∈ Metric.sphere (0 : ι → ℝ) 1, 0 < x ⬝ᵥ (S τ *ᵥ x) := by
     refine (isCompact_sphere (0 : ι → ℝ) 1).eventually_forall_of_forall_eventually
-      (P := fun τ x => 0 < x ⬝ᵥ (S τ *ᵥ x)) fun x hx => ?_
+      (P := fun τ x => 0 < x ⬝ᵥ (S τ *ᵥ x))
+      fun x hx => ?_
     exact (hcont.continuousAt (x := (τ₀, x))).eventually (lt_mem_nhds ((key τ₀).1 h₀ x hx))
   filter_upwards [hev] with τ hτ
   exact (key τ).2 hτ

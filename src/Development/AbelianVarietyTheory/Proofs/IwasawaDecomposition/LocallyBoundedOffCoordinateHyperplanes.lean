@@ -82,7 +82,24 @@ lemma norm_le_of_circle {n a : ℕ} {ρ r : ℝ} {Φ : (Fin n → ℂ) → ℂ} 
     rw [hGH t htb ht0]
     exact hB t ht
 
-theorem locally_bounded : (∀ (H : ℂ → ℂ) (r C : ℝ) (N : ℕ), 0 < r → DifferentiableOn ℂ H (Metric.ball (0 : ℂ) r \ {0}) → (∀ t ∈ Metric.ball (0 : ℂ) r, t ≠ 0 → ‖Complex.exp (2 * Real.pi * Complex.I * H t)‖ * ‖t‖ ^ N ≤ C) → ∃ G : ℂ → ℂ, DifferentiableOn ℂ G (Metric.ball (0 : ℂ) r) ∧ ∀ t ∈ Metric.ball (0 : ℂ) r, t ≠ 0 → G t = H t) → ∀ (n a : ℕ) (ρ : ℝ) (Φ : (Fin n → ℂ) → ℂ) (m : Fin n → ℕ), 0 < ρ → DifferentiableOn ℂ Φ {z | z ∈ Metric.ball (0 : Fin n → ℂ) ρ ∧ ∀ k : Fin n, (k : ℕ) < a → z k ≠ 0} → (∀ z ∈ Metric.ball (0 : Fin n → ℂ) ρ, (∀ k : Fin n, (k : ℕ) < a → z k ≠ 0) → ‖Complex.exp (2 * Real.pi * Complex.I * Φ z)‖ * ∏ k, ‖z k‖ ^ m k ≤ 1) → ∀ z₀ ∈ Metric.ball (0 : Fin n → ℂ) ρ, ∃ V ∈ nhds z₀, ∃ M : ℝ, ∀ z ∈ V, z ∈ Metric.ball (0 : Fin n → ℂ) ρ → (∀ k : Fin n, (k : ℕ) < a → z k ≠ 0) → ‖Φ z‖ ≤ M := by
+theorem locally_bounded
+    : (∀ (H : ℂ → ℂ) (r C : ℝ) (N : ℕ),
+        0 < r → DifferentiableOn ℂ H (Metric.ball (0 : ℂ) r \ {0})
+          → (∀ t ∈ Metric.ball (0 : ℂ) r,
+            t ≠ 0 → ‖Complex.exp (2 * Real.pi * Complex.I * H t)‖ * ‖t‖ ^ N ≤ C)
+          → ∃ G : ℂ → ℂ,
+            DifferentiableOn ℂ G (Metric.ball (0 : ℂ) r)
+              ∧ ∀ t ∈ Metric.ball (0 : ℂ) r, t ≠ 0 → G t = H t)
+      → ∀ (n a : ℕ) (ρ : ℝ) (Φ : (Fin n → ℂ) → ℂ) (m : Fin n → ℕ),
+        0 < ρ
+          → DifferentiableOn ℂ Φ
+            {z | z ∈ Metric.ball (0 : Fin n → ℂ) ρ ∧ ∀ k : Fin n, (k : ℕ) < a → z k ≠ 0}
+          → (∀ z ∈ Metric.ball (0 : Fin n → ℂ) ρ,
+            (∀ k : Fin n, (k : ℕ) < a → z k ≠ 0)
+              → ‖Complex.exp (2 * Real.pi * Complex.I * Φ z)‖ * ∏ k, ‖z k‖ ^ m k ≤ 1)
+          → ∀ z₀ ∈ Metric.ball (0 : Fin n → ℂ) ρ, ∃ V ∈ nhds z₀, ∃ M : ℝ, ∀ z ∈ V,
+            z ∈ Metric.ball (0 : Fin n → ℂ) ρ → (∀ k : Fin n, (k : ℕ) < a → z k ≠ 0)
+              → ‖Φ z‖ ≤ M := by
   intro hext n a ρ Φ m hρ hΦ hgr z₀ hz₀
   have hUo := isOpen_offHyperplanes n a ρ
   have hδ : 0 < ρ - ‖z₀‖ := by rw [mem_ball, dist_zero_right] at hz₀; linarith
@@ -94,7 +111,8 @@ theorem locally_bounded : (∀ (H : ℂ → ℂ) (r C : ℝ) (N : ℕ), 0 < r �
         simpa using (continuous_const_mul (2 : ℝ)).tendsto 0
       exact this.eventually (gt_mem_nhds hδ)
     have h3 : ∀ᶠ r in 𝓝[>] (0 : ℝ), ∀ k, z₀ k ≠ 0 → r < ‖z₀ k‖ := by
-      rw [eventually_all]; intro k
+      rw [eventually_all]
+      intro k
       by_cases hk : z₀ k = 0
       · exact Eventually.of_forall fun _ h => absurd hk h
       · exact (show ∀ᶠ r in 𝓝[>] (0 : ℝ), r < ‖z₀ k‖ from
@@ -103,10 +121,13 @@ theorem locally_bounded : (∀ (H : ℂ → ℂ) (r C : ℝ) (N : ℕ), 0 < r �
   have hsub : ball z₀ (2 * r) ⊆ ball 0 ρ := ball_subset_ball' (by rw [dist_zero_right]; linarith)
   set K := closedBall z₀ r ∩ {ζ : Fin n → ℂ | ∀ k : Fin n, (k : ℕ) < a → z₀ k = 0 → ‖ζ k‖ = r}
     with hK
-  have hKc : IsCompact K := (isCompact_closedBall z₀ r).inter_right (by
-    simp only [setOf_forall]
-    exact isClosed_iInter fun k => isClosed_iInter fun _ => isClosed_iInter fun _ =>
-      isClosed_eq (continuous_norm.comp (continuous_apply k)) continuous_const)
+  have hKc : IsCompact K :=
+    (isCompact_closedBall z₀ r).inter_right (by
+      simp only [setOf_forall]
+      exact isClosed_iInter fun k =>
+        isClosed_iInter fun _ =>
+          isClosed_iInter fun _ =>
+            isClosed_eq (continuous_norm.comp (continuous_apply k)) continuous_const)
   have hKU : K ⊆ {z | z ∈ Metric.ball (0 : Fin n → ℂ) ρ ∧ ∀ k : Fin n, (k : ℕ) < a → z k ≠ 0} := by
     rintro ζ ⟨hζ, hζc⟩
     refine ⟨hsub (closedBall_subset_ball (by linarith) hζ), fun k hk => ?_⟩
@@ -118,8 +139,11 @@ theorem locally_bounded : (∀ (H : ℂ → ℂ) (r C : ℝ) (N : ℕ), 0 < r �
       have := hrk k h0
       linarith [mem_closedBall.1 hζ]
   obtain ⟨M, hM⟩ := hKc.exists_bound_of_continuousOn (hΦ.continuousOn.mono hKU)
-  have hind : ∀ S : Finset (Fin n), ∀ z : Fin n → ℂ, (∀ j, z j ≠ 0) → z ∈ closedBall z₀ r →
-      (∀ k : Fin n, (k : ℕ) < a → z₀ k = 0 → k ∉ S → ‖z k‖ = r) → ‖Φ z‖ ≤ M := by
+  have hind
+      : ∀ S : Finset (Fin n), ∀ z : Fin n → ℂ,
+        (∀ j, z j ≠ 0) → z ∈ closedBall z₀ r
+          → (∀ k : Fin n, (k : ℕ) < a → z₀ k = 0 → k ∉ S → ‖z k‖ = r)
+          → ‖Φ z‖ ≤ M := by
     intro S
     refine Finset.induction_on S ?_ ?_
     · intro z _ hz hc
@@ -151,10 +175,11 @@ theorem locally_bounded : (∀ (H : ℂ → ℂ) (r C : ℝ) (N : ℕ), 0 < r �
   have hzU : z ∈ {z | z ∈ Metric.ball (0 : Fin n → ℂ) ρ ∧ ∀ k : Fin n, (k : ℕ) < a → z k ≠ 0} :=
     ⟨hzρ, hza⟩
   let w : ℂ → Fin n → ℂ := fun s j => if z j = 0 then s else z j
-  have hwc : Continuous w := continuous_pi fun j => by
-    by_cases h : z j = 0
-    · simp only [w, h, if_true]; exact continuous_id
-    · simp only [w, h, if_false]; exact continuous_const
+  have hwc : Continuous w :=
+    continuous_pi fun j => by
+      by_cases h : z j = 0
+      · simp only [w, h, if_true]; exact continuous_id
+      · simp only [w, h, if_false]; exact continuous_const
   have hw0 : w 0 = z := funext fun j => by by_cases h : z j = 0 <;> simp [w, h]
   have hΦz : ContinuousAt Φ z := (hΦ.differentiableAt (hUo.mem_nhds hzU)).continuousAt
   have hT : Tendsto (fun s => Φ (w s)) (𝓝[≠] (0 : ℂ)) (𝓝 (Φ z)) := by

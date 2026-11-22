@@ -8,7 +8,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+  GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi
+  UpperTheory.V.Hi.CaseU
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterminantRing Pair)
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
@@ -16,11 +20,14 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 set_option synthInstance.maxHeartbeats 200000
 
 section Loc
-variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ)
-  (C : Subgroup 𝓀[k]ˣ)
+variable
+  (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  (n : ℕ) (C : Subgroup 𝓀[k]ˣ)
 
-private theorem iwLev_loc : IsOpen (AlgebraTools.iwC k n C : Set (GL (Fin n) k)) ∧ IsCompact (AlgebraTools.iwC k n C : Set (GL (Fin n) k)) ∧
-    AlgebraTools.iwC k n C ≤ AlgebraTools.iwC k n ⊤ := by
+private theorem iwLev_loc
+    : IsOpen (AlgebraTools.iwC k n C : Set (GL (Fin n) k))
+      ∧ IsCompact (AlgebraTools.iwC k n C : Set (GL (Fin n) k))
+      ∧ AlgebraTools.iwC k n C ≤ AlgebraTools.iwC k n ⊤ := by
   have h1 := (AlgebraTools.memIwC k n C).1
   have h2 := (AlgebraTools.memIwC k n C).2.1
   have hle : AlgebraTools.iwC k n C ≤ AlgebraTools.iwC k n ⊤ := by
@@ -28,15 +35,18 @@ private theorem iwLev_loc : IsOpen (AlgebraTools.iwC k n C : Set (GL (Fin n) k))
     rw [h2]
     exact ((h1 g).1 hg).1
   have hopen : IsOpen (AlgebraTools.iwC k n C : Set (GL (Fin n) k)) :=
-    Subgroup.isOpen_mono (show KOne k (Fin n) ≤ AlgebraTools.iwC k n C from le_sup_left.trans le_sup_left)
+    Subgroup.isOpen_mono
+      (show KOne k (Fin n) ≤ AlgebraTools.iwC k n C from le_sup_left.trans le_sup_left)
       GlobalTheory.StepData.isOpen_KOne
   refine ⟨hopen, ?_, hle⟩
-  refine IsCompact.of_isClosed_subset GlobalTheory.SplitFlip.isCompact_KO (Subgroup.isClosed_of_isOpen _ hopen) ?_
+  refine IsCompact.of_isClosed_subset GlobalTheory.SplitFlip.isCompact_KO
+    (Subgroup.isClosed_of_isOpen _ hopen) ?_
   intro g hg
   exact GlobalTheory.SmGL.iwahori_le_KO k (Fin n) ((h1 g).1 hg).1
 
-private theorem iwLev_conj {x g : GL (Fin n) k} (hx : x ∈ AlgebraTools.iwC k n C) (hg : g ∈ AlgebraTools.iwC k n ⊤) :
-    g * x * g⁻¹ ∈ AlgebraTools.iwC k n C := by
+private theorem iwLev_conj
+    {x g : GL (Fin n) k} (hx : x ∈ AlgebraTools.iwC k n C) (hg : g ∈ AlgebraTools.iwC k n ⊤)
+    : g * x * g⁻¹ ∈ AlgebraTools.iwC k n C := by
   have h2 := (AlgebraTools.memIwC k n C).2.1
   have h3 := (AlgebraTools.memIwC k n C).2.2.1
   rw [h2] at hg
@@ -44,8 +54,14 @@ private theorem iwLev_conj {x g : GL (Fin n) k} (hx : x ∈ AlgebraTools.iwC k n
 
 end Loc
 
-theorem UpperTheory.V.Hi.levelUR2IwLev :
-    ∀ (l : ℕ) (L : Type) [Field L] [NumberField L] (n q : ℕ) (w : Fin q → Plc L), (∀ j C, IsOpen (AlgebraTools.iwC ((w j).adicCompletion L) n C : Set (GLw n (w j))) ∧ IsCompact (AlgebraTools.iwC ((w j).adicCompletion L) n C : Set (GLw n (w j))) ∧ AlgebraTools.iwC ((w j).adicCompletion L) n C ≤ AlgebraTools.iwC ((w j).adicCompletion L) n ⊤) ∧ ((Pa.UIw1 l n w).subgroupOf (Pa.UIw n w)).Normal := by
+theorem UpperTheory.V.Hi.levelUR2IwLev
+    : ∀ (l : ℕ) (L : Type) [Field L] [NumberField L] (n q : ℕ) (w : Fin q → Plc L),
+      (∀ j C,
+          IsOpen (AlgebraTools.iwC ((w j).adicCompletion L) n C : Set (GLw n (w j)))
+            ∧ IsCompact (AlgebraTools.iwC ((w j).adicCompletion L) n C : Set (GLw n (w j)))
+            ∧ AlgebraTools.iwC ((w j).adicCompletion L) n C
+              ≤ AlgebraTools.iwC ((w j).adicCompletion L) n ⊤)
+        ∧ ((Pa.UIw1 l n w).subgroupOf (Pa.UIw n w)).Normal := by
   intro l L _ _ n q w
   refine ⟨fun j C => iwLev_loc _ n C, ?_⟩
   have hle : Pa.UIw1 l n w ≤ Pa.UIw n w := by

@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PinchingSqua
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,7 +23,14 @@ set_option autoImplicit false
 
 namespace GlobalTheory.PinchLift
 
-theorem exists_pic_patch : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z), IsPullback i' p' p i → IsAffineHom p → IsClosedImmersion i → GlobalTheory.PinchLift.Glues p i i' p' → ∀ (a : Pic X') (b : Pic Z), GlobalTheory.CechPic.pull i' a = GlobalTheory.CechPic.pull p' b → ∃ e : Pic X, GlobalTheory.CechPic.pull p e = a ∧ GlobalTheory.CechPic.pull i e = b := by
+theorem exists_pic_patch
+    : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z),
+      IsPullback i' p' p i → IsAffineHom p → IsClosedImmersion i
+        → GlobalTheory.PinchLift.Glues p i i' p'
+        → ∀ (a : Pic X') (b : Pic Z),
+          GlobalTheory.CechPic.pull i' a = GlobalTheory.CechPic.pull p' b
+            → ∃ e : Pic X,
+              GlobalTheory.CechPic.pull p e = a ∧ GlobalTheory.CechPic.pull i e = b := by
   have hA1 := GlobalTheory.T.exists_lineBundle_generator_off_closed_subscheme
   have hA2 := GlobalTheory.T.exists_matching_lineBundle_generators_near_pinching_point
   have hB := GlobalTheory.T.pinchingSquare_glue_lineBundle_of_local_generators
@@ -36,7 +46,14 @@ theorem exists_pic_patch : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z �
   · push_neg at hx
     obtain ⟨W, s', hxW, hbot, hs'⟩ := hA1 X X' Z Z' p i i' p' hsq hp hi hgl L' hL' x hx
     have hno : ∀ y : Z, y ∉ i ⁻¹ᵁ W := fun y hy => by rw [hbot] at hy; exact hy
-    refine ⟨W, s', fun _ => 1, hxW, hs', fun k l y _ _ hy => (hno y hy).elim,
-      fun z j k _ _ hz _ => (hno _ hz).elim⟩
+    refine ⟨
+      W,
+      s',
+      fun _ => 1,
+      hxW,
+      hs',
+      fun k l y _ _ hy => (hno y hy).elim,
+      fun z j k _ _ hz _ => (hno _ hz).elim
+    ⟩
 
 end GlobalTheory.PinchLift

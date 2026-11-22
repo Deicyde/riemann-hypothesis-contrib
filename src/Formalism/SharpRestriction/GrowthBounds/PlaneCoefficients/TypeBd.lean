@@ -11,12 +11,14 @@ open MvPolynomial Finset
 
 namespace Formalism.MainNotions.PairMembershipBlocks
 
-open Formalism.MainNotions.G Formalism.MainNotions.TestSideWords Formalism.MainNotions.G.GLWeightTheory
+open Formalism.MainNotions.G Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.G.GLWeightTheory
 
 theorem typeBound_proved (D : Formalism.BasicNotions.D7) : TypeBound := by
-
   have hV := Formalism.MainNotions.G.GLWeightTheory.valuation_field D
-  unfold Formalism.MainNotions.CovariantDegrees.ValuationLemmaField Formalism.MainNotions.CovariantDegrees.ShaLengthVersionTwo at hV
+  unfold Formalism.MainNotions.CovariantDegrees.ValuationLemmaField
+      Formalism.MainNotions.CovariantDegrees.ShaLengthVersionTwo
+    at hV
   unfold TypeBound
   intro K _ _ ι _ LL n _ S e he _ G lam hne
   obtain ⟨hval, hlam⟩ := hV.2 K ι LL n S e he

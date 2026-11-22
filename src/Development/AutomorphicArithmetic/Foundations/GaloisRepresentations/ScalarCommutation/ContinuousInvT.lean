@@ -18,12 +18,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo
+  GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC
 open UpperTheory.Gal.CertificateRingHomMap (GUf Plc comp lev GLw invT_val invT_invT')
 open UpperTheory.Gal.W2.Seed UpperTheory.Gal.Int.Geo UpperTheory.Gal.Int.Geo.Pl UpperTheory.Gal.Spc
 
-private theorem continuous_invT' {n : ℕ} {R : Type} [CommRing R] [TopologicalSpace R] :
-    Continuous (invT n R : GL (Fin n) R → GL (Fin n) R) := by
+private theorem continuous_invT' {n : ℕ} {R : Type} [CommRing R] [TopologicalSpace R]
+    : Continuous (invT n R : GL (Fin n) R → GL (Fin n) R) := by
   refine Units.continuous_iff.2 ⟨?_, ?_⟩
   · exact Units.continuous_coe_inv.matrix_transpose
   · have e : (fun g : GL (Fin n) R => ((invT n R g)⁻¹ : GL (Fin n) R).val) = fun g => g.valᵀ := by
@@ -58,8 +59,9 @@ private theorem tyTop_of (hF : KNFact) (hG : CongGrpEx) (hC : CuspTh) : TyTop :=
     exact hJc.image continuous_invT'
   · have hc : Continuous (fun y : Ty.J => (⟨invT n _ y.1, (hJ y.1).1 y.2⟩ : V.J)) :=
       (continuous_invT'.comp continuous_subtype_val).subtype_mk _
-    have e : (Ty.ψ.ker : Set Ty.J) =
-        (fun y : Ty.J => (⟨invT n _ y.1, (hJ y.1).1 y.2⟩ : V.J)) ⁻¹' {k : V.J | V.χ k = 1} := by
+    have e
+        : (Ty.ψ.ker : Set Ty.J)
+          = (fun y : Ty.J => (⟨invT n _ y.1, (hJ y.1).1 y.2⟩ : V.J)) ⁻¹' {k : V.J | V.χ k = 1} := by
       ext y
       have h := hT.ψ_eq y ⟨invT n _ y.1, (hJ y.1).1 y.2⟩ (invT_val y.1)
       simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_preimage, Set.mem_ofPred_eq, h]
@@ -69,11 +71,12 @@ private theorem tyTop_of (hF : KNFact) (hG : CongGrpEx) (hC : CuspTh) : TyTop :=
     obtain ⟨σ', e, he, hcusp⟩ := hC E n w₀ σ
     refine hcusp (V.cusp σ' (e v) (fun h => hv (e.map_eq_zero_iff.1 h)) fun g => ?_)
     have hg : invT n _ g.1 ∈ Ty.J := (hJ _).2 (by rw [invT_invT']; exact g.2)
-    have hval : (g : GLw n w₀).val = ((invT n _ g.1)⁻¹).valᵀ := by
-      rw [← invT_val, invT_invT']
+    have hval : (g : GLw n w₀).val = ((invT n _ g.1)⁻¹).valᵀ := by rw [← invT_val, invT_invT']
     rw [he _ _ v hval, hσ ⟨_, hg⟩, map_smul, hT.ψ_eq ⟨_, hg⟩ g hval]
 
-theorem UpperTheory.Gal.Spc.tyTop :
-    UpperTheory.Gal.Spc.TyTop :=
-  tyTop_of (pKNFact (pKNIff (pLatCoord pRepLaws)) pFacEq (pAtApart pJEq) pCongGrpEx (pCongConj UpperTheory.Gal.CertificateRingHomMap.pLocComm_of) pLocComm
-    UpperTheory.Gal.CertificateRingHomMap.pLocComm_of) pCongGrpEx pCuspTh
+theorem UpperTheory.Gal.Spc.tyTop : UpperTheory.Gal.Spc.TyTop :=
+  tyTop_of
+    (pKNFact (pKNIff (pLatCoord pRepLaws)) pFacEq (pAtApart pJEq) pCongGrpEx
+      (pCongConj UpperTheory.Gal.CertificateRingHomMap.pLocComm_of) pLocComm
+      UpperTheory.Gal.CertificateRingHomMap.pLocComm_of)
+    pCongGrpEx pCuspTh

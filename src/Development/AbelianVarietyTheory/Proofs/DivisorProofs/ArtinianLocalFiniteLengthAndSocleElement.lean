@@ -7,18 +7,23 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Abe
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.AbCoh
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 set_option autoImplicit false
 
 namespace GlobalTheory
 
-theorem artinianLocal_finiteLength_and_socle_element :
-    ∀ (R : Type) [CommRing R] [IsArtinianRing R] [IsLocalRing R],
-      (∃ n : ℕ, Module.length R R = n) ∧
-      (¬ IsField R → ∃ t : R, t ≠ 0 ∧ (∀ a ∈ IsLocalRing.maximalIdeal R, a * t = 0) ∧
-        Module.length (R ⧸ Ideal.span {t}) (R ⧸ Ideal.span {t}) < Module.length R R) := by
+theorem artinianLocal_finiteLength_and_socle_element
+    : ∀ (R : Type) [CommRing R] [IsArtinianRing R] [IsLocalRing R],
+      (∃ n : ℕ, Module.length R R = n)
+        ∧ (¬ IsField R
+          → ∃ t : R,
+            t ≠ 0 ∧ (∀ a ∈ IsLocalRing.maximalIdeal R, a * t = 0)
+              ∧ Module.length (R ⧸ Ideal.span {t}) (R ⧸ Ideal.span {t}) < Module.length R R) := by
   intro R _ _ _
   have hfin : IsFiniteLength R R :=
     isFiniteLength_iff_isNoetherian_isArtinian.2 ⟨inferInstance, inferInstance⟩
@@ -48,10 +53,11 @@ theorem artinianLocal_finiteLength_and_socle_element :
     exact (Submodule.mem_bot R).1 h1
   refine ⟨t, ht0, hkill, ?_⟩
   set I : Ideal R := Ideal.span {t}
-  rw [Module.length_eq_of_surjective (S := R) (R := R ⧸ I) (M := R ⧸ I)
-    Ideal.Quotient.mk_surjective |>.symm]
-  have hadd := Module.length_eq_add_of_exact (R := R) I.subtype I.mkQ I.injective_subtype
-    I.mkQ_surjective (LinearMap.exact_subtype_mkQ I)
+  rw [Module.length_eq_of_surjective (S := R) (R := R ⧸ I) (M := R ⧸ I) Ideal.Quotient.mk_surjective
+    |>.symm]
+  have hadd :=
+    Module.length_eq_add_of_exact (R := R) I.subtype I.mkQ I.injective_subtype I.mkQ_surjective
+      (LinearMap.exact_subtype_mkQ I)
   have hI : Module.length R I ≠ 0 := by
     rw [Ne, Module.length_eq_zero_iff]
     intro hs

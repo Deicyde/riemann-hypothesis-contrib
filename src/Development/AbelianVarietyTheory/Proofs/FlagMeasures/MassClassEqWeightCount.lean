@@ -112,16 +112,23 @@ namespace GlobalTheory.HL.LocGenMass
 
 open GlobalTheory.HL.PairingClass
 
-theorem act_one' {E : Type} [CommRing E] {V : Type} [AddCommGroup V] [Module E V] {n : ℕ}
-    (g : Fin n → V) : act g (1 : Matrix (Fin n) (Fin n) E) = g := by
+theorem act_one'
+    {E : Type} [CommRing E] {V : Type} [AddCommGroup V] [Module E V] {n : ℕ} (g : Fin n → V)
+    : act g (1 : Matrix (Fin n) (Fin n) E) = g := by
   funext j
   simp [act, Matrix.one_apply]
 
-theorem span_act_eq {E : Type} [CommRing E] {V : Type} [AddCommGroup V] [Module E V] {n : ℕ}
-    (O : Subring E) (g₀ : Fin n → V) (C : Matrix (Fin n) (Fin n) E) (hU : UT C) (hC : IntM O C) :
-    Submodule.span O (Set.range (act g₀ C)) = Submodule.span O (Set.range g₀) := by
-  have key : ∀ (g : Fin n → V) (D : Matrix (Fin n) (Fin n) E), IntM O D →
-      Submodule.span O (Set.range (act g D)) ≤ Submodule.span O (Set.range g) := by
+theorem span_act_eq
+    {E : Type} [CommRing E]
+    {V : Type} [AddCommGroup V] [Module E V]
+    {n : ℕ}
+    (O : Subring E)
+    (g₀ : Fin n → V)
+    (C : Matrix (Fin n) (Fin n) E) (hU : UT C) (hC : IntM O C)
+    : Submodule.span O (Set.range (act g₀ C)) = Submodule.span O (Set.range g₀) := by
+  have key
+      : ∀ (g : Fin n → V) (D : Matrix (Fin n) (Fin n) E),
+        IntM O D → Submodule.span O (Set.range (act g D)) ≤ Submodule.span O (Set.range g) := by
     intro g D hD
     refine Submodule.span_le.2 ?_
     rintro _ ⟨j, rfl⟩
@@ -133,14 +140,16 @@ theorem span_act_eq {E : Type} [CommRing E] {V : Type} [AddCommGroup V] [Module 
   have := key (act g₀ C) B (hint O hC)
   rwa [e] at this
 
-theorem relift {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-    [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E) (r k : ℕ)
-    (S : Frames L r k) (δ : S.Datum) (Λ : Submodule L.O S.V) (m₀ m₀' m m' : S.GLV)
-    (hW : S.IsTermW δ Λ m₀ m₀') (hm : m ∈ S.N) (hm' : m' ∈ S.N')
-    (hc : ((fun b => m (S.f b)), (fun b => m' (S.f' b))) ∈
-      S.frameCls (fun b => m₀ (S.f b)) (fun b => m₀' (S.f' b))) :
-    ∃ m₂ ∈ S.N, ∃ m₂' ∈ S.N', (∀ b, m₂ (S.f b) = m (S.f b)) ∧ (∀ b, m₂' (S.f' b) = m' (S.f' b)) ∧
-      S.IsTermW δ Λ m₂ m₂' := by
+theorem relift
+    {F : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
+    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : LocE F E) (r k : ℕ) (S : Frames L r k) (δ : S.Datum) (Λ : Submodule L.O S.V)
+    (m₀ m₀' m m' : S.GLV) (hW : S.IsTermW δ Λ m₀ m₀') (hm : m ∈ S.N) (hm' : m' ∈ S.N')
+    (hc : ((fun b => m (S.f b)), (fun b => m' (S.f' b)))
+      ∈ S.frameCls (fun b => m₀ (S.f b)) (fun b => m₀' (S.f' b)))
+    : ∃ m₂ ∈ S.N, ∃ m₂' ∈ S.N',
+      (∀ b, m₂ (S.f b) = m (S.f b)) ∧ (∀ b, m₂' (S.f' b) = m' (S.f' b)) ∧ S.IsTermW δ Λ m₂ m₂' := by
   obtain ⟨hA, hA', hn₀, hn₀', e, e', hth, hgr⟩ := hW
   obtain ⟨C, C', a3, a4, a12, adiag, aθ, p1, p2⟩ := hc
   have p1 : ∀ j, m (S.f j) = ∑ i, C i j • m₀ (S.f i) := p1
@@ -153,29 +162,36 @@ theorem relift {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNon
     simp [S.gram, Fin.castSucc_ne_last]
   have hg' : ∀ a (j : Fin r), hf L S.Hm (S.f' a) (S.f' j.castSucc) = 0 := fun a j => by
     simp [S.gram', Fin.castSucc_ne_last]
-  have hs : {i : Fin (r + 1) | (i : ℕ) < r + 1} = Set.univ := by
-    ext i; simpa using i.2
+  have hs : {i : Fin (r + 1) | (i : ℕ) < r + 1} = Set.univ := by ext i; simpa using i.2
   obtain ⟨s1, s2, s3⟩ := StdLat.stdLat_spec L r k S _ _ (Or.inl ⟨rfl, rfl⟩) _ hA
   obtain ⟨s1', s2', s3'⟩ := StdLat.stdLat_spec L r k S _ _ (Or.inr ⟨rfl, rfl⟩) _ hA'
   have hSD : IsSD L S.Hm Λ := by
     have := TermBasic.isSD_smul S hn₀.1.1 s1
     rwa [← e] at this
-  have tr : ∀ x, (x ∈ Λ ∧ x ∈ S.spanTo S.f (r + 1)) ↔
-      x ∈ Submodule.span L.O (Set.range fun b => m₀ (S.f b)) := by
+  have tr
+      : ∀ x,
+        (x ∈ Λ ∧ x ∈ S.spanTo S.f (r + 1))
+          ↔ x ∈ Submodule.span L.O (Set.range fun b => m₀ (S.f b)) := by
     intro x
     have := TermBasic.trace_smul hg hn₀ (s2 (r + 1) le_rfl) x
     rwa [← e, hs, Set.image_univ] at this
-  have tr' : ∀ x, (x ∈ Λ ∧ x ∈ S.spanTo S.f' (r + 1)) ↔
-      x ∈ Submodule.span L.O (Set.range fun b => m₀' (S.f' b)) := by
+  have tr'
+      : ∀ x,
+        (x ∈ Λ ∧ x ∈ S.spanTo S.f' (r + 1))
+          ↔ x ∈ Submodule.span L.O (Set.range fun b => m₀' (S.f' b)) := by
     intro x
     have := TermBasic.trace_smul hg' hn₀' (s2' (r + 1) le_rfl) x
     rwa [← e', hs, Set.image_univ] at this
-  have prim : ∀ x, (x ∈ Λ ∧ x ∈ S.spanTo S.f (r + 1)) ↔
-      x ∈ Submodule.span L.O (Set.range fun b => m (S.f b)) := by
+  have prim
+      : ∀ x,
+        (x ∈ Λ ∧ x ∈ S.spanTo S.f (r + 1))
+          ↔ x ∈ Submodule.span L.O (Set.range fun b => m (S.f b)) := by
     intro x
     rw [tr, pf, span_act_eq L.O _ C hU a3]
-  have prim' : ∀ x, (x ∈ Λ ∧ x ∈ S.spanTo S.f' (r + 1)) ↔
-      x ∈ Submodule.span L.O (Set.range fun b => m' (S.f' b)) := by
+  have prim'
+      : ∀ x,
+        (x ∈ Λ ∧ x ∈ S.spanTo S.f' (r + 1))
+          ↔ x ∈ Submodule.span L.O (Set.range fun b => m' (S.f' b)) := by
     intro x
     rw [tr', pf', span_act_eq L.O _ C' hU' a4]
   obtain ⟨A₁, hA₁, n₁, hn₁, hfix, hΛ₁⟩ :=
@@ -198,15 +214,17 @@ theorem relift {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNon
   choose y hy hyeq using hth
   choose cc hcc hcceq using aθ
   have hmem : ∀ i, m₀ (S.f i) ∈ Λ := fun i => ((tr _).2 (Submodule.subset_span ⟨i, rfl⟩)).1
-  refine ⟨∑ i, ((⟨C' i j, a4 i j⟩ : L.O) • y i + (⟨cc i j, hcc i j⟩ : L.O) • m₀ (S.f i)),
-    Submodule.sum_mem _ fun i _ => Submodule.add_mem _ (Submodule.smul_mem _ _ (hy i))
-      (Submodule.smul_mem _ _ (hmem i)), ?_⟩
+  refine ⟨
+    ∑ i, ((⟨C' i j, a4 i j⟩ : L.O) • y i + (⟨cc i j, hcc i j⟩ : L.O) • m₀ (S.f i)),
+    Submodule.sum_mem _ fun i _ =>
+      Submodule.add_mem _ (Submodule.smul_mem _ _ (hy i)) (Submodule.smul_mem _ _ (hmem i)),
+    ?_
+  ⟩
   rw [← Finset.sum_sub_distrib, Finset.smul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   have h1 : m₀' (S.f' i) = m₀ (S.f i) + algebraMap F E S.th • y i := by
     rw [← hyeq i, add_sub_cancel]
-  have h2 : C' i j = C i j + algebraMap F E S.th * cc i j := by
-    rw [← hcceq i j, add_sub_cancel]
+  have h2 : C' i j = C i j + algebraMap F E S.th * cc i j := by rw [← hcceq i j, add_sub_cancel]
   rw [h1, Subring.smul_def, Subring.smul_def]
   simp only [h2]
   module

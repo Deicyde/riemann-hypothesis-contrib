@@ -10,7 +10,9 @@ namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
 open Formalism.MainNotions.G Formalism.BasicNotions Finset
 
-attribute [local instance] Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
+attribute [local instance]
+  Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO
+  Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
   Formalism.MainNotions.G.GAtP.algOK
 
 variable {p : ℕ} [Fact p.Prime] {X : Sys p}
@@ -29,8 +31,10 @@ theorem pKf_ne (Y : Pend X) : ((p : ℕ) : X.G.Kf) ≠ 0 := by
     exact h1
   exact prime_cast_ne_zero ((map_eq_zero _).1 h2)
 
-theorem algebraMap_inj (Y : Pend X) (he : 0 < X.eO) : Function.Injective (algebraMap X.G.O X.G.Kf) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem algebraMap_inj (Y : Pend X) (he : 0 < X.eO)
+    : Function.Injective (algebraMap X.G.O X.G.Kf) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   by_contra ha0
   obtain ⟨n, hn⟩ := IsDiscreteValuationRing.associated_pow_irreducible ha0 X.unif
@@ -47,11 +51,13 @@ theorem algebraMap_inj (Y : Pend X) (he : 0 < X.eO) : Function.Injective (algebr
   rw [map_mul, map_natCast] at h3
   rcases mul_eq_zero.1 h3 with h | h
   · exact pKf_ne Y h
-  · have : algebraMap X.G.O X.G.Kf ((u' : X.G.O) * ((u'⁻¹ : X.G.Oˣ) : X.G.O)) = 0 := by rw [map_mul, h, zero_mul]
+  · have : algebraMap X.G.O X.G.Kf ((u' : X.G.O) * ((u'⁻¹ : X.G.Oˣ) : X.G.O)) = 0 := by
+      rw [map_mul, h, zero_mul]
     simp at this
 
 theorem isFractionRing_of_pos_eO (Y : Pend X) (he : 0 < X.eO) : IsFractionRing X.G.O X.G.Kf := by
-  have : FaithfulSMul X.G.O X.G.Kf := (faithfulSMul_iff_algebraMap_injective _ _).2 (algebraMap_inj Y he)
+  have : FaithfulSMul X.G.O X.G.Kf :=
+    (faithfulSMul_iff_algebraMap_injective _ _).2 (algebraMap_inj Y he)
   apply IsFractionRing.of_field
   intro z
   rcases Y.Oc_val (algebraMap X.G.Kf Y.Kc z) with h | h

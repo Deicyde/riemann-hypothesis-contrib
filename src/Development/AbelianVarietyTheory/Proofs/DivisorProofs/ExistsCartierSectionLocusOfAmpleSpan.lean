@@ -4,9 +4,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SubsetSpanBy
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
@@ -14,8 +17,10 @@ noncomputable section
 
 namespace GlobalTheory.Desc
 
-theorem unitAt_of_mul_right {X : Scheme.{0}} [IsIntegral X] {x : X} {a b : X.functionField}
-    (ha : RegAt x a) (hb : RegAt x b) (h : UnitAt x (a * b)) : UnitAt x b := by
+theorem unitAt_of_mul_right
+    {X : Scheme.{0}} [IsIntegral X]
+    {x : X} {a b : X.functionField} (ha : RegAt x a) (hb : RegAt x b) (h : UnitAt x (a * b))
+    : UnitAt x b := by
   obtain ⟨a', rfl⟩ := ha
   obtain ⟨b', rfl⟩ := hb
   obtain ⟨w, hw, e⟩ := h
@@ -23,11 +28,16 @@ theorem unitAt_of_mul_right {X : Scheme.{0}} [IsIntegral X] {x : X} {a b : X.fun
   obtain rfl := IsFractionRing.injective (X.presheaf.stalk x) X.functionField e
   exact ⟨b', isUnit_of_mul_isUnit_right hw, rfl⟩
 
-theorem regAt_cst {R : Type} [CommRing R] {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ Sp R) (x : X) (r : R) :
-    RegAt x (cst p r) :=
+theorem regAt_cst
+    {R : Type} [CommRing R] {X : Scheme.{0}} [IsIntegral X] (p : X ⟶ Sp R) (x : X) (r : R)
+    : RegAt x (cst p r) :=
   regAt_fnOf (x := x) (U := ⊤) trivial trivial _
 
-theorem exists_locus_of_span : ∀ (R₁ F : Type) [CommRing R₁] [Field F] (Y : Scheme.{0}) [IsIntegral Y] (q : Y ⟶ Sp R₁) (θ : F →+* Y.functionField) (N : ℕ → Set F) (D₁ : CartierDiv Y), AmpleDiv D₁ → (∀ k, Sec D₁ k = spanBy (GlobalTheory.Desc.cst q) (θ '' N k)) → ∀ y : Y, ∃ k, 1 ≤ k ∧ ∃ b ∈ N k, y ∈ locus D₁ k (θ b) := by
+theorem exists_locus_of_span
+    : ∀ (R₁ F : Type) [CommRing R₁] [Field F] (Y : Scheme.{0}) [IsIntegral Y] (q : Y ⟶ Sp R₁)
+        (θ : F →+* Y.functionField) (N : ℕ → Set F) (D₁ : CartierDiv Y),
+      AmpleDiv D₁ → (∀ k, Sec D₁ k = spanBy (GlobalTheory.Desc.cst q) (θ '' N k))
+        → ∀ y : Y, ∃ k, 1 ≤ k ∧ ∃ b ∈ N k, y ∈ locus D₁ k (θ b) := by
   intro R₁ F _ _ Y _ q θ N D₁ hA hS y
   obtain ⟨k, hk, u, hu, U, -, hU, hy⟩ := hA y
   have hyu : y ∈ locus D₁ k u := hU ▸ hy

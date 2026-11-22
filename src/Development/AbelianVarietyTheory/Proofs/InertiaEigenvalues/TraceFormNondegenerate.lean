@@ -10,29 +10,33 @@ open Formalism.MainNotions.N GlobalTheory.TraceSemisimple
 
 namespace GlobalTheory.SemisimpleTraceForm
 
-theorem idem_eq_zero_of_trace {k : Type} [Field k] [CharZero k] {n : ℕ}
-    (e : Matrix (Fin n) (Fin n) k) (he : e * e = e) (ht : e.trace = 0) : e = 0 := by
+theorem idem_eq_zero_of_trace
+    {k : Type} [Field k] [CharZero k]
+    {n : ℕ} (e : Matrix (Fin n) (Fin n) k) (he : e * e = e) (ht : e.trace = 0)
+    : e = 0 := by
   have hf : IsIdempotentElem (Matrix.toLin' e) := by
     unfold IsIdempotentElem
     rw [Module.End.mul_eq_comp, ← Matrix.toLin'_mul, he]
-  have hp : LinearMap.IsProj (LinearMap.range (Matrix.toLin' e)) (Matrix.toLin' e) :=
-    ⟨fun v => ⟨v, rfl⟩, by
+  have hp : LinearMap.IsProj (LinearMap.range (Matrix.toLin' e)) (Matrix.toLin' e) := ⟨
+    fun v => ⟨v, rfl⟩,
+    by
       rintro _ ⟨v, rfl⟩
-      exact congrArg (fun f : Module.End k (Fin n → k) => f v) hf⟩
+      exact congrArg (fun f : Module.End k (Fin n → k) => f v) hf
+  ⟩
   have h1 := hp.trace
   rw [Matrix.trace_toLin'_eq, ht] at h1
-  have h2 : Module.finrank k (LinearMap.range (Matrix.toLin' e)) = 0 := by
-    exact_mod_cast h1.symm
+  have h2 : Module.finrank k (LinearMap.range (Matrix.toLin' e)) = 0 := by exact_mod_cast h1.symm
   rw [Submodule.finrank_eq_zero, LinearMap.range_eq_bot] at h2
   exact (LinearEquiv.map_eq_zero_iff _).1 h2
 
-theorem semisimple_span {Γ k : Type} [Group Γ] [Field k] {n : ℕ}
-    (ρ : Γ →* GL (Fin n) k) (h : IsSSRep ρ) : IsSemisimpleRing (spanAlg ρ) := by
+theorem semisimple_span
+    {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (ρ : Γ →* GL (Fin n) k) (h : IsSSRep ρ)
+    : IsSemisimpleRing (spanAlg ρ) := by
   let φ : spanAlg ρ →+* Module.End k (Fin n → k) :=
     ((Matrix.toLinAlgEquiv' (R := k) (n := Fin n)).toAlgHom.comp (spanAlg ρ).val).toRingHom
   letI : Module (spanAlg ρ) (Fin n → k) := Module.compHom _ φ
-  have hs : ∀ (a : spanAlg ρ) (v : Fin n → k),
-      a • v = (a : Matrix (Fin n) (Fin n) k).mulVec v := fun _ _ => rfl
+  have hs : ∀ (a : spanAlg ρ) (v : Fin n → k), a • v = (a : Matrix (Fin n) (Fin n) k).mulVec v :=
+    fun _ _ => rfl
   have hinv : ∀ W, IsInv ρ W → ∀ a : spanAlg ρ, ∀ v ∈ W, a • v ∈ W := by
     rintro W hW ⟨a, ha⟩ v hv
     rw [hs]
@@ -46,19 +50,21 @@ theorem semisimple_span {Γ k : Type} [Group Γ] [Field k] {n : ℕ}
   have hV : IsSemisimpleModule (spanAlg ρ) (Fin n → k) := by
     rw [isSemisimpleModule_iff]
     refine ⟨fun U => ?_⟩
-    let W : Submodule k (Fin n → k) :=
-      { toAddSubmonoid := U.toAddSubmonoid
-        smul_mem' := fun c v hv => by
-          have h1 : (c • (1 : Matrix (Fin n) (Fin n) k)).mulVec v ∈ U :=
-            U.smul_mem (c • (1 : spanAlg ρ)) hv
-          rw [Matrix.smul_mulVec, Matrix.one_mulVec] at h1
-          exact h1 }
+    let W : Submodule k (Fin n → k) := {
+      toAddSubmonoid := U.toAddSubmonoid
+      smul_mem' := fun c v hv => by
+        have h1 : (c • (1 : Matrix (Fin n) (Fin n) k)).mulVec v ∈ U :=
+          U.smul_mem (c • (1 : spanAlg ρ)) hv
+        rw [Matrix.smul_mulVec, Matrix.one_mulVec] at h1
+        exact h1
+    }
     have hW : IsInv ρ W := fun g v hv =>
       U.smul_mem ⟨(ρ g : GL (Fin n) k), Submodule.subset_span ⟨g, rfl⟩⟩ hv
     obtain ⟨W', hW', hc⟩ := h W hW
-    let U' : Submodule (spanAlg ρ) (Fin n → k) :=
-      { toAddSubmonoid := W'.toAddSubmonoid
-        smul_mem' := fun a v hv => hinv W' hW' a v hv }
+    let U' : Submodule (spanAlg ρ) (Fin n → k) := {
+      toAddSubmonoid := W'.toAddSubmonoid
+      smul_mem' := fun a v hv => hinv W' hW' a v hv
+    }
     refine ⟨U', ?_, ?_⟩
     · rw [Submodule.disjoint_def]
       exact fun v hv hv' => Submodule.disjoint_def.1 hc.disjoint v hv hv'
@@ -70,7 +76,8 @@ theorem semisimple_span {Γ k : Type} [Group Γ] [Field k] {n : ℕ}
   let ψ : spanAlg ρ →ₗ[spanAlg ρ] (Fin n → Fin n → k) :=
     LinearMap.pi fun j => LinearMap.toSpanSingleton _ _ (Pi.single j 1)
   have hψ : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     ext i j
     have h1 : (a : Matrix (Fin n) (Fin n) k).mulVec ((Pi.single j 1 : Fin n → k)) i = 0 :=
@@ -80,11 +87,12 @@ theorem semisimple_span {Γ k : Type} [Group Γ] [Field k] {n : ℕ}
     instIsSemisimpleModuleForallOfFinite fun _ => Fin n → k
   exact IsSemisimpleModule.of_injective ψ hψ
 
-theorem trace_form_nondegenerate :
-    ∀ {Γ k : Type} [Group Γ] [Field k] [CharZero k] {n : ℕ} (ρ : Γ →* GL (Fin n) k),
-      IsSSRep ρ → ∀ x ∈ spanAlg ρ,
-        (∀ g : Γ, Matrix.trace (x * ((ρ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) = 0) →
-        x = 0 := by
+theorem trace_form_nondegenerate
+    : ∀ {Γ k : Type} [Group Γ] [Field k] [CharZero k] {n : ℕ} (ρ : Γ →* GL (Fin n) k),
+      IsSSRep ρ
+        → ∀ x ∈ spanAlg ρ,
+          (∀ g : Γ, Matrix.trace (x * ((ρ g : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) = 0)
+            → x = 0 := by
   intro Γ k _ _ _ n ρ h x hx ht
   have := semisimple_span ρ h
   have hA : ∀ a ∈ spanAlg ρ, (x * a).trace = 0 := by
@@ -102,8 +110,7 @@ theorem trace_form_nondegenerate :
   obtain ⟨e, he, f, hf, hef⟩ := Submodule.mem_sup.1 h1
   have key : ∀ z ∈ Submodule.span (spanAlg ρ) {y}, z * e = z := by
     intro z hz
-    have h2 : z * f = z - z * e := by
-      rw [eq_sub_iff_add_eq', ← mul_add, hef, mul_one]
+    have h2 : z * f = z - z * e := by rw [eq_sub_iff_add_eq', ← mul_add, hef, mul_one]
     have h3 : z * f = 0 :=
       Submodule.disjoint_def.1 hC.disjoint _
         (h2 ▸ Submodule.sub_mem _ hz (Submodule.smul_mem _ z he)) (C.smul_mem z hf)

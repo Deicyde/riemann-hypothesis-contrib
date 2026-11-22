@@ -15,20 +15,33 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Ramificat
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.PRep
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+  GlobalTheory.Doubling GlobalTheory.PRep
 open Formalism.UG (IsUnifV qV IsUnramInv GU KU IsInertAt Hecke ordL)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
 open GlobalTheory.LGrp (bcParam)
-open GlobalTheory.LFun (toCompl locMat locChar IsSplitChart IsInertChart IsFrameAt KGL IsSatVecGL IsSatVecU eulerFac UnrAt LvTw dv Fam)
+open GlobalTheory.LFun
+  (toCompl locMat locChar IsSplitChart IsInertChart IsFrameAt KGL IsSatVecGL IsSatVecU eulerFac
+    UnrAt LvTw dv Fam)
 
 namespace GlobalTheory.AbsInert
 
-theorem ordL_eq_neg_log {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {y : L}
-    (hy : Valued.v y ≠ (0 : WithZero (Multiplicative ℤ))) : ordL y = -WithZero.log (Valued.v y) := by
+theorem ordL_eq_neg_log
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    {y : L} (hy : Valued.v y ≠ (0 : WithZero (Multiplicative ℤ)))
+    : ordL y = - WithZero.log (Valued.v y) := by
   unfold ordL
   rw [dite_eq_right hy, WithZero.toAdd_unzero_eq_log]
 
-theorem absEv_inert : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E)) (h : w.under (𝓞 F) = v), IsInertAt F E v w → ∀ x : (Fv F v ⊗[F] E)ˣ, (absEv F E v x : ℝ) = (qV F v : ℝ) ^ (-(2 * ordL (toCompl h x.1))) := by
+theorem absEv_inert
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (v : HeightOneSpectrum (𝓞 F)) (w : HeightOneSpectrum (𝓞 E)) (h : w.under (𝓞 F) = v),
+          IsInertAt F E v w
+            → ∀ x : (Fv F v ⊗[F] E)ˣ,
+              (absEv F E v x : ℝ) = (qV F v : ℝ) ^ (-(2 * ordL (toCompl h x.1))) := by
   intro F E _ _ _ _ _ σ hσ v w h hw x
 
   set N : Fv F v := Algebra.norm (Fv F v) x.1 with hNdef
@@ -45,7 +58,8 @@ theorem absEv_inert : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
 
   let c : w.adicCompletion E →+* w.adicCompletion E :=
     (GlobalTheory.LFun.InertChart.complEquiv hw h).toRingHom.comp
-      (((sigR (Fv F v) σ : Fv F v ⊗[F] E →+* Fv F v ⊗[F] E)).comp (GlobalTheory.LFun.InertChart.complEquiv hw h).symm.toRingHom)
+      (((sigR (Fv F v) σ : Fv F v ⊗[F] E →+* Fv F v ⊗[F] E)).comp
+        (GlobalTheory.LFun.InertChart.complEquiv hw h).symm.toRingHom)
   have he : ∀ t, GlobalTheory.LFun.InertChart.complEquiv hw h t = toCompl h t := fun _ => rfl
   have hs : (GlobalTheory.LFun.InertChart.complEquiv hw h).symm z = x.1 := by
     rw [RingEquiv.symm_apply_eq, he]
@@ -75,8 +89,8 @@ theorem absEv_inert : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
 
   rw [GlobalTheory.Doubling.absEv_apply, coe_nnnorm]
   show ‖N‖ = _
-  rw [NumberField.FinitePlace.norm_def, WithZeroMulInt.toNNReal_neg_apply _ hN',
-    hvN, WithZero.log_pow, ordL_eq_neg_log (y := toCompl h x.1) hz']
+  rw [NumberField.FinitePlace.norm_def, WithZeroMulInt.toNNReal_neg_apply _ hN', hvN,
+    WithZero.log_pow, ordL_eq_neg_log (y := toCompl h x.1) hz']
   have hq : ((Ideal.absNorm v.asIdeal : ℝ≥0) : ℝ) = (qV F v : ℝ) := by simp [qV]
   rw [NNReal.coe_zpow, hq]
   congr 1

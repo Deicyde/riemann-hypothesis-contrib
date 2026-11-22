@@ -19,7 +19,8 @@ open Pb Pb.Kap
 
 variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)}
 
-theorem dividedPowerFiltration_one {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) : pdP δ 1 = J := by
+theorem dividedPowerFiltration_one {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J)
+    : pdP δ 1 = J := by
   refine le_antisymm (Ideal.span_le.2 ?_) fun z hz => by simpa using pow_mem_pdP δ hz 1
   rintro _ ⟨L, hL, hr, rfl⟩
   induction L with
@@ -30,8 +31,12 @@ theorem dividedPowerFiltration_one {B : Type} [CommRing B] {J : Ideal B} (δ : D
     · exact J.mul_mem_left _ (ih (fun q' hq' => hL q' (List.mem_cons_of_mem _ hq')) (by omega))
     · exact J.mul_mem_right _ (δ.dpow_mem h.ne' (hL q List.mem_cons_self))
 
-structure Br (R : Per l K) (Y : CB l K) (e : Y.Λ →+* R.A) (θP : R.P →+* ℂ_[l]) (sΛ : K.fixingSubgroup → Y.Λ →+* Y.Λ)
-    (sn : K.fixingSubgroup → ∀ n, Y.R n →+* Y.R n) (sC : K.fixingSubgroup → ℂ_[l] →+* ℂ_[l]) (c : K.fixingSubgroup → ℂ_[l]) : Prop where
+structure Br
+    (R : Per l K) (Y : CB l K) (e : Y.Λ →+* R.A)
+    (θP : R.P →+* ℂ_[l]) (sΛ : K.fixingSubgroup → Y.Λ →+* Y.Λ)
+    (sn : K.fixingSubgroup → ∀ n, Y.R n →+* Y.R n) (sC : K.fixingSubgroup → ℂ_[l] →+* ℂ_[l])
+    (c : K.fixingSubgroup → ℂ_[l])
+    : Prop where
   et : e Y.t = R.t
   t_ne : R.tB ≠ 0
   θ_i : ∀ x, ∃ y : R.P, (y : R.B) = R.i (e x) ∧ θP y = Y.θ x
@@ -42,14 +47,20 @@ structure Br (R : Per l K) (Y : CB l K) (e : Y.Λ →+* R.A) (θP : R.P →+* �
   eσ : ∀ g x, e (sΛ g x) = R.σA g (e x)
   cris : ∀ g n x, sn g n (Y.c n x) = Y.c n (sΛ g x)
 
-variable {R : Per l K} {Y : CB l K} {e : Y.Λ →+* R.A} {θP : R.P →+* ℂ_[l]} {sΛ : K.fixingSubgroup → Y.Λ →+* Y.Λ}
-  {sn : K.fixingSubgroup → ∀ n, Y.R n →+* Y.R n} {sC : K.fixingSubgroup → ℂ_[l] →+* ℂ_[l]} {c : K.fixingSubgroup → ℂ_[l]}
-  (hb : Br R Y e θP sΛ sn sC c) {m : ℕ} {L : Lev R m} (hL : L.Good)
+variable
+  {R : Per l K} {Y : CB l K} {e : Y.Λ →+* R.A} {θP : R.P →+* ℂ_[l]}
+  {sΛ : K.fixingSubgroup → Y.Λ →+* Y.Λ} {sn : K.fixingSubgroup → ∀ n, Y.R n →+* Y.R n}
+  {sC : K.fixingSubgroup → ℂ_[l] →+* ℂ_[l]} {c : K.fixingSubgroup → ℂ_[l]}
+  (hb : Br R Y e θP sΛ sn sC c)
+  {m : ℕ} {L : Lev R m} (hL : L.Good)
 
 include hb hL
 
 theorem Br.θ_ex : ∃ θ : L.B →+* ℂ_[l], ∀ x, θ (L.toB x) = θP x := by
-  refine ⟨(L.toB.liftOfSurjective hL.toB_surj) ⟨θP, fun x hx => ?_⟩, fun x => RingHom.liftOfRightInverse_comp_apply _ _ _ _ _⟩
+  refine ⟨
+    (L.toB.liftOfSurjective hL.toB_surj) ⟨θP, fun x hx => ?_⟩,
+    fun x => RingHom.liftOfRightInverse_comp_apply _ _ _ _ _
+  ⟩
   obtain ⟨y, hy⟩ := (hL.toB_ker x).1 hx
   obtain ⟨t, ht, -⟩ := hb.θ_i Y.t
   rw [hb.et] at ht
@@ -58,7 +69,9 @@ theorem Br.θ_ex : ∃ θ : L.B →+* ℂ_[l], ∀ x, θ (L.toB x) = θP x := by
   rw [hy, hk, pow_add, pow_one, Subring.coe_mul, SubmonoidClass.coe_pow, ht, mul_assoc]
   rfl
 
-theorem Br.t_ex : ∃ t : R.P, (t : R.B) = R.tB ∧ L.ι (L.lam (e Y.t)) = L.toB t ∧ L.IB = Ideal.span {L.toB t} := by
+theorem Br.t_ex
+    : ∃ t : R.P,
+      (t : R.B) = R.tB ∧ L.ι (L.lam (e Y.t)) = L.toB t ∧ L.IB = Ideal.span {L.toB t} := by
   obtain ⟨t, ht, -⟩ := hb.θ_i Y.t
   refine ⟨t, by rw [ht, hb.et]; rfl, hL.ι_lam _ t ht, ?_⟩
   rw [← dividedPowerFiltration_one L.γB, hL.pdP_B 1 t (by rw [ht, hb.et]; rfl), pow_one]
@@ -82,8 +95,10 @@ theorem Br.ker_θ : RingHom.ker (hb.θ hL) = L.IB := by
     have h0 : θP t = 0 := (hb.ker t).2 ⟨1, by rw [ht]; simp⟩
     rw [← hb.θ_toB hL, ← ha, map_mul, hb.θ_toB, h0, mul_zero]
 
-theorem Br.gr (i : ℕ) (hi : i < m) (x : L.B)
-    (h : x * L.ι (L.lam (e Y.t)) ^ i ∈ Ideal.span {L.ι (L.lam (e Y.t)) ^ (i + 1)}) : x ∈ L.IB := by
+theorem Br.gr
+    (i : ℕ) (hi : i < m)
+    (x : L.B) (h : x * L.ι (L.lam (e Y.t)) ^ i ∈ Ideal.span {L.ι (L.lam (e Y.t)) ^ (i + 1)})
+    : x ∈ L.IB := by
   obtain ⟨t, ht, h1, hI⟩ := hb.t_ex hL
   rw [h1] at h
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.1 h
@@ -101,8 +116,10 @@ theorem Br.gr (i : ℕ) (hi : i < m) (x : L.B)
   rw [hI, h3, map_mul]
   exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)
 
-def Br.lv (hd : ∀ n, ∃ d : RedIn (O := OK l K) (Y.γ n) (Y.κ n) L.γ l n, ∀ x, d.ρ (Y.c n x) = Ideal.Quotient.mk _ (L.lam (e x))) :
-    Lv Y m where
+def Br.lv
+    (hd : ∀ n, ∃ d : RedIn (O := OK l K) (Y.γ n) (Y.κ n) L.γ l n, ∀ x,
+      d.ρ (Y.c n x) = Ideal.Quotient.mk _ (L.lam (e x)))
+    : Lv Y m where
   B := L.B
   IB := L.IB
   γB := L.γB
@@ -137,7 +154,8 @@ def Br.lv (hd : ∀ n, ∃ d : RedIn (O := OK l K) (Y.γ n) (Y.κ n) L.γ l n, �
     exact (hL.toB_ker _).2 ⟨1, by simp [ht]⟩
   gr := hb.gr hL
 
-theorem Br.gal (hd) (g : K.fixingSubgroup) : Nonempty (LHom (hb.lv hL hd) (hb.lv hL hd) (sΛ g) (sn g) (sC g) (c g)) := by
+theorem Br.gal (hd) (g : K.fixingSubgroup)
+    : Nonempty (LHom (hb.lv hL hd) (hb.lv hL hd) (sΛ g) (sn g) (sC g) (c g)) := by
   obtain ⟨u, hu, hc⟩ := hb.galois_t_transform g
   obtain ⟨t, ht, h1, -⟩ := hb.t_ex hL
   exact ⟨{
@@ -161,33 +179,40 @@ theorem Br.gal (hd) (g : K.fixingSubgroup) : Nonempty (LHom (hb.lv hL hd) (hb.lv
       change L.σB g (L.ι (L.lam (e Y.t))) = L.toB u * L.ι (L.lam (e Y.t))
       rw [h1, ← map_mul]
       exact hL.σB_toB g t (u * t) (by rw [Subring.coe_mul, ht, hu])
-    θc := (hb.θ_toB hL u).trans hc }⟩
+    θc := (hb.θ_toB hL u).trans hc
+  }⟩
 
 omit hL in
-theorem Br.sys (S : LevSys R) (hS : S.Good)
-    (hd : ∀ m n, ∃ d : RedIn (O := OK l K) (Y.γ n) (Y.κ n) (S.L m).γ l n,
-      ∀ x, d.ρ (Y.c n x) = Ideal.Quotient.mk _ ((S.L m).lam (e x))) : Nonempty (LvSys Y sΛ sn sC c) :=
-  ⟨{ L := fun m => hb.lv (hS.lev m) (hd m)
-     dn := fun m =>
-      { le := Nat.le_succ _
-        sA := S.dA m
-        sB := S.dB m
-        dpA := hS.ddp m
-        dpB := hS.ddpB m
-        oA := hS.dO m
-        oB := hS.dK m
-        ι := hS.dι m
-        lam := fun x => hS.dlam m (e x)
-        cris := fun _ _ => rfl
-        θ := fun b => by
-          obtain ⟨x, rfl⟩ := (hS.lev (m + 1)).toB_surj b
-          change hb.θ (hS.lev m) (S.dB m ((S.L (m + 1)).toB x)) = hb.θ (hS.lev (m + 1)) ((S.L (m + 1)).toB x)
-          rw [hS.dB_toB, hb.θ_toB, hb.θ_toB]
-        cB := 1
-        t := by
-          change S.dB m ((S.L (m + 1)).ι ((S.L (m + 1)).lam (e Y.t))) = 1 * (S.L m).ι ((S.L m).lam (e Y.t))
-          rw [hS.dι, hS.dlam, one_mul]
-        θc := map_one _ }
-     gal := fun m g => (hb.gal (hS.lev m) (hd m) g).some }⟩
+theorem Br.sys
+    (S : LevSys R) (hS : S.Good)
+    (hd : ∀ m n, ∃ d : RedIn (O := OK l K) (Y.γ n) (Y.κ n) (S.L m).γ l n, ∀ x,
+      d.ρ (Y.c n x) = Ideal.Quotient.mk _ ((S.L m).lam (e x)))
+    : Nonempty (LvSys Y sΛ sn sC c) := ⟨{
+  L := fun m => hb.lv (hS.lev m) (hd m)
+  dn := fun m => {
+    le := Nat.le_succ _
+    sA := S.dA m
+    sB := S.dB m
+    dpA := hS.ddp m
+    dpB := hS.ddpB m
+    oA := hS.dO m
+    oB := hS.dK m
+    ι := hS.dι m
+    lam := fun x => hS.dlam m (e x)
+    cris := fun _ _ => rfl
+    θ := fun b => by
+      obtain ⟨x, rfl⟩ := (hS.lev (m + 1)).toB_surj b
+      change hb.θ (hS.lev m) (S.dB m ((S.L (m + 1)).toB x))
+        = hb.θ (hS.lev (m + 1)) ((S.L (m + 1)).toB x)
+      rw [hS.dB_toB, hb.θ_toB, hb.θ_toB]
+    cB := 1
+    t := by
+      change S.dB m ((S.L (m + 1)).ι ((S.L (m + 1)).lam (e Y.t)))
+        = 1 * (S.L m).ι ((S.L m).lam (e Y.t))
+      rw [hS.dι, hS.dlam, one_mul]
+    θc := map_one _
+  }
+  gal := fun m g => (hb.gal (hS.lev m) (hd m) g).some
+}⟩
 
 end CrystallineSemistableComparison.HT

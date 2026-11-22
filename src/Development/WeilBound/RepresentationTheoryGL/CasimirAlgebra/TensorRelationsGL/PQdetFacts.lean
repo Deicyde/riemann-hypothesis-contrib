@@ -28,13 +28,15 @@ theorem qdet_eq_capelliC {n : ℕ} (E : Fin n → Fin n → A) (x : ℂ) : qdet 
   funext k
   rw [add_comm]
 
-theorem capelliC_negT {n : ℕ} (E : Fin n → Fin n → A) (x : ℂ) :
-    capelliC (fun a b => -E b a) x = (-1) ^ n * rminor E id id ((n : ℂ) - 1 - x) := by
+theorem capelliC_negT {n : ℕ} (E : Fin n → Fin n → A) (x : ℂ)
+    : capelliC (fun a b => - E b a) x = (-1) ^ n * rminor E id id ((n : ℂ) - 1 - x) := by
   simp only [capelliC, cminor, rminor, id]
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun σ _ => ?_
-  have h : (List.ofFn fun j : Fin n => capEntry (fun a b => -E b a) (x - ((j : ℕ) : ℂ)) (σ j) j) =
-      (List.ofFn fun j : Fin n => capEntry E ((n : ℂ) - 1 - x - (n : ℂ) + 1 + ((j : ℕ) : ℂ)) j (σ j)).map Neg.neg := by
+  have h
+      : (List.ofFn fun j : Fin n => capEntry (fun a b => - E b a) (x - ((j : ℕ) : ℂ)) (σ j) j)
+        = (List.ofFn fun j : Fin n =>
+          capEntry E ((n : ℂ) - 1 - x - (n : ℂ) + 1 + ((j : ℕ) : ℂ)) j (σ j)).map Neg.neg := by
     rw [List.map_ofFn]
     congr 1
     funext j
@@ -47,8 +49,8 @@ theorem capelliC_negT {n : ℕ} (E : Fin n → Fin n → A) (x : ℂ) :
   rw [h, List.prod_map_neg, List.length_ofFn, zsmul_eq_mul, zsmul_eq_mul, ← mul_assoc, ← mul_assoc,
     ((Commute.neg_one_left _).pow_left n).eq]
 
-theorem qdet_negT {n : ℕ} (E : Fin n → Fin n → A) (hE : GlRel E) (u : ℂ) :
-    qdet (fun a b => -E b a) u = (-1) ^ n * qdet E ((n : ℂ) - 1 - u) := by
+theorem qdet_negT {n : ℕ} (E : Fin n → Fin n → A) (hE : GlRel E) (u : ℂ)
+    : qdet (fun a b => - E b a) u = (-1) ^ n * qdet E ((n : ℂ) - 1 - u) := by
   rw [qdet_eq_capelliC, capelliC_negT, qdet_eq_capelliC, capelliC, cminor_eq_rminor E hE]
 
 def tmPoly {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a b : Fin n) : A[X] :=
@@ -63,67 +65,69 @@ def evU (u : ℂ) : A[X] →+* A :=
 
 theorem evU_apply (u : ℂ) (p : A[X]) : evU u p = eval₂ (RingHom.id A) (algebraMap ℂ A u) p := rfl
 
-theorem evU_tmPoly {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) (k : ℕ) (a b : Fin n) :
-    evU u (tmPoly E k a b) = Tm E (u - (k : ℂ)) a b := by
+theorem evU_tmPoly {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) (k : ℕ) (a b : Fin n)
+    : evU u (tmPoly E k a b) = Tm E (u - (k : ℂ)) a b := by
   rw [evU_apply, tmPoly, Tm]
   split_ifs <;> simp [eval₂_add, eval₂_sub, map_sub]
 
 theorem evU_qdetPoly {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) : evU u (qdetPoly E) = qdet E u := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [qdetPoly, qdet, qminor, id, map_sum, map_mul, map_list_prod, List.map_ofFn, Function.comp_def,
-    evU_tmPoly]
+    simp only [qdetPoly, qdet, qminor, id, map_sum, map_mul, map_list_prod, List.map_ofFn,
+      Function.comp_def, evU_tmPoly]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [evU_apply, eval₂_C]
   rfl
 
-theorem natDegree_tmPoly_le {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a b : Fin n) :
-    (tmPoly E k a b).natDegree ≤ if a = b then 1 else 0 := by
+theorem natDegree_tmPoly_le {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a b : Fin n)
+    : (tmPoly E k a b).natDegree ≤ if a = b then 1 else 0 := by
   rw [tmPoly]
   split_ifs with h
-  · exact (natDegree_add_le _ _).trans (max_le (natDegree_X_sub_C_le _) (by rw [natDegree_C]; exact zero_le_one))
+  · exact (natDegree_add_le _ _).trans
+      (max_le (natDegree_X_sub_C_le _) (by rw [natDegree_C]; exact zero_le_one))
   · rw [zero_add, natDegree_C]
 
-theorem natDegree_prod_le {n : ℕ} (E : Fin n → Fin n → A) (σ : Equiv.Perm (Fin n)) :
-    (List.ofFn fun k : Fin n => tmPoly E k (σ k) k).prod.natDegree ≤
-      ∑ k : Fin n, if σ k = k then 1 else 0 := by
+theorem natDegree_prod_le {n : ℕ} (E : Fin n → Fin n → A) (σ : Equiv.Perm (Fin n))
+    : (List.ofFn fun k : Fin n => tmPoly E k (σ k) k).prod.natDegree
+      ≤ ∑ k : Fin n, if σ k = k then 1 else 0 := by
   refine (natDegree_list_prod_le _).trans ?_
   rw [List.map_ofFn, List.sum_ofFn]
   exact Finset.sum_le_sum fun k _ => natDegree_tmPoly_le E k (σ k) k
 
-theorem fixed_add_support {n : ℕ} (σ : Equiv.Perm (Fin n)) :
-    (∑ k : Fin n, if σ k = k then 1 else 0) + σ.support.card = n := by
+theorem fixed_add_support {n : ℕ} (σ : Equiv.Perm (Fin n))
+    : (∑ k : Fin n, if σ k = k then 1 else 0) + σ.support.card = n := by
   rw [Finset.sum_boole, Nat.cast_id]
   have hs : σ.support = Finset.univ.filter (fun k => ¬ σ k = k) := by
     ext k
     simp [Equiv.Perm.mem_support]
   rw [hs, Finset.card_filter_add_card_filter_not, Finset.card_univ, Fintype.card_fin]
 
-theorem natDegree_prod_ne_one {n : ℕ} (E : Fin n → Fin n → A) {σ : Equiv.Perm (Fin n)} (hσ : σ ≠ 1) :
-    (List.ofFn fun k : Fin n => tmPoly E k (σ k) k).prod.natDegree + 2 ≤ n := by
+theorem natDegree_prod_ne_one {n : ℕ} (E : Fin n → Fin n → A) {σ : Equiv.Perm (Fin n)} (hσ : σ ≠ 1)
+    : (List.ofFn fun k : Fin n => tmPoly E k (σ k) k).prod.natDegree + 2 ≤ n := by
   have h1 := natDegree_prod_le E σ
   have h2 := fixed_add_support σ
   have h3 := Equiv.Perm.two_le_card_support_of_ne_one hσ
   omega
 
 omit [Algebra ℂ A] in
-theorem prod_linear (m : ℕ) (c : Fin m → A) :
-    (List.ofFn fun k : Fin m => X + C (c k)).prod.natDegree ≤ m ∧
-      (List.ofFn fun k : Fin m => X + C (c k)).prod.coeff m = 1 ∧
-      ∀ j, j + 1 = m → (List.ofFn fun k : Fin m => X + C (c k)).prod.coeff j = ∑ k, c k := by
+theorem prod_linear (m : ℕ) (c : Fin m → A)
+    : (List.ofFn fun k : Fin m => X + C (c k)).prod.natDegree ≤ m
+      ∧ (List.ofFn fun k : Fin m => X + C (c k)).prod.coeff m = 1
+      ∧ ∀ j, j + 1 = m → (List.ofFn fun k : Fin m => X + C (c k)).prod.coeff j = ∑ k, c k := by
   induction m with
-  | zero =>
-    refine ⟨by simp, by simp, fun j hj => by omega⟩
+  | zero => refine ⟨by simp, by simp, fun j hj => by omega⟩
   | succ m ih =>
     obtain ⟨h1, h2, h3⟩ := ih (fun k => c k.castSucc)
-    have e : (List.ofFn fun k : Fin (m + 1) => X + C (c k)).prod =
-        (List.ofFn fun k : Fin m => X + C (c k.castSucc)).prod * (X + C (c (Fin.last m))) := by
+    have e
+        : (List.ofFn fun k : Fin (m + 1) => X + C (c k)).prod
+          = (List.ofFn fun k : Fin m => X + C (c k.castSucc)).prod * (X + C (c (Fin.last m))) := by
       rw [List.ofFn_succ', List.concat_eq_append, List.prod_append, List.prod_singleton]
     rw [e]
     have hP : (List.ofFn fun k : Fin m => X + C (c k.castSucc)).prod.coeff (m + 1) = 0 :=
       coeff_eq_zero_of_natDegree_lt (by omega)
     refine ⟨?_, ?_, ?_⟩
     · refine natDegree_mul_le.trans (add_le_add h1 ?_)
-      exact (natDegree_add_le _ _).trans (max_le natDegree_X_le (by rw [natDegree_C]; exact zero_le_one))
+      exact (natDegree_add_le _ _).trans
+        (max_le natDegree_X_le (by rw [natDegree_C]; exact zero_le_one))
     · rw [mul_add, coeff_add, coeff_mul_C, coeff_mul_X, h2, hP, zero_mul, add_zero]
     · intro j hj
       obtain rfl : j = m := by omega
@@ -134,8 +138,8 @@ theorem prod_linear (m : ℕ) (c : Fin m → A) :
       · rw [coeff_mul_X]
         exact h3 j rfl
 
-theorem tmPoly_diag {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a : Fin n) :
-    tmPoly E k a a = X + C (E a a - algebraMap ℂ A (k : ℂ)) := by
+theorem tmPoly_diag {n : ℕ} (E : Fin n → Fin n → A) (k : ℕ) (a : Fin n)
+    : tmPoly E k a a = X + C (E a a - algebraMap ℂ A (k : ℂ)) := by
   rw [tmPoly, if_pos rfl, C_sub]
   abel
 
@@ -154,10 +158,12 @@ theorem natDegree_qdetPoly_le {n : ℕ} (E : Fin n → Fin n → A) : (qdetPoly 
   have := fixed_add_support σ
   omega
 
-theorem coeff_qdetPoly_top {n : ℕ} (E : Fin n → Fin n → A) (j : ℕ) (hj : n ≤ j + 1) :
-    (qdetPoly E).coeff j = (List.ofFn fun k : Fin n => X + C (E k k - algebraMap ℂ A ((k : ℕ) : ℂ))).prod.coeff j := by
+theorem coeff_qdetPoly_top {n : ℕ} (E : Fin n → Fin n → A) (j : ℕ) (hj : n ≤ j + 1)
+    : (qdetPoly E).coeff j
+      = (List.ofFn fun k : Fin n => X + C (E k k - algebraMap ℂ A ((k : ℕ) : ℂ))).prod.coeff j := by
   rw [qdetPoly, Polynomial.finsetSum_coeff, Finset.sum_eq_single (1 : Equiv.Perm (Fin n))]
-  · simp only [Equiv.Perm.sign_one, Units.val_one, Int.cast_one, C_1, one_mul, Equiv.Perm.one_apply, tmPoly_diag]
+  · simp only [Equiv.Perm.sign_one, Units.val_one, Int.cast_one, C_1, one_mul, Equiv.Perm.one_apply,
+      tmPoly_diag]
   · intro σ _ hσ
     rw [coeff_C_mul]
     have := natDegree_prod_ne_one E hσ
@@ -171,7 +177,8 @@ section Op
 
 variable {M : Type} [AddCommGroup M] [Module ℂ M]
 
-theorem coeff_eq_zero_of_evU (r : (Module.End ℂ M)[X]) (h : ∀ u : ℂ, evU u r = 0) (i : ℕ) : r.coeff i = 0 := by
+theorem coeff_eq_zero_of_evU (r : (Module.End ℂ M)[X]) (h : ∀ u : ℂ, evU u r = 0) (i : ℕ)
+    : r.coeff i = 0 := by
   by_cases hi : i ∈ r.support
   swap
   · exact notMem_support_iff.mp hi
@@ -183,14 +190,17 @@ theorem coeff_eq_zero_of_evU (r : (Module.End ℂ M)[X]) (h : ∀ u : ℂ, evU u
     rw [eval_zero, Polynomial.eval_finsetSum]
     have hu := congrArg (fun T : Module.End ℂ M => φ (T m)) (h u)
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [evU_apply, eval₂_eq_sum, Polynomial.sum_def, LinearMap.zero_apply, map_zero, RingHom.id_apply,
-      LinearMap.sum_apply, Module.End.mul_apply, ← map_pow, Module.algebraMap_end_apply,
-      map_smul, map_sum, smul_eq_mul] at hu
+      simp only [evU_apply, eval₂_eq_sum, Polynomial.sum_def, LinearMap.zero_apply, map_zero,
+          RingHom.id_apply, LinearMap.sum_apply, Module.End.mul_apply, ← map_pow,
+          Module.algebraMap_end_apply, map_smul, map_sum, smul_eq_mul]
+        at hu
     rw [← hu]
     refine Finset.sum_congr rfl fun e _ => ?_
     rw [eval_monomial, mul_comm]
   have hc := congrArg (fun p : ℂ[X] => p.coeff i) hq0
-  simp only [Polynomial.finsetSum_coeff, coeff_monomial_apply, coeff_zero, Finset.sum_ite_eq', if_pos hi] at hc
+  simp only [Polynomial.finsetSum_coeff, coeff_monomial_apply, coeff_zero, Finset.sum_ite_eq',
+      if_pos hi]
+    at hc
   exact hc
 
 end Op
@@ -206,26 +216,33 @@ theorem qdetFacts_holds : QdetFacts := by
     rw [qdet_eq_capelliC]
     exact (capelliC_central E hE u a b).symm
   · refine ⟨fun i => (qdetPoly E).coeff i, fun u => ?_⟩
-    rw [← evU_qdetPoly, evU_apply, eval₂_eq_sum_range' _ (Nat.lt_succ_of_le (natDegree_qdetPoly_le E))]
+    rw [← evU_qdetPoly, evU_apply,
+      eval₂_eq_sum_range' _ (Nat.lt_succ_of_le (natDegree_qdetPoly_le E))]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [RingHom.id_apply, ← map_pow, ← Algebra.commutes, ← Algebra.smul_def]
   · intro l hl
-    have key : ∀ i, (qdetPoly E).coeff i =
-        algebraMap ℂ (Module.End ℂ M) ((∏ k : Fin n, (X + C (l k))).coeff i) := by
+    have key
+        : ∀ i,
+          (qdetPoly E).coeff i
+            = algebraMap ℂ (Module.End ℂ M) ((∏ k : Fin n, (X + C (l k))).coeff i) := by
       intro i
       rw [← coeff_map, ← sub_eq_zero, ← coeff_sub]
       refine coeff_eq_zero_of_evU _ (fun u => ?_) i
-      rw [map_sub, evU_qdetPoly, hl u, evU_apply, eval₂_map, RingHom.id_comp, eval₂_at_apply, eval_prod]
+      rw [map_sub, evU_qdetPoly, hl u, evU_apply, eval₂_map, RingHom.id_comp, eval₂_at_apply,
+        eval_prod]
       simp only [eval_add, eval_X, eval_C, sub_self]
     cases n with
     | zero => simp
     | succ m =>
       have h1 := key m
-      have h2 := (prod_linear (m + 1) fun k => E k k - algebraMap ℂ (Module.End ℂ M) ((k : ℕ) : ℂ)).2.2 m rfl
+      have h2 :=
+        (prod_linear (m + 1) fun k => E k k - algebraMap ℂ (Module.End ℂ M) ((k : ℕ) : ℂ)).2.2 m rfl
       have h3 := (prod_linear (m + 1) l).2.2 m rfl
       rw [List.prod_ofFn] at h3
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [coeff_qdetPoly_top E m le_rfl, h2, h3, Finset.sum_sub_distrib, sub_eq_iff_eq_add, ← map_sum] at h1
+        rw [coeff_qdetPoly_top E m le_rfl, h2, h3, Finset.sum_sub_distrib, sub_eq_iff_eq_add,
+            ← map_sum]
+          at h1
       rw [h1, ← map_add (f := _), sum_fin_cast]
   · unfold GlRel
     intro a b c d
@@ -236,7 +253,9 @@ theorem qdetFacts_holds : QdetFacts := by
     split_ifs <;> abel
   · intro l hl u
     rw [qdet_negT E hE, hl]
-    have hp : ∏ k : Fin n, (u + (-((n : ℂ) - 1) - l k)) = (-1) ^ n * ∏ k : Fin n, ((n : ℂ) - 1 - u + l k) := by
+    have hp
+        : ∏ k : Fin n, (u + (-((n : ℂ) - 1) - l k))
+          = (-1) ^ n * ∏ k : Fin n, ((n : ℂ) - 1 - u + l k) := by
       rw [show (-1 : ℂ) ^ n = ∏ _k : Fin n, (-1 : ℂ) by simp, ← Finset.prod_mul_distrib]
       exact Finset.prod_congr rfl fun k _ => by ring
     rw [hp, map_mul, map_pow, map_neg, map_one]

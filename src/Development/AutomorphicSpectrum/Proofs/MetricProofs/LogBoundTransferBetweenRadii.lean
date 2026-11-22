@@ -7,12 +7,20 @@ public import ReciprocityTheory.AnalyticForms.LeviForms.TailCut
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Metric.BoundConv
 
-theorem bound_conv_local (C₅ M : ℝ) : ∃ C₅' : ℝ, 0 ≤ C₅' ∧ ∀ (rw rl p d : ℝ), Real.exp 1 ≤ rw → Real.exp 1 ≤ rl → |rw - rl| ≤ M → (-C₅ * Real.log rw ≤ p → p ≤ C₅ → -C₅' * Real.log rl ≤ p ∧ p ≤ C₅') ∧ (d ≤ |C₅| * rw ^ |C₅| * Real.exp (rw / 2) → d ≤ C₅' * rl ^ C₅' * Real.exp (rl / 2)) := by
+theorem bound_conv_local (C₅ M : ℝ)
+    : ∃ C₅' : ℝ,
+      0 ≤ C₅'
+        ∧ ∀ (rw rl p d : ℝ),
+          Real.exp 1 ≤ rw → Real.exp 1 ≤ rl → |rw - rl| ≤ M
+            → (-C₅ * Real.log rw ≤ p → p ≤ C₅ → -C₅' * Real.log rl ≤ p ∧ p ≤ C₅')
+              ∧ (d ≤ |C₅| * rw ^ |C₅| * Real.exp (rw / 2)
+                → d ≤ C₅' * rl ^ C₅' * Real.exp (rl / 2)) := by
   set A := |C₅| with hA
   set M' := |M| with hM'
   have hA0 : 0 ≤ A := abs_nonneg _
@@ -35,10 +43,8 @@ theorem bound_conv_local (C₅ M : ℝ) : ∃ C₅' : ℝ, 0 ≤ C₅' ∧ ∀ (
   have he1 : 1 ≤ Real.exp 1 := Real.one_le_exp (by norm_num)
   have hy1 : 1 ≤ y := le_trans he1 hy
   have hx1 : 1 ≤ x := le_trans he1 hx
-  have hlogy : 1 ≤ Real.log y := by
-    rw [Real.le_log_iff_exp_le (by linarith)]; exact hy
-  have hlogx : 1 ≤ Real.log x := by
-    rw [Real.le_log_iff_exp_le (by linarith)]; exact hx
+  have hlogy : 1 ≤ Real.log y := by rw [Real.le_log_iff_exp_le (by linarith)]; exact hy
+  have hlogx : 1 ≤ Real.log x := by rw [Real.le_log_iff_exp_le (by linarith)]; exact hx
   have hxle : x ≤ y + M' := by
     have := (abs_le.mp (le_trans hxy (le_abs_self M))).2
     linarith
@@ -70,16 +76,24 @@ theorem bound_conv_local (C₅ M : ℝ) : ∃ C₅' : ℝ, 0 ≤ C₅' ∧ ∀ (
     have hxA : 0 ≤ x ^ A := Real.rpow_nonneg (by linarith) _
     have hyK : 0 ≤ y ^ K := Real.rpow_nonneg (by linarith) _
     have hB0 : 0 ≤ (1 + M') ^ A := by linarith
-    calc d ≤ A * x ^ A * Real.exp (x / 2) := hd
+    calc
+      d ≤ A * x ^ A * Real.exp (x / 2) := hd
       _ ≤ A * (y ^ A * (1 + M') ^ A) * (Real.exp (y / 2) * Real.exp M') := by
-          apply mul_le_mul (mul_le_mul_of_nonneg_left h1 hA0) h2 (Real.exp_pos _).le
-          positivity
+        apply mul_le_mul (mul_le_mul_of_nonneg_left h1 hA0) h2 (Real.exp_pos _).le
+        positivity
       _ ≤ A * (y ^ K * (1 + M') ^ A) * (Real.exp (y / 2) * Real.exp M') := by
-          apply mul_le_mul_of_nonneg_right _ (by positivity)
-          exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right h3 hB0) hA0
+        apply mul_le_mul_of_nonneg_right _ (by positivity)
+        exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right h3 hB0) hA0
       _ = K * y ^ K * Real.exp (y / 2) := by rw [hK]; ring
 
-theorem bound_conv : ∀ (C₅ M : ℝ), ∃ C₅' : ℝ, 0 ≤ C₅' ∧ ∀ (rw rl p d : ℝ), Real.exp 1 ≤ rw → Real.exp 1 ≤ rl → |rw - rl| ≤ M → (-C₅ * Real.log rw ≤ p → p ≤ C₅ → -C₅' * Real.log rl ≤ p ∧ p ≤ C₅') ∧ (d ≤ |C₅| * rw ^ |C₅| * Real.exp (rw / 2) → d ≤ C₅' * rl ^ C₅' * Real.exp (rl / 2)) :=
+theorem bound_conv
+    : ∀ (C₅ M : ℝ), ∃ C₅' : ℝ,
+      0 ≤ C₅'
+        ∧ ∀ (rw rl p d : ℝ),
+          Real.exp 1 ≤ rw → Real.exp 1 ≤ rl → |rw - rl| ≤ M
+            → (-C₅ * Real.log rw ≤ p → p ≤ C₅ → -C₅' * Real.log rl ≤ p ∧ p ≤ C₅')
+              ∧ (d ≤ |C₅| * rw ^ |C₅| * Real.exp (rw / 2)
+                → d ≤ C₅' * rl ^ C₅' * Real.exp (rl / 2)) :=
   bound_conv_local
 
 end GlobalTheory.CompanionTheory.Metric.BoundConv

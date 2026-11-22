@@ -92,26 +92,29 @@ lemma entry {ε : Fin n → Bool} {k : Mat n} (hk : k ∈ Formalism.REAL.Kset ε
     · simp [hil]
   · simp [had]
 
-def AP (ε : Fin n → Bool) : Matrix (Mode ε) (Mode ε) (Poly n) :=
-  fun x y => if x.1.2 = y.1.2 then MvPolynomial.X (Sum.inl (x.1.1, y.1.1)) else 0
+def AP (ε : Fin n → Bool) : Matrix (Mode ε) (Mode ε) (Poly n) := fun x y =>
+  if x.1.2 = y.1.2 then MvPolynomial.X (Sum.inl (x.1.1, y.1.1)) else 0
 
 end OmegaDeterminant
 
 open OmegaDeterminant in
-theorem modeMatrixDet_eq_adjointDet :
-    ∀ (n : ℕ) (ε : Fin n → Bool), ∃ Q : Poly n, ∀ k ∈ Formalism.REAL.Kset ε,
+theorem modeMatrixDet_eq_adjointDet
+    : ∀ (n : ℕ) (ε : Fin n → Bool), ∃ Q : Poly n, ∀ k ∈ Formalism.REAL.Kset ε,
       ev k Q * ev k (OmP ε).det = physDet ε k := by
   intro n ε
   refine ⟨(AP ε).det, fun k hk => ?_⟩
   let e : Mode ε ≃ {x : Fin n × Fin n // IsPhys ε x} :=
-    Equiv.subtypeEquivRight (p := fun x : Fin n × Fin n => ε x.1 = true ∧ ε x.2 = false) (fun _ => Iff.rfl)
-  have key : (ev k).mapMatrix (AP ε) * (ev k).mapMatrix (OmP ε) =
-      (Matrix.of fun x y : {x : Fin n × Fin n // IsPhys ε x} =>
-        (if x = y then (1 : ℂ) else 0) - k x.1.1 y.1.1 * star (k x.1.2 y.1.2)).submatrix e e := by
+    Equiv.subtypeEquivRight
+      (p := fun x : Fin n × Fin n => ε x.1 = true ∧ ε x.2 = false)
+      (fun _ => Iff.rfl)
+  have key
+      : (ev k).mapMatrix (AP ε) * (ev k).mapMatrix (OmP ε)
+        = (Matrix.of fun x y : {x : Fin n × Fin n // IsPhys ε x} =>
+          (if x = y then (1 : ℂ) else 0) - k x.1.1 y.1.1 * star (k x.1.2 y.1.2)).submatrix e e := by
     ext x z
     rw [Matrix.mul_apply]
-    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, AP, ev_OmP, Matrix.submatrix_apply, Matrix.of_apply,
-      apply_ite (ev k), ev_X_inl, map_zero, e, EmbeddingLike.apply_eq_iff_eq]
+    simp only [RingHom.mapMatrix_apply, Matrix.map_apply, AP, ev_OmP, Matrix.submatrix_apply,
+      Matrix.of_apply, apply_ite (ev k), ev_X_inl, map_zero, e, EmbeddingLike.apply_eq_iff_eq]
     exact entry hk x z
   rw [RingHom.map_det, RingHom.map_det, ← Matrix.det_mul, key, Matrix.det_submatrix_equiv_self]
   rfl

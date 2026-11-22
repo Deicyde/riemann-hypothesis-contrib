@@ -5,7 +5,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscrim
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB
 
 namespace GlobalTheory
 
@@ -76,22 +77,23 @@ private lemma quad_nsmul' (hQ : ∀ x, 2 * Q x = Bf x x) (m : ℕ) (x : X) :
   have h := quad_zsmul' hQ (m : ℤ) x
   rwa [natCast_zsmul] at h
 
-
 variable {X : Type} [AddCommGroup X] {Bf : X →+ X →+ ℤ} {Q : X → ℤ} in
-theorem _root_.GlobalTheory.small_combination_strict_min_mod :
-    ∀ (X : Type) [AddCommGroup X] (Bf : X →+ X →+ ℤ) (Q : X → ℤ), (∀ x y, Bf x y = Bf y x) →
-    (∀ x, 2 * Q x = Bf x x) → (∀ x, x ≠ 0 → 1 ≤ Q x) →
-    ∀ (n D q : ℕ) (b : Fin n → X) (Cc M₀ : ℝ), 0 ≤ Cc → 0 ≤ M₀ → (∀ j, (Q (b j) : ℝ) ≤ Cc) →
-    (∀ j z, |(Bf (b j) z : ℝ)| ≤ M₀ * Q z) → (D : ℝ) * M₀ < q →
-    ∀ e : Fin n → ℕ, ∑ j, e j ≤ D →
-    ((Q (∑ j, e j • b j) : ℝ) ≤ (D : ℝ) ^ 2 * Cc) ∧
-      ∀ z, z ≠ 0 → Q (∑ j, e j • b j) < Q (∑ j, e j • b j + q • z) := by
+theorem _root_.GlobalTheory.small_combination_strict_min_mod
+    : ∀ (X : Type) [AddCommGroup X] (Bf : X →+ X →+ ℤ) (Q : X → ℤ),
+      (∀ x y, Bf x y = Bf y x) → (∀ x, 2 * Q x = Bf x x) → (∀ x, x ≠ 0 → 1 ≤ Q x)
+        → ∀ (n D q : ℕ) (b : Fin n → X) (Cc M₀ : ℝ),
+          0 ≤ Cc → 0 ≤ M₀ → (∀ j, (Q (b j) : ℝ) ≤ Cc) → (∀ j z, |(Bf (b j) z : ℝ)| ≤ M₀ * Q z)
+            → (D : ℝ) * M₀ < q
+            → ∀ e : Fin n → ℕ,
+              ∑ j, e j ≤ D
+                → ((Q (∑ j, e j • b j) : ℝ) ≤ (D : ℝ) ^ 2 * Cc)
+                  ∧ ∀ z, z ≠ 0 → Q (∑ j, e j • b j) < Q (∑ j, e j • b j + q • z) := by
   intro X _ Bf Q hsym hQ hpos n D q b Cc M₀ hCc hM₀ hb hBb hq e he
   have hsumR : (∑ j, (e j : ℝ)) ≤ D := by exact_mod_cast he
   have hsum0 : (0 : ℝ) ≤ ∑ j, (e j : ℝ) := Finset.sum_nonneg fun _ _ => Nat.cast_nonneg _
   constructor
-  · have key : ∀ s : Finset (Fin n),
-        (Q (∑ j ∈ s, e j • b j) : ℝ) ≤ (∑ j ∈ s, (e j : ℝ)) ^ 2 * Cc := by
+  · have key
+        : ∀ s : Finset (Fin n), (Q (∑ j ∈ s, e j • b j) : ℝ) ≤ (∑ j ∈ s, (e j : ℝ)) ^ 2 * Cc := by
       intro s
       refine Finset.induction_on s ?_ ?_
       · simp [quad_zero' hQ]
@@ -102,14 +104,15 @@ theorem _root_.GlobalTheory.small_combination_strict_min_mod :
         rw [quad_nsmul' hQ]
         push_cast
         exact mul_le_mul_of_nonneg_left (hb j) (by positivity)
-    calc (Q (∑ j, e j • b j) : ℝ) ≤ (∑ j, (e j : ℝ)) ^ 2 * Cc := key Finset.univ
-      _ ≤ (D : ℝ) ^ 2 * Cc :=
-        mul_le_mul_of_nonneg_right (pow_le_pow_left₀ hsum0 hsumR 2) hCc
+    calc
+      (Q (∑ j, e j • b j) : ℝ)
+        ≤ (∑ j, (e j : ℝ)) ^ 2 * Cc := key Finset.univ
+      _ ≤ (D : ℝ) ^ 2 * Cc := mul_le_mul_of_nonneg_right (pow_le_pow_left₀ hsum0 hsumR 2) hCc
   · intro z hz
     have hz1 : (1 : ℝ) ≤ Q z := by exact_mod_cast hpos z hz
     have hBv : Bf (∑ j, e j • b j) z = ∑ j, (e j : ℤ) * Bf (b j) z := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, map_nsmul, nsmul_eq_mul]
+      simp [map_sum, map_nsmul, nsmul_eq_mul]
     have hBvR : (Bf (∑ j, e j • b j) z : ℝ) = ∑ j, (e j : ℝ) * Bf (b j) z := by
       rw [hBv]; push_cast; rfl
     have hMz : (0 : ℝ) ≤ M₀ * Q z := mul_nonneg hM₀ (by linarith)
@@ -118,13 +121,13 @@ theorem _root_.GlobalTheory.small_combination_strict_min_mod :
       refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun j _ => ?_)
       rw [abs_mul, Nat.abs_cast]
       exact mul_le_mul_of_nonneg_left (hBb j z) (Nat.cast_nonneg _)
-    have h2 : (∑ j, (e j : ℝ)) * (M₀ * Q z) ≤ D * (M₀ * Q z) :=
-      mul_le_mul_of_nonneg_right hsumR hMz
+    have h2 : (∑ j, (e j : ℝ)) * (M₀ * Q z) ≤ D * (M₀ * Q z) := mul_le_mul_of_nonneg_right hsumR hMz
     have hlow := neg_abs_le (Bf (∑ j, e j • b j) z : ℝ)
     have hbound : -((D : ℝ) * M₀ * Q z) ≤ (Bf (∑ j, e j • b j) z : ℝ) := by nlinarith
     have hq0 : (0 : ℝ) < q := lt_of_le_of_lt (mul_nonneg (Nat.cast_nonneg _) hM₀) hq
-    have hadd : (Q (∑ j, e j • b j + q • z) : ℝ)
-        = Q (∑ j, e j • b j) + (q : ℝ) ^ 2 * Q z + q * Bf (∑ j, e j • b j) z := by
+    have hadd
+        : (Q (∑ j, e j • b j + q • z) : ℝ)
+          = Q (∑ j, e j • b j) + (q : ℝ) ^ 2 * Q z + q * Bf (∑ j, e j • b j) z := by
       rw [quad_add_eq_add_add_bilin hsym hQ, quad_nsmul' hQ, map_nsmul, nsmul_eq_mul]
       push_cast
       ring

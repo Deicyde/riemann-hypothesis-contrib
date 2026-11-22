@@ -18,8 +18,8 @@ variable {φ : Frame} (H : HostRaw φ)
 
 abbrev kcBelow (P : Ideal (𝓞 H.E)) : Ideal (𝓞 H.K) := P.comap (algebraMap (𝓞 H.K) (𝓞 H.E))
 
-theorem kc_below_smul (σ : H.E ≃ₐ[ℚ] H.E) (hσ : H.gal σ ∈ φ.Psi) (P : Ideal (𝓞 H.E)) :
-    kcBelow H (σ • P) = kcBelow H P := by
+theorem kc_below_smul (σ : H.E ≃ₐ[ℚ] H.E) (hσ : H.gal σ ∈ φ.Psi) (P : Ideal (𝓞 H.E))
+    : kcBelow H (σ • P) = kcBelow H P := by
   ext a
   simp only [kcBelow, Ideal.mem_comap]
   rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem]
@@ -32,8 +32,11 @@ theorem kc_below_smul (σ : H.E ≃ₐ[ℚ] H.E) (hσ : H.gal σ ∈ φ.Psi) (P 
     exact kc_fixK H σ⁻¹ hσ' (a : H.K)
   rw [e]
 
-private theorem liesOver_span_of_natCast_mem_prime {M : Type} [Field M] [NumberField M] (P : Ideal (𝓞 M)) [hP : P.IsPrime] (p : ℕ)
-    (hp : p.Prime) (h : (p : 𝓞 M) ∈ P) : P.LiesOver (span {(p : ℤ)}) := by
+private theorem liesOver_span_of_natCast_mem_prime
+    {M : Type} [Field M] [NumberField M]
+    (P : Ideal (𝓞 M)) [hP : P.IsPrime]
+    (p : ℕ) (hp : p.Prime) (h : (p : 𝓞 M) ∈ P)
+    : P.LiesOver (span {(p : ℤ)}) := by
   constructor
   have hmax : (span {(p : ℤ)} : Ideal ℤ).IsMaximal :=
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hp).irreducible
@@ -42,31 +45,34 @@ private theorem liesOver_span_of_natCast_mem_prime {M : Type} [Field M] [NumberF
   show algebraMap ℤ (𝓞 M) (p : ℤ) ∈ P
   simpa using h
 
-theorem kc_exists_prime {M : Type} [Field M] [NumberField M] (P : Ideal (𝓞 M)) [hP : P.IsPrime] (n : ℕ) (hn : n ≠ 0)
-    (hm : (n : 𝓞 M) ∈ P) : ∃ p : ℕ, p.Prime ∧ p ∣ n ∧ P.LiesOver (span {(p : ℤ)}) := by
+theorem kc_exists_prime
+    {M : Type} [Field M] [NumberField M]
+    (P : Ideal (𝓞 M)) [hP : P.IsPrime]
+    (n : ℕ) (hn : n ≠ 0) (hm : (n : 𝓞 M) ∈ P)
+    : ∃ p : ℕ, p.Prime ∧ p ∣ n ∧ P.LiesOver (span {(p : ℤ)}) := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
-  have hn1 : n ≠ 1 := by
-    rintro rfl
-    exact hP.ne_top ((Ideal.eq_top_iff_one _).mpr (by simpa using hm))
-  have hpm := Nat.minFac_prime hn1
-  obtain ⟨k, hk⟩ := Nat.minFac_dvd n
-  have hm' : (n.minFac : 𝓞 M) * (k : 𝓞 M) ∈ P := by
-    rw [← Nat.cast_mul, ← hk]
-    exact hm
-  rcases hP.mem_or_mem hm' with h | h
-  · exact ⟨n.minFac, hpm, Nat.minFac_dvd n, liesOver_span_of_natCast_mem_prime P _ hpm h⟩
-  · have hk0 : k ≠ 0 := by
+    have hn1 : n ≠ 1 := by
       rintro rfl
-      simp at hk
-      exact hn hk
-    have hkn : k < n := by
-      have h2 := hpm.two_le
-      have hkpos := Nat.pos_of_ne_zero hk0
-      rw [hk]
-      nlinarith
-    obtain ⟨p, hp, hpk, hl⟩ := ih k hkn hk0 h
-    exact ⟨p, hp, hpk.trans (Dvd.intro_left _ hk.symm), hl⟩
+      exact hP.ne_top ((Ideal.eq_top_iff_one _).mpr (by simpa using hm))
+    have hpm := Nat.minFac_prime hn1
+    obtain ⟨k, hk⟩ := Nat.minFac_dvd n
+    have hm' : (n.minFac : 𝓞 M) * (k : 𝓞 M) ∈ P := by
+      rw [← Nat.cast_mul, ← hk]
+      exact hm
+    rcases hP.mem_or_mem hm' with h | h
+    · exact ⟨n.minFac, hpm, Nat.minFac_dvd n, liesOver_span_of_natCast_mem_prime P _ hpm h⟩
+    · have hk0 : k ≠ 0 := by
+        rintro rfl
+        simp at hk
+        exact hn hk
+      have hkn : k < n := by
+        have h2 := hpm.two_le
+        have hkpos := Nat.pos_of_ne_zero hk0
+        rw [hk]
+        nlinarith
+      obtain ⟨p, hp, hpk, hl⟩ := ih k hkn hk0 h
+      exact ⟨p, hp, hpk.trans (Dvd.intro_left _ hk.symm), hl⟩
 
 theorem kc_conj_sq : H.conj * H.conj = 1 := by
   apply H.gal.injective
@@ -76,8 +82,9 @@ theorem kc_conj_sq : H.conj * H.conj = 1 := by
 variable (C : HostCore H)
 include C
 
-theorem diffSupport : ∀ P : Ideal (𝓞 H.E), P.IsPrime → P ∣ differentIdeal (𝓞 H.K) (𝓞 H.E) →
-    ((H.QS * H.q : ℕ) : 𝓞 H.E) ∈ P := by
+theorem diffSupport
+    : ∀ P : Ideal (𝓞 H.E),
+      P.IsPrime → P ∣ differentIdeal (𝓞 H.K) (𝓞 H.E) → ((H.QS * H.q : ℕ) : 𝓞 H.E) ∈ P := by
   intro P hP hdvd
   have := H.galois
   by_contra hnot
@@ -108,17 +115,18 @@ theorem diffSupport : ∀ P : Ideal (𝓞 H.E), P.IsPrime → P ∣ differentIde
     rw [hgal, h1] at hpsi
     exact kc_iod_not_mem hpsi
 
-theorem kc_below_ne (P : Ideal (𝓞 H.E)) [P.IsPrime] (hm : ((H.QS * H.q : ℕ) : 𝓞 H.E) ∈ P) :
-    kcBelow H P ≠ kcBelow H (H.conj • P) := by
+theorem kc_below_ne (P : Ideal (𝓞 H.E)) [P.IsPrime] (hm : ((H.QS * H.q : ℕ) : 𝓞 H.E) ∈ P)
+    : kcBelow H P ≠ kcBelow H (H.conj • P) := by
   have := H.galois
   intro heq
-  have hn0 : H.QS * H.q ≠ 0 := Nat.mul_ne_zero H.QS_pos.ne' (by
-    rintro h0
-    have := H.QS_coprime
-    rw [h0, zero_mul, Nat.coprime_zero_right] at this
-    have h2 := kc_two_dvd H
-    rw [this] at h2
-    omega)
+  have hn0 : H.QS * H.q ≠ 0 :=
+    Nat.mul_ne_zero H.QS_pos.ne' (by
+      rintro h0
+      have := H.QS_coprime
+      rw [h0, zero_mul, Nat.coprime_zero_right] at this
+      have h2 := kc_two_dvd H
+      rw [this] at h2
+      omega)
   obtain ⟨l, hl, hldvd, hlo⟩ := kc_exists_prime P (H.QS * H.q) hn0 hm
   have : P.LiesOver (kcBelow H P) := ⟨rfl⟩
   have : (H.conj • P).LiesOver (kcBelow H P) := ⟨heq⟩
@@ -128,13 +136,16 @@ theorem kc_below_ne (P : Ideal (𝓞 H.E)) [P.IsPrime] (hm : ((H.QS * H.q : ℕ)
     rw [MulAction.mem_stabilizer_iff, mul_smul, ← hτ', inv_smul_smul]
   have hpsi := C.decomp_typeI l hl hldvd P _ hst
   rw [map_mul, map_inv, Subgroup.mul_mem_cancel_left _ (inv_mem (kc_restrict_mem_Psi H τ)),
-    kc_gal_conj] at hpsi
+      kc_gal_conj]
+    at hpsi
   exact kc_cc_not_mem hpsi
 
 attribute [local instance] FractionRing.liftAlgebra FractionRing.isScalarTower_liftAlgebra
 
-theorem principal : ∃ 𝔟 : Ideal (𝓞 H.E), differentIdeal (𝓞 H.K) (𝓞 H.E) = 𝔟 * (H.conj • 𝔟) ∧ 𝔟 ⊔ H.conj • 𝔟 = ⊤ ∧
-    ∀ σ : H.E ≃ₐ[ℚ] H.E, H.gal σ ∈ φ.Psi → σ • 𝔟 = 𝔟 := by
+theorem principal
+    : ∃ 𝔟 : Ideal (𝓞 H.E),
+      differentIdeal (𝓞 H.K) (𝓞 H.E) = 𝔟 * (H.conj • 𝔟) ∧ 𝔟 ⊔ H.conj • 𝔟 = ⊤
+        ∧ ∀ σ : H.E ≃ₐ[ℚ] H.E, H.gal σ ∈ φ.Psi → σ • 𝔟 = 𝔟 := by
   have := H.galois
   obtain ⟨f, hf⟩ : ∃ f : Ideal (𝓞 H.E) ≃* Ideal (𝓞 H.E), ∀ I, f I = H.conj • I :=
     ⟨(MulSemiringAction.toRingEquiv _ (Ideal (𝓞 H.E)) H.conj).toMulEquiv, fun _ => rfl⟩
@@ -144,10 +155,10 @@ theorem principal : ∃ 𝔟 : Ideal (𝓞 H.E), differentIdeal (𝓞 H.K) (𝓞
     exact kc_diff_smul_eq H H.conj
   have hcc : ∀ I : Ideal (𝓞 H.E), H.conj • H.conj • I = I := fun I => by
     rw [← mul_smul, kc_conj_sq, one_smul]
-  let p : Ideal (𝓞 H.E) → Prop := fun P =>
-    WellOrderingRel (kcBelow H P) (kcBelow H (H.conj • P))
-  have hp : ∀ P ∈ UniqueFactorizationMonoid.normalizedFactors (differentIdeal (𝓞 H.K) (𝓞 H.E)),
-      (p (f P) ↔ ¬ p P) := by
+  let p : Ideal (𝓞 H.E) → Prop := fun P => WellOrderingRel (kcBelow H P) (kcBelow H (H.conj • P))
+  have hp
+      : ∀ P ∈ UniqueFactorizationMonoid.normalizedFactors (differentIdeal (𝓞 H.K) (𝓞 H.E)),
+        (p (f P) ↔ ¬ p P) := by
     intro P hP
     have hPp : P.IsPrime :=
       Ideal.isPrime_of_prime (UniqueFactorizationMonoid.prime_of_normalized_factor P hP)

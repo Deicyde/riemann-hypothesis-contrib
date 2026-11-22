@@ -12,8 +12,7 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 namespace InjectiveHolomorphicOpen
 
-theorem finrank_eq (k : ℕ) :
-    Module.finrank ℝ (Fin k → ℂ) = Module.finrank ℝ (Fin (2 * k) → ℝ) := by
+theorem finrank_eq (k : ℕ) : Module.finrank ℝ (Fin k → ℂ) = Module.finrank ℝ (Fin (2 * k) → ℝ) := by
   simp [Module.finrank_pi_fintype, Complex.finrank_real_complex, mul_comm]
 
 theorem proof (hID : InvarianceOfDomain.Statement) : InjectiveHolomorphicOpen.Statement := by

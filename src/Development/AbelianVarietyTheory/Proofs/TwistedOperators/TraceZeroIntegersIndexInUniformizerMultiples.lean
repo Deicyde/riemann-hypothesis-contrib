@@ -56,7 +56,8 @@ theorem traceIndex : TraceIndex := by
     refine ⟨(intL L).mul_mem (pow_mem hϖO e) hy.1, ?_⟩
     rw [AddMonoidHom.coe_mulLeft, map_mul, map_pow, hϖ]
     linear_combination ϖ ^ e * hy.2
-  rw [← AddSubgroup.relIndex_map_map_of_injective (traceZero σ 1) (traceZero σ (ϖ ^ f)) (hinj f), hmap f, h1]
+  rw [← AddSubgroup.relIndex_map_map_of_injective (traceZero σ 1) (traceZero σ (ϖ ^ f)) (hinj f),
+    hmap f, h1]
   induction f with
   | zero =>
     have : T.map (AddMonoidHom.mulLeft (ϖ ^ 0)) = T := by
@@ -65,8 +66,9 @@ theorem traceIndex : TraceIndex := by
     rw [this]
     simp
   | succ e ih =>
-    have hcomp : T.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1))) =
-        (T.map (AddMonoidHom.mulLeft ϖ)).map (AddMonoidHom.mulLeft (ϖ ^ e)) := by
+    have hcomp
+        : T.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1)))
+          = (T.map (AddMonoidHom.mulLeft ϖ)).map (AddMonoidHom.mulLeft (ϖ ^ e)) := by
       ext x
       simp only [AddSubgroup.mem_map, AddMonoidHom.coe_mulLeft]
       constructor
@@ -74,11 +76,14 @@ theorem traceIndex : TraceIndex := by
         exact ⟨ϖ * o, ⟨o, ho, rfl⟩, by rw [pow_succ, mul_assoc]⟩
       · rintro ⟨_, ⟨o, ho, rfl⟩, rfl⟩
         exact ⟨o, ho, by rw [pow_succ, mul_assoc]⟩
-    have hstep : (T.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1)))).relIndex
-        (T.map (AddMonoidHom.mulLeft (ϖ ^ e))) = q := by
+    have hstep
+        : (T.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1)))).relIndex
+            (T.map (AddMonoidHom.mulLeft (ϖ ^ e)))
+          = q := by
       rw [hcomp, AddSubgroup.relIndex_map_map_of_injective _ _ (hinj e)]
       exact hq
-    have hle1 : T.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1))) ≤ T.map (AddMonoidHom.mulLeft (ϖ ^ e)) := by
+    have hle1
+        : T.map (AddMonoidHom.mulLeft (ϖ ^ (e + 1))) ≤ T.map (AddMonoidHom.mulLeft (ϖ ^ e)) := by
       rw [hcomp]
       exact AddSubgroup.map_mono (by simpa using hmulle 1)
     rw [← AddSubgroup.relIndex_mul_relIndex _ _ _ hle1 (hmulle e), hstep, ih]

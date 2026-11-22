@@ -11,8 +11,7 @@ variable {E K K' : Type} [Field E] [Field K] [Field K'] {ι ι' : Type} [Fintype
 def MU (φ : ι → E →+* K) (e : ι → ℤ) : Prop :=
   ∀ z : E, (∃ m : ℕ, 0 < m ∧ z ^ m = 1) → ∏ i, φ i z ^ e i = 1
 
-def MUQ (φ : ι → E →+* K) (e : ι → ℚ) : Prop :=
-  ∃ a : ι → ℤ, (∀ i, e i = a i) ∧ MU φ a
+def MUQ (φ : ι → E →+* K) (e : ι → ℚ) : Prop := ∃ a : ι → ℤ, (∀ i, e i = a i) ∧ MU φ a
 
 theorem root_ne_zero {z : E} (hz : ∃ m : ℕ, 0 < m ∧ z ^ m = 1) : z ≠ 0 := by
   obtain ⟨m, hm, h⟩ := hz
@@ -22,7 +21,9 @@ theorem root_ne_zero {z : E} (hz : ∃ m : ℕ, 0 < m ∧ z ^ m = 1) : z ≠ 0 :
 
 theorem prod_neg_one_zpow (e : ι → ℤ) : ∏ i, (-1 : K) ^ e i = (-1) ^ (∑ i, e i) := by
   classical
-  refine Finset.induction_on (motive := fun s => ∏ i ∈ s, (-1 : K) ^ e i = (-1) ^ (∑ i ∈ s, e i)) Finset.univ (by simp) ?_
+  refine Finset.induction_on
+    (motive := fun s => ∏ i ∈ s, (-1 : K) ^ e i = (-1) ^ (∑ i ∈ s, e i))
+    Finset.univ (by simp) ?_
   intro a s ha ih
   rw [Finset.prod_insert ha, Finset.sum_insert ha, ih, zpow_add₀ (by norm_num)]
 
@@ -34,7 +35,8 @@ theorem add (h : MU φ e) (h' : MU φ e') : MU φ (e + e') := by
   intro z hz
   have hne : ∀ i, φ i z ≠ 0 := fun i => (map_ne_zero (φ i)).2 (root_ne_zero hz)
   show ∏ i, φ i z ^ (e i + e' i) = 1
-  rw [Finset.prod_congr rfl fun i _ => zpow_add₀ (hne i) (e i) (e' i), Finset.prod_mul_distrib, h z hz, h' z hz, one_mul]
+  rw [Finset.prod_congr rfl fun i _ => zpow_add₀ (hne i) (e i) (e' i), Finset.prod_mul_distrib,
+    h z hz, h' z hz, one_mul]
 
 theorem neg (h : MU φ e) : MU φ (-e) := by
   intro z hz
@@ -81,9 +83,10 @@ theorem even [CharZero K] (h : MUQ φ e) : ∃ z : ℤ, ∑ i, e i = 2 * (z : �
 
 theorem mu (h : MUQ φ e) {a : ι → ℤ} (ha : ∀ i, e i = a i) : MU φ a := by
   obtain ⟨b, hb, hm⟩ := h
-  have hab : a = b := funext fun i => by
-    have h3 := (ha i).symm.trans (hb i)
-    exact_mod_cast h3
+  have hab : a = b :=
+    funext fun i => by
+      have h3 := (ha i).symm.trans (hb i)
+      exact_mod_cast h3
   subst hab
   exact hm
 

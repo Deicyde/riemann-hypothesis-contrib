@@ -55,7 +55,8 @@ theorem HolomorphicKernelFibre.proof : HolomorphicKernelFibre.Statement := by
 
   let M : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ := (A : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ) + (E.comp lam : _)
   have hMinj : Function.Injective M := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v hv
     have hv' : A v + E (lam v) = 0 := hv
     have hAv : A v = 0 := by
@@ -69,7 +70,8 @@ theorem HolomorphicKernelFibre.proof : HolomorphicKernelFibre.Statement := by
     have : eK (K.projectionOnto K' hKK' v) = 0 := hlv
     rw [Submodule.projectionOnto_apply_of_mem_left hKK' hvK, LinearEquiv.map_eq_zero_iff] at this
     exact congrArg Subtype.val this
-  let M' : (Fin k → ℂ) ≃L[ℂ] Fin k → ℂ := (LinearEquiv.ofInjectiveEndo M hMinj).toContinuousLinearEquiv
+  let M' : (Fin k → ℂ) ≃L[ℂ] Fin k → ℂ :=
+    (LinearEquiv.ofInjectiveEndo M hMinj).toContinuousLinearEquiv
   let Φ : (Fin k → ℂ) → Fin k → ℂ := fun z => P (f z) + E (lam z)
   have hΦd : HasFDerivAt Φ (M' : (Fin k → ℂ) →L[ℂ] Fin k → ℂ) b := by
     have h := (P.hasFDerivAt.comp b hfd).add (E.comp lam).hasFDerivAt
@@ -97,10 +99,12 @@ theorem HolomorphicKernelFibre.proof : HolomorphicKernelFibre.Statement := by
   · show c + E (lam b) ∈ T
     refine ⟨⟨hΦbT, ?_⟩, hbO⟩
     show H.symm (Φ b) ∈ U
-    rw [hHb]; exact hb
+    rw [hHb]
+    exact hb
   · intro t ht
     exact ((hO _ ht.2).differentiableAt one_ne_zero).comp t
-      ((differentiableAt_const c).add E.differentiableAt) |>.differentiableWithinAt
+        ((differentiableAt_const c).add E.differentiableAt)
+      |>.differentiableWithinAt
   · intro t ht
     exact ht.1.2
   · intro s hs t ht hst
@@ -108,26 +112,27 @@ theorem HolomorphicKernelFibre.proof : HolomorphicKernelFibre.Statement := by
     have h2 := H.right_inv ht.1.1
     have : aff s = aff t := by rw [← h1, ← h2]; exact congrArg H hst
     exact hEinj (add_left_cancel this)
-  ·
-    have hfib : ∀ t ∈ aff ⁻¹' T, P (f (H.symm (aff t))) = c := by
+  · have hfib : ∀ t ∈ aff ⁻¹' T, P (f (H.symm (aff t))) = c := by
       intro t ht
       have h1 : Φ (H.symm (aff t)) = c + E t := H.right_inv ht.1.1
       have h2 := congrArg P h1
       simp only [Φ, map_add (f := _), hPE, add_zero, hPP] at h2
       rw [h2, hc, hPP]
     intro s hs t ht hst
-    have hq : C.projectionOnto W hWC.symm (f (H.symm (aff s))) =
-        C.projectionOnto W hWC.symm (f (H.symm (aff t))) := eC.injective hst
+    have hq
+        : C.projectionOnto W hWC.symm (f (H.symm (aff s)))
+          = C.projectionOnto W hWC.symm (f (H.symm (aff t))) :=
+      eC.injective hst
     rw [← Submodule.projection_add_projection_eq_self hWC (f (H.symm (aff s))),
       ← Submodule.projection_add_projection_eq_self hWC (f (H.symm (aff t)))]
     have hs' := hfib s hs
     have ht' := hfib t ht
     simp only [P, LinearMap.coe_toContinuousLinearMap'] at hs' ht'
     rw [hs', ht', Submodule.projection_apply, Submodule.projection_apply (q := W), hq]
-  ·
-    have hγy : H.symm (aff (lam b)) = b := hHb
+  · have hγy : H.symm (aff (lam b)) = b := hHb
     have hγd : DifferentiableAt ℂ (fun t => H.symm (aff t)) (lam b) :=
-      (hinv.differentiableAt one_ne_zero).comp (lam b) ((differentiableAt_const c).add E.differentiableAt)
+      (hinv.differentiableAt one_ne_zero).comp (lam b)
+        ((differentiableAt_const c).add E.differentiableAt)
     have hfd' : HasFDerivAt f A (H.symm (aff (lam b))) := by rw [hγy]; exact hfd
     have h := ℓ.hasFDerivAt.comp (lam b) (hfd'.comp (lam b) hγd.hasFDerivAt)
     refine h.fderiv.trans ?_

@@ -41,13 +41,18 @@ theorem BlowUpHorizontalMinimal.full : BlowUpHorizontalMinimal.Statement.{u} := 
       rwa [sub_add_cancel] at this
     exact hj ((hPp.mem_or_mem h1).resolve_left fun h' => hv j (hPW₀ h'))
 
-  obtain ⟨u₀, a, hu₀W, hrelP⟩ : ∃ (u₀ : MRing ι O) (a : J → MRing ι O), u₀ ∉ W₀ ∧
-      ∀ j, u₀ * u j - u j₀ * a j ∈ P := by
+  obtain ⟨u₀, a, hu₀W, hrelP⟩
+      : ∃ (u₀ : MRing ι O) (a : J → MRing ι O), u₀ ∉ W₀ ∧ ∀ j, u₀ * u j - u j₀ * a j ∈ P := by
     have := hW₀p
-    refine ⟨∏ j, v j, fun j => w j * ∏ j' ∈ Finset.univ.erase j, v j',
-      fun h => W₀.primeCompl.prod_mem (fun j _ => hv j) h, fun j => ?_⟩
-    have e : (∏ j, v j) * u j - u j₀ * (w j * ∏ j' ∈ Finset.univ.erase j, v j') =
-        (∏ j' ∈ Finset.univ.erase j, v j') * (v j * u j - w j * u j₀) := by
+    refine ⟨
+      ∏ j, v j,
+      fun j => w j * ∏ j' ∈ Finset.univ.erase j, v j',
+      fun h => W₀.primeCompl.prod_mem (fun j _ => hv j) h,
+      fun j => ?_
+    ⟩
+    have e
+        : (∏ j, v j) * u j - u j₀ * (w j * ∏ j' ∈ Finset.univ.erase j, v j')
+          = (∏ j' ∈ Finset.univ.erase j, v j') * (v j * u j - w j * u j₀) := by
       rw [← Finset.mul_prod_erase Finset.univ v (Finset.mem_univ j)]; ring
     rw [e]
     exact P.mul_mem_left _ (hvw j)
@@ -63,8 +68,10 @@ theorem BlowUpHorizontalMinimal.full : BlowUpHorizontalMinimal.Statement.{u} := 
   have hrelB : ∀ j, newVar j * liftForm (a j₀) - newVar j₀ * liftForm (a j) ∈ blowUpOf P u := by
     intro j
     apply mem_blowUpOf_of_sub
-    have e : u₀ * (u j * a j₀ - u j₀ * a j) =
-        a j₀ * (u₀ * u j - u j₀ * a j) - a j * (u₀ * u j₀ - u j₀ * a j₀) := by ring
+    have e
+        : u₀ * (u j * a j₀ - u j₀ * a j)
+          = a j₀ * (u₀ * u j - u j₀ * a j) - a j * (u₀ * u j₀ - u j₀ * a j₀) := by
+      ring
     have h1 : u₀ * (u j * a j₀ - u j₀ * a j) ∈ P := by
       rw [e]; exact P.sub_mem (P.mul_mem_left _ (hrelP j)) (P.mul_mem_left _ (hrelP j₀))
     exact (hPp.mem_or_mem h1).resolve_left hu₀P
@@ -74,8 +81,9 @@ theorem BlowUpHorizontalMinimal.full : BlowUpHorizontalMinimal.Statement.{u} := 
   have := hP'.1
   have hxP' : x ∈ P' := hP'.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self x))
 
-  let Q' := (Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P').comap
-    (aeval (R := O) (chartSubst a))
+  let Q' :=
+    (Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P').comap
+      (aeval (R := O) (chartSubst a))
   have hQ'p : Q'.IsPrime := Ideal.comap_isPrime _ _
   have hBQ' : blowUpOf P u ⊔ Ideal.span {liftForm x} ≤ Q' := by
     refine sup_le (fun G hG => ?_) ((Ideal.span_singleton_le_iff_mem _).mpr ?_)
@@ -88,7 +96,8 @@ theorem BlowUpHorizontalMinimal.full : BlowUpHorizontalMinimal.Statement.{u} := 
 
   have hWQ' : W ≤ Q' := hmin.2 ⟨hQ'p, hBQ'⟩ hQ'W
   intro p hp
-  have h5 : Polynomial.C p ∈ Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P' := by
+  have h5
+      : Polynomial.C p ∈ Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P' := by
     rw [← aeval_chartSubst_liftForm a p]
     exact hWQ' hp
   simpa using Ideal.mem_map_C_iff.mp h5 0

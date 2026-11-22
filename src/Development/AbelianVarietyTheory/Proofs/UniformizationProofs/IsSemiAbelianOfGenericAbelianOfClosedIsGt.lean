@@ -12,16 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Abelian
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
 
 namespace GlobalTheory
 
-theorem isSemiAbelian_of_grpIso {S : Scheme.{0}} {G₁ G₂ : Over S} [GrpObj G₁] [GrpObj G₂] [hc : IsCommMonObj G₂]
-    (e : G₂ ≅ G₁) [IsMonHom e.hom] (h : IsSemiAbelian G₁) : IsSemiAbelian G₂ := by
+theorem isSemiAbelian_of_grpIso
+    {S : Scheme.{0}} {G₁ G₂ : Over S} [GrpObj G₁] [GrpObj G₂] [hc : IsCommMonObj G₂]
+    (e : G₂ ≅ G₁) [IsMonHom e.hom]
+    (h : IsSemiAbelian G₁)
+    : IsSemiAbelian G₂ := by
   have hi : IsIso e.hom.left := ((Over.forget S).mapIso e).isIso_hom
   have hw : G₂.hom = e.hom.left ≫ G₁.hom := (Over.w e.hom).symm
   have := h.smooth
@@ -38,7 +43,8 @@ theorem isSemiAbelian_of_grpIso {S : Scheme.{0}} {G₁ G₂ : Over S} [GrpObj G�
     have h1 : ConnectedSpace ((Over.pullback q).obj G₁).left := pullback_of_geometrically hg.1 K q
     exact (((Over.pullback q).map e.hom).left.homeomorph.connectedSpace_iff).2 h1
   · obtain ⟨E⟩ := h.fibres Ω q
-    have : IsMonHom ((Over.pullback q).mapIso e).hom := inferInstanceAs (IsMonHom ((Over.pullback q).map e.hom))
+    have : IsMonHom ((Over.pullback q).mapIso e).hom :=
+      inferInstanceAs (IsMonHom ((Over.pullback q).map e.hom))
     have : IsMonHom ((Over.pullback q).mapIso e).symm.hom :=
       inferInstanceAs (IsMonHom ((Over.pullback q).mapIso e).inv)
     exact ⟨torusExtOfIso ((Over.pullback q).mapIso e).symm E⟩

@@ -35,7 +35,9 @@ def HinfS (S : Set (Fin I.n → I.E)) : Subgroup I.Ginf where
   inv_mem' := by
     intro s hs v x hx
     have e1 : uMat (s⁻¹ v) * uMat (s v) = 1 := by simp [uMat]
-    calc uMat (s⁻¹ v) *ᵥ rv I v x = uMat (s⁻¹ v) *ᵥ (uMat (s v) *ᵥ rv I v x) := by rw [hs v x hx]
+    calc
+      uMat (s⁻¹ v) *ᵥ rv I v x
+        = uMat (s⁻¹ v) *ᵥ (uMat (s v) *ᵥ rv I v x) := by rw [hs v x hx]
       _ = rv I v x := by rw [Matrix.mulVec_mulVec, e1, Matrix.one_mulVec]
 
 def HfinS (S : Set (Fin I.n → I.E)) : Subgroup I.Gf where
@@ -50,7 +52,9 @@ def HfinS (S : Set (Fin I.n → I.E)) : Subgroup I.Gf where
   inv_mem' := by
     intro a ha y hy
     have e1 : I.fmat a⁻¹ * I.fmat a = 1 := by simp [AutInst.fmat]
-    calc I.fmat a⁻¹ *ᵥ incl I y = I.fmat a⁻¹ *ᵥ (I.fmat a *ᵥ incl I y) := by rw [ha y hy]
+    calc
+      I.fmat a⁻¹ *ᵥ incl I y
+        = I.fmat a⁻¹ *ᵥ (I.fmat a *ᵥ incl I y) := by rw [ha y hy]
       _ = incl I y := by rw [Matrix.mulVec_mulVec, e1, Matrix.one_mulVec]
 
 def GamS (S : Set (Fin I.n → I.E)) : Subgroup I.GA :=
@@ -64,15 +68,20 @@ end Defs
 
 def DefiniteCompl (I : Formalism.MainNotions.S.AutInst) (S : Set (Fin I.n → I.E)) : Prop :=
   ∀ ι : I.F →+* ℝ,
-    (∀ x : Fin I.n → I.E, x ≠ 0 → (∀ s ∈ S, Formalism.UG.hform (starRingEnd I.E) I.J s x = 0) →
-      ∃ a : I.F, algebraMap I.F I.E a = Formalism.UG.hform (starRingEnd I.E) I.J x x ∧ 0 < ι a) ∨
-    (∀ x : Fin I.n → I.E, x ≠ 0 → (∀ s ∈ S, Formalism.UG.hform (starRingEnd I.E) I.J s x = 0) →
-      ∃ a : I.F, algebraMap I.F I.E a = Formalism.UG.hform (starRingEnd I.E) I.J x x ∧ ι a < 0)
+    (∀ x : Fin I.n → I.E,
+        x ≠ 0 → (∀ s ∈ S, Formalism.UG.hform (starRingEnd I.E) I.J s x = 0)
+          → ∃ a : I.F,
+            algebraMap I.F I.E a = Formalism.UG.hform (starRingEnd I.E) I.J x x ∧ 0 < ι a)
+      ∨ (∀ x : Fin I.n → I.E,
+        x ≠ 0 → (∀ s ∈ S, Formalism.UG.hform (starRingEnd I.E) I.J s x = 0)
+          → ∃ a : I.F,
+            algebraMap I.F I.E a = Formalism.UG.hform (starRingEnd I.E) I.J x x ∧ ι a < 0)
 
 def StabClassFinite : Prop :=
-  ∀ (I : Formalism.MainNotions.S.AutInst) (S : Set (Fin I.n → I.E)), DefiniteCompl I S →
-    ∀ (K : Subgroup (HfinS I S)) (g : ℕ) (x : I.Gf), 1 ≤ g →
-      (∀ h : HfinS I S, x⁻¹ * (h : I.Gf) * x ∈ I.Kg g → h ∈ K) →
-      Finite (Formalism.UG.ClassSet (iotaFS I S).range K)
+  ∀ (I : Formalism.MainNotions.S.AutInst) (S : Set (Fin I.n → I.E)),
+    DefiniteCompl I S
+      → ∀ (K : Subgroup (HfinS I S)) (g : ℕ) (x : I.Gf),
+        1 ≤ g → (∀ h : HfinS I S, x⁻¹ * (h : I.Gf) * x ∈ I.Kg g → h ∈ K)
+          → Finite (Formalism.UG.ClassSet (iotaFS I S).range K)
 
 end PI.InHHClassFin

@@ -12,14 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NotDvdDiscrHo
 
 noncomputable section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.FlatTw GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.RefSum
+open GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects NumberField IsDedekindDomain
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.FlatLine
+  GlobalTheory.FlatTw GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop
+  GlobalTheory.RefSum
 
 namespace GlobalTheory.BadLog
 
-theorem logSum_le_log {B : Finset ℕ} {N : ℕ} (hN : N ≠ 0) (h : ∀ p ∈ B, p.Prime ∧ p ∣ N) : logSum B ≤ Real.log N := by
+theorem logSum_le_log {B : Finset ℕ} {N : ℕ} (hN : N ≠ 0) (h : ∀ p ∈ B, p.Prime ∧ p ∣ N)
+    : logSum B ≤ Real.log N := by
   have h1 : ∏ p ∈ B, p ∣ N :=
-    (Finset.prod_dvd_prod_of_subset _ _ (fun p => p) fun p hp =>
-      Nat.mem_primeFactors.2 ⟨(h p hp).1, (h p hp).2, hN⟩).trans (Nat.prod_primeFactors_dvd N)
+    (Finset.prod_dvd_prod_of_subset _ _
+        (fun p => p)
+        fun p hp => Nat.mem_primeFactors.2 ⟨(h p hp).1, (h p hp).2, hN⟩).trans
+      (Nat.prod_primeFactors_dvd N)
   have h0 : ∀ p ∈ B, (p : ℝ) ≠ 0 := fun p hp => by exact_mod_cast (h p hp).1.ne_zero
   unfold logSum
   rw [← Real.log_prod h0, ← Nat.cast_prod]
@@ -28,9 +35,10 @@ theorem logSum_le_log {B : Finset ℕ} {N : ℕ} (hN : N ≠ 0) (h : ∀ p ∈ B
 
 variable {D : D7} {L : SizeData₂ D}
 
-theorem log_level_le (P : ParameterChoice' D L) :
-    LevelStarExponents.condE D * (D.host.g 0 * D.host.g 1) * 15 ≠ 0 ∧
-    Real.log ((LevelStarExponents.condE D * (D.host.g 0 * D.host.g 1) * 15 : ℕ) : ℝ) ≤ (2 * |P.CYL| + 17) * zBase L := by
+theorem log_level_le (P : ParameterChoice' D L)
+    : LevelStarExponents.condE D * (D.host.g 0 * D.host.g 1) * 15 ≠ 0
+      ∧ Real.log ((LevelStarExponents.condE D * (D.host.g 0 * D.host.g 1) * 15 : ℕ) : ℝ)
+        ≤ (2 * |P.CYL| + 17) * zBase L := by
   have hn : 0 < D.R.n := D.R.ord_pos
   have h1 := D.R.two_le_m
   have h2 := D.R.m_add_three_le_k
@@ -54,12 +62,15 @@ theorem log_level_le (P : ParameterChoice' D L) :
   obtain ⟨Y, y1, -, y3, y4⟩ := P.g_Y
   have hY : 0 < Y := lt_of_lt_of_le (by positivity) y1
   have hg0 : ∀ i, (0 : ℝ) < D.host.g i := fun i => hY.trans_le (y4 i).1
-  have l2 : Real.log 2 ≤ 1 := by linarith [Real.log_le_sub_one_of_pos (show (0 : ℝ) < 2 by norm_num)]
-  have l15 : Real.log 15 ≤ 14 := by linarith [Real.log_le_sub_one_of_pos (show (0 : ℝ) < 15 by norm_num)]
+  have l2 : Real.log 2 ≤ 1 := by
+    linarith [Real.log_le_sub_one_of_pos (show (0 : ℝ) < 2 by norm_num)]
+  have l15 : Real.log 15 ≤ 14 := by
+    linarith [Real.log_le_sub_one_of_pos (show (0 : ℝ) < 15 by norm_num)]
   have hg : ∀ i, Real.log (D.host.g i) ≤ 1 + |P.CYL| * L.sc.L := fun i => by
     have a := Real.log_le_log (hg0 i) (y4 i).2
     rw [Real.log_mul two_ne_zero hY.ne'] at a
-    have b : P.CYL * L.sc.L ≤ |P.CYL| * L.sc.L := mul_le_mul_of_nonneg_right (le_abs_self _) (by linarith)
+    have b : P.CYL * L.sc.L ≤ |P.CYL| * L.sc.L :=
+      mul_le_mul_of_nonneg_right (le_abs_self _) (by linarith)
     linarith
   have hz : L.sc.L ≤ zBase L := by
     unfold zBase
@@ -75,14 +86,22 @@ theorem log_level_le (P : ParameterChoice' D L) :
   refine le_trans ?_ (mul_le_mul_of_nonneg_left hz (by positivity))
   linarith [hg 0, hg 1]
 
-theorem dvd_of_mem_badPrimes {T : Core D} (hQ : T.Q.Pins) {j : ℕ} {Y : Deep T j} {e : ℕ} {o : ℝ} (h : Y.Good e o)
-    {p : ℕ} (hp : p ∈ badPrimes T.Q.H Y.d.l₂) : p.Prime ∧ p ∣ LevelStarExponents.condE D * (D.host.g 0 * D.host.g 1) * 15 := by
+theorem dvd_of_mem_badPrimes
+    {T : Core D} (hQ : T.Q.Pins)
+    {j : ℕ} {Y : Deep T j} {e : ℕ} {o : ℝ} (h : Y.Good e o)
+    {p : ℕ} (hp : p ∈ badPrimes T.Q.H Y.d.l₂)
+    : p.Prime ∧ p ∣ LevelStarExponents.condE D * (D.host.g 0 * D.host.g 1) * 15 := by
   obtain ⟨hp, h'⟩ := mem_badPrimes.1 hp
   refine ⟨hp, ?_⟩
   have hM : Y.d.l₂.M = D.host.g 0 * D.host.g 1 * 15 ^ e := by rw [← h.pd, h.lev.1.2.1, hQ.2.1.1]
-  have key : ∀ a, a ∣ LevelStarExponents.condE D → a ∣ LevelStarExponents.condE D * (D.host.g 0 * D.host.g 1) * 15 := fun a ha =>
+  have key
+      : ∀ a,
+        a ∣ LevelStarExponents.condE D
+          → a ∣ LevelStarExponents.condE D * (D.host.g 0 * D.host.g 1) * 15 := fun a ha =>
     (ha.mul_right _).mul_right _
-  have cD : ∀ a : ℕ, a.Prime → (a : ℤ) ∣ NumberField.discr D.host.E → a ∣ LevelStarExponents.condE D := D.host.der.discr_primes.1
+  have cD
+      : ∀ a : ℕ, a.Prime → (a : ℤ) ∣ NumberField.discr D.host.E → a ∣ LevelStarExponents.condE D :=
+    D.host.der.discr_primes.1
   have c2 : 2 ∣ LevelStarExponents.condE D := cD 2 Nat.prime_two D.host.der.discr_primes.2.1
   have cd : D.host.d ∣ LevelStarExponents.condE D := cD _ D.host.hyp.2.1 D.host.der.discr_primes.2.2
   rcases h' with rfl | h' | h' | h' | h'

@@ -13,7 +13,8 @@ private theorem even_tot (l : ℕ) [hl : Fact l.Prime] : Even (Nat.totient (l ^ 
   split_ifs with h
   · subst h; norm_num
   · have := hl.out.two_le
-    rw [pow_one]; omega
+    rw [pow_one]
+    omega
 
 private theorem pos_tot (l : ℕ) [hl : Fact l.Prime] : 0 < Nat.totient (l ^ ee l) :=
   Nat.totient_pos.2 (pow_pos hl.out.pos _)
@@ -25,8 +26,12 @@ private theorem neg_ne (l : ℕ) [Fact l.Prime] (r : ℤ_[l]ˣ) : r ≠ -r := by
     simpa using this
   exact r.ne_zero (self_eq_neg.1 h1)
 
-theorem UpperTheory.V.FW.reps :
-    ∀ (l : ℕ) [Fact l.Prime], ∃ R : Finset ℤ_[l]ˣ, R.Nonempty ∧ (∀ r ∈ R, r ∈ WW l) ∧ (∀ r ∈ R, ∀ r' ∈ R, r ≠ r' → ∀ a b : ℤ, (a : ℤ_[l]) * r = (b : ℤ_[l]) * r' → a = 0) ∧ (∀ r ∈ R, -r ∉ R) ∧ (∀ w ∈ WW l, w ∈ R ∨ -w ∈ R) ∧ (-1 : ℤ_[l]ˣ) ∈ WW l ∧ ∀ n, 2 ≤ n → ∀ w ∈ WW l, redU l n w = 1 → w = 1 := by
+theorem UpperTheory.V.FW.reps
+    : ∀ (l : ℕ) [Fact l.Prime], ∃ R : Finset ℤ_[l]ˣ,
+      R.Nonempty ∧ (∀ r ∈ R, r ∈ WW l)
+        ∧ (∀ r ∈ R, ∀ r' ∈ R, r ≠ r' → ∀ a b : ℤ, (a : ℤ_[l]) * r = (b : ℤ_[l]) * r' → a = 0)
+        ∧ (∀ r ∈ R, -r ∉ R) ∧ (∀ w ∈ WW l, w ∈ R ∨ -w ∈ R) ∧ (-1 : ℤ_[l]ˣ) ∈ WW l
+        ∧ ∀ n, 2 ≤ n → ∀ w ∈ WW l, redU l n w = 1 → w = 1 := by
   intro l _
   classical
   have hev := even_tot l
@@ -60,8 +65,7 @@ theorem UpperTheory.V.FW.reps :
     · exact ⟨_, h⟩
   · intro r hr r' hr' hne a b hab
     by_contra ha
-    have e1 : (r : ℤ_[l]) ^ Nat.totient (l ^ ee l) = 1 :=
-      (mem_rootsOfUnity' _ _).1 ((hR _).1 hr).1
+    have e1 : (r : ℤ_[l]) ^ Nat.totient (l ^ ee l) = 1 := (mem_rootsOfUnity' _ _).1 ((hR _).1 hr).1
     have e2 : (r' : ℤ_[l]) ^ Nat.totient (l ^ ee l) = 1 :=
       (mem_rootsOfUnity' _ _).1 ((hR _).1 hr').1
     have e3 := congrArg (· ^ Nat.totient (l ^ ee l)) hab
@@ -76,14 +80,15 @@ theorem UpperTheory.V.FW.reps :
       have : r = -r' := Units.ext (by simpa using mul_left_cancel₀ ha' hab)
       exact h4 r' hr' (this ▸ hr)
   · intro n hn w hw h1
-    have hle : ee l ≤ n := by
-      unfold ee; split_ifs <;> omega
+    have hle : ee l ≤ n := by unfold ee; split_ifs <;> omega
     have h2 : PadicInt.toZModPow n (w : ℤ_[l]) = 1 := by
       have := congrArg Units.val h1
       simpa [redU] using this
     have h3 : PadicInt.toZModPow (ee l) (w : ℤ_[l]) = 1 := by
       rw [← PadicInt.zmod_cast_comp_toZModPow (ee l) n hle, RingHom.comp_apply, h2, map_one]
-    have h4 : ((redU l (ee l)).comp (WW l).subtype) ⟨w, hw⟩ = ((redU l (ee l)).comp (WW l).subtype) 1 := by
+    have h4
+        : ((redU l (ee l)).comp (WW l).subtype) ⟨w, hw⟩
+          = ((redU l (ee l)).comp (WW l).subtype) 1 := by
       rw [map_one]
       apply Units.ext
       simpa [redU] using h3

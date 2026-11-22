@@ -12,14 +12,18 @@ open GlobalTheory GlobalTheory.DI
 
 namespace GlobalTheory.DI
 
-theorem Dtot_cup : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E] (d : E →+ E)
-    (Φ : E →+ (Finset ι → E)) (c : Finset ι → E), (∀ x, Φ x ∅ = 0) → c ∅ = 0 →
-    (∀ s, Dtot d (Φ (c s)) = 0) → Dtot d (cup Φ c) = cup Φ (delta c) := by
+theorem Dtot_cup
+    : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E] (d : E →+ E)
+        (Φ : E →+ (Finset ι → E)) (c : Finset ι → E),
+      (∀ x, Φ x ∅ = 0) → c ∅ = 0 → (∀ s, Dtot d (Φ (c s)) = 0)
+        → Dtot d (cup Φ c) = cup Φ (delta c) := by
   intro ι _ E _ d Φ c hΦ hc hD
   funext u
   have key := delta_cup_eq Φ c hΦ hc u
-  suffices hS : (∑ j ∈ u, ((-1 : ℤ) ^ ({x ∈ u | x < j}).card) • delta (Φ (c ({x ∈ u | x ≤ j}))) ({x ∈ u | j ≤ x}))
-      + ((-1 : ℤ) ^ u.card) • d (cup Φ c u) = 0 by
+  suffices hS
+      : (∑ j ∈ u, ((-1 : ℤ) ^ ({x ∈ u | x < j}).card) • delta (Φ (c ({x ∈ u | x ≤ j}))) ({x ∈ u | j ≤ x}))
+          + ((-1 : ℤ) ^ u.card) • d (cup Φ c u)
+        = 0 by
     simp only [Dtot]
     rw [key, add_assoc, hS, add_zero]
   set_option synthInstance.maxHeartbeats 100000 in

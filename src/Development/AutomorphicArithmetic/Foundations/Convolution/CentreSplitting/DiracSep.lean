@@ -7,29 +7,38 @@ public import GroundTheory.AutomorphicForms.CuspidalProjection.OrthogonalProject
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
 open scoped InnerProductSpace Topology
 
-private theorem near_one_nhds {G H : Type*} [Group G] [TopologicalSpace G] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H) {v : H} (hpos : 0 < ‖v‖) :
-    {g : G | ‖π g v - v‖ < ‖v‖ / 2} ∈ 𝓝 (1 : G) := by
+private theorem near_one_nhds
+    {G H : Type*}
+    [Group G] [TopologicalSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (π : UnitaryRep G H)
+    {v : H} (hpos : 0 < ‖v‖)
+    : {g : G | ‖π g v - v‖ < ‖v‖ / 2} ∈ 𝓝 (1 : G) := by
   have hcont : Continuous fun g => π g v := π.continuous_orbit v
   have ht : Filter.Tendsto (fun g => ‖π g v - v‖) (𝓝 (1 : G)) (𝓝 ‖π 1 v - v‖) :=
     (hcont.sub continuous_const).norm.tendsto 1
   rw [UnitaryRep.map_one_apply, sub_self, norm_zero] at ht
   exact ht.eventually_lt_const (half_pos hpos)
 
-private theorem exists_bump_nonzero {G H : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    (ν : Measure G) [ν.IsHaarMeasure] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    (π : UnitaryRep G H) {v : H} (hpos : 0 < ‖v‖) (ρ : G → ℝ) (β : CompactlySupportedContinuousMap G ℂ)
-    (hβa : ∀ g, β g = (ρ g : ℂ)) (hρ0 : ∀ g, 0 ≤ ρ g) (hρ1 : ∫ g, ρ g ∂ν = 1)
+private theorem exists_bump_nonzero
+    {G H : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (ν : Measure G)
+    [ν.IsHaarMeasure] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (π : UnitaryRep G H)
+    {v : H} (hpos : 0 < ‖v‖)
+    (ρ : G → ℝ) (β : CompactlySupportedContinuousMap G ℂ) (hβa : ∀ g, β g = (ρ g : ℂ))
+    (hρ0 : ∀ g, 0 ≤ ρ g) (hρ1 : ∫ g, ρ g ∂ν = 1)
     (hρN : ∀ g, ρ g ≠ 0 → g ∈ {g : G | ‖π g v - v‖ < ‖v‖ / 2})
-    (h2 : π.integrated ν (UnitaryRep.ccToL1 ν β) v = 0) : False := by
+    (h2 : π.integrated ν (UnitaryRep.ccToL1 ν β) v = 0)
+    : False := by
   have hcont : Continuous fun g => π g v := π.continuous_orbit v
   have hin : ∫ g, (ρ g : ℂ) * ⟪v, π g v⟫_ℂ ∂ν = 0 := by
     have h1 := CuspidalProjection.inner_integrated_ccToL1 ν π β v v
@@ -44,9 +53,10 @@ private theorem exists_bump_nonzero {G H : Type*} [Group G] [TopologicalSpace G]
     simp only [← hβa]
     exact (β.continuous.mul hF).integrable_of_hasCompactSupport (β.hasCompactSupport.mul_right)
   have hc1 : Continuous fun g => ⟪v, π g v⟫_ℂ := continuous_const.inner hcont
-  have e : ∫ g, (ρ g : ℂ) * ⟪v, π g v - v⟫_ℂ ∂ν = -⟪v, v⟫_ℂ := by
-    have h3 : (fun g => (ρ g : ℂ) * ⟪v, π g v - v⟫_ℂ) =
-        fun g => (ρ g : ℂ) * ⟪v, π g v⟫_ℂ - (ρ g : ℂ) * ⟪v, v⟫_ℂ := by
+  have e : ∫ g, (ρ g : ℂ) * ⟪v, π g v - v⟫_ℂ ∂ν = - ⟪v, v⟫_ℂ := by
+    have h3
+        : (fun g => (ρ g : ℂ) * ⟪v, π g v - v⟫_ℂ)
+          = fun g => (ρ g : ℂ) * ⟪v, π g v⟫_ℂ - (ρ g : ℂ) * ⟪v, v⟫_ℂ := by
       funext g
       rw [inner_sub_right, mul_sub]
     rw [h3, integral_sub (hint _ hc1) (hint _ continuous_const), hin, integral_mul_const,
@@ -67,12 +77,14 @@ private theorem exists_bump_nonzero {G H : Type*} [Group G] [TopologicalSpace G]
     simpa using hb
   nlinarith
 
-theorem UpperTheory.ConvolutionTheory.Dp.diracSep :
-    UpperTheory.ConvolutionTheory.Dp.DiracSep := by
+theorem UpperTheory.ConvolutionTheory.Dp.diracSep : UpperTheory.ConvolutionTheory.Dp.DiracSep := by
   intro K _ _ n μ _ ν _ v hv
   by_contra hne
   have hpos : 0 < ‖v‖ := norm_pos_iff.2 hne
-  obtain ⟨ρ, hρ0, hρt, hρ1, -, -, hρN, -⟩ := exists_archBump ν
-    (near_one_nhds ((rightRegularRep (rationalGLOne (K := K) (n := n)) μ).compHom (archP K n) continuous_archP) hpos)
+  obtain ⟨ρ, hρ0, hρt, hρ1, -, -, hρN, -⟩ :=
+    exists_archBump ν
+      (near_one_nhds
+        ((rightRegularRep (rationalGLOne (K := K) (n := n)) μ).compHom (archP K n) continuous_archP)
+        hpos)
   let β : TI K n := ⟨⟨fun a => (ρ a : ℂ), hρt.continuous _⟩, hρt.2⟩
   exact exists_bump_nonzero ν _ hpos ρ β (fun _ => rfl) hρ0 hρ1 hρN (hv β hρt.1)

@@ -260,9 +260,9 @@ lemma fill (hD : GlRel N D) (x : W) (hZ : ∀ c < N, D c c x = 0) (hup : ∀ k, 
 
 end GlobalTheory.LeviCut.GridProof
 
-
 open GlobalTheory.LeviCut.GridProof in
-theorem GlobalTheory.LeviCut.gridInv_of_rankOne_rankTwo (h1 : RankOne) (h2 : RankTwo) : GridInv := by
+theorem GlobalTheory.LeviCut.gridInv_of_rankOne_rankTwo (h1 : RankOne) (h2 : RankTwo)
+    : GridInv := by
   intro W _ _ a b K D hD hB T hT
   have hcommG : ∀ c < a + b, Commute (D c c) (gridP D K a b a) := by
     intro c hc
@@ -273,29 +273,33 @@ theorem GlobalTheory.LeviCut.gridInv_of_rankOne_rankTwo (h1 : RankOne) (h2 : Ran
     obtain ⟨j, hj, rfl⟩ := List.mem_map.mp hf
     rw [List.mem_range'_1] at hj
     exact commute_diag_rootP hD K hc (by omega) (by omega)
-  have hZ : ∀ c < a + b, D c c (gridP D K a b a T) = 0 :=
-    fun c hc => zero_of_comm (hcommG c hc) (hT c hc c hc Iff.rfl)
+  have hZ : ∀ c < a + b, D c c (gridP D K a b a T) = 0 := fun c hc =>
+    zero_of_comm (hcommG c hc) (hT c hc c hc Iff.rfl)
   have hup : ∀ k, k + 1 < a + b → D k (k + 1) (gridP D K a b a T) = 0 := by
     intro k hk
     rcases lt_trichotomy (k + 1) a with hka | hka | hka
-    ·
-      have hT0 : PZ (a + b) D k T := ⟨fun c hc => hT c hc c hc Iff.rfl, hT k (by omega) (k + 1) hk (by omega)⟩
-      refine (keeps_grid_pair (P := PZ (a + b) D k) (fun i => rowP D K i a b) k ?_ a (by omega) ?_ T hT0).2
+    · have hT0 : PZ (a + b) D k T :=
+        ⟨fun c hc => hT c hc c hc Iff.rfl, hT k (by omega) (k + 1) hk (by omega)⟩
+      refine (keeps_grid_pair (P := PZ (a + b) D k)
+        (fun i => rowP D K i a b)
+        k ?_ a (by omega) ?_ T hT0).2
       · exact keeps_rows_pair (rootP D K (k + 1)) (rootP D K k) b a
           (fun j hj1 hj2 => keeps_pair_twist hD hB h2 (by omega) (by omega))
-          fun j j' h1 h2 h3 h4 h5 => commute_proj_proj
-            (comm_off hD (by omega) (by omega) (by omega) (by omega) (by omega) (by omega))
-            (comm_off hD (by omega) (by omega) (by omega) (by omega) (by omega) (by omega))
-            (comm_off hD (by omega) (by omega) (by omega) (by omega) (by omega) (by omega))
-            (comm_off hD (by omega) (by omega) (by omega) (by omega) (by omega) (by omega)) _ _ _ _
+          fun j j' h1 h2 h3 h4 h5 =>
+            commute_proj_proj
+              (comm_off hD (by omega) (by omega) (by omega) (by omega) (by omega) (by omega))
+              (comm_off hD (by omega) (by omega) (by omega) (by omega) (by omega) (by omega))
+              (comm_off hD (by omega) (by omega) (by omega) (by omega) (by omega) (by omega))
+              (comm_off hD (by omega) (by omega) (by omega) (by omega) (by omega) (by omega)) _ _ _
+              _
       · intro m hm hmk hmk'
         exact keeps_range' _ _ _ fun j h1 h2 =>
           keeps_rootP_far hD K hk (by omega) (by omega) hmk hmk' (by omega) (by omega)
-    ·
-      obtain ⟨b', rfl⟩ : ∃ b', b = b' + 1 := ⟨b - 1, by omega⟩
+    · obtain ⟨b', rfl⟩ : ∃ b', b = b' + 1 := ⟨b - 1, by omega⟩
       subst hka
-      have e : gridP D K (k + 1) (b' + 1) (k + 1) =
-          rootP D K k (k + 1) * (rowP D K k (k + 1 + 1) b' * gridP D K (k + 1) (b' + 1) k) := by
+      have e
+          : gridP D K (k + 1) (b' + 1) (k + 1)
+            = rootP D K k (k + 1) * (rowP D K k (k + 1 + 1) b' * gridP D K (k + 1) (b' + 1) k) := by
         unfold gridP
         rw [grid_succ]
         unfold rowP
@@ -315,21 +319,25 @@ theorem GlobalTheory.LeviCut.gridInv_of_rankOne_rankTwo (h1 : RankOne) (h2 : Ran
         obtain ⟨j, hj, rfl⟩ := List.mem_map.mp hf
         rw [List.mem_range'_1] at hj
         exact commute_diag_rootP hD K hc (by omega) (by omega)
-      have hU : ∀ c < k + 1 + (b' + 1),
-          D c c ((rowP D K k (k + 1 + 1) b' * gridP D K (k + 1) (b' + 1) k) T) = 0 := by
+      have hU
+          : ∀ c < k + 1 + (b' + 1),
+            D c c ((rowP D K k (k + 1 + 1) b' * gridP D K (k + 1) (b' + 1) k) T) = 0 := by
         intro c hc
         rw [Module.End.mul_apply]
         exact zero_of_comm (hcommR c hc) (zero_of_comm (hcommG' c hc) (hT c hc c hc Iff.rfl))
-      have := (h1 W (k + 1 + (b' + 1)) K D hD hB k (k + 1) (by omega) hk (by omega) _
-        (hU k (by omega)) (hU (k + 1) hk)).1
+      have :=
+        (h1 W (k + 1 + (b' + 1)) K D hD hB k (k + 1) (by omega) hk (by omega) _ (hU k (by omega))
+          (hU (k + 1) hk)).1
       have e0 : k + 1 - k - 1 = 0 := by omega
       rw [e, Module.End.mul_apply]
       simpa only [rootP, e0] using this
-    ·
-      have hT0 : PZ (a + b) D k T := ⟨fun c hc => hT c hc c hc Iff.rfl, hT k (by omega) (k + 1) hk (by omega)⟩
+    · have hT0 : PZ (a + b) D k T :=
+        ⟨fun c hc => hT c hc c hc Iff.rfl, hT k (by omega) (k + 1) hk (by omega)⟩
       refine (keeps_grid (P := PZ (a + b) D k) (fun i => rowP D K i a b) a (fun i hi => ?_) T hT0).2
       exact keeps_range'_pair _ k (keeps_pair_row hD hB h2 hk (by omega)) b a (by omega) (by omega)
-        fun m hm1 hm2 h3 h4 => keeps_rootP_far hD K hk (by omega) (by omega) (by omega) (by omega) h3 h4
+        fun m hm1 hm2 h3 h4 =>
+          keeps_rootP_far hD K hk (by omega) (by omega) (by omega) (by omega) h3 h4
   have hdown : ∀ k, k + 1 < a + b → D (k + 1) k (gridP D K a b a T) = 0 := fun k hk =>
-    (h1 W (a + b) K D hD hB k (k + 1) (by omega) hk (by omega) _ (hZ k (by omega)) (hZ (k + 1) hk)).2 (hup k hk)
+    (h1 W (a + b) K D hD hB k (k + 1) (by omega) hk (by omega) _ (hZ k (by omega))
+      (hZ (k + 1) hk)).2 (hup k hk)
   exact fill hD _ hZ hup hdown

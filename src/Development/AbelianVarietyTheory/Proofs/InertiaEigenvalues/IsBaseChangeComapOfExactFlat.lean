@@ -6,19 +6,20 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NotF
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
 namespace GlobalTheory
 
-theorem isBaseChange_comap_of_exact (A E : Type) [CommRing A] [CommRing E] [Algebra A E]
-    [Module.Flat A E] (D₀ D₁ D₂ : Type) [AddCommGroup D₀] [AddCommGroup D₁] [AddCommGroup D₂]
-    [Module E D₀] [Module E D₁] [Module E D₂] [Module A D₀] [Module A D₁] [Module A D₂]
-    [IsScalarTower A E D₀] [IsScalarTower A E D₁] [IsScalarTower A E D₂]
+theorem isBaseChange_comap_of_exact
+    (A E : Type) [CommRing A] [CommRing E] [Algebra A E] [Module.Flat A E]
+    (D₀ D₁ D₂ : Type) [AddCommGroup D₀] [AddCommGroup D₁] [AddCommGroup D₂] [Module E D₀]
+    [Module E D₁] [Module E D₂] [Module A D₀] [Module A D₁] [Module A D₂] [IsScalarTower A E D₀]
+    [IsScalarTower A E D₁] [IsScalarTower A E D₂]
     (j : D₀ →ₗ[E] D₁) (q : D₁ →ₗ[E] D₂) (N₁ : Submodule A D₁) (N₂ : Submodule A D₂)
     (hj : Function.Injective j) (hex : Function.Exact j q) (_hq : Function.Surjective q)
-    (h₁ : IsBaseChange E N₁.subtype) (h₂ : IsBaseChange E N₂.subtype)
-    (hN : ∀ x ∈ N₁, q x ∈ N₂) :
-    IsBaseChange E (N₁.comap (j.restrictScalars A)).subtype := by
+    (h₁ : IsBaseChange E N₁.subtype) (h₂ : IsBaseChange E N₂.subtype) (hN : ∀ x ∈ N₁, q x ∈ N₂)
+    : IsBaseChange E (N₁.comap (j.restrictScalars A)).subtype := by
   set N₀ := N₁.comap (j.restrictScalars A) with hN₀
   let ι : N₀ →ₗ[A] N₁ := (j.restrictScalars A).restrict (fun x hx => hx)
   let f : N₁ →ₗ[A] N₂ := (q.restrictScalars A).restrict hN
@@ -40,7 +41,8 @@ theorem isBaseChange_comap_of_exact (A E : Type) [CommRing A] [CommRing E] [Alge
       obtain ⟨x, hx⟩ := (hex (y : D₁)).1 hy'
       refine ⟨⟨x, ?_⟩, ?_⟩
       · show j x ∈ N₁
-        rw [hx]; exact y.2
+        rw [hx]
+        exact y.2
       · apply Subtype.ext
         simpa [ι] using hx
     · rintro ⟨x, rfl⟩

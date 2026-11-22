@@ -14,14 +14,19 @@ open scoped Topology
 
 namespace GlobalTheory
 
-theorem box_subset_box_of_valuation_le {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : Type) {s t : kˣ}
-    (h : valuation k (s : k) ≤ valuation k (t : k)) : box n s ⊆ box n t :=
-  fun x hx i _ => show valuation k (x i) ≤ _ from le_trans (hx i trivial) h
+theorem box_subset_box_of_valuation_le
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : Type)
+    {s t : kˣ} (h : valuation k (s : k) ≤ valuation k (t : k))
+    : box n s ⊆ box n t := fun x hx i _ =>
+  show valuation k (x i) ≤ _ from le_trans (hx i trivial) h
 
-theorem exists_box_superset_of_isCompact (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] (K : Set (n → k)) :
-    IsCompact K → ∀ r : kˣ, ∃ R : kˣ, valuation k (r : k) ≤ valuation k (R : k) ∧ K ⊆ box n R := by
+theorem exists_box_superset_of_isCompact
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : Type) [Fintype n]
+    (K : Set (n → k))
+    : IsCompact K
+      → ∀ r : kˣ, ∃ R : kˣ, valuation k (r : k) ≤ valuation k (R : k) ∧ K ⊆ box n R := by
   intro hK r
   let ι := {s : kˣ // valuation k (r : k) ≤ valuation k (s : k)}
   haveI : Nonempty ι := ⟨⟨r, le_rfl⟩⟩
@@ -29,8 +34,8 @@ theorem exists_box_superset_of_isCompact (k : Type) [Field k] [ValuativeRel k] [
     intro x _
     rw [Set.mem_iUnion]
     by_cases hn : Nonempty n
-    · obtain ⟨i0, -, hi0⟩ := Finset.exists_max_image Finset.univ (fun i => valuation k (x i))
-        Finset.univ_nonempty
+    · obtain ⟨i0, -, hi0⟩ :=
+        Finset.exists_max_image Finset.univ (fun i => valuation k (x i)) Finset.univ_nonempty
       by_cases hle : valuation k (x i0) ≤ valuation k (r : k)
       · refine ⟨⟨r, le_rfl⟩, fun i _ => ?_⟩
         exact le_trans (hi0 i (Finset.mem_univ i)) hle
@@ -47,8 +52,8 @@ theorem exists_box_superset_of_isCompact (k : Type) [Field k] [ValuativeRel k] [
     rcases le_total (valuation k ((s : kˣ) : k)) (valuation k ((t : kˣ) : k)) with h | h
     · exact ⟨t, box_subset_box_of_valuation_le n h, le_rfl⟩
     · exact ⟨s, le_rfl, box_subset_box_of_valuation_le n h⟩
-  obtain ⟨s, hs⟩ := hK.elim_directed_cover (fun s : ι => box n (s : kˣ))
-    (fun s => isOpen_box _) hcov hdir
+  obtain ⟨s, hs⟩ :=
+    hK.elim_directed_cover (fun s : ι => box n (s : kˣ)) (fun s => isOpen_box _) hcov hdir
   exact ⟨s, s.2, hs⟩
 
 end GlobalTheory

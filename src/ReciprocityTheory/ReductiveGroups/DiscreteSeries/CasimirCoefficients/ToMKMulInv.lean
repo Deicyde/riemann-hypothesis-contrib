@@ -39,22 +39,27 @@ lemma toMK_mul_inv' (k : KG ε) : toMK k * toMK k⁻¹ = 1 := by rw [← toMK_mu
 
 lemma toMK_inv_mul' (k : KG ε) : toMK k⁻¹ * toMK k = 1 := by rw [← toMK_mul', inv_mul_cancel, toMK_one']
 
-theorem psiM_kexp (T : KType ε Λ) (μ : Fin n → ℤ) (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) :
-    PsiM T μ (toMK k * NormedSpace.exp X) = T.op k * psM T μ (NormedSpace.exp X) := by
-  have h : ∃ (k' : KG ε) (X' : Matrix (Fin n) (Fin n) ℂ), inP ε X' ∧
-      toMK k * NormedSpace.exp X = toMK k' * NormedSpace.exp X' := ⟨k, X, hX, rfl⟩
+theorem psiM_kexp
+    (T : KType ε Λ) (μ : Fin n → ℤ) (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X)
+    : PsiM T μ (toMK k * NormedSpace.exp X) = T.op k * psM T μ (NormedSpace.exp X) := by
+  have h
+      : ∃ (k' : KG ε) (X' : Matrix (Fin n) (Fin n) ℂ),
+        inP ε X' ∧ toMK k * NormedSpace.exp X = toMK k' * NormedSpace.exp X' :=
+    ⟨k, X, hX, rfl⟩
   obtain ⟨hk, hXX⟩ := polar_unique hX h.choose_spec.choose_spec.1 h.choose_spec.choose_spec.2
   rw [PsiM, dite_eq_left h, ← hXX, ← hk]
 
-theorem psiM_equiv (T : KType ε Λ) (μ : Fin n → ℤ) (k₁ k₂ : KG ε) {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) :
-    PsiM T μ (toMK k₁ * g * toMK k₂) = T.op k₁ * PsiM T μ g * T.op k₂ := by
+theorem psiM_equiv
+    (T : KType ε Λ) (μ : Fin n → ℤ) (k₁ k₂ : KG ε) {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
+    : PsiM T μ (toMK k₁ * g * toMK k₂) = T.op k₁ * PsiM T μ g * T.op k₂ := by
   obtain ⟨k, X, hX, rfl⟩ := polar_exists hg
   obtain ⟨hX', hexp⟩ := inP_conj k₂⁻¹ hX
   rw [inv_inv] at hX' hexp
   have hc := psM_conj T μ k₂⁻¹ (NormedSpace.exp X)
   rw [inv_inv] at hc
-  have hg' : toMK k₁ * (toMK k * NormedSpace.exp X) * toMK k₂ =
-      toMK (k₁ * k * k₂) * NormedSpace.exp (toMK k₂⁻¹ * X * toMK k₂) := by
+  have hg'
+      : toMK k₁ * (toMK k * NormedSpace.exp X) * toMK k₂
+        = toMK (k₁ * k * k₂) * NormedSpace.exp (toMK k₂⁻¹ * X * toMK k₂) := by
     rw [hexp, toMK_mul', toMK_mul']
     simp only [_root_.mul_assoc]
     rw [← _root_.mul_assoc (toMK k₂) (toMK k₂⁻¹), toMK_mul_inv', _root_.one_mul]
@@ -64,8 +69,12 @@ theorem psiM_equiv (T : KType ε Λ) (μ : Fin n → ℤ) (k₁ k₂ : KG ε) {g
 
 theorem psiM_one (T : KType ε Λ) (μ : Fin n → ℤ) : PsiM T μ 1 = 1 := by
   have h0 : inP ε (0 : Matrix (Fin n) (Fin n) ℂ) := by
-    first | exact ⟨by simp [inG], by simp⟩ | exact ⟨by first | exact inG_zero ε | exact inG_zero, by simp⟩
-  have h1 : (1 : Matrix (Fin n) (Fin n) ℂ) = toMK (1 : KG ε) * NormedSpace.exp (0 : Matrix (Fin n) (Fin n) ℂ) := by
+    first
+    | exact ⟨by simp [inG], by simp⟩
+    | exact ⟨by first | exact inG_zero ε | exact inG_zero, by simp⟩
+  have h1
+      : (1 : Matrix (Fin n) (Fin n) ℂ)
+        = toMK (1 : KG ε) * NormedSpace.exp (0 : Matrix (Fin n) (Fin n) ℂ) := by
     rw [toMK_one', NormedSpace.exp_zero, one_mul]
   rw [h1, psiM_kexp T μ 1 h0, op_one', one_mul, NormedSpace.exp_zero]
   first | exact psM_one T μ | exact psM_one | simp [psM_one]

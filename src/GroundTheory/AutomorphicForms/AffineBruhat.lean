@@ -15,8 +15,8 @@ open Matrix DoubleCoset ValuativeRel
 
 namespace GLnLocal
 
-variable (F : Type*) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  (n : ℕ)
+variable
+  (F : Type*) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (n : ℕ)
 
 local notation "ϖ" => ((uniformizer F : 𝒪[F]) : F)
 
@@ -25,30 +25,30 @@ section Iwahori
 def residueReduction : GL (Fin n) 𝒪[F] →* GL (Fin n) (IsLocalRing.ResidueField 𝒪[F]) :=
   Matrix.GeneralLinearGroup.map (IsLocalRing.residue 𝒪[F])
 
-theorem residueReduction_apply (u : GL (Fin n) 𝒪[F]) (i j : Fin n) :
-    (residueReduction F n u : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField 𝒪[F])) i j =
-      IsLocalRing.residue 𝒪[F] (u i j) :=
+theorem residueReduction_apply (u : GL (Fin n) 𝒪[F]) (i j : Fin n)
+    : (residueReduction F n u : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField 𝒪[F])) i j
+      = IsLocalRing.residue 𝒪[F] (u i j) :=
   rfl
 
 def iwahori : Subgroup (GL (Fin n) F) :=
   ((borel n (IsLocalRing.ResidueField 𝒪[F])).comap (residueReduction F n)).map (integralGLHom F n)
 
-theorem residue_eq_zero_iff_valuation_lt_one (x : 𝒪[F]) :
-    IsLocalRing.residue 𝒪[F] x = 0 ↔ valuation F (x : F) < 1 := by
+theorem residue_eq_zero_iff_valuation_lt_one (x : 𝒪[F])
+    : IsLocalRing.residue 𝒪[F] x = 0 ↔ valuation F (x : F) < 1 := by
   rw [← not_iff_not, ← ne_eq, IsLocalRing.residue_ne_zero_iff_isUnit,
     (Valuation.integer.integers (valuation F)).isUnit_iff_valuation_eq_one, not_lt]
   exact ⟨fun h => h.ge, fun h => le_antisymm ((Valuation.mem_integer_iff _ _).mp x.2) h⟩
 
-theorem residue_ne_zero_iff_valuation_eq_one (x : 𝒪[F]) :
-    IsLocalRing.residue 𝒪[F] x ≠ 0 ↔ valuation F (x : F) = 1 := by
+theorem residue_ne_zero_iff_valuation_eq_one (x : 𝒪[F])
+    : IsLocalRing.residue 𝒪[F] x ≠ 0 ↔ valuation F (x : F) = 1 := by
   rw [IsLocalRing.residue_ne_zero_iff_isUnit,
     (Valuation.integer.integers (valuation F)).isUnit_iff_valuation_eq_one]
   exact Iff.rfl
 
-theorem exists_mem_iwahori (M : Matrix (Fin n) (Fin n) F)
-    (h1 : ∀ i j, valuation F (M i j) ≤ 1) (h2 : ∀ i j, j < i → valuation F (M i j) < 1)
-    (h3 : ∀ i, valuation F (M i i) = 1) :
-    ∃ x ∈ iwahori F n, (x : Matrix (Fin n) (Fin n) F) = M := by
+theorem exists_mem_iwahori
+    (M : Matrix (Fin n) (Fin n) F) (h1 : ∀ i j, valuation F (M i j) ≤ 1)
+    (h2 : ∀ i j, j < i → valuation F (M i j) < 1) (h3 : ∀ i, valuation F (M i i) = 1)
+    : ∃ x ∈ iwahori F n, (x : Matrix (Fin n) (Fin n) F) = M := by
   classical
   let A : Matrix (Fin n) (Fin n) 𝒪[F] :=
     Matrix.of fun i j => ⟨M i j, (Valuation.mem_integer_iff _ _).mpr (h1 i j)⟩
@@ -56,7 +56,8 @@ theorem exists_mem_iwahori (M : Matrix (Fin n) (Fin n) F)
   have hup : Ā.IsUpperTriangular := by
     intro i j hij
     exact (residue_eq_zero_iff_valuation_lt_one F (A i j)).mpr (h2 i j hij)
-  have hdiag : ∀ i, Ā i i ≠ 0 := fun i => (residue_ne_zero_iff_valuation_eq_one F (A i i)).mpr (h3 i)
+  have hdiag : ∀ i, Ā i i ≠ 0 := fun i =>
+    (residue_ne_zero_iff_valuation_eq_one F (A i i)).mpr (h3 i)
   have hdetĀ : IsUnit Ā.det := by
     rw [det_of_isUpperTriangular hup, isUnit_iff_ne_zero]
     exact Finset.prod_ne_zero_iff.mpr fun i _ => hdiag i
@@ -74,22 +75,21 @@ theorem exists_mem_iwahori (M : Matrix (Fin n) (Fin n) F)
     rw [integralGLHom_apply, hu]
     rfl
 
-theorem mem_iwahori_iff {g : GL (Fin n) F} :
-    g ∈ iwahori F n ↔ (∀ i j, valuation F (g i j) ≤ 1) ∧
-      (∀ i j, j < i → valuation F (g i j) < 1) ∧ ∀ i, valuation F (g i i) = 1 := by
+theorem mem_iwahori_iff {g : GL (Fin n) F}
+    : g ∈ iwahori F n
+      ↔ (∀ i j, valuation F (g i j) ≤ 1) ∧ (∀ i j, j < i → valuation F (g i j) < 1)
+        ∧ ∀ i, valuation F (g i i) = 1 := by
   constructor
   · rintro ⟨u, hu, rfl⟩
     change residueReduction F n u ∈ borel n _ at hu
-    refine ⟨fun i j => (Valuation.mem_integer_iff _ _).mp (u i j).2, fun i j hij => ?_,
-      fun i => ?_⟩
+    refine ⟨fun i j => (Valuation.mem_integer_iff _ _).mp (u i j).2, fun i j hij => ?_, fun i => ?_⟩
     · exact (residue_eq_zero_iff_valuation_lt_one F (u i j)).mp ((mem_borel_iff _).mp hu i j hij)
     · exact (residue_ne_zero_iff_valuation_eq_one F (u i i)).mp (borel_diag_ne_zero hu i)
   · rintro ⟨h1, h2, h3⟩
     obtain ⟨x, hx, hxg⟩ := exists_mem_iwahori F n (g : Matrix (Fin n) (Fin n) F) h1 h2 h3
     rwa [show x = g from Units.ext hxg] at hx
 
-theorem iwahori_le_integralGL : iwahori F n ≤ integralGL F n :=
-  Subgroup.map_le_range _ _
+theorem iwahori_le_integralGL : iwahori F n ≤ integralGL F n := Subgroup.map_le_range _ _
 
 theorem congruenceSubgroup_one_le_iwahori : congruenceSubgroup F n 1 ≤ iwahori F n := by
   intro g hg
@@ -111,57 +111,58 @@ theorem isOpen_iwahori : IsOpen (iwahori F n : Set (GL (Fin n) F)) :=
   Subgroup.isOpen_mono (congruenceSubgroup_one_le_iwahori F n) (isOpen_congruenceSubgroup F n 1)
 
 theorem isCompact_iwahori : IsCompact (iwahori F n : Set (GL (Fin n) F)) :=
-  (isCompact_integralGL F n).of_isClosed_subset
-    (Subgroup.isClosed_of_isOpen _ (isOpen_iwahori F n)) (iwahori_le_integralGL F n)
+  (isCompact_integralGL F n).of_isClosed_subset (Subgroup.isClosed_of_isOpen _ (isOpen_iwahori F n))
+    (iwahori_le_integralGL F n)
 
 end Iwahori
 
 section AffineWeyl
 
-theorem uniformizer_ne_zero : ϖ ≠ 0 := fun h =>
-  (irreducible_uniformizer F).ne_zero (Subtype.ext h)
+theorem uniformizer_ne_zero : ϖ ≠ 0 := fun h => (irreducible_uniformizer F).ne_zero (Subtype.ext h)
 
 theorem valuation_uniformizer_pos : 0 < valuation F ϖ :=
   zero_lt_iff.mpr (valuation_uniformizer_ne_zero F)
 
 def diagPow : (Fin n → Multiplicative ℤ) →* GL (Fin n) F where
-  toFun a :=
-    { val := diagonal fun i => ϖ ^ (a i).toAdd
-      inv := diagonal fun i => ϖ ^ (-(a i).toAdd)
-      val_inv := by
-        rw [diagonal_mul_diagonal, ← diagonal_one]
-        congr 1
-        funext i
-        rw [← zpow_add₀ (uniformizer_ne_zero F), add_neg_cancel, zpow_zero]
-      inv_val := by
-        rw [diagonal_mul_diagonal, ← diagonal_one]
-        congr 1
-        funext i
-        rw [← zpow_add₀ (uniformizer_ne_zero F), neg_add_cancel, zpow_zero] }
+  toFun a := {
+    val := diagonal fun i => ϖ ^ (a i).toAdd
+    inv := diagonal fun i => ϖ ^ (-(a i).toAdd)
+    val_inv := by
+      rw [diagonal_mul_diagonal, ← diagonal_one]
+      congr 1
+      funext i
+      rw [← zpow_add₀ (uniformizer_ne_zero F), add_neg_cancel, zpow_zero]
+    inv_val := by
+      rw [diagonal_mul_diagonal, ← diagonal_one]
+      congr 1
+      funext i
+      rw [← zpow_add₀ (uniformizer_ne_zero F), neg_add_cancel, zpow_zero]
+  }
   map_one' := by
     refine Units.ext ?_
     change (diagonal fun i => ϖ ^ ((1 : Fin n → Multiplicative ℤ) i).toAdd) = 1
     simp only [Pi.one_apply, toAdd_one, zpow_zero, diagonal_one]
   map_mul' a b := by
     refine Units.ext ?_
-    change (diagonal fun i => ϖ ^ ((a * b) i).toAdd) =
-      (diagonal fun i => ϖ ^ (a i).toAdd) * (diagonal fun i => ϖ ^ (b i).toAdd)
+    change (diagonal fun i => ϖ ^ ((a * b) i).toAdd)
+      = (diagonal fun i => ϖ ^ (a i).toAdd) * (diagonal fun i => ϖ ^ (b i).toAdd)
     rw [diagonal_mul_diagonal]
     congr 1
     funext i
     rw [Pi.mul_apply, toAdd_mul, zpow_add₀ (uniformizer_ne_zero F)]
 
-theorem diagPow_val (a : Fin n → Multiplicative ℤ) :
-    (diagPow F n a : Matrix (Fin n) (Fin n) F) = diagonal fun i => ϖ ^ (a i).toAdd :=
+theorem diagPow_val (a : Fin n → Multiplicative ℤ)
+    : (diagPow F n a : Matrix (Fin n) (Fin n) F) = diagonal fun i => ϖ ^ (a i).toAdd :=
   rfl
 
 def permAct : Equiv.Perm (Fin n) →* MulAut (Fin n → Multiplicative ℤ) where
-  toFun σ :=
-    { toFun := fun a i => a (σ⁻¹ i)
-      invFun := fun a i => a (σ i)
-      left_inv := fun a => funext fun i => by simp
-      right_inv := fun a => funext fun i => by simp
-      map_mul' := fun _ _ => rfl }
+  toFun σ := {
+    toFun := fun a i => a (σ⁻¹ i)
+    invFun := fun a i => a (σ i)
+    left_inv := fun a => funext fun i => by simp
+    right_inv := fun a => funext fun i => by simp
+    map_mul' := fun _ _ => rfl
+  }
   map_one' := by
     ext a i
     rfl
@@ -170,18 +171,18 @@ def permAct : Equiv.Perm (Fin n) →* MulAut (Fin n → Multiplicative ℤ) wher
     show a ((σ * τ)⁻¹ i) = a (τ⁻¹ (σ⁻¹ i))
     rw [_root_.mul_inv_rev, Equiv.Perm.mul_apply]
 
-theorem permAct_apply (σ : Equiv.Perm (Fin n)) (a : Fin n → Multiplicative ℤ) (i : Fin n) :
-    permAct n σ a i = a (σ⁻¹ i) :=
+theorem permAct_apply (σ : Equiv.Perm (Fin n)) (a : Fin n → Multiplicative ℤ) (i : Fin n)
+    : permAct n σ a i = a (σ⁻¹ i) :=
   rfl
 
-theorem permAct_symm_apply (σ : Equiv.Perm (Fin n)) (a : Fin n → Multiplicative ℤ) (i : Fin n) :
-    (permAct n σ).symm a i = a (σ i) :=
+theorem permAct_symm_apply (σ : Equiv.Perm (Fin n)) (a : Fin n → Multiplicative ℤ) (i : Fin n)
+    : (permAct n σ).symm a i = a (σ i) :=
   rfl
 
 abbrev ExtendedAffineWeyl := (Fin n → Multiplicative ℤ) ⋊[permAct n] Equiv.Perm (Fin n)
 
-theorem permGL_mul_diagPow_mul_inv (σ : Equiv.Perm (Fin n)) (a : Fin n → Multiplicative ℤ) :
-    permGL F σ * diagPow F n a * (permGL F σ)⁻¹ = diagPow F n (permAct n σ a) := by
+theorem permGL_mul_diagPow_mul_inv (σ : Equiv.Perm (Fin n)) (a : Fin n → Multiplicative ℤ)
+    : permGL F σ * diagPow F n a * (permGL F σ)⁻¹ = diagPow F n (permAct n σ a) := by
   refine Units.ext ?_
   ext i j
   rw [← map_inv, Units.val_mul, mul_permGL_apply, Units.val_mul, permGL_mul_apply, diagPow_val,
@@ -200,9 +201,9 @@ def affineWeylGL : ExtendedAffineWeyl n →* GL (Fin n) F :=
     simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
     rw [permGL_mul_diagPow_mul_inv]
 
-theorem affineWeylGL_apply (w : ExtendedAffineWeyl n) (i j : Fin n) :
-    (affineWeylGL F n w : Matrix (Fin n) (Fin n) F) i j =
-      if i = w.right j then ϖ ^ (w.left i).toAdd else 0 := by
+theorem affineWeylGL_apply (w : ExtendedAffineWeyl n) (i j : Fin n)
+    : (affineWeylGL F n w : Matrix (Fin n) (Fin n) F) i j
+      = if i = w.right j then ϖ ^ (w.left i).toAdd else 0 := by
   show ((diagPow F n w.left * permGL F w.right : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i j = _
   rw [Units.val_mul, diagPow_val, diagonal_mul, permGL_apply]
   split_ifs <;> simp
@@ -216,9 +217,10 @@ def RowsReducedOn (M : Matrix (Fin n) (Fin n) F) (R : Finset (Fin n)) : Prop :=
   ∃ p : Fin n → Fin n, ∀ i ∈ R,
     M i (p i) ≠ 0 ∧ (∀ c, c ≠ p i → M i c = 0) ∧ (∀ r, r ≠ i → M r (p i) = 0)
 
-theorem rowsReducedOn_step (h : GL (Fin n) F) (R : Finset (Fin n)) (hR : R ≠ Finset.univ)
-    (hred : RowsReducedOn (h : Matrix (Fin n) (Fin n) F) R) :
-    ∃ x ∈ iwahori F n, ∃ y ∈ iwahori F n, ∃ r ∉ R,
+theorem rowsReducedOn_step
+    (h : GL (Fin n) F) (R : Finset (Fin n))
+    (hR : R ≠ Finset.univ) (hred : RowsReducedOn (h : Matrix (Fin n) (Fin n) F) R)
+    : ∃ x ∈ iwahori F n, ∃ y ∈ iwahori F n, ∃ r ∉ R,
       RowsReducedOn ((x * h * y : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) (insert r R) := by
   classical
   obtain ⟨p, hp⟩ := hred
@@ -230,8 +232,7 @@ theorem rowsReducedOn_step (h : GL (Fin n) F) (R : Finset (Fin n)) (hR : R ≠ F
     intro i
     by_contra hcon
     push Not at hcon
-    exact ((Matrix.isUnit_iff_isUnit_det _).mp h.isUnit).ne_zero
-      (det_eq_zero_of_row_eq_zero i hcon)
+    exact ((Matrix.isUnit_iff_isUnit_det _).mp h.isUnit).ne_zero (det_eq_zero_of_row_eq_zero i hcon)
   let M : Matrix (Fin n) (Fin n) F := h
   let S : Finset (Fin n × Fin n) := Finset.univ.filter fun e => e.1 ∉ R
   have hS : S.Nonempty := ⟨(i₀, i₀), Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi₀⟩⟩
@@ -251,12 +252,13 @@ theorem rowsReducedOn_step (h : GL (Fin n) F) (R : Finset (Fin n)) (hR : R ≠ F
   have F1 : ∀ i, i ∉ R → ∀ j, valuation F (M i j) ≤ valuation F (M r c₂) := fun i hi j => by
     rw [hv]
     exact he₀ (i, j) (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi⟩)
-  have F2 : ∀ i, i ∉ R → ∀ j, valuation F (M i j) = valuation F (M r c₂) → c₂ ≤ j :=
-    fun i hi j hij => he₁ (i, j) (Finset.mem_filter.mpr
-      ⟨Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi⟩, hij.trans hv⟩)
-  have F3 : ∀ i, i ∉ R → valuation F (M i c₂) = valuation F (M r c₂) → i ≤ r :=
-    fun i hi hij => he₂ (i, c₂) (Finset.mem_filter.mpr
-      ⟨Finset.mem_filter.mpr ⟨Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi⟩, hij.trans hv⟩, rfl⟩)
+  have F2
+      : ∀ i, i ∉ R → ∀ j, valuation F (M i j) = valuation F (M r c₂) → c₂ ≤ j := fun i hi j hij =>
+    he₁ (i, j) (Finset.mem_filter.mpr ⟨Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi⟩, hij.trans hv⟩)
+  have F3 : ∀ i, i ∉ R → valuation F (M i c₂) = valuation F (M r c₂) → i ≤ r := fun i hi hij =>
+    he₂ (i, c₂)
+      (Finset.mem_filter.mpr
+        ⟨Finset.mem_filter.mpr ⟨Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi⟩, hij.trans hv⟩, rfl⟩)
   have hP : M r c₂ ≠ 0 := by
     obtain ⟨j, hj⟩ := hrow i₀
     intro h0
@@ -301,31 +303,32 @@ theorem rowsReducedOn_step (h : GL (Fin n) F) (R : Finset (Fin n)) (hR : R ≠ F
     intro i j
     simp only [X, Matrix.add_apply, vecMulVec_apply, Pi.single_apply]
     split_ifs <;> simp
-  obtain ⟨x, hx, hxX⟩ := exists_mem_iwahori F n X
-    (fun i j => by
-      rw [hX]
-      by_cases hij : i = j
-      · subst hij
-        rw [one_apply_eq]
+  obtain ⟨x, hx, hxX⟩ :=
+    exists_mem_iwahori F n X
+      (fun i j => by
+        rw [hX]
+        by_cases hij : i = j
+        · subst hij
+          rw [one_apply_eq]
+          by_cases hir : i = r
+          · rw [if_pos hir, hir, hur, add_zero, map_one]
+          · rw [if_neg hir, add_zero, map_one]
+        · rw [one_apply_ne hij, zero_add]
+          split_ifs
+          · exact hu_le i
+          · rw [map_zero]
+            exact zero_le)
+      (fun i j hji => by
+        rw [hX, one_apply_ne hji.ne', zero_add]
+        split_ifs with hjr
+        · exact hu_lt i (hjr ▸ hji)
+        · rw [map_zero]
+          exact zero_lt_one)
+      (fun i => by
+        rw [hX, one_apply_eq]
         by_cases hir : i = r
         · rw [if_pos hir, hir, hur, add_zero, map_one]
-        · rw [if_neg hir, add_zero, map_one]
-      · rw [one_apply_ne hij, zero_add]
-        split_ifs
-        · exact hu_le i
-        · rw [map_zero]
-          exact zero_le)
-    (fun i j hji => by
-      rw [hX, one_apply_ne hji.ne', zero_add]
-      split_ifs with hjr
-      · exact hu_lt i (hjr ▸ hji)
-      · rw [map_zero]
-        exact zero_lt_one)
-    (fun i => by
-      rw [hX, one_apply_eq]
-      by_cases hir : i = r
-      · rw [if_pos hir, hir, hur, add_zero, map_one]
-      · rw [if_neg hir, add_zero, map_one])
+        · rw [if_neg hir, add_zero, map_one])
 
   let t : Fin n → F := fun j => if j = c₂ then 0 else -(M r j / M r c₂)
   have ht_val : ∀ j, j ≠ c₂ → valuation F (t j) = valuation F (M r j) / valuation F (M r c₂) := by
@@ -347,42 +350,43 @@ theorem rowsReducedOn_step (h : GL (Fin n) F) (R : Finset (Fin n)) (hR : R ≠ F
     intro i j
     simp only [Y, Matrix.add_apply, vecMulVec_apply, Pi.single_apply]
     split_ifs <;> simp
-  obtain ⟨y, hy, hyY⟩ := exists_mem_iwahori F n Y
-    (fun i j => by
-      rw [hY]
-      by_cases hij : i = j
-      · subst hij
-        rw [one_apply_eq]
+  obtain ⟨y, hy, hyY⟩ :=
+    exists_mem_iwahori F n Y
+      (fun i j => by
+        rw [hY]
+        by_cases hij : i = j
+        · subst hij
+          rw [one_apply_eq]
+          by_cases hic : i = c₂
+          · rw [if_pos hic, hic, htc, add_zero, map_one]
+          · rw [if_neg hic, add_zero, map_one]
+        · rw [one_apply_ne hij, zero_add]
+          split_ifs
+          · exact ht_le j
+          · rw [map_zero]
+            exact zero_le)
+      (fun i j hji => by
+        rw [hY, one_apply_ne hji.ne', zero_add]
+        split_ifs with hic
+        · exact ht_lt j (hic ▸ hji)
+        · rw [map_zero]
+          exact zero_lt_one)
+      (fun i => by
+        rw [hY, one_apply_eq]
         by_cases hic : i = c₂
         · rw [if_pos hic, hic, htc, add_zero, map_one]
-        · rw [if_neg hic, add_zero, map_one]
-      · rw [one_apply_ne hij, zero_add]
-        split_ifs
-        · exact ht_le j
-        · rw [map_zero]
-          exact zero_le)
-    (fun i j hji => by
-      rw [hY, one_apply_ne hji.ne', zero_add]
-      split_ifs with hic
-      · exact ht_lt j (hic ▸ hji)
-      · rw [map_zero]
-        exact zero_lt_one)
-    (fun i => by
-      rw [hY, one_apply_eq]
-      by_cases hic : i = c₂
-      · rw [if_pos hic, hic, htc, add_zero, map_one]
-      · rw [if_neg hic, add_zero, map_one])
+        · rw [if_neg hic, add_zero, map_one])
 
   let M₁ : Matrix (Fin n) (Fin n) F := X * M
-  have hM₁ : ∀ a b, M₁ a b = M a b + u a * M r b := fun a b =>
-    one_add_vecMulVec_mul_apply M r u a b
+  have hM₁ : ∀ a b, M₁ a b = M a b + u a * M r b := fun a b => one_add_vecMulVec_mul_apply M r u a b
   have hM₁c : ∀ a, a ≠ r → M₁ a c₂ = 0 := by
     intro a ha
     rw [hM₁]
     simp only [u, if_neg ha]
     rw [neg_mul, div_mul_cancel₀ _ hP, add_neg_cancel]
-  have hN : ∀ a b, ((x * h * y : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) a b =
-      M₁ a b + M₁ a c₂ * t b := by
+  have hN
+      : ∀ a b,
+        ((x * h * y : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) a b = M₁ a b + M₁ a c₂ * t b := by
     intro a b
     rw [Units.val_mul, Units.val_mul, hxX, hyY]
     exact mul_one_add_vecMulVec_apply M₁ c₂ t a b
@@ -406,23 +410,34 @@ theorem rowsReducedOn_step (h : GL (Fin n) F) (R : Finset (Fin n)) (hR : R ≠ F
     rw [hN]
     by_cases har : a = r
     · subst har
-      have htp : t (p i) = 0 := by
-        simp only [t, if_neg (hpc i hiR), hrp i hiR, zero_div, neg_zero]
+      have htp : t (p i) = 0 := by simp only [t, if_neg (hpc i hiR), hrp i hiR, zero_div, neg_zero]
       rw [htp, mul_zero, add_zero, hM₁, hrp i hiR, mul_zero, add_zero]
     · have h3' : M a (p i) = 0 := h3 a ha
       rw [hM₁c a har, zero_mul, add_zero, hM₁, h3', hrp i hiR, mul_zero, add_zero]
 
-theorem exists_rowsReducedOn_univ (g : GL (Fin n) F) :
-    ∃ x ∈ iwahori F n, ∃ y ∈ iwahori F n,
+theorem exists_rowsReducedOn_univ (g : GL (Fin n) F)
+    : ∃ x ∈ iwahori F n, ∃ y ∈ iwahori F n,
       RowsReducedOn ((x * g * y : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) Finset.univ := by
-  have key : ∀ d, d ≤ n → ∃ x ∈ iwahori F n, ∃ y ∈ iwahori F n, ∃ R : Finset (Fin n),
-      R.card = d ∧ RowsReducedOn ((x * g * y : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) R := by
+  have key
+      : ∀ d,
+        d ≤ n
+          → ∃ x ∈ iwahori F n, ∃ y ∈ iwahori F n, ∃ R : Finset (Fin n),
+            R.card = d
+              ∧ RowsReducedOn ((x * g * y : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) R := by
     intro d
     induction d with
     | zero =>
       intro _
-      exact ⟨1, (iwahori F n).one_mem, 1, (iwahori F n).one_mem, ∅, rfl, id, fun i hi =>
-        absurd hi (Finset.notMem_empty i)⟩
+      exact ⟨
+        1,
+        (iwahori F n).one_mem,
+        1,
+        (iwahori F n).one_mem,
+        ∅,
+        rfl,
+        id,
+        fun i hi => absurd hi (Finset.notMem_empty i)
+      ⟩
     | succ d ih =>
       intro hd
       obtain ⟨x, hx, y, hy, R, hRc, hred⟩ := ih (by omega)
@@ -431,15 +446,22 @@ theorem exists_rowsReducedOn_univ (g : GL (Fin n) F) :
         rw [e, Finset.card_univ, Fintype.card_fin] at hRc
         omega
       obtain ⟨x', hx', y', hy', r, hr, hred'⟩ := rowsReducedOn_step F n _ R hRne hred
-      refine ⟨x' * x, (iwahori F n).mul_mem hx' hx, y * y', (iwahori F n).mul_mem hy hy',
-        insert r R, by rw [Finset.card_insert_of_notMem hr, hRc], ?_⟩
+      refine ⟨
+        x' * x,
+        (iwahori F n).mul_mem hx' hx,
+        y * y',
+        (iwahori F n).mul_mem hy hy',
+        insert r R,
+        by rw [Finset.card_insert_of_notMem hr, hRc],
+        ?_
+      ⟩
       simpa only [mul_assoc] using hred'
   obtain ⟨x, hx, y, hy, R, hRc, hred⟩ := key n le_rfl
   have hR : R = Finset.univ := Finset.eq_univ_of_card R (by rw [hRc, Fintype.card_fin])
   exact ⟨x, hx, y, hy, hR ▸ hred⟩
 
-theorem exists_valuation_div_zpow_eq_one {x : F} (hx : x ≠ 0) :
-    ∃ m : ℤ, valuation F (x / ϖ ^ m) = 1 := by
+theorem exists_valuation_div_zpow_eq_one {x : F} (hx : x ≠ 0)
+    : ∃ m : ℤ, valuation F (x / ϖ ^ m) = 1 := by
   obtain ⟨N, hN⟩ := (eventually_pow_mul_mem F x).exists
   have hϖ := uniformizer_ne_zero F
   have hy : (⟨ϖ ^ N * x, hN⟩ : 𝒪[F]) ≠ 0 := by
@@ -458,9 +480,9 @@ theorem exists_valuation_div_zpow_eq_one {x : F} (hx : x ≠ 0) :
   rw [hxu]
   exact (Valuation.integer.integers (valuation F)).isUnit_iff_valuation_eq_one.mp u.isUnit
 
-theorem exists_eq_mul_affineWeylGL_of_rowsReducedOn (g : GL (Fin n) F)
-    (hred : RowsReducedOn (g : Matrix (Fin n) (Fin n) F) Finset.univ) :
-    ∃ w : ExtendedAffineWeyl n, ∃ t ∈ iwahori F n, g = t * affineWeylGL F n w := by
+theorem exists_eq_mul_affineWeylGL_of_rowsReducedOn
+    (g : GL (Fin n) F) (hred : RowsReducedOn (g : Matrix (Fin n) (Fin n) F) Finset.univ)
+    : ∃ w : ExtendedAffineWeyl n, ∃ t ∈ iwahori F n, g = t * affineWeylGL F n w := by
   classical
   obtain ⟨p, hp⟩ := hred
   have hp' := fun i => hp i (Finset.mem_univ i)
@@ -473,17 +495,18 @@ theorem exists_eq_mul_affineWeylGL_of_rowsReducedOn (g : GL (Fin n) F)
   choose m hm using fun i => exists_valuation_div_zpow_eq_one F (hp' i).1
   let w : ExtendedAffineWeyl n := ⟨fun i => Multiplicative.ofAdd (m i), τ⁻¹⟩
   let d : Fin n → F := fun i => (g : Matrix (Fin n) (Fin n) F) i (p i) / ϖ ^ m i
-  obtain ⟨t, ht, htd⟩ := exists_mem_iwahori F n (diagonal d)
-    (fun i j => by
-      rw [diagonal_apply]
-      split_ifs with hij
-      · exact (hm i).le
-      · rw [map_zero]
-        exact zero_le)
-    (fun i j hji => by
-      rw [diagonal_apply, if_neg hji.ne', map_zero]
-      exact zero_lt_one)
-    (fun i => by rw [diagonal_apply_eq]; exact hm i)
+  obtain ⟨t, ht, htd⟩ :=
+    exists_mem_iwahori F n (diagonal d)
+      (fun i j => by
+        rw [diagonal_apply]
+        split_ifs with hij
+        · exact (hm i).le
+        · rw [map_zero]
+          exact zero_le)
+      (fun i j hji => by
+        rw [diagonal_apply, if_neg hji.ne', map_zero]
+        exact zero_lt_one)
+      (fun i => by rw [diagonal_apply_eq]; exact hm i)
   refine ⟨w, t, ht, Units.ext ?_⟩
   ext i j
   rw [Units.val_mul, htd, diagonal_mul, affineWeylGL_apply]
@@ -500,13 +523,21 @@ theorem exists_eq_mul_affineWeylGL_of_rowsReducedOn (g : GL (Fin n) F)
     rw [← hτ, e]
     simp
 
-theorem exists_mem_doubleCoset_affineWeylGL (g : GL (Fin n) F) :
-    ∃ w : ExtendedAffineWeyl n,
+theorem exists_mem_doubleCoset_affineWeylGL (g : GL (Fin n) F)
+    : ∃ w : ExtendedAffineWeyl n,
       g ∈ doubleCoset (affineWeylGL F n w) (iwahori F n) (iwahori F n) := by
   obtain ⟨x, hx, y, hy, hred⟩ := exists_rowsReducedOn_univ F n g
   obtain ⟨w, t, ht, hgt⟩ := exists_eq_mul_affineWeylGL_of_rowsReducedOn F n _ hred
-  refine ⟨w, mem_doubleCoset.mpr ⟨x⁻¹ * t, (iwahori F n).mul_mem ((iwahori F n).inv_mem hx) ht,
-    y⁻¹, (iwahori F n).inv_mem hy, ?_⟩⟩
+  refine ⟨
+    w,
+    mem_doubleCoset.mpr ⟨
+      x⁻¹ * t,
+      (iwahori F n).mul_mem ((iwahori F n).inv_mem hx) ht,
+      y⁻¹,
+      (iwahori F n).inv_mem hy,
+      ?_
+    ⟩
+  ⟩
   rw [mul_assoc x⁻¹ t, ← hgt]
   group
 
@@ -518,10 +549,9 @@ end Decomposition
 
 section Integral
 
-theorem affineWeylGL_inr (σ : Equiv.Perm (Fin n)) :
-    affineWeylGL F n (SemidirectProduct.inr σ) = permGL F σ :=
+theorem affineWeylGL_inr (σ : Equiv.Perm (Fin n))
+    : affineWeylGL F n (SemidirectProduct.inr σ) = permGL F σ :=
   SemidirectProduct.lift_inr _ _ _ _
-
 
 omit [TopologicalSpace F] [IsNonarchimedeanLocalField F] in
 theorem permGL_mem_integralGL (σ : Equiv.Perm (Fin n)) : permGL F σ ∈ integralGL F n := by
@@ -536,8 +566,8 @@ theorem permGL_mem_integralGL (σ : Equiv.Perm (Fin n)) : permGL F σ ∈ integr
     · exact Subring.one_mem _
     · exact Subring.zero_mem _
 
-theorem affineWeylGL_mem_integralGL_iff (w : ExtendedAffineWeyl n) :
-    affineWeylGL F n w ∈ integralGL F n ↔ w.left = 1 := by
+theorem affineWeylGL_mem_integralGL_iff (w : ExtendedAffineWeyl n)
+    : affineWeylGL F n w ∈ integralGL F n ↔ w.left = 1 := by
   constructor
   · intro hw
     obtain ⟨h1, h2⟩ := (mem_integralGL_iff F n).mp hw
@@ -572,9 +602,9 @@ theorem affineWeylGL_mem_integralGL_iff (w : ExtendedAffineWeyl n) :
     rw [this, affineWeylGL_inr]
     exact permGL_mem_integralGL F n _
 
-theorem integralGL_eq_iUnion_doubleCoset_permGL :
-    (integralGL F n : Set (GL (Fin n) F)) =
-      ⋃ σ : Equiv.Perm (Fin n), doubleCoset (permGL F σ) (iwahori F n) (iwahori F n) := by
+theorem integralGL_eq_iUnion_doubleCoset_permGL
+    : (integralGL F n : Set (GL (Fin n) F))
+      = ⋃ σ : Equiv.Perm (Fin n), doubleCoset (permGL F σ) (iwahori F n) (iwahori F n) := by
   ext k
   constructor
   · intro hk
@@ -585,8 +615,8 @@ theorem integralGL_eq_iUnion_doubleCoset_permGL :
         rw [hxy]
         group
       rw [this]
-      exact (integralGL F n).mul_mem ((integralGL F n).mul_mem
-        ((integralGL F n).inv_mem (iwahori_le_integralGL F n hx)) hk)
+      exact (integralGL F n).mul_mem
+        ((integralGL F n).mul_mem ((integralGL F n).inv_mem (iwahori_le_integralGL F n hx)) hk)
         ((integralGL F n).inv_mem (iwahori_le_integralGL F n hy))
     have hleft := (affineWeylGL_mem_integralGL_iff F n w).mp hwK
     have hw' : w = SemidirectProduct.inr w.right := SemidirectProduct.ext hleft rfl
@@ -596,8 +626,9 @@ theorem integralGL_eq_iUnion_doubleCoset_permGL :
   · intro hk
     obtain ⟨σ, hσ⟩ := Set.mem_iUnion.mp hk
     obtain ⟨x, hx, y, hy, rfl⟩ := mem_doubleCoset.mp hσ
-    exact (integralGL F n).mul_mem ((integralGL F n).mul_mem (iwahori_le_integralGL F n hx)
-      (permGL_mem_integralGL F n σ)) (iwahori_le_integralGL F n hy)
+    exact (integralGL F n).mul_mem
+      ((integralGL F n).mul_mem (iwahori_le_integralGL F n hx) (permGL_mem_integralGL F n σ))
+      (iwahori_le_integralGL F n hy)
 
 end Integral
 

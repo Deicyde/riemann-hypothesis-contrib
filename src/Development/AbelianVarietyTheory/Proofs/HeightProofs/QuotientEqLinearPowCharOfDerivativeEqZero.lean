@@ -12,10 +12,11 @@ open scoped IntermediateField
 namespace GlobalTheory
 
 theorem quotient_eq_linear_pow_char_of_derivative_eq_zero
-    (k : Type) [Field k] (p : ℕ) [Fact p.Prime] [CharP k p] (A D : k[X]) (hD : D ≠ 0)
-    (hA : A.natDegree ≤ p) (hDp : D.natDegree < p)
-    (hder : derivative A * D = A * derivative D) (hnc : ¬ ∃ c : k, A = C c * D) :
-    ∃ a b c : k, a ≠ 0 ∧ c ≠ 0 ∧ D = C c ∧ A = C c * (C a * X ^ p + C b) := by
+    (k : Type) [Field k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (A D : k[X]) (hD : D ≠ 0) (hA : A.natDegree ≤ p) (hDp : D.natDegree < p)
+    (hder : derivative A * D = A * derivative D) (hnc : ¬ ∃ c : k, A = C c * D)
+    : ∃ a b c : k, a ≠ 0 ∧ c ≠ 0 ∧ D = C c ∧ A = C c * (C a * X ^ p + C b) := by
   classical
   have hp : p.Prime := Fact.out
   have hA0 : A ≠ 0 := fun h => hnc ⟨0, by simp [h]⟩
@@ -63,8 +64,7 @@ theorem quotient_eq_linear_pow_char_of_derivative_eq_zero
       rw [h0, zero_mul] at nA
       obtain ⟨a, rfl⟩ := natDegree_eq_zero.1 nA
       refine hnc ⟨a * d⁻¹, ?_⟩
-      have : (C a : k[X]) = C (a * d⁻¹) * C d := by
-        rw [← map_mul, inv_mul_cancel_right₀ hd]
+      have : (C a : k[X]) = C (a * d⁻¹) * C d := by rw [← map_mul, inv_mul_cancel_right₀ hd]
       rw [this]
       simp only [map_mul]
       ring
@@ -80,8 +80,15 @@ theorem quotient_eq_linear_pow_char_of_derivative_eq_zero
     rintro rfl
     exact hg (map_zero _)
   obtain ⟨a, ha, b, hab⟩ := natDegree_eq_one.1 hm
-  refine ⟨a * d⁻¹, b * d⁻¹, γ * d, mul_ne_zero ha (inv_ne_zero hd), mul_ne_zero hγ hd,
-    (map_mul _ _ _).symm, ?_⟩
+  refine ⟨
+    a * d⁻¹,
+    b * d⁻¹,
+    γ * d,
+    mul_ne_zero ha (inv_ne_zero hd),
+    mul_ne_zero hγ hd,
+    (map_mul _ _ _).symm,
+    ?_
+  ⟩
   have hdd : (C d : k[X]) * C d⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel₀ hd, map_one]
   rw [← eA, ← hab]
   simp only [map_add (f := _), map_mul, expand_C, expand_X]

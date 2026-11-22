@@ -67,24 +67,26 @@ end
 
 variable [CompactSpace X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
 
-theorem exists_measure_of_positive (Λ : C(X, ℂ) →ₗ[ℂ] ℂ)
-    (hΛ : ∀ f : C(X, ℂ), 0 ≤ Λ (star f * f)) :
-    ∃ μ : Measure X, IsFiniteMeasure μ ∧ μ.Regular ∧ ∀ f : C(X, ℂ), Λ f = ∫ x, f x ∂μ := by
-  let Λr : C_c(X, ℝ) →ₚ[ℝ] ℝ :=
-  { toFun g := (Λ (ofR g.toContinuousMap)).re
+theorem exists_measure_of_positive (Λ : C(X, ℂ) →ₗ[ℂ] ℂ) (hΛ : ∀ f : C(X, ℂ), 0 ≤ Λ (star f * f))
+    : ∃ μ : Measure X, IsFiniteMeasure μ ∧ μ.Regular ∧ ∀ f : C(X, ℂ), Λ f = ∫ x, f x ∂μ := by
+  let Λr : C_c(X, ℝ) →ₚ[ℝ] ℝ := {
+    toFun g := (Λ (ofR g.toContinuousMap)).re
     map_add' g g' := by
       have : (g + g').toContinuousMap = g.toContinuousMap + g'.toContinuousMap := rfl
       rw [this, ofR_add, map_add (f := _), Complex.add_re]
     map_smul' c g := by
       have : (c • g).toContinuousMap = c • g.toContinuousMap := rfl
-      rw [this, ofR_smul, map_smul]; simp
+      rw [this, ofR_smul, map_smul]
+      simp
     monotone' g g' hgg' := by
-      have h := nonneg_ofR Λ hΛ (g := g'.toContinuousMap - g.toContinuousMap)
-        (fun x => sub_nonneg.2 (hgg' x))
+      have h :=
+        nonneg_ofR Λ hΛ (g := g'.toContinuousMap - g.toContinuousMap)
+          (fun x => sub_nonneg.2 (hgg' x))
       rw [ofR_sub, map_sub, Complex.le_def] at h
       have := h.1
       simp only [Complex.zero_re, Complex.sub_re] at this
-      linarith }
+      linarith
+  }
   refine ⟨RealRMK.rieszMeasure Λr, inferInstance, inferInstance, fun f => ?_⟩
   have key : ∀ g : C(X, ℝ), Λ (ofR g) = ((∫ x, g x ∂(RealRMK.rieszMeasure Λr) : ℝ) : ℂ) := by
     intro g
@@ -104,10 +106,11 @@ namespace PositivityTheory.Rg.BcB.E2.P
 
 theorem specmeas : SpecMeas := by
   intro K _ _ _ S _ _ _ _ _ π v
-  let Λ : C(S, ℂ) →ₗ[ℂ] ℂ :=
-  { toFun f := inner ℂ v (π f v)
+  let Λ : C(S, ℂ) →ₗ[ℂ] ℂ := {
+    toFun f := inner ℂ v (π f v)
     map_add' f g := by simp [map_add (f := _)]
-    map_smul' c f := by simp }
+    map_smul' c f := by simp
+  }
   have hΛ : ∀ f : C(S, ℂ), 0 ≤ Λ (star f * f) := by
     intro f
     show 0 ≤ inner ℂ v (π (star f * f) v)

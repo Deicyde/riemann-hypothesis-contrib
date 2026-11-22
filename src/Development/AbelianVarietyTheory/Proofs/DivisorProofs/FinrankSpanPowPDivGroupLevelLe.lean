@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinrankRigid
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 open Coalgebra Bialgebra WithConv
 
@@ -47,8 +48,8 @@ def annPowIdeal (h : (p : K) = 0) (G : PDivGroup p K) (r : ℕ) : Ideal (G.dual.
       change χ.ofConv _ = 0 at e
       rw [e, mul_zero]
 
-theorem frobKerIdeal_le_annPowIdeal (h : (p : K) = 0) (G : PDivGroup p K) (r : ℕ) :
-    frobKerIdeal (p ^ r) K (G.dual.A r) ≤ annPowIdeal h G r := by
+theorem frobKerIdeal_le_annPowIdeal (h : (p : K) = 0) (G : PDivGroup p K) (r : ℕ)
+    : frobKerIdeal (p ^ r) K (G.dual.A r) ≤ annPowIdeal h G r := by
   refine Ideal.span_le.2 ?_
   rintro _ ⟨χ, hχ, rfl⟩ a
   have h1 := GlobalTheory.T.cartierDual_primePow_conv_pairing p K h G r r χ a
@@ -61,11 +62,15 @@ theorem frobKerIdeal_le_annPowIdeal (h : (p : K) = 0) (G : PDivGroup p K) (r : �
 end GlobalTheory.SpanPow
 
 open GlobalTheory.SpanPow in
-theorem GlobalTheory.finrank_span_pow_le : ∀ (p : ℕ) [Fact p.Prime] (K : Type) [Field K] (h : (p : K) = 0) (G : PDivGroup p K), ∀ r : ℕ, Module.finrank K (Submodule.span K (Set.range fun a : G.A r => a ^ p ^ r)) ≤ (p ^ r) ^ Module.finrank K G.dual.omega := by
+theorem GlobalTheory.finrank_span_pow_le
+    : ∀ (p : ℕ) [Fact p.Prime] (K : Type) [Field K] (h : (p : K) = 0) (G : PDivGroup p K), ∀ r : ℕ,
+      Module.finrank K (Submodule.span K (Set.range fun a : G.A r => a ^ p ^ r))
+        ≤ (p ^ r) ^ Module.finrank K G.dual.omega := by
   intro p _ K _ h G r
   set S := Submodule.span K (Set.range fun a : G.A r => a ^ p ^ r) with hS
   let D := G.dual.A r
-  let ev : D →ₗ[K] Module.Dual K S := S.subtype.dualMap ∘ₗ (CartierDual.toDual K (G.A r)).toLinearMap
+  let ev : D →ₗ[K] Module.Dual K S :=
+    S.subtype.dualMap ∘ₗ (CartierDual.toDual K (G.A r)).toLinearMap
   have hev : Function.Surjective ev :=
     (LinearMap.dualMap_surjective_of_injective S.injective_subtype).comp
       (CartierDual.toDual K (G.A r)).surjective
@@ -85,8 +90,8 @@ theorem GlobalTheory.finrank_span_pow_le : ∀ (p : ℕ) [Fact p.Prime] (K : Typ
     | add x y _ _ hx hy => rw [map_add (f := _), hx, hy, add_zero]
     | smul c x _ hx => rw [map_smul, hx, smul_zero]
   let φ : (D ⧸ J) →ₗ[K] Module.Dual K S :=
-    (J.restrictScalars K).liftQ ev hle ∘ₗ
-      (Submodule.Quotient.restrictScalarsEquiv K J).symm.toLinearMap
+    (J.restrictScalars K).liftQ ev hle
+      ∘ₗ (Submodule.Quotient.restrictScalarsEquiv K J).symm.toLinearMap
   have hφ : Function.Surjective φ := by
     intro y
     obtain ⟨x, rfl⟩ := hev y
@@ -96,7 +101,9 @@ theorem GlobalTheory.finrank_span_pow_le : ∀ (p : ℕ) [Fact p.Prime] (K : Typ
     have := LinearMap.finrank_range_le φ
     rw [LinearMap.range_eq_top.2 hφ, finrank_top, Subspace.dual_finrank_eq] at this
     exact this
-  have h2 := GlobalTheory.T.finrank_frobeniusKernelQuotient_le_pow_cotangent (p ^ r) K D (pow_pos (Fact.out : p.Prime).pos r)
+  have h2 :=
+    GlobalTheory.T.finrank_frobeniusKernelQuotient_le_pow_cotangent (p ^ r) K D
+      (pow_pos (Fact.out : p.Prime).pos r)
   have hfin := (GlobalTheory.T.finrank_rigidExtensions_eq_height_and_dim_add_dual p K h G.dual).1
   have h3 : Module.finrank K (Cot K D) ≤ Module.finrank K G.dual.omega := by
     have := LinearMap.finrank_range_le (G.dual.omegaLevel r)

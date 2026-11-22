@@ -14,11 +14,13 @@ namespace PositivityTheory.RgUd.T.Desc.SLF
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-theorem centralizer_le_of {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {s x : Matrix (Fin n) (Fin n) k}
-    (hx : ∀ a ∈ Z, a * x = x * a) (hs : s * x = x * s) :
-    adj Z s ≤ Subalgebra.centralizer k ({x} : Set (Matrix (Fin n) (Fin n) k)) := by
+theorem centralizer_le_of
+    {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {s x : Matrix (Fin n) (Fin n) k}
+    (hx : ∀ a ∈ Z, a * x = x * a) (hs : s * x = x * s)
+    : adj Z s ≤ Subalgebra.centralizer k ({x} : Set (Matrix (Fin n) (Fin n) k)) := by
   apply Algebra.adjoin_le
   intro a ha
   rw [SetLike.mem_coe, Subalgebra.mem_centralizer_iff]
@@ -29,21 +31,26 @@ theorem centralizer_le_of {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {s x : M
   · exact hs.symm
   · exact (hx a ha).symm
 
-theorem mem_Bz_adj {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {s x : Matrix (Fin n) (Fin n) k}
-    (hx : x ∈ Bz Z) (hs : s * x = x * s) : x ∈ Bz (adj Z s) := by
+theorem mem_Bz_adj
+    {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {s x : Matrix (Fin n) (Fin n) k}
+    (hx : x ∈ Bz Z) (hs : s * x = x * s)
+    : x ∈ Bz (adj Z s) := by
   show ∀ a ∈ adj Z s, a * x = x * a
   intro a ha
   have h := centralizer_le_of hx hs ha
   rw [Subalgebra.mem_centralizer_iff] at h
   exact (h x (Set.mem_singleton x)).symm
 
-theorem mem_Gz_adj_iff {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {s : Matrix (Fin n) (Fin n) k} {g : GL (Fin n) k} :
-    g ∈ Gz (adj Z s) ↔ g ∈ Gz Z ∧ s * g.val = g.val * s := by
+theorem mem_Gz_adj_iff
+    {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {s : Matrix (Fin n) (Fin n) k} {g : GL (Fin n) k}
+    : g ∈ Gz (adj Z s) ↔ g ∈ Gz Z ∧ s * g.val = g.val * s := by
   simp only [Gz, Set.mem_setOf_eq]
   constructor
   · intro h
-    exact ⟨fun a ha => h a (Algebra.subset_adjoin (Set.mem_insert_of_mem _ ha)),
-      h s (Algebra.subset_adjoin (Set.mem_insert _ _))⟩
+    exact ⟨
+      fun a ha => h a (Algebra.subset_adjoin (Set.mem_insert_of_mem _ ha)),
+      h s (Algebra.subset_adjoin (Set.mem_insert _ _))
+    ⟩
   · rintro ⟨h1, h2⟩ a ha
     have h := centralizer_le_of (x := (g : Matrix (Fin n) (Fin n) k)) h1 h2 ha
     rw [Subalgebra.mem_centralizer_iff] at h
@@ -53,11 +60,13 @@ def Xs (F : Set (Matrix (Fin n) (Fin n) k)) : Set (Sp k n) := F ×ˢ Set.univ
 
 section Act
 
-variable {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {F : Set (Matrix (Fin n) (Fin n) k)}
+variable
+  {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {F : Set (Matrix (Fin n) (Fin n) k)}
   (hFinv : ∀ g ∈ Gz Z, ∀ x ∈ F, g.val * x * g⁻¹.val ∈ F)
 
 include hFinv in
-theorem act_mem_Xs {g : GL (Fin n) k} (hg : g ∈ Gz Z) {q : Sp k n} (hq : q ∈ Xs F) : act g q ∈ Xs F := by
+theorem act_mem_Xs {g : GL (Fin n) k} (hg : g ∈ Gz Z) {q : Sp k n} (hq : q ∈ Xs F)
+    : act g q ∈ Xs F := by
   refine Set.mem_prod.mpr ⟨?_, Set.mem_univ _⟩
   exact hFinv g hg q.1 (Set.mem_prod.mp hq).1
 
@@ -75,7 +84,7 @@ theorem continuous_act : Continuous fun p : GL (Fin n) k × Sp k n => act p.1 p.
   unfold act
   refine Continuous.prodMk ?_ ?_
   · exact ((Units.continuous_val.comp continuous_fst).matrix_mul
-      (continuous_fst.comp continuous_snd)).matrix_mul
+        (continuous_fst.comp continuous_snd)).matrix_mul
       (Units.continuous_coe_inv.comp continuous_fst)
   · exact (Units.continuous_val.comp continuous_fst).matrix_mulVec
       (continuous_snd.comp continuous_snd)

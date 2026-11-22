@@ -45,44 +45,51 @@ lemma not_eventually_weierstrassP_eq {l : ℂ} (hl : l ∈ L.lattice) {g : ℂ �
 lemma hasDerivAt_weierstrassP {z : ℂ} (hz : z ∉ L.lattice) : HasDerivAt ℘[L] (℘'[L] z) z := by
   simpa using (L.analyticOnNhd_weierstrassP z hz).differentiableAt.hasDerivAt
 
-theorem hasDerivAt_derivWeierstrassP {z : ℂ} (hz : z ∉ L.lattice) :
-    HasDerivAt ℘'[L] (6 * ℘[L] z ^ 2 - L.g₂ / 2) z := by
+theorem hasDerivAt_derivWeierstrassP {z : ℂ} (hz : z ∉ L.lattice)
+    : HasDerivAt ℘'[L] (6 * ℘[L] z ^ 2 - L.g₂ / 2) z := by
   have hd : ∀ z ∉ L.lattice, HasDerivAt ℘'[L] (deriv ℘'[L] z) z := fun z hz ↦
     (L.analyticOnNhd_derivWeierstrassP z hz).differentiableAt.hasDerivAt
-  have h1 : ∀ z ∈ (L.lattice : Set ℂ)ᶜ,
-      ℘'[L] z * (deriv ℘'[L] z - (6 * ℘[L] z ^ 2 - L.g₂ / 2)) = 0 := fun z hz ↦ by
+  have h1
+      : ∀ z ∈ (L.lattice : Set ℂ)ᶜ,
+        ℘'[L] z * (deriv ℘'[L] z - (6 * ℘[L] z ^ 2 - L.g₂ / 2)) = 0 := fun z hz ↦ by
     have h2 := (hd z hz).pow 2
-    have h3 := ((((hasDerivAt_weierstrassP L hz).pow 3).const_mul 4).sub
-      ((hasDerivAt_weierstrassP L hz).const_mul L.g₂)).sub_const L.g₃
-    have h4 := h2.unique (h3.congr_of_eventuallyEq (by
-      filter_upwards [eventually_notMem_periodLattice L hz] with w hw
-      simpa using L.derivWeierstrassP_sq w hw))
+    have h3 :=
+      ((((hasDerivAt_weierstrassP L hz).pow 3).const_mul 4).sub
+        ((hasDerivAt_weierstrassP L hz).const_mul L.g₂)).sub_const L.g₃
+    have h4 :=
+      h2.unique (h3.congr_of_eventuallyEq (by
+        filter_upwards [eventually_notMem_periodLattice L hz] with w hw
+        simpa using L.derivWeierstrassP_sq w hw))
     simp only [Nat.cast_ofNat, Nat.add_one_sub_one, pow_one] at h4
     linear_combination h4 / 2
   have hP := L.analyticOnNhd_weierstrassP
   have hP' := L.analyticOnNhd_derivWeierstrassP
-  have h5 := AnalyticOnNhd.eq_zero_or_eq_zero_of_mul_eq_zero hP'
-    (g := fun z ↦ deriv ℘'[L] z - (6 * ℘[L] z ^ 2 - L.g₂ / 2))
-    (fun z hz ↦ by have := hP z hz; have := (hP' z hz).deriv; fun_prop) h1
-    (Set.Countable.isConnected_compl_of_one_lt_rank (by simp) (countable_periodLattice L)).2
+  have h5 :=
+    AnalyticOnNhd.eq_zero_or_eq_zero_of_mul_eq_zero hP'
+      (g := fun z ↦ deriv ℘'[L] z - (6 * ℘[L] z ^ 2 - L.g₂ / 2))
+      (fun z hz ↦ by have := hP z hz; have := (hP' z hz).deriv; fun_prop)
+      h1 (Set.Countable.isConnected_compl_of_one_lt_rank (by simp) (countable_periodLattice L)).2
   rcases h5 with h5 | h5
   · exfalso
     have h6 : Set.EqOn ℘[L] (fun _ ↦ ℘[L] z) (L.lattice : Set ℂ)ᶜ :=
       IsOpen.eqOn_of_deriv_eq (𝕜 := ℂ) L.isClosed_lattice.isOpen_compl
         (Set.Countable.isConnected_compl_of_one_lt_rank (by simp) (countable_periodLattice L)).2
-        L.differentiableOn_weierstrassP (by fun_prop) (fun w hw ↦ by simpa using h5 w hw) hz rfl
+        L.differentiableOn_weierstrassP (by fun_prop)
+        (fun w hw ↦ by simpa using h5 w hw)
+        hz rfl
     refine not_eventually_weierstrassP_eq L (zero_mem _) (g := fun _ ↦ ℘[L] z) (by fun_prop) ?_
     filter_upwards [eventually_ne_notMem_periodLattice L 0] with w hw using h6 hw
   · rw [← sub_eq_zero.mp (h5 z hz)]
     exact hd z hz
 
-theorem eventuallyEq_of_weierstrass_system {f₁ g₁ f₂ g₂ : ℂ → ℂ} {k z : ℂ}
+theorem eventuallyEq_of_weierstrass_system
+    {f₁ g₁ f₂ g₂ : ℂ → ℂ} {k z : ℂ}
     (h₁ : ∀ᶠ w in 𝓝 z, HasDerivAt f₁ (g₁ w) w ∧ HasDerivAt g₁ (6 * f₁ w ^ 2 - k) w)
     (h₂ : ∀ᶠ w in 𝓝 z, HasDerivAt f₂ (g₂ w) w ∧ HasDerivAt g₂ (6 * f₂ w ^ 2 - k) w)
-    (hf : f₁ z = f₂ z) (hg : g₁ z = g₂ z) : f₁ =ᶠ[𝓝 z] f₂ := by
-  have an : ∀ {f g : ℂ → ℂ}, (∀ᶠ w in 𝓝 z, HasDerivAt f (g w) w) → AnalyticAt ℂ f z :=
-    fun h ↦ Complex.analyticAt_iff_eventually_differentiableAt.mpr
-      (h.mono fun w hw ↦ hw.differentiableAt)
+    (hf : f₁ z = f₂ z) (hg : g₁ z = g₂ z)
+    : f₁ =ᶠ[𝓝 z] f₂ := by
+  have an : ∀ {f g : ℂ → ℂ}, (∀ᶠ w in 𝓝 z, HasDerivAt f (g w) w) → AnalyticAt ℂ f z := fun h ↦
+    Complex.analyticAt_iff_eventually_differentiableAt.mpr (h.mono fun w hw ↦ hw.differentiableAt)
   have a₁ := an (h₁.mono fun _ h ↦ h.1)
   have a₂ := an (h₂.mono fun _ h ↦ h.1)
   have b₁ := an (h₁.mono fun _ h ↦ h.2)
@@ -101,9 +108,8 @@ theorem eventuallyEq_of_weierstrass_system {f₁ g₁ f₂ g₂ : ℂ → ℂ} {
     | succ n ih =>
       push_cast
       rw [← analyticOrderAt_deriv_ge_iff (a₁.sub a₂) (by simp [hf]),
-        ← analyticOrderAt_deriv_ge_iff (b₁.sub b₂) (by simp [hg]),
-        analyticOrderAt_congr d₁, analyticOrderAt_congr d₂,
-        analyticOrderAt_mul (by fun_prop) (a₁.sub a₂)]
+        ← analyticOrderAt_deriv_ge_iff (b₁.sub b₂) (by simp [hg]), analyticOrderAt_congr d₁,
+        analyticOrderAt_congr d₂, analyticOrderAt_mul (by fun_prop) (a₁.sub a₂)]
       exact ⟨ih.2, ih.1.trans le_add_self⟩
   have := analyticOrderAt_eq_top.mp (ENat.eq_top_iff_forall_ge.mpr fun n ↦ (key n).1)
   filter_upwards [this] with w hw
@@ -124,18 +130,22 @@ lemma analyticAt_weierstrassP_add (c : ℂ) {z : ℂ} (hz : z + c ∉ L.lattice)
     AnalyticAt ℂ (fun t ↦ ℘[L] (t + c)) z :=
   (L.analyticOnNhd_weierstrassP _ hz).comp (f := (· + c)) (by fun_prop)
 
-theorem sub_mem_lattice_of_weierstrassP_eq {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice)
-    (h : ℘[L] z = ℘[L] w) (h' : ℘'[L] z = ℘'[L] w) : z - w ∈ L.lattice := by
+theorem sub_mem_lattice_of_weierstrassP_eq
+    {z w : ℂ}
+    (hz : z ∉ L.lattice) (hw : w ∉ L.lattice) (h : ℘[L] z = ℘[L] w) (h' : ℘'[L] z = ℘'[L] w)
+    : z - w ∈ L.lattice := by
   by_contra hc
   have hw' : w + (z - w) ∉ L.lattice := by simpa using hz
-  have h1 := eventuallyEq_of_weierstrass_system
-    (weierstrass_system_add_const L 0 (z := w) (by simpa using hw))
-    (weierstrass_system_add_const L (z - w) hw') (by simp [h]) (by simp [h'])
-  have h2 := eqOn_compl_of_countable
-    ((countable_add_mem_periodLattice L 0).union (countable_add_mem_periodLattice L (z - w)))
-    (fun t ht ↦ analyticAt_weierstrassP_add L 0 fun h ↦ ht (.inl h))
-    (fun t ht ↦ analyticAt_weierstrassP_add L (z - w) fun h ↦ ht (.inr h))
-    (z := w) (by rintro (h | h); exacts [hw (by simpa using h), hw' h]) h1
+  have h1 :=
+    eventuallyEq_of_weierstrass_system
+      (weierstrass_system_add_const L 0 (z := w) (by simpa using hw))
+      (weierstrass_system_add_const L (z - w) hw') (by simp [h]) (by simp [h'])
+  have h2 :=
+    eqOn_compl_of_countable
+      ((countable_add_mem_periodLattice L 0).union (countable_add_mem_periodLattice L (z - w)))
+      (fun t ht ↦ analyticAt_weierstrassP_add L 0 fun h ↦ ht (.inl h))
+      (fun t ht ↦ analyticAt_weierstrassP_add L (z - w) fun h ↦ ht (.inr h))
+      (z := w) (by rintro (h | h); exacts [hw (by simpa using h), hw' h]) h1
   have h0 : 0 + (z - w) ∉ L.lattice := by simpa using hc
   refine not_eventually_weierstrassP_eq L (zero_mem _)
     (analyticAt_weierstrassP_add L (z - w) h0).continuousAt ?_
@@ -144,8 +154,8 @@ theorem sub_mem_lattice_of_weierstrassP_eq {z w : ℂ} (hz : z ∉ L.lattice) (h
       (eventually_notMem_periodLattice L h0))] with t h3 h4
   simpa using h2 (x := t) (by rintro (h | h); exacts [h3 (by simpa using h), h4 h])
 
-theorem weierstrassP_eq_iff {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice) :
-    ℘[L] z = ℘[L] w ↔ z - w ∈ L.lattice ∨ z + w ∈ L.lattice := by
+theorem weierstrassP_eq_iff {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice)
+    : ℘[L] z = ℘[L] w ↔ z - w ∈ L.lattice ∨ z + w ∈ L.lattice := by
   constructor
   · intro h
     have h1 : ℘'[L] z ^ 2 = ℘'[L] w ^ 2 := by
@@ -153,24 +163,26 @@ theorem weierstrassP_eq_iff {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lat
     rcases sq_eq_sq_iff_eq_or_eq_neg.mp h1 with h2 | h2
     · exact .inl (sub_mem_lattice_of_weierstrassP_eq L hz hw h h2)
     · exact .inr (by
-        simpa using sub_mem_lattice_of_weierstrassP_eq L (w := -w) hz (by simpa using hw)
-          (by simpa using h) (by simpa using h2))
+        simpa using
+          sub_mem_lattice_of_weierstrassP_eq L (w := -w) hz (by simpa using hw) (by simpa using h)
+            (by simpa using h2))
   · rintro (h | h)
     · rw [← L.weierstrassP_add_coe w ⟨_, h⟩]; simp
     · rw [← L.weierstrassP_neg w, ← L.weierstrassP_add_coe (-w) ⟨_, h⟩]; simp
 
-theorem derivWeierstrassP_eq_zero_iff {z : ℂ} (hz : z ∉ L.lattice) :
-    ℘'[L] z = 0 ↔ z + z ∈ L.lattice := by
+theorem derivWeierstrassP_eq_zero_iff {z : ℂ} (hz : z ∉ L.lattice)
+    : ℘'[L] z = 0 ↔ z + z ∈ L.lattice := by
   constructor
   · intro h
-    simpa using sub_mem_lattice_of_weierstrassP_eq L (w := -z) hz (by simpa using hz)
-      (by simp) (by simp [h])
+    simpa using
+      sub_mem_lattice_of_weierstrassP_eq L (w := -z) hz (by simpa using hz) (by simp) (by simp [h])
   · intro h
     have := L.derivWeierstrassP_add_coe (-z) ⟨_, h⟩
     simpa [CharZero.eq_neg_self_iff] using this
 
-theorem eq_of_differentiable_of_periodic {f : ℂ → ℂ} (hf : Differentiable ℂ f)
-    (hp : ∀ z, ∀ l ∈ L.lattice, f (z + l) = f z) (z w : ℂ) : f z = f w :=
+theorem eq_of_differentiable_of_periodic
+    {f : ℂ → ℂ} (hf : Differentiable ℂ f) (hp : ∀ z, ∀ l ∈ L.lattice, f (z + l) = f z) (z w : ℂ)
+    : f z = f w :=
   hf.apply_eq_apply_of_bounded
     (IsZLattice.isCompact_range_of_periodic L.lattice _ hf.continuous hp).isBounded z w
 
@@ -193,13 +205,16 @@ theorem exists_weierstrassP_eq (c : ℂ) : ∃ z ∉ L.lattice, ℘[L] z = c := 
       filter_upwards [eventually_ne_notMem_periodLattice L z] with w hw
       simp [f, hw]
     · exact hf1 z hz
-  have := eq_of_differentiable_of_periodic L hf (fun z l hl ↦ by
-    simp only [f, L.weierstrassP_add_coe z ⟨l, hl⟩, (L.lattice.add_mem_iff_left hl)])
-    (L.ω₁ / 2) 0
+  have :=
+    eq_of_differentiable_of_periodic L hf
+      (fun z l hl ↦ by
+        simp only [f, L.weierstrassP_add_coe z ⟨l, hl⟩, (L.lattice.add_mem_iff_left hl)])
+      (L.ω₁ / 2) 0
   simp [f, L.ω₁_div_two_notMem_lattice, sub_ne_zero.mpr (hc _ L.ω₁_div_two_notMem_lattice)] at this
 
-theorem exists_weierstrassP_eq_and_derivWeierstrassP_eq {x y : ℂ} (h : y ^ 2 = 4 * x ^ 3 - L.g₂ * x - L.g₃) :
-    ∃ z ∉ L.lattice, ℘[L] z = x ∧ ℘'[L] z = y := by
+theorem exists_weierstrassP_eq_and_derivWeierstrassP_eq
+    {x y : ℂ} (h : y ^ 2 = 4 * x ^ 3 - L.g₂ * x - L.g₃)
+    : ∃ z ∉ L.lattice, ℘[L] z = x ∧ ℘'[L] z = y := by
   obtain ⟨z, hz, rfl⟩ := exists_weierstrassP_eq L x
   rw [← L.derivWeierstrassP_sq z hz] at h
   rcases sq_eq_sq_iff_eq_or_eq_neg.mp h with h | h

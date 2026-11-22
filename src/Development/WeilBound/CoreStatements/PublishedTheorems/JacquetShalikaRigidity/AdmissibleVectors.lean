@@ -7,8 +7,10 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -22,8 +24,9 @@ set_option synthInstance.maxHeartbeats 400000
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {k : ℕ}
 
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem map_wd (μ : Measure (GA E k)) [μ.IsHaarMeasure] (β : GA E k → ℝ≥0∞) (t : GA E k) :
-    Measure.map (MeasurableEquiv.mulLeft t⁻¹) (μ.withDensity β) = μ.withDensity fun g => β (t * g) := by
+theorem map_wd (μ : Measure (GA E k)) [μ.IsHaarMeasure] (β : GA E k → ℝ≥0∞) (t : GA E k)
+    : Measure.map (MeasurableEquiv.mulLeft t⁻¹) (μ.withDensity β)
+      = μ.withDensity fun g => β (t * g) := by
   ext s hs
   rw [Measure.map_apply (MeasurableEquiv.mulLeft t⁻¹).measurable hs,
     withDensity_apply _ ((MeasurableEquiv.mulLeft t⁻¹).measurable hs), withDensity_apply _ hs,
@@ -56,7 +59,9 @@ theorem sum_wt_mul_massS_le_inv_pow_mul_total_mass : Q1 → Q2 → N2 → N3 →
   have hwt : IsWt (nuP E k 0) β' := by
     refine ⟨hβ'm, fun g => ?_⟩
     simp only [hβ']
-    rw [lintegral_const_mul c⁻¹ (f := fun h => β (t * (h * g))) (hβ0m.comp (measurable_mul_const g))]
+    rw [lintegral_const_mul c⁻¹
+      (f := fun h => β (t * (h * g)))
+      (hβ0m.comp (measurable_mul_const g))]
     have := hN2 E k w l (fun h => β (h * (t * g))) (hβ.1.comp (measurable_mul_const _))
     rw [← ht] at this
     simp only [mul_assoc, inv_mul_cancel_left] at this
@@ -76,7 +81,8 @@ theorem sum_wt_mul_massS_le_inv_pow_mul_total_mass : Q1 → Q2 → N2 → N3 →
     by_contra hn
     have : t * h * t⁻¹ ∈ S := subset_toMeasurable _ _ hn
     simp [Set.indicator_of_mem this] at hh
-  have hone : ∀ g, ∫⁻ r, ∫⁻ h, β (r⁻¹ * h * g) ∂nuP E k 0 ∂Measure.dirac (1 : GA E k) = 1 := fun g => by
+  have hone
+      : ∀ g, ∫⁻ r, ∫⁻ h, β (r⁻¹ * h * g) ∂nuP E k 0 ∂Measure.dirac (1 : GA E k) = 1 := fun g => by
     rw [lintegral_dirac]; simpa using hβ.2 g
   have hΦ'm : Measurable fun g => Φ (t * g) := hΦ.comp (measurable_const_mul t)
   have hΦ'H : ∀ h ∈ {h : GA E k | UU 0 (t * h * t⁻¹)}, ∀ g, Φ (t * (h * g)) = Φ (t * g) := by
@@ -97,8 +103,10 @@ theorem sum_wt_mul_massS_le_inv_pow_mul_total_mass : Q1 → Q2 → N2 → N3 →
       rw [hsm, smul_smul, ENNReal.inv_mul_cancel hc0 hctop, one_smul]
     rw [h1]
     exact hint0.smul_measure (ENNReal.inv_ne_top.2 hc0)
-  have hQ := hQ2 (GA E k) μ (nuP E k 0) (Measure.dirac 1) _ β' β hinv hH hwt hβ.1 hone
-    (fun g => Φ (t * g)) hΦ'm hΦ'H hint'
+  have hQ :=
+    hQ2 (GA E k) μ (nuP E k 0) (Measure.dirac 1) _ β' β hinv hH hwt hβ.1 hone
+      (fun g => Φ (t * g))
+      hΦ'm hΦ'H hint'
   simp only [integral_dirac, one_mul] at hQ
   refine ⟨hQ.1, ?_⟩
   have e1 : ∫ g, Φ g ∂μ.withDensity β = ∫ g, Φ (t * g) ∂μ.withDensity fun g => β (t * g) := by

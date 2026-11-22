@@ -8,8 +8,8 @@ namespace GlobalTheory.NatMulIntegralExists
 
 open NumberField
 
-theorem exists_nat_mul_integral {E : Type} [Field E] [NumberField E] (a : E) :
-    ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * a) := by
+theorem exists_nat_mul_integral {E : Type} [Field E] [NumberField E] (a : E)
+    : ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * a) := by
   have hz : IsAlgebraic ℤ a := IsFractionRing.isAlgebraic_iff ℤ ℚ E |>.mpr (.of_finite ℚ a)
   obtain ⟨y, hy, hint⟩ := hz.exists_integral_multiple
   refine ⟨y.natAbs, Int.natAbs_pos.mpr hy, ?_⟩
@@ -18,16 +18,19 @@ theorem exists_nat_mul_integral {E : Type} [Field E] [NumberField E] (a : E) :
   · have : ((y.natAbs : ℕ) : E) = (y : E) := by
       conv_rhs => rw [h]
       simp
-    rw [this]; exact hint
+    rw [this]
+    exact hint
   · have : ((y.natAbs : ℕ) : E) = -(y : E) := by
       conv_rhs => rw [h]
       simp
-    rw [this, neg_mul]; exact hint.neg
+    rw [this, neg_mul]
+    exact hint.neg
 
-theorem main : ∀ {E : Type} [inst : Field E] [NumberField E] {r : ℕ}
-    (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E)),
-    Submodule.span E (↑Λ : Set (Fin r → E)) = ⊤ →
-    ∀ (w : Fin r → E), ∃ (k : ℕ), (0 : ℕ) < k ∧ (↑k : E) • w ∈ Λ := by
+theorem main
+    : ∀ {E : Type} [inst : Field E] [NumberField E] {r : ℕ}
+        (Λ : Submodule (NumberField.RingOfIntegers E) (Fin r → E)),
+      Submodule.span E (↑Λ : Set (Fin r → E)) = ⊤
+        → ∀ (w : Fin r → E), ∃ (k : ℕ), (0 : ℕ) < k ∧ (↑k : E) • w ∈ Λ := by
   intro E _ _ r Λ hspan w
   have hw : w ∈ Submodule.span E (↑Λ : Set (Fin r → E)) := by rw [hspan]; trivial
 
@@ -42,7 +45,9 @@ theorem main : ∀ {E : Type} [inst : Field E] [NumberField E] {r : ℕ}
     obtain ⟨k₁, hk₁, h₁⟩ := hx
     obtain ⟨k₂, hk₂, h₂⟩ := hy
     refine ⟨k₁ * k₂, Nat.mul_pos hk₁ hk₂, ?_⟩
-    have e : ((k₁ * k₂ : ℕ) : E) • (x + y) = (k₂ : E) • ((k₁ : E) • x) + (k₁ : E) • ((k₂ : E) • y) := by
+    have e
+        : ((k₁ * k₂ : ℕ) : E) • (x + y)
+          = (k₂ : E) • ((k₁ : E) • x) + (k₁ : E) • ((k₂ : E) • y) := by
       rw [smul_add, smul_smul, smul_smul]; push_cast; ring_nf
     rw [e]
     exact Λ.add_mem (hnat _ _ h₁) (hnat _ _ h₂)
@@ -56,7 +61,8 @@ theorem main : ∀ {E : Type} [inst : Field E] [NumberField E] {r : ℕ}
       simp only [Pi.smul_apply, smul_eq_mul]
       rw [Algebra.smul_def]
       change _ = ((d : E) * a) * _
-      push_cast; ring
+      push_cast
+      ring
     rw [e]
     exact Λ.smul_mem c h
 

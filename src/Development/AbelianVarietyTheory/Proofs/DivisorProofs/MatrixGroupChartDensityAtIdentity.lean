@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Contin
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Filter Topology GlobalTheory.SUVol GlobalTheory.RiemConst ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+open NumberField MeasureTheory Matrix Filter Topology GlobalTheory.SUVol GlobalTheory.RiemConst
+  ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
 open scoped ENNReal
 
 noncomputable section
@@ -17,36 +19,55 @@ namespace GlobalTheory.SUVol.DensChart
 
 open scoped Pointwise
 
-theorem mem_grpBall_iff_norm {ι : Type} [Fintype ι] {r : ℕ} (H : Subgroup (ι → GL (Fin r) ℂ)) {ε : ℝ}
-    (hε : 0 < ε) (g : H) :
-    g ∈ grpBall H ε ↔ ‖(fun τ i j => ((((g : H) : ι → GL (Fin r) ℂ) τ : GL (Fin r) ℂ) :
-      Matrix (Fin r) (Fin r) ℂ) i j) - (fun (_ : ι) i j => (1 : Matrix (Fin r) (Fin r) ℂ) i j)‖ < ε := by
+theorem mem_grpBall_iff_norm
+    {ι : Type} [Fintype ι] {r : ℕ} (H : Subgroup (ι → GL (Fin r) ℂ)) {ε : ℝ} (hε : 0 < ε) (g : H)
+    : g ∈ grpBall H ε
+      ↔ ‖(fun τ i j => ((((g : H) : ι → GL (Fin r) ℂ) τ : GL (Fin r) ℂ) :
+          Matrix (Fin r) (Fin r) ℂ) i j) - (fun (_ : ι) i j => (1 : Matrix (Fin r) (Fin r) ℂ) i j)‖
+        < ε := by
   rw [pi_norm_lt_iff hε]; simp only [pi_norm_lt_iff hε]; rfl
 
-theorem tanBall_eq_ball {ι : Type} [Fintype ι] {r : ℕ} {ε : ℝ} (hε : 0 < ε) :
-    tanBall ι r ε = Metric.ball 0 ε := by
+theorem tanBall_eq_ball {ι : Type} [Fintype ι] {r : ℕ} {ε : ℝ} (hε : 0 < ε)
+    : tanBall ι r ε = Metric.ball 0 ε := by
   ext X; rw [mem_ball_zero_iff, pi_norm_lt_iff hε]; simp only [pi_norm_lt_iff hε]; rfl
 
-theorem density_at_one : ∀ (ι : Type) [Fintype ι] (r : ℕ) (H : Subgroup (ι → GL (Fin r) ℂ)) [MeasurableSpace H] (μ : Measure H) (W : Type) [NormedAddCommGroup W] [NormedSpace ℝ W] [FiniteDimensional ℝ W] [MeasurableSpace W] [BorelSpace W] (lam : Measure W) [lam.IsAddHaarMeasure] (Q : W → H) (D : W →L[ℝ] (ι → Fin r → Fin r → ℂ)) (h : W → ℝ≥0∞) (a : ℝ≥0∞) (ρ : ℝ), HasStrictFDerivAt (fun w => fun τ i j => ((((Q w : H) : ι → GL (Fin r) ℂ) τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) i j) D 0 → Q 0 = 1 → Function.Injective D → (∀ δ : ℝ, 0 < δ → ∃ ε : ℝ, 0 < ε ∧ ∀ g ∈ grpBall H ε, ∃ w : W, ‖w‖ < δ ∧ Q w = g) → Tendsto h (𝓝 0) (𝓝 a) → a ≠ 0 → a ≠ ⊤ → 0 < ρ → (∀ A : Set W, MeasurableSet A → A ⊆ Metric.ball 0 ρ → μ (Q '' A) = ∫⁻ w in A, h w ∂lam) → Tendsto (fun ε : ℝ => μ (grpBall H ε) / (lam.map D) (tanBall ι r ε)) (𝓝[>] 0) (𝓝 a) := by
+theorem density_at_one
+    : ∀ (ι : Type) [Fintype ι] (r : ℕ) (H : Subgroup (ι → GL (Fin r) ℂ)) [MeasurableSpace H]
+        (μ : Measure H) (W : Type) [NormedAddCommGroup W] [NormedSpace ℝ W] [FiniteDimensional ℝ W]
+        [MeasurableSpace W] [BorelSpace W] (lam : Measure W) [lam.IsAddHaarMeasure] (Q : W → H)
+        (D : W →L[ℝ] (ι → Fin r → Fin r → ℂ)) (h : W → ℝ≥0∞) (a : ℝ≥0∞) (ρ : ℝ),
+      HasStrictFDerivAt
+          (fun w => fun τ i j =>
+            ((((Q w : H) : ι → GL (Fin r) ℂ) τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) i j)
+          D 0
+        → Q 0 = 1 → Function.Injective D
+        → (∀ δ : ℝ, 0 < δ → ∃ ε : ℝ, 0 < ε ∧ ∀ g ∈ grpBall H ε, ∃ w : W, ‖w‖ < δ ∧ Q w = g)
+        → Tendsto h (𝓝 0) (𝓝 a) → a ≠ 0 → a ≠ ⊤ → 0 < ρ
+        → (∀ A : Set W, MeasurableSet A → A ⊆ Metric.ball 0 ρ → μ (Q '' A) = ∫⁻ w in A, h w ∂lam)
+        → Tendsto (fun ε : ℝ => μ (grpBall H ε) / (lam.map D) (tanBall ι r ε)) (𝓝[>] 0) (𝓝 a) := by
   intro ι _ r H _ μ W _ _ _ _ _ lam _ Q D h a ρ hD hQ0 hDi hon hh ha0 hat hρ hμ
   set f : W → (ι → Fin r → Fin r → ℂ) := fun w τ i j =>
     ((((Q w : H) : ι → GL (Fin r) ℂ) τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) i j with hf
   set one : ι → Fin r → Fin r → ℂ := fun _ i j => (1 : Matrix (Fin r) (Fin r) ℂ) i j with hone
   have hf0 : f 0 = one := by simp [hf, hone, hQ0]
   have hD' : HasStrictFDerivAt f D 0 := hD
-  obtain ⟨K, -, hK⟩ := (D : W →ₗ[ℝ] (ι → Fin r → Fin r → ℂ)).exists_antilipschitzWith
-    (LinearMap.ker_eq_bot.2 hDi)
+  obtain ⟨K, -, hK⟩ :=
+    (D : W →ₗ[ℝ] (ι → Fin r → Fin r → ℂ)).exists_antilipschitzWith (LinearMap.ker_eq_bot.2 hDi)
   set K' : ℝ := (K : ℝ) + 1 with hK'
   have hK'0 : 0 < K' := by positivity
   have hnorm : ∀ w, ‖w‖ ≤ K' * ‖D w‖ := by
     intro w
     have h1 := hK.le_mul_dist w 0
     simp only [dist_zero_right, map_zero] at h1
-    calc ‖w‖ ≤ K * ‖D w‖ := h1
+    calc
+      ‖w‖
+        ≤ K * ‖D w‖ := h1
       _ ≤ K' * ‖D w‖ := by gcongr; linarith
   have hcw : ∀ c : ℝ, 0 ≤ c → ∀ w, c / K' * ‖w‖ ≤ c * ‖D w‖ := by
     intro c hc w
-    calc c / K' * ‖w‖ ≤ c / K' * (K' * ‖D w‖) := by gcongr; exact hnorm w
+    calc
+      c / K' * ‖w‖
+        ≤ c / K' * (K' * ‖D w‖) := by gcongr; exact hnorm w
       _ = c * ‖D w‖ := by field_simp
   have approx : ∀ κ : ℝ, 0 < κ → ∃ δ > 0, ∀ w : W, ‖w‖ < δ → ‖f w - one - D w‖ ≤ κ * ‖w‖ := by
     intro κ hκ
@@ -66,15 +87,18 @@ theorem density_at_one : ∀ (ι : Type) [Fintype ι] (r : ℕ) (H : Subgroup (�
       (measure_mono fun w hw => ?_)
     rw [Set.mem_preimage, mem_ball_zero_iff] at hw
     rw [mem_closedBall_zero_iff]
-    calc ‖w‖ ≤ K' * ‖D w‖ := hnorm w
+    calc
+      ‖w‖
+        ≤ K' * ‖D w‖ := hnorm w
       _ ≤ K' * ε := by gcongr
-  have hVhom : ∀ t ε : ℝ, 0 < t → 0 < ε → V (t * ε) = ENNReal.ofReal (t ^ Module.finrank ℝ W) * V ε := by
+  have hVhom
+      : ∀ t ε : ℝ, 0 < t → 0 < ε → V (t * ε) = ENNReal.ofReal (t ^ Module.finrank ℝ W) * V ε := by
     intro t ε ht _
     have hs : D ⁻¹' Metric.ball 0 (t * ε) = t • (D ⁻¹' Metric.ball 0 ε) := by
       ext w
       rw [Set.mem_smul_set_iff_inv_smul_mem₀ ht.ne']
-      simp only [Set.mem_preimage, mem_ball_zero_iff, map_smul, norm_smul, Real.norm_eq_abs, abs_inv,
-        abs_of_pos ht]
+      simp only [Set.mem_preimage, mem_ball_zero_iff, map_smul, norm_smul, Real.norm_eq_abs,
+        abs_inv, abs_of_pos ht]
       rw [inv_mul_lt_iff₀ ht]
     simp only [hVdef]
     rw [hs, Measure.addHaar_smul, abs_of_pos (pow_pos ht _)]
@@ -85,7 +109,9 @@ theorem density_at_one : ∀ (ι : Type) [Fintype ι] (r : ℕ) (H : Subgroup (�
     refine Set.inter_eq_left.2 fun w hw => ?_
     rw [Set.mem_preimage, mem_ball_zero_iff] at hw
     rw [mem_ball_zero_iff]
-    calc ‖w‖ ≤ K' * ‖D w‖ := hnorm w
+    calc
+      ‖w‖
+        ≤ K' * ‖D w‖ := hnorm w
       _ < K' * (ρ / K') := by gcongr; linarith [norm_nonneg (D w)]
       _ = ρ := by field_simp
   have hFint : ∀ ε : ℝ, F ε = ∫⁻ w in S ε, h w ∂lam := fun ε =>
@@ -102,10 +128,13 @@ theorem density_at_one : ∀ (ι : Type) [Fintype ι] (r : ℕ) (H : Subgroup (�
         refine setLIntegral_mono' (measurableSet_ball.preimage D.measurable) fun w hw => (hδ ?_).le
         rw [Set.mem_preimage, mem_ball_zero_iff] at hw
         rw [dist_zero_right]
-        calc ‖w‖ ≤ K' * ‖D w‖ := hnorm w
+        calc
+          ‖w‖
+            ≤ K' * ‖D w‖ := hnorm w
           _ < K' * (δh / K') := by gcongr; linarith [norm_nonneg (D w)]
           _ = δh := by field_simp
-      calc b < a' := hb'
+      calc
+        b < a' := hb'
         _ = a' * V ε / V ε := (ENNReal.mul_div_cancel_right (hV0 ε hε0) (hVt ε)).symm
         _ ≤ F ε / V ε := ENNReal.div_le_div_right hle _
     · obtain ⟨a', ha', hb'⟩ := exists_between hb
@@ -118,14 +147,21 @@ theorem density_at_one : ∀ (ι : Type) [Fintype ι] (r : ℕ) (H : Subgroup (�
         refine setLIntegral_mono' (measurableSet_ball.preimage D.measurable) fun w hw => (hδ ?_).le
         rw [Set.mem_preimage, mem_ball_zero_iff] at hw
         rw [dist_zero_right]
-        calc ‖w‖ ≤ K' * ‖D w‖ := hnorm w
+        calc
+          ‖w‖
+            ≤ K' * ‖D w‖ := hnorm w
           _ < K' * (δh / K') := by gcongr; linarith [norm_nonneg (D w)]
           _ = δh := by field_simp
-      calc F ε / V ε ≤ a' * V ε / V ε := ENNReal.div_le_div_right hle _
+      calc
+        F ε / V ε
+          ≤ a' * V ε / V ε := ENNReal.div_le_div_right hle _
         _ = a' := ENNReal.mul_div_cancel_right (hV0 ε hε0) (hVt ε)
         _ < b := hb'
-  have hA : ∀ t : ℝ, 1 < t → ∀ᶠ ε in 𝓝[>] (0 : ℝ),
-      F (t⁻¹ * ε) ≤ μ (grpBall H ε) ∧ μ (grpBall H ε) ≤ F (t * ε) := by
+  have hA
+      : ∀ t : ℝ,
+        1 < t
+          → ∀ᶠ ε in 𝓝[>] (0 : ℝ),
+            F (t⁻¹ * ε) ≤ μ (grpBall H ε) ∧ μ (grpBall H ε) ≤ F (t * ε) := by
     intro t ht
     have ht0 : 0 < t := by linarith
     have hti : t⁻¹ < 1 := inv_lt_one_of_one_lt₀ ht
@@ -145,20 +181,28 @@ theorem density_at_one : ∀ (ι : Type) [Fintype ι] (r : ℕ) (H : Subgroup (�
       rw [mem_grpBall_iff_norm H hεp]
       change ‖f w - one‖ < ε
       have hDw : ‖D w‖ < ε := by
-        calc ‖D w‖ < t⁻¹ * ε := hw1
+        calc
+          ‖D w‖
+            < t⁻¹ * ε := hw1
           _ < 1 * ε := by gcongr
           _ = ε := one_mul ε
       have hw : ‖w‖ < δ1 := by
-        calc ‖w‖ ≤ K' * ‖D w‖ := hnorm w
+        calc
+          ‖w‖
+            ≤ K' * ‖D w‖ := hnorm w
           _ < K' * (δ1 / K') := by gcongr; linarith
           _ = δ1 := by field_simp
       have e1 := H1 w hw
       have e2 := hcw (t - 1) (by linarith) w
       have e3 : ‖f w - one‖ ≤ ‖D w‖ + ‖f w - one - D w‖ := by
-        calc ‖f w - one‖ = ‖D w + (f w - one - D w)‖ := by congr 1; abel
+        calc
+          ‖f w - one‖
+            = ‖D w + (f w - one - D w)‖ := by congr 1; abel
           _ ≤ _ := norm_add_le _ _
       have e4 : t * ‖D w‖ < ε := by
-        calc t * ‖D w‖ < t * (t⁻¹ * ε) := by gcongr
+        calc
+          t * ‖D w‖
+            < t * (t⁻¹ * ε) := by gcongr
           _ = ε := by field_simp
       nlinarith
     · refine measure_mono fun g hg => ?_
@@ -172,13 +216,19 @@ theorem density_at_one : ∀ (ι : Type) [Fintype ι] (r : ℕ) (H : Subgroup (�
       have e1 := H2 w hw.2
       have e2 := hcw (1 - t⁻¹) (by linarith) w
       have e3 : ‖D w‖ ≤ ‖f w - one‖ + ‖f w - one - D w‖ := by
-        calc ‖D w‖ = ‖(f w - one) - (f w - one - D w)‖ := by congr 1; abel
+        calc
+          ‖D w‖
+            = ‖(f w - one) - (f w - one - D w)‖ := by congr 1; abel
           _ ≤ _ := norm_sub_le _ _
       have e4 : t⁻¹ * ‖D w‖ < ε := by linarith
-      calc ‖D w‖ = t * (t⁻¹ * ‖D w‖) := by field_simp
+      calc
+        ‖D w‖
+          = t * (t⁻¹ * ‖D w‖) := by field_simp
         _ < t * ε := by gcongr
-  have hsq := GlobalTheory.CompactDualQuot.tendsto_div_of_squeeze (F := F) (V := V)
-    (A := fun ε => μ (grpBall H ε)) (n := Module.finrank ℝ W) hat hVhom hF hA
+  have hsq :=
+    GlobalTheory.CompactDualQuot.tendsto_div_of_squeeze (F := F) (V := V)
+      (A := fun ε => μ (grpBall H ε))
+      (n := Module.finrank ℝ W) hat hVhom hF hA
   refine hsq.congr' ?_
   filter_upwards [self_mem_nhdsWithin] with ε hε
   have hε : (0 : ℝ) < ε := hε

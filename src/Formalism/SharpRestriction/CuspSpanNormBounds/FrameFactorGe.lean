@@ -10,14 +10,18 @@ noncomputable section
 
 namespace Formalism.MainNotions.FrameBoundFromBesselTorus
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates
 
 variable {r : ℕ} {κ τ : ℝ}
 
-theorem frames_ineqs {pw pw₁ s K ρ F : ℝ} (X : ENNReal) (hs : 0 ≤ s) (hK : 0 ≤ K) (hρ : 0 < ρ)
-    (h1 : ρ ≤ F) (h2 : ρ⁻¹ ≤ F) (he : pw₁ * s = K * ρ * pw) :
-    ENNReal.ofReal pw₁ * (ENNReal.ofReal s * X) ≤ ENNReal.ofReal (K * F) * (ENNReal.ofReal pw * X) ∧
-      ENNReal.ofReal K * (ENNReal.ofReal pw * X) ≤ ENNReal.ofReal F * (ENNReal.ofReal pw₁ * (ENNReal.ofReal s * X)) := by
+theorem frames_ineqs
+    {pw pw₁ s K ρ F : ℝ}
+    (X : ENNReal) (hs : 0 ≤ s) (hK : 0 ≤ K) (hρ : 0 < ρ) (h1 : ρ ≤ F) (h2 : ρ⁻¹ ≤ F)
+    (he : pw₁ * s = K * ρ * pw)
+    : ENNReal.ofReal pw₁ * (ENNReal.ofReal s * X) ≤ ENNReal.ofReal (K * F) * (ENNReal.ofReal pw * X)
+      ∧ ENNReal.ofReal K * (ENNReal.ofReal pw * X)
+        ≤ ENNReal.ofReal F * (ENNReal.ofReal pw₁ * (ENNReal.ofReal s * X)) := by
   have hF : 0 < F := lt_of_lt_of_le hρ h1
   rw [← mul_assoc (ENNReal.ofReal pw₁), ← ENNReal.ofReal_mul' hs, he]
   by_cases hp : pw ≤ 0

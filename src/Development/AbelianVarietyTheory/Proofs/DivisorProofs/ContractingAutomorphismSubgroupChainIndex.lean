@@ -10,11 +10,10 @@ open Formalism.UG GlobalTheory.SatakeWeyl
 
 namespace GlobalTheory.SatakeWeyl
 
-theorem chain_comap_eq {A : Type} [Group A] (U : Subgroup A) (c : MulAut A) (j : ℤ) :
-    U.comap (c ^ j).toMonoidHom = (U.map c.toMonoidHom).comap (c ^ (j + 1)).toMonoidHom := by
+theorem chain_comap_eq {A : Type} [Group A] (U : Subgroup A) (c : MulAut A) (j : ℤ)
+    : U.comap (c ^ j).toMonoidHom = (U.map c.toMonoidHom).comap (c ^ (j + 1)).toMonoidHom := by
   ext a
-  have h : (c ^ (j + 1)) a = c ((c ^ j) a) := by
-    rw [add_comm, zpow_add, zpow_one, MulAut.mul_apply]
+  have h : (c ^ (j + 1)) a = c ((c ^ j) a) := by rw [add_comm, zpow_add, zpow_one, MulAut.mul_apply]
   simp only [Subgroup.mem_comap, Subgroup.mem_map, MulEquiv.coe_toMonoidHom, h]
   constructor
   · intro ha
@@ -23,10 +22,11 @@ theorem chain_comap_eq {A : Type} [Group A] (U : Subgroup A) (c : MulAut A) (j :
     rw [← c.injective hxa]
     exact hx
 
-theorem chain_step {A : Type} [Group A] (U : Subgroup A) (c : MulAut A) (hc : ∀ a ∈ U, c a ∈ U) (j : ℤ) :
-    U.comap (c ^ j).toMonoidHom ≤ U.comap (c ^ (j + 1)).toMonoidHom ∧
-      (U.comap (c ^ j).toMonoidHom).relIndex (U.comap (c ^ (j + 1)).toMonoidHom) =
-        (U.map c.toMonoidHom).relIndex U := by
+theorem chain_step
+    {A : Type} [Group A] (U : Subgroup A) (c : MulAut A) (hc : ∀ a ∈ U, c a ∈ U) (j : ℤ)
+    : U.comap (c ^ j).toMonoidHom ≤ U.comap (c ^ (j + 1)).toMonoidHom
+      ∧ (U.comap (c ^ j).toMonoidHom).relIndex (U.comap (c ^ (j + 1)).toMonoidHom)
+        = (U.map c.toMonoidHom).relIndex U := by
   rw [chain_comap_eq U c j]
   refine ⟨Subgroup.comap_mono ?_, ?_⟩
   · rintro _ ⟨x, hx, rfl⟩

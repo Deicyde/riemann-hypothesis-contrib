@@ -15,16 +15,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComp
 
 @[expose] public section
 
-open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
 set_option synthInstance.maxHeartbeats 400000
 open ReciprocityTheory.Def (Z1 B1 H1)
 open TensorProduct
 
 namespace GlobalTheory
 
-theorem finite_module_killed_by_pow_of_not_isUnit :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (lam : O), ¬ IsUnit lam →
-    ∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X], ∃ a : ℕ, ∀ x : X, lam ^ a • x = 0 := by
+theorem finite_module_killed_by_pow_of_not_isUnit
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (lam : O),
+      ¬ IsUnit lam
+        → ∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X], ∃ a : ℕ, ∀ x : X,
+          lam ^ a • x = 0 := by
   intro O _ _ lam hlam X _ _ _
   obtain ⟨n, hn⟩ := IsArtinian.range_smul_pow_stabilizes (R := O) X lam
   set Y : Submodule O X := LinearMap.range (lam ^ n • (LinearMap.id : X →ₗ[O] X)) with hY

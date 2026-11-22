@@ -10,10 +10,14 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 noncomputable section
 namespace GlobalTheory.JR
 
-theorem weilAt_of_subsingleton (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (hK : Subsingleton A.K) : WeilAt A := by
+theorem weilAt_of_subsingleton
+    (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+    [StarRing E] [Unram F E]
+    (A : Et F E) (hK : Subsingleton A.K)
+    : WeilAt A := by
   have h01 : (0 : A.L) = 1 := by
-    rw [← map_zero (algebraMap A.K A.L), ← map_one (algebraMap A.K A.L), Subsingleton.elim (0 : A.K) 1]
+    rw [← map_zero (algebraMap A.K A.L), ← map_one (algebraMap A.K A.L),
+      Subsingleton.elim (0 : A.K) 1]
   haveI hL : Subsingleton A.L := subsingleton_of_zero_eq_one h01
   have hpsi : ∀ (ψ : AddChar F ℂ), IsStdChar ψ → ∀ t : A.K, A.psiK ψ t = 1 := by
     intro ψ _ t

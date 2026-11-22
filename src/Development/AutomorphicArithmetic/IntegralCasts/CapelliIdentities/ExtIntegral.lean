@@ -4,15 +4,16 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qe16.ext_integral :
-    ∀ {B S K : Type} [inst : CommRing B] [inst_1 : CommRing S]
-    [inst_2 : Field K] [IsAlgClosed K] [inst_4 : Algebra B S] [Algebra.IsIntegral B S],
-    Function.Injective (⇑(Algebra.algebraMap B S) : B → S) →
-      ∀ (φ : B →+* K), ∃ (Φ : S →+* K), ∀ (b : B), (Φ : S → K) ((Algebra.algebraMap B S : B → S) b) = (φ : B → K) b := by
+theorem UpperTheory.Reformulated.B.Qe16.ext_integral
+    : ∀ {B S K : Type} [inst : CommRing B] [inst_1 : CommRing S] [inst_2 : Field K] [IsAlgClosed K]
+        [inst_4 : Algebra B S] [Algebra.IsIntegral B S],
+      Function.Injective (⇑(Algebra.algebraMap B S) : B → S)
+        → ∀ (φ : B →+* K), ∃ (Φ : S →+* K), ∀ (b : B),
+          (Φ : S → K) ((Algebra.algebraMap B S : B → S) b) = (φ : B → K) b := by
   intro B S K _ _ _ _ _ _ hinj φ
   haveI hP : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime φ
-  obtain ⟨Q, -, hQ, hQP⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := S)
-    (RingHom.ker φ) ⊥ (by
+  obtain ⟨Q, -, hQ, hQP⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (S := S) (RingHom.ker φ) ⊥ (by
       rw [Ideal.under_def, ← RingHom.ker_eq_comap_bot, (RingHom.injective_iff_ker_eq_bot _).1 hinj]
       exact bot_le)
   haveI : Q.LiesOver (RingHom.ker φ) := ⟨hQP.symm⟩
@@ -30,8 +31,7 @@ theorem UpperTheory.Reformulated.B.Qe16.ext_integral :
   haveI : Algebra.IsAlgebraic (B ⧸ RingHom.ker φ) (S ⧸ Q) := Algebra.IsIntegral.isAlgebraic
   let f : (S ⧸ Q) →ₐ[B ⧸ RingHom.ker φ] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨f.toRingHom.comp (Ideal.Quotient.mk Q), fun b => ?_⟩
   exact (f.commutes (Ideal.Quotient.mk _ b)).trans (RingHom.kerLift_mk φ b)

@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCu
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead GlobalTheory.ThetaGL GlobalTheory.TameIwahori ValuativeRel
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead
+  GlobalTheory.ThetaGL GlobalTheory.TameIwahori ValuativeRel
 
 noncomputable section
 
@@ -16,16 +17,17 @@ namespace GlobalTheory.TameParahoric
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem residue_eq_zero_iff_val_lt (x : 𝒪[k]) :
-    IsLocalRing.residue 𝒪[k] x = 0 ↔ valuation k (algebraMap 𝒪[k] k x) < 1 := by
+theorem residue_eq_zero_iff_val_lt (x : 𝒪[k])
+    : IsLocalRing.residue 𝒪[k] x = 0 ↔ valuation k (algebraMap 𝒪[k] k x) < 1 := by
   rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
     (Valuation.integer.integers (valuation k)).isUnit_iff_valuation_eq_one]
   exact ⟨fun h => lt_of_le_of_ne x.2 h, fun h => h.ne⟩
 
-theorem val_det_sub_one_lt {m : Type} [Fintype m] [LinearOrder m] (A : Matrix m m 𝒪[k])
-    (hl : ∀ i j, j < i → valuation k (algebraMap 𝒪[k] k (A i j)) < 1)
-    (hd : ∀ i, valuation k (algebraMap 𝒪[k] k (A i i) - 1) < 1) :
-    valuation k ((A.map (algebraMap 𝒪[k] k)).det - 1) < 1 := by
+theorem val_det_sub_one_lt
+    {m : Type} [Fintype m] [LinearOrder m]
+    (A : Matrix m m 𝒪[k]) (hl : ∀ i j, j < i → valuation k (algebraMap 𝒪[k] k (A i j)) < 1)
+    (hd : ∀ i, valuation k (algebraMap 𝒪[k] k (A i i) - 1) < 1)
+    : valuation k ((A.map (algebraMap 𝒪[k] k)).det - 1) < 1 := by
   have h1 : (A.map (IsLocalRing.residue 𝒪[k])).det = 1 := by
     rw [Matrix.det_of_upperTriangular]
     · refine Finset.prod_eq_one fun i _ => ?_
@@ -40,10 +42,14 @@ theorem val_det_sub_one_lt {m : Type} [Fintype m] [LinearOrder m] (A : Matrix m 
   have := (residue_eq_zero_iff_val_lt _).1 h2
   rwa [map_sub, map_one, RingHom.map_det] at this
 
-theorem isIwVec_of_isParahoricVec (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (r t : ℕ) (χ : kˣ →* ℂˣ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (GL (Fin (r + t)) k) V) (v : V) (hχ : IsTame χ) (hv : IsParahoricVec χ π v) :
-    IsIwVec (Fin.append (fun _ : Fin r => (1 : kˣ →* ℂˣ)) (fun _ : Fin t => χ)) π v := by
+theorem isIwVec_of_isParahoricVec
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (r t : ℕ)
+    (χ : kˣ →* ℂˣ)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (GL (Fin (r + t)) k) V) (v : V)
+    (hχ : IsTame χ) (hv : IsParahoricVec χ π v)
+    : IsIwVec (Fin.append (fun _ : Fin r => (1 : kˣ →* ℂˣ)) (fun _ : Fin t => χ)) π v := by
   have hlt : ∀ (i : Fin t) (j : Fin r), Fin.castAdd t j < Fin.natAdd r i := by
     intro i j
     rw [Fin.lt_iff_val_lt_val]
@@ -55,8 +61,9 @@ theorem isIwVec_of_isParahoricVec (k : Type) [Field k] [ValuativeRel k] [Topolog
       intro i j
       rw [← hh]
       rfl
-    have hsub : h.val.submatrix (Fin.natAdd r) (Fin.natAdd r) =
-        (h₀.val.submatrix (Fin.natAdd r) (Fin.natAdd r)).map (algebraMap 𝒪[k] k) := by
+    have hsub
+        : h.val.submatrix (Fin.natAdd r) (Fin.natAdd r)
+          = (h₀.val.submatrix (Fin.natAdd r) (Fin.natAdd r)).map (algebraMap 𝒪[k] k) := by
       ext i j
       simp [hval]
     have hdet : valuation k ((h.val.submatrix (Fin.natAdd r) (Fin.natAdd r)).det - 1) < 1 := by
@@ -71,12 +78,14 @@ theorem isIwVec_of_isParahoricVec (k : Type) [Field k] [ValuativeRel k] [Topolog
     have hu : χ (Units.mk0 _ hne) = 1 := hχ _ (by simpa using hdet)
     rw [hv h ⟨h₀, hh⟩ (fun i j => hl _ _ (hlt i j)) (Units.mk0 _ hne) rfl, hu]
     simp
-  · have hD : ((∏ j : Fin t, s (Fin.natAdd r j) : kˣ) : k) =
-        ((diagT k (Fin (r + t)) s).val.submatrix (Fin.natAdd r) (Fin.natAdd r)).det := by
+  · have hD
+        : ((∏ j : Fin t, s (Fin.natAdd r j) : kˣ) : k)
+          = ((diagT k (Fin (r + t)) s).val.submatrix (Fin.natAdd r) (Fin.natAdd r)).det := by
       rw [val_diagT, Matrix.submatrix_diagonal _ _ (Fin.natAdd_injective _ _), Matrix.det_diagonal]
       simp [Units.coe_prod]
-    have hlow : ∀ (i : Fin t) (j : Fin r),
-        valuation k ((diagT k (Fin (r + t)) s).val (Fin.natAdd r i) (Fin.castAdd t j)) < 1 := by
+    have hlow
+        : ∀ (i : Fin t) (j : Fin r),
+          valuation k ((diagT k (Fin (r + t)) s).val (Fin.natAdd r i) (Fin.castAdd t j)) < 1 := by
       intro i j
       rw [val_diagT, Matrix.diagonal_apply_ne _ (hlt i j).ne']
       simp

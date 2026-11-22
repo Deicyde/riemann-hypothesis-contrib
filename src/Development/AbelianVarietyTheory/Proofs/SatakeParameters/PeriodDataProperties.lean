@@ -8,25 +8,28 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N Formalism.BasicNotions Formalism.FrobeniusOrbits
 open TensorProduct
 
 namespace GlobalTheory.SubSumJumps
 
 section
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V']
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+  {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V']
 
-theorem map_mem_FilV (f : V →ₗ[LL] V') (a : ℤ) (x : V ⊗[Qp] BdR)
-    (hx : x ∈ FilV PD (LL := LL) (V := V) a) :
-    AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x
+theorem map_mem_FilV
+    (f : V →ₗ[LL] V') (a : ℤ) (x : V ⊗[Qp] BdR) (hx : x ∈ FilV PD (LL := LL) (V := V) a)
+    : AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x
       ∈ FilV PD (LL := LL) (V := V') a := by
   obtain ⟨y, rfl⟩ := hx
   refine ⟨AlgebraTensorModule.map f LinearMap.id y, ?_⟩
@@ -35,36 +38,40 @@ theorem map_mem_FilV (f : V →ₗ[LL] V') (a : ℤ) (x : V ⊗[Qp] BdR)
   | tmul v b => simp
   | add y z hy hz => simp only [map_add (f := _), hy, hz]
 
-theorem map_mem_DdRE (ρ : Representation LL G V) (ρ' : Representation LL G V') (f : V →ₗ[LL] V')
-    (hf : ∀ g v, f (ρ g v) = ρ' g (f v)) (τ : K →ₐ[Qp] LL) (x : V ⊗[Qp] BdR)
-    (hx : x ∈ DdRE PD ρ τ) :
-    AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x ∈ DdRE PD ρ' τ := by
-  have h1 : ∀ (g : G) (y : V ⊗[Qp] BdR),
-      actVdR PD ρ' g (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) y)
-        = AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) (actVdR PD ρ g y) := by
+theorem map_mem_DdRE
+    (ρ : Representation LL G V) (ρ' : Representation LL G V') (f : V →ₗ[LL] V')
+    (hf : ∀ g v, f (ρ g v) = ρ' g (f v))
+    (τ : K →ₐ[Qp] LL) (x : V ⊗[Qp] BdR) (hx : x ∈ DdRE PD ρ τ)
+    : AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x ∈ DdRE PD ρ' τ := by
+  have h1
+      : ∀ (g : G) (y : V ⊗[Qp] BdR),
+        actVdR PD ρ' g (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) y)
+          = AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) (actVdR PD ρ g y) := by
     intro g y
     induction y using TensorProduct.induction_on with
     | zero => simp
     | tmul v b => simp [actVdR, hf]
     | add y z hy hz => simp only [map_add (f := _), hy, hz]
-  have h2 : ∀ (c : K) (y : V ⊗[Qp] BdR),
-      mulVdR (K := K) (BdR := BdR) (V := V') (LL := LL) c
-        (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) y)
-        = AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR)
-          (mulVdR (K := K) (BdR := BdR) (V := V) (LL := LL) c y) := by
+  have h2
+      : ∀ (c : K) (y : V ⊗[Qp] BdR),
+        mulVdR (K := K) (BdR := BdR) (V := V') (LL := LL) c
+            (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) y)
+          = AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR)
+            (mulVdR (K := K) (BdR := BdR) (V := V) (LL := LL) c y) := by
     intro c y
     induction y using TensorProduct.induction_on with
     | zero => simp
     | tmul v b => simp [mulVdR]
     | add y z hy hz => simp only [map_add (f := _), hy, hz]
   simp only [DdRE, DdR, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker,
-    LinearMap.sub_apply, LinearMap.id_apply, LinearMap.smul_apply, sub_eq_zero] at hx ⊢
+      LinearMap.sub_apply, LinearMap.id_apply, LinearMap.smul_apply, sub_eq_zero]
+    at hx ⊢
   refine ⟨fun g => ?_, fun c => ?_⟩
   · rw [h1, hx.1 g]
   · rw [h2, hx.2 c, map_smul]
 
-theorem FilV_anti (a : ℤ) :
-    FilV PD (LL := LL) (V := V) (a + 1) ≤ FilV PD (LL := LL) (V := V) a := by
+theorem FilV_anti (a : ℤ)
+    : FilV PD (LL := LL) (V := V) (a + 1) ≤ FilV PD (LL := LL) (V := V) a := by
   rintro x ⟨y, rfl⟩
   induction y using TensorProduct.induction_on with
   | zero => simp
@@ -73,7 +80,17 @@ theorem FilV_anti (a : ℤ) :
 
 end
 
-theorem jumpsInV_of_isSubOfSums : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B] [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR] [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] (PD : PeriodData G Qp K₀ K B BdR) {LL : Type} [Field LL] [Algebra Qp LL] {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] (ρ : Representation LL G V) {ι : Type} {k : ℕ} (Ms : ι → (G →* Matrix (Fin k) (Fin k) LL)) (τ : K →ₐ[Qp] LL) (J : Set ℤ), IsSubOfSums ρ (fun x g => Ms x g) → (∀ x, JumpsInV PD (matRep (Ms x)) τ J) → JumpsInV PD ρ τ J := by
+theorem jumpsInV_of_isSubOfSums
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+        [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B BdR : Type}
+        [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+        [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+        [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] (PD : PeriodData G Qp K₀ K B BdR)
+        {LL : Type} [Field LL] [Algebra Qp LL] {V : Type} [AddCommGroup V] [Module LL V]
+        [Module Qp V] [IsScalarTower Qp LL V] (ρ : Representation LL G V) {ι : Type} {k : ℕ}
+        (Ms : ι → (G →* Matrix (Fin k) (Fin k) LL)) (τ : K →ₐ[Qp] LL) (J : Set ℤ),
+      IsSubOfSums ρ (fun x g => Ms x g) → (∀ x, JumpsInV PD (matRep (Ms x)) τ J)
+        → JumpsInV PD ρ τ J := by
   intro G _ _ Qp K₀ K _ _ _ _ _ _ _ B BdR _ _ _ _ _ _ _ _ _ _ _ PD LL _ _ V _ _ _ _ ρ ι k Ms τ J
     hsub hJ a ha
   by_contra haJ
@@ -88,9 +105,11 @@ theorem jumpsInV_of_isSubOfSums : ∀ {G : Type} [Group G] [TopologicalSpace G] 
   let p : Fin m → (V →ₗ[LL] (Fin k → LL)) := fun b => (LinearMap.proj b).comp j
   let s : Fin m → ((Fin k → LL) →ₗ[LL] V) := fun b =>
     r.comp (LinearMap.single LL (fun _ : Fin m => Fin k → LL) b)
-  have hdec : ∀ y : V ⊗[Qp] BdR, y = ∑ b, AlgebraTensorModule.map (s b)
-      (LinearMap.id : BdR →ₗ[Qp] BdR)
-      (AlgebraTensorModule.map (p b) (LinearMap.id : BdR →ₗ[Qp] BdR) y) := by
+  have hdec
+      : ∀ y : V ⊗[Qp] BdR,
+        y = ∑ b, AlgebraTensorModule.map (s b)
+          (LinearMap.id : BdR →ₗ[Qp] BdR)
+          (AlgebraTensorModule.map (p b) (LinearMap.id : BdR →ₗ[Qp] BdR) y) := by
     intro y
     induction y using TensorProduct.induction_on with
     | zero => simp
@@ -110,8 +129,9 @@ theorem jumpsInV_of_isSubOfSums : ∀ {G : Type} [Group G] [TopologicalSpace G] 
   have heq : FildR PD (matRep (Ms (xs b))) τ (a + 1) = FildR PD (matRep (Ms (xs b))) τ a := by
     by_contra h
     exact haJ (hJ (xs b) a h)
-  have hm : AlgebraTensorModule.map (p b) (LinearMap.id : BdR →ₗ[Qp] BdR) x
-      ∈ FildR PD (matRep (Ms (xs b))) τ a := by
+  have hm
+      : AlgebraTensorModule.map (p b) (LinearMap.id : BdR →ₗ[Qp] BdR) x
+        ∈ FildR PD (matRep (Ms (xs b))) τ a := by
     refine ⟨map_mem_DdRE PD ρ _ (p b) (fun g v => ?_) τ x hx.1, map_mem_FilV PD (p b) a x hx.2⟩
     simp [p, hje, matRep, Matrix.toLinAlgEquiv'_apply]
   rw [← heq] at hm

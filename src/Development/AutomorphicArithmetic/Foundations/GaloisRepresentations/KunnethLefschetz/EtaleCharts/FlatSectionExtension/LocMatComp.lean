@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
 namespace UpperTheory.Gal.KunnethLefschetz.G.PX
 
@@ -28,8 +29,10 @@ private lemma restr_sec {V Z : Scheme.{0}} (f : V ⟶ Z) {U U₂ : V.Opens} {N N
   simp only [CommRingCat.hom_comp, RingHom.comp_apply] at e3
   rw [e1, CommRingCat.hom_comp, RingHom.comp_apply, h, ← e3]
 
-variable {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)}
-  {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ}
+variable
+  {K : Type} [CommRing K]
+  {W Z Y : Scheme.{0}}
+  {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ}
 
 private lemma tN_res (B : Blow q i π D d) (α : B.ι) {N N₂ : Z.Opens} (h : N ≤ B.V α)
     (hN : N₂ ≤ N) (m : Fin d) :
@@ -60,8 +63,11 @@ private lemma isTr_comp (B : Blow q i π D d) (α β γ : B.ι) {N : Z.Opens} (h
 
 end UpperTheory.Gal.KunnethLefschetz.G.PX
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.locMatComp :
-    ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α β γ : B.ι) {V : Scheme.{0}} (p : V ⟶ W) (M M' : Matrix (Fin d) (Fin d) Γ(V, ⊤)), LocMat B α β p M → LocMat B β γ p M' → LocMat B α γ p (M' * M) := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.locMatComp
+    : ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
+        {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α β γ : B.ι) {V : Scheme.{0}}
+        (p : V ⟶ W) (M M' : Matrix (Fin d) (Fin d) Γ(V, ⊤)),
+      LocMat B α β p M → LocMat B β γ p M' → LocMat B α γ p (M' * M) := by
   intro K _ W Z Y q i π D d B α β γ V p M M' h h' x
   obtain ⟨U, N, hx, hNa, h₁, h₂, hU, G, hG, hM⟩ := h x
   obtain ⟨U', N', hx', hNa', h₁', h₂', hU', G', hG', hM'⟩ := h' x
@@ -76,9 +82,18 @@ theorem UpperTheory.Gal.KunnethLefschetz.G.PX.locMatComp :
   have hU₂ : ⊤ ≤ (U₂.ι ≫ p ≫ i) ⁻¹ᵁ N₂ := by
     intro y _
     exact y.2.2
-  refine ⟨U₂, N₂, ⟨⟨hx, hx'⟩, hxN₂⟩, hA, hl₁.trans h₁, hl₂.trans h₂', hU₂,
+  refine ⟨
+    U₂,
+    N₂,
+    ⟨⟨hx, hx'⟩, hxN₂⟩,
+    hA,
+    hl₁.trans h₁,
+    hl₂.trans h₂',
+    hU₂,
     G'.map (Z.presheaf.map (homOfLE hl₂).op).hom * G.map (Z.presheaf.map (homOfLE hl₁).op).hom,
-    ?_, ?_⟩
+    ?_,
+    ?_
+  ⟩
   · exact isTr_comp B α β γ _ (hl₁.trans h₂) _ _ _ (isTr_res B α β h₁ h₂ hl₁ G hG)
       (isTr_res B β γ h₁' h₂' hl₂ G' hG')
   · rw [Matrix.map_mul, Matrix.map_mul]

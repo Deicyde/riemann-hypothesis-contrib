@@ -16,10 +16,20 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
 variable {k r : ℕ}
 
 def sw (l : Fin r) (p : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) :=
-  if p = eI k r l then esI k r l else if p = esI k r l then eI k r l else p
+  if p = eI k r l then
+    esI k r l
+  else if p = esI k r l then
+    eI k r l
+  else
+    p
 
 def al (l : Fin r) (c : ℂ) (p : Fin (2 * r + k + 1)) : ℂ :=
-  if p = eI k r l then c else if p = esI k r l then (star c)⁻¹ else 1
+  if p = eI k r l then
+    c
+  else if p = esI k r l then
+    (star c)⁻¹
+  else
+    1
 
 private lemma eI_val_weyl_conjugation_fixed_column (l : Fin r) : (eI k r l).val = l.val := rfl
 
@@ -240,6 +250,10 @@ end G
 
 theorem isotropic_reflection_properties : Formalism.FourierDecayAlt.Q.WeylLevelElementFacts := by
   intro k r l c hc
-  exact ⟨reflection_mem_Glev_castSucc l c hc, fun g hg => ⟨g_mem_cast l g hg, w1_commute_of_mem_Glev l g hg c, reflection_hermitian_value l g hg c⟩⟩
+  exact ⟨
+    reflection_mem_Glev_castSucc l c hc,
+    fun g hg =>
+      ⟨g_mem_cast l g hg, w1_commute_of_mem_Glev l g hg c, reflection_hermitian_value l g hg c⟩
+  ⟩
 
 end PI.IsotropicReflections

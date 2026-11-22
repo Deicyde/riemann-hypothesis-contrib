@@ -48,8 +48,10 @@ lemma bE_sq (h : IsLayer (e + 2) q d ζ a b) : bE ζ a b ^ 2 = -(d : hostE ζ a 
   apply Subtype.ext
   simpa [bE] using h.2.2.1
 
-theorem discr_hostE (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : IsLayer (e + 2) q d ζ a b) :
-    discr (hostE ζ a b) = 2 ^ (2 ^ (e + 2) * (e + 1) - 4) * ((q * d : ℕ) : ℤ) ^ (2 ^ (e + 1)) := by
+theorem discr_hostE
+    (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : IsLayer (e + 2) q d ζ a b)
+    : discr (hostE ζ a b)
+      = 2 ^ (2 ^ (e + 2) * (e + 1) - 4) * ((q * d : ℕ) : ℤ) ^ (2 ^ (e + 1)) := by
   classical
   have hqd := hH.toHypOdd
   obtain ⟨hqp, hdp, hq8, hd16, -⟩ := hH
@@ -68,7 +70,8 @@ theorem discr_hostE (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : Is
       rw [← Set.range_comp]
       rfl
   have hqq : ∀ i, (qq i).Prime ∧ qq i % 4 = 3 := by
-    intro i; fin_cases i
+    intro i
+    fin_cases i
     · exact ⟨hqp, by simp [qq]; omega⟩
     · exact ⟨hdp, by simp [qq]; omega⟩
   have hinj : Function.Injective qq := by
@@ -77,8 +80,9 @@ theorem discr_hostE (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : Is
   have hd₁ : discr K₁ = (q : ℤ) ^ 2 * (d : ℤ) ^ 2 := by
     rw [Formalism.HF.Final.mqDiscr 2 qq (by norm_num) hqq hinj K₁ β hβ]
     simp [Fin.prod_univ_two, qq]
-  have hGal₁ : IsGalois ℚ K₁ := (Formalism.Q3.mqGalois 2 K₁ _ β hβ
-    (fun i => neg_ne_zero.2 (Nat.cast_ne_zero.2 (hqq i).1.ne_zero))).1
+  have hGal₁ : IsGalois ℚ K₁ :=
+    (Formalism.Q3.mqGalois 2 K₁ _ β hβ
+      (fun i => neg_ne_zero.2 (Nat.cast_ne_zero.2 (hqq i).1.ne_zero))).1
   let ι : hostE ζ a b →ₐ[ℚ] L := ((hostE ζ a b).val : hostE ζ a b →+* L).toRatAlgHom
   have hmap : K₂.map ι = F1 ζ := by
     rw [adjoin_map, Set.image_singleton]
@@ -108,8 +112,9 @@ theorem discr_hostE (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : Is
     have h4 : 2 ^ (e + 2) = 4 * 2 ^ e := by ring
     rw [h4] at this
     exact (Nat.eq_of_mul_eq_mul_right (by positivity) this).symm
-  have hnat := natAbs_discr_eq_natAbs_discr_pow_mul_natAbs_discr_pow (hostE ζ a b) K₁ K₂ hld hsup
-    (isCoprime_differentIdeal_of_isCoprime_discr (hostE ζ a b) hcop)
+  have hnat :=
+    natAbs_discr_eq_natAbs_discr_pow_mul_natAbs_discr_pow (hostE ζ a b) K₁ K₂ hld hsup
+      (isCoprime_differentIdeal_of_isCoprime_discr (hostE ζ a b) hcop)
   have hr : nrRealPlaces (hostE ζ a b) = 0 :=
     Formalism.HF.P.nrRealPlaces_zero (aE ζ a b) (-(q : ℤ)) (by have := hqp.pos; omega)
       (by rw [ConjReal.aE_sq h]; push_cast; rfl)
@@ -126,8 +131,9 @@ theorem discr_hostE (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : Is
   rw [← pow_mul, exp_E, show 2 ^ (e + 1) = 2 * 2 ^ e by ring, pow_mul]
   ring
 
-theorem discr_hostF (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : IsLayer (e + 2) q d ζ a b) :
-    discr (hostF ζ a b) = 2 ^ (2 ^ (e + 1) * (e + 1) - 2) * ((q * d : ℕ) : ℤ) ^ (2 ^ e) := by
+theorem discr_hostF
+    (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : IsLayer (e + 2) q d ζ a b)
+    : discr (hostF ζ a b) = 2 ^ (2 ^ (e + 1) * (e + 1) - 2) * ((q * d : ℕ) : ℤ) ^ (2 ^ e) := by
   classical
   have hqd := hH.toHypOdd
   obtain ⟨hqp, hdp, hq8, hd16, -⟩ := hH
@@ -144,7 +150,9 @@ theorem discr_hostF (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : Is
   let M₂ : IntermediateField ℚ (hostF ζ a b) := adjoin ℚ {thF}
   let x₁ : M₁ := ⟨abF, mem_adjoin_simple_self _ _⟩
   have hx₁ : x₁ ^ 2 = (((q : ℤ) * d : ℤ) : M₁) := by
-    apply Subtype.ext; apply Subtype.ext; apply Subtype.ext
+    apply Subtype.ext
+    apply Subtype.ext
+    apply Subtype.ext
     push_cast
     show (a * b) ^ 2 = _
     rw [mul_pow, h.2.1, h.2.2.1]
@@ -162,9 +170,12 @@ theorem discr_hostF (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : Is
     rw [Int.mul_emod, hq4, hd4]
     norm_num
   have hd₁ : discr M₁ = (q : ℤ) * d := Formalism.HF.Final.quadDiscr M₁ _ x₁ hx₁ htop₁ hsf hmod
-  have hGal₁ : IsGalois ℚ M₁ := (Formalism.Q3.mqGalois 1 M₁ (fun _ => (q : ℤ) * d) (fun _ => x₁)
-    ⟨fun _ => hx₁, by rw [Set.range_const]; exact htop₁⟩
-    (fun _ => mul_ne_zero (Nat.cast_ne_zero.2 hqp.ne_zero) (Nat.cast_ne_zero.2 hdp.ne_zero))).1
+  have hGal₁ : IsGalois ℚ M₁ :=
+    (Formalism.Q3.mqGalois 1 M₁
+      (fun _ => (q : ℤ) * d)
+      (fun _ => x₁)
+      ⟨fun _ => hx₁, by rw [Set.range_const]; exact htop₁⟩
+      (fun _ => mul_ne_zero (Nat.cast_ne_zero.2 hqp.ne_zero) (Nat.cast_ne_zero.2 hdp.ne_zero))).1
   have hmap : M₂.map ι = F1 ζ := by
     rw [adjoin_map, Set.image_singleton]
     rfl
@@ -193,8 +204,9 @@ theorem discr_hostF (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : Is
     have h2 : 2 ^ (e + 1) = 2 * 2 ^ e := by ring
     rw [h2] at this
     exact (Nat.eq_of_mul_eq_mul_right (by positivity) this).symm
-  have hnat := natAbs_discr_eq_natAbs_discr_pow_mul_natAbs_discr_pow (hostF ζ a b) M₁ M₂ hld hsup
-    (isCoprime_differentIdeal_of_isCoprime_discr (hostF ζ a b) hcop)
+  have hnat :=
+    natAbs_discr_eq_natAbs_discr_pow_mul_natAbs_discr_pow (hostF ζ a b) M₁ M₂ hld hsup
+      (isCoprime_differentIdeal_of_isCoprime_discr (hostF ζ a b) hcop)
   have hs : (discr (hostF ζ a b)).sign = 1 := by
     rw [sign_discr, IsTotallyReal.nrComplexPlaces_eq_zero, pow_zero]
   rw [← Int.sign_mul_natAbs (discr (hostF ζ a b)), hs, hnat, hd₁, hd₂, hf₁, hf₂, one_mul]
@@ -203,14 +215,13 @@ theorem discr_hostF (h1 : DiscrMaximalRealCyclotomic) (hH : HostHyp q d) (h : Is
   rw [← pow_mul, exp_F]
   ring
 
-theorem rdE (e q d : ℕ) (hq : 0 < q) (hd : 0 < d) :
-    |(((2 : ℤ) ^ (2 ^ (e + 2) * (e + 1) - 4) * ((q * d : ℕ) : ℤ) ^ (2 ^ (e + 1)) : ℤ) : ℝ)| ^
-        ((1 : ℝ) / (2 ^ (e + 2) : ℝ)) =
-      (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d) := by
+theorem rdE (e q d : ℕ) (hq : 0 < q) (hd : 0 < d)
+    : |(((2 : ℤ) ^ (2 ^ (e + 2) * (e + 1) - 4) * ((q * d : ℕ) : ℤ) ^ (2 ^ (e + 1)) : ℤ) : ℝ)|
+        ^ ((1 : ℝ) / (2 ^ (e + 2) : ℝ))
+      = (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d) := by
   have hX : (0 : ℝ) ≤ (q : ℝ) * d := by positivity
   have hB : 4 ≤ 2 ^ (e + 2) * (e + 1) := by
-    have : 4 ≤ 2 ^ (e + 2) := by
-      rw [pow_add]; norm_num; exact Nat.one_le_two_pow
+    have : 4 ≤ 2 ^ (e + 2) := by rw [pow_add]; norm_num; exact Nat.one_le_two_pow
     nlinarith
   push_cast
   rw [abs_of_nonneg (by positivity), Real.mul_rpow (by positivity) (by positivity),
@@ -225,14 +236,13 @@ theorem rdE (e q d : ℕ) (hq : 0 < q) (hd : 0 < d) :
     field_simp
     ring
 
-theorem rdF (e q d : ℕ) (hq : 0 < q) (hd : 0 < d) :
-    |(((2 : ℤ) ^ (2 ^ (e + 1) * (e + 1) - 2) * ((q * d : ℕ) : ℤ) ^ (2 ^ e) : ℤ) : ℝ)| ^
-        ((1 : ℝ) / (2 ^ (e + 1) : ℝ)) =
-      (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d) := by
+theorem rdF (e q d : ℕ) (hq : 0 < q) (hd : 0 < d)
+    : |(((2 : ℤ) ^ (2 ^ (e + 1) * (e + 1) - 2) * ((q * d : ℕ) : ℤ) ^ (2 ^ e) : ℤ) : ℝ)|
+        ^ ((1 : ℝ) / (2 ^ (e + 1) : ℝ))
+      = (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d) := by
   have hX : (0 : ℝ) ≤ (q : ℝ) * d := by positivity
   have hB : 2 ≤ 2 ^ (e + 1) * (e + 1) := by
-    have : 2 ≤ 2 ^ (e + 1) := by
-      rw [pow_succ]; norm_num; exact Nat.one_le_two_pow
+    have : 2 ≤ 2 ^ (e + 1) := by rw [pow_succ]; norm_num; exact Nat.one_le_two_pow
     nlinarith
   push_cast
   rw [abs_of_nonneg (by positivity), Real.mul_rpow (by positivity) (by positivity),
@@ -247,9 +257,9 @@ theorem rdF (e q d : ℕ) (hq : 0 < q) (hd : 0 < d) :
     field_simp
     ring
 
-theorem sqF (e q d : ℕ) :
-    ((2 : ℤ) ^ (2 ^ (e + 1) * (e + 1) - 2) * ((q * d : ℕ) : ℤ) ^ (2 ^ e)) ^ 2 =
-      (2 : ℤ) ^ (2 ^ (e + 2) * (e + 1) - 4) * ((q * d : ℕ) : ℤ) ^ (2 ^ (e + 1)) := by
+theorem sqF (e q d : ℕ)
+    : ((2 : ℤ) ^ (2 ^ (e + 1) * (e + 1) - 2) * ((q * d : ℕ) : ℤ) ^ (2 ^ e)) ^ 2
+      = (2 : ℤ) ^ (2 ^ (e + 2) * (e + 1) - 4) * ((q * d : ℕ) : ℤ) ^ (2 ^ (e + 1)) := by
   have hB : 2 ^ (e + 2) * (e + 1) - 4 = (2 ^ (e + 1) * (e + 1) - 2) * 2 := by
     rw [Nat.sub_mul, show 2 ^ (e + 2) * (e + 1) = 2 ^ (e + 1) * (e + 1) * 2 by ring]
   rw [hB, mul_pow, ← pow_mul, ← pow_mul, ← pow_succ]

@@ -8,22 +8,26 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PadicInt
 
 @[expose] public section
 
-open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
+open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
 
 namespace GlobalTheory.CompanionTheory.LatCOK
 
-theorem exists_uniform_mem_sub : ∀ (l : ℕ) [Fact l.Prime]
-    (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K],
-    ∃ M : ℕ, ∀ (k : ℕ) (a : OK l K),
-      Lat.pk l k (Lat.kP l K a) ∈ Lat.sub (Lat.fk l k) (xi0 l) l M := by
+theorem exists_uniform_mem_sub
+    : ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l))
+        [FiniteDimensional ℚ_[l] K],
+      ∃ M : ℕ, ∀ (k : ℕ) (a : OK l K),
+        Lat.pk l k (Lat.kP l K a) ∈ Lat.sub (Lat.fk l k) (xi0 l) l M := by
   intro l _ K _
   classical
   obtain ⟨s, hs⟩ := GlobalTheory.CompanionTheory.LocalIntegers.exists_finset_generators l K
   choose c hc using GlobalTheory.T.integer_mem_lattice_sub_bound l K
   refine ⟨2 * s.sup c, fun k a => ?_⟩
   obtain ⟨d, hd⟩ := hs a
-  have h1 : Lat.kP l K a = ∑ i ∈ s, algClToBdR l (algebraMap ℚ_[l] (PadicAlgCl l) (d i : ℚ_[l])) *
-      Lat.kP l K i := by
+  have h1
+      : Lat.kP l K a
+        = ∑ i ∈ s, algClToBdR l (algebraMap ℚ_[l] (PadicAlgCl l) (d i : ℚ_[l])) *
+          Lat.kP l K i := by
     have h2 : Lat.kP l K a = algClToBdR l (((a : K) : PadicAlgCl l)) := rfl
     set_option synthInstance.maxHeartbeats 100000 in
       rw [h2, hd, map_sum]

@@ -8,18 +8,20 @@ public import ReciprocityTheory.SemistableReduction.FinrankRestrictTotalDegree
 
 namespace GlobalTheory
 
-theorem card_exponents_sum_lt_sub (D T : ℕ) (hT : D < T) :
-    Nat.card {α : Fin D → ℕ // ∑ i, α i < T - D} = (T - 1).choose D := by
+theorem card_exponents_sum_lt_sub (D T : ℕ) (hT : D < T)
+    : Nat.card {α : Fin D → ℕ // ∑ i, α i < T - D} = (T - 1).choose D := by
   have e : {α : Fin D →₀ ℕ // α.degree ≤ T - D - 1} ≃ {α : Fin D → ℕ // ∑ i, α i < T - D} :=
     Finsupp.equivFunOnFinite.subtypeEquiv fun α => by
       rw [Finsupp.degree_eq_sum]
       simp only [Finsupp.equivFunOnFinite_apply]
       omega
-  rw [← Nat.card_congr e, ReciprocityTheory.MultiplicativeHeights.card_degree_le, show T - D - 1 + D = T - 1 by omega]
+  rw [← Nat.card_congr e, ReciprocityTheory.MultiplicativeHeights.card_degree_le,
+    show T - D - 1 + D = T - 1 by omega]
 
-theorem le_of_add_mul_choose_pred_le (D T δ d ρ : ℕ) (hD : 2 ≤ D) (hT : 11 * D ^ 2 ≤ T)
-    (hd : d ≤ δ * (T + 2 * D + 6).choose D) (hρ : ρ + δ * (T - 1).choose D ≤ d) :
-    (ρ : ℝ) ≤ 22 * (D : ℝ) ^ 2 * d / T := by
+theorem le_of_add_mul_choose_pred_le
+    (D T δ d ρ : ℕ) (hD : 2 ≤ D) (hT : 11 * D ^ 2 ≤ T) (hd : d ≤ δ * (T + 2 * D + 6).choose D)
+    (hρ : ρ + δ * (T - 1).choose D ≤ d)
+    : (ρ : ℝ) ≤ 22 * (D : ℝ) ^ 2 * d / T := by
   have hT' : D * (2 * D + 7) ≤ T := by nlinarith
   have hTpos : (0 : ℝ) < T := by
     have : 0 < T := by nlinarith
@@ -41,10 +43,18 @@ theorem le_of_add_mul_choose_pred_le (D T δ d ρ : ℕ) (hD : 2 ≤ D) (hT : 11
   rw [le_div_iff₀ hTpos]
   nlinarith
 
-theorem card_exponents_and_choose_ratio_bounds : ∀ (D T : ℕ), (0 < D → D < T → Nat.card {α : Fin D → ℕ // ∑ i, α i < T - D} = (T - 1).choose D) ∧ ∀ (δ d ρ : ℕ), 2 ≤ D → 11 * D ^ 2 ≤ T → d ≤ δ * (T + 2 * D + 6).choose D → (ρ + δ * (T - 1).choose D ≤ d → (ρ : ℝ) ≤ 22 * (D : ℝ) ^ 2 * d / T) ∧ (ρ + δ * (T + D).choose D ≤ d → (ρ : ℝ) ≤ 22 * (D : ℝ) ^ 2 * d / T) := by
+theorem card_exponents_and_choose_ratio_bounds
+    : ∀ (D T : ℕ),
+      (0 < D → D < T → Nat.card {α : Fin D → ℕ // ∑ i, α i < T - D} = (T - 1).choose D)
+        ∧ ∀ (δ d ρ : ℕ),
+          2 ≤ D → 11 * D ^ 2 ≤ T → d ≤ δ * (T + 2 * D + 6).choose D
+            → (ρ + δ * (T - 1).choose D ≤ d → (ρ : ℝ) ≤ 22 * (D : ℝ) ^ 2 * d / T)
+              ∧ (ρ + δ * (T + D).choose D ≤ d → (ρ : ℝ) ≤ 22 * (D : ℝ) ^ 2 * d / T) := by
   intro D T
-  refine ⟨fun _ h => card_exponents_sum_lt_sub D T h, fun δ d ρ hD hT hd =>
-    ⟨le_of_add_mul_choose_pred_le D T δ d ρ hD hT hd, fun h => ?_⟩⟩
+  refine ⟨
+    fun _ h => card_exponents_sum_lt_sub D T h,
+    fun δ d ρ hD hT hd => ⟨le_of_add_mul_choose_pred_le D T δ d ρ hD hT hd, fun h => ?_⟩
+  ⟩
   refine le_of_add_mul_choose_pred_le D T δ d ρ hD hT hd (le_trans ?_ h)
   exact Nat.add_le_add_left (Nat.mul_le_mul_left _ (Nat.choose_le_choose D (by omega))) _
 

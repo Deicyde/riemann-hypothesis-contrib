@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SplitTorusRa
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.VB GlobalTheory.LieVB GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.NeronCurve GlobalTheory.Nef
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.VB GlobalTheory.LieVB GlobalTheory.QCoh GlobalTheory.CechPic
+  GlobalTheory.NeronCurve GlobalTheory.Nef
 open GlobalTheory.Twist (resM)
 open scoped CategoryTheory.Obj RatFunc
 
@@ -21,9 +24,9 @@ noncomputable section
 
 namespace GlobalTheory.Nef.TorExt
 
-theorem algebraMap_comp_C (Ω : Type) [Field Ω] :
-    (algebraMap (RatFunc Ω) (LaurentSeries Ω)).comp RatFunc.C =
-      (algebraMap (PowerSeries Ω) (LaurentSeries Ω)).comp PowerSeries.C := by
+theorem algebraMap_comp_C (Ω : Type) [Field Ω]
+    : (algebraMap (RatFunc Ω) (LaurentSeries Ω)).comp RatFunc.C
+      = (algebraMap (PowerSeries Ω) (LaurentSeries Ω)).comp PowerSeries.C := by
   refine RingHom.ext fun c => ?_
   simp only [RingHom.comp_apply]
   rw [← RatFunc.algebraMap_C]
@@ -31,8 +34,8 @@ theorem algebraMap_comp_C (Ω : Type) [Field Ω] :
   simp only [Polynomial.coe_C] at this
   exact this.symm
 
-theorem unitSec_comp {S : Scheme.{0}} {G H : Over S} [GrpObj G] [GrpObj H] (f : G ⟶ H) [IsMonHom f] :
-    unitSec G ≫ f.left = unitSec H := by
+theorem unitSec_comp {S : Scheme.{0}} {G H : Over S} [GrpObj G] [GrpObj H] (f : G ⟶ H) [IsMonHom f]
+    : unitSec G ≫ f.left = unitSec H := by
   rw [unitSec, unitSec, sec, sec, ← Over.comp_left, IsMonHom.one_hom]
 
 theorem isLocalHom_field {K L : Type} [Field K] [Field L] (φ : K →+* L) : IsLocalHom φ :=
@@ -41,10 +44,15 @@ theorem isLocalHom_field {K L : Type} [Field K] [Field L] (φ : K →+* L) : IsL
     · subst h; simp at hx
     · exact IsUnit.mk0 x h⟩
 
-theorem exists_lift {Ω : Type} [Field Ω] {G : Over (Sp Ω)} [GrpObj G] (E : TorusExtension G) {Z : Scheme.{0}}
-    (z : Z ⟶ Sp Ω) (f : Z ⟶ G.left) (hf : f ≫ G.hom = z) (hq : letI := E.grpB; f ≫ E.q.left = z ≫ unitSec E.B) :
-    letI := E.addCommGroup
-    ∃ g : Z ⟶ (splitTorus (Sp Ω) E.X).left, g ≫ E.i.left = f ∧ g ≫ (splitTorus (Sp Ω) E.X).hom = z := by
+theorem exists_lift
+    {Ω : Type} [Field Ω]
+    {G : Over (Sp Ω)} [GrpObj G]
+    (E : TorusExtension G)
+    {Z : Scheme.{0}} (z : Z ⟶ Sp Ω) (f : Z ⟶ G.left) (hf : f ≫ G.hom = z)
+    (hq : letI := E.grpB; f ≫ E.q.left = z ≫ unitSec E.B)
+    : letI := E.addCommGroup
+      ∃ g : Z ⟶ (splitTorus (Sp Ω) E.X).left,
+        g ≫ E.i.left = f ∧ g ≫ (splitTorus (Sp Ω) E.X).hom = z := by
   letI := E.addCommGroup
   letI := E.grpB
   let f' : Over.mk z ⟶ G := Over.homMk f hf
@@ -56,9 +64,9 @@ theorem exists_lift {Ω : Type} [Field Ω] {G : Over (Sp Ω)} [GrpObj G] (E : To
     rfl
   · exact Over.w (E.isKernel.lift f' (toUnit _) h)
 
-theorem mono_i {Ω : Type} [Field Ω] {G : Over (Sp Ω)} [GrpObj G] (E : TorusExtension G) :
-    letI := E.addCommGroup
-    Mono E.i.left := by
+theorem mono_i {Ω : Type} [Field Ω] {G : Over (Sp Ω)} [GrpObj G] (E : TorusExtension G)
+    : letI := E.addCommGroup
+      Mono E.i.left := by
   letI := E.addCommGroup
   letI := E.grpB
   have : Mono E.i := ⟨fun a b hab => E.isKernel.hom_ext hab (toUnit_unique _ _)⟩
@@ -68,10 +76,10 @@ end GlobalTheory.Nef.TorExt
 
 namespace GlobalTheory.Nef
 
-
 open TorExt in
-theorem ratRigid_of_torusExtension : ∀ (Ω : Type) [Field Ω] [CharZero Ω] (G : Over (Sp Ω)) [GrpObj G],
-    Nonempty (TorusExtension G) → RatRigid G (𝟙 (Sp Ω)) := by
+theorem ratRigid_of_torusExtension
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] (G : Over (Sp Ω)) [GrpObj G],
+      Nonempty (TorusExtension G) → RatRigid G (𝟙 (Sp Ω)) := by
   intro Ω _ _ G _ ⟨E⟩ ξ hξ ⟨β, hβ⟩
   letI := E.addCommGroup
   letI := E.grpB
@@ -89,11 +97,12 @@ theorem ratRigid_of_torusExtension : ∀ (Ω : Type) [Field Ω] [CharZero Ω] (G
   have hC : spMap a ≫ spMap RatFunc.C = spMap ι₀ ≫ spMap (PowerSeries.C (R := Ω)) := by
     rw [← Geo.Tor.spMap_comp, ← Geo.Tor.spMap_comp, algebraMap_comp_C]
   have hq : ξ ≫ E.q.left = spMap (PowerSeries.C (R := Ω)) ≫ unitSec E.B := by
-    have := GlobalTheory.T.rationalSquaringPathsRigid_of_proper_charZero Ω E.B inferInstance (ξ ≫ E.q.left) ((bc2 _ G E.B E.q Ω 2 (𝟙 _) ξ).1 hξ)
-      ⟨β ≫ E.q.left, by rw [← Category.assoc, hβ, Category.assoc]⟩
+    have :=
+      GlobalTheory.T.rationalSquaringPathsRigid_of_proper_charZero Ω E.B inferInstance
+        (ξ ≫ E.q.left) ((bc2 _ G E.B E.q Ω 2 (𝟙 _) ξ).1 hξ)
+        ⟨β ≫ E.q.left, by rw [← Category.assoc, hβ, Category.assoc]⟩
     rw [this, triv, Category.id_comp]
-  have hbase : ξ ≫ G.hom = spMap (PowerSeries.C (R := Ω)) := by
-    rw [hξ.base, Category.comp_id]
+  have hbase : ξ ≫ G.hom = spMap (PowerSeries.C (R := Ω)) := by rw [hξ.base, Category.comp_id]
   obtain ⟨ζ, hζ, hζT⟩ := exists_lift E _ ξ hbase hq
   have hβG : β ≫ G.hom = spMap (RatFunc.C (K := Ω)) :=
     epi1 _ _ a ha _ _ _ (by rw [reassoc_of% hβ, hbase, hC])

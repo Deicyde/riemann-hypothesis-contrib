@@ -9,8 +9,9 @@ open IsLocalRing GlobalTheory.UT
 
 namespace GlobalTheory.Poinc
 
-theorem sumI_maximalIdeal_unique :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] (Ix : Type) (x : Ix → R) (s s' : R),
+theorem sumI_maximalIdeal_unique
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] (Ix : Type) (x : Ix → R)
+        (s s' : R),
       SumI (maximalIdeal R) x s → SumI (maximalIdeal R) x s' → s = s' := by
   classical
   intro R _ _ _ Ix x s s' ⟨N, _, _, _, h⟩ ⟨N', _, _, _, h'⟩

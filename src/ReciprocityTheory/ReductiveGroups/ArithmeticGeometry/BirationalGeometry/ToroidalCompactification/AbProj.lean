@@ -23,8 +23,8 @@ theorem isProper_str (R : Type) [CommRing R] (N : ℕ) : IsProper (PSpace.str R 
   have hP : IsProper (Proj.toSpecZero (MvPolynomial.homogeneousSubmodule (Fin (N + 1)) R)) := by
     infer_instance
 
-  have hbij : Function.Bijective
-      (algebraMap R ↥(MvPolynomial.homogeneousSubmodule (Fin (N + 1)) R 0)) := by
+  have hbij : Function.Bijective (algebraMap R
+      ↥(MvPolynomial.homogeneousSubmodule (Fin (N + 1)) R 0)) := by
     constructor
     · intro a b hab
       have := congrArg Subtype.val hab
@@ -54,8 +54,12 @@ theorem abLocusOne : AbLocusOneSt := by
   let u := j ≫ pullback.fst t t'
   let u' := j ≫ pullback.snd t t'
   have e : u ≫ t = u' ≫ t' := by simp only [u, u', Category.assoc, pullback.condition]
-  have P₁ := (IsPullback.of_hasPullback (pullback.snd G.hom t) u).paste_horiz (IsPullback.of_hasPullback G.hom t)
-  have P₂ := (IsPullback.of_hasPullback (pullback.snd G.hom t') u').paste_horiz (IsPullback.of_hasPullback G.hom t')
+  have P₁ :=
+    (IsPullback.of_hasPullback (pullback.snd G.hom t) u).paste_horiz
+      (IsPullback.of_hasPullback G.hom t)
+  have P₂ :=
+    (IsPullback.of_hasPullback (pullback.snd G.hom t') u').paste_horiz
+      (IsPullback.of_hasPullback G.hom t')
   rw [← e] at P₂
   have h₂ : UniversallyClosed (pullback.snd (pullback.snd G.hom t') u') := by
     rw [← (P₂.isoIsPullback _ _ P₁).hom_inv_id_assoc (pullback.snd (pullback.snd G.hom t') u'),

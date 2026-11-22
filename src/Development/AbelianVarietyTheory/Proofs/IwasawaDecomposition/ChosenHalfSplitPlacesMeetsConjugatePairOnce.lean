@@ -9,36 +9,49 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Comap
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.HeightCounting.FormsStep NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.FormsStep NumberField IsDedekindDomain Polynomial
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.ChosenHalf
 
-theorem isConjPl_unique (D : D7) {P w w' : PlE D.host} (h : IsConjPl D.host P w) (h' : IsConjPl D.host P w') :
-    w = w' := by
+theorem isConjPl_unique
+    (D : D7) {P w w' : PlE D.host} (h : IsConjPl D.host P w) (h' : IsConjPl D.host P w')
+    : w = w' := by
   apply HeightOneSpectrum.ext
   ext y
   obtain ⟨x, hx⟩ := (RingOfIntegers.mapRingEquiv D.host.conj.toRingEquiv).surjective y
-  have hy : (y : D.host.E) = D.host.conj (x : D.host.E) := by
-    rw [← hx]; rfl
+  have hy : (y : D.host.E) = D.host.conj (x : D.host.E) := by rw [← hx]; rfl
   rw [← h x y hy, ← h' x y hy]
 
-theorem not_isConjPl_self (D : D7) {P : PlE D.host} (hs : IsSplitPl D.host P) : ¬ IsConjPl D.host P P := by
+theorem not_isConjPl_self (D : D7) {P : PlE D.host} (hs : IsSplitPl D.host P)
+    : ¬ IsConjPl D.host P P := by
   intro hc
   obtain ⟨x, hx, hy⟩ := hs
-  have hyx : ((RingOfIntegers.mapRingEquiv D.host.conj.toRingEquiv x : 𝓞 D.host.E) : D.host.E) =
-      D.host.conj (x : D.host.E) := rfl
+  have hyx
+      : ((RingOfIntegers.mapRingEquiv D.host.conj.toRingEquiv x : 𝓞 D.host.E) : D.host.E)
+        = D.host.conj (x : D.host.E) :=
+    rfl
   exact hy _ hyx ((hc x _ hyx).1 hx)
 
-theorem overPl_unique (D : D7) {P : PlE D.host} {v v' : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E))}
-    (h : NG.OverPl P v) (h' : NG.OverPl P v') : v = v' :=
+theorem overPl_unique
+    (D : D7)
+    {P : PlE D.host} {v v' : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E))}
+    (h : NG.OverPl P v) (h' : NG.OverPl P v')
+    : v = v' :=
   HeightOneSpectrum.ext (h.symm.trans h')
 
-theorem qpOf_half : ∀ (D : D7) (Pq : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)) → PlE D.host), (∀ v, NG.OverPl (Pq v) v) →
-    ∀ S : Finset (PlE D.host), (∀ P ∈ S, IsSplitPl D.host P) →
-    (∀ P ∈ S, ∃ P' ∈ qpOf D Pq S, P' = P ∨ IsConjPl D.host P P') ∧ ∀ P ∈ qpOf D Pq S, ∀ P' ∈ qpOf D Pq S, ¬ IsConjPl D.host P P' := by
+theorem qpOf_half
+    : ∀ (D : D7) (Pq : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)) → PlE D.host),
+      (∀ v, NG.OverPl (Pq v) v)
+        → ∀ S : Finset (PlE D.host),
+          (∀ P ∈ S, IsSplitPl D.host P)
+            → (∀ P ∈ S, ∃ P' ∈ qpOf D Pq S, P' = P ∨ IsConjPl D.host P P')
+              ∧ ∀ P ∈ qpOf D Pq S, ∀ P' ∈ qpOf D Pq S, ¬ IsConjPl D.host P P' := by
   classical
   intro D Pq hPq S hS
   have pair := GlobalTheory.T.comap_realSubfield_eq_iff_eq_or_isConjPlace D

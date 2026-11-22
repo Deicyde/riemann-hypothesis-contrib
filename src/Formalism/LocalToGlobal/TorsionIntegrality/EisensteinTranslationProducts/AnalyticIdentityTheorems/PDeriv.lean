@@ -70,10 +70,12 @@ theorem sigmaDouble_of (h : SigmaAdd) (he : SigmaEntire) (hs : SigmaSimple) : Si
   intro L z hz
   have h0 : wSigma L 0 = 0 := by simp only [wSigma, zero_mul]
   have hd : ∀ x, HasDerivAt (wSigma L) (deriv (wSigma L) x) x := fun x => (he L x).hasDerivAt
-  have hF := (HasDerivAt.comp z (hd (z + z)) ((hasDerivAt_id' z).const_add z)).mul
-    (HasDerivAt.comp z (hd (z - z)) ((hasDerivAt_id' z).const_sub z))
-  have hG := ((((hd z).mul (hd z)).const_mul (wSigma L z ^ 2)).mul
-    ((hasDerivAt_P L hz).const_sub (L.weierstrassP z))).neg
+  have hF :=
+    (HasDerivAt.comp z (hd (z + z)) ((hasDerivAt_id' z).const_add z)).mul
+      (HasDerivAt.comp z (hd (z - z)) ((hasDerivAt_id' z).const_sub z))
+  have hG :=
+    ((((hd z).mul (hd z)).const_mul (wSigma L z ^ 2)).mul
+      ((hasDerivAt_P L hz).const_sub (L.weierstrassP z))).neg
   have hG' : HasDerivAt (fun w => wSigma L (z + w) * wSigma L (z - w)) _ z :=
     hG.congr_of_eventuallyEq ((eventually_notMem L hz).mono fun w hw => by
       simp only [Pi.neg_apply, Pi.mul_apply]
@@ -92,14 +94,18 @@ theorem pDerivZero_of (h : SigmaDouble) (hz : SigmaZero) : PDerivZero := by
 
 theorem discNeZero_of (hp : PDerivZero) (hi : PInjective) : DiscNeZero := by
   intro L
-  have root : ∀ x, x ∉ L.lattice → 2 * x ∈ L.lattice →
-      4 * L.weierstrassP x ^ 3 - L.g₂ * L.weierstrassP x - L.g₃ = 0 := by
+  have root
+      : ∀ x,
+        x ∉ L.lattice → 2 * x ∈ L.lattice
+          → 4 * L.weierstrassP x ^ 3 - L.g₂ * L.weierstrassP x - L.g₃ = 0 := by
     intro x hx h2
     have hsq := L.derivWeierstrassP_sq x hx
     rw [(hp L x hx).mpr h2] at hsq
     linear_combination -hsq
-  have ne : ∀ x y, x ∉ L.lattice → y ∉ L.lattice → x - y ∉ L.lattice → x + y ∉ L.lattice →
-      L.weierstrassP x ≠ L.weierstrassP y := fun x y hx hy h1 h2 he =>
+  have ne
+      : ∀ x y,
+        x ∉ L.lattice → y ∉ L.lattice → x - y ∉ L.lattice → x + y ∉ L.lattice
+          → L.weierstrassP x ≠ L.weierstrassP y := fun x y hx hy h1 h2 he =>
     ((hi L x y hx hy).mp he).elim h1 h2
   have hw1 : L.ω₁ ∈ L.lattice := L.ω₁_mem_lattice
   have hw2 : L.ω₂ ∈ L.lattice := PeriodPair.mem_lattice.mpr ⟨0, 1, by push_cast; ring⟩
@@ -119,11 +125,14 @@ theorem discNeZero_of (hp : PDerivZero) (hi : PInjective) : DiscNeZero := by
     rw [show 2 * ((L.ω₁ + L.ω₂) / 2) = L.ω₁ + L.ω₂ by ring]
     exact add_mem hw1 hw2
   exact disc_alg _ _ _ _ _ (root _ n1 d1) (root _ n2 d2) (root _ n3 d3)
-    (ne _ _ n1 n2 (notMem_of_rat L 2⁻¹ (-2⁻¹) (by push_cast; ring) (by first | decide | norm_num | simp))
+    (ne _ _ n1 n2
+      (notMem_of_rat L 2⁻¹ (-2⁻¹) (by push_cast; ring) (by first | decide | norm_num | simp))
       (notMem_of_rat L 2⁻¹ 2⁻¹ (by push_cast; ring) (by first | decide | norm_num | simp)))
-    (ne _ _ n1 n3 (notMem_of_rat L 0 (-2⁻¹) (by push_cast; ring) (by first | decide | norm_num | simp))
+    (ne _ _ n1 n3
+      (notMem_of_rat L 0 (-2⁻¹) (by push_cast; ring) (by first | decide | norm_num | simp))
       (notMem_of_rat L 1 2⁻¹ (by push_cast; ring) (by first | decide | norm_num | simp)))
-    (ne _ _ n2 n3 (notMem_of_rat L (-2⁻¹) 0 (by push_cast; ring) (by first | decide | norm_num | simp))
+    (ne _ _ n2 n3
+      (notMem_of_rat L (-2⁻¹) 0 (by push_cast; ring) (by first | decide | norm_num | simp))
       (notMem_of_rat L 2⁻¹ 1 (by push_cast; ring) (by first | decide | norm_num | simp)))
 
 theorem zetaAdd_of (h : SigmaAdd) (hl : SigmaLogDeriv) (hz : SigmaZero) : ZetaAdd := by
@@ -137,10 +146,12 @@ theorem zetaAdd_of (h : SigmaAdd) (hl : SigmaLogDeriv) (hz : SigmaZero) : ZetaAd
     rw [h0, mul_zero, neg_zero] at hadd
     exact mul_ne_zero (hσ _ hab) (hσ _ hamb) hadd
 
-  have hF1 := (HasDerivAt.comp a (hl L (a + b) hab) ((hasDerivAt_id' a).add_const b)).mul
-    (HasDerivAt.comp a (hl L (a - b) hamb) ((hasDerivAt_id' a).sub_const b))
-  have hG1 := ((((hl L a ha).mul (hl L a ha)).mul_const (wSigma L b ^ 2)).mul
-    ((hasDerivAt_P L ha).sub_const (L.weierstrassP b))).neg
+  have hF1 :=
+    (HasDerivAt.comp a (hl L (a + b) hab) ((hasDerivAt_id' a).add_const b)).mul
+      (HasDerivAt.comp a (hl L (a - b) hamb) ((hasDerivAt_id' a).sub_const b))
+  have hG1 :=
+    ((((hl L a ha).mul (hl L a ha)).mul_const (wSigma L b ^ 2)).mul
+      ((hasDerivAt_P L ha).sub_const (L.weierstrassP b))).neg
   have hG1' : HasDerivAt (fun x => wSigma L (x + b) * wSigma L (x - b)) _ a :=
     hG1.congr_of_eventuallyEq ((eventually_notMem L ha).mono fun x hx => by
       simp only [Pi.neg_apply, Pi.mul_apply]
@@ -149,10 +160,12 @@ theorem zetaAdd_of (h : SigmaAdd) (hl : SigmaLogDeriv) (hz : SigmaZero) : ZetaAd
   have k1 := hF1.unique hG1'
   simp only [Function.comp_apply, Pi.mul_apply] at k1
 
-  have hF2 := (HasDerivAt.comp b (hl L (a + b) hab) ((hasDerivAt_id' b).const_add a)).mul
-    (HasDerivAt.comp b (hl L (a - b) hamb) ((hasDerivAt_id' b).const_sub a))
-  have hG2 := ((((hl L b hb).mul (hl L b hb)).const_mul (wSigma L a ^ 2)).mul
-    ((hasDerivAt_P L hb).const_sub (L.weierstrassP a))).neg
+  have hF2 :=
+    (HasDerivAt.comp b (hl L (a + b) hab) ((hasDerivAt_id' b).const_add a)).mul
+      (HasDerivAt.comp b (hl L (a - b) hamb) ((hasDerivAt_id' b).const_sub a))
+  have hG2 :=
+    ((((hl L b hb).mul (hl L b hb)).const_mul (wSigma L a ^ 2)).mul
+      ((hasDerivAt_P L hb).const_sub (L.weierstrassP a))).neg
   have hG2' : HasDerivAt (fun y => wSigma L (a + y) * wSigma L (a - y)) _ b :=
     hG2.congr_of_eventuallyEq ((eventually_notMem L hb).mono fun y hy => by
       simp only [Pi.neg_apply, Pi.mul_apply]
@@ -160,19 +173,24 @@ theorem zetaAdd_of (h : SigmaAdd) (hl : SigmaLogDeriv) (hz : SigmaZero) : ZetaAd
       ring)
   have k2 := hF2.unique hG2'
   simp only [Function.comp_apply, Pi.mul_apply] at k2
-  have e1 : (wSigma L a ^ 2 * wSigma L b ^ 2) *
-      ((L.weierstrassP a - L.weierstrassP b) * (wZeta L (a + b) + wZeta L (a - b))
-        - 2 * wZeta L a * (L.weierstrassP a - L.weierstrassP b) - L.derivWeierstrassP a) = 0 := by
+  have e1
+      : (wSigma L a ^ 2 * wSigma L b ^ 2)
+          * ((L.weierstrassP a - L.weierstrassP b) * (wZeta L (a + b) + wZeta L (a - b))
+            - 2 * wZeta L a * (L.weierstrassP a - L.weierstrassP b) - L.derivWeierstrassP a)
+        = 0 := by
     linear_combination (wZeta L (a + b) + wZeta L (a - b)) * hadd - k1
-  have e2 : (wSigma L a ^ 2 * wSigma L b ^ 2) *
-      ((L.weierstrassP a - L.weierstrassP b) * (wZeta L (a + b) - wZeta L (a - b))
-        - 2 * wZeta L b * (L.weierstrassP a - L.weierstrassP b) + L.derivWeierstrassP b) = 0 := by
+  have e2
+      : (wSigma L a ^ 2 * wSigma L b ^ 2)
+          * ((L.weierstrassP a - L.weierstrassP b) * (wZeta L (a + b) - wZeta L (a - b))
+            - 2 * wZeta L b * (L.weierstrassP a - L.weierstrassP b) + L.derivWeierstrassP b)
+        = 0 := by
     linear_combination (wZeta L (a + b) - wZeta L (a - b)) * hadd - k2
   have f1 := (mul_eq_zero.mp e1).resolve_left hK
   have f2 := (mul_eq_zero.mp e2).resolve_left hK
-  have hq : wZeta L (a + b) - (wZeta L a + wZeta L b)
-      = (L.derivWeierstrassP a - L.derivWeierstrassP b) /
-        (2 * (L.weierstrassP a - L.weierstrassP b)) := by
+  have hq
+      : wZeta L (a + b) - (wZeta L a + wZeta L b)
+        = (L.derivWeierstrassP a - L.derivWeierstrassP b)
+          / (2 * (L.weierstrassP a - L.weierstrassP b)) := by
     rw [eq_div_iff (mul_ne_zero two_ne_zero hD)]
     linear_combination f1 + f2
   linear_combination hq

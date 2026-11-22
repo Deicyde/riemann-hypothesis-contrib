@@ -7,15 +7,17 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 
 namespace GlobalTheory.FibreLinInd
 
-theorem exists_det_ne_zero {K A : Type} [Field K] {r : ℕ} (v : A → Fin r → K)
-    (h : ∀ c : Fin r → K, (∀ a, ∑ i, c i * v a i = 0) → c = 0) :
-    ∃ a : Fin r → A, (Matrix.of fun k i => v (a k) i).det ≠ 0 := by
+theorem exists_det_ne_zero
+    {K A : Type} [Field K]
+    {r : ℕ} (v : A → Fin r → K) (h : ∀ c : Fin r → K, (∀ a, ∑ i, c i * v a i = 0) → c = 0)
+    : ∃ a : Fin r → A, (Matrix.of fun k i => v (a k) i).det ≠ 0 := by
   classical
   have hspan : Submodule.span K (Set.range v) = ⊤ := by
     by_contra hne
@@ -28,9 +30,12 @@ theorem exists_det_ne_zero {K A : Type} [Field K] {r : ℕ} (v : A → Fin r →
       congr 2
       ext j
       simp [Pi.single_apply, eq_comm]
-    have := h (fun i => φ (Pi.single i 1)) fun a => by
-      rw [← hφ']
-      exact hφ (Submodule.subset_span ⟨a, rfl⟩)
+    have :=
+      h
+        (fun i => φ (Pi.single i 1))
+        fun a => by
+          rw [← hφ']
+          exact hφ (Submodule.subset_span ⟨a, rfl⟩)
     refine LinearMap.ext fun w => ?_
     rw [hφ']
     simp [congrFun this]
@@ -43,21 +48,34 @@ theorem exists_det_ne_zero {K A : Type} [Field K] {r : ℕ} (v : A → Fin r →
     Matrix.linearIndependent_rows_iff_isUnit.1 h2
   exact ((Matrix.isUnit_iff_isUnit_det _).1 h3).ne_zero
 
-theorem exists_fibrePower {G Z : Scheme.{0}} (f : G ⟶ Z) [UniversallyOpen f]
-    [LocallyOfFiniteType f] (r : ℕ) :
-    ∃ (P : Scheme.{0}) (p : P ⟶ Z) (π : Fin r → (P ⟶ G)), UniversallyOpen p ∧
-      LocallyOfFiniteType p ∧ (∀ k, π k ≫ f = p) ∧
-      ∀ (T : Scheme.{0}) (x : T ⟶ Z) (g : Fin r → (T ⟶ G)), (∀ k, g k ≫ f = x) →
-        ∃ h : T ⟶ P, h ≫ p = x ∧ ∀ k, h ≫ π k = g k := by
+theorem exists_fibrePower
+    {G Z : Scheme.{0}} (f : G ⟶ Z) [UniversallyOpen f] [LocallyOfFiniteType f] (r : ℕ)
+    : ∃ (P : Scheme.{0}) (p : P ⟶ Z) (π : Fin r → (P ⟶ G)),
+      UniversallyOpen p ∧ LocallyOfFiniteType p ∧ (∀ k, π k ≫ f = p)
+        ∧ ∀ (T : Scheme.{0}) (x : T ⟶ Z) (g : Fin r → (T ⟶ G)),
+          (∀ k, g k ≫ f = x) → ∃ h : T ⟶ P, h ≫ p = x ∧ ∀ k, h ≫ π k = g k := by
   induction r with
   | zero =>
-    exact ⟨Z, 𝟙 Z, Fin.elim0, inferInstance, inferInstance, fun k => k.elim0,
-      fun T x g _ => ⟨x, by simp, fun k => k.elim0⟩⟩
+    exact ⟨
+      Z,
+      𝟙 Z,
+      Fin.elim0,
+      inferInstance,
+      inferInstance,
+      fun k => k.elim0,
+      fun T x g _ => ⟨x, by simp, fun k => k.elim0⟩
+    ⟩
   | succ r ih =>
     obtain ⟨P, p, π, h1, h2, h3, h4⟩ := ih
-    refine ⟨pullback f p, pullback.snd f p ≫ p,
-      Fin.cons (pullback.fst f p) (fun k => pullback.snd f p ≫ π k), inferInstance, inferInstance,
-      ?_, ?_⟩
+    refine ⟨
+      pullback f p,
+      pullback.snd f p ≫ p,
+      Fin.cons (pullback.fst f p) (fun k => pullback.snd f p ≫ π k),
+      inferInstance,
+      inferInstance,
+      ?_,
+      ?_
+    ⟩
     · refine Fin.cases ?_ fun k => ?_
       · simpa using pullback.condition
       · simp [h3]
@@ -68,13 +86,16 @@ theorem exists_fibrePower {G Z : Scheme.{0}} (f : G ⟶ Z) [UniversallyOpen f]
       · simp [pullback.lift_fst]
       · simp [pullback.lift_snd_assoc, hπ]
 
-theorem exists_lift {W Z : Scheme.{0}} (q : W ⟶ Z) [LocallyOfFiniteType q] {K : Type} [Field K]
-    [IsAlgClosed K] (x : Sp K ⟶ Z) (w : W) (t : Sp K) (hw : q w = x t) :
-    ∃ h : Sp K ⟶ W, h ≫ q = x := by
+theorem exists_lift
+    {W Z : Scheme.{0}} (q : W ⟶ Z) [LocallyOfFiniteType q]
+    {K : Type} [Field K] [IsAlgClosed K]
+    (x : Sp K ⟶ Z) (w : W) (t : Sp K) (hw : q w = x t)
+    : ∃ h : Sp K ⟶ W, h ≫ q = x := by
   obtain ⟨y, -, -⟩ := Scheme.Pullback.exists_preimage_pullback w t hw
   have : JacobsonSpace ↥(pullback q x) := LocallyOfFiniteType.jacobsonSpace (pullback.snd q x)
-  obtain ⟨y', -, hy'⟩ := nonempty_inter_closedPoints (Z := (Set.univ : Set ↥(pullback q x)))
-    ⟨y, trivial⟩ isOpen_univ.isLocallyClosed
+  obtain ⟨y', -, hy'⟩ :=
+    nonempty_inter_closedPoints (Z := (Set.univ : Set ↥(pullback q x))) ⟨y, trivial⟩
+      isOpen_univ.isLocallyClosed
   have hc : IsClosed {y'} := hy'
   refine ⟨pointOfClosedPoint (pullback.snd q x) y' hc ≫ pullback.fst q x, ?_⟩
   rw [Category.assoc, pullback.condition, pointOfClosedPoint_comp_assoc]
@@ -83,14 +104,16 @@ variable {K : Type} [Field K] {P G : Scheme.{0}}
 
 theorem top_le_iff (x : Sp K ⟶ P) (U : P.Opens) (z : Sp K) : ⊤ ≤ x ⁻¹ᵁ U ↔ x z ∈ U := by
   have : Subsingleton (Sp K) := inferInstanceAs (Subsingleton (PrimeSpectrum K))
-  exact ⟨fun h => h (show z ∈ (⊤ : (Sp K).Opens) from trivial),
-    fun h y _ => by rw [Subsingleton.elim y z]; exact h⟩
+  exact ⟨
+    fun h => h (show z ∈ (⊤ : (Sp K).Opens) from trivial),
+    fun h y _ => by rw [Subsingleton.elim y z]; exact h
+  ⟩
 
 def evalHom (h : Sp K ⟶ P) (U : P.Opens) (hU : ⊤ ≤ h ⁻¹ᵁ U) : Γ(P, U) →+* K :=
   (Scheme.ΓSpecIso (CommRingCat.of K)).hom.hom.comp (h.appLE U ⊤ hU).hom
 
-theorem mem_basicOpen_iff (h : Sp K ⟶ P) (U : P.Opens) (hU : ⊤ ≤ h ⁻¹ᵁ U) (D : Γ(P, U))
-    (t : Sp K) : h t ∈ P.basicOpen D ↔ evalHom h U hU D ≠ 0 := by
+theorem mem_basicOpen_iff (h : Sp K ⟶ P) (U : P.Opens) (hU : ⊤ ≤ h ⁻¹ᵁ U) (D : Γ(P, U)) (t : Sp K)
+    : h t ∈ P.basicOpen D ↔ evalHom h U hU D ≠ 0 := by
   have e : (Sp K).basicOpen (h.appLE U ⊤ hU D) = h ⁻¹ᵁ P.basicOpen D := by
     rw [Scheme.basicOpen_appLE, top_inf_eq]
   have hinj : Function.Bijective (Scheme.ΓSpecIso (CommRingCat.of K)).hom.hom :=
@@ -104,24 +127,28 @@ theorem mem_basicOpen_iff (h : Sp K ⟶ P) (U : P.Opens) (hU : ⊤ ≤ h ⁻¹�
     exact ht
   · intro h0
     have : IsUnit (h.appLE U ⊤ hU D) :=
-      (MulEquiv.isUnit_map
-        (Scheme.ΓSpecIso (CommRingCat.of K)).commRingCatIsoToRingEquiv).1 (IsUnit.mk0 _ h0)
+      (MulEquiv.isUnit_map (Scheme.ΓSpecIso (CommRingCat.of K)).commRingCatIsoToRingEquiv).1
+        (IsUnit.mk0 _ h0)
     rw [Scheme.basicOpen_of_isUnit _ this]
     trivial
 
-theorem evalHom_appLE (h : Sp K ⟶ P) (U : P.Opens) (hU : ⊤ ≤ h ⁻¹ᵁ U) (π : P ⟶ G) (V : G.Opens)
-    (hV : U ≤ π ⁻¹ᵁ V) (a : Γ(G, V)) :
-    evalHom h U hU (π.appLE V U hV a) = valF (h ≫ π) V a := by
+theorem evalHom_appLE
+    (h : Sp K ⟶ P) (U : P.Opens) (hU : ⊤ ≤ h ⁻¹ᵁ U)
+    (π : P ⟶ G) (V : G.Opens) (hV : U ≤ π ⁻¹ᵁ V) (a : Γ(G, V))
+    : evalHom h U hU (π.appLE V U hV a) = valF (h ≫ π) V a := by
   have hle : ⊤ ≤ (h ≫ π) ⁻¹ᵁ V := fun y hy => hV (hU hy)
   rw [valF, dite_eq_left hle, ← Scheme.Hom.appLE_comp_appLE h π V U ⊤ hV hU]
   rfl
 
-theorem isOpen_setOf_linearIndependent_on_fibres :
-    ∀ (G Z : Scheme.{0}) (f : G ⟶ Z) [Flat f] [LocallyOfFinitePresentation f] (L : LB G),
-      L.IsLB → ∀ (r : ℕ) (s : Fin r → LB.Sec L), IsOpen {z : Z | ∀ (K : Type) [Field K]
-        [IsAlgClosed K] (x : Sp K ⟶ Z), Set.range x = {z} → ∀ c : Fin r → K,
-          (∀ (g : Sp K ⟶ G) (j : L.ι), g ≫ f = x →
-            ∑ i, c i * valF g (L.U j) ((s i).f j) = 0) → c = 0} := by
+theorem isOpen_setOf_linearIndependent_on_fibres
+    : ∀ (G Z : Scheme.{0}) (f : G ⟶ Z) [Flat f] [LocallyOfFinitePresentation f] (L : LB G),
+      L.IsLB
+        → ∀ (r : ℕ) (s : Fin r → LB.Sec L),
+          IsOpen
+            {z : Z | ∀ (K : Type) [Field K]
+              [IsAlgClosed K] (x : Sp K ⟶ Z), Set.range x = {z} → ∀ c : Fin r → K,
+                (∀ (g : Sp K ⟶ G) (j : L.ι), g ≫ f = x →
+                  ∑ i, c i * valF g (L.U j) ((s i).f j) = 0) → c = 0} := by
   classical
   intro G Z f _ _ L _ r s
   obtain ⟨P, p, π, h1, h2, h3, h4⟩ := exists_fibrePower f r
@@ -141,16 +168,19 @@ theorem isOpen_setOf_linearIndependent_on_fibres :
       exact hxt t
     · rintro rfl
       exact ⟨t₀, hxt t₀⟩
-  obtain ⟨a, ha⟩ := exists_det_ne_zero
-    (fun (a : {g : Sp K ⟶ G // g ≫ f = x} × L.ι) i => valF a.1.1 (L.U a.2) ((s i).f a.2))
-    fun c hc => hz K x hx c fun g j hg => hc (⟨g, hg⟩, j)
+  obtain ⟨a, ha⟩ :=
+    exists_det_ne_zero
+      (fun (a : {g : Sp K ⟶ G // g ≫ f = x} × L.ι) i => valF a.1.1 (L.U a.2) ((s i).f a.2))
+      fun c hc => hz K x hx c fun g j hg => hc (⟨g, hg⟩, j)
   let j : Fin r → L.ι := fun k => (a k).2
   let U : P.Opens := LB.wchart L π j
   have hU : ∀ k, U ≤ π k ⁻¹ᵁ L.U (j k) := LB.wchart_le L π j
   let M : Matrix (Fin r) (Fin r) Γ(P, U) :=
     Matrix.of fun k i => (π k).appLE (L.U (j k)) U (hU k) ((s i).f (j k))
-  have hM : ∀ {K : Type} [Field K] (h : Sp K ⟶ P) (hh : ⊤ ≤ h ⁻¹ᵁ U), evalHom h U hh M.det =
-      (Matrix.of fun k i => valF (h ≫ π k) (L.U (j k)) ((s i).f (j k))).det := by
+  have hM
+      : ∀ {K : Type} [Field K] (h : Sp K ⟶ P) (hh : ⊤ ≤ h ⁻¹ᵁ U),
+        evalHom h U hh M.det
+          = (Matrix.of fun k i => valF (h ≫ π k) (L.U (j k)) ((s i).f (j k))).det := by
     intro K _ h hh
     rw [RingHom.map_det]
     congr 1

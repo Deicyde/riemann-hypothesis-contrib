@@ -8,28 +8,31 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-private theorem UpperTheory.V.KT.fe_lift {X : Type} (s : Set X) (c : X →₀ ℤ)
-    (hc : c ∈ Finsupp.supported ℤ ℤ s) :
-    ∃ f : {t // t ∈ s} →₀ ℤ, Finsupp.mapDomain Subtype.val f = c := by
+private theorem UpperTheory.V.KT.fe_lift
+    {X : Type} (s : Set X) (c : X →₀ ℤ) (hc : c ∈ Finsupp.supported ℤ ℤ s)
+    : ∃ f : {t // t ∈ s} →₀ ℤ, Finsupp.mapDomain Subtype.val f = c := by
   have h := Finsupp.lmapDomain_supported ℤ ℤ (Subtype.val : {t // t ∈ s} → X) Set.univ
   rw [Set.image_univ, Subtype.range_coe_subtype, Set.setOf_mem_eq] at h
   rw [← h] at hc
   obtain ⟨f, -, hf⟩ := hc
   exact ⟨f, hf⟩
 
-private theorem UpperTheory.V.KT.fe_mem {X : Type} (s : Set X) (f : {t // t ∈ s} →₀ ℤ) :
-    Finsupp.mapDomain Subtype.val f ∈ Finsupp.supported ℤ ℤ s := by
+private theorem UpperTheory.V.KT.fe_mem {X : Type} (s : Set X) (f : {t // t ∈ s} →₀ ℤ)
+    : Finsupp.mapDomain Subtype.val f ∈ Finsupp.supported ℤ ℤ s := by
   have h := Finsupp.lmapDomain_supported (M := ℤ) (R := ℤ) (Subtype.val : {t // t ∈ s} → X) Set.univ
   rw [Set.image_univ, Subtype.range_coe] at h
   rw [← h]
   exact Submodule.mem_map_of_mem (by simp [Finsupp.supported_univ])
 
-private theorem UpperTheory.V.KT.fe_comm {I : Type} (S : ∀ n, Set (Fin n → I)) (hS : ConeExtensionAcyclic.FaceClosed S)
-    (p : ℕ) (f : {t : Fin (p + 1) → I // t ∈ S (p + 1)} →₀ ℤ) :
-    Finsupp.mapDomain Subtype.val
-      (KH.faceD (fun (i : Fin (p + 1)) (t : {t : Fin (p + 1) → I // t ∈ S (p + 1)}) =>
-        (⟨t.1 ∘ i.succAbove, hS _ t.1 t.2 i⟩ : {t : Fin p → I // t ∈ S p})) f) =
-      ConeExtensionAcyclic.bd I p (Finsupp.mapDomain Subtype.val f) := by
+private theorem UpperTheory.V.KT.fe_comm
+    {I : Type} (S : ∀ n, Set (Fin n → I)) (hS : ConeExtensionAcyclic.FaceClosed S)
+    (p : ℕ) (f : {t : Fin (p + 1) → I // t ∈ S (p + 1)} →₀ ℤ)
+    : Finsupp.mapDomain Subtype.val
+        (KH.faceD
+          (fun (i : Fin (p + 1)) (t : {t : Fin (p + 1) → I // t ∈ S (p + 1)}) =>
+            (⟨t.1 ∘ i.succAbove, hS _ t.1 t.2 i⟩ : {t : Fin p → I // t ∈ S p}))
+          f)
+      = ConeExtensionAcyclic.bd I p (Finsupp.mapDomain Subtype.val f) := by
   induction f using Finsupp.induction_linear with
   | zero => simp
   | add f g hf hg =>
@@ -44,9 +47,9 @@ private theorem UpperTheory.V.KT.fe_comm {I : Type} (S : ∀ n, Set (Fin n → I
     simp only [Finsupp.smul_single, smul_eq_mul, mul_one]
     rw [mul_comm]
 
-private theorem UpperTheory.V.KT.fe_aug {I : Type} (s : Set (Fin 1 → I)) (f : {t // t ∈ s} →₀ ℤ) :
-    ConeExtensionAcyclic.bd I 0 (Finsupp.mapDomain Subtype.val f) =
-      Finsupp.single (Fin.elim0 : Fin 0 → I) (KH.aug _ f) := by
+private theorem UpperTheory.V.KT.fe_aug {I : Type} (s : Set (Fin 1 → I)) (f : {t // t ∈ s} →₀ ℤ)
+    : ConeExtensionAcyclic.bd I 0 (Finsupp.mapDomain Subtype.val f)
+      = Finsupp.single (Fin.elim0 : Fin 0 → I) (KH.aug _ f) := by
   induction f using Finsupp.induction_linear with
   | zero => simp
   | add f g hf hg =>
@@ -60,14 +63,21 @@ private theorem UpperTheory.V.KT.fe_aug {I : Type} (s : Set (Fin 1 → I)) (f : 
     funext k
     exact Fin.elim0 k
 
-theorem UpperTheory.V.KT.faceexact :
-    ∀ (I : Type) (S : ∀ n, Set (Fin n → I)) (hS : ConeExtensionAcyclic.FaceClosed S), S 0 = Set.univ → ConeExtensionAcyclic.Acyc S → ∀ m : ℕ,
-    KH.FaceExactTo (fun p => {t : Fin (p + 1) → I // t ∈ S (p + 1)})
-      (fun p i t => ⟨t.1 ∘ i.succAbove, hS _ t.1 t.2 i⟩) m := by
+theorem UpperTheory.V.KT.faceexact
+    : ∀ (I : Type) (S : ∀ n, Set (Fin n → I)) (hS : ConeExtensionAcyclic.FaceClosed S),
+      S 0 = Set.univ → ConeExtensionAcyclic.Acyc S
+        → ∀ m : ℕ,
+          KH.FaceExactTo
+            (fun p => {t : Fin (p + 1) → I // t ∈ S (p + 1)})
+            (fun p i t => ⟨t.1 ∘ i.succAbove, hS _ t.1 t.2 i⟩)
+            m := by
   intro I S hS hS0 hA m
   obtain ⟨hA0, hAn⟩ := hA
-  have inj : ∀ n, Function.Injective (Finsupp.mapDomain (M := ℤ) (Subtype.val : {t : Fin n → I // t ∈ S n} → (Fin n → I))) :=
-    fun n => Finsupp.mapDomain_injective Subtype.val_injective
+  have inj
+      : ∀ n,
+        Function.Injective (Finsupp.mapDomain (M := ℤ)
+          (Subtype.val : {t : Fin n → I // t ∈ S n} → (Fin n → I))) := fun n =>
+    Finsupp.mapDomain_injective Subtype.val_injective
   refine ⟨?_, ?_, ?_⟩
   · have hc : Finsupp.single (Fin.elim0 : Fin 0 → I) (1 : ℤ) ∈ Finsupp.supported ℤ ℤ (S 0) := by
       rw [hS0, Finsupp.supported_univ]
@@ -89,8 +99,12 @@ theorem UpperTheory.V.KT.faceexact :
       refine ⟨g, inj 1 ?_⟩
       rw [fe_comm S hS 1 g, hbc]
     · rintro ⟨g, rfl⟩
-      have h := fe_aug (S 1) (KH.faceD (fun (i : Fin 2) (t : {t : Fin 2 → I // t ∈ S 2}) =>
-        (⟨t.1 ∘ i.succAbove, hS _ t.1 t.2 i⟩ : {t : Fin 1 → I // t ∈ S 1})) g)
+      have h :=
+        fe_aug (S 1)
+          (KH.faceD
+            (fun (i : Fin 2) (t : {t : Fin 2 → I // t ∈ S 2}) =>
+              (⟨t.1 ∘ i.succAbove, hS _ t.1 t.2 i⟩ : {t : Fin 1 → I // t ∈ S 1}))
+            g)
       rw [fe_comm S hS 1 g, ConeExtensionAcyclic.bd_bd] at h
       exact Finsupp.single_eq_zero.mp h.symm
   · intro p _ y
@@ -105,4 +119,5 @@ theorem UpperTheory.V.KT.faceexact :
       rw [fe_comm S hS (p + 2) g, hbc]
     · rintro ⟨g, rfl⟩
       apply inj (p + 1)
-      rw [fe_comm S hS (p + 1), fe_comm S hS (p + 2) g, ConeExtensionAcyclic.bd_bd, Finsupp.mapDomain_zero]
+      rw [fe_comm S hS (p + 1), fe_comm S hS (p + 2) g, ConeExtensionAcyclic.bd_bd,
+        Finsupp.mapDomain_zero]

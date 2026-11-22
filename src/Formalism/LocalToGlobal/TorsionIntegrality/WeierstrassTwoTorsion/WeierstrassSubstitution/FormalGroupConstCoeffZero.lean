@@ -28,37 +28,38 @@ private theorem fgl_constantCoeff (W : WeierstrassCurve A) : cc (fgl W) = 0 := b
   obtain ⟨_, _, _, _, h, _, _⟩ := fglChord A W
   exact h
 
-theorem pair_vector_map (φ : A →+* B) (a b : MvPowerSeries σ A) :
-    (fun i => MvPowerSeries.map φ ((![a, b] : Fin 2 → MvPowerSeries σ A) i))
+theorem pair_vector_map (φ : A →+* B) (a b : MvPowerSeries σ A)
+    : (fun i => MvPowerSeries.map φ ((![a, b] : Fin 2 → MvPowerSeries σ A) i))
       = ![MvPowerSeries.map φ a, MvPowerSeries.map φ b] := by
   funext i; fin_cases i <;> rfl
 
-theorem hasSubst2 {a b : MvPowerSeries σ A} (ha : cc a = 0) (hb : cc b = 0) :
-    MvPowerSeries.HasSubst (![a, b] : Fin 2 → MvPowerSeries σ A) :=
+theorem hasSubst2 {a b : MvPowerSeries σ A} (ha : cc a = 0) (hb : cc b = 0)
+    : MvPowerSeries.HasSubst (![a, b] : Fin 2 → MvPowerSeries σ A) :=
   MvPowerSeries.hasSubst_of_constantCoeff_zero (Fin.forall_fin_two.2 ⟨ha, hb⟩)
 
-theorem map_formal_group_subst (φ : A →+* B) (W : WeierstrassCurve A) {a b : MvPowerSeries σ A}
-    (ha : cc a = 0) (hb : cc b = 0) :
-    MvPowerSeries.map φ (MvPowerSeries.subst (![a, b] : Fin 2 → MvPowerSeries σ A) (fgl W))
+theorem map_formal_group_subst
+    (φ : A →+* B) (W : WeierstrassCurve A) {a b : MvPowerSeries σ A} (ha : cc a = 0) (hb : cc b = 0)
+    : MvPowerSeries.map φ (MvPowerSeries.subst (![a, b] : Fin 2 → MvPowerSeries σ A) (fgl W))
       = MvPowerSeries.subst
-          (![MvPowerSeries.map φ a, MvPowerSeries.map φ b] : Fin 2 → MvPowerSeries σ B)
-          (fgl (W.map φ)) := by
+        (![MvPowerSeries.map φ a, MvPowerSeries.map φ b] : Fin 2 → MvPowerSeries σ B)
+        (fgl (W.map φ)) := by
   rw [MvPowerSeries.map_subst (hasSubst2 ha hb), pair_vector_map, Fgl1.fgl_map]
 
-theorem formal_group_constCoeff_zero (W : WeierstrassCurve A) {a b : MvPowerSeries σ A} (ha : cc a = 0) (hb : cc b = 0) :
-    cc (MvPowerSeries.subst (![a, b] : Fin 2 → MvPowerSeries σ A) (fgl W)) = 0 :=
+theorem formal_group_constCoeff_zero
+    (W : WeierstrassCurve A) {a b : MvPowerSeries σ A} (ha : cc a = 0) (hb : cc b = 0)
+    : cc (MvPowerSeries.subst (![a, b] : Fin 2 → MvPowerSeries σ A) (fgl W)) = 0 :=
   MvPowerSeries.constantCoeff_subst_eq_zero (hasSubst2 ha hb) (Fin.forall_fin_two.2 ⟨ha, hb⟩)
     (fgl_constantCoeff W)
 
-theorem iSer_cc (W : WeierstrassCurve A) : constantCoeff (iSer W) = 0 := by
-  simp [iSer]
+theorem iSer_cc (W : WeierstrassCurve A) : constantCoeff (iSer W) = 0 := by simp [iSer]
 
-theorem iSer_subst_cc (W : WeierstrassCurve A) {a : MvPowerSeries σ A} (ha : cc a = 0) :
-    cc ((iSer W).subst a) = 0 :=
+theorem iSer_subst_cc (W : WeierstrassCurve A) {a : MvPowerSeries σ A} (ha : cc a = 0)
+    : cc ((iSer W).subst a) = 0 :=
   PowerSeries.constantCoeff_subst_eq_zero ha _ (iSer_cc W)
 
-theorem inv_wU_subst {K : Type u} [Field K] (W : WeierstrassCurve K) {a : MvPowerSeries σ K}
-    (ha : cc a = 0) : ((Formalism.ELL.wU (wSer W)).subst a)⁻¹ = (xS W).subst a := by
+theorem inv_wU_subst
+    {K : Type u} [Field K] (W : WeierstrassCurve K) {a : MvPowerSeries σ K} (ha : cc a = 0)
+    : ((Formalism.ELL.wU (wSer W)).subst a)⁻¹ = (xS W).subst a := by
   have hs : HasSubst a := HasSubst.of_constantCoeff_zero ha
   have h1 : (xS W).subst a * (wU W).subst a = 1 := by
     rw [← subst_mul hs, mul_comm, wU_mul_xS, ← coe_substAlgHom hs, map_one]
@@ -69,13 +70,13 @@ theorem inv_wU_subst {K : Type u} [Field K] (W : WeierstrassCurve K) {a : MvPowe
     exact zero_ne_one this
   exact (MvPowerSeries.inv_eq_iff_mul_eq_one h0).2 h1
 
-theorem yS_subst (W : WeierstrassCurve A) {a : MvPowerSeries σ A} (ha : cc a = 0) :
-    (yS W).subst a = -(xS W).subst a := by
+theorem yS_subst (W : WeierstrassCurve A) {a : MvPowerSeries σ A} (ha : cc a = 0)
+    : (yS W).subst a = - (xS W).subst a := by
   have hs : HasSubst a := HasSubst.of_constantCoeff_zero ha
   rw [yS, ← coe_substAlgHom hs, map_neg]
 
-theorem invSer_eq {K : Type u} [Field K] (W : WeierstrassCurve K) :
-    Formalism.ELL.invSer W (wSer W) = iSer W := by
+theorem invSer_eq {K : Type u} [Field K] (W : WeierstrassCurve K)
+    : Formalism.ELL.invSer W (wSer W) = iSer W := by
   unfold Formalism.ELL.invSer iSer
   rw [PowerSeries.invOfUnit_eq' (iDen W) (-1) (by rw [iDen_cc, Units.val_neg, Units.val_one])]
   rfl
@@ -86,7 +87,8 @@ theorem mem_range {x : K₀} (hx : x ∈ Formalism.ELL.coeffRing WK) : ∃ z : Z
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
     rcases hx with rfl | rfl | rfl | rfl | rfl
     exacts [⟨W₀.a₁, rfl⟩, ⟨W₀.a₂, rfl⟩, ⟨W₀.a₃, rfl⟩, ⟨W₀.a₄, rfl⟩, ⟨W₀.a₆, rfl⟩]
-  | algebraMap r => exact ⟨(r : Z), by simp⟩
+  | algebraMap r =>
+    exact ⟨(r : Z), by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, rfl⟩ := hx
     obtain ⟨b, rfl⟩ := hy
@@ -96,8 +98,9 @@ theorem mem_range {x : K₀} (hx : x ∈ Formalism.ELL.coeffRing WK) : ∃ z : Z
     obtain ⟨b, rfl⟩ := hy
     exact ⟨a * b, map_mul _ _ _⟩
 
-theorem lift (c : MvPowerSeries σ K₀) (h : ∀ d, MvPowerSeries.coeff d c ∈ Formalism.ELL.coeffRing WK) :
-    ∃ c₀ : MvPowerSeries σ Z, MvPowerSeries.map ι c₀ = c := by
+theorem lift
+    (c : MvPowerSeries σ K₀) (h : ∀ d, MvPowerSeries.coeff d c ∈ Formalism.ELL.coeffRing WK)
+    : ∃ c₀ : MvPowerSeries σ Z, MvPowerSeries.map ι c₀ = c := by
   choose f hf using fun d => mem_range (h d)
   refine ⟨f, ?_⟩
   ext d
@@ -130,16 +133,18 @@ theorem map_quadratic_lhs (φ : A →+* B) : MvPowerSeries.map φ (lhs2 W) = lhs
 theorem map_diff2 (φ : A →+* B) : MvPowerSeries.map φ (diff2 W) = diff2 (W.map φ) := by
   unfold diff2
   rw [map_formal_group_subst φ W (MvPowerSeries.constantCoeff_X 0)
-    (iSer_subst_cc W (MvPowerSeries.constantCoeff_X 1)), PowerSeries.map_subst (HasSubst.X 1),
-    map_iSer, MvPowerSeries.map_X, MvPowerSeries.map_X]
+      (iSer_subst_cc W (MvPowerSeries.constantCoeff_X 1)),
+    PowerSeries.map_subst (HasSubst.X 1), map_iSer, MvPowerSeries.map_X, MvPowerSeries.map_X]
 
 theorem two_univ : ∃ c : MvPowerSeries (Fin 2) Z, cc c = -1 ∧ lhs2 W₀ = c * fgl W₀ * diff2 W₀ := by
-  obtain ⟨c, hc, hc0, h⟩ := Formalism.ELL.cubeTwo K₀ WK (wSer WK) (fgl WK) (wSer_fixed WK)
-    (fgl_constantCoeff WK) (fglSum K₀ WK)
+  obtain ⟨c, hc, hc0, h⟩ :=
+    Formalism.ELL.cubeTwo K₀ WK (wSer WK) (fgl WK) (wSer_fixed WK) (fgl_constantCoeff WK)
+      (fglSum K₀ WK)
   obtain ⟨c₀, rfl⟩ := lift c hc
   refine ⟨c₀, lift_cc hc0, mv_map_injective ι ι_injective ?_⟩
   rw [inv_wU_subst WK (MvPowerSeries.constantCoeff_X 0),
-    inv_wU_subst WK (MvPowerSeries.constantCoeff_X 1), invSer_eq] at h
+      inv_wU_subst WK (MvPowerSeries.constantCoeff_X 1), invSer_eq]
+    at h
   rw [map_mul, map_mul, map_quadratic_lhs, map_diff2, Fgl1.fgl_map]
   exact h
 
@@ -158,8 +163,9 @@ def lhs3 : MvPowerSeries (Fin 3) A :=
 def sum3 : MvPowerSeries (Fin 3) A :=
   MvPowerSeries.subst
     (![MvPowerSeries.subst (![MvPowerSeries.X 0, MvPowerSeries.X 1] :
-        Fin 2 → MvPowerSeries (Fin 3) A) (fgl W), MvPowerSeries.X 2] :
-      Fin 2 → MvPowerSeries (Fin 3) A) (fgl W)
+        Fin 2 → MvPowerSeries (Fin 3) A) (fgl W), MvPowerSeries.X 2]
+      : Fin 2 → MvPowerSeries (Fin 3) A)
+    (fgl W)
 
 theorem map_cubic_lhs (φ : A →+* B) : MvPowerSeries.map φ (lhs3 W) = lhs3 (W.map φ) := by
   unfold lhs3
@@ -173,16 +179,23 @@ theorem map_cubic_lhs (φ : A →+* B) : MvPowerSeries.map φ (lhs3 W) = lhs3 (W
 
 theorem map_cubic_sum (φ : A →+* B) : MvPowerSeries.map φ (sum3 W) = sum3 (W.map φ) := by
   unfold sum3
-  rw [map_formal_group_subst φ W (formal_group_constCoeff_zero W (MvPowerSeries.constantCoeff_X 0) (MvPowerSeries.constantCoeff_X 1))
-    (MvPowerSeries.constantCoeff_X 2),
+  rw [map_formal_group_subst φ W
+      (formal_group_constCoeff_zero W (MvPowerSeries.constantCoeff_X 0)
+        (MvPowerSeries.constantCoeff_X 1))
+      (MvPowerSeries.constantCoeff_X 2),
     map_formal_group_subst φ W (MvPowerSeries.constantCoeff_X 0) (MvPowerSeries.constantCoeff_X 1),
     MvPowerSeries.map_X, MvPowerSeries.map_X, MvPowerSeries.map_X]
 
-theorem three_univ : ∃ e : MvPowerSeries (Fin 3) Z, cc e = -1 ∧
-    lhs3 W₀ = e * sum3 W₀ * (MvPowerSeries.X 0 - MvPowerSeries.X 1)
-      * (MvPowerSeries.X 0 - MvPowerSeries.X 2) * (MvPowerSeries.X 1 - MvPowerSeries.X 2) := by
-  obtain ⟨e, he, he0, h⟩ := Formalism.ELL.cubeThree K₀ WK (wSer WK) (fgl WK) (wSer_fixed WK)
-    (fgl_constantCoeff WK) (fglSum K₀ WK)
+theorem three_univ
+    : ∃ e : MvPowerSeries (Fin 3) Z,
+      cc e = -1
+        ∧ lhs3 W₀
+          = e * sum3 W₀ * (MvPowerSeries.X 0 - MvPowerSeries.X 1)
+            * (MvPowerSeries.X 0 - MvPowerSeries.X 2)
+            * (MvPowerSeries.X 1 - MvPowerSeries.X 2) := by
+  obtain ⟨e, he, he0, h⟩ :=
+    Formalism.ELL.cubeThree K₀ WK (wSer WK) (fgl WK) (wSer_fixed WK) (fgl_constantCoeff WK)
+      (fglSum K₀ WK)
   obtain ⟨e₀, rfl⟩ := lift e he
   refine ⟨e₀, lift_cc he0, mv_map_injective ι ι_injective ?_⟩
   simp only [inv_wU_subst WK (MvPowerSeries.constantCoeff_X _)] at h
@@ -225,7 +238,8 @@ theorem coeffMem_of (hZ : ZSerMap.{u, u}) (hH : HalfLog.{u, u}) : CoeffMem.{u} :
     exact (coeff n f).2
   obtain ⟨m1, -, m3, m4, m5, -, m7, m8⟩ := seriesMap S R S.subtype WS
   rw [hW] at m1 m3 m4 m5 m7 m8
-  refine ⟨key _ _ m1, key _ _ m3, key _ _ m4, key _ _ m5, key _ _ m7, key _ _ m8, ?_, ?_, ?_, ?_, ?_⟩
+  refine
+    ⟨key _ _ m1, key _ _ m3, key _ _ m4, key _ _ m5, key _ _ m7, key _ _ m8, ?_, ?_, ?_, ?_, ?_⟩
   · intro d
     have := fglMap S R S.subtype WS
     rw [hW] at this

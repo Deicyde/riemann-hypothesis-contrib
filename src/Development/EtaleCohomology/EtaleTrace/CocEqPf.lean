@@ -9,11 +9,16 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CochainComplex.Hom
 
 namespace LateralTheory.EtaleTrace
 
-theorem free_ext (R : Type) [CommRing R] (P : PSh) {G : Shv R} (f g : (free R).obj P ⟶ G)
+theorem free_ext
+    (R : Type) [CommRing R]
+    (P : PSh)
+    {G : Shv R} (f g : (free R).obj P ⟶ G)
     (h : ∀ (U : Scheme.{0}) (x : P.obj (op U)),
-      (f.hom.app (op U)).hom (freeGen R P U x) = (g.hom.app (op U)).hom (freeGen R P U x)) : f = g := by
+      (f.hom.app (op U)).hom (freeGen R P U x) = (g.hom.app (op U)).hom (freeGen R P U x))
+    : f = g := by
   apply Sheaf.hom_ext
-  refine sheafify_hom_ext (J := Scheme.etaleTopology) (P := (freeP R).obj P) f.hom g.hom G.property ?_
+  refine sheafify_hom_ext (J := Scheme.etaleTopology) (P := (freeP R).obj P) f.hom g.hom G.property
+    ?_
   ext U : 2
   apply ModuleCat.free_hom_ext
   rintro ⟨x⟩
@@ -31,8 +36,9 @@ theorem cocEq : CocEq := by
   rcases lt_trichotomy q 0 with hq | rfl | hq
   · have : (res R F).IsStrictlyGE 0 := by unfold res; infer_instance
     exact (CochainComplex.isZero_of_isStrictlyGE (res R F) 0 q hq).eq_of_tgt _ _
-  · have key : (chainsXIso R (sch.obj X) 0).inv ≫ α.1.v _ _ (show -((0:ℕ):ℤ) + 0 = 0 by simp) =
-        (chainsXIso R (sch.obj X) 0).inv ≫ β.1.v _ _ (show -((0:ℕ):ℤ) + 0 = 0 by simp) := by
+  · have key
+        : (chainsXIso R (sch.obj X) 0).inv ≫ α.1.v _ _ (show -((0 : ℕ) : ℤ) + 0 = 0 by simp)
+          = (chainsXIso R (sch.obj X) 0).inv ≫ β.1.v _ _ (show -((0 : ℕ) : ℤ) + 0 = 0 by simp) := by
       apply free_ext
       intro U x
       exact h U x
@@ -41,7 +47,7 @@ theorem cocEq : CocEq := by
   · apply IsZero.eq_of_src
     apply HomologicalComplex.isZero_extend_X
     intro i hi
-    change -(i:ℤ) = q at hi
+    change -(i : ℤ) = q at hi
     omega
 
 theorem CocEq_of : CocEq := cocEq

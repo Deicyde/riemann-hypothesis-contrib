@@ -19,17 +19,19 @@ def abLocus (G : Over S) : Set S :=
   {s | ∀ (K : Type) [Field K] [IsAlgClosed K] (t : Sp K ⟶ S), s ∈ Set.range t → IsProper (pullback.snd G.hom t)}
 
 structure OAct (O : Type) [CommRing O] (G : Over S) [GrpObj G] where
-
   act : O → (G ⟶ G)
   hom : ∀ a, IsMonHom (act a)
   one : act 1 = 𝟙 G
   mul : ∀ a b, act (a * b) = act a ≫ act b
   add : ∀ a b, act (a + b) = act a * act b
 
-def IsGrpPullback {S' : Scheme.{0}} (G' : Over S') [GrpObj G'] (G : Over S) [GrpObj G] (f : S' ⟶ S)
-    (φ : G'.left ⟶ G.left) : Prop :=
-  IsPullback φ G'.hom G.hom f ∧
-    ∀ (T : Over S') (x y : T ⟶ G') (x₀ y₀ : Over.mk (T.hom ≫ f) ⟶ G),
+def IsGrpPullback
+    {S' : Scheme.{0}} (G' : Over S') [GrpObj G']
+    (G : Over S) [GrpObj G]
+    (f : S' ⟶ S) (φ : G'.left ⟶ G.left)
+    : Prop :=
+  IsPullback φ G'.hom G.hom f
+    ∧ ∀ (T : Over S') (x y : T ⟶ G') (x₀ y₀ : Over.mk (T.hom ≫ f) ⟶ G),
       x₀.left = x.left ≫ φ → y₀.left = y.left ≫ φ → (x₀ * y₀).left = (x * y).left ≫ φ
 
 abbrev resG (X : Scheme.{0}) {U V : X.Opens} (h : V ≤ U) : Γ(X, U) →+* Γ(X, V) :=

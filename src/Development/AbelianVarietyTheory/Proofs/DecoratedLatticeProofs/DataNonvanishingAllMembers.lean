@@ -33,24 +33,28 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Ran
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Fc GlobalTheory.MiS GlobalTheory.Fam
+open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.EX.OB
+  GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Fc GlobalTheory.MiS GlobalTheory.Fam
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.Fam.MemberData
 
-
 open Formalism.MainNotions.S in
-theorem dataNW_of_val {C : Formalism.MainNotions.Inhab.FC} {cD ch : ℝ} (hC : Std C) {D : D7} (L : SizeData₂ D)
-    (hV : Val C cD ch L) (hS : SizesAt L) (hR : ∀ u, GlobalTheory.Core.Rk.RankMu D u) : GlobalTheory.Core.Deg.DataNW D := by
+theorem dataNW_of_val
+    {C : Formalism.MainNotions.Inhab.FC} {cD ch : ℝ} (hC : Std C)
+    {D : D7} (L : SizeData₂ D) (hV : Val C cD ch L) (hS : SizesAt L)
+    (hR : ∀ u, GlobalTheory.Core.Rk.RankMu D u)
+    : GlobalTheory.Core.Deg.DataNW D := by
   have hk := D.R.m_add_three_le_k
   have hm := D.R.two_le_m
   have hk0 : 0 < D.R.k := by omega
   have hSc := Sc_eq' L
   have e1 : ∀ u τ, uOne D u τ 1 = (((D.hc τ).u ⟨0, hk0⟩ : ℚ) : ℝ) := fun u τ => by
     rw [show (1 : ℕ) = 0 + 1 from rfl, uOne_succ u τ 0 hk0, D.hcW_first u τ hk0]
-  have e2 : ∀ τ, vOne D τ 1 = (((D.hc τ).v ⟨0, by omega⟩ : ℚ) : ℝ) := fun τ => vOne_succ τ 0 (by omega)
+  have e2 : ∀ τ, vOne D τ 1 = (((D.hc τ).v ⟨0, by omega⟩ : ℚ) : ℝ) := fun τ =>
+    vOne_succ τ 0 (by omega)
   have hCc : L.Cc = 2 := hV.Cc_eq.trans hC.2.1
   have hdu : ∀ u, 0 < D.duS u := fun u => by
     have h := hR u
@@ -61,11 +65,23 @@ theorem dataNW_of_val {C : Formalism.MainNotions.Inhab.FC} {cD ch : ℝ} (hC : S
     have hTk : 0 < ((D.mem u).A.T : ℝ) ^ D.R.k - 1 := sub_pos.2 (one_lt_pow₀ hT (by omega))
     have h0 : (0 : ℝ) < D.duS u := by rw [h]; positivity
     exact_mod_cast h0
-  refine ⟨data1 L, data2, ?_, ?_, ?_, ?_, data7, data8,
-    fun u => ⟨GlobalTheory.CollCompare.splits_level D u, T_mod D u⟩, hdu,
-    Formalism.L2.SG.ResidEvFree.splitsE_g D 0, Formalism.L2.SG.ResidEvFree.splitsE_g D 1,
-    discriminant_eq_base_sq D (Formalism.MainNotions.UnusedSlot33.ramification_two_and_conjugation_at_q_and_d D),
-    fun u => ne_of_mod (D.host.g_prime 0).two_le (D.host.g_prime 1).two_le (T_mod D u)⟩
+  refine ⟨
+    data1 L,
+    data2,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    data7,
+    data8,
+    fun u => ⟨GlobalTheory.CollCompare.splits_level D u, T_mod D u⟩,
+    hdu,
+    Formalism.L2.SG.ResidEvFree.splitsE_g D 0,
+    Formalism.L2.SG.ResidEvFree.splitsE_g D 1,
+    discriminant_eq_base_sq D
+      (Formalism.MainNotions.UnusedSlot33.ramification_two_and_conjugation_at_q_and_d D),
+    fun u => ne_of_mod (D.host.g_prime 0).two_le (D.host.g_prime 1).two_le (T_mod D u)
+  ⟩
   · intro u τ
     rw [e1, e2, ← hSc]
     by_cases ht : Formalism.MainNotions.S.IsTop D τ
@@ -121,8 +137,10 @@ theorem dataNW_of_val {C : Formalism.MainNotions.Inhab.FC} {cD ch : ℝ} (hC : S
     rw [eb, et]
     constructor <;> linarith
 
-theorem val_congr {C C' : Formalism.MainNotions.Inhab.FC} {cD cD' ch ch' : ℝ} {D : D7} {L : SizeData₂ D} (h1 : C = C') (h2 : cD = cD')
-    (h3 : ch = ch') (h : Val C cD ch L) : Val C' cD' ch' L := by
+theorem val_congr
+    {C C' : Formalism.MainNotions.Inhab.FC} {cD cD' ch ch' : ℝ} {D : D7} {L : SizeData₂ D}
+    (h1 : C = C') (h2 : cD = cD') (h3 : ch = ch') (h : Val C cD ch L)
+    : Val C' cD' ch' L := by
   subst h1 h2 h3
   exact h
 

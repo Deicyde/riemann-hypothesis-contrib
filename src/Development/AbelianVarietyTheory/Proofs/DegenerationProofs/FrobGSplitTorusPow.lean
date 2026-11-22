@@ -12,42 +12,47 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Exi
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory.SS
 
-theorem appTop_pow_mul {S : Scheme.{0}} {G : Over S} (F : End G) (q m : ℕ) (f : Γ(G.left, ⊤))
-    (h : (F ^ m).asHom.left.appTop.hom f = f ^ (q ^ m)) (j : ℕ) :
-    (F ^ (m * j)).asHom.left.appTop.hom f = f ^ (q ^ (m * j)) := by
+theorem appTop_pow_mul
+    {S : Scheme.{0}} {G : Over S} (F : End G)
+    (q m : ℕ) (f : Γ(G.left, ⊤)) (h : (F ^ m).asHom.left.appTop.hom f = f ^ (q ^ m))
+    (j : ℕ)
+    : (F ^ (m * j)).asHom.left.appTop.hom f = f ^ (q ^ (m * j)) := by
   induction j with
   | zero =>
     simp only [Nat.mul_zero, pow_zero, pow_one]
     change (Scheme.Hom.appTop (𝟙 G.left)).hom f = f
     simp
   | succ j ih =>
-    have e : (F ^ (m * (j + 1))).asHom.left =
-        (F ^ m).asHom.left ≫ (F ^ (m * j)).asHom.left := by
+    have e : (F ^ (m * (j + 1))).asHom.left = (F ^ m).asHom.left ≫ (F ^ (m * j)).asHom.left := by
       rw [Nat.mul_succ, pow_add]; rfl
     rw [e, Scheme.Hom.comp_appTop, CommRingCat.hom_comp, RingHom.comp_apply, ih, map_pow, h,
       ← pow_mul, ← pow_add, Nat.mul_succ, add_comm]
 
-theorem isAffine_splitTorus (k : Type) [Field k] (X : Type) [AddCommGroup X] :
-    IsAffine (splitTorus (Sp k) X).left := by
+theorem isAffine_splitTorus (k : Type) [Field k] (X : Type) [AddCommGroup X]
+    : IsAffine (splitTorus (Sp k) X).left := by
   have : IsAffine (splitTorusAff ZU X).left := inferInstanceAs (IsAffine (Spec _))
   have : IsAffine (Spec ZU.{0}) := inferInstance
   exact inferInstanceAs (IsAffine (pullback (splitTorusAff ZU X).hom (toZ (Sp k))))
 
-theorem frobG_splitTorus_pow :
-    ∀ (k : Type) [Field k] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
-      (F : End (splitTorus (Sp k) X)) (q : ℕ), FrobG (splitTorus (Sp k) X) F q →
-        ∃ m, 1 ≤ m ∧ ∀ l, (F ^ (m * l)).asHom = (𝟙 (splitTorus (Sp k) X)) ^ (q ^ (m * l)) := by
+theorem frobG_splitTorus_pow
+    : ∀ (k : Type) [Field k] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+        (F : End (splitTorus (Sp k) X)) (q : ℕ),
+      FrobG (splitTorus (Sp k) X) F q
+        → ∃ m, 1 ≤ m ∧ ∀ l, (F ^ (m * l)).asHom = (𝟙 (splitTorus (Sp k) X)) ^ (q ^ (m * l)) := by
   intro k _ X _ _ _ F q hF
   classical
   have := isAffine_splitTorus k X
-  have key : ∀ χ : X, ∃ m : ℕ, 1 ≤ m ∧
-      (F ^ m).asHom.left.appTop.hom
-        (charUnit (Sp k) X χ).val = (charUnit (Sp k) X χ).val ^ (q ^ m) := by
+  have key
+      : ∀ χ : X, ∃ m : ℕ,
+        1 ≤ m
+          ∧ (F ^ m).asHom.left.appTop.hom (charUnit (Sp k) X χ).val
+            = (charUnit (Sp k) X χ).val ^ (q ^ m) := by
     intro χ
     obtain ⟨m, hm, h, hh⟩ := hF.2 ⊤ (isAffineOpen_top _) (charUnit (Sp k) X χ).val
     refine ⟨m, hm, ?_⟩
@@ -59,8 +64,10 @@ theorem frobG_splitTorus_pow :
   let e := splitTorusPointsEquiv (Sp k) X (splitTorus (Sp k) X)
   apply e.injective
   rw [map_pow]
-  have hgen : ∀ χ ∈ s, e (F ^ ((∏ x ∈ s, n0 x) * l)).asHom (Multiplicative.ofAdd χ) =
-      (e (𝟙 _) ^ (q ^ ((∏ x ∈ s, n0 x) * l))) (Multiplicative.ofAdd χ) := by
+  have hgen
+      : ∀ χ ∈ s,
+        e (F ^ ((∏ x ∈ s, n0 x) * l)).asHom (Multiplicative.ofAdd χ)
+          = (e (𝟙 _) ^ (q ^ ((∏ x ∈ s, n0 x) * l))) (Multiplicative.ofAdd χ) := by
     intro χ hχ
     obtain ⟨c, hc⟩ := Finset.dvd_prod_of_mem n0 hχ
     apply Units.ext

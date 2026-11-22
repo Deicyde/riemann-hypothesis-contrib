@@ -11,13 +11,14 @@ open ValuativeRel
 
 namespace Formalism.L2.SG.Pf.MassDataX
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.DataInst Formalism.L2.SG.CntLocal
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.DataInst Formalism.L2.SG.CntLocal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem one_sub_eta_nonneg (η : ℝ) (hη : η = 1 ∨ η = -1) (q i : ℕ) : 0 ≤ 1 - η ^ i / ((q : ℕ) : ℝ) ^ i := by
-  have h1 : |η ^ i| = 1 := by
-    rcases hη with rfl | rfl <;> simp [abs_pow]
+theorem one_sub_eta_nonneg (η : ℝ) (hη : η = 1 ∨ η = -1) (q i : ℕ)
+    : 0 ≤ 1 - η ^ i / ((q : ℕ) : ℝ) ^ i := by
+  have h1 : |η ^ i| = 1 := by rcases hη with rfl | rfl <;> simp [abs_pow]
   rcases Nat.eq_zero_or_pos (q ^ i) with h | h
   · have h' : ((q : ℕ) : ℝ) ^ i = 0 := by exact_mod_cast h
     rw [h', div_zero]
@@ -46,9 +47,11 @@ theorem alpD_nonneg {D : D7} (u u' : D.what₂.Word) (p : PlF D) : 0 ≤ alpD u 
   · exact aPD_nonneg p _
   · exact mul_nonneg (aPD_nonneg p _) (aPD_nonneg p _)
 
-theorem densP_nonneg {D : D7} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep} (L : LocSp D M)
-    (δ : ∀ p : PlF D, (D.s.atP p).Fp) (ϖ : ∀ p : PlF D, 𝒪[(D.s.atP p).Fp]) (T T' : D.host.E) (Z : MatZ D) (p : PlF D) :
-    0 ≤ densP L δ ϖ T T' Z p := by
+theorem densP_nonneg
+    {D : D7} {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep}
+    (L : LocSp D M) (δ : ∀ p : PlF D, (D.s.atP p).Fp) (ϖ : ∀ p : PlF D, 𝒪[(D.s.atP p).Fp])
+    (T T' : D.host.E) (Z : MatZ D) (p : PlF D)
+    : 0 ≤ densP L δ ϖ T T' Z p := by
   unfold densP Formalism.MainNotions.S.Loc.HermSp.dens
   positivity
 

@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SiegelUni
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-theorem UpperTheory.V.Z.Kato.Sym.KU.sgU :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (c : ℕ) (x : Fin 2 → ℚ), GlobalTheory.Sieg.admitted c x → IsU X (siegel X c x) := by
+theorem UpperTheory.V.Z.Kato.Sym.KU.sgU
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (c : ℕ)
+        (x : Fin 2 → ℚ),
+      GlobalTheory.Sieg.admitted c x → IsU X (siegel X c x) := by
   intro Ω _ _ _ ε X c x hx
   have hne := siegel_ne_zero Ω ε X c x hx
   obtain ⟨h1, h2⟩ := TopUnits.siegel_hol X hx

@@ -11,8 +11,15 @@ open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem flat_quotSMulTop_coker_of_matrix_witnesses :
-    ∀ (R S : Type) [CommRing R] [CommRing S] [Algebra R S] (r a b : ℕ) (g : Fin r → S) (u : S) (Φ : Matrix (Fin a) (Fin b) S), Module.Flat R (S ⧸ Ideal.span (Set.range g)) → (∃ c : Fin r → S, u = ∑ k, c k * g k) → (∀ k, ∃ (C : Matrix (Fin b) (Fin a) S) (C' : Matrix (Fin a) (Fin a) S), g k • (1 : Matrix (Fin a) (Fin a) S) = Φ * C + u • C') → (∃ (Ψ : Matrix (Fin b) (Fin a) S) (E : Fin r → Matrix (Fin a) (Fin b) S), Φ * Ψ * Φ = Φ + ∑ k, g k • E k) → Module.Flat R (QuotSMulTop u ((Fin a → S) ⧸ LinearMap.range Φ.mulVecLin)) := by
+theorem flat_quotSMulTop_coker_of_matrix_witnesses
+    : ∀ (R S : Type) [CommRing R] [CommRing S] [Algebra R S] (r a b : ℕ) (g : Fin r → S) (u : S)
+        (Φ : Matrix (Fin a) (Fin b) S),
+      Module.Flat R (S ⧸ Ideal.span (Set.range g)) → (∃ c : Fin r → S, u = ∑ k, c k * g k)
+        → (∀ k, ∃ (C : Matrix (Fin b) (Fin a) S) (C' : Matrix (Fin a) (Fin a) S),
+          g k • (1 : Matrix (Fin a) (Fin a) S) = Φ * C + u • C')
+        → (∃ (Ψ : Matrix (Fin b) (Fin a) S) (E : Fin r → Matrix (Fin a) (Fin b) S),
+          Φ * Ψ * Φ = Φ + ∑ k, g k • E k)
+        → Module.Flat R (QuotSMulTop u ((Fin a → S) ⧸ LinearMap.range Φ.mulVecLin)) := by
   intro R S _ _ _ r a b g u Φ hflat hu hker hreg
   obtain ⟨c, hc⟩ := hu
   obtain ⟨Ψ, E, hΨ⟩ := hreg
@@ -21,8 +28,9 @@ theorem flat_quotSMulTop_coker_of_matrix_witnesses :
   have huI : u ∈ I := by
     rw [hc]
     exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_left _ _ (hgI k)
-  have hmv : ∀ {m : ℕ} (A : Matrix (Fin a) (Fin m) S), (∀ j i, A j i ∈ I) →
-      ∀ y j, (Matrix.mulVec A y) j ∈ I := by
+  have hmv
+      : ∀ {m : ℕ} (A : Matrix (Fin a) (Fin m) S),
+        (∀ j i, A j i ∈ I) → ∀ y j, (Matrix.mulVec A y) j ∈ I := by
     intro m A hA y j
     simp only [Matrix.mulVec, dotProduct]
     exact Ideal.sum_mem _ fun i _ => Ideal.mul_mem_right _ _ (hA j i)
@@ -45,8 +53,8 @@ theorem flat_quotSMulTop_coker_of_matrix_witnesses :
     obtain ⟨C, C', h⟩ := hker k
     have hx : g k • x = Matrix.mulVec Φ (Matrix.mulVec C x) + u • Matrix.mulVec C' x := by
       have := congrArg (fun A => Matrix.mulVec A x) h
-      simp only [Matrix.smul_mulVec, Matrix.one_mulVec, Matrix.add_mulVec,
-        ← Matrix.mulVec_mulVec] at this
+      simp only [Matrix.smul_mulVec, Matrix.one_mulVec, Matrix.add_mulVec, ← Matrix.mulVec_mulVec]
+        at this
       exact this
     rw [← map_smul, hx, map_add (f := _), hK, hU, add_zero]
   have hI : ∀ s ∈ I, ∀ x, s • pr x = 0 := by
@@ -79,7 +87,9 @@ theorem flat_quotSMulTop_coker_of_matrix_witnesses :
     simp only [f0, LinearMap.comp_apply]
     apply hq
     intro j
-    have hy : Φ.mulVecLin y - (Φ * Ψ).mulVecLin (Φ.mulVecLin y) = -(Matrix.mulVec (∑ k, g k • E k) y) := by
+    have hy
+        : Φ.mulVecLin y - (Φ * Ψ).mulVecLin (Φ.mulVecLin y)
+          = -(Matrix.mulVec (∑ k, g k • E k) y) := by
       simp only [Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, hΨ, Matrix.add_mulVec]
       abel
     rw [LinearMap.sub_apply, LinearMap.id_apply, hy, Pi.neg_apply]
@@ -98,8 +108,8 @@ theorem flat_quotSMulTop_coker_of_matrix_witnesses :
         exact hI s hs _)) ∘ₗ LinearMap.proj j
   have hpq : ∀ v, p (q v) = pr v := by
     intro v
-    simp only [p, q, LinearMap.sum_apply, LinearMap.comp_apply,
-      LinearMap.proj_apply, LinearMap.pi_apply, Submodule.mkQ_apply, Submodule.liftQ_apply,
+    simp only [p, q, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply,
+      LinearMap.pi_apply, Submodule.mkQ_apply, Submodule.liftQ_apply,
       LinearMap.toSpanSingleton_apply]
     set_option synthInstance.maxHeartbeats 100000 in
       conv_rhs => rw [← Finset.univ_sum_single v, map_sum]
@@ -116,8 +126,8 @@ theorem flat_quotSMulTop_coker_of_matrix_witnesses :
     rw [hpq, map_sub, Matrix.mulVecLin_apply, ← Matrix.mulVec_mulVec, hK, sub_zero]
   have := hflat
   have : Module.Flat R (Fin a → S ⧸ I) :=
-    Module.Flat.of_linearEquiv
-      (DFinsupp.linearEquivFunOnFintype (R := R) (M := fun _ : Fin a => S ⧸ I)).symm
+    Module.Flat.of_linearEquiv (DFinsupp.linearEquivFunOnFintype (R := R)
+      (M := fun _ : Fin a => S ⧸ I)).symm
   exact Module.Flat.of_retract (i.restrictScalars R) (p.restrictScalars R)
     (LinearMap.ext fun n => LinearMap.congr_fun hpi n)
 

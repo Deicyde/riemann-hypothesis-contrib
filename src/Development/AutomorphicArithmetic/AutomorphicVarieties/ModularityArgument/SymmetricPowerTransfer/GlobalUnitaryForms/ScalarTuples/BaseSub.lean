@@ -10,8 +10,10 @@ namespace UpperTheory.V.Z.Sym.Glob
 
 open Matrix Loc
 
-private theorem base_bot {Γ G V : Type} [Group Γ] [Group G] [AddCommGroup V] [Module ℂ V] (ι : Γ →* G) (U : Subgroup G)
-    (W : Representation ℂ Γ V) : ∃ B : Base Γ G V, B.ι = ι ∧ B.U = U ∧ B.ω = 1 ∧ B.Γ₀ = ⊥ ∧ B.W = W := by
+private theorem base_bot
+    {Γ G V : Type} [Group Γ] [Group G] [AddCommGroup V] [Module ℂ V]
+    (ι : Γ →* G) (U : Subgroup G) (W : Representation ℂ Γ V)
+    : ∃ B : Base Γ G V, B.ι = ι ∧ B.U = U ∧ B.ω = 1 ∧ B.Γ₀ = ⊥ ∧ B.W = W := by
   refine ⟨⟨ι, U, 1, W, ⊥, bot_le, ?_, ?_, ?_⟩, rfl, rfl, rfl, rfl, rfl⟩
   · intro z hz
     rw [Subgroup.mem_bot.1 hz, map_one]
@@ -23,11 +25,16 @@ private theorem base_bot {Γ G V : Type} [Group Γ] [Group G] [AddCommGroup V] [
     obtain rfl := Subgroup.mem_bot.1 hz
     simp
 
-private theorem base_sub {Γ G V : Type} [Group Γ] [Group G] [AddCommGroup V] [Module ℂ V] (ι : Γ →* G) (S : Subgroup Γ)
-    (T U : Subgroup G) (h : ∀ γ ∈ S, ι γ ∈ T) (x : G) (W : Representation ℂ S V) :
-    ∃ B : Base S T V, (∀ γ : S, (B.ι γ : G) = ι γ) ∧ (∀ g : T, g ∈ B.U ↔ x⁻¹ * g * x ∈ U) ∧ B.ω = 1 ∧ B.Γ₀ = ⊥ ∧ B.W = W := by
-  obtain ⟨B, h1, h2, h3⟩ := base_bot ((ι.comp S.subtype).codRestrict T fun γ => h γ γ.2)
-    ((U.comap (MulAut.conj x⁻¹).toMonoidHom).subgroupOf T) W
+private theorem base_sub
+    {Γ G V : Type} [Group Γ] [Group G] [AddCommGroup V] [Module ℂ V]
+    (ι : Γ →* G) (S : Subgroup Γ) (T U : Subgroup G) (h : ∀ γ ∈ S, ι γ ∈ T)
+    (x : G) (W : Representation ℂ S V)
+    : ∃ B : Base S T V,
+      (∀ γ : S, (B.ι γ : G) = ι γ) ∧ (∀ g : T, g ∈ B.U ↔ x⁻¹ * g * x ∈ U) ∧ B.ω = 1 ∧ B.Γ₀ = ⊥
+        ∧ B.W = W := by
+  obtain ⟨B, h1, h2, h3⟩ :=
+    base_bot ((ι.comp S.subtype).codRestrict T fun γ => h γ γ.2)
+      ((U.comap (MulAut.conj x⁻¹).toMonoidHom).subgroupOf T) W
   refine ⟨B, fun γ => by rw [h1]; rfl, fun g => ?_, h3⟩
   rw [h2, Subgroup.mem_subgroupOf, Subgroup.mem_comap]
   simp
@@ -39,8 +46,7 @@ private theorem mem_SU {K : Type} [Field K] {Δ : K} (g : DX Δ) : g ∈ SU Δ �
 end UpperTheory.V.Z.Sym.Glob
 
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Glob in
-theorem UpperTheory.V.Z.Sym.Glob.baseS :
-    UpperTheory.V.Z.Sym.Glob.BaseS := by
+theorem UpperTheory.V.Z.Sym.Glob.baseS : UpperTheory.V.Z.Sym.Glob.BaseS := by
   intro F _ _ Δ D _ V _ _ W ch htr x
   obtain ⟨-, ⟨ι, hι⟩, -⟩ := iotaEx F Δ
   have hmem : ∀ γ ∈ SU Δ, ι γ ∈ SA Δ := by

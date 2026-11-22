@@ -13,12 +13,15 @@ open ReciprocityTheory.L2DbarEstimates
 
 variable {n : ℕ}
 
-theorem grad_le_of_minorant (rh Ψ : V n → ℝ) (v0 : V n) (C : ℝ) (hC : 0 < C)
-    (hΨ0 : 0 < Ψ v0) (hrh : ContDiffAt ℝ 2 rh v0) (hΨ : ContDiffAt ℝ 2 Ψ v0) (ξ : Fin n → ℂ)
-    (hL : (leviV n (fun y => (Ψ y : ℂ)) v0 ξ).re ≤ 0)
-    (hle : ∀ᶠ v in 𝓝 v0, -C * Real.log (Ψ v) ≤ rh v) (heq : rh v0 = -C * Real.log (Ψ v0)) :
-    Complex.normSq (∑ j, wd n j (fun y => (rh y : ℂ)) v0 * ξ j) ≤
-      C * (leviV n (fun y => (rh y : ℂ)) v0 ξ).re := by
+theorem grad_le_of_minorant
+    (rh Ψ : V n → ℝ)
+    (v0 : V n)
+    (C : ℝ) (hC : 0 < C)
+    (hΨ0 : 0 < Ψ v0) (hrh : ContDiffAt ℝ 2 rh v0) (hΨ : ContDiffAt ℝ 2 Ψ v0)
+    (ξ : Fin n → ℂ) (hL : (leviV n (fun y => (Ψ y : ℂ)) v0 ξ).re ≤ 0)
+    (hle : ∀ᶠ v in 𝓝 v0, -C * Real.log (Ψ v) ≤ rh v) (heq : rh v0 = -C * Real.log (Ψ v0))
+    : Complex.normSq (∑ j, wd n j (fun y => (rh y : ℂ)) v0 * ξ j)
+      ≤ C * (leviV n (fun y => (rh y : ℂ)) v0 ξ).re := by
   set k : ℝ → ℝ := fun t => -C * Real.log t with hkdef
   set ψ : V n → ℝ := fun y => k (Ψ y) with hψdef
   have hk : ContDiffAt ℝ 2 k (Ψ v0) := contDiffAt_const.mul (Real.contDiffAt_log.2 hΨ0.ne')
@@ -49,8 +52,10 @@ theorem grad_le_of_minorant (rh Ψ : V n → ℝ) (v0 : V n) (C : ℝ) (hC : 0 <
     show -C * deriv (fun x : ℝ => x⁻¹) t = _
     rw [deriv_inv]
     ring
-  have hwdψ : ∀ j, wd n j (fun y => (ψ y : ℂ)) v0 =
-      (((-C * (Ψ v0)⁻¹ : ℝ)) : ℂ) * wd n j (fun y => (Ψ y : ℂ)) v0 := by
+  have hwdψ
+      : ∀ j,
+        wd n j (fun y => (ψ y : ℂ)) v0
+          = (((-C * (Ψ v0)⁻¹ : ℝ)) : ℂ) * wd n j (fun y => (Ψ y : ℂ)) v0 := by
     intro j
     rw [show (fun y => (ψ y : ℂ)) = fun y => (k (Ψ y) : ℂ) from rfl, wd_ofReal_comp hkd hΨd, hdk]
   have hchain := leviChain n k Ψ v0 ξ hΨ hk
@@ -62,9 +67,14 @@ theorem grad_le_of_minorant (rh Ψ : V n → ℝ) (v0 : V n) (C : ℝ) (hC : 0 <
     filter_upwards with y
     ring
   have hcd : ContDiffAt ℝ 2 (fun y => ψ y + (-1) * rh y) v0 := hψ.add (contDiffAt_const.mul hrh)
-  have h2 := ReciprocityTheory.L2DbarEstimates.Y.LocalMaximumSecondDerivative.leviV_re_nonpos_of_isLocalMax hcd hmax ξ
-  rw [ReciprocityTheory.L2DbarEstimates.Y.LocalMaximumSecondDerivative.leviV_ofReal_add hψ (contDiffAt_const.mul hrh) ξ,
-    ReciprocityTheory.L2DbarEstimates.Y.LocalMaximumSecondDerivative.leviV_ofReal_const_mul (-1) hrh ξ] at h2
+  have h2 :=
+    ReciprocityTheory.L2DbarEstimates.Y.LocalMaximumSecondDerivative.leviV_re_nonpos_of_isLocalMax
+      hcd hmax ξ
+  rw [ReciprocityTheory.L2DbarEstimates.Y.LocalMaximumSecondDerivative.leviV_ofReal_add hψ
+        (contDiffAt_const.mul hrh) ξ,
+      ReciprocityTheory.L2DbarEstimates.Y.LocalMaximumSecondDerivative.leviV_ofReal_const_mul (-1)
+        hrh ξ]
+    at h2
   have hψL : leviV n (fun y => (ψ y : ℂ)) v0 ξ = leviV n (fun y => (k (Ψ y) : ℂ)) v0 ξ := rfl
   rw [hψL, hchain] at h2
   set N := Complex.normSq (∑ j, wd n j (fun y => (Ψ y : ℂ)) v0 * ξ j) with hN
@@ -72,11 +82,13 @@ theorem grad_le_of_minorant (rh Ψ : V n → ℝ) (v0 : V n) (C : ℝ) (hC : 0 <
   set Lr := (leviV n (fun y => (rh y : ℂ)) v0 ξ).re
   have h3 : (-C * (Ψ v0)⁻¹) * LΨ + C * ((Ψ v0) ^ 2)⁻¹ * N ≤ Lr := by
     simp only [Complex.add_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul,
-      sub_zero, Complex.neg_re, Complex.one_re, neg_mul, one_mul] at h2
+        sub_zero, Complex.neg_re, Complex.one_re, neg_mul, one_mul]
+      at h2
     linarith
-  have hlhs : Complex.normSq (∑ j, wd n j (fun y => (rh y : ℂ)) v0 * ξ j) =
-      (C * (Ψ v0)⁻¹) ^ 2 * N := by
-    simp only [hwd, hwdψ, mul_assoc, ← Finset.mul_sum, Complex.normSq_mul, Complex.normSq_ofReal, hN]
+  have hlhs
+      : Complex.normSq (∑ j, wd n j (fun y => (rh y : ℂ)) v0 * ξ j) = (C * (Ψ v0)⁻¹) ^ 2 * N := by
+    simp only [hwd, hwdψ, mul_assoc, ← Finset.mul_sum, Complex.normSq_mul, Complex.normSq_ofReal,
+      hN]
     ring
   rw [hlhs]
   have hN0 : 0 ≤ N := Complex.normSq_nonneg _
@@ -84,8 +96,7 @@ theorem grad_le_of_minorant (rh Ψ : V n → ℝ) (v0 : V n) (C : ℝ) (hC : 0 <
   have h4 : 0 ≤ (-C * (Ψ v0)⁻¹) * LΨ := by
     have : -C * (Ψ v0)⁻¹ ≤ 0 := by nlinarith
     nlinarith
-  have h5 : (C * (Ψ v0)⁻¹) ^ 2 * N = C * (C * ((Ψ v0) ^ 2)⁻¹ * N) := by
-    ring
+  have h5 : (C * (Ψ v0)⁻¹) ^ 2 * N = C * (C * ((Ψ v0) ^ 2)⁻¹ * N) := by ring
   rw [h5]
   exact mul_le_mul_of_nonneg_left (by linarith) hC.le
 
@@ -98,13 +109,13 @@ open scoped ComplexOrder Matrix
 open ReciprocityTheory.ChartRestriction.G.AR.Up.ExhA
 
 open scoped MatrixOrder in
-theorem exists_factor {m : ℕ} {M : Matrix (Fin m) (Fin m) ℂ} (hM : M.PosSemidef) :
-    ∃ y : Matrix (Fin m) (Fin m) ℂ, M = yᴴ * y := by
+theorem exists_factor {m : ℕ} {M : Matrix (Fin m) (Fin m) ℂ} (hM : M.PosSemidef)
+    : ∃ y : Matrix (Fin m) (Fin m) ℂ, M = yᴴ * y := by
   obtain ⟨y, hy⟩ := CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hM.nonneg
   exact ⟨y, hy⟩
 
-theorem amgm_psd {m : ℕ} (hm : 0 < m) {P : Matrix (Fin m) (Fin m) ℂ} (hP : P.PosSemidef) :
-    P.det.re ^ ((m : ℝ)⁻¹) ≤ P.trace.re / m := by
+theorem amgm_psd {m : ℕ} (hm : 0 < m) {P : Matrix (Fin m) (Fin m) ℂ} (hP : P.PosSemidef)
+    : P.det.re ^ ((m : ℝ)⁻¹) ≤ P.trace.re / m := by
   have hH := hP.1
   have hd : P.det.re = ∏ i, hH.eigenvalues i := by
     rw [hH.det_eq_prod_eigenvalues]
@@ -114,16 +125,22 @@ theorem amgm_psd {m : ℕ} (hm : 0 < m) {P : Matrix (Fin m) (Fin m) ℂ} (hP : P
     simp [← Complex.ofReal_sum]
   have hnn : ∀ i, 0 ≤ hH.eigenvalues i := fun i => hP.eigenvalues_nonneg i
   have hmR : (0 : ℝ) < m := by exact_mod_cast hm
-  have h := Real.geom_mean_le_arith_mean_weighted (Finset.univ : Finset (Fin m))
-    (fun _ => (m : ℝ)⁻¹) (fun i => hH.eigenvalues i) (fun _ _ => by positivity)
-    (by simp [Finset.card_univ]; field_simp) (fun i _ => hnn i)
+  have h :=
+    Real.geom_mean_le_arith_mean_weighted (Finset.univ : Finset (Fin m))
+      (fun _ => (m : ℝ)⁻¹)
+      (fun i => hH.eigenvalues i)
+      (fun _ _ => by positivity)
+      (by simp [Finset.card_univ]; field_simp)
+      (fun i _ => hnn i)
   rw [hd, ht, ← Real.finsetProd_rpow _ _ (fun i _ => hnn i)]
-  calc ∏ i, hH.eigenvalues i ^ ((m : ℝ)⁻¹) ≤ ∑ i, (m : ℝ)⁻¹ * hH.eigenvalues i := h
+  calc
+    ∏ i, hH.eigenvalues i ^ ((m : ℝ)⁻¹)
+      ≤ ∑ i, (m : ℝ)⁻¹ * hH.eigenvalues i := h
     _ = (∑ i, hH.eigenvalues i) / m := by rw [← Finset.mul_sum]; field_simp
 
-theorem amgm {m : ℕ} (hm : 0 < m) {A A0 : Matrix (Fin m) (Fin m) ℂ} (hA : A.PosDef)
-    (hA0 : A0.PosDef) :
-    A.det.re ^ ((m : ℝ)⁻¹) ≤ A0.det.re ^ ((m : ℝ)⁻¹) * ((A * A0⁻¹).trace.re / m) := by
+theorem amgm
+    {m : ℕ} (hm : 0 < m) {A A0 : Matrix (Fin m) (Fin m) ℂ} (hA : A.PosDef) (hA0 : A0.PosDef)
+    : A.det.re ^ ((m : ℝ)⁻¹) ≤ A0.det.re ^ ((m : ℝ)⁻¹) * ((A * A0⁻¹).trace.re / m) := by
   have hM : (A0⁻¹).PosDef := hA0.inv
   obtain ⟨y, hy⟩ := exists_factor hM.posSemidef
   have hP : (y * A * yᴴ).PosSemidef := hA.posSemidef.mul_mul_conjTranspose_same y
@@ -140,9 +157,10 @@ theorem amgm {m : ℕ} (hm : 0 < m) {A A0 : Matrix (Fin m) (Fin m) ℂ} (hA : A.
   have h := amgm_psd hm hP
   rw [hdet, htr, Real.mul_rpow ha.le (inv_nonneg.2 hb.le), Real.inv_rpow hb.le] at h
   have hc : 0 < A0.det.re ^ ((m : ℝ)⁻¹) := Real.rpow_pos_of_pos hb _
-  calc A.det.re ^ ((m : ℝ)⁻¹) = A0.det.re ^ ((m : ℝ)⁻¹) *
-        (A.det.re ^ ((m : ℝ)⁻¹) * (A0.det.re ^ ((m : ℝ)⁻¹))⁻¹) := by
-        field_simp
+  calc
+    A.det.re ^ ((m : ℝ)⁻¹)
+        = A0.det.re ^ ((m : ℝ)⁻¹) * (A.det.re ^ ((m : ℝ)⁻¹) * (A0.det.re ^ ((m : ℝ)⁻¹))⁻¹) := by
+      field_simp
     _ ≤ _ := mul_le_mul_of_nonneg_left h hc.le
 
 end ReciprocityTheory.ChartRestriction.G.AR.Up.RgB

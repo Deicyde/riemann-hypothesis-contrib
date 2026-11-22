@@ -11,9 +11,13 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.UPoinc GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+  GlobalTheory.UPoinc GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.USep
@@ -21,7 +25,24 @@ noncomputable section
 
 namespace GlobalTheory.USepGen
 
-theorem genfib_pull : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H), 1 ≤ Dw.p + Dw.q → ∀ (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (C : UCompact Xo c), ∀ (X₁ : GlobalTheory.GSep.GSet) (act : 𝓞 E → (X₁.ρ.P.A ⟶ X₁.ρ.P.A)) (u : Sp (ratHull X₁.S.R) ⟶ Xo.XF c) (π : X₁.M.Z ⟶ C.Z), GlobalTheory.GSep.ULink C X₁ act u π → ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], IsCN V → ∀ (t : SAB H (Sp V)) (P : PELUnif (maximalIdeal V) t) (yK : X₁.S.R →+* FractionRing V) (x' : Sp (FractionRing V) ⟶ Sp (ratHull X₁.S.R)), x' ≫ spMap (toRat X₁.S.R) = spMap yK → GenOf Xo c (x' ≫ u) t → ∃ φ : P.A.A.left ⟶ X₁.ρ.P.A.left, IsGrpPullback P.A.A X₁.ρ.P.A (spMap yK) φ ∧ LBIso P.A.L (X₁.ρ.P.L.pull φ) ∧ ∀ a, (letI := H.starRing; (P.oA.act (H.bar a)).left) ≫ φ = φ ≫ (act a).left := by
+theorem genfib_pull
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H),
+      1 ≤ Dw.p + Dw.q
+        → ∀ (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (C : UCompact Xo c),
+          ∀ (X₁ : GlobalTheory.GSep.GSet) (act : 𝓞 E → (X₁.ρ.P.A ⟶ X₁.ρ.P.A))
+              (u : Sp (ratHull X₁.S.R) ⟶ Xo.XF c) (π : X₁.M.Z ⟶ C.Z),
+            GlobalTheory.GSep.ULink C X₁ act u π
+              → ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
+                IsCN V
+                  → ∀ (t : SAB H (Sp V)) (P : PELUnif (maximalIdeal V) t)
+                      (yK : X₁.S.R →+* FractionRing V)
+                      (x' : Sp (FractionRing V) ⟶ Sp (ratHull X₁.S.R)),
+                    x' ≫ spMap (toRat X₁.S.R) = spMap yK → GenOf Xo c (x' ≫ u) t
+                      → ∃ φ : P.A.A.left ⟶ X₁.ρ.P.A.left,
+                        IsGrpPullback P.A.A X₁.ρ.P.A (spMap yK) φ ∧ LBIso P.A.L (X₁.ρ.P.L.pull φ)
+                          ∧ ∀ a,
+                            (letI := H.starRing; (P.oA.act (H.bar a)).left) ≫ φ
+                              = φ ≫ (act a).left := by
   intro E _ _ _ H Dw _ l Xo c C X₁ act u π hL V _ _ _ _ t P yK x' hx' hgen
   obtain ⟨-, ⟨G, iG, α, β, hα, hβ, hLab, hf⟩, -, -⟩ := hL
   obtain ⟨tK, ⟨m₁⟩, ⟨m₂⟩⟩ := hgen
@@ -30,7 +51,8 @@ theorem genfib_pull : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H 
   have gpA : IsGrpPullback P.A.A t.G (jK V) (P.U.gen.inv.left ≫ pullback.fst t.G.hom (jK V)) :=
     ((isGrpPullback_of_iso P.U.gen.symm).comp (isGrpPullback_pullback t.G (jK V))).congr
       (Category.id_comp _) rfl
-  have w₁ : (P.U.gen.inv.left ≫ pullback.fst t.G.hom (jK V)) ≫ t.G.hom = (P.A.A.hom ≫ 𝟙 _) ≫ jK V := by
+  have w₁
+      : (P.U.gen.inv.left ≫ pullback.fst t.G.hom (jK V)) ≫ t.G.hom = (P.A.A.hom ≫ 𝟙 _) ≫ jK V := by
     rw [gpA.1.w, Category.comp_id]
   let κ : P.A.A.left ⟶ tK.G.left := m₁.cart.1.lift _ _ w₁
   have hκ₁ : κ ≫ m₁.φ = P.U.gen.inv.left ≫ pullback.fst t.G.hom (jK V) := m₁.cart.1.lift_fst _ _ _
@@ -53,7 +75,8 @@ theorem genfib_pull : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H 
     obtain ⟨w, hw⟩ := P.U.ext
     have hc : P.U.gen.inv.left ≫ P.U.gen.hom.left = 𝟙 _ := by
       rw [← Over.comp_left, Iso.inv_hom_id]; rfl
-    have e₁ : LBIso (P.A.L.pull (𝟙 _)) (P.U.LG.L.pull (P.U.gen.inv.left ≫ pullback.fst t.G.hom (jK V))) :=
+    have e₁ : LBIso (P.A.L.pull (𝟙 _))
+        (P.U.LG.L.pull (P.U.gen.inv.left ≫ pullback.fst t.G.hom (jK V))) :=
       GlobalTheory.GenSpread.lbIso_pull_comp P.U.gen.inv.left hc.symm rfl ⟨w, hw⟩
     rw [P.bundle, ← hκ₁] at e₁
     have e₀ : LBIso P.A.L (P.A.L.pull (𝟙 _)) := GlobalTheory.SiegelPullComp.iso_pull_id hA
@@ -75,16 +98,19 @@ theorem genfib_pull : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H 
     obtain ⟨f, hfα, hfβ⟩ := hf a
     letI := H.starRing
     have hext := P.lin.ext (H.bar a)
-    have hg : (P.oA.act (H.bar a)).left ≫ P.U.gen.inv.left =
-        P.U.gen.inv.left ≫ ((Over.pullback (jK V)).map (t.act.act (H.bar a))).left := by
-      have : P.oA.act (H.bar a) ≫ P.U.gen.inv =
-          P.U.gen.inv ≫ (Over.pullback (jK V)).map (t.act.act (H.bar a)) := by
-        rw [Iso.eq_inv_comp, ← Category.assoc, ← hext, Category.assoc, Iso.hom_inv_id, Category.comp_id]; rfl
+    have hg
+        : (P.oA.act (H.bar a)).left ≫ P.U.gen.inv.left
+          = P.U.gen.inv.left ≫ ((Over.pullback (jK V)).map (t.act.act (H.bar a))).left := by
+      have : P.oA.act (H.bar a) ≫ P.U.gen.inv
+          = P.U.gen.inv ≫ (Over.pullback (jK V)).map (t.act.act (H.bar a)) := by
+        rw [Iso.eq_inv_comp, ← Category.assoc, ← hext, Category.assoc, Iso.hom_inv_id,
+          Category.comp_id]
+        rfl
       rw [← Over.comp_left, this, Over.comp_left]
     have s₁ : (P.oA.act (H.bar a)).left ≫ κ = κ ≫ (tK.act.act (H.bar a)).left := by
       apply m₁.cart.1.hom_ext
-      · rw [Category.assoc, hκ₁, Category.assoc, m₁.act, ← Category.assoc κ, hκ₁, ← Category.assoc, hg,
-          Category.assoc, Category.assoc]
+      · rw [Category.assoc, hκ₁, Category.assoc, m₁.act, ← Category.assoc κ, hκ₁, ← Category.assoc,
+          hg, Category.assoc, Category.assoc]
         congr 1
         exact pullback.lift_fst _ _ _
       · rw [Category.assoc, hκ₂, Category.assoc, Over.w, hκ₂, ← Category.assoc, Over.w]

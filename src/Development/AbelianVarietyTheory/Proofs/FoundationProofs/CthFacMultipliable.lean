@@ -15,10 +15,11 @@ namespace GlobalTheory.Sieg.CthMult
 
 end GlobalTheory.Sieg.CthMult
 
-
 open scoped UpperHalfPlane MatrixGroups Manifold in
-theorem _root_.GlobalTheory.Sieg.cthFac_multipliable : ∀ (c : ℕ) (q t : ℂ), ‖q‖ < 1 → t ≠ 0 →
-    Multipliable (fun m : ℕ => _root_.GlobalTheory.Sieg.cthFac c q t (m + 1)) := by
+theorem _root_.GlobalTheory.Sieg.cthFac_multipliable
+    : ∀ (c : ℕ) (q t : ℂ),
+      ‖q‖ < 1 → t ≠ 0
+        → Multipliable (fun m : ℕ => _root_.GlobalTheory.Sieg.cthFac c q t (m + 1)) := by
   intro c q t hq _
   set g : ℂ → ℂ := fun u => (1 - u * t) ^ c ^ 2 * (1 - u * t⁻¹) ^ c ^ 2 /
     ((1 - u * t ^ c) * (1 - u * (t ^ c)⁻¹)) with hg

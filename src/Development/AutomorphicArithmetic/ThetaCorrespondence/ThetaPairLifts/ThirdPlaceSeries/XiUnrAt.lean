@@ -10,11 +10,18 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin GlobalTheory.PendOf
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+  GlobalTheory.PendOf
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace GlobalTheory.TupleCharAtType
-theorem xi_unrAt_alt {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {D : D7} (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (i : D.nd.Loc) (k : Fin 2) (v : D.nd.PlG k) :
-    (P.tp.xi (D.nd.mu i)).UnrAt (D.naut.plGw k v) := by
+theorem xi_unrAt_alt
+    {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {D : D7}
+    (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (i : D.nd.Loc)
+    (k : Fin 2) (v : D.nd.PlG k)
+    : (P.tp.xi (D.nd.mu i)).UnrAt (D.naut.plGw k v) := by
   have hwg : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ (D.naut.plGw k v).asIdeal := D.naut.plGw_over k v
   have hgp := D.host.g_prime k
   rw [D.nd.mu_w i, P.tp.xi_tw, D.nd.w_l i]
@@ -44,13 +51,34 @@ theorem xi_unrAt_alt {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {D : D7} (P :
   intro x hx
   change (P.cf.delAt (D.nd.l i)).loc _ x * (P.tp.psi (D.nd.w i)).loc _ x = 1
   rw [hdel x hx, hpsi x hx, one_mul]
-theorem mu_unit_value_eq_loc_k_mu0 : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (S : Reading P.T), _root_.GlobalTheory.NPin.IsFaithfulReading P S → ∀ (i : D.nd.Loc) (k : Fin 2) (v : D.nd.PlG k) (hw : IsSplitPl D.host (D.naut.plGw k v)) (j : Fin D.R.m), j.1 + 1 = D.nd.j i → ∀ (u : 𝓞 D.host.E) (hu : (u : D.host.E) ≠ 0), u ∉ (D.naut.plGw k v).asIdeal → (((S i _ hw).mu (Units.map (algebraMap D.host.E ((D.naut.plGw k v).adicCompletion D.host.E)).toMonoidHom (Units.mk0 (u : D.host.E) hu)) : ℂˣ) : ℂ) = (((P.cf.mu0 j).locK (D.naut.plGw k v) (Units.mk0 (u : D.host.E) hu) : ℂˣ) : ℂ) := by
+theorem mu_unit_value_eq_loc_k_mu0
+    : ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7)
+        (P : _root_.GlobalTheory.NPin.CharacterChoiceData hL D) (S : Reading P.T),
+      _root_.GlobalTheory.NPin.IsFaithfulReading P S
+        → ∀ (i : D.nd.Loc) (k : Fin 2) (v : D.nd.PlG k) (hw : IsSplitPl D.host (D.naut.plGw k v))
+            (j : Fin D.R.m),
+          j.1 + 1 = D.nd.j i
+            → ∀ (u : 𝓞 D.host.E) (hu : (u : D.host.E) ≠ 0),
+              u ∉ (D.naut.plGw k v).asIdeal
+                → (((S i _ hw).mu
+                        (Units.map
+                          (algebraMap D.host.E
+                            ((D.naut.plGw k v).adicCompletion D.host.E)).toMonoidHom
+                          (Units.mk0 (u : D.host.E) hu))
+                      : ℂˣ)
+                    : ℂ)
+                  = (((P.cf.mu0 j).locK (D.naut.plGw k v) (Units.mk0 (u : D.host.E) hu) : ℂˣ)
+                    : ℂ) := by
   intro hL D P S hS i k v hw j hj u hu hnot
   rw [(hS.mu i _ hw j hj).2 (Units.mk0 (u : D.host.E) hu)]
-  have hx := _root_.GlobalTheory.TupleCharAtType.xi_unrAt_alt P i k v _ (isUnitAt_of_notMem u hu hnot)
+  have hx :=
+    _root_.GlobalTheory.TupleCharAtType.xi_unrAt_alt P i k v _ (isUnitAt_of_notMem u hu hnot)
   show (((P.cf.mu0 j * P.tp.xi (D.nd.mu i)).loc (D.naut.plGw k v) (atFin _ (Units.mk0 (u : D.host.E) hu)) : ℂˣ) : ℂ) = _
-  change (((P.cf.mu0 j).loc _ (atFin _ (Units.mk0 (u : D.host.E) hu)) *
-    (P.tp.xi (D.nd.mu i)).loc _ (atFin _ (Units.mk0 (u : D.host.E) hu)) : ℂˣ) : ℂ) = _
+  change (((P.cf.mu0 j).loc _ (atFin _ (Units.mk0 (u : D.host.E) hu))
+          * (P.tp.xi (D.nd.mu i)).loc _ (atFin _ (Units.mk0 (u : D.host.E) hu))
+        : ℂˣ)
+      : ℂ)
+    = _
   rw [hx, mul_one]
   rfl
 end GlobalTheory.TupleCharAtType

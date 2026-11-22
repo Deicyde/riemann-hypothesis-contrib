@@ -22,12 +22,15 @@ variable {L : LocE F E} {r k : ℕ} (S : Frames L r k)
 theorem spanTo_mono (g : Fin (r + 1) → S.V) {a b : ℕ} (h : a ≤ b) : S.spanTo g a ≤ S.spanTo g b :=
   Submodule.span_mono (Set.image_mono fun _ hi => lt_of_lt_of_le hi h)
 
-theorem mem_spanTo (g : Fin (r + 1) → S.V) {a : ℕ} (i : Fin (r + 1)) (h : (i : ℕ) < a) :
-    g i ∈ S.spanTo g a := Submodule.subset_span ⟨i, h, rfl⟩
+theorem mem_spanTo (g : Fin (r + 1) → S.V) {a : ℕ} (i : Fin (r + 1)) (h : (i : ℕ) < a)
+    : g i ∈ S.spanTo g a :=
+  Submodule.subset_span ⟨i, h, rfl⟩
 
-theorem hf_spanTo (g : Fin (r + 1) → S.V) {a : ℕ} (y : S.V)
-    (h : ∀ i : Fin (r + 1), (i : ℕ) < a → hf L S.Hm (g i) y = 0) {x : S.V} (hx : x ∈ S.spanTo g a) :
-    hf L S.Hm x y = 0 := by
+theorem hf_spanTo
+    (g : Fin (r + 1) → S.V)
+    {a : ℕ} (y : S.V) (h : ∀ i : Fin (r + 1), (i : ℕ) < a → hf L S.Hm (g i) y = 0)
+    {x : S.V} (hx : x ∈ S.spanTo g a)
+    : hf L S.Hm x y = 0 := by
   induction hx using Submodule.span_induction with
   | mem x hx => obtain ⟨i, hi, rfl⟩ := hx; exact h i hi
   | zero => simp [hf]
@@ -37,9 +40,10 @@ theorem hf_spanTo (g : Fin (r + 1) → S.V) {a : ℕ} (y : S.V)
 theorem hf_symm0 {x y : S.V} (h : hf L S.Hm x y = 0) : hf L S.Hm y x = 0 := by
   rw [← hf_cj L S.herm.1, h, map_zero]
 
-theorem mem_unipOn {N : ℕ} {A B : Submodule E (Fin N → E)} (hBA : B ≤ A)
-    (n : (Fin N → E) ≃ₗ[E] (Fin N → E)) (h1 : ∀ v ∈ A, n v - v ∈ B) (h2 : ∀ v ∈ A, n⁻¹ v - v ∈ B) :
-    n ∈ unipOn A B := by
+theorem mem_unipOn
+    {N : ℕ} {A B : Submodule E (Fin N → E)} (hBA : B ≤ A) (n : (Fin N → E) ≃ₗ[E] (Fin N → E))
+    (h1 : ∀ v ∈ A, n v - v ∈ B) (h2 : ∀ v ∈ A, n⁻¹ v - v ∈ B)
+    : n ∈ unipOn A B := by
   refine ⟨fun v => ⟨fun hv => ?_, fun hv => ?_⟩, h1⟩
   · have h3 := A.add_mem (hBA (h2 _ hv)) hv
     have h4 : n⁻¹ (n v) = v := n.symm_apply_apply v
@@ -49,7 +53,19 @@ theorem mem_unipOn {N : ℕ} {A B : Submodule E (Fin N → E)} (hBA : B ≤ A)
 
 end
 
-theorem eichler_mem_unip : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), ∀ (g : Fin (r + 1) → S.V) (gs : Fin r → S.V), (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es') → ∀ (j : Fin r) (x u : S.V) (s : E), x ∈ S.spanTo g (j + 1) → u ∈ perp L S.Hm (S.spanTo g (j + 1)) → s + L.cj s = S.h u u → ∃ n ∈ S.Nof g, (∀ v, n v = eich L S.Hm x u s v) ∧ (∀ v, n⁻¹ v = eich L S.Hm x (-u) (L.cj s) v) ∧ (∀ v ∈ S.spanTo g (j + 1), n v = v) ∧ ∀ m ∈ S.Nof g, S.psiOf g gs n = L.psi0 (algebraMap F E S.th⁻¹ * (S.h x (gs j) * S.h (m (g j.succ)) u)) := by
+theorem eichler_mem_unip
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k), ∀ (g : Fin (r + 1) → S.V) (gs : Fin r → S.V),
+        (g = S.f ∧ gs = S.es) ∨ (g = S.f' ∧ gs = S.es')
+          → ∀ (j : Fin r) (x u : S.V) (s : E),
+            x ∈ S.spanTo g (j + 1) → u ∈ perp L S.Hm (S.spanTo g (j + 1)) → s + L.cj s = S.h u u
+              → ∃ n ∈ S.Nof g,
+                (∀ v, n v = eich L S.Hm x u s v) ∧ (∀ v, n⁻¹ v = eich L S.Hm x (-u) (L.cj s) v)
+                  ∧ (∀ v ∈ S.spanTo g (j + 1), n v = v)
+                  ∧ ∀ m ∈ S.Nof g,
+                    S.psiOf g gs n
+                      = L.psi0 (algebraMap F E S.th⁻¹ * (S.h x (gs j) * S.h (m (g j.succ)) u)) := by
   intro F _ _ _ _ _ E _ _ _ L r k S g gs hg j x u s hx hu hs
   have hgram : ∀ a b : Fin (r + 1), (b : ℕ) < r → hf L S.Hm (g a) (g b) = 0 := by
     intro a b hb
@@ -68,13 +84,15 @@ theorem eichler_mem_unip : ∀ {F : Type} [Field F] [ValuativeRel F] [Topologica
   have hXX : ∀ {c : ℕ}, ∀ v ∈ S.spanTo g c, v ∈ perp L S.Hm (S.spanTo g r) := fun v hv y hy =>
     hf_spanTo S g y (fun i _ => hgX i y hy) hv
   have hxr : x ∈ S.spanTo g r := spanTo_mono S g hjr hx
-  have hE : ∀ (u : S.V) (s : E), ∀ v ∈ perp L S.Hm (S.spanTo g r),
-      eich L S.Hm x u s v - v = hf L S.Hm v u • x := by
+  have hE
+      : ∀ (u : S.V) (s : E), ∀ v ∈ perp L S.Hm (S.spanTo g r),
+        eich L S.Hm x u s v - v = hf L S.Hm v u • x := by
     intro u s v hv
     simp only [eich, hv x hxr]
     module
-  have hfl : ∀ u ∈ perp L S.Hm (S.spanTo g (j + 1)), ∀ (s : E) (i : ℕ), ∀ v ∈ S.spanTo g (i + 1),
-      eich L S.Hm x u s v - v ∈ S.spanTo g i := by
+  have hfl
+      : ∀ u ∈ perp L S.Hm (S.spanTo g (j + 1)), ∀ (s : E) (i : ℕ), ∀ v ∈ S.spanTo g (i + 1),
+        eich L S.Hm x u s v - v ∈ S.spanTo g i := by
     intro u hu s i v hv
     rw [hE u s v (hXX v hv)]
     rcases le_or_gt i j with h | h

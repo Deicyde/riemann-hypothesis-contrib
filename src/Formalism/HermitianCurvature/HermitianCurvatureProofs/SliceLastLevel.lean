@@ -26,7 +26,8 @@ open Matrix MeasureTheory
 
 namespace Formalism.FourierDecayAlt.P.SliceLastLevel
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -39,7 +40,8 @@ open Matrix
 
 namespace Formalism.FourierDecayAlt.P.SliceLastLevel
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.Ux5
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.Ux5
 
 section szIndex
 
@@ -85,7 +87,8 @@ set_option linter.style.haveILetI false
 
 namespace Formalism.FourierDecayAlt.P.SliceLastLevel
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -143,16 +146,15 @@ lemma tr_f_pos {A : ℝ} {g : B.Mat k r} (hg : g ∈ B.GV k r) : 0 < ENNReal.ofR
 lemma tr_bigCell_one_mem {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) : bigCell k r c 1 ∈ B.GV k r :=
   big_cell_mem_holds k r c 1 hc (by simp)
 
-theorem intN_AB {μN : Measure (Mt k r)} (hN : IsHaarOn (Nset k r) μN) :
-    ∫⁻ x, ENNReal.ofReal (B.gN (Matrix.of x : B.Mat k r) ^ (-(B.AB k r))) ∂μN < ⊤ := by
+theorem intN_AB {μN : Measure (Mt k r)} (hN : IsHaarOn (Nset k r) μN)
+    : ∫⁻ x, ENNReal.ofReal (B.gN (Matrix.of x : B.Mat k r) ^ (-(B.AB k r))) ∂μN < ⊤ := by
   classical
   haveI := P.LongWeylElement.sf hN
   obtain ⟨μG, hG⟩ := P.unitary_group_haar_exists k r
   obtain ⟨μb, hb⟩ := P.opposite_weyl_haar_exists k r
   haveI := P.LongWeylElement.sf hb
   set A := B.AB k r with hA
-  have hA0 : 0 ≤ A := by
-    rw [hA]; unfold B.AB; positivity
+  have hA0 : 0 ≤ A := by rw [hA]; unfold B.AB; positivity
   set f : Mt k r → ENNReal := fun g => ENNReal.ofReal (B.gN (Matrix.of g : B.Mat k r) ^ (-A)) with hfdef
   have hfm : Measurable f := tr_f_meas A
   obtain ⟨C, hC, hI⟩ := P.iterated_integration_formula k r μG μN μb hG hN hb
@@ -176,76 +178,96 @@ theorem intN_AB {μN : Measure (Mt k r)} (hN : IsHaarOn (Nset k r) μN) :
 
   set S : Set (Fin r → ℂ) := {c | ∀ a, c a ≠ 0} with hSdef
   have hSo : IsOpen S := by
-    have : S = ⋂ a : Fin r, (fun c : Fin r → ℂ => c a) ⁻¹' {0}ᶜ := by
-      ext c; simp [hSdef]
+    have : S = ⋂ a : Fin r, (fun c : Fin r → ℂ => c a) ⁻¹' {0}ᶜ := by ext c; simp [hSdef]
     rw [this]
     exact isOpen_iInter_of_finite fun a => isOpen_compl_singleton.preimage (continuous_apply a)
   have hSm : MeasurableSet S := hSo.measurableSet
 
-  have hinner : ∀ c ∈ S, ENNReal.ofReal (B.gN (bigCell k r c 1) ^ (-A)) * (IN * IN * Ib) ≤
-      ∫⁻ p : (Mt k r × Mt k r) × Mt k r,
-        f ((Matrix.of p.1.1)⁻¹ * bigCell k r c 1 * Matrix.of p.2 * Matrix.of p.1.2) ∂((μN.prod μN).prod μb) := by
-    intro c hc
-    have hbG := tr_bigCell_one_mem (k := k) hc
-    have hae1 : ∀ᵐ p ∂((μN.prod μN).prod μb), (Matrix.of p.1.1 : B.Mat k r) ∈ Nset k r :=
-      Measure.quasiMeasurePreserving_fst.ae (Measure.quasiMeasurePreserving_fst.ae (P.LongWeylElement.haar_ae hN))
-    have hae2 : ∀ᵐ p ∂((μN.prod μN).prod μb), (Matrix.of p.1.2 : B.Mat k r) ∈ Nset k r :=
-      Measure.quasiMeasurePreserving_fst.ae (Measure.quasiMeasurePreserving_snd.ae (P.LongWeylElement.haar_ae hN))
-    have hae3 : ∀ᵐ p ∂((μN.prod μN).prod μb), (Matrix.of p.2 : B.Mat k r) ∈ B2.UWb k r :=
-      Measure.quasiMeasurePreserving_snd.ae (P.LongWeylElement.haar_ae hb)
-    set β : ENNReal := ENNReal.ofReal (B.gN (bigCell k r c 1) ^ (-A)) with hβ
-    have hpt : ∀ᵐ p ∂((μN.prod μN).prod μb),
-        β * ((f p.1.1 * f p.1.2) * f p.2) ≤
-          f ((Matrix.of p.1.1)⁻¹ * bigCell k r c 1 * Matrix.of p.2 * Matrix.of p.1.2) := by
-      filter_upwards [hae1, hae2, hae3] with p h1 h2 h3
-      set n : B.Mat k r := Matrix.of p.1.1
-      set n' : B.Mat k r := Matrix.of p.1.2
-      set m : B.Mat k r := Matrix.of p.2
-      have hn : n ∈ B.GV k r := h1.1
-      have hn' : n' ∈ B.GV k r := h2.1
-      have hm : m ∈ B.GV k r := h3.1
-      have hgG : n⁻¹ * bigCell k r c 1 * m * n' ∈ B.GV k r :=
-        P.BetaSesquilinearity.gv_mul (P.BetaSesquilinearity.gv_mul (P.BetaSesquilinearity.gv_mul (P.BetaSesquilinearity.gv_inv hn) hbG) hm) hn'
-      have hgpos : 0 < B.gN (n⁻¹ * bigCell k r c 1 * m * n') :=
-        lt_of_lt_of_le one_pos (P.BetaSesquilinearity.gN_ge_one hgG)
-      have hle : B.gN (n⁻¹ * bigCell k r c 1 * m * n') ≤
-          B.gN n * B.gN (bigCell k r c 1) * B.gN m * B.gN n' := by
-        calc B.gN (n⁻¹ * bigCell k r c 1 * m * n') ≤ B.gN (n⁻¹ * bigCell k r c 1 * m) * B.gN n' := gN_mul_le _ _
-          _ ≤ (B.gN (n⁻¹ * bigCell k r c 1) * B.gN m) * B.gN n' :=
+  have hinner
+      : ∀ c ∈ S,
+        ENNReal.ofReal (B.gN (bigCell k r c 1) ^ (-A)) * (IN * IN * Ib)
+          ≤ ∫⁻ p : (Mt k r × Mt k r) × Mt k r,
+              f ((Matrix.of p.1.1)⁻¹ * bigCell k r c 1 * Matrix.of p.2 * Matrix.of p.1.2) ∂((μN.prod μN).prod μb) :=
+    by
+      intro c hc
+      have hbG := tr_bigCell_one_mem (k := k) hc
+      have hae1 : ∀ᵐ p ∂((μN.prod μN).prod μb), (Matrix.of p.1.1 : B.Mat k r) ∈ Nset k r :=
+        Measure.quasiMeasurePreserving_fst.ae (Measure.quasiMeasurePreserving_fst.ae
+          (P.LongWeylElement.haar_ae hN))
+      have hae2 : ∀ᵐ p ∂((μN.prod μN).prod μb), (Matrix.of p.1.2 : B.Mat k r) ∈ Nset k r :=
+        Measure.quasiMeasurePreserving_fst.ae (Measure.quasiMeasurePreserving_snd.ae
+          (P.LongWeylElement.haar_ae hN))
+      have hae3 : ∀ᵐ p ∂((μN.prod μN).prod μb), (Matrix.of p.2 : B.Mat k r) ∈ B2.UWb k r :=
+        Measure.quasiMeasurePreserving_snd.ae (P.LongWeylElement.haar_ae hb)
+      set β : ENNReal := ENNReal.ofReal (B.gN (bigCell k r c 1) ^ (-A)) with hβ
+      have hpt
+          : ∀ᵐ p ∂((μN.prod μN).prod μb),
+            β * ((f p.1.1 * f p.1.2) * f p.2) ≤
+              f ((Matrix.of p.1.1)⁻¹ * bigCell k r c 1 * Matrix.of p.2 * Matrix.of p.1.2) := by
+        filter_upwards [hae1, hae2, hae3] with p h1 h2 h3
+        set n : B.Mat k r := Matrix.of p.1.1
+        set n' : B.Mat k r := Matrix.of p.1.2
+        set m : B.Mat k r := Matrix.of p.2
+        have hn : n ∈ B.GV k r := h1.1
+        have hn' : n' ∈ B.GV k r := h2.1
+        have hm : m ∈ B.GV k r := h3.1
+        have hgG : n⁻¹ * bigCell k r c 1 * m * n' ∈ B.GV k r :=
+          P.BetaSesquilinearity.gv_mul
+            (P.BetaSesquilinearity.gv_mul
+              (P.BetaSesquilinearity.gv_mul (P.BetaSesquilinearity.gv_inv hn) hbG) hm)
+            hn'
+        have hgpos : 0 < B.gN (n⁻¹ * bigCell k r c 1 * m * n') :=
+          lt_of_lt_of_le one_pos (P.BetaSesquilinearity.gN_ge_one hgG)
+        have hle
+            : B.gN (n⁻¹ * bigCell k r c 1 * m * n')
+              ≤ B.gN n * B.gN (bigCell k r c 1) * B.gN m * B.gN n' := by
+          calc
+            B.gN (n⁻¹ * bigCell k r c 1 * m * n')
+              ≤ B.gN (n⁻¹ * bigCell k r c 1 * m) * B.gN n' := gN_mul_le _ _
+            _ ≤ (B.gN (n⁻¹ * bigCell k r c 1) * B.gN m) * B.gN n' :=
               mul_le_mul_of_nonneg_right (gN_mul_le _ _) (tr_gN_nonneg _)
-          _ ≤ ((B.gN n⁻¹ * B.gN (bigCell k r c 1)) * B.gN m) * B.gN n' :=
-              mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (gN_mul_le _ _) (tr_gN_nonneg _))
-                (tr_gN_nonneg _)
-          _ = B.gN n * B.gN (bigCell k r c 1) * B.gN m * B.gN n' := by rw [gN_inv_GV hn]
-      have hrp := Real.rpow_le_rpow_of_nonpos hgpos hle (by linarith : -A ≤ 0)
-      have e1 : (B.gN n * B.gN (bigCell k r c 1) * B.gN m * B.gN n') ^ (-A) =
-          B.gN n ^ (-A) * B.gN (bigCell k r c 1) ^ (-A) * B.gN m ^ (-A) * B.gN n' ^ (-A) := by
-        rw [Real.mul_rpow (mul_nonneg (mul_nonneg (tr_gN_nonneg _) (tr_gN_nonneg _)) (tr_gN_nonneg _))
-            (tr_gN_nonneg _),
-          Real.mul_rpow (mul_nonneg (tr_gN_nonneg _) (tr_gN_nonneg _)) (tr_gN_nonneg _),
-          Real.mul_rpow (tr_gN_nonneg _) (tr_gN_nonneg _)]
-      rw [e1] at hrp
-      have hnn : ∀ g : B.Mat k r, 0 ≤ B.gN g ^ (-A) := fun g => Real.rpow_nonneg (tr_gN_nonneg _) _
-      calc β * ((f p.1.1 * f p.1.2) * f p.2)
-          = ENNReal.ofReal (B.gN n ^ (-A) * B.gN (bigCell k r c 1) ^ (-A) * B.gN m ^ (-A) * B.gN n' ^ (-A)) := by
+            _ ≤ ((B.gN n⁻¹ * B.gN (bigCell k r c 1)) * B.gN m) * B.gN n' :=
+              mul_le_mul_of_nonneg_right
+                (mul_le_mul_of_nonneg_right (gN_mul_le _ _) (tr_gN_nonneg _)) (tr_gN_nonneg _)
+            _ = B.gN n * B.gN (bigCell k r c 1) * B.gN m * B.gN n' := by rw [gN_inv_GV hn]
+        have hrp := Real.rpow_le_rpow_of_nonpos hgpos hle (by linarith : -A ≤ 0)
+        have e1
+            : (B.gN n * B.gN (bigCell k r c 1) * B.gN m * B.gN n') ^ (-A)
+              = B.gN n ^ (-A) * B.gN (bigCell k r c 1) ^ (-A) * B.gN m ^ (-A) * B.gN n' ^ (-A) := by
+          rw [Real.mul_rpow
+              (mul_nonneg (mul_nonneg (tr_gN_nonneg _) (tr_gN_nonneg _)) (tr_gN_nonneg _))
+              (tr_gN_nonneg _),
+            Real.mul_rpow (mul_nonneg (tr_gN_nonneg _) (tr_gN_nonneg _)) (tr_gN_nonneg _),
+            Real.mul_rpow (tr_gN_nonneg _) (tr_gN_nonneg _)]
+        rw [e1] at hrp
+        have hnn : ∀ g : B.Mat k r, 0 ≤ B.gN g ^ (-A) := fun g =>
+          Real.rpow_nonneg (tr_gN_nonneg _) _
+        calc
+          β * ((f p.1.1 * f p.1.2) * f p.2)
+              = ENNReal.ofReal
+                (B.gN n ^ (-A) * B.gN (bigCell k r c 1) ^ (-A) * B.gN m ^ (-A)
+                  * B.gN n' ^ (-A)) := by
             rw [ENNReal.ofReal_mul (mul_nonneg (mul_nonneg (hnn _) (hnn _)) (hnn _)),
               ENNReal.ofReal_mul (mul_nonneg (hnn _) (hnn _)), ENNReal.ofReal_mul (hnn _)]
             simp only [hfdef, hβ]
             ring
-        _ ≤ f ((Matrix.of p.1.1)⁻¹ * bigCell k r c 1 * Matrix.of p.2 * Matrix.of p.1.2) :=
+          _ ≤ f ((Matrix.of p.1.1)⁻¹ * bigCell k r c 1 * Matrix.of p.2 * Matrix.of p.1.2) :=
             ENNReal.ofReal_le_ofReal hrp
-    refine le_trans (le_of_eq ?_) (lintegral_mono_ae hpt)
-    have hm3 : Measurable (fun p : (Mt k r × Mt k r) × Mt k r => f p.1.1 * f p.1.2 * f p.2) :=
-      ((hfm.comp (measurable_fst.comp measurable_fst)).mul (hfm.comp (measurable_snd.comp measurable_fst))).mul
-        (hfm.comp measurable_snd)
-    have hm2 : Measurable (fun q : Mt k r × Mt k r => f q.1 * f q.2) :=
-      (hfm.comp measurable_fst).mul (hfm.comp measurable_snd)
-    have e1 : ∫⁻ p : (Mt k r × Mt k r) × Mt k r, f p.1.1 * f p.1.2 * f p.2 ∂((μN.prod μN).prod μb) =
-        (∫⁻ q : Mt k r × Mt k r, f q.1 * f q.2 ∂(μN.prod μN)) * Ib :=
-      lintegral_prod_mul (f := fun q : Mt k r × Mt k r => f q.1 * f q.2) (g := f) hm2.aemeasurable hfm.aemeasurable
-    have e2 : ∫⁻ q : Mt k r × Mt k r, f q.1 * f q.2 ∂(μN.prod μN) = IN * IN :=
-      lintegral_prod_mul (f := f) (g := f) hfm.aemeasurable hfm.aemeasurable
-    rw [lintegral_const_mul _ hm3, e1, e2]
+      refine le_trans (le_of_eq ?_) (lintegral_mono_ae hpt)
+      have hm3 : Measurable (fun p : (Mt k r × Mt k r) × Mt k r => f p.1.1 * f p.1.2 * f p.2) :=
+        ((hfm.comp (measurable_fst.comp measurable_fst)).mul
+          (hfm.comp (measurable_snd.comp measurable_fst))).mul (hfm.comp measurable_snd)
+      have hm2 : Measurable (fun q : Mt k r × Mt k r => f q.1 * f q.2) :=
+        (hfm.comp measurable_fst).mul (hfm.comp measurable_snd)
+      have e1
+          : ∫⁻ p : (Mt k r × Mt k r) × Mt k r, f p.1.1 * f p.1.2 * f p.2 ∂((μN.prod μN).prod μb)
+            = (∫⁻ q : Mt k r × Mt k r, f q.1 * f q.2 ∂(μN.prod μN)) * Ib :=
+        lintegral_prod_mul
+          (f := fun q : Mt k r × Mt k r => f q.1 * f q.2)
+          (g := f) hm2.aemeasurable hfm.aemeasurable
+      have e2 : ∫⁻ q : Mt k r × Mt k r, f q.1 * f q.2 ∂(μN.prod μN) = IN * IN :=
+        lintegral_prod_mul (f := f) (g := f) hfm.aemeasurable hfm.aemeasurable
+      rw [lintegral_const_mul _ hm3, e1, e2]
 
   set F : (Fin r → ℂ) → ENNReal := fun c => ENNReal.ofReal (B2.cWeight k r c) *
     ENNReal.ofReal (B.gN (bigCell k r c 1) ^ (-A)) with hFdef
@@ -268,30 +290,36 @@ theorem intN_AB {μN : Measure (Mt k r)} (hN : IsHaarOn (Nset k r) μN) :
       exact hpos c hc
     have h3 := hSo.measure_pos (volume : Measure (Fin r → ℂ)) ⟨fun _ => 1, fun a => one_ne_zero⟩
     exact absurd h2 (ne_of_gt h3)
-  have hlow : K * (IN * IN * Ib) ≤ ∫⁻ c, ENNReal.ofReal (B2.cWeight k r c) *
-      ∫⁻ p : (Mt k r × Mt k r) × Mt k r,
-        f ((Matrix.of p.1.1)⁻¹ * bigCell k r c 1 * Matrix.of p.2 * Matrix.of p.1.2) ∂((μN.prod μN).prod μb) := by
-    rw [hKdef, ← lintegral_mul_const _ (hFm.indicator hSm)]
-    refine lintegral_mono fun c => ?_
-    by_cases hc : c ∈ S
-    · rw [Set.indicator_of_mem hc, hFdef, mul_assoc]
-      gcongr
-      exact hinner c hc
-    · rw [Set.indicator_of_notMem hc, zero_mul]
-      exact zero_le
+  have hlow
+      : K * (IN * IN * Ib)
+        ≤ ∫⁻ c, ENNReal.ofReal (B2.cWeight k r c) *
+          ∫⁻ p : (Mt k r × Mt k r) × Mt k r,
+            f ((Matrix.of p.1.1)⁻¹ * bigCell k r c 1 * Matrix.of p.2 * Matrix.of p.1.2) ∂((μN.prod μN).prod μb) :=
+    by
+      rw [hKdef, ← lintegral_mul_const _ (hFm.indicator hSm)]
+      refine lintegral_mono fun c => ?_
+      by_cases hc : c ∈ S
+      · rw [Set.indicator_of_mem hc, hFdef, mul_assoc]
+        gcongr
+        exact hinner c hc
+      · rw [Set.indicator_of_notMem hc, zero_mul]
+        exact zero_le
   have hfin2 : (C : ENNReal) * (K * (IN * IN * Ib)) < ⊤ := by
     refine lt_of_le_of_lt ?_ hfin
     gcongr
   by_contra htop
   have hIN : IN = ⊤ := not_lt_top_iff.1 htop
   have hCne : (C : ENNReal) ≠ 0 := by exact_mod_cast (ne_of_gt hC)
-  rw [hIN, ENNReal.top_mul (by simp), ENNReal.top_mul hIb, ENNReal.mul_top hK, ENNReal.mul_top hCne] at hfin2
+  rw [hIN, ENNReal.top_mul (by simp), ENNReal.top_mul hIb, ENNReal.mul_top hK, ENNReal.mul_top hCne]
+    at hfin2
   exact lt_irrefl _ hfin2
 
-theorem intN (k r : ℕ) (μN : Measure (Mt k r)) (hN : IsHaarOn (Nset k r) μN) (a : ℝ) (ha : B.AB k r ≤ a) :
-    Integrable (fun x : Mt k r => B.gN (Matrix.of x : B.Mat k r) ^ (-a)) μN := by
+theorem intN
+    (k r : ℕ) (μN : Measure (Mt k r)) (hN : IsHaarOn (Nset k r) μN) (a : ℝ) (ha : B.AB k r ≤ a)
+    : Integrable (fun x : Mt k r => B.gN (Matrix.of x : B.Mat k r) ^ (-a)) μN := by
   refine ⟨((P.HaarUniquenessConjugation.gN_meas k r).pow_const _).aestronglyMeasurable, ?_⟩
-  rw [hasFiniteIntegral_iff_ofReal (Eventually.of_forall fun x => Real.rpow_nonneg (tr_gN_nonneg _) _)]
+  rw [hasFiniteIntegral_iff_ofReal (Eventually.of_forall fun x =>
+    Real.rpow_nonneg (tr_gN_nonneg _) _)]
   refine lt_of_le_of_lt (lintegral_mono_ae ?_) (intN_AB hN)
   filter_upwards [P.LongWeylElement.haar_ae hN] with x hx
   have h1 : 1 ≤ B.gN (Matrix.of x : B.Mat k r) := P.BetaSesquilinearity.gN_ge_one hx.1
@@ -307,25 +335,29 @@ open scoped ContDiff
 
 namespace Formalism.FourierDecayAlt.P.SliceLastLevel
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section cdmap
 
-variable {k r d : ℕ} {O : Set (Fin d → ℝ)} {cx : (Fin d → ℝ) → Fin r → ℂ} {μx : (Fin d → ℝ) → B.Mat k 0}
+variable
+  {k r d : ℕ} {O : Set (Fin d → ℝ)} {cx : (Fin d → ℝ) → Fin r → ℂ} {μx : (Fin d → ℝ) → B.Mat k 0}
 
 end cdmap
 
 section cdmap2
 
-variable {k r d : ℕ} {O : Set (Fin d → ℝ)} {cx : (Fin d → ℝ) → Fin r → ℂ} {μx : (Fin d → ℝ) → B.Mat k 0}
+variable
+  {k r d : ℕ} {O : Set (Fin d → ℝ)} {cx : (Fin d → ℝ) → Fin r → ℂ} {μx : (Fin d → ℝ) → B.Mat k 0}
 
 end cdmap2
 
 section cdmap3
 
-variable {k r d : ℕ} {O : Set (Fin d → ℝ)} {cx : (Fin d → ℝ) → Fin r → ℂ} {μx : (Fin d → ℝ) → B.Mat k 0}
+variable
+  {k r d : ℕ} {O : Set (Fin d → ℝ)} {cx : (Fin d → ℝ) → Fin r → ℂ} {μx : (Fin d → ℝ) → B.Mat k 0}
   {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
 end cdmap3
@@ -340,7 +372,8 @@ open Matrix MeasureTheory Filter Topology
 
 namespace Formalism.FourierDecayAlt.P.SliceLastLevel
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -366,15 +399,17 @@ end meas
 
 section clause2
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 end clause2
 
 section clause12
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 end clause12
 
@@ -391,28 +426,32 @@ set_option linter.style.haveILetI false
 
 namespace Formalism.FourierDecayAlt.P.SliceLastLevel
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section words
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 end words
 
 section clause3
 
-variable {k r d : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r d : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 end clause3
 
 section clause3b
 
-variable {k r d : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r d : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 end clause3b
 

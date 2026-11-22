@@ -17,9 +17,12 @@ section Hopf
 
 variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
 
-def pullHopf {N X : Type} [AddCommGroup N] [Fintype N] [DecidableEq N] [AddCommGroup X]
-    [Fintype X] [DecidableEq X] (ψ : X →+ N) (AA : HopfOrder (C := C) R N)
-    (hlat : IsLat R (AA.carrier.map (LinearMap.funLeft R C ψ))) : HopfOrder (C := C) R X where
+def pullHopf
+    {N X : Type}
+    [AddCommGroup N] [Fintype N] [DecidableEq N] [AddCommGroup X] [Fintype X] [DecidableEq X]
+    (ψ : X →+ N) (AA : HopfOrder (C := C) R N)
+    (hlat : IsLat R (AA.carrier.map (LinearMap.funLeft R C ψ)))
+    : HopfOrder (C := C) R X where
   carrier := AA.carrier.map (LinearMap.funLeft R C ψ)
   lat := hlat
   le_int := by
@@ -39,35 +42,47 @@ def pullHopf {N X : Type} [AddCommGroup N] [Fintype N] [DecidableEq N] [AddCommG
     rintro _ ⟨f, hf, rfl⟩
     exact ⟨fun x => f (-x), AA.antipode f hf, funext fun x => by simp [LinearMap.funLeft_apply]⟩
 
-theorem pullHopf_carrier {N X : Type} [AddCommGroup N] [Fintype N] [DecidableEq N]
-    [AddCommGroup X] [Fintype X] [DecidableEq X] (ψ : X →+ N) (AA : HopfOrder (C := C) R N)
-    (hlat : IsLat R (AA.carrier.map (LinearMap.funLeft R C ψ))) :
-    (pullHopf ψ AA hlat).carrier = AA.carrier.map (LinearMap.funLeft R C ψ) := rfl
+theorem pullHopf_carrier
+    {N X : Type}
+    [AddCommGroup N] [Fintype N] [DecidableEq N] [AddCommGroup X] [Fintype X] [DecidableEq X]
+    (ψ : X →+ N) (AA : HopfOrder (C := C) R N)
+    (hlat : IsLat R (AA.carrier.map (LinearMap.funLeft R C ψ)))
+    : (pullHopf ψ AA hlat).carrier = AA.carrier.map (LinearMap.funLeft R C ψ) :=
+  rfl
 
-theorem isLat_map_equiv {X K : Type} [Fintype X] [DecidableEq X] {_ : Fintype K} {_ : DecidableEq K}
-    (e : X ≃ K) {M : Submodule R (K → C)} (hM : IsLat R M) :
-    IsLat R (M.map (LinearMap.funLeft R C e)) := by
+theorem isLat_map_equiv
+    {X K : Type} [Fintype X] [DecidableEq X] {_ : Fintype K} {_ : DecidableEq K}
+    (e : X ≃ K)
+    {M : Submodule R (K → C)} (hM : IsLat R M)
+    : IsLat R (M.map (LinearMap.funLeft R C e)) := by
   obtain ⟨B, hB, rfl⟩ := hM
   refine ⟨B.submatrix e e, by rwa [Matrix.det_submatrix_equiv_self], ?_⟩
   rw [Submodule.map_span, ← Set.range_comp]
-  have h1 : (fun j x => (B.submatrix e e) x j) =
-      (⇑(LinearMap.funLeft R C e) ∘ fun j x => B x j) ∘ e := by
+  have h1
+      : (fun j x => (B.submatrix e e) x j)
+        = (⇑(LinearMap.funLeft R C e) ∘ fun j x => B x j) ∘ e := by
     funext j x
     rfl
   rw [h1, e.surjective.range_comp]
 
-theorem hopfLat {K : Type} {_ : AddCommGroup K} {_ : Fintype K} {_ : DecidableEq K}
-    (A : HopfOrder (C := C) R K) : IsLat R A.carrier := A.lat
+theorem hopfLat
+    {K : Type} {_ : AddCommGroup K} {_ : Fintype K} {_ : DecidableEq K} (A : HopfOrder (C := C) R K)
+    : IsLat R A.carrier :=
+  A.lat
 
-theorem isLat_pull (v : Valuation C NNReal) (hv : v.Integers R) {N X : Type} [AddCommGroup N]
-    [Fintype N] [DecidableEq N] [AddCommGroup X] [Fintype X] [DecidableEq X]
-    (ψ : X →+ N) (hψ : Function.Injective ψ) (AA : HopfOrder (C := C) R N) :
-    IsLat R (AA.carrier.map (LinearMap.funLeft R C ψ)) := by
+theorem isLat_pull
+    (v : Valuation C NNReal) (hv : v.Integers R)
+    {N X : Type}
+    [AddCommGroup N] [Fintype N] [DecidableEq N] [AddCommGroup X] [Fintype X] [DecidableEq X]
+    (ψ : X →+ N) (hψ : Function.Injective ψ)
+    (AA : HopfOrder (C := C) R N)
+    : IsLat R (AA.carrier.map (LinearMap.funLeft R C ψ)) := by
   classical
   obtain ⟨⟨AK, hAK⟩, -⟩ := h2 C R v hv N ψ.range AA
   let e := AddMonoidHom.ofInjective hψ
-  have hmap : (AA.carrier.map (resK ψ.range)).map (LinearMap.funLeft R C e.toEquiv) =
-      AA.carrier.map (LinearMap.funLeft R C ψ) := by
+  have hmap
+      : (AA.carrier.map (resK ψ.range)).map (LinearMap.funLeft R C e.toEquiv)
+        = AA.carrier.map (LinearMap.funLeft R C ψ) := by
     rw [← Submodule.map_comp]
     congr 1
   rw [← hmap, ← hAK]
@@ -77,11 +92,14 @@ end Hopf
 
 section Split
 
-variable {S : Type} [CommRing S] {n k : Type} [Fintype n] [DecidableEq n] [Fintype k] [DecidableEq k]
+variable
+  {S : Type} [CommRing S] {n k : Type} [Fintype n] [DecidableEq n] [Fintype k] [DecidableEq k]
 
-theorem exists_split (e : Matrix n n S) (he : e * e = e) (B : Matrix n k S)
-    (hr : LinearMap.range B.mulVecLin = LinearMap.range e.mulVecLin)
-    (hk : LinearMap.ker B.mulVecLin = ⊥) : ∃ L : Matrix k n S, L * B = 1 ∧ B * L = e := by
+theorem exists_split
+    (e : Matrix n n S) (he : e * e = e)
+    (B : Matrix n k S) (hr : LinearMap.range B.mulVecLin = LinearMap.range e.mulVecLin)
+    (hk : LinearMap.ker B.mulVecLin = ⊥)
+    : ∃ L : Matrix k n S, L * B = 1 ∧ B * L = e := by
   have hcol : ∀ j : n, ∃ c : k → S, B *ᵥ c = e *ᵥ Pi.single j 1 := by
     intro j
     have hmem : e *ᵥ Pi.single j 1 ∈ LinearMap.range B.mulVecLin := by

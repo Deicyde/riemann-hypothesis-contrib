@@ -7,8 +7,12 @@ public import Mathlib
 namespace GlobalTheory.FixedOfPower
 open Polynomial
 
-theorem fix_of_pow {k : Type} [Field k] (p : ℕ) [Fact (Nat.Prime p)] [CharP k p]
-    (τ : k →+* k) (c : k) (hc : c ^ p = c) : τ c = c := by
+theorem fix_of_pow
+    {k : Type} [Field k]
+    (p : ℕ) [Fact (Nat.Prime p)] [CharP k p]
+    (τ : k →+* k)
+    (c : k) (hc : c ^ p = c)
+    : τ c = c := by
   classical
   have hp1 : 1 < p := (Fact.out : p.Prime).one_lt
   let f : ZMod p →+* k := ZMod.castHom (dvd_refl p) k
@@ -27,16 +31,21 @@ theorem fix_of_pow {k : Type} [Field k] (p : ℕ) [Fact (Nat.Prime p)] [CharP k 
     have hcard : (insert c (Finset.univ.image f)).card = p + 1 := by
       rw [Finset.card_insert_of_notMem (by simpa using hcon),
         Finset.card_image_of_injective _ f.injective, Finset.card_univ, ZMod.card]
-    have hle := (Finset.card_le_card hsub).trans
-      ((Multiset.toFinset_card_le _).trans (card_roots' (X ^ p - X : k[X])))
+    have hle :=
+      (Finset.card_le_card hsub).trans
+        ((Multiset.toFinset_card_le _).trans (card_roots' (X ^ p - X : k[X])))
     rw [hcard, Polynomial.natDegree_X_pow_sub_X (R := k) hp1] at hle
     omega
   obtain ⟨a, rfl⟩ := hc'
   exact DFunLike.congr_fun (RingHom.ext_zmod (τ.comp f) f) a
 
-theorem ringHom_apply_eq_pow {k : Type} [Field k] (p : ℕ) [Fact (Nat.Prime p)] [CharP k p]
-    (τ : k →+* k) (N : ℕ) (hN : 0 < N) (z : k) (hz : z ^ p ^ N = z) :
-    ∃ e : ℕ, τ z = z ^ p ^ e := by
+theorem ringHom_apply_eq_pow
+    {k : Type} [Field k]
+    (p : ℕ) [Fact (Nat.Prime p)] [CharP k p]
+    (τ : k →+* k)
+    (N : ℕ) (hN : 0 < N)
+    (z : k) (hz : z ^ p ^ N = z)
+    : ∃ e : ℕ, τ z = z ^ p ^ e := by
   have : ExpChar k p := ExpChar.prime Fact.out
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 1 := ⟨N - 1, by omega⟩
   let g : k[X] := ∏ e ∈ Finset.range (M + 1), (X - C (z ^ p ^ e))
@@ -59,7 +68,8 @@ theorem ringHom_apply_eq_pow {k : Type} [Field k] (p : ℕ) [Fact (Nat.Prime p)]
     exact Finset.prod_eq_zero (Finset.mem_range.mpr (Nat.succ_pos M)) (by simp)
   have hτz : g.eval (τ z) = 0 := by
     rw [← hτ, Polynomial.eval_map, Polynomial.eval₂_at_apply, hz0, map_zero]
-  simp only [g, Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C] at hτz
+  simp only [g, Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C]
+    at hτz
   obtain ⟨e, -, he⟩ := Finset.prod_eq_zero_iff.mp hτz
   exact ⟨e, sub_eq_zero.mp he⟩
 

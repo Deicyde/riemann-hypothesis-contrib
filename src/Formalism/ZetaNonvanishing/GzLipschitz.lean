@@ -233,7 +233,7 @@ theorem zetaPrimeSumErrorLipschitz : GzLipschitz := by
     have h2 : |Gz t| ≤ |Gz t - Gz (1 / 2)| + |Gz (1 / 2)| := by
       have := abs_sub_abs_le_abs_sub (Gz t) (Gz (1 / 2))
       linarith
-    rw [abs_of_nonneg (by linarith : (0:ℝ) ≤ t - 1 / 2)] at h
+    rw [abs_of_nonneg (by linarith : (0 : ℝ) ≤ t - 1 / 2)] at h
     nlinarith [abs_nonneg (Gz (1 / 2)), mul_nonneg (abs_nonneg (Gz (1 / 2))) (by linarith : (0:ℝ) ≤ t - 1 / 2)]
   · exact le_trans (hlip t t' ht ht')
       (mul_le_mul_of_nonneg_right (by linarith [abs_nonneg (Gz (1 / 2))]) (abs_nonneg _))

@@ -282,9 +282,20 @@ lemma continuousOn_polarLog (ε : Fin n → Bool) : ContinuousOn (polarLog (n :=
 
 theorem polar_decomposition_holds : Polar := by
   intro n ε
-  refine ⟨fun g hg => ⟨g * NormedSpace.exp (-polarLog g), polarLog g, mul_exp_neg_polarLog_mem_compact hg,
-      polarLog_mem_hermitian_part hg, polar_decomposition_eq⟩,
+  refine ⟨
+    fun g hg => ⟨
+      g * NormedSpace.exp (- polarLog g),
+      polarLog g,
+      mul_exp_neg_polarLog_mem_compact hg,
+      polarLog_mem_hermitian_part hg,
+      polar_decomposition_eq
+    ⟩,
     fun k k' X X' hk hk' hX hX' h => polar_decomposition_unique k k' X X' hk hk' hX hX' h,
-    ⟨polarLog, continuousOn_polarLog ε, fun g hg => ⟨polarLog_mem_hermitian_part hg, mul_exp_neg_polarLog_mem_compact hg⟩⟩⟩
+    ⟨
+      polarLog,
+      continuousOn_polarLog ε,
+      fun g hg => ⟨polarLog_mem_hermitian_part hg, mul_exp_neg_polarLog_mem_compact hg⟩
+    ⟩
+  ⟩
 
 end Formalism.REAL

@@ -47,17 +47,22 @@ end
 def invT (a : ℕ) (R : Type) [CommRing R] : GL (Fin a) R →* GL (Fin a) R :=
   (Reformulated.TransposeInverseTheory.transposeInv : GL (Fin a) R ≃* GL (Fin a) R).toMonoidHom
 
-def twRep {G : Type} [Group G] {V : Type} [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (χ : G →* ℂˣ) : Representation ℂ G V where
+def twRep
+    {G : Type} [Group G]
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (χ : G →* ℂˣ)
+    : Representation ℂ G V where
   toFun g := (χ g : ℂ) • ρ g
   map_one' := by simp
   map_mul' g h := by
     simp only [map_mul, Units.val_mul, smul_mul_assoc, mul_smul_comm, smul_smul]
     rw [mul_comm (χ h : ℂ)]
 
-theorem isOpen_stab_of_mem_nhds {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : G →* Module.End ℂ V) (v : V)
-    (h : {g : G | ρ g v = v} ∈ nhds (1 : G)) : IsOpen {g : G | ρ g v = v} :=
+theorem isOpen_stab_of_mem_nhds
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : G →* Module.End ℂ V) (v : V) (h : {g : G | ρ g v = v} ∈ nhds (1 : G))
+    : IsOpen {g : G | ρ g v = v} :=
   UpperTheory.Reformulated.B.IsOpenStabilizer.isOpen_stab_of_mem_nhds ρ v h
 
 end GlobalTheory.CuspRep

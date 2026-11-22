@@ -9,11 +9,12 @@ open GlobalTheory.BCT
 
 namespace GlobalTheory.ConjRegroup
 
-theorem finsum_fibres {H C : Type} (p : H → C) (a : H → ℂ) (ha : (Function.support a).Finite) :
-    ∑ᶠ γ, a γ = ∑ᶠ c : C, ∑ᶠ x, Set.indicator {x | p x = c} a x := by
+theorem finsum_fibres {H C : Type} (p : H → C) (a : H → ℂ) (ha : (Function.support a).Finite)
+    : ∑ᶠ γ, a γ = ∑ᶠ c : C, ∑ᶠ x, Set.indicator {x | p x = c} a x := by
   classical
-  have h1 : ∀ c : C, ∑ᶠ x, Set.indicator {x | p x = c} a x
-      = ∑ x ∈ ha.toFinset, if c = p x then a x else 0 := by
+  have h1
+      : ∀ c : C,
+        ∑ᶠ x, Set.indicator {x | p x = c} a x = ∑ x ∈ ha.toFinset, if c = p x then a x else 0 := by
     intro c
     rw [finsum_eq_sum_of_support_subset (s := ha.toFinset)]
     · refine Finset.sum_congr rfl fun x _ => ?_
@@ -35,8 +36,8 @@ theorem finsum_fibres {H C : Type} (p : H → C) (a : H → ℂ) (ha : (Function
     by_contra h
     exact hc (if_neg h)
 
-theorem mk_eq_iff {H : Type} [Group H] (x y : H) :
-    (Quot.mk _ x : TwCl (MonoidHom.id H)) = Quot.mk _ y ↔ ∃ g, y = g⁻¹ * x * g := by
+theorem mk_eq_iff {H : Type} [Group H] (x y : H)
+    : (Quot.mk _ x : TwCl (MonoidHom.id H)) = Quot.mk _ y ↔ ∃ g, y = g⁻¹ * x * g := by
   have he : Equivalence fun x y : H => ∃ g, y = g⁻¹ * x * (MonoidHom.id H) g := by
     refine ⟨fun x => ⟨1, by simp⟩, ?_, ?_⟩
     · rintro x y ⟨g, rfl⟩
@@ -45,20 +46,21 @@ theorem mk_eq_iff {H : Type} [Group H] (x y : H) :
       exact ⟨g * h, by simp [mul_assoc]⟩
   exact Quot.eq.trans he.eqvGen_iff
 
-theorem conj_injective {H : Type} [Group H] (r : H) :
-    Function.Injective fun δ : H ⧸ twCent (MonoidHom.id H) r =>
+theorem conj_injective {H : Type} [Group H] (r : H)
+    : Function.Injective fun δ : H ⧸ twCent (MonoidHom.id H) r =>
       Quotient.out δ * r * (Quotient.out δ)⁻¹ := by
   intro δ ε h
   rw [← QuotientGroup.out_eq' δ, ← QuotientGroup.out_eq' ε, QuotientGroup.eq]
   change (Quotient.out δ)⁻¹ * Quotient.out ε * r = r * ((Quotient.out δ)⁻¹ * Quotient.out ε)
   simp only at h
-  calc (Quotient.out δ)⁻¹ * Quotient.out ε * r
+  calc
+    (Quotient.out δ)⁻¹ * Quotient.out ε * r
       = (Quotient.out δ)⁻¹ * (Quotient.out ε * r * (Quotient.out ε)⁻¹) * Quotient.out ε := by group
     _ = r * ((Quotient.out δ)⁻¹ * Quotient.out ε) := by rw [← h]; group
 
-theorem range_conj {H : Type} [Group H] (c : TwCl (MonoidHom.id H)) :
-    Set.range (fun δ : H ⧸ twCent (MonoidHom.id H) c.rep =>
-      Quotient.out δ * c.rep * (Quotient.out δ)⁻¹)
+theorem range_conj {H : Type} [Group H] (c : TwCl (MonoidHom.id H))
+    : Set.range (fun δ : H ⧸ twCent (MonoidHom.id H) c.rep =>
+        Quotient.out δ * c.rep * (Quotient.out δ)⁻¹)
       = {x | (Quot.mk _ x : TwCl (MonoidHom.id H)) = c} := by
   have hc : (Quot.mk _ c.rep : TwCl (MonoidHom.id H)) = c := Quot.out_eq c
   ext x
@@ -74,13 +76,16 @@ theorem range_conj {H : Type} [Group H] (c : TwCl (MonoidHom.id H)) :
     obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul (twCent (MonoidHom.id H) c.rep) g
     have hk2 : (k : H) * c.rep = c.rep * k := k.2
     rw [hk]
-    calc g * k * c.rep * (g * k)⁻¹ = g * (k * c.rep) * (g * k)⁻¹ := by group
+    calc
+      g * k * c.rep * (g * k)⁻¹
+        = g * (k * c.rep) * (g * k)⁻¹ := by group
       _ = g * c.rep * g⁻¹ := by rw [hk2]; group
       _ = x := by rw [hg]; group
 
-theorem finsum_eq_finsum_classes {H : Type} [Group H] (a : H → ℂ) (ha : (Function.support a).Finite) :
-    ∑ᶠ γ, a γ = ∑ᶠ c : TwCl (MonoidHom.id H), ∑ᶠ δ : H ⧸ twCent (MonoidHom.id H) c.rep,
-      a (Quotient.out δ * c.rep * (Quotient.out δ)⁻¹) := by
+theorem finsum_eq_finsum_classes {H : Type} [Group H] (a : H → ℂ) (ha : (Function.support a).Finite)
+    : ∑ᶠ γ, a γ
+      = ∑ᶠ c : TwCl (MonoidHom.id H), ∑ᶠ δ : H ⧸ twCent (MonoidHom.id H) c.rep,
+        a (Quotient.out δ * c.rep * (Quotient.out δ)⁻¹) := by
   rw [finsum_fibres (fun x => (Quot.mk _ x : TwCl (MonoidHom.id H))) a ha]
   refine finsum_congr fun c => ?_
   rw [← finsum_mem_def, ← range_conj c, finsum_mem_range (conj_injective (TwCl.rep c))]

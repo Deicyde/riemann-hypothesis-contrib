@@ -13,7 +13,9 @@ public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.FrobeniusOrbits GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.FrobeniusOrbits
+  GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
 
 namespace GlobalTheory.SplitRowProbe
 
@@ -25,10 +27,11 @@ theorem conj_sqrt (φ : H.E →+* ℂ) (x : H.E) : φ (H.conj x) = starRingEnd �
 
 theorem sqrt_sq (φ : H.E →+* ℂ) : φ (H.sqd) ^ 2 = -(H.d : ℂ) := by
   have h : (H.sqd) ^ 2 = -(H.d : H.E) := H.sqd_sq
-  rw [← map_pow, h]; simp
+  rw [← map_pow, h]
+  simp
 
-theorem mem_halfType_false (φ : H.E →+* ℂ) :
-    φ ∈ halfType H false ↔ φ (H.sqd) = -(Complex.I * (Real.sqrt H.d : ℂ)) := by
+theorem mem_halfType_false (φ : H.E →+* ℂ)
+    : φ ∈ halfType H false ↔ φ (H.sqd) = -(Complex.I * (Real.sqrt H.d : ℂ)) := by
   change φ (H.conj (H.sqd)) = _ ↔ _
   rw [conj_sqrt]
   constructor
@@ -36,7 +39,8 @@ theorem mem_halfType_false (φ : H.E →+* ℂ) :
     have := congrArg (starRingEnd ℂ) h
     simpa using this
   · intro h
-    rw [h]; simp
+    rw [h]
+    simp
 
 theorem halfType_xor (φ : H.E →+* ℂ) : Xor (φ ∈ halfType H true) (φ ∈ halfType H false) := by
   rw [mem_halfType_false]
@@ -55,15 +59,16 @@ theorem halfType_xor (φ : H.E →+* ℂ) : Xor (φ ∈ halfType H true) (φ ∈
 end Host
 
 section Loc
-variable (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
+variable
+  (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
   (hw : w ∈ placesOver D.host.E (D.nd.l i))
 
 theorem nonempty_emb : Nonempty (Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw) :=
   ⟨((D.nbr i w hw).Kw.1.val).codRestrict (D.nbr i w hw).LL.1.toSubalgebra
     ((D.nbr i w hw).LL_split _)⟩
 
-theorem embIn_xor (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw) :
-    Xor (EmbIn (N := D.nd) D.nbr i true w hw τ) (EmbIn (N := D.nd) D.nbr i false w hw τ) := by
+theorem embIn_xor (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw)
+    : Xor (EmbIn (N := D.nd) D.nbr i true w hw τ) (EmbIn (N := D.nd) D.nbr i false w hw τ) := by
   obtain ⟨g, key, -⟩ := GlobalTheory.HTW.exists_letter_of_local_embedding D i w hw τ
   have hemb : ∀ x, D.what₂.embLL (D.embE (D.host.sigmaOf g x)) = D.host.emb g x := fun x =>
     DFunLike.congr_fun D.embE_φ₀ (D.host.sigmaOf g x)
@@ -71,9 +76,10 @@ theorem embIn_xor (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i 
     intro s
     constructor
     · rintro ⟨-, φ, hφ, h⟩
-      have : D.host.emb g = φ := RingHom.ext fun x => by
-        rw [← hemb x]
-        exact h x _ (key x).symm
+      have : D.host.emb g = φ :=
+        RingHom.ext fun x => by
+          rw [← hemb x]
+          exact h x _ (key x).symm
       exact this ▸ hφ
     · intro hg
       refine ⟨fun x => ⟨_, (key x).symm⟩, D.host.emb g, hg, fun x y hy => ?_⟩
@@ -83,14 +89,15 @@ theorem embIn_xor (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i 
   rw [main, main]
   exact halfType_xor D.host _
 
-theorem not_both_columns : ¬ (PlIn (N := D.nd) D.nbr i true w hw ∧ PlIn (N := D.nd) D.nbr i false w hw) := by
+theorem not_both_columns
+    : ¬(PlIn (N := D.nd) D.nbr i true w hw ∧ PlIn (N := D.nd) D.nbr i false w hw) := by
   rintro ⟨⟨⟨τ⟩, h1⟩, -, h2⟩
   rcases embIn_xor D i w hw τ with h | h
   · exact h.2 (h2 τ)
   · exact h.2 (h1 τ)
 
-theorem bridge_place (x : 𝓞 D.host.E) :
-    x ∈ w.asIdeal ↔ ‖(D.nbr i w hw).j (algebraMap D.host.E D.nd.Om (x : D.host.E))‖ < 1 := by
+theorem bridge_place (x : 𝓞 D.host.E)
+    : x ∈ w.asIdeal ↔ ‖(D.nbr i w hw).j (algebraMap D.host.E D.nd.Om (x : D.host.E))‖ < 1 := by
   rw [← D.nd.plOm.2 w x]
   set y := algebraMap D.host.E D.nd.Om (x : D.host.E)
   by_cases hy : y = 0
@@ -98,7 +105,8 @@ theorem bridge_place (x : 𝓞 D.host.E) :
   have hj : 0 < ‖(D.nbr i w hw).j y‖ := norm_pos_iff.2 ((map_ne_zero _).2 hy)
   have h := D.nbr_ind i w hw y⁻¹
   rw [← ValuationSubring.valuation_le_one_iff, map_inv₀, map_inv₀, norm_inv, inv_le_one₀ hj,
-    inv_le_one₀ (zero_lt_iff.2 ((map_ne_zero _).2 hy))] at h
+      inv_le_one₀ (zero_lt_iff.2 ((map_ne_zero _).2 hy))]
+    at h
   rw [← not_le, ← not_le, h]
 
 end Loc

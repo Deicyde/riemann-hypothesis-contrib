@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsRealThe
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open MeasureTheory Matrix GlobalTheory.Chain GlobalTheory.ChainFr GlobalTheory.Grid
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -18,9 +20,14 @@ namespace GlobalTheory.GridParD
 
 open GlobalTheory.SignedHC Finset
 
-theorem pairPar_X : ∀ D : D7, GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.Sizes D → ∀ (i j : ℕ) (τ : D.what₂.Tau), i < D.R.m → j ≤ D.R.m →
-    PairPar (GlobalTheory.SignedHC.flip (parV D (i + 1) j τ)) (parV D i j τ) (att (cen D τ (D.R.m - i)) (rkV D (i + 1) j))
-      (att (cen D τ (D.R.m - i)) (rkV D i j)) := by
+theorem pairPar_X
+    : ∀ D : D7,
+      GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.Sizes D
+        → ∀ (i j : ℕ) (τ : D.what₂.Tau),
+          i < D.R.m → j ≤ D.R.m
+            → PairPar (GlobalTheory.SignedHC.flip (parV D (i + 1) j τ)) (parV D i j τ)
+              (att (cen D τ (D.R.m - i)) (rkV D (i + 1) j))
+              (att (cen D τ (D.R.m - i)) (rkV D i j)) := by
   intro D hS i j τ hi hj
   have hnear := grid_nearMid D τ
   have hB1 := gridDataAtRealPlace_neg_firstLowEnd_lt_cloud D τ
@@ -34,8 +41,8 @@ theorem pairPar_X : ∀ D : D7, GlobalTheory.IndefiniteRowSideFullHecke.CuspAlon
   have hle := entries_parD_le (grid D τ) hi hj hnear hB1 hbe hs2
   have hgap : ∀ i', GapOver ((grid D τ).parD i' j) (2 * (bigN D : ℚ) ^ 3) := fun i' =>
     gapOver_parD (grid D τ) i' j hN0 hnear hB1 heb hbb hga
-  have hlt : ∀ x ∈ (grid D τ).parD i j, x.1 + ((sLen D : ℚ) + 1) / 2 ≤ (cen D τ (D.R.m - i) : ℚ) := fun x hx =>
-    hle x.1 (fst_mem_entries hx)
+  have hlt : ∀ x ∈ (grid D τ).parD i j, x.1 + ((sLen D : ℚ) + 1) / 2 ≤ (cen D τ (D.R.m - i) : ℚ) :=
+    fun x hx => hle x.1 (fst_mem_entries hx)
   have hs0 : (0 : ℚ) ≤ sLen D := by positivity
   set c : ℚ := (cen D τ (D.R.m - i) : ℚ) with hc
   set δ : ℚ := if Odd (i + j) then -(1 / 2) else 0 with hδdef
@@ -50,8 +57,9 @@ theorem pairPar_X : ∀ D : D7, GlobalTheory.IndefiniteRowSideFullHecke.CuspAlon
     by_cases h : Odd (i + j)
     · simp [att, odd_rkV_iff, e1, h, hδ'def]
     · simp [att, odd_rkV_iff, e1, h, hδ'def, sub_eq_add_neg]
-  have key : partner (sLen D) false (c + δ) (c + δ') (shift δ ((grid D τ).parD i j)) =
-      flip (shift δ' ((grid D τ).parD (i + 1) j)) := by
+  have key
+      : partner (sLen D) false (c + δ) (c + δ') (shift δ ((grid D τ).parD i j))
+        = flip (shift δ' ((grid D τ).parD (i + 1) j)) := by
     rw [parD_succ _ hi]
     ext y
     simp only [partner, Finset.mem_union, Finset.mem_image, mem_flip, mem_shift, mem_plus]
@@ -82,11 +90,20 @@ theorem pairPar_X : ∀ D : D7, GlobalTheory.IndefiniteRowSideFullHecke.CuspAlon
         · ext
           · rfl
           · simpa using h2
-  refine ⟨sLen D, flip (shift δ' ((grid D τ).parD (i + 1) j)), shift δ ((grid D τ).parD i j), ?_, rfl, Or.inr ?_⟩
+  refine ⟨
+    sLen D,
+    flip (shift δ' ((grid D τ).parD (i + 1) j)),
+    shift δ ((grid D τ).parD i j),
+    ?_,
+    rfl,
+    Or.inr ?_
+  ⟩
   · exact flip_dualPar _
   · rw [hδ, hδ', ← key]
-    have hX : ((grid D τ).parD i j).Nonempty :=
-      ⟨((grid D τ).v 2, true), GridData.mem_parD.2 (Or.inl ⟨GridData.mem_cloud.2 ⟨2, le_rfl, (grid D τ).two_le_k, rfl⟩, rfl⟩)⟩
+    have hX : ((grid D τ).parD i j).Nonempty := ⟨
+      ((grid D τ).v 2, true),
+      GridData.mem_parD.2 (Or.inl ⟨GridData.mem_cloud.2 ⟨2, le_rfl, (grid D τ).two_le_k, rfl⟩, rfl⟩)
+    ⟩
     have hinj : Function.Injective fun x : ℚ × Bool => (x.1 + δ, x.2) := by
       intro a b e
       simp only [Prod.mk.injEq, add_left_inj] at e
@@ -105,7 +122,8 @@ theorem pairPar_X : ∀ D : D7, GlobalTheory.IndefiniteRowSideFullHecke.CuspAlon
       have hr : D.R.r + 1 = D.R.k + D.R.m := by have := D.R.m_add_three_le_k; unfold Ranks.r; omega
       unfold bigN
       nlinarith
-    refine GlobalTheory.T.isRealThetaParameterPair_thetaPartnerSignedParameter (sLen D) false (c + δ) (c + δ') _ (bigN D) (by unfold sLen; omega) (hX.image _)
+    refine GlobalTheory.T.isRealThetaParameterPair_thetaPartnerSignedParameter (sLen D) false
+      (c + δ) (c + δ') _ (bigN D) (by unfold sLen; omega) (hX.image _)
       (GapOver.isRegular hN0 (gapOver_shift δ (hgap i))) ?_ ?_ hcard hN (gapOver_shift δ (hgap i))
       (by rw [key]; exact gapOver_flip (gapOver_shift δ' (hgap (i + 1))))
     · intro x hx

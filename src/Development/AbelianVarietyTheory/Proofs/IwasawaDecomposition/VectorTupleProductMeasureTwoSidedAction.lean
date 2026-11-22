@@ -7,26 +7,32 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.T2Spa
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx Matrix
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx Matrix
 open scoped TensorProduct NNReal ENNReal Pointwise Kronecker
 
 namespace GlobalTheory.GaugeEx.ModDet
 
-theorem induction_pi {S : Type} [CommRing S] {ι : Type} [Fintype ι] [DecidableEq ι] {K : ι → Type}
-    [∀ k, Field (K k)] (e : S ≃+* ∀ k, K k) {κ : Type} [Fintype κ] [DecidableEq κ]
+theorem induction_pi
+    {S : Type} [CommRing S]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {K : ι → Type} [∀ k, Field (K k)]
+    (e : S ≃+* ∀ k, K k)
+    {κ : Type} [Fintype κ] [DecidableEq κ]
     (P : Matrix κ κ S → Prop) (hd : ∀ d : κ → S, (∀ i, IsUnit (d i)) → P (diagonal d))
-    (ht : ∀ (i j : κ) (c : S), i ≠ j → P (transvection i j c))
-    (hm : ∀ A B, P A → P B → P (A * B)) (g : Matrix κ κ S) (hg : IsUnit g.det) : P g := by
+    (ht : ∀ (i j : κ) (c : S), i ≠ j → P (transvection i j c)) (hm : ∀ A B, P A → P B → P (A * B))
+    (g : Matrix κ κ S) (hg : IsUnit g.det)
+    : P g := by
   let E : Matrix κ κ S ≃+* ∀ k, Matrix κ κ (K k) := e.mapMatrix.trans Matrix.piRingEquiv
   have hE : ∀ A k i j, E A k i j = e (A i j) k := fun _ _ _ _ => rfl
   have h1 : ∀ k (A : Matrix κ κ (K k)), A.det ≠ 0 → P (E.symm (Pi.mulSingle k A)) := by
     intro k A hA
-    apply diagonal_transvection_induction_of_det_ne_zero
-      (fun A => P (E.symm (Pi.mulSingle k A))) A hA
+    apply
+      diagonal_transvection_induction_of_det_ne_zero (fun A => P (E.symm (Pi.mulSingle k A))) A hA
     · intro D hD
       rw [det_diagonal] at hD
-      have : E.symm (Pi.mulSingle k (diagonal D)) =
-          diagonal fun i => e.symm (Pi.mulSingle k (D i)) := by
+      have : E.symm (Pi.mulSingle k (diagonal D))
+          = diagonal fun i => e.symm (Pi.mulSingle k (D i)) := by
         rw [RingEquiv.symm_apply_eq]
         funext k'
         ext i j
@@ -45,8 +51,8 @@ theorem induction_pi {S : Type} [CommRing S] {ι : Type} [Fintype ι] [Decidable
       exact (this.map (MonoidHom.mulSingle K k)).map e.symm
     · intro t
       obtain ⟨a, b, hab, c⟩ := t
-      have : E.symm (Pi.mulSingle k (transvection a b c)) =
-          transvection a b (e.symm (Pi.single k c)) := by
+      have : E.symm (Pi.mulSingle k (transvection a b c))
+          = transvection a b (e.symm (Pi.single k c)) := by
         rw [RingEquiv.symm_apply_eq]
         funext k'
         ext i j
@@ -73,8 +79,8 @@ theorem induction_pi {S : Type} [CommRing S] {ι : Type} [Fintype ι] [Decidable
       rw [this, map_one, ← diagonal_one]
       exact hd _ fun _ => isUnit_one
     | insert a s ha ih =>
-      have : (fun k => if k ∈ insert a s then E g k else 1) =
-          Pi.mulSingle a (E g a) * fun k => if k ∈ s then E g k else 1 := by
+      have : (fun k => if k ∈ insert a s then E g k else 1)
+          = Pi.mulSingle a (E g a) * fun k => if k ∈ s then E g k else 1 := by
         funext k
         by_cases hk : k = a
         · subst hk; simp [ha]
@@ -87,10 +93,10 @@ section
 
 variable {S : Type} [CommRing S] [TopologicalSpace S] [IsTopologicalRing S] [LocallyCompactSpace S]
 
-theorem modu_coe (u : Sˣ) : modu S u = distribHaarChar S u := by
-  simp [modu]
+theorem modu_coe (u : Sˣ) : modu S u = distribHaarChar S u := by simp [modu]
 
-theorem modu_mul {a b : S} (ha : IsUnit a) (hb : IsUnit b) : modu S (a * b) = modu S a * modu S b := by
+theorem modu_mul {a b : S} (ha : IsUnit a) (hb : IsUnit b)
+    : modu S (a * b) = modu S a * modu S b := by
   obtain ⟨a, rfl⟩ := ha
   obtain ⟨b, rfl⟩ := hb
   rw [← Units.val_mul, modu_coe, modu_coe, modu_coe, map_mul]
@@ -101,10 +107,13 @@ theorem modu_pow {a : S} (ha : IsUnit a) (n : ℕ) : modu S (a ^ n) = modu S a ^
 
 variable [T2Space S] [SecondCountableTopology S] [MeasurableSpace S] [BorelSpace S]
 
-theorem smul_map_mulVec_pi [IsArtinianRing S] [IsReduced S] (ν : Measure S) [ν.IsAddHaarMeasure]
-    {κ : Type} [Fintype κ] [DecidableEq κ] (M : Matrix κ κ S) (hM : IsUnit M.det) :
-    (modu S M.det : ℝ≥0∞) • Measure.map M.mulVec (Measure.pi fun _ : κ => ν) =
-      Measure.pi fun _ : κ => ν := by
+theorem smul_map_mulVec_pi
+    [IsArtinianRing S] [IsReduced S]
+    (ν : Measure S) [ν.IsAddHaarMeasure]
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    (M : Matrix κ κ S) (hM : IsUnit M.det)
+    : (modu S M.det : ℝ≥0∞) • Measure.map M.mulVec (Measure.pi fun _ : κ => ν)
+      = Measure.pi fun _ : κ => ν := by
   classical
   have hm : ∀ A : Matrix κ κ S, Measurable A.mulVec := fun A =>
     (continuous_const.matrix_mulVec continuous_id).measurable
@@ -112,15 +121,18 @@ theorem smul_map_mulVec_pi [IsArtinianRing S] [IsReduced S] (ν : Measure S) [ν
   letI : ∀ m : MaximalSpectrum S, Field (S ⧸ m.asIdeal) := fun m =>
     haveI := m.isMaximal
     Ideal.Quotient.field m.asIdeal
-  refine (induction_pi (IsArtinianRing.equivPi S).toRingEquiv (fun M : Matrix κ κ S => IsUnit M.det ∧
-    (modu S M.det : ℝ≥0∞) • Measure.map M.mulVec (Measure.pi fun _ : κ => ν) =
-      Measure.pi fun _ : κ => ν) ?_ ?_ ?_ M hM).2
+  refine (induction_pi (IsArtinianRing.equivPi S).toRingEquiv
+    (fun M : Matrix κ κ S =>
+      IsUnit M.det
+        ∧ (modu S M.det : ℝ≥0∞) • Measure.map M.mulVec (Measure.pi fun _ : κ => ν)
+          = Measure.pi fun _ : κ => ν)
+    ?_ ?_ ?_ M hM).2
   · intro D A
     have hu' : (diagonal D).det = ((∏ i, (A i).unit : Sˣ) : S) := by simp
     refine ⟨hu' ▸ Units.isUnit _, (Measure.pi_eq fun s hs => ?_).symm⟩
     rw [Measure.smul_apply, Measure.map_apply (hm _) (MeasurableSet.univ_pi hs)]
-    have : ((diagonal D).mulVec ⁻¹' Set.pi Set.univ fun i : κ => s i) =
-        Set.pi Set.univ fun i : κ => ((A i).unit)⁻¹ • s i := by
+    have : ((diagonal D).mulVec ⁻¹' Set.pi Set.univ fun i : κ => s i)
+        = Set.pi Set.univ fun i : κ => ((A i).unit)⁻¹ • s i := by
       ext f
       simp only [Set.mem_preimage, Set.mem_univ_pi, mulVec_diagonal]
       exact forall_congr' fun i => (Set.mem_inv_smul_set_iff (a := (A i).unit)).symm
@@ -154,8 +166,8 @@ theorem smul_map_mulVec_pi [IsArtinianRing S] [IsReduced S] (ν : Measure S) [ν
 
 end
 
-theorem tupMeas_eq_map {S : Type} [MeasurableSpace S] (lam : Measure S) [SigmaFinite lam] (n M : ℕ) :
-    tupMeas lam n M = (Measure.pi fun _ : Fin n × Fin M => lam).map Function.curry := by
+theorem tupMeas_eq_map {S : Type} [MeasurableSpace S] (lam : Measure S) [SigmaFinite lam] (n M : ℕ)
+    : tupMeas lam n M = (Measure.pi fun _ : Fin n × Fin M => lam).map Function.curry := by
   have hu : Measurable (Function.uncurry : (Fin n → Fin M → S) → Fin n × Fin M → S) :=
     Measurable.of_eval fun p => (measurable_pi_apply p.2).comp (measurable_pi_apply p.1)
   have hc : Measurable (Function.curry : (Fin n × Fin M → S) → Fin n → Fin M → S) :=
@@ -163,8 +175,8 @@ theorem tupMeas_eq_map {S : Type} [MeasurableSpace S] (lam : Measure S) [SigmaFi
   have : (Measure.pi fun _ : Fin n × Fin M => lam) = (tupMeas lam n M).map Function.uncurry := by
     refine Measure.pi_eq fun s hs => ?_
     rw [Measure.map_apply hu (MeasurableSet.univ_pi hs)]
-    have : (Function.uncurry ⁻¹' Set.pi Set.univ s : Set (Fin n → Fin M → S)) =
-        Set.pi Set.univ fun a => Set.pi Set.univ fun i => s (a, i) := by
+    have : (Function.uncurry ⁻¹' Set.pi Set.univ s : Set (Fin n → Fin M → S))
+        = Set.pi Set.univ fun a => Set.pi Set.univ fun i => s (a, i) := by
       ext X
       simp [Function.uncurry]
     rw [this, tupMeas, Measure.pi_pi, Fintype.prod_prod_type]
@@ -172,7 +184,16 @@ theorem tupMeas_eq_map {S : Type} [MeasurableSpace S] (lam : Measure S) [SigmaFi
   rw [this, Measure.map_map hc hu]
   exact Measure.map_id.symm
 
-theorem tupMeas_lrAct : ∀ (S : Type) [CommRing S] [TopologicalSpace S] [IsTopologicalRing S] [T2Space S] [LocallyCompactSpace S] [SecondCountableTopology S] [MeasurableSpace S] [BorelSpace S], IsArtinianRing S → IsReduced S → ∀ (lam : Measure S), lam.IsAddHaarMeasure → ∀ (n M : ℕ) (g : Matrix (Fin M) (Fin M) S) (γ : Matrix (Fin n) (Fin n) S), IsUnit g.det → IsUnit γ.det → tupMeas lam n M = (modu S g.det ^ n * modu S γ.det ^ M) • (tupMeas lam n M).map (lrAct g γ) := by
+theorem tupMeas_lrAct
+    : ∀ (S : Type) [CommRing S] [TopologicalSpace S] [IsTopologicalRing S] [T2Space S]
+        [LocallyCompactSpace S] [SecondCountableTopology S] [MeasurableSpace S] [BorelSpace S],
+      IsArtinianRing S → IsReduced S
+        → ∀ (lam : Measure S),
+          lam.IsAddHaarMeasure
+            → ∀ (n M : ℕ) (g : Matrix (Fin M) (Fin M) S) (γ : Matrix (Fin n) (Fin n) S),
+              IsUnit g.det → IsUnit γ.det
+                → tupMeas lam n M
+                  = (modu S g.det ^ n * modu S γ.det ^ M) • (tupMeas lam n M).map (lrAct g γ) := by
   intro S _ _ _ _ _ _ _ _ _ _ lam _ n M g γ hg hγ
   have hc : Measurable (Function.curry : (Fin n × Fin M → S) → Fin n → Fin M → S) :=
     Measurable.of_eval fun a => Measurable.of_eval fun i => measurable_pi_apply (a, i)

@@ -7,7 +7,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.LatSplit
 
@@ -15,8 +16,10 @@ section Ext
 
 variable {O M M' : Type} [CommRing O] [AddCommGroup M] [Module O M] [AddCommGroup M'] [Module O M']
 
-theorem mem_of_pow_smul_mem (c : O) (W : Submodule O M) (h2 : ∀ x : M, c • x ∈ W → x ∈ W) (k : ℕ) (x : M)
-    (h : c ^ k • x ∈ W) : x ∈ W := by
+theorem mem_of_pow_smul_mem
+    (c : O) (W : Submodule O M) (h2 : ∀ x : M, c • x ∈ W → x ∈ W)
+    (k : ℕ) (x : M) (h : c ^ k • x ∈ W)
+    : x ∈ W := by
   induction k with
   | zero => simpa using h
   | succ k ih =>
@@ -24,12 +27,15 @@ theorem mem_of_pow_smul_mem (c : O) (W : Submodule O M) (h2 : ∀ x : M, c • x
     rw [smul_smul, ← pow_succ']
     exact h
 
-theorem exists_ext (c : O) (W : Submodule O M) (ρ₀ : W →ₗ[O] M')
-    (h1 : ∀ x : M, ∃ w ∈ W, ∃ z, x = w + c • z) (h2 : ∀ x : M, c • x ∈ W → x ∈ W)
+theorem exists_ext
+    (c : O) (W : Submodule O M)
+    (ρ₀ : W →ₗ[O] M') (h1 : ∀ x : M, ∃ w ∈ W, ∃ z, x = w + c • z) (h2 : ∀ x : M, c • x ∈ W → x ∈ W)
     (hS : ∀ y : M', (∀ k : ℕ, ∃ z, y = c ^ k • z) → y = 0)
-    (hC : ∀ y : ℕ → M', (∀ k, ∃ z, y (k + 1) - y k = c ^ k • z) → ∃ L, ∀ k, ∃ z, L - y k = c ^ k • z) :
-    ∃ ρ : M →ₗ[O] M', ∀ w : W, ρ w = ρ₀ w := by
-  have hD : ∀ (k : ℕ) (w w' : W) (t : M), (w : M) - w' = c ^ k • t → ∃ z, ρ₀ w - ρ₀ w' = c ^ k • z := by
+    (hC
+      : ∀ y : ℕ → M', (∀ k, ∃ z, y (k + 1) - y k = c ^ k • z) → ∃ L, ∀ k, ∃ z, L - y k = c ^ k • z)
+    : ∃ ρ : M →ₗ[O] M', ∀ w : W, ρ w = ρ₀ w := by
+  have hD
+      : ∀ (k : ℕ) (w w' : W) (t : M), (w : M) - w' = c ^ k • t → ∃ z, ρ₀ w - ρ₀ w' = c ^ k • z := by
     intro k w w' t h
     have ht : t ∈ W := mem_of_pow_smul_mem c W h2 k t (h ▸ W.sub_mem w.2 w'.2)
     refine ⟨ρ₀ ⟨t, ht⟩, ?_⟩
@@ -54,14 +60,20 @@ theorem exists_ext (c : O) (W : Submodule O M) (ρ₀ : W →ₗ[O] M')
   have hE : ∀ x, ∃ y, Rel x y := by
     intro x
     choose w z hwz using fun k => hA k x
-    obtain ⟨L, hL⟩ := hC (fun k => ρ₀ (w k)) (fun k => hD k _ _ (z k - c • z (k + 1)) (by
-      have e : (w (k + 1) : M) + c ^ (k + 1) • z (k + 1) = w k + c ^ k • z k := (hwz (k + 1)).symm.trans (hwz k)
-      linear_combination (norm := module) e))
+    obtain ⟨L, hL⟩ :=
+      hC
+        (fun k => ρ₀ (w k))
+        (fun k =>
+          hD k _ _ (z k - c • z (k + 1)) (by
+            have e : (w (k + 1) : M) + c ^ (k + 1) • z (k + 1) = w k + c ^ k • z k :=
+              (hwz (k + 1)).symm.trans (hwz k)
+            linear_combination (norm := module) e))
     refine ⟨L, fun k v t e => ?_⟩
     obtain ⟨a, ha⟩ := hL k
-    obtain ⟨b, hb⟩ := hD k (w k) v (t - z k) (by
-      have e' : (w k : M) + c ^ k • z k = v + c ^ k • t := (hwz k).symm.trans e
-      linear_combination (norm := module) e')
+    obtain ⟨b, hb⟩ :=
+      hD k (w k) v (t - z k) (by
+        have e' : (w k : M) + c ^ k • z k = v + c ^ k • t := (hwz k).symm.trans e
+        linear_combination (norm := module) e')
     refine ⟨a + b, ?_⟩
     rw [smul_add, ← ha, ← hb]
     abel
@@ -83,10 +95,11 @@ theorem exists_ext (c : O) (W : Submodule O M) (ρ₀ : W →ₗ[O] M')
     obtain ⟨w', z', e2⟩ := hA k x'
     obtain ⟨p, hp⟩ := h k w z e1
     obtain ⟨p', hp'⟩ := h' k w' z' e2
-    obtain ⟨b, hb⟩ := hD k (a • w + w') v (t - a • z - z') (by
-      rw [e1, e2] at e
-      simp only [Submodule.coe_add, Submodule.coe_smul]
-      linear_combination (norm := module) e)
+    obtain ⟨b, hb⟩ :=
+      hD k (a • w + w') v (t - a • z - z') (by
+        rw [e1, e2] at e
+        simp only [Submodule.coe_add, Submodule.coe_smul]
+        linear_combination (norm := module) e)
     refine ⟨a • p + p' + b, ?_⟩
     rw [map_add (f := _), map_smul] at hb
     rw [smul_add, smul_add, ← hb, smul_comm, ← hp, ← hp', smul_sub]
@@ -113,12 +126,13 @@ namespace GlobalTheory.CompanionTheory.LatSplit
 
 section Basic
 
-variable {O N : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup N] [Module O N]
+variable
+  {O N : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup N] [Module O N]
 
-theorem exists_basic_irreducible (ϖ : O) (hϖ : Irreducible ϖ)
-    (ht : ∀ (a : O) (n : N), a ≠ 0 → a • n = 0 → n = 0) :
-    ∃ P : Submodule O N, Module.Free O P ∧ (∀ n, ∃ p ∈ P, ∃ z, n = p + ϖ • z) ∧
-      ∀ n, ϖ • n ∈ P → n ∈ P := by
+theorem exists_basic_irreducible
+    (ϖ : O) (hϖ : Irreducible ϖ) (ht : ∀ (a : O) (n : N), a ≠ 0 → a • n = 0 → n = 0)
+    : ∃ P : Submodule O N,
+      Module.Free O P ∧ (∀ n, ∃ p ∈ P, ∃ z, n = p + ϖ • z) ∧ ∀ n, ϖ • n ∈ P → n ∈ P := by
   classical
   let I : Ideal O := Ideal.span {ϖ}
   haveI hI : I.IsMaximal := PrincipalIdealRing.isMaximal_of_irreducible hϖ
@@ -135,8 +149,9 @@ theorem exists_basic_irreducible (ϖ : O) (hϖ : Irreducible ϖ)
     · rintro ⟨z, rfl⟩
       exact ⟨z, trivial, rfl⟩
   choose e he using fun j => hq (B j)
-  have hstar : ∀ (s : Finset _) (g : _ → O), (∑ i ∈ s, g i • e i) ∈ (I • ⊤ : Submodule O N) →
-      ∀ i ∈ s, ϖ ∣ g i := by
+  have hstar
+      : ∀ (s : Finset _) (g : _ → O),
+        (∑ i ∈ s, g i • e i) ∈ (I • ⊤ : Submodule O N) → ∀ i ∈ s, ϖ ∣ g i := by
     intro s g h i hi
     have h0 : q (∑ i ∈ s, g i • e i) = 0 := (Submodule.Quotient.mk_eq_zero _).2 h
     set_option synthInstance.maxHeartbeats 100000 in
@@ -148,7 +163,8 @@ theorem exists_basic_irreducible (ϖ : O) (hϖ : Irreducible ϖ)
       rfl
     have h2 := linearIndependent_iff'.1 B.linearIndependent s _ h1 i hi
     exact Ideal.mem_span_singleton.1 (Ideal.Quotient.eq_zero_iff_mem.1 h2)
-  have hall : ∀ (s : Finset _) (t : ℕ) (g : _ → O), (∑ i ∈ s, g i • e i) = 0 → ∀ i ∈ s, ϖ ^ t ∣ g i := by
+  have hall
+      : ∀ (s : Finset _) (t : ℕ) (g : _ → O), (∑ i ∈ s, g i • e i) = 0 → ∀ i ∈ s, ϖ ^ t ∣ g i := by
     intro s t
     induction t with
     | zero => simp
@@ -180,8 +196,8 @@ theorem exists_basic_irreducible (ϖ : O) (hϖ : Irreducible ϖ)
   refine ⟨Submodule.span O (Set.range e), Module.Free.of_basis (Module.Basis.span hli), ?_, ?_⟩
   · intro n
     have h1 : q n ∈ Submodule.span O (Set.range B) := by
-      rw [← Submodule.restrictScalars_span O (O ⧸ I) Ideal.Quotient.mk_surjective, Submodule.restrictScalars_mem,
-        B.span_eq]
+      rw [← Submodule.restrictScalars_span O (O ⧸ I) Ideal.Quotient.mk_surjective,
+        Submodule.restrictScalars_mem, B.span_eq]
       trivial
     have h2 : Set.range B = q '' Set.range e := by
       rw [← Set.range_comp]
@@ -193,10 +209,11 @@ theorem exists_basic_irreducible (ϖ : O) (hϖ : Irreducible ϖ)
     exact ⟨p, hp, z, by rw [← hz]; abel⟩
   · intro n hn
     obtain ⟨f, hf⟩ := (Finsupp.mem_span_range_iff_exists_finsupp).1 hn
-    have h1 := hstar f.support f (by
-      have : (∑ i ∈ f.support, f i • e i) = ϖ • n := hf
-      rw [this]
-      exact (hmem _).2 ⟨n, rfl⟩)
+    have h1 :=
+      hstar f.support f (by
+        have : (∑ i ∈ f.support, f i • e i) = ϖ • n := hf
+        rw [this]
+        exact (hmem _).2 ⟨n, rfl⟩)
     have h2 : ∀ i, ∃ g', i ∈ f.support → f i = ϖ * g' := fun i => by
       by_cases hi : i ∈ f.support
       · obtain ⟨g', hg'⟩ := h1 i hi
@@ -214,9 +231,9 @@ theorem exists_basic_irreducible (ϖ : O) (hϖ : Irreducible ϖ)
     rw [sub_eq_zero.1 h3]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem exists_basic (ht : ∀ (a : O) (n : N), a ≠ 0 → a • n = 0 → n = 0) (c : O) (hc : c ≠ 0) :
-    ∃ P : Submodule O N, Module.Free O P ∧ (∀ n, ∃ p ∈ P, ∃ z, n = p + c • z) ∧
-      ∀ n, c • n ∈ P → n ∈ P := by
+theorem exists_basic (ht : ∀ (a : O) (n : N), a ≠ 0 → a • n = 0 → n = 0) (c : O) (hc : c ≠ 0)
+    : ∃ P : Submodule O N,
+      Module.Free O P ∧ (∀ n, ∃ p ∈ P, ∃ z, n = p + c • z) ∧ ∀ n, c • n ∈ P → n ∈ P := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨P, hF, h1, h2⟩ := exists_basic_irreducible ϖ hϖ ht
   obtain ⟨k, u, hu⟩ := IsDiscreteValuationRing.associated_pow_irreducible hc hϖ
@@ -248,36 +265,49 @@ namespace GlobalTheory.CompanionTheory.LatSplit
 
 section Sec
 
-variable {O M : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup M] [Module O M]
+variable
+  {O M : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup M] [Module O M]
 
-theorem exists_section (M' : Submodule O M) (c : O) (hc : c ≠ 0)
+theorem exists_section
+    (M' : Submodule O M)
+    (c : O) (hc : c ≠ 0)
     (ht : ∀ (a : O) (x : M), a ≠ 0 → a • x ∈ M' → x ∈ M')
     (hS : ∀ y : M', (∀ k : ℕ, ∃ z : M', y = c ^ k • z) → y = 0)
-    (hC : ∀ y : ℕ → M', (∀ k, ∃ z : M', y (k + 1) - y k = c ^ k • z) → ∃ L : M', ∀ k, ∃ z : M', L - y k = c ^ k • z) :
-    ∃ s : (M ⧸ M') →ₗ[O] M, ∀ n, M'.mkQ (s n) = n := by
-  obtain ⟨P, hF, h1, h2⟩ := exists_basic (N := M ⧸ M') (fun a n ha h => by
-    obtain ⟨x, rfl⟩ := M'.mkQ_surjective n
-    refine (Submodule.Quotient.mk_eq_zero _).2 (ht a x ha ((Submodule.Quotient.mk_eq_zero _).1 ?_))
-    simpa using h) c hc
+    (hC : ∀ y : ℕ → M',
+      (∀ k, ∃ z : M', y (k + 1) - y k = c ^ k • z) → ∃ L : M', ∀ k, ∃ z : M', L - y k = c ^ k • z)
+    : ∃ s : (M ⧸ M') →ₗ[O] M, ∀ n, M'.mkQ (s n) = n := by
+  obtain ⟨P, hF, h1, h2⟩ :=
+    exists_basic (N := M ⧸ M')
+      (fun a n ha h => by
+        obtain ⟨x, rfl⟩ := M'.mkQ_surjective n
+        refine (Submodule.Quotient.mk_eq_zero _).2
+          (ht a x ha ((Submodule.Quotient.mk_eq_zero _).1 ?_))
+        simpa using h)
+      c hc
   obtain ⟨σ, hσ⟩ := Module.projective_lifting_property M'.mkQ P.subtype (Submodule.mkQ_surjective _)
   have hσ' : ∀ p : P, M'.mkQ (σ p) = p := fun p => LinearMap.congr_fun hσ p
   let W : Submodule O M := P.comap M'.mkQ
   let π : W →ₗ[O] P := M'.mkQ.restrict fun x hx => hx
   have hπ : ∀ w : W, (π w : M ⧸ M') = M'.mkQ w := fun w => rfl
-  let ρ₀ : W →ₗ[O] M' := (W.subtype - σ ∘ₗ π).codRestrict M' fun w => by
-    have : M'.mkQ ((w : M) - σ (π w)) = 0 := by rw [map_sub, hσ', hπ, sub_self]
-    exact (Submodule.Quotient.mk_eq_zero _).1 this
+  let ρ₀ : W →ₗ[O] M' :=
+    (W.subtype - σ ∘ₗ π).codRestrict M' fun w => by
+      have : M'.mkQ ((w : M) - σ (π w)) = 0 := by rw [map_sub, hσ', hπ, sub_self]
+      exact (Submodule.Quotient.mk_eq_zero _).1 this
   have hρ₀ : ∀ w : W, (ρ₀ w : M) = w - σ (π w) := fun w => rfl
-  obtain ⟨ρ, hρ⟩ := exists_ext c W ρ₀ (fun x => by
-      obtain ⟨p, hp, z, e⟩ := h1 (M'.mkQ x)
-      obtain ⟨z', rfl⟩ := M'.mkQ_surjective z
-      refine ⟨x - c • z', ?_, z', by abel⟩
-      change M'.mkQ (x - c • z') ∈ P
-      rw [map_sub, map_smul, e, add_sub_cancel_right]
-      exact hp)
-    (fun x hx => h2 _ (by
-      have : M'.mkQ (c • x) ∈ P := hx
-      rwa [map_smul] at this)) hS hC
+  obtain ⟨ρ, hρ⟩ :=
+    exists_ext c W ρ₀
+      (fun x => by
+        obtain ⟨p, hp, z, e⟩ := h1 (M'.mkQ x)
+        obtain ⟨z', rfl⟩ := M'.mkQ_surjective z
+        refine ⟨x - c • z', ?_, z', by abel⟩
+        change M'.mkQ (x - c • z') ∈ P
+        rw [map_sub, map_smul, e, add_sub_cancel_right]
+        exact hp)
+      (fun x hx =>
+        h2 _ (by
+          have : M'.mkQ (c • x) ∈ P := hx
+          rwa [map_smul] at this))
+      hS hC
   have hker : ∀ x ∈ M', ((ρ x : M') : M) = x := by
     intro x hx
     have hxW : x ∈ W := by
@@ -304,8 +334,10 @@ end GlobalTheory.CompanionTheory.LatSplit
 
 namespace GlobalTheory.CompanionTheory.LatSplit
 
-theorem nonempty_grSplit : ∀ {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A] {I : Ideal A}
-    (γ : DividedPowers I) (l m : ℕ), (∀ a : O, a ≠ 0 → ∃ k : ℕ, a ∣ (l : O) ^ k) → LatBase γ l m → Nonempty (GrSplit O γ m) := by
+theorem nonempty_grSplit
+    : ∀ {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A]
+        [Algebra O A] {I : Ideal A} (γ : DividedPowers I) (l m : ℕ),
+      (∀ a : O, a ≠ 0 → ∃ k : ℕ, a ∣ (l : O) ^ k) → LatBase γ l m → Nonempty (GrSplit O γ m) := by
   intro O A _ _ _ _ _ I γ l m hdiv h
   have hc : (l : O) ≠ 0 := by
     intro h0
@@ -325,8 +357,11 @@ theorem nonempty_grSplit : ∀ {O A : Type} [CommRing O] [IsDomain O] [IsDiscret
       intro x hx
       exact h.tf.tf r x (ih _ (by rw [← mul_assoc, ← pow_succ]; exact hx))
   let L : ℕ → Submodule O A := fun r => (pdP γ r).restrictScalars O
-  have hv : ∀ (r k : ℕ) (z : L r), (((l : O) ^ k • z : L r) : A) = (l : A) ^ k * z := fun r k z => hsm k z
-  have hI : ∀ (n : ℕ) (x : A), x ∈ (Ideal.span {(l : A)} ^ n • ⊤ : Submodule A A) ↔ ∃ t, x = (l : A) ^ n * t := by
+  have hv : ∀ (r k : ℕ) (z : L r), (((l : O) ^ k • z : L r) : A) = (l : A) ^ k * z := fun r k z =>
+    hsm k z
+  have hI
+      : ∀ (n : ℕ) (x : A),
+        x ∈ (Ideal.span {(l : A)} ^ n • ⊤ : Submodule A A) ↔ ∃ t, x = (l : A) ^ n * t := by
     intro n x
     rw [smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton']
     constructor
@@ -352,7 +387,9 @@ theorem nonempty_grSplit : ∀ {O A : Type} [CommRing O] [IsDomain O] [IsDiscret
       have hz' : ∀ b, ∃ z : L r, (y (b + 1) : A) - y b = (l : A) ^ b * z := fun b => by
         obtain ⟨z, hz⟩ := hy b
         exact ⟨z, by rw [← hv]; exact congrArg Subtype.val hz⟩
-      have hcau : ∀ {a b : ℕ}, a ≤ b → (y a : A) ≡ y b [SMOD (Ideal.span {(l : A)} ^ a • ⊤ : Submodule A A)] := by
+      have hcau
+          : ∀ {a b : ℕ},
+            a ≤ b → (y a : A) ≡ y b [SMOD (Ideal.span {(l : A)} ^ a • ⊤ : Submodule A A)] := by
         intro a b hab
         induction b, hab using Nat.le_induction with
         | base => rfl
@@ -368,17 +405,20 @@ theorem nonempty_grSplit : ∀ {O A : Type} [CommRing O] [IsDomain O] [IsDiscret
       have hl : ∀ n, ∃ t, Lim - y n = (l : A) ^ n * t := fun n => by
         obtain ⟨t, ht'⟩ := (hI _ _).1 ((SModEq.sub_mem).1 (hLim n))
         exact ⟨-t, by rw [← neg_sub, ht']; ring⟩
-      have hLm : Lim ∈ pdP γ r := h.closed r Lim fun n => by
-        obtain ⟨t, ht'⟩ := hl n
-        refine Submodule.mem_sup.2 ⟨(l : A) ^ n * t, Ideal.mem_span_singleton.2 (Dvd.intro _ rfl), y n, (y n).2, ?_⟩
-        rw [← ht']
-        abel
+      have hLm : Lim ∈ pdP γ r :=
+        h.closed r Lim fun n => by
+          obtain ⟨t, ht'⟩ := hl n
+          refine Submodule.mem_sup.2
+            ⟨(l : A) ^ n * t, Ideal.mem_span_singleton.2 (Dvd.intro _ rfl), y n, (y n).2, ?_⟩
+          rw [← ht']
+          abel
       refine ⟨⟨Lim, hLm⟩, fun k => ?_⟩
       obtain ⟨t, ht'⟩ := hl k
       have htm : t ∈ pdP γ r := htf r k t (by rw [← ht']; exact (pdP γ r).sub_mem hLm (y k).2)
       exact ⟨⟨t, htm⟩, Subtype.ext (by rw [hv]; exact ht')⟩
   choose s hs using hsec
-  have hmk : ∀ (r : ℕ) (x : A), (L r).mkQ x = 0 ↔ x ∈ L r := fun r x => Submodule.Quotient.mk_eq_zero _
+  have hmk : ∀ (r : ℕ) (x : A), (L r).mkQ x = 0 ↔ x ∈ L r := fun r x =>
+    Submodule.Quotient.mk_eq_zero _
   have hanti : ∀ r, pdP γ (r + 1) ≤ pdP γ r := fun r =>
     Ideal.span_mono fun z ⟨q, h1, h2, h3⟩ => ⟨q, h1, by omega, h3⟩
   have hflat : ∀ r, Module.Flat O ((L r).map (L (r + 1)).mkQ) := by
@@ -393,18 +433,23 @@ theorem nonempty_grSplit : ∀ {O A : Type} [CommRing O] [IsDomain O] [IsDiscret
     exact (Submodule.mem_bot _).2 (Subtype.ext (by rw [← hy]; exact (hmk _ _).2 h1))
   have hν : ∀ (r : ℕ) (n : (L r).map (L (r + 1)).mkQ), s (r + 1) n ∈ pdP γ r := by
     rintro r ⟨_, y, hy, rfl⟩
-    have h1 : s (r + 1) ((L (r + 1)).mkQ y) - y ∈ pdP γ (r + 1) := (hmk _ _).1 (by rw [map_sub, hs, sub_self])
+    have h1 : s (r + 1) ((L (r + 1)).mkQ y) - y ∈ pdP γ (r + 1) :=
+      (hmk _ _).1 (by rw [map_sub, hs, sub_self])
     have h2 := (pdP γ r).add_mem (hanti r h1) hy
     simpa using h2
-  exact ⟨{ N := fun i => ↥((L i).map (L (i + 1)).mkQ)
-           flat := fun i => hflat i
-           ν := fun i => s (i + 1) ∘ₗ Submodule.subtype _
-           mem := fun i n => hν i n
-           inj := fun i n hn => Subtype.ext (by rw [← hs (i + 1) n]; exact (hmk _ _).2 hn)
-           surj := fun i x hx => ⟨⟨(L (i + 1)).mkQ x, Submodule.mem_map_of_mem hx⟩,
-             (hmk _ _).1 (by
-               change (L (i + 1)).mkQ (x - s (i + 1) ((L (i + 1)).mkQ x)) = 0
-               rw [map_sub, hs, sub_self])⟩
-           nil := h.tf.nil }⟩
+  exact ⟨{
+    N := fun i => ↥((L i).map (L (i + 1)).mkQ)
+    flat := fun i => hflat i
+    ν := fun i => s (i + 1) ∘ₗ Submodule.subtype _
+    mem := fun i n => hν i n
+    inj := fun i n hn => Subtype.ext (by rw [← hs (i + 1) n]; exact (hmk _ _).2 hn)
+    surj := fun i x hx => ⟨
+      ⟨(L (i + 1)).mkQ x, Submodule.mem_map_of_mem hx⟩,
+      (hmk _ _).1 (by
+        change (L (i + 1)).mkQ (x - s (i + 1) ((L (i + 1)).mkQ x)) = 0
+        rw [map_sub, hs, sub_self])
+    ⟩
+    nil := h.tf.nil
+  }⟩
 
 end GlobalTheory.CompanionTheory.LatSplit

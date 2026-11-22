@@ -8,8 +8,8 @@ open Matrix Filter Topology ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.LocalFieldChar
 
-theorem circle_eq_one_of_forall_re_pow_pos (z : Circle)
-    (h : ∀ n : ℕ, 0 < ((z ^ n : Circle) : ℂ).re) : z = 1 := by
+theorem circle_eq_one_of_forall_re_pow_pos (z : Circle) (h : ∀ n : ℕ, 0 < ((z ^ n : Circle) : ℂ).re)
+    : z = 1 := by
   have hsq : ∀ w : Circle, (w : ℂ).re ^ 2 + (w : ℂ).im ^ 2 = 1 := by
     intro w
     have := Circle.normSq_coe w
@@ -29,8 +29,7 @@ theorem circle_eq_one_of_forall_re_pow_pos (z : Circle)
   have hstep : ∀ j, a (j + 1) = 2 * a j ^ 2 - 1 := by
     intro j
     have h2 := hsq (z ^ (2 ^ j))
-    have hp : z ^ (2 ^ (j + 1)) = z ^ (2 ^ j) * z ^ (2 ^ j) := by
-      rw [pow_succ, pow_mul, sq]
+    have hp : z ^ (2 ^ (j + 1)) = z ^ (2 ^ j) * z ^ (2 ^ j) := by rw [pow_succ, pow_mul, sq]
     simp only [ha]
     rw [hp, Circle.coe_mul, Complex.mul_re]
     nlinarith
@@ -55,23 +54,24 @@ theorem circle_eq_one_of_forall_re_pow_pos (z : Circle)
   have hpos : 0 < a j := h _
   linarith
 
-theorem isOpen_addChar_ker : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle), Continuous ψ →
-    IsOpen {x : k | ψ x = 1} := by
+theorem isOpen_addChar_ker
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (ψ : AddChar k Circle),
+      Continuous ψ → IsOpen {x : k | ψ x = 1} := by
   intro k _ _ _ _ ψ hψ
-  let H : AddSubgroup k :=
-    { carrier := {x | ψ x = 1}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
-        rw [AddChar.map_add_eq_mul, ha, hb, one_mul]
-      zero_mem' := by simp
-      neg_mem' := fun {a} ha => by
-        simp only [Set.mem_setOf_eq] at ha ⊢
-        rw [AddChar.map_neg_eq_inv, ha, inv_one] }
+  let H : AddSubgroup k := {
+    carrier := {x | ψ x = 1}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq] at ha hb ⊢
+      rw [AddChar.map_add_eq_mul, ha, hb, one_mul]
+    zero_mem' := by simp
+    neg_mem' := fun {a} ha => by
+      simp only [Set.mem_setOf_eq] at ha ⊢
+      rw [AddChar.map_neg_eq_inv, ha, inv_one]
+  }
   have hV : IsOpen {z : Circle | 0 < (z : ℂ).re} :=
     isOpen_lt continuous_const (Complex.continuous_re.comp continuous_induced_dom)
-  have hU : ψ ⁻¹' {z : Circle | 0 < (z : ℂ).re} ∈ 𝓝 (0 : k) :=
-    (hV.preimage hψ).mem_nhds (by simp)
+  have hU : ψ ⁻¹' {z : Circle | 0 < (z : ℂ).re} ∈ 𝓝 (0 : k) := (hV.preimage hψ).mem_nhds (by simp)
   obtain ⟨γ, hγ, hball⟩ := (IsValuativeTopology.hasBasis_nhds_zero' k).mem_iff.1 hU
   have hsmul : ∀ x : k, valuation k x < γ → ∀ n : ℕ, valuation k (n • x) < γ := by
     intro x hx n

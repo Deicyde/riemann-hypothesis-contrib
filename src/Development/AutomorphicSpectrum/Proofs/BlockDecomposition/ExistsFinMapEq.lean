@@ -13,8 +13,8 @@ open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.Wig
 
 namespace GlobalTheory.CompanionTheory.RgCz
 
-theorem exists_fin_map_eq {a : ℕ} (m : Multiset ℂ) (hm : Multiset.card m = a) :
-    ∃ χ : Fin a → ℂ, Multiset.map χ Finset.univ.val = m := by
+theorem exists_fin_map_eq {a : ℕ} (m : Multiset ℂ) (hm : Multiset.card m = a)
+    : ∃ χ : Fin a → ℂ, Multiset.map χ Finset.univ.val = m := by
   subst hm
   induction m using Quotient.inductionOn with
   | h l =>
@@ -26,10 +26,13 @@ theorem exists_fin_map_eq {a : ℕ} (m : Multiset ℂ) (hm : Multiset.card m = a
     · intro n h1 h2
       simp
 
-theorem charInt_at {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ} (π : CuspSub E a)
-    (hr : (CG.mk π).IsRegAlg) (τ : E →+* ℂ) :
-    ∃ l : Fin a → ℤ, Function.Injective l ∧
-      PositivityTheory.Rg.Cz.HasChar (cx τ (lieOp π)) fun k => (l k : ℂ) := by
+theorem charInt_at
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {a : ℕ} (π : CuspSub E a) (hr : (CG.mk π).IsRegAlg)
+    (τ : E →+* ℂ)
+    : ∃ l : Fin a → ℤ,
+      Function.Injective l
+        ∧ PositivityTheory.Rg.Cz.HasChar (cx τ (lieOp π)) fun k => (l k : ℂ) := by
   obtain ⟨hnd, hint⟩ := hr τ
   obtain ⟨χ, hχ⟩ := exists_fin_map_eq ((CG.mk π).infChar τ) (CG.card_infChar (CG.mk π) τ)
   have hinf : π.HasInfChar τ (Multiset.map χ Finset.univ.val) := by

@@ -23,7 +23,8 @@ def piChar {H : ∀ a, Subgroup (Γ a)} (χ : ∀ a, H a →* ℂˣ) : piSub H �
   map_one' := Finset.prod_eq_one fun a _ => map_one (χ a)
   map_mul' x y := by
     rw [← Finset.prod_mul_distrib]
-    exact Finset.prod_congr rfl fun a _ => map_mul (χ a) ⟨x.1 a, x.2 a (Set.mem_univ a)⟩ ⟨y.1 a, y.2 a (Set.mem_univ a)⟩
+    exact Finset.prod_congr rfl fun a _ =>
+      map_mul (χ a) ⟨x.1 a, x.2 a (Set.mem_univ a)⟩ ⟨y.1 a, y.2 a (Set.mem_univ a)⟩
 
 end Pi
 
@@ -42,7 +43,8 @@ def wOpen : Equiv.Perm (Fin N) := Tuple.sort (wKey d hd)
 variable {k}
 variable {W : Type} [AddCommGroup W] [Module ℂ W]
 
-def openFns (ρ : Representation ℂ (Levi k fun a => Fin (d a)) W) : Submodule ℂ (IndSp (stdBlocks d hd) ρ) where
+def openFns (ρ : Representation ℂ (Levi k fun a => Fin (d a)) W)
+    : Submodule ℂ (IndSp (stdBlocks d hd) ρ) where
   carrier := {f | ∀ g, f.1.1 g ≠ 0 → g ∈ cell k d hd (wOpen d hd)}
   add_mem' := by
     intro a b ha hb g hg
@@ -69,15 +71,18 @@ abbrev whitM (ψ : AddChar k Circle) : unipM k d →* ℂˣ := piChar fun a => w
 variable (k)
 
 def unipU : Subgroup (GL (Fin N) k) :=
-  unipB k (Fin N) ⊓ (unipRadLower k (stdBlocks d hd)).comap (MulAut.conj (pm k (wOpen d hd))).toMonoidHom
+  unipB k (Fin N)
+    ⊓ (unipRadLower k (stdBlocks d hd)).comap (MulAut.conj (pm k (wOpen d hd))).toMonoidHom
 
 def unipL : Subgroup (GL (Fin N) k) :=
-  unipB k (Fin N) ⊓ (leviEmb k (stdBlocks d hd)).range.comap (MulAut.conj (pm k (wOpen d hd))).toMonoidHom
+  unipB k (Fin N)
+    ⊓ (leviEmb k (stdBlocks d hd)).range.comap (MulAut.conj (pm k (wOpen d hd))).toMonoidHom
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem OpenFactor.mem_unipL {u : GL (Fin N) k} : u ∈ unipL k d hd ↔
-    u ∈ unipB k (Fin N) ∧
-      pm k (wOpen d hd) * u * (pm k (wOpen d hd))⁻¹ ∈ (leviEmb k (stdBlocks d hd)).range := by
+theorem OpenFactor.mem_unipL {u : GL (Fin N) k}
+    : u ∈ unipL k d hd
+      ↔ u ∈ unipB k (Fin N)
+        ∧ pm k (wOpen d hd) * u * (pm k (wOpen d hd))⁻¹ ∈ (leviEmb k (stdBlocks d hd)).range := by
   simp only [unipL, Subgroup.mem_inf, Subgroup.mem_comap, MulEquiv.coe_toMonoidHom,
     MulAut.conj_apply]
 
@@ -85,7 +90,10 @@ end GlobalTheory.CompanionTheory.Rodier
 
 namespace GlobalTheory.CompanionTheory.Rodier
 
-def smInt {X W : Type} [MeasurableSpace X] [AddCommGroup W] [Module ℂ W] (μ : MeasureTheory.Measure X) (φ : X → W) : W :=
+def smInt
+    {X W : Type} [MeasurableSpace X] [AddCommGroup W] [Module ℂ W]
+    (μ : MeasureTheory.Measure X) (φ : X → W)
+    : W :=
   ∑ᶠ v : W, (((μ (φ ⁻¹' {v})).toReal : ℝ) : ℂ) • v
 
 end GlobalTheory.CompanionTheory.Rodier

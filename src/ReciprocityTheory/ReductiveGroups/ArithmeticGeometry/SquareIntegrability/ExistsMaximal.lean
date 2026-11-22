@@ -13,23 +13,32 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem act_add' {dim : (E →+* ℂ) → ℕ} (α : 𝓞 E) (v w : Vsp dim) :
-    act α (v + w) = act α v + act α w := by
+theorem act_add' {dim : (E →+* ℂ) → ℕ} (α : 𝓞 E) (v w : Vsp dim)
+    : act α (v + w) = act α v + act α w := by
   rw [act_eq_actE, act_eq_actE, act_eq_actE, actE_add_right]
 
 variable [IsCMField E]
 
-private theorem exists_integer_complexConj (β : 𝓞 E) : ∃ β' : 𝓞 E, (β' : E) = IsCMField.complexConj E (β : E) :=
-  ⟨⟨IsCMField.complexConj E (β : E), (mem_integralClosure_iff ℤ E).mpr
-    ((NumberField.RingOfIntegers.isIntegral_coe β).map
-      (RingHom.toIntAlgHom (IsCMField.complexConj E).toRingEquiv.toRingHom))⟩, rfl⟩
+private theorem exists_integer_complexConj (β : 𝓞 E)
+    : ∃ β' : 𝓞 E, (β' : E) = IsCMField.complexConj E (β : E) := ⟨
+  ⟨
+    IsCMField.complexConj E (β : E),
+    (mem_integralClosure_iff ℤ E).mpr
+      ((NumberField.RingOfIntegers.isIntegral_coe β).map
+        (RingHom.toIntAlgHom (IsCMField.complexConj E).toRingEquiv.toRingHom))
+  ⟩,
+  rfl
+⟩
 
-theorem greedy_step (X : PT E) {n : ℕ} (ω : Fin n → 𝓞 E) {Ω th : ℝ} (hΩ : 0 < Ω) (hth : 0 < th)
-    (hΩth : Ω * th ^ 2 ≤ 1) (hω : ∀ j (σ : E →+* ℂ), ‖σ (ω j)‖ ≤ Ω)
+theorem greedy_step
+    (X : PT E)
+    {n : ℕ} (ω : Fin n → 𝓞 E)
+    {Ω th : ℝ}
+    (hΩ : 0 < Ω) (hth : 0 < th) (hΩth : Ω * th ^ 2 ≤ 1) (hω : ∀ j (σ : E →+* ℂ), ‖σ (ω j)‖ ≤ Ω)
     (hsp : ∀ α : 𝓞 E, (α : E) ∈ Submodule.span ℚ (Set.range fun j => (ω j : E)))
-    {I : Submodule ℤ (Vsp X.dim)} (hI : Good X (1 / (Ω * th)) I) {x : Vsp X.dim} (hx : x ∈ X.L)
-    (hxI : x ∉ I) (hd : Metric.infDist x (IR I) < th) :
-    ∃ J, Good X (1 / (Ω * th)) J ∧ Module.finrank ℝ (IR I) < Module.finrank ℝ (IR J) := by
+    {I : Submodule ℤ (Vsp X.dim)} (hI : Good X (1 / (Ω * th)) I)
+    {x : Vsp X.dim} (hx : x ∈ X.L) (hxI : x ∉ I) (hd : Metric.infDist x (IR I) < th)
+    : ∃ J, Good X (1 / (Ω * th)) J ∧ Module.finrank ℝ (IR I) < Module.finrank ℝ (IR J) := by
   have hΩθ : 0 < Ω * th := mul_pos hΩ hth
   obtain ⟨p, hp, hxp⟩ := (Metric.infDist_lt_iff ⟨0, (IR I).zero_mem⟩).mp hd
   have hp' : p ∈ IR I := hp
@@ -71,7 +80,8 @@ theorem greedy_step (X : PT E) {n : ℕ} (ω : Fin n → 𝓞 E) {Ω th : ℝ} (
     have e1 : (Hf p (act (ω j) p)).im = 0 := hI.IR_iso p hp' _ (hact _ p hp')
     have e2 : (Hf r (act (ω j) p)).im = 0 := hrIR _ (hact _ p hp')
     have e3 : (Hf p (act (ω j) r)).im = 0 := by
-      rw [act_eq_actE, Hf_actE', ← hβ', ← act_eq_actE, Hf_im_antisymm, hrIR _ (hact β' p hp'), neg_zero]
+      rw [act_eq_actE, Hf_actE', ← hβ', ← act_eq_actE, Hf_im_antisymm, hrIR _ (hact β' p hp'),
+        neg_zero]
     have e4 : |(Hf r (act (ω j) r)).im| < 1 := by
       have h1 := abs_Hf_im_le r (act (ω j) r)
       have h2 : ‖act (ω j) r‖ ≤ Ω * ‖r‖ := by
@@ -170,8 +180,7 @@ theorem greedy_step (X : PT E) {n : ℕ} (ω : Fin n → 𝓞 E) {Ω th : ℝ} (
       have h1 := one_le_abs_im X hy (X.stable (ω j) x hx) hj
       have h2 : (Hf y (act (ω j) x)).im = inner ℝ u (act (ω j) r) := by
         have hmem : act (ω j) x ∈ W := Submodule.subset_span (Or.inr ⟨ω j, rfl⟩)
-        rw [← hinner _ hmem, hxpr, act_add', inner_add_right,
-          horth _ (hact _ p hp'), zero_add]
+        rw [← hinner _ hmem, hxpr, act_add', inner_add_right, horth _ (hact _ p hp'), zero_add]
       have h3 : |inner ℝ u (act (ω j) r)| ≤ ‖u‖ * (Ω * ‖r‖) := by
         refine le_trans (abs_real_inner_le_norm _ _) (mul_le_mul_of_nonneg_left ?_ (norm_nonneg u))
         rw [act_eq_actE]
@@ -197,13 +206,17 @@ theorem greedy_step (X : PT E) {n : ℕ} (ω : Fin n → 𝓞 E) {Ω th : ℝ} (
     rw [← heq] at hxW
     exact hxI (hI.sat x hx hxW)
 
-theorem exists_maximal (X : PT E) {n : ℕ} (ω : Fin n → 𝓞 E) {Ω th : ℝ} (hΩ : 0 < Ω)
-    (hth : 0 < th) (hΩth : Ω * th ^ 2 ≤ 1) (hω : ∀ j (σ : E →+* ℂ), ‖σ (ω j)‖ ≤ Ω)
-    (hsp : ∀ α : 𝓞 E, (α : E) ∈ Submodule.span ℚ (Set.range fun j => (ω j : E))) :
-    ∃ I, Good X (1 / (Ω * th)) I ∧ ∀ x ∈ X.L, x ∉ I → th ≤ Metric.infDist x (IR I) := by
-  have key : ∀ k : ℕ, ∀ I : Submodule ℤ (Vsp X.dim), Good X (1 / (Ω * th)) I →
-      Module.finrank ℝ (Vsp X.dim) - Module.finrank ℝ (IR I) ≤ k →
-      ∃ J, Good X (1 / (Ω * th)) J ∧ ∀ x ∈ X.L, x ∉ J → th ≤ Metric.infDist x (IR J) := by
+theorem exists_maximal
+    (X : PT E)
+    {n : ℕ} (ω : Fin n → 𝓞 E)
+    {Ω th : ℝ}
+    (hΩ : 0 < Ω) (hth : 0 < th) (hΩth : Ω * th ^ 2 ≤ 1) (hω : ∀ j (σ : E →+* ℂ), ‖σ (ω j)‖ ≤ Ω)
+    (hsp : ∀ α : 𝓞 E, (α : E) ∈ Submodule.span ℚ (Set.range fun j => (ω j : E)))
+    : ∃ I, Good X (1 / (Ω * th)) I ∧ ∀ x ∈ X.L, x ∉ I → th ≤ Metric.infDist x (IR I) := by
+  have key
+      : ∀ k : ℕ, ∀ I : Submodule ℤ (Vsp X.dim),
+        Good X (1 / (Ω * th)) I → Module.finrank ℝ (Vsp X.dim) - Module.finrank ℝ (IR I) ≤ k
+          → ∃ J, Good X (1 / (Ω * th)) J ∧ ∀ x ∈ X.L, x ∉ J → th ≤ Metric.infDist x (IR J) := by
     intro k
     induction k with
     | zero =>

@@ -14,12 +14,13 @@ noncomputable section
 
 universe u
 
-
 set_option synthInstance.maxHeartbeats 400000 in
-theorem isReduced_tensorProduct_of_forall_field {k : Type*} [Field k] (C : Type*) [CommRing C]
-    [Algebra k C]
+theorem isReduced_tensorProduct_of_forall_field
+    {k : Type*} [Field k]
+    (C : Type*) [CommRing C] [Algebra k C]
     (h : ∀ (E : Type u) [Field E] [Algebra k E] [Algebra.EssFiniteType k E], IsReduced (C ⊗[k] E))
-    (A : Type u) [CommRing A] [Algebra k A] [IsReduced A] : IsReduced (C ⊗[k] A) := by
+    (A : Type u) [CommRing A] [Algebra k A] [IsReduced A]
+    : IsReduced (C ⊗[k] A) := by
   apply IsReduced.tensorProduct_of_flat_of_forall_fg
   intro B hB
   have : IsReduced B := isReduced_of_injective B.val Subtype.val_injective
@@ -32,7 +33,8 @@ theorem isReduced_tensorProduct_of_forall_field {k : Type*} [Field k] (C : Type*
     AlgHom.pi fun P =>
       (IsScalarTower.toAlgHom k (B ⧸ P.1) (FractionRing (B ⧸ P.1))).comp (Ideal.Quotient.mkₐ k P.1)
   have hφ : Function.Injective φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro b hb
     have hmem : b ∈ sInf (minimalPrimes B) := by
       rw [Submodule.mem_sInf]
@@ -49,21 +51,23 @@ theorem isReduced_tensorProduct_of_forall_field {k : Type*} [Field k] (C : Type*
     Module.Flat.lTensor_preserves_injective_linearMap (φ.toLinearMap) hφ
   have : ∀ P : minimalPrimes B, IsReduced (C ⊗[k] FractionRing (B ⧸ P.1)) := fun P => h _
   let ψ := Algebra.TensorProduct.piRight k k C (fun P : minimalPrimes B => FractionRing (B ⧸ P.1))
-  exact isReduced_of_injective (ψ.toRingEquiv.toRingHom.comp
-      (Algebra.TensorProduct.map (AlgHom.id C C) φ).toRingHom)
+  exact isReduced_of_injective
+    (ψ.toRingEquiv.toRingHom.comp (Algebra.TensorProduct.map (AlgHom.id C C) φ).toRingHom)
     ((AlgEquiv.injective ψ).comp hinj)
 
-theorem isReduced_tensorProduct_of_isSeparable {F E : Type u} [Field F] [Field E] [Algebra F E]
-    [Algebra.IsSeparable F E] [Algebra.EssFiniteType F E]
-    (D : Type u) [CommRing D] [Algebra F D] [IsReduced D] : IsReduced (E ⊗[F] D) := by
+theorem isReduced_tensorProduct_of_isSeparable
+    {F E : Type u}
+    [Field F] [Field E] [Algebra F E] [Algebra.IsSeparable F E] [Algebra.EssFiniteType F E]
+    (D : Type u) [CommRing D] [Algebra F D] [IsReduced D]
+    : IsReduced (E ⊗[F] D) := by
   refine isReduced_tensorProduct_of_forall_field E (fun M _ _ _ => ?_) D
   have : Algebra.FormallyUnramified F E := Algebra.FormallyUnramified.of_isSeparable F E
   have : IsReduced (M ⊗[F] E) := Algebra.FormallyUnramified.isReduced_of_field M (M ⊗[F] E)
   exact isReduced_of_injective (Algebra.TensorProduct.comm F E M).toAlgHom (AlgEquiv.injective _)
 
-theorem isReduced_fractionRing_mvPolynomial_tensorProduct (K : Type u) [Field K] (σ : Type u)
-    (L : Type u) [Field L] [Algebra K L] :
-    IsReduced (FractionRing (MvPolynomial σ K) ⊗[K] L) := by
+theorem isReduced_fractionRing_mvPolynomial_tensorProduct
+    (K : Type u) [Field K] (σ : Type u) (L : Type u) [Field L] [Algebra K L]
+    : IsReduced (FractionRing (MvPolynomial σ K) ⊗[K] L) := by
   let R := MvPolynomial σ K
   have : IsReduced (R ⊗[K] L) :=
     isReduced_of_injective
@@ -73,17 +77,18 @@ theorem isReduced_fractionRing_mvPolynomial_tensorProduct (K : Type u) [Field K]
   have : IsReduced (FractionRing R ⊗[R] (R ⊗[K] L)) := by
     let : Algebra (R ⊗[K] L) (FractionRing R ⊗[R] (R ⊗[K] L)) := Algebra.TensorProduct.rightAlgebra
     exact isReduced_localizationPreserves
-      (Algebra.algebraMapSubmonoid (R ⊗[K] L) (nonZeroDivisors R))
-      (FractionRing R ⊗[R] (R ⊗[K] L)) inferInstance
+      (Algebra.algebraMapSubmonoid (R ⊗[K] L) (nonZeroDivisors R)) (FractionRing R ⊗[R] (R ⊗[K] L))
+      inferInstance
   exact isReduced_of_injective
     (Algebra.TensorProduct.cancelBaseChange K R R (FractionRing R) L).symm.toAlgHom
     (AlgEquiv.injective _)
 
-
 set_option synthInstance.maxHeartbeats 400000 in
-theorem isReduced_tensorProduct_field_of_perfectField (K : Type u) [Field K] [PerfectField K]
-    (L : Type u) [Field L] [Algebra K L] (E : Type u) [Field E] [Algebra K E]
-    [Algebra.EssFiniteType K E] : IsReduced (L ⊗[K] E) := by
+theorem isReduced_tensorProduct_field_of_perfectField
+    (K : Type u) [Field K] [PerfectField K]
+    (L : Type u) [Field L] [Algebra K L]
+    (E : Type u) [Field E] [Algebra K E] [Algebra.EssFiniteType K E]
+    : IsReduced (L ⊗[K] E) := by
   obtain ⟨s, hs, H⟩ := exists_isTranscendenceBasis_and_isSeparable_of_perfectField K E
   let F := IntermediateField.adjoin K (s : Set E)
   have : Algebra.EssFiniteType F E := Algebra.EssFiniteType.of_comp K F E
@@ -100,11 +105,14 @@ theorem isReduced_tensorProduct_field_of_perfectField (K : Type u) [Field K] [Pe
       (Algebra.TensorProduct.cancelBaseChange K F F E L).symm.toRingEquiv)
     (RingEquiv.injective _) hD
 
-theorem isReduced_tensorProduct_of_perfectField (K : Type u) [Field K] [PerfectField K]
-    (L : Type u) [Field L] [Algebra K L] (A : Type u) [CommRing A] [Algebra K A] [IsReduced A] :
-    IsReduced (L ⊗[K] A) :=
+theorem isReduced_tensorProduct_of_perfectField
+    (K : Type u) [Field K] [PerfectField K]
+    (L : Type u) [Field L] [Algebra K L]
+    (A : Type u) [CommRing A] [Algebra K A] [IsReduced A]
+    : IsReduced (L ⊗[K] A) :=
   isReduced_tensorProduct_of_forall_field L
-    (fun E _ _ _ => isReduced_tensorProduct_field_of_perfectField K L E) A
+    (fun E _ _ _ => isReduced_tensorProduct_field_of_perfectField K L E)
+    A
 
 end
 

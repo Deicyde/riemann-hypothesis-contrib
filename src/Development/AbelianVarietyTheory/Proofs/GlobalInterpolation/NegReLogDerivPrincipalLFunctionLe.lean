@@ -100,7 +100,14 @@ lemma norm_logDeriv_sub_le (q : ℕ) [NeZero q] {s : ℂ} (hs : 1 < s.re) :
         Finset.sum_le_sum fun p hp => norm_logDeriv_factor_le (Nat.prime_of_mem_primeFactors hp) hre
     _ ≤ Real.log q := sum_log_primeFactors_le q
 
-theorem neg_re_logDeriv_le : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (σ t : ℝ), 1 < σ → σ ≤ 2 → -(deriv (LFunction (1 : DirichletCharacter ℂ q)) (σ + t * I) / LFunction (1 : DirichletCharacter ℂ q) (σ + t * I)).re ≤ (1 / ((σ : ℂ) + t * I - 1)).re + C * Real.log (q * (|t| + 2)) := by
+theorem neg_re_logDeriv_le
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (q : ℕ) [NeZero q] (σ t : ℝ),
+          1 < σ → σ ≤ 2
+            → -(deriv (LFunction (1 : DirichletCharacter ℂ q)) (σ + t * I)
+                / LFunction (1 : DirichletCharacter ℂ q) (σ + t * I)).re
+              ≤ (1 / ((σ : ℂ) + t * I - 1)).re + C * Real.log (q * (|t| + 2)) := by
   obtain ⟨C, hC, hZ⟩ := GlobalTheory.T.logDeriv_riemannZeta_local_zero_sum
   refine ⟨C + 1, by linarith, ?_⟩
   intro q _ σ t hσ1 hσ2
@@ -113,8 +120,7 @@ theorem neg_re_logDeriv_le : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (σ
     exact lt_irrefl _ hs1
   have hζ0 : riemannZeta s ≠ 0 := riemannZeta_ne_zero_of_one_lt_re hs1
   have hdist : ‖s - (3 / 2 + t * I)‖ ≤ 2 / 3 := by
-    have h1 : s - (3 / 2 + t * I) = ((σ - 3 / 2 : ℝ) : ℂ) := by
-      rw [hsdef]; push_cast; ring
+    have h1 : s - (3 / 2 + t * I) = ((σ - 3 / 2 : ℝ) : ℂ) := by rw [hsdef]; push_cast; ring
     rw [h1, Complex.norm_real, Real.norm_eq_abs, abs_le]
     constructor <;> linarith
   obtain ⟨hfin, hbound⟩ := hZ t s hdist hsne hζ0
@@ -134,16 +140,16 @@ theorem neg_re_logDeriv_le : ∃ C : ℝ, 0 < C ∧ ∀ (q : ℕ) [NeZero q] (σ
     rw [hSdef, finsum_mem_eq_finite_toFinset_sum _ hfin, Complex.re_sum]
     exact Finset.sum_nonneg fun w hw => hterm w (hfin.mem_toFinset.mp hw)
   set E := deriv riemannZeta s / riemannZeta s + 1 / (s - 1) - S with hEdef
-  have hζ : deriv riemannZeta s / riemannZeta s = E - 1 / (s - 1) + S := by
-    rw [hEdef]; ring
+  have hζ : deriv riemannZeta s / riemannZeta s = E - 1 / (s - 1) + S := by rw [hEdef]; ring
   have hE : -E.re ≤ C * Real.log (|t| + 2) :=
     le_trans (neg_le_abs _) (le_trans (Complex.abs_re_le_norm E) hbound)
   set D := deriv (LFunction (1 : DirichletCharacter ℂ q)) s / LFunction (1 : DirichletCharacter ℂ q) s
     - deriv riemannZeta s / riemannZeta s with hDdef
   have hD : ‖D‖ ≤ Real.log q := norm_logDeriv_sub_le q hs1
   have hDre : -D.re ≤ Real.log q := le_trans (neg_le_abs _) (le_trans (Complex.abs_re_le_norm D) hD)
-  have hLsplit : deriv (LFunction (1 : DirichletCharacter ℂ q)) s /
-      LFunction (1 : DirichletCharacter ℂ q) s = D + (E - 1 / (s - 1) + S) := by
+  have hLsplit
+      : deriv (LFunction (1 : DirichletCharacter ℂ q)) s / LFunction (1 : DirichletCharacter ℂ q) s
+        = D + (E - 1 / (s - 1) + S) := by
     rw [hDdef, ← hζ]; ring
   have hq1 : (1 : ℝ) ≤ q := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (NeZero.ne q)
   have hlq : 0 ≤ Real.log q := Real.log_nonneg hq1

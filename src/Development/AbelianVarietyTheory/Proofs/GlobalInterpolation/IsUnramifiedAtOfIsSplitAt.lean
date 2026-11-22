@@ -9,11 +9,10 @@ open NumberField IsDedekindDomain GlobalTheory.UnitaryBC
 
 namespace GlobalTheory.SplitUnram
 
-
 set_option maxHeartbeats 800000 in
-theorem isUnramifiedAt_of_isSplitAt : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L]
-    (w : HeightOneSpectrum (𝓞 L)), IsSplitAt w →
-    Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield L)) w.asIdeal := by
+theorem isUnramifiedAt_of_isSplitAt
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (w : HeightOneSpectrum (𝓞 L)),
+      IsSplitAt w → Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield L)) w.asIdeal := by
   intro L _ _ _ w hw
   obtain ⟨u, hne, hu⟩ := hw
   set K := maximalRealSubfield L
@@ -32,22 +31,28 @@ theorem isUnramifiedAt_of_isSplitAt : ∀ (L : Type) [Field L] [NumberField L] [
   have hneI : u.asIdeal ≠ w.asIdeal := fun h => hne (HeightOneSpectrum.ext h)
   have hsum := Ideal.sum_ramification_inertia (𝓞 L) K L (p := p) hp0
   rw [Algebra.IsQuadraticExtension.finrank_eq_two K L] at hsum
-  have hterm : ∀ P ∈ IsDedekindDomain.primesOverFinset p (𝓞 L), 1 ≤ p.ramificationIdx' P * p.inertiaDeg' P := by
+  have hterm
+      : ∀ P ∈ IsDedekindDomain.primesOverFinset p (𝓞 L),
+        1 ≤ p.ramificationIdx' P * p.inertiaDeg' P := by
     intro P hP
     obtain ⟨hPp, hPl⟩ := (IsDedekindDomain.mem_primesOverFinset_iff hp0 (𝓞 L)).1 hP
-    haveI := hPp; haveI := hPl
+    haveI := hPp
+    haveI := hPl
     have h1 : 0 < p.ramificationIdx' P := by
       rw [Ideal.ramificationIdx'_eq_ramificationIdx p P hp0]
       exact Ideal.ramificationIdx_pos (R := 𝓞 K) P
     have h2 : 0 < p.inertiaDeg' P := Ideal.inertiaDeg'_pos p P
     exact Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero h1.ne' h2.ne')
-  have hpair : ({w.asIdeal, u.asIdeal} : Finset (Ideal (𝓞 L))) ⊆ IsDedekindDomain.primesOverFinset p (𝓞 L) := by
+  have hpair
+      : ({w.asIdeal, u.asIdeal} : Finset (Ideal (𝓞 L)))
+        ⊆ IsDedekindDomain.primesOverFinset p (𝓞 L) := by
     intro P hP
     simp only [Finset.mem_insert, Finset.mem_singleton] at hP
     rcases hP with rfl | rfl
     · exact hwmem
     · exact humem
-  have hle := Finset.sum_le_sum_of_subset (f := fun P => p.ramificationIdx' P * p.inertiaDeg' P) hpair
+  have hle :=
+    Finset.sum_le_sum_of_subset (f := fun P => p.ramificationIdx' P * p.inertiaDeg' P) hpair
   rw [Finset.sum_pair hneI.symm, hsum] at hle
   have hu1 := hterm _ humem
   have hw1 : p.ramificationIdx' w.asIdeal * p.inertiaDeg' w.asIdeal = 1 := by

@@ -28,10 +28,7 @@ theorem natCard_MA : Nat.card φ.MA = φ.ord := by
   exact natCard_A_eq_ord φ
 
 private theorem natCard_int_units_eq_two : Nat.card ℤˣ = 2 := by
-  first
-  | (rw [Nat.card_eq_fintype_card]; rfl)
-  | (rw [Nat.card_eq_fintype_card]; decide)
-  | simp
+  first | (rw [Nat.card_eq_fintype_card]; rfl) | (rw [Nat.card_eq_fintype_card]; decide) | simp
 
 private theorem natCard_GG_eq_four_mul_ord : Nat.card φ.GG = 4 * φ.ord := by
   have h3 : Nat.card φ.GG = Nat.card ℤˣ * Nat.card ℤˣ * Nat.card φ.MA := by
@@ -92,8 +89,10 @@ theorem cc_mul_iod : φ.cc * φ.iod = φ.sg := by
 theorem orderOf_cc : orderOf φ.cc = 2 := by
   exact orderOf_eq_prime (by rw [pow_two]; exact φ.cc_mul_cc) φ.cc_ne_one
 
-theorem hostGroup : Nat.card φ.GG = 4 * φ.ord ∧ φ.Psi.index = 2 ∧ φ.cc ∉ φ.Psi ∧ φ.sg ∈ φ.Psi ∧
-    orderOf φ.cc = 2 := ⟨by rw [natCard_GG_eq_four_mul_ord], φ.index_Psi, φ.cc_notMem_Psi, φ.sg_mem_Psi, φ.orderOf_cc⟩
+theorem hostGroup
+    : Nat.card φ.GG = 4 * φ.ord ∧ φ.Psi.index = 2 ∧ φ.cc ∉ φ.Psi ∧ φ.sg ∈ φ.Psi
+      ∧ orderOf φ.cc = 2 :=
+  ⟨by rw [natCard_GG_eq_four_mul_ord], φ.index_Psi, φ.cc_notMem_Psi, φ.sg_mem_Psi, φ.orderOf_cc⟩
 
 theorem iota_injective : Function.Injective φ.iota := fun _ _ h => Multiplicative.ofAdd.injective h
 
@@ -105,11 +104,14 @@ theorem iotaInv_eq_zero_iff (a : φ.MA) : φ.iotaInv a = 0 ↔ a = 1 := toAdd_eq
 
 theorem orderOf_iota (t : φ.A) : orderOf (φ.iota t) = addOrderOf t := orderOf_ofAdd_eq_addOrderOf t
 
-theorem addOrderOf_iotaInv (a : φ.MA) : addOrderOf (φ.iotaInv a) = orderOf a := (orderOf_ofAdd_eq_addOrderOf (Multiplicative.toAdd a)).symm
+theorem addOrderOf_iotaInv (a : φ.MA) : addOrderOf (φ.iotaInv a) = orderOf a :=
+  (orderOf_ofAdd_eq_addOrderOf (Multiplicative.toAdd a)).symm
 
-theorem tau1_injective : Function.Injective φ.tau1 := fun _ _ h => φ.iota_injective (congrArg Prod.snd h)
+theorem tau1_injective : Function.Injective φ.tau1 := fun _ _ h =>
+  φ.iota_injective (congrArg Prod.snd h)
 
-theorem doubling_injective : Function.Injective φ.tau2 := fun _ _ h => φ.iota_injective (congrArg Prod.snd h)
+theorem doubling_injective : Function.Injective φ.tau2 := fun _ _ h =>
+  φ.iota_injective (congrArg Prod.snd h)
 
 theorem tau1_mem_Psi (t : φ.A) : φ.tau1 t ∈ φ.Psi := rfl
 
@@ -172,9 +174,11 @@ theorem n0_pos : 0 < φ.n0 := addOrderOf_pos φ.a0
 
 theorem cyclic_order_dvd_exponent : φ.n0 ∣ φ.ord := φ.addOrderOf_dvd_ord φ.a0
 
-theorem exponent_eq_index_mul_cyclic_order : φ.ord = φ.o * φ.n0 := (Nat.div_mul_cancel φ.cyclic_order_dvd_exponent).symm
+theorem exponent_eq_index_mul_cyclic_order : φ.ord = φ.o * φ.n0 :=
+  (Nat.div_mul_cancel φ.cyclic_order_dvd_exponent).symm
 
-theorem o_pos : 0 < φ.o := Nat.div_pos (Nat.le_of_dvd (ord_pos' φ) φ.cyclic_order_dvd_exponent) φ.n0_pos
+theorem o_pos : 0 < φ.o :=
+  Nat.div_pos (Nat.le_of_dvd (ord_pos' φ) φ.cyclic_order_dvd_exponent) φ.n0_pos
 
 theorem natCard_cyclic_subgroup : Nat.card φ.A0 = φ.n0 := Nat.card_zmultiples φ.a0
 
@@ -195,7 +199,8 @@ theorem orderOf_hH_iota (t : φ.A) : orderOf (φ.hH (φ.iota t)) = addOrderOf (�
   rw [φ.hH_iota]
   exact (addOrderOf_ofMul_eq_orderOf _).symm
 
-theorem addOrderOf_projection_of_mem_cyclic {t : φ.A} (ht : t ∈ φ.A0) : addOrderOf (φ.h t) = addOrderOf t := by
+theorem addOrderOf_projection_of_mem_cyclic {t : φ.A} (ht : t ∈ φ.A0)
+    : addOrderOf (φ.h t) = addOrderOf t := by
   apply Nat.dvd_antisymm (φ.addOrderOf_h_dvd t)
   apply addOrderOf_dvd_of_nsmul_eq_zero
   apply φ.eq_zero_of_mem_cyclic_of_projection (φ.A0.nsmul_mem ht _)
@@ -214,9 +219,11 @@ theorem cyclic_order_dvd_two_pow : φ.n0 ∣ 2 ^ φ.e := by
   rw [← φ.addOrderOf_projection_of_mem_cyclic (AddSubgroup.mem_zmultiples φ.a0)]
   exact φ.addOrderOf_h_dvd_two_pow _
 
-theorem cyclic_order_le_two_pow : φ.n0 ≤ 2 ^ φ.e := Nat.le_of_dvd (by positivity) φ.cyclic_order_dvd_two_pow
+theorem cyclic_order_le_two_pow : φ.n0 ≤ 2 ^ φ.e :=
+  Nat.le_of_dvd (by positivity) φ.cyclic_order_dvd_two_pow
 
-theorem cyclic_order_le_exponent : φ.n0 ≤ φ.ord := Nat.le_of_dvd (ord_pos' φ) φ.cyclic_order_dvd_exponent
+theorem cyclic_order_le_exponent : φ.n0 ≤ φ.ord :=
+  Nat.le_of_dvd (ord_pos' φ) φ.cyclic_order_dvd_exponent
 
 theorem ord_le_o_mul_two_pow : φ.ord ≤ φ.o * 2 ^ φ.e := by
   rw [φ.exponent_eq_index_mul_cyclic_order]
@@ -231,9 +238,11 @@ theorem o_nsmul_of_h_eq_zero {t : φ.A} (ht : φ.h t = 0) : φ.o • t = 0 := by
   apply φ.eq_zero_of_mem_cyclic_of_projection (o_smul_mem_A0 φ t)
   rw [map_nsmul, ht, nsmul_zero]
 
-theorem digit_mem_cyclic_subgroup (s : ℕ) : φ.dig s ∈ φ.A0 := φ.A0.nsmul_mem (AddSubgroup.mem_zmultiples φ.a0) s
+theorem digit_mem_cyclic_subgroup (s : ℕ) : φ.dig s ∈ φ.A0 :=
+  φ.A0.nsmul_mem (AddSubgroup.mem_zmultiples φ.a0) s
 
-theorem dig_eq_dig_iff (s s' : ℕ) : φ.dig s = φ.dig s' ↔ s ≡ s' [MOD φ.n0] := nsmul_eq_nsmul_iff_modEq
+theorem dig_eq_dig_iff (s s' : ℕ) : φ.dig s = φ.dig s' ↔ s ≡ s' [MOD φ.n0] :=
+  nsmul_eq_nsmul_iff_modEq
 
 theorem dig_injOn : Set.InjOn φ.dig (Set.Iio φ.n0) := by
   intro s hs s' hs' h
@@ -241,9 +250,11 @@ theorem dig_injOn : Set.InjOn φ.dig (Set.Iio φ.n0) := by
   unfold Nat.ModEq at h1
   rwa [Nat.mod_eq_of_lt (Set.mem_Iio.1 hs), Nat.mod_eq_of_lt (Set.mem_Iio.1 hs')] at h1
 
-theorem dig_inj {s s' : ℕ} (hs : s < φ.n0) (hs' : s' < φ.n0) (h : φ.dig s = φ.dig s') : s = s' := φ.dig_injOn (Set.mem_Iio.2 hs) (Set.mem_Iio.2 hs') h
+theorem dig_inj {s s' : ℕ} (hs : s < φ.n0) (hs' : s' < φ.n0) (h : φ.dig s = φ.dig s') : s = s' :=
+  φ.dig_injOn (Set.mem_Iio.2 hs) (Set.mem_Iio.2 hs') h
 
-theorem zsmul_generator_eq_zero_iff (k : ℤ) : k • φ.a0 = 0 ↔ (φ.n0 : ℤ) ∣ k := addOrderOf_dvd_iff_zsmul_eq_zero.symm
+theorem zsmul_generator_eq_zero_iff (k : ℤ) : k • φ.a0 = 0 ↔ (φ.n0 : ℤ) ∣ k :=
+  addOrderOf_dvd_iff_zsmul_eq_zero.symm
 
 private theorem sign_group_sq_eq_one_var (x : G0) : x ^ 2 = 1 :=
   Prod.ext (by rw [Prod.pow_fst]; exact Int.units_sq _) (by rw [Prod.pow_snd]; exact Int.units_sq _)
@@ -251,7 +262,8 @@ private theorem sign_group_sq_eq_one_var (x : G0) : x ^ 2 = 1 :=
 private theorem G0_pow_eq_ite_even (x : G0) (i : ℕ) : x ^ i = if Even i then 1 else x := by
   rcases Nat.even_or_odd i with ⟨k, rfl⟩ | ⟨k, rfl⟩
   · rw [if_pos ⟨k, rfl⟩, ← two_mul, pow_mul, sign_group_sq_eq_one_var, one_pow]
-  · rw [if_neg (Nat.not_even_iff_odd.2 ⟨k, rfl⟩), pow_succ, pow_mul, sign_group_sq_eq_one_var, one_pow, one_mul]
+  · rw [if_neg (Nat.not_even_iff_odd.2 ⟨k, rfl⟩), pow_succ, pow_mul, sign_group_sq_eq_one_var,
+      one_pow, one_mul]
 
 private theorem G0_zpow_eq_ite_even (x : G0) (k : ℤ) : x ^ k = if Even k then 1 else x := by
   have h2 : x ^ (2 : ℤ) = 1 := by rw [zpow_two, ← pow_two, sign_group_sq_eq_one_var]
@@ -259,7 +271,8 @@ private theorem G0_zpow_eq_ite_even (x : G0) (k : ℤ) : x ^ k = if Even k then 
   · rw [if_pos ⟨m, rfl⟩, ← two_mul, zpow_mul, h2, one_zpow]
   · rw [if_neg (Int.not_even_iff_odd.2 ⟨m, rfl⟩), zpow_add_one, zpow_mul, h2, one_zpow, one_mul]
 
-theorem cc_mem_zpowers_iff (g : φ.GG) : φ.cc ∈ Subgroup.zpowers g ↔ g.1 = c0 ∧ Odd (orderOf g.2) := by
+theorem cc_mem_zpowers_iff (g : φ.GG)
+    : φ.cc ∈ Subgroup.zpowers g ↔ g.1 = c0 ∧ Odd (orderOf g.2) := by
   constructor
   · intro h
     obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.1 h
@@ -283,12 +296,6 @@ theorem cc_mem_zpowers_iff (g : φ.GG) : φ.cc ∈ Subgroup.zpowers g ↔ g.1 = 
     · show g.2 ^ orderOf g.2 = 1
       exact pow_orderOf_eq_one g.2
 
-
-
-
-
-
-
 theorem even_orderOf_of_hH_ne_one {a : φ.MA} (ha : φ.hH a ≠ 1) : Even (orderOf a) := by
   have h1 := φ.orderOf_hH_dvd a
   obtain ⟨i, -, hi⟩ := (Nat.dvd_prime_pow Nat.prime_two).1 (φ.orderOf_H_dvd (φ.hH a))
@@ -301,8 +308,8 @@ private theorem cc_mul_mem_Psi_iff_not_mem (g : φ.GG) : φ.cc * g ∈ φ.Psi �
   show (-1 : ℤˣ) * g.1.2 = 1 ↔ ¬ g.1.2 = 1
   rcases Int.units_eq_one_or g.1.2 with h | h <;> rw [h] <;> simp [int_units_neg_one_ne_one]
 
-theorem hostPartner (τ : φ.GG) (hτ : τ ∈ φ.Psi) :
-    Set.BijOn (fun g : φ.GG => φ.cc * g * τ) {g | g ∉ φ.Psi} (φ.Psi : Set φ.GG) := by
+theorem hostPartner (τ : φ.GG) (hτ : τ ∈ φ.Psi)
+    : Set.BijOn (fun g : φ.GG => φ.cc * g * τ) {g | g ∉ φ.Psi} (φ.Psi : Set φ.GG) := by
   refine ⟨?_, ?_, ?_⟩
   · intro g hg
     exact φ.Psi.mul_mem ((cc_mul_mem_Psi_iff_not_mem φ g).2 hg) hτ
@@ -317,8 +324,7 @@ theorem hostPartner (τ : φ.GG) (hτ : τ ∈ φ.Psi) :
     · show φ.cc * (φ.cc * y * τ⁻¹) * τ = y
       rw [← mul_assoc, ← mul_assoc, φ.cc_mul_cc, one_mul, inv_mul_cancel_right]
 
-def twHom (χ : φ.GG →* ℂˣ) : φ.GG →* ℂ :=
-  (Units.coeHom ℂ).comp φ.chC * Misc2.conjHom χ
+def twHom (χ : φ.GG →* ℂˣ) : φ.GG →* ℂ := (Units.coeHom ℂ).comp φ.chC * Misc2.conjHom χ
 
 theorem twHom_eq_one_iff (χ : φ.GG →* ℂˣ) : φ.twHom χ = 1 ↔ χ = φ.chC := by
   constructor
@@ -333,14 +339,13 @@ theorem twHom_eq_one_iff (χ : φ.GG →* ℂˣ) : φ.twHom χ = 1 ↔ χ = φ.c
       rw [φ.chC_apply]
       exact map_intCast _ _
     have h2 : starRingEnd ℂ ((χ g : ℂˣ) : ℂ) = ((φ.chC g : ℂˣ) : ℂ) := by
-      calc _ = ((φ.chC g : ℂˣ) : ℂ) * ((φ.chC g : ℂˣ) : ℂ) * starRingEnd ℂ ((χ g : ℂˣ) : ℂ) := by
-            rw [hc, one_mul]
+      calc
+        _ = ((φ.chC g : ℂˣ) : ℂ) * ((φ.chC g : ℂˣ) : ℂ) * starRingEnd ℂ ((χ g : ℂˣ) : ℂ) := by
+          rw [hc, one_mul]
         _ = ((φ.chC g : ℂˣ) : ℂ) := by rw [mul_assoc, hg, mul_one]
     have h3 := congrArg (starRingEnd ℂ) h2
     rw [Complex.conj_conj, hr] at h3
-    first
-    | exact h3
-    | exact Units.ext h3
+    first | exact h3 | exact Units.ext h3
   · rintro rfl
     ext g
     show ((φ.chC g : ℂˣ) : ℂ) * starRingEnd ℂ ((φ.chC g : ℂˣ) : ℂ) = 1
@@ -353,26 +358,36 @@ theorem chC_ne_one : φ.chC ≠ 1 := by
   rw [φ.chC_apply] at h1
   norm_num [iod] at h1
 
-
 open scoped Classical in
 open Classical in
-theorem hostCharSum :
-    (∀ χ : φ.GG →* ℂˣ,
-      (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∉ φ.Psi), starRingEnd ℂ ((χ g : ℂˣ) : ℂ)) =
-        if χ = 1 then (2 * φ.ord : ℂ) else if χ = φ.chC then -(2 * φ.ord : ℂ) else 0) ∧
-    ∀ g : φ.GG,
-      4 * (if g.1 = ((1 : ℤˣ), (-1 : ℤˣ)) then (1 : ℤ) else 0) =
-        (1 - ((φ.chD g : ℤˣ) : ℤ)) * (1 + ((φ.chQ g : ℤˣ) : ℤ)) := by
+theorem hostCharSum
+    : (∀ χ : φ.GG →* ℂˣ,
+        (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∉ φ.Psi), starRingEnd ℂ ((χ g : ℂˣ) : ℂ))
+          = if χ = 1 then
+              (2 * φ.ord : ℂ)
+            else if χ = φ.chC then
+              -(2 * φ.ord : ℂ)
+            else
+              0)
+      ∧ ∀ g : φ.GG,
+        4 * (if g.1 = ((1 : ℤˣ), (-1 : ℤˣ)) then (1 : ℤ) else 0)
+          = (1 - ((φ.chD g : ℤˣ) : ℤ)) * (1 + ((φ.chQ g : ℤˣ) : ℤ)) := by
   refine ⟨fun χ => ?_, fun g => ?_⟩
   · let f : φ.GG →* ℂ := Formalism.FrobeniusOrbits.Misc2.conjHom χ
     have hfg : ∀ g, f g = starRingEnd ℂ ((χ g : ℂˣ) : ℂ) := fun g => rfl
-    have hT1 : (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∈ φ.Psi), f g) +
-        (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∉ φ.Psi), f g) = ∑ g, f g :=
+    have hT1
+        : (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∈ φ.Psi), f g)
+            + (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∉ φ.Psi), f g)
+          = ∑ g, f g :=
       Finset.sum_filter_add_sum_filter_not _ _ _
-    have hT2 : (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∈ φ.Psi), f g) -
-        (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∉ φ.Psi), f g) = ∑ g, φ.twHom χ g := by
-      rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (fun g : φ.GG => g ∈ φ.Psi)
-        (φ.twHom χ), sub_eq_add_neg, ← Finset.sum_neg_distrib]
+    have hT2
+        : (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∈ φ.Psi), f g)
+            - (∑ g ∈ Finset.univ.filter (fun g : φ.GG => g ∉ φ.Psi), f g)
+          = ∑ g, φ.twHom χ g := by
+      rw [← Finset.sum_filter_add_sum_filter_not Finset.univ
+          (fun g : φ.GG => g ∈ φ.Psi)
+          (φ.twHom χ),
+        sub_eq_add_neg, ← Finset.sum_neg_distrib]
       congr 1
       · apply Finset.sum_congr rfl
         intro g hg
@@ -393,9 +408,7 @@ theorem hostCharSum :
         have h1 : starRingEnd ℂ ((χ g : ℂˣ) : ℂ) = 1 := by rw [← hfg, h, MonoidHom.one_apply]
         have h2 := congrArg (starRingEnd ℂ) h1
         rw [Complex.conj_conj, map_one] at h2
-        first
-        | exact h2
-        | exact Units.ext h2
+        first | exact h2 | exact Units.ext h2
       · intro h
         ext g
         rw [hfg, h]
@@ -429,11 +442,11 @@ theorem hostCharSum :
   · obtain ⟨⟨q, d⟩, a⟩ := g
     show 4 * (if ((q, d) : G0) = ((1 : ℤˣ), (-1 : ℤˣ)) then (1 : ℤ) else 0) =
       (1 - ((d : ℤˣ) : ℤ)) * (1 + ((q : ℤˣ) : ℤ))
-    rcases Int.units_eq_one_or q with rfl | rfl <;> rcases Int.units_eq_one_or d with rfl | rfl <;>
-      norm_num [int_units_neg_one_ne_one, int_units_neg_one_ne_one.symm]
+    rcases Int.units_eq_one_or q with rfl | rfl <;> rcases Int.units_eq_one_or d with rfl | rfl
+      <;> norm_num [int_units_neg_one_ne_one, int_units_neg_one_ne_one.symm]
 
-theorem pow_mul_mem_Psi_iff {g : φ.GG} (hg : g ∉ φ.Psi) {τ : φ.GG} (hτ : τ ∈ φ.Psi) (i : ℕ) :
-    g ^ i * τ ∈ φ.Psi ↔ Even i := by
+theorem pow_mul_mem_Psi_iff {g : φ.GG} (hg : g ∉ φ.Psi) {τ : φ.GG} (hτ : τ ∈ φ.Psi) (i : ℕ)
+    : g ^ i * τ ∈ φ.Psi ↔ Even i := by
   rw [mem_Psi_iff] at hg hτ
   rw [mem_Psi_iff]
   have hg' : g.1.2 = -1 := (Int.units_eq_one_or _).resolve_left hg
@@ -441,17 +454,16 @@ theorem pow_mul_mem_Psi_iff {g : φ.GG} (hg : g ∉ φ.Psi) {τ : φ.GG} (hτ : 
   rw [hg', hτ, mul_one]
   exact neg_one_pow_eq_one_iff_even int_units_neg_one_ne_one
 
-private theorem not_mem_Psi_of_fst_eq_c0_or (g : φ.GG) (hg : g.1 = c0 ∨ g.1 = ((1 : ℤˣ), (-1 : ℤˣ))) :
-    g ∉ φ.Psi := by
+private theorem not_mem_Psi_of_fst_eq_c0_or (g : φ.GG) (hg : g.1 = c0 ∨ g.1 = ((1 : ℤˣ), (-1 : ℤˣ)))
+    : g ∉ φ.Psi := by
   rw [mem_Psi_iff]
   rcases hg with h | h <;> rw [h] <;> exact int_units_neg_one_ne_one
 
-theorem hostOrbitsPlaces (g : φ.GG) (hg : g.1 = c0 ∨ g.1 = ((1 : ℤˣ), (-1 : ℤˣ))) (τ : φ.GG) (hτ : τ ∈ φ.Psi)
-    (i : ℕ) :
-    (placeOf (g ^ i * τ)).2 = g.2 ^ i * τ.2 ∧
-    (g.1 = c0 → (placeOf (g ^ i * τ)).1 = τ.1) ∧
-    (g.1 = ((1 : ℤˣ), (-1 : ℤˣ)) →
-      (placeOf (g ^ i * τ)).1 = (if Even i then 1 else φ.sg.1) * τ.1) := by
+theorem hostOrbitsPlaces
+    (g : φ.GG) (hg : g.1 = c0 ∨ g.1 = ((1 : ℤˣ), (-1 : ℤˣ))) (τ : φ.GG) (hτ : τ ∈ φ.Psi) (i : ℕ)
+    : (placeOf (g ^ i * τ)).2 = g.2 ^ i * τ.2 ∧ (g.1 = c0 → (placeOf (g ^ i * τ)).1 = τ.1)
+      ∧ (g.1 = ((1 : ℤˣ), (-1 : ℤˣ))
+        → (placeOf (g ^ i * τ)).1 = (if Even i then 1 else φ.sg.1) * τ.1) := by
   have hg' := not_mem_Psi_of_fst_eq_c0_or φ g hg
   refine ⟨(φ.placeOf_snd _).trans rfl, fun hc => ?_, fun hs => ?_⟩
   · by_cases hi : Even i
@@ -460,7 +472,8 @@ theorem hostOrbitsPlaces (g : φ.GG) (hg : g.1 = c0 ∨ g.1 = ((1 : ℤˣ), (-1 
       rw [hc, G0_pow_eq_ite_even, if_pos hi, one_mul]
     · rw [φ.placeOf_of_notMem (fun h => hi ((φ.pow_mul_mem_Psi_iff hg' hτ i).1 h))]
       show c0 * (g.1 ^ i * τ.1) = τ.1
-      rw [hc, G0_pow_eq_ite_even, if_neg hi, ← mul_assoc, ← pow_two, sign_group_sq_eq_one_var, one_mul]
+      rw [hc, G0_pow_eq_ite_even, if_neg hi, ← mul_assoc, ← pow_two, sign_group_sq_eq_one_var,
+        one_mul]
   · by_cases hi : Even i
     · rw [φ.placeOf_of_mem ((φ.pow_mul_mem_Psi_iff hg' hτ i).2 hi), if_pos hi]
       show g.1 ^ i * τ.1 = 1 * τ.1
@@ -470,38 +483,43 @@ theorem hostOrbitsPlaces (g : φ.GG) (hg : g.1 = c0 ∨ g.1 = ((1 : ℤˣ), (-1 
       rw [hs, G0_pow_eq_ite_even, if_neg hi, ← mul_assoc]
       congr 1
 
-private theorem ncard_range_pow_eq_orderOf {M : Type*} [Group M] (x : M) :
-    (Set.range fun i : ℕ => x ^ i).ncard = orderOf x := by
+private theorem ncard_range_pow_eq_orderOf {M : Type*} [Group M] (x : M)
+    : (Set.range fun i : ℕ => x ^ i).ncard = orderOf x := by
   have h : Nat.card (Submonoid.powers x) = orderOf x := Nat.card_submonoidPowers
   rw [← h, ← Submonoid.coe_powers]
   exact (Nat.card_coe_set_eq _).symm
 
-theorem hostOrbitCount (g : φ.GG) (h0 : g.1 = c0) (τ : φ.GG) (hτ : τ ∈ φ.Psi) :
-    (Set.range fun i : ℕ => placeOf (g ^ i * τ)).ncard = orderOf g.2 := by
-  have hfun : (fun i : ℕ => placeOf (g ^ i * τ)) =
-      (fun y : φ.MA => ((τ.1, y * τ.2) : φ.GG)) ∘ (fun i : ℕ => g.2 ^ i) := by
+theorem hostOrbitCount (g : φ.GG) (h0 : g.1 = c0) (τ : φ.GG) (hτ : τ ∈ φ.Psi)
+    : (Set.range fun i : ℕ => placeOf (g ^ i * τ)).ncard = orderOf g.2 := by
+  have hfun
+      : (fun i : ℕ => placeOf (g ^ i * τ))
+        = (fun y : φ.MA => ((τ.1, y * τ.2) : φ.GG)) ∘ (fun i : ℕ => g.2 ^ i) := by
     funext i
     obtain ⟨h1, h2, -⟩ := φ.hostOrbitsPlaces g (Or.inl h0) τ hτ i
     exact Prod.ext (h2 h0) h1
-  rw [hfun, Set.range_comp, Set.ncard_image_of_injective _
-    (fun y y' h => mul_right_cancel (congrArg Prod.snd h)), ncard_range_pow_eq_orderOf]
+  rw [hfun, Set.range_comp,
+    Set.ncard_image_of_injective _ (fun y y' h => mul_right_cancel (congrArg Prod.snd h)),
+    ncard_range_pow_eq_orderOf]
 
 def InTranslate (T : Finset ℕ) (u₀ x : φ.A) : Prop := ∃ s ∈ T, x = φ.dig s + u₀
 
 theorem dig_eq_zsmul (s : ℕ) : φ.dig s = (s : ℤ) • φ.a0 := (natCast_zsmul φ.a0 s).symm
 
-private theorem sub_smul_eq_sub_smul_a0_of_dig_eq (t u₀ x : φ.A) (p q : ℤ) (sp sq : ℕ)
-    (hp : t + p • x = φ.dig sp + u₀) (hq : t + q • x = φ.dig sq + u₀) :
-    (q - p) • x = ((sq : ℤ) - sp) • φ.a0 := by
+private theorem sub_smul_eq_sub_smul_a0_of_dig_eq
+    (t u₀ x : φ.A) (p q : ℤ) (sp sq : ℕ)
+    (hp : t + p • x = φ.dig sp + u₀) (hq : t + q • x = φ.dig sq + u₀)
+    : (q - p) • x = ((sq : ℤ) - sp) • φ.a0 := by
   rw [sub_zsmul, sub_zsmul, ← φ.dig_eq_zsmul, ← φ.dig_eq_zsmul, eq_sub_of_add_eq hq.symm,
     eq_sub_of_add_eq hp.symm]
   abel
 
-theorem thick_key {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0) (hR : NoRel T L)
-    (u₀ t x : φ.A) (hord : 4 * L < addOrderOf x) (i₀ a b c : ℤ)
-    (ha : a ∈ Finset.Ico i₀ (i₀ + L)) (hc : c ∈ Finset.Ico i₀ (i₀ + L)) (hab : a < b)
+theorem thick_key
+    {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0) (hR : NoRel T L)
+    (u₀ t x : φ.A) (hord : 4 * L < addOrderOf x)
+    (i₀ a b c : ℤ) (ha : a ∈ Finset.Ico i₀ (i₀ + L)) (hc : c ∈ Finset.Ico i₀ (i₀ + L)) (hab : a < b)
     (hbc : b < c) (hxa : φ.InTranslate T u₀ (t + a • x)) (hxb : φ.InTranslate T u₀ (t + b • x))
-    (hxc : φ.InTranslate T u₀ (t + c • x)) : False := by
+    (hxc : φ.InTranslate T u₀ (t + c • x))
+    : False := by
   obtain ⟨s1, hs1, h1⟩ := hxa
   obtain ⟨s2, hs2, h2⟩ := hxb
   obtain ⟨s3, hs3, h3⟩ := hxc
@@ -523,10 +541,10 @@ theorem thick_key {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n
   · subst h23
     exact small (c - b) (by omega) (by omega) (by rw [e23, sub_self, zero_zsmul])
   apply hR s1 hs1 s2 hs2 s3 hs3 h12 h13 h23 (b - a) (c - a) (abs_pos.2 (by omega))
-    (abs_le.2 ⟨by omega, by omega⟩) (abs_pos.2 (by omega)) (abs_le.2 ⟨by omega, by omega⟩) (by omega)
+    (abs_le.2 ⟨by omega, by omega⟩) (abs_pos.2 (by omega)) (abs_le.2 ⟨by omega, by omega⟩)
+    (by omega)
   have hD : ((c - a) * ((s2 : ℤ) - s1) - (b - a) * ((s3 : ℤ) - s1)) • φ.a0 = 0 := by
-    rw [sub_zsmul, ← smul_smul, ← smul_smul, ← e12, ← e13, smul_smul, smul_smul,
-      mul_comm (c - a)]
+    rw [sub_zsmul, ← smul_smul, ← smul_smul, ← e12, ← e13, smul_smul, smul_smul, mul_comm (c - a)]
     abel
   rw [φ.zsmul_generator_eq_zero_iff] at hD
   have t1 : 4 * (L : ℤ) * s1 < φ.n0 := by exact_mod_cast hT s1 hs1
@@ -548,38 +566,43 @@ theorem thick_key {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n
   have hz := Int.eq_zero_of_abs_lt_dvd hD (abs_lt.2 ⟨by linarith, by linarith⟩)
   linear_combination hz
 
-
 open scoped Classical in
 open Classical in
-theorem thick_part_one {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0) (hR : NoRel T L)
-    (u₀ t x : φ.A) (hord : 4 * L < addOrderOf x) (i₀ : ℤ) :
-    ((Finset.Ico i₀ (i₀ + L)).filter (fun i : ℤ => φ.InTranslate T u₀ (t + i • x))).card ≤ 2 := by
+theorem thick_part_one
+    {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0) (hR : NoRel T L)
+    (u₀ t x : φ.A) (hord : 4 * L < addOrderOf x)
+    (i₀ : ℤ)
+    : ((Finset.Ico i₀ (i₀ + L)).filter (fun i : ℤ => φ.InTranslate T u₀ (t + i • x))).card ≤ 2 := by
   by_contra hcon
   push_neg at hcon
   obtain ⟨p, hp, q, hq, r, hr, hpq, hpr, hqr⟩ := Finset.two_lt_card.1 hcon
   rw [Finset.mem_filter] at hp hq hr
-  have K : ∀ a b c : ℤ, a ∈ Finset.Ico i₀ (i₀ + L) → b ∈ Finset.Ico i₀ (i₀ + L) →
-      c ∈ Finset.Ico i₀ (i₀ + L) → a < b → b < c → φ.InTranslate T u₀ (t + a • x) →
-      φ.InTranslate T u₀ (t + b • x) → φ.InTranslate T u₀ (t + c • x) → False :=
-    fun a b c ha _ hc hab hbc hxa hxb hxc =>
-      φ.thick_key T hT hR u₀ t x hord i₀ a b c ha hc hab hbc hxa hxb hxc
-  rcases lt_or_gt_of_ne hpq with h1 | h1 <;> rcases lt_or_gt_of_ne hpr with h2 | h2 <;>
-    rcases lt_or_gt_of_ne hqr with h3 | h3 <;>
-    first
-    | omega
-    | exact K p q r hp.1 hq.1 hr.1 (by omega) (by omega) hp.2 hq.2 hr.2
-    | exact K p r q hp.1 hr.1 hq.1 (by omega) (by omega) hp.2 hr.2 hq.2
-    | exact K q p r hq.1 hp.1 hr.1 (by omega) (by omega) hq.2 hp.2 hr.2
-    | exact K q r p hq.1 hr.1 hp.1 (by omega) (by omega) hq.2 hr.2 hp.2
-    | exact K r p q hr.1 hp.1 hq.1 (by omega) (by omega) hr.2 hp.2 hq.2
-    | exact K r q p hr.1 hq.1 hp.1 (by omega) (by omega) hr.2 hq.2 hp.2
+  have K
+      : ∀ a b c : ℤ,
+        a ∈ Finset.Ico i₀ (i₀ + L) → b ∈ Finset.Ico i₀ (i₀ + L) → c ∈ Finset.Ico i₀ (i₀ + L) → a < b
+          → b < c → φ.InTranslate T u₀ (t + a • x) → φ.InTranslate T u₀ (t + b • x)
+          → φ.InTranslate T u₀ (t + c • x)
+          → False := fun a b c ha _ hc hab hbc hxa hxb hxc =>
+    φ.thick_key T hT hR u₀ t x hord i₀ a b c ha hc hab hbc hxa hxb hxc
+  rcases lt_or_gt_of_ne hpq with h1 | h1 <;> rcases lt_or_gt_of_ne hpr with h2 | h2
+    <;> rcases lt_or_gt_of_ne hqr with h3 | h3
+    <;> first
+      | omega
+      | exact K p q r hp.1 hq.1 hr.1 (by omega) (by omega) hp.2 hq.2 hr.2
+      | exact K p r q hp.1 hr.1 hq.1 (by omega) (by omega) hp.2 hr.2 hq.2
+      | exact K q p r hq.1 hp.1 hr.1 (by omega) (by omega) hq.2 hp.2 hr.2
+      | exact K q r p hq.1 hr.1 hp.1 (by omega) (by omega) hq.2 hr.2 hp.2
+      | exact K r p q hr.1 hp.1 hq.1 (by omega) (by omega) hr.2 hp.2 hq.2
+      | exact K r q p hr.1 hq.1 hp.1 (by omega) (by omega) hr.2 hq.2 hp.2
 
-theorem thick_part_two {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0)
-    (u₀ t x : φ.A) (hord : addOrderOf (φ.h x) ≤ 4 * L) :
-    {y : φ.A | (∃ i : ℤ, y = t + i • x) ∧ φ.InTranslate T u₀ y}.ncard ≤ 1 := by
+theorem thick_part_two
+    {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0)
+    (u₀ t x : φ.A) (hord : addOrderOf (φ.h x) ≤ 4 * L)
+    : {y : φ.A | (∃ i : ℤ, y = t + i • x) ∧ φ.InTranslate T u₀ y}.ncard ≤ 1 := by
   rw [Set.ncard_le_one (Set.toFinite _)]
   rintro y1 ⟨⟨i, rfl⟩, s1, hs1, h1⟩ y2 ⟨⟨j, rfl⟩, s2, hs2, h2⟩
-  have e : (j - i) • x = ((s2 : ℤ) - s1) • φ.a0 := sub_smul_eq_sub_smul_a0_of_dig_eq φ t u₀ x i j s1 s2 h1 h2
+  have e : (j - i) • x = ((s2 : ℤ) - s1) • φ.a0 :=
+    sub_smul_eq_sub_smul_a0_of_dig_eq φ t u₀ x i j s1 s2 h1 h2
   have hm0 : 0 < addOrderOf (φ.h x) := addOrderOf_pos _
   have hz : ((addOrderOf (φ.h x) : ℤ) • (((s2 : ℤ) - s1) • φ.a0)) = 0 := by
     apply φ.eq_zero_of_mem_cyclic_of_projection
@@ -603,18 +626,18 @@ theorem thick_part_two {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s <
     · omega
   rw [h1, h2, hs]
 
-
 open scoped Classical in
 open Classical in
-theorem hostThickOrbit {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0) (hR : NoRel T L)
-    (u₀ t x : φ.A) :
-    (4 * L < addOrderOf x → ∀ i₀ : ℤ,
-      ((Finset.Ico i₀ (i₀ + L)).filter (fun i : ℤ => φ.InTranslate T u₀ (t + i • x))).card ≤ 2) ∧
-    (addOrderOf x ≤ 4 * L →
-      {y : φ.A | (∃ i : ℤ, y = t + i • x) ∧ φ.InTranslate T u₀ y}.ncard ≤ 1) := by
-  refine ⟨fun h i₀ => φ.thick_part_one T hT hR u₀ t x h i₀, fun h => φ.thick_part_two T hT u₀ t x ?_⟩
+theorem hostThickOrbit
+    {L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < φ.n0) (hR : NoRel T L) (u₀ t x : φ.A)
+    : (4 * L < addOrderOf x
+        → ∀ i₀ : ℤ,
+          ((Finset.Ico i₀ (i₀ + L)).filter (fun i : ℤ => φ.InTranslate T u₀ (t + i • x))).card ≤ 2)
+      ∧ (addOrderOf x ≤ 4 * L
+        → {y : φ.A | (∃ i : ℤ, y = t + i • x) ∧ φ.InTranslate T u₀ y}.ncard ≤ 1) := by
+  refine
+    ⟨fun h i₀ => φ.thick_part_one T hT hR u₀ t x h i₀, fun h => φ.thick_part_two T hT u₀ t x ?_⟩
   exact le_trans (Nat.le_of_dvd (addOrderOf_pos x) (φ.addOrderOf_h_dvd x)) h
-
 
 end Formalism.HC.Frame
 

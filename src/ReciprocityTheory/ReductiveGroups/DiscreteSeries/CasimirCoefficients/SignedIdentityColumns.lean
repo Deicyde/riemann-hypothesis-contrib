@@ -147,7 +147,8 @@ end supnorm
 
 def hsRV {Q : Type} [Fintype Q] (x : Matrix (Fin n) Q ℂ) : ℝ := ∑ i, ∑ j, ‖x i j‖ ^ 2
 
-def signedIdentityColumns (ε : Fin n → Bool) (s : Bool) : Matrix (Fin n) (SgIxV ε s) ℂ := fun a b => if a = b.1 then 1 else 0
+def signedIdentityColumns (ε : Fin n → Bool) (s : Bool) : Matrix (Fin n) (SgIxV ε s) ℂ := fun a b =>
+  if a = b.1 then 1 else 0
 
 lemma hsRV_cont {Q : Type} [Fintype Q] : Continuous (hsRV : Matrix (Fin n) Q ℂ → ℝ) := by
   unfold hsRV
@@ -227,7 +228,8 @@ lemma hs_le_colsV {ε : Fin n → Bool} (s : Bool) {g : Matrix (Fin n) (Fin n) �
         rw [Finset.sum_add_distrib, ← Finset.mul_sum]
         simp
 
-def LcV {Q : Type} [Fintype Q] (g : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) Q ℂ →ₗ[ℂ] Matrix (Fin n) Q ℂ where
+def LcV {Q : Type} [Fintype Q] (g : Matrix (Fin n) (Fin n) ℂ)
+    : Matrix (Fin n) Q ℂ →ₗ[ℂ] Matrix (Fin n) Q ℂ where
   toFun x := g * x
   map_add' := Matrix.mul_add g
   map_smul' c x := by simp
@@ -258,8 +260,8 @@ abbrev REV (n : ℕ) (Q : Type) := Fin n → Q → ℂ
 def ReV (n : ℕ) (Q : Type) : REV n Q ≃ₗ[ℝ] Matrix (Fin n) Q ℂ := Matrix.ofLinearEquiv ℝ
 
 def RLV {Q : Type} [Fintype Q] (g : Matrix (Fin n) (Fin n) ℂ) : REV n Q →ₗ[ℝ] REV n Q :=
-  ((ReV n Q).symm : Matrix (Fin n) Q ℂ →ₗ[ℝ] REV n Q) ∘ₗ ((LcV (Q := Q) g).restrictScalars ℝ) ∘ₗ
-    ((ReV n Q : REV n Q ≃ₗ[ℝ] Matrix (Fin n) Q ℂ) : REV n Q →ₗ[ℝ] Matrix (Fin n) Q ℂ)
+  ((ReV n Q).symm : Matrix (Fin n) Q ℂ →ₗ[ℝ] REV n Q) ∘ₗ ((LcV (Q := Q) g).restrictScalars ℝ)
+    ∘ₗ ((ReV n Q : REV n Q ≃ₗ[ℝ] Matrix (Fin n) Q ℂ) : REV n Q →ₗ[ℝ] Matrix (Fin n) Q ℂ)
 
 lemma RLV_apply {Q : Type} [Fintype Q] (g : Matrix (Fin n) (Fin n) ℂ) (x : REV n Q) :
     RLV g x = Matrix.of.symm (g * Matrix.of x) := rfl

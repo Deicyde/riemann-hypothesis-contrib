@@ -13,25 +13,27 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-private theorem isKum_one_of_vanish_on_inD {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ}
-    (X : Tower Ω ε) (m : ℕ) (hm : 0 < m) (φ : RingAut (Kb X) → ZMod m)
-    (hφ : ∀ h, InD X h → φ h = 0) : IsKum X m φ 1 := by
+private theorem isKum_one_of_vanish_on_inD
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    {ε : Ω →+* ℂ} (X : Tower Ω ε)
+    (m : ℕ) (hm : 0 < m) (φ : RingAut (Kb X) → ZMod m) (hφ : ∀ h, InD X h → φ h = 0)
+    : IsKum X m φ 1 := by
   refine ⟨1, by simp, fun h hh => ?_⟩
   rw [hφ h hh]
   show lg X m (h 1) 1 = 0
   rw [map_one]
   exact (lgB Ω ε X m hm).2.2.1 1 1 0 one_ne_zero (by simp)
 
-private theorem pt_mv_mul_eq_mv_mv_one {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} {X : Tower Ω ε} {m : ℕ}
-    (σ ρ : RingAut (Kb X)) (χ : ZMod m) (P : Pt X m) :
-    Pt.mv (σ * ρ) χ P = Pt.mv σ χ (Pt.mv ρ 1 P) := by
+private theorem pt_mv_mul_eq_mv_mv_one
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} {X : Tower Ω ε} {m : ℕ} (σ ρ : RingAut (Kb X)) (χ : ZMod m) (P : Pt X m)
+    : Pt.mv (σ * ρ) χ P = Pt.mv σ χ (Pt.mv ρ 1 P) := by
   simp only [Pt.mv, one_pow, one_mul, Pt.mk.injEq]
   refine ⟨rfl, rfl, ?_⟩
   funext h
   simp only [mul_inv_rev, mul_assoc]
 
-theorem UpperTheory.V.Z.Kato.Sym.mvEx :
-    UpperTheory.V.Z.Kato.Sym.MvEx := by
+theorem UpperTheory.V.Z.Kato.Sym.mvEx : UpperTheory.V.Z.Kato.Sym.MvEx := by
   intro Ω _ _ _ ε X m hm τ s hadm u v P hP
   obtain ⟨-, -, hrefl, -, -, -, hlift, -⟩ := admB Ω ε X
   have hD := difB Ω ε X m hm
@@ -80,7 +82,8 @@ theorem UpperTheory.V.Z.Kato.Sym.mvEx :
       have hB : IsPt X m (τ u) (τ v) (Pt.mv σ₀ (cyc m s) P) := hMv τ s hadm σ₀ hσ₀ u v P hP
       have hsplit := (hD (τ u) (τ v) _ _ hA hB).2.2.2.1 Q hQ h hh
       have hzero : dif X (Pt.mv σ₁ (cyc m s) P) (Pt.mv σ₀ (cyc m s) P) h = 0 := by
-        rw [show σ₁ = σ₀ * (σ₀⁻¹ * σ₁) from (mul_inv_cancel_left σ₀ σ₁).symm, pt_mv_mul_eq_mv_mv_one]
+        rw [show σ₁ = σ₀ * (σ₀⁻¹ * σ₁) from (mul_inv_cancel_left σ₀ σ₁).symm,
+          pt_mv_mul_eq_mv_mv_one]
         rw [(hD u v _ P hP1 hP).2.2.2.2.2.2 τ s hadm σ₀ hσ₀ h hh,
           (hD u v P P hP hP).2.2.2.2.2.1 _ hρ _ hconj, mul_zero]
       rw [hsplit, hzero, zero_add]

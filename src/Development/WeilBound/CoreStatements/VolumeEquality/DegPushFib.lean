@@ -14,14 +14,29 @@ namespace Fib
 variable {Ψ : Type} {p q : ℕ} {K : Type}
 
 def entPair : Ent (rk Ψ p q) → PairIx Ψ p q
-  | ⟨.inl τ, ⟨l, m⟩, h⟩ => (τ, ⟨(Fin.castAdd q m, Fin.castAdd q l), h, by
-      have h1 : (l : ℕ) < p := l.2
-      have h2 : (m : ℕ) < p := m.2
-      exact iff_of_true h2 h1⟩)
-  | ⟨.inr τ, ⟨l, m⟩, h⟩ => (τ, ⟨(Fin.natAdd p m, Fin.natAdd p l), by
-      have h' : (m : ℕ) < l := h
-      exact ⟨show p + (m : ℕ) < p + l by omega, iff_of_false (show ¬ p + (m : ℕ) < p by omega)
-        (show ¬ p + (l : ℕ) < p by omega)⟩⟩)
+  | ⟨.inl τ, ⟨l, m⟩, h⟩ => (
+    τ,
+    ⟨
+      (Fin.castAdd q m, Fin.castAdd q l),
+      h,
+      by
+        have h1 : (l : ℕ) < p := l.2
+        have h2 : (m : ℕ) < p := m.2
+        exact iff_of_true h2 h1
+    ⟩
+  )
+  | ⟨.inr τ, ⟨l, m⟩, h⟩ => (
+    τ,
+    ⟨
+      (Fin.natAdd p m, Fin.natAdd p l),
+      by
+        have h' : (m : ℕ) < l := h
+        exact ⟨
+          show p + (m : ℕ) < p + l by omega,
+          iff_of_false (show ¬ p + (m : ℕ) < p by omega) (show ¬ p + (l : ℕ) < p by omega)
+        ⟩
+    ⟩
+  )
 
 theorem entPair_bij : Function.Bijective (entPair : Ent (rk Ψ p q) → PairIx Ψ p q) := by
   constructor
@@ -75,7 +90,8 @@ theorem entPair_bij : Function.Bijective (entPair : Ent (rk Ψ p q) → PairIx �
 def dif {n : ℕ} (st : Fin n → K → ℤ) (m : Fin n) : K → ℤ :=
   st m - if h : 0 < (m : ℕ) then st ⟨m - 1, by omega⟩ else 0
 
-theorem dif_sum {n : ℕ} (g : Fin n → K → ℤ) (m : Fin n) : dif (fun m => ∑ m' ∈ Finset.Iic m, g m') m = g m := by
+theorem dif_sum {n : ℕ} (g : Fin n → K → ℤ) (m : Fin n)
+    : dif (fun m => ∑ m' ∈ Finset.Iic m, g m') m = g m := by
   unfold dif
   beta_reduce
   rw [Finset.Iic_eq_cons_Iio m, Finset.sum_cons]
@@ -94,10 +110,13 @@ theorem dif_sum {n : ℕ} (g : Fin n → K → ℤ) (m : Fin n) : dif (fun m => 
     simp
 
 def rootOf (st : ∀ s, Fin (rk Ψ p q s) → K → ℤ) (t : Ψ × Fin (p + q)) : K → ℤ :=
-  if h : (t.2 : ℕ) < p then dif (st (.inl t.1)) ⟨t.2, h⟩
-  else -dif (st (.inr t.1)) ⟨p + q - 1 - t.2, by have := t.2.2; show _ < q; omega⟩
+  if h : (t.2 : ℕ) < p then
+    dif (st (.inl t.1)) ⟨t.2, h⟩
+  else
+    - dif (st (.inr t.1)) ⟨p + q - 1 - t.2, by have := t.2.2; show _ < q; omega⟩
 
-theorem rootOf_step (x : Ψ × Fin (p + q) → K → ℤ) (t : Ψ × Fin (p + q)) : rootOf (stepDeg x) t = x t := by
+theorem rootOf_step (x : Ψ × Fin (p + q) → K → ℤ) (t : Ψ × Fin (p + q))
+    : rootOf (stepDeg x) t = x t := by
   obtain ⟨τ, j⟩ := t
   unfold rootOf
   split_ifs with h
@@ -108,7 +127,8 @@ theorem rootOf_step (x : Ψ × Fin (p + q) → K → ℤ) (t : Ψ × Fin (p + q)
   · have hj := j.2
     have h' : ¬ (j : ℕ) < p := h
     have e := dif_sum (grDeg x (Sum.inr τ)) ⟨p + q - 1 - (j : ℕ), by show _ < q; omega⟩
-    change -dif (fun m => ∑ m' ∈ Finset.Iic m, grDeg x (Sum.inr τ) m') ⟨p + q - 1 - (j : ℕ), _⟩ = x (τ, j)
+    change - dif (fun m => ∑ m' ∈ Finset.Iic m, grDeg x (Sum.inr τ) m') ⟨p + q - 1 - (j : ℕ), _⟩
+      = x (τ, j)
     rw [e]
     simp only [grDeg, neg_neg]
     congr 2
@@ -118,12 +138,22 @@ theorem rootOf_step (x : Ψ × Fin (p + q) → K → ℤ) (t : Ψ × Fin (p + q)
 
 section
 
-variable {k : Type} [Field k] {Ω : Type} [Field Ω] [Algebra k Ω] [Fintype K] {ι : K → Type} [∀ b, Fintype (ι b)]
-  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ b, Fintype (ι' b)] {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω}
+variable
+  {k : Type} [Field k]
+  {Ω : Type} [Field Ω] [Algebra k Ω] [Fintype K]
+  {ι : K → Type} [∀ b, Fintype (ι b)]
+  {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ b, Fintype (ι' b)]
+  {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω}
 
-private theorem sup_valuation_ne_zero_of_exists_ne_zero {L : Type} [Field L] {J : Type} [Fintype J] {κ : J → Type} [∀ b, Fintype (κ b)]
-    (O : ValuationSubring L) (z : (Σ b, κ b) → L) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0) (b : J) :
-    (Finset.univ.sup fun i : κ b => O.valuation (z ⟨b, i⟩)) ≠ 0 := by
+private theorem sup_valuation_ne_zero_of_exists_ne_zero
+    {L : Type} [Field L]
+    {J : Type} [Fintype J]
+    {κ : J → Type} [∀ b, Fintype (κ b)]
+    (O : ValuationSubring L)
+    (z : (Σ b, κ b) → L) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0)
+    (b : J)
+    : (Finset.univ.sup fun i : κ b => O.valuation (z ⟨b, i⟩)) ≠ 0 := by
   obtain ⟨i, hi⟩ := hz b
   have hv : O.valuation (z ⟨b, i⟩) ≠ 0 := by
     rw [Valuation.ne_zero_iff]
@@ -134,24 +164,37 @@ private theorem sup_valuation_ne_zero_of_exists_ne_zero {L : Type} [Field L] {J 
   rw [h0] at hle
   exact hv (le_antisymm hle zero_le')
 
-private theorem vdeg_sub' {L : Type} [Field L] {J : Type} [Fintype J] {κ : J → Type} [∀ b, Fintype (κ b)]
-    (O : ValuationSubring L) (z : (Σ b, κ b) → L) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0) (a c : J → ℤ) :
-    vdeg O z (a - c) = vdeg O z a / vdeg O z c := by
+private theorem vdeg_sub'
+    {L : Type} [Field L]
+    {J : Type} [Fintype J]
+    {κ : J → Type} [∀ b, Fintype (κ b)]
+    (O : ValuationSubring L)
+    (z : (Σ b, κ b) → L) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0)
+    (a c : J → ℤ)
+    : vdeg O z (a - c) = vdeg O z a / vdeg O z c := by
   unfold vdeg
   rw [← Finset.prod_div_distrib]
   refine Finset.prod_congr rfl fun b _ => ?_
   rw [Pi.sub_apply, zpow_sub₀ (sup_valuation_ne_zero_of_exists_ne_zero O z hz b)]
 
-private theorem vdeg_ne_zero' {L : Type} [Field L] {J : Type} [Fintype J] {κ : J → Type} [∀ b, Fintype (κ b)]
-    (O : ValuationSubring L) (z : (Σ b, κ b) → L) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0) (a : J → ℤ) :
-    vdeg O z a ≠ 0 := by
+private theorem vdeg_ne_zero'
+    {L : Type} [Field L]
+    {J : Type} [Fintype J]
+    {κ : J → Type} [∀ b, Fintype (κ b)]
+    (O : ValuationSubring L)
+    (z : (Σ b, κ b) → L) (hz : ∀ b, ∃ i, z ⟨b, i⟩ ≠ 0)
+    (a : J → ℤ)
+    : vdeg O z a ≠ 0 := by
   unfold vdeg
   rw [Finset.prod_ne_zero_iff]
   intro b _
   exact zpow_ne_zero _ (sup_valuation_ne_zero_of_exists_ne_zero O z hz b)
 
-theorem valEq_dif (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (hy' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0) {n : ℕ} {st : Fin n → K → ℤ}
-    {st' : Fin n → K' → ℤ} (h : ∀ m, ValEq k y (st m) y' (st' m)) (m : Fin n) : ValEq k y (dif st m) y' (dif st' m) := by
+theorem valEq_dif
+    (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (hy' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0)
+    {n : ℕ} {st : Fin n → K → ℤ} {st' : Fin n → K' → ℤ}
+    (h : ∀ m, ValEq k y (st m) y' (st' m)) (m : Fin n)
+    : ValEq k y (dif st m) y' (dif st' m) := by
   unfold dif
   split_ifs with hm
   · obtain ⟨ρ₁, hρ₁, h₁⟩ := h m
@@ -165,34 +208,49 @@ theorem valEq_dif (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (hy' : ∀ b, ∃ i, y
     field_simp
   · simpa using h m
 
-private theorem vdeg_neg' {L : Type} [Field L] {J : Type} [Fintype J] {κ : J → Type} [∀ b, Fintype (κ b)]
-    (O : ValuationSubring L) (z : (Σ b, κ b) → L) (a : J → ℤ) :
-    vdeg O z (-a) = (vdeg O z a)⁻¹ := by
+private theorem vdeg_neg'
+    {L : Type} [Field L]
+    {J : Type} [Fintype J]
+    {κ : J → Type} [∀ b, Fintype (κ b)]
+    (O : ValuationSubring L) (z : (Σ b, κ b) → L) (a : J → ℤ)
+    : vdeg O z (-a) = (vdeg O z a)⁻¹ := by
   unfold vdeg
   rw [← Finset.prod_inv_distrib]
   refine Finset.prod_congr rfl fun b _ => ?_
   rw [Pi.neg_apply, zpow_neg]
 
-theorem valEq_root (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (hy' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0) {st : ∀ s, Fin (rk Ψ p q s) → K → ℤ}
-    {st' : ∀ s, Fin (rk Ψ p q s) → K' → ℤ} (h : ∀ s m, ValEq k y (st s m) y' (st' s m)) (t : Ψ × Fin (p + q)) :
-    ValEq k y (rootOf st t) y' (rootOf st' t) := by
+theorem valEq_root
+    (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (hy' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0)
+    {st : ∀ s, Fin (rk Ψ p q s) → K → ℤ} {st' : ∀ s, Fin (rk Ψ p q s) → K' → ℤ}
+    (h : ∀ s m, ValEq k y (st s m) y' (st' s m))
+    (t : Ψ × Fin (p + q))
+    : ValEq k y (rootOf st t) y' (rootOf st' t) := by
   unfold rootOf
   split_ifs with ht
   · exact valEq_dif hy hy' (h _) _
-  · obtain ⟨ρ, hρ, hh⟩ := valEq_dif hy hy' (h (Sum.inr t.1)) ⟨p + q - 1 - (t.2 : ℕ), by have := t.2.2; show _ < q; omega⟩
+  · obtain ⟨ρ, hρ, hh⟩ :=
+      valEq_dif hy hy' (h (Sum.inr t.1))
+        ⟨p + q - 1 - (t.2 : ℕ), by have := t.2.2; show _ < q; omega⟩
     refine ⟨ρ⁻¹, inv_ne_zero hρ, fun O hO => ?_⟩
     rw [vdeg_neg', vdeg_neg', hh O hO, map_inv₀, mul_inv]
 
 end
 
 def uConst (Ψ : Type) [Fintype Ψ] (p q : ℕ) : ℤ :=
-  uNum (rk Ψ p q) fun j => fibDeg (rootOf fun s m => plDeg ⟨s, m⟩) ((Finite.equivFin (PairIx Ψ p q)).symm j)
+  uNum (rk Ψ p q) fun j =>
+    fibDeg (rootOf fun s m => plDeg ⟨s, m⟩) ((Finite.equivFin (PairIx Ψ p q)).symm j)
 
-private theorem valEq_sub {k : Type} [Field k] {Ω : Type} [Field Ω] [Algebra k Ω] {K : Type} [Fintype K]
-    {ι : K → Type} [∀ b, Fintype (ι b)] {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ b, Fintype (ι' b)]
+private theorem valEq_sub
+    {k : Type} [Field k]
+    {Ω : Type} [Field Ω] [Algebra k Ω]
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ b, Fintype (ι b)]
+    {K' : Type} [Fintype K']
+    {ι' : K' → Type} [∀ b, Fintype (ι' b)]
     {y : (Σ b, ι b) → Ω} {y' : (Σ b, ι' b) → Ω}
-    (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (hy' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0) {a c : K → ℤ} {a' c' : K' → ℤ}
-    (ha : ValEq k y a y' a') (hc : ValEq k y c y' c') : ValEq k y (a - c) y' (a' - c') := by
+    (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (hy' : ∀ b, ∃ i, y' ⟨b, i⟩ ≠ 0)
+    {a c : K → ℤ} {a' c' : K' → ℤ} (ha : ValEq k y a y' a') (hc : ValEq k y c y' c')
+    : ValEq k y (a - c) y' (a' - c') := by
   obtain ⟨ρ₁, hρ₁, h₁⟩ := ha
   obtain ⟨ρ₂, hρ₂, h₂⟩ := hc
   refine ⟨ρ₁ / ρ₂, div_ne_zero hρ₁ hρ₂, fun O hO => ?_⟩
@@ -203,20 +261,28 @@ private theorem valEq_sub {k : Type} [Field k] {Ω : Type} [Field Ω] [Algebra k
   have hw := vdeg_ne_zero' O y' hy' c'
   field_simp
 
-theorem num_eq (hN : NumEq) [Fintype Ψ] (k : Type) [Field k] [CharZero k] (Ω : Type) [Field Ω] [Algebra k Ω] [Fintype K]
-    (ι : K → Type) [∀ b, Fintype (ι b)] (y : (Σ b, ι b) → Ω) (u : ∀ s, Matrix (Fin (rk Ψ p q s)) (Fin (rk Ψ p q s)) Ω)
-    (d r : ℕ) (x : Ψ × Fin (p + q) → K → ℤ) (e : Fin r ≃ PairIx Ψ p q) (hu : IsGenU k u d) (hy : IsPt k y r)
-    (hv : ∀ s m, ValEq k y (stepDeg x s m) (plPt u) (plDeg ⟨s, m⟩)) :
-    num k y (fun j => fibDeg x (e j)) = d * uConst Ψ p q := by
+theorem num_eq
+    (hN : NumEq)
+    [Fintype Ψ]
+    (k : Type) [Field k] [CharZero k]
+    (Ω : Type) [Field Ω] [Algebra k Ω] [Fintype K]
+    (ι : K → Type) [∀ b, Fintype (ι b)]
+    (y : (Σ b, ι b) → Ω) (u : ∀ s, Matrix (Fin (rk Ψ p q s)) (Fin (rk Ψ p q s)) Ω) (d r : ℕ)
+    (x : Ψ × Fin (p + q) → K → ℤ) (e : Fin r ≃ PairIx Ψ p q) (hu : IsGenU k u d) (hy : IsPt k y r)
+    (hv : ∀ s m, ValEq k y (stepDeg x s m) (plPt u) (plDeg ⟨s, m⟩))
+    : num k y (fun j => fibDeg x (e j)) = d * uConst Ψ p q := by
   classical
   have hne := plPt_ne u hu.1 hu.2.1
   have hfd : FiniteDimensional (fnField k (plPt u)) Ω := by
     rw [fnField_plPt u hu.1 hu.2.1]
     exact Module.finite_of_finrank_pos (by rw [hu.2.2.2.2]; exact hu.2.2.2.1)
   have hcard : Nat.card (Ent (rk Ψ p q)) = r := by
-    rw [Nat.card_eq_of_bijective _ entPair_bij, Nat.card_congr e.symm, Nat.card_eq_fintype_card, Fintype.card_fin]
+    rw [Nat.card_eq_of_bijective _ entPair_bij, Nat.card_congr e.symm, Nat.card_eq_fintype_card,
+      Fintype.card_fin]
   have hpt' : IsPt k (plPt u) r := ⟨hne, hfd, by rw [trdeg_eq u hu, hcard]⟩
-  have hval : ∀ j, ValEq k y (fibDeg x (e j)) (plPt u) (fibDeg (rootOf fun s m => plDeg ⟨s, m⟩) (e j)) := by
+  have hval
+      : ∀ j,
+        ValEq k y (fibDeg x (e j)) (plPt u) (fibDeg (rootOf fun s m => plDeg ⟨s, m⟩) (e j)) := by
     intro j
     unfold fibDeg
     apply valEq_sub hy.1 hne
@@ -237,17 +303,19 @@ theorem num_eq (hN : NumEq) [Fintype Ψ] (k : Type) [Field k] [CharZero k] (Ω :
   revert e
   rw [← hN']
   intro e hval
-  have := GroundTheory.Heights₂.Heights.FieldNumbers.IntNumSymm.proof ℚ (Σ s, Fin (rk Ψ p q s)) (PlIx (rk Ψ p q))
-    (RingHom.ker (MvPolynomial.aeval (genCone (rk Ψ p q)))) _ (fun j => g ((Finite.equivFin (PairIx Ψ p q)).symm j))
-    (e.trans (Finite.equivFin (PairIx Ψ p q)))
+  have :=
+    GroundTheory.Heights₂.Heights.FieldNumbers.IntNumSymm.proof ℚ (Σ s, Fin (rk Ψ p q s))
+      (PlIx (rk Ψ p q)) (RingHom.ker (MvPolynomial.aeval (genCone (rk Ψ p q)))) _
+      (fun j => g ((Finite.equivFin (PairIx Ψ p q)).symm j))
+      (e.trans (Finite.equivFin (PairIx Ψ p q)))
   convert this using 2
   funext j
   simp
 
 variable {Ψ' : Type} {Ω : Type}
 
-def reU (ε : Ψ' → Ψ) (u : ∀ s, Matrix (Fin (rk Ψ p q s)) (Fin (rk Ψ p q s)) Ω) :
-    ∀ s, Matrix (Fin (rk Ψ' p q s)) (Fin (rk Ψ' p q s)) Ω
+def reU (ε : Ψ' → Ψ) (u : ∀ s, Matrix (Fin (rk Ψ p q s)) (Fin (rk Ψ p q s)) Ω)
+    : ∀ s, Matrix (Fin (rk Ψ' p q s)) (Fin (rk Ψ' p q s)) Ω
   | .inl τ => u (.inl (ε τ))
   | .inr τ => u (.inr (ε τ))
 
@@ -255,8 +323,12 @@ def reEnt (ε : Ψ' → Ψ) : Ent (rk Ψ' p q) → Ent (rk Ψ p q)
   | ⟨.inl τ, x⟩ => ⟨.inl (ε τ), x⟩
   | ⟨.inr τ, x⟩ => ⟨.inr (ε τ), x⟩
 
-theorem isGenU_reU {k : Type} [Field k] [Field Ω] [Algebra k Ω] (ε : Ψ' ≃ Ψ)
-    (u : ∀ s, Matrix (Fin (rk Ψ p q s)) (Fin (rk Ψ p q s)) Ω) {d : ℕ} (h : IsGenU k u d) : IsGenU k (reU ε u) d := by
+theorem isGenU_reU
+    {k : Type} [Field k] [Field Ω] [Algebra k Ω]
+    (ε : Ψ' ≃ Ψ)
+    (u : ∀ s, Matrix (Fin (rk Ψ p q s)) (Fin (rk Ψ p q s)) Ω)
+    {d : ℕ} (h : IsGenU k u d)
+    : IsGenU k (reU ε u) d := by
   obtain ⟨h1, h2, h3, h4, h5⟩ := h
   refine ⟨?_, ?_, ?_, h4, ?_⟩
   · rintro (τ | τ) m
@@ -265,8 +337,9 @@ theorem isGenU_reU {k : Type} [Field k] [Field Ω] [Algebra k Ω] (ε : Ψ' ≃ 
   · rintro (τ | τ) l m hlm
     · exact h2 (Sum.inl (ε τ)) l m hlm
     · exact h2 (Sum.inr (ε τ)) l m hlm
-  · have e : (fun q : Ent (rk Ψ' p q) => reU ε u q.1 q.2.1.1 q.2.1.2) =
-        (fun q : Ent (rk Ψ p q) => u q.1 q.2.1.1 q.2.1.2) ∘ reEnt ε := by
+  · have e
+        : (fun q : Ent (rk Ψ' p q) => reU ε u q.1 q.2.1.1 q.2.1.2)
+          = (fun q : Ent (rk Ψ p q) => u q.1 q.2.1.1 q.2.1.2) ∘ reEnt ε := by
       funext ⟨s, x⟩
       rcases s with τ | τ <;> rfl
     rw [e]
@@ -289,8 +362,11 @@ theorem isGenU_reU {k : Type} [Field k] [Field Ω] [Algebra k Ω] (ε : Ψ' ≃ 
       have hx' : x = x' := eq_of_heq hx
       subst hx'
       rfl
-  · have e : (Set.range fun q : (s : Ψ' ⊕ Ψ') × Fin (rk Ψ' p q s) × Fin (rk Ψ' p q s) => reU ε u q.1 q.2.1 q.2.2) =
-        Set.range fun q : (s : Ψ ⊕ Ψ) × Fin (rk Ψ p q s) × Fin (rk Ψ p q s) => u q.1 q.2.1 q.2.2 := by
+  · have e
+        : (Set.range fun q : (s : Ψ' ⊕ Ψ') × Fin (rk Ψ' p q s) × Fin (rk Ψ' p q s) =>
+            reU ε u q.1 q.2.1 q.2.2)
+          = Set.range fun q : (s : Ψ ⊕ Ψ) × Fin (rk Ψ p q s) × Fin (rk Ψ p q s) =>
+            u q.1 q.2.1 q.2.2 := by
       ext z
       constructor
       · rintro ⟨⟨s, l, m⟩, rfl⟩
@@ -299,8 +375,14 @@ theorem isGenU_reU {k : Type} [Field k] [Field Ω] [Algebra k Ω] (ε : Ψ' ≃ 
         · exact ⟨⟨Sum.inr (ε τ), l, m⟩, rfl⟩
       · rintro ⟨⟨s, l, m⟩, rfl⟩
         rcases s with τ | τ
-        · exact ⟨⟨Sum.inl (ε.symm τ), l, m⟩, congrArg (fun X => u (Sum.inl X) l m) (ε.apply_symm_apply τ)⟩
-        · exact ⟨⟨Sum.inr (ε.symm τ), l, m⟩, congrArg (fun X => u (Sum.inr X) l m) (ε.apply_symm_apply τ)⟩
+        · exact ⟨
+            ⟨Sum.inl (ε.symm τ), l, m⟩,
+            congrArg (fun X => u (Sum.inl X) l m) (ε.apply_symm_apply τ)
+          ⟩
+        · exact ⟨
+            ⟨Sum.inr (ε.symm τ), l, m⟩,
+            congrArg (fun X => u (Sum.inr X) l m) (ε.apply_symm_apply τ)
+          ⟩
     rw [e]
     exact h5
 

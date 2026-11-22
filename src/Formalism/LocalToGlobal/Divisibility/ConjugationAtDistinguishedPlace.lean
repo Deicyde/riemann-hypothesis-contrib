@@ -25,7 +25,8 @@ def conjQb (ι : Qb →+* ℂ) : Qb ≃ₐ[ℚ] Qb :=
 theorem conjQb_spec (ι : Qb →+* ℂ) (x : Qb) : ι (conjQb ι x) = starRingEnd ℂ (ι x) := by
   have key : conjQb ι x = (algC ι).symm (algC ((starRingEnd ℂ).comp ι) x) := rfl
   rw [key, ← algC_coe ι ((algC ι).symm (algC ((starRingEnd ℂ).comp ι) x)),
-    RingEquiv.apply_symm_apply, algC_coe] <;> rfl
+      RingEquiv.apply_symm_apply, algC_coe]
+    <;> rfl
 
 theorem conjQb_conjQb (ι : Qb →+* ℂ) (x : Qb) : conjQb ι (conjQb ι x) = x := by
   apply ι.injective
@@ -33,7 +34,8 @@ theorem conjQb_conjQb (ι : Qb →+* ℂ) (x : Qb) : conjQb ι (conjQb ι x) = x
 
 def cLL (ι : Qb →+* ℂ) (LL : Fld) [Normal ℚ LL] : LL ≃ₐ[ℚ] LL := (conjQb ι).restrictNormal LL
 
-theorem cLL_coe (ι : Qb →+* ℂ) (LL : Fld) [Normal ℚ LL] (x : LL) : ((cLL ι LL x : LL) : Qb) = conjQb ι x := by
+theorem cLL_coe (ι : Qb →+* ℂ) (LL : Fld) [Normal ℚ LL] (x : LL)
+    : ((cLL ι LL x : LL) : Qb) = conjQb ι x := by
   first
   | exact AlgEquiv.restrictNormal_commutes (conjQb ι) LL x
   | exact AlgEquiv.restrictNormal_commutes (conjQb ι) x
@@ -42,7 +44,8 @@ theorem cLL_cLL (ι : Qb →+* ℂ) (LL : Fld) [Normal ℚ LL] (x : LL) : cLL ι
   apply Subtype.ext
   rw [cLL_coe, cLL_coe, conjQb_conjQb]
 
-@[reducible] def starLL (ι : Qb →+* ℂ) (LL : Fld) [Normal ℚ LL] : StarRing LL where
+@[reducible]
+def starLL (ι : Qb →+* ℂ) (LL : Fld) [Normal ℚ LL] : StarRing LL where
   star := cLL ι LL
   star_involutive := cLL_cLL ι LL
   star_mul a b := by rw [map_mul, mul_comm]

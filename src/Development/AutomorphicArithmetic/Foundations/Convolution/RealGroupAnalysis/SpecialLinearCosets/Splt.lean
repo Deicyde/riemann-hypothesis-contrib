@@ -7,19 +7,24 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H UpperTheory.ConvolutionTheory.R2.I
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
+  UpperTheory.ConvolutionTheory.R2.I
 open scoped Classical
 
-theorem UpperTheory.ConvolutionTheory.R2.I.splt :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (D : Dat F E) (v : P F) (w : P E) (i : Kv v ≃+* Kv w), Continuous i →
-      (∀ x : F, i (algebraMap F _ x) = algebraMap E _ (algebraMap F E x)) →
-      ∃ θ : Kv v, Splt D v θ ((lc w).comp (Matrix.GeneralLinearGroup.map i.toRingHom)) := by
+theorem UpperTheory.ConvolutionTheory.R2.I.splt
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (D : Dat F E)
+        (v : P F) (w : P E) (i : Kv v ≃+* Kv w),
+      Continuous i → (∀ x : F, i (algebraMap F _ x) = algebraMap E _ (algebraMap F E x))
+        → ∃ θ : Kv v, Splt D v θ ((lc w).comp (Matrix.GeneralLinearGroup.map i.toRingHom)) := by
   intro F E _ _ _ _ _ D v w i hc hal
   obtain ⟨θ, hsq, hne, hk⟩ := UpperTheory.ConvolutionTheory.R2.I.place F E D v w i hc hal
   obtain ⟨-, -, -, -, hlc, -⟩ := UpperTheory.ConvolutionTheory.R2.H.sgLaws E w
-  have hone : ∀ a b : Fin 2, i ((1 : Matrix (Fin 2) (Fin 2) (Kv v)) a b) =
-      (1 : Matrix (Fin 2) (Fin 2) (Kv w)) a b := by
+  have hone
+      : ∀ a b : Fin 2,
+        i ((1 : Matrix (Fin 2) (Fin 2) (Kv v)) a b) = (1 : Matrix (Fin 2) (Fin 2) (Kv w)) a b := by
     intro a b
     rw [Matrix.one_apply, Matrix.one_apply]
     split_ifs <;> simp

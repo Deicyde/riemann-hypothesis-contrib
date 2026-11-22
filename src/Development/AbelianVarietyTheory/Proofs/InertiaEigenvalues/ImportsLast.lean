@@ -8,8 +8,11 @@ namespace GlobalTheory.PowerDifferenceNormInertiaEigenvalues
 
 universe u_1
 
-theorem norm_pow_sub_pow_le {C : Type u_1} [NormedField C] [IsUltrametricDist C] {x y : C}
-    (hx : ‖x‖ ≤ (1 : ℝ)) (hy : ‖y‖ ≤ (1 : ℝ)) (n : ℕ) : ‖x ^ n - y ^ n‖ ≤ ‖x - y‖ := by
+theorem norm_pow_sub_pow_le
+    {C : Type u_1} [NormedField C] [IsUltrametricDist C]
+    {x y : C} (hx : ‖x‖ ≤ (1 : ℝ)) (hy : ‖y‖ ≤ (1 : ℝ))
+    (n : ℕ)
+    : ‖x ^ n - y ^ n‖ ≤ ‖x - y‖ := by
   induction n with
   | zero => simp
   | succ n ih =>

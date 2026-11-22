@@ -10,20 +10,23 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MeasureTheory
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MeasureTheory
 
 noncomputable section
 
-theorem ResolutionFormsIndependent.proof (hND : NonvanishingDense.Statement) :
-    ResolutionFormsIndependent.Statement := by
+theorem ResolutionFormsIndependent.proof (hND : NonvanishingDense.Statement)
+    : ResolutionFormsIndependent.Statement := by
   intro D Ω _ _ κ _ d n r b hb a ha
   obtain ⟨g, hgJ, hgP⟩ := SetLike.not_le_iff_exists.1 d.R.nondeg
   set F : (Ix κ → ℂ) → ℂ := fun z => ∑ k, a k * secFun (b k) z with hF
   have hFc : Continuous F :=
     continuous_finsetSum _ fun k _ => continuous_const.mul (continuous_secFun _)
 
-  have hoff : ∀ z, z ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ d.x) →
-      eval z (map (Int.castRingHom ℂ) g) ≠ 0 → F z = 0 := by
+  have hoff
+      : ∀ z,
+        z ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ d.x) → eval z (map (Int.castRingHom ℂ) g) ≠ 0
+          → F z = 0 := by
     intro z hz hgz
     obtain ⟨y, c, hc, hyz⟩ := d.R.surj z hz (fun hJ => hgz (hJ.2 g hgJ))
     have h1 : resPt d y = c () • z := by
@@ -38,8 +41,10 @@ theorem ResolutionFormsIndependent.proof (hND : NonvanishingDense.Statement) :
   have hpts : ∀ z ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ d.x), F z = 0 := by
     intro z hz
     have hcl := hND Unit (GlobalTheory κ) (coordIdeal ℤ d.x) (D + 1) g d.arith hgP hz
-    have hsub : {z' | z' ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ d.x) ∧
-        eval z' (map (Int.castRingHom ℂ) g) ≠ 0} ⊆ {z' | F z' = 0} := by
+    have hsub
+        : {z' | z' ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ d.x) ∧
+            eval z' (map (Int.castRingHom ℂ) g) ≠ 0}
+          ⊆ {z' | F z' = 0} := by
       intro z' hz'
       exact hoff z' hz'.1 hz'.2
     exact closure_minimal hsub (isClosed_eq hFc continuous_const) hcl
@@ -51,7 +56,8 @@ theorem ResolutionFormsIndependent.proof (hND : NonvanishingDense.Statement) :
     have h1 := measure_univ (μ := d.dV)
     rw [Set.univ_eq_empty_iff.2 h, measure_empty] at h1
     exact zero_ne_one h1
-  have hz₀ : resPt d y₀ ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ d.x) := d.R.mem y₀ y₀ (d.R.mem_U y₀)
+  have hz₀ : resPt d y₀ ∈ mcPts (ι := GlobalTheory κ) (coordIdeal ℤ d.x) :=
+    d.R.mem y₀ y₀ (d.R.mem_U y₀)
   refine coeff_eq_zero_of_vanish (linIndep_rat_of_isSecBasis hb) fun z hz => ?_
   by_cases h0 : z = 0
   · have h1 := hpts _ hz₀

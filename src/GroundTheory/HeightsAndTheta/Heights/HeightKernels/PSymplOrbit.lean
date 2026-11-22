@@ -13,24 +13,23 @@ open Matrix
 
 namespace PSymplOrbit
 
-theorem smul_symplCons {R : Type*} [CommRing R] {n : ℕ} (m p q : R) (w : Fin n ⊕ Fin n → R) :
-    m • symplCons p q w = symplCons (m * p) (m * q) (m • w) := by
+theorem smul_symplCons {R : Type*} [CommRing R] {n : ℕ} (m p q : R) (w : Fin n ⊕ Fin n → R)
+    : m • symplCons p q w = symplCons (m * p) (m * q) (m • w) := by
   funext x
   rcases x with i | i <;> refine Fin.cases ?_ (fun j => ?_) i <;> simp [symplCons]
 
-theorem symplCons_one_zero {R : Type*} [CommRing R] {n : ℕ} :
-    symplCons (1 : R) 0 (0 : Fin n ⊕ Fin n → R) = Pi.single (Sum.inl 0) 1 := by
+theorem symplCons_one_zero {R : Type*} [CommRing R] {n : ℕ}
+    : symplCons (1 : R) 0 (0 : Fin n ⊕ Fin n → R) = Pi.single (Sum.inl 0) 1 := by
   funext x
-  rcases x with i | i <;> refine Fin.cases ?_ (fun j => ?_) i <;>
-    simp [symplCons, Fin.succ_ne_zero]
+  rcases x with i | i <;> refine Fin.cases ?_ (fun j => ?_) i <;> simp [symplCons, Fin.succ_ne_zero]
 
 end PSymplOrbit
 
-
 open PSymplOrbit in
-theorem SymplOrbit.proof (h1 : SymplExtMem.Statement) (h2 : SymplExtVecMul.Statement)
-    (h3 : SymplTwoRow.Statement) (h4 : SymplGcd.Statement) (h5 : SymplCons.Statement) :
-    SymplOrbit.Statement := by
+theorem SymplOrbit.proof
+    (h1 : SymplExtMem.Statement) (h2 : SymplExtVecMul.Statement) (h3 : SymplTwoRow.Statement)
+    (h4 : SymplGcd.Statement) (h5 : SymplCons.Statement)
+    : SymplOrbit.Statement := by
   intro n
   induction n with
   | zero =>
@@ -39,8 +38,9 @@ theorem SymplOrbit.proof (h1 : SymplExtMem.Statement) (h2 : SymplExtVecMul.State
     have hE := h1 ℤ 0 a' b' (-y) x 1 (by linarith) (Submonoid.one_mem _)
     refine ⟨_, hE, c, ?_⟩
     have htail : symplTail v = 0 := funext fun z => z.elim (fun i => i.elim0) (fun i => i.elim0)
-    have hrow : symplExt a' b' (-y) x (1 : Matrix (Fin 0 ⊕ Fin 0) (Fin 0 ⊕ Fin 0) ℤ) (Sum.inl 0) =
-        symplCons a' b' 0 :=
+    have hrow
+        : symplExt a' b' (-y) x (1 : Matrix (Fin 0 ⊕ Fin 0) (Fin 0 ⊕ Fin 0) ℤ) (Sum.inl 0)
+          = symplCons a' b' 0 :=
       rfl
     rw [hrow, smul_symplCons, ← ha, ← hb, smul_zero, ← htail]
     exact ((h5 ℤ 0).1 v).symm
@@ -52,14 +52,19 @@ theorem SymplOrbit.proof (h1 : SymplExtMem.Statement) (h2 : SymplExtVecMul.State
     obtain ⟨P₂, hP₂, hrow₂⟩ := h3 n c'' d'' x' y' hxy'
     have hE₁ := h1 ℤ (n + 1) a' b' (-y) x 1 (by linarith) (Submonoid.one_mem _)
     have hE₂ := h1 ℤ (n + 1) 1 0 0 1 Q (by ring) hQ
-    refine ⟨P₂ * symplExt 1 0 0 1 Q * symplExt a' b' (-y) x 1,
-      Submonoid.mul_mem _ (Submonoid.mul_mem _ hP₂ hE₂) hE₁, k, ?_⟩
+    refine ⟨
+      P₂ * symplExt 1 0 0 1 Q * symplExt a' b' (-y) x 1,
+      Submonoid.mul_mem _ (Submonoid.mul_mem _ hP₂ hE₂) hE₁,
+      k,
+      ?_
+    ⟩
     have e1 : symplCons c 0 (symplTail v) ᵥ* symplExt a' b' (-y) x 1 = v := by
       rw [h2, vecMul_one]
       simp only [zero_mul, add_zero]
       rw [← ha, ← hb]
       exact (h5 ℤ (n + 1)).1 v
-    have e2 : symplCons c 0 (symplCons m' 0 0) ᵥ* symplExt 1 0 0 1 Q = symplCons c 0 (symplTail v) := by
+    have e2
+        : symplCons c 0 (symplCons m' 0 0) ᵥ* symplExt 1 0 0 1 Q = symplCons c 0 (symplTail v) := by
       rw [h2]
       simp only [mul_one, mul_zero, add_zero]
       congr 1

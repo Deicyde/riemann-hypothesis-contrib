@@ -12,22 +12,37 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Glo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel
 open scoped CategoryTheory.Obj TensorProduct
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.abelian_scheme_torsion_points_restrict_bijective : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A],
-    IsAbelianScheme A → ∀ (n : ℕ), 0 < n → IsUnit (n : Γ(S, ⊤)) →
-    ∀ (R : Type) [CommRing R] [HenselianLocalRing R] [IsAlgClosed (IsLocalRing.ResidueField R)] (t : Sp R ⟶ S)
-    (K : Type) [Field K] (φ : R →+* K),
-    (∀ g h : Over.mk t ⟶ A, g ^ n = 1 → h ^ n = 1 →
-      (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ g =
-        (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ h → g = h) ∧
-    ∀ x : Over.mk (spMap φ ≫ t) ⟶ A, x ^ n = 1 → ∃ g : Over.mk t ⟶ A, g ^ n = 1 ∧
-      (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ g = x := by
-  have exists_iso_sp_of_finite_etale : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (f : X ⟶ Sp R), IsFinite f → Etale f →
-      ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B), Algebra.Etale R B ∧ Module.Finite R B ∧
-        ∃ e : X ≅ Sp B, e.hom ≫ spMap (algebraMap R B) = f := by
+theorem _root_.GlobalTheory.T.abelian_scheme_torsion_points_restrict_bijective
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A],
+      IsAbelianScheme A
+        → ∀ (n : ℕ),
+          0 < n → IsUnit (n : Γ(S, ⊤))
+            → ∀ (R : Type) [CommRing R] [HenselianLocalRing R]
+                [IsAlgClosed (IsLocalRing.ResidueField R)] (t : Sp R ⟶ S) (K : Type) [Field K]
+                (φ : R →+* K),
+              (∀ g h : Over.mk t ⟶ A,
+                  g ^ n = 1 → h ^ n = 1
+                    → (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ g
+                      = (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ h
+                    → g = h)
+                ∧ ∀ x : Over.mk (spMap φ ≫ t) ⟶ A,
+                  x ^ n = 1
+                    → ∃ g : Over.mk t ⟶ A,
+                      g ^ n = 1
+                        ∧ (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ g
+                          = x := by
+  have exists_iso_sp_of_finite_etale
+      : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (f : X ⟶ Sp R),
+        IsFinite f → Etale f
+          → ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B),
+            Algebra.Etale R B ∧ Module.Finite R B
+              ∧ ∃ e : X ≅ Sp B, e.hom ≫ spMap (algebraMap R B) = f := by
     intro R _ X f hf hfe
     have : IsAffine X := isAffine_of_isAffineHom f
     let ρ : R →+* Γ(X, ⊤) := ((Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ f.appTop).hom
@@ -47,7 +62,8 @@ theorem _root_.GlobalTheory.T.abelian_scheme_torsion_points_restrict_bijective :
     · exact (HasRingHomProperty.Spec_iff (P := @Etale)).1 het
     · exact (IsFinite.SpecMap_iff _).1 hfi
 
-  have preconnectedSpace_sp : ∀ (R : Type) [CommRing R] [IsLocalRing R], PreconnectedSpace (Sp R) := by
+  have preconnectedSpace_sp
+      : ∀ (R : Type) [CommRing R] [IsLocalRing R], PreconnectedSpace (Sp R) := by
     intro R _ _
     rw [preconnectedSpace_iff_clopen]
     intro s hs
@@ -85,14 +101,16 @@ theorem _root_.GlobalTheory.T.abelian_scheme_torsion_points_restrict_bijective :
   · obtain ⟨y, hy⟩ := (E _).surjective ⟨x, hx⟩
     have yx : y ≫ torsion.ι A n = x := congrArg Subtype.val hy
     obtain ⟨B, _, _, _, _, e, he⟩ :=
-      exists_iso_sp_of_finite_etale R _ (pullback.snd (torsion A n).hom t) inferInstance inferInstance
+      exists_iso_sp_of_finite_etale R _ (pullback.snd (torsion A n).hom t) inferInstance
+        inferInstance
     let q : Sp K ⟶ Sp B := pullback.lift y.left (spMap φ) (Over.w y) ≫ e.hom
     obtain ⟨χ', hχ'⟩ := Spec.map_surjective q
     have hq : q ≫ spMap (algebraMap R B) = spMap φ := by
       simp only [q, Category.assoc, he, pullback.lift_snd]
     have hχ : χ'.hom.comp (algebraMap R B) = φ := by
-      have h0 : Spec.map (CommRingCat.ofHom (algebraMap R B) ≫ χ') =
-          Spec.map (CommRingCat.ofHom φ) := by
+      have h0
+          : Spec.map (CommRingCat.ofHom (algebraMap R B) ≫ χ')
+            = Spec.map (CommRingCat.ofHom φ) := by
         rw [Spec.map_comp, hχ']
         exact hq
       exact congrArg CommRingCat.Hom.hom (Spec.map_injective h0)

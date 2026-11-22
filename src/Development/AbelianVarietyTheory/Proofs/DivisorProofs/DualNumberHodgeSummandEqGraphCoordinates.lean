@@ -9,61 +9,90 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RedPullConst
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 
 namespace GlobalTheory.HTGlueLie
 variable {k : Type} [Field k] {A₀ : Over (Sp k)} [GrpObj A₀]
 
-theorem inr_one_mul (y : TrivSqZeroExt k k) :
-    (TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) * y = TrivSqZeroExt.inr y.fst := by
+theorem inr_one_mul (y : TrivSqZeroExt k k)
+    : (TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) * y = TrivSqZeroExt.inr y.fst := by
   ext
   · simp
   · simp
 
-theorem fstC_inr_smul (e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀) :
-    fstC A₀ ((TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) • e) = 0 := by
+theorem fstC_inr_smul
+    (e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+      (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀)
+    : fstC A₀ ((TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) • e) = 0 := by
   ext c
   rw [fstC_apply]
-  change ((TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) * e ((GlobalTheory.FODef.constMorV k k A₀).pull c)).fst = 0
+  change ((TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k)
+      * e ((GlobalTheory.FODef.constMorV k k A₀).pull c)).fst
+    = 0
   rw [inr_one_mul, TrivSqZeroExt.fst_inr]
 
-theorem sndC_inr_smul (e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀) :
-    (sndC A₀ ((TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) • e) : HdR A₀) = fstC A₀ e := by
+theorem sndC_inr_smul
+    (e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+      (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀)
+    : (sndC A₀ ((TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) • e) : HdR A₀) = fstC A₀ e := by
   ext c
   change (sndC A₀ _) c = fstC A₀ e c
   rw [sndC_apply, fstC_apply]
-  change ((TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k) * e ((GlobalTheory.FODef.constMorV k k A₀).pull c)).snd = _
+  change ((TrivSqZeroExt.inr (1 : k) : TrivSqZeroExt k k)
+      * e ((GlobalTheory.FODef.constMorV k k A₀).pull c)).snd
+    = _
   rw [inr_one_mul, TrivSqZeroExt.snd_inr]
 
-theorem exists_of_coords_self (hA : IsAbelianScheme A₀) (x : HdR A₀) (y : primDR A₀ →ₗ[k] k) :
-    ∃ e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀, fstC A₀ e = x ∧ sndC A₀ e = y :=
+theorem exists_of_coords_self (hA : IsAbelianScheme A₀) (x : HdR A₀) (y : primDR A₀ →ₗ[k] k)
+    : ∃ e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+        (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀,
+      fstC A₀ e = x ∧ sndC A₀ e = y :=
   exists_of_coords hA x y
 
-theorem ext_coords_self (hA : IsAbelianScheme A₀) {e e' : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀}
-    (h1 : fstC A₀ e = fstC A₀ e') (h2 : (sndC A₀ e : HdR A₀) = sndC A₀ e') : e = e' :=
+theorem ext_coords_self
+    (hA : IsAbelianScheme A₀)
+    {e e' : Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+      (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀}
+    (h1 : fstC A₀ e = fstC A₀ e') (h2 : (sndC A₀ e : HdR A₀) = sndC A₀ e')
+    : e = e' :=
   ext_coords hA h1 h2
 
-
 set_option maxHeartbeats 1600000 in
-theorem dualNumber_hodge_summand_eq_graph_coords_of_compl (hA : IsAbelianScheme A₀) (f : HdR A₀ →ₗ[k] HdR A₀)
+theorem dualNumber_hodge_summand_eq_graph_coords_of_compl
+    (hA : IsAbelianScheme A₀)
+    (f : HdR A₀ →ₗ[k] HdR A₀)
     (E M : Submodule (TrivSqZeroExt k k)
-      (Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀))
+      (Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+        (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀))
     (hEM : IsCompl E M)
-    (h2 : ∀ y : HdR A₀, y ∈ Fil A₀ ↔ ∃ e ∈ E,
-      (GlobalTheory.Published.GrothendieckMessing.crysRedMor (divided₂ (GlobalTheory.FODef.sqZero k k)) rfl A₀).Corr e y)
-    (h3 : ∀ x ∈ Fil A₀, ∃ e ∈ E, ∀ c, e ((GlobalTheory.FODef.constMorV k k A₀).pull c) =
-      TrivSqZeroExt.inl (x c) + TrivSqZeroExt.inr (f x c))
-    (e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀) :
-    e ∈ E ↔ (fstC A₀ e ∈ Fil A₀ ∧ (sndC A₀ e : HdR A₀) - f (fstC A₀ e) ∈ Fil A₀) := by
+    (h2 : ∀ y : HdR A₀,
+      y ∈ Fil A₀
+        ↔ ∃ e ∈ E,
+          (GlobalTheory.Published.GrothendieckMessing.crysRedMor
+            (divided₂ (GlobalTheory.FODef.sqZero k k)) rfl A₀).Corr e y)
+    (h3 : ∀ x ∈ Fil A₀, ∃ e ∈ E, ∀ c,
+      e ((GlobalTheory.FODef.constMorV k k A₀).pull c)
+        = TrivSqZeroExt.inl (x c) + TrivSqZeroExt.inr (f x c))
+    (e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+      (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀)
+    : e ∈ E ↔ (fstC A₀ e ∈ Fil A₀ ∧ (sndC A₀ e : HdR A₀) - f (fstC A₀ e) ∈ Fil A₀) := by
   have hε := fun e' ↦ And.intro (fstC_inr_smul (A₀ := A₀) e') (sndC_inr_smul (A₀ := A₀) e')
   have hc : ∀ x ∈ Fil A₀, ∃ e ∈ E, fstC A₀ e = x ∧ (sndC A₀ e : HdR A₀) = f x := by
     intro x hx
     refine (h3 x hx).elim fun e₁ hh ↦ ⟨e₁, hh.1, ?_, ?_⟩
-    · ext c; rw [fstC_apply, hh.2 c, TrivSqZeroExt.fst_add, TrivSqZeroExt.fst_inl, TrivSqZeroExt.fst_inr, add_zero]
-    · ext c; show (sndC A₀ e₁) c = _; rw [sndC_apply, hh.2 c, TrivSqZeroExt.snd_add, TrivSqZeroExt.snd_inl, TrivSqZeroExt.snd_inr, zero_add]
-  have hfil : ∀ a ∈ E, fstC A₀ a ∈ Fil A₀ := fun a ha ↦ (h2 _).2 ⟨a, ha, (corr_iff_fstC hA a _).2 rfl⟩
+    · ext c
+      rw [fstC_apply, hh.2 c, TrivSqZeroExt.fst_add, TrivSqZeroExt.fst_inl, TrivSqZeroExt.fst_inr,
+        add_zero]
+    · ext c
+      show (sndC A₀ e₁) c = _
+      rw [sndC_apply, hh.2 c, TrivSqZeroExt.snd_add, TrivSqZeroExt.snd_inl, TrivSqZeroExt.snd_inr,
+        zero_add]
+  have hfil : ∀ a ∈ E, fstC A₀ a ∈ Fil A₀ := fun a ha ↦
+    (h2 _).2 ⟨a, ha, (corr_iff_fstC hA a _).2 rfl⟩
   constructor
   · intro he
     have hx := hfil e he
@@ -104,7 +133,32 @@ theorem dualNumber_hodge_summand_eq_graph_coords_of_compl (hA : IsAbelianScheme 
     rw [this]
     exact E.add_mem he₁ (E.smul_mem _ he₂)
 
-theorem fo_summand_coords : ∀ (k : Type) [Field k] (A₀ : Over (Sp k)) [GrpObj A₀], IsAbelianScheme A₀ → ∀ (f : HdR A₀ →ₗ[k] HdR A₀) (E : Submodule (TrivSqZeroExt k k) (Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀)), (∃ M : Submodule (TrivSqZeroExt k k) (Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀), IsCompl E M) → (∀ y : HdR A₀, y ∈ Fil A₀ ↔ ∃ e ∈ E, (GlobalTheory.Published.GrothendieckMessing.crysRedMor (divided₂ (GlobalTheory.FODef.sqZero k k)) rfl A₀).Corr e y) → (∀ x ∈ Fil A₀, ∃ e ∈ E, ∀ c, e ((GlobalTheory.FODef.constMorV k k A₀).pull c) = TrivSqZeroExt.inl (x c) + TrivSqZeroExt.inr (f x c)) → ∀ e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k)) (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀, e ∈ E ↔ (GlobalTheory.HTGlueLie.fstC A₀ e ∈ Fil A₀ ∧ (GlobalTheory.HTGlueLie.sndC A₀ e : HdR A₀) - f (GlobalTheory.HTGlueLie.fstC A₀ e) ∈ Fil A₀) := fun _ _ _ _ hA f E ⟨M, hEM⟩ h2 h3 e ↦
+theorem fo_summand_coords
+    : ∀ (k : Type) [Field k] (A₀ : Over (Sp k)) [GrpObj A₀],
+      IsAbelianScheme A₀
+        → ∀ (f : HdR A₀ →ₗ[k] HdR A₀)
+            (E : Submodule (TrivSqZeroExt k k)
+              (Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+                (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀)),
+          (∃ M : Submodule (TrivSqZeroExt k k)
+                (Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+                  (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀),
+              IsCompl E M)
+            → (∀ y : HdR A₀,
+              y ∈ Fil A₀
+                ↔ ∃ e ∈ E,
+                  (GlobalTheory.Published.GrothendieckMessing.crysRedMor
+                    (divided₂ (GlobalTheory.FODef.sqZero k k)) rfl A₀).Corr e y)
+            → (∀ x ∈ Fil A₀, ∃ e ∈ E, ∀ c,
+              e ((GlobalTheory.FODef.constMorV k k A₀).pull c)
+                = TrivSqZeroExt.inl (x c) + TrivSqZeroExt.inr (f x c))
+            → ∀ e : Crys (divided₂ (GlobalTheory.FODef.sqZero k k))
+                (spMap (TrivSqZeroExt.fstHom k k k).toRingHom) A₀,
+              e ∈ E
+                ↔ (GlobalTheory.HTGlueLie.fstC A₀ e ∈ Fil A₀
+                  ∧ (GlobalTheory.HTGlueLie.sndC A₀ e : HdR A₀)
+                      - f (GlobalTheory.HTGlueLie.fstC A₀ e)
+                    ∈ Fil A₀) := fun _ _ _ _ hA f E ⟨M, hEM⟩ h2 h3 e ↦
   dualNumber_hodge_summand_eq_graph_coords_of_compl hA f E M hEM h2 h3 e
 
 end GlobalTheory.HTGlueLie

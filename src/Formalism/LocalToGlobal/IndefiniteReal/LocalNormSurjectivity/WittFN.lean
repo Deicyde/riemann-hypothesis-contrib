@@ -14,14 +14,16 @@ theorem finNormSurj : FinNormSurj := by
   have hτu : ∀ x : kˣ, Units.map τ.toMonoidHom (Units.map τ.toMonoidHom x) = x := by
     intro x; ext; simp [hτ]
   let T : kˣ →* kˣ := Units.map τ.toMonoidHom
-  let N : kˣ →* kˣ :=
-    { toFun := fun x => T x * x
-      map_one' := by simp
-      map_mul' := by intro x y; simp only [map_mul]; exact mul_mul_mul_comm _ _ _ _ }
-  let ψ : kˣ →* kˣ :=
-    { toFun := fun x => x * (T x)⁻¹
-      map_one' := by simp
-      map_mul' := by intro x y; simp only [map_mul, mul_inv]; exact mul_mul_mul_comm _ _ _ _ }
+  let N : kˣ →* kˣ := {
+    toFun := fun x => T x * x
+    map_one' := by simp
+    map_mul' := by intro x y; simp only [map_mul]; exact mul_mul_mul_comm _ _ _ _
+  }
+  let ψ : kˣ →* kˣ := {
+    toFun := fun x => x * (T x)⁻¹
+    map_one' := by simp
+    map_mul' := by intro x y; simp only [map_mul, mul_inv]; exact mul_mul_mul_comm _ _ _ _
+  }
   have hTT : ∀ x, T (T x) = x := hτu
   have hT : ∀ x : kˣ, ((T x : kˣ) : k) = τ (x : k) := fun x => rfl
   have hψv : ∀ y : kˣ, ((ψ y : kˣ) : k) = (y : k) * (τ (y : k))⁻¹ := fun y => by
@@ -55,8 +57,7 @@ theorem finNormSurj : FinNormSurj := by
         rw [map_sub, hτ, hm]
         have : τ θ - θ = -(θ - τ θ) := by ring
         rw [this, inv_neg, mul_neg, mul_inv_cancel₀ hy0]
-      · have hy0 : (1 : k) + x ≠ 0 := by
-          intro h; apply hm; linear_combination h
+      · have hy0 : (1 : k) + x ≠ 0 := by intro h; apply hm; linear_combination h
         refine ⟨Units.mk0 _ hy0, ?_⟩
         ext
         rw [hψv, Units.val_mk0]
@@ -80,8 +81,7 @@ theorem finNormSurj : FinNormSurj := by
     rw [mul_comm (Nat.card ψ.ker)] at h
     exact (Nat.eq_of_mul_eq_mul_left hpos h)
   have hEq : N.range = ψ.ker := Subgroup.eq_of_le_of_card_ge hle heq.ge
-  have hcu : Units.mk0 c hc0 ∈ ψ.ker := by
-    rw [hkerψ]; ext; rw [hT, Units.val_mk0]; exact hc
+  have hcu : Units.mk0 c hc0 ∈ ψ.ker := by rw [hkerψ]; ext; rw [hT, Units.val_mk0]; exact hc
   rw [← hEq] at hcu
   obtain ⟨x, hx⟩ := hcu
   refine ⟨(x : k), ?_⟩

@@ -11,7 +11,7 @@ open scoped ContDiff
 
 noncomputable section
 
-abbrev T0 : ℝ := Real.exp (-Real.exp (Real.exp 1))
+abbrev T0 : ℝ := Real.exp (- Real.exp (Real.exp 1))
 
 section RM
 

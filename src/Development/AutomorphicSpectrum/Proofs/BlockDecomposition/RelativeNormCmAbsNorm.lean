@@ -5,12 +5,20 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsLatInt
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 open scoped Matrix
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.NormSig
 
-theorem norm_eq_mul_conj_and_absNorm : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ t : 𝓞 E, algebraMap F E ((RingOfIntegers.norm F t : 𝓞 F) : F) = (t : E) * σ (t : E) ∧ Ideal.absNorm (Ideal.span {RingOfIntegers.norm F t}) = Ideal.absNorm (Ideal.span {t}) := by
+theorem norm_eq_mul_conj_and_absNorm
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ t : 𝓞 E,
+          algebraMap F E ((RingOfIntegers.norm F t : 𝓞 F) : F) = (t : E) * σ (t : E)
+            ∧ Ideal.absNorm (Ideal.span {RingOfIntegers.norm F t})
+              = Ideal.absNorm (Ideal.span {t}) := by
   intro F E _ _ _ _ _ σ hσ t
   classical
   obtain ⟨_, hE, hdeg, hconj⟩ := hσ
@@ -31,7 +39,8 @@ theorem norm_eq_mul_conj_and_absNorm : ∀ (F E : Type) [Field F] [NumberField F
       rw [ComplexEmbedding.conjugate_coe_eq, starRingEnd_apply, ← hconj, hx]
     have hcard_le : Fintype.card (E ≃ₐ[F] E) ≤ 2 := by
       rw [← hdeg]
-      exact (Fintype.card_le_of_injective (fun g : E ≃ₐ[F] E => (g : E →ₐ[F] E))
+      exact (Fintype.card_le_of_injective
+        (fun g : E ≃ₐ[F] E => (g : E →ₐ[F] E))
         (fun a b h => AlgEquiv.ext fun x => DFunLike.congr_fun h x)).trans AlgHom.card_le
     have huniv : (Finset.univ : Finset (E ≃ₐ[F] E)) = {1, σ'} := by
       symm

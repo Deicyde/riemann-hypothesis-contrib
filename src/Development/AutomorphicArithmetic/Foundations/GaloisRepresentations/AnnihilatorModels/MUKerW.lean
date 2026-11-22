@@ -8,15 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharZeroOfIs
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.uKerW_of :
-    KerU → PullKer → UKerW := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.uKerW_of : KerU → PullKer → UKerW := by
   intro hKerU _ p _ D O _ _ _ _ f b N r w _ hstd M j c T hflat X g hg
   obtain ⟨⟨k, hck⟩, hmon, hact, -, -, ψ', hmon', h1, h2⟩ := T.isog
   subst hck

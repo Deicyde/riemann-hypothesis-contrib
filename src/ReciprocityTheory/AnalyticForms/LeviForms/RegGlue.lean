@@ -15,27 +15,33 @@ open scoped ContDiff
 
 noncomputable section
 
-def chartBall {e : ℕ} {X : Type} [TopologicalSpace X] (B : FinHolAtlas e X) (j : Fin B.n) (ρ : ℝ) :
-    Set X :=
+def chartBall {e : ℕ} {X : Type} [TopologicalSpace X] (B : FinHolAtlas e X) (j : Fin B.n) (ρ : ℝ)
+    : Set X :=
   (B.chart j).source ∩ B.chart j ⁻¹' ball 0 ρ
 
 def RegMaxDominatedStatement : Prop :=
-  ∀ (ι : Type) [Fintype ι] [Nonempty ι] [DecidableEq ι] (η : ℝ) (t : ι → ℝ) (k₀ : ι)
-    (I : Finset ι), 0 < η → k₀ ∈ I → (∀ j ∉ I, t j + η ≤ t k₀) →
-      ReciprocityTheory.AnForm.A.regMax η t =
-        ReciprocityTheory.AnForm.A.regMax η (fun j => if j ∈ I then t j else t k₀ - η)
+  ∀ (ι : Type) [Fintype ι] [Nonempty ι] [DecidableEq ι] (η : ℝ) (t : ι → ℝ) (k₀ : ι) (I : Finset ι),
+    0 < η → k₀ ∈ I → (∀ j ∉ I, t j + η ≤ t k₀)
+      → ReciprocityTheory.AnForm.A.regMax η t
+        = ReciprocityTheory.AnForm.A.regMax η (fun j => if j ∈ I then t j else t k₀ - η)
 
-private theorem kθ_eq_zero_of_half_le_abs {x : ℝ} (hx : 1 / 2 ≤ |x|) : ReciprocityTheory.AnForm.A.kθ x = 0 := by
+private theorem kθ_eq_zero_of_half_le_abs {x : ℝ} (hx : 1 / 2 ≤ |x|)
+    : ReciprocityTheory.AnForm.A.kθ x = 0 := by
   unfold ReciprocityTheory.AnForm.A.kθ
   by_contra hne
-  have hm : x ∈ Function.support
-      ((⟨1 / 4, 1 / 2, by norm_num, by norm_num⟩ : ContDiffBump (0 : ℝ)).normed volume) := hne
+  have hm
+      : x ∈ Function.support
+        ((⟨1 / 4, 1 / 2, by norm_num, by norm_num⟩ : ContDiffBump (0 : ℝ)).normed volume) :=
+    hne
   rw [ContDiffBump.support_normed_eq, Metric.mem_ball, Real.dist_eq, sub_zero] at hm
   exact absurd hm (not_lt.mpr hx)
 
-private theorem tmax_eq_of_eqOn_of_le_at_mem {ι : Type} [Fintype ι] [Nonempty ι] (f g : ι → ℝ) (I : Finset ι) (k₀ : ι)
-    (hk₀ : k₀ ∈ I) (hI : ∀ j ∈ I, f j = g j) (hf : ∀ j ∉ I, f j ≤ f k₀) (hg : ∀ j ∉ I, g j ≤ g k₀) :
-    ReciprocityTheory.AnForm.A.tmax f = ReciprocityTheory.AnForm.A.tmax g := by
+private theorem tmax_eq_of_eqOn_of_le_at_mem
+    {ι : Type} [Fintype ι] [Nonempty ι]
+    (f g : ι → ℝ)
+    (I : Finset ι) (k₀ : ι) (hk₀ : k₀ ∈ I)
+    (hI : ∀ j ∈ I, f j = g j) (hf : ∀ j ∉ I, f j ≤ f k₀) (hg : ∀ j ∉ I, g j ≤ g k₀)
+    : ReciprocityTheory.AnForm.A.tmax f = ReciprocityTheory.AnForm.A.tmax g := by
   unfold ReciprocityTheory.AnForm.A.tmax
   apply le_antisymm
   · apply Finset.sup'_le
@@ -43,7 +49,9 @@ private theorem tmax_eq_of_eqOn_of_le_at_mem {ι : Type} [Fintype ι] [Nonempty 
     by_cases hj : j ∈ I
     · rw [hI j hj]
       exact Finset.le_sup' g (Finset.mem_univ j)
-    · calc f j ≤ f k₀ := hf j hj
+    · calc
+        f j
+          ≤ f k₀ := hf j hj
         _ = g k₀ := hI k₀ hk₀
         _ ≤ _ := Finset.le_sup' g (Finset.mem_univ k₀)
   · apply Finset.sup'_le
@@ -51,7 +59,9 @@ private theorem tmax_eq_of_eqOn_of_le_at_mem {ι : Type} [Fintype ι] [Nonempty 
     by_cases hj : j ∈ I
     · rw [← hI j hj]
       exact Finset.le_sup' f (Finset.mem_univ j)
-    · calc g j ≤ g k₀ := hg j hj
+    · calc
+        g j
+          ≤ g k₀ := hg j hj
         _ = f k₀ := (hI k₀ hk₀).symm
         _ ≤ _ := Finset.le_sup' f (Finset.mem_univ k₀)
 
@@ -84,19 +94,19 @@ theorem regMax_dominated : RegMaxDominatedStatement := by
     rw [h0, mul_zero, mul_zero]
 
 def GlueCutoffStatement : Prop :=
-  ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [T2Space X] (A B : FinHolAtlas e X), A.Compatible B →
-    (∀ j, closedBall (0 : Fin e → ℂ) 2 ⊆ (B.chart j).target) →
-    ∃ η : Fin B.n → X → ℝ, ∀ j, A.Smooth (η j) ∧ (∀ y, -1 ≤ η j y ∧ η j y ≤ 0) ∧
-      (∀ y ∈ chartBall B j 1, η j y = 0) ∧ ∀ y ∉ chartBall B j (9 / 8), η j y = -1
+  ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [T2Space X] (A B : FinHolAtlas e X),
+    A.Compatible B → (∀ j, closedBall (0 : Fin e → ℂ) 2 ⊆ (B.chart j).target)
+      → ∃ η : Fin B.n → X → ℝ, ∀ j,
+        A.Smooth (η j) ∧ (∀ y, -1 ≤ η j y ∧ η j y ≤ 0) ∧ (∀ y ∈ chartBall B j 1, η j y = 0)
+          ∧ ∀ y ∉ chartBall B j (9 / 8), η j y = -1
 
 def cutψ (s : ℝ) : ℝ := Real.smoothTransition (64 * (s - 1) / 17)
 
 def cutP {e : ℕ} (z : Fin e → ℂ) : ℝ := ∏ i, (1 - cutψ (‖z i‖ ^ 2))
 
-
 open Classical in
-def glueCut {e : ℕ} {X : Type} [TopologicalSpace X] (B : FinHolAtlas e X) (j : Fin B.n) (y : X) :
-    ℝ := by
+def glueCut {e : ℕ} {X : Type} [TopologicalSpace X] (B : FinHolAtlas e X) (j : Fin B.n) (y : X)
+    : ℝ := by
   classical
   exact if y ∈ (B.chart j).source then cutP (B.chart j y) - 1 else -1
 
@@ -151,10 +161,11 @@ lemma cutP_contDiff {e : ℕ} : ContDiff ℝ ∞ (cutP (e := e)) := by
   unfold cutP cutψ
   exact contDiff_prod fun i _ => contDiff_const.sub (Real.smoothTransition.contDiff.comp (hq i))
 
-private theorem smooth_glueCut_of_compatible {e : ℕ} {X : Type} [TopologicalSpace X] [T2Space X]
+private theorem smooth_glueCut_of_compatible
+    {e : ℕ} {X : Type} [TopologicalSpace X] [T2Space X]
     (A B : FinHolAtlas e X) (hAB : A.Compatible B)
-    (h2 : ∀ j, closedBall (0 : Fin e → ℂ) 2 ⊆ (B.chart j).target) (j : Fin B.n) :
-    A.Smooth (glueCut B j) := by
+    (h2 : ∀ j, closedBall (0 : Fin e → ℂ) 2 ⊆ (B.chart j).target) (j : Fin B.n)
+    : A.Smooth (glueCut B j) := by
   have hCt : closedBall (0 : Fin e → ℂ) (9 / 8) ⊆ (B.chart j).target :=
     (closedBall_subset_closedBall (by norm_num)).trans (h2 j)
   have hCc : IsClosed ((B.chart j).symm '' closedBall (0 : Fin e → ℂ) (9 / 8)) :=
@@ -163,8 +174,8 @@ private theorem smooth_glueCut_of_compatible {e : ℕ} {X : Type} [TopologicalSp
   have hCsrc : (B.chart j).symm '' closedBall (0 : Fin e → ℂ) (9 / 8) ⊆ (B.chart j).source := by
     rintro _ ⟨z, hz, rfl⟩
     exact (B.chart j).map_target (hCt hz)
-  have hout : ∀ y, y ∉ (B.chart j).symm '' closedBall (0 : Fin e → ℂ) (9 / 8) →
-      glueCut B j y = -1 := by
+  have hout
+      : ∀ y, y ∉ (B.chart j).symm '' closedBall (0 : Fin e → ℂ) (9 / 8) → glueCut B j y = -1 := by
     intro y hy
     unfold glueCut
     split_ifs with hys
@@ -177,28 +188,40 @@ private theorem smooth_glueCut_of_compatible {e : ℕ} {X : Type} [TopologicalSp
   apply contDiffOn_of_locally_contDiffOn
   intro x hx
   by_cases hxs : (A.chart k).symm x ∈ (B.chart j).source
-  · refine ⟨(A.chart k).target ∩ (A.chart k).symm ⁻¹' (B.chart j).source,
-      (A.chart k).isOpen_inter_preimage_symm (B.chart j).open_source, ⟨hx.1, hxs⟩, ?_⟩
+  · refine ⟨
+      (A.chart k).target ∩ (A.chart k).symm ⁻¹' (B.chart j).source,
+      (A.chart k).isOpen_inter_preimage_symm (B.chart j).open_source,
+      ⟨hx.1, hxs⟩,
+      ?_
+    ⟩
     have hR : ContDiffOn ℝ ∞ (B.chart j ∘ (A.chart k).symm)
         ((A.chart k).target ∩ (A.chart k).symm ⁻¹' (B.chart j).source) :=
-      ((hAB.1 k j).contDiffOn (n := ∞) ((A.chart k).isOpen_inter_preimage_symm
-        (B.chart j).open_source).uniqueDiffOn).restrict_scalars ℝ
+      ((hAB.1 k j).contDiffOn (n := ∞)
+        ((A.chart k).isOpen_inter_preimage_symm
+          (B.chart j).open_source).uniqueDiffOn).restrict_scalars ℝ
     have hc := (cutP_contDiff.comp_contDiffOn hR).sub (contDiffOn_const (c := (1 : ℝ)))
     refine (hc.mono Set.inter_subset_right).congr ?_
     intro z hz
     show glueCut B j ((A.chart k).symm z) = cutP (B.chart j ((A.chart k).symm z)) - 1
     unfold glueCut
     exact if_pos hz.2.2
-  · refine ⟨(A.chart k).target ∩ (A.chart k).symm ⁻¹' ((B.chart j).symm '' closedBall 0 (9 / 8))ᶜ,
-      (A.chart k).isOpen_inter_preimage_symm hCc.isOpen_compl, ⟨hx.1, fun hc => hxs (hCsrc hc)⟩, ?_⟩
+  · refine ⟨
+      (A.chart k).target ∩ (A.chart k).symm ⁻¹' ((B.chart j).symm '' closedBall 0 (9 / 8))ᶜ,
+      (A.chart k).isOpen_inter_preimage_symm hCc.isOpen_compl,
+      ⟨hx.1, fun hc => hxs (hCsrc hc)⟩,
+      ?_
+    ⟩
     refine (contDiffOn_const (c := (-1 : ℝ))).congr ?_
     intro z hz
     exact hout _ hz.2.2
 
 theorem glue_cutoff : GlueCutoffStatement := by
   intro e X _ _ A B hAB h2
-  refine ⟨glueCut B, fun j => ⟨smooth_glueCut_of_compatible A B hAB h2 j, fun y => ?_, fun y hy => ?_,
-    fun y hy => ?_⟩⟩
+  refine ⟨
+    glueCut B,
+    fun j =>
+      ⟨smooth_glueCut_of_compatible A B hAB h2 j, fun y => ?_, fun y hy => ?_, fun y hy => ?_⟩
+  ⟩
   · unfold glueCut
     split_ifs
     · constructor <;> linarith [polydiscCutoff_nonneg (B.chart j y), cutP_le_one (B.chart j y)]
@@ -223,7 +246,6 @@ lemma chartBall_isOpen (B : FinHolAtlas e X) (j : Fin B.n) (ρ : ℝ) : IsOpen (
 lemma chartBall_mono (B : FinHolAtlas e X) (j : Fin B.n) {ρ ρ' : ℝ} (h : ρ ≤ ρ') :
     chartBall B j ρ ⊆ chartBall B j ρ' :=
   Set.inter_subset_inter_right _ (Set.preimage_mono (ball_subset_ball h))
-
 
 open Classical in
 def glueArg (B : FinHolAtlas e X) (f η : Fin B.n → X → ℝ) (δ Mb : ℝ) (j : Fin B.n) (y : X) : ℝ := by

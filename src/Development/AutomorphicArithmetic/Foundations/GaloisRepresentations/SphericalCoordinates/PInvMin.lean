@@ -4,14 +4,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-private theorem aeval_inv_reverse_eq_zero_iff {K A : Type} [Field K] [Ring A] [Algebra K A] (u : Aˣ) (f : K[X]) :
-    Polynomial.aeval (↑u⁻¹ : A) f.reverse = 0 ↔ Polynomial.aeval (u : A) f = 0 := by
+private theorem aeval_inv_reverse_eq_zero_iff
+    {K A : Type} [Field K] [Ring A] [Algebra K A] (u : Aˣ) (f : K[X])
+    : Polynomial.aeval (↑u⁻¹ : A) f.reverse = 0 ↔ Polynomial.aeval (u : A) f = 0 := by
   let S : Subalgebra K A := Algebra.adjoin K {(u : A), ↑u⁻¹}
   letI : IsMulCommutative S := Algebra.isMulCommutative_adjoin K (by
     intro a ha b hb _
@@ -26,12 +30,12 @@ private theorem aeval_inv_reverse_eq_zero_iff {K A : Type} [Field K] [Ring A] [A
     Polynomial.aeval_algHom_apply S.val y f.reverse
   have h2 : Polynomial.aeval (u : A) f = S.val (Polynomial.aeval x f) :=
     Polynomial.aeval_algHom_apply S.val x f
-  rw [h1, h2, map_eq_zero_iff S.val Subtype.val_injective, map_eq_zero_iff S.val Subtype.val_injective,
-    Polynomial.aeval_def, Polynomial.aeval_def]
+  rw [h1, h2, map_eq_zero_iff S.val Subtype.val_injective,
+    map_eq_zero_iff S.val Subtype.val_injective, Polynomial.aeval_def, Polynomial.aeval_def]
   exact key
 
-private theorem squarefree_mirror {F : Type} [Field F] (f : F[X]) (h : Squarefree f) :
-    Squarefree f.mirror := by
+private theorem squarefree_mirror {F : Type} [Field F] (f : F[X]) (h : Squarefree f)
+    : Squarefree f.mirror := by
   intro r hr
   obtain ⟨s, hs⟩ := hr
   have hf : f = r.mirror * r.mirror * s.mirror := by
@@ -45,24 +49,26 @@ private theorem squarefree_mirror {F : Type} [Field F] (f : F[X]) (h : Squarefre
   rw [Polynomial.isUnit_iff_degree_eq_zero] at hu ⊢
   rw [Polynomial.degree_eq_natDegree hr0]
   rw [Polynomial.degree_eq_natDegree (Polynomial.mirror_eq_zero.not.mpr hr0),
-    Polynomial.mirror_natDegree] at hu
+      Polynomial.mirror_natDegree]
+    at hu
   exact hu
 
-private theorem separable_reverse_of_coeff_zero_ne_zero {K : Type} [Field K] (f : K[X]) (h0 : f.coeff 0 ≠ 0)
-    (hs : f.Separable) : f.reverse.Separable := by
+private theorem separable_reverse_of_coeff_zero_ne_zero
+    {K : Type} [Field K] (f : K[X]) (h0 : f.coeff 0 ≠ 0) (hs : f.Separable)
+    : f.reverse.Separable := by
   rw [← Polynomial.separable_map (algebraMap K (AlgebraicClosure K))]
-  have hm : (f.reverse).map (algebraMap K (AlgebraicClosure K)) =
-      (f.map (algebraMap K (AlgebraicClosure K))).mirror := by
+  have hm
+      : (f.reverse).map (algebraMap K (AlgebraicClosure K))
+        = (f.map (algebraMap K (AlgebraicClosure K))).mirror := by
     have htd : (f.map (algebraMap K (AlgebraicClosure K))).natTrailingDegree = 0 :=
-      Polynomial.natTrailingDegree_eq_zero.mpr
-        (Or.inr (by rw [Polynomial.coeff_map]; exact (_root_.map_ne_zero _).mpr h0))
+      Polynomial.natTrailingDegree_eq_zero.mpr (Or.inr (by
+        rw [Polynomial.coeff_map]; exact (_root_.map_ne_zero _).mpr h0))
     rw [Polynomial.mirror, htd, pow_zero, _root_.mul_one]
     simp only [Polynomial.reverse, Polynomial.natDegree_map, Polynomial.reflect_map]
   rw [hm, PerfectField.separable_iff_squarefree]
   exact squarefree_mirror _ ((Polynomial.separable_map _).mpr hs).squarefree
 
-theorem UpperTheory.Gal.W2.invMin_of :
-    UpperTheory.Gal.W2.InvMin := by
+theorem UpperTheory.Gal.W2.invMin_of : UpperTheory.Gal.W2.InvMin := by
   intro K A _ _ _ _ _ u
   have hint : ∀ v : Aˣ, IsIntegral K (v : A) := fun v => .of_finite K _
   have hc : ∀ v : Aˣ, (minpoly K (v : A)).coeff 0 ≠ 0 := by
@@ -105,7 +111,8 @@ theorem UpperTheory.Gal.W2.invMin_of :
     have h2 := minpoly.degree_le_of_ne_zero K (u : A) (mt Polynomial.reverse_eq_zero.mp hq0) h1
     have h3 := Polynomial.natDegree_le_natDegree h2
     have h4 := Polynomial.reverse_natDegree_le q
-    rw [Polynomial.degree_eq_natDegree hinvMonic.ne_zero, Polynomial.degree_eq_natDegree hq0, hinvDeg]
+    rw [Polynomial.degree_eq_natDegree hinvMonic.ne_zero, Polynomial.degree_eq_natDegree hq0,
+      hinvDeg]
     exact_mod_cast h3.trans h4
   refine ⟨heq, by rw [heq, hinvDeg], fun hs => ?_⟩
   rw [heq]

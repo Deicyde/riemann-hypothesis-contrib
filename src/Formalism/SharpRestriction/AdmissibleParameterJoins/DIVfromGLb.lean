@@ -14,8 +14,9 @@ namespace Formalism.MainNotions.J
 open Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 def NumsL (D : D7) (L : SizeData₂ D) (Cn cL : ℝ) : Prop :=
-  ∀ u, flipTwoThree.Nums D (flipTwoThree.Tu D u) (D.host.g 0) (D.host.g 1) Cn L.sc.x L.sc.b (cL * L.sc.L) L.sc.b' L.Sc
-    L.etaSz
+  ∀ u,
+    flipTwoThree.Nums D (flipTwoThree.Tu D u) (D.host.g 0) (D.host.g 1) Cn L.sc.x L.sc.b
+      (cL * L.sc.L) L.sc.b' L.Sc L.etaSz
 
 def WtsL (D : D7) (L : SizeData₂ D) (Cn : ℝ) : Prop :=
   ∀ u, flipTwoThree.Wts D u Cn L.sc.x L.sc.b L.sc.b' L.Sc L.etaSz
@@ -29,12 +30,14 @@ theorem tau1_injective_alt (φ : Formalism.HC.Frame) : Function.Injective φ.tau
   intro a b h
   simpa [Formalism.HC.Frame.tau1, Formalism.HC.Frame.iota] using h
 
-theorem sum_tops (D : D7) (g : D.what₂.Tau → ℝ) (h : D.host.TT → ℝ)
-    (hg : ∀ τ (t : D.host.TT), (D.eTau τ : D.R.GG) = D.R.tau1 t → g τ = h t) :
-    ∑ τ ∈ topsOf D.host D.eTau, g τ = ∑ t : D.host.TT, h t := by
+theorem sum_tops
+    (D : D7) (g : D.what₂.Tau → ℝ) (h : D.host.TT → ℝ)
+    (hg : ∀ τ (t : D.host.TT), (D.eTau τ : D.R.GG) = D.R.tau1 t → g τ = h t)
+    : ∑ τ ∈ topsOf D.host D.eTau, g τ = ∑ t : D.host.TT, h t := by
   symm
   refine Finset.sum_bij
-    (fun (t : D.host.TT) _ => D.eTau.symm ⟨D.R.tau1 (t : D.R.A), tau1_mem_Psi D.R.toFrame (t : D.R.A)⟩)
+    (fun (t : D.host.TT) _ =>
+      D.eTau.symm ⟨D.R.tau1 (t : D.R.A), tau1_mem_Psi D.R.toFrame (t : D.R.A)⟩)
     ?_ ?_ ?_ ?_
   · intro t _
     simp only [topsOf, Finset.mem_filter, Finset.mem_univ, true_and, Equiv.apply_symm_apply,
@@ -46,7 +49,8 @@ theorem sum_tops (D : D7) (g : D.what₂.Tau → ℝ) (h : D.host.TT → ℝ)
     exact Subtype.ext (tau1_injective_alt D.R.toFrame h1)
   · intro τ hτ
     simp only [topsOf, Finset.mem_filter, Finset.mem_univ, true_and, Host.topPlaces,
-      Finset.mem_image] at hτ
+        Finset.mem_image]
+      at hτ
     obtain ⟨a, ha, hat⟩ := hτ
     refine ⟨⟨a, ha⟩, Finset.mem_univ _, ?_⟩
     apply D.eTau.injective
@@ -58,14 +62,18 @@ theorem sum_tops (D : D7) (g : D.what₂.Tau → ℝ) (h : D.host.TT → ℝ)
     apply hg
     simp only [Equiv.apply_symm_apply, Subtype.coe_mk]
 
-theorem lamCol_top (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (τ : D.what₂.Tau) (t : D.host.TT)
-    (h : (D.eTau τ : D.R.GG) = D.R.tau1 t) : flipTwoThree.aT D u τ = (L.aT t : ℝ) := by
+theorem lamCol_top
+    (D : D7) (L : SizeData₂ D) (u : D.what₂.Word) (τ : D.what₂.Tau) (t : D.host.TT)
+    (h : (D.eTau τ : D.R.GG) = D.R.tau1 t)
+    : flipTwoThree.aT D u τ = (L.aT t : ℝ) := by
   have hk : 0 < D.R.k := by have := D.R.m_add_three_le_k; omega
   obtain ⟨h1, -⟩ := L.top_u τ t hk h
   have e1 := D.hcW_first u τ hk
-  have e2 : flipTwoThree.aT D u τ = (((D.hcW u τ).u ⟨0, hk⟩ : ℚ) : ℝ) - (((D.R.k : ℝ) - 1) / 2) := by
-    simp only [flipTwoThree.aT, flipTwoThree.lamCol, dif_pos hk, hcToWeightQ, rhoVec, Fin.val_mk, Nat.cast_zero,
-      sub_zero] <;> push_cast <;> ring
+  have e2
+      : flipTwoThree.aT D u τ = (((D.hcW u τ).u ⟨0, hk⟩ : ℚ) : ℝ) - (((D.R.k : ℝ) - 1) / 2) := by
+    simp only [flipTwoThree.aT, flipTwoThree.lamCol, dif_pos hk, hcToWeightQ, rhoVec, Fin.val_mk,
+        Nat.cast_zero, sub_zero]
+      <;> push_cast <;> ring
   rw [e2, e1, h1]
   ring
 
@@ -76,11 +84,13 @@ theorem scale_pos (s : Scale) : 0 < s.x ∧ 0 < s.L ∧ 0 < s.b ∧ 0 < s.a ∧ 
   have ha : 0 < s.a := mul_pos hx hb
   exact ⟨hx, hL, hb, ha, div_pos ha (Real.exp_pos _)⟩
 
-theorem orderBound_of_fifth_sixth (D : D7) (L : SizeData₂ D) (Cn C5 C6 cL : ℝ)
-    (h5 : flipTwoThree.Conclusion5 D Cn C5 L.sc.x) (h6 : flipTwoThree.Conclusion6 D Cn C6 L.sc.x)
-    (hcL : 1 ≤ cL) (hrd : 1 ≤ D.host.rdE)
-    (hN : NumsL D L Cn cL) (hW : WtsL D L Cn) (CV : ∀ u, flipTwoThree.ColVal D u) :
-    LocalQuadraticParts.FrobeniusExpansionCongruence L (max (max C5 C6) 0 * cL) := by
+theorem orderBound_of_fifth_sixth
+    (D : D7) (L : SizeData₂ D)
+    (Cn C5 C6 cL : ℝ) (h5 : flipTwoThree.Conclusion5 D Cn C5 L.sc.x)
+    (h6 : flipTwoThree.Conclusion6 D Cn C6 L.sc.x) (hcL : 1 ≤ cL)
+    (hrd : 1 ≤ D.host.rdE) (hN : NumsL D L Cn cL) (hW : WtsL D L Cn)
+    (CV : ∀ u, flipTwoThree.ColVal D u)
+    : LocalQuadraticParts.FrobeniusExpansionCongruence L (max (max C5 C6) 0 * cL) := by
   intro u
   have hM5 : C5 ≤ max (max C5 C6) 0 := le_trans (le_max_left _ _) (le_max_left _ _)
   have hM6 : C6 ≤ max (max C5 C6) 0 := le_trans (le_max_right _ _) (le_max_left _ _)
@@ -96,8 +106,9 @@ theorem orderBound_of_fifth_sixth (D : D7) (L : SizeData₂ D) (Cn C5 C6 cL : �
   obtain ⟨-, -, -, -, -, -, hSc, heta, hmt, -, -, -, -, -, hv1, -⟩ := hNu
   have eT : flipTwoThree.Tu D u = (D.mem u).A.T := rfl
   rw [eT] at h5' h6'
-  have hS : ∑ t ∈ flipTwoThree.tops D, flipTwoThree.aT D u t / (D.R.k : ℝ) * Real.log ((D.mem u).A.T : ℝ) =
-      ∑ t : D.host.TT, ((L.aT t : ℝ) / D.R.k) * Real.log ((D.mem u).A.T : ℝ) :=
+  have hS
+      : ∑ t ∈ flipTwoThree.tops D, flipTwoThree.aT D u t / (D.R.k : ℝ) * Real.log ((D.mem u).A.T : ℝ)
+        = ∑ t : D.host.TT, ((L.aT t : ℝ) / D.R.k) * Real.log ((D.mem u).A.T : ℝ) :=
     sum_tops D _ _ (fun τ t h => by rw [lamCol_top D L u τ t h])
   rw [hS] at h5'
   have hk : 1 ≤ D.R.k := by have := D.R.m_add_three_le_k; omega
@@ -122,25 +133,31 @@ theorem orderBound_of_fifth_sixth (D : D7) (L : SizeData₂ D) (Cn C5 C6 cL : �
   have hk0 : (0 : ℝ) ≤ D.R.k := by linarith
   have hfk2L : 0 ≤ (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L :=
     mul_nonneg (mul_nonneg hf (sq_nonneg _)) hsc.2.1.le
-  rw [show LocalQuadraticParts.nTT D = (D.host.TT.card : ℝ) from rfl, show L.sc.a = L.sc.x * L.sc.b from rfl]
+  rw [show LocalQuadraticParts.nTT D = (D.host.TT.card : ℝ) from rfl,
+    show L.sc.a = L.sc.x * L.sc.b from rfl]
   constructor
   · have p1 := mul_nonneg (sub_nonneg.mpr hC5) (mul_nonneg (mul_nonneg hn hxb) hlk)
     have p2 := mul_nonneg (sub_nonneg.mpr hC5) (mul_nonneg (mul_nonneg (mul_nonneg hf hk0) hbS) hlk)
-    have p3 := mul_nonneg (sub_nonneg.mpr hC5) (mul_nonneg (mul_nonneg hf (by linarith : (0 : ℝ) ≤ L.Sc)) hlT)
+    have p3 :=
+      mul_nonneg (sub_nonneg.mpr hC5)
+        (mul_nonneg (mul_nonneg hf (by linarith : (0 : ℝ) ≤ L.Sc)) hlT)
     have p4 := mul_nonneg (mul_nonneg (sub_nonneg.mpr hM5) hcL0) hfk2L
     linarith
   · have q1 := mul_nonneg (sub_nonneg.mpr hC6) (mul_nonneg (mul_nonneg hn hxb) hlkv)
-    have q2 := mul_nonneg (sub_nonneg.mpr hC6)
-      (mul_nonneg (mul_nonneg hf hbS) (add_nonneg (mul_nonneg hk0 hlkv) hlT))
+    have q2 :=
+      mul_nonneg (sub_nonneg.mpr hC6)
+        (mul_nonneg (mul_nonneg hf hbS) (add_nonneg (mul_nonneg hk0 hlkv) hlT))
     have q3 := mul_nonneg (mul_nonneg (sub_nonneg.mpr hM6) hcL0) hfk2L
     linarith
 
-theorem family_orderBound_of_fifth_sixth {eps : ℝ} (Fm : Formalism.MainNotions.FamP eps)
-    (Cn cL : ℝ) (h5 : flipTwoThree.ConclusionF5 Fm) (h6 : flipTwoThree.ConclusionF6 Fm) (hcL : 1 ≤ cL)
+theorem family_orderBound_of_fifth_sixth
+    {eps : ℝ} (Fm : Formalism.MainNotions.FamP eps)
+    (Cn cL : ℝ)
+    (h5 : flipTwoThree.ConclusionF5 Fm) (h6 : flipTwoThree.ConclusionF6 Fm) (hcL : 1 ≤ cL)
     (hE : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x,
-      1 ≤ (Fm.D x i).host.rdE ∧ NumsL (Fm.D x i) (Fm.L x i) Cn cL ∧ WtsL (Fm.D x i) (Fm.L x i) Cn ∧
-        ∀ u, Nonempty (flipTwoThree.ColVal (Fm.D x i) u)) :
-    LocalQuadraticParts.SlopesFamily Fm := by
+      1 ≤ (Fm.D x i).host.rdE ∧ NumsL (Fm.D x i) (Fm.L x i) Cn cL ∧ WtsL (Fm.D x i) (Fm.L x i) Cn
+        ∧ ∀ u, Nonempty (flipTwoThree.ColVal (Fm.D x i) u))
+    : LocalQuadraticParts.SlopesFamily Fm := by
   obtain ⟨C5, xa, hC5⟩ := h5 Cn
   obtain ⟨C6, xb, hC6⟩ := h6 Cn
   obtain ⟨x0, hx0⟩ := hE
@@ -155,8 +172,11 @@ theorem family_orderBound_of_fifth_sixth {eps : ℝ} (Fm : Formalism.MainNotions
     linarith
   obtain ⟨hrd, hN, hW, hCV⟩ := hx0 x hx0' i
   have hxx := Fm.L_x x i hx1
-  have p5 : flipTwoThree.Conclusion5 (Fm.D x i) Cn C5 (Fm.L x i).sc.x := by rw [hxx]; exact hC5 x hxa hx1 i
-  have p6 : flipTwoThree.Conclusion6 (Fm.D x i) Cn C6 (Fm.L x i).sc.x := by rw [hxx]; exact hC6 x hxb hx1 i
-  exact orderBound_of_fifth_sixth (Fm.D x i) (Fm.L x i) Cn C5 C6 cL p5 p6 hcL hrd hN hW (fun u => (hCV u).some)
+  have p5 : flipTwoThree.Conclusion5 (Fm.D x i) Cn C5 (Fm.L x i).sc.x := by
+    rw [hxx]; exact hC5 x hxa hx1 i
+  have p6 : flipTwoThree.Conclusion6 (Fm.D x i) Cn C6 (Fm.L x i).sc.x := by
+    rw [hxx]; exact hC6 x hxb hx1 i
+  exact orderBound_of_fifth_sixth (Fm.D x i) (Fm.L x i) Cn C5 C6 cL p5 p6 hcL hrd hN hW
+    (fun u => (hCV u).some)
 
 end Formalism.MainNotions.J

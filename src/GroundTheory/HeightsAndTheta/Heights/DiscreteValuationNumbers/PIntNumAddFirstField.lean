@@ -35,19 +35,20 @@ private lemma eventualValue_of_eventually_zero {K : Type*} (f : (K → ℤ) → 
   obtain ⟨m, h1, h2⟩ := (hex.choose_spec.and hf).exists
   rw [← h1, h2]
 
-theorem IntNumAddFirst.proof (h1 : FieldNumbers.IntNumAdd.Statement.{u})
-    (h2 : FieldNumbers.IntNumZeroSlot.Statement.{u})
-    (h3 : FieldNumbers.HilbDegreeBound.Statement.{u}) : IntNumAddFirst.Statement.{u} := by
+theorem IntNumAddFirst.proof
+    (h1 : FieldNumbers.IntNumAdd.Statement.{u}) (h2 : FieldNumbers.IntNumZeroSlot.Statement.{u})
+    (h3 : FieldNumbers.HilbDegreeBound.Statement.{u})
+    : IntNumAddFirst.Statement.{u} := by
   intro F _ K _ _ ι _ n G hG hGh hdim b₁ b₂ L
-  have hupd : ∀ b : K → ℤ,
-      Matrix.vecCons b L = Function.update (Matrix.vecCons (0 : K → ℤ) L) 0 b := fun b => by
+  have hupd
+      : ∀ b : K → ℤ,
+        Matrix.vecCons b L = Function.update (Matrix.vecCons (0 : K → ℤ) L) 0 b := fun b => by
     simp [Matrix.vecCons, Fin.update_cons_zero]
   by_cases hrel : IsRelevant G
-  ·
-    have hle : relDim G = ((n + 1 : ℕ) : WithBot (WithTop ℤ)) ∨
-        relDim G < ((n + 1 : ℕ) : WithBot (WithTop ℤ)) := by
-      have hc : ((n + 1 : ℕ) : WithBot (WithTop ℤ)) = (((n + 1 : ℕ) : ℤ) : WithTop ℤ) := by
-        rfl
+  · have hle
+        : relDim G = ((n + 1 : ℕ) : WithBot (WithTop ℤ))
+          ∨ relDim G < ((n + 1 : ℕ) : WithBot (WithTop ℤ)) := by
+      have hc : ((n + 1 : ℕ) : WithBot (WithTop ℤ)) = (((n + 1 : ℕ) : ℤ) : WithTop ℤ) := by rfl
       unfold relDim
       generalize ringKrullDim (MRing ι F ⧸ G) = x at hdim ⊢
       induction x using WithBot.recBotCoe with

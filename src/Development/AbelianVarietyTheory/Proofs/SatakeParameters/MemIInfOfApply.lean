@@ -11,9 +11,11 @@ namespace GlobalTheory.IndependentInfimum
 
 open Module
 
-theorem le_of_indep {K V X : Type*} [Field K] [AddCommGroup V] [Module K V]
-    (U W : X → Submodule K V) (hW : iSupIndep W) (hUW : ∀ x, U x ≤ W x)
-    (hU : ⨆ x, U x = ⊤) (x : X) : W x ≤ U x := by
+theorem le_of_indep
+    {K V X : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (U W : X → Submodule K V) (hW : iSupIndep W) (hUW : ∀ x, U x ≤ W x) (hU : ⨆ x, U x = ⊤)
+    (x : X)
+    : W x ≤ U x := by
   classical
   intro w hw
   have htop : w ∈ ⨆ y, U y := by rw [hU]; exact Submodule.mem_top
@@ -27,8 +29,7 @@ theorem le_of_indep {K V X : Type*} [Field K] [AddCommGroup V] [Module K V]
     · exact sup_le (le_iSup U x) (iSup₂_le fun y _ => le_iSup U y)
   rw [hsplit] at htop
   obtain ⟨u, hu, w', hw', hsum⟩ := Submodule.mem_sup.1 htop
-  have hw'W : w' ∈ ⨆ (y) (_ : y ≠ x), W y :=
-    (iSup₂_mono fun y _ => hUW y) hw'
+  have hw'W : w' ∈ ⨆ (y) (_ : y ≠ x), W y := (iSup₂_mono fun y _ => hUW y) hw'
   have hdiff : w - u ∈ W x := W x |>.sub_mem hw (hUW x hu)
   have heq : w - u = w' := by rw [← hsum]; abel
   have hdis := (hW x).le_bot (Submodule.mem_inf.2 ⟨hdiff, heq ▸ hw'W⟩)
@@ -36,17 +37,23 @@ theorem le_of_indep {K V X : Type*} [Field K] [AddCommGroup V] [Module K V]
   rw [hdis]
   exact hu
 
-theorem mem_iInf_of_apply {K V I : Type*} [Field K] [AddCommGroup V] [Module K V]
-    (A : I → Module.End K V) (x : I → K) (v : V) (hv : ∀ i, A i v = x i • v) :
-    v ∈ ⨅ i, (A i).maxGenEigenspace (x i) := Submodule.mem_iInf _ |>.2 fun i =>
-  Module.End.eigenspace_le_maxGenEigenspace (Module.End.mem_eigenspace_iff.2 (hv i))
+theorem mem_iInf_of_apply
+    {K V I : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (A : I → Module.End K V) (x : I → K) (v : V) (hv : ∀ i, A i v = x i • v)
+    : v ∈ ⨅ i, (A i).maxGenEigenspace (x i) :=
+  Submodule.mem_iInf _
+    |>.2 fun i => Module.End.eigenspace_le_maxGenEigenspace (Module.End.mem_eigenspace_iff.2 (hv i))
 
-theorem main {E I C : Type} [AddCommGroup E] [Module ℂ E] [FiniteDimensional ℂ E]
+theorem main
+    {E I C : Type} [AddCommGroup E] [Module ℂ E] [FiniteDimensional ℂ E]
     (h : I → Module.End ℂ E) (e : Module.End ℂ E) (Ec : C → Submodule ℂ E) (lab : C → I → ℂ)
     (he : e * e = e) (hE : ⨆ (c : C), Ec c = LinearMap.range e)
-    (hl : ∀ (c : C), ∀ w ∈ Ec c, ∀ (i : I), (h i : E → E) w = lab c i • w) :
-    (Formalism.L2.Col.PairComm fun (i : I) ↦ h i * e) ∧ ∀ (Q : (I → ℂ) → Prop), ¬Q (0 : I → ℂ) →
-      Formalism.L2.Col.eigSum (fun (i : I) ↦ h i * e) Q = ⨆ (c : C), ⨆ (_ : Q (lab c)), Ec c := by
+    (hl : ∀ (c : C), ∀ w ∈ Ec c, ∀ (i : I), (h i : E → E) w = lab c i • w)
+    : (Formalism.L2.Col.PairComm fun (i : I) ↦ h i * e)
+      ∧ ∀ (Q : (I → ℂ) → Prop),
+        ¬ Q (0 : I → ℂ)
+          → Formalism.L2.Col.eigSum (fun (i : I) ↦ h i * e) Q
+            = ⨆ (c : C), ⨆ (_ : Q (lab c)), Ec c := by
   classical
   have hee : ∀ v, e (e v) = e v := fun v => by
     have := congrArg (fun f : Module.End ℂ E => f v) he
@@ -74,7 +81,8 @@ theorem main {E I C : Type} [AddCommGroup E] [Module ℂ E] [FiniteDimensional �
     simpa [Module.End.mul_apply, hee] using this
   refine ⟨hcomm, fun Q hQ => ?_⟩
   have hind : iSupIndep fun x : I → ℂ => ⨅ i, (h i * e).maxGenEigenspace (x i) :=
-    Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo (fun i => h i * e)
+    Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo
+      (fun i => h i * e)
       fun i j φ => Module.End.mapsTo_maxGenEigenspace_of_comm (hcomm j i) φ
   let U : (I → ℂ) → Submodule ℂ E := fun x =>
     (⨆ (c : C) (_ : lab c = x), Ec c) ⊔ ⨆ (_ : x = 0), LinearMap.ker e
@@ -90,11 +98,14 @@ theorem main {E I C : Type} [AddCommGroup E] [Module ℂ E] [FiniteDimensional �
     intro v _
     have h1 : LinearMap.range e ≤ ⨆ x, U x := by
       rw [← hE]
-      exact iSup_le fun c => le_iSup_of_le (lab c)
-        (le_sup_of_le_left (le_iSup₂_of_le (f := fun c' (_ : lab c' = lab c) => Ec c') c rfl le_rfl))
+      exact iSup_le fun c =>
+        le_iSup_of_le (lab c)
+          (le_sup_of_le_left
+            (le_iSup₂_of_le (f := fun c' (_ : lab c' = lab c) => Ec c') c rfl le_rfl))
     have h2 : LinearMap.ker e ≤ ⨆ x, U x :=
-      le_iSup_of_le 0 (le_sup_of_le_right
-        (le_iSup_of_le (f := fun _ : (0 : I → ℂ) = 0 => LinearMap.ker e) rfl le_rfl))
+      le_iSup_of_le 0
+        (le_sup_of_le_right
+          (le_iSup_of_le (f := fun _ : (0 : I → ℂ) = 0 => LinearMap.ker e) rfl le_rfl))
     have h3 : v - e v ∈ LinearMap.ker e := by simp [LinearMap.mem_ker, hee]
     have := Submodule.add_mem _ (h1 ⟨v, rfl⟩) (h2 h3)
     simpa using this
@@ -105,7 +116,8 @@ theorem main {E I C : Type} [AddCommGroup E] [Module ℂ E] [FiniteDimensional �
     exact le_iSup₂_of_le (f := fun c (_ : Q (lab c)) => Ec c) c (hc ▸ hx) le_rfl
   · refine iSup₂_le fun c hc => ?_
     refine le_iSup₂_of_le
-      (f := fun (x : I → ℂ) (_ : Q x) => ⨅ i, (h i * e).maxGenEigenspace (x i)) (lab c) hc ?_
+      (f := fun (x : I → ℂ) (_ : Q x) => ⨅ i, (h i * e).maxGenEigenspace (x i))
+      (lab c) hc ?_
     intro w hw
     exact mem_iInf_of_apply (fun i => h i * e) (lab c) w (hA c w hw)
 

@@ -4,10 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.homl_desc :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ Γ' : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] [Group Γ'] [TopologicalSpace Γ'] [IsTopologicalGroup Γ'] [CompactSpace Γ'] [TotallyDisconnectedSpace Γ'] (f : Γ →* Γ') (H : Subgroup Γ'), Continuous f → Function.Surjective f → Finite (HomL l (H.comap f)) → Finite (HomL l H) ∧ Nat.card (HomL l H) ≤ Nat.card (HomL l (H.comap f)) := by
+theorem UpperTheory.V.Pa.homl_desc
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ Γ' : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] [Group Γ'] [TopologicalSpace Γ']
+        [IsTopologicalGroup Γ'] [CompactSpace Γ'] [TotallyDisconnectedSpace Γ'] (f : Γ →* Γ')
+        (H : Subgroup Γ'),
+      Continuous f → Function.Surjective f → Finite (HomL l (H.comap f))
+        → Finite (HomL l H) ∧ Nat.card (HomL l H) ≤ Nat.card (HomL l (H.comap f)) := by
   intro l _ Γ Γ' _ _ _ _ _ _ _ _ _ _ f H hf hsurj hfin
   let g : (H.comap f) →* H := f.subgroupComap H
   have hg : Continuous g := (hf.comp continuous_subtype_val).subtype_mk _
@@ -15,10 +21,12 @@ theorem UpperTheory.V.Pa.homl_desc :
     rintro ⟨y, hy⟩
     obtain ⟨x, rfl⟩ := hsurj y
     exact ⟨⟨x, hy⟩, rfl⟩
-  let Φ : HomL l H → HomL l (H.comap f) := fun φ =>
-    ⟨φ.1.comp g, by
+  let Φ : HomL l H → HomL l (H.comap f) := fun φ => ⟨
+    φ.1.comp g,
+    by
       show IsOpen (g ⁻¹' (φ.1.ker : Set H))
-      exact φ.2.preimage hg⟩
+      exact φ.2.preimage hg
+  ⟩
   have hinj : Function.Injective Φ := by
     intro φ ψ h
     apply Subtype.ext

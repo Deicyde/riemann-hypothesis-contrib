@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsC
 
 @[expose] public section
 
-open NumberField MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates GlobalTheory.LevGeo
+open NumberField MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates GlobalTheory.LevGeo
 open scoped ENNReal
 
 namespace GlobalTheory.LamSize
@@ -23,10 +25,10 @@ theorem one_le_dE_field (E : Type) [Field E] [NumberField E] : 1 ≤ dE E := by
   rw [← Int.cast_abs]
   exact_mod_cast h
 
-theorem neg_log_epStar_le (f M d w : ℝ) (hf : 1 ≤ f) (hM : 1 ≤ M) (hd : 1 ≤ d) (hw : 1 ≤ w) :
-    0 < epStar (2 * M * Real.sqrt d) f w 1 ∧ epStar (2 * M * Real.sqrt d) f w 1 ≤ 1 ∧
-      -Real.log (epStar (2 * M * Real.sqrt d) f w 1) ≤
-        Real.log 2 + Real.log M + 1 / 2 * Real.log d + Real.log f + Real.log w := by
+theorem neg_log_epStar_le (f M d w : ℝ) (hf : 1 ≤ f) (hM : 1 ≤ M) (hd : 1 ≤ d) (hw : 1 ≤ w)
+    : 0 < epStar (2 * M * Real.sqrt d) f w 1 ∧ epStar (2 * M * Real.sqrt d) f w 1 ≤ 1
+      ∧ - Real.log (epStar (2 * M * Real.sqrt d) f w 1)
+        ≤ Real.log 2 + Real.log M + 1 / 2 * Real.log d + Real.log f + Real.log w := by
   have hl2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hl2' : Real.log 2 < 1 := by have := Real.log_two_lt_d9; linarith
   have hpi := Real.pi_gt_three
@@ -36,7 +38,8 @@ theorem neg_log_epStar_le (f M d w : ℝ) (hf : 1 ≤ f) (hM : 1 ≤ M) (hd : 1 
   have hA1 : 1 ≤ A := by
     have h1 : 1 ≤ M * Real.sqrt d := one_le_mul_of_one_le_of_one_le hM hsd
     have : A = 2 * (M * Real.sqrt d) * (f * w) := by rw [hA]; ring
-    rw [this]; nlinarith
+    rw [this]
+    nlinarith
   have hA0 : 0 < A := by linarith
   have hB : 0 < 2 * M * Real.sqrt d * (f * w + 2) * 1 * Real.log 2 := by positivity
   have hlow : 1 / A ≤ epStar (2 * M * Real.sqrt d) f w 1 := by
@@ -45,7 +48,9 @@ theorem neg_log_epStar_le (f M d w : ℝ) (hf : 1 ≤ f) (hM : 1 ≤ M) (hd : 1 
     rw [div_le_div_iff₀ hA0 hB]
     have hMd : 0 < 2 * M * Real.sqrt d := by positivity
     have key : (f * w + 2) * Real.log 2 ≤ Real.pi * (f * w) := by nlinarith
-    have : 1 * (2 * M * Real.sqrt d * (f * w + 2) * 1 * Real.log 2) = (2 * M * Real.sqrt d) * ((f * w + 2) * Real.log 2) := by ring
+    have : 1 * (2 * M * Real.sqrt d * (f * w + 2) * 1 * Real.log 2)
+        = (2 * M * Real.sqrt d) * ((f * w + 2) * Real.log 2) := by
+      ring
     rw [this]
     have : Real.pi * A = (2 * M * Real.sqrt d) * (Real.pi * (f * w)) := by rw [hA]; ring
     rw [this]
@@ -55,21 +60,27 @@ theorem neg_log_epStar_le (f M d w : ℝ) (hf : 1 ≤ f) (hM : 1 ≤ M) (hd : 1 
   have h1 : Real.log (1 / A) ≤ Real.log (epStar (2 * M * Real.sqrt d) f w 1) :=
     Real.log_le_log (by positivity) hlow
   rw [one_div, Real.log_inv] at h1
-  have hlA : Real.log A = Real.log 2 + Real.log M + 1 / 2 * Real.log d + Real.log f + Real.log w := by
-    rw [hA, Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
+  have hlA
+      : Real.log A = Real.log 2 + Real.log M + 1 / 2 * Real.log d + Real.log f + Real.log w := by
+    rw [hA, Real.log_mul (by positivity) (by positivity),
       Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
-      Real.log_sqrt (by linarith)]
+      Real.log_mul (by positivity) (by positivity), Real.log_sqrt (by linarith)]
     ring
   linarith
 
-theorem log_radius_le (E : Type) [Field E] [NumberField E] [IsCMField E] (r d M : ℕ) (w L : ℝ)
-    (hr : 1 ≤ r) (hd : 1 ≤ d) (hM : 1 ≤ M) (hL : 1 ≤ L) (hw : 1 ≤ w)
-    (hfr : Real.log (fdeg E * r) ≤ L) (hlM : Real.log M ≤ 30 * L) (hdE : Real.log (dE E) ≤ 4 * fdeg E * L)
-    (hld : Real.log d ≤ 4 * L) (hlw : Real.log w ≤ 2 * L) :
-    1 ≤ 2 * ReciprocityTheory.MultiplicativeHeights.approxR r (d5mu (fdeg E) r (dE E) (Real.sqrt (epsLev E d M w) / Real.sqrt (fdeg E)))
-      (3 * frameRadius w r / 5) ∧
-    Real.log (2 * ReciprocityTheory.MultiplicativeHeights.approxR r (d5mu (fdeg E) r (dE E) (Real.sqrt (epsLev E d M w) / Real.sqrt (fdeg E)))
-      (3 * frameRadius w r / 5)) ≤ (4 * fdeg E + 32) * L := by
+theorem log_radius_le
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r d M : ℕ) (w L : ℝ) (hr : 1 ≤ r) (hd : 1 ≤ d) (hM : 1 ≤ M) (hL : 1 ≤ L) (hw : 1 ≤ w)
+    (hfr : Real.log (fdeg E * r) ≤ L) (hlM : Real.log M ≤ 30 * L)
+    (hdE : Real.log (dE E) ≤ 4 * fdeg E * L) (hld : Real.log d ≤ 4 * L) (hlw : Real.log w ≤ 2 * L)
+    : 1 ≤ 2 * ReciprocityTheory.MultiplicativeHeights.approxR r
+        (d5mu (fdeg E) r (dE E) (Real.sqrt (epsLev E d M w) / Real.sqrt (fdeg E)))
+        (3 * frameRadius w r / 5)
+      ∧ Real.log
+          (2 * ReciprocityTheory.MultiplicativeHeights.approxR r
+            (d5mu (fdeg E) r (dE E) (Real.sqrt (epsLev E d M w) / Real.sqrt (fdeg E)))
+            (3 * frameRadius w r / 5))
+        ≤ (4 * fdeg E + 32) * L := by
   have hf1 := one_le_fdeg_of_cm E
   have hf' : (1 : ℝ) ≤ fdeg E := by exact_mod_cast hf1
   have hr' : (1 : ℝ) ≤ r := by exact_mod_cast hr
@@ -79,7 +90,8 @@ theorem log_radius_le (E : Type) [Field E] [NumberField E] [IsCMField E] (r d M 
   obtain ⟨he0, he1, hne⟩ := neg_log_epStar_le (fdeg E) M d w hf' hM' hd' hw
   have hepsdef : epsLev E d M w = epStar (2 * M * Real.sqrt d) (fdeg E) w 1 := rfl
   rw [← hepsdef] at he0 he1 hne
-  obtain ⟨hX0, hX⟩ := GlobalTheory.room_log_radius (fdeg E) r (dE E) (epsLev E d M w) w hf1 hr hdE1 he0 hw
+  obtain ⟨hX0, hX⟩ :=
+    GlobalTheory.room_log_radius (fdeg E) r (dE E) (epsLev E d M w) w hf1 hr hdE1 he0 hw
   set X := 2 * ReciprocityTheory.MultiplicativeHeights.approxR r (d5mu (fdeg E) r (dE E) (Real.sqrt (epsLev E d M w) / Real.sqrt (fdeg E)))
     (3 * frameRadius w r / 5) with hXdef
   clear_value X
@@ -96,7 +108,8 @@ theorem log_radius_le (E : Type) [Field E] [NumberField E] [IsCMField E] (r d M 
   have hmul : Real.log ((fdeg E : ℝ) * r) = Real.log (fdeg E : ℝ) + Real.log r :=
     Real.log_mul (by positivity) (by positivity)
   have hc : Real.log (1600 / 3 : ℝ) ≤ 7 := by
-    have h1 : Real.log (1600 / 3 : ℝ) ≤ Real.log ((2 : ℝ) ^ 10) := Real.log_le_log (by norm_num) (by norm_num)
+    have h1 : Real.log (1600 / 3 : ℝ) ≤ Real.log ((2 : ℝ) ^ 10) :=
+      Real.log_le_log (by norm_num) (by norm_num)
     rw [Real.log_pow] at h1
     have := Real.log_two_lt_d9
     push_cast at h1
@@ -113,13 +126,24 @@ theorem log_radius_le (E : Type) [Field E] [NumberField E] [IsCMField E] (r d M 
     rw [this]
     linarith
 
-theorem lamSup_le : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r q d M : ℕ) (Om s t L : ℝ), 1 ≤ r → 1 ≤ d → 1 ≤ M → 1 ≤ L → 0 ≤ s → 0 ≤ t → Real.log (fdeg E * r) ≤ L → Real.log M ≤ 30 * L → Real.log (dE E) ≤ 4 * fdeg E * L → Real.log d ≤ 4 * L → Real.log (s + t + 1) ≤ 2 * L → lamSup E r q d M Om s t ≤ ((1 + |Om|) / 2 + L + (2 * q + 1) * (6 * fdeg E + 48) * L) * (s + t) := by
+theorem lamSup_le
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r q d M : ℕ) (Om s t L : ℝ),
+      1 ≤ r → 1 ≤ d → 1 ≤ M → 1 ≤ L → 0 ≤ s → 0 ≤ t → Real.log (fdeg E * r) ≤ L
+        → Real.log M ≤ 30 * L → Real.log (dE E) ≤ 4 * fdeg E * L → Real.log d ≤ 4 * L
+        → Real.log (s + t + 1) ≤ 2 * L
+        → lamSup E r q d M Om s t
+          ≤ ((1 + |Om|) / 2 + L + (2 * q + 1) * (6 * fdeg E + 48) * L) * (s + t) := by
   intro E _ _ _ r q d M Om s t L hr hd hM hL hs ht hfr hlM hdE hld hlw
   have hw : (1 : ℝ) ≤ s + t + 1 := by linarith
   obtain ⟨hX1, hXle⟩ := log_radius_le E r d M (s + t + 1) L hr hd hM hL hw hfr hlM hdE hld hlw
   have hr' : (1 : ℝ) ≤ r := by exact_mod_cast hr
-  have hcm : cmLen E r q d M (s + t + 1) = (2 * ReciprocityTheory.MultiplicativeHeights.approxR r (d5mu (fdeg E) r (dE E)
-      (Real.sqrt (epsLev E d M (s + t + 1)) / Real.sqrt (fdeg E))) (3 * frameRadius (s + t + 1) r / 5)) ^ (2 * q + 1) := rfl
+  have hcm
+      : cmLen E r q d M (s + t + 1)
+        = (2 * ReciprocityTheory.MultiplicativeHeights.approxR r
+            (d5mu (fdeg E) r (dE E) (Real.sqrt (epsLev E d M (s + t + 1)) / Real.sqrt (fdeg E)))
+            (3 * frameRadius (s + t + 1) r / 5))
+          ^ (2 * q + 1) :=
+    rfl
   unfold lamSup
   rw [hcm]
   set X := 2 * ReciprocityTheory.MultiplicativeHeights.approxR r (d5mu (fdeg E) r (dE E)
@@ -147,7 +171,8 @@ theorem lamSup_le : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r q 
   have c2 : (3 / 2 * Y) * (s + t) ≤ (K * (6 * fdeg E + 48) * L) * (s + t) := by
     refine mul_le_mul_of_nonneg_right ?_ hst
     have : K * (6 * (fdeg E : ℝ) + 48) * L = 3 / 2 * (K * ((4 * fdeg E + 32) * L)) := by ring
-    rw [this]; linarith
+    rw [this]
+    linarith
   nlinarith
 
 end GlobalTheory.LamSize

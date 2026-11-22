@@ -16,8 +16,9 @@ namespace PI.SwSandwichOfWork
 
 open PI.SwBig PI.SwSand
 
-attribute [local instance] Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedSpace
-  Matrix.frobeniusNormedRing Matrix.frobeniusNormedAlgebra
+attribute [local instance]
+  Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedSpace Matrix.frobeniusNormedRing
+  Matrix.frobeniusNormedAlgebra
 
 variable {k r : ℕ}
 
@@ -36,8 +37,8 @@ theorem normRL : NormRL := by
 def sgI (k r : ℕ) (i : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) :=
   if r ≤ i.val ∧ i.val ≤ r + k then i else ⟨2 * r + k - i.val, by omega⟩
 
-theorem Log_Hpk_eq (i j : Fin (2 * r + k + 1)) :
-    Hpk k r i j = if j = sgI k r i then (if i.val = r + k then -1 else 1) else 0 := by
+theorem Log_Hpk_eq (i j : Fin (2 * r + k + 1))
+    : Hpk k r i j = if j = sgI k r i then (if i.val = r + k then -1 else 1) else 0 := by
   rcases i with ⟨i, hi⟩
   rcases j with ⟨j, hj⟩
   unfold Hpk sgI
@@ -84,11 +85,15 @@ theorem logG : LogG := by
   have hadj : ‖adjH L‖ < ε := by
     have h1 : ‖adjH L‖ ≤ ‖H‖ * ‖H‖ * ‖L‖ := by
       unfold adjH
-      calc ‖H * Lᴴ * H‖ ≤ ‖H * Lᴴ‖ * ‖H‖ := norm_mul_le _ _
+      calc
+        ‖H * Lᴴ * H‖
+          ≤ ‖H * Lᴴ‖ * ‖H‖ := norm_mul_le _ _
         _ ≤ ‖H‖ * ‖Lᴴ‖ * ‖H‖ := by gcongr; exact norm_mul_le _ _
         _ = ‖H‖ * ‖H‖ * ‖L‖ := by rw [Matrix.frobenius_norm_conjTranspose]; ring
     have h2 : ‖H‖ * ‖H‖ * ‖L‖ < ε := by
-      calc ‖H‖ * ‖H‖ * ‖L‖ ≤ C * ‖L‖ := by gcongr; simp [C]
+      calc
+        ‖H‖ * ‖H‖ * ‖L‖
+          ≤ C * ‖L‖ := by gcongr; simp [C]
         _ < C * (ε / C) := by gcongr
         _ = ε := by field_simp
     linarith
@@ -99,8 +104,11 @@ theorem logG : LogG := by
       rw [hHi, Matrix.exp_conjTranspose] at this
       exact this
     have h2 : (H * (NormedSpace.exp L)ᴴ * H) * NormedSpace.exp L = 1 := by
-      rw [Matrix.mul_assoc (H * _), show H * (NormedSpace.exp L)ᴴ * (H * NormedSpace.exp L)
-        = H * ((NormedSpace.exp L)ᴴ * H * NormedSpace.exp L) by simp only [Matrix.mul_assoc], hG', hHH]
+      rw [Matrix.mul_assoc (H * _),
+        show H * (NormedSpace.exp L)ᴴ * (H * NormedSpace.exp L)
+            = H * ((NormedSpace.exp L)ᴴ * H * NormedSpace.exp L) by
+          simp only [Matrix.mul_assoc],
+        hG', hHH]
     rw [h1, Matrix.exp_neg, Matrix.inv_eq_left_inv h2]
   have e1 := hleft (y := adjH L) (by simpa using hadj)
   have e2 := hleft (y := -L) (by simpa using hLε)

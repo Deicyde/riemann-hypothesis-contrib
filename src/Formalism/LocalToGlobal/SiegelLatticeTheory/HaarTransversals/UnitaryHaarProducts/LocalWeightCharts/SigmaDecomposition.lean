@@ -55,8 +55,9 @@ theorem sigma_decomposition : SigmaG := by
     exact this
   · intro a ha b hb
     have hab : P * (a * b) * P⁻¹ = P * a * P⁻¹ * (P * b * P⁻¹) := by
-      calc P * (a * b) * P⁻¹ = P * a * (P⁻¹ * P) * b * P⁻¹ := by
-            rw [cay_inv_mul hPu]; simp only [Matrix.mul_one, Matrix.mul_assoc]
+      calc
+        P * (a * b) * P⁻¹ = P * a * (P⁻¹ * P) * b * P⁻¹ := by
+          rw [cay_inv_mul hPu]; simp only [Matrix.mul_one, Matrix.mul_assoc]
         _ = P * a * P⁻¹ * (P * b * P⁻¹) := by simp only [Matrix.mul_assoc]
     rw [hσ' (a * b), hab]
     have := hmul _ (cay_mem hP.1 ha) _ (cay_mem hP.1 hb)

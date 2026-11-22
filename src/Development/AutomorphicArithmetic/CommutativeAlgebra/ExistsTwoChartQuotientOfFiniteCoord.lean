@@ -8,9 +8,13 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleCohomolo
 noncomputable section
 open IsLocalRing UpperTheory.Et
 
-private theorem coord_mem_of_mem {A D ι : Type} [CommRing A] [CommRing D] [Algebra A D]
-    (β : Module.Basis ι A D) (I : Ideal A) {x : D} (hx : x ∈ I.map (algebraMap A D)) (i : ι) :
-    β.repr x i ∈ I := by
+private theorem coord_mem_of_mem
+    {A D ι : Type} [CommRing A] [CommRing D] [Algebra A D]
+    (β : Module.Basis ι A D)
+    (I : Ideal A)
+    {x : D} (hx : x ∈ I.map (algebraMap A D))
+    (i : ι)
+    : β.repr x i ∈ I := by
   have hx' : x ∈ I • (⊤ : Submodule A D) := by
     rw [Ideal.smul_top_eq_map]
     exact hx
@@ -22,27 +26,35 @@ private theorem coord_mem_of_mem {A D ι : Type} [CommRing A] [CommRing D] [Alge
     rw [map_add (f := _), Finsupp.add_apply]
     exact I.add_mem hy hz
 
-private theorem mem_smul_span_of_coord {A D ι : Type} [CommRing A] [CommRing D] [Algebra A D]
-    (β : Module.Basis ι A D) (I : Ideal A) (W : Set ι) {x : D}
-    (hW : x ∈ Submodule.span A (β '' W)) (hc : ∀ i, β.repr x i ∈ I) :
-    x ∈ I • Submodule.span A (β '' W) := by
+private theorem mem_smul_span_of_coord
+    {A D ι : Type} [CommRing A] [CommRing D] [Algebra A D]
+    (β : Module.Basis ι A D) (I : Ideal A) (W : Set ι)
+    {x : D} (hW : x ∈ Submodule.span A (β '' W)) (hc : ∀ i, β.repr x i ∈ I)
+    : x ∈ I • Submodule.span A (β '' W) := by
   have hs : ↑(β.repr x).support ⊆ W := (β.mem_span_image).1 hW
   rw [← β.linearCombination_repr x, Finsupp.linearCombination_apply, Finsupp.sum]
   refine Submodule.sum_mem _ (fun i hi => ?_)
   exact Submodule.smul_mem_smul (hc i) (Submodule.subset_span ⟨i, hs hi, rfl⟩)
 
-private theorem mem_map_of_coord {A D ι : Type} [CommRing A] [CommRing D] [Algebra A D]
-    (β : Module.Basis ι A D) (I : Ideal A) {x : D} (hc : ∀ i, β.repr x i ∈ I) :
-    x ∈ I.map (algebraMap A D) := by
+private theorem mem_map_of_coord
+    {A D ι : Type} [CommRing A] [CommRing D] [Algebra A D]
+    (β : Module.Basis ι A D) (I : Ideal A)
+    {x : D} (hc : ∀ i, β.repr x i ∈ I)
+    : x ∈ I.map (algebraMap A D) := by
   rw [← β.linearCombination_repr x, Finsupp.linearCombination_apply, Finsupp.sum]
   refine Ideal.sum_mem _ (fun i _ => ?_)
   rw [Algebra.smul_def]
   exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ (hc i))
 
-theorem UpperTheory.exists_twoChart_quotient_of_finite_coord :
-    ∀ (A D : Type) [CommRing A] [CommRing D] [Algebra A D] (T : TC A D), T.Fin → T.Coord → ∀ I : Ideal A, ∃ T' : TC A (D ⧸ I.map (algebraMap A D)), T'.Fin ∧ T'.t = Ideal.Quotient.mk _ T.t ∧ T'.s = Ideal.Quotient.mk _ T.s ∧
-      (∀ j, ∀ y ∈ T'.S j, ∃ x ∈ T.S j, Ideal.Quotient.mk _ x = y) ∧ (∀ j, ∀ x ∈ T.S j, Ideal.Quotient.mk _ x ∈ T'.S j) ∧
-      (∀ x ∈ T.B, x ∈ I.map (algebraMap A D) → x ∈ I • Subalgebra.toSubmodule T.B) ∧ ∀ x ∈ T.C, x ∈ I.map (algebraMap A D) → x ∈ I • Subalgebra.toSubmodule T.C := by
+theorem UpperTheory.exists_twoChart_quotient_of_finite_coord
+    : ∀ (A D : Type) [CommRing A] [CommRing D] [Algebra A D] (T : TC A D),
+      T.Fin → T.Coord
+        → ∀ I : Ideal A, ∃ T' : TC A (D ⧸ I.map (algebraMap A D)),
+          T'.Fin ∧ T'.t = Ideal.Quotient.mk _ T.t ∧ T'.s = Ideal.Quotient.mk _ T.s
+            ∧ (∀ j, ∀ y ∈ T'.S j, ∃ x ∈ T.S j, Ideal.Quotient.mk _ x = y)
+            ∧ (∀ j, ∀ x ∈ T.S j, Ideal.Quotient.mk _ x ∈ T'.S j)
+            ∧ (∀ x ∈ T.B, x ∈ I.map (algebraMap A D) → x ∈ I • Subalgebra.toSubmodule T.B)
+            ∧ ∀ x ∈ T.C, x ∈ I.map (algebraMap A D) → x ∈ I • Subalgebra.toSubmodule T.C := by
   classical
   intro A D _ _ _ T hF hC I
   obtain ⟨ι, β, U, V, hU, hV⟩ := hC
@@ -52,24 +64,25 @@ theorem UpperTheory.exists_twoChart_quotient_of_finite_coord :
   have hsurj : Function.Surjective (Ideal.Quotient.mk J) := Ideal.Quotient.mk_surjective
   have h1 : Ideal.Quotient.mk J T.t * Ideal.Quotient.mk J T.s = 1 := by
     rw [← map_mul, T.ts, map_one]
-  let T' : TC A (D ⧸ J) :=
-    { B := T.B.map q
-      C := T.C.map q
-      t := Ideal.Quotient.mk J T.t
-      s := Ideal.Quotient.mk J T.s
-      ts := h1
-      tB := Subalgebra.mem_map.2 ⟨T.t, T.tB, rfl⟩
-      sC := Subalgebra.mem_map.2 ⟨T.s, T.sC, rfl⟩
-      locB := by
-        intro y
-        obtain ⟨x, rfl⟩ := hsurj y
-        obtain ⟨k, hk⟩ := T.locB x
-        exact ⟨k, Subalgebra.mem_map.2 ⟨_, hk, by rw [hq, map_mul, map_pow]⟩⟩
-      locC := by
-        intro y
-        obtain ⟨x, rfl⟩ := hsurj y
-        obtain ⟨k, hk⟩ := T.locC x
-        exact ⟨k, Subalgebra.mem_map.2 ⟨_, hk, by rw [hq, map_mul, map_pow]⟩⟩ }
+  let T' : TC A (D ⧸ J) := {
+    B := T.B.map q
+    C := T.C.map q
+    t := Ideal.Quotient.mk J T.t
+    s := Ideal.Quotient.mk J T.s
+    ts := h1
+    tB := Subalgebra.mem_map.2 ⟨T.t, T.tB, rfl⟩
+    sC := Subalgebra.mem_map.2 ⟨T.s, T.sC, rfl⟩
+    locB := by
+      intro y
+      obtain ⟨x, rfl⟩ := hsurj y
+      obtain ⟨k, hk⟩ := T.locB x
+      exact ⟨k, Subalgebra.mem_map.2 ⟨_, hk, by rw [hq, map_mul, map_pow]⟩⟩
+    locC := by
+      intro y
+      obtain ⟨x, rfl⟩ := hsurj y
+      obtain ⟨k, hk⟩ := T.locC x
+      exact ⟨k, Subalgebra.mem_map.2 ⟨_, hk, by rw [hq, map_mul, map_pow]⟩⟩
+  }
   refine ⟨T', ?_, rfl, rfl, ?_, ?_, ?_, ?_⟩
   · obtain ⟨X, hX1, hX2⟩ := hF
     refine ⟨X.image q, ?_, ?_⟩
@@ -96,8 +109,9 @@ theorem UpperTheory.exists_twoChart_quotient_of_finite_coord :
       exact hc
     have hbw : b - T.t ^ j * c ∈ J := by
       rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_mul, map_pow, ← hq c, hce]
-      change Ideal.Quotient.mk J b - Ideal.Quotient.mk J T.t ^ j *
-        (Ideal.Quotient.mk J T.s ^ j * Ideal.Quotient.mk J b) = 0
+      change Ideal.Quotient.mk J b
+          - Ideal.Quotient.mk J T.t ^ j * (Ideal.Quotient.mk J T.s ^ j * Ideal.Quotient.mk J b)
+        = 0
       rw [← mul_assoc, ← mul_pow, h1, one_pow, one_mul, sub_self]
     have hcoord := coord_mem_of_mem β I hbw
     have hbU : ↑(β.repr b).support ⊆ U := β.mem_span_image.1 (by rw [← hU]; exact hb)

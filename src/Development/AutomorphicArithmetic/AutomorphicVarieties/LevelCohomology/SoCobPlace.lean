@@ -5,11 +5,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
 open scoped Pointwise
 
-theorem UpperTheory.V.X.So.cobPlace :
-    ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (O : Type) [CommRing O] (θ : G k Ω →* Oˣ) (z : G k Ω → O), Coc θ z → ∀ (v : HeightOneSpectrum (𝓞 k)) (A A' : ValuationSubring Ω), IsPlaceOver A v → IsPlaceOver A' v → CobOn θ z (Dec (F := k) A) → CobOn θ z (Dec (F := k) A') := by
+theorem UpperTheory.V.X.So.cobPlace
+    : ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (O : Type)
+        [CommRing O] (θ : G k Ω →* Oˣ) (z : G k Ω → O),
+      Coc θ z
+        → ∀ (v : HeightOneSpectrum (𝓞 k)) (A A' : ValuationSubring Ω),
+          IsPlaceOver A v → IsPlaceOver A' v → CobOn θ z (Dec (F := k) A)
+            → CobOn θ z (Dec (F := k) A') := by
   intro k Ω _ _ _ _ _ O _ θ z hz v A A' hA hA' hcob
   obtain ⟨a, ha, m, hm⟩ := hcob
   obtain ⟨g, rfl⟩ := exists_smul_eq_of_over hA hA'

@@ -6,8 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.perturb :
-    ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {q : Y → E →L[ℝ] ℝ}, LocFin q → ∀ h ∈ poly q, ∀ k : E, (∀ y, q y h = 1 → q y k = 0) → ∃ ε : ℝ, 0 < ε ∧ ∀ s : ℝ, |s| ≤ ε → h + s • k ∈ poly q := by
+theorem UpperTheory.V.ConeExtensionAcyclic.perturb
+    : ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {q : Y → E →L[ℝ] ℝ},
+      LocFin q
+        → ∀ h ∈ poly q, ∀ k : E,
+          (∀ y, q y h = 1 → q y k = 0)
+            → ∃ ε : ℝ, 0 < ε ∧ ∀ s : ℝ, |s| ≤ ε → h + s • k ∈ poly q := by
   intro E Y _ _ q hq h hh k hk
   have hh' : ∀ y, 1 ≤ q y h := hh
   obtain ⟨S, hS, hU⟩ := hq h hh

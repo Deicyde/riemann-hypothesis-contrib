@@ -8,33 +8,43 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemHatIff
 
 noncomputable section
 
-open Formalism.BasicNotions IsDedekindDomain NumberField Matrix Formalism.L2.DIV Formalism.IndefR.Lev GlobalTheory.StdFrames GlobalTheory.AdIsom
+open Formalism.BasicNotions IsDedekindDomain NumberField Matrix Formalism.L2.DIV
+  Formalism.IndefR.Lev GlobalTheory.StdFrames GlobalTheory.AdIsom
 open scoped TensorProduct
 
 namespace GlobalTheory.LevNorm
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-@[reducible] def kField {E : Type} [Field E] [NumberField E] (Q : Pl E) : Field (kP Q) :=
+@[reducible]
+def kField {E : Type} [Field E] [NumberField E] (Q : Pl E) : Field (kP Q) :=
   haveI := Q.isMaximal
   Ideal.Quotient.field Q.asIdeal
 
 attribute [local instance] kField
 
-def adPlaces (D : D7) : PlaceSys (EAf D) (Formalism.L2.Herm.intAf D.host.F D.host.E) (Pl D.host.E) (fun Q => kP Q)
-    (fun Q => resS D.host.F Q) where
+def adPlaces (D : D7)
+    : PlaceSys (EAf D) (Formalism.L2.Herm.intAf D.host.F D.host.E) (Pl D.host.E)
+      (fun Q => kP Q)
+      (fun Q => resS D.host.F Q) where
   K Q := Q.adicCompletion D.host.E
   O Q := Q.adicCompletionIntegers D.host.E
   p Q := cpt Q
   e Q := idem Q
   surj Q x := by
     classical
-    obtain ⟨z, hz⟩ := GlobalTheory.AdeleBaseChange.map_surjective (toAd_spec D)
-      (⟨Pi.single Q x, by
-        refine Filter.mem_of_superset (Set.finite_singleton Q).compl_mem_cofinite fun Q' h => ?_
-        show (Pi.single Q x : ∀ v : Pl D.host.E, v.adicCompletion D.host.E) Q' ∈ Q'.adicCompletionIntegers D.host.E
-        rw [Pi.single_eq_of_ne h]
-        exact zero_mem _⟩ : FiniteAdeleRing (𝓞 D.host.E) D.host.E)
+    obtain ⟨z, hz⟩ :=
+      GlobalTheory.AdeleBaseChange.map_surjective (toAd_spec D)
+        (⟨
+           Pi.single Q x,
+           by
+             refine Filter.mem_of_superset (Set.finite_singleton Q).compl_mem_cofinite fun Q' h =>
+               ?_
+             show (Pi.single Q x : ∀ v : Pl D.host.E, v.adicCompletion D.host.E) Q' ∈ Q'.adicCompletionIntegers D.host.E
+             rw [Pi.single_eq_of_ne h]
+             exact zero_mem _
+         ⟩
+          : FiniteAdeleRing (𝓞 D.host.E) D.host.E)
     refine ⟨z, ?_⟩
     change toAd D z Q = _
     rw [hz]
@@ -47,8 +57,9 @@ def adPlaces (D : D7) : PlaceSys (EAf D) (Formalism.L2.Herm.intAf D.host.F D.hos
   r_surj Q y := by
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective y
     exact ⟨_, resS_oToS Q x⟩
-  r_ker Q s := (resS_eq_zero_iff_cpt Q s).trans
-    ((Valuation.isEquiv_valuation_valuationSubring Valued.v).lt_one_iff_lt_one)
+  r_ker Q s :=
+    (resS_eq_zero_iff_cpt Q s).trans
+      ((Valuation.isEquiv_valuation_valuationSubring Valued.v).lt_one_iff_lt_one)
 
 end GlobalTheory.LevNorm
 

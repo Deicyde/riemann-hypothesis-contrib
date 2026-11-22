@@ -10,12 +10,14 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem exists_unit_mul_sq_sub_one_lt :
-    ∀ (K : Type) [Field K] (w : Valuation K ℤᵐ⁰) (δ π : K) (k : ℕ), w π = WithZero.exp (-1) → (∀ x : K, w x ≤ 1 → ∃ y : K, w y ≤ 1 ∧ w (x - y ^ 2) < 1) → w δ = 1 → w 4 < w (δ - 1) → w (δ - 1) = WithZero.exp (-(2 * (k : ℤ))) → ∃ c : K, w c = 1 ∧ w (δ * c ^ 2 - 1) < w (δ - 1) := by
+theorem exists_unit_mul_sq_sub_one_lt
+    : ∀ (K : Type) [Field K] (w : Valuation K ℤᵐ⁰) (δ π : K) (k : ℕ),
+      w π = WithZero.exp (-1) → (∀ x : K, w x ≤ 1 → ∃ y : K, w y ≤ 1 ∧ w (x - y ^ 2) < 1) → w δ = 1
+        → w 4 < w (δ - 1) → w (δ - 1) = WithZero.exp (-(2 * (k : ℤ)))
+        → ∃ c : K, w c = 1 ∧ w (δ * c ^ 2 - 1) < w (δ - 1) := by
   intro K _ w δ π k hπ hres hδ h4 hk
   rcases Nat.eq_zero_or_pos k with rfl | hkpos
-  ·
-    have hδ0 : δ ≠ 0 := by
+  · have hδ0 : δ ≠ 0 := by
       intro h
       rw [h, map_zero] at hδ
       exact zero_ne_one hδ
@@ -32,9 +34,7 @@ theorem exists_unit_mul_sq_sub_one_lt :
         ring
       rw [e, Valuation.map_neg, map_mul, hδ, one_mul, hk]
       simpa using hy
-  ·
-
-    set t := π ^ k with ht
+  · set t := π ^ k with ht
     set g := w (δ - 1) with hg
     have hgpos : 0 < g := lt_of_le_of_lt zero_le' h4
     have htt : w t * w t = g := by
@@ -54,7 +54,9 @@ theorem exists_unit_mul_sq_sub_one_lt :
       norm_num
     have hg1 : g < 1 := by
       rw [← htt]
-      calc w t * w t ≤ w t * 1 := mul_le_mul' le_rfl ht1.le
+      calc
+        w t * w t
+          ≤ w t * 1 := mul_le_mul' le_rfl ht1.le
         _ = w t := mul_one _
         _ < 1 := ht1
     have h2t : w 2 < w t := by
@@ -73,20 +75,27 @@ theorem exists_unit_mul_sq_sub_one_lt :
     refine ⟨1 + t * y, ?_, ?_⟩
     · apply Valuation.map_one_add_of_lt
       rw [map_mul]
-      calc w t * w y ≤ w t * 1 := mul_le_mul' le_rfl hy1
+      calc
+        w t * w y
+          ≤ w t * 1 := mul_le_mul' le_rfl hy1
         _ = w t := mul_one _
         _ < 1 := ht1
-    · have e : δ * (1 + t * y) ^ 2 - 1
-          = -(t ^ 2 * (-x - y ^ 2)) + 2 * t * y + (δ - 1) * (2 * t * y + t ^ 2 * y ^ 2) := by
+    · have e
+          : δ * (1 + t * y) ^ 2 - 1
+            = -(t ^ 2 * (-x - y ^ 2)) + 2 * t * y + (δ - 1) * (2 * t * y + t ^ 2 * y ^ 2) := by
         linear_combination (-1 : K) * hx
       rw [e]
       have hA : w (-(t ^ 2 * (-x - y ^ 2))) < g := by
         rw [Valuation.map_neg, map_mul, map_pow, sq, htt]
-        calc g * w (-x - y ^ 2) < g * 1 := mul_lt_mul_of_pos_left hy hgpos
+        calc
+          g * w (-x - y ^ 2)
+            < g * 1 := mul_lt_mul_of_pos_left hy hgpos
           _ = g := mul_one g
       have hB : w (2 * t * y) < g := by
         rw [map_mul, map_mul, ← htt]
-        calc w 2 * w t * w y ≤ w 2 * w t * 1 := mul_le_mul' le_rfl hy1
+        calc
+          w 2 * w t * w y
+            ≤ w 2 * w t * 1 := mul_le_mul' le_rfl hy1
           _ = w 2 * w t := mul_one _
           _ < w t * w t := mul_lt_mul_of_pos_right h2t hwtpos
       have hC : w ((δ - 1) * (2 * t * y + t ^ 2 * y ^ 2)) < g := by
@@ -94,11 +103,15 @@ theorem exists_unit_mul_sq_sub_one_lt :
           apply Valuation.map_add_lt
           · exact hB.trans hg1
           · rw [map_mul, map_pow w t, map_pow w y, sq (w t), htt]
-            calc g * w y ^ 2 ≤ g * 1 := mul_le_mul' le_rfl (pow_le_one₀ zero_le' hy1)
+            calc
+              g * w y ^ 2
+                ≤ g * 1 := mul_le_mul' le_rfl (pow_le_one₀ zero_le' hy1)
               _ = g := mul_one g
               _ < 1 := hg1
         rw [map_mul, ← hg]
-        calc g * w (2 * t * y + t ^ 2 * y ^ 2) < g * 1 := mul_lt_mul_of_pos_left hD hgpos
+        calc
+          g * w (2 * t * y + t ^ 2 * y ^ 2)
+            < g * 1 := mul_lt_mul_of_pos_left hD hgpos
           _ = g := mul_one g
       exact Valuation.map_add_lt _ (Valuation.map_add_lt _ hA hB) hC
 

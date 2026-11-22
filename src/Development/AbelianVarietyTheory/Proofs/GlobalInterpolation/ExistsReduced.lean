@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CmBase
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric GlobalTheory.Glob.IntegralWittCoefficients GlobalTheory.IndefiniteRowSideFullHecke
+open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric
+  GlobalTheory.Glob.IntegralWittCoefficients GlobalTheory.IndefiniteRowSideFullHecke
 
 noncomputable section
 
@@ -17,18 +18,23 @@ namespace GlobalTheory.IdealLattice
 
 open scoped MatrixGroups UpperHalfPlane
 
-theorem wK_mul_mem (D : D7) (c : Ideal (𝓞 D.host.K)) (x : ℂ) :
-    ∀ z ∈ lamOf D c x, ((1 + Complex.I * (Real.sqrt D.host.d : ℂ)) / 2) * z ∈ lamOf D c x := by
+theorem wK_mul_mem (D : D7) (c : Ideal (𝓞 D.host.K)) (x : ℂ)
+    : ∀ z ∈ lamOf D c x, ((1 + Complex.I * (Real.sqrt D.host.d : ℂ)) / 2) * z ∈ lamOf D c x := by
   intro z hz
-  obtain ⟨o, ho⟩ := (GlobalTheory.MomDict.inOK_iff D ((1 + Complex.I * (Real.sqrt D.host.d : ℂ)) / 2)).1
-    ⟨0, 1, by simp [GlobalTheory.MomOne.wK]⟩
+  obtain ⟨o, ho⟩ :=
+    (GlobalTheory.MomDict.inOK_iff D ((1 + Complex.I * (Real.sqrt D.host.d : ℂ)) / 2)).1
+      ⟨0, 1, by simp [GlobalTheory.MomOne.wK]⟩
   obtain ⟨a, ha, rfl⟩ := (GlobalTheory.CurveLattice.mem_lamOf D c x z).1 hz
   refine (GlobalTheory.CurveLattice.mem_lamOf D c x _).2 ⟨o * a, c.mul_mem_left o ha, ?_⟩
-  rw [ho]; simp; ring
+  rw [ho]
+  simp
+  ring
 
-theorem exists_reduced {Λ : AddSubgroup ℂ} {b : ℂ} {τ₀ : ℍ} (hb : b ≠ 0)
-    (h : ∀ z, z ∈ Λ ↔ ∃ m n : ℤ, b * (m * (τ₀ : ℂ) + n) = z) :
-    ∃ ω₁ : ℂ, ∃ τ : ℍ, ω₁ ≠ 0 ∧ τ ∈ ModularGroup.fd ∧ JacobiThetaHalfCharacteristic.IsPeriodLattice Λ ω₁ τ := by
+theorem exists_reduced
+    {Λ : AddSubgroup ℂ} {b : ℂ} {τ₀ : ℍ}
+    (hb : b ≠ 0) (h : ∀ z, z ∈ Λ ↔ ∃ m n : ℤ, b * (m * (τ₀ : ℂ) + n) = z)
+    : ∃ ω₁ : ℂ, ∃ τ : ℍ,
+      ω₁ ≠ 0 ∧ τ ∈ ModularGroup.fd ∧ JacobiThetaHalfCharacteristic.IsPeriodLattice Λ ω₁ τ := by
   obtain ⟨g, hg⟩ := ModularGroup.exists_smul_mem_fd τ₀
   set A : ℤ := g 0 0 with hA
   set B : ℤ := g 0 1 with hB
@@ -49,8 +55,10 @@ theorem exists_reduced {Λ : AddSubgroup ℂ} {b : ℂ} {τ₀ : ℍ} (hb : b �
     simp at this
   refine ⟨b * (C * τ₀ + E), g • τ₀, mul_ne_zero hb hden, hg, fun z => ?_⟩
   rw [h, hco]
-  have key : ∀ m n : ℂ, (C * (τ₀ : ℂ) + E) * (m + n * ((A * τ₀ + B) / (C * τ₀ + E))) =
-      m * (C * τ₀ + E) + n * (A * τ₀ + B) := fun m n => by
+  have key
+      : ∀ m n : ℂ,
+        (C * (τ₀ : ℂ) + E) * (m + n * ((A * τ₀ + B) / (C * τ₀ + E)))
+          = m * (C * τ₀ + E) + n * (A * τ₀ + B) := fun m n => by
     field_simp
   constructor
   · rintro ⟨M, N, rfl⟩
@@ -64,16 +72,22 @@ theorem exists_reduced {Λ : AddSubgroup ℂ} {b : ℂ} {τ₀ : ℍ} (hb : b �
     push_cast
     ring
 
-theorem main : ∀ (D : D7) (c : Ideal (𝓞 D.host.K)), c ≠ ⊥ → ∀ x : ℂ, x ≠ 0 →
-    (∀ z ∈ lamOf D c x, ((1 + Complex.I * (Real.sqrt D.host.d : ℂ)) / 2) * z ∈ lamOf D c x) ∧
-    ∃ ω₁ τ : ℂ, ω₁ ≠ 0 ∧ 0 < τ.im ∧ JacobiThetaHalfCharacteristic.IsPeriodLattice (lamOf D c x) ω₁ τ ∧
-      1 / 2 ≤ τ.im ∧ 2 * τ.im ≤ Real.sqrt D.host.d := by
+theorem main
+    : ∀ (D : D7) (c : Ideal (𝓞 D.host.K)),
+      c ≠ ⊥
+        → ∀ x : ℂ,
+          x ≠ 0
+            → (∀ z ∈ lamOf D c x,
+                ((1 + Complex.I * (Real.sqrt D.host.d : ℂ)) / 2) * z ∈ lamOf D c x)
+              ∧ ∃ ω₁ τ : ℂ,
+                ω₁ ≠ 0 ∧ 0 < τ.im ∧ JacobiThetaHalfCharacteristic.IsPeriodLattice (lamOf D c x) ω₁ τ
+                  ∧ 1 / 2 ≤ τ.im ∧ 2 * τ.im ≤ Real.sqrt D.host.d := by
   intro D c hc x hx
   have hst := wK_mul_mem D c x
   refine ⟨hst, ?_⟩
   obtain ⟨a, τ₀, ha, -, hlat⟩ := GlobalTheory.CurveLattice.exists_tau D c hc
-  obtain ⟨ω₁, τ, hω, hfd, hper⟩ := exists_reduced (Λ := lamOf D c x) (b := x * a) (τ₀ := τ₀)
-    (mul_ne_zero hx ha) (hlat x)
+  obtain ⟨ω₁, τ, hω, hfd, hper⟩ :=
+    exists_reduced (Λ := lamOf D c x) (b := x * a) (τ₀ := τ₀) (mul_ne_zero hx ha) (hlat x)
   have him : 0 < (τ : ℂ).im := τ.im_pos
   have him' : 0 < τ.im := τ.im_pos
   have hci : (τ : ℂ).im = τ.im := rfl

@@ -9,15 +9,14 @@ namespace PI.UnitaryGroupMassFormula.ScGapBig
 
 open PI.ScGapBig
 
-theorem nat_bound (n m t : ℕ) (hn : 1801 ≤ n) (hm : m ≤ n + 1) (ht : t ≤ n + 6) :
-    2 * (n + m * t) ^ 3 + t + 3 < 16 * n ^ 19 := by
+theorem nat_bound (n m t : ℕ) (hn : 1801 ≤ n) (hm : m ≤ n + 1) (ht : t ≤ n + 6)
+    : 2 * (n + m * t) ^ 3 + t + 3 < 16 * n ^ 19 := by
   have hmt : m * t ≤ (n + 1) * (n + 6) := Nat.mul_le_mul hm ht
   have hsq : 1801 * n ≤ n * n := Nat.mul_le_mul_right n hn
   have h1 : n + m * t ≤ 2 * n ^ 2 := by nlinarith
   have h2 : (n + m * t) ^ 3 ≤ (2 * n ^ 2) ^ 3 := Nat.pow_le_pow_left h1 3
   have h3 : (2 * n ^ 2) ^ 3 = 8 * n ^ 6 := by ring
-  have h4 : 2 ≤ n ^ 13 :=
-    le_trans (by norm_num) (Nat.pow_le_pow_left (show 2 ≤ n by omega) 13)
+  have h4 : 2 ≤ n ^ 13 := le_trans (by norm_num) (Nat.pow_le_pow_left (show 2 ≤ n by omega) 13)
   have h5 : n ^ 19 = n ^ 6 * n ^ 13 := by ring
   have h6 : n ^ 6 * 2 ≤ n ^ 6 * n ^ 13 := Nat.mul_le_mul_left _ h4
   have h7 : n ≤ n ^ 6 := Nat.le_self_pow (by norm_num) n
@@ -34,8 +33,9 @@ theorem scGapBig_main : ScGapBig := by
   intro j hj
   have hm : 2 * r + 2 ≤ rk48 k r + 1 := by omega
   have hb := nat_bound (rk48 k r) (2 * r + 2) t hn hm ht2
-  have hcast : 2 * ((rk48 k r + (2 * r + 2) * t : ℕ) : ℝ) ^ 3 + (t : ℝ) + 3 <
-      16 * (rk48 k r : ℝ) ^ 19 := by
+  have hcast
+      : 2 * ((rk48 k r + (2 * r + 2) * t : ℕ) : ℝ) ^ 3 + (t : ℝ) + 3
+        < 16 * (rk48 k r : ℝ) ^ 19 := by
     exact_mod_cast hb
   linarith [hgap j hj]
 

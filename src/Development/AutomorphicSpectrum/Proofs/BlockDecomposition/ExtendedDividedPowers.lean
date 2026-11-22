@@ -9,7 +9,9 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 set_option autoImplicit false
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 
 namespace GlobalTheory.CompanionTheory.PDMap
 
@@ -37,8 +39,12 @@ theorem fil_mul_le (δ : DividedPowers J) (m n : ℕ) : fil δ m * fil δ n ≤ 
   · simpa using Nat.add_le_add h2 h2'
   · simp
 
-theorem map_fil_le' {C : Type} [CommRing C] {J' : Ideal C} (δ : DividedPowers J) (δ' : DividedPowers J')
-    (f : B →+* C) (hf : IsDPMorphism δ δ' f) (N : ℕ) : (fil δ N).map f ≤ fil δ' N := by
+theorem map_fil_le'
+    {C : Type} [CommRing C]
+    {J' : Ideal C}
+    (δ : DividedPowers J) (δ' : DividedPowers J') (f : B →+* C) (hf : IsDPMorphism δ δ' f)
+    (N : ℕ)
+    : (fil δ N).map f ≤ fil δ' N := by
   rw [Ideal.map_le_iff_le_comap, fil, Ideal.span_le]
   rintro _ ⟨l, h1, h2, rfl⟩
   have hJ : ∀ p ∈ l, f p.2 ∈ J' := fun p hp ↦ hf.ideal_comp (Ideal.mem_map_of_mem f (h1 p hp))
@@ -52,11 +58,14 @@ theorem map_fil_le' {C : Type} [CommRing C] {J' : Ideal C} (δ : DividedPowers J
     simp only [Function.comp_apply]
     exact (hf.dpow_comp (n := p.1) p.2 (h1 p hp)).symm
 
-theorem fil_le_map {C : Type} [CommRing C] (δ : DividedPowers J) (f : B →+* C)
-    (δ' : DividedPowers (J.map f)) (hf : IsDPMorphism δ δ' f) (N : ℕ) :
-    fil δ' N ≤ (fil δ N).map f := by
-  have hmul : ∀ {m n : ℕ} {a b : C}, a ∈ (fil δ m).map f → b ∈ (fil δ n).map f →
-      a * b ∈ (fil δ (m + n)).map f := by
+theorem fil_le_map
+    {C : Type} [CommRing C]
+    (δ : DividedPowers J) (f : B →+* C) (δ' : DividedPowers (J.map f)) (hf : IsDPMorphism δ δ' f)
+    (N : ℕ)
+    : fil δ' N ≤ (fil δ N).map f := by
+  have hmul
+      : ∀ {m n : ℕ} {a b : C},
+        a ∈ (fil δ m).map f → b ∈ (fil δ n).map f → a * b ∈ (fil δ (m + n)).map f := by
     intro m n a b ha hb
     have : (fil δ m).map f * (fil δ n).map f ≤ (fil δ (m + n)).map f := by
       rw [← Ideal.map_mul]
@@ -92,8 +101,10 @@ theorem fil_le_map {C : Type} [CommRing C] (δ : DividedPowers J) (f : B →+* C
       intro n
       rw [smul_eq_mul, δ'.dpow_mul hx]
       exact Ideal.mul_mem_left _ _ (ih n)
-  have hprod : ∀ l : List (ℕ × C), (∀ p ∈ l, p.2 ∈ J.map f) →
-      (l.map fun p ↦ δ'.dpow p.1 p.2).prod ∈ (fil δ (l.map Prod.fst).sum).map f := by
+  have hprod
+      : ∀ l : List (ℕ × C),
+        (∀ p ∈ l, p.2 ∈ J.map f)
+          → (l.map fun p ↦ δ'.dpow p.1 p.2).prod ∈ (fil δ (l.map Prod.fst).sum).map f := by
     intro l hl
     induction l with
     | nil => exact hzero _
@@ -104,7 +115,14 @@ theorem fil_le_map {C : Type} [CommRing C] (δ : DividedPowers J) (f : B →+* C
   rintro _ ⟨l, h1, h2, rfl⟩
   exact Ideal.map_mono (fil_anti δ h2) (hprod l h1)
 
-theorem extended_dividedPowers : ∀ {B B' : Type} [CommRing B] [CommRing B'] {J : Ideal B} (δ : DividedPowers J) (φ : B →+* B') (δ' : DividedPowers (J.map φ)), IsDPMorphism δ δ' φ → (∀ r, fil δ' r = (fil δ r).map φ) ∧ ∀ {B'' : Type} [CommRing B''] {J'' : Ideal B''} (δ'' : DividedPowers J'') (ψ : B' →+* B''), IsDPMorphism δ δ'' (ψ.comp φ) → IsDPMorphism δ' δ'' ψ := by
+theorem extended_dividedPowers
+    : ∀ {B B' : Type} [CommRing B] [CommRing B'] {J : Ideal B} (δ : DividedPowers J) (φ : B →+* B')
+        (δ' : DividedPowers (J.map φ)),
+      IsDPMorphism δ δ' φ
+        → (∀ r, fil δ' r = (fil δ r).map φ)
+          ∧ ∀ {B'' : Type} [CommRing B''] {J'' : Ideal B''} (δ'' : DividedPowers J'')
+              (ψ : B' →+* B''),
+            IsDPMorphism δ δ'' (ψ.comp φ) → IsDPMorphism δ' δ'' ψ := by
   intro B B' _ _ J δ φ δ' hφ
   refine ⟨fun r ↦ le_antisymm (fil_le_map δ φ δ' hφ r) (map_fil_le' δ δ' φ hφ r), ?_⟩
   intro B'' _ J'' δ'' ψ hψ

@@ -7,25 +7,42 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Abe
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.AbCoh
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AbCoh
 
-theorem baseChange_middle_equiv_of_exact : ∀ (R R' : Type) [CommRing R] [CommRing R'] [Algebra R R'] (W M H : Type) [AddCommGroup W] [Module R W] [AddCommGroup M] [Module R M] [AddCommGroup H] [Module R H] (W' M' H' : Type) [AddCommGroup W'] [Module R' W'] [AddCommGroup M'] [Module R' M'] [AddCommGroup H'] [Module R' H'] (i : W →ₗ[R] M) (p : M →ₗ[R] H) (i' : W' →ₗ[R'] M') (p' : M' →ₗ[R'] H') (a : W →ₛₗ[algebraMap R R'] W') (b : M →ₛₗ[algebraMap R R'] M') (c : H →ₛₗ[algebraMap R R'] H'), Function.Surjective p → Function.Exact i p → Function.Injective i' → Function.Exact i' p' → (∀ x, b (i x) = i' (a x)) → (∀ x, p' (b x) = c (p x)) → (∃ e : R' ⊗[R] W ≃ₗ[R'] W', ∀ x, e (1 ⊗ₜ x) = a x) → (∃ e : R' ⊗[R] H ≃ₗ[R'] H', ∀ x, e (1 ⊗ₜ x) = c x) → ∃ e : R' ⊗[R] M ≃ₗ[R'] M', ∀ x, e (1 ⊗ₜ x) = b x := by
-  intro R R' _ _ _ W M H _ _ _ _ _ _ W' M' H' _ _ _ _ _ _ i p i' p' a b c hp hip hi' hip' hb hc hW hH
+theorem baseChange_middle_equiv_of_exact
+    : ∀ (R R' : Type) [CommRing R] [CommRing R'] [Algebra R R'] (W M H : Type) [AddCommGroup W]
+        [Module R W] [AddCommGroup M] [Module R M] [AddCommGroup H] [Module R H] (W' M' H' : Type)
+        [AddCommGroup W'] [Module R' W'] [AddCommGroup M'] [Module R' M'] [AddCommGroup H']
+        [Module R' H'] (i : W →ₗ[R] M) (p : M →ₗ[R] H) (i' : W' →ₗ[R'] M') (p' : M' →ₗ[R'] H')
+        (a : W →ₛₗ[algebraMap R R'] W') (b : M →ₛₗ[algebraMap R R'] M')
+        (c : H →ₛₗ[algebraMap R R'] H'),
+      Function.Surjective p → Function.Exact i p → Function.Injective i' → Function.Exact i' p'
+        → (∀ x, b (i x) = i' (a x)) → (∀ x, p' (b x) = c (p x))
+        → (∃ e : R' ⊗[R] W ≃ₗ[R'] W', ∀ x, e (1 ⊗ₜ x) = a x)
+        → (∃ e : R' ⊗[R] H ≃ₗ[R'] H', ∀ x, e (1 ⊗ₜ x) = c x)
+        → ∃ e : R' ⊗[R] M ≃ₗ[R'] M', ∀ x, e (1 ⊗ₜ x) = b x := by
+  intro R R' _ _ _ W M H _ _ _ _ _ _ W' M' H' _ _ _ _ _ _ i p i' p' a b c hp hip hi' hip' hb hc hW
+    hH
   obtain ⟨eW, heW⟩ := hW
   obtain ⟨eH, heH⟩ := hH
   letI : Module R M' := Module.compHom M' (algebraMap R R')
   haveI : IsScalarTower R R' M' := ⟨fun r s x => by
     show (r • s) • x = algebraMap R R' r • s • x
     rw [Algebra.smul_def, mul_smul]⟩
-  let b' : M →ₗ[R] M' :=
-    { toFun := b, map_add' := b.map_add, map_smul' := fun r m => b.map_smulₛₗ r m }
+  let b' : M →ₗ[R] M' := {
+    toFun := b
+    map_add' := b.map_add
+    map_smul' := fun r m => b.map_smulₛₗ r m
+  }
   let f : R' ⊗[R] M →ₗ[R'] M' := b'.liftBaseChange R'
-  have hf1 : ∀ x, f (1 ⊗ₜ x) = b x := by
-    intro x; simp [f, b']
+  have hf1 : ∀ x, f (1 ⊗ₜ x) = b x := by intro x; simp [f, b']
   have hfp : ∀ s, p' (f s) = eH (LinearMap.baseChange R' p s) := by
     intro s
     induction s using TensorProduct.induction_on with
@@ -33,7 +50,8 @@ theorem baseChange_middle_equiv_of_exact : ∀ (R R' : Type) [CommRing R] [CommR
     | tmul r m =>
       have h1 : (r ⊗ₜ[R] m : R' ⊗[R] M) = r • (1 ⊗ₜ m) := by
         rw [TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
-      rw [h1]; simp only [map_smul, hf1, LinearMap.baseChange_tmul, heH, hc]
+      rw [h1]
+      simp only [map_smul, hf1, LinearMap.baseChange_tmul, heH, hc]
     | add x y hx hy => simp only [map_add (f := _), hx, hy]
   have hfi : ∀ u, f (LinearMap.baseChange R' i u) = i' (eW u) := by
     intro u
@@ -42,7 +60,8 @@ theorem baseChange_middle_equiv_of_exact : ∀ (R R' : Type) [CommRing R] [CommR
     | tmul r w =>
       have h1 : (r ⊗ₜ[R] w : R' ⊗[R] W) = r • (1 ⊗ₜ w) := by
         rw [TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
-      rw [h1]; simp only [map_smul, hf1, LinearMap.baseChange_tmul, heW, hb]
+      rw [h1]
+      simp only [map_smul, hf1, LinearMap.baseChange_tmul, heW, hb]
     | add x y hx hy => simp only [map_add (f := _), hx, hy]
   have hex : Function.Exact (LinearMap.baseChange R' i) (LinearMap.baseChange R' p) := by
     rw [LinearMap.baseChange_eq_ltensor, LinearMap.baseChange_eq_ltensor]
@@ -63,8 +82,7 @@ theorem baseChange_middle_equiv_of_exact : ∀ (R R' : Type) [CommRing R] [CommR
   have hsur : Function.Surjective f := by
     intro m'
     obtain ⟨s, hs⟩ := hsurj (eH.symm (p' m'))
-    have h0 : p' (m' - f s) = 0 := by
-      rw [map_sub, hfp, hs, LinearEquiv.apply_symm_apply, sub_self]
+    have h0 : p' (m' - f s) = 0 := by rw [map_sub, hfp, hs, LinearEquiv.apply_symm_apply, sub_self]
     obtain ⟨w', hw'⟩ := (hip' _).1 h0
     refine ⟨s + LinearMap.baseChange R' i (eW.symm w'), ?_⟩
     rw [map_add (f := _), hfi, LinearEquiv.apply_symm_apply, hw', add_sub_cancel]

@@ -34,11 +34,12 @@ instance isMulCommutative_maxAbelian : IsMulCommutative Gal(maxAbelian K M/K) :=
 
 instance isAbelianGalois_maxAbelian : IsAbelianGalois K (maxAbelian K M) where
 
-theorem finrank_maxAbelian :
-    Module.finrank K (maxAbelian K M) = Nat.card (Group.Abelianization Gal(M/K)) := by
+theorem finrank_maxAbelian
+    : Module.finrank K (maxAbelian K M) = Nat.card (Group.Abelianization Gal(M/K)) := by
   have h1 := Module.finrank_mul_finrank K (maxAbelian K M) M
   rw [maxAbelian, finrank_fixedField_eq_card, ← IsGalois.card_aut_eq_finrank K M,
-    ← (commutator Gal(M/K)).card_mul_index] at h1
+      ← (commutator Gal(M/K)).card_mul_index]
+    at h1
   have hpos : 0 < Nat.card (commutator Gal(M/K)) := Nat.card_pos
   rw [mul_comm] at h1
   exact Nat.eq_of_mul_eq_mul_left hpos h1
@@ -49,19 +50,23 @@ namespace IdeleClassLimit
 
 open FiniteSubfield GroundTheory.LocalField.Abstract
 
-variable (K L : FiniteSubfield) [hKL : Fact (K ≤ L)]
-  [(L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup).Normal]
+variable
+  (K L : FiniteSubfield)
+  [hKL : Fact (K ≤ L)] [(L.1.fixingSubgroup.subgroupOf K.1.fixingSubgroup).Normal]
 
-theorem ker_abstractSymbol_le :
-    (abstractSymbol K L).ker ≤ (FiniteSubfield.ideleClassNorm hKL.out).range := by
+theorem ker_abstractSymbol_le
+    : (abstractSymbol K L).ker ≤ (FiniteSubfield.ideleClassNorm hKL.out).range := by
   intro c hc
   rw [MonoidHom.mem_ker, abstractSymbol_apply] at hc
   have hinj : Function.Injective (Group.Abelianization.map (quotientGaloisEquiv K L).toMonoidHom) :=
     fun a b hab ↦ (quotientGaloisEquiv K L).abelianizationCongr.injective hab
   rw [← map_one (Group.Abelianization.map (quotientGaloisEquiv K L).toMonoidHom), hinj.eq_iff,
-    ← map_one (reciprocityEquiv K L).symm, (reciprocityEquiv K L).symm.injective.eq_iff] at hc
+      ← map_one (reciprocityEquiv K L).symm, (reciprocityEquiv K L).symm.injective.eq_iff]
+    at hc
   change (QuotientGroup.mk (fixedEquiv K c) : tateZero IdeleClassLimit
-    (K.openSubgroup : Subgroup (AlgebraicClosure ℚ ≃ₐ[ℚ] AlgebraicClosure ℚ)) L.openSubgroup) = 1 at hc
+        (K.openSubgroup : Subgroup (AlgebraicClosure ℚ ≃ₐ[ℚ] AlgebraicClosure ℚ)) L.openSubgroup)
+      = 1
+    at hc
   rw [QuotientGroup.eq_one_iff] at hc
   obtain ⟨b, hb⟩ := hc
   obtain ⟨d, rfl⟩ := (fixedEquiv L).surjective b
@@ -69,9 +74,9 @@ theorem ker_abstractSymbol_le :
   rw [← norm_fixedEquiv hKL.out d]
   exact hb
 
-theorem index_range_ideleClassNorm_dvd :
-    (FiniteSubfield.ideleClassNorm hKL.out).range.index ∣
-      Nat.card (Group.Abelianization (L.1 ≃ₐ[K.1] L.1)) := by
+theorem index_range_ideleClassNorm_dvd
+    : (FiniteSubfield.ideleClassNorm hKL.out).range.index
+      ∣ Nat.card (Group.Abelianization (L.1 ≃ₐ[K.1] L.1)) := by
   refine (Subgroup.index_dvd_of_le (ker_abstractSymbol_le K L)).trans ?_
   rw [Subgroup.index_ker]
   exact Subgroup.card_subgroup_dvd_card (abstractSymbol K L).range
@@ -80,9 +85,9 @@ end IdeleClassLimit
 
 section Transport
 
-theorem index_range_ideleClassNorm_dvd_card_abelianization {K M : Type*} [Field K] [NumberField K]
-    [Field M] [NumberField M] [Algebra K M] [IsGalois K M] :
-    (ideleClassNorm K M).range.index ∣ Nat.card (Group.Abelianization Gal(M/K)) := by
+theorem index_range_ideleClassNorm_dvd_card_abelianization
+    {K M : Type*} [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M] [IsGalois K M]
+    : (ideleClassNorm K M).range.index ∣ Nat.card (Group.Abelianization Gal(M/K)) := by
   let K' := baseField K M
   let M' := topField M
   let _ : Algebra K K'.1 := (rangeMap (baseEmbedding K M)).toAlgebra
@@ -97,8 +102,9 @@ theorem index_range_ideleClassNorm_dvd_card_abelianization {K M : Type*} [Field 
   have : IsGalois K'.1 M'.1 := IsGalois.tower_top_of_isGalois K K'.1 M'.1
   have := FiniteSubfield.normal_subgroupOf_of_isGalois (F := K') (E := M')
   have h1 := IdeleClassLimit.index_range_ideleClassNorm_dvd K' M'
-  have hrange : (ideleClassNorm K M).range =
-      (ideleClassNorm K'.1 M'.1).range.map (ideleClassNorm K K'.1) := by
+  have hrange
+      : (ideleClassNorm K M).range
+        = (ideleClassNorm K'.1 M'.1).range.map (ideleClassNorm K K'.1) := by
     ext c
     constructor
     · rintro ⟨d, rfl⟩
@@ -106,13 +112,17 @@ theorem index_range_ideleClassNorm_dvd_card_abelianization {K M : Type*} [Field 
       rw [ideleClassNorm_ideleClassNorm, ← ideleClassNorm_ideleClassNorm (L := M),
         ideleClassNorm_ideleClassMap, finrank_eq_one_of_bijective hM, pow_one]
     · rintro ⟨_, ⟨d, rfl⟩, rfl⟩
-      exact ⟨ideleClassNorm M M'.1 d, by
-        rw [ideleClassNorm_ideleClassNorm, ideleClassNorm_ideleClassNorm]⟩
-  have hsurj : Function.Surjective (ideleClassNorm K K'.1) := fun c ↦
-    ⟨ideleClassMap K K'.1 c, by
-      rw [ideleClassNorm_ideleClassMap, finrank_eq_one_of_bijective hK, pow_one]⟩
-  have hcard : Nat.card (Group.Abelianization Gal(M'.1/K'.1)) =
-      Nat.card (Group.Abelianization Gal(M/K)) := by
+      exact ⟨
+        ideleClassNorm M M'.1 d,
+        by rw [ideleClassNorm_ideleClassNorm, ideleClassNorm_ideleClassNorm]
+      ⟩
+  have hsurj : Function.Surjective (ideleClassNorm K K'.1) := fun c ↦ ⟨
+    ideleClassMap K K'.1 c,
+    by rw [ideleClassNorm_ideleClassMap, finrank_eq_one_of_bijective hK, pow_one]
+  ⟩
+  have hcard
+      : Nat.card (Group.Abelianization Gal(M'.1/K'.1))
+        = Nat.card (Group.Abelianization Gal(M/K)) := by
     let f : Gal(M'.1/K'.1) →* Gal(M/K) :=
       (AlgEquiv.restrictNormalHom (F := K) (K₁ := M'.1) M).comp (restrictScalarsHom K)
     have hinj : Function.Injective f := by
@@ -133,16 +143,17 @@ theorem index_range_ideleClassNorm_dvd_card_abelianization {K M : Type*} [Field 
 
 universe u
 
-variable {K M : Type u} [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
-  [IsGalois K M]
+variable
+  {K M : Type u} [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M] [IsGalois K M]
 
-theorem range_ideleClassNorm_maxAbelian :
-    (ideleClassNorm K (maxAbelian K M)).range = (ideleClassNorm K M).range := by
+theorem range_ideleClassNorm_maxAbelian
+    : (ideleClassNorm K (maxAbelian K M)).range = (ideleClassNorm K M).range := by
   have hle : (ideleClassNorm K M).range ≤ (ideleClassNorm K (maxAbelian K M)).range := by
     rintro _ ⟨c, rfl⟩
     exact ⟨ideleClassNorm (maxAbelian K M) M c, ideleClassNorm_ideleClassNorm c⟩
-  have hE : (ideleClassNorm K (maxAbelian K M)).range.index =
-      Nat.card (Group.Abelianization Gal(M/K)) := by
+  have hE
+      : (ideleClassNorm K (maxAbelian K M)).range.index
+        = Nat.card (Group.Abelianization Gal(M/K)) := by
     rw [index_range_ideleClassNorm_eq_finrank_of_isMulCommutative, finrank_maxAbelian]
   have hne : (ideleClassNorm K (maxAbelian K M)).range.index ≠ 0 := by
     rw [index_range_ideleClassNorm_eq_finrank_of_isMulCommutative]
@@ -157,11 +168,10 @@ theorem range_ideleClassNorm_maxAbelian :
     exact this
   exact le_antisymm (Subgroup.relIndex_eq_one.1 h1) hle
 
-
 omit [IsGalois K M] in
-theorem exists_isAbelianGalois_range_ideleClassNorm_le (L : Type u) [Field L] [NumberField L]
-    [Algebra K L] :
-    ∃ (E : Type u) (_ : Field E) (_ : NumberField E) (_ : Algebra K E),
+theorem exists_isAbelianGalois_range_ideleClassNorm_le
+    (L : Type u) [Field L] [NumberField L] [Algebra K L]
+    : ∃ (E : Type u) (_ : Field E) (_ : NumberField E) (_ : Algebra K E),
       IsAbelianGalois K E ∧ (ideleClassNorm K E).range ≤ (ideleClassNorm K L).range := by
   let Ω := AlgebraicClosure L
   have : Algebra.IsAlgebraic K Ω := Algebra.IsAlgebraic.trans K L Ω

@@ -13,11 +13,12 @@ open scoped ENNReal NNReal Pointwise
 
 section LHU
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
 
-theorem lhu_right (m : Measure G) [m.IsHaarMeasure] (z : G) :
-    ∃ r : ℝ≥0∞, ∀ B : Set G, MeasurableSet B → m {x | x * z ∈ B} = r * m B := by
+theorem lhu_right (m : Measure G) [m.IsHaarMeasure] (z : G)
+    : ∃ r : ℝ≥0∞, ∀ B : Set G, MeasurableSet B → m {x | x * z ∈ B} = r * m B := by
   have hmeas : Measurable (fun x : G => x * z) := measurable_mul_const z
   haveI : (m.map (fun x : G => x * z)).IsMulLeftInvariant := ⟨fun g => by
     rw [Measure.map_map (measurable_const_mul g) hmeas]
@@ -33,12 +34,13 @@ theorem lhu_right (m : Measure G) [m.IsHaarMeasure] (z : G) :
   show m ((fun x : G => x * z) ⁻¹' B) = _
   rw [← Measure.map_apply hmeas hB, hc, Measure.coe_nnreal_smul_apply]
 
-theorem lhu_key (m : Measure G) [m.IsHaarMeasure] (β : Measure G) (W V : Set G)
-    (hinv : ∀ (h : G) (S : Set G), MeasurableSet S → S ⊆ W → (fun g => h * g) '' S ⊆ W →
-      β ((fun g => h * g) '' S) = β S)
-    (hVc : IsCompact V) (hVW : V ⊆ W) (hVW' : ∀ v ∈ V, v⁻¹ ∈ W) (hβV : β V ≠ ⊤) (hβVi : β V⁻¹ ≠ ⊤) :
-    ∃ K : ℝ≥0∞, ∀ B : Set G, MeasurableSet B → B ⊆ V → m V * β B = K * m B := by
-
+theorem lhu_key
+    (m : Measure G) [m.IsHaarMeasure]
+    (β : Measure G) (W V : Set G)
+    (hinv : ∀ (h : G) (S : Set G),
+      MeasurableSet S → S ⊆ W → (fun g => h * g) '' S ⊆ W → β ((fun g => h * g) '' S) = β S)
+    (hVc : IsCompact V) (hVW : V ⊆ W) (hVW' : ∀ v ∈ V, v⁻¹ ∈ W) (hβV : β V ≠ ⊤) (hβVi : β V⁻¹ ≠ ⊤)
+    : ∃ K : ℝ≥0∞, ∀ B : Set G, MeasurableSet B → B ⊆ V → m V * β B = K * m B := by
   have hVm : MeasurableSet V := hVc.isClosed.measurableSet
   have hVim : MeasurableSet V⁻¹ := hVc.inv.isClosed.measurableSet
   have hViW : V⁻¹ ⊆ W := fun x hx => by simpa using hVW' x⁻¹ hx
@@ -53,21 +55,25 @@ theorem lhu_key (m : Measure G) [m.IsHaarMeasure] (β : Measure G) (W V : Set G)
   have hE : MeasurableSet {p : G × G | p.2 * p.1 ∈ B} := (measurable_snd.mul measurable_fst) hB
   have hF : MeasurableSet {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹} :=
     (measurable_snd.inv.mul measurable_fst) hVim
-  have ha : ((β.restrict V⁻¹).prod m) {p : G × G | p.2 * p.1 ∈ B}
-      = (∫⁻ x in V⁻¹, r x ∂β) * m B := by
+  have ha
+      : ((β.restrict V⁻¹).prod m) {p : G × G | p.2 * p.1 ∈ B} = (∫⁻ x in V⁻¹, r x ∂β) * m B := by
     rw [Measure.prod_apply hE]
-    calc _ = ∫⁻ x, r x * m B ∂(β.restrict V⁻¹) := lintegral_congr (fun x => hr x B hB)
+    calc
+      _ = ∫⁻ x, r x * m B ∂(β.restrict V⁻¹) := lintegral_congr (fun x => hr x B hB)
       _ = (∫⁻ x in V⁻¹, r x ∂β) * m B := lintegral_mul_const' _ _ hmB
-  have h1 : ∀ t : G, (β.restrict V⁻¹) ((fun x => (x, t)) ⁻¹' {p : G × G | p.2 * p.1 ∈ B})
-      = (β.restrict B) ((fun y => (y, t)) ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹}) := by
+  have h1
+      : ∀ t : G,
+        (β.restrict V⁻¹) ((fun x => (x, t)) ⁻¹' {p : G × G | p.2 * p.1 ∈ B})
+          = (β.restrict B) ((fun y => (y, t)) ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹}) := by
     intro t
     have hS : MeasurableSet ((fun x => (x, t)) ⁻¹' {p : G × G | p.2 * p.1 ∈ B}) :=
       measurable_const_mul t hB
     have hT : MeasurableSet ((fun y => (y, t)) ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹}) :=
       measurable_const_mul t⁻¹ hVim
     rw [Measure.restrict_apply hS, Measure.restrict_apply hT]
-    have himg : (fun g => t * g) '' ((fun x => (x, t)) ⁻¹' {p : G × G | p.2 * p.1 ∈ B} ∩ V⁻¹)
-        = (fun y => (y, t)) ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹} ∩ B := by
+    have himg
+        : (fun g => t * g) '' ((fun x => (x, t)) ⁻¹' {p : G × G | p.2 * p.1 ∈ B} ∩ V⁻¹)
+          = (fun y => (y, t)) ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹} ∩ B := by
       ext y
       constructor
       · rintro ⟨x, ⟨hx1, hx2⟩, rfl⟩
@@ -78,23 +84,25 @@ theorem lhu_key (m : Measure G) [m.IsHaarMeasure] (β : Measure G) (W V : Set G)
         refine ⟨t⁻¹ * y, ⟨?_, hy1⟩, mul_inv_cancel_left t y⟩
         show t * (t⁻¹ * y) ∈ B
         rwa [mul_inv_cancel_left]
-    have hsub : (fun g => t * g) '' ((fun x => (x, t)) ⁻¹' {p : G × G | p.2 * p.1 ∈ B} ∩ V⁻¹) ⊆ W := by
+    have hsub
+        : (fun g => t * g) '' ((fun x => (x, t)) ⁻¹' {p : G × G | p.2 * p.1 ∈ B} ∩ V⁻¹) ⊆ W := by
       rw [himg]; exact fun y hy => hVW (hBV hy.2)
     rw [← himg]
     exact (hinv t _ (hS.inter hVim) (fun x hx => hViW hx.2) hsub).symm
   have hb : ((β.restrict V⁻¹).prod m) {p : G × G | p.2 * p.1 ∈ B} = m V * β B := by
     rw [Measure.prod_apply_symm hE]
-    calc _ = ∫⁻ t, (β.restrict B) ((fun y => (y, t)) ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹}) ∂m :=
-          lintegral_congr h1
+    calc
+      _ = ∫⁻ t, (β.restrict B) ((fun y => (y, t)) ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹}) ∂m :=
+        lintegral_congr h1
       _ = ((β.restrict B).prod m) {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹} :=
-          (Measure.prod_apply_symm hF).symm
+        (Measure.prod_apply_symm hF).symm
       _ = ∫⁻ y, m (Prod.mk y ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹}) ∂(β.restrict B) :=
-          Measure.prod_apply hF
+        Measure.prod_apply hF
       _ = ∫⁻ y, m V ∂(β.restrict B) := by
-          refine lintegral_congr (fun y => ?_)
-          have hpre : Prod.mk y ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹} = (fun t => y⁻¹ * t) ⁻¹' V := by
-            ext t; simp [mul_inv_rev]
-          rw [hpre, measure_preimage_mul]
+        refine lintegral_congr (fun y => ?_)
+        have hpre : Prod.mk y ⁻¹' {p : G × G | p.2⁻¹ * p.1 ∈ V⁻¹} = (fun t => y⁻¹ * t) ⁻¹' V := by
+          ext t; simp [mul_inv_rev]
+        rw [hpre, measure_preimage_mul]
       _ = m V * β B := by rw [lintegral_const, Measure.restrict_apply_univ]
   exact hb.symm.trans ha
 
@@ -151,8 +159,9 @@ theorem local_haar_unique : LocalHaarUnique := by
   have e2 : β V = (m V)⁻¹ * (K * m V) := by
     rw [← h2, ← mul_assoc, ENNReal.inv_mul_cancel hmV0 hmVt, one_mul]
   rw [e1, div_eq_mul_inv, e2]
-  calc (m V)⁻¹ * (K * m (s ∩ V)) = (m V)⁻¹ * K * (m V * (m V)⁻¹) * m (s ∩ V) := by
-        rw [ENNReal.mul_inv_cancel hmV0 hmVt, mul_one, mul_assoc]
+  calc
+    (m V)⁻¹ * (K * m (s ∩ V)) = (m V)⁻¹ * K * (m V * (m V)⁻¹) * m (s ∩ V) := by
+      rw [ENNReal.mul_inv_cancel hmV0 hmVt, mul_one, mul_assoc]
     _ = (m V)⁻¹ * (K * m V) * (m V)⁻¹ * m (s ∩ V) := by ring
 
 end LHU

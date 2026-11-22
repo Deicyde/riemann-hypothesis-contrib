@@ -10,11 +10,13 @@ noncomputable section
 
 namespace SameDiaZero
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.product_first_zeroth_parts Formalism.L2.Forms Formalism.L2.GlobalTheoryTheory Formalism.L2.GlobalTheoryTheory.LocalLatticeBases Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0 Formalism.UG
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.product_first_zeroth_parts
+  Formalism.L2.Forms Formalism.L2.GlobalTheoryTheory
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.S0 Formalism.UG
 open NumberField IsDedekindDomain Matrix CrossDiaZero
 
 variable {D : D7} {u : D.what₂.Word}
-
 
 set_option maxHeartbeats 8000000 in
 set_option synthInstance.maxHeartbeats 400000 in
@@ -152,7 +154,6 @@ theorem upSame_one (T : Forms0 D u) (v : (D.mem u).A.vT) (a : ((D.mem u).A.Fv v)
     group
   rw [efin]
   exact mul_mem hmm κd.2
-
 
 set_option maxHeartbeats 8000000 in
 set_option synthInstance.maxHeartbeats 400000 in

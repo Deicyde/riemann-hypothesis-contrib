@@ -17,10 +17,12 @@ section FE
 
 variable {X : Fields} {Pr : Primes X} {R : Ranks}
 
-private theorem mulVec_eN_eq_of_mem_HPar {κ : Type} [CommRing κ] {n r k rS t s : ℕ} (hr : r ≤ n) (ht : 0 < t)
-    (hn : n = r + s * t) (hkr : k < r) (hkrS : k + rS ≤ r) (M : GL (Fin n) κ)
-    (hM : M ∈ HPar n κ hr (List.replicate s t) (HPsymF κ r k rS)) :
-    (M : Matrix (Fin n) (Fin n) κ) *ᵥ Loc.eN κ n k = Loc.eN κ n k := by
+private theorem mulVec_eN_eq_of_mem_HPar
+    {κ : Type} [CommRing κ]
+    {n r k rS t s : ℕ}
+    (hr : r ≤ n) (ht : 0 < t) (hn : n = r + s * t) (hkr : k < r) (hkrS : k + rS ≤ r)
+    (M : GL (Fin n) κ) (hM : M ∈ HPar n κ hr (List.replicate s t) (HPsymF κ r k rS))
+    : (M : Matrix (Fin n) (Fin n) κ) *ᵥ Loc.eN κ n k = Loc.eN κ n k := by
   rw [mem_HPar_iff hr ht hn] at hM
   obtain ⟨hB, hS⟩ := hM
   rw [mem_HPsymF_iff hkrS] at hS
@@ -35,8 +37,10 @@ private theorem mulVec_eN_eq_of_mem_HPar {κ : Type} [CommRing κ] {n r k rS t s
   funext i
   simp only [Matrix.col_apply, Pi.single_apply]
   by_cases hir : (i : ℕ) < r
-  · have key : ∀ a b : Fin r, ((upperLeftBlock hr M : GL (Fin r) κ) : Matrix (Fin r) (Fin r) κ) a b =
-        (M : Matrix (Fin n) (Fin n) κ) (Fin.castLE hr a) (Fin.castLE hr b) := by
+  · have key
+        : ∀ a b : Fin r,
+          ((upperLeftBlock hr M : GL (Fin r) κ) : Matrix (Fin r) (Fin r) κ) a b
+            = (M : Matrix (Fin n) (Fin n) κ) (Fin.castLE hr a) (Fin.castLE hr b) := by
       intro a b
       rw [hv]
       rfl
@@ -58,11 +62,12 @@ private theorem mulVec_eN_eq_of_mem_HPar {κ : Type} [CommRing κ] {n r k rS t s
       simp only [blkOf, Fin.val_mk, if_pos hkr, if_neg hir]
       exact Nat.succ_pos _)
 
-theorem fixE_colLevSym (Ch : Chars X Pr R.m) {m2 : ℕ} (hm : R.m = m2 + 2) : FixE (R := R) (colLevSym Ch) m2 := by
+theorem fixE_colLevSym (Ch : Chars X Pr R.m) {m2 : ℕ} (hm : R.m = m2 + 2)
+    : FixE (R := R) (colLevSym Ch) m2 := by
   intro h hh w
   have hw : h w ∈ (colLevSym Ch (m2 + 1) w).H := (Subgroup.mem_pi _).mp hh w (Set.mem_univ _)
-  have e0 : ¬ (m2 + 1 = 0) := by omega
-  have e1 : ¬ (m2 + 1 + 1 < R.m) := by omega
+  have e0 : ¬(m2 + 1 = 0) := by omega
+  have e1 : ¬(m2 + 1 + 1 < R.m) := by omega
   have e2 : m2 + 1 + 1 = R.m := by omega
   unfold colLevSym at hw
   rw [if_neg e0, dite_eq_right e1, dite_eq_left e2] at hw
@@ -77,7 +82,8 @@ theorem fixE_colLevSym (Ch : Chars X Pr R.m) {m2 : ℕ} (hm : R.m = m2 + 2) : Fi
       omega)
     (by
       show R.k + (R.m / 2 - 1) ≤ R.k + R.m - 1
-      omega) _ hw
+      omega)
+    _ hw
 
 end FE
 

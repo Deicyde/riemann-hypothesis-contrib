@@ -5,15 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.liftFF_of :
-    AlgOf → LiftPt → LiftFF := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.liftFF_of : AlgOf → LiftPt → LiftFF := by
   intro hAlg hPt S K h hfin hflat V _ _ _ _ z g hg
   obtain ⟨B, _, _, k, hfinB, hfreeB, hp⟩ := hAlg S K h hfin hflat V z
   haveI : Module.Finite V B := hfinB
@@ -26,8 +28,9 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.liftFF_of :
     show Spec.map (CommRingCat.ofHom (Spec.preimage u).hom) = u
     rw [CommRingCat.ofHom_hom, Spec.map_preimage]
   have hχa : χ.comp (algebraMap V B) = IsLocalRing.residue V := by
-    have h1 : Spec.map (CommRingCat.ofHom (χ.comp (algebraMap V B))) =
-        Spec.map (CommRingCat.ofHom (IsLocalRing.residue V)) := by
+    have h1
+        : Spec.map (CommRingCat.ofHom (χ.comp (algebraMap V B)))
+          = Spec.map (CommRingCat.ofHom (IsLocalRing.residue V)) := by
       rw [CommRingCat.ofHom_comp, Spec.map_comp]
       exact (congrArg (· ≫ spMap (algebraMap V B)) hχ).trans hua
     have h2 := Spec.map_injective h1

@@ -42,15 +42,18 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Eventuall
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Fc GlobalTheory.RowEx GlobalTheory.Mem.LiteralAutomorphy
+open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.EX.OB
+  GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl
+  GlobalTheory.Fc GlobalTheory.RowEx GlobalTheory.Mem.LiteralAutomorphy
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.Mem.AtSize
 
-theorem leastSplitAuxiliaryPrime_lt_scaleBound {K : Ctx} {X : Stages} (hO : K.Over X.B.toPre) {C5 c6 Cb : ℝ} (hG : K.Good C5 c6 Cb) :
-    ((GlobalTheory.ChiGrid.q0 X.toD7 : ℕ) : ℝ) < K.s.X' := by
+theorem leastSplitAuxiliaryPrime_lt_scaleBound
+    {K : Ctx} {X : Stages} (hO : K.Over X.B.toPre) {C5 c6 Cb : ℝ} (hG : K.Good C5 c6 Cb)
+    : ((GlobalTheory.ChiGrid.q0 X.toD7 : ℕ) : ℝ) < K.s.X' := by
   have hOk := hG.ok
   obtain ⟨sp, hT, hY, hA', hV, hz, hB, -⟩ := hO
   obtain ⟨B, Cc, W, V, S, N, Gj⟩ := X
@@ -61,7 +64,6 @@ theorem leastSplitAuxiliaryPrime_lt_scaleBound {K : Ctx} {X : Stages} (hO : K.Ov
   rcases hOk.lev _ hmem with ⟨i, hi⟩ | hlt
   · exact absurd hi (hOk.small.2.2.2.1 i)
   · exact hlt
-
 
 end GlobalTheory.Mem.AtSize
 

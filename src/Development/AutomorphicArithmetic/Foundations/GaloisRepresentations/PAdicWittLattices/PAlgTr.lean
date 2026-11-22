@@ -4,20 +4,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-private theorem trace_pi_eq_sum {C J : Type} [CommRing C] [Fintype J] (a : J → C) :
-    Algebra.trace C (J → C) a = ∑ j, a j := by
+private theorem trace_pi_eq_sum {C J : Type} [CommRing C] [Fintype J] (a : J → C)
+    : Algebra.trace C (J → C) a = ∑ j, a j := by
   classical
   rw [Algebra.trace_apply, LinearMap.trace_eq_matrix_trace C (Pi.basisFun C J), Matrix.trace]
   apply Finset.sum_congr rfl
   intro j _
   simp [LinearMap.toMatrix_apply, Pi.single_apply]
 
-theorem UpperTheory.Gal.G3.pAlgTr :
-    AlgTr := by
+theorem UpperTheory.Gal.G3.pAlgTr : AlgTr := by
   intro A A' C _ _ _ _ _ _ _ J _ τ e he b
   letI : Algebra A' (C ⊗[A] A') := Algebra.TensorProduct.rightAlgebra
   haveI : Module.Projective A A' := projective_of_etale A A'

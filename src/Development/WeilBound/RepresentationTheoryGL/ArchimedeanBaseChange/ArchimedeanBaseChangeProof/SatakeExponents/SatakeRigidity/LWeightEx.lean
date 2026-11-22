@@ -11,12 +11,16 @@ public import Development.WeilBound.RepresentationTheoryGL.ResidualSpectrum.Slic
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.F
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.F
 
 namespace PositivityTheory.Rg.BcB.F.Rig
 
-theorem weight_zero {E : Type} [Field E] [NumberField E] [IsCMField E] (π : Submodule ℂ (UA E 0 → ℂ))
-    (hπ : IsAutRepU π) (τ : E →+* ℂ) : ∃ lam : DomWeight 0, HasWeightAt π τ lam := by
+theorem weight_zero
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (π : Submodule ℂ (UA E 0 → ℂ)) (hπ : IsAutRepU π)
+    (τ : E →+* ℂ)
+    : ∃ lam : DomWeight 0, HasWeightAt π τ lam := by
   let lam : DomWeight 0 := ⟨fun i => i.elim0, fun i => i.elim0⟩
   refine ⟨lam, GlobalTheory.DefU.isIrreducible_sqRep 0 lam, ?_⟩
   obtain ⟨φ, hφ, hφ0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hπ.ne_bot
@@ -40,8 +44,8 @@ theorem weightEx : WeightEx := by
   · exact weight_zero π hπ τ
   · exact GlobalTheory.T.exists_algebraicWeight_of_automorphic_definiteUnitary E n hn π hπ τ
 
-theorem infOfWeight_reg {n : ℕ} (lam : DomWeight n) : (infOfWeight lam).Nodup ∧
-    ∀ x ∈ infOfWeight lam, ∃ k : ℤ, x = k + ((n : ℂ) - 1) / 2 := by
+theorem infOfWeight_reg {n : ℕ} (lam : DomWeight n)
+    : (infOfWeight lam).Nodup ∧ ∀ x ∈ infOfWeight lam, ∃ k : ℤ, x = k + ((n : ℂ) - 1) / 2 := by
   refine ⟨Multiset.Nodup.map (fun k k' h => ?_) Finset.univ.nodup, fun x hx => ?_⟩
   · have h2 : ((lam.w k - ((k : ℕ) : ℤ) : ℤ) : ℂ) = ((lam.w k' - ((k' : ℕ) : ℤ) : ℤ) : ℂ) := by
       push_cast
@@ -64,16 +68,26 @@ theorem regPart : RegPart := by
     rw [← hlam, ← Finset.add_sum_erase Finset.univ (fun j => D.m j τ) (Finset.mem_univ i)]
     exact Multiset.le_add_right _ _
   obtain ⟨h1, h2⟩ := infOfWeight_reg lam
-  exact ⟨D.m i τ, D.inf i τ, Multiset.nodup_of_le hle h1, fun x hx => h2 x (Multiset.subset_of_le hle hx)⟩
+  exact ⟨
+    D.m i τ,
+    D.inf i τ,
+    Multiset.nodup_of_le hle h1,
+    fun x hx => h2 x (Multiset.subset_of_le hle hx)
+  ⟩
 
 theorem rStrings : RStrings := by
   intro hR E _ _ _ n D hr i
   let τ : E →+* ℂ := (IsAlgClosed.lift : E →ₐ[ℚ] ℂ).toRingHom
   obtain ⟨m, hm, hnd, hx⟩ := hR E n D hr i τ
-  have hRI : RegInt (D.V i) τ := ⟨m, hm, hnd, fun x hx' y hy => by
-    obtain ⟨k, rfl⟩ := hx x hx'
-    obtain ⟨k', rfl⟩ := hx y hy
-    exact ⟨k - k', by push_cast; ring⟩⟩
+  have hRI : RegInt (D.V i) τ := ⟨
+    m,
+    hm,
+    hnd,
+    fun x hx' y hy => by
+      obtain ⟨k, rfl⟩ := hx x hx'
+      obtain ⟨k', rfl⟩ := hx y hy
+      exact ⟨k - k', by push_cast; ring⟩
+  ⟩
   obtain ⟨a, d, P, hu, hn, he⟩ := ascSeed_holds2.1 E (D.N i) (D.pos i) (D.V i) (D.discrete i) τ hRI
   obtain ⟨h, -⟩ := he P (Setoid.refl (α := CuspSub E a) P)
   have hda : d * a = D.N i := by simpa using h

@@ -8,9 +8,12 @@ open MvPolynomial Matrix
 
 namespace Bl.general_b_fact_right_alt
 
-theorem goal1 {K S : Type*} [CommRing K] [CommRing S] [Algebra K S] {ι : Type*} [Fintype ι]
-    {G : MvPolynomial ι K} {d : ℕ} (hG : IsHomogeneous G d) (c : S) (f : ι → S) :
-    aeval (fun v => c * f v) G = c ^ d * aeval f G := by
+theorem goal1
+    {K S : Type*} [CommRing K] [CommRing S] [Algebra K S]
+    {ι : Type*} [Fintype ι]
+    {G : MvPolynomial ι K} {d : ℕ} (hG : IsHomogeneous G d)
+    (c : S) (f : ι → S)
+    : aeval (fun v => c * f v) G = c ^ d * aeval f G := by
   classical
   conv_lhs => rw [G.as_sum]
   conv_rhs => rw [G.as_sum]

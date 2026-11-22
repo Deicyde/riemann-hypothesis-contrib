@@ -12,26 +12,29 @@ namespace Formalism.HC
 
 open Formalism.FrobeniusOrbits
 
-theorem unitsMap_eq_iff {M N : ℕ} [NeZero N] [NeZero M] (h : M ∣ N) (u : (ZMod N)ˣ) (v : (ZMod M)ˣ) :
-    ZMod.unitsMap h u = v ↔ (u : ZMod N).val ≡ (v : ZMod M).val [MOD M] := by
+theorem unitsMap_eq_iff {M N : ℕ} [NeZero N] [NeZero M] (h : M ∣ N) (u : (ZMod N)ˣ) (v : (ZMod M)ˣ)
+    : ZMod.unitsMap h u = v ↔ (u : ZMod N).val ≡ (v : ZMod M).val [MOD M] := by
   rw [Units.ext_iff, D7.unitsMap_val, ← ZMod.natCast_eq_natCast_iff, ZMod.natCast_zmod_val]
 
-theorem unitsMap_eq_one_iff {M N : ℕ} [NeZero N] (h : M ∣ N) (u : (ZMod N)ˣ) :
-    ZMod.unitsMap h u = 1 ↔ (u : ZMod N).val ≡ 1 [MOD M] := by
+theorem unitsMap_eq_one_iff {M N : ℕ} [NeZero N] (h : M ∣ N) (u : (ZMod N)ˣ)
+    : ZMod.unitsMap h u = 1 ↔ (u : ZMod N).val ≡ 1 [MOD M] := by
   haveI : NeZero M := ⟨by
     rintro rfl
     exact NeZero.ne N (Nat.eq_zero_of_zero_dvd h)⟩
   rw [unitsMap_eq_iff h u 1, Units.val_one, ZMod.val_one_eq_one_mod]
   exact ⟨fun h1 => h1.trans (Nat.mod_modEq 1 M), fun h1 => h1.trans (Nat.mod_modEq 1 M).symm⟩
 
-theorem unitsMap_val_modEq {M N : ℕ} [NeZero N] [NeZero M] (h : M ∣ N) (u : (ZMod N)ˣ) :
-    (u : ZMod N).val ≡ ((ZMod.unitsMap h u : (ZMod M)ˣ) : ZMod M).val [MOD M] :=
+theorem unitsMap_val_modEq {M N : ℕ} [NeZero N] [NeZero M] (h : M ∣ N) (u : (ZMod N)ˣ)
+    : (u : ZMod N).val ≡ ((ZMod.unitsMap h u : (ZMod M)ˣ) : ZMod M).val [MOD M] :=
   (unitsMap_eq_iff h u _).mp rfl
 
-theorem exists_unit_three {a b c : ℕ} [NeZero (a * b * c)] (hab : Nat.Coprime a b) (hac : Nat.Coprime a c) (hbc : Nat.Coprime b c)
-    (x y z : ℕ) (hx : Nat.Coprime x a) (hy : Nat.Coprime y b) (hz : Nat.Coprime z c) :
-    ∃ u : (ZMod (a * b * c))ˣ, (u : ZMod (a * b * c)).val ≡ x [MOD a] ∧
-      (u : ZMod (a * b * c)).val ≡ y [MOD b] ∧ (u : ZMod (a * b * c)).val ≡ z [MOD c] := by
+theorem exists_unit_three
+    {a b c : ℕ} [NeZero (a * b * c)]
+    (hab : Nat.Coprime a b) (hac : Nat.Coprime a c) (hbc : Nat.Coprime b c)
+    (x y z : ℕ) (hx : Nat.Coprime x a) (hy : Nat.Coprime y b) (hz : Nat.Coprime z c)
+    : ∃ u : (ZMod (a * b * c))ˣ,
+      (u : ZMod (a * b * c)).val ≡ x [MOD a] ∧ (u : ZMod (a * b * c)).val ≡ y [MOD b]
+        ∧ (u : ZMod (a * b * c)).val ≡ z [MOD c] := by
   obtain ⟨t1, h1a, h1b⟩ := Nat.chineseRemainder hab x y
   obtain ⟨t, h2ab, h2c⟩ := Nat.chineseRemainder (Nat.Coprime.mul_left hac hbc) t1 z
   have hta : t ≡ x [MOD a] := (h2ab.of_mul_right b).trans h1a
@@ -99,8 +102,9 @@ theorem projection_surjective : Function.Surjective D.p1 := by
 theorem exists_gen : ∃ a : D.R, ∀ x : D.R, D.p2 x = 1 ↔ x ∈ Subgroup.zpowers a := by
   haveI : IsCyclic (HGrp D.e) := (Formalism.TwoAdicCyclotomicDecomposition.towerProperties.1.2.1 D.e).1
   let f : D.p2.ker →* HGrp D.e := D.p1.comp D.p2.ker.subtype
-  have hf : Function.Injective f := (injective_iff_map_eq_one f).mpr fun x hx =>
-    Subtype.ext (D.eq_one_of hx (MonoidHom.mem_ker.mp x.2))
+  have hf : Function.Injective f :=
+    (injective_iff_map_eq_one f).mpr fun x hx =>
+      Subtype.ext (D.eq_one_of hx (MonoidHom.mem_ker.mp x.2))
   haveI : IsCyclic D.p2.ker := isCyclic_of_surjective (MonoidHom.ofInjective hf).symm (MulEquiv.surjective _)
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := D.p2.ker)
   refine ⟨g, fun x => ⟨fun hx => ?_, fun hx => ?_⟩⟩
@@ -120,7 +124,8 @@ theorem hA_surj : Function.Surjective D.hA := by
   obtain ⟨x, hx⟩ := D.projection_surjective (Additive.toMul y)
   exact ⟨Additive.ofMul x, hx⟩
 
-theorem hA_ker (k : ℤ) (hk : D.hA (k • Additive.ofMul D.gen) = 0) : k • Additive.ofMul D.gen = 0 := by
+theorem hA_ker (k : ℤ) (hk : D.hA (k • Additive.ofMul D.gen) = 0)
+    : k • Additive.ofMul D.gen = 0 := by
   have h2 : D.p2 D.gen = 1 := (D.gen_spec D.gen).mpr (Subgroup.mem_zpowers _)
   have hk' : D.p1 (D.gen ^ k) = 1 := hk
   have h3 := D.eq_one_of hk' (by rw [map_zpow, h2, one_zpow])
@@ -130,7 +135,8 @@ theorem hA_ker (k : ℤ) (hk : D.hA (k • Additive.ofMul D.gen) = 0) : k • Ad
 
 def frame : Frame := Frame.ofGroup D.e D.hA D.hA_surj (Additive.ofMul D.gen) D.hA_ker
 
-def isoA : D.frame.A ≃+ Additive D.R := Frame.ofGroupIso D.e D.hA D.hA_surj (Additive.ofMul D.gen) D.hA_ker
+def isoA : D.frame.A ≃+ Additive D.R :=
+  Frame.ofGroupIso D.e D.hA D.hA_surj (Additive.ofMul D.gen) D.hA_ker
 
 def iso : D.frame.MA ≃* D.R where
   toFun a := (D.isoA a.toAdd).toMul
@@ -150,7 +156,8 @@ theorem toA_surj : Function.Surjective D.toA :=
   D.iso.symm.surjective.comp D.eta.rangeRestrict_surjective
 
 theorem toA_eq_one_iff (u : (ZMod D.m)ˣ) : D.toA u = 1 ↔ D.eta u = 1 := by
-  rw [← D.iso.map_eq_one_iff, iso_toA, Subtype.ext_iff, MonoidHom.coe_rangeRestrict, OneMemClass.coe_one]
+  rw [← D.iso.map_eq_one_iff, iso_toA, Subtype.ext_iff, MonoidHom.coe_rangeRestrict,
+    OneMemClass.coe_one]
 
 theorem hH_toA (u : (ZMod D.m)ˣ) : D.frame.hH (D.toA u) = D.cl u := by
   rw [hH_eq, iso_toA]
@@ -169,30 +176,37 @@ theorem neZeroN : NeZero (D.m * q * d) :=
   ⟨Nat.mul_ne_zero (Nat.mul_ne_zero D.m_pos.ne' hH.1.ne_zero) hH.2.1.ne_zero⟩
 
 def art : (ZMod (D.m * q * d))ˣ →* D.frame.GG :=
-  ((D7.sgnN hH.1 (D.q_dvd q d)).prod (D7.sgnN hH.2.1 (D.d_dvd q d))).prod (D.toA.comp (ZMod.unitsMap (D.m_dvd q d)))
+  ((D7.sgnN hH.1 (D.q_dvd q d)).prod (D7.sgnN hH.2.1 (D.d_dvd q d))).prod
+    (D.toA.comp (ZMod.unitsMap (D.m_dvd q d)))
 
-theorem art_snd (u : (ZMod (D.m * q * d))ˣ) : (D.art hH u).2 = D.toA (ZMod.unitsMap (D.m_dvd q d) u) := rfl
+theorem art_snd (u : (ZMod (D.m * q * d))ˣ)
+    : (D.art hH u).2 = D.toA (ZMod.unitsMap (D.m_dvd q d) u) :=
+  rfl
 
-theorem art_ps (u : (ZMod (D.m * q * d))ˣ) :
-    (((D.art hH u).1.1 : ℤˣ) : ℤ) = jacobiSym (((u : ZMod (D.m * q * d)).val : ℕ) : ℤ) q := by
+theorem art_ps (u : (ZMod (D.m * q * d))ˣ)
+    : (((D.art hH u).1.1 : ℤˣ) : ℤ) = jacobiSym (((u : ZMod (D.m * q * d)).val : ℕ) : ℤ) q := by
   haveI := D.neZeroN hH
   haveI := Fact.mk hH.1
   show ((D7.sgnN hH.1 (D.q_dvd q d) u : ℤˣ) : ℤ) = _
-  simp only [D7.sgnN, MonoidHom.coe_comp, Function.comp_apply, MulChar.coe_toUnitHom, D7.unitsMap_val]
+  simp only [D7.sgnN, MonoidHom.coe_comp, Function.comp_apply, MulChar.coe_toUnitHom,
+    D7.unitsMap_val]
   rw [← jacobiSym.legendreSym.to_jacobiSym q (((u : ZMod (D.m * q * d)).val : ℕ) : ℤ)]
   simp [legendreSym]
 
-theorem art_ch (u : (ZMod (D.m * q * d))ˣ) :
-    (((D.art hH u).1.2 : ℤˣ) : ℤ) = jacobiSym (((u : ZMod (D.m * q * d)).val : ℕ) : ℤ) d := by
+theorem art_ch (u : (ZMod (D.m * q * d))ˣ)
+    : (((D.art hH u).1.2 : ℤˣ) : ℤ) = jacobiSym (((u : ZMod (D.m * q * d)).val : ℕ) : ℤ) d := by
   haveI := D.neZeroN hH
   haveI := Fact.mk hH.2.1
   show ((D7.sgnN hH.2.1 (D.d_dvd q d) u : ℤˣ) : ℤ) = _
-  simp only [D7.sgnN, MonoidHom.coe_comp, Function.comp_apply, MulChar.coe_toUnitHom, D7.unitsMap_val]
+  simp only [D7.sgnN, MonoidHom.coe_comp, Function.comp_apply, MulChar.coe_toUnitHom,
+    D7.unitsMap_val]
   rw [← jacobiSym.legendreSym.to_jacobiSym d (((u : ZMod (D.m * q * d)).val : ℕ) : ℤ)]
   simp [legendreSym]
 
-theorem art_ps_one (u : (ZMod (D.m * q * d))ˣ) {y : ℕ} (hu : (u : ZMod (D.m * q * d)).val ≡ y [MOD q])
-    (hy : jacobiSym (y : ℤ) q = 1) : (D.art hH u).1.1 = 1 := by
+theorem art_ps_one
+    (u : (ZMod (D.m * q * d))ˣ)
+    {y : ℕ} (hu : (u : ZMod (D.m * q * d)).val ≡ y [MOD q]) (hy : jacobiSym (y : ℤ) q = 1)
+    : (D.art hH u).1.1 = 1 := by
   have h1 := D.art_ps hH u
   have h2 : jacobiSym (((u : ZMod (D.m * q * d)).val : ℕ) : ℤ) q = jacobiSym (y : ℤ) q := by
     rw [jacobiSym.mod_left, jacobiSym.mod_left (y : ℤ)]
@@ -201,7 +215,8 @@ theorem art_ps_one (u : (ZMod (D.m * q * d))ˣ) {y : ℕ} (hu : (u : ZMod (D.m *
   rw [h2, hy] at h1
   exact Units.ext h1
 
-theorem art_snd_one (u : (ZMod (D.m * q * d))ˣ) (hu : (u : ZMod (D.m * q * d)).val ≡ 1 [MOD D.m]) : (D.art hH u).2 = 1 := by
+theorem art_snd_one (u : (ZMod (D.m * q * d))ˣ) (hu : (u : ZMod (D.m * q * d)).val ≡ 1 [MOD D.m])
+    : (D.art hH u).2 = 1 := by
   haveI := D.neZeroN hH
   rw [art_snd, (unitsMap_eq_one_iff _ u).mpr hu, map_one]
 
@@ -209,8 +224,9 @@ variable (hc : Nat.Coprime D.m (q * d))
 
 include hc in
 theorem art_surj : Function.Surjective (D.art hH) := by
-  have hsgn : ∀ {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 3) (s : ℤˣ),
-      ∃ y : ℕ, Nat.Coprime y p ∧ jacobiSym (y : ℤ) p = (s : ℤ) := by
+  have hsgn
+      : ∀ {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 3) (s : ℤˣ), ∃ y : ℕ,
+        Nat.Coprime y p ∧ jacobiSym (y : ℤ) p = (s : ℤ) := by
     intro p hp hp4 s
     rcases Int.units_eq_one_or s with rfl | rfl
     · exact ⟨1, Nat.coprime_one_left p, by simp⟩
@@ -225,22 +241,26 @@ theorem art_surj : Function.Surjective (D.art hH) := by
           rw [Int.emod_eq_emod_iff_emod_sub_eq_zero]
           push_cast [Nat.cast_sub (by omega : 1 ≤ p)]
           simp
-        rw [jacobiSym.mod_left, e, ← jacobiSym.mod_left, jacobiSym.at_neg_one hodd, ZMod.χ₄_nat_three_mod_four hp4]
+        rw [jacobiSym.mod_left, e, ← jacobiSym.mod_left, jacobiSym.at_neg_one hodd,
+          ZMod.χ₄_nat_three_mod_four hp4]
         simp
   haveI := D.neZeroN hH
   rintro ⟨⟨s1, s2⟩, a⟩
   obtain ⟨w, rfl⟩ := D.toA_surj a
   obtain ⟨y, hy, hys⟩ := hsgn hH.1 (D7.q4 hH) s1
   obtain ⟨z, hz, hzs⟩ := hsgn hH.2.1 (D7.d4 hH) s2
-  have hqd : Nat.Coprime q d := (Nat.coprime_primes hH.1 hH.2.1).mpr (by
-    intro h
-    have h1 := hH.2.2.1
-    have h2 := hH.2.2.2.1
-    subst h
-    omega)
-  obtain ⟨u, hu1, hu2, hu3⟩ := exists_unit_three (a := D.m) (b := q) (c := d)
-    (Nat.Coprime.coprime_dvd_right (dvd_mul_right q d) hc) (Nat.Coprime.coprime_dvd_right (dvd_mul_left d q) hc) hqd
-    _ y z (ZMod.val_coe_unit_coprime w) hy hz
+  have hqd : Nat.Coprime q d :=
+    (Nat.coprime_primes hH.1 hH.2.1).mpr (by
+      intro h
+      have h1 := hH.2.2.1
+      have h2 := hH.2.2.2.1
+      subst h
+      omega)
+  obtain ⟨u, hu1, hu2, hu3⟩ :=
+    exists_unit_three (a := D.m) (b := q) (c := d)
+      (Nat.Coprime.coprime_dvd_right (dvd_mul_right q d) hc)
+      (Nat.Coprime.coprime_dvd_right (dvd_mul_left d q) hc) hqd _ y z (ZMod.val_coe_unit_coprime w)
+      hy hz
   refine ⟨u, Prod.ext (Prod.ext ?_ ?_) ?_⟩
   · show (D.art hH u).1.1 = s1
     apply Units.ext
@@ -270,7 +290,8 @@ def charData : CharData D.frame where
   art := D.art hH
   art_surj := D.art_surj hH hc
   art_neg_one := by
-    refine Prod.ext (Prod.ext (D7.sgnN_neg_one hH.1 (D7.q4 hH) _) (D7.sgnN_neg_one hH.2.1 (D7.d4 hH) _)) ?_
+    refine Prod.ext
+      (Prod.ext (D7.sgnN_neg_one hH.1 (D7.q4 hH) _) (D7.sgnN_neg_one hH.2.1 (D7.d4 hH) _)) ?_
     rw [art_snd, D7.unitsMap_neg_one]
     exact (D.toA_eq_one_iff _).mpr D.eta_neg_one
   art_h := fun u v hv => by
@@ -292,13 +313,17 @@ def charData : CharData D.frame where
 
 def host : HostRaw D.frame := (D.charData hH hc he hs).toHostRaw
 
-theorem exact (h : ∀ l : ℕ, l.Prime → l ∣ D.m → ∃ v : (ZMod D.m)ˣ, (v : ZMod D.m).val ≡ 1 [MOD D.m / l] ∧ D.eta v ≠ 1) :
-    (D.host hH hc he hs).Exact := by
+theorem exact
+    (h : ∀ l : ℕ,
+      l.Prime → l ∣ D.m → ∃ v : (ZMod D.m)ˣ, (v : ZMod D.m).val ≡ 1 [MOD D.m / l] ∧ D.eta v ≠ 1)
+    : (D.host hH hc he hs).Exact := by
   have := D.neZeroN hH
   intro l hl (hlm : l ∣ D.m)
   obtain ⟨v, hv, hv1⟩ := h l hl hlm
-  obtain ⟨u, h1, h2, h3⟩ := exists_unit_three hc.coprime_mul_right_right hc.coprime_mul_left_right (D7.cop_qd hH)
-    (v : ZMod D.m).val 1 1 (ZMod.val_coe_unit_coprime v) (Nat.coprime_one_left _) (Nat.coprime_one_left _)
+  obtain ⟨u, h1, h2, h3⟩ :=
+    exists_unit_three hc.coprime_mul_right_right hc.coprime_mul_left_right (D7.cop_qd hH)
+      (v : ZMod D.m).val 1 1 (ZMod.val_coe_unit_coprime v) (Nat.coprime_one_left _)
+      (Nat.coprime_one_left _)
   refine ⟨u, ?_, fun h4 => hv1 ?_⟩
   · show (u : ZMod (D.m * q * d)).val ≡ 1 [MOD D.m * q * d / l]
     have h5 : D.m * q * d / l = D.m / l * (q * d) := by rw [mul_assoc, Nat.div_mul_right_comm hlm]

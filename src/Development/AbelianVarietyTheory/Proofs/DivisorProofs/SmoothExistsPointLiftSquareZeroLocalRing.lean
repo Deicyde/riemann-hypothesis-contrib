@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon GlobalTheory.DualOpen
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon GlobalTheory.DualOpen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -16,10 +19,12 @@ namespace GlobalTheory.SmoothPtLift
 
 set_option autoImplicit false
 
-theorem exists_lift (U S : Scheme.{0}) (p : U ⟶ S) [Smooth p] (C : Type) [CommRing C] [IsLocalRing C]
-    (I : Ideal C) (hI : I ^ 2 = ⊥) (s : Sp C ⟶ S) (u₀ : Sp (C ⧸ I) ⟶ U)
-    (hw : u₀ ≫ p = spMap (Ideal.Quotient.mk I) ≫ s) :
-    ∃ u : Sp C ⟶ U, spMap (Ideal.Quotient.mk I) ≫ u = u₀ ∧ u ≫ p = s := by
+theorem exists_lift
+    (U S : Scheme.{0}) (p : U ⟶ S) [Smooth p]
+    (C : Type) [CommRing C] [IsLocalRing C]
+    (I : Ideal C) (hI : I ^ 2 = ⊥)
+    (s : Sp C ⟶ S) (u₀ : Sp (C ⧸ I) ⟶ U) (hw : u₀ ≫ p = spMap (Ideal.Quotient.mk I) ≫ s)
+    : ∃ u : Sp C ⟶ U, spMap (Ideal.Quotient.mk I) ≫ u = u₀ ∧ u ≫ p = s := by
   have hItop : I ≠ ⊤ := by
     rintro rfl
     have h1 : (1 : C) ∈ (⊤ : Ideal C) ^ 2 := by rw [Ideal.top_pow]; exact Submodule.mem_top
@@ -49,7 +54,8 @@ theorem exists_lift (U S : Scheme.{0}) (p : U ⟶ S) [Smooth p] (C : Type) [Comm
     rw [hV.range_fromSpec]
     rintro _ ⟨z, rfl⟩
     exact ((IsLocalRing.specializes_closedPoint z).map u₀.continuous).mem_open V.2 hxV
-  obtain ⟨a, ha⟩ : ∃ a, Spec.map a = IsOpenImmersion.lift hW.fromSpec s hsW := ⟨_, Spec.map_preimage _⟩
+  obtain ⟨a, ha⟩ : ∃ a, Spec.map a = IsOpenImmersion.lift hW.fromSpec s hsW :=
+    ⟨_, Spec.map_preimage _⟩
   obtain ⟨b₀, hb₀⟩ : ∃ b, Spec.map b = IsOpenImmersion.lift hV.fromSpec u₀ hu₀V :=
     ⟨_, Spec.map_preimage _⟩
   have key : p.appLE W V hVW ≫ b₀ = a ≫ CommRingCat.ofHom (Ideal.Quotient.mk I) := by
@@ -59,11 +65,12 @@ theorem exists_lift (U S : Scheme.{0}) (p : U ⟶ S) [Smooth p] (C : Type) [Comm
       IsOpenImmersion.lift_fac, hw]
   have hsm := p.smooth_appLE hW hV hVW
   algebraize [(p.appLE W V hVW).hom, a.hom]
-  let g : Γ(U, V) →ₐ[Γ(S, W)] C ⧸ I :=
-    { b₀.hom with
-      commutes' := fun r => by
-        have := congrArg (fun f => f.hom r) key
-        exact this }
+  let g : Γ(U, V) →ₐ[Γ(S, W)] C ⧸ I := {
+    b₀.hom with
+    commutes' := fun r => by
+      have := congrArg (fun f => f.hom r) key
+      exact this
+  }
   let b := Algebra.FormallySmooth.lift I ⟨2, hI⟩ g
   refine ⟨Spec.map (CommRingCat.ofHom b.toRingHom) ≫ hV.fromSpec, ?_, ?_⟩
   · have e : CommRingCat.ofHom b.toRingHom ≫ CommRingCat.ofHom (Ideal.Quotient.mk I) = b₀ := by

@@ -17,9 +17,10 @@ open GlobalTheory.CompanionTheory.RCalc (isOpen_GLs differentiableAt_of_smooth)
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-private theorem good_smul_bump_of_isWave {n : ℕ} (E : KMod n) (u : ℝ → Mat n → E.V) (hu : IsWave E u)
-    (g : ℝ → ℝ) (T : ℝ) (hg : IsBump g T) :
-    Good (GLs n) (fun q : ℝ × Mat n => ((g q.1 : ℂ)) • u q.1 q.2) T := by
+private theorem good_smul_bump_of_isWave
+    {n : ℕ} (E : KMod n) (u : ℝ → Mat n → E.V) (hu : IsWave E u)
+    (g : ℝ → ℝ) (T : ℝ) (hg : IsBump g T)
+    : Good (GLs n) (fun q : ℝ × Mat n => ((g q.1 : ℂ)) • u q.1 q.2) T := by
   refine ⟨?_, ?_⟩
   · have h1 : ContDiff ℝ ∞ (fun q : ℝ × Mat n => ((g q.1 : ℂ))) :=
       Complex.ofRealCLM.contDiff.comp (hg.1.comp contDiff_fst)

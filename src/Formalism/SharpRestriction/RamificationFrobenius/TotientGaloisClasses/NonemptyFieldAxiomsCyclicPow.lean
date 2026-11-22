@@ -18,15 +18,20 @@ open Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition
 
 section Field
 
-variable {e q d : ℕ} (hH : HostHyp q d) {L : Type} [Field L] [NumberField L] {ζ a b : L}
-  (h : IsLayer (e + 2) q d ζ a b)
+variable
+  {e q d : ℕ} (hH : HostHyp q d)
+  {L : Type} [Field L] [NumberField L]
+  {ζ a b : L} (h : IsLayer (e + 2) q d ζ a b)
 include hH h
 
-theorem frob_art (p : ℕ) [Fact p.Prime] (hp : ¬ p ∣ 2 ^ (e + 2) * q * d)
+theorem frob_art
+    (p : ℕ) [Fact p.Prime]
+    (hp : ¬ p ∣ 2 ^ (e + 2) * q * d)
     (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})]
-    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (u : (ZMod (2 ^ (e + 2) * q * d))ˣ)
-    (hu : (u : ZMod (2 ^ (e + 2) * q * d)) = (p : ZMod (2 ^ (e + 2) * q * d))) :
-    IsArithFrobAt ℤ σ P ↔ galE e ζ a b σ = art0 e hH u := by
+    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
+    (u : (ZMod (2 ^ (e + 2) * q * d))ˣ)
+    (hu : (u : ZMod (2 ^ (e + 2) * q * d)) = (p : ZMod (2 ^ (e + 2) * q * d)))
+    : IsArithFrobAt ℤ σ P ↔ galE e ζ a b σ = art0 e hH u := by
   have hpp : p.Prime := Fact.out
   have hp2 : p ≠ 2 := by
     rintro rfl
@@ -59,7 +64,9 @@ theorem frob_art (p : ℕ) [Fact p.Prime] (hp : ¬ p ∣ 2 ^ (e + 2) * q * d)
     (Nat.ModEq.of_mul_right d huN).of_mul_right q
   have hcop : p.Coprime (2 ^ (e + 2)) :=
     Nat.Coprime.pow_right _ ((Nat.coprime_primes hpp Nat.prime_two).mpr hp2)
-  have hvp : ((ZMod.unitOfCoprime p hcop : (ZMod (2 ^ (e + 2)))ˣ) : ZMod (2 ^ (e + 2))) = (p : ZMod (2 ^ (e + 2))) :=
+  have hvp
+      : ((ZMod.unitOfCoprime p hcop : (ZMod (2 ^ (e + 2)))ˣ) : ZMod (2 ^ (e + 2)))
+        = (p : ZMod (2 ^ (e + 2))) :=
     ZMod.coe_unitOfCoprime p hcop
   have hA : (((art0 e hH u).1.1 : ℤˣ) : ℤ) = jacobiSym (p : ℤ) q := by
     apply artinMap_first_eq_jacobiSym_of_modEq
@@ -69,7 +76,8 @@ theorem frob_art (p : ℕ) [Fact p.Prime] (hp : ¬ p ∣ 2 ^ (e + 2) * q * d)
     exact hud
   have hC : (art0 e hH u).2 = hcl e (ZMod.unitOfCoprime p hcop) := by
     exact artinMap_dyadic_eq_of_modEq (hu := hu2) (hv := hvp) ..
-  rw [(Formalism.FrobeniusOrbits.Final.host_field.2.2.2.2.2.2.2.2.2.2.2.1 e q d hH.toHypOdd L ζ a b h p hp2 hpq hpd P).2.1 σ]
+  rw [(Formalism.FrobeniusOrbits.Final.host_field.2.2.2.2.2.2.2.2.2.2.2.1 e q d hH.toHypOdd L ζ a b
+    h p hp2 hpq hpd P).2.1 σ]
   constructor
   · rintro ⟨h1, h2, v', hv', h3⟩
     have hvv : v' = ZMod.unitOfCoprime p hcop := Units.ext (hv'.trans hvp.symm)
@@ -85,12 +93,16 @@ theorem frob_art (p : ℕ) [Fact p.Prime] (hp : ¬ p ∣ 2 ^ (e + 2) * q * d)
       exact (recip d hd4).symm
     · rw [hg, hC]
 
-theorem inertia_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
-    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) :
-    (∀ x : 𝓞 (hostE ζ a b), σ • x - x ∈ P) ↔ ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
-      (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ 1 [MOD ordCompl[l] (2 ^ (e + 2) * q * d)] ∧
-        galE e ζ a b σ = art0 e hH u := by
-  have hI := Formalism.FrobeniusOrbits.Final.host_field.2.2.2.2.2.2.2.2.2.2.2.2.1 e q d hH L ζ a b h σ
+theorem inertia_art
+    (l : ℕ) [Fact l.Prime]
+    (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
+    : (∀ x : 𝓞 (hostE ζ a b), σ • x - x ∈ P)
+      ↔ ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
+        (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ 1 [MOD ordCompl[l] (2 ^ (e + 2) * q * d)]
+          ∧ galE e ζ a b σ = art0 e hH u := by
+  have hI :=
+    Formalism.FrobeniusOrbits.Final.host_field.2.2.2.2.2.2.2.2.2.2.2.2.1 e q d hH L ζ a b h σ
   by_cases hl2 : l = 2
   · subst hl2
     haveI : P.LiesOver (span {(2 : ℤ)}) := by
@@ -119,7 +131,9 @@ theorem inertia_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [
     · exact hld ((Nat.prime_dvd_prime_iff_eq hlp hdp).mp h1)
   have hoc : ordCompl[l] (2 ^ (e + 2) * q * d) = 2 ^ (e + 2) * q * d := by
     rw [Nat.factorization_eq_zero_of_not_dvd hnd, pow_zero, Nat.div_one]
-  rw [hoc, (Formalism.FrobeniusOrbits.Final.host_field.2.2.2.2.2.2.2.2.2.2.2.1 e q d hH.toHypOdd L ζ a b h l hl2 hlq hld P).2.2 σ]
+  rw [hoc,
+    (Formalism.FrobeniusOrbits.Final.host_field.2.2.2.2.2.2.2.2.2.2.2.1 e q d hH.toHypOdd L ζ a b h
+      l hl2 hlq hld P).2.2 σ]
   have hone : galE e ζ a b 1 = 1 := map_one (galEquiv hH.toHypOdd h)
   constructor
   · rintro rfl
@@ -137,14 +151,19 @@ theorem inertia_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [
     exact (galEquiv hH.toHypOdd h).injective
       (show galEquiv hH.toHypOdd h σ = galEquiv hH.toHypOdd h 1 from hu2)
 
-theorem decomp_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
-    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) :
-    σ ∈ MulAction.stabilizer _ P ↔ ∃ (u : (ZMod (2 ^ (e + 2) * q * d))ˣ) (k : ℕ),
-      (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ l ^ k [MOD ordCompl[l] (2 ^ (e + 2) * q * d)] ∧
-        galE e ζ a b σ = art0 e hH u := by
+theorem decomp_art
+    (l : ℕ) [Fact l.Prime]
+    (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
+    : σ ∈ MulAction.stabilizer _ P
+      ↔ ∃ (u : (ZMod (2 ^ (e + 2) * q * d))ˣ) (k : ℕ),
+        (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ l ^ k [MOD ordCompl[l] (2 ^ (e + 2) * q * d)]
+          ∧ galE e ζ a b σ = art0 e hH u := by
   have hl : l.Prime := Fact.out
-  have hD := hostDecomp e q d hH L ζ a b h (ZMod.unitOfCoprime q (cop_2q e hH).symm)
-    (ZMod.unitOfCoprime d (cop_2d e hH).symm) (ZMod.coe_unitOfCoprime _ _) (ZMod.coe_unitOfCoprime _ _) σ
+  have hD :=
+    hostDecomp e q d hH L ζ a b h (ZMod.unitOfCoprime q (cop_2q e hH).symm)
+      (ZMod.unitOfCoprime d (cop_2d e hH).symm) (ZMod.coe_unitOfCoprime _ _)
+      (ZMod.coe_unitOfCoprime _ _) σ
   by_cases hN : l ∣ 2 ^ (e + 2) * q * d
   · rcases (dvd_N_iff e hH hl).mp hN with h2 | h2 | h2
     · subst h2
@@ -161,8 +180,10 @@ theorem decomp_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P
     rw [dvd_N_iff e hH hl, not_or, not_or] at hN'
     obtain ⟨⟨F, hF⟩, -, hin⟩ := Final.frob e q d hH.toHypOdd L ζ a b h l hN'.1 hN'.2.1 hN'.2.2 P
     set w := ZMod.unitOfCoprime l hc with hw
-    have hwv : ∀ k : ℕ, ((w ^ k : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)) =
-        ((l ^ k : ℕ) : ZMod (2 ^ (e + 2) * q * d)) := fun k => by
+    have hwv
+        : ∀ k : ℕ,
+          ((w ^ k : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d))
+            = ((l ^ k : ℕ) : ZMod (2 ^ (e + 2) * q * d)) := fun k => by
       rw [Units.val_pow_eq_pow_val, hw, ZMod.coe_unitOfCoprime, Nat.cast_pow]
     have hFw := (frob_art hH h l hN P F w (ZMod.coe_unitOfCoprime _ _)).mp hF
     constructor
@@ -175,7 +196,8 @@ theorem decomp_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P
     · rintro ⟨u, k, hu, h1⟩
       have h2 : u = w ^ k := by
         apply Units.ext
-        rw [hwv, ← ZMod.natCast_zmod_val (u : ZMod (2 ^ (e + 2) * q * d)), (ZMod.natCast_eq_natCast_iff _ _ _).mpr hu]
+        rw [hwv, ← ZMod.natCast_zmod_val (u : ZMod (2 ^ (e + 2) * q * d)),
+          (ZMod.natCast_eq_natCast_iff _ _ _).mpr hu]
       have h3 : σ = F ^ k := by
         apply galE_injective (e := e) hH.toHypOdd h
         rw [h1, h2, galE_pow hH.toHypOdd h, hFw, map_pow]
@@ -183,8 +205,9 @@ theorem decomp_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P
       exact Subgroup.pow_mem _ hF.mem_stabilizer k
 
 omit hH h in
-theorem frob_iff_inertia (P : Ideal (𝓞 (hostE ζ a b))) (F σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (hF : IsArithFrobAt ℤ F P) :
-    IsArithFrobAt ℤ σ P ↔ ∀ x : 𝓞 (hostE ζ a b), (σ * F⁻¹) • x - x ∈ P := by
+theorem frob_iff_inertia
+    (P : Ideal (𝓞 (hostE ζ a b))) (F σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (hF : IsArithFrobAt ℤ F P)
+    : IsArithFrobAt ℤ σ P ↔ ∀ x : 𝓞 (hostE ζ a b), (σ * F⁻¹) • x - x ∈ P := by
   have hF' : ∀ x : 𝓞 (hostE ζ a b), F • x - x ^ Nat.card (ℤ ⧸ P.under ℤ) ∈ P := hF
   have key : ∀ y : 𝓞 (hostE ζ a b), (σ * F⁻¹) • (F • y) = σ • y := by
     intro y
@@ -200,11 +223,13 @@ theorem frob_iff_inertia (P : Ideal (𝓞 (hostE ζ a b))) (F σ : hostE ζ a b 
     have h3 := P.add_mem (hin (F • y)) (hF' y)
     rwa [key, sub_add_sub_cancel] at h3
 
-theorem exists_frob_lift (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime]
-    [P.LiesOver (span {(l : ℤ)})] :
-    ∃ (Q : Ideal (𝓞 L)) (_ : Q.IsPrime) (_ : Q.LiesOver (span {(l : ℤ)})) (F : L ≃ₐ[ℚ] L)
-      (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b), IsArithFrobAt ℤ F Q ∧ IsArithFrobAt ℤ σ P ∧
-      galE e ζ a b σ = (((galMap h.1 a b F).2.1, (galMap h.1 a b F).2.2), hcl e (galMap h.1 a b F).1) := by
+theorem exists_frob_lift
+    (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+    : ∃ (Q : Ideal (𝓞 L)) (_ : Q.IsPrime) (_ : Q.LiesOver (span {(l : ℤ)})) (F : L ≃ₐ[ℚ] L)
+        (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b),
+      IsArithFrobAt ℤ F Q ∧ IsArithFrobAt ℤ σ P
+        ∧ galE e ζ a b σ
+          = (((galMap h.1 a b F).2.1, (galMap h.1 a b F).2.2), hcl e (galMap h.1 a b F).1) := by
   have hl : l.Prime := Fact.out
   have hqd := hH.toHypOdd
   obtain ⟨hLgal, -⟩ := layerGalois (e + 2) q d (by omega) hqd L ζ a b h
@@ -219,11 +244,12 @@ theorem exists_frob_lift (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b
   obtain ⟨σ, hσ⟩ := Galois.exists_restrict hqd h F
   exact ⟨Q, hQp, hQ, F, σ, hF, Decomp.frob_restrict l Q P σ F hσ hF, galE_of_lift h hσ⟩
 
-theorem exists_frob_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime]
-    [P.LiesOver (span {(l : ℤ)})] :
-    ∃ (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (u : (ZMod (2 ^ (e + 2) * q * d))ˣ), IsArithFrobAt ℤ σ P ∧
-      (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ l [MOD ordCompl[l] (2 ^ (e + 2) * q * d)] ∧
-        galE e ζ a b σ = art0 e hH u := by
+theorem exists_frob_art
+    (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+    : ∃ (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (u : (ZMod (2 ^ (e + 2) * q * d))ˣ),
+      IsArithFrobAt ℤ σ P
+        ∧ (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ l [MOD ordCompl[l] (2 ^ (e + 2) * q * d)]
+        ∧ galE e ζ a b σ = art0 e hH u := by
   have hl : l.Prime := Fact.out
   have hqd := hH.toHypOdd
   obtain ⟨Q, _, _, F, σ, hF, hσ, hg⟩ := exists_frob_lift hH h l P
@@ -235,69 +261,107 @@ theorem exists_frob_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b)
   · rcases (dvd_N_iff e hH hl).mp hN with h2 | h2 | h2
     · subst h2
       have : P.LiesOver (span {(2 : ℤ)}) := ‹P.LiesOver (span {((2 : ℕ) : ℤ)})›
-      have hD := fun τ => (hostDecomp e q d hH L ζ a b h (ZMod.unitOfCoprime q (cop_2q e hH).symm)
-        (ZMod.unitOfCoprime d (cop_2d e hH).symm) (ZMod.coe_unitOfCoprime _ _) (ZMod.coe_unitOfCoprime _ _) τ).1 P
+      have hD := fun τ =>
+        (hostDecomp e q d hH L ζ a b h (ZMod.unitOfCoprime q (cop_2q e hH).symm)
+          (ZMod.unitOfCoprime d (cop_2d e hH).symm) (ZMod.coe_unitOfCoprime _ _)
+          (ZMod.coe_unitOfCoprime _ _) τ).1 P
       have h1 : (galE e ζ a b σ).1.2 = 1 := (hD σ).mp hσ.mem_stabilizer
       have h3 : (galE e ζ a b σ).1.1 = -1 := by
         refine (Int.units_eq_one_or _).resolve_left fun h4 => ?_
         obtain ⟨s, hs⟩ := exists_galE_eq hqd h (sg e)
-        obtain ⟨k, ρ, hρ, hk⟩ := Decomp.stab_eq_inertia_mul 2 P σ s hσ ((hD s).mpr (by rw [hs]; rfl))
+        obtain ⟨k, ρ, hρ, hk⟩ :=
+          Decomp.stab_eq_inertia_mul 2 P σ s hσ ((hD s).mpr (by rw [hs]; rfl))
         have h5 := ((hostInertia e q d hH L ζ a b h ρ).1 P).mp hρ
         have h6 : (galE e ζ a b σ).1 = 1 := Prod.ext h4 h1
         have h7 := congrArg (fun g : FrobeniusOrbits.GG e => g.1) hs
-        simp only [hk, galE_mul hqd h, galE_pow hqd h, Prod.fst_mul, Prod.pow_fst, h5, h6, one_pow, mul_one] at h7
+        simp only [hk, galE_mul hqd h, galE_pow hqd h, Prod.fst_mul, Prod.pow_fst, h5, h6, one_pow,
+            mul_one]
+          at h7
         exact absurd h7 (show ¬ (1 : G0) = (-1, 1) by decide)
       obtain ⟨x, v, hv, hx⟩ := exists_rep e (galE e ζ a b σ).2
-      obtain ⟨u, -, u2, u3, hu⟩ := exists_art e hH _ x 2 2 v hv hx (by rw [h3, jac_2q hH]; rfl)
-        (by rw [h1, jac_2d hH]; rfl)
-      exact ⟨σ, u, hσ, by
-        rw [ordCompl_two e hH]; exact (Nat.modEq_and_modEq_iff_modEq_mul (cop_qd hH)).mp ⟨u2, u3⟩, hu⟩
+      obtain ⟨u, -, u2, u3, hu⟩ :=
+        exists_art e hH _ x 2 2 v hv hx (by rw [h3, jac_2q hH]; rfl) (by rw [h1, jac_2d hH]; rfl)
+      exact ⟨
+        σ,
+        u,
+        hσ,
+        by
+          rw [ordCompl_two e hH]; exact (Nat.modEq_and_modEq_iff_modEq_mul (cop_qd hH)).mp ⟨u2, u3⟩,
+        hu
+      ⟩
     · subst h2
       have h1 := odd_cyc_frob h.1 l hqd.2.2.2.1 Q F hF
-      have h3 := odd_frob_sgn l hqd.2.2.2.1 Q F hF b _ hb
-        (by rw [dvd_neg]; intro h'; exact hqnd (by exact_mod_cast h'))
+      have h3 :=
+        odd_frob_sgn l hqd.2.2.2.1 Q F hF b _ hb
+          (by rw [dvd_neg]; intro h'; exact hqnd (by exact_mod_cast h'))
       rw [hH.2.2.2.2] at h3
       obtain ⟨y, -, hy⟩ := exists_sign hH.1 (q4 hH) (galE e ζ a b σ).1.1
-      obtain ⟨u, u1, -, u3, hu⟩ := exists_art e hH (galE e ζ a b σ) l y l _ h1 (by rw [hg]; rfl) hy.symm
-        (by rw [jac_qd hH, hg]; exact h3)
-      exact ⟨σ, u, hσ, by
-        rw [ordCompl_q e hH]; exact (Nat.modEq_and_modEq_iff_modEq_mul (cop_2d e hH)).mp ⟨u1, u3⟩, hu⟩
+      obtain ⟨u, u1, -, u3, hu⟩ :=
+        exists_art e hH (galE e ζ a b σ) l y l _ h1 (by rw [hg]; rfl) hy.symm
+          (by rw [jac_qd hH, hg]; exact h3)
+      exact ⟨
+        σ,
+        u,
+        hσ,
+        by
+          rw [ordCompl_q e hH]; exact (Nat.modEq_and_modEq_iff_modEq_mul (cop_2d e hH)).mp ⟨u1, u3⟩,
+        hu
+      ⟩
     · subst h2
       have h1 := odd_cyc_frob h.1 l hqd.2.2.2.2 Q F hF
-      have h3 := odd_frob_sgn l hqd.2.2.2.2 Q F hF a _ ha
-        (by rw [dvd_neg]; intro h'; exact hdnq (by exact_mod_cast h'))
+      have h3 :=
+        odd_frob_sgn l hqd.2.2.2.2 Q F hF a _ ha
+          (by rw [dvd_neg]; intro h'; exact hdnq (by exact_mod_cast h'))
       rw [hostRecip q l hH] at h3
       obtain ⟨z, -, hz⟩ := exists_sign hH.2.1 (d4 hH) (galE e ζ a b σ).1.2
-      obtain ⟨u, u1, u2, -, hu⟩ := exists_art e hH (galE e ζ a b σ) l l z _ h1 (by rw [hg]; rfl)
-        (by rw [jac_dq hH, hg]; exact h3) hz.symm
-      exact ⟨σ, u, hσ, by
-        rw [ordCompl_d e hH]; exact (Nat.modEq_and_modEq_iff_modEq_mul (cop_2q e hH)).mp ⟨u1, u2⟩, hu⟩
+      obtain ⟨u, u1, u2, -, hu⟩ :=
+        exists_art e hH (galE e ζ a b σ) l l z _ h1 (by rw [hg]; rfl)
+          (by rw [jac_dq hH, hg]; exact h3) hz.symm
+      exact ⟨
+        σ,
+        u,
+        hσ,
+        by
+          rw [ordCompl_d e hH]; exact (Nat.modEq_and_modEq_iff_modEq_mul (cop_2q e hH)).mp ⟨u1, u2⟩,
+        hu
+      ⟩
   · have := neZeroN e hH
     have hc : Nat.Coprime l (2 ^ (e + 2) * q * d) := (Nat.Prime.coprime_iff_not_dvd hl).mpr hN
-    refine ⟨σ, ZMod.unitOfCoprime l hc, hσ, ?_, (frob_art hH h l hN P σ _ (ZMod.coe_unitOfCoprime _ _)).mp hσ⟩
+    refine ⟨
+      σ,
+      ZMod.unitOfCoprime l hc,
+      hσ,
+      ?_,
+      (frob_art hH h l hN P σ _ (ZMod.coe_unitOfCoprime _ _)).mp hσ
+    ⟩
     rw [ZMod.coe_unitOfCoprime, ZMod.val_natCast]
     exact (Nat.mod_modEq _ _).of_dvd (Nat.ordCompl_dvd _ _)
 
-theorem frob_any_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
-    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) :
-    IsArithFrobAt ℤ σ P ↔ ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
-      (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ l [MOD ordCompl[l] (2 ^ (e + 2) * q * d)] ∧
-        galE e ζ a b σ = art0 e hH u := by
+theorem frob_any_art
+    (l : ℕ) [Fact l.Prime]
+    (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(l : ℤ)})]
+    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
+    : IsArithFrobAt ℤ σ P
+      ↔ ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
+        (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ l [MOD ordCompl[l] (2 ^ (e + 2) * q * d)]
+          ∧ galE e ζ a b σ = art0 e hH u := by
   obtain ⟨F, u0, hF, hu0, hgF⟩ := exists_frob_art hH h l P
   rw [frob_iff_inertia P F σ hF, inertia_art hH h l P]
-  have hmul : ∀ τ₁ τ₂ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b,
-      galE e ζ a b (τ₁ * τ₂) = galE e ζ a b τ₁ * galE e ζ a b τ₂ :=
-    fun τ₁ τ₂ => map_mul (galEquiv hH.toHypOdd h) τ₁ τ₂
-  have hinv : ∀ τ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b, galE e ζ a b τ⁻¹ = (galE e ζ a b τ)⁻¹ :=
-    fun τ => map_inv (galEquiv hH.toHypOdd h) τ
+  have hmul
+      : ∀ τ₁ τ₂ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b,
+        galE e ζ a b (τ₁ * τ₂) = galE e ζ a b τ₁ * galE e ζ a b τ₂ := fun τ₁ τ₂ =>
+    map_mul (galEquiv hH.toHypOdd h) τ₁ τ₂
+  have hinv : ∀ τ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b, galE e ζ a b τ⁻¹ = (galE e ζ a b τ)⁻¹ := fun τ =>
+    map_inv (galEquiv hH.toHypOdd h) τ
   have hN0 : 2 ^ (e + 2) * q * d ≠ 0 :=
     mul_ne_zero (mul_ne_zero (pow_ne_zero _ two_ne_zero) hH.1.ne_zero) hH.2.1.ne_zero
   haveI : NeZero (2 ^ (e + 2) * q * d) := ⟨hN0⟩
   have hdvd : ordCompl[l] (2 ^ (e + 2) * q * d) ∣ 2 ^ (e + 2) * q * d := Nat.ordCompl_dvd _ _
-  have hval : ∀ x y : (ZMod (2 ^ (e + 2) * q * d))ˣ,
-      ((x * y : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)).val ≡
-        (x : ZMod (2 ^ (e + 2) * q * d)).val * (y : ZMod (2 ^ (e + 2) * q * d)).val
-        [MOD ordCompl[l] (2 ^ (e + 2) * q * d)] := by
+  have hval
+      : ∀ x y : (ZMod (2 ^ (e + 2) * q * d))ˣ,
+        ((x * y : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)).val ≡
+          (x : ZMod (2 ^ (e + 2) * q * d)).val * (y : ZMod (2 ^ (e + 2) * q * d)).val
+          [MOD ordCompl[l] (2 ^ (e + 2) * q * d)] := by
     intro x y
     rw [Units.val_mul, ZMod.val_mul]
     exact Nat.ModEq.of_dvd hdvd (Nat.mod_modEq _ _)
@@ -309,22 +373,27 @@ theorem frob_any_art (l : ℕ) [Fact l.Prime] (P : Ideal (𝓞 (hostE ζ a b))) 
     · rw [map_mul, ← hgF, ← hg1, hmul, hinv, inv_mul_cancel_right]
   · rintro ⟨u, hu, hg⟩
     refine ⟨u * u0⁻¹, ?_, ?_⟩
-    · have h1 : ((u0⁻¹ * u0 : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)).val ≡ 1
-          [MOD ordCompl[l] (2 ^ (e + 2) * q * d)] := by
+    · have h1
+          : ((u0⁻¹ * u0 : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)).val ≡ 1
+            [MOD ordCompl[l] (2 ^ (e + 2) * q * d)] := by
         rw [inv_mul_cancel, Units.val_one, ZMod.val_one_eq_one_mod]
         exact Nat.ModEq.of_dvd hdvd (Nat.mod_modEq 1 _)
       have h2 := (hval u0⁻¹ u0).symm.trans h1
       have h3 := (hval u u0⁻¹).trans (Nat.ModEq.mul_right _ (hu.trans hu0.symm))
-      have hc : (u0 : ZMod (2 ^ (e + 2) * q * d)).val * ((u0⁻¹ : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)).val =
-          ((u0⁻¹ : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)).val * (u0 : ZMod (2 ^ (e + 2) * q * d)).val :=
+      have hc
+          : (u0 : ZMod (2 ^ (e + 2) * q * d)).val
+              * ((u0⁻¹ : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)).val
+            = ((u0⁻¹ : (ZMod (2 ^ (e + 2) * q * d))ˣ) : ZMod (2 ^ (e + 2) * q * d)).val
+              * (u0 : ZMod (2 ^ (e + 2) * q * d)).val :=
         Nat.mul_comm _ _
       rw [hc] at h3
       exact h3.trans h2
     · rw [hmul, hinv, hg, hgF, map_mul, map_inv]
 
 omit h in
-theorem exact_art (he : 1 ≤ e) : ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
-    (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ 1 [MOD 2 ^ (e + 2) * q * d / 2] ∧ art0 e hH u ≠ 1 := by
+theorem exact_art (he : 1 ≤ e)
+    : ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
+      (u : ZMod (2 ^ (e + 2) * q * d)).val ≡ 1 [MOD 2 ^ (e + 2) * q * d / 2] ∧ art0 e hH u ≠ 1 := by
   have hqp : q.Prime := hH.1
   have hdp : d.Prime := hH.2.1
   have hq8 := hH.2.2.1
@@ -338,12 +407,14 @@ theorem exact_art (he : 1 ≤ e) : ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
   have hcop : (1 + 2 ^ (e + 1)).Coprime (2 ^ (e + 2)) :=
     Nat.Coprime.pow_right _
       (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd Nat.prime_two).mpr (by omega)))
-  obtain ⟨v, hv⟩ : ∃ v : (ZMod (2 ^ (e + 2)))ˣ,
-      (v : ZMod (2 ^ (e + 2))) = ((1 + 2 ^ (e + 1) : ℕ) : ZMod (2 ^ (e + 2))) :=
+  obtain ⟨v, hv⟩
+      : ∃ v : (ZMod (2 ^ (e + 2)))ˣ,
+        (v : ZMod (2 ^ (e + 2))) = ((1 + 2 ^ (e + 1) : ℕ) : ZMod (2 ^ (e + 2))) :=
     ⟨ZMod.unitOfCoprime _ hcop, ZMod.coe_unitOfCoprime _ hcop⟩
   have hvne : hcl e v ≠ 1 := by
     intro hc
-    have hmem : v ∈ Subgroup.zpowers (-1 : (ZMod (2 ^ (e + 2)))ˣ) := (QuotientGroup.eq_one_iff v).mp hc
+    have hmem : v ∈ Subgroup.zpowers (-1 : (ZMod (2 ^ (e + 2)))ˣ) :=
+      (QuotientGroup.eq_one_iff v).mp hc
     rcases (Formalism.FrobeniusOrbits.Galois.mem_zpowers_neg_one v).mp hmem with h1 | h1
     · have h3 : ((1 + 2 ^ (e + 1) : ℕ) : ZMod (2 ^ (e + 2))) = ((1 : ℕ) : ZMod (2 ^ (e + 2))) := by
         rw [← hv, h1, Units.val_one, Nat.cast_one]
@@ -353,8 +424,9 @@ theorem exact_art (he : 1 ≤ e) : ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
       rw [Nat.mod_eq_of_lt hlt1, Nat.mod_eq_of_lt hlt2] at h4
       omega
     · have h3 : ((2 + 2 ^ (e + 1) : ℕ) : ZMod (2 ^ (e + 2))) = ((0 : ℕ) : ZMod (2 ^ (e + 2))) := by
-        have h5 : ((2 + 2 ^ (e + 1) : ℕ) : ZMod (2 ^ (e + 2))) =
-            ((1 + 2 ^ (e + 1) : ℕ) : ZMod (2 ^ (e + 2))) + 1 := by
+        have h5
+            : ((2 + 2 ^ (e + 1) : ℕ) : ZMod (2 ^ (e + 2)))
+              = ((1 + 2 ^ (e + 1) : ℕ) : ZMod (2 ^ (e + 2))) + 1 := by
           push_cast
           ring
         rw [h5, ← hv, h1, Units.val_neg, Units.val_one, neg_add_cancel, Nat.cast_zero]
@@ -362,9 +434,9 @@ theorem exact_art (he : 1 ≤ e) : ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
       have hlt3 : 2 + 2 ^ (e + 1) < 2 ^ (e + 2) := by omega
       rw [Nat.mod_eq_of_lt hlt3, Nat.zero_mod] at h4
       omega
-  obtain ⟨u, hux, huy, huz, hg⟩ := exists_art (hH := hH) (g := ((1, 1), hcl e v))
-    (x := 1 + 2 ^ (e + 1)) (y := 1) (z := 1) (v := v) (hv := hv) (hx := rfl)
-    (hy := by simp) (hz := by simp) ..
+  obtain ⟨u, hux, huy, huz, hg⟩ :=
+    exists_art (hH := hH) (g := ((1, 1), hcl e v)) (x := 1 + 2 ^ (e + 1)) (y := 1) (z := 1) (v := v)
+      (hv := hv) (hx := rfl) (hy := by simp) (hz := by simp) ..
   refine ⟨u, ?_, ?_⟩
   · have hN2 : 2 ^ (e + 2) * q * d / 2 = 2 ^ (e + 1) * q * d :=
       Nat.div_eq_of_eq_mul_left (by norm_num) (by ring)
@@ -377,7 +449,8 @@ theorem exact_art (he : 1 ≤ e) : ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
     have hc1 : Nat.Coprime (2 ^ (e + 1)) q :=
       Nat.Coprime.pow_left _ ((Nat.coprime_primes Nat.prime_two hqp).mpr (Ne.symm hq2))
     have hc2 : Nat.Coprime (2 ^ (e + 1) * q) d :=
-      Nat.Coprime.mul_left (Nat.Coprime.pow_left _ ((Nat.coprime_primes Nat.prime_two hdp).mpr (Ne.symm hd2)))
+      Nat.Coprime.mul_left
+        (Nat.Coprime.pow_left _ ((Nat.coprime_primes Nat.prime_two hdp).mpr (Ne.symm hd2)))
         ((Nat.coprime_primes hqp hdp).mpr hqd)
     exact (Nat.modEq_and_modEq_iff_modEq_mul hc2).mp
       ⟨(Nat.modEq_and_modEq_iff_modEq_mul hc1).mp ⟨hx1, huy⟩, huz⟩
@@ -385,30 +458,34 @@ theorem exact_art (he : 1 ≤ e) : ∃ u : (ZMod (2 ^ (e + 2) * q * d))ˣ,
     rw [← hg] at h0
     exact hvne (congrArg Prod.snd h0)
 
-theorem splitK_E (p : ℕ) (hp : p.Prime) :
-    (primesOver (span {(p : ℤ)}) (𝓞 (KinE ζ a b))).ncard = 2 ↔ (p = 2 ∨ (p ≠ 2 ∧ jacobiSym (-(d : ℤ)) p = 1)) :=
+theorem splitK_E (p : ℕ) (hp : p.Prime)
+    : (primesOver (span {(p : ℤ)}) (𝓞 (KinE ζ a b))).ncard = 2
+      ↔ (p = 2 ∨ (p ≠ 2 ∧ jacobiSym (-(d : ℤ)) p = 1)) :=
   SplitK.clause (L := hostE ζ a b) (b := bE ζ a b) hH.2.1 (by have := hH.2.2.2.1; omega)
     (by apply Subtype.ext; push_cast; exact h.2.2.1) p hp
 
-theorem rd_eq : |(discr (hostE ζ a b) : ℝ)| ^ ((1 : ℝ) / (Module.finrank ℚ (hostE ζ a b) : ℝ)) =
-    (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d) := by
+theorem rd_eq
+    : |(discr (hostE ζ a b) : ℝ)| ^ ((1 : ℝ) / (Module.finrank ℚ (hostE ζ a b) : ℝ))
+      = (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d) := by
   rw [Formalism.FrobeniusOrbits.finrank_cmField hH.toHypOdd h]
   push_cast
-  exact ((Formalism.FrobeniusOrbits.hostDiscr_of Formalism.FrobeniusOrbits.discriminant_real_subfield) e q d hH L ζ a b h).2.2.2.1
+  exact ((Formalism.FrobeniusOrbits.hostDiscr_of
+      Formalism.FrobeniusOrbits.discriminant_real_subfield)
+    e q d hH L ζ a b h).2.2.2.1
 
 end Field
 
-theorem real_ge (e q d : ℕ) (hq : 1 ≤ q) :
-    (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt d ≤
-      (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d) := by
+theorem real_ge (e q d : ℕ) (hq : 1 ≤ q)
+    : (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt d
+      ≤ (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d) := by
   have hq' : (1 : ℝ) ≤ q := by exact_mod_cast hq
   have hd : (0 : ℝ) ≤ d := Nat.cast_nonneg d
   apply mul_le_mul_of_nonneg_left _ (by positivity)
   apply Real.sqrt_le_sqrt
   nlinarith
 
-theorem real_le (e : ℕ) (s : ℝ) (hs : 0 ≤ s) :
-    (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * s ≤ ((2 ^ (e + 2) : ℕ) : ℝ) / 2 * s := by
+theorem real_le (e : ℕ) (s : ℝ) (hs : 0 ≤ s)
+    : (2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * s ≤ ((2 ^ (e + 2) : ℕ) : ℝ) / 2 * s := by
   apply mul_le_mul_of_nonneg_right _ hs
   have h1 : ((2 ^ (e + 2) : ℕ) : ℝ) / 2 = (2 : ℝ) ^ ((e : ℝ) + 1) := by
     rw [show ((e : ℝ) + 1) = ((e + 1 : ℕ) : ℝ) by push_cast; ring, Real.rpow_natCast]
@@ -419,8 +496,9 @@ theorem real_le (e : ℕ) (s : ℝ) (hs : 0 ≤ s) :
   have : (0 : ℝ) ≤ (2 : ℝ) ^ (-(e : ℝ)) := by positivity
   linarith
 
-theorem real_sq (e q d : ℕ) (he : 2 ≤ e) (hq : 1 ≤ q) (hd : 1 ≤ d) :
-    (4 * ((2 ^ e : ℕ) : ℝ)) ≤ ((2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d)) ^ 2 := by
+theorem real_sq (e q d : ℕ) (he : 2 ≤ e) (hq : 1 ≤ q) (hd : 1 ≤ d)
+    : (4 * ((2 ^ e : ℕ) : ℝ))
+      ≤ ((2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ))) * Real.sqrt ((q : ℝ) * d)) ^ 2 := by
   have hq1 : (1 : ℝ) ≤ q := by exact_mod_cast hq
   have hd1 : (1 : ℝ) ≤ d := by exact_mod_cast hd
   have hqd : (1 : ℝ) ≤ (q : ℝ) * d := by nlinarith
@@ -429,8 +507,9 @@ theorem real_sq (e q d : ℕ) (he : 2 ≤ e) (hq : 1 ≤ q) (hd : 1 ≤ d) :
     apply Real.rpow_le_one_of_one_le_of_nonpos (by norm_num)
     have : (0 : ℝ) ≤ e := Nat.cast_nonneg e
     linarith
-  have hpow : ((2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ)))) ^ 2 =
-      (2 : ℝ) ^ (2 * ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ)))) := by
+  have hpow
+      : ((2 : ℝ) ^ ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ)))) ^ 2
+        = (2 : ℝ) ^ (2 * ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ)))) := by
     rw [← Real.rpow_natCast, ← Real.rpow_mul (by norm_num)]
     congr 1
     push_cast
@@ -443,25 +522,31 @@ theorem real_sq (e q d : ℕ) (he : 2 ≤ e) (hq : 1 ≤ q) (hd : 1 ≤ d) :
   rw [h4]
   have he' : (2 : ℝ) ≤ e := by exact_mod_cast he
   have hpos : (0 : ℝ) < (2 : ℝ) ^ (2 * ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ)))) := by positivity
-  calc (2 : ℝ) ^ ((e : ℝ) + 2) ≤ (2 : ℝ) ^ (2 * ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ)))) := by
-        apply Real.rpow_le_rpow_of_exponent_le (by norm_num)
-        linarith
+  calc
+    (2 : ℝ) ^ ((e : ℝ) + 2) ≤ (2 : ℝ) ^ (2 * ((e : ℝ) + 1 - (2 : ℝ) ^ (-(e : ℝ)))) := by
+      apply Real.rpow_le_rpow_of_exponent_le (by norm_num)
+      linarith
     _ ≤ _ := by nlinarith
 
-variable (φ : Frame) (hinj : Function.Injective φ.h)
-  {q d : ℕ} (hH : HostHyp q d) (he : 2 ≤ φ.e) {L : Type} [Field L] [NumberField L] {ζ a b : L}
-  (h : IsLayer (φ.e + 2) q d ζ a b)
+variable
+  (φ : Frame) (hinj : Function.Injective φ.h)
+  {q d : ℕ} (hH : HostHyp q d)
+  (he : 2 ≤ φ.e)
+  {L : Type} [Field L] [NumberField L]
+  {ζ a b : L} (h : IsLayer (φ.e + 2) q d ζ a b)
 
-theorem gal_eq (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) :
-    (hostRaw φ hinj hH he h).gal σ = ggIso φ hinj (galE φ.e ζ a b σ) := rfl
+theorem gal_eq (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
+    : (hostRaw φ hinj hH he h).gal σ = ggIso φ hinj (galE φ.e ζ a b σ) :=
+  rfl
 
-theorem gal_eq_art (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (u : (ZMod (2 ^ (φ.e + 2) * q * d))ˣ) :
-    (hostRaw φ hinj hH he h).gal σ = (hostRaw φ hinj hH he h).art u ↔ galE φ.e ζ a b σ = art0 φ.e hH u := by
+theorem gal_eq_art (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (u : (ZMod (2 ^ (φ.e + 2) * q * d))ˣ)
+    : (hostRaw φ hinj hH he h).gal σ = (hostRaw φ hinj hH he h).art u
+      ↔ galE φ.e ζ a b σ = art0 φ.e hH u := by
   rw [gal_eq]
   exact (ggIso φ hinj).injective.eq_iff
 
-theorem gal_eq_cc (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) :
-    (hostRaw φ hinj hH he h).gal σ = φ.cc ↔ galE φ.e ζ a b σ = cc φ.e := by
+theorem gal_eq_cc (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
+    : (hostRaw φ hinj hH he h).gal σ = φ.cc ↔ galE φ.e ζ a b σ = cc φ.e := by
   rw [gal_eq]
   exact ggIso_eq_iff φ hinj _ c0
 
@@ -470,7 +555,8 @@ theorem galE_conj : galE φ.e ζ a b (hostRaw φ hinj hH he h).conj = cc φ.e :=
     (hostRaw φ hinj hH he h).gal.apply_symm_apply φ.cc
   exact (gal_eq_cc φ hinj hH he h _).mp h2
 
-theorem cc_mem_zpowers (g : FrobeniusOrbits.GG φ.e) : φ.cc ∈ Subgroup.zpowers (ggIso φ hinj g) ↔ g = cc φ.e := by
+theorem cc_mem_zpowers (g : FrobeniusOrbits.GG φ.e)
+    : φ.cc ∈ Subgroup.zpowers (ggIso φ hinj g) ↔ g = cc φ.e := by
   have hcc : φ.cc = ggIso φ hinj (cc φ.e) := (ggIso_mk_one φ hinj c0).symm
   rw [hcc, Subgroup.mem_zpowers_iff]
   constructor
@@ -501,8 +587,7 @@ theorem cc_mem_zpowers (g : FrobeniusOrbits.GG φ.e) : φ.cc ∈ Subgroup.zpower
           push_cast
           exact dvd_pow_self 2 hne
         omega
-      have ht : g.2 = 1 := by
-        rw [← orderOf_eq_one_iff, hoi, hi0, pow_zero]
+      have ht : g.2 = 1 := by rw [← orderOf_eq_one_iff, hoi, hi0, pow_zero]
       exact Prod.ext h1 ht
   · rintro rfl
     exact ⟨1, zpow_one _⟩
@@ -515,8 +600,8 @@ theorem sqq_sq : sqq φ hinj hH he h ^ 2 = -(q : (hostRaw φ hinj hH he h).E) :=
   exact h.2.1
 
 include hH h in
-theorem gal_sqq (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) :
-    σ (aE ζ a b) = ((((galE φ.e ζ a b σ).1.1 : ℤˣ) : ℤ) : hostE ζ a b) * aE ζ a b := by
+theorem gal_sqq (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
+    : σ (aE ζ a b) = ((((galE φ.e ζ a b σ).1.1 : ℤˣ) : ℤ) : hostE ζ a b) * aE ζ a b := by
   apply Subtype.ext
   push_cast
   exact galE_aE hH.toHypOdd h σ
@@ -543,60 +628,88 @@ theorem hostDer : HostDer (hostRaw φ hinj hH he h) := by
   have hord := ord_eq φ hinj
   have hc := galE_conj φ hinj hH he h
   have hdisc := hostDiscr_of discriminant_real_subfield φ.e q d hH L ζ a b h
-  have hcase : ∀ {l : ℕ}, l.Prime → l ∣ 2 ^ (φ.e + 2) * q * d → (l = 2 ∨ l = q ∨ (l = d ∧ 2 ≤ φ.e)) := fun hl hN =>
-    ((dvd_N_iff φ.e hH hl).mp hN).imp_right (Or.imp_right fun h1 => ⟨h1, he⟩)
-  have hncase : ∀ {l : ℕ}, l.Prime → ¬ l ∣ 2 ^ (φ.e + 2) * q * d → (l ≠ 2 ∧ l ≠ q ∧ l ≠ d) := fun hl hN => by
+  have hcase
+      : ∀ {l : ℕ}, l.Prime → l ∣ 2 ^ (φ.e + 2) * q * d → (l = 2 ∨ l = q ∨ (l = d ∧ 2 ≤ φ.e)) :=
+    fun hl hN => ((dvd_N_iff φ.e hH hl).mp hN).imp_right (Or.imp_right fun h1 => ⟨h1, he⟩)
+  have hncase
+      : ∀ {l : ℕ},
+        l.Prime → ¬ l ∣ 2 ^ (φ.e + 2) * q * d → (l ≠ 2 ∧ l ≠ q ∧ l ≠ d) := fun hl hN => by
     rwa [dvd_N_iff φ.e hH hl, not_or, not_or] at hN
-  refine
-    { art_surj := (ggIso φ hinj).surjective.comp (art0_surjective φ.e hH)
-      cm := isCMField_hostE hqd h
-      conj_iff := fun ψ σ => (isConj_iff_galE hqd h ψ σ).trans (gal_eq_cc φ hinj hH he h σ).symm
-      finrank_E := (finrank_cmField hqd h).trans (by rw [hord]; ring)
-      finrank_F := (finrank_hostF hqd h).trans (by rw [hord]; ring)
-      mem_F := fun x => by
-        rw [(eq_conjE_iff hqd h _).mpr hc]
-        exact conjE_mem_hostF_iff hqd h x
-      cmType := ⟨(Final.cmType φ.e q d hqd L ζ a b h).1,
-        (Final.cmType φ.e q d hqd L ζ a b h).2.1.trans (by rw [hord]; ring), (Final.cmType φ.e q d hqd L ζ a b h).2.2⟩
-      ps_root := ⟨aE ζ a b, ?_, gal_sqq φ hH h⟩
-      art_ch := artinMap_second_eq_jacobiSym φ.e hH
-      ps_d := fun u hu => Units.ext ((artinMap_first_eq_jacobiSym_of_modEq φ.e hH u (hu.of_dvd (dvd_mul_left _ _))).trans (jac_dq hH))
-      frob := fun p _ hp (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(p : ℤ)})) =>
+  refine {
+    art_surj := (ggIso φ hinj).surjective.comp (art0_surjective φ.e hH)
+    cm := isCMField_hostE hqd h
+    conj_iff := fun ψ σ => (isConj_iff_galE hqd h ψ σ).trans (gal_eq_cc φ hinj hH he h σ).symm
+    finrank_E := (finrank_cmField hqd h).trans (by rw [hord]; ring)
+    finrank_F := (finrank_hostF hqd h).trans (by rw [hord]; ring)
+    mem_F := fun x => by
+      rw [(eq_conjE_iff hqd h _).mpr hc]
+      exact conjE_mem_hostF_iff hqd h x
+    cmType := ⟨
+      (Final.cmType φ.e q d hqd L ζ a b h).1,
+      (Final.cmType φ.e q d hqd L ζ a b h).2.1.trans (by rw [hord]; ring),
+      (Final.cmType φ.e q d hqd L ζ a b h).2.2
+    ⟩
+    ps_root := ⟨aE ζ a b, ?_, gal_sqq φ hH h⟩
+    art_ch := artinMap_second_eq_jacobiSym φ.e hH
+    ps_d := fun u hu =>
+      Units.ext
+        ((artinMap_first_eq_jacobiSym_of_modEq φ.e hH u (hu.of_dvd (dvd_mul_left _ _))).trans
+          (jac_dq hH))
+    frob :=
+      fun p _ hp (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(p : ℤ)})) =>
         ?_
-      frob_any := fun l _ (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)}))
-        (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) => (frob_any_art hH h l P σ).trans
-        (exists_congr fun u => and_congr_right fun _ => (gal_eq_art φ hinj hH he h σ u).symm)
-      inertia := fun l _ (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)}))
-        (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) => (inertia_art hH h l P σ).trans
-        (exists_congr fun u => and_congr_right fun _ => (gal_eq_art φ hinj hH he h σ u).symm)
-      decomp := fun l _ (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)}))
-        (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) => (decomp_art hH h l P σ).trans
-        (exists_congr fun u => exists_congr fun _ => and_congr_right fun _ => (gal_eq_art φ hinj hH he h σ u).symm)
-      inertia_d := fun (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(d : ℤ)}))
-        (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) => ((hostInertia φ.e q d hH L ζ a b h σ).2.2 P).trans
-        (or_congr (ggIso_eq_iff φ hinj _ 1).symm (ggIso_eq_iff φ hinj _ (1, -1)).symm)
-      decomp_typeI := fun l hl hN (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)}))
-        (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) hσ => ?_
-      decompConj := fun l hl hN (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)})) =>
+    frob_any :=
+      fun l _ (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)}))
+          (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) =>
+        (frob_any_art hH h l P σ).trans
+          (exists_congr fun u => and_congr_right fun _ => (gal_eq_art φ hinj hH he h σ u).symm)
+    inertia :=
+      fun l _ (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)}))
+          (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) =>
+        (inertia_art hH h l P σ).trans
+          (exists_congr fun u => and_congr_right fun _ => (gal_eq_art φ hinj hH he h σ u).symm)
+    decomp :=
+      fun l _ (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)}))
+          (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) =>
+        (decomp_art hH h l P σ).trans
+          (exists_congr fun u =>
+            exists_congr fun _ => and_congr_right fun _ => (gal_eq_art φ hinj hH he h σ u).symm)
+    inertia_d :=
+      fun (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(d : ℤ)}))
+          (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) =>
+        ((hostInertia φ.e q d hH L ζ a b h σ).2.2 P).trans
+          (or_congr (ggIso_eq_iff φ hinj _ 1).symm (ggIso_eq_iff φ hinj _ (1, -1)).symm)
+    decomp_typeI :=
+      fun l hl hN (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)}))
+          (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) hσ =>
+        ?_
+    decompConj :=
+      fun l hl hN (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(l : ℤ)})) =>
         hostDecompConj φ.e q d hH L ζ a b h _ hc l (hcase hl hN) P
-      unramEF := fun P hP hP0 => hostUnramEF φ.e q d hH L ζ a b h P hP hP0 _ hc
-      splitK := splitK_E hH h
-      ordinary := fun p _ (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(p : ℤ)})) =>
+    unramEF := fun P hP hP0 => hostUnramEF φ.e q d hH L ζ a b h P hP hP0 _ hc
+    splitK := splitK_E hH h
+    ordinary :=
+      fun p _ (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(p : ℤ)})) =>
         (hostOrdinary φ.e q d hH L ζ a b h p P).trans
-        (((Final.splitK φ.e q d hH L ζ a b h).1 p Fact.out).trans (splitK_E hH h p Fact.out).symm)
-      eta := ⟨(hostEta φ.e q d hH L ζ a b h).1, fun p _ hp (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(p : ℤ)}))
-        (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) hσ => ?_,
-        fun p _ hp (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(p : ℤ)})) =>
-        (hostEta φ.e q d hH L ζ a b h).2.2 p (hcase Fact.out hp) P⟩
-      diffSupport := fun P hP hdvd => ?_
-      principal := principal_stable hH h _ hc
-      unimodular := hostUnimodular φ.e q d hH L ζ a b h _ hc
-      discr_sq := hdisc.2.2.1
-      discr_primes := ?_
-      rd_ge := (real_ge φ.e q d hH.1.pos).trans (rd_eq hH h).ge
-      rd_le := (rd_eq hH h).le.trans (real_le φ.e _ (Real.sqrt_nonneg _))
-      rd_sq_ge := ?_
-      norm_mu := norm_mu hH h }
+          (((Final.splitK φ.e q d hH L ζ a b h).1 p Fact.out).trans (splitK_E hH h p Fact.out).symm)
+    eta := ⟨
+      (hostEta φ.e q d hH L ζ a b h).1,
+      fun p _ hp (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(p : ℤ)}))
+          (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) hσ =>
+        ?_,
+      fun p _ hp (P : Ideal (𝓞 (hostE ζ a b))) (_ : P.IsPrime) (_ : P.LiesOver (span {(p : ℤ)})) =>
+        (hostEta φ.e q d hH L ζ a b h).2.2 p (hcase Fact.out hp) P
+    ⟩
+    diffSupport := fun P hP hdvd => ?_
+    principal := principal_stable hH h _ hc
+    unimodular := hostUnimodular φ.e q d hH L ζ a b h _ hc
+    discr_sq := hdisc.2.2.1
+    discr_primes := ?_
+    rd_ge := (real_ge φ.e q d hH.1.pos).trans (rd_eq hH h).ge
+    rd_le := (rd_eq hH h).le.trans (real_le φ.e _ (Real.sqrt_nonneg _))
+    rd_sq_ge := ?_
+    norm_mu := norm_mu hH h
+  }
   · intro h0
     have h1 : a = 0 := congrArg Subtype.val h0
     have h2 := h.2.1
@@ -606,14 +719,20 @@ theorem hostDer : HostDer (hostRaw φ hinj hH he h) := by
   · have hp' : p.Prime := Fact.out
     obtain ⟨n2, nq, nd⟩ := hncase hp' hp
     obtain ⟨f1, f2, f3⟩ := Final.frob φ.e q d hqd L ζ a b h p n2 nq nd P
-    refine ⟨f1, fun σ u hu => (frob_art hH h p hp P σ u hu).trans (gal_eq_art φ hinj hH he h σ u).symm,
-      fun σ hσ => ?_, f3⟩
+    refine ⟨
+      f1,
+      fun σ u hu => (frob_art hH h p hp P σ u hu).trans (gal_eq_art φ hinj hH he h σ u).symm,
+      fun σ hσ => ?_,
+      f3
+    ⟩
     have hcop : Nat.Coprime p (2 ^ (φ.e + 2) * q * d) := (Nat.Prime.coprime_iff_not_dvd hp').mpr hp
     obtain ⟨-, g2, v, g3, g4⟩ := (f2 σ).mp hσ
     refine ⟨?_, g2, v, g3, (hH_ggIso φ hinj _).trans g4⟩
-    have h1 := (gal_eq_art φ hinj hH he h σ _).mpr
-      ((frob_art hH h p hp P σ (ZMod.unitOfCoprime p hcop) (ZMod.coe_unitOfCoprime _ _)).mp hσ)
-    rw [h1, HostRaw.psAt, dite_eq_left (show Nat.Coprime p (hostRaw φ hinj hH he h).condN from hcop)]
+    have h1 :=
+      (gal_eq_art φ hinj hH he h σ _).mpr
+        ((frob_art hH h p hp P σ (ZMod.unitOfCoprime p hcop) (ZMod.coe_unitOfCoprime _ _)).mp hσ)
+    rw [h1, HostRaw.psAt,
+      dite_eq_left (show Nat.Coprime p (hostRaw φ hinj hH he h).condN from hcop)]
     rfl
   · have hm : ((l : ℤ) : 𝓞 (hostE ζ a b)) ∈ P := by
       have : Fact l.Prime := ⟨hl⟩
@@ -624,7 +743,8 @@ theorem hostDer : HostDer (hostRaw φ hinj hH he h) := by
       · exact Or.inr ((Nat.prime_dvd_prime_iff_eq hl hH.1).mp h1)
     exact Formalism.HermitianLattices.FiltrationBoundaryCriterion.PfN.stab_Psi hH h l hr P hm σ hσ
   · obtain ⟨n2, nq, nd⟩ := hncase Fact.out hp
-    exact ((hostEta φ.e q d hH L ζ a b h).2.1 p n2 nq nd P σ hσ).trans (cc_mem_zpowers φ hinj _).symm
+    exact ((hostEta φ.e q d hH L ζ a b h).2.1 p n2 nq nd P σ hσ).trans
+      (cc_mem_zpowers φ hinj _).symm
   · show ((2 ^ (φ.e + 2) * q : ℕ) : 𝓞 (hostE ζ a b)) ∈ P
     push_cast
     rcases hostDiffSupport φ.e q d hH L ζ a b h P hP hdvd with h1 | h1
@@ -653,8 +773,6 @@ theorem hostDer : HostDer (hostRaw φ hinj hH he h) := by
     exact real_sq φ.e q d he hH.1.pos hH.2.1.pos
 
 def hostAx : HostAx φ := ⟨hostRaw φ hinj hH he h, hostDer φ hinj hH he h⟩
-
-
 
 end D7
 

@@ -10,26 +10,27 @@ open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BasicNotions Global
 
 namespace GlobalTheory.AlcMult
 
-
 open Polynomial in
 noncomputable def linProd {k : Type} [Field k] {ι : Type} [Fintype ι] (a : ι → k) : k[X] :=
   ∏ i, (1 - Polynomial.C (a i) * Polynomial.X)
 
 open Polynomial in
-theorem linProd_ne_zero {k : Type} [Field k] {ι : Type} [Fintype ι] (a : ι → k) :
-    linProd a ≠ 0 := by
+theorem linProd_ne_zero {k : Type} [Field k] {ι : Type} [Fintype ι] (a : ι → k)
+    : linProd a ≠ 0 := by
   intro h
   have := congrArg (Polynomial.eval 0) h
   simp [linProd, Polynomial.eval_prod] at this
 
 open Polynomial in
-theorem count_roots_factor {k : Type} [Field k] [DecidableEq k] (c y : k) (hy : y ≠ 0) :
-    Multiset.count y⁻¹ (1 - Polynomial.C c * Polynomial.X).roots = if c = y then 1 else 0 := by
+theorem count_roots_factor {k : Type} [Field k] [DecidableEq k] (c y : k) (hy : y ≠ 0)
+    : Multiset.count y⁻¹ (1 - Polynomial.C c * Polynomial.X).roots = if c = y then 1 else 0 := by
   by_cases hc : c = 0
   · subst hc
     have : (0 : k) ≠ y := fun h => hy h.symm
     simp [this]
-  · have e : (1 - Polynomial.C c * Polynomial.X) = Polynomial.C (-c) * (Polynomial.X - Polynomial.C c⁻¹) := by
+  · have e
+        : (1 - Polynomial.C c * Polynomial.X)
+          = Polynomial.C (-c) * (Polynomial.X - Polynomial.C c⁻¹) := by
       rw [mul_sub, ← Polynomial.C_mul]
       simp [hc]
       ring
@@ -41,9 +42,9 @@ theorem count_roots_factor {k : Type} [Field k] [DecidableEq k] (c y : k) (hy : 
       simp [h, this]
 
 open Polynomial in
-theorem count_roots_linProd {k : Type} [Field k] [DecidableEq k] {ι : Type} [Fintype ι] (a : ι → k) (y : k)
-    (hy : y ≠ 0) :
-    Multiset.count y⁻¹ (linProd a).roots = (Finset.univ.filter fun i => a i = y).card := by
+theorem count_roots_linProd
+    {k : Type} [Field k] [DecidableEq k] {ι : Type} [Fintype ι] (a : ι → k) (y : k) (hy : y ≠ 0)
+    : Multiset.count y⁻¹ (linProd a).roots = (Finset.univ.filter fun i => a i = y).card := by
   classical
   have h := linProd_ne_zero a
   unfold linProd at h ⊢
@@ -52,8 +53,9 @@ theorem count_roots_linProd {k : Type} [Field k] [DecidableEq k] {ι : Type} [Fi
   rw [Finset.card_filter]
   rfl
 
-theorem coe_linProd {k : Type} [Field k] {ι : Type} [Fintype ι] (a : ι → k) :
-    ((linProd a : Polynomial k) : PowerSeries k) = ∏ i, (1 - PowerSeries.C (a i) * PowerSeries.X) := by
+theorem coe_linProd {k : Type} [Field k] {ι : Type} [Fintype ι] (a : ι → k)
+    : ((linProd a : Polynomial k) : PowerSeries k)
+      = ∏ i, (1 - PowerSeries.C (a i) * PowerSeries.X) := by
   rw [linProd, ← Polynomial.coeToPowerSeries.ringHom_apply, map_prod]
   simp
 
@@ -61,9 +63,11 @@ end GlobalTheory.AlcMult
 
 namespace GlobalTheory.AlcMult
 
-theorem zmod_const_of_step (p : ℕ) [Fact p.Prime] (m m' : ZMod p → ℕ)
-    (h : ∀ y : ZMod p, y + 1 ≠ 0 → m y + m' (y + 1) = m' y + m (y + 1))
-    (hs : ∑ x, m x = ∑ x, m' x) : ∀ x, m x = m' x := by
+theorem zmod_const_of_step
+    (p : ℕ) [Fact p.Prime]
+    (m m' : ZMod p → ℕ)
+    (h : ∀ y : ZMod p, y + 1 ≠ 0 → m y + m' (y + 1) = m' y + m (y + 1)) (hs : ∑ x, m x = ∑ x, m' x)
+    : ∀ x, m x = m' x := by
   set d : ZMod p → ℤ := fun x => (m x : ℤ) - m' x with hd
   have step : ∀ y : ZMod p, y + 1 ≠ 0 → d (y + 1) = d y := by
     intro y hy
@@ -107,56 +111,72 @@ end GlobalTheory.AlcMult
 
 namespace GlobalTheory.AlcMult
 
-theorem card_cast_eq {p : ℕ} {k : Type} [Field k] [CharP k p] [DecidableEq k] {N : ℕ}
-    (l : Fin N → ℕ) (z : ZMod p) :
-    (Finset.univ.filter fun i => (l i : k) = ZMod.castHom (dvd_refl p) k z).card =
-      (Finset.univ.filter fun i => (l i : ZMod p) = z).card := by
+theorem card_cast_eq
+    {p : ℕ} {k : Type} [Field k] [CharP k p] [DecidableEq k] {N : ℕ} (l : Fin N → ℕ) (z : ZMod p)
+    : (Finset.univ.filter fun i => (l i : k) = ZMod.castHom (dvd_refl p) k z).card
+      = (Finset.univ.filter fun i => (l i : ZMod p) = z).card := by
   congr 1
   apply Finset.filter_congr
   intro i _
   rw [← map_natCast (ZMod.castHom (dvd_refl p) k) (l i)]
   exact (ZMod.castHom_injective k).eq_iff
 
-theorem card_cast_succ_eq {p : ℕ} {k : Type} [Field k] [CharP k p] [DecidableEq k] {N : ℕ}
-    (l : Fin N → ℕ) (z : ZMod p) :
-    (Finset.univ.filter fun i => (l i : k) + 1 = ZMod.castHom (dvd_refl p) k z).card =
-      (Finset.univ.filter fun i => (l i : ZMod p) = z - 1).card := by
+theorem card_cast_succ_eq
+    {p : ℕ} {k : Type} [Field k] [CharP k p] [DecidableEq k] {N : ℕ} (l : Fin N → ℕ) (z : ZMod p)
+    : (Finset.univ.filter fun i => (l i : k) + 1 = ZMod.castHom (dvd_refl p) k z).card
+      = (Finset.univ.filter fun i => (l i : ZMod p) = z - 1).card := by
   congr 1
   apply Finset.filter_congr
   intro i _
   rw [← map_natCast (ZMod.castHom (dvd_refl p) k) (l i), ← map_one (ZMod.castHom (dvd_refl p) k),
     ← map_add, (ZMod.castHom_injective k).eq_iff, eq_sub_iff_add_eq]
 
-theorem sum_card_fiber {p : ℕ} [NeZero p] {N : ℕ} (l : Fin N → ℕ) :
-    ∑ x : ZMod p, (Finset.univ.filter fun i => (l i : ZMod p) = x).card = N := by
+theorem sum_card_fiber {p : ℕ} [NeZero p] {N : ℕ} (l : Fin N → ℕ)
+    : ∑ x : ZMod p, (Finset.univ.filter fun i => (l i : ZMod p) = x).card = N := by
   classical
-  rw [← Finset.card_eq_sum_card_fiberwise (f := fun i => (l i : ZMod p)) (s := Finset.univ)
+  rw [← Finset.card_eq_sum_card_fiberwise
+    (f := fun i => (l i : ZMod p))
+    (s := Finset.univ)
     (fun _ _ => Finset.mem_coe.mpr (Finset.mem_univ _))]
   simp
 
 end GlobalTheory.AlcMult
 
 open GlobalTheory.AlcMult in
-theorem GlobalTheory.Alc.multiset_eq_of_series_eq : ∀ (p : ℕ), p.Prime → ∀ (k : Type) [Field k] [CharP k p] (N : ℕ) (l l' : Fin N → ℕ), (∏ i, (1 - PowerSeries.C ((l i : k) + 1) * PowerSeries.X)) * ∏ i, (1 - PowerSeries.C (l' i : k) * PowerSeries.X) = (∏ i, (1 - PowerSeries.C ((l' i : k) + 1) * PowerSeries.X)) * ∏ i, (1 - PowerSeries.C (l i : k) * PowerSeries.X) → ∀ x : ZMod p, (Finset.univ.filter fun i => (l i : ZMod p) = x).card = (Finset.univ.filter fun i => (l' i : ZMod p) = x).card := by
+theorem GlobalTheory.Alc.multiset_eq_of_series_eq
+    : ∀ (p : ℕ),
+      p.Prime
+        → ∀ (k : Type) [Field k] [CharP k p] (N : ℕ) (l l' : Fin N → ℕ),
+          (∏ i, (1 - PowerSeries.C ((l i : k) + 1) * PowerSeries.X))
+                * ∏ i, (1 - PowerSeries.C (l' i : k) * PowerSeries.X)
+              = (∏ i, (1 - PowerSeries.C ((l' i : k) + 1) * PowerSeries.X))
+                * ∏ i, (1 - PowerSeries.C (l i : k) * PowerSeries.X)
+            → ∀ x : ZMod p,
+              (Finset.univ.filter fun i => (l i : ZMod p) = x).card
+                = (Finset.univ.filter fun i => (l' i : ZMod p) = x).card := by
   intro p hp k _ _ N l l' H
   haveI : Fact p.Prime := ⟨hp⟩
   letI : DecidableEq k := Classical.decEq k
-  have HP : linProd (fun i => (l i : k) + 1) * linProd (fun i => (l' i : k)) =
-      linProd (fun i => (l' i : k) + 1) * linProd (fun i => (l i : k)) := by
+  have HP
+      : linProd (fun i => (l i : k) + 1) * linProd (fun i => (l' i : k))
+        = linProd (fun i => (l' i : k) + 1) * linProd (fun i => (l i : k)) := by
     apply Polynomial.coe_injective
     rw [Polynomial.coe_mul, Polynomial.coe_mul, coe_linProd, coe_linProd, coe_linProd, coe_linProd]
     exact H
-  have hcount : ∀ y : k, y ≠ 0 →
-      (Finset.univ.filter fun i => (l i : k) + 1 = y).card +
-        (Finset.univ.filter fun i => (l' i : k) = y).card =
-      (Finset.univ.filter fun i => (l' i : k) + 1 = y).card +
-        (Finset.univ.filter fun i => (l i : k) = y).card := by
+  have hcount
+      : ∀ y : k,
+        y ≠ 0
+          → (Finset.univ.filter fun i => (l i : k) + 1 = y).card
+              + (Finset.univ.filter fun i => (l' i : k) = y).card
+            = (Finset.univ.filter fun i => (l' i : k) + 1 = y).card
+              + (Finset.univ.filter fun i => (l i : k) = y).card := by
     intro y hy
     have e := congrArg (fun q => Multiset.count y⁻¹ q.roots) HP
     rw [Polynomial.roots_mul (mul_ne_zero (linProd_ne_zero _) (linProd_ne_zero _)),
-      Polynomial.roots_mul (mul_ne_zero (linProd_ne_zero _) (linProd_ne_zero _)),
-      Multiset.count_add, Multiset.count_add, count_roots_linProd _ _ hy, count_roots_linProd _ _ hy,
-      count_roots_linProd _ _ hy, count_roots_linProd _ _ hy] at e
+        Polynomial.roots_mul (mul_ne_zero (linProd_ne_zero _) (linProd_ne_zero _)),
+        Multiset.count_add, Multiset.count_add, count_roots_linProd _ _ hy,
+        count_roots_linProd _ _ hy, count_roots_linProd _ _ hy, count_roots_linProd _ _ hy]
+      at e
     exact e
   apply zmod_const_of_step p
   · intro y hy
@@ -164,6 +184,7 @@ theorem GlobalTheory.Alc.multiset_eq_of_series_eq : ∀ (p : ℕ), p.Prime → �
       rw [← map_zero (ZMod.castHom (dvd_refl p) k)]
       exact fun h => hy ((ZMod.castHom_injective k) h)
     have := hcount _ hne
-    rw [card_cast_succ_eq, card_cast_succ_eq, card_cast_eq, card_cast_eq, add_sub_cancel_right] at this
+    rw [card_cast_succ_eq, card_cast_succ_eq, card_cast_eq, card_cast_eq, add_sub_cancel_right]
+      at this
     exact this
   · rw [sum_card_fiber, sum_card_fiber]

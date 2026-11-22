@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical ComplexOrder
 
@@ -34,18 +36,28 @@ private lemma conv_nonneg_of_pp (b : ArithmeticFunction ℂ) (hb : b.IsMultiplic
   rw [hb.multiplicative_factorization _ hn]
   exact Finset.prod_nonneg fun p hp => hpp p _ (Nat.prime_of_mem_primeFactors (by simpa using hp))
 
-theorem UpperTheory.false_of_landau_nonneg_euler_factors_entire :
-    ∀ (a a' : ℕ → ℂ) (N : ℕ), 0 < N → a 1 = 1 → a' 1 = 1 → (∀ m n, m.Coprime n → a (m * n) = a m * a n) →
-        (∀ m n, m.Coprime n → a' (m * n) = a' m * a' n) → (∀ p k : ℕ, p.Prime → p ∣ N → a (p ^ (k + 1)) = 0) →
-        (∀ p k : ℕ, p.Prime → p ∣ N → a' (p ^ (k + 1)) = 0) →
-        (∀ p : ℕ, p.Prime → ¬ p ∣ N →
-          (∀ k, 0 ≤ PowerSeries.coeff k (PowerSeries.mk (fun k => a (p ^ k)) * PowerSeries.mk (fun k => a' (p ^ k)))) ∧
-          1 ≤ PowerSeries.coeff 4 (PowerSeries.mk (fun k => a (p ^ k)) * PowerSeries.mk (fun k => a' (p ^ k)))) →
-        (∀ s : ℂ, 4 < s.re → LSeriesSummable a s) → (∀ s : ℂ, 4 < s.re → LSeriesSummable a' s) → Entire a → Entire a' → Landau → False := by
+theorem UpperTheory.false_of_landau_nonneg_euler_factors_entire
+    : ∀ (a a' : ℕ → ℂ) (N : ℕ),
+      0 < N → a 1 = 1 → a' 1 = 1 → (∀ m n, m.Coprime n → a (m * n) = a m * a n)
+        → (∀ m n, m.Coprime n → a' (m * n) = a' m * a' n)
+        → (∀ p k : ℕ, p.Prime → p ∣ N → a (p ^ (k + 1)) = 0)
+        → (∀ p k : ℕ, p.Prime → p ∣ N → a' (p ^ (k + 1)) = 0)
+        → (∀ p : ℕ,
+          p.Prime → ¬ p ∣ N
+            → (∀ k,
+                0 ≤ PowerSeries.coeff k
+                  (PowerSeries.mk (fun k => a (p ^ k)) * PowerSeries.mk (fun k => a' (p ^ k))))
+              ∧ 1
+                ≤ PowerSeries.coeff 4
+                  (PowerSeries.mk (fun k => a (p ^ k)) * PowerSeries.mk (fun k => a' (p ^ k))))
+        → (∀ s : ℂ, 4 < s.re → LSeriesSummable a s) → (∀ s : ℂ, 4 < s.re → LSeriesSummable a' s)
+        → Entire a → Entire a' → Landau
+        → False := by
   intro a a' N hN h1 h1' hm hm' hbad hbad' hgood hs hs' hE hE' hL
   have hmul : (toArithmeticFunction a * toArithmeticFunction a').IsMultiplicative :=
     (toAF_mult a h1 hm).mul (toAF_mult a' h1' hm')
-  have hcoe : ∀ n, LSeries.convolution a a' n = (toArithmeticFunction a * toArithmeticFunction a') n :=
+  have hcoe
+      : ∀ n, LSeries.convolution a a' n = (toArithmeticFunction a * toArithmeticFunction a') n :=
     fun n => rfl
   have hone : LSeries.convolution a a' 1 = 1 := by rw [hcoe, hmul.map_one]
   have hpp : ∀ p k : ℕ, p.Prime → 0 ≤ LSeries.convolution a a' (p ^ k) := by
@@ -66,10 +78,9 @@ theorem UpperTheory.false_of_landau_nonneg_euler_factors_entire :
         exact hz.ge
     · rw [conv_prime_pow a a' hp]
       exact (hgood p hp hpN).1 k
-  have hnn : ∀ n, 0 ≤ LSeries.convolution a a' n :=
-    conv_nonneg_of_pp _ hmul hpp
-  have hsum : ∀ s : ℂ, 4 < s.re → LSeriesSummable (LSeries.convolution a a') s :=
-    fun s h => (hs s h).convolution (hs' s h)
+  have hnn : ∀ n, 0 ≤ LSeries.convolution a a' n := conv_nonneg_of_pp _ hmul hpp
+  have hsum : ∀ s : ℂ, 4 < s.re → LSeriesSummable (LSeries.convolution a a') s := fun s h =>
+    (hs s h).convolution (hs' s h)
   have hent : Entire (LSeries.convolution a a') := by
     obtain ⟨F, hF, hFe⟩ := hE
     obtain ⟨G, hG, hGe⟩ := hE'

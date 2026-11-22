@@ -13,7 +13,8 @@ public import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MvPolynomial Formalism.BasicNotions Formalism.L2.DIV Formalism.DivisionValues GlobalTheory.TestLat Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
+open NumberField IsDedekindDomain MvPolynomial Formalism.BasicNotions Formalism.L2.DIV
+  Formalism.DivisionValues GlobalTheory.TestLat Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 open scoped Matrix ComplexOrder
 
 namespace GlobalTheory.TestLat
@@ -62,8 +63,8 @@ section
 
 variable {K : Type} [Field K] (R : Subring K)
 
-theorem mem_range_map_subtype_iff {σ : Type} (P : MvPolynomial σ K) :
-    P ∈ (MvPolynomial.map (σ := σ) R.subtype).range ↔ ∀ m, AddMonoidAlgebra.coeff P m ∈ R := by
+theorem mem_range_map_subtype_iff {σ : Type} (P : MvPolynomial σ K)
+    : P ∈ (MvPolynomial.map (σ := σ) R.subtype).range ↔ ∀ m, AddMonoidAlgebra.coeff P m ∈ R := by
   constructor
   · rintro ⟨Q, rfl⟩ m
     rw [coeff_map]
@@ -72,17 +73,24 @@ theorem mem_range_map_subtype_iff {σ : Type} (P : MvPolynomial σ K) :
     rw [P.as_sum]
     exact sum_mem fun m _ => ⟨monomial m ⟨_, h m⟩, by rw [map_monomial]; rfl⟩
 
-theorem blockAct_mem_range_map_subtype {ι : Type} [Fintype ι] {n : ℕ}
-    (U : ι → Matrix (Fin n) (Fin n) K) (hU : ∀ τ a b, U τ a b ∈ R)
+theorem blockAct_mem_range_map_subtype
+    {ι : Type} [Fintype ι]
+    {n : ℕ} (U : ι → Matrix (Fin n) (Fin n) K) (hU : ∀ τ a b, U τ a b ∈ R)
     {P : MvPolynomial (ι × Fin n × Fin n) K}
-    (hP : P ∈ (MvPolynomial.map (σ := ι × Fin n × Fin n) R.subtype).range) :
-    Formalism.GradedWeylDivisibility.blockAct K U P ∈ (MvPolynomial.map (σ := ι × Fin n × Fin n) R.subtype).range := by
-  have hC : ∀ {a : K}, a ∈ R → (C a : MvPolynomial (ι × Fin n × Fin n) K) ∈
-      (MvPolynomial.map (σ := ι × Fin n × Fin n) R.subtype).range :=
-    fun {a} ha => ⟨C ⟨a, ha⟩, by simp⟩
-  have hX : ∀ v, (X v : MvPolynomial (ι × Fin n × Fin n) K) ∈
-      (MvPolynomial.map (σ := ι × Fin n × Fin n) R.subtype).range :=
-    fun v => ⟨X v, by simp⟩
+    (hP : P ∈ (MvPolynomial.map (σ := ι × Fin n × Fin n) R.subtype).range)
+    : Formalism.GradedWeylDivisibility.blockAct K U P
+      ∈ (MvPolynomial.map (σ := ι × Fin n × Fin n) R.subtype).range := by
+  have hC
+      : ∀ {a : K},
+        a ∈ R
+          → (C a : MvPolynomial (ι × Fin n × Fin n) K)
+            ∈ (MvPolynomial.map (σ := ι × Fin n × Fin n) R.subtype).range := fun {a} ha =>
+    ⟨C ⟨a, ha⟩, by simp⟩
+  have hX
+      : ∀ v,
+        (X v : MvPolynomial (ι × Fin n × Fin n) K)
+          ∈ (MvPolynomial.map (σ := ι × Fin n × Fin n) R.subtype).range := fun v =>
+    ⟨X v, by simp⟩
   obtain ⟨Q, rfl⟩ := hP
   induction Q using MvPolynomial.induction_on with
   | C a =>
@@ -97,11 +105,17 @@ theorem blockAct_mem_range_map_subtype {ι : Type} [Fintype ι] {n : ℕ}
 
 end
 
-theorem vw_fockS_blockAct_nonneg : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (ι : Type) [Fintype ι] (n : ℕ) (w : HeightOneSpectrum (𝓞 K)) (F F' : Pol K ι n) (U : ι → Matrix (Fin n) (Fin n) K), (∀ mo, 0 ≤ vw (conjPl w) (AddMonoidAlgebra.coeff F mo)) → (∀ mo, 0 ≤ vw w (AddMonoidAlgebra.coeff F' mo)) → (∀ τ a b, 0 ≤ vw w (U τ a b)) → 0 ≤ vw w (fockS F (Formalism.GradedWeylDivisibility.blockAct K U F')) := by
+theorem vw_fockS_blockAct_nonneg
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (ι : Type) [Fintype ι] (n : ℕ)
+        (w : HeightOneSpectrum (𝓞 K)) (F F' : Pol K ι n) (U : ι → Matrix (Fin n) (Fin n) K),
+      (∀ mo, 0 ≤ vw (conjPl w) (AddMonoidAlgebra.coeff F mo))
+        → (∀ mo, 0 ≤ vw w (AddMonoidAlgebra.coeff F' mo)) → (∀ τ a b, 0 ≤ vw w (U τ a b))
+        → 0 ≤ vw w (fockS F (Formalism.GradedWeylDivisibility.blockAct K U F')) := by
   intro K _ _ _ ι _ n w F F' U hF hF' hU
-  have h := (mem_range_map_subtype_iff (nonnegRing_vw w) _).1
-    (blockAct_mem_range_map_subtype (nonnegRing_vw w) U hU
-      ((mem_range_map_subtype_iff (nonnegRing_vw w) F').2 hF'))
+  have h :=
+    (mem_range_map_subtype_iff (nonnegRing_vw w) _).1
+      (blockAct_mem_range_map_subtype (nonnegRing_vw w) U hU
+        ((mem_range_map_subtype_iff (nonnegRing_vw w) F').2 hF'))
   change fockS F (Formalism.GradedWeylDivisibility.blockAct K U F') ∈ nonnegRing_vw w
   unfold fockS
   refine sum_mem fun m _ => mul_mem (mul_mem ?_ (h m)) (natCast_mem _ _)

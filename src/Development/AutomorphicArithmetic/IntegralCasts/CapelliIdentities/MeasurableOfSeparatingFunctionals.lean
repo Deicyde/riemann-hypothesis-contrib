@@ -4,13 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qk65.measurable_of_separating_functionals :
-    ∀ {G V ι : Type} [inst : MeasurableSpace G] [inst_1 : AddCommGroup V] [inst_2 : _root_.Module ℂ V]
-    [FiniteDimensional ℂ V] (l : ι → V →ₗ[ℂ] ℂ),
-    (∀ (a : V), (∀ (y : ι), (l y : V → ℂ) a = (0 : ℂ)) → a = (0 : V)) →
-      ∀ (T : G → V),
-        (∀ (y : ι), Measurable fun (g : G) ↦ (l y : V → ℂ) (T g)) →
-          ∀ (L : V →ₗ[ℂ] ℂ), Measurable fun (g : G) ↦ (L : V → ℂ) (T g) := by
+theorem UpperTheory.Reformulated.B.Qk65.measurable_of_separating_functionals
+    : ∀ {G V ι : Type} [inst : MeasurableSpace G] [inst_1 : AddCommGroup V]
+        [inst_2 : _root_.Module ℂ V] [FiniteDimensional ℂ V] (l : ι → V →ₗ[ℂ] ℂ),
+      (∀ (a : V), (∀ (y : ι), (l y : V → ℂ) a = (0 : ℂ)) → a = (0 : V))
+        → ∀ (T : G → V),
+          (∀ (y : ι), Measurable fun (g : G) ↦ (l y : V → ℂ) (T g))
+            → ∀ (L : V →ₗ[ℂ] ℂ), Measurable fun (g : G) ↦ (L : V → ℂ) (T g) := by
   intro G V ι _ _ _ _ l hl T hT L
   have hL : L ∈ Submodule.span ℂ (Set.range l) := by
     apply FiniteDimensional.mem_span_of_iInf_ker_le_ker

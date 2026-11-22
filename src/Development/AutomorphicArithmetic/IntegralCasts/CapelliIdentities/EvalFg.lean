@@ -4,12 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qn15.eval_fg :
-    ∀ {R : Type} [inst : CommRing R] [inst_1 : Algebra R ℂ] {σ : Type} {M₀ : Submodule R ℂ},
-    M₀.FG →
-      ∀ (P : MvPolynomial σ ℂ),
-        ∃ (M : Submodule R ℂ),
-          M.FG ∧ ∀ (v : σ → ℂ), (∀ (i : σ), v i ∈ M₀) → (MvPolynomial.eval v : MvPolynomial σ ℂ → ℂ) P ∈ M := by
+theorem UpperTheory.Reformulated.B.Qn15.eval_fg
+    : ∀ {R : Type} [inst : CommRing R] [inst_1 : Algebra R ℂ] {σ : Type} {M₀ : Submodule R ℂ},
+      M₀.FG
+        → ∀ (P : MvPolynomial σ ℂ), ∃ (M : Submodule R ℂ),
+          M.FG
+            ∧ ∀ (v : σ → ℂ),
+              (∀ (i : σ), v i ∈ M₀) → (MvPolynomial.eval v : MvPolynomial σ ℂ → ℂ) P ∈ M := by
   intro R _ _ σ M₀ h₀ P
   induction P using MvPolynomial.induction_on with
   | C a =>

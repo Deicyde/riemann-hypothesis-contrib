@@ -8,15 +8,16 @@ open Polynomial
 
 namespace GlobalTheory.SimilarTranspose
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.SimilarTranspose.exists_form {k : Type} [Field k] (f : k[X]) (hf : f ≠ 0) :
-    ∃ l : k[X] →ₗ[k] k, (∀ a, f ∣ a → l a = 0) ∧ ∀ a, (∀ b, l (a * b) = 0) → f ∣ a := by
+theorem _root_.GlobalTheory.SimilarTranspose.exists_form
+    {k : Type} [Field k] (f : k[X]) (hf : f ≠ 0)
+    : ∃ l : k[X] →ₗ[k] k, (∀ a, f ∣ a → l a = 0) ∧ ∀ a, (∀ b, l (a * b) = 0) → f ∣ a := by
   set g := f * C f.leadingCoeff⁻¹ with hg
   have hgm : g.Monic := monic_mul_leadingCoeff_inv hf
   have hdvd : ∀ a, f ∣ a ↔ g ∣ a := fun a =>
     (associated_mul_unit_right f _
-      (isUnit_C.2 (isUnit_iff_ne_zero.2 (inv_ne_zero (leadingCoeff_ne_zero.2 hf))))).dvd_iff_dvd_left
+      (isUnit_C.2 (isUnit_iff_ne_zero.2 (inv_ne_zero (leadingCoeff_ne_zero.2
+        hf))))).dvd_iff_dvd_left
   let l : k[X] →ₗ[k] k := (lcoeff k (g.natDegree - 1)).comp (modByMonicHom g)
   refine ⟨l, fun a ha => ?_, fun a ha => ?_⟩
   · simp [l, (modByMonic_eq_zero_iff_dvd hgm).2 ((hdvd a).1 ha)]
@@ -50,15 +51,18 @@ theorem _root_.GlobalTheory.SimilarTranspose.exists_form {k : Type} [Field k] (f
     exact hr (leadingCoeff_eq_zero.1 h)
 
 open Polynomial in
-private theorem exists_nondegenerate_X_symmetric_form_quotient {k : Type} [Field k] (f : k[X]) (hf : f ≠ 0) :
-    ∃ G : (k[X] ⧸ (k[X] ∙ f)) →ₗ[k] (k[X] ⧸ (k[X] ∙ f)) →ₗ[k] k,
+private theorem exists_nondegenerate_X_symmetric_form_quotient
+    {k : Type} [Field k] (f : k[X]) (hf : f ≠ 0)
+    : ∃ G : (k[X] ⧸ (k[X] ∙ f)) →ₗ[k] (k[X] ⧸ (k[X] ∙ f)) →ₗ[k] k,
       (∀ x y, G ((X : k[X]) • x) y = G x ((X : k[X]) • y)) ∧ ∀ x, (∀ y, G x y = 0) → x = 0 := by
   obtain ⟨l, h1, h2⟩ := _root_.GlobalTheory.SimilarTranspose.exists_form f hf
   have hsurj := Submodule.Quotient.mk_surjective (k[X] ∙ f)
   let rep := Function.surjInv hsurj
   have hrep : ∀ x, Submodule.Quotient.mk (p := k[X] ∙ f) (rep x) = x := Function.surjInv_eq hsurj
-  have hdiff : ∀ a a' : k[X], Submodule.Quotient.mk (p := k[X] ∙ f) a =
-      Submodule.Quotient.mk (p := k[X] ∙ f) a' → f ∣ a - a' := by
+  have hdiff
+      : ∀ a a' : k[X],
+        Submodule.Quotient.mk (p := k[X] ∙ f) a = Submodule.Quotient.mk (p := k[X] ∙ f) a'
+          → f ∣ a - a' := by
     intro a a' h
     rw [Submodule.Quotient.eq, Submodule.mem_span_singleton] at h
     obtain ⟨c, hc⟩ := h
@@ -68,9 +72,10 @@ private theorem exists_nondegenerate_X_symmetric_form_quotient {k : Type} [Field
     intro a b
     have ha := hdiff _ _ (hrep (Submodule.Quotient.mk a))
     have hb := hdiff _ _ (hrep (Submodule.Quotient.mk b))
-    have : rep (Submodule.Quotient.mk a) * rep (Submodule.Quotient.mk b) - a * b =
-        (rep (Submodule.Quotient.mk a) - a) * rep (Submodule.Quotient.mk b) +
-          a * (rep (Submodule.Quotient.mk b) - b) := by ring
+    have : rep (Submodule.Quotient.mk a) * rep (Submodule.Quotient.mk b) - a * b
+        = (rep (Submodule.Quotient.mk a) - a) * rep (Submodule.Quotient.mk b)
+          + a * (rep (Submodule.Quotient.mk b) - b) := by
+      ring
     have h0 := h1 _ (this ▸ dvd_add (dvd_mul_of_dvd_left ha _) (dvd_mul_of_dvd_right hb _))
     rw [map_sub, sub_eq_zero] at h0
     exact h0
@@ -101,33 +106,43 @@ private theorem exists_nondegenerate_X_symmetric_form_quotient {k : Type} [Field
       smul_eq_mul, mul_assoc, mul_left_comm]
   · intro x hx
     obtain ⟨a, rfl⟩ := hsurj x
-    obtain ⟨c, hc⟩ := h2 a fun b => by
-      have := hx (Submodule.Quotient.mk b)
-      rw [LinearMap.mk₂_apply, hg] at this
-      exact this
+    obtain ⟨c, hc⟩ :=
+      h2 a fun b => by
+        have := hx (Submodule.Quotient.mk b)
+        rw [LinearMap.mk₂_apply, hg] at this
+        exact this
     rw [Submodule.Quotient.mk_eq_zero, Submodule.mem_span_singleton]
     exact ⟨c, by rw [hc, smul_eq_mul, mul_comm]⟩
 
 open Polynomial in
-private theorem exists_nondegenerate_X_symmetric_form_torsion {k : Type} [Field k] {M : Type} [AddCommGroup M]
-    [Module k[X] M] [Module k M] [IsScalarTower k k[X] M] [Module.Finite k[X] M]
-    (hM : Module.IsTorsion k[X] M) :
-    ∃ B : M →ₗ[k] M →ₗ[k] k, (∀ m n, B ((X : k[X]) • m) n = B m ((X : k[X]) • n)) ∧
-      ∀ m, (∀ n, B m n = 0) → m = 0 := by
+private theorem exists_nondegenerate_X_symmetric_form_torsion
+    {k : Type} [Field k]
+    {M : Type}
+    [AddCommGroup M] [Module k[X] M] [Module k M] [IsScalarTower k k[X] M] [Module.Finite k[X] M]
+    (hM : Module.IsTorsion k[X] M)
+    : ∃ B : M →ₗ[k] M →ₗ[k] k,
+      (∀ m n, B ((X : k[X]) • m) n = B m ((X : k[X]) • n)) ∧ ∀ m, (∀ n, B m n = 0) → m = 0 := by
   classical
   obtain ⟨ι, _, p, hp, e, ⟨φ⟩⟩ := Module.equiv_directSum_of_isTorsion hM
   have hne : ∀ i, p i ^ e i ≠ 0 := fun i => pow_ne_zero _ (hp i).ne_zero
   choose G hGX hGn using fun i => exists_nondegenerate_X_symmetric_form_quotient (p i ^ e i) (hne i)
-  let ψ : M →ₗ[k] (DirectSum ι fun i => k[X] ⧸ k[X] ∙ p i ^ e i) :=
-    φ.toLinearMap.restrictScalars k
+  let ψ : M →ₗ[k] (DirectSum ι fun i => k[X] ⧸ k[X] ∙ p i ^ e i) := φ.toLinearMap.restrictScalars k
   have hψ : ∀ m, ψ m = φ m := fun m => rfl
-  have happ : ∀ m n, (∑ i, (G i).compl₁₂ ((DirectSum.component k ι _ i).comp ψ)
-      ((DirectSum.component k ι _ i).comp ψ)) m n = ∑ i, G i (φ m i) (φ n i) := by
+  have happ
+      : ∀ m n,
+        (∑ i, (G i).compl₁₂ ((DirectSum.component k ι _ i).comp ψ)
+          ((DirectSum.component k ι _ i).comp ψ))
+            m n
+          = ∑ i, G i (φ m i) (φ n i) := by
     intro m n
     simp only [LinearMap.sum_apply, LinearMap.compl₁₂_apply, LinearMap.comp_apply, hψ]
     rfl
-  refine ⟨∑ i, (G i).compl₁₂ ((DirectSum.component k ι _ i).comp ψ)
-      ((DirectSum.component k ι _ i).comp ψ), ?_, ?_⟩
+  refine ⟨
+    ∑ i, (G i).compl₁₂ ((DirectSum.component k ι _ i).comp ψ)
+      ((DirectSum.component k ι _ i).comp ψ),
+    ?_,
+    ?_
+  ⟩
   · intro m n
     rw [happ, happ]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -145,16 +160,18 @@ private theorem exists_nondegenerate_X_symmetric_form_torsion {k : Type} [Field 
       rw [DirectSum.of_eq_of_ne _ _ _ hji, map_zero]
     · simp
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.SimilarTranspose.main : ∀ (k ι : Type) [Field k] [Fintype ι] [DecidableEq ι] (A : Matrix ι ι k),
-    ∃ P : Matrix ι ι k, IsUnit P ∧ P * A = A.transpose * P := by
+theorem _root_.GlobalTheory.SimilarTranspose.main
+    : ∀ (k ι : Type) [Field k] [Fintype ι] [DecidableEq ι] (A : Matrix ι ι k), ∃ P : Matrix ι ι k,
+      IsUnit P ∧ P * A = A.transpose * P := by
   intro k ι _ _ _ A
   have hT := Module.AEval.isTorsion_of_finiteDimensional k (ι → k) (Matrix.toLin' A)
-  obtain ⟨B, hBX, hBn⟩ := exists_nondegenerate_X_symmetric_form_torsion (M := Module.AEval' (Matrix.toLin' A)) hT
+  obtain ⟨B, hBX, hBn⟩ :=
+    exists_nondegenerate_X_symmetric_form_torsion (M := Module.AEval' (Matrix.toLin' A)) hT
   let o := Module.AEval'.of (Matrix.toLin' A)
   let Q : (ι → k) →ₗ[k] (ι → k) →ₗ[k] k := B.compl₁₂ o.toLinearMap o.toLinearMap
-  have hQ : Q.compl₁₂ (Matrix.toLin' A) LinearMap.id = Q.compl₁₂ LinearMap.id (Matrix.toLin' A) := by
+  have hQ
+      : Q.compl₁₂ (Matrix.toLin' A) LinearMap.id = Q.compl₁₂ LinearMap.id (Matrix.toLin' A) := by
     refine LinearMap.ext₂ fun v w => ?_
     simp only [Q, LinearMap.compl₁₂_apply, LinearMap.id_apply, LinearEquiv.coe_coe, o]
     rw [← Module.AEval'.X_smul_of, ← Module.AEval'.X_smul_of, hBX]
@@ -169,9 +186,10 @@ theorem _root_.GlobalTheory.SimilarTranspose.main : ∀ (k ι : Type) [Field k] 
       rw [hQP, Matrix.sub_vecMul]
       simp only at hvw
       rw [hvw, sub_self, zero_dotProduct]
-    have := hBn (o (v - w)) fun n => by
-      have := h0 (o.symm n)
-      simpa [Q] using this
+    have :=
+      hBn (o (v - w)) fun n => by
+        have := h0 (o.symm n)
+        simpa [Q] using this
     rw [map_eq_zero_iff _ o.injective, sub_eq_zero] at this
     exact this
   · have := congrArg (LinearMap.toMatrix₂' k) hQ

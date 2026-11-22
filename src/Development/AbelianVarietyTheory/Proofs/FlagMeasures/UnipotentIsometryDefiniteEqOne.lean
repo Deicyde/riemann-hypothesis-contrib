@@ -8,10 +8,10 @@ open Matrix Finset Real
 
 namespace GlobalTheory
 
-
 open scoped ComplexOrder in
-theorem unipotent_isometry_definite_eq_one :
-    ∀ (n m : ℕ) (A : Matrix (Fin n) (Fin n) ℂ) (c : ℂ), c ≠ 0 → Aᴴ * (c • (1 : Matrix (Fin n) (Fin n) ℂ)) * A = c • 1 → (A - 1) ^ m = 0 → A = 1 := by
+theorem unipotent_isometry_definite_eq_one
+    : ∀ (n m : ℕ) (A : Matrix (Fin n) (Fin n) ℂ) (c : ℂ),
+      c ≠ 0 → Aᴴ * (c • (1 : Matrix (Fin n) (Fin n) ℂ)) * A = c • 1 → (A - 1) ^ m = 0 → A = 1 := by
   intro n m A c hc hA hm
 
   have hU : Aᴴ * A = 1 := by
@@ -29,8 +29,7 @@ theorem unipotent_isometry_definite_eq_one :
 
   have hBh : ((A - 1)ᴴ * (A - 1))ᴴ = (A - 1)ᴴ * (A - 1) := by
     rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose]
-  have hB : ((A - 1)ᴴ * (A - 1)) ^ (m + 1) = 0 := by
-    rw [hcomm.mul_pow, hN, mul_zero]
+  have hB : ((A - 1)ᴴ * (A - 1)) ^ (m + 1) = 0 := by rw [hcomm.mul_pow, hN, mul_zero]
   have key : ∀ k : ℕ, ((A - 1)ᴴ * (A - 1)) ^ (k + 1) = 0 → (A - 1)ᴴ * (A - 1) = 0 := by
     intro k
     induction k with

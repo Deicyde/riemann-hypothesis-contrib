@@ -159,14 +159,14 @@ private lemma expansion (N k : ℕ) [NeZero N] (hk : 3 ≤ k) (b : ℤ) (hb : (b
 
 end UpperTheory.V.Sd
 
-theorem UpperTheory.V.Sd.eisCoef :
-    UpperTheory.V.Sd.EisCoef := by
+theorem UpperTheory.V.Sd.eisCoef : UpperTheory.V.Sd.EisCoef := by
   intro N k _ hk a ha
   obtain ⟨b, rfl⟩ := ZMod.intCast_surjective a
   obtain ⟨f, hf⟩ := UpperTheory.V.Sd.eisMF N k hk b
-  have h := ModularFormClass.qExpansion_coeff_unique (f := f) one_pos
-    (by rw [CongruenceSubgroup.strictPeriods_Gamma1]; exact AddSubgroup.mem_zmultiples 1)
-    (fun τ => by rw [hf]; exact UpperTheory.V.Sd.expansion N k hk b ha τ)
+  have h :=
+    ModularFormClass.qExpansion_coeff_unique (f := f) one_pos
+      (by rw [CongruenceSubgroup.strictPeriods_Gamma1]; exact AddSubgroup.mem_zmultiples 1)
+      (fun τ => by rw [hf]; exact UpperTheory.V.Sd.expansion N k hk b ha τ)
   rw [hf] at h
   refine ⟨(h 0).symm, fun n hn => ?_⟩
   rw [UpperTheory.V.Af.coef, ← h n, if_neg (by omega)]

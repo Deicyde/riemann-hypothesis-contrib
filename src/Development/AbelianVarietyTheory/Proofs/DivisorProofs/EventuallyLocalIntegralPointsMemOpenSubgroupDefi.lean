@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EventuallyLo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -19,13 +20,15 @@ namespace GlobalTheory.BCT.GlobLev
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem map_one_entry {R : Type} [Ring R] (f : Ad E →+* R) (i j : Fin n) :
-    f ((1 : Matrix (Fin n) (Fin n) (Ad E)) i j) = (1 : Matrix (Fin n) (Fin n) R) i j := by
+theorem map_one_entry {R : Type} [Ring R] (f : Ad E →+* R) (i j : Fin n)
+    : f ((1 : Matrix (Fin n) (Fin n) (Ad E)) i j) = (1 : Matrix (Fin n) (Fin n) R) i j := by
   rw [Matrix.one_apply, Matrix.one_apply]
   split_ifs <;> simp
 
-theorem sub_one_entry_mem {w : Pl E} {g : GLw n w} (hg : g ∈ GlobalTheory.LFun.KGL w (n := n)) (i j : Fin n) :
-    g.val i j - (1 : Matrix (Fin n) (Fin n) (w.adicCompletion E)) i j ∈ w.adicCompletionIntegers E := by
+theorem sub_one_entry_mem
+    {w : Pl E} {g : GLw n w} (hg : g ∈ GlobalTheory.LFun.KGL w (n := n)) (i j : Fin n)
+    : g.val i j - (1 : Matrix (Fin n) (Fin n) (w.adicCompletion E)) i j
+      ∈ w.adicCompletionIntegers E := by
   rw [mem_KGL_iff_val] at hg
   refine sub_mem ((HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).2 (hg.1 i j)) ?_
   rw [Matrix.one_apply]
@@ -33,27 +36,31 @@ theorem sub_one_entry_mem {w : Pl E} {g : GLw n w} (hg : g ∈ GlobalTheory.LFun
   · exact one_mem _
   · exact zero_mem _
 
+omit [IsCMField E] in
+theorem af_ext {a b : Af E} (h : ∀ u : Pl E, pLoc E u a = pLoc E u b) : a = b :=
+  Subtype.ext (funext h)
 
 omit [IsCMField E] in
-theorem af_ext {a b : Af E} (h : ∀ u : Pl E, pLoc E u a = pLoc E u b) : a = b := Subtype.ext (funext h)
-
-omit [IsCMField E] in
-theorem pLoc_singleNU_self (w : Pl E) (y : w.adicCompletion E) : pLoc E w (GlobalTheory.GLTwoHecke.singleNU w y) = y :=
+theorem pLoc_singleNU_self (w : Pl E) (y : w.adicCompletion E)
+    : pLoc E w (GlobalTheory.GLTwoHecke.singleNU w y) = y :=
   GlobalTheory.AdelicU.evalV_singleFin_self w y
 
 omit [IsCMField E] in
-theorem pLoc_singleNU_ne {u w : Pl E} (h : u ≠ w) (y : w.adicCompletion E) :
-    pLoc E u (GlobalTheory.GLTwoHecke.singleNU w y) = 0 :=
+theorem pLoc_singleNU_ne {u w : Pl E} (h : u ≠ w) (y : w.adicCompletion E)
+    : pLoc E u (GlobalTheory.GLTwoHecke.singleNU w y) = 0 :=
   GlobalTheory.AdelicU.evalV_singleFin_ne h y
 
-theorem entry_eq_one_add {w : Pl E} {N N' : Set (Af E)} (h0 : (0 : Af E) ∈ N')
-    (hadd : ∀ a ∈ N', ∀ b ∈ N', a + b ∈ N)
+theorem entry_eq_one_add
+    {w : Pl E} {N N' : Set (Af E)} (h0 : (0 : Af E) ∈ N') (hadd : ∀ a ∈ N', ∀ b ∈ N', a + b ∈ N)
     (hw : ∀ y ∈ w.adicCompletionIntegers E, GlobalTheory.GLTwoHecke.singleNU w y ∈ N')
     (hc : ∀ y ∈ (conjSrc (conjE E) w).adicCompletionIntegers E,
       GlobalTheory.GLTwoHecke.singleNU (conjSrc (conjE E) w) y ∈ N')
-    (z : UA E n) (hz : z ∈ locU n w) (hK : cLoc w z ∈ GlobalTheory.LFun.KGL w (n := n)) (i j : Fin n) :
-    ∃ a ∈ N, ((z : GA E n) : Matrix (Fin n) (Fin n) (Ad E)) i j =
-      (1 : Matrix (Fin n) (Fin n) (Ad E)) i j + (show Ad E from ((0 : InfiniteAdeleRing E), a)) := by
+    (z : UA E n) (hz : z ∈ locU n w) (hK : cLoc w z ∈ GlobalTheory.LFun.KGL w (n := n))
+    (i j : Fin n)
+    : ∃ a ∈ N,
+      ((z : GA E n) : Matrix (Fin n) (Fin n) (Ad E)) i j
+        = (1 : Matrix (Fin n) (Fin n) (Ad E)) i j
+          + (show Ad E from ((0 : InfiniteAdeleRing E), a)) := by
   have hKc := integral_conjSrc z w hK
   have hfin : z ∈ finU (E := E) (n := n) := (Subgroup.mem_inf.1 hz).1
   have hout : ∀ u : Pl E, u ≠ w → u ≠ conjSrc (conjE E) w → cLoc u z = 1 := by
@@ -62,16 +69,24 @@ theorem entry_eq_one_add {w : Pl E} {N N' : Set (Af E)} (h0 : (0 : Af E) ∈ N')
       (eq_or_eq_conjSrc h).elim huw huc
     exact (Subgroup.mem_iInf.1 (Subgroup.mem_iInf.1 (Subgroup.mem_inf.1 hz).2 u) hne)
   generalize conjSrc (conjE E) w = c at hc hKc hout
-  refine ⟨GlobalTheory.GLTwoHecke.singleNU w ((cLoc w z).val i j - (1 : Matrix (Fin n) (Fin n) _) i j) +
-    (if c = w then 0 else GlobalTheory.GLTwoHecke.singleNU c ((cLoc c z).val i j - (1 : Matrix (Fin n) (Fin n) _) i j)),
-    hadd _ (hw _ (sub_one_entry_mem hK i j)) _ ?_, ?_⟩
+  refine ⟨
+    GlobalTheory.GLTwoHecke.singleNU w ((cLoc w z).val i j - (1 : Matrix (Fin n) (Fin n) _) i j)
+      + (if c = w then
+           0
+         else
+           GlobalTheory.GLTwoHecke.singleNU c
+             ((cLoc c z).val i j - (1 : Matrix (Fin n) (Fin n) _) i j)),
+    hadd _ (hw _ (sub_one_entry_mem hK i j)) _ ?_,
+    ?_
+  ⟩
   · split_ifs
     · exact h0
     · exact hc _ (sub_one_entry_mem hKc i j)
   refine Prod.ext ?_ ?_
   · have h1 : GeneralLinearGroup.map (pInf E) (z : GA E n) = 1 := hfin
-    have h2 : pInf E (((z : GA E n) : Matrix (Fin n) (Fin n) (Ad E)) i j) =
-        pInf E ((1 : Matrix (Fin n) (Fin n) (Ad E)) i j) := by
+    have h2
+        : pInf E (((z : GA E n) : Matrix (Fin n) (Fin n) (Ad E)) i j)
+          = pInf E ((1 : Matrix (Fin n) (Fin n) (Ad E)) i j) := by
       rw [map_one_entry]
       have := congrArg (fun g : GL (Fin n) (Cinf E) => (g : Matrix (Fin n) (Fin n) (Cinf E)) i j) h1
       simpa using this
@@ -81,8 +96,9 @@ theorem entry_eq_one_add {w : Pl E} {N N' : Set (Af E)} (h0 : (0 : Af E) ∈ N')
     exact h3
   · apply af_ext
     intro u
-    change (cLoc u z).val i j = ((pLoc E u).comp (pFin E)) ((1 : Matrix (Fin n) (Fin n) (Ad E)) i j +
-      (show Ad E from ((0 : InfiniteAdeleRing E), _)))
+    change (cLoc u z).val i j
+      = ((pLoc E u).comp (pFin E))
+        ((1 : Matrix (Fin n) (Fin n) (Ad E)) i j + (show Ad E from ((0 : InfiniteAdeleRing E), _)))
     rw [map_add (f := _), map_one_entry]
     change _ = _ + pLoc E u (GlobalTheory.GLTwoHecke.singleNU w _ + _)
     rw [map_add (f := _)]
@@ -95,17 +111,22 @@ theorem entry_eq_one_add {w : Pl E} {N N' : Set (Af E)} (h0 : (0 : Af E) ∈ N')
     · rw [pLoc_singleNU_ne huw]
       by_cases huc : u = c
       · subst huc
-        rw [if_neg huw, pLoc_singleNU_self]; abel
+        rw [if_neg huw, pLoc_singleNU_self]
+        abel
       · rw [hout u huw huc]
         split_ifs
         · simp
         · rw [pLoc_singleNU_ne huc]; simp
 
-theorem eventually_locU_mem : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (L : Subgroup (finU (E := E) (n := n))),
-    IsOpen (L : Set (finU (E := E) (n := n))) → ∀ᶠ w in cofinite, ∀ x : UA E n, x ∈ locU n w → cLoc w x ∈ GlobalTheory.LFun.KGL w (n := n) →
-      ∀ h : x ∈ finU (E := E) (n := n), (⟨x, h⟩ : finU (E := E) (n := n)) ∈ L := by
+theorem eventually_locU_mem
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ)
+        (L : Subgroup (finU (E := E) (n := n))),
+      IsOpen (L : Set (finU (E := E) (n := n)))
+        → ∀ᶠ w in cofinite, ∀ x : UA E n, x ∈ locU n w → cLoc w x ∈ GlobalTheory.LFun.KGL w (n := n) →
+          ∀ h : x ∈ finU (E := E) (n := n), (⟨x, h⟩ : finU (E := E) (n := n)) ∈ L := by
   intro E _ _ _ n L hL
-  have h1 : (L : Set (finU (E := E) (n := n))) ∈ 𝓝 (1 : finU (E := E) (n := n)) := hL.mem_nhds L.one_mem
+  have h1 : (L : Set (finU (E := E) (n := n))) ∈ 𝓝 (1 : finU (E := E) (n := n)) :=
+    hL.mem_nhds L.one_mem
   rw [nhds_subtype, Filter.mem_comap] at h1
   obtain ⟨V1, hV1, hV1L⟩ := h1
   rw [nhds_subtype, Filter.mem_comap] at hV1
@@ -115,18 +136,22 @@ theorem eventually_locU_mem : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
   let Φ : Af E → Ad E := fun a => show Ad E from ((0 : InfiniteAdeleRing E), a)
   have hΦ : Continuous Φ := continuous_const.prodMk continuous_id
   have hΦ0 : Φ 0 = 0 := rfl
-  let ψ : (Bool × Fin n × Fin n → Af E) →
-      Matrix (Fin n) (Fin n) (Ad E) × (Matrix (Fin n) (Fin n) (Ad E))ᵐᵒᵖ :=
-    fun y => (Matrix.of fun i j => (1 : Matrix (Fin n) (Fin n) (Ad E)) i j + Φ (y (false, i, j)),
-      MulOpposite.op (Matrix.of fun i j => (1 : Matrix (Fin n) (Fin n) (Ad E)) i j + Φ (y (true, i, j))))
+  let ψ
+      : (Bool × Fin n × Fin n → Af E)
+        → Matrix (Fin n) (Fin n) (Ad E) × (Matrix (Fin n) (Fin n) (Ad E))ᵐᵒᵖ := fun y => (
+    Matrix.of fun i j => (1 : Matrix (Fin n) (Fin n) (Ad E)) i j + Φ (y (false, i, j)),
+    MulOpposite.op (Matrix.of fun i j =>
+      (1 : Matrix (Fin n) (Fin n) (Ad E)) i j + Φ (y (true, i, j)))
+  )
   have hψ : Continuous ψ := by
-    refine Continuous.prodMk ?_ (MulOpposite.continuous_op.comp ?_) <;>
-    exact continuous_pi fun i => continuous_pi fun j => continuous_const.add (hΦ.comp (continuous_apply _))
+    refine Continuous.prodMk ?_ (MulOpposite.continuous_op.comp ?_) <;> exact continuous_pi fun i =>
+      continuous_pi fun j => continuous_const.add (hΦ.comp (continuous_apply _))
   have hψ0 : ψ 0 = Units.embedProduct _ (1 : GA E n) := by
     refine Prod.ext ?_ ?_
     · ext i j; simp [ψ, hΦ0]
     · refine MulOpposite.unop_injective ?_
-      ext i j; simp [ψ, hΦ0]
+      ext i j
+      simp [ψ, hΦ0]
   have hS : ψ ⁻¹' W ∈ 𝓝 (0 : Bool × Fin n × Fin n → Af E) :=
     hψ.continuousAt.preimage_mem_nhds (by rw [hψ0]; exact hW)
   rw [nhds_pi, Filter.mem_pi'] at hS
@@ -142,10 +167,11 @@ theorem eventually_locU_mem : ∀ (E : Type) [Field E] [NumberField E] [IsCMFiel
   choose a ha hxa using entry_eq_one_add h0 hadd hw hw2 x hxw hxK
   choose b hb hxb using entry_eq_one_add h0 hadd hw hw2 x⁻¹ hxw' hxK'
   let y : Bool × Fin n × Fin n → Af E := fun p => if p.1 then b p.2.1 p.2.2 else a p.2.1 p.2.2
-  have hy : y ∈ ψ ⁻¹' W := hIt fun p _ => by
-    rcases p with ⟨_ | _, i, j⟩
-    · exact Set.mem_iInter.1 (ha i j) _
-    · exact Set.mem_iInter.1 (hb i j) _
+  have hy : y ∈ ψ ⁻¹' W :=
+    hIt fun p _ => by
+      rcases p with ⟨_ | _, i, j⟩
+      · exact Set.mem_iInter.1 (ha i j) _
+      · exact Set.mem_iInter.1 (hb i j) _
   apply hV1L
   apply hVV1
   apply hWV

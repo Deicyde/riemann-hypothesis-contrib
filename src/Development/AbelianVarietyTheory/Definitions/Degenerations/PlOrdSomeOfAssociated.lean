@@ -8,19 +8,27 @@ public import Development.AbelianVarietyTheory.Definitions.AbelianSchemeLaws.Fir
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 noncomputable section
 namespace GlobalTheory.SS
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.AbLaw
 
 def FrobG {k : Type} [Field k] (G : Over (Sp k)) [GrpObj G] (F : End G) (q : ℕ) : Prop :=
-  IsMonHom F.asHom ∧ ∀ U : G.left.Opens, IsAffineOpen U → ∀ f : Γ(G.left, U), ∃ m : ℕ, 1 ≤ m ∧
-    ∃ h : U = (F ^ m).asHom.left ⁻¹ᵁ U, ((F ^ m).asHom.left.appLE U U h.le).hom f = f ^ (q ^ m)
+  IsMonHom F.asHom
+    ∧ ∀ U : G.left.Opens,
+      IsAffineOpen U
+        → ∀ f : Γ(G.left, U), ∃ m : ℕ,
+          1 ≤ m
+            ∧ ∃ h : U = (F ^ m).asHom.left ⁻¹ᵁ U,
+              ((F ^ m).asHom.left.appLE U U h.le).hom f = f ^ (q ^ m)
 
 def AmpleCub {S : Scheme.{0}} (G : Over S) [GrpObj G] (L : LB G.left) : Prop :=
-  L.IsLB ∧ (∃ t : LB.Gen (Theta G L), t.IsGen) ∧
-  (∃ t : LB.Gen (LB.LinComb L (K := Fin 2) ![(ι[G]).left, 𝟙 G.left] ![1, -1]), t.IsGen) ∧
-  ∃ n : ℕ, 1 ≤ n ∧ ∀ x : G.left, ∃ s : LB.Sec (pw L n), x ∈ nonzeroLocus s ∧ IsAffineOpen (nonzeroLocus s)
+  L.IsLB ∧ (∃ t : LB.Gen (Theta G L), t.IsGen)
+    ∧ (∃ t : LB.Gen (LB.LinComb L (K := Fin 2) ![(ι[G]).left, 𝟙 G.left] ![1, -1]), t.IsGen)
+    ∧ ∃ n : ℕ,
+      1 ≤ n
+        ∧ ∀ x : G.left, ∃ s : LB.Sec (pw L n), x ∈ nonzeroLocus s ∧ IsAffineOpen (nonzeroLocus s)
 
 def PullPow {X : Scheme.{0}} (F : X ⟶ X) (L : LB X) (q : ℤ) : Prop :=
   ∃ t : LB.Gen (LB.LinComb L (K := Fin 2) ![F, 𝟙 X] ![1, -q]), t.IsGen
@@ -46,7 +54,6 @@ def MonIrr.prime {k : Type} [Field k] (p : MonIrr k) : HeightOneSpectrum k[X] wh
   isPrime := (Ideal.span_singleton_prime p.2.2.ne_zero).2 p.2.2.prime
   ne_bot := by simpa using p.2.2.ne_zero
 
-
 open scoped Classical in
 def plVal : Option (MonIrr k) → Valuation (RatFunc k) (WithZero (Multiplicative ℤ))
   | none => RatFunc.inftyValuation k
@@ -56,25 +63,27 @@ def plDeg : Option (MonIrr k) → ℕ
   | none => 1
   | some p => p.1.natDegree
 
-def plOrd (i : Option (MonIrr k)) (x : RatFunc k) : ℤ := -(plDeg k i : ℤ) * WithZero.log (plVal k i x)
+def plOrd (i : Option (MonIrr k)) (x : RatFunc k) : ℤ :=
+  -(plDeg k i : ℤ) * WithZero.log (plVal k i x)
 
 variable {k}
 
 theorem plDeg_pos (i : Option (MonIrr k)) : 0 < plDeg k i := by
   cases i with
   | none => exact Nat.one_pos
-  | some p => exact Polynomial.natDegree_pos_iff_degree_pos.2 (Polynomial.degree_pos_of_irreducible p.2.2)
+  | some p =>
+    exact Polynomial.natDegree_pos_iff_degree_pos.2 (Polynomial.degree_pos_of_irreducible p.2.2)
 
-theorem plOrd_mul (i : Option (MonIrr k)) {x y : RatFunc k} (hx : x ≠ 0) (hy : y ≠ 0) :
-    plOrd k i (x * y) = plOrd k i x + plOrd k i y := by
+theorem plOrd_mul (i : Option (MonIrr k)) {x y : RatFunc k} (hx : x ≠ 0) (hy : y ≠ 0)
+    : plOrd k i (x * y) = plOrd k i x + plOrd k i y := by
   have hx' : plVal k i x ≠ 0 := (Valuation.ne_zero_iff _).2 hx
   have hy' : plVal k i y ≠ 0 := (Valuation.ne_zero_iff _).2 hy
   unfold plOrd
   rw [map_mul, WithZero.log_mul hx' hy']
   ring
 
-theorem plOrd_none {p : k[X]} (hp : p ≠ 0) :
-    plOrd k none (algebraMap k[X] (RatFunc k) p) = -(p.natDegree : ℤ) := by
+theorem plOrd_none {p : k[X]} (hp : p ≠ 0)
+    : plOrd k none (algebraMap k[X] (RatFunc k) p) = -(p.natDegree : ℤ) := by
   classical
   have h : plVal k none (algebraMap k[X] (RatFunc k) p) = WithZero.exp (p.natDegree : ℤ) := by
     show RatFunc.inftyValuation k _ = _
@@ -83,8 +92,8 @@ theorem plOrd_none {p : k[X]} (hp : p ≠ 0) :
   rw [h, WithZero.log_exp]
   simp [plDeg]
 
-theorem plOrd_some_of_not_dvd (π : MonIrr k) {p : k[X]} (h : ¬ π.1 ∣ p) :
-    plOrd k (some π) (algebraMap k[X] (RatFunc k) p) = 0 := by
+theorem plOrd_some_of_not_dvd (π : MonIrr k) {p : k[X]} (h : ¬ π.1 ∣ p)
+    : plOrd k (some π) (algebraMap k[X] (RatFunc k) p) = 0 := by
   classical
   have h1 : plVal k (some π) (algebraMap k[X] (RatFunc k) p) = 1 := by
     show π.prime.valuation (RatFunc k) _ = 1
@@ -94,8 +103,8 @@ theorem plOrd_some_of_not_dvd (π : MonIrr k) {p : k[X]} (h : ¬ π.1 ∣ p) :
   unfold plOrd
   rw [h1, WithZero.log_one, mul_zero]
 
-theorem plOrd_some_of_associated (π : MonIrr k) {p : k[X]} (h : Associated π.1 p) :
-    plOrd k (some π) (algebraMap k[X] (RatFunc k) p) = p.natDegree := by
+theorem plOrd_some_of_associated (π : MonIrr k) {p : k[X]} (h : Associated π.1 p)
+    : plOrd k (some π) (algebraMap k[X] (RatFunc k) p) = p.natDegree := by
   classical
   have hp : p ≠ 0 := by
     rintro rfl
@@ -126,7 +135,7 @@ theorem PF.mul {x y : RatFunc k} (hx : x ≠ 0) (hy : y ≠ 0) (a : PF x) (b : P
   · rw [e, finsum_add_distrib a1 b1, a2, b2, add_zero]
 
 theorem PF.inv {x : RatFunc k} (hx : x ≠ 0) (a : PF x) : PF x⁻¹ := by
-  have e : (fun i => plOrd k i x⁻¹) = fun i => -plOrd k i x := by
+  have e : (fun i => plOrd k i x⁻¹) = fun i => - plOrd k i x := by
     funext i
     have h1 := plOrd_mul i hx (inv_ne_zero hx)
     have h0 : plOrd k i 1 = 0 := by
@@ -141,7 +150,8 @@ theorem PF.inv {x : RatFunc k} (hx : x ≠ 0) (a : PF x) : PF x⁻¹ := by
     exact a1.subset fun i hi => by simpa [Function.mem_support] using hi
   · rw [e, finsum_neg_distrib, a2, neg_zero]
 
-private theorem pf_algebraMap_of_isUnit {u : k[X]} (hu : IsUnit u) : PF (algebraMap k[X] (RatFunc k) u) := by
+private theorem pf_algebraMap_of_isUnit {u : k[X]} (hu : IsUnit u)
+    : PF (algebraMap k[X] (RatFunc k) u) := by
   have hz : ∀ i, plOrd k i (algebraMap k[X] (RatFunc k) u) = 0 := by
     intro i
     cases i with
@@ -152,10 +162,12 @@ private theorem pf_algebraMap_of_isUnit {u : k[X]} (hu : IsUnit u) : PF (algebra
   rw [e]
   exact ⟨by simp, by simp⟩
 
-private theorem pf_algebraMap_of_irreducible {q : k[X]} (hq : Irreducible q) : PF (algebraMap k[X] (RatFunc k) q) := by
+private theorem pf_algebraMap_of_irreducible {q : k[X]} (hq : Irreducible q)
+    : PF (algebraMap k[X] (RatFunc k) q) := by
   classical
   have hq0 : q ≠ 0 := hq.ne_zero
-  let π₀ : MonIrr k := ⟨normalize q, Polynomial.monic_normalize hq0, (associated_normalize q).irreducible hq⟩
+  let π₀ : MonIrr k :=
+    ⟨normalize q, Polynomial.monic_normalize hq0, (associated_normalize q).irreducible hq⟩
   have hπ₀ : Associated π₀.1 q := (associated_normalize q).symm
   have hz : ∀ i, i ≠ none → i ≠ some π₀ → plOrd k i (algebraMap k[X] (RatFunc k) q) = 0 := by
     intro i h1 h2
@@ -168,12 +180,14 @@ private theorem pf_algebraMap_of_irreducible {q : k[X]} (hq : Irreducible q) : P
       congr 1
       exact Subtype.ext (Polynomial.eq_of_monic_of_associated π.2.1 π₀.2.1
         ((π.2.2.associated_of_dvd hq hd).trans hπ₀.symm))
-  have hs : Function.support (fun i => plOrd k i (algebraMap k[X] (RatFunc k) q)) ⊆
-      ((({none, some π₀} : Finset (Option (MonIrr k)))) : Set (Option (MonIrr k))) := by
+  have hs
+      : Function.support (fun i => plOrd k i (algebraMap k[X] (RatFunc k) q))
+        ⊆ ((({none, some π₀} : Finset (Option (MonIrr k)))) : Set (Option (MonIrr k))) := by
     intro i hi
     by_contra hn
     simp only [Finset.coe_insert, Finset.coe_singleton, Set.mem_insert_iff, Set.mem_singleton_iff,
-      not_or] at hn
+        not_or]
+      at hn
     exact hi (hz i hn.1 hn.2)
   unfold PF
   refine ⟨(Finset.finite_toSet _).subset hs, ?_⟩
@@ -197,7 +211,8 @@ theorem pf_all (x : RatFunc k) : x ≠ 0 → PF x := by
   exact PF.mul (RatFunc.algebraMap_ne_zero (RatFunc.num_ne_zero hx))
     (inv_ne_zero (RatFunc.algebraMap_ne_zero (RatFunc.denom_ne_zero x)))
     (pf_poly _ (RatFunc.num_ne_zero hx))
-    (PF.inv (RatFunc.algebraMap_ne_zero (RatFunc.denom_ne_zero x)) (pf_poly _ (RatFunc.denom_ne_zero x)))
+    (PF.inv (RatFunc.algebraMap_ne_zero (RatFunc.denom_ne_zero x))
+      (pf_poly _ (RatFunc.denom_ne_zero x)))
 
 variable (k)
 

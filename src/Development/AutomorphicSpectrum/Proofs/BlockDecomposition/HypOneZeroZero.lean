@@ -9,8 +9,8 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.Free
 
-def hypOne {K : Type} [Zero K] [One K] {M : ℕ} (A : Matrix (Fin M) (Fin M) K) :
-    Matrix (Fin (M + 2)) (Fin (M + 2)) K :=
+def hypOne {K : Type} [Zero K] [One K] {M : ℕ} (A : Matrix (Fin M) (Fin M) K)
+    : Matrix (Fin (M + 2)) (Fin (M + 2)) K :=
   Matrix.of (Fin.cons (Fin.cons 0 (Fin.cons 1 fun _ => 0))
     (Fin.cons (Fin.cons 1 (Fin.cons 0 fun _ => 0)) fun i => Fin.cons 0 (Fin.cons 0 (A i))))
 

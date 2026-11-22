@@ -19,12 +19,12 @@ theorem tp_natDeg (n : ℕ) (z : Fin n → ℂ) : (tp n z).natDegree ≤ n := by
 theorem tp_eval (n : ℕ) (z : Fin n → ℂ) (x : ℂ) : (tp n z).eval x = ∏ i, (x - z i) := by
   simp [tp, eval_prod]
 
-theorem tp_eval_sum (n : ℕ) (z : Fin n → ℂ) (x : ℂ) :
-    (tp n z).eval x = ∑ a ∈ range (n + 1), (tp n z).coeff a * x ^ a :=
+theorem tp_eval_sum (n : ℕ) (z : Fin n → ℂ) (x : ℂ)
+    : (tp n z).eval x = ∑ a ∈ range (n + 1), (tp n z).coeff a * x ^ a :=
   eval_eq_sum_range' (Nat.lt_succ_of_le (tp_natDeg n z)) x
 
-theorem tp_coeff_norm (n : ℕ) (z : Fin n → ℂ) (hz : ∀ i, ‖z i‖ ≤ 1) (a : ℕ) (ha : a ≤ n) :
-    ‖(tp n z).coeff a‖ ≤ n.choose a := by
+theorem tp_coeff_norm (n : ℕ) (z : Fin n → ℂ) (hz : ∀ i, ‖z i‖ ≤ 1) (a : ℕ) (ha : a ≤ n)
+    : ‖(tp n z).coeff a‖ ≤ n.choose a := by
   classical
   set s : Multiset ℂ := Finset.univ.val.map z with hs
   have hcard : Multiset.card s = n := by simp [hs]
@@ -47,22 +47,25 @@ theorem tp_coeff_norm (n : ℕ) (z : Fin n → ℂ) (hz : ∀ i, ‖z i‖ ≤ 1
     exact hz i
   rw [htp, Multiset.prod_X_sub_C_coeff s (by rw [hcard]; exact ha), hcard, norm_mul, norm_pow,
     norm_neg, norm_one, one_pow, one_mul, ← Nat.choose_symm ha, Multiset.esymm]
-  calc ‖((s.powersetCard (n - a)).map Multiset.prod).sum‖
+  calc
+    ‖((s.powersetCard (n - a)).map Multiset.prod).sum‖
       ≤ (((s.powersetCard (n - a)).map Multiset.prod).map norm).sum := norm_multiset_sum_le _
     _ = ((s.powersetCard (n - a)).map fun t => ‖t.prod‖).sum := by rw [Multiset.map_map]; rfl
     _ ≤ ((s.powersetCard (n - a)).map fun _ => (1 : ℝ)).sum := by
-        refine Multiset.sum_map_le_sum_map _ _ fun t ht => hprod t fun x hx => hmem x ?_
-        exact Multiset.mem_of_le (Multiset.mem_powersetCard.mp ht).1 hx
+      refine Multiset.sum_map_le_sum_map _ _ fun t ht => hprod t fun x hx => hmem x ?_
+      exact Multiset.mem_of_le (Multiset.mem_powersetCard.mp ht).1 hx
     _ = n.choose (n - a) := by simp [Multiset.card_powersetCard, hcard]
 
-theorem tp_sum_norm (n : ℕ) (z : Fin n → ℂ) (hz : ∀ i, ‖z i‖ ≤ 1) :
-    ∑ a ∈ range (n + 1), ‖(tp n z).coeff a‖ ≤ 2 ^ n := by
-  calc ∑ a ∈ range (n + 1), ‖(tp n z).coeff a‖ ≤ ∑ a ∈ range (n + 1), (n.choose a : ℝ) :=
-        Finset.sum_le_sum fun a ha => tp_coeff_norm n z hz a (Nat.lt_succ_iff.mp (Finset.mem_range.mp ha))
+theorem tp_sum_norm (n : ℕ) (z : Fin n → ℂ) (hz : ∀ i, ‖z i‖ ≤ 1)
+    : ∑ a ∈ range (n + 1), ‖(tp n z).coeff a‖ ≤ 2 ^ n := by
+  calc
+    ∑ a ∈ range (n + 1), ‖(tp n z).coeff a‖ ≤ ∑ a ∈ range (n + 1), (n.choose a : ℝ) :=
+      Finset.sum_le_sum fun a ha =>
+        tp_coeff_norm n z hz a (Nat.lt_succ_iff.mp (Finset.mem_range.mp ha))
     _ = 2 ^ n := by exact_mod_cast Nat.sum_range_choose n
 
-theorem tp_rev (n : ℕ) (z : Fin n → ℂ) (ζ : ℂ) (hζ : ζ ≠ 0) :
-    ∏ i, (1 - z i * ζ) = ∑ a ∈ range (n + 1), (tp n z).coeff a * ζ ^ (n - a) := by
+theorem tp_rev (n : ℕ) (z : Fin n → ℂ) (ζ : ℂ) (hζ : ζ ≠ 0)
+    : ∏ i, (1 - z i * ζ) = ∑ a ∈ range (n + 1), (tp n z).coeff a * ζ ^ (n - a) := by
   have h1 : ∏ i, (1 - z i * ζ) = ζ ^ n * (tp n z).eval ζ⁻¹ := by
     rw [tp_eval, ← Fin.prod_const n ζ, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun i _ => ?_
@@ -74,8 +77,8 @@ theorem tp_rev (n : ℕ) (z : Fin n → ℂ) (ζ : ℂ) (hζ : ζ ≠ 0) :
   rw [inv_pow, pow_sub₀ _ hζ ha']
   ring
 
-theorem tp_root (n : ℕ) (z : Fin n → ℂ) (i : Fin n) :
-    ∑ a ∈ range (n + 1), (tp n z).coeff a * z i ^ a = 0 := by
+theorem tp_root (n : ℕ) (z : Fin n → ℂ) (i : Fin n)
+    : ∑ a ∈ range (n + 1), (tp n z).coeff a * z i ^ a = 0 := by
   rw [← tp_eval_sum, tp_eval]
   exact Finset.prod_eq_zero (Finset.mem_univ i) (sub_self _)
 

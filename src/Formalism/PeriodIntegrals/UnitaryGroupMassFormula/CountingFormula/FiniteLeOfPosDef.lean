@@ -6,9 +6,12 @@ public import Mathlib
 
 namespace PI.UnitaryGroupMassFormula.CntFormula
 
-theorem finite_le_of_posDef {V : Type*} [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V]
+theorem finite_le_of_posDef
+    {V : Type*} [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V]
     (B : LinearMap.BilinForm ℚ V) (hS : ∀ x y, B x y = B y x) (hpos : ∀ v, v ≠ 0 → 0 < B v v)
-    (A : Submodule ℤ V) (hA : A.FG) (c : ℚ) : {v | v ∈ A ∧ B v v ≤ c}.Finite := by
+    (A : Submodule ℤ V) (hA : A.FG)
+    (c : ℚ)
+    : {v | v ∈ A ∧ B v v ≤ c}.Finite := by
   classical
   obtain ⟨S, hS'⟩ := hA
   have hnn : ∀ v, 0 ≤ B v v := fun v => by
@@ -22,8 +25,8 @@ theorem finite_le_of_posDef {V : Type*} [AddCommGroup V] [Module ℚ V] [FiniteD
     · simp [hw]
     · have hww := hpos w hw
       have key := hnn (B w w • v - B v w • w)
-      simp only [map_sub, map_smul, LinearMap.sub_apply, LinearMap.smul_apply, smul_eq_mul,
-        hS w v] at key
+      simp only [map_sub, map_smul, LinearMap.sub_apply, LinearMap.smul_apply, smul_eq_mul, hS w v]
+        at key
       have h2 : B w w * B v w ^ 2 ≤ B w w * (B v v * B w w) := by nlinarith [key]
       exact le_of_mul_le_mul_left h2 hww
   let b := Module.finBasis ℚ V
@@ -53,7 +56,8 @@ theorem finite_le_of_posDef {V : Type*} [AddCommGroup V] [Module ℚ V] [FiniteD
       rw [hk]
       push_cast
       linear_combination (-(k : ℚ)) * e
-    | zero => intro i; exact ⟨0, by simp⟩
+    | zero =>
+      intro i; exact ⟨0, by simp⟩
     | add x y _ _ hx hy =>
       intro i
       obtain ⟨z1, h1⟩ := hx i
@@ -86,9 +90,12 @@ theorem finite_le_of_posDef {V : Type*} [AddCommGroup V] [Module ℚ V] [FiniteD
     simp only [g]
     rw [← hz, round_intCast]
   apply Set.Finite.of_finite_image (f := g)
-  · refine Set.Finite.subset (Set.Finite.pi (t := fun i =>
-      Set.Icc (-⌈(N : ℚ) * (1 + |c| * B (b i) (b i))⌉) ⌈(N : ℚ) * (1 + |c| * B (b i) (b i))⌉)
-      fun i => Set.finite_Icc _ _) ?_
+  · refine Set.Finite.subset
+      (Set.Finite.pi
+        (t := fun i =>
+          Set.Icc (- ⌈(N : ℚ) * (1 + |c| * B (b i) (b i))⌉) ⌈(N : ℚ) * (1 + |c| * B (b i) (b i))⌉)
+        fun i => Set.finite_Icc _ _)
+      ?_
     rintro _ ⟨v, ⟨hvA, hvc⟩, rfl⟩
     simp only [Set.mem_pi, Set.mem_univ, true_implies, Set.mem_Icc]
     intro i
@@ -100,12 +107,11 @@ theorem finite_le_of_posDef {V : Type*} [AddCommGroup V] [Module ℚ V] [FiniteD
     have l1 := neg_abs_le ((g v i : ℤ) : ℚ)
     have l2 := le_abs_self ((g v i : ℤ) : ℚ)
     constructor
-    · have : ((-⌈(N : ℚ) * (1 + |c| * B (b i) (b i))⌉ : ℤ) : ℚ) ≤ ((g v i : ℤ) : ℚ) := by
+    · have : ((- ⌈(N : ℚ) * (1 + |c| * B (b i) (b i))⌉ : ℤ) : ℚ) ≤ ((g v i : ℤ) : ℚ) := by
         push_cast
         linarith
       exact_mod_cast this
-    · have : ((g v i : ℤ) : ℚ) ≤ ((⌈(N : ℚ) * (1 + |c| * B (b i) (b i))⌉ : ℤ) : ℚ) := by
-        linarith
+    · have : ((g v i : ℤ) : ℚ) ≤ ((⌈(N : ℚ) * (1 + |c| * B (b i) (b i))⌉ : ℤ) : ℚ) := by linarith
       exact_mod_cast this
   · rintro v ⟨hvA, -⟩ w ⟨hwA, -⟩ hvw
     apply hinj

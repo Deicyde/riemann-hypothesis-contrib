@@ -33,23 +33,26 @@ open GlobalTheory.Mem.Col2 (DGam autOrd autO gamOrd gamRanks)
 
 section Transport
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E]
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
   {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
   {V' : Type} [AddCommGroup V'] [Module E V'] [Module (𝓞 E) V'] [IsScalarTower (𝓞 E) E V']
 
-
 omit [StarRing E] in
-theorem card_dvd_of_minkMult {n N M : ℕ} (hM : MinkMult N M) (hN : Module.finrank ℚ E * n ≤ N)
-    (G : Subgroup (Sp E n ≃ₗ[E] Sp E n)) [Finite G] : Nat.card G ∣ M := by
+theorem card_dvd_of_minkMult
+    {n N M : ℕ} (hM : MinkMult N M) (hN : Module.finrank ℚ E * n ≤ N)
+    (G : Subgroup (Sp E n ≃ₗ[E] Sp E n)) [Finite G]
+    : Nat.card G ∣ M := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hN
   have hr : Module.finrank ℚ (Sp E n × (Fin k → ℚ)) = Module.finrank ℚ E * n + k := by
     rw [Module.finrank_prod, ← Module.finrank_mul_finrank ℚ E (Sp E n)]
     simp
   let b := Module.finBasisOfFinrankEq ℚ _ hr
-  let r : G →* Module.End ℚ (Sp E n × (Fin k → ℚ)) :=
-    { toFun := fun g => ((g.1 : Sp E n →ₗ[E] Sp E n).restrictScalars ℚ).prodMap LinearMap.id
-      map_one' := LinearMap.ext fun _ => rfl
-      map_mul' := fun _ _ => LinearMap.ext fun _ => rfl }
+  let r : G →* Module.End ℚ (Sp E n × (Fin k → ℚ)) := {
+    toFun := fun g => ((g.1 : Sp E n →ₗ[E] Sp E n).restrictScalars ℚ).prodMap LinearMap.id
+    map_one' := LinearMap.ext fun _ => rfl
+    map_mul' := fun _ _ => LinearMap.ext fun _ => rfl
+  }
   have hr : Function.Injective r := fun g h hgh =>
     Subtype.ext (LinearEquiv.ext fun x => congrArg Prod.fst (LinearMap.congr_fun hgh (x, 0)))
   let φ : G →* Matrix.GeneralLinearGroup (Fin (Module.finrank ℚ E * n + k)) ℚ :=

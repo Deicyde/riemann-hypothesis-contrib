@@ -10,10 +10,11 @@ namespace GlobalTheory.LaurentFlagBasis
 
 variable {F : Type} [Field F]
 
-noncomputable def red {n : ℕ} (y : Fin n → PowerSeries F) : Fin n → F := fun a => constantCoeff (y a)
+noncomputable def red {n : ℕ} (y : Fin n → PowerSeries F) : Fin n → F := fun a =>
+  constantCoeff (y a)
 
-noncomputable def lift {n : ℕ} (y : Fin n → PowerSeries F) : Fin n → LaurentSeries F :=
-  fun a => (y a : LaurentSeries F)
+noncomputable def lift {n : ℕ} (y : Fin n → PowerSeries F) : Fin n → LaurentSeries F := fun a =>
+  (y a : LaurentSeries F)
 
 lemma exists_primitive {n : ℕ} (u : Fin n → LaurentSeries F) (hu : u ≠ 0) :
     ∃ (i : Fin n) (y : Fin n → PowerSeries F), lift y = (u i)⁻¹ • u ∧ y i = 1 := by
@@ -133,14 +134,17 @@ lemma greedy {n : ℕ} (V : ℕ → Submodule (LaurentSeries F) (Fin n → Laure
 
 end GlobalTheory.LaurentFlagBasis
 
-
 open GlobalTheory.LaurentFlagBasis in
-theorem GlobalTheory.LaurentFlagBasis.adapted_integral_basis : ∀ (F : Type) [Field F] (n R : ℕ)
-    (W : Fin (R + 1) → Submodule (LaurentSeries F) (Fin n → LaurentSeries F)), Monotone W →
-    ∃ g : (Matrix (Fin n) (Fin n) (PowerSeries F))ˣ, ∀ (k : Fin (R + 1)) (j : Fin n),
-      (j : ℕ) < Module.finrank (LaurentSeries F) (W k) →
-      (fun a => (((g : Matrix (Fin n) (Fin n) (PowerSeries F)) a j : PowerSeries F) :
-        LaurentSeries F)) ∈ W k := by
+theorem GlobalTheory.LaurentFlagBasis.adapted_integral_basis
+    : ∀ (F : Type) [Field F] (n R : ℕ)
+        (W : Fin (R + 1) → Submodule (LaurentSeries F) (Fin n → LaurentSeries F)),
+      Monotone W
+        → ∃ g : (Matrix (Fin n) (Fin n) (PowerSeries F))ˣ, ∀ (k : Fin (R + 1)) (j : Fin n),
+          (j : ℕ) < Module.finrank (LaurentSeries F) (W k)
+            → (fun a =>
+                (((g : Matrix (Fin n) (Fin n) (PowerSeries F)) a j : PowerSeries F)
+                  : LaurentSeries F))
+              ∈ W k := by
   intro F _ n R W hW
   let V : ℕ → Submodule (LaurentSeries F) (Fin n → LaurentSeries F) := fun j =>
     ⨅ (k : Fin (R + 1)) (_ : j < Module.finrank (LaurentSeries F) (W k)), W k
@@ -148,9 +152,10 @@ theorem GlobalTheory.LaurentFlagBasis.adapted_integral_basis : ∀ (F : Type) [F
     intro j hj
     by_cases h : ∃ k, j < Module.finrank (LaurentSeries F) (W k)
     · obtain ⟨k, hk⟩ := h
-      obtain ⟨k0, hk0, hmin⟩ := Finset.exists_min_image
-        (Finset.univ.filter fun k => j < Module.finrank (LaurentSeries F) (W k)) id
-        ⟨k, by simp [hk]⟩
+      obtain ⟨k0, hk0, hmin⟩ :=
+        Finset.exists_min_image
+          (Finset.univ.filter fun k => j < Module.finrank (LaurentSeries F) (W k)) id
+          ⟨k, by simp [hk]⟩
       have hle : W k0 ≤ V j := le_iInf₂ fun k hk => hW (hmin k (by simp [hk]))
       have := Submodule.finrank_mono hle
       simp at hk0

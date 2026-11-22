@@ -28,7 +28,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKDef
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKDef
 open UpperTheory.Gal.CertificateRingHomMap (GUf Gam0 Plc comp rat mat)
 
 namespace UpperTheory.Gal.W2.Seed
@@ -41,7 +42,8 @@ theorem isoEx'_holds : IsoEx' := fun E _ _ _ A n hn => by
 
 theorem adTEx_holds : AdTEx := pAdTEx pAdQEx pAdTensor pIdemP
 
-theorem trEx_holds : TrEx := pTrEx adTEx_holds pMuEx isoEx'_holds (pJEx pMuStar) pJEq (pJSurj pIdemP pMuStar)
+theorem trEx_holds : TrEx :=
+  pTrEx adTEx_holds pMuEx isoEx'_holds (pJEx pMuStar) pJEq (pJSurj pIdemP pMuStar)
 
 theorem latCoord_holds : LatCoord := pLatCoord pRepLaws
 
@@ -82,12 +84,14 @@ theorem frameEx_holds : FrameEx := fun E _ _ _ A n p _ S hn => by
     hx := hx
     mem := hm
     emb1 := he
-    emb2 := fun y _ h' => ⟨fun h => (pPInt E A n p S ⟨y, h'⟩ h).1, fun h => pPIntRev pIntConj E A n p S ⟨y, h'⟩ h⟩
+    emb2 := fun y _ h' =>
+      ⟨fun h => (pPInt E A n p S ⟨y, h'⟩ h).1, fun h => pPIntRev pIntConj E A n p S ⟨y, h'⟩ h⟩
     th := CertificateRingHomMap.th
     th_mat := fun _ => rfl
     th_sim := fun _ => rfl
     tr := T
     j_tr := rfl
-    a_tr := fun _ => rfl }⟩
+    a_tr := fun _ => rfl
+  }⟩
 
 end UpperTheory.Gal.Int.Geo.Pl

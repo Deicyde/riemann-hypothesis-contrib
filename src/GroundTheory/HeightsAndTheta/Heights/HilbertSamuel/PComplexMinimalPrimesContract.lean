@@ -15,13 +15,13 @@ noncomputable section
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 
-theorem mvPolynomial_int_complex_flat (σ : Type) :
-    Module.Flat (MvPolynomial σ ℤ) (MvPolynomial σ ℂ) :=
+theorem mvPolynomial_int_complex_flat (σ : Type)
+    : Module.Flat (MvPolynomial σ ℤ) (MvPolynomial σ ℂ) :=
   Module.Flat.isBaseChange ℤ (MvPolynomial σ ℤ) ℂ (MvPolynomial σ ℂ)
     (Algebra.IsPushout.out (R := ℤ) (S := MvPolynomial σ ℤ) (R' := ℂ) (S' := MvPolynomial σ ℂ))
 
-theorem algebraMap_mvPolynomial_int_complex (σ : Type) :
-    algebraMap (MvPolynomial σ ℤ) (MvPolynomial σ ℂ) = MvPolynomial.map (Int.castRingHom ℂ) := by
+theorem algebraMap_mvPolynomial_int_complex (σ : Type)
+    : algebraMap (MvPolynomial σ ℤ) (MvPolynomial σ ℂ) = MvPolynomial.map (Int.castRingHom ℂ) := by
   rw [MvPolynomial.algebraMap_def]
   congr 1
 
@@ -32,8 +32,7 @@ theorem ComplexMinimalPrimesContract.proof : ComplexMinimalPrimesContract.Statem
   have hAlg := algebraMap_mvPolynomial_int_complex σ
   have : Q.IsPrime := hQ.1.1
   have hPQ : P.map (MvPolynomial.map (Int.castRingHom ℂ)) ≤ Q := hQ.1.2
-  have hle : P ≤ Q.comap (MvPolynomial.map (Int.castRingHom ℂ)) :=
-    Ideal.map_le_iff_le_comap.mp hPQ
+  have hle : P ≤ Q.comap (MvPolynomial.map (Int.castRingHom ℂ)) := Ideal.map_le_iff_le_comap.mp hPQ
   have : (Q.comap (MvPolynomial.map (Int.castRingHom ℂ))).IsPrime := Ideal.comap_isPrime _ Q
   have : Q.LiesOver (Q.comap (MvPolynomial.map (Int.castRingHom ℂ))) :=
     ⟨by rw [Ideal.under, Ideal.comap, hAlg]; rfl⟩

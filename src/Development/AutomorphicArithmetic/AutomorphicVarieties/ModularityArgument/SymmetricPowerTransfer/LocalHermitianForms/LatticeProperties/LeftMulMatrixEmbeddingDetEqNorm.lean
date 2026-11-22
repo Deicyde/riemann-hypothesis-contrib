@@ -15,7 +15,8 @@ section Mat
 variable {O : Type} [CommRing O] {K : Type} [Field K] [Algebra O K]
 
 variable (O) in
-def Ent (g : GL (Fin 2) K) : Prop := ∀ s t, (g : Matrix (Fin 2) (Fin 2) K) s t ∈ Set.range (algebraMap O K)
+def Ent (g : GL (Fin 2) K) : Prop :=
+  ∀ s t, (g : Matrix (Fin 2) (Fin 2) K) s t ∈ Set.range (algebraMap O K)
 
 abbrev sc (s : Kˣ) : GL (Fin 2) K := GeneralLinearGroup.scalar (Fin 2) s
 
@@ -31,14 +32,17 @@ theorem kg_ent {g : GL (Fin 2) K} (h : g ∈ KG O K) : Ent O g := by
   obtain ⟨a, rfl⟩ := h
   exact fun s t => ⟨(a : Matrix (Fin 2) (Fin 2) O) s t, rfl⟩
 
-theorem kg_det {g : GL (Fin 2) K} (h : g ∈ KG O K) :
-    ∃ u : Oˣ, (g : Matrix (Fin 2) (Fin 2) K).det = algebraMap O K u := by
+theorem kg_det {g : GL (Fin 2) K} (h : g ∈ KG O K)
+    : ∃ u : Oˣ, (g : Matrix (Fin 2) (Fin 2) K).det = algebraMap O K u := by
   obtain ⟨a, rfl⟩ := h
   refine ⟨GeneralLinearGroup.det a, ?_⟩
   simp [RingHom.map_det]
 
-theorem kg_of_det [IsFractionRing O K] {g : GL (Fin 2) K} (h : Ent O g) (u : Oˣ)
-    (hu : (g : Matrix (Fin 2) (Fin 2) K).det = algebraMap O K u) : g ∈ KG O K := by
+theorem kg_of_det
+    [IsFractionRing O K]
+    {g : GL (Fin 2) K} (h : Ent O g)
+    (u : Oˣ) (hu : (g : Matrix (Fin 2) (Fin 2) K).det = algebraMap O K u)
+    : g ∈ KG O K := by
   choose a ha using h
   have hg : (g : Matrix (Fin 2) (Fin 2) K) = (algebraMap O K).mapMatrix (Matrix.of a) := by
     ext s t
@@ -50,11 +54,13 @@ theorem kg_of_det [IsFractionRing O K] {g : GL (Fin 2) K} (h : Ent O g) (u : Oˣ
   rw [hg]
   rfl
 
-theorem ent_det {g : GL (Fin 2) K} (h : Ent O g) : ∃ r : O, (g : Matrix (Fin 2) (Fin 2) K).det = algebraMap O K r := by
+theorem ent_det {g : GL (Fin 2) K} (h : Ent O g)
+    : ∃ r : O, (g : Matrix (Fin 2) (Fin 2) K).det = algebraMap O K r := by
   choose a ha using h
   exact ⟨a 0 0 * a 1 1 - a 0 1 * a 1 0, by simp [det_fin_two, ha]⟩
 
-theorem kg_of_inv [IsFractionRing O K] {g : GL (Fin 2) K} (h : Ent O g) (h' : Ent O g⁻¹) : g ∈ KG O K := by
+theorem kg_of_inv [IsFractionRing O K] {g : GL (Fin 2) K} (h : Ent O g) (h' : Ent O g⁻¹)
+    : g ∈ KG O K := by
   obtain ⟨r, hr⟩ := ent_det h
   obtain ⟨r', hr'⟩ := ent_det h'
   have : r * r' = 1 := by
@@ -76,8 +82,11 @@ theorem zk_iff {g : GL (Fin 2) K} : g ∈ ZK O K ↔ ∃ s : Kˣ, ∃ k ∈ KG O
   · rintro ⟨s, k, hk, rfl⟩
     exact Subgroup.mul_mem_sup ⟨s, rfl⟩ hk
 
-theorem ent_of_zk [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] {g : GL (Fin 2) K} (u : Oˣ)
-    (hu : (g : Matrix (Fin 2) (Fin 2) K).det = algebraMap O K u) (h : g ∈ ZK O K) : Ent O g := by
+theorem ent_of_zk
+    [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K]
+    {g : GL (Fin 2) K} (u : Oˣ) (hu : (g : Matrix (Fin 2) (Fin 2) K).det = algebraMap O K u)
+    (h : g ∈ ZK O K)
+    : Ent O g := by
   obtain ⟨w, k, hk, rfl⟩ := zk_iff.1 h
   obtain ⟨v, hv⟩ := kg_det hk
   have hw : ∃ r : O, algebraMap O K r = w := by
@@ -116,8 +125,10 @@ abbrev j0 : Etau K τ →ₐ[K] Matrix (Fin 2) (Fin 2) K := Algebra.leftMulMatri
 theorem leftMulMatrixEmbedding_omega_trace : (j0 τ ω).trace = τ := by
   simp [Matrix.trace_fin_two, Algebra.leftMulMatrix_eq_repr_mul, QuadraticAlgebra.basis]
 
-theorem leftMulMatrixEmbedding_det_eq_norm (x : Etau K τ) : (j0 τ x).det = QuadraticAlgebra.norm x := by
-  simp [Matrix.det_fin_two, Algebra.leftMulMatrix_eq_repr_mul, QuadraticAlgebra.basis, QuadraticAlgebra.norm_def]
+theorem leftMulMatrixEmbedding_det_eq_norm (x : Etau K τ)
+    : (j0 τ x).det = QuadraticAlgebra.norm x := by
+  simp [Matrix.det_fin_two, Algebra.leftMulMatrix_eq_repr_mul, QuadraticAlgebra.basis,
+    QuadraticAlgebra.norm_def]
   ring
 
 variable (τ) in
@@ -136,12 +147,13 @@ variable (O τ) in
 def LL (g : GL (Fin 2) K) : Set (Etau K τ) :=
   {x | ∀ i, (((g⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ (b0 τ).repr x) i ∈ Set.range (algebraMap O K)}
 
-theorem lat_mul (t : (Etau K τ)ˣ) (g : GL (Fin 2) K) :
-    LL O τ (jU (j0 τ) t * g) = ((t : Etau K τ) * ·) '' LL O τ g := by
+theorem lat_mul (t : (Etau K τ)ˣ) (g : GL (Fin 2) K)
+    : LL O τ (jU (j0 τ) t * g) = ((t : Etau K τ) * ·) '' LL O τ g := by
   have h : ∀ x, x ∈ LL O τ (jU (j0 τ) t * g) ↔ ((t⁻¹ : (Etau K τ)ˣ) : Etau K τ) * x ∈ LL O τ g := by
     intro x
     simp only [LL, Set.mem_setOf_eq]
-    rw [_root_.mul_inv_rev, ← map_inv, Units.val_mul, ← mulVec_mulVec, ← Algebra.leftMulMatrix_mulVec_repr]
+    rw [_root_.mul_inv_rev, ← map_inv, Units.val_mul, ← mulVec_mulVec,
+      ← Algebra.leftMulMatrix_mulVec_repr]
     rfl
   ext x
   rw [h]
@@ -157,19 +169,24 @@ theorem lat_sc (s : Kˣ) (g : GL (Fin 2) K) : LL O τ (sc s * g) = ((s : K) • 
 theorem lat_le {g g' : GL (Fin 2) K} : LL O τ g ⊆ LL O τ g' ↔ Ent O (g'⁻¹ * g) := by
   constructor
   · intro h s t
-    have := h (a := (b0 τ).equivFun.symm ((g : Matrix (Fin 2) (Fin 2) K) *ᵥ Pi.single t 1)) (by
-      intro i
-      rw [← Module.Basis.equivFun_apply, LinearEquiv.apply_symm_apply, mulVec_mulVec, ← Units.val_mul, inv_mul_cancel,
-        Units.val_one, one_mulVec]
-      by_cases h : i = t
-      · exact ⟨1, by simp [h]⟩
-      · exact ⟨0, by simp [h]⟩) s
-    rw [← Module.Basis.equivFun_apply, LinearEquiv.apply_symm_apply, mulVec_mulVec, ← Units.val_mul] at this
+    have :=
+      h (a := (b0 τ).equivFun.symm ((g : Matrix (Fin 2) (Fin 2) K) *ᵥ Pi.single t 1))
+        (by
+          intro i
+          rw [← Module.Basis.equivFun_apply, LinearEquiv.apply_symm_apply, mulVec_mulVec,
+            ← Units.val_mul, inv_mul_cancel, Units.val_one, one_mulVec]
+          by_cases h : i = t
+          · exact ⟨1, by simp [h]⟩
+          · exact ⟨0, by simp [h]⟩)
+        s
+    rw [← Module.Basis.equivFun_apply, LinearEquiv.apply_symm_apply, mulVec_mulVec, ← Units.val_mul]
+      at this
     simpa using this
   · intro h x hx i
-    have e : ((g'⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ (b0 τ).repr x =
-        ((g'⁻¹ * g : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ
-          (((g⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ (b0 τ).repr x) := by
+    have e
+        : ((g'⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ (b0 τ).repr x
+          = ((g'⁻¹ * g : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
+            *ᵥ (((g⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ (b0 τ).repr x) := by
       rw [mulVec_mulVec, ← Units.val_mul, mul_inv_cancel_right]
     rw [e]
     choose a ha using h
@@ -179,9 +196,11 @@ theorem lat_le {g g' : GL (Fin 2) K} : LL O τ g ⊆ LL O τ g' ↔ Ent O (g'⁻
     generalize ((g⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ (b0 τ).repr x = w
     simp [mulVec, dotProduct]
 
-theorem lat_basis [IsDomain O] [IsFractionRing O K] (B : Module.Basis (Fin 2) K (Etau K τ)) (g : GL (Fin 2) K)
-    (h : ∀ x, ((g⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ (b0 τ).repr x = B.repr x) :
-    LL O τ g = Submodule.span O (Set.range B) := by
+theorem lat_basis
+    [IsDomain O] [IsFractionRing O K]
+    (B : Module.Basis (Fin 2) K (Etau K τ)) (g : GL (Fin 2) K)
+    (h : ∀ x, ((g⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) *ᵥ (b0 τ).repr x = B.repr x)
+    : LL O τ g = Submodule.span O (Set.range B) := by
   ext x
   rw [SetLike.mem_coe, B.mem_span_iff_repr_mem O, ← h]
   rfl
@@ -194,15 +213,18 @@ theorem lat_isLat [IsDomain O] [IsFractionRing O K] (g : GL (Fin 2) K) : IsLat O
   refine ⟨⟨Finset.univ.image B, by rw [h]; simp⟩, ?_⟩
   rw [h, Submodule.span_span_of_tower, B.span_eq]
 
-theorem isLat_lat [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] {S : Set (Etau K τ)}
-    (hS : IsLat O τ S) : ∃ g, S = LL O τ g := by
+theorem isLat_lat
+    [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K]
+    {S : Set (Etau K τ)} (hS : IsLat O τ S)
+    : ∃ g, S = LL O τ g := by
   obtain ⟨⟨s, rfl⟩, hsp⟩ := hS
   set M : Submodule O (Etau K τ) := Submodule.span O (s : Set (Etau K τ)) with hM
   haveI : Submodule.IsLattice K M := Submodule.IsLattice.of_fg K ⟨s, rfl⟩
   haveI : Submodule.IsFullLattice K M := ⟨hsp⟩
   have hr : Module.finrank O M = 2 := by
     apply Module.finrank_eq_of_rank_eq
-    rw [Submodule.IsFullLattice.rank_eq K M, ← Module.finrank_eq_rank, QuadraticAlgebra.finrank_eq_two]
+    rw [Submodule.IsFullLattice.rank_eq K M, ← Module.finrank_eq_rank,
+      QuadraticAlgebra.finrank_eq_two]
   let b := Module.finBasisOfFinrankEq O M hr
   let B := b.extendOfIsFullLattice K
   refine ⟨⟨(b0 τ).toMatrix B, B.toMatrix (b0 τ), by simp, by simp⟩, ?_⟩
@@ -224,8 +246,8 @@ theorem cls_smul (s : Kˣ) (S : Set (Etau K τ)) : cls τ (((s : K) • ·) '' S
   · rintro ⟨r, rfl⟩
     exact ⟨r * s⁻¹, by simp [← Set.image_comp, Function.comp_def, smul_smul]⟩
 
-theorem cls_lat [IsFractionRing O K] {g g' : GL (Fin 2) K} :
-    cls τ (LL O τ g) = cls τ (LL O τ g') ↔ g⁻¹ * g' ∈ ZK O K := by
+theorem cls_lat [IsFractionRing O K] {g g' : GL (Fin 2) K}
+    : cls τ (LL O τ g) = cls τ (LL O τ g') ↔ g⁻¹ * g' ∈ ZK O K := by
   constructor
   · intro h
     obtain ⟨s, hs⟩ : LL O τ g' ∈ cls τ (LL O τ g) := h ▸ cls_self _

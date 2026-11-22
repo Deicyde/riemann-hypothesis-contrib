@@ -32,20 +32,27 @@ namespace BridgeK
 
 open Formalism.L2.Th1.CM
 
-theorem cW_eq {K : Type} [Field K] (g2 g3 : K) (k : ℕ) :
-    cW g2 g3 k = if k = 2 then g2 / 20 else if k = 3 then g3 / 28 else
-      if 4 ≤ k then
-        3 / ((2 * (k : K) + 1) * ((k : K) - 3)) *
-          ∑ m : Fin (k - 3), cW g2 g3 (m.val + 2) * cW g2 g3 (k - (m.val + 2))
-      else 0 := by
+theorem cW_eq {K : Type} [Field K] (g2 g3 : K) (k : ℕ)
+    : cW g2 g3 k
+      = if k = 2 then
+          g2 / 20
+        else if k = 3 then
+          g3 / 28
+        else if 4 ≤ k then
+          3 / ((2 * (k : K) + 1) * ((k : K) - 3))
+            * ∑ m : Fin (k - 3), cW g2 g3 (m.val + 2) * cW g2 g3 (k - (m.val + 2))
+        else
+          0 := by
   conv_lhs => unfold cW
   rw [Nat.strongRecOn_eq]
   simp only [dite_eq_ite]
   rfl
 
-theorem cW_succ (hS : WpShape.{0}) (hR : WpRecursion.{0}) {K : Type} [Field K] [CharZero K]
-    (W : WeierstrassCurve K) (k : ℕ) :
-    cW (g₂ W) (g₃ W) (k + 1) = coeff (2 * k) (wpReg W) := by
+theorem cW_succ
+    (hS : WpShape.{0}) (hR : WpRecursion.{0})
+    {K : Type} [Field K] [CharZero K]
+    (W : WeierstrassCurve K) (k : ℕ)
+    : cW (g₂ W) (g₃ W) (k + 1) = coeff (2 * k) (wpReg W) := by
   obtain ⟨_, h0, _, h2, h4⟩ := hS K W
   induction k using Nat.strong_induction_on with
   | _ k ih =>
@@ -60,32 +67,36 @@ theorem cW_succ (hS : WpShape.{0}) (hR : WpRecursion.{0}) {K : Type} [Field K] [
     · have hrec := hR K W k hk
       rw [cW_eq, if_neg (show k + 1 ≠ 2 by omega), if_neg (show k + 1 ≠ 3 by omega),
         if_pos (show 4 ≤ k + 1 by omega)]
-      have hsum : (∑ m : Fin (k + 1 - 3), cW (g₂ W) (g₃ W) (m.val + 2) * cW (g₂ W) (g₃ W) (k + 1 - (m.val + 2)))
-          = ∑ i ∈ Finset.Icc 1 (k - 2), coeff (2 * i) (wpReg W) * coeff (2 * (k - 1 - i)) (wpReg W) := by
-        rw [Fin.sum_univ_eq_sum_range (fun m => cW (g₂ W) (g₃ W) (m + 2) * cW (g₂ W) (g₃ W) (k + 1 - (m + 2)))
-          (k + 1 - 3)]
-        refine Finset.sum_nbij' (fun m => m + 1) (fun i => i - 1) ?_ ?_ ?_ ?_ ?_
-        · intro a ha
-          rw [Finset.mem_range] at ha
-          rw [Finset.mem_Icc]
-          omega
-        · intro a ha
-          rw [Finset.mem_Icc] at ha
-          rw [Finset.mem_range]
-          omega
-        · intro a _
-          show a + 1 - 1 = a
-          omega
-        · intro a ha
-          rw [Finset.mem_Icc] at ha
-          show a - 1 + 1 = a
-          omega
-        · intro m hm
-          rw [Finset.mem_range] at hm
-          show cW (g₂ W) (g₃ W) (m + 2) * cW (g₂ W) (g₃ W) (k + 1 - (m + 2))
-            = coeff (2 * (m + 1)) (wpReg W) * coeff (2 * (k - 1 - (m + 1))) (wpReg W)
-          rw [show m + 2 = m + 1 + 1 by omega, show k + 1 - (m + 1 + 1) = k - 2 - m + 1 by omega,
-            ih (m + 1) (by omega), ih (k - 2 - m) (by omega), show k - 1 - (m + 1) = k - 2 - m by omega]
+      have hsum
+          : (∑ m : Fin (k + 1 - 3), cW (g₂ W) (g₃ W) (m.val + 2) * cW (g₂ W) (g₃ W) (k + 1 - (m.val + 2)))
+            = ∑ i ∈ Finset.Icc 1 (k - 2), coeff (2 * i) (wpReg W) * coeff (2 * (k - 1 - i)) (wpReg W) :=
+        by
+          rw [Fin.sum_univ_eq_sum_range
+            (fun m => cW (g₂ W) (g₃ W) (m + 2) * cW (g₂ W) (g₃ W) (k + 1 - (m + 2)))
+            (k + 1 - 3)]
+          refine Finset.sum_nbij' (fun m => m + 1) (fun i => i - 1) ?_ ?_ ?_ ?_ ?_
+          · intro a ha
+            rw [Finset.mem_range] at ha
+            rw [Finset.mem_Icc]
+            omega
+          · intro a ha
+            rw [Finset.mem_Icc] at ha
+            rw [Finset.mem_range]
+            omega
+          · intro a _
+            show a + 1 - 1 = a
+            omega
+          · intro a ha
+            rw [Finset.mem_Icc] at ha
+            show a - 1 + 1 = a
+            omega
+          · intro m hm
+            rw [Finset.mem_range] at hm
+            show cW (g₂ W) (g₃ W) (m + 2) * cW (g₂ W) (g₃ W) (k + 1 - (m + 2))
+              = coeff (2 * (m + 1)) (wpReg W) * coeff (2 * (k - 1 - (m + 1))) (wpReg W)
+            rw [show m + 2 = m + 1 + 1 by omega, show k + 1 - (m + 1 + 1) = k - 2 - m + 1 by omega,
+              ih (m + 1) (by omega), ih (k - 2 - m) (by omega),
+              show k - 1 - (m + 1) = k - 2 - m by omega]
       rw [hsum]
       have hne1 : (2 * ((k : K) + 1) + 1) ≠ 0 := by
         have e : ((2 * k + 3 : ℕ) : K) = 2 * ((k : K) + 1) + 1 := by
@@ -162,14 +173,12 @@ theorem uSerEq_of (hS : WpShape.{0}) (hR : WpRecursion.{0}) : USerEq := by
   obtain ⟨hshape, -⟩ := hS K W
   obtain ⟨hd, -⟩ := wpODE.{0} K W
   obtain ⟨-, hfl⟩ := flowZ.{0} K W
-  have hx : wpL W = xZ W := by
-    rw [wpL, hb]; simp
+  have hx : wpL W = xZ W := by rw [wpL, hb]; simp
   have ha1 : W.a₁ = 0 := rfl
   have ha3 : W.a₃ = 0 := rfl
   rw [ha1, ha3, map_zero, zero_mul, add_zero, add_zero] at hd
 
-  have hrel : toL (expSer W) * dL (wpL W) = -2 * wpL W := by
-    rw [hd, hx]; linear_combination 2 * hfl
+  have hrel : toL (expSer W) * dL (wpL W) = -2 * wpL W := by rw [hd, hx]; linear_combination 2 * hfl
   rw [hshape, map_add (f := _), dL_uPow, dL_toL] at hrel
   have h3 : (uPow (-2 - 1) : LaurentSeries K) * toL (X ^ 3) = 1 := by
     rw [← uPow_natCast]; exact uPow_neg_mul 3
@@ -177,20 +186,20 @@ theorem uSerEq_of (hS : WpShape.{0}) (hR : WpRecursion.{0}) : USerEq := by
     rw [← uPow_natCast, ← uPow_add, ← uPow_one]; norm_num
   have hC : (HahnSeries.C (((-2 : ℤ)) : K) : LaurentSeries K) = toL (C (-2 : K)) := by
     rw [toL_C]; norm_num
-  have hps : expSer W * (C (-2 : K) + X ^ 3 * derivative (wpReg W)) =
-      C (-2 : K) * (X + X ^ 3 * wpReg W) := by
+  have hps
+      : expSer W * (C (-2 : K) + X ^ 3 * derivative (wpReg W))
+        = C (-2 : K) * (X + X ^ 3 * wpReg W) := by
     apply toL_injective
     have hm2 : (toL (C (-2 : K)) : LaurentSeries K) = -2 := by
-      rw [map_neg C, map_neg toL]; congr 1
+      rw [map_neg C, map_neg toL]
+      congr 1
       rw [map_ofNat C, map_ofNat toL]
     simp only [map_mul, map_add (f := _)]
     rw [hC] at hrel
     linear_combination toL (X ^ 3) * hrel - toL (expSer W) * toL (C (-2 : K)) * h3 - 2 * h2
       - (toL X + toL (X ^ 3) * toL (wpReg W)) * hm2
-  have hab : (C (1 / 2 : K) : K⟦X⟧) * C (-2 : K) = -1 := by
-    rw [← map_mul]; norm_num
-  have hcc : constantCoeff (CM.wpDen g2 g3) ≠ 0 := by
-    rw [hden]; simp
+  have hab : (C (1 / 2 : K) : K⟦X⟧) * C (-2 : K) = -1 := by rw [← map_mul]; norm_num
+  have hcc : constantCoeff (CM.wpDen g2 g3) ≠ 0 := by rw [hden]; simp
   symm
   rw [CM.uSer, eq_mul_inv_iff_mul_eq hcc, hnum, hden]
   linear_combination -(C (1 / 2 : K) : K⟦X⟧) * hps + (expSer W - X - X ^ 3 * wpReg W) * hab

@@ -20,16 +20,17 @@ namespace GlobalTheory.FNExpJ
 
 variable {Ω : Type} [Field Ω]
 
-theorem ofPowerSeries_coeff_of_ne (P : PowerSeries Ω) {r : ℚ} (hr : ∀ n : ℕ, (n : ℚ) ≠ r) :
-    (HahnSeries.ofPowerSeries ℚ Ω P).coeff r = 0 := by
+theorem ofPowerSeries_coeff_of_ne (P : PowerSeries Ω) {r : ℚ} (hr : ∀ n : ℕ, (n : ℚ) ≠ r)
+    : (HahnSeries.ofPowerSeries ℚ Ω P).coeff r = 0 := by
   rw [HahnSeries.ofPowerSeries_apply]
   apply HahnSeries.embDomain_notin_image_support
   rintro ⟨n, -, hn⟩
   exact hr n (by simpa using hn)
 
-theorem expansion_j : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ), ∃ h : HahnSeries ℚ Ω,
-    IsExp ε jT h ∧ h.coeff (-1) = 1 ∧ (∀ r : ℚ, r < -1 → h.coeff r = 0) ∧
-      ∀ r : ℚ, ∃ n : ℤ, h.coeff r = n := by
+theorem expansion_j
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ), ∃ h : HahnSeries ℚ Ω,
+      IsExp ε jT h ∧ h.coeff (-1) = 1 ∧ (∀ r : ℚ, r < -1 → h.coeff r = 0)
+        ∧ ∀ r : ℚ, ∃ n : ℤ, h.coeff r = n := by
   intro Ω _ ε
   obtain ⟨c, hc⟩ := GlobalTheory.exists_hasSum_modularJ_sub_inv
   set P : PowerSeries Ω := PowerSeries.mk fun n => (c n : Ω) with hPdef
@@ -40,8 +41,8 @@ theorem expansion_j : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ), ∃ h : Ha
   have hneg : ∀ r : ℚ, r < 0 → ∀ n : ℕ, (n : ℚ) ≠ r := fun r hr n hn => by
     have : (0 : ℚ) ≤ n := n.cast_nonneg
     linarith
-  refine ⟨HahnSeries.single (-1 : ℚ) (1 : Ω) + HahnSeries.ofPowerSeries ℚ Ω P,
-    ⟨?_, 0, ?_⟩, ?_, ?_, ?_⟩
+  refine
+    ⟨HahnSeries.single (-1 : ℚ) (1 : Ω) + HahnSeries.ofPowerSeries ℚ Ω P, ⟨?_, 0, ?_⟩, ?_, ?_, ?_⟩
   · refine ⟨1, one_pos, fun r hr => ?_⟩
     by_cases h1 : r = -1
     · exact ⟨-1, by simp [h1]⟩
@@ -59,20 +60,31 @@ theorem expansion_j : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ), ∃ h : Ha
       rfl
     have hq : Function.Periodic.qParam 1 (τ : ℂ) = Complex.exp (2 * Real.pi * Complex.I * z) := by
       simp [Function.Periodic.qParam, hτ]
-    have H1 : HasSum (fun r : ℚ => ε ((HahnSeries.single (-1 : ℚ) (1 : Ω)).coeff r) *
-        Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z)) (Function.Periodic.qParam 1 (τ : ℂ))⁻¹ := by
-      have := hasSum_single (f := fun r : ℚ => ε ((HahnSeries.single (-1 : ℚ) (1 : Ω)).coeff r) *
-        Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z)) (-1) (fun r hr => by
-          simp [HahnSeries.coeff_single_of_ne hr])
+    have H1 : HasSum
+        (fun r : ℚ =>
+          ε ((HahnSeries.single (-1 : ℚ) (1 : Ω)).coeff r)
+            * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z))
+        (Function.Periodic.qParam 1 (τ : ℂ))⁻¹ := by
+      have :=
+        hasSum_single
+          (f := fun r : ℚ =>
+            ε ((HahnSeries.single (-1 : ℚ) (1 : Ω)).coeff r)
+              * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z))
+          (-1)
+          (fun r hr => by simp [HahnSeries.coeff_single_of_ne hr])
       convert this using 1
       rw [hq, HahnSeries.coeff_single_same, map_one, one_mul, ← Complex.exp_neg]
       congr 1
       push_cast
       ring
-    have H2 : HasSum (fun r : ℚ => ε ((HahnSeries.ofPowerSeries ℚ Ω P).coeff r) *
-        Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z))
+    have H2 : HasSum
+        (fun r : ℚ =>
+          ε ((HahnSeries.ofPowerSeries ℚ Ω P).coeff r)
+            * Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z))
         (GlobalTheory.modularJ τ - (Function.Periodic.qParam 1 (τ : ℂ))⁻¹) := by
-      refine (Function.Injective.hasSum_iff (g := fun n : ℕ => (n : ℚ)) Nat.cast_injective
+      refine (Function.Injective.hasSum_iff
+        (g := fun n : ℕ => (n : ℚ))
+        Nat.cast_injective
         (fun r hr => ?_)).mp ?_
       · rw [h0 r (fun n hn => hr ⟨n, hn⟩), map_zero, zero_mul]
       · convert hc τ using 1

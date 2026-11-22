@@ -40,11 +40,16 @@ lemma exists_row {n : ℕ} (B : Matrix (Fin n) (Fin n) ℂ) (i : Fin n)
     rw [hsum, hk']
     ring
 
-theorem lu : ∀ {n : ℕ} (B : GL (Fin n) ℂ), (∀ (k : ℕ) (hk : k ≤ n), (B.val.submatrix (Fin.castLE hk) (Fin.castLE hk)).det ≠ 0) → ∃ L U : GL (Fin n) ℂ, L.val.BlockTriangular OrderDual.toDual ∧ U.val.BlockTriangular id ∧ B = L * U := by
+theorem lu
+    : ∀ {n : ℕ} (B : GL (Fin n) ℂ),
+      (∀ (k : ℕ) (hk : k ≤ n), (B.val.submatrix (Fin.castLE hk) (Fin.castLE hk)).det ≠ 0)
+        → ∃ L U : GL (Fin n) ℂ,
+          L.val.BlockTriangular OrderDual.toDual ∧ U.val.BlockTriangular id ∧ B = L * U := by
   intro n B hB
-  have hx : ∀ i : Fin n, ∃ x : Fin n → ℂ, (∀ j, i ≤ j → x j = 0) ∧
-      ∀ k, k < i → B.val i k + ∑ j, x j * B.val j k = 0 :=
-    fun i => exists_row B.val i (hB i i.is_lt.le)
+  have hx
+      : ∀ i : Fin n, ∃ x : Fin n → ℂ,
+        (∀ j, i ≤ j → x j = 0) ∧ ∀ k, k < i → B.val i k + ∑ j, x j * B.val j k = 0 := fun i =>
+    exists_row B.val i (hB i i.is_lt.le)
   choose x hx0 hx1 using hx
   let M : Matrix (Fin n) (Fin n) ℂ := fun i j => x i j + if i = j then 1 else 0
   have hMlow : M.BlockTriangular OrderDual.toDual := by
@@ -66,8 +71,8 @@ theorem lu : ∀ {n : ℕ} (B : GL (Fin n) ℂ), (∀ (k : ℕ) (hk : k ≤ n), 
     show (M * B.val) i k = 0
     rw [Matrix.mul_apply]
     have := hx1 i k hik'
-    simp only [M, add_mul, Finset.sum_add_distrib, ite_mul, one_mul, zero_mul,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    simp only [M, add_mul, Finset.sum_add_distrib, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq,
+      Finset.mem_univ, if_true]
     rw [add_comm]
     exact this
 

@@ -4,11 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-theorem UpperTheory.V.Kum.zmodToQZ :
-    ∀ (l : ℕ) [Fact l.Prime] (r : ℕ), ∃ ι : ZMod (l ^ r) →+ QZ l, Function.Injective ι ∧ (∀ x, x ∈ Set.range ι ↔ (l : ℤ_[l]) ^ r • x = 0) ∧
-    ∀ (z : ℤ_[l]) (a : ZMod (l ^ r)), ι (PadicInt.toZModPow r z * a) = z • ι a := by
+theorem UpperTheory.V.Kum.zmodToQZ
+    : ∀ (l : ℕ) [Fact l.Prime] (r : ℕ), ∃ ι : ZMod (l ^ r) →+ QZ l,
+      Function.Injective ι ∧ (∀ x, x ∈ Set.range ι ↔ (l : ℤ_[l]) ^ r • x = 0)
+        ∧ ∀ (z : ℤ_[l]) (a : ZMod (l ^ r)), ι (PadicInt.toZModPow r z * a) = z • ι a := by
   intro l _ r
   have hl : l.Prime := Fact.out
   have hlr0 : ((l : ℚ_[l]) ^ r) ≠ 0 := pow_ne_zero _ (by exact_mod_cast hl.ne_zero)
@@ -23,9 +26,12 @@ theorem UpperTheory.V.Kum.zmodToQZ :
     push_cast
     exact (mul_inv_cancel₀ hlr0).symm
   let ι : ZMod (l ^ r) →+ QZ l :=
-    ZMod.lift (l ^ r) ⟨zmultiplesHom (QZ l) (QZ.mk l (((l : ℚ_[l]) ^ r)⁻¹)), by
-      rw [zmultiplesHom_apply]
-      exact hker⟩
+    ZMod.lift (l ^ r) ⟨
+      zmultiplesHom (QZ l) (QZ.mk l (((l : ℚ_[l]) ^ r)⁻¹)),
+      by
+        rw [zmultiplesHom_apply]
+        exact hker
+    ⟩
   have hι : ∀ k : ℤ, ι (k : ZMod (l ^ r)) = QZ.mk l ((k : ℚ_[l]) * ((l : ℚ_[l]) ^ r)⁻¹) := by
     intro k
     simp only [ι, ZMod.lift_coe, zmultiplesHom_apply]
@@ -43,7 +49,8 @@ theorem UpperTheory.V.Kum.zmodToQZ :
       rw [hw]
       ring
     conv_rhs => rw [hzw]
-    rw [add_smul, Nat.cast_smul_eq_nsmul, mul_smul, Nat.cast_smul_eq_nsmul, hkill, smul_zero, add_zero]
+    rw [add_smul, Nat.cast_smul_eq_nsmul, mul_smul, Nat.cast_smul_eq_nsmul, hkill, smul_zero,
+      add_zero]
   refine ⟨ι, ?_, ?_, h3⟩
   · rw [injective_iff_map_eq_zero]
     intro a ha
@@ -74,7 +81,8 @@ theorem UpperTheory.V.Kum.zmodToQZ :
       have hz' : (z : ℚ_[l]) = (((l : ℤ_[l]) ^ r : ℤ_[l]) : ℚ_[l]) * q := hz
       push_cast at hz'
       refine ⟨PadicInt.toZModPow r z, ?_⟩
-      rw [← mul_one (PadicInt.toZModPow r z), h3, show (1 : ZMod (l ^ r)) = ((1 : ℤ) : ZMod (l ^ r)) by simp, hι]
+      rw [← mul_one (PadicInt.toZModPow r z), h3,
+        show (1 : ZMod (l ^ r)) = ((1 : ℤ) : ZMod (l ^ r)) by simp, hι]
       show QZ.mk l ((z : ℚ_[l]) * (((1 : ℤ) : ℚ_[l]) * ((l : ℚ_[l]) ^ r)⁻¹)) = Submodule.Quotient.mk q
       congr 1
       rw [hz']

@@ -15,8 +15,10 @@ section
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L} {n : ℕ}
 
-theorem rad_mul_levi_apply {β : Fin n → ℕ} {u p : GU σ n} (hu : u ∈ radU σ β) (hp : p ∈ leviU σ β) {i j : Fin n}
-    (hij : β j ≤ β i) : mat (u * p) i j = mat p i j := by
+theorem rad_mul_levi_apply
+    {β : Fin n → ℕ} {u p : GU σ n} (hu : u ∈ radU σ β) (hp : p ∈ leviU σ β)
+    {i j : Fin n} (hij : β j ≤ β i)
+    : mat (u * p) i j = mat p i j := by
   rw [mat_mul, Matrix.mul_apply, Finset.sum_eq_single i]
   · rw [hu i i le_rfl, Matrix.one_apply_eq, one_mul]
   · intro l _ hl
@@ -25,8 +27,10 @@ theorem rad_mul_levi_apply {β : Fin n → ℕ} {u p : GU σ n} (hu : u ∈ radU
     · rw [hp l j (by omega), mul_zero]
   · simp
 
-theorem rad_levi_rad_apply {β : Fin n → ℕ} {u p u' : GU σ n} (hu : u ∈ radU σ β) (hp : p ∈ leviU σ β)
-    (hu' : u' ∈ radU σ β) {i j : Fin n} (hij : β j ≤ β i) : mat (u * p * u') i j = mat p i j := by
+theorem rad_levi_rad_apply
+    {β : Fin n → ℕ} {u p u' : GU σ n} (hu : u ∈ radU σ β) (hp : p ∈ leviU σ β) (hu' : u' ∈ radU σ β)
+    {i j : Fin n} (hij : β j ≤ β i)
+    : mat (u * p * u') i j = mat p i j := by
   rw [mat_mul, Matrix.mul_apply, Finset.sum_eq_single j]
   · rw [hu' j j le_rfl, Matrix.one_apply_eq, mul_one]
     exact rad_mul_levi_apply hu hp hij
@@ -38,23 +42,26 @@ theorem rad_levi_rad_apply {β : Fin n → ℕ} {u p u' : GU σ n} (hu : u ∈ r
 
 variable {N : ℕ}
 
-theorem levi_mul_zero {x y : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N)) : mat (x * y) 0 0 = mat x 0 0 * mat y 0 0 := by
-  rw [mat_mul, Matrix.mul_apply, sum_idx, Finset.sum_eq_zero, hx 0 (Fin.last (N + 1)) (by simp), zero_mul, add_zero,
-    add_zero]
+theorem levi_mul_zero {x y : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N))
+    : mat (x * y) 0 0 = mat x 0 0 * mat y 0 0 := by
+  rw [mat_mul, Matrix.mul_apply, sum_idx, Finset.sum_eq_zero, hx 0 (Fin.last (N + 1)) (by simp),
+    zero_mul, add_zero, add_zero]
   intro j _
   rw [hx 0 (mid j) (by simp), zero_mul]
 
-theorem levi_mul_last {x y : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N)) :
-    mat (x * y) (Fin.last (N + 1)) (Fin.last (N + 1)) =
-      mat x (Fin.last (N + 1)) (Fin.last (N + 1)) * mat y (Fin.last (N + 1)) (Fin.last (N + 1)) := by
-  rw [mat_mul, Matrix.mul_apply, sum_idx, Finset.sum_eq_zero, hx (Fin.last (N + 1)) 0 (by simp), zero_mul, zero_add,
-    zero_add]
+theorem levi_mul_last {x y : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N))
+    : mat (x * y) (Fin.last (N + 1)) (Fin.last (N + 1))
+      = mat x (Fin.last (N + 1)) (Fin.last (N + 1))
+        * mat y (Fin.last (N + 1)) (Fin.last (N + 1)) := by
+  rw [mat_mul, Matrix.mul_apply, sum_idx, Finset.sum_eq_zero, hx (Fin.last (N + 1)) 0 (by simp),
+    zero_mul, zero_add, zero_add]
   intro j _
   rw [hx (Fin.last (N + 1)) (mid j) (by simp), zero_mul]
 
-theorem levi_mul_mid {x y : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N)) (i j : Fin N) :
-    mat (x * y) (mid i) (mid j) = ∑ k, mat x (mid i) (mid k) * mat y (mid k) (mid j) := by
-  rw [mat_mul, Matrix.mul_apply, sum_idx, hx (mid i) 0 (by simp), hx (mid i) (Fin.last (N + 1)) (by simp)]
+theorem levi_mul_mid {x y : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N)) (i j : Fin N)
+    : mat (x * y) (mid i) (mid j) = ∑ k, mat x (mid i) (mid k) * mat y (mid k) (mid j) := by
+  rw [mat_mul, Matrix.mul_apply, sum_idx, hx (mid i) 0 (by simp),
+    hx (mid i) (Fin.last (N + 1)) (by simp)]
   simp
 
 end

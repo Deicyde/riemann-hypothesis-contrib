@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section OmLocAux
@@ -87,8 +88,7 @@ private lemma common_den (B : Subalgebra ℂ L) (e : B →ₐ[ℂ] ℂ) {q : ℕ
 
 end OmLocAux
 
-theorem UpperTheory.Gal.productCup_of_system.omLoc_of :
-    OmLoc := by
+theorem UpperTheory.Gal.productCup_of_system.omLoc_of : OmLoc := by
   intro L _ _ B e q
   have hle : B ≤ loc B e := fun v hv => ⟨1, by simp, by simpa using hv⟩
   refine ⟨le_antisymm ?_ ?_, fun r hr m hm => omB_stab B q hr hm, fun B' h => omB_mono h q⟩
@@ -105,7 +105,8 @@ theorem UpperTheory.Gal.productCup_of_system.omLoc_of :
     have h1 := ιMulti_mem B q (fun j => ((b : L) ^ 2) • D ℂ L (v j)) fun j => two_mem B b.2 (hbv j)
     have h2 := omB_stab B q hbc h1
     rw [AlternatingMap.map_smul_univ, smul_smul, Finset.prod_const, Finset.card_univ,
-      Fintype.card_fin] at h2
+        Fintype.card_fin]
+      at h2
     convert h2 using 1
     rw [smul_smul]
     congr 1

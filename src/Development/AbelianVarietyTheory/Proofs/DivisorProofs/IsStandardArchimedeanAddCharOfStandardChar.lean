@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsArc
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 open IsDedekindDomain NumberField
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chr incM)
@@ -26,12 +27,14 @@ namespace GlobalTheory.WeilL2Words.StdTheta
 def negSum (F : Type) [Field F] [NumberField F] : mixedEmbedding.mixedSpace F →ₗ[ℝ] ℝ :=
   -(∑ w : {w : InfinitePlace F // w.IsReal}, (LinearMap.proj w).comp (LinearMap.fst ℝ _ _))
 
-theorem negSum_apply (F : Type) [Field F] [NumberField F] (z : mixedEmbedding.mixedSpace F) :
-    negSum F z = -∑ w, z.1 w := by
+theorem negSum_apply (F : Type) [Field F] [NumberField F] (z : mixedEmbedding.mixedSpace F)
+    : negSum F z = - ∑ w, z.1 w := by
   simp [negSum]
 
-theorem negSum_nondeg (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (z : mixedEmbedding.mixedSpace F)
-    (hz : z ≠ 0) : ∃ u, negSum F (z * u) ≠ 0 := by
+theorem negSum_nondeg
+    (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
+    (z : mixedEmbedding.mixedSpace F) (hz : z ≠ 0)
+    : ∃ u, negSum F (z * u) ≠ 0 := by
   have h1 : z.1 ≠ 0 := by
     intro h0
     apply hz
@@ -42,26 +45,32 @@ theorem negSum_nondeg (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (z 
   rw [negSum_apply]
   simpa [Pi.single_apply] using hw
 
-theorem cmTypeComponents_sum_eq_realCoordinates_sum (D : D7) (x : Ainf D.host.F) :
-    ∑ ρ, Formalism.L2.Fam.ThC.th0 D ρ (x ⊗ₜ[D.host.F] (1 : D.host.E)) =
-      ((∑ w, (InfiniteAdeleRing.ringEquiv_mixedSpace D.host.F x).1 w : ℝ) : ℂ) := by
+theorem cmTypeComponents_sum_eq_realCoordinates_sum (D : D7) (x : Ainf D.host.F)
+    : ∑ ρ, Formalism.L2.Fam.ThC.th0 D ρ (x ⊗ₜ[D.host.F] (1 : D.host.E))
+      = ((∑ w, (InfiniteAdeleRing.ringEquiv_mixedSpace D.host.F x).1 w : ℝ) : ℂ) := by
   haveI := D.sp.cm.totReal
-  have e1 : ∀ ρ, Formalism.L2.Fam.ThC.th0 D ρ (x ⊗ₜ[D.host.F] (1 : D.host.E)) =
-      InfinitePlace.Completion.extensionEmbedding (GlobalTheory.AdelicU.placeOf D ρ) (x (GlobalTheory.AdelicU.placeOf D ρ)) := by
+  have e1
+      : ∀ ρ,
+        Formalism.L2.Fam.ThC.th0 D ρ (x ⊗ₜ[D.host.F] (1 : D.host.E))
+          = InfinitePlace.Completion.extensionEmbedding (GlobalTheory.AdelicU.placeOf D ρ)
+            (x (GlobalTheory.AdelicU.placeOf D ρ)) := by
     intro ρ
     show Formalism.L2.Fam.ThC.projAt (tauE D ρ) (x ⊗ₜ[D.host.F] (1 : D.host.E)) = _
     rw [Formalism.L2.Fam.ThC.projAt_tmul, map_one, mul_one]
     rfl
   rw [Finset.sum_congr rfl fun ρ _ => e1 ρ,
-    (GlobalTheory.AdelicU.placeOf_bijective D).sum_comp (fun w => InfinitePlace.Completion.extensionEmbedding w (x w)),
+    (GlobalTheory.AdelicU.placeOf_bijective D).sum_comp
+      (fun w => InfinitePlace.Completion.extensionEmbedding w (x w)),
     Complex.ofReal_sum]
-  refine (Fintype.sum_equiv (Equiv.subtypeUnivEquiv fun w : InfinitePlace D.host.F => IsTotallyReal.isReal w) _ _
+  refine (Fintype.sum_equiv
+    (Equiv.subtypeUnivEquiv fun w : InfinitePlace D.host.F => IsTotallyReal.isReal w) _ _
     fun w => ?_).symm
   rw [InfiniteAdeleRing.ringEquiv_mixedSpace_apply]
   exact InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply w.2 (x w.1)
 
-theorem isStdInf_of_isStdChar : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) →
-    GlobalTheory.WeilL2Words.IsStdInf D.host.F ψ := by
+theorem isStdInf_of_isStdChar
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1) → GlobalTheory.WeilL2Words.IsStdInf D.host.F ψ := by
   intro D ψ hψ
   haveI := D.sp.cm.totReal
   have h := Formalism.L2.Fam.ThC.allSome_fam.1 hψ.2

@@ -5,10 +5,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 @[expose] public section
 
 open PrimeSpectrum in
-private theorem UpperTheory.V.Pr.exp_product_chart_local {X : Type} [TopologicalSpace X] {C : Type} [CommRing C]
-    {j : PrimeSpectrum C → X} (hj : Topology.IsOpenEmbedding j) {Z : Set X} (hZ : IsIrreducible Z)
-    {c : PrimeSpectrum C} (hc : j c ∈ Z) :
-    ∃ q : PrimeSpectrum C, q ⤳ c ∧ Z ⊆ closure {j q} := by
+private theorem UpperTheory.V.Pr.exp_product_chart_local
+    {X : Type} [TopologicalSpace X]
+    {C : Type} [CommRing C]
+    {j : PrimeSpectrum C → X} (hj : Topology.IsOpenEmbedding j)
+    {Z : Set X} (hZ : IsIrreducible Z)
+    {c : PrimeSpectrum C} (hc : j c ∈ Z)
+    : ∃ q : PrimeSpectrum C, q ⤳ c ∧ Z ⊆ closure {j q} := by
   have h1 : IsIrreducible (j ⁻¹' Z) := ⟨⟨c, hc⟩, hZ.isPreirreducible.preimage hj⟩
   obtain ⟨q, hq⟩ := QuasiSober.sober h1.closure isClosed_closure
   refine ⟨q, hq.specializes (subset_closure hc), ?_⟩
@@ -21,8 +24,7 @@ private theorem UpperTheory.V.Pr.exp_product_chart_local {X : Type} [Topological
   exact specializes_iff_mem_closure.mp (h3.map hj.continuous)
 
 open PrimeSpectrum in
-theorem UpperTheory.V.Pr.chartOfFlat :
-    UpperTheory.V.Pr.ChartOfFlat := by
+theorem UpperTheory.V.Pr.chartOfFlat : UpperTheory.V.Pr.ChartOfFlat := by
   intro X _ C _ j hj R _ _ _ _
   have hg : GeneralizingMap (PrimeSpectrum.comap (algebraMap C R)) :=
     Algebra.HasGoingDown.iff_generalizingMap_primeSpectrumComap.mp inferInstance
@@ -43,10 +45,12 @@ theorem UpperTheory.V.Pr.chartOfFlat :
   · intro Y hY hx
     obtain ⟨q, hq, hYq⟩ := UpperTheory.V.Pr.exp_product_chart_local hj hY.1 hx
     obtain ⟨P', -, rfl⟩ := hg hq
-    obtain ⟨p, hp, hle⟩ := Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal R)) (J := P'.asIdeal) bot_le
+    obtain ⟨p, hp, hle⟩ :=
+      Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal R)) (J := P'.asIdeal) bot_le
     refine ⟨⟨p, hp.1.1⟩, hp, ?_⟩
     have h1 : (⟨p, hp.1.1⟩ : PrimeSpectrum R) ⤳ P' := (PrimeSpectrum.le_iff_specializes _ _).mp hle
     have h2 : Y ⊆ closure {(j ∘ PrimeSpectrum.comap (algebraMap C R)) ⟨p, hp.1.1⟩} :=
       hYq.trans (closure_minimal
-        (Set.singleton_subset_iff.mpr (specializes_iff_mem_closure.mp (h1.map hc))) isClosed_closure)
+        (Set.singleton_subset_iff.mpr (specializes_iff_mem_closure.mp (h1.map hc)))
+        isClosed_closure)
     exact Set.Subset.antisymm (hY.2 isIrreducible_singleton.closure h2) h2

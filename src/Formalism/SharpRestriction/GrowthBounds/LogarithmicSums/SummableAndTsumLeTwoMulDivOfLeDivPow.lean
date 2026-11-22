@@ -57,8 +57,11 @@ private lemma scale_b_prime_div_x_le_b (s : Scale) : s.b' / s.x ≤ s.b := by
   rw [h]
   exact div_le_self hb.le hX
 
-theorem fill_ge (X : Inst D L) (b : HH D → ℤ) (hb : ∀ t ∈ D.host.TT, L.sc.b' ≤ (b t : ℝ)) (j : ℕ)
-    (z : Bool × HH D) : L.sc.w'' D.R.n ≤ fill X b j z := by
+theorem fill_ge
+    (X : Inst D L)
+    (b : HH D → ℤ) (hb : ∀ t ∈ D.host.TT, L.sc.b' ≤ (b t : ℝ))
+    (j : ℕ) (z : Bool × HH D)
+    : L.sc.w'' D.R.n ≤ fill X b j z := by
   have hn := n_pos D
   have hI : X.off j z ≤ fill X b j z := by
     unfold fill
@@ -91,7 +94,9 @@ theorem Sc_facts (P : ParameterChoice' D L) : 100 ≤ L.Sc ∧ 5 * L.Sc ≤ L.sc
     exact Nat.le_add_right _ _
   have hNr : (D.R.k : ℝ) ≤ (D.R.N D.R.m : ℝ) := by exact_mod_cast hN
   have hm10 : (1024 : ℝ) ≤ (D.R.m : ℝ) ^ 10 := by
-    calc (1024 : ℝ) = 2 ^ 10 := by norm_num
+    calc
+      (1024 : ℝ)
+        = 2 ^ 10 := by norm_num
       _ ≤ (D.R.m : ℝ) ^ 10 := pow_le_pow_left₀ (by norm_num) hm 10
   have hprod : (5 : ℝ) * 1024 ≤ (D.R.N D.R.m : ℝ) * (D.R.m : ℝ) ^ 10 :=
     mul_le_mul (by linarith) hm10 (by norm_num) (by linarith)
@@ -107,8 +112,12 @@ theorem Sc_facts (P : ParameterChoice' D L) : 100 ≤ L.Sc ∧ 5 * L.Sc ≤ L.sc
   · have h1 := P.kS_le
     nlinarith [mul_le_mul_of_nonneg_right hk hSc0]
 
-theorem fillG_ge (P : ParameterChoice' D L) (X : Inst D L) (b : HH D → ℤ) (hb : ∀ t ∈ D.host.TT, L.sc.b' ≤ (b t : ℝ)) (j : ℕ)
-    (hj : j ∈ SizeData₂.lifts D) (z : Bool × HH D) : L.sc.w'' D.R.n - L.Sc ≤ fillG X b j z := by
+theorem fillG_ge
+    (P : ParameterChoice' D L) (X : Inst D L)
+    (b : HH D → ℤ) (hb : ∀ t ∈ D.host.TT, L.sc.b' ≤ (b t : ℝ))
+    (j : ℕ) (hj : j ∈ SizeData₂.lifts D)
+    (z : Bool × HH D)
+    : L.sc.w'' D.R.n - L.Sc ≤ fillG X b j z := by
   have hf := fill_ge X b hb j z
   unfold SizeData₂.lifts at hj
   have hj' := Finset.mem_Icc.mp hj
@@ -127,8 +136,7 @@ theorem fillG_ge (P : ParameterChoice' D L) (X : Inst D L) (b : HH D → ℤ) (h
     push_cast <;> ring
   have hm10 : (1 : ℝ) ≤ (D.R.m : ℝ) ^ 10 := one_le_pow₀ (by linarith)
   have hN0 : (0 : ℝ) ≤ (D.R.N D.R.m : ℝ) := Nat.cast_nonneg _
-  have hNle : (D.R.N D.R.m : ℝ) ≤ D.s.Del := by
-    nlinarith [mul_le_mul_of_nonneg_left hm10 hN0]
+  have hNle : (D.R.N D.R.m : ℝ) ≤ D.s.Del := by nlinarith [mul_le_mul_of_nonneg_left hm10 hN0]
   have hDel0 : (0 : ℝ) ≤ D.s.Del := by linarith
   have hSc := L.Sc_eq
   have hka : kaJ D j ≤ L.Sc := by
@@ -139,8 +147,10 @@ theorem fillG_ge (P : ParameterChoice' D L) (X : Inst D L) (b : HH D → ℤ) (h
   unfold fillG
   linarith
 
-theorem summable_and_tsum_le_two_mul_div_of_le_div_pow (p y : ℝ) (hp : 2 ≤ p) (f : ℕ → ℝ) (h0 : ∀ e, 0 ≤ f e) (hz : f 0 = 0)
-    (h1 : ∀ e, f e ≤ y / p ^ e) : Summable f ∧ ∑' e, f e ≤ 2 * y / p := by
+theorem summable_and_tsum_le_two_mul_div_of_le_div_pow
+    (p y : ℝ) (hp : 2 ≤ p)
+    (f : ℕ → ℝ) (h0 : ∀ e, 0 ≤ f e) (hz : f 0 = 0) (h1 : ∀ e, f e ≤ y / p ^ e)
+    : Summable f ∧ ∑' e, f e ≤ 2 * y / p := by
   have hp0 : (0 : ℝ) < p := by linarith
   have hpne : p ≠ 0 := hp0.ne'
   have hy : 0 ≤ y := by
@@ -161,18 +171,22 @@ theorem summable_and_tsum_le_two_mul_div_of_le_div_pow (p y : ℝ) (hp : 2 ≤ p
   rw [hf.tsum_eq_zero_add, hz, zero_add]
   have hle : ∀ e : ℕ, f (e + 1) ≤ y / p * (1 / p) ^ e := fun e => by
     have h := h1 (e + 1)
-    calc f (e + 1) ≤ y / p ^ (e + 1) := h
+    calc
+      f (e + 1)
+        ≤ y / p ^ (e + 1) := h
       _ = y / p * (1 / p) ^ e := by
         rw [pow_succ, one_div_pow, div_mul_div_comm, mul_one, mul_comm (p ^ e) p]
-  calc ∑' e, f (e + 1) ≤ ∑' e : ℕ, y / p * (1 / p) ^ e :=
-        Summable.tsum_le_tsum hle hshift (hgeo.mul_left (y / p))
+  calc
+    ∑' e, f (e + 1)
+      ≤ ∑' e : ℕ, y / p * (1 / p) ^ e := Summable.tsum_le_tsum hle hshift (hgeo.mul_left (y / p))
     _ = y / p * (1 - 1 / p)⁻¹ := by rw [tsum_mul_left, tsum_geometric_of_lt_one hr0 hr1]
     _ = y / (p - 1) := by
-        rw [one_sub_div hpne, inv_div, div_mul_div_comm, mul_comm p (p - 1), mul_div_mul_right _ _ hpne]
+      rw [one_sub_div hpne, inv_div, div_mul_div_comm, mul_comm p (p - 1),
+        mul_div_mul_right _ _ hpne]
     _ ≤ 2 * y / p := by
-        have hp1' : (0 : ℝ) < p - 1 := by linarith
-        rw [div_le_iff₀ hp1', div_mul_eq_mul_div, le_div_iff₀ hp0]
-        nlinarith
+      have hp1' : (0 : ℝ) < p - 1 := by linarith
+      rw [div_le_iff₀ hp1', div_mul_eq_mul_div, le_div_iff₀ hp0]
+      nlinarith
 
 def thW (D : D7) (s : Scale) : ℝ := 1 / ((D.R.k : ℝ) * s.x ^ (Scale.A / 2))
 
@@ -184,23 +198,28 @@ theorem k_ge (D : D7) : (5 : ℝ) ≤ (D.R.k : ℝ) := by
 
 theorem thW_bounds (D : D7) (s : Scale) : 0 < thW D s ∧ thW D s ≤ 1 / 5 := by
   have hk := k_ge D
-  have hx : 1 ≤ s.x ^ (Scale.A / 2) :=
-    Real.one_le_rpow s.one_lt_alt.le (by norm_num [Scale.A])
+  have hx : 1 ≤ s.x ^ (Scale.A / 2) := Real.one_le_rpow s.one_lt_alt.le (by norm_num [Scale.A])
   have h5 : (5 : ℝ) ≤ (D.R.k : ℝ) * s.x ^ (Scale.A / 2) := by nlinarith
   have hpos : 0 < (D.R.k : ℝ) * s.x ^ (Scale.A / 2) := by linarith
   unfold thW
   exact ⟨one_div_pos.mpr hpos, one_div_le_one_div_of_le (by norm_num) h5⟩
 
-theorem inWin_le {a b : HH D → ℤ} (h : InWin L a b) {t : HH D} (ht : t ∈ D.host.TT) :
-    (a t : ℝ) ≤ L.sc.a * (1 + thW D L.sc) := by
+theorem inWin_le {a b : HH D → ℤ} (h : InWin L a b) {t : HH D} (ht : t ∈ D.host.TT)
+    : (a t : ℝ) ≤ L.sc.a * (1 + thW D L.sc) := by
   have h1 := (h t ht).2.1
   unfold thW
-  calc (a t : ℝ) ≤ L.sc.a + L.sc.a / ((D.R.k : ℝ) * L.sc.x ^ (Scale.A / 2)) := h1
+  calc
+    (a t : ℝ)
+      ≤ L.sc.a + L.sc.a / ((D.R.k : ℝ) * L.sc.x ^ (Scale.A / 2)) := h1
     _ = L.sc.a * (1 + 1 / ((D.R.k : ℝ) * L.sc.x ^ (Scale.A / 2))) := by ring
 
-theorem ask_bounds (P : ParameterChoice' D L) (X : Inst D L) {a b : HH D → ℤ} (h : InWin L a b) (p : ℕ) (hp : p.Prime) (j : ℕ)
-    (hj : j ∈ SizeData₂.lifts D) (s : HH D)
-    (hs : s ∈ D.host.TT) : 0 ≤ askG X a b p j s ∧ askG X a b p j s ≤ 3 * L.sc.a / p := by
+theorem ask_bounds
+    (P : ParameterChoice' D L) (X : Inst D L)
+    {a b : HH D → ℤ} (h : InWin L a b)
+    (p : ℕ) (hp : p.Prime)
+    (j : ℕ) (hj : j ∈ SizeData₂.lifts D)
+    (s : HH D) (hs : s ∈ D.host.TT)
+    : 0 ≤ askG X a b p j s ∧ askG X a b p j s ≤ 3 * L.sc.a / p := by
   have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hp.two_le
   obtain ⟨hS100, hS5⟩ := Sc_facts P
   have hbT : ∀ t ∈ D.host.TT, L.sc.b' ≤ (b t : ℝ) := fun t ht => (h t ht).2.2
@@ -212,16 +231,30 @@ theorem ask_bounds (P : ParameterChoice' D L) (X : Inst D L) {a b : HH D → ℤ
   have hn0 : ¬ Odd (0 : ℕ) := by
     rintro ⟨m, hm⟩
     omega
-  have h0 : ∀ e : ℕ, 0 ≤ (if Odd e then max 0 ((a s : ℝ) / (p : ℝ) ^ e -
-      fillG X b j (partner D p s e)) else 0) := by
+  have h0
+      : ∀ e : ℕ,
+        0 ≤ (if Odd e then
+               max 0 ((a s : ℝ) / (p : ℝ) ^ e - fillG X b j (partner D p s e))
+             else
+               0) := by
     intro e
     split_ifs
     · exact le_max_left _ _
     · exact le_rfl
-  have hz : (if Odd 0 then max 0 ((a s : ℝ) / (p : ℝ) ^ 0 -
-      fillG X b j (partner D p s 0)) else 0) = 0 := if_neg hn0
-  have h1 : ∀ e : ℕ, (if Odd e then max 0 ((a s : ℝ) / (p : ℝ) ^ e -
-      fillG X b j (partner D p s e)) else 0) ≤ (a s : ℝ) / (p : ℝ) ^ e := by
+  have hz
+      : (if Odd 0 then
+           max 0 ((a s : ℝ) / (p : ℝ) ^ 0 - fillG X b j (partner D p s 0))
+         else
+           0)
+        = 0 :=
+    if_neg hn0
+  have h1
+      : ∀ e : ℕ,
+        (if Odd e then
+           max 0 ((a s : ℝ) / (p : ℝ) ^ e - fillG X b j (partner D p s e))
+         else
+           0)
+          ≤ (a s : ℝ) / (p : ℝ) ^ e := by
     intro e
     split_ifs
     · exact max_le (div_nonneg has0 (by positivity)) (by linarith [hfG (partner D p s e)])
@@ -230,9 +263,10 @@ theorem ask_bounds (P : ParameterChoice' D L) (X : Inst D L) {a b : HH D → ℤ
   have hθ := thW_bounds D L.sc
   have haw := inWin_le h hs
   refine ⟨tsum_nonneg h0, ?_⟩
-  have h6 : 2 * (a s : ℝ) ≤ 3 * L.sc.a := by
-    nlinarith [mul_le_mul_of_nonneg_left hθ.2 hapos.le]
-  calc askG X a b p j s ≤ 2 * (a s : ℝ) / p := hle
+  have h6 : 2 * (a s : ℝ) ≤ 3 * L.sc.a := by nlinarith [mul_le_mul_of_nonneg_left hθ.2 hapos.le]
+  calc
+    askG X a b p j s
+      ≤ 2 * (a s : ℝ) / p := hle
     _ ≤ 3 * L.sc.a / p := by
       apply div_le_div_of_nonneg_right h6
       positivity
@@ -255,8 +289,8 @@ theorem thS_bounds (P : ParameterChoice' D L) : thW D L.sc ≤ thS L ∧ thS L �
   unfold thS
   constructor <;> linarith [hθ.2]
 
-theorem thS_key (P : ParameterChoice' D L) :
-    L.sc.w'' D.R.n * (1 + thW D L.sc) ≤ (L.sc.w'' D.R.n - L.Sc) * (1 + thS L) := by
+theorem thS_key (P : ParameterChoice' D L)
+    : L.sc.w'' D.R.n * (1 + thW D L.sc) ≤ (L.sc.w'' D.R.n - L.Sc) * (1 + thS L) := by
   obtain ⟨h100, h5⟩ := Sc_facts P
   have hθ := thW_bounds D L.sc
   have hW : 0 < L.sc.w'' D.R.n := by linarith
@@ -274,10 +308,17 @@ private lemma scale_b_le_a (s : Scale) : s.b ≤ s.a := by
   unfold Scale.a
   nlinarith
 
-theorem ask_high (P : ParameterChoice' D L) (X : Inst D L) {a b : HH D → ℤ} (h : InWin L a b) (p : ℕ)
-    (hpX : L.sc.X'' D.R.n < (p : ℝ)) (j : ℕ) (hj : j ∈ SizeData₂.lifts D) (s : HH D) (hs : s ∈ D.host.TT) :
-    askG X a b p j s ≤
-      if (p : ℝ) < L.sc.X'' D.R.n * (1 + thS L) then thW D L.sc * L.sc.w'' D.R.n + L.Sc else 0 := by
+theorem ask_high
+    (P : ParameterChoice' D L) (X : Inst D L)
+    {a b : HH D → ℤ} (h : InWin L a b)
+    (p : ℕ) (hpX : L.sc.X'' D.R.n < (p : ℝ))
+    (j : ℕ) (hj : j ∈ SizeData₂.lifts D)
+    (s : HH D) (hs : s ∈ D.host.TT)
+    : askG X a b p j s
+      ≤ if (p : ℝ) < L.sc.X'' D.R.n * (1 + thS L) then
+          thW D L.sc * L.sc.w'' D.R.n + L.Sc
+        else
+          0 := by
   obtain ⟨hS100, hS5⟩ := Sc_facts P
   have hn := n_pos D
   have hW : 0 < L.sc.w'' D.R.n := sc_w''_pos L.sc D.R.n hn
@@ -308,11 +349,19 @@ theorem ask_high (P : ParameterChoice' D L) (X : Inst D L) {a b : HH D → ℤ} 
   have hap0 : (a s : ℝ) ≤ L.sc.w'' D.R.n * (1 + thW D L.sc) * p := by
     have hc : 0 < L.sc.w'' D.R.n * (1 + thW D L.sc) := mul_pos hW (by linarith [hθ.1])
     have h1 := mul_lt_mul_of_pos_left hpX hc
-    calc (a s : ℝ) ≤ L.sc.a * (1 + thW D L.sc) := haw
+    calc
+      (a s : ℝ)
+        ≤ L.sc.a * (1 + thW D L.sc) := haw
       _ = L.sc.w'' D.R.n * (1 + thW D L.sc) * L.sc.X'' D.R.n := by rw [← hXa]; ring
       _ ≤ L.sc.w'' D.R.n * (1 + thW D L.sc) * p := h1.le
-  have hsingle : ∀ e : ℕ, e ≠ 1 → (if Odd e then max 0 ((a s : ℝ) / (p : ℝ) ^ e -
-      fillG X b j (partner D p s e)) else 0) = 0 := by
+  have hsingle
+      : ∀ e : ℕ,
+        e ≠ 1
+          → (if Odd e then
+               max 0 ((a s : ℝ) / (p : ℝ) ^ e - fillG X b j (partner D p s e))
+             else
+               0)
+            = 0 := by
     intro e he
     split_ifs with ho
     · refine le_antisymm ?_ (le_max_left _ _)
@@ -326,7 +375,9 @@ theorem ask_high (P : ParameterChoice' D L) (X : Inst D L) {a b : HH D → ℤ} 
           (by linarith : (0 : ℝ) ≤ p + 2)]
       have hwp := mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hθ.2 hW.le) hp.le
       have hle : (a s : ℝ) ≤ (L.sc.w'' D.R.n - L.Sc) * (p : ℝ) ^ e := by
-        calc (a s : ℝ) ≤ L.sc.w'' D.R.n * (1 + thW D L.sc) * p := hap0
+        calc
+          (a s : ℝ)
+            ≤ L.sc.w'' D.R.n * (1 + thW D L.sc) * p := hap0
           _ ≤ (4 / 5 * L.sc.w'' D.R.n) * (4 * p) := by nlinarith [mul_pos hW hp]
           _ ≤ (L.sc.w'' D.R.n - L.Sc) * (p : ℝ) ^ e :=
             mul_le_mul (by linarith) (by linarith) (by positivity) (by linarith)
@@ -347,7 +398,9 @@ theorem ask_high (P : ParameterChoice' D L) (X : Inst D L) {a b : HH D → ℤ} 
     apply max_le le_rfl
     have hθS := thS_bounds P
     have h1 : (a s : ℝ) ≤ (L.sc.w'' D.R.n - L.Sc) * p := by
-      calc (a s : ℝ) ≤ L.sc.a * (1 + thW D L.sc) := haw
+      calc
+        (a s : ℝ)
+          ≤ L.sc.a * (1 + thW D L.sc) := haw
         _ = L.sc.X'' D.R.n * (L.sc.w'' D.R.n * (1 + thW D L.sc)) := by rw [← hXa]; ring
         _ ≤ L.sc.X'' D.R.n * ((L.sc.w'' D.R.n - L.Sc) * (1 + thS L)) :=
           mul_le_mul_of_nonneg_left hkey hX.le

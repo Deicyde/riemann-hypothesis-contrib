@@ -12,8 +12,11 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.JoinCoordsCo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.ExtraBlocks
 
@@ -24,9 +27,12 @@ variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) 
 theorem isLocalRing_regAt (p : Cpt ξ) : IsLocalRing (regAt ξ p) :=
   IsLocalRing.of_surjective' (genMap ξ p).rangeRestrict (genMap ξ p).rangeRestrict_surjective
 
-theorem exists_unit_gen {B : Type} [Fintype B] (A : Subring Ω) [IsLocalRing A] (z : B → Ω) {f : Ω} (hf : f ≠ 0)
-    (h : Submodule.span A (Set.range z) = Submodule.span A {f}) :
-    ∃ l, z l ≠ 0 ∧ ∀ l', z l' / z l ∈ A := by
+theorem exists_unit_gen
+    {B : Type} [Fintype B]
+    (A : Subring Ω) [IsLocalRing A]
+    (z : B → Ω)
+    {f : Ω} (hf : f ≠ 0) (h : Submodule.span A (Set.range z) = Submodule.span A {f})
+    : ∃ l, z l ≠ 0 ∧ ∀ l', z l' / z l ∈ A := by
   classical
   have hz : ∀ i, ∃ a : A, (a : Ω) * f = z i := fun i => by
     have hi : z i ∈ Submodule.span A {f} := h ▸ Submodule.subset_span ⟨i, rfl⟩
@@ -47,7 +53,8 @@ theorem exists_unit_gen {B : Type} [Fintype B] (A : Subring Ω) [IsLocalRing A] 
     push_neg at hn
     have h1 : (1 : A) ∈ IsLocalRing.maximalIdeal A := by
       rw [← hsum]
-      exact Ideal.sum_mem _ fun i _ => Ideal.mul_mem_left _ _ ((IsLocalRing.mem_maximalIdeal _).2 (hn i))
+      exact Ideal.sum_mem _ fun i _ =>
+        Ideal.mul_mem_left _ _ ((IsLocalRing.mem_maximalIdeal _).2 (hn i))
     exact (Ideal.ne_top_iff_one _).1 (IsLocalRing.maximalIdeal.isMaximal A).ne_top h1
   obtain ⟨b, hb⟩ := hl.exists_right_inv
   have hb' : (a l : Ω) * b = 1 := by simpa using congrArg (Subtype.val) hb
@@ -63,27 +70,36 @@ theorem exists_unit_gen {B : Type} [Fintype B] (A : Subring Ω) [IsLocalRing A] 
   rw [e]
   exact (a l' * b).2
 
-theorem inChart_pair {α β : Type} {u : α → Ω} {v : β → Ω} {c : α} {e : β} {p : Cpt ξ}
-    (hu : InChart ξ u c p) (hv : InChart ξ v e p) :
-    InChart ξ (fun q : α × β => u q.1 * v q.2) (c, e) p :=
-  ⟨mul_ne_zero hu.1 hv.1, fun q => by
+theorem inChart_pair
+    {α β : Type} {u : α → Ω} {v : β → Ω} {c : α} {e : β} {p : Cpt ξ}
+    (hu : InChart ξ u c p) (hv : InChart ξ v e p)
+    : InChart ξ (fun q : α × β => u q.1 * v q.2) (c, e) p := ⟨
+  mul_ne_zero hu.1 hv.1,
+  fun q => by
     show u q.1 * v q.2 / (u c * v e) ∈ _
     rw [mul_div_mul_comm]
-    exact mul_mem (hu.2 _) (hv.2 _)⟩
+    exact mul_mem (hu.2 _) (hv.2 _)
+⟩
 
-theorem inChart_pi {A : Type} [Fintype A] {B : A → Type} {z : ∀ a, B a → Ω} {l : ∀ a, B a} {p : Cpt ξ}
-    (h : ∀ a, InChart ξ (z a) (l a) p) : InChart ξ (fun l' : ∀ a, B a => ∏ a, z a (l' a)) l p :=
-  ⟨Finset.prod_ne_zero_iff.2 fun a _ => (h a).1, fun l' => by
+theorem inChart_pi
+    {A : Type} [Fintype A]
+    {B : A → Type} {z : ∀ a, B a → Ω} {l : ∀ a, B a} {p : Cpt ξ} (h : ∀ a, InChart ξ (z a) (l a) p)
+    : InChart ξ (fun l' : ∀ a, B a => ∏ a, z a (l' a)) l p := ⟨
+  Finset.prod_ne_zero_iff.2 fun a _ => (h a).1,
+  fun l' => by
     show (∏ a, z a (l' a)) / ∏ a, z a (l a) ∈ _
     rw [← Finset.prod_div_distrib]
-    exact prod_mem fun a _ => (h a).2 _⟩
+    exact prod_mem fun a _ => (h a).2 _
+⟩
 
-theorem inChart_equiv_iff {κ κ₂ : Type} {x : κ → Ω} (e : κ₂ ≃ κ) (c : κ₂) (p : Cpt ξ) :
-    InChart ξ (fun c' => x (e c')) c p ↔ InChart ξ x (e c) p :=
+theorem inChart_equiv_iff {κ κ₂ : Type} {x : κ → Ω} (e : κ₂ ≃ κ) (c : κ₂) (p : Cpt ξ)
+    : InChart ξ (fun c' => x (e c')) c p ↔ InChart ξ x (e c) p :=
   ⟨fun h => ⟨h.1, fun c' => by simpa using h.2 (e.symm c')⟩, fun h => ⟨h.1, fun c' => h.2 _⟩⟩
 
-theorem coordTie_equiv {o : Type} [CommRing o] [Algebra o Ω] {κ κ₂ : Type} {x : κ → Ω} (e : κ₂ ≃ κ)
-    (h : CoordTie o ξ x) : CoordTie o ξ (fun c => x (e c)) := by
+theorem coordTie_equiv
+    {o : Type} [CommRing o] [Algebra o Ω]
+    {κ κ₂ : Type} {x : κ → Ω} (e : κ₂ ≃ κ) (h : CoordTie o ξ x)
+    : CoordTie o ξ (fun c => x (e c)) := by
   refine ⟨h.gen, fun p => ?_, fun c hc => ?_, fun c hc a => ?_⟩
   · obtain ⟨c, hc⟩ := h.cover p
     exact ⟨e.symm c, (inChart_equiv_iff e _ p).2 (by simpa using hc)⟩
@@ -95,17 +111,21 @@ theorem coordTie_equiv {o : Type} [CommRing o] [Algebra o Ω] {κ κ₂ : Type} 
     rw [hr, h.ring (e c) hc a]
     exact forall_congr' fun p => imp_congr (inChart_equiv_iff e c p).symm Iff.rfl
 
-theorem isCohOn_of_isVBOn {E : Type} [AddCommGroup E] [Module Ω E] {L : Lat ξ E} {T : Set (Cpt ξ)} {r : ℕ}
-    {V : Submodule Ω E} (h : L.IsVBOn T r V) : L.IsCohOn T := fun p hp => by
+theorem isCohOn_of_isVBOn
+    {E : Type} [AddCommGroup E] [Module Ω E]
+    {L : Lat ξ E} {T : Set (Cpt ξ)} {r : ℕ} {V : Submodule Ω E} (h : L.IsVBOn T r V)
+    : L.IsCohOn T := fun p hp => by
   obtain ⟨U, hU, b, -, hb⟩ := h p hp
   exact ⟨U, hU, r, b, fun q hq hqU => (hb q hq hqU).2⟩
 
 variable {κ : Type} {x : κ → Ω} {Λ : Lat ξ Ω} {d n : ℕ} {z : Fin n → Ω}
 
-theorem exists_inChart_of_twist (hc : ∀ p : Cpt ξ, ∃ c, InChart ξ x c p)
-    (H : ∀ c (p : Cpt ξ), InChart ξ x c p →
-      Λ p = Submodule.span (regAt ξ p) (Set.range fun k => (x c ^ d)⁻¹ • z k))
-    (hv : Λ.IsVB 1 ⊤) (p : Cpt ξ) : ∃ l, InChart ξ z l p := by
+theorem exists_inChart_of_twist
+    (hc : ∀ p : Cpt ξ, ∃ c, InChart ξ x c p)
+    (H : ∀ c (p : Cpt ξ),
+      InChart ξ x c p → Λ p = Submodule.span (regAt ξ p) (Set.range fun k => (x c ^ d)⁻¹ • z k))
+    (hv : Λ.IsVB 1 ⊤) (p : Cpt ξ)
+    : ∃ l, InChart ξ z l p := by
   obtain ⟨c, hcp⟩ := hc p
   obtain ⟨e, he, hL, -⟩ := Flat.exists_gen_of_isVB_one hv p
   haveI := isLocalRing_regAt p
@@ -117,10 +137,10 @@ theorem exists_inChart_of_twist (hc : ∀ p : Cpt ξ, ∃ c, InChart ξ x c p)
   rwa [mul_div_mul_left _ _ hx] at h1
 
 theorem stalk_eq_of_twist
-    (H : ∀ c (p : Cpt ξ), InChart ξ x c p →
-      Λ p = Submodule.span (regAt ξ p) (Set.range fun k => (x c ^ d)⁻¹ • z k))
-    {c : κ} {l : Fin n} {p : Cpt ξ} (hx : InChart ξ x c p) (hz : InChart ξ z l p) :
-    Λ p = Submodule.span (regAt ξ p) {(x c ^ d)⁻¹ * z l} := by
+    (H : ∀ c (p : Cpt ξ),
+      InChart ξ x c p → Λ p = Submodule.span (regAt ξ p) (Set.range fun k => (x c ^ d)⁻¹ • z k))
+    {c : κ} {l : Fin n} {p : Cpt ξ} (hx : InChart ξ x c p) (hz : InChart ξ z l p)
+    : Λ p = Submodule.span (regAt ξ p) {(x c ^ d)⁻¹ * z l} := by
   rw [H c p hx]
   have h0 := hz.1
   apply le_antisymm
@@ -149,8 +169,8 @@ def fintypeBJ [∀ k, Fintype (J k)] [Fintype κ] : ∀ k, Fintype (BJ J κ n k)
   | .inr none => inferInstanceAs (Fintype κ)
   | .inr (some a) => inferInstanceAs (Fintype (Fin (n a)))
 
-def blockCo {Ω : Type} (y : (Σ k, J k) → Ω) (x : κ → Ω) (z : ∀ a, Fin (n a) → Ω) :
-    (Σ k, BJ J κ n k) → Ω
+def blockCo {Ω : Type} (y : (Σ k, J k) → Ω) (x : κ → Ω) (z : ∀ a, Fin (n a) → Ω)
+    : (Σ k, BJ J κ n k) → Ω
   | ⟨.inl k, j⟩ => y ⟨k, j⟩
   | ⟨.inr none, c⟩ => x c
   | ⟨.inr (some a), l⟩ => z a l
@@ -160,9 +180,11 @@ def blockDeg [DecidableEq A] (d : A → ℕ) (a : A) : K ⊕ Option A → ℤ
   | .inr none => -(d a : ℤ)
   | .inr (some a') => if a' = a then 1 else 0
 
-def blockEquiv : ((k : K ⊕ Option A) → BJ J κ n k) ≃ κ × (((k : K) → J k) × ((a : A) → Fin (n a))) where
+def blockEquiv
+    : ((k : K ⊕ Option A) → BJ J κ n k) ≃ κ × (((k : K) → J k) × ((a : A) → Fin (n a))) where
   toFun c := (c (.inr none), (fun k => c (.inl k), fun a => c (.inr (some a))))
-  invFun t := fun k => match k with
+  invFun t := fun k =>
+    match k with
     | .inl k => t.2.1 k
     | .inr none => t.1
     | .inr (some a) => t.2.2 a
@@ -171,23 +193,27 @@ def blockEquiv : ((k : K ⊕ Option A) → BJ J κ n k) ≃ κ × (((k : K) → 
 
 variable {J κ n} {Ω : Type} [Field Ω] [Fintype K] [Fintype A]
 
-theorem segre_blockCo (y : (Σ k, J k) → Ω) (x : κ → Ω) (z : ∀ a, Fin (n a) → Ω)
-    (c : (k : K ⊕ Option A) → BJ J κ n k) :
-    ∏ k, blockCo J κ n y x z ⟨k, c k⟩ =
-      x (c (.inr none)) * ((∏ k, y ⟨k, c (.inl k)⟩) * ∏ a, z a (c (.inr (some a)))) := by
+theorem segre_blockCo
+    (y : (Σ k, J k) → Ω) (x : κ → Ω) (z : ∀ a, Fin (n a) → Ω) (c : (k : K ⊕ Option A) → BJ J κ n k)
+    : ∏ k, blockCo J κ n y x z ⟨k, c k⟩
+      = x (c (.inr none)) * ((∏ k, y ⟨k, c (.inl k)⟩) * ∏ a, z a (c (.inr (some a)))) := by
   rw [Fintype.prod_sum_type, Fintype.prod_option]
   show (∏ k, y ⟨k, c (.inl k)⟩) * (x (c (.inr none)) * ∏ a, z a (c (.inr (some a)))) = _
   ring
 
-theorem deg_blockCo [DecidableEq A] (y : (Σ k, J k) → Ω) (x : κ → Ω) (z : ∀ a, Fin (n a) → Ω) (d : A → ℕ) (a : A)
-    (c : (k : K ⊕ Option A) → BJ J κ n k) :
-    ∏ k, blockCo J κ n y x z ⟨k, c k⟩ ^ blockDeg d a k =
-      (x (c (.inr none)) ^ d a)⁻¹ * z a (c (.inr (some a))) := by
+theorem deg_blockCo
+    [DecidableEq A]
+    (y : (Σ k, J k) → Ω) (x : κ → Ω) (z : ∀ a, Fin (n a) → Ω) (d : A → ℕ) (a : A)
+    (c : (k : K ⊕ Option A) → BJ J κ n k)
+    : ∏ k, blockCo J κ n y x z ⟨k, c k⟩ ^ blockDeg d a k
+      = (x (c (.inr none)) ^ d a)⁻¹ * z a (c (.inr (some a))) := by
   rw [Fintype.prod_sum_type, Fintype.prod_option]
-  have h1 : ∏ k : K, blockCo J κ n y x z ⟨.inl k, c (.inl k)⟩ ^ blockDeg (K := K) d a (.inl k) = 1 :=
+  have h1
+      : ∏ k : K, blockCo J κ n y x z ⟨.inl k, c (.inl k)⟩ ^ blockDeg (K := K) d a (.inl k) = 1 :=
     Finset.prod_eq_one fun k _ => zpow_zero _
-  have h2 : ∏ a' : A, blockCo J κ n y x z ⟨.inr (some a'), c (.inr (some a'))⟩ ^ blockDeg (K := K) d a (.inr (some a')) =
-      z a (c (.inr (some a))) := by
+  have h2
+      : ∏ a' : A, blockCo J κ n y x z ⟨.inr (some a'), c (.inr (some a'))⟩ ^ blockDeg (K := K) d a (.inr (some a'))
+        = z a (c (.inr (some a))) := by
     rw [Finset.prod_eq_single a]
     · show z a _ ^ (if a = a then (1 : ℤ) else 0) = _
       simp
@@ -201,14 +227,26 @@ theorem deg_blockCo [DecidableEq A] (y : (Σ k, J k) → Ω) (x : κ → Ω) (z 
 
 end Blocks
 
-theorem exists_blocks_of_lines : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω) (M : PModel o x) (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (A : Type) [Finite A] (Λ : A → Lat M.ξ Ω), (∀ p : Cpt M.ξ, ∃ c₀, InChart M.ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) c₀ p) → (∀ a, (Λ a).IsVB 1 ⊤) → ∃ (K' : Type) (_ : Fintype K') (J' : K' → Type) (_ : ∀ k, Fintype (J' k)) (y' : (Σ k, J' k) → Ω) (bk : K → K') (bx : ∀ k, J k ≃ J' (bk k)) (deg : A → K' → ℤ), Function.Injective bk ∧ (∀ k a, y' ⟨bk k, bx k a⟩ = y ⟨k, a⟩) ∧ CoordTie o M.ξ (fun c' : (k : K') → J' k => ∏ k, y' ⟨k, c' k⟩) ∧ ∀ a, (Λ a).IsDegOn Set.univ y' (deg a) 1 := by
+theorem exists_blocks_of_lines
+    : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω)
+        (M : PModel o x) (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)]
+        (y : (Σ k, J k) → Ω) (A : Type) [Finite A] (Λ : A → Lat M.ξ Ω),
+      (∀ p : Cpt M.ξ, ∃ c₀, InChart M.ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) c₀ p)
+        → (∀ a, (Λ a).IsVB 1 ⊤)
+        → ∃ (K' : Type) (_ : Fintype K') (J' : K' → Type) (_ : ∀ k, Fintype (J' k))
+            (y' : (Σ k, J' k) → Ω) (bk : K → K') (bx : ∀ k, J k ≃ J' (bk k)) (deg : A → K' → ℤ),
+          Function.Injective bk ∧ (∀ k a, y' ⟨bk k, bx k a⟩ = y ⟨k, a⟩)
+            ∧ CoordTie o M.ξ (fun c' : (k : K') → J' k => ∏ k, y' ⟨k, c' k⟩)
+            ∧ ∀ a, (Λ a).IsDegOn Set.univ y' (deg a) 1 := by
   intro o _ Ω _ _ κ _ x M K _ J _ y A _ Λ hy hv
   classical
   haveI := Fintype.ofFinite κ
   haveI := Fintype.ofFinite A
-  have hs : ∀ a, ∃ (d n : ℕ) (z : Fin n → Ω), ∀ c (p : Cpt M.ξ), InChart M.ξ x c p →
-      Λ a p = Submodule.span (regAt M.ξ p) (Set.range fun k => (x c ^ d)⁻¹ • z k) :=
-    fun a => GlobalTheory.T.coherent_lattice_chart_span o Ω κ x M Ω (Λ a) (isCohOn_of_isVBOn (hv a))
+  have hs
+      : ∀ a, ∃ (d n : ℕ) (z : Fin n → Ω), ∀ c (p : Cpt M.ξ),
+        InChart M.ξ x c p
+          → Λ a p = Submodule.span (regAt M.ξ p) (Set.range fun k => (x c ^ d)⁻¹ • z k) := fun a =>
+    GlobalTheory.T.coherent_lattice_chart_span o Ω κ x M Ω (Λ a) (isCohOn_of_isVBOn (hv a))
   choose d n z H using hs
   let w : ((k : K) → J k) × ((a : A) → Fin (n a)) → Ω := fun q =>
     (∏ k, y ⟨k, q.1 k⟩) * ∏ a, z a (q.2 a)
@@ -217,19 +255,34 @@ theorem exists_blocks_of_lines : ∀ (o : Type) [CommRing o] (Ω : Type) [Field 
     obtain ⟨c₀, h₀⟩ := hy p
     choose l hl using fun a => exists_inChart_of_twist M.tie.cover (H a) (hv a) p
     exact ⟨(c₀, l), inChart_pair h₀ (inChart_pi hl)⟩
-  have ht := coordTie_equiv (blockEquiv J κ n) (GlobalTheory.T.join_coords_coordTie o Ω κ x M _ w hw)
-  refine ⟨K ⊕ Option A, inferInstance, BJ J κ n, fintypeBJ J κ n, blockCo J κ n y x z, Sum.inl,
-    fun k => Equiv.refl _, fun a => blockDeg d a, Sum.inl_injective, fun _ _ => rfl, ?_,
-    fun a => ⟨one_ne_zero, fun p _ c hc => ?_⟩⟩
-  · have e : (fun c' : (k : K ⊕ Option A) → BJ J κ n k => ∏ k, blockCo J κ n y x z ⟨k, c' k⟩) =
-        fun c => joinCo (RingHom.id Ω) x w (blockEquiv J κ n c) :=
+  have ht :=
+    coordTie_equiv (blockEquiv J κ n) (GlobalTheory.T.join_coords_coordTie o Ω κ x M _ w hw)
+  refine ⟨
+    K ⊕ Option A,
+    inferInstance,
+    BJ J κ n,
+    fintypeBJ J κ n,
+    blockCo J κ n y x z,
+    Sum.inl,
+    fun k => Equiv.refl _,
+    fun a => blockDeg d a,
+    Sum.inl_injective,
+    fun _ _ => rfl,
+    ?_,
+    fun a => ⟨one_ne_zero, fun p _ c hc => ?_⟩
+  ⟩
+  · have e
+        : (fun c' : (k : K ⊕ Option A) → BJ J κ n k => ∏ k, blockCo J κ n y x z ⟨k, c' k⟩)
+          = fun c => joinCo (RingHom.id Ω) x w (blockEquiv J κ n c) :=
       funext fun c => segre_blockCo y x z c
     rw [e]
     exact ht
   · have hx : InChart M.ξ x (c (.inr none)) p :=
       ⟨Lat.block_coord_ne_zero hc (.inr none), fun i => Lat.block_ratio_mem hc (.inr none) i⟩
-    have hz : InChart M.ξ (z a) (c (.inr (some a))) p :=
-      ⟨Lat.block_coord_ne_zero hc (.inr (some a)), fun i => Lat.block_ratio_mem hc (.inr (some a)) i⟩
+    have hz : InChart M.ξ (z a) (c (.inr (some a))) p := ⟨
+      Lat.block_coord_ne_zero hc (.inr (some a)),
+      fun i => Lat.block_ratio_mem hc (.inr (some a)) i
+    ⟩
     rw [stalk_eq_of_twist (H a) hx hz, deg_blockCo, smul_eq_mul, _root_.mul_one]
 
 end GlobalTheory.CompanionTheory.Ar.ExtraBlocks

@@ -9,21 +9,22 @@ open Matrix GlobalTheory.AlgWtHW
 
 namespace GlobalTheory.AlgWtHW.MaxWeight
 
-noncomputable def twoDiag (n : ℕ) : GL (Fin n) ℂ :=
-  ⟨Matrix.diagonal (fun i : Fin n => (2 : ℂ) ^ ((n : ℤ) - ((i : ℕ) : ℤ))),
-    Matrix.diagonal (fun i : Fin n => ((2 : ℂ) ^ ((n : ℤ) - ((i : ℕ) : ℤ)))⁻¹),
-    by
-      rw [Matrix.diagonal_mul_diagonal]
-      rw [← Matrix.diagonal_one]
-      congr 1
-      funext i
-      exact mul_inv_cancel₀ (zpow_ne_zero _ two_ne_zero),
-    by
-      rw [Matrix.diagonal_mul_diagonal]
-      rw [← Matrix.diagonal_one]
-      congr 1
-      funext i
-      exact inv_mul_cancel₀ (zpow_ne_zero _ two_ne_zero)⟩
+noncomputable def twoDiag (n : ℕ) : GL (Fin n) ℂ := ⟨
+  Matrix.diagonal (fun i : Fin n => (2 : ℂ) ^ ((n : ℤ) - ((i : ℕ) : ℤ))),
+  Matrix.diagonal (fun i : Fin n => ((2 : ℂ) ^ ((n : ℤ) - ((i : ℕ) : ℤ)))⁻¹),
+  by
+    rw [Matrix.diagonal_mul_diagonal]
+    rw [← Matrix.diagonal_one]
+    congr 1
+    funext i
+    exact mul_inv_cancel₀ (zpow_ne_zero _ two_ne_zero),
+  by
+    rw [Matrix.diagonal_mul_diagonal]
+    rw [← Matrix.diagonal_one]
+    congr 1
+    funext i
+    exact inv_mul_cancel₀ (zpow_ne_zero _ two_ne_zero)
+⟩
 
 lemma twoDiag_isDiag (n : ℕ) : (twoDiag n).val.IsDiag := Matrix.isDiag_diagonal _
 
@@ -44,10 +45,16 @@ lemma two_zpow_inj {a b : ℤ} (h : (2 : ℂ) ^ a = (2 : ℂ) ^ b) : a = b := by
     exact_mod_cast h
   exact zpow_right_injective₀ (by norm_num : (0:ℝ) < 2) (by norm_num : (2:ℝ) ≠ 1) h'
 
-theorem exists_max_weight : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
-    (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ) (μ₀ : Fin n → ℤ), IsWt Φ μ₀ →
-    ∃ μ : Fin n → ℤ, IsWt Φ μ ∧ ∀ ν : Fin n → ℤ, IsWt Φ ν →
-      ∑ i : Fin n, ((n : ℤ) - ((i : ℕ) : ℤ)) * ν i ≤ ∑ i : Fin n, ((n : ℤ) - ((i : ℕ) : ℤ)) * μ i := by
+theorem exists_max_weight
+    : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ)
+        (μ₀ : Fin n → ℤ),
+      IsWt Φ μ₀
+        → ∃ μ : Fin n → ℤ,
+          IsWt Φ μ
+            ∧ ∀ ν : Fin n → ℤ,
+              IsWt Φ ν
+                → ∑ i : Fin n, ((n : ℤ) - ((i : ℕ) : ℤ)) * ν i
+                  ≤ ∑ i : Fin n, ((n : ℤ) - ((i : ℕ) : ℤ)) * μ i := by
   intro n ι _ _ Φ μ₀ h₀
   let f : (Fin n → ℤ) → ℤ := fun ν => ∑ i : Fin n, ((n : ℤ) - ((i : ℕ) : ℤ)) * ν i
   let A : Module.End ℂ (ι → ℂ) := Matrix.toLin' (Φ (twoDiag n))

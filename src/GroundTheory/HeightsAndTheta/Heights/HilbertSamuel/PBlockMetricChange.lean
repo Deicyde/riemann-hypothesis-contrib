@@ -11,12 +11,15 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory Filter Asymptotics
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory
+  Filter Asymptotics
 
 noncomputable section
 
-theorem BlockMetricChange.proof (hMeas : BlockMeasureChange.Statement)
-    (hMet : BlockDefectMetricChange.Statement) : BlockMetricChange.Statement := by
+theorem BlockMetricChange.proof
+    (hMeas : BlockMeasureChange.Statement) (hMet : BlockDefectMetricChange.Statement)
+    : BlockMetricChange.Statement := by
   intro D K _ _ ι _ Ω _ _ I d d' hI hy hk
   have hdeg : d'.A.a = unitDeg d.k₀ := hk ▸ d'.deg
   have hle : d'.P0 ≤ mCoordIdeal d.y := hy ▸ d'.normalForm_baseLattice_le_dualSpan_sup_line

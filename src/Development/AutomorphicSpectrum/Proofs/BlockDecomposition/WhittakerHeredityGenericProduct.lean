@@ -13,9 +13,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.Leib
 
-theorem nontrivial_piTensorProduct_iff {ι : Type} [Fintype ι] [DecidableEq ι] (M : ι → Type)
-    [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)] :
-    Nontrivial (⨂[ℂ] i, M i) ↔ ∀ i, Nontrivial (M i) := by
+theorem nontrivial_piTensorProduct_iff
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (M : ι → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)]
+    : Nontrivial (⨂[ℂ] i, M i) ↔ ∀ i, Nontrivial (M i) := by
   classical
   constructor
   · intro hN i
@@ -38,18 +39,25 @@ theorem nontrivial_piTensorProduct_iff {ι : Type} [Fintype ι] [DecidableEq ι]
       exact hv i ((Module.forall_dual_apply_eq_zero_iff ℂ (v i)).1 hc)
     choose φ hφ using hφ
     refine ⟨⟨PiTensorProduct.tprod ℂ v, 0, fun h => ?_⟩⟩
-    have h1 := congrArg (PiTensorProduct.lift ((MultilinearMap.mkPiAlgebra ℂ ι ℂ).compLinearMap φ)) h
+    have h1 :=
+      congrArg (PiTensorProduct.lift ((MultilinearMap.mkPiAlgebra ℂ ι ℂ).compLinearMap φ)) h
     simp only [PiTensorProduct.lift.tprod, map_zero, MultilinearMap.compLinearMap_apply,
-      MultilinearMap.mkPiAlgebra_apply] at h1
+        MultilinearMap.mkPiAlgebra_apply]
+      at h1
     exact (Finset.prod_ne_zero_iff.2 fun i _ => hφ i) h1
 
-theorem genericProdIff_of_whitHeredity (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] : WhitHeredity k → GenericProdIff k := by
+theorem genericProdIff_of_whitHeredity
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : WhitHeredity k → GenericProdIff k := by
   intro hW h N d hd X _ _ π hsm
   obtain ⟨ψ, hψc, hψ1⟩ := GlobalTheory.LocGL.exists_continuous_addChar_ne_one (k := k)
   obtain ⟨e⟩ := hW ψ hψc hψ1 h N d hd X π hsm
   simp only [GlobalTheory.LocGL.isGeneric_iff_isGenericFor hψc hψ1, GlobalTheory.LocGL.IsGenericFor]
-  exact Iff.trans ⟨fun hn => @Equiv.nontrivial _ _ e.symm.toEquiv hn, fun hn => @Equiv.nontrivial _ _ e.toEquiv hn⟩
+  exact Iff.trans
+    ⟨
+      fun hn => @Equiv.nontrivial _ _ e.symm.toEquiv hn,
+      fun hn => @Equiv.nontrivial _ _ e.toEquiv hn
+    ⟩
     (nontrivial_piTensorProduct_iff _)
 
 end GlobalTheory.CompanionTheory.Leib

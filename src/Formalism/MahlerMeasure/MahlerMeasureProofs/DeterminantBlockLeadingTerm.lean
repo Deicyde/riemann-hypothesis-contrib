@@ -8,10 +8,11 @@ namespace Formalism.GM
 
 open Finset Polynomial
 
-theorem prod_natDegree_coeff {K ι : Type*} [CommRing K] (s : Finset ι) (f : ι → K[X]) (d : ι → ℕ)
-    (h : ∀ i ∈ s, (f i).natDegree ≤ d i) :
-    (∏ i ∈ s, f i).natDegree ≤ ∑ i ∈ s, d i ∧
-      (∏ i ∈ s, f i).coeff (∑ i ∈ s, d i) = ∏ i ∈ s, (f i).coeff (d i) := by
+theorem prod_natDegree_coeff
+    {K ι : Type*} [CommRing K]
+    (s : Finset ι) (f : ι → K[X]) (d : ι → ℕ) (h : ∀ i ∈ s, (f i).natDegree ≤ d i)
+    : (∏ i ∈ s, f i).natDegree ≤ ∑ i ∈ s, d i
+      ∧ (∏ i ∈ s, f i).coeff (∑ i ∈ s, d i) = ∏ i ∈ s, (f i).coeff (d i) := by
   classical
   revert h
   refine Finset.induction_on s ?_ ?_
@@ -21,25 +22,32 @@ theorem prod_natDegree_coeff {K ι : Type*} [CommRing K] (s : Finset ι) (f : ι
     have ha' : (f a).natDegree ≤ d a := h a (Finset.mem_insert_self a s)
     obtain ⟨ih1, ih2⟩ := ih (fun i hi => h i (Finset.mem_insert_of_mem hi))
     rw [Finset.prod_insert ha, Finset.sum_insert ha, Finset.prod_insert ha]
-    exact ⟨Polynomial.natDegree_mul_le.trans (add_le_add ha' ih1),
-      by rw [Polynomial.coeff_mul_add_eq_of_natDegree_le ha' ih1, ih2]⟩
+    exact ⟨
+      Polynomial.natDegree_mul_le.trans (add_le_add ha' ih1),
+      by rw [Polynomial.coeff_mul_add_eq_of_natDegree_le ha' ih1, ih2]
+    ⟩
 
-theorem term_natDegree_coeff {K : Type*} [CommRing K] (u : ℤˣ) (p : K[X]) (N : ℕ)
-    (hp : p.natDegree ≤ N) :
-    (u • p).natDegree ≤ N ∧ (u • p).coeff N = u • p.coeff N := by
+theorem term_natDegree_coeff
+    {K : Type*} [CommRing K] (u : ℤˣ) (p : K[X]) (N : ℕ) (hp : p.natDegree ≤ N)
+    : (u • p).natDegree ≤ N ∧ (u • p).coeff N = u • p.coeff N := by
   refine ⟨?_, ?_⟩
   · rw [Units.smul_def]
     exact (Polynomial.natDegree_smul_le _ _).trans hp
   · rw [Units.smul_def, Units.smul_def, Polynomial.coeff_smul]
 
-theorem det_natDegree_coeff {K : Type*} [CommRing K] {n : ℕ} (A : Matrix (Fin n) (Fin n) K[X]) (N : ℕ)
-    (c : Equiv.Perm (Fin n) → Fin n → ℕ) (hc : ∀ σ, ∑ i, c σ i = N)
-    (hA : ∀ σ i, (A (σ i) i).natDegree ≤ c σ i) :
-    A.det.natDegree ≤ N ∧
-      A.det.coeff N = ∑ σ : Equiv.Perm (Fin n), Equiv.Perm.sign σ • ∏ i, (A (σ i) i).coeff (c σ i) := by
-  have key : ∀ σ : Equiv.Perm (Fin n), (Equiv.Perm.sign σ • ∏ i, A (σ i) i).natDegree ≤ N ∧
-      (Equiv.Perm.sign σ • ∏ i, A (σ i) i).coeff N =
-        Equiv.Perm.sign σ • ∏ i, (A (σ i) i).coeff (c σ i) := by
+theorem det_natDegree_coeff
+    {K : Type*} [CommRing K]
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) K[X])
+    (N : ℕ) (c : Equiv.Perm (Fin n) → Fin n → ℕ)
+    (hc : ∀ σ, ∑ i, c σ i = N) (hA : ∀ σ i, (A (σ i) i).natDegree ≤ c σ i)
+    : A.det.natDegree ≤ N
+      ∧ A.det.coeff N
+        = ∑ σ : Equiv.Perm (Fin n), Equiv.Perm.sign σ • ∏ i, (A (σ i) i).coeff (c σ i) := by
+  have key
+      : ∀ σ : Equiv.Perm (Fin n),
+        (Equiv.Perm.sign σ • ∏ i, A (σ i) i).natDegree ≤ N
+          ∧ (Equiv.Perm.sign σ • ∏ i, A (σ i) i).coeff N
+            = Equiv.Perm.sign σ • ∏ i, (A (σ i) i).coeff (c σ i) := by
     intro σ
     obtain ⟨h1, h2⟩ := prod_natDegree_coeff univ (fun i => A (σ i) i) (c σ) (fun i _ => hA σ i)
     rw [hc σ] at h1 h2
@@ -60,10 +68,8 @@ theorem determinant_block_leading_term : DetBlockLead := by
     have h3 := hA (σ i) i
     have h4 : e i ≤ max (e (σ i)) (e i) := le_max_right _ _
     omega
-  obtain ⟨h1, h2⟩ := det_natDegree_coeff A (∑ i, (D - e i)) (fun _ i => D - e i)
-    (fun _ => rfl) hdeg
-  have hprod : ∀ σ : Equiv.Perm (Fin n),
-      ∏ i, (A (σ i) i).coeff (D - e i) = ∏ i, M (σ i) i := by
+  obtain ⟨h1, h2⟩ := det_natDegree_coeff A (∑ i, (D - e i)) (fun _ i => D - e i) (fun _ => rfl) hdeg
+  have hprod : ∀ σ : Equiv.Perm (Fin n), ∏ i, (A (σ i) i).coeff (D - e i) = ∏ i, M (σ i) i := by
     intro σ
     by_cases hall : ∀ i, e (σ i) = e i
     · refine Finset.prod_congr rfl (fun i _ => ?_)

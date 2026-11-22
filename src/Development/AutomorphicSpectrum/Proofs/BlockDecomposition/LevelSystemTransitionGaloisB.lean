@@ -5,13 +5,16 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
+open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
 
 namespace GlobalTheory.CompanionTheory.LatLevel
 
-theorem dB_sigmaB {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} {M : ℕ}
-    (h : LevHyp l K M) : ∀ m g b, (levSys h).dB m (((levSys h).L (m + 1)).σB g b) =
-      ((levSys h).L m).σB g ((levSys h).dB m b) := by
+theorem dB_sigmaB
+    {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} {M : ℕ} (h : LevHyp l K M)
+    : ∀ m g b,
+      (levSys h).dB m (((levSys h).L (m + 1)).σB g b)
+        = ((levSys h).L m).σB g ((levSys h).dB m b) := by
   intro m g b
   change Bk l (m + 1 + 1) at b
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective b

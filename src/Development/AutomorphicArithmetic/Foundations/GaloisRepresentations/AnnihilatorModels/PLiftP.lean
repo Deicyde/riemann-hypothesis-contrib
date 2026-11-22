@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.liftingProperty :
-    LiftP := by
+theorem UpperTheory.Gal.crystallineComparison.liftingProperty : LiftP := by
   intro R T ι _ _ f N' h
   have hl : N' ∈ Polynomial.lifts (MvPolynomial.map (σ := ι) f) := by
     rw [Polynomial.lifts_iff_coeff_lifts]
