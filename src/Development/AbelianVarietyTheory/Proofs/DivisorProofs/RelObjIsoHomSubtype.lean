@@ -84,7 +84,8 @@ def relSpec (H : QCohSub f F) : Scheme := (glueData H).glued
 
 def relCover (H : QCohSub f F) : (relSpec H).OpenCover := (glueData H).cover
 
-private lemma isOpenImmersion_relCover (H : QCohSub f F) (U : Y.affineOpens) :
+
+lemma isOpenImmersion_relCover (H : QCohSub f F) (U : Y.affineOpens) :
     IsOpenImmersion ((relCover H).f U) :=
   (relCover H).map_prop U
 
