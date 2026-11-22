@@ -20,7 +20,7 @@ This repository also adds Comparator files and cache infrastructure:
 | [`src/Challenge.lean`](src/Challenge.lean) | the five theorems, stated in a file that imports only Mathlib |
 | [`comparator.json`](comparator.json) | the Comparator config |
 | [`export-targets.txt`](export-targets.txt) | the declarations to export |
-| [`formal-conjectures/`](formal-conjectures/) | a second Comparator setup, whose challenge is formal-conjectures' own statement of RH and GRH |
+| [`comparator/`](comparator/) | further Comparator setups; so far one, whose challenge is formal-conjectures' own statement of RH and GRH |
 | [`verification/`](verification/NOTES.md) | our notes, and the results once there are some |
 | [`scripts/`](scripts/) | public Lake cache configuration and reproducible bootstrap/publishing tools |
 
@@ -110,17 +110,17 @@ Hypothesis and the Generalized Riemann Hypothesis in
 [`FormalConjectures/Millennium/RiemannHypothesis.lean`](https://github.com/google-deepmind/formal-conjectures/blob/d8d031d4998c78575159ccab9a7a9e95ce043883/FormalConjectures/Millennium/RiemannHypothesis.lean).
 Salvatore Mercuri wrote its statement of GRH in November 2025, a year before the announcement,
 and the text has not changed since 2025-11-07. It covers every non-trivial zero in the plane,
-not only the critical strip. The setup in [`formal-conjectures/`](formal-conjectures/) takes
-that file itself as the challenge, so the statement being judged was written by neither the
-author nor us:
+not only the critical strip. A second setup, in [`comparator/`](comparator/), takes that file
+itself as the challenge, so the statement being judged was written by neither the author nor
+us:
 
 | File | What it is |
 |---|---|
-| [`comparator.json`](formal-conjectures/comparator.json) | the Comparator config, for `RiemannHypothesis.riemannHypothesis` and `GRH.generalized_riemann_hypothesis` |
-| [`export-targets.txt`](formal-conjectures/export-targets.txt) | the declarations to export |
-| [`FormalConjecturesStatement.lean`](formal-conjectures/FormalConjecturesStatement.lean) | the three constants in the GRH statement that Mathlib does not have, copied from formal-conjectures |
-| [`FormalConjecturesBridge.lean`](formal-conjectures/FormalConjecturesBridge.lean) | states that GRH and proves `PrimitiveDirichletLZerosOnLine` equivalent to it, from Mathlib and `Statements.lean` alone |
-| [`FormalConjecturesSolution.lean`](formal-conjectures/FormalConjecturesSolution.lean) | the two theorems under formal-conjectures' names, proved from `Main.lean` |
+| [`formal-conjectures.json`](comparator/formal-conjectures.json) | the Comparator config, for `RiemannHypothesis.riemannHypothesis` and `GRH.generalized_riemann_hypothesis` |
+| [`formal-conjectures-export-targets.txt`](comparator/formal-conjectures-export-targets.txt) | the declarations to export |
+| [`FormalConjecturesStatement.lean`](comparator/FormalConjecturesStatement.lean) | the three constants in the GRH statement that Mathlib does not have, copied from formal-conjectures |
+| [`FormalConjecturesBridge.lean`](comparator/FormalConjecturesBridge.lean) | states that GRH and proves `PrimitiveDirichletLZerosOnLine` equivalent to it, from Mathlib and `Statements.lean` alone |
+| [`FormalConjecturesSolution.lean`](comparator/FormalConjecturesSolution.lean) | the two theorems under formal-conjectures' names, proved from `Main.lean` |
 
 It adds three steps to the ones above, with the same environment variables:
 
@@ -131,19 +131,19 @@ git checkout d8d031d4998c78575159ccab9a7a9e95ce043883
 lake exe cache get
 lake build FormalConjectures.Millennium.RiemannHypothesis
 lake env lean4export FormalConjectures.Millennium.RiemannHypothesis -- \
-  $(cat "$CLEAN/formal-conjectures/export-targets.txt") > fc-challenge.export
+  $(cat "$CLEAN/comparator/formal-conjectures-export-targets.txt") > fc-challenge.export
 
 # 3b. Compile the three files on the finished build of step 2 and export. Inside the sandbox.
-mkdir -p .lake/formal-conjectures
+mkdir -p .lake/comparator
 for m in FormalConjecturesStatement FormalConjecturesBridge FormalConjecturesSolution; do
-  LEAN_PATH="$PWD/.lake/formal-conjectures" lake env lean --root=formal-conjectures \
-    -o ".lake/formal-conjectures/$m.olean" "formal-conjectures/$m.lean"
+  LEAN_PATH="$PWD/.lake/comparator" lake env lean --root=comparator \
+    -o ".lake/comparator/$m.olean" "comparator/$m.lean"
 done
-LEAN_PATH="$PWD/.lake/formal-conjectures" lake env lean4export FormalConjecturesSolution -- \
-  $(cat "$CLEAN/formal-conjectures/export-targets.txt") > fc-solution.export
+LEAN_PATH="$PWD/.lake/comparator" lake env lean4export FormalConjecturesSolution -- \
+  $(cat "$CLEAN/comparator/formal-conjectures-export-targets.txt") > fc-solution.export
 
 # 4b. Judge, as in step 4.
-lake comparator --config "$CLEAN/formal-conjectures/comparator.json" \
+lake comparator --config "$CLEAN/comparator/formal-conjectures.json" \
   --challenge-from-export "$FC/fc-challenge.export" --solution-from-export fc-solution.export
 ```
 
@@ -173,8 +173,8 @@ for verification only: unmodified at commit `40e56bab`, and changed since then a
 [notes](verification/NOTES.md#source) describe.
 
 The declarations in
-[`FormalConjecturesStatement.lean`](formal-conjectures/FormalConjecturesStatement.lean) and the
-GRH statement in [`FormalConjecturesBridge.lean`](formal-conjectures/FormalConjecturesBridge.lean)
+[`FormalConjecturesStatement.lean`](comparator/FormalConjecturesStatement.lean) and the
+GRH statement in [`FormalConjecturesBridge.lean`](comparator/FormalConjecturesBridge.lean)
 are copied from [formal-conjectures](https://github.com/google-deepmind/formal-conjectures),
 copyright The Formal Conjectures Authors, under the
 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
