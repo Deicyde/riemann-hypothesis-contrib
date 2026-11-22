@@ -68,10 +68,10 @@ theorem map_gramR {d j : ℕ} (H : Matrix (Fin d) (Fin d) K) (e : Fin j → Fin 
   rw [RingHom.map_det, RingHom.mapMatrix_apply]
   congr 1
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.map_apply, Matrix.of_apply, Matrix.mul_apply, Matrix.conjTranspose_apply,
-    Matrix.transpose_apply, dotProduct, Matrix.mulVec, Pi.star_apply, map_sum, map_mul,
-    Rb.tw_apply, Finset.mul_sum, Finset.sum_mul]
+
+  simp only [Matrix.map_apply, Matrix.of_apply, Matrix.mul_apply, Matrix.conjTranspose_apply,
+  Matrix.transpose_apply, dotProduct, Matrix.mulVec, Pi.star_apply, map_sum, map_mul,
+  Rb.tw_apply, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
   simp only [Complex.star_def, Complex.conj_conj]

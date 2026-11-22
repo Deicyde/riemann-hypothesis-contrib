@@ -15,7 +15,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 private theorem card_residueField_sub_one_eq_neg_one {O : Type} [CommRing O] [IsLocalRing O] [Fintype (ResidueField O)] :
     ((Fintype.card (ResidueField O) - 1 : ℕ) : ResidueField O) = -1 := by
@@ -39,8 +39,8 @@ private theorem teichmuller_eq_of_residue_eq {O : Type} [CommRing O] [IsLocalRin
   have key := geom_sum₂_mul a b N
   rw [ha, hb, sub_self] at key
   have hu : IsUnit (∑ i ∈ Finset.range N, a ^ i * b ^ (N - 1 - i)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_sum]
+
+    rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_sum]
     simp only [map_mul, map_pow, ← hab]
     have hterm : ∀ i ∈ Finset.range N,
         residue O a ^ i * residue O a ^ (N - 1 - i) = residue O a ^ (N - 1) := by

@@ -45,17 +45,17 @@ theorem continuous_coeff_aeval (Q : MvPolynomial (Fin 2) ℝ) (m : Fin 3 →₀ 
   have hv : ![dotPoly (Prod.fst : S2 × S2 → S2), dotPoly Prod.snd] = fun r => mapAlgHom φ (v r) := by
     funext r
     fin_cases r
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [Fin.zero_eta, Matrix.cons_val_zero, v, dotPoly, mapAlgHom_apply, map_sum, map_mul, map_X, map_C]
-        apply Finset.sum_congr rfl
-        intro i hi
-        congr 2
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [Fin.mk_one, Matrix.cons_val_one, Matrix.cons_val_fin_one, v, dotPoly, mapAlgHom_apply, map_sum,
-        map_mul, map_X, map_C]
-        apply Finset.sum_congr rfl
-        intro i hi
-        congr 2
+
+    · simp only [Fin.zero_eta, Matrix.cons_val_zero, v, dotPoly, mapAlgHom_apply, map_sum, map_mul, map_X, map_C]
+      apply Finset.sum_congr rfl
+      intro i hi
+      congr 2
+
+    · simp only [Fin.mk_one, Matrix.cons_val_one, Matrix.cons_val_fin_one, v, dotPoly, mapAlgHom_apply, map_sum,
+      map_mul, map_X, map_C]
+      apply Finset.sum_congr rfl
+      intro i hi
+      congr 2
   rw [hv, ← comp_aeval, AlgHom.comp_apply, mapAlgHom_apply, coeff_map]
   exact (AddMonoidAlgebra.coeff (aeval v Q) m).continuous
 
@@ -73,8 +73,8 @@ theorem sum_diagWordMomentPoly (k : ℕ) :
   simp only [diagWordMomentPoly]
   rw [← momentPoly_sum _ _ _ _ fun i _ m =>
     FibreLocal.integrable_mul _ (continuous_coeff_aeval _ m)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← map_sum, ← map_sum, sum_words]
+
+  rw [← map_sum, ← map_sum, ← map_sum, sum_words]
   rfl
 
 end DiagFibreMoment

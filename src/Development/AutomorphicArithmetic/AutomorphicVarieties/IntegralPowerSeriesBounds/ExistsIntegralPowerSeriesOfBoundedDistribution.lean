@@ -22,8 +22,8 @@ theorem UpperTheory.exists_integral_powerSeries_of_bounded_distribution :
         ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r)) x' = x),
         ν (r + 1) (Pi.single x' 1) := by
     intro r hr x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum]
+
+    rw [← map_sum]
     symm
     apply hcomp r hr
     intro y
@@ -58,7 +58,7 @@ theorem UpperTheory.exists_integral_powerSeries_of_bounded_distribution :
     have h3 : (fun x : ZMod (l ^ r) => z ^ x.val) = ∑ x, z ^ x.val • Pi.single x (1 : Qbar l) := by
       funext y
       simp [Finset.sum_apply, Pi.single_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h3, map_sum]
+
+    rw [h3, map_sum]
     simp [map_smul, mul_comm]
   rwa [h2] at h1

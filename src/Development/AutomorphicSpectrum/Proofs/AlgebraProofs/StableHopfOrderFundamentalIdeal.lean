@@ -11,7 +11,7 @@ public import Development.WeilBound.CoreStatements.HodgeTatePoints.ProdIccFin
 open ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up GlobalTheory.CompanionTheory.Ar.GR
 open scoped Matrix
 open PositivityTheory.HtPt.Rc ReciprocityTheory.PGsh.L2.SecondCohomologyLattice in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.CompanionTheory.Relay.stable_hopf_order_fundamental_ideal : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable (F := F) AA.carrier → ∀ σ : MulChar F R, IsFund p σ → (∀ χ : MulChar F R, ∃ r : NNReal, r ≠ 0 ∧ HasLen v R (OmType AA.carrier χ) r) ∧ ∀ r : ℕ → NNReal, (∀ m ∈ Finset.Icc 1 (p ^ f - 1), HasLen v R (OmType AA.carrier (σ ^ m)) (r m)) → HasLen v R (OmAA AA.carrier) (∏ m ∈ Finset.Icc 1 (p ^ f - 1), r m) := by
   intro p _ C _ _ _ v R _ _ hv hvp F _ _ _ _ f hf N _ _ _ _ AA hAA σ hσ
   have := hv.hom_inj.isDomain
@@ -73,8 +73,8 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.stable_hopf_order_fundamental_
       rw [← hg i]
       refine congrArg Submodule.Quotient.mk (Subtype.ext ?_)
       show projL (σ ^ ((i : ℕ) + 1)) (∑ i, (g i : N → C)) = g i
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_eq_single i, projL_self _ (g i).2]
+
+      rw [map_sum, Finset.sum_eq_single i, projL_self _ (g i).2]
       · intro j _ hj
         refine projL_ne (fun h => hj ?_) (g j).2
         rw [pow_succ, pow_succ] at h

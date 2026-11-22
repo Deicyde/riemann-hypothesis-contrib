@@ -22,7 +22,7 @@ open GlobalTheory.ExportSeries (Base Twist Weight PairRep GLR detChar detFam foc
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SingleDatum
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -57,15 +57,15 @@ theorem toEAf_cA_idem_mul_inv_mem {Pg Q : Finset (Formalism.L2.DIV.Pl D.host.E)}
     toEAf D (cA D (GlobalTheory.ExportSeries.idem Pg) * incA D c) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
   obtain ⟨P, h1, -, hsp⟩ := hP.split
   have hS : GlobalTheory.ExportSeries.SplitSet Pg := hsp.mono h1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [GlobalTheory.ExportSeries.idem, map_sum, Finset.sum_mul, map_sum]
+
+  rw [GlobalTheory.ExportSeries.idem, map_sum, Finset.sum_mul, map_sum]
   refine sum_mem fun PP hPP => ?_
   have ht : GlobalTheory.IdemSupport.Comparison₂ PP (GlobalTheory.ExportSeries.idemAt PP) := (hS.isIdemAt hPP).2
   refine tie_mul_inv_mem ht.conj ?_ hc
   exact hP.prime PP (Or.inl hPP) _ (Or.inr ((GlobalTheory.IdemSupport.isConjPl_iff PP _).2 rfl))
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem mem_latO_of_adj_int {S T : HSp D} {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
     {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)} {βS : GL (Fin S.rank) (EAf D)} {βT : GL (Fin T.rank) (EAf D)}
     (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT) (fS : Formalism.L2.DIV.IsFrame βS ΛS) (fT : Formalism.L2.DIV.IsFrame βT ΛT)
@@ -154,8 +154,8 @@ theorem mem_latO_of_adj_int {S T : HSp D} {ΛS : Submodule (𝓞 D.host.E) (Fin 
       rw [RingHom.map_mul, RingHom.map_mul, h4, ← RingHom.map_mul, ← RingHom.map_mul, mul_assoc, ← RingHom.map_mul (incA D)]
       congr 3
       ring
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl fun l _ => hterm l, ← Finset.mul_sum, ← map_sum, ← Finset.sum_mul]
+
+    rw [Finset.sum_congr rfl fun l _ => hterm l, ← Finset.mul_sum, ← map_sum, ← Finset.sum_mul]
     have hac' : ∑ l, pc l * pa l = 1 := by rw [← hac]; exact Finset.sum_congr rfl fun l _ => mul_comm _ _
     rw [hac', one_mul, Matrix.map_apply, Matrix.map_apply, mul_comm (incA D (t₁ a i)), mul_assoc, ← RingHom.map_mul]
   rw [hsum]

@@ -32,14 +32,14 @@ theorem det_trace_ne_zero (hP : B.P.Separable)
     intro k
     have := congrFun hMv k
     simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.zero_apply] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.mul_sum, map_sum, ← this]
+
+    rw [Finset.mul_sum, map_sum, ← this]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [mul_smul_comm, map_smul, smul_eq_mul, mul_comm]
   have hall : ∀ w : B.A, Algebra.trace K.E B.A ((∑ l, v l • e l) * w) = 0 := by
     intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr w, Finset.mul_sum, map_sum]
+
+    rw [← b.sum_repr w, Finset.mul_sum, map_sum]
     refine Finset.sum_eq_zero fun k _ => ?_
     rw [mul_smul_comm, map_smul, hb k, mul_comm, hk k, smul_zero]
   have hz0 : ∑ l, v l • e l = 0 :=
@@ -108,8 +108,8 @@ theorem sgnLat_mulLat (hP : B.P.Separable) (M : Submodule K.O B.A) (hM : IsLat K
     simp only [Matrix.mul_apply, Matrix.of_apply, Algebra.leftMulMatrix_eq_repr_mul]
     rw [he' l]
     conv_lhs => rw [← e.sum_repr ((y : B.A) * e l)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.mul_sum, map_sum]
+
+    rw [Finset.mul_sum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [mul_smul_comm, map_smul, smul_eq_mul, mul_comm]
   rw [hspan, SgnBasis.sgnLat_span_basis, ← he, SgnBasis.sgnLat_span_basis, hmat, Matrix.det_mul,

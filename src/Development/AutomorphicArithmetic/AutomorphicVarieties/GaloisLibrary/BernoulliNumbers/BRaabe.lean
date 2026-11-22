@@ -32,8 +32,8 @@ theorem UpperTheory.V.Bern.b_raabe :
     · exact hm.ne' h1
   suffices h : F N a = ∑ j ∈ range m, F (N * m) (a + j * N) by
     have h2 := congrArg (PowerSeries.coeff k) h
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h2
+
+    rw [map_sum] at h2
     simp only [F, PowerSeries.coeff_mk] at h2
     rw [← Finset.sum_div, div_left_inj' (by positivity)] at h2
     exact h2

@@ -220,8 +220,8 @@ theorem exists_boundAt (hG : Formalism.L2.SG.ConcreteSettingExists.GapHyp D) (R 
     have hx : x ∈ Submodule.span D.what₂.LL (Set.range b) := hsp' ▸ Submodule.mem_top
     obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hx
     show (R.HW i (sg0 D A3.A)).e _ ∈ Submodule.span ℂ (Set.range ι)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum]
+
+    rw [map_sum, map_sum]
     refine Submodule.sum_mem _ fun l _ => ?_
     rw [map_smulₛₗ, map_smul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨⟨b l, hb l⟩, rfl⟩)
@@ -237,8 +237,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 2000000
+
+
 
 theorem exists_bound {D : D7} (hG : Formalism.L2.SG.ConcreteSettingExists.GapHyp D) {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
     {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]

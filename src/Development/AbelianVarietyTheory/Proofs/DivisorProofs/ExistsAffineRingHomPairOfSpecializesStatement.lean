@@ -12,7 +12,7 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFiniteE
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel
 open scoped CategoryTheory.Obj TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_affine_ring_hom_pair_of_specializes :
     ∀ {X : Scheme.{0}} {k k' : Type} [Field k] [Field k']
       (x : Spec (CommRingCat.of k) ⟶ X) (x' : Spec (CommRingCat.of k') ⟶ X)

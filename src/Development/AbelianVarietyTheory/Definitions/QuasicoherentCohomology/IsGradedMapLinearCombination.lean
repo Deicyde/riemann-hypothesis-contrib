@@ -20,9 +20,9 @@ variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
 theorem grProj_sum (ℳ : ℤ → Submodule R M) [Decomposition ℳ] (T : Finset ℤ) (v : ℤ → M)
     (hv : ∀ j ∈ T, v j ∈ ℳ j) {n : ℤ} (hn : n ∈ T) : proj ℳ n (∑ j ∈ T, v j) = v n := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single n (fun j hj h => proj_of_mem_ne ℳ (hv j hj) h)
-    (fun h => absurd hn h), proj_of_mem ℳ (hv n hn)]
+
+  rw [map_sum, Finset.sum_eq_single n (fun j hj h => proj_of_mem_ne ℳ (hv j hj) h)
+  (fun h => absurd hn h), proj_of_mem ℳ (hv n hn)]
 
 theorem exists_sum_grProj (ℳ : ℤ → Submodule R M) [Decomposition ℳ] (m : M) :
     ∃ T : Finset ℤ, ∑ j ∈ T, proj ℳ j m = m := by
@@ -345,8 +345,8 @@ theorem isHomogeneous_span_gr (ℳ : ℤ → Submodule R M) [Decomposition ℳ] 
   intro n m hm
   change proj ℳ n m ∈ _
   obtain ⟨c, hc, rfl⟩ := (Finsupp.mem_span_iff_linearCombination _ _ _).1 hm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finsupp.linearCombination_apply, Finsupp.sum, map_sum]
+
+  rw [Finsupp.linearCombination_apply, Finsupp.sum, map_sum]
   refine Submodule.sum_mem _ fun g _ => ?_
   obtain ⟨d, hd⟩ := hG g g.2
   rw [proj_smul_of_mem_right ℳ _ hd]
@@ -531,10 +531,10 @@ instance : Decomposition (grading hx) :=
     (fun T v hv h j hj => by
       choose! a ha using fun i hi => (mem_grading hx).1 (hv i hi)
       have := congrArg (component hx j) h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← Finset.sum_congr rfl ha, map_sum, Finset.sum_eq_single j
-        (fun i _ e => component_of_ne hx e _) (fun e => absurd hj e), component_of,
-        map_zero] at this
+
+      rw [← Finset.sum_congr rfl ha, map_sum, Finset.sum_eq_single j
+      (fun i _ e => component_of_ne hx e _) (fun e => absurd hj e), component_of,
+      map_zero] at this
       rw [← ha j hj, this, map_zero])
     fun m => by
       induction m using DirectSum.induction_on with

@@ -81,14 +81,14 @@ theorem hT_f_e (hf : IsDualF F0 f) (a b : Fin D.R.rS) :
 
 theorem hT_e_yc (hf : IsDualF F0 f) (a : Fin D.R.rS) (v : (VS D).V) :
     (VS D).hT (F0.e a) (ycL F0 f v) = (VS D).hT (F0.e a) v := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ycL_apply, map_sum]
+
+  rw [ycL_apply, map_sum]
   simp [hf.1]
 
 theorem hT_f_xc (hf : IsDualF F0 f) (a : Fin D.R.rS) (v : (VS D).V) :
     (VS D).hT (f a) (xcL F0 f v) = (VS D).hT (f a) v := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [xcL_apply, map_sum]
+
+  rw [xcL_apply, map_sum]
   simp [hT_f_e hf]
 
 theorem xc_mem_X (v : (VS D).V) : xcL F0 f v ∈ F0.X := by

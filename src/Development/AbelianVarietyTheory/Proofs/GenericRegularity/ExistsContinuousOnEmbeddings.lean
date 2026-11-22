@@ -159,10 +159,10 @@ theorem exists_continuousOn_embeddings (K : Type) [Field K] [CharZero K] (σ : T
     refine ⟨IsFractionRing.lift hinj, hτa, hτ, ?_⟩
     have hmon : (minpoly F pb.gen).Monic := minpoly.monic pb.isIntegral_gen
     conv_rhs => rw [hmon.as_sum, pb.natDegree_minpoly]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Polynomial.map_add (f := _), Polynomial.map_pow, Polynomial.map_X, Polynomial.map_sum,
-      Polynomial.map_add, Polynomial.map_pow, Polynomial.map_X, Polynomial.map_sum,
-      Finset.sum_range]
+
+    rw [Polynomial.map_add (f := _), Polynomial.map_pow, Polynomial.map_X, Polynomial.map_sum,
+    Polynomial.map_add, Polynomial.map_pow, Polynomial.map_X, Polynomial.map_sum,
+    Finset.sum_range]
     simp [cf, hτ]
   obtain ⟨y, V, hV, hyc, hy⟩ := exists_continuousOn_roots p hp (cf t₀) (by
     obtain ⟨τ, -, -, h⟩ := hτ t₀ ht₀
@@ -205,8 +205,8 @@ theorem exists_continuousOn_embeddings (K : Type) [Field K] [CharZero K] (σ : T
     refine hc.congr fun t ht => ?_
     show P t k a = _
     conv_lhs => rw [← pb.basis.sum_repr a]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [Algebra.smul_def, map_mul, pb.basis_eq_pow, map_pow, hP1 t ht, hP2 t ht]
   · intro k l hkl

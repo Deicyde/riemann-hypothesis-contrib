@@ -78,8 +78,8 @@ theorem gens (R : Subalgebra o Ω) (hR : IsNoetherianRing R) {N : ℕ} {L₀ : A
   have hL : L' ≤ Submodule.span R (Set.range fun i => f (v i)) := by
     intro y hy
     obtain ⟨e, he, rfl⟩ := hle y hy
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hv e, map_sum]
+
+    rw [← hv e, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_smul]
     exact Submodule.smul_mem _ (⟨φ i e, hφ i e he⟩ : R) (Submodule.subset_span ⟨i, rfl⟩)
@@ -89,8 +89,8 @@ theorem gens (R : Subalgebra o Ω) (hR : IsNoetherianRing R) {N : ℕ} {L₀ : A
   · rw [eq_top_iff]
     intro y _
     obtain ⟨e, rfl⟩ := hf y
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hv e, map_sum]
+
+    rw [← hv e, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_smul]
     refine Submodule.smul_mem _ _ ?_

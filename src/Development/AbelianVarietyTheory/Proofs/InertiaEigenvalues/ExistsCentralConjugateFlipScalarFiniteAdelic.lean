@@ -15,7 +15,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.LevelSeries
 
 noncomputable section
@@ -106,8 +106,8 @@ theorem flip_central_exists : ∀ (D : D7) (V : HSp D) (T : Finset (Formalism.L2
   have hinv := flipElt_mul_cA he hec hm
   refine ⟨scalU V _ hinv, ?_, ?_, mt_scalU V _ hinv⟩
   · have hinf : infPart D eT = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hsum, map_sum]
+
+      rw [hsum, map_sum]
       exact Finset.sum_eq_zero fun PP hPP => (delta_of_isIdemAt hΦ (hes PP hPP)).1
     refine mem_GfC_of_suppF V (f := eT + cA D eT) ?_ ((suppF_iff V _ _).2 ?_)
     · rw [map_add (f := _), hinf, (parts_cA eT).1, hinf, map_zero, add_zero]

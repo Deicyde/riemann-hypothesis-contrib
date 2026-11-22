@@ -6,7 +6,7 @@ public import Mathlib
 
 open IsLocalRing
 
-set_option maxHeartbeats 400000 in
+
 theorem UpperTheory.V.AlgebraTools.powerSeries_equiv_of_complete_dvr :
     ∀ (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [IsAdicComplete (maximalIdeal A) A]
       (p : ℕ) [Fact p.Prime] [CharP A p] [Finite (ResidueField A)] (t : A), Irreducible t →

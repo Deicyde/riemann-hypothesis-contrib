@@ -214,7 +214,7 @@ namespace GlobalTheory.Mem.Col2.TC
 open GlobalTheory.Mem.Col2.RowTie
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem clsP_tie : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)),
     ∀ u : B.Word, ∃ (KP : ClsPTied (D := (I.rec7 l Z)) u) (W : ValPTied u KP),
       I.ReadsP I.mu0 KP.lev.Lb KP.lev.U KP.lev.chi (fun c => (KP.y c).1) KP.lat (fun c s => (KP.stabI c s).1) ∧

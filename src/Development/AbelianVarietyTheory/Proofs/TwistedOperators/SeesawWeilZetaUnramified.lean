@@ -58,7 +58,7 @@ private theorem rho_add_twisted_operators {R : Type} [CommRing R] [Invertible (2
   rw [schr_comp_apply, ← co.form, map_add (f := _), ← mul_assoc, ← AddChar.map_add_eq_mul, neg_add_cancel,
     AddChar.map_zero_eq_one, one_mul]
 
-set_option maxHeartbeats 6400000 in
+
 private theorem tendsto_add_smul_punctured_of_differentiableAt {D : D7} {n d m : ℕ} (u₀ : Matrix (Fin n) (Fin d) (AE D)) (e' : Fin d ≃ Fin m)
     (G : Matrix (Fin n) (Fin n) (AE D)) :
     Continuous fun t : ℝ => (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.realAd D.host.F t • u₀)ᵀ.submatrix e'.symm id * G := by
@@ -77,7 +77,7 @@ private theorem fin_realAd_smul_eq_zero {D : D7} (t : ℝ) (a : AE D) :
   rw [h0, zero_mul]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem thO_pure_deriv {D : D7} (S X : HSp D) {d : ℕ} (e : Fin d ≃ Fin X.rank)
     (Bs : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base D.host.F D.host.E) (hBs : Bs.IsGood D.sp.cm.sig)
     (Vs : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc D.host.F D.host.E S.rank) (Ws : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Spc D.host.F D.host.E d)

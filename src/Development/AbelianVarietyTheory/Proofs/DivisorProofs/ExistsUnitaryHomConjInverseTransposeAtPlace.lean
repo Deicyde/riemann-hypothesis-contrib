@@ -30,8 +30,8 @@ theorem idem (ι : L →+ _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTen
 theorem map_mul_map (ι : L →+ _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (hmul : ∀ x y, ι (x * y) = ι x * ι y) {n : ℕ}
     (X Y : Matrix (Fin n) (Fin n) L) : X.map ι * Y.map ι = (X * Y).map ι := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mul_apply, map_sum, hmul]
+
+  simp [Matrix.mul_apply, map_sum, hmul]
 
 theorem smul_map_eq_zero (ι : L →+ _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (hmul : ∀ x y, ι (x * y) = ι x * ι y) {n : ℕ}
     (X : Matrix (Fin n) (Fin n) L) : (1 - ι 1) • X.map ι = 0 := by

@@ -30,8 +30,8 @@ theorem UpperTheory.V.Weyl.rtrPoly :
     have hX : rtr g (MvPolynomial.X ij : Pol n)
         = ∑ k, (MvPolynomial.X (ij.1, k) : Pol n) * MvPolynomial.C (g k ij.2) := by
       simp [rtr, MvPolynomial.aeval_X]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_mul, hX, Finset.mul_sum, map_sum, map_sum]
+
+    rw [map_mul, hX, Finset.mul_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     have hk := hP k g
     simp only [LinearMap.comp_apply, LinearMap.mulRight_apply] at hk

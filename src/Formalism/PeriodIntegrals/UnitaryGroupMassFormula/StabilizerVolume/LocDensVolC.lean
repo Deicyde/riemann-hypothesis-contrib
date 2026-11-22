@@ -28,12 +28,12 @@ theorem crd_sigR (σ : E →ₐ[F] E) (z : Fv F v ⊗[F] E) (l : Fin d) :
     intro k
     simp [sigR]
   conv_lhs => rw [← B.sum_repr z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [sigR_smul, hB, hs, crd, map_sum, map_smul, Finset.sum_apply,
-    Finsupp.smul_apply, smul_eq_mul, Algebra.TensorProduct.basis_repr_tmul,
-    Finsupp.mapRange_apply, one_smul]
+
+  rw [map_sum]
+
+  simp only [sigR_smul, hB, hs, crd, map_sum, map_smul, Finset.sum_apply,
+  Finsupp.smul_apply, smul_eq_mul, Algebra.TensorProduct.basis_repr_tmul,
+  Finsupp.mapRange_apply, one_smul]
   simp [Finsupp.smul_apply, Finsupp.mapRange_apply, hBdef]
 
 theorem ev_sig (σ : E →ₐ[F] E) :

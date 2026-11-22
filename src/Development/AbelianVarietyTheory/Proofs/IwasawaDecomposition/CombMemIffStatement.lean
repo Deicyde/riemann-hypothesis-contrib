@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Incre
 @[expose] public section
 
 open MvPolynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.comb_mem_iff_alt : ∀ (p : ℕ) [Fact p.Prime] (Lt T : Type) [Fintype Lt] [DecidableEq Lt] [Fintype T] (e : Lt → T), Function.Bijective e →
     ∀ (N : ℕ) (ν : T → Fin N → ℕ) (ι : Lt → Type) [∀ s, Fintype (ι s)] [∀ s, DecidableEq (ι s)]
     (b g : ∀ s, ι s → MvPolynomial (Fin N × Fin N) ℚ) (Nc : Lt → ℚ), (∀ s, Nc s ≠ 0) →

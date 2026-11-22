@@ -7,7 +7,7 @@ public import Formalism.MeanHeightDescent.DivisionInequalityWithCovolume
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

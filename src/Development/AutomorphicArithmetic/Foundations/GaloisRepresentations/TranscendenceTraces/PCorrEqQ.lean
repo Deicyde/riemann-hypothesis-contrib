@@ -40,5 +40,5 @@ theorem UpperTheory.Gal.TranscendenceTraces.corrEqQ_of :
     rfl
   simp only [e, Int.cast_smul_eq_zsmul]
   simp_rw [← map_zsmul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, h, map_zero]
+
+  rw [← map_sum, h, map_zero]

@@ -13,7 +13,7 @@ open MvPolynomial
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {e : ℕ}
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_monic_rel (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
     (P : Ideal (MRing ι)) (hPh : IsMultiHomogIdeal P) (hΨ : IsGoodProj P Ψ)
     (F : MvPolynomial ((k : K) → ι k) ℂ) :
@@ -54,8 +54,8 @@ theorem exists_monic_rel (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e 
     induction d using Nat.strong_induction_on with
     | _ d ih =>
       intro f hf
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [f.as_sum, map_sum]
+
+      rw [f.as_sum, map_sum]
       refine N.sum_mem fun s hs => ?_
       rw [show monomial s (AddMonoidAlgebra.coeff f s) = C (AddMonoidAlgebra.coeff f s) * monomial s 1 by
         rw [C_mul_monomial, mul_one], map_mul]

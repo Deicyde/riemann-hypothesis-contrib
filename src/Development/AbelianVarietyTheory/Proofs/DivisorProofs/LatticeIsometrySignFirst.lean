@@ -18,8 +18,8 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.StdCha
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.DatumFourier
 
@@ -235,15 +235,15 @@ theorem idem_div_int {e : AE D} {P : Finset (Formalism.L2.DIV.Pl D.host.E)} (he 
     (hP : ∀ PP ∈ P, (N : 𝓞 D.host.E) ∉ PP.asIdeal) :
     toEAf D (e * incA D (N : D.host.E)⁻¹) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_mul, map_sum]
+
+  rw [Finset.sum_mul, map_sum]
   refine sum_mem fun PP hPP => GlobalTheory.IdemIntegral.toEAf_mem_of_finPart ?_
   by_contra h
   refine hP PP hPP (((hes PP hPP).2 _ (Nat.cast_ne_zero.2 hN)).2 ?_)
   rwa [show ((N : 𝓞 D.host.E) : D.host.E) = N from map_natCast (algebraMap (𝓞 D.host.E) D.host.E) N]
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem mem_latO_of_int {βS : GL (Fin S.rank) (EAf D)} {βT : GL (Fin T.rank) (EAf D)}
     (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT) (fS : Formalism.L2.DIV.IsFrame βS ΛS) (fT : Formalism.L2.DIV.IsFrame βT ΛT)
     {e : AE D} {P : Finset (Formalism.L2.DIV.Pl D.host.E)} (he : IsIdemSum e P) {N : ℕ} (hN : N ≠ 0)
@@ -362,8 +362,8 @@ theorem thetaAt_eq_sum {ψ : AddChar (AF D.host.F) ℂ} {e : AE D} {Λ : AddSubg
     simp only [Pi.smul_apply, smul_eq_mul]
     ring
   have hvac : Tm (halfInd e Λ) = f₀ := by simpa using hTm.vac
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hall Tm hTm, hΦ', map_sum]
+
+  rw [hall Tm hTm, hΦ', map_sum]
   refine Finset.sum_congr rfl fun q _ => ?_
   rw [map_smul, hTm.modul _ (GlobalTheory.isSBHalf_halfInd e Λ) _ (hY q), hvac]
 
@@ -374,9 +374,9 @@ theorem hRat_std (hG : S.gram = 1) (X Y : Fin S.rank → Fin T.rank → D.host.E
   rw [hG, inv_one, Finset.mul_sum]
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [Finset.sum_eq_single b (fun k _ hk => by simp [Matrix.one_apply_ne hk.symm]) (by simp)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Module.Basis.equivFun_symm_apply, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
-    map_smul, smul_eq_mul, Finset.mul_sum, Matrix.one_apply_eq, Matrix.of_apply, star_mul', hc, HSpace.gram]
+
+  simp only [Module.Basis.equivFun_symm_apply, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
+  map_smul, smul_eq_mul, Finset.mul_sum, Matrix.one_apply_eq, Matrix.of_apply, star_mul', hc, HSpace.gram]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
   simp only [starRingEnd_apply]

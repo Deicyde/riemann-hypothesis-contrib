@@ -9,7 +9,7 @@ open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalC
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.EtLev GlobalTheory.UPel.HT.ES
 open UpperTheory.Gal.FiniteEtaleModels
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.Gal.FiniteEtaleModels.crtMul_holds :
     CrtMul := by
   intro p _ D R _ b N S s o 𝔞 𝔟 hab T l₁ l₂ h1 h2

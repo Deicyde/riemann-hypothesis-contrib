@@ -109,7 +109,7 @@ open GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.
 noncomputable section
 namespace GlobalTheory.Mem.R3.Rw.MultAt
 open GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.R3.Rw
-set_option maxHeartbeats 2000000 in
+
 theorem twisted_local_multiplicity_eq : GlobalTheory.Published.HarishChandraAnalyticity → GlobalTheory.Published.DiscreteSeriesClassification → GlobalTheory.Published.CuspRapidDecay →
     GlobalTheory.Published.HarishChandraFinite → GlobalTheory.Published.CuspTraceClass → GlobalTheory.Published.DixmierMalliavinFactorisation →
     GlobalTheory.Published.FlathFactorisation → GlobalTheory.Published.ZelevinskyPolynomialRing →

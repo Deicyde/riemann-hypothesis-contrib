@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsCoTyp
 @[expose] public section
 
 open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition GlobalTheory.SatakeBound GlobalTheory.ParHecke
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.cartan_decomposition_dominance_local_field :
     ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
       (N : ℕ) (ϖ : kˣ), valuation k (ϖ : k) = uniformizer k →

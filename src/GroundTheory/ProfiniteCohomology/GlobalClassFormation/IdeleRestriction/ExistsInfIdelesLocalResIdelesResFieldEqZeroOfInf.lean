@@ -89,7 +89,7 @@ section Finite
 variable {v : HeightOneSpectrum (𝓞 K.1)}
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem idelesProj_eq_of_algebraMap (w : PlacesOver E.1 v) (ι : ℚ̄ →ₐ[K.1] AlgebraicClosure (v.adicCompletion K.1))
     (ιE : ℚ̄ →ₐ[E.1] AlgebraicClosure (w.1.adicCompletion E.1))
     (e : AlgebraicClosure (w.1.adicCompletion E.1) ≃+* AlgebraicClosure (v.adicCompletion K.1))
@@ -128,7 +128,7 @@ section Infinite
 variable {v : InfinitePlace K.1}
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem infIdelesProj_eq_of_algebraMap (w : v.placesOver E.1) (ι : ℚ̄ →ₐ[K.1] AlgebraicClosure v.Completion)
     (ιE : ℚ̄ →ₐ[E.1] AlgebraicClosure (w : InfinitePlace E.1).Completion)
     (e : AlgebraicClosure (w : InfinitePlace E.1).Completion ≃+* AlgebraicClosure v.Completion)
@@ -172,7 +172,7 @@ end Infinite
 section Places
 
 
-set_option maxHeartbeats 4000000 in
+
 variable (v) in
 theorem exists_idelesLocalRes_idelesResField_eq_zero_of_placeOfEmbedding (v : HeightOneSpectrum (𝓞 K.1))
     (ι : ℚ̄ →ₐ[K.1] AlgebraicClosure (v.adicCompletion K.1)) (y : cohomology (limitRep K) 2)
@@ -238,7 +238,7 @@ theorem exists_idelesLocalRes_idelesResField_eq_zero_of_placeOfEmbedding (v : He
   rw [h0, map_zero]
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem exists_infIdelesLocalRes_idelesResField_eq_zero_of_infPlaceOfEmbedding {v : InfinitePlace K.1}
     (ι : ℚ̄ →ₐ[K.1] AlgebraicClosure v.Completion) (y : cohomology (limitRep K) 2)
     (hy : (infIdelesLocalRes ι 2).hom y = 0) :
@@ -295,7 +295,7 @@ end Places
 section Main
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem idelesResField_eq_zero (ι : LocalEmbeddings K) (y : cohomology (limitRep K) 2)
     (hinf : ∀ v : InfinitePlace K.1, idelesLimitCohomologyEquiv ι (by norm_num) y (.inl v) = 0)
     (hfin : ∀ (v : HeightOneSpectrum (𝓞 K.1)) (w : PlacesOver E.1 v),

@@ -43,8 +43,8 @@ theorem pr_smul_right (c : ℂ) (z U : VCx ι a b) : pr z (c • U) = conj c * p
   refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
 theorem pr_swap (z U : VCx ι a b) : pr U z = conj (pr z U) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [pr, map_sum, map_mul, Complex.conj_conj]
+
+  simp only [pr, map_sum, map_mul, Complex.conj_conj]
   refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
 omit [Fintype ι] in
@@ -194,8 +194,8 @@ theorem omO_eq {δ : ℂ} {sc : ℝ} (hP : StdPair θ S T δ sc ψ) (y U : VCx D
   show ((∑ τ, formAt S T τ (y τ) (U τ) : ℝ) : ℂ) = _
   rw [Complex.ofReal_sum]
   simp only [formAt_eq hP]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum, ← map_sum, mul_sub]
+
+  rw [Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum, ← map_sum, mul_sub]
   rfl
 
 end Form

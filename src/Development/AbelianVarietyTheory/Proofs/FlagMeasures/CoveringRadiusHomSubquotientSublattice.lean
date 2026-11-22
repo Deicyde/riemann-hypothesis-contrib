@@ -38,9 +38,9 @@ theorem vecAt_mulVec {K : Type} [Field K] [NumberField K] [StarRing K] {a b : �
     vecAt (Pi.basisFun K (Fin a)) w (M *ᵥ y)
       = M.map w.embedding *ᵥ vecAt (Pi.basisFun K (Fin b)) w y := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [vecAt, Pi.basisFun_repr, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum,
-    map_mul]
+
+  simp only [vecAt, Pi.basisFun_repr, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum,
+  map_mul]
 
 theorem mulVec_fcoord {K : Type} [Field K] [NumberField K] [StarRing K] {a : ℕ}
     (X : InfinitePlace K → Matrix (Fin a) (Fin a) ℂ)

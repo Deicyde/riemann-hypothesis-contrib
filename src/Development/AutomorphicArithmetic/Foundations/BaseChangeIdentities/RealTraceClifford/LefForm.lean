@@ -33,7 +33,7 @@ private theorem lefschetz_form_identities {A : Type*} [CommRing A] [NoZeroDiviso
     · exact absurd h hD
     · linear_combination h
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.RealTr.lefForm :
     ∀ (n : ℕ) (lam : Fin n → ℤ) (c₁ cT χ : FR n), alt (rhoV n) * χ = alt ((fun a => (lam a : ℝ)) + rhoV n) →
       (∀ (θ : Wt n) (z : Fin n → ℂ), (∀ a, z a = Complex.exp (Complex.I * θ a)) → (Function.Injective fun a => z a ^ 2) →

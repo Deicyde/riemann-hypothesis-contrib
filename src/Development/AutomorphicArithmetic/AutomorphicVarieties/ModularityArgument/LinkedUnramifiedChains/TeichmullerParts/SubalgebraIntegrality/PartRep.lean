@@ -19,7 +19,7 @@ open scoped Matrix TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.V.Z.J.D
 
@@ -52,8 +52,8 @@ private theorem chi_map {n : ℕ} {R S G : Type} [CommRing R] [CommRing S] [Grou
 private theorem pol_map {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) (n q : ℕ) (a : ℕ → R) (b : ℕ → S)
     (h : ∀ j ≤ n, f (a j) = b j) : (Hi.heckePol n q a).map f = Hi.heckePol n q b := by
   unfold Hi.heckePol
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Polynomial.map_sum]
+
+  rw [Polynomial.map_sum]
   refine Finset.sum_congr rfl fun j hj => ?_
   rw [Polynomial.map_mul, Polynomial.map_pow, map_X, map_C, map_mul, h j (Nat.lt_succ_iff.1 (Finset.mem_range.1 hj))]
   simp

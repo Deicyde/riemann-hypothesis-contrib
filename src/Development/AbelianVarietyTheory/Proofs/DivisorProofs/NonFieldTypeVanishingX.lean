@@ -53,7 +53,7 @@ end
 end
 
 section
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.PsCo.Plug.parabolicT : GlobalTheory.IndefiniteRowSideFullHecke.ConstantTermVanishing.ParabolicAndConstTermX := by
   first | exact @GlobalTheory.Proof.parabolic_and_constant_term.parabolicAndConstTermX | exact GlobalTheory.Proof.parabolic_and_constant_term.parabolicAndConstTermX | (intros; apply GlobalTheory.Proof.parabolic_and_constant_term.parabolicAndConstTermX <;> assumption)
 end
@@ -69,7 +69,7 @@ noncomputable section
 namespace GlobalTheory.NonFieldType
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7} {V : HSp D}
-set_option maxHeartbeats 4000000 in
+
 theorem productClauseX {S : D.what₂.Tau → SPar} {M : DSModel V S} {T : TypeDataG V} {U : AuxiliaryPlaceHermitianSpace V}
     {μa : ∀ w, Measure (GArch D.sp.cm.sig V.gram w)} {μf : ∀ v, Measure (GLoc D.sp.cm.sig V.gram v)}
     {μ : Measure (GA D V)} (hμ : IsRestrictedProd D.sp.cm.sig V.gram (frameLat V) μa μf μ)
@@ -104,7 +104,7 @@ theorem productClauseX {S : D.what₂.Tau → SPar} {M : DSModel V S} {T : TypeD
   exact @GlobalTheory.T.classTerm_eq_volume_mul_orbitalIntegral (GA D V) _ _ _ _ _ _ _ _ (GQ V) _ (ratEmb D.sp.cm.sig V.gram γ) (ratEmb_mem_GQ γ)
     (isMulCommutative_cent_ratEmb hreg) μ hμ.2.2.1 dt htt 𝓣 h𝓣 hvol _ _ hc.1 hc.2 hO 𝓕 h𝓕
 
-set_option maxHeartbeats 4000000 in
+
 theorem nonFieldTypeVanishingX : NonFieldTypeVanishingX := by
   intro D V _ S M T U hH μa μf μ hμ fa ff ha hf γ hγ
   have hL := localClause (fun v => hμ.2.1 v) hf hγ
@@ -115,7 +115,7 @@ end
 end
 
 section
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.PsCo.Plug.nonFieldT : GlobalTheory.IndefiniteRowSideFullHecke.NonFieldTypeVanishingAlt.NonFieldTypeVanishingX := by
   first | exact @GlobalTheory.NonFieldType.nonFieldTypeVanishingX | exact GlobalTheory.NonFieldType.nonFieldTypeVanishingX | (intros; apply GlobalTheory.NonFieldType.nonFieldTypeVanishingX <;> assumption)
 end
@@ -144,7 +144,7 @@ open GlobalTheory.AdelicU GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary For
 open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots GlobalTheory.TrEll
 open GlobalTheory.IndefiniteRowSideFullHecke.AdelicUnitaryGroups (mapH diagH)
 open scoped TensorProduct ComplexConjugate Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.PsCo.Plug.ellipticT : GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots.EllipticPartX := by
   first | exact @GlobalTheory.TrEllSum.ellipticPartX | exact GlobalTheory.TrEllSum.ellipticPartX | (intros; apply GlobalTheory.TrEllSum.ellipticPartX <;> assumption)
 end

@@ -14,7 +14,7 @@ open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 open GlobalTheory
 open Classical
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_finite_extension_unitary_point_generic_fibre : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H)
     (Xo : Moduli Dw l) (c : Coeff l) (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], GlobalTheory.Mum.Base V →
     IsDiscreteValuationRing V → ∀ y : Sp (FractionRing V) ⟶ Xo.XF c,

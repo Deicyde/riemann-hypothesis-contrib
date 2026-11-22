@@ -16,7 +16,7 @@ private theorem alg {g e c k : ℝ} (hc : 0 < c) (hk : 0 < k) {A B C S K : ℂ} 
   push_cast
   field_simp
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.V.Z.Sym.Glob.tFId0 : TFId0 := by
   unfold TFId0
   intro F iF iN Δ D hD x₀ hx

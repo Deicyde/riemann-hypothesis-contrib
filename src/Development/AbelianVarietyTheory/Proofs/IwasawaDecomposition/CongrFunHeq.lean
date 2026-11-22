@@ -12,7 +12,7 @@ open GlobalTheory.HeightCounting GlobalTheory.Mem.R3.Tr
 
 noncomputable section
 namespace GlobalTheory.LayerMove
-set_option maxHeartbeats 4000000
+
 variable {D : D7} (m : Mv D)
 
 def Mv.lam (x : GlobalTheory.LamTie.LamDat D) : GlobalTheory.LamTie.LamDat m.D := @_root_.GlobalTheory.LamTie.LamDat.mk (_)

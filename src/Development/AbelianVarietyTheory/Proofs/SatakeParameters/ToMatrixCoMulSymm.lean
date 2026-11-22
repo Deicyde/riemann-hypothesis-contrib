@@ -68,9 +68,9 @@ theorem orth_of_gram {E : Type} [Field E] (σ : E →+* E) {N : ℕ} (J : Matrix
   set M := LinearMap.toMatrix' (co : (Fin N → E) →ₗ[E] (Fin N → E)) with hMdef
   have hx : ∀ z, co z = M *ᵥ z := fun z => by rw [hMdef, LinearMap.toMatrix'_mulVec]; rfl
   rw [← hM]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hx, Matrix.mulVec, dotProduct, cT, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul,
-    Finset.sum_mul, Finset.mul_sum]
+
+  simp only [hx, Matrix.mulVec, dotProduct, cT, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul,
+  Finset.sum_mul, Finset.mul_sum]
   conv_lhs => arg 2; ext a; rw [Finset.sum_comm]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_

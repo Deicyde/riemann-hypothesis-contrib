@@ -47,8 +47,8 @@ theorem differentiable_ev_comb (f : A.V → Conv.halfRing T) (hf : IsComb A j (C
       apply Subtype.ext
       rw [AddSubmonoidClass.coe_finsetSum]
       exact h2 v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e, map_sum]
+
+    rw [e, map_sum]
     exact Finset.sum_congr rfl fun i _ => by rw [map_mul, hv i w hw]
   rw [key]
   exact Differentiable.fun_sum fun i _ =>

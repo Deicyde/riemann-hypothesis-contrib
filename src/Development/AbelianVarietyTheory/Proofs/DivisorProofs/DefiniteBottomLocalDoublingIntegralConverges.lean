@@ -129,7 +129,7 @@ private theorem f_fock (hX : IsBottomTri W i j X) (t : T) (τ : D.what₂.Tau) :
     hX.is.isVac.2.theta (f_theta hX t) (hX.is.isVac.2.fock τ)
 
 
-set_option maxHeartbeats 1000000 in
+
 private theorem real_fix (hX : IsBottomTri W i j X) (t : T) (hr : A.rank ≤ WW.rank) (n : D.what₂.Tau → ℕ)
     (hn : ∀ τ, HasInfExp D (betaB G i j / alphaB L i j t) τ ((n τ : ℚ) + (WW.rank : ℚ) / 2))
     {k : GA D (GlobalTheory.Grid.neg A)} (hk : k ∈ GinfC (GlobalTheory.Grid.neg A)) :

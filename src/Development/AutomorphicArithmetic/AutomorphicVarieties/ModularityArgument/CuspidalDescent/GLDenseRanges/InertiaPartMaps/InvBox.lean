@@ -10,7 +10,7 @@ noncomputable section
 open UpperTheory.V.Hi UpperTheory.V.Z.J.D
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.V.Z.Desc.V0
 
@@ -121,7 +121,7 @@ private theorem mem_invT_iff_sum_smul_inl_eq_and_inr_fixed {G H W : Type} [Group
     F ∈ invT K₁ K₂ τ₀ ρ ↔ (∀ (k : K₁) (i : Fin m), ∑ j, (τ₀ k : Matrix (Fin m) (Fin m) ℂ) i j • ρ (↑k, 1) (F j) = F i) ∧
       ∀ k ∈ K₂, ∀ i, ρ (1, k) (F i) = F i := Iff.rfl
 
-set_option maxHeartbeats 800000 in
+
 theorem invBox : InvBox := by
   intro G H W W' _ _ _ _ _ _ ρ κ m K₁ K₂ τ₀ a N
   classical

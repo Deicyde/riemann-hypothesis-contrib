@@ -129,9 +129,9 @@ theorem skodaDbar (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M] :
         (starRingEnd ℂ) (g i x) *
           (∑ l, g l x * ∑ j, (starRingEnd ℂ) (d n z j (g l) x) * (starRingEnd ℂ) (ξ j)) /
             ((vsq (gv g x) : ℝ) : ℂ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [perp, jacM, gv, map_sub, map_mul, map_sum, map_div₀, Complex.conj_ofReal,
-      Complex.conj_conj]
+
+    simp only [perp, jacM, gv, map_sub, map_mul, map_sum, map_div₀, Complex.conj_ofReal,
+    Complex.conj_conj]
     ring
   rw [hL, hsplit, hswap, hconj]
   ring
@@ -188,8 +188,8 @@ private theorem ofReal_vsq_perp_eq {p : ℕ} (g w : Fin p → ℂ) (hS : vsq g �
       ((∑ j, g j * (starRingEnd ℂ) (w j)) / ((vsq g : ℝ) : ℂ)) *
         ((∑ j, (starRingEnd ℂ) (g j) * w j) / ((vsq g : ℝ) : ℂ)) * ((starRingEnd ℂ) (g l) * g l) := by
     intro l
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [perp, map_sub, map_mul, map_div₀, map_sum, Complex.conj_ofReal, Complex.conj_conj]
+
+    simp only [perp, map_sub, map_mul, map_div₀, map_sum, Complex.conj_ofReal, Complex.conj_conj]
     ring
   rw [e1, Finset.sum_congr rfl (fun l _ => e2 l), Finset.sum_add_distrib, Finset.sum_sub_distrib,
     Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum, hgg]
@@ -210,14 +210,14 @@ private theorem levi_form_expand_eq_neg_sq_mul_add_sum {n p : ℕ} (a : Fin n �
     exact Finset.sum_congr rfl (fun _ _ => Finset.sum_congr rfl (fun _ _ => by ring))
   have h2 : ∑ l, G l * (starRingEnd ℂ) (∑ j, a j l * ξ j) =
       ∑ k, (∑ l, (starRingEnd ℂ) (a k l) * G l) * (starRingEnd ℂ) (ξ k) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, Finset.mul_sum, Finset.sum_mul]
+
+    simp only [map_sum, map_mul, Finset.mul_sum, Finset.sum_mul]
     refine (Finset.sum_comm).trans ?_
     exact Finset.sum_congr rfl (fun _ _ => Finset.sum_congr rfl (fun _ _ => by ring))
   have h3 : ∑ l, (∑ j, a j l * ξ j) * (starRingEnd ℂ) (∑ j, a j l * ξ j) =
       ∑ j, ∑ k, (∑ l, (starRingEnd ℂ) (a k l) * a j l) * ξ j * (starRingEnd ℂ) (ξ k) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, Finset.sum_mul_sum]
+
+    simp only [map_sum, map_mul, Finset.sum_mul_sum]
     simp only [Finset.sum_mul]
     refine (Finset.sum_comm).trans ?_
     refine Finset.sum_congr rfl (fun j _ => ?_)

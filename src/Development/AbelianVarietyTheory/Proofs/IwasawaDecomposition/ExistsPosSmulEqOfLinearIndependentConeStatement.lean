@@ -5,7 +5,7 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_pos_smul_eq_of_linearIndependent_cone' : ∀ {L : Type} [AddCommGroup L] {m m' : ℕ} (δ : Fin m → L) (γ : Fin m' → L) (i : Fin m) (k : ℕ)
     (a : Fin m' → ℕ), LinearIndependent ℤ δ → 0 < k → k • δ i = ∑ j, a j • γ j →
     (∀ j, 0 < a j → ∃ (k' : ℕ) (b : Fin m → ℕ), 0 < k' ∧ k' • γ j = ∑ l, b l • δ l) →

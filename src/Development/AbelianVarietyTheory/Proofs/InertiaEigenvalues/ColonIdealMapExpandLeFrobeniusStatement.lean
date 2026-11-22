@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PowerSe
 @[expose] public section
 
 open PowerSeries GlobalTheory.BK Matrix GlobalTheory.LiftCoker
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.colonIdeal_map_expand_le_frobenius : ∀ (O K : Type)
     [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
     (l : ℕ) [Fact l.Prime] (ι κ : Type) [Fintype ι] [Fintype κ] (G : Matrix κ ι K⟦X⟧),
@@ -39,8 +39,8 @@ theorem _root_.GlobalTheory.T.colonIdeal_map_expand_le_frobenius : ∀ (O K : Ty
     exact mul_mem (pow_mem hX _) (frob_mem_A l (hm j i))
   · funext i
     have hwi : w i = ∑ j : Fin l, (X : K⟦X⟧) ^ j.val * frob K l (PowerSeries.map (algebraMap O K) (g i j)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hf i, hg i, map_sum]
+
+      rw [← hf i, hg i, map_sum]
       simp [map_mul, map_pow, map_X, map_expand, frob]
     have key : ∀ j : Fin l, frob K l (PowerSeries.map (algebraMap O K) α) *
         frob K l (PowerSeries.map (algebraMap O K) (g i j)) = (G.map (frob K l) *ᵥ frobV l (m j)) i := by

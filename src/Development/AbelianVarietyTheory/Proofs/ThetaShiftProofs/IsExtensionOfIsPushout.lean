@@ -136,8 +136,8 @@ theorem IsExtension.of_proj {J : Type} {P Q : J → Type} [∀ j, AddCommGroup (
     exact hS j i (fun h => hi (Finset.mem_biUnion.mpr ⟨j, hj, h⟩)))
   have hx : x = ∑ i ∈ T.biUnion S, β i • a (v i) := by
     refine (sub_eq_zero.mp (inj' _ (fun j => ?_)))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, sub_eq_zero, map_sum]
+
+    rw [map_sub, sub_eq_zero, map_sum]
     simp only [map_smul, comm, hv]
     conv_lhs => rw [hS' j (T.biUnion S ∪ S j) Finset.subset_union_right]
     symm
@@ -212,8 +212,8 @@ theorem graph_bijective (X : Submodule R (V₀ × ∀ j, P₀ j))
       refine Finset.sum_congr rfl (fun i _ => ?_)
       rw [Prod.smul_fst, LinearMap.map_smulₛₗ, hΛa (c i) _, hcoef i, smul_smul]
     · have hnat := IsCoord.natural hd.span hΛd (hΛb j) (π j) (π' j) (comm j) w
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hnat, hw j, map_sum, Prod.snd_sum, Finset.sum_apply, map_sum, Finset.smul_sum]
+
+      rw [← hnat, hw j, map_sum, Prod.snd_sum, Finset.sum_apply, map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl (fun i _ => ?_)
       rw [Prod.smul_snd, Pi.smul_apply, LinearMap.map_smulₛₗ, hΛb j (c i) _, hcoef i, smul_smul]
   have hne : ∀ r : R, r ≠ 0 → algebraMap K F (algebraMap R K r) ≠ 0 := fun r hr =>

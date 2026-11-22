@@ -31,8 +31,8 @@ theorem charpoly_of_red {R K M V : Type} [CommRing R] [Field K] [AddCommGroup M]
   let v : Module.Free.ChooseBasisIndex R M → V := fun i => red (b i)
   have hred : ∀ m, red m = ∑ i, π (b.repr m i) • v i := fun m => by
     conv_lhs => rw [← b.sum_repr m]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => map_smulₛₗ red _ _
   have hli : LinearIndependent K v := by
     rw [Fintype.linearIndependent_iff]
@@ -40,16 +40,16 @@ theorem charpoly_of_red {R K M V : Type} [CommRing R] [Field K] [AddCommGroup M]
     let a : Module.Free.ChooseBasisIndex R M → R := fun j => Function.surjInv hπ (g j)
     have ha : ∀ j, π (a j) = g j := fun j => Function.surjInv_eq hπ (g j)
     have h0 : red (∑ j, a j • b j) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp_rw [map_smulₛₗ, ha]
       exact hg
     obtain ⟨n, hn⟩ := (hk _).1 h0
     have hai : a i = (c : R) * b.repr n i := by
       have := congrArg (fun m => b.repr m i) hn
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply,
-          Module.Basis.repr_self, smul_eq_mul, map_nsmul] at this
+
+      simp only [map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply,
+        Module.Basis.repr_self, smul_eq_mul, map_nsmul] at this
       rw [Finset.sum_eq_single i (fun j _ hj => by simp [hj])
         (fun hi => absurd (Finset.mem_univ i) hi)] at this
       simpa [nsmul_eq_mul] using this
@@ -67,10 +67,10 @@ theorem charpoly_of_red {R K M V : Type} [CommRing R] [Field K] [AddCommGroup M]
     ext i j
     rw [Matrix.map_apply, LinearMap.toMatrix_apply, LinearMap.toMatrix_apply, hbV j, ← h, hred]
     have hv : ∀ i', v i' = bV i' := fun i' => (hbV i').symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hv, map_sum, map_smul, Module.Basis.repr_self, Finsupp.finsetSum_apply,
-        Finsupp.smul_apply, smul_eq_mul, Finsupp.single_apply, mul_ite, _root_.mul_one, mul_zero,
-        Finset.sum_ite_eq', Finset.mem_univ, ite_true]
+
+    simp only [hv, map_sum, map_smul, Module.Basis.repr_self, Finsupp.finsetSum_apply,
+      Finsupp.smul_apply, smul_eq_mul, Finsupp.single_apply, mul_ite, _root_.mul_one, mul_zero,
+      Finset.sum_ite_eq', Finset.mem_univ, ite_true]
   rw [← LinearMap.charpoly_toMatrix ψ bV, hmat, Matrix.charpoly_map, LinearMap.charpoly_toMatrix]
 
 theorem charpoly_dualMap {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]

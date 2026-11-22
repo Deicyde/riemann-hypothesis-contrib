@@ -200,8 +200,8 @@ def orbitSum (ν : Fin n → ℤ) : LaurentRing (n := n) :=
 
 theorem orbitSum_mem (ν : Fin n → ℤ) : orbitSum ν ∈ symmetricLaurent (n := n) := by
   intro τ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [orbitSum, map_sum]
+
+  rw [orbitSum, map_sum]
   simp only [monomial, permAct_single]
   exact Fintype.sum_equiv (Equiv.mulLeft τ) _ _ fun σ => by congr 1
 

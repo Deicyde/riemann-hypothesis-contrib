@@ -30,13 +30,13 @@ theorem comp_proj {bar : 𝓞 E ≃+* 𝓞 E} (hinr : ∀ a f, ρH a (0, f) = (0
     have h2 := congrArg Prod.snd h1
     exact LinearMap.congr_fun h2 z
   have h2 : ∑ k, σ' (HT.dualInt E k) * σ' ((RingOfIntegers.basis E k : 𝓞 E) : E) = 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_one σ', ← HT.LatBasic.sum_dualInt_mul, map_sum]
+
+    rw [← map_one σ', ← HT.LatBasic.sum_dualInt_mul, map_sum]
     simp
   ext z
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [HT.eigProj, LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, h3,
-    smul_smul]
+
+  simp only [HT.eigProj, LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, h3,
+  smul_smul]
   rw [← Finset.sum_smul, h2, one_smul]
 
 theorem dual_frame [CharZero K] {q : ℕ} {b : Fin q → W} (hb : LinearIndependent K b) {τ : E →+* K}
@@ -66,8 +66,8 @@ theorem dual_frame [CharZero K] {q : ℕ} {b : Fin q → W} (hb : LinearIndepend
       have h2 : HT.eigProj ρ τ (ρ c x) = ρ c (HT.eigProj ρ τ x) := by
         have hcomm : ∀ k, ρ (RingOfIntegers.basis E k) (ρ c x) = ρ c (ρ (RingOfIntegers.basis E k) x) := fun k => by
           rw [← Module.End.mul_apply, ← map_mul, mul_comm, map_mul, Module.End.mul_apply]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hcomm]
+
+        simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hcomm]
       rw [hπ, h2, HT.LatBasic.mem_eigSp.1 (HT.LatBasic.eigProj_mem ρ τ x) c]
       rfl)
     simp [h1]
@@ -142,8 +142,8 @@ theorem exists_adapted_basis : ∀ (E : Type) [Field E] [NumberField E] (K W : T
     have hd : z.2 = ∑ j, z.2 (w j) • f j := by
       ext x
       have h1 := LinearMap.congr_fun hcomp x
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [LinearMap.comp_apply, hf1, map_sum] at h1
+
+      rw [LinearMap.comp_apply, hf1, map_sum] at h1
       rw [← h1]
       simp [LinearMap.sum_apply, mul_comm]
     have e2 : ∑ j, z.2 (w j) • (((0 : W), f j) : W × Module.Dual K W) = z := by

@@ -114,8 +114,8 @@ theorem levels_of_basis (ob : Obj D l bB sB) (ob' : Obj D l bB' sB') (hd : l.M �
     obtain ⟨c, rfl⟩ := bas.surjective a
     have hc : c = ∑ i, c i • (Pi.single i 1 : Fin n → ℤ) := by
       ext j; simp [Pi.single_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hc, map_sum]
+
+    rw [hc, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_smul]
     refine zsmul_mem ?_ _

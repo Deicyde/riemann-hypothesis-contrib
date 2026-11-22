@@ -251,7 +251,7 @@ theorem isIntegral_w {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Geo
   exact map_isIntegral_int (d.eF : c.F →+* d.c₂.F) (isIntegral_zpow_of_pow_eq_one (hz _ c).1 (hz _ c).2 _ _)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem den_of_large (D : D7) (T : CoreJ D) (h : LawsJ T) (j : ℕ) (hj : InR D j) (a : (D.host.E →+* ℂ) × ℕ → ℕ)
     (n : ℕ) (hdom : Dom a n) (hn : 4 * (Module.finrank ℚ D.host.E * D.R.r) + 4 ≤ n) (f : T.toCore.R j)
     (hf : f ∈ T.toCore.cuspA j a n) : Den (T.toCore.Vs j) (fun _ => True) f := by

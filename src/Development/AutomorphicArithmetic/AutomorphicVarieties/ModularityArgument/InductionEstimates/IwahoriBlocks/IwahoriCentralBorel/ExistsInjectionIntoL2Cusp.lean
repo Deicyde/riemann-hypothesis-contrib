@@ -244,15 +244,15 @@ private theorem fix_gen {G : Type*} [Group G] [TopologicalSpace G] [IsTopologica
         simp only [← mul_assoc]
         rw [integral_mul_const, hid m hm]
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 private theorem fix_avg (D : TypeDat K n) {F : G1 K n → ℂ} (hF : Continuous F) :
     D.Fix fun x => ∫ k, D.e k * F (x * k) ∂D.ν := by
   intro x
   haveI := D.prob
   exact fix_gen (typeFin D).1 D.supp D.inv D.cont D.idem hF x
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 private theorem fixed_of (D : TypeDat K n) {κ : Measure (archCompact K n)} {e : archCompact K n → ℂ} {U₀ : Subgroup (FA K n)}
     (hT : IsTy D κ e U₀) (he : IdemA κ e) (hac : Continuous (arc1 : archCompact K n → G1 K n)) (hcomp : CompactSpace (archCompact K n))
     {v : L2 μ} (hp : pOp μ κ e v = v) (hv : v ∈ fixF μ U₀) :
@@ -340,8 +340,8 @@ private theorem rep_in {τ : Submodule ℂ (L2 μ)} (hcl : IsClosed (τ : Set (L
 
 end Proj
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.IwahoriBlocks.exists_injection_into_l2_cusp :
     ∀ {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (μ : Measure (G1 K 2)) [μ.IsHaarMeasure] (τ : Submodule ℂ (L2 μ)) (κ : Measure (archCompact K 2)) (p : archCompact K 2 → ℂ), CuspIrr μ τ → IdemA κ p → ∀ S : Finset (Pl K), ∃ J : Xs μ τ κ p S →ₗ[ℂ] L2 μ, Function.Injective J ∧ (∀ φ, Reps μ (J φ) φ ∧ InH μ τ κ p S (J φ)) ∧
       (∀ (h : FA K 2) (φ φ' : Xs μ τ κ p S), (∀ x, φ'.1 x = φ.1 (x * fin1 h)) → J φ' = rhoF μ h (J φ)) ∧

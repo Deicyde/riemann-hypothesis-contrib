@@ -67,10 +67,10 @@ theorem multi_poly (k : ℕ) (M : ContinuousMultilinearMap ℝ (fun _ : Fin k =>
       simp [Pi.single_apply]
     have e1 : M (fun _ => η) = M (fun _ => ∑ i, η i • EuclideanSpace.single i (1 : ℝ)) := by
       rw [← hη]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, M.map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [M.map_smul_univ, map_sum, map_mul, MvPolynomial.eval_C, map_prod, MvPolynomial.eval_X]
+
+    rw [e1, M.map_sum]
+
+    simp only [M.map_smul_univ, map_sum, map_mul, MvPolynomial.eval_C, map_prod, MvPolynomial.eval_X]
     refine Finset.sum_congr rfl fun r _ => ?_
     rw [Complex.real_smul, Complex.ofReal_prod, mul_comm]
 
@@ -86,8 +86,8 @@ theorem line_poly {ι : Type} [Fintype ι] (N : ℕ) (K : EuclideanSpace ℝ ι 
     exact (hQd k).trans hk'
   · obtain ⟨p, hp, hpK⟩ := H η
     rw [K_eq_sum K hK η p hp hpK]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, MvPolynomial.eval_C, hQ]
+
+    simp only [map_sum, map_mul, MvPolynomial.eval_C, hQ]
 
 end PositivityTheory.SiegelWeilFormula.KFPB
 

@@ -72,10 +72,10 @@ theorem zhat_chg : ∀ (D : D7) {T T' : D.host.E} (F G : LFlag (D.sp.Y 0) D.R.rS
   funext a b
   have h1 : G.fl.fvec a = ∑ c, A c a • F.fl.fvec c := hc a
   have h2 : G'.fl.fvec b = ∑ c, A' c b • F'.fl.fvec c := hc' b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ZhatL, Formalism.MainNotions.S.Zhat, Formalism.MainNotions.S.brS, h1, h2, map_sum, map_smulₛₗ, LinearMap.sum_apply,
-    LinearMap.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.map_apply, Matrix.transpose_apply,
-    Finset.mul_sum, Finset.sum_mul]
+
+  simp only [ZhatL, Formalism.MainNotions.S.Zhat, Formalism.MainNotions.S.brS, h1, h2, map_sum, map_smulₛₗ, LinearMap.sum_apply,
+  LinearMap.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.map_apply, Matrix.transpose_apply,
+  Finset.mul_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
   simp only [starRingEnd_apply, RingHom.id_apply]
   ring

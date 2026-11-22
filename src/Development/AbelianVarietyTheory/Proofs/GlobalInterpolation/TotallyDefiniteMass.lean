@@ -65,8 +65,8 @@ private theorem span_eq_top_of_unimodular (S : HSpace E) (N : Submodule (𝓞 E)
       apply S.frame.ext
       intro i
       dsimp only [μ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, LinearMap.sum_apply]
+
+      rw [map_sum, LinearMap.sum_apply]
       have hs : ∀ j, S.hT (star (φ (S.frame j)) • bs j) (S.frame i) =
           φ (S.frame j) * (if i = j then 1 else 0) := by
         intro j

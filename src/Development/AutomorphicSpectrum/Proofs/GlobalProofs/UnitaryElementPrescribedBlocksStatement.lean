@@ -15,7 +15,7 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Published GlobalTheory.Published.AutFin GlobalTheory.StdPar GlobalTheory.ThK.SmoothLev GlobalTheory.CompanionTheory.Hypotheses₂.ConstFin GlobalTheory.CompanionTheory.Hypotheses₂.LeviPart
 open GlobalTheory.UAut GlobalTheory.AdelicU GlobalTheory.SiegelSet
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.archimedean_unitary_element_lift : ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)), IsInfFam θ → ∀ (V : HSp D) {m : ℕ}
     (X : Matrix (Fin V.rank) (Fin m) D.host.E) (u : D.what₂.Tau → Matrix (Fin m) (Fin V.rank) ℂ)
     (w : D.what₂.Tau → Matrix (Fin V.rank) (Fin m) ℂ),

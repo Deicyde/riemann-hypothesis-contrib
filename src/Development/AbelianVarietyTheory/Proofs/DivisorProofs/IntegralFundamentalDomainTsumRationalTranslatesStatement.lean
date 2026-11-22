@@ -27,7 +27,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open MeasureTheory
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.integral_fundamentalDomain_tsum_rationalTranslates : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ],
     letI : MeasurableSpace (κ → AF F) := borel _
     ∀ (μ : MeasureTheory.Measure (κ → AF F)), μ.IsAddHaarMeasure →

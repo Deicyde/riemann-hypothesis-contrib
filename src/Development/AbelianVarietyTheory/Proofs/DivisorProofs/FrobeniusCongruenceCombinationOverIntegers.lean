@@ -71,14 +71,14 @@ theorem GlobalTheory.SmallSecond.frob_congr_to_O : ∀ (p : ℕ) [Fact p.Prime] 
   choose g _ hg using fun l => (he l).2.2
   choose c1 _ hc1 using fun l => (he l).2.1
   have hSm : ∀ α, F.θ (∑ l, W l * g l α) ∈ m := fun α => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact m.sum_mem fun l _ => by rw [map_mul]; exact m.mul_mem_right _ (hWm l)
   have hF : In (⊤ : Ideal F.B) (cob1 (up F.Q μ') (comb (Sum.elim (fun _ => (0 : F.B)) b) e)) := by
     intro α
     refine ⟨∑ l, Sum.elim (fun _ => (0 : F.B)) b l * g l α, trivial, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hcomb, map_sum, map_sum]
+
+    rw [hcomb, map_sum, map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [MvPowerSeries.coeff_smul, hg, map_mul]
   obtain ⟨F₁, hF₁⟩ := In.top_iff.1 hF
@@ -100,8 +100,8 @@ theorem GlobalTheory.SmallSecond.frob_congr_to_O : ∀ (p : ℕ) [Fact p.Prime] 
     intro α
     have h1 := congrArg (coeff α) hup
     rw [coeff_map] at h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, ← hrC α, map_sub, map_sub, hF₁, map_sum, map_sum]
+
+    rw [h1, ← hrC α, map_sub, map_sub, hF₁, map_sum, map_sum]
     have h2 : ∑ l, coeff α (algebraMap F.B F.Q (W l) • cob1 (up F.Q μ') (e l)) =
         ∑ l, algebraMap F.B F.Q (W l * g l α) :=
       Finset.sum_congr rfl fun l _ => by rw [MvPowerSeries.coeff_smul, hg, map_mul]
@@ -114,19 +114,19 @@ theorem GlobalTheory.SmallSecond.frob_congr_to_O : ∀ (p : ℕ) [Fact p.Prime] 
       rw [coeff_map] at h1
       have hnd : ¬ p ∣ (Finsupp.single i 1 : Fin d →₀ ℕ) i := by
         rw [Finsupp.single_eq_same]; exact (Fact.out : p.Prime).not_dvd_one
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h1, map_sub, coeff_frob_of_not_dvd p hp0 _ _ hnd, zero_sub, map_neg, map_sum]
+
+      rw [h1, map_sub, coeff_frob_of_not_dvd p hp0 _ _ hnd, zero_sub, map_neg, map_sum]
       unfold comb
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       congr 1
       refine Finset.sum_congr rfl fun l _ => ?_
       have := hc1 l i
       simp only [lin] at this
       rw [MvPowerSeries.coeff_smul, this, map_mul]
     unfold lin
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [coeff_map, key, map_neg, map_sum]
+
+    rw [coeff_map, key, map_neg, map_sum]
     exact m.neg_mem (m.sum_mem fun l _ => by rw [map_mul]; exact m.mul_mem_right _ (hWm l))
   · have h1 := hgen (p • β)
     rw [coeff_frob_smul p hp0, coeff_map, F.s_alg, ← map_add (f := _), ← map_sub] at h1

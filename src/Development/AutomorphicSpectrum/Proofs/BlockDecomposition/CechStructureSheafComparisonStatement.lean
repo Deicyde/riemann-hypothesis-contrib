@@ -7,7 +7,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CubeResA
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.CompanionTheory.Hodge.Nerve
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.cech_structure_sheaf_comparison : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (s : X ⟶ Spec (CommRingCat.of R)) (P : Type) [SemilatticeInf P]
     (S : MainStatements.Hodge.Sys X P) {κ : Type} [LinearOrder κ] (e : κ → P) (n : ℕ),
     letI := GlobalTheory.algebraΓOfHom s

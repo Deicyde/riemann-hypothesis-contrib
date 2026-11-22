@@ -57,8 +57,8 @@ private lemma Good.mul {k k' : ℤ} {f g : (ZMod N)ˣ → ℍ → ℂ} (hf : Goo
     rw [ModularForm.mul_slash_SL2, hf.fam a b γ hγ h, hg.fam a b γ hγ h]
   · intro a n
     unfold coef
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hf.q_mul hg, PowerSeries.coeff_mul, map_sum]
+
+    rw [hf.q_mul hg, PowerSeries.coeff_mul, map_sum]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun p _ => ?_
     rw [map_mul, norm_mul]
     exact mul_le_one₀ (hf.int a p.1) (norm_nonneg _) (hg.int a p.2)

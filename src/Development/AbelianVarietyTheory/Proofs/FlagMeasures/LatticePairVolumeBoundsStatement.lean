@@ -9,7 +9,7 @@ public import Formalism.RealPlaceAnalysis.Complexify
 
 open Formalism.HN Formalism.HermitianLatticesTheory Matrix NumberField Finset
 open GlobalTheory.HomCover in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lattice_pair_volume_bounds :
     ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K] (a b : ℕ)
       (X : InfinitePlace K → Matrix (Fin a) (Fin a) ℂ)

@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsLocal
 @[expose] public section
 
 open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Unr Polynomial
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.isUnit_traceForm_discr_unramifiedExt :
     ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ →
     ∀ (π : K.O) (π' : K'.O),
@@ -56,8 +56,8 @@ theorem _root_.GlobalTheory.T.isUnit_traceForm_discr_unramifiedExt :
     have hsum : ∀ (g : Fin d → K.O) (v : Fin d → K'.O),
         algebraMap K'.O K'.E (∑ k, g k • v k) = ∑ k, algebraMap K.O K.E (g k) • algebraMap K'.O K'.E (v k) := by
       intro g v
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun k _ => hsm _ _
 
     have hw1 : ∀ k, ∃ y : K'.O, algebraMap K'.O K'.E y = w k := by
@@ -102,9 +102,9 @@ theorem _root_.GlobalTheory.T.isUnit_traceForm_discr_unramifiedExt :
     have hTr : ∀ y, algebraMap K.O K.E (Algebra.trace K.O K'.O y) =
         Algebra.trace K.E K'.E (algebraMap K'.O K'.E y) := by
       intro y
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Algebra.trace_eq_matrix_trace b, Algebra.trace_eq_matrix_trace w, Matrix.trace, Matrix.trace,
-        map_sum]
+
+      rw [Algebra.trace_eq_matrix_trace b, Algebra.trace_eq_matrix_trace w, Matrix.trace, Matrix.trace,
+      map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       simp only [Matrix.diag_apply, Algebra.leftMulMatrix_apply, LinearMap.toMatrix_apply,
         Algebra.coe_lmul_eq_mul, LinearMap.mul_apply', hrep, map_mul, hb]

@@ -81,7 +81,7 @@ theorem point_of_val {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra
     exact Ideal.Quotient.eq_zero_iff_mem.1 ((map_eq_zero_iff φ hφi).1 this)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem cdvr_point {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
     {Γ : Type} [LinearOrderedCommGroupWithZero Γ]
     (la : HeightOneSpectrum (𝓞 K)) (ν : Valuation Ω Γ)

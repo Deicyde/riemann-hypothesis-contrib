@@ -22,16 +22,16 @@ namespace PositivityTheory.Rg.Rsw.L.LLatBound
 
 variable {D : D7}
 
-set_option maxHeartbeats 800000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem exists_intOpen (V : HSp D) : ∃ U : Subgroup (GA D V), IsOpen (U : Set (GA D V)) ∧
     ∀ k ∈ U, ∀ i j, finPart D (mt V k i j) ∈ intAE D := by
   have hfc : Continuous (finPart D) := GlobalTheory.Member.continuous_finPart D
   have hint : ∀ (A B : Mx D V.rank V.rank), (∀ i j, finPart D (A i j) ∈ intAE D) → (∀ i j, finPart D (B i j) ∈ intAE D) →
       ∀ i j, finPart D ((A * B) i j) ∈ intAE D := by
     intro A B hA hB i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.mul_apply, map_sum]
+
+    rw [Matrix.mul_apply, map_sum]
     exact sum_mem fun l _ => by rw [map_mul]; exact GlobalTheory.CompanionTheory.Ipf.Bdd.mul_mem_int (hA i l) (hB l j)
   have hone : ∀ i j, finPart D ((1 : Mx D V.rank V.rank) i j) ∈ intAE D := by
     intro i j

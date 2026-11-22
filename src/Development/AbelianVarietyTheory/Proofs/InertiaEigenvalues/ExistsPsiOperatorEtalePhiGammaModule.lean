@@ -43,8 +43,8 @@ theorem psi_of_etale_basis {R E M Γ : Type*} [CommRing R] [CommRing E] [Algebra
     intro x y
     have hy : φD y = ∑ j, φE (b.repr y j) • b' j := by
       conv_lhs => rw [← b.sum_repr y]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [hφD, hb]
     rw [hψ, hy, Finset.smul_sum]
     simp only [smul_smul]
@@ -60,8 +60,8 @@ theorem psi_of_etale_basis {R E M Γ : Type*} [CommRing R] [CommRing E] [Algebra
     rw [map_smul, Finsupp.smul_apply, smul_eq_mul, hψφ, mul_smul]
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [hψ z, map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [hdec z, map_sum, map_sum]
+
+    conv_lhs => rw [hdec z, map_sum, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [hγD, ← hφγ, hkey, hψγ, hγD]
 

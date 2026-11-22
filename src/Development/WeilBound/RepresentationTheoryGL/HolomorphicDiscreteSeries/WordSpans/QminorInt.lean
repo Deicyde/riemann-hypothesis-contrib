@@ -30,8 +30,8 @@ theorem qminor_int {V V' : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V
       simp only [List.ofFn_succ, List.prod_cons, Module.End.mul_apply]
       rw [h, ih (fun k => g k.succ) (fun k => g' k.succ) (fun k y => h k.succ y)]
   unfold qminor
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.sum_apply, map_sum, Module.End.mul_apply]
+
+  simp only [LinearMap.sum_apply, map_sum, Module.End.mul_apply]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [Module.End.intCast_apply, Module.End.intCast_apply, map_zsmul,
     hP _ _ _ (fun k y => hT _ _ _ y)]
@@ -39,9 +39,9 @@ theorem qminor_int {V V' : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V
 theorem thMap : ThMap := by
   intro V V' _ _ _ _ N E E' f hf u X x
   refine ⟨?_, qminor_int f hf _ _ _ _⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Th, LinearMap.pi_apply, LinearMap.sum_apply, map_sum,
-    LinearMap.smul_apply, LinearMap.comp_apply, LinearMap.proj_apply]
+
+  simp only [Th, LinearMap.pi_apply, LinearMap.sum_apply, map_sum,
+  LinearMap.smul_apply, LinearMap.comp_apply, LinearMap.proj_apply]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [map_smul, qminor_int f hf]
 
@@ -56,8 +56,8 @@ theorem keyId : KeyId := by
     intro y
     rw [(hT (fun _ => y) 0).2]
     exact h0 _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← LinearMap.map_smul, h, map_sub, map_sum, hq, zero_sub]
+
+  rw [← LinearMap.map_smul, h, map_sub, map_sum, hq, zero_sub]
   congr 1
   refine Finset.sum_congr rfl fun c _ => ?_
   exact (hT _ c).1

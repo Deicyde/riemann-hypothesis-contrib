@@ -92,15 +92,15 @@ theorem flt_gL_mul_gLinv (R : Type*) [CommRing R] (n : ℕ) : gL R n * gLinv R n
         algebraMap _ (GLCoord R n) ((genMat R n).adjugate j k)) =
       IsLocalization.Away.invSelf (genMat R n).det *
         algebraMap _ (GLCoord R n) ((genMat R n * (genMat R n).adjugate) i k) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.mul_apply, map_sum, Finset.mul_sum]
+
+    rw [Matrix.mul_apply, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul]
     ring
   rw [Matrix.mul_adjugate, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul] at e
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, gL, gLinv, Matrix.map_apply, ← map_mul, ← map_sum, e,
-    Matrix.one_apply]
+
+  simp only [Matrix.mul_apply, gL, gLinv, Matrix.map_apply, ← map_mul, ← map_sum, e,
+  Matrix.one_apply]
   split_ifs
   · rw [mul_one, mul_comm, hu, map_one]
   · rw [mul_zero, map_zero, mul_zero, map_zero]

@@ -80,8 +80,8 @@ theorem trace_σ (B : InvAlg K) (a : B.A) :
     intro y _
     have h1 : y = ∑ j, K.c (b.repr (B.σ.symm y) j) • B.σ (b j) := by
       conv_lhs => rw [← B.σ.apply_symm_apply y, ← b.sum_repr (B.σ.symm y)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun j _ => hsm _ _
     rw [h1]
     exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
@@ -93,13 +93,13 @@ theorem trace_σ (B : InvAlg K) (a : B.A) :
     intro y i
     have h1 : B.σ y = ∑ j, K.c (b.repr y j) • b' j := by
       conv_lhs => rw [← b.sum_repr y]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun j _ => by rw [hsm, hb']
     rw [h1, b'.repr_sum_self]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Algebra.trace_eq_matrix_trace b', Algebra.trace_eq_matrix_trace b, Matrix.trace, Matrix.trace,
-    map_sum]
+
+  rw [Algebra.trace_eq_matrix_trace b', Algebra.trace_eq_matrix_trace b, Matrix.trace, Matrix.trace,
+  map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [Matrix.diag_apply, Algebra.leftMulMatrix_eq_repr_mul]
   rw [hb', ← map_mul, hrepr]

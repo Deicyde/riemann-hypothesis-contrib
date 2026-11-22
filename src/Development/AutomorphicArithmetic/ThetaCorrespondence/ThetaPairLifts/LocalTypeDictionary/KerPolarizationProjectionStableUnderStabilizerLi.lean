@@ -69,8 +69,8 @@ theorem GlobalTheory.SquareAgree.ker_polarizationProjection_stabilizer_lie : _ro
       rw [Finset.sum_insert ha, Finset.sum_insert ha]
       exact CoinvPass.isDatum_add hψ (hΦ'D a) ih
   have hΦ₁ : Φ₁ = ∑ i, Φ' i := IsDatum.fun_eq Γ.M' ψ cB cB.surjective hD₁ (hsum ▸ hsumD Finset.univ)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hΦ₁, map_sum]
+
+  rw [hΦ₁, map_sum]
   refine Finset.sum_eq_zero fun i _ => ?_
   have hi := hl _ (List.get_mem l i)
   rw [hm.mapB.eql _ _ hi Φ hΦF (Φ' i) (hΦ'F i)
@@ -87,7 +87,7 @@ open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.I
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.ker_polarizationProjection_stable_under_stabilizer_lie : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (W W₁ X : HSp D) (A : Fr W) (A₁ : Fr W₁)
     (B : Fr X) (α β : (AE D)ˣ →* Circle) (ν : Measure (GA D W)) (𝓕 : Set (GA D W)) (ν₁ : Measure (GA D W₁))
     (𝓕₁ : Set (GA D W₁)) (ωA : WRep W X) (ωB : WRep W₁ X) (e : Fin X.rank ≃ Fin (W.rank + W₁.rank))

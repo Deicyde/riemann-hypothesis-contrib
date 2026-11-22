@@ -24,7 +24,7 @@ open GlobalTheory.SquareComm
 open scoped Pointwise
 open Formalism.IndefR.Datum
 open GlobalTheory.Grid
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.siegelCone_integral_matrix_lattice_count : ∀ {D : D7} (θ : InfFam D), IsInfFam θ → ∀ (m r : ℕ) (c : ℝ), 0 < c →
     ∃ (N A : ℕ) (C : ℝ), 0 ≤ C ∧ ∀ L : ℕ, 0 < L → ∀ t ∈ GlobalTheory.SiegelSet.cone r c,
       ∑' ξ : Matrix (Fin m) (Fin r) D.host.E,

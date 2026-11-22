@@ -111,7 +111,7 @@ theorem wittCoreColumns_transvectionLeviProduct (s : Mx D 1 S₀.rank) (c : skew
     cancel₂ (d.levi_jX _), val_unip, Matrix.mul_assoc, Matrix.add_mul, Matrix.one_mul, Matrix.mul_assoc, cancel₂ h,
     Matrix.zero_mul, Matrix.mul_zero, add_zero]
 
-set_option maxHeartbeats 1000000 in
+
 theorem prod_jY :
     mt S (d.levi (unip A γ h) * d.nB (A ⬝ (adj β ⬝ gA S₀)) * d.nC (skewPart A α γ)) ⬝ d.jY =
       d.jY + d.jX ⬝ (A ⬝ adj α) - (d.jX ⬝ α + d.j0 ⬝ β + d.jY ⬝ γ) ⬝ adj A -
@@ -135,7 +135,7 @@ theorem prod_jY :
 end Main
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem eq_levi_nB_nC {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (A : Mx D ρ 1) (V : Mx D S.rank 1)
     (h : adj (d.pY ⬝ V) ⬝ A = 0) (u : GA D S)
     (hu : mt S u = 1 + d.jX ⬝ A ⬝ (adj V ⬝ gA S) - V ⬝ (adj (d.jX ⬝ A) ⬝ gA S) -

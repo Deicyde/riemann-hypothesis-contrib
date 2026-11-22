@@ -92,7 +92,7 @@ theorem rel_A {k : Type} [Field k] (b : k) (Z : M4 k) (h : IsUp (adj (1 + b • 
   refine ⟨by linear_combination h10, h21, by linear_combination h30 - b * e20 - b * h31⟩
 
 set_option synthInstance.maxSize 4000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
 set_option maxRecDepth 20000 in
 theorem keyA : ∀ S ∈ redTypes, (-wPs ∈ S ∨ (-wBe ∈ S ∧ -wTh ∈ S ∧ S ≠ yY)) → ∃ i₀ j₀ : Fin 4, wt i₀ j₀ ∈ oddRoots ∧
     (i₀ = 0 ∧ j₀ = 3 ∨ wt 0 3 ∉ S) ∧ (i₀ = 1 ∧ j₀ = 2 ∨ wt 1 2 ∉ S) ∧

@@ -165,7 +165,7 @@ theorem norm_neg_gen_eq_coeff_zero {x : Ω} (hint : IsIntegral K x) :
 
 
 include hπ hf in
-set_option maxHeartbeats 1000000 in
+
 theorem reciprocity_frobenius_lubinTate (m : ℕ) (U : OpenSubgroup (Ω ≃ₐ[K] Ω))
     [((U : Subgroup (Ω ≃ₐ[K] Ω)).subgroupOf
       ((⊤ : OpenSubgroup (Ω ≃ₐ[K] Ω)) : Subgroup (Ω ≃ₐ[K] Ω))).Normal]

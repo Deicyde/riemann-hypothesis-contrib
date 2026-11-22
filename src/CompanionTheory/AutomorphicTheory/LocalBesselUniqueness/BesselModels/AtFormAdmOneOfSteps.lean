@@ -10,7 +10,7 @@ open scoped InnerProductSpace ENNReal NNReal ComplexConjugate
 
 noncomputable section
 
-set_option maxHeartbeats 1600000
+
 
 namespace CompanionTheory.Lime.BM
 

@@ -19,7 +19,7 @@ open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris Divided
 
 namespace CrystallineSemistableComparison.Pb
 
-set_option maxHeartbeats 1000000
+
 
 open Kap
 

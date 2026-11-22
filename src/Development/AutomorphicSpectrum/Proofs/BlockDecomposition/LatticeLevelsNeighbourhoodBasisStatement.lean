@@ -25,7 +25,7 @@ open GlobalTheory.CompanionTheory.SiegelND.Integ GlobalTheory.CompanionTheory.Si
 open NumberField
 open GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl GlobalTheory.CompanionTheory.SW.Core
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.lattice_levels_neighbourhood_basis : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (n M : ℕ),
     ∀ U ∈ nhds (0 : Fin n → Fin M → Af F ⊗[F] E), ∃ N : ℕ, 0 < N ∧

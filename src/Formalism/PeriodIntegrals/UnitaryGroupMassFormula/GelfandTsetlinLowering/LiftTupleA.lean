@@ -236,8 +236,8 @@ theorem rowDiv_comb {r c n K : ℕ} (e : Fin n → Fin r) (sz : Fin K → ℕ)
       rowDiv_prod e sz G hG C0 a b hC t J]
     congr 1
     unfold tmat
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun F _ => ?_
     split_ifs
     · rw [Finsupp.linearCombination_single, one_smul]

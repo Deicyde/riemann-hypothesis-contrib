@@ -54,10 +54,10 @@ theorem mvPowerSeries_three_eq_zero_of_subst_lines :
     rw [h1]
     rw [finsum_eq_sum_of_support_subset _ (s := S) hsupp]
     simp only [hprod, PowerSeries.coeff_C_mul_X_pow, smul_eq_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [P, map_sum, MvPolynomial.eval_monomial]
-        refine Finset.sum_congr rfl (fun e he => ?_)
-        rw [if_pos ((hS e).1 he).symm, Finsupp.prod_fintype _ _ (fun s => pow_zero _)]
+
+    · simp only [P, map_sum, MvPolynomial.eval_monomial]
+      refine Finset.sum_congr rfl (fun e he => ?_)
+      rw [if_pos ((hS e).1 he).symm, Finsupp.prod_fintype _ _ (fun s => pow_zero _)]
   have hP : P = 0 := MvPolynomial.funext (fun t => by rw [← hcoef, h t, map_zero, map_zero])
   have hd := congrArg (AddMonoidAlgebra.coeff · d) hP
   simp only [P, MvPolynomial.coeff_zero, MvPolynomial.coeff_sum, MvPolynomial.coeff_monomial,

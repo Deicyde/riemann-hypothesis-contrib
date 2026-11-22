@@ -50,8 +50,8 @@ private theorem core0 (hT : TraceType) {E : Type} [Field E] [NumberField E] [IsC
   rw [← Finset.mul_sum, ← Complex.re_sum]
   congr 2
   push_cast
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Arith.bar_eq, Finset.mul_sum, map_sum, map_mul, IsCMField.complexEmbedding_complexConj]
+
+  simp only [Arith.bar_eq, Finset.mul_sum, map_sum, map_mul, IsCMField.complexEmbedding_complexConj]
   refine Finset.sum_congr rfl fun i _ => ?_
   ring
 

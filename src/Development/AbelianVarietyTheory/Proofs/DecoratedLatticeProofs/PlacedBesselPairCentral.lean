@@ -27,7 +27,7 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Gra
 
 noncomputable section
 
-set_option maxHeartbeats 1600000
+
 
 namespace GlobalTheory.LevelLine
 
@@ -81,8 +81,8 @@ theorem cond_iff (q : SplitPt D k) {ϖ : k} (hϖ : ∀ x : k, valuation k x < 1 
 theorem mulVec_sec (q : SplitPt D k) {m n : ℕ} (M : Matrix (Fin m) (Fin n) (AE D)) (y : Fin n → k) :
     M *ᵥ (fun i => q.sec (y i)) = fun i => q.sec ((M.map q.pr *ᵥ y) i) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply]
+
+  simp only [Matrix.mulVec, dotProduct, map_sum, Matrix.map_apply]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [mul_comm, sec_mul_right, mul_comm]
 
@@ -103,9 +103,9 @@ theorem int_moved (q : SplitPt D k) {PP : Formalism.L2.DIV.Pl D.host.E} (hq : Fo
     have h4 : ∀ j, (1 - toEAf D q.e) * toEAf D (q.sec (y j)) = 0 := fun j => by
       rw [sub_mul, one_mul, ← map_mul, e_mul_sec, sub_self]
     rw [h2, ← map_inv]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [mulVec, dotProduct, Finset.mul_sum, mul_left_comm (1 - toEAf D q.e), h4, mul_zero, Finset.sum_const_zero, zero_mem,
-      true_and, map_sum, map_mul, h1, q.pr_sec]
+
+    simp only [mulVec, dotProduct, Finset.mul_sum, mul_left_comm (1 - toEAf D q.e), h4, mul_zero, Finset.sum_const_zero, zero_mem,
+    true_and, map_sum, map_mul, h1, q.pr_sec]
     rfl
   have hs : Function.Surjective (toEAf D) := by
     refine (Algebra.TensorProduct.comm D.host.F (Af D.host.F) D.host.E).surjective.comp ?_
@@ -166,8 +166,8 @@ theorem line_moved (q : SplitPt D k) {PP : Formalism.L2.DIV.Pl D.host.E} (hq : F
   have ht : ∀ i, q.pr (incA D (star ((V.gram *ᵥ u) i))) =
       ∑ j, q.pr (cA D (incA D (V.gram i j))) * q.pr (incA D (star (u j))) := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, star_sum, star_mul', map_sum, map_mul, cA_incA]
+
+    simp only [Matrix.mulVec, dotProduct, star_sum, star_mul', map_sum, map_mul, cA_incA]
   have hsum : ∀ y : Y → k, ∑ i, ∑ j, ((mt V t⁻¹).map q.pr *ᵥ (G.β *ᵥ y)) i * q.pr (cA D (incA D (V.gram i j))) *
       (((mt V t⁻¹).map fun a => q.pr (cA D a)) *ᵥ fun r => A * q.pr (incA D (star (u r)))) j = y m₁ * (A * κ') := by
     intro y
@@ -223,8 +223,8 @@ theorem line_bes (q : SplitPt D k) {PP : Formalism.L2.DIV.Pl D.host.E} (hq : For
   have key : ∀ {m : Type} (M : Matrix (Fin B.V.rank) m D.host.E) (j : m),
       ∑ r, π (M r j) * π (star ((B.V.gram *ᵥ fun r => B.d.e r i) r)) = π (star ((Mᴴ * B.V.gram * B.d.e) j i)) := by
     intro m M j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.mul_assoc, Matrix.mul_apply, star_sum, map_sum]
+
+    rw [Matrix.mul_assoc, Matrix.mul_apply, star_sum, map_sum]
     refine Finset.sum_congr rfl fun r _ => ?_
     rw [star_mul', Matrix.conjTranspose_apply, star_star, map_mul]
     rfl

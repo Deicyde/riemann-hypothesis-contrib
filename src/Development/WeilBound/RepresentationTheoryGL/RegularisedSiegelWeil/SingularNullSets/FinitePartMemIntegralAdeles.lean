@@ -6,7 +6,7 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
@@ -61,8 +61,8 @@ theorem finPart_plc_mem (v : Pl D) {t : Fv D.host.F v ⊗[D.host.F] D.host.E} (h
 
 theorem finPart_mem_of_good {z : AE D} (hb : ∀ v, ¬ IsGood D.host.F D.host.E v → cv D v z = 0)
     (hz : ∀ v, cv D v z ∈ intLoc D.host.F D.host.E v) : finPart D z ∈ intAE D := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← (bA D).sum_repr z, map_sum]
+
+  rw [← (bA D).sum_repr z, map_sum]
   refine sum_mem fun k _ => ?_
   have hN : (den (bE D.host.F D.host.E k) : D.host.F) ≠ 0 := by exact_mod_cast den_ne (bE D.host.F D.host.E k)
   let o : 𝓞 D.host.E := ⟨(den (bE D.host.F D.host.E k) : D.host.E) * bE D.host.F D.host.E k, den_int _⟩
@@ -89,8 +89,8 @@ theorem finPart_mem_of_good {z : AE D} (hb : ∀ v, ¬ IsGood D.host.F D.host.E 
 open Classical in
 theorem cv_sub_plc (z : AE D) (B : Finset (Pl D)) (z' : AE D) (hz' : z' = z - ∑ v ∈ B, plc D.host.E v (cv D v z))
     (w : Pl D) : cv D w z' = if w ∈ B then 0 else cv D w z := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hz', RingHom.map_sub, map_sum]
+
+  rw [hz', RingHom.map_sub, map_sum]
   by_cases hw : w ∈ B
   · rw [if_pos hw, Finset.sum_eq_single w (fun v _ hv => compFin_plc_ne (Ne.symm hv) _) (fun h => absurd hw h),
       compFin_plc_self, sub_self]
@@ -113,8 +113,8 @@ theorem finPart_mem (z : AE D) (hz : ∀ v, cv D v z ∈ intLoc D.host.F D.host.
   have h1 := finite_part_mem_integral_adeles z _ hz hfin _ rfl (cv_sub_plc z hfin.toFinset _ rfl)
   have e : z = (z - ∑ v ∈ hfin.toFinset, plc D.host.E v (cv D v z)) + ∑ v ∈ hfin.toFinset, plc D.host.E v (cv D v z) :=
     (sub_add_cancel _ _).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, RingHom.map_add (f := _), map_sum]
+
+  rw [e, RingHom.map_add (f := _), map_sum]
   exact add_mem h1 (sum_mem fun v _ => finPart_plc_mem v (hz v))
 
 theorem infPart_eq_one {z : AE D} (h : ∀ w, compInf D.host.F D.host.E w z = 1) : infPart D z = 1 := by

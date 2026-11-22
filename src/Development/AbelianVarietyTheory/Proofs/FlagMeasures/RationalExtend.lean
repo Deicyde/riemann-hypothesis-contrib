@@ -119,8 +119,8 @@ theorem _root_.GlobalTheory.HL.RatExt.rational_extend : ∀ {F E : Type} [Field 
     rfl
   · unfold _root_.GlobalTheory.HL.hf
     rw [_root_.GlobalTheory.HL.Places.L_cj]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [hbc, map_sum, map_mul, Matrix.map_apply, _root_.Formalism.MainNotions.S.Loc.LocAt.cj_ιE]
+
+    simp [hbc, map_sum, map_mul, Matrix.map_apply, _root_.Formalism.MainNotions.S.Loc.LocAt.cj_ιE]
   · constructor
     · intro hv
       obtain ⟨φ, hφ⟩ := exists_dual_family_of_linearIndependent hv
@@ -131,8 +131,8 @@ theorem _root_.GlobalTheory.HL.RatExt.rational_extend : ∀ {F E : Type} [Field 
         intro a
         have h := congrArg (A.loc p).ιE (LinearMap.pi_apply_eq_sum_univ (φ b) (v a))
         rw [hφ] at h
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, smul_eq_mul, map_mul] at h
+
+        simp only [map_sum, smul_eq_mul, map_mul] at h
         rw [← h]
         split_ifs <;> simp
       calc c b = ∑ a, c a * (if a = b then 1 else 0) := by simp
@@ -151,8 +151,8 @@ theorem _root_.GlobalTheory.HL.RatExt.rational_extend : ∀ {F E : Type} [Field 
         funext j
         have hj := congrFun hc j
         simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, hbc] at hj ⊢
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← map_zero (A.loc p).ιE, ← hj, map_sum]
+
+        rw [← map_zero (A.loc p).ιE, ← hj, map_sum]
         simp [map_mul])
       exact (map_eq_zero_iff _ (A.loc p).ιE.injective).mp (h a)
 

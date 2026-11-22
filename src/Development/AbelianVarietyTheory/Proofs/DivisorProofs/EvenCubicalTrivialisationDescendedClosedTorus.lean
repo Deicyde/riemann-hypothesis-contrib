@@ -293,7 +293,7 @@ theorem nonempty_tq_of_normal [FiniteDimensional k K] [Normal k K] [Module.Free 
 end Descent
 
 
-set_option maxHeartbeats 800000 in
+
 theorem nonempty_tq {R R' : Type} [CommRing R] [IsDomain R] [IsLocalRing R] [CommRing R'] [IsDomain R'] [IsLocalRing R']
     {ρ : R →+* R'} (hfin : ρ.Finite) (hgal : IsGal ρ) {D : DegData R (maximalIdeal R)}
     {D' : DegData R' (maximalIdeal R')} {hD : IsPullDeg ρ D.toPre D'.toPre} {A' : PolAV (Sp (FractionRing R'))}

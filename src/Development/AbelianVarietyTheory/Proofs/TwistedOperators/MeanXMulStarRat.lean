@@ -36,8 +36,8 @@ theorem continuous_cplx : Continuous (cplx V W B) := by
 theorem cplx_rat (c : Matrix (Fin 1) (Fin k) D.host.E) :
     cplx V W B (c.map (incA D)) = (∑ i, c 0 i • B i).map (incA D) := by
   ext p q
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [cplx, Matrix.sum_apply, map_sum, smul_eq_mul]
+
+  simp [cplx, Matrix.sum_apply, map_sum, smul_eq_mul]
 
 end
 

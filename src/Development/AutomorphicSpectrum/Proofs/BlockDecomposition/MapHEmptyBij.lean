@@ -104,8 +104,8 @@ def cechHom {A B : Sy.{w} R ι} (m : A.Hom B) :
     DCx.Hom (cechCos A).dcx (cechCos B).dcx (RingHom.id R) where
   f p q := (prodHom fun i : Fin (p + 1) → ι => m.φ (ent i)).f q
   ch p q x := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Cos.d_apply, Cos.d_apply, map_sum]
+
+    rw [Cos.d_apply, Cos.d_apply, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_zsmul]
     refine congrArg _ (funext fun t => ?_)

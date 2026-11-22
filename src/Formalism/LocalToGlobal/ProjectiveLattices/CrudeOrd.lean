@@ -69,8 +69,8 @@ theorem cro_ordGe_zero' (t : ℕ) : OrdGe t (0 : PS k n d) := by
 theorem cro_ordGe_sum {t : ℕ} {ι : Type} (s : Finset ι) (f : ι → PS k n d) (hf : ∀ i ∈ s, OrdGe t (f i)) :
     OrdGe t (∑ i ∈ s, f i) := by
   intro m hm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_eq_zero fun i hi => hf i hi m hm
 
 theorem cro_ordGe_mul_left {t : ℕ} (g : PS k n d) {f : PS k n d} (hf : OrdGe t f) : OrdGe t (g * f) := by
@@ -346,8 +346,8 @@ theorem cro_dofN_lin (F : Fin d → PS k 2 d)
       simpa using hF i j
     · intro p l
       fin_cases p <;> simp [pt]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   first
     | (simp only [map_mul, MvPowerSeries.constantCoeff_C, hc]
        simp)
@@ -382,8 +382,8 @@ theorem nabValN_eq_lin [Algebra ℚ k] {O : Type} [CommRing O] [StarRing O] (B :
   set g := FB.expS k ((m : k) • ∑ b : Fin n, ev (n := n) ![pt k d b] (B.hL k h w0)) with hg_def
   have hg1 : constantCoeff g = 1 := by
     apply cro_constCoeff_expS
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [smul_eq_C_mul, map_mul, map_sum]
+
+    rw [smul_eq_C_mul, map_mul, map_sum]
     have : ∀ b : Fin n, constantCoeff (ev (n := n) ![pt k d b] (B.hL k h w0)) = 0 := by
       intro b
       rw [cro_constCoeff_ev, hL0]
@@ -393,8 +393,8 @@ theorem nabValN_eq_lin [Algebra ℚ k] {O : Type} [CommRing O] [StarRing O] (B :
     intro i j
     simp only [FB.FK, FGLaw.mapF, coeff_map, cro_coeff_lin, Algebra.algebraMap_self, RingHom.id_apply]
   unfold nabValN DpolyN
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun a ha => ?_
   rw [map_mul, constantCoeff_C]
   congr 1

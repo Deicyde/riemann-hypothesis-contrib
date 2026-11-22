@@ -130,8 +130,8 @@ theorem transFin_of : TensorGl → JMComm → StepFormula → QdetFacts → Spec
       have h2 : (Subalgebra.toSubmodule K).mkQ (∑ i ∈ Finset.range (n + 1), u ^ i • c i) = 0 := by
         rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
         exact h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum, map_smul] using h2) i hi
+
+      simpa [map_sum, map_smul] using h2) i hi
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at this
     exact this
   have hcB : ∀ i ∈ Finset.range (n + 1), c i ∈ B := hcoefmem B _ hinf (fun u hu => hqB u hu)

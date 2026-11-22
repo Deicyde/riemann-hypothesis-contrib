@@ -73,8 +73,8 @@ theorem hasRes_matMul {n : ℕ} {P : HeightOneSpectrum (𝓞 E)} {A B : Matrix (
     {a b : Matrix (Fin n) (Fin n) (𝓞 E ⧸ P.asIdeal)} (hA : ∀ i j, HasRes P (adAt F P (A i j)) (a i j))
     (hB : ∀ i j, HasRes P (adAt F P (B i j)) (b i j)) (i j : Fin n) :
     HasRes P (adAt F P ((A * B) i j)) ((a * b) i j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.mul_apply, Matrix.mul_apply, map_sum]
+
+  rw [Matrix.mul_apply, Matrix.mul_apply, map_sum]
   exact hasRes_sum Finset.univ fun k _ => by
     rw [map_mul]
     exact hasRes_mul (hA i k) (hB k j)
@@ -187,7 +187,7 @@ noncomputable section
 namespace GlobalTheory.Mem.Col2.TC.ChTw.Match
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem conj_unitary_preserves_stdLat_of_ptOf : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → ∀ (l : I.Laws) (u : B.Word) (n : ℕ) (t s : GA B n)
     (x : ∀ w : (B.primes X).vGs, GL (Fin n) (𝓞 B.fields.E ⧸ w.1.asIdeal)) (h : GLG (E := B.fields.E) (n := n) (SG := (B.primes X).vGs)),
     (∃ p : DecoF B.fields.E n ∅ ∅ ∅, PtOf t p ∧ p.deco.1.N = stdLat B.fields.E n) →

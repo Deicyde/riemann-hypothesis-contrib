@@ -229,7 +229,7 @@ theorem ideal_smul_auxiliary_vector_mem_lattice {A B : HSp D} {c : ℕ} {ε : D.
 end GlobalTheory.AscFin.DepthColumn
 
 
-set_option maxHeartbeats 1000000 in
+
 open GlobalTheory.AscFin.DepthColumn GlobalTheory.FinPl.FrameLat in
 theorem GlobalTheory.AscFin.DepthColumn.scaled_column_mem : OnStd fun {D} _ _ {sc} {G} W F => ∀ σ (h : 2 * (σ + 1) + 2 ≤ D.R.m), ∀ v ∈ G.pl.S0, ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
     (p : GlobalTheory.FinPl.SplitPt D k) (β : GlobalTheory.FinPl.Frame p (G.V (.grid (2 * (σ + 1) + 1) 0)) (Fin (G.V (.grid (2 * (σ + 1) + 1) 0)).rank)) (ϖ : 𝒪[k])
@@ -302,11 +302,11 @@ theorem GlobalTheory.AscFin.DepthColumn.scaled_column_mem : OnStd fun {D} _ _ {s
   have ha1 : a j q = ∑ l, (F.dB (σ + 1) h).extX _ a j l * (F.dB (σ + 1) h).jX l q := by
     change _ = (a * (F.dB (σ + 1) h).pX * (F.dB (σ + 1) h).jX) j q
     rw [Matrix.mul_assoc, HypDec.pX_jX, Matrix.mul_one]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Pi.smul_apply, smul_eq_mul, ha1, map_sum, Finset.mul_sum]
+
+  rw [Pi.smul_apply, smul_eq_mul, ha1, map_sum, Finset.mul_sum]
   change _ = p.pr (∑ l, e₀ * (F.dB (σ + 1) h).extX _ a j l * _)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun l _ => ?_
   have e4 : p.pr ((F.dB (σ + 1) h).jX l q) = ξ * p.pr (incA D ((G.colDec (2 * (σ + 1) + 2) (by omega) h).a l q')) := by
     change p.pr (incA D ((F.dB (σ + 1) h).e l q)) = _

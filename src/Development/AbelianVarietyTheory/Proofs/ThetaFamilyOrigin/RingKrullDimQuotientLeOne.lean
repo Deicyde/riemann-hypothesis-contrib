@@ -126,9 +126,9 @@ private theorem exists_mem_notMem_homogeneous_prime_of_finite_points {K T : Type
   have hh1 : h ∈ 𝒜 1 := Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hx i)
   have hψh : ∀ ψ : T →ₐ[K] K, ψ h = (pol ψ).eval t := by
     intro ψ
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [h, pol, map_sum, map_smul, smul_eq_mul, Polynomial.eval_finsetSum,
-      Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X]
+
+    simp only [h, pol, map_sum, map_smul, smul_eq_mul, Polynomial.eval_finsetSum,
+    Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X]
     exact Finset.sum_congr rfl fun i _ => mul_comm _ _
   have hne : Q ⊔ Ideal.span {h} ≠ ⊤ :=
     sup_span_ne_top_of_homogeneous_pos_degree hQ hQp.ne_top hh1 one_pos

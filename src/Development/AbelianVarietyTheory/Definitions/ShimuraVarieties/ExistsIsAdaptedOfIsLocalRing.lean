@@ -198,8 +198,8 @@ theorem exists_isAdapted_of_free (F : FullFlag (R := R) (M := M) n) (h : ∀ i, 
     obtain ⟨i, hi, hmax⟩ := Finset.exists_max_image (Finset.univ.filter fun i => a i ≠ 0) id
       (by obtain ⟨i, hi⟩ := hne; exact ⟨i, by simpa using hi⟩)
     have h0 : e i (π i (∑ j, a j • v j)) = a i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum, Finset.sum_eq_single i _ (by simp)]
+
+      rw [map_sum, map_sum, Finset.sum_eq_single i _ (by simp)]
       · simp [v, h₁]
       · intro j _ hj
         by_cases haj : a j = 0

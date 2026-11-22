@@ -165,8 +165,8 @@ private theorem cc_d_ev_lemma_4 {m n : ℕ} {a : Fin m → Pt R n d} (ha : ZZ a)
     simp [map_add (f := _), Finsupp.degree_single]
   have hR : coeff e (∑ p : Fin m × Fin d,
       ev a (pderiv p (f - (P : PS R m d))) * pderiv t (a p.1 p.2)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_eq_zero fun p _ => ?_
     rw [coeff_mul]
     refine Finset.sum_eq_zero fun x hx => ?_
@@ -190,8 +190,8 @@ private theorem cc_d_ev_lemma_4 {m n : ℕ} {a : Fin m → Pt R n d} (ha : ZZ a)
 theorem cc_d_ev {m n : ℕ} {a : Fin m → Pt R n d} (ha : ZZ a) (t : Fin n × Fin d) (f : PS R m d) :
     constantCoeff (pderiv t (ev a f)) =
       ∑ p : Fin m × Fin d, constantCoeff (pderiv p f) * constantCoeff (pderiv t (a p.1 p.2)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [cc_d_ev_lemma_4 ha t f, map_sum]
+
+  rw [cc_d_ev_lemma_4 ha t f, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
   rw [map_mul, cc_ev ha]
 
@@ -201,8 +201,8 @@ theorem cc_dd_ev {m n : ℕ} {a : Fin m → Pt R n d} (ha : ZZ a) (s t : Fin n �
       ∑ p : Fin m × Fin d, (∑ q : Fin m × Fin d, constantCoeff (pderiv q (pderiv p f)) *
         constantCoeff (pderiv s (a q.1 q.2))) * constantCoeff (pderiv t (a p.1 p.2)) := by
   have hchain := cc_d_ev_lemma_4 ha t f
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hchain, map_sum, map_sum]
+
+  rw [hchain, map_sum, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
   rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul, map_add (f := _), map_mul, map_mul, cc_ev ha, hf, zero_mul, zero_add,
     cc_d_ev ha, mul_comm]

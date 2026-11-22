@@ -70,8 +70,8 @@ theorem pPart_elim (A : Matrix (Fin (j + j')) (Sg j j') ℂ) (v : Fin j → ℂ)
     · simp [Finset.sum_apply, Pi.single_apply]
     · simp [Finset.sum_apply, Pi.single_apply]
   change pPartL C R τ _ = ∑ i, v i • pPartL C R τ _ + ∑ b, x b • pPartL C R τ _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hs, Matrix.mulVec_add, map_add (f := _), Matrix.mulVec_sum, Matrix.mulVec_sum, map_sum, map_sum]
+
+  rw [hs, Matrix.mulVec_add, map_add (f := _), Matrix.mulVec_sum, Matrix.mulVec_sum, map_sum, map_sum]
   simp [Matrix.mulVec_smul]
 
 end

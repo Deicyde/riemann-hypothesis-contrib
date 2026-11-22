@@ -41,8 +41,8 @@ theorem exists_indep_comb {K R V : Type} [Field K] [AddCommGroup R] [Module K R]
   · funext m
     exact (Fintype.linearIndependent_iff.1 hlin) c (by simpa only [hsm] using hc) m
   · rw [← hv]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smulₛₗ, Finset.smul_sum, smul_smul, hgv]
+
+    simp only [map_sum, map_smulₛₗ, Finset.smul_sum, smul_smul, hgv]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [← Finset.sum_smul, hzexp k]
@@ -144,7 +144,7 @@ end Geometric
 
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar in
-set_option maxHeartbeats 1000000 in
+
 theorem cusp_descends : ∀ (D : D7) (T : CoreJ D), LawsJ T → ∀ j, Formalism.L2.Pj.InR D j → ∀ σ : T.Q.c.F →+* ℂ, GoodEmb T.Q.c σ → ∀ w : WeightFamilies.Wt D j, w.LastPos → 0 < w.n → holSub0 (T.U j σ).X (laU (T.U j σ) (wtA w) w.n) ⊓ Submodule.span ℂ (rdU (T.U j σ) '' (sec (T.Q.Xo j) T.Q.c (wtA w) w.n : Set (Rul (T.Q.Xo j) T.Q.c))) ≤ Submodule.span ℂ (rdU (T.U j σ) '' {f | f ∈ sec (T.Q.Xo j) T.Q.c (wtA w) w.n ∧ rdU (T.U j σ) f ∈ holSub0 (T.U j σ).X (laU (T.U j σ) (wtA w) w.n)}) := by
   intro D T h j hj σ hσ w hw hn
   have hfr : Module.finrank ℚ D.host.E = 2 * D.R.f := Formalism.L2.Pj.hostSize_finrank D

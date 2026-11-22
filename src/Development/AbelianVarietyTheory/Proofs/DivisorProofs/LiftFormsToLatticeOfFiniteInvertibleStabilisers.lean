@@ -41,8 +41,8 @@ theorem lift_forms_of_card_isUnit : ∀ (O : Type) [CommRing O] (G : Type) [Grou
       rw [← Nat.cast_smul_eq_nsmul O, smul_smul, ← Nat.card_eq_fintype_card, ← hu', Units.inv_mul,
         one_smul]
     · intro h hk
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_smul, map_sum]
+
+      rw [map_smul, map_sum]
       congr 1
       have hmul : ∀ x : {γ : Γ // s⁻¹ * (γ : G) * s ∈ K},
           s⁻¹ * ((h * x.1 : Γ) : G) * s ∈ K := by

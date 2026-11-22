@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 @[expose] public section
 
 open MeasureTheory ValuativeRel Matrix Topology GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.genericLevelOfFrame_block_and_character :
     ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
       (ψ : AddChar k Circle) (ϖ : kˣ) (κ l : ℕ)

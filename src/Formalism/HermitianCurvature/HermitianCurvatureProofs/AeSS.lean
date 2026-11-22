@@ -27,7 +27,7 @@ theorem ae_mem_UWset_and_mem_Nset {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup
     exact measure_mono_null (fun x hx => hx) D.haarN.conc
   exact (Measure.quasiMeasurePreserving_fst.ae hW).and (Measure.quasiMeasurePreserving_snd.ae hN)
 
-set_option maxHeartbeats 800000 in
+
 theorem quadB_of (hNI : NormInv) (hGS : GrowthS) (hGG : GrowthG) (hDD : DecDD) (hIn : Inputs) {k r : ℕ}
     {Wp Wq : Type}
     [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp] [FiniteDimensional ℂ Wp]

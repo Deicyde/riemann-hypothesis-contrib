@@ -48,7 +48,7 @@ open GlobalTheory.BadCount
 open scoped TensorProduct
 open GlobalTheory.FlatLine GlobalTheory.FlatTw GlobalTheory.IndefiniteRowSideFullHecke.ComponentMassSum GlobalTheory.ShFam GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions.TH
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

@@ -54,10 +54,10 @@ theorem pr_diag_norm : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E
     simp only [Matrix.mul_assoc]
   have hsum : Matrix.trace (dD' * Y * dD * (Y.map c)ᵀ) =
       algebraMap F E (∑ i, ∑ j, D' i * D j * Algebra.norm F (Y i j)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.trace, diag_apply, Matrix.mul_apply, dD', dD, diagonal_apply, ite_mul, mul_ite, zero_mul, mul_zero,
-      Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true, transpose_apply, map_apply,
-      map_sum, map_mul, hE.algebraMap_norm]
+
+    simp only [Matrix.trace, diag_apply, Matrix.mul_apply, dD', dD, diagonal_apply, ite_mul, mul_ite, zero_mul, mul_zero,
+    Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true, transpose_apply, map_apply,
+    map_sum, map_mul, hE.algebraMap_norm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
   obtain ⟨b, -, -⟩ := hE.basis

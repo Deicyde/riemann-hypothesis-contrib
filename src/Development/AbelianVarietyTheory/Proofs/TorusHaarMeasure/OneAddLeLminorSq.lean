@@ -214,8 +214,8 @@ theorem hq_conj {r : ℕ} (H : Matrix (Fin r) (Fin r) ℂ) (u : Fin r → ℂ) :
   unfold hq
   rw [← Complex.conj_re (star u ⬝ᵥ _)]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [dotProduct, mulVec, map_sum]
+
+  simp [dotProduct, mulVec, map_sum]
 
 end Mat
 

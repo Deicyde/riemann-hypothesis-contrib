@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DvdPowZer
 @[expose] public section
 
 open Matrix
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_elementaryDivisors_integral_preimage_lattice : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ϖ : L),
     Valued.v ϖ = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) →
     ∀ (n n' : ℕ) (x : Matrix (Fin n') (Fin n) L),

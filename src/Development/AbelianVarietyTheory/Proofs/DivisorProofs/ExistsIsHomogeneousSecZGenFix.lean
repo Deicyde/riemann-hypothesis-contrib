@@ -13,7 +13,7 @@ open GlobalTheory.AllWt (Psi wtOf cuspOn latOn normOn petOn GoodOn GoodW bergOn 
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
 open GlobalTheory.HSApp
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.LamT (CMPt)
 
 namespace GlobalTheory.FieldPolyZ

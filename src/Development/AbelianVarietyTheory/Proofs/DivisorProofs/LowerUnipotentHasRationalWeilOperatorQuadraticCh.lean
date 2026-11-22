@@ -135,8 +135,8 @@ theorem evFin_quad (b : Matrix κ κ F) (v : Pl (F := F)) (x : κ → AF F) :
       have hmul : evFin F v (2 * ⅟(2 : AF F)) = 1 := by rw [mul_invOf_self, map_one]
       rwa [map_mul, map_ofNat] at hmul
     rw [hmap, invOf_eq_inv]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [quad, dotProduct, Matrix.mulVec, map_sum, h]
+
+  simp [quad, dotProduct, Matrix.mulVec, map_sum, h]
 
 theorem psi_quad_rat (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ) (b : Matrix κ κ F) (ξ : κ → F) :
     ψ (quad (⅟2) (-(b.map (algebraMap F (AF F)))) (fun i => algebraMap F (AF F) (ξ i))) = 1 := by

@@ -34,21 +34,21 @@ theorem _root_.GlobalTheory.exists_embedding_idempotent_tensor (F K L : Type) [F
     refine Finset.sum_congr rfl fun j _ => ?_
     congr 1
     conv_lhs => rw [← b.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_mul, map_sum]
+
+    rw [Finset.sum_mul, map_sum]
     simp [smul_mul_assoc, hbd]
   have hs0 : s ≠ 0 := by
     intro h
     have htr : Algebra.trace F K s = (Module.finrank F K : F) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hs, map_sum]
+
+      rw [hs, map_sum]
       simp [hbd]
     rw [h, map_zero] at htr
     exact (Module.finrank_pos (R := F) (M := K)).ne' (Nat.cast_eq_zero.mp htr.symm)
   refine ⟨Module.finrank F K, fun j => τ (s⁻¹ * b j), d, ?_, fun y => ?_⟩
   · calc ∑ j, τ (s⁻¹ * b j) * τ (d j) = τ (s⁻¹ * s) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp only [← map_mul, ← map_sum, hs, Finset.mul_sum, mul_assoc]
+
+          simp only [← map_mul, ← map_sum, hs, Finset.mul_sum, mul_assoc]
       _ = 1 := by rw [inv_mul_cancel₀ hs0, map_one]
   · have lhs : ∑ j, τ (s⁻¹ * b j) ⊗ₜ[F] (y * d j) =
         ∑ j, ∑ i, (Algebra.trace F K (y * d j * b i) • τ (s⁻¹ * b j)) ⊗ₜ[F] d i := by
@@ -61,8 +61,8 @@ theorem _root_.GlobalTheory.exists_embedding_idempotent_tensor (F K L : Type) [F
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [← map_mul, mul_left_comm]
       conv_lhs => rw [← hb (y * b i)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.mul_sum, map_sum, TensorProduct.sum_tmul]
+
+      rw [Finset.mul_sum, map_sum, TensorProduct.sum_tmul]
       simp_rw [mul_smul_comm, map_smul]
     rw [lhs, rhs, Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_

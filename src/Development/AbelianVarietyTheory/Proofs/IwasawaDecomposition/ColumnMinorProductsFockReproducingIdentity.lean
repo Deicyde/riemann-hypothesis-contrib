@@ -73,9 +73,9 @@ theorem reproducing (N : ℕ) (Y : YoungDiagram) (hY : Y.colLen 0 ≤ N) (h : Mv
   have hev : eval (idFrame ℚ N N) (rowAct ℚ z h) = eval x h := by
     have : (eval (idFrame ℚ N N)).comp (rowAct ℚ z).toRingHom = eval x := by
       refine MvPolynomial.ringHom_ext (fun a => by simp [rowAct]) fun v => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, rowAct, aeval_X, eval_X,
-        map_sum, map_mul, eval_C, idFrame]
+
+      simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, rowAct, aeval_X, eval_X,
+      map_sum, map_mul, eval_C, idFrame]
       rw [Finset.sum_eq_single v.2]
       · simp [hz]
       · intro b _ hb
@@ -86,8 +86,8 @@ theorem reproducing (N : ℕ) (Y : YoungDiagram) (hY : Y.colLen 0 ≤ N) (h : Mv
       ∑ J : GlobalTheory.WeylLatDualProof.IncreasingRowChoicePerColumn N Y, fockQ h (colProd ℚ N Y hY J) * eval x (colProd ℚ N Y hY J) := by
     rw [hz, rowAct_hw_expand, (fockQPos _ _ _).1]
     change L _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun J _ => ?_
     rw [C_mul', L.map_smul, smul_eq_mul, mul_comm]
     change fockQ _ h * _ = _
@@ -95,8 +95,8 @@ theorem reproducing (N : ℕ) (Y : YoungDiagram) (hY : Y.colLen 0 ≤ N) (h : Mv
   have key2 : fockQ h (rowAct ℚ z.transpose (hw ℚ le_rfl μ)) = eval x h * fockQ (hw ℚ le_rfl μ) (hw ℚ le_rfl μ) := by
     rw [← fock_space_row_action, (fockQPos _ _ _).1,
       fock_space_highest_weight N N le_rfl μ hanti _ (dualWeylRowStable ℚ N N μ z h hh), hev]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, smul_eval]
+
+  rw [map_sum, smul_eval]
   simp only [smul_eval]
   rw [← key1, key2, mul_comm]
 

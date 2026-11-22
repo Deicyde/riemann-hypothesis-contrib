@@ -42,12 +42,12 @@ theorem eventually_mem_intLoc_iff_repr {d : ℕ} (b : Module.Basis (Fin d) F E) 
     intro x k
     have hx : (x : E) = ∑ j, (ω.repr x j) • ((ω j : 𝓞 E) : E) := by
       have := congrArg (algebraMap (𝓞 E) E) (ω.sum_repr x)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at this
+
+      rw [map_sum] at this
       simp only [map_zsmul] at this
       exact this.symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hx, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_sum]
+
+    rw [hx, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply, map_sum]
     refine sum_mem fun j _ => ?_
     rw [map_zsmul, Finsupp.smul_apply, map_zsmul]
     exact zsmul_mem (h1 j k) _

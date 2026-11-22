@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqOfSecAlgTo
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry Opposite
 open scoped TensorProduct
 open GlobalTheory.HilbAff in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.ker_affineHilbertTensor_pullback_eq_map :
     ∀ (A B C : Type) [CommRing A] [CommRing B] [Algebra A B] [CommRing C] [Algebra A C]
       (J : Ideal (C ⊗[A] B)) (Z : Scheme.{0}) (h : Z ⟶ Spec (CommRingCat.of C))

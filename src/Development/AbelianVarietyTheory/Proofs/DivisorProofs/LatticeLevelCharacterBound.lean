@@ -59,15 +59,15 @@ theorem mem_span_image_eigen {K L V W Γ G : Type} [Field K] [Field L] [CharZero
     refine Submodule.span_le.2 ?_
     rintro _ ⟨v, rfl⟩
     refine Submodule.subset_span ⟨∑ u : P, (((lam u)⁻¹ : Kˣ) : K) • ρ u v, fun x => ?_, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sum, Finset.smul_sum]
-        refine Fintype.sum_equiv (Equiv.mulLeft x) _ _ fun u => ?_
-        rw [map_smul, ← hρ, smul_smul, Equiv.coe_mulLeft, map_mul, Subgroup.coe_mul]
-        congr 1
-        rw [mul_inv, Units.val_mul, Units.mul_inv_cancel_left]
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sum, LinearMap.sum_apply]
-        exact Finset.sum_congr rfl fun u _ => by rw [map_smulₛₗ, LinearMap.smul_apply, hc, hs]
+
+    · rw [map_sum, Finset.smul_sum]
+      refine Fintype.sum_equiv (Equiv.mulLeft x) _ _ fun u => ?_
+      rw [map_smul, ← hρ, smul_smul, Equiv.coe_mulLeft, map_mul, Subgroup.coe_mul]
+      congr 1
+      rw [mul_inv, Units.val_mul, Units.mul_inv_cancel_left]
+
+    · rw [map_sum, LinearMap.sum_apply]
+      exact Finset.sum_congr rfl fun u _ => by rw [map_smulₛₗ, LinearMap.smul_apply, hc, hs]
   have h3 := h2 hw
   rw [Submodule.mem_comap, h1] at h3
   exact (Submodule.smul_mem_iff _ (Nat.cast_ne_zero.2 Fintype.card_ne_zero)).1 h3
@@ -208,7 +208,7 @@ theorem exists_root (p : PtAt ex Csz) (k : Fin 2) : ∃ ζ : p.T.Q.c.F, IsPrimit
   exact ⟨_, hz.pow (Nat.pos_of_ne_zero hN0) (hc.trans (mul_comm _ _))⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem typeK_eq (p : PtAt ex Csz) (i : Fin D.R.m) (lam : (p.F.lv2.lvl false).P →* (p.T.Q.c.F)ˣ)
     (hlam : ∀ u : (p.F.lv2.lvl false).P, algebraMap p.T.Q.c.F D.what₂.LL (lam u : (p.T.Q.c.F)ˣ) =
       (((p.R.toRealDat.FW i).chi u * (p.F.lv2.lvl false).ψ⁻¹ u : D.what₂.LLˣ) : D.what₂.LL)) :
@@ -229,7 +229,7 @@ theorem typeK_eq (p : PtAt ex Csz) (i : Fin D.R.m) (lam : (p.F.lv2.lvl false).P 
   exact ⟨fun ⟨h, hf⟩ => ⟨h, fun u => (key ⟨f, h⟩ u).1 (hf u)⟩, fun ⟨h, hf⟩ => ⟨h, fun u => (key ⟨f, h⟩ u).2 (hf u)⟩⟩
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem latDeep_eq_latN (p : PtAt ex Csz) (i : Fin D.R.m) (Y : Cov p i) {e : ℕ} {o : ℝ} (hY : Y.Good e o) :
     ∃ (fr : TypeFrame (dat p i) Y.d.l₂) (ψ : ∀ v : Sq D.host, AddChar (ZMod (D.host.g v.1)) Y.d.c₂.F),
       (∀ v, ψ v ≠ 1) ∧ IsTypeLevel Y.d.l₂ ∧ latDeep p i Y = latN fr Y.U (Gk p i) ψ := by

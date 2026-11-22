@@ -46,8 +46,8 @@ private theorem coeff_det_generic_sum_eval {X O : Type} [CommRing O] {n m : ℕ}
   have h1 : φ.mapMatrix (∑ k, (MvPolynomial.X k : MvPolynomial (Fin m) (X → O)) •
       Matrix.of (fun i j => MvPolynomial.C (fun y => a k y i j))) =
       ∑ k, (MvPolynomial.X k : MvPolynomial (Fin m) O) • (a k x).map MvPolynomial.C := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     refine Matrix.ext fun i j => ?_
     simp [hφ]
@@ -80,8 +80,8 @@ theorem coeff_det_generic_sum_mem_of_inRing :
     rintro _ ⟨g, rfl⟩ _ ⟨h, rfl⟩
     refine ⟨g * h, ?_⟩
     refine Matrix.ext fun i j => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [M, Matrix.mul_apply, Matrix.of_apply, ← map_mul, ← map_sum]
+
+    simp only [M, Matrix.mul_apply, Matrix.of_apply, ← map_mul, ← map_sum]
     congr 1
     funext y
     simp [mat, Matrix.mul_apply, Finset.sum_apply]

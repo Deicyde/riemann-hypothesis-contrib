@@ -17,7 +17,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 
-set_option maxHeartbeats 2000000
+
 
 namespace GlobalTheory.GoodPlaceAtState
 

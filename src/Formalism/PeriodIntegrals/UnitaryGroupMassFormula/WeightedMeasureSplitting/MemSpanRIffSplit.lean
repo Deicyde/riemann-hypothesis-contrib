@@ -59,8 +59,8 @@ theorem mapV_mem_spanR {m : ℕ} (Y : Fin m → Fin n → E) (s : Set (Fin m)) (
 
 theorem hR_mapV (x y : Fin n → R ⊗[F] E) :
     hR R' σ J (mapV (E := E) φ x) (mapV (E := E) φ y) = tensMap (E := E) φ (hR R σ J x y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hR, Formalism.UG.hform, map_sum, map_mul, mapV_apply]
+
+  simp only [hR, Formalism.UG.hform, map_sum, map_mul, mapV_apply]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have h1 : tensMap (E := E) φ (sigR R σ (x i)) = sigR R' σ (tensMap (E := E) φ (x i)) := by
     have := congrArg (fun f : R ⊗[F] E →+* R' ⊗[F] E => f (x i)) (tensMap_sigR (E := E) φ σ)

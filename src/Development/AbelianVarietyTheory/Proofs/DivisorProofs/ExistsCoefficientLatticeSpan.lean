@@ -26,8 +26,8 @@ open Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMas
 open Formalism.IndefR.FWT GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option autoImplicit false
@@ -56,15 +56,15 @@ theorem clSum_trU_of_lift {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Ty
     clSum (presV R i t) (kern R i t) (trU (A.leftGroupActionLift i t) U ψ f) v =
       levelTrace R i U ψ (clSum (presV R i t) (kern R i t) f v) := by
   unfold levelTrace gaL
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [trU_apply, map_sum, Finset.sum_apply, LinearMap.sum_apply]
+
+  rw [trU_apply, map_sum, Finset.sum_apply, LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [map_smulₛₗ, clSum_equiv_of_lift hS hl, LinearMap.smul_apply, invChar, apply_dite D.what₂.embLL, map_zero]
   rfl
 
 
 open GlobalTheory.TraceIncl in
-set_option maxHeartbeats 4000000 in
+
 theorem exists_adForm_levelTrace {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
     {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} {i : Fin D.R.m} {t : T0}
     (hS : HidaSetting R i t) (hl : ∀ g0 : G0 R.Pg D.R.r, ∃ κ', Formalism.IndefR.Lev.IsLevelLift (Wc D i) (R.βW i) (R.datWp i R.triv) g0 κ')

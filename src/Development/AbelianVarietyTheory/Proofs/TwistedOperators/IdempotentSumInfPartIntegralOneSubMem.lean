@@ -23,8 +23,8 @@ open scoped Pointwise TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 namespace GlobalTheory.IdemSumIdeal
 
@@ -81,8 +81,8 @@ theorem isIdemSum_props : ∀ {D : D7} (e : AE D) (P : Finset (Formalism.L2.DIV.
   intro D e P d h
   obtain ⟨⟨es, hes, he⟩, -⟩ := id h
   have hint : toEAf D e ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [he, map_sum]
+
+    rw [he, map_sum]
     exact sum_mem fun w hw => (idemOf_toEAf (hes w hw)).mem
   refine ⟨?_, hint, ?_⟩
   · set_option synthInstance.maxHeartbeats 100000 in

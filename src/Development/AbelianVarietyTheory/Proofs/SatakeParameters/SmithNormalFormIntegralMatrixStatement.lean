@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemIntMat
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.smith_normal_form_integral_matrix : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (ϖ : L),
     Valued.v ϖ = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) →
     ∀ (n n' : ℕ) (x : Matrix (Fin n') (Fin n) L),

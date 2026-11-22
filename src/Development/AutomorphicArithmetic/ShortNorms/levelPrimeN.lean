@@ -36,7 +36,7 @@ private theorem ev_log_le {a k : ℝ} (ha : 0 < a) (hk : 0 < k) (A D : ℝ) (hD 
     nlinarith [le_abs_self A]
   linarith
 
-set_option maxHeartbeats 800000 in
+
 theorem levelPrimeN :
     ShortNorm → ∀ eps : ℝ, 0 < eps → eps < 1 / 52 → ∀ cs CY : ℝ, 0 < cs → 0 < CY → ∃ x₀ : ℝ, ∀ x ≥ x₀, ∀ N d g₁ g₂ m : ℕ,
       ModAt x eps N d → 1 ≤ g₁ → 1 ≤ g₂ → Real.log g₁ ≤ CY * x ^ eps → Real.log g₂ ≤ CY * x ^ eps → x ^ ((1 : ℝ) / 3) ≤ m →

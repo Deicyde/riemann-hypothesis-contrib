@@ -16,21 +16,21 @@ namespace GlobalTheory.CoefDuty.MemberO
 
 variable {D : D7}
 
-set_option maxHeartbeats 1000000 in
+
 theorem live_iff (L : LocAll (lay0 D)) (i : L.X.nd.Loc) : Live (withLoc L).nd i ↔ Live L.lay.fixZ.nd i := Iff.rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem zdecomp_iff (L : LocAll (lay0 D)) (i : L.X.nd.Loc) : ZDecomp (withLoc L).nd i ↔ ZDecomp L.lay.fixZ.nd i := Iff.rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem chosen_iff (L : LocAll (lay0 D)) (i : L.X.nd.Loc) (S : Set ℂ) :
     Chosen (withLoc L).nd (withLoc L).naut i S ↔ Chosen L.lay.fixZ.nd L.lay.fixZ.naut i S := Iff.rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem goodR_iff (L : LocAll (lay0 D)) (i : L.X.nd.Loc) :
     (∃ r, GoodR (withLoc L).nd i r) ↔ ∃ r, GoodR L.lay.fixZ.nd i r := Iff.rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem taken_iff (L : LocAll (lay0 D)) (i : L.X.nd.Loc) :
     (∃ r ρ, GoodR (withLoc L).nd i r ∧ TakenWild (withLoc L).nd i r ρ) ↔
       ∃ r ρ, GoodR L.lay.fixZ.nd i r ∧ TakenWild L.lay.fixZ.nd i r ρ := Iff.rfl

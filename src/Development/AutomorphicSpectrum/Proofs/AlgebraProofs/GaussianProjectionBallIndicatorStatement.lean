@@ -10,7 +10,7 @@ set_option maxSynthPendingDepth 1
 open GroundTheory.Heights₂.Heights MeasureTheory MvPolynomial Matrix GlobalTheory.CompanionTheory.Ar.Short.Crofton
 open scoped ENNReal
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.gaussian_projection_ball_indicator : ∀ (n m : ℕ) (h : HermNorm n) (J : Ideal (MvPolynomial (Fin n) ℂ)), IsProjPrime J → 0 < m → m ≤ n →
   (∀ᵐ π : Fin m → Fin n → ℂ, ∀ᵐ w : EuclideanSpace ℂ (Fin m), fibreCount h J π w ≠ ⊤) →
   ∀ A : Set (EuclideanSpace ℂ (Fin n)), MeasurableSet A →

@@ -214,7 +214,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7} {u : D.what₂.Word}
 
 
-set_option maxHeartbeats 1000000 in
+
 structure StepCharts (C : ColumnChain D.R D.what₂.Tau (D.hcW u)) (i : ℕ) (hi : i ≤ D.R.m) where
 
   T : ℕ

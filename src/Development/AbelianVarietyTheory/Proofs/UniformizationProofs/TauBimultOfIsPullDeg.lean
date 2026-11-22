@@ -169,7 +169,7 @@ theorem val_psiW (hD : IsPullDeg φ D D') {y : (TK R').left} {J J'} (hJ : Good D
   rw [Category.id_comp]
   exact zpow_neg_one _
 
-set_option maxHeartbeats 1000000 in
+
 theorem tauBimult_pull (hG : GlobalFnsSt) (hD : IsPullDeg φ D D') (hB : D.TauBimult) : D'.TauBimult := by
   intro a a' b
   refine corr_of_val D'.P.isLB fun y J' hJ' => ?_

@@ -58,8 +58,8 @@ theorem UpperTheory.Reformulated.B.HilbertNinetyCapelliIdentities.h90 :
   have key : ∀ g : Gal(Ω/K),
       f g * g (∑ q, f q.out * χ q x) = ∑ q, f q.out * χ q x := by
     intro g
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.mul_sum]
+
+    rw [map_sum, Finset.mul_sum]
     refine Fintype.sum_equiv (MulAction.toPerm g) _ _ fun q => ?_
     have hq : g • q = QuotientGroup.mk (g * q.out) := by
       conv_lhs => rw [← QuotientGroup.out_eq' q]

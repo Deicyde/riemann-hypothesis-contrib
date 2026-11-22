@@ -123,8 +123,8 @@ theorem UpperTheory.ConvolutionTheory.D.hasseEt : UpperTheory.ConvolutionTheory.
   have h1 : Algebra.TensorProduct.map (Ideal.Quotient.mkₐ F m.asIdeal) (AlgHom.id F E)
       (∑ j, c j ⊗ₜ[F] b j) = y m := by
     conv_rhs => rw [← (Algebra.TensorProduct.basis _ b).sum_repr (y m)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Algebra.TensorProduct.map_tmul, Algebra.TensorProduct.basis_apply, ← hc m j,
       TensorProduct.smul_tmul', smul_eq_mul, mul_one]

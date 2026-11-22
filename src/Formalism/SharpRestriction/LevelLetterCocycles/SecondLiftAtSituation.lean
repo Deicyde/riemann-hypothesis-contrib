@@ -25,7 +25,7 @@ variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp]
     {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
     [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
 
-set_option maxHeartbeats 1000000 in
+
 theorem second_lift_at_situation [NeZero n] (W : LocWach PD LL O v n) (hZ : TTool2Z W)
     (hF : Formalism.MainNotions.CrystallineLiftingInputs.FTool W) (hB : Sh.BasTool W) (hK : Sh.LemK W) (hD : Sh.FilDim W)
     (hR : Sh.ExpRing W) (hE : Sh.ExpRules W)
@@ -352,8 +352,8 @@ theorem second_lift_at_situation [NeZero n] (W : LocWach PD LL O v n) (hZ : TToo
       (fun c' => tL c' f₁) d) = liftCorrectionSum W T₂ s₁ σ (y f) (fun c' => ms c' f) (fun c' => tL c' f₁) d := by
     intro δ hδ
     unfold liftCorrectionSum
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun c hc => ?_
     have h1 : W.γD T₂ δ (liftCorrection W T₂ s₁ σ (y f) (fun c' => ms c' f) (fun c' => tL c' f₁) c) =
         liftCorrection W T₂ s₁ σ (y f) (fun c' => ms c' f) (fun c' => tL c' f₁) c := (hmhDL c hc f₁).2 δ hδ

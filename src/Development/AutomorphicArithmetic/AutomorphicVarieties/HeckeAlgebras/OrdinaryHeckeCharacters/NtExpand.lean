@@ -12,7 +12,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 private lemma nt_expand {R : Type*} [Ring R] (y : R) (m : ℕ) :
     ∃ w : R, (1 + y) ^ m = 1 + m • y + (m.choose 2) • (y * y) + y * y * y * w := by

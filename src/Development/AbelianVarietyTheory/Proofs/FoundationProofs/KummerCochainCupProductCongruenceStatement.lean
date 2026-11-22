@@ -48,7 +48,7 @@ private theorem exists_half (p n : ℕ) (hp : p.Prime) (h2 : p ≠ 2) :
   push_cast at this
   rw [this]; ring
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.kummer_cochain_cup_product_congruence : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω] (H : Subgroup (Gal p Ω)) (n c : ℕ)
   (a b lz lq : Gal p Ω → ZMod (p ^ n)) (A B A' B' : Ω),
   (∀ g ∈ H, ∀ h ∈ H, a (g * h) = a g + a h) → (∀ g ∈ H, ∀ h ∈ H, b (g * h) = b g + b h) →

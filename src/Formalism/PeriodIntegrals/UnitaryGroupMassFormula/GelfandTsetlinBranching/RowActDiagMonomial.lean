@@ -33,8 +33,8 @@ theorem PsiB_wnB (n N : ℕ) (v : Fin N × Fin N) : PsiB n (wnB n N v) = psiB n 
 
 theorem weight_psiB (n N : ℕ) (e : Fin N × Fin N →₀ ℕ) :
     Finsupp.weight (psiB n N) e = PsiB n (Finsupp.weight (wnB n N) e) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finsupp.weight_apply, Finsupp.weight_apply, Finsupp.sum, Finsupp.sum, map_sum]
+
+  rw [Finsupp.weight_apply, Finsupp.weight_apply, Finsupp.sum, Finsupp.sum, map_sum]
   refine Finset.sum_congr rfl fun v _ => ?_
   rw [map_nsmul, PsiB_wnB]
 
@@ -91,8 +91,8 @@ theorem rowAct_diag_homog {n N : ℕ} (t : Fin n → ℂ) (g : MvPolynomial (Fin
     Formalism.GradedWeylDivisibility.rowAct ℂ (n := N) (Matrix.diagonal (dB n N t)) g = chiB t m • g := by
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.smul_sum]
+
+  rw [map_sum, Finset.smul_sum]
   refine Finset.sum_congr rfl fun e he => ?_
   rw [rowAct_diag_monomial, hg (mem_support_iff.mp he)]
 
@@ -140,8 +140,8 @@ theorem sep_mem_B {ι T V : Type*} [DecidableEq ι] [AddCommGroup V] [Module ℂ
     let y' : ι → V := fun i => (p i t - p i1 t) • y i
     have hy'1 : y' i1 = 0 := by simp [y']
     have hsum : ∑ i ∈ F.erase i1, y' i = C t (∑ i ∈ F, y i) - p i1 t • ∑ i ∈ F, y i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_erase _ hy'1, map_sum, Finset.smul_sum, ← Finset.sum_sub_distrib]
+
+      rw [Finset.sum_erase _ hy'1, map_sum, Finset.smul_sum, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun i hi => ?_
       simp only [y']
       rw [hy i hi t, sub_smul]

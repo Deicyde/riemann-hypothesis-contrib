@@ -15,7 +15,7 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -25,8 +25,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
 open Formalism.MainNotions.IntegralHeckeForms (HkIdx)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 section General
 variable {D : D7}
 theorem exists_frob_unit_and_hkF_zero_eq_of_built {hL : _root_.UpperTheory.Zero.LLC.RecTExists} (b : _root_.GlobalTheory.HeightCounting.NormChoiceConstructed hL D) (h0 : ∀ j P, b.hL j 0 P = 1) :

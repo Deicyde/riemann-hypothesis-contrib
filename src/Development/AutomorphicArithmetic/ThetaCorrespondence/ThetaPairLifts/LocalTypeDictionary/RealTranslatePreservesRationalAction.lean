@@ -125,8 +125,8 @@ theorem rationalAction_real_translate : ∀ {D : D7} {T : Type} [Finite T] {L : 
     simp only [hPT]
     rw [e, Module.End.mul_apply, e1r, hact]
     conv_lhs => rw [hQs]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.smul_sum, map_sum, Finset.sum_apply]
+
+    rw [map_sum, Finset.smul_sum, map_sum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun k' _ => ?_
     simp only [map_smul, Pi.smul_apply, smul_eq_mul, mul_assoc]
   have hint := (hX.integrable t).1
@@ -164,7 +164,7 @@ open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RowEx MeasureTheory
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.realTranslate_preserves_rationalAction : ∀ {D : D7} {T : Type} [Finite T] {L : LevCh D T} {μ₀ : T} {sc : Consts} {G : GridData L sc} {W : G.Weil}
     {i j : Fin D.R.m} {A A' WW : HSp D} {X : Tri T A A' WW}, _root_.GlobalTheory.FunPr.ThetaLocalInputs → (∀ D, GlobalTheory.NormSum.Inp D) → L.Is μ₀ →
     IsBottomTri W i j X →

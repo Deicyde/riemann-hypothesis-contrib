@@ -8,7 +8,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option genSizeOfSpec false
@@ -23,7 +23,7 @@ variable {B : GlobalTheory.Mem.Base} {X : PreX B.toPre} {I : TC B X} {l : I.Laws
   {hT : GatTies (I.rec7 l Z)} {Gi : Formalism.MainNotions.G.Inst (I.rec7 l Z) L} {Gl : Formalism.MainNotions.G.LatInst (I.rec7 l Z)} {Kc : Formalism.MainNotions.G.Consts}
   {Yd : DivX (I.rec7 l Z)} {cX : ExtraC} {ex : Extra (I.rec7 l Z) L hT Gi Gl Kc Yd cX} {W : _root_.GlobalTheory.MiS.RealPackAlt ex} {u : B.Word}
 abbrev chrK_alt (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (t : W.P.T) (j : ℕ) : (AE (I.rec7 l Z))ˣ →* Circle := (_root_.GlobalTheory.Fam.pk_z W).toLevCh.mu t (j + 1)
-set_option maxHeartbeats 1000000 in
+
 structure QuadraticExtensionData (a : _root_.GlobalTheory.Fam.GeometricFamily W u) (t : W.P.T) where
   Ch₀ : ℕ → Type
   A : TwDat I l Z u (W.P.I.tup t) Ch₀

@@ -42,8 +42,8 @@ theorem re_swapSum_le' (f : TV n ℂ Q) (B : Finset Q) (p : Q)
       f - Y f + pm (Equiv.swap p q) f := by
     intro q hqB
     have hpq : p ≠ q := fun h => hp (h ▸ hqB)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hYf, ← Finset.add_sum_erase B _ hqB, map_add (f := _), map_sum, pm_pm, Equiv.swap_mul_self]
+
+    rw [hYf, ← Finset.add_sum_erase B _ hqB, map_add (f := _), map_sum, pm_pm, Equiv.swap_mul_self]
     have : ∀ q' ∈ B.erase q, (pm (Equiv.swap p q) : Module.End ℂ (TV n ℂ Q)) (pm (Equiv.swap p q') f) =
         -(pm (Equiv.swap p q') f) := by
       intro q' hq'

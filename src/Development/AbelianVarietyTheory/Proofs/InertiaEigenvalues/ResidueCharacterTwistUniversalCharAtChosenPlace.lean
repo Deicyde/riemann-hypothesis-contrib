@@ -15,8 +15,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Classical
 
 noncomputable section
-set_option maxHeartbeats 1600000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 namespace GlobalTheory.ResTwist
 

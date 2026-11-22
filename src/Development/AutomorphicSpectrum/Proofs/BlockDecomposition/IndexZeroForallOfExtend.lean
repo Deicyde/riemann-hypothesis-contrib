@@ -35,8 +35,8 @@ def fs {Fil : ℤ → IdF Φ.A} (hF : IsFil Φ Fil) {d : ℕ} (E : Frame Φ d) (
 theorem fs_val {Fil : ℤ → IdF Φ.A} (hF : IsFil Φ Fil) {d : ℕ} (E : Frame Φ d) (σ : ∀ T : C, E.D ⟶ T) {j q : ℕ} {r : ℤ}
     (hr : r = j + q) (x : Idx j d → Φ.A.obj E.D) (hx : ∀ I, x I ∈ (Fil q).S E.D) (s : ComposableArrows C j) :
     (show sqM _ _ _ from fs hF E σ hr x hx s).1 = Ideal.Quotient.mk _ (∑ I : Idx j d, E.form σ I.1 (x I) s) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   unfold fs
   rw [Finset.sum_apply]
   exact (map_sum (sqM (Fil r) (Fil (r + 1)) (s.obj (Fin.last j))).subtype _ _).trans rfl
@@ -102,8 +102,8 @@ theorem pull_cfs (hF : IsFil Φ Fil) (hc : E.GrConst Fil) {j q : ℕ} {r : ℤ} 
     (hx : ∀ I, x I ∈ (Fil q).S E.D) :
     (Pm Q E σ Fil r).pullC j (cfs E hF hr x hx) = (Jm Q E σ Fil r).pullC j (fsS E σ hF hr x hx) := by
   unfold cfs fsS fs
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum]
+
+  rw [map_sum, map_sum]
   refine Finset.sum_congr rfl fun I _ => ?_
   exact GlobalTheory.T.frame_form_restriction_cocycle Q hF E σ hc j q r hr I.1 (x I) (hx I) _ _ (fun s => rfl) (fun s => rfl)
 
@@ -308,8 +308,8 @@ theorem d_fs {d : ℕ} (Q : Poly Φ) {Fil : ℤ → IdF Φ.A} (hF : IsFil Φ Fil
     (hc : E.GrConst Fil) (r : ℤ) (hQ : ∀ r' ≤ r + 1, Q.Crit Fil r') {j q : ℕ} (hr : r = j + q) (x : Idx j d → Φ.A.obj E.D)
     (hx : ∀ I, x I ∈ (Fil q).S E.D) : CH.d (gr Fil r) j (fs hF E σ hr x hx) = 0 := by
   unfold fs
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_eq_zero fun I _ => cyc d Q hF E σ hc r hQ hr I _ _
 
 section Cut2
@@ -322,15 +322,15 @@ theorem d_cfs (hF : IsFil Φ Fil) (hc : E.GrConst Fil) (r : ℤ) (hQ : ∀ r' �
 theorem d_fsS (hF : IsFil Φ Fil) (hc : E.GrConst Fil) (r : ℤ) (hQ : ∀ r' ≤ r + 1, Q.Crit Fil r') {j q : ℕ} (hr : r = j + q)
     (x : Idx j d → Φ.A.obj E.D) (hx : ∀ I, x I ∈ (Fil q).S E.D) : CH.d _ j (fsS E σ hF hr x hx) = 0 := by
   unfold fsS
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_eq_zero fun I _ => cyc (d + 1) Q hF E σ hc r hQ hr (idxS I) _ _
 
 theorem d_fsZ (hF : IsFil Φ Fil) (hc : E.GrConst Fil) (r : ℤ) (hQ : ∀ r' ≤ r + 1, Q.Crit Fil r') {j q : ℕ} (hr : r = (j + 1 : ℕ) + q)
     (x : Idx j d → Φ.A.obj E.D) (hx : ∀ I, x I ∈ (Fil q).S E.D) : CH.d _ (j + 1) (fsZ E σ hF hr x hx) = 0 := by
   unfold fsZ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_eq_zero fun I _ => cyc (d + 1) Q hF E σ hc r hQ hr (idxZ I) _ _
 
 theorem fs_split (hF : IsFil Φ Fil) {j q : ℕ} {r : ℤ} (hr : r = (j + 1 : ℕ) + q) (x : Idx (j + 1) (d + 1) → Φ.A.obj E.D)
@@ -351,8 +351,8 @@ theorem d_ys (hF : IsFil Φ Fil) (hc : E.GrConst Fil) {j q : ℕ} {r : ℤ} (hr 
     (hx : ∀ I, x I ∈ (Fil q).S E.D) :
     CH.d _ j (ys Q E σ hF hr x hx) = (Jm Q E σ Fil r).pullC (j + 1) (-fsZ E σ hF hr x hx) := by
   unfold ys fsZ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_neg, map_sum, ← Finset.sum_neg_distrib]
+
+  rw [map_sum, map_neg, map_sum, ← Finset.sum_neg_distrib]
   exact Finset.sum_congr rfl fun I _ => d_yc Q E σ hF hc hr I.1 (x I) (hx I)
 
 theorem beta_ys (hF : IsFil Φ Fil) {r : ℤ} (β : G Q E σ Fil r ⟶ G Q E σ Fil (r - 1))
@@ -364,8 +364,8 @@ theorem beta_ys (hF : IsFil Φ Fil) {r : ℤ} (β : G Q E σ Fil r ⟶ G Q E σ 
     {j q : ℕ} (hr : r = (j + 1 : ℕ) + q) (hr' : r - 1 = j + q) (x : Idx j d → Φ.A.obj E.D) (hx : ∀ I, x I ∈ (Fil q).S E.D) :
     (CH.Mor.ofNatTrans β).pullC j (ys Q E σ hF hr x hx) = (Jm Q E σ Fil (r - 1)).pullC j (fsS E σ hF hr' x hx) := by
   unfold ys fsS
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum]
+
+  rw [map_sum, map_sum]
   exact Finset.sum_congr rfl fun I _ => beta_yc Q E σ hF β hβ hr hr' _ _ _
 
 theorem fc_zero (hF : IsFil Φ Fil) {d : ℕ} (E : Frame Φ d) (σ : ∀ T : C, E.D ⟶ T) {j q : ℕ} {r : ℤ} (hr : r = j + q) (I : Fin j → Fin d)

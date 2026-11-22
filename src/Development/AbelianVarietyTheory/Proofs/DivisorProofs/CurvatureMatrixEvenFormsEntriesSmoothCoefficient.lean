@@ -18,8 +18,8 @@ theorem curvEv_entry_smooth : ∀ (n : ℕ) (r : Type) [Fintype r] [DecidableEq 
   intro n r _ _ G v hG hu i j
   have e : ∀ x, (curvEv G x i j : Alt n) = ∑ a, ∑ b, curv G x (coordVec a) (coordVec b) i j • (dz a * dzb b) := by
     intro x
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [curvEv, curvPoly, Matrix.map_apply, map_sum, sym, Algebra.smul_def]
+
+    simp [curvEv, curvPoly, Matrix.map_apply, map_sum, sym, Algebra.smul_def]
   refine ⟨e, fun S => ?_⟩
   have hc : ∀ a b, ContDiffAt ℝ ∞ (fun x => curv G x (coordVec a) (coordVec b) i j) v := fun a b =>
     MContDiffAt.curv (j := ∞) hG hu (le_of_eq rfl) _ _ i j
@@ -27,8 +27,8 @@ theorem curvEv_entry_smooth : ∀ (n : ℕ) (r : Type) [Fintype r] [DecidableEq 
       fun x => ∑ a, ∑ b, curv G x (coordVec a) (coordVec b) i j * (bas n).repr (dz a * dzb b) S := by
     funext x
     rw [e x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finsupp.finsetSum_apply]
+
+    simp [map_sum, Finsupp.finsetSum_apply]
   rw [hf]
   exact ContDiffAt.sum fun a _ => ContDiffAt.sum fun b _ => (hc a b).mul contDiffAt_const
 

@@ -134,7 +134,7 @@ private theorem tr_bd {E : Type} [Field E] [NumberField E] {μ : Measure (normOn
     rw [pow_succ, pow_succ]
     exact (norm_mul_le _ _).trans (mul_le_mul ih (by linarith) (norm_nonneg _) (by positivity))
 
-set_option maxHeartbeats 6000000 in
+
 theorem sideEstX :
     OneSideX → Ci.EvVal → Ci.TruncSpec → ∀ (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
       (μ : Measure (normOneGL (K := K) (n := (2 + 2)))) [μ.IsHaarMeasure] (θ : Twist μ) (𝔰 : Side θ 2) (𝔵 : Fam 𝔰)

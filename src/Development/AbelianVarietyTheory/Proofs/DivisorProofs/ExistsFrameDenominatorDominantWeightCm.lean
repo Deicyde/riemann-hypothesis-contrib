@@ -43,7 +43,7 @@ open scoped TensorProduct
 open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.GeometryOfNumbersTheory TopologicalSpace Limits
 open GlobalTheory.HSApp
 open GlobalTheory.LamT (CMPt)
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic
 
 namespace GlobalTheory.LatFull.CMInt

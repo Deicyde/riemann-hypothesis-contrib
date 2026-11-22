@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.T
 
 open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount
 open scoped TensorProduct Classical
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.finite_doubleCoset_definiteHermitianForm_level : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p), G.a = 1 → ∀ (L : G.Level) (K' : Subgroup (Gr G 1)),
   Subgroup.Commensurable K' (KHT p G.m G.n 1 G.Fw) → ∀ B : GlobalTheory.LKDef.DForm G,
     Finite (DoubleCoset.Quotient (B.emb.range : Set (G.GAf × Gr G 1))

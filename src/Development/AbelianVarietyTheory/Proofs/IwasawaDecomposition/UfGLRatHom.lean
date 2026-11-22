@@ -151,7 +151,7 @@ theorem Lsh_empty (d : DecoSet (E := X.E) (n := n) (ST := ∅) (SG := SG)) : d.1
   exact d.2.uni
 
 
-set_option maxHeartbeats 4000000 in
+
 theorem exists_cls (hQ : Q = ∅) (hs : ∀ P ∈ uSG SG ∅, conjPrime₂ P ∉ uSG SG ∅) (f : ℕ) (J : Matrix (Fin n) (Fin n) X.E) (hJ : J = 1)
     (bad : Set (HeightOneSpectrum (𝓞 X.F))) (hb : bad = plUnder X.F SG) :
     ∃ (L : StepLevel X.F X.E hc.sig J 1 f bad)

@@ -68,8 +68,8 @@ theorem deg_iff_not_li {F : Type} [Field F] {N n : ℕ} (x : Mat F N) :
         q.as_sum_range' (n+1) (by omega)
       have h2 : Polynomial.aeval x q = ∑ b : Fin (n+1), q.coeff b • x ^ (b : ℕ) := by
         conv_lhs => rw [h1]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, ← Fin.sum_univ_eq_sum_range (fun i => Polynomial.aeval x (Polynomial.monomial i (q.coeff i)))]
+
+        rw [map_sum, ← Fin.sum_univ_eq_sum_range (fun i => Polynomial.aeval x (Polynomial.monomial i (q.coeff i)))]
         refine Finset.sum_congr rfl (fun b _ => ?_)
         rw [Polynomial.aeval_monomial, Algebra.smul_def]
       rw [h2] at hqx
@@ -97,15 +97,15 @@ theorem deg_iff_not_li {F : Type} [Field F] {N n : ℕ} (x : Mat F N) :
     · apply Polynomial.natDegree_sum_le_of_forall_le
       intro b _
       exact (Polynomial.natDegree_monomial_le _).trans (by omega)
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_sum]
-        ext j k
-        have := congrFun hg (j, k)
-        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at this
-        simp only [Polynomial.aeval_monomial, Matrix.sum_apply, Matrix.zero_apply]
-        rw [← this]
-        refine Finset.sum_congr rfl (fun b _ => ?_)
-        rw [← Algebra.smul_def, Matrix.smul_apply, smul_eq_mul]
+
+    · rw [map_sum]
+      ext j k
+      have := congrFun hg (j, k)
+      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at this
+      simp only [Polynomial.aeval_monomial, Matrix.sum_apply, Matrix.zero_apply]
+      rw [← this]
+      refine Finset.sum_congr rfl (fun b _ => ?_)
+      rw [← Algebra.smul_def, Matrix.smul_apply, smul_eq_mul]
 
 noncomputable def gen (C : Type) [Field C] (N : ℕ) : Mat (MP C N) N :=
   Matrix.of fun i j => MvPolynomial.X (i, j)

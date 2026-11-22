@@ -19,7 +19,7 @@ open UpperTheory.V.Z.Tf.GlobalTraceComparison
 open UpperTheory.V.Af.Bc (cPl)
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.Zero.ConvolutionTheory.EB
 
@@ -36,7 +36,7 @@ private theorem conv_smul' {E : Type} [Field E] [NumberField E] [IsCMField E] {a
   funext y
   ring
 
-set_option maxHeartbeats 1000000 in
+
 theorem realAlg : RealAlg := by
   intro E _ _ _ B Q _ Γ _ t v 𝔄 a₀ g s hok hK hT hs hs0
   let gg : Γ → BGen B := fun x => Sum.inr (t x)

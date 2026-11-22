@@ -13,7 +13,7 @@ open IsLocalRing UpperTheory.V.Fr
 
 private theorem exists_field_embedding_of_domain (D : Type) [CommRing D] [IsDomain D] :
     ∃ (K : Type) (_ : Field K) (j : D →+* K), Function.Injective j := by
-  set_option synthInstance.maxHeartbeats 400000 in
+
   exact ⟨FractionRing D, inferInstance, algebraMap D _, IsFractionRing.injective D (FractionRing D)⟩
 
 private theorem exists_algClosed_embedding_of_field (F : Type) [Field F] :
@@ -39,7 +39,7 @@ private theorem ringHom_injective_of_fields {F K : Type} [Field F] [Field K] (g 
     Function.Injective g :=
   RingHom.injective _
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.Pr.stableOf :
     ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [UpperTheory.V.Fr.IsCoef l O] [Algebra ℤ_[l] O] (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O)) (n : ℕ) (T : UpperTheory.V.Pr.Setup F n), T.StableOf := by
   intro l _ O _ _ _ _ _ F n T

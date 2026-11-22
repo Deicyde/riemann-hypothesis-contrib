@@ -200,7 +200,7 @@ theorem val₂_eq (hp : PowFns t) {K : Type} [Fintype K] {ξ : K → ((t.G ⊗ t
     (pullGen_isGen _ _ _ _ hw' (lift (powPr t.G (0 : Fin 3)) (powPr t.G (2 : Fin 3))).left) p p q hJ
   simpa only [val_ros _ _ hJ, tup_0, tup_2, h, h', _root_.mul_one] using key
 
-set_option maxHeartbeats 2000000 in
+
 theorem iso_of_coord (hs : ∀ a : 𝓞 E, star a = H.bar a) (hp : PowFns t) {ψ : Q S d 1}
     (hψ : ∀ m, g.x m = PP m g₂.x ψ) {lam : PS S 2 d} (hl : LamEq g g₂ φ lam) :
     GlobalTheory.CompanionTheory.Ar.Conj.IsIso g.B g₂.B φ.1 ψ.1 lam := by

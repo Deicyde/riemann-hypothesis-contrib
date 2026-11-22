@@ -73,9 +73,9 @@ theorem csr_ker_orth_range {K : Type} [Field K] (σ : K →+* K) {n : ℕ}
     rw [hBP, ← mulVec_mulVec, smul_mulVec, hx, smul_zero, mulVec_zero]
   have expand : ∑ k, σ ((aeval γ Q *ᵥ z) k) * x k
       = ∑ l, σ (z l) * ((((aeval γ Q).map σ)ᵀ) *ᵥ x) l := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [mulVec, dotProduct, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum,
-      transpose_apply, map_apply]
+
+    simp only [mulVec, dotProduct, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum,
+    transpose_apply, map_apply]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   rw [expand, hMt, hBx]

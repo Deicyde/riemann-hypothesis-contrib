@@ -37,8 +37,8 @@ theorem Hf_smul_r (a : ℂ) (v w : EuclideanSpace ℂ ι) : Hf v (a • w) = (st
   ring
 
 theorem Hf_swap (v w : EuclideanSpace ℂ ι) : Hf w v = (starRingEnd ℂ) (Hf v w) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Hf, map_sum, map_mul, Complex.conj_conj]
+
+  simp only [Hf, map_sum, map_mul, Complex.conj_conj]
   refine Finset.sum_congr rfl fun i _ => ?_
   ring
 

@@ -50,8 +50,8 @@ def toPi (a : ι) : N ≃ₗ[R] (ι → U.corner a) where
     rw [U.apply_apply]; simp
   right_inv v := by
     ext j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, U.apply_apply]
+
+    simp only [map_sum, U.apply_apply]
     simp [(U.mem_corner_iff a _).1 (v j).2]
 
 theorem toPi_apply (a : ι) (x : N) (i : ι) : ((U.toPi a x) i : N) = U.E a i x := rfl

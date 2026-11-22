@@ -8,7 +8,7 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 
-set_option maxHeartbeats 1000000
+
 
 noncomputable section
 

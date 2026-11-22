@@ -220,7 +220,7 @@ end Ad
 
 end GlobalTheory.FormFinVal
 
-set_option maxHeartbeats 1600000 in
+
 open GlobalTheory.FormFinVal in
 theorem _root_.GlobalTheory.T.integralGoodForm_values_mem_scaledDualWeylLattice : BigC fun {D} {_} _ _ {_} {_} {A} {_} _ _ _ {R} F ch _ _ => ∀ (t : _) (w : PlL D), ∀ x ∈ (A.fam.R t).Mt (A.fam.lvl F.P0 F.ψ0), ∀ y,
   InLat _ w 0 (latAt ch.S.toGridChoice (.grid 0 D.R.m) y) (rowVal ch.S.toGridChoice (ch.S.formC t (R.jX t (formOf F t x)) y)) := by

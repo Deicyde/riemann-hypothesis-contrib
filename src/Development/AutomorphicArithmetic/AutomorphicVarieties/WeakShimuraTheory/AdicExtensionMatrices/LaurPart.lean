@@ -40,8 +40,8 @@ theorem UpperTheory.V.Ws.sxLaurPart :
   have h1 := hM _ (GlobalTheory.algHom_sub_aeval_truncTotal_mem (F.comp W.π) hm M g)
   rw [map_sub, HahnSeries.coeff_sub, sub_eq_zero] at h1
   refine h1.trans ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [MvPolynomial.aeval_def, MvPolynomial.eval₂_eq, map_sum, HahnSeries.coeff_sum]
+
+  rw [MvPolynomial.aeval_def, MvPolynomial.eval₂_eq, map_sum, HahnSeries.coeff_sum]
   refine Finset.sum_eq_zero fun d hd => ?_
   have hw : Finsupp.weight W.wt d = j := by
     by_contra hne
@@ -49,8 +49,8 @@ theorem UpperTheory.V.Ws.sxLaurPart :
     rw [MvPowerSeries.coeff_truncTotal_eq_ite, hg d hne, ite_self]
   obtain ⟨y, hy⟩ := laurPart_prod e (fun s => τ (W.wt s)) (fun s => F (W.z s)) hF d d.support
   have hs : (∑ i ∈ d.support, d i • τ (W.wt i)) = τ j := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hw, Finsupp.weight_apply, Finsupp.sum, map_sum]
+
+    rw [← hw, Finsupp.weight_apply, Finsupp.sum, map_sum]
     simp only [map_nsmul]
   rw [hs] at hy
   rw [map_mul, hL.alg]

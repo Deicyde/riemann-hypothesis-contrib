@@ -23,7 +23,7 @@ private theorem finrank_quotient_eq_add_finrank_ker_factor (κ Λ : Type) [Field
   rw [← LinearMap.finrank_range_add_finrank_ker (Ideal.Quotient.factorₐ κ h).toLinearMap,
     LinearMap.range_eq_top.mpr hs, finrank_top]
 
-set_option maxHeartbeats 400000 in
+
 private theorem ideal_eq_span_pow_of_finrank (κ Λ : Type) [Field κ] [CommRing Λ] [IsLocalRing Λ] [Algebra κ Λ]
     [Module.Finite κ Λ] (ε : Λ →ₐ[κ] κ) (t : Λ)
     (ht : IsLocalRing.maximalIdeal Λ = Ideal.span {t}) (q : ℕ) :

@@ -80,8 +80,8 @@ open GlobalTheory.CompanionTheory.IwaAd GlobalTheory.CompanionTheory.HermVol Glo
 variable {D : D7} {n : ℕ}
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem char_herm [BorelSpace (Mx D n n)] [LocallyCompactSpace (hermA D n)] (a : GL (Fin n) (AE D)) :
     addEquivAddHaarChar (restr (hermA D n) (GlobalTheory.ModuLR.lrCE a (ad a)⁻¹) (lr_herm a) (lr_herm_symm a)) =
       absA D (Matrix.GeneralLinearGroup.det a : (AE D)ˣ) ^ n := by
@@ -115,7 +115,7 @@ def smulH (e : AE D) (hc : cA D e = e) : hermA D n →+ hermA D n where
   map_zero' := Subtype.ext (smul_zero e)
   map_add' x y := Subtype.ext (smul_add e x.1 y.1)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem continuous_smulH (e : AE D) (hc : cA D e = e) : Continuous (smulH (n := n) e hc) :=
   ((continuous_const_smul e).comp continuous_subtype_val).subtype_mk _
 

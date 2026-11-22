@@ -48,8 +48,8 @@ private theorem exists_idem {A : Test l} {S : Fam A} (h : IsDec S) :
     · subst hji; rw [hne i' j hii, mul_zero]
     · rw [hne i j hji, zero_mul]
   · refine ext' _ _ fun j => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_one, Finset.sum_eq_single j, hsame]
+
+    rw [map_sum, map_one, Finset.sum_eq_single j, hsame]
     · intro i _ hij
       exact hne i j hij.symm
     · intro hj

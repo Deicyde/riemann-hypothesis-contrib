@@ -16,8 +16,8 @@ theorem coords_of_common_eigenvector {k k' M M' I J : Type*} [Field k] [Field k'
   have hm : ∀ j, (LinearMap.toMatrix c c (T j)).map φ = LinearMap.toMatrix c' c' (S j) := fun j => by
     ext p q
     rw [map_apply, LinearMap.toMatrix_apply, LinearMap.toMatrix_apply, hc, ← h]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [← c.sum_repr (T j (c q)), map_sum]
+
+    conv_rhs => rw [← c.sum_repr (T j (c q)), map_sum]
     simp [LinearMap.map_smulₛₗ, ← hc, Finsupp.single_apply]
   refine ⟨c'.repr x, fun h0 => hx0 (c'.repr.injective (by ext p; simpa using congrFun h0 p)), fun j => ?_⟩
   rw [hm, LinearMap.toMatrix_mulVec_repr, hx, map_smul]
@@ -152,8 +152,8 @@ theorem occE {U : Type*} [AddCommGroup U] [Module k U]
         conv_lhs => rw [← b.sum_repr u]
         simp only [Submodule.coe_sum, Submodule.coe_smul]
       have hρ' : ∀ q, g σ (b q).1 = ∑ p, ρ σ p q • (b p).1 := hρ σ
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h0, map_sum, Submodule.coe_sum]
+
+      rw [h0, map_sum, Submodule.coe_sum]
       simp only [mulVec, dotProduct, Submodule.coe_smul]
       simp only [Finset.sum_smul]
       rw [Finset.sum_comm]
@@ -179,8 +179,8 @@ theorem occE {U : Type*} [AddCommGroup U] [Module k U]
       Subtype.ext (by simp)
     rw [this]
     funext p
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [A, mulVec, dotProduct, map_sum, map_smul]
+
+    simp only [A, mulVec, dotProduct, map_sum, map_smul]
     change _ = (Finsupp.applyAddHom p) (∑ q, u q • b.repr ⟨E (e q), (e q).2⟩)
     rw [map_sum]
     simp only [Finsupp.applyAddHom_apply, Finsupp.smul_apply, smul_eq_mul]

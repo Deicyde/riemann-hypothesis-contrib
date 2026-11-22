@@ -410,8 +410,8 @@ theorem lcq_finite_local (hπ0 : ∀ i, PowerSeries.constantCoeff (π' i) = 0)
     have : Submodule.Quotient.mk x = ∑ j, κ j • g j := by
       have hy : ∑ j, κ j • g j =
           Submodule.Quotient.mk (∑ j, κ j • (⟨e • b j, hgen j⟩ : ↥(NcS W T (c - 1)))) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← Submodule.mkQ_apply, map_sum]
+
+        rw [← Submodule.mkQ_apply, map_sum]
         simp only [map_smul, Submodule.mkQ_apply, g]
       rw [hy, Submodule.Quotient.eq, Submodule.mem_comap, Submodule.coe_subtype, Submodule.coe_sub,
         Submodule.coe_sum]
@@ -451,8 +451,8 @@ theorem lcq_finite (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
   exact lcq_finite_local hπ0 hexp r b hbΔ hspan
 
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem u2rank_of_ring (hR : Formalism.MainNotions.N.Ln34.SecondRingHypothesis) : Formalism.MainNotions.N.Ln34.SecondRankHypothesis := by
   intro D HW F Cm CA CB CK hA hML l _ hl K LL hG π' E hπ T h' hh' hc hj c
   haveI : IsDiscreteValuationRing ↥(OL LL) := GenPf.isDVR (D.loc l) LL

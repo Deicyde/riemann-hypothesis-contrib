@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.DeRhamLattices.
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut GlobalTheory.UseLoc Module TensorProduct GlobalTheory.UseLoc.Cases UpperTheory.KN
 
 private theorem emb_gen {O K L Γ : Type} [CommRing O] [Field K] [Field L] (φ : O →+* K) (f : K →+* L)

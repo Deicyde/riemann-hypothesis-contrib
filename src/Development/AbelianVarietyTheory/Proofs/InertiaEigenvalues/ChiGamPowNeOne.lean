@@ -50,7 +50,7 @@ def levOf {Dc : Disc R b₀ tS zS} {Mo : WN E zl} (bT : ∀ T : LocLat G Qp LL O
     ↥(Mo.N T) →+ (ℤ → T.V ⊗[Qp] B) :=
   if h : IsCrys PD T.ρ then (Fr T h).lev bT i ζ else 0
 
-set_option maxHeartbeats 1000000 in
+
 theorem nonempty_wCmp [NeZero n] (Dc : Disc R b₀ tS zS) (Mo : WN E zl) {ιdR : Ai →+* BdR} {p1 : Ai}
     {βdR : ∀ T : LocLat G Qp LL O, TW (O ⊗[Zl] Ai) T →+ T.V ⊗[Qp] BdR}
     {bT : ∀ T : LocLat G Qp LL O, ↥(Mo.N T) →+ T.V ⊗[Qp] B} (hP : IsPer Mo b₀ ιdR p1 βdR bT)
@@ -154,9 +154,9 @@ theorem nonempty_wCmp [NeZero n] (Dc : Disc R b₀ tS zS) (Mo : WN E zl) {ιdR :
       intro j hj
       have : (k - m).toNat + 1 ≤ j := by simpa using hj
       exact hm _ (by omega)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hN, hsmul, finsum_eq_sum_of_support_subset (s := Finset.range ((k - m).toNat + 1)),
-      finsum_eq_sum_of_support_subset (s := Finset.range ((k - m).toNat + 1)), map_sum]
+
+    rw [hN, hsmul, finsum_eq_sum_of_support_subset (s := Finset.range ((k - m).toNat + 1)),
+    finsum_eq_sum_of_support_subset (s := Finset.range ((k - m).toNat + 1)), map_sum]
     · simp only [map_smul, hN]
     · intro j hj
       by_contra hc
@@ -196,7 +196,7 @@ theorem chi_gam_pow_ne_one {l : ℕ} [Fact l.Prime] {P : LocPrime l} {K : FinExt
   omega
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem nonempty_cmpS : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI →
     ∀ (K : FinExt l) (s : ℕ) (LL : FinExt l), Good K s LL → ∀ (Γ : GamS P K s LL) (R : WSer Γ) (I : IoS AI R),
     IoW I → ∀ (E : WEt I) (Mo : NS E), Nonempty (CmpS Mo) := by

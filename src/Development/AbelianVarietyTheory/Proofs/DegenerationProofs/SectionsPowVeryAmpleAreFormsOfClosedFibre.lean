@@ -149,8 +149,8 @@ theorem gs_cst (p : X ⟶ Spec (CommRingCat.of R)) (r : Z ⟶ X) (z : Z) (U : X.
 theorem gs_comb (p : X ⟶ Spec (CommRingCat.of R)) (r : Z ⟶ X) (z : Z) (U : X.Opens) (h : r z ∈ U) {n : ℕ}
     (c : Fin n → R) (x : Fin n → Γ(X, U)) :
     gs r z U (∑ i, AbLaw.cst p U (c i) * x i) = ∑ i, cstGerm (r ≫ p) z (c i) * gs r z U (x i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← gsHom_apply r z U h, map_sum]
+
+  rw [← gsHom_apply r z U h, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, gsHom_apply, gsHom_apply, gs_cst p r z U h]
 
@@ -205,11 +205,11 @@ theorem GlobalTheory.Degen.sections_pw_are_forms_of_closed_fibre : ∀ (A : Type
     rw [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ hu, Matrix.vecMul_one]
   generalize Matrix.vecMul a (Matrix.of c)⁻¹ = d at e ⊢
   subst e
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Eq.trans ?_ (Finset.sum_congr rfl fun i _ => ((map_mul _ _ _).trans
     (congrArg₂ (· * ·) (MvPolynomial.eval₂Hom_C _ _ _) (hc i k))).symm)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum,
-    _root_.mul_assoc]
+
+  simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum,
+  _root_.mul_assoc]
   exact Finset.sum_comm

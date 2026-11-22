@@ -103,7 +103,7 @@ variable (hbij : Function.Bijective
   (fun p : (𝓞 F ⧸ v.asIdeal) × (𝓞 F ⧸ v.asIdeal) => algebraMap _ K p.1 + algebraMap _ K p.2 * r))
 
 include hσr hbij in
-set_option maxHeartbeats 400000 in
+
 theorem cnt_meas [Finite K] (hσ : ∀ x, σ (σ x) = x) {M a d : ℕ} [MeasurableAdd (Fin a → Fin M → Fv F v ⊗[F] E)] (J : Matrix (Fin M) (Fin M) E)
     (hJ : ∀ i j, σ (J j i) = J i j) (T : Matrix (Fin a) (Fin a) E)
     (hT : ∀ i j, σ (T j i) = T i j) (b : Module.Basis (Fin d) F E)

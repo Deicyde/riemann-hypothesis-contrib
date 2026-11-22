@@ -50,8 +50,8 @@ theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.kerSp :
       have h1 : (f : M) = ((e y0 : Y0) : M) := by rw [hey]
       rw [h1]
       conv_lhs => rw [hy0]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Submodule.coe_sum]
+
+      rw [map_sum, Submodule.coe_sum]
       simp only [map_smul, Submodule.coe_smul]
     rw [hfY]
     refine Submodule.sum_mem _ (fun i hi => ?_)

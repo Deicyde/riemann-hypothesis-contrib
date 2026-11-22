@@ -37,12 +37,12 @@ theorem coeff_lg_pcurve (G : LogFGL v d) {p : ℕ} (hp : p ≠ 0)
       refine Finset.sum_congr rfl fun b _ => ?_
       rw [lgCurve_expC G (pow_ne_zero n hp) (fun c => (hrescale b c).1),
         lgCurve_rescale G _ (fun c => (hγ b c).1)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hlog, map_sum]
+
+  rw [hlog, map_sum]
   apply Finset.sum_congr rfl
   intro s _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   apply Finset.sum_congr rfl
   intro b _
   rw [coeff_expand_rescale]

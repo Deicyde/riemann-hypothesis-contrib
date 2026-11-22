@@ -17,8 +17,8 @@ open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTh
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 2000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 namespace GlobalTheory.UnitaryMove
 

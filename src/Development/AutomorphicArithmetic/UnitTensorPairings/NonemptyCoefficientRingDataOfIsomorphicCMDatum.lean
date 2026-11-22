@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.HeightCounting GlobalTheory.TwInputs.Move GlobalTheory.HeightCounting.SideCopy
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
+
 
 private theorem readMove {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] {A K L L' : Type} [CommRing A] [CommRing K]
     [CommRing L] [CommRing L'] {pl : HeightOneSpectrum (𝓞 E) → ValuationSubring Ω} {φ : G E Ω →* Aˣ} {rd : A →+* K} {eL : L →+* K}

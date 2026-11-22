@@ -9,7 +9,7 @@ public import Formalism.SharpRestriction.GrowthBounds.WeilJacquetShalikaLaw
 @[expose] public section
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.LvT GlobalTheory.LvT.Built GlobalTheory.LvT.Built.TrueLaws
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.fivePointLaws_trueChains :
     ∀ (B : GlobalTheory.Mem.Base) (X : PreX B.toPre) (I : TC B X), I.Ok → I.JetsIn →
     ∀ (l : I.Laws) (l0 : I.Law0 l) (Z : TC.Later B (I.cols l)) (u : B.Word) (a : I.ι),

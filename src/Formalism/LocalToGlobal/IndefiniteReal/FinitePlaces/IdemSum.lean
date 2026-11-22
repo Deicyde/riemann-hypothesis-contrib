@@ -10,7 +10,7 @@ noncomputable section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace Formalism.IndefR.Fin
 

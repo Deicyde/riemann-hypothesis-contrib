@@ -97,8 +97,8 @@ theorem omega_projection_scalar_character (hS : ScalChar X χ) (v : X.V) :
     simp [y2, LinearMap.pi_apply]
   rw [hy]
   simp_rw [← Pr_tensE (X := X) (χ := χ) (s := s)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, sum_tensE_single, map_add (f := _), map_smul, Pr_om, om_Pr hS, ← add_smul, ← neg_smul, Pi.smul_apply]
+
+  rw [← map_sum, sum_tensE_single, map_add (f := _), map_smul, Pr_om, om_Pr hS, ← add_smul, ← neg_smul, Pi.smul_apply]
   congr 1
   unfold cn; push_cast; ring
 

@@ -341,7 +341,7 @@ theorem ac_one (u : Q S d n) : ac (AQ A 1) u = u :=
 
 end Law
 
-set_option maxHeartbeats 4000000 in
+
 theorem fbId : FBIdSt := by
   intro E _ _ _ H X0 t hPow _ hs S _ x0 d G A κ _ tg uvec x e ph1 ph2 sy ad hc hf ha had
   have localCub : ∀ {T : Over X0} {z : T.left} {J : (T.left ⟶ t.G.left) → t.PP.L.ι}, Good t.PP.L z J → IsCub (cubV t.cub z J) := by

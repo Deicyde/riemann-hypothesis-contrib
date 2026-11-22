@@ -84,8 +84,8 @@ theorem _root_.GlobalTheory.AdLat.Model.hermA_symm (c : E ≃ₐ[F] E) (hc : ∀
       ((1 : FiniteAdeleRing (𝓞 F) F) ⊗ₜ[F] G a b) = 1 ⊗ₜ[F] G b a := by
     intro a b
     simp [_root_.GlobalTheory.AdLat.sg, hG]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [_root_.GlobalTheory.AdLat.hermA, map_sum, map_mul, hinv, hG']
+
+  simp only [_root_.GlobalTheory.AdLat.hermA, map_sum, map_mul, hinv, hG']
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ring

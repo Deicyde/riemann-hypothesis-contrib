@@ -106,8 +106,8 @@ theorem mem_int_iff (y : Af F ⊗[F] E) :
       exact hy)
     obtain ⟨m, g, hg⟩ := Module.Finite.exists_fin (R := ℤ) (M := 𝓞 E)
     obtain ⟨r, hr, e⟩ := Formalism.UG.P.levelaf_decomp g hg h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← c.symm_apply_apply y, e, map_sum]
+
+    rw [← c.symm_apply_apply y, e, map_sum]
     exact sum_mem fun i _ => AddSubgroup.subset_closure ⟨r i, hr i, g i, rfl⟩
 
 theorem continuous_finAdEquiv_symm : Continuous (finAdEquiv F E).symm :=
@@ -183,7 +183,7 @@ theorem unrAt_of_unramEverywhere (h : UnramEverywhere D c) (w : HeightOneSpectru
 variable {χ : HChar D.host.E}
 
 
-set_option maxHeartbeats 800000 in
+
 theorem locChar_eq_of_chrEq (h : ChrEq c χ) (w : HeightOneSpectrum (𝓞 D.host.E)) : locChar c w = χ.loc w := by
   obtain ⟨e, he, h0, h1, h2⟩ := GlobalTheory.PlaceIdem.exists_isPlIdem D (finAdEquiv D.host.F D.host.E)
     (fun x => (toFinAd_tmul 1 x).trans (by rw [map_one, one_mul])) mem_int_iff (fun a k P n ha => by

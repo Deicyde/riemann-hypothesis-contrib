@@ -43,8 +43,8 @@ private theorem conj_form (j : F →+* F) (hj : ∀ x, j (j x) = x) (Q : Matrix 
   have hQ' : ∀ i k, j (Q i k) = - Q k i := fun i k => by
     have := congrFun (congrFun hQ k) i
     simpa using this
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dotProduct, Matrix.mulVec, map_sum, map_mul, hj, hQ', Finset.mul_sum, ← Finset.sum_neg_distrib]
+
+  simp only [dotProduct, Matrix.mulVec, map_sum, map_mul, hj, hQ', Finset.mul_sum, ← Finset.sum_neg_distrib]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun i _ => ?_
   ring

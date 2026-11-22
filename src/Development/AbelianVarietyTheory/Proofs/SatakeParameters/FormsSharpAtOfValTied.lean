@@ -49,8 +49,8 @@ theorem eval_colSub {ι : Type} [Fintype ι] {a : ℕ} (β x : ι → Matrix (Fi
   | mul_X p v hp =>
     simp only [map_mul, hp, colSub, MvPolynomial.aeval_X, MvPolynomial.eval_X, Matrix.mul_apply]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun r _ => ?_
     simp [mul_comm]
 
@@ -80,8 +80,8 @@ theorem isVLam_of_wtPol {ι : Type} [Fintype ι] {a : ℕ} {Y : Type} (fr g : Y 
       | C c => simp [sub]
       | add p q hp hq => simp only [map_add (f := _), hp, hq]
       | mul_X p v hp =>
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_mul, hp, sub, MvPolynomial.aeval_X, MvPolynomial.eval_X, hg', Matrix.mul_apply, map_sum]
+
+        simp only [map_mul, hp, sub, MvPolynomial.aeval_X, MvPolynomial.eval_X, hg', Matrix.mul_apply, map_sum]
         simp
     have hdet : ∀ y τ, MvPolynomial.eval (fun k : ι × Fin a × Fin a => g y k.1 k.2.1 k.2.2) (frDet ℂ a τ) = (g y τ).det := by
       intro y τ
