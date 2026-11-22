@@ -146,7 +146,9 @@ theorem map_scalar {K LL : FinExt l} {n : ℕ} (emb : ZMod n → (↥(K0 K) →�
     (φ : LetA ↥(OL LL) n →ₐ[↥(OL LL)] RA LL) (c : ℤ_[l]) :
     φ (letEmb emb (PowerSeries.C (algebraMap ℤ_[l] (WK K) c))) =
       (1 : ↥(OL LL)) ⊗ₜ[ℤ_[l]] algebraMap ℤ_[l] (Ainf l) c := by
-  rw [letEmb_scalar, AlgHom.commutes, tmul_algebraMap]
+  exact (congrArg (fun x => φ x) (letEmb_scalar (K := K) (LL := LL) emb c)).trans
+    ((φ.commutes (algebraMap ℤ_[l] ↥(OL LL) c)).trans
+      (tmul_algebraMap (O := ↥(OL LL)) (A := Ainf l) c))
 
 theorem theta_scalar (K : FinExt l) (c : ℤ_[l]) :
     Formalism.Per.θ l (algebraMap ℤ_[l] (Ainf l) c) = intToOC K (algebraMap ℤ_[l] ↥(OL K) c) :=
@@ -200,18 +202,25 @@ theorem exists_io {K LL : FinExt l} {n : ℕ} (emb : ZMod n → (↥(K0 K) →�
   obtain ⟨_, -, -, hu, hfree, -⟩ := GlobalTheory.Per.integers_completeDVR l LL
   obtain ⟨r, hr⟩ := exists_retraction (Z := ℤ_[l]) (O := ↥(OL LL)) (l : ℤ_[l])
     PadicInt.maximalIdeal_eq_span_p (by rwa [map_natCast])
-  have hX : φ (letEmb emb PowerSeries.X) =
-      (1 : ↥(OL LL)) ⊗ₜ[ℤ_[l]] (WittVector.teichmuller l e - 1) := by
-    rw [letEmb_X, hπ]
-  obtain ⟨hinj, io, hio⟩ := exists_factor r hr (φ.toRingHom.comp (letEmb emb)) _ hX
+  -- Supply the indices of `letEmb` before composition compares the power series instances.
+  let f : PowerSeries (WK K) →+* RA LL := φ.1.comp (letEmb (K := K) (LL := LL) emb)
+  have hX : f PowerSeries.X =
+      (1 : ↥(OL LL)) ⊗ₜ[ℤ_[l]] (WittVector.teichmuller l e - 1) :=
+    (congrArg (fun x => φ x) (letEmb_X (K := K) (LL := LL) emb)).trans hπ
+  obtain ⟨hinj, io, hio⟩ := exists_factor (Z := ℤ_[l]) (O := ↥(OL LL)) (A := Ainf l)
+    (W := WK K) r hr f (WittVector.teichmuller l e - 1) hX
     (fun w => (hC w).imp fun a h => h.1)
     ((GlobalTheory.HWL.TensorWitt.main l LL).2.2.2.2 e he).toIsHausdorff
   refine ⟨io, hio, hinj _ _ ((hio _).symm.trans hX), fun w => ?_⟩
   obtain ⟨a, h1, h2⟩ := hC w
-  rw [hinj _ _ ((hio _).symm.trans h1), h2]
+  exact (congrArg (Formalism.Per.θ l) (hinj _ _ ((hio _).symm.trans h1))).trans h2
 
 theorem main : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (s : ℕ) (LL : FinExt l) (Γ : GamS P K s LL) (R : WSer Γ) (I : IoS AI R), IoW I → ∃ io : PowerSeries (WK K) →+* Ainf l, (∀ x, I.io (letEmb Γ.emb x) = (1 : ↥(OL LL)) ⊗ₜ[ℤ_[l]] io x) ∧ io PowerSeries.X = WittVector.teichmuller l (AI.εroot s) - 1 ∧ ∀ w : WK K, Formalism.Per.θ l (io (PowerSeries.C w)) = intToOC (unr K) w :=
-  fun _ _ _ AI _ s _ Γ _ I hI =>
-    exists_io Γ.emb I.io _ (εroot_sub_not_unit AI s) I.io_π (exists_const Γ.emb I.io hI)
+  fun _ _ P AI K s LL Γ _ I hI =>
+    -- Use the structure instances already fixed by Γ and I for these projections.
+    let emb := Γ.1
+    let φ := I.1
+    exists_io (K := K) (LL := LL) emb φ (AI.εroot s)
+      (εroot_sub_not_unit (P := P) AI s) I.2 (exists_const (K := K) (LL := LL) emb φ hI)
 
 end GlobalTheory.PrismS.IoDescent

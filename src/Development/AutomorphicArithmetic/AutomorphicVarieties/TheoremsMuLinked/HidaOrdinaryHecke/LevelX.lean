@@ -120,8 +120,10 @@ private theorem s2 (P : Af.HypothesesH) (l : ℕ) [Fact l.Prime] (L Ω : Type) [
       ∀ f : (hset Q0 τ₀).X.Fn A m, f ∈ (hset Q τ₀).MK θ' a' (kMax Q τ₀) ↔ f ∈ (hset Q0 τ₀).MK θ a K0 := by
   obtain rfl : a' = fun i => a (opUp Q0 Q hsub τ₀ i) := funext e2
   rw [e1]
-  exact levelUR2LocEq P l L Ω s n hn V0 V Q0 Q c r ι ⟨A, κ, hi, hu⟩ ⟨m, τ₀, ty, θ, th, hw, a, rs⟩ K0 (kMax Q τ₀) hS (fun _ => rfl)
+  have hloc := levelUR2LocEq P l L Ω s n hn V0 V Q0 Q c r ι ⟨A, κ, hi, hu⟩ ⟨m, τ₀, ty, θ, th, hw, a, rs⟩ K0 (kMax Q τ₀) hS (fun _ => rfl)
     (p0 h) (continuous_levelChangeBaseGroupHom h) (surjective_levelChangeBaseGroupHom h) (levelChangeBaseGroupHom_apply_projection h hp) (opUp Q0 Q hsub τ₀) (fun _ => rfl) fun _ _ => ⟨_, rfl⟩
+  dsimp (config := { instances := true }) only at hloc
+  exact hloc
 
 
 private theorem s3 (P : Af.HypothesesH) (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (n : ℕ) (hn : 1 ≤ n)
@@ -151,8 +153,19 @@ private theorem s3 (P : Af.HypothesesH) (l : ℕ) [Fact l.Prime] (L Ω : Type) [
     (base_object_hom_ext B') μ hμ (fun t y => (α t ⟨y.1, Submodule.mem_iSup_of_mem _ y.2⟩).1) (fun t => congrArg Subtype.val (map_zero (α t)))
     (fun {i1} {i2} => (@h5 (kMax Q τ₀) i1 i2).elim fun f hf => ⟨f, hf.1, fun t y => hf.2 t y _ rfl⟩)
   obtain ⟨e0, he0⟩ := eq_sub _ _ ((hset Q0 τ₀).MK θ a K0) _ (h3 (kMax Q τ₀)).1 hM
-  refine ⟨_, _, _, ρ, α, lam, hl, h1, h2, fun K hK => (h3 ⟨K, hK⟩).2, fun K K' hK hK' hN => @h4 ⟨K, hK⟩ ⟨K', hK'⟩ hN, ⟨e0, fun t x x' hx => Subtype.ext ?_⟩, h6⟩
-  exact ((he0 x').1.trans (congrArg Subtype.val hx)).trans (key t ⟨x.1.1, (he0 x).2⟩ (e0 x) (he0 x).1.symm)
+  let M := (⨆ K, (hset Q τ₀).MK θ' a' K : Submodule A ((hset Q τ₀).X.Fn A m))
+  refine ⟨M, inferInstance, inferInstance, ρ, α, lam, hl, h1, h2, ?_, ?_, ?_, ?_⟩
+  · intro K hK
+    exact (h3 ⟨K, hK⟩).2
+  · intro K K' hK hK' hN
+    have projective := @h4 (⟨K, hK⟩ : (hset Q τ₀).Lev) (⟨K', hK'⟩ : (hset Q τ₀).Lev)
+    -- Reduce the level projections inside the quotient-group instances.
+    dsimp (config := { instances := true }) only [hset] at projective ⊢
+    have hProj := @projective hN
+    assumption
+  · refine ⟨e0, fun t x x' hx => Subtype.ext ?_⟩
+    exact ((he0 x').1.trans (congrArg Subtype.val hx)).trans (key t ⟨x.1.1, (he0 x).2⟩ (e0 x) (he0 x).1.symm)
+  · exact h6
 
 
 private theorem s4 (P : Af.HypothesesH) (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (n : ℕ) (hn : 1 ≤ n)
@@ -190,17 +203,30 @@ private theorem s4 (P : Af.HypothesesH) (l : ℕ) [Fact l.Prime] (L Ω : Type) [
   have hβ1 : B'.u.D.map β.toRingHom = B.u.D.comap (p0 h) := hβ.1.trans hp1
   have hβ2 : ∀ (v : Vl l L) i, @Eq (Dec (F := L) (s.A v.1) →* B.Bˣ) (W.pushCh β.toRingHom (B'.u.ψ v i)) (B.u.ψ v i) :=
     fun v i => (hβ.2 v i).trans (hp2 v i)
-  obtain ⟨M, _, _, ρ, α, lam, hl, h1, h2, h3, h4, ⟨e0, he0⟩, h6⟩ := @s3 P l _ L Ω _ _ _ _ _ _ s n hn V0 Q0 c r ι A _ _ _ κ hi hu m τ₀ ty θ th hw a rs
+  obtain ⟨M, mAdd, mMod, ρ, α, lam, hl, h1, h2, h3, h4, ⟨e0, he0⟩, h6⟩ := @s3 P l _ L Ω _ _ _ _ _ _ s n hn V0 Q0 c r ι A _ _ _ κ hi hu m τ₀ ty θ th hw a rs
     V h (qUp V w hv hvS hV) (instDecidableEqFin q) hsub hp B' hS K B β hβ1 hβ2 μ hμ3
   obtain ⟨hI, hNm⟩ := levelUR2IwLev l L n q w
-  obtain ⟨ρ', h7, h8⟩ := @h4 (fun j => AlgebraTools.iwC _ n ⊤) (fun j => AlgebraTools.iwC _ n (Pa.ellC l _)) (fun j => ⟨(hI j ⊤).1, (hI j ⊤).2.1⟩)
-    (fun j => ⟨(hI j _).1, (hI j _).2.1⟩) hNm fun j => (hI j _).2.2
-  refine @levelUR2ModPack l _ L Ω _ _ _ _ _ _ s V0 c.O _ _ _ n r B J _ b V h q w (rN h) (rN_compat h) B'.B _ _ _ (pairN h B'.u)
-    A _ _ e lam (fun k => ?_) β ⟨hβ1, hβ2⟩ M _ _ ρ α h1 h2
-    (h3 (fun j => AlgebraTools.iwC _ n (Pa.ellC l _)) fun j => ⟨(hI j _).1, (hI j _).2.1⟩) hNm ρ' h7 h8 (e0.trans eb)
-    (fun t x x' hx => (congrArg eb (he0 t x x' hx)).trans (heb (β t) (e0 x))) ι h6
-  rw [hX k, map_sub, map_mul, map_one, AlgHom.commutes]
-  exact congrArg (fun z => algebraMap c.O B'.B (b.wt.c k) * z - 1) (hl (b.wt.v k) (b.wt.i k) (b.wt.γ k) (hγ k))
+  have hKiw (j : Fin q) := And.intro (hI j ⊤).1 (hI j ⊤).2.1
+  have hKiw1 (j : Fin q) := And.intro (hI j (Pa.ellC l _)).1 (hI j (Pa.ellC l _)).2.1
+  have hfinIw := h3 (fun j => AlgebraTools.iwC ((w j).adicCompletion L) n (Pa.ellC l _)) hKiw1
+  obtain ⟨ρ', h7, h8⟩ := @h4
+    (fun j => AlgebraTools.iwC ((w j).adicCompletion L) n ⊤)
+    (fun j => AlgebraTools.iwC ((w j).adicCompletion L) n (Pa.ellC l _))
+    hKiw hKiw1 hNm fun j => (hI j (Pa.ellC l _)).2.2
+  let eM := e0.trans eb
+  have hWeight k : lam (e (MvPowerSeries.X (.inr k))) = algebraMap c.O B'.B (b.wt.c k) *
+      (B'.u.ψ (b.wt.v k) (b.wt.i k) (b.wt.γ k) : B'.B) - 1 := by
+    rw [hX k, map_sub, map_mul, map_one, AlgHom.commutes]
+    exact congrArg (fun z => algebraMap c.O B'.B (b.wt.c k) * z - 1) (hl (b.wt.v k) (b.wt.i k) (b.wt.γ k) (hγ k))
+  have pack := @levelUR2ModPack l _ L Ω _ _ _ _ _ _ s V0 c.O _ _ _ n r B J _ b V h q w
+    (rN h) (rN_compat h) B'.B _ _ _ (pairN h B'.u) A _ _ e lam hWeight β ⟨hβ1, hβ2⟩ M mAdd mMod ρ α h1 h2
+  -- Expose the product subgroups used to construct the Iwahori representation.
+  dsimp (config := { instances := true }) only [Pa.UIw, Pa.UIw1, Pa.UK, Pa.atJ] at pack
+  refine @pack hfinIw hNm ρ' h7 ?_ eM ?_ ι ?_
+  · assumption
+  · intro t x x' hx
+    exact (congrArg eb (he0 t x x' hx)).trans (heb (β t) (e0 x))
+  · exact h6
 
 
 theorem UpperTheory.V.Th.AnnihilatorQuotientFinite.levelX :

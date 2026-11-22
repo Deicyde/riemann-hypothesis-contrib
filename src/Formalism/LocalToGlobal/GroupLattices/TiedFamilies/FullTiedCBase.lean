@@ -35,6 +35,16 @@ theorem levTieOf_spl {L L' : ColLevel R F E sp gp C A clsLat} (h : L' = L) (t : 
   subst h
   rfl
 
+private theorem levTieOf_fr_eq_bc {L L' : ColLevel R F E sp gp C A clsLat} (hL : L' = L)
+    (t : Formalism.L2.Herm.GLevTie L G) (B : GL (Fin R.k) E)
+    (w : HeightOneSpectrum (𝓞 F)) (h : (p : 𝓞 F) ∈ w.asIdeal)
+    (hB : t.fr w h = bc (((RingHom.fst _ _).comp (t.spl w h).toRingHom).comp
+      (inclE (F := F) (w.adicCompletion F))) B) :
+    (levTieOf hL t).fr w h = bc (((RingHom.fst _ _).comp ((levTieOf hL t).spl w h).toRingHom).comp
+      (inclE (F := F) (w.adicCompletion F))) B := by
+  subst hL
+  exact hB
+
 end Cast
 
 variable (D : D7) (sc : Scale) (Ce : ℝ)
@@ -62,10 +72,17 @@ abbrev gatTiesC : GatTies (recC D sc Ce Lc I ψ hd) := gatTiesG D sc Ce Lc (pack
 theorem ringTied_recC (u : D.what₂.Word) (w : D.what₂.places.Pl) (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w))
     (v : Fin ((recC D sc Ce Lc I ψ hd).gat u w hg).P.nV) : RingCompatibleAt (recC D sc Ce Lc I ψ hd) u w hg v := by
   unfold RingCompatibleAt
-  exact ⟨RingEquiv.refl (((recC D sc Ce Lc I ψ hd).gat u w hg).P.W v),
-    RingEquiv.refl (((recC D sc Ce Lc I ψ hd).gat u w hg).P.Qq v),
-    RingEquiv.refl ((recC D sc Ce Lc I ψ hd).gat u w hg).O, RingEquiv.refl ((recC D sc Ce Lc I ψ hd).gat u w hg).Kf,
-    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, rfl⟩
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · exact RingEquiv.refl (((recC D sc Ce Lc I ψ hd).gat u w hg).P.W v)
+  · exact RingEquiv.refl (((recC D sc Ce Lc I ψ hd).gat u w hg).P.Qq v)
+  -- Reduce the extension-ring instances through the record update on each witness goal.
+  · dsimp +instances only [ORec, KfRec, tauRec, recC, recG]
+    apply RingEquiv.refl
+  · dsimp +instances only [ORec, KfRec, tauRec, recC, recG]
+    apply RingEquiv.refl
+  all_goals
+    intros
+    rfl
 
 def hermitianLevelZeroOfRecursion (H0 : Formalism.L2.Herm.Herm0 (recC D sc Ce Lc I ψ hd)) (hL : ∀ u, H0.lev0 u = Lc u) :
     Formalism.L2.Herm.Herm0 (recC D sc Ce Lc I ψ hd) :=
@@ -75,7 +92,7 @@ theorem gatIs_recC (H0 : Formalism.L2.Herm.Herm0 (recC D sc Ce Lc I ψ hd)) (hL 
     (hH : ∀ u w h, Cmp.HypAtP (I u w h)) (u : D.what₂.Word) (w : D.what₂.places.Pl)
     (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) :
     GatIs (recC D sc Ce Lc I ψ hd) (hermitianLevelZeroOfRecursion D sc Ce Lc I ψ hd H0 hL).lev0 u w hg := by
-  exact gatIs_recG D sc Ce Lc (packC D Lc I ψ) hd _ hL hH u w hg
+  exact gatIs_recG D sc Ce Lc (packC D Lc I ψ) hd H0.lev0 hL hH u w hg
 
 
 
@@ -87,10 +104,7 @@ theorem frRat_C (H0 : Formalism.L2.Herm.Herm0 (recC D sc Ce Lc I ψ hd)) (hL : �
     (u : D.what₂.Word) (w : D.what₂.places.Pl) (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) :
     Cmp.FrRat (hermitianLevelZeroOfRecursion D sc Ce Lc I ψ hd H0 hL) u w hg B := by
   intro w' h
-  dsimp only [hermitianLevelZeroOfRecursion]
-  erw [levTieOf_fr (hL u) (levTieG D sc Ce Lc (packC D Lc I ψ) hd u w hg),
-    levTieOf_spl (hL u) (levTieG D sc Ce Lc (packC D Lc I ψ) hd u w hg)]
-  exact hB u w hg w' h
+  exact levTieOf_fr_eq_bc (hL u) (levTieG D sc Ce Lc (packC D Lc I ψ) hd u w hg) B w' h (hB u w hg w' h)
 
 
 

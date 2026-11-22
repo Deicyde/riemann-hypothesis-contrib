@@ -61,19 +61,41 @@ variable {X : HidaSetting D} {u : D.what₂.Word} {F : Forms0 D u} {F' : Forms0 
 
 
 
-theorem colDictInto_reTr (h : ColDictInto X T Y.hK) : ColDictInto (reX Z X) (reTr Z T hy he) (reY Z Y).hK := (by with_unfolding_all exact ((colDict_congr T Y.hK ((by with_unfolding_all exact (colDictL (reX Z X) (reTr Z T hy he) (reY Z Y).hK :)))
-    ((by with_unfolding_all exact (colDictL_reTr Z T hy he Y.hK :)))).1 h :))
+private theorem colDict_congr_reTr :
+    (ColDictInto X T Y.hK → ColDictInto (reX Z X) (reTr Z T hy he) (reY Z Y).hK) ∧
+    (ColDictBij X T Y.hK → ColDictBij (reX Z X) (reTr Z T hy he) (reY Z Y).hK) ∧
+    ∀ (hF : FinX Y) (hF' : FinX (reY Z Y)),
+      ColDictIsom X T Y.hK (Y.cs u) (hF.shInj u) →
+      ColDictIsom (reX Z X) (reTr Z T hy he) (reY Z Y).hK ((reY Z Y).cs u) (hF'.shInj u) := by
+  let L' := @colDictL (reD D Z) (reX Z X) u F' (@reTr D Z X u F F' T hy he) Y.hK
+  -- Elaborate in the original indices of each term and let the kernel check the
+  -- definitional equalities across reD, as in eCure.
+  let L : Cu X u Y.hK →ₗ[ℂ] ((D.mem u).C.cls 0 → (D.mem u).C.Y 0 → ℂ) := by
+    run_tac
+      let value ← Lean.Elab.Tactic.getFVarId (Lean.mkIdent `L')
+      Lean.Elab.Tactic.liftMetaFinishingTactic (·.assign (.fvar value))
+  have hL : ∀ x, L x = colDictL X T Y.hK x :=
+    @colDictL_reTr D Z X u F F' T hy he Y.hK
+  have h := colDict_congr T Y.hK L hL
+  have result := And.intro h.1 (And.intro h.2.1
+    (fun (hF : FinX Y) (_ : FinX (reY Z Y)) => h.2.2 (Y.cs u) (hF.shInj u)))
+  run_tac
+    let proof ← Lean.Elab.Tactic.getFVarId (Lean.mkIdent `result)
+    Lean.Elab.Tactic.liftMetaFinishingTactic (·.assign (.fvar proof))
+
+theorem colDictInto_reTr (h : ColDictInto X T Y.hK) : ColDictInto (reX Z X) (reTr Z T hy he) (reY Z Y).hK :=
+  (colDict_congr_reTr Z T hy he Y).1 h
 
 
 
-theorem colDictBij_reTr (h : ColDictBij X T Y.hK) : ColDictBij (reX Z X) (reTr Z T hy he) (reY Z Y).hK := (by with_unfolding_all exact ((colDict_congr T Y.hK ((by with_unfolding_all exact (colDictL (reX Z X) (reTr Z T hy he) (reY Z Y).hK :)))
-    ((by with_unfolding_all exact (colDictL_reTr Z T hy he Y.hK :)))).2.1 h :))
+theorem colDictBij_reTr (h : ColDictBij X T Y.hK) : ColDictBij (reX Z X) (reTr Z T hy he) (reY Z Y).hK :=
+  (colDict_congr_reTr Z T hy he Y).2.1 h
 
 
 
 theorem colDictIsom_reTr (hF : FinX Y) (hF' : FinX (reY Z Y)) (h : ColDictIsom X T Y.hK (Y.cs u) (hF.shInj u)) :
-    ColDictIsom (reX Z X) (reTr Z T hy he) (reY Z Y).hK ((reY Z Y).cs u) (hF'.shInj u) := (by with_unfolding_all exact ((colDict_congr T Y.hK ((by with_unfolding_all exact (colDictL (reX Z X) (reTr Z T hy he) (reY Z Y).hK :)))
-    ((by with_unfolding_all exact (colDictL_reTr Z T hy he Y.hK :)))).2.2 (Y.cs u) (hF.shInj u) h :))
+    ColDictIsom (reX Z X) (reTr Z T hy he) (reY Z Y).hK ((reY Z Y).cs u) (hF'.shInj u) :=
+  (colDict_congr_reTr Z T hy he Y).2.2 hF hF' h
 
 end Col
 

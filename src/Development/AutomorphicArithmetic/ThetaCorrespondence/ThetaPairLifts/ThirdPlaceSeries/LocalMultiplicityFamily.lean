@@ -79,32 +79,24 @@ def localEigenvalueDegree : ℕ → (DL x L).what₂.FT → ℕ → PlE (DL x L)
 def smallPlaceSet : Finset (PlE (DL x L).host) := (by with_unfolding_all exact (l.rat.In.Sb :))
 theorem twist_ok_local : ∀ v, TwistedAt (DL x L) v → IntegralHeckeForms.TwOK ((_root_.GlobalTheory.HeightCounting.Fin3.characterChoiceLocal L l).twI v) ((_root_.GlobalTheory.HeightCounting.Fin3.characterChoiceLocal L l).k' v) ((_root_.GlobalTheory.HeightCounting.Fin3.characterChoiceLocal L l).Q v)
     (((_root_.GlobalTheory.HeightCounting.Fin3.characterChoiceLocal L l).psi' v).comp ((DL x L).ntw.art ((_root_.GlobalTheory.HeightCounting.Fin3.characterChoiceLocal L l).twI v) ((_root_.GlobalTheory.HeightCounting.Fin3.characterChoiceLocal L l).Q v))) := by
-  intro v hv
-  with_unfolding_all exact (l.c.ok v hv :)
+  -- The kernel checks the conversion between the two character choices.
+  run_tac Lean.Elab.Tactic.closeMainGoalUsing `twistOk fun _ _ =>
+    Lean.Elab.Tactic.elabTerm (Lean.mkIdent `l.c.ok) none
 
 
 theorem thetaTie_yStructureLocal_nonempty : Nonempty (GlobalTheory.GeoTie.ThetaTie (_root_.GlobalTheory.HeightCounting.Fin3.yStructureLocal L l) (datL x L).geo.fw (DL x L).nth) := by
-  let Y : NExpRealS (datL x L).R (datL x L).cG (ratL L l.rat.S) := by
-    with_unfolding_all exact (yStructureLocal L l :)
-  with_unfolding_all change Nonempty (GlobalTheory.GeoTie.ThetaTie Y (datL x L).geo.fw (DL x L).nth)
   obtain ⟨g⟩ := l.b.geo
   refine ⟨{ side := ?_, isUnramified₂ := ?_ }⟩
   · intro i j b
     let side := g.side (by with_unfolding_all exact (i :)) (by with_unfolding_all exact (j :)) b
     refine { pt := ?_, cover := ?_, ev_eq := ?_, fmUr := ?_, hk := ?_, hk_none := ?_ }
-    · with_unfolding_all exact (side.pt :)
-    · intro z
-      with_unfolding_all exact (side.cover z :)
-    · intro f y
-      with_unfolding_all exact (side.ev_eq f y :)
-    · intro f
-      with_unfolding_all exact (side.fmUr f :)
-    · intro k P hP
-      with_unfolding_all exact (side.hk k P hP :)
-    · intro k P hP y hy c
-      with_unfolding_all exact (side.hk_none k P hP y hy c :)
-  · intro i
-    with_unfolding_all exact (g.isUnramified₂ i :)
+    -- The transported fields have definitionally equal types. The kernel
+    -- checks them in the resulting record without elaborator unification.
+    run_tac
+      for field in [`side.pt, `side.cover, `side.ev_eq, `side.fmUr, `side.hk, `side.hk_none] do
+        Lean.Elab.Tactic.closeMainGoalUsing `thetaTieField fun _ _ =>
+          Lean.Elab.Tactic.elabTerm (Lean.mkIdent field) none
+  · with_unfolding_all exact (g.isUnramified₂ :)
 
 theorem kept_characterChoiceLocal : Kept l.c.ch (_root_.GlobalTheory.HeightCounting.Fin3.characterChoiceLocal L l) :=
   ⟨sameGaloisL L, twistDataAgreeAcrossCoefficients_localized L, sameFormsL L, (by with_unfolding_all exact ((HEq.refl (Dof x).ntwbr) :)), (by with_unfolding_all exact ((HEq.refl l.c.ch.twI) :)), (by with_unfolding_all exact ((HEq.refl l.c.ch.sd) :)),

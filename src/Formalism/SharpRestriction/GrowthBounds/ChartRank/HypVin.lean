@@ -83,32 +83,31 @@ theorem valIntN_of (S : StepIn M i hi G) (e : D.what₂.LL →+* G.Kf) (w : D.wh
   have hpw := (L β).resChar
   subst hpw
   have : Fact (D.what₂.places.resChar w).Prime := ⟨D.what₂.places.resChar_prime w⟩
-  have hblk : BlockRational G.P (S.loc β).rk S.pos (gramC (gramN D i hi) (embT D))
-      (crdB (embT D) (S.loc β).B) D.what₂.embLL (M.lam i) := by
-    refine hS G.P (S.loc β).rk S.pos _ _ D.what₂.embLL (M.lam i) (H β).wt fun τ => ⟨bc (tEL D τ) ((S.loc β).B)⁻¹, ?_⟩
-    ext a b
-    exact (tEL_emb D τ _).symm
-  exact valIntAt_of (S := (S.K β).lev) (emb := embT D) (embLL := D.what₂.embLL) (G := S.charts.gat β)
+  have hCore := H β
+  have hLat := L β
+  have hEx := (hCore.toHyp hS).ex
+  have hσ : ∀ x : D.host.E, sigD D (sigD D x) = x := by
+    intro x
+    rw [Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.forms_involution_eq_host_conj,
+      Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.forms_involution_eq_host_conj,
+      Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.host_conj_involutive]
+  refine valIntAt_of (S := (S.K β).lev) (emb := embT D) (embLL := D.what₂.embLL) (G := S.charts.gat β)
     (e := e) (A := S.loc β) (pos := S.pos) (embV := S.embN β) (yc := (S.K β).y) weylLatticeDescent_holds hfrac (tEL D) (tEL_emb D)
-    (intW D.what₂.places w) hR0 (M.lam i) (H β).wt (valEx_of_rep' (tEL D) (tEL_emb D) (embT_conj D) (H β).std (S.adExt β)
-      (ptEx_of (H β).good (S.K β).lev (S.K β).y (S.K β).y_bij.2)
-      (ptOne_of (S.K β).lev (H β).int (H β).hypP (H β).bad_p)
-      (S.evRatRep β (H β).chRat hblk) (H β).chiRat)
+    (intW D.what₂.places w) hR0 (M.lam i) hCore.wt hEx
     (fun cl B' => IsLocBasis (D.what₂.places.resChar w)
       (dualSet (sigD D : D.host.E →+* D.host.E) (gramN D i hi) (S.lat cl.1)) B')
-    (fun cl => exB_of_lat hi (D.what₂.places.resChar w) (S.lat cl.1) ((L β).lat cl))
-    (fun a Lt cl g γ κ hg hγ hpt B' hB' v s => by
-      exact latO_of (tEL D) (H β).pos_emb
-        (fun x => by rw [Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.forms_involution_eq_host_conj, Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.forms_involution_eq_host_conj, Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.host_conj_involutive])
-        (H β).std γ hγ B' Lt
-        (fun v => by
-          rw [hg v]
-          exact latW_gen (S.K β).lev (S.loc β) (H β).int hp (L β).siteGood_prime_torsion (L β).alg (L β).base (S.lat cl.1) ((S.K β).y cl)
-            ((S.K β).y_lat cl) (le_dual_chart (S.K β) cl) B' hB' a g γ κ hpt v)
-        (fun v a b => gramW_gen (S.K β).lev (S.loc β) (H β).int hp (L β).siteGood_prime_torsion (L β).alg
-          (Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.bwB_gramN_det D i hi) (S.lat cl.1) ((S.K β).y cl) ((S.K β).y_lat cl) (le_dual_chart (S.K β) cl)
-          B' hB' v a b) v s)
-    (L β).chi
+    (fun cl => exB_of_lat hi (D.what₂.places.resChar w) (S.lat cl.1) (hLat.lat cl)) ?_ hLat.chi
+  intro a Lt cl g γ κ hg hγ hpt B' hB' v s
+  have hDual := le_dual_chart (S.K β) cl
+  refine latO_of (G := S.charts.gat β) (e := e) (A := S.loc β) (pos := S.pos)
+    (σ := sigD D) (J := gramN D i hi) (tEL D) hCore.pos_emb hσ hCore.std γ hγ B' Lt ?_ ?_ v s
+  · intro v
+    exact (hg v).trans (latW_gen (S.K β).lev (S.loc β) hCore.int hp hLat.siteGood_prime_torsion
+      hLat.alg hLat.base (S.lat cl.1) ((S.K β).y cl) ((S.K β).y_lat cl) hDual B' hB' a g γ κ hpt v)
+  · intro v a b
+    exact gramW_gen (S.K β).lev (S.loc β) hCore.int hp hLat.siteGood_prime_torsion hLat.alg
+      (Formalism.L2.GlobalTheoryTheory.LocalLatticeBases.bwB_gramN_det D i hi)
+      (S.lat cl.1) ((S.K β).y cl) ((S.K β).y_lat cl) hDual B' hB' v a b
 
 end Formalism.MainNotions.G.CmpJ.PValIntN
 

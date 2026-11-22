@@ -23,19 +23,24 @@ theorem read_updS_keep (R : RealDat3 D A3 Ks) (F : Face3 D A3) (lam : type_of% R
     (Y : Read (A3 := A3) R.toRealDat F.lv2 X0) (Z : ReadL R F X0 Y) :
     ∃ (Y' : Read (A3 := A3) ((R.updS R.kap lam).withErr err).toRealDat (reFace F Dc Sp Zsc).lv2 X0) (Z' : ReadL ((R.updS R.kap lam).withErr err) (reFace F Dc Sp Zsc) X0 Y'), Y'.tup = Y.tup ∧ Y'.tupT = Y.tupT ∧ HEq Y'.jA Y.jA ∧ HEq Y'.jA0 Y.jA0 ∧ HEq Y'.eMt Y.eMt ∧ HEq Y'.PY Y.PY ∧ HEq Y'.eFT Y.eFT ∧ HEq Y'.IL Y.IL ∧ HEq Y'.PW Y.PW ∧ HEq Y'.eE Y.eE ∧ HEq Y'.mj.eW Y.mj.eW ∧ HEq Z'.eRR Z.eRR ∧ HEq Z'.jW Z.jW := by
   refine ⟨reFaceRead (R.updS R.kap lam) F Dc Sp Zsc err X0 Y,
-    reFaceReadL (R.updS R.kap lam) F Dc Sp Zsc err X0 Y (scalReadL R F lam hX X0 Y Z),
-    rfl, rfl, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  · exact (by with_unfolding_all exact (HEq.refl Y.jA :))
-  · exact (by with_unfolding_all exact (HEq.refl Y.jA0 :))
-  · exact (by with_unfolding_all exact (HEq.refl Y.eMt :))
-  · exact (by with_unfolding_all exact (HEq.refl Y.PY :))
-  · exact (by with_unfolding_all exact (HEq.refl Y.eFT :))
-  · exact (by with_unfolding_all exact (HEq.refl Y.IL :))
-  · exact (by with_unfolding_all exact (HEq.refl Y.PW :))
-  · exact (by with_unfolding_all exact (HEq.refl Y.eE :))
-  · exact (by with_unfolding_all exact (HEq.refl Y.mj.eW :))
-  · exact (by with_unfolding_all exact (HEq.refl Z.eRR :))
-  · exact (by with_unfolding_all exact (HEq.refl Z.jW :))
+    reFaceReadL (R.updS R.kap lam) F Dc Sp Zsc err X0 Y (scalReadL R F lam hX X0 Y Z), ?_⟩
+  have fields := And.intro (Eq.refl Y.tup) <| And.intro (Eq.refl Y.tupT) <|
+    And.intro (HEq.refl Y.jA) <| And.intro (HEq.refl Y.jA0) <|
+    And.intro (HEq.refl Y.eMt) <| And.intro (HEq.refl Y.PY) <|
+    And.intro (HEq.refl Y.eFT) <| And.intro (HEq.refl Y.IL) <|
+    And.intro (HEq.refl Y.PW) <| And.intro (HEq.refl Y.eE) <|
+    And.intro (HEq.refl Y.mj.eW) <| And.intro (HEq.refl Z.eRR) (HEq.refl Z.jW)
+  -- Compare the fully elaborated conjunction in the kernel, which reduces the copied fields.
+  run_tac
+    Lean.Elab.Tactic.closeMainGoalUsing `exact fun target _ => do
+      let proof ← Lean.Elab.Tactic.elabTerm (Lean.mkIdent `fields) none
+      let actual ← Lean.instantiateMVars (← Lean.Meta.inferType proof)
+      let target ← Lean.instantiateMVars target
+      let context ← Lean.instantiateLCtxMVars (← Lean.getLCtx)
+      match Lean.Kernel.isDefEq (← Lean.getEnv) context actual target with
+      | .ok true => pure proof
+      | .ok false => throwError "The copied fields are not definitionally equal"
+      | .error err => Lean.throwKernelException err
 
 end GlobalTheory.Mem.R3
 

@@ -57,17 +57,21 @@ theorem read_of_fits : ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B
   have hU : ∀ μ, Used0 (w.st o.Z).toD7 μ ↔ m.y.Us μ := by
     intro μ; unfold Used0 Hd.Us; simp only [hmu]
   have hN : NumOK (w.st o.Z).toD7 := q.num o.η o.hη o.V o.S o.N o.G
-  have k1 := rowSide_of_pk _ _ _ _ _ _ m.z.R.toRealDat m.z.F.lv2 m.y hU true m.t.rep _ (RowSide.sharp (w.st o.Z).toD7) _
-    (w.st o.Z).toD7.what₂.onb (w.st o.Z).toD7.what₂.ft (fun t x => ((m.t.tA true (m.y.tup t)).cast (m.t.hA true t)).j x) (m.t.ch true)
-  obtain ⟨Ish, h1R, h1P, h1E, h1X⟩ := k1
-  have k0 := rowSide_of_pk _ _ _ _ _ _ m.z.R.toRealDat m.z.F.lv2 m.y hU false m.t.rep _ s.p0.s _
-    (w.st o.Z).toD7.what₂.onb0 (w.st o.Z).toD7.what₂.ft0 (fun t x => ((m.t.tA false (m.y.tup t)).cast (m.t.hA false t)).j x) (m.t.ch false)
-  obtain ⟨Iz, h0R, h0P, h0E, h0X⟩ := k0
+  -- The coordinate maps of these local definitions reduce to the chain maps.
+  let Ish := SideTie.ids (S := RowSide.sharp (w.st o.Z).toD7) hU (m.t.ch true)
+  let Iz := SideTie.ids (D := (w.st o.Z).toD7) (R := m.z.R.toRealDat) (F := m.z.F.lv2)
+    (S := s.p0.s) (bs := (w.st o.Z).toD7.what₂.onb0) (ty := (w.st o.Z).toD7.what₂.ft0)
+    hU (m.t.ch false)
+  have h1R := SideTie.real (S := RowSide.sharp (w.st o.Z).toD7) hU (m.t.ch true)
+  have h0R := SideTie.real (D := (w.st o.Z).toD7) (R := m.z.R.toRealDat) (F := m.z.F.lv2)
+    (S := s.p0.s) (bs := (w.st o.Z).toD7.what₂.onb0) (ty := (w.st o.Z).toD7.what₂.ft0)
+    hU (m.t.ch false)
   have kL := liftTie_of_pk _ _ _ _ _ _ m.z.R.toRealDat m.z.F.lv2 m.y hU hN.lam m.t.rep _ m.t.lf
   obtain ⟨IL, mj, hLT, hPW, hMj, hMt, hEW⟩ := kL
   have kF := RepCls.reps_classes _ _ _ _ _ _ m.z.R.toRealDat m.z.F.lv2 m.y _ m.t.rep m.t.reps
   obtain ⟨eF, heF⟩ := kF
-  have kE := exists_eE m.y hB true (m.t.ch true).jE (m.t.ch true).jE_range
+  have kE := exists_eE (E := (w.st o.Z).toD7.what₂.EE) m.y hB true
+    (m.t.ch true).jE (m.t.ch true).jE_range
   obtain ⟨eE, heE⟩ := kE
   have hocc : ∀ π, (∃ σ, (q.p.ch true).ty σ = π) ∨ ∃ σ, (q.p.ch false).ty σ = π := fun π => by
     have k := (heF π).2.2.2
@@ -95,8 +99,8 @@ theorem read_of_fits : ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B
     eFT := eF
     ιW := m.y.ιW
     tied := ⟨h1R, h0R, hLT, colTie m.y hB hN.bu⟩
-    prtE := fun π => by exact (h1P π).trans ((heF π).2.1 true).symm
-    prtE0 := fun π => by exact (h0P π).trans ((heF π).2.1 false).symm
+    prtE := fun π => by exact ((heF π).2.1 true).symm
+    prtE0 := fun π => by exact ((heF π).2.1 false).symm
     prtWE := fun i π => by exact (hPW i π).trans ((heF π).2.2.1 i).symm
     xi := fun _ _ => rfl
     isomFin := m.y.isomFin
@@ -113,22 +117,31 @@ theorem read_of_fits : ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B
     formsL := fun i t => by exact (cast_forms (m.t.hL i t) (q.p.tL (m.y.tup t) ((i : ℕ) + 1)))
     latL := fun i t => by exact (cast_lat (m.t.hL i t) (q.p.tL (m.y.tup t) ((i : ℕ) + 1)))
     topRead := fun t h x => by
-      exact ((h1X _ h _).trans ((congrArg ((m.t.ch true).jX (m.y.tup t))
-        (((q.p.ch true).multTop (m.y.tup t)).apply_symm_apply _)).trans ((m.t.ch true).top t ((hU _).1 h) x)))
+      let e := (q.p.ch true).multTop (m.y.tup t)
+      let v := ((m.t.tA true (m.y.tup t)).cast (m.t.hA true t)).j x
+      change (m.t.ch true).jX (m.y.tup t) (e (e.symm v)) = _
+      exact (congrArg ((m.t.ch true).jX (m.y.tup t)) (e.apply_symm_apply v)).trans
+        ((m.t.ch true).top t ((hU _).1 h) x)
     topRead0 := fun t h x => by
-      exact ((h0X _ h _).trans ((congrArg ((m.t.ch false).jX (m.y.tup t))
-        (((q.p.ch false).multTop (m.y.tup t)).apply_symm_apply _)).trans ((m.t.ch false).top t ((hU _).1 h) x)))
+      let e := (q.p.ch false).multTop (m.y.tup t)
+      let v := ((m.t.tA false (m.y.tup t)).cast (m.t.hA false t)).j x
+      change (m.t.ch false).jX (m.y.tup t) (e (e.symm v)) = _
+      exact (congrArg ((m.t.ch false).jX (m.y.tup t)) (e.apply_symm_apply v)).trans
+        ((m.t.ch false).top t ((hU _).1 h) x)
     mtRead := fun i t h x => by
       exact ((hMt _ h i _).trans ((congrArg (m.t.lf.jMt (m.y.tup t) i)
         (cast_apply (m.t.hL i t) (q.p.tL (m.y.tup t) ((i : ℕ) + 1)) x)).trans (m.t.lf.read i t ((hU _).1 h) x)))
     mj := mj
     mjRead := fun i v => by
-      exact ((hMj i v).trans ((m.t.lf.jMj_read i v).trans
-        (congrArg (fun u => PiTensorProduct.lift ((m.z.R.HW i _).e u)) (hEW i v).symm)))
+      refine (hMj i v).trans ?_
+      exact (m.t.lf.jMj_read i v).trans
+        (congrArg (fun u => PiTensorProduct.lift ((m.z.R.HW i _).e u)) (hEW i v).symm)
     stable := fun μ => by exact (m.t.tA true μ).stable
     stable0 := fun μ => by exact (m.t.tA false μ).stable
     eE := by exact eE
-    eE_read := fun x => by exact ((h1E x).trans (heE x))
+    eE_read := fun x => by
+      change (m.t.ch true).jE x = _
+      exact heE x
     dall := by exact m.t.dall
     junk := fun μ h => iota_eq_zero _ m.y.hm μ ((m.t.ch true).junk μ fun h' => h ((hU μ).2 h'))
     cen0 := fun cG hk t => by
@@ -146,8 +159,12 @@ theorem read_of_fits : ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B
   · intro i t x
     exact heq_funCongr (K := B.LL) (congrArg Mat1.n (m.t.hL i t)) x
   · exact fun π => (heF π).1
-  · exact fun x => heq_of_eq (h1E x)
-  · exact fun x => heq_of_eq (h0E x)
+  · intro x
+    change HEq ((m.t.ch true).jE x) ((m.t.ch true).jE x)
+    exact HEq.rfl
+  · intro x
+    change HEq ((m.t.ch false).jE x) ((m.t.ch false).jE x)
+    exact HEq.rfl
   · exact fun i x => heq_of_eq (hEW i x)
   · exact fun μ h i x => heq_of_eq (hMt μ h i x)
 

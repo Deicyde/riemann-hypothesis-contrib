@@ -42,14 +42,13 @@ private theorem pow_fix (r : Res l K) (a : r.k) : ∃ f : ℕ, 0 < f ∧ a ^ l ^
   obtain ⟨x, rfl⟩ := r.surj a
   have hc : ‖((x : K) : PadicAlgCl l)‖ ≤ 1 := mem_normInteger.1 x.2
   obtain ⟨k₀, k₁, hlt, hn⟩ := exists_lt_norm_pow_sub_lt hc one_pos (fun k => l ^ k)
+  let toAlgCl : OK l K →+* PadicAlgCl l := K.val.toRingHom.comp (OK l K).subtype
   have hd := rho_zero r (x ^ l ^ k₁ - x ^ l ^ k₀) (by
-    have e : ((okToOC l K (x ^ l ^ k₁ - x ^ l ^ k₀) : OC l) : ℂ_[l]) =
-        clToC l (((x : K) : PadicAlgCl l) ^ l ^ k₁ - ((x : K) : PadicAlgCl l) ^ l ^ k₀) := by
-      simp [okToOC]
-    rw [e, norm_clToC]
+    change ‖clToC l (toAlgCl (x ^ l ^ k₁ - x ^ l ^ k₀))‖ < 1
+    rw [norm_clToC, map_sub toAlgCl, map_pow toAlgCl, map_pow toAlgCl]
     exact hn)
   rw [map_sub, map_pow, map_pow, sub_eq_zero] at hd
-  refine ⟨k₁ - k₀, by omega, ?_⟩
+  refine ⟨k₁ - k₀, Nat.sub_pos_of_lt hlt, ?_⟩
   have h0 : ((r.ρ x) ^ l ^ (k₁ - k₀) - r.ρ x) ^ l ^ k₀ = 0 := by
     rw [sub_pow_char_pow, ← pow_mul, ← pow_add, Nat.sub_add_cancel hlt.le, hd, sub_self]
   exact sub_eq_zero.1 (pow_eq_zero_iff (pow_ne_zero _ (Fact.out : l.Prime).ne_zero) |>.1 h0)
@@ -164,28 +163,34 @@ private def fB : Acris l →+* ACris.BCris (untilt_epsilon (p := l)) :=
   (algebraMap (ACris.BCrisPlus ℂ_[l] l) (ACris.BCris (untilt_epsilon (p := l)))).comp
     (algebraMap (Acris l) (ACris.BCrisPlus ℂ_[l] l))
 
+private theorem fB_apply (a : Acris l) :
+    fB l a = algebraMap (ACris.BCrisPlus ℂ_[l] l) (ACris.BCris hE)
+      (algebraMap (Acris l) (ACris.BCrisPlus ℂ_[l] l) a) := rfl
+
 private theorem iB_fB (a : Acris l) : ACris.iotaB hE hZ (fB l a) = DeRhamPotentiallySemistable.DRPst.iC l a := by
-  change ACris.iotaB hE hZ (algebraMap (ACris.BCrisPlus ℂ_[l] l) _ (algebraMap (Acris l) _ a)) = _
-  rw [ACris.iotaB_algebraMap, ACris.iotaPlus_algebraMap]
-  rfl
+  exact (congrArg (ACris.iotaB hE hZ) (fB_apply a)).trans
+    ((ACris.iotaB_algebraMap hE hZ _).trans
+      (congrArg (algebraMap (BDeRhamPlus (normInteger ℂ_[l]) l) (BDeRham (normInteger ℂ_[l]) l))
+        (ACris.iotaPlus_algebraMap (K := ℂ_[l]) (p := l) a)))
 
 private theorem iC_inj : Function.Injective (DeRhamPotentiallySemistable.DRPst.iC l) :=
   (IsFractionRing.injective (BDeRhamPlus (normInteger ℂ_[l]) l) (BDeRham (normInteger ℂ_[l]) l)).comp
     (ACris.iota_injective (K := ℂ_[l]) (p := l))
 
-private theorem fB_t_unit : IsUnit (fB l (tA l)) :=
-  IsLocalization.Away.algebraMap_isUnit (S := ACris.BCris (untilt_epsilon (p := l)))
-    (algebraMap (ACris.ACris ℂ_[l] l) (ACris.BCrisPlus ℂ_[l] l) (ACris.periodT (untilt_epsilon (p := l))))
+private theorem fB_t_unit : IsUnit (fB l (tA l)) := by
+  rw [fB_apply (tA l)]
+  exact IsLocalization.Away.algebraMap_isUnit (S := ACris.BCris hE)
+    (algebraMap (Acris l) (ACris.BCrisPlus ℂ_[l] l) (ACris.periodT hE))
 
 private theorem iC_t_unit : IsUnit (DeRhamPotentiallySemistable.DRPst.iC l (tA l)) := by
-  rw [← iB_fB]
-  exact fB_t_unit.map _
+  exact iB_fB (tA l) ▸ (fB_t_unit (l := l)).map (ACris.iotaB hE hZ)
 
 private theorem galB_fB (σ : Gal(PadicAlgCl l/K)) (a : Acris l) :
     ACris.galB hE σ (fB l a) = fB l (ACris.galCris σ a) := by
-  change ACris.galB hE σ (algebraMap (ACris.BCrisPlus ℂ_[l] l) _ (algebraMap (Acris l) _ a)) = _
-  rw [ACris.galB_algebraMap]
-  exact congrArg _ (ACris.galPlus_algebraMap σ a)
+  exact (congrArg (ACris.galB hE σ) (fB_apply a)).trans
+    ((ACris.galB_algebraMap hE σ _).trans
+      ((congrArg (algebraMap (ACris.BCrisPlus ℂ_[l] l) (ACris.BCris hE))
+          (ACris.gal_smul_algebraMap_plus σ a)).trans (fB_apply (ACris.galCris σ a)).symm))
 
 private theorem galCris_w (r : Res l K) (σ : Gal(PadicAlgCl l/K)) (w : WittVector l r.k) :
     ACris.galCris σ (r.w w) = r.w w := by
@@ -208,12 +213,12 @@ private theorem hT [FiniteDimensional ℚ_[l] K] (r : Res l K) (w : WittVector l
     ∃ k ∈ maxUnramified l K,
       DeRhamPotentiallySemistable.DRPst.iC l (r.w w) = algebraMap (BDeRhamPlus (normInteger ℂ_[l]) l) (BDeRham (normInteger ℂ_[l]) l) (algClToBdR l k) ∧
       clToC l k = ((tau r w : OC l) : ℂ_[l]) := by
-  obtain ⟨k, hk, h⟩ := ACris.bCris_fixed_mem_maxUnramified hE hZ (K := K) (fB l (r.w w)) (fun σ => by
-    rw [galB_fB, galCris_w])
-  rw [iB_fB] at h
-  refine ⟨k, hk, h, ?_⟩
+  obtain ⟨k, hk, h⟩ := ACris.bCris_fixed_mem_maxUnramified hE hZ (K := K) (fB l (r.w w)) (fun σ =>
+    (galB_fB σ (r.w w)).trans (congrArg (fB l) (galCris_w r σ w)))
+  have hi := (iB_fB (r.w w)).symm.trans h
+  refine ⟨k, hk, hi, ?_⟩
   have h1 : ACris.iota ℂ_[l] l (r.w w) = algClToBdR l k :=
-    IsFractionRing.injective (BDeRhamPlus (normInteger ℂ_[l]) l) (BDeRham (normInteger ℂ_[l]) l) h
+    IsFractionRing.injective (BDeRhamPlus (normInteger ℂ_[l]) l) (BDeRham (normInteger ℂ_[l]) l) hi
   have h2 := congrArg (thetaAlgHom l) h1
   rw [thetaAlgHom_algClToBdR] at h2
   have h3 : r.w w = algebraMap (Ainf l) (Acris l) (WittVector.map r.s w) := rfl
@@ -297,47 +302,60 @@ private theorem hK [FiniteDimensional ℚ_[l] K] (r : Res l K) {k : PadicAlgCl l
   have e : k₁ = k := (clToC l).injective h3
   exact ⟨w, e ▸ h2⟩
 
+private theorem injective_of_pow_mul_ker {A C D : Type*} [CommRing A] [CommRing C] [CommRing D]
+    (c : A →+* C) (i : A →+* D) (hi : Function.Injective i) {t : A} (ht : IsUnit (i t))
+    (hker : ∀ a, c a = 0 → ∃ m : ℕ, t ^ m * a = 0) : Function.Injective c := by
+  intro u v huv
+  obtain ⟨m, hm⟩ := hker (u - v) ((map_sub c u v).trans (sub_eq_zero.mpr huv))
+  have hz := congrArg i hm
+  simp only [map_mul, map_pow, map_zero] at hz
+  have hsub := hi (((ht.pow m).mul_right_eq_zero).1 hz |>.trans (map_zero i).symm)
+  exact sub_eq_zero.mp hsub
+
+private theorem map_cross_mul {A C : Type*} [CommRing A] [CommRing C]
+    (c : A →+* C) (s : A →+* A) (g : C →+* C) {t a : A} {n : ℕ} {x : C}
+    (hsc : ∀ u, g (c u) = c (s u)) (hx : g x = x) (hna : c t ^ n * x = c a) :
+    c (s a * t ^ n) = c (a * s t ^ n) := by
+  have h := congrArg g hna
+  simp only [map_mul, map_pow, hx, hsc] at h
+  rw [map_mul c, map_mul c, map_pow c, map_pow c, ← h, ← hna]
+  calc
+    _ = (c (s t) ^ n * c t ^ n) * x := mul_right_comm _ _ _
+    _ = (c t ^ n * c (s t) ^ n) * x := congrArg (· * x) (mul_comm _ _)
+    _ = _ := (mul_right_comm _ _ _).symm
+
 private theorem mainC [FiniteDimensional ℚ_[l] K] (B₀ : PB l K) (r : Res l K) : InvC B₀ r := by
   refine ⟨fun g w => galCris_w r _ w, fun x hx => ?_⟩
-  have hcinj : ∀ u v : Acris l, B₀.c u = B₀.c v → u = v := by
-    intro u v h
-    obtain ⟨m, hm⟩ := B₀.ker (u - v) (by rw [map_sub, h, sub_self])
-    have h1 := congrArg (DeRhamPotentiallySemistable.DRPst.iC l) hm
-    rw [map_mul, map_pow, map_zero] at h1
-    have h2 := ((iC_t_unit.pow m).mul_right_eq_zero).1 h1
-    rw [map_sub, sub_eq_zero] at h2
-    exact iC_inj h2
+  have hcinj : Function.Injective B₀.c :=
+    injective_of_pow_mul_ker B₀.c (DeRhamPotentiallySemistable.DRPst.iC l) iC_inj iC_t_unit B₀.ker
   obtain ⟨n, a, hna⟩ := B₀.loc x
   obtain ⟨T, hT1⟩ := fB_t_unit (l := l) |>.exists_right_inv
   have hy : ∀ σ : Gal(PadicAlgCl l/K), ACris.galB hE σ (fB l a * T ^ n) = fB l a * T ^ n := by
     intro σ
-    have hσ : IntermediateField.fixingSubgroupEquiv K ((IntermediateField.fixingSubgroupEquiv K).symm σ) = σ :=
-      MulEquiv.apply_symm_apply _ σ
-    have hsc : ∀ u, B₀.σ ((IntermediateField.fixingSubgroupEquiv K).symm σ) (B₀.c u) = B₀.c (ACris.galCris σ u) := by
-      intro u
-      rw [B₀.σ_c, galA, hσ]
-    have hg := hx ((IntermediateField.fixingSubgroupEquiv K).symm σ)
-    refine fix_aux (fB l) (ACris.galB hE σ) (ACris.galCris σ) (galB_fB σ) hT1 (hcinj _ _ ?_)
-    have h1 := congrArg (B₀.σ ((IntermediateField.fixingSubgroupEquiv K).symm σ)) hna
-    rw [map_mul, map_pow, hg, hsc, hsc] at h1
-    rw [map_mul, map_mul, map_pow, map_pow, ← h1, ← hna]
-    ring
+    let e := IntermediateField.fixingSubgroupEquiv K
+    let g := e.symm σ
+    let s := ACris.galCris σ
+    have hsc (u : Acris l) : B₀.σ g (B₀.c u) = B₀.c (s u) :=
+      (B₀.σ_c g u).trans (congrArg (fun σ' => B₀.c (ACris.galCris σ' u)) (e.apply_symm_apply σ))
+    have hcross := map_cross_mul B₀.c s (B₀.σ g).toRingHom hsc (hx g) hna
+    exact fix_aux (fB l) (ACris.galB hE σ) s (galB_fB σ) hT1 (hcinj hcross)
   obtain ⟨k, hk, hky⟩ := ACris.bCris_fixed_mem_maxUnramified hE hZ (K := K) _ hy
   obtain ⟨e, he⟩ : ∃ e : ℕ, ‖(l : PadicAlgCl l) ^ e * k‖ ≤ 1 := by
     have hl1 : ‖(l : PadicAlgCl l)‖ < 1 := norm_natCast_p_algCl_lt_one
-    obtain ⟨e, he⟩ := exists_pow_lt_of_lt_one (show 0 < (‖k‖ + 1)⁻¹ by positivity) hl1
+    have h1 : 0 < ‖k‖ + 1 := add_pos_of_nonneg_of_pos (norm_nonneg k) one_pos
+    obtain ⟨e, he⟩ := exists_pow_lt_of_lt_one (inv_pos.mpr h1) hl1
     refine ⟨e, ?_⟩
     rw [norm_mul, norm_pow]
-    have h1 : 0 < ‖k‖ + 1 := by positivity
     calc ‖(l : PadicAlgCl l)‖ ^ e * ‖k‖ ≤ (‖k‖ + 1)⁻¹ * (‖k‖ + 1) :=
-          mul_le_mul he.le (by linarith) (norm_nonneg _) (by positivity)
+          mul_le_mul he.le (le_add_of_nonneg_right zero_le_one) (norm_nonneg _) (inv_nonneg.mpr h1.le)
       _ = 1 := inv_mul_cancel₀ h1.ne'
   obtain ⟨w, hw⟩ := hK r (mul_mem (pow_mem (natCast_mem _ l) e) hk) he
   refine ⟨e, w, ?_⟩
+  let q := (algebraMap (BDeRhamPlus (normInteger ℂ_[l]) l) (BDeRham (normInteger ℂ_[l]) l)).comp
+    (algClToBdR l : PadicAlgCl l →+* BDeRhamPlus (normInteger ℂ_[l]) l)
   have hA : (l : Acris l) ^ e * a = tA l ^ n * r.w w :=
     iC_inj (pullback_fin_relation (fB l) (ACris.iotaB hE hZ) (DeRhamPotentiallySemistable.DRPst.iC l)
-      ((algebraMap (BDeRhamPlus (normInteger ℂ_[l]) l) (BDeRham (normInteger ℂ_[l]) l)).comp (algClToBdR l : PadicAlgCl l →+* BDeRhamPlus (normInteger ℂ_[l]) l))
-      iB_fB hT1 hky hw)
+      q iB_fB hT1 hky hw)
   exact fin2 B₀.c (B₀.t_unit.pow n) hna hA
 
 end UpperTheory.Ru.crystallineComparison.PBI

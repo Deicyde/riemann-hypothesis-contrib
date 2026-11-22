@@ -23,38 +23,38 @@ theorem lawsM_tr {T : Core a.D} (h : LawsM T) : LawsM (core b T) := by
   have key : ∀ c : CDHaar, c = a.G.cd → LawsM (core (setCd b c) T) := by
     rintro _ rfl
     constructor
-    case pins => exact (by with_unfolding_all exact (h.pins :))
-    case half => exact (by with_unfolding_all exact (h.half :))
-    case evalWD => exact (by with_unfolding_all exact (h.evalWD :))
-    case unf => exact (by with_unfolding_all exact (h.unf :))
-    case unTest => exact (by with_unfolding_all exact (h.unTest :))
-    case chiTriv => exact (by with_unfolding_all exact (h.chiTriv :))
-    case dictU => exact (by with_unfolding_all exact (h.dictU :))
-    case spaceW => exact (by with_unfolding_all exact (h.spaceW :))
-    case levelK => exact (by with_unfolding_all exact (h.levelK :))
-    case xiAbs => exact (by with_unfolding_all exact (h.xiAbs :))
-    case muUnit => exact (by with_unfolding_all exact (h.muUnit :))
-    case muCont => exact (by with_unfolding_all exact (h.muCont :))
-    case finVol => exact (by with_unfolding_all exact (h.finVol :))
-    case cuspFD => exact (by with_unfolding_all exact (h.cuspFD :))
-    case supDef => exact (by with_unfolding_all exact (h.supDef :))
-    case cuspidalL2Subspace => exact (by with_unfolding_all exact (h.cuspidalL2Subspace :))
-    case l2Def => exact (by with_unfolding_all exact (h.l2Def :))
-    case unitIndep => exact (by with_unfolding_all exact (h.unitIndep :))
-    case ptNe => exact (by with_unfolding_all exact (h.ptNe :))
-  exact (by with_unfolding_all exact ((key b.G.cd (cd_eq _ _)) :))
+    case pins => with_unfolding_all exact h.pins
+    case half => with_unfolding_all exact h.half
+    case evalWD => with_unfolding_all exact h.evalWD
+    case unf => with_unfolding_all exact h.unf
+    case unTest => with_unfolding_all exact h.unTest
+    case chiTriv => with_unfolding_all exact h.chiTriv
+    case dictU => with_unfolding_all exact h.dictU
+    case spaceW => with_unfolding_all exact h.spaceW
+    case levelK => with_unfolding_all exact h.levelK
+    case xiAbs => with_unfolding_all exact h.xiAbs
+    case muUnit => with_unfolding_all exact h.muUnit
+    case muCont => with_unfolding_all exact h.muCont
+    case finVol => with_unfolding_all exact h.finVol
+    case cuspFD => with_unfolding_all exact h.cuspFD
+    case supDef => with_unfolding_all exact h.supDef
+    case cuspidalL2Subspace => with_unfolding_all exact h.cuspidalL2Subspace
+    case l2Def => with_unfolding_all exact h.l2Def
+    case unitIndep => with_unfolding_all exact h.unitIndep
+    case ptNe => with_unfolding_all exact h.ptNe
+  with_unfolding_all exact key b.G.cd (cd_eq _ _)
 
 theorem lawsJ_tr {T : CoreJ a.D} (h : LawsJ T) : LawsJ (coreJ b T) := by
   constructor
-  case toLawsM => exact (by with_unfolding_all exact ((lawsM_tr b h.toLawsM) :))
-  case cUnit => exact (by with_unfolding_all exact (h.cUnit :))
-  case muVal => exact (by with_unfolding_all exact (h.muVal :))
-  case muConj => exact (by with_unfolding_all exact (h.muConj :))
-  case intAll => exact (by with_unfolding_all exact (h.intAll :))
-  case modelW => exact (by with_unfolding_all exact (h.modelW :))
-  case familyUniformisationBasePointOrthogonal => exact (by with_unfolding_all exact (h.familyUniformisationBasePointOrthogonal :))
-  case kfHalf => exact (by with_unfolding_all exact (h.kfHalf :))
-  case adPin => exact (by with_unfolding_all exact (h.adPin :))
+  case toLawsM => with_unfolding_all exact lawsM_tr b h.toLawsM
+  case cUnit => with_unfolding_all exact h.cUnit
+  case muVal => with_unfolding_all exact h.muVal
+  case muConj => with_unfolding_all exact h.muConj
+  case intAll => with_unfolding_all exact h.intAll
+  case modelW => with_unfolding_all exact h.modelW
+  case familyUniformisationBasePointOrthogonal => with_unfolding_all exact h.familyUniformisationBasePointOrthogonal
+  case kfHalf => with_unfolding_all exact h.kfHalf
+  case adPin => with_unfolding_all exact h.adPin
 
 variable {A : FamIn a.D.what₂.LL G Pl0 T0 a.D.R.m}
 
@@ -98,32 +98,34 @@ theorem omPins_tr {O : OMDat T R i Tp tup} {κ v₀ ι x₀} (h : O.Pins κ v₀
       ((ι)) ((x₀)) := by
   apply (config := { synthAssignedInstances := false }) OMDat.Pins.mk
   case lift =>
+    have lift := h.lift
     apply (config := { synthAssignedInstances := false }) ThPinsR.mk
-    case field => exact (by with_unfolding_all exact (h.lift.field :))
-    case std => exact (by with_unfolding_all exact (h.lift.std :))
-    case v0 => exact (by with_unfolding_all exact (h.lift.v0 :))
-    case lev => exact (by with_unfolding_all exact (h.lift.lev :))
+    case field => with_unfolding_all exact lift.field
+    case std => with_unfolding_all exact lift.std
+    case v0 => with_unfolding_all exact lift.v0
+    case lev => with_unfolding_all exact lift.lev
     case c0 =>
-      obtain ⟨x, y, z, h1, h2⟩ := h.lift.c0
+      obtain ⟨x, y, z, h1, h2⟩ := lift.c0
       refine ⟨(by with_unfolding_all exact (x :)), (by with_unfolding_all exact (y :)), (by with_unfolding_all exact (z :)), ?_, (by with_unfolding_all exact (h2 :))⟩
-      exact (by with_unfolding_all exact ((famTie_imp b _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ h1) :))
+      with_unfolding_all exact famTie_imp b _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ h1
   case tuple =>
     intro t
+    have ht := h.tuple t
     apply (config := { synthAssignedInstances := false }) ThPinsT.mk
-    case reps => exact (by with_unfolding_all exact ((h.tuple t).reps :))
-    case B => exact (by with_unfolding_all exact ((h.tuple t).B :))
-    case xi => exact (by with_unfolding_all exact ((h.tuple t).xi :))
-    case phi => exact (by with_unfolding_all exact ((h.tuple t).phi :))
-    case half => exact (by with_unfolding_all exact ((h.tuple t).half :))
-  case act => exact (by with_unfolding_all exact (h.act :))
-  case bad => exact (by with_unfolding_all exact (h.bad :))
-  case reps => exact (by with_unfolding_all exact (h.reps :))
-  case ep => exact (by with_unfolding_all exact (h.ep :))
-  case io => exact (by with_unfolding_all exact (h.io :))
-  case w => exact (by with_unfolding_all exact (h.w :))
-  case cov => exact (by with_unfolding_all exact (h.cov :))
-  case cxi => exact (by with_unfolding_all exact (h.cxi :))
-  case model₂ => exact (by with_unfolding_all exact (h.model₂ :))
+    case reps => with_unfolding_all exact ht.reps
+    case B => with_unfolding_all exact ht.B
+    case xi => with_unfolding_all exact ht.xi
+    case phi => with_unfolding_all exact ht.phi
+    case half => with_unfolding_all exact ht.half
+  case act => with_unfolding_all exact h.act
+  case bad => with_unfolding_all exact h.bad
+  case reps => with_unfolding_all exact h.reps
+  case ep => with_unfolding_all exact h.ep
+  case io => with_unfolding_all exact h.io
+  case w => with_unfolding_all exact h.w
+  case cov => with_unfolding_all exact h.cov
+  case cxi => with_unfolding_all exact h.cxi
+  case model₂ => with_unfolding_all exact h.model₂
 
 end Theta
 
@@ -162,18 +164,15 @@ def geoHalf {ph : Fin a.D.R.m → ℂ} (x : GeoHalf T R ph) :
 set_option maxHeartbeats 16000000 in
 theorem inGeo_tr {ph : Fin a.D.R.m → ℂ} {x : GeoHalf T R ph} (h : InGeo x) :
     @InGeo b.D G _ _ Pl0 T0 (famM b A) (coreJ b T) ((@alg B C a b (↥(@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff.F (@Formalism.HC.HostRaw.E (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (@Formalism.HC.HostRaw.instField (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (@Formalism.HC.HostRaw.instNF (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (instCMHost (@Late.D B C a)) (@Par.H (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))) (@Par.l (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))) (@Par.c (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))))) (@IntermediateField.toField Rat Complex Rat.instField Complex.instField (@DivisionRing.toRatAlgebra Complex (@Field.toDivisionRing Complex Complex.instField) Complex.instCharZero) (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff.F (@Formalism.HC.HostRaw.E (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (@Formalism.HC.HostRaw.instField (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (@Formalism.HC.HostRaw.instNF (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (instCMHost (@Late.D B C a)) (@Par.H (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))) (@Par.l (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))) (@Par.c (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))))) iK)) ((@real B C a b G ‹Group G› ‹Fintype G› Pl0 T0 (↥(@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff.F (@Formalism.HC.HostRaw.E (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (@Formalism.HC.HostRaw.instField (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (@Formalism.HC.HostRaw.instNF (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (instCMHost (@Late.D B C a)) (@Par.H (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))) (@Par.l (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))) (@Par.c (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))))) (@IntermediateField.toField Rat Complex Rat.instField Complex.instField (@DivisionRing.toRatAlgebra Complex (@Field.toDivisionRing Complex Complex.instField) Complex.instCharZero) (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff.F (@Formalism.HC.HostRaw.E (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (@Formalism.HC.HostRaw.instField (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (@Formalism.HC.HostRaw.instNF (@Late.D B C a).R.toFrame (@Formalism.HC.HostAx.toHostRaw (@Late.D B C a).R.toFrame (@Host.toHostAx (@Late.D B C a).R (@Late.D B C a).host))) (instCMHost (@Late.D B C a)) (@Par.H (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))) (@Par.l (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))) (@Par.c (@Late.D B C a) (@Core.Q (@Late.D B C a) (@CoreJ.toCore (@Late.D B C a) T))))) (inferInstance) iK A R)) ((ph)) (geoHalf b x) := by
-  apply (config := { synthAssignedInstances := false }) InGeo.mk
-  case jEvExists => exact (by with_unfolding_all exact (h.jEvExists :))
-  case jEvBar => exact (by with_unfolding_all exact (h.jEvBar :))
-  case evInj => exact (by with_unfolding_all exact (h.evInj :))
-  case jUnif => exact (by with_unfolding_all exact (h.jUnif :))
-  case geoAct =>
-    intro i
-    exact (by with_unfolding_all exact (h.geoAct i :))
-  case latFull => exact (by with_unfolding_all exact (h.latFull :))
-  case dimMatch =>
-    intro i
-    exact (by with_unfolding_all exact (h.dimMatch i :))
+  -- Build the constructor using the indices in the goal so the kernel handles
+  -- conversion of the transported fields.
+  run_tac
+    Lean.Elab.Tactic.closeMainGoalUsing `inGeo_tr fun target _ => do
+      let source ← Lean.Meta.getFVarFromUserName `h
+      let fields ← (Lean.getStructureFields (← Lean.getEnv) ``InGeo).mapM fun field => do
+        Lean.Meta.mkProjection source field
+      let ctor := Lean.mkConst ``InGeo.mk target.getAppFn.constLevels!
+      return Lean.mkAppN (Lean.mkAppN ctor target.getAppArgs) fields
 
 end GlobalTheory.Mem.R3.Tr
 

@@ -134,16 +134,25 @@ theorem gsLocalRes_cohomologyπ_bock (z : cocycles (zmodRep.{0} (galUnramifiedOu
       galCupClass (v.adicCompletion K.1) (AlgebraicClosure (v.adicCompletion K.1))
         (contCharComp (charQZ χ) (decompHomS (v.adicCompletion K.1) S ι)
           (continuous_decompHomS (Kv := v.adicCompletion K.1) S ι))
-        (Units.map (algebraMap K.1 (v.adicCompletion K.1) : K.1 →* _) b) :=
-  cohomologyMapAlong_cohomologyπ_bock _ _ (decompHomS (v.adicCompletion K.1) S ι)
-    (continuous_decompHomS (Kv := v.adicCompletion K.1) S ι) (embUnitsMorZ S ι) z _
-    (fun σ => (charQZ_apply χ _).trans (congrArg (zmodToQZ n) (hχ _))) _ _
+        (Units.map (algebraMap K.1 (v.adicCompletion K.1) : K.1 →* _) b) := by
+  delta gsLocalRes
+  have hbock := cohomologyMapAlong_cohomologyπ_bock
+    (v.adicCompletion K.1) (AlgebraicClosure (v.adicCompletion K.1))
+    (decompHomS (v.adicCompletion K.1) S ι) (continuous_decompHomS (Kv := v.adicCompletion K.1) S ι)
+    (A := galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) (embUnitsMorZ S ι) z
+    (contCharComp (charQZ χ) (decompHomS (v.adicCompletion K.1) S ι)
+      (continuous_decompHomS (Kv := v.adicCompletion K.1) S ι))
+    (fun σ => (charQZ_apply χ _).trans (congrArg (zmodToQZ n) (hχ _)))
+    (Units.map (algebraMap K.1 (v.adicCompletion K.1) : K.1 →* v.adicCompletion K.1) b)
+    (Additive.ofMul (Units.map (algebraMap K.1 (maxUnramifiedOutside K.1 ℚ̄ S)).toMonoidHom b))
     (by
       apply Additive.toMul.injective
       apply Units.ext
       change ι (algebraMap K.1 ℚ̄ (b : K.1)) = algebraMap (v.adicCompletion K.1)
         (AlgebraicClosure (v.adicCompletion K.1)) (algebraMap K.1 (v.adicCompletion K.1) (b : K.1))
       rw [AlgHom.commutes, ← IsScalarTower.algebraMap_apply]) w hw
+  -- The restriction map is already unfolded, so use reducible transparency for the final check.
+  with_reducible exact hbock
 
 end LocalClass
 
@@ -183,15 +192,19 @@ theorem placeInv_gsLocalRes_of_bock (t : sInvariantSubgroup ℚ̄ S)
       (globalUniformizer v ^ ordAbove S v (t : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ)))) =
         ordAbove S v (t : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ) := by
     rw [ordEmb_algebraMap, ordAt_zpow', ordAt_globalUniformizer, mul_one]
-  have hval : (cohomologyMapAlong (decompHomS (v.adicCompletion K.1) S ι)
-      (continuous_decompHomS (Kv := v.adicCompletion K.1) S ι) (ordEmbMor S ι hv) 2).hom
+  let φ := decompHomS (v.adicCompletion K.1) S ι
+  let hφ : Continuous φ := continuous_decompHomS (Kv := v.adicCompletion K.1) S ι
+  let f := ordEmbMor S ι hv
+  have hval : (cohomologyMapAlong φ hφ f 2).hom
         (cohomologyπ _ 2 W - cohomologyπ _ 2 wb) = 0 := by
-    rw [map_sub, sub_eq_zero, cohomologyMapAlong_cohomologyπ, cohomologyMapAlong_cohomologyπ]
-    congr 1
+    refine (map_sub (cohomologyMapAlong φ hφ f 2).hom _ _).trans (sub_eq_zero.2 ?_)
+    refine (cohomologyMapAlong_cohomologyπ φ hφ f W).trans (Eq.trans ?_
+      (cohomologyMapAlong_cohomologyπ φ hφ f wb).symm)
+    apply congrArg (cohomologyπ _ 2)
     apply cocycles_ext
     funext s
-    rw [cochainOf_cocycleι_cocyclesMapAlong, cochainOf_cocycleι_cocyclesMapAlong]
-    beta_reduce
+    refine (congrFun (cochainOf_cocycleι_cocyclesMapAlong φ hφ f W) s).trans (Eq.trans ?_
+      (congrFun (cochainOf_cocycleι_cocyclesMapAlong φ hφ f wb) s).symm)
     have hu : ∀ u : Fin 2 → galUnramifiedOutside K.1 ℚ̄ S, u = ![u 0, u 1] := fun u => by
       funext j
       fin_cases j <;> rfl
@@ -206,8 +219,10 @@ theorem placeInv_gsLocalRes_of_bock (t : sInvariantSubgroup ℚ̄ S)
       fun u => by
         conv_lhs => rw [hu u]
         exact hwbv _ _
-    refine (hW' _).trans ?_
-    refine Eq.trans ?_ (congrArg (ordEmb S ι hv) (hwb' _)).symm
+    have hleft := ordEmbMor_hom_apply S ι hv (cochainOf _ (cocycleι _ 2 W) (⇑φ ∘ s))
+    have hright := ordEmbMor_hom_apply S ι hv (cochainOf _ (cocycleι _ 2 wb) (⇑φ ∘ s))
+    refine hleft.trans ((hW' (⇑φ ∘ s)).trans (Eq.trans ?_ hright.symm))
+    refine Eq.trans ?_ (congrArg (ordEmb S ι hv) (hwb' (⇑φ ∘ s))).symm
     refine Eq.trans ?_ (map_zsmul (ordEmb S ι hv) _ _).symm
     exact (congrArg (_ * ·) hbv.symm).trans (smul_eq_mul _ _).symm
   have hloc := (gsLocalRes_eq_zero_iff S ι hv _).2 hval
@@ -263,24 +278,31 @@ theorem sum_localInvU_eq_neg_divChar (t : sInvariantSubgroup ℚ̄ S)
       -divChar S hodd χ (divAbove S (Additive.ofMul t)) := by
   classical
   let ιL := gsLocalEmbeddings S ιs
-  let B : cohomology (unitsLimitRep K) 2 :=
-    (gsBrauerInfl K S 2).hom (cohomologyULiftIntAddEquiv _ 2 (cohomologyπ _ 2 W)) - sUnitsBrauer K S y
+  let x := cohomologyULiftIntAddEquiv _ 2 (cohomologyπ _ 2 W)
+  let A := (gsBrauerInfl K S 2).hom x
+  let C := sUnitsBrauer K S y
+  let B := A - C
   have hBv : ∀ w : HeightOneSpectrum (𝓞 K.1), placeInv (K := K) (.inr w) (brauerLocal ιL B (.inr w)) =
-      placeInv (K := K) (.inr w) ((gsLocalRes S (ιL.fin w) 2).hom (cohomologyULiftIntAddEquiv _ 2 (cohomologyπ _ 2 W))) -
-        placeInv (K := K) (.inr w) (brauerLocal ιL (sUnitsBrauer K S y) (.inr w)) := fun w => by
-    have e : brauerLocal ιL B (.inr w) = brauerLocal ιL ((gsBrauerInfl K S 2).hom
-        (cohomologyULiftIntAddEquiv _ 2 (cohomologyπ _ 2 W))) (.inr w) -
-          brauerLocal ιL (sUnitsBrauer K S y) (.inr w) := by
-      rw [map_sub, DFinsupp.sub_apply]
-    rw [e, map_sub, brauerLocal_gsBrauerInfl_inr]
+      placeInv (K := K) (.inr w) ((gsLocalRes S (ιL.fin w) 2).hom x) -
+        placeInv (K := K) (.inr w) (brauerLocal ιL C (.inr w)) := fun w => by
+    let p : Place K.1 := .inr w
+    let inv := placeInv (K := K) p
+    have e := (congrArg (fun z => z p) (map_sub (brauerLocal ιL) A C)).trans
+      (DFinsupp.sub_apply (brauerLocal ιL A) (brauerLocal ιL C) p)
+    have h := congrArg (fun z => inv z - inv (brauerLocal ιL C p))
+      (brauerLocal_gsBrauerInfl_inr K S ιL w x)
+    with_reducible exact (congrArg inv e).trans ((map_sub inv _ _).trans h)
   have hS' : ∀ v : S, placeInv (K := K) (.inr (v : HeightOneSpectrum (𝓞 K.1)))
       (brauerLocal ιL B (.inr (v : HeightOneSpectrum (𝓞 K.1)))) = localInvU (v : HeightOneSpectrum (𝓞 K.1)) (β' v) := by
     intro v
     have hfin : ιL.fin (v : HeightOneSpectrum (𝓞 K.1)) = ιs v := gsLocalEmbeddings_fin S ιs v
-    have h2 : brauerLocal ιL (sUnitsBrauer K S y) (.inr (v : HeightOneSpectrum (𝓞 K.1))) =
-        (gsLocalRes S (ιs v) 2).hom (cohomologyULiftIntAddEquiv _ 2
-          ((cohomologyMap (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) 2).hom y)) := by
-      rw [sUnitsBrauer_apply, brauerLocal_gsBrauerInfl_inr, hfin]
+    let y' := cohomologyULiftIntAddEquiv _ 2
+      ((cohomologyMap (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) 2).hom y)
+    have h2 : brauerLocal ιL C (.inr v.1) = (gsLocalRes S (ιs v) 2).hom y' := by
+      have hinfl := congrArg (fun z => brauerLocal ιL z (.inr v.1)) (sUnitsBrauer_apply K S y)
+      have hres := brauerLocal_gsBrauerInfl_inr K S ιL v.1 y'
+      have hemb := congrArg (fun ι => (gsLocalRes S ι 2).hom y') hfin
+      with_reducible exact hinfl.trans (hres.trans hemb)
     have hyv : (cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _)
         (gsUnitsLocalMor S ιs v) 2).hom (cohomologyπ _ 2 W) -
         (cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _)
@@ -288,30 +310,13 @@ theorem sum_localInvU_eq_neg_divChar (t : sInvariantSubgroup ℚ̄ S)
       exact (congrArg (_ - ·) (hy v).symm).trans (sub_sub_cancel _ _)
     refine (hBv (v : HeightOneSpectrum (𝓞 K.1))).trans ?_
     refine (congrArg₂ (· - ·) (congrArg (fun ι => placeInv (K := K) (.inr (v : HeightOneSpectrum (𝓞 K.1)))
-      ((gsLocalRes S ι 2).hom (cohomologyULiftIntAddEquiv _ 2 (cohomologyπ _ 2 W)))) hfin)
+      ((gsLocalRes S ι 2).hom x)) hfin)
       (congrArg (placeInv (K := K) (.inr (v : HeightOneSpectrum (𝓞 K.1)))) h2)).trans ?_
     refine Eq.trans ?_ (congrArg (localInvU (v : HeightOneSpectrum (𝓞 K.1))) hyv)
     refine Eq.trans ?_ (map_sub _ _ _).symm
-    have hUnits (x : cohomology (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) 2) :
-        localInvU (v : HeightOneSpectrum (𝓞 K.1))
-            ((cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _)
-              (gsUnitsLocalMor S ιs v) 2).hom x) =
-          placeInv (K := K) (.inr (v : HeightOneSpectrum (𝓞 K.1)))
-            ((gsLocalRes S (ιs v) 2).hom (cohomologyULiftIntAddEquiv _ 2 x)) := by
-      refine (DFunLike.congr_fun (localInvU_eq (v : HeightOneSpectrum (𝓞 K.1))) _).trans ?_
-      refine (AddMonoidHom.comp_apply _ _ _).trans ?_
-      refine Eq.trans ?_ (placeInv_inr_apply (K := K) _ _).symm
-      refine congrArg (brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
-        (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))) ?_
-      refine (AddMonoidHom.comp_apply _ _ _).trans ?_
-      exact cohomologyMap_uliftInt_cohomologyMapAlong_of (gsFinFamily S ιs v).toMonoidHom
-        (continuous_toMonoidHom _) (gsUnitsLocalMor S ιs v) (galUnitsToZ _ _)
-        (embUnitsMorZ S (ιs v)) (fun _ => rfl) 2 x
-    have hSUnits := congrArg (localInvU (v : HeightOneSpectrum (𝓞 K.1)))
-      (cohomologyMapAlong_cohomologyMap_apply (gsFinFamily S ιs v).toMonoidHom
-        (continuous_toMonoidHom _) (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S))
-        (gsUnitsLocalMor S ιs v) 2 y)
-    exact congrArg₂ (· - ·) (hUnits _).symm ((hUnits _).symm.trans hSUnits)
+    exact congrArg₂ (· - ·)
+      (localInvU_cohomologyMapAlong_gsUnitsLocalMor S ιs v (cohomologyπ _ 2 W)).symm
+      (localInvU_cohomologyMapAlong_gsSUnitsLocalMor S ιs v y).symm
   have hout : ∀ (w : HeightOneSpectrum (𝓞 K.1)) (hw : w ∉ S), placeInv (K := K) (.inr w) (brauerLocal ιL B (.inr w)) =
       divChar S hodd χ (Finsupp.single ⟨w, hw⟩ (ordAbove S w (t : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ))) := by
     intro w hw

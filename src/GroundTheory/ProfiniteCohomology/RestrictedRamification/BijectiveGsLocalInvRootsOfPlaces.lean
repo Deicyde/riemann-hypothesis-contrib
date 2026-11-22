@@ -83,6 +83,26 @@ theorem natCast_not_mem_of_not_mem : ∀ v ∉ S, ((n : ℕ) : 𝓞 K.1) ∉ v.a
   fun v hv h => hv (mem_of_natCast_pow_mem S n ℓ k hnk hS v h)
 
 
+include hℓ hnk hS in
+private theorem gsLevelBijective_of_pairing [Nonempty S] (hμ : ∀ ζ : ℚ̄, ζ ^ n = 1 → ζ ∈ K.1)
+    (hP : GsPairingNondegenerate S ιs n hodd h3) :
+    GsLevelBijective (S := S) (ιs := ιs) (n := n) (gsCompactInv S ιs n hodd h3) := by
+  refine ⟨bijective_gsCompactInv_of_mem S n ιs ℓ k hℓ hnk hS hμ hodd h3, ?_⟩
+  intro r s h
+  have h3Z := subsingleton_zmodRep_gs_three S n ℓ k hnk hS hodd
+  have hfin1 := finite_zmodRep_gs_one S n ℓ k hnk hS
+  have hfin2 := finite_gsRoots_compact_two S n ℓ k hnk hS ιs
+  have hleft := hP.1
+  have hright := hP.2
+  have hdual := bijective_gs_compactZmodDualityMap S ιs n ℓ k hℓ hnk hS hμ
+    hodd h3 h3Z hfin1 hfin2
+  -- The kernel checks the conversion of the pairing hypotheses and the duality map.
+  run_tac Lean.Elab.Tactic.withMainContext do
+    let dual ← Lean.Meta.getFVarFromUserName `hdual
+    let args ← #[`hleft, `hright, `r, `s, `h].mapM (m := Lean.MetaM) Lean.Meta.getFVarFromUserName
+    let goal ← Lean.Elab.Tactic.getMainGoal
+    goal.assign (Lean.Meta.mkExpectedPropHint (Lean.mkAppN dual args) (← goal.getType))
+
 
 include hℓ hnk hS in
 theorem gsBaseBijective_of_le (hP : GsPairingInput n ℓ)
@@ -96,29 +116,33 @@ theorem gsBaseBijective_of_le (hP : GsPairingInput n ℓ)
     GsBaseBijective S ιs n (gsOpenSubgroup S hL) (gsCompactInv S ιs n hodd h3) := by
   have hnS := natCast_not_mem_of_not_mem S n ℓ k hnk hS
   have : Nonempty S := nonempty_of_natCast_mem S ℓ hℓ hS
-  let := fintypePlacesOver (L := L) S
-  have : Nonempty (placesOver S : Set (HeightOneSpectrum (𝓞 L.1))) :=
-    nonempty_placesOver_of_natCast_mem S hℓ hS
-  have hSL : ∀ w : HeightOneSpectrum (𝓞 L.1), ((ℓ : ℕ) : 𝓞 L.1) ∈ w.asIdeal → w ∈ placesOver S :=
+  let SL := placesOver (F := K.1) (L := L.1) S
+  let ιsL := gsMackeyEmbeddings (F := K.1) (L := L.1) (Ω := ℚ̄) hL ιs
+  let : Fintype SL := fintypePlacesOver (L := L) S
+  have : Nonempty SL := nonempty_placesOver_of_natCast_mem (L := L) S hℓ hS
+  have hSL : ∀ w : HeightOneSpectrum (𝓞 L.1), ((ℓ : ℕ) : 𝓞 L.1) ∈ w.asIdeal → w ∈ SL :=
     fun w hw => mem_placesOver_of_natCast_mem hS hw
   have hμL : ∀ ζ : ℚ̄, ζ ^ n = 1 → ζ ∈ L.1 :=
-    rootsOfUnity_mem_of_gsOpenSubgroup_le S n hL W₀ hW₀ hUW (NeZero.ne n) hnS
+    rootsOfUnity_mem_of_gsOpenSubgroup_le (L := L) S n hL W₀ hW₀ hUW (NeZero.ne n) hnS
   have hoddL : Odd n ∨ IsTotallyComplex L.1 := hodd.imp id fun h => by
     have := h
     exact isTotallyComplex_of_algebra K.1 L.1
-  have h3L := subsingleton_gsRoots_three (placesOver S) n ℓ k hnk hSL hoddL
-  have hPL := hP L (placesOver S) (gsMackeyEmbeddings hL ιs) hSL hμL hoddL h3L
-  have hsurj : GsCoresSurjective S ιs n (gsOpenSubgroup S hL) (gsCompactInv S ιs n hodd h3) :=
-    (surjective_gsCompactInv S n ιs hodd h3 fun v =>
-      (bijective_gsLocalInvRoots_of_places S ιs n hnS v).2).comp (hcores _)
+  have h3L := subsingleton_gsRoots_three (K := L) SL n ℓ k hnk hSL hoddL
+  have hPL := hP L SL ιsL hSL hμL hoddL h3L
+  let U := gsOpenSubgroup (F := K.1) (L := L.1) (Ω := ℚ̄) S hL
+  have hInv := surjective_gsCompactInv S n ιs hodd h3 fun v =>
+    (bijective_gsLocalInvRoots_of_places S ιs n hnS v).2
+  have hsurj : GsCoresSurjective S ιs n U (gsCompactInv S ιs n hodd h3) := by
+    have hcomp := hInv.comp (hcores U)
+    -- The kernel identifies the underlying function with the bundled composition.
+    run_tac Lean.Elab.Tactic.withMainContext do
+      let proof ← Lean.Meta.getFVarFromUserName `hcomp
+      let goal ← Lean.Elab.Tactic.getMainGoal
+      goal.assign (Lean.Meta.mkExpectedPropHint proof (← goal.getType))
+  have hLev := gsLevelBijective_of_pairing (K := L) SL ιsL n ℓ k hℓ hnk hSL hoddL h3L hμL hPL
   intro r s h
-  exact bijective_zmodCompactDualityMap_gsOpenSubgroup S ιs hL n _
-    (gsCompactInv (placesOver S) (gsMackeyEmbeddings hL ιs) n hoddL h3L)
-    ⟨bijective_gsCompactInv_of_mem (placesOver S) n (gsMackeyEmbeddings hL ιs) ℓ k hℓ hnk hSL hμL hoddL h3L,
-      fun h => bijective_gs_compactZmodDualityMap (placesOver S) (gsMackeyEmbeddings hL ιs) n ℓ k hℓ hnk hSL hμL
-        hoddL h3L (subsingleton_zmodRep_gs_three (placesOver S) n ℓ k hnk hSL hoddL)
-        (finite_zmodRep_gs_one (placesOver S) n ℓ k hnk hSL)
-        (finite_gsRoots_compact_two (placesOver S) n ℓ k hnk hSL (gsMackeyEmbeddings hL ιs)) hPL.1 hPL.2 h⟩ hsurj h
+  exact bijective_zmodCompactDualityMap_gsOpenSubgroup (K := K) (L := L) S ιs hL n (gsCompactInv S ιs n hodd h3)
+    (gsCompactInv (K := L) SL ιsL n hoddL h3L) hLev hsurj (r := r) (s := s) h
 
 end Level
 
