@@ -420,6 +420,16 @@
             "resolution": "resolutions/54-normf-membership.lean"
           }
         ]
+      },
+      {
+        "commit": "26dceebeca3c8a5b784978878ce48a68f6239086",
+        "files": [
+          {
+            "path": "src/Formalism/SharpRestriction/GrowthBounds/HermitianTensor/GrowthOfBasic.lean",
+            "ours": "dacb8b3cb0316fae5a6afd913afcc11fb27663dc",
+            "resolution": "resolutions/54-hermitian-growth.lean"
+          }
+        ]
       }
     ]
   }
