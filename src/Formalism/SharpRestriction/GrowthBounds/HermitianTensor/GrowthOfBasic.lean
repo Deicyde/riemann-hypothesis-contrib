@@ -233,4 +233,3 @@ theorem pb_abs {O K V : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing
 end Formalism.MainNotions.flipOneThree.Pf
 
 end
-

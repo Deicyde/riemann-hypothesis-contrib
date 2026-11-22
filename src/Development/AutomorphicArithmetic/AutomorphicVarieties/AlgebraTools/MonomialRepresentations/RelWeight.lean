@@ -85,4 +85,3 @@ theorem UpperTheory.V.AlgebraTools.relWeight :
     exact ⟨1, one_ne_zero, by simpa [hP] using hm⟩
   calc ∑ i, m i * f (q i) = f (∑ i, m i • q i) := by simp [map_sum]
     _ = 0 := by rw [hq0, map_zero]
-

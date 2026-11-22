@@ -54,4 +54,3 @@ theorem finite_quotient_of_complete_nakayama : ∀ {R : Type} [CommRing R] (ϖ :
   exact Submodule.smul_mem _ _ (Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_image_of_mem _ hi)))
 
 end GlobalTheory
-
