@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/ExistsGlobalElementNearIdempotentAdicCompletion.lean",
+      "stages": {
+        "1": "1f1b2180d573998f27592a838593bef133602f67",
+        "2": "bc362fc68b406235a645dd76c4c35015c285daf9",
+        "3": "db751b4f53a0a3235b66e076f0af911ffed6a266"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "adaecfe4f877c48b999c0bca21dbcbdfb54b9c5c",
+  "checkpoint_head": "525be01611d1d49231b2a14b636f0e81d25448e7"
+}
