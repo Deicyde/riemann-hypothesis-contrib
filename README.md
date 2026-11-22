@@ -20,6 +20,8 @@ checking. Follow [Checking the proof](#checking-the-proof) for the verification 
 consult the [verification notes](verification/NOTES.md) for recorded results and the source
 revisions they cover.
 
+The [`literature/`](literature/README.md) directory collects a reader's proposals for matching the formal statements with published results.
+
 ## What is claimed
 
 `src/Main.lean` proves five theorems:
