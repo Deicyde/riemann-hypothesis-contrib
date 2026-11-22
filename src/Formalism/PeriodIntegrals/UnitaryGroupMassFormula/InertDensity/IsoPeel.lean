@@ -22,13 +22,12 @@ theorem iso_li_tail {n c : ℕ} (x : Fin n → L) (X' : Fin c → Fin n → L) (
     LinearIndependent L (fun i => X' i - a i • x) := by
   rw [Fintype.linearIndependent_iff] at h ⊢
   intro g hg i
-  have := h (Fin.cons (-(∑ j, g j * a j)) g) (by
+  simpa using (h (Fin.cons (-(∑ j, g j * a j)) g) (by
     rw [Fin.sum_univ_succ]
     simp only [Fin.cons_zero, Fin.cons_succ]
     rw [← hg]
     simp only [smul_sub, Finset.sum_sub_distrib, smul_smul, ← Finset.sum_smul, neg_smul]
-    abel) i.succ
-  simpa using this
+    abel) i.succ)
 
 theorem iso_li_cons {n c : ℕ} (x : Fin n → L) (U : Fin c → Fin n → L) (a : Fin c → L)
     (φ : (Fin n → L) →ₗ[L] L) (hφx : φ x = 1) (hφU : ∀ i, φ (U i) = 0)

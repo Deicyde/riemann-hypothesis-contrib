@@ -11,12 +11,10 @@ open Finset
 lemma anti_of_step (f : ℕ → ℝ) (N : ℕ) (h : ∀ i, i + 1 < N → f (i + 1) < f i) :
     ∀ i j, i < j → j < N → f j < f i := by
   intro i j hij hjN
-  induction j with
-  | zero => omega
-  | succ j ih =>
-    rcases Nat.lt_succ_iff_lt_or_eq.1 hij with h' | h'
-    · exact lt_trans (h j (by omega)) (ih h' (by omega))
-    · subst h'; exact h i hjN
+  refine Nat.le_induction (m := i + 1) (P := fun n _ => n < N → f n < f i) ?_ ?_ j (Nat.succ_le_of_lt hij) hjN
+  · exact fun hN => h i hN
+  · intro n hn ih hN
+    exact lt_trans (h n (by omega)) (ih (by omega))
 
 lemma gap_of_step (f : ℕ → ℝ) (N : ℕ) (h : ∀ i, i + 1 < N → 1 ≤ f (i + 1) - f i) :
     ∀ i j, i < j → j < N → 1 ≤ f j - f i := by
@@ -25,27 +23,19 @@ lemma gap_of_step (f : ℕ → ℝ) (N : ℕ) (h : ∀ i, i + 1 < N → 1 ≤ f 
   | zero => omega
   | succ j ih =>
     rcases Nat.lt_succ_iff_lt_or_eq.1 hij with h' | h'
-    · have h1 := h j (by omega)
-      have h2 := ih h' (by omega)
-      linarith
+    · linarith [h j (by omega), ih h' (by omega)]
     · subst h'; exact h i hjN
 
 lemma vandN_pos (x : ℕ → ℝ) (N : ℕ) (h : ∀ i j, i < j → j < N → x j < x i) : 0 < vandN x N := by
   unfold vandN
-  apply prod_pos
-  intro i hi
-  apply prod_pos
-  intro j hj
+  refine Finset.prod_pos fun i hi => Finset.prod_pos fun j hj => ?_
   rw [mem_range] at hi
   rw [mem_Ico] at hj
   exact sub_pos.2 (h i j (by omega) (by omega))
 
 lemma vandN_congr (x y : ℕ → ℝ) (N : ℕ) (h : ∀ i, i < N → x i = y i) : vandN x N = vandN y N := by
   unfold vandN
-  apply prod_congr rfl
-  intro i hi
-  apply prod_congr rfl
-  intro j hj
+  refine Finset.prod_congr rfl fun i hi => Finset.prod_congr rfl fun j hj => ?_
   rw [mem_range] at hi
   rw [mem_Ico] at hj
   rw [h i hi, h j (by omega)]
@@ -54,8 +44,7 @@ lemma vandN_succ_right (x : ℕ → ℝ) (N : ℕ) :
     vandN x (N + 1) = vandN x N * ∏ i ∈ range N, (x i - x N) := by
   unfold vandN
   rw [prod_range_succ, Ico_self, prod_empty, mul_one, ← prod_mul_distrib]
-  apply prod_congr rfl
-  intro i hi
+  refine Finset.prod_congr rfl fun i hi => ?_
   rw [mem_range] at hi
   rw [prod_Ico_succ_top (by omega : i + 1 ≤ N)]
 
@@ -64,8 +53,7 @@ lemma vandN_succ_left (x : ℕ → ℝ) (N : ℕ) :
   unfold vandN
   rw [prod_range_succ', mul_comm, zero_add]
   congr 1
-  apply prod_congr rfl
-  intro i _
+  refine Finset.prod_congr rfl fun i _ => ?_
   rw [← prod_Ico_add' (fun j => x (i + 1) - x j) (i + 1) N 1]
 
 private lemma vandN_mul_prod_pow_le_vandN_rowPar (k M : ℕ) (v b : ℕ → ℝ)

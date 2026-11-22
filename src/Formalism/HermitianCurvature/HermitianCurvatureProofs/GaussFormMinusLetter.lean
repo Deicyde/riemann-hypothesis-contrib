@@ -42,9 +42,8 @@ end Mon
 
 theorem star_inv {R : Type} [Ring R] [StarRing R] {a b a' b' : R} (h1 : a * b = 1) (h : star a = a')
     (h2 : a' * b' = 1) : star b = b' := by
-  have e : star b * a' = 1 := by rw [← h, ← star_mul, h1, star_one]
   calc star b = star b * (a' * b') := by rw [h2, mul_one]
-    _ = b' := by rw [← mul_assoc, e, one_mul]
+    _ = b' := by rw [← mul_assoc, ← h, ← star_mul, h1, star_one, one_mul]
 
 section Slots
 
@@ -74,34 +73,28 @@ theorem free_io (c : S) (x : A) : FreeOf c (io x : SlopeTestRemainingChoices S A
   split_ifs <;> simp
 
 theorem free_one (c : S) : FreeOf c (1 : SlopeTestRemainingChoices S A) := by
-  unfold Formalism.FourierDecayAlt.Wd.FreeOf
-  intro i j
-  exact Commute.one_right _
+  unfold FreeOf
+  exact fun i j => Commute.one_right _
 
 theorem free_zero (c : S) : FreeOf c (0 : SlopeTestRemainingChoices S A) := by
-  unfold Formalism.FourierDecayAlt.Wd.FreeOf
-  intro i j
-  exact Commute.zero_right _
+  unfold FreeOf
+  exact fun i j => Commute.zero_right _
 
 theorem free_mul {c : S} {b b' : SlopeTestRemainingChoices S A} (h : FreeOf c b) (h' : FreeOf c b') : FreeOf c (b * b') := by
-  unfold Formalism.FourierDecayAlt.Wd.FreeOf at h h' ⊢
-  intro i j
-  exact (h i j).mul_right (h' i j)
+  unfold FreeOf at h h' ⊢
+  exact fun i j => (h i j).mul_right (h' i j)
 
 theorem free_add {c : S} {b b' : SlopeTestRemainingChoices S A} (h : FreeOf c b) (h' : FreeOf c b') : FreeOf c (b + b') := by
-  unfold Formalism.FourierDecayAlt.Wd.FreeOf at h h' ⊢
-  intro i j
-  exact (h i j).add_right (h' i j)
+  unfold FreeOf at h h' ⊢
+  exact fun i j => (h i j).add_right (h' i j)
 
 theorem free_pow {c : S} {b : SlopeTestRemainingChoices S A} (h : FreeOf c b) (n : ℕ) : FreeOf c (b ^ n) := by
-  unfold Formalism.FourierDecayAlt.Wd.FreeOf at h ⊢
-  intro i j
-  exact (h i j).pow_right n
+  unfold FreeOf at h ⊢
+  exact fun i j => (h i j).pow_right n
 
 theorem free_smul [Algebra ℂ A] {c : S} {b : SlopeTestRemainingChoices S A} (k : ℂ) (h : FreeOf c b) : FreeOf c (k • b) := by
-  unfold Formalism.FourierDecayAlt.Wd.FreeOf at h ⊢
-  intro i j
-  exact (h i j).smul_right k
+  unfold FreeOf at h ⊢
+  exact fun i j => (h i j).smul_right k
 
 theorem free_star [StarRing A] {c : S} {b : SlopeTestRemainingChoices S A} (h : FreeOf c b) : FreeOf c (star b) := by
   unfold Formalism.FourierDecayAlt.Wd.FreeOf at h ⊢
@@ -167,8 +160,7 @@ theorem mGGi (L : LevelData A r) : L.GGi ∈ zfns L := by
   simp [Formalism.FourierDecayAlt.Fr.zfns]
 
 theorem star_ζb {L : LevelData A r} (h : IsStarLevel L) : star L.ζb = L.ζ := by
-  obtain ⟨h1, -, -⟩ := h
-  rw [← h1, star_star]
+  rw [← h.1, star_star]
 
 theorem star_GG {L : LevelData A r} (h : IsStarLevel L) : star L.GG = L.GG := by
   obtain ⟨h1, -, h3⟩ := id h
@@ -177,8 +169,7 @@ theorem star_GG {L : LevelData A r} (h : IsStarLevel L) : star L.GG = L.GG := by
 theorem star_GGi {L : LevelData A r} (h : IsStarLevel L) : star L.GGi = L.GGi := star_inv L.GG_GGi (star_GG h) L.GG_GGi
 
 theorem star_ζi {L : LevelData A r} (h : IsStarLevel L) : star L.ζi = L.ζbi := by
-  obtain ⟨h1, -, -⟩ := h
-  exact star_inv L.ζ_ζi h1 L.ζb_ζbi
+  exact star_inv L.ζ_ζi h.1 L.ζb_ζbi
 
 theorem star_ζbi {L : LevelData A r} (h : IsStarLevel L) : star L.ζbi = L.ζi := star_inv L.ζb_ζbi (star_ζb h) L.ζ_ζi
 
@@ -186,26 +177,22 @@ theorem wt_eq (L : LevelData A r) : (wt L : SlopeTestRemainingChoices S A) = io 
   simp only [Formalism.FourierDecayAlt.Fr.wt, io_mul]
 
 theorem star_wt {L : LevelData A r} (h : IsStarLevel L) : star (wt L : SlopeTestRemainingChoices S A) = wt L := by
-  obtain ⟨h1, -, -⟩ := id h
   rw [Formalism.FourierDecayAlt.Fr.wt, io_star]
   congr 1
-  rw [star_mul, star_mul, star_GGi h, star_ζb h, h1]
+  rw [star_mul, star_mul, star_GGi h, star_ζb h, h.1]
   exact ((fcomm L (mGGi L) (mζ L)).mul_right (fcomm L (mGGi L) (mζb L))).eq
 
 theorem wt_fn (L : LevelData A r) {g : A} (hg : g ∈ zfns L) : Commute (wt L : SlopeTestRemainingChoices S A) (io g) := by
-  unfold Formalism.FourierDecayAlt.Fr.wt
-  exact io_comm (((fcomm L (mζ L) hg).mul_left (fcomm L (mζb L) hg)).mul_left (fcomm L (mGGi L) hg))
+  simpa only [Formalism.FourierDecayAlt.Fr.wt] using io_comm (((fcomm L (mζ L) hg).mul_left (fcomm L (mζb L) hg)).mul_left (fcomm L (mGGi L) hg))
 
 theorem wti_wt (L : LevelData A r) : (wti L : SlopeTestRemainingChoices S A) * wt L = 1 := by
   rw [Formalism.FourierDecayAlt.Fr.wti, Formalism.FourierDecayAlt.Fr.wt, ← io_mul, ← io_one]
-  congr 1
-  exact mon3 L.ζi_ζ L.ζbi_ζb L.GG_GGi (fcomm L (mζbi L) (mζ L))
+  rw [mon3 L.ζi_ζ L.ζbi_ζb L.GG_GGi (fcomm L (mζbi L) (mζ L))]
 
 variable {L : LevelData A r} {f : FrameData S A}
 
 theorem c_wt (h : IsFrame L f) : Commute f.c (wt L) := by
-  rw [wt_eq]
-  exact ((h.c_fn _ (mζ L)).mul_right (h.c_fn _ (mζb L))).mul_right (h.c_fn _ (mGGi L))
+  simpa only [wt_eq] using ((h.c_fn _ (mζ L)).mul_right (h.c_fn _ (mζb L))).mul_right (h.c_fn _ (mGGi L))
 
 theorem star_d (hS : IsStarLevel L) (h : IsFrame L f) : star (f.d L) = f.d L := by
   rw [Formalism.FourierDecayAlt.Fr.FrameData.d, star_mul, star_pow, star_wt hS, h.c_star]

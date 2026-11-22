@@ -167,13 +167,11 @@ theorem UpperTheory.Reformulated.B.placeRankTwoOne.aux3 :
                                 (instDecidableEqFin n))))))))))
               g h) := by
   intro n ε g h hg hh
-  have hg' : g.val.conjTranspose * Jm ε * g.val = Jm ε := hg
-  have hh' : h.val.conjTranspose * Jm ε * h.val = Jm ε := hh
   change (g.val * h.val).conjTranspose * Jm ε * (g.val * h.val) = Jm ε
   calc (g.val * h.val).conjTranspose * Jm ε * (g.val * h.val)
       = h.val.conjTranspose * (g.val.conjTranspose * Jm ε * g.val) * h.val := by
         simp only [Matrix.conjTranspose_mul, mul_assoc]
-    _ = Jm ε := by rw [hg', hh']
+    _ = Jm ε := by rw [show g.val.conjTranspose * Jm ε * g.val = Jm ε from hg, show h.val.conjTranspose * Jm ε * h.val = Jm ε from hh]
 
 theorem UpperTheory.Reformulated.B.placeRankTwoOne.aux4 :
     ∀ {n : Nat} (ε : Fin n → Bool),
@@ -276,7 +274,6 @@ theorem UpperTheory.Reformulated.B.placeRankTwoOne.aux4 :
                                 (instDecidableEqFin n)))))))))))))
         (@UpperTheory.Reformulated.B.placeRankTwoOne.Jm n ε) := by
   intro n ε
-  change (1 : Matrix (Fin n) (Fin n) ℂ).conjTranspose * Jm ε * 1 = Jm ε
   simp
 
 theorem UpperTheory.Reformulated.B.placeRankTwoOne.aux5 :
@@ -363,10 +360,9 @@ theorem UpperTheory.Reformulated.B.placeRankTwoOne.aux5 :
                         (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))))))
             g) := by
   intro n ε g hg
-  have hg' : g.val.conjTranspose * Jm ε * g.val = Jm ε := hg
   change (g⁻¹).val.conjTranspose * Jm ε * (g⁻¹).val = Jm ε
   calc (g⁻¹).val.conjTranspose * Jm ε * (g⁻¹).val
-      = (g⁻¹).val.conjTranspose * (g.val.conjTranspose * Jm ε * g.val) * (g⁻¹).val := by rw [hg']
+      = (g⁻¹).val.conjTranspose * (g.val.conjTranspose * Jm ε * g.val) * (g⁻¹).val := by rw [show g.val.conjTranspose * Jm ε * g.val = Jm ε from hg]
     _ = (g.val * (g⁻¹).val).conjTranspose * Jm ε * (g.val * (g⁻¹).val) := by
         simp only [Matrix.conjTranspose_mul, mul_assoc]
     _ = Jm ε := by rw [Units.mul_inv]; simp
@@ -634,28 +630,24 @@ open Matrix
 private theorem UpperTheory.Reformulated.B.placeRankTwoOne.Jm_sq {n : ℕ} (ε : Fin n → Bool) : Jm ε * Jm ε = 1 := by
   unfold Jm
   rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-  congr 1
-  funext a
-  split_ifs <;> simp
+  ext a b
+  by_cases h : ε a = true <;> simp [Matrix.diagonal, h]
 
 private theorem UpperTheory.Reformulated.B.placeRankTwoOne.normSq_det {n : ℕ} {ε : Fin n → Bool}
     {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) : Complex.normSq g.det = 1 := by
   have hJ : (Jm ε).det ≠ 0 := fun h => by
-    have := congrArg Matrix.det (Jm_sq ε)
-    simp [h] at this
+    simpa [h] using congrArg Matrix.det (Jm_sq ε)
   have h := congrArg Matrix.det (show gᴴ * Jm ε * g = Jm ε from hg)
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, mul_right_comm,
     mul_eq_right₀ hJ] at h
-  have h2 := Complex.normSq_eq_conj_mul_self (z := g.det)
-  exact_mod_cast h2.trans h
+  exact_mod_cast (Complex.normSq_eq_conj_mul_self (z := g.det)).trans h
 
 private theorem UpperTheory.Reformulated.B.placeRankTwoOne.norm_inv_entry {n : ℕ} {ε : Fin n → Bool}
     {g : (Matrix (Fin n) (Fin n) ℂ)ˣ} (hg : inUJ ε g.val) (i j : Fin n) :
     ‖(g⁻¹).val i j‖ = ‖g.val j i‖ := by
   have h : (g⁻¹).val = Jm ε * g.valᴴ * Jm ε := by
     apply Units.inv_eq_of_mul_eq_one_left
-    have h0 : g.valᴴ * Jm ε * g.val = Jm ε := hg
-    rw [mul_assoc (Jm ε), mul_assoc (Jm ε), h0, Jm_sq]
+    rw [mul_assoc (Jm ε), mul_assoc (Jm ε), hg, Jm_sq]
   rw [h]
   unfold Jm
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul]
@@ -919,8 +911,7 @@ private theorem UpperTheory.Reformulated.B.placeRankTwoOne.act_mul {n : ℕ} (g 
   simp [act, Matrix.mulVec_mulVec]
 
 private theorem UpperTheory.Reformulated.B.placeRankTwoOne.act_one {n : ℕ} (x : Fin n → Fin n → ℂ) : act 1 x = x := by
-  funext j
-  simp [act]
+  exact funext (fun j => Matrix.one_mulVec (x j))
 
 private theorem UpperTheory.Reformulated.B.placeRankTwoOne.act_sub {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ)
     (x y : Fin n → Fin n → ℂ) : act g (x - y) = act g x - act g y := by
@@ -946,11 +937,9 @@ private theorem UpperTheory.Reformulated.B.placeRankTwoOne.vol_act {n : ℕ} (g 
   let f : (Fin n → Fin n → ℂ) →ₗ[ℝ] (Fin n → Fin n → ℂ) :=
     LinearMap.pi fun j => ((Matrix.toLin' g).restrictScalars ℝ).comp (LinearMap.proj j)
   have hf : LinearMap.det f = 1 := by
-    simp only [f]
-    rw [LinearMap.det_pi]
-    simp [LinearMap.det_restrictScalars, Algebra.norm_complex_apply, hg]
-  have : act g = f := rfl
-  rw [this, Measure.addHaar_preimage_linearMap _ (by rw [hf]; exact one_ne_zero), hf]
+    simp [f, LinearMap.det_pi, LinearMap.det_restrictScalars,
+      Algebra.norm_complex_apply, hg]
+  rw [show act g = f from rfl, Measure.addHaar_preimage_linearMap _ (by rw [hf]; exact one_ne_zero), hf]
   simp
 
 private theorem UpperTheory.Reformulated.B.placeRankTwoOne.entry_le {n : ℕ} (h : Matrix (Fin n) (Fin n) ℂ)
@@ -959,19 +948,16 @@ private theorem UpperTheory.Reformulated.B.placeRankTwoOne.entry_le {n : ℕ} (h
     (hw : ‖act h v‖ ≤ 2) (i j : Fin n) : ‖h i j‖ ≤ 4 := by
   set e : Fin n → Fin n → ℂ := fun j : Fin n => (Pi.single j 1 : Fin n → ℂ) with he
   have h1 : ∀ i j, ‖h i j‖ ≤ ‖act h e‖ := fun i j => by
-    have : h i j = act h e j i := by simp [act, he]
-    rw [this]
+    rw [show h i j = act h e j i by simp [act, he]]
     exact (norm_le_pi_norm _ i).trans (norm_le_pi_norm _ j)
   have h2 := norm_act_le h (norm_nonneg _) h1 (e - v)
   rw [act_sub] at h2
-  have h3 : ‖e - v‖ < 1 / (2 * n + 2) := by rwa [mem_ball_iff_norm'] at hv
   have h4 : (n : ℝ) * ‖e - v‖ ≤ 1 / 2 := by
-    rw [lt_div_iff₀ (by positivity)] at h3
+    rw [mem_ball_iff_norm'] at hv
+    rw [lt_div_iff₀ (by positivity)] at hv
     nlinarith [norm_nonneg (e - v)]
-  have h5 := norm_sub_norm_le (act h e) (act h v)
-  have h6 := mul_le_mul_of_nonneg_left h4 (norm_nonneg (act h e))
-  have := h1 i j
-  nlinarith
+  nlinarith [norm_sub_norm_le (act h e) (act h v),
+    mul_le_mul_of_nonneg_left h4 (norm_nonneg (act h e)), h1 i j]
 
 private theorem UpperTheory.Reformulated.B.placeRankTwoOne.norm_le_two {n : ℕ} (v : Fin n → Fin n → ℂ)
     (hv : v ∈ Metric.ball (fun j : Fin n => (Pi.single j 1 : Fin n → ℂ)) (1 / (2 * n + 2))) :
@@ -982,10 +968,8 @@ private theorem UpperTheory.Reformulated.B.placeRankTwoOne.norm_le_two {n : ℕ}
   have h3 : ‖v - e‖ < 1 / (2 * n + 2) := by rwa [mem_ball_iff_norm] at hv
   have h4 : (1 : ℝ) / (2 * n + 2) ≤ 1 := by
     rw [div_le_one (by positivity)]
-    have : (0 : ℝ) ≤ n := by positivity
-    linarith
-  have h5 := norm_sub_norm_le v e
-  linarith
+    nlinarith [show (0 : ℝ) ≤ n by positivity]
+  nlinarith [norm_sub_norm_le v e]
 
 end Helpers
 

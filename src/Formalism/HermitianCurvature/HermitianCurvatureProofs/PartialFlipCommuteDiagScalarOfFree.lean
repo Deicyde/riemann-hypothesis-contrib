@@ -174,16 +174,14 @@ theorem ins_twine {a : S} {M M' : M2 (SlopeTestRemainingChoices S A)} {x : Slope
 
 theorem twine_entries {M M' : M2 (SlopeTestRemainingChoices S A)} {x : SlopeTestRemainingChoices S A} {c : K}
     (h : M * d0 x = c • (d0 x * M')) (i j : Fin 2) : M i j * x = c • (x * M' i j) := by
-  have e := congrFun (congrFun h i) j
-  rwa [mul_diagScalar_apply, Matrix.smul_apply, diagScalar_mul_apply] at e
+  simpa only [mul_diagScalar_apply, Matrix.smul_apply, diagScalar_mul_apply] using congrFun (congrFun h i) j
 
 theorem J_conj : (YangianSpanCharacter.T.J (SlopeTestRemainingChoices S A))ᴴ = (YangianSpanCharacter.T.J (SlopeTestRemainingChoices S A))ᵀ := by
   refine Matrix.ext fun i j => ?_
   fin_cases i <;> fin_cases j <;> simp [YangianSpanCharacter.T.J]
 
 theorem Jt_conj : ((YangianSpanCharacter.T.J (SlopeTestRemainingChoices S A))ᵀ)ᴴ = YangianSpanCharacter.T.J (SlopeTestRemainingChoices S A) := by
-  refine Matrix.ext fun i j => ?_
-  fin_cases i <;> fin_cases j <;> simp [YangianSpanCharacter.T.J]
+  rw [← J_conj, Matrix.conjTranspose_conjTranspose]
 
 theorem J_entry_comm (x : SlopeTestRemainingChoices S A) (i j : Fin 2) : Commute x (YangianSpanCharacter.T.J (SlopeTestRemainingChoices S A) i j) := by
   fin_cases i <;> fin_cases j <;> simp [YangianSpanCharacter.T.J]
@@ -191,10 +189,8 @@ theorem J_entry_comm (x : SlopeTestRemainingChoices S A) (i j : Fin 2) : Commute
 theorem good_cons {l : Letter K S} {W : List (Letter K S)} (h : Good (l :: W)) :
     Good W ∧ l.intersection_update_fsHerm_neg_one ∉ W.map Letter.intersection_update_fsHerm_neg_one ∧ star l.pt = l.pt ∧ Reg W l.pt := by
   obtain ⟨h1, h2, h3⟩ := h
-  rw [List.map_cons, List.nodup_cons] at h1
-  rw [List.pairwise_cons] at h3
-  exact ⟨⟨h1.2, fun l' hl' => h2 l' (List.mem_cons_of_mem _ hl'), h3.2⟩, h1.1,
-    h2 l List.mem_cons_self, h3.1⟩
+  simp only [List.map_cons, List.nodup_cons, List.pairwise_cons] at h1 h3
+  exact ⟨⟨h1.2, fun l' hl' => h2 l' (List.mem_cons_of_mem _ hl'), h3.2⟩, h1.1, h2 l List.mem_cons_self, h3.1⟩
 
 theorem reg_cons {l : Letter K S} {W : List (Letter K S)} {Y : K} (h : Reg (l :: W) Y) :
     RegL l Y ∧ Reg W Y :=

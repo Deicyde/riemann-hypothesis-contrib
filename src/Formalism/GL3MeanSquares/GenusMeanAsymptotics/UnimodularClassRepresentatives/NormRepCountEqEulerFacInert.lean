@@ -34,16 +34,14 @@ theorem cast_geom (c : ℕ → ℕ) (q N : ℕ) (X : ℝ) (h : ∀ k, 1 ≤ k �
 theorem inert_alg (q : ℝ) (hq : q ≠ 0) (M : ℕ) (hM : 1 ≤ M) :
     q ^ (M - 1) * (q ^ M - (-1) ^ M) = q ^ (2 * M - 1) * (1 - (-1 : ℝ) ^ M * q ^ (-(M : ℤ))) := by
   obtain ⟨j, rfl⟩ : ∃ j, M = j + 1 := ⟨M - 1, by omega⟩
-  rw [show 2 * (j + 1) - 1 = 2 * j + 1 by omega, Nat.add_sub_cancel, zpow_neg]
-  rw [show ((j + 1 : ℕ) : ℤ) = ((j + 1 : ℕ) : ℤ) from rfl, zpow_natCast]
+  rw [show 2 * (j + 1) - 1 = 2 * j + 1 by omega, Nat.add_sub_cancel, zpow_neg, zpow_natCast]
   field_simp
   ring
 
 theorem split_alg (q : ℝ) (hq : q ≠ 0) (M : ℕ) (hM : 1 ≤ M) :
     q ^ (2 * M - 1) - q ^ (M - 1) = q ^ (2 * M - 1) * (1 - q ^ (-(M : ℤ))) := by
   obtain ⟨j, rfl⟩ : ∃ j, M = j + 1 := ⟨M - 1, by omega⟩
-  rw [show 2 * (j + 1) - 1 = 2 * j + 1 by omega, Nat.add_sub_cancel, zpow_neg]
-  rw [show ((j + 1 : ℕ) : ℤ) = ((j + 1 : ℕ) : ℤ) from rfl, zpow_natCast]
+  rw [show 2 * (j + 1) - 1 = 2 * j + 1 by omega, Nat.add_sub_cancel, zpow_neg, zpow_natCast]
   field_simp
   ring
 
@@ -108,19 +106,8 @@ theorem normRepCount_eq_eulerFac_split (hK : Formalism.HermitianLatticesTheory.I
         (Formalism.HermitianLatticesTheory.eulerFac K M P * Formalism.HermitianLatticesTheory.eulerFac K M (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P))⁻¹ := by
   have hc' : Formalism.HermitianLatticesTheory.conjIdeal (K := K) (Formalism.HermitianLatticesTheory.conjIdeal (K := K) P) ≠ Formalism.HermitianLatticesTheory.conjIdeal (K := K) P :=
     fun h => hc ((conjIdeal_conjIdeal hK P).symm.trans h).symm
-  have hPbot : P ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hP (RingOfIntegers.not_isField K)
-  have hN0 : Ideal.absNorm P ≠ 0 := by
-    rw [Ne, Ideal.absNorm_eq_zero_iff]
-    exact hPbot
-  have hN1 : Ideal.absNorm P ≠ 1 := by
-    rw [Ne, Ideal.absNorm_eq_one_iff]
-    exact hP.ne_top
-  have hN2 : (1 : ℝ) < (Ideal.absNorm P : ℝ) := by
-    have : 2 ≤ Ideal.absNorm P := by omega
-    exact_mod_cast (by omega : 1 < Ideal.absNorm P)
-  have hx : 0 < 1 - (Ideal.absNorm P : ℝ) ^ (-(M : ℤ)) := by
-    rw [zpow_neg, zpow_natCast, sub_pos]
-    exact inv_lt_one_of_one_lt₀ (one_lt_pow₀ hN2 (by omega))
+  have hx : 0 < 1 - (Ideal.absNorm P : ℝ) ^ (-(M : ℤ)) :=
+    sub_pos.mpr (IdealNormInequalities.zpow_neg_lt_one (IdealNormInequalities.one_lt_absNorm hP) hM)
   rw [(localDensity K hK P hP M k hM hk n hn hnP).2 hc, Formalism.HermitianLatticesTheory.eulerFac, Formalism.HermitianLatticesTheory.eulerFac, if_neg hc,
     if_neg hc', absNorm_conjIdeal hK, ← Real.rpow_add hx,
     show (-(1 : ℝ) / 2 + -(1 : ℝ) / 2) = -1 by norm_num, Real.rpow_neg_one, inv_inv]
